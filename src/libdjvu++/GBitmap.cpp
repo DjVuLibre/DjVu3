@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GBitmap.cpp,v 1.12 1999-06-08 20:36:24 leonb Exp $
+//C- $Id: GBitmap.cpp,v 1.13 1999-09-20 13:47:46 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -24,7 +24,7 @@
 #include "Arrays.h"
 
 
-// File "$Id: GBitmap.cpp,v 1.12 1999-06-08 20:36:24 leonb Exp $"
+// File "$Id: GBitmap.cpp,v 1.13 1999-09-20 13:47:46 leonb Exp $"
 // - Author: Leon Bottou, 05/1997
 
 // ----- constructor and destructor
@@ -282,8 +282,11 @@ GBitmap::compress()
     return;
   delete [] rle;
   delete [] rlerows;
+  rle = 0;
   rlerows = 0;
   rlelength = encode(&rle);
+  if (! rlelength)
+    return;
   delete [] bytes_data;
   bytes = bytes_data = 0;
 }
@@ -818,6 +821,8 @@ void
 GBitmap::save_rle(ByteStream &bs)
 {
   // checks
+  if (ncolumns==0 || nrows==0)
+    THROW("Uninitialized bitmap");
   if (grays > 2)
     THROW("Cannot make PBM file with a gray level bitmap");
   // header
@@ -831,7 +836,7 @@ GBitmap::save_rle(ByteStream &bs)
     }
   else
     {
-      unsigned char *runs;
+      unsigned char *runs = 0;
       int size = encode(&runs);
       bs.writall((void*)runs, size);
       delete [] runs;
@@ -982,8 +987,9 @@ int
 GBitmap::encode(unsigned char **pruns) const
 {
   // uncompress rle information
+  *pruns = 0;
   if (nrows==0 || ncolumns==0)
-    THROW("Uninitialized bitmap");
+    return 0;
   if (!bytes)
     {
       unsigned char *runs = new unsigned char[rlelength];
