@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GContainer.h,v 1.15 1999-08-13 00:25:12 leonb Exp $
+//C- $Id: GContainer.h,v 1.16 1999-08-17 21:28:39 leonb Exp $
 
 
 #ifndef _GCONTAINER_H_
@@ -26,7 +26,8 @@
 #include "GSmartPointer.h"
 
 #define GCONTAINER_OLD_ITERATORS
-#define STUPID_CPLUSPLUS
+#define GCONTAINER_BOUNDS_CHECK
+
 
 /** @name GContainer.h
 
@@ -45,7 +46,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@research.att.com> -- bug fixes.
     @version 
-    #$Id: GContainer.h,v 1.15 1999-08-13 00:25:12 leonb Exp $# */
+    #$Id: GContainer.h,v 1.16 1999-08-17 21:28:39 leonb Exp $# */
 //@{
 
 
@@ -260,18 +261,22 @@ public:
       "#a[n]=v#") an array element.  This operation will not extend the valid
       subscript range: an exception \Ref{GException} is thrown if argument #n#
       is not in the valid subscript range. */
-  TYPE& operator[](int n)
-    { if (n<lobound || n>hibound) throw_illegal_subscript(); 
-      return ((TYPE*)data)[n-minlo]; }
+  TYPE& operator[](int n) {
+#ifdef GCONTAINER_BOUNDS_CHECK
+    if (n<lobound || n>hibound) throw_illegal_subscript(); 
+#endif
+    return ((TYPE*)data)[n-minlo]; }
   /** Returns a constant reference to the array element for subscript #n#.
       This reference can only be used for reading (as "#a[n]#") an array
       element.  This operation will not extend the valid subscript range: an
       exception \Ref{GException} is thrown if argument #n# is not in the valid
       subscript range.  This variant of #operator[]# is necessary when dealing
       with a #const GArray<TYPE>#. */
-  const TYPE& operator[](int n) const
-    { if (n<lobound || n>hibound) throw_illegal_subscript(); 
-      return ((const TYPE*)data)[n-minlo]; }
+  const TYPE& operator[](int n) const {
+#ifdef GCONTAINER_BOUNDS_CHECK
+    if (n<lobound || n>hibound) throw_illegal_subscript(); 
+#endif
+    return ((const TYPE*)data)[n-minlo]; }
   // -- CONVERSION
   /** Returns a pointer for reading or writing the array elements.  This
       pointer can be used to access the array elements with the same
@@ -306,7 +311,7 @@ public:
        int lineno=1;
        GArray<GString> a;
        while (! end_of_file()) { 
-         a.touch[lineno]; 
+         a.touch(lineno); 
 	 a[lineno++] = read_a_line(); 
        }
       \end{verbatim} */
@@ -467,11 +472,11 @@ class GPArray : public GArrayTemplate<GP<TYPE> >
 {
 public:
   GPArray() 
-    : GArrayTemplate<GP<TYPE> >(GCont::NormTraits<GP<TYPE> >::traits() ) { } ;
+    : GArrayTemplate<GP<TYPE> >(GCont::NormTraits<GPBase>::traits() ) { } ;
   GPArray(int hi) 
-    : GArrayTemplate<GP<TYPE> >(GCont::NormTraits<GP<TYPE> >::traits(), 0, hi ) { } ;
+    : GArrayTemplate<GP<TYPE> >(GCont::NormTraits<GPBase>::traits(), 0, hi ) { } ;
   GPArray(int lo, int hi) 
-    : GArrayTemplate<GP<TYPE> >(GCont::NormTraits<GP<TYPE> >::traits(), lo, hi ) { } ;
+    : GArrayTemplate<GP<TYPE> >(GCont::NormTraits<GPBase>::traits(), lo, hi ) { } ;
 };
 
 /** Dynamic array for simple types.  
@@ -526,15 +531,15 @@ public:
     this class should be used to iterate over the objects contained
     in a list or a map:
     \begin{verbatim}
-    void print_list(GList<GString> l)
+    void print_list(GList<GString> a)
     {
       for (GPosition i = a; ; i; ++i) 
-        printf("%s\n", (const char*)l[pos]);
+        printf("%s\n", (const char*) a[i] );
     }
-    void print_list_backwards(GList<GString> l)
+    void print_list_backwards(GList<GString> a)
     {
       for (GPosition i = a.lastpos(); ; i; --i) 
-        printf("%s\n", (const char*)l[pos]);
+        printf("%s\n", (const char*) a[i] );
     }
     \end{verbatim}
     A #GPosition# object remains meaningful as long as you do not modify the
@@ -560,10 +565,17 @@ public:
   // Internal use
   GPosition(Node *p, void *c) 
     : ptr(p), cont(c) { } ;
+#ifdef GCONTAINER_BOUNDS_CHECK
   Node *check(void *c) 
     { if (!ptr || c!=cont) throw_invalid(c); return ptr; } ;
   const Node *check(void *c) const
     { if (!ptr || c!=cont) throw_invalid(c); return ptr; } ;
+#else
+  Node *check(void *c) 
+    { return ptr; } ;
+  const Node *check(void *c) const
+    { return ptr; } ;
+#endif
 protected:
   Node *ptr;
   void *cont;
@@ -894,6 +906,7 @@ GSetImpl<K>::get(const K &key) const
   return 0;
 }
 
+#ifdef GCONTAINER_BOUNDS_CHECK
 template<class K> GCont::HNode *
 GSetImpl<K>::get_or_throw(const K &key) const
 { 
@@ -901,6 +914,13 @@ GSetImpl<K>::get_or_throw(const K &key) const
   if (!m) throw_cannot_add();
   return m;
 }
+#else
+template<class K> inline GCont::HNode *
+GSetImpl<K>::get_or_throw(const K &key) const
+{ 
+  return get(key);
+}
+#endif
 
 template<class K> GCont::HNode *
 GSetImpl<K>::get_or_create(const K &key)
