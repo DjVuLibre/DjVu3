@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GMapAreas.h,v 1.3 1999-10-04 20:34:49 eaf Exp $
+//C- $Id: GMapAreas.h,v 1.4 1999-10-04 22:22:44 eaf Exp $
 
 #ifndef _GMAPAREAS_H
 #define _GMAPAREAS_H
@@ -41,7 +41,7 @@
     @memo Definition of base map area classes
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: GMapAreas.h,v 1.3 1999-10-04 20:34:49 eaf Exp $# */
+    #$Id: GMapAreas.h,v 1.4 1999-10-04 22:22:44 eaf Exp $# */
 //@{
 
 /****************************************************************************
@@ -177,6 +177,8 @@ public:
 
       /// Virtual function returning the shape name.
    virtual GString	get_shape_name(void) const=0;
+      /// Virtual function generating a copy of this object
+   virtual GP<GMapArea>	get_copy(void) const=0;
 protected:
    virtual int		gma_get_xmin(void)=0;
    virtual int		gma_get_ymin(void)=0;
@@ -230,6 +232,8 @@ public:
 
       /// Returns #"rect"#
    virtual GString	get_shape_name(void) const;
+      /// Returns a copy of the rectangle
+   virtual GP<GMapArea>	get_copy(void) const;
 protected:
    int		xmin, ymin, xmax, ymax;
    virtual int		gma_get_xmin(void);
@@ -290,6 +294,9 @@ GMapRect::gma_is_point_inside(int x, int y)
 inline GString
 GMapRect::get_shape_name(void) const { return "rect"; }
 
+inline GP<GMapArea>
+GMapRect::get_copy(void) const { return new GMapRect(*this); }
+
 /****************************************************************************
 **************************** GMapPoly declaration ***************************
 ****************************************************************************/
@@ -328,6 +335,8 @@ public:
 
       /// Returns #"poly"# all the time
    virtual GString	get_shape_name(void) const;
+      /// Returns a copy of the polygon
+   virtual GP<GMapArea>	get_copy(void) const;
 protected:
    virtual int		gma_get_xmin(void);
    virtual int		gma_get_ymin(void);
@@ -381,6 +390,9 @@ GMapPoly::move_vertex(int i, int x, int y)
 inline GString
 GMapPoly::get_shape_name(void) const { return "poly"; }
 
+inline GP<GMapArea>
+GMapPoly::get_copy(void) const { return new GMapPoly(*this); }
+
 /****************************************************************************
 **************************** GMapOval declaration ***************************
 ****************************************************************************/
@@ -407,6 +419,8 @@ public:
 
       /// Returns #"oval"#
    virtual GString	get_shape_name(void) const;
+      /// Returns a copy of the oval
+   virtual GP<GMapArea>	get_copy(void) const;
 protected:
    virtual int		gma_get_xmin(void);
    virtual int		gma_get_ymin(void);
@@ -466,6 +480,9 @@ GMapOval::gma_move(int dx, int dy)
 
 inline GString
 GMapOval::get_shape_name(void) const { return "oval"; }
+
+inline GP<GMapArea>
+GMapOval::get_copy(void) const { return new GMapOval(*this); }
 
 //@}
 
