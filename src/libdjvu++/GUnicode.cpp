@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GUnicode.cpp,v 1.21 2001-06-05 03:19:58 bcr Exp $
+// $Id: GUnicode.cpp,v 1.22 2001-06-12 19:38:31 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -366,7 +366,7 @@ GStringRep::Unicode::create(
           (eptr<xeptr)&&(w=*(unsigned short const *)eptr);
           eptr+=sizeof(unsigned short))
         {
-          maxutf8size+=(w>0x7f)?3:1;
+          maxutf8size+=3;
         }
         break;
       }
@@ -561,10 +561,10 @@ static unsigned long
 UTF16LEtoUCS4(unsigned char const *&s,void const * const eptr)
 {
   unsigned long U=0;
-  unsigned long const C1MSB=s[1];
   unsigned char const * const r=s+2;
   if(r <= eptr)
   {
+    unsigned long const C1MSB=s[1];
     if((C1MSB<0xD8)||(C1MSB>0xDF))
     {
       if((U=((C1MSB<<8)|((unsigned long)s[0]))))

@@ -1,7 +1,7 @@
 //C-  Copyright © 2000-2001, LizardTech, Inc. All Rights Reserved.
 //C-              Unauthorized use prohibited.
 //
-// $Id: UnicodeByteStream.cpp,v 1.11 2001-06-05 15:54:56 fcrary Exp $
+// $Id: UnicodeByteStream.cpp,v 1.12 2001-06-12 19:38:31 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -61,32 +61,8 @@ UnicodeByteStream::read(void *buf, size_t size)
   const int retval=bs->read(buf,size);
   if(retval)
   {
-    void *bufend=memchr(buf,0,retval);
-    if(! bufend)
-    {
-      buffer=GUTF8String::create(
-        (unsigned char const *)buf,retval,buffer.get_remainder());
-    }else
-    {
-      int len=(size_t)bufend-(size_t)buf; 
-      GUTF8String e(GUTF8String::create(buf,len,buffer.get_remainder())+"&#0;");
-      void *bufstart=(char *)bufend+1;
-      int left=retval-len-1;
-      for(;left>0;left-=len+1,bufstart=(char *)bufend+1)
-      {
-        bufend=memchr((bufstart=(char *)bufend+1),0,left);
-        if(!bufend)
-          break; 
-        len=(size_t)bufend-(size_t)buf; 
-        e+=GUTF8String::create(bufstart,len,buffer.get_remainder())+"&#0;";
-      }
-      if(left)
-      {
-        e+=GUTF8String::create(bufstart,left,buffer.get_remainder());
-      }
-      buffer=GUTF8String::create(
-        (unsigned char const *)(const char *)e,e.length(),buffer.get_remainder());
-    }
+    buffer=GUTF8String::create(
+      (unsigned char const *)buf,retval,buffer.get_remainder());
   }else
   {
     buffer=GUTF8String::create(0,0,buffer.get_remainder());
