@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: ByteStream.cpp,v 1.36 2000-11-13 19:22:05 mrosen Exp $
+// $Id: ByteStream.cpp,v 1.38 2001-01-03 19:39:09 bcr Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 04/1997
@@ -429,19 +429,19 @@ StdioByteStream::seek(long offset, int whence, bool nothrow)
 ///////// MEMORYBYTESTREAM
 
 MemoryByteStream::MemoryByteStream()
-  : where(0), bsize(0), nblocks(0), blocks(0)
+  : where(0), bsize(0), nblocks(0), gblocks(blocks,0)
 {
 }
 
 MemoryByteStream::MemoryByteStream(const void *buffer, size_t sz)
-  : where(0), bsize(0), nblocks(0), blocks(0)
+  : where(0), bsize(0), nblocks(0), gblocks(blocks,0)
 {
   MemoryByteStream::write(buffer, sz);
   where = 0;
 }
 
 MemoryByteStream::MemoryByteStream(const char *buffer)
-  : where(0), bsize(0), nblocks(0), blocks(0)
+  : where(0), bsize(0), nblocks(0), gblocks(blocks,0)
 {
   MemoryByteStream::write(buffer, strlen(buffer));
   where = 0;
@@ -451,12 +451,13 @@ void
 MemoryByteStream::empty()
 {
   for (int b=0; b<nblocks; b++)
+  {
     delete [] blocks[b];
+    blocks[b]=0;
+  }
   bsize = 0;
   where = 0;
   nblocks = 0;
-  delete [] blocks;
-  blocks = 0;
 }
 
 MemoryByteStream::~MemoryByteStream()
@@ -473,25 +474,24 @@ MemoryByteStream::write(const void *buffer, size_t sz)
   // check memory
   if ( (where+nsz) > ((bsize+0xfff)&~0xfff) )
     {
-      int b;
       // reallocate pointer array
       if ( (where+nsz) > (nblocks<<12) )
         {
-          int new_nblocks = (((where+nsz)+0xffff)&~0xffff) >> 12;
-          char **new_blocks = new char* [new_nblocks];
-          for (b=0; b<nblocks; b++) 
-            new_blocks[b] = blocks[b];
-          for (; b<new_nblocks; b++) 
-            new_blocks[b] = 0;
-           char **old_blocks = blocks;
-          blocks = new_blocks;
-          nblocks = new_nblocks;
-          delete [] old_blocks;
+          char const ** eblocks=(char const **)(blocks+nblocks);
+          nblocks = (((where+nsz)+0xffff)&~0xffff) >> 12;
+          gblocks.resize(nblocks);
+          for(char const * const * const new_eblocks=blocks+nblocks;
+            eblocks <new_eblocks; eblocks++) 
+          {
+            *eblocks = 0;
+          }
         }
       // allocate blocks
-      for (b=(where>>12); (b<<12)<(where+nsz); b++)
+      for (int b=(where>>12); (b<<12)<(where+nsz); b++)
+      {
         if (! blocks[b])
           blocks[b] = new char[0x1000];
+      }
     }
   // write data to buffer
   while (nsz > 0)

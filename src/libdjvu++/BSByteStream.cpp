@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: BSByteStream.cpp,v 1.23 2000-12-21 01:22:45 bcr Exp $
+// $Id: BSByteStream.cpp,v 1.24 2001-01-03 19:35:31 bcr Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 07/1998
@@ -937,12 +937,11 @@ BSByteStream::decode()
       blocksize = size;
       if (data)
       {
-        delete [] data; 
-        data = 0;
+        gdata.resize(0);
       }
     }
   if (! data) 
-    data = new unsigned char[blocksize];
+    gdata.resize(blocksize);
   // Decode Estimation Speed
   int fshift = 0;
   if (zp.decoder())
@@ -1090,7 +1089,7 @@ BSByteStream::decode()
 
 BSByteStream::BSByteStream(ByteStream &xbs, int encoding)
   : encoding(encoding), offset(0), bptr(0), blocksize(0), 
-    data(0), size(0), eof(0), bs(&xbs),
+    gdata(data,0), size(0), eof(0), bs(&xbs),
     zp(*bs, encoding?true:false, true)
 {
   if (encoding)
@@ -1123,8 +1122,6 @@ BSByteStream::~BSByteStream()
     encode_raw(zp, 24, 0);
 #endif
   // Free allocated memory
-  if (data)
-    delete [] data; 
 }
 
 
@@ -1215,7 +1212,7 @@ BSByteStream::write(const void *buffer, size_t sz)
       if (!data) 
         {
           bptr = 0;
-          data = new unsigned char[blocksize+OVERFLOW];
+          gdata.resize(blocksize+OVERFLOW);
         }
       // Compute remaining
       int bytes = blocksize - 1 - bptr;

@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: BSByteStream.h,v 1.20 2000-12-18 17:13:40 bcr Exp $
+// $Id: BSByteStream.h,v 1.21 2001-01-03 19:35:32 bcr Exp $
 // $Name:  $
 
 #ifndef _BSBYTESTREAM_H
@@ -116,7 +116,7 @@
     @memo
     Simple Burrows-Wheeler general purpose compressor.
     @version
-    #$Id: BSByteStream.h,v 1.20 2000-12-18 17:13:40 bcr Exp $# */
+    #$Id: BSByteStream.h,v 1.21 2001-01-03 19:35:32 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -202,6 +202,7 @@ private:
   int             bptr;
   unsigned int    blocksize;
   unsigned char  *data;
+  GPBuffer<unsigned char> gdata;
   int             size;
   int             eof;
   ByteStream	 *bs;
