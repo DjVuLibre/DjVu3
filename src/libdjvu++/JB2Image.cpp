@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: JB2Image.cpp,v 1.59 2001-07-24 17:52:04 bcr Exp $
+// $Id: JB2Image.cpp,v 1.60 2001-08-27 17:01:34 docbill Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -59,10 +59,12 @@ class JB2Dict::JB2Codec::Decode : public JB2Dict::JB2Codec
 {
 public:
   Decode(void);
-  void init(GP<ByteStream> gbs);
+  void init(const GP<ByteStream> &gbs);
 // virtual
-  void code(GP<JB2Image> jim);
-  void code(GP<JB2Dict> jim);
+  void code(const GP<JB2Image> &jim);
+  void code(JB2Image *jim) {const GP<JB2Image> gjim(jim);code(gjim);}
+  void code(const GP<JB2Dict> &jim);
+  void code(JB2Dict *jim) {const GP<JB2Dict> gjim(jim);code(gjim);}
   void set_dict_callback(JB2DecoderCallback *cb, void *arg);
 protected:
   int CodeNum(const int lo, const int hi, NumContext &ctx);
@@ -145,7 +147,7 @@ JB2Dict::get_shape(const int shapeno) const
 }
 
 void 
-JB2Dict::set_inherited_dict(GP<JB2Dict> dict)
+JB2Dict::set_inherited_dict(const GP<JB2Dict> &dict)
 {
   if (shapes.size() > 0)
     G_THROW( ERR_MSG("JB2Image.cant_set") );
@@ -191,13 +193,13 @@ JB2Dict::add_shape(const JB2Shape &shape)
 }
 
 void 
-JB2Dict::decode(GP<ByteStream> gbs, JB2DecoderCallback *cb, void *arg)
+JB2Dict::decode(const GP<ByteStream> &gbs, JB2DecoderCallback *cb, void *arg)
 {
   init();
   JB2Codec::Decode codec;
   codec.init(gbs);
   codec.set_dict_callback(cb,arg);
-  codec.code(GP<JB2Dict>(this));
+  codec.code(this);
 }
 
 
@@ -290,13 +292,13 @@ JB2Image::get_bitmap(const GRect &rect, int subsample, int align, int dispy) con
 }
 
 void 
-JB2Image::decode(GP<ByteStream> gbs, JB2DecoderCallback *cb, void *arg)
+JB2Image::decode(const GP<ByteStream> &gbs, JB2DecoderCallback *cb, void *arg)
 {
   init();
   JB2Codec::Decode codec;
   codec.init(gbs);
   codec.set_dict_callback(cb,arg);
-  codec.code(GP<JB2Image>(this));
+  codec.code(this);
 }
 
 
@@ -336,7 +338,7 @@ JB2Dict::JB2Codec::Decode::Decode(void)
 : JB2Dict::JB2Codec(0), cbfunc(0), cbarg(0) {}
 
 void
-JB2Dict::JB2Codec::Decode::init(GP<ByteStream> gbs)
+JB2Dict::JB2Codec::Decode::init(const GP<ByteStream> &gbs)
 {
   gzp=ZPCodec::create(gbs,false,true);
 }
@@ -878,7 +880,8 @@ JB2Dict::JB2Codec::Decode::code_bitmap_by_cross_coding (GBitmap &bm, GBitmap &cb
 // CODE JB2DICT RECORD
 
 void
-JB2Dict::JB2Codec::code_record(int &rectype, GP<JB2Dict> gjim, JB2Shape *xjshp)
+JB2Dict::JB2Codec::code_record(
+  int &rectype, const GP<JB2Dict> &gjim, JB2Shape *xjshp)
 {
   GP<GBitmap> cbm;
   GP<GBitmap> bm;
@@ -1008,7 +1011,7 @@ JB2Dict::JB2Codec::code_record(int &rectype, GP<JB2Dict> gjim, JB2Shape *xjshp)
 // CODE JB2DICT
 
 void 
-JB2Dict::JB2Codec::Decode::code(GP<JB2Dict> gjim)
+JB2Dict::JB2Codec::Decode::code(const GP<JB2Dict> &gjim)
 {
   if(!gjim)
   {
@@ -1035,7 +1038,8 @@ JB2Dict::JB2Codec::Decode::code(GP<JB2Dict> gjim)
 // CODE JB2IMAGE RECORD
 
 void
-JB2Dict::JB2Codec::code_record(int &rectype, GP<JB2Image> gjim, JB2Shape *xjshp, JB2Blit *jblt)
+JB2Dict::JB2Codec::code_record(
+  int &rectype, const GP<JB2Image> &gjim, JB2Shape *xjshp, JB2Blit *jblt)
 {
   GP<GBitmap> bm;
   GP<GBitmap> cbm;
@@ -1286,7 +1290,7 @@ JB2Dict::JB2Codec::code_record(int &rectype, GP<JB2Image> gjim, JB2Shape *xjshp,
 // CODE JB2IMAGE
 
 void 
-JB2Dict::JB2Codec::Decode::code(GP<JB2Image> gjim)
+JB2Dict::JB2Codec::Decode::code(const GP<JB2Image> &gjim)
 {
   if(!gjim)
   {
@@ -1364,5 +1368,11 @@ JB2Dict::JB2Codec::LibRect::compute_bounding_box(const GBitmap &bm)
       if (p<pe)
         break;
     }
+}
+
+GP<JB2Dict>
+JB2Dict::create(void)
+{
+  return new JB2Dict();
 }
 

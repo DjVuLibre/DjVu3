@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: JB2Image.h,v 1.35 2001-07-24 17:52:04 bcr Exp $
+// $Id: JB2Image.h,v 1.36 2001-08-27 17:01:34 docbill Exp $
 // $Name:  $
 
 #ifndef _JB2IMAGE_H
@@ -129,7 +129,7 @@
     \end{itemize}
 
     @version
-    #$Id: JB2Image.h,v 1.35 2001-07-24 17:52:04 bcr Exp $#
+    #$Id: JB2Image.h,v 1.36 2001-08-27 17:01:34 docbill Exp $#
     @memo
     Coding bilevel images with JB2.
     @author
@@ -220,7 +220,7 @@ public:
   /** Default creator.  Constructs an empty #JB2Dict# object.  You can then
       call the decoding function #decode#.  You can also manually set the
       image size using #add_shape#. */
-  static GP<JB2Dict> create(void) { return new JB2Dict(); }
+  static GP<JB2Dict> create(void);
 
   // INITIALIZATION
   /** Resets the #JB2Image# object.  This function reinitializes both the shape
@@ -233,7 +233,7 @@ public:
   /** Returns the number of inherited shapes. */
   int get_inherited_shape_count(void) const;
   /** Sets the inherited dictionary. */
-  void set_inherited_dict(GP<JB2Dict> dict);
+  void set_inherited_dict(const GP<JB2Dict> &dict);
 
   // ACCESSING THE SHAPE LIBRARY
   /** Returns the total number of shapes.
@@ -267,7 +267,7 @@ public:
   // CODING
   /** Encodes the JB2Dict into ByteStream #bs#.  
       This function generates the JB2 data stream without any header.   */
-  void encode(GP<ByteStream> gbs) const;
+  void encode(const GP<ByteStream> &gbs) const;
   /** Decodes JB2 data from ByteStream #bs#. This function decodes the image
       size and populates the shape and blit arrays.  The callback function
       #cb# is called when the decoder determines that the ByteStream data
@@ -276,7 +276,7 @@ public:
       and must return a suitable dictionary which will be installed as the
       inherited dictionary.  The callback should return null if no such
       dictionary is found. */
-  void decode(GP<ByteStream> gbs, JB2DecoderCallback *cb=0, void *arg=0);
+  void decode(const GP<ByteStream> &gbs, JB2DecoderCallback *cb=0, void *arg=0);
 
   
 public:
@@ -372,7 +372,7 @@ public:
   // CODING
   /** Encodes the JB2Image into ByteStream #bs#.  
       This function generates the JB2 data stream without any header. */
-  void encode(GP<ByteStream> gbs) const;
+  void encode(const GP<ByteStream> &gbs) const;
   /** Decodes JB2 data from ByteStream #bs#. This function decodes the image
       size and populates the shape and blit arrays.  The callback function
       #cb# is called when the decoder determines that the ByteStream data
@@ -381,7 +381,7 @@ public:
       and must return a suitable dictionary which will be installed as the
       inherited dictionary.  The callback should return null if no such
       dictionary is found. */
-  void decode(GP<ByteStream> gbs, JB2DecoderCallback *cb=0, void *arg=0);
+  void decode(const GP<ByteStream> &gbs, JB2DecoderCallback *cb=0, void *arg=0);
   
 private:
   // Implementation
@@ -578,8 +578,8 @@ protected:
   void code_relative_location(JB2Blit *jblt, int rows, int columns);
   void code_bitmap_directly (GBitmap &bm);
   void code_bitmap_by_cross_coding (GBitmap &bm, GP<GBitmap> &cbm, const int libno);
-  void code_record(int &rectype, GP<JB2Dict> jim, JB2Shape *jshp);
-  void code_record(int &rectype, GP<JB2Image> jim, JB2Shape *jshp, JB2Blit *jblt);
+  void code_record(int &rectype, const GP<JB2Dict> &jim, JB2Shape *jshp);
+  void code_record(int &rectype, const GP<JB2Image> &jim, JB2Shape *jshp, JB2Blit *jblt);
   static void compute_bounding_box(GBitmap &cbm, LibRect &lrect);
   static int get_direct_context( unsigned char const * const up2,
     unsigned char const * const up1, unsigned char const * const up0,

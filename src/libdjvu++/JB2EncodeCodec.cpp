@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: JB2EncodeCodec.cpp,v 1.10 2001-07-24 17:52:04 bcr Exp $
+// $Id: JB2EncodeCodec.cpp,v 1.11 2001-08-27 17:01:34 docbill Exp $
 // $Name:  $
 
 #ifndef NEED_DECODER_ONLY
@@ -55,14 +55,16 @@ class JB2Dict::JB2Codec::Encode : public JB2Dict::JB2Codec
 {
 public:
   Encode(void);
-  void init(GP<ByteStream> gbs);
+  void init(const GP<ByteStream> &gbs);
 //virtual
-  void code(GP<JB2Image> jim);
-  void code(GP<JB2Dict> jim);
+  void code(const GP<JB2Image> &jim);
+  void code(JB2Image *jim) { const GP<JB2Image> gjim(jim);code(gjim); }
+  void code(const GP<JB2Dict> &jim);
+  void code(JB2Dict *jim) { const GP<JB2Dict> gjim(jim);code(gjim); }
 
 protected:
   void CodeNum(const int num, const int lo, const int hi, NumContext &ctx);
-  void encode_libonly_shape(GP<JB2Image> jim, int shapeno);
+  void encode_libonly_shape(const GP<JB2Image> &jim, int shapeno);
 // virtual
   bool CodeBit(const bool bit, BitContext &ctx);
   void code_comment(GUTF8String &comment);
@@ -92,11 +94,11 @@ private:
 ////////////////////////////////////////
 
 void 
-JB2Dict::encode(GP<ByteStream> gbs) const
+JB2Dict::encode(const GP<ByteStream> &gbs) const
 {
   JB2Codec::Encode codec;
   codec.init(gbs);
-  codec.code(GP<JB2Dict>(const_cast<JB2Dict *>(this)));
+  codec.code(const_cast<JB2Dict *>(this));
 }
 
 ////////////////////////////////////////
@@ -104,11 +106,11 @@ JB2Dict::encode(GP<ByteStream> gbs) const
 ////////////////////////////////////////
 
 void 
-JB2Image::encode(GP<ByteStream> gbs) const
+JB2Image::encode(const GP<ByteStream> &gbs) const
 {
   JB2Codec::Encode codec;
   codec.init(gbs);
-  codec.code(GP<JB2Image>(const_cast<JB2Image *>(this)));
+  codec.code(const_cast<JB2Image *>(this));
 }
 
 ////////////////////////////////////////
@@ -141,7 +143,7 @@ JB2Dict::JB2Codec::Encode::Encode(void)
 : JB2Dict::JB2Codec(1) {}
 
 void
-JB2Dict::JB2Codec::Encode::init(GP<ByteStream> gbs)
+JB2Dict::JB2Codec::Encode::init(const GP<ByteStream> &gbs)
 {
   gzp=ZPCodec::create(gbs,true,true);
 }
@@ -308,7 +310,7 @@ JB2Dict::JB2Codec::Encode::code_bitmap_by_cross_coding (GBitmap &bm, GBitmap &cb
 // CODE JB2DICT
 
 void 
-JB2Dict::JB2Codec::Encode::code(GP<JB2Dict> gjim)
+JB2Dict::JB2Codec::Encode::code(const GP<JB2Dict> &gjim)
 {
   if(!gjim)
   {
@@ -359,7 +361,7 @@ JB2Dict::JB2Codec::Encode::code(GP<JB2Dict> gjim)
 // CODE JB2IMAGE
 
 void 
-JB2Dict::JB2Codec::Encode::code(GP<JB2Image> gjim)
+JB2Dict::JB2Codec::Encode::code(const GP<JB2Image> &gjim)
 {
   if(!gjim)
   {
@@ -466,7 +468,7 @@ JB2Dict::JB2Codec::Encode::code(GP<JB2Image> gjim)
 	  if (cur_ncell > CELLCHUNK) 
 	    {
 	      rectype = REQUIRED_DICT_OR_RESET;
-	      code_record(rectype, 0, 0, 0);
+	      code_record(rectype, 0, 0);
 	    }
         }
       // Code end of data record
@@ -480,7 +482,8 @@ JB2Dict::JB2Codec::Encode::code(GP<JB2Image> gjim)
 ////////////////////////////////////////
 
 void 
-JB2Dict::JB2Codec::Encode::encode_libonly_shape(GP<JB2Image> gjim, int shapeno )
+JB2Dict::JB2Codec::Encode::encode_libonly_shape(
+  const GP<JB2Image> &gjim, int shapeno )
 {
   if(!gjim)
   {
@@ -504,7 +507,7 @@ JB2Dict::JB2Codec::Encode::encode_libonly_shape(GP<JB2Image> gjim, int shapeno )
       if (cur_ncell > CELLCHUNK) 
 	{
 	  rectype = REQUIRED_DICT_OR_RESET;
-	  code_record(rectype, 0, 0, 0);
+	  code_record(rectype, 0, 0);
 	}
     }
 }
