@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessage.cpp,v 1.65 2001-07-16 15:46:04 bcr Exp $
+// $Id: DjVuMessage.cpp,v 1.66 2001-07-16 16:20:06 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -149,11 +149,14 @@ RegOpenReadConfig ( HKEY hParentKey )
 static GURL
 GetModulePath( void )
 {
+  const GUTF8String cwd(GOS::cwd());
   TCHAR path[1024];
   DWORD dwCount = (sizeof(path)/sizeof(TCHAR))-1;
   GetModuleFileName(0, path, dwCount);
   USES_CONVERSION;
-  return GURL::Filename::Native(T2CA(path)).base();
+  GURL retval=GURL::Filename::Native(T2CA(path)).base();
+  GOS::cwd(cwd);
+  return retval;
 }
 #elif defined(UNIX)
 #ifndef NO_DEBUG
