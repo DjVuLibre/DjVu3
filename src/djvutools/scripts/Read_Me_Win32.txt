@@ -1,7 +1,7 @@
-                PDF/PS to DjVu Utility
+                PDF/PS to DjVu(r) Utility
 
 -------------------------------------------------------------------
-                README File Contents
+README File Contents
 -------------------------------------------------------------------
 
     I Contents of the distribution
@@ -9,121 +9,132 @@
   III Installation instructions
    IV Configuration
     V Execution
-   VI Release Notes
-   IV Licenses and Trademarks
+   VI Release notes
+   IV Licenses and trademarks
+
 
 -------------------------------------------------------------------
-    I Contents of the Distribution
+I Contents of the distribution
 -------------------------------------------------------------------
-    1. READ_ME_Win32.txt	- This file.
+    1. READ_ME_Win32.txt	- This file
     2. gnu-gs-5.50-win32.zip	- Ghostscript binaries
-    3. pdftodjvu.pl    		- PERL script to convert PS & PDF 
-				  files to DjVu
-    4. pstodjvu.pl    		- PERL script to convert PS & PDF
-				  files to Djvu
+    3. pdftodjvu.pl    		- PERL script to convert PDF files
+				  to DjVu files
+    4. pstodjvu.pl    		- PERL script to convert PS files
+				  to DjVu files
+
 
 -------------------------------------------------------------------
-   II Requirements
+II Requirements
 -------------------------------------------------------------------
-	1.  DjVu Enterprise 3.1 Win32
-	2.  ActivePERL 
+    1.  DjVu Enterprise 3.1 for Windows(r)
+    2.  ActivePERL 
+
 
 -------------------------------------------------------------------
-  III Installation instructions
+III Installation instructions
 -------------------------------------------------------------------
 
-Perform the following procedure to install the PDF/PS to DjVu utilities.
+Perform the following procedure to install the PDF/PS to DjVu 
+Utility:
 
-Step 1:
-    Download the pdftodjvu301.zip
+1. Download the pdftodjvu301_win32.zip file from the LizardTech Web 
+   site.
 
-Step 2:
-     Unzip the pdftodjvu301.zip file:
+2. Unzip the pdftodjvu301_win32 file. The following files are 
+extracted into the pdftodjvu301 folder: pstodjvu.pl, pdftodjvu.pl, 
+and gnu-gs-5.50-win32.zip.
         
-Step 3:
-     Unzip the pdftodjvu301/gnu-gs-5.50-win32.zip
+3. Unzip the gnu-gs-5.50-win32.zip file to extract the Ghostscript 
+   binaries.
+
 
 -------------------------------------------------------------------
-  IV Configuration
+IV Configuration
 -------------------------------------------------------------------
 
-Perform the following procedure to configure your environment:
+Perform one of the following procedures to configure your Windows 
+environment:
 
-Step 1:
+WINDOWS NT, Windows 2000
     
-     Set the DjVu Enterprise bin directory to be in the PATH environment 
-     variable.
-	Example: C:\Program Files\LizardTech\DjVu Encoder Command line\bin
+1. Set the DjVu Enterprise bin folder to be in the PATH environment 
+   variable. 
 
-Step 2:
+   Example: C:\Program Files\LizardTech\DjVu Encoder Command Line\bin
 
-     Add c:\gs and c|pdftodjvu3-1 to the PATH environment variable.
-     Bring up the system environment settings:
-	Right-click the "My Computer" icon on the desktop and select
-	"Properties"
-	Select the "Environment" tab
-     Add the new directories to the path:
-	In the "System Variables" panel, select PATH
-	In the "Value" field (near the bottom of the dialog, add the
-	following text:
-		;c:\gs;c:\pdftodjvu301
-	Click the "Set" button
-	Click the "Apply" button
+2. Right-click "My Computer" and choose "Properties". 
 
-Step 3:
+3. In the "System Properties" dialog box, click the "Environment" 
+   tab.
 
-     Set the GS_LIB and GS_FONTPATH environment variables.
-     Bring up the system environment settings:
-     Add the new GS_LIB variable to the environment:
-	In the "Variable" field, type GS_LIB
-	In the "Value" field, type c:\gs;c:\gs\fonts	
-	Click the "Set" button
-	Click the "Apply" button
-     Add the new GS_FONTPATH variable to the environment:
-	In the "Variable" field, type GS_FONTPATH
-	In the "Value" field, type c:\gs;c:\gs\fonts
-	Click the "Set" button
-	Click the "Apply" button
-     Close the dialog:
-	Click the "OK" button to close the dialog
+2. Add c:\gs and c:\pdftodjvu3-1 to the PATH environment variable:
+
+   a. Under "System Variables", choose "Path".
+   b. In the "Value" text box, type the following: 
+           ;c:\gs;c:\pdftodjvu301
+   c. Click "Set", and then click "Apply".
+
+3. Add the GS_LIB environment variable to the environment:
+
+   a. In the "Variable" text box, type the following: 
+           GS_LIB
+   b. In the "Value" text box, type the following: 
+           c:\gs;c:\gs\fonts	
+   c. Click "Set", and then click "Apply".
+
+4. Add the GS_FONTPATH environment variable to the environment:
+
+   a. In the "Variable" text box, type the following:
+           GS_FONTPATH
+   b. In the "Value" text box, type the following:
+           c:\gs;c:\gs\fonts
+   c. Click "Set", and then click "Apply".
+
+5. Click "OK".
+ 
+Windows 95/98
+
+1. Edit the autoexec.bat with the following entries:
+set  PATH=%PATH%;c:\Program Files\LizardTech\DjVu Encoder Command Line\bin;c:\gs;c:\pdftodjvu301
+set GS_LIB=c:\gs;c:\gs\fonts
+set GS_FONTPATH=c:\gs;c:\gs\fonts
 
      
 -------------------------------------------------------------------
-   V Execution
+V Execution
 -------------------------------------------------------------------
 
-    Execute the PERL scripts (pdftodjvu.pl or pstodjvu.pl) to
-    convert PDF/PS files to DjVu by using the following syntax:
+Start the PERL scripts (pdftodjvu.pl or pstodjvu.pl) to convert PDF/PS 
+files to DjVu by using the following syntax:
 
-DjVu Enterprise:
-    Bundled output:
+Bundled output:
         pdftodjvu.pl --profile=[profilename] [documenttodjvu options] \
             [--best] <inputfile> <outputfile>
 
-    Indirect output:
+Indirect output:
         pdftodjvu.pl --profile=[profilename] [documenttodjvu options] \
             [--best] <inputfile> <outputdir>
 
-Note: "--profile=clean300" is recommended for most documents with photos
-or other complicated graphics.  The "--free" option is recommended for
-documents that are mostly simple text.
+NOTES
 
--------------------------------------------------------------------
-   VI Release Notes
--------------------------------------------------------------------
+* The "--profile=clean300" setting is recommended for most documents 
+with photos or other complicated graphics.  
 
-    1. Ghostscript version 5.50 supports PDF versions 1.0, 1.1, and 1.2
-       file formats.
-
-    2. The "--profile=clean300" option is recommended for most documents
-       with photos or other complicated graphics.
-
-    3. The "--free" option is recommended for documents that are mostly
-       simple text.
+* The "--free" option is recommended for documents that are mostly 
+simple text.
 
 
 -------------------------------------------------------------------
-   VII Licenses and Trademarks.
+VI Release Notes
+-------------------------------------------------------------------
+
+Ghostscript version 5.50 supports PDF versions 1.0, 1.1, and 1.2
+file formats.
+
+
+-------------------------------------------------------------------
+VII Licenses and Trademarks.
 -------------------------------------------------------------------
 
 Copyright (c) 2001 LizardTech, Inc.
@@ -190,7 +201,8 @@ patent must be licensed for everyone's free use or not licensed at all.
 
   The precise terms and conditions for copying, distribution and
 modification follow.
-
+
+
                     GNU GENERAL PUBLIC LICENSE
    TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
 
@@ -245,7 +257,8 @@ above, provided that you also meet all of these conditions:
     License.  (Exception: if the Program itself is interactive but
     does not normally print such an announcement, your work based on
     the Program is not required to print an announcement.)
-
+
+
 These requirements apply to the modified work as a whole.  If
 identifiable sections of that work are not derived from the Program,
 and can be reasonably considered independent and separate works in
@@ -303,7 +316,8 @@ access to copy from a designated place, then offering equivalent
 access to copy the source code from the same place counts as
 distribution of the source code, even though third parties are not
 compelled to copy the source along with the object code.
-
+
+
   4. You may not copy, modify, sublicense, or distribute the Program
 except as expressly provided under this License.  Any attempt
 otherwise to copy, modify, sublicense or distribute the Program is
@@ -360,7 +374,8 @@ impose that choice.
 
 This section is intended to make thoroughly clear what is believed to
 be a consequence of the rest of this License.
-
+
+
   8. If the distribution and/or use of the Program is restricted in
 certain countries either by patents or by copyrighted interfaces, the
 original copyright holder who places the Program under this License
