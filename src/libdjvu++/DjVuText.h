@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuText.h,v 1.14 2001-06-25 18:24:47 bcr Exp $
+// $Id: DjVuText.h,v 1.15 2001-07-03 00:21:13 mchen Exp $
 // $Name:  $
 
 #ifndef _DJVUTEXT_H
@@ -55,7 +55,7 @@
     @memo Implements support for DjVuImage hidden text.
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: DjVuText.h,v 1.14 2001-06-25 18:24:47 bcr Exp $# */
+    #$Id: DjVuText.h,v 1.15 2001-07-03 00:21:13 mchen Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -191,6 +191,10 @@ public:
 
   GList<Zone *> find_text_in_rect(GRect target_rect, GUTF8String &text) const;
 
+   // get all zones of zone type zone_type under node parent. zone_list
+   // contains the return value
+   void get_zones(int zone_type, const Zone *parent, GList<Zone *> & zone_list) const;
+     
   /** Returns the number of bytes needed by this data structure. It's
       used by caching routines to estimate the size of a \Ref{DjVuImage}. */
   unsigned int get_memory_usage() const;

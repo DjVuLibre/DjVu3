@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuText.cpp,v 1.21 2001-06-25 18:24:46 bcr Exp $
+// $Id: DjVuText.cpp,v 1.22 2001-07-03 00:21:13 mchen Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -217,6 +217,7 @@ DjVuTXT::Zone::decode(const GP<ByteStream> &gbs, int maxtext,
 
   // Decode text info
   text_start = (int) bs.read16()-0x8000;
+//  int start=text_start;
   text_length = bs.read24();
   if (prev)
   {
@@ -237,7 +238,6 @@ DjVuTXT::Zone::decode(const GP<ByteStream> &gbs, int maxtext,
     text_start+=parent->text_start;
   }
   rect=GRect(x, y, width, height);
-  
   // Get children size
   int size = bs.read24();
 
@@ -339,6 +339,35 @@ DjVuTXT::search_zone(const Zone * zone, int start, int & end) const
   return false;
 }
 
+void
+DjVuTXT::get_zones(int zone_type, const Zone *parent, GList<Zone *> & zone_list) const 
+   // get all the zones of  type zone_type under zone node parent
+{
+   // search all branches under parent
+   const Zone *zone=parent;
+   int ztype_tmp=zone->ztype;
+   while( ztype_tmp<zone_type )
+   {
+      GPosition pos;
+      for(pos=zone->children; pos; ++pos)
+      {
+	 Zone *zcur=(Zone *)&zone->children[pos];
+	 if ( zcur->ztype == zone_type )
+	 {
+	    GPosition zpos=zone_list;
+	    if ( !zone_list.search(zcur,zpos) )
+	       zone_list.append(zcur);
+	 }
+	 else if ( zone->children[pos].ztype < zone_type )
+	 {
+	    const Zone *zone_next=&zone->children[pos];
+	    get_zones(zone_type, zone_next, zone_list);
+	 }
+      }
+      ++ztype_tmp;
+   }
+}
+
 DjVuTXT::Zone *
 DjVuTXT::get_smallest_zone(int max_type, int start, int & end) const
       // Will return the smallest zone with type up to max_type containing
@@ -352,12 +381,12 @@ DjVuTXT::get_smallest_zone(int max_type, int start, int & end) const
   {
     GPosition pos;
     for(pos=zone->children;pos;++pos)
-      if (search_zone(&zone->children[pos], start, end))
-        break;
-      if (pos) 
-        zone=&zone->children[pos];
-      else 
-        break;
+       if (search_zone(&zone->children[pos], start, end))
+	  break;
+    if (pos) 
+       zone=&zone->children[pos];
+    else 
+       break;
   }
   
   return (Zone *) zone;
@@ -414,78 +443,43 @@ DjVuTXT::find_zones(int string_start, int string_length) const
 
 GList<DjVuTXT::Zone *>
 DjVuTXT::find_text_in_rect(GRect target_rect, GUTF8String &text) const
-      // For the string starting at string_start of length string_length
-      // the function will generate a list of smallest zones of the
-      // same type and will return it
+   // returns a list of zones of type WORD in the nearest/selected paragraph 
 {
-  GList<Zone *> zone_list;
-  GList<Zone *> temp_list;
+   GList<Zone *> zone_list;
 
-  int text_start = 0;
-  int text_end = 0;
-  text = ""; //initialize to null string
-
-  int zone_type=CHARACTER;
-  while(zone_type>=PAGE)
-  {
-      
-    int start=0;
-    int end=textUTF8.length();
-
-
-	enum { notfound, finding, found } found_status;
-	found_status = notfound;
-    
-    while(found_status!=found)
-    {
-        
-      if (start==end) 
-		break;
-      
-      Zone * zone=get_smallest_zone(zone_type, start, end);
-      if (zone && zone_type==zone->ztype )
+   get_zones((int)PARAGRAPH, &page_zone, zone_list);
+   // it's possible that no paragraph structure was generated 
+   // by a ocr engine. In this case, we can do very little ...
+   if (zone_list.isempty())
+      get_zones((int)LINE, &page_zone, zone_list);
+   GPosition pos, pos_sel=zone_list;
+   int t_xmin=target_rect.xmin;
+//  int t_xmax=target_rect.xmax;
+   int t_ymin=target_rect.ymin;
+//  int t_ymax=target_rect.ymax;
+   int dist=-1;
+   for(pos=zone_list; pos; ++pos)
+   {
+      GRect rect=zone_list[pos]->rect;
+      if ( rect.xmin>t_xmin && rect.ymin>t_ymin )
       {
-		  if(target_rect.contains(zone->rect))
-		  {
-            for(GPosition pos=temp_list; pos; ++pos)
-                zone_list.append(temp_list[pos]);
-            
-            temp_list.empty();
-            /////
-			zone_list.append(zone);
-			if( found_status == notfound )
-				text_start = start;
-
-			text_end = end;
-			
-			found_status = finding;
-		  }
-		  else 
-		  if( found_status == finding && ((target_rect.ymin > zone->rect.ymax) || (target_rect.ymax < zone->rect.ymin)))
-		  {
-			  found_status = found;
-		  }
-		  else if( found_status == finding )
-		  {
-              temp_list.append(zone);
-		  }	  
+	 int d=(rect.xmin-t_xmin)*(rect.xmin-t_xmin) +
+	    (rect.ymin-t_ymin)*(rect.ymin-t_ymin);
+	 if ( dist<0 || dist>d) 
+	 {
+	    dist=d;
+	    pos_sel=pos;
+	 }
       }
-      start=end;
-	  end=textUTF8.length();
-    }
-    if (zone_list.size()) 
-	{
-		text = textUTF8.substr(text_start, text_end-text_start);
-		break;
-	}
-	else
-		zone_type--;
+   }
 
+   Zone *pzone=zone_list[pos_sel];
+   zone_list.empty();
+   get_zones((int)WORD,pzone, zone_list);
 
-  }
-  
-  return zone_list;
+   return zone_list;
 }
+
 
 static inline bool
 is_blank(char ch)
