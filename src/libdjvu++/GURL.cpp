@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GURL.cpp,v 1.26 2000-01-24 22:55:24 eaf Exp $
+//C- $Id: GURL.cpp,v 1.27 2000-01-25 00:08:03 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -178,7 +178,30 @@ GURL::hash_argument(void) const
 	 }
       }
    }
-   return arg;
+   return GOS::decode_reserved(arg);
+}
+
+void
+GURL::set_hash_argument(const char * xarg)
+{
+   GCriticalSectionLock lock((GCriticalSection *) &url_lock);
+
+   GString arg=GOS::encode_reserved(xarg);
+   
+   GString new_url;
+   bool found=false;
+   const char * ptr;
+   for(ptr=url;*ptr;ptr++)
+      if (is_argument(ptr))
+      {
+	 if (ptr[0]=='#' || ptr[0]=='%' &&
+	     ptr[1]=='2' && ptr[2]=='3')
+	    found=true;
+	 else break;
+      } else if (!found)
+	 new_url+=*ptr;
+
+   url=new_url+"#"+arg+ptr;
 }
 
 void
@@ -232,8 +255,8 @@ GURL::parse_cgi_args(void)
 	 int args=cgi_name_arr.size();
 	 cgi_name_arr.resize(args);
 	 cgi_value_arr.resize(args);
-	 cgi_name_arr[args]=name;
-	 cgi_value_arr[args]=value;
+	 cgi_name_arr[args]=GOS::decode_reserved(name);
+	 cgi_value_arr[args]=GOS::decode_reserved(value);
       }
    }
 }
@@ -256,10 +279,12 @@ GURL::store_cgi_args(void)
    
    for(int i=0;i<cgi_name_arr.size();i++)
    {
-      if (i) new_url+="&"+cgi_name_arr[i];
-      else new_url+="?"+cgi_name_arr[i];
-      if (cgi_value_arr[i].length())
-	 new_url+="="+cgi_value_arr[i];
+      GString name=GOS::encode_reserved(cgi_name_arr[i]);
+      GString value=GOS::encode_reserved(cgi_value_arr[i]);
+      if (i) new_url+="&"+name;
+      else new_url+="?"+name;
+      if (value.length())
+	 new_url+="="+value;
    }
 
    url=new_url;
