@@ -6,7 +6,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: parseoptions.h,v 1.22 2000-01-27 14:41:15 haffner Exp $
+//C- $Id: parseoptions.h,v 1.23 2000-01-29 22:07:24 praveen Exp $
 
 #endif /* __cplusplus */
 
@@ -67,7 +67,7 @@
 
    @memo Class used for parsing options and configuration files.
    @author Bill Riemers
-   @version #$Id: parseoptions.h,v 1.22 2000-01-27 14:41:15 haffner Exp $#
+   @version #$Id: parseoptions.h,v 1.23 2000-01-29 22:07:24 praveen Exp $#
  */
 
 /*@{*/
@@ -603,7 +603,9 @@ public:
   void Add(const int,const int,const char []);
   int Grow(const int);
   inline const char *GetValue(const int profile ,const int var) const
-  { return ((profile<size) && (profile>=0))?(profiles[profile].GetValue(var)):0; };
+  { 
+      return ((profile<size) && (profile>=0))?(profiles[profile].GetValue(var)):0; 
+  };
 };
 
 // This is a class for implementing a getopt_long type function.
