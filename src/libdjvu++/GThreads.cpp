@@ -7,10 +7,10 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: GThreads.cpp,v 1.14 1999-03-08 15:10:45 leonb Exp $
+//C-  $Id: GThreads.cpp,v 1.15 1999-03-08 16:07:45 leonb Exp $
 
 
-// **** File "$Id: GThreads.cpp,v 1.14 1999-03-08 15:10:45 leonb Exp $"
+// **** File "$Id: GThreads.cpp,v 1.15 1999-03-08 16:07:45 leonb Exp $"
 // This file defines machine independent classes
 // for running and synchronizing threads.
 // - Author: Leon Bottou, 01/1998
@@ -722,12 +722,25 @@ cotask_yield()
     { 
       if (q->wchan)
         {
-          if ( (*q->wchan>0) ||
-               (q->maxwait && *q->maxwait<=elapsed && !(*q->maxwait=0)) ||
-               (q->wselect && globalmaxwait<=elapsed && coselect_test(q->wselect)) )
-            { 
+          if (*q->wchan>0)
+            {
               q->wchan=0; 
               q->maxwait=0; 
+              q->wselect=0; 
+            } 
+          else if (q->maxwait && *q->maxwait<=elapsed) 
+            {
+              *q->maxwait = 0;
+              q->wchan=0; 
+              q->maxwait=0; 
+              q->wselect=0; 
+            }
+          else if (q->wselect && globalmaxwait<=elapsed && coselect_test(q->wselect))
+            {
+              q->wchan=0;
+              if (q->maxwait)
+                *q->maxwait -= elapsed;
+              q->maxwait = 0; 
               q->wselect=0; 
             }
           if (q->maxwait)
@@ -856,7 +869,13 @@ cotask_select(int nfds,
   // reschedule
   cotask_yield();
   // call select to update masks
-  return select(nfds, rfds, wfds, efds, tm);
+  if (tm)
+    {
+      tm->tv_sec = maxwait/1000;
+      tm->tv_usec = 1000*(maxwait-1000*tm->tv_sec);
+    }
+  static timeval tmzero = {0,0};
+  return select(nfds, rfds, wfds, efds, &tmzero);
 }
 
 
