@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: JPEGDecoder.cpp,v 1.19 2001-07-12 23:33:16 bcr Exp $
+// $Id: JPEGDecoder.cpp,v 1.20 2001-07-16 15:46:04 bcr Exp $
 // $Name:  $
 
 #include "JPEGDecoder.h"
@@ -270,7 +270,8 @@ JPEGDecoder::Impl::jpeg_byte_stream_src(j_decompress_ptr cinfo,ByteStream &bs)
 void *
 JPEGDecoder::jpeg_lookup(const GUTF8String &name)
 {
-  void *sym=DjVuDynamic(GUTF8String(LIBJPEGNAME),name);
+  static DjVuDynamic lib(GUTF8String(LIBJPEGNAME));
+  void *sym=lib.lookup(name);
   if(!sym)
     G_THROW(ERR_MSG("DjVuFile.JPEG_bg2"));
   return sym;

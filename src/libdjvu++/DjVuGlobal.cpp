@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuGlobal.cpp,v 1.33 2001-04-12 18:50:50 fcrary Exp $
+// $Id: DjVuGlobal.cpp,v 1.34 2001-07-16 15:46:04 bcr Exp $
 // $Name:  $
 
 /** This file impliments the DjVuProgressTask elements.  The memory
@@ -68,7 +68,13 @@ public:
 };
 
   
-static GMap<void *,GP<DjVuProgressTask::Data> > *map_ptr=0;
+static GMap<void *,GP<DjVuProgressTask::Data> > &
+get_map(void)
+{
+  static GMap<void *,GP<DjVuProgressTask::Data> > &map=
+    GMap<void *,GP<DjVuProgressTask::Data> >::static_reference(); 
+  return map;
+}
 
 djvu_progress_callback *
 DjVuProgressTask::set_callback(djvu_progress_callback *_callback)
@@ -76,11 +82,7 @@ DjVuProgressTask::set_callback(djvu_progress_callback *_callback)
   djvu_progress_callback *retval=0;
   if(_callback)
   {
-    if(!map_ptr)
-    {
-      map_ptr=new GMap<void *,GP<DjVuProgressTask::Data> >;
-    }
-    GMap<void *,GP<DjVuProgressTask::Data> > &map=*map_ptr;
+    GMap<void *,GP<DjVuProgressTask::Data> > &map=get_map();
     void *threadID=GThread::current();
     if(map.contains(threadID))
     {
@@ -94,9 +96,9 @@ DjVuProgressTask::set_callback(djvu_progress_callback *_callback)
     {
       map[threadID]=new Data(_callback);
     }
-  }else if(map_ptr)
+  }else
   {
-    GMap<void *,GP<DjVuProgressTask::Data> > &map=*map_ptr;
+    GMap<void *,GP<DjVuProgressTask::Data> > &map=get_map();
     void *threadID=GThread::current();
     if(map.contains(threadID))
     {
@@ -116,9 +118,8 @@ DjVuProgressTask::DjVuProgressTask(const char *xtask,int nsteps)
   : task(xtask),parent(0), nsteps(nsteps), runtostep(0), gdata(0), data(0)
 {
   //  gtask=task;
-  if(map_ptr)
   {
-    GMap<void *,GP<DjVuProgressTask::Data> > &map=*map_ptr;
+    GMap<void *,GP<DjVuProgressTask::Data> > &map=get_map();
     void *threadID=GThread::current();
     if(map.contains(threadID))
     {

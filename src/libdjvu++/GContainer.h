@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GContainer.h,v 1.47 2001-04-26 18:58:05 bcr Exp $
+// $Id: GContainer.h,v 1.48 2001-07-16 15:46:04 bcr Exp $
 // $Name:  $
 
 #ifndef _GCONTAINER_H_
@@ -73,7 +73,8 @@
 #endif
 
 
-
+GPEnabled *
+static_const_GPBase(GPEnabled *foo);
 
 /** @name GContainer.h
 
@@ -92,7 +93,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@geocities.com> -- bug fixes.
     @version 
-    #$Id: GContainer.h,v 1.47 2001-04-26 18:58:05 bcr Exp $# */
+    #$Id: GContainer.h,v 1.48 2001-07-16 15:46:04 bcr Exp $# */
 //@{
 
 
@@ -116,8 +117,9 @@
 #endif
 
 
-
-class GCont
+// GPEnabled inhertenced added so the static_const_GP class can be used
+// for static maps and lists.
+class GCont : public GPEnabled
 #if GCONTAINER_NO_MEMBER_TEMPLATES
 {
 };
@@ -907,6 +909,9 @@ template <class TYPE>
 class GList : public GListTemplate<TYPE,TYPE>
 {
 public:
+  static GList<TYPE> &static_reference(void)
+  { GList<TYPE> *ptr=new GList<TYPE>;(void)static_const_GPBase(ptr);return *ptr;}
+
   /** Null Constructor. Constructs a list with zero elements. */
   GList() : GListTemplate<TYPE,TYPE>() {}
   GList& operator=(const GList &r) 
@@ -1116,7 +1121,6 @@ template <class KTYPE, class VTYPE, class TI>
 class GMapTemplate : protected GMapImpl<KTYPE,TI>
 {
 public:
-  // -- ACCESS
   /** Returns the number of elements in the map. */
   int size() const
     { return nelems; }
@@ -1209,6 +1213,10 @@ template <class KTYPE, class VTYPE>
 class GMap : public GMapTemplate<KTYPE,VTYPE,VTYPE>
 {
 public:
+  static GMap &static_reference(void)
+  { GMap<KTYPE,VTYPE> *ptr=new GMap<KTYPE,VTYPE>;(void)static_const_GPBase(ptr);return *ptr;}
+
+  // -- ACCESS
   GMap() : GMapTemplate<KTYPE,VTYPE,VTYPE>() {}
   GMap& operator=(const GMap &r) 
     { GSetBase::operator=(r); return *this; }
@@ -1316,6 +1324,15 @@ hash(const double & x)
   else
     return addr[0]^addr[1]^addr[2]^addr[3];    
 }
+
+/** Function for storing GP pointers statically. */
+GPEnabled *
+static_const_GPBase(GPEnabled *foo);
+
+template<class foo>
+inline foo *
+static_const_GP( const GP<foo> &bar )
+{ return (foo *)static_const_GPBase(bar); }
 
 //@}
 //@}

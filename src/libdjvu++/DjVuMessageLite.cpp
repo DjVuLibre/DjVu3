@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessageLite.cpp,v 1.5 2001-07-13 01:05:27 fcrary Exp $
+// $Id: DjVuMessageLite.cpp,v 1.6 2001-07-16 15:46:04 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -388,7 +388,7 @@ DjVuMessageLite::AddByteStream(const GP<ByteStream> &bs)
 void
 DjVuWriteError( const char *message )
 {
-  static GP<ByteStream> errout=ByteStream::create(2,0,false);
+  static ByteStream * const errout=static_const_GP(ByteStream::create(2,0,false));
   if(errout)
   {
     const GUTF8String external = DjVuMessageLite::LookUpUTF8( message );
@@ -399,7 +399,7 @@ DjVuWriteError( const char *message )
 void
 DjVuWriteMessage( const char *message )
 {
-  static GP<ByteStream> strout=ByteStream::create(1,0,false);
+  static ByteStream * const strout=static_const_GP(ByteStream::create(1,0,false));
   if(strout)
   {
     const GUTF8String external = DjVuMessageLite::LookUpUTF8( message );

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GContainer.cpp,v 1.31 2001-06-13 18:26:19 bcr Exp $
+// $Id: GContainer.cpp,v 1.32 2001-07-16 15:46:04 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -748,5 +748,16 @@ GSetBase::empty()
   gtable.clear();
 //  for (int i=0; i<nbuckets; i++)
 //    table[i] = 0;
+}
+
+GPEnabled *
+static_const_GPBase(GPEnabled *foo)
+{
+  if(foo)
+  {
+    static GPList<GPEnabled> list;
+    list.append(foo);
+  }
+  return foo;
 }
 

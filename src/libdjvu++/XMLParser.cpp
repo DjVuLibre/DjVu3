@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: XMLParser.cpp,v 1.17 2001-07-06 18:18:04 mchen Exp $
+// $Id: XMLParser.cpp,v 1.18 2001-07-16 15:46:04 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -192,7 +192,8 @@ lt_XMLParser::Impl::parse(const GP<ByteStream> &bs)
 static inline const GMap<GUTF8String,GMapArea::BorderType> &
 BorderTypeMap(void)
 {
-  static GMap<GUTF8String,GMapArea::BorderType> typeMap;
+  static GMap<GUTF8String,GMapArea::BorderType> &typeMap=
+    GMap<GUTF8String,GMapArea::BorderType>::static_reference();
   typeMap["none"]=GMapArea::NO_BORDER;
   typeMap["xor"]=GMapArea::XOR_BORDER;
   typeMap["solid"]=GMapArea::SOLID_BORDER;

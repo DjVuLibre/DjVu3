@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.113 2001-07-11 20:44:02 bcr Exp $
+// $Id: GString.cpp,v 1.114 2001-07-16 15:46:04 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -567,7 +567,8 @@ GStringRep::toEscaped( const bool tosevenbit ) const
 static inline const GMap<GUTF8String,GUTF8String> &
 BasicMap( void )
 {
-  static GMap<GUTF8String,GUTF8String> Basic;
+  static GMap<GUTF8String,GUTF8String> &Basic=
+    GMap<GUTF8String,GUTF8String>::static_reference();
   Basic["lt"]   = GUTF8String('<');
   Basic["gt"]   = GUTF8String('>');
   Basic["amp"]  = GUTF8String('&');

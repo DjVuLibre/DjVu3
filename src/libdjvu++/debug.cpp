@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: debug.cpp,v 1.23 2001-04-19 00:05:28 bcr Exp $
+// $Id: debug.cpp,v 1.24 2001-07-16 15:46:04 bcr Exp $
 // $Name:  $
 
 #ifdef NO_DEBUG
@@ -77,7 +77,13 @@ static int              debug_file_count;
 #if THREADMODEL==NOTHREADS
 static DjVuDebug debug_obj;
 #else
-static GMap<long, DjVuDebug> debug_map;
+static GMap<long, DjVuDebug> &
+debug_map(void)
+{
+  static GMap<long, DjVuDebug> &map=
+    GMap<long, DjVuDebug>::static_reference();
+  return map;
+}
 #endif
 
 DjVuDebug::DjVuDebug()
@@ -179,8 +185,8 @@ DjVuDebug::lock(int lvl, int noindent)
 #else
   // Get per-thread debug object
   long threadid = (long) GThread::current();
-  DjVuDebug &dbg = debug_map[threadid];
-  threads_num=debug_map.size();
+  DjVuDebug &dbg = debug_map()[threadid];
+  threads_num=debug_map().size();
 #endif
   // Check level
   dbg.block = (lvl > debug_level);

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDynamic.h,v 1.1 2001-07-12 23:33:16 bcr Exp $
+// $Id: DjVuDynamic.h,v 1.2 2001-07-16 15:46:04 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUDYNAMIC_H_
@@ -40,18 +40,22 @@
 #pragma interface
 #endif
 
+#include "GString.h"
+
 class GURL;
-class GUTF8String;
+class DjVuDynamicLib;
 
-/// Load a dynamic library symbol from the specified library
-void *DjVuDynamic(
-  const GUTF8String &libname, const GUTF8String &symname,
-  const bool nothrow=false);
-
-/// Load a dynamic library symbol from the specified library
-void *DjVuDynamic(
-  const GURL &url, const GUTF8String &symname,
-  const bool nothrow=false);
+class DjVuDynamic : public GP<GPEnabled>
+{
+public:
+  DjVuDynamic(void);
+  DjVuDynamic(const GUTF8String &libname);
+  DjVuDynamic(const GURL &liburl);
+  /// Load a dynamic library symbol from the specified library
+  void *lookup(const GUTF8String &symname, const bool nothrow=false);
+  DjVuDynamicLib *lib;
+  GUTF8String error;
+};
 
 #endif // _DJVUDYNAMIC_H_
 

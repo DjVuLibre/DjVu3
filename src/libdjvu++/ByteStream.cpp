@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.cpp,v 1.82 2001-06-13 18:26:19 bcr Exp $
+// $Id: ByteStream.cpp,v 1.83 2001-07-16 15:46:04 bcr Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 04/1997
@@ -1287,7 +1287,7 @@ ByteStream::Wrapper::~Wrapper() {}
 void
 DjVuPrintErrorUTF8(const char *fmt, ... )
 {
-  static GP<ByteStream> errout=ByteStream::create(2,0,false);
+  static ByteStream * const errout=static_const_GP(ByteStream::create(2,0,false));
   if(errout)
   {
     errout->cp=ByteStream::NATIVE;
@@ -1301,7 +1301,7 @@ DjVuPrintErrorUTF8(const char *fmt, ... )
 void
 DjVuPrintErrorNative(const char *fmt, ... )
 {
-  static GP<ByteStream> errout=ByteStream::create(2,0,false);
+  static ByteStream * const errout=static_const_GP(ByteStream::create(2,0,false));
   if(errout)
   {
     errout->cp=ByteStream::NATIVE;
@@ -1315,7 +1315,7 @@ DjVuPrintErrorNative(const char *fmt, ... )
 void
 DjVuPrintMessageUTF8(const char *fmt, ... )
 {
-  static GP<ByteStream> strout=ByteStream::create(1,0,false);
+  static ByteStream * const strout=static_const_GP(ByteStream::create(1,0,false));
   if(strout)
   {
     strout->cp=ByteStream::NATIVE;
@@ -1329,7 +1329,7 @@ DjVuPrintMessageUTF8(const char *fmt, ... )
 void
 DjVuPrintMessageNative(const char *fmt, ... )
 {
-  static GP<ByteStream> strout=ByteStream::create(1,0,false);
+  static ByteStream * const strout=static_const_GP(ByteStream::create(1,0,false));
   if(strout)
   {
     strout->cp=ByteStream::NATIVE;
