@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: TestSmartPointer.cpp,v 1.5 1999-03-17 19:25:01 leonb Exp $
+//C- $Id: TestSmartPointer.cpp,v 1.6 1999-08-12 21:51:46 leonb Exp $
 
 
 #include <stdio.h>
@@ -71,6 +71,7 @@ subr3(Test *arg)
 
 
 
+int
 main()
 {
   GP<Test> t1 = new Test;
@@ -96,6 +97,7 @@ main()
   t5->show("t5");  
   t5 = subr3(t5);
   t5->show("t5");  
+  return 0;
 }
 
 

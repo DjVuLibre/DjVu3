@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GContainer.cpp,v 1.7 1999-08-08 23:17:19 leonb Exp $
+//C- $Id: GContainer.cpp,v 1.8 1999-08-12 21:51:46 leonb Exp $
 
 
 #include "GContainer.h"
@@ -521,23 +521,16 @@ GSetBase::hashnode(unsigned int hashcode) const
   return table[bucket];
 }
 
-
 GCont::HNode *
-GSetBase::createnode(const void *key, int disposition)
+GSetBase::installnode(HNode *n)
 {
-  if (disposition == 0)
-    return 0;
-  if (disposition < 0)
-    THROW("Cannot create key in const GMap");
   // Rehash if table is more than 60% full
   if (nelems*3 > nbuckets*2)
     rehash( 2*nbuckets - 1 );
   // Create and insert
-  HNode *n = newnode(key);
   insertnode(n);
   return n;
 }
-
 
 void 
 GSetBase::insertnode(HNode *n)
@@ -670,3 +663,8 @@ GSetBase::empty()
     table[i] = 0;
 }
 
+void 
+GSetBase::throw_cannot_add()
+{
+  THROW("Cannot add key to constant associative map");
+}

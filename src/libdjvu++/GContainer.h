@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GContainer.h,v 1.13 1999-08-12 20:24:49 leonb Exp $
+//C- $Id: GContainer.h,v 1.14 1999-08-12 21:51:46 leonb Exp $
 
 
 #ifndef _GCONTAINER_H_
@@ -45,7 +45,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@research.att.com> -- bug fixes.
     @version 
-    #$Id: GContainer.h,v 1.13 1999-08-12 20:24:49 leonb Exp $# */
+    #$Id: GContainer.h,v 1.14 1999-08-12 21:51:46 leonb Exp $# */
 //@{
 
 
@@ -207,7 +207,7 @@ public:
   GArrayBase(const Traits &traits);
   GArrayBase(const Traits &traits, int lobound, int hibound);
   // -- DESTRUCTOR
-  virtual ~GArrayBase();
+  ~GArrayBase();
   // -- ASSIGNMENT
   GArrayBase &operator= (const GArrayBase &ga);
   // -- ALTERATION
@@ -589,7 +589,7 @@ protected:
   int nelem;
   Node head;
 public:
-  virtual ~GListBase();
+  ~GListBase();
   GListBase & operator= (const GListBase & gl);
   GPosition firstpos() const { return GPosition(head.next, (void*)this); } ;
   GPosition lastpos() const { return GPosition(head.prev, (void*)this); } ;
@@ -833,11 +833,12 @@ class GSetBase : public GCont
 protected:
   GSetBase(const Traits &traits);
   GSetBase(const GSetBase &ref);
-  virtual GCont::HNode *newnode(const void *key) const = 0;
+  static GCont::HNode *newnode(const void *key);
   HNode *hashnode(unsigned int hashcode) const;
-  HNode *createnode(const void *key, int disposition);
+  HNode *installnode(HNode *n);
   void   deletenode(HNode *n);
 protected:
+  static void throw_cannot_add() no_return;
   const Traits &traits;
   int nelems;
   int nbuckets;
@@ -847,7 +848,7 @@ private:
   void insertnode(HNode *n);
   void rehash(int newbuckets);
 public:
-  virtual ~GSetBase();
+  ~GSetBase();
   GSetBase& operator=(const GSetBase &ref);
   GPosition firstpos() const;
   void del(GPosition &pos); 
@@ -862,14 +863,14 @@ protected:
   GSetImpl();
   GSetImpl(const Traits &traits);
   typedef GCont::SetNode<K> SNode;
-  virtual GCont::HNode *newnode(const void *key) const;
-  HNode *get(const K &key, int disposition);
-  HNode *get(const K &key, int disposition) const;
+  HNode *get(const K &key) const;
+  HNode *get_or_throw(const K &key) const;
+  HNode *get_or_create(const K &key);
 public:
   GPosition contains(const K &key) const 
-    { return GPosition( get(key, 0), (void*)this); } ;
+    { return GPosition( get(key), (void*)this); } ;
   void del(const K &key) 
-    { deletenode(get(key, 0)); } ;
+    { deletenode(get(key)); } ;
 };
 
 template<class K>
@@ -885,27 +886,32 @@ GSetImpl<K>::GSetImpl(const Traits &traits)
 }
 
 template<class K> GCont::HNode *
-GSetImpl<K>::newnode(const void *key) const
-{
-  SNode *n = (SNode*) operator new (sizeof(SNode));
-  new ((void*)&(n->key)) K ( *(K*)key );
-  n->hashcode = hash((const K&)(n->key));
-  return (HNode*) n;
-}
-
-template<class K> GCont::HNode *
-GSetImpl<K>::get(const K &key, int disposition)
-{
+GSetImpl<K>::get(const K &key) const
+{ 
   unsigned int hashcode = hash(key);
   for (SNode *s=(SNode*)hashnode(hashcode); s; s=(SNode*)(s->hprev))
     if (s->hashcode == hashcode && s->key == key) return s;
-  return createnode((const void*)&key, disposition);
+  return 0;
 }
 
 template<class K> GCont::HNode *
-GSetImpl<K>::get(const K &key, int disposition) const
+GSetImpl<K>::get_or_throw(const K &key) const
 { 
-  return ((GSetImpl<K>*)this)->get(key, disposition); // Ugly
+  HNode *m = get(key);
+  if (!m) throw_cannot_add();
+  return m;
+}
+
+template<class K> GCont::HNode *
+GSetImpl<K>::get_or_create(const K &key)
+{
+  HNode *m = get(key);
+  if (m) return m;
+  SNode *n = (SNode*) operator new (sizeof(SNode));
+  new ((void*)&(n->key)) K ( *(K*)key );
+  n->hashcode = hash((const K&)(n->key));
+  installnode(n);
+  return n;
 }
 
 template <class K, class TI>
@@ -915,7 +921,7 @@ protected:
   GMapImpl();
   GMapImpl(const Traits &traits);
   typedef GCont::MapNode<K,TI> MNode;
-  virtual GCont::HNode *newnode(const void *key) const;
+  GCont::HNode* get_or_create(const K &key);
 };
 
 template<class K, class TI>
@@ -931,14 +937,18 @@ GMapImpl<K,TI>::GMapImpl(const Traits &traits)
 }
 
 template<class K, class TI> GCont::HNode *
-GMapImpl<K,TI>::newnode(const void *key) const
+GMapImpl<K,TI>::get_or_create(const K &key)
 {
+  HNode *m = get(key);
+  if (m) return m;
   MNode *n = (MNode*) operator new (sizeof(MNode));
-  new ((void*)&(n->key)) K  (*(K*)key);
+  new ((void*)&(n->key)) K  (key);
   new ((void*)&(n->val)) TI ();
   n->hashcode = hash((const K&)(n->key));
-  return (HNode*) n;
+  installnode(n);
+  return n;
 }
+
 
 
 /** Common base class for all associative maps.
@@ -1002,13 +1012,13 @@ public:
       contains key #key#. This variant of #operator[]# is necessary when
       dealing with a #const GMAP<KTYPE,VTYPE>#. */
   const VTYPE& operator[](const KTYPE &key) const
-    { return (const VTYPE&)(((const MNode*)(get(key,-1)))->val); }
+    { return (const VTYPE&)(((const MNode*)(get_or_throw(key)))->val); }
   /** Returns a reference to the value of the map entry for key #key#.  This
       reference can be used for both reading (as "#a[n]#") and modifying (as
       "#a[n]=v#"). If there is no entry for key #key#, a new entry is created
       for that key with the null constructor #VTYPE::VTYPE()#. */
   VTYPE& operator[](const KTYPE &key)
-    { return (VTYPE&)(((MNode*)(get(key,1)))->val); }
+    { return (VTYPE&)(((MNode*)(get_or_create(key)))->val); }
   /** Destroys the map entry for position #pos#.  
       Nothing is done if position #pos# is not a valid position. */
   void del(GPosition &pos)
