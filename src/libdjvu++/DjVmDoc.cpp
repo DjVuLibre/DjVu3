@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVmDoc.cpp,v 1.11 1999-09-28 17:28:46 eaf Exp $
+//C- $Id: DjVmDoc.cpp,v 1.12 1999-09-29 18:38:28 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -163,6 +163,7 @@ DjVmDoc::write(ByteStream & str)
    }
 
    iff.close_chunk();
+   iff.flush();
 
    DEBUG_MSG("done storing DjVm file.\n");
 }
@@ -279,6 +280,7 @@ DjVmDoc::write_index(ByteStream & str)
    dir->encode(iff);
    iff.close_chunk();
    iff.close_chunk();
+   iff.flush();
 }
 
 void
