@@ -1,35 +1,44 @@
 # This rule sets the following variables:
 #	CXX, CXXFLAGS, CXXSYMBOLIC, CXXPIC, CXXUNROLL, CXXWARN
-# $Id: cxx.sh,v 1.19 2000-02-06 22:26:34 bcr Exp $
+# $Id: cxx.sh,v 1.20 2000-02-06 22:41:13 bcr Exp $
 
-if [ -z "$CONFIG_DIR" ] ; then
+if [ -z "$CONFIG_DIR" ]
+then
   echo "You must source functions.sh" 1>&2
   exit 1
 fi
 
 ECXX="eg++"
-if [ -z "$CXX_SET" ] ; then
+if [ -z "$CXX_SET" ]
+then
   echo 'extern "C" {void exit(int);};void foo(void) {exit(0);}' |testfile $temp.cpp
   
   CXXFLAGS=""
   CXXPIC_SET=""
   cxx_is_gcc=
   echon "Searching for C++ compiler ... "
-  if [ -n "$CXX" ] ; then
-    if ( run $CXX -c $temp.cpp ) ; then
+  if [ -n "$CXX" ]
+  then
+    if ( run $CXX -c $temp.cpp )
+    then
       echo "$CXX"
     else
       CXX=""
     fi
-  if
-  if [ -z "$CXX" ] ; then  
-    if ( run $EGXX -c $temp.cpp ) ; then
+  fi
+  if [ -z "$CXX" ]
+  then  
+    if ( run $EGXX -c $temp.cpp )
+    then
         CXX="$EGXX"
-    elif ( run c++ -c $temp.cpp ) ; then
+    elif ( run c++ -c $temp.cpp )
+    then
       CXX=c++
-    elif ( run g++ -c $temp.cpp ) ; then
+    elif ( run g++ -c $temp.cpp )
+    then
       CXX=g++
-    elif ( run CC -c $temp.cpp ) ; then
+    elif ( run CC -c $temp.cpp )
+    then
       CXX=CC
     else 
       echo "none available"
@@ -41,7 +50,8 @@ if [ -z "$CXX_SET" ] ; then
 
   echon "Checking ${CXX} version ... "
   CXXVERSION=""
-  if [ "$CXX" != "$EGXX" ] ; then
+  if [ "$CXX" != "$EGXX" ]
+  then
     s=`$CXX -Vfoo 2>&1|"${grep}" 'file path prefix'|"${sed}" 's,.* .\([^ ]*/\)foo/. never.*,\1,'`
     if [ ! -z "$s" ]
     then
@@ -49,9 +59,11 @@ if [ -z "$CXX_SET" ] ; then
     else
       # This test fails for pre-release versions of egcs (-eaf)
       EGCSTEST=`($CXX -v 2>&1)|"${sed}" -n -e 's,.*/egcs-.*,Is EGCS,p' -e 's,.*/pgcc-.*,Is PGCC,p'`
-      if [ ! -z "$EGCSTEST" ] ; then
+      if [ ! -z "$EGCSTEST" ]
+      then
         echo "egcs"
-      elif ( run $CXX -V2.8.1 -c $temp.cpp ) ; then
+      elif ( run $CXX -V2.8.1 -c $temp.cpp )
+      then
         echo "gcc 2.8.1"
         CXXVERSION="-V2.8.1"
       else
@@ -156,42 +168,39 @@ if [ -z "$CXX_SET" ] ; then
 
   echon "Checking ${CXX} symbolic option ... "
   CXXSYMBOLIC=""
-    SYSTEMGXX=`echo $SYS | tr A-Z a-z `-$cxx_is_gcc
-    case $SYSTEMGXX in
-      linux-*)
-        TESTCXXSYMBOLIC="-shared "
-        TESTCXXPIC="-fPIC"
-        ;;
-      solaris-yes)
-        if [ -z "$CROSSCOMPILER" ] ; then 
-          TESTCXXSYMBOLIC="-shared -L/usr/lib -R/usr/lib "
-        else
-          TESTCXXSYMBOLIC="-shared -Wl,-rpath,/usr/lib:/usr/ccs/lib:/usr/openwin/lib "
-        fi
-        TESTCXXPIC="-fPIC"
-        ;;
-      solaris-*)
-        if [ -z "$CROSSCOMPILER" ] ; then 
-          TESTCXXSYMBOLIC="-G -L/usr/lib -R/usr/lib "
-        else
-          TESTCXXSYMBOLIC="-shared -Wl,-rpath,/usr/lib:/usr/ccs/lib:/usr/openwin/lib "
-        fi
-        TESTCXXPIC="-K PIC"
-        ;;
-      irix*-*)
-        TESTCXXSYMBOLIC="-shared "
-        TESTCXXPIC=""
-        ;;
-      aix*-*)
-        TESTCXXSYMBOLIC="-r "
-        TESTCXXPIC="-bM\:SRE"
-        ;;
-    esac
+  SYSTEMGXX=`echo $SYS | tr A-Z a-z `-$cxx_is_gcc
+  case $SYSTEMGXX in
+    linux-*)
+      TESTCXXSYMBOLIC="-shared "
+      TESTCXXPIC="-fPIC"
+      ;;
+    solaris-yes)
+      if [ -z "$CROSSCOMPILER" ] ; then 
+        TESTCXXSYMBOLIC="-shared -L/usr/lib -R/usr/lib "
+      else
+        TESTCXXSYMBOLIC="-shared -Wl,-rpath,/usr/lib:/usr/ccs/lib:/usr/openwin/lib "
+      fi
+      TESTCXXPIC="-fPIC"
+      ;;
+    solaris-*)
+      if [ -z "$CROSSCOMPILER" ] ; then 
+        TESTCXXSYMBOLIC="-G -L/usr/lib -R/usr/lib "
+      else
+        TESTCXXSYMBOLIC="-shared -Wl,-rpath,/usr/lib:/usr/ccs/lib:/usr/openwin/lib "
+      fi
+      TESTCXXPIC="-K PIC"
+      ;;
+    irix*-*)
+      TESTCXXSYMBOLIC="-shared "
+      TESTCXXPIC=""
+      ;;
+    aix*-*)
+      TESTCXXSYMBOLIC="-r "
+      TESTCXXPIC="-bM\:SRE"
+      ;;
+  esac
 
-		check_shared_link_flags CXXSYMBOLIC $temp.cpp "$TESTCXXSYMBOLIC"
-#  if [ "$SYS" != "linux-libc6" ] ; then
-#    check_link_flags CXXSYMBOLIC $temp.cpp "-shared -symbolic" "-shared -Wl,-Bsymbolic" "-shared -Wl,-Bsymbolic -lc" "-shared -Wl,-Bsymbolic -lc -lm"
-#  fi
+  check_shared_link_flags CXXSYMBOLIC $temp.cpp "$TESTCXXSYMBOLIC"
   if [ -z "$CXXSYMBOLIC" ] ; then
     echo "none"
   else
