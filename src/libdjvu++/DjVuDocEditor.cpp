@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocEditor.cpp,v 1.19 1999-12-17 16:39:37 eaf Exp $
+//C- $Id: DjVuDocEditor.cpp,v 1.20 2000-01-10 21:34:11 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -70,7 +70,6 @@ DjVuDocEditor::init(void)
    initialized=true;
 
    DjVuDocument::init(doc_url, this);
-   wait_for_complete_init();
 }
 
 void
@@ -87,7 +86,6 @@ DjVuDocEditor::init(const char * fname)
    doc_url=GOS::filename_to_url(fname);
    GP<DjVuDocument> tmp_doc=new DjVuDocument();
    tmp_doc->init(doc_url, this);
-   tmp_doc->wait_for_complete_init();
    if (!tmp_doc->is_init_complete())
       THROW(GString("Failed to open document '")+fname+"'\n");
    
@@ -113,7 +111,6 @@ DjVuDocEditor::init(const char * fname)
       // data, but we will take care of it by redirecting the request_data().
    initialized=true;
    DjVuDocument::init(doc_url, this);
-   wait_for_complete_init();
 
       // Cool. Now extract the thumbnails...
    GCriticalSectionLock lock(&thumb_lock);
@@ -562,7 +559,6 @@ DjVuDocEditor::insert_group(const GList<GString> & file_names, int page_num)
 	       // one after another
 	    GP<DjVuDocument> doc=new DjVuDocument();
 	    doc->init(GOS::filename_to_url(fname));
-	    doc->wait_for_complete_init();
 	    GString dirname=tmpnam(0);
 	    if (GOS::mkdir(dirname)<0)
 	       THROW("Failed to create directory '"+dirname+"'");
