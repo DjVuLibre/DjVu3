@@ -4,7 +4,7 @@
 //C-              Unauthorized use prohibited.
 //C-
 // 
-// $Id: main.cpp,v 1.2 2001-06-07 22:13:55 mchen Exp $
+// $Id: main.cpp,v 1.3 2001-07-17 20:49:51 mchen Exp $
 // $Name:  $
 
 
@@ -181,7 +181,6 @@ main(int argc, char ** argv)
 	 }
 	 FILE *df=fopen("/dev/tty", "w");
 	 if (df) DjVuDebug::set_debug_file(df);
-//	 DjVuDebug::set_debug_url(GURL::Filename::UTF8("/dev/tty"));
       }
 #endif
 
