@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.51 1999-09-28 20:23:39 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.52 1999-09-29 17:58:10 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -1016,4 +1016,20 @@ DjVuDocument::expand(const char * dir_name, const char * idx_name)
    
    GP<DjVmDoc> doc=get_djvm_doc();
    doc->expand(dir_name, idx_name);
+}
+
+void
+DjVuDocument::save_as(const char * where, bool bundled)
+{
+   DEBUG_MSG("DjVuDocument::save_as(): where='" << where <<
+	     "', bundled=" << bundled << "\n");
+   DEBUG_MAKE_INDENT(3);
+   
+   GString full_name=GOS::expand_name(where, GOS::cwd());
+   
+   if (bundled)
+   {
+      StdioByteStream str(full_name, "wb");
+      write(str);
+   } else expand(GOS::dirname(full_name), GOS::basename(full_name));
 }

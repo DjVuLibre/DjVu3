@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.h,v 1.32 1999-09-28 20:23:39 eaf Exp $
+//C- $Id: DjVuDocument.h,v 1.33 1999-09-29 17:58:10 eaf Exp $
  
 #ifndef _DJVUDOCUMENT_H
 #define _DJVUDOCUMENT_H
@@ -33,7 +33,7 @@
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocument.h,v 1.32 1999-09-28 20:23:39 eaf Exp $#
+    @version #$Id: DjVuDocument.h,v 1.33 1999-09-29 17:58:10 eaf Exp $#
 */
 
 //@{
@@ -542,6 +542,18 @@ public:
       */
    void			expand(const char * dir_name,
 			       const char * idx_name);
+      /** This function can be used instead of \Ref{write}() and \Ref{expand}().
+	  It allows to save the document either in the new #BUNDLED# format
+	  or in the new #INDIRECT# format depending on the value of parameter
+	  #bundled#.
+
+	  Depending on the document's type, the meaning of #where# is:
+	  \begin{itemize}
+	     \item For #BUNDLED# documents this is the name of the file
+	     \item For #INDIRECT# documents this is the name of top-level
+	           index file. All document files will be saved into the
+		   save directory where the index file will resize. */
+   virtual void		save_as(const char * where, bool bundled);
       //@}
       /** Returns pointer to the internal directory of the document, if it
 	  is in one of the new formats: #BUNDLED# or #INDIRECT#.
