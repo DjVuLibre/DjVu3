@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: parseoptions.cpp,v 1.16 1999-12-15 21:03:02 bcr Exp $
+//C- $Id: parseoptions.cpp,v 1.17 1999-12-15 21:50:26 bcr Exp $
 #ifdef __GNUC__
 #pragma implementation
 #endif
@@ -1306,9 +1306,10 @@ DjVuParseOptions::GetOpt::getopt_long()
 {
   int longindex=1+(strlen(optstring)/2);
   char *optptr;
+  optarg=0;
   do 
   {
-    if(argc <= optind || !argv[optind] || argv[optind][0] != '-')
+    if((argc <= optind)||(!argv[optind])||(argv[optind][0] != '-'))
     {
       return -1;
     }
@@ -1320,13 +1321,13 @@ DjVuParseOptions::GetOpt::getopt_long()
       }else
       {
         nextchar=1;
-	if(++optind >= argc || argv[optind][0] != '-')
+	if((++optind >= argc)||(argv[optind][0] != '-'))
 	  return -1;
       }
     }
   }while(! argv[optind][nextchar]);
   const int has_dash=(argv[optind][nextchar] == '-');
-  if(nextchar == 1 && (has_dash || long_only))
+  if((nextchar == 1)&&(has_dash || long_only))
   {
     int s;
     if(has_dash) nextchar++;
@@ -1340,11 +1341,17 @@ DjVuParseOptions::GetOpt::getopt_long()
     {
       if(!strcmp(opts->name,argv[optind]+nextchar))
       {
-        if(!opts->has_arg)
-          optarg=0;
-        else
-          optarg=argv[++optind];
-        optind++;
+        if((opts->has_arg)&&(opts->has_arg != 2))
+        {
+          if(++optind < argc)
+          {
+            optarg=argv[optind];
+            optind++;
+          }
+        }else
+        {
+          optind++;
+        }
         nextchar=1;
         return longindex;
       }
@@ -1356,9 +1363,7 @@ DjVuParseOptions::GetOpt::getopt_long()
       if(!strncmp(ss,argv[optind]+nextchar,s)
         &&(argv[optind][nextchar+s] == '=')
       ) {
-        if(!opts->has_arg)
-          optarg=0;
-        else
+        if(opts->has_arg)
           optarg=argv[optind]+nextchar+1+s;
         optind++;
         nextchar=1;
@@ -1409,7 +1414,7 @@ DjVuParseOptions::GetOpt::getopt_long()
       optarg=argv[optind];
     }else if(opts.has_arg == 2)
     {
-      optarg=NULL;
+      optarg=0;
     }else
     {
       static const char emesg[]="Argument required for --%s option";
