@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuFile.cpp,v 1.172 2001-06-05 03:19:58 bcr Exp $
+// $Id: DjVuFile.cpp,v 1.173 2001-06-11 19:26:59 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -1746,7 +1746,7 @@ DjVuFile::move(GMap<GURL, void *> & map, const GURL & dir_url)
   {
     map[url]=0;
     
-    url=dir_url+url.name();
+    url=GURL::UTF8(url.name(),dir_url);
     
     
     // Leave the lock here!

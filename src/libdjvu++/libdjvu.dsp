@@ -136,214 +136,1065 @@ LIB32=link.exe -lib
 # Begin Source File
 
 SOURCE=.\Arrays.cpp
+DEP_CPP_ARRAY=\
+	"..\include\DjVu.h"\
+	".\Arrays.h"\
+	".\ByteStream.h"\
+	".\DjVuGlobal.h"\
+	".\GException.h"\
+	".\GSmartPointer.h"\
+	
 # End Source File
 # Begin Source File
 
 SOURCE=.\BSByteStream.cpp
+DEP_CPP_BSBYT=\
+	"..\include\DjVu.h"\
+	".\Arrays.h"\
+	".\BSByteStream.h"\
+	".\ByteStream.h"\
+	".\DjVuGlobal.h"\
+	".\GContainer.h"\
+	".\GException.h"\
+	".\GOS.h"\
+	".\GSmartPointer.h"\
+	".\GString.h"\
+	".\ZPCodec.h"\
+	
 # End Source File
 # Begin Source File
 
 SOURCE=.\BSEncodeByteStream.cpp
+DEP_CPP_BSENC=\
+	"..\include\DjVu.h"\
+	".\Arrays.h"\
+	".\BSByteStream.h"\
+	".\ByteStream.h"\
+	".\DjVuGlobal.h"\
+	".\GContainer.h"\
+	".\GException.h"\
+	".\GOS.h"\
+	".\GSmartPointer.h"\
+	".\GString.h"\
+	".\ZPCodec.h"\
+	
 # End Source File
 # Begin Source File
 
 SOURCE=.\ByteStream.cpp
+DEP_CPP_BYTES=\
+	"..\include\DjVu.h"\
+	".\Arrays.h"\
+	".\ByteStream.h"\
+	".\DjVuGlobal.h"\
+	".\DjVuMessage.h"\
+	".\DjVuMessageLite.h"\
+	".\GContainer.h"\
+	".\GException.h"\
+	".\GOS.h"\
+	".\GSmartPointer.h"\
+	".\GString.h"\
+	".\GThreads.h"\
+	".\GURL.h"\
+	
+NODEP_CPP_BYTES=\
+	".\jri.h"\
+	
 # End Source File
 # Begin Source File
 
 SOURCE=.\DataPool.cpp
+DEP_CPP_DATAP=\
+	"..\include\DjVu.h"\
+	".\Arrays.h"\
+	".\ByteStream.h"\
+	".\DataPool.h"\
+	".\debug.h"\
+	".\DjVuGlobal.h"\
+	".\GContainer.h"\
+	".\GException.h"\
+	".\GOS.h"\
+	".\GSmartPointer.h"\
+	".\GString.h"\
+	".\GThreads.h"\
+	".\GURL.h"\
+	".\IFFByteStream.h"\
+	
+NODEP_CPP_DATAP=\
+	".\jri.h"\
+	
 # End Source File
 # Begin Source File
 
 SOURCE=.\debug.cpp
+DEP_CPP_DEBUG=\
+	"..\include\DjVu.h"\
+	".\Arrays.h"\
+	".\ByteStream.h"\
+	".\debug.h"\
+	".\DjVuGlobal.h"\
+	".\GContainer.h"\
+	".\GException.h"\
+	".\GSmartPointer.h"\
+	".\GString.h"\
+	".\GThreads.h"\
+	".\GURL.h"\
+	
+NODEP_CPP_DEBUG=\
+	".\jri.h"\
+	
 # End Source File
 # Begin Source File
 
 SOURCE=.\DjVmDir.cpp
+DEP_CPP_DJVMD=\
+	"..\include\DjVu.h"\
+	".\Arrays.h"\
+	".\BSByteStream.h"\
+	".\ByteStream.h"\
+	".\debug.h"\
+	".\DjVmDir.h"\
+	".\DjVuGlobal.h"\
+	".\GContainer.h"\
+	".\GException.h"\
+	".\GSmartPointer.h"\
+	".\GString.h"\
+	".\GThreads.h"\
+	".\GURL.h"\
+	".\ZPCodec.h"\
+	
+NODEP_CPP_DJVMD=\
+	".\jri.h"\
+	
 # End Source File
 # Begin Source File
 
 SOURCE=.\DjVmDir0.cpp
+DEP_CPP_DJVMDI=\
+	"..\include\DjVu.h"\
+	".\Arrays.h"\
+	".\ByteStream.h"\
+	".\debug.h"\
+	".\DjVmDir0.h"\
+	".\DjVuGlobal.h"\
+	".\GContainer.h"\
+	".\GException.h"\
+	".\GSmartPointer.h"\
+	".\GString.h"\
+	
 # End Source File
 # Begin Source File
 
 SOURCE=.\DjVmDoc.cpp
+DEP_CPP_DJVMDO=\
+	"..\include\DjVu.h"\
+	".\Arrays.h"\
+	".\ByteStream.h"\
+	".\DataPool.h"\
+	".\debug.h"\
+	".\DjVmDir.h"\
+	".\DjVmDoc.h"\
+	".\DjVuGlobal.h"\
+	".\GContainer.h"\
+	".\GException.h"\
+	".\GOS.h"\
+	".\GSmartPointer.h"\
+	".\GString.h"\
+	".\GThreads.h"\
+	".\GURL.h"\
+	".\IFFByteStream.h"\
+	
+NODEP_CPP_DJVMDO=\
+	".\jri.h"\
+	
 # End Source File
 # Begin Source File
 
 SOURCE=.\DjVuAnno.cpp
+DEP_CPP_DJVUA=\
+	"..\include\DjVu.h"\
+	".\Arrays.h"\
+	".\BSByteStream.h"\
+	".\ByteStream.h"\
+	".\debug.h"\
+	".\DjVuAnno.h"\
+	".\DjVuGlobal.h"\
+	".\GContainer.h"\
+	".\GException.h"\
+	".\GMapAreas.h"\
+	".\GRect.h"\
+	".\GSmartPointer.h"\
+	".\GString.h"\
+	".\IFFByteStream.h"\
+	".\ZPCodec.h"\
+	
 # End Source File
 # Begin Source File
 
 SOURCE=.\DjVuDocEditor.cpp
+DEP_CPP_DJVUD=\
+	"..\include\DjVu.h"\
+	".\Arrays.h"\
+	".\ByteStream.h"\
+	".\DataPool.h"\
+	".\debug.h"\
+	".\DjVmDir.h"\
+	".\DjVmDoc.h"\
+	".\DjVuAnno.h"\
+	".\DjVuDocEditor.h"\
+	".\DjVuDocument.h"\
+	".\DjVuFile.h"\
+	".\DjVuGlobal.h"\
+	".\DjVuImage.h"\
+	".\DjVuInfo.h"\
+	".\DjVuPalette.h"\
+	".\DjVuPort.h"\
+	".\GContainer.h"\
+	".\GException.h"\
+	".\GOS.h"\
+	".\GPixmap.h"\
+	".\GRect.h"\
+	".\GSmartPointer.h"\
+	".\GString.h"\
+	".\GThreads.h"\
+	".\GURL.h"\
+	".\IFFByteStream.h"\
+	".\IW44Image.h"\
+	".\ZPCodec.h"\
+	
+NODEP_CPP_DJVUD=\
+	".\jri.h"\
+	
 # End Source File
 # Begin Source File
 
 SOURCE=.\DjVuDocument.cpp
+DEP_CPP_DJVUDO=\
+	"..\include\DjVu.h"\
+	".\Arrays.h"\
+	".\ByteStream.h"\
+	".\DataPool.h"\
+	".\debug.h"\
+	".\DjVmDir.h"\
+	".\DjVmDir0.h"\
+	".\DjVmDoc.h"\
+	".\DjVuAnno.h"\
+	".\DjVuDocument.h"\
+	".\DjVuFile.h"\
+	".\DjVuFileCache.h"\
+	".\DjVuGlobal.h"\
+	".\DjVuImage.h"\
+	".\DjVuInfo.h"\
+	".\DjVuNavDir.h"\
+	".\DjVuPalette.h"\
+	".\DjVuPort.h"\
+	".\GContainer.h"\
+	".\GException.h"\
+	".\GOS.h"\
+	".\GPixmap.h"\
+	".\GRect.h"\
+	".\GSmartPointer.h"\
+	".\GString.h"\
+	".\GThreads.h"\
+	".\GURL.h"\
+	".\IFFByteStream.h"\
+	".\IW44Image.h"\
+	".\ZPCodec.h"\
+	
+NODEP_CPP_DJVUDO=\
+	".\jri.h"\
+	
 # End Source File
 # Begin Source File
 
 SOURCE=.\DjVuDumpHelper.cpp
+DEP_CPP_DJVUDU=\
+	"..\include\DjVu.h"\
+	".\Arrays.h"\
+	".\ByteStream.h"\
+	".\DataPool.h"\
+	".\DjVmDir.h"\
+	".\DjVuDumpHelper.h"\
+	".\DjVuGlobal.h"\
+	".\DjVuInfo.h"\
+	".\GContainer.h"\
+	".\GException.h"\
+	".\GRect.h"\
+	".\GSmartPointer.h"\
+	".\GString.h"\
+	".\GThreads.h"\
+	".\GURL.h"\
+	".\IFFByteStream.h"\
+	
+NODEP_CPP_DJVUDU=\
+	".\jri.h"\
+	
 # End Source File
 # Begin Source File
 
 SOURCE=.\DjVuErrorList.cpp
+DEP_CPP_DJVUE=\
+	"..\include\DjVu.h"\
+	".\Arrays.h"\
+	".\DataPool.h"\
+	".\DjVmDir.h"\
+	".\DjVmDoc.h"\
+	".\DjVuErrorList.h"\
+	".\DjVuGlobal.h"\
+	".\DjVuPort.h"\
+	".\GContainer.h"\
+	".\GException.h"\
+	".\GOS.h"\
+	".\GSmartPointer.h"\
+	".\GString.h"\
+	".\GThreads.h"\
+	".\GURL.h"\
+	
+NODEP_CPP_DJVUE=\
+	".\jri.h"\
+	
 # End Source File
 # Begin Source File
 
 SOURCE=.\DjVuFile.cpp
+DEP_CPP_DJVUF=\
+	"..\3rd-party\libjpeg\jconfig.h"\
+	"..\3rd-party\libjpeg\jerror.h"\
+	"..\3rd-party\libjpeg\jinclude.h"\
+	"..\3rd-party\libjpeg\jmorecfg.h"\
+	"..\3rd-party\libjpeg\jpegint.h"\
+	"..\3rd-party\libjpeg\jpeglib.h"\
+	"..\include\DjVu.h"\
+	".\Arrays.h"\
+	".\ByteStream.h"\
+	".\DataPool.h"\
+	".\debug.h"\
+	".\DjVuAnno.h"\
+	".\DjVuFile.h"\
+	".\DjVuGlobal.h"\
+	".\DjVuInfo.h"\
+	".\DjVuNavDir.h"\
+	".\DjVuPalette.h"\
+	".\DjVuPort.h"\
+	".\DjVuText.h"\
+	".\GContainer.h"\
+	".\GException.h"\
+	".\GMapAreas.h"\
+	".\GOS.h"\
+	".\GPixmap.h"\
+	".\GRect.h"\
+	".\GSmartPointer.h"\
+	".\GString.h"\
+	".\GThreads.h"\
+	".\GURL.h"\
+	".\IFFByteStream.h"\
+	".\IW44Image.h"\
+	".\JB2Image.h"\
+	".\JPEGDecoder.h"\
+	".\MMRDecoder.h"\
+	".\ZPCodec.h"\
+	
+NODEP_CPP_DJVUF=\
+	".\jri.h"\
+	
 # End Source File
 # Begin Source File
 
 SOURCE=.\DjVuFileCache.cpp
+DEP_CPP_DJVUFI=\
+	"..\include\DjVu.h"\
+	".\Arrays.h"\
+	".\debug.h"\
+	".\DjVuFile.h"\
+	".\DjVuFileCache.h"\
+	".\DjVuGlobal.h"\
+	".\DjVuInfo.h"\
+	".\DjVuPalette.h"\
+	".\DjVuPort.h"\
+	".\GContainer.h"\
+	".\GException.h"\
+	".\GPixmap.h"\
+	".\GRect.h"\
+	".\GSmartPointer.h"\
+	".\GString.h"\
+	".\GThreads.h"\
+	".\GURL.h"\
+	
+NODEP_CPP_DJVUFI=\
+	".\jri.h"\
+	
 # End Source File
 # Begin Source File
 
 SOURCE=.\DjVuGlobal.cpp
+DEP_CPP_DJVUG=\
+	"..\include\DjVu.h"\
+	".\DjVuGlobal.h"\
+	".\GContainer.h"\
+	".\GException.h"\
+	".\GOS.h"\
+	".\GSmartPointer.h"\
+	".\GString.h"\
+	".\GThreads.h"\
+	
+NODEP_CPP_DJVUG=\
+	".\jri.h"\
+	
 # End Source File
 # Begin Source File
 
 SOURCE=.\DjVuGlobalMemory.cpp
+DEP_CPP_DJVUGL=\
+	"..\include\DjVu.h"\
+	".\debug.h"\
+	".\DjVuGlobal.h"\
+	".\GException.h"\
+	
 # End Source File
 # Begin Source File
 
 SOURCE=.\DjVuImage.cpp
+DEP_CPP_DJVUI=\
+	"..\include\DjVu.h"\
+	".\Arrays.h"\
+	".\ByteStream.h"\
+	".\DataPool.h"\
+	".\debug.h"\
+	".\DjVuAnno.h"\
+	".\DjVuDocument.h"\
+	".\DjVuFile.h"\
+	".\DjVuGlobal.h"\
+	".\DjVuImage.h"\
+	".\DjVuInfo.h"\
+	".\DjVuPalette.h"\
+	".\DjVuPort.h"\
+	".\GBitmap.h"\
+	".\GContainer.h"\
+	".\GException.h"\
+	".\GMapAreas.h"\
+	".\GPixmap.h"\
+	".\GRect.h"\
+	".\GScaler.h"\
+	".\GSmartPointer.h"\
+	".\GString.h"\
+	".\GThreads.h"\
+	".\GURL.h"\
+	".\IW44Image.h"\
+	".\JB2Image.h"\
+	".\ZPCodec.h"\
+	
+NODEP_CPP_DJVUI=\
+	".\jri.h"\
+	
 # End Source File
 # Begin Source File
 
 SOURCE=.\DjVuInfo.cpp
+DEP_CPP_DJVUIN=\
+	"..\include\DjVu.h"\
+	".\Arrays.h"\
+	".\ByteStream.h"\
+	".\DjVuGlobal.h"\
+	".\DjVuInfo.h"\
+	".\GException.h"\
+	".\GRect.h"\
+	".\GSmartPointer.h"\
+	
 # End Source File
 # Begin Source File
 
 SOURCE=.\DjVuMessage.cpp
+DEP_CPP_DJVUM=\
+	"..\include\DjVu.h"\
+	".\Arrays.h"\
+	".\ByteStream.h"\
+	".\debug.h"\
+	".\DjVuGlobal.h"\
+	".\DjVuMessage.h"\
+	".\DjVuMessageLite.h"\
+	".\GContainer.h"\
+	".\GException.h"\
+	".\GOS.h"\
+	".\GSmartPointer.h"\
+	".\GString.h"\
+	".\GThreads.h"\
+	".\GURL.h"\
+	".\XMLTags.h"\
+	
+NODEP_CPP_DJVUM=\
+	".\jri.h"\
+	
 # End Source File
 # Begin Source File
 
 SOURCE=.\DjVuMessageLite.cpp
+DEP_CPP_DJVUME=\
+	"..\include\DjVu.h"\
+	".\Arrays.h"\
+	".\ByteStream.h"\
+	".\debug.h"\
+	".\DjVuGlobal.h"\
+	".\DjVuMessageLite.h"\
+	".\GContainer.h"\
+	".\GException.h"\
+	".\GOS.h"\
+	".\GSmartPointer.h"\
+	".\GString.h"\
+	".\GThreads.h"\
+	".\GURL.h"\
+	".\XMLTags.h"\
+	
+NODEP_CPP_DJVUME=\
+	".\jri.h"\
+	
 # End Source File
 # Begin Source File
 
 SOURCE=.\DjVuNavDir.cpp
+DEP_CPP_DJVUN=\
+	"..\include\DjVu.h"\
+	".\Arrays.h"\
+	".\ByteStream.h"\
+	".\debug.h"\
+	".\DjVuGlobal.h"\
+	".\DjVuNavDir.h"\
+	".\GContainer.h"\
+	".\GException.h"\
+	".\GOS.h"\
+	".\GSmartPointer.h"\
+	".\GString.h"\
+	".\GThreads.h"\
+	".\GURL.h"\
+	
+NODEP_CPP_DJVUN=\
+	".\jri.h"\
+	
 # End Source File
 # Begin Source File
 
 SOURCE=.\DjVuPalette.cpp
+DEP_CPP_DJVUP=\
+	"..\include\DjVu.h"\
+	".\Arrays.h"\
+	".\BSByteStream.h"\
+	".\ByteStream.h"\
+	".\DjVuGlobal.h"\
+	".\DjVuPalette.h"\
+	".\GContainer.h"\
+	".\GException.h"\
+	".\GPixmap.h"\
+	".\GSmartPointer.h"\
+	".\ZPCodec.h"\
+	
 # End Source File
 # Begin Source File
 
 SOURCE=.\DjVuPort.cpp
+DEP_CPP_DJVUPO=\
+	"..\include\DjVu.h"\
+	".\Arrays.h"\
+	".\DataPool.h"\
+	".\DjVuAnno.h"\
+	".\DjVuDocument.h"\
+	".\DjVuFile.h"\
+	".\DjVuGlobal.h"\
+	".\DjVuImage.h"\
+	".\DjVuInfo.h"\
+	".\DjVuMessageLite.h"\
+	".\DjVuPalette.h"\
+	".\DjVuPort.h"\
+	".\GContainer.h"\
+	".\GException.h"\
+	".\GOS.h"\
+	".\GPixmap.h"\
+	".\GRect.h"\
+	".\GSmartPointer.h"\
+	".\GString.h"\
+	".\GThreads.h"\
+	".\GURL.h"\
+	
+NODEP_CPP_DJVUPO=\
+	".\jri.h"\
+	
 # End Source File
 # Begin Source File
 
 SOURCE=.\DjVuText.cpp
+DEP_CPP_DJVUT=\
+	"..\include\DjVu.h"\
+	".\Arrays.h"\
+	".\BSByteStream.h"\
+	".\ByteStream.h"\
+	".\debug.h"\
+	".\DjVuGlobal.h"\
+	".\DjVuText.h"\
+	".\GContainer.h"\
+	".\GException.h"\
+	".\GMapAreas.h"\
+	".\GRect.h"\
+	".\GSmartPointer.h"\
+	".\GString.h"\
+	".\IFFByteStream.h"\
+	".\ZPCodec.h"\
+	
 # End Source File
 # Begin Source File
 
 SOURCE=.\GBitmap.cpp
+DEP_CPP_GBITM=\
+	"..\include\DjVu.h"\
+	".\Arrays.h"\
+	".\ByteStream.h"\
+	".\DjVuGlobal.h"\
+	".\GBitmap.h"\
+	".\GContainer.h"\
+	".\GException.h"\
+	".\GRect.h"\
+	".\GSmartPointer.h"\
+	".\GString.h"\
+	".\GThreads.h"\
+	
+NODEP_CPP_GBITM=\
+	".\jri.h"\
+	
 # End Source File
 # Begin Source File
 
 SOURCE=.\GContainer.cpp
+DEP_CPP_GCONT=\
+	"..\include\DjVu.h"\
+	".\DjVuGlobal.h"\
+	".\GContainer.h"\
+	".\GException.h"\
+	".\GSmartPointer.h"\
+	
 # End Source File
 # Begin Source File
 
 SOURCE=.\GException.cpp
+DEP_CPP_GEXCE=\
+	"..\include\DjVu.h"\
+	".\debug.h"\
+	".\DjVuGlobal.h"\
+	".\DjVuMessageLite.h"\
+	".\GContainer.h"\
+	".\GException.h"\
+	".\GSmartPointer.h"\
+	".\GString.h"\
+	
 # End Source File
 # Begin Source File
 
 SOURCE=.\GIFFManager.cpp
+DEP_CPP_GIFFM=\
+	"..\include\DjVu.h"\
+	".\Arrays.h"\
+	".\ByteStream.h"\
+	".\debug.h"\
+	".\DjVuGlobal.h"\
+	".\GContainer.h"\
+	".\GException.h"\
+	".\GIFFManager.h"\
+	".\GSmartPointer.h"\
+	".\GString.h"\
+	".\IFFByteStream.h"\
+	
 # End Source File
 # Begin Source File
 
 SOURCE=.\GMapAreas.cpp
+DEP_CPP_GMAPA=\
+	"..\include\DjVu.h"\
+	".\debug.h"\
+	".\DjVuGlobal.h"\
+	".\GContainer.h"\
+	".\GException.h"\
+	".\GMapAreas.h"\
+	".\GRect.h"\
+	".\GSmartPointer.h"\
+	".\GString.h"\
+	
 # End Source File
 # Begin Source File
 
 SOURCE=.\GOS.cpp
+DEP_CPP_GOS_C=\
+	"..\include\DjVu.h"\
+	".\Arrays.h"\
+	".\DjVuGlobal.h"\
+	".\GContainer.h"\
+	".\GException.h"\
+	".\GOS.h"\
+	".\GSmartPointer.h"\
+	".\GString.h"\
+	".\GThreads.h"\
+	".\GURL.h"\
+	
+NODEP_CPP_GOS_C=\
+	".\jri.h"\
+	
 # End Source File
 # Begin Source File
 
 SOURCE=.\GPixmap.cpp
+DEP_CPP_GPIXM=\
+	"..\include\DjVu.h"\
+	".\Arrays.h"\
+	".\ByteStream.h"\
+	".\DjVuGlobal.h"\
+	".\GBitmap.h"\
+	".\GContainer.h"\
+	".\GException.h"\
+	".\GPixmap.h"\
+	".\GRect.h"\
+	".\GSmartPointer.h"\
+	".\GString.h"\
+	".\GThreads.h"\
+	
+NODEP_CPP_GPIXM=\
+	".\jri.h"\
+	
 # End Source File
 # Begin Source File
 
 SOURCE=.\GRect.cpp
+DEP_CPP_GRECT=\
+	"..\include\DjVu.h"\
+	".\DjVuGlobal.h"\
+	".\GException.h"\
+	".\GRect.h"\
+	
 # End Source File
 # Begin Source File
 
 SOURCE=.\GScaler.cpp
+DEP_CPP_GSCAL=\
+	"..\include\DjVu.h"\
+	".\DjVuGlobal.h"\
+	".\GBitmap.h"\
+	".\GException.h"\
+	".\GPixmap.h"\
+	".\GRect.h"\
+	".\GScaler.h"\
+	".\GSmartPointer.h"\
+	
 # End Source File
 # Begin Source File
 
 SOURCE=.\GSmartPointer.cpp
+DEP_CPP_GSMAR=\
+	"..\include\DjVu.h"\
+	".\DjVuGlobal.h"\
+	".\GException.h"\
+	".\GSmartPointer.h"\
+	".\GThreads.h"\
+	
+NODEP_CPP_GSMAR=\
+	".\jri.h"\
+	
 # End Source File
 # Begin Source File
 
 SOURCE=.\GString.cpp
+DEP_CPP_GSTRI=\
+	"..\include\DjVu.h"\
+	".\debug.h"\
+	".\DjVuGlobal.h"\
+	".\GContainer.h"\
+	".\GException.h"\
+	".\GSmartPointer.h"\
+	".\GString.h"\
+	
 # End Source File
 # Begin Source File
 
 SOURCE=.\GThreads.cpp
+DEP_CPP_GTHRE=\
+	"..\include\DjVu.h"\
+	".\DjVuGlobal.h"\
+	".\DjVuMessageLite.h"\
+	".\GContainer.h"\
+	".\GException.h"\
+	".\GSmartPointer.h"\
+	".\GString.h"\
+	".\GThreads.h"\
+	
+NODEP_CPP_GTHRE=\
+	".\jri.h"\
+	
 # End Source File
 # Begin Source File
 
 SOURCE=.\GUnicode.cpp
+DEP_CPP_GUNIC=\
+	"..\include\DjVu.h"\
+	".\DjVuGlobal.h"\
+	".\GContainer.h"\
+	".\GException.h"\
+	".\GSmartPointer.h"\
+	".\GString.h"\
+	
 # End Source File
 # Begin Source File
 
 SOURCE=.\GURL.cpp
+DEP_CPP_GURL_=\
+	"..\include\DjVu.h"\
+	".\Arrays.h"\
+	".\debug.h"\
+	".\DjVuGlobal.h"\
+	".\GContainer.h"\
+	".\GException.h"\
+	".\GOS.h"\
+	".\GSmartPointer.h"\
+	".\GString.h"\
+	".\GThreads.h"\
+	".\GURL.h"\
+	
+NODEP_CPP_GURL_=\
+	".\jri.h"\
+	
 # End Source File
 # Begin Source File
 
 SOURCE=.\IFFByteStream.cpp
+DEP_CPP_IFFBY=\
+	"..\include\DjVu.h"\
+	".\Arrays.h"\
+	".\ByteStream.h"\
+	".\DjVuGlobal.h"\
+	".\GContainer.h"\
+	".\GException.h"\
+	".\GSmartPointer.h"\
+	".\GString.h"\
+	".\IFFByteStream.h"\
+	
 # End Source File
 # Begin Source File
 
 SOURCE=.\IW44EncodeCodec.cpp
+DEP_CPP_IW44E=\
+	"..\include\DjVu.h"\
+	".\Arrays.h"\
+	".\ByteStream.h"\
+	".\DjVuGlobal.h"\
+	".\GBitmap.h"\
+	".\GContainer.h"\
+	".\GException.h"\
+	".\GOS.h"\
+	".\GPixmap.h"\
+	".\GRect.h"\
+	".\GSmartPointer.h"\
+	".\GString.h"\
+	".\IFFByteStream.h"\
+	".\IW44Image.h"\
+	".\MMX.h"\
+	".\ZPCodec.h"\
+	
 # End Source File
 # Begin Source File
 
 SOURCE=.\IW44Image.cpp
+DEP_CPP_IW44I=\
+	"..\include\DjVu.h"\
+	".\Arrays.h"\
+	".\ByteStream.h"\
+	".\DjVuGlobal.h"\
+	".\GBitmap.h"\
+	".\GContainer.h"\
+	".\GException.h"\
+	".\GOS.h"\
+	".\GPixmap.h"\
+	".\GRect.h"\
+	".\GSmartPointer.h"\
+	".\GString.h"\
+	".\IFFByteStream.h"\
+	".\IW44Image.h"\
+	".\MMX.h"\
+	".\ZPCodec.h"\
+	
 # End Source File
 # Begin Source File
 
 SOURCE=.\JB2EncodeCodec.cpp
+DEP_CPP_JB2EN=\
+	"..\include\DjVu.h"\
+	".\DjVuGlobal.h"\
+	".\GBitmap.h"\
+	".\GContainer.h"\
+	".\GException.h"\
+	".\GSmartPointer.h"\
+	".\GString.h"\
+	".\JB2Image.h"\
+	".\ZPCodec.h"\
+	
 # End Source File
 # Begin Source File
 
 SOURCE=.\JB2Image.cpp
+DEP_CPP_JB2IM=\
+	"..\include\DjVu.h"\
+	".\DjVuGlobal.h"\
+	".\GBitmap.h"\
+	".\GContainer.h"\
+	".\GException.h"\
+	".\GRect.h"\
+	".\GSmartPointer.h"\
+	".\GString.h"\
+	".\GThreads.h"\
+	".\JB2Image.h"\
+	".\ZPCodec.h"\
+	
+NODEP_CPP_JB2IM=\
+	".\jri.h"\
+	
 # End Source File
 # Begin Source File
 
 SOURCE=.\JPEGDecoder.cpp
+DEP_CPP_JPEGD=\
+	"..\3rd-party\libjpeg\jconfig.h"\
+	"..\3rd-party\libjpeg\jerror.h"\
+	"..\3rd-party\libjpeg\jinclude.h"\
+	"..\3rd-party\libjpeg\jmorecfg.h"\
+	"..\3rd-party\libjpeg\jpegint.h"\
+	"..\3rd-party\libjpeg\jpeglib.h"\
+	"..\include\DjVu.h"\
+	".\Arrays.h"\
+	".\ByteStream.h"\
+	".\DjVuGlobal.h"\
+	".\GException.h"\
+	".\GPixmap.h"\
+	".\GSmartPointer.h"\
+	".\JPEGDecoder.h"\
+	
 # End Source File
 # Begin Source File
 
 SOURCE=.\MMRDecoder.cpp
+DEP_CPP_MMRDE=\
+	"..\include\DjVu.h"\
+	".\Arrays.h"\
+	".\ByteStream.h"\
+	".\DjVuGlobal.h"\
+	".\GBitmap.h"\
+	".\GContainer.h"\
+	".\GException.h"\
+	".\GSmartPointer.h"\
+	".\GString.h"\
+	".\JB2Image.h"\
+	".\MMRDecoder.h"\
+	".\ZPCodec.h"\
+	
 # End Source File
 # Begin Source File
 
 SOURCE=.\MMX.cpp
+DEP_CPP_MMX_C=\
+	"..\include\DjVu.h"\
+	".\DjVuGlobal.h"\
+	".\MMX.h"\
+	
 # End Source File
 # Begin Source File
 
 SOURCE=.\parseoptions.cpp
+DEP_CPP_PARSE=\
+	"..\include\DjVu.h"\
+	"..\include\DjVuOptions.h"\
+	".\Arrays.h"\
+	".\DjVuGlobal.h"\
+	".\DjVuMessage.h"\
+	".\DjVuMessageLite.h"\
+	".\GContainer.h"\
+	".\GException.h"\
+	".\GSmartPointer.h"\
+	".\GString.h"\
+	".\GThreads.h"\
+	".\parseoptions.h"\
+	
+NODEP_CPP_PARSE=\
+	".\jri.h"\
+	
 # End Source File
 # Begin Source File
 
 SOURCE=.\UnicodeByteStream.cpp
+DEP_CPP_UNICO=\
+	"..\include\DjVu.h"\
+	".\Arrays.h"\
+	".\ByteStream.h"\
+	".\DjVuGlobal.h"\
+	".\GContainer.h"\
+	".\GException.h"\
+	".\GSmartPointer.h"\
+	".\GString.h"\
+	".\UnicodeByteStream.h"\
+	
 # End Source File
 # Begin Source File
 
 SOURCE=.\XMLParser.cpp
+DEP_CPP_XMLPA=\
+	"..\include\DjVu.h"\
+	".\Arrays.h"\
+	".\ByteStream.h"\
+	".\debug.h"\
+	".\DjVuAnno.h"\
+	".\DjVuDocument.h"\
+	".\DjVuFile.h"\
+	".\DjVuGlobal.h"\
+	".\DjVuImage.h"\
+	".\DjVuInfo.h"\
+	".\DjVuPalette.h"\
+	".\DjVuPort.h"\
+	".\DjVuText.h"\
+	".\GContainer.h"\
+	".\GException.h"\
+	".\GMapAreas.h"\
+	".\GOS.h"\
+	".\GPixmap.h"\
+	".\GRect.h"\
+	".\GSmartPointer.h"\
+	".\GString.h"\
+	".\GThreads.h"\
+	".\GURL.h"\
+	".\XMLParser.h"\
+	".\XMLTags.h"\
+	
+NODEP_CPP_XMLPA=\
+	".\jri.h"\
+	
 # End Source File
 # Begin Source File
 
 SOURCE=.\XMLTags.cpp
+DEP_CPP_XMLTA=\
+	"..\include\DjVu.h"\
+	".\Arrays.h"\
+	".\ByteStream.h"\
+	".\DjVuGlobal.h"\
+	".\GContainer.h"\
+	".\GException.h"\
+	".\GSmartPointer.h"\
+	".\GString.h"\
+	".\UnicodeByteStream.h"\
+	".\XMLTags.h"\
+	
 # End Source File
 # Begin Source File
 
 SOURCE=.\ZPCodec.cpp
+DEP_CPP_ZPCOD=\
+	"..\include\DjVu.h"\
+	".\Arrays.h"\
+	".\ByteStream.h"\
+	".\DjVuGlobal.h"\
+	".\GContainer.h"\
+	".\GException.h"\
+	".\GSmartPointer.h"\
+	".\ZPCodec.h"\
+	
 # End Source File
 # End Group
 # Begin Group "Header Files"

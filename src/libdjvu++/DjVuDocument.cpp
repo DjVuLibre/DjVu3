@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocument.cpp,v 1.175 2001-06-11 18:26:40 bcr Exp $
+// $Id: DjVuDocument.cpp,v 1.176 2001-06-11 19:26:59 bcr Exp $
 // $Name:  $
 
 
@@ -386,11 +386,11 @@ DjVuDocument::init_thread(void)
 	    // Seems to be 1-page old-style document. Create dummy NDIR
 	 if (doc_type==OLD_BUNDLED)
 	 {
-	    ndir=DjVuNavDir::create(init_url+"directory");
+		 ndir=DjVuNavDir::create(GURL::UTF8("directory",init_url));
 	    ndir->insert_page(-1, first_page_name);
 	 } else
 	 {
-	    ndir=DjVuNavDir::create(init_url.base()+"directory");
+		 ndir=DjVuNavDir::create(GURL::UTF8("directory",init_url.base()));
 	    ndir->insert_page(-1, init_url.fname());
 	 }
       } 
