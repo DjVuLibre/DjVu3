@@ -1,4 +1,4 @@
-/* File "$Id: DjVuAPI.h,v 1.4 1999-11-16 20:04:16 orost Exp $"
+/* File "$Id: DjVuAPI.h,v 1.5 1999-11-18 00:17:12 parag Exp $"
  *
  * The main header file for the DjVu API
  */
@@ -11,7 +11,10 @@
 
 /* 
  * $Log: DjVuAPI.h,v $
- * Revision 1.4  1999-11-16 20:04:16  orost
+ * Revision 1.5  1999-11-18 00:17:12  parag
+ * After changing Callback for djvu_fin
+ *
+ * Revision 1.4  1999/11/16 20:04:16  orost
  * Added in the functions for libimage
  *
  * Revision 1.3  1999/11/10 17:55:01  parag
@@ -198,7 +201,7 @@ typedef enum {
                void *privdata;      /* reserved for internal use */
                unsigned int xdpi;   /* The X image resolution */ 
                unsigned int ydpi;   /* The Y image resolution */ 
-               long reserved;       /* Reserved as Func Ptr */
+							 void * reserved;     /* Reserved for callback struct Ptr */
 #ifdef __cplusplus
                 djvu_pixel_image_struct();
 #endif
@@ -676,14 +679,15 @@ typedef enum {
                                   * being read */
                  const int len,  /* Length of the data
                                   * being read  
-                                  * retVal < len >=0 (EOF reached)
-                                  * retval > len     (Wants to send More Data)
-                                  * retval < 0       ( Error Condition) */
+				  * retVal < len >=0 (EOF reached)
+				  * retval > len     (Wants to send More Data)
+				  * retval < 0       ( Error Condition) */
 		 const int seek=0, /* seek == 0    (Allocate &/ Give data)
-                                    * seek == +n   (Skip next "n" data )
-                                    * seek == -1   (Deallocate if required) */
-                 const int whence=1 /* Default to SEEK_CUR */
+				    * seek == +n   (Skip next "n" data )
+				    * seek == -1   (Deallocate if required) */
+		 const int whence=1 /* Default to SEEK_CUR */
                             );
+
 /* 
  *      djvu_output_sub
  *
@@ -888,6 +892,19 @@ djvu_run_to_pixel(const djvu_run_image *rimg);
 
 DJVUAPI djvu_pixel_image *
 io_run_to_pixel(const djvu_run_image *rimg); /** ONLY internally used */
+/*
+ * For freeing memory allocated by the callbacks
+ */ 
+DJVUAPI void
+io_free_callback(void * callbackStruct);
+
+/* 
+ *      djvu_pixel_copy_scaled  // depreciated, use djvu_pixel_copy_transformed
+ *
+ * 		See DjVuAPI-2_0.html#djvu_pixel_copy_scaled
+ */
+DJVUAPI djvu_pixel_image *
+djvu_pixel_copy_scaled(const djvu_pixel_image *pimg,const int scale,const int quality);
 /*
  *      djvu_pixel_copy_transformed
  *
