@@ -32,7 +32,7 @@
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #C- 
 #
-# $Id: pdftodjvu.pl,v 1.4 2001-03-27 23:07:28 debs Exp $
+# $Id: pdftodjvu.pl,v 1.5 2001-05-04 21:41:30 debs Exp $
 # $Name:  $
 
 # Perl libs to use
@@ -236,7 +236,7 @@ if ( ! $profile ) {
   $profile="$defaultprofile$dpi";
 } elsif ( ! $dpi ) {
   $dpi="$profile";
-  $dpi =~ /.*\([1-6][0-5]0\)$1p/;
+  $dpi =~ s/^.*([1-6][0-5]0)$/$1/;
   if ( ! $dpi ) {
     $dpi=$defaultdpi;
   }
@@ -306,12 +306,16 @@ $tfile2=sprintf("${tmpdir}/${name}-%04d.djvu");
 ## close SFILE;
 ## $cmdstr="gswin32c -dBATCH -dNOPAUSE -q -sDEVICE=$outputdev -r$rdpi -sOutputFile=$tfile $input; $script $tfile $tfile2";
 ## $cmdstr="gswin32c -dBATCH -dNOPAUSE -q -sDEVICE=$outputdev -r$rdpi -sOutputFile=$tfile $input; $djvucommand $args $tfile $tfile2";
-$cmdstr="gswin32c -dBATCH -dNOPAUSE -q -sDEVICE=$outputdev -r$rdpi -sOutputFile=" . '"' . $tfile . '" "' . $input . '"';
+$cmdstr="gswin32c -dBATCH -dNOPAUSE -q -sDEVICE=$outputdev -r$rdpi -sOutputFile=" . '"' . $tfile . '" "' . $input . '" 2>&1';
 if ( $verbose ) { print "$cmdstr\n"; }
-system($cmdstr);
-$cmdstr="$djvucommand $args " . '"' . $tfile . '" "' . $tfile2 . '"';
+$outputstr=`$cmdstr`;
+$outputstr =~ s/\*+Unknown operator: ri\n//g;
+if ( $verbose ) { print $outputstr; }
+$cmdstr="$djvucommand $args " . '"' . $tfile . '" "' . $tfile2 . '" 2>&1';
 if ( $verbose ) { print "$cmdstr\n"; }
-system($cmdstr);
+$outputstr=`$cmdstr`;
+$outputstr =~ s/Failed to read page [0-9]//g;
+if ( $verbose ) { print $outputstr; }
 
 find(\&wanted,$tmpdir);
 
