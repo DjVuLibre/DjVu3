@@ -18,7 +18,7 @@ LDFLAGS=
 # Release info
 
 NAM= libdjvu++
-VER= 1.2
+VER= 2.1
 
 # This 
 LIB= libdjvu++.a
