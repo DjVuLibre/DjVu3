@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuAnno.cpp,v 1.35 1999-10-28 14:38:15 praveen Exp $
+//C- $Id: DjVuAnno.cpp,v 1.36 1999-10-28 14:43:51 eaf Exp $
 
 
 #ifdef __GNUC__
@@ -1161,7 +1161,7 @@ DjVuTXT::copy(void) const
 
 
 bool
-DjVuTXT::search_zone(Zone * zone, int start, int & length)
+DjVuTXT::search_zone(const Zone * zone, int start, int & length) const
       // Will return TRUE if 'zone' contains beginning of the text
       // at 'start'. In this case it will also modify the 'length'
       // to show how much of the text in this zone
@@ -1176,14 +1176,14 @@ DjVuTXT::search_zone(Zone * zone, int start, int & length)
 }
 
 DjVuTXT::Zone *
-DjVuTXT::get_smallest_zone(int max_type, int start, int & length)
+DjVuTXT::get_smallest_zone(int max_type, int start, int & length) const
       // Will return the smallest zone with type up to max_type containing
       // the text starting at start. If anything is found, length will
       // be modified to indicate how much of the text is inside the zone
 {
    if (!search_zone(&main, start, length)) return 0;
    
-   Zone * zone=&main;
+   const Zone * zone=&main;
    while(zone->ztype<max_type)
    {
       GPosition pos;
@@ -1194,7 +1194,7 @@ DjVuTXT::get_smallest_zone(int max_type, int start, int & length)
       else break;
    }
 
-   return zone;
+   return (Zone *) zone;
 }
 
 static inline bool
@@ -1214,7 +1214,7 @@ chars_equal(char ch1, char ch2, bool match_case)
 
 GList<DjVuTXT::Zone *>
 DjVuTXT::search_string(const char * string, int & from,
-		       bool search_fwd, bool match_case)
+		       bool search_fwd, bool match_case) const
 {
    GList<Zone *> zone_list;
    int string_length = strlen(string);

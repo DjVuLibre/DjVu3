@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuAnno.h,v 1.17 1999-10-26 22:26:47 eaf Exp $
+//C- $Id: DjVuAnno.h,v 1.18 1999-10-28 14:43:51 eaf Exp $
 
 #ifndef _DJVUANNO_H
 #define _DJVUANNO_H
@@ -36,7 +36,7 @@
     @memo Implements support for DjVuImage annotations
     @author Andrei Erofeev <eaf@research.att.com>
     @version
-    #$Id: DjVuAnno.h,v 1.17 1999-10-26 22:26:47 eaf Exp $# */
+    #$Id: DjVuAnno.h,v 1.18 1999-10-28 14:43:51 eaf Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -255,13 +255,13 @@ public:
       @param match_case If set to #FALSE# the search will be case-insensitive.
       */
   GList<Zone *> search_string(const char * string, int & start_pos,
-			      bool search_fwd, bool match_case);
+			      bool search_fwd, bool match_case) const;
   /** Returns the number of bytes needed by this data structure. It's
       used by caching routines to estimate the size of a \Ref{DjVuImage}. */
   unsigned int get_memory_usage() const;
 private:
-  bool		search_zone(Zone * zone, int start, int & length);
-  Zone	*	get_smallest_zone(int max_type, int start, int & length);
+  bool		search_zone(const Zone * zone, int start, int & length) const;
+  Zone	*	get_smallest_zone(int max_type, int start, int & length) const;
 };
 
 
