@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.h,v 1.2 1999-05-25 19:42:27 eaf Exp $
+//C- $Id: DataPool.h,v 1.3 1999-05-25 21:26:36 leonb Exp $
  
 #ifndef _DATAPOOL_H
 #define _DATAPOOL_H
@@ -38,19 +38,20 @@
 
     @memo Thread safe data storage
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DataPool.h,v 1.2 1999-05-25 19:42:27 eaf Exp $#
+    @version #$Id: DataPool.h,v 1.3 1999-05-25 21:26:36 leonb Exp $#
 */
 
 //@{
 
-/** #DataPool# is an object, which accepts data from outside (see
-    \Ref{add_data}()) and stores it inside for immediate access through
-    \Ref{get_data}() function from other threads
+/** Thread safe data file.  
+    Each #DataPool# object accepts data from outside (see \Ref{add_data}())
+    and stores it inside for immediate access (see \Ref{get_data}()) from
+    other threads.
 
-    It is derived from \Ref{MemoryByteStream}, which allows it to handle
-    underlying data storage efficiently, and it's also thread-protected.
-    It means, that more than one thread can attempt to request data from
-    it at the same time.
+    This class is derived from \Ref{MemoryByteStream}, which allows it to
+    handle underlying data storage efficiently, and it's also
+    thread-protected.  It means, that more than one thread can attempt to
+    request data from it at the same time.
 
     The interface of \Ref{get_data}() function allows to request data from
     any portion of the #DataPool#. In case if there is still not enough data
@@ -68,8 +69,7 @@
     when a given amount of data has been received. It's a useful feature
     when you don't want to block waiting for data in a \Ref{get_data}()
     request, but still want to be informed when a non-block read can be
-    possible.
-*/
+    possible.  */
 
 class DataPool : public GPEnabled, protected MemoryByteStream
 {
