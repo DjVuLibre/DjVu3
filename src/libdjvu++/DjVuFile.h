@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.h,v 1.36 1999-09-19 19:24:36 eaf Exp $
+//C- $Id: DjVuFile.h,v 1.37 1999-09-20 22:07:12 eaf Exp $
  
 #ifndef _DJVUFILE_H
 #define _DJVUFILE_H
@@ -46,7 +46,7 @@
 
     @memo Classes representing DjVu files.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuFile.h,v 1.36 1999-09-19 19:24:36 eaf Exp $#
+    @version #$Id: DjVuFile.h,v 1.37 1999-09-20 22:07:12 eaf Exp $#
 */
 
 //@{
@@ -147,7 +147,8 @@ class DjVuFile : public DjVuPort
 public:
    enum { DECODING=1, DECODE_OK=2, DECODE_FAILED=4, DECODE_STOPPED=8,
 	  DATA_PRESENT=16, ALL_DATA_PRESENT=32, INCL_FILES_CREATED=64,
-          MODIFIED=128, DONT_START_DECODE=256 };
+          MODIFIED=128, DONT_START_DECODE=256, STOPPED=512,
+	  BLOCKED_STOPPED=1024 };
    enum { STARTED=1, FINISHED=2 };
 
       /** @name Decoded file contents */
@@ -302,18 +303,25 @@ public:
 	  just signal the thread to stop and will return immediately.
 	  Decoding of all included files will be stopped too. */
    void		stop_decode(bool sync);
-      /** Stops data-related operations.
+      /** Recursively stops all data-related operations.
 
 	  Depending on the value of #only_blocked# flag this works as follows:
 	  \begin{itemize}
 	     \item If #only_blocked# is #TRUE#, the function will make sure,
 	           that any further access to the file's data will result
-		   in a #STOP# exception if not enough data is available
+		   in a #STOP# exception if the desired data is not available
 		   (and the thread would normally block).
 	     \item If #only_blocked# is #FALSE#, then {\bf any} further
 	           access to the file's data will result in immediate
 		   #STOP# exception.
-	  \end{itemize} */
+	  \end{itemize}
+
+	  The action of this function is recursive, meaning that any #DjVuFile#
+	  included into this one will also be stopped.
+
+	  Use this function when you don't need the #DjVuFile# anymore. The
+	  results cannot be undone, and the whole idea is to make all threads
+	  working with this file exit with the #STOP# exception. */
    void		stop(bool only_blocked);
       /** Wait for the decoding to finish. This will wait for the
 	  termination of included files too. */
@@ -406,11 +414,9 @@ protected:
 private:
    bool                 initialized;
    GSafeFlags		flags;
-   GSafeFlags		decode_thread_flags;
 
    GThread		* decode_thread;
    GP<DataPool>		decode_data_pool;
-   GP<DjVuFile>		decode_life_saver;
 
    GP<DjVuPort>		simple_port;
 

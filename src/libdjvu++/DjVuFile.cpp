@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.57 1999-09-19 19:34:27 eaf Exp $
+//C- $Id: DjVuFile.cpp,v 1.58 1999-09-20 22:07:12 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -153,15 +153,14 @@ DjVuFile::~DjVuFile(void)
       // No more messages. They may result in adding this file to a cache
       // which will be very-very bad as we're being destroyed
    get_portcaster()->del_port(this);
-   
+
+      // Unregister the trigger (we don't want it to be called and attempt
+      // to access the destroyed object)
    if (data_pool) data_pool->del_trigger(static_trigger_cb, this);
-   stop_decode(true);	// Synchronous stop
-   stop(true);		// Stop DataPool for "blocked" operations
-   
-   GMonitorLock lock(&decode_thread_flags);
-   while((decode_thread_flags & STARTED) &&
-	 !(decode_thread_flags & FINISHED))
-      decode_thread_flags.wait();
+
+      // We don't have to wait for decoding to finish here. It's already
+      // finished (we know it because there is a "life saver" in the
+      // thread function)
 }
 
 void
@@ -331,14 +330,26 @@ void
 DjVuFile::static_decode_func(void * cl_data)
 {
    DjVuFile * th=(DjVuFile *) cl_data;
+   
+      /* Please do not undo this life saver. If you do then try to resolve the
+         following conflict first:
+            1. Decoding starts and there is only one external reference
+	       to the DjVuFile.
+	    2. Decoding proceeds and calls DjVuPortcaster::notify_error(),
+	       which creates inside a temporary GP<DjVuFile>.
+	    3. While notify_error() is running, the only external reference
+	       is lost, but the DjVuFile is still alive (remember the
+	       temporary GP<>?)
+	    4. The notify_error() returns, the temporary GP<> gets destroyed
+	       and the DjVuFile is attempting to destroy right in the middle
+	       of the decoding thread. This is either a dead block (waiting
+	       for the termination of the decoding from the ~DjVuFile() called
+	       from the decoding thread) or coredump. */
+   GP<DjVuFile> life_saver=th;
    TRY {
       th->decode_func();
-	 // Don't do ANYTHING below this line.
    } CATCH(exc) {
-      th->decode_thread_flags|=FINISHED;
-	 // Don't do ANYTHING below this line.
    } ENDCATCH;
-   // Don't do ANYTHING below this line.
 }
 
 void
@@ -347,12 +358,6 @@ DjVuFile::decode_func(void)
    check();
    DEBUG_MSG("DjVuFile::decode_func() called, url='" << url << "'\n");
    DEBUG_MAKE_INDENT(3);
-
-      // In the past we used to install a local life saver here. That was
-      // a huge mistake. Even when last external reference to the file
-      // was lost it still continued decoding. Now we just wait in the
-      // destructor for the decoding thread to finish. No life savers.
-   decode_life_saver=0;
 
    DjVuPortcaster * pcaster=get_portcaster();
 
@@ -410,10 +415,6 @@ DjVuFile::decode_func(void)
    TRY {
       if (flags.test_and_modify(DECODING, 0, DECODE_OK | INCL_FILES_CREATED, DECODING))
 	 pcaster->notify_file_flags_changed(this, DECODE_OK | INCL_FILES_CREATED, DECODING);
-
-      decode_thread_flags|=FINISHED;
-	 // Nothing below this point please. The object may already
-	 // be destroyed.
    } CATCH(exc) {} ENDCATCH;
    DEBUG_MSG("decoding thread for url='" << url << "' ended\n");
 }
@@ -465,6 +466,10 @@ DjVuFile::process_incl_chunk(ByteStream & str)
       GP<DjVuFile> file=(DjVuFile *) pcaster->id_to_file(this, incl_str).get();
       if (!file) THROW("Internal error: id_to_file() didn't create any file.");
       pcaster->add_route(file, this);
+      
+	 // We may have been stopped. Make sure the child will be stopped too.
+      if (flags & STOPPED) file->stop(false);
+      if (flags & BLOCKED_STOPPED) file->stop(true);
 
 	 // Lock the list again and check if the file has already been
 	 // added by someone else
@@ -868,16 +873,16 @@ DjVuFile::start_decode(void)
 	 if (flags & DECODE_STOPPED) reset();
 	 flags&=~(DECODE_OK | DECODE_STOPPED | DECODE_FAILED);
 	 flags|=DECODING;
-	 decode_thread_flags=STARTED;
       
 	 delete decode_thread; decode_thread=0;
 	 decode_thread=new GThread();
-	 decode_life_saver=this;	// To prevent unexpected destruction
 	 decode_thread->create(static_decode_func, this);
 
 	    // We want to wait until the other thread actually starts.
-	    // One of the reasons is that if somebody tries to terminate the decoding
-	    // before its thread actually starts, it will NOT be terminated
+	    // One of the reasons is that if somebody tries to terminate the
+	    // decoding before its thread actually starts, it will NOT be
+	    // terminated. The other is that we want it to initialize the
+	    // local life_saver
 	 while(!decode_data_pool) GThread::yield();
       }
    } CATCH(exc) {
@@ -946,10 +951,13 @@ DjVuFile::stop_decode(bool sync)
 
 void
 DjVuFile::stop(bool only_blocked)
+      // This is a one-way function. There is no way to undo the stop()
+      // command.
 {
    DEBUG_MSG("DjVuFile::stop(): Stopping everything\n");
    DEBUG_MAKE_INDENT(3);
 
+   flags|=only_blocked ? BLOCKED_STOPPED : STOPPED;
    if (data_pool) data_pool->stop(only_blocked);
    GCriticalSectionLock lock(&inc_files_lock);
    for(GPosition pos=inc_files_list;pos;++pos)
