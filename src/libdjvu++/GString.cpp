@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.62 2001-04-17 15:41:15 chrisp Exp $
+// $Id: GString.cpp,v 1.63 2001-04-17 19:51:00 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -1357,48 +1357,103 @@ GStringRep::Native::Native(void) {}
 
 GStringRep::Native::~Native() {}
 
-int 
-GStringRep::cmp(const GP<GStringRep> &s2) const
+int
+GStringRep::cmp(const char *s1,const int len) const
 {
-  int retval=1;
-  if(s2)
-  {
-    if(s2->isUTF8() || s2->isNative())
-      retval=-(s2->cmp(const_cast<GStringRep *>(this)));
-    else
-      retval=strcmp(data,s2->data); 
-  }
-  return retval;
+  return cmp(data,s1,len);
 }
 
 int
-GStringRep::UTF8::cmp(const GP<GStringRep> &s2) const
+GStringRep::cmp(const char *s1, const char *s2,const int len)
 {
-  int retval=1;
+  return (len
+   ?(s1
+      ?(s2
+        ?((len>0)
+          ?strncmp(s1,s2,len)
+          :strcmp(s1,s2))
+        :1)
+      :(s2?(-1):0))
+   :0);
+}
+
+int 
+GStringRep::cmp(const GP<GStringRep> &s1, const GP<GStringRep> &s2,
+  const int len )
+{
+  return (s1?(s1->cmp(s2,len)):cmp(0,(s2?(s2->data):0),len));
+}
+
+int 
+GStringRep::cmp(const GP<GStringRep> &s1, const char *s2, 
+  const int len )
+{
+  return cmp((s1?s1->data:0),s2,len);
+}
+
+int 
+GStringRep::cmp(const char *s1, const GP<GStringRep> &s2,
+  const int len )
+{
+  return cmp(s1,(s2?(s2->data):0),len);
+}
+
+int 
+GStringRep::cmp(const GP<GStringRep> &s2, const int len) const
+{
+  return cmp(data,(s2?(s2->data):0),len);
+}
+
+int
+GStringRep::UTF8::cmp(const GP<GStringRep> &s2,const int len) const
+{
+  int retval;
   if(s2)
   {
-    GP<GStringRep> r=s2->toUTF8(true);
-    if(r)
+    if(s2->isNative())
     {
-      retval=strcmp(data,r->data);
+      GP<GStringRep> r(s2->toUTF8(true));
+      if(r)
+      {
+        retval=GStringRep::cmp(data,r->data,len);
+      }else
+      {
+        retval=-(s2->cmp(toNative(true),len));
+      }
+    }else
+    {
+      retval=GStringRep::cmp(data,s2->data,len);
     }
+  }else
+  { 
+    retval=GStringRep::cmp(data,0,len);
   }
   return retval;
 } 
 
 int
-GStringRep::Native::cmp(const GP<GStringRep> &s2) const
+GStringRep::Native::cmp(const GP<GStringRep> &s2,const int len) const
 {
-  int retval=1;
+  int retval;
   if(s2)
   {
     if(s2->isUTF8())
     {
-      retval=-(s2->cmp(const_cast<GStringRep::Native *>(this)));
+      GP<GStringRep> r(toUTF8(true));
+      if(r)
+      {
+        retval=GStringRep::cmp(r->data,s2->data,len);
+      }else
+      {
+        retval=cmp(s2->toNative(true),len);
+      }
     }else
     {
-      retval=strcmp(data,s2->data);
+      retval=GStringRep::cmp(data,s2->data,len);
     }
+  }else
+  {
+    retval=GStringRep::cmp(data,0,len);
   }
   return retval;
 }
@@ -1423,11 +1478,15 @@ GStringRep::toLong( GP<GStringRep>& eptr, bool &isLong, const int base) const
   char *edata=0;
   const GUTF8String clocale=setlocale(LC_CTYPE,0);
   const GUTF8String nlocale=setlocale(LC_NUMERIC,0);
-  setlocale(LC_CTYPE,"C");
-  setlocale(LC_NUMERIC,"C");
+  if(clocale != "C")
+    setlocale(LC_CTYPE,"C");
+  if(nlocale != "C")
+    setlocale(LC_NUMERIC,"C");
   long retval=strtol(data, &edata, base);
-  setlocale(LC_CTYPE,(const char *)clocale);
-  setlocale(LC_NUMERIC,(const char *)nlocale);
+  if(clocale != "C")
+    setlocale(LC_CTYPE,(const char *)clocale);
+  if(nlocale != "C")
+    setlocale(LC_NUMERIC,(const char *)nlocale);
   if(edata)
   {
     eptr=GStringRep::create(data);
@@ -1474,11 +1533,15 @@ GStringRep::toULong( GP<GStringRep>& eptr, bool &isULong, const int base) const
   char *edata=0;
   const GUTF8String clocale=setlocale(LC_CTYPE,0);
   const GUTF8String nlocale=setlocale(LC_NUMERIC,0);
-  setlocale(LC_CTYPE,"C");
-  setlocale(LC_NUMERIC,"C");
+  if(clocale != "C")
+    setlocale(LC_CTYPE,"C");
+  if(nlocale != "C")
+    setlocale(LC_NUMERIC,"C");
   unsigned long retval=strtoul(data, &edata, base);
-  setlocale(LC_CTYPE,(const char *)clocale);
-  setlocale(LC_NUMERIC,(const char *)nlocale);
+  if(clocale != "C")
+    setlocale(LC_CTYPE,(const char *)clocale);
+  if(nlocale != "C")
+    setlocale(LC_NUMERIC,(const char *)nlocale);
   if(edata)
   {
     eptr=GStringRep::create(edata);
@@ -1525,11 +1588,15 @@ GStringRep::toDouble( GP<GStringRep>& eptr, bool &isDouble) const
   char *edata=0;
   const GUTF8String clocale=setlocale(LC_CTYPE,0);
   const GUTF8String nlocale=setlocale(LC_NUMERIC,0);
-  setlocale(LC_CTYPE,"C");
-  setlocale(LC_NUMERIC,"C");
+  if(clocale != "C")
+    setlocale(LC_CTYPE,"C");
+  if(nlocale != "C")
+    setlocale(LC_NUMERIC,"C");
   double retval=strtod(data, &edata);
-  setlocale(LC_CTYPE,(const char *)clocale);
-  setlocale(LC_NUMERIC,(const char *)nlocale);
+  if(clocale != "C")
+    setlocale(LC_CTYPE,(const char *)clocale);
+  if(nlocale != "C")
+    setlocale(LC_NUMERIC,(const char *)nlocale);
   if(edata)
   {
     eptr=GStringRep::create(edata);
@@ -1556,58 +1623,91 @@ double
 GStringRep::Native::toDouble(
   GP<GStringRep>& eptr, bool &isDouble) const
 {
-   char *edata=0;
-   const double retval=strtod(data, &edata);
-   if(edata)
-   {
-     eptr=GStringRep::Native::create(edata);
-     isDouble=true;
-   }else
-   {
-     eptr=0;
-     isDouble=false;
-   }
-   return retval;
+  char *edata=0;
+  const double retval=strtod(data, &edata);
+  if(edata)
+  {
+    eptr=GStringRep::Native::create(edata);
+    isDouble=true;
+  }else
+  {
+    eptr=0;
+    isDouble=false;
+  }
+  return retval;
 }
 
 int
 GStringRep::nextNonSpace(int from) const
 {
-  // Store current locale;
-  const GString clocale=setlocale(LC_CTYPE,0);
-  const GString nlocale=setlocale(LC_NUMERIC,0);
+  int retval;
+  if(from<size)
+  {
+    // Store current locale;
+    const GString clocale=setlocale(LC_CTYPE,0);
+    const GString nlocale=setlocale(LC_NUMERIC,0);
 
-  // set locale to C
-  setlocale(LC_CTYPE,"C");
-  setlocale(LC_NUMERIC,"C");
+    // set locale to C
+    if(clocale != "C")
+      setlocale(LC_CTYPE,"C");
+    if(nlocale != "C")
+      setlocale(LC_NUMERIC,"C");
 
+    int n=0;
+    sscanf(data+from, " %n", &n);
+    retval=n+from;
+    // return locale to previous state.
+    if(clocale != "C")
+      setlocale(LC_CTYPE,(const char *)clocale);
+    if(nlocale != "C")
+      setlocale(LC_NUMERIC,(const char *)nlocale);
+  }else
+  {
+    retval=size;
+  }
+  return retval;
+}
+
+int
+GStringRep::UTF8::nextNonSpace(const int from) const
+{
   // We want to return the position of the next
   // non white space starting from the #from#
   // location.  isspace should work in any locale
   // so we should only need to do this for the non-
   // native locales (UTF8)
-  int retval=from;
-  const size_t length=strlen(data) - from;
-  const unsigned char * const eptr=(const unsigned char *)(data+from)+length;
-  mbstate_t ps;
-  for(const unsigned char *s=(const unsigned char *)(data+from);(s<=eptr)&& *s;)
+  int retval;
+  if(from<size)
   {
-     const wchar_t w=(wchar_t)UTF8toUCS4(s,eptr);
-     if (isspace(w)) retval++;
-     char bytes[12];
-     int i=wcrtomb(bytes,w,&ps);
+    retval=from;
+    const unsigned char * s = (const unsigned char *)(data+from);
+    for( const unsigned char * const eptr=s+size-from; s<=eptr ;
+      retval=((size_t)s-(size_t)data))
+    {
+      const wchar_t w=(wchar_t)UTF8toUCS4(s,eptr);
+      if (!isspace(w))
+        break;
+    }
+  }else
+  {
+    retval=size;
   }
-  // return locale to previous state.
-  setlocale(LC_CTYPE,(const char *)clocale);
-  setlocale(LC_NUMERIC,(const char *)nlocale);
-   
   return retval;
 }
 
 int
 GStringRep::Native::nextNonSpace(int from) const
 {
-   int retval;
-   sscanf(data+from, " %n", &retval);
-   return (retval+from);
+  int retval;
+  if(retval<size)
+  {
+    int n=0;
+    sscanf(data+from, " %n", &n);
+    retval=n+from;
+  }else
+  {
+    retval=size;
+  }
+  return retval;
 }
+

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.h,v 1.49 2001-04-17 15:41:14 chrisp Exp $
+// $Id: GString.h,v 1.50 2001-04-17 19:51:00 bcr Exp $
 // $Name:  $
 
 #ifndef _GSTRING_H_
@@ -57,7 +57,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.49 2001-04-17 15:41:14 chrisp Exp $# */
+    #$Id: GString.h,v 1.50 2001-04-17 19:51:00 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -109,7 +109,7 @@ public:
   virtual GP<GStringRep> toThis(
     const GP<GStringRep> &rep,const GP<GStringRep> &locale=0) const;
       // Compare with #s2#.
-  virtual int cmp(const GP<GStringRep> &s2) const;
+  virtual int cmp(const GP<GStringRep> &s2,const int len=(-1)) const;
 
   // Convert strings to numbers.
   virtual int toInt() const;
@@ -120,8 +120,8 @@ public:
   virtual double toDouble(
     GP<GStringRep>& endptr, bool &isDouble) const;
 
-   // return next non space position
-   virtual int nextNonSpace( int from ) const;
+  // return next non space position
+  virtual int nextNonSpace( const int from ) const;
 
     // Create an empty string.
   template <class TYPE> static GP<GStringRep> create(
@@ -179,10 +179,15 @@ public:
     const unsigned long w,unsigned char *ptr);
 
 
-  int cmp(const char *s2) const; 
-  static int cmp(const GP<GStringRep> &s1, const GP<GStringRep> &s2) ;
-  static int cmp(const GP<GStringRep> &s1, const char *s2);
-  static int cmp(const char *s1, const GP<GStringRep> &s2);
+  int cmp(const char *s2, const int len=(-1)) const; 
+  static int cmp(
+    const GP<GStringRep> &s1, const GP<GStringRep> &s2, const int len=(-1)) ;
+  static int cmp(
+    const GP<GStringRep> &s1, const char *s2, const int len=(-1));
+  static int cmp(
+    const char *s1, const GP<GStringRep> &s2, const int len=(-1));
+  static int cmp(
+    const char *s1, const char *s2, const int len=(-1));
 
 private:
   int  size;
@@ -223,7 +228,7 @@ public:
   virtual GP<GStringRep> toThis(
      const GP<GStringRep> &rep,const GP<GStringRep> &) const;
       // Compare with #s2#.
-  virtual int cmp(const GP<GStringRep> &s2) const;
+  virtual int cmp(const GP<GStringRep> &s2, const int len=(-1)) const;
 
   // Convert strings to numbers.
   virtual int toInt() const;
@@ -234,8 +239,8 @@ public:
   virtual double toDouble(
     GP<GStringRep>& endptr, bool &isDouble) const;
 
-   // return position of next non space.
-   virtual int nextNonSpace( int from ) const;
+  // return position of next non space.
+  virtual int nextNonSpace( const int from ) const;
 
     // Create an empty string
   static GP<GStringRep> create(const unsigned int sz = 0)
@@ -305,7 +310,7 @@ public:
   virtual GP<GStringRep> toThis(
     const GP<GStringRep> &rep,const GP<GStringRep> &) const;
       // Compare with #s2#.
-  virtual int cmp(const GP<GStringRep> &s2) const;
+  virtual int cmp(const GP<GStringRep> &s2,const int len=(-1)) const;
 
   static GP<GStringRep> create(const unsigned int sz = 0)
   { return GStringRep::create(sz,(GStringRep::UTF8 *)0); }
@@ -329,6 +334,9 @@ public:
     const char *s,const int start,const int length=(-1))
   { GStringRep::UTF8 dummy; return dummy.substr(s,start,length); }
   // Creates by appending to the current string
+
+  // return position of next non space.
+  virtual int nextNonSpace( const int from ) const;
 
   friend class GString;
 };
@@ -613,12 +621,30 @@ public:
   // -- HASHING
 
   // -- COMPARISONS
-  int cmp(const GString &s2) const
+    /// Returns an #int#.  Compares string with #s2# and returns sorting order.
+  int cmp(const GString &s2, const int len=(-1)) const
+    { return GStringRep::cmp(*this,s2,len); }
+    /// Returns an #int#.  Compares string with #s2# and returns sorting order.
+  int cmp(const char *s2, const int len=(-1)) const
     { return GStringRep::cmp(*this,s2); }
-  int cmp(const char *s2) const
-    { return GStringRep::cmp(*this,s2); }
+    /// Returns an #int#.  Compares string with #s2# and returns sorting order.
   int cmp(const char s2) const
-    { return GStringRep::cmp(*this,GStringRep::create(&s2,0,1)); }
+    { return GStringRep::cmp(*this,&s2,1); }
+    /// Returns an #int#.  Compares #s2# with #s2# and returns sorting order.
+  static int cmp(const char *s1, const char *s2, const int len=(-1))
+    { return GStringRep::cmp(s1,s2,len); }
+  /** Returns a boolean.  Compares string with #s2# and a given length
+      of #len# */
+  bool ncmp(const GString& s2, const int len) const
+    { return !cmp(s2,len); }
+  bool ncmp(const char *s2, const int len) const
+    { return !cmp(s2,len); }
+  /** Returns a boolean. The Standard C strncmp takes two string and
+      compares the first N characters.  static bool GString::ncmp will
+      compare #s1# with #s2# 
+      with the #len# characters starting from the beginning of the string.*/
+  static bool ncmp(const char *s1, const char *s2, const int len)
+    { return !GStringRep::cmp(s1,s2,len); }
 
   /** String comparison. Returns true if and only if character strings #s1#
       and #s2# are equal (as with #strcmp#.)
@@ -704,18 +730,6 @@ public:
   friend bool operator<=(const char    s1, const GString &s2)
     { return !(s1>s2); }
 
-   /** Returns a boolean.  Compares string with #s2# and a given length
-       of #len#
-   */
-   inline bool ncmp(const GString& s2, const int len=1) const
-      { return (substr(0,len) == s2.substr(0,len)); }
-   /** Returns a boolean. The Standard C strncmp takes two string and
-       compares the first N characters.  static bool GString::ncmp will
-       compare #s1# with #s2# 
-       with the #len# characters starting from the beginning of the string.*/
-   static bool ncmp(const GString &s1,const GString &s2, const int len=1)
-      { return (s1.substr(0,len) == s2.substr(0,len)); }
-
    /** Returns an integer.  Implements a functional i18n atoi. Note that if
        you pass a GString that is not in Native format the results may be
        disparaging. */
@@ -795,12 +809,6 @@ public:
       to be recognized. Numeric representations of
       characters (e.g., "&#38;" or "&#x26;" for "*") are always converted. */
   GUTF8String fromEscaped( const GMap<GUTF8String,GUTF8String> ConvMap ) const;
-
-   /** Returns a boolean. The Standard C strncmp takes two string and compares the 
-       first N characters.  static bool GString::ncmp will compare #s1# with #s2# 
-       with the #len# characters starting from the beginning of the string.*/
-   static bool ncmp(const GUTF8String &s1,const GUTF8String &s2, const int len=1)
-      { return (s1.substr(0,len) == s2.substr(0,len)); }
 
   /** Returns a long intenger.  Implments i18n strtol.  */
   long int toLong(
@@ -917,14 +925,6 @@ public:
   GNativeString& operator= (const GString &str);
   GNativeString& operator= (const GUTF8String &str);
   GNativeString& operator= (const GNativeString &str);
-
-   /** Returns a boolean. The Standard C strncmp takes two string and
-       compares the first N characters.  static bool GString::ncmp will
-       compare #s1# with #s2# with the #len# characters starting from
-       the beginning of the string. */
-   static bool ncmp(
-     const GNativeString &s1,const GNativeString &s2, const int len=1)
-   { return (s1.substr(0,len) == s2.substr(0,len)); }
 
   // -- CONCATENATION
   /// Appends character #ch# to the string.
@@ -1073,30 +1073,6 @@ inline GP<GStringRep>
 GStringRep::NativeToUTF8( const char *s )
 {
   return GStringRep::Native::create(s)->toUTF8();
-}
-
-inline int
-GStringRep::cmp(const char *s1) const
-{
-  return s1?strcmp(data,s1):1;
-}
-
-inline int 
-GStringRep::cmp(const GP<GStringRep> &s1, const GP<GStringRep> &s2)
-{
-  return (s1?(s1->cmp(s2)):(s2?(-1):0));
-}
-
-inline int 
-GStringRep::cmp(const GP<GStringRep> &s1, const char *s2)
-{
-  return (s1?(s1->cmp(s2)):(s2?(-1):0));
-}
-
-inline int 
-GStringRep::cmp(const char *s1, const GP<GStringRep> &s2)
-{
-  return (s2?(-s2->cmp(s1)):(s1?1:0));
 }
 
 inline GString::GString(void) { init(); }
