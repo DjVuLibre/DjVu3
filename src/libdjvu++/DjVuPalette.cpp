@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuPalette.cpp,v 1.3 1999-11-10 22:40:15 leonb Exp $
+//C- $Id: DjVuPalette.cpp,v 1.4 1999-11-11 15:41:41 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -74,6 +74,25 @@ DjVuPalette::~DjVuPalette()
     delete [] hcube;
   if (pcube)
     delete [] pcube;
+}
+
+DjVuPalette& 
+DjVuPalette::operator=(const DjVuPalette &ref)
+{
+  if (this != &ref)
+    {
+      if (hcube) { delete [] hcube; hcube=0; }
+      if (pcube) { delete [] pcube; pcube=0; }
+      palette = ref.palette;
+      colordata = ref.colordata;
+    }
+  return *this;
+}
+
+DjVuPalette::DjVuPalette(const DjVuPalette &ref)
+  : hcube(0), pcube(0)
+{
+  this->operator=(ref);
 }
 
 void

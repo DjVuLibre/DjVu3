@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuPalette.h,v 1.5 1999-11-11 15:29:54 leonb Exp $
+//C- $Id: DjVuPalette.h,v 1.6 1999-11-11 15:41:41 leonb Exp $
 
 
 
@@ -37,7 +37,7 @@
     @memo 
     DjVuPalette header file
     @version 
-    #$Id: DjVuPalette.h,v 1.5 1999-11-11 15:29:54 leonb Exp $#
+    #$Id: DjVuPalette.h,v 1.6 1999-11-11 15:41:41 leonb Exp $#
     @author: 
     L\'eon Bottou <leonb@research.att.com> */
 //@{
@@ -72,6 +72,9 @@ class DjVuPalette : public GPEnabled
 public:
   DjVuPalette();
   ~DjVuPalette();
+  // COPY
+  DjVuPalette(const DjVuPalette &ref);
+  DjVuPalette& operator=(const DjVuPalette &ref);
   // QUANTIZATION
   /** Resets the color histogram to zero. */
   void histogram_clear();
