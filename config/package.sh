@@ -78,6 +78,7 @@ then
   echo "Version not found in TOPDIR/SRCDIR/src/include/DjVuVersion.h" 1>&2
   exit 1
 fi
+version=`echo "$version"|tr ' ' '_'`
 srcfilelist="$srcdir/archive.list"
 filelist="$packagedir/archive.list"
 if [ ! -r "$srcfilelist" ]

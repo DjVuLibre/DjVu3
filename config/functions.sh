@@ -1067,5 +1067,6 @@ if [ -z "$version" ]
 then 
   version=`sed -n -e 's,.* DJVU_VERSION  *"\(.*\)".*$,\1,p' -e 's,.*DJVU_CVS_REV.*Revision: \([0-9][.0-9]*\) .*,\1,p' < "$i"|tr '\n' '-'|sed 's,-$,,g'`
 fi
+version=`echo "$version"|tr ' ' '_'`
 CONFIG_VARS=`echo version $CONFIG_VARS`
 
