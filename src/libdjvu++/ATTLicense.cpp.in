@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: ATTLicense.cpp.in,v 1.3 1999-03-15 17:16:45 leonb Exp $
+//C-  $Id: ATTLicense.cpp.in,v 1.4 1999-03-15 17:18:28 leonb Exp $
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -20,7 +20,7 @@ static const char *the_copyright =
 
 static const char *the_usage = 
 "\tThis program is copyright (c) AT&T 1999.\n"
-"\tUse option \'-license\' to see the licensing terms\n";
+"\tUse option \'-license\' for more information\n";
 
 static const char *the_notice = 
 "This software contains software code or other information proprietary to AT&T\n"
@@ -85,7 +85,7 @@ ATTLicense::process_cmdline(int argc, char **argv)
   if (i>=argc)
     return;
   // Display license
-#ifdef UNIX
+#ifdef USE_UNIX_PAGER
   char *pager = getenv("PAGER");
   if (pager==0) 
     pager="more";
