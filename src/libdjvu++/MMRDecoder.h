@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: MMRDecoder.h,v 1.1 1999-09-27 21:04:53 leonb Exp $
+//C- $Id: MMRDecoder.h,v 1.2 1999-12-20 01:16:38 bcr Exp $
 
 #ifndef _MMRDECODER_H_
 #define _MMRDECODER_H_
@@ -49,14 +49,12 @@
     @memo
     CCITT-G4/MMR decoder.
     @version
-    #$Id: MMRDecoder.h,v 1.1 1999-09-27 21:04:53 leonb Exp $#
+    #$Id: MMRDecoder.h,v 1.2 1999-12-20 01:16:38 bcr Exp $#
     @author
     Parag Deshmukh <parag@sanskrit.lz.att.com> */
 //@{
 
 
-class _VLSource;
-class _VLTable;
 
 
 /** Class for G4/MMR decoding.  The simplest way to use this class is
@@ -88,10 +86,14 @@ class MMRDecoder
   int height;
   int lineno;
   unsigned char *refline;
-  _VLSource *src;
-  _VLTable *mrtable;
-  _VLTable *wtable;
-  _VLTable *btable;
+  class VLSource;
+  class VLTable;
+  VLSource *src;
+  VLTable *mrtable;
+  VLTable *wtable;
+  VLTable *btable;
+  friend class VLSource;
+  friend class VLTable;
 };
 
 

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GBitmap.h,v 1.14 1999-11-17 19:47:30 leonb Exp $
+//C- $Id: GBitmap.h,v 1.15 1999-12-20 01:16:38 bcr Exp $
 
 #ifndef _GBITMAP_H_
 #define _GBITMAP_H_
@@ -45,7 +45,7 @@ class GMonitor;
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: GBitmap.h,v 1.14 1999-11-17 19:47:30 leonb Exp $#
+    #$Id: GBitmap.h,v 1.15 1999-12-20 01:16:38 bcr Exp $#
 
  */
 //@{
@@ -339,6 +339,12 @@ public:
       formats}.  */
   void borrow_rle(unsigned char *rledata, unsigned int rledatalen, int w, int h);
   //@}
+
+// These are constants, but we use enum because that works on older compilers.
+  enum {MAXRUNSIZE=0x3fff};
+  enum {RUNOVERFLOWVALUE=0xc0};
+  enum {RUNMSBMASK=0x3f};
+  enum {RUNLSBMASK=0xff};
 
 
 protected:

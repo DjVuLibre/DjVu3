@@ -8,7 +8,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: MMRDecoder.cpp,v 1.5 1999-09-28 14:09:27 leonb Exp $
+//C- $Id: MMRDecoder.cpp,v 1.6 1999-12-20 01:16:38 bcr Exp $
 
 
 #ifdef __GNUC__
@@ -22,18 +22,9 @@
 
 
 // ----------------------------------------
-// ASSERTIONS/EXCEPTIONS
-
-
-
-static void throw_assertion() { THROW("Assertion failed"); }
-static void throw_corrupted() { THROW("MMR data is corrupted"); }
-#define ASSERT(x)  { if (!(x)) throw_assertion(); }
-
-
-// ----------------------------------------
 // MMR CODEBOOKS
 
+static const char invalid_mmr_data[]="Invalid MMR Data";
 
 struct VLCode 
 {
@@ -42,11 +33,13 @@ struct VLCode
   short value;
 };
 
-enum MMRMode { 
-  P, H, V0, VR1, VR2, VR3, VL1, VL2, VL3 
+enum MMRMode
+{ 
+  P=0, H=1, V0=2, VR1=3, VR2=4, VR3=5, VL1=6, VL2=7, VL3=8 
 };
 
-static VLCode mrcodes[] = {   // Codes on 7 bits
+static const VLCode mrcodes[] =
+{   // Codes on 7 bits
   // 7 bit codes
   { 0x08,   4,    P }, // 0001
   { 0x10,   3,    H }, // 001
@@ -61,7 +54,7 @@ static VLCode mrcodes[] = {   // Codes on 7 bits
 };
 
 
-static VLCode wcodes[] = {    
+static const VLCode wcodes[] = {    
   // 13 bit codes
   { 0x06a0,  8,    0 }, // 00110101
   { 0x0380,  6,    1 }, // 000111
@@ -171,7 +164,7 @@ static VLCode wcodes[] = {
 };
 
 
-static VLCode bcodes[] = {
+static const VLCode bcodes[] = {
   // 13 bit codes
   { 0x01b8, 10,    0 }, // 0000110111
   { 0x0800,  3,    1 }, // 010
@@ -287,7 +280,7 @@ static VLCode bcodes[] = {
 // SOURCE OF BITS
 
 
-class _VLSource
+class MMRDecoder::VLSource
 {
 private:
   ByteStream &inp;
@@ -298,7 +291,7 @@ private:
   int bufmax;
 public:
   // Initializes a bit source on a bytestream
-  _VLSource(ByteStream &inp);
+  VLSource(ByteStream &inp);
   // Returns a 32 bits integer with at least the 
   // next sixteen code bits in the high order bits.
   unsigned int peek() 
@@ -311,7 +304,7 @@ public:
     { codeword<<=n; lowbits+=n; if (lowbits>=16) preload(); }
 };
 
-_VLSource::_VLSource(ByteStream &inp)
+MMRDecoder::VLSource::VLSource(ByteStream &inp)
   : inp(inp), codeword(0), 
     lowbits(0), bufpos(0), bufmax(0)
 {
@@ -320,7 +313,7 @@ _VLSource::_VLSource(ByteStream &inp)
 }
 
 void
-_VLSource::preload()
+MMRDecoder::VLSource::preload()
 {
   while (lowbits>=8) 
     {
@@ -343,28 +336,28 @@ _VLSource::preload()
 
 
 
-class _VLTable
+class MMRDecoder::VLTable
 {
 public:
-  VLCode *code;
+  const VLCode *code;
   int codewordshift;
   unsigned char *index;
-  ~_VLTable();
-  // Construct a _VLTable given a codebook with #nbits# long codes.
-  _VLTable(VLCode *codes, int nbits);
-  // Reads one symbol from a _VLSource
-  int decode(_VLSource *src);
+  ~VLTable();
+  // Construct a VLTable given a codebook with #nbits# long codes.
+  VLTable(const VLCode *codes, int nbits);
+  // Reads one symbol from a VLSource
+  int decode(MMRDecoder::VLSource *src);
 };
 
 inline int
-_VLTable::decode(_VLSource *src)    
+MMRDecoder::VLTable::decode(MMRDecoder::VLSource *src)    
 { 
-  VLCode &c = code[ index[ src->peek() >> codewordshift ] ];
+  const VLCode &c = code[ index[ src->peek() >> codewordshift ] ];
   src->shift(c.codelen); 
   return c.value; 
 }
 
-_VLTable::_VLTable(VLCode *codes, int nbits)
+MMRDecoder::VLTable::VLTable(const VLCode *codes, int nbits)
   : code(codes)
 {
   int i;
@@ -373,8 +366,10 @@ _VLTable::_VLTable(VLCode *codes, int nbits)
   while (codes[ncodes].codelen)
     ncodes++;
   // check arguments
-  ASSERT(sizeof(int)>=4);
-  ASSERT(nbits>1 && nbits<=16 && ncodes<256) // sizes are ok
+  if (nbits<=1 || nbits>16)
+    THROW(invalid_mmr_data);
+  if (ncodes>=256)
+    THROW(invalid_mmr_data);
   codewordshift = 32 - nbits;
   // allocate table
   int size = (1<<nbits);
@@ -386,17 +381,21 @@ _VLTable::_VLTable(VLCode *codes, int nbits)
   for (i=0; i<ncodes; i++) {
     int c = codes[i].code;
     int b = codes[i].codelen;
-    ASSERT(b>0 && b<=nbits);
+    if(b<=0 || b>nbits)
+    {
+      THROW(invalid_mmr_data);
+    }
     // fill table entries whose index high bits are code.
     int n = c + (1<<(nbits-b));
     while ( --n >= c ) {
-      ASSERT(index[n] == ncodes); // ambiguous codebook
+      if(index[n] != ncodes)
+       THROW("ambiguous MMR codebook");
       index[n] = i;
     }
   }
 }
 
-_VLTable::~_VLTable()
+MMRDecoder::VLTable::~VLTable()
 {
   delete index;
 }
@@ -416,21 +415,20 @@ MMRDecoder::~MMRDecoder()
   delete btable;
   delete mrtable;
   delete src;
-  delete refline;
+  delete [] refline;
 }
 
 
 MMRDecoder::MMRDecoder(ByteStream &bs, int width, int height)
   : width(width), height(height), lineno(0)
 {
-  refline = new unsigned char [width];
+  refline = new unsigned char [width+5];
   memset(refline, 0, width);
-  src = new _VLSource(bs);
-  mrtable = new _VLTable(mrcodes, 7);
-  btable = new _VLTable(bcodes, 13);
-  wtable = new _VLTable(wcodes, 13);
+  src = new VLSource(bs);
+  mrtable = new VLTable(mrcodes, 7);
+  btable = new VLTable(bcodes, 13);
+  wtable = new VLTable(wcodes, 13);
 }
-
 
 const unsigned char *
 MMRDecoder::scanline()
@@ -439,83 +437,104 @@ MMRDecoder::scanline()
   if (lineno >= height)
     return 0;
   // Loop until scanline is complete
-  char a0color=0;
-  int a0=0, a1, b1, b2;
-  bool ignore = false;
-  while (a0 < width)
+  unsigned char CurColor=0;
+  unsigned char *ptr=refline,*StartRun=refline,*EndRun;
+  unsigned char *endptr=refline+width;
+  for (EndRun=ptr;(EndRun<endptr)&&(EndRun[0]==CurColor); EndRun++);
+  while (ptr < endptr)
     {
-      // Compute b1, b2 
       // (Optimization idea: Make #refline# an array of run lengths.)
-      for (b1=a0; b1<width; b1++)
-	if (refline[b1] == a0color)
-	  ignore = false;
-	else if (!ignore)
-	  break;
-      for (b2=b1+1; b2<width; b2++)
-        if (refline[b2] == a0color)
-          break;
-      ignore = true;
       // Process MMR codes
       switch ( mrtable->decode(src) )
         {
           /* Pass Mode */
         case P: 
           { 
-            while (a0 < b2)
-              refline[a0++] = a0color;
+            while(ptr<StartRun) // extend left side of run to ptr
+              (ptr++)[0] = CurColor;
+            for(ptr=EndRun;(ptr<endptr)&&(ptr[0]!=CurColor);(ptr++)[0]=CurColor);
             break;
           }
           /* Horizontal Mode */
         case H: 
           { 
             int len;
-            _VLTable *table;
+            VLTable *table;
             // First run
-            a1 = a0;
-            table = (a0color ? btable : wtable);
-            do { len = table->decode(src); a1 += len; } while (len >= 64);
-            if (len<0 || a1>width) 
-              throw_corrupted();
-            while (a0 < a1) 
-              refline[a0++] = a0color;
+            unsigned char *NewEndRun= ptr;
+            table = (CurColor ? btable : wtable);
+            do
+            {
+              NewEndRun += (len = table->decode(src));
+            } while (len >= 64);
+            if (len<0 || NewEndRun>endptr) 
+              THROW(invalid_mmr_data);
+            if(NewEndRun > StartRun)
+            {
+              while (ptr < StartRun)  // extend left side of run to ptr
+                *(ptr++) = CurColor;
+              if(NewEndRun>EndRun)
+              {
+                for(ptr=EndRun;ptr<NewEndRun;*(ptr++)=CurColor);
+              }else
+              {
+                ptr=NewEndRun;
+              }
+            }else
+            {
+              while (ptr < NewEndRun) 
+                *(ptr++) = CurColor;
+            }
             // Second run
-            a1 = a0;
-            table = (!a0color ? btable : wtable);
-            do { len = table->decode(src); a1 += len; } while (len >= 64);
-            if (len<0 || a1>width) 
-              throw_corrupted();
-            while (a0 < a1) 
-              refline[a0++] = !a0color;
+            table = (!CurColor ? btable : wtable);
+            do
+            { 
+              NewEndRun += (len = table->decode(src));
+            } while (len >= 64);
+            if (len<0 || NewEndRun>endptr) 
+              THROW(invalid_mmr_data);
+            while (ptr < NewEndRun)
+              *(ptr++) = !CurColor;
             break;
           }
           /* Vertical Modes */
         case V0:
-          a1 = b1;
-          goto vertical_mode;
-        case VR1:
-          a1 = b1 + 1;
-          goto vertical_mode;
-        case VR2:
-          a1 = b1 + 2;
-          goto vertical_mode;
+          while (ptr<StartRun)  // extend left side of run to ptr
+            (ptr++)[0] = CurColor;
+          ptr=EndRun;
+          CurColor = !CurColor;
+          break;
         case VR3:
-          a1 = b1 + 3;
-          goto vertical_mode;
-        case VL1:
-          a1 = b1 - 1;
-          goto vertical_mode;
-        case VL2:
-          a1 = b1 - 2;
-          goto vertical_mode;
+          (EndRun++)[0]=CurColor;
+        case VR2:
+          (EndRun++)[0]=CurColor;
+        case VR1:
+          (EndRun++)[0]=CurColor;
+          if (EndRun > endptr)
+            THROW(invalid_mmr_data);
+          while (ptr < StartRun)  // extend left side of run to ptr
+            (ptr++)[0] = CurColor;
+          ptr=EndRun;
+          CurColor = !CurColor;
+          break;
+          /* Uncommon modes */
         case VL3:
-          a1 = b1 - 3;
-          goto vertical_mode;
-        vertical_mode:
-          if (a1 > width)
-            throw_corrupted();    
-          while (a0 < a1) 
-            refline[a0++] = a0color;
-          a0color = !a0color;
+          --EndRun;
+        case VL2:
+          --EndRun;
+        case VL1:
+          --EndRun;
+          if(EndRun<=StartRun) // extend left side of run to ptr
+          {
+            while (ptr<EndRun) // extend right side of run to new EndRun
+              (ptr++)[0] = CurColor;
+          }else
+          {
+            while (ptr<StartRun)  // extend left side of run to ptr
+              (ptr++)[0] = CurColor;
+            ptr=EndRun;
+          }
+          CurColor = !CurColor;
           break;
           /* Uncommon modes */
         default: 
@@ -541,44 +560,45 @@ MMRDecoder::scanline()
                     if (m == 0x04000000)       // 000001
                       {
                         src->shift(6);
-                        if (a0+4 >= width)
-                          throw_corrupted();
-                        refline[a0++] = 0;
-                        refline[a0++] = 0;
-                        refline[a0++] = 0;
-                        refline[a0++] = 0;
-                        refline[a0++] = 0;
+                        if (ptr+4 >= endptr)
+                          THROW(invalid_mmr_data);
+                        (ptr++)[0] = 0;
+                        (ptr++)[0] = 0;
+                        (ptr++)[0] = 0;
+                        (ptr++)[0] = 0;
+                        (ptr++)[0] = 0;
                       } 
                     else                       // 000010 to 111111 
                       {
                         src->shift(1);
-                        if (a0 >= width)
-                          throw_corrupted();
-                        refline[a0++] = ((m & 0x80000000) ? 1 : 0);
+                        if (ptr >= endptr)
+                          THROW(invalid_mmr_data);
+                        (ptr++)[0] = ((m & 0x80000000) ? 1 : 0);
                       }
                   }
                 // Analyze uncompressed termination code.
                 m = src->peek() & 0xff000000;  
                 src->shift(8);
-                if (m == 0x03000000)           // 00000011
-                  a0color = 1;
-                else if (m == 0x02000000)      // 00000010
-                  a0color = 0;
-                else
-                  throw_corrupted();
+                if((CurColor=!(m==0x02000000))  // 00000010
+                  &&(m!=0x03000000))           // 00000011
+                {
+                  THROW(invalid_mmr_data);
+                }
                 // Cross fingers and proceed ...
                 break;
               }
             // -- Unknown MMR code.
-            throw_corrupted();
+            THROW(invalid_mmr_data);
           }
         }
+      // Compute EndRun
+      for(StartRun=ptr;(StartRun<endptr)&&(StartRun[0]!=CurColor);StartRun++);
+      for(EndRun=StartRun;(EndRun<endptr)&&(EndRun[0]==CurColor);++EndRun);
     }
   /* Increment and return */
   lineno += 1;
   return refline;
 }
-
 
 
 // ----------------------------------------
