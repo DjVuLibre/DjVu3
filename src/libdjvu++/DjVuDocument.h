@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.h,v 1.2 1999-05-25 19:42:28 eaf Exp $
+//C- $Id: DjVuDocument.h,v 1.3 1999-05-26 18:20:53 eaf Exp $
  
 #ifndef _DJVUDOCUMENT_H
 #define _DJVUDOCUMENT_H
@@ -31,7 +31,7 @@
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocument.h,v 1.2 1999-05-25 19:42:28 eaf Exp $#
+    @version #$Id: DjVuDocument.h,v 1.3 1999-05-26 18:20:53 eaf Exp $#
 */
 
 //@{
@@ -113,7 +113,11 @@ public:
    GP<DjVuFile>	get_djvu_file(const GURL & url);
       /** Creates and returns \Ref{DjVuFile} corresponding to the fiven
 	  page. Cache will be used to take advantage of files created and
-	  decoded before. */
+	  decoded before.
+
+	  Negative #page_num# has a special meaning for the multipage documents
+	  with each page in separate files: the #DjVuDocument# will start
+	  decoding of the URL with which it has been initialized. */
    GP<DjVuFile>	get_djvu_file(int page_num);
       /** Returns navigation directory of the document. This is the only
 	  way to figure out the number of pages in the document and URLs
@@ -182,8 +186,9 @@ private:
    DjVuSimplePort	* simple_port;
    bool			readonly;
 
+   bool			dummy_dir;
    GP<DjVuNavDir>	dir;
-   GP<DjVuFile>		dir_file;
+   GP<DjVuFile>		dir_file;	// Used in editing only
 
    GPList<DjVuFile>	added_files_list;
    GCriticalSection	added_files_lock;
@@ -194,6 +199,8 @@ private:
    GP<DataPool>		djvm_pool;
    DjVmDir0		djvm_dir;
    GString		djvm_first_page_name;
+
+   GURL			init_url;
 
    void			detect_doc_type(const GURL & doc_url);
    GString		djvm_url2name(const GURL & url) const;

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.3 1999-05-25 22:33:33 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.4 1999-05-26 18:20:54 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -25,7 +25,8 @@
 
 DjVuDocument::DjVuDocument(const GURL & url, bool xreadonly,
 			   DjVuPort * xport, GCache<GURL, DjVuFile> * xcache):
-      cache(xcache), simple_port(0), readonly(1), djvm(0)
+      cache(xcache), simple_port(0), readonly(1), dummy_dir(1), djvm(0),
+      init_url(url)
 {
    if (!xreadonly)
    {
@@ -529,31 +530,13 @@ DjVuDocument::notify_chunk_done(const DjVuPort * source, const char * name)
       if (source->inherits("DjVuFile"))
       {
 	 DjVuFile * file=(DjVuFile *) source;
-	 if (dir->get_pages_num()==1 && file->dir)
+	 if (dummy_dir && file->dir)
 	 {
 	    DEBUG_MSG("DjVuDocument::notify_chunk_done(): updating nav. directory\n");
 	    dir=file->dir;
-	 };
-      };
-}
-
-static GP<DjVuNavDir>
-get_ndir(const GP<DjVuFile> & file, GMap<GURL, void *> & map)
-{
-   GURL url=file->get_url();
-   if (!map.contains(url))
-   {
-      map[url]=0;
-      if (file->dir) return file->dir;
-
-      GPList<DjVuFile> list=file->get_included_files();
-      for(GPosition pos=list;pos;++pos)
-      {
-	 GP<DjVuNavDir> dir=get_ndir(list[pos], map);
-	 if (dir) return dir;
+	    dummy_dir=0;
+	 }
       }
-   }
-   return 0;
 }
 
 GP<DjVuFile>
@@ -572,7 +555,7 @@ DjVuDocument::get_djvu_file(const GURL & url)
       if (dir->get_pages_num()==1)
       {
 	 GMap<GURL, void *> map;
-	 GP<DjVuNavDir> fdir=get_ndir(file, map);
+	 GP<DjVuNavDir> fdir=file->find_ndir();
 	 if (fdir)
 	 {
 	    DEBUG_MSG("updating nav. directory from the cached file.\n");
@@ -590,7 +573,39 @@ DjVuDocument::get_djvu_file(int page_num)
    DEBUG_MSG("DjVuDocument::get_djvu_file(): request for page " << page_num << "\n");
    DEBUG_MAKE_INDENT(3);
 
-   return get_djvu_file(dir->page_to_url(page_num));
+   GURL url;
+   if (page_num<0)
+      if (djvm) url=djvm_doc_url+djvm_first_page_name;
+      else url=init_url;
+   else
+   {
+      DEBUG_MSG("dummy_dir=" << dummy_dir << "\n");
+      if (dummy_dir)
+      {
+	    // Navigation directory has not been decoded yet.
+	 GP<DjVuNavDir> d;
+	 if (djvm)
+	 {
+	    GP<DjVuFile> f=get_djvu_file(djvm_doc_url+djvm_first_page_name);
+	    d=f->find_ndir();
+	    DEBUG_MSG("*** d=" << d << "\n");
+	    if (!d) { d=f->decode_ndir();
+	    DEBUG_MSG("**** d=" << d << "\n"); }
+	 } else
+	 {
+	    GP<DjVuFile> f=get_djvu_file(init_url);
+	    d=f->find_ndir();
+	    if (!d) d=f->decode_ndir();
+	 }
+	 
+	 if (d)
+	 {
+	    dir=d; dummy_dir=0;
+	 }
+      }
+      url=dir->page_to_url(page_num);
+   }
+   return get_djvu_file(url);
 }
 
 GP<DjVuImage>
