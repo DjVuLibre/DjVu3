@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.123 2000-05-19 19:00:06 bcr Exp $
+//C- $Id: DjVuFile.cpp,v 1.124 2000-05-31 21:42:33 bcr Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -554,17 +554,20 @@ DjVuFile::report_error
     }
   }else
   {
-    char buffer[sizeof(eof_msg)+1020];
-    const char *url=get_url();
-    strcpy(buffer,eof_msg); 
-    sprintf(buffer,eof_msg,(const char *)url);
-    if(throw_errors)
-    {
-      EXTHROW(ex,buffer);
-    }else
-    {
-      get_portcaster()->notify_error(this,buffer);
-    }
+     GURL url=get_url();
+     GString url_str=(const char *) url;
+     if (url.is_local_file_url())
+	url_str=GOS::url_to_filename(url);
+
+     GString msg;
+     msg.format(eof_msg, (const char *) url_str);
+     if(throw_errors)
+     {
+	EXTHROW(ex, msg);
+     }else
+     {
+	get_portcaster()->notify_error(this,msg);
+     }
   }
 }
 
@@ -1639,11 +1642,11 @@ DjVuFile::contains_anno(void)
    while(iff.get_chunk(chkid))
    {
       if (is_annotation(chkid))
-	 return TRUE;
+	 return true;
       iff.close_chunk();
    }
    
-   return FALSE;
+   return false;
 }
 
 //*****************************************************************************

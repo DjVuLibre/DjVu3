@@ -11,10 +11,10 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: GThreads.cpp,v 1.46 2000-05-01 16:15:22 bcr Exp $
+//C- $Id: GThreads.cpp,v 1.47 2000-05-31 21:42:33 bcr Exp $
 
 
-// **** File "$Id: GThreads.cpp,v 1.46 2000-05-01 16:15:22 bcr Exp $"
+// **** File "$Id: GThreads.cpp,v 1.47 2000-05-31 21:42:33 bcr Exp $"
 // This file defines machine independent classes
 // for running and synchronizing threads.
 // - Author: Leon Bottou, 01/1998
@@ -163,10 +163,16 @@ GThread::current()
   return (void*) GetCurrentThreadId();
 }
 
+struct thr_waiting {
+  struct thr_waiting *next;
+  struct thr_waiting *prev;
+  BOOL   waiting;
+  HANDLE gwait;
+};
+
 GMonitor::GMonitor()
-  : ok(0), count(1)
+  : ok(0), count(1), head(0), tail(0)
 {
-  hev[0] = hev[1] = 0;
   InitializeCriticalSection(&cs);
   locker = GetCurrentThreadId();
   ok = 1;
@@ -175,9 +181,11 @@ GMonitor::GMonitor()
 GMonitor::~GMonitor()
 {
   ok = 0;
+  EnterCriticalSection(&cs);
+  for (struct thr_waiting *w=head; w; w=w->next)
+    SetEvent(w->gwait);
+  LeaveCriticalSection(&cs);
   DeleteCriticalSection(&cs); 
-  if (hev[0]) CloseHandle(hev[0]);
-  if (hev[1]) CloseHandle(hev[1]);
 }
 
 void 
@@ -217,8 +225,13 @@ GMonitor::signal()
       DWORD self = GetCurrentThreadId();
       if (count>0 || self!=locker)
         THROW("Monitor was not acquired by this thread (GMonitor::signal)");
-      if (hev[0])
-        SetEvent(hev[0]);
+      for (struct thr_waiting *w=head; w; w=w->next)
+        if (w->waiting) 
+          {
+            SetEvent(w->gwait);
+            w->waiting = FALSE;
+            break; // Only one thread runs
+          }
     }
 }
 
@@ -230,21 +243,14 @@ GMonitor::broadcast()
       DWORD self = GetCurrentThreadId();
       if (count>0 || self!=locker)
         THROW("Monitor was not acquired by this thread (GMonitor::broadcast)");
-      if (hev[1])
-        SetEvent(hev[1]);
+      for (struct thr_waiting *w=head; w; w=w->next)
+        if (w->waiting)
+            {
+              SetEvent(w->gwait);
+              w->waiting = FALSE;
+            }
     }
 }
-
-
-static void
-create_events(HANDLE *hev)
-{
-  if (!hev[0])
-    hev[0] = CreateEvent(NULL,FALSE,FALSE,NULL);
-  if (!hev[1])
-    hev[1] = CreateEvent(NULL,TRUE,FALSE,NULL);
-}
-
 
 void
 GMonitor::wait()
@@ -256,21 +262,28 @@ GMonitor::wait()
   // Wait
   if (ok)
     {
-      // Lazy creation of events
-      if (!hev[0]) 
-        create_events(hev);
-      // Release
+      // Prepare wait record
+      struct thr_waiting waitrec;
+      waitrec.waiting = TRUE;
+      waitrec.gwait = CreateEvent(NULL,FALSE,FALSE,NULL);
+      waitrec.next = 0;
+      waitrec.prev = tail;
+      // Link wait record (protected by critical section)
+      *(waitrec.next ? &waitrec.next->prev : &tail) = &waitrec; 
+      *(waitrec.prev ? &waitrec.prev->next : &head) = &waitrec;
+      // Start wait
       int sav_count = count;
       count = 1;
-      ResetEvent(hev[0]);
-      ResetEvent(hev[1]);
-      // Wait
       LeaveCriticalSection(&cs);
-      WaitForMultipleObjects(2,hev,FALSE,INFINITE);
+      WaitForSingleObject(waitrec.gwait,INFINITE);
       // Re-acquire
       EnterCriticalSection(&cs);
       count = sav_count;
       locker = self;
+      // Unlink wait record
+      *(waitrec.next ? &waitrec.next->prev : &tail) = waitrec.prev;
+      *(waitrec.prev ? &waitrec.prev->next : &head) = waitrec.next;
+      CloseHandle(waitrec.gwait);
     }
 }
 
@@ -284,21 +297,28 @@ GMonitor::wait(unsigned long timeout)
   // Wait
   if (ok)
     {
-      // Lazy creation of events
-      if (!hev[0]) 
-        create_events(hev);
-      // Release
+      // Prepare wait record
+      struct thr_waiting waitrec;
+      waitrec.waiting = TRUE;
+      waitrec.gwait = CreateEvent(NULL,FALSE,FALSE,NULL);
+      waitrec.next = 0;
+      waitrec.prev = tail;
+      // Link wait record (protected by critical section)
+      *(waitrec.prev ? &waitrec.prev->next : &head) = &waitrec;
+      *(waitrec.next ? &waitrec.next->prev : &tail) = &waitrec; 
+      // Start wait
       int sav_count = count;
       count = 1;
-      ResetEvent(hev[0]);
-      ResetEvent(hev[1]);
-      // Wait
       LeaveCriticalSection(&cs);
-      WaitForMultipleObjects(2,hev,FALSE,timeout);
+      WaitForSingleObject(waitrec.gwait,timeout);
       // Re-acquire
       EnterCriticalSection(&cs);
       count = sav_count;
       locker = self;
+      // Unlink wait record
+      *(waitrec.next ? &waitrec.next->prev : &tail) = waitrec.prev;
+      *(waitrec.prev ? &waitrec.prev->next : &head) = waitrec.next;
+      CloseHandle(waitrec.gwait);
     }
 }
 
@@ -313,14 +333,14 @@ GMonitor::wait(unsigned long timeout)
 #if THREADMODEL==MACTHREADS
 
 // Doubly linked list of waiting threads
-static struct thr_waiting {
+struct thr_waiting {
   struct thr_waiting *next;     // ptr to next waiting thread record
   struct thr_waiting *prev;     // ptr to ptr to this waiting thread
   unsigned long thid;           // id of waiting thread
   void *wchan;                  // cause of the wait
 };
-struct thr_waiting *first_waiting_thr = 0;
-struct thr_waiting *last_waiting_thr = 0;
+static struct thr_waiting *first_waiting_thr = 0;
+static struct thr_waiting *last_waiting_thr = 0;
 
 
 // Stops current thread. 
@@ -348,7 +368,6 @@ macthread_wait(ThreadID self, void *wchan)
   // Returns from the wait.
 }
 
-
 // Wakeup one thread or all threads waiting on cause wchan
 static void
 macthread_wakeup(void *wchan, int onlyone)
@@ -363,18 +382,15 @@ macthread_wakeup(void *wchan, int onlyone)
     }
 }
 
-
 GThread::GThread(int stacksize) 
   : thid(kNoThreadID), finished(0), xentry(0), xarg(0)
 {
 }
 
-
 GThread::~GThread(void)
 {
    wait_for_finish();
 }
-
 
 pascal void *
 GThread::start(void *arg)
@@ -1774,3 +1790,4 @@ GSafeFlags::wait_and_modify(long set_mask, long clr_mask,
    }
    leave();
 }
+

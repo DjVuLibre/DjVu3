@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: DjVuAnno.cpp,v 1.48 2000-05-19 19:00:06 bcr Exp $
+//C- $Id: DjVuAnno.cpp,v 1.49 2000-05-31 21:42:33 bcr Exp $
 
 
 #ifdef __GNUC__
@@ -1271,6 +1271,21 @@ DjVuTXT::find_zones(int string_start, int string_length) const
       // same type and will return it
 {
    GList<Zone *> zone_list;
+
+   {
+	 // Get rid of the leading and terminating spaces
+      int start=string_start;
+      int end=string_start+string_length;
+      while(start<end && isspace(textUTF8[start]))
+	 start++;
+      while(end>start && isspace(textUTF8[end-1]))
+	 end--;
+      if (start==end)
+	 return zone_list;
+      string_start=start;
+      string_length=end-start;
+   }
+
    int zone_type=CHARACTER;
    while(zone_type>=PAGE)
    {
@@ -1279,7 +1294,7 @@ DjVuTXT::find_zones(int string_start, int string_length) const
 
       while(true)
       {
-	 while(isspace(textUTF8[start]) && start<end) start++;
+	 while(start<end && isspace(textUTF8[start])) start++;
 	 if (start==end) break;
 
 	 Zone * zone=get_smallest_zone(zone_type, start, end);
@@ -1301,28 +1316,47 @@ DjVuTXT::find_zones(int string_start, int string_length) const
 }
 
 static inline bool
+is_blank(char ch)
+{
+   return
+       isspace(ch) ||
+       ch==DjVuTXT::end_of_column ||
+       ch==DjVuTXT::end_of_region ||
+       ch==DjVuTXT::end_of_paragraph ||
+       ch==DjVuTXT::end_of_line;
+}
+
+static inline bool
+is_separator(char ch, bool whole_word)
+   // Returns TRUE, if the 'ch' is a separator.
+   // If 'whole_word' is TRUE, the separators also include
+   // all punctuation characters. Otherwise, they include only
+   // white characters.
+{
+   return is_blank(ch) ||
+	  whole_word && strchr("-!,.;:?\"'", ch);
+}
+
+static inline bool
 chars_equal(char ch1, char ch2, bool match_case)
 {
-   if (ch1==DjVuTXT::end_of_column ||
-       ch1==DjVuTXT::end_of_region ||
-       ch1==DjVuTXT::end_of_paragraph ||
-       ch1==DjVuTXT::end_of_line) ch1=' ';
-   if (ch2==DjVuTXT::end_of_column ||
-       ch2==DjVuTXT::end_of_region ||
-       ch2==DjVuTXT::end_of_paragraph ||
-       ch2==DjVuTXT::end_of_line) ch2=' ';
-   
+   if (is_blank(ch1) && is_blank(ch2))
+      return true;
+
    return match_case ? (ch1==ch2) : (toupper(ch1)==toupper(ch2));
 }
 
 static bool
 equal(const char * txt, const char * str, bool match_case, int * length)
-      // Returns TRUE, if there is a portion in the 'txt' which contains
-      // the same words in the same order (but possible with different
-      // number of separating spaces) as the 'str'
+      // Returns TRUE, if 'txt' contains the same words as the 'str'
+      // in the same order (but possibly with different number of
+      // separators between words). The 'separators' in this
+      // function are blank and 'end_of_...' characters.
+      //
       // If search has been successful, the function will make 'length'
       // contain the index of the first character in the 'txt' beyond the
       // found string
+      //
       // NOTE, that it may be different from strlen(str) because of different
       // number of spaces between words in 'str' and 'txt'
 {
@@ -1330,25 +1364,53 @@ equal(const char * txt, const char * str, bool match_case, int * length)
    const char * txt_ptr=txt;
    while(*str_ptr)
    {
-      while(*str_ptr && isspace(*str_ptr)) str_ptr++;
-      while(*str_ptr && *txt_ptr && !isspace(*str_ptr))
+      while(*str_ptr && is_blank(*str_ptr)) str_ptr++;
+      while(*str_ptr && *txt_ptr && !is_blank(*str_ptr))
 	 if (chars_equal(*txt_ptr, *str_ptr, match_case))
 	 {
 	    txt_ptr++; str_ptr++;
 	 } else break;
-      if (*str_ptr && !isspace(*str_ptr)) return false;
-      else if (!*str_ptr) break;
-      while(*txt_ptr && isspace(*txt_ptr)) txt_ptr++;
+      if (!*str_ptr)
+	 break;
+      if (!*txt_ptr || !is_blank(*str_ptr) || !is_blank(*txt_ptr))
+	 return false;
+      while(*txt_ptr && is_blank(*txt_ptr)) txt_ptr++;
    }
    if (length) *length=txt_ptr-txt;
    return true;
 }
 
 GList<DjVuTXT::Zone *>
-DjVuTXT::search_string(const char * string, int & from,
-		       bool search_fwd, bool match_case) const
+DjVuTXT::search_string(const char * string, int & from, bool search_fwd,
+		       bool match_case, bool whole_word) const
 {
-   while(*string && isspace(*string)) string++;
+   GString local_string;
+
+   const char * ptr;
+
+      // Get rid of the leading separators
+   for(ptr=string;*ptr;ptr++)
+      if (!is_separator(*ptr, whole_word))
+	 break;
+   local_string=ptr;
+
+      // Get rid of the terminating separators
+   while(local_string.length() &&
+      is_separator(local_string[local_string.length()-1], whole_word))
+	 local_string.setat(local_string.length()-1, 0);
+
+   string=local_string;
+
+   if (whole_word)
+   {
+	 // Make sure that the string does not contain any
+	 // separators in the middle
+      for(const char * ptr=string;*ptr;ptr++)
+	 if (is_separator(*ptr, true))
+	    THROW("Search string must contain only ONE word\n"
+		  "in the 'Match Whole Word' mode.");
+   }
+
    int string_length=strlen(string);
    bool found=false;
 
@@ -1368,8 +1430,14 @@ DjVuTXT::search_string(const char * string, int & from,
       {
 	 if (equal((const char *) textUTF8+from, string, match_case, &real_str_len))
 	 {
-	    found=true;
-	    break;
+	    if (!whole_word ||
+		(from==0 || is_separator(textUTF8[from-1], true)) &&
+		(from+real_str_len==(int) textUTF8.length() ||
+		 is_separator(textUTF8[from+real_str_len], true)))
+	    {
+	       found=true;
+	       break;
+	    }
 	 }
 	 from++;
       }      
@@ -1381,8 +1449,14 @@ DjVuTXT::search_string(const char * string, int & from,
       {
 	 if (equal((const char *) textUTF8+from, string, match_case, &real_str_len))
 	 {
-	    found=true;
-	    break;
+	    if (!whole_word ||
+		(from==0 || is_separator(textUTF8[from-1], true)) &&
+		(from+real_str_len==(int) textUTF8.length() ||
+		 is_separator(textUTF8[from+real_str_len], true)))
+	    {
+	       found=true;
+	       break;
+	    }
 	 }
 	 from--;
       }

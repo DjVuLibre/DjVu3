@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuAnno.h,v 1.26 2000-05-19 19:00:06 bcr Exp $
+//C- $Id: DjVuAnno.h,v 1.27 2000-05-31 21:42:33 bcr Exp $
 
 #ifndef _DJVUANNO_H
 #define _DJVUANNO_H
@@ -36,7 +36,7 @@
     @memo Implements support for DjVuImage annotations
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: DjVuAnno.h,v 1.26 2000-05-19 19:00:06 bcr Exp $# */
+    #$Id: DjVuAnno.h,v 1.27 2000-05-31 21:42:33 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -256,9 +256,18 @@ public:
 	     if searching forward and #-1# otherwise.
       @param search_fwd #TRUE# means to search forward. #FALSE# - backward.
       @param match_case If set to #FALSE# the search will be case-insensitive.
+      @param whole_word If set to #TRUE# the function will try to find
+	     a whole word matching the passed string. The word separators
+	     are all blank and punctuation characters. The passed
+	     string may {\bf not} contain word separators, that is it
+	     {\bf must} be a whole word.
+
+      {\bf WARNING:} The returned list contains pointers to Zones.
+      {\bf DO NOT DELETE} these Zones.
       */
   GList<Zone *> search_string(const char * string, int & start_pos,
-			      bool search_fwd, bool match_case) const;
+			      bool search_fwd, bool match_case,
+			      bool whole_word=false) const;
   /** Returns the number of bytes needed by this data structure. It's
       used by caching routines to estimate the size of a \Ref{DjVuImage}. */
   unsigned int get_memory_usage() const;

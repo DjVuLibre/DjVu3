@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.h,v 1.59 2000-03-14 23:08:26 eaf Exp $
+//C- $Id: DjVuDocument.h,v 1.60 2000-05-31 21:42:33 bcr Exp $
  
 #ifndef _DJVUDOCUMENT_H
 #define _DJVUDOCUMENT_H
@@ -33,7 +33,7 @@
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocument.h,v 1.59 2000-03-14 23:08:26 eaf Exp $#
+    @version #$Id: DjVuDocument.h,v 1.60 2000-05-31 21:42:33 bcr Exp $#
 */
 
 //@{
@@ -100,7 +100,10 @@
 	     because the initialization itself requires data, which is
 	     not immediately available in the plugin. Thus, to prevent the
 	     main thread from blocking, we perform initialization in a
-	     separate thread. To check if the class is completely initialized,
+	     separate thread. To check if the class is completely and
+	     successfully initialized, use \Ref{is_init_ok}(). To see if
+	     there was an error, use \Ref{is_init_failed}(). To
+	     know when initialization is over (whether successfully or not),
 	     use \Ref{is_init_complete}(). To wait for this to happen use
 	     \Ref{wait_for_complete_init}(). Once again, all these things are
 	     not required for single-threaded program.
@@ -147,7 +150,8 @@
 		\item #DOC_NDIR_KNOWN#: Contents of the document navigation
 		      directory became known. This is meaningful for old-style
 		      documents (#OLD_BUNDLED# and #OLD_INDEXED#) only
-		\item #DOC_INIT_COMPLETE#: The initializating code finished.
+		\item #DOC_INIT_OK# or #DOC_INIT_FAILED#:
+		      The initializating code finished.
 	     \end{itemize}
     \end{enumerate} */
     
@@ -163,11 +167,11 @@ public:
 	     \item #DOC_NDIR_KNOWN#: Contents of the document navigation
 		   directory became known. This is meaningful for old-style
 		   documents (#OLD_BUNDLED# and #OLD_INDEXED#) only
-	     \item #DOC_INIT_COMPLETE#: The initialization has completed successfully.
+	     \item #DOC_INIT_OK#: The initialization has completed successfully.
 	     \item #DOC_INIT_FAILED#: The initialization failed.
 	  \end{itemize} */
    enum DOC_FLAGS { DOC_TYPE_KNOWN=1, DOC_DIR_KNOWN=2,
-		    DOC_NDIR_KNOWN=4, DOC_INIT_COMPLETE=8,
+		    DOC_NDIR_KNOWN=4, DOC_INIT_OK=8,
 		    DOC_INIT_FAILED=16 };
       /** Specifies the format of #DjVuDocument#. There are currently 4 DjVu
 	  multipage formats recognized by the library. Two of them are obsolete
@@ -292,19 +296,36 @@ public:
    void		init(const GURL & url, GP<DjVuPort> port=0,
 		     DjVuFileCache * cache=0);
 
-      /** Returns #TRUE# if the initialization thread finished successfully.
-	  As soon as it happens, the document becomes completely initialized
-	  and its every function should work properly. Please refer to
-	  the description of \Ref{init}() function and of the #DjVuDocument#
-	  class to learn about the initializing stages.
+      /** Returns #TRUE# if the initialization thread finished (does not
+	  matter successfully or not). As soon as it happens, the document
+	  becomes completely initialized and its every function should work
+	  properly. Please refer to the description of \Ref{init}() function
+	  and of the #DjVuDocument# class to learn about the initializing
+	  stages.
 
 	  To wait for the initialization to complete use
-	  \Ref{wait_for_complete_init}() function. To query the initialization
-	  stage use \Ref{get_flags}() function.
+	  \Ref{wait_for_complete_init}() function.
+
+	  To query the initialization stage use \Ref{get_flags}() function.
+
+	  To learn whether initialization was successful or not,
+	  use \Ref{is_init_ok}() and \Ref{is_init_failed}().
 
 	  {\bf Note:} In a single threaded application the initialization
 	  completes before the \Ref{init}() function returns. */
    bool		is_init_complete(void) const;
+
+      /** Returns #TRUE# is the initialization thread finished successfully.
+
+	  See \Ref{is_init_complete}() and \Ref{wait_for_complete_init}()
+	  for more details. */
+   bool		is_init_ok(void) const;
+
+      /** Returns #TRUE# is the initialization thread failed.
+
+	  See \Ref{is_init_complete}() and \Ref{wait_for_complete_init}()
+	  for more details. */
+   bool		is_init_failed(void) const;
 
       /** If the document has already learnt its type, the function will
 	  returns it: #DjVuDocument::OLD_BUNDLED# or
@@ -544,8 +565,11 @@ public:
    float	get_thumbnails_gamma(void) const;
       //@}
 
-      /** Waits until the document becomes completely initialized. As
-	  described in \Ref{start_init}(), for multi-threaded applications the
+      /** Waits until the document initialization process finishes.
+	  It can finish either successfully or not. Use \Ref{is_init_ok}()
+	  and \Ref{is_init_failed}() to learn the result code.
+	  
+	  As described in \Ref{start_init}(), for multi-threaded applications the
 	  initialization is carried out in parallel with the main thread.
 	  This function blocks the calling thread until the initializing
 	  thread reads enough data, receives information about the document
@@ -736,7 +760,19 @@ DjVuDocument::ThumbReq::ThumbReq(int xpage_num, const GP<DataPool> & xdata_pool)
 inline bool
 DjVuDocument::is_init_complete(void) const
 {
-   return (flags & DOC_INIT_COMPLETE)!=0;
+   return (flags & (DOC_INIT_OK | DOC_INIT_FAILED))!=0;
+}
+
+inline bool
+DjVuDocument::is_init_ok(void) const
+{
+   return (flags & DOC_INIT_OK)!=0;
+}
+
+inline bool
+DjVuDocument::is_init_failed(void) const
+{
+   return (flags & DOC_INIT_FAILED)!=0;
 }
 
 inline bool
@@ -744,12 +780,12 @@ DjVuDocument::wait_for_complete_init(void)
 {
    flags.enter();
    while(!(flags & DOC_INIT_FAILED) &&
-	 !(flags & DOC_INIT_COMPLETE)) flags.wait();
+	 !(flags & DOC_INIT_OK)) flags.wait();
    flags.leave();
 #if THREADMODEL!=NOTHREADS
    init_thr.wait_for_finish();
 #endif // THREADMODEL!=NOTHREADS    
-   return (flags & DOC_INIT_COMPLETE)!=0;
+   return (flags & (DOC_INIT_OK | DOC_INIT_FAILED))!=0;
 }
 
 inline int

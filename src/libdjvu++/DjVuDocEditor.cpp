@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: DjVuDocEditor.cpp,v 1.35 2000-05-23 01:30:51 bcr Exp $
+//C- $Id: DjVuDocEditor.cpp,v 1.36 2000-05-31 21:42:33 bcr Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -90,7 +90,7 @@ DjVuDocEditor::init(const char * fname)
    doc_url=GOS::filename_to_url(fname);
    GP<DjVuDocument> tmp_doc=new DjVuDocument();
    tmp_doc->init(doc_url, this);
-   if (!tmp_doc->is_init_complete())
+   if (!tmp_doc->is_init_ok())
       THROW(GString("Failed to open document '")+fname+"'");
 
    orig_doc_type=tmp_doc->get_doc_type();

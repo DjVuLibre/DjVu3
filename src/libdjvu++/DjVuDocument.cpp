@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.119 2000-05-19 19:00:06 bcr Exp $
+//C- $Id: DjVuDocument.cpp,v 1.120 2000-05-31 21:42:33 bcr Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -277,14 +277,14 @@ DjVuDocument::init_thread(void)
    {
 	 // DJVU format
       DEBUG_MSG("Got DJVU OLD_INDEXED or SINGLE_PAGE document here.\n");
-      doc_type=OLD_INDEXED;
+      doc_type=SINGLE_PAGE;
 
       flags|=DOC_TYPE_KNOWN;
       pcaster->notify_doc_flags_changed(this, DOC_TYPE_KNOWN, 0);
       check_unnamed_files();
    }
 
-   if (doc_type==OLD_BUNDLED || doc_type==OLD_INDEXED)
+   if (doc_type==OLD_BUNDLED || doc_type==SINGLE_PAGE)
    {
       DEBUG_MSG("Searching for NDIR chunks...\n");
       ndir_file=get_djvu_file(-1);
@@ -299,18 +299,23 @@ DjVuDocument::init_thread(void)
 	    ndir->insert_page(-1, first_page_name);
 	 } else
 	 {
-	    doc_type=SINGLE_PAGE;
 	    ndir=new DjVuNavDir(init_url.base()+"directory");
 	    ndir->insert_page(-1, init_url.fname());
 	 }
+      } 
+      else
+      {
+	 if (doc_type==SINGLE_PAGE)
+	    doc_type=OLD_INDEXED;
       }
+
       flags|=DOC_NDIR_KNOWN;
       pcaster->notify_doc_flags_changed(this, DOC_NDIR_KNOWN, 0);
       check_unnamed_files();
    }
 
-   flags|=DOC_INIT_COMPLETE;
-   pcaster->notify_doc_flags_changed(this, DOC_INIT_COMPLETE, 0);
+   flags|=DOC_INIT_OK;
+   pcaster->notify_doc_flags_changed(this, DOC_INIT_OK, 0);
    check_unnamed_files();
 
    init_thread_flags|=FINISHED;
@@ -426,6 +431,7 @@ DjVuDocument::check_unnamed_files(void)
 			// No empty URLs are allowed at this point.
 			// We now know all information about the document
 			// and can determine if a page is inside it or not
+		     f->data_pool->set_eof();
 		     GString msg;
 		     if (f->id_type==UnnamedFile::ID)
 			msg="Page with name '"+f->id+"' is not in this document.";
@@ -935,6 +941,8 @@ DjVuDocument::process_threqs(void)
 	       // Switch this request to the "decoding" mode
 	    req->image_file=get_djvu_file(req->page_num);
 	    req->thumb_file=0;
+	    req->data_pool->set_eof();
+	    remove=true;
 	 } ENDCATCH;
       } // if (req->thumb_file)
       
@@ -958,9 +966,10 @@ DjVuDocument::process_threqs(void)
 		     if (!pm)
 		     {
 			GP<GBitmap> bm=dimg->get_bitmap(rect, rect, sizeof(int));
-			pm=new GPixmap(*bm);
+			if(bm)
+			   pm=new GPixmap(*bm);
 		     }
-		     if (!pm) THROW("Unable to render page "+GString(req->page_num));
+		     if (!pm) THROW("Unable to render page "+GString(req->page_num+1));
 		     
 			// Store and compress the pixmap
 		     GP<IWPixmap> iwpix=new IWPixmap(pm);
@@ -983,6 +992,7 @@ DjVuDocument::process_threqs(void)
 			// Unfortunately we cannot decode it
 		     req->thumb_file=0;
 		     req->image_file=0;
+		     req->data_pool->set_eof();
 		     remove=true;
 		  } else req->image_file->start_decode();
 	       }
@@ -995,6 +1005,7 @@ DjVuDocument::process_threqs(void)
 	       // Get rid of this request
 	    req->image_file=0;
 	    req->thumb_file=0;
+	    req->data_pool->set_eof();
 	    remove=true;
 	 } ENDCATCH;
       }
