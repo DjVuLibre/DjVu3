@@ -28,34 +28,34 @@ the proper destructors when an exception occurs, and (b) it is not thread
 safe.  Although all modern C++ compiler handle exception decently, the
 exception handling intrinsics are not always thread safe.  Therefore we
 urge programmers to <EM>only</EM> use exceptions to signal error conditions
-that force the library to discontinue execution.<P>There are four macros for handling exceptions.  Macros <TT>TRY</TT>, <TT>CATCH</TT> and
-<TT>ENDCATCH</TT> are used to define an exception catching block.  Exceptions can
-be thrown at all times using macro <TT>THROW(cause)</TT>. An exception can be
-re-thrown from a catch block using macro <TT>RETHROW</TT>.<P>Example:
+that force the library to discontinue execution.<P>There are four macros for handling exceptions.  Macros <TT>G_TRY</TT>, <TT>G_CATCH</TT> and
+<TT>G_ENDCATCH</TT> are used to define an exception catching block.  Exceptions can
+be thrown at all times using macro <TT>G_THROW(cause)</TT>. An exception can be
+re-thrown from a catch block using macro <TT>G_RETHROW</TT>.<P>Example:
 <PRE>
-    TRY
+    G_TRY
       {
         // program lines which may result in a call to THROW()
-        THROW(&quot;message&quot;);
+        G_THROW(&quot;message&quot;);
       }
-    CATCH(ex) 
+    G_CATCH(ex) 
       {
         // Variable ex refers to a GException object.
         ex.perror();  
         // You can rethrow the exception to an outer exception handler.
-        RETHROW;
+        G_RETHROW;
       }
-    ENDCATCH;
+    G_ENDCATCH;
     </PRE> <P></BLOCKQUOTE>
 <DL><DT><DT><B>Author:</B><DD>L&eacute;on Bottou &lt;leonb@research.att.com&gt; -- initial implementation.<BR>
 Andrei Erofeev &lt;eaf@geocities.com&gt; -- fixed message memory allocation.
 
-<DT><B>Version:</B><DD><TT>$Id: GException.h.html,v 1.4 2001-08-08 17:54:16 docbill Exp $</TT> 
+<DT><B>Version:</B><DD><TT>$Id: GException.h.html,v 1.14 2001-08-08 19:02:17 docbill Exp $</TT> 
 <DD></DL><P><I><A HREF="index.html">Alphabetic index</A></I> <I><A HREF="HIER.html">Hierarchy of classes</A></I></P><HR>
 <!-- This is were the DOC++ footer is defined  -->
 
 <font face="arial,helvetica" size="2">
-<a href=http://www.djvu.att.com>DjVu</a> is a trademark of AT&amp;T.  
+<a href=http://www.lizardtech.com>DjVu</a> is a trademark of LizardTech, Inc.  
 <br>All other products mentioned are registered trademarks or trademarks of
 their respective companies.
 </font>

@@ -31,7 +31,7 @@
 #C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #
-# $Id: functions.sh,v 1.72 2001-08-02 16:49:04 bcr Exp $
+# $Id: functions.sh,v 1.73 2001-08-08 19:02:17 docbill Exp $
 # $Name:  $
 
 #
@@ -458,7 +458,11 @@ require_compiler()
 
 check_debug_option()
 {
-  if [ -z "$*" ] ; then return; fi
+  if [ -z "$*" ] ;
+  then
+    append_defs NO_DEBUG 1
+    return
+  fi
   # We could test that one ...
   C_CCOPT=REPLACE
   C_CXXOPT=REPLACE
@@ -468,8 +472,6 @@ check_debug_option()
   R_OPT=""
   append_defs DEBUG 1
   HAS_DEBUG=true
-#  C_DEFS=APPEND
-#  A_DEFS="-DDEBUG $A_DEFS"
 }
 
 

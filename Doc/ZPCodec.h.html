@@ -1,11 +1,11 @@
 <HTML>
 <HEAD>
-   <TITLE> </TITLE>
+   <TITLE>class  ByteStream</TITLE>
    <META NAME="GENERATOR" CONTENT="DOC++ 3.4.1">
 </HEAD>
 <BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
 
-<H2> <A HREF="#DOC.DOCU">ZPCodec.h</A></H2>
+<H2>class  <A HREF="#DOC.DOCU">ZPCodec.h</A></H2>
 <BLOCKQUOTE>Binary adaptive quasi-arithmetic coder. </BLOCKQUOTE>
 
 <HR>
@@ -17,7 +17,7 @@
 <DT>
 
 <IMG ALT="o" BORDER=0 SRC=icon1.gif><A NAME="ZPCodec"></A>
-<B>class  </B><A HREF=ZPCodec.html><B>ZPCodec</B></A><B></B><DD><I>Performs ZP-Coder encoding and decoding.</I>
+<B>class  </B><A HREF=ZPCodec.html><B>ZPCodec</B></A><B>: public <!1><A HREF="GPEnabled.html#DOC.1.4.4.2">GPEnabled</A></B><DD><I>Performs ZP-Coder encoding and decoding.</I>
 <DT>
 
 <IMG ALT="o" BORDER=0 SRC=icon1.gif><A NAME="ZPCodec Examples"></A>
@@ -28,7 +28,7 @@
 Files <TT>&quot;ZPCodec.h&quot;</TT> and <TT>&quot;ZPCodec.cpp&quot;</TT> implement a fast binary adaptive
 quasi-arithmetic coder named ZP-Coder.  Because of its speed and
 convenience, the ZP-Coder is used in several parts of the DjVu reference
-library (See <!1><A HREF="BSByteStream.h.html">BSByteStream.h</A>, <!1><A HREF="JB2Image.h.html">JB2Image.h</A>, <!1><A HREF="IWImage.h.html">IWImage.h</A>).
+library (See <!1><A HREF="BSByteStream.h.html">BSByteStream.h</A>, <!1><A HREF="JB2Image.h.html">JB2Image.h</A>, <!1><A HREF="IW44Image.h.html">IW44Image.h</A>).
 The following comments avoid the theory (see the historical remarks for
 useful pointers) and concentrate on the user perspective on the ZP-Coder.<P><B>Introduction</B> ---
 Encoding consists of transforming a sequence of <EM>message bits</EM> into a
@@ -83,13 +83,13 @@ ZP-Coder is straightforward (see <!1><A HREF="ZPCodecExamples.html">ZPCodec Exam
 initializes them to zero. It then constructs a <!1><A HREF="ZPCodec.html">ZPCodec</A> object for
 encoding. For each message bit, the encoder program retrieves the context
 bits, selects a context variable on the basis of the context bits and
-calls member function <!1><A HREF="ZPCodec.html#DOC.1.5.15.2.4">encoder</A> with the message bit and a
+calls member function <!1><A HREF="ZPCodec.html#DOC.1.4.17.2.2">encoder</A> with the message bit and a
 reference to the context variable.
 <LI> The <EM>decoder program</EM> allocates context variables and
 initializes them to zero. It then constructs a <!1><A HREF="ZPCodec.html">ZPCodec</A> object for
 decoding. For each message bit, the decoder program retrieves the context
 bits, selects a context variable on the basis of the context bits and
-calls member function <!1><A HREF="ZPCodec.html#DOC.1.5.15.2.3">decoder</A> with a reference to the
+calls member function <!1><A HREF="ZPCodec.html#DOC.1.4.17.2.5">decoder</A> with a reference to the
 context variable. This function returns the message bit.
 </UL>
 Functions
@@ -103,24 +103,24 @@ been described in certain parts of the JPEG standard.  Unfortunate patent
 policies have made these coders very difficult to use in general purpose
 applications.  The Z-Coder is constructed using a new approach based on an
 extension of the Golomb codes (Bottou, Howard, Bengio, IEEE DCC 98, 1998
-<A HREF=http://www.research.att.com/~leonb/DJVU/bottou-howard-bengio>DjVu</A>
+<A HREF=http://www.research.att.com/~leonb/DJVU/bottou-howard-bengio/>DjVu</A>
 <A HREF=http://www.research.att.com/~leonb/PS/bottou-howard-bengio.ps.gz>PostScript</A>)
 This new approach does not infringe the QM-Coder patents.  Unfortunately
 the Z-Coder is dangerously close to the patented Arithmetic MEL Coder.
 Therefore we wrote the ZP-Coder (pronounce Zee-Prime Coder) which we
 believe is clear of legal problems.  Needless to say, AT&amp;T has patents
-pending for both the Z-Coder and the ZP-Coder. The good news however is
-that we can grant a license to use the ZP-Coder in ``free software''
-without further complication. See the <!1><A HREF="ATTSourceCodeAgreement.html">AT&amp;T Source Code Agreement</A> for
-more information.<P></BLOCKQUOTE>
+pending for both the Z-Coder and the ZP-Coder, licenced to LizardTech.
+The good news however is that we can grant a license to use the ZP-Coder
+in ``free software'' without further complication. See the Copyright
+for more information.<P></BLOCKQUOTE>
 <DL><DT><DT><B>Author:</B><DD>L&eacute;on Bottou &lt;leonb@research.att.com&gt; 
-<DT><B>Version:</B><DD><TT>$Id: ZPCodec.h.html,v 1.4 2001-08-08 17:54:16 docbill Exp $</TT>
+<DT><B>Version:</B><DD><TT>$Id: ZPCodec.h.html,v 1.14 2001-08-08 19:02:17 docbill Exp $</TT>
 
 <DD></DL><P><I><A HREF="index.html">Alphabetic index</A></I> <I><A HREF="HIER.html">Hierarchy of classes</A></I></P><HR>
 <!-- This is were the DOC++ footer is defined  -->
 
 <font face="arial,helvetica" size="2">
-<a href=http://www.djvu.att.com>DjVu</a> is a trademark of AT&amp;T.  
+<a href=http://www.lizardtech.com>DjVu</a> is a trademark of LizardTech, Inc.  
 <br>All other products mentioned are registered trademarks or trademarks of
 their respective companies.
 </font>

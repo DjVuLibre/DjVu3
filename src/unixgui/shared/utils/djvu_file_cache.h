@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: djvu_file_cache.h,v 1.2 2001-08-08 17:44:52 docbill Exp $
+// $Id: djvu_file_cache.h,v 1.3 2001-08-08 19:02:17 docbill Exp $
 // $Name:  $
 
 

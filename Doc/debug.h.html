@@ -1,11 +1,11 @@
 <HTML>
 <HEAD>
-   <TITLE> </TITLE>
+   <TITLE>(x)class  GURL</TITLE>
    <META NAME="GENERATOR" CONTENT="DOC++ 3.4.1">
 </HEAD>
 <BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
 
-<H2> <A HREF="#DOC.DOCU">debug.h</A></H2>
+<H2>(x)class  <A HREF="#DOC.DOCU">debug.h</A></H2>
 <BLOCKQUOTE>Macros for printing debug messages. </BLOCKQUOTE>
 
 <HR>
@@ -71,7 +71,7 @@ of debug code, but does not enable the debug messages automatically.
 In order to see them the program should use <!1><A HREF="DEBUG_SET_LEVEL.html">DEBUG_SET_LEVEL</A> to
 change the level to anything greater than 0. Normally this happens when
 user specifies option <TT>-debug</TT> in the command line. Usage of
-<TT>RUNTIME_DEBUG_ONLY</TT> implies <TT>DEBUGLVL=1</TT> if not specified otherwise.<P>Finally, <TT>-DDEBUG</TT> can be used instead of <TT>-DDEBUGLVL=1</TT>.<P><B>Historical Comment</B> --- Debug macros are rarely used in the reference
+<TT>RUNTIME_DEBUG_ONLY</TT> implies <TT>DEBUGLVL=1</TT> if not specified otherwise.<P>Finally, <TT>-DNO_DEBUG</TT> can be used instead of <TT>-DDEBUGLVL=0</TT>.<P><B>Historical Comment</B> --- Debug macros are rarely used in the reference
 DjVu library because Leon thinks that debugging messages unnecessarily
 clutter the code.  Debug macros are used everywhere in the plugin code
 because Andrew thinks that code without debugging messages is close to
@@ -80,7 +80,7 @@ if cluttering header files with huge documentation chunks helps to
 improve code readability.<P></BLOCKQUOTE>
 <DL><DT><DT><B>Author:</B><DD>Andrew Erofeev &lt;eaf@geocities.com&gt; -- initial implementation <BR>
 Leon Bottou &lt;leonb@research.att.com&gt; -- cleanups 
-<DT><B>Version:</B><DD><TT>$Id: debug.h.html,v 1.8 2001-08-08 18:07:06 docbill Exp $</TT>
+<DT><B>Version:</B><DD><TT>$Id: debug.h.html,v 1.14 2001-08-08 19:02:17 docbill Exp $</TT>
 
 <DD></DL><P><I><A HREF="index.html">Alphabetic index</A></I> <I><A HREF="HIER.html">Hierarchy of classes</A></I></P><HR>
 <!-- This is were the DOC++ footer is defined  -->

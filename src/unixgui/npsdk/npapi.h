@@ -1,11 +1,11 @@
 /*C-  -*- C -*-
- * $Id: npapi.h,v 1.1 2001-08-08 17:38:04 docbill Exp $
+ * $Id: npapi.h,v 1.2 2001-08-08 19:02:17 docbill Exp $
  * $Name:  $
  */
 
 /* -*- Mode: C; tab-width: 4; -*- */
 /*
- *  npapi.h $Revision: 1.1 $
+ *  npapi.h $Revision: 1.2 $
  *  Netscape client plug-in API spec
  */
 

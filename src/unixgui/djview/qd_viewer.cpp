@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qd_viewer.cpp,v 1.10 2001-08-08 18:09:39 docbill Exp $
+// $Id: qd_viewer.cpp,v 1.11 2001-08-08 19:02:17 docbill Exp $
 // $Name:  $
 
 

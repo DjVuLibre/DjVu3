@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // $Name:  $
-static char RCSVersion[]="@(#) $Id: djvu_file_cache.cpp,v 1.2 2001-08-08 17:44:52 docbill Exp $";
+static char RCSVersion[]="@(#) $Id: djvu_file_cache.cpp,v 1.3 2001-08-08 19:02:17 docbill Exp $";
 
 #ifdef __GNUC__
 #pragma implementation
