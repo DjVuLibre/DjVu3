@@ -9,9 +9,9 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: ByteStream.cpp,v 1.18 1999-11-04 18:41:39 bcr Exp $
+//C- $Id: ByteStream.cpp,v 1.19 2000-01-22 22:01:12 bcr Exp $
 
-// File "$Id: ByteStream.cpp,v 1.18 1999-11-04 18:41:39 bcr Exp $"
+// File "$Id: ByteStream.cpp,v 1.19 2000-01-22 22:01:12 bcr Exp $"
 // - Author: Leon Bottou, 04/1997
 
 #ifdef __GNUC__
@@ -74,6 +74,8 @@ ByteStream::readall(void *buffer, size_t size)
   while (size > 0)
     {
       size_t nitems = read(buffer, size);
+      if(nitems < 0) 
+        ::perror("read");
       if (nitems == 0)
         break;
       total += nitems;
