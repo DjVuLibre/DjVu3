@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuPalette.cpp,v 1.5 2000-01-21 19:48:42 leonb Exp $
+//C- $Id: DjVuPalette.cpp,v 1.6 2000-02-16 22:17:37 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -283,13 +283,16 @@ DjVuPalette::compute_palette(int maxcolors, int minboxsize)
       color.p[2] = rsum/box.sum;
       color.p[3] = ( color.p[0]*BMUL + color.p[1]*GMUL + color.p[2]*RMUL) / SMUL;
     }
+  // Save dominant color
+  PColor dcolor = palette[0];
   // Sort palette colors in luminance order
   qsort((PColor*)palette, ncolors, sizeof(PColor), lcomp);
   // Clear invalid data
   colordata.empty();
   if (pcube) 
     allocate_pcube();
-  return ncolors;
+  // Return dominant color
+  return color_to_index_slow(dcolor.p);
 }
 
 #endif
@@ -349,9 +352,9 @@ DjVuPalette::compute_palette_and_quantize(GPixmap &pm, int maxcolors, int minbox
         histogram_add(p[i], 1);
     }
   // Execute
-  int ncolors = compute_palette(maxcolors, minboxsize);
+  int result = compute_palette(maxcolors, minboxsize);
   quantize(pm);
-  return ncolors;
+  return result;
 }
 
 void 
