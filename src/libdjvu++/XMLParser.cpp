@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: XMLParser.cpp,v 1.5 2001-05-15 23:00:25 bcr Exp $
+// $Id: XMLParser.cpp,v 1.6 2001-05-16 18:32:31 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -329,9 +329,7 @@ lt_XMLParser::Anno::ChangeAnno(const lt_XMLTags &map,const GURL &url,const GUTF8
             ymin=xx[1];
             ymax=xx[3];
           }
-//          DjVuPrintMessage("xmin=%d ymin=%d xmax=%d,ymax=%d\n",xmin,ymin,xmax,ymax);
           GRect rect(xmin,ymin,xmax-xmin,ymax-ymin);
-//          DjVuPrintMessage("xmin=%d ymin=%d width=%u height=%u\n",xmin,ymin,rect.width(),rect.height());
           a=GMapRect::create(rect);
         }else if(shape == "circle")
         {
@@ -621,85 +619,142 @@ template<class TYPE>
 static inline TYPE min(TYPE a,TYPE b) { return (a<b)?a:b; }
 
 // used to build the zone tree
-GRect make_next_layer(
-  DjVuTXT::Zone &parent, const lt_XMLTags &tag, ByteStream &bs, int height)
+void
+make_next_layer(
+  DjVuTXT::Zone &parent,
+  const lt_XMLTags &tag, ByteStream &bs,
+  const int height)
 {
   // the plugin thinks there are only Pages, Lines and Words
   // so we don't make Paragraphs, Regions and Columns zones
   // if we did the plugin is not able to search the text but 
   // DjVuToText writes out all the text anyway
+  DjVuTXT::Zone *self_ptr;
   char sepchar;
-  DjVuTXT::Zone *child_ptr;
   if(tag.name == "WORD")
   {
-    child_ptr = parent.append_child();
-    child_ptr->ztype = DjVuTXT::WORD;
+    self_ptr=parent.append_child();
+    self_ptr->ztype = DjVuTXT::WORD;
     sepchar=' ';
   }else if(tag.name == "LINE")
   {
-    child_ptr = parent.append_child();
-    child_ptr->ztype = DjVuTXT::LINE;
+    self_ptr=parent.append_child();
+    self_ptr->ztype = DjVuTXT::LINE;
     sepchar=DjVuTXT::end_of_line;
   }else if(tag.name == "PARAGRAPH")
   {
-    child_ptr = parent.append_child();
-    child_ptr->ztype = DjVuTXT::PARAGRAPH;
+    self_ptr=parent.append_child();
+    self_ptr->ztype = DjVuTXT::PARAGRAPH;
     sepchar=DjVuTXT::end_of_paragraph;
   }else if(tag.name == "REGION")
   {
-    child_ptr = parent.append_child();
-    child_ptr->ztype = DjVuTXT::REGION;
+    self_ptr=parent.append_child();
+    self_ptr->ztype = DjVuTXT::REGION;
     sepchar=DjVuTXT::end_of_region;
   }else if(tag.name == "PAGECOLUMN")
   {
-    child_ptr = parent.append_child();
-    child_ptr->ztype = DjVuTXT::COLUMN;
+    self_ptr=parent.append_child();
+    self_ptr->ztype = DjVuTXT::COLUMN;
     sepchar=DjVuTXT::end_of_column;
   }else
   {
-    child_ptr = &parent;
-    child_ptr->ztype = DjVuTXT::PAGE;
+    self_ptr = &parent;
+    self_ptr->ztype = DjVuTXT::PAGE;
     sepchar=0;
   }
-  DjVuTXT::Zone &child = *child_ptr;
-  child.text_start = bs.tell();
-  GRect ret(child.rect);
-  if(child.ztype == DjVuTXT::WORD)
+  DjVuTXT::Zone &self = *self_ptr;
+  self.text_start = bs.tell();
+  int &xmin=self.rect.xmin;
+  int &ymin=self.rect.ymin;
+  int &xmax=self.rect.xmax;
+  int &ymax=self.rect.ymax;
+  xmin=parent.rect.xmax;
+  ymin=parent.rect.ymax;
+  xmax=parent.rect.xmin;
+  ymax=parent.rect.ymin;
+  GPosition pos=tag.args.contains("coords");
+  if(pos)
   {
     GList<int> rectArgs;
-    lt_XMLParser::intList(tag.args["coords"], rectArgs);
-    GPosition i = rectArgs;
-    
-    child.rect.xmin = rectArgs[i];
-    child.rect.ymin = height - 1 - rectArgs[++i];
-    child.rect.xmax = rectArgs[++i];
-    child.rect.ymax = height - 1 - rectArgs[++i];
+    lt_XMLParser::intList(tag.args[pos], rectArgs);
+    if((pos=rectArgs))
+    {
+      xmin=rectArgs[pos];
+      if(++pos)
+      {
+        ymin=(height-1)-rectArgs[pos];
+        if(++pos)
+        {
+          xmax=rectArgs[pos];
+          if(++pos)
+          {
+            ymax=(height-1)-rectArgs[pos];
+          }else
+          {
+            ymax=parent.rect.xmax;
+          }
+        }
+      }
+      if(pos)
+      {
+        if(xmin>xmax)
+        {
+          const int t=xmin;
+          xmin=xmax;
+          xmax=t;
+        }
+        if(ymin>ymax)
+        {
+          const int t=ymin;
+          ymin=ymax;
+          ymax=t;
+        }
+      }else
+      {
+        xmin=parent.rect.xmax;
+        ymin=parent.rect.ymax;
+        xmax=parent.rect.xmin;
+        ymax=parent.rect.ymin;
+      }
+    }
+  }
+  if(self.ztype == DjVuTXT::WORD)
+  {
     bs.writestring(tag.raw.substr(0,tag.raw.firstEndSpace()));
-    bs.write8(sepchar);
-    child.text_length = bs.tell() - child.text_start;
+    DjVuPrintMessage("<<<%s>>>\n",
+      (const char *)tag.raw.substr(0,tag.raw.firstEndSpace()));
+    if(sepchar)
+      bs.write8(sepchar);
+    self.text_length = bs.tell() - self.text_start;
   }else
   {
-    ret.xmin = 65535;
-    ret.ymin = height;
-    ret.xmax = 0;
-    ret.ymax = 0;
     for(GPosition pos = tag.content; pos; ++pos)
     {
       GP<lt_XMLTags> t = tag.content[pos].tag;
-      child.rect = make_next_layer(child, *t, bs, height);
-      
+      make_next_layer(self, *t, bs, height);
       if(sepchar)
         bs.write8(sepchar);
-      child.text_length = bs.tell() - child.text_start;
-      
-      // find the size of the rect that holds the zone
-      ret.xmin=min(child.rect.xmin,ret.xmin);
-      ret.ymin=min(child.rect.ymin,ret.ymin);
-      ret.xmax=max(child.rect.xmax,ret.xmax);
-      ret.ymax=max(child.rect.ymax,ret.ymax);
+      self.text_length = bs.tell() - self.text_start;
     }
   }
-  return ret; // returns the rect that holds the zone
+  parent.rect.xmin=min(xmin,parent.rect.xmin);
+  parent.rect.ymin=min(ymin,parent.rect.ymin);
+  parent.rect.xmax=max(xmax,parent.rect.xmax);
+  parent.rect.ymax=max(ymax,parent.rect.ymax);
+  if(xmin>xmax)
+  {
+    const int t=xmin;
+    xmin=xmax;
+    xmax=t;
+  }
+  if(ymin>ymax)
+  {
+    const int t=ymin;
+    ymin=ymax;
+    ymax=t;
+  }
+  DjVuPrintMessage("(%d,%d)(%d,%d)<<<\\%o>>>\n",
+    xmin,ymin,xmax,ymax, sepchar);
 }
 
 #if 0
@@ -715,7 +770,8 @@ void step_down(DjVuTXT::Zone &parent)
 #endif
 
 void 
-lt_XMLParser::Text::ChangeText(const lt_XMLTags &tags, const GURL &url,const GUTF8String &id, const GUTF8String &width,const GUTF8String &height)
+lt_XMLParser::Text::ChangeText(const lt_XMLTags &tags, const GURL &url,
+  const GUTF8String &id, const GUTF8String &width,const GUTF8String &height)
 {
   const GUTF8String url_string((const char *)url);
   DjVuDocument &doc = *(m_docs[url_string]);
@@ -740,7 +796,13 @@ lt_XMLParser::Text::ChangeText(const lt_XMLTags &tags, const GURL &url,const GUT
   GP<ByteStream> textbs = ByteStream::create(); 
   
   txt->page_zone.text_start = 0;
-  txt->page_zone.rect = make_next_layer(txt->page_zone, tags, *textbs, atoi(height));
+  DjVuTXT::Zone &parent=txt->page_zone;
+  parent.rect.xmin=0;
+  parent.rect.ymin=0;
+  parent.rect.xmax=width.toInt();
+  parent.rect.ymax=height.toInt();
+  make_next_layer(parent,
+    tags, *textbs, parent.rect.ymax);
   textbs->write8(0);
   long len = textbs->tell();
   txt->page_zone.text_length = len;
