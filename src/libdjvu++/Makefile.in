@@ -14,11 +14,15 @@ DEFS=@defs@
 CXXFLAGS= $(DEFS) $(OPT) $(WARN) -I$(SRCDIR) -DUNIX
 LDFLAGS=
 
-# This 
 
+# Release info
+
+NAM= libdjvu++
+VER= 1.2
+
+# This 
 LIB= libdjvu++.a
 PROG= djvuinfo c44 d44 djvutopnm djvumake djvuextract ppmcoco bzz
-
 
 # Makefile for libdjvu++.a
 
@@ -144,8 +148,20 @@ depend:
 	cat Makefile.dep >> Makefile.new
 	mv Makefile.new Makefile
 	  
+release:
+	$(MAKE) realclean
+	$(MAKE) depend
+	$(MAKE) ATTLicense.cpp
+	$(MAKE) libdjvu++.dxx
+	$(MAKE) tex
+	$(MAKE) html
+	$(MAKE) distclean
+	( cd .. ; gnu-tar -cvz -f - --exclude=CVS $(NAM) ) > ../$(NAM)-$(VER).tar.gz
+	@attcapsule ATTLICENSE ../$(NAM)-$(VER).tar.gz
+	@echo Distribution is in ../$(NAM)-$(VER).tar.gz
 
-PHONY: html tex clean realclean distclean install depend
+
+PHONY: html tex clean realclean distclean install depend release
 
 
 # Handle cpp files as C++
