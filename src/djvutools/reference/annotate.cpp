@@ -30,18 +30,18 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: annotate.cpp,v 1.18 2001-07-24 17:52:03 bcr Exp $
+// $Id: annotate.cpp,v 1.19 2001-09-21 20:21:30 leonb Exp $
 // $Name:  $
 
 /*****************************************************************************
  *
- *   $Revision: 1.18 $
- *   $Date: 2001-07-24 17:52:03 $
- *   @(#) $Id: annotate.cpp,v 1.18 2001-07-24 17:52:03 bcr Exp $
+ *   $Revision: 1.19 $
+ *   $Date: 2001-09-21 20:21:30 $
+ *   @(#) $Id: annotate.cpp,v 1.19 2001-09-21 20:21:30 leonb Exp $
  *
  *****************************************************************************/
 
-static const char RCSVersion[]="@(#) $Id: annotate.cpp,v 1.18 2001-07-24 17:52:03 bcr Exp $";
+static const char RCSVersion[]="@(#) $Id: annotate.cpp,v 1.19 2001-09-21 20:21:30 leonb Exp $";
 
 #include "GIFFManager.h"
 #include "GOS.h"
@@ -69,7 +69,7 @@ static inline void del_anno(GIFFManager &mng)
      mng.del_chunk(binary_ant);
 }
 
-static void remove_djvu(DArray<GUTF8String> & argv)
+static void remove_djvu(GArray<GUTF8String> & argv)
    // argv[]: annotate -remove <djvu_in> [<djvu_out>]
 {
    const int argc=argv.hbound()+1;
@@ -101,7 +101,7 @@ static void remove_djvu(DArray<GUTF8String> & argv)
    mng.save_file(dst);
 }
 
-static void extract_djvu(DArray<GUTF8String> & argv)
+static void extract_djvu(GArray<GUTF8String> & argv)
    // argv[]: annotate -extract <djvu_in> <annotate_out> [<djvu_out>]
 {
    const int argc=argv.hbound()+1;
@@ -132,7 +132,7 @@ static void extract_djvu(DArray<GUTF8String> & argv)
    }
 }
 
-static void insert_djvu(DArray<GUTF8String> & argv)
+static void insert_djvu(GArray<GUTF8String> & argv)
    // argv[]: annotate -insert <djvu_in> <annotate_in> [<djvu_out>]
 {
    const int argc=argv.hbound()+1;
@@ -187,7 +187,7 @@ int main(int argc, char ** argv)
 {
   setlocale(LC_ALL,"");
   djvu_programname(argv[0]);
-  DArray<GUTF8String> dargv(0,argc-1);
+  GArray<GUTF8String> dargv(0,argc-1);
   for(int i=0;i<argc;++i)
     dargv[i]=GNativeString(argv[i]);
 

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //
-// $Id: djvumake.cpp,v 1.26 2001-07-24 17:52:03 bcr Exp $
+// $Id: djvumake.cpp,v 1.27 2001-09-21 20:21:30 leonb Exp $
 // $Name:  $
 
 /** @name djvumake
@@ -102,7 +102,7 @@
     @memo
     Assemble DjVu files.
     @version
-    #$Id: djvumake.cpp,v 1.26 2001-07-24 17:52:03 bcr Exp $#
+    #$Id: djvumake.cpp,v 1.27 2001-09-21 20:21:30 leonb Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> \\
     Patrick Haffner <haffner@research.att.com>
@@ -282,7 +282,7 @@ analyze_jb2_chunk(const GURL &url)
 // -- Create info chunk from specification or mask
 
 void
-create_info_chunk(IFFByteStream &iff, DArray<GUTF8String> &argv)
+create_info_chunk(IFFByteStream &iff, GArray<GUTF8String> &argv)
 {
   const int argc=argv.hbound()+1;
   // Process info specification
@@ -622,7 +622,7 @@ main(int argc, char **argv)
 {
   setlocale(LC_ALL,"");
   djvu_programname(argv[0]);
-  DArray<GUTF8String> dargv(0,argc-1);
+  GArray<GUTF8String> dargv(0,argc-1);
   for(int i=0;i<argc;++i)
     dargv[i]=GNativeString(argv[i]);
   G_TRY

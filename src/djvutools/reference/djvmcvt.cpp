@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djvmcvt.cpp,v 1.23 2001-07-24 17:52:03 bcr Exp $
+// $Id: djvmcvt.cpp,v 1.24 2001-09-21 20:21:30 leonb Exp $
 // $Name:  $
 
 /** @name djvmcvt
@@ -106,7 +106,7 @@
     @author
     Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: djvmcvt.cpp,v 1.23 2001-07-24 17:52:03 bcr Exp $# */
+    #$Id: djvmcvt.cpp,v 1.24 2001-09-21 20:21:30 leonb Exp $# */
 
 #ifdef __GNUC__
 #pragma implementation
@@ -150,7 +150,7 @@ Usage:\n\
 }
 
 static void
-do_bundled(DArray<GUTF8String> &argv)
+do_bundled(GArray<GUTF8String> &argv)
       // <progname> -b[undled] <file_in> <file_out>
 {
    const int argc=argv.hbound()+1;
@@ -163,7 +163,7 @@ do_bundled(DArray<GUTF8String> &argv)
 }
 
 static void
-do_indirect(DArray<GUTF8String> &argv)
+do_indirect(GArray<GUTF8String> &argv)
       // <progname> -i[ndirect] <file_in> <dir_out> <idx_fname>
 {
    const int argc=argv.hbound()+1;
@@ -179,7 +179,7 @@ main(int argc, char ** argv)
 {
   setlocale(LC_ALL,"");
   djvu_programname(argv[0]);
-  DArray<GUTF8String> dargv(0,argc-1);
+  GArray<GUTF8String> dargv(0,argc-1);
   for(int i=0;i<argc;++i)
     dargv[i]=GNativeString(argv[i]);
   progname=dargv[0]=GOS::basename(dargv[0]);

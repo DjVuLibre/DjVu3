@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djvm.cpp,v 1.22 2001-07-24 17:52:03 bcr Exp $
+// $Id: djvm.cpp,v 1.23 2001-09-21 20:21:30 leonb Exp $
 // $Name:  $
 
 /** @name djvm
@@ -99,7 +99,7 @@
     @author
     Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: djvm.cpp,v 1.22 2001-07-24 17:52:03 bcr Exp $# */
+    #$Id: djvm.cpp,v 1.23 2001-09-21 20:21:30 leonb Exp $# */
 //@{
 //@}
 
@@ -155,7 +155,7 @@ Usage:\n\
 }
 
 static void
-create(DArray<GUTF8String> &argv)
+create(GArray<GUTF8String> &argv)
       // djvm -c[reate] <doc.djvu> <page_1.djvu> ... <page_n.djvu>
       // doc.djvu will be overwritten
 {
@@ -177,7 +177,7 @@ create(DArray<GUTF8String> &argv)
 }
 
 static void
-insert(DArray<GUTF8String> &argv)
+insert(GArray<GUTF8String> &argv)
       // djvm -i[nsert] <doc.djvu> <page.djvu> <page_num>
 {
    const int argc=argv.hbound()+1;
@@ -197,7 +197,7 @@ insert(DArray<GUTF8String> &argv)
 }
 
 static void
-del(DArray<GUTF8String> &argv)
+del(GArray<GUTF8String> &argv)
       // djvm -d[elete] <doc.djvu> <page_num>
 {
    const int argc=argv.hbound()+1;
@@ -221,7 +221,7 @@ del(DArray<GUTF8String> &argv)
 }
 
 static void
-list(DArray<GUTF8String> &argv)
+list(GArray<GUTF8String> &argv)
       // djvm -l[ist] <doc.djvu>
 {
    const int argc=argv.hbound()+1;
@@ -271,7 +271,7 @@ main(int argc, char ** argv)
 {
   setlocale(LC_ALL,"");
   djvu_programname(argv[0]);
-  DArray<GUTF8String> dargv(0,argc-1);
+  GArray<GUTF8String> dargv(0,argc-1);
   for(int i=0;i<argc;++i)
     dargv[i]=GNativeString(argv[i]);
   progname=dargv[0]=GOS::basename(dargv[0]);

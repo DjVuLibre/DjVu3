@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: c44.cpp,v 1.37 2001-09-05 19:27:33 docbill Exp $
+// $Id: c44.cpp,v 1.38 2001-09-21 20:21:30 leonb Exp $
 // $Name:  $
 
 
@@ -185,7 +185,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: c44.cpp,v 1.37 2001-09-05 19:27:33 docbill Exp $# */
+    #$Id: c44.cpp,v 1.38 2001-09-21 20:21:30 leonb Exp $# */
 //@{
 //@}
 
@@ -469,7 +469,7 @@ resolve_quality(int npix)
 
 
 void
-parse(DArray<GUTF8String> &argv)
+parse(GArray<GUTF8String> &argv)
 {
   const int argc=argv.hbound()+1;
   for (int i=1; i<argc; i++)
@@ -672,7 +672,7 @@ main(int argc, char **argv)
 {
   setlocale(LC_ALL,"");
   djvu_programname(argv[0]);
-  DArray<GUTF8String> dargv(0,argc-1);
+  GArray<GUTF8String> dargv(0,argc-1);
   for(int i=0;i<argc;++i)
     dargv[i]=GNativeString(argv[i]);
   G_TRY

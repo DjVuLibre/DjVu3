@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djthumb.cpp,v 1.25 2001-07-26 17:52:26 bcr Exp $
+// $Id: djthumb.cpp,v 1.26 2001-09-21 20:21:30 leonb Exp $
 // $Name:  $
 
 // DJTHUMB -- DjVu thumbnails generator
@@ -68,7 +68,7 @@
     @author
     Andrei Erofeev <eaf@geocities.com> -- initial implementation
     @version
-#$Id: djthumb.cpp,v 1.25 2001-07-26 17:52:26 bcr Exp $# */
+#$Id: djthumb.cpp,v 1.26 2001-09-21 20:21:30 leonb Exp $# */
 //@{
 //@}
 
@@ -121,7 +121,7 @@ main(int argc, char ** argv)
 {
   setlocale(LC_ALL,"");
   djvu_programname(argv[0]);
-  DArray<GUTF8String> dargv(0,argc-1);
+  GArray<GUTF8String> dargv(0,argc-1);
   for(int i=0;i<argc;++i)
     dargv[i]=GNativeString(argv[i]);
   // Get the program name

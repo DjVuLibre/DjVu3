@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djvudump.cpp,v 1.22 2001-07-24 17:52:03 bcr Exp $
+// $Id: djvudump.cpp,v 1.23 2001-09-21 20:21:30 leonb Exp $
 // $Name:  $
 
 /** @name djvuinfo
@@ -78,7 +78,7 @@ xxx
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: djvudump.cpp,v 1.22 2001-07-24 17:52:03 bcr Exp $# */
+    #$Id: djvudump.cpp,v 1.23 2001-09-21 20:21:30 leonb Exp $# */
 //@{
 //@}
 
@@ -121,7 +121,7 @@ main(int argc, char **argv)
 {
   setlocale(LC_ALL,"");
   djvu_programname(argv[0]);
-  DArray<GUTF8String> dargv(0,argc-1);
+  GArray<GUTF8String> dargv(0,argc-1);
   for(int i=0;i<argc;++i)
     dargv[i]=GNativeString(argv[i]);
   G_TRY

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djvutxt.cpp,v 1.24 2001-07-24 17:52:03 bcr Exp $
+// $Id: djvutxt.cpp,v 1.25 2001-09-21 20:21:30 leonb Exp $
 // $Name:  $
 
 // DJVUTXT -- DjVu TXT extractor
@@ -69,7 +69,7 @@
     @author
     Andrei Erofeev <eaf@geocities.com> -- initial implementation
     @version
-    #$Id: djvutxt.cpp,v 1.24 2001-07-24 17:52:03 bcr Exp $# */
+    #$Id: djvutxt.cpp,v 1.25 2001-09-21 20:21:30 leonb Exp $# */
 //@{
 //@}
 
@@ -135,7 +135,7 @@ main(int argc, char ** argv)
 {
   setlocale(LC_ALL,"");
   djvu_programname(argv[0]);
-  DArray<GUTF8String> dargv(0,argc-1);
+  GArray<GUTF8String> dargv(0,argc-1);
   for(int i=0;i<argc;++i)
     dargv[i]=GNativeString(argv[i]);
   progname=dargv[0]=GOS::basename(dargv[0]);

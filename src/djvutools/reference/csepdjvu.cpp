@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: csepdjvu.cpp,v 1.33 2001-07-26 22:34:47 fcrary Exp $
+// $Id: csepdjvu.cpp,v 1.34 2001-09-21 20:21:30 leonb Exp $
 // $Name:  $
 
 
@@ -108,7 +108,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: csepdjvu.cpp,v 1.33 2001-07-26 22:34:47 fcrary Exp $# */
+    #$Id: csepdjvu.cpp,v 1.34 2001-09-21 20:21:30 leonb Exp $# */
 //@{
 //@}
 
@@ -1279,7 +1279,7 @@ main(int argc, const char **argv)
 #endif
   setlocale(LC_ALL,"");
   djvu_programname(argv[0]);
-  DArray<GUTF8String> dargv(0,argc-1);
+  GArray<GUTF8String> dargv(0,argc-1);
   for(int i=0;i<argc;++i)
     dargv[i]=GNativeString(argv[i]);
   G_TRY

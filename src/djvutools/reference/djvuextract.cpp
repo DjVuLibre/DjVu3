@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djvuextract.cpp,v 1.27 2001-07-24 17:52:03 bcr Exp $
+// $Id: djvuextract.cpp,v 1.28 2001-09-21 20:21:30 leonb Exp $
 // $Name:  $
 
 /** @name djvuextract
@@ -65,7 +65,7 @@
     @memo
     Extract components from DjVu files.
     @version
-    #$Id: djvuextract.cpp,v 1.27 2001-07-24 17:52:03 bcr Exp $#
+    #$Id: djvuextract.cpp,v 1.28 2001-09-21 20:21:30 leonb Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> - Initial implementation\\
     Andrei Erofeev <eaf@geocities.com> - Multipage support */
@@ -209,7 +209,7 @@ main(int argc, char **argv)
 {
   setlocale(LC_ALL,"");
   djvu_programname(argv[0]);
-  DArray<GUTF8String> dargv(0,argc-1);
+  GArray<GUTF8String> dargv(0,argc-1);
   for(int i=0;i<argc;++i)
     dargv[i]=GNativeString(argv[i]);
   G_TRY

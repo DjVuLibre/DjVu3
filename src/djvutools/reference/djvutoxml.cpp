@@ -4,7 +4,7 @@
 //C-              Unauthorized use prohibited.
 //C-
 // 
-// $Id: djvutoxml.cpp,v 1.7 2001-06-25 18:24:45 bcr Exp $
+// $Id: djvutoxml.cpp,v 1.8 2001-09-21 20:21:30 leonb Exp $
 // $Name:  $
 
 #include "DjVuDocument.h"
@@ -35,7 +35,7 @@ main(int argc, char * argv[], char *env[])
 {
   setlocale(LC_ALL,"");
   djvu_programname(argv[0]);
-  DArray<GUTF8String> dargv(0,argc-1);
+  GArray<GUTF8String> dargv(0,argc-1);
   for(int i=0;i<argc;++i)
     dargv[i]=GNativeString(argv[i]);
 

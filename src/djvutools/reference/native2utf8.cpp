@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: native2utf8.cpp,v 1.3 2001-07-24 17:52:03 bcr Exp $
+// $Id: native2utf8.cpp,v 1.4 2001-09-21 20:21:30 leonb Exp $
 // $Name:  $
 
 /** @name nativetoutf8
@@ -43,7 +43,7 @@
     @author
     Dr Bill C Riemers <bcr@lizardtech.com>
     @version
-    #$Id: native2utf8.cpp,v 1.3 2001-07-24 17:52:03 bcr Exp $# */
+    #$Id: native2utf8.cpp,v 1.4 2001-09-21 20:21:30 leonb Exp $# */
 //@{
 //@}
 
@@ -64,7 +64,7 @@ main(int argc, char **argv)
 {
   setlocale(LC_ALL,"");
   djvu_programname(argv[0]);
-  DArray<GUTF8String> dargv(0,argc-1);
+  GArray<GUTF8String> dargv(0,argc-1);
   for(int i=0;i<argc;++i)
     dargv[i]=GNativeString(argv[i]);
   GURL::Filename::UTF8 inurl((argc<2)?GUTF8String("-"):dargv[1]);
