@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.36 2001-03-13 21:33:22 bcr Exp $
+// $Id: GString.cpp,v 1.37 2001-03-16 21:38:18 fcrary Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -287,7 +287,7 @@ GString::fromEscaped( const GMap<GString,GString> ConvMap ) const
     if( semi_locn < 0 ) break;  // No closing semicolon, exit and copy
                                 //  the rest of the string.
     ret += substr( start_locn, amp_locn - start_locn );
-    int const len=semi_locn-amp_locn-1;
+    int const len = semi_locn - amp_locn - 1;
     if(len)
     {
       GString key = substr( amp_locn+1, len);
@@ -309,7 +309,7 @@ GString::fromEscaped( const GMap<GString,GString> ConvMap ) const
           ret+=GString((char const)(value));
         }else
         {
-          ret += substr(amp_locn,semi_locn-amp_locn+1);
+          ret += substr( amp_locn, semi_locn - amp_locn + 1 );
         }
       }else
       {  
@@ -319,20 +319,20 @@ GString::fromEscaped( const GMap<GString,GString> ConvMap ) const
           ret += ConvMap[map_entry];
         } else
         {
-          static const GMap<GString,GString> &Basic=BasicMap();
+          static const GMap<GString,GString> &Basic = BasicMap();
           GPosition map_entry = Basic.contains( key );
-          if ( map_entry)
+          if ( map_entry )
           {
-            ret += ConvMap[map_entry];
+            ret += Basic[map_entry];
           }else
           {
-            ret += substr(amp_locn,len+2);
+            ret += substr( amp_locn, len+2 );
           }
         }
       }
     }else
     {
-      ret += substr(amp_locn,len+2);
+      ret += substr( amp_locn, len+2 );
     }
     start_locn = semi_locn + 1;
     DEBUG_MSG( "ret = '" << ret << "'\n" );
