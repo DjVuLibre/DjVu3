@@ -1,5 +1,4 @@
 #!/bin/sh 
-# Copyright (c) 2000 AT&T -- All Rights Reserved
 # Written 01/00 by Patrick Haffner
 
 ppmfile=$1
@@ -33,3 +32,4 @@ echo 1>&2 "-- Subsample, mask and assemble DjVu file."
 run "djvumake $djvufile Sjbz=$tmp.djvu PPM=$ppmfile"
 
 echo 1>&2 "-- Finished."
+
