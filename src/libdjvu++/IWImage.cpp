@@ -9,9 +9,9 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: IWImage.cpp,v 1.19 1999-09-23 03:13:37 leonb Exp $
+//C- $Id: IWImage.cpp,v 1.20 1999-09-23 03:27:27 leonb Exp $
 
-// File "$Id: IWImage.cpp,v 1.19 1999-09-23 03:13:37 leonb Exp $"
+// File "$Id: IWImage.cpp,v 1.20 1999-09-23 03:27:27 leonb Exp $"
 // - Author: Leon Bottou, 08/1998
 
 #ifdef __GNUC__
@@ -2112,8 +2112,10 @@ IWBitmap::encode_iff(IFFByteStream &iff, int nchunks, const IWEncoderParms *parm
     THROW("(IWBitmap::encode_iff) Codec has been left open");
   int flag = 1;
   iff.put_chunk("FORM:BM44", 1);
+  DJVU_PROGRESS_TASK(iff, nchunks);
   for (int i=0; flag && i<nchunks; i++)
     {
+      DJVU_PROGRESS_RUN(iff, i+1);
       iff.put_chunk("BM44");
       flag = encode_chunk(iff, parms[i]);
       iff.close_chunk();
@@ -2617,8 +2619,10 @@ IWPixmap::encode_iff(IFFByteStream &iff, int nchunks, const IWEncoderParms *parm
     THROW("(IWPixmap::encode_iff) Codec has been left open");
   int flag = 1;
   iff.put_chunk("FORM:PM44", 1);
+  DJVU_PROGRESS_TASK(iff, nchunks);
   for (int i=0; flag && i<nchunks; i++)
     {
+      DJVU_PROGRESS_RUN(iff, i+1);
       iff.put_chunk("PM44");
       flag = encode_chunk(iff, parms[i]);
       iff.close_chunk();
