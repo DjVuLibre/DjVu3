@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: parseoptions.cpp,v 1.83 2001-05-10 00:20:04 bcr Exp $
+// $Id: parseoptions.cpp,v 1.84 2001-06-05 15:54:56 fcrary Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -1295,13 +1295,13 @@ DjVuParseOptions::ConfigFilename(const char config[],int level)
   }
   return retval;
 #else    // WIN32 
-
+  
   TCHAR * root;
   int rootlen;
-
+  
   const char *retval=0;
   const char *this_config=config[0]?config:default_string;
-
+  
   static const TCHAR profiles[]=TEXT("\\Profiles");
   TCHAR modulepath[1024];
   GetModuleFileName(0, modulepath, sizeof(modulepath)-1);
@@ -1310,55 +1310,55 @@ DjVuParseOptions::ConfigFilename(const char config[],int level)
   int i=_tcslen(modulepath);
   while(i>0)
   {
-    const TCHAR c=modulepath[--i];
-    if(c == '/' || c == '\\')
-    {
-      modulepath[i]=0;
-      break;
-    }
+  const TCHAR c=modulepath[--i];
+  if(c == '/' || c == '\\')
+  {
+  modulepath[i]=0;
+  break;
+  }
   }
   */
-	LPTSTR backslash = _tcsrchr(modulepath, _T('\\'));//MBCS DBCS
-	LPTSTR forslash = _tcsrchr(modulepath, _T('/'));//MBCS DBCS
-	if (forslash == NULL) {//MBCS DBCS
-		if (backslash != NULL)
-			*backslash=0;
-	}
-	else {
-		if (backslash == NULL || forslash > backslash)
-			*forslash=0;
-		else
-			*backslash=0;
-	}
-
+  LPTSTR backslash = _tcsrchr(modulepath, _T('\\'));//MBCS DBCS
+  LPTSTR forslash = _tcsrchr(modulepath, _T('/'));//MBCS DBCS
+  if (forslash == NULL) {//MBCS DBCS
+    if (backslash != NULL)
+      *backslash=0;
+  }
+  else {
+    if (backslash == NULL || forslash > backslash)
+      *forslash=0;
+    else
+      *backslash=0;
+  }
+  
   root = new TCHAR [_tcslen(path)+sizeof(profiles)];
   if(!level)
   {
-	/*
+  /*
     int i=_tcslen(modulepath);
     while(i>0)
-	{
+    {
       const TCHAR c=modulepath[--i];
       if(c == '/' || c == '\\')
-	  {
+      {
         modulepath[i]=0;
         break;
-	  }
-	}
-	*/
-	LPTSTR backslash = _tcsrchr(modulepath, _T('\\'));//MBCS DBCS
-	LPTSTR forslash = _tcsrchr(modulepath, _T('/'));//MBCS DBCS
-	if (forslash == NULL) {//MBCS DBCS
-		if (backslash != NULL)
-			*backslash=0;
-	}
-	else {
-		if (backslash == NULL || forslash > backslash)
-			*forslash=0;
-		else
-			*backslash=0;
-	}
-
+      }
+    }
+    */
+    LPTSTR backslash = _tcsrchr(modulepath, _T('\\'));//MBCS DBCS
+    LPTSTR forslash = _tcsrchr(modulepath, _T('/'));//MBCS DBCS
+    if (forslash == NULL) {//MBCS DBCS
+      if (backslash != NULL)
+        *backslash=0;
+    }
+    else {
+      if (backslash == NULL || forslash > backslash)
+        *forslash=0;
+      else
+        *backslash=0;
+    }
+    
   }
   _tcscpy(root, path);
   _tcscat(root,profiles);
@@ -1370,12 +1370,12 @@ DjVuParseOptions::ConfigFilename(const char config[],int level)
     else
       root = (TCHAR *) RegOpenReadConfig (HKEY_LOCAL_MACHINE);
     if(!root)
-	{
+    {
       path=TEXT("C:\\Program Files\\LizardTech");
       root = new TCHAR [_tcslen(path)+sizeof(profiles)];
       _tcscpy(root,path);
       _tcscat(root,profiles);
-	}
+    }
   }
   if (root && root[0])
   {
