@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GURL.cpp,v 1.22 2000-01-21 18:24:46 eaf Exp $
+//C- $Id: GURL.cpp,v 1.23 2000-01-21 20:28:09 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -246,14 +246,13 @@ GURL::store_cgi_args(void)
    GCriticalSectionLock lock1(&url_lock);
    GCriticalSectionLock lock2(&cgi_lock);
 
-   GString new_url;
-   for(const char * ptr=url;*ptr;ptr++)
+   const char * ptr;
+   for(ptr=url;*ptr;ptr++)
       if (ptr[0]=='?' || ptr[0]=='%' &&
 	  ptr[1]=='3' && toupper(ptr[2])=='F')
-      {
-	 new_url=GString(url, ptr-url);
 	 break;
-      }
+   
+   GString new_url=GString(url, ptr-url);
    
    for(int i=0;i<cgi_name_arr.size();i++)
    {
