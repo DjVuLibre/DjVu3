@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: GMapAreas.cpp,v 1.17 2000-11-28 18:48:31 fcrary Exp $
+// $Id: GMapAreas.cpp,v 1.18 2000-11-28 23:55:04 mchen Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -690,7 +690,7 @@ GMapOval::gma_check_object(void) const
    return (border_type!=NO_BORDER &&
        border_type!=SOLID_BORDER &&
        border_type!=XOR_BORDER)?error_oval_border:
-      ((hilite_color!=0xffffffff)?"":error_oval_hilite);
+      ((hilite_color!=0xffffffff) ? error_oval_hilite:"");
 }
 
 void
