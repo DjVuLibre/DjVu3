@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVmDoc.cpp,v 1.12 1999-09-29 18:38:28 eaf Exp $
+//C- $Id: DjVmDoc.cpp,v 1.13 1999-09-29 20:15:59 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -305,7 +305,7 @@ DjVmDoc::expand(const char * dir_name, const char * idx_name)
       DEBUG_MSG("storing file '" << file_name << "'\n");
 
       GP<ByteStream> str_in=data[data_pos]->get_stream();
-      GOS::deletefile(file_name);
+      DataPool::load_file(file_name);
       StdioByteStream str_out(file_name, "wb");
       str_out.writall("AT&T", 4);
       str_out.copy(*str_in);
@@ -315,7 +315,7 @@ DjVmDoc::expand(const char * dir_name, const char * idx_name)
    
    DEBUG_MSG("storing index file '" << idx_full_name << "'\n");
 
-   GOS::deletefile(idx_full_name);
+   DataPool::load_file(idx_full_name);
    StdioByteStream str(idx_full_name, "wb");
    write_index(str);
 }
