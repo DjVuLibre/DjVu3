@@ -77,7 +77,7 @@ then
   outputdir=`dirname $outputname`
   if [ ! -x "$outputdir/$name" ]
   then
-    "$LN" `basename "$linkname"` "$outputdir/$name"
+    (cd $outputdir;"$LN" -s `basename "$linkname"` "$name")
   fi 
   exec `unescape "$LN"` -s `basename "$linkname"` "$outputname"
 else
