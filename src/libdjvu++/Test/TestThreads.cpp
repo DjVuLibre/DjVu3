@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: TestThreads.cpp,v 1.3 1999-02-16 17:19:15 leonb Exp $
+//C-  $Id: TestThreads.cpp,v 1.4 1999-03-06 00:42:11 leonb Exp $
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -41,6 +41,8 @@ readfile()
 {
   char c;
   int fd = open(__FILE__, O_RDONLY, 0666);
+  if (fd < 0)
+    { fprintf(stderr,"Cannot open file '" __FILE__ "'."); exit(1); }
   while (read(fd, &c, 1)==1) 
     { 
       GThread::yield(); 
@@ -71,6 +73,8 @@ alloc()
   int size = 1;
   char *mem = (char*)malloc(1);
   FILE *f = fopen(__FILE__,"r");
+  if (f == 0)
+    { fprintf(stderr,"Cannot open file '" __FILE__ "'."); exit(0); }
   while (!feof(f))
     {
       mem = (char*)realloc(mem, size+1);
