@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: djthumb.cpp,v 1.3 2000-05-01 16:15:23 bcr Exp $
+//C- $Id: djthumb.cpp,v 1.4 2000-05-02 17:49:02 bcr Exp $
 
 // DJTHUMB -- DjVu thumbnails generator
 
@@ -48,7 +48,7 @@
     @author
     Andrei Erofeev <eaf@geocities.com> -- initial implementation
     @version
-    #$Id: djthumb.cpp,v 1.3 2000-05-01 16:15:23 bcr Exp $# */
+    #$Id: djthumb.cpp,v 1.4 2000-05-02 17:49:02 bcr Exp $# */
 //@{
 //@}
 
@@ -157,8 +157,13 @@ main(int argc, char ** argv)
       pages_num=doc->get_pages_num();
       if (pages_num==1)
 	 THROW("Thumbnails cannot be generated for one-page documents.");
-      
-      doc->generate_thumbnails(size, verbose ? progress_cb : 0, 0);
+     
+      int page_num=0;
+      do 
+      { 
+        doc->generate_thumbnails(size, page_num);
+        progress_cb(page_num,0);
+      }while (page_num>=0);
       
       doc->save_as(name_out, true);
 
