@@ -1,13 +1,13 @@
 //C-  -*- C++ -*-
 //C-
-//C-  Copyright (c) 1988 AT&T	
+//C-  Copyright (c) 1998 AT&T	
 //C-  All Rights Reserved 
 //C-
 //C-  THIS IS UNPUBLISHED PROPRIETARY SOURCE CODE OF AT&T
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: BSByteStream.h,v 1.2 1999-01-26 19:42:39 leonb Exp $
+//C-  $Id: BSByteStream.h,v 1.3 1999-02-01 18:32:31 leonb Exp $
 
 
 #ifndef _BSBYTESTREAM_H
@@ -90,7 +90,7 @@
     @memo
     Simple Burrows-Wheeler general purpose compressor.
     @version
-    #$Id: BSByteStream.h,v 1.2 1999-01-26 19:42:39 leonb Exp $# */
+    #$Id: BSByteStream.h,v 1.3 1999-02-01 18:32:31 leonb Exp $# */
 //@{
 
 #ifdef __GNUC__

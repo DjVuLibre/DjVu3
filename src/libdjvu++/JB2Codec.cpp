@@ -1,17 +1,13 @@
 //C-  -*- C++ -*-
 //C-
-//C-  Copyright (c) 1988 AT&T	
+//C-  Copyright (c) 1998 AT&T	
 //C-  All Rights Reserved 
 //C-
 //C-  THIS IS UNPUBLISHED PROPRIETARY SOURCE CODE OF AT&T
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: JB2Codec.cpp,v 1.1 1999-01-22 00:40:19 leonb Exp $
-
-// File "$Id: JB2Codec.cpp,v 1.1 1999-01-22 00:40:19 leonb Exp $"
-// - Author: Leon Bottou, 04/1997
-// - based on Paul Howard's program "jb2"
+//C-  $Id: JB2Codec.cpp,v 1.2 1999-02-01 18:32:33 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -21,9 +17,6 @@
 #include <string.h>
 #include "JB2Codec.h"
 #include "GException.h"
-
-
-
 
 
 ////////////////////////////////////////
@@ -46,7 +39,7 @@
 // Contains all contextual information for encoding/decoding a JB2Image.
 
 
-class JB2Codec {
+class JB2Image::JB2Codec {
 
 public:
   // Constructor Destructor
@@ -281,14 +274,14 @@ JB2Image::decode(ByteStream &bs, int)
 
 // STATIC DATA MEMBERS
 
-const int JB2Codec::BIGPOSITIVE = 262143;
-const int JB2Codec::BIGNEGATIVE = -262143;
-const int JB2Codec::MAX_NCELLS = 20000;
+const int JB2Image::JB2Codec::BIGPOSITIVE = 262143;
+const int JB2Image::JB2Codec::BIGNEGATIVE = -262143;
+const int JB2Image::JB2Codec::MAX_NCELLS = 20000;
 
 
 // CONSTRUCTOR
 
-JB2Codec::JB2Codec(ByteStream &bs, int encoding)
+JB2Image::JB2Codec::JB2Codec(ByteStream &bs, int encoding)
   : zp(bs, encoding),
     encoding(encoding),
     cur_ncell(0),
@@ -329,7 +322,7 @@ JB2Codec::JB2Codec(ByteStream &bs, int encoding)
 }
 
 
-JB2Codec::~JB2Codec()
+JB2Image::JB2Codec::~JB2Codec()
 {
   delete [] bitcells;
   delete [] rightcell;
@@ -339,7 +332,7 @@ JB2Codec::~JB2Codec()
 // CODE NUMBERS
 
 inline void 
-JB2Codec::CodeBit(int &bit, BitContext &ctx)
+JB2Image::JB2Codec::CodeBit(int &bit, BitContext &ctx)
 {
   if (encoding)
     zp.encoder(bit, ctx);
@@ -348,7 +341,7 @@ JB2Codec::CodeBit(int &bit, BitContext &ctx)
 }
 
 void 
-JB2Codec::CodeNum(int &num, int low, int high, NumContext &ctx)
+JB2Image::JB2Codec::CodeNum(int &num, int low, int high, NumContext &ctx)
 {
 
   int cutoff, decision, negative=0, phase, range, temp, v=0;
@@ -466,7 +459,7 @@ JB2Codec::CodeNum(int &num, int low, int high, NumContext &ctx)
 // CODE COMMENTS
 
 void 
-JB2Codec::code_comment(GString &comment)
+JB2Image::JB2Codec::code_comment(GString &comment)
 {
   // Encode size
   if (encoding)
@@ -498,7 +491,7 @@ JB2Codec::code_comment(GString &comment)
 // CODE SIMPLE VALUES
 
 void 
-JB2Codec::code_record_type(int &rectype)
+JB2Image::JB2Codec::code_record_type(int &rectype)
 {
   CodeNum(rectype, 
              START_OF_DATA, END_OF_DATA, 
@@ -506,7 +499,7 @@ JB2Codec::code_record_type(int &rectype)
 }
 
 void
-JB2Codec::code_eventual_lossless_refinement()
+JB2Image::JB2Codec::code_eventual_lossless_refinement()
 {
   int bit;
   if (encoding)
@@ -517,7 +510,7 @@ JB2Codec::code_eventual_lossless_refinement()
 }
 
 void 
-JB2Codec::code_match_index(int &index)
+JB2Image::JB2Codec::code_match_index(int &index)
 {
   CodeNum(index,
              lib2shape.lbound(), lib2shape.hbound(), 
@@ -528,14 +521,14 @@ JB2Codec::code_match_index(int &index)
 // HANDLE SHORT LIST
 
 void 
-JB2Codec::fill_short_list(int v)
+JB2Image::JB2Codec::fill_short_list(int v)
 {
   short_list[0] = short_list[1] = short_list[2] = v;
   short_list_pos = 0;
 }
 
 int 
-JB2Codec::update_short_list(int v)
+JB2Image::JB2Codec::update_short_list(int v)
 {
   if (++ short_list_pos == 3)
     short_list_pos = 0;
@@ -566,7 +559,7 @@ JB2Codec::update_short_list(int v)
 
 
 void 
-JB2Codec::code_image_size(JB2Image *jim)
+JB2Image::JB2Codec::code_image_size(JB2Image *jim)
 {
   if (encoding)
     {
@@ -588,7 +581,7 @@ JB2Codec::code_image_size(JB2Image *jim)
 }
 
 void 
-JB2Codec::code_relative_location(JB2Blit *jblt, int rows, int columns)
+JB2Image::JB2Codec::code_relative_location(JB2Blit *jblt, int rows, int columns)
 {
   // Check start record
   if (!gotstartrecordp)
@@ -669,7 +662,7 @@ JB2Codec::code_relative_location(JB2Blit *jblt, int rows, int columns)
 }
 
 void 
-JB2Codec::code_absolute_location(JB2Blit *jblt, int rows, int columns)
+JB2Image::JB2Codec::code_absolute_location(JB2Blit *jblt, int rows, int columns)
 {
   // Check start record
   if (!gotstartrecordp)
@@ -699,7 +692,7 @@ JB2Codec::code_absolute_location(JB2Blit *jblt, int rows, int columns)
 }
 
 void 
-JB2Codec::code_absolute_mark_size(GBitmap *bm, int border)
+JB2Image::JB2Codec::code_absolute_mark_size(GBitmap *bm, int border)
 {
   int xsize, ysize;
   if (encoding) 
@@ -716,7 +709,7 @@ JB2Codec::code_absolute_mark_size(GBitmap *bm, int border)
 }
 
 void 
-JB2Codec::code_relative_mark_size(GBitmap *bm, int cw, int ch, int border)
+JB2Image::JB2Codec::code_relative_mark_size(GBitmap *bm, int cw, int ch, int border)
 {
   int xdiff, ydiff;
   if (encoding) 
@@ -771,7 +764,7 @@ shift_direct_context(int &context, int next,
 
 
 void 
-JB2Codec::code_bitmap_directly (GBitmap *bm)
+JB2Image::JB2Codec::code_bitmap_directly (GBitmap *bm)
 {
   // ensure borders are adequate
   bm->minborder(3);
@@ -881,7 +874,7 @@ shift_cross_context( int &context, int next,
 
 
 void 
-JB2Codec::code_bitmap_by_cross_coding (GBitmap *bm, GBitmap *cbm, int libno)
+JB2Image::JB2Codec::code_bitmap_by_cross_coding (GBitmap *bm, GBitmap *cbm, int libno)
 {
   int cw = cbm->columns();
   int ch = cbm->rows();
@@ -981,7 +974,7 @@ JB2Codec::code_bitmap_by_cross_coding (GBitmap *bm, GBitmap *cbm, int libno)
 // CODE RECORDS
 
 void
-JB2Codec::code_record(int &rectype, JB2Image *jim, JB2Shape *jshp, JB2Blit *jblt)
+JB2Image::JB2Codec::code_record(int &rectype, JB2Image *jim, JB2Shape *jshp, JB2Blit *jblt)
 {
   GBitmap *bm = 0;
   GBitmap *cbm;
@@ -1224,7 +1217,7 @@ JB2Codec::code_record(int &rectype, JB2Image *jim, JB2Shape *jshp, JB2Blit *jblt
 // CODE IMAGE
 
 void 
-JB2Codec::code(JB2Image *jim)
+JB2Image::JB2Codec::code(JB2Image *jim)
 {
   // Easy check
   if (gotstartrecordp)
@@ -1357,7 +1350,7 @@ JB2Codec::code(JB2Image *jim)
 // HELPER FUNCTIONS
 
 void 
-JB2Codec::encode_libonly_shape(JB2Image *jim, int shapeno )
+JB2Image::JB2Codec::encode_libonly_shape(JB2Image *jim, int shapeno )
 {
   // Recursively encode parent shape
   JB2Shape *jshp = jim->get_shape(shapeno);
@@ -1386,7 +1379,7 @@ JB2Codec::encode_libonly_shape(JB2Image *jim, int shapeno )
 
 #ifdef STRICT_PGH
 void 
-JB2Codec::compute_pgh_size(int libno, GBitmap *cbm)
+JB2Image::JB2Codec::compute_pgh_size(int libno, GBitmap *cbm)
 {
   int nrows = cbm->rows();
   int ncolumns = cbm->columns();

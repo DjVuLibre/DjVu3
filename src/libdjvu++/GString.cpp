@@ -1,13 +1,13 @@
 //C-  -*- C++ -*-
 //C-
-//C-  Copyright (c) 1988 AT&T	
+//C-  Copyright (c) 1998 AT&T	
 //C-  All Rights Reserved 
 //C-
 //C-  THIS IS UNPUBLISHED PROPRIETARY SOURCE CODE OF AT&T
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: GString.cpp,v 1.2 1999-01-27 20:03:33 leonb Exp $
+//C-  $Id: GString.cpp,v 1.3 1999-02-01 18:32:33 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -23,7 +23,7 @@
 
 #include "GString.h"
 
-// File "$Id: GString.cpp,v 1.2 1999-01-27 20:03:33 leonb Exp $"
+// File "$Id: GString.cpp,v 1.3 1999-02-01 18:32:33 leonb Exp $"
 // - Author: Leon Bottou, 04/1997
 
 static GStringRep nullstring;

@@ -1,13 +1,13 @@
 //C-  -*- C++ -*-
 //C-
-//C-  Copyright (c) 1988 AT&T	
+//C-  Copyright (c) 1998 AT&T	
 //C-  All Rights Reserved 
 //C-
 //C-  THIS IS UNPUBLISHED PROPRIETARY SOURCE CODE OF AT&T
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: d44.cpp,v 1.2 1999-01-26 20:22:18 leonb Exp $
+//C-  $Id: d44.cpp,v 1.3 1999-02-01 18:32:34 leonb Exp $
 
 
 
@@ -62,7 +62,7 @@
     @author
     Leon Bottou <leonb@research.att.com>
     @version
-    #$Id: d44.cpp,v 1.2 1999-01-26 20:22:18 leonb Exp $# */
+    #$Id: d44.cpp,v 1.3 1999-02-01 18:32:34 leonb Exp $# */
 //#{
 //#}
 

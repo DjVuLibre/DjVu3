@@ -1,13 +1,13 @@
 //C-  -*- C++ -*-
 //C-
-//C-  Copyright (c) 1988 AT&T	
+//C-  Copyright (c) 1998 AT&T	
 //C-  All Rights Reserved 
 //C-
 //C-  THIS IS UNPUBLISHED PROPRIETARY SOURCE CODE OF AT&T
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: GContainer.h,v 1.1 1999-01-22 00:40:19 leonb Exp $
+//C-  $Id: GContainer.h,v 1.2 1999-02-01 18:32:32 leonb Exp $
 
 
 #ifndef _GCONTAINER_H_
@@ -46,7 +46,7 @@
     Leon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@geocities.com> -- bug fixes.
     @version 
-    #$Id: GContainer.h,v 1.1 1999-01-22 00:40:19 leonb Exp $# */
+    #$Id: GContainer.h,v 1.2 1999-02-01 18:32:32 leonb Exp $# */
 //@{
 
 class GContainerBase;

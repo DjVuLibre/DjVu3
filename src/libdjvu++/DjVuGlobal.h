@@ -1,13 +1,13 @@
 //C-  -*- C++ -*-
 //C-
-//C-  Copyright (c) 1988 AT&T	
+//C-  Copyright (c) 1998 AT&T	
 //C-  All Rights Reserved 
 //C-
 //C-  THIS IS UNPUBLISHED PROPRIETARY SOURCE CODE OF AT&T
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: DjVuGlobal.h,v 1.2 1999-01-27 20:08:37 leonb Exp $
+//C-  $Id: DjVuGlobal.h,v 1.3 1999-02-01 18:32:31 leonb Exp $
 
 
 #ifndef _DJVUGLOBAL_H
@@ -26,7 +26,7 @@
     @memo
     Global definitions.
     @version
-    #$Id: DjVuGlobal.h,v 1.2 1999-01-27 20:08:37 leonb Exp $#
+    #$Id: DjVuGlobal.h,v 1.3 1999-02-01 18:32:31 leonb Exp $#
     @author
     Leon Bottou <leonb@research.att.com> -- initial (empty) file.  */
 //@{

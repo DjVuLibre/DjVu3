@@ -1,15 +1,15 @@
 //C-  -*- C++ -*-
 //C-
-//C-  Copyright (c) 1988 AT&T	
+//C-  Copyright (c) 1998 AT&T	
 //C-  All Rights Reserved 
 //C-
 //C-  THIS IS UNPUBLISHED PROPRIETARY SOURCE CODE OF AT&T
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: IFFByteStream.cpp,v 1.4 1999-01-26 20:22:18 leonb Exp $
+//C-  $Id: IFFByteStream.cpp,v 1.5 1999-02-01 18:32:33 leonb Exp $
 
-// File "$Id: IFFByteStream.cpp,v 1.4 1999-01-26 20:22:18 leonb Exp $"
+// File "$Id: IFFByteStream.cpp,v 1.5 1999-02-01 18:32:33 leonb Exp $"
 // -- Implementation of IFFByteStream
 // - Author: Leon Bottou, 06/1998
 

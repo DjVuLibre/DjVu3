@@ -1,13 +1,13 @@
 //C-  -*- C++ -*-
 //C-
-//C-  Copyright (c) 1988 AT&T	
+//C-  Copyright (c) 1998 AT&T	
 //C-  All Rights Reserved 
 //C-
 //C-  THIS IS UNPUBLISHED PROPRIETARY SOURCE CODE OF AT&T
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: GRect.h,v 1.3 1999-01-22 22:09:35 leonb Exp $
+//C-  $Id: GRect.h,v 1.4 1999-02-01 18:32:32 leonb Exp $
 
 
 #ifndef _GRECT_H_
@@ -28,7 +28,7 @@
     @author
     Leon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GRect.h,v 1.3 1999-01-22 22:09:35 leonb Exp $# */
+    #$Id: GRect.h,v 1.4 1999-02-01 18:32:32 leonb Exp $# */
 //@{
 
 #include "DjVuGlobal.h"

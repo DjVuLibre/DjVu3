@@ -1,13 +1,13 @@
 //C-  -*- C++ -*-
 //C-
-//C-  Copyright (c) 1988 AT&T	
+//C-  Copyright (c) 1998 AT&T	
 //C-  All Rights Reserved 
 //C-
 //C-  THIS IS UNPUBLISHED PROPRIETARY SOURCE CODE OF AT&T
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: debug.h,v 1.1 1999-01-22 00:40:19 leonb Exp $
+//C-  $Id: debug.h,v 1.2 1999-02-01 18:32:34 leonb Exp $
 
 
 #ifndef _TEMPLATE_H_
@@ -61,7 +61,7 @@
     @memo 
     Macros for printing debug messages.
     @version 
-    #$Id: debug.h,v 1.1 1999-01-22 00:40:19 leonb Exp $#
+    #$Id: debug.h,v 1.2 1999-02-01 18:32:34 leonb Exp $#
     @author
     Andrew Erofeev <eaf@research.att.com> -- initial implementation \\
     Leon Bottou <leonb@research.att.com> -- cleanups */
