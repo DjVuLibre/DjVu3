@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: JB2Codec.cpp,v 1.2 1999-02-01 18:32:33 leonb Exp $
+//C-  $Id: JB2Image.cpp,v 1.1 1999-02-01 18:57:33 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -15,7 +15,7 @@
 #endif
 
 #include <string.h>
-#include "JB2Codec.h"
+#include "JB2Image.h"
 #include "GException.h"
 
 

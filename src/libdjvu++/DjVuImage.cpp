@@ -7,14 +7,14 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: DjVuCodec.cpp,v 1.6 1999-02-01 18:32:31 leonb Exp $
+//C-  $Id: DjVuImage.cpp,v 1.1 1999-02-01 18:57:33 leonb Exp $
 
 
 #ifdef __GNUC__
 #pragma implementation
 #endif
 
-#include "DjVuCodec.h"
+#include "DjVuImage.h"
 #include "GScaler.h"
 #include <stdarg.h>
 

@@ -7,14 +7,14 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: JB2Codec.h,v 1.2 1999-02-01 18:32:33 leonb Exp $
+//C-  $Id: JB2Image.h,v 1.1 1999-02-01 18:57:34 leonb Exp $
 
-#ifndef _JB2CODEC_H
-#define _JB2CODEC_H
+#ifndef _JB2IMAGE_H
+#define _JB2IMAGE_H
 
-/** @name JB2Codec.h
+/** @name JB2Image.h
 
-    Files #"JB2Codec.h"# and #"JB2Codec.cpp"# address the compression of
+    Files #"JB2Image.h"# and #"JB2Image.cpp"# address the compression of
     bilevel images using the JB2 soft pattern matching scheme.  These files
     provide the complete decoder and the decoder back-end.  The JB2 scheme is
     optimized for images containing a large number of self-similar small
@@ -96,7 +96,7 @@
     \end{itemize}
 
     @version
-    #$Id: JB2Codec.h,v 1.2 1999-02-01 18:32:33 leonb Exp $#
+    #$Id: JB2Image.h,v 1.1 1999-02-01 18:57:34 leonb Exp $#
     @memo
     Coding bilevel images with JB2.
     @author

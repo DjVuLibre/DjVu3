@@ -7,9 +7,9 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: djvutopnm.cpp,v 1.7 1999-02-01 18:32:34 leonb Exp $
+//C-  $Id: djvutopnm.cpp,v 1.8 1999-02-01 18:57:34 leonb Exp $
 
-// File "$Id: djvutopnm.cpp,v 1.7 1999-02-01 18:32:34 leonb Exp $"
+// File "$Id: djvutopnm.cpp,v 1.8 1999-02-01 18:57:34 leonb Exp $"
 // Author: Yann Le Cun 08/1997
 
 #include <stdio.h>
@@ -18,7 +18,7 @@
 #include "GRect.h"
 #include "GPixmap.h"
 #include "GBitmap.h"
-#include "DjVuCodec.h"
+#include "DjVuImage.h"
 #include "GOS.h"
 
 

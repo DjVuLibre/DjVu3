@@ -39,7 +39,7 @@ clean: PHONY
 depend: PHONY
 	sed -e '/^### DEPENDENCIES$$/,$$d' Makefile > Makefile.new
 	echo "### DEPENDENCIES" >> Makefile.new
-	for n in *.cpp ; do g++ -MM $(CXXFLAGS) $$n >> Makefile.new ; done
+	for n in *.cpp ; do ${CXX} -MM $(CXXFLAGS) $$n >> Makefile.new ; done
 	sed -e '1,$$s/^\(Test[A-Za-z0-9]*\)\.o:/\1:/g' < Makefile.new > Makefile
 	rm Makefile.new
 
@@ -79,10 +79,7 @@ TestBitmap: TestBitmap.cpp ../GBitmap.h ../DjVuGlobal.h ../GRect.h \
  ../ByteStream.h ../GException.h ../GContainer.h ../GSmartPointer.h
 TestException: TestException.cpp ../GException.h ../DjVuGlobal.h \
  ../GString.h ../GSmartPointer.h
-TestIFF: TestIFF.cpp ../GIFFManager.h ../IFFByteStream.h \
- ../DjVuGlobal.h ../GException.h ../GString.h ../GSmartPointer.h \
- ../ByteStream.h ../GContainer.h
-TestJB2: TestJB2.cpp ../JB2Codec.h ../DjVuGlobal.h ../GString.h \
+TestJB2: TestJB2.cpp ../JB2Image.h ../DjVuGlobal.h ../GString.h \
  ../GException.h ../GSmartPointer.h ../GContainer.h ../ZPCodec.h \
  ../ByteStream.h ../GRect.h ../GBitmap.h
 TestList: TestList.cpp ../GContainer.h ../DjVuGlobal.h \

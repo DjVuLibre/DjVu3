@@ -7,15 +7,15 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: IWCodec.h,v 1.2 1999-02-01 18:32:33 leonb Exp $
+//C-  $Id: IWImage.h,v 1.1 1999-02-01 18:57:33 leonb Exp $
 
-#ifndef _IWCODEC_H_
-#define _IWCODEC_H_
+#ifndef _IWIMAGE_H_
+#define _IWIMAGE_H_
 
 
-/** @name IWCodec.h
+/** @name IWImage.h
 
-    Files #"IWCodec.h"# and #"IWCodec.cpp"# implement the DjVu IW44 wavelet
+    Files #"IWImage.h"# and #"IWImage.cpp"# implement the DjVu IW44 wavelet
     scheme for the compression of gray-level images (see class \Ref{IWBitmap})
     and color images (see class \Ref{IWPixmap}).  Programs \Ref{c44} and
     \Ref{d44} demonstrate how to encode and decode IW44 files.
@@ -97,7 +97,7 @@
     @author
     Leon Bottou <leonb@research.att.com>
     @version
-    #$Id: IWCodec.h,v 1.2 1999-02-01 18:32:33 leonb Exp $# */
+    #$Id: IWImage.h,v 1.1 1999-02-01 18:57:33 leonb Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -154,7 +154,7 @@ struct IWEncoderParms
     coefficients.  The coefficients are stored in a memory efficient data
     structure.  Member function \Ref{get_bitmap} renders an arbitrary segment
     of the image into a \Ref{GBitmap}.  Member functions \Ref{decode_iff} and
-    \Ref{encode_iff} read and write DjVu IW44 files (see \Ref{IWCodec.h}).
+    \Ref{encode_iff} read and write DjVu IW44 files (see \Ref{IWImage.h}).
     Both the copy constructor and the copy operator are declared as private
     members. It is therefore not possible to make multiple copies of instances
     of this class. */
@@ -170,7 +170,7 @@ public:
   /** Initializes an IWBitmap with image #bm#.  This constructor
       performs the wavelet decomposition of image #bm# and records the
       corresponding wavelet coefficient.  Argument #mask# is an optional
-      bilevel image specifying the masked pixels (see \Ref{IWCodec.h}). */
+      bilevel image specifying the masked pixels (see \Ref{IWImage.h}). */
   void init(const GBitmap *bm, const GBitmap *mask=0);
   /** Convenience constructor. This constructors creates an empty IWBitmap
       and then calls function \Ref{init} above. */
@@ -263,7 +263,7 @@ private:
     coefficients are stored in a memory efficient data structure.  Member
     function \Ref{get_pixmap} renders an arbitrary segment of the image into a
     \Ref{GPixmap}.  Member functions \Ref{decode_iff} and \Ref{encode_iff}
-    read and write DjVu IW44 files (see \Ref{IWCodec.h}).  Both the copy
+    read and write DjVu IW44 files (see \Ref{IWImage.h}).  Both the copy
     constructor and the copy operator are declared as private members. It is
     therefore not possible to make multiple copies of instances of this
     class. */
@@ -291,7 +291,7 @@ public:
   /** Initializes an IWPixmap with color image #bm#.  This constructor
       performs the wavelet decomposition of image #bm# and records the
       corresponding wavelet coefficient.  Argument #mask# is an optional
-      bilevel image specifying the masked pixels (see \Ref{IWCodec.h}).
+      bilevel image specifying the masked pixels (see \Ref{IWImage.h}).
       Argument #crcbmode# specifies how the chrominance information should be
       encoded (see \Ref{CRCBMode}). */
   void init(const GPixmap *bm, const GBitmap *mask=0, CRCBMode crcbmode=CRCBnormal);

@@ -7,17 +7,17 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: makedjvu.cpp,v 1.5 1999-02-01 18:32:34 leonb Exp $
+//C-  $Id: makedjvu.cpp,v 1.6 1999-02-01 18:57:34 leonb Exp $
 
 // MakeDjVu -- Assemble IFF files
-// $Id: makedjvu.cpp,v 1.5 1999-02-01 18:32:34 leonb Exp $
+// $Id: makedjvu.cpp,v 1.6 1999-02-01 18:57:34 leonb Exp $
 // Author: Leon Bottou 08/1997
 
 #include <stdio.h>
 #include <stdlib.h>
 #include "GString.h"
 #include "GException.h"
-#include "DjVuCodec.h"
+#include "DjVuImage.h"
 
 #ifndef TRUE
 #define TRUE 1

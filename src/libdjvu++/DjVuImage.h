@@ -1,4 +1,3 @@
-
 //C-  -*- C++ -*-
 //C-
 //C-  Copyright (c) 1998 AT&T	
@@ -8,33 +7,40 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: DjVuCodec.h,v 1.3 1999-02-01 18:32:31 leonb Exp $
+//C-  $Id: DjVuImage.h,v 1.1 1999-02-01 18:57:33 leonb Exp $
 
-#ifndef _DEJAVUCODEC_H
-#define _DEJAVUCODEC_H
+#ifndef _DJVUIMAGE_H
+#define _DJVUIMAGE_H
 
 
-/**
+/** @name DjVuImage.h
 
-   {\bf ToDo: Multi-page Documents} --- The proposed multi-page format for
-   DjVu documents will considerably change the decoding interface for this
-   class.  The responsibility of supervising the decoding tasks will be
-   transferred to a new class DjVuDocument.  Individual streams composing the
-   multi-page document will be processed by a new class DjVuFile.  Class
-   DjVuImage will still contain the rendering function, but the DjVu image
-   components will be accessed via pointers to the underlying DjVuFile
-   objects.
+    Files #"DjVuImage.h"# and #"DjVuImage.cpp"# provide the main entry points
+    for decoding and processing a DjVu image.  The major component is class
+    \Ref{DjVuImage} which represents a document image using the DjVu layered
+    scheme.
+    
 
-   {\bf ToDo: Annotations} --- Class DjVuAnno should move into another
-   set of source files in order to implement the annotation chunk parser,
-   and to retrieve the hyperlink data structure given a position (x,y).
 
-   @memo
-   DjVu encoded images
-   @author
-   Leon Bottou <leonb@research.att.com>
-   @version
-   #$Id: DjVuCodec.h,v 1.3 1999-02-01 18:32:31 leonb Exp $# */
+    {\bf ToDo: Multi-page Documents} --- The envisionned multi-page format for
+    DjVu documents will considerably change the decoding interface for this
+    class.  The responsibility of supervising the decoding tasks will be
+    transferred to a new class DjVuDocument.  Individual streams composing the
+    multi-page document will be processed by a new class DjVuFile.  Class
+    DjVuImage will still contain the rendering function, but the DjVu image
+    components will be accessed via pointers to the underlying DjVuFile
+    objects.
+    
+    {\bf ToDo: Annotations} --- Class DjVuAnno should move into another
+    set of source files in order to implement the annotation chunk parser,
+    and to retrieve the hyperlink data structure given a position (x,y).
+    
+    @memo
+    Decoding DjVu images.
+    @author
+    Leon Bottou <leonb@research.att.com>
+    @version
+    #$Id: DjVuImage.h,v 1.1 1999-02-01 18:57:33 leonb Exp $# */
 //@{
 
 
@@ -47,8 +53,8 @@
 #include "GSmartPointer.h"
 #include "ByteStream.h"
 #include "IFFByteStream.h"
-#include "JB2Codec.h"
-#include "IWCodec.h"
+#include "JB2Image.h"
+#include "IWImage.h"
 #include "GBitmap.h"
 #include "GPixmap.h"
 

@@ -7,12 +7,12 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: TestJB2.cpp,v 1.2 1999-02-01 18:32:35 leonb Exp $
+//C-  $Id: TestJB2.cpp,v 1.3 1999-02-01 18:57:35 leonb Exp $
 
 
 
 #include <stdio.h>
-#include "JB2Codec.h"
+#include "JB2Image.h"
 #include "GBitmap.h"
 #include "ByteStream.h"
 #include "GException.h"

@@ -10,12 +10,12 @@ OBJS= 	GString.o		\
 	ZPCodec.o		\
 	GBitmap.o		\
 	GPixmap.o		\
-	JB2Codec.o		\
 	IFFByteStream.o		\
 	BSByteStream.o		\
+	JB2Image.o		\
 	GScaler.o               \
-	IWCodec.o		\
-	DjVuCodec.o             \
+	IWImage.o		\
+	DjVuImage.o             \
 	GOS.o                   \
 	debug.o	
 
@@ -109,7 +109,7 @@ clean:
 depend:
 	sed -e '/^### DEPENDENCIES$$/,$$d' Makefile > Makefile.new
 	echo "### DEPENDENCIES" >> Makefile.new
-	for n in *.cpp ; do gcc -MM $(CXXFLAGS) $$n >> Makefile.new ; done
+	for n in *.cpp ; do ${CXX} -MM $(CXXFLAGS) $$n >> Makefile.new ; done
 	sed -e '1,$$s/^\(Test[A-Za-z0-9]*\)\.o:/\1:/g' < Makefile.new > Makefile
 	rm Makefile.new
 
@@ -128,9 +128,9 @@ BSByteStream.o: BSByteStream.cpp BSByteStream.h DjVuGlobal.h \
  GException.h ByteStream.h GContainer.h GSmartPointer.h ZPCodec.h
 ByteStream.o: ByteStream.cpp ByteStream.h DjVuGlobal.h GException.h \
  GContainer.h GSmartPointer.h
-DjVuCodec.o: DjVuCodec.cpp DjVuCodec.h GString.h DjVuGlobal.h \
+DjVuImage.o: DjVuImage.cpp DjVuImage.h GString.h DjVuGlobal.h \
  GException.h GSmartPointer.h GThreads.h ByteStream.h GContainer.h \
- IFFByteStream.h JB2Codec.h ZPCodec.h GRect.h GBitmap.h IWCodec.h \
+ IFFByteStream.h JB2Image.h ZPCodec.h GRect.h GBitmap.h IWImage.h \
  GPixmap.h GScaler.h
 GBitmap.o: GBitmap.cpp GBitmap.h DjVuGlobal.h GRect.h ByteStream.h \
  GException.h GContainer.h GSmartPointer.h GString.h
@@ -151,10 +151,10 @@ GString.o: GString.cpp GString.h DjVuGlobal.h GException.h \
 GThreads.o: GThreads.cpp GThreads.h DjVuGlobal.h GException.h
 IFFByteStream.o: IFFByteStream.cpp IFFByteStream.h DjVuGlobal.h \
  GException.h GString.h GSmartPointer.h ByteStream.h GContainer.h
-IWCodec.o: IWCodec.cpp GRect.h DjVuGlobal.h GException.h \
- GSmartPointer.h ZPCodec.h ByteStream.h GContainer.h IWCodec.h \
+IWImage.o: IWImage.cpp GRect.h DjVuGlobal.h GException.h \
+ GSmartPointer.h ZPCodec.h ByteStream.h GContainer.h IWImage.h \
  GBitmap.h GPixmap.h IFFByteStream.h GString.h
-JB2Codec.o: JB2Codec.cpp JB2Codec.h DjVuGlobal.h GString.h \
+JB2Image.o: JB2Image.cpp JB2Image.h DjVuGlobal.h GString.h \
  GException.h GSmartPointer.h GContainer.h ZPCodec.h ByteStream.h \
  GRect.h GBitmap.h
 ZPCodec.o: ZPCodec.cpp ZPCodec.h DjVuGlobal.h ByteStream.h \
@@ -164,22 +164,22 @@ breakdjvu.o: breakdjvu.cpp GException.h DjVuGlobal.h ByteStream.h \
 bzz.o: bzz.cpp GException.h DjVuGlobal.h ByteStream.h GContainer.h \
  GSmartPointer.h BSByteStream.h ZPCodec.h
 c44.o: c44.cpp GString.h DjVuGlobal.h GException.h GSmartPointer.h \
- IWCodec.h GRect.h GBitmap.h ByteStream.h GContainer.h GPixmap.h \
+ IWImage.h GRect.h GBitmap.h ByteStream.h GContainer.h GPixmap.h \
  IFFByteStream.h GOS.h
 d44.o: d44.cpp GString.h DjVuGlobal.h GException.h GSmartPointer.h \
- IWCodec.h GRect.h GBitmap.h ByteStream.h GContainer.h GPixmap.h \
+ IWImage.h GRect.h GBitmap.h ByteStream.h GContainer.h GPixmap.h \
  IFFByteStream.h GOS.h
-debug.o: debug.cpp debug.h GThreads.h DjVuGlobal.h GException.h \
- GContainer.h
+debug.o: debug.cpp
 djvutopnm.o: djvutopnm.cpp GException.h DjVuGlobal.h GSmartPointer.h \
- GRect.h GPixmap.h ByteStream.h GContainer.h GBitmap.h JB2Codec.h \
- GString.h ZPCodec.h IFFByteStream.h DjVuCodec.h GThreads.h IWCodec.h
+ GRect.h GPixmap.h ByteStream.h GContainer.h GBitmap.h DjVuImage.h \
+ GString.h GThreads.h IFFByteStream.h JB2Image.h ZPCodec.h IWImage.h \
+ GOS.h
 makedjvu.o: makedjvu.cpp GString.h DjVuGlobal.h GException.h \
- GSmartPointer.h DjVuCodec.h GThreads.h ByteStream.h GContainer.h \
- IFFByteStream.h JB2Codec.h ZPCodec.h GRect.h GBitmap.h IWCodec.h \
+ GSmartPointer.h DjVuImage.h GThreads.h ByteStream.h GContainer.h \
+ IFFByteStream.h JB2Image.h ZPCodec.h GRect.h GBitmap.h IWImage.h \
  GPixmap.h
 ppmcoco.o: ppmcoco.cpp ByteStream.h DjVuGlobal.h GException.h \
  GContainer.h GSmartPointer.h GPixmap.h GRect.h GBitmap.h GString.h
 showiff.o: showiff.cpp GException.h DjVuGlobal.h GString.h \
- GSmartPointer.h ByteStream.h GContainer.h IFFByteStream.h DjVuCodec.h \
- GThreads.h JB2Codec.h ZPCodec.h GRect.h GBitmap.h IWCodec.h GPixmap.h
+ GSmartPointer.h ByteStream.h GContainer.h IFFByteStream.h DjVuImage.h \
+ GThreads.h JB2Image.h ZPCodec.h GRect.h GBitmap.h IWImage.h GPixmap.h

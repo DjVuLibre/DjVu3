@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: d44.cpp,v 1.3 1999-02-01 18:32:34 leonb Exp $
+//C-  $Id: d44.cpp,v 1.4 1999-02-01 18:57:34 leonb Exp $
 
 
 
@@ -62,14 +62,14 @@
     @author
     Leon Bottou <leonb@research.att.com>
     @version
-    #$Id: d44.cpp,v 1.3 1999-02-01 18:32:34 leonb Exp $# */
+    #$Id: d44.cpp,v 1.4 1999-02-01 18:57:34 leonb Exp $# */
 //#{
 //#}
 
 #include <stdio.h>
 #include "GString.h"
 #include "GException.h"
-#include "IWCodec.h"
+#include "IWImage.h"
 #include "GOS.h"
 
 

@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: showiff.cpp,v 1.4 1999-02-01 18:32:34 leonb Exp $
+//C-  $Id: showiff.cpp,v 1.5 1999-02-01 18:57:34 leonb Exp $
 
 
 
@@ -51,7 +51,7 @@
     @author
     Leon Bottou <leonb@research.att.com>
     @version
-    #$Id: showiff.cpp,v 1.4 1999-02-01 18:32:34 leonb Exp $# */
+    #$Id: showiff.cpp,v 1.5 1999-02-01 18:57:34 leonb Exp $# */
 //@{
 //@}
 
@@ -60,7 +60,7 @@
 #include "GString.h"
 #include "ByteStream.h"
 #include "IFFByteStream.h"
-#include "DjVuCodec.h"
+#include "DjVuImage.h"
 
 
 

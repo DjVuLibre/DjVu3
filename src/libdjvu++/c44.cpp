@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: c44.cpp,v 1.3 1999-02-01 18:32:34 leonb Exp $
+//C-  $Id: c44.cpp,v 1.4 1999-02-01 18:57:34 leonb Exp $
 
 
 /** @name c44
@@ -42,7 +42,7 @@
 
     {\bf Quality Specification}---
     Files produced by the DjVu IW44 Wavelet Encoder are IFF files composed of
-    an arbitrary number of chunks (see \Ref{showiff} and \Ref{IWCodec.h})
+    an arbitrary number of chunks (see \Ref{showiff} and \Ref{IWImage.h})
     containing successive refinements of the encoded image.  Each chunk is
     composed of several slices.  A typical file contains a total of 100 slices
     split between three or four chunks.  Various options provide quality
@@ -148,7 +148,7 @@
     @author
     Leon Bottou <leonb@research.att.com>
     @version
-    #$Id: c44.cpp,v 1.3 1999-02-01 18:32:34 leonb Exp $# */
+    #$Id: c44.cpp,v 1.4 1999-02-01 18:57:34 leonb Exp $# */
 //@{
 //@}
 
@@ -156,7 +156,7 @@
 #include <string.h>
 #include "GString.h"
 #include "GException.h"
-#include "IWCodec.h"
+#include "IWImage.h"
 #include "GOS.h"
 
 // command line data
