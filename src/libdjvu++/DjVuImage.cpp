@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuImage.cpp,v 1.27 1999-09-17 14:42:18 leonb Exp $
+//C- $Id: DjVuImage.cpp,v 1.28 1999-09-17 15:34:59 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -415,6 +415,7 @@ DjVuImage::is_legal_bilevel() const
   GP<DjVuInfo> info = get_info();
   GP<JB2Image> fgjb = get_fgjb();
   GP<IWPixmap> bg44 = get_bg44();
+  GP<GPixmap>  bgpm = get_bgpm();
   GP<GPixmap>  fgpm = get_fgpm();
   // Check info
   if (! info)
@@ -429,7 +430,7 @@ DjVuImage::is_legal_bilevel() const
   if (fgjb->get_width()!=width || fgjb->get_height()!=height)
     return 0;
   // Check that color information is not present.
-  if (bg44 || fgpm)
+  if (bg44 || bgpm || fgpm)
     return 0;
   // Ok.
   return 1;
@@ -442,6 +443,7 @@ DjVuImage::is_legal_photo() const
   GP<DjVuInfo> info = get_info();
   GP<JB2Image> fgjb = get_fgjb(); 
   GP<IWPixmap> bg44 = get_bg44();
+  GP<GPixmap>  bgpm = get_bgpm();
   GP<GPixmap>  fgpm = get_fgpm();
   // Check info
   if (! info)
@@ -450,16 +452,17 @@ DjVuImage::is_legal_photo() const
   int height = info->height;
   if (! (width>0 && height>0))
     return 0;
-  // Check bg44
-  if (!bg44)
-    return 0;
-  if (bg44->get_width()!=width || bg44->get_height()!=height)
-    return 0;
   // Check that extra information is not present.
   if (fgjb || fgpm)
     return 0;
+  // Check bg44
+  if (bg44 && bg44->get_width()==width && bg44->get_height()==height)
+    return 1;
+  // Check bgpm
+  if (bgpm && (int)bgpm->columns()==width && (int)bgpm->rows()==height)
+    return 1;
   // Ok.
-  return 1;
+  return 0;
 }
 
 int 
@@ -469,6 +472,7 @@ DjVuImage::is_legal_compound() const
   GP<DjVuInfo> info = get_info();
   GP<JB2Image> fgjb = get_fgjb();
   GP<IWPixmap> bg44 = get_bg44();
+  GP<GPixmap>  bgpm = get_bgpm();
   GP<GPixmap>  fgpm = get_fgpm();
   // Check size
   if (! info)
@@ -486,6 +490,8 @@ DjVuImage::is_legal_compound() const
   int bgred = 0;
   if (bg44)
     bgred = compute_red(width, height, bg44->get_width(), bg44->get_height());
+  else if (bgpm)
+    bgred = compute_red(width, height, bgpm->columns(), bgpm->rows());
   if (bgred<1 || bgred>12)
     return 0;
   // Check foreground colors
@@ -531,7 +537,6 @@ DjVuImage::get_bg_pixmap(const GRect &rect,
   int height = get_height();
   GP<DjVuInfo> info = get_info();
   if (width<=0 || height<=0 || !info) return 0;
-  GP<IWPixmap> bg44 = get_bg44();
   // Compute gamma_correction
   double gamma_correction = 1.0;
   if (gamma > 0)
@@ -542,6 +547,7 @@ DjVuImage::get_bg_pixmap(const GRect &rect,
     gamma_correction = 10;
   
   // CASE1: Incremental BG IWPixmap
+  GP<IWPixmap> bg44 = get_bg44();
   if (bg44)
     {
       int w = bg44->get_width();
@@ -608,6 +614,49 @@ DjVuImage::get_bg_pixmap(const GRect &rect,
       return pm;
     }
 
+  // CASE 2: Raw background pixmap
+  GP<GPixmap>  bgpm = get_bgpm();
+  if (bgpm)
+    {
+      int w = bgpm->columns();
+      int h = bgpm->rows();
+      // Avoid silly cases
+      if (w==0 || h==0 || width==0 || height==0)
+        return 0;
+      // Determine how much bgpm is reduced
+      int red = compute_red(width,height,w,h);
+      if (red<1 || red>12)
+        return 0;
+      // Handle pure downsampling cases
+      int ratio = subsample/red;
+      if (subsample==ratio*red && ratio>=1)
+        {
+          pm = new GPixmap;
+          if (ratio == 1)
+            pm->init(*bgpm, rect);
+          else if (ratio > 1)
+            pm->downsample(bgpm, ratio, &rect);
+        }
+      // Handle all other cases with pixmapscaler
+      else
+        {
+          // setup pixmap scaler
+          int outw = (width+subsample-1)/subsample;
+          int outh = (height+subsample-1)/subsample;
+          GPixmapScaler ps(w, h, outw, outh);
+          ps.set_horz_ratio(red, subsample);
+          ps.set_vert_ratio(red, subsample);
+          // run pixmap scaler
+          pm = new GPixmap();
+          GRect xrect(0,0,w,h);
+          ps.scale(xrect, *bgpm, rect, *pm);
+        }
+      // Apply gamma correction
+      if (pm && gamma_correction!=1.0)
+        pm->color_correct(gamma_correction);
+      return pm;
+    }
+
   // FAILURE
   return 0;
 }
@@ -621,8 +670,6 @@ DjVuImage::stencil(GPixmap *pm, const GRect &rect,
   int height = get_height();
   GP<DjVuInfo> info = get_info();
   if (width<=0 || height<=0 || !info) return 0;
-  GP<JB2Image> fgjb = get_fgjb();
-  GP<GPixmap> fgpm = get_fgpm();
   // Compute gamma_correction
   double gamma_correction = 1.0;
   if (gamma > 0)
@@ -633,6 +680,8 @@ DjVuImage::stencil(GPixmap *pm, const GRect &rect,
     gamma_correction = 10;
 
   // CASE1: JB2 stencil and FG pixmap
+  GP<JB2Image> fgjb = get_fgjb();
+  GP<GPixmap> fgpm = get_fgpm();
   if (fgjb && fgpm)
     {
       GP<GBitmap> bm = get_bitmap(rect, subsample);
