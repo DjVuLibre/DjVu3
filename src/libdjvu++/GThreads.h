@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: GThreads.h,v 1.9 1999-03-03 17:12:49 leonb Exp $
+//C-  $Id: GThreads.h,v 1.10 1999-03-05 20:51:04 leonb Exp $
 
 #ifndef _GTHREADS_H_
 #define _GTHREADS_H_
@@ -76,7 +76,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Praveen Guduru <praveen@sanskrit.lz.att.com> -- mac implementation.
     @version
-    #$Id: GThreads.h,v 1.9 1999-03-03 17:12:49 leonb Exp $# */
+    #$Id: GThreads.h,v 1.10 1999-03-05 20:51:04 leonb Exp $# */
 //@{
 
 #include "DjVuGlobal.h"
@@ -224,10 +224,9 @@ private:
 private:
   JRIGlobalRef obj;
 #elif THREADMODEL==COTHREADS
-private:
-  struct cotask *task;
-  static void start(void);
 public:
+  // Should be considered as private
+  struct cotask *task;
   /** Replaces system call #select# (COTHREADS only).  The #COTHREADS# model
       does not redefine system function.  System functions therefore can
       potentially block the whole process (instead of blocking the current
@@ -249,16 +248,17 @@ public:
       \end{verbatim} */
   static int select(int, fd_set*, fd_set*, fd_set*, struct timeval*);
   /** Install hooks in the scheduler (COTHREADS only).  The hook function
-      #call# is called when a new thread is created (argument then is #0#),
-      when a critical section \Ref{GCriticalSection} is released (argument
-      then is #1#), and when a synchronization event \Ref{GEvent} is set. This
-      callback can be useful in certain GUI toolkits where the most convenient
-      method for scheduling the threads consists in setting a timer event that
-      calls \Ref{GThread::yield}.  */
+      #call# is called when a new thread is created (argument is
+      #GThread::CallbackCreate#), when a thread terminates (argument is
+      #GThread::CallbackTerminate#), or when thread is unblocked (argument is
+      #GThread::CallbackUnblock#).  This callback can be useful in certain GUI
+      toolkits where the most convenient method for scheduling the threads
+      consists in setting a timer event that calls \Ref{GThread::yield}.  */
   static void set_scheduling_callback(void (*call)(int));
+  enum { CallbackCreate, CallbackTerminate, CallbackUnblock };
 #endif
 public:
-  // This is only accessed by the entry function
+  // Should be considered as private
   void (*xentry)(void*);
   void  *xarg;
 private:

@@ -7,10 +7,10 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: GThreads.cpp,v 1.8 1999-03-04 17:11:10 leonb Exp $
+//C-  $Id: GThreads.cpp,v 1.9 1999-03-05 20:51:04 leonb Exp $
 
 
-// **** File "$Id: GThreads.cpp,v 1.8 1999-03-04 17:11:10 leonb Exp $"
+// **** File "$Id: GThreads.cpp,v 1.9 1999-03-05 20:51:04 leonb Exp $"
 // This file defines machine independent classes
 // for running and synchronizing threads.
 // - Author: Leon Bottou, 01/1998
@@ -861,8 +861,8 @@ starttwo(GThread *thr)
 
 static GThread * volatile starter;
 
-void
-GThread::start(void)
+static void
+startone(void)
 {
   GThread *thr = starter;
   mach_switch(&thr->task->regs, &curtask->regs);
@@ -887,11 +887,10 @@ GThread::create(void (*entry)(void*), void *arg)
   task->prev->next = task;
   cotask *old = curtask;
   starter = this;
-  mach_start(&old->regs, 
-             (void*)GThread::start, 
+  mach_start(&old->regs, (void*)startone, 
              task->stack, task->stack+task->stacksize);
   if (scheduling_callback)
-    (*scheduling_callback)(0);
+    (*scheduling_callback)(CallbackCreate);
   return 0;
 }
 
@@ -904,6 +903,8 @@ GThread::terminate()
     abort();
   if (task->next)
     {
+      if (scheduling_callback)
+        (*scheduling_callback)(CallbackTerminate);
       task->prev->next = task->next;
       task->next->prev = task->prev;
       task->next = 0;
@@ -1102,7 +1103,7 @@ GCriticalSection::unlock()
     {
       locker = 0;
       if (scheduling_callback)
-        (*scheduling_callback)(1);
+        (*scheduling_callback)(GThread::CallbackUnblock);
     }
 }
 
@@ -1125,7 +1126,7 @@ GEvent::set()
 {
   status = 1;
   if (scheduling_callback)
-    (*scheduling_callback)(2);
+    (*scheduling_callback)(GThread::CallbackUnblock);
 }
 
 void
