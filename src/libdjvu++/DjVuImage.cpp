@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuImage.cpp,v 1.59 2001-04-03 20:26:17 mchen Exp $
+// $Id: DjVuImage.cpp,v 1.60 2001-04-03 22:31:37 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -58,7 +58,7 @@
 //// DJVUIMAGE: CONSTRUCTION
 
 DjVuImage::DjVuImage(void) 
-: relayout_sent(false)
+: relayout_sent(false),rotate_count(-1)
 {
 }
 
@@ -77,12 +77,26 @@ DjVuImage::connect(const GP<DjVuFile> & xfile)
 GP<DjVuInfo>
 DjVuImage::get_info(const GP<DjVuFile> & file) const
 {
-   if (file->info) return file->info;
+   if (file->info)
+   {
+     if(rotate_count<0)
+     {
+       init_rotate(*(file->info));
+     }
+     return file->info;
+   }
    GPList<DjVuFile> list=file->get_included_files();
    for(GPosition pos=list;pos;++pos)
    {
       GP<DjVuInfo> info=get_info(list[pos]);
-      if (info) return info;
+      if (info) 
+      {
+        if(rotate_count<0)
+        {
+          init_rotate(*(file->info));
+        }
+        return info;
+      }
    }
    return 0;
 }
@@ -155,8 +169,13 @@ DjVuImage::get_fgbc(const GP<DjVuFile> & file) const
 GP<DjVuInfo>   
 DjVuImage::get_info() const
 {
-   if (file) return get_info(file);
-   else return 0;
+   if (file)
+   {
+     return get_info(file);
+   }else
+   {
+     return 0;
+   }
 }
 
 GP<ByteStream>
@@ -1202,34 +1221,26 @@ DjVuImage::get_fg_pixmap(const GRect &rect, const GRect &all, double gamma) cons
 
 int 
 DjVuImage::get_rotate() const
+{
+  return (rotate_count<0)?0:rotate_count;
+}
+
+void
+DjVuImage::init_rotate(const DjVuInfo &info)
 { 
-  GP<DjVuInfo> info=get_info();
-  int rotate_count=0;
-  if(info)
+  rotate_count=4;
+  for(int a=(int)(info->orientation);(a!=(int)GRect::BULRNR)&&(a!=(int)GRect::BURLNR);--rotate_count)
   {
-    for(int a=(int)(info->orientation);(a!=(int)GRect::BULRNR)&&(a!=(int)GRect::BURLNR);--rotate_count)
-    {
-      a^=((a&(int)GRect::ROTATE90_CW)
-        ?(int)(GRect::BOTTOM_UP|GRect::MIRROR|GRect::ROTATE90_CW)
-        :(int)(GRect::ROTATE90_CW));
-    }
+    a^=((a&(int)GRect::ROTATE90_CW)
+      ?(int)(GRect::BOTTOM_UP|GRect::MIRROR|GRect::ROTATE90_CW)
+      :(int)(GRect::ROTATE90_CW));
   }
-  return (rotate_count+4)%4; 
+  rotate_count%=4;
 }
 
 void DjVuImage::set_rotate(int count) 
 { 
-  GP<DjVuInfo> info=get_info();
-  if(info)
-  {
-    GRect::Orientations &orientation=info->orientation;
-    for(count=((count%4)+4)%4;count>=1;--count)
-    {
-      orientation=(GRect::Orientations)(((int)orientation)^((orientation&GRect::ROTATE90_CW)
-        ?(int)(GRect::BOTTOM_UP|GRect::MIRROR|GRect::ROTATE90_CW)
-        :(int)(GRect::ROTATE90_CW)));
-    }
-  }
+  rotate_count=((count%4)+4)%4;
 }
 
 GP<DjVuAnno> 

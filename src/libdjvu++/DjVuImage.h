@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuImage.h,v 1.40 2001-04-02 21:17:15 bcr Exp $
+// $Id: DjVuImage.h,v 1.41 2001-04-03 22:31:37 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUIMAGE_H
@@ -73,7 +73,7 @@
     L\'eon Bottou <leonb@research.att.com> - initial implementation
     Andrei Erofeev <eaf@geocities.com> - multipage support
     @version
-    #$Id: DjVuImage.h,v 1.40 2001-04-02 21:17:15 bcr Exp $# */
+    #$Id: DjVuImage.h,v 1.41 2001-04-03 22:31:37 bcr Exp $# */
 //@{
 
 
@@ -365,6 +365,7 @@ public:
   GP<GPixmap>  get_fg_pixmap(const GRect &rect, int subs=1, double gamma=0) const;
 private:
   GP<DjVuFile>		file;
+  int			rotate_count;
   bool			relayout_sent;
   
   // HELPERS
@@ -375,6 +376,7 @@ private:
   GP<JB2Image>		get_fgjb(const GP<DjVuFile> & file) const;
   GP<GPixmap>		get_fgpm(const GP<DjVuFile> & file) const;
   GP<DjVuPalette>      get_fgbc(const GP<DjVuFile> & file) const;
+  void init_rotate(const DjVuInfo &info);
 };
 
 
