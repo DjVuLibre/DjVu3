@@ -32,7 +32,7 @@
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #C- 
 #
-# $Id: pdftodjvu.sh,v 1.4 2001-02-02 18:19:02 bcr Exp $
+# $Id: pdftodjvu.sh,v 1.5 2001-02-02 18:38:44 bcr Exp $
 # $Name:  $
 
 # DjVu Enterprise Commands
@@ -92,8 +92,8 @@ case "$j" in
         "--page-range="*|"--pages-per-dict=*")
            echo "Option $j is not supported by %0" 1>&2
            usage=1 ;;
-	"--help")
-	   usage=0 ;;
+        "--help")
+           usage=0 ;;
         *)
            free=""
            args="$args '$j'" ;;
@@ -112,21 +112,48 @@ case "$j" in
   *) ;;
 esac
 
+if [ -z "$usage" ]
+then
+  input="$1"
+  shift
+  output="$1"
+  shift
+  if [ ! -r "$input" ]
+  then
+    echo "Failed to find input file '$input'." 1>&2
+    usage=1
+  elif [ -z "$output" ]
+  then
+    echo "Failed to specify output." 1>&2
+    usage=1
+  elif [ -n "$1" ]
+  then
+    echo "Too many arguments." 1>&2
+    usage=1
+  fi
+fi
 if [ -n "$usage" ] 
 then
+e=`basename "$electroniccommand"`
+d=`basename "$documentcommand"`
 cat <<+
 For usage with the DjVu3 Open Source:
-   Bundled output:
-	$0 --free [$electroniccommand options] <inputfile> <outputfile>
-   Indirect output:
-	$0 --free [$electroniccommand options] <inputfile> <outputdir>
+  Bundled output:
+    $0 --free [$e options] \\
+        <inputfile> <outputfile>
+  Indirect output:
+    $0 --free [$e options] \\
+        <inputfile> <outputdir>
 
 For usage with DjVu Enterprise
+  Bundled output:
+    $0 --profile=[profilename] [$d options] \\
+        [--best] <inputfile> <outputfile>
+  Indirect output:
+    $0 --profile=[profilename] [$d options] \\
+        [--best] <inputfile> <outputdir>
 
-   Bundled output:
-	$0 --profile=[profilename] [$documentcommand options] <inputfile> <outputfile>
-   Indirect output:
-	$0 --profile=[profilename] [$documentcommand options] <inputfile> <outputdir>
+For most PDF and Postscript documents, use '--free' or '--profile=clean300'.
 +
   
   exit $usage
@@ -181,15 +208,6 @@ else
   fi
 fi
 
-input="$1"
-shift
-output="$1"
-shift
-if [ -n "$1" ]
-then
-  echo "Usage: $0 [--best] [options] <input> <output>" 1>&2
-  exit 1
-fi
 tmpdir="$output.tmp" 
 name=`basename "$input" .ps`
 name=`basename "$name" .pdf`
