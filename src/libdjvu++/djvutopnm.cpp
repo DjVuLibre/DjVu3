@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: djvutopnm.cpp,v 1.24 1999-09-20 23:12:59 leonb Exp $
+//C- $Id: djvutopnm.cpp,v 1.25 1999-09-28 20:23:14 leonb Exp $
 
 
 /** @name djvutopnm
@@ -90,7 +90,7 @@
     Yann Le Cun <yann@research.att.com>\\
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: djvutopnm.cpp,v 1.24 1999-09-20 23:12:59 leonb Exp $# */
+    #$Id: djvutopnm.cpp,v 1.25 1999-09-28 20:23:14 leonb Exp $# */
 //@{
 //@}
 
@@ -154,6 +154,9 @@ convert(const char *from, const char *to, int page_num)
         fprintf(stderr, "This is a legal Photo DjVu image\n");
       else if (blackp)
         fprintf(stderr, "This is a legal Bilevel DjVu image\n");
+      // Without included files
+      fprintf(stderr, "Direct memory usage is %4.1f Kb\n", 
+              (double)(dimg->get_djvu_file()->get_memory_usage())/1024 );
     }    
   if (!compoundp && !colorp && !blackp)
     { 
