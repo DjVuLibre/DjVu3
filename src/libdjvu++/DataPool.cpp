@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.cpp,v 1.38 1999-12-22 21:00:50 eaf Exp $
+//C- $Id: DataPool.cpp,v 1.39 1999-12-22 21:21:43 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -939,7 +939,12 @@ DataPool::stop(bool only_blocked)
 	 // to continue issuing this command until we get rid of all
 	 // "active_readers"
       while(active_readers)
+      {
+#if THREADMODEL==COTHREADS
+	 GThread::yield();
+#endif
 	 pool->restart_readers();
+      }
    }
 }
 
