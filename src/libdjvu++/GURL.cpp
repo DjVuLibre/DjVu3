@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: GURL.cpp,v 1.44 2000-12-24 23:59:48 praveen Exp $
+// $Id: GURL.cpp,v 1.45 2001-01-03 20:41:12 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -79,65 +79,60 @@ collapse(char * ptr, const int chars)
    const int length=strlen(ptr);
    const char *srcptr=ptr+((chars>length)?length:chars);
    while((*(ptr++) = *(srcptr++)))
-   	continue;
+     EMPTY_LOOP;
 }
 
 void
 GURL::beautify_path(void)
 {
-   GCriticalSectionLock lock(&class_lock);
+  GCriticalSectionLock lock(&class_lock);
    
-      // Eats parts like ./ or ../ or ///
-   char * buffer=new char[url.length()+1];
-   strcpy(buffer, url);
+  // Eats parts like ./ or ../ or ///
+  char * buffer;
+  GPBuffer<char> gbuffer(buffer,url.length()+1);
+  strcpy(buffer, (const char *)url);
    
-   G_TRY
-   {
-	 // Find start point
-      char * start=buffer+protocol().length()+1;
-      while(*start && *start=='/') start++;
+  // Find start point
+  char * start=buffer+protocol().length()+1;
+  while(*start && *start=='/') start++;
 
-	 // Find end of the url (don't touch arguments)
-      char * ptr;
-      GString args;
-      for(ptr=start;*ptr;ptr++)
-	 if (is_argument(ptr))
-	 {
-	    args=ptr;
-	    *ptr=0;
-	    break;
-	 }
+  // Find end of the url (don't touch arguments)
+  char * ptr;
+  GString args;
+  for(ptr=start;*ptr;ptr++)
+  {
+    if (is_argument(ptr))
+    {
+      args=ptr;
+      *ptr=0;
+      break;
+    }
+  }
 
-	 // Eat multiple slashes
-      for(;(ptr=strstr(start, "////"));collapse(ptr, 3))
-      	continue;
-      for(;(ptr=strstr(start, "//"));collapse(ptr, 1))
-      	continue;
-      
-	 // Convert /./ stuff into plain /
-      for(;(ptr=strstr(start, "/./"));collapse(ptr, 2))
-      	continue;
+  // Eat multiple slashes
+  for(;(ptr=strstr(start, "////"));collapse(ptr, 3));
+    EMPTY_LOOP;
+  for(;(ptr=strstr(start, "//"));collapse(ptr, 1))
+    EMPTY_LOOP;
+  // Convert /./ stuff into plain /
+  for(;(ptr=strstr(start, "/./"));collapse(ptr, 2))
+    EMPTY_LOOP;
 
-	 // Process /../
-      while((ptr=strstr(start, "/../")))
+  // Process /../
+  while((ptr=strstr(start, "/../")))
+  {
+    for(char * ptr1=ptr-1;(ptr1>=start);ptr1--)
+    {
+      if (*ptr1=='/')
       {
-	 for(char * ptr1=ptr-1;(ptr1>=start);ptr1--)
-         {
-	    if (*ptr1=='/')
-	    {
-	       collapse(ptr1, ptr-ptr1+3);
-	       break;
-	    }
-         }
-      }
-	 // Done. Copy the buffer back into the URL and add arguments.
-      url=buffer;
-      url+=args;
-      delete buffer; buffer=0;
-   } G_CATCH_ALL {
-      delete buffer;
-      G_RETHROW;
-   } G_ENDCATCH;
+        collapse(ptr1, ptr-ptr1+3);
+        break;
+       }
+    }
+  }
+  // Done. Copy the buffer back into the URL and add arguments.
+  url=buffer;
+  url+=args;
 }
 
 void
@@ -151,32 +146,32 @@ GURL::init(void)
       if (!proto.length())
         G_THROW("GURL.no_protocol\t"+url);
 
-	 // Below we have to make this complex test to detect URLs really
-	 // referring to *local* files. Surprisingly, file://hostname/dir/file
-	 // is also valid, but shouldn't be treated thru local FS.
+         // Below we have to make this complex test to detect URLs really
+         // referring to *local* files. Surprisingly, file://hostname/dir/file
+         // is also valid, but shouldn't be treated thru local FS.
       if (proto=="file" && url[5]=='/' &&
-	  (url[6]!='/' || !strncmp((const char *)url,localhost,sizeof(localhost))))
+          (url[6]!='/' || !strncmp((const char *)url,localhost,sizeof(localhost))))
       {
-	    // Separate the arguments
+            // Separate the arguments
          GString arg;
          {
            const char * const url_ptr=url;
-	   const char * ptr;
-	   for(ptr=url_ptr;*ptr;ptr++)
-	      if (is_argument(ptr))
-	         break;
-	   arg=ptr;
-	   url.setat((int)(ptr-url_ptr), 0);
+           const char * ptr;
+           for(ptr=url_ptr;*ptr&&!is_argument(ptr);ptr++);
+           arg=ptr;
+           url.setat((int)(ptr-url_ptr), 0);
          }
 
-	    // Do double conversion
-	 GString tmp=GOS::url_to_filename(url);
-	 if (!tmp.length()) G_THROW("GURL.fail_to_file");
-	 url=GOS::filename_to_url(tmp);
-	 if (!url.length()) G_THROW("GURL.fail_to_URL");
+            // Do double conversion
+         GString tmp=GOS::url_to_filename(url);
+         if (!tmp.length())
+           G_THROW("GURL.fail_to_file");
+         url=GOS::filename_to_url(tmp);
+         if (!url.length())
+           G_THROW("GURL.fail_to_URL");
 
-	    // Return the argument back
-	 url+=arg;
+            // Return the argument back
+         url+=arg;
       }
 
       convert_slashes();
@@ -213,10 +208,10 @@ GString
 GURL::protocol(const char * url)
 {
    const char * const url_ptr=url;
-   const char * ptr;
-   for(ptr=url_ptr;*ptr && !(!isalpha(*ptr) && !isdigit(*ptr) &&
-	  *ptr!='+' && *ptr!='-' && *ptr!='.');ptr++)
-	  	continue;
+   const char * ptr=url_ptr;
+   for(char c=*ptr;
+     c && !(!isalnum(c) && c != '+' && c != '-' && c != '.');
+     c=*ptr++) EMPTY_LOOP;
    return(*ptr==':')?GString(url_ptr, ptr-url_ptr):GString();
 }
 
@@ -227,12 +222,10 @@ GURL::hash_argument(void) const
    GCriticalSectionLock lock((GCriticalSection *) &class_lock);
    bool found=false;
    GString arg;
-   for(const char * start=url;*start;start++)
-   {
-	 // Break if CGI argument is found
-      if (*start=='?')
-         break;
 
+         // Break if CGI argument is found
+   for(const char * start=url;*start&&(*start!='?');start++)
+   {
       if (found)
       {
          arg+=*start;
@@ -256,14 +249,14 @@ GURL::set_hash_argument(const char * arg)
    {
       if (is_argument(ptr))
       {
-	 if (*ptr!='#')
+         if (*ptr!='#')
          {
            break;
          }
          found=true;
       } else if (!found)
       {
-	 new_url+=*ptr;
+         new_url+=*ptr;
       }
    }
 
@@ -281,47 +274,52 @@ GURL::parse_cgi_args(void)
 
       // Search for the beginning of CGI arguments
    const char * start=url;
-   while(*start &&(*(start++)!='?'))
-   		continue;
+   while(*start)
+   {
+     if(*(start++)=='?')
+     {
+       break;
+     }
+   }
 
       // Now loop until we see all of them
    while(*start)
    {
-      GString arg;	// Storage for another argument
-      while(*start)	// Seek for the end of it
+      GString arg;        // Storage for another argument
+      while(*start)        // Seek for the end of it
       {
-	 if (*start=='&')
-	 {
-	    start++;
-	    break;
-	 } else
+         if (*start=='&')
+         {
+            start++;
+            break;
+         } else
          {
            arg+=*start++;
          }
       }
       if (arg.length())
       {
-	    // Got argument in 'arg'. Split it into 'name' and 'value'
-	 const char * ptr;
+            // Got argument in 'arg'. Split it into 'name' and 'value'
+         const char * ptr;
          const char * const arg_ptr=arg;
 	 for(ptr=arg_ptr;*ptr&&(*ptr != '=');ptr++)
-	 	continue;
+	   EMPTY_LOOP;
 
-	 GString name, value;
-	 if (*ptr)
-	 {
-	    name=GString(arg_ptr, (int)((ptr++)-arg_ptr));
-	    value=GString(ptr, arg.length()-name.length()-1);
-	 } else
+         GString name, value;
+         if (*ptr)
+         {
+            name=GString(arg_ptr, (int)((ptr++)-arg_ptr));
+            value=GString(ptr, arg.length()-name.length()-1);
+         } else
          {
            name=arg;
          }
-	    
-	 int args=cgi_name_arr.size();
-	 cgi_name_arr.resize(args);
-	 cgi_value_arr.resize(args);
-	 cgi_name_arr[args]=GOS::decode_reserved(name);
-	 cgi_value_arr[args]=GOS::decode_reserved(value);
+            
+         int args=cgi_name_arr.size();
+         cgi_name_arr.resize(args);
+         cgi_value_arr.resize(args);
+         cgi_name_arr[args]=GOS::decode_reserved(name);
+         cgi_value_arr[args]=GOS::decode_reserved(value);
       }
    }
 }
@@ -335,21 +333,17 @@ GURL::store_cgi_args(void)
 
    const char * const url_ptr=url;
    const char * ptr;
-   for(ptr=url_ptr;*ptr;ptr++)
-      if (*ptr=='?') break;
+   for(ptr=url_ptr;*ptr&&(*ptr!='?');ptr++);
    
-   GString new_url=GString(url_ptr, ptr-url_ptr);
+   GString new_url(url_ptr, ptr-url_ptr);
    
    for(int i=0;i<cgi_name_arr.size();i++)
    {
       GString name=GOS::encode_reserved(cgi_name_arr[i]);
       GString value=GOS::encode_reserved(cgi_value_arr[i]);
-      if (i)
-        new_url+="&"+name;
-      else
-        new_url+="?"+name;
+      new_url+=(i?"&":"?")+name;
       if (value.length())
-	 new_url+="="+value;
+         new_url+="="+value;
    }
 
    url=new_url;
@@ -372,8 +366,8 @@ GURL::djvu_cgi_arguments(void) const
    {
       if (cgi_name_arr[i].upcase()==djvuopts)
       {
-	 args=cgi_name_arr.size()-(i+1);
-	 break;
+         args=cgi_name_arr.size()-(i+1);
+         break;
       }
    } 
    return args;
@@ -383,8 +377,7 @@ GString
 GURL::cgi_name(int num) const
 {
    GCriticalSectionLock lock((GCriticalSection *) &class_lock);
-   if (num<cgi_name_arr.size()) return cgi_name_arr[num];
-   else return GString();
+   return (num<cgi_name_arr.size())?cgi_name_arr[num]:GString();
 }
 
 GString
@@ -396,13 +389,13 @@ GURL::djvu_cgi_name(int num) const
    for(int i=0;i<cgi_name_arr.size();i++)
       if (cgi_name_arr[i].upcase()==djvuopts)
       {
-	 for(i++;i<cgi_name_arr.size();i++)
-	    if (num--==0)
-	    {
-	       arg=cgi_name_arr[i];
-	       break;
-	    }
-	 break;
+         for(i++;i<cgi_name_arr.size();i++)
+            if (! num--)
+            {
+               arg=cgi_name_arr[i];
+               break;
+            }
+         break;
       }
    return arg;
 }
@@ -411,13 +404,7 @@ GString
 GURL::cgi_value(int num) const
 {
    GCriticalSectionLock lock((GCriticalSection *) &class_lock);
-   if (num<cgi_value_arr.size())
-   {
-     return cgi_value_arr[num];
-   }else
-   {
-     return GString();
-   }
+   return (num<cgi_value_arr.size())?cgi_value_arr[num]:GString();
 }
 
 GString
@@ -427,16 +414,20 @@ GURL::djvu_cgi_value(int num) const
 
    GString arg;
    for(int i=0;i<cgi_name_arr.size();i++)
+   {
       if (cgi_name_arr[i].upcase()==djvuopts)
       {
-	 for(i++;i<cgi_name_arr.size();i++)
-	    if (num--==0)
-	    {
-	       arg=cgi_value_arr[i];
-	       break;
-	    }
-	 break;
+         for(i++;i<cgi_name_arr.size();i++)
+         {
+            if (! num--)
+            {
+               arg=cgi_value_arr[i];
+               break;
+            }
+         }
+         break;
       }
+   }
    return arg;
 }
 
@@ -461,16 +452,16 @@ GURL::djvu_cgi_names(void) const
 
    int i;
    DArray<GString> arr;
-   for(i=0;i<cgi_name_arr.size();i++)
-      if (cgi_name_arr[i].upcase()==djvuopts)
-	 break;
+   for(i=0;(i<cgi_name_arr.size())&&
+     (cgi_name_arr[i].upcase()!=djvuopts)
+     ;i++);
 
    int size=cgi_name_arr.size()-(i+1);
    if (size>0)
    {
       arr.resize(size-1);
       for(i=0;i<arr.size();i++)
-	 arr[i]=cgi_name_arr[cgi_name_arr.size()-arr.size()+i];
+         arr[i]=cgi_name_arr[cgi_name_arr.size()-arr.size()+i];
    }
 
    return arr;
@@ -483,16 +474,14 @@ GURL::djvu_cgi_values(void) const
 
    int i;
    DArray<GString> arr;
-   for(i=0;i<cgi_name_arr.size();i++)
-      if (cgi_name_arr[i].upcase()==djvuopts)
-	 break;
+   for(i=0;i<cgi_name_arr.size()&&(cgi_name_arr[i].upcase()!=djvuopts);i++);
 
    int size=cgi_name_arr.size()-(i+1);
    if (size>0)
    {
       arr.resize(size-1);
       for(i=0;i<arr.size();i++)
-	 arr[i]=cgi_value_arr[cgi_value_arr.size()-arr.size()+i];
+         arr[i]=cgi_value_arr[cgi_value_arr.size()-arr.size()+i];
    }
 
    return arr;
@@ -514,18 +503,20 @@ GURL::clear_hash_argument(void)
    GString new_url;
    for(const char * start=url;*start;start++)
    {
-	 // Break on first CGI arg.
+         // Break on first CGI arg.
       if (*start=='?')
       {
-	 new_url+=start;
-	 break;
+         new_url+=start;
+         break;
       }
 
       if (!found)
-	 if (*start=='#')
-	    found=true;
-
-      if (!found) new_url+=*start;
+      { 
+        if (*start=='#')
+          found=true;
+        else
+          new_url+=*start;
+      }
    }
    url=new_url;
 }
@@ -543,8 +534,8 @@ GURL::clear_cgi_arguments(void)
    for(const char * ptr=url;*ptr;ptr++)
       if (*ptr=='?')
       {
-	 url.setat(ptr-url, 0);
-	 break;
+         url.setat(ptr-url, 0);
+         break;
       }
 }
 
@@ -557,9 +548,9 @@ GURL::clear_djvu_cgi_arguments(void)
    {
       if (cgi_name_arr[i].upcase()==djvuopts)
       {
-	 cgi_name_arr.resize(i-1);
-	 cgi_value_arr.resize(i-1);
-	 break;
+         cgi_name_arr.resize(i-1);
+         cgi_value_arr.resize(i-1);
+         break;
       }
    }
 
@@ -575,11 +566,13 @@ GURL::add_djvu_cgi_argument(const char * name, const char * value)
       // Check if we already have the "DJVUOPTS" argument
    bool have_djvuopts=false;
    for(int i=0;i<cgi_name_arr.size();i++)
+   {
       if (cgi_name_arr[i].upcase()==djvuopts)
       {
-	 have_djvuopts=true;
-	 break;
+         have_djvuopts=true;
+         break;
       }
+   }
 
       // If there is no DJVUOPTS, insert it
    if (!have_djvuopts)
@@ -656,12 +649,13 @@ GURL::extension(void) const
    GString retval;
 
    for(int i=filename.length()-1;i>=0;i--)
+   {
       if (filename[i]=='.')
       {
-	 retval=GString((const char*) filename+i+1);
-	 break;
+         retval=(const char*)filename+i+1;
+         break;
       }
-   
+   } 
    return retval;
 }
 
@@ -675,15 +669,10 @@ GURL::operator+(const char * xname) const
       const char * const url_ptr=(const char *)url;
       const char * ptr;
       for(ptr=url_ptr+protocol().length()+1;*ptr&&!is_argument(ptr);ptr++)
-      	continue;
+      	EMPTY_LOOP;
 
-      if (*(ptr-1) != '/')
-      {
-        res=GString(url_ptr,(int)(ptr-url_ptr))+"/"+xname+ptr;
-      }else
-      {
-        res=GString(url_ptr,(int)(ptr-url_ptr))+xname+ptr;
-      }
+      res=GString(url_ptr,(int)(ptr-url_ptr))
+        +((*(ptr-1) != '/')?"/":"")+xname+ptr;
    } else
    {
      res=xname;
