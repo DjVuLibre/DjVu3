@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.18 1999-08-19 23:03:52 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.19 1999-08-25 22:07:25 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -612,17 +612,8 @@ DjVuDocument::get_djvm_doc(void)
    GP<DjVmDoc> doc=new DjVmDoc();
    if (doc_type==BUNDLED)
    {
-      DEBUG_MSG("Trivial: the document is BUNDLED: just read the pool.\n");
-      GP<DataRange> data_range=new DataRange(init_data_pool);
-      ByteStream * str=0;
-      TRY {
-	 str=data_range->get_stream();
-	 doc->read(*str);
-      } CATCH(exc) {
-	 delete str;
-	 RETHROW;
-      } ENDCATCH;
-      delete str; str=0;
+      DEBUG_MSG("Trivial: the document is BUNDLED: just pass the pool.\n");
+      doc->read(init_data_pool);
    } else if (doc_type==INDIRECT)
    {
       DEBUG_MSG("Not difficult: the document is INDIRECT => follow DjVmDir.\n");
@@ -632,7 +623,7 @@ DjVuDocument::get_djvm_doc(void)
       {
 	 GP<DjVmDir::File> f=new DjVmDir::File(*files_list[pos]);
 	 GP<DjVuFile> file=get_djvu_file(id_to_url(f->id));
-	 doc->insert_file(f, file->get_djvu_data(false, true));
+	 doc->insert_file(f, file->get_data_range());
       }
    } else
    {
