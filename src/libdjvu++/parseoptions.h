@@ -6,7 +6,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: parseoptions.h,v 1.5 1999-11-03 23:31:08 bcr Exp $
+//C- $Id: parseoptions.h,v 1.6 1999-11-12 16:45:55 bcr Exp $
 
 #endif /* __cplusplus */
 
@@ -18,10 +18,12 @@
 #pragma interface
 #endif
 
-#include "tokenlist.h"
+#ifndef DJVUPARSEOPTIONS_STANDALONE
+#include "DjVuGlobal.h"
+#endif /* DJVUPARSEOPTIONS_STANDALONE */
+
 #include <stdio.h>
 
-#define DEFAULT_STRING "global"
 
 //** @name parseoptions.h \begin{verbatim}                                        
 //
@@ -175,7 +177,7 @@
 //
 // \end{verbatim} */
 //** @memo parseoptions header file */
-//** @version $Id: parseoptions.h,v 1.5 1999-11-03 23:31:08 bcr Exp $ */
+//** @version $Id: parseoptions.h,v 1.6 1999-11-12 16:45:55 bcr Exp $ */
 //** @author: $Author: bcr $ */
 
 // First we include some C wrappers for our class.
@@ -247,7 +249,7 @@ extern "C" {
 #ifdef __cplusplus
 };
 
-
+class DjVuTokenList;
 //@{
 
 class DjVuParseOptions
@@ -264,7 +266,8 @@ private:
   int defaultProfile;
   int currentProfile;
   ErrorList *Errors;
-  DjVuTokenList *VarTokens,*ProfileTokens;
+  DjVuTokenList *VarTokens;
+  DjVuTokenList *ProfileTokens;
   ProfileList *Configuration;
   Profiles *Arguments;
 public:
@@ -288,20 +291,17 @@ public:
   //** multiple profiles, we recommend retrieving the token value for that  */
   //** variable, to avoid repeated lookups of the string.                   */
   //** Negative values are returned for an unregistered variable name.      */
-  inline int GetVarToken(const char xname[]) const
-  {return VarTokens->GetToken(xname);};
+  inline int GetVarToken(const char xname[]) const;
 
   //** This is the same as GetVarToken() except if a variable name is NOT    */
   //** currently tokenized, a new token is created and returned.  If you are */
   //** Use of this is recommended when the token value is to be stored       */
   //** statically.                                                           */
-  inline int SetVarToken(const char xname[]) const
-  {return VarTokens->SetToken(xname);};
+  inline int SetVarToken(const char xname[]) const;
 
   //** This is simular to GetVarToken(), but it looks up the token for       */
   //** profile name instead.                                                 */
-  inline int GetProfileToken(const char xname[]) const
-  {return ProfileTokens->GetToken(xname);};
+  inline int GetProfileToken(const char xname[]) const;
 
   //** This is simular to SetVarToken(), but it looks up the token for      */
   //** profile name instead.   Care should be used when using this method.  */
@@ -309,20 +309,17 @@ public:
   //** to have been read.  Consequently, if you use this function, and the  */
   //** profile did not exist.  An empty profile will be created...          */
   //** Perhaps this method should be private instead.                       */
-  inline int SetProfileToken(const char xname[]) const
-  {return ProfileTokens->SetToken(xname);};
+  inline int SetProfileToken(const char xname[]) const;
 
   //** This is the reverse transform of the GetVarToken() routine.   */
   //** Given the token, it returns the var name.  This is handy for  */
   //** creating readable messages for log files and such.            */
-  inline const char * const GetVarName(const int token) const
-  {return VarTokens->GetString(token);};
+  inline const char * const GetVarName(const int token) const;
   
   //** This is the reverse transform of the GetProfileToken() routine.   */
   //** Given the token, it returns the profile name.  This is handy for  */
   //** creating readable messages for log files and such.                */
-  inline const char * const GetProfileName(const int token) const
-  {return ProfileTokens->GetString(token);};
+  inline const char * const GetProfileName(const int token) const;
 
   //** This is the primary lookup routine.  Input is the token as returned by */
   //** GetToken(), and the return value is the string associated with the     */
@@ -337,13 +334,11 @@ public:
   int GetBest(const int listsize,const int tokens[]);
 
   //** Same as above, but -1 terminated */
-  inline int GetBest(const int tokens[])
-  {int i;for(i=0;tokens[i]>=0;i++);return GetBest(i,tokens);}
+  inline int GetBest(const int tokens[]);
 
   //** This is just a short cut, when a token value is only needed for one */
   //** lookup.  A list of tokens may be specified as well.                 */
-  inline const char * const GetValue(const char xname[]) const
-  { return GetValue(GetVarToken(xname)); }
+  inline const char * const GetValue(const char xname[]) const;
 
   //** Multiple names may be in an array of the specified listsize.  The    */
   //** index of the name with a value of the highest presidence will be     */
@@ -353,22 +348,20 @@ public:
   int GetBest(const int listsize,const char * const[]);
 
   //** Same as above, but NULL terminated */
-  inline int GetBest(const char * const names[])
-  {int i;for(i=0;names[i];i++);return GetBest(i,names);}
+  inline int GetBest(const char * const names[]);
 
   //** This just checks for TRUE, and if not does an atoi() conversion. */
   //** Anything beginning with [Tt] is returned as 1, [Ff\0] is returned */
   //** as 0, and anything else that is not a legal integer is returned */
   //** as errval.                                                       */
-  const int GetInteger(const int token,const int errval=0) const;
+  int GetInteger(const int token,const int errval=0) const;
 
   //** This is just a short cut, when a token value is only needed for one */
   //** lookup.                                                             */
-  const int GetInteger(const char xname[],const int errval=0) const
-  { return GetInteger(GetVarToken(xname),errval); }
+  inline int GetInteger(const char xname[],const int errval=0) const;
 
   //** This method allows us to check if any errors occurred.           */
-  const int HasError() const;
+  int HasError() const;
 
   //** This allows us to retrieve and clear errors one at a time.  A NULL is */
   //** returned when all errors have been cleared.                           */
@@ -383,12 +376,12 @@ public:
   void perror();
 
   //** This is the primary function for reading command  line arguments.  */
-  const int ParseArguments(const int,char * const [],const djvu_option [],const int=0);
+  int ParseArguments(const int,char * const [],const djvu_option [],const int=0);
 
 private:
   void Add(const char [],const int,const int,const int,const char []);
-  const int ReadConfig(const char prog[]);
-  const int ReadNextConfig(const char filename[],int &,const char prog[],FILE *f);
+  int ReadConfig(const char prog[]);
+  int ReadNextConfig(const char filename[],int &,const char prog[],FILE *f);
   void ReadFile(const char [],int &,FILE *f,const int profile);
   void Init(const char[],const int,const char * const [],const djvu_option []);
   FILE *OpenConfig(const char prog[]);
@@ -397,11 +390,119 @@ private:
 
 //@}
 
+//** @name tokenlist.h \begin{verbatim}
+// 
+// This is a class very simmular to GMap, only it is limited it is much
+// limited scope.  It is an associative array "string" to integer.  But
+// the integer is assigned uniquely by this class in sequental order.
+// This is of use when you want to store items sequentially in an array
+// without making the array to large.  This list is always sorted, so
+// this class is also usefull for creating a sorted unique list of words.
+//
+// At some point the TokenList class may be replaced by a wrapper to the
+// GMap class.  We will have to evaluate CPU and memory usage to see if
+// the GMap replacement would be adiquate.
+//
+// \end{verbatim} */
+
+//@{
+
+//** The DjVuTokenList keeps track of string,integer pairs.  One unique     */
+//** interger is assigned per string.  With the integer range stored from   */
+//** zero to the number of strings present.  This is primarily intended to  */
+//** allow a simple mapping between strings and a fixed size array.         */
+class DjVuTokenList
+{
+private:
+  int ListSize;
+  int NextToken;
+  class Entries;
+  Entries *Entry;
+  char **Strings;
+public:
+  int links;
+  //** Simple Constructor */
+  DjVuTokenList() : ListSize(0),NextToken(0),Entry(0),Strings(0),links(0) {};
+  //** Simple Destructor */
+  ~DjVuTokenList();
+
+  //** Lookup up a string given the token */
+  inline const char * const GetString(const int token) const;
+
+  //** Lookup up a token given a string */
+  int GetToken(const char name[]) const;
+
+  //** Assign a token if not already assigned and return it given the string */
+  int SetToken(const char name[]);
+};
+//@}
+
+// The following are the inline functions declared above:
+//
+inline int
+DjVuParseOptions::GetVarToken
+(const char xname[]) const
+{return VarTokens->GetToken(xname);}
+
+inline int
+DjVuParseOptions::SetVarToken
+(const char xname[]) const
+{return VarTokens->SetToken(xname);}
+
+inline int
+DjVuParseOptions::GetProfileToken
+(const char xname[]) const
+{return ProfileTokens->GetToken(xname);}
+
+inline int
+DjVuParseOptions::SetProfileToken
+(const char xname[]) const
+{return ProfileTokens->SetToken(xname);}
+
+inline const char * const
+DjVuParseOptions::GetVarName
+(const int token) const
+{return VarTokens->GetString(token);}
+
+inline const char * const
+DjVuParseOptions::GetProfileName
+(const int token) const
+{return ProfileTokens->GetString(token);}
+
+inline int
+DjVuParseOptions::GetBest
+(const int tokens[])
+{int i;for(i=0;tokens[i]>=0;i++);return GetBest(i,tokens);}
+
+inline const char * const
+DjVuParseOptions::GetValue
+(const char xname[]) const
+{ return GetValue(GetVarToken(xname)); }
+
+inline int
+DjVuParseOptions::GetBest
+(const char * const names[])
+{int i;for(i=0;names[i];i++);return GetBest(i,names);}
+
+inline int
+DjVuParseOptions::GetInteger
+(const char xname[],const int errval=0) const
+{ return GetInteger(GetVarToken(xname),errval); }
+
+inline const char * const
+DjVuTokenList::GetString
+(const int token) const
+{ return (token<NextToken)?Strings[token]:0; }
+
+
 // The following are all classes which are private to the implementation
 // of this class.
 //
 
-#ifdef _PARSEOPTIONS_H_IMPLEMENTATION 
+#ifdef _PARSEOPTIONS_H_IMPLEMENTATION_ 
+
+#define DEFAULT_STRING "global"
+
 // This is a double linked list for appending error messages.  This
 // is used to queue up error messages, so we can parse all the configuration
 // files without interruption, or trying to figure out how to resume if 
@@ -419,7 +520,7 @@ public:
   ~ErrorList();
   const char *AddError(const char value[]);
   const char *GetError(); // Each get removes the error message.
-  inline const int HasError() const 
+  inline int HasError() const 
   { return !!value; };
 };
 
@@ -477,7 +578,15 @@ public:
   int getopt_long();
   GetOpt(DjVuParseOptions *,const int,char * const[],const djvu_option[],const int=0);
 };
-#endif _PARSEOPTIONS_H_IMPLEMENTATION 
+
+class DjVuTokenList::Entries
+{
+public:
+  int Token;
+  char *Name;
+  Entries() : Token(0),Name(0) {};
+};
+#endif /* _PARSEOPTIONS_H_IMPLEMENTATION_  */
 
 #endif /* __cplusplus */
 

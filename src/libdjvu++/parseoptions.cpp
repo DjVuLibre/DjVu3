@@ -9,13 +9,14 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: parseoptions.cpp,v 1.7 1999-11-03 23:31:08 bcr Exp $
+//C- $Id: parseoptions.cpp,v 1.8 1999-11-12 16:45:55 bcr Exp $
 #ifdef __GNUC__
 #pragma implementation
 #endif
 
-#define _PARSEOPTIONS_H_IMPLEMENTATION
+#define _PARSEOPTIONS_H_IMPLEMENTATION_ true
 #include "parseoptions.h"
+#include <string.h>
 #ifdef THREADMODEL
 #include "GThreads.h"
 #endif THREADMODEL
@@ -236,7 +237,7 @@ DjVuParseOptions::GetBest
   int retval=(-1);
   int besttoken=(-1);
   int i;
-  for(i=0;!r&&(i<listsize);r=Arguments->GetValue(tokens[i++]));
+  for(i=0;!r&&(i<listsize);r=Arguments->GetValue(tokens[i++])) /* NOP */;
   if(r)
   {
     for(besttoken=tokens[(retval=i-1)];i<listsize;i++)
@@ -250,7 +251,7 @@ DjVuParseOptions::GetBest
   }else
   {
     for(i=0;!r&&(i<listsize);
-      r=Configuration->GetValue(currentProfile,tokens[i++]));
+      r=Configuration->GetValue(currentProfile,tokens[i++])) /* NOP */;
     if(r)
     {
       for(besttoken=tokens[(retval=i-1)];i<listsize;i++)
@@ -264,7 +265,7 @@ DjVuParseOptions::GetBest
     }else
     {
       for(i=0;!r&&(i<listsize);
-        r=Configuration->GetValue(defaultProfile,tokens[i++]));
+        r=Configuration->GetValue(defaultProfile,tokens[i++])) /* NOP */;
       if(r)
       {
         for(besttoken=tokens[(retval=i-1)];i<listsize;i++)
@@ -309,7 +310,7 @@ DjVuParseOptions::GetBest
 // is returned as 0.  Otherwise if strtol() is successfull a value is returned.
 // In the even of failure, the errval is returned.
 //
-const int
+int
 DjVuParseOptions::GetInteger
 (const int token,const int errval) const 
 {
@@ -336,7 +337,7 @@ DjVuParseOptions::GetInteger
 
 // This function parses the command line arguments
 //
-const int
+int
 DjVuParseOptions::ParseArguments
 (const int argc,char * const argv[],const djvu_option opts[],const int long_only)
 {
@@ -355,7 +356,9 @@ DjVuParseOptions::ParseArguments
 }
 
 
-const int DjVuParseOptions::HasError() const 
+int
+DjVuParseOptions::HasError
+() const 
 {
   return Errors->HasError();
 }
@@ -409,7 +412,7 @@ DjVuParseOptions::Add
 // Even if that doesn't happen, one thread may try to access the profile
 // while it is still being read.
 //
-const int
+int
 DjVuParseOptions::ReadConfig
 (const char prog[])
 {
@@ -442,7 +445,7 @@ DjVuParseOptions::ReadConfig
 // Reads in the specified configuration file if it hasn't been read yet.
 // Again this is private, since we don't want to read files multiple times.
 // 
-const int
+int
 DjVuParseOptions::ReadNextConfig
 (const char filename[],int &line,const char prog[],FILE *f)
 {
@@ -1183,5 +1186,90 @@ DjVuParseOptions::GetOpt::getopt_long()
     nextchar++;
   }
   return longindex;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+//  The following is the tokenlist class implementation.
+//////////////////////////////////////////////////////////////////////////////
+static const int inc_size=256;  // This is how large we grow the list each time.
+
+DjVuTokenList::~DjVuTokenList()
+{
+  int i;
+  for(i=0;i<NextToken;i++)
+  {
+    delete [] Strings[i];
+  }
+  delete [] Strings;
+  delete [] Entry;
+}
+
+// This does a bilinear search for the given token, and if it doesn't find
+// it, inserts it into the list with a new token value...
+//
+int
+DjVuTokenList::GetToken
+(const char name[]) const
+{
+  int MaxGuess=NextToken;
+  int MinGuess=0;
+  while(MinGuess<MaxGuess)
+  {
+    const int guess=MinGuess+((MaxGuess-MinGuess)/2);
+    const int i=strcmp(name,Entry[guess].Name);
+    if(i<0)
+    {
+      MaxGuess=guess;
+    }else if(i)
+    {
+      MinGuess=guess+1;
+    }else
+    {
+      return Entry[guess].Token;
+    }
+  }
+  return (-1-MinGuess);
+}
+
+int
+DjVuTokenList::SetToken
+(const char name[])
+{
+  int retval;
+  if((retval=GetToken(name))<0)
+  {
+    const int MinGuess=(-1-retval);
+	// Allocate a larger buffer, if needed.
+    if(NextToken == ListSize)
+    {
+      Entries *NewEntry=new Entries[(ListSize+=inc_size)];
+	// Copy the lower entries.
+      if(MinGuess)
+      {
+        memcpy(NewEntry,Entry,sizeof(Entries)*MinGuess);
+      }
+	// Copy the upper entries.
+      if(MinGuess<NextToken)
+      {
+        memcpy(&(NewEntry[MinGuess+1]),&(Entry[MinGuess]),sizeof(Entries)*(NextToken-MinGuess));
+      }
+      delete [] Entry;
+      Entry=NewEntry;
+      char **NewStrings=new char *[ListSize];
+      memcpy(NewStrings,Strings,sizeof(char *)*NextToken);
+      delete [] Strings;
+      Strings=NewStrings;
+    }else
+    {
+      // Move the upper entries.
+      if(MinGuess<NextToken)
+      {
+        memmove(&(Entry[MinGuess+1]),&(Entry[MinGuess]),sizeof(Entries)*(NextToken-MinGuess));
+      }
+    }
+    strcpy((Strings[NextToken]=Entry[MinGuess].Name=new char [strlen(name)+1]),name);
+    retval=Entry[MinGuess].Token=NextToken++;
+  }
+  return retval;
 }
 
