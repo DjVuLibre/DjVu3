@@ -58,6 +58,7 @@ then
     then
       echo "egcs"
     else
+      # This test fails for pre-release versions of egcs (-eaf)
       EGCSTEST=`($CC -v 2>&1)|sed -n -e 's,.*/egcs-.*,Is EGCS,p' -e 's,.*/pgcc-.*,Is PGCC,p'`
       if [ ! -z "$EGCSTEST" ]
       then
@@ -76,8 +77,33 @@ then
         echo 2.8.1
         echo WARNING: version 2.7.2.3 of gcc is recommended. 1>&2
       else
-        echo unknown
-        echo WARNING: version 2.7.2.3 of gcc is recommended. 1>&2
+	(echo '#include <stdio.h>';\
+	 echo 'int main(void) { printf("%d", __GNUC__); }') | testfile $temp.c
+	if (run $CC $temp.c -o $temp.exe)
+	then
+	  MAJOR=`$temp.exe`
+	fi
+	(echo '#include <stdio.h>';\
+	 echo 'int main(void) { printf("%d", __GNUC_MINOR__); }') | testfile $temp.c
+	if (run $CC $temp.c -o $temp.exe)
+	then
+	  MINOR=`$temp.exe`
+	fi
+	if [ -n "$MAJOR" -a -n "$MINOR" ]
+	then
+	  echon "$MAJOR.$MINOR"
+	  if [ $MAJOR -eq 2 -a $MINOR -ge 9 -o $MAJOR -ge 3 ]
+	  then
+	    echo " (egcs)"
+	  else
+	    echo
+	    echo WARNING: version 2.7.2.3 of gcc is recommended. 1>&2
+	  fi
+	else
+          echo unknown
+          echo WARNING: version 2.7.2.3 of gcc is recommended. 1>&2
+	fi
+	rm -f $temp.exe
       fi
     fi
   else
