@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuPalette.cpp,v 1.6 2000-02-16 22:17:37 leonb Exp $
+//C- $Id: DjVuPalette.cpp,v 1.7 2000-02-22 17:15:32 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -295,6 +295,24 @@ DjVuPalette::compute_palette(int maxcolors, int minboxsize)
   return color_to_index_slow(dcolor.p);
 }
 
+
+
+int 
+DjVuPalette::compute_pixmap_palette(const GPixmap &pm, int ncolors, int minboxsize=0)
+{
+  // Prepare histogram
+  histogram_clear();
+  for (int j=0; j<(int)pm.rows(); j++)
+    {
+      const GPixel *p = pm[j];
+      for (int i=0; i<(int)pm.columns(); i++)
+        histogram_add(p[i], 1);
+    }
+  // Compute palette
+  return compute_palette(ncolors, minboxsize);
+}
+
+
 #endif
 
 
@@ -343,16 +361,7 @@ DjVuPalette::quantize(GPixmap &pm)
 int 
 DjVuPalette::compute_palette_and_quantize(GPixmap &pm, int maxcolors, int minboxsize)
 {
-  // Prepare histogram
-  histogram_clear();
-  for (int j=0; j<(int)pm.rows(); j++)
-    {
-      GPixel *p = pm[j];
-      for (int i=0; i<(int)pm.columns(); i++)
-        histogram_add(p[i], 1);
-    }
-  // Execute
-  int result = compute_palette(maxcolors, minboxsize);
+  int result = compute_pixmap_palette(pm, maxcolors, minboxsize);
   quantize(pm);
   return result;
 }

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: cpaldjvu.cpp,v 1.2 2000-02-22 14:32:31 leonb Exp $
+//C- $Id: cpaldjvu.cpp,v 1.3 2000-02-22 17:15:32 leonb Exp $
 
 
 /** @name cpaldjvu
@@ -47,7 +47,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: cpaldjvu.cpp,v 1.2 2000-02-22 14:32:31 leonb Exp $# */
+    #$Id: cpaldjvu.cpp,v 1.3 2000-02-22 17:15:32 leonb Exp $# */
 //@{
 //@}
 
@@ -681,7 +681,7 @@ struct cpaldjvuopts
 
 // -- Compresses low color pixmap.
 void 
-cpaldjvu(GPixmap &input, const char *fileout, const cpaldjvuopts &opts)
+cpaldjvu(const GPixmap &input, const char *fileout, const cpaldjvuopts &opts)
 {
   int w = input.columns();
   int h = input.rows();
@@ -690,14 +690,7 @@ cpaldjvu(GPixmap &input, const char *fileout, const cpaldjvuopts &opts)
   int smallsize = MAX(2, dpi/150);
   // Compute optimal palette and quantize input pixmap
   DjVuPalette pal;
-  pal.histogram_clear();
-  for (int j=0; j<h; j++) 
-    {
-      GPixel *p = input[j];
-      for (int i=0; i<w; i++)
-        pal.histogram_add(p[i], 1);
-    }
-  int bgindex = pal.compute_palette(opts.ncolors);
+  int bgindex = pal.compute_pixmap_palette(input, opts.ncolors);
   if (opts.verbose)
     fprintf(stderr,"Image %dx%d has %d colors\n", w, h, pal.size());
   GPixel bgcolor;
@@ -709,7 +702,7 @@ cpaldjvu(GPixmap &input, const char *fileout, const cpaldjvuopts &opts)
   for (int y=0; y<h; y++)
     {
       int x = 0;
-      GPixel *row = input[y];
+      const GPixel *row = input[y];
       while (x<w)
         {
           int x1 = x;

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuPalette.h,v 1.11 2000-02-16 22:17:18 leonb Exp $
+//C- $Id: DjVuPalette.h,v 1.12 2000-02-22 17:15:32 leonb Exp $
 
 
 
@@ -37,7 +37,7 @@
     @memo 
     DjVuPalette header file
     @version 
-    #$Id: DjVuPalette.h,v 1.11 2000-02-16 22:17:18 leonb Exp $#
+    #$Id: DjVuPalette.h,v 1.12 2000-02-22 17:15:32 leonb Exp $#
     @author: 
     L\'eon Bottou <leonb@research.att.com> */
 //@{
@@ -75,7 +75,7 @@ public:
   // COPY
   DjVuPalette(const DjVuPalette &ref);
   DjVuPalette& operator=(const DjVuPalette &ref);
-  // QUANTIZATION
+  // PALETTE COMPUTATION
   /** Resets the color histogram to zero. */
   void histogram_clear();
   /** Adds the color specified by #p# to the histogram.
@@ -97,6 +97,10 @@ public:
       #minboxsize# controls the minimal size of the color cube area affected
       to a color palette entry.  Returns the index of the dominant color. */
   int compute_palette(int maxcolors, int minboxsize=0);
+  /** Computes the optimal palette for pixmap #pm#.  This function builds the
+      histogram for pixmap #pm# and computes the optimal palette using
+      \Ref{compute_palette}. */
+  int compute_pixmap_palette(const GPixmap &pm, int ncolors, int minboxsize=0);
   // CONVERSION
   /** Returns the number of colors in the palette. */
   int size() const;
@@ -112,11 +116,8 @@ public:
   /** Quantizes pixmap #pm#. All pixels are replaced by their closest
       approximation available in the palette. */
   void quantize(GPixmap &pm);
-  /** Computes the optimal palette and quantize pixmap #pm#.  This function
-      builds the histogram for pixmap #pm#, computes the optimal palette using
-      \Ref{compute_palette} and quantize the pixmap using \Ref{quantize}. 
-      Returns the index of the dominant color. */
-  int compute_palette_and_quantize(GPixmap &pm, int ncolors, int minboxsize=0);
+  /** Calls \Ref{compute_pixmap_palette} and \Ref{quantize}. */
+  int compute_palette_and_quantize(GPixmap &pm, int maxcolors, int minboxsize=0);
   // COLOR CORRECTION
   /** Applies a luminance gamma correction factor of #corr# to the palette
       entries.  Values greater than #1.0# make the image brighter.  Values
