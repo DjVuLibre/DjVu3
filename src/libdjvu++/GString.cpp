@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.69 2001-04-19 19:20:04 bcr Exp $
+// $Id: GString.cpp,v 1.70 2001-04-19 20:42:21 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -578,9 +578,7 @@ GString::format(const char fmt[], ... )
 {
   va_list args;
   va_start(args, fmt);
-  init(GStringRep::create(fmt,args));
-  va_end(args);
-  return *this;
+  return init(GStringRep::create(fmt,args));
 }
 
 GUTF8String &
@@ -600,7 +598,7 @@ GNativeString::format(const char fmt[], ... )
 }
 
 GP<GStringRep>
-GStringRep::format(const char fmt[],...)
+GStringRep::create_format(const char fmt[],...)
 {
   va_list args;
   va_start(args, fmt);
@@ -608,7 +606,7 @@ GStringRep::format(const char fmt[],...)
 }
 
 GP<GStringRep>
-GStringRep::UTF8::format(const char fmt[],...)
+GStringRep::UTF8::create_format(const char fmt[],...)
 {
   va_list args;
   va_start(args, fmt);
@@ -616,7 +614,7 @@ GStringRep::UTF8::format(const char fmt[],...)
 }
 
 GP<GStringRep>
-GStringRep::Native::format(const char fmt[],...)
+GStringRep::Native::create_format(const char fmt[],...)
 {
   va_list args;
   va_start(args, fmt);
@@ -624,7 +622,7 @@ GStringRep::Native::format(const char fmt[],...)
 }
 
 GP<GStringRep>
-GStringRep::format(int,va_list &args) const
+GStringRep::format(va_list &args) const
 {
   int buflen=32768;
   char *buffer;
@@ -1735,7 +1733,7 @@ GStringRep::Native::toDouble(
 
 #if 0
 int 
-GStringRep::nextUCS4(const int from,const unsigned long &w) const
+GStringRep::getUCS4(unsigned long &w, const int from) const
 {
   int retval;
   if(from>=size)
@@ -1748,74 +1746,69 @@ GStringRep::nextUCS4(const int from,const unsigned long &w) const
     retval=(-1);
   }else
   {
-    retval=(from<0)?0:from;
-    w=data[retval++];
+    const char *source=data+from;
+    w=getValidUCS4(source);
+    retval=(int)((size_t)source-(size_t)data);
   } 
   return retval;
 }
 
-int
-GStringRep::UTF8::nextUCS4(const int from,const unsigned long &w) const
+unsigned long
+GStringRep::getValidUCS4(const char *&source) const
 {
-  int retval;
-  if(from>=size)
-  {
-    w=0;
-    retval=size;
-  }else if(from<0)
-  {
-    w=(unsigned int)(-1);
-    retval=(-1);
-  }else
-  {
-    const char *s=data+from;
-    w=UTF8toUCS4(s,s+size);
-    retval=(int)((size_t)s-(size_t)data);
-  }
-  return retval;
+  return data[source++];
 }
 
-int
-GStringRep::Native::nextUCS4(const int from,const unsigned long &w) const
+unsigned long
+GStringRep::UTF8::getValidUCS4(const char *&source) const
 {
-  int retval;
-  if(from>=size)
+  const char *source=data+from;
+  return UTF8toUCS4(source,data+size);
+}
+
+unsigned long
+GStringRep::Native::getValidUCS4(const char *&source) const
+{
+  int n=(int)((size_t)size+(size_t)data-(size_t)source);
+  mbstate_t ps;
+  (void)mbrlen(source, n, &ps);
+  wchar_t wt;
+  const int len=mbrtowc(&wt,source,n,&ps); 
+  unsigned long retval=0;
+  if(len>=0)
   {
-    w=0;
-    retval=size;
-  }else if(from<0)
-  {
-    w=(unsigned int)(-1);
-    retval=(-1);
-  }else
-  {
-    const char *source=s+from;
-    int n=size-from;
-    if((n>0)&&((i=mbrtowc(&w,source,n,&ps))>=0))
+    if(sizeof(wchar_t) == sizeof(unsigned short))
     {
+      source+=len;
       unsigned short s[2];
-      s[0]=w;
-      unsigned long w0;
-      if(UTF16toUCS4(w0,s,s+1)<=0)
+      s[0]=(unsigned short)wt;
+      if(UTF16toUCS4(retval,s,s+1)<=0)
       {
-        source+=i;
-        n-=i;
-        if((n>0)&&((i=mbrtowc(&w,source,n,&ps))>=0))
+        if((n-=len)>0)
         {
-          s[1]=w;
-          if(UTF16toUCS4(w0,s,s+2)<=0)
+          const int len=mbrtowc(&wt,source,n,&ps);
+          if(len>=0)
           {
-            i=(-1);
-            break;
+            s[1]=(unsigned short)wt;
+            unsigned long w;
+            if(UTF16toUCS4(w,s,s+2)>0)
+            {
+              source+=len;
+              retval=w;
+            }
           }
-        }else
-        {
-          i=(-1);
-          break;
         }
       }
-    }
+    }else
+    {
+      retval=(unsigned long)wt;
+      source++;
+    } 
+  }else
+  {
+    source++;
   }
+  return retval;
 }
 
 #endif
@@ -1899,8 +1892,8 @@ GStringRep::UCS4toUTF16(
     retval=1;
   }else
   {
-    w1=unsigned short((((w-0x10000)>>10)&0x3ff)+0xD800);
-    w2=unsigned short((w&0x3ff)+0xDC00);
+    w1=(unsigned short)((((w-0x10000)>>10)&0x3ff)+0xD800);
+    w2=(unsigned short)((w&0x3ff)+0xDC00);
     retval=2;
   }
   return retval;
