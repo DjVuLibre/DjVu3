@@ -7,11 +7,39 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: djvuextract.cpp,v 1.1 1999-02-03 22:55:30 leonb Exp $
+//C-  $Id: djvuextract.cpp,v 1.2 1999-02-18 00:12:01 leonb Exp $
 
-// Obtains the components of a DJVU file
-// File "$Id"
+/** @name djvuextract
 
+    {\bf Synopsis}
+    \begin{verbatim}
+    djvumake <djvufile> [Sjbz=<maskout>] [FG44=<fgout>] [BG44=<bgout>]
+    \end{verbatim}
+    
+    {\bf Description}\\
+    Program #djvuextract# analyzes the Bilevel DjVu or Color DjVu file
+    #<djvufile># and saves the various layers into the specified files.
+    The reverse operation can be achieved using program \Ref{djvumake}.
+    \begin{itemize}
+    \item When option #Sjbz=<maskout># is specified, the foreground mask is
+      saved into file #<maskout># as JB2 data. This data file can be read
+      using function #decode# in class \Ref{JB2Image}.
+    \item When option #FG44=<fgout># is specified, the foreground color image
+      is saved into file #<fgout># as IW44 data.  This data file can be processed
+      using programs \Ref{d44} or \Ref{c44}.
+    \item When option #BG44=<bgout># is specified, the background color image
+      is saved into file #<bgout># as IW44 data.  This data file can be processed
+      using programs \Ref{d44} or \Ref{c44}.
+    \end{itemize}
+
+    @memo
+    Extract layers from Bilevel DjVu files or Color DjVu files.
+    @version
+    #$Id: djvuextract.cpp,v 1.2 1999-02-18 00:12:01 leonb Exp $#
+    @author
+    Leon Bottou <leonb@research.att.com> */
+//@{
+//@}
 
 #include "GException.h"
 #include "ByteStream.h"

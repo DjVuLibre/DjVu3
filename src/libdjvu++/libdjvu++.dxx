@@ -384,24 +384,24 @@
     \begin{verbatim}
        % configure --prefix=$HOME/djvu
     \end{verbatim}
-    The optional argument #--prefix# indicates where the binary files will be
-    installed.  You are now ready to compile everything by typing the
-    following command:
+    The options supported by the configuration script are displayed by typing
+    #configure --help#.  The option #-prefix# indicates where the binary files
+    will be installed.  You can also specify which compiler to use by setting 
+    the environment variable #CXX# before invoking #configure#.
+
+    You are now ready to compile and install everything by typing:
     \begin{verbatim}
-       % make
+       % make all
+       % make install
     \end{verbatim}
-    Finally, you can install the utility programs by typing #make install#.
-    The executable files are copied in the #bin# subdirectory of the directory
-    specified with the configuration option #--prefix#.
-    
+
     {\bf Using the DjVu Reference Library} --- At this point, you have
     generated a collection of small executables documented in section
     \Ref{Utility Programs}.  This is not very exciting.  It is now time to
-    remember that the DjVu Reference Library is a source code library.  Its
-    purpose is to allow you to do stuff with our stuff.  Almost everything you
-    can use safely is documented in section \Ref{Library Reference}.  You may
-    want however to start with sections \Ref{Decoding DjVu content} and
-    \Ref{Creating DjVu content}.  */
+    remember that the DjVu Reference Library is a source code library.  Almost
+    everything you can use safely is documented in section \Ref{Library
+    Reference}.  You may want however to start with sections \Ref{Decoding
+    DjVu content} and \Ref{Creating DjVu content}.  */
 
 
 /** @name Compiling the Library (Systems other than Unix)       
@@ -410,16 +410,19 @@
    version 5.0.  It should also compile under MacOS using the MetroWerks
    compiler, although some system dependent functions are still missing.  In
    both cases however, you have to provide your makefile (or your project, or
-   your workspace or whatever) using the Unix makefile as a template.
+   your workspace or whatever) using the Unix makefiles as a template.
 
  */
-
 
 
 /** @name Decoding DjVu content
+
+    See \Ref{DjVuImage.h}.
  */
 
 /** @name Creating DjVu content
+
+    See \Ref{djvumake}.
  */
 
 
@@ -465,6 +468,7 @@
 //@Include: d44.cpp
 //@Include: djvutopnm.cpp
 //@Include: djvumake.cpp
+//@Include: djvuextract.cpp
 //@}
 
 

@@ -7,15 +7,13 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: djvumake.cpp,v 1.2 1999-02-15 23:23:37 leonb Exp $
-
-
+//C-  $Id: djvumake.cpp,v 1.3 1999-02-18 00:12:01 leonb Exp $
 
 /** @name djvumake
 
     {\bf Synopsis}
     \begin{verbatim}
-       djvumake <djvufile> <chunk-specification>
+       % djvumake <djvufile> [Sjbz=<jb2file>] [FG44=<iw4file>] [BG44=<iw4file>]
     \end{verbatim}
     
     {\bf Recipe for Creating a Bilevel DjVu File}\\
@@ -25,56 +23,90 @@
     instance.  You can then assemble file #"my.djvu"# using #djvumake#
     with the following arguments:
     \begin{verbatim}
-       djvumake my.djvu Sjbz=myjb2.q
+       % djvumake my.djvu Sjbz=myjb2.q
     \end{verbatim}
     
     {\bf Recipe for Creating a Color DjVu File}\\
-    Let's assume that you already have decided what is going into the
-    background layer and what is going into the foreground layer.  Remember
-    that the size of the background image is computed by rounding up the ratio
-    between the size of the mask and an integer background sub-sampling ratio
-    in range 1 to 12.  Choosing a sub-sampling ratio of 3 is usually a good
-    starting point.  Save this background image into a PPM file named
-    #"mybg.ppm"# and encode it using \Ref{c44}:
-    \begin{verbatim} 
-       c44 -slice 74+10+9+4 mybg.ppm  mybg.iw4 
-    \end{verbatim}
-    You must also create a JB2 file containing the foreground mask as
+    Let us assume that you use a program like Gimp \URL{http://www.gimp.org}
+    or Photoshop.  You have created your image using two layers.  The
+    background layer contains all pictures and background details.  The
+    foreground layer contains the text and the drawings. Transparency is
+    controlled by a layer mask attached to the foreground layer.  The layer
+    mask contains the shape of the text and drawings in black and white.  The
+    actual foreground layer contains large patches of color which are only
+    displayed where the layer mask is black.  You can see a Gimp example in
+    file #"@Samples/layers.xcf.gz"#.
+
+    This layered model is very close to the DjVu model.  In the DjVu model
+    however, the three images (the background layer, the foreground layer
+    mask, and the actual foreground layer) can have different resolutions.
+    \begin{itemize}
+    \item
+    The size of the foreground layer mask is always equal to the size of the
+    DjVu image.  You must create a JB2 file containing the foreground mask as
     explained in the {\em Recipe for Creating a Bilevel DjVu File}. Each zero
     pixel in the mask means that the corresponding pixel in the raw image
     belongs to the background. Each non zero pixel means that the
     corresponding pixel in the raw image belongs to the foreground. Let us
     call this file #"myjb2.q"#.
+    \item
+    The size of the background image is computed by rounding up the ratio
+    between the size of the mask and an integer background sub-sampling ratio
+    in range 1 to 12.  Choosing a sub-sampling ratio of 3 is usually a good
+    starting point.  You must then subsample the background layer image and save
+    it into a PPM file named #"mybg.ppm"#.  
+    \item
+    The size of the foreground color image is computed by rounding up the
+    ratio between the size of the mask and an integer background sub-sampling
+    ratio in range 1 to 12.  Choosing a sub-sampling ratio of 12 is usually
+    adequate.  You must then subsample the background layer image and save
+    it into a PPM file named #"myfg.ppm"#.  
+    \end{itemize}
+    
+    When you subsample these images, you should consider some refinements.
+    The color of each pixel of the subsampled image is an average of the
+    colors of a couple of pixels in the original image.  When you compute this
+    average, you eliminate the original pixels which are not visible, such as
+    pixels of the background layer which are masked by the foreground, or
+    pixels of the foreground color layer which are not visible because of the
+    mask transparency.  
+    
+    It sometimes happens that you cannot compute the color of a pixel in the
+    subsampled image because none of the pixels in the corresponding image are
+    visible.  That means that we do not really care abou the color of the
+    subsampled pixel because it is not visible at all.  It is not desirable of
+    course to encode the color value of such pixels.  This is possible using
+    the {\em masking} feature of the wavelet encoder.  You must first save two
+    PBM images named #"mybg.pbm"# and #"myfg.pbm"#.  These images have the
+    same size as the corresponding PPM images.  A black pixel in these images
+    mean that we should not code the color of the corresponding pixel in the
+    PPM image.
 
-    You must then prepare the foreground color image.  Remember that the size
-    of the foreground color image is computed by rounding up the ratio between
-    the size of the mask and an integer background sub-sampling ratio in range
-    1 to 12.  Choosing a sub-sampling ratio of 12 is usually adequate.  First
-    create a PPM image #"myfg.ppm"# and a PBM image mask #"myfgmask.pbm"#.
-    Both the PPM image and the PBM image mask have the same size as the
-    foreground color image.  For each pixel in the PPM image and the PBM image
-    mask, locate the corresponding foreground pixels in the raw image.  If
-    there are at least two such pixels, store their average into the PPM image
-    and store a zero into the PBM image mask.  Otherwise, store an arbitrary
-    color into the PPM image and store a one into the PBM image mask.  Then
-    encode the foreground color image using \Ref{c44} as a single chunk and
-    using the masking option:
-    \begin{verbatim} 
-       c44 -slice 100 -crcbfull -mask myfgmask.pbm myfg.ppm  myfg.iw4
+    We must then encode both images using the \Ref{c44} wavelet encoder.
+    The following commands to the trick:
+    \begin{verbatim}
+      % c44 -slice 74+10+9+4 -mask mybg.msk mybg.ppm mybg.iw4 
+      % c44 -slice 100 -crcbfull -mask myfg.msk myfg.ppm myfg.iw4
     \end{verbatim}
-    Finally assemble the DjVu file using the following command:
+    Note that we use different options. The background wavelet file
+    #"mybg.iw4"# contains four refinement chunks specified by option #-slice#.
+    The foreground wavelet file #"myfg.iw4"# contains a single chunk (option
+    #-slice#) and allocated more bits for encoding the colors (option
+    #-crcbfull#). 
+
+    The last step consists of assembling the DjVu file using #djvumake#.
     \begin{verbatim}
        djvumake my.djvu Sjbz=myjb2.q FG44=myfg.iw4 BG44=mybg.iw4
     \end{verbatim}
 
-    {\bf Creating an IW44 File}\\
+    {\bf Recipe for creating an IW44 File}\\
     You do not need program #djvumake# to create an IW44 File.  
     Program \Ref{c44} already produces compliant IW44 files.
 
     @memo
     Create Bilevel DjVu files or Color DjVu files.
     @version
-    #$Id: djvumake.cpp,v 1.2 1999-02-15 23:23:37 leonb Exp $#
+    #$Id: djvumake.cpp,v 1.3 1999-02-18 00:12:01 leonb Exp $#
     @author
     Leon Bottou <leonb@research.att.com> */
 //@{
