@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.37.2.5 2001-03-28 01:04:27 bcr Exp $
+// $Id: GString.cpp,v 1.37.2.6 2001-03-30 23:03:44 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -41,6 +41,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+#include <wchar.h>
 
 #include "GString.h"
 #include "debug.h"
@@ -50,10 +51,13 @@
 #define LIBICONV_PLUG true
 #endif
 
-
-#include "iconv.h"//MBCS cvt
-#include "iconv_string.h"
+#ifdef HAS_ICONV
+#include <iconv.h>//MBCS cvt
+// #include "iconv_string.h"
 #include "libcharset.h"//MBCS cvt
+#endif
+// #include <locale.h>
+#include "GUnicode.h"
 
 
 // - Author: Leon Bottou, 04/1997
@@ -588,78 +592,251 @@ GString::throw_illegal_subscript()
   G_THROW("GString.bad_subscript");
 }
 
+#ifdef HAS_ICONV
+class DjVuIconv {
+private:
+  char *buf;
+  GPBuffer<char> gbuf;
+  GMap<GString,iconv_t> iconv_map;
+  GList<GString> codes;
+  DjVuIconv() : gbuf(buf) {}
+public:
+  static size_t iconv_string(const GString &fromcode,const GString &tocode,
+    const char *fromstr, const size_t fromstr_len, char *&retval,
+    size_t &retval_len,GPBuffer<char> &);
+  iconv_t getmap(const GString &fromcode, const GString &tocode);
+  ~DjVuIconv();
+};
+
+DjVuIconv::~DjVuIconv()
+{
+  GPosition pos;
+  while((pos=iconv_map))
+  {
+    iconv_t cd=iconv_map[pos];
+    iconv_map.del(pos);
+    if(cd != (iconv_t)(-1))
+      iconv_close(cd);
+  }
+}
+
+iconv_t
+DjVuIconv::getmap(const GString &tocode, const GString &fromcode)
+{
+  GString code(tocode+fromcode);
+  GPosition pos;
+  iconv_t retval;
+  if(!(pos=iconv_map.contains(code)))
+  {
+    codes.append(tocode);
+    const char *tc=codes[codes.lastpos()];
+    codes.append(fromcode);
+    const char *fc=codes[codes.lastpos()];
+    iconv_map[code]=retval=iconv_open(tc,fc);
+  }else
+  {
+    retval=iconv_map[pos];
+  }
+  return retval;
+}
+
+size_t
+DjVuIconv::iconv_string(const GString &tocode,const GString &fromcode,
+  const char *fromstr, const size_t fromstr_len, char *&outbuf, size_t &outbuf_len,GPBuffer<char> &gbufout)
+{
+  static DjVuIconv conv;
+  iconv_t cd=conv.getmap(tocode,fromcode);
+  const char *inbuf=fromstr;
+  size_t insize=fromstr_len;
+  size_t outsize=fromstr_len*6;
+  gbufout.resize(fromstr_len*6+1);
+  char *retbuf=outbuf;
+  outbuf[0]=0;
+  const size_t retval=(cd!=(iconv_t)-1)?iconv(cd,&inbuf,&insize,&retbuf,&outsize):(size_t)(-1);
+  if(retval != (size_t)(-1))
+  {
+    gbufout.resize(fromstr_len*6-outsize);
+  }else
+  {
+    gbufout.resize(0);
+  }
+  return retval;
+}
+#if 0
+static GString locale_charset(void)
+{
+  GString retval;
+  GString glocale_charset=setlocale(LC_CTYPE,0);
+  const int at=glocale_charset.search('@');
+  if(at > -1)
+  {
+    glocale_charset.setat(at,0);
+    const int dot=glocale_charset.search('.');
+    if(dot > -1)
+    {
+      retval=glocale_charset.substr(dot+1,glocale_charset.length());
+    }
+  }
+  return retval;
+}
+#endif
+#endif /* HAS_ICONV */
+
+
+static GString
+UTF82Native(const char source[])
+{
+  GString retval;
+  const GUnicode gsource(source);
+  char *r=retval.getbuf(12*gsource.length()+12);
+  mbstate_t ps;
+  for(const unsigned long *s=gsource;s[0];++s)
+  { 
+    const wchar_t w=s[0];
+    char bytes[12];
+    int i=wcrtomb(bytes,w,&ps);
+    if(i<0)
+    {
+      r=retval.getbuf(1);
+      break;
+    }else if(!i)
+    {
+      break;
+    }else
+    {
+      for(int j=0;j<i;++j)
+      {
+        (r++)[0]=bytes[j];
+      }
+    }
+  }
+  r[0]=0;
+  return retval;
+}
+
 /*MBCS*/
 GString
-GString::getUTF82Native(const char* tocode) const { //MBCS cvt
+GString::getUTF82Native(char* tocode) const
+{ //MBCS cvt
+  GString retval;
+  const size_t slen=length()+1;
+  if(slen>1)
+  {
     const char * s=*this;
-	char* result = NULL;
-	size_t length = 0;
-		if (iconv_string(locale_charset(), "UTF-8",
-			s, s+strlen(s)+1, &result, &length) < 0) {
-			if (iconv_string("ASCII", "UTF-8",
-				s, s+strlen(s)+1, &result, &length) < 0) {
-				if (iconv_string("ISO-8859-1", "UTF-8",
-					s, s+strlen(s)+1, &result, &length) < 0) {
-					if (iconv_string("CP932", "UTF-8",
-						s, s+strlen(s)+1, &result, &length) < 0) {
-						if (iconv_string("EUC-JP", "UTF-8",
-							s, s+strlen(s)+1, &result, &length) < 0) {
-							if (tocode) strcpy((char*)tocode,locale_charset()); 
-							return *this; //invalid codeset
-						} else {if (tocode) strcpy((char*)tocode,"EUC-JP"); return result;} //text converted to native
-					} else {if (tocode) strcpy((char*)tocode,"CP932"); return result;} //text converted to native
-				} else {if (tocode) strcpy((char*)tocode,"ISO-8859-1"); return result;} //text converted to native
-			} else {if (tocode) strcpy((char*)tocode,"ASCII"); return result;} //text converted to native
-		} else {if (tocode) strcpy((char*)tocode,locale_charset()); return result;} //text converted to native
+    retval=UTF82Native(s);
+    if(!retval.length())
+    {
+#ifdef HAS_ICONV 
+      char *result;
+      GPBuffer<char> gresult(result);
+      size_t length = 0;
+      const char *locales[]={0,"ASCII","ISO-8859-1","CP932","EUC-JP",0};
+      GString glocale_charset=locale_charset();
+      locales[0]=glocale_charset;
+      const char **pos=locales;
+      for(;pos[0];++pos)
+      {
+        if (pos[0][0]&&!DjVuIconv::iconv_string(pos[0], "UTF-8",
+          s, slen, result, length, gresult))
+        {
+          if (tocode)
+            strcpy((char*)tocode,pos[0]);
+          retval=result;
+          break;
+        }
+      }
+      if(!pos[0])
+      {
+        if (tocode)
+          strcpy(tocode,locales[0]);
+        retval=*this; //invalid codeset
+      }
+#else /* HAS_ICONV */
+      retval=*this;
+#endif /* HAS_ICONV */
+    }
+  }
+  return retval;
+}
 
+static size_t
+mbstolcs(const char *source,unsigned long *result)
+{
+  size_t retval=0;
+  size_t n=strlen(source);
+  GString newsource;
+  int i;
+  mbstate_t ps;
+  for(wchar_t w;
+    (n>0)&&(i=mbrtowc(&w,source,n,&ps));
+    ++result,n-=i,source+=i,++retval)
+  {
+    if(i<0)
+    {
+      retval=(size_t)(-1);
+      break;
+    }
+    result[0]=w;
+  }
+  result[0]=0;
+  return retval;
+}
+
+static GString
+Native2UTF8(const char *source,const size_t slen)
+{
+  GString retval;
+  unsigned long *wresult;
+  GPBuffer<unsigned long> gwresult(wresult,slen);
+  size_t len=mbstolcs(source,wresult);
+  if(len && (len != (size_t)(-1)))
+  {
+    retval=GUnicode(wresult,len,GUnicode::UCS4);
+  }
+  return retval;
 }
 
 GString
-GString::getNative2UTF8(const char* fromcode) const { //MBCS cvt
+GString::getNative2UTF8(const char *fromcode) const
+{ //MBCS cvt
+  const size_t slen=length()+1;
+  GString retval;
+  if(slen > 1)
+  {
     const char * s=*this;
-	char* result = NULL;
-	size_t length = 0;
-	if (!(strcmp(fromcode,""))) {
-		if (iconv_string("UTF-8", locale_charset(),
-			s, s+strlen(s)+1, &result, &length) < 0) 
-			if (iconv_string("UTF-8", "autodetect_jp",
-				s, s+strlen(s)+1, &result, &length) < 0) 
-				if (iconv_string("UTF-8", "autodetect_utf8",
-					s, s+strlen(s)+1, &result, &length) < 0) 
-					if (iconv_string("UTF-8", "autodetect_kr",
-						s, s+strlen(s)+1, &result, &length) < 0) 
-						return *this; //can't convert
-					else 
-						return result; //text converted
-				else 
-					return result; //text converted
-			else 
-				return result; //text converted
-		else 
-			return result; //text converted
-	}
-	else {
-		if (!(strcmp(fromcode,"autodetect"))) {
-			if (iconv_string("UTF-8", "autodetect_jp",
-				s, s+strlen(s)+1, &result, &length) < 0) 
-				if (iconv_string("UTF-8", "autodetect_utf8",
-					s, s+strlen(s)+1, &result, &length) < 0) 
-					if (iconv_string("UTF-8", "autodetect_kr",
-						s, s+strlen(s)+1, &result, &length) < 0) 
-						return *this; //can't convert
-					else 
-						return result; //text converted
-				else 
-					return result; //text converted
-			else 
-				return result; //text converted
-		}
-		else
-			if (iconv_string("UTF-8", fromcode,
-				s, s+strlen(s)+1, &result, &length) < 0) 
-				return *this; //can't convert
-			else 
-				return result; //text converted
-	}
-}
-/*MBCS*/
+    retval=Native2UTF8(s,slen);
+    if(!retval.length())
+    {
+#ifdef HAS_ICONV
+      char *result;
+      GPBuffer<char> gresult(result);
+      const char *locales[]={0,"ASCII","ISO-8859-1","CP932","EUC-JP",0};
+      size_t length = 0;
+      GString glocale_charset;
+      if (!fromcode || !fromcode[0])
+      {
+        fromcode="UTF-8";
+        locales[0]=glocale_charset=locale_charset();
+      }
+      const char **pos=locales;
+      for(;pos[0];++pos)
+      {
+        if (!DjVuIconv::iconv_string(fromcode, pos[0],
+          s, slen, result, length, gresult))
+        {
+          retval=result;
+          break;
+        }
+      }
+      if(!pos[0])
+      {
+        retval=*this;
+      }
+#else /* HAS_ICONV */
+      retval=*this;
+#endif /* HAS_ICONV */
+    }
+  }
+  return retval;
+} /*MBCS*/
+

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.h,v 1.27.2.2 2001-03-28 01:04:27 bcr Exp $
+// $Id: GString.h,v 1.27.2.3 2001-03-30 23:03:44 bcr Exp $
 // $Name:  $
 
 #ifndef _GSTRING_H_
@@ -57,7 +57,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.27.2.2 2001-03-28 01:04:27 bcr Exp $# */
+    #$Id: GString.h,v 1.27.2.3 2001-03-30 23:03:44 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -234,7 +234,7 @@ public:
   GString fromEscaped( void ) const;
 
   /** Converts strings between native & UTF8 **/
-  GString getUTF82Native( const char* tocode=NULL ) const;/*MBCS*/
+  GString getUTF82Native( char* tocode=NULL ) const;/*MBCS*/
   GString getNative2UTF8( const char* fromcode="" ) const;/*MBCS*/
 
   /** Converts strings containing HTML/XML escaped characters (e.g.,
