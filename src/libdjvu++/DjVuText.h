@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuText.h,v 1.15 2001-07-03 00:21:13 mchen Exp $
+// $Id: DjVuText.h,v 1.16 2001-07-06 00:04:59 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUTEXT_H
@@ -55,7 +55,7 @@
     @memo Implements support for DjVuImage hidden text.
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: DjVuText.h,v 1.15 2001-07-03 00:21:13 mchen Exp $# */
+    #$Id: DjVuText.h,v 1.16 2001-07-06 00:04:59 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -88,8 +88,9 @@ public:
   enum ZoneType { PAGE=1, COLUMN=2, REGION=3, PARAGRAPH=4, LINE=5, WORD=6, CHARACTER=7 };
   /** Data structure representing document textual components.
       The text structure is represented by a hierarchy of rectangular zones. */
-  struct Zone 
+  class Zone 
   {
+  public:
     Zone();
     /** Type of the zone. */
     enum ZoneType ztype;
@@ -105,6 +106,19 @@ public:
         with an empty rectangle, empty text, and has the same type as this
         zone. */
     Zone *append_child();
+    /// Find the text_start and text_end indicated by the given box.
+    void get_text_by_rect(
+      const GRect &box, int &string_start,int &string_end) const;
+    /// Find the zones used by the specified string and append them to the list.
+    void find_zones(
+      GList<Zone *> &list, const int string_start, const int string_end) const;
+    /// Finds the smallest rectangles and appends them to the list.
+    void get_smallest(GList<GRect> &list) const;
+    /** Finds the smallest rectangles and appends them to the list after 
+      padding the smallest unit to fit width or height for the parent rectangle
+      and adding the number of specified pixels. */
+    void get_smallest_pad(
+      GList<GRect> &list,const GRect &rect, const int padding=0) const;
   private:
     friend class DjVuTXT;
     void cleartext();
@@ -190,6 +204,9 @@ public:
 			      bool whole_word=false) const;
 
   GList<Zone *> find_text_in_rect(GRect target_rect, GUTF8String &text) const;
+    /// Find the text specified by the rectangles.
+  GList<GRect> find_text_by_rect(
+    const GRect &box, GUTF8String &text, const int padding=0) const;
 
    // get all zones of zone type zone_type under node parent. zone_list
    // contains the return value

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuText.cpp,v 1.25 2001-07-04 20:15:25 mchen Exp $
+// $Id: DjVuText.cpp,v 1.26 2001-07-06 00:04:59 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -345,6 +345,121 @@ DjVuTXT::search_zone(const Zone * zone, int start, int & end) const
   return false;
 }
 
+static inline bool
+intersects_zone(GRect box, const GRect &zone)
+{
+  return
+    ((box.xmin < zone.xmin)
+      ?(box.xmax >= zone.xmin)
+      :(box.xmin <= zone.xmax))
+    &&((box.ymin < zone.ymin)
+      ?(box.ymax >= zone.ymin)
+      :(box.ymin <= zone.ymax));
+}
+
+void
+DjVuTXT::Zone::get_text_by_rect(
+  const GRect &box, int &string_start, int &string_end) const
+{
+  GPosition pos=children;
+  if(pos?box.contains(rect):intersects_zone(box,rect))
+  {
+    const int text_end=text_start+text_length;
+    if(string_start == string_end)
+    {
+      string_start=text_start;
+      string_end=text_end;
+    }else
+    {
+      if (string_end < text_end)
+        string_end=text_end;
+      if(text_start < string_start)
+        string_start=text_start;
+    }
+  }else if(pos&&intersects_zone(box,rect))
+  {
+    do
+    {
+      children[pos].get_text_by_rect(box,string_start,string_end);
+    } while(++pos);
+  }
+}
+
+void
+DjVuTXT::Zone::find_zones(
+  GList<Zone *> &list, const int string_start, const int string_end) const
+{
+  GPosition pos=children;
+  const int text_end=text_start+text_length;
+  if(text_start >= string_start)
+  {
+    if(text_end <= string_end)
+    {
+      list.append(const_cast<Zone *>(this));
+    }else if(text_start < string_end)
+    {
+      if(pos)
+      {
+        do
+        {
+          children[pos].find_zones(list,string_start,string_end);
+        } while (++pos);
+      }else
+      {
+        list.append(const_cast<Zone *>(this));
+      }
+    }
+  }else if( text_end > string_start)
+  {
+    do
+    {
+      children[pos].find_zones(list,string_start,string_end);
+    } while (++pos);
+  }
+}
+
+void
+DjVuTXT::Zone::get_smallest(GList<GRect> &list) const
+{
+  GPosition pos=children;
+  if(pos)
+  {
+    do
+    {
+      children[pos].get_smallest(list);
+    } while (++pos);
+  }else
+  {
+    list.append(rect);
+  }
+}
+
+void
+DjVuTXT::Zone::get_smallest_pad(
+   GList<GRect> &list,const GRect &xrect, const int padding) const
+{
+  GPosition pos=children;
+  if(pos)
+  {
+    do
+    {
+      children[pos].get_smallest_pad(list,rect,padding);
+    } while (++pos);
+  }else if(xrect.contains(rect))
+  {
+    if(xrect.height() <= xrect.width())
+    {
+      list.append(GRect(rect.xmin-padding,xrect.ymin-padding,rect.xmax+padding,xrect.ymax+padding));
+    }else
+    {
+      list.append(GRect(xrect.xmin-padding,rect.ymin-padding,xrect.xmax+padding,rect.ymax+padding));
+    }
+  }else
+  {
+    list.append(GRect(rect.xmin-padding,rect.ymin-padding,rect.xmax+padding,rect.ymax+padding));
+  }
+}
+
 void
 DjVuTXT::get_zones(int zone_type, const Zone *parent, GList<Zone *> & zone_list) const 
    // get all the zones of  type zone_type under zone node parent
@@ -439,6 +554,38 @@ DjVuTXT::find_zones(int string_start, int string_length) const
     if (zone_list.size()) break;
   }
   return zone_list;
+}
+
+GList<GRect>
+DjVuTXT::find_text_by_rect(
+  const GRect &box, GUTF8String &text, const int padding) const
+{
+  GList<GRect> retval;
+  int text_start=0;
+  int text_end=0;
+  page_zone.get_text_by_rect(box,text_start,text_end);
+  if(text_start != text_end)
+  {
+    GList<Zone *> zones;
+    page_zone.find_zones(zones,text_start,text_end);
+    GPosition pos=zones;
+    if(pos)
+    {
+      do
+      {
+        if(padding >= 0)
+        {
+          GRect rect;
+          zones[pos]->get_smallest_pad(retval,rect,padding);
+        }else
+        {
+          zones[pos]->get_smallest(retval);
+        }
+      } while(++pos);
+    }
+  }
+  text=textUTF8.substr(text_start,text_end-text_start);
+  return retval;
 }
 
 
