@@ -4,7 +4,7 @@
 //C-              Unauthorized use prohibited.
 //C-
 // 
-// $Id: qd_viewer.cpp,v 1.1 2001-05-30 17:29:32 mchen Exp $
+// $Id: qd_viewer.cpp,v 1.2 2001-06-04 15:18:23 mchen Exp $
 // $Name:  $
 
 
@@ -80,9 +80,6 @@ QDViewer::PluginData::parsePair(const GUTF8String &qname_in, const GUTF8String &
    DEBUG_MAKE_INDENT(3);
 
    DEBUG_MSG("name=" << qname_in << "; " << "value=" << qvalue << "\n");
-//     if ( qname_in.length() && qvalue.length() )
-//        printf("QDViewer::PluginData::parsePair: name=%s; value=%s\n",
-//  	     (const char *)qname_in, (const char *)qvalue);
    
    GUTF8String name=qname_in.downcase();
 

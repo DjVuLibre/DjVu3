@@ -4,7 +4,7 @@
 //C-              Unauthorized use prohibited.
 //C-
 // 
-// $Id: init_qt.cpp,v 1.2 2001-05-30 17:29:33 mchen Exp $
+// $Id: init_qt.cpp,v 1.3 2001-06-04 15:18:24 mchen Exp $
 // $Name:  $
 
 
@@ -20,6 +20,8 @@
 //#include "qt_hack.h"
 #include "debug.h"
 #include "GString.h"
+#include "DjVuMessage.h"
+#include "GURL.h"
 #include "exc_msg.h"
 #include "exc_res.h"
 #include "qx_imager.h"
@@ -164,24 +166,27 @@ InstallLangTranslator(void)
    // get the encoding name of current locale
    QString encoding=QFont::encodingName(char_set);
    
-   // load language translation files 
-   QString lang=getenv("HOME");
-   lang = lang+"/.DjVu/"+"lang_"+encoding+".qm";
-   if(!QFileInfo(lang).isFile())
+   // load language translation files
+   bool have_translation=false;
+   QString lang = "lang_"+encoding+".qm";
+   GList<GURL> paths=DjVuMessage::GetProfilePaths();
+   for(GPosition pos=paths;!have_translation && pos;++pos)
    {
-      lang=QString("/etc/DjVu/")+"lang_"+encoding+".qm";
-      if(!QFileInfo(lang).isFile())
-	 lang=QString::null;
+      const GURL::UTF8 url(GStringFromQString(lang),paths[pos]);
+      if(url.is_file())
+      {
+	 lang=QStringFromGString(url.pathname());
+	 have_translation=true;
+      }
    }
-
-   // no language translation file found 
-   if (lang.isEmpty()) return FALSE;
-
+   if (!have_translation)
+      return FALSE;
+   
    // load locale sepcific font 
    QFont font;
    font.setCharSet(char_set);
 // for testing only 
-#if 0   
+#if 1
    if ( char_set == QFont::Set_Big5 ||
 	char_set == QFont::Big5 )
    {
@@ -199,9 +204,9 @@ InstallLangTranslator(void)
       qApp->removeTranslator( translator );
       delete translator;
    }	
-   translator = new QTranslator( 0 );
-   translator->load( lang );
-   qApp->installTranslator( translator );
+   translator = new QTranslator(0);
+   translator->load(lang);
+   qApp->installTranslator(translator);
 
    return TRUE;
 }
