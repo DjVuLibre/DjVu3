@@ -1,16 +1,8 @@
-/*C-  -*- C++ -*-
-//C-
-//C- Copyright (c) 1999 AT&T Corp.  All rights reserved.
-//C-
-//C- This software may only be used by you under license from AT&T
-//C- Corp. ("AT&T"). A copy of AT&T's Source Code Agreement is available at
-//C- AT&T's Internet website having the URL <http://www.djvu.att.com/open>.
-//C- If you received this software without first entering into a license with
-//C- AT&T, you have an infringing copy of this software and cannot use it
-//C- without violating AT&T's intellectual property rights.
-//C-
-//C- $Id: DjVuMultiAPI.h,v 1.11 2000-01-21 14:46:29 leonb Exp $
-*/
+/*  -*- C++ -*-
+ * Copyright (c) 1999 AT&T Corp.  All rights reserved.
+ * $Id: DjVuMultiAPI.h,v 1.11 2000/01/21 14:46:29 leonb Exp 
+ */
+
 
 #ifndef __DJVUMULTIAPI_H__
 #define __DJVUMULTIAPI_H__
@@ -29,7 +21,10 @@
 
 /* 
  * $Log: DjVuMultiAPI.h,v $
- * Revision 1.11  2000-01-21 14:46:29  leonb
+ * Revision 1.12  2000-01-21 21:09:52  leonb
+ * Replaced initial comment (copyright notice).
+ *
+ * Revision 1.11  2000/01/21 14:46:29  leonb
  * Reinserted #ifdef DOCXX_CODE etc.
  *
  * Revision 1.10  2000/01/21 14:24:56  leonb
