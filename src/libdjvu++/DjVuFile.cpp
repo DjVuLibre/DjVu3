@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.49 1999-09-16 14:00:22 eaf Exp $
+//C- $Id: DjVuFile.cpp,v 1.50 1999-09-16 15:41:43 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -329,9 +329,11 @@ DjVuFile::decode_func(void)
    check();
    DEBUG_MSG("DjVuFile::decode_func() called, url='" << url << "'\n");
    DEBUG_MAKE_INDENT(3);
-   
-      // In case if all reference to this file are suddenly lost
-   GP<DjVuFile> life_saver=this;
+
+      // In the past we used to install a local life saver here. That was
+      // a huge mistake. Even when last external reference to the file
+      // was lost it still continued decoding. Now we just wait in the
+      // destructor for the decoding thread to finish. No life savers.
    decode_life_saver=0;
 
    DjVuPortcaster * pcaster=get_portcaster();
