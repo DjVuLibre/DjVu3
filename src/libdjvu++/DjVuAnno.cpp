@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuAnno.cpp,v 1.33 1999-10-26 21:32:05 eaf Exp $
+//C- $Id: DjVuAnno.cpp,v 1.34 1999-10-26 22:26:47 eaf Exp $
 
 
 #ifdef __GNUC__
@@ -1214,7 +1214,7 @@ chars_equal(char ch1, char ch2, bool match_case)
 
 GList<DjVuTXT::Zone *>
 DjVuTXT::search_string(const char * string, int & from,
-		       bool search_down, bool match_case)
+		       bool search_fwd, bool match_case)
 {
    GList<Zone *> zone_list;
    int string_length = strlen(string);
@@ -1222,12 +1222,15 @@ DjVuTXT::search_string(const char * string, int & from,
 	
    if (string_length==0 || textUTF8.length()==0 ||
        string_length>(int) textUTF8.length())
+   {
+      if (search_fwd) from=textUTF8.length();
+      else from=-1;
       return zone_list;
+   }
 
-   if (from<0 || from>(int) textUTF8.length()-1)
-      from=(int) textUTF8.length()-1;
-
-   if (search_down)
+   if (search_fwd)
+   {
+      if (from<0) from=0;
       while(from<(int) textUTF8.length())
       {
 	 int i;
@@ -1241,7 +1244,9 @@ DjVuTXT::search_string(const char * string, int & from,
 	 }
 	 from++;
       }
-   else
+   } else
+   {
+      if (from>(int) textUTF8.length()-1) from=(int) textUTF8.length()-1;
       while(from>=0)
       {
 	 int i;
@@ -1255,15 +1260,11 @@ DjVuTXT::search_string(const char * string, int & from,
 	 }
 	 from--;
       }
-   
-   if (from==(int) textUTF8.length()-1) from=-1;
+   }
 
    if (found)
    {
       int string_start=from;
-
-      if (search_down) from++;
-      else from--;
 
       int zone_type=CHARACTER;
       while(zone_type>=PAGE)
@@ -1293,9 +1294,6 @@ DjVuTXT::search_string(const char * string, int & from,
    return zone_list;
 }
 
-
-
-
 unsigned int 
 DjVuTXT::get_memory_usage() const
 {
@@ -1315,7 +1313,6 @@ DjVuAnno::decode(ByteStream &bs)
    IFFByteStream iff(bs);
    while( iff.get_chunk(chkid) )
    {
-      fprintf(stderr, "chkid=%s\n", (const char *) chkid);
      if (chkid == "ANTa")
        {
          if (ant) {
