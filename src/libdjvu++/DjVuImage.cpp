@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuImage.cpp,v 1.17 1999-06-09 21:42:36 leonb Exp $
+//C- $Id: DjVuImage.cpp,v 1.18 1999-06-24 15:13:02 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -701,6 +701,7 @@ do_bitmap(const DjVuImage &dimg, BImager get,
   int h = dimg.get_height();
   int rw = all.width();
   int rh = all.height();
+  if (w==0 || h==0) return 0;
   GRect zrect = rect; 
   zrect.translate(-all.xmin, -all.ymin);
   for (red=1; red<=15; red++)
@@ -742,6 +743,7 @@ do_pixmap(const DjVuImage &dimg, PImager get,
   int h = dimg.get_height();
   int rw = all.width();
   int rh = all.height();
+  if (w==0 || h==0) return 0;
   GRect zrect = rect; 
   zrect.translate(-all.xmin, -all.ymin);
   for (red=1; red<=15; red++)
