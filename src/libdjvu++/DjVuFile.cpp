@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.70 1999-10-05 20:30:31 eaf Exp $
+//C- $Id: DjVuFile.cpp,v 1.71 1999-10-07 15:22:22 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -591,6 +591,7 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
       if (anno->tell() & 1)  anno->write((void*)"", 1);
       // Copy data
       anno->copy(iff);
+      desc.format("Page annotations");
     }
 
   else if (chkid == "ANTa")
@@ -605,6 +606,7 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
       iffout.put_chunk(id);
       iffout.copy(iff);
       iffout.close_chunk();
+      desc.format("Page annotations");
     }
   
   // NDIR (obsolete navigation chunk)
