@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GBitmap.h,v 1.10 1999-05-19 18:31:37 leonb Exp $
+//C- $Id: GBitmap.h,v 1.11 1999-05-25 20:36:25 leonb Exp $
 
 #ifndef _GBITMAP_H_
 #define _GBITMAP_H_
@@ -44,7 +44,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: GBitmap.h,v 1.10 1999-05-19 18:31:37 leonb Exp $#
+    #$Id: GBitmap.h,v 1.11 1999-05-25 20:36:25 leonb Exp $#
 
  */
 //@{
@@ -186,6 +186,26 @@ public:
   unsigned int get_memory_usage() const;
   //@}
 
+  /** @name Accessing RLE data.
+      The next two functions are useful for processing bilevel images
+      encoded using the run length encoding scheme.  Both functions return
+      zero if the bitmap is not RLE encoded.  Function \Ref{compress} must
+      be used to ensure that the bitmap is RLE encoded.  */
+  //@{
+  /** Gets the pixels for line #rowno#.  One line of pixel is stored as
+      #unsigned char# values into array #bits#.  Each pixel is either 1 or 0.
+      The array must be large enough to hold the whole line.  The number of
+      pixels is returned. */
+  int rle_get_bits(int rowno, unsigned char *bits) const;
+  /** Gets the lengths of all runs in line #rowno#.  The array #rlens# must be
+      large enough to accomodate #w# integers where #w# is the number of
+      columns in the image.  These integers represent the lengths of
+      consecutive runs of alternatively white or black pixels.  Lengths can be
+      zero in order to allow for lines starting with black pixels.  This
+      function returns the total number of runs in the line. */
+  int rle_get_runs(int rowno, int *rlens) const;
+  //@}
+
   /** @name Additive Blit.  
       The blit functions are designed to efficiently construct an anti-aliased
       image by copying smaller images at predefined locations.  The image of a
@@ -308,9 +328,10 @@ protected:
   unsigned short border;
   unsigned short bytes_per_row;
   unsigned short grays;
-  unsigned char *bytes;
-  unsigned char *bytes_data;
-  unsigned char *rle;
+  unsigned char  *bytes;
+  unsigned char  *bytes_data;
+  unsigned char  *rle;
+  unsigned char  **rlerows;
   unsigned int   rlelength;
 private:
   // helpers
@@ -445,7 +466,6 @@ GBitmap::minborder(int minimum)
         {
           GBitmap tmp(*this, minimum);
           delete [] bytes_data;
-          delete [] rle;
           bytes_per_row = tmp.bytes_per_row;
           bytes = bytes_data = tmp.bytes_data;
           tmp.bytes = tmp.bytes_data = 0;

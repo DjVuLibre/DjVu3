@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GBitmap.cpp,v 1.8 1999-05-25 19:42:28 eaf Exp $
+//C- $Id: GBitmap.cpp,v 1.9 1999-05-25 20:36:25 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -24,7 +24,7 @@
 #include "Arrays.h"
 
 
-// File "$Id: GBitmap.cpp,v 1.8 1999-05-25 19:42:28 eaf Exp $"
+// File "$Id: GBitmap.cpp,v 1.9 1999-05-25 20:36:25 leonb Exp $"
 // - Author: Leon Bottou, 05/1997
 
 // ----- constructor and destructor
@@ -33,21 +33,23 @@ GBitmap::~GBitmap()
 {
   delete [] bytes_data;
   delete [] rle;
+  delete [] rlerows;
   bytes = bytes_data = rle = 0;
+  rlerows = 0;
   rlelength = 0;
 }
 
 GBitmap::GBitmap()
   : nrows(0), ncolumns(0), border(0), 
     bytes_per_row(0), grays(0), bytes(0), bytes_data(0), 
-    rle(0), rlelength(0)
+    rle(0), rlerows(0), rlelength(0)
 {
 }
 
 GBitmap::GBitmap(int nrows, int ncolumns, int border)
   : nrows(0), ncolumns(0), border(0), 
     bytes_per_row(0), grays(0), bytes(0), bytes_data(0), 
-    rle(0), rlelength(0)
+    rle(0), rlerows(0), rlelength(0)
 {
   init(nrows, ncolumns, border);
 }
@@ -55,7 +57,7 @@ GBitmap::GBitmap(int nrows, int ncolumns, int border)
 GBitmap::GBitmap(ByteStream &ref, int border)
   : nrows(0), ncolumns(0), border(0), 
     bytes_per_row(0), grays(0), bytes(0), bytes_data(0),
-    rle(0), rlelength(0)
+    rle(0), rlerows(0), rlelength(0)
 {
   init(ref, border);
 }
@@ -63,7 +65,7 @@ GBitmap::GBitmap(ByteStream &ref, int border)
 GBitmap::GBitmap(const GBitmap &ref)
   : nrows(0), ncolumns(0), border(0), 
     bytes_per_row(0), grays(0), bytes(0), bytes_data(0), 
-    rle(0), rlelength(0)
+    rle(0), rlerows(0), rlelength(0)
 {
   init(ref, ref.border);
 }
@@ -71,7 +73,7 @@ GBitmap::GBitmap(const GBitmap &ref)
 GBitmap::GBitmap(const GBitmap &ref, int border)
   : nrows(0), ncolumns(0), border(0), 
     bytes_per_row(0), grays(0), bytes(0), bytes_data(0),
-    rle(0), rlelength(0)
+    rle(0), rlerows(0), rlelength(0)
 {
   init(ref, border);
 }
@@ -80,7 +82,7 @@ GBitmap::GBitmap(const GBitmap &ref, int border)
 GBitmap::GBitmap(const GBitmap &ref, const GRect &rect, int border)
   : nrows(0), ncolumns(0), border(0), 
     bytes_per_row(0), grays(0), bytes(0), bytes_data(0),
-    rle(0), rlelength(0)
+    rle(0), rlerows(0), rlelength(0)
 {
   init(ref, rect, border);
 }
@@ -97,7 +99,9 @@ GBitmap::init(int arows, int acolumns, int aborder)
 {
   delete [] bytes_data;
   delete [] rle;
+  delete [] rlerows;
   bytes = bytes_data = rle = 0;
+  rlerows = 0;
   grays = 2;
   nrows = arows;
   ncolumns = acolumns;
@@ -224,7 +228,9 @@ GBitmap::borrow_data(unsigned char *data, int w, int h)
 {
   delete [] bytes_data;
   delete [] rle;
+  delete [] rlerows;
   bytes = bytes_data = rle = 0;
+  rlerows = 0;
   grays = 2;
   nrows = h;
   ncolumns = w;
@@ -240,7 +246,9 @@ GBitmap::borrow_rle(unsigned char *rledata, unsigned int rledatalen, int w, int 
 {
   delete [] bytes_data;
   delete [] rle;
+  delete [] rlerows;
   bytes = bytes_data = rle = 0;
+  rlerows = 0;
   grays = 2;
   nrows = h;
   ncolumns = w;
@@ -273,6 +281,8 @@ GBitmap::compress()
   if (!bytes)
     return;
   delete [] rle;
+  delete [] rlerows;
+  rlerows = 0;
   rlelength = encode(&rle);
   delete [] bytes_data;
   bytes = bytes_data = 0;
@@ -826,6 +836,95 @@ GBitmap::save_rle(ByteStream &bs)
 }
 
 
+// ------ runs
+
+
+static unsigned char **
+makerows(int nrows, int ncolumns, unsigned char *runs)
+{
+  int r = nrows;
+  unsigned char **rlerows = new (unsigned char*)[nrows];
+  while (r-- > 0)
+    {
+      int c=0;
+      rlerows[r] = runs;
+      while (c<ncolumns)
+        {
+          int x = *runs++;
+          if (x>=0xC0)
+            x = ((x&0x3f)<<8) | (*runs++);
+          c += x;
+          if (c > ncolumns)
+            THROW("(GBitmap::decode) RLE synchronization lost");
+        }
+    }
+  return rlerows;
+}
+
+
+int 
+GBitmap::rle_get_bits(int rowno, unsigned char *bits) const
+{
+  if (!rle)
+    return 0;
+  if (rowno<0 || rowno>=nrows)
+    return 0;
+  if (!rlerows)
+    *(unsigned char***)&rlerows = makerows(nrows,ncolumns,rle);
+  int n = 0;
+  int p = 0;
+  int c = 0;
+  unsigned char *runs = rlerows[rowno];
+  while (c < ncolumns)
+    {
+      int x = *runs++;
+      if (x>=0xC0)
+        x = ((x&0x3f)<<8) | (*runs++);
+      c += x;
+      if (c>ncolumns)
+        c = ncolumns;
+      while (n<c)
+        bits[n++] = p;
+      p = 1-p;
+    }
+  return n;
+}
+
+
+int 
+GBitmap::rle_get_runs(int rowno, int *rlens) const
+{
+  if (!rle)
+    return 0;
+  if (rowno<0 || rowno>=nrows)
+    return 0;
+  if (!rlerows)
+    *(unsigned char***)&rlerows = makerows(nrows,ncolumns,rle);
+  int n = 0;
+  int d = 0;
+  int c = 0;
+  unsigned char *runs = rlerows[rowno];
+  while (c < ncolumns)
+    {
+      int x = *runs++;
+      if (x>=0xC0)
+        x = ((x&0x3f)<<8) | (*runs++);
+      c += x;
+      if (n>0 && !x)
+        {
+          n--;
+          d = d-rlens[n];
+        }
+      else 
+        {
+          rlens[n++] = c-d;
+          d = c;
+        }
+    }
+  return n;
+}
+
+
 // ------ helpers
 
 int
@@ -866,13 +965,15 @@ GBitmap::encode(unsigned char **pruns) const
               while (c<ncolumns && !row[c]) 
                 x++, c++;            
             }
-          if (x >= 0x4000)
-            THROW("RLE: run length overflow");
-          if (pos >= size)
+          while (x >= 0x4000)
             {
-              size = (size < 1024 ? 1024 : size + size);
-              runs.resize(0,size);
+              runs.touch(pos+2);
+              runs[pos++] = 0xFF;
+              runs[pos++] = 0xFF;
+              runs[pos++] = 0;
+              x -= 0x3FFF;
             }
+          runs.touch(pos+1);
           if (x >= 0xC0) 
             runs[pos++] = (x>>8 | 0xc0);
           runs[pos++] = x & 0xFF;
@@ -927,9 +1028,10 @@ GBitmap::decode(unsigned char *runs)
         }
     }
   // Free rle data possibly attached to this bitmap
-  if (rle)
-    delete [] rle;
+  delete [] rle;
+  delete [] rlerows;
   rle = 0;
+  rlerows = 0;
   rlelength = 0;
 #ifdef DEBUG
   check_border();
