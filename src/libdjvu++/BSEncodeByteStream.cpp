@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: BSEncodeByteStream.cpp,v 1.1 2001-03-06 19:55:41 bcr Exp $
+// $Id: BSEncodeByteStream.cpp,v 1.2 2001-03-28 00:04:06 mchen Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 07/1998
@@ -761,7 +761,7 @@ BSByteStream::Encode::encode()
   /////////////////////////////////
   ////////////  Block Sort Tranform
 
-  int markerpos = --size;
+  int markerpos = size-1;
   blocksort(data,size,markerpos);
 
   /////////////////////////////////
