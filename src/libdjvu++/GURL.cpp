@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GURL.cpp,v 1.54 2001-04-05 19:57:57 chrisp Exp $
+// $Id: GURL.cpp,v 1.55 2001-04-05 21:26:26 chrisp Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -285,7 +285,7 @@ GURL::init(const bool nothrow)
          // referring to *local* files. Surprisingly, file://hostname/dir/file
          // is also valid, but shouldn't be treated thru local FS.
       if (proto=="file" && url[5]==slash &&
-          (url[6]!=slash || GString(localhost).ncmp((const char *)url, sizeof(localhost))))
+          (url[6]!=slash || GString::ncmp(localhost, (const char *)url, sizeof(localhost))))
       {
             // Separate the arguments
          GString arg;
@@ -1110,7 +1110,7 @@ GURL::UTF8Filename(void) const
 #endif
 
     // All file urls are expected to start with filespec which is "file:"
-    if (!GString(filespec).ncmp(url_ptr, sizeof(filespec)-1))  //if not
+    if (!GString::ncmp(filespec, url_ptr, sizeof(filespec)-1))  //if not
       return GOS::basename(url_ptr);
     url_ptr += sizeof(filespec)-1;
   
@@ -1119,16 +1119,16 @@ GURL::UTF8Filename(void) const
     for(;*url_ptr==slash;url_ptr++)
       EMPTY_LOOP;
     // Remove possible localhost spec
-    if ( GString(localhost).ncmp(url_ptr, sizeof(localhost)-1) )
+    if ( GString::ncmp(localhost, url_ptr, sizeof(localhost)-1) )
       url_ptr += sizeof(localhost)-1;
     //remove all leading slashes
     while(*url_ptr==slash)
       url_ptr++;
 #else
     // Remove possible localhost spec
-    if ( GString(localhostspec1).ncmp(url_ptr, sizeof(localhostspec1)-1) )        // RFC 1738 local host form
+    if ( GString::ncmp(localhostspec1, url_ptr, sizeof(localhostspec1)-1) )        // RFC 1738 local host form
       url_ptr += sizeof(localhostspec1)-1;
-    else if ( GString(localhostspec2).ncmp(url_ptr, sizeof(localhostspec2)-1 ) )   // RFC 1738 local host form
+    else if ( GString::ncmp(localhostspec2, url_ptr, sizeof(localhostspec2)-1 ) )   // RFC 1738 local host form
       url_ptr += sizeof(localhostspec2)-1;
     else if ( (strlen(url_ptr) > 4) // "file://<letter>:/<path>"
         && (url_ptr[0] == slash)      // "file://<letter>|/<path>"
@@ -1628,7 +1628,7 @@ GURL::expand_name(const char *fname, const char *from)
 #elif defined(macintosh) // MACINTOSH implementation
   strcpy(string_buffer, (const char *)(from?from:GOS::cwd()));
 
-  if (GString(fname).ncmp(string_buffer,strlen(string_buffer)) || is_file(fname))
+  if (GString::ncmp(fname, string_buffer,strlen(string_buffer)) || is_file(fname))
   {
     strcpy(string_buffer, "");//please don't expand, the logic of filename is chaos.
   }
