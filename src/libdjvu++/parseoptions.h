@@ -6,7 +6,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: parseoptions.h,v 1.6 1999-11-12 16:45:55 bcr Exp $
+//C- $Id: parseoptions.h,v 1.7 1999-11-14 05:55:21 bcr Exp $
 
 #endif /* __cplusplus */
 
@@ -177,7 +177,7 @@
 //
 // \end{verbatim} */
 //** @memo parseoptions header file */
-//** @version $Id: parseoptions.h,v 1.6 1999-11-12 16:45:55 bcr Exp $ */
+//** @version $Id: parseoptions.h,v 1.7 1999-11-14 05:55:21 bcr Exp $ */
 //** @author: $Author: bcr $ */
 
 // First we include some C wrappers for our class.
@@ -211,6 +211,10 @@ extern "C" {
 
     /* This is a wrapper for the C++ DjVuParseOptions constructor  */
   struct djvu_parse
+  djvu_parse_config(const char [],const char []);
+
+    /* This is a wrapper for the C++ DjVuParseOptions constructor  */
+  struct djvu_parse
   djvu_parse_copy(const struct djvu_parse);
 
     /* This is a wrapper for the DjVuParseOptions::ChangeProfile function. */
@@ -230,7 +234,7 @@ extern "C" {
   djvu_parse_integer(struct djvu_parse,const char [],const int);
 
     /* This is a wrapper for the DjVuParseOptions::ParseArguments function */
-  void
+  int
   djvu_parse_arguments
   (struct djvu_parse,int,char * const [],const struct djvu_option []);
 
@@ -245,6 +249,10 @@ extern "C" {
     /* This is a wrapper for the DjVuParseOptions::perror function */
   void
   djvu_parse_perror(struct djvu_parse);
+
+    /* This is a wrapper for the DjVuParseOptions::ConfigFilename function */
+  const char *
+  djvu_parse_configfile(struct djvu_parse,const char[],int);
 
 #ifdef __cplusplus
 };
@@ -262,6 +270,7 @@ private: // These are just class declarations.
   friend GetOpt;
 
 private:
+  char *filename; // This is the name of the function.
   char *name; // This is the name of the function.
   int defaultProfile;
   int currentProfile;
@@ -276,7 +285,10 @@ public:
   ~DjVuParseOptions();
 
   //** This is the normal constructor.  A profile name must be specified.   */
-  DjVuParseOptions(const char []); // This is the normal constructor.
+  DjVuParseOptions(const char []);
+
+  //** This constructor is for using an alternate configuration file */
+  DjVuParseOptions(const char [],const char []);
 
   //** This is a copy constructor.  Arguments, and ErrorLists are not       */
   //** copied.   VarTokens, ProfileTokens, and Configuration are copied by  */
@@ -378,11 +390,16 @@ public:
   //** This is the primary function for reading command  line arguments.  */
   int ParseArguments(const int,char * const [],const djvu_option [],const int=0);
 
+  //** Get the name of the last configuration file corresponding to the profile */
+  const char * const ConfigFilename(const char [],int);
+
 private:
-  void Add(const char [],const int,const int,const int,const char []);
-  int ReadConfig(const char prog[]);
-  int ReadNextConfig(const char filename[],int &,const char prog[],FILE *f);
-  void ReadFile(const char [],int &,FILE *f,const int profile);
+  void Add(const int,const int,const int,const char []);
+  int ReadConfig(const char[],const char []);
+  inline int ReadConfig(const char name[]) 
+  { return ReadConfig(name,""); }
+  int ReadNextConfig(int &,const char prog[],FILE *f);
+  void ReadFile(int &,FILE *f,const int profile);
   void Init(const char[],const int,const char * const [],const djvu_option []);
   FILE *OpenConfig(const char prog[]);
   void AmbiguousOptions(const int,const char[],const int,const char[]);

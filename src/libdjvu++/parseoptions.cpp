@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: parseoptions.cpp,v 1.8 1999-11-12 16:45:55 bcr Exp $
+//C- $Id: parseoptions.cpp,v 1.9 1999-11-14 05:55:21 bcr Exp $
 #ifdef __GNUC__
 #pragma implementation
 #endif
@@ -36,7 +36,6 @@ static const char default_string[]=DEFAULT_STRING;
 // These are some static functions we need.  They don't need access to class
 // variables so, there is no need to messup the class declarations with them.
 //
-static FILE *OpenConfigFile(const char[],char **filename);
 static int ReadEscape(FILE *f,int &line);
 
 //////////////////////////////////////////////////////////////////////////
@@ -49,6 +48,14 @@ djvu_parse_init(const char name[])
 {
   struct djvu_parse retval;    
   retval.Private=new DjVuParseOptions(name);
+  return retval; // Return by reference.
+}
+
+struct djvu_parse
+djvu_parse_config(const char config[],const char name[]) 
+{
+  struct djvu_parse retval;    
+  retval.Private=new DjVuParseOptions(config,name);
   return retval; // Return by reference.
 }
 
@@ -90,11 +97,11 @@ djvu_parse_integer(struct djvu_parse opts,const char name[],const int errval)
 }
 
   /* This is a wrapper for the DjVuParseOptions::ParseArguments function */
-void
+int
 djvu_parse_arguments
 (struct djvu_parse opts,int argc,char * const argv[],const struct djvu_option lopts[])
 {
-  ((DjVuParseOptions *)(opts.Private))->ParseArguments(argc,argv,lopts);
+  return ((DjVuParseOptions *)(opts.Private))->ParseArguments(argc,argv,lopts);
 }
 
   /* This is a wrapper for the DjVuParseOptions::HasError function */
@@ -118,6 +125,12 @@ djvu_parse_perror(struct djvu_parse opts)
   return ((DjVuParseOptions *)(opts.Private))->perror();
 }
 
+  /* This is a wrapper for the DjVUParseOptions::ConfigFilename funciton */
+const char *
+djvu_parse_configfile(struct djvu_parse opts,const char *name,int which)
+{
+  return ((DjVuParseOptions *)(opts.Private))->ConfigFilename(name,which);
+}
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -137,12 +150,36 @@ DjVuParseOptions::DjVuParseOptions
   Configuration=new ProfileList;
   Arguments=new Profiles;
   Errors=new ErrorList;
+  defaultProfile=ReadConfig(default_string);
   const char *progname=strrchr(prog,'/');
   progname=progname?(progname+1):prog;
-  name=new char [strlen(progname)+1];
-  strcpy(name,progname);
-  defaultProfile=ReadConfig(default_string);
+  int namelen=strlen(progname),i;
+  name=new char [namelen+1];
+  for(i=0;i<namelen;i++)
+  {
+    name[i]=tolower(progname[i]);
+  }
+  name[i]=0;
+  if(namelen > 4 && !strcasecmp(name+namelen-4,".exe"))
+  {
+    name[namelen-4]=0;
+  }
   currentProfile=ReadConfig(name);
+}
+
+DjVuParseOptions::DjVuParseOptions 
+(const char readfilename[],const char readasprofile[])
+{
+  VarTokens=new DjVuTokenList;
+  ProfileTokens=new DjVuTokenList;
+  Configuration=new ProfileList;
+  Arguments=new Profiles;
+  Errors=new ErrorList;
+  name=new char [strlen(readasprofile)+1];
+  strcpy(name,readasprofile);
+  filename=0;
+  defaultProfile=ReadConfig(default_string);
+  currentProfile=ReadConfig(readfilename,readasprofile);
 }
 
 // This is a simple copy constructor.
@@ -162,6 +199,8 @@ DjVuParseOptions::DjVuParseOptions
   Arguments=new Profiles;
   name=new char [strlen(Original.name)+1];
   strcpy(name,Original.name);
+  filename=new char [strlen(Original.filename)+1];
+  strcpy(filename,Original.filename);
 }
 
 // This is the corresponding destructor.
@@ -174,6 +213,7 @@ DjVuParseOptions::~DjVuParseOptions()
   delete Arguments;
   delete Errors;
   delete [] name;
+  delete [] filename;
 }
 
 // This changes the current profile
@@ -389,7 +429,7 @@ void DjVuParseOptions::perror()
 //
 void
 DjVuParseOptions::Add
-(const char filename[],const int line,const int profile,const int var,const char value[])
+(const int line,const int profile,const int var,const char value[])
 {
   if(var<0)
   {
@@ -414,7 +454,7 @@ DjVuParseOptions::Add
 //
 int
 DjVuParseOptions::ReadConfig
-(const char prog[])
+(const char prog[],const char readasprofile[])
 {
 #ifdef THREADMODEL
 #if THREADMODEL!=NOTHREADS
@@ -422,21 +462,36 @@ DjVuParseOptions::ReadConfig
   GCriticalSectionLock(locking);
 #endif /* THREADMODEL */
 #endif
-  const char *xname=strrchr(prog,'/');
-  xname=xname?(xname+1):prog;
-  const int retval=ProfileTokens->SetToken(xname);
-  int profile=retval;
-	// First check and see if we have already read in this profile.
-  if(Configuration->Grow(profile+1))
+  int retval;
+  int line=1;
+  if(readasprofile[0])
   {
-    int line=1;
-    char *filename;
-    FILE *f=OpenConfigFile(xname,&filename);
+    delete [] filename;
+    filename=new char [strlen(prog)+1];
+    strcpy(filename,prog);
+    FILE *f=fopen(filename,"r");
+    retval=ProfileTokens->SetToken(readasprofile);
+    (void)(Configuration->Grow(retval+1));
     if(f)
     {
-      ReadFile(filename,line,f,profile);
+      ReadFile(line,f,retval);
       fclose(f);
-      delete [] filename;
+    }
+  }else
+  {
+    const char *xname=strrchr(prog,'/');
+    xname=xname?(xname+1):prog;
+    retval=ProfileTokens->SetToken(xname);
+	// First check and see if we have already read in this profile.
+    if(Configuration->Grow(retval+1))
+    {
+      FILE *f=0;
+      if(((ConfigFilename(xname,0)&&(f=fopen(filename,"r"))))
+        ||((ConfigFilename(xname,1)&&(f=fopen(filename,"r")))))
+      {
+        ReadFile(line,f,retval);
+        fclose(f);
+      }
     }
   }
   return retval;
@@ -447,7 +502,7 @@ DjVuParseOptions::ReadConfig
 // 
 int
 DjVuParseOptions::ReadNextConfig
-(const char filename[],int &line,const char prog[],FILE *f)
+(int &line,const char prog[],FILE *f)
 {
   const char *xname=strrchr(prog,'/');
   xname=xname?(xname+1):prog;
@@ -459,7 +514,7 @@ DjVuParseOptions::ReadNextConfig
     profile=(-1);
   }else if(f)
   {
-    ReadFile(filename,line,f,profile);
+    ReadFile(line,f,profile);
   }
   return retval;
 }
@@ -494,7 +549,7 @@ DjVuParseOptions::ReadNextConfig
 
 void
 DjVuParseOptions::ReadFile
-(const char filename[],int &line,FILE *f,const int profile)
+(int &line,FILE *f,const int profile)
 {
   int c;
   char *value=new char[local_bufsize];
@@ -570,7 +625,7 @@ DjVuParseOptions::ReadFile
                 case ':': // This indicates the start of a new profile...
                   if(value[0] &&(c!=EOF))
                   {
-                    ReadNextConfig(filename,line,value,f);
+                    ReadNextConfig(line,value,f);
                     value[0]=0;
                     s=value;
                     state=READ_EOL;
@@ -587,7 +642,7 @@ DjVuParseOptions::ReadFile
                   {
                     var=(-1);
                     state=READ_EOL;
-                    Add(filename,startline,profile,var,value);
+                    Add(startline,profile,var,value);
                   }
                   s=value;
                   s_end=0;
@@ -650,7 +705,7 @@ DjVuParseOptions::ReadFile
                     s[0]=0;
                   }
                   state=READ_EOL;
-                  Add(filename,startline,profile,var,value);
+                  Add(startline,profile,var,value);
                   var=(-1);
                   value[0]=0;
                   break;
@@ -703,11 +758,11 @@ DjVuParseOptions::ReadFile
           const char *v=VarTokens->GetString(var);
           char *r=new char [strlen(v)+strlen(value)+2];
           sprintf(r,"%s=%s",v,value);
-          Add(filename,startline,profile,-1,r);
+          Add(startline,profile,-1,r);
           delete [] r;
         }else
         {
-          Add(filename,startline,profile,var,value);
+          Add(startline,profile,var,value);
         }
       }
     }
@@ -859,73 +914,63 @@ DjVuParseOptions::ProfileList::Add
   }
 }
 
-// This routine searches for a configure file in the user's home directory
-// and then the root configuration directory and the and opens it.
-// The opened FILE pointer is returned if successfull, otherwise NULL is
-// returned.
-//
-static FILE *
-OpenConfigFile
-(const char config[],char **filename)
+const char * const
+DjVuParseOptions::ConfigFilename
+(const char config[],int level)
 {
-  FILE *retval=0;
-  static char nill[]="";
-  static char *home=0;
-  if(config[0])
-  {  // First, we find the user's home directory.
+  const char *this_config=config[0]?config:default_string;
+  delete [] filename;
+  filename=0;
+  if(!level)
+  {
+    static const char *home=0;
     if(!home)
     {
-      home=nill;
-      struct passwd *pw=getpwuid(getuid());
-      if(pw && pw->pw_dir)
+      if(!((home=getenv("HOME"))&&(home[0]=='/')))
       {
-        if(pw->pw_dir[0] == '/')
+        static const char nill[]="";
+        home=nill;
+        struct passwd *pw=getpwuid(getuid());
+        if(pw && pw->pw_dir)
         {
-          strcpy(home=new char [strlen(pw->pw_dir)+sizeof(LocalDjVuDir)],pw->pw_dir);
-          strcat(home,LocalDjVuDir);
-        }
-      }else
-      {
-        char *envhome=getenv("HOME");
-        if(envhome && envhome[0] == '/')
-        {
-          strcpy(home=new char [strlen(envhome)+sizeof(LocalDjVuDir)],envhome);
-          strcat(home,LocalDjVuDir);
+          if(pw->pw_dir[0] == '/')
+          {
+            char *s=new char [strlen(pw->pw_dir)+1];
+            strcpy(s,pw->pw_dir);
+            home=s;
+          }
         }
       }
     }
-    if(home != nill)
+    if(home[0])
     {
-      char *configfile=new char [strlen(home)+strlen(config)+sizeof(ConfigExt)];
-      strcpy(configfile,home);
-      strcat(configfile,config);
-      strcat(configfile,ConfigExt);
-      retval=fopen(configfile,"r");
-      if(filename)
+      filename=new char [strlen(home)+sizeof(LocalDjVuDir)+strlen(this_config)+sizeof(ConfigExt)];
+      strcpy(filename,home);
+      strcat(filename,LocalDjVuDir);
+      strcat(filename,this_config);
+      strcat(filename,ConfigExt);
+    }
+  }else
+  {
+    static int rootlen=sizeof(RootDjVuDir)-1;
+    static const char *root=0;
+    if(!root)
+    {
+      root=getenv("DJVU_CONFIG_DIR");
+      if(!(root&&(root[0]=='/')))
       {
-        filename[0]=configfile;
+        root=RootDjVuDir;
       }else
       {
-        delete [] configfile;
+        rootlen=strlen(root);
       }
     }
-    if(!retval)
-    {
-      char *configfile=new char [sizeof(RootDjVuDir)+strlen(config)+sizeof(ConfigExt)];
-      strcpy(configfile,RootDjVuDir);
-      strcat(configfile,config);
-      strcat(configfile,ConfigExt);
-      retval=fopen(configfile,"r");
-      if(filename)
-      {
-        filename[0]=configfile;
-      }else
-      {
-        delete [] configfile;
-      }
-    }
+    filename=new char [rootlen+strlen(this_config)+sizeof(ConfigExt)];
+    strcpy(filename,root);
+    strcat(filename,this_config);
+    strcat(filename,ConfigExt);
   }
-  return retval;
+  return filename;
 }
 
 static int
