@@ -13,7 +13,7 @@
 <DT>
 
 <IMG ALT="o" BORDER=0 SRC=icon1.gif><A NAME="IFFByteStream"></A>
-<B>class  </B><A HREF=IFFByteStream.html><B>IFFByteStream</B></A><B>: public ByteStream::Wrapper</B><DD><I>ByteStream interface for an IFF file.</I>
+<B>class  </B><A HREF=IFFByteStream.html><B>IFFByteStream</B></A><B>: public <!1><A HREF="ByteStream.html">ByteStream</A></B><DD><I>ByteStream interface for an IFF file.</I>
 </DL>
 <A NAME="DOC.DOCU">
 <BLOCKQUOTE>
@@ -39,26 +39,26 @@ data until reaching the end of the chunk.  The utility program
 Class <TT>IFFByteStream</TT> repositions the underlying ByteStream whenever a new
 chunk is accessed.  It is possible to code chunk data with the ZP-Coder
 without worrying about the final file position. See class <!1><A HREF="ZPCodec.html">ZPCodec</A>
-for more details.<P><B>DjVu IFF Files</B> --- We had initially planned to exactly follow the
+for more details.<P><B>AT&amp;T IFF Files</B> --- We had initially planned to exactly follow the
 IFF specifications.  Then we realized that certain versions of MSIE
 recognize any IFF file as a Microsoft AIFF sound file and pop a message
 box "Cannot play that sound".  It appears that the structure of AIFF files
 is entirely modeled after the IFF standard, with small variations
 regarding the endianness of numbers and the padding rules.  We eliminate
-this problem by casting the octet protection spell.  Our IFF files always
-start with the four octets <TT>0x41,0x54,0x26,0x54</TT> followed by the fully
-conformant IFF byte stream.  Class <TT>IFFByteStream</TT> silently skips these
-four octets when it encounters them.<P><B>References</B> --- EA IFF 85 Interchange File Format specification:<BR>
+this problem by casting the AT&amp;T protection spell.  Our IFF files always
+start with the four octets <TT>&quot;AT&amp;T&quot;</TT> followed by the fully conformant IFF
+byte stream.  Class <TT>IFFByteStream</TT> silently skips these four
+octets when it encounters them.<P><B>References</B> --- EA IFF 85 Interchange File Format specification:<BR>
 <A HREF=http://www.cica.indiana.edu/graphics/image_specs/ilbm.format.txt>http://www.cica.indiana.edu/graphics/image_specs/ilbm.format.txt</A> or
 <A HREF=http://www.tnt.uni-hannover.de/soft/compgraph/fileformats/docs/iff.pre>http://www.tnt.uni-hannover.de/soft/compgraph/fileformats/docs/iff.pre</A><P></BLOCKQUOTE>
 <DL><DT><DT><B>Author:</B><DD>L&eacute;on Bottou &lt;leonb@research.att.com&gt;
 
-<DT><B>Version:</B><DD><TT>$Id: IFFByteStream.h.html,v 1.13 2001-08-08 18:17:07 docbill Exp $</TT> 
+<DT><B>Version:</B><DD><TT>$Id: IFFByteStream.h.html,v 1.4 2001-08-08 17:54:16 docbill Exp $</TT> 
 <DD></DL><P><I><A HREF="index.html">Alphabetic index</A></I> <I><A HREF="HIER.html">Hierarchy of classes</A></I></P><HR>
 <!-- This is were the DOC++ footer is defined  -->
 
 <font face="arial,helvetica" size="2">
-<a href=http://www.lizardtech.com>DjVu</a> is a trademark of LizardTech, Inc.  
+<a href=http://www.djvu.att.com>DjVu</a> is a trademark of AT&amp;T.  
 <br>All other products mentioned are registered trademarks or trademarks of
 their respective companies.
 </font>

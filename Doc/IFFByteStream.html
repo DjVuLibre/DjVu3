@@ -5,16 +5,16 @@
 </HEAD>
 <BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
 
-<H2>class  <A HREF="#DOC.DOCU">IFFByteStream</A>: public ByteStream::Wrapper</H2>
+<H2>class  <A HREF="#DOC.DOCU">IFFByteStream</A>: public <!1><A HREF="ByteStream.html">ByteStream</A></H2>
 <BLOCKQUOTE>ByteStream interface for an IFF file.</BLOCKQUOTE>
 <HR>
 
 <H2>Inheritance:</H2>
-<APPLET CODE="ClassGraph.class" WIDTH=600 HEIGHT=65>
-<param name=classes value="MByteStream::Wrapper,M,CIFFByteStream,MIFFByteStream.html">
-<param name=before value="M,M">
-<param name=after value="Md_,M">
-<param name=indent value="0,1">
+<APPLET CODE="ClassGraph.class" WIDTH=600 HEIGHT=95>
+<param name=classes value="CGPEnabled,MGPEnabled.html,CByteStream,MByteStream.html,CIFFByteStream,MIFFByteStream.html">
+<param name=before value="M,M,M">
+<param name=after value="Md_SP,Md_,M">
+<param name=indent value="0,1,2">
 <param name=arrowdir value="down">
 </APPLET>
 <HR>
@@ -22,41 +22,124 @@
 <DL>
 <P><DL>
 <DT><H3>Public Fields</H3><DD><DT>
-<A HREF="#DOC.1.4.15.1.11"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>bool <B>has_magic</B>
+<A HREF="#DOC.1.5.13.1.11"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>bool <B>has_magic</B>
 <DD><I><TT>has_magic</TT> is true if the stream has the DjVu file magic</I>
 </DL></P>
 
 <P><DL>
 <DT><H3>Public Methods</H3><DD><DT>
-<A HREF="#DOC.1.4.15.1.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="IFFByteStream.html">IFFByteStream</A>&gt;  <B>create</B>(<!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="ByteStream.html">ByteStream</A>&gt; bs)
+<A HREF="#DOC.1.5.13.1.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>IFFByteStream</B>(<!1><A HREF="ByteStream.html">ByteStream</A> &amp;bs)
 <DD><I>Constructs an IFFByteStream object attached to ByteStream <TT>bs</TT>.</I>
 <DT>
-<A HREF="#DOC.1.4.15.1.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_chunk</B>(<!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;chkid, int *rawoffsetptr=0, int *rawsizeptr=0)
+<A HREF="#DOC.1.5.13.1.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_chunk</B>(<!1><A HREF="GString.html">GString</A> &amp;chkid, int *rawoffsetptr=0, int *rawsizeptr=0)
 <DD><I>Enters a chunk for reading.</I>
 <DT>
-<A HREF="#DOC.1.4.15.1.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>put_chunk</B>(const char *chkid, int insertmagic=0)
+<A HREF="#DOC.1.5.13.1.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>put_chunk</B>(const char *chkid, int insertmagic=0)
 <DD><I>Enters a chunk for writing.</I>
 <DT>
-<A HREF="#DOC.1.4.15.1.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>close_chunk</B>()
+<A HREF="#DOC.1.5.13.1.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>close_chunk</B>()
 <DD><I>Leaves the current chunk.</I>
 <DT>
-<A HREF="#DOC.1.4.15.1.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>seek_close_chunk</B>()
+<A HREF="#DOC.1.5.13.1.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>seek_close_chunk</B>()
 <DD><I>This is identical to the above, plus it adds a seek to the start of the next chunk.</I>
 <DT>
-<A HREF="#DOC.1.4.15.1.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>ready</B>()
+<A HREF="#DOC.1.5.13.1.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>ready</B>()
 <DD><I>Returns true when it is legal to call <TT>read</TT> or <TT>write</TT>.</I>
 <DT>
-<A HREF="#DOC.1.4.15.1.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>composite</B>()
+<A HREF="#DOC.1.5.13.1.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>composite</B>()
 <DD><I>Returns true when the current chunk is a composite chunk.</I>
 <DT>
-<A HREF="#DOC.1.4.15.1.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>short_id</B>(<!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;chkid)
+<A HREF="#DOC.1.5.13.1.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>short_id</B>(<!1><A HREF="GString.html">GString</A> &amp;chkid)
 <DD><I>Returns the current chunk identifier of the current chunk.</I>
 <DT>
-<A HREF="#DOC.1.4.15.1.9"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>full_id</B>(<!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;chkid)
+<A HREF="#DOC.1.5.13.1.9"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>full_id</B>(<!1><A HREF="GString.html">GString</A> &amp;chkid)
 <DD><I>Returns the qualified chunk identifier of the current chunk.</I>
 <DT>
-<A HREF="#DOC.1.4.15.1.10"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   int <B>check_id</B>(const char *id)
+<A HREF="#DOC.1.5.13.1.10"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   int <B>check_id</B>(const char *id)
 <DD><I>Checks a potential chunk identifier.</I>
+</DL></P>
+
+</DL>
+<HR><H3>Inherited from <A HREF="ByteStream.html">ByteStream</A>:</H3>
+<DL>
+<P><DL>
+<DT><H3>Public</H3><DD><DT>
+<P> <B>Virtual Functions.</B>
+<P><DL>
+<DT>
+<A HREF="#DOC.1.5.12.1.1.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   <B>~ByteStream</B>()
+<DD><I>Virtual destructor.</I>
+<DT>
+<A HREF="#DOC.1.5.12.1.1.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   size_t <B>read</B>(void *buffer, size_t <!1><A HREF="ByteStream.html#DOC.1.5.12.1.2.12">size</A>)
+<DD><I>Reads data from a ByteStream.</I>
+<DT>
+<A HREF="#DOC.1.5.12.1.1.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   size_t <B>write</B>(const void *buffer, size_t <!1><A HREF="ByteStream.html#DOC.1.5.12.1.2.12">size</A>)
+<DD><I>Writes data to a ByteStream.</I>
+<DT>
+<A HREF="#DOC.1.5.12.1.1.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   long <B>tell</B>(void) const 
+<DD><I>Returns the offset of the current position in the ByteStream.</I>
+<DT>
+<A HREF="#DOC.1.5.12.1.1.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   int <B>seek</B>(long offset, int whence = SEEK_SET, bool nothrow=false)
+<DD><I>Sets the current position for reading or writing the ByteStream.</I>
+<DT>
+<A HREF="#DOC.1.5.12.1.1.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>flush</B>(void)
+<DD><I>Flushes all buffers in the ByteStream.</I>
+</DL></P>
+<DT>
+<P> <B>Utility Functions.  </B>
+<P><DL>
+<DT>
+<A HREF="#DOC.1.5.12.1.2.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>size_t <B>readall</B>(void *buffer, size_t <!1><A HREF="ByteStream.html#DOC.1.5.12.1.2.12">size</A>)
+<DD><I>Reads data and blocks until everything has been read.</I>
+<DT>
+<A HREF="#DOC.1.5.12.1.2.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>size_t <B>writall</B>(const void *buffer, size_t <!1><A HREF="ByteStream.html#DOC.1.5.12.1.2.12">size</A>)
+<DD><I>Writes data and blocks until everything has been written.</I>
+<DT>
+<A HREF="#DOC.1.5.12.1.2.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>size_t <B>copy</B>(<!1><A HREF="ByteStream.html">ByteStream</A> &amp;bsfrom, size_t <!1><A HREF="ByteStream.html#DOC.1.5.12.1.2.12">size</A>=0)
+<DD><I>Copy data from another ByteStream.</I>
+<DT>
+<A HREF="#DOC.1.5.12.1.2.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>write8</B>(unsigned int card8)
+<DD><I>Writes a one-byte integer to a ByteStream.</I>
+<DT>
+<A HREF="#DOC.1.5.12.1.2.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>write16</B>(unsigned int card16)
+<DD><I>Writes a two-bytes integer to a ByteStream.</I>
+<DT>
+<A HREF="#DOC.1.5.12.1.2.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>write24</B>(unsigned int card24)
+<DD><I>Writes a three-bytes integer to a ByteStream.</I>
+<DT>
+<A HREF="#DOC.1.5.12.1.2.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>write32</B>(unsigned int card32)
+<DD><I>Writes a four-bytes integer to a ByteStream.</I>
+<DT>
+<A HREF="#DOC.1.5.12.1.2.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>unsigned int <B>read8</B>()
+<DD><I>Reads a one-byte integer from a ByteStream.</I>
+<DT>
+<A HREF="#DOC.1.5.12.1.2.9"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>unsigned int <B>read16</B>()
+<DD><I>Reads a two-bytes integer from a ByteStream.</I>
+<DT>
+<A HREF="#DOC.1.5.12.1.2.10"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>unsigned int <B>read24</B>()
+<DD><I>Reads a three-bytes integer from a ByteStream.</I>
+<DT>
+<A HREF="#DOC.1.5.12.1.2.11"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>unsigned int <B>read32</B>()
+<DD><I>Reads a four-bytes integer from a ByteStream.</I>
+<DT>
+<A HREF="#DOC.1.5.12.1.2.12"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   int <B>size</B>(void) const 
+<DD><I>Returns the total number of bytes contained in the buffer, file, etc.</I>
+</DL></P>
+</DL></P>
+
+</DL>
+<HR><H3>Inherited from <A HREF="GPEnabled.html">GPEnabled</A>:</H3>
+<DL>
+<P><DL>
+<DT><H3>Public Methods</H3><DD><DT>
+<IMG ALT="o" SRC=icon2.gif><!1><A HREF="GPEnabled.html#DOC.1.5.4.1.2">GPEnabled</A>&amp; <B>operator=</B>(const <!1><A HREF="GPEnabled.html#DOC.1.5.4.1.2">GPEnabled</A> &amp; obj)
+<DT>
+<IMG ALT="o" SRC=icon2.gif>int <B>get_count</B>(void) const 
+</DL></P>
+
+<P><DL>
+<DT><H3>Protected Fields</H3><DD><DT>
+<IMG ALT="o" SRC=icon2.gif>volatile   int <B>count</B>
 </DL></P>
 
 </DL>
@@ -68,11 +151,11 @@
 functions for navigating from chunk to chunk.  It works in relation
 with a ByteStream specified at construction time. <P><B>Reading an IFF file</B> --- You can read an IFF file by constructing an
 <TT>IFFByteStream</TT> object attached to the ByteStream containing the IFF file.
-Calling function <!1><A HREF="IFFByteStream.html#DOC.1.4.15.1.2">get_chunk</A> positions the file pointer at the
-beginning of the first chunk.  You can then use <!1><A HREF="ByteStream.html#DOC.1.4.14.1.1.2">read</A> to
+Calling function <!1><A HREF="IFFByteStream.html#DOC.1.5.13.1.2">get_chunk</A> positions the file pointer at the
+beginning of the first chunk.  You can then use <!1><A HREF="ByteStream.html#DOC.1.5.12.1.1.2">read</A> to
 access the chunk data.  Function <TT>read</TT> will return <TT>0</TT> if you attempt to
 read past the end of the chunk, just as if you were trying to read past
-the end of a file. You can at any time call function <!1><A HREF="IFFByteStream.html#DOC.1.4.15.1.4">close_chunk</A> to
+the end of a file. You can at any time call function <!1><A HREF="IFFByteStream.html#DOC.1.5.13.1.4">close_chunk</A> to
 terminate reading data in this chunk.  The following chunks can be
 accessed by calling <TT>get_chunk</TT> and <TT>close_chunk</TT> repeatedly until you
 reach the end of the file.  Function <TT>read</TT> is not very useful when
@@ -80,30 +163,30 @@ accessing a composite chunk.  You can instead make nested calls to
 functions <TT>get_chunk</TT> and <TT>close_chunk</TT> in order to access the chunks
 located inside the composite chunk.<P><B>Writing an IFF file</B> --- You can write an IFF file by constructing an
 <TT>IFFByteStream</TT> object attached to the seekable ByteStream object that
-will contain the IFF file.  Calling function <!1><A HREF="IFFByteStream.html#DOC.1.4.15.1.3">put_chunk</A> creates a
+will contain the IFF file.  Calling function <!1><A HREF="IFFByteStream.html#DOC.1.5.13.1.3">put_chunk</A> creates a
 first chunk header and positions the file pointer at the beginning of the
-chunk.  You can then use <!1><A HREF="ByteStream.html#DOC.1.4.14.1.1.3">write</A> to store the chunk data.
-Calling function <!1><A HREF="IFFByteStream.html#DOC.1.4.15.1.4">close_chunk</A> terminates the current chunk.  You can
+chunk.  You can then use <!1><A HREF="ByteStream.html#DOC.1.5.12.1.1.3">write</A> to store the chunk data.
+Calling function <!1><A HREF="IFFByteStream.html#DOC.1.5.13.1.4">close_chunk</A> terminates the current chunk.  You can
 append more chunks by calling <TT>put_chunk</TT> and <TT>close_chunk</TT> repeatedly.
 Function <TT>write</TT> is not very useful for writing a composite chunk.  You
 can instead make nested calls to function <TT>put_chunk</TT> and <TT>close_chunk</TT> in
 order to create chunks located inside the composite chunk.<P>Writing an IFF file requires a seekable ByteStream (see
 ByteStream::is_seekable).  This is not much of a problem because you
-can always create the IFF file into a MemoryByteStream and then use
-<!1><A HREF="ByteStream.html#DOC.1.4.14.1.2.3">copy</A> to transfer the IFF file into a non seekable
+can always create the IFF file into a <!1><A HREF="MemoryByteStream.html">MemoryByteStream</A> and then use
+<!1><A HREF="ByteStream.html#DOC.1.5.12.1.2.3">copy</A> to transfer the IFF file into a non seekable
 ByteStream.  </BLOCKQUOTE>
 <DL>
 
-<A NAME="create">
-<A NAME="DOC.1.4.15.1.1">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="IFFByteStream.html">IFFByteStream</A>&gt;  create(<!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="ByteStream.html">ByteStream</A>&gt; bs)</B></TT>
+<A NAME="IFFByteStream">
+<A NAME="DOC.1.5.13.1.1">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> IFFByteStream(<!1><A HREF="ByteStream.html">ByteStream</A> &amp;bs)</B></TT>
 <DD>Constructs an IFFByteStream object attached to ByteStream <TT>bs</TT>.
 Any ByteStream can be used when reading an IFF file.  Writing
 an IFF file however requires a seekable ByteStream. 
 <DL><DT><DD></DL><P>
 <A NAME="get_chunk">
-<A NAME="DOC.1.4.15.1.2">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int get_chunk(<!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;chkid, int *rawoffsetptr=0, int *rawsizeptr=0)</B></TT>
+<A NAME="DOC.1.5.13.1.2">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int get_chunk(<!1><A HREF="GString.html">GString</A> &amp;chkid, int *rawoffsetptr=0, int *rawsizeptr=0)</B></TT>
 <DD>Enters a chunk for reading.  Function <TT>get_chunk</TT> returns zero when the
 last chunk has already been accessed.  Otherwise it parses a chunk
 header, positions the IFFByteStream at the beginning of the chunk data,
@@ -117,7 +200,7 @@ and the length of the file segment containing both the chunk header and
 the chunk data. 
 <DL><DT><DD></DL><P>
 <A NAME="put_chunk">
-<A NAME="DOC.1.4.15.1.3">
+<A NAME="DOC.1.5.13.1.3">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void put_chunk(const char *chkid, int insertmagic=0)</B></TT>
 <DD>Enters a chunk for writing.  Function <TT>put_chunk</TT> prepares a chunk
 header and positions the IFFByteStream at the beginning of the chunk
@@ -127,7 +210,7 @@ chunk is terminated by a matching call to function <TT>close_chunk</TT>.  When<P
 <!1><A HREF="IFFByteStream.h.html">IFFByteStream.h</A>. 
 <DL><DT><DD></DL><P>
 <A NAME="close_chunk">
-<A NAME="DOC.1.4.15.1.4">
+<A NAME="DOC.1.5.13.1.4">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void close_chunk()</B></TT>
 <DD>Leaves the current chunk.  This function leaves the chunk previously
 entered by a matching call to <TT>get_chunk</TT> and <TT>put_chunk</TT>.  The
@@ -135,24 +218,24 @@ IFFByteStream is then ready to process the next chunk at the same
 hierarchical level. 
 <DL><DT><DD></DL><P>
 <A NAME="seek_close_chunk">
-<A NAME="DOC.1.4.15.1.5">
+<A NAME="DOC.1.5.13.1.5">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void seek_close_chunk()</B></TT>
 <DD>This is identical to the above, plus it adds a seek to the start of
 the next chunk.  This way we catch EOF errors with the current chunk.
 <DL><DT><DD></DL><P>
 <A NAME="ready">
-<A NAME="DOC.1.4.15.1.6">
+<A NAME="DOC.1.5.13.1.6">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int ready()</B></TT>
 <DD>Returns true when it is legal to call <TT>read</TT> or <TT>write</TT>. 
 <DL><DT><DD></DL><P>
 <A NAME="composite">
-<A NAME="DOC.1.4.15.1.7">
+<A NAME="DOC.1.5.13.1.7">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int composite()</B></TT>
 <DD>Returns true when the current chunk is a composite chunk. 
 <DL><DT><DD></DL><P>
 <A NAME="short_id">
-<A NAME="DOC.1.4.15.1.8">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void short_id(<!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;chkid)</B></TT>
+<A NAME="DOC.1.5.13.1.8">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void short_id(<!1><A HREF="GString.html">GString</A> &amp;chkid)</B></TT>
 <DD>Returns the current chunk identifier of the current chunk.  String
 <TT>chkid</TT> is overwritten with the <EM>extended chunk identifier</EM> of the
 current chunk.  The extended chunk identifier of a regular chunk is
@@ -162,8 +245,8 @@ identifier, of a semicolon <TT>&quot;:&quot;</TT>, and of the secondary chunk id
 as in <TT>&quot;FORM:DJVU&quot;</TT>. 
 <DL><DT><DD></DL><P>
 <A NAME="full_id">
-<A NAME="DOC.1.4.15.1.9">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void full_id(<!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;chkid)</B></TT>
+<A NAME="DOC.1.5.13.1.9">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void full_id(<!1><A HREF="GString.html">GString</A> &amp;chkid)</B></TT>
 <DD>Returns the qualified chunk identifier of the current chunk.  String
 <TT>chkid</TT> is overwritten with the <EM>qualified chunk identifier</EM> of the
 current chunk.  The qualified chunk identifier of a composite chunk is
@@ -176,7 +259,7 @@ scoping rules, the qualified chunk identifier uniquely defines how the
 chunk data should be interpreted. 
 <DL><DT><DD></DL><P>
 <A NAME="check_id">
-<A NAME="DOC.1.4.15.1.10">
+<A NAME="DOC.1.5.13.1.10">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static   int check_id(const char *id)</B></TT>
 <DD>Checks a potential chunk identifier.  This function categorizes the
 chunk identifier formed by the first four characters of string <TT>chkid</TT>.
@@ -186,7 +269,7 @@ returns <TT>-1</TT> if this is an illegal or otherwise reserved identifier
 which should not be used.  
 <DL><DT><DD></DL><P>
 <A NAME="has_magic">
-<A NAME="DOC.1.4.15.1.11">
+<A NAME="DOC.1.5.13.1.11">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>bool has_magic</B></TT>
 <DD><TT>has_magic</TT> is true if the stream has the DjVu file magic
 <DL><DT><DD></DL><P></DL>
@@ -197,7 +280,7 @@ which should not be used.
 <!-- This is were the DOC++ footer is defined  -->
 
 <font face="arial,helvetica" size="2">
-<a href=http://www.lizardtech.com>DjVu</a> is a trademark of LizardTech, Inc.  
+<a href=http://www.lizardtech.com>DjVu</a> is a trademark of AT&amp;T.  
 <br>All other products mentioned are registered trademarks or trademarks of
 their respective companies.
 </font>
