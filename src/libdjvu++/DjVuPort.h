@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuPort.h,v 1.9 1999-09-07 20:41:46 leonb Exp $
+//C- $Id: DjVuPort.h,v 1.10 1999-09-09 18:55:33 eaf Exp $
  
 #ifndef _DJVUPORT_H
 #define _DJVUPORT_H
@@ -72,7 +72,7 @@
     
     @memo DjVu decoder communication mechanism.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuPort.h,v 1.9 1999-09-07 20:41:46 leonb Exp $#
+    @version #$Id: DjVuPort.h,v 1.10 1999-09-09 18:55:33 eaf Exp $#
 */
 //@{
 
@@ -377,6 +377,22 @@ public:
           to an existing #DjVuPort#.  Returns a null pointer otherwise. */
    GP<DjVuPort> is_port_alive(DjVuPort *port);
 
+      /** Assigns the specified name to the given \Ref{DjVuPort}. Each port
+	  may have only one name and each name may correspond to only one
+	  port. Thus, if the specified name is already associated with another
+	  port, this association will be removed. */
+   void		set_name(const DjVuPort * port, const char * name);
+
+      /** Returns \Ref{DjVuPort} associated with the given #name#. If nothing
+	  is known about name #name#, or the port associated with it has
+	  already been destroyed #ZERO# pointer will be returned. */
+   GP<DjVuPort>	name_to_port(const char * name);
+
+      /** Returns name associated with the given \Ref{DjVuPort}. If no name
+	  has been assigned to this port before, an empty string will
+	  be returned. */
+   GString	port_to_name(const DjVuPort * port);
+
       /** Computes destination list for #source# and calls the corresponding
 	  function in each of the ports from the destination list starting from
 	  the closest until one of them returns non-empty \Ref{GURL}. */
@@ -456,6 +472,8 @@ private:
    GCriticalSection		map_lock;
    GMap<const void *, void *>	route_map;	// GMap<DjVuPort *, GList<DjVuPort *> *>
    GMap<const void *, void *>	cont_map;	// GMap<DjVuPort *, DjVuPort *>
+   GMap<GString, const void *>	n2p_map;	// GMap<GString, DjVuPort *>
+   GMap<const void *, void *>	p2n_map;	// GMap<DjVuPort *, const char *>
    void del_port(const DjVuPort * port);
    void add_to_closure(GMap<const void*, void*> & set,
                        const DjVuPort *dst, int distance);

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuPort.cpp,v 1.13 1999-09-07 15:59:53 leonb Exp $
+//C- $Id: DjVuPort.cpp,v 1.14 1999-09-09 18:55:33 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -125,20 +125,73 @@ DjVuPortcaster::is_port_alive(DjVuPort *port)
 }
 
 void
+DjVuPortcaster::set_name(const DjVuPort * port, const char * name)
+{
+   GCriticalSectionLock lock(&map_lock);
+
+   GPosition pos;
+   if (p2n_map.contains(port, pos))
+   {
+      n2p_map.del((const char *) p2n_map[pos]);
+      delete (const char *) p2n_map[pos];
+      p2n_map.del(pos);
+   }
+   
+   p2n_map[port]=strdup(name);
+   n2p_map[name]=port;
+}
+
+GP<DjVuPort>
+DjVuPortcaster::name_to_port(const char * name)
+{
+   GCriticalSectionLock lock(&map_lock);
+
+   GPosition pos;
+   if (n2p_map.contains(name, pos))
+      return (DjVuPort *) n2p_map[pos];
+   else return 0;
+}
+
+GString
+DjVuPortcaster::port_to_name(const DjVuPort * port)
+{
+   GCriticalSectionLock lock(&map_lock);
+
+   GPosition pos;
+   if (p2n_map.contains(port, pos))
+      return (const char *) p2n_map[pos];
+   else return GString();
+}
+
+void
 DjVuPortcaster::del_port(const DjVuPort * port)
 {
    GCriticalSectionLock lock(&map_lock);
 
+   GPosition pos;
+   GString name;
+   
+      // Update "port=>name" map
+   if (p2n_map.contains(port, pos))
+   {
+      name=(const char *) p2n_map[pos];
+      delete (const char *) p2n_map[pos];
+      p2n_map.del(pos);
+   }
+
+      // Update "name=>port" map
+   if (name.length() && n2p_map.contains(name, pos)) n2p_map.del(pos);
+   
       // Update "contents map"
-   if (cont_map.contains(port)) cont_map.del(port);
+   if (cont_map.contains(port, pos)) cont_map.del(pos);
 
       // Update "route map"
-   if (route_map.contains(port))
+   if (route_map.contains(port, pos))
    {
-      delete (GList<void *> *) route_map[port];
-      route_map.del(port);
+      delete (GList<void *> *) route_map[pos];
+      route_map.del(pos);
    }
-   for(GPosition pos=route_map;pos;)
+   for(pos=route_map;pos;)
    {
       GList<void *> & list=*(GList<void *> *) route_map[pos];
       GPosition list_pos;
