@@ -8,12 +8,12 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: JPEGDecoder.h,v 1.2 1999-10-19 14:48:37 leonb Exp $
+//C- $Id: JPEGDecoder.h,v 1.3 2000-01-07 16:58:49 praveen Exp $
 
 #ifndef _JPEGDECODER_H_
 #define _JPEGDECODER_H_
 
-#include "DjVuGlobal.h"
+//#include "DjVuGlobal.h"
 #ifdef NEED_JPEG_DECODER
 
 #include "ByteStream.h"
@@ -31,7 +31,7 @@
     @memo
     Decoding interface to the IJG JPEG library.
     @version
-    #$Id: JPEGDecoder.h,v 1.2 1999-10-19 14:48:37 leonb Exp $#
+    #$Id: JPEGDecoder.h,v 1.3 2000-01-07 16:58:49 praveen Exp $#
     @author
     Parag Deshmukh <parag@sanskrit.lz.att.com> 
 */

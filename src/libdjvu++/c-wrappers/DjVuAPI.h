@@ -1,4 +1,4 @@
-/* File "$Id: DjVuAPI.h,v 1.19 2000-01-06 04:34:03 bcr Exp $"
+/* File "$Id: DjVuAPI.h,v 1.20 2000-01-07 16:58:50 praveen Exp $"
  *
  * The main header file for the DjVu API
  */
@@ -8,7 +8,10 @@
 
 /* 
  * $Log: DjVuAPI.h,v $
- * Revision 1.19  2000-01-06 04:34:03  bcr
+ * Revision 1.20  2000-01-07 16:58:50  praveen
+ * updated
+ *
+ * Revision 1.19  2000/01/06 04:34:03  bcr
  * Don't ask me.
  *
  * Revision 1.17  2000/01/05 19:39:48  praveen
@@ -158,6 +161,7 @@
 #endif
 
 #include "DjVu.h"
+#include "DjVuDecodeAPI.h"
 
 /*
  *  ------------------------------------------------------------------------
@@ -175,78 +179,7 @@ extern "C" {
  * DYNAMIC LINK LIBRARY STUFF
  */
 
-typedef enum {
-  asciiBW='1',
-  asciiGRAY,
-  asciiCOLOR,
-  binaryBW,
-  binaryGRAY,
-  binaryCOLOR
-} pnm;
 
-
- /* Mirror and Rotate90 is added to represent the orientation of any tiff
-  * image.
-	*/
-#define 						 DJVU_PIXEL_MIRROR        0x20
-#define 						 DJVU_PIXEL_ROTATE90_CW   0x40
-#define              DJVU_PIXEL_BOTTOM_UP     0x02
-
-// This class is for PNM IO.
-/*
- * DjVu Image Formats
- * 	See DjVuAPI-2_0.html#DjVu Image Formats
- *
- *      djvu_pixel_image
- *		See DjVuAPI-2_0.html#djvu_pixel_image
- */
-             typedef struct djvu_pixel_image_struct
-             {
-               int flags;
-#define              DJVU_PIXEL_RGB        0x04
-#define              DJVU_PIXEL_BGR        0x08
-#define              DJVU_PIXEL_GRAY       0x10
- /* Black and white is not officially supported since this a format for
-  * gray scale and color documents.  But this flag is set when reading
-  * Pnm files, so you know to convert to djvu_run_image format.  To test, use
-  *    ((image->flags&DJVU_PIXEL_BLACKANDWHITE)==DJVU_PIXEL_BLACKANDWHITE)
-  */
-#define              DJVU_PIXEL_BLACKANDWHITE (0x20|DJVU_PIXEL_GRAY)
-#define		     DJVU_PIXEL_HAS_DPI 0x40 /* This has a dpi field */
-               int w;               /* Image width in Pixels */
-               int h;               /* Image height in Pixels */
-               size_t offset;       /* Byte offset to start of image in data pointer */
-               size_t rowsize;      /* Bytes per row. */
-               size_t pixsize;      /* Bytes per pixel */
-               unsigned char *data; /* Pointer to image data */
-               void *privdata;      /* reserved for internal use */
-               unsigned int xdpi;   /* The X image resolution */ 
-               unsigned int ydpi;   /* The Y image resolution */ 
-#ifdef __cplusplus
-                djvu_pixel_image_struct();
-#endif
-             }
-             djvu_pixel_image;
-#ifdef __cplusplus
-             inline
-             djvu_pixel_image_struct::djvu_pixel_image_struct()
-             : flags(0), w(0), h(0), offset(0), rowsize(0), pixsize(0),
-               data(0), privdata(0), xdpi(0), ydpi(0) {}
-#endif
-/* 
- *
- *           Deallocation:
- */
-                  DJVUAPI void
-                  djvu_pixel_image_free(djvu_pixel_image *);
-/* 
- *                Deallocates any allocated pointers and the
- *                structure.  This should only be used when the
- *                structure was allocated by another DjVu API
- *                call.  Users may use the command:
- */
-		  DJVUAPI djvu_pixel_image *
-		  djvu_pixel_image_allocate(int rows,int cols,int grayscale);
 
 /*		  to allocate, or they may use their own allocation routine.
  * 

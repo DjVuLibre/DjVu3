@@ -10,7 +10,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuMultiAPI.h,v 1.4 2000-01-07 00:28:07 bcr Exp $
+//C- $Id: DjVuMultiAPI.h,v 1.5 2000-01-07 16:58:50 praveen Exp $
 #endif
 
 #ifndef __DJVUMULTIAPI_H__
@@ -25,7 +25,10 @@
 
 /* 
  * $Log: DjVuMultiAPI.h,v $
- * Revision 1.4  2000-01-07 00:28:07  bcr
+ * Revision 1.5  2000-01-07 16:58:50  praveen
+ * updated
+ *
+ * Revision 1.4  2000/01/07 00:28:07  bcr
  * Fixed bugs in parseoptions, and added usage instructions to executables.
  *
  * Revision 1.3  2000/01/06 20:10:44  praveen
@@ -60,6 +63,7 @@
 #endif  /*DJVUAPI*/
 
 #include <stdio.h>
+#include "DjVu.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -101,7 +105,6 @@ typedef struct djvu_combine_options djvu_join_options;
     using it to create a bundled file. */
 typedef struct djvu_combine_options djvu_bundle_options;
 
-struct djvu_parse;
 
 /** This is the primary allocation routine for djvu_bundle_options.
     Even if the values specified are illegal, an options structure
