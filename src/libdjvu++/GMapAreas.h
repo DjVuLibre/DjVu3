@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GMapAreas.h,v 1.5 1999-10-05 16:00:06 leonb Exp $
+//C- $Id: GMapAreas.h,v 1.6 1999-10-28 14:38:15 praveen Exp $
 
 #ifndef _GMAPAREAS_H
 #define _GMAPAREAS_H
@@ -47,7 +47,7 @@ typedef unsigned int u_int32;
     @memo Definition of base map area classes
     @author Andrei Erofeev <eaf@research.att.com>
     @version
-    #$Id: GMapAreas.h,v 1.5 1999-10-05 16:00:06 leonb Exp $# */
+    #$Id: GMapAreas.h,v 1.6 1999-10-28 14:38:15 praveen Exp $# */
 //@{
 
 
@@ -101,6 +101,8 @@ public:
    enum BorderType { NO_BORDER=0, XOR_BORDER=1, SOLID_BORDER=2,
 		     SHADOW_IN_BORDER=3, SHADOW_OUT_BORDER=4,
 		     SHADOW_EIN_BORDER=5, SHADOW_EOUT_BORDER=6 };
+
+   enum Special_Hilite_Color{ NO_HILITE=0xFFFFFFFF, XOR_HILITE=0xFF000000};
       /** Optional URL which this map area can be associated with.
 	  If it's not empty then clicking this map area with the mouse
 	  will make the browser load the HTML page referenced by
@@ -139,8 +141,8 @@ public:
    int		border_width;
       /** Specified a color for highlighting the internal area of the map
 	  area. Will work with rectangular map areas only. The color is
-	  specified in #00RRGGBB format. A special value of #FFFFFFFF disabled
-	  highlighting. */
+	  specified in #00RRGGBB format. A special value of #FFFFFFFF disables
+      highlighting and #FF000000 is for XOR highlighting. */
    u_int32	hilite_color;
 
       /// Default constructor
