@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djvutxt.cpp,v 1.8 2001-01-04 22:04:54 bcr Exp $
+// $Id: djvutxt.cpp,v 1.9 2001-01-19 02:31:21 bcr Exp $
 // $Name:  $
 
 // DJVUTXT -- DjVu TXT extractor
@@ -69,7 +69,7 @@
     @author
     Andrei Erofeev <eaf@geocities.com> -- initial implementation
     @version
-    #$Id: djvutxt.cpp,v 1.8 2001-01-04 22:04:54 bcr Exp $# */
+    #$Id: djvutxt.cpp,v 1.9 2001-01-19 02:31:21 bcr Exp $# */
 //@{
 //@}
 
@@ -144,7 +144,7 @@ main(int argc, char ** argv)
 	 int level=atoi(debug);
 	 if (level<1) level=1;
 	 if (level>32) level=32;
-	 DEBUG_SET_LEVEL(level);
+//	 DEBUG_SET_LEVEL(level);
       }
    }
 #endif
