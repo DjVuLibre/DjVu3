@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.49 1999-09-27 20:06:57 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.50 1999-09-27 22:22:18 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -978,7 +978,10 @@ DjVuDocument::get_djvm_doc(void)
       {
 	 GP<DjVmDir::File> f=new DjVmDir::File(*files_list[pos]);
 	 GP<DjVuFile> file=url_to_file(id_to_url(f->id));
-	 doc->insert_file(f, file->get_data_pool());
+	 GP<DataPool> data;
+	 if (file->is_modified()) data=file->get_djvu_data(false, true);
+	 else data=file->get_init_data_pool();
+	 doc->insert_file(f, data);
       }
    } else
    {
