@@ -9,7 +9,7 @@
 # C- AT&T, you have an infringing copy of this software and cannot use it
 # C- without violating AT&T's intellectual property rights.
 # C-
-# C- $Id: configure,v 1.25 1999-09-08 21:39:50 leonb Exp $
+# C- $Id: configure,v 1.26 1999-09-21 14:27:53 leonb Exp $
 
 
 ### ------------------------------------------------------------------------
@@ -48,7 +48,7 @@ fi
 
 conf=`basename $0`
 topsrcdir=`dirname $0`
-if [ ! -r "$topsrcdir/libdjvu++.dxx.in" -o ! -r $topsrcdir/ATTLICENSE ] 
+if [ ! -r "$topsrcdir/GSmartPointer.h" -o ! -r $topsrcdir/ATTLICENSE ] 
 then
    echo 1>&2 "$conf: Cannot recognize source directory."
    exit 1
@@ -412,10 +412,10 @@ generate_makefile()
 ### ------------------------------------------------------------------------
 ### Generate makefiles
 
-if [ ! -d @Test ] ; then mkdir @Test ; fi
+if [ ! -d Test ] ; then mkdir Test ; fi
 
 generate_makefile .
-generate_makefile @Test
+generate_makefile Test
 
 
 ### ------------------------------------------------------------------------
