@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessage.cpp,v 1.16 2001-03-09 00:06:33 bcr Exp $
+// $Id: DjVuMessage.cpp,v 1.17 2001-03-09 00:27:58 bcr Exp $
 // $Name:  $
 
 
@@ -57,10 +57,10 @@
 #ifdef WIN32
 static const char LocalDjVuDir[] ="Profiles"; // appended to the home directory.
 static const char RootDjVuDir[] ="C:/Program Files/LizardTech/Profiles";
+static const char registerypath[]="Software\\LizardTech\\DjVu\\Profile Path";
 #else
 static const char LocalDjVuDir[] =".DjVu"; // appended to the home directory.
 static const char RootDjVuDir[] ="/etc/DjVu/";
-static const char registerypath[]="Software\\LizardTech\\DjVu\\Profile Path";
 #endif
 static const char DjVuEnv[]="DJVU_CONFIG_DIR";
 
@@ -265,7 +265,6 @@ DjVuMessage::InsertArg( GString &message, int ArgId, GString arg ) const
   }
 }
 
-#if 0
 #ifdef WIN32
 static GString
 RegOpenReadConfig ( HKEY hParentKey )
@@ -281,15 +280,13 @@ RegOpenReadConfig ( HKEY hParentKey )
   {
     TCHAR path[1024];
     // Success
-    LPCTSTR szPathValue = path;
+    LPSTR szPathValue = path;
     LPCTSTR lpszEntry = TEXT("");
     DWORD dwCount = (sizeof(path)/sizeof(TCHAR))-1;
     DWORD dwType;
 
-//    LONG lResult = RegQueryValueEx(hKey, lpszEntry, NULL,
-//             &dwType, (LPBYTE) szPathValue, &dwCount);
     LONG lResult = RegQueryValueEx(hKey, lpszEntry, NULL,
-             &dwType, szPathValue, &dwCount);
+             &dwType, (LPBYTE) szPathValue, &dwCount);
 
     RegCloseKey(hKey);
 
@@ -305,7 +302,7 @@ RegOpenReadConfig ( HKEY hParentKey )
 }
 
 static GString
-GetModualPath( void )
+GetModulePath( void )
 {
   TCHAR path[1024];
   DWORD dwCount = (sizeof(path)/sizeof(TCHAR))-1;
@@ -317,7 +314,7 @@ GetModualPath( void )
 }
 #endif
 
-GList<GString> &
+static GList<GString> &
 GetProfilePaths(void)
 {
   static bool first=true;
@@ -364,4 +361,3 @@ GetProfilePaths(void)
   }
   return paths;
 }
-#endif
