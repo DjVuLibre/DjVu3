@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: DjVuImage.cpp,v 1.4 1999-02-08 21:31:50 leonb Exp $
+//C-  $Id: DjVuImage.cpp,v 1.5 1999-02-08 23:07:53 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -557,7 +557,9 @@ DjVuImage::get_pixmap(const GRect &rect, int subsample, double gamma) const
   // Get background
   GP<GPixmap> pm = get_bg_pixmap(rect, subsample, gamma);
   // Superpose foreground
-  stencil(pm, rect, subsample, gamma);
+  if (! stencil(pm, rect, subsample, gamma))
+    // Avoid ugly progressive display (hack)
+    if (get_fgjb()) return 0;
   // Return
   return pm;
 }
