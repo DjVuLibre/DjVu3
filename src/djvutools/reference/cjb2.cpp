@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: cjb2.cpp,v 1.22 2001-07-03 17:02:31 bcr Exp $
+// $Id: cjb2.cpp,v 1.23 2001-07-23 22:59:41 bcr Exp $
 // $Name:  $
 
 
@@ -70,7 +70,7 @@
     Paul Howard <pgh@research.att.com>\\
     Pascal Vincent <vincentp@iro.umontreal.ca>
     @version
-    $Id: cjb2.cpp,v 1.22 2001-07-03 17:02:31 bcr Exp $ */
+    $Id: cjb2.cpp,v 1.23 2001-07-23 22:59:41 bcr Exp $ */
 //@{
 //@}
 
@@ -881,10 +881,10 @@ usage()
 {
   DjVuPrintErrorUTF8("Usage: cjb2 [options] <inputpbmfile> <outputdjvufile>\n"
           "Options are:\n"
-          "   -dpi xxx     Specify image resolution (default 300).\n"
-          "   -clean       Remove small flyspecs (lossy).\n"
-          "   -loose       Substitute patterns with small variations (lossy).\n"
-          "   -verbose     Displays additional messages.\n"
+          "   -dpi [25-1200] Specify image resolution (default 300).\n"
+          "   -clean         Remove small flyspecs (lossy).\n"
+          "   -loose         Substitute patterns with small variations (lossy).\n"
+          "   -verbose       Displays additional messages.\n"
           "Encoding is lossless unless one or several lossy options are selected.\n" );
   exit(10);
 }
@@ -916,7 +916,7 @@ main(int argc, const char **argv)
             {
               char *end;
               opts.dpi = strtol(dargv[++i], &end, 10);
-              if (*end || opts.dpi<75 || opts.dpi>144000)
+              if (*end || opts.dpi<25 || opts.dpi>1200)
                 usage();
             }
           else if (arg == "-clean")
