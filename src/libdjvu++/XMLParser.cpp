@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: XMLParser.cpp,v 1.6 2001-05-16 18:32:31 bcr Exp $
+// $Id: XMLParser.cpp,v 1.7 2001-05-16 18:32:59 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -721,8 +721,8 @@ make_next_layer(
   if(self.ztype == DjVuTXT::WORD)
   {
     bs.writestring(tag.raw.substr(0,tag.raw.firstEndSpace()));
-    DjVuPrintMessage("<<<%s>>>\n",
-      (const char *)tag.raw.substr(0,tag.raw.firstEndSpace()));
+//    DjVuPrintMessage("<<<%s>>>\n",
+//      (const char *)tag.raw.substr(0,tag.raw.firstEndSpace()));
     if(sepchar)
       bs.write8(sepchar);
     self.text_length = bs.tell() - self.text_start;
@@ -753,8 +753,8 @@ make_next_layer(
     ymin=ymax;
     ymax=t;
   }
-  DjVuPrintMessage("(%d,%d)(%d,%d)<<<\\%o>>>\n",
-    xmin,ymin,xmax,ymax, sepchar);
+//  DjVuPrintMessage("(%d,%d)(%d,%d)<<<\\%o>>>\n",
+//    xmin,ymin,xmax,ymax, sepchar);
 }
 
 #if 0
