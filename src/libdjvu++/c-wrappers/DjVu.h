@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVu.h,v 1.8 2000-01-26 23:30:21 bcr Exp $
+ *C- $Id: DjVu.h,v 1.9 2000-01-27 20:36:18 haffner Exp $
  */
 
 #include <stdlib.h>
@@ -96,7 +96,7 @@ djvu_progress_callback (const char *task,unsigned long,unsigned long);
 DJVUAPI djvu_progress_callback *
 djvu_set_progress_callback(djvu_progress_callback *);
 
-/** The #djvu_option# structure is very simmular to the standard unix
+/** The #djvu_option# structure is very similar to the standard unix
     long_options structure for getopt_long(3), and the usage is almost
     identical.
     @memo The djvu_option structure wraps the DjVuParseOptions class 

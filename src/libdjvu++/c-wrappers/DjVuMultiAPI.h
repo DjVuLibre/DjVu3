@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuMultiAPI.h,v 1.15 2000-01-24 21:30:44 parag Exp $
+ *C- $Id: DjVuMultiAPI.h,v 1.16 2000-01-27 20:36:18 haffner Exp $
  */
 
 
@@ -28,7 +28,12 @@
 
 /* 
  * $Log: DjVuMultiAPI.h,v $
- * Revision 1.15  2000-01-24 21:30:44  parag
+ * Revision 1.16  2000-01-27 20:36:18  haffner
+ * Spell check.
+ *
+ * Reimplemented with Bill BitonalToDjVu.cpp
+ *
+ * Revision 1.15  2000/01/24 21:30:44  parag
  * "C" compatibility added
  *
  * Revision 1.14  2000/01/22 07:10:14  bcr
@@ -36,7 +41,7 @@
  * page ranges in PhotoToDjVu and DjVuToPhoto.  Updated comments.
  *
  * Revision 1.13  2000/01/22 00:15:04  bcr
- * Removed "backwards compatability macros".  We shouldn't use such hacks while
+ * Removed "backwards compatibility macros".  We shouldn't use such hacks while
  * still in beta.  Corrected the author field.
  *
  * Revision 1.12  2000/01/21 21:09:52  leonb
@@ -168,7 +173,7 @@ typedef struct djvu_combine_options_struct
   const char * const *filelist;
   /** Private data.
       This field is used internally to hold the C++ peer of this data structure.
-      Function \Ref{djvu_combine_options_alloc} properly initialises this field.  
+      Function \Ref{djvu_combine_options_alloc} properly initializes this field.  
       Do not modify it. */
   void *priv;
 } djvu_combine_options;
@@ -194,7 +199,7 @@ djvu_combine_options_free(djvu_combine_options *);
 DJVUAPI int 
 djvu_combine(djvu_combine_options *options);
 
-/** Tests for error messsages.  After executing \Ref{djvu_combine}, the
+/** Tests for error messages.  After executing \Ref{djvu_combine}, the
     #options# data structure may contain a list of error messages.  This
     function tests whether there are error messages available. */
 DJVUAPI int 
@@ -221,7 +226,7 @@ djvu_combine_perror(djvu_combine_options *options, const char *mesg);
 DJVUAPI int djvu_bundle(djvu_combine_options*);
 
 /** Prints usage instructions for program #djvubundle#. 
-    Output is sent to file descriptor #fd#.  Occurences of
+    Output is sent to file descriptor #fd#.  Occurrences of
     program name #djvubundle# are replaced by the user supplied
     program name #prog#. */
 DJVUAPI void djvu_bundle_usage(int fd,const char *prog);
@@ -232,7 +237,7 @@ DJVUAPI void djvu_bundle_usage(int fd,const char *prog);
 DJVUAPI int djvu_join(djvu_combine_options*);
 
 /** Prints usage instructions for program #djvujoin#. 
-    Output is sent to file descriptor #fd#.  Occurences of
+    Output is sent to file descriptor #fd#.  Occurrences of
     program name #djvubundle# are replaced by the user supplied
     program name #prog#. */
 DJVUAPI void djvu_join_usage(int fd,const char *prog);

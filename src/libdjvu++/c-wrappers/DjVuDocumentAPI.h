@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuDocumentAPI.h,v 1.10 2000-01-26 23:30:21 bcr Exp $
+ *C- $Id: DjVuDocumentAPI.h,v 1.11 2000-01-27 20:36:18 haffner Exp $
  */
 
 #ifndef _DJVUDOC_H_
@@ -33,12 +33,12 @@ extern "C"
 
 /** List of options for the foreground image.
 
-    Whereas the backgound image can use the #libdjvuphoto# wavelet options,
+    Whereas the background image can use the #libdjvuphoto# wavelet options,
     the foreground image has specific constraints, as it may be encoded
     within the JB2 image.
 
     When encoded as wavelet, options such as the number of chunks or the
-    crcbdely would be an overkill.
+    crcbdelay would be an overkill.
     
     The #gamma_correction# is set to the same value as the background image.
 */
@@ -153,7 +153,7 @@ typedef struct djvu_segmenter_options_struct
   /** inhibit_foreback level.
 
       This inhibit_foreback level parameter corresponds to the an a-priori cost
-      added to the decision to peform foreground/background separation (vs.
+      added to the decision to perform foreground/background separation (vs.
       deciding that a given block should not be segmented).
 
       It is advisable to increase the inhibit_foreback to remove isolated

@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuPriv.h,v 1.6 2000-01-22 07:10:14 bcr Exp $
+ *C- $Id: DjVuPriv.h,v 1.7 2000-01-27 20:36:18 haffner Exp $
  */
 
 #ifndef _DJVU_PRIV_H_
@@ -20,7 +20,7 @@
 static inline void _djvu_image_free(djvu_image &img);
 
 /* This is an strictly inline version of a priv struct for djvu_image's,
- * so we don't have library dependancies...
+ * so we don't have library dependencies...
  */
 struct _djvu_image_priv 
 {

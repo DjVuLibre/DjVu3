@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuAPI.h,v 1.29 2000-01-27 00:46:56 bcr Exp $
+ *C- $Id: DjVuAPI.h,v 1.30 2000-01-27 20:36:18 haffner Exp $
  *
  * The main header file for the DjVu API
  */
@@ -17,7 +17,12 @@
 
 /* 
  * $Log: DjVuAPI.h,v $
- * Revision 1.29  2000-01-27 00:46:56  bcr
+ * Revision 1.30  2000-01-27 20:36:18  haffner
+ * Spell check.
+ *
+ * Reimplemented with Bill BitonalToDjVu.cpp
+ *
+ * Revision 1.29  2000/01/27 00:46:56  bcr
  * Added the *arg argument, I forgot.
  *
  * Revision 1.28  2000/01/26 23:30:21  bcr
@@ -87,7 +92,7 @@ typedef struct djvu_image_struct djvu_image;
  *  ------------------------------------------------------------------------
  * Basic IO interface.
  *
- *    The following routines creat an instance of a djvuio structure
+ *    The following routines create an instance of a djvuio structure
  *    defined as:
  */
 struct djvuio_struct
@@ -133,7 +138,7 @@ typedef enum djvuio_type_enum
 DJVUAPI djvu_import
 djvu_import_file( const char filename[]);
 
-/* Open the named file for writting. 
+/* Open the named file for writing. 
  */
 DJVUAPI djvu_export
 djvu_export_file( const char filename[]);
@@ -152,7 +157,7 @@ djvu_export_fileno( int fileno);
 
 
 /* Open a user allocated buffer as a stream for reading.  The buffer should
- * not be free'd until after the djvu_import stream is closed.  This type of
+ * not be freed until after the djvu_import stream is closed.  This type of
  * stream is most useful for memmap files,  or files read in whole from a 
  * database.
  */
@@ -169,7 +174,7 @@ DJVUAPI djvu_import
 djvu_import_callback( void *arg,djvu_input_sub *inpf,djvu_seek_sub *seekf);
 
 
-/* Open a stream for writting to user defined callback functions.
+/* Open a stream for writing to user defined callback functions.
  */
 typedef int djvu_output_sub ( void *arg, const void *data, size_t len );
 
@@ -231,9 +236,9 @@ djvu_dstream_skip_image(djvu_import io);
 DJVUAPI int
 djvu_dstream_is_eof(djvu_import io);
 
-/* -- Writting Images --  
- * It is assumed all output is sequential.  If writting to a file type
- * that does not accept multiple pages, it is the users responcability
+/* -- Writing Images --  
+ * It is assumed all output is sequential.  If writing to a file type
+ * that does not accept multiple pages, it is the users responsibility
  * to check that only one page is written.
  */
 
@@ -263,7 +268,7 @@ DJVUAPI const char *
 djvu_export_error( djvu_export);
 
 
-/* Print all error messsages from a stream.
+/* Print all error messages from a stream.
  */
 DJVUAPI void
 djvu_import_perror( djvu_import,const char *);
@@ -299,7 +304,7 @@ djvu_export_magic(djvu_export);
  *    The djvu_image structure, is the primary form of dealing in memory
  *    with renderable images.  In the previous version of the DjVuAPI, 
  *    the image format was known as djvu_run_image for black and white,
- *    and djvu_pixel_image for color images.  While often, the distiction
+ *    and djvu_pixel_image for color images.  While often, the distinction
  *    between black and white and color is very important, we found that
  *    actually having two separate formats meant programmers had to learn
  *    twice as many function calls, and write nearly twice as much code.
@@ -359,7 +364,7 @@ typedef struct _djvu_image_priv * djvu_image_priv;
 /*
  * To be friendly for C++ users, we define C++ methods for the 
  * structure.  If you are using C, don't worry.  All the methods
- * are defined with MACRO's that are available from within C.
+ * are defined with Macros that are available from within C.
  * 
  * Now for the djvu_image structure:
  */
@@ -380,26 +385,26 @@ typedef struct _djvu_image_priv * djvu_image_priv;
                djvu_image_priv priv;
 #ifdef __cplusplus
                djvu_image_struct();
-                 // Gets the width using bottom up cooridinates.
+                 // Gets the width using bottom up coordinates.
                inline int get_width(void) const;
-                 // Gets the height using bottom up cooridinates.
+                 // Gets the height using bottom up coordinates.
                inline int get_height(void) const;
-                 // Gets the horizontal DPI using bottom up cooridinates.
+                 // Gets the horizontal DPI using bottom up coordinates.
                inline unsigned int get_xdpi(void) const;
-                 // Gets the vertical DPI using bottom up cooridinates.
+                 // Gets the vertical DPI using bottom up coordinates.
                inline unsigned int get_ydpi(void) const;
                  // Tests if this image is in the "native" format.
                inline bool isNative(void) const;
-                 // Does a rotate of 0,90,180, or 270 degress.
+                 // Does a rotate of 0,90,180, or 270 degrees.
                inline void Rotate(const int angle);
 		 // This does a vertical flip in the raw coordinate system.
                inline void VFlip(void);
-                 // This flips using corrected bottom up cooridinates.
+                 // This flips using corrected bottom up coordinates.
                inline void HFlip(void);
-                 // This crops using cooridinates in the raw coordinate system.
+                 // This crops using coordinates in the raw coordinate system.
                inline void CropRaw(const int x,const int y,
                  const unsigned int width,const unsigned int height);
-                 // This crops using corrected bottom up cooridinates.
+                 // This crops using corrected bottom up coordinates.
                inline void Crop(const int x,const int y,
                  const unsigned int width,const unsigned int height);
 #endif
@@ -484,8 +489,8 @@ typedef struct _djvu_image_priv * djvu_image_priv;
      {(IMAGE)->orientation^=DJVU_MIRROR;}
 
 /* This crops away sections of the image by starting and the x0, y0 
- * corridinates as defined with the lower y0==0 indicating the last
- * row, in the uncorrected corridinate system.  This is refered to
+ * coordinates as defined with the lower y0==0 indicating the last
+ * row, in the uncorrected coordinate system.  This is referred to
  * by the version that corrects for orientation. 
  */
 #define DJVU_IMAGE_CROP_RAW(image,x0,y0,width,height) \
@@ -497,8 +502,8 @@ typedef struct _djvu_image_priv * djvu_image_priv;
      }
 
 /* This crops away sections of the image by starting and the x0, y0 
- * corridinates as defined in the image's current orientation.  (0,0)
- * referes to the bottom left corner.
+ * coordinates as defined in the image's current orientation.  (0,0)
+ * refers to the bottom left corner.
  */
 #define DJVU_IMAGE_CROP(image,x0,y0,width,height) \
      { \
@@ -515,51 +520,51 @@ typedef struct _djvu_image_priv * djvu_image_priv;
     to access and/or modify the djvu_image structure.  If you are using
     C, then you'll have to use the macros defined above...  */
 
-               // This is just a simple constructor that zero's the values.
+               // This is just a simple constructor that zeros the values.
              inline djvu_image_struct::djvu_image_struct()
              : type(DJVU_UNKNOWN),orientation(0),w(0),h(0),pixsize(0),
                datasize(0),xdpi(0),ydpi(0),data(0),start_alloc(0),priv(0) {}
-               // Gets the width using bottom up cooridinates.
+               // Gets the width using bottom up coordinates.
              inline int djvu_image_struct::get_width(void) const
              {return DJVU_IMAGE_GET_WIDTH(this);}
-               // Gets the height using bottom up cooridinates.
+               // Gets the height using bottom up coordinates.
              inline int djvu_image_struct::get_height(void) const
              {return DJVU_IMAGE_GET_HEIGHT(this);}
-               // Gets the horizontal DPI using bottom up cooridinates.
+               // Gets the horizontal DPI using bottom up coordinates.
              inline unsigned int djvu_image_struct::get_xdpi(void) const
              {return DJVU_IMAGE_GET_XDPI(this);}
-               // Gets the vertical DPI using bottom up cooridinates.
+               // Gets the vertical DPI using bottom up coordinates.
              inline unsigned int djvu_image_struct::get_ydpi(void) const
              {return DJVU_IMAGE_GET_YDPI(this);}
                // This tests if the image is in the "native" format.
              inline bool djvu_image_struct::isNative(void) const
              {return DJVU_IMAGE_IS_NATIVE(this);}
-               // Does a rotate of 0,90,180, or 270 degress.
+               // Does a rotate of 0,90,180, or 270 degrees.
              inline void djvu_image_struct::Rotate(const int angle)
              DJVU_IMAGE_ROTATE(this,angle)
-               // This flips using corrected bottom up cooridinates.
+               // This flips using corrected bottom up coordinates.
              inline void djvu_image_struct::VFlip(void)
              DJVU_IMAGE_VFLIP(this)
-               // This flips using corrected bottom up cooridinates.
+               // This flips using corrected bottom up coordinates.
              inline void djvu_image_struct::HFlip(void)
              DJVU_IMAGE_HFLIP(this)
-               // This crops using cooridinates in the raw coordinate system.
+               // This crops using coordinates in the raw coordinate system.
              inline void djvu_image_struct::CropRaw(const int x0,const int y0,
                const unsigned int width,const unsigned int height)
              DJVU_IMAGE_CROP_RAW(this,x0,y0,width,height)
-               // This crops using corrected bottom up cooridinates.
+               // This crops using corrected bottom up coordinates.
              inline void djvu_image_struct::Crop(const int x0,const int y0,
                const unsigned int width,const unsigned int height)
              DJVU_IMAGE_CROP(this,x0,y0,width,height)
 #endif
 
-/** This free's an image allocated by the DjVu libraries.  This call should
+/** This frees an image allocated by the DjVu libraries.  This call should
    not be used on images that have been allocated manually.
  */
 DJVUAPI void 
 djvuio_image_free(djvu_image *ximg);
 
-/** This free's an image's data.  It is always safe to call this routine.
+/** This frees an image data.  It is always safe to call this routine.
    However, if you manually allocated the start_alloc pointer, then this
    routine will not actually do anything.
  */
@@ -596,25 +601,25 @@ djvuio_image_get_row(
  *
  *    Most routines below have two versions.  A version that will operate
  *    directly on the image passed, and a version that will copy from a
- *    a contant image.
+ *    a constant image.
  */
 
 /** Same as djvuio_image_free_data(), but in a different library.  Useful if
-   you are using the static libraries, and wish to controle which library you 
+   you are using the static libraries, and wish to control which library you 
    link from.
  */
 DJVUAPI void 
 djvu_image_free(djvu_image *ximg);
 
 /** Same as djvuio_image_free_data(), but in a different library.  Useful if
-   you are using the static libraries, and wish to controle which library you 
+   you are using the static libraries, and wish to control which library you 
    link from.
  */
 DJVUAPI void
 djvu_image_free_data(djvu_image ximg[1]);
 
 /** Same as djvuio_image_get_row(), but in a different library.  Useful if you
-   are using the static libraries, and wish to controle which library you 
+   are using the static libraries, and wish to control which library you 
    link from.
  */
 DJVUAPI int
@@ -651,7 +656,7 @@ DJVUAPI djvu_image *
 djvu_image_copy_native(const djvu_image *ximg,char *ebuf,size_t ebuf_size);
 
 /** This converts images to gray scale.   An error is indicated by returning
-  a NULL value and writting a message into the user supplied buffer (ebuf). 
+  a NULL value and writing a message into the user supplied buffer (ebuf). 
   The application program should free the image in the event of an error.
  */
 DJVUAPI djvu_image *
@@ -659,7 +664,7 @@ djvu_image_gray(djvu_image *ximg,char *ebuf,size_t ebuf_size);
 
 /** This copies an image in gray scale.  This will be a DEEP copy, meaning
   all image data will be duplicated.  An error will be indicated by a
-  NULL return value and writting a message into the user supplied 
+  NULL return value and writing a message into the user supplied 
   buffer (ebuf).
  */
 DJVUAPI djvu_image *
@@ -670,7 +675,7 @@ djvu_image_copy_gray(const djvu_image *ximg,char *ebuf,size_t ebuf_size);
   threshold, with values below the threshold becoming black and above
   white.  The pixels are then encoded by storing the number of
   consecutive pixels of the same color, instead of bit mapping each
-  pixel.  An error is indicated by returning a NULL value and writting
+  pixel.  An error is indicated by returning a NULL value and writing
   a message into the user supplied buffer (ebuf).  The application
   program should free the image in the event of an error.
  */
@@ -684,7 +689,7 @@ djvu_image_rle(
   black and above white.  The pixels are then encoded by storing the
   number of consecutive pixels of the same color, instead of bit mapping
   each pixel.  This will be DEEP copy, meaning all image data is duplicated.
-  An error is indicated by returning a NULL value and writting a message
+  An error is indicated by returning a NULL value and writing a message
   into the user supplied buffer (ebuf). 
  */
 DJVUAPI djvu_image*
@@ -703,7 +708,7 @@ djvu_image_copy_resize(
 
 /** This resizes the image to the specified width and height.  This will be
   DEEP copy, meaning all image data is duplicated.  An error is indicated
-  by returning a NULL value and writting a message into the user supplied
+  by returning a NULL value and writing a message into the user supplied
   buffer (ebuf). 
  */
 DJVUAPI djvu_image *
@@ -713,8 +718,8 @@ djvu_image_resize(
 
 /** This makes a copy of the image headers, with the flags changed to
   the specified rotation.  The copy will be SHALLOW, meaning the
-  new image structure still referes to the data in the original
-  image, and the original image can not be deallocaed while the copy
+  new image structure still refers to the data in the original
+  image, and the original image can not be deallocated while the copy
   is still in use.  If a DEEP copy is desired, use any of the above
   transforms, such as djvu_image_copy_native().
  */
@@ -730,8 +735,8 @@ djvu_image_rotate(djvu_image *ximg,int angle);
 
 /** This makes a copy of the image headers, with the flags changed to
   the specified crop size.  The copy will be SHALLOW, meaning the
-  new image structure still referes to the data in the original
-  image, and the original image can not be deallocaed while the copy
+  new image structure still refers to the data in the original
+  image, and the original image can not be deallocated while the copy
   is still in use.  If a DEEP copy is desired, use any of the above
   transforms, such as djvu_image_copy_native().
  */
@@ -750,8 +755,8 @@ djvu_image_crop(
 
 /** This makes a copy of the image headers, with the flags changed to
   indicate a vflip operation.  The copy will be SHALLOW, meaning the
-  new image structure still referes to the data in the original
-  image, and the original image can not be deallocaed while the copy
+  new image structure still refers to the data in the original
+  image, and the original image can not be deallocated while the copy
   is still in use.  If a DEEP copy is desired, use any of the above
   transforms, such as djvu_image_copy_native().
  */
@@ -766,8 +771,8 @@ djvu_image_vflip(djvu_image *ximg);
 
 /** This makes a copy of the image headers, with the flags changed to
   indicate a hflip operation.  The copy will be SHALLOW, meaning the
-  new image structure still referes to the data in the original
-  image, and the original image can not be deallocaed while the copy
+  new image structure still refers to the data in the original
+  image, and the original image can not be deallocated while the copy
   is still in use.  If a DEEP copy is desired, use any of the above
   transforms, such as djvu_image_copy_native().
  */

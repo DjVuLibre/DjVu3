@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuBitonalAPI.h,v 1.6 2000-01-26 04:40:46 bcr Exp $
+ *C- $Id: DjVuBitonalAPI.h,v 1.7 2000-01-27 20:36:18 haffner Exp $
  */
 
 #ifndef _DJVUBITONAL_H_
@@ -57,7 +57,7 @@ typedef struct djvu_jb2_options_struct
 /** These decides which predefined set of options to use. Quality
   value is greatest in lossless. (lossless > normal > conservative
   > aggressive).  pseudo will create the djvu output with data
-  stored in G4 format, that is same as input.  The relavent
+  stored in G4 format, that is same as input.  The relevant
   configuration file option is lossless, normal, conservative,
   aggressive, and pseudo as mutually exclusive options.
  */
