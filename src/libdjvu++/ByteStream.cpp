@@ -7,9 +7,9 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: ByteStream.cpp,v 1.3 1999-02-03 23:07:25 leonb Exp $
+//C-  $Id: ByteStream.cpp,v 1.4 1999-02-26 22:19:13 leonb Exp $
 
-// File "$Id: ByteStream.cpp,v 1.3 1999-02-03 23:07:25 leonb Exp $"
+// File "$Id: ByteStream.cpp,v 1.4 1999-02-26 22:19:13 leonb Exp $"
 // - Author: Leon Bottou, 04/1997
 
 #ifdef __GNUC__
@@ -309,54 +309,100 @@ StdioByteStream::seek(long offset, int whence)
 
 ///////// MEMORYBYTESTREAM
 
-MemoryByteStream::MemoryByteStream(const void *buffer, size_t size)
-  : where(0), data(0, size-1)
+MemoryByteStream::MemoryByteStream()
+  : where(0), bsize(0), nblocks(0), blocks(0)
 {
-  memcpy((void*)(char*)data, buffer, size);
-}
- 
-MemoryByteStream::MemoryByteStream(const char *buffer)
-  : where(0), data(0, strlen(buffer))
-{
-  strcpy((char*)data, buffer);
 }
 
-MemoryByteStream::MemoryByteStream()
-  : where(0)
+MemoryByteStream::MemoryByteStream(const void *buffer, size_t sz)
+  : where(0), bsize(0), nblocks(0), blocks(0)
 {
+  MemoryByteStream::write(buffer, sz);
+  where = 0;
+}
+
+MemoryByteStream::MemoryByteStream(const char *buffer)
+  : where(0), bsize(0), nblocks(0), blocks(0)
+{
+  MemoryByteStream::write(buffer, strlen(buffer));
+  where = 0;
 }
 
 MemoryByteStream::~MemoryByteStream()
 {
+  for (int b=0; b<nblocks; b++)
+    delete [] blocks[b];
+  bsize = 0;
+  where = 0;
+  nblocks = 0;
+  delete [] blocks;
+  blocks = 0;
 }
 
 size_t 
-MemoryByteStream::write(const void *buffer, size_t size)
+MemoryByteStream::write(const void *buffer, size_t sz)
 {
-  if (size > 0)
+  int nsz = (int)sz;
+  if (nsz <= 0)
+    return 0;
+  // check memory
+  if ( (where+nsz) > ((bsize+0xfff)&~0xfff) )
     {
-      data.touch(where);
-      data.touch(where+size-1);
-      void *dptr = (void*)((char*)data + where);
-      memcpy(dptr, buffer, size);
-      where += size;
+      int b;
+      // reallocate pointer array
+      if ( (where+nsz) > (nblocks<<12) )
+        {
+          int new_nblocks = (((where+nsz)+0xffff)&~0xffff) >> 12;
+          char **new_blocks = new (char*) [new_nblocks];
+          for (b=0; b<nblocks; b++) 
+            new_blocks[b] = blocks[b];
+          for (; b<new_nblocks; b++) 
+            new_blocks[b] = 0;
+           char **old_blocks = blocks;
+          blocks = new_blocks;
+          nblocks = new_nblocks;
+          delete [] old_blocks;
+        }
+      // allocate blocks
+      for (b=(where>>12); (b<<12)<(where+nsz); b++)
+        if (! blocks[b])
+          blocks[b] = new char[0x1000];
     }
-  return size;
+  // write data to buffer
+  while (nsz > 0)
+    {
+      int n = (where|0xfff) + 1 - where;
+      n = ((nsz < n) ? nsz : n);
+      memcpy( (void*)&blocks[where>>12][where&0xfff], buffer, n);
+      buffer = (void*) ((char*)buffer + n);
+      where += n;
+      nsz -= n;
+    }
+  // adjust size
+  if (where > bsize)
+    bsize = where;
+  return sz;
 }
 
 size_t 
-MemoryByteStream::read(void *buffer, size_t size)
+MemoryByteStream::read(void *buffer, size_t sz)
 {
-  int actual_size = data.size() - where;
-  if ((int)size < actual_size)
-    actual_size = size;
-  if (actual_size < 0)
-    THROW("Attempt to read past end of MemoryByteStream");
-  void *dptr = (void*)((char*)data + where);
-  if (actual_size > 0)
-    memcpy(buffer, dptr, actual_size);
-  where += actual_size;
-  return actual_size;
+  if ((int) sz > bsize - where)
+    sz = bsize - where;
+  int nsz = (int)sz;
+  if (nsz <= 0)
+    return 0;
+  // read data from buffer
+  while (nsz > 0)
+    {
+      int n = (where|0xfff) + 1 - where;
+      n = ((nsz < n) ? nsz : n);
+      memcpy(buffer, (void*)&blocks[where>>12][where&0xfff], n);
+      buffer = (void*) ((char*)buffer + n);
+      where += n;
+      nsz -= n;
+    }
+  return sz;
 }
 
 long 
@@ -379,11 +425,74 @@ MemoryByteStream::seek(long offset, int whence)
     {
     case SEEK_SET: nwhere = 0; break;
     case SEEK_CUR: nwhere = where; break;
-    case SEEK_END: nwhere = data.size(); break;
+    case SEEK_END: nwhere = bsize; break;
     default: THROW("Illegal argument in MemoryByteStream::seek()");
     }
   nwhere += offset;
-  if (nwhere<data.lbound() || nwhere>data.size())
+  if (nwhere<0 || nwhere>bsize)
     THROW("Seek out of bound in MemoryByteStream");
   where = nwhere;
 }
+
+
+///////// STATICBYTESTREAM
+
+
+StaticByteStream::StaticByteStream(const char *buffer, size_t sz)
+  : data(buffer), bsize(sz), where(0)
+{
+}
+
+StaticByteStream::StaticByteStream(const char *buffer)
+  : data(buffer), bsize(0), where(0)
+{
+  bsize = strlen(data);
+}
+
+size_t 
+StaticByteStream::read(void *buffer, size_t sz)
+{
+  if ((int) sz > bsize - where)
+    sz = bsize - where;
+  if ((int) sz <= 0)
+    return 0;
+  memcpy(buffer, data+where, sz);
+  where += sz;
+  return sz;
+}
+
+size_t 
+StaticByteStream::write(const void *buffer, size_t sz)
+{
+  THROW("Attempt to write into a StaticByteStream");
+}
+
+int 
+StaticByteStream::is_seekable(void) const
+{
+  return 1;
+}
+
+void 
+StaticByteStream::seek(long offset, int whence = SEEK_SET)
+{
+  int nwhere = 0;
+  switch (whence)
+    {
+    case SEEK_SET: nwhere = 0; break;
+    case SEEK_CUR: nwhere = where; break;
+    case SEEK_END: nwhere = bsize; break;
+    default: THROW("Illegal argument in StaticByteStream::seek()");
+    }
+  nwhere += offset;
+  if (nwhere<0 || nwhere>bsize)
+    THROW("Seek out of bound in StaticByteStream");
+  where = nwhere;
+}
+
+long 
+StaticByteStream::tell()
+{
+  return where;
+}
+
