@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //
-// $Id: GString.h,v 1.95 2001-09-04 23:01:51 docbill Exp $
+// $Id: GString.h,v 1.96 2001-09-05 19:24:22 docbill Exp $
 // $Name:  $
 
 #ifndef _GSTRING_H_
@@ -64,7 +64,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.95 2001-09-04 23:01:51 docbill Exp $# */
+    #$Id: GString.h,v 1.96 2001-09-05 19:24:22 docbill Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -1088,7 +1088,7 @@ GUTF8String::vformat(const GUTF8String &fmt, va_list &args)
 { return (*this = (fmt.ptr?GUTF8String(fmt,args):fmt)); }
 
 inline GUTF8String
-GUTF8String::toEscaped( const bool tosevenbit=false ) const
+GUTF8String::toEscaped( const bool tosevenbit ) const
 { return ptr?GUTF8String((*this)->toEscaped(tosevenbit)):(*this); }
 
 inline GP<GStringRep::Unicode> 
@@ -1243,11 +1243,11 @@ GBaseString::rcontains(const char accept[], const int from) const
 { return ptr?((*this)->rcontains(accept,from)):(-1); }
 
 inline int
-GBaseString::cmp(const GBaseString &s2, const int len=(-1)) const
+GBaseString::cmp(const GBaseString &s2, const int len) const
 { return GStringRep::cmp(*this,s2,len); }
 
 inline int
-GBaseString::cmp(const char *s2, const int len=(-1)) const
+GBaseString::cmp(const char *s2, const int len) const
 { return GStringRep::cmp(*this,s2,len); }
 
 inline int
@@ -1255,7 +1255,7 @@ GBaseString::cmp(const char s2) const
 { return GStringRep::cmp(*this,&s2,1); }
 
 inline int
-GBaseString::cmp(const char *s1, const char *s2, const int len=(-1))
+GBaseString::cmp(const char *s1, const char *s2, const int len)
 { return GStringRep::cmp(s1,s2,len); }
 
 inline bool

@@ -1,3 +1,4 @@
+<?xml version="1.0" ?>
 <!--================== Imported Names ====================================-->
 
 <!ENTITY % ContentType "CDATA">
@@ -63,25 +64,25 @@
   coords     %Coords;   #IMPLIED
 >
 
-<!ELEMENT PAGECOLUMN ( (REGION)+ | (#PCDATA) ) >
+<!ELEMENT PAGECOLUMN (#PCDATA|REGION)* >
 <!ATTLIST PAGECOLUMN
   shape      CDATA      "rect"
   coords     %Coords;   #IMPLIED
 >
 
-<!ELEMENT REGION ( (PARAGRAPH)+ | (#PCDATA) ) >
+<!ELEMENT REGION (#PCDATA|PARAGRAPH)* >
 <!ATTLIST REGION
   shape      CDATA      "rect"
   coords     %Coords;   #IMPLIED
 >
 
-<!ELEMENT PARAGRAPH ( (LINE)+ | (#PCDATA) ) >
+<!ELEMENT PARAGRAPH (#PCDATA|LINE)* >
 <!ATTLIST PARAGRAPH 
   shape      CDATA      "rect"
   coords     %Coords;   #IMPLIED
 >
 
-<!ELEMENT LINE ( (WORD)+ | (#PCDATA) ) >
+<!ELEMENT LINE (#PCDATA|WORD)* >
 <!ATTLIST LINE 
   shape      CDATA      "rect"
   coords     %Coords;   #IMPLIED
@@ -91,6 +92,12 @@
 <!ATTLIST WORD 
   shape      CDATA      "rect"
   coords     %Coords;   #IMPLIED
+>
+
+<!--===================== METADATA =====================================-->
+<!ELEMENT METADATA (#PCDATA)>
+<!ATTLIST METADATA 
+  %attrs;
 >
 
 <!--================== Client-side image maps ============================-->
@@ -138,7 +145,7 @@
   anywhere after the PARAM elements.
 -->
 
-<!ELEMENT OBJECT ( (PARAM)*, (%flow;)*, HIDDENTEXT?, (%flow;)* ) >
+<!ELEMENT OBJECT ( (PARAM)*, (%flow;)*, HIDDENTEXT?, METADATA?, (%flow;)* ) >
 <!ATTLIST OBJECT
   %attrs;
   data        %URI;          #REQUIRED
