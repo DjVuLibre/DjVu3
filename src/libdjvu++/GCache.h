@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GCache.h,v 1.1.2.3 1999-04-27 15:29:53 eaf Exp $
+//C- $Id: GCache.h,v 1.1.2.4 1999-04-27 15:46:19 eaf Exp $
 
 #ifndef _GCACHE_H
 #define _GCACHE_H
@@ -106,6 +106,7 @@ public:
    GP<Value> 	get_item(const Key & key);
    void		del_item(const Key & key);
    void		add_item(const Key & key, const GP<Value> & value);
+   void		clear(void);
    void		set_max_size(int max_size);
    void		enable(bool en);
    bool		is_enabled(void) const;
@@ -257,6 +258,12 @@ GCache<Key, Value>::add_item(const Key & k, const GP<Value> & v)
    
    cache[k]=v;
    cur_size+=add_size;
+}
+
+template<class Key, class Value> void
+GCache<Key, Value>::clear(void)
+{
+   clear_to_size(0);
 }
 
 template<class Key, class Value> void
