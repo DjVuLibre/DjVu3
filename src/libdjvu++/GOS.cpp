@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: GOS.cpp,v 1.32 2000-10-23 19:31:39 mrosen Exp $
+//C- $Id: GOS.cpp,v 1.33 2000-10-23 23:04:42 mrosen Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -91,7 +91,7 @@ static const char nillchar=0;
   static const char root[] = "/";
 #else
 #ifdef WIN32
-  static const char root[] = "C:\\";
+  static const char root[] = "\\";
 #else
 #ifdef macintosh
   static char const * const root = &nillchar; 
