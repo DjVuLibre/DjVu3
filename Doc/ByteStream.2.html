@@ -23,7 +23,7 @@
 <DT><H3>Public Methods</H3><DD><DT>
 <IMG ALT="o" SRC=icon2.gif>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="ByteStream.html">ByteStream</A>&gt;  <B>create</B>(void)
 <DT>
-<IMG ALT="o" SRC=icon2.gif>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="ByteStream.html">ByteStream</A>&gt;  <B>create</B>(void const * const buffer, const size_t <!1><A HREF="ByteStream.html#DOC.1.4.14.1.2.13">size</A>)
+<IMG ALT="o" SRC=icon2.gif>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="ByteStream.html">ByteStream</A>&gt;  <B>create</B>(void const * const buffer, const size_t <!1><A HREF="ByteStream.html#DOC.1.4.14.1.2.17">size</A>)
 <DT>
 <IMG ALT="o" SRC=icon2.gif>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="ByteStream.html">ByteStream</A>&gt;  <B>create</B>( const <!1><A HREF="GURL.html">GURL</A> &amp;url, char const * const mode)
 <DT>
@@ -33,7 +33,11 @@
 <DT>
 <IMG ALT="o" SRC=icon2.gif>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="ByteStream.html">ByteStream</A>&gt;  <B>create</B>( FILE * const f, char const * const mode, const bool closeme)
 <DT>
-<IMG ALT="o" SRC=icon2.gif>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="ByteStream.html">ByteStream</A>&gt;  <B>create_static</B>( void const * const buffer, const size_t <!1><A HREF="ByteStream.html#DOC.1.4.14.1.2.13">size</A>)
+<IMG ALT="o" SRC=icon2.gif>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="ByteStream.html">ByteStream</A>&gt;  <B>create_static</B>( void const * const buffer, const size_t <!1><A HREF="ByteStream.html#DOC.1.4.14.1.2.17">size</A>)
+<DT>
+<IMG ALT="o" SRC=icon2.gif><!1><A HREF="GNativeString.html">GNativeString</A> <B>getAsNative</B>(void)
+<DT>
+<IMG ALT="o" SRC=icon2.gif><!1><A HREF="GUTF8String.html">GUTF8String</A> <B>getAsUTF8</B>(void)
 </DL></P>
 
 <P><DL>
@@ -44,10 +48,10 @@
 <A HREF="#DOC.1.4.14.1.1.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual  UTF8public <B>~ByteStream</B>()
 <DD><I>Virtual destructor.</I>
 <DT>
-<A HREF="#DOC.1.4.14.1.1.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   size_t <B>read</B>(void *buffer, size_t <!1><A HREF="ByteStream.html#DOC.1.4.14.1.2.13">size</A>)
+<A HREF="#DOC.1.4.14.1.1.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   size_t <B>read</B>(void *buffer, size_t <!1><A HREF="ByteStream.html#DOC.1.4.14.1.2.17">size</A>)
 <DD><I>Reads data from a ByteStream.</I>
 <DT>
-<A HREF="#DOC.1.4.14.1.1.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   size_t <B>write</B>(const void *buffer, size_t <!1><A HREF="ByteStream.html#DOC.1.4.14.1.2.13">size</A>)
+<A HREF="#DOC.1.4.14.1.1.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   size_t <B>write</B>(const void *buffer, size_t <!1><A HREF="ByteStream.html#DOC.1.4.14.1.2.17">size</A>)
 <DD><I>Writes data to a ByteStream.</I>
 <DT>
 <A HREF="#DOC.1.4.14.1.1.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   long <B>tell</B>(void) const 
@@ -63,56 +67,71 @@
 <P> <B>Utility Functions.  </B>
 <P><DL>
 <DT>
-<A HREF="#DOC.1.4.14.1.2.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>size_t <B>readall</B>(void *buffer, size_t <!1><A HREF="ByteStream.html#DOC.1.4.14.1.2.13">size</A>)
+<A HREF="#DOC.1.4.14.1.2.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>size_t <B>readall</B>(void *buffer, size_t <!1><A HREF="ByteStream.html#DOC.1.4.14.1.2.17">size</A>)
 <DD><I>Reads data and blocks until everything has been read.</I>
 <DT>
-<A HREF="#DOC.1.4.14.1.2.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>size_t <B>writall</B>(const void *buffer, size_t <!1><A HREF="ByteStream.html#DOC.1.4.14.1.2.13">size</A>)
+<A HREF="#DOC.1.4.14.1.2.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>size_t <B>writall</B>(const void *buffer, size_t <!1><A HREF="ByteStream.html#DOC.1.4.14.1.2.17">size</A>)
 <DD><I>Writes data and blocks until everything has been written.</I>
 <DT>
-<A HREF="#DOC.1.4.14.1.2.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>size_t <B>copy</B>(<!1><A HREF="ByteStream.html">ByteStream</A> &amp;bsfrom, size_t <!1><A HREF="ByteStream.html#DOC.1.4.14.1.2.13">size</A>=0)
+<A HREF="#DOC.1.4.14.1.2.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>size_t <B>copy</B>(<!1><A HREF="ByteStream.html">ByteStream</A> &amp;bsfrom, size_t <!1><A HREF="ByteStream.html#DOC.1.4.14.1.2.17">size</A>=0)
 <DD><I>Copy data from another ByteStream.</I>
 <DT>
-<A HREF="#DOC.1.4.14.1.2.15"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>size_t <B>format</B>(const char *fmt, ... )
+<A HREF="#DOC.1.4.14.1.2.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="ByteStream.html">ByteStream</A>&gt;  <B>duplicate</B>(const size_t <!1><A HREF="ByteStream.html#DOC.1.4.14.1.2.17">size</A>=0) const 
+<DD><I>Create a new <TT>ByteStream</TT> that copies the data from this <TT>ByteStream</TT> starting from the current position, upto <TT>size</TT> bytes.</I>
+<DT>
+<A HREF="#DOC.1.4.14.1.2.19"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>size_t <B>format</B>(const char *fmt, ... )
 <DD><I>Allows printf() type operations to a bytestream.</I>
 <DT>
-<A HREF="#DOC.1.4.14.1.2.16"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>scanf</B>(const char *fmt, ... )
+<A HREF="#DOC.1.4.14.1.2.20"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>scanf</B>(const char *fmt, ... )
 <DD><I>Allows scanf() type operations on a bytestream.</I>
 <DT>
-<A HREF="#DOC.1.4.14.1.2.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>size_t <B>writestring</B>(const GUTF8String &amp;s)
+<A HREF="#DOC.1.4.14.1.2.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>size_t <B>writestring</B>(const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;s)
 <DD><I>Writes the string as is, to the specified stream.</I>
 <DT>
-<A HREF="#DOC.1.4.14.1.2.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>write8</B>(unsigned int card8)
+<A HREF="#DOC.1.4.14.1.2.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>size_t <B>writestring</B>(const <!1><A HREF="GNativeString.html">GNativeString</A> &amp;s)
+<DD><I>Writes the string as is, to the specified stream.</I>
+<DT>
+<A HREF="#DOC.1.4.14.1.2.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>formatmessage</B>( const char *fmt, ... )
+<DD><I>Formats the message string, looks up the external representation and writes it to the specified stream.</I>
+<DT>
+<A HREF="#DOC.1.4.14.1.2.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>ByteStream::writemessage</B>( const char *message )
+<DD><I>Looks up the message and writes it to the specified stream.</I>
+<DT>
+<A HREF="#DOC.1.4.14.1.2.9"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>write8</B>(unsigned int card8)
 <DD><I>Writes a one-byte integer to a ByteStream.</I>
 <DT>
-<A HREF="#DOC.1.4.14.1.2.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>write16</B>(unsigned int card16)
+<A HREF="#DOC.1.4.14.1.2.10"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>write16</B>(unsigned int card16)
 <DD><I>Writes a two-bytes integer to a ByteStream.</I>
 <DT>
-<A HREF="#DOC.1.4.14.1.2.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>write24</B>(unsigned int card24)
+<A HREF="#DOC.1.4.14.1.2.11"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>write24</B>(unsigned int card24)
 <DD><I>Writes a three-bytes integer to a ByteStream.</I>
 <DT>
-<A HREF="#DOC.1.4.14.1.2.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>write32</B>(unsigned int card32)
+<A HREF="#DOC.1.4.14.1.2.12"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>write32</B>(unsigned int card32)
 <DD><I>Writes a four-bytes integer to a ByteStream.</I>
 <DT>
-<A HREF="#DOC.1.4.14.1.2.9"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>unsigned int <B>read8</B>()
+<A HREF="#DOC.1.4.14.1.2.13"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>unsigned int <B>read8</B>()
 <DD><I>Reads a one-byte integer from a ByteStream.</I>
 <DT>
-<A HREF="#DOC.1.4.14.1.2.10"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>unsigned int <B>read16</B>()
+<A HREF="#DOC.1.4.14.1.2.14"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>unsigned int <B>read16</B>()
 <DD><I>Reads a two-bytes integer from a ByteStream.</I>
 <DT>
-<A HREF="#DOC.1.4.14.1.2.11"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>unsigned int <B>read24</B>()
+<A HREF="#DOC.1.4.14.1.2.15"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>unsigned int <B>read24</B>()
 <DD><I>Reads a three-bytes integer from a ByteStream.</I>
 <DT>
-<A HREF="#DOC.1.4.14.1.2.12"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>unsigned int <B>read32</B>()
+<A HREF="#DOC.1.4.14.1.2.16"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>unsigned int <B>read32</B>()
 <DD><I>Reads a four-bytes integer from a ByteStream.</I>
 <DT>
-<A HREF="#DOC.1.4.14.1.2.13"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   int <B>size</B>(void) const 
+<A HREF="#DOC.1.4.14.1.2.17"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   int <B>size</B>(void) const 
 <DD><I>Returns the total number of bytes contained in the buffer, file, etc.</I>
 <DT>
-<A HREF="#DOC.1.4.14.1.2.17"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="TArray.html">TArray</A>&lt;char&gt;  <B>get_data</B>(void)
+<A HREF="#DOC.1.4.14.1.2.21"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="TArray.html">TArray</A>&lt;char&gt;  <B>get_data</B>(void)
 <DD><I>Use at your own risk, only guarenteed to work for ByteStream::Memorys.</I>
 <DT>
-<A HREF="#DOC.1.4.14.1.2.14"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   size_t <B>readat</B>(void *buffer, size_t sz, int pos)
+<A HREF="#DOC.1.4.14.1.2.18"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   size_t <B>readat</B>(void *buffer, size_t sz, int pos)
 <DD><I>Reads data from a random position.</I>
+<DT>
+<A HREF="#DOC.1.4.14.1.2.22"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   bool <B>is_static</B>(void) const 
+<DD><I>Returns false, unless a subclass of ByteStream::Static</I>
 </DL></P>
 </DL></P>
 

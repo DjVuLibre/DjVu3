@@ -9,6 +9,13 @@ then
 fi
 CONFIG_FILE=`dirname "$PROGRAM"`"/config/functions.sh"
 conf=`basename "$PROGRAM"`
+if [ -r "$conf" ]
+then
+  mkdir build
+  cd build
+  CONFIG_FILE="../$CONFIG_FILE"
+  PROGRAM="../$conf"
+fi
 if [ ! -r "$CONFIG_FILE" ]
 then
     echo 1>&2 "$conf: Cannot recognize source directory"
@@ -76,9 +83,15 @@ do
       ;;
     --without-jpeg )
       without_jpeg=yes
+      jpeg_name=
       ;;
     --with-jpeg )
       without_jpeg=
+      jpeg_name=
+      ;;
+    --with-jpeg=* )
+      without_jpeg=
+      jpeg_name=`echo $arg|sed 's/[-A-Za-z]*=//'`
       ;;
     --without-iconv )
       with_iconv=
@@ -100,6 +113,7 @@ do
         echo 1>&2 "  --shared, --with(out)-shared "
         echo 1>&2 "  --static, --with(out)-static "
         echo 1>&2 "  --with(out)-jpeg "
+        echo 1>&2 "  --with-jpeg=libjpeg.so "
         echo 1>&2 "  --with(out)-reference"
         exit 1 
       fi
@@ -390,10 +404,12 @@ else
    CONFIG_VARS="$CONFIG_VARS RPO"
 fi
 
-
-if [ ! -d $TOPSRCDIR/src/3rd-party/libjpeg ]
+if [ -z "$jpeg_name" ]
 then
-  without_jpeg=true
+  if [ ! -d $TOPSRCDIR/src/3rd-party/libjpeg ]
+  then
+    without_jpeg=true
+  fi
 fi
 
 libdirs="
@@ -426,16 +442,28 @@ A_DEFS="$A_DEFS -DNEED_DJVU_PROGRESS"
 
 if [ -z "$without_jpeg" ]
 then
-  A_DEFS="$A_DEFS -DNEED_JPEG_DECODER"
-  C_INCS=APPEND
-  A_INCS="$A_INCS -I./TOPDIR/src/3rd-party/libjpeg -I./TOPDIR/SRCDIR/src/3rd-party/libjpeg"
-  LIBJPEG='$(LIBPATH)/libjpeg.a'
-  C_CXXSYMBOLIC=APPEND
-  A_CXXSYMBOLIC="$A_CXXSYMBOLIC $WLWHOLEARCHIVE,"'$(LIBJPEG)'
-  libdirs="src/3rd-party/libjpeg $libdirs"
-  if [ shared = "$build_mode_decode" ]
+  append_defs NEED_JPEG_DECODER
+  if [ -z "$jpeg_name" ] 
   then
-    DYNAMICLIBS=`echo '$(LIBJPEGSO)' $DYNAMICLIBS`
+    if [ ! -d "$TOPSRCDIR/src/3rd-party/libjpeg" ]
+    then
+      C_INCS=APPEND
+      A_INCS="$A_INCS -I./TOPDIR/src/3rd-party/libjpeg -I./TOPDIR/SRCDIR/src/3rd-party/libjpeg"
+      LIBJPEG='$(LIBPATH)/libjpeg.a'
+      C_CXXSYMBOLIC=APPEND
+      A_CXXSYMBOLIC="$A_CXXSYMBOLIC $WLWHOLEARCHIVE,"'$(LIBJPEG)'
+      libdirs="src/3rd-party/libjpeg $libdirs"
+      if [ shared = "$build_mode_decode" ]
+      then
+        DYNAMICLIBS=`echo '$(LIBJPEGSO)' $DYNAMICLIBS`
+      fi
+    else
+      LIBJPEG=""
+      append_defs LIBJPEGNAME \""libjpeg.so"\"
+    fi
+  else
+    LIBJPEG=""
+    append_defs LIBJPEGNAME \""$jpeg_name"\"
   fi
 else
   LIBJPEG=""

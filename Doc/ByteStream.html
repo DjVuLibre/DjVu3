@@ -1,17 +1,17 @@
 <HTML>
 <HEAD>
-   <TITLE>class  ByteStream</TITLE>
+   <TITLE>class  GURLclass  GUTF8Stringclass  GNativeStringclass  ByteStream</TITLE>
    <META NAME="GENERATOR" CONTENT="DOC++ 3.4.1">
 </HEAD>
 <BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
 
-<H2>class  <A HREF="#DOC.DOCU">ByteStream</A>: public <!1><A HREF="GPEnabled.html#DOC.1.4.4.1.2">GPEnabled</A></H2>
+<H2>class  GURLclass  GUTF8Stringclass  GNativeStringclass  <A HREF="#DOC.DOCU">ByteStream</A>: public <!1><A HREF="GPEnabled.html#DOC.1.4.4.2">GPEnabled</A></H2>
 <BLOCKQUOTE>Abstract class for a stream of bytes.</BLOCKQUOTE>
 <HR>
 
 <H2>Inheritance:</H2>
 <APPLET CODE="ClassGraph.class" WIDTH=600 HEIGHT=125>
-<param name=classes value="CGPEnabled,MGPEnabled.html,CByteStream,MByteStream.html,CIFFByteStream,MIFFByteStream.html,CBSByteStream,MBSByteStream.html">
+<param name=classes value="CGPEnabled,MGPEnabled.html,CByteStream,MByteStream.html,CByteStream,MByteStream.2.html,CBSByteStream,MBSByteStream.html">
 <param name=before value="M,M,M|_,Mr_">
 <param name=after value="Md_,M,M,M">
 <param name=indent value="0,1,1,1">
@@ -22,94 +22,106 @@
 <DL>
 <P><DL>
 <DT><H3>Public Methods</H3><DD><DT>
-<A HREF="#DOC.1.4.12.1.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="ByteStream.html">ByteStream</A>&gt;  <B>create</B>(void)
+<A HREF="#DOC.1.4.14.1.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="ByteStream.html">ByteStream</A>&gt;  <B>create</B>(void)
 <DD><I>Constructs an empty Memory ByteStream.</I>
 <DT>
-<A HREF="#DOC.1.4.12.1.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="ByteStream.html">ByteStream</A>&gt;  <B>create</B>(void const * const buffer, const size_t <!1><A HREF="ByteStream.html#DOC.1.4.12.1.2.12">size</A>)
+<A HREF="#DOC.1.4.14.1.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="ByteStream.html">ByteStream</A>&gt;  <B>create</B>(void const * const buffer, const size_t <!1><A HREF="ByteStream.html#DOC.1.4.14.1.2.13">size</A>)
 <DD><I>Constructs a Memory ByteStream by copying initial data.</I>
 <DT>
-<A HREF="#DOC.1.4.12.1.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="ByteStream.html">ByteStream</A>&gt;  <B>create</B>( const char filename[], char const * const mode)
-<DD><I>Constructs a ByteStream for accessing the file named <TT>filename</TT>.</I>
+<A HREF="#DOC.1.4.14.1.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="ByteStream.html">ByteStream</A>&gt;  <B>create</B>( const <!1><A HREF="GURL.html">GURL</A> &amp;url, char const * const mode)
+<DD><I>Constructs a ByteStream for accessing the file named <TT>url</TT>.</I>
 <DT>
-<A HREF="#DOC.1.4.12.1.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="ByteStream.html">ByteStream</A>&gt;  <B>create</B>( const int fd, char const * const mode, const bool closeme)
+<A HREF="#DOC.1.4.14.1.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="ByteStream.html">ByteStream</A>&gt;  <B>create</B>( char const * const mode)
+<DD><I>Same as the above, but uses stdio.</I>
+<DT>
+<A HREF="#DOC.1.4.14.1.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="ByteStream.html">ByteStream</A>&gt;  <B>create</B>( const int fd, char const * const mode, const bool closeme)
 <DD><I>Constructs a ByteStream for accessing the stdio file <TT>f</TT>.</I>
 <DT>
-<A HREF="#DOC.1.4.12.1.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="ByteStream.html">ByteStream</A>&gt;  <B>create</B>( FILE * const f, char const * const mode, const bool closeme)
+<A HREF="#DOC.1.4.14.1.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="ByteStream.html">ByteStream</A>&gt;  <B>create</B>( FILE * const f, char const * const mode, const bool closeme)
 <DD><I>Constructs a ByteStream for accessing the stdio file <TT>f</TT>.</I>
 <DT>
-<A HREF="#DOC.1.4.12.1.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="ByteStream.html">ByteStream</A>&gt;  <B>create_static</B>( void const * const buffer, const size_t <!1><A HREF="ByteStream.html#DOC.1.4.12.1.2.12">size</A>)
+<A HREF="#DOC.1.4.14.1.9"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="ByteStream.html">ByteStream</A>&gt;  <B>create_static</B>( void const * const buffer, const size_t <!1><A HREF="ByteStream.html#DOC.1.4.14.1.2.13">size</A>)
 <DD><I>Creates a ByteStream object for allocating the memory area of length <TT>sz</TT> starting at address <TT>buffer</TT>.</I>
 </DL></P>
 
 <P><DL>
 <DT><H3>Public</H3><DD><DT>
-<A HREF="#DOC.1.4.12.1.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>class  Stdioclass  Staticclass  Memoryclass  <B>Virtual Functions.</B>
+<A HREF="#DOC.1.4.14.1.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Virtual Functions.</B>
 <DD><I></I>
 <P><DL>
 <DT>
-<A HREF="#DOC.1.4.12.1.1.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   <B>~ByteStream</B>()
+<A HREF="#DOC.1.4.14.1.1.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual  UTF8public <B>~ByteStream</B>()
 <DD><I>Virtual destructor.</I>
 <DT>
-<A HREF="#DOC.1.4.12.1.1.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   size_t <B>read</B>(void *buffer, size_t <!1><A HREF="ByteStream.html#DOC.1.4.12.1.2.12">size</A>)
+<A HREF="#DOC.1.4.14.1.1.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   size_t <B>read</B>(void *buffer, size_t <!1><A HREF="ByteStream.html#DOC.1.4.14.1.2.13">size</A>)
 <DD><I>Reads data from a ByteStream.</I>
 <DT>
-<A HREF="#DOC.1.4.12.1.1.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   size_t <B>write</B>(const void *buffer, size_t <!1><A HREF="ByteStream.html#DOC.1.4.12.1.2.12">size</A>)
+<A HREF="#DOC.1.4.14.1.1.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   size_t <B>write</B>(const void *buffer, size_t <!1><A HREF="ByteStream.html#DOC.1.4.14.1.2.13">size</A>)
 <DD><I>Writes data to a ByteStream.</I>
 <DT>
-<A HREF="#DOC.1.4.12.1.1.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   long <B>tell</B>(void) const 
+<A HREF="#DOC.1.4.14.1.1.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   long <B>tell</B>(void) const 
 <DD><I>Returns the offset of the current position in the ByteStream.</I>
 <DT>
-<A HREF="#DOC.1.4.12.1.1.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   int <B>seek</B>(long offset, int whence = SEEK_SET, bool nothrow=false)
+<A HREF="#DOC.1.4.14.1.1.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   int <B>seek</B>(long offset, int whence = SEEK_SET, bool nothrow=false)
 <DD><I>Sets the current position for reading or writing the ByteStream.</I>
 <DT>
-<A HREF="#DOC.1.4.12.1.1.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>flush</B>(void)
+<A HREF="#DOC.1.4.14.1.1.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>flush</B>(void)
 <DD><I>Flushes all buffers in the ByteStream.</I>
 </DL></P>
 <DT>
-<A HREF="#DOC.1.4.12.1.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Utility Functions.  </B>
+<A HREF="#DOC.1.4.14.1.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Utility Functions.  </B>
 <DD><I></I>
 <P><DL>
 <DT>
-<A HREF="#DOC.1.4.12.1.2.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>size_t <B>readall</B>(void *buffer, size_t <!1><A HREF="ByteStream.html#DOC.1.4.12.1.2.12">size</A>)
+<A HREF="#DOC.1.4.14.1.2.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>size_t <B>readall</B>(void *buffer, size_t <!1><A HREF="ByteStream.html#DOC.1.4.14.1.2.13">size</A>)
 <DD><I>Reads data and blocks until everything has been read.</I>
 <DT>
-<A HREF="#DOC.1.4.12.1.2.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>size_t <B>writall</B>(const void *buffer, size_t <!1><A HREF="ByteStream.html#DOC.1.4.12.1.2.12">size</A>)
+<A HREF="#DOC.1.4.14.1.2.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>size_t <B>writall</B>(const void *buffer, size_t <!1><A HREF="ByteStream.html#DOC.1.4.14.1.2.13">size</A>)
 <DD><I>Writes data and blocks until everything has been written.</I>
 <DT>
-<A HREF="#DOC.1.4.12.1.2.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>size_t <B>copy</B>(<!1><A HREF="ByteStream.html">ByteStream</A> &amp;bsfrom, size_t <!1><A HREF="ByteStream.html#DOC.1.4.12.1.2.12">size</A>=0)
+<A HREF="#DOC.1.4.14.1.2.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>size_t <B>copy</B>(<!1><A HREF="ByteStream.html">ByteStream</A> &amp;bsfrom, size_t <!1><A HREF="ByteStream.html#DOC.1.4.14.1.2.13">size</A>=0)
 <DD><I>Copy data from another ByteStream.</I>
 <DT>
-<A HREF="#DOC.1.4.12.1.2.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>write8</B>(unsigned int card8)
+<A HREF="#DOC.1.4.14.1.2.15"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>size_t <B>format</B>(const char *fmt, ... )
+<DD><I>Allows printf() type operations to a bytestream.</I>
+<DT>
+<A HREF="#DOC.1.4.14.1.2.16"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>scanf</B>(const char *fmt, ... )
+<DD><I>Allows scanf() type operations on a bytestream.</I>
+<DT>
+<A HREF="#DOC.1.4.14.1.2.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>size_t <B>writestring</B>(const GUTF8String &amp;s)
+<DD><I>Writes the string as is, to the specified stream.</I>
+<DT>
+<A HREF="#DOC.1.4.14.1.2.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>write8</B>(unsigned int card8)
 <DD><I>Writes a one-byte integer to a ByteStream.</I>
 <DT>
-<A HREF="#DOC.1.4.12.1.2.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>write16</B>(unsigned int card16)
+<A HREF="#DOC.1.4.14.1.2.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>write16</B>(unsigned int card16)
 <DD><I>Writes a two-bytes integer to a ByteStream.</I>
 <DT>
-<A HREF="#DOC.1.4.12.1.2.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>write24</B>(unsigned int card24)
+<A HREF="#DOC.1.4.14.1.2.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>write24</B>(unsigned int card24)
 <DD><I>Writes a three-bytes integer to a ByteStream.</I>
 <DT>
-<A HREF="#DOC.1.4.12.1.2.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>write32</B>(unsigned int card32)
+<A HREF="#DOC.1.4.14.1.2.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>write32</B>(unsigned int card32)
 <DD><I>Writes a four-bytes integer to a ByteStream.</I>
 <DT>
-<A HREF="#DOC.1.4.12.1.2.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>unsigned int <B>read8</B>()
+<A HREF="#DOC.1.4.14.1.2.9"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>unsigned int <B>read8</B>()
 <DD><I>Reads a one-byte integer from a ByteStream.</I>
 <DT>
-<A HREF="#DOC.1.4.12.1.2.9"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>unsigned int <B>read16</B>()
+<A HREF="#DOC.1.4.14.1.2.10"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>unsigned int <B>read16</B>()
 <DD><I>Reads a two-bytes integer from a ByteStream.</I>
 <DT>
-<A HREF="#DOC.1.4.12.1.2.10"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>unsigned int <B>read24</B>()
+<A HREF="#DOC.1.4.14.1.2.11"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>unsigned int <B>read24</B>()
 <DD><I>Reads a three-bytes integer from a ByteStream.</I>
 <DT>
-<A HREF="#DOC.1.4.12.1.2.11"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>unsigned int <B>read32</B>()
+<A HREF="#DOC.1.4.14.1.2.12"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>unsigned int <B>read32</B>()
 <DD><I>Reads a four-bytes integer from a ByteStream.</I>
 <DT>
-<A HREF="#DOC.1.4.12.1.2.12"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   int <B>size</B>(void) const 
+<A HREF="#DOC.1.4.14.1.2.13"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   int <B>size</B>(void) const 
 <DD><I>Returns the total number of bytes contained in the buffer, file, etc.</I>
 <DT>
-<A HREF="#DOC.1.4.12.1.2.14"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="TArray.html">TArray</A>&lt;char&gt;  <B>get_data</B>(void)
+<A HREF="#DOC.1.4.14.1.2.17"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="TArray.html">TArray</A>&lt;char&gt;  <B>get_data</B>(void)
 <DD><I>Use at your own risk, only guarenteed to work for ByteStream::Memorys.</I>
 <DT>
-<A HREF="#DOC.1.4.12.1.2.13"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   size_t <B>readat</B>(void *buffer, size_t sz, int pos)
+<A HREF="#DOC.1.4.14.1.2.14"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   size_t <B>readat</B>(void *buffer, size_t sz, int pos)
 <DD><I>Reads data from a random position.</I>
 </DL></P>
 </DL></P>
@@ -119,7 +131,7 @@
 <DL>
 <P><DL>
 <DT><H3>Public Methods</H3><DD><DT>
-<IMG ALT="o" SRC=icon2.gif><!1><A HREF="GPEnabled.html#DOC.1.4.4.1.2">GPEnabled</A>&amp; <B>operator=</B>(const <!1><A HREF="GPEnabled.html#DOC.1.4.4.1.2">GPEnabled</A> &amp; obj)
+<IMG ALT="o" SRC=icon2.gif><!1><A HREF="GPEnabled.html#DOC.1.4.4.2">GPEnabled</A>&amp; <B>operator=</B>(const <!1><A HREF="GPEnabled.html#DOC.1.4.4.2">GPEnabled</A> &amp; obj)
 <DT>
 <IMG ALT="o" SRC=icon2.gif>int <B>get_count</B>(void) const 
 </DL></P>
@@ -145,19 +157,19 @@ of instances of this class, as implied by the class semantic.  </BLOCKQUOTE>
 <DL>
 
 <A NAME="Virtual Functions.">
-<A NAME="DOC.1.4.12.1.1">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>class  Stdioclass  Staticclass  Memoryclass  Virtual Functions.</B></TT>
+<A NAME="DOC.1.4.14.1.1">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> Virtual Functions.</B></TT>
 <DD>These functions are usually implemented by each subclass of <TT>ByteStream</TT>. 
 <DL><DT><DD></DL><P><DL>
 
 <A NAME="~ByteStream">
-<A NAME="DOC.1.4.12.1.1.1">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   ~ByteStream()</B></TT>
+<A NAME="DOC.1.4.14.1.1.1">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual  UTF8public ~ByteStream()</B></TT>
 <DD>Virtual destructor. 
 <DL><DT><DD></DL><P>
 <A NAME="read">
-<A NAME="DOC.1.4.12.1.1.2">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   size_t read(void *buffer, size_t <!1><A HREF="ByteStream.html#DOC.1.4.12.1.2.12">size</A>)</B></TT>
+<A NAME="DOC.1.4.14.1.1.2">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   size_t read(void *buffer, size_t <!1><A HREF="ByteStream.html#DOC.1.4.14.1.2.13">size</A>)</B></TT>
 <DD>Reads data from a ByteStream.  This function <EM>must</EM> be implemented
 by each subclass of <TT>ByteStream</TT>.  At most <TT>size</TT> bytes are read from
 the ByteStream and stored in the memory area pointed to by <TT>buffer</TT>.
@@ -167,30 +179,30 @@ smaller than <TT>size</TT> if the end-of-file mark is reached before filling
 the buffer. Subsequent invocations will always return value <TT>0</TT>.
 Function <TT>read</TT> may also return a value greater than zero but smaller
 than <TT>size</TT> for internal reasons. Programs must be ready to handle these
-cases or use function <!1><A HREF="ByteStream.html#DOC.1.4.12.1.2.1">readall</A>. Exception <!1><A HREF="GException.html">GException</A> is
+cases or use function <!1><A HREF="ByteStream.html#DOC.1.4.14.1.2.1">readall</A>. Exception <!1><A HREF="GException.html">GException</A> is
 thrown with a plain text error message whenever an error occurs. 
 <DL><DT><DD></DL><P>
 <A NAME="write">
-<A NAME="DOC.1.4.12.1.1.3">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   size_t write(const void *buffer, size_t <!1><A HREF="ByteStream.html#DOC.1.4.12.1.2.12">size</A>)</B></TT>
+<A NAME="DOC.1.4.14.1.1.3">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   size_t write(const void *buffer, size_t <!1><A HREF="ByteStream.html#DOC.1.4.14.1.2.13">size</A>)</B></TT>
 <DD>Writes data to a ByteStream.  This function <EM>must</EM> be implemented by
 each subclass of <TT>ByteStream</TT>.  At most <TT>size</TT> bytes from buffer
 <TT>buffer</TT> are written to the ByteStream.  Function <TT>write</TT> returns
 immediately if <TT>size</TT> is zero.  The actual number of bytes written is
 returned. Function <TT>write</TT> may also return a value greater than zero but
 smaller than <TT>size</TT> for internal reasons. Programs must be ready to
-handle these cases or use function <!1><A HREF="ByteStream.html#DOC.1.4.12.1.2.2">writall</A>. Exception
+handle these cases or use function <!1><A HREF="ByteStream.html#DOC.1.4.14.1.2.2">writall</A>. Exception
 <!1><A HREF="GException.html">GException</A> is thrown with a plain text error message whenever an
 error occurs. 
 <DL><DT><DD></DL><P>
 <A NAME="tell">
-<A NAME="DOC.1.4.12.1.1.4">
+<A NAME="DOC.1.4.14.1.1.4">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   long tell(void) const </B></TT>
 <DD>Returns the offset of the current position in the ByteStream.  This
 function <EM>must</EM> be implemented by each subclass of <TT>ByteStream</TT>. 
 <DL><DT><DD></DL><P>
 <A NAME="seek">
-<A NAME="DOC.1.4.12.1.1.5">
+<A NAME="DOC.1.4.14.1.1.5">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   int seek(long offset, int whence = SEEK_SET, bool nothrow=false)</B></TT>
 <DD>Sets the current position for reading or writing the ByteStream.  Class
 <TT>ByteStream</TT> provides a default implementation able to seek forward by
@@ -214,7 +226,7 @@ If <TT>seek()</TT> succeeds, <TT>0</TT> is returned. Otherwise it either returns
 exception. 
 <DL><DT><DD></DL><P>
 <A NAME="flush">
-<A NAME="DOC.1.4.12.1.1.6">
+<A NAME="DOC.1.4.14.1.1.6">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   void flush(void)</B></TT>
 <DD>Flushes all buffers in the ByteStream.  Calling this function
 guarantees that pending data have been actually written (i.e. passed to
@@ -223,7 +235,7 @@ implementation which does nothing.
 <DL><DT><DD></DL><P></DL>
 
 <A NAME="Utility Functions.  ">
-<A NAME="DOC.1.4.12.1.2">
+<A NAME="DOC.1.4.14.1.2">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> Utility Functions.  </B></TT>
 <DD>Class <TT>ByteStream</TT> implements these functions using the virtual
 interface functions only.  All subclasses of <TT>ByteStream</TT> inherit these
@@ -231,8 +243,8 @@ functions.
 <DL><DT><DD></DL><P><DL>
 
 <A NAME="readall">
-<A NAME="DOC.1.4.12.1.2.1">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>size_t readall(void *buffer, size_t <!1><A HREF="ByteStream.html#DOC.1.4.12.1.2.12">size</A>)</B></TT>
+<A NAME="DOC.1.4.14.1.2.1">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>size_t readall(void *buffer, size_t <!1><A HREF="ByteStream.html#DOC.1.4.14.1.2.13">size</A>)</B></TT>
 <DD>Reads data and blocks until everything has been read.  This function is
 essentially similar to function <TT>read</TT>.  Unlike function <TT>read</TT> however,
 function <TT>readall</TT> will never return a value smaller than <TT>size</TT> unless
@@ -242,8 +254,8 @@ end-of-file mark.  Note that <TT>read</TT> and <TT>readall</TT> are equivalent w
 <TT>size</TT> is one. 
 <DL><DT><DD></DL><P>
 <A NAME="writall">
-<A NAME="DOC.1.4.12.1.2.2">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>size_t writall(const void *buffer, size_t <!1><A HREF="ByteStream.html#DOC.1.4.12.1.2.12">size</A>)</B></TT>
+<A NAME="DOC.1.4.14.1.2.2">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>size_t writall(const void *buffer, size_t <!1><A HREF="ByteStream.html#DOC.1.4.14.1.2.13">size</A>)</B></TT>
 <DD>Writes data and blocks until everything has been written.  This function
 is essentially similar to function <TT>write</TT>.  Unlike function <TT>write</TT>
 however, function <TT>writall</TT> will only return after all <TT>size</TT> bytes have
@@ -252,8 +264,8 @@ been written.  This is implemented by repeatedly calling function
 are equivalent when <TT>size</TT> is one. 
 <DL><DT><DD></DL><P>
 <A NAME="copy">
-<A NAME="DOC.1.4.12.1.2.3">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>size_t copy(<!1><A HREF="ByteStream.html">ByteStream</A> &amp;bsfrom, size_t <!1><A HREF="ByteStream.html#DOC.1.4.12.1.2.12">size</A>=0)</B></TT>
+<A NAME="DOC.1.4.14.1.2.3">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>size_t copy(<!1><A HREF="ByteStream.html">ByteStream</A> &amp;bsfrom, size_t <!1><A HREF="ByteStream.html#DOC.1.4.14.1.2.13">size</A>=0)</B></TT>
 <DD>Copy data from another ByteStream.  A maximum of <TT>size</TT> bytes are read
 from the ByteStream <TT>bsfrom</TT> and are written to the ByteStream <TT>*this</TT>
 at the current position.  Less than <TT>size</TT> bytes may be written if an
@@ -263,72 +275,87 @@ default value) has a special meaning: the copying process will continue
 until reaching the end-of-file mark on ByteStream <TT>bsfrom</TT>, regardless
 of the number of bytes transferred.  
 <DL><DT><DD></DL><P>
+<A NAME="format">
+<A NAME="DOC.1.4.14.1.2.15">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>size_t format(const char *fmt, ... )</B></TT>
+<DD>Allows printf() type operations to a bytestream.
+<DL><DT><DD></DL><P>
+<A NAME="scanf">
+<A NAME="DOC.1.4.14.1.2.16">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int scanf(const char *fmt, ... )</B></TT>
+<DD>Allows scanf() type operations on a bytestream.
+<DL><DT><DD></DL><P>
+<A NAME="writestring">
+<A NAME="DOC.1.4.14.1.2.4">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>size_t writestring(const GUTF8String &amp;s)</B></TT>
+<DD>Writes the string as is, to the specified stream. 
+<DL><DT><DD></DL><P>
 <A NAME="write8">
-<A NAME="DOC.1.4.12.1.2.4">
+<A NAME="DOC.1.4.14.1.2.5">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void write8(unsigned int card8)</B></TT>
 <DD>Writes a one-byte integer to a ByteStream. 
 <DL><DT><DD></DL><P>
 <A NAME="write16">
-<A NAME="DOC.1.4.12.1.2.5">
+<A NAME="DOC.1.4.14.1.2.6">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void write16(unsigned int card16)</B></TT>
 <DD>Writes a two-bytes integer to a ByteStream.
 The integer most significant byte is written first,
 regardless of the processor endianness. 
 <DL><DT><DD></DL><P>
 <A NAME="write24">
-<A NAME="DOC.1.4.12.1.2.6">
+<A NAME="DOC.1.4.14.1.2.7">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void write24(unsigned int card24)</B></TT>
 <DD>Writes a three-bytes integer to a ByteStream.
 The integer most significant byte is written first,
 regardless of the processor endianness. 
 <DL><DT><DD></DL><P>
 <A NAME="write32">
-<A NAME="DOC.1.4.12.1.2.7">
+<A NAME="DOC.1.4.14.1.2.8">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void write32(unsigned int card32)</B></TT>
 <DD>Writes a four-bytes integer to a ByteStream. 
 The integer most significant bytes are written first,
 regardless of the processor endianness. 
 <DL><DT><DD></DL><P>
 <A NAME="read8">
-<A NAME="DOC.1.4.12.1.2.8">
+<A NAME="DOC.1.4.14.1.2.9">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>unsigned int read8()</B></TT>
 <DD>Reads a one-byte integer from a ByteStream. 
 <DL><DT><DD></DL><P>
 <A NAME="read16">
-<A NAME="DOC.1.4.12.1.2.9">
+<A NAME="DOC.1.4.14.1.2.10">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>unsigned int read16()</B></TT>
 <DD>Reads a two-bytes integer from a ByteStream.
 The integer most significant byte is read first,
 regardless of the processor endianness. 
 <DL><DT><DD></DL><P>
 <A NAME="read24">
-<A NAME="DOC.1.4.12.1.2.10">
+<A NAME="DOC.1.4.14.1.2.11">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>unsigned int read24()</B></TT>
 <DD>Reads a three-bytes integer from a ByteStream.
 The integer most significant byte is read first,
 regardless of the processor endianness. 
 <DL><DT><DD></DL><P>
 <A NAME="read32">
-<A NAME="DOC.1.4.12.1.2.11">
+<A NAME="DOC.1.4.14.1.2.12">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>unsigned int read32()</B></TT>
 <DD>Reads a four-bytes integer from a ByteStream.
 The integer most significant bytes are read first,
 regardless of the processor endianness. 
 <DL><DT><DD></DL><P>
 <A NAME="size">
-<A NAME="DOC.1.4.12.1.2.12">
+<A NAME="DOC.1.4.14.1.2.13">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   int size(void) const </B></TT>
 <DD>Returns the total number of bytes contained in the buffer, file, etc.
 Valid offsets for function <TT>seek</TT> range from 0 to the value returned
 by this function. 
 <DL><DT><DD></DL><P>
 <A NAME="get_data">
-<A NAME="DOC.1.4.12.1.2.14">
+<A NAME="DOC.1.4.14.1.2.17">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="TArray.html">TArray</A>&lt;char&gt;  get_data(void)</B></TT>
 <DD>Use at your own risk, only guarenteed to work for ByteStream::Memorys.
 <DL><DT><DD></DL><P>
 <A NAME="readat">
-<A NAME="DOC.1.4.12.1.2.13">
+<A NAME="DOC.1.4.14.1.2.14">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   size_t readat(void *buffer, size_t sz, int pos)</B></TT>
 <DD>Reads data from a random position. This function reads at most <TT>sz</TT>
 bytes at position <TT>pos</TT> into <TT>buffer</TT> and returns the actual number of
@@ -336,7 +363,7 @@ bytes read.  The current position is unchanged.
 <DL><DT><DD></DL><P></DL>
 
 <A NAME="create">
-<A NAME="DOC.1.4.12.1.3">
+<A NAME="DOC.1.4.14.1.3">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="ByteStream.html">ByteStream</A>&gt;  create(void)</B></TT>
 <DD>Constructs an empty Memory ByteStream.  The buffer itself is organized
 as an array of 4096 byte blocks.  The buffer is initially empty. You
@@ -345,18 +372,18 @@ function <TT>seek</TT> to rewind the current position, and function <TT>read</TT
 read the data back. 
 <DL><DT><DD></DL><P>
 <A NAME="create">
-<A NAME="DOC.1.4.12.1.4">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="ByteStream.html">ByteStream</A>&gt;  create(void const * const buffer, const size_t <!1><A HREF="ByteStream.html#DOC.1.4.12.1.2.12">size</A>)</B></TT>
+<A NAME="DOC.1.4.14.1.4">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="ByteStream.html">ByteStream</A>&gt;  create(void const * const buffer, const size_t <!1><A HREF="ByteStream.html#DOC.1.4.14.1.2.13">size</A>)</B></TT>
 <DD>Constructs a Memory ByteStream by copying initial data.  The
 Memory buffer is initialized with <TT>size</TT> bytes copied from the
 memory area pointed to by <TT>buffer</TT>. 
 <DL><DT><DD></DL><P>
 <A NAME="create">
-<A NAME="DOC.1.4.12.1.5">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="ByteStream.html">ByteStream</A>&gt;  create( const char filename[], char const * const mode)</B></TT>
-<DD>Constructs a ByteStream for accessing the file named <TT>filename</TT>.
-Arguments <TT>filename</TT> and <TT>mode</TT> are similar to the arguments of the well
-known stdio function <TT>fopen</TT>. In addition a filename of <TT>-</TT> will be
+<A NAME="DOC.1.4.14.1.5">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="ByteStream.html">ByteStream</A>&gt;  create( const <!1><A HREF="GURL.html">GURL</A> &amp;url, char const * const mode)</B></TT>
+<DD>Constructs a ByteStream for accessing the file named <TT>url</TT>.
+Arguments <TT>url</TT> and <TT>mode</TT> are similar to the arguments of the well
+known stdio function <TT>fopen</TT>. In addition a url of <TT>-</TT> will be
 interpreted as the standard output or the standard input according to
 <TT>mode</TT>.  This constructor will open a stdio file and construct a
 ByteStream object accessing this file. Destroying the ByteStream object
@@ -365,7 +392,12 @@ will flush and close the associated stdio file.  Exception
 file cannot be opened. 
 <DL><DT><DD></DL><P>
 <A NAME="create">
-<A NAME="DOC.1.4.12.1.6">
+<A NAME="DOC.1.4.14.1.6">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="ByteStream.html">ByteStream</A>&gt;  create( char const * const mode)</B></TT>
+<DD>Same as the above, but uses stdio. 
+<DL><DT><DD></DL><P>
+<A NAME="create">
+<A NAME="DOC.1.4.14.1.7">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="ByteStream.html">ByteStream</A>&gt;  create( const int fd, char const * const mode, const bool closeme)</B></TT>
 <DD>Constructs a ByteStream for accessing the stdio file <TT>f</TT>.
 Argument <TT>mode</TT> indicates the type of the stdio file, as in the
@@ -373,7 +405,7 @@ well known stdio function <TT>fopen</TT>.  Destroying the ByteStream
 object will not close the stdio file <TT>f</TT> unless closeme is true. 
 <DL><DT><DD></DL><P>
 <A NAME="create">
-<A NAME="DOC.1.4.12.1.7">
+<A NAME="DOC.1.4.14.1.8">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="ByteStream.html">ByteStream</A>&gt;  create( FILE * const f, char const * const mode, const bool closeme)</B></TT>
 <DD>Constructs a ByteStream for accessing the stdio file <TT>f</TT>.
 Argument <TT>mode</TT> indicates the type of the stdio file, as in the
@@ -381,8 +413,8 @@ well known stdio function <TT>fopen</TT>.  Destroying the ByteStream
 object will not close the stdio file <TT>f</TT> unless closeme is true. 
 <DL><DT><DD></DL><P>
 <A NAME="create_static">
-<A NAME="DOC.1.4.12.1.8">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="ByteStream.html">ByteStream</A>&gt;  create_static( void const * const buffer, const size_t <!1><A HREF="ByteStream.html#DOC.1.4.12.1.2.12">size</A>)</B></TT>
+<A NAME="DOC.1.4.14.1.9">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="ByteStream.html">ByteStream</A>&gt;  create_static( void const * const buffer, const size_t <!1><A HREF="ByteStream.html#DOC.1.4.14.1.2.13">size</A>)</B></TT>
 <DD>Creates a ByteStream object for allocating the memory area of
 length <TT>sz</TT> starting at address <TT>buffer</TT>.  This call impliments 
 a read-only ByteStream interface for a memory area specified by
@@ -392,7 +424,7 @@ content remain valid long enough.
 <DL><DT><DD></DL><P></DL>
 <HR>
 <DL><DT><B>Direct child classes:
-</B><DD><A HREF="IFFByteStream.html">IFFByteStream</A><BR>
+</B><DD><A HREF="ByteStream.2.html">ByteStream</A><BR>
 <A HREF="BSByteStream.html">BSByteStream</A><BR>
 </DL>
 

@@ -17,14 +17,15 @@ that don't exist in any of our currently released products.
 
 To build the reference library on a Unix platform:
 
-	./configure
+	mkdir build
+	cd build;../configure
 	make
 
 To install: (as root)
 	cp bin/* /usr/bin/.
 	cp lib/* /usr/lib/.
 	mkdir /etc/DjVu
-	cp profiles/message.conf /etc/DjVu
+	cp -r profiles/. /etc/DjVu
 
 
 To build under Windows:
