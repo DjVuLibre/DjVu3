@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocument.cpp,v 1.136 2001-01-09 00:17:37 bcr Exp $
+// $Id: DjVuDocument.cpp,v 1.137 2001-01-16 23:03:53 bcr Exp $
 // $Name:  $
 
 
@@ -91,54 +91,72 @@ DjVuDocument::DjVuDocument(void)
 {
 }
 
-void
-DjVuDocument::init(const GURL & url, GP<DjVuPort> port, DjVuFileCache * cache)
+GP<DjVuDocument>
+DjVuDocument::create(
+  GP<DataPool> pool, GP<DjVuPort> xport, DjVuFileCache * const xcache)
 {
-   start_init(url, port, cache);
-   wait_for_complete_init();
+  GP<DjVuDocument> retval=new DjVuDocument;
+  retval->init_data_pool=pool;
+  retval->start_init(0,xport,xcache);
+  return retval;
+}
+
+GP<DjVuDocument>
+DjVuDocument::create(
+  ByteStream &bs, GP<DjVuPort> xport, DjVuFileCache * const xcache)
+{
+  return create(new DataPool(bs),xport,xcache);
 }
 
 void
-DjVuDocument::start_init(const GURL & url, GP<DjVuPort> xport,
-			 DjVuFileCache * xcache)
+DjVuDocument::start_init(
+  const GURL & url, GP<DjVuPort> xport, DjVuFileCache * xcache)
 {
-   if (url.is_empty())
-     G_THROW("DjVuDocument.empty_url");
-   
+   DEBUG_MSG("DjVuDocument::start_init(): initializing class...\n");
+   DEBUG_MAKE_INDENT(3);
    if (init_started)
       G_THROW("DjVuDocument.2nd_init");
    if (!get_count())
       G_THROW("DjVuDocument.not_secure");
-   DEBUG_MSG("DjVuDocument::start_init(): initializing class...\n");
-   DEBUG_MAKE_INDENT(3);
+   if(url.is_empty())
+   {
+     if (!init_data_pool)
+       G_THROW("DjVuDocument.empty_url");
+     init_url=invent_url("document.djvu");
+   }else
+   {
+     init_url=url;
+   }
    
       // Initialize
    cache=xcache;
    doc_type=UNKNOWN_TYPE;
-   init_url=url;
    DjVuPortcaster * pcaster=get_portcaster();
    if (!xport) xport=simple_port=new DjVuSimplePort();
    pcaster->add_route(this, xport);
    pcaster->add_route(this, this);
 
-   init_data_pool=pcaster->request_data(this, init_url);
-   if(init_data_pool)
+   if(!url.is_empty())
    {
-     if(init_url && init_url.is_local_file_url() && djvu_import_codec)
+     init_data_pool=pcaster->request_data(this, init_url);
+     if(init_data_pool)
      {
-       djvu_import_codec(init_data_pool,(const char *)(GOS::url_to_filename(init_url)),needs_compression_flag,needs_rename_flag);
+       if(!init_url.is_empty() && init_url.is_local_file_url() && djvu_import_codec)
+       {
+         djvu_import_codec(init_data_pool,(const char *)(GOS::url_to_filename(init_url)),needs_compression_flag,needs_rename_flag);
+       }
+       if(needs_rename_flag)
+         can_compress_flag=true;
      }
-     if(needs_rename_flag)
-       can_compress_flag=true;
-   }
-   if (!init_data_pool) 
-   {
-     if(url.is_local_file_url())
+     if (!init_data_pool) 
      {
-        G_THROW("DjVuDocument.fail_file\t"+GOS::url_to_filename(init_url));
-     }else
-     {
-        G_THROW("DjVuDocument.fail_URL\t"+init_url);
+       if(url.is_local_file_url())
+       {
+          G_THROW("DjVuDocument.fail_file\t"+GOS::url_to_filename(init_url));
+       }else
+       {
+          G_THROW("DjVuDocument.fail_URL\t"+init_url);
+       }
      }
    }
       // Now we say it is ready
@@ -492,7 +510,7 @@ DjVuDocument::check_unnamed_files(void)
 	   GCriticalSectionLock lock(&ufiles_lock);
      for(pos=ufiles_list;pos;)
      {
-	      G_TRY
+	G_TRY
         {
           GP<UnnamedFile> f=ufiles_list[pos];
           if (f->id_type==UnnamedFile::ID) 
@@ -827,9 +845,10 @@ DjVuDocument::get_djvu_file(int page_num, bool dont_create)
 	       // Invent some dummy temporary URL. I don't care what it will
 	       // be. I'll remember the page_num and will generate the correct URL
 	       // after I learn what the document is
-	    char buffer[128];
-	    sprintf(buffer, "djvufileurl://%p/page%d.djvu", this, page_num);
-	    url=buffer;
+            GString name("page");
+            name+=page_num;
+            name+=".djvu";
+            url=invent_url(name);
 
 	    GCriticalSectionLock lock(&ufiles_lock);
 	    for(GPosition pos=ufiles_list;pos;++pos)
@@ -864,6 +883,14 @@ DjVuDocument::get_djvu_file(int page_num, bool dont_create)
    return file;
 }
 
+GURL
+DjVuDocument::invent_url(const char name[]) const
+{
+   char buffer[128];
+   sprintf(buffer, "djvufileurl://%p/%s", this, name);
+   return buffer;
+}
+
 GP<DjVuFile>
 DjVuDocument::get_djvu_file(const char * id, bool dont_create)
 {
@@ -892,9 +919,7 @@ DjVuDocument::get_djvu_file(const char * id, bool dont_create)
 	    // Invent some dummy temporary URL. I don't care what it will
 	    // be. I'll remember the ID and will generate the correct URL
 	    // after I learn what the document is
-	 char buffer[128];
-	 sprintf(buffer, "djvufileurl://%p/%s", this, id);
-	 url=buffer;
+	 url=invent_url(id);
 	 DEBUG_MSG("Invented url='" << url << "'\n");
 	 
 	 GCriticalSectionLock lock(&ufiles_lock);

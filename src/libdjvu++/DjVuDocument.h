@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocument.h,v 1.73 2001-01-04 22:04:54 bcr Exp $
+// $Id: DjVuDocument.h,v 1.74 2001-01-16 23:03:53 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUDOCUMENT_H
@@ -58,7 +58,7 @@ class ByteStream;
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocument.h,v 1.73 2001-01-04 22:04:54 bcr Exp $#
+    @version #$Id: DjVuDocument.h,v 1.74 2001-01-16 23:03:53 bcr Exp $#
 */
 
 //@{
@@ -302,6 +302,18 @@ public:
 	         is actually useful in the plugin only.  */
    void		start_init(const GURL & url, GP<DjVuPort> port=0,
 			   DjVuFileCache * cache=0);
+
+   /** Create a version of DjVuDocument which has begun initializing. */
+   static GP<DjVuDocument> create(
+     const GURL &url, GP<DjVuPort> xport=0, DjVuFileCache * const xcache=0);
+
+   /** Create a version of DjVuDocument which has begun initializing. */
+   static GP<DjVuDocument> create(
+     GP<DataPool> pool, GP<DjVuPort> xport=0, DjVuFileCache * const xcache=0);
+
+   /** Create a version of DjVuDocument which has begun initializing. */
+   static GP<DjVuDocument> create(
+     ByteStream &bs, GP<DjVuPort> xport=0, DjVuFileCache * const xcache=0);
 
       /** Call this function when you don't need the #DjVuDocument# any more.
 	  In a multi-threaded environment it will stop initialization
@@ -781,6 +793,7 @@ protected:
    void			check_unnamed_files(void);
    GString		get_int_prefix(void);
    void			set_file_aliases(const DjVuFile * file);
+   GURL			invent_url(const char name[]) const;
 };
 
 class DjVuDocument::UnnamedFile : public GPEnabled
@@ -816,6 +829,22 @@ protected:
       page_num(xpage_num), data_pool(xdata_pool) {}
    friend class DjVuDocument;
 };
+
+inline void
+DjVuDocument::init(const GURL &url, GP<DjVuPort> port, DjVuFileCache *cache)
+{
+  start_init(url,port,cache);
+  wait_for_complete_init();
+}
+
+inline GP<DjVuDocument>
+DjVuDocument::create(
+  const GURL &url, GP<DjVuPort> xport, DjVuFileCache * const xcache)
+{
+  GP<DjVuDocument> retval=new DjVuDocument;
+  retval->start_init(url,xport,xcache);
+  return retval;
+}
 
 inline bool
 DjVuDocument::is_init_complete(void) const
