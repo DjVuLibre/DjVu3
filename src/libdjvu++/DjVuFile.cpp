@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.108 2000-01-30 02:41:04 praveen Exp $
+//C- $Id: DjVuFile.cpp,v 1.109 2000-02-01 22:21:02 leonb Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -172,7 +172,8 @@ DjVuFile::~DjVuFile(void)
 
       // We don't have to wait for decoding to finish here. It's already
       // finished (we know it because there is a "life saver" in the
-      // thread function)
+      // thread function)  -- but we need to delete it
+   delete decode_thread; decode_thread=0;
 }
 
 void
