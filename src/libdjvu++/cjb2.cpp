@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: cjb2.cpp,v 1.8 2000-02-17 22:12:47 leonb Exp $
+//C- $Id: cjb2.cpp,v 1.9 2000-02-24 20:23:07 leonb Exp $
 
 
 /** @name cjb2
@@ -20,7 +20,7 @@
     \end{verbatim}
 
     {\bf Description}
-    
+
     File #"cjb2.cpp"# demonstrates a simple encoder for Bilevel DjVu Images.
     It is able to perform lossless encoding and limited lossy encoding.  Lots
     of lossy encoding refinements are missing from this simple implementation.
@@ -31,17 +31,24 @@
     \item[-dpi xxx]  Specify image resolution (default 300).
     \item[-clean]    Clean small flyspecs (lossy).
     \item[-loose]    Substitute patterns with small variations (lossy).
+    \item[-verbose]  Displays additional messages.
     \end{description}
     Encoding is lossless unless one or several lossy options are selected.
     The #dpi# argument mostly affects the cleaning thresholds.
+
+    {\bf Bugs}
+
+    This is not the full-fledged multipage DjVu compressor, but merely a free
+    tool provided with the DjVu Reference Library as a demonstrative example.
 
     @memo
     Simple JB2 encoder.
     @author
     L\'eon Bottou <leonb@research.att.com>\\
-    Paul Howard <pgh@research.att.com>
+    Paul Howard <pgh@research.att.com>\\
+    Pascal Vincent <vincentp@iro.umontreal.ca>
     @version
-    #$Id: cjb2.cpp,v 1.8 2000-02-17 22:12:47 leonb Exp $# */
+    #$Id: cjb2.cpp,v 1.9 2000-02-24 20:23:07 leonb Exp $# */
 //@{
 //@}
 
@@ -767,6 +774,7 @@ struct cjb2opts {
   int dpi;
   int substitute_threshold;
   bool clean; 
+  bool verbose;
 };
 
 
@@ -780,21 +788,38 @@ cjb2(const char *filein, const char *fileout, const cjb2opts &opts)
   CCImage rimg(input.columns(), input.rows(), opts.dpi);  // construct CCImage
   rimg.add_bitmap_runs(input);       // fill CCImage
   input.init(0,0);                   // save memory
-
+  if (opts.verbose)
+    fprintf(stderr,"cjb2: %d runs\n", rimg.runs.size());
+  
   // Component analysis
   rimg.make_ccids_by_analysis();             // obtain ccids
   rimg.make_ccs_from_ccids();                // compute cc descriptors
+  if (opts.verbose)
+    fprintf(stderr,"cjb2: %d ccs\n", rimg.ccs.size());
   if (opts.clean) 
     rimg.erase_tiny_ccs();                   // clean
   rimg.merge_and_split_ccs();                // reorganize weird ccs
   rimg.sort_in_reading_order();              // sort cc descriptors
+  if (opts.verbose)
+    fprintf(stderr,"cjb2: %d ccs after preprocessing\n", rimg.ccs.size());
   
   // Pattern matching
   GP<JB2Image> jimg = rimg.get_jb2image();          // get ``raw'' jb2image
   rimg.runs.empty();                                // save memory
   rimg.ccs.empty();                                 // save memory
   tune_jb2image(jimg, opts.substitute_threshold);   // organize jb2image
-
+  if (opts.verbose)
+    {
+      int nshape=0, nrefine=0;
+      for (int i=0; i<jimg->get_shape_count(); i++) {
+        if (!jimg->get_shape(i)->bits) continue;
+        if (jimg->get_shape(i)->parent >= 0) nrefine++; 
+        nshape++; 
+      }
+      fprintf(stderr,"cjb2: %d shapes after matching (%d are cross-coded)\n", 
+              nshape, nrefine);
+    }
+  
   // Code
   StdioByteStream obs(fileout, "wb");
   IFFByteStream iff(obs);
@@ -826,8 +851,6 @@ cjb2(const char *filein, const char *fileout, const cjb2opts &opts)
 // MAIN
 // --------------------------------------------------
 
-
-
 void
 usage()
 {
@@ -836,6 +859,7 @@ usage()
           "   -dpi xxx     Specify image resolution (default 300).\n"
           "   -clean       Remove small flyspecs (lossy).\n"
           "   -loose       Substitute patterns with small variations (lossy).\n"
+          "   -verbose     Displays additional messages.\n"
           "Encoding is lossless unless one or several lossy options are selected.\n" );
   exit(10);
 }
@@ -853,6 +877,7 @@ main(int argc, const char **argv)
       opts.dpi = 300;
       opts.substitute_threshold = 0;
       opts.clean = false;
+      opts.verbose = false;
       // Parse options
       for (int i=1; i<argc; i++)
         {
@@ -867,7 +892,9 @@ main(int argc, const char **argv)
           else if (arg == "-clean")
             opts.clean = true;
           else if (arg == "-loose")
-            opts.substitute_threshold = 5;
+            opts.substitute_threshold = 6;
+          else if (arg == "-verbose")
+            opts.verbose = true;
           else if (arg[0] == '-')
             usage();
           else if (!inputpbmfile)

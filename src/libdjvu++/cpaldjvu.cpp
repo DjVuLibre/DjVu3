@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: cpaldjvu.cpp,v 1.4 2000-02-24 20:01:51 leonb Exp $
+//C- $Id: cpaldjvu.cpp,v 1.5 2000-02-24 20:23:07 leonb Exp $
 
 
 /** @name cpaldjvu
@@ -47,7 +47,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: cpaldjvu.cpp,v 1.4 2000-02-24 20:01:51 leonb Exp $# */
+    #$Id: cpaldjvu.cpp,v 1.5 2000-02-24 20:23:07 leonb Exp $# */
 //@{
 //@}
 
@@ -737,18 +737,17 @@ cpaldjvu(const GPixmap &input, const char *fileout, const cpaldjvuopts &opts)
         }
     }
   if (opts.verbose)
-    fprintf(stderr,"cpaldjvu: found %d color runs\n", 
+    fprintf(stderr,"cpaldjvu: %d color runs\n", 
             rimg.runs.size());
 
   // Perform Color Connected Component Analysis
   rimg.make_ccids_by_analysis();                  // Obtain ccids
   rimg.make_ccs_from_ccids();                     // Compute cc descriptors
   if (opts.verbose)
-    fprintf(stderr,"cpaldjvu: found %d ccs\n", 
-            rimg.ccs.size());
+    fprintf(stderr,"cpaldjvu: %d ccs\n", rimg.ccs.size());
   rimg.merge_and_split_ccs(smallsize,largesize);  // Eliminates gross ccs
   if (opts.verbose)
-    fprintf(stderr,"cpaldjvu: merging/splitting yields %d ccs\n", 
+    fprintf(stderr,"cpaldjvu: %d ccs after merging/splitting\n", 
             rimg.ccs.size());
   rimg.sort_in_reading_order();                   // Sort cc descriptors
   
@@ -783,7 +782,7 @@ cpaldjvu(const GPixmap &input, const char *fileout, const cpaldjvuopts &opts)
         if (jimg.get_shape(i)->parent >= 0) nrefine++; 
         nshape++; 
       }
-      fprintf(stderr,"cpaldjvu: coding %d shapes (%d are cross-coded)\n", 
+      fprintf(stderr,"cpaldjvu: %d shapes after matching (%d are cross-coded)\n", 
               nshape, nrefine);
     }
   
@@ -797,8 +796,8 @@ cpaldjvu(const GPixmap &input, const char *fileout, const cpaldjvuopts &opts)
   iwimage.init(&inputsub, mask);
 #else
   // -- but who cares since the background is uniform.
-  GP<GBitmap> mask = jimg.get_bitmap();
-  iwimage.init(&input, mask);
+  GPixmap inputsub((h+11)/12, (w+11)/12, &bgcolor);
+  iwimage.init(&inputsub);
 #endif
 
   // Assemble DJVU file
