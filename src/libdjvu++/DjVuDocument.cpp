@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.97 2000-01-14 15:22:47 bcr Exp $
+//C- $Id: DjVuDocument.cpp,v 1.98 2000-01-14 23:38:55 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -292,7 +292,7 @@ DjVuDocument::init_thread(void)
    {
       DEBUG_MSG("Searching for NDIR chunks...\n");
       ndir_file=get_djvu_file(-1);
-      ndir=ndir_file->decode_ndir();
+      if (ndir_file) ndir=ndir_file->decode_ndir();
       ndir_file=0;	// Otherwise ~DjVuDocument() will stop (=kill) it
       if (!ndir)
       {
@@ -799,17 +799,22 @@ DjVuDocument::get_page(int page_num, DjVuPort * port)
    check();
    DEBUG_MSG("DjVuDocument::get_page(): request for page " << page_num << "\n");
    DEBUG_MAKE_INDENT(3);
+
+   GP<DjVuImage> dimg;
    
    GP<DjVuFile> file=get_djvu_file(page_num);
-   GP<DjVuImage> dimg=new DjVuImage();
-   dimg->connect(file);
-   if (port) DjVuPort::get_portcaster()->add_route(dimg, port);
+   if (file)
+   {
+      dimg=new DjVuImage();
+      dimg->connect(file);
+      if (port) DjVuPort::get_portcaster()->add_route(dimg, port);
    
-   if (!file->is_decoding() &&
-       !file->is_decode_ok() &&
-       !file->is_decode_failed())
-      file->start_decode();
+      if (!file->is_decoding() &&
+	  !file->is_decode_ok() &&
+	  !file->is_decode_failed())
+	 file->start_decode();
 
+   }
    return dimg;
 }
 
@@ -820,15 +825,20 @@ DjVuDocument::get_page(const char * id, DjVuPort * port)
    DEBUG_MSG("DjVuDocument::get_page(): ID='" << id << "'\n");
    DEBUG_MAKE_INDENT(3);
 
-   GP<DjVuFile> file=get_djvu_file(id);
-   GP<DjVuImage> dimg=new DjVuImage();
-   dimg->connect(file);
-   if (port) DjVuPort::get_portcaster()->add_route(dimg, port);
+   GP<DjVuImage> dimg;
    
-   if (!file->is_decoding() &&
-       !file->is_decode_ok() &&
-       !file->is_decode_failed())
-      file->start_decode();
+   GP<DjVuFile> file=get_djvu_file(id);
+   if (file)
+   {
+      dimg=new DjVuImage();
+      dimg->connect(file);
+      if (port) DjVuPort::get_portcaster()->add_route(dimg, port);
+   
+      if (!file->is_decoding() &&
+	  !file->is_decode_ok() &&
+	  !file->is_decode_failed())
+	 file->start_decode();
+   }
 
    return dimg;
 }
