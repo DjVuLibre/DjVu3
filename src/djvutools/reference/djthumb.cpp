@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djthumb.cpp,v 1.12 2001-04-06 18:38:31 chrisp Exp $
+// $Id: djthumb.cpp,v 1.13 2001-04-09 20:49:40 chrisp Exp $
 // $Name:  $
 
 // DJTHUMB -- DjVu thumbnails generator
@@ -68,7 +68,7 @@
     @author
     Andrei Erofeev <eaf@geocities.com> -- initial implementation
     @version
-    #$Id: djthumb.cpp,v 1.12 2001-04-06 18:38:31 chrisp Exp $# */
+    #$Id: djthumb.cpp,v 1.13 2001-04-09 20:49:40 chrisp Exp $# */
 //@{
 //@}
 
@@ -136,9 +136,10 @@ main(int argc, char ** argv)
       const GString debug(GOS::getenv("DEBUG"));
       if (debug.length())
       {
-	 int level=debug.is_int()?atoi((const char *)debug):1;
-	 if (level<1) level=1;
-	 if (level>32) level=32;
+//	 int level=debug.is_int()?atoi((const char *)debug):1;
+         int level=debug.is_int()?debug.toInt():1;
+         if (level<1) level=1;
+         if (level>32) level=32;
 //	 DEBUG_SET_LEVEL(level);
       }
    }

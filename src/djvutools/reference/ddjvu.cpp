@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ddjvu.cpp,v 1.14 2001-04-06 18:38:31 chrisp Exp $
+// $Id: ddjvu.cpp,v 1.15 2001-04-09 20:49:39 chrisp Exp $
 // $Name:  $
 
 /** @name ddjvu
@@ -111,7 +111,7 @@
     Yann Le Cun <yann@research.att.com>\\
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: ddjvu.cpp,v 1.14 2001-04-06 18:38:31 chrisp Exp $# */
+    #$Id: ddjvu.cpp,v 1.15 2001-04-09 20:49:39 chrisp Exp $# */
 //@{
 //@}
 
@@ -411,7 +411,7 @@ main(int argc, char **argv)
               if (page_num>=0)
                 G_THROW("Duplicate page specification");
               argc -=1; dargv.shift(-1); s = dargv[1];
-	      page_num=atoi(s);
+              page_num=GString::toInt(s); // atoi(s);
 	      if (page_num<=0) G_THROW("Page number must be positive.");
 	      page_num--;
 	    }

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djvutxt.cpp,v 1.15 2001-04-06 18:38:31 chrisp Exp $
+// $Id: djvutxt.cpp,v 1.16 2001-04-09 20:49:40 chrisp Exp $
 // $Name:  $
 
 // DJVUTXT -- DjVu TXT extractor
@@ -69,7 +69,7 @@
     @author
     Andrei Erofeev <eaf@geocities.com> -- initial implementation
     @version
-    #$Id: djvutxt.cpp,v 1.15 2001-04-06 18:38:31 chrisp Exp $# */
+    #$Id: djvutxt.cpp,v 1.16 2001-04-09 20:49:40 chrisp Exp $# */
 //@{
 //@}
 
@@ -144,9 +144,10 @@ main(int argc, char ** argv)
       const GString debug(GOS::getenv("DEBUG"));
       if (debug.length())
       {
-	 int level=debug.is_int()?atoi((const char *)debug):0;
-	 if (level<1) level=1;
-	 if (level>32) level=32;
+//	 int level=debug.is_int()?atoi((const char *)debug):0;
+         int level=debug.is_int()?debug.toInt():0;
+         if (level<1) level=1;
+         if (level>32) level=32;
 //	 DEBUG_SET_LEVEL(level);
       }
    }
@@ -191,7 +192,7 @@ main(int argc, char ** argv)
 		  exit(1);
 	       }
 	       i++;
-	       page_num=atoi(dargv[i])-1;
+	       page_num=dargv[i].toInt() - 1;//atoi(dargv[i])-1;
 	       if (page_num<0)
 	       {
 		  DjVuPrintError("%s","Page number must be positive.\n\n");

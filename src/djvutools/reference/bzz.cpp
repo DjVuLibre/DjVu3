@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: bzz.cpp,v 1.15 2001-04-06 18:38:31 chrisp Exp $
+// $Id: bzz.cpp,v 1.16 2001-04-09 20:49:39 chrisp Exp $
 // $Name:  $
 
 
@@ -58,7 +58,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation
     @version
-    $Id: bzz.cpp,v 1.15 2001-04-06 18:38:31 chrisp Exp $ */
+    $Id: bzz.cpp,v 1.16 2001-04-09 20:49:39 chrisp Exp $ */
 //@{
 //@}
 
@@ -115,7 +115,7 @@ main(int argc, char **argv)
             {
               blocksize = 2048;
               if (dargv[1][2])
-                blocksize = atoi(2+(const char *)dargv[1]);
+                 blocksize = dargv[1].substr(2, dargv[1].length()).toInt(); //atoi(2+(const char *)dargv[1]);
             }
           else 
             usage();
