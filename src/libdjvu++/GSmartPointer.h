@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: GSmartPointer.h,v 1.30 2000-12-28 19:20:26 praveen Exp $
+// $Id: GSmartPointer.h,v 1.31 2001-01-03 22:54:13 bcr Exp $
 // $Name:  $
 
 #ifndef _GSMARTPOINTER_H_
@@ -54,7 +54,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation\\
     Andrei Erofeev <eaf@geocities.com> -- bug fix.
     @version 
-    #$Id: GSmartPointer.h,v 1.30 2000-12-28 19:20:26 praveen Exp $# 
+    #$Id: GSmartPointer.h,v 1.31 2001-01-03 22:54:13 bcr Exp $# 
     @args
 */
 //@{
@@ -93,6 +93,7 @@ GPBufferBase::GPBufferBase(void *&xptr,const size_t n,const size_t t) : ptr(xptr
 inline
 GPBufferBase::~GPBufferBase()
 {
+  fprintf(stderr,"delete %x\n",ptr);
   ::operator delete(ptr);
 }
 

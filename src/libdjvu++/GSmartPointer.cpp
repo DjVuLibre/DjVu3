@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: GSmartPointer.cpp,v 1.21 2000-12-24 23:59:48 praveen Exp $
+// $Id: GSmartPointer.cpp,v 1.22 2001-01-03 22:54:13 bcr Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 05/1997
@@ -160,7 +160,7 @@ GPBufferBase::resize(const size_t n, const size_t t)
     {
       memcpy(nptr, ptr, s);
     }
-    void *temp=nptr;
+    void *temp=ptr;
     ptr=nptr;
     nptr=temp;
     num=gnptr.num;
