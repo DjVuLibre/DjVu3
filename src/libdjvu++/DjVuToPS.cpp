@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuToPS.cpp,v 1.2 2000-03-19 22:33:25 eaf Exp $
+//C- $Id: DjVuToPS.cpp,v 1.3 2000-03-19 22:37:59 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -40,6 +40,7 @@ DjVuToPS::Options::Options(void)
    zoom=FIT_PAGE;
    color=true;
    gamma=2.60;
+   copies=1;
 }
 
 void
