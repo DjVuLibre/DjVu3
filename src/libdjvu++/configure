@@ -9,7 +9,7 @@
 # C- AT&T, you have an infringing copy of this software and cannot use it
 # C- without violating AT&T's intellectual property rights.
 # C-
-# C- $Id: configure,v 1.15 1999-06-07 21:41:42 leonb Exp $
+# C- $Id: configure,v 1.16 1999-06-08 15:31:48 leonb Exp $
 
 
 ### The substitutions
@@ -56,7 +56,8 @@ do
            prefix=`echo $arg | sed 's/[-A-Za-z_]*=//'` 
            ;; 
         --with-debug )
-           OPT=-g 
+           OPT='-g'
+           DEFS="$DEFS -DDEBUG"
            ;;
         --with-threads=* )
            threads=`echo $arg | sed 's/[-A-Za-z_]*=//'` 
