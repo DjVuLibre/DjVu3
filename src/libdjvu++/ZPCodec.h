@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ZPCodec.h,v 1.21 2001-01-04 22:04:55 bcr Exp $
+// $Id: ZPCodec.h,v 1.22 2001-01-19 01:16:22 bcr Exp $
 // $Name:  $
 
 #ifndef _ZPCODEC_H
@@ -153,7 +153,7 @@ class ByteStream;
     @memo
     Binary adaptive quasi-arithmetic coder.
     @version
-    #$Id: ZPCodec.h,v 1.21 2001-01-04 22:04:55 bcr Exp $#
+    #$Id: ZPCodec.h,v 1.22 2001-01-19 01:16:22 bcr Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> */
 //@{
@@ -237,7 +237,7 @@ public:
   void encoder(int bit);
   /** Decodes a bit without compression (pass-thru decoder).  This function
       retrieves bits encoded with the pass-thru encoder. */
-  int  decoder();
+  int  decoder(void);
 #ifdef ZPCODEC_BITCOUNT
   /** Counter for code bits (requires #-DZPCODEC_BITCOUNT#). This member
       variable is available when the ZP-Coder is compiled with option
@@ -259,6 +259,8 @@ public:
   // Non-adaptive encoder/decoder
   void encoder_nolearn(int pix, BitContext &ctx);
   int  decoder_nolearn(BitContext &ctx);
+  inline int  IWdecoder(void);
+  inline void IWencoder(const bool bit);
 protected:
   // coder status
   ByteStream *bs;               // Where the data goes/comes from
@@ -301,6 +303,9 @@ private:
   // no copy allowed (hate c++)
   ZPCodec(const ZPCodec&);
   ZPCodec& operator=(const ZPCodec&);
+#ifdef ZPCODEC_FRIEND
+  friend ZPCODEC_FRIEND;
+#endif
 };
 
 
@@ -315,11 +320,21 @@ ZPCodec::encoder(int bit, BitContext &ctx)
 {
   unsigned int z = a + p[ctx];
   if (bit != (ctx & 1))
+  {
     encode_lps(ctx, z);
-  else if (z >= 0x8000)
+  }else if (z >= 0x8000)
+  {
     encode_mps(ctx, z);
-  else
+  }else
+  {
     a = z;
+  }
+}
+
+inline int
+ZPCodec::IWdecoder(void)
+{
+  return decode_sub_simple(0,0x8000 + ((a+a+a) >> 3));
 }
 
 inline int
@@ -362,14 +377,23 @@ ZPCodec::encoder(int bit)
 }
 
 inline int
-ZPCodec::decoder()
+ZPCodec::decoder(void)
 {
   return decode_sub_simple(0, 0x8000 + (a>>1));
 }
 
-// ------------ THE END
-#endif
-
+inline void
+ZPCodec::IWencoder(const bool bit)
+{
+  const int z = 0x8000 + ((a+a+a) >> 3);
+  if (bit)
+  {
+    encode_lps_simple(z);
+  }else
+  {
+    encode_mps_simple(z);
+  }
+}
 
 // ------------ ADDITIONAL DOCUMENTATION
 
@@ -663,3 +687,8 @@ ZPCodec::decoder()
    
    @memo Suggestions for efficiently using the ZP-Coder.  */
 //@}
+
+// ------------ THE END
+#endif
+
+

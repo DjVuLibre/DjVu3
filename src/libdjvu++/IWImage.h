@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: IWImage.h,v 1.17 2001-01-04 22:04:55 bcr Exp $
+// $Id: IWImage.h,v 1.18 2001-01-19 01:16:21 bcr Exp $
 // $Name:  $
 
 
@@ -129,7 +129,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: IWImage.h,v 1.17 2001-01-04 22:04:55 bcr Exp $# */
+    #$Id: IWImage.h,v 1.18 2001-01-19 01:16:21 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -431,8 +431,30 @@ private:
   IWPixmap& operator=(const IWPixmap &ref);
 };
 
+/** IW44Transform.
+*/
+class IWTransform
+{
+public:
+  class Decode;
+  class Encode;
+protected:
+  static void filter_begin(int w, int h);
+  static void filter_end(void);
+};
 
-
+class GPixel;
+class IWTransform::Decode : public IWTransform
+{
+public:
+ // WAVELET TRANSFORM
+  /** Forward transform. */
+  static void backward(short *p, int w, int h, int rowsize, int begin, int end);
+  
+  // COLOR TRANSFORM
+  /** Converts YCbCr to RGB. */
+  static void YCbCr_to_RGB(GPixel *p, int w, int h, int rowsize);
+};
 
 //@}
 
