@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GURL.cpp,v 1.72 2001-06-11 22:45:18 bcr Exp $
+// $Id: GURL.cpp,v 1.73 2001-06-18 18:50:37 lchen Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -1067,10 +1067,10 @@ url_from_UTF8filename(const GUTF8String &gfilename)
 }
 
 GUTF8String 
-GURL::get_string(void) const
+GURL::get_string(const bool nothrow) const
 {
   if(!validurl)
-    const_cast<GURL *>(this)->init();
+    const_cast<GURL *>(this)->init(nothrow);
   return url;
 }
 
@@ -1108,18 +1108,45 @@ GURL::UTF8::UTF8(const GUTF8String &xurl,const GURL &codebase)
       {
         base=newbase;
       }
-      url=base.get_string()+GURL::encode_reserved(xurl);
+      url=base.get_string(true)+GURL::encode_reserved(xurl);
     }else
     {
-      url=beautify_path(codebase.get_string()+GUTF8String(slash)+GURL::encode_reserved(xurl));
+      url=beautify_path(codebase.get_string(true)+GUTF8String(slash)+GURL::encode_reserved(xurl));
     }
   }
+}
+
+GURL::Native::Native(const GNativeString &xurl)
+: GURL(xurl.getNative2UTF8())
+{
+#ifdef WIN32
+  if(is_valid() && is_local_file_url())
+  {
+	GURL::Filename::UTF8 retval(UTF8Filename());
+	url=retval.get_string(true);
+    validurl=false;
+  }
+#endif
 }
 
 GURL::Native::Native(const GNativeString &xurl,const GURL &codebase)
 {
   GURL::UTF8 retval(xurl.getNative2UTF8(),codebase);
-  url=retval.get_string();
+  if(retval.is_valid())
+  {
+#ifdef WIN32 // Hack for IE to change \\ to /
+	if(retval.is_local_file_url())
+	{
+		GURL::Filename::UTF8 retval2(retval.UTF8Filename());
+		url=retval2.get_string(true);
+		validurl=false;
+	}else
+#endif // WIN32
+	{
+	  url=retval.get_string(true);
+	  validurl=false;
+	}
+  }
 }
 
 GURL::Filename::Native::Native(const GNativeString &gfilename)

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GURL.h,v 1.41 2001-06-11 19:27:00 bcr Exp $
+// $Id: GURL.h,v 1.42 2001-06-18 18:50:37 lchen Exp $
 // $Name:  $
 
 #ifndef _GURL_H_
@@ -49,7 +49,7 @@
     \Ref{GURL} class used to store URLs in a system independent format.
     @memo System independent URL representation.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: GURL.h,v 1.41 2001-06-11 19:27:00 bcr Exp $#
+    @version #$Id: GURL.h,v 1.42 2001-06-18 18:50:37 lchen Exp $#
 */
 
 //@{
@@ -252,7 +252,7 @@ public:
       #"Microsoft"#. */
    GUTF8String get_string(const GUTF8String &useragent) const;
 
-   GUTF8String get_string(void) const;
+   GUTF8String get_string(const bool nothrow=false) const;
 
       /// Escape special characters
    static GUTF8String encode_reserved(const GUTF8String &gs);
@@ -336,7 +336,7 @@ public:
 class GURL::Native : public GURL
 {
 public:
-  Native(const GNativeString &xurl) : GURL(xurl.getNative2UTF8()) {}
+  Native(const GNativeString &xurl);
   Native(const GNativeString &xurl, const GURL &codebase);
 };
 

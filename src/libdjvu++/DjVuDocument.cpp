@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocument.cpp,v 1.176 2001-06-11 19:26:59 bcr Exp $
+// $Id: DjVuDocument.cpp,v 1.177 2001-06-18 18:50:37 lchen Exp $
 // $Name:  $
 
 
@@ -871,7 +871,7 @@ DjVuDocument::get_djvu_file(int page_num, bool dont_create)
 	       // be. I'll remember the page_num and will generate the correct URL
 	       // after I learn what the document is
             GUTF8String name("page");
-            name+=page_num;
+            name+=GUTF8String(page_num);
             name+=".djvu";
             url=invent_url(name);
 
