@@ -8,7 +8,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: MMRDecoder.cpp,v 1.11 2000-02-01 16:29:36 leonb Exp $
+//C- $Id: MMRDecoder.cpp,v 1.12 2000-02-03 01:50:10 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -462,8 +462,8 @@ MMRDecoder::MMRDecoder(ByteStream &bs, int width, int height, int striped)
     striplineno(0), rowsperstrip(0),
     line(0), lineruns(0), prevruns(0)
 {
-  lineruns = new unsigned short[width+2];
-  prevruns = new unsigned short[width+2];
+  lineruns = new unsigned short[width+4];
+  prevruns = new unsigned short[width+4];
   lineruns[0] = width;
   prevruns[0] = width;
   rowsperstrip = (striped ? bs.read16() : height);
@@ -617,8 +617,22 @@ MMRDecoder::scanruns(const unsigned short **endptr)
           pr += 2;
         }
     }
-  if (a0 > width)
-    THROW(invalid_mmr_data);
+  // Final P must be followed by V0 (they say!)
+  if (rle > 0)
+    if (mrtable->decode(src) != V0)
+      THROW(invalid_mmr_data);
+  if (rle > 0)
+    *xr++ = rle;
+  // At this point we should have A0 equal to WIDTH
+  // But there are buggy files around (Kofax!)
+  // and we are not the CCITT police.
+  if (a0 > width) 
+    {
+      while (a0 > width && xr > lineruns)
+        a0 -= *--xr;
+      if (a0 < width)
+        *xr++ = width-a0;
+    }
   /* Increment and return */
   if (endptr) 
     *endptr = xr;
