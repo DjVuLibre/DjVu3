@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocEditor.cpp,v 1.2 1999-11-06 16:16:37 eaf Exp $
+//C- $Id: DjVuDocEditor.cpp,v 1.3 1999-11-11 20:12:44 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -82,6 +82,7 @@ DjVuDocEditor::init(const char * fname)
       tmp_doc_name=tmpnam(0);
       StdioByteStream str(tmp_doc_name, "wb");
       tmp_doc->write(str);
+      str.flush();
       doc_pool=new DataPool(tmp_doc_name);
    }
 
