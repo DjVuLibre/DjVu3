@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocument.h,v 1.78 2001-03-06 19:55:42 bcr Exp $
+// $Id: DjVuDocument.h,v 1.79 2001-03-08 16:54:30 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUDOCUMENT_H
@@ -58,7 +58,7 @@ class ByteStream;
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocument.h,v 1.78 2001-03-06 19:55:42 bcr Exp $#
+    @version #$Id: DjVuDocument.h,v 1.79 2001-03-08 16:54:30 bcr Exp $#
 */
 
 //@{
@@ -306,6 +306,9 @@ public:
 	         is actually useful in the plugin only.  */
    void		start_init(const GURL & url, GP<DjVuPort> port=0,
 			   DjVuFileCache * cache=0);
+
+   /** This creates a DjVuDocument without initializing it. */
+   static GP<DjVuDocument> create_noinit(void) {return new DjVuDocument;}
 
    /** Create a version of DjVuDocument which has finished initializing. */
    static GP<DjVuDocument> create_wait(
