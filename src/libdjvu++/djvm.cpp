@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: djvm.cpp,v 1.5 1999-05-27 14:58:22 eaf Exp $
+//C- $Id: djvm.cpp,v 1.6 1999-08-30 19:28:31 leonb Exp $
 
 /** @name djvm
 
@@ -19,12 +19,11 @@
     \end{verbatim}
 
     {\bf Description} ---
-    File #"djvm.cpp"# and program djvm illustrates how classes \Ref{DjVmFile},
-    \Ref{DjVuFile} and \Ref{DjVuDocument} can be used to open, save and
-    convert DjVu multipage documents. Using this program you can create
-    a new all-in-one-file multipage DjVu document, decompose it back into
-    separate files, insert and delete any given page.
-    
+
+    File #"djvm.cpp"# illustrates how classes
+    \Ref{DjVmDoc}, and \Ref{DjVuDocument} to create, modify and
+    convert multipage documents.
+
     {\bf Arguments} ---
     Depending on the task to be performed, the number and types of arguments
     differ:
@@ -78,7 +77,7 @@
     @author
     Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: djvm.cpp,v 1.5 1999-05-27 14:58:22 eaf Exp $# */
+    #$Id: djvm.cpp,v 1.6 1999-08-30 19:28:31 leonb Exp $# */
 //@{
 //@}
 
@@ -94,20 +93,20 @@ static char * progname;
 static void
 usage(void)
 {
-   cerr << "\
-Usage:\n\
-   To compose a multipage document:\n\
-      " << progname << " -c[reate] <doc.djvu> <page_1.djvu> ... <page_n.djvu>\n\
-   To expand a multipage document in current directory:\n\
-      " << progname << " -e[xpand] <doc.djvu>\n\
-   To insert a new page into an existing document:\n\
-      " << progname << " -i[nsert] <doc.djvu> <page.djvu> <page_num>\n\
-   To delete page from an existing document:\n\
-      " << progname << " -d[elete] <doc.djvu> <page_num>\n\
-   To list document contents:\n\
-      " << progname << " -l[ist] <doc.djvu>\n\
-\n";
+  fprintf(stderr,
+
+
 }
+
+
+
+
+
+
+
+
+
+
 
 static void
 create(int argc, char ** argv)

@@ -9,17 +9,17 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: ByteStream.cpp,v 1.12 1999-08-17 21:28:09 eaf Exp $
+//C- $Id: ByteStream.cpp,v 1.13 1999-08-30 19:28:31 leonb Exp $
 
-// File "$Id: ByteStream.cpp,v 1.12 1999-08-17 21:28:09 eaf Exp $"
+// File "$Id: ByteStream.cpp,v 1.13 1999-08-30 19:28:31 leonb Exp $"
 // - Author: Leon Bottou, 04/1997
 
 #ifdef __GNUC__
 #pragma implementation
 #endif
 
-#include "ByteStream.h"
 #include <errno.h>
+#include "ByteStream.h"
 
 //// CLASS BYTESTREAM
 
@@ -271,14 +271,22 @@ StdioByteStream::~StdioByteStream()
       THROW(strerror(errno));
 }
 
+
 size_t 
 StdioByteStream::read(void *buffer, size_t size)
 {
   if (!can_read)
     THROW("StdioByteStream not opened for writing");
-  size_t nitems = fread(buffer, 1, size, fp);
+ restart:
+  size_t nitems = fread(buffer, 1, size, fp); 
   if (nitems<=0 && ferror(fp))
-    THROW(strerror(errno));
+    {
+#ifdef EINTR
+      if (errno==EINTR)
+	goto restart;
+#endif
+      THROW(strerror(errno));
+    }
   pos += nitems;
   return nitems;
 }
@@ -288,9 +296,16 @@ StdioByteStream::write(const void *buffer, size_t size)
 {
   if (!can_write)
     THROW("StdioByteStream not opened for writing");
+ restart:
   size_t nitems = fwrite(buffer, 1, size, fp);
   if (nitems<=0 && ferror(fp))
-    THROW(strerror(errno));
+    {
+#ifdef EINTR
+      if (errno==EINTR)
+	goto restart;
+#endif
+      THROW(strerror(errno));
+    }
   pos += nitems;
   return nitems;
 }

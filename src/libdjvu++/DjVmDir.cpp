@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVmDir.cpp,v 1.3 1999-08-24 22:02:33 eaf Exp $
+//C- $Id: DjVmDir.cpp,v 1.4 1999-08-30 19:28:31 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -142,7 +142,8 @@ DjVmDir::decode(ByteStream & str)
    {
       GP<File> file=files_list[pos];
       if (name2file.contains(file->name))
-	 THROW("Error in 'DIRM' chunk: two records for the same NAME '"+file->name+"'");
+	 THROW("Error in 'DIRM' chunk: two records for the same NAME '"
+	       + file->name + "'");
       name2file[file->name]=file;
    }
 
@@ -151,7 +152,8 @@ DjVmDir::decode(ByteStream & str)
    {
       GP<File> file=files_list[pos];
       if (id2file.contains(file->id))
-	 THROW("Error in 'DIRM' chunk: two records for the same ID '"+file->id+"'");
+	 THROW("Error in 'DIRM' chunk: two records for the same ID '"
+	       + file->id + "'");
       id2file[file->id]=file;
    }
 
@@ -162,7 +164,8 @@ DjVmDir::decode(ByteStream & str)
       if (file->title.length())
       {
 	 if (title2file.contains(file->title))
-	    THROW("Error in 'DIRM' chunk: two records for the same TITLE '"+file->title+"'");
+	    THROW("Error in 'DIRM' chunk: two records for the same TITLE '"
+		  + file->title + "'");
 	 title2file[file->title]=file;
       }
    }

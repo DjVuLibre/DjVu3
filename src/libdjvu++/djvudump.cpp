@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: djvudump.cpp,v 1.1 1999-08-18 23:14:31 leonb Exp $
+//C- $Id: djvudump.cpp,v 1.2 1999-08-30 19:28:31 leonb Exp $
 
 
 
@@ -17,19 +17,19 @@
 
     {\bf Synopsis}
     \begin{verbatim}
-        djvuinfo <... iff_file_names ...>
+        djvudump <... iff_file_names ...>
     \end{verbatim}
 
-    {\bf Description} ---
-    File #"djvuinfo.cpp"# uses the facilities provided by \Ref{IFFByteStream.h}
-    to display an indented representation of the chunk structure of an
-    ``EA IFF 85'' file.  Each line represent contains a chunk ID followed by the
-    chunk size.  Additional information about the chunk is provided when
-    program #djvuinfo.cpp# recognizes the chunk name and knows how to summarize
-    the chunk data. In addition, when it recognizes that the file is a DjVu
-    multipage document (an archive of pages), it prints page names too.
-    Lines are indented in order to reflect the hierarchical
-    structure of the IFF files.
+    {\bf Description} --- File #"djvudump.cpp"# uses the facilities
+    provided by \Ref{IFFByteStream.h} to display an indented
+    representation of the chunk structure of an ``EA IFF 85'' file.
+    Each line represent contains a chunk ID followed by the chunk
+    size.  Additional information about the chunk is provided when
+    program #djvuinfo.cpp# recognizes the chunk name and knows how to
+    summarize the chunk data.  Furthermore, page identifiers are
+    printed between curly braces when #djvudump# recognizes a bundled
+    multipage document.  Lines are indented in order to reflect the
+    hierarchical structure of the IFF files.
 
     {\bf Example}
     \begin{verbatim}
@@ -57,7 +57,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: djvudump.cpp,v 1.1 1999-08-18 23:14:31 leonb Exp $# */
+    #$Id: djvudump.cpp,v 1.2 1999-08-30 19:28:31 leonb Exp $# */
 //@{
 //@}
 
@@ -68,21 +68,28 @@
 #include "ByteStream.h"
 #include "IFFByteStream.h"
 #include "DjVuImage.h"
-#include "DjVmDir0.h"
+#include "DjVmDir.h"
 #include "ATTLicense.h"
+
+
+struct DjVmInfo
+{
+  GP<DjVmDir> dir;
+  GPMap<int,DjVmDir::File> map;
+};
+
 
 
 // ---------- ROUTINES FOR SUMMARIZING CHUNK DATA
 
-static GP<DjVmDir0> dir0;
 
 void
-display_djvu_info(IFFByteStream &iff, const GString &head, size_t size)
+display_djvu_info(IFFByteStream &iff, GString, size_t size, DjVmInfo& )
 {
   struct DjVuInfo info;
   info.decode(iff);
   if (size >= 4)
-    printf("%dx%d", info.width, info.height);
+    printf("DjVu info, %dx%d", info.width, info.height);
   if (size >= 5)
     printf(", version %d", info.version);
   if (size >= 8)
@@ -92,13 +99,13 @@ display_djvu_info(IFFByteStream &iff, const GString &head, size_t size)
 }
 
 void
-display_sjbz_info(IFFByteStream &iff, const GString &head, size_t size)
+display_sjbz(IFFByteStream &iff, GString, size_t, DjVmInfo& )
 {
-  printf("JB2 data, no header");
+  printf("JB2 data");
 }
 
 void
-display_iw4_info(IFFByteStream &iff, const GString &head, size_t size)
+display_iw4(IFFByteStream &iff, GString, size_t, DjVmInfo& )
 {
   struct PrimaryHeader {
     unsigned char serial;
@@ -114,11 +121,11 @@ display_iw4_info(IFFByteStream &iff, const GString &head, size_t size)
   
   if (iff.readall((void*)&primary, sizeof(primary)) == sizeof(primary))
     {
-      printf("#%d - %d slices ", primary.serial+1, primary.slices);
+      printf("IW4 data #%d, %d slices", primary.serial+1, primary.slices);
       if (primary.serial==0)
         if (iff.readall((void*)&secondary, sizeof(secondary)) == sizeof(secondary))
           {
-            printf("- v%d.%d (%s) - %dx%d", secondary.major&0x7f, secondary.minor,
+            printf(", v%d.%d (%s), %dx%d", secondary.major&0x7f, secondary.minor,
                    (secondary.major & 0x80 ? "b&w" : "color"),
                    (secondary.xhi<<8)+secondary.xlo,
                    (secondary.yhi<<8)+secondary.ylo  );
@@ -127,56 +134,42 @@ display_iw4_info(IFFByteStream &iff, const GString &head, size_t size)
 }
 
 void
-display_dir0_info(IFFByteStream & iff, const GString &, size_t)
+display_djvm_dirm(IFFByteStream & iff, GString head, size_t, DjVmInfo& djvminfo)
 {
-   dir0=new DjVmDir0();
-   dir0->decode(iff);
-   printf("Document directory (%d files)", dir0->get_files_num());
+  GP<DjVmDir> dir = new DjVmDir();
+  dir->decode(iff);
+  GPList<DjVmDir::File> list = dir->get_files_list();
+  if (dir->is_indirect())
+    {
+      printf("Document directory (indirect, %d files %d pages)", 
+	     dir->get_files_num(), dir->get_pages_num());
+      for (GPosition p=list; p; ++p)
+	printf("\n%s%s -> %s", (const char*)head, 
+	       (const char*)list[p]->id, (const char*)list[p]->name );
+    }
+  else
+    {
+      printf("Document directory (bundled, %d files %d pages)", 
+	     dir->get_files_num(), dir->get_pages_num());
+      djvminfo.dir = dir;
+      djvminfo.map.empty();
+      for (GPosition p=list; p; ++p)
+	djvminfo.map[list[p]->offset] = list[p];
+    }
 }
 
 void
-display_djvi_info(IFFByteStream & iff, const GString &, size_t)
-{
-   if (dir0)
-   {
-      long offset=iff.tell()-12;
-      int files=dir0->get_files_num();
-      for(int i=0;i<files;i++)
-      {
-	 GP<DjVmDir0::FileRec> file=dir0->get_file(i);
-	 if (file->offset==offset)
-	 {
-	    printf("Directory name: \"%s\"", (const char *) file->name);
-	    break;
-	 }
-      }
-   }
-}
-
-void
-display_ndir_info(IFFByteStream &, const GString &, size_t)
-{
-   printf("Navigation directory");
-}
-
-void
-display_incl_info(IFFByteStream & iff, const GString &, size_t)
+display_incl(IFFByteStream & iff, GString, size_t, DjVmInfo& )
 {
    GString name;
    char ch;
-   while(iff.read(&ch, 1))
-      if (!isspace(ch))
-      {
-	 name+=ch;
-	 break;
-      }
-   while(iff.read(&ch, 1) && ch!='\n') name+=ch;
-   
+   while(iff.read(&ch, 1) && ch!='\n')
+     name += ch;
    printf("Indirection chunk (%s)", (const char *) name);
 }
 
 void
-display_anta_info(IFFByteStream &, const GString &, size_t)
+display_anta(IFFByteStream &, GString, size_t, DjVmInfo& )
 {
    printf("Page annotation");
 }
@@ -184,27 +177,23 @@ display_anta_info(IFFByteStream &, const GString &, size_t)
 struct displaysubr
 {
   const char *id;
-  void (*subr)(IFFByteStream &iff, const GString &head, size_t size);
+  void (*subr)(IFFByteStream &, GString, size_t, DjVmInfo& );
 } 
 disproutines[] = 
 {
   { "DJVU.INFO", display_djvu_info },
-  { "DJVU.Sjbz", display_sjbz_info },
-  { "DJVU.FG44", display_iw4_info },
-  { "DJVU.BG44", display_iw4_info },
-  { "BM44.BM44", display_iw4_info },
-  { "PM44.PM44", display_iw4_info },
-  { "DJVM.DIR0", display_dir0_info },
-  { "FORM:DJVI", display_djvi_info },
-  { "FORM:DJVU", display_djvi_info },
-  { "FORM:PM44", display_djvi_info },
-  { "FORM:BM44", display_djvi_info },
-  { "NDIR", display_ndir_info },
-  { "INCL", display_incl_info },
-  { "INCF", display_incl_info },
-  { "ANTa", display_anta_info },
+  { "DJVU.Sjbz", display_sjbz },
+  { "DJVU.FG44", display_iw4 },
+  { "DJVU.BG44", display_iw4 },
+  { "BM44.BM44", display_iw4 },
+  { "PM44.PM44", display_iw4 },
+  { "DJVM.DIRM", display_djvm_dirm },
+  { "INCL", display_incl },
+  { "ANTa", display_anta },
   { 0, 0 },
 };
+
+
 
 
 // ---------- ROUTINES FOR DISPLAYING CHUNK STRUCTURE
@@ -215,12 +204,21 @@ display_chunks(IFFByteStream &iff, const GString &head)
   size_t size;
   GString id, fullid;
   GString head2 = head + "  ";
+  GPMap<int,DjVmDir::File> djvmmap;
+  DjVmInfo djvminfo;
+  int rawoffset;
   
-  while ((size = iff.get_chunk(id)))
+  while ((size = iff.get_chunk(id, &rawoffset)))
     {
       GString msg;
       msg.format("%s%s [%d] ", (const char *)head, (const char *)id, size);
       printf("%s", (const char *)msg);
+      // Display DJVM is when adequate
+      if (djvminfo.dir)
+	{
+	  GP<DjVmDir::File> rec = djvminfo.map[rawoffset];
+	  printf("{%s}", rec ? (const char*)rec->id : "???");
+	}
       // Test chunk type
       iff.full_id(fullid);
       for (int i=0; disproutines[i].id; i++)
@@ -229,13 +227,13 @@ display_chunks(IFFByteStream &iff, const GString &head)
             int n = msg.length();
 	    while (n++ < 26) putchar(' ');
 	    if (!iff.composite()) printf("    ");
-            (*disproutines[i].subr)(iff, head2, size);
+            (*disproutines[i].subr)(iff, head2, size, djvminfo);
             break;
           }
       // Default display of composite chunk
       printf("\n");
       if (iff.composite())
-        display_chunks(iff, head2);
+	display_chunks(iff, head2);
       // Terminate
       iff.close_chunk();
     }
