@@ -9,16 +9,19 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.66 1999-09-28 19:56:18 leonb Exp $
+//C- $Id: DjVuFile.cpp,v 1.67 1999-09-28 20:56:23 leonb Exp $
 
 #ifdef __GNUC__
 #pragma implementation
 #endif
 
+#include "debug.h"
 #include "DjVuFile.h"
 #include "BSByteStream.h"
 #include "MMRDecoder.h"
-#include "debug.h"
+#ifdef NEED_JPEG_DECODER
+#include "JPEGDecoder.h"
+#endif
 
 class ProgressByteStream : public ByteStream
 {
@@ -710,8 +713,7 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
     {
       if (DjVuFile::fgjb)
         THROW("DjVu Decoder: Corrupted data (Duplicate Sxxx chunk)");
-      GP<JB2Image> fgjb = MMRDecoder::decode(iff);
-      DjVuFile::fgjb = fgjb;
+      DjVuFile::fgjb = MMRDecoder::decode(iff);
       desc.format("G4/MMR encoded mask (%dx%d)", fgjb->get_width(), fgjb->get_height());
     }
   
@@ -721,6 +723,8 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
     {
       if (!bg44)
         {
+          if (bgpm)
+            THROW("DjVu Decoder: Corrupted data (Duplicate background layer)");
           // First chunk
           GP<IWPixmap> bg44=new IWPixmap();
           bg44->decode_chunk(iff);
@@ -740,7 +744,7 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
   else if (chkid == "FG44" && (djvu || djvu))
     {
       if (fgpm)
-        THROW("DjVu Decoder: Corrupted data (Duplicate foreground layer)");
+        THROW("DjVu Decoder: Corrupted data (Duplicate foreground color layer)");
       IWPixmap fg44;
       fg44.decode_chunk(iff);
       fgpm=fg44.get_pixmap();
@@ -751,18 +755,28 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
 
   else if (chkid == "BGjp" && (djvu || djvi))
     {
-      if (bg44)
+      if (bg44 || bgpm)
         THROW("DjVu Decoder: Corrupted data (Duplicate background layer)");
+#ifdef NEED_JPEG_DECODER
+      DjVuFile::bgpm = JPEGDecoder::decode(iff);
+      desc.format("JPEG background (%dx%d)", bgpm->columns(), bgpm->rows());
+#else
       desc.format("JPEG background (Unimplemented)");
+#endif
     } 
-
+  
   // FGjp (foreground JPEG)
   
   else if (chkid == "FGjp" && (djvu || djvi))
     {
       if (fgpm)
-        THROW("DjVu Decoder: Corrupted data (Duplicate foreground layer)");
+        THROW("DjVu Decoder: Corrupted data (Duplicate foreground color layer)");
+#ifdef NEED_JPEG_DECODER
+      DjVuFile::fgpm = JPEGDecoder::decode(iff);
+      desc.format("JPEG foreground colors (%dx%d)", fgpm->columns(), fgpm->rows());
+#else
       desc.format("JPEG foreground colors (Unimplemented)");
+#endif
     } 
   
   // BG2k (background JPEG-2000) Note: JPEG2K bitstream not finalized.
@@ -779,7 +793,7 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
   else if (chkid == "FG2k" && (djvu || djvi))
     {
       if (fgpm)
-        THROW("DjVu Decoder: Corrupted data (Duplicate foreground layer)");
+        THROW("DjVu Decoder: Corrupted data (Duplicate foreground color layer)");
       desc.format("JPEG-2000 foreground colors (Unimplemented)");
     } 
 
