@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: cpalette.cpp,v 1.3 2000-02-17 19:38:04 leonb Exp $
+//C- $Id: cpalette.cpp,v 1.4 2000-02-17 21:23:26 leonb Exp $
 
 
 /** @name cpalette
@@ -39,7 +39,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: cpalette.cpp,v 1.3 2000-02-17 19:38:04 leonb Exp $# */
+    #$Id: cpalette.cpp,v 1.4 2000-02-17 21:23:26 leonb Exp $# */
 //@{
 //@}
 
@@ -160,6 +160,7 @@ CCImage::make_ccids_by_analysis()
       int color = runs[n].color;
       int id = (umap.hbound() + 1);
       // iterate over previous line runs
+      if (p>0) p--;
       for(;runs[p].y < y-1;p++);
       for(;(runs[p].y < y) && (runs[p].x1 <= x2);p++ )
         {
