@@ -9,9 +9,9 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: IWImage.cpp,v 1.22 1999-09-28 19:56:18 leonb Exp $
+//C- $Id: IWImage.cpp,v 1.23 1999-10-19 20:58:19 haffner Exp $
 
-// File "$Id: IWImage.cpp,v 1.22 1999-09-28 19:56:18 leonb Exp $"
+// File "$Id: IWImage.cpp,v 1.23 1999-10-19 20:58:19 haffner Exp $"
 // - Author: Leon Bottou, 08/1998
 
 #ifdef __GNUC__
@@ -2243,6 +2243,8 @@ IWPixmap::init(const GPixmap *pm, const GBitmap *mask, CRCBMode crcbmode)
           mskrowsize = mask->rowsize();
         }
       // Fill buffer with luminance information
+      DJVU_PROGRESS_TASK(create,4);
+      DJVU_PROGRESS_RUN(create, (crcb_delay>=0 ? 2 : 4));
       IWTransform::RGB_to_Y((*pm)[0], w, h, pm->rowsize(), buffer, w);
       if (crcb_delay < 0)
         {
@@ -2258,13 +2260,13 @@ IWPixmap::init(const GPixmap *pm, const GBitmap *mask, CRCBMode crcbmode)
         {
           cbmap = new _IWMap(w,h);
           crmap = new _IWMap(w,h);
-          // Fill buffer with CB information
+          // Process CB information
+          DJVU_PROGRESS_RUN(create,3);
           IWTransform::RGB_to_Cb((*pm)[0], w, h, pm->rowsize(), buffer, w);
-          // Create chrominance map (CB) with half resolution
           cbmap->create(buffer, w, msk8, mskrowsize);
-          // Fill buffer with CR information
+          // Process CR information
+          DJVU_PROGRESS_RUN(create,4);
           IWTransform::RGB_to_Cr((*pm)[0], w, h, pm->rowsize(), buffer, w); 
-          // Create chrominance map (CR) with half resolution
           crmap->create(buffer, w, msk8, mskrowsize);
           // Perform chrominance reduction (CRCBhalf)
           if (crcb_half)
