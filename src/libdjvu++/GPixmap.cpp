@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: GPixmap.cpp,v 1.24 2001-01-03 20:03:56 bcr Exp $
+// $Id: GPixmap.cpp,v 1.25 2001-01-03 20:51:34 bcr Exp $
 // $Name:  $
 
 // -- Implements class PIXMAP
@@ -273,13 +273,13 @@ GPixmap::init(const GBitmap &ref, const GPixel *userramp)
   if (nrows>0 && ncolumns>0)
   {
     // Create pixel ramp
-    void *loc_ramp;
-    GPBufferBase gloc_ramp(loc_ramp,0,sizeof(GPixel));
+    GPixel *loc_ramp;
+    GPBuffer<GPixel> gloc_ramp(loc_ramp,0);
     const GPixel *ramp=userramp;
     if(! userramp)
     {
-      gloc_ramp.resize(256,sizeof(GPixel));
-      ramp=new_gray_ramp(ref.get_grays(),(GPixel *)loc_ramp);
+      gloc_ramp.resize(256);
+      ramp=new_gray_ramp(ref.get_grays(),loc_ramp);
     }
     // Copy pixels
     for (int y=0; y<nrows; y++)
@@ -305,13 +305,13 @@ GPixmap::init(const GBitmap &ref, const GRect &rect, const GPixel *userramp)
   if (! rect2.isempty())
   {
     // allocate ramp
-    void *loc_ramp;
-    GPBufferBase gloc_ramp(loc_ramp,0,sizeof(GPixel));
+    GPixel *loc_ramp;
+    GPBuffer<GPixel> gloc_ramp(loc_ramp,0);
     const GPixel *ramp=userramp;
     if(! userramp)
     {
-      gloc_ramp.resize(256,sizeof(GPixel));
-      ramp=new_gray_ramp(ref.get_grays(),(GPixel *)loc_ramp);
+      gloc_ramp.resize(256);
+      ramp=new_gray_ramp(ref.get_grays(),loc_ramp);
     }
     // copy pixels
     for (int y=rect2.ymin; y<rect2.ymax; y++)
