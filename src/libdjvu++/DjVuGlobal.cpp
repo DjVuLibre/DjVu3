@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: DjVuGlobal.cpp,v 1.1 1999-02-05 22:48:32 leonb Exp $
+//C-  $Id: DjVuGlobal.cpp,v 1.2 1999-02-05 23:44:08 leonb Exp $
 
 
 
@@ -108,21 +108,28 @@ _djvu_progress(const char *filename, const char *tag, int index)
   for (; scale && scale->percent>0 && scale->percent<100; scale++)
     {
       // Check for a match
-      if (scale->match_filename)
-        if (strcmp(filename, scale->match_filename))
-          continue;
-      if (scale->match_tag)
-        if (strcmp(tag, scale->match_tag))
-          continue;
-      if (scale->match_index)
-        if (index < scale->match_index)
-          break;
-      // Match
+      if (scale->match_filename && strcmp(filename, scale->match_filename))
+        continue;
+      if (scale->match_tag && strcmp(tag, scale->match_tag))
+        continue;
+      if (index < scale->match_index)
+        break;
+      // We have a match
       if (p_log)
         fprintf(p_log, "  // got %d %%\n", scale->percent );
       if (p_cb)
         (*p_cb) (scale->percent);
-      p_scale = ++scale;
+      // Go to next entry
+      for (scale++; scale->percent>0 && scale->percent<100; scale++)
+        {
+          if (scale->match_filename && strcmp(filename, scale->match_filename))
+            break;
+          if (scale->match_tag && strcmp(tag, scale->match_tag))
+            break;
+          if (index <= scale->match_index)
+            break;
+        }
+      p_scale = scale;
       break;
     }
 }
