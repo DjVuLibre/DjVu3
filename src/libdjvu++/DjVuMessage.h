@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessage.h,v 1.20 2001-04-23 18:14:22 bcr Exp $
+// $Id: DjVuMessage.h,v 1.21 2001-05-01 18:44:17 bcr Exp $
 // $Name:  $
 
 
@@ -109,7 +109,7 @@ class ByteStream;
     Annex R) and SHOULD NOT BE ASSUMED TO BE ASCII.
   */
 
-class DjVuMessage
+class DjVuMessage : public GPEnabled
 {
 private:
   // Constructor:
@@ -118,9 +118,12 @@ private:
   GUTF8String errors;
 
 public:
+  /// Creates a DjVuMessage class.
   static const DjVuMessage &create(void);
 
-  static const DjVuMessage &create(const GP<ByteStream> &bs);
+  /** Adds a byte stream to be parsed whenever the next DjVuMessage::create()
+      call is made. */
+  static void AddByteStreamLater(const GP<ByteStream> &bs);
 
   /** Destructor: Does any necessary cleanup. Actions depend on how the message
       file is implemented. */
@@ -161,7 +164,7 @@ private:
   void InsertArg(
     GUTF8String &message, const int ArgId, const GUTF8String &arg ) const;
 
-  void AddByteStream(GP<ByteStream> bs);
+  void AddByteStream(const GP<ByteStream> &bs);
 };
 
 

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: XMLTags.h,v 1.7 2001-04-24 17:54:09 jhayes Exp $
+// $Id: XMLTags.h,v 1.8 2001-05-01 18:44:17 bcr Exp $
 // $Name:  $
 
 #ifndef _LT_XMLTAGS__
@@ -71,7 +71,7 @@ public:
   inline const GPList<lt_XMLTags> & operator [] (const GUTF8String name) const;
   inline const GPList<lt_XMLTags> & operator [] (const GPosition &pos) const;
   void init(XMLByteStream &xmlbs);
-  void init(GP<ByteStream> &bs);
+  void init(const GP<ByteStream> &bs);
   void init(const GURL & url);
   GPList<lt_XMLTags> getTags(char const tagname[]) const;
   static void ParseValues(char const *t, GMap<GUTF8String,GUTF8String> &args,bool downcase=true);

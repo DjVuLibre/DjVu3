@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessage.cpp,v 1.39 2001-04-24 17:11:21 bcr Exp $
+// $Id: DjVuMessage.cpp,v 1.40 2001-05-01 18:44:17 bcr Exp $
 // $Name:  $
 
 
@@ -100,6 +100,27 @@ static const char bodystring[]="BODY";
 static const char headstring[]="HEAD";
 static const char includestring[]="INCLUDE";
 static const char messagestring[]="MESSAGE";
+
+static GPList<ByteStream> &
+getByteStream(void)
+{
+  static GPList<ByteStream> gbs;
+  return gbs;
+}
+
+static GP<DjVuMessage> &
+getDjVuMessage(void)
+{
+  static GP<DjVuMessage> message;
+  return message;
+}
+
+void
+DjVuMessage::AddByteStreamLater(const GP<ByteStream> &bs)
+{
+  getByteStream().append(bs);
+}
+
 
 #if defined(WIN32)
 static GURL
@@ -363,10 +384,19 @@ parse(GMap<GUTF8String,GP<lt_XMLTags> > &retval)
 const DjVuMessage &
 DjVuMessage::create(void)
 {
-  static const DjVuMessage m;
+  GP<DjVuMessage> &message=getDjVuMessage();
+  if(!message)
+  {
+    message=new DjVuMessage;
+  }
+  DjVuMessage &m=*message;
+  GPList<ByteStream> &bs(getByteStream());
+  for(GPosition pos;(pos=bs);bs.del(pos))
+  {
+    m.AddByteStream(bs[pos]);
+  }
   return m;
 }
-
 
 
 // Constructor
@@ -593,16 +623,8 @@ void DjVuMessage_LookUp( char *msg_buffer, const unsigned int buffer_size, const
     strcpy( msg_buffer, converted );
 }
 
-const DjVuMessage &
-DjVuMessage::create(const GP<ByteStream> &bs)
-{
-  DjVuMessage &m=const_cast<DjVuMessage &>(create());
-  m.AddByteStream(bs);
-  return m;
-}
-
 void
-DjVuMessage::AddByteStream(GP<ByteStream> bs)
+DjVuMessage::AddByteStream(const GP<ByteStream> &bs)
 {
   GP<lt_XMLTags> gtags=lt_XMLTags::create();
   lt_XMLTags &tags=*gtags;
