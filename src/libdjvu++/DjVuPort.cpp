@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuPort.cpp,v 1.29 1999-11-29 22:12:22 eaf Exp $
+//C- $Id: DjVuPort.cpp,v 1.30 1999-12-22 19:55:03 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -40,16 +40,94 @@ DjVuPort::get_portcaster(void)
 //******************************* DjVuPort ***********************************
 //****************************************************************************
 
+#define MAX_CORPSE_NUM	64
+
+// Last MAX_CORPSE_NUM addresses of dead DjVuPorts. We want to maintain this
+// list because of the way DjVuPort::is_port_alive() works: it accepts an
+// address and runs it thru its internal maps. The problem will occur if
+// a new DjVuPort is created exactly on place of another one, which just
+// died. Here we attempt to remember the last MAX_CORPSE_NUM addresses
+// of dead DjVuPorts, and take them into account in DjVuPort::operator new();
+GCriticalSection * DjVuPort::corpse_lock;
+DjVuPort::DjVuPortCorpse	* DjVuPort::corpse_head;
+DjVuPort::DjVuPortCorpse	* DjVuPort::corpse_tail;
+int		DjVuPort::corpse_num;
+
 void *
 DjVuPort::operator new (size_t sz)
 {
-  void *addr = ::operator new (sz);
-  DjVuPortcaster *pcaster = get_portcaster();
-  GCriticalSectionLock lock(& pcaster->map_lock );
-  pcaster->cont_map[addr] = 0;
-  return addr;
+   if (!corpse_lock) corpse_lock=new GCriticalSection();
+
+      // Loop until we manage to allocate smth, which is not mentioned in
+      // the 'corpse' list. Thus we will avoid allocating a new DjVuPort
+      // on place of a dead one. Not *absolutely* secure (only 64 items
+      // in the list) but is still better than nothing.
+   void * addr=0;
+   {
+      GCriticalSectionLock lock(corpse_lock);
+
+	 // Store here addresses, which were found in 'corpse' list.
+	 // We will free then in the end
+      static void * addr_arr[MAX_CORPSE_NUM];
+      
+	 // Make at most MAX_CORPSE_NUM attempts
+      int addr_num;
+      for(addr_num=0;addr_num<MAX_CORPSE_NUM;addr_num++)
+      {
+	 addr=::operator new (sz);
+	    // See if 'addr' is in the 'corpse' list (was recently used)
+	 DjVuPortCorpse * corpse;
+	 for(corpse=corpse_head;corpse;corpse=corpse->next)
+	    if (addr==corpse->port)
+	    {
+		  // Store address for future delete
+	       addr_arr[addr_num]=addr;
+	       break;
+	    }
+	 if (!corpse) break;
+      }
+      addr_num--;
+      
+	 // Here 'addr' contains address, that we want to use and
+	 // addr_arr contains addresses, that we want to free
+      while(addr_num>=0) ::operator delete(addr_arr[addr_num--]);
+   }
+   
+   DjVuPortcaster * pcaster=get_portcaster();
+   GCriticalSectionLock lock(&pcaster->map_lock);
+   pcaster->cont_map[addr]=0;
+   return addr;
 }
 
+void
+DjVuPort::operator delete(void * addr)
+{
+   if (corpse_lock)
+   {
+      GCriticalSectionLock lock(corpse_lock);
+   
+	 // Add 'addr' to the list of corpses
+      if (corpse_tail)
+      {
+	 corpse_tail->next=new DjVuPortCorpse((DjVuPort *) addr);
+	 corpse_tail=corpse_tail->next;
+	 corpse_tail->next=0;
+      } else
+      {
+	 corpse_head=corpse_tail=new DjVuPortCorpse((DjVuPort *) addr);
+	 corpse_head->next=0;
+      }
+      corpse_num++;
+      if (corpse_num>=MAX_CORPSE_NUM)
+      {
+	 DjVuPortCorpse * corpse=corpse_head;
+	 corpse_head=corpse_head->next;
+	 delete corpse;
+	 corpse_num--;
+      }
+   }
+   ::operator delete(addr);
+}
 
 DjVuPort::DjVuPort()
 {

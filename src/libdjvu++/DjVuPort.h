@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuPort.h,v 1.23 1999-11-21 09:21:36 bcr Exp $
+//C- $Id: DjVuPort.h,v 1.24 1999-12-22 19:55:03 eaf Exp $
  
 #ifndef _DJVUPORT_H
 #define _DJVUPORT_H
@@ -71,7 +71,7 @@
     @memo DjVu decoder communication mechanism.
     @author Andrei Erofeev <eaf@research.att.com>\\
             L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuPort.h,v 1.23 1999-11-21 09:21:36 bcr Exp $# */
+    @version #$Id: DjVuPort.h,v 1.24 1999-12-22 19:55:03 eaf Exp $# */
 //@{
 
 class DjVuPort;
@@ -95,7 +95,7 @@ public:
    DjVuPort();
    virtual ~DjVuPort();
    static void *operator new (size_t sz);
-   static void operator delete(void *addr) { ::operator delete(addr); } ;
+   static void operator delete(void *addr);
 
       /**  Use this function to get a copy of the global \Ref{DjVuPortcaster}. */
    static DjVuPortcaster *get_portcaster(void);
@@ -208,6 +208,18 @@ public:
           other than ABORT may just result in even more errors. */
    enum ErrorRecoveryAction {ABORT=0,SKIP_PAGES=1,SKIP_CHUNKS=2,KEEP_ALL=3 }; 
       //@}
+private:
+   class DjVuPortCorpse
+   {
+   public:
+      DjVuPort		* port;
+      DjVuPortCorpse	* next;
+
+      DjVuPortCorpse(DjVuPort * _port) : port(_port), next(0) {}
+   };
+   static GCriticalSection	* corpse_lock;
+   static DjVuPortCorpse	* corpse_head, * corpse_tail;
+   static int			corpse_num;
 };
 
 /** Simple port.  
