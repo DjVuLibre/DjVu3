@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuMultiAPI.h,v 1.21 2000-03-08 22:59:46 bcr Exp $
+ *C- $Id: DjVuMultiAPI.h,v 1.22 2000-05-02 22:34:56 bcr Exp $
  */
 
 
@@ -26,7 +26,10 @@
 
 /* 
  * $Log: DjVuMultiAPI.h,v $
- * Revision 1.21  2000-03-08 22:59:46  bcr
+ * Revision 1.22  2000-05-02 22:34:56  bcr
+ * Added basic support for thumbnails.
+ *
+ * Revision 1.21  2000/03/08 22:59:46  bcr
  * Updated the documentation.  I'm using Leon's libdjvu++ documentation
  * as a template.
  *
@@ -90,6 +93,15 @@ struct djvu_combine_options_struct
       \end{description}
   */
   int recover_level;
+
+  /** Thumbsize.
+	This option specifies the size of the thumbnails that should be
+	included in the final output.  A value of 0 means no thumbnails
+	should be included.  A value between 32 and 256 is considered
+	the size of the thumbnail.  Thumbnails are automatically resized
+	when used, so this option only effects quality.
+  */
+  int thumbsize;
 
   /** Number of files to assemble.  This positive integer indicates the number
       of elements in #filelist#. */

@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: djvm.cpp,v 1.11 2000-05-01 16:15:23 bcr Exp $
+//C- $Id: djvm.cpp,v 1.12 2000-05-02 22:34:56 bcr Exp $
 
 /** @name djvm
 
@@ -79,7 +79,7 @@
     @author
     Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: djvm.cpp,v 1.11 2000-05-01 16:15:23 bcr Exp $# */
+    #$Id: djvm.cpp,v 1.12 2000-05-02 22:34:56 bcr Exp $# */
 //@{
 //@}
 
@@ -216,12 +216,18 @@ list(int argc, char ** argv)
 	    for(int i=strlen(buffer);i<9;i++)
 	       putchar(' ');
 	 } else if (file->is_include())
+         {
 	    printf("%s", "INCLUDE  ");
 	 } else if (file->is_shared_anno())
+         {
 	    printf("%s", "SHARED_ANNO  ");
-	 else if (file->is_thumbnails())
+	 }else if (file->is_thumbnails())
+         {
 	    printf("%s", "THUMBNAIL");
-	 else printf("%s", "UNKNOWN  ");
+	 } else
+         {
+           printf("%s", "UNKNOWN  ");
+         }
 	 printf("   %s\n", (const char *) file->name);
       }
    }
