@@ -6,7 +6,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: parseoptions.h,v 1.12 1999-12-15 21:03:02 bcr Exp $
+//C- $Id: parseoptions.h,v 1.13 1999-12-16 15:21:27 bcr Exp $
 
 #endif /* __cplusplus */
 
@@ -24,36 +24,64 @@
 
 #include <stdio.h>
 
-
 /** @name parseoptions.h
-  
    The idea is simply to have one object that we can use to parse arguments
-   for all command line programs, and API type function calls.
-   For implementing this we declare a DjVuParseOptions class, with C
-   wrappers.  It is probably easier to show an example before describing
-   the functions:
+   for all command line programs, and API type function calls.  The
+   primary class implemented is \Ref{DjVuParseOptions} in the files
+   #"parseoptions.h"# and #"parseoptions.cpp"#.  
+
+   Normal usage is to first declare an array of \Ref{djvu_option} structures
+   listing all the command line options.  The last element of the array must
+   be
+\begin{verbatim}
+ {0,0,0,0}
+\end{verbatim}
+   Typically the djvu_option array is declared statically.
+
+   The next step is to declare the \Ref{DjVuParseOptions} class, passing
+   it the name of the default profile to read values from.  Profiles are
+   normally contained in "/etc/DjVu" or "~/.DjVu" for unix.  The location
+   is stored in the registery for Windows.  Legal profile variables can be
+   any name beginning with a letter consisting of characters [-A-Za-z0-9].
+   This includes all command long options of this format in the
+   \Ref{djvu_option} structure.
+
+   Finally, you can tell your new \Ref{DjVuParseOptions} object to parse
+   the command line arguments and use the class methods to determine the
+   value specified for each option.
+
+   For a better understanding of this procedure contine on to the 
+   \Ref{DjVuParseOptions Examples}.
+
+   @memo Class used for parsing options and configuration files.
+   @author: #$Author: bcr $#
+   @version #$Id: parseoptions.h,v 1.13 1999-12-16 15:21:27 bcr Exp $#
+ */
+
+//@{
+
+/** @name DjVuParseOptions Examples
+    The following #DjVuParseOptions examples# demonstrait how to use the
+    \Ref{DjVuParseOptions} class in your code.
+
 \begin{verbatim}                                        
         // First we define the command line arguments with the
         // normal option structure defined by getopt(3)
         // Only I didn't add support for any feature that requires
         // a non-constant structure.  So we can use a compile time
         // constant.
+        static const char favorite_color_string[]="favorite-color";
+        static const char pizza_topping_string[]="pizza-topping";
+        static const char bignumber_string[]="bignumber";
+        static const char redo_string[]="redo";
+        static const char profile_string[]="profile";
+
    	static const djvu_option long_options[] = {
-   	  {"favorite-color",1,0,'f'},
-   	  {"pizza-topping",1,0,'P'},
-   	  {"bignumber",1,0,'n'},
-   	  {"redo",0,0,'r'},
-   	  {"profile",0,0,'p'},
-   	  {"count",3,0,'0'},  // This is a special definition for a numerical
-   	  {"count",3,0,'1'},  // operator.   Like -69 treated as an option.
-   	  {"count",3,0,'2'},  // When -69 is used, the value of "count" will 
-   	  {"count",3,0,'3'},  // will be 69.  Simularly, -3 would result in
-   	  {"count",3,0,'4'},  // count having a value of 3.
-   	  {"count",3,0,'5'},
-   	  {"count",3,0,'6'},  // Litterally, the 3 argument means to assign
-   	  {"count",3,0,'7'},  // the option letter used as the first character
-   	  {"count",3,0,'8'},  // of the value.
-   	  {"count",3,0,'9'},
+   	  {favorite_color_string,1,0,'f'},
+   	  {pizza_topping_string,1,0,'P'},
+   	  {bignumber_string,1,0,'n'},
+   	  {redo_string,0,0,'r'},
+   	  {profile_string,0,0,'p'},
    	  {0,0,0,0}
    	};
   
@@ -72,20 +100,20 @@
           MyOptions.ParseArguments(argc,argv,long_options);
    		// We could for example, check the value of a profile
    		// option, and switch which profile we are using.
-   	  profile=MyOptions.GetValue("profile");
+   	  profile=MyOptions.GetValue(profile_string);
           if(profile) MyOptions.ChangeProfile(profile);
    		// Now we can read in the variables.
    		// I find it is a good idea to only list the variable
-   		// strings once, so I'm passing them from the long_options
-   		// structure.  But this isn't necessary.
-   	  topping=MyOptions.GetValue(long_options[0].name);
-   	  color=MyOptions.GetValue(long_options[1].name);
+   		// strings once, so I use constant strings.  But this
+                // isn't required.
+   	  topping=MyOptions.GetValue(pizza_topping_string);
+   	  color=MyOptions.GetValue(favorite_color_string);
    		// We can also read in integers, and specify a default value
    		// to return in case the value is not an integer.  In this
    		// case I specified -1.
-   	  bignumber=MyOptions.GetNumber(long_options[2].name,-1);
+   	  bignumber=MyOptions.GetNumber(bignumber_string,-1);
    		// We can also check true/false type values.
-   	  redo=MyOptions.GetInteger(long_options[2].name,0);
+   	  redo=MyOptions.GetInteger(redo_string,0);
    		// Now before we do anything with these values we might
    		// want to check for errors.
    	  if(MyOptions.HasError())
@@ -150,6 +178,7 @@
    and begin a new one, simply list the new profile name followed by
    a ':'.  e.g.
   
+\begin{verbatim}                                        
    	name=fido
    	species=dog
    	birthday=today
@@ -162,11 +191,13 @@
    	birthday=tomorrow
    	favorite-food=mice
    	mice-eaten-this-week=5
+\end{verbatim}
   
    You can use quotes the same as in a shell script.  If you don't use
    quotes, extra white spaces are stripped, and escape characters are used.
    All of the following are equivalent.
    e.g.
+\begin{verbatim}                                        
    	test="This is a simple test.\nThis is only a test.\\"
   
    	test="This is a simple test.
@@ -177,12 +208,11 @@
   
    	test='This is a simple test.
    	This is only a test.\'
+\end{verbatim}
   
-   Be very careful of missing quotes...  */  
-
-/**  @memo parseoptions header file
-     @version $Id: parseoptions.h,v 1.12 1999-12-15 21:03:02 bcr Exp $
-     @author: $Author: bcr $ */
+   Be very careful of missing quotes...
+   @memo Examples using the \Ref{DjVuParseOptions} class
+ */
 
 // First we include some C wrappers for our class.
 // The purpose of the DjVuParseOptions class, is to give a standard
@@ -192,81 +222,112 @@
 // The operations of ChangeProfile(), and the copy constructor are only
 // thread safe if you define a THREADMETHOD.
 //
+
 extern "C" {
 #endif /* __cplusplus */
-  /** This structure is identical to most systems options structure. */
-  /** As defined for getopt_long(3).                                 */
+
+/** The #djvu_option# structure is very simmular to the standard unix
+    long_options structure for getopt_long(3), and the usage is almost
+    identical.
+    @memo The djvu_option structure wraps the DjVuParseOptions class 
+  */
+
   struct djvu_option {
+    /** This is the option long name without the leading double dash */
     const char *name;
+    /** has_arg is one if the option has a value, and 2 if the value
+        is optional.  Otherwise has_arg should be 0. */
     int has_arg;
+    /** Currently this value is unused. */
     int *flag;
+    /** This is a character representing the short option value.  Use '-'
+        if there is no short option. */
     int val;
   };
 
-    /* This is a wrapper for the C++ DjVuParseOptions class */
+/** @name DjVuParseOptions C Wrappers
+    The \Ref{DjVuParseOptions} class is wrapped by the following
+    the following set of wrapper functions.
+    @memo Wrapper functions for \Ref{DjVuParseOptions} */
+#ifdef DOCXX_CODE
+//@{
+#endif
+
+/** The #djvu_parse# structure is used for exporting and \Ref{DjVuParseOptions}
+    methods from C++ into C.
+ */
   struct djvu_parse
   {
+    /** This is a pointer to a \Ref{DjVuParseOptions} object */
     void *Private;
   };
 
-    /* This is a wrapper for the C++ DjVuParseOptions constructor  */
+  /** This is a wrapper for the C++ DjVuParseOptions profile constructor  */
   struct djvu_parse
   djvu_parse_init(const char []);
 
-    /* This is a wrapper for the C++ DjVuParseOptions constructor  */
+  /** This is a wrapper for the C++ DjVuParseOptions config file constructor  */
   struct djvu_parse
   djvu_parse_config(const char [],const char []);
 
-    /* This is a wrapper for the C++ DjVuParseOptions constructor  */
+  /** This is a wrapper for the C++ DjVuParseOptions copy constructor  */
   struct djvu_parse
   djvu_parse_copy(const struct djvu_parse);
 
-    /* This is a wrapper for the DjVuParseOptions::ChangeProfile function. */
+  /** This is a wrapper for the DjVuParseOptions::ChangeProfile function. */
   void
   djvu_parse_change_profile(struct djvu_parse,const char []);
 
-    /* This is a wrapper for the DjVuParseOptions destructor */
+    /** This is a wrapper for the DjVuParseOptions destructor */
   void
   djvu_parse_free(struct djvu_parse);
 
-    /* This is a wrapper for the DjVuParseOptions::GetValue function */
+    /** This is a wrapper for the DjVuParseOptions::GetValue function */
   const char *
   djvu_parse_value(struct djvu_parse,const char []);
 
-    /* This is a wrapper for the DjVuParseOptions::GetInteger function */
+    /** This is a wrapper for the DjVuParseOptions::GetInteger function */
   int
   djvu_parse_integer(struct djvu_parse,const char [],const int);
 
-    /* This is a wrapper for the DjVuParseOptions::GetInteger function */
+    /** This is a wrapper for the DjVuParseOptions::GetInteger function */
   int
   djvu_parse_number(struct djvu_parse,const char [],const int);
 
-    /* This is a wrapper for the DjVuParseOptions::ParseArguments function */
+    /** This is a wrapper for the DjVuParseOptions::ParseArguments function */
   int
   djvu_parse_arguments
   (struct djvu_parse,int,const char * const *,const struct djvu_option []);
 
-    /* This is a wrapper for the DjVuParseOptions::HasError function */
+    /** This is a wrapper for the DjVuParseOptions::HasError function */
   int
   djvu_parse_haserror(struct djvu_parse);
 
-    /* This is a wrapper for the DjVuParseOptions::GetError function */
+    /** This is a wrapper for the DjVuParseOptions::GetError function */
   const char *
   djvu_parse_error(struct djvu_parse);
 
-    /* This is a wrapper for the DjVuParseOptions::perror function */
+    /** This is a wrapper for the DjVuParseOptions::perror function */
   void
   djvu_parse_perror(struct djvu_parse);
 
-    /* This is a wrapper for the DjVuParseOptions::ConfigFilename function */
+    /** This is a wrapper for the DjVuParseOptions::ConfigFilename function */
   const char *
   djvu_parse_configfile(struct djvu_parse,const char[],int);
 
+#ifdef DOCXX_CODE
+//@}
+#endif
 #ifdef __cplusplus
 };
+#endif
+
 
 class DjVuTokenList;
-//@{
+
+/** #DjVuParseOptions# is the only class you really need to declare.  This
+    will handle all fo the details of parsing options from the command line
+    and configuration files on disk. */
 
 class DjVuParseOptions
 {
@@ -438,27 +499,22 @@ private:
   void AmbiguousOptions(const int,const char[],const int,const char[]);
 };
 
-//@}
+ /** This is a class very simmular to GMap, only it is limited much more
+     limited scope.  It is an associative array "string" to integer.  But
+     the integer is assigned uniquely by this class in sequental order.
+     This is of use when you want to store items sequentially in an array
+     without making the array to large.  This list is always sorted, so
+     this class is also usefull for creating a sorted unique list of words.
 
-/** @name tokenlist.h
- 
- This is a class very simmular to GMap, only it is limited it is much
- limited scope.  It is an associative array "string" to integer.  But
- the integer is assigned uniquely by this class in sequental order.
- This is of use when you want to store items sequentially in an array
- without making the array to large.  This list is always sorted, so
- this class is also usefull for creating a sorted unique list of words.
+     At some point the TokenList class may be replaced by a wrapper to the
+     GMap class.  We will have to evaluate CPU and memory usage to see if
+     the GMap replacement would be adiquate.
 
- At some point the TokenList class may be replaced by a wrapper to the
- GMap class.  We will have to evaluate CPU and memory usage to see if
- the GMap replacement would be adiquate.  */
+     The DjVuTokenList keeps track of string,integer pairs.  One unique     
+     interger is assigned per string.  With the integer range stored from   
+     zero to the number of strings present.  This is primarily intended to  
+     allow a simple mapping between strings and a fixed size array. */
 
-//@{
-
-/** The DjVuTokenList keeps track of string,integer pairs.  One unique     
-    interger is assigned per string.  With the integer range stored from   
-    zero to the number of strings present.  This is primarily intended to  
-    allow a simple mapping between strings and a fixed size array. */
 class DjVuTokenList
 {
 private:
@@ -486,6 +542,7 @@ public:
   /// Everybody needs friends 
   friend void DjVuParseOptions::init(const char [],const char []);
 };
+
 //@}
 
 // The following are the inline functions declared above:

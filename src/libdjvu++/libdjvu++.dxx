@@ -627,10 +627,6 @@
 //@Include: DjVuFileCache.h
 //@Include: DjVuImage.h
 //@Include: DjVmDoc.h
-/** @name Classes with C wrapper functions.
-    This class has a C wrapper so it can be accessed from
-    either C or C++.
- */
 //@Include: parseoptions.h
 
 /** @name Quasi obsolete files.
