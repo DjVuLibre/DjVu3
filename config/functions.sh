@@ -842,7 +842,7 @@ check_make_shlib()
   if [ -z "$make_shlib_test" ]
   then
     make_shlib_test=checked
-    if [ -z "$CXXSYMBOLIC$CCSYMBOLIC" ]
+    if [ -z "$CXXSYMBOLIC$CCSYMBOLIC" -o -z "CXXPICCCPIC" ]
     then
      	make_shlib=""
     else
