@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuImage.cpp,v 1.35 1999-11-16 19:01:01 leonb Exp $
+//C- $Id: DjVuImage.cpp,v 1.36 1999-11-17 20:52:22 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -709,6 +709,11 @@ DjVuImage::stencil(GPixmap *pm, const GRect &rect,
   if (fgjb)
     {
       JB2Image *jimg = fgjb;
+      if (! (width && height && 
+             jimg->get_width() == width && 
+             jimg->get_height() == height ) )
+        return 0;
+      // Decode bitmap
       bm = new GBitmap(rect.height(), rect.width());
       bm->set_grays(1+subsample*subsample);
       int rxmin = rect.xmin * subsample;
@@ -757,6 +762,8 @@ DjVuImage::stencil(GPixmap *pm, const GRect &rect,
           GPosition pos = components;
           int lastx = 0;
           int colorindex = fg->colordata[components[pos]];
+          if (colorindex >= palettesize)
+            THROW("Corrupted file (color index is greater than palette size)");
           // Gather relevant components and relevant rectangle
           GList<int> compset;
           GRect comprect;
