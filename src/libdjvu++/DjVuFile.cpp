@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.50 1999-09-16 15:41:43 eaf Exp $
+//C- $Id: DjVuFile.cpp,v 1.51 1999-09-16 16:55:42 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -220,23 +220,27 @@ DjVuFile::wait_for_finish(bool self)
 #endif
    check();
    
-      // By locking the monitor, we guarantee that situation doesn't change
-      // between the moments when we check for pending finish events
-      // and when we actually run wait(). If we don't lock, the last child
-      // may terminate in between, and we'll wait forever.
-      //
-      // Locking is required by GMonitor interface too, btw.
-   GMonitorLock lock(&finish_mon);
    if (self)
    {
+	 // It's best to check for self termination using flags. The reason
+	 // is that finish_mon is updated in a DjVuPort function, which
+	 // will not be called if the object is being destroyed
+      GMonitorLock lock(&flags);
       if (is_decoding())
       {
-	 while(is_decoding()) finish_mon.wait();
+	 while(is_decoding()) flags.wait();
 	 DEBUG_MSG("got it\n");
 	 return 1;
       }
    } else
    {
+	 // By locking the monitor, we guarantee that situation doesn't change
+	 // between the moments when we check for pending finish events
+	 // and when we actually run wait(). If we don't lock, the last child
+	 // may terminate in between, and we'll wait forever.
+	 //
+	 // Locking is required by GMonitor interface too, btw.
+      GMonitorLock lock(&finish_mon);
       GP<DjVuFile> file;
       {
 	 GCriticalSectionLock lock(&inc_files_lock);
