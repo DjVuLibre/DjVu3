@@ -70,16 +70,16 @@ name=`unescape "$soname"`
 echo "" > "dummy$$.c"
 "$cxx" -c "dummy$$.c" -o "dummy$$.o" 
 echo "$cxx $cxxsymbolic -o $outputname dummy$$.o -Wl,-soname,$name $libs"
-"$cxx" "$cxxsymbolic" -o `basename "$outputname"` "dummy$$.o" "-Wl,-soname,$name" $libs
+"$cxx" $cxxsymbolic -o `basename "$outputname"` "dummy$$.o" "-Wl,-soname,$name" $libs
 rm -f "dummy$$.o" "dummy$$.c"
 `unescape "$mv"` `basename $outputname` "$outputname"
 
-if [ -x "$outputname" ] 
+if [ -f "$outputname" ] 
 then
   `unescape "$mv"` "$outputname" "$linkname"
   LN=`unescape "$ln"`
   outputdir=`dirname $outputname`
-  if [ ! -x "$outputdir/$name" ]
+  if [ ! -f "$outputdir/$name" ]
   then
     (cd $outputdir;"$LN" -s `basename "$linkname"` "$name")
   fi 
