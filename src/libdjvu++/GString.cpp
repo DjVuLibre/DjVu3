@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GString.cpp,v 1.12 2000-01-06 20:40:34 eaf Exp $
+//C- $Id: GString.cpp,v 1.13 2000-03-02 17:17:27 bcr Exp $
 
 
 #ifdef __GNUC__
@@ -25,7 +25,7 @@
 
 #include "GString.h"
 
-// File "$Id: GString.cpp,v 1.12 2000-01-06 20:40:34 eaf Exp $"
+// File "$Id: GString.cpp,v 1.13 2000-03-02 17:17:27 bcr Exp $"
 // - Author: Leon Bottou, 04/1997
 
 GStringRep *
@@ -186,20 +186,38 @@ GString::setat(int n, char ch)
     }
 }
 
+#ifdef WIN32
+#define USE_VSNPRINTF _vsnprintf
+#else
+#ifdef linux
+#define USE_VSNPRINTF vsnprintf
+#endif
+#endif
+
 void
 GString::format(const char *fmt, ... )
 {
-  char buffer[4096];
+  int buflen=4096;
+  char *buffer=new char [buflen];
   // Format string
   va_list args;
   va_start(args, fmt);
   buffer[sizeof(buffer)-1] = 0;
+#ifdef USE_VSNPRINTF
+  while(USE_VSNPRINTF(buffer, buflen, fmt, args)<0)
+  {
+    delete [] buffer;
+    buffer=new char [buflen+=4096];
+  }
+#else
   vsprintf(buffer, fmt, args);
+#endif
   va_end(args);
   if (buffer[sizeof(buffer)-1])
     abort();
   // Go altering the string
-  (*this) = buffer;
+  (*this) = (const char *)buffer;
+  delete [] buffer;
 }
 
 int 
