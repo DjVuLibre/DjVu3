@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.cpp,v 1.54 2001-03-12 23:50:23 fcrary Exp $
+// $Id: ByteStream.cpp,v 1.55 2001-03-30 00:34:26 fcrary Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 04/1997
@@ -258,14 +258,14 @@ ByteStream::~ByteStream()
 size_t 
 ByteStream::read(void *buffer, size_t sz)
 {
-  G_THROW("bytestream.cant_read");      //  Cannot read from a ByteStream created for writing
+  G_THROW("ByteStream.cant_read");      //  Cannot read from a ByteStream created for writing
   return 0;
 }
 
 size_t 
 ByteStream::write(const void *buffer, size_t sz)
 {
-  G_THROW("bytestream.cant_write");      //  Cannot write from a ByteStream created for reading
+  G_THROW("ByteStream.cant_write");      //  Cannot write from a ByteStream created for reading
   return 0;
 }
 

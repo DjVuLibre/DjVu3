@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: parseoptions.cpp,v 1.66 2001-01-04 22:04:55 bcr Exp $
+// $Id: parseoptions.cpp,v 1.67 2001-03-30 00:34:26 fcrary Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -39,6 +39,7 @@
 
 #define _PARSEOPTIONS_H_IMPLEMENTATION_ true
 #include "parseoptions.h"
+#include "DjVuOptions.h"
 #include <string.h>
 #ifdef THREADMODEL
 #include "GThreads.h"
@@ -591,6 +592,9 @@ DjVuParseOptions::ParseArguments(
     const char *s=opts[i].name;
     if(s && (j=strlen(s)) && (v=VarTokens->GetToken(opts[i].name))>=0)
     {
+#ifdef SUPPRESS_VERBOSE
+      if( strcmp( "verbose", s ) != 0 )
+#endif
       Arguments->Add(v,args.optarg?args.optarg:"TRUE");
     }
   }
