@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocEditor.cpp,v 1.5 1999-11-20 07:11:24 bcr Exp $
+//C- $Id: DjVuDocEditor.cpp,v 1.6 1999-11-22 21:10:52 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -18,6 +18,8 @@
 #include "DjVuDocEditor.h"
 #include "GOS.h"
 #include "debug.h"
+
+#include <ctype.h>
 
 void
 DjVuDocEditor::check(void)
@@ -276,6 +278,10 @@ DjVuDocEditor::strip_incl_chunks(const GP<DataPool> & pool_in)
 GString
 DjVuDocEditor::insert_file(const char * file_name, const char * parent_id,
 			   int chunk_num)
+      // Will open the 'file_name' and insert it into an existing DjVuFile
+      // with ID 'parent_id'. Will insert the INCL chunk at position chunk_num
+      // Will NOT process ANY files included into the file being inserted.
+      // Moreover it will strip out any INCL chunks in that file...
 {
    DEBUG_MSG("DjVuDocEditor::insert_file(): fname='" << file_name <<
 	     "', parent_id='" << parent_id << "'\n");
@@ -322,46 +328,192 @@ DjVuDocEditor::insert_file(const char * file_name, const char * parent_id,
    return id;
 }
 
-GString
+void
+DjVuDocEditor::insert_file(const char * file_name, bool is_page,
+			   int & file_pos, GMap<GString, GString> & name2id)
+      // First it will insert the 'file_name' at position 'file_pos'.
+      //
+      // Then it will process all the INCL chunks in the file and try to do
+      // the same thing with the included files. If insertion of an included
+      // file fails, it will proceed with other INCL chunks until it does
+      // them all. In the very end we will throw exception to let the caller
+      // know about problems with included files.
+      //
+      // If the name of a file being inserted conflicts with some other
+      // name, which has been in DjVmDir prior to call to this function,
+      // it will be modified. name2id is the translation table to
+      // keep track of these modifications.
+      //
+      // Also, if a name is in name2id, we will not insert that file again.
+{
+   GString errors;
+
+      // We do not want to insert the same file twice (important when
+      // we insert a group of files at the same time using insert_group())
+      // So we check if we already did that and return if so.
+   if (name2id.contains(GOS::basename(file_name))) return;
+   
+   TRY {
+      GP<DjVmDir> dir=get_djvm_dir();
+
+	 // Create DataPool and see if the file exists
+      GP<DataPool> file_pool=new DataPool(file_name);
+
+	 // Oh. It does exist... Check that it has IFF structure
+      {
+	 GP<ByteStream> str=file_pool->get_stream();
+	 IFFByteStream iff(*str);
+	 GString chkid;
+	 int length;
+	 length=iff.get_chunk(chkid);
+	 if (length>1024*1024)
+	    THROW("File '"+GString(file_name)+"' is not a DjVu file");
+      }
+      
+	 // Now get a unique name for this file.
+	 // Check the name2id first...
+      GString id, name=GOS::basename(file_name);
+      if (name2id.contains(name)) id=name2id[name];
+      else
+      {
+	    // Otherwise create a new unique ID and remember the translation
+	 id=find_unique_id(name);
+	 name2id[name]=id;
+      }
+
+	 // Good. Before we continue with the included files we want to
+	 // complete insertion of this one. Notice, that insertion of
+	 // children may fail, in which case we will have to modify
+	 // data for this file to get rid of invalid INCL
+
+	 // Create a file record with the chosen ID
+      GP<DjVmDir::File> file;
+      file=new DjVmDir::File(id, id, id, is_page ? DjVmDir::File::PAGE :
+			     DjVmDir::File::INCLUDE);
+
+	 // And insert it into the directory
+      dir->insert_file(file, file_pos);
+      if (file_pos>=0) file_pos++;
+
+	 // And add the File record (containing the file URL and DataPool)
+      {
+	 GURL file_url=id_to_url(id);
+	 GP<File> f=new File;
+	 f->pool=file_pool;
+	 GCriticalSectionLock lock(&files_lock);
+	 files_map[file_url]=f;
+      }
+
+	 // The file has been added. If it doesn't include anything else,
+	 // that will be enough. Otherwise repeat what we just did for every
+	 // included child. Don't forget to modify the contents of INCL
+	 // chunks due to name2id translation
+      GString chkid;
+      GP<ByteStream> str_in=file_pool->get_stream();
+      IFFByteStream iff_in(*str_in);
+      MemoryByteStream str_out;
+      IFFByteStream iff_out(str_out);
+      
+      iff_in.get_chunk(chkid);
+      iff_out.put_chunk(chkid);
+      while(iff_in.get_chunk(chkid))
+      {
+	 if (chkid!="INCL")
+	 {
+	    iff_out.put_chunk(chkid);
+	    iff_out.copy(iff_in);
+	    iff_in.close_chunk();
+	    iff_out.close_chunk();
+	 } else
+	 {
+	    GString name;
+	    char buffer[1024];
+	    int length;
+	    while((length=iff_in.read(buffer, 1024)))
+	       name+=GString(buffer, length);
+	    while(isspace(name[0])) { GString tmp=(const char *) name+1; name=tmp; }
+	    while(isspace(name[name.length()-1])) name.setat(name.length()-1, 0);
+	    GString full_name=GOS::expand_name(name, GOS::dirname(file_name));
+	    iff_in.close_chunk();
+
+	    TRY {
+	       insert_file(full_name, false, file_pos, name2id);
+	       GString id=name2id[name];
+	       iff_out.put_chunk("INCL");
+	       iff_out.write((const char *) id, id.length());
+	       iff_out.close_chunk();
+	    } CATCH(exc) {
+		  // Should an error occur, we move on. INCL chunk will
+		  // not be copied.
+	       if (errors.length()) errors+="\n";
+	       errors+=exc.get_cause();
+	    } ENDCATCH;
+	 }
+      } // while(iff_in.get_chunk(chkid))
+      iff_out.close_chunk();
+
+	 // We have just inserted every included file. We may have modified
+	 // contents of the INCL chunks. So we need to update the DataPool...
+      str_out.seek(0);
+      GP<DataPool> new_file_pool=new DataPool(str_out);
+      {
+	 
+	 GURL file_url=id_to_url(id);
+	 GCriticalSectionLock lock(&files_lock);
+	 files_map[file_url]->pool=new_file_pool;
+      }
+
+      StdioByteStream str("/tmp/tmp.djvu", "wb");
+      str_out.seek(0);
+      str.copy(str_out);
+   } CATCH(exc) {
+      if (errors.length()) errors+="\n";
+      errors+=exc.get_cause();
+      THROW(errors);
+   } ENDCATCH;
+
+      // The only place where we intercept exceptions is when we process
+      // included files. We want to process all of them even if we failed to
+      // process one. But here we need to let the exception propagate...
+   if (errors.length()) THROW(errors);
+}
+
+void
+DjVuDocEditor::insert_group(const GList<GString> & file_names, int page_num)
+      // The function will insert every file from the list at position
+      // corresponding to page_num. If page_num is negative, concatenation
+      // will occur. Included files will be processed as well
+{
+      // First translate the page_num to file_pos.
+   GP<DjVmDir> dir=get_djvm_dir();
+   int file_pos;
+   if (page_num<0 || page_num>=dir->get_pages_num()) file_pos=-1;
+   else file_pos=dir->get_page_pos(page_num);
+
+      // Now call the insert_file() for every page. We will remember the
+      // name2id translation table. Thus insert_file() will remember IDs
+      // it assigned to shared files
+   GMap<GString, GString> name2id;
+
+   for(GPosition pos=file_names;pos;++pos)
+      insert_file(file_names[pos], true, file_pos, name2id);
+}
+   
+void
 DjVuDocEditor::insert_page(const char * file_name, int page_num)
 {
    DEBUG_MSG("DjVuDocEditor::insert_page(): fname='" << file_name << "'\n");
    DEBUG_MAKE_INDENT(3);
-   
+
+      // First translate the page_num to file_pos.
    GP<DjVmDir> dir=get_djvm_dir();
+   int file_pos;
+   if (page_num<0 || page_num>=dir->get_pages_num()) file_pos=-1;
+   else file_pos=dir->get_page_pos(page_num);
 
-      // Create DataPool and see if the file exists
-   GP<DataPool> file_pool=new DataPool(file_name);
-
-      // Strip any INCL chunks
-   file_pool=strip_incl_chunks(file_pool);
-
-      // Choose an ID, which is not in the directory yet
-   GString id=find_unique_id(GOS::basename(file_name));
-
-      // Create a file record with the chosen ID
-   GP<DjVmDir::File> file=new DjVmDir::File(id, id, id, DjVmDir::File::PAGE);
-
-      // And insert it into the directory
-   if (page_num<0 || page_num>=dir->get_pages_num())
-      dir->insert_file(file, -1);
-   else
-   {
-      int file_num=dir->get_page_pos(page_num);
-      dir->insert_file(file, file_num);
-   }
-
-      // Now add the File record (containing the file URL and DataPool)
-   GURL file_url=id_to_url(id);
-   GP<File> f=new File;
-   f->pool=file_pool;
-   GCriticalSectionLock lock(&files_lock);
-   files_map[file_url]=f;
-
-      // At this moment the page is considered "added" because DjVuDocument
-      // knows about it from DjVmDir, and we will provide data for it
-      // as soon as somebody requests it.
-   return id;
+      // Now just call insert_file() to complete the job
+   GMap<GString, GString> name2id;
+   insert_file(file_name, true, file_pos, name2id);
 }
 
 void

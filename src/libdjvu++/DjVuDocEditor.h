@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocEditor.h,v 1.3 1999-11-19 17:31:28 eaf Exp $
+//C- $Id: DjVuDocEditor.h,v 1.4 1999-11-22 21:10:51 eaf Exp $
  
 #ifndef _DJVUDOCEDITOR_H
 #define _DJVUDOCEDITOR_H
@@ -27,7 +27,7 @@
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocEditor.h,v 1.3 1999-11-19 17:31:28 eaf Exp $#
+    @version #$Id: DjVuDocEditor.h,v 1.4 1999-11-22 21:10:51 eaf Exp $#
 */
 
 //@{
@@ -75,9 +75,48 @@ public:
    
    virtual void	save_as(const char * where, bool bundled);
    
-   GString	insert_page(const char * fname, int page_num=-1);
    GString	insert_file(const char * fname, const char * parent_id,
 			    int chunk_num=1);
+      /** Inserts the referenced file into this DjVu document.
+
+	  @param fname Name of the top-level file containing the image of
+	  	 the page to be inserted. This file must be a DjVu file and
+		 may include one or more other DjVu files.
+
+		 If it include other DjVu files, the function will try to
+		 insert them into the document too. Should this attempt fail,
+		 the corresponding #INCL# chunk will be removed from the
+		 referencing file and an exception will be thrown.
+
+		 When inserting a file, the function may modify its name
+		 to be unique in the DjVu document.
+	  @param page_num Position where the new page should be inserted at.
+	  	 Negative value means "append" */
+   void		insert_page(const char * fname, int page_num=-1);
+      /** Inserts a group of pages into this DjVu document.
+	  
+	  Like \Ref{insert_page}() it will insert every page into the document.
+	  The main advantage of calling this function once for the whole
+	  group instead of calling \Ref{insert_page}() for every page is
+	  the processing of included files:
+
+	  The group of files may include one or more files, which are thus
+	  shared by them. If you call \Ref{insert_page}() for every page,
+	  this shared file will be inserted into the document more than once
+	  though under different names. This is how \Ref{insert_page}() works:
+	  whenever it inserts something, it checks for duplicate names with
+	  only one purpose: invent a new name if a given one is already in
+	  use.
+
+	  On the other hand, if you call #insert_group#(), it will insert
+	  shared included files only once. This is because it can analyze
+	  the group of files before inserting them and figure out what files
+	  are shared and thus should be inserted only once.
+
+	  @param fname_list List of top-level files for the pages to be inserted
+	  @param page_num Position where the new pages should be inserted at.
+	  	 Negative value means "append" */
+   void		insert_group(const GList<GString> & fname_list, int page_num=-1);
    void		generate_thumbnails(int thumb_size, int images_per_file,
 				    void (* cb)(int page_num, void *)=0,
 				    void * cl_data=0);
@@ -129,6 +168,8 @@ private:
    GString	find_unique_id(const char * id);
    GP<DataPool>	strip_incl_chunks(const GP<DataPool> & pool);
    void		clean_files_map(void);
+   void		insert_file(const char * file_name, bool is_page,
+			    int & file_pos, GMap<GString, GString> & name2id);
 };
 
 inline bool
