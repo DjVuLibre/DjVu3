@@ -39,7 +39,7 @@
 	@echo "pod2html --infile=$*.pod --outfile=$*.html"
 	@if [ -r "$*.pod" ] ; then i="$*.pod" ; else i="SRCDIR/$*.pod" ; fi ; \
 	pod2html --infile="$$i" --outfile="$*.tmp"
-	if ( $(SED) -e 's,^<BODY>,<BODY BGCOLOR=\#fefefe>,' -e 's,H1>,H3>,g' < "$*.tmp" > "$*.html" ) ; \
+	if ( $(SED) -e 's,^<BODY>,<BODY BGCOLOR=\#fefefe BACKGROUND="back.jpg">,' -e 's,H1>,H3>,g' < "$*.tmp" > "$*.html" ) ; \
 	then $(RM) -f "$*.tmp" pod2html-* ; else $(RM) -f "$*.tmp" "$*.html" pod2html-* ; exit 1 ; fi
 
 
