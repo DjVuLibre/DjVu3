@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.115 2000-03-21 01:09:25 parag Exp $
+//C- $Id: DjVuDocument.cpp,v 1.116 2000-03-27 19:55:32 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -159,10 +159,12 @@ DjVuDocument::static_init_thread(void * cl_data)
       th->flags|=DjVuDocument::DOC_INIT_FAILED;
       TRY {
 	 th->check_unnamed_files();
-	 if (strcmp(exc.get_cause(), "STOP"))
-	    get_portcaster()->notify_error(th, exc.get_cause());
-	 else
+	 if (!strcmp(exc.get_cause(), "EOF") && th->verbose_eof)
+	    get_portcaster()->notify_error(th, "Unexpected end of file encountered during document initialization.");
+	 else if (!strcmp(exc.get_cause(), "STOP"))
 	    get_portcaster()->notify_status(th, "DjVuDocument init thread STOPPed");
+	 else
+	    get_portcaster()->notify_error(th, exc.get_cause());
       } CATCH(exc) {} ENDCATCH;
       th->init_thread_flags|=FINISHED;
    } ENDCATCH;
