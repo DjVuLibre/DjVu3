@@ -28,11 +28,30 @@ fi
 
 conf=`basename $0`
 SRCDIR=`dirname $0`
-if [ ! -r "$SRCDIR/libdjvu++.dxx.in" ] 
+if [ ! -r "$SRCDIR/libdjvu++.dxx.in" -o ! -r $SRCDIR/ATTLICENSE ] 
 then
    echo 1>&2 "$conf: Cannot recognize source directory."
    exit 1
 fi
+
+
+### License stuff
+
+accept=show
+while [ "$accept" != yes -a "$accept" != no ]
+do
+    if [ "$accept" = show ] ; then
+       ${PAGER-more} $SRCDIR/ATTLICENSE
+    fi
+    echo
+    echon "Do you accept this license agreement (yes/no/show) ?"
+    read accept
+    if [ "$accept" = no ] ; then
+       echo Bye
+       exit 0
+    fi
+done
+
 
 ### Process arguments
 
@@ -239,3 +258,8 @@ generate_makefile @Tools
 generate_makefile @Test
 
 
+# Further instructions
+
+echo
+echo "Type 'make' to proceed with the compilation".
+echo
