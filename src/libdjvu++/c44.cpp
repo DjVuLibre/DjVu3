@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: c44.cpp,v 1.10 1999-03-02 16:17:12 leonb Exp $
+//C-  $Id: c44.cpp,v 1.11 1999-03-02 16:51:34 leonb Exp $
 
 
 /** @name c44
@@ -140,7 +140,7 @@
     although these schemes may achieve slightly smaller file sizes, the
     decoding functions did not even approach our requirements.  The IW44
     wavelets reach these requirements today and may in the future implement
-    more modern refinements (such as treillis quantization, bitrate
+    more modern refinements (such as trellis quantization, bitrate
     allocation, etc.) if (and only if) these refinements can be implemented
     within our constraints.
 
@@ -149,7 +149,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: c44.cpp,v 1.10 1999-03-02 16:17:12 leonb Exp $# */
+    #$Id: c44.cpp,v 1.11 1999-03-02 16:51:34 leonb Exp $# */
 //@{
 //@}
 

@@ -7,13 +7,13 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: djvuextract.cpp,v 1.5 1999-03-02 16:17:13 leonb Exp $
+//C-  $Id: djvuextract.cpp,v 1.6 1999-03-02 16:51:34 leonb Exp $
 
 /** @name djvuextract
 
     {\bf Synopsis}
     \begin{verbatim}
-    djvumake <djvufile> [Sjbz=<maskout>] [FG44=<fgout>] [BG44=<bgout>]
+    djvuextract <djvufile> [Sjbz=<maskout>] [FG44=<fgout>] [BG44=<bgout>]
     \end{verbatim}
     
     {\bf Description}\\
@@ -35,7 +35,7 @@
     @memo
     Extract components from DjVu files.
     @version
-    #$Id: djvuextract.cpp,v 1.5 1999-03-02 16:17:13 leonb Exp $#
+    #$Id: djvuextract.cpp,v 1.6 1999-03-02 16:51:34 leonb Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> */
 //@{

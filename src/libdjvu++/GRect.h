@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: GRect.h,v 1.5 1999-03-02 02:12:12 leonb Exp $
+//C-  $Id: GRect.h,v 1.6 1999-03-02 16:51:34 leonb Exp $
 
 
 #ifndef _GRECT_H_
@@ -20,7 +20,7 @@
 /** @name GRect.h
     Files #"GRect.h"# and #"GRect.cpp"# implement basic operations on
     rectangles. Class \Ref{GRect} is used to represent rectangles.  Class
-    \Ref{GRectMapper} represent the correspondance between points relative to
+    \Ref{GRectMapper} represent the correspondence between points relative to
     given rectangles.  Class \Ref{GRatio} is used to represent scaling factors
     as rational numbers.
     @memo
@@ -28,7 +28,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GRect.h,v 1.5 1999-03-02 02:12:12 leonb Exp $# */
+    #$Id: GRect.h,v 1.6 1999-03-02 16:51:34 leonb Exp $# */
 //@{
 
 #include "DjVuGlobal.h"
@@ -92,7 +92,7 @@ public:
     represents a relation between the points of two rectangles. Given the
     coordinates of a point in the first rectangle (input rectangle), function
     \Ref{map} computes the coordinates of the corresponding point in the
-    second rectangle (the ouput rectangle).  This function actually implements
+    second rectangle (the output rectangle).  This function actually implements
     an affine transform which maps the corners of the first rectangle onto the
     matching corners of the second rectangle. The scaling operation is
     performed using integer fraction arithmetic in order to maximize
@@ -109,18 +109,18 @@ public:
   void set_input(const GRect &rect);
   /** Sets the output rectangle. */
   void set_output(const GRect &rect);
-  /** Composes the affine tranform with a rotation of #count# quarter turns
+  /** Composes the affine transform with a rotation of #count# quarter turns
       counter-clockwise.  This operation essentially is a modification of the
       match between the corners of the input rectangle and the corners of the
       output rectangle. */
   void rotate(int count=1);
-  /** Composes the affine tranform with a symmetry with respect to the
-      vertical line crossign the center of the output rectangle.  This
+  /** Composes the affine transform with a symmetry with respect to the
+      vertical line crossing the center of the output rectangle.  This
       operation essentially is a modification of the match between the corners
       of the input rectangle and the corners of the output rectangle. */
   void mirrorx();
-  /** Composes the affine tranform with a symmetry with respect to the
-      horizontal line crossign the center of the output rectangle.  This
+  /** Composes the affine transform with a symmetry with respect to the
+      horizontal line crossing the center of the output rectangle.  This
       operation essentially is a modification of the match between the corners
       of the input rectangle and the corners of the output rectangle. */
   void mirrory();

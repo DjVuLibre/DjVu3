@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: GOS.h,v 1.3 1999-03-02 02:12:12 leonb Exp $
+//C-  $Id: GOS.h,v 1.4 1999-03-02 16:51:33 leonb Exp $
 
 #ifndef _GOS_H_
 #define _GOS_H_
@@ -29,7 +29,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- Initial implementation
     @version
-    #$Id: GOS.h,v 1.3 1999-03-02 02:12:12 leonb Exp $#
+    #$Id: GOS.h,v 1.4 1999-03-02 16:51:33 leonb Exp $#
 */
 //@{
 
@@ -56,7 +56,7 @@ class GOS
       but also supports the naming conventions of other operating systems. */
   static GString dirname(const char *filename);
   /** Returns the last component of file name #filename#.  If the filename
-      suffix matches arguement #suffix#, the filename suffix is removed.  This
+      suffix matches argument #suffix#, the filename suffix is removed.  This
       function works like the unix command #/bin/basename#, but also supports
       the naming conventions of other operating systems. */
   static GString basename(const char *filename, const char *suffix=0);

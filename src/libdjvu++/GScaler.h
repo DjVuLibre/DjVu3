@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: GScaler.h,v 1.5 1999-03-02 16:17:12 leonb Exp $
+//C-  $Id: GScaler.h,v 1.6 1999-03-02 16:51:34 leonb Exp $
 
 #ifndef _GSCALER_H_
 #define _GSCALER_H_
@@ -28,7 +28,7 @@
     image is implemented by class \Ref{GPixmapScaler}.
 
     {\bf Remark} --- The bilinear interpolation code relies on fixed precision
-    tables.  It becomes suboptimal when supersampling (i.e. zooming into) an
+    tables.  It becomes suboptimal when upsampling (i.e. zooming into) an
     image by a factor greater than eight.  High contrast images displayed at
     high magnification may contain visible jaggies.
 
@@ -37,7 +37,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: GScaler.h,v 1.5 1999-03-02 16:17:12 leonb Exp $# */
+    #$Id: GScaler.h,v 1.6 1999-03-02 16:51:34 leonb Exp $# */
 //@{
 
 

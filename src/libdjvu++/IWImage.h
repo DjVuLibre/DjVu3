@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: IWImage.h,v 1.6 1999-03-02 16:17:12 leonb Exp $
+//C-  $Id: IWImage.h,v 1.7 1999-03-02 16:51:34 leonb Exp $
 
 #ifndef _IWIMAGE_H_
 #define _IWIMAGE_H_
@@ -86,18 +86,18 @@
     (see \URL{http://www.research.att.com/~leonb/DJVU/mask}).
 
     {\bf ToDo} --- There are many improvements to be made.  Besides better
-    quantization algorithms (such as treillis quantization and bitrate
+    quantization algorithms (such as trellis quantization and bitrate
     allocation), we should allow for more wavelet transforms.  These
     improvements may be implemented in future version, if (and only if) they
     can meet our decoding constraints.  Future versions will probably split
-    file #"IWCodec.cpp"# which currently contains everything.
+    file #"IWImage.cpp"# which currently contains everything.
  
     @memo
     Wavelet encoded images.
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: IWImage.h,v 1.6 1999-03-02 16:17:12 leonb Exp $# */
+    #$Id: IWImage.h,v 1.7 1999-03-02 16:51:34 leonb Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -328,7 +328,7 @@ public:
   unsigned int get_memory_usage() const;
   /** Returns the filling ratio of the internal data structure.  Wavelet
       coefficients are stored in a sparse array.  This function tells what
-      percentage of bins have been effectively alocated. */
+      percentage of bins have been effectively allocated. */
   int get_percent_memory() const;
   // CODER
   /** Encodes one data chunk into ByteStream #bs#.  Parameter #parms# controls

@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: JB2Image.h,v 1.4 1999-03-02 16:17:12 leonb Exp $
+//C-  $Id: JB2Image.h,v 1.5 1999-03-02 16:51:34 leonb Exp $
 
 #ifndef _JB2IMAGE_H
 #define _JB2IMAGE_H
@@ -97,7 +97,7 @@
     \end{itemize}
 
     @version
-    #$Id: JB2Image.h,v 1.4 1999-03-02 16:17:12 leonb Exp $#
+    #$Id: JB2Image.h,v 1.5 1999-03-02 16:51:34 leonb Exp $#
     @memo
     Coding bilevel images with JB2.
     @author
@@ -131,7 +131,7 @@ public:
   unsigned short left;
   /** Vertical coordinate of the blit. */
   unsigned short bottom;
-  /** Indice of the shape to blit. */
+  /** Index of the shape to blit. */
   unsigned int shapeno;
 };
 

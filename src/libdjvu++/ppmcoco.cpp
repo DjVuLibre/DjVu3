@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: ppmcoco.cpp,v 1.7 1999-03-02 16:17:13 leonb Exp $
+//C-  $Id: ppmcoco.cpp,v 1.8 1999-03-02 16:51:35 leonb Exp $
 
 
 
@@ -65,7 +65,7 @@
     gamma coefficients are close, partly because the color values have a
     limited dynamical range, and partly because we do not exactly perform a
     regular gamma correction: regular gamma correction tends to reveal ugly
-    data compression artefacts in the dark areas of the image.  We suggest
+    data compression artifacts in the dark areas of the image.  We suggest
     therefore to design images with a intermediate gamma coefficient.  Value
     2.2 gives decent results on all computers.  This value is suggested by
     several photo editing programs (such as Photoshop), and is
@@ -82,7 +82,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: ppmcoco.cpp,v 1.7 1999-03-02 16:17:13 leonb Exp $# */
+    #$Id: ppmcoco.cpp,v 1.8 1999-03-02 16:51:35 leonb Exp $# */
 //@{
 //@}
 

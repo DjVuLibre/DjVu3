@@ -10,7 +10,7 @@
     YOUR acceptance of all the provisions specified in this agreement.
 
 
-    {\bf Acknowldegements} --- The ideas discussed in this library are the
+    {\bf Acknowledgements} --- The ideas discussed in this library are the
     result of endless discussions with Yoshua Bengio, Patrick Haffner, Paul
     Howard, and Yann Le Cun.  Many improvements have suggested by Andrei
     Erofeev, Praveen Guduru, and Bill Riemers.  Credits are given whenever
@@ -108,7 +108,7 @@
    source code form.  The DjVu Reference Library completely defines the DjVu
    and IW44 image formats.  It does not implement however the sophisticated
    encoding strategies which allow for the highest compression ratios.  These
-   strategies however are very application dependent.  We have developped
+   strategies however are very application dependent.  We have developed
    encoders for scanned documents (see \URL{http://www.djvu.att.com/djvu}.  We
    also know that completely different (and probably much easier) encoding
    strategies are needed for electronically created documents.
@@ -193,7 +193,7 @@
     #"@Test"# contains a few test programs for the library basic features.
     Directory #"@Tools"# contains tools that may be useful for building the
     library or its documentation.  The character #"@"# in the directory names
-    is a probably misguided attempt to emphazise the directory names when you
+    is a probably misguided attempt to emphasize the directory names when you
     type #ls#.
 
     {\bf Prerequisites} --- The DjVu Reference Library should compile and run
@@ -209,7 +209,7 @@
     version #egcs# greater than #egcs-1.0.2#.  Use command #g++ -v# to find
     out what is installed on your system.  If you have an earlier version of
     #g++# such as #gcc-2.7.23#, you must upgrade because it is not going to
-    work.  We strongly recomment upgrading directly to #egcs-1.1.1# or better.
+    work.  We strongly recommend upgrading directly to #egcs-1.1.1# or better.
     The easiest way consists of picking a binary distribution somewhere on the
     Internet.  Linux users may have a look at \URL{http://www.gcc.ml.org} or
     \URL{http://rufus.w3.org/linux/RPM}.

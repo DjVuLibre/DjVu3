@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: BSByteStream.h,v 1.6 1999-03-02 16:17:12 leonb Exp $
+//C-  $Id: BSByteStream.h,v 1.7 1999-03-02 16:51:32 leonb Exp $
 
 
 #ifndef _BSBYTESTREAM_H
@@ -25,7 +25,7 @@
     is performed using a combination of the Karp-Miller-Rosenberg and the
     Bentley-Sedgewick algorithms. This is comparable to (Sadakane, DCC 98)
     with a slightly more flexible ranking scheme. Symbols are then ordered
-    according to a running estimate of their occurence frequencies.  The
+    according to a running estimate of their occurrence frequencies.  The
     symbol ranks are then coded using a simple fixed tree and the
     \Ref{ZPCodec} binary adaptive coder.
 
@@ -92,7 +92,7 @@
     @memo
     Simple Burrows-Wheeler general purpose compressor.
     @version
-    #$Id: BSByteStream.h,v 1.6 1999-03-02 16:17:12 leonb Exp $# */
+    #$Id: BSByteStream.h,v 1.7 1999-03-02 16:51:32 leonb Exp $# */
 //@{
 
 #ifdef __GNUC__

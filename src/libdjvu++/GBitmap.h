@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: GBitmap.h,v 1.4 1999-03-02 16:17:12 leonb Exp $
+//C-  $Id: GBitmap.h,v 1.5 1999-03-02 16:51:32 leonb Exp $
 
 #ifndef _GBITMAP_H_
 #define _GBITMAP_H_
@@ -42,7 +42,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: GBitmap.h,v 1.4 1999-03-02 16:17:12 leonb Exp $#
+    #$Id: GBitmap.h,v 1.5 1999-03-02 16:51:32 leonb Exp $#
 
  */
 //@{
@@ -189,7 +189,7 @@ public:
       image by copying smaller images at predefined locations.  The image of a
       page, for instance, is composed by copying the images of characters at
       predefined locations.  These functions are fairly optimized.  They can
-      direclty use compressed GBitmaps (see \Ref{compress}).  We consider in
+      directly use compressed GBitmaps (see \Ref{compress}).  We consider in
       this section that each GBitmap comes with a coordinate system defined as
       follows.  Position (#0#,#0#) corresponds to the bottom left corner of
       the bottom left pixel.  Position (#1#,#1#) corresponds to the top right

@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: ZPCodec.h,v 1.6 1999-03-02 16:17:12 leonb Exp $
+//C-  $Id: ZPCodec.h,v 1.7 1999-03-02 16:51:34 leonb Exp $
 
 
 #ifndef _ZPCODEC_H
@@ -130,7 +130,7 @@
     @memo
     Binary adaptive quasi-arithmetic coder.
     @version
-    #$Id: ZPCodec.h,v 1.6 1999-03-02 16:17:12 leonb Exp $#
+    #$Id: ZPCodec.h,v 1.7 1999-03-02 16:51:34 leonb Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> */
 //@{
@@ -514,13 +514,13 @@ ZPCodec::decoder()
     context variables.  This problem can be solved by using a priori knowledge
     about the probability distribution of our numbers.
 
-    Assume for instance that the distribution is symetrical and that small
+    Assume for instance that the distribution is symmetrical and that small
     numbers are much more probable than large numbers.  We will first group
     our numbers into several sets.  Each number is coded by first coding which
     set contains the number and then coding a position within the set.  Each
     set contains #2^n# numbers that we consider roughly equiprobable.  Since
     the most probable values occur much more often, we want to model their
-    probabily more precisely. Therefore we use small sets for the most
+    probability more precisely. Therefore we use small sets for the most
     probable values and large sets for the least probable values, as
     demonstrated below.
     \begin{verbatim} 
@@ -593,7 +593,7 @@ ZPCodec::decoder()
    Suppose that we first code points located towards the left side and then
    slowly move towards points located on the right side.  The ZP-Coder will
    first estimate that the X coordinates are rather on the left side. This
-   estimation will be progressively revised after seing more points on the
+   estimation will be progressively revised after seeing more points on the
    right side.  Such an ordering of the points obviously violates the point
    independence assumption on which our code is based.  Despite our inexact
    assumptions, the tracking mechanism allows for better prediction of the X
@@ -610,12 +610,12 @@ ZPCodec::decoder()
    Adaptation is always associated with a small loss of efficiency.  The
    ZP-Coder updates the probability model whenever it suspects, {\em after
    coding}, that the current settings were not optimal.  The model will be
-   better next time, but a slight loss in compression has occured.  The design of
-   ZP-Coder of course minimizes this effect as much as possible.  Yet you will
-   pay a price if you ask too much to the adaptation algorithm.  If you have
-   millions of context variables, it will be difficult to train them all.  If
-   the probability distributions change drastically while coding, it will be
-   difficult to track the changes fast enough.
+   better next time, but a slight loss in compression has occurred.  The
+   design of ZP-Coder of course minimizes this effect as much as possible.
+   Yet you will pay a price if you ask too much to the adaptation algorithm.
+   If you have millions of context variables, it will be difficult to train
+   them all.  If the probability distributions change drastically while
+   coding, it will be difficult to track the changes fast enough.
 
    Adaptation on the other hand is a great simplification.  A good data
    compression program must (a) represent the data in order to make its

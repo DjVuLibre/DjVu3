@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: ByteStream.h,v 1.6 1999-03-02 02:12:11 leonb Exp $
+//C-  $Id: ByteStream.h,v 1.7 1999-03-02 16:51:32 leonb Exp $
 
 
 #ifndef _BYTESTREAM_H
@@ -39,7 +39,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation\\
     Andrei Erofeev <eaf@research.att.com> -- 
     @version
-    #$Id: ByteStream.h,v 1.6 1999-03-02 02:12:11 leonb Exp $# */
+    #$Id: ByteStream.h,v 1.7 1999-03-02 16:51:32 leonb Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -63,7 +63,7 @@
     to change the current position.
 
     {\bf Note}. Both the copy constructor and the copy operator are declared
-    as private members. It is threfore not possible to make multiple copies
+    as private members. It is therefore not possible to make multiple copies
     of instances of this class, as implied by the class semantic.  
 */
 class ByteStream {
@@ -77,7 +77,7 @@ public:
   /** Reads data from a ByteStream.  This function {\em must} be implemented
       by each subclass of #ByteStream#.  At most #size# bytes are read from
       the ByteStream and stored in the memory area pointed to by #buffer#.
-      Function #read# returns immediatly if #size# is zero. The actual number
+      Function #read# returns immediately if #size# is zero. The actual number
       of bytes read is returned.  Function #read# returns a number of bytes
       smaller than #size# if the end-of-file mark is reached before filling
       the buffer. Subsequent invocations will always return value #0#.
@@ -89,7 +89,7 @@ public:
   /** Writes data to a ByteStream.  This function {\em must} be implemented by
       each subclass of #ByteStream#.  At most #size# bytes from buffer
       #buffer# are written to the ByteStream.  Function #write# returns
-      immediatly if #size# is zero.  The actual number of bytes written is
+      immediately if #size# is zero.  The actual number of bytes written is
       returned. Function #write# may also return a value greater than zero but
       smaller than #size# for internal reasons. Programs must be ready to
       handle these cases or use function \Ref{writall}. Exception
@@ -138,7 +138,7 @@ public:
   /** Reads data and blocks until everything has been read.  This function is
       essentially similar to function #read#.  Unlike function #read# however,
       function #readall# will never return a value smaller than #size# unless
-      an end-of-file mark is reached.  This is implemented by repeatitively
+      an end-of-file mark is reached.  This is implemented by repeatedly
       calling function #read# until everything is read or until we reach an
       end-of-file mark.  Note that #read# and #readall# are equivalent when
       #size# is one. */
@@ -146,7 +146,7 @@ public:
   /** Writes data and blocks until everything has been written.  This function
       is essentially similar to function #write#.  Unlike function #write#
       however, function #writall# will only return after all #size# bytes have
-      been written.  This is implemented by repeatitively calling function
+      been written.  This is implemented by repeatedly calling function
       #write# until everything is written.  Note that #write# and #writall#
       are equivalent when #size# is one. */
   size_t writall(const void *buffer, size_t size);

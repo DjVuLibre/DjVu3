@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: IFFByteStream.h,v 1.8 1999-03-02 16:17:12 leonb Exp $
+//C-  $Id: IFFByteStream.h,v 1.9 1999-03-02 16:51:34 leonb Exp $
 
 
 #ifndef _IFFBYTESTREAM_H_
@@ -17,7 +17,7 @@
 /** @name IFFByteStream.h
 
     Files #"IFFByteStream.h"# and #"IFFByteStream.cpp"# implement a parser for
-    files structured accoding the Electronic Arts ``EA IFF 85 Interchange
+    files structured according the Electronic Arts ``EA IFF 85 Interchange
     File Format''.  IFF files are composed of a sequence of data {\em chunks}.
     Each chunk is identified by a four character {\em chunk identifier}
     describing the type of the data stored in the chunk.  A few special chunk
@@ -66,7 +66,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: IFFByteStream.h,v 1.8 1999-03-02 16:17:12 leonb Exp $# */
+    #$Id: IFFByteStream.h,v 1.9 1999-03-02 16:51:34 leonb Exp $# */
 //@{
 
 #ifdef __GNUC__

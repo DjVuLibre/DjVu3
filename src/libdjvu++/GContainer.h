@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: GContainer.h,v 1.5 1999-03-02 02:12:12 leonb Exp $
+//C-  $Id: GContainer.h,v 1.6 1999-03-02 16:51:32 leonb Exp $
 
 
 #ifndef _GCONTAINER_H_
@@ -46,7 +46,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@research.att.com> -- bug fixes.
     @version 
-    #$Id: GContainer.h,v 1.5 1999-03-02 02:12:12 leonb Exp $# */
+    #$Id: GContainer.h,v 1.6 1999-03-02 16:51:32 leonb Exp $# */
 //@{
 
 class GContainerBase;
@@ -267,7 +267,7 @@ public:
       subscripts and the usual bracket syntax.  This pointer remains valid as
       long as the valid subscript range is unchanged. If you change the
       subscript range, you must stop using the pointers returned by prior
-      invokation of this conversion operator. */
+      invocation of this conversion operator. */
   operator const TYPE* () const;
   // -- ALTERATION
   /** Erases the array contents. All elements in the array are destroyed.  
@@ -340,8 +340,8 @@ protected:
 
 /** Sortable array.  
     Template class #GSArray<TYPE># implements sorting routines for the array
-    elements. These sorting routines are implemented in a subsclass in order
-    to reduce the template instanciation overhead for class #GArray#.  Besides
+    elements. These sorting routines are implemented in a subclass in order
+    to reduce the template instantiation overhead for class #GArray#.  Besides
     the #TYPE# constructors and operators required by class #GArray#, this
     template class must be able to access a less-or-equal comparison operator:
     #TYPE::operator<=(const TYPE&)#.  */

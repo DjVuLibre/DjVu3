@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: GException.h,v 1.7 1999-03-02 02:12:12 leonb Exp $
+//C-  $Id: GException.h,v 1.8 1999-03-02 16:51:33 leonb Exp $
 
 
 #ifndef _GEXCEPTION_H_
@@ -44,7 +44,7 @@
       }
     CATCH(ex) 
       {
-        // Variable ex refres to a GException object.
+        // Variable ex refers to a GException object.
         ex.perror();  
         // You can rethrow the exception to an outer exception handler.
         RETHROW;
@@ -58,7 +58,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@research.att.com> -- fixed message memory allocation.
     @version 
-    #$Id: GException.h,v 1.7 1999-03-02 02:12:12 leonb Exp $# */
+    #$Id: GException.h,v 1.8 1999-03-02 16:51:33 leonb Exp $# */
 //@{
 
 #include "DjVuGlobal.h"

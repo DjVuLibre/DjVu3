@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: GThreads.h,v 1.7 1999-03-02 02:12:12 leonb Exp $
+//C-  $Id: GThreads.h,v 1.8 1999-03-02 16:51:34 leonb Exp $
 
 #ifndef _GTHREADS_H_
 #define _GTHREADS_H_
@@ -42,8 +42,8 @@
           Posix threads.
     \item[-DTHREADMODEL=COTHREADS] Custom cooperative threads.
           These custom threads do not redefine system calls. Before executing
-          a potentially blocking system function, each thread must explicitely
-          check whether it is going to block and yield control explicitely if
+          a potentially blocking system function, each thread must explicitly
+          check whether it is going to block and yield control explicitly if
           this is the case.  This code must be compiled with a patched version
           of egcs-1.1.1 \URL{http://egcs.cygnus.com}. The patch addresses
           exception thread-safety and is provided in #"@Tools/libgcc2.c.diff"#.
@@ -61,7 +61,7 @@
     
     {\bf Portability}: The simultaneous use of threads and exceptions caused a
     lot of portability headaches under Unix.  We eventually decided to
-    implement the COTHREADS cooperative threads (because preemtive threads
+    implement the COTHREADS cooperative threads (because preemptive threads
     have more problems) and to patch EGCS in order to make exception handling
     COTHREAD-safe.  We expect to make COTHREADs the default in future
     releases.
@@ -76,7 +76,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Praveen Guduru <praveen@sanskrit.lz.att.com> -- mac implementation.
     @version
-    #$Id: GThreads.h,v 1.7 1999-03-02 02:12:12 leonb Exp $# */
+    #$Id: GThreads.h,v 1.8 1999-03-02 16:51:34 leonb Exp $# */
 //@{
 
 #include "DjVuGlobal.h"
@@ -160,7 +160,7 @@
     thread and of several secondary threads.  Each secondary thread is
     represented by a #GThread# object.  The amount of memory required for the
     stack of a secondary thread is defined when the #GThread# object is
-    constructed.  The executaion thread is started when function
+    constructed.  The execution thread is started when function
     \Ref{GThread::create} is called.  The execution can be terminated
     at all times by destroying the #GThread# object or calling
     \Ref{GThread::terminate}.
@@ -171,7 +171,7 @@
     replacement for the well-known unix system call #select#.  
 
     {\bf Note} --- Both the copy constructor and the copy operator are declared
-    as private members. It is threfore not possible to make multiple copies
+    as private members. It is therefore not possible to make multiple copies
     of instances of this class, as implied by the class semantic. */
 class GThread {
 public:
@@ -200,11 +200,11 @@ public:
       effect of #yield# heavily depends on the selected implementation.
       Function #yield# returns #-1# when the selected implementation does not
       provide an explicit way to relinquish the processor. This is often the
-      case with preemtive multithreading models like #POSIXTHREADS# or
+      case with preemptive multithreading models like #POSIXTHREADS# or
       #WINTHREADS#.  The scheduling code does not need such a feature.
-      Function #yield# may return #+1# if the scheduler has to immediatly return
-      control to the current thread because no other thread is ready to run.
-      Otherwise function #yield# returns #0# when the current thread is
+      Function #yield# may return #+1# if the scheduler has to immediately
+      return control to the current thread because no other thread is ready to
+      run.  Otherwise function #yield# returns #0# when the current thread is
       resumed. */
   static int yield();
   /** Returns a value which uniquely identifies the current thread. */
@@ -280,7 +280,7 @@ private:
     this effectively.
 
     {\bf Note}. Both the copy constructor and the copy operator are declared
-    as private members. It is threfore not possible to make multiple copies of
+    as private members. It is therefore not possible to make multiple copies of
     instances of this class, as implied by the class semantic. */
 
 class GCriticalSection {
@@ -327,7 +327,7 @@ private:
     then turns it to {\em non-signaled}.
 
     {\bf Note}. Both the copy constructor and the copy operator are declared
-    as private members. It is threfore not possible to make multiple copies
+    as private members. It is therefore not possible to make multiple copies
     of instances of this class, as implied by the class semantic. */
 
 class GEvent {
@@ -351,7 +351,7 @@ public:
   void set();
   /** Waits until the event object is {\em signaled}.  If the event object was
       {\em signaled} before, the event object is turned to {\em non signaled}
-      and this function returns immediatly. If the event object was {\em not
+      and this function returns immediately. If the event object was {\em not
       signaled}, this function waits until another thread calls function
       \Ref{set}, then turns the object to the {\em non-signaled} state and
       returns. */
@@ -466,7 +466,7 @@ inline void GEvent::wait(int timeout) {}
     automatic variables in order to make sure that the critical section is
     unlocked when exiting the protected code.  The following code will release
     the lock when the execution thread leaves the protected scope, either
-    because the protected code has executed succesfully, or because an
+    because the protected code has executed successfully, or because an
     exception was thrown.
     \begin{verbatim}
       {      -- protected scope
