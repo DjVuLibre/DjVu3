@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuImage.cpp,v 1.22 1999-09-03 23:35:40 leonb Exp $
+//C- $Id: DjVuImage.cpp,v 1.23 1999-09-07 22:36:12 eaf Exp $
 
 
 #ifdef __GNUC__
@@ -113,36 +113,36 @@ DjVuImage::get_dir(const GP<DjVuFile> & file) const
 GP<DjVuInfo>   
 DjVuImage::get_info() const
 {
-   return (file && (!info || file->is_decoding())) ?
-	  ((DjVuImage *) this)->info=get_info(file) : info;
+   if (file) return get_info(file);
+   else return 0;
 }
 
 GP<DjVuAnno>   
 DjVuImage::get_anno() const
 {
-   return (file && (!anno || file->is_decoding())) ?
-	  ((DjVuImage *) this)->anno=get_anno(file) : anno;
+   if (file) return get_anno(file);
+   else return 0;
 }
 
 GP<IWPixmap>   
 DjVuImage::get_bg44() const
 {
-   return (file && (!bg44 || file->is_decoding())) ?
-	  ((DjVuImage *) this)->bg44=get_bg44(file) : bg44;
+   if (file) return get_bg44(file);
+   else return 0;
 }
 
 GP<JB2Image>   
 DjVuImage::get_fgjb() const
 {
-   return (file && (!fgjb || file->is_decoding())) ?
-	  ((DjVuImage *) this)->fgjb=get_fgjb(file) : fgjb;
+   if (file) return get_fgjb(file);
+   else return 0;
 }
 
 GP<GPixmap>    
 DjVuImage::get_fgpm() const
 {
-   return (file && (!fgpm || file->is_decoding())) ?
-	  ((DjVuImage *) this)->fgpm=get_fgpm(file) : fgpm;
+   if (file) return get_fgpm(file);
+   else return 0;
 }
 
 int
@@ -202,7 +202,7 @@ DjVuImage::get_gamma() const
 GString
 DjVuImage::get_mimetype() const
 {
-   return file->mimetype;
+   return file ? file->mimetype : GString();
 }
 
 
@@ -215,7 +215,7 @@ DjVuImage::get_short_description() const
   int width = get_width();
   int height = get_height();
   if (width && height)
-    if (file->file_size > 100)
+    if (file && file->file_size>100)
       msg.format("%dx%d in %0.1f Kb", width, height, file->file_size/1024.0);
     else
       msg.format("%dx%d", width, height);
@@ -229,7 +229,7 @@ DjVuImage::get_long_description() const
   // This code replace them with spaces so that every column 
   // is really aligned.  Lines that do not contain tabs are 
   // left unchanged.
-  GString result = file->description;
+  GString result = file ? file->description : GString();
   // Loop on tabulations
   for(;;)
     {

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuImage.h,v 1.15 1999-09-03 23:35:40 leonb Exp $
+//C- $Id: DjVuImage.h,v 1.16 1999-09-07 22:36:12 eaf Exp $
 
 #ifndef _DJVUIMAGE_H
 #define _DJVUIMAGE_H
@@ -51,7 +51,7 @@
     L\'eon Bottou <leonb@research.att.com> - initial implementation
     Andrei Erofeev <eaf@geocities.com> - multipage support
     @version
-    #$Id: DjVuImage.h,v 1.15 1999-09-03 23:35:40 leonb Exp $# */
+    #$Id: DjVuImage.h,v 1.16 1999-09-07 22:36:12 eaf Exp $# */
 //@{
 
 
@@ -289,13 +289,6 @@ public:
   GP<GPixmap>  get_fg_pixmap(const GRect &rect, int subs=1, double gamma=0) const;
 private:
    GP<DjVuFile>		file;
-   GP<DjVuInfo>		info;
-   GP<DjVuAnno>		anno;
-   GP<IWPixmap>		bg44;
-   GP<JB2Image>		fgjb;
-   GP<GPixmap>		fgpm;
-   GP<DjVuNavDir>	dir;
-   GString		description;
    
    // HELPERS
    int	stencil(GPixmap *pm, const GRect &rect, int subs, double gcorr) const;
