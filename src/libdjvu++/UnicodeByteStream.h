@@ -1,7 +1,7 @@
 //C-  Copyright © 2000-2001, LizardTech, Inc. All Rights Reserved.
 //C-              Unauthorized use prohibited.
 //
-// $Id: UnicodeByteStream.h,v 1.4 2001-03-07 00:33:32 bcr Exp $
+// $Id: UnicodeByteStream.h,v 1.5 2001-04-23 18:14:22 bcr Exp $
 // $Name:  $
 
 #ifndef _UNICODEBYTESTREAM_H_
@@ -29,7 +29,7 @@
     @author
     Bill C Riemers <bcr@lizardtech.org>
     @version
-    #$Id: UnicodeByteStream.h,v 1.4 2001-03-07 00:33:32 bcr Exp $# */
+    #$Id: UnicodeByteStream.h,v 1.5 2001-04-23 18:14:22 bcr Exp $# */
 //@{
 
 #include "DjVuGlobal.h"
@@ -89,11 +89,15 @@ public:
   virtual long tell(void) const;
   /// Does a flush, and clears the read ahead buffer.
   virtual void flush(void);
+
+  /// Find out how many lines have been read with gets.
+  int get_lines_read(void) const { return linesread; }
 protected:
   /// The real byte stream.
   GUnicode::EncodeType encodetype;
   GUnicode buffer;
   GP<ByteStream> bs;
+  int linesread;
 private:
   // Cancel C++ default stuff
   UnicodeByteStream & operator=(UnicodeByteStream &);

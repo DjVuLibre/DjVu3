@@ -1,7 +1,7 @@
 //C-  Copyright © 2000-2001, LizardTech, Inc. All Rights Reserved.
 //C-              Unauthorized use prohibited.
 //
-// $Id: UnicodeByteStream.cpp,v 1.3 2001-04-20 18:29:20 praveen Exp $
+// $Id: UnicodeByteStream.cpp,v 1.4 2001-04-23 18:14:22 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -12,15 +12,15 @@
 #include "ByteStream.h"
 
 UnicodeByteStream::UnicodeByteStream(const UnicodeByteStream &uni)
-: encodetype(uni.encodetype)
+: encodetype(uni.encodetype), linesread(0)
 {
   bs=uni.bs;
   buffer=uni.buffer;
 }
 
-UnicodeByteStream::UnicodeByteStream
-(GP<ByteStream> ibs,const GUnicode::EncodeType et)
-: encodetype(et)
+UnicodeByteStream::UnicodeByteStream(
+  GP<ByteStream> ibs,const GUnicode::EncodeType et)
+: encodetype(et), linesread(0)
 {
   bs=ibs;
 }
@@ -28,8 +28,24 @@ UnicodeByteStream::UnicodeByteStream
 UnicodeByteStream::~UnicodeByteStream()
 {}
 
+static int
+CountLines(const unsigned long *ptr,int len)
+{
+  int retval=0;
+  while(len-- && ptr[0])
+  {
+    static const unsigned long lf='\n';
+    if(ptr++[0] == lf)
+    {
+      retval++;
+    }
+  }
+  return retval;
+}
+
 GUnicode 
-UnicodeByteStream::gets(size_t const t,unsigned long const stopat,bool const inclusive)
+UnicodeByteStream::gets(
+  size_t const t,unsigned long const stopat,bool const inclusive)
 {
   GUnicode retval;
   const unsigned int len=buffer.length();
@@ -40,21 +56,24 @@ UnicodeByteStream::gets(size_t const t,unsigned long const stopat,bool const inc
       if(inclusive)
       {
         retval=buffer.substr_nr(0,1);
+        linesread+=CountLines(retval,1);
         buffer=buffer.substr(1,len);
       }
     }else
     {
       int i=1;
-      do
+      for(;;)
       {
         if(i == (int)t)
         {
           retval=buffer.substr_nr(0,i);
+          linesread+=CountLines(retval,i);
           buffer=buffer.substr(i,len);
           break;
         }else if(i == (int)len) 
         {
           retval=buffer.substr_nr(0,i);
+          linesread+=CountLines(retval,i);
           buffer=buffer.substr(i,len);
           retval+=gets(t?(t-i):0,stopat,inclusive);
           break;
@@ -63,10 +82,11 @@ UnicodeByteStream::gets(size_t const t,unsigned long const stopat,bool const inc
           if(!inclusive) 
             --i;
           retval=buffer.substr_nr(0,i);
+          linesread+=CountLines(retval,i);
           buffer=buffer.substr(i,len);
           break;
         }
-      }while ( true );
+      }
     }
   }else
   {

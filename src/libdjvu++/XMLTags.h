@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: XMLTags.h,v 1.5 2001-04-12 00:25:00 bcr Exp $
+// $Id: XMLTags.h,v 1.6 2001-04-23 18:14:22 bcr Exp $
 // $Name:  $
 
 #ifndef _LT_XMLTAGS__
@@ -53,7 +53,7 @@ class GURL;
 class lt_XMLTags : public GPEnabled
 {
 protected:
-  lt_XMLTags(void);
+  lt_XMLTags();
   lt_XMLTags(const char n[]);
 public:
   /// Default creator.
@@ -63,6 +63,8 @@ public:
   /// Non-virtual destructor.
   ~lt_XMLTags();
 
+  inline void setLine(const int xstartline) { startline=xstartline; }
+  inline int getLine(void) { return startline; }
   inline void addtag(GP<lt_XMLTags> x);
   inline void addraw(GUTF8String raw);
   inline GPosition contains(GUTF8String name) const;
@@ -82,6 +84,7 @@ public:
   GUTF8String raw;
   GList<lt_XMLContents> content;
   GMap<GUTF8String,GPList<lt_XMLTags> > allTags;
+  int startline;
 };
 
 class lt_XMLContents

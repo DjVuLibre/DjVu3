@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessage.h,v 1.19 2001-04-20 22:13:45 praveen Exp $
+// $Id: DjVuMessage.h,v 1.20 2001-04-23 18:14:22 bcr Exp $
 // $Name:  $
 
 
@@ -115,6 +115,7 @@ private:
   // Constructor:
   DjVuMessage( void );
   GMap<GUTF8String,GP<lt_XMLTags> > Map;
+  GUTF8String errors;
 
 public:
   static const DjVuMessage &create(void);

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: XMLTags.cpp,v 1.16 2001-04-21 00:16:58 bcr Exp $
+// $Id: XMLTags.cpp,v 1.17 2001-04-23 18:14:22 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -103,26 +103,6 @@ tagtoname(char const tag[])
   return tagtoname(tag,t);
 }
 
-#if 0
-static bool
-isspaces(char const *s)
-{
-  bool retval=true;
-  if(s)
-  {
-    while(*s)
-    {
-      if(!isspace(*s++))
-      {
-        retval=false;
-        break;
-      }
-    }
-  }
-  return retval;
-}
-#endif
-
 static bool
 isspaces(unsigned long const *s)
 {
@@ -156,9 +136,9 @@ lt_XMLTags::ParseValues(char const *t, GMap<GUTF8String,GUTF8String> &args,bool 
 
 lt_XMLTags::~lt_XMLTags() {}
 
-lt_XMLTags::lt_XMLTags(void) {}
+lt_XMLTags::lt_XMLTags(void) : startline(0) {}
 
-lt_XMLTags::lt_XMLTags(const char n[])
+lt_XMLTags::lt_XMLTags(const char n[]) : startline(0)
 {
   char const *t;
   name=tagtoname(n,t);
@@ -190,15 +170,15 @@ lt_XMLTags::init(XMLByteStream &xmlbs)
   GMap<GUTF8String,GPList<lt_XMLTags> > allTags;
   GMap<GUTF8String,GMap<GUTF8String,GPList<lt_XMLTags> > > namedTags;
   GUnicode tag,raw(xmlbs.gets(0,'<',false));
+  int linesread=xmlbs.get_lines_read();
   if(!isspaces((unsigned long const *)raw))
   {
     GUTF8String mesg;
     mesg.format( ERR_MSG("XMLTags.raw_string") "\t%s",(const char *)raw);
     G_THROW(mesg);
   }
-  while((tag=xmlbs.gets(0,'>',true))[0])
+  for(int len;(len=(tag=xmlbs.gets(0,'>',true)).length());)
   {
-    int len=tag.length();
     while(tag[len-1] != '>')
     {
       GUTF8String mesg;
@@ -235,7 +215,8 @@ lt_XMLTags::init(XMLByteStream &xmlbs)
       {
         if(tag[2] == '-' && tag[3] == '-')
         {
-          while((len < 7) || (tag.substr_nr(len-3,len).get_GUTF8String() != "-->"))
+          while((len < 7) ||
+            (tag.substr_nr(len-3,len).get_GUTF8String() != "-->"))
           {
             GUnicode cont(xmlbs.gets(0,'>',true));
             if(!cont[0])
@@ -257,14 +238,19 @@ lt_XMLTags::init(XMLByteStream &xmlbs)
       {
         GUTF8String xname=tagtoname(((const char *)tag)+2);
         GPosition last=level.lastpos();
-        if(last || level[last]->name != xname)
+        if(last)
         {
+          if(level[last]->name != xname)
+          {
+            G_THROW( (ERR_MSG("XMLTags.unmatched_end") "\t")
+              +level[last]->name+("\t"+GUTF8String(level[last]->getLine()))
+              +("\t"+xname)+("\t"+GUTF8String(linesread+1)));
+          }
 //          DjVuPrintMessage("Got end tag: %s\n",(const char *)name);
           level.del(last);
         }else
         {
-          GUTF8String mesg( ERR_MSG("XMLTags.bad_form") );
-          G_THROW(mesg);
+          G_THROW( ERR_MSG("XMLTags.bad_form") );
         }
         break;
       }
@@ -291,9 +277,9 @@ lt_XMLTags::init(XMLByteStream &xmlbs)
           level.append(t);
         }else
         {
-          GUTF8String mesg( ERR_MSG("XMLTags.no_body") );
-          G_THROW(mesg);
+          G_THROW( ERR_MSG("XMLTags.no_body") );
         }
+        t->setLine(linesread+1);
         allTags[t->name].append(t);
         for(GPosition pos=t->args;pos;++pos)
         {
@@ -304,6 +290,7 @@ lt_XMLTags::init(XMLByteStream &xmlbs)
     }
     if((raw=xmlbs.gets(0,'<',false))[0])
     { 
+      linesread=xmlbs.get_lines_read();
       GPosition last=level.lastpos();
       if(last)
       {

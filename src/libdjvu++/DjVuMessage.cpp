@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessage.cpp,v 1.36 2001-04-21 00:16:58 bcr Exp $
+// $Id: DjVuMessage.cpp,v 1.37 2001-04-23 18:14:22 bcr Exp $
 // $Name:  $
 
 
@@ -63,6 +63,9 @@ static const char unrecognized_default[] =
   "** Unrecognized DjVu Message: [Contact LizardTech for assistance]\n"
   "\t** Message name:  %1!s!";
 static const char uparameter_default[]="Parameter: %1!s!";
+static const char *failed_to_parse_XML=ERR_MSG("DjVuMessage.failed_to_parse_XML");
+static const char failed_to_parse_XML_default[]=
+  "Failed to parse XML message file:&#10;&#09;&apos;%1!s!&apos;.";
 
 #ifndef NO_DEBUG
 #if defined(UNIX)
@@ -262,13 +265,14 @@ GetProfilePaths(void)
   return realpaths;
 }
 
-static void
+static GUTF8String
 getbodies(
   GList<GURL> &paths,
   const GUTF8String &MessageFileName,
   GPList<lt_XMLTags> &body, 
   GMap<GUTF8String, void *> & map )
 {
+  GUTF8String errors;
   bool isdone=false;
   for(GPosition pos=paths;!isdone && pos;++pos)
   {
@@ -280,7 +284,23 @@ getbodies(
       lt_XMLTags &tags=*gtags;
       {
         GP<ByteStream> bs=ByteStream::create(url,"rb");
-        tags.init(bs);
+        G_TRY
+        {
+          tags.init(bs);
+        }
+        G_CATCH(ex)
+        {
+          GUTF8String mesg(failed_to_parse_XML+("\t"+url.get_string()));
+          if(errors.length())
+          {
+            errors+="\n"+mesg;
+          }else
+          {
+            errors=mesg;
+          }
+          errors+="\n"+GUTF8String(ex.get_cause());
+        }
+        G_ENDCATCH;
       }
       GPList<lt_XMLTags> Bodies=tags.getTags(bodystring);
       if(! Bodies.isempty())
@@ -299,53 +319,45 @@ getbodies(
         lt_XMLTags::getMaps(includestring,namestring,Head,includes);
         for(GPosition pos=includes;pos;++pos)
         {
-          GUTF8String file=includes.key(pos);
+          const GUTF8String file=includes.key(pos);
           if(! map.contains(file))
           {
-            getbodies(paths,file,body,map);
+            const GUTF8String err2(getbodies(paths,file,body,map));
+            if(err2.length())
+            {
+              if(errors.length())
+              {
+                errors+="\n"+err2;
+              }else
+              {
+                errors=err2;
+              }
+            }
           }
         }
       }
     }
   }
+  return errors;
 }
 
-static void
+static GUTF8String
 parse(GMap<GUTF8String,GP<lt_XMLTags> > &retval)
 {
+  GUTF8String errors;
   GPList<lt_XMLTags> body;
   {
     GList<GURL> paths=GetProfilePaths();
     GMap<GUTF8String, void *> map;
     GUTF8String m(MessageFile);
-    getbodies(paths,m,body,map);
+    errors=getbodies(paths,m,body,map);
   }
   if(! body.isempty())
   {
     lt_XMLTags::getMaps(messagestring,namestring,body,retval);
   }
+  return errors;
 }
-
-
-#if 0
-static void
-parse (GMap<GUTF8String,GP<lt_XMLTags> > &retval)
-{
-  GList<GUTF8String> &paths=GetProfilePaths();
-  for(GPosition pos=paths;pos;++pos)
-  {
-    const GURL url=GOS::filename_to_url(GOS::expand_name(MessageFileName,paths[pos]));
-    if(GOS::is_file(GOS::url_to_filename(url)))
-    {
-      parse(retval,ByteStream::create(url,"rb"));
-      if(retval.isempty())
-      {
-        break;
-      }
-    }
-  }
-}
-#endif
 
 
 //  There is only object of class DjVuMessage in a program, and here it is:
@@ -361,11 +373,8 @@ DjVuMessage::create(void)
 
 // Constructor
 DjVuMessage::DjVuMessage( void )
-#if 0
-: opts(0)
-#endif
 {
-  parse(Map);
+  errors=parse(Map);
 }
 
 // Destructor
@@ -389,7 +398,13 @@ DjVuMessage::perror( const GUTF8String & MessageList ) const
 GUTF8String
 DjVuMessage::LookUp( const GUTF8String & MessageList ) const
 {
-  GUTF8String result;                           // Result string; begins empty
+  GUTF8String result;                       // Result string; begins empty
+  if(errors.length())
+  {
+    const GUTF8String err1(errors);
+    (const_cast<GUTF8String &>(errors)).empty();
+    result=LookUp(err1)+"\n";
+  }
 
   int start = 0;                            // Beginning of next message
   int end = MessageList.length();           // End of the message string
@@ -442,9 +457,12 @@ DjVuMessage::LookUpSingle( const GUTF8String &Single_Message ) const
     }else if(message == uparameter)
     {
       msg_text = uparameter_default;
+    }else if(message == failed_to_parse_XML)
+    {
+      msg_text = failed_to_parse_XML_default;
     }else
     {
-      return LookUpSingle(GUTF8String(unrecognized)+"\t"+message);
+      return LookUpSingle(unrecognized+("\t"+Single_Message));
     }
   }
 #ifndef NO_DEBUG
@@ -498,52 +516,6 @@ DjVuMessage::LookUpID( const GUTF8String &msgID,
       }
     }
   }
-#if 0
-#ifndef macintosh
-  else if(opts)
-  {  
-    result=opts->GetValue(msgID);
-    opts->perror();
-  }
-#endif
-#endif
-
-#if 0
-  //  Find the message file
-  const char *ss;
-  struct djvu_parse opt = djvu_parse_init( "-" );
-  ss = djvu_parse_configfile( opt, DjVuMessageFileName, -1 );
-  FILE *MessageFile = fopen( ss, "r" );
-  GUTF8String result;
-  if( MessageFile != NULL )
-  {
-    enum {BUFSIZE=500};
-    char buffer[BUFSIZE];             // holds the message file lines
-    char *status;                     // holds success or failure of the fgets call
-    while( (status = fgets(buffer, BUFSIZE, MessageFile)) != NULL )
-    {
-      if( strncmp( msgID, buffer, msgID.length() ) == 0 &&
-          buffer[msgID.length()] == '\t' )
-        break;                              // stop when the correct string is found
-    }
-
-    if( status != NULL )
-    {
-      int text_start = msgID.length()+1;
-      while( buffer[text_start] == '\t' ) 
-        text_start++;                                 // allow for multiple tabs
-      result = &buffer[text_start];                   // extract the message text
-      result = result.substr(0, result.length()-1);   // remove trailing newline
-    }
-    else
-      result.empty();                 // end of file (or error), so we return an
-                                      // empty string to indicate failure
-
-    fclose( MessageFile );
-  }
-  else
-    result.empty();  // Message text file not open
-#endif
 }
 
 

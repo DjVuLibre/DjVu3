@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.h,v 1.60 2001-04-23 16:46:43 chrisp Exp $
+// $Id: GString.h,v 1.61 2001-04-23 18:14:22 bcr Exp $
 // $Name:  $
 
 #ifndef _GSTRING_H_
@@ -57,7 +57,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.60 2001-04-23 16:46:43 chrisp Exp $# */
+    #$Id: GString.h,v 1.61 2001-04-23 18:14:22 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -809,6 +809,10 @@ public:
   friend unsigned int hash(const GString &ref);
   // -- HELPERS
   friend GStringRep;
+
+  /// Returns next non space position.
+  int nextNonSpace( const int from=0 ) const
+  { return ptr?(*this)->nextNonSpace(from):0; }
 protected:
   const char *gstr;
   static void throw_illegal_subscript() no_return;

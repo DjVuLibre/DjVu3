@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.75 2001-04-21 00:16:58 bcr Exp $
+// $Id: GString.cpp,v 1.76 2001-04-23 18:14:22 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -801,20 +801,7 @@ GString::is_int(void) const
    bool isLong;
    GString endptr;
    toLong(endptr, isLong, 10);
-
-   // if an error occurred we cannot be sure that the value
-   // was indeed a number...
-   if (isLong)
-   {
-     // count blanks;
-     int i=0;
-     for (i=0; i < (int)endptr.length() && iswspace(endptr[i]); ++i);
-
-     // if the length of the endptr is 0 the whole string
-     // was a number so return true.
-     isLong=(i == (int)endptr.length());
-   }
-   return isLong;
+   return isLong?(endptr.nextNonSpace(0) == (int)endptr.length()):false;
 }
 
 bool
@@ -823,20 +810,7 @@ GString::is_float(void) const
    bool isDouble;
    GString endptr;
    toDouble(endptr, isDouble);
-
-   // if an error occured we cannot be sure that the 
-   // value was indeed a number...
-   if (isDouble)
-   {
-     // count blanks;
-     int i=0;
-     for (i=0; i < (int)endptr.length() && iswspace(endptr[i]); ++i);
-   
-     // if i equals the length of the endptr the string is
-     // a number;
-     isDouble=(i == (int)endptr.length());
-   }
-   return isDouble;
+   return isDouble?(endptr.nextNonSpace(0) == (int)endptr.length()):false;
 }
 
 unsigned int 
