@@ -8,7 +8,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVu.h,v 1.4 2000-01-07 00:28:07 bcr Exp $
+//C- $Id: DjVu.h,v 1.5 2000-01-09 02:45:03 praveen Exp $
 #endif /* __cplusplus */
 
 #include <stdlib.h>
@@ -17,6 +17,7 @@
 #define _DJVU_GLOBAL_H
 
 #ifndef DJVUAPI
+
 #ifndef DJVU_STATIC_LIBRARY
 #ifdef WIN32 
 #define DLLIMPORT __declspec(dllimport)
@@ -31,15 +32,12 @@
 #endif /* DJVU_STATIC_LIBRARY */
 
 #ifdef BUILD_LIB
-#ifndef DJVUAPI
 #define DJVUAPI DLLEXPORT
-#endif  /*DJVUAPI*/
 #else
-#ifndef DJVUAPI
 #define DJVUAPI DLLIMPORT
-#endif  /*DJVUAPI*/
 #endif  /*BUILD_LIB*/
-#endif DJVUAPI
+
+#endif /*DJVUAPI*/
 
 #ifdef __cplusplus
 extern "C"
