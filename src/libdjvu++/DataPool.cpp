@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.cpp,v 1.13 1999-09-07 19:16:52 leonb Exp $
+//C- $Id: DataPool.cpp,v 1.14 1999-09-07 20:26:46 leonb Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -573,7 +573,7 @@ DataPool::call_triggers(void)
 }
 
 
-inline void
+void
 DataPool::add_trigger(int thresh, void (* callback)(void *), void * cl_data)
 {
   if (thresh>=0)
