@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: IWImage.h,v 1.5 1999-03-02 02:12:13 leonb Exp $
+//C-  $Id: IWImage.h,v 1.6 1999-03-02 16:17:12 leonb Exp $
 
 #ifndef _IWIMAGE_H_
 #define _IWIMAGE_H_
@@ -27,7 +27,7 @@
     #"FORM:PM44"# chunk composed of an arbitrary number of #"PM44"# data
     chunks.  The successive #"PM44"# or #"BM44"# data chunks contain
     successive refinements of the encoded image.  Each chunk contains a
-    certain number of "data slices".  The first chunk also contains a small
+    certain number of ``data slices''.  The first chunk also contains a small
     image header.  You can use program \Ref{djvuinfo} to display all this
     structural information:
     \begin{verbatim}
@@ -69,13 +69,12 @@
     important role in the DjVu system.  We have investigated various
     state-of-the-art wavelet compression schemes: although these schemes may
     achieve slightly smaller file sizes, the decoding functions did not even
-    approach our requirements.  The IW44 wavelets reach these requirements
-    today.  Little care however has been taken to make the IW44 encoder very
-    lean.  This code uses two copies of the wavelet coefficient data structure
-    (one for the raw coefficients, one for the quantized coefficients).  A
-    more sophisticated implementation should considerably reduce the memory
-    requirements.  Such an improvement could be a premature optimization
-    however.
+    approach our requirements.  The IW44 wavelets satisfy these requirements
+    today.  Little care however has been taken to make the IW44 encoder memory
+    efficient.  This code uses two copies of the wavelet coefficient data
+    structure (one for the raw coefficients, one for the quantized
+    coefficients).  A more sophisticated implementation should considerably
+    reduce the memory requirements.
 
     {\bf Masking} --- When we create a DjVu image, we often know that certain
     pixels of the background image are going to be covered by foreground
@@ -86,19 +85,19 @@
     replace these masked pixels by a color value whose coding cost is minimal
     (see \URL{http://www.research.att.com/~leonb/DJVU/mask}).
 
-    {\bf ToDo} --- There are many improvements to be made.  Besides modern
+    {\bf ToDo} --- There are many improvements to be made.  Besides better
     quantization algorithms (such as treillis quantization and bitrate
-    allocation), we should allow for more wavelet transform.  These
+    allocation), we should allow for more wavelet transforms.  These
     improvements may be implemented in future version, if (and only if) they
     can meet our decoding constraints.  Future versions will probably split
-    file #"IWCodec.cpp"# which currently contains everything
+    file #"IWCodec.cpp"# which currently contains everything.
  
     @memo
     Wavelet encoded images.
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: IWImage.h,v 1.5 1999-03-02 02:12:13 leonb Exp $# */
+    #$Id: IWImage.h,v 1.6 1999-03-02 16:17:12 leonb Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -141,8 +140,8 @@ struct IWEncoderParms
       estimated luminance error, expressed in decibels, reaches value
       #decibel#.  The default value #0# has a special meaning: data will be
       generated regardless of the estimated luminance error.  Specifying value
-      #0# in fact shortcuts the luminance error estimation and sensibly speeds
-      up the encoding process.  */
+      #0# in fact shortcuts the computation of the estimated luminance error
+      and sensibly speeds up the encoding process.  */
   float  decibels;
   /** Constructor. Initializes the structure with the default values. */
   IWEncoderParms();
@@ -197,7 +196,7 @@ public:
   unsigned int get_memory_usage() const;
   /** Returns the filling ratio of the internal data structure.  Wavelet
       coefficients are stored in a sparse array.  This function tells what
-      percentage of bins have been effectively alocated. */
+      percentage of bins have been effectively allocated. */
   int get_percent_memory() const;
   // CODER
   /** Encodes one data chunk into ByteStream #bs#.  Parameter #parms# controls
@@ -226,13 +225,13 @@ public:
   // MISCELLANEOUS
   /** Resets the encoder/decoder state.  The first call to #decode_chunk# or
       #encode_chunk# initializes the coder for encoding or decoding.  Function
-      #close_coder# must be called after processing the last chunk in order to
+      #close_codec# must be called after processing the last chunk in order to
       reset the coder and release the associated memory. */
   void close_codec();  
   /** Returns the chunk serial number.  This function returns the serial
       number of the last chunk encoded with #encode_chunk# or decoded with
       #decode_chunk#. The first chunk always has serial number #1#. Successive
-      chunks have increasing serial numbers.  Value #0# is returned is this
+      chunks have increasing serial numbers.  Value #0# is returned if this
       function is called before calling #encode_chunk# or #decode_chunk# or
       after calling #close_codec#. */
   int get_serial();
@@ -279,15 +278,24 @@ public:
   IWPixmap();
   /** Chrominance processing selector.  The following constants may be used as
       argument to the following \Ref{IWPixmap} constructor to indicate how the
-      chrominance information should be processed. */
+      chrominance information should be processed. There are four possible values:
+      \begin{description}
+      \item[CRCBnone:] The wavelet transform will discard the chrominance 
+           information and only keep the luminance. The image will show in shades of gray.
+      \item[CRCBhalf:] The wavelet transform will process the chrominance at only 
+           half the image resolution. This option creates smaller files but may create
+           artifacts in highly colored images.
+      \item[CRCBnormal:] The wavelet transform will process the chrominance at full 
+           resolution. This is the default.
+      \item[CRCBfull:] The wavelet transform will process the chrominance at full 
+           resolution. This option also disables the chrominance encoding delay
+           (see \Ref{parm_crcbdelay}) which usually reduces the bitrate associated with the
+           chrominance information.
+      \end{description} */
   enum CRCBMode { 
-    /// Disables chrominance encoding. 
     CRCBnone, 
-    /// Selects half resolution chrominance.
     CRCBhalf, 
-    /// Selects full resolution chrominance.
     CRCBnormal, 
-    /// Selects full resolution and zero encoding delay.
     CRCBfull };
   /** Initializes an IWPixmap with color image #bm#.  This constructor
       performs the wavelet decomposition of image #bm# and records the
@@ -349,13 +357,13 @@ public:
   // MISCELLANEOUS
   /** Resets the encoder/decoder state.  The first call to #decode_chunk# or
       #encode_chunk# initializes the coder for encoding or decoding.  Function
-      #close_coder# must be called after processing the last chunk in order to
+      #close_codec# must be called after processing the last chunk in order to
       reset the coder and release the associated memory. */
   void close_codec();  
   /** Returns the chunk serial number.  This function returns the serial
       number of the last chunk encoded with #encode_chunk# or decoded with
       #decode_chunk#. The first chunk always has serial number #1#. Successive
-      chunks have increasing serial numbers.  Value #0# is returned is this
+      chunks have increasing serial numbers.  Value #0# is returned if this
       function is called before calling #encode_chunk# or #decode_chunk# or
       after calling #close_codec#. */
   int  get_serial();

@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: JB2Image.h,v 1.3 1999-03-02 02:12:13 leonb Exp $
+//C-  $Id: JB2Image.h,v 1.4 1999-03-02 16:17:12 leonb Exp $
 
 #ifndef _JB2IMAGE_H
 #define _JB2IMAGE_H
@@ -25,15 +25,15 @@
     {\bf JB2 and JBIG2} --- JB2 has strong similarities with the forthcoming
     JBIG2 standard developped by the "ISO/IEC JTC1 SC29 Working Group 1" which
     is responsible for both the JPEG and JBIG standards.  This is hardly
-    surprising since JB2 was the Paul Howard's proposal for the JBIG2 standard
+    surprising since JB2 was our own proposal for the JBIG2 standard
     and remained the only proposal for years.  The full JBIG2 standard however
     is significantly more complex and slighlty less efficient than JB2 because
     it addresses a broader range of applications.  Full JBIG2 compliance may
     be implemented in the future.
 
     {\bf JB2 Images} --- Class \Ref{JB2Image} is the central data structure
-    implemented in this file.  A #JB2Image# is composed of an array of shapes
-    and an array of blits.  Each shape contains a small bitmap represents an
+    implemented here.  A #JB2Image# is composed of an array of shapes
+    and an array of blits.  Each shape contains a small bitmap representing an
     elementary blob of ink, such as a character or a segment of line art.
     Each blit instructs the decoder to render a particular shape at a
     specified position in the image.  Some compression is already achieved
@@ -68,24 +68,25 @@
           same size and the same pixels.
     \end{itemize}
     All this is quite easy to achieve in the case of an electronically
-    produced document such a DVI file or a PS file: we know what the
+    produced document such as a DVI file or a PS file: we know what the
     characters are and where they are located.  If you only have a scanned
     image however you must first locate the characters (connected component
     analysis) and cut the remaining pieces of ink into smaller blobs.
     Ordering the blits and matching the shapes is then an essentially
     heuristic process.  Although the quality of the heuristics substantially
-    affects the file size, misordering blits or mismatching shapes never
-    affects the quality of the image.  The last refinement consists in
+    effects the file size, misordering blits or mismatching shapes never
+    effects the quality of the image.  The last refinement consists in
     smoothing the shapes in order to reduce the noise and maximize the
     similarities between shapes.
     
     {\bf ToDo} --- Some improvements have been planned for a long time: (a)
-    Shapes eventually will have a hotspot: this could improve the handling of
-    the character descenders and also will provide a more understandable way
-    to superpose matching shapes.  (b) JB2 files eventually will be able to
-    reference external shape dictionaries: common characters will be shared
-    between document pages.  (c) There will be a way to specify a color for
-    each shape: this is good for encoding electronically produced documents.
+    Shapes eventually will contain information about the baseline: this could
+    improve the handling of the character descenders and also will provide a
+    more understandable way to superpose matching shapes.  (b) JB2 files
+    eventually will be able to reference external shape dictionaries: common
+    characters will be shared between document pages.  (c) There will be a way
+    to specify a color for each shape: this is good for encoding
+    electronically produced documents.
     
     {\bf References} 
     \begin{itemize}
@@ -96,7 +97,7 @@
     \end{itemize}
 
     @version
-    #$Id: JB2Image.h,v 1.3 1999-03-02 02:12:13 leonb Exp $#
+    #$Id: JB2Image.h,v 1.4 1999-03-02 16:17:12 leonb Exp $#
     @memo
     Coding bilevel images with JB2.
     @author
@@ -145,7 +146,7 @@ class JB2Shape {
 public: 
   /** Subscript of the parent shape.  The parent shape must always be located
       before the current shape in the shape array.  A negative value indicates
-      that this shape has no parent.  A negative values smaller than #-1#
+      that this shape has no parent.  Any negative values smaller than #-1#
       further indicates that this shape does not look like a character.  This
       is used to enable a few internal optimizations.  This information is
       saved into the JB2 file, but the actual value of the #parent# variable
@@ -185,10 +186,10 @@ public:
 
   // ACCESS
   /** Returns the width of the image.  
-      This is the value previously set with #set_dimension#. */
+      This is the width value previously set with #set_dimension#. */
   int get_width() const;
   /** Returns the height of the image.  
-      This is the value previously set with #set_dimension#. */
+      This is the height value previously set with #set_dimension#. */
   int get_height() const;
 
   // RENDERING
@@ -199,7 +200,7 @@ public:
       anti-aliased edges.  Argument #align# specified the alignment of the
       rows of the returned images.  Setting #align# to #4#, for instance, will
       adjust the bitmap border in order to make sure that each row of the
-      returned image starts on a double-word (four bytes) boundary. */
+      returned image starts on a word (four byte) boundary. */
   GP<GBitmap> get_bitmap(int subsample = 1, int align = 1) const;
   /** Renders an anti-aliased gray level sub-image.  This function renders a
       segment of the JB2Image as a bilevel or gray level image.  Conceptually,
@@ -249,7 +250,9 @@ public:
 
   // BUILDING JB2IMAGE
   /** Sets the size of the JB2Image.
-      The #width# and the #height# are stored in the JB2 file. */
+      This function can be called at any time. 
+      The corresponding #width# and the #height# are stored
+      in the JB2 file. */
   void set_dimension(int width, int height);
   /** Appends a shape to the shape array.  This function appends a copy of
       shape #shape# to the shape array and returns the subscript of the new

@@ -7,34 +7,48 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: djvumake.cpp,v 1.6 1999-03-02 02:12:13 leonb Exp $
+//C-  $Id: djvumake.cpp,v 1.7 1999-03-02 16:17:13 leonb Exp $
 
 /** @name djvumake
 
     {\bf Synopsis}
     \begin{verbatim}
-       % djvumake <djvufile> [Sjbz=<jb2file>] [FG44=<iw4file>] [BG44=<iw4file>]
+       % djvumake <djvufile> [Sjbz=<maskfile>] [FG44=<fgfile>] [BG44=<bgfile>]
     \end{verbatim}
 
-    {\bf Recipe for creating a Photo DjVu File}\\
+    {\bf Description}
+
+    This program assembles the DjVu file #djvufile# using the JB2 data
+    contained in file #maskfile# and the IW44 data contained in files #bgfile#
+    and #fgfile#.  Although this is slightly beyond the scope of the DjVu
+    Reference Library, the following description explains how to prepare the
+    input files required for assembling DjVu files.
+
+    {\bf Recipe for creating a Photo DjVu File}
+
     You should first use program \Ref{c44} and produce an IW44 file "my.iw4".
     Assuming that this image is 640 pixels wide and 480 pixels high, you can
     assemble file #"my.djvu"# using #djvumake# with the following arguments.
     \begin{verbatim}
        % djvumake my.djvu  INFO=640,480  BG44=my.iw4
     \end{verbatim}
+
     
-    {\bf Recipe for creating a Bilevel DjVu File}\\
+    {\bf Recipe for creating a Bilevel DjVu File}
+
     The first step consists in creating a \Ref{JB2Image} object according to
     the guidelines specified in section \Ref{JB2Image.h}.  Then use function
-    #JB2Image::encode# to save the JB2 data into a file named #"myjb2.q"# for
-    instance.  You can then assemble file #"my.djvu"# using #djvumake#
-    with the following arguments:
+    \Ref{JB2Image::encode} in class \Ref{JB2Image} to save the JB2 data into a
+    file named #"myjb2.q"# for instance.  You can then assemble file
+    #"my.djvu"# using #djvumake# with the following arguments:
+
     \begin{verbatim}
        % djvumake my.djvu Sjbz=myjb2.q
     \end{verbatim}
+
     
-    {\bf Recipe for creating a Compound DjVu File}\\
+    {\bf Recipe for creating a Compound DjVu File}
+
     Let us assume that you use a program like Gimp \URL{http://www.gimp.org}
     or Photoshop.  You have created your image using two layers.  The
     background layer contains all pictures and background details.  The
@@ -82,7 +96,7 @@
     
     It sometimes happens that you cannot compute the color of a pixel in the
     subsampled image because none of the pixels in the corresponding image are
-    visible.  That means that we do not really care abou the color of the
+    visible.  That means that we do not really care about the color of the
     subsampled pixel because it is not visible at all.  It is not desirable of
     course to encode the color value of such pixels.  This is possible using
     the {\em masking} feature of the wavelet encoder.  You must first save two
@@ -111,7 +125,7 @@
     @memo
     Assemble DjVu files.
     @version
-    #$Id: djvumake.cpp,v 1.6 1999-03-02 02:12:13 leonb Exp $#
+    #$Id: djvumake.cpp,v 1.7 1999-03-02 16:17:13 leonb Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> */
 //@{

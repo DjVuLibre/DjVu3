@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: djvuextract.cpp,v 1.4 1999-03-02 02:12:13 leonb Exp $
+//C-  $Id: djvuextract.cpp,v 1.5 1999-03-02 16:17:13 leonb Exp $
 
 /** @name djvuextract
 
@@ -23,19 +23,19 @@
     \begin{itemize}
     \item When option #Sjbz=<maskout># is specified, the foreground mask is
       saved into file #<maskout># as JB2 data. This data file can be read
-      using function #decode# in class \Ref{JB2Image}.
+      using function \Ref{JB2Image::decode} in class \Ref{JB2Image}.
     \item When option #FG44=<fgout># is specified, the foreground color image
       is saved into file #<fgout># as IW44 data.  This data file can be processed
-      using programs \Ref{d44} or \Ref{c44}.
+      using programs \Ref{d44}.
     \item When option #BG44=<bgout># is specified, the background color image
       is saved into file #<bgout># as IW44 data.  This data file can be processed
-      using programs \Ref{d44} or \Ref{c44}.
+      using programs \Ref{d44}.
     \end{itemize}
 
     @memo
     Extract components from DjVu files.
     @version
-    #$Id: djvuextract.cpp,v 1.4 1999-03-02 02:12:13 leonb Exp $#
+    #$Id: djvuextract.cpp,v 1.5 1999-03-02 16:17:13 leonb Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> */
 //@{

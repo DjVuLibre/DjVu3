@@ -1,6 +1,7 @@
 // -*- C++ -*-
 /** @name DjVu Reference Library
 
+    
     The DjVu Reference Library is Copyright (c) AT&T 1999.  
 
     YOU may use this software pursuant to the terms and conditions specified
@@ -8,12 +9,23 @@
     with AT&T regarding this software, YOUR use of this software shall imply
     YOUR acceptance of all the provisions specified in this agreement.
 
+
+    {\bf Acknowldegements} --- The ideas discussed in this library are the
+    result of endless discussions with Yoshua Bengio, Patrick Haffner, Paul
+    Howard, and Yann Le Cun.  Many improvements have suggested by Andrei
+    Erofeev, Praveen Guduru, and Bill Riemers.  Credits are given whenever
+    possible.  Finally, this document would be much worse without Joe Orost's
+    and Paul Howard's careful proofreading.
+
     @version
     1.1
     @author
-    L\'eon Bottou, 02/1999
-*/
+    L\'eon Bottou, 02/1999 */
 //@{
+
+
+
+
 
 //----------------------------------------
 /** @name Introduction

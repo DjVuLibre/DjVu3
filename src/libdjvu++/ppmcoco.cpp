@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: ppmcoco.cpp,v 1.6 1999-03-02 02:12:14 leonb Exp $
+//C-  $Id: ppmcoco.cpp,v 1.7 1999-03-02 16:17:13 leonb Exp $
 
 
 
@@ -28,11 +28,11 @@
     The default value 2.2 is assumed when this argument is omitted.
     \item[<ppmin>]
     Name of the PPM file to read. A single dash (#"-"#) means that the PPM
-    file is to be read on the standard input.  See \Ref{PNM and RLE file
-    formats} for more information about PPM files.
+    file is to be read on the standard input.  See 
+    \Ref{PNM and RLE file formats} for more information about PPM files.
     \item[<ppmout>]
     Name of the PPM file into which the color corrected image will be written.
-    Ommitting this argument or providing a single dash (#"-"#) means that the
+    Omitting this argument or providing a single dash (#"-"#) means that the
     PPM data will be written to the standard output.
     \end{description}
     
@@ -49,7 +49,7 @@
 
     The current release of the DjVu Reference Library only implements gamma
     correction.  Cathodic displays are reasonably well characterized by a
-    single floating point number called "gamma".  Typical gamma values 
+    single floating point number called ``gamma''.  Typical gamma values 
     are given in the table below:
     \begin{center}\begin{tabular}{ll}
     {\bf computer} & {\bf gamma}\\
@@ -68,7 +68,7 @@
     data compression artefacts in the dark areas of the image.  We suggest
     therefore to design images with a intermediate gamma coefficient.  Value
     2.2 gives decent results on all computers.  This value is suggested by
-    several photo edition programs (such as Adobe Photoshop (tm)), and is
+    several photo editing programs (such as Photoshop), and is
     supported by virtually all scanner drivers.
 
     Program #ppmcoco# reads a PPM file #ppmin# containing an image designed
@@ -82,7 +82,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: ppmcoco.cpp,v 1.6 1999-03-02 02:12:14 leonb Exp $# */
+    #$Id: ppmcoco.cpp,v 1.7 1999-03-02 16:17:13 leonb Exp $# */
 //@{
 //@}
 

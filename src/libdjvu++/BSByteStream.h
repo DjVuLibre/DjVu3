@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: BSByteStream.h,v 1.5 1999-03-02 02:12:11 leonb Exp $
+//C-  $Id: BSByteStream.h,v 1.6 1999-03-02 16:17:12 leonb Exp $
 
 
 #ifndef _BSBYTESTREAM_H
@@ -17,8 +17,9 @@
     
     Files #"BSByteStream.h"# and #"BSByteStream.cpp"# implement a very compact
     general purpose compressor based on the Burrows-Wheeler transform.  The
-    utility program \Ref{bzz} provides a front-end for this class. This is not
-    currently used in DjVu files.
+    utility program \Ref{bzz} provides a front-end for this class. Although
+    this compression model is not currently used in DjVu files, it may be used
+    in the future for encoding textual data chunks.
 
     {\bf Algorithms} --- The Burrows-Wheeler transform (also named Block-Sorting)
     is performed using a combination of the Karp-Miller-Rosenberg and the
@@ -91,7 +92,7 @@
     @memo
     Simple Burrows-Wheeler general purpose compressor.
     @version
-    #$Id: BSByteStream.h,v 1.5 1999-03-02 02:12:11 leonb Exp $# */
+    #$Id: BSByteStream.h,v 1.6 1999-03-02 16:17:12 leonb Exp $# */
 //@{
 
 #ifdef __GNUC__

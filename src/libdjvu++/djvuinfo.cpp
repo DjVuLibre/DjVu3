@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: djvuinfo.cpp,v 1.3 1999-03-02 02:12:13 leonb Exp $
+//C-  $Id: djvuinfo.cpp,v 1.4 1999-03-02 16:17:13 leonb Exp $
 
 
 
@@ -21,7 +21,7 @@
     {\bf Description} ---
     File #"djvuinfo.cpp"# uses the facilities provided by \Ref{IFFByteStream.h}
     to display an indented representation of the chunk structure of an
-    EA-IFF85 file.  Each line represent contains a chunk ID followed by the
+    ``EA IFF 85'' file.  Each line represent contains a chunk ID followed by the
     chunk size.  Additional information about the chunk is provided when
     program #djvuinfo.cpp# recognizes the chunk name and knows how to summarize
     the chunk data.  Lines are indented in order to reflect the hierarchical
@@ -32,17 +32,17 @@
     % djvuinfo graham1.djvu 
     graham1.djvu:
       FORM:DJVU [32553] 
-        INFO [5]            3156x2325, version 17
-        Sjbz [17692] 
-        BG44 [2570]         #1 - 74 slices - v1.2 (color) - 1052x775
-        FG44 [1035]         #1 - 100 slices - v1.2 (color) - 263x194
+        INFO [5]            2325x3156, version 20, 300 dpi, gamma 2.2
+        Sjbz [17692]        JB2 data, no header
+        BG44 [2570]         #1 - 74 slices - v1.2 (color) - 775x1052
+        FG44 [1035]         #1 - 100 slices - v1.2 (color) - 194x263
         BG44 [3048]         #2 - 10 slices 
         BG44 [894]          #3 - 4 slices 
         BG44 [7247]         #4 - 9 slices 
     \end{verbatim}
 
     {\bf References} ---
-    EA IFF 85 file format specification:
+    EA IFF 85 file format specification:\\
     \URL{http://www.cica.indiana.edu/graphics/image_specs/ilbm.format.txt}
     or \URL{http://www.tnt.uni-hannover.de/soft/compgraph/fileformats/docs/iff.pre}
 
@@ -51,7 +51,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: djvuinfo.cpp,v 1.3 1999-03-02 02:12:13 leonb Exp $# */
+    #$Id: djvuinfo.cpp,v 1.4 1999-03-02 16:17:13 leonb Exp $# */
 //@{
 //@}
 
@@ -84,7 +84,7 @@ display_djvu_info(IFFByteStream &iff, const GString &head, size_t size)
 void
 display_sjbz_info(IFFByteStream &iff, const GString &head, size_t size)
 {
-  printf("JB2 encoded");
+  printf("JB2 data, no header");
 }
 
 void
@@ -110,8 +110,8 @@ display_iw4_info(IFFByteStream &iff, const GString &head, size_t size)
           {
             printf("- v%d.%d (%s) - %dx%d", secondary.major&0x7f, secondary.minor,
                    (secondary.major & 0x80 ? "b&w" : "color"),
-                   (secondary.yhi<<8)+secondary.ylo,
-                   (secondary.xhi<<8)+secondary.xlo  );
+                   (secondary.xhi<<8)+secondary.xlo,
+                   (secondary.yhi<<8)+secondary.ylo  );
           }
     }
 }

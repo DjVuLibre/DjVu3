@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: ZPCodec.h,v 1.5 1999-03-02 02:12:13 leonb Exp $
+//C-  $Id: ZPCodec.h,v 1.6 1999-03-02 16:17:12 leonb Exp $
 
 
 #ifndef _ZPCODEC_H
@@ -130,7 +130,7 @@
     @memo
     Binary adaptive quasi-arithmetic coder.
     @version
-    #$Id: ZPCodec.h,v 1.5 1999-03-02 02:12:13 leonb Exp $#
+    #$Id: ZPCodec.h,v 1.6 1999-03-02 16:17:12 leonb Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> */
 //@{
@@ -417,7 +417,7 @@ ZPCodec::decoder()
     void encode_8_bits(ZPCodec &zp, int x, BitContext *ctx )
     {
       int n = 1;
-      REPEAT8( { int b=(x&0x80)>>7;  x=(x<<1);
+      REPEAT8( { int b=((x&0x80)?1:0);  x=(x<<1);
                  zp.encoder(b,ctx[n-1]);  n=(n<<1)|(b); } );
     }
     \end{verbatim}

@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: bzz.cpp,v 1.6 1999-03-02 02:12:13 leonb Exp $
+//C-  $Id: bzz.cpp,v 1.7 1999-03-02 16:17:12 leonb Exp $
 
 // BZZ -- a frontend for BSByteStream
 
@@ -21,7 +21,9 @@
     \end{description}    
 
     Program bzz is a simple front-end for the Burrows Wheeler encoder
-    implemented in \Ref{BSByteStream.h}.  Argument #blocksize# is expressed in
+    implemented in \Ref{BSByteStream.h}.  Although this compression model is
+    not currently used in DjVu files, it may be used in the future for
+    encoding textual data chunks.  Argument #blocksize# is expressed in
     kilobytes and must be in range 200 to 4096.  The default value is 2048.
     Arguments #infile# and #outfile# are the input and output filenames. A
     single dash (#"-"#) can be used to represent the standard input or output.
@@ -31,7 +33,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation
     @version
-    #$Id: bzz.cpp,v 1.6 1999-03-02 02:12:13 leonb Exp $# */
+    #$Id: bzz.cpp,v 1.7 1999-03-02 16:17:12 leonb Exp $# */
 //@{
 //@}
 

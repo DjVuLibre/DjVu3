@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: GBitmap.h,v 1.3 1999-03-02 02:12:12 leonb Exp $
+//C-  $Id: GBitmap.h,v 1.4 1999-03-02 16:17:12 leonb Exp $
 
 #ifndef _GBITMAP_H_
 #define _GBITMAP_H_
@@ -25,8 +25,8 @@
 /** @name GBitmap.h
 
     Files #"GBitmap.h"# and #"GBitmap.cpp"# implement class \Ref{GBitmap}.
-    Instances of these class represent bilevel or gray-level images. The
-    "bottom left" coordinate system is used consistently in the DjVu library.
+    Instances of this class represent bilevel or gray-level images. The
+    ``bottom left'' coordinate system is used consistently in the DjVu library.
     Line zero of a bitmap is the bottom line in the bitmap.  Pixels are
     organized from left to right within each line.  As suggested by its name,
     class #GBitmap# was initially a class for bilevel images only.  It was
@@ -42,7 +42,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: GBitmap.h,v 1.3 1999-03-02 02:12:12 leonb Exp $#
+    #$Id: GBitmap.h,v 1.4 1999-03-02 16:17:12 leonb Exp $#
 
  */
 //@{
@@ -57,15 +57,14 @@
 
     The bracket operator returns a pointer to the bytes composing one line of
     the image.  This pointer can be used to read or write the image pixels.
-    Following the general convention of the DjVu Reference Library, line zero
-    is always the bottom line of the image.
+    Line zero represents the bottom line of the image.
 
     The memory organization is setup in such a way that you can safely read a
     few pixels located in a small border surrounding all four sides of the
     image.  The width of this border can be modified using the function
-    \Ref{minborder}.  The border pixels are initialized to zero (e.g. white).
-    You should never write anything into border pixels because they are shared
-    between images and between lines.  */
+    \Ref{minborder}.  The border pixels are initialized to zero and therefore
+    represent white pixels.  You should never write anything into border
+    pixels because they are shared between images and between lines.  */
 
 class GBitmap : public GPEnabled
 {
@@ -139,9 +138,9 @@ public:
   /** Returns a pointer to the first byte of row #row#.
       This pointer can be used as an array to read or write the row elements. */
   unsigned char *operator[] (int row);
-  /** Returns the size of a row in memory.  This number is equal to the
-      difference between pointers to pixels located in the same column in
-      consecutive rows.  This difference can be larger than the number of
+  /** Returns the size of a row in memory (in pixels).  This number is equal
+      to the difference between pointers to pixels located in the same column
+      in consecutive rows.  This difference can be larger than the number of
       columns in the image. */
   unsigned int rowsize() const;
   /** Makes sure that the border is at least #minimum# pixels large.  This
@@ -154,12 +153,12 @@ public:
   /** @name Managing gray levels. */
   //@{
   /** Returns the number of gray levels. 
-      Value #2# denotes a gray level image. */
+      Value #2# denotes a bilevel image. */
   int  get_grays() const;
   /** Sets the number of gray levels without changing the pixels.
       Argument #grays# must be in range #2# to #256#. */
   void set_grays(int grays);
-  /** Changes the number of gray levels.  The argument #grays# must be in
+  /** Changes the number of gray levels.  The argument #grays# must be in the
       range #2# to #256#.  All the pixel values are then rescaled and clipped
       in range #0# to #grays-1#. */
   void change_grays(int grays);
@@ -201,7 +200,7 @@ public:
 
   //@{
   /** Performs an additive blit of the GBitmap #bm#.  The GBitmap #bm# is
-      first positionned above the current GBitmap in such a way that position
+      first positioned above the current GBitmap in such a way that position
       (#u#,#v#) in GBitmap #bm# corresponds to position (#u#+#x#,#v#+#y#) in
       the current GBitmap.  The value of each pixel in GBitmap #bm# is then
       added to the value of the corresponding pixel in the current GBitmap.
@@ -214,7 +213,7 @@ public:
       how the pixel values should be interpreted. */
   void blit(const GBitmap *bm, int x, int y);
   /** Performs an additive blit of the GBitmap #bm# with anti-aliasing.  The
-      GBitmap #bm# is first positionned above the current GBitmap in such a
+      GBitmap #bm# is first positioned above the current GBitmap in such a
       way that position (#u#,#v#) in GBitmap #bm# corresponds to position
       (#u#+#x#/#subsample#,#v#+#y#/#subsample#) in the current GBitmap.  This
       mapping results in a contraction of GBitmap #bm# by a factor
@@ -230,7 +229,7 @@ public:
       for instance GBitmap #bm# is a bilevel image (pixels can be #0# or #1#),
       the pixels of the current GBitmap can take values in range #0# to
       #subsample*subsample#.  Note that function #blit# does not change the
-      number of gray levels in the current GBitmap.  You may must call
+      number of gray levels in the current GBitmap.  You must call
       \Ref{set_grays} to indicate that there are #subsample^2+1# gray
       levels.  Since there is at most 256 gray levels, this also means that
       #subsample# should never be greater than #15#.
@@ -250,18 +249,19 @@ public:
       read using the ByteStream based constructor or initialization function.
       See \Ref{PNM and RLE file formats} for more information. */
   //@{
-  /** Saves the image into ByteStream #bs# using the PBM format.
-      Argument #raw# selects the "Raw PBM" or the "Ascii PBM" format.
-      The image is saved as a bilevel image. All non zero pixels are
-      considered black pixels. */
+  /** Saves the image into ByteStream #bs# using the PBM format.  Argument
+      #raw# selects the ``Raw PBM'' (1) or the ``Ascii PBM'' (0) format.  The
+      image is saved as a bilevel image.  All non zero pixels are considered
+      black pixels. See section \Ref{PNM and RLE file formats}. */
   void save_pbm(ByteStream &bs, int raw=1);
-  /** Saves the image into ByteStream #bs# using the PGM format.
-      Argument #raw# selects the "Raw PGM" or the "Ascii PGM" format. 
-      The image is saved as a gray level image. */
+  /** Saves the image into ByteStream #bs# using the PGM format.  Argument
+      #raw# selects the ``Raw PGM'' (1) or the ``Ascii PGM'' (0) format.  The
+      image is saved as a gray level image.  See section
+      \Ref{PNM and RLE file formats}. */
   void save_pgm(ByteStream &bs, int raw=1);
   /** Saves the image into ByteStream #bs# using the RLE file format.
       The image is saved as a bilevel image. All non zero pixels are
-      considered black pixels. */
+      considered black pixels. See section \Ref{PNM and RLE file formats}. */
   void save_rle(ByteStream &bs);
   //@}
 
@@ -271,17 +271,17 @@ public:
       address of the memory buffer allocated by this GBitmap object.  The
       offset of the first pixel in the bottom line is written into variable
       #offset#.  Other lines can be accessed using pointer arithmetic (see
-      \Ref{rowsize}).  The GBitmap object no longer "owns" the buffer: you
+      \Ref{rowsize}).  The GBitmap object no longer ``owns'' the buffer: you
       must explicitly de-allocate the buffer using #operator delete []#.  This
       de-allocation should take place after the destruction or the
       re-initialization of the GBitmap object.  This function will return a
-      null pointer if the GBitmap object does not "own" the buffer in the
+      null pointer if the GBitmap object does not ``own'' the buffer in the
       first place.  */
   unsigned char *take_data(size_t &offset);
   /** Initializes this GBitmap by borrowing a memory segment.  The GBitmap
       then directly addresses the memory buffer #data# provided by the user.
       This buffer must be large enough to hold #w*h# bytes.  The GBitmap
-      object does not "own" the buffer: you must explicitly de-allocate the
+      object does not ``own'' the buffer: you must explicitly de-allocate the
       buffer using #operator delete []#.  This de-allocation should take place
       after the destruction or the re-initialization of the GBitmap object.  */
   void borrow_data(unsigned char *data, int w, int h);
@@ -328,11 +328,11 @@ public:
     NetPBM \URL{http://www.arc.umn.edu/GVL/Software/netpbm.html} or
     ImageMagick \URL{http://www.wizards.dupont.com/cristy/}.
     
-    {\bf RLE} --- The RLE file format is a simple run-length encoding scheme
-    for storing bilevel images.  Encoding or decoding a RLE encoded file is
-    extremely simple. Yet RLE encoded files are usually much smaller than the
-    corresponding PBM encoded files.  RLE files always begin with a header
-    line composed of:\\
+    {\bf RLE} --- The binary RLE file format is a simple run-length encoding
+    scheme for storing bilevel images.  Encoding or decoding a RLE encoded
+    file is extremely simple. Yet RLE encoded files are usually much smaller
+    than the corresponding PBM encoded files.  RLE files always begin with a
+    header line composed of:\\
     - the two characters #"R4"#,\\
     - one or more blank characters,\\
     - the number of columns, encoded using characters #"0"# to #"9"#,\\
