@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessage.cpp,v 1.45 2001-05-04 19:00:14 fcrary Exp $
+// $Id: DjVuMessage.cpp,v 1.46 2001-05-04 20:56:32 bcr Exp $
 // $Name:  $
 
 
@@ -548,6 +548,19 @@ DjVuMessage::LookUpID( const GUTF8String &msgID,
       if(valuepos)
       {
         message_text=tag->args[valuepos];
+      }else
+      {
+        const int start_line=tag->raw.search('\n',0);
+      
+        const int start_text=tag->raw.nextNonSpace(0);
+        const int end_text=tag->raw.firstEndSpace(0);
+        if(start_line<0 || start_text<0 || start_text < start_line)
+        {
+          message_text=tag->raw.substr(0,end_text).fromEscaped();
+        }else
+        {
+          message_text=tag->raw.substr(start_line+1,end_text-start_line-1).fromEscaped();
+        }
       }
       GPosition numberpos=tag->args.contains(numberstring);
       if(numberpos)
