@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: parseoptions.cpp,v 1.10 1999-11-14 21:45:54 bcr Exp $
+//C- $Id: parseoptions.cpp,v 1.11 1999-11-24 05:32:56 bcr Exp $
 #ifdef __GNUC__
 #pragma implementation
 #endif
@@ -150,6 +150,7 @@ DjVuParseOptions::DjVuParseOptions
   Configuration=new ProfileList;
   Arguments=new Profiles;
   Errors=new ErrorList;
+  filename=0;
   defaultProfile=ReadConfig(default_string);
   const char *progname=strrchr(prog,'/');
   progname=progname?(progname+1):prog;
@@ -167,10 +168,33 @@ DjVuParseOptions::DjVuParseOptions
   currentProfile=ReadConfig(name);
 }
 
-DjVuParseOptions::DjVuParseOptions 
-(const char readfilename[],const char readasprofile[])
+#if 0
+DjVuParseOptions::DjVuParseOptions()
 {
   VarTokens=new DjVuTokenList;
+  ProfileTokens=new DjVuTokenList;
+  Configuration=new ProfileList;
+  Arguments=new Profiles;
+  Errors=new ErrorList;
+  name=new char[1];
+  name[0]=0;
+  filename=0;
+  name=new char [sizeof(default_string)];
+  strcpy(name,default_string));
+  currentProfile=defaultProfile=ReadConfig(default_string);
+}
+#endif
+
+DjVuParseOptions::DjVuParseOptions 
+(const char readfilename[],const char readasprofile[],DjVuTokenList *Vars)
+{
+  if(Vars)
+  {
+    (VarTokens=Vars)->links++;
+  }else
+  {
+    VarTokens=new DjVuTokenList;
+  }
   ProfileTokens=new DjVuTokenList;
   Configuration=new ProfileList;
   Arguments=new Profiles;
@@ -199,8 +223,14 @@ DjVuParseOptions::DjVuParseOptions
   Arguments=new Profiles;
   name=new char [strlen(Original.name)+1];
   strcpy(name,Original.name);
-  filename=new char [strlen(Original.filename)+1];
-  strcpy(filename,Original.filename);
+  if(Original.filename)
+  {
+    filename=new char [strlen(Original.filename)+1];
+    strcpy(filename,Original.filename);
+  }else
+  {
+    filename=0;
+  }
 }
 
 // This is the corresponding destructor.
@@ -214,6 +244,46 @@ DjVuParseOptions::~DjVuParseOptions()
   delete Errors;
   delete [] name;
   delete [] filename;
+}
+
+// This reiniallizes the object, by creating a new object, copying the
+// arguments and error list into that object, and then stealing the data
+// from the new object.  This is the only way to handle something simmular
+// to make's -f option.
+//
+void
+DjVuParseOptions::init
+(const char readfilename[],const char readasprofile[])
+{
+  DjVuParseOptions tmp(readfilename,readasprofile,VarTokens);
+
+  const char *s;  // Append the error messages from the tmp object.
+  while((s=tmp.Errors->GetError()))
+  {
+    Errors->AddError(s);
+  }
+    // Now we copy all the new profiles
+  int i;
+  const int i_max=ProfileTokens->NextToken;
+  for(i=0;i<i_max;i++)
+  {
+    s=tmp.ProfileTokens->Entry[i].Name;
+    int j=ProfileTokens->SetToken(s);
+    if(!(Configuration->Grow(j+1)))
+    {
+      delete [] Configuration->profiles[j].values;
+    }
+    Configuration->profiles[j].size=tmp.Configuration->profiles[i].size;
+    Configuration->profiles[j].values=tmp.Configuration->profiles[i].values;
+    tmp.Configuration->profiles[i].size=0;
+    tmp.Configuration->profiles[i].values=0;
+  }
+  delete [] name;
+  delete [] filename;
+  name=tmp.name;
+  filename=tmp.filename;
+  tmp.name=0;
+  tmp.filename=0;
 }
 
 // This changes the current profile
@@ -844,6 +914,13 @@ DjVuParseOptions::ErrorList::GetError()
   return retvalue;
 }
 
+// These constructors and destructors are as simple as it gets.
+DjVuParseOptions::ProfileList::ProfileList()
+: size(0),links(0),profiles(0) {}
+
+DjVuParseOptions::ProfileList::~ProfileList()
+{delete [] profiles;};
+
 // Makes sure the profile list is increased to the specified size.
 // Returns 1 if this is a new profile, and 0 if it is an existing one.
 //
@@ -1251,6 +1328,7 @@ DjVuTokenList::~DjVuTokenList()
   for(i=0;i<NextToken;i++)
   {
     delete [] Strings[i];
+    Strings[i]=0;
   }
   delete [] Strings;
   delete [] Entry;
@@ -1324,4 +1402,19 @@ DjVuTokenList::SetToken
   }
   return retval;
 }
+
+DjVuParseOptions::Profiles::Profiles()
+: size(0), values(0) {}
+
+DjVuParseOptions::Profiles::~Profiles()
+{
+  int i;
+  for(i=0;i<size;i++)
+  {
+    delete [] values[i];
+    values[i]=0;
+  }
+  delete [] values;
+}
+
 

@@ -6,7 +6,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: parseoptions.h,v 1.7 1999-11-14 05:55:21 bcr Exp $
+//C- $Id: parseoptions.h,v 1.8 1999-11-24 05:32:56 bcr Exp $
 
 #endif /* __cplusplus */
 
@@ -25,160 +25,164 @@
 #include <stdio.h>
 
 
-//** @name parseoptions.h \begin{verbatim}                                        
-//
-// The idea is simply to have one object that we can use to parse arguments
-// for all command line programs, and API type function calls.
-// For implementing this we declare a DjVuParseOptions class, with C
-// wrappers.  It is probably easier to show an example before describing
-// the functions:
-//
-//      // First we define the command line arguments with the
-//      // normal option structure defined by getopt(3)
-//      // Only I didn't add support for any feature that requires
-//      // a non-constant structure.  So we can use a compile time
-//      // constant.
-// 	static const djvu_option long_options[] = {
-// 	  {"favorite-color",1,0,'f'},
-// 	  {"pizza-topping",1,0,'P'},
-// 	  {"bignumber",1,0,'n'},
-// 	  {"redo",0,0,'r'},
-// 	  {"profile",0,0,'p'},
-// 	  {"count",3,0,'0'},  // This is a special definition for a numerical
-// 	  {"count",3,0,'1'},  // operator.   Like -69 treated as an option.
-// 	  {"count",3,0,'2'},  // When -69 is used, the value of "count" will 
-// 	  {"count",3,0,'3'},  // will be 69.  Simularly, -3 would result in
-// 	  {"count",3,0,'4'},  // count having a value of 3.
-// 	  {"count",3,0,'5'},
-// 	  {"count",3,0,'6'},  // Litterally, the 3 argument means to assign
-// 	  {"count",3,0,'7'},  // the option letter used as the first character
-// 	  {"count",3,0,'8'},  // of the value.
-// 	  {"count",3,0,'9'},
-// 	  {0,0,0,0}
-// 	};
-//
-// 	int
-//  	main(int argc,char **argv,char **env)
-//      {
-// 	  char *profile,*topping,*color;
-//        int redo,bignumber;
-// 		// This will read in the default configuration file
-// 		// which is either ~/.DjVu/global.conf if it exists,
-// 		// otherwise /etc/DjVu/global.conf.
-// 		// Next the file MyConfigFile.conf will be read from
-// 		// either ~/.DjVu or /etc/DjVu
-//        DjVuParseOptions MyOptions("MyConfigFile");
-// 		// This parses the command line arguments.
-//        MyOptions.ParseArguments(argc,argv,long_options);
-// 		// We could for example, check the value of a profile
-// 		// option, and switch which profile we are using.
-// 	  profile=MyOptions.GetValue("profile");
-//        if(profile) MyOptions.ChangeProfile(profile);
-// 		// Now we can read in the variables.
-// 		// I find it is a good idea to only list the variable
-// 		// strings once, so I'm passing them from the long_options
-// 		// structure.  But this isn't necessary.
-// 	  topping=MyOptions.GetValue(long_options[0].name);
-// 	  color=MyOptions.GetValue(long_options[1].name);
-// 		// We can also read in integers, and specify a default value
-// 		// to return in case the value is not an integer.  In this
-// 		// case I specified -1.
-// 	  bignumber=MyOptions.GetInteger(long_options[2].name,-1);
-// 		// We can also check true/false type values.
-// 	  redo=MyOptions.GetInteger(long_options[2].name,0);
-// 		// Now before we do anything with these values we might
-// 		// want to check for errors.
-// 	  if(MyOptions.HasError())
-// 	  {
-// 	     MyOptions.perror();
-// 	     usage();
-// 	  }
-//
-// 	  ... Now we can do the real work of this program...
-// 	  exit(0);
-// 	}
-// 	
-//
-// Now the more complicated issue is using the same object for libraries
-// with a minimal amount of changes.  The first issue to note is we don't
-// want a library function to re-read the configuration file each time it
-// is called.  And we don't want to use static variables, since that could
-// causing threading problems.  So, I took the simplest solution, which
-// is to assume a copy of the class object will always get once created
-// in the first function.
-//
-// So, then the problem is if we pass by value, then if a function reads
-// in it's own profile, each time it is recalled, it will have lost that
-// information and need to read in the same profile again.  If we pass by
-// references we run into problems that multiple functions can not parse
-// argv[] arrays.
-//
-// The compromise I reached is the profiles, are stored in the class as
-// references.  So when you pass by "value", the profile information is
-// still passed by reference.  Consequently if you do something like:
-// 	int foo(DjVuParseOptions);
-// 	DjVuParseOptions Opts("Config");
-// 	Opts.ParseArguments(argc,argv,long_opts,long_only);
-// 	foo(Opts);
-// the copy of Opts passed to foo will not contain any information from
-// the argv[] array.  But it will contain the profile information.
-// If you do a ChangeProfile() it will only effect the original to
-// the extent if it does the same ChangeProfile() the configuration
-// file will have already been parsed.
-//
-//
-// The core functionality is also available via C wrappers.
-//
-// The configuration files themselves are fairly simple.  They simple
-// listings  of the form:
-// 	<varable>=<value>
-//
-// e.g.
-//
-// 	foo="689234 ksdf"
-// 	fi=bar
-// 	test=TRUE
-//
-// The one unique implementation detail, is alternate profiles may be
-// specified  within a configuration file.  The rules is simple.  The
-// default profile name is the file name.  To end the current profile
-// and begin a new one, simply list the new profile name followed by
-// a ':'.  e.g.
-//
-// 	name=fido
-// 	species=dog
-// 	birthday=today
-// 	
-// 	# Lets begin an alternate profile for mycat
-//
-// 	cats:
-// 	name=fluffy
-// 	species=cat
-// 	birthday=tomorrow
-// 	favorite-food=mice
-// 	mice-eaten-this-week=5
-//
-// You can use quotes the same as in a shell script.  If you don't use
-// quotes, extra white spaces are stripped, and escape characters are used.
-// All of the following are equivalent.
-// e.g.
-// 	test="This is a simple test.\nThis is only a test.\\"
-//
-// 	test="This is a simple test.
-// 	This is only a test.\\"
-//
-// 	test= This is a simple test.\ 
-// 	\nThis 		is only		a test.\\ 
-//
-// 	test='This is a simple test.
-// 	This is only a test.\'
-//
-// Be very careful of missing quotes...
-//
-// \end{verbatim} */
-//** @memo parseoptions header file */
-//** @version $Id: parseoptions.h,v 1.7 1999-11-14 05:55:21 bcr Exp $ */
-//** @author: $Author: bcr $ */
+/** @name parseoptions.h
+  
+   The idea is simply to have one object that we can use to parse arguments
+   for all command line programs, and API type function calls.
+   For implementing this we declare a DjVuParseOptions class, with C
+   wrappers.  It is probably easier to show an example before describing
+   the functions:
+\begin{verbatim}                                        
+        // First we define the command line arguments with the
+        // normal option structure defined by getopt(3)
+        // Only I didn't add support for any feature that requires
+        // a non-constant structure.  So we can use a compile time
+        // constant.
+   	static const djvu_option long_options[] = {
+   	  {"favorite-color",1,0,'f'},
+   	  {"pizza-topping",1,0,'P'},
+   	  {"bignumber",1,0,'n'},
+   	  {"redo",0,0,'r'},
+   	  {"profile",0,0,'p'},
+   	  {"count",3,0,'0'},  // This is a special definition for a numerical
+   	  {"count",3,0,'1'},  // operator.   Like -69 treated as an option.
+   	  {"count",3,0,'2'},  // When -69 is used, the value of "count" will 
+   	  {"count",3,0,'3'},  // will be 69.  Simularly, -3 would result in
+   	  {"count",3,0,'4'},  // count having a value of 3.
+   	  {"count",3,0,'5'},
+   	  {"count",3,0,'6'},  // Litterally, the 3 argument means to assign
+   	  {"count",3,0,'7'},  // the option letter used as the first character
+   	  {"count",3,0,'8'},  // of the value.
+   	  {"count",3,0,'9'},
+   	  {0,0,0,0}
+   	};
+  
+   	int
+    	main(int argc,char **argv,char **env)
+        {
+   	  char *profile,*topping,*color;
+          int redo,bignumber;
+   		// This will read in the default configuration file
+   		// which is either ~/.DjVu/global.conf if it exists,
+   		// otherwise /etc/DjVu/global.conf.
+   		// Next the file MyConfigFile.conf will be read from
+   		// either ~/.DjVu or /etc/DjVu
+          DjVuParseOptions MyOptions("MyConfigFile");
+   		// This parses the command line arguments.
+          MyOptions.ParseArguments(argc,argv,long_options);
+   		// We could for example, check the value of a profile
+   		// option, and switch which profile we are using.
+   	  profile=MyOptions.GetValue("profile");
+          if(profile) MyOptions.ChangeProfile(profile);
+   		// Now we can read in the variables.
+   		// I find it is a good idea to only list the variable
+   		// strings once, so I'm passing them from the long_options
+   		// structure.  But this isn't necessary.
+   	  topping=MyOptions.GetValue(long_options[0].name);
+   	  color=MyOptions.GetValue(long_options[1].name);
+   		// We can also read in integers, and specify a default value
+   		// to return in case the value is not an integer.  In this
+   		// case I specified -1.
+   	  bignumber=MyOptions.GetInteger(long_options[2].name,-1);
+   		// We can also check true/false type values.
+   	  redo=MyOptions.GetInteger(long_options[2].name,0);
+   		// Now before we do anything with these values we might
+   		// want to check for errors.
+   	  if(MyOptions.HasError())
+   	  {
+   	     MyOptions.perror();
+   	     usage();
+   	  }
+  
+   	  ... Now we can do the real work of this program...
+   	  exit(0);
+   	}
+\end{verbatim}
+  
+   Now the more complicated issue is using the same object for libraries
+   with a minimal amount of changes.  The first issue to note is we don't
+   want a library function to re-read the configuration file each time it
+   is called.  And we don't want to use static variables, since that could
+   causing threading problems.  So, I took the simplest solution, which
+   is to assume a copy of the class object will always get once created
+   in the first function.
+  
+   So, then the problem is if we pass by value, then if a function reads
+   in it's own profile, each time it is recalled, it will have lost that
+   information and need to read in the same profile again.  If we pass by
+   references we run into problems that multiple functions can not parse
+   argv[] arrays.
+  
+   The compromise I reached is the profiles, are stored in the class as
+   references.  So when you pass by "value", the profile information is
+   still passed by reference.  Consequently if you do something like:
+\begin{verbatim}                                        
+   	int foo(DjVuParseOptions);
+   	DjVuParseOptions Opts("Config");
+   	Opts.ParseArguments(argc,argv,long_opts,long_only);
+   	foo(Opts);
+\end{verbatim}
+   the copy of Opts passed to foo will not contain any information from
+   the argv[] array.  But it will contain the profile information.
+   If you do a ChangeProfile() it will only effect the original to
+   the extent if it does the same ChangeProfile() the configuration
+   file will have already been parsed.
+  
+  
+   The core functionality is also available via C wrappers.
+  
+   The configuration files themselves are fairly simple.  They simple
+   listings  of the form:
+\begin{verbatim}                                        
+   	<varable>=<value>
+\end{verbatim}
+  
+   e.g.
+\begin{verbatim}                                        
+   	foo="689234 ksdf"
+   	fi=bar
+   	test=TRUE
+\end{verbatim}
+  
+   The one unique implementation detail, is alternate profiles may be
+   specified  within a configuration file.  The rules is simple.  The
+   default profile name is the file name.  To end the current profile
+   and begin a new one, simply list the new profile name followed by
+   a ':'.  e.g.
+  
+   	name=fido
+   	species=dog
+   	birthday=today
+   	
+   	# Lets begin an alternate profile for mycat
+  
+   	cats:
+   	name=fluffy
+   	species=cat
+   	birthday=tomorrow
+   	favorite-food=mice
+   	mice-eaten-this-week=5
+  
+   You can use quotes the same as in a shell script.  If you don't use
+   quotes, extra white spaces are stripped, and escape characters are used.
+   All of the following are equivalent.
+   e.g.
+   	test="This is a simple test.\nThis is only a test.\\"
+  
+   	test="This is a simple test.
+   	This is only a test.\\"
+  
+   	test= This is a simple test.\ 
+   	\nThis 		is only		a test.\\ 
+  
+   	test='This is a simple test.
+   	This is only a test.\'
+  
+   Be very careful of missing quotes...  */  
+
+/**  @memo parseoptions header file
+     @version $Id: parseoptions.h,v 1.8 1999-11-24 05:32:56 bcr Exp $
+     @author: $Author: bcr $ */
 
 // First we include some C wrappers for our class.
 // The purpose of the DjVuParseOptions class, is to give a standard
@@ -288,7 +292,10 @@ public:
   DjVuParseOptions(const char []);
 
   //** This constructor is for using an alternate configuration file */
-  DjVuParseOptions(const char [],const char []);
+  DjVuParseOptions(const char [],const char [],DjVuTokenList *VarTokens=0);
+
+  //** This reinitallizes with the above constructor */
+  void init(const char [],const char []);
 
   //** This is a copy constructor.  Arguments, and ErrorLists are not       */
   //** copied.   VarTokens, ProfileTokens, and Configuration are copied by  */
@@ -451,6 +458,9 @@ public:
 
   //** Assign a token if not already assigned and return it given the string */
   int SetToken(const char name[]);
+
+  //** Everybody needs friends */
+  friend void DjVuParseOptions::init(const char [],const char []);
 };
 //@}
 
@@ -550,8 +560,8 @@ class DjVuParseOptions::Profiles
 public:
   int size;
   char **values;
-  Profiles() : size(0), values(0) {};
-  ~Profiles() {delete [] values;};
+  Profiles();
+  ~Profiles();
   void Add(const int,const char []);
   inline const char * const GetValue(const int token) const
   {return (token<size)?values[token]:0;};
@@ -566,8 +576,8 @@ private:
 public:
   int links;
   Profiles *profiles;
-  ProfileList() : size(0),profiles(0) {};
-  ~ProfileList() {delete [] profiles;};
+  ProfileList();
+  ~ProfileList();
   void Add(const int,const int,const char []);
   int Grow(const int);
   inline const char *GetValue(const int profile ,const int var) const
