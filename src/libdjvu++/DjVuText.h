@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuText.h,v 1.16 2001-07-06 00:04:59 bcr Exp $
+// $Id: DjVuText.h,v 1.17 2001-07-06 16:15:57 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUTEXT_H
@@ -55,7 +55,7 @@
     @memo Implements support for DjVuImage hidden text.
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: DjVuText.h,v 1.16 2001-07-06 00:04:59 bcr Exp $# */
+    #$Id: DjVuText.h,v 1.17 2001-07-06 16:15:57 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -107,7 +107,7 @@ public:
         zone. */
     Zone *append_child();
     /// Find the text_start and text_end indicated by the given box.
-    void get_text_by_rect(
+    void get_text_with_rect(
       const GRect &box, int &string_start,int &string_end) const;
     /// Find the zones used by the specified string and append them to the list.
     void find_zones(
@@ -117,10 +117,12 @@ public:
     /** Finds the smallest rectangles and appends them to the list after 
       padding the smallest unit to fit width or height for the parent rectangle
       and adding the number of specified pixels. */
-    void get_smallest_pad(
-      GList<GRect> &list,const GRect &rect, const int padding=0) const;
+    void get_smallest(GList<GRect> &list,const int padding) const;
+    /// Find out this Zone's parent.
+    const Zone *get_parent(void) const;
   private:
     friend class DjVuTXT;
+    const Zone *zone_parent;
     void cleartext();
     void normtext(const char *instr, GUTF8String &outstr);
     unsigned int memuse() const;
@@ -205,7 +207,7 @@ public:
 
   GList<Zone *> find_text_in_rect(GRect target_rect, GUTF8String &text) const;
     /// Find the text specified by the rectangles.
-  GList<GRect> find_text_by_rect(
+  GList<GRect> find_text_with_rect(
     const GRect &box, GUTF8String &text, const int padding=0) const;
 
    // get all zones of zone type zone_type under node parent. zone_list
@@ -220,6 +222,12 @@ private:
   Zone	*	get_smallest_zone(int max_type, int start, int & end) const;
   GList<Zone *>	find_zones(int string_start, int string_length) const;
 };
+
+inline const DjVuTXT::Zone *
+DjVuTXT::Zone::get_parent(void) const
+{
+  return zone_parent;
+}
 
 
 class DjVuText : public GPEnabled

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuText.cpp,v 1.26 2001-07-06 00:04:59 bcr Exp $
+// $Id: DjVuText.cpp,v 1.27 2001-07-06 16:15:57 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -61,7 +61,7 @@ const char DjVuTXT::end_of_line      = 012;      // LF: Line Feed
 const int DjVuTXT::Zone::version  = 1;
 
 DjVuTXT::Zone::Zone()
-  : ztype(DjVuTXT::PAGE), text_start(0), text_length(0)
+  : ztype(DjVuTXT::PAGE), text_start(0), text_length(0), zone_parent(0)
 {
 }
 
@@ -72,6 +72,7 @@ DjVuTXT::Zone::append_child()
   empty.ztype = ztype;
   empty.text_start = 0;
   empty.text_length = 0;
+  empty.zone_parent=this;
   children.append(empty);
   return & children[children.lastpos()];
 }
@@ -358,7 +359,7 @@ intersects_zone(GRect box, const GRect &zone)
 }
 
 void
-DjVuTXT::Zone::get_text_by_rect(
+DjVuTXT::Zone::get_text_with_rect(
   const GRect &box, int &string_start, int &string_end) const
 {
   GPosition pos=children;
@@ -380,7 +381,7 @@ DjVuTXT::Zone::get_text_by_rect(
   {
     do
     {
-      children[pos].get_text_by_rect(box,string_start,string_end);
+      children[pos].get_text_with_rect(box,string_start,string_end);
     } while(++pos);
   }
 }
@@ -435,18 +436,19 @@ DjVuTXT::Zone::get_smallest(GList<GRect> &list) const
 }
 
 void
-DjVuTXT::Zone::get_smallest_pad(
-   GList<GRect> &list,const GRect &xrect, const int padding) const
+DjVuTXT::Zone::get_smallest( 
+  GList<GRect> &list, const int padding) const
 {
   GPosition pos=children;
   if(pos)
   {
     do
     {
-      children[pos].get_smallest_pad(list,rect,padding);
+      children[pos].get_smallest(list,padding);
     } while (++pos);
-  }else if(xrect.contains(rect))
+  }else if(zone_parent && zone_parent->ztype >= PARAGRAPH)
   {
+    const GRect &xrect=zone_parent->rect;
     if(xrect.height() <= xrect.width())
     {
       list.append(GRect(rect.xmin-padding,xrect.ymin-padding,rect.xmax+padding,xrect.ymax+padding));
@@ -557,13 +559,13 @@ DjVuTXT::find_zones(int string_start, int string_length) const
 }
 
 GList<GRect>
-DjVuTXT::find_text_by_rect(
+DjVuTXT::find_text_with_rect(
   const GRect &box, GUTF8String &text, const int padding) const
 {
   GList<GRect> retval;
   int text_start=0;
   int text_end=0;
-  page_zone.get_text_by_rect(box,text_start,text_end);
+  page_zone.get_text_with_rect(box,text_start,text_end);
   if(text_start != text_end)
   {
     GList<Zone *> zones;
@@ -575,8 +577,7 @@ DjVuTXT::find_text_by_rect(
       {
         if(padding >= 0)
         {
-          GRect rect;
-          zones[pos]->get_smallest_pad(retval,rect,padding);
+          zones[pos]->get_smallest(retval,padding);
         }else
         {
           zones[pos]->get_smallest(retval);
