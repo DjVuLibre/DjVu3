@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.97 1999-12-06 21:14:34 bcr Exp $
+//C- $Id: DjVuFile.cpp,v 1.98 1999-12-09 03:49:52 bcr Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -473,7 +473,14 @@ DjVuFile::process_incl_chunk(ByteStream & str, int file_num)
       GP<DjVuFile> file=(DjVuFile *) pcaster->id_to_file(this, incl_str).get();
       if(recover_errors != ABORT) file->set_recover_errors(recover_errors);
       if(verbose_eof) file->set_verbose_eof(verbose_eof);
-      if (!file) THROW("Internal error: id_to_file() didn't create any file.");
+      if (!file)
+      {
+        const char mesg[]="Internal error: id_to_file(%1.1023s) did not create any file.";
+        char buf[1024+sizeof(mesg)];
+        sprintf(buf,mesg,(const char *)incl_str);
+        abort();
+        THROW(buf);
+      }
       pcaster->add_route(file, this);
       
 	 // We may have been stopped. Make sure the child will be stopped too.
@@ -554,7 +561,8 @@ DjVuFile::process_incl_chunks(void)
          for(;(chunks_left--)&&(chksize=iff.get_chunk(chkid));last_chunk=chunks)
          {
             chunks++;
-	    if (chkid=="INCL") process_incl_chunk(iff, incl_cnt++);
+	    if (chkid=="INCL")
+              process_incl_chunk(iff, incl_cnt++);
 	    iff.seek_close_chunk();
          }
          if (chunks_number < 0) chunks_number=last_chunk;
@@ -1326,7 +1334,8 @@ DjVuFile::trigger_cb(void)
    flags|=DATA_PRESENT;
    get_portcaster()->notify_file_flags_changed(this, DATA_PRESENT, 0);
 
-   if (!are_incl_files_created()) process_incl_chunks();
+   if (!are_incl_files_created())
+     process_incl_chunks();
 
    bool all=true;
    {
@@ -1379,7 +1388,8 @@ DjVuFile::move(GMap<GURL, void *> & map, const GURL & dir_url)
 
       url=dir_url+url.name();
 
-      if (!are_incl_files_created()) process_incl_chunks();
+      if (!are_incl_files_created())
+        process_incl_chunks();
 
       GPList<DjVuFile> list=get_included_files(false);
       for(GPosition pos=list;pos;++pos)

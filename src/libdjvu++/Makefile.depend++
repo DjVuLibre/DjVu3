@@ -78,6 +78,8 @@ DjVuFileCache.o: DjVuFileCache.cpp DjVuFileCache.h \
  IFFByteStream.h DjVuPalette.h DjVuPort.h \
  GURL.h DjVuNavDir.h debug.h
 DjVuGlobal.o: DjVuGlobal.cpp DjVuGlobal.h
+DjVuGlobalMemory.o: DjVuGlobalMemory.cpp
+DjVuGlobalUnix.o: DjVuGlobalUnix.cpp
 DjVuImage.o: DjVuImage.cpp DjVuImage.h \
  GString.h DjVuGlobal.h GException.h \
  GSmartPointer.h GThreads.h ByteStream.h \
