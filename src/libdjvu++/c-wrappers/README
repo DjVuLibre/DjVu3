@@ -14,7 +14,7 @@ This directory contains the following header files:
 	disk to disk operations.
 
  4. DjVuPhotoAPI.h
-	Defines the functions needed to encode photo's with disk to
+	Defines the functions needed to encode photos with disk to
 	disk operations.
 
  5. DjVuDocumentAPI.h
@@ -26,7 +26,7 @@ This directory contains the following header files:
 	disk operations.
 
  7. DjVuAPI.h
-	Defines the functions needed to do operations 2-4 with 
+	Defines the functions needed to do operations 2-5 with 
 	memory to disk, disk to memory, and memory to memory operations.
 
  8. DjVuPriv.h

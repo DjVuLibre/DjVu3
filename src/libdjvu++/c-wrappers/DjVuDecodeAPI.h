@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuDecodeAPI.h,v 1.25 2000-03-08 22:59:46 bcr Exp $
+ *C- $Id: DjVuDecodeAPI.h,v 1.26 2000-03-09 22:27:59 bcr Exp $
  */
 
 #ifndef _DJVUDECODE_H_
@@ -16,7 +16,7 @@
 
 /** @name DjVuDecodeAPI.h
     
-    @memo #DjVuDecodeAPI.h# defines the API for decoding multi page documents.
+    @memo #DjVuDecodeAPI.h# defines the API for decoding multi-page documents.
     The structures defined here are also used for some of the encoding
     functions.
     @author
@@ -27,7 +27,10 @@
 
 /*
  * $Log: DjVuDecodeAPI.h,v $
- * Revision 1.25  2000-03-08 22:59:46  bcr
+ * Revision 1.26  2000-03-09 22:27:59  bcr
+ * Updated the documentation, again.
+ *
+ * Revision 1.25  2000/03/08 22:59:46  bcr
  * Updated the documentation.  I'm using Leon's libdjvu++ documentation
  * as a template.
  *
@@ -70,10 +73,11 @@ extern "C"
 #endif /* __cplusplus */
 
 
-/** @memo #djvu_transform_options# preprocessing of images.
+/** @memo #djvu_transform_options# contains options for 
+   preprocessing of images.
 
    The #djvu_transform_options# structure defines the options
-   used by all the decoding API and some encoding API's for
+   used by all the decoding API and some encoding APIs for
    transforming the image.
 */
 struct djvu_transform_options_struct
@@ -98,30 +102,49 @@ struct djvu_transform_options_struct
      as the #tobitonal# option.  Set #tobitonal# to a non-zero value to
      perform this conversion. */
   int tobitonal;
-  /** The #invert# option exchanges black with white and white with black
-     in a bitonal (RLE) image.  There will be no effect on color and gray
-     scale documents unless the #togray# and #tobitonal# flags have also
-     been used respectively.  Set #invert# to a non-zero value to perform
-     this conversion. */
+  /** The #invert# option swaps black and white in a bitonal (RLE) image.
+     There will be no effect on color and gray scale documents unless the
+     #tobitonal# flag has also been used.  Set #invert# to a non-zero value
+     to perform this conversion. */
   int invert;
-  /** Specify the absolute size desired.  0,0 has the special meaning of 
-     being unresized. */
-  int hsize,vsize;
-  /** The amount to upsample the horizontal axis. */
+  /** Specify the horizontal size in pixels of the transformed image.
+      0 has the special meaning of deactivating this option. */
+  int hsize;
+  /** Specify the vertical size in pixels of the transformed image.
+      0 has the special meaning of deactivating this option. */
+  int vsize;
+  /** The amount to upsample the horizontal axis.  A value of 0 or 1 may be
+      used to disable upsampling. */
   int hupsample;
-  /** The amount to subsample the horizontal axis. */
+  /** The amount to subsample the horizontal axis.  A value of 0 or 1 may be
+      used to disable supsampling. */
   int hsubsample;
-  /** The amount to upsample the vertical axis. */
+  /** The amount to upsample the vertical axis.  A value of 0 or 1 may be
+      used to disable upsampling. */
   int vupsample;
-  /** The amount to subsample the vertical axis. */
+  /** The amount to subsample the vertical axis.  A value of 0 or 1 may be
+      used to disable supsampling. */
   int vsubsample;
   /** The values xmin, ymin, seg_width, and seg_height, allow cropping
       (segmentation) of the image. */
-  int xmin, ymin, seg_width, seg_height;
+  int xmin;
+  /** The values xmin, ymin, seg_width, and seg_height, allow cropping
+      (segmentation) of the image.  To disable this option, set all four
+      values to 0. */
+  int ymin;
+  /** The values xmin, ymin, seg_width, and seg_height, allow cropping
+      (segmentation) of the image.  To disable this option, set all four
+      values to 0. */
+  int seg_width;
+  /** The values xmin, ymin, seg_width, and seg_height, allow cropping
+      (segmentation) of the image.  To disable this option, set all four
+      values to 0. */
+  int seg_height;
   /** The #dpi# option will override the dpi value specified in the file.
      The image itself is left unmodified, but the rendering and compression
      will be effected.  To use the #dpi# information in the image, then
-     set this value to 0. */
+     set this value to 0.  A negative value may be supplied to indicate
+     a hint value. */
   int dpi;
 #ifdef __cplusplus
   inline djvu_transform_options_struct();
@@ -142,42 +165,45 @@ struct djvu_process_options_struct
       the pages that should be parsed. */
   const char *page_range;
 
-  /** warnfileno should be non-zero to print warning messages that may
-    effect the processing.  If this is zero, then warnings will be
+  /** warnfileno should be a non-zero fileno to print warning messages that
+    may effect the processing.  If this is zero, then warnings will be
     spooled like error messages.  This will likely make the output less
     intuitive, since unlike errors, processing continues even after a 
     warning is issued. */
   int warnfileno;
 
-  /** logfileno should be non-zero to print verbose processing details */
+  /** logfileno should be a non-zero fileno to print verbose processing
+      details */
   int logfileno;
 
-  /** #helpfileno# should be non-zero to print usage instructions. */
+  /** #helpfileno# should be non-zero fileno to print usage instructions. */
   int helpfileno;
 
-  /** list of input filenames being the last */
+  /** #filelist# is an array listing of input filenames.  Set this to zero
+      if you wish to use an input_stream instead. */
   const char * const * filelist;
 
-  /** Number of files in filelist */
+  /** #filecount# is the number of files in filelist. */
   int filecount;
 
-  /** You can an import stream.  If you specify both a filelist and an import
-    stream, then the file list will be exhausted first, then the input_stream
-    will be used. */
+  /** #input_stream# specifies a \Ref{djvu_import} stream to read input from.
+    If you specify both a filelist and an import stream, then the file list
+    will be exhausted first, then the #input_stream# will be used. */
   djvu_import input_stream;
 
-  /** The output filename (or directory) */
+  /** #output# contains the output filename (or directory.) */
   const char *output;
 
   /** Instead of specifying an output filename, you can define a 
-    djvu_export stream as defined in DjVuAPI.h.  When using an output_stream
-    output should be set to zero.  */
+    \Ref{djvu_export} stream as defined in \Ref{DjVuAPI.h}.  When using an
+    #output_stream# \Ref{output} should be set to zero.  */
   djvu_export output_stream;
 
-  /** The program name */
+  /** #prog# is the program name that will be in messages. */
   const char *prog;
 
-  /** This is where all memory is allocated and errors are listed. */
+  /** The #priv# pointer is where all memory is allocated and errors are
+     stored. */
   void *priv;
 
 #ifdef __cplusplus
@@ -200,14 +226,19 @@ struct djvu_decode_options_struct
      errors. */
   djvu_process_options process;
 
-  /** The \Ref{djvu_transform_options} structure, #transform, defines the
+  /** The \Ref{djvu_transform_options} structure, #transform#, defines the
     preprocessing that should be done while rendering. */
   djvu_transform_options transform;
 
   /** #output_format# is string, that indicates the output format, specified
-    by the normal file extension of "pnm","ppm","pgm","pbm","tif","jpg",
-    "ps", or "pict".  The special value of "auto" or a NULL pointer means to 
-    try and decide the output format based on the output file's extension. */
+    by the normal file extension of "pnm", "tif", "jpg", "ps", or
+    "pict".  Other extensions such as "ppm", "pgm", "pbm", "tiff", "jpeg",
+    "pdf", "tiff" are legal, but simply treated as the same as one of 
+    the primary primary extensions.  As an example, if the user specifies
+    "pgm", it will be treated as "pnm" and the output could be color or 
+    bitonal instead "gray" as "pgm" implies.  The special value of "auto" or
+    a NULL pointer means to try and decide the output format based on the
+    output file's extension. */
   const char *output_format;
 
   /** This specifies the layer to decode.
@@ -263,9 +294,13 @@ DJVUAPI
 #endif
 /** ++ This is the primary allocation routine for the
     #djvu_decode_options#.  Even if the values specified are
-    illegal, an options structure will always be returned. */
+    illegal, an options structure will always be returned.  The
+    #parse# value may be specified if an \Ref{djvu_parse} structure
+    has already been created; otherwise, a value of NULL should be
+    used. */
 djvu_decode_options *
-djvu_decode_options_alloc(struct djvu_parse *,int,const char * const argv[]);
+djvu_decode_options_alloc(
+  struct djvu_parse *parse,int argc,const char * const argv[]);
 
 DJVUAPI
 #if 0
@@ -288,9 +323,9 @@ DJVUAPI
 #if 0
 ;
 #endif
-/** ++ A non-zero value indicates there are error messages.  Error
-    messages are generated for both fatal errors, and errors
-    that are recovered from.  */
+/** ++ A non-zero value indicates there are error messages on the
+    stack.  Error messages are generated for fatal errors, and
+    some non-fatal errors.  */
 int djvu_decode_haserror(const djvu_decode_options [1]);
 
 DJVUAPI
@@ -322,14 +357,16 @@ DJVUAPI
 #if 0
 ;
 #endif
-/** ++ Prints all the errors to stderr. */
+/** ++ Prints all the errors to stderr. When #mesg# is not NULL, #mesg# is
+  printed first followed by a colon and a blank before each error message. */
 void djvu_decode_perror(djvu_decode_options [1],const char *mesg);
 
 DJVUAPI
 #if 0
 ;
 #endif
-/** ++ This will print usage instructions to the specified output. */
+/** ++ #djvu_decode_usage# will print usage instructions to the specified
+  fileno. */
 void djvu_decode_usage(int fd,const char *prog);
 
 /*@}*/

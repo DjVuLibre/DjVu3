@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuBitonalAPI.h,v 1.12 2000-03-08 22:59:46 bcr Exp $
+ *C- $Id: DjVuBitonalAPI.h,v 1.13 2000-03-09 22:27:59 bcr Exp $
  */
 
 #ifndef _DJVUBITONAL_H_
@@ -25,7 +25,10 @@
 
 /* 
  * $Log: DjVuBitonalAPI.h,v $
- * Revision 1.12  2000-03-08 22:59:46  bcr
+ * Revision 1.13  2000-03-09 22:27:59  bcr
+ * Updated the documentation, again.
+ *
+ * Revision 1.12  2000/03/08 22:59:46  bcr
  * Updated the documentation.  I'm using Leon's libdjvu++ documentation
  * as a template.
  *
@@ -67,19 +70,20 @@ extern "C"
 #endif
 
 
-/** @memo #djvu_jb2_options# fine tune compression quality and speed.
+/** @memo #djvu_jb2_options# fine tunes compression quality and speed.
 
     This structure defines the options used by \Ref{djvu_bitonal}.
     Each field correspends to command line options of the corresponding
-    untility programs.
+    utility programs.
 */
 struct djvu_jb2_options_struct
 {
-  /** #pages_per_dict# allows n number of pages to be matched together.
-      This value should never be too high or too low. Best values are
-      between 10 to 20.  A value of 1 has the special meaning of 
-      not using a shared dictionary, and should be when fewer than
-      ten or so pages are being processed. */
+  /** #pages_per_dict# allows n number of pages to be matched together
+      and joined with a common shared dictionary.  This value should never
+      be too high or too low. Best values are between 10 to 20.  A value
+      of 1 has the special meaning of not using a shared dictionary, and
+      should be when fewer than ten or so pages are being processed, or
+      when you expect very few matching shapes (e.g. hand drawn text). */
   int pages_per_dict;
 
   /** The #compression# field specifies how aggressive compression is.
@@ -91,7 +95,7 @@ struct djvu_jb2_options_struct
 
   /** Halftone detection is used for dithered images.  The default
       of zero, means halftone detection is on.  When the #disable_halftone#
-      option is none zero, the JB2 encoder will not check for dithering.
+      option is non-zero, the JB2 encoder will not check for dithering.
       If the document is not dithered, the result of #disable_halftone# is
       to reduce the compression time.  You should not set #disable_halftone#
       for documents that really are dithered. */
@@ -111,10 +115,12 @@ inline djvu_jb2_options_struct();
 typedef struct djvu_jb2_options_struct djvu_jb2_options;
 
 
-/** @memo #bitonaltodjvu_options# lists options corresponding to bitonaltodjvu.
+/** @memo #bitonaltodjvu_options# lists options corresponding to
+    \URL[bitonaltodjvu]{../bitonaltodjvu.html}.
 
     The values of the #bitonaltodjvu_options# correspond to
-    the command line options of the bitonaltodjvu utility.
+    the command line options of the \URL[bitonaltodjvu]{../bitonaltodjvu.html}
+    utility.
 */
 
 struct bitonaltodjvu_options_struct
@@ -150,54 +156,58 @@ DJVUAPI
 #if 0
 ;
 #endif
-/** ++ This is the primary allocation routine for bitonaltodjvu_options.
-    Even if the values specified are illegal, an options structure
-    will be returned. */
+/** ++ #bitonaltodjvu_options_alloc# is the primary allocation routine for 
+    \Ref{bitonaltodjvu_options}.  If a \Ref{djvu_parse} structure has been
+    declared, it may be passed to the #bitonaltodjvu_options_alloc# routine.
+    Otherwise a NULL value should be passed as the parse value.  Even if the
+    values specified are illegal, an options structure will be returned. */
 bitonaltodjvu_options *
-bitonaltodjvu_options_alloc(struct djvu_parse *,int,const char * const argv[]);
+bitonaltodjvu_options_alloc(
+  struct djvu_parse *parse,int argc,const char * const argv[]);
 
 DJVUAPI
 #if 0
 ;
 #endif
-/** ++ Deallocates the fields of the bitonaltodjvu_options structure.
-    You should always use the free option, even if you did not use alloc
-    so the data pointed to by priv is freed. */
+/** ++ #bitonaltodjvu_options_free# deallocates the fields of the
+    \Ref{bitonaltodjvu_options} structure.  You should always use the
+    free option, even if you did not use alloc so the data pointed to by
+    priv pointer is freed. */
 void bitonaltodjvu_options_free(bitonaltodjvu_options *);
 
 DJVUAPI
 #if 0
 ;
 #endif
-/** ++ This function converts the bitonal input files to a multipage
+/** ++ #bitonaltodjvu# converts the bitonal input files to a multipage
     DjVu document according to the options structure.
     Depending on the type of the input data, the function uses the
-    A non-zero return value indicates a fatal error. */
+    a non-zero return value indicates a fatal error. */
 int bitonaltodjvu(bitonaltodjvu_options[1]);
 
 DJVUAPI
 #if 0
 ;
 #endif
-/** ++ A non-zero value indicates there are error messages.  Error
-    messages are generated for both fatal errors, and errors
-    that are recovered from.  */
+/** ++ #bitonaltodjvu_haserror# returns a non-zero value indicates there are
+    error messages on the stack.  Error messages are generated for both fatal
+    and some non-fatal errors. */
 int bitonaltodjvu_haserror(const bitonaltodjvu_options [1]);
 
 DJVUAPI
 #if 0
 ;
 #endif
-/** ++ A non-zero value indicates there are warning messages.  Waring
-    messages are generated for non-fatal problems, that may be an
-    error, or could just be abnormal usage. */
+/** ++ #bitonaltodjvu_haswarning# returns a non-zero value indicates there are
+    warning messages on the stack.  Warning messages are generated for both
+    non-fatal problems, and some types of abnormal usage. */
 int bitonaltodjvu_haswarning(const bitonaltodjvu_options [1]);
 
 DJVUAPI
 #if 0
 ;
 #endif
-/** ++ Returns a string of the first error message on the stack.  Each
+/** ++ #bitonaltodjvu_error# pops the first error message off the stack.  Each
     call erases the previous return value. */
 const char * bitonaltodjvu_error(bitonaltodjvu_options [1]);
 
@@ -205,22 +215,24 @@ DJVUAPI
 #if 0
 ;
 #endif
-/** ++ Returns a string of the first warning message on the stack.  Each
-    call erases the previous return value. */
+/** ++ #bitonaltodjvu_warning# pops the first warning message off the stack.
+    Each call erases the previous return value. */
 const char * bitonaltodjvu_warning(bitonaltodjvu_options [1]);
 
 DJVUAPI
 #if 0
 ;
 #endif
-/** ++ Prints all the errors to stderr.  */
+/** ++ #bitonaltodjvu_perror# prints all the errors to stderr, and removes
+  them from the stack.  If mesg is not NULL, the mesg string will be printed
+  followed by a colon and a blank befor each error message.  */
 void bitonaltodjvu_perror(bitonaltodjvu_options [1],const char *mesg);
 
 DJVUAPI
 #if 0
 ;
 #endif
-/** ++ This will print usage instructions to the specified output. */
+/** ++ This will print usage instructions to the specified fileno. */
 void bitonaltodjvu_usage(int fd,const char *prog);
 
 /*@}*/

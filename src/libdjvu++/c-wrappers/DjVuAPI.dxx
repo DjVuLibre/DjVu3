@@ -42,7 +42,7 @@
     site content developers have been unable to leverage existing printed
     materials.
     
-    The DjVu image compression technology \URL{http://www.djvu.att.com/}
+    The DjVu image compression technology \URL{http://www.djvu.com/}
     addresses this problem.  Content developers can scan high-resolution color
     pages of books, magazines, catalogs, manuals, historical or ancient
     documents.  The DjVu document format provides the means to compress these
@@ -58,8 +58,8 @@
        Photo DjVu Image files are best used for encoding photographic images
        in colors or in shades of gray.  The images are coded using the IW44
        wavelet representation optimized for fast progressive rendering.
-    \item[Bilevel DjVu Image.]
-       Bilevel DjVu Image files are best used to compress black and white
+    \item[Bitonal DjVu Image.]
+       Bitonal DjVu Image files are best used to compress black and white
        images representing text and simple drawings.  The JB2 data compression
        model uses a the "soft pattern matching" technique which essentially
        consists of encoding each character by describing how it differs from a
@@ -68,7 +68,7 @@
        Compound DjVu Image files are an extremely efficient way to compress
        high resolution color document images containing both pictures and
        text, such as a page of a magazine.  Compound DjVu Images represent the
-       document images using two layers.  The {\em background layer} is used
+       document image using two layers.  The {\em background layer} is used
        for encoding the pictures and the paper texture.  The {\em foreground
        layer} is used for encoding the text and the drawings.
    \end{description}
@@ -77,10 +77,10 @@
    Photo DjVu Images but use a simpler file format.  There are two variants of
    IW44 files for gray level images and color images.
 
-  {\bf DjVu Reference Library} --- The DjVu Reference Library implements the
+  {\bf DjVu Reference Library} --- The #DjVu Reference Library# implements the
   components of the DjVu technology that are essential for the definition of
   the file formats.  AT&T Labs \URL{http://www.att.com/attlabs}
-  releases the full source code of the DjVu Reference Library under the terms
+  releases the full source code of the #DjVu Reference Library# under the terms
   of the \Ref{AT&T Source Code License}.
 
   {\bf DjVu Software Development Kit (SDK)} --- The DjVu SDK defines
@@ -89,10 +89,10 @@
   DjVu.
 
   Our experience has been there are two different categories of use for
-  DjVu code.  Multi-threaded code for interactive viewing of documents,
+  DjVu code:  Multi-threaded code for interactive viewing of documents,
   and single threaded code that needs to compress documents.
-  {\bf DjVu Reference Library} is very well suited for multi-threaded 
-  GUI code.  The DjVu SDK is designed for the later case.  Even with
+  The {\bf DjVu Reference Library} is very well suited for multi-threaded 
+  GUI code.  The DjVu SDK is designed for the latter case.  Even with
   programs like DjVu Shop which do both, it still greatly simplies
   the source code to keep the compression and rendering tasks separate.
 
@@ -116,32 +116,33 @@
   \item[DjVu Multi-Page API.]
     As defined in \Ref{DjVuMultiAPI.h}, this provides a C interface for
     manipulating multi-page documents.  The \Ref{djvubundle utility} and
-    the \Ref{djvujoin utility} are simple command line implimentations of
+    the \Ref{djvujoin utility} are simple command line implementations of
   the {\bf DjVu Multi-Page API}.
   \item[DjVu Decode API.]
     As defined in \Ref{DjVuDecodeAPI.h}, this provides a C interface for
     exporting DjVu documents to other graphic formats.
-    The \Ref{djvudecode utility} and other decoding programs are implimentation
-    of the {\bf DjVu Decode API}.  For GUI programs designed to display DjVu
-    documents, we recommend using the {\bf DjVu Reference Library}.  
+    The \Ref{djvudecode utility} and other decoding programs are
+    implementations of the {\bf DjVu Decode API}.  For GUI programs designed
+    to display DjVu documents, we recommend using the
+    {\bf DjVu Reference Library}.  
   \item[DjVu Bitonal API.]
     As defined in \Ref{DjVuBitonalAPI.h}, this provides a C interface for
-    converting files to {\bf Bilevel DjVu Image} documents.
-    The \Ref{bitonaltodjvu utility} is a simple command line implimentation of
+    converting files to {\bf Bitonal DjVu Image} documents.
+    The \Ref{bitonaltodjvu utility} is a simple command line implementation of
     this API.
   \item[DjVu Photo API.]
     As defined in \Ref{DjVuPhotoAPI.h}, this provides a C interface for
     converting files to {\bf Photo DjVu Image} documents.
-    The \Ref{phototodjvu utility} is a simple command line implimentation of
+    The \Ref{phototodjvu utility} is a simple command line implementation of
     this API.
   \item[DjVu Document API.]
     As defined in \Ref{DjVuDocumentAPI.h}, this provides a C interface for
     converting files to {\bf Compound DjVu Image} documents.
-    The \Ref{documenttodjvu utility} is a simple command line implimentation
+    The \Ref{documenttodjvu utility} is a simple command line implementation
     of this API.
   \end{description}
 
-  Using the five primary API's it is possible to impliment all the SDK utilities
+  Using the five primary API's it is possible to implement all the SDK utilities
   except {\bf djvureindex}.  The functionality neccissary for {\bf djvureindex}
   is not included to discourage usage of the old multi-page format.
   However, programmers often need to do program things that can not
@@ -155,12 +156,12 @@
 
   \begin{description}
   \item[DjVuAPI]
-  As defined in \Ref{DjVuAPI.h} this API defines the neccissary functions
+  As defined in \Ref{DjVuAPI.h}, this API defines the neccessary functions
   and structures needed to do memory and callback operations with the
   \Ref{DjVuDecodeAPI.h}, \Ref{DjVuBitonalAPI.h}, \Ref{DjVuPhotoAPI.h},
   and \Ref{DjVuDocumentAPI.h}.
   \item[DjVu Global API]
-  As defined in \Ref{DjVu.h} the global API defines functions for 
+  As defined in \Ref{DjVu.h}, the global API defines functions for 
   memory overloads, progress monitoring, and command line/configuration
   file parsing.
   \end{description}
@@ -169,7 +170,7 @@
   a DjVu application developer except one.  How do we allow the 
   developer complete control over processes like image segmentation 
   which requires approximately 40 separate variable settings to be
-  tuned properly with out requiring the DjVu application developer
+  tuned properly without requiring the DjVu application developer
   understanding exactly what each variable does and what settings the
   the end user of the application will need?  Even members of the DjVu
   development team do not know the effects of all the configuration
@@ -177,262 +178,15 @@
 
   The answer to this perplexing problem was to introduce profiles.  Old
   fortran programs can think of these as datacards, and young C programmers
-  can thing of them as Makefiles.  Regardless of how you prefere to think
+  can thing of them as Makefiles.  Regardless of how you prefer to think
   of them, the idea is simple.  A \URL[profile]{../djvuprofile.html} defines
   a commonly used set of options.  Instead of specifying all the options
   in a command line argument, or argv[] vector, it is sufficient just to
   specify the profile name that contains all the options.  
 */
   
-
-
 //----------------------------------------
-/** @name Getting Started (Ignore For Now)
- */
-//@{
-
-/** @name Compiling the Library (Unix)
-
-
-    {\bf Directories} --- The structure of the distribution is essentially
-    flat.  All the source code files, for both the library and the utility
-    programs, are found in the main directory #"libdjvu++"#.  A few
-    subdirectories contain accessory material.  Directory #"Doc"# contains
-    the HTML documentation generated from the source files.  Directory
-    #"Samples"# contains sample DjVu files for testing purposes.  Directory
-    #"Test"# contains a few test programs for the library basic features.
-    
-    {\bf Prerequisites} --- The DjVu Reference Library should compile and run
-    on any well behaved Unix system, {\em provided that you use a good C++
-    compiler} supporting templates, exceptions and possibly multithreading.
-    Workstation makers usually provide good compilers.  You can certainly
-    compile and run the library with these compilers if you find out which
-    options apply to your system and your particular version of the compiler.
-    We find that there are just too many different compilers around.  This is
-    why we recommend using #gcc# or #egcs#.
-
-    You can safely proceed to the compilation if you have #gcc-2.8.x# or any
-    version #egcs# greater than #egcs-1.0.2#.  Use command #g++ -v# to find
-    out what is installed on your system.  If you have an earlier version of
-    #g++# such as #gcc-2.7.23#, you must upgrade because it is not going to
-    work.  We strongly recommend upgrading directly to #egcs-1.1.1# or better.
-    The easiest way consists of picking a binary distribution somewhere on the
-    Internet.  Linux users may have a look at \URL{http://www.gcc.ml.org} or
-    \URL{http://rufus.w3.org/linux/RPM}.
-
-    {\bf Building your compiler (advanced)} --- You should really skip this
-    section if you can avoid reading it.  You should only read it if (a) you
-    cannot find a suitable binary distribution of #egcs#, or (b) you want to
-    experiment with the multi-threading features of the library.
-
-    Building the #egcs# compilers requires GNU Make.  The Linux operating
-    systems uses GNU Make by default.  Many Unix systems provide GNU Make
-    under the name #gmake#.  You must otherwise download the source code at
-    \URL{ftp://gatekeeper.dec.com/pub/GNU/make} or
-    \URL{ftp://prep.ai.mit.edu/pub/gnu}, unpack it, read the instructions,
-    compile and install.
-
-    You must then download the source distribution of the latest release of
-    #egcs# from \URL{http://egcs.cygnus.com}.  We provide a small patch for
-    #"egcs/gcc/libgcc2.c"# which is required by our multi-threading code.
-    You can apply the patch using command #patch#. 
-    \begin{verbatim}
-      % cd egcs/gcc
-      % patch < $HOME/libdjvu++/@Tools/libgcc2.c.diff
-      Patching file libgcc2.c using Plan A...
-      Hunk #1 succeeded at 3063.
-      Hunk #2 succeeded at 3118.
-      done
-    \end{verbatim}
-    This patch has been tested with #egcs-1.1#, #egcs-1.1.1# and #gcc-2.95#.
-    We hope that the EGCS people will either include the patch in their future
-    releases, or provide a similar capability.  If anything suspicious happens
-    during the patching process, we suggest that you restore the original
-    version of #"libgcc2.c"# which is automatically saved as
-    #"libgcc2.c.orig"#.
-
-    You must then configure and compile #egcs#.  Everything is pretty well
-    described at \URL{http://egcs.cygnus.com}.  I could use for instance the
-    following commands on my SGI workstation running Irix-6.5:
-    \begin{verbatim}
-      % cd egcs
-      % configure --prefix=$HOME/egcs  mips-sgi-irix-5.3
-      % gnu-make
-      % gnu-make install
-    \end{verbatim}
-    You are reading correctly: We are pretending that the workstation has
-    Irix-5.3 because we want to create backward compatible binaries.  Welcome
-    to the wonderful world of compilers.
-
-    {\bf Compiling the DjVu Reference Library} --- Compiling the DjVu
-    Reference Library is a two step process.  You must first invoke the script
-    #configure# which searches the compiler, selects the compilation options
-    and creates the makefiles.
-    \begin{verbatim}
-       % configure --prefix=$HOME/djvu
-    \end{verbatim}
-
-    You can specify a particular compiler by setting environment variable
-    #CXX# before invoking the configuration script. This script also 
-    supports the following options:
-    \begin{description}
-    \item[--prefix=PREFIXDIR] indicates where the binary files will be installed.
-    \item[--with-debug] enables the debugging options of the compiler.
-    \item[--with-cxxflag=FLAG] passes a particular option to the compiler.
-    \item[--without-threads] disables multi-threading (the default).
-    \item[--with-threads=(cothreads,posix,dce)] enables multithreading and
-         selects a multithreading implementation (see \Ref{GThreads.h}). You
-         must make sure that your C++ compiler is compatible with the chosen
-         thread implementation.  The safest option consists of using the
-         patched version of #egcs# (see above) and the #cothreads#
-         implementation.
-    \end{description}
-
-    You are now ready to compile and install everything by typing:
-    \begin{verbatim}
-       % make all
-       % make install
-    \end{verbatim}
-
-    {\bf Using the DjVu Reference Library} --- At this point, you have
-    generated a collection of small executables documented in section
-    \Ref{Utility Programs}.  This is not very exciting.  It is now time to
-    remember that the DjVu Reference Library is a source code library.  Almost
-    everything you can use safely is documented in section 
-    \Ref{Library Reference}.  You may want however to start with 
-    section \Ref{Decoding DjVu Content}.  */
-
-
-/** @name Compiling the Library (Systems other than Unix)       
-
-   This library compiles without modification under Windows using Visual C++
-   version 5.0.  It should also compile under MacOS using the MetroWerks
-   compiler, although some system dependent functions are still missing.  In
-   both cases however, you have to provide your makefile (or your project, or
-   your workspace or whatever) using the Unix makefiles as a template.
-
- */
-
-
-/** @name Decoding DjVu Content
-
-    Classes \Ref{DjVuImage} and \Ref{DjVuDocument} provide the preferred way
-    to decode the contents of a DjVu file.  The complete documentation is
-    found in section \Ref{DjVuDocument.h}, \Ref{DjVuImage.h} and
-    \Ref{DjVuFile}.  You may also consult the source code of programs
-    \Ref{ddjvu} and \Ref{djvm}.
-
-    The DjVu Reference Library uses a two stage decoding model. 
-    \begin{itemize}
-    \item The first stage, called {\em decoding}, consists of analyzing a DjVu
-          or IW44 file and constructing a partially decoded representation of
-          the image in memory.  This partially decoded representation requires
-          much less memory (typically 1-2 MBytes) than the raw image
-          (typically 20-30 MBytes).  
-    \item The second stage, called {\em rendering}, consists of using this
-          representation to recreate the pixels for any part of the image at
-          any resolution.  You should render {\em on-the-fly} the part of the
-          image that you actually wish to display.  This strategy minimizes
-          both the memory and the computational requirements.
-    \end{itemize}
-
-    An example of decoding a multipage DjVu document is shown below.
-    First you create \Ref{DjVuDocument} and call
-    \Ref{DjVuDocument::init} with a proper file URL.  This function
-    starts a thread which decodes the document structure (i.e. the
-    number of pages, the page names, etc.).  You can use function
-    \Ref{DjVuDocument::wait_for_complete_init} to wait for the
-    termination of this thread and check its result.  Then you can use
-    function \Ref{DjVuDocument::get_page} to obtain a \Ref{DjVuImage}
-    for a given page number.  This function starts a thread which
-    decodes the image data. Again you can call function
-    \Ref{DjVuImage::wait_for_complete_decode} to wait for the
-    termination of this thread and check its result.
-
-    \begin{verbatim}
-      GP<DjVuDocument> doc = new DjVuDocument;
-      // Decode the document structure
-      doc->init(GOS::filename_to_url("file.djvu"));
-      if (! doc->wait_for_complete_init())
-        THROW("A decoding error has occured");      
-      // Decode a page
-      GP<DjVuImage> dimg = doc->get_page(2);
-      if (! dimg->wait_for_complete_decode() )
-        THROW("A decoding error has occured");
-    \end{verbatim}
-
-    Note: When the reference library is compiled without threads, both functions
-    \Ref{DjVuDocument::init} and \Ref{DjVuDocument::get_page} perform their
-    task before returning.  The functions \Ref{DjVuDocument::wait_for_complete_init}
-    and \Ref{DjVuImage::wait_for_complete_decode} do not wait, but are still
-    useful for testing that the operation was successful.
-
-    The sample rendering code below may be called whenever you need to
-    redisplay part of a window showing DjVu image.  Class \Ref{GRect} is used
-    to represent two rectangles of interest. Rectangle #full# represents the
-    range of pixels that would be occupied by the full DjVu image. This
-    rectangle may be much larger than your computer screen.  The ratio between
-    the size of this rectangle and the size of the image implicitly defines
-    the resolution of the displayed image.  Rectangle #part# represents the
-    range of pixel that you actually want to compute.  This rectangle always
-    corresponds to a visible portion of your screen.  The functions
-    \Ref{DjVuImage::get_pixmap} and \Ref{DjVuImage::get_bitmap} return a
-    "smart" \Ref{GP} pointer to either a \Ref{GPixmap} or \Ref{GBitmap}
-    containing the requested pixels.
-    \begin{verbatim}
-       GRect part = my_rectangle_to_redisplay();
-       GRect full = my_rectangle_for_the_full_image();
-       // Try rendering in color
-       GP<GPixmap> pm = img->get_pixmap(part, full);
-       if (pm) { my_display_in_color(pm); return; }
-       // Try rendering in gray
-       GP<GBitmap> bm = img->get_bitmap(part, full);
-       if (bm) { my_display_in_grays(bm); return ; }
-    \end{verbatim}
-     
-    This is the easiest way to decode and render a DjVu document
-    stored in the filesystem. \Ref{DjVuDocument} accesses all the
-    required and prints all potential error messages directly to
-    #stderr#.
-
-    In a more complex environment you may want to have more control on
-    where the data is coming from and where status and error messages
-    are directed.  By definining a subclass of \Ref{DjVuPort}, you can
-    receive notifications from the decoding threads.  These
-    notifications allow you to provide data from various sources, to
-    know about various error conditions, and to know when enough data
-    has been decoded to display a preliminary version of the image.
-    
-    Progressive display, for instance, can be implemented by letting
-    the decoding threads run in the background.  These threads wait
-    for data and process it as soon as possible.  The main thread
-    handles the user interface and can call the rendering functions at
-    any time while the decoding is in progress.  These function will
-    render the best possible image given the amount of data currently
-    received (or simply return 0 if no rendering is possible yet).
-    The \Ref{DjVuPort} notification mechanism allows you to determine
-    when enough data has been received to justify redisplaying an
-    updated version of the image.
-
-    Section \Ref{GThreads.h} discusses the multi-threading capabilities of the
-    DjVu Reference Library.  These features must be enabled at compile-time
-    using the adequate option of the configuration script.  
-
-    {\bf Note:} In previous versions of the library, decoding was
-    achieved by calling function \Ref{DjVuImage::decode} in class
-    \Ref{DjVuImage}.  This method has been made obsolete by the
-    introduction of multipage DjVu documents and #INCL# chunks.  The
-    decoder has to handle more than one stream of incoming data and
-    should be able to keep track of relationships between different
-    files in the same document.  All this activity is now orchestrated
-    by class \Ref{DjVuDocument}.  */
-
-//@}
-
-
-
-//----------------------------------------
-/** @name DjVu File Structure (Ignore For Now)
+/** @name DjVu File Structure
 
     DjVu files are organized according to the ``EA IFF 85'' layout.  Pointers to
     the appropriate reference document are provided in section
@@ -457,240 +211,11 @@
     skip chunks whose identifier is not recognized.  This mechanism
     provides a backward compatible way to extend the initial format by
     allocating new chunk identifiers. 
+
+    Further information about the DjVu file format is available in 
+    the \Ref{DjVu Reference Library}. 
 */
 //@{
-
-/** @name DjVu Image Files
-
-    {\bf Photo DjVu Image} --- Photo DjVu Image files are best used for
-    encoding photographic images in colors or in shades of gray.  The data
-    compression model relies on the IW44 wavelet representation.  This format
-    is designed such that the IW44 decoder is able to quickly perform
-    progressive rendering of any image segment using only a small amount of
-    memory.  Photo DjVu files are composed of a single #"FORM:DJVU"# composite
-    chunk.  This composite chunk always begins with one #"INFO"# chunk
-    describing the image size and resolution (see \Ref{DjVuInfo.h}).  One or
-    more additional #"BG44"# chunks contains the image data encoded with the
-    IW44 representation (see \Ref{IWImage.h}).  The image size specified in
-    the #"INFO"# chunk and the image size specified in the IW44 data must be
-    equal.
-
-    {\bf Bilevel DjVu Image} --- Bilevel DjVu Image files are used to compress
-    black and white images representing text and simple drawings.   The
-    JB2 data compression model uses the soft pattern matching technique, which
-    essentially consists of encoding each character by describing how it
-    differs from a well chosen already encoded character.  Bilevel DjVu Files
-    are composed of a single #"FORM:DJVU"# composite chunk.  This composite
-    chunk always begins with one #"INFO"# chunk describing the image size and
-    resolution (see \Ref{DjVuInfo.h}).  An additional #"Sjbz"# chunk contains
-    the bilevel data encoded with the JB2 representation (see
-    \Ref{JB2Image.h}).  The image size specified in the #"INFO"# chunk and the
-    image size specified in the JB2 data must be equal.
-
-    {\bf Compound DjVu Image} --- Compound DjVu Files are an extremely
-    efficient way to compress high resolution Compound document images
-    containing both pictures and text, such as a page of a magazine.  Compound
-    DjVu Files represent the document images using two layers.  The {\em
-    background layer} is used for encoding the pictures and the paper texture.
-    The {\em foreground layer} is used for encoding the text and the drawings.
-    Compound DjVu Files are composed of a single #"FORM:DJVU"# composite
-    chunk.  This composite chunk always begins with one #"INFO"# chunk
-    describing the size and the resolution of the image (see \Ref{DjVuInfo}).
-    Additional chunks hold the components of either the foreground or the
-    background layers.
-
-    The main component of the foreground layer is a bilevel image named the
-    {\em foreground mask}. The pixel size of the foreground mask is equal to
-    the size of the DjVu image.  It contains a black-on-white representation
-    of the text and the drawings.  This image is encoded by a #"Sjbz"# chunk
-    using the JB2 representation.  There may also be a companion chunk
-    #"Djbz"# containing a {\em shape dictionary} that defines bilevel shapes
-    referenced by the #"Sjbz"# chunk.
-
-    The {\em foreground colors} can be encoded according to two models:
-    \begin{itemize}
-    \item 
-      The foreground colors may be encoded using a small color image, the {\em
-      foreground color image}, encoded as a single #"FG44"# chunk using the
-      IW44 representation (see \Ref{IWImage.h}).  Such compound DjVu images
-      are rendered by painting the foreground color image on top of the
-      background color image using the foreground mask as a stencil.  The
-      pixel size of the foreground color image is computed by rounding up the
-      quotient of the mask size by an integer sub-sampling factor ranging from
-      1 to 12.  Most Compound DjVu Images use a foreground color sub-sampling
-      factor of 12.  Smaller sub-sampling factors produce very slightly better
-      images.
-    \item 
-      The foreground colors may be encoded by specifying one solid color per
-      object described by the JB2 encoded mask. These {\em JB2 colors} are
-      color-quantized and stored in a single #"FGbz"# chunk (see.
-      \Ref{DjVuPalette.h}).  Such compound DjVu images are rendered by
-      painting each foreground object on top of the background color image
-      using the solid color specified by the #"FGbz"# chunk.
-    \end{itemize}
-
-    The background layer is a color image, \Ref{the background color image}
-    ncoded by an arbitrary number of #"BG44"# chunks containing successive
-    IW44 refinements (see \Ref{IWImage.h}).  The size of this image is
-    computed by rounding up the quotient of the mask size by an integer
-    sub-sampling factor ranging from 1 to 12.  Most Compound DjVu Images use a
-    background sub-sampling factor equal to 3.  Smaller sub-sampling factors
-    are adequate for images with a very rich paper texture.  Larger
-    sub-sampling factors are adequate for images containing no pictures.
-
-    There are no ordering or interleaving constraints on these chunks except
-    that (a) the #"INFO"# chunk must appear first, and (b) the successive
-    #"BG44"# refinements must appear with their natural order.  The chunk
-    order simply affects the progressive rendering of DjVu images on a web
-    browser.  
-
-    {\bf Alternative encodings} --- Besides the JB2 and IW44 encoding schemes,
-    the DjVu format supports alternative encoding methods for its components.  
-    \begin{itemize}
-    \item
-       The foreground mask may be represented by a single #"Smmr"# chunk
-       instead of #"Sjbz"#.  The #"Smmr"# chunk contains a bilevel image
-       encoded with the Fax-G4/MMR method.  Although the resulting files
-       are typically six times larger, this capability can be useful when
-       DjVu is used as a front-end for fax machines and scanners with 
-       embedded Fax-G4/MMR capabilities. 
-    \item
-       The background color image may be represented by a single #"BGjp"#
-       chunk instead of several #"BG44"# chunks.  The #"BGjp"# chunk contains
-       a JPEG encoded color image.  The resulting files are significantly
-       larger and lack the progressivity of the usual DjVu files.  
-       This is useful because some scanners have embedded JPEG capabilities.
-    \item
-       The foreground color image may be represented by a single #"FGjp"#
-       chunk instead of a single #"FG44"# chunk.  This is useful because 
-       some scanners have embedded JPEG capabilities.
-    \end{itemize}
-    In addition, the chunk names #"BG2k"# and #"FG2k"# have been reserved for
-    encoding the background color image and the foreground color image using
-    the forthcoming JPEG-2000 standard.  This capability is not implemented at
-    the moment.  The JPEG-2000 standard may even become the preferred encoding
-    method for color images in DjVu.  */
-
-/** @name IW44 Image Files
-    
-    The IW44 Image file format is the native format for the IW44 wavelet
-    representation.  The DjVu Reference Library comes with two small programs,
-    \Ref{c44} and \Ref{d44}, for encoding and decoding IW44 Files.
-    
-    {\bf Gray Level IW44 Images} --- Gray Level IW44 Image files are composed
-    of a single #"FORM:BM44"# composite chunk.  This composite chunk itself
-    contains one or more #"BM44"# chunks containing successive refinements of
-    the gray level image (see \Ref{IWBitmap}).
-    
-    {\bf Color IW44 Images} --- Color IW44 Image files are composed of a
-    single #"FORM:PM44"# composite chunk.  This composite chunk itself
-    contains one or more #"PM44"# chunks containing successive refinements of
-    the color image (see \Ref{IWPixmap}).  */
-
-
-/** @name Annotations and Textual Information.
-
-    {\bf Annotation chunks} --- All types of DjVu images may contain
-    annotation chunks.  Annotation chunks are currently used to describe
-    hyperlinks as well as specifying more closely the behavior of the viewers.
-    Annotation chunks can be edited with the DjVu editor #djedit#.  Annotation
-    chunks can be inserted or removed using command #djvuiff#.  Annotations
-    are contained in #"ANTa"# or #"ANTz"# chunks.  The #"ANTa"# chunks contain
-    the annotation in plain text. The #"ANTz"# chunks contain the same
-    information compressed with the BZZ encoder (cf. \Ref{BSByteStream.h}).
-    The syntax of the uncompressed annotation chunk uses a simple
-    parenthesized notation. Erroneous and unrecognized constructs are silently
-    ignored.  The following constructs are recognized:
-
-    \begin{description}
-    \item[(background <color>)]
-       Sets the color of the viewer area surrounding the DjVu image.
-       The color argument #color# are always represented using X11 
-       syntax \##RRGGBB#. For instance \##000000# is black 
-       and \##FFFFFF# is white.
-
-    \item[(zoom <zoom-value>)]
-       Sets the initial zoom factor of the image.  Argument #zoom-value# may
-       be #stretch#, #one2one#, #width#, #page#, or composed of the letter
-       #"d"# followed by a number between #1# and #999# (such as in #d300# for
-       instance.)
-
-    \item[(mode <mode-value>)]
-       Sets the display mode for the image.  Argument #mode-value# may
-       be #color#, #bw#, #fore# or #back#.
-
-    \item[(align <horz-align> <vert-align>)]
-       Specifies how the image should be aligned on the viewer surface.
-       By default the image is located in the center.  Argument #horz-align#
-       may be #left#, #center#, or #right#.  Argument #vert-align# may be
-       #top#, #center#, or #bottom#.
-
-    \item[(maparea <url> <comment> <area> <...options...>]
-       Defines an hyperlink for the URL specified by argument #url#.
-
-       Argument #url# may have one of the following two forms:
-       \begin{verbatim}
-            "<href>"
-            (url "<href>" "<target>")
-       \end{verbatim}
-       where #href# is a string representing the URL and #target# is a string
-       representing the target frame for the hyperlink (cf. Documentation for
-       the HTML tag #<A>#).  Both strings are surrounded with double quotes.
-       Argument #comment# is a string surrounded by double quotes.
-       This string may be displayed as a tooltip when the user
-       moves the mouse over the hyperlink.
-       Argument #area# defines the shape of the hyperlink.
-       The following options are supported for representing
-       rectangle, circle, or polygons.
-       \begin{verbatim}
-            (rect <xmin> <ymin> <width> <height>)
-            (oval <xmin> <ymin> <width> <height>)
-            (polygon <x0> <y0> <x1> <y1> ....)
-       \end{verbatim}
-       All parameters are numbers representing coordinates measured in image
-       pixels with the origin set at the bottom left corner of the image.  The
-       remaining arguments describe options regarding the hyperlink borders.
-       A first set of option define the type of the borders:
-       \begin{verbatim}
-            (xor)
-            (border <color>
-            (shadow_in [<thickness>])
-            (shadow_out [<thickness>])
-            (shadow_ein [<thickness>])
-            (shadow_eout [<thickness>])
-       \end{verbatim}
-       where parameter #color# has syntax \##RRGGBB# (as above) and parameter
-       #thickness# is a number from 1 to 32.  The last four border modes are
-       only supported with rectangular areas. The border becomes visible when
-       the user moves the mouse over the hyperlink.  The border may be made
-       always visible by using the following option:
-       \begin{verbatim}
-            (border-avis)
-       \end{verbatim}
-       Finally the following option may be used with rectangular areas only.
-       The complete area will be hilited using the specified color (specified
-       with syntax \##RRGGBB# as usual).
-       \begin{verbatim}
-            (hilite <color>)
-       \end{verbatim}
-       This is often used with an empty URL for simply emphasizing a specific
-       segment of an image.
-    \end{description}
-
-
-    {\bf Textual Information Chunks} --- DjVu image files also contain a
-    computer readable description of the text appearing on the page.  This
-    information is contained by either a #"TXTa"# chunk or #"TXTz"# chunk.
-    The #"TXTa"# chunk contains uncompressed data.  The #"TXTz"# chunk
-    contains the same data compressed with the \Ref{bzz} compressor
-    (cf. \Ref{BSByteStream.h}).  The #"TXTa"# chunks begins by a 24 bit
-    integer (most significant byte first) describing the length of the text in
-    bytes.  Then come the ISO10646/UTF8 text.  Additional information
-    indicates the position of each column/region/paragraph/line/word in the
-    document.  More information about the capabilities of the chunk can be
-    found in section \Ref{DjVuTXT}.  More information about the encoding of
-    textual information can be found in file #"DjVuAnno.cpp"#.  */
-
 
 /** @name Multipage DjVu documents.
 

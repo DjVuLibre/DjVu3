@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuDocumentAPI.h,v 1.27 2000-03-08 22:59:46 bcr Exp $
+ *C- $Id: DjVuDocumentAPI.h,v 1.28 2000-03-09 22:27:59 bcr Exp $
  */
 
 #ifndef _DJVUDOCUMENT_H_
@@ -27,7 +27,10 @@
 
 /*
  * $Log: DjVuDocumentAPI.h,v $
- * Revision 1.27  2000-03-08 22:59:46  bcr
+ * Revision 1.28  2000-03-09 22:27:59  bcr
+ * Updated the documentation, again.
+ *
+ * Revision 1.27  2000/03/08 22:59:46  bcr
  * Updated the documentation.  I'm using Leon's libdjvu++ documentation
  * as a template.
  *
@@ -162,8 +165,7 @@ struct djvu_segmenter_options_struct
       \item[100] maximum background
       \item[Default] 50
       \item[Optimization] Because of tremendous improvements in the foreback
-      module, thus pare-meter is no longer so critical. Has not been optimized
-      recently.
+      module, this parameter is not critical.
       \item[Command line] no
       \end{description}
 
@@ -248,7 +250,8 @@ struct djvu_segmenter_options_struct
       \item bad color registration in the printer or the scanner
       \item ink blurring around in old documents
       \end{itemize}
-      {\em Its most direct influence is a band of width #edge_size# around each character is not used to sample the background color}
+      {\em Its most direct influence is a band of width edge_size around
+      each character is not used to sample the background color.}
 
       \begin{description}
       \item[Option type] Pixel size.
@@ -263,7 +266,8 @@ struct djvu_segmenter_options_struct
   /** Render Size: size of the "ideal" pixel, viewed at the standard rendering
       resolution.
 
-      {\em Its most direct influence is that any character with #render_size# or less pixels will be removed }
+      {\em Its most direct influence is that any character with render_size
+      or less pixels will be removed.}
 
       If is assumed that at this render size, characters have a reasonable
       size (typically more than 10 pixels and less than 100 pixels).
@@ -306,8 +310,9 @@ struct djvu_segmenter_options_struct
   int thickening;
   /*@}*/
   
-  /** @name Options for the subsampling process that happens after the
-      extraction of the selector mask.  */
+  /** @name Options for subsampling
+      @memo -- These options are processed that happens after the extraction
+      of the selector mask.  */
 
   /*@{*/
   /** Subsampling for the foreground image.
@@ -376,7 +381,10 @@ struct djvu_segmenter_options_struct
   /*@}*/
 
  
-  /** @name Flags */
+  /** @name Flags
+
+      @memo #Flags# are configuration file boolean options to control the 
+      segmenter. */
 
   /*@{*/
   /** Indicates the color of the foreground characters varies in the same line.
@@ -388,7 +396,6 @@ struct djvu_segmenter_options_struct
       \begin{itemize}
       \item Characters in the neighboring words have very different colors
       \item A character is next to a vertical line of different color
-      \item Command line: no
       \end{itemize}
    */
   int high_variation_foreground;
@@ -397,8 +404,6 @@ struct djvu_segmenter_options_struct
   /** Level of refinement in subsampling the foreground and the background.
 
       Parameter type: quality
-      
-      Command line: no
    */
   int masksub_refine;
 
@@ -441,23 +446,27 @@ struct documenttodjvu_options_struct
     errors. */
   djvu_process_options process;
 
-  /** These are the transformation options.  These will take place before
-    compression. */
+  /** #transform# contains the \Ref{djvu_transform_options} values.
+    All transformations will take place before compression. */
   djvu_transform_options transform;
 
-  /** These options control the separation of the foreground and background. */
+  /** #segment# contains the \Ref{djvu_segmenter_options} values.  These
+    values control the separation of foreground and background. */
   djvu_segmenter_options segment;
 
-  /** These options are the options that control the quality and speed
-    and format of the foreground compression.  */
+  /** #foreground# contains the \Ref{djvu_foreground_options} values.  These
+    values control the quality, speed, and format of the foreground
+    layer compression. */
   djvu_foreground_options foreground;
 
-  /** These options are the options that control the quality and speed
-    of the mask layer compression.  */
+  /** #jb2# contains the \Ref{djvu_jb2_options} values.  These
+    values control the quality, speed, and format of the mask layer
+    compression. */
   djvu_jb2_options jb2;
 
-  /** These options are the options that control the quality and speed
-    of the background compression.  */
+  /** #iw44# contains the \Ref{djvu_iw44_options} values.  These
+    values control the quality, speed, and format of the background layer
+    compression. */
   djvu_iw44_options iw44;
 
 #ifdef __cplusplus
@@ -483,26 +492,30 @@ DJVUAPI
 #if 0
 ;
 #endif
-/** ++ This is the primary allocation routine for documenttodjvu_options.
-    Even if the values specified are illegal, an options structure
-    will be returned. */
+/** ++ #documenttodjvu_options_alloc# is the primary allocation routine for
+    documenttodjvu_options.  If a \Ref{djvu_parse} structure has been
+    allocated, it may be passed as the parse argument.  Otherwise a NULL
+    value should be passed as parse.  Even if the values specified are
+    illegal, an options structure will be returned. */
 documenttodjvu_options *
-documenttodjvu_options_alloc(struct djvu_parse *,int,const char * const argv[]);
+documenttodjvu_options_alloc(
+  struct djvu_parse *parse,int argc,const char * const argv[]);
 
 DJVUAPI
 #if 0
 ;
 #endif
-/** ++ Deallocates the fields of the documenttodjvu_options structure.
-    You should always use the free option, even if you did not use alloc
-    so the data pointed to by priv is freed. */
+/** ++ #documenttodjvu_options_free# deallocates the fields of the
+    \Ref{documenttodjvu_options} structure.  You should always use the
+    free option, even if you did not use alloc so the data pointed to by
+    the priv pointer is freed. */
 void documenttodjvu_options_free(documenttodjvu_options *);
 
 DJVUAPI
 #if 0
 ;
 #endif
-/** ++ This function converts the photo input files to a multipage DjVu
+/** ++ #documenttodjvu# converts the photo input files to a multipage DjVu
     document according to the options structure.  A non-zero return value
     indicates a fatal error. */
 int documenttodjvu(documenttodjvu_options[1]);
@@ -511,25 +524,25 @@ DJVUAPI
 #if 0
 ;
 #endif
-/** ++ A non-zero value indicates there are error messages.  Error
-    messages are generated for both fatal errors, and errors
-    that are recovered from.  */
+/** ++ #documenttodjvu_haserror# returns a non-zero value to indicate there are
+    error messages on the stack.  Error messages are generated for both fatal
+    errors, and some non-fatal errors. */
 int documenttodjvu_haserror(const documenttodjvu_options [1]);
 
 DJVUAPI
 #if 0
 ;
 #endif
-/** ++ A non-zero value indicates there are warning messages.  Waring
-    messages are generated for non-fatal problems, that may be an
-    error, or could just be abnormal usage. */
+/** ++ #documenttodjvu_haswarning# returns a non-zero value to indicate there
+    are warning messages on the stack.  Waring messages are generated for
+    non-fatal problems, that may be an error, or could just be abnormal usage. */
 int documenttodjvu_haswarning(const documenttodjvu_options [1]);
 
 DJVUAPI
 #if 0
 ;
 #endif
-/** ++ Returns a string of the first error message on the stack.  Each
+/** ++ #documenttodjvu_error# pops the first error message off the stack.  Each
     call erases the previous return value. */
 const char * documenttodjvu_error(documenttodjvu_options [1]);
 
@@ -537,22 +550,26 @@ DJVUAPI
 #if 0
 ;
 #endif
-/** ++ Returns a string of the first warning message on the stack.  Each
-    call erases the previous return value. */
+/** ++ #documenttodjvu_warning# pops the first warning message off the stack.
+    Each call erases the previous return value. */
 const char * documenttodjvu_warning(documenttodjvu_options [1]);
 
 DJVUAPI
 #if 0
 ;
 #endif
-/** ++ Prints all the errors to stderr */
+/** ++ #documenttodjvu_perror# removes all error messages from the stack
+  and prints them to stderr.  When mesg is not NULL, the mesg string
+  followed by a colon and a blank will be printed before each error 
+  message. */
 void documenttodjvu_perror(documenttodjvu_options [1],const char *mesg);
 
 DJVUAPI
 #if 0
 ;
 #endif
-/** ++ This will print usage instructions to the specified output. */
+/** ++ #documenttodjvu_usage# will print usage instructions to the specified
+   fileno. */
 void documenttodjvu_usage(int fd,const char *prog);
 
 /*@}*/
