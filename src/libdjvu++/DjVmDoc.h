@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVmDoc.h,v 1.10 1999-10-25 16:49:41 eaf Exp $
+//C- $Id: DjVmDoc.h,v 1.11 1999-12-03 17:32:20 eaf Exp $
  
 #ifndef _DJVMDOC_H
 #define _DJVMDOC_H
@@ -32,7 +32,7 @@
 
     @memo DjVu multipage documents reader/writer.
     @author Andrei Erofeev <eaf@research.att.com>
-    @version #$Id: DjVmDoc.h,v 1.10 1999-10-25 16:49:41 eaf Exp $#
+    @version #$Id: DjVmDoc.h,v 1.11 1999-12-03 17:32:20 eaf Exp $#
 */
 
 //@{
@@ -139,12 +139,14 @@ public:
       /** Writes the multipage DjVu document in the {\em indirect} format
 	  into the given directory. Every page and included file will be
           stored as a separate file. Besides, one top-level file with
-          the document directory (named #idx_name#) will be created.
+          the document directory (named #idx_name#) will be created unless
+	  #idx_name# is empty.
 
           @param dir_name Name of the directory where files should be
 		 created
 	  @param idx_name Name of the top-level file with the \Ref{DjVmDir}
-		 with the list of files composing the given document. */
+		 with the list of files composing the given document.
+		 If empty, the file will not be created. */
    void		expand(const char * dir_name, const char * idx_name);
       //@}
 
