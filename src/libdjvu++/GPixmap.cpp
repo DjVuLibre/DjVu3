@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GPixmap.cpp,v 1.36 2001-08-24 20:04:52 docbill Exp $
+// $Id: GPixmap.cpp,v 1.37 2001-08-24 21:50:10 docbill Exp $
 // $Name:  $
 
 // -- Implements class PIXMAP

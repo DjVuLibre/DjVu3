@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: JPEGDecoder.h,v 1.17 2001-08-24 20:04:52 docbill Exp $
+// $Id: JPEGDecoder.h,v 1.18 2001-08-24 21:50:10 docbill Exp $
 // $Name:  $
 
 #ifndef _JPEGDECODER_H_
@@ -65,7 +65,7 @@ extern "C" {
     @memo
     Decoding interface to the IJG JPEG library.
     @version
-    #$Id: JPEGDecoder.h,v 1.17 2001-08-24 20:04:52 docbill Exp $#
+    #$Id: JPEGDecoder.h,v 1.18 2001-08-24 21:50:10 docbill Exp $#
     @author
     Parag Deshmukh <parag@sanskrit.lz.att.com> 
 */

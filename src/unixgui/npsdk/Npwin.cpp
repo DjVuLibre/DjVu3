@@ -4,7 +4,7 @@
 //C-              Unauthorized use prohibited.
 //C-
 // 
-// $Id: Npwin.cpp,v 1.13 2001-08-24 18:38:05 docbill Exp $
+// $Id: Npwin.cpp,v 1.14 2001-08-24 21:50:10 docbill Exp $
 // $Name:  $
 
 /* npwin.cpp */

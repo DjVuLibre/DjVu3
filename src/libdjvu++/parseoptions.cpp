@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: parseoptions.cpp,v 1.91 2001-08-24 18:38:05 docbill Exp $
+// $Id: parseoptions.cpp,v 1.92 2001-08-24 21:50:10 docbill Exp $
 // $Name:  $
 
 #ifdef __GNUC__
