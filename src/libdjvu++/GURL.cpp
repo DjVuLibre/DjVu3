@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GURL.cpp,v 1.6 1999-06-09 19:35:03 eaf Exp $
+//C- $Id: GURL.cpp,v 1.7 1999-06-09 22:12:36 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -74,7 +74,11 @@ GURL::init(void)
       GString proto=protocol();
       if (!proto.length()) THROW("URL '"+url+"' does not contain a protocol prefix.");
 
-      if (proto=="file")
+	 // Below we have to make this complex test to detect URLs really
+	 // referring to *local* files. Surprisingly, file://hostname/dir/file
+	 // is also valid, but shouldn't be treated thru local FS.
+      if (proto=="file" && url[5]=='/' &&
+	  (url[6]!='/' || !strncmp(url, "file://localhost/", strlen("file://localhost/"))))
       {
 	 url=GOS::url_to_filename(url);
 	 if (!url.length()) THROW("Failed to convert URL to filename.");
@@ -111,7 +115,9 @@ GURL::protocol(const char * url)
 bool
 GURL::is_local_file_url(void) const
 {
-   return protocol()=="file" && GOS::url_to_filename(url).length()>0;
+   return
+      protocol()=="file" && url[5]=='/' &&
+      (url[6]!='/' || !strncmp(url, "file://localhost/", strlen("file://localhost/")));
 }
 
 GURL
