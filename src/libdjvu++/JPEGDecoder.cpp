@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: JPEGDecoder.cpp,v 1.2 1999-10-19 14:48:37 leonb Exp $
+//C- $Id: JPEGDecoder.cpp,v 1.3 1999-11-03 16:20:06 eaf Exp $
 
 
 #include "JPEGDecoder.h"
@@ -179,7 +179,7 @@ skip_input_data (j_decompress_ptr cinfo, long num_bytes)
 {
   byte_stream_src_ptr src = (byte_stream_src_ptr) cinfo->src;
 
-  if (num_bytes > src->pub.bytes_in_buffer) {
+  if (num_bytes > (long) src->pub.bytes_in_buffer) {
 
   	src->byteStream->seek((num_bytes - src->pub.bytes_in_buffer), SEEK_CUR);
     (void) fill_input_buffer(cinfo);
