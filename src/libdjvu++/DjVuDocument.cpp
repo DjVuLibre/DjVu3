@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.81 1999-12-01 23:37:53 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.82 1999-12-02 17:08:42 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -1271,8 +1271,7 @@ add_file_to_djvm(const GP<DjVuFile> & file, bool page,
 }
 
 static void
-local_get_file_names
-(DjVuFile * f,const GMap<GURL, void *> & map,GMap<GURL,void *> &tmpmap)
+local_get_file_names(DjVuFile * f,const GMap<GURL, void *> & map,GMap<GURL,void *> &tmpmap)
 {
    GURL url=f->get_url();
    if (!map.contains(url) && !tmpmap.contains(url))
@@ -1286,8 +1285,7 @@ local_get_file_names
 }
 
 static void
-local_get_file_names
-(DjVuFile * f, GMap<GURL, void *> & map)
+local_get_file_names(DjVuFile * f, GMap<GURL, void *> & map)
 {
    GMap<GURL,void *> tmpmap;
    local_get_file_names(f,map,tmpmap);
@@ -1455,8 +1453,7 @@ DjVuDocument::expand(const char * dir_name, const char * idx_name)
 }
 
 void
-DjVuDocument::save_as
-(const char where[], const bool bundled)
+DjVuDocument::save_as(const char where[], const bool bundled)
 {
    DEBUG_MSG("DjVuDocument::save_as(): where='" << where <<
 	     "', bundled=" << bundled << "\n");
