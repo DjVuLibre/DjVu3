@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.104 2000-01-20 21:38:16 eaf Exp $
+//C- $Id: DjVuFile.cpp,v 1.105 2000-01-21 20:27:04 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -130,9 +130,12 @@ DjVuFile::init(const GURL & xurl, GP<DjVuPort> port)
    DEBUG_MAKE_INDENT(3);
 
    if (initialized)
-     THROW("DjVuFile is already initialized");
+      THROW("DjVuFile is already initialized");
    if (!get_count())
-     THROW("DjVuFile is not secured by a GP<DjVuFile>");
+      THROW("DjVuFile is not secured by a GP<DjVuFile>");
+   if (xurl.is_empty())
+      THROW("Empty URL passed to DjVuFile.");
+   
    url = xurl;
    file_size=0;
    decode_thread=0;
