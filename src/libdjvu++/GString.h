@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GString.h,v 1.8 1999-03-17 19:24:58 leonb Exp $
+//C- $Id: GString.h,v 1.9 1999-08-02 20:23:37 leonb Exp $
 
 
 #ifndef _GSTRING_H_
@@ -36,7 +36,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.8 1999-03-17 19:24:58 leonb Exp $# */
+    #$Id: GString.h,v 1.9 1999-08-02 20:23:37 leonb Exp $# */
 //@{
 
 #include "DjVuGlobal.h"
@@ -45,9 +45,7 @@
 #include "GException.h"
 #include "GSmartPointer.h"
 
-#ifdef __GNUC__
-#pragma interface
-#endif
+
 
 // Internal string representation.
 
@@ -283,6 +281,7 @@ protected:
   GString(GStringRep* rep);
   GString& operator= (GStringRep *rep);
   static GString concat (const char *str1, const char *str2);
+  static void throw_illegal_subscript() no_return;
 };
 
 //@}
@@ -328,7 +327,7 @@ GString::operator[] (int n) const
   if (n < 0)  
     n += (*this)->size;
   if (n < 0 || n>=(int)(*this)->size)
-    THROW("Illegal bound in GString subscript");
+    throw_illegal_subscript();
   return (*this)->data[n];
 }
 

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GException.h,v 1.11 1999-03-17 19:24:57 leonb Exp $
+//C- $Id: GException.h,v 1.12 1999-08-02 20:23:36 leonb Exp $
 
 
 #ifndef _GEXCEPTION_H_
@@ -60,13 +60,20 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@research.att.com> -- fixed message memory allocation.
     @version 
-    #$Id: GException.h,v 1.11 1999-03-17 19:24:57 leonb Exp $# */
+    #$Id: GException.h,v 1.12 1999-08-02 20:23:36 leonb Exp $# */
 //@{
 
 #include "DjVuGlobal.h"
 
 #ifdef __GNUC__
 #pragma interface
+#endif
+#ifndef no_return
+#ifdef __GNUC__
+#define no_return __attribute__ ((noreturn))
+#else
+#define no_return
+#endif
 #endif
 
 /** Exception class.  
@@ -198,10 +205,10 @@ public:
 
 #ifdef __GNUG__
 #define G_THROW(msg) GExceptionHandler::emthrow \
-  (GException(msg, __FILE__, __LINE__, __PRETTY_FUNCTION__))
+  (GException(msg, __FILE__, __LINE__, __PRETTY_FUNCTION__)) no_return
 #else
 #define G_THROW(m) GExceptionHandler::emthrow \
-  (GException(m, __FILE__, __LINE__))
+  (GException(m, __FILE__, __LINE__)) no_return
 #endif
 
 #endif // !CPP_SUPPORTS_EXCEPTIONS

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GString.cpp,v 1.7 1999-03-17 19:24:58 leonb Exp $
+//C- $Id: GString.cpp,v 1.8 1999-08-02 20:23:36 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -25,7 +25,7 @@
 
 #include "GString.h"
 
-// File "$Id: GString.cpp,v 1.7 1999-03-17 19:24:58 leonb Exp $"
+// File "$Id: GString.cpp,v 1.8 1999-08-02 20:23:36 leonb Exp $"
 // - Author: Leon Bottou, 04/1997
 
 static GStringRep nullstring;
@@ -309,5 +309,10 @@ hash(const GString &str)
   return x;
 }
 
+void 
+GString::throw_illegal_subscript()
+{
+  THROW("Illegal subscript in GString::operator[]");
+}
 
 
