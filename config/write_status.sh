@@ -14,7 +14,7 @@ then
   fi
   (echo '#!'"${smartshell}"
    "${sed}" -e 's,+$,\\,g' -e "s!xTOPBUILDDIR!$TOPBUILDDIR!g" -e "s!xTOPSRCDIR!$TOPSRCDIR!g" <<\EOF
-c=1;in="$1";out="$2";tmpA="$2~A";tmpB="$2~B";tmpC="$3~C"
+c=1;in="$1";out="$2";tmpA="$2~A";tmpB="$2~B";tmpC="$2~C"
 SRCDIR=`dirname "$1"`
 SRCDIR=`cd "$SRCDIR" 1>>/dev/null 2>>/dev/null;pwd`
 BUILDDIR=`dirname "$2"`
@@ -142,6 +142,7 @@ EOF2
     mv "$out" "$2"
   fi
   rm -f "$tmpA" "$tmpB" "$tmpC"
+
 EOF
 ) > "$CONFIG_STATUS"
   "${chmod}" 755 "${CONFIG_STATUS}"
