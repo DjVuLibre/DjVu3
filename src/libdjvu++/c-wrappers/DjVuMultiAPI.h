@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuMultiAPI.h,v 1.9 2000-01-20 23:27:45 leonb Exp $
+//C- $Id: DjVuMultiAPI.h,v 1.10 2000-01-21 14:24:56 leonb Exp $
 */
 
 #ifndef __DJVUMULTIAPI_H__
@@ -27,7 +27,10 @@
 
 /* 
  * $Log: DjVuMultiAPI.h,v $
- * Revision 1.9  2000-01-20 23:27:45  leonb
+ * Revision 1.10  2000-01-21 14:24:56  leonb
+ * BCR suggested changes
+ *
+ * Revision 1.9  2000/01/20 23:27:45  leonb
  * Added cosmetic changes for doc++
  *
  * Revision 1.8  2000/01/20 23:15:46  leonb
@@ -124,7 +127,7 @@ struct djvu_combine_options
       the file descriptor (as returned by the system function #open#)
       contained in #helpfileno#.  File descriptor #1# always corresponds to
       the standard output.  File descriptor #2# always corresponds to the
-      standard output. */
+      standard error. */
   int helpfileno;
   /** Log output destination.  When this integer is non zero, function
       \Ref{djvu_combine} outputs various messages describing the successive
@@ -147,8 +150,8 @@ struct djvu_combine_options
   const char * const *filelist;
   /** Private data.
       This field is used internally to hold the C++ peer of this data structure.
-      Functions \Ref{djvu_bundle_options_alloc} and \Ref{djvu_join_options_alloc}
-      properly initialise this field.  Do not modify it. */
+      Function \Ref{djvu_combine_options_alloc} properly initialises this field.  
+      Do not modify it. */
   void *priv;
 };
 
