@@ -34,7 +34,7 @@
 <A HREF="#DOC.1.5.26.2.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GMapRect.html">GMapRect</A>&amp; <B>operator=</B>(const <!1><A HREF="GRect.html">GRect</A> &amp; rect)
 <DD><I>Changes the <TT>GMapRect</TT>'s geometry</I>
 <DT>
-<A HREF="#DOC.1.5.26.2.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   <!1><A HREF="GString.html">GString</A> <B>get_shape_name</B>(void) const 
+<A HREF="#DOC.1.5.26.2.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   char const* const <B>get_shape_name</B>(void) const 
 <DD><I>Returns <TT>&quot;rect&quot;</TT></I>
 <DT>
 <A HREF="#DOC.1.5.26.2.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GMapArea.html#DOC.1.5.26.1.16">GMapArea</A>&gt;  <B>get_copy</B>(void) const 
@@ -83,7 +83,7 @@
 <DT>
 <IMG ALT="o" SRC=icon2.gif>void <B>transform</B>(const <!1><A HREF="GRect.html">GRect</A> &amp; grect)
 <DT>
-<IMG ALT="o" SRC=icon2.gif><!1><A HREF="GString.html">GString</A> <B>check_object</B>(void)
+<IMG ALT="o" SRC=icon2.gif>char const* const <B>check_object</B>(void)
 <DT>
 <IMG ALT="o" SRC=icon2.gif><!1><A HREF="GString.html">GString</A> <B>print</B>(void)
 </DL></P>
@@ -133,7 +133,7 @@ and <TT>SHADOW_EOUT_BORDER</TT> types of border and area highlighting. </BLOCKQU
 <DL><DT><DD></DL><P>
 <A NAME="get_shape_name">
 <A NAME="DOC.1.5.26.2.5">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   <!1><A HREF="GString.html">GString</A> get_shape_name(void) const </B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   char const* const get_shape_name(void) const </B></TT>
 <DD>Returns <TT>&quot;rect&quot;</TT>
 <DL><DT><DD></DL><P>
 <A NAME="get_copy">
@@ -148,7 +148,7 @@ and <TT>SHADOW_EOUT_BORDER</TT> types of border and area highlighting. </BLOCKQU
 <!-- This is were the DOC++ footer is defined  -->
 
 <font face="arial,helvetica" size="2">
-DjVu is a trademark of LizardTech.   
+<a href=http://www.djvu.att.com>DjVu</a> is a trademark of AT&amp;T.  
 <br>All other products mentioned are registered trademarks or trademarks of
 their respective companies.
 </font>

@@ -67,13 +67,17 @@ CRITICAL_SECTION cs;
 struct thr_waiting *head;
 struct thr_waiting *tail;<P>int ok;
 int count;
-unsigned long locker;<P>int ok;
+unsigned long locker;
+int wlock;
+int wsig;<P>int ok;
 int count;
 pthread_t locker;
 pthread_mutex_t mutex;
 pthread_cond_t cond;<P>int ok;
 int count;
-void *locker;<P>JRIGlobalRef obj;<P>private:
+void *locker;
+int wlock;
+int wsig;<P>JRIGlobalRef obj;<P>private:
 GMonitor(const GMonitor&amp;);
 GMonitor&amp; operator=(const GMonitor&amp;);
 };<P><P><P>
@@ -82,7 +86,6 @@ inline GThread::~GThread(void) {}
 inline void GThread::terminate() {}
 inline int GThread::yield() { return 0; }
 inline void* GThread::current() { return 0; }
-inline void GThread::wait_for_finish(void) {}
 inline GMonitor::GMonitor() {}
 inline GMonitor::~GMonitor() {}
 inline void GMonitor::enter() {}
@@ -112,7 +115,7 @@ public:
 <!-- This is were the DOC++ footer is defined  -->
 
 <font face="arial,helvetica" size="2">
-DjVu is a trademark of LizardTech.   
+<a href=http://www.djvu.att.com>DjVu</a> is a trademark of AT&amp;T.  
 <br>All other products mentioned are registered trademarks or trademarks of
 their respective companies.
 </font>
