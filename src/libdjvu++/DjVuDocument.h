@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.h,v 1.16 1999-09-03 23:55:22 leonb Exp $
+//C- $Id: DjVuDocument.h,v 1.17 1999-09-09 18:24:18 eaf Exp $
  
 #ifndef _DJVUDOCUMENT_H
 #define _DJVUDOCUMENT_H
@@ -33,7 +33,7 @@
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocument.h,v 1.16 1999-09-03 23:55:22 leonb Exp $#
+    @version #$Id: DjVuDocument.h,v 1.17 1999-09-09 18:24:18 eaf Exp $#
 */
 
 //@{
@@ -223,8 +223,13 @@ public:
           a separate thread, which enables to do progressive display.
           Negative #page_num# has a special meaning for the {\em old indexed}
 	  multipage documents: the #DjVuDocument# will start decoding of the
-	  URL with which it has been initialized. */
-   GP<DjVuImage>get_page(int page_num);
+	  URL with which it has been initialized.
+
+	  #DjVuDocument# can also connect the created page to the specified
+	  #port# {\em before starting decoding}. This option will allow
+	  the future owner of \Ref{DjVuImage} to receive all messages and
+	  requests generated during its decoding. */
+   GP<DjVuImage>get_page(int page_num, DjVuPort * port=0);
       /** Creates and returns \Ref{DjVuFile} corresponding to the given #url#.
 	  For {\em bundled} documents the #url# is faked by appending file
 	  name to the document's URL honoring possible #;# and #?# in the

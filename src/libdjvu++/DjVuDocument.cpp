@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.29 1999-09-09 17:32:41 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.30 1999-09-09 18:24:18 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -578,20 +578,22 @@ DjVuDocument::get_djvu_file(int page_num)
 }
 
 GP<DjVuImage>
-DjVuDocument::get_page(int page_num)
+DjVuDocument::get_page(int page_num, DjVuPort * port)
 {
    check();
    DEBUG_MSG("DjVuDocument::get_page(): request for page " << page_num << "\n");
    DEBUG_MAKE_INDENT(3);
    
    GP<DjVuFile> file=get_djvu_file(page_num);
+   GP<DjVuImage> dimg=new DjVuImage();
+   dimg->connect(file);
+   if (port) DjVuPort::get_portcaster()->add_route(dimg, port);
+   
    if (!file->is_decoding() &&
        !file->is_decode_ok() &&
        !file->is_decode_failed())
       file->start_decode();
 
-   GP<DjVuImage> dimg=new DjVuImage();
-   dimg->connect(file);
    return dimg;
 }
 
