@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuImage.h,v 1.11.4.2 1999-04-16 20:20:09 eaf Exp $
+//C- $Id: DjVuImage.h,v 1.11.4.3 1999-05-03 18:55:48 eaf Exp $
 
 #ifndef _DJVUIMAGE_H
 #define _DJVUIMAGE_H
@@ -60,7 +60,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: DjVuImage.h,v 1.11.4.2 1999-04-16 20:20:09 eaf Exp $# */
+    #$Id: DjVuImage.h,v 1.11.4.3 1999-05-03 18:55:48 eaf Exp $# */
 //@{
 
 
@@ -102,10 +102,6 @@ public:
   DjVuImage(void);
   /** Constructs a DjVu image. */
   DjVuImage(const GP<DjVuFile> & file);
-  /** Resets a DjVu image and release all memory. 
-      Function #decode# must then be called to
-      populate this DjVu image object. */
-  void init();
   //@}
 
   // COMPONENTS
