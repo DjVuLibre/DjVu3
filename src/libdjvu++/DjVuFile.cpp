@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.13 1999-08-04 21:43:02 leonb Exp $
+//C- $Id: DjVuFile.cpp,v 1.14 1999-08-17 21:30:05 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -68,6 +68,30 @@ private:
    ProgressByteStream & operator=(const ProgressByteStream &);
 };
 
+DjVuFile::DjVuFile(ByteStream & str) : cache(0), status(0), simple_port(0)
+{
+   DEBUG_MSG("DjVuFile::DjVuFile(): ByteStream constructor\n");
+   DEBUG_MAKE_INDENT(3);
+   
+   file_size=0;
+   decode_thread=0;
+
+      // Read the data from the stream
+   GP<DataPool> data_pool=new DataPool();
+   char buffer[1024];
+   int length;
+   while((length=str.read(buffer, 1024)))
+      data_pool->add_data(buffer, length);
+
+      // Construct some dummy URL
+   sprintf(buffer, "djvufile:/%p", this);
+   url=buffer;
+
+      // Create the DataRange
+   data_range=new DataRange(data_pool);
+   data_range->add_trigger(-1, static_trigger_cb, this);
+}
+
 DjVuFile::DjVuFile(const GURL & xurl, DjVuPort * port,
 		   GCache<GURL, DjVuFile> * xcache) :
       url(xurl), cache(xcache), status(0), simple_port(0)
@@ -104,6 +128,8 @@ DjVuFile::~DjVuFile(void)
    data_range->del_trigger(static_trigger_cb, this);
    
    stop_decode(1);
+
+   if (simple_port) { delete simple_port; simple_port=0; }
 }
 
 int
@@ -180,6 +206,7 @@ DjVuFile::get_included_files(void)
 {
    GCriticalSectionLock lock(&inc_files_lock);
 
+   if (!are_incl_files_created()) process_incl_chunks();
    GPList<DjVuFile> list=inc_files_list;	// Get a copy when locked
    return list;
 }
@@ -290,7 +317,10 @@ void
 DjVuFile::static_decode_func(void * cl_data)
 {
    DjVuFile * th=(DjVuFile *) cl_data;
-   th->decode_func();
+   TRY {
+      th->decode_func();
+   } CATCH(exc) {
+   } ENDCATCH;
 }
 
 void
@@ -368,13 +398,11 @@ DjVuFile::decode_func(void)
 }
 
 GP<DjVuFile>
-DjVuFile::process_incl_chunk(ByteStream & str, bool incl)
+DjVuFile::process_incl_chunk(ByteStream & str)
 {
-   DEBUG_MSG("DjVuFile::process_incl_chunk(): processing INCL or INCF chunk...\n");
+   DEBUG_MSG("DjVuFile::process_incl_chunk(): processing INCL chunk...\n");
    DEBUG_MAKE_INDENT(3);
 
-   GString chunk_name=incl ? "INCL" : "INCF";
-   
    GString incl_str;
    char buffer[1024];
    int length;
@@ -392,40 +420,41 @@ DjVuFile::process_incl_chunk(ByteStream & str, bool incl)
    if (incl_str.length()>0)
    {
       if (strchr(incl_str, '/'))
-	 THROW("Malformed "+chunk_name+" chunk. No directories allowed.");
+	 THROW("Malformed INCL chunk. No slashes allowed.");
 
       DEBUG_MSG("incl_str='" << incl_str << "'\n");
-      
-      GURL incl_url=url.base()+incl_str;
-      GCriticalSectionLock lock(&inc_files_lock);
-      GPosition pos;
-      for(pos=inc_files_list;pos;++pos)
-	 if (inc_files_list[pos]->url==incl_url) break;
-      if (!pos)
+
+      GURL incl_url=get_portcaster()->id_to_url(this, incl_str);
+      if (incl_url.is_empty())	// Fallback. Should never be used.
+	 incl_url=url.base()+incl_str;
+
+	 // Now see if there is already a file with this URL created
       {
-	 GP<DjVuFile> file;
-	 if (cache) file=cache->get_item(incl_url);
-	 if (!file)
-	 {
-	    DEBUG_MSG("creating new file\n");
-	    TRY {
-	       file=new DjVuFile(incl_url, this, cache);
-	    } CATCH(exc) {
-	       if (incl)
-	       {
-		  get_portcaster()->notify_error(this,
-						 "Failed to include file '"+
-						 incl_url+"'");
-		  return 0;
-	       } else RETHROW;
-	    } ENDCATCH;
-	    if (cache) cache->add_item(incl_url, file);
-	 } else { DEBUG_MSG("reusing file from cache\n"); }
-	 get_portcaster()->add_route(file, this);
-	 inc_files_list.append(file);
-	 return file;
-      } else return inc_files_list[pos];
-   };
+	 GCriticalSectionLock lock(&inc_files_lock);
+	 GPosition pos;
+	 for(pos=inc_files_list;pos;++pos)
+	    if (inc_files_list[pos]->url==incl_url) break;
+	 if (pos) return inc_files_list[pos];
+      }
+      
+	 // No. We have to create a new file
+      GP<DjVuFile> file;
+      if (cache) file=cache->get_item(incl_url);
+      if (!file)
+      {
+	 DEBUG_MSG("creating new file\n");
+	 TRY {
+	    file=new DjVuFile(incl_url, this, cache);
+	 } CATCH(exc) {
+	    THROW("Failed to include file '"+incl_url+"'");
+	 } ENDCATCH;
+      } else { DEBUG_MSG("reusing file from cache\n"); }
+      get_portcaster()->add_route(file, this);
+
+      GCriticalSectionLock lock(&inc_files_lock);
+      inc_files_list.append(file);
+      return file;
+   }
    return 0;
 }
 
@@ -516,9 +545,9 @@ DjVuFile::decode(ByteStream & str)
 	       } else anno->merge(iff);
 	       desc.format(" %0.1f Kb\t'%s'\tPage annotation.\n",
 			   chksize/1024.0, (const char*)chkid);
-	    } else if (chkid=="INCL" || chkid=="INCF")
+	    } else if (chkid=="INCL")
 	    {
-	       GP<DjVuFile> file=process_incl_chunk(iff, chkid=="INCL");
+	       GP<DjVuFile> file=process_incl_chunk(iff);
 	       if (file)
 		  if (!file->is_decoding() &&
 		      !file->is_decode_ok() &&
@@ -676,9 +705,9 @@ DjVuFile::decode(ByteStream & str)
 	       } else anno->merge(iff);
 	       desc.format(" %0.1f Kb\t'%s'\tPage annotation.\n",
 			   chksize/1024.0, (const char*)chkid);
-	    } else if (chkid=="INCL" || chkid=="INCF")
+	    } else if (chkid=="INCL")
 	    {
-	       GP<DjVuFile> file=process_incl_chunk(iff, chkid=="INCL");
+	       GP<DjVuFile> file=process_incl_chunk(iff);
 	       if (file)
 		  if (!file->is_decoding() &&
 		      !file->is_decode_ok() &&
@@ -854,31 +883,26 @@ DjVuFile::stop_decode(bool sync)
 void
 DjVuFile::process_incl_chunks(void)
 {
-  ByteStream * str=0;
-  TRY 
-    {
+   ByteStream * str=0;
+   TRY {
       str=data_range->get_stream();
       int chksize;
       GString chkid;
       IFFByteStream iff(*str);
       if (iff.get_chunk(chkid))
-        {
-          while((chksize=iff.get_chunk(chkid)))
-            {
-              if (chkid=="INCL" || chkid=="INCF")
-                process_incl_chunk(iff, chkid=="INCL");
-              iff.close_chunk();
-            }
-        }
-    } 
-  CATCH(exc) 
-    {
+      {
+	 while((chksize=iff.get_chunk(chkid)))
+	 {
+	    if (chkid=="INCL") process_incl_chunk(iff);
+	    iff.close_chunk();
+	 }
+      }
+   } CATCH(exc) {
       delete str; str=0;
       RETHROW;
-    } 
-  ENDCATCH;
-  delete str; str=0;
-  status|=INCL_FILES_CREATED;
+   } ENDCATCH;
+   delete str; str=0;
+   status|=INCL_FILES_CREATED;
 }
 
 GP<DjVuNavDir>
@@ -1083,7 +1107,7 @@ DjVuFile::unlink_file(const char * name)
 
       while((chksize=iff_in.get_chunk(chkid)))
       {
-	 if (chkid=="INCL" || chkid=="INCF")
+	 if (chkid=="INCL")
 	 {
 	    GString incl_str;
 	    char buffer[1024];
@@ -1152,7 +1176,7 @@ DjVuFile::unlink_file(const char * name)
 }
 
 void
-DjVuFile::include_file(const GP<DjVuFile> & file, int chunk_pos, bool incl)
+DjVuFile::include_file(const GP<DjVuFile> & file, int chunk_pos)
 {
    DEBUG_MSG("DjVuFile::include_file(): incl_url='" << file->get_url() << "'\n");
    DEBUG_MAKE_INDENT(3);
@@ -1176,7 +1200,7 @@ DjVuFile::include_file(const GP<DjVuFile> & file, int chunk_pos, bool incl)
    file->disable_standard_port();
    get_portcaster()->add_route(file, this);
 
-      // Insert INCL/INCF chunk
+      // Insert INCL chunk
    MemoryByteStream str_out;
    IFFByteStream iff_out(str_out);
    
@@ -1198,8 +1222,8 @@ DjVuFile::include_file(const GP<DjVuFile> & file, int chunk_pos, bool incl)
       {
 	 if (chunk_num==chunk_pos)
 	 {
-	    iff_out.put_chunk(incl ? "INCL" : "INCF");
-	    iff_out.write((const char*)file_name, file_name.length());
+	    iff_out.put_chunk("INCL");
+	    iff_out.write(file_name, file_name.length());
 	    iff_out.close_chunk();
 	    stored=1;
 
@@ -1217,13 +1241,13 @@ DjVuFile::include_file(const GP<DjVuFile> & file, int chunk_pos, bool incl)
 	 iff_in.close_chunk();
 	 iff_out.close_chunk();
 	 chunk_num++;
-	 if (chkid=="INCL" || chkid=="INCF") inc_chunk_num++;
+	 if (chkid=="INCL") inc_chunk_num++;
       }
 
       if (!stored)
       {
-	 iff_out.put_chunk(incl ? "INCL" : "INCF");
-	 iff_out.write((const char*)file_name, file_name.length());
+	 iff_out.put_chunk("INCL");
+	 iff_out.write(file_name, file_name.length());
 	 iff_out.close_chunk();
 
 	 GCriticalSectionLock lock(&inc_files_lock);
@@ -1338,8 +1362,8 @@ DjVuFile::delete_chunks(const char * chunk_name)
    DEBUG_MSG("DjVuFile::delete_chunks(): chunk_name='" << chunk_name << "'\n");
    DEBUG_MAKE_INDENT(3);
 
-   if (chunk_name=="INCL" || chunk_name=="INCF")
-      THROW("Can't delete INCL or INCF chunks. Use unlink_file() instead.");
+   if (chunk_name=="INCL")
+      THROW("Can't delete INCL chunks. Use unlink_file() instead.");
    
    bool done=0;
    MemoryByteStream str_out;
@@ -1398,8 +1422,8 @@ DjVuFile::insert_chunk(int pos, const char * chunk_name,
    DEBUG_MSG("DjVuFile::insert_chunk(): chunk_name='" << chunk_name << "'\n");
    DEBUG_MAKE_INDENT(3);
 
-   if (chunk_name=="INCL" || chunk_name=="INCF")
-      THROW("Can't insert INCL or INCF chunks. Use include_file() instead.");
+   if (chunk_name=="INCL")
+      THROW("Can't insert INCL chunks. Use include_file() instead.");
    
    MemoryByteStream str_out;
    IFFByteStream iff_out(str_out);
@@ -1491,9 +1515,9 @@ DjVuFile::add_djvu_data(IFFByteStream & ostr, GMap<GURL, void *> & map,
       int chunk_num=0;
       while((chksize=iff.get_chunk(chkid)))
       {
-	 if ((chkid=="INCL" || chkid=="INCF") && included_too)
+	 if (chkid=="INCL" && included_too)
 	 {
-	    GP<DjVuFile> file=process_incl_chunk(iff, chkid=="INCL");
+	    GP<DjVuFile> file=process_incl_chunk(iff);
 	    if (file) file->add_djvu_data(ostr, map, included_too, no_ndir);
 	 } else if (chkid=="ANTa" && anno && !anno->is_empty())
 	 {
@@ -1551,30 +1575,6 @@ DjVuFile::get_djvu_data(bool included_too, bool no_ndir)
 }
 
 void
-DjVuFile::add_to_djvm(DjVmFile & djvm_file, GMap<GURL, void *> & map)
-{
-   if (map.contains(url)) return;
-
-   map[url]=0;
-
-   TArray<char> data=get_djvu_data(0, 0);
-   djvm_file.add_file(url.name(), data, -1);
-
-   if (!are_incl_files_created()) process_incl_chunks();
-   
-   GCriticalSectionLock lock(&inc_files_lock);
-   for(GPosition pos=inc_files_list;pos;++pos)
-      inc_files_list[pos]->add_to_djvm(djvm_file, map);
-}
-
-void
-DjVuFile::add_to_djvm(DjVmFile & djvm_file)
-{
-   GMap<GURL, void *> map;
-   add_to_djvm(djvm_file, map);
-}
-
-void
 DjVuFile::move(GMap<GURL, void *> & map, const GURL & dir_url)
 {
    if (!map.contains(url))
@@ -1602,6 +1602,7 @@ void
 DjVuFile::change_cache(GMap<GURL, void *> & map,
 		       GCache<GURL, DjVuFile> * xcache)
 {
+      // TODO: We no longer update cache from DjVuFile: FIX IT!
    if (map.contains(url)) return;
 
    map[url]=0;
