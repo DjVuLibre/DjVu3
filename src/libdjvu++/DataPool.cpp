@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.cpp,v 1.35 1999-10-20 16:12:10 eaf Exp $
+//C- $Id: DataPool.cpp,v 1.36 1999-12-03 22:05:16 bcr Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -734,9 +734,11 @@ DataPool::get_data(void * buffer, int offset, int sz, int level)
 {
    Incrementor inc(active_readers);
    
-   if (stop_flag) THROW("STOP");
+   if (stop_flag)
+     THROW("STOP");
    if (stop_blocked_flag && !is_eof() &&
-       !has_data(offset, sz)) THROW("STOP");
+       !has_data(offset, sz))
+     THROW("STOP");
    
    if (sz < 0) THROW("Size must be non negative");
    if (sz == 0) return 0;
