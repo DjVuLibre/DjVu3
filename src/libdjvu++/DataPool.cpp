@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.cpp,v 1.16 1999-09-15 17:54:12 eaf Exp $
+//C- $Id: DataPool.cpp,v 1.17 1999-09-15 19:29:28 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -257,11 +257,9 @@ DataPool::connect(const GP<DataPool> & pool_in, int start_in, int length_in)
    for(GPosition pos=triggers_list;pos;++pos)
    {
       GP<Trigger> t=triggers_list[pos];
-      int tstart=t->start;
       int tlength=t->length;
       if (tlength<0 && length>0) tlength=length-t->start;
-      tstart+=start;
-      pool->add_trigger(tstart, tlength, t->callback, t->cl_data);
+      pool->add_trigger(start+t->start, tlength, t->callback, t->cl_data);
    }
 }
 
@@ -643,10 +641,9 @@ DataPool::add_trigger(int tstart, int tlength,
       {
 	    // We're connected to a DataPool
 	    // Just pass the triggers down remembering it in the list
-	 GP<Trigger> trigger=new Trigger(tstart, tlength, callback, cl_data);
-	 tstart+=start;
 	 if (tlength<0 && length>0) tlength=length-tstart;
-	 pool->add_trigger(tstart, tlength, callback, cl_data);
+	 GP<Trigger> trigger=new Trigger(tstart, tlength, callback, cl_data);
+	 pool->add_trigger(start+tstart, tlength, callback, cl_data);
 	 GCriticalSectionLock lock(&triggers_lock);
 	 triggers_list.append(trigger);
       } else if (!stream)
