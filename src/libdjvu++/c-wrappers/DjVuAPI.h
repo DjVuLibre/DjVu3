@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuAPI.h,v 1.40 2000-02-17 23:49:44 bcr Exp $
+ *C- $Id: DjVuAPI.h,v 1.41 2000-02-24 15:30:03 parag Exp $
  *
  * The main header file for the DjVu API
  */
@@ -17,7 +17,10 @@
 
 /* 
  * $Log: DjVuAPI.h,v $
- * Revision 1.40  2000-02-17 23:49:44  bcr
+ * Revision 1.41  2000-02-24 15:30:03  parag
+ * PS and PDF input implementation
+ *
+ * Revision 1.40  2000/02/17 23:49:44  bcr
  * Adding the DjVu_CallbackStream class.
  *
  * Revision 1.39  2000/02/16 00:44:08  bcr
@@ -152,6 +155,7 @@ typedef enum djvuio_type_enum
   DjVuIO_BMP,
   DjVuIO_PICT,
   DjVuIO_PS,
+  DjVuIO_EXPS,
   DjVuIO_PDF,
   DjVuIO_TIFF,
   DjVuIO_LIBTIFF,
