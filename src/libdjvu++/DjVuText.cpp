@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuText.cpp,v 1.24 2001-07-03 22:57:06 mchen Exp $
+// $Id: DjVuText.cpp,v 1.25 2001-07-04 20:15:25 mchen Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -351,7 +351,7 @@ DjVuTXT::get_zones(int zone_type, const Zone *parent, GList<Zone *> & zone_list)
 {
    // search all branches under parent
    const Zone *zone=parent;
-   for( int ztype_tmp=zone->ztype; ztype_tmp<zone_type; ++ztype_tmp )
+   for( int cur_ztype=zone->ztype; cur_ztype<zone_type; ++cur_ztype )
    {
       GPosition pos;
       for(pos=zone->children; pos; ++pos)
@@ -461,7 +461,8 @@ DjVuTXT::find_text_in_rect(GRect target_rect, GUTF8String &text) const
       for(pos=zone_list; pos; ++pos)
       {
 	 GRect rect=zone_list[pos]->rect;
-	 if(rect.intersect(rect,target_rect))
+	 int h0=rect.height()/2;
+	 if(rect.intersect(rect,target_rect) && rect.height()>h0)
 	    lines.append(zone_list[pos]);
       }
    } else 
@@ -483,7 +484,7 @@ DjVuTXT::find_text_in_rect(GRect target_rect, GUTF8String &text) const
 	 }
       }
       Zone *parag;
-      if ( ar>0) parag=zone_list[pos_sel];
+      if ( ar>0 ) parag=zone_list[pos_sel];
       zone_list.empty();
       if ( ar>0 ) 
       {
@@ -493,7 +494,8 @@ DjVuTXT::find_text_in_rect(GRect target_rect, GUTF8String &text) const
 	    for(GPosition pos=zone_list; pos; ++pos)
 	    {
 	       GRect rect=zone_list[pos]->rect;
-	       if(rect.intersect(rect,target_rect))
+	       int h0=rect.height()/2;
+	       if(rect.intersect(rect,target_rect) && rect.height()>h0)
 		  lines.append(zone_list[pos]);
 	    }
 	 }
@@ -515,7 +517,9 @@ DjVuTXT::find_text_in_rect(GRect target_rect, GUTF8String &text) const
 	 {
 	    for(GPosition p=words;p;++p)
 	    {
-	       if (target_rect.contains(words[p]->rect))
+	       GRect rect=words[p]->rect;
+	       if(rect.intersect(rect,target_rect))
+	       //if (target_rect.contains(words[p]->rect))
 		  zone_list.append(words[p]);
 	    }
 	 } else
@@ -527,15 +531,15 @@ DjVuTXT::find_text_in_rect(GRect target_rect, GUTF8String &text) const
 	       {
 		  if ( start )
 		  {
-		     if (target_rect.contains(words[p]->rect))
+		     GRect rect=words[p]->rect;
+		     if(rect.intersect(rect,target_rect))
+			//if (target_rect.contains(words[p]->rect))
 		     {
 			start=false;
 			zone_list.append(words[p]);
 		     }
 		  } else 
-		  {
 		     zone_list.append(words[p]);
-		  }
 	       }
 	    } else if (i==lsize)
 	    {
@@ -544,7 +548,9 @@ DjVuTXT::find_text_in_rect(GRect target_rect, GUTF8String &text) const
 	       {
 		  if ( end )
 		  {
-		     if(target_rect.contains(words[p]->rect) )
+		     GRect rect=words[p]->rect;
+		     if(rect.intersect(rect,target_rect))
+			//if(target_rect.contains(words[p]->rect) )
 		     {
 			end=false;
 			zone_list.append(words[p]);
@@ -555,10 +561,10 @@ DjVuTXT::find_text_in_rect(GRect target_rect, GUTF8String &text) const
 	    }
 
 	    if (i!=1 && i!=lsize )
+	    {
 	       for(GPosition p=words;p;++p)
-	       {
 		  zone_list.append(words[p]);
-	       }
+	    }
 	 }
       }
    } 
