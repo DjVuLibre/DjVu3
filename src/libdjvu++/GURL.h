@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GURL.h,v 1.10 1999-12-01 21:18:18 bcr Exp $
+//C- $Id: GURL.h,v 1.11 1999-12-21 00:09:28 eaf Exp $
 
 #ifndef _GURL_H_
 #define _GURL_H_
@@ -19,13 +19,14 @@
 #endif
 
 #include "GString.h"
+#include "Arrays.h"
 
 /** @name GURL.h
     Files #"GURL.h"# and #"GURL.cpp"# contain the implementation of the
     \Ref{GURL} class used to store URLs in a system independent format.
     @memo System independent URL representation.
     @author Andrei Erofeev <eaf@research.att.com>
-    @version #$Id: GURL.h,v 1.10 1999-12-01 21:18:18 bcr Exp $#
+    @version #$Id: GURL.h,v 1.11 1999-12-21 00:09:28 eaf Exp $#
 */
 
 //@{
@@ -55,11 +56,14 @@ class GURL
 private:
    GString	url;
 
+   DArray<GString>cgi_name_arr, cgi_value_arr;
+
    void		init(void);
    void		convert_slashes(void);
    void		eat_dots(void);
 
    static GString	protocol(const char * url);
+   void		parse_cgi_args(void);
 public:
       /// Extracts the {\em protocol} part from the URL and returns it
    GString	protocol(void) const;
@@ -67,8 +71,19 @@ public:
       /// Returns string after the first '#' or '%23'
    GString	hash_argument(void) const;
 
-      /// Erases everything after the first '#' or '%23'
-   void		clear_hash_argument(void);
+      /** Returns the total number of CGI arguments in the URL.
+	  CGI arguments follow '#?#' sign and are separated by '#&#' signs */
+   int		cgi_arguments(void) const;
+
+      /** Returns that part of CGI argument number #num#, which is
+	  before the equal sign. */
+   GString	cgi_name(int num) const;
+      /** Returns that part of CGI argument number #num#, which is
+	  after the equal sign. */
+   GString	cgi_value(int num) const;
+
+      /// Erases everything after the first '#' ('%23') or '?' ('%3f')
+   void		clear_all_arguments(void);
    
       /** Returns the URL corresponding to the directory containing the document
 	  with this URL. */

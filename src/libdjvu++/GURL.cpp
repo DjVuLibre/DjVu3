@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GURL.cpp,v 1.12 1999-12-01 21:18:18 bcr Exp $
+//C- $Id: GURL.cpp,v 1.13 1999-12-21 00:09:28 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -84,6 +84,7 @@ GURL::init(void)
 
       convert_slashes();
       eat_dots();
+      parse_cgi_args();
    }
 }
 
@@ -122,12 +123,102 @@ GURL::hash_argument(void) const
 }
 
 void
-GURL::clear_hash_argument(void)
+GURL::parse_cgi_args(void)
+{
+   cgi_name_arr.empty();
+   cgi_value_arr.empty();
+
+      // Search for the beginning of CGI arguments
+   const char * start;
+   for(start=url;*start;start++)
+      if (start[0]=='?' || start[0]=='%' &&
+	  start[1]=='3' && toupper(start[2])=='F')
+      {
+	 if (start[0]=='?') start++;
+	 else start+=3;
+	 break;
+      }
+
+      // Now loop until we see all of them
+   while(*start)
+   {
+      GString arg;	// Storage for another argument
+      while(*start)	// Seek for the end of it
+      {
+	 if (start[0]=='&' || start[0]=='%' &&
+	     start[1]=='2' && start[2]=='6')
+	 {
+	    if (start[0]=='&') start++;
+	    else start+=3;
+	    break;
+	 } else arg+=start[0];
+      }
+      if (arg.length())
+      {
+	    // Got argument in 'arg'. Split it into 'name' and 'value'
+	 const char * ptr;
+	 for(ptr=arg;*ptr;ptr++)
+	    if (*ptr=='=') break;
+	 GString name, value;
+	 if (*ptr)
+	 {
+	    name=GString(arg, ptr-arg);
+	    value=GString(ptr+1, arg.length()-name.length()-1);
+	 } else name=arg;
+	    
+	 int args=cgi_name_arr.size();
+	 cgi_name_arr.resize(args);
+	 cgi_value_arr.resize(args);
+	 cgi_name_arr[args]=name;
+	 cgi_value_arr[args]=value;
+      }
+   }
+}
+
+int
+GURL::cgi_arguments(void) const
+{
+   return cgi_name_arr.size();
+}
+
+GString
+GURL::cgi_name(int num) const
+{
+   if (num<cgi_name_arr.size()) return cgi_name_arr[num];
+   else return GString();
+}
+
+GString
+GURL::cgi_value(int num) const
+{
+   if (num<cgi_value_arr.size()) return cgi_value_arr[num];
+   else return GString();
+}
+
+static bool
+is_argument(const char * start)
+{
+   return
+      start[0]=='#' || start[0]=='%' &&
+      start[1]=='2' && start[2]=='3' ||
+      
+      start[0]=='?' || start[0]=='%' &&
+      start[1]=='3' && toupper(start[2])=='F' ||
+      
+      start[0]==';' || start[0]=='%' &&
+      start[1]=='3' && toupper(start[2])=='B';
+}
+
+void
+GURL::clear_all_arguments(void)
 {
    for(const char * start=url;*start;start++)
-      if (start[0]=='#' || start[0]=='%' &&
-	  start[1]=='2' && start[2]=='3')
+      if (is_argument(start))
+      {
 	 url.setat(start-url, 0);
+	 break;
+      }
+   parse_cgi_args();
 }
 
 bool
@@ -145,7 +236,7 @@ GURL::base(void) const
 {
    GString proto=protocol();
    const char * ptr, * slash=(const char *) url+proto.length()+1;
-   for(ptr=slash;*ptr && *ptr!=';' && *ptr!='?';ptr++)
+   for(ptr=slash;*ptr && !is_argument(ptr);ptr++)
       if (*ptr=='/') slash=ptr;
    
    return GURL(GString(url, slash-url)+GString(ptr, url.length()-(ptr-url)));
@@ -156,7 +247,7 @@ GURL::name(void) const
 {
    GString proto=protocol();
    const char * ptr, * slash=(const char *) url+proto.length()+1;
-   for(ptr=slash;*ptr && *ptr!=';' && *ptr!='?';ptr++)
+   for(ptr=slash;*ptr && !is_argument(ptr);ptr++)
       if (*ptr=='/') slash=ptr;
    
    return GString(slash+1, ptr-slash-1);
@@ -172,7 +263,7 @@ GURL::operator+(const char * xname) const
 
       const char * ptr;
       for(ptr=(const char *) url+proto.length()+1;*ptr;ptr++)
-	 if (*ptr==';' || *ptr=='?') break;
+	 if (is_argument(ptr)) break;
 
       GString str(url, ptr-url);
       if (str[(int)str.length()-1]!='/') str+='/';
@@ -181,5 +272,6 @@ GURL::operator+(const char * xname) const
 
       res=str;
    } else res=xname;
+   res.parse_cgi_args();
    return res;
 }
