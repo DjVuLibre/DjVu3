@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.83 1999-11-11 19:28:48 leonb Exp $
+//C- $Id: DjVuFile.cpp,v 1.84 1999-11-11 19:50:34 leonb Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -718,8 +718,8 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
   // FG44 (foreground wavelets)
   else if (chkid == "FG44" && (djvu || djvu))
     {
-      if (fgpm)
-        THROW("DjVu Decoder: Corrupted data (Duplicate foreground color layer)");
+      if (fgpm || fgbc)
+        THROW("DjVu Decoder: Corrupted data (Duplicate foreground color info)");
       IWPixmap fg44;
       fg44.decode_chunk(iff);
       fgpm=fg44.get_pixmap();
@@ -746,8 +746,8 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
   // FGjp (foreground JPEG)
   else if (chkid == "FGjp" && (djvu || djvi))
     {
-      if (fgpm)
-        THROW("DjVu Decoder: Corrupted data (Duplicate foreground color layer)");
+      if (fgpm || fgbc)
+        THROW("DjVu Decoder: Corrupted data (Duplicate foreground color info)");
 #ifdef NEED_JPEG_DECODER
       DjVuFile::fgpm = JPEGDecoder::decode(iff);
       desc.format("JPEG foreground colors (%dx%d, %d dpi)",
@@ -769,10 +769,20 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
   // FG2k (foreground JPEG-2000) Note: JPEG2K bitstream not finalized.
   else if (chkid == "FG2k" && (djvu || djvi))
     {
-      if (fgpm)
-        THROW("DjVu Decoder: Corrupted data (Duplicate foreground color layer)");
+      if (fgpm || fgbc)
+        THROW("DjVu Decoder: Corrupted data (Duplicate foreground color info)");
       desc.format("JPEG-2000 foreground colors (Unimplemented)");
     } 
+
+  // FGbz (foreground color vector)
+  else if (chkid == "FGbz" && (djvu || djvi))
+    {
+      if (fgpm || fgbc)
+        THROW("DjVu Decoder: Corrupted data (Duplicate foreground color info)");
+      GP<DjVuPalette> fgbc = new DjVuPalette;
+      fgbc->decode(iff);
+      DjVuFile::fgbc = fgbc;
+    }
 
   // BM44/PM44 (IW44 data)
   else if ((chkid == "PM44" || chkid=="BM44") && iw44)

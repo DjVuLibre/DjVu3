@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuImage.h,v 1.23 1999-10-05 16:00:06 leonb Exp $
+//C- $Id: DjVuImage.h,v 1.24 1999-11-11 19:50:34 leonb Exp $
 
 #ifndef _DJVUIMAGE_H
 #define _DJVUIMAGE_H
@@ -51,7 +51,7 @@
     L\'eon Bottou <leonb@research.att.com> - initial implementation
     Andrei Erofeev <eaf@research.att.com> - multipage support
     @version
-    #$Id: DjVuImage.h,v 1.23 1999-10-05 16:00:06 leonb Exp $# */
+    #$Id: DjVuImage.h,v 1.24 1999-11-11 19:50:34 leonb Exp $# */
 //@{
 
 
@@ -71,6 +71,7 @@
 #include "DjVuInfo.h"
 #include "DjVuAnno.h"
 #include "DjVuFile.h"
+#include "DjVuPalette.h"
 
 #include "GURL.h"
 #include "DataPool.h"
@@ -127,26 +128,30 @@ public:
   /** Returns a pointer to a DjVu information component.
       This function returns a null pointer until the decoder
       actually processes an #"INFO"# chunk. */
-  GP<DjVuInfo>   get_info() const;
+  GP<DjVuInfo>    get_info() const;
   /** Returns a pointer to the IW44 encoded background component of a DjVu
       image.  This function returns a null pointer until the decoder actually
       processes an #"BG44"# chunk. */
-  GP<IWPixmap>   get_bg44() const;
+  GP<IWPixmap>    get_bg44() const;
   /** Returns a pointer to tthe raw background component of a DjVu image. The
       background component is used for JPEG encoded backgrounds.  This
       function returns a null pointer until the decoder actually processes an
       #"BGjp"# chunk. */
-  GP<GPixmap>    get_bgpm() const;
+  GP<GPixmap>     get_bgpm() const;
   /** Returns a pointer to the mask of the foreground component of a DjVu
       image. The mask of the foreground component is always a JB2 image in
       this implementation. This function returns a null pointer until the
       decoder actually processes an #"Sjbz"# chunk. */
-  GP<JB2Image>   get_fgjb() const;
+  GP<JB2Image>    get_fgjb() const;
   /** Returns a pointer to the colors of the foreground component of a DjVu
       image. The mask of the foreground component is always a small pixmap in
       this implementation. This function returns a null pointer until the
       decoder actually processes an #"FG44"# chunk. */
-  GP<GPixmap>    get_fgpm() const;
+  GP<GPixmap>     get_fgpm() const;
+  /** Returns a pointer to a palette object containing colors for the 
+      foreground components of a DjVu image.  These colors are only
+      pertinent with respect to the JB2Image. */
+  GP<DjVuPalette> get_fgbc() const;
   /** Returns a pointer to a MemoryByteStream containing all the annotation
       chunks collected so far for this image.  Individual chunks can be
       retrieved using \Ref{IFFByteStream}. Returns NULL if no chunks have been
@@ -320,6 +325,8 @@ private:
    GP<GPixmap>		get_bgpm(const GP<DjVuFile> & file) const;
    GP<JB2Image>		get_fgjb(const GP<DjVuFile> & file) const;
    GP<GPixmap>		get_fgpm(const GP<DjVuFile> & file) const;
+   GP<DjVuPalette>      get_fgbc(const GP<DjVuFile> & file) const;
+
 };
 
 inline GP<DjVuFile>

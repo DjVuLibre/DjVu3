@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.h,v 1.46 1999-11-09 17:41:22 eaf Exp $
+//C- $Id: DjVuFile.h,v 1.47 1999-11-11 19:50:34 leonb Exp $
  
 #ifndef _DJVUFILE_H
 #define _DJVUFILE_H
@@ -24,6 +24,7 @@
 #include "DjVuInfo.h"
 #include "JB2Image.h"
 #include "IWImage.h"
+#include "DjVuPalette.h"
 #include "GPixmap.h"
 #include "DjVuPort.h"
 #include "GContainer.h"
@@ -45,7 +46,7 @@
 
     @memo Classes representing DjVu files.
     @author Andrei Erofeev <eaf@research.att.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuFile.h,v 1.46 1999-11-09 17:41:22 eaf Exp $#
+    @version #$Id: DjVuFile.h,v 1.47 1999-11-11 19:50:34 leonb Exp $#
 */
 
 //@{
@@ -162,8 +163,10 @@ public:
    GP<JB2Image>		fgjb;
       /// Pointer to the optional shape dictionary for the mask (JB2 encoced).
    GP<JB2Dict>		fgjd;
-      /// Pointer to the colors of foreground component of DjVu image (Raw).
+      /// Pointer to a colors layer for the foreground component of DjVu image.
    GP<GPixmap>		fgpm;
+      /// Pointer to a colors vector for the foreground component of DjVu image.
+   GP<DjVuPalette>	fgbc;
       /// Pointer to collected annotation chunks.
    GP<MemoryByteStream>	anno;
       /// Pointer to the *old* navigation directory contained in this file
