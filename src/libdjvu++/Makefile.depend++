@@ -82,7 +82,7 @@ DjVuFileCache.o: DjVuFileCache.cpp DjVuFileCache.h \
  GBitmap.h IWImage.h GPixmap.h \
  IFFByteStream.h DjVuPalette.h DjVuPort.h \
  GURL.h DjVuNavDir.h debug.h
-DjVuGlobal.o: DjVuGlobal.cpp DjVuGlobal.h
+DjVuGlobal.o: DjVuGlobal.cpp
 DjVuGlobalMemory.o: DjVuGlobalMemory.cpp
 DjVuImage.o: DjVuImage.cpp DjVuImage.h \
  GString.h DjVuGlobal.h GException.h \
@@ -206,6 +206,17 @@ d44.o: d44.cpp GString.h DjVuGlobal.h \
  GContainer.h Arrays.h GPixmap.h \
  IFFByteStream.h GOS.h
 debug.o: debug.cpp debug.h
+djthumb.o: djthumb.cpp GString.h DjVuGlobal.h \
+ GException.h GSmartPointer.h DjVuDocEditor.h \
+ DjVuDocument.h DjVuFileCache.h DjVuFile.h \
+ ByteStream.h GContainer.h Arrays.h \
+ DataPool.h GThreads.h DjVuInfo.h \
+ JB2Image.h ZPCodec.h GRect.h GBitmap.h \
+ IWImage.h GPixmap.h IFFByteStream.h \
+ DjVuPalette.h DjVuPort.h GURL.h \
+ DjVuNavDir.h debug.h DjVuImage.h \
+ DjVuAnno.h GMapAreas.h DjVmDir0.h \
+ DjVmDoc.h DjVmDir.h GOS.h
 djvmcvt.o: djvmcvt.cpp debug.h DjVmDoc.h \
  DjVuGlobal.h ByteStream.h GException.h \
  GContainer.h GSmartPointer.h Arrays.h \
