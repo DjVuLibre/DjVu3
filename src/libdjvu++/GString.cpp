@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.101 2001-05-17 15:40:30 bcr Exp $
+// $Id: GString.cpp,v 1.102 2001-05-18 18:30:04 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -54,7 +54,6 @@ GBaseString::~GBaseString() {}
 GNativeString::~GNativeString() {}
 GUTF8String::~GUTF8String() {}
 
-//#ifndef HAS_MBSTATE
 #if !defined(HAS_MBSTATE) && !defined(UNDER_CE)
 // Under some systems, wctomb() and mbtowc() are not thread
 // safe.  In those cases, wcrtomb and mbrtowc are preferred.
@@ -82,13 +81,10 @@ mbrlen(const char *s, size_t n, mbstate_t *)
 
 
 #ifdef HAS_ICONV
-// #ifndef WIN32
 #define LIBICONV_PLUG true
-// #endif
 #include <iconv.h>//MBCS cvt
 #include "libcharset.h"//MBCS cvt
 #endif
-// #include <locale.h>
 
 // - Author: Leon Bottou, 04/1997
 
@@ -1566,7 +1562,6 @@ GStringRep::UTF16toUCS4(
 // Gather the native implementations here. Not used in WinCE.
 
 GStringRep::Native::Native(void) {}
-
 GStringRep::Native::~Native() {}
 
 GP<GStringRep>

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.h,v 1.73 2001-05-16 22:57:50 bcr Exp $
+// $Id: GString.h,v 1.74 2001-05-18 18:30:04 bcr Exp $
 // $Name:  $
 
 #ifndef _GSTRING_H_
@@ -57,7 +57,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.73 2001-05-16 22:57:50 bcr Exp $# */
+    #$Id: GString.h,v 1.74 2001-05-18 18:30:04 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -88,13 +88,15 @@ typedef int mbstate_t;
 class GStringRep : public GPEnabled
 {
 public:
-  class Native;
   class UTF8;
 #ifndef UNDER_CE
+  class Native;
   class ChangeLocale;
 #endif // UNDER_CE
 
+#ifndef UNDER_CE
   friend Native;
+#endif
   friend UTF8;
   friend class GBaseString;
   friend class GUTF8String;
@@ -368,13 +370,7 @@ GStringRep::UTF8::create(const char fmt[],va_list args)
   return (s?(s->vformat(args)):s);
 }
 
-#ifdef UNDER_CE
-
-class GStringRep::Native : public GStringRep::UTF8
-{};
-
-#else
-
+#ifndef UNDER_CE
 class GStringRep::Native : public GStringRep
 {
 public:
@@ -975,34 +971,14 @@ public:
   }
 };
 
+
 #ifdef UNDER_CE
-
-// In Windows CE there is no concept of a native string, so we make the class
-// the same as GUTF8String.
-class GNativeString : public GUTF8String
-{
-public:
-  ~GNativeString();
-  /** Null constructor. Constructs an empty string. */
-  GNativeString(void);
-  /// Construct from base class.
-  GNativeString(const GUTF8String &str);
-  /// Constructs a string from a null terminated character array.
-  GNativeString(const char *str);
-};
-
-#else
-
+#define GBaseString GUTF8String
+#endif
 class GNativeString : public GBaseString
 {
 public:
   ~GNativeString();
-  void init(void)
-  { GBaseString::init(); }
-
-  GNativeString &init(const GP<GStringRep> &rep)
-  {  GP<GStringRep>::operator=(rep?rep->toNative(true):rep); init(); return *this; }
-
   // -- CONSTRUCTORS
   /** Null constructor. Constructs an empty string. */
   GNativeString(void);
@@ -1043,6 +1019,17 @@ public:
       point number #number#. The format is similar to format #"%f"# in
       function #printf#.  */
   GNativeString(const double number);
+
+#ifdef UNDER_CE
+#undef GBaseString
+#else
+  /// Initialize this string class
+  void init(void)
+  { GBaseString::init(); }
+
+  /// Initialize this string class
+  GNativeString &init(const GP<GStringRep> &rep)
+  {  GP<GStringRep>::operator=(rep?rep->toNative(true):rep); init(); return *this; }
 
   /** Copy a null terminated character array. Resets this string with the
       character string contained in the null terminated character array
@@ -1174,9 +1161,8 @@ public:
       init((*this)->setat(CheckSubscript(n),ch));
     }
   }
+#endif // WinCE
 };
-
-#endif // UNDER_CE
 
 //@}
 
@@ -1278,20 +1264,34 @@ inline GUTF8String& GUTF8String::operator= (const GNativeString &str)
 inline GUTF8String GBaseString::operator+(const GUTF8String &s2) const
   { return GStringRep::UTF8::create(*this,s2); }
 
-#ifndef UNDER_CE
+inline GNativeString::GNativeString(void) {}
+
+#ifdef UNDER_CE
 // For Windows CE, GNativeString is essentially GUTF8String
+inline
+GNativeString::GNativeString(const GUTF8String &str) : GUTF8String(str) {}
+inline
+GNativeString::GNativeString(const GP<GStringRep> &str) : GUTF8String(str) {}
+inline
+GNativeString::GNativeString(const char dat) : GUTF8String(dat) {}
+inline
+GNativeString::GNativeString(const char *str) : GUTF8String(str) {}
+inline
+GNativeString::GNativeString(const unsigned char *str) : GUTF8String(str) {}
+inline
+GNativeString::GNativeString(const char *dat, unsigned int len)
+: GUTF8String(dat,len) {}
+inline
+GNativeString::GNativeString(const GNativeString &str) : GUTF8String(str) {}
+inline
+GNativeString::GNativeString(const int number) : GUTF8String(number) {}
+inline
+GNativeString::GNativeString(const double number) : GUTF8String(number) {}
+inline
+GNativeString::GNativeString(const GNativeString &fmt, va_list &args)
+: GUTF8String(fmt,va_list) {}
 
-inline GNativeString 
-GNativeString::upcase( void ) const
-{ 
-  return (ptr?(*this)->upcase():(*this));
-}
-
-inline GNativeString 
-GNativeString::downcase( void ) const
-{ 
-  return (ptr?(*this)->downcase():(*this));
-}
+#else // UNDER_CE
 
 inline
 GNativeString::GNativeString(const GUTF8String &str)
@@ -1305,31 +1305,48 @@ inline
 GNativeString::GNativeString(const GBaseString &str)
 { init(str.length()?(str->toNative(true)):(GP<GStringRep>)str); }
 
-inline GNativeString::GNativeString(void) { }
-inline GNativeString::GNativeString(const char dat)
+inline
+GNativeString::GNativeString(const char dat)
 { init(GStringRep::Native::create(&dat,0,1)); }
-inline GNativeString::GNativeString(const char *str)
+
+inline
+GNativeString::GNativeString(const char *str)
 { init(GStringRep::Native::create(str)); }
-inline GNativeString::GNativeString(const unsigned char *str)
+
+inline
+GNativeString::GNativeString(const unsigned char *str)
 { init(GStringRep::Native::create((const char *)str)); }
-inline GNativeString::GNativeString(const char *dat, unsigned int len)
+
+inline
+GNativeString::GNativeString(const char *dat, unsigned int len)
 { init(GStringRep::Native::create(dat,0,((int)len<0)?(-1):(int)len)); }
+
+inline
+GNativeString::GNativeString(const GNativeString &str)
+{ init(str); }
+
+inline
+GNativeString::GNativeString(const GBaseString &gs, int from, unsigned int len)
+{ init(GStringRep::Native::create(gs,from,((int)len<0)?(-1):(int)len)); }
+
+inline
+GNativeString::GNativeString(const int number)
+{ init(GStringRep::Native::create_format("%d",number)); }
+
+inline
+GNativeString::GNativeString(const double number)
+{ init(GStringRep::Native::create_format("%f",number)); }
+
+inline
+GNativeString::GNativeString(const GNativeString &fmt, va_list &args)
+{ init(fmt.ptr?fmt->vformat(args):fmt); }
+
 //inline GNativeString::GNativeString(const GP<GStringRep> &str)
 //{ init(str); }
 //inline GNativeString::GNativeString(const GBaseString &str)
 //{ init(str); }
 //inline GNativeString::GNativeString(const GUTF8String &str)
 //{ init(str); }
-inline GNativeString::GNativeString(const GNativeString &str)
-{ init(str); }
-inline GNativeString::GNativeString(const GBaseString &gs, int from, unsigned int len)
-{ init(GStringRep::Native::create(gs,from,((int)len<0)?(-1):(int)len)); }
-inline GNativeString::GNativeString(const int number)
-{ init(GStringRep::Native::create_format("%d",number)); }
-inline GNativeString::GNativeString(const double number)
-{ init(GStringRep::Native::create_format("%f",number)); }
-inline GNativeString::GNativeString(const GNativeString &fmt, va_list &args)
-{ init(fmt.ptr?fmt->vformat(args):fmt); }
 
 inline GNativeString& GNativeString::operator= (const char str)
 { return init(GStringRep::Native::create(&str,0,1)); }
@@ -1350,6 +1367,19 @@ inline GUTF8String GNativeString::operator+(const GUTF8String &s2) const
   { return GStringRep::UTF8::create(ptr?(*this)->toUTF8(true):(*this),s2); }
 inline GUTF8String GUTF8String::operator+(const GNativeString &s2) const
   { return GStringRep::UTF8::create(*this,s2.ptr?s2->toUTF8(true):s2); }
+
+inline GNativeString 
+GNativeString::upcase( void ) const
+{ 
+  return (ptr?(*this)->upcase():(*this));
+}
+
+inline GNativeString 
+GNativeString::downcase( void ) const
+{ 
+  return (ptr?(*this)->downcase():(*this));
+}
+
 
 #endif // UNDER_CE
 

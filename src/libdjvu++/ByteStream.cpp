@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.cpp,v 1.79 2001-05-18 00:06:56 fcrary Exp $
+// $Id: ByteStream.cpp,v 1.80 2001-05-18 18:30:04 bcr Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 04/1997
@@ -419,12 +419,31 @@ ByteStream::format(const char *fmt, ... )
 }
 
 size_t
+ByteStream::writestring(const GNativeString &s)
+{
+  int retval;
+  if(cp != UTF8)
+  {
+    retval=writall((const char *)s,s.length());
+    if(cp == AUTO)
+      cp=NATIVE; // Avoid mixing string types.
+  }else
+  { 
+    const GUTF8String msg(s.getNative2UTF8());
+    retval=writall((const char *)msg,msg.length());
+  }
+  return retval;
+}
+
+size_t
 ByteStream::writestring(const GUTF8String &s)
 {
   int retval;
-  if(cp == UTF8)
+  if(cp != NATIVE)
   {
     retval=writall((const char *)s,s.length());
+    if(cp == AUTO)
+      cp=UTF8; // Avoid mixing string types.
   }else
   { 
     const GNativeString msg(s.getUTF82Native());

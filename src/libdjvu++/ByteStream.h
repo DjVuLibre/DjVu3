@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.h,v 1.54 2001-05-10 23:09:36 fcrary Exp $
+// $Id: ByteStream.h,v 1.55 2001-05-18 18:30:04 bcr Exp $
 // $Name:  $
 
 #ifndef _BYTESTREAM_H
@@ -62,7 +62,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation\\
     Andrei Erofeev <eaf@geocities.com> -- 
     @version
-    #$Id: ByteStream.h,v 1.54 2001-05-10 23:09:36 fcrary Exp $# */
+    #$Id: ByteStream.h,v 1.55 2001-05-18 18:30:04 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -96,7 +96,7 @@ public:
   class Static;
   class Memory;
   class Wrapper;
-  enum codepage_type {RAW,NATIVE,UTF8} cp;
+  enum codepage_type {RAW,AUTO,NATIVE,UTF8} cp;
 
   /** @name Virtual Functions.
       These functions are usually implemented by each subclass of #ByteStream#. */
@@ -198,6 +198,8 @@ public:
   int scanf(const char *fmt, ... );
   /** Writes the string as is, to the specified stream. */
   size_t writestring(const GUTF8String &s);
+  /** Writes the string as is, to the specified stream. */
+  size_t writestring(const GNativeString &s);
   /** Formats the message string, looks up the external representation
       and writes it to the specified stream. */
   void formatmessage( const char *fmt, ... );
@@ -245,7 +247,7 @@ public:
   virtual bool is_static(void) const { return false; }
   //@}
 protected:
-  ByteStream(void) : cp(RAW) {};
+  ByteStream(void) : cp(AUTO) {};
 private:
   // Cancel C++ default stuff
   ByteStream(const ByteStream &);
