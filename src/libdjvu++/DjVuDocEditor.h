@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocEditor.h,v 1.11 1999-12-03 00:44:40 bcr Exp $
+//C- $Id: DjVuDocEditor.h,v 1.12 1999-12-03 21:16:35 eaf Exp $
  
 #ifndef _DJVUDOCEDITOR_H
 #define _DJVUDOCEDITOR_H
@@ -27,7 +27,7 @@
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocEditor.h,v 1.11 1999-12-03 00:44:40 bcr Exp $#
+    @version #$Id: DjVuDocEditor.h,v 1.12 1999-12-03 21:16:35 eaf Exp $#
 */
 
 //@{
@@ -135,7 +135,9 @@ public:
 	  If #remove_unref# is #TRUE#, the function will also remove every
 	  file, which will become unreferenced after the removal of this file. */
    void		remove_file(const char * id, bool remove_unref=true);
-      /** Makes page number #page_num# to be #new_page_num#. */
+      /** Makes page number #page_num# to be #new_page_num#. If #new_page_num#
+	  is negative or too big, the function will move page #page_num# to
+	  the end of the document. */
    void		move_page(int page_num, int new_page_num);
 
       /** @name Thumbnails */
@@ -241,6 +243,8 @@ private:
    void		generate_ref_map(const GP<DjVuFile> & file,
 				 GMap<GString, void *> & ref_map,
 				 GMap<GURL, void *> & visit_map);
+   void		move_file(const char * id, int & file_pos,
+			  GMap<GString, void *> & map);
    void		unfile_thumbnails(void);
    void		file_thumbnails(void);
 };

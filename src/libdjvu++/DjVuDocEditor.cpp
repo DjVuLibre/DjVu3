@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocEditor.cpp,v 1.16 1999-12-01 22:12:02 eaf Exp $
+//C- $Id: DjVuDocEditor.cpp,v 1.17 1999-12-03 21:16:35 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -758,11 +758,75 @@ DjVuDocEditor::remove_page(int page_num, bool remove_unref)
 }
 
 void
+DjVuDocEditor::move_file(const char * id, int & file_pos,
+			 GMap<GString, void *> & map)
+{
+   if (!map.contains(id))
+   {
+      map[id]=0;
+
+      GP<DjVmDir::File> file_rec=djvm_dir->id_to_file(id);
+      if (file_rec)
+      {
+	 djvm_dir->delete_file(id);
+	 djvm_dir->insert_file(file_rec, file_pos);
+
+	 if (file_pos>=0)
+	 {
+	    file_pos++;
+	    
+	       // We care to move included files only if we do not append
+	       // This is because the only reason why we move included
+	       // files is to made them available sooner than they would
+	       // be available if we didn't move them. By appending files
+	       // we delay the moment when the data for the file becomes
+	       // available, of course.
+	    GP<DjVuFile> djvu_file=get_djvu_file(id);
+	    if (djvu_file)
+	    {
+	       GPList<DjVuFile> files_list=djvu_file->get_included_files(false);
+	       for(GPosition pos=files_list;pos;++pos)
+	       {
+		  GString name=files_list[pos]->get_url().name();
+		  GP<DjVmDir::File> child_frec=djvm_dir->name_to_file(name);
+
+		     // If the child is positioned in DjVmDir AFTER the
+		     // file being processed (position is file_pos or greater),
+		     // move it to file_pos position
+		  if (child_frec)
+		     if (djvm_dir->get_file_pos(child_frec)>file_pos)
+			move_file(child_frec->id, file_pos, map);
+	       }
+	    }
+	 }
+      }
+   }
+}
+
+void
 DjVuDocEditor::move_page(int page_num, int new_page_num)
 {
    DEBUG_MSG("DjVuDocEditor::move_page(): page_num=" << page_num <<
 	     ", new_page_num=" << new_page_num << "\n");
    DEBUG_MAKE_INDENT(3);
+
+   if (page_num==new_page_num) return;
+   
+   int pages_num=get_pages_num();
+   if (page_num<0 || page_num>=pages_num)
+      THROW("Invalid page number");
+
+   GString id=page_to_id(page_num);
+   int file_pos=-1;
+   if (new_page_num>=0 && new_page_num<pages_num)
+      if (new_page_num>page_num)	// Moving toward the end
+      {
+	 if (new_page_num<pages_num-1)
+	    file_pos=djvm_dir->get_page_pos(new_page_num+1)-1;
+      } else file_pos=djvm_dir->get_page_pos(new_page_num);
+
+   GMap<GString, void *> map;
+   move_file(id, file_pos, map);
 }
 
 GP<DataPool>
