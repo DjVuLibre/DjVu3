@@ -26,33 +26,27 @@ fi
 
 for arg 
 do
-   case $arg in 
-        --with-threads=* )
-           threads=`echo $arg | sed 's/[-A-Za-z_]*=//'` 
-           ;; 
-        --with-rpo|--frepo )
-           rpo=yes
-           ;;
-        *)
-           if process_general_option $arg
-           then
-             :
-           else
-             test $arg = --help || echo 1>&2 "$conf: Unrecognized option '$arg'"
-             cat 1>&2 <<EOF
-Usage: $conf <options>
-Recognized options:
-EOF
-             list_general_options
-             cat 1>&2 <<EOF
-  --with-threads=(no|co|posix|dce)          choose a thread implementation.
-  --with-rpo,--frepo                        use --frepo option in G++.
-EOF
-             exit 1 
-           fi
-           ;;
+  case $arg in 
+    --with-threads=* )
+      threads=`echo $arg | sed 's/[-A-Za-z_]*=//'` 
+      ;; 
+    --with-rpo|--frepo )
+      rpo=yes
+      ;;
+    *)
+      if process_general_option $arg
+      then true  
+      else
+        test $arg = --help || echo 1>&2 "$conf: Unrecognized option '$arg'"
+        echo 1>&2 "Usage: $conf <options>"
+        echo 1>&2 "Recognized options:"
+        list_general_options
+        echo 1>&2 "  --with-threads=(no|co|posix|dce)          choose a thread implementation."
+        echo 1>&2 "  --with-rpo,--frepo                        use --frepo option in G++."
+        exit 1 
+      fi
+      ;;
    esac
-   shift
 done
 
 
@@ -90,6 +84,15 @@ generate_main_makefile src/libdjvu++
 
 ### ------------------------------------------------------------------------
 ### Success
+
+
+# --- save command line
+
+echo '#!/bin/sh' > reconfigure
+echo "$0 $*" >> reconfigure
+chmod 755 reconfigure
+
+# --- display cool message
 
 echo
 echo Configuration is complete.

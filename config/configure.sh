@@ -566,6 +566,4 @@ EOF
         cat >>Makefile <<EOF 
 .PHONY: $targets
 EOF
-
-EOF
 }
