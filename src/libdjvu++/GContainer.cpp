@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GContainer.cpp,v 1.14 1999-09-28 21:18:18 leonb Exp $
+//C- $Id: GContainer.cpp,v 1.15 1999-10-07 23:33:33 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -80,6 +80,26 @@ GArrayBase::operator= (const GArrayBase &ga)
                    hibound - lobound + 1, 0 );
     }
   return *this;
+}
+
+
+void
+GArrayBase::steal(GArrayBase &ga)
+{
+  if (&traits != &ga.traits)
+    THROW("Assignment of incompatible arrays.");
+  if (this != &ga)
+    {
+      empty();
+      lobound = ga.lobound;
+      hibound = ga.hibound;
+      minlo = ga.minlo;
+      maxhi = ga.maxhi;
+      data = ga.data;
+      ga.lobound = ga.minlo = 0;
+      ga.hibound = ga.maxhi = -1;
+      ga.data = 0;
+    }
 }
 
 

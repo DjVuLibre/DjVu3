@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GContainer.h,v 1.25 1999-10-07 19:21:52 leonb Exp $
+//C- $Id: GContainer.h,v 1.26 1999-10-07 23:33:33 leonb Exp $
 
 
 #ifndef _GCONTAINER_H_
@@ -69,7 +69,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@research.att.com> -- bug fixes.
     @version 
-    #$Id: GContainer.h,v 1.25 1999-10-07 19:21:52 leonb Exp $# */
+    #$Id: GContainer.h,v 1.26 1999-10-07 23:33:33 leonb Exp $# */
 //@{
 
 
@@ -247,7 +247,7 @@ public:
   // -- DESTRUCTOR
   ~GArrayBase();
   // -- ASSIGNMENT
-  GArrayBase &operator= (const GArrayBase &ga);
+  GArrayBase& operator= (const GArrayBase &ga);
   // -- ALTERATION
   void empty();
   void touch(int n);
@@ -255,6 +255,7 @@ public:
   void shift(int disp);
   void del(int n, int howmany=1);
   void ins(int n, const void *src, int howmany=1);
+  void steal(GArrayBase &ga);
 protected:
   static void throw_illegal_subscript() no_return;
   const Traits &traits;
@@ -390,6 +391,10 @@ public:
       for type #TYPE#. See \Ref{ins(int n, unsigned int howmany=1)}. */
   void ins(int n, const TYPE &val, int howmany=1)
     { GArrayBase::ins(n, (const void*)&val, howmany); } ;
+  /** Steals contents from array #ga#.  After this call, array #ga# is empty,
+      and this array contains everything previously contained in #ga#. */
+  void steal(GArrayTemplate &ga)
+    { GArrayBase::steal(ga); } ;
   // -- SORTING
   /** Sort array elements.  Sort all array elements in ascending
       order according to the less-or-equal comparison
