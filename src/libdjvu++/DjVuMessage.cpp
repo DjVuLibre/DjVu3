@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessage.cpp,v 1.37 2001-04-23 18:14:22 bcr Exp $
+// $Id: DjVuMessage.cpp,v 1.38 2001-04-24 16:54:49 bcr Exp $
 // $Name:  $
 
 
@@ -175,7 +175,7 @@ GetProfilePaths(void)
     first=false;
     GList<GURL> paths;
     GURL path;
-#ifndef WINCE
+#ifndef UNDER_CE
     const GUTF8String envp(GOS::getenv(DjVuEnv));
     if(envp.length())
       paths.append((path=GURL::Filename::UTF8(envp)));

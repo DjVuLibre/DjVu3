@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.77 2001-04-24 00:25:50 bcr Exp $
+// $Id: GString.cpp,v 1.78 2001-04-24 16:54:49 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -41,17 +41,14 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+#ifndef UNDER_CE
 #include <wctype.h>
-#include <wchar.h>
 #include <locale.h>
+#endif
 
 #include "GString.h"
 #include "debug.h"
 
-
-#if defined(__linux__) || defined(WIN32)
-#define HAS_MBSTATE 1
-#endif
 
 #ifndef HAS_MBSTATE
 // Under some systems, wctomb() and mbtowc() are not thread
@@ -59,19 +56,24 @@
 // For Solaris, wctomb() and mbtowc() are thread safe, and 
 // wcrtomb() and mbrtowc() don't exist.
 
-typedef int mbstate_t;
 static inline  int
-wcrtomb(char *bytes,wchar_t w,mbstate_t &);
+wcrtomb(char *bytes,wchar_t w,mbstate_t *);
 {
   return wctomb(bytes,w);
 }
 
 static inline int
-mbrtowc(wchar_t *w,const char *s, size_t n, mbstate_t &)
+mbrtowc(wchar_t *w,const char *s, size_t n, mbstate_t *)
 {
   return mbtowc(&w,source,n);
 }
-#endif
+
+static inline size_t
+mbrlen(const char *s, size_t n, mbstate_t *)
+{
+  return mblen(s,n);
+}
+#endif // HAS_MBSTATE
 
 
 #ifdef HAS_ICONV
@@ -695,9 +697,9 @@ GStringRep::format(va_list &args) const
     if(from < 0)
     {
 #ifndef WIN32
-      const char *fmt=(nfmt&&nfmt[0])?nfmt:data;
+      char const * const fmt=(nfmt&&nfmt[0])?nfmt:data;
 #else
-      cosnt char *fmt=data;
+      char const * const fmt=data;
 #endif
       int buflen=32768;
       char *buffer;
@@ -925,7 +927,7 @@ DjVuIconv::iconv_string(const GBaseString &tocode,const GBaseString &fromcode,
 
 unsigned char *
 GStringRep::UCS4toString(
-  const unsigned long w0,unsigned char *ptr, void *ps) const
+  const unsigned long w0,unsigned char *ptr, mbstate_t *) const
 {
   ptr[0]=(unsigned char)(w0);
   return (ptr+1);
@@ -933,14 +935,14 @@ GStringRep::UCS4toString(
 
 unsigned char *
 GStringRep::UTF8::UCS4toString(
-  const unsigned long w0,unsigned char *ptr, void *ps) const
+  const unsigned long w0,unsigned char *ptr, mbstate_t *) const
 {
   return UCS4toUTF8(w0,ptr);
 }
 
 unsigned char *
 GStringRep::Native::UCS4toString(
-  const unsigned long w0,unsigned char *ptr, void *ps) const
+  const unsigned long w0,unsigned char *ptr, mbstate_t *ps) const
 {
   return UCS4toNative(w0,ptr,ps);
 }
@@ -951,7 +953,7 @@ GStringRep::Native::UCS4toString(
 // is enough.)
 unsigned char *
 GStringRep::UCS4toNative(
-  const unsigned long w0,unsigned char *ptr, void *ps)
+  const unsigned long w0,unsigned char *ptr, mbstate_t *ps)
 {
   unsigned short w1, w2;
   for(int count=(sizeof(wchar_t) == sizeof(w1))?UCS4toUTF16(w0,w1,w2):1;
@@ -959,7 +961,7 @@ GStringRep::UCS4toNative(
   {
     // wchar_t can be either UCS4 or UCS2
     const wchar_t w=(sizeof(wchar_t) == sizeof(w1))?(wchar_t)w1:(wchar_t)w0;
-    int i=wcrtomb((char *)ptr,w,(mbstate_t *)ps);
+    int i=wcrtomb((char *)ptr,w,ps);
     if(i<0)
     {
       break;

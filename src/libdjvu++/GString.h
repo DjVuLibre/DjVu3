@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.h,v 1.63 2001-04-24 15:52:36 bcr Exp $
+// $Id: GString.h,v 1.64 2001-04-24 16:54:49 bcr Exp $
 // $Name:  $
 
 #ifndef _GSTRING_H_
@@ -57,7 +57,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.63 2001-04-24 15:52:36 bcr Exp $# */
+    #$Id: GString.h,v 1.64 2001-04-24 16:54:49 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -73,7 +73,14 @@
 #ifdef WIN32
 #include <windows.h>
 #endif
+#include <wchar.h>
 
+#if defined(__linux__) || defined(WIN32)
+#define HAS_MBSTATE 1
+#endif
+#ifndef HAS_MBSTATE
+typedef int mbstate_t;
+#endif // HAS_MBSTATE
 
 // Internal string representation.
 class GStringRep : public GPEnabled
@@ -216,13 +223,13 @@ public:
   int getUCS4(unsigned long &w, const int from) const;
 
   virtual unsigned char *UCS4toString(
-    const unsigned long w,unsigned char *ptr, void *ps=0) const;
+    const unsigned long w,unsigned char *ptr, mbstate_t *ps=0) const;
 
   static unsigned char *UCS4toUTF8(
     const unsigned long w,unsigned char *ptr);
 
   static unsigned char *UCS4toNative(
-    const unsigned long w,unsigned char *ptr, void *ps);
+    const unsigned long w,unsigned char *ptr, mbstate_t *ps);
 
   int search(char c, int from=0) const;
 
@@ -329,7 +336,7 @@ public:
   static GP<GStringRep> create(const char fmt[],va_list &args);
 
   virtual unsigned char *UCS4toString(
-    const unsigned long w,unsigned char *ptr, void *ps=0) const;
+    const unsigned long w,unsigned char *ptr, mbstate_t *ps=0) const;
 
   friend class GBaseString;
 protected:
@@ -413,7 +420,7 @@ public:
   virtual int nextNonSpace( const int from=0 ) const;
 
   virtual unsigned char *UCS4toString(
-    const unsigned long w,unsigned char *ptr, void *ps=0) const;
+    const unsigned long w,unsigned char *ptr, mbstate_t *ps=0) const;
 
   friend class GBaseString;
 protected:
