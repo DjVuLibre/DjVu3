@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuAnno.h,v 1.1.2.1 1999-04-12 16:48:21 eaf Exp $
+//C- $Id: DjVuAnno.h,v 1.1.2.2 1999-04-26 19:19:21 eaf Exp $
 
 #ifndef _DJVUANNO_H
 #define _DJVUANNO_H
@@ -60,7 +60,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: DjVuAnno.h,v 1.1.2.1 1999-04-12 16:48:21 eaf Exp $# */
+    #$Id: DjVuAnno.h,v 1.1.2.2 1999-04-26 19:19:21 eaf Exp $# */
 //@{
 
 
@@ -72,6 +72,9 @@
 #include "GThreads.h"
 #include "GSmartPointer.h"
 #include "ByteStream.h"
+#include "DjVuGlobal.h"
+#include "GHLObjects.h"
+#include "GPContainer.h"
 
 /** Display annotation component.
     The annotation chunk contains directives for displaying DjVu image, such
@@ -85,23 +88,61 @@
 class DjVuAnno : public GPEnabled
 {
 public:
-  /** Constructs an empty annotation object. */
-  DjVuAnno();
-  /** Decode an annotation chunk.  The annotation data is simply read from
-      ByteStream #bs# until reaching an end-of-stream marker.  This function
-      is normally called after a call to \Ref{IFFByteStream::get_chunk}. */
-  void decode(ByteStream &bs);
-  /** Encodes the annotation chunk.  The annotation data is simply written
-      into ByteStream #bs# with no IFF header. This function is normally
-      called after a call to \Ref{IFFByteStream::put_chunk}. */
-  void encode(ByteStream &bs);
-  /** Returns the number of bytes needed by this data structure. */
-  unsigned int get_memory_usage() const;
-  /** Raw annotation data. The current version of the DjVu Reference Library
-      does not yet use that data. */
-  GString raw;
+   enum { MODE_UNSPEC=0, MODE_COLOR, MODE_FORE, MODE_BACK, MODE_BW };
+   enum { ZOOM_STRETCH=-4, ZOOM_ONE2ONE=-3, ZOOM_WIDTH=-2,
+	  ZOOM_PAGE=-1, ZOOM_UNSPEC=0 };
+   enum { ALIGN_UNSPEC=0, ALIGN_LEFT, ALIGN_CENTER, ALIGN_RIGHT,
+	  ALIGN_TOP, ALIGN_BOTTOM };
+   u_int32	bg_color;
+   int		zoom;
+   int		mode;
+   int		hor_align, ver_align;
+   GPList<GHLRect>	rect_hlinks;
+   GPList<GHLPoly>	poly_hlinks;
+   GPList<GHLOval>	oval_hlinks;
+   
+   /** Constructs an empty annotation object. */
+   DjVuAnno();
+   virtual ~DjVuAnno();
+   /** Decode an annotation chunk.  The annotation data is simply read from
+       ByteStream #bs# until reaching an end-of-stream marker.  This function
+       is normally called after a call to \Ref{IFFByteStream::get_chunk}. */
+   void decode(ByteStream &bs);
+   /** Same as \Ref{decode}() but adds the new data to one that has
+       been decoded before */
+   void merge(ByteStream & bs);
+   /** Encodes the annotation chunk.  The annotation data is simply written
+       into ByteStream #bs# with no IFF header. This function is normally
+       called after a call to \Ref{IFFByteStream::put_chunk}. */
+   void encode(ByteStream &bs);
+   /** Returns the number of bytes needed by this data structure. */
+   unsigned int get_memory_usage() const;
+   /** Encodes data back into raw annotation data */
+   GString encode_raw(void) const;
+
+   /** Returns TRUE if no features are specified */
+   bool		is_empty(void) const;
+   
+   GString raw;
 private:
-  GCriticalSection mutex;
+   GCriticalSection class_lock;
+
+   void		decode(class GLParser & parser);
+   
+   static GString	read_raw(ByteStream & str);
+   
+   static u_int32	cvt_color(const char * color, u_int32 def);
+   static unsigned char	decode_comp(char ch1, char ch2);
+   static u_int32	get_bg_color(class GLParser & parser);
+   static int		get_zoom(class GLParser & parser);
+   static int		get_mode(class GLParser & parser);
+   static int		get_hor_align(class GLParser & parser);
+   static int		get_ver_align(class GLParser & parser);
+   static void		get_hlinks(class GLParser & parser,
+				   GPList<GHLRect> &,
+				   GPList<GHLPoly> &,
+				   GPList<GHLOval> &);
+   static void		del_all_items(const char * name, class GLParser & parser);
 };
 
 
