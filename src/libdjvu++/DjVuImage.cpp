@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuImage.cpp,v 1.28 1999-09-17 15:34:59 leonb Exp $
+//C- $Id: DjVuImage.cpp,v 1.29 1999-09-17 21:09:52 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -22,9 +22,15 @@
 #include "GSmartPointer.h"
 #include <stdarg.h>
 
+
+
+
 //// DJVUIMAGE: CONSTRUCTION
 
-DjVuImage::DjVuImage(void) : relayout_sent(false) {};
+DjVuImage::DjVuImage(void) 
+  : relayout_sent(false) 
+{
+}
 
 void
 DjVuImage::connect(const GP<DjVuFile> & xfile)
@@ -33,7 +39,10 @@ DjVuImage::connect(const GP<DjVuFile> & xfile)
    DjVuPort::get_portcaster()->add_route(file, this);
 }
 
-//// DJVUIMAGE: data collectors
+
+
+
+//// DJVUIMAGE: DATA COLLECTORS
 
 GP<DjVuInfo>
 DjVuImage::get_info(const GP<DjVuFile> & file) const
@@ -313,8 +322,12 @@ DjVuImage::notify_chunk_done(const DjVuPort *, const char * name)
      DjVuPort::get_portcaster()->notify_redisplay(this);
 }
 
-//// DJVUIMAGE: OLD-STYLE DECODING
 
+
+
+
+
+//// DJVUIMAGE: OLD-STYLE DECODING
 
 class DjVuImageNotifier : public DjVuPort
 {
@@ -322,15 +335,16 @@ class DjVuImageNotifier : public DjVuPort
   DjVuInterface  *notifier;
   GP<DataPool>	  stream_pool;
   GURL		  stream_url;
-  bool		  relayout_sent;
 public:
   DjVuImageNotifier(DjVuInterface *notifier);
   GP<DataPool> request_data(const DjVuPort *src, const GURL & url);
   void notify_chunk_done(const DjVuPort *, const char *);
+  void notify_redisplay(const class DjVuImage * source);
+  void notify_relayout(const class DjVuImage * source);
 };
 
 DjVuImageNotifier::DjVuImageNotifier(DjVuInterface *notifier)
-  : notifier(notifier), relayout_sent(false)
+  : notifier(notifier)
 {
 }
 
@@ -338,30 +352,29 @@ GP<DataPool>
 DjVuImageNotifier::request_data(const DjVuPort *src, const GURL & url)
 {
   if (url!=stream_url)
-    THROW("This stream cannot be decoded the old way.");
+    THROW("Cannot decode this DjVu document using the backward-compatibility mode.");
   return stream_pool;
+}
+
+void 
+DjVuImageNotifier::notify_redisplay(const class DjVuImage * source)
+{
+  if (notifier)
+    notifier->notify_redisplay();
+}
+
+void 
+DjVuImageNotifier::notify_relayout(const class DjVuImage * source)
+{
+  if (notifier)
+    notifier->notify_relayout();
 }
 
 void 
 DjVuImageNotifier::notify_chunk_done(const DjVuPort *, const char *name)
 {
-   if (notifier)
-   {
-      notifier->notify_chunk(name, "");
-
-      if (!relayout_sent &&
-	  (!strcmp(name, "INFO") ||
-	   !strcmp(name, "PM44") ||
-	   !strcmp(name, "BM44")))
-      {
-	 notifier->notify_relayout();
-	 relayout_sent=true;
-      } else
-	 if (!strcmp(name, "Sjbz") ||
-	     !strcmp(name, "BG44") ||
-	     !strcmp(name, "BM44"))
-	    notifier->notify_redisplay();
-   }
+  if (notifier)
+    notifier->notify_chunk(name, "" );
 }
 
 void
@@ -370,27 +383,26 @@ DjVuImage::decode(ByteStream & str, DjVuInterface *notifier)
   DEBUG_MSG("DjVuImage::decode(): decoding old way...\n");
   DEBUG_MAKE_INDENT(3);
   if (file) 
-    THROW("To decode old way you should not have been used the connect() function.");
-  
+    THROW("DjVuImage::decode should not be called after DjVuImage::connect");
   GP<DjVuImageNotifier> pport = new DjVuImageNotifier(notifier);
-  pport->stream_url="internal://fake_url_for_old_style_decoder";
+  pport->stream_url="internal://fake/fake.djvu";
   pport->stream_pool=new DataPool();
+  // Get all the data first
   int length;
   char buffer[1024];
   while((length=str.read(buffer, 1024)))
     pport->stream_pool->add_data(buffer, length);
   pport->stream_pool->set_eof();
-
   GP<DjVuDocument> doc = new DjVuDocument;
   doc->init(pport->stream_url, (DjVuImageNotifier*)pport);
-  GP<DjVuImage> dimg=doc->get_page(-1);
+  GP<DjVuImage> dimg=doc->get_page(-1, (DjVuImageNotifier*)pport);
   file=dimg->get_djvu_file();
   file->wait_for_finish();
   if (file->is_decode_stopped())
     THROW("STOP");
   if (file->is_decode_failed())
     THROW("EOF");  // a guess
-  if (! file->is_decode_ok())
+  if (!file->is_decode_ok())
     THROW("Multiple errors while decoding");
   DEBUG_MSG("decode DONE\n");
 }
