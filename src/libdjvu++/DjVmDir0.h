@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVmDir0.h,v 1.3 1999-08-08 23:27:05 leonb Exp $
+//C- $Id: DjVmDir0.h,v 1.4 1999-08-18 15:36:03 eaf Exp $
  
 #ifndef _DJVMDIR0_H
 #define _DJVMDIR0_H
@@ -37,7 +37,7 @@
 
     @memo Directory of DjVu all-in-one-file DjVu documents.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: DjVmDir0.h,v 1.3 1999-08-08 23:27:05 leonb Exp $# */
+    @version #$Id: DjVmDir0.h,v 1.4 1999-08-18 15:36:03 eaf Exp $# */
 
 //@{
 
@@ -114,8 +114,8 @@ public:
    DjVmDir0(const DjVmDir0 & d);
 
       /// Default constructor
-   DjVmDir0(void);
-   virtual ~DjVmDir0(void);
+   DjVmDir0(void) {};
+   virtual ~DjVmDir0(void) {};
 };
 
 inline
@@ -147,12 +147,6 @@ DjVmDir0::DjVmDir0(const DjVmDir0 & d) :
       name2file(d.name2file), num2file(d.num2file)
 {
 }
-
-inline
-DjVmDir0::DjVmDir0(void) {}
-
-inline
-DjVmDir0::~DjVmDir0(void) {}
 
 //@}
 
