@@ -6,7 +6,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: parseoptions.h,v 1.26 2000-02-02 01:12:11 bcr Exp $
+//C- $Id: parseoptions.h,v 1.27 2000-02-03 05:36:14 bcr Exp $
 
 #endif /* __cplusplus */
 
@@ -67,7 +67,7 @@
 
    @memo Class used for parsing options and configuration files.
    @author Bill Riemers
-   @version #$Id: parseoptions.h,v 1.26 2000-02-02 01:12:11 bcr Exp $#
+   @version #$Id: parseoptions.h,v 1.27 2000-02-03 05:36:14 bcr Exp $#
  */
 
 /*@{*/
@@ -283,12 +283,6 @@ public:
 /** @name Accessing options
  */
   /*@{*/
-  /** If you wish to retrieve the same variable multiple times, or from    
-      multiple profiles, we recommend retrieving the token value for that  
-      variable, to avoid repeated lookups of the string.                   
-      Negative values are returned for an unregistered variable name. */
-  inline int GetVarToken(const char xname[]) const;
-
   /** This is the same as GetVarToken() except if a variable name is NOT    
       currently tokenized, a new token is created and returned.  If you are 
       Use of this is recommended when the token value is to be stored       
@@ -411,6 +405,12 @@ public:
 
 
 private:
+  /** If you wish to retrieve the same variable multiple times, or from    
+      multiple profiles, we recommend retrieving the token value for that  
+      variable, to avoid repeated lookups of the string.                   
+      Negative values are returned for an unregistered variable name. */
+  inline int GetVarToken(const char xname[]) const;
+
   void Add(const int,const int,const int,const char []);
   int ReadConfig(const char[],const char []);
   inline int ReadConfig(const char name[]) 

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: parseoptions.cpp,v 1.36 2000-02-02 01:12:11 bcr Exp $
+//C- $Id: parseoptions.cpp,v 1.37 2000-02-03 05:36:14 bcr Exp $
 #ifdef __GNUC__
 #pragma implementation
 #endif
@@ -391,7 +391,7 @@ DjVuParseOptions::GetBest
   {
     for(i=0;(i<listsize);i++)
     {
-      if((r=Arguments->GetValue(tokens[i])))
+      if((r=Configuration->GetValue(currentProfile,tokens[i])))
       {
         if((!requiretrue)||(r[0]=='T')||(r[0]=='t')||(atoi(r)))
         {
@@ -417,7 +417,7 @@ DjVuParseOptions::GetBest
     {
       for(i=0;(i<listsize);i++)
       {
-        if((r=Arguments->GetValue(tokens[i])))
+        if((r=Configuration->GetValue(defaultProfile,tokens[i])))
         {
           if((!requiretrue)||(r[0]=='T')||(r[0]=='t')||(atoi(r)))
           {
