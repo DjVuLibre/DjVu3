@@ -77,3 +77,6 @@ To build under Windows:
            directory as the excutables, or one directory up.
 
 
+Report bugs to: bcr@lizardtech.com
+
+
