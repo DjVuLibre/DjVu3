@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.1.2.2 1999-04-26 19:20:46 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.1.2.3 1999-04-28 20:22:01 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -25,8 +25,6 @@ DjVuDocument::DjVuDocument(const GURL & url, bool xreadonly,
 			   DjVuPort * xport, GCache<GURL, DjVuFile> * xcache):
       cache(xcache), simple_port(0), readonly(1), djvm(0)
 {
-   dir_url=url.baseURL();
-
    if (!xreadonly)
    {
 	 // We want to keep loaded files in an unlimited private cache
