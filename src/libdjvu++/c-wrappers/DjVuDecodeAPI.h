@@ -10,7 +10,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDecodeAPI.h,v 1.8 2000-01-14 01:20:44 bcr Exp $
+//C- $Id: DjVuDecodeAPI.h,v 1.9 2000-01-14 05:32:08 bcr Exp $
 #endif
 
 #ifndef _DJVU_DECODE_API_H
@@ -18,7 +18,10 @@
 
 /* 
  * $Log: DjVuDecodeAPI.h,v $
- * Revision 1.8  2000-01-14 01:20:44  bcr
+ * Revision 1.9  2000-01-14 05:32:08  bcr
+ * Corrected the invert problem, and removed the dependancy of libimage.
+ *
+ * Revision 1.8  2000/01/14 01:20:44  bcr
  * Added more short inline functions.
  *
  * Revision 1.7  2000/01/13 16:04:01  bcr
@@ -156,7 +159,7 @@ typedef struct _djvu_image_priv * djvu_image_priv;
 
                  // Does a rotate of 0,90,180, or 270 degress.
                inline void Rotate(int angle)
-               {for(int a=((angle%360)+405)%360;a>90;a-=90) orientation^=(orientation&DJVU_ROTATE90_CW)?(DJVU_BOTTOM_UP|DJVU_MIRROR):DJVU_ROTATE90_CW;}
+               {for(int a=((angle%360)+405)%360;a>90;a-=90) orientation^=(orientation&DJVU_ROTATE90_CW)?(DJVU_BOTTOM_UP|DJVU_MIRROR|DJVU_ROTATE90_CW):DJVU_ROTATE90_CW;}
 
 		 // This does a vertical flip in the raw coordinate system.
                inline void VFlipRaw(void)
@@ -164,7 +167,7 @@ typedef struct _djvu_image_priv * djvu_image_priv;
 
                  // This flips using corrected bottom up cooridinates.
                inline void VFlip(void)
-               {orientation^=(orientation&DJVU_ROTATE90_CW)?DJVU_BOTTOM_UP:DJVU_MIRROR;}
+               {orientation^=(orientation&DJVU_ROTATE90_CW)?DJVU_MIRROR:DJVU_BOTTOM_UP;}
 
 		 // This does a horizontal flip in the raw coordinate system.
                inline void HFlipRaw(void)
@@ -172,7 +175,7 @@ typedef struct _djvu_image_priv * djvu_image_priv;
 
                  // This flips using corrected bottom up cooridinates.
                inline void HFlip(void)
-               {orientation^=(orientation&DJVU_ROTATE90_CW)?DJVU_MIRROR:DJVU_ROTATE90_CW;}
+               {orientation^=(orientation&DJVU_ROTATE90_CW)?DJVU_BOTTOM_UP:DJVU_MIRROR;}
 
                  // This crops using cooridinates in the raw coordinate system.
                inline void CropRaw(const int x,const int y,
