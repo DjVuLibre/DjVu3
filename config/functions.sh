@@ -153,26 +153,6 @@ unescape()
   done)|sed  -e 's,@%%@a,'"'"',g' -e 's,@%%@q,",g' -e 's,@%%@d,\$,g' -e 's,@%%@t,	,g' -e 's,@%%@s, ,g' -e 's,@%%@e,!,g' -e 's,@%%@p,@%%@,g'
 }
 
-# Make directory and all parents unless they exist already
-mkdir -p "$temp/test/test" 2>>/dev/null 1>>/dev/null
-if [ -d "$temp/test/test" ] ; then
-  rm -rf "$temp"
-  mkdirp()
-  {
-    "${mkdir}" -p "$*"
-  }
-  SUPPORTS_MKDIRP=true
-else
-  mkdirp()
-  {
-    if [ -n "$*" -a "$*" != "." -a ! -d "$*" ]
-    then
-      mkdirp `"${dirname}" "$*"`
-      "${mkdir}" "$*"
-    fi
-  }
-fi
-
 # Make a test file with echo on CONFIG_LOG
 testfile()
 {
@@ -855,7 +835,7 @@ generate_makefile()
     xsrcdir=`pathclean $xsrcdir`
 
     # substitute
-    mkdirp "$TOPBUILDDIR/$1"
+    ${mkdirp} "$TOPBUILDDIR/$1"
     if [ -z "$WROTE_STATUS" ]
     then
       . "${CONFIG_DIR}/write_status.sh"
@@ -885,7 +865,7 @@ generate_main_makefile()
     echo "Writing $TOPBUILDDIR/Makefile"
     # Generate Makefile header
     "${sed}" -e 's,x$,\\,g' > "$TOPBUILDDIR/Makefile" <<EOF
-SHELL=/bin/sh
+SHELL=${smartshell}
 TOPSRCDIR=`unescape $TOPSRCDIR`
 TOPBUILDDIR=`unescape $TOPBUILDDIR`
 SUBDIRS= x

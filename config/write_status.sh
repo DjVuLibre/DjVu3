@@ -10,10 +10,10 @@ then
   p=`"${pwdcmd}"`
   echo "Writing the ${CONFIG_STATUS} file"|sed -e "s! ${p}[/]*! !" 
   if [ ! -d "$TOPBUILDDIR" ] ; then
-    mkdirp "$TOPBUILDDIR"
+    ${mkdirp} "$TOPBUILDDIR"
   fi
-  ("${sed}" -e 's,+$,\\,g' -e 's,X!,#!,g' -e "s!xTOPBUILDDIR!$TOPBUILDDIR!g" -e "s!xTOPSRCDIR!$TOPSRCDIR!g" <<\EOF
-X!/bin/sh
+  (echo '#!'"${smartshell}"
+   "${sed}" -e 's,+$,\\,g' -e "s!xTOPBUILDDIR!$TOPBUILDDIR!g" -e "s!xTOPSRCDIR!$TOPSRCDIR!g" <<\EOF
 c=1;in="$1";out="$2";tmpA="$2~A";tmpB="$2~B";tmpC="$3~C"
 SRCDIR=`dirname "$1"`
 SRCDIR=`cd "$SRCDIR" 1>>/dev/null 2>>/dev/null;pwd`

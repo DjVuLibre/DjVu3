@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.95 1999-12-02 22:37:31 eaf Exp $
+//C- $Id: DjVuFile.cpp,v 1.96 1999-12-06 20:13:47 bcr Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -518,7 +518,7 @@ DjVuFile::report_error
     char buffer[sizeof(eof_msg)+1020];
     const char *url=get_url();
     strcpy(buffer,eof_msg); 
-    sprintf(buffer,eof_msg,url);
+    sprintf(buffer,eof_msg,(const char *)url);
     if(throw_errors)
     {
       EXTHROW(ex,buffer);

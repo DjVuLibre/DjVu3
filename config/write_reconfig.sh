@@ -6,7 +6,7 @@ if [ -z "$CONFIG_DIR" ] ; then
 fi
     
 # --- save command line
-echo '#!/bin/sh' > "$TOPBUILDDIR/reconfigure"
+echo '#!'"$smartshell" > "$TOPBUILDDIR/reconfigure"
 echo "'$TOPSRCDIR/$PROGRAM_NAME' \\" >> "$TOPBUILDDIR/reconfigure"
 set - $CONFIGURATION_OPTIONS
 while [ $# != 0 ] ; do

@@ -23,6 +23,7 @@ PWDCMD=@%pwdcmd%@
 RANLIB=@%ranlib%@
 RM=@%rm%@
 SED=@%sed%@
+SMARTSHELL=@%smartshell%@
 SORT=@%sort%@
 TAR=@%tar%@
 TEE=@%tee%@

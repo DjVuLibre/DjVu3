@@ -9,7 +9,7 @@ if [ -z "$CONFIG_READONLY" ] ; then
   p=`"${pwdcmd}"`
   echo "Writing the ${CONFIG_CACHE} file"|"${sed}" -e "s! ${p}[/]*! !" 
   if [ ! -d "$TOPBUILDDIR" ] ; then
-    mkdirp "$TOPBUILDDIR"
+    ${mkdirp} "$TOPBUILDDIR"
   fi
   CONFIG_VARS=`sortlist $CONFIG_VARS`
   echo CONFIG_VARS="'$CONFIG_VARS'" > "${CONFIG_CACHE}"

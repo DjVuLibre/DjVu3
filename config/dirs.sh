@@ -25,7 +25,7 @@ if [ -z "$CONFIG_CACHE" ] ; then
   CONFIG_STATUS="$TOPBUILDDIR"/config.status
   CONFIG_LOG="$TOPBUILDDIR"/config.log
   if [ ! -d "$TOPBUILDDIR" ] ; then
-    mkdirp "$TOPBUILDDIR"
+    ${mkdirp} "$TOPBUILDDIR"
   fi
   CONFIG_VARS=`echo TOPSRCDIR PROJECT TOPBUILDDIR CONFIG_LOG CONFIG_STATUS CONFIG_CACHE ${CONFIG_VARS}`
 fi

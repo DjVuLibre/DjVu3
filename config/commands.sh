@@ -20,6 +20,16 @@ then
     whence=which
   fi
 
+  if ( ${whence} ksh 1>>/dev/null 2>>/dev/null )
+  then
+    smartshell="`${whence} ksh`"
+  elif ( ${whence} bash 1>>/dev/null 2>>/dev/null )
+  then
+    smartshell="`${whence} bash`"
+  else
+    smartshell=/bin/sh
+  fi
+
   if ( ${whence} true 1>>/dev/null 2>>/dev/null )
   then
     true="`${whence} true`"
