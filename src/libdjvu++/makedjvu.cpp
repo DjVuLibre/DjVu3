@@ -7,10 +7,10 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: makedjvu.cpp,v 1.3 1999-01-26 22:54:29 leonb Exp $
+//C-  $Id: makedjvu.cpp,v 1.4 1999-01-27 22:24:26 leonb Exp $
 
 // MakeDjVu -- Assemble IFF files
-// $Id: makedjvu.cpp,v 1.3 1999-01-26 22:54:29 leonb Exp $
+// $Id: makedjvu.cpp,v 1.4 1999-01-27 22:24:26 leonb Exp $
 // Author: Leon Bottou 08/1997
 
 #include <stdio.h>
@@ -30,7 +30,6 @@ int flag_contains_fg      = 0;
 int flag_contains_bg      = 0;
 int flag_contains_stencil = 0;
 int flag_contains_bg44    = 0;
-int flag_contains_dif     = 0;
 
 IFFByteStream *bg44iff    = 0;
 MemoryByteStream *jb2stencil = 0;
@@ -50,17 +49,14 @@ usage()
          "Possible arguments are:\n"
          "   INFO=w,h                    --  Create the initial information chunk\n"
          "   Sjbz=jb2file                --  Create a JB2 stencil chunk\n"
-         "   FGjp=jpegfile               --  Create a 25dpi JPEG foreground chunk\n"
-         "   BGjp=jpegfile               --  Create a 25dpi JPEG background chunk\n"
          "   FG44=iw4file                --  Create a 25dpi IW44 foreground chunk\n"
-         "   DIjp=jpegfile               --  Create a 100dpi JPEG delta chunk\n"
-         "   BG44=[iw4file]:nchunks      --  Create one or more IW44 background chunks\n"
+         "   BG44=[iw4file][:nchunks]    --  Create one or more IW44 background chunks\n"
          "\n"
          "* You may omit the specification of the information chunk. An information\n"
          "  chunk will be created using the image size of the first stencil chunk\n"
          "* Although this program tries to issue a warning when you are building an\n"
          "  incorrect djvu file. There is no guarantee that these warnings flag\n"
-         "  all conditions. The content of jpeg files is never checked.\n"
+         "  all conditions.\n"
          "\n");
   exit(-1);
 }
@@ -117,16 +113,6 @@ create_info_chunk(IFFByteStream &iff, int argc, char **argv)
   iff.close_chunk();
 }
 
-
-void 
-create_jpeg_chunk(IFFByteStream &iff, char *chkid, char *filename)
-{
-  fprintf(stderr,"makedjvu: jpeg chunks are obsolete\n");
-  StdioByteStream bs(filename,"rb");
-  iff.put_chunk(chkid);
-  iff.copy(bs);
-  iff.close_chunk();
-}
 
 void 
 create_jb2_chunk(IFFByteStream &iff, char *chkid, char *filename)
@@ -220,7 +206,7 @@ create_bg44_chunk(IFFByteStream &iff, char *ckid, char *filespec)
       if (s == filespec)
         THROW("makedjvu: no filename specified in first BG44 specification");
       if (!s)
-        THROW("makedjvu: invalid first BG44 specification (colon missing)");        
+        s = filespec + strlen(filespec);
       GString filename(filespec, s-filespec);
       ByteStream *pbs = new StdioByteStream(filename,"rb");
       bg44iff = new IFFByteStream(*pbs);
@@ -228,12 +214,15 @@ create_bg44_chunk(IFFByteStream &iff, char *ckid, char *filespec)
       bg44iff->get_chunk(chkid);
       if (chkid != "FORM:PM44" && chkid != "FORM:BM44")
         THROW("makedjvu: BG44 file has incorrect format (wrong IFF header)");        
-      filespec = s+1;
+      if (*s == ':')
+        filespec = s+1;
+      else 
+        filespec = "99";
     }
   else
     {
       if (*filespec!=':')
-        THROW("makedjvu: filename specified in non-first BG44 specification");
+        THROW("makedjvu: filename specified in BG44 refinement");
       filespec += 1;
     }
   int nchunks = strtol(filespec, &filespec, 10);
@@ -241,7 +230,7 @@ create_bg44_chunk(IFFByteStream &iff, char *ckid, char *filespec)
     THROW("makedjvu: invalid number of chunks in BG44 specification");    
   if (*filespec)
     THROW("makedjvu: invalid BG44 specification (syntax error)");
-
+  
   int flag = (nchunks>=99);
   GString chkid;
   while (nchunks-->0 && bg44iff->get_chunk(chkid))
@@ -315,27 +304,6 @@ main(int argc, char **argv)
                 fprintf(stderr,"makedjvu: duplicate stencil specification\n");
               flag_contains_stencil = 1;
             }
-          else if (! strncmp(argv[i],"FGjp=",5))
-            {
-              create_jpeg_chunk(iff, "FGjp", argv[i]+5);
-              if (flag_contains_fg)
-                fprintf(stderr,"makedjvu: duplicate foreground specification\n");
-              flag_contains_fg = 1;
-            }
-          else if (! strncmp(argv[i],"BGjp=",5))
-            {
-              create_jpeg_chunk(iff, "BGjp", argv[i]+5);
-              if (flag_contains_bg)
-                fprintf(stderr,"makedjvu: duplicate background specification\n");
-              flag_contains_bg = 1;
-            }
-          else if (! strncmp(argv[i],"DIjp=",5))
-            {
-              create_jpeg_chunk(iff, "DIjp", argv[i]+5);
-              if (flag_contains_dif)
-                fprintf(stderr,"makedjvu: duplicate delta specification\n");
-              flag_contains_dif = 1;
-            }
           else if (! strncmp(argv[i],"FG44=",5))
             {
               create_fg44_chunk(iff, "FG44", argv[i]+5);
@@ -360,8 +328,6 @@ main(int argc, char **argv)
         fprintf(stderr,"makedjvu: djvu file contains no stencil\n");
       if (flag_contains_bg && !flag_contains_fg)
         fprintf(stderr,"makedjvu: djvu file contains background but no foreground\n");
-      if (flag_contains_dif && !flag_contains_fg)
-        fprintf(stderr,"makedjvu: djvu file contains delta but no color information\n");
     }
   CATCH(ex)
     {
