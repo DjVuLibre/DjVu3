@@ -32,7 +32,7 @@
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #C- 
 #
-# $Id: configure,v 1.55 2001-10-16 18:01:41 docbill Exp $
+# $Id: configure,v 1.56 2001-10-16 20:25:48 docbill Exp $
 # $Name:  $
 
 # LIBDJVU++ -- Decoding library and utilities
@@ -163,6 +163,7 @@ then
 else
     require_compiler c++
 fi
+wrap_compiler
 
 check_thread_option $threads
 require_library math log -lm

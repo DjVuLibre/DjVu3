@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuFile.h,v 1.87 2001-10-16 18:01:43 docbill Exp $
+// $Id: DjVuFile.h,v 1.88 2001-10-16 20:25:49 docbill Exp $
 // $Name:  $
 
 #ifndef _DJVUFILE_H
@@ -71,7 +71,7 @@ class DjVuNavDir;
 
     @memo Classes representing DjVu files.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuFile.h,v 1.87 2001-10-16 18:01:43 docbill Exp $#
+    @version #$Id: DjVuFile.h,v 1.88 2001-10-16 20:25:49 docbill Exp $#
 */
 
 //@{
@@ -647,6 +647,8 @@ private:
                                 GMap<GURL, void *> & map);
    static void  get_text(const GP<DjVuFile> & file,
                          const GP<ByteStream> &str_out);
+   static void  get_anno(const GP<DjVuFile> &file,
+     const GP<ByteStream> &str_out);
    static void  get_anno(const GP<DjVuFile> &file,
      const GP<ByteStream> &str_out, const GList<GURL> &ignore_list,
      int level, int &max_level, GMap<GURL, void *> &map );

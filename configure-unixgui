@@ -138,6 +138,7 @@ then
 else 
   require_compiler c++ c $build_mode_decode
 fi  
+wrap_compiler
 
 check_debug_option $debug
 check_rpo_option $use_rpo
