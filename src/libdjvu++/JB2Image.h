@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: JB2Image.h,v 1.16 1999-09-20 12:55:50 leonb Exp $
+//C- $Id: JB2Image.h,v 1.17 1999-10-18 21:45:52 leonb Exp $
 
 #ifndef _JB2IMAGE_H
 #define _JB2IMAGE_H
@@ -107,7 +107,7 @@
     \end{itemize}
 
     @version
-    #$Id: JB2Image.h,v 1.16 1999-09-20 12:55:50 leonb Exp $#
+    #$Id: JB2Image.h,v 1.17 1999-10-18 21:45:52 leonb Exp $#
     @memo
     Coding bilevel images with JB2.
     @author
@@ -253,8 +253,7 @@ public:
 
   
 public:
-  /** Comment string.  
-      This variable holds an optional comment included in JB2 files. */
+  /** Comment string coded by JB2 file. */
   GString comment;
 
 private:
@@ -363,6 +362,11 @@ private:
   int width;
   int height;
   GTArray<JB2Blit> blits;
+public:
+  /** Reproduces a old bug.  Setting this flag may be necessary for accurately
+      decoding DjVu files with version smaller than #18#.  The default value
+      is of couse #false#. */
+  bool reproduce_old_bug;
 };
 
 

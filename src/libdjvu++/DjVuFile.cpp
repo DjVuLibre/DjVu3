@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.74 1999-10-12 20:10:59 eaf Exp $
+//C- $Id: DjVuFile.cpp,v 1.75 1999-10-18 21:45:52 leonb Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -676,6 +676,10 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
       if (DjVuFile::fgjb)
         THROW("DjVu Decoder: Corrupted data (Duplicate Sxxx chunk)");
       GP<JB2Image> fgjb=new JB2Image();
+      // ---- begin hack
+      if (info && info->version <=18)
+        fgjb->reproduce_old_bug = true;
+      // ---- end hack
       fgjb->decode(iff, static_get_fgjd, (void*)this);
       DjVuFile::fgjb = fgjb;
       desc.format("JB2 foreground mask (%dx%d)", fgjb->get_width(), fgjb->get_height());

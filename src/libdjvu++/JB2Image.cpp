@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: JB2Image.cpp,v 1.23 1999-09-28 19:56:18 leonb Exp $
+//C- $Id: JB2Image.cpp,v 1.24 1999-10-18 21:45:52 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -223,7 +223,7 @@ JB2Dict::decode(ByteStream &bs, JB2DecoderCallback *cb, void *arg)
 
 
 JB2Image::JB2Image()
-  : width(0), height(0)
+  : width(0), height(0), reproduce_old_bug(false)
 {
 }
 
@@ -1419,11 +1419,10 @@ _JB2Codec::code_record(int &rectype, JB2Image *jim, JB2Shape *jshp, JB2Blit *jbl
         LibRect &l = libinfo[match];
         jblt->left += l.left;
         jblt->bottom += l.bottom;
-#ifdef REPRODUCE_OLD_BUG
-        code_relative_location (jblt, bm->rows(), bm->columns() );
-#else
-        code_relative_location (jblt, l.top-l.bottom+1, l.right-l.left+1 );
-#endif
+        if (jim->reproduce_old_bug)
+          code_relative_location (jblt, bm->rows(), bm->columns() );
+        else
+          code_relative_location (jblt, l.top-l.bottom+1, l.right-l.left+1 );
         jblt->left -= l.left;
         jblt->bottom -= l.bottom; 
         break;
