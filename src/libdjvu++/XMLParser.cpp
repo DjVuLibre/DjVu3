@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: XMLParser.cpp,v 1.16 2001-07-03 17:02:32 bcr Exp $
+// $Id: XMLParser.cpp,v 1.17 2001-07-06 18:18:04 mchen Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -857,10 +857,10 @@ make_child_layer(
       {
         const GP<lt_XMLTags> t(tag.get_content()[pos].tag);
         make_child_layer(self, *t, bs, height,ws,hs);
-        if(sepchar)
-          bs.write8(sepchar);
-        self.text_length = bs.tell() - self.text_start;
       }
+      if(sepchar)
+        bs.write8(sepchar);
+      self.text_length = bs.tell() - self.text_start;
     }else
     {
       const GUTF8String raw(tag.get_raw().fromEscaped());
@@ -875,7 +875,7 @@ make_child_layer(
     self.rect=default_rect;
     if((pos=tag.get_content()))
     {
-      for(; pos; ++pos)
+      do
       {
         const GP<lt_XMLTags> t(tag.get_content()[pos].tag);
         const GRect save_rect(self.rect);
@@ -886,9 +886,6 @@ make_child_layer(
           xmax=max(save_rect.xmax,xmax);
           ymin=min(save_rect.ymin,ymin);
           ymax=max(save_rect.ymax,ymax);
-          if(sepchar)
-            bs.write8(sepchar);
-          self.text_length = bs.tell() - self.text_start;
         }else
         {
           // If the child doesn't have coordinates, we need to use a box
@@ -901,13 +898,13 @@ make_child_layer(
           {
             const GP<lt_XMLTags> t(tag.get_content()[pos].tag);
             make_child_layer(self, *t, bs, height,ws,hs);
-            if(sepchar)
-              bs.write8(sepchar);
-            self.text_length = bs.tell() - self.text_start;
           }
           break;
         }
-      }
+      } while(++pos);
+      if(sepchar)
+        bs.write8(sepchar);
+      self.text_length = bs.tell() - self.text_start;
     }else
     {
       const GUTF8String raw(tag.get_raw().fromEscaped());
@@ -968,7 +965,8 @@ lt_XMLParser::Impl::ChangeMeta(
   GUTF8String raw(gbs->getAsUTF8());
   if(raw.length())
   {
-    dfile.change_meta("<"+(metadatatag+(">"+raw))+"</"+metadatatag+">\n");
+     //GUTF8String gs="<"+(metadatatag+(">"+raw))+"</"+metadatatag+">\n");
+    dfile.change_meta(raw+"\n");
   }else
   {
     dfile.change_meta(GUTF8String());
