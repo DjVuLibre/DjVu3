@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.h,v 1.41 1999-09-27 21:59:11 eaf Exp $
+//C- $Id: DjVuFile.h,v 1.42 1999-09-30 16:21:35 leonb Exp $
  
 #ifndef _DJVUFILE_H
 #define _DJVUFILE_H
@@ -19,13 +19,12 @@
 #endif
 
 #include "GSmartPointer.h"
+#include "ByteStream.h"
 #include "DataPool.h"
 #include "DjVuInfo.h"
-#include "DjVuAnno.h"
 #include "JB2Image.h"
 #include "IWImage.h"
 #include "GPixmap.h"
-#include "DjVuText.h"
 #include "DjVuPort.h"
 #include "GContainer.h"
 #include "DjVuNavDir.h"
@@ -46,7 +45,7 @@
 
     @memo Classes representing DjVu files.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuFile.h,v 1.41 1999-09-27 21:59:11 eaf Exp $#
+    @version #$Id: DjVuFile.h,v 1.42 1999-09-30 16:21:35 leonb Exp $#
 */
 
 //@{
@@ -155,8 +154,6 @@ public:
       //@{
       /// Pointer to the DjVu file information component.
    GP<DjVuInfo>		info;
-      /// Pointer to DjVu annotation.
-   GP<DjVuAnno>		anno;
       /// Pointer to the background component of DjVu image (IW44 encoded).
    GP<IWPixmap>		bg44;
       /// Pointer to the background component of DjVu image (Raw).
@@ -167,9 +164,9 @@ public:
    GP<JB2Dict>		fgjd;
       /// Pointer to the colors of foreground component of DjVu image (Raw).
    GP<GPixmap>		fgpm;
-      /// Pointer to the textual information
-   GP<DjVuText>         txtz;
-      /// Pointer to the navigation directory contained in this file
+      /// Pointer to collected annotation chunks.
+   GP<MemoryByteStream>	anno;
+      /// Pointer to the *old* navigation directory contained in this file
    GP<DjVuNavDir>	dir;
       /// Description of the file formed during decoding
    GString		description;
@@ -388,7 +385,7 @@ public:
       //@{
       /** The main function that encodes data back into binary stream.
 	  The data returned will reflect possible changes made into the
-	  chunk structure, annotation chunk #ANTa# and navigation directory
+	  chunk structure, annotation chunks and navigation directory
 	  chunk #NDIR#.
 	  @param included_too Process included files too
 	  @param no_ndir Get rid of #NDIR# chunks. */
@@ -412,6 +409,9 @@ public:
 
       // Internal. Used by DjVuDocument
    GSafeFlags &		get_safe_flags(void);
+
+      // Internal. Used by DjVuImage
+   void                 merge_anno(MemoryByteStream &out);
 
       // Functions inherited from DjVuPort
    virtual bool		inherits(const char * class_name) const;

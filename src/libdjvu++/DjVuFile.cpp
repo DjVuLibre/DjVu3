@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.67 1999-09-28 20:56:23 leonb Exp $
+//C- $Id: DjVuFile.cpp,v 1.68 1999-09-30 16:21:35 leonb Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -172,7 +172,6 @@ DjVuFile::reset(void)
    fgjb = 0; 
    fgjd = 0;
    fgpm = 0;
-   txtz = 0;
    dir  = 0; 
    description = ""; 
    mimetype = "";
@@ -183,10 +182,10 @@ DjVuFile::get_memory_usage(void) const
 {
    unsigned int size=sizeof(*this);
    if (info) size+=info->get_memory_usage();
-   if (anno) size+=anno->get_memory_usage();
    if (bg44) size+=bg44->get_memory_usage();
    if (fgjb) size+=fgjb->get_memory_usage();
    if (fgpm) size+=fgpm->get_memory_usage();
+   if (anno) size+=anno->size();
    if (dir) size+=dir->get_memory_usage();
    return size;
 }
@@ -582,43 +581,35 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
       desc.format("Page information");
     }
 
-  // ANTa (annotation)
+  // FORM:ANNO and ANTa (annotation)
+
+  else if (chkid == "FORM:ANNO") 
+    {
+      // Borrow inc_files_lock since MemoryByteStream is not thread safe
+      GCriticalSectionLock lock(&inc_files_lock);  // anno_lock ?
+      if (! anno) anno = new MemoryByteStream;
+      anno->seek(0,SEEK_END);
+      if (anno->tell() & 1)  anno->write((void*)"", 1);
+      // Copy data
+      anno->copy(iff);
+    }
 
   else if (chkid == "ANTa")
     {
-      if (DjVuFile::anno)
-        {
-          anno->merge(iff);
-        }
-      else 
-        {
-          GP<DjVuAnno> anno=new DjVuAnno();
-          anno->decode(iff);
-          DjVuFile::anno = anno;
-        }
-      desc.format("Page annotation");
-    }
-
-  // ANTz (compressed annotation)
-
-  else if (chkid == "ANTz")
-    {
-      BSByteStream bsiff(iff);
-      if (DjVuFile::anno)
-        {
-          anno->merge(bsiff);
-        }
-      else 
-        {
-          GP<DjVuAnno> anno=new DjVuAnno();
-          anno->decode(bsiff);
-          DjVuFile::anno = anno;
-        }
-      desc.format("Page annotation (compressed)");
+      // Borrow inc_files_lock since MemoryByteStream is not thread safe
+      GCriticalSectionLock lock(&inc_files_lock); // anno_lock ?
+      if (! anno) anno = new MemoryByteStream;
+      anno->seek(0,SEEK_END);
+      if (anno->tell() & 1) anno->write((const void*)"", 1);
+      // Recreate chunk header
+      IFFByteStream iffout(*anno);
+      iffout.put_chunk(id);
+      iffout.copy(iff);
+      iffout.close_chunk();
     }
   
   // NDIR (obsolete navigation chunk)
-
+  
   else if (chkid == "NDIR")
     {
       GP<DjVuNavDir> dir=new DjVuNavDir(url);
@@ -626,29 +617,7 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
       DjVuFile::dir=dir;
       desc.format("Navigation directory (obsolete)");
     }
-
-  // TXTz (text information)
-
-  else if (chkid == "TXTz")
-    {
-      if (DjVuFile::txtz)
-        THROW("DjVu Decoder: Corrupted file (Duplicate TXTz chunk)");
-      GP<DjVuText> txtz = new DjVuText;
-      txtz->decode_text(iff);
-      DjVuFile::txtz = txtz;
-    }
   
-  // TZNz (text zone hierarchy)
-  
-  else if (chkid == "TZNz")
-    {
-      if (! DjVuFile::txtz)
-        THROW("DjVu Decoder: Corrupted file (Found TZNz without preceding TXTz chunk)");
-      if (txtz->has_valid_zones())
-        THROW("DjVu Decoder: Corrupted file (Duplicate TZNz chunk)");
-      txtz->decode_zones(iff);
-    }
-
   // INCL (inclusion chunk)
 
   else if (chkid == "INCL" && (djvi || djvu))
@@ -658,7 +627,7 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
         {
           int decode_was_already_started = 1;
           {
-            GMonitorLock(&file->flags);
+            GMonitorLock lock(&file->flags);
             if (!file->is_decoding() &&
                 !file->is_decode_ok() &&
                 !file->is_decode_failed() )
@@ -1268,60 +1237,72 @@ DjVuFile::add_djvu_data(IFFByteStream & ostr, GMap<GURL, void *> & map,
 {
    check();
    if (map.contains(url)) return;
-
-   bool top_level=map.size()==0;
-   
+   bool top_level = !map.size();
    map[url]=0;
-
-   bool have_anta=contains_chunk("ANTa");
-   
+   bool processed_annotation = false;
+     
    GP<ByteStream> str=data_pool->get_stream();
    int chksize;
    GString chkid;
    IFFByteStream iff(*str);
    if (!iff.get_chunk(chkid)) 
-      THROW("EOF");
-
-   if (top_level) ostr.put_chunk(chkid);
-
-   int chunk_num=0;
-   while((chksize=iff.get_chunk(chkid)))
+     THROW("EOF");
+   // Open toplevel form
+   if (top_level) 
+     ostr.put_chunk(chkid);
+   // Process chunks
+   while((chksize = iff.get_chunk(chkid)))
    {
       if (chkid=="INCL" && included_too)
-      {
-	 GP<DjVuFile> file=process_incl_chunk(iff);
-	 if (file) file->add_djvu_data(ostr, map, included_too, no_ndir);
-      } else if (chkid=="ANTa" && anno && !anno->is_empty())
-      {
-	 ostr.put_chunk(chkid);
-	 anno->encode(ostr);
-	 ostr.close_chunk();
-      } else if (chkid=="NDIR" && dir && !no_ndir)
-      {
+        {
+          GP<DjVuFile> file = process_incl_chunk(iff);
+          if (file) file->add_djvu_data(ostr, map, included_too, no_ndir);
+        } 
+      else if (chkid=="ANTa" || chkid=="FORM:ANNO")
+        {
+          if (!processed_annotation && anno && anno->size())
+            {
+              processed_annotation = true;
+              // Borrow inc_files_lock since MemoryByteStreams are not thread safe
+              GCriticalSectionLock lock(&inc_files_lock);  // anno_lock ?
+              ostr.put_chunk("FORM:ANNO");
+              anno->seek(0);
+              ostr.copy(*anno);
+              ostr.close_chunk();
+            }
+        }
+      else if (chkid=="NDIR" && dir && !no_ndir)
+        {
 #ifndef NEED_DECODER_ONLY   // Decoder should never generate old NDIR chunks
-	 ostr.put_chunk(chkid);
-	 dir->encode(ostr);
-	 ostr.close_chunk();
+          if (dir && !no_ndir)
+            {
+              ostr.put_chunk(chkid);
+              dir->encode(ostr);
+              ostr.close_chunk();
+            }
 #endif
-      } else if (!no_ndir || chkid!="NDIR")
-      {
-	 ostr.put_chunk(chkid);
-	 ostr.copy(iff);
-	 ostr.close_chunk();
-      }
+        } 
+      else
+        {
+          ostr.put_chunk(chkid);
+          ostr.copy(iff);
+          ostr.close_chunk();
+        }
       iff.close_chunk();
-
-      if (!have_anta && chunk_num==0 &&
-	  anno && !anno->is_empty())
-      {
-	 ostr.put_chunk("ANTa");
-	 anno->encode(ostr);
-	 ostr.close_chunk();
-      }
-      chunk_num++;
    }
-
-   if (top_level) ostr.close_chunk();
+   // Otherwise, writes annotation at the end (annotations could be big)
+   if (!processed_annotation && anno && anno->size())
+     {
+       // Borrow inc_files_lock since MemoryByteStreams are not thread safe
+       GCriticalSectionLock lock(&inc_files_lock);  // anno_lock ?
+       ostr.put_chunk("FORM:ANNO");
+       anno->seek(0);
+       ostr.copy(*anno);
+       ostr.close_chunk();
+     }
+   // Close iff
+   if (top_level) 
+     ostr.close_chunk();
 }
 
 
@@ -1346,6 +1327,25 @@ DjVuFile::get_djvu_data(bool included_too, bool no_ndir)
    GP<MemoryByteStream> pbs = get_djvu_bytestream(included_too, no_ndir);
    return new DataPool(*pbs);
 }
+
+void
+DjVuFile::merge_anno(MemoryByteStream &out)
+{
+  // Borrow inc_files_lock since MemoryByteStreams are not thread safe
+  GCriticalSectionLock lock(&inc_files_lock);   // used as anno_lock as well  
+  GPList<DjVuFile> incl = get_included_files(); // locked!
+  for (GPosition pos=incl; pos; ++pos)
+    incl[pos]->merge_anno(out);
+  if (anno && anno->size())
+    {
+      if (out.tell() & 1)
+        out.write((void*)"", 1);
+      anno->seek(0);
+      out.copy(*anno);
+    }
+}
+
+
 
 //****************************************************************************
 //******************************* Modifying **********************************

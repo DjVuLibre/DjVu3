@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuImage.h,v 1.21 1999-09-20 22:02:19 eaf Exp $
+//C- $Id: DjVuImage.h,v 1.22 1999-09-30 16:21:35 leonb Exp $
 
 #ifndef _DJVUIMAGE_H
 #define _DJVUIMAGE_H
@@ -51,7 +51,7 @@
     L\'eon Bottou <leonb@research.att.com> - initial implementation
     Andrei Erofeev <eaf@geocities.com> - multipage support
     @version
-    #$Id: DjVuImage.h,v 1.21 1999-09-20 22:02:19 eaf Exp $# */
+    #$Id: DjVuImage.h,v 1.22 1999-09-30 16:21:35 leonb Exp $# */
 //@{
 
 
@@ -128,10 +128,6 @@ public:
       This function returns a null pointer until the decoder
       actually processes an #"INFO"# chunk. */
   GP<DjVuInfo>   get_info() const;
-  /** Returns a pointer to a DjVu display annotation component.
-      This function returns a null pointer until the decoder
-      actually processes an #"ANTa"# chunk. */
-  GP<DjVuAnno>   get_anno() const;
   /** Returns a pointer to the IW44 encoded background component of a DjVu
       image.  This function returns a null pointer until the decoder actually
       processes an #"BG44"# chunk. */
@@ -151,6 +147,11 @@ public:
       this implementation. This function returns a null pointer until the
       decoder actually processes an #"FG44"# chunk. */
   GP<GPixmap>    get_fgpm() const;
+  /** Returns a pointer to a MemoryByteStream containing all the annotation
+      chunks collected so far for this image.  Individual chunks can be
+      retrieved using \Ref{IFFByteStream}. Returns NULL if no chunks have been
+      collected yet. */
+  GP<MemoryByteStream> get_anno() const;
   //@}
 
   // NEW STYLE DECODING
@@ -315,7 +316,6 @@ private:
    // HELPERS
    int	stencil(GPixmap *pm, const GRect &rect, int subs, double gcorr) const;
    GP<DjVuInfo>		get_info(const GP<DjVuFile> & file) const;
-   GP<DjVuAnno>		get_anno(const GP<DjVuFile> & file) const;
    GP<IWPixmap>		get_bg44(const GP<DjVuFile> & file) const;
    GP<GPixmap>		get_bgpm(const GP<DjVuFile> & file) const;
    GP<JB2Image>		get_fgjb(const GP<DjVuFile> & file) const;

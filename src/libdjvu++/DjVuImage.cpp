@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuImage.cpp,v 1.30 1999-09-20 22:02:19 eaf Exp $
+//C- $Id: DjVuImage.cpp,v 1.31 1999-09-30 16:21:35 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -53,19 +53,6 @@ DjVuImage::get_info(const GP<DjVuFile> & file) const
    {
       GP<DjVuInfo> info=get_info(list[pos]);
       if (info) return info;
-   }
-   return 0;
-}
-
-GP<DjVuAnno>
-DjVuImage::get_anno(const GP<DjVuFile> & file) const
-{
-   if (file->anno) return file->anno;
-   GPList<DjVuFile> list=file->get_included_files();
-   for(GPosition pos=list;pos;++pos)
-   {
-      GP<DjVuAnno> anno=get_anno(list[pos]);
-      if (anno) return anno;
    }
    return 0;
 }
@@ -129,10 +116,15 @@ DjVuImage::get_info() const
    else return 0;
 }
 
-GP<DjVuAnno>   
+GP<MemoryByteStream>   
 DjVuImage::get_anno() const
 {
-   if (file) return get_anno(file);
+   GP<MemoryByteStream> out = new MemoryByteStream;
+   if (file) 
+     file->merge_anno(*out);
+   out->seek(0);
+   if (out->size()) 
+     return out;
    else return 0;
 }
 
