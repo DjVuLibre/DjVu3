@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuGlobal.h,v 1.19 1999-10-05 16:00:06 leonb Exp $
+//C- $Id: DjVuGlobal.h,v 1.20 1999-12-08 16:47:58 bcr Exp $
 
 
 #ifndef _DJVUGLOBAL_H
@@ -27,7 +27,7 @@
     @memo
     Global definitions.
     @version
-    #$Id: DjVuGlobal.h,v 1.19 1999-10-05 16:00:06 leonb Exp $#
+    #$Id: DjVuGlobal.h,v 1.20 1999-12-08 16:47:58 bcr Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> -- empty file.\\
     Bill Riemers <bcr@sanskrit.lz.att.com> -- real work.  */
@@ -40,64 +40,96 @@
     defined.  Function #_djvu_memory_callback# can be used to redefine the C++
     memory allocation operators.  Some operating systems (e.g. Macintoshes)
     require very peculiar memory allocation in shared objects.  We redefine
-    the operators #new# and #delete# as #inline_as_macro# because we do not
+    the operators #new# and #delete# as #STATIC_INLINE# because we do not
     want to export these redefined versions to other libraries.  */
 //@{
 //@}
 
 #ifdef NEED_DJVU_MEMORY
 #include <new.h>
-
 // Normally, this is the only functions we should need.
 typedef void djvu_delete_callback(void *);
 typedef void *djvu_new_callback(size_t);
-void _djvu_memory_callback(djvu_delete_callback*, djvu_new_callback*);
+// Normally, these are the only functions we should need.
+int djvu_memoryObject_callback ( djvu_delete_callback*, djvu_new_callback*);
+int djvu_memoryArray_callback ( djvu_delete_callback*, djvu_new_callback*);
 
-#ifndef NEED_DJVU_MEMORY_IMPLEMENTATION
 // We need to use this inline function in all modules, but we never want it to
 // appear in the symbol table.  It seems different compilers need different
 // directives to do this...
-#ifndef inline_as_macro
+#ifndef STATIC_INLINE
 #ifdef __GNUC__
-#define inline_as_macro extern inline
-#else
-#define inline_as_macro inline
-#endif
-#endif
+#define STATIC_INLINE extern inline
+#else /* !__GNUC__ */
+#define STATIC_INLINE inline
+#endif /* __GNUC__ */
+#endif /* STATIC_INLINE */
 // This clause is used when overriding operator new
 // because the standard has slightly changed.
 #if defined( __GNUC__ ) && ( __GNUC__*1000 + __GNUC_MINOR__ >= 2091 )
 #ifndef new_throw_spec
 #define new_throw_spec throw(std::bad_alloc)
-#endif
+#endif /* new_throw_spec */
 #ifndef delete_throw_spec
 #define delete_throw_spec throw()
-#endif
-#endif
+#endif /* delete_throw_spec */
+#endif /* __GNUC__ ... */
 // Old style
 #ifndef new_throw_spec
 #define new_throw_spec
-#endif
+#endif /* new_throw_spec */
 #ifndef delete_throw_spec
 #define delete_throw_spec
-#endif 
-// Overrides
-void *_djvu_new(size_t);
-void  _djvu_delete(void *);
-inline_as_macro void *
+#endif  /* delete_throw_spec */
+
+// Replacement functions.
+void * _djvu_new(size_t);
+void * _djvu_newArray(size_t);
+void _djvu_delete(void *);
+void _djvu_deleteArray(void *);
+
+#ifdef UNIX
+extern djvu_new_callback *_djvu_new_ptr;
+extern djvu_new_callback *_djvu_newArray_ptr;
+extern djvu_delete_callback *_djvu_delete_ptr;
+extern djvu_delete_callback *_djvu_deleteArray_ptr;
+
+#ifndef NEED_DJVU_MEMORY_IMPLEMENTATION
+void *operator new (size_t) new_throw_spec;
+void *operator new[] (size_t) new_throw_spec;
+void operator delete (void *) delete_throw_spec;
+void operator delete[] (void *) delete_throw_spec;
+
+STATIC_INLINE void *
+operator new(size_t sz) new_throw_spec
+{ return (*_djvu_new_ptr)(sz); }
+STATIC_INLINE void
+operator delete(void *addr) delete_throw_spec
+{ return (*_djvu_delete_ptr)(addr); }
+STATIC_INLINE void *
+operator new [] (size_t sz) new_throw_spec
+{ return (*_djvu_newArray_ptr)(sz); }
+STATIC_INLINE void
+operator delete [] (void *addr) delete_throw_spec
+{ return (*_djvu_deleteArray_ptr)(addr); }
+#endif /* NEED_DJVU_MEMORY_IMPLEMENTATION */
+#else
+#ifndef NEED_DJVU_MEMORY_IMPLEMENTATION
+STATIC_INLINE void *
 operator new(size_t sz) new_throw_spec
 { return _djvu_new(sz); }
-inline_as_macro void
+STATIC_INLINE void
 operator delete(void *addr) delete_throw_spec
 { return _djvu_delete(addr); }
-inline_as_macro void *
+STATIC_INLINE void *
 operator new [] (size_t sz) new_throw_spec
-{ return _djvu_new(sz); }
-inline_as_macro void
+{ return _djvu_newArray(sz); }
+STATIC_INLINE void
 operator delete [] (void *addr) delete_throw_spec
-{ return _djvu_delete(addr); }
-#endif // !NEED_DJVU_MEMORY_IMPLEMENTATION
-#endif // NEED_DJVU_MEMORY
+{ return _djvu_deleteArray(addr); }
+#endif /* !NEED_DJVU_MEMORY_IMPLEMENTATION */
+#endif /* UNIX */
+#endif /* NEED_DJVU_MEMORY */
 
 
 
@@ -191,6 +223,6 @@ private:
 #endif // NEED_DJVU_NAMES
 
 //@}
-#endif // _DJVUGLOBAL_H_
+#endif /* _DJVUGLOBAL_H_ */
 
 
