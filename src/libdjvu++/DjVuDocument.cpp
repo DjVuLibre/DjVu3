@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.113 2000-02-16 07:38:19 bcr Exp $
+//C- $Id: DjVuDocument.cpp,v 1.114 2000-02-17 18:00:37 praveen Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -330,7 +330,7 @@ DjVuDocument::get_int_prefix(void)
       // file's URL. Please note, that output of this function is used only
       // as name for DjVuPortcaster. Not as a URL.
    char buffer[128];
-   sprintf(buffer, "document_%p%d?", this, hash((GString) init_url));
+   sprintf(buffer, "document_%p%d?", this, hash((GString) (const char*)init_url));
    return buffer;
 }
 
