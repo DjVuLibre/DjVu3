@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuAPI.h,v 1.33 2000-01-31 06:52:20 bcr Exp $
+ *C- $Id: DjVuAPI.h,v 1.34 2000-01-31 17:02:20 bcr Exp $
  *
  * The main header file for the DjVu API
  */
@@ -17,7 +17,11 @@
 
 /* 
  * $Log: DjVuAPI.h,v $
- * Revision 1.33  2000-01-31 06:52:20  bcr
+ * Revision 1.34  2000-01-31 17:02:20  bcr
+ * Converted the RawStream into a separate class.  I will be adding callbacks
+ * to this class next.
+ *
+ * Revision 1.33  2000/01/31 06:52:20  bcr
  * Added an djvu_export_image() function, to allow decoding images to memory.
  *
  * Revision 1.32  2000/01/30 02:41:04  praveen
@@ -836,7 +840,7 @@ djvu_import_image ( djvu_image * );
  * be freed with djvu_image_free.
  */
 DJVUAPI djvu_export
-djvu_export_image ( djvu_image *[1] );
+djvu_export_image ( djvu_image *[], const int size );
 
 #ifdef __cplusplus
 }
