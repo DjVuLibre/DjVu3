@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ddjvu.cpp,v 1.22 2001-06-05 03:19:57 bcr Exp $
+// $Id: ddjvu.cpp,v 1.23 2001-06-11 18:32:27 fcrary Exp $
 // $Name:  $
 
 /** @name ddjvu
@@ -111,7 +111,7 @@
     Yann Le Cun <yann@research.att.com>\\
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: ddjvu.cpp,v 1.22 2001-06-05 03:19:57 bcr Exp $# */
+    #$Id: ddjvu.cpp,v 1.23 2001-06-11 18:32:27 fcrary Exp $# */
 //@{
 //@}
 
@@ -157,13 +157,13 @@ convert(const GURL &from, const GURL &to, int page_num)
   // Create DjVuDocument
   GP<DjVuDocument> doc=DjVuDocument::create_wait(from);
   if (! doc->wait_for_complete_init())
-    G_THROW( ERR_MSG("Decoding failed. Nothing can be done."));
+    G_THROW( ERR_MSG("ddjvu.failed") );
   
   // Create DjVuImage
   start=GOS::ticks();
   GP<DjVuImage> dimg=doc->get_page(page_num);
   if (!dimg || ! dimg->wait_for_complete_decode() )
-    G_THROW( ERR_MSG("Decoding failed. Nothing can be done."));
+    G_THROW( ERR_MSG("ddjvu.failed") );
   stop=GOS::ticks();
 
   // Verbose
@@ -194,7 +194,7 @@ convert(const GURL &from, const GURL &to, int page_num)
     { 
       DjVuPrintError("%s","Warning: This is not a well formed DjVu image\n");
       if (!info)
-        G_THROW( ERR_MSG("Cannot find INFO chunk. Aborting.")); 
+        G_THROW( ERR_MSG("ddjvu.no_info") ); 
     }
 
   // Setup rectangles
@@ -256,7 +256,7 @@ convert(const GURL &from, const GURL &to, int page_num)
     }
   else 
     {
-      G_THROW(ERR_MSG("Cannot render the requested image"));
+      G_THROW( ERR_MSG("ddjvu.cant_render") );
     }
 }
 
@@ -289,7 +289,7 @@ usage()
 static inline void
 syntax_error(void)
 {
-  G_THROW( ERR_MSG("Syntax error in geometry specification"));
+  G_THROW( ERR_MSG("ddjvu.syntax"));
 }
 
 void
@@ -366,41 +366,41 @@ main(int argc, char **argv)
           else if (s == "-scale")
             {
               if (argc<=2)
-                G_THROW( ERR_MSG("No argument for option '-scale'"));
+                G_THROW( ERR_MSG("ddjvu.no_scale") );
               if (flag_subsample>=0 || flag_scale>=0 || flag_size>=0)
-                G_THROW( ERR_MSG("Duplicate scaling specification"));
+                G_THROW( ERR_MSG("ddjvu.dupl_scale") );
               argc -=1;
               dargv.shift(-1);
               s = dargv[1];
               int pos;
               flag_scale = s.toDouble(0,pos);
               if((pos<0)||(pos == (int)s.length()))
-                G_THROW( ERR_MSG("Illegal argument for option '-scale'"));
+                G_THROW( ERR_MSG("ddjvu.bad_scale") );
               if (s[pos] == '%') 
               {
                 pos++;
               }
               if (pos < (int)s.length())
-                G_THROW( ERR_MSG("Illegal argument for option '-scale'"));
+                G_THROW( ERR_MSG("ddjvu.bad_scale"));
             }
           else if ( s == "-size")
             {
               if (argc<=2)
-                G_THROW( ERR_MSG("No argument for option '-size'"));
+                G_THROW( ERR_MSG("ddjvu.no_size") );
               if (flag_subsample>=0 || flag_scale>=0 || flag_size>=0)
-                G_THROW( ERR_MSG("Duplicate scaling specification"));
+                G_THROW( ERR_MSG("ddjvu.dupl_size"));
               argc -=1; dargv.shift(-1); s = dargv[1];
               geometry(s, fullrect);
               flag_size = 1;
               if (fullrect.xmin || fullrect.ymin)
-                G_THROW( ERR_MSG("Illegal size specification"));
+                G_THROW( ERR_MSG("ddjvu.bad_size"));
             }
           else if (s == "-segment")
             {
               if (argc<=2)
-                G_THROW( ERR_MSG("No argument for option '-segment'"));
+                G_THROW( ERR_MSG("ddjvu.no_seg") );
               if (flag_segment>=0)
-                G_THROW( ERR_MSG("Duplicate segment specification"));
+                G_THROW( ERR_MSG("ddjvu.dupl_seg") );
               argc -=1; dargv.shift(-1); s = dargv[1];
               geometry(s, segmentrect);
               flag_segment = 1;
@@ -408,33 +408,33 @@ main(int argc, char **argv)
           else if (s == "-black")
             {
               if (flag_mode)
-                G_THROW( ERR_MSG("Duplicate rendering mode specification"));
+                G_THROW( ERR_MSG("ddjvu.dupl_render"));
               flag_mode = 's';
             }
           else if (s == "-foreground")
             {
               if (flag_mode)
-                G_THROW( ERR_MSG("Duplicate rendering mode specification"));
+                G_THROW( ERR_MSG("ddjvu.dupl_render"));
               flag_mode = 'f';
             }
           else if (s == "-background")
             {
               if (flag_mode)
-                G_THROW( ERR_MSG("Duplicate rendering mode specification"));
+                G_THROW( ERR_MSG("ddjvu.dupl_render"));
               flag_mode = 'b';
             }
 	  else if (s == "-page")
 	    {
 	      if (argc<=2)
-                G_THROW( ERR_MSG("No argument for option '-page'"));
+                G_THROW( ERR_MSG("ddjvu.no_page") );
               if (page_num>=0)
-                G_THROW( ERR_MSG("Duplicate page specification"));
+                G_THROW( ERR_MSG("ddjvu.dupl_page") );
               argc -=1;
               dargv.shift(-1);
               s = dargv[1];
               page_num=s.toInt(); // atoi(s);
 	      if (page_num<=0)
-                G_THROW( ERR_MSG("Page number must be positive."));
+                G_THROW( ERR_MSG("ddjvu.bad_page"));
 	      page_num--;
 	    }
           else if (s[1]>='1' && s[1]<='9')
@@ -444,7 +444,7 @@ main(int argc, char **argv)
               if ((arg<0)||(pos<0)||(pos<(int)s.length()))
                 usage();
               if (flag_subsample>=0 || flag_scale>=0 || flag_size>=0)
-                G_THROW( ERR_MSG("Duplicate scaling specification"));
+                G_THROW( ERR_MSG("ddjvu.dupl_scale") );
               flag_subsample = arg;
             }
           else
