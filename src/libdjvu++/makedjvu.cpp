@@ -7,10 +7,10 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: makedjvu.cpp,v 1.1 1999-01-22 00:40:19 leonb Exp $
+//C-  $Id: makedjvu.cpp,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $
 
 // MakeDjVu -- Assemble IFF files
-// $Id: makedjvu.cpp,v 1.1 1999-01-22 00:40:19 leonb Exp $
+// $Id: makedjvu.cpp,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $
 // Author: Leon Bottou 08/1997
 
 #include <stdio.h>

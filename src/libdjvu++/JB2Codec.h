@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: JB2Codec.h,v 1.1 1999-01-22 00:40:19 leonb Exp $
+//C-  $Id: JB2Codec.h,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $
 
 #ifndef _JB2CODEC_H
 #define _JB2CODEC_H
@@ -96,7 +96,7 @@
     \end{itemize}
 
     @version
-    #$Id: JB2Codec.h,v 1.1 1999-01-22 00:40:19 leonb Exp $#
+    #$Id: JB2Codec.h,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $#
     @memo
     Coding bilevel images with JB2.
     @author

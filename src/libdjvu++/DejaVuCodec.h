@@ -7,13 +7,13 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: DejaVuCodec.h,v 1.1 1999-01-22 00:40:19 leonb Exp $
+//C-  $Id: DejaVuCodec.h,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $
 
 
 #ifndef _DEJAVUCODEC_H
 #define _DEJAVUCODEC_H
 
-//**** File "$Id: DejaVuCodec.h,v 1.1 1999-01-22 00:40:19 leonb Exp $
+//**** File "$Id: DejaVuCodec.h,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $
 // - Performs DEJAVU decode
 // - Author: Leon Bottou, 07/1997
 

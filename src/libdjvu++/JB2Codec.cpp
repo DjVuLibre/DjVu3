@@ -7,9 +7,9 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: JB2Codec.cpp,v 1.1 1999-01-22 00:40:19 leonb Exp $
+//C-  $Id: JB2Codec.cpp,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $
 
-// File "$Id: JB2Codec.cpp,v 1.1 1999-01-22 00:40:19 leonb Exp $"
+// File "$Id: JB2Codec.cpp,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $"
 // - Author: Leon Bottou, 04/1997
 // - based on Paul Howard's program "jb2"
 
