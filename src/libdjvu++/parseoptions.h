@@ -6,7 +6,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: parseoptions.h,v 1.28 2000-02-11 06:57:59 bcr Exp $
+//C- $Id: parseoptions.h,v 1.29 2000-02-11 17:08:34 bcr Exp $
 
 #endif /* __cplusplus */
 
@@ -67,7 +67,7 @@
 
    @memo Class used for parsing options and configuration files.
    @author Bill Riemers
-   @version #$Id: parseoptions.h,v 1.28 2000-02-11 06:57:59 bcr Exp $#
+   @version #$Id: parseoptions.h,v 1.29 2000-02-11 17:08:34 bcr Exp $#
  */
 
 /*@{*/
@@ -405,7 +405,8 @@ public:
 
 
 private:
-  /** If you wish to retrieve the same variable multiple times, or from    
+  int profile_token;
+  /* If you wish to retrieve the same variable multiple times, or from    
       multiple profiles, we recommend retrieving the token value for that  
       variable, to avoid repeated lookups of the string.                   
       Negative values are returned for an unregistered variable name. */

@@ -278,17 +278,6 @@ djvutopnm.o: djvutopnm.cpp GException.h \
  DjVuPalette.h DjVuPort.h GURL.h \
  DjVuNavDir.h DjVuDocument.h DjVuFileCache.h \
  debug.h DjVmDir0.h DjVmDoc.h DjVmDir.h \
- GOS.h parseoptions.h c-wrappers/DjVu.h
-djvutopnm_old.o: djvutopnm_old.cpp GException.h \
- DjVuGlobal.h GSmartPointer.h GRect.h \
- GPixmap.h ByteStream.h GContainer.h \
- Arrays.h GBitmap.h DjVuImage.h GString.h \
- GThreads.h IFFByteStream.h JB2Image.h \
- ZPCodec.h IWImage.h DjVuInfo.h DjVuAnno.h \
- GMapAreas.h DjVuFile.h DataPool.h \
- DjVuPalette.h DjVuPort.h GURL.h \
- DjVuNavDir.h DjVuDocument.h DjVuFileCache.h \
- debug.h DjVmDir0.h DjVmDoc.h DjVmDir.h \
  GOS.h
 parseoptions.o: parseoptions.cpp parseoptions.h \
  c-wrappers/DjVu.h DjVuGlobal.h

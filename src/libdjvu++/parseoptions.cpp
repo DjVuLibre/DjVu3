@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: parseoptions.cpp,v 1.37 2000-02-03 05:36:14 bcr Exp $
+//C- $Id: parseoptions.cpp,v 1.38 2000-02-11 17:08:34 bcr Exp $
 #ifdef __GNUC__
 #pragma implementation
 #endif
@@ -37,6 +37,9 @@ static const char RootDjVuDir[] ="/etc/DjVu/";
 static const char ConfigExt[] =".conf";
 static const unsigned int local_bufsize=256;
 static const char default_string[]=DEFAULT_STRING;
+static const char profile_token_string[]="profile:";
+static const char profile_token_read_string[]="read";
+static const char profile_token_default_string[]="default";
 
 // These are some static functions we need.  They don't need access to class
 // variables so, there is no need to messup the class declarations with them.
@@ -166,6 +169,7 @@ DjVuParseOptions::DjVuParseOptions(const char prog[])
   Arguments=new Profiles;
   Errors=new ErrorList;
   filename=0;
+  profile_token=VarTokens->SetToken(profile_token_string);
   defaultProfile=ReadConfig(default_string);
   const char *progname=strrchr(prog,'/');
   progname=progname?(progname+1):prog;
@@ -201,6 +205,7 @@ DjVuParseOptions::DjVuParseOptions (
   name=new char [strlen(readasprofile)+1];
   strcpy(name,readasprofile);
   filename=0;
+  profile_token=VarTokens->SetToken(profile_token_string);
   defaultProfile=ReadConfig(default_string);
   currentProfile=ReadConfig(readfilename,readasprofile);
 }
@@ -225,6 +230,7 @@ DjVuParseOptions::DjVuParseOptions
   Arguments=new Profiles;
   name=new char [strlen(Original.name)+1];
   strcpy(name,Original.name);
+  profile_token=VarTokens->SetToken(profile_token_string);
   if(Original.filename)
   {
     filename=new char [strlen(Original.filename)+1];
@@ -311,7 +317,7 @@ DjVuParseOptions::ChangeProfile(const char prog[])
   name=new char [strlen(progname)+1];
   strcpy(name,progname);
   currentProfile=ReadConfig(name);
-  const char *s=GetValue("profile:");
+  const char *s=GetValue(profile_token);
   return (s&&s[0]);
 }
 
@@ -681,12 +687,12 @@ DjVuParseOptions::ReadConfig(const char prog[],
     (void)(Configuration->Grow(retval+1));
     if(f)
     {
-      Configuration->Add(retval,VarTokens->SetToken("profile:"),"read");
+      Configuration->Add(retval,profile_token,profile_token_default_string);
       ReadFile(line,f,retval);
       fclose(f);
     }else
     {
-      Configuration->Add(retval,VarTokens->SetToken("profile:"),"");
+      Configuration->Add(retval,profile_token,"");
     }
   }else
   {
@@ -707,12 +713,12 @@ DjVuParseOptions::ReadConfig(const char prog[],
       if(((ConfigFilename(xname,0)&&(f=fopen(filename,"r"))))
          ||((ConfigFilename(xname,1)&&(f=fopen(filename,"r")))))
       {
-        Configuration->Add(retval,VarTokens->SetToken("profile:"),"read");
+        Configuration->Add(retval,profile_token,profile_token_read_string);
         ReadFile(line,f,retval);
         fclose(f);
       }else
       {
-        Configuration->Add(retval,VarTokens->SetToken("profile:"),"");
+        Configuration->Add(retval,profile_token,"");
       }
     }
   }
@@ -728,13 +734,16 @@ DjVuParseOptions::ReadNextConfig
 {
   const char *xname=strrchr(prog,'/');
   xname=xname?(xname+1):prog;
+
+  // First check and see if we have already read in this profile.
   int profile=ProfileTokens->GetToken(xname);
-  if(profile<0)
+  const char * const s=(profile>0)?Configuration->GetValue(profile,profile_token):0;
+
+  if(!s||strcmp(s,profile_token_read_string))
   {
     profile=ProfileTokens->SetToken(xname);
-  // First check and see if we have already read in this profile.
     (void)(Configuration->Grow(profile+1));
-    Configuration->Add(profile,VarTokens->SetToken("profile:"),"read");
+    Configuration->Add(profile,profile_token,profile_token_read_string);
     ReadFile(line,f,profile);
   }else if(f)
   {
