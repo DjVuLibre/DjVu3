@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GURL.cpp,v 1.74 2001-06-18 19:44:26 lchen Exp $
+// $Id: GURL.cpp,v 1.75 2001-06-19 19:06:17 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -1111,7 +1111,7 @@ url_from_UTF8filename(const GUTF8String &gfilename)
 {
   if(GURL::UTF8(gfilename).is_valid())
   {
-    DEBUG_MSG("Illegal URL: " << gfilename << "\n");
+    DEBUG_MSG("Debug: URL as Filename: " << gfilename << "\n");
   } 
   const char *filename=gfilename;
   if(filename && (unsigned char)filename[0] == (unsigned char)0xEF

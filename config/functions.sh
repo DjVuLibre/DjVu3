@@ -31,7 +31,7 @@
 #C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #
-# $Id: functions.sh,v 1.65 2001-06-19 17:23:31 bcr Exp $
+# $Id: functions.sh,v 1.66 2001-06-19 19:06:16 bcr Exp $
 # $Name:  $
 
 #
@@ -1022,7 +1022,7 @@ generate_makefile()
   TOPSRCDIR=`unescape $TOPSRCDIR`
   TOPBUILDDIR=`unescape $TOPBUILDDIR`
   ${mkdirp} "$TOPBUILDDIR/bin"
-  ${mkdirp} "$TOPBUILDDIR/profiles/codecs"
+  ${mkdirp} "$TOPBUILDDIR/profiles/modules"
   ${mkdirp} "$TOPBUILDDIR/lib"
   ${mkdirp} "$TOPBUILDDIR/text"
   ${mkdirp} "$TOPBUILDDIR/html"
