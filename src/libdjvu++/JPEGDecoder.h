@@ -8,46 +8,43 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: JPEGDecoder.h,v 1.1 1999-10-06 22:54:25 orost Exp $
+//C- $Id: JPEGDecoder.h,v 1.2 1999-10-19 14:48:37 leonb Exp $
 
-#ifndef _JPEGDECODER_
-#define _JPEGDECODER_
+#ifndef _JPEGDECODER_H_
+#define _JPEGDECODER_H_
 
-#include <string.h>
+#include "DjVuGlobal.h"
+#ifdef NEED_JPEG_DECODER
 
 #include "ByteStream.h"
 #include "GPixmap.h"
 #include "GException.h"
-
 #include "jinclude.h"
 #include "jpeglib.h"
 #include "jerror.h"
+#include <string.h>
 #include <setjmp.h>
 
 /** @name JPEGDecoder.h
-    
-    Files #"JPEGDecoder.h"# and #"JPEGDecoder.cpp"# implement JPEG  decoding
-    algorithm. 
-    
+    Files #"JPEGDecoder.h"# and #"JPEGDecoder.cpp"# implement an
+    interface to the decoding subset of the IJG JPEG library.
     @memo
-    JPEG decoder.
+    Decoding interface to the IJG JPEG library.
     @version
-    #$Id: JPEGDecoder.h,v 1.1 1999-10-06 22:54:25 orost Exp $#
+    #$Id: JPEGDecoder.h,v 1.2 1999-10-19 14:48:37 leonb Exp $#
     @author
-    Parag Deshmukh <parag@sanskrit.lz.att.com> */
-
+    Parag Deshmukh <parag@sanskrit.lz.att.com> 
+*/
 //@{
 
+/** This class ensures namespace isolation. */
 class JPEGDecoder {
-	public:
-		~JPEGDecoder(){};
-		JPEGDecoder(){};
-    /** Decodes the JPEG formated ByteStream */ 
-
-		static GP<GPixmap> decode(ByteStream & bs);
-
+public:
+  /** Decodes the JPEG formated ByteStream */ 
+  static GP<GPixmap> decode(ByteStream & bs);
 };
 
-#endif
-
 //@}
+
+#endif // NEED_JPEG_DECODER
+#endif // _JPEGDECODER_H_

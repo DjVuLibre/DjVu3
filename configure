@@ -32,19 +32,14 @@ do
     --with-rpo|--frepo )
       use_rpo=yes
       ;;
-    --with-jpeg-inc=* )
-      jpeg_inc_path=`echo $arg | sed 's/[-A-Za-z_]*=//'` 
-			C_DEFS=APPEND
-			A_DEFS="$A_DEFS -DNEED_JPEG_DECODER"
-			C_INCS=APPEND
-			A_INCS="$A_INCS -I$jpeg_inc_path"
-			C_JOBJ=APPEND
-			A_JOBJ="$A_JOBJ JPEGDecoder.o"
-      ;;
-    --with-jpeg-lib=* )
-      jpeg_lib_path=`echo $arg | sed 's/[-A-Za-z_]*=//'` 
-			C_LIBS=APPEND
-			A_LIBS="$A_LIBS $jpeg_lib_path"
+    --with-jpeg )
+      with_jpeg=yes
+      C_DEFS=APPEND
+      A_DEFS="$A_DEFS -DNEED_JPEG_DECODER"
+      C_INCS=APPEND
+      A_INCS="$A_INCS -I\$(TOPSRCDIR)/src/libdjpeg"
+      C_LIBS=APPEND
+      A_LIBS="$A_LIBS \$(TOPBUILDDIR)/src/libdjpeg/libdjpeg.a"
       ;;
     *)
       if ( process_general_option $arg )
@@ -56,8 +51,7 @@ do
         list_general_options
         echo 1>&2 "  --with-threads=(no|co|posix|dce)          choose a thread implementation."
         echo 1>&2 "  --with-rpo,--frepo                        use --frepo option in G++."
-        echo 1>&2 "  --with-jpeg-inc=jpeg_inc_path         give a jpeg include file path."
-        echo 1>&2 "  --with-jpeg-lib=jpeg_lib_path         give a jpeg library  path."
+        echo 1>&2 "  --with-jpeg                               include JPEG decoder (bulky)."
         exit 1 
       fi
       ;;
@@ -80,7 +74,16 @@ fi
 ### ---------------------------
 ### Proceed
 
-require_compiler c++
+if [ "$with_jpeg" = yes ] 
+then
+    check_compiler c c++
+    require_compiler c
+    require_compiler c++
+else
+    check_compiler c++
+    require_compiler c++
+fi
+
 check_debug_option $debug
 check_thread_option $threads
 require_library math log -lm
@@ -94,15 +97,30 @@ require_make_stlib
 generate_makefile src/libdjvu++
 generate_makefile src/libdjvu++/Test
 
-generate_main_makefile src/libdjvu++ <<\EOF
+if [ "$with_jpeg" = yes ] 
+then
+    ## This is the version with JPEG 
+    generate_makefile src/libdjpeg
+    generate_main_makefile src/libdjpeg src/libdjvu++ <<\EOF
+all: 
+	( cd src/libdjpeg; $(MAKE) lib )
+	( cd src/libdjvu++; $(MAKE) lib prog )
 
+install:
+	( cd src/libdjpeg; $(MAKE) install-lib )
+	( cd src/libdjvu++; $(MAKE) install-lib install-prog )
+EOF
+
+else
+    ## This is the regular version
+    generate_main_makefile src/libdjvu++ <<\EOF
 all: 
 	( cd src/libdjvu++; $(MAKE) lib prog )
 
 install:
 	( cd src/libdjvu++; $(MAKE) install-lib install-prog )
-
 EOF
+fi
 
 
 
