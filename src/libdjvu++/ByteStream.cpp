@@ -9,9 +9,9 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: ByteStream.cpp,v 1.11 1999-06-08 20:36:24 leonb Exp $
+//C- $Id: ByteStream.cpp,v 1.12 1999-08-17 21:28:09 eaf Exp $
 
-// File "$Id: ByteStream.cpp,v 1.11 1999-06-08 20:36:24 leonb Exp $"
+// File "$Id: ByteStream.cpp,v 1.12 1999-08-17 21:28:09 eaf Exp $"
 // - Author: Leon Bottou, 04/1997
 
 #ifdef __GNUC__
@@ -145,6 +145,17 @@ ByteStream::write16(unsigned int card)
 }
 
 void 
+ByteStream::write24(unsigned int card)
+{
+  unsigned char c[3];
+  c[0] = (card>>16) & 0xff;
+  c[1] = (card>>8) & 0xff;
+  c[2] = (card) & 0xff;
+  if (writall((void*)c, sizeof(c)) != sizeof(c))
+    THROW(strerror(errno));
+}
+
+void 
 ByteStream::write32(unsigned int card)
 {
   unsigned char c[4];
@@ -172,6 +183,15 @@ ByteStream::read16()
   if (readall((void*)c, sizeof(c)) != sizeof(c))
     THROW("EOF");
   return (c[0]<<8)+c[1];
+}
+
+unsigned int 
+ByteStream::read24()
+{
+  unsigned char c[3];
+  if (readall((void*)c, sizeof(c)) != sizeof(c))
+    THROW("EOF");
+  return (((c[0]<<8)+c[1])<<8)+c[2];
 }
 
 unsigned int 

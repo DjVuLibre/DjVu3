@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: ByteStream.h,v 1.11 1999-05-25 19:42:27 eaf Exp $
+//C- $Id: ByteStream.h,v 1.12 1999-08-17 21:28:10 eaf Exp $
 
 
 #ifndef _BYTESTREAM_H
@@ -41,7 +41,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation\\
     Andrei Erofeev <eaf@research.att.com> -- 
     @version
-    #$Id: ByteStream.h,v 1.11 1999-05-25 19:42:27 eaf Exp $# */
+    #$Id: ByteStream.h,v 1.12 1999-08-17 21:28:10 eaf Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -168,6 +168,10 @@ public:
       The integer most significant byte is written first,
       regardless of the processor endianness. */
   void write16(unsigned int card16);
+  /** Writes a three-bytes integer to a ByteStream.
+      The integer most significant byte is written first,
+      regardless of the processor endianness. */
+  void write24(unsigned int card24);
   /** Writes a four-bytes integer to a ByteStream. 
       The integer most significant bytes are written first,
       regardless of the processor endianness. */
@@ -178,6 +182,10 @@ public:
       The integer most significant byte is read first,
       regardless of the processor endianness. */
   unsigned int read16();
+  /** Reads a three-bytes integer from a ByteStream.
+      The integer most significant byte is read first,
+      regardless of the processor endianness. */
+  unsigned int read24();
   /** Reads a four-bytes integer from a ByteStream.
       The integer most significant bytes are read first,
       regardless of the processor endianness. */
