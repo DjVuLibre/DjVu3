@@ -2,7 +2,9 @@
 .1.txt:
 	@echo "nroff -man $*.1|sed -e 's,.^H,,g' > $*.txt"
 	@if [ -r "$*.1" ] ; then i="$*.1" ; else i="SRCDIR/$*.1" ; fi ; \
-	if ( nroff -man "$$i"|cat -s|$(SED) -e 's,.,,g' > "$*.txt" ) ; \
+	if ( nroff -man "$$i"|cat -s|$(SED) -e 's,.,,g' \
+		-e 's,\(djvu[a-z][a-z]*\)([15]),\1.txt,g' \
+		> "$*.txt" ) ; \
 	then $(TRUE) ; else \
 		$(RM) -f "$*.txt" ; \
 		exit 1 ; \
@@ -11,7 +13,9 @@
 .5.txt:
 	@echo "nroff -man $*.5|sed -e 's,.^H,,g' > $*.txt"
 	@if [ -r "$*.5" ] ; then i="$*.5" ; else i="SRCDIR/$*.5" ; fi ; \
-	if ( nroff -man "$$i"|cat -s|$(SED) -e 's,.,,g' > "$*.txt" ) ; \
+	if ( nroff -man "$$i"|cat -s|$(SED) -e 's,.,,g' \
+		-e 's,\(djvu[a-z][a-z]*\)([15]),\1.txt,g' \
+		> "$*.txt" ) ; \
 	then $(TRUE) ; else \
 		$(RM) -f "$*.txt" ; \
 		exit 1 ; \
@@ -39,7 +43,11 @@
 	@echo "pod2html --infile=$*.pod --outfile=$*.html"
 	@if [ -r "$*.pod" ] ; then i="$*.pod" ; else i="SRCDIR/$*.pod" ; fi ; \
 	pod2html --infile="$$i" --outfile="$*.tmp"
-	if ( $(SED) -e 's,^<BODY>,<BODY BGCOLOR=\#fefefe BACKGROUND="back.jpg">,' -e 's,H1>,H3>,g' < "$*.tmp" > "$*.html" ) ; \
+	if ( $(SED) \
+		-e 's,^<BODY>,<BODY BGCOLOR=\#fefefe BACKGROUND="back.jpg">,' \
+		-e 's,H1>,H3>,g' \
+		-e 's,\(djvu[a-z][a-z]*\)\(([15])\),<A HREF=\1.html>\1\2</A>,g' \
+		< "$*.tmp" > "$*.html" ) ; \
 	then $(RM) -f "$*.tmp" pod2html-* ; else $(RM) -f "$*.tmp" "$*.html" pod2html-* ; exit 1 ; fi
 
 
