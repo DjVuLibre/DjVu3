@@ -1,7 +1,7 @@
 //C-  Copyright © 2000-2001, LizardTech, Inc. All Rights Reserved.
 //C-              Unauthorized use prohibited.
 //
-// $Id: GUnicode.cpp,v 1.1 2001-01-17 00:14:55 bcr Exp $
+// $Id: GUnicode.cpp,v 1.2 2001-01-17 00:22:52 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -698,11 +698,11 @@ GUnicode::setat(unsigned int const pos,unsigned long const w)
 }
 
 UnicodeRep::Remainder::Remainder(UnicodeRep::Remainder::EncodeType t)
-: encodetype(t),gdata(data,0),size(0) {}
+: encodetype(t),gdata(data,0,1),size(0) {}
 
 
 UnicodeRep::Remainder::Remainder(const Remainder &r)
-: encodetype(r.encodetype),gdata(data,r.size),size(r.size)
+: encodetype(r.encodetype),gdata(data,r.size,1),size(r.size)
 {
   if(size)
   {
@@ -711,7 +711,7 @@ UnicodeRep::Remainder::Remainder(const Remainder &r)
 }
 
 UnicodeRep::Remainder::Remainder(const Remainder &r1,const Remainder &r2)
-: encodetype(UnicodeRep::Remainder::OTHER),gdata(data,0),size(0)
+: encodetype(UnicodeRep::Remainder::OTHER),gdata(data,0,1),size(0)
 {
   init(r1,r2);
 }
@@ -738,8 +738,8 @@ UnicodeRep::Remainder::init(
   }else if(r1.size
     &&((r1.encodetype == OTHER)||(r1.encodetype == t)))
   {
-    gdata.resize(0);
-    gdata.resize(size);
+    gdata.resize(0,1);
+    gdata.resize(size,1);
     size=r1.size+r2.size;
     memcpy(data,r1.data,r1.size);
     memcpy((unsigned char *)data+r2.size,r2.data,r2.size);
@@ -757,10 +757,10 @@ void
 UnicodeRep::Remainder::init(
   void const * const d,size_t const s,UnicodeRep::Remainder::EncodeType t)
 {
-  gdata.resize(0);
+  gdata.resize(0,1);
   if(d && s)
   {
-    gdata.resize(s);
+    gdata.resize(s,1);
     size=s;
     memcpy(data,d,s);
   }else
