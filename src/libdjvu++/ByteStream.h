@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.h,v 1.41 2001-02-15 20:31:57 bcr Exp $
+// $Id: ByteStream.h,v 1.42 2001-02-15 21:49:20 fcrary Exp $
 // $Name:  $
 
 #ifndef _BYTESTREAM_H
@@ -62,7 +62,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation\\
     Andrei Erofeev <eaf@geocities.com> -- 
     @version
-    #$Id: ByteStream.h,v 1.41 2001-02-15 20:31:57 bcr Exp $# */
+    #$Id: ByteStream.h,v 1.42 2001-02-15 21:49:20 fcrary Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -296,15 +296,14 @@ ByteStream::size(void) const
   return bsize;
 }
 
-/** ByteStream::Wrapper impliments wrapping bytestream.  This is usefull
-    for dirived classes that take a GP<ByteStream> as a creation argument,
-    and the backwards compatable bytestreams.  */
+/** ByteStream::Wrapper implements wrapping bytestream.  This is useful
+    for derived classes that take a GP<ByteStream> as a creation argument,
+    and the backwards compatible bytestreams.  */
 class ByteStream::Wrapper : public ByteStream
 {
 protected:
   GP<ByteStream> gbs;
   ByteStream *bs;
-  void init(GP<ByteStream> xbs) { bs=gbs=xbs; }
   Wrapper(void) : bs(0) {}
   Wrapper(GP<ByteStream> &xbs) : gbs(xbs), bs(xbs) {}
 public:
@@ -312,18 +311,16 @@ public:
   ByteStream * operator & () const {return bs;}
   ByteStream * operator & () {return bs;}
   virtual size_t read(void *buffer, size_t size)
-  { return bs->read(buffer,size); }
+    { return bs->read(buffer,size); }
   virtual size_t write(const void *buffer, size_t size)
-  { return bs->write(buffer,size); }
+    { return bs->write(buffer,size); }
   virtual long tell(void) const
-  { return bs->tell(); }
+    { return bs->tell(); }
   virtual int seek(long offset, int whence = SEEK_SET, bool nothrow=false)
-  { return bs->seek(offset,whence,nothrow); }
+    { return bs->seek(offset,whence,nothrow); }
   virtual void flush(void)
-  { bs->flush(); }
+    { bs->flush(); }
   GP<ByteStream> & get_bytestream(void) { return gbs; }
-private:
-  static void init(ByteStream *);
 };
 
 /*x Obsolete ByteStream interface for stdio files. 
@@ -345,7 +342,7 @@ public:
       \Ref{GException} is thrown with a plain text error message if the stdio
       file cannot be opened. */
   StdioByteStream(const char filename[], const char * const mode="rb")
-  { init(ByteStream::create(filename,mode)); }
+  { bs=gbs=create(filename,mode); }
 
   /*x Constructs a ByteStream for accessing the stdio file #f#.
       Argument #mode# indicates the type of the stdio file, as in the
@@ -353,7 +350,7 @@ public:
       object will not close the stdio file #f# unless closeme is true. */
   StdioByteStream(
     FILE * const f, const char * const mode="rb", const bool closeme=false)
-  { init(ByteStream::create(f,mode,closeme));;}
+  { bs=gbs=create(f,mode,closeme);}
 };
 
 /*x Obsolete ByteStream interface managing a memory buffer.  
@@ -370,21 +367,21 @@ public:
       to store data into the buffer, use function #seek# to rewind the
       current position, and function #read# to read the data back. */
   MemoryByteStream()
-  { init(create()); }
+  { bs=gbs=create(); }
   /*x Constructs a Memory by copying initial data.  The
       Memory buffer is initialized with #size# bytes copied from the
       memory area pointed to by #buffer#. */
   MemoryByteStream(const void *buffer, size_t size)
-  { init(create(buffer,size)); }
+  { bs=gbs=create(buffer,size); }
   /*x Constructs a Memory by copying an initial string.  The
       Memory buffer is initialized with the null terminated string
       #buffer#. */
   MemoryByteStream(const char *buffer)
-  { init(create(buffer,strlen(buffer))); }
+  { bs=gbs=create(buffer,strlen(buffer)); }
   /*x Erases everything in the Memory.
       The current location is reset to zero. */
   void empty(void)
-  { init(create()); }
+  { bs=gbs=create(); }
 };
 
 /*x Obsolete Read-only ByteStream interface to a memory area.  
@@ -400,11 +397,11 @@ public:
   /*x Creates a ByteStream object for allocating the memory area of
       length #sz# starting at address #buffer#. */
   StaticByteStream(const char *buffer, size_t sz)
-  { init(create_static(buffer,sz)); }
+  { bs=gbs=create_static(buffer,sz); }
   /*x Creates a ByteStream object for allocating the null terminated
       memory area starting at address #buffer#. */
   StaticByteStream(const char *buffer)
-  { init(create_static(buffer,strlen(buffer))); }
+  { bs=gbs=create_static(buffer,strlen(buffer)); }
 };
 
 //@}

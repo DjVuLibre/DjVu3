@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: IW44Image.cpp,v 1.1 2001-02-14 19:49:02 bcr Exp $
+// $Id: IW44Image.cpp,v 1.2 2001-02-15 21:49:20 fcrary Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 08/1998
@@ -1294,6 +1294,7 @@ int
 IW44Image::encode_chunk(ByteStream &, const IWEncoderParms &)
 {
   G_THROW("IW44Image.codec_open2");
+  return 0;
 }
 
 void 
