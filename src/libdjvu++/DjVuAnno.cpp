@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuAnno.cpp,v 1.30 1999-10-26 20:52:06 eaf Exp $
+//C- $Id: DjVuAnno.cpp,v 1.31 1999-10-26 20:53:50 eaf Exp $
 
 
 #ifdef __GNUC__
@@ -1161,15 +1161,15 @@ DjVuTXT::copy(void) const
 
 
 bool
-DjVuTXT::search_zone(Zone & zone, int start, int & length)
+DjVuTXT::search_zone(Zone * zone, int start, int & length)
       // Will return TRUE if 'zone' contains beginning of the text
       // at 'start'. In this case it will also modify the 'length'
       // to show how much of the text in this zone
 {
-   if (start>=zone.text_start && start<zone.text_start+zone.text_length)
+   if (start>=zone->text_start && start<zone->text_start+zone->text_length)
    {
-      if (start+length>zone.text_start+zone.text_length)
-	 length=zone.text_start+zone.text_length-start;
+      if (start+length>zone->text_start+zone->text_length)
+	 length=zone->text_start+zone->text_length-start;
       return true;
    }
    return false;
@@ -1181,14 +1181,14 @@ DjVuTXT::get_smallest_zone(int max_type, int start, int & length)
       // the text starting at start. If anything is found, length will
       // be modified to indicate how much of the text is inside the zone
 {
-   if (!search_zone(main, start, length)) return 0;
+   if (!search_zone(&main, start, length)) return 0;
    
    Zone * zone=&main;
    while(zone->ztype<max_type)
    {
       GPosition pos;
       for(pos=zone->children;pos;++pos)
-	 if (search_zone(zone->children[pos], start, length))
+	 if (search_zone(&zone->children[pos], start, length))
 	    break;
       if (pos) zone=&zone->children[pos];
       else break;

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuAnno.h,v 1.14 1999-10-26 20:52:06 eaf Exp $
+//C- $Id: DjVuAnno.h,v 1.15 1999-10-26 20:53:50 eaf Exp $
 
 #ifndef _DJVUANNO_H
 #define _DJVUANNO_H
@@ -36,7 +36,7 @@
     @memo Implements support for DjVuImage annotations
     @author Andrei Erofeev <eaf@research.att.com>
     @version
-    #$Id: DjVuAnno.h,v 1.14 1999-10-26 20:52:06 eaf Exp $# */
+    #$Id: DjVuAnno.h,v 1.15 1999-10-26 20:53:50 eaf Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -239,7 +239,7 @@ public:
       used by caching routines to estimate the size of a \Ref{DjVuImage}. */
   unsigned int get_memory_usage() const;
 private:
-  bool		search_zone(Zone & zone, int start, int & length);
+  bool		search_zone(Zone * zone, int start, int & length);
   Zone	*	get_smallest_zone(int max_type, int start, int & length);
 };
 
