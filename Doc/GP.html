@@ -1,17 +1,17 @@
 <HTML>
 <HEAD>
-   <TITLE>template<class TYPE> class  GP</TITLE>
+   <TITLE>template<class TYPE> class  _GSMARTPOINTER_H_::GP</TITLE>
    <META NAME="GENERATOR" CONTENT="DOC++ 3.4.1">
 </HEAD>
 <BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
 
-<H2>template&lt;class TYPE&gt; class  <A HREF="#DOC.DOCU">GP</A>: protected <!1><A HREF="GPBase.html#DOC.1.4.5.1">GPBase</A></H2>
+<H2>template&lt;class TYPE&gt; class  <A HREF="#DOC.DOCU">GP</A>: protected <!1><A HREF="GPBase.html#DOC.1.5.4.2.1">GPBase</A></H2>
 <BLOCKQUOTE>Reference counting pointer.</BLOCKQUOTE>
 <HR>
 
 <H2>Inheritance:</H2>
 <APPLET CODE="ClassGraph.class" WIDTH=600 HEIGHT=95>
-<param name=classes value="CGPBase,MGPBase.html,CGP,MGP.html,CGBaseString,MGBaseString.html">
+<param name=classes value="CGPBase,MGPBase.html,CGP,MGP.html,CGString,MGString.html">
 <param name=before value="M,M,M^-">
 <param name=after value="Md-,M,M">
 <param name=indent value="0,1,1">
@@ -22,37 +22,37 @@
 <DL>
 <P><DL>
 <DT><H3>Public Methods</H3><DD><DT>
-<A HREF="#DOC.1.4.6.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GP</B>()
+<A HREF="#DOC.1.5.4.3.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GP</B>()
 <DD><I>Constructs a null smart-pointer.</I>
 <DT>
-<A HREF="#DOC.1.4.6.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GP</B>(const <!1><A HREF="GP.html#DOC.1.4.6.1">GP</A>&lt;TYPE&gt; &amp;sptr)
+<A HREF="#DOC.1.5.4.3.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GP</B>(const <!1><A HREF="GP.html#DOC.1.5.4.3.1">GP</A>&lt;TYPE&gt; &amp;sptr)
 <DD><I>Constructs a copy of a smart-pointer.</I>
 <DT>
-<A HREF="#DOC.1.4.6.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GP</B>(TYPE *nptr)
+<A HREF="#DOC.1.5.4.3.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GP</B>(TYPE *nptr)
 <DD><I>Constructs a smart-pointer from a regular pointer.</I>
 <DT>
-<A HREF="#DOC.1.4.6.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>operator TYPE* </B>() const 
+<A HREF="#DOC.1.5.4.3.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>operator TYPE* </B>() const 
 <DD><I>Converts a smart-pointer into a regular pointer.</I>
 <DT>
-<A HREF="#DOC.1.4.6.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html#DOC.1.4.6.1">GP</A>&lt;TYPE&gt; &amp; <B>operator= </B>(TYPE *nptr)
+<A HREF="#DOC.1.5.4.3.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html#DOC.1.5.4.3.1">GP</A>&lt;TYPE&gt; &amp; <B>operator= </B>(TYPE *nptr)
 <DD><I>Assigns a regular pointer to a smart-pointer lvalue.</I>
 <DT>
-<A HREF="#DOC.1.4.6.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html#DOC.1.4.6.1">GP</A>&lt;TYPE&gt; &amp; <B>operator= </B>(const <!1><A HREF="GP.html#DOC.1.4.6.1">GP</A>&lt;TYPE&gt; &amp;sptr)
+<A HREF="#DOC.1.5.4.3.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html#DOC.1.5.4.3.1">GP</A>&lt;TYPE&gt; &amp; <B>operator= </B>(const <!1><A HREF="GP.html#DOC.1.5.4.3.1">GP</A>&lt;TYPE&gt; &amp;sptr)
 <DD><I>Assigns a smart-pointer to a smart-pointer lvalue.</I>
 <DT>
-<A HREF="#DOC.1.4.6.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>TYPE* <B>operator-&gt;</B>() const 
+<A HREF="#DOC.1.5.4.3.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>TYPE* <B>operator-&gt;</B>() const 
 <DD><I>Indirection operator.</I>
 <DT>
-<A HREF="#DOC.1.4.6.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>TYPE&amp; <B>operator*</B>() const 
+<A HREF="#DOC.1.5.4.3.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>TYPE&amp; <B>operator*</B>() const 
 <DD><I>Dereferencement operator.</I>
 <DT>
-<A HREF="#DOC.1.4.6.9"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>operator== </B>(TYPE *nptr) const 
+<A HREF="#DOC.1.5.4.3.9"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>operator== </B>(TYPE *nptr) const 
 <DD><I>Comparison operator.</I>
 <DT>
-<A HREF="#DOC.1.4.6.10"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>operator!= </B>(TYPE *nptr) const 
+<A HREF="#DOC.1.5.4.3.10"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>operator!= </B>(TYPE *nptr) const 
 <DD><I>Comparison operator.</I>
 <DT>
-<A HREF="#DOC.1.4.6.11"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>operator! </B>() const 
+<A HREF="#DOC.1.5.4.3.11"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>operator! </B>() const 
 <DD><I>Test operator.</I>
 </DL></P>
 
@@ -63,13 +63,13 @@
 <DT><H3>Public Methods</H3><DD><DT>
 <IMG ALT="o" SRC=icon2.gif><!1><A HREF="GPEnabled.html">GPEnabled</A>* <B>get</B>() const 
 <DT>
-<IMG ALT="o" SRC=icon2.gif><!1><A HREF="GPBase.html#DOC.1.4.5.1">GPBase</A>&amp; <B>assign</B>(const <!1><A HREF="GPBase.html#DOC.1.4.5.1">GPBase</A> &amp;sptr)
+<IMG ALT="o" SRC=icon2.gif><!1><A HREF="GPBase.html#DOC.1.5.4.2.1">GPBase</A>&amp; <B>assign</B>(const <!1><A HREF="GPBase.html#DOC.1.5.4.2.1">GPBase</A> &amp;sptr)
 <DT>
-<IMG ALT="o" SRC=icon2.gif><!1><A HREF="GPBase.html#DOC.1.4.5.1">GPBase</A>&amp; <B>assign</B>(<!1><A HREF="GPEnabled.html">GPEnabled</A> *nptr)
+<IMG ALT="o" SRC=icon2.gif><!1><A HREF="GPBase.html#DOC.1.5.4.2.1">GPBase</A>&amp; <B>assign</B>(<!1><A HREF="GPEnabled.html">GPEnabled</A> *nptr)
 <DT>
-<IMG ALT="o" SRC=icon2.gif><!1><A HREF="GPBase.html#DOC.1.4.5.1">GPBase</A>&amp; <B>operator=</B>(const <!1><A HREF="GPBase.html#DOC.1.4.5.1">GPBase</A> &amp; obj)
+<IMG ALT="o" SRC=icon2.gif><!1><A HREF="GPBase.html#DOC.1.5.4.2.1">GPBase</A>&amp; <B>operator=</B>(const <!1><A HREF="GPBase.html#DOC.1.5.4.2.1">GPBase</A> &amp; obj)
 <DT>
-<IMG ALT="o" SRC=icon2.gif>int <B>operator==</B>(const <!1><A HREF="GPBase.html#DOC.1.4.5.1">GPBase</A> &amp; g2) const 
+<IMG ALT="o" SRC=icon2.gif>int <B>operator==</B>(const <!1><A HREF="GPBase.html#DOC.1.5.4.2.1">GPBase</A> &amp; g2) const 
 </DL></P>
 
 <P><DL>
@@ -131,18 +131,18 @@ But one has to be aware of its existence.  </BLOCKQUOTE>
 <DL>
 
 <A NAME="GP">
-<A NAME="DOC.1.4.6.1">
+<A NAME="DOC.1.5.4.3.1">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> GP()</B></TT>
 <DD>Constructs a null smart-pointer. 
 <DL><DT><DD></DL><P>
 <A NAME="GP">
-<A NAME="DOC.1.4.6.2">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> GP(const <!1><A HREF="GP.html#DOC.1.4.6.1">GP</A>&lt;TYPE&gt; &amp;sptr)</B></TT>
+<A NAME="DOC.1.5.4.3.2">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> GP(const <!1><A HREF="GP.html#DOC.1.5.4.3.1">GP</A>&lt;TYPE&gt; &amp;sptr)</B></TT>
 <DD>Constructs a copy of a smart-pointer.
 
 <DL><DT><DT><B>Parameters:</B><DD><B>sptr</B> -  smart-pointer to copy. <BR><DD></DL><P>
 <A NAME="GP">
-<A NAME="DOC.1.4.6.3">
+<A NAME="DOC.1.5.4.3.3">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> GP(TYPE *nptr)</B></TT>
 <DD>Constructs a smart-pointer from a regular pointer.
 The pointed object must be dynamically allocated (with operator <TT>new</TT>).
@@ -151,7 +151,7 @@ since the object life is now controlled by smart-pointers.
 
 <DL><DT><DT><B>Parameters:</B><DD><B>nptr</B> -  regular pointer to a <EM>dynamically allocated object</EM>. <BR><DD></DL><P>
 <A NAME="operator TYPE* ">
-<A NAME="DOC.1.4.6.4">
+<A NAME="DOC.1.5.4.3.4">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> operator TYPE* () const </B></TT>
 <DD>Converts a smart-pointer into a regular pointer.  
 This is useful for caching the value of a smart-pointer for performances
@@ -159,8 +159,8 @@ purposes.  The cached pointer will remain valid until the smart-pointer
 is destroyed or until the smart-pointer value is changed. 
 <DL><DT><DD></DL><P>
 <A NAME="operator= ">
-<A NAME="DOC.1.4.6.5">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GP.html#DOC.1.4.6.1">GP</A>&lt;TYPE&gt; &amp; operator= (TYPE *nptr)</B></TT>
+<A NAME="DOC.1.5.4.3.5">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GP.html#DOC.1.5.4.3.1">GP</A>&lt;TYPE&gt; &amp; operator= (TYPE *nptr)</B></TT>
 <DD>Assigns a regular pointer to a smart-pointer lvalue.
 The pointed object must be dynamically allocated (with operator <TT>new</TT>).
 You should no longer explicitly destroy the object referenced by <TT>sptr</TT>
@@ -168,13 +168,13 @@ since the object life is now controlled by smart-pointers.
 
 <DL><DT><DT><B>Parameters:</B><DD><B>nptr</B> -  regular pointer to a <EM>dynamically allocated object</EM>. <BR><DD></DL><P>
 <A NAME="operator= ">
-<A NAME="DOC.1.4.6.6">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GP.html#DOC.1.4.6.1">GP</A>&lt;TYPE&gt; &amp; operator= (const <!1><A HREF="GP.html#DOC.1.4.6.1">GP</A>&lt;TYPE&gt; &amp;sptr)</B></TT>
+<A NAME="DOC.1.5.4.3.6">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GP.html#DOC.1.5.4.3.1">GP</A>&lt;TYPE&gt; &amp; operator= (const <!1><A HREF="GP.html#DOC.1.5.4.3.1">GP</A>&lt;TYPE&gt; &amp;sptr)</B></TT>
 <DD>Assigns a smart-pointer to a smart-pointer lvalue.
 
 <DL><DT><DT><B>Parameters:</B><DD><B>sptr</B> -  smart-pointer copied into this smart-pointer. <BR><DD></DL><P>
 <A NAME="operator->">
-<A NAME="DOC.1.4.6.7">
+<A NAME="DOC.1.5.4.3.7">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>TYPE* operator-&gt;() const </B></TT>
 <DD>Indirection operator.
 This operator provides a convenient access to the members
@@ -182,14 +182,14 @@ of a smart-pointed object. Operator <TT>-&gt;</TT> works with smart-pointers
 exactly as with regular pointers. 
 <DL><DT><DD></DL><P>
 <A NAME="operator*">
-<A NAME="DOC.1.4.6.8">
+<A NAME="DOC.1.5.4.3.8">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>TYPE&amp; operator*() const </B></TT>
 <DD>Dereferencement operator.
 This operator provides a convenient access to the smart-pointed object. 
 Operator <TT>*</TT> works with smart-pointers exactly as with regular pointers. 
 <DL><DT><DD></DL><P>
 <A NAME="operator== ">
-<A NAME="DOC.1.4.6.9">
+<A NAME="DOC.1.5.4.3.9">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int operator== (TYPE *nptr) const </B></TT>
 <DD>Comparison operator. 
 Returns true if both this smart-pointer and pointer <TT>nptr</TT> point to the
@@ -198,7 +198,7 @@ pointers allows you to compare two smart-pointers as well.
 
 <DL><DT><DT><B>Parameters:</B><DD><B>nptr</B> -  pointer to compare with. <BR><DD></DL><P>
 <A NAME="operator!= ">
-<A NAME="DOC.1.4.6.10">
+<A NAME="DOC.1.5.4.3.10">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int operator!= (TYPE *nptr) const </B></TT>
 <DD>Comparison operator.  
 Returns true if this smart-pointer and pointer <TT>nptr</TT> point to different
@@ -207,7 +207,7 @@ pointers allows you to compare two smart-pointers as well.
 
 <DL><DT><DT><B>Parameters:</B><DD><B>nptr</B> -  pointer to compare with. <BR><DD></DL><P>
 <A NAME="operator! ">
-<A NAME="DOC.1.4.6.11">
+<A NAME="DOC.1.5.4.3.11">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int operator! () const </B></TT>
 <DD>Test operator.
 Returns true if the smart-pointer is null.  The automatic conversion 
@@ -220,14 +220,14 @@ a smart-pointer is non-null.  You can use both following constructs:
 <DL><DT><DD></DL><P></DL>
 <HR>
 <DL><DT><B>Direct child classes:
-</B><DD><A HREF="GBaseString.html">GBaseString</A><BR>
+</B><DD><A HREF="GString.html">GString</A><BR>
 </DL>
 
 <DL><DT><DD></DL><P><I><A HREF="index.html">Alphabetic index</A></I> <I><A HREF="HIER.html">HTML hierarchy of classes</A> or <A HREF="HIERjava.html">Java</A></I><P><HR>
 <!-- This is were the DOC++ footer is defined  -->
 
 <font face="arial,helvetica" size="2">
-<a href=http://www.lizardtech.com>DjVu</a> is a trademark of LizardTech, Inc.  
+<a href=http://www.djvu.att.com>DjVu</a> is a trademark of AT&amp;T.  
 <br>All other products mentioned are registered trademarks or trademarks of
 their respective companies.
 </font>
