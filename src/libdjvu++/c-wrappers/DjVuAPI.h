@@ -1,4 +1,13 @@
-/* File "$Id: DjVuAPI.h,v 1.22 2000-01-16 13:13:54 bcr Exp $"
+/*C-  -*- C -*-
+ *C-
+ *C- This software may only be used by you under license from AT&T
+ *C- Corp. ("AT&T"). A copy of AT&T's Source Code Agreement is available at
+ *C- AT&T's Internet web site having the URL <http://www.djvu.att.com/open>.
+ *C- If you received this software without first entering into a license with
+ *C- AT&T, you have an infringing copy of this software and cannot use it
+ *C- without violating AT&T's intellectual property rights.
+ *C-
+ *C- $Id: DjVuAPI.h,v 1.23 2000-01-22 07:10:14 bcr Exp $
  *
  * The main header file for the DjVu API
  */
@@ -8,7 +17,11 @@
 
 /* 
  * $Log: DjVuAPI.h,v $
- * Revision 1.22  2000-01-16 13:13:54  bcr
+ * Revision 1.23  2000-01-22 07:10:14  bcr
+ * Fixed serious bug in djvutobitonal, with all output being bogus.  Fixed the
+ * page ranges in PhotoToDjVu and DjVuToPhoto.  Updated comments.
+ *
+ * Revision 1.22  2000/01/16 13:13:54  bcr
  * Added a get_info() option to the Stream class.
  *
  * I found the orientation flags is ignored by most unix programs, so the

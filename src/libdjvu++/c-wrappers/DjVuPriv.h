@@ -1,9 +1,21 @@
+/*C-  -*- C -*-
+ *C-
+ *C- This software may only be used by you under license from AT&T
+ *C- Corp. ("AT&T"). A copy of AT&T's Source Code Agreement is available at
+ *C- AT&T's Internet web site having the URL <http://www.djvu.att.com/open>.
+ *C- If you received this software without first entering into a license with
+ *C- AT&T, you have an infringing copy of this software and cannot use it
+ *C- without violating AT&T's intellectual property rights.
+ *C-
+ *C- $Id: DjVuPriv.h,v 1.6 2000-01-22 07:10:14 bcr Exp $
+ */
 
 #ifndef _DJVU_PRIV_H_
 #define _DJVU_PRIV_H_ true
 #include "DjVuGlobal.h"
 #include "DjVuAPI.h"
 #include <stdlib.h> 
+#include <stdio.h>
 
 static inline void _djvu_image_free(djvu_image &img);
 
@@ -182,9 +194,7 @@ static inline void
 _djvu_image_free(djvu_image &img)
 {
   if(img.priv)
-  {
     delete img.priv;
-  }
   img.type=DJVU_RLE;
   img.orientation=0;
   img.w=img.h=0;

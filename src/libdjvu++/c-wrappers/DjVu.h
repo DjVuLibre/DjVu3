@@ -1,15 +1,14 @@
-#ifdef __cplusplus
-//C-  -*- C -*-
-//C-
-//C- This software may only be used by you under license from AT&T
-//C- Corp. ("AT&T"). A copy of AT&T's Source Code Agreement is available at
-//C- AT&T's Internet web site having the URL <http://www.djvu.att.com/open>.
-//C- If you received this software without first entering into a license with
-//C- AT&T, you have an infringing copy of this software and cannot use it
-//C- without violating AT&T's intellectual property rights.
-//C-
-//C- $Id: DjVu.h,v 1.5 2000-01-09 02:45:03 praveen Exp $
-#endif /* __cplusplus */
+/*C-  -*- C -*-
+ *C-
+ *C- This software may only be used by you under license from AT&T
+ *C- Corp. ("AT&T"). A copy of AT&T's Source Code Agreement is available at
+ *C- AT&T's Internet web site having the URL <http://www.djvu.att.com/open>.
+ *C- If you received this software without first entering into a license with
+ *C- AT&T, you have an infringing copy of this software and cannot use it
+ *C- without violating AT&T's intellectual property rights.
+ *C-
+ *C- $Id: DjVu.h,v 1.6 2000-01-22 07:10:14 bcr Exp $
+ */
 
 #include <stdlib.h>
 

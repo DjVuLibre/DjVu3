@@ -1,17 +1,14 @@
-#ifdef __cplusplus
-//C-  -*- C++ -*-
-//C-
-//C-  Copyright (c) 1999 AT&T
-//C-  All Rights Reserved
-//C-
-//C-  THIS IS UNPUBLISHED PROPRIETARY SOURCE CODE OF AT&T
-//C-  The copyright notice above does not evidence any
-//C-  actual or intended publication of such source code.
-//C-
-//C- "$Id: DjVuBitonalAPI.h,v 1.1 2000-01-18 05:24:51 bcr Exp $"
-//C- -- Bitonal To DjVu
-//C- Author: Parag Deshmukh (Dec 99), Andrei Erofeev (Jan 2000)
-#endif  /* __cplusplus */
+/*C-  -*- C -*-
+ *C-
+ *C- This software may only be used by you under license from AT&T
+ *C- Corp. ("AT&T"). A copy of AT&T's Source Code Agreement is available at
+ *C- AT&T's Internet web site having the URL <http://www.djvu.att.com/open>.
+ *C- If you received this software without first entering into a license with
+ *C- AT&T, you have an infringing copy of this software and cannot use it
+ *C- without violating AT&T's intellectual property rights.
+ *C-
+ *C- $Id: DjVuBitonalAPI.h,v 1.2 2000-01-22 07:10:14 bcr Exp $
+ */
 
 #ifndef _DJVUBITONAL_H_
 #define _DJVUBITONAL_H_
