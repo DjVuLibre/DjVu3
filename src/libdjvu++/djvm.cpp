@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: djvm.cpp,v 1.4 1999-05-26 20:36:43 eaf Exp $
+//C- $Id: djvm.cpp,v 1.5 1999-05-27 14:58:22 eaf Exp $
 
 /** @name djvm
 
@@ -62,7 +62,7 @@
              #djvm -d[elete] <doc.djvu> <page_num>#
 
 	     This will remove page number #<page_num># from document
-	     #<doc.djvu>#. If there will be only one page left in #<doc.djvu>#
+	     #<doc.djvu>#. If there is only one page left in #<doc.djvu>#
 	     after deletion, it will automatically be converted into a
 	     single page DjVu file format. Page numbering starts from #1#.
 
@@ -78,7 +78,7 @@
     @author
     Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: djvm.cpp,v 1.4 1999-05-26 20:36:43 eaf Exp $# */
+    #$Id: djvm.cpp,v 1.5 1999-05-27 14:58:22 eaf Exp $# */
 //@{
 //@}
 
@@ -115,8 +115,8 @@ create(int argc, char ** argv)
       // doc.djvu will be overwritten
 {
    if (argc<4) { usage(); exit(1); }
-   GP<DjVuDocument> doc=new DjVuDocument(GOS::filename_to_url(argv[3]), 0);
-   for(int i=4;i<argc;i++)
+   GP<DjVuDocument> doc=new DjVuDocument(0);
+   for(int i=3;i<argc;i++)
    {
       GP<DjVuFile> file=new DjVuFile(GOS::filename_to_url(argv[i]));
       doc->insert_page(file, -1);
