@@ -832,20 +832,20 @@
  */             
 
 //@{
-//@Include: bzz.cpp
-//@Include: djvudump.cpp
-//@Include: ppmcoco.cpp
-//@Include: c44.cpp
-//@Include: d44.cpp
-//@Include: cjb2.cpp
-//@Include: cpaldjvu.cpp
-//@Include: ddjvu.cpp
-//@Include: djvumake.cpp
-//@Include: djvuextract.cpp
-//@Include: djvmcvt.cpp
-//@Include: djvm.cpp
-//@Include: djthumb.cpp
-//@Include: djvutxt.cpp
+//@Include: ../djvutools/reference/bzz.cpp
+//@Include: ../djvutools/reference/djvudump.cpp
+//@Include: ../djvutools/reference/ppmcoco.cpp
+//@Include: ../djvutools/reference/c44.cpp
+//@Include: ../djvutools/reference/d44.cpp
+//@Include: ../djvutools/reference/cjb2.cpp
+//@Include: ../djvutools/reference/cpaldjvu.cpp
+//@Include: ../djvutools/reference/ddjvu.cpp
+//@Include: ../djvutools/reference/djvumake.cpp
+//@Include: ../djvutools/reference/djvuextract.cpp
+//@Include: ../djvutools/reference/djvmcvt.cpp
+//@Include: ../djvutools/reference/djvm.cpp
+//@Include: ../djvutools/reference/djthumb.cpp
+//@Include: ../djvutools/reference/djvutxt.cpp
 
 
 /** @name cdjvu

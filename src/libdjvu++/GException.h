@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GException.h,v 1.19 2000-10-06 21:47:21 fcrary Exp $
+//C- $Id: GException.h,v 1.20 2000-10-16 22:28:57 bcr Exp $
 
 
 #ifndef _GEXCEPTION_H_
@@ -71,7 +71,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@geocities.com> -- fixed message memory allocation.
     @version 
-    #$Id: GException.h,v 1.19 2000-10-06 21:47:21 fcrary Exp $# */
+    #$Id: GException.h,v 1.20 2000-10-16 22:28:57 bcr Exp $# */
 //@{
 
 #include "DjVuGlobal.h"
@@ -184,8 +184,8 @@ public:
 };
 
 #define G_TRY        try
-#define G_CATCH(n)   catch(const GException &n) {
-#define G_CATCH_ALL   catch(...) {
+#define G_CATCH(n)   catch(const GException &n) { 
+#define G_CATCH_ALL   catch(...) { 
 #define G_ENDCATCH   } 
 #define G_RETHROW    GExceptionHandler::rethrow()
 #define G_EMTHROW(ex)  GExceptionHandler::exthrow(ex)
