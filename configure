@@ -76,11 +76,8 @@ fi
 
 if [ "$with_jpeg" = yes ] 
 then
-    check_compiler c c++
-    require_compiler c
-    require_compiler c++
+    require_compiler c c++
 else
-    check_compiler c++
     require_compiler c++
 fi
 

@@ -302,7 +302,7 @@ check_compiler()
 
 require_compiler()
 {
-  if [ -z "$CC$CXX" ]
+  if [ -z "$CC_SET$CXX_SET" ]
   then
     compilers="$*"
     if [ -z "$compilers" ]
