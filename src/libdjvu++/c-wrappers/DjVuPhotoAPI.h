@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuPhotoAPI.h,v 1.11 2000-01-26 21:51:13 bcr Exp $
+ *C- $Id: DjVuPhotoAPI.h,v 1.12 2000-01-28 19:23:04 haffner Exp $
  */
 
 #ifndef _DJVUPHOTO_H_
@@ -40,6 +40,7 @@ typedef struct djvu_iw44_options_struct
 /** This is the gamma factor used for correcting the image lighting.
     If you don't know what this is just leave it as 2.2, the default. */
   float gamma;
+  #define DEFAULT_GAMMA 2.2
 
 /** These decides which predefined set of options to use. They are
   enum values, defined above. */
@@ -72,9 +73,7 @@ typedef struct djvu_iw44_options_struct
     be either null pointers, or nchunk size. */
   int nchunks;
 
-/** pages_per_dict allows n number of pages to be matched together.
-    This value should never be too high or too low. Best value  can
-    be between 10 to 20 */
+/** crcbdelay */
   int crcbdelay;
 
 #ifdef __cplusplus
@@ -175,7 +174,7 @@ void phototodjvu_usage(int fd,const char *prog);
 }
 
 inline djvu_iw44_options_struct::djvu_iw44_options_struct() :
-  gamma((float)2.2), compression(djvu_crcbnormal), slices(0),
+  gamma((float)DEFAULT_GAMMA), compression(djvu_crcbnormal), slices(0),
   bytes(0), decibels(0), nchunks(0), crcbdelay(10) {}
 
 inline phototodjvu_options_struct::phototodjvu_options_struct() :
