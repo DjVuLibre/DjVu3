@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.h,v 1.51 2001-04-19 00:05:28 bcr Exp $
+// $Id: GString.h,v 1.52 2001-04-19 19:18:49 praveen Exp $
 // $Name:  $
 
 #ifndef _GSTRING_H_
@@ -57,7 +57,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.51 2001-04-19 00:05:28 bcr Exp $# */
+    #$Id: GString.h,v 1.52 2001-04-19 19:18:49 praveen Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -171,7 +171,7 @@ public:
       function #vprintf()# for more information. The current implementation
       will cause a segmentation violation if the resulting string is longer
       than 32768 characters. */
-  GP<GStringRep> format(va_list &args) const;
+  GP<GStringRep> format(int, va_list &args) const;
   static GP<GStringRep> format(const char fmt[],...);
   static GP<GStringRep> create(const char fmt[],va_list &args);
 
@@ -238,7 +238,7 @@ inline GP<GStringRep>
 GStringRep::create(const char fmt[],va_list &args)
 { 
   GP<GStringRep> s=create(fmt);
-  return (s?(s->format(args)):s);
+  return (s?(s->format(0,args)):s);
 }
 
 
@@ -332,7 +332,7 @@ inline GP<GStringRep>
 GStringRep::Native::create(const char fmt[],va_list args)
 { 
   GP<GStringRep> s=create(fmt);
-  return (s?(s->format(args)):s);
+  return (s?(s->format(0,args)):s);
 }
 
 class GStringRep::UTF8 : public GStringRep
@@ -410,7 +410,7 @@ inline GP<GStringRep>
 GStringRep::UTF8::create(const char fmt[],va_list args)
 { 
   GP<GStringRep> s=create(fmt);
-  return (s?(s->format(args)):s);
+  return (s?(s->format(0,args)):s);
 }
 
 /** General purpose character string.

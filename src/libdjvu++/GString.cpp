@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.67 2001-04-19 16:42:49 bcr Exp $
+// $Id: GString.cpp,v 1.68 2001-04-19 19:18:49 praveen Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -624,7 +624,7 @@ GStringRep::Native::format(const char fmt[],...)
 }
 
 GP<GStringRep>
-GStringRep::format(va_list &args) const
+GStringRep::format(int,va_list &args) const
 {
   int buflen=32768;
   char *buffer;
@@ -1028,7 +1028,7 @@ GStringRep::toUTF8(const bool noconvert) const
           if((n>0)&&((i=mbrtowc(&w,source,n,&ps))>=0))
           {
             s[1]=w;
-            if(!UTF16toUCS4(w0,s,s+2)<=0)
+            if(UTF16toUCS4(w0,s,s+2)<=0)
             {
               i=(-1);
               break;
@@ -1807,13 +1807,13 @@ GStringRep::UCS4toUTF16(
   int retval;
   if(w<0x10000)
   {
-    w1=w;
+    w1=(unsigned short)w;
     w2=0;
     retval=1;
   }else
   {
-    w1=(((w-0x10000)>>10)&0x3ff)+0xD800;
-    w2=(w&0x3ff)+0xDC00;
+    w1=unsigned short((((w-0x10000)>>10)&0x3ff)+0xD800);
+    w2=unsigned short((w&0x3ff)+0xDC00);
     retval=2;
   }
   return retval;
@@ -1860,8 +1860,9 @@ GString::GString(const GString &fmt, va_list &args)
   {
 #ifndef WIN32
     GString nfmt;
+    int start=0;
 #endif
-    int start, from=0;
+    int from=0;
     while((from=fmt.search('%',from+1)) >= 0)
     {
       if(fmt[++from] != '%')
@@ -1881,7 +1882,7 @@ GString::GString(const GString &fmt, va_list &args)
             G_THROW(GException::outofmemory);
           }
           va_end(args); 
-          init(lpszTemp);
+          init(fmt->strdup((const char *)lpszTemp));
           LocalFree(lpszTemp);
           return;
 #else
