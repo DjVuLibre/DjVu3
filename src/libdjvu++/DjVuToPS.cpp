@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuToPS.cpp,v 1.8 2000-03-23 01:09:44 leonb Exp $
+//C- $Id: DjVuToPS.cpp,v 1.9 2000-03-23 23:07:39 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -1034,8 +1034,10 @@ image\n",
 %cgsave\n\
 %c[ a11 a21 a12 a22 a13 a23 ] concat\n\
 %c0.7 setgray\n\
+%c1 coeff div setlinewidth\n\
 %c0 0 %d %d rectstroke\n\
-%cgrestore\n\n", frc, frc, frc, frc, prn_rect.width(), prn_rect.height(), frc);
+%cgrestore\n\n", frc, frc, frc, frc, frc,
+                 prn_rect.width(), prn_rect.height(), frc);
 
    if (prn_progress_cb)
       prn_progress_cb(1, prn_progress_cl_data);
