@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuAnno.h,v 1.40 2001-04-12 00:24:59 bcr Exp $
+// $Id: DjVuAnno.h,v 1.41 2001-06-14 16:10:51 mchen Exp $
 // $Name:  $
 
 #ifndef _DJVUANNO_H
@@ -58,7 +58,7 @@
     @memo Implements support for DjVuImage annotations
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: DjVuAnno.h,v 1.40 2001-04-12 00:24:59 bcr Exp $# */
+    #$Id: DjVuAnno.h,v 1.41 2001-06-14 16:10:51 mchen Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -202,11 +202,11 @@ public:
 	  chunk with previously decoded information. This function
 	  should be called right after applying \Ref{IFFByteStream::get_chunk}()
 	  to data from #FORM:ANNO#. */
-   void decode(GP<ByteStream> bs);
+   void decode(const GP<ByteStream> & bs);
 
       /** Encodes all annotations back into a sequence of chunks to be put
 	  inside a #FORM:ANNO#. */
-   void	encode(GP<ByteStream> bs);
+   void	encode(const GP<ByteStream> &bs);
 
       /// Returns a copy of this object
    GP<DjVuAnno>	copy(void) const;
