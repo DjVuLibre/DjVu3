@@ -8,7 +8,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C- "$Id: DjVuDocumentAPI.h,v 1.1 2000-01-21 16:13:16 haffner Exp $"
+//C- "$Id: DjVuDocumentAPI.h,v 1.2 2000-01-21 18:05:38 haffner Exp $"
 //C- -- Photo To DjVu
 //C- Author: P. Haffner (Jan 2000), Bill C Riemers (Jan 2000)
 #endif  /* __cplusplus */
@@ -53,8 +53,8 @@ extern "C"
 /*@{*/
 
 
-/** List of segmenter options */
-struct segmenter_options_struct
+/** List of djvu_segmenter options */
+struct djvu_segmenter_options_struct
 {
   /** @name Quality slider options
 
@@ -81,6 +81,7 @@ struct segmenter_options_struct
       \item[100] maximum background
       \item[Default] 25
       \item[Optimization] Default chosen to avoid dropping of characters (it is only acceptable to drop dots). Generally, the optimal pix_filter_level corresponds to the smaller file size. Unfortunately, the optimum varies on document. For most documents, it is 50, but it is 25 for 200dpi documents.
+      \item[Command line] yes
       \end{description}
       
 
@@ -102,6 +103,7 @@ struct segmenter_options_struct
       \item[100] maximum background
       \item[Default] 50
       \item[Optimization] Highly critical parameter. Current value best for 75% of documents.
+      \item[Command line] yes
       \end{description}
 
   */
@@ -116,6 +118,7 @@ struct segmenter_options_struct
       \item[100] maximum background
       \item[Default] 50
       \item[Optimization] Because of tremendous improvements in the foreback module, thus pare-meter is no longer so critical. Has not been optimized recently.
+      \item[Command line] no
       \end{description}
 
       Mark (i.e. connected components) with a score higher than this filter level are kept.
@@ -138,6 +141,7 @@ struct segmenter_options_struct
       \item[100] maximum background
       \item[Default] 40
       \item[Optimization] Little
+      \item[Command line] no
       \end{description}
 
   */
@@ -153,6 +157,7 @@ struct segmenter_options_struct
       \item[100] all inversion
       \item[Default] 25
       \item[Optimization] Really case-by-case. This is still too much inversion for comics.
+      \item[Command line] yes
       \end{description}
   */
   int inversion_level;
@@ -195,6 +200,7 @@ struct segmenter_options_struct
       \item[Range] 1..3
       \item[0] Very clean or 100dpi images
       \item[Default] 3
+      \item[Command line] no
       \end{description}
   */
   int edge_size;
@@ -212,6 +218,7 @@ struct segmenter_options_struct
       \item[0] Very clean or 100dpi images
       \item[4] High resolution images
       \item[Default] 3
+      \item[Command line] no
       \end{description}
   */
   int render_size;
@@ -234,6 +241,7 @@ struct segmenter_options_struct
       \item[0] Very clean or 100dpi images
       \item[4] High resolution images
       \item[Default] 3
+      \item[Command line] no
       \end{description}
   */
   int smoothing_size;
@@ -245,6 +253,12 @@ struct segmenter_options_struct
   //@{
    /** Subsampling for the foreground image.
       
+      \begin{description}
+      \item[Option type] Pixel size.
+      \item[Range] 3..12
+      \item[Default] 12
+      \item[Command line] yes
+      \end{description}
       
   */
   int fg_pixel_size;
@@ -257,6 +271,7 @@ struct segmenter_options_struct
       \item[1] 300dpi bg
       \item[6] 50dpi bg
       \item[Default] 3
+      \item[Command line] yes
       \end{description}
    */
   int bg_pixel_size;
@@ -286,6 +301,7 @@ struct segmenter_options_struct
       \item[1] less than 300dpi
       \item[2] more than 300dpi
       \item[Default] 1
+      \item[Command line] yes
       \end{description}
       
   */
@@ -305,6 +321,7 @@ struct segmenter_options_struct
       \begin{itemize}
       \item Characters in the neighboring words have very different colors
       \item A character is next to a vertical line of different color
+      \item Command line: no
       \end{itemize}
       
    */
@@ -314,6 +331,8 @@ struct segmenter_options_struct
   /** Level of refinement in subsampling the foreground and the background.
 
       Parameter type: quality
+      
+      Command line: no
    */
   int masksub_refine;
 
@@ -355,6 +374,7 @@ struct segmenter_options_struct
       mark_filter_level= 50;
       pix_filter_level= 50;
       inversion_level= 25;
+      inhibit_foreback_level=40;
       
       edge_size= 3;
       render_size= 3;
@@ -377,6 +397,7 @@ struct segmenter_options_struct
       mark_filter_level= 25;
       pix_filter_level= 25;
       inversion_level= 25;
+      inhibit_foreback_level=40;
       
       edge_size= 2;
       render_size= 3;
@@ -390,7 +411,7 @@ struct segmenter_options_struct
       masksub_refine= true;
     }
   
-  /** Dpi100 profile
+  /** Dpi100 screen dump profile
    */
   void dpi100()
     {
@@ -405,6 +426,7 @@ struct segmenter_options_struct
       fg_pixel_size= 6; 
       bg_pixel_size= 1; 
       upsample_size=1;
+      inhibit_foreback_level=40;
 
       
       high_variation_foreground= true;
@@ -430,6 +452,7 @@ struct segmenter_options_struct
       mark_filter_level= 50;
       pix_filter_level= 50;
       inversion_level= 25;
+      inhibit_foreback_level=40;
       
       edge_size= 3;
       render_size= 3;
@@ -460,6 +483,7 @@ struct segmenter_options_struct
       mark_filter_level= 50;
       pix_filter_level= 50;
       inversion_level= 25;
+      inhibit_foreback_level=40;
       
       edge_size= 3;
       render_size= 3;
@@ -473,7 +497,7 @@ struct segmenter_options_struct
       masksub_refine= true;
     }
   
-  /** "very clean" profile.
+  /** "very clean" profile for 300dpi screen dumps.
       What differs from standard is:
       
       \begin{verbatim}
@@ -490,7 +514,8 @@ struct segmenter_options_struct
       mark_filter_level= 50;
       pix_filter_level= 50;
       inversion_level= 25;
-      
+       inhibit_foreback_level=40;
+     
       edge_size= 1;
       render_size= 1;
       smoothing_size= 1;
@@ -505,11 +530,11 @@ struct segmenter_options_struct
   //@}
 
   /** C++ constructor */
-  segmenter_options_struct() {standard();};
+  djvu_segmenter_options_struct() {standard();};
 #endif
 };
 
-typedef struct segmenter_options_struct segmenter_options;
+typedef struct djvu_segmenter_options_struct djvu_segmenter_options;
 
 /*@}*/
 
