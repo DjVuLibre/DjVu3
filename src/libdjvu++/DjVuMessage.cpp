@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessage.cpp,v 1.32 2001-04-19 21:07:29 bcr Exp $
+// $Id: DjVuMessage.cpp,v 1.33 2001-04-19 23:25:46 bcr Exp $
 // $Name:  $
 
 
@@ -56,21 +56,33 @@
 #endif
 #include <locale.h>
 
+static const char *unrecognized=ERR_MSG("DjVuMessage.Unrecognized");
+static const char *uparameter=ERR_MSG("DjVuMessage.Parameter");
+static const char unrecognized_default[] =
+  "** Unrecognized DjVu Message: [Contact LizardTech for assistance]\n"
+  "\t** Message name:  %1!s!";
+static const char uparameter_default[]="Parameter: %1!s!";
+
 #ifndef NO_DEBUG
 #if defined(UNIX)
-static const char ModuleDjVuDir[] ="profiles"; // appended to the home directory.
-static const char DebugModuleDjVuDir[] ="../TOPDIR/SRCDIR/profiles"; // appended to the home directory.
+  // appended to the home directory.
+static const char ModuleDjVuDir[] ="profiles";
+  // appended to the home directory.
+static const char DebugModuleDjVuDir[] ="../TOPDIR/SRCDIR/profiles";
 #elif defined(WIN32)
-static const char DebugModuleDjVuDir[] ="../../profiles"; // appended to the home directory.
+  // appended to the home directory.
+static const char DebugModuleDjVuDir[] ="../../profiles";
 #endif
 #endif
 
 #ifdef WIN32
-static const char ModuleDjVuDir[] ="Profiles"; // appended to the home directory.
+  // appended to the home directory.
+static const char ModuleDjVuDir[] ="Profiles";
 static const char RootDjVuDir[] ="C:/Program Files/LizardTech/Profiles";
 static const TCHAR registrypath[]= TEXT("Software\\LizardTech\\DjVu\\Profile Path");
 #else
-static const char LocalDjVuDir[] =".DjVu"; // appended to the home directory.
+// appended to the home directory.
+static const char LocalDjVuDir[] =".DjVu";
 static const char RootDjVuDir[] ="/etc/DjVu/";
 #endif
 static const char DjVuEnv[]="DJVU_CONFIG_DIR";
@@ -416,23 +428,23 @@ DjVuMessage::LookUpSingle( const GUTF8String &Single_Message ) const
     ending_posn = Single_Message.length();
   GUTF8String msg_text;
   GUTF8String msg_number;
-  LookUpID( Single_Message.substr(0,ending_posn), msg_text, msg_number );
+  const GUTF8String message=Single_Message.substr(0,ending_posn);
+  LookUpID( message, msg_text, msg_number );
 
   //  Check whether we found anything
-  if( !msg_text )
+  if( !msg_text.length())
   {
-    //  Didn't find anything, fabricate a message
-#ifdef macintosh
-    msg_text = GUTF8String("** Error messages not implemented for Macintosh: [Contact LizardTech for assistance]\n") + 
-               "\tMessage name:  " +
-               Single_Message.substr(0,ending_posn);
-#else
-    msg_text = GUTF8String("** Unrecognized DjVu Message: [Contact LizardTech for assistance]\n") + 
-               "\tMessage name:  " +
-               Single_Message.substr(0,ending_posn);
-#endif
-
-
+    if(message == unrecognized)
+    {
+      //  Didn't find anything, fabricate a message
+      msg_text = unrecognized_default;
+    }else if(message == uparameter)
+    {
+      msg_text = uparameter_default;
+    }else
+    {
+      return LookUpSingle(GUTF8String(unrecognized)+"\t"+message);
+    }
   }
 #ifndef NO_DEBUG
   else
@@ -443,27 +455,25 @@ DjVuMessage::LookUpSingle( const GUTF8String &Single_Message ) const
     
   //  Insert the parameters (if any)
   unsigned int param_num = 0;
-  while( unsigned(ending_posn) < Single_Message.length() )
+  while( (unsigned int)ending_posn < Single_Message.length() )
   {
-    int start_posn = ending_posn+1;
+    const int start_posn = ending_posn+1;
     ending_posn = Single_Message.search('\t',start_posn);
     if( ending_posn < 0 )
       ending_posn = Single_Message.length();
-    InsertArg( msg_text,
-               ++param_num,
+    InsertArg( msg_text, ++param_num,
                Single_Message.substr(start_posn, ending_posn-start_posn) );
   }
   //  Insert the message number
-    InsertArg( msg_text,
-               0,
-               msg_number );
+  InsertArg( msg_text, 0, msg_number );
 
   return msg_text;
 }
 
 
-//  Looks up the msgID in the file of messages and returns a pointer to the beginning
-//  of the translated message, if found; and an empty string otherwise.
+// Looks up the msgID in the file of messages and returns a pointer to
+// the beginning of the translated message, if found; and an empty string
+// otherwise.
 void
 DjVuMessage::LookUpID( const GUTF8String &msgID,
                        GUTF8String &message_text,
@@ -478,12 +488,12 @@ DjVuMessage::LookUpID( const GUTF8String &msgID,
       GPosition valuepos=tag->args.contains(valuestring);
       if(valuepos)
       {
-        message_text=tag->args[valuepos];
+        message_text=tag->args[valuepos].fromEscaped();
       }
       GPosition numberpos=tag->args.contains(numberstring);
-      if(valuepos)
+      if(numberpos)
       {
-        message_number=tag->args[numberpos];
+        message_number=tag->args[numberpos].fromEscaped();
       }
     }
   }
@@ -536,31 +546,38 @@ DjVuMessage::LookUpID( const GUTF8String &msgID,
 }
 
 
-//  Insert a string into the message text. Will insert into any field description.
-//  Except for an ArgId of zero (message number), if the ArgId is not found, the
-//  routine adds a line with the parameter so information will not be lost.
+// Insert a string into the message text. Will insert into any field
+// description.  Except for an ArgId of zero (message number), if the ArgId
+// is not found, the routine adds a line with the parameter so information
+// will not be lost.
 void
-DjVuMessage::InsertArg( GUTF8String &message, int ArgId, GUTF8String arg ) const
+DjVuMessage::InsertArg( GUTF8String &message,
+  const int ArgId, const GUTF8String &arg ) const
 {
     // argument target string
-  GUTF8String target = GUTF8String("%") + GUTF8String(ArgId) + "!s!";
+  const GUTF8String target= "%"+GUTF8String(ArgId)+"!";
     // location of target string
-  const int format_start = message.search( target );
+  int format_start = message.search( target );
   if( format_start >= 0 )
   {
-    int format_end = format_start;
-    while( !isalpha( message[format_end++] ) ) {}  // locate end of format
-    //GString format = "%" + message.substr( format_start + target.length(),
-    //                                       format_end - format_start - target.length() );
-    message = message.substr( 0, format_start ) +
-              arg +
-              message.substr( format_end, message.length() - format_end );
+    do
+    {
+      const int format_end=message.search('!',format_start+target.length()+1);
+      if(format_end > format_start)
+      {
+        message = message.substr( 0, format_start )+arg
+          +message.substr( format_end+1, (unsigned int)(-1));
+      }
+      format_start=message.search(target,format_start+arg.length());
+    } while(format_start >= 0);
   }
   else
   {
     //  Not found, fake it
     if( ArgId != 0 )
-      message += GUTF8String("\n\tParameter ") + GUTF8String(ArgId) + ":  " + arg;
+    {
+      message += "\n"+LookUpSingle(uparameter+("\t"+arg));
+    }
   }
 }
 
@@ -576,5 +593,26 @@ void DjVuMessage_LookUp( char *msg_buffer, const unsigned int buffer_size, const
     msg_buffer[0] = '\0';
   else
     strcpy( msg_buffer, converted );
+}
+
+const DjVuMessage &
+DjVuMessage::create(const GP<ByteStream> &bs)
+{
+  DjVuMessage &m=const_cast<DjVuMessage &>(create());
+  m.AddByteStream(bs);
+  return m;
+}
+
+void
+DjVuMessage::AddByteStream(GP<ByteStream> bs)
+{
+  GP<lt_XMLTags> gtags=lt_XMLTags::create();
+  lt_XMLTags &tags=*gtags;
+  tags.init(bs);
+  GPList<lt_XMLTags> Bodies=tags.getTags(bodystring);
+  if(! Bodies.isempty())
+  {
+    lt_XMLTags::getMaps(messagestring,namestring,Bodies,Map);
+  }
 }
 

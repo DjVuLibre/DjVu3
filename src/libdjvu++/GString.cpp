@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.71 2001-04-19 21:07:29 bcr Exp $
+// $Id: GString.cpp,v 1.72 2001-04-19 23:25:46 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -468,11 +468,14 @@ GUTF8String::fromEscaped( const GMap<GUTF8String,GUTF8String> ConvMap ) const
   int amp_locn;                 // Location of a found ampersand
 
   while( (amp_locn = search( '&', start_locn )) > -1 )
-  {                             // Found the next apostrophe
-                                // Locate the closing semicolon
-    int semi_locn = search( ';', amp_locn );
-    if( semi_locn < 0 ) break;  // No closing semicolon, exit and copy
-                                //  the rest of the string.
+  {
+      // Found the next apostrophe
+      // Locate the closing semicolon
+    const int semi_locn = search( ';', amp_locn );
+      // No closing semicolon, exit and copy
+      //  the rest of the string.
+    if( semi_locn < 0 )
+      break;
     ret += substr( start_locn, amp_locn - start_locn );
     int const len = semi_locn - amp_locn - 1;
     if(len)
@@ -491,8 +494,7 @@ GUTF8String::fromEscaped( const GMap<GUTF8String,GUTF8String> ConvMap ) const
         {
           value=strtoul((char const *)(s+1),&ptr,10);
         }
-
-        if(!ptr)
+        if(ptr)
         {
           ret+=GUTF8String((char const)(value));
         }else
@@ -673,10 +675,13 @@ GString::search(const char *str, int from) const
   int len = strlen(src);
   if (from<0)
     from += len;
-  if (from<0 || from>=len)
-    return -1;
-  char *s = strstr(&src[from], str);
-  return (s ? s - src : -1);
+  int retval=(-1);
+  if (from>=0 && from<len)
+  {
+    const char *s = strstr(src+from, str);
+    retval=(s ? s - src : -1);
+  }
+  return retval;
 }
 
 int 

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.h,v 1.54 2001-04-19 20:58:50 bcr Exp $
+// $Id: GString.h,v 1.55 2001-04-19 23:25:46 bcr Exp $
 // $Name:  $
 
 #ifndef _GSTRING_H_
@@ -57,7 +57,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.54 2001-04-19 20:58:50 bcr Exp $# */
+    #$Id: GString.h,v 1.55 2001-04-19 23:25:46 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -247,7 +247,6 @@ GStringRep::create(const char fmt[],va_list &args)
   GP<GStringRep> s=create(fmt);
   return (s?(s->format(args)):s);
 }
-
 
 class GStringRep::Native : public GStringRep
 {
@@ -713,6 +712,10 @@ public:
   static bool ncmp(const char *s1, const char *s2, const int len)
     { return !GStringRep::cmp(s1,s2,len); }
 
+  /// Comparies the string with the relavent lookup message.
+  bool messagecmp(const char s2[]) const;
+
+
   /** String comparison. Returns true if and only if character strings #s1#
       and #s2# are equal (as with #strcmp#.)
     */
@@ -815,6 +818,14 @@ protected:
   GNativeString UTF8ToNative(const bool currentlocale=false) const;
   GUTF8String NativeToUTF8(void) const;
 };
+
+inline bool 
+GString::messagecmp(const char s2[]) const
+{
+  const int n=s2?strlen(s2):0;
+  return ncmp(s2,n)&&(!operator[](n)||operator[](n)=='\t'||operator[](n)=='\n');
+}
+
 
 class GUTF8String : public GString
 {

@@ -1,4 +1,3 @@
-/*
 //C-  -*- C++ -*-
 //C- DjVu® Reference Library (v. 3.0)
 //C- 
@@ -31,9 +30,8 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessage.h,v 1.16 2001-04-17 16:41:07 bcr Exp $
+// $Id: DjVuMessage.h,v 1.17 2001-04-19 23:25:46 bcr Exp $
 // $Name:  $
-*/
 
 
 
@@ -41,12 +39,65 @@
 #define __DJVU_MESSAGE_H__
 
 
-#ifdef __cplusplus
-
 #include "GString.h"
-// class DjVuParseOptions;
-
 class lt_XMLTags;
+class ByteStream;
+
+/** Exception causes and external messages are passed as message lists which
+    have the following syntax:
+  
+    message_list ::= single_message |
+                     single_message separator message_list
+    
+    separator ::= newline |
+                  newline | separator
+    
+    single_message ::= message_ID |
+                       message_ID parameters
+    
+    parameters ::= tab string |
+                   tab string parameters
+    
+    Message_IDs are looked up an external file and replaced by the message
+    text strings they are mapped to. The message text may contain the
+    following:
+    
+    Parameter specifications: These are modelled after printf format
+    specifications and have one of the following forms:
+  
+      %n!s!            %n!d!            %n!x!
+  
+    where n is the parameter number. The parameter number is indicated
+    explicitly to allow for the possibility that the parameter order may
+    change when the message text is translated into another language.
+    The final letter ('s', 'd', or 'x') indicates the form of the parameter
+    (string, integer or hexadecimal, respectively).  But, you say, all the
+    parameters are strings!
+
+    The form is indicated in case there is a necessity to change the
+    appearance (especially of numbers) when translating the message.
+
+    Formatting strings: The message text may also contain formatting
+    strings of following forms:
+
+            "\\n"         [that is, a backslash followed by the letter 'n']
+            "\\t"         [backslash 't']
+  
+    After parameters have been inserted in the message text, the formatting 
+    strings are replaced by their usual equivalents (newline and tab
+    respectively).
+
+    If a message_id cannot be found in the external file, a message text
+    is fabricated giving the message_id and the parameters (if any).
+
+    Separators (newlines) are preserved in the translated message list.
+
+    Expands message lists by looking up the message IDs and inserting
+    arguments into the retrieved messages.
+
+    N.B. The resulting string may be encoded in UTF-8 format (ISO 10646-1
+    Annex R) and SHOULD NOT BE ASSUMED TO BE ASCII.
+  */
 
 class DjVuMessage
 {
@@ -54,103 +105,61 @@ private:
   // Constructor:
   DjVuMessage( void );
   GMap<GUTF8String,GP<lt_XMLTags> > Map;
-//  DjVuParseOptions *opts;
 
 public:
-
   static const DjVuMessage &create(void);
 
-  // Destructor: Does any necessary cleanup. Actions depend on how the message
-  //    file is implemented.
+  static const DjVuMessage &create(const GP<ByteStream> &bs);
+
+  /** Destructor: Does any necessary cleanup. Actions depend on how the message
+      file is implemented. */
   ~DjVuMessage();
 
-  //  Exception causes and external messages are passed as message lists which
-  //  have the following syntax:
-  //
-  //  message_list ::= single_message |
-  //                   single_message separator message_list
-  //
-  //  separator ::= newline |
-  //                newline | separator
-  //
-  //  single_message ::= message_ID |
-  //                     message_ID parameters
-  //
-  //  parameters ::= tab string |
-  //                 tab string parameters
-  //
-  //  Message_IDs are looked up an external file and replaced by the message text
-  //  strings they are mapped to. The message text may contain the following:
-  //
-  //    Parameter specifications: These are modelled after printf format
-  //      specifications and have one of the following forms:
-  //
-  //            %#n#s            %#n#d            %#n#x
-  //
-  //      where n is the parameter number. The parameter number is indicated
-  //      explicitly to allow for the possibility that the parameter order may
-  //      change when the message text is translated into another language.
-  //      The final letter ('s', 'd', or 'x') indicates the form of the parameter (string,
-  //      integer or hexadecimal, respectively). But, you say, all the parameters are strings!
-  //      The form is indicated in case there is a necessity to change the appearance
-  //      (especially of numbers) when translating the message.
-  //
-  //    Formatting strings: The message text may also contain formatting strings of 
-  //      following forms:
-  //
-  //            "\\n"         [that is, a backslash followed by the letter 'n']
-  //            "\\t"         [backslash 't']
-  //
-  //      After parameters have been inserted in the message text, the formatting 
-  //      strings are replaced by their usual equivalents (newline and tab respectively).
-  //
-  //  If a message_id cannot be found in the external file, a message text is fabricated
-  //  giving the message_id and the parameters (if any).
-  //
-  //  Separators (newlines) are preserved in the translated message list.
-
-//----------------------------------------------------------------------------------
-
-  //  Expands message lists by looking up the message IDs and inserting
-  //  arguments into the retrieved messages.
-  //  N.B. The resulting string may be encoded in UTF-8 format (ISO 10646-1 Annex R)
-  //       and SHOULD NOT BE ASSUMED TO BE ASCII.
+  /// Lookup the relavent string and parse the message.
   GUTF8String LookUp( const GUTF8String & MessageList ) const;
 
-  // Same as LookUp, but this is a static method.
+  //// Same as LookUp, but this is a static method.
   static GUTF8String LookUpUTF8( const GUTF8String & MessageList )
   { return DjVuMessage::create().LookUp(MessageList); }
 
-  // Same as Lookup, but returns the a multibyte character string in the
-  // current locale.
+  /** Same as Lookup, but returns the a multibyte character string in the
+      current locale. */
   static GUTF8String LookUpNative( const GUTF8String & MessageList )
   { return DjVuMessage::create().LookUp(MessageList).getUTF82Native(); }
 
-  // This is a simple alias to the above class, but does an fprintf to stderr.
+  /// This is a simple alias to the above class, but does an fprintf to stderr.
   void perror( const GUTF8String & MessageList ) const;
 
 private:
 
-  //  Looks up the msgID in the file of messages. The strings message_text and
-  //  message_number are returned if found. If not found, these strings are empty.
-  void LookUpID( const GUTF8String & msgID, GUTF8String &message_text, GUTF8String &message_number ) const;
+  /** Looks up the msgID in the file of messages. The strings message_text
+      and message_number are returned if found. If not found, these strings
+      are empty. */
+  void LookUpID( const GUTF8String & msgID,
+    GUTF8String &message_text, GUTF8String &message_number ) const;
 
-  //  Expands a single message and inserts the arguments. Single_Message contains no
-  //  separators (newlines), but includes all the parameters separated by tabs.
+  /** Expands a single message and inserts the arguments. Single_Message
+      contains no separators (newlines), but includes all the parameters
+      separated by tabs. */
   GUTF8String LookUpSingle( const GUTF8String & Single_Message ) const;
 
-  //  Insert a string into the message text. Will insert into any field description.
-  //  Except for an ArgId of zero (message number), if the ArgId is not found, the
-  //  routine adds a line with the parameter so information will not be lost.
-  void InsertArg( GUTF8String &message, int ArgId, GUTF8String arg ) const;
+  /** Insert a string into the message text. Will insert into any field
+      description.  Except for an ArgId of zero (message number), if the
+      #ArgId# is not found, the routine adds a line with the parameter
+      so information will not be lost. */
+  void InsertArg(
+    GUTF8String &message, const int ArgId, const GUTF8String &arg ) const;
+
+  void AddByteStream(GP<ByteStream> bs);
 };
 
 
-//  There is only object of class CDjVuMessage in a program, and here it is (the actual
-//  object is in DjVuMessage.cpp).
+// There is only object of class DjVuMessage in a program, and here it
+// is (the actual object is in DjVuMessage.cpp).
+//
 // extern DjVuMessage  DjVuMsg;
+
 #define DjVuMsg DjVuMessage::create()
 
-#endif /* __cplusplus */
-
 #endif /* __DJVU_MESSAGE_H__ */
+
