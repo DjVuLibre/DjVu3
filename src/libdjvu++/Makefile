@@ -17,6 +17,7 @@ OBJS= 	GString.o		\
 	IWImage.o		\
 	DjVuImage.o             \
 	GOS.o                   \
+	DjVuGlobal.o            \
 	debug.o	
 
 SHELL=/bin/sh
@@ -129,6 +130,8 @@ BSByteStream.o: BSByteStream.cpp BSByteStream.h DjVuGlobal.h \
  GException.h ByteStream.h GContainer.h GSmartPointer.h ZPCodec.h
 ByteStream.o: ByteStream.cpp ByteStream.h DjVuGlobal.h GException.h \
  GContainer.h GSmartPointer.h
+DjVuGlobal.o: DjVuGlobal.cpp DjVuGlobal.h GOS.h GString.h GException.h \
+ GSmartPointer.h
 DjVuImage.o: DjVuImage.cpp DjVuImage.h GString.h DjVuGlobal.h \
  GException.h GSmartPointer.h GThreads.h ByteStream.h GContainer.h \
  IFFByteStream.h JB2Image.h ZPCodec.h GRect.h GBitmap.h IWImage.h \
@@ -173,8 +176,7 @@ djvuextract.o: djvuextract.cpp GException.h DjVuGlobal.h ByteStream.h \
  GContainer.h GSmartPointer.h IFFByteStream.h GString.h
 djvuinfo.o: djvuinfo.cpp GException.h DjVuGlobal.h GString.h \
  GSmartPointer.h ByteStream.h GContainer.h IFFByteStream.h DjVuImage.h \
- GThreads.h JB2Image.h ZPCodec.h GRect.h GBitmap.h IWImage.h GPixmap.h \
- GOS.h
+ GThreads.h JB2Image.h ZPCodec.h GRect.h GBitmap.h IWImage.h GPixmap.h
 djvumake.o: djvumake.cpp GString.h DjVuGlobal.h GException.h \
  GSmartPointer.h DjVuImage.h GThreads.h ByteStream.h GContainer.h \
  IFFByteStream.h JB2Image.h ZPCodec.h GRect.h GBitmap.h IWImage.h \
@@ -183,5 +185,5 @@ djvutopnm.o: djvutopnm.cpp GException.h DjVuGlobal.h GSmartPointer.h \
  GRect.h GPixmap.h ByteStream.h GContainer.h GBitmap.h DjVuImage.h \
  GString.h GThreads.h IFFByteStream.h JB2Image.h ZPCodec.h IWImage.h \
  GOS.h
-ppmcoco.o: ppmcoco.cpp ByteStream.h DjVuGlobal.h GException.h \
+ppmcoco.o: ppmcoco.cpp GException.h DjVuGlobal.h ByteStream.h \
  GContainer.h GSmartPointer.h GPixmap.h GRect.h GBitmap.h GString.h

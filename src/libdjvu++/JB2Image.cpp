@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: JB2Image.cpp,v 1.1 1999-02-01 18:57:33 leonb Exp $
+//C-  $Id: JB2Image.cpp,v 1.2 1999-02-05 22:48:33 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -1266,6 +1266,8 @@ JB2Image::JB2Codec::code(JB2Image *jim)
           JB2Blit *jblt = jim->get_blit(blitno);
           int shapeno = jblt->shapeno;
           JB2Shape *jshp = jim->get_shape(shapeno);
+          // Progress indicator
+          DJVU_PROGRESS("code_record", blitno*100/nblit);
           // Test if shape is already in library
           if (shape2lib[shapeno] >= 0)
             {

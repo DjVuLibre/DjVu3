@@ -7,9 +7,9 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: IWImage.cpp,v 1.2 1999-02-04 21:48:47 leonb Exp $
+//C-  $Id: IWImage.cpp,v 1.3 1999-02-05 22:48:32 leonb Exp $
 
-// File "$Id: IWImage.cpp,v 1.2 1999-02-04 21:48:47 leonb Exp $"
+// File "$Id: IWImage.cpp,v 1.3 1999-02-05 22:48:32 leonb Exp $"
 // - Author: Leon Bottou, 08/1998
 
 #ifdef __GNUC__
@@ -198,6 +198,8 @@ forward(short *p, int w, int h, int rowsize, int begin, int end)
         forward_filter(p, i*rowsize, i*rowsize+w, i*rowsize, scale);
       for (int j=0; j<w; j+=scale)
         forward_filter(p, j, j+h*rowsize, j, scale*rowsize);
+      // Progress
+      DJVU_PROGRESS("decomp",scale);
     }
 }
 
@@ -367,6 +369,8 @@ interpolate_mask(short *data16, int w, int h, int rowsize,
   // free memory
   delete [] count;
   delete [] sdata;
+  // progress
+  DJVU_PROGRESS("interpolate",0);
 }
 
 
@@ -408,6 +412,7 @@ forward_mask(short *data16, int w, int h, int rowsize, int begin, int end,
       int overshoot = 1;
       for (rp=0; rp<maxit; rp++)
         {
+          DJVU_PROGRESS("masking", scale*1000 + rp);
           // Decompose
           for (i=0; i<h; i+=scale)
             forward_filter(sdata, i*w, i*w+w, i*w, scale);
@@ -895,6 +900,8 @@ _IWMap::create(const signed char *img8, int imgrowsize,
     }
   // Free decomposition buffer
   delete [] data16;
+  // Progress
+  DJVU_PROGRESS("decomposition",0);
 }
 
 void 
@@ -2277,6 +2284,7 @@ IWBitmap::encode_chunk(ByteStream &bs, const IWEncoderParms &parm)
           if (ycodec->curband==0 || estdb>=parm.decibels-DECIBEL_PRUNE)
             estdb = ycodec->estimate_decibel(db_frac);
         nslices++;
+        DJVU_PROGRESS("slice", cslice+nslices);
       }
   }
   // Write primary header
@@ -2792,6 +2800,7 @@ IWPixmap::encode_chunk(ByteStream &bs, const IWEncoderParms &parm)
             flag |= bcodec->code_slice(zp);
           }
         nslices++;
+        DJVU_PROGRESS("slice", cslice+nslices);
       }
   }
   // Write primary header
