@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuAnno.cpp,v 1.32 1999-10-26 21:12:54 eaf Exp $
+//C- $Id: DjVuAnno.cpp,v 1.33 1999-10-26 21:32:05 eaf Exp $
 
 
 #ifdef __GNUC__
@@ -1213,56 +1213,53 @@ chars_equal(char ch1, char ch2, bool match_case)
 }
 
 GList<DjVuTXT::Zone *>
-DjVuTXT::search_string(const char* string, int &from,
+DjVuTXT::search_string(const char * string, int & from,
 		       bool search_down, bool match_case)
 {
-   int k,i;
    GList<Zone *> zone_list;
    int string_length = strlen(string);
+   bool found=false;
 	
-   if( (string_length == 0) || (textUTF8.length() == 0) || (string_length>textUTF8.length()))
+   if (string_length==0 || textUTF8.length()==0 ||
+       string_length>(int) textUTF8.length())
       return zone_list;
 
-   if( search_down )
-   {
-      for(i=from; i<textUTF8.length(); i++)
-      {
-	 k=0;
-	 for(int j=i; j<textUTF8.length() && k<string_length; j++,k++)
-	 {
-	    if( !chars_equal(textUTF8[j], string[k], match_case ) )
-	       break;
-	 }
+   if (from<0 || from>(int) textUTF8.length()-1)
+      from=(int) textUTF8.length()-1;
 
-	 if( k == string_length )
+   if (search_down)
+      while(from<(int) textUTF8.length())
+      {
+	 int i;
+	 for(i=0;i<string_length && from+i<(int) textUTF8.length();i++)
+	    if (!chars_equal(textUTF8[from+i], string[i], match_case))
+	       break;
+	 if (i==string_length)
+	 {
+	    found=true;
 	    break;
+	 }
+	 from++;
       }
-      if( k != string_length )
-	 from = -1; 
-   }
    else
-   {
-      for(i=from; i>=0; i--)
+      while(from>=0)
       {
-	 k=0;
-	 for(int j=i; j<textUTF8.length() && k<string_length; j++,k++)
-	 {
-	    if( !chars_equal(textUTF8[j], string[k], match_case ) )
+	 int i;
+	 for(i=0;i<string_length && from+i<(int) textUTF8.length();i++)
+	    if (!chars_equal(textUTF8[from+i], string[i], match_case))
 	       break;
-	 }
-
-	 if( k == string_length )
+	 if (i==string_length)
+	 {
+	    found=true;
 	    break;
+	 }
+	 from--;
       }
-      if( k != string_length )
-	 from = 0; 
-      
-   }
+   
+   if (from==(int) textUTF8.length()-1) from=-1;
 
-   if( k == string_length )   /// string found in text?
+   if (found)
    {
-      from = i; /// update search location for next search
-
       int string_start=from;
 
       if (search_down) from++;
@@ -1274,21 +1271,12 @@ DjVuTXT::search_string(const char* string, int &from,
 	 int start=string_start;
 	 int length=string_length;
 
-	    /*
-	 fprintf(stderr, "trying zone_type=%d, st=%d, len=%d\n",
-		 zone_type, start, length);*/
-	 
 	 zone_list.empty();
 	 while(1)
 	 {
 	    Zone * zone=get_smallest_zone(zone_type, start, length);
 	    if (zone && zone_type==zone->ztype)
 	    {
-		  /*
-	       fprintf(stderr, "   found zone, length=%d\n", length);
-	       fprintf(stderr, "   type=%d, zst=%d, zend=%d\n",
-		       zone->ztype, zone->text_start, zone->text_length);*/
-	       
 	       zone_list.append(zone);
 	       start+=length;
 	       length=string_start+string_length-start;

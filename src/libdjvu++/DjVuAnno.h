@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuAnno.h,v 1.15 1999-10-26 20:53:50 eaf Exp $
+//C- $Id: DjVuAnno.h,v 1.16 1999-10-26 21:32:05 eaf Exp $
 
 #ifndef _DJVUANNO_H
 #define _DJVUANNO_H
@@ -36,7 +36,7 @@
     @memo Implements support for DjVuImage annotations
     @author Andrei Erofeev <eaf@research.att.com>
     @version
-    #$Id: DjVuAnno.h,v 1.15 1999-10-26 20:53:50 eaf Exp $# */
+    #$Id: DjVuAnno.h,v 1.16 1999-10-26 21:32:05 eaf Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -231,9 +231,20 @@ public:
   void decode(ByteStream &bs);
   /** Returns a copy of this object. */
   GP<DjVuTXT> copy(void) const;
-  /** Returns the zones of text which matches */
-
-  GList<Zone *> search_string(const char * string, int &from,
+  /** Searches the TXT chunk for the given string and returns a list of
+      the smallest zones covering the text.
+      @param string String to be found. May contain spaces as word separators.
+      @param start_pos Position where to start searching. The beginning of the
+             page is denoted with position #0#, the end of the page corresponds
+	     to position #-1#. If the function manages to find the string,
+	     it will modify the #start_pos# to point to the next or
+	     the previous character in the string (depending on the search
+	     direction). If no match has been found, the #start_pos# will
+	     be reset to #-1# if searching forward and #0# otherwise.
+      @param search_down #TRUE# means to search forward. #FALSE# - backward.
+      @param match_case If set to #FALSE# the search will be case-insensitive.
+      */
+  GList<Zone *> search_string(const char * string, int & start_pos,
 			      bool search_down, bool match_case);
   /** Returns the number of bytes needed by this data structure. It's
       used by caching routines to estimate the size of a \Ref{DjVuImage}. */
