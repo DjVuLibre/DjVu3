@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuAnno.cpp,v 1.6 1999-06-30 15:12:17 eaf Exp $
+//C- $Id: DjVuAnno.cpp,v 1.7 1999-06-30 20:48:09 eaf Exp $
 
 
 #ifdef __GNUC__
@@ -938,5 +938,8 @@ bool
 DjVuAnno::is_empty(void) const
 {
    GString raw=encode_raw();
+   for(int i=raw.length()-1;i>=0;i--)
+      if (isspace(raw[i])) raw.setat(i, 0);
+      else break;
    return raw.length()==0;
 }
