@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.34 1999-09-03 23:57:51 leonb Exp $
+//C- $Id: DjVuFile.cpp,v 1.35 1999-09-04 01:02:08 leonb Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -683,7 +683,7 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
       GP<DjVuFile> file=process_incl_chunk(iff);
       if (file && !file->is_decoding())
         {
-          if (file->is_decode_ok() || !file->is_decode_failed()) 
+          if (file->is_decode_ok() || file->is_decode_failed()) 
             {
               // Send chunk notifications
               int chksize;
