@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessage.cpp,v 1.22 2001-03-13 18:06:20 fcrary Exp $
+// $Id: DjVuMessage.cpp,v 1.23 2001-03-15 21:59:31 bcr Exp $
 // $Name:  $
 
 
@@ -45,6 +45,7 @@
 #endif
 #endif
 #include <ctype.h>
+#include <stdlib.h>
 // #include <stdio.h>
 #ifdef WIN32
 #include <tchar.h>
@@ -59,9 +60,11 @@
 #endif
 
 #ifndef NO_DEBUG
-static const char DebugModuleDjVuDir[] ="../TOPDIR/SRCDIR/profiles"; // appended to the home directory.
-#ifdef UNIX
+#if defined(UNIX)
 static const char ModuleDjVuDir[] ="profiles"; // appended to the home directory.
+static const char DebugModuleDjVuDir[] ="../TOPDIR/SRCDIR/profiles"; // appended to the home directory.
+#elif defined(WIN32)
+static const char DebugModuleDjVuDir[] ="../../profiles"; // appended to the home directory.
 #endif
 #endif
 
