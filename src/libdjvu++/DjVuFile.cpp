@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.35 1999-09-04 01:02:08 leonb Exp $
+//C- $Id: DjVuFile.cpp,v 1.36 1999-09-04 01:02:28 leonb Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -323,7 +323,6 @@ DjVuFile::wait_for_finish(bool self)
       // may terminate in between, and we'll wait forever.
       //
       // Locking is required by GMonitor interface too, btw.
-   check();
    GMonitorLock lock(&finish_mon);
    if (self)
    {
