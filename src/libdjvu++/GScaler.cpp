@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: GScaler.cpp,v 1.13 2000-11-09 20:15:07 jmw Exp $
+// $Id: GScaler.cpp,v 1.14 2001-01-03 19:56:08 bcr Exp $
 // $Name:  $
 
 // Rescale images with fast bilinear interpolation
@@ -102,16 +102,13 @@ GScaler::GScaler()
   : inw(0), inh(0), 
     xshift(0), yshift(0), redw(0), redh(0), 
     outw(0), outh(0),
-    vcoord(0), hcoord(0)
+    gvcoord(vcoord,0), ghcoord(hcoord,0)
 {
 }
 
 
 GScaler::~GScaler()
 {
-  delete [] vcoord;
-  delete [] hcoord;
-  vcoord = hcoord = 0;
 }
 
 
@@ -120,9 +117,14 @@ GScaler::set_input_size(int w, int h)
 { 
   inw = w;
   inh = h;
-  if (vcoord) delete [] vcoord;
-  if (hcoord) delete [] hcoord;
-  vcoord = hcoord = 0;
+  if (vcoord)
+  {
+    gvcoord.resize(0);
+  }
+  if (hcoord)
+  {
+    ghcoord.resize(0);
+  }
 }
 
 
@@ -131,9 +133,14 @@ GScaler::set_output_size(int w, int h)
 { 
   outw = w;
   outh = h;
-  if (vcoord) delete [] vcoord;
-  if (hcoord) delete [] hcoord;
-  vcoord = hcoord = 0;
+  if (vcoord)
+  {
+    gvcoord.resize(0);
+  }
+  if (hcoord)
+  {
+    ghcoord.resize(0);
+  }
 }
 
 
@@ -179,7 +186,8 @@ GScaler::set_horz_ratio(int numer, int denom)
    numer = numer << 1;
   }
   // Compute coordinate table
-  if (! hcoord) hcoord = new int[outw];
+  if (! hcoord)
+    ghcoord.resize(outw);
   prepare_coord(hcoord, redw, outw, denom, numer);
 }
 
@@ -204,7 +212,10 @@ GScaler::set_vert_ratio(int numer, int denom)
     numer = numer << 1;
   }
   // Compute coordinate table
-  if (! vcoord) vcoord = new int[outh];
+  if (! vcoord)
+  {
+    gvcoord.resize(outh);
+  }
   prepare_coord(vcoord, redh, outh, denom, numer);
 }
 
@@ -256,13 +267,13 @@ GScaler::get_input_rect( const GRect &desired_output, GRect &required_input )
 
 
 GBitmapScaler::GBitmapScaler()
-  : lbuffer(0), conv(0), p1(0), p2(0)
+  : glbuffer(lbuffer,0), gconv(conv,0), gp1(p1,0), gp2(p2,0)
 {
 }
 
 
 GBitmapScaler::GBitmapScaler(int inw, int inh, int outw, int outh)
-  : lbuffer(0), conv(0), p1(0), p2(0)
+  : glbuffer(lbuffer,0), gconv(conv,0), gp1(p1,0), gp2(p2,0)
 {
   set_input_size(inw, inh);
   set_output_size(outw, outh);
@@ -271,11 +282,6 @@ GBitmapScaler::GBitmapScaler(int inw, int inh, int outw, int outh)
 
 GBitmapScaler::~GBitmapScaler()
 {
-  delete [] p1;
-  delete [] p2;
-  delete [] lbuffer;
-  delete [] conv;
-  p1 = p2 = lbuffer = 0;
 }
 
 
@@ -373,26 +379,24 @@ GBitmapScaler::scale( const GRect &provided_input, const GBitmap &input,
     output.init(desired_output.height(), desired_output.width());
   output.set_grays(256);
   // Prepare temp stuff
-  delete [] p1;
-  delete [] p2;
-  delete [] lbuffer;
-  p1 = p2 = lbuffer = 0;
+  gp1.resize(0);
+  gp2.resize(0);
+  glbuffer.resize(0);
   prepare_interp();
-  int bufw = required_red.width();
-  lbuffer = new unsigned char[bufw+2];
-  p1 = new unsigned char[bufw];
-  p2 = new unsigned char[bufw];
+  const int bufw = required_red.width();
+  glbuffer.resize(bufw+2);
+  gp1.resize(bufw);
+  gp2.resize(bufw);
   l1 = l2 = -1;
   // Prepare gray conversion array (conv)
-  delete [] conv;
-  conv = new unsigned char[256];
+  gconv.resize(0);
+  gconv.resize(256);
   int maxgray = input.get_grays()-1;
   for (int i=0; i<256; i++) 
     {
-      if (i<= maxgray)
-        conv[i] = ((i*255) + (maxgray>>1)) / maxgray;
-      else
-        conv[i] = 255;
+      conv[i]=(i<= maxgray)
+        ?(((i*255) + (maxgray>>1)) / maxgray)
+        :255;
     }
   // Loop on output lines
   for (int y=desired_output.ymin; y<desired_output.ymax; y++)
@@ -407,18 +411,15 @@ GBitmapScaler::scale( const GRect &provided_input, const GBitmap &input,
         lower = get_line(fy1, required_red, provided_input, input);
         upper = get_line(fy2, required_red, provided_input, input);
         // Compute line
-        int npix = bufw;
         unsigned char *dest = lbuffer+1;
         const short *deltas = & interp[fy&FRACMASK][256];
-        while (--npix >= 0)
-          {
-            int l = *lower;
-            int u = *upper;
-            *dest = l + deltas[u-l];
-            upper += 1;
-            lower += 1;
-            dest  += 1;
-          }
+        for(unsigned char const * const edest=(unsigned char const *)dest+bufw;
+          dest<edest;upper++,lower++,dest++)
+        {
+          const int l = *lower;
+          const int u = *upper;
+          *dest = l + deltas[u-l];
+        }
       }
       // Perform horizontal interpolation
       {
@@ -441,11 +442,10 @@ GBitmapScaler::scale( const GRect &provided_input, const GBitmap &input,
       }
     }
   // Free temporaries
-  delete [] p1;
-  delete [] p2;
-  delete [] lbuffer;
-  delete [] conv;
-  p1 = p2 = lbuffer = conv = 0;
+  gp1.resize(0);
+  gp2.resize(0);
+  glbuffer.resize(0);
+  gconv.resize(0);
 }
 
 
@@ -458,13 +458,13 @@ GBitmapScaler::scale( const GRect &provided_input, const GBitmap &input,
 
 
 GPixmapScaler::GPixmapScaler()
-  : lbuffer(0), p1(0), p2(0)
+  : glbuffer((void *&)lbuffer,0,sizeof(GPixel)), gp1((void *&)p1,0,sizeof(GPixel)), gp2((void *&)p2,0,sizeof(GPixel))
 {
 }
 
 
 GPixmapScaler::GPixmapScaler(int inw, int inh, int outw, int outh)
-  : lbuffer(0), p1(0), p2(0)
+  : glbuffer((void *&)lbuffer,0,sizeof(GPixel)), gp1((void *&)p1,0,sizeof(GPixel)), gp2((void *&)p2,0,sizeof(GPixel))
 {
   set_input_size(inw, inh);
   set_output_size(outw, outh);
@@ -473,10 +473,6 @@ GPixmapScaler::GPixmapScaler(int inw, int inh, int outw, int outh)
 
 GPixmapScaler::~GPixmapScaler()
 {
-  delete [] p1;
-  delete [] p2;
-  delete [] lbuffer;
-  p1 = p2 = lbuffer = 0;
 }
 
 
@@ -496,7 +492,7 @@ GPixmapScaler::get_line(int fy,
   if (fy == l1)
     return p1;
   // Shift
-  GPixel *p = p1;
+  GPixel *p=p1;
   p1 = p2;
   l1 = l2;
   p2 = p;
@@ -547,7 +543,7 @@ GPixmapScaler::get_line(int fy,
         }
     }
   // Return
-  return p2;
+  return (GPixel *)p2;
 }
 
 
@@ -572,18 +568,17 @@ GPixmapScaler::scale( const GRect &provided_input, const GPixmap &input,
   if (desired_output.width() != (int)output.columns() ||
       desired_output.height() != (int)output.rows() )
     output.init(desired_output.height(), desired_output.width());
-  // Prepare temp stuff
-  delete [] p1;
-  delete [] p2;
-  delete [] lbuffer;
-  p1 = p2 = lbuffer = 0;
+  // Prepare temp stuff 
+  gp1.resize(0,sizeof(GPixel));
+  gp2.resize(0,sizeof(GPixel));
+  glbuffer.resize(0,sizeof(GPixel));
   prepare_interp();
-  int bufw = required_red.width();
-  lbuffer = new GPixel[bufw+2];
+  const int bufw = required_red.width();
+  glbuffer.resize(bufw+2,sizeof(GPixel));
   if (xshift>0 || yshift>0)
     {
-      p1 = new GPixel[bufw];
-      p2 = new GPixel[bufw];
+      gp1.resize(bufw,sizeof(GPixel));
+      gp2.resize(bufw,sizeof(GPixel));
       l1 = l2 = -1;
     }
   // Loop on output lines
@@ -610,26 +605,21 @@ GPixmapScaler::scale( const GRect &provided_input, const GPixmap &input,
             upper = input[fy2-provided_input.ymin] + dx;
           }
         // Compute line
-        int npix = bufw;
         GPixel *dest = lbuffer+1;
         const short *deltas = & interp[fy&FRACMASK][256];
-        while (--npix >= 0)
-          {
-            // Optimizer will reorder/schedule
-            int lower_r = lower->r;
-            int lower_g = lower->g;
-            int lower_b = lower->b;
-            int delta_r = deltas[(int)upper->r - lower_r];
-            int delta_g = deltas[(int)upper->g - lower_g];
-            int delta_b = deltas[(int)upper->b - lower_b];
-            dest->r = lower_r + delta_r;
-            dest->g = lower_g + delta_g;
-            dest->b = lower_b + delta_b;
-            // Next pixels
-            upper += 1;
-            lower += 1;
-            dest  += 1;
-          }
+        for(GPixel const * const edest = (GPixel const *)dest+bufw;
+          dest<edest;upper++,lower++,dest++)
+        {
+          const int lower_r = lower->r;
+          const int delta_r = deltas[(int)upper->r - lower_r];
+          dest->r = lower_r + delta_r;
+          const int lower_g = lower->g;
+          const int delta_g = deltas[(int)upper->g - lower_g];
+          dest->g = lower_g + delta_g;
+          const int lower_b = lower->b;
+          const int delta_b = deltas[(int)upper->b - lower_b];
+          dest->b = lower_b + delta_b;
+        }
       }
       // Perform horizontal interpolation
       {
@@ -639,30 +629,27 @@ GPixmapScaler::scale( const GRect &provided_input, const GPixmap &input,
         GPixel *line = lbuffer+1-required_red.xmin;
         GPixel *dest  = output[y-desired_output.ymin];
         // Loop horizontally
-        for (int x=desired_output.xmin; x<desired_output.xmax; x++)
+        for (int x=desired_output.xmin; x<desired_output.xmax; x++,dest++)
           {
-            int n = hcoord[x];
+            const int n = hcoord[x];
             const GPixel *lower = line + (n>>FRACBITS);
             const short *deltas = &interp[n&FRACMASK][256];
-            // Optimizer will reorder/schedule
-            int lower_r = lower[0].r;
-            int lower_g = lower[0].g;
-            int lower_b = lower[0].b;
-            int delta_r = deltas[(int)lower[1].r - lower_r];
-            int delta_g = deltas[(int)lower[1].g - lower_g];
-            int delta_b = deltas[(int)lower[1].b - lower_b];
+            const int lower_r = lower[0].r;
+            const int delta_r = deltas[(int)lower[1].r - lower_r];
             dest->r = lower_r + delta_r;
+            const int lower_g = lower[0].g;
+            const int delta_g = deltas[(int)lower[1].g - lower_g];
             dest->g = lower_g + delta_g;
+            const int lower_b = lower[0].b;
+            const int delta_b = deltas[(int)lower[1].b - lower_b];
             dest->b = lower_b + delta_b;
-            dest++;
           }
       }
     }
   // Free temporaries
-  delete [] p1;
-  delete [] p2;
-  delete [] lbuffer;
-  p1 = p2 = lbuffer = 0;
+  gp1.resize(0,sizeof(GPixel));
+  gp2.resize(0,sizeof(GPixel));
+  glbuffer.resize(0,sizeof(GPixel));
 }
 
 

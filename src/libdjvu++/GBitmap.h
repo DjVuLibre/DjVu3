@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: GBitmap.h,v 1.29 2000-12-18 19:06:42 mchen Exp $
+// $Id: GBitmap.h,v 1.30 2001-01-03 19:56:08 bcr Exp $
 // $Name:  $
 
 #ifndef _GBITMAP_H_
@@ -70,7 +70,7 @@ class ByteStream;
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: GBitmap.h,v 1.29 2000-12-18 19:06:42 mchen Exp $#
+    #$Id: GBitmap.h,v 1.30 2001-01-03 19:56:08 bcr Exp $#
 
  */
 //@{
@@ -98,6 +98,7 @@ class GBitmap : public GPEnabled
 {
 public:
   virtual ~GBitmap();
+  void destroy(void);
   /** @name Construction. */
   //@{
   /** Constructs an empty GBitmap object.  The returned GBitmap has zero rows

@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: DjVuGlobal.h,v 1.41 2000-11-16 22:20:36 mrosen Exp $
+// $Id: DjVuGlobal.h,v 1.42 2001-01-03 19:56:08 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUGLOBAL_H
@@ -80,7 +80,7 @@
     @memo
     Global definitions.
     @version
-    #$Id: DjVuGlobal.h,v 1.41 2000-11-16 22:20:36 mrosen Exp $#
+    #$Id: DjVuGlobal.h,v 1.42 2001-01-03 19:56:08 bcr Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> -- empty file.\\
     Bill Riemers <bcr@lizardtech.com> -- real work.  */
@@ -171,13 +171,13 @@ operator delete [] (void *addr) delete_throw_spec
 STATIC_INLINE void *
 operator new(size_t sz) new_throw_spec
 { return _djvu_new(sz); }
-STATIC_INLINE void
+inline_as_macro void
 operator delete(void *addr) delete_throw_spec
-{ _djvu_delete(addr); }
-STATIC_INLINE void *
+{ return _djvu_delete(addr); }
+inline_as_macro void *
 operator new [] (size_t sz) new_throw_spec
-{ return _djvu_newArray(sz); }
-STATIC_INLINE void
+{ return _djvu_new(sz); }
+inline_as_macro void
 operator delete [] (void *addr) delete_throw_spec
 { _djvu_deleteArray(addr); }
 #endif /* !NEED_DJVU_MEMORY_IMPLEMENTATION */
@@ -192,9 +192,6 @@ operator delete [] (void *addr) delete_throw_spec
 #define _djvu_calloc(siz,items) calloc((siz),(items))
 
 #endif /* NEED_DJVU_MEMORY */
-
-
-
 
 /** @name DjVu Progress  
 
@@ -295,6 +292,12 @@ private:
 #endif // NEED_DJVU_NAMES
 
 //@}
+
+#if defined(macintosh)
+#define EMPTY_LOOP continue
+#else
+#define EMPTY_LOOP /* nop */
+#endif
 
 #endif /* _DJVUGLOBAL_H_ */
 

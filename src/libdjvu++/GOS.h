@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: GOS.h,v 1.15 2000-11-09 20:15:07 jmw Exp $
+// $Id: GOS.h,v 1.16 2001-01-03 19:56:08 bcr Exp $
 // $Name:  $
 
 #ifndef _GOS_H_
@@ -54,7 +54,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- Initial implementation
     @version
-    #$Id: GOS.h,v 1.15 2000-11-09 20:15:07 jmw Exp $#
+    #$Id: GOS.h,v 1.16 2001-01-03 19:56:08 bcr Exp $#
 */
 //@{
 
@@ -73,10 +73,10 @@ class GOS
   // -----------------------------------------
   
   /** Returns true if #filename# exists and is a regular file. */
-  static int is_file(const char *filename);
+  static bool is_file(const char *filename);
 
   /** Returns true if #filename# exists and is a directory. */
-  static int is_dir(const char *filename);
+  static bool is_dir(const char *filename);
 
   /** Returns the name of the parent directory of #filename#.
       This function works like the unix command #/bin/dirname#,

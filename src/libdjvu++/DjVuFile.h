@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: DjVuFile.h,v 1.69 2000-12-24 23:59:48 praveen Exp $
+// $Id: DjVuFile.h,v 1.70 2001-01-03 19:56:08 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUFILE_H
@@ -72,7 +72,7 @@ class DjVuNavDir;
 
     @memo Classes representing DjVu files.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuFile.h,v 1.69 2000-12-24 23:59:48 praveen Exp $#
+    @version #$Id: DjVuFile.h,v 1.70 2001-01-03 19:56:08 bcr Exp $#
 */
 
 //@{
@@ -716,7 +716,7 @@ inline void
 DjVuFile::wait_for_finish(void)
 {
    while(wait_for_finish(1))
-   		continue;
+     EMPTY_LOOP;
 }
 
 inline GURL

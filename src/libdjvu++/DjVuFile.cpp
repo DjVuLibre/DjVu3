@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: DjVuFile.cpp,v 1.139 2000-12-24 23:59:48 praveen Exp $
+// $Id: DjVuFile.cpp,v 1.140 2001-01-03 19:56:07 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -1248,14 +1248,17 @@ DjVuFile::start_decode(void)
       decode_thread=new GThread();
       decode_thread->create(static_decode_func, this);
     }
-  } G_CATCH_ALL {
+  }
+  G_CATCH_ALL
+  {
     flags&=~DECODING;
     flags|=DECODE_FAILED;
     flags.leave();
     get_portcaster()->notify_file_flags_changed(this, DECODE_FAILED, DECODING);
     delete thread_to_delete;
     G_RETHROW;
-  } G_ENDCATCH;
+  }
+  G_ENDCATCH;
   flags.leave();
   delete thread_to_delete;
 }
@@ -1269,7 +1272,8 @@ DjVuFile::stop_decode(bool sync)
     "', sync=" << (int) sync << "\n");
   DEBUG_MAKE_INDENT(3);
   
-  G_TRY {
+  G_TRY
+  {
     flags|=DONT_START_DECODE;
     
     // Don't stop SYNCHRONOUSLY from the thread where the decoding is going!!!
@@ -1389,297 +1393,104 @@ DjVuFile::decode_ndir(GMap<GURL, void *> & map)
     {
       int chunks_left=(recover_errors>SKIP_PAGES)?chunks_number:(-1);
       int chksize;
-      for(;(chunks_left--)&&(chksize=iff.get_chunk(chkid));last_chunk=chunks)
+      GString chkid;
+      IFFByteStream iff(*str);
+      if (!iff.get_chunk(chkid)) 
+	 THROW("EOF");
+
+      while((chksize=iff.get_chunk(chkid)))
       {
-        chunks++;
-        if (chkid=="NDIR")
-        {
-          GP<DjVuNavDir> d=new DjVuNavDir(url);
-          d->decode(iff);
-          dir=d;
-          break;
-        }
-        iff.seek_close_chunk();
+	 if (chkid=="NDIR")
+	 {
+	    GP<DjVuNavDir> d=new DjVuNavDir(url);
+	    d->decode(iff);
+	    dir=d;
+	    break;
+	 }
+	 iff.close_chunk();
       }
-      if ((!dir)&&(chunks_number < 0)) chunks_number=last_chunk;
-    }
-    G_CATCH(ex)
-    {
-      if(!strcmp(ex.get_cause(),"EOF"))
+
+      if (dir) return dir;
+
+      GPList<DjVuFile> list=get_included_files(false);
+      for(GPosition pos=list;pos;++pos)
       {
-        if (chunks_number < 0)
-          chunks_number=(recover_errors>SKIP_CHUNKS)?chunks:last_chunk;
-        report_error(ex,(recover_errors<=SKIP_PAGES));
-      }else
-      {
-        report_error(ex,true);
+	 GP<DjVuNavDir> d=list[pos]->decode_ndir(map);
+	 if (d) return d;
       }
-    }
-    G_ENDCATCH;
-    
-    if (dir) return dir;
-    
-    GPList<DjVuFile> list=get_included_files(false);
-    for(GPosition pos=list;pos;++pos)
-    {
-      GP<DjVuNavDir> d=list[pos]->decode_ndir(map);
-      if (d) return d;
-    }
-  }
-  return 0;
+   }
+   return 0;
 }
 
 GP<DjVuNavDir>
 DjVuFile::decode_ndir(void)
 {
-  GMap<GURL, void *> map;
-  return decode_ndir(map);
-}
-
-void
-DjVuFile::get_merged_anno(const GP<DjVuFile> & file,
-                          ByteStream & str_out,
-                          const GList<GURL> & ignore_list,
-                          int level, int & max_level,
-                          GMap<GURL, void *> & map)
-{
-  GURL url=file->get_url();
-  if (!map.contains(url))
-  {
-    map[url]=0;
-    
-    // Do the included files first (To make sure that they have
-    // less precedence)
-    // Depending on if we have all data present, we will
-    // either create all included files or will use only
-    // those that have already been created
-    GPList<DjVuFile> list=file->get_included_files(!file->is_data_present());
-    for(GPosition pos=list;pos;++pos)
-      get_merged_anno(list[pos], str_out, ignore_list, level+1, max_level, map);
-    
-    // Now process the DjVuFile's own annotations
-    if (!ignore_list.contains(file->get_url()))
-    {
-      if (!file->is_data_present() ||
-        file->is_modified() && file->anno)
-      {
-	       // Process the decoded (?) anno
-        GCriticalSectionLock lock(&file->anno_lock);
-        if (file->anno && file->anno->size())
-        {
-          if (str_out.tell())
-          {
-            str_out.write((void *) "", 1);
-          }
-          file->anno->seek(0);
-          str_out.copy(*file->anno);
-        }
-      } else if (file->is_data_present())
-      {
-	       // Copy all annotations chunks, but do NOT modify
-	       // DjVuFile::anno (to avoid correlation with DjVuFile::decode())
-        GP<ByteStream> str=file->data_pool->get_stream();
-        IFFByteStream iff(*str);
-        GString chkid;
-        if (iff.get_chunk(chkid))
-          while(iff.get_chunk(chkid))
-          {
-            if (chkid=="FORM:ANNO")
-            {
-              if (max_level<level)
-                max_level=level;
-              if (str_out.tell())
-              {
-                str_out.write((void *) "", 1);
-              }
-              str_out.copy(iff);
-            } 
-            else if (is_annotation(chkid)) // but not FORM:ANNO
-            {
-              if (max_level<level)
-                max_level=level;
-              if (str_out.tell())
-              {
-                str_out.write((void *) "", 1);
-              }
-              IFFByteStream iff_out(str_out);
-              iff_out.put_chunk(chkid);
-              iff_out.copy(iff);
-              iff_out.close_chunk();
-            }
-            iff.close_chunk();
-          }
-      }
-    }
-  }
-}
-
-GP<ByteStream>
-DjVuFile::get_merged_anno(const GList<GURL> & ignore_list,
-                          int * max_level_ptr)
-                          // Will do the same thing as get_merged_anno(int *), but will
-                          // ignore DjVuFiles with URLs from the ignore_list
-{
-  MemoryByteStream *mstr=new MemoryByteStream;
-  GP<ByteStream> str=mstr;
-  GMap<GURL, void *> map;
-  int max_level=0;
-  get_merged_anno(this, *str, ignore_list, 0, max_level, map);
-  if (max_level_ptr)
-    *max_level_ptr=max_level;
-  if (str->tell()==0) 
-    str=0;
-  else
-    str->seek(0);
-  return str;
-}
-
-GP<ByteStream>
-DjVuFile::get_merged_anno(int * max_level_ptr)
-// Will go down the DjVuFile's hierarchy and decode all DjVuAnno even
-// when the DjVuFile is not fully decoded yet. To avoid correlations
-// with DjVuFile::decode(), we do not modify DjVuFile::anno data.
-//
-// Files deeper in the hierarchy have less influence on the
-// results. It means, for example, that the if annotations are
-// specified in the top level page file and in a shared file,
-// the top level page file settings will take precedence.
-//
-// NOTE! This function guarantees correct results only if the
-// DjVuFile has all data
-{
-  GList<GURL> ignore_list;
-  return get_merged_anno(ignore_list, max_level_ptr);
-}
-
-
-void
-DjVuFile::get_text(const GP<DjVuFile> & file,
-                          ByteStream & str_out)
-{
-  if (!file->is_data_present() ||
-    file->is_modified() && file->text)
-  {
-    // Process the decoded (?) text
-    GCriticalSectionLock lock(&file->text_lock);
-    if (file->text && file->text->size())
-    {
-      if (str_out.tell())
-      {
-        str_out.write((void *) "", 1);
-      }
-      file->text->seek(0);
-      str_out.copy(*file->text);
-    }
-  } else if (file->is_data_present())
-  {
-	       // Copy all text chunks, but do NOT modify
-	       // DjVuFile::text (to avoid correlation with DjVuFile::decode())
-    GP<ByteStream> str=file->data_pool->get_stream();
-    IFFByteStream iff(*str);
-    GString chkid;
-    if (iff.get_chunk(chkid))
-    {
-      while(iff.get_chunk(chkid))
-      {
-        if (is_text(chkid))
-        {
-          if (str_out.tell())
-          {
-            str_out.write((void *) "", 1);
-          }
-          IFFByteStream iff_out(str_out);
-          iff_out.put_chunk(chkid);
-          iff_out.copy(iff);
-          iff_out.close_chunk();
-        }
-        iff.close_chunk();
-      }
-    }
-  }
-}
-
-GP<ByteStream>
-DjVuFile::get_text(void)
-{
-  MemoryByteStream *mstr=new MemoryByteStream;
-  GP<ByteStream> str=mstr;
-  get_text(this, *str);
-  if (str->tell()==0)
-  { 
-    str=0;
-  }else
-  {
-    str->seek(0);
-  }
-  return str;
+   GMap<GURL, void *> map;
+   return decode_ndir(map);
 }
 
 void
 DjVuFile::static_trigger_cb(void * cl_data)
 {
-  DjVuFile * th=(DjVuFile *) cl_data;
-  G_TRY {
-    GP<DjVuPort> port=DjVuPort::get_portcaster()->is_port_alive(th);
-    if (port && port->inherits("DjVuFile"))
-      ((DjVuFile *) (DjVuPort *) port)->trigger_cb();
-  } G_CATCH(exc) {
-    G_TRY {
-      get_portcaster()->notify_error(th, exc.get_cause());
-    } G_CATCH_ALL {} G_ENDCATCH;
-  } G_ENDCATCH;
+   DjVuFile * th=(DjVuFile *) cl_data;
+   TRY {
+      th->trigger_cb();
+   } CATCH(exc) {
+      TRY {
+	 get_portcaster()->notify_error(th, exc.get_cause());
+      } CATCH(exc) {} ENDCATCH;
+   } ENDCATCH;
 }
 
 void
 DjVuFile::trigger_cb(void)
 {
-  GP<DjVuFile> life_saver=this;
-  
-  DEBUG_MSG("DjVuFile::trigger_cb(): got data for '" << url << "'\n");
-  DEBUG_MAKE_INDENT(3);
-  
-  file_size=data_pool->get_length();
-  flags|=DATA_PRESENT;
-  get_portcaster()->notify_file_flags_changed(this, DATA_PRESENT, 0);
-  
-  if (!are_incl_files_created())
-    process_incl_chunks();
-  
-  bool all=true;
-  inc_files_lock.lock();
-  GPList<DjVuFile> files_list=inc_files_list;
-  inc_files_lock.unlock();
-  for(GPosition pos=files_list;pos;++pos)
-    if (!files_list[pos]->is_all_data_present())
-    {
-      all=false; break;
-    }
-    if (all)
-    {
+   GP<DjVuFile> life_saver=this;
+   
+   DEBUG_MSG("DjVuFile::trigger_cb(): got data for '" << url << "'\n");
+   DEBUG_MAKE_INDENT(3);
+
+   file_size=data_pool->get_length();
+   flags|=DATA_PRESENT;
+   get_portcaster()->notify_file_flags_changed(this, DATA_PRESENT, 0);
+
+   if (!are_incl_files_created()) process_incl_chunks();
+
+   bool all=true;
+   {
+      GCriticalSectionLock flock(&inc_files_lock);
+      for(GPosition pos=inc_files_list;pos;++pos)
+	 if (!inc_files_list[pos]->is_all_data_present())
+	 {
+	    all=false; break;
+	 }
+   }
+   if (all)
+   {
       DEBUG_MSG("It appears, that we have ALL data for '" << url << "'\n");
       flags|=ALL_DATA_PRESENT;
       get_portcaster()->notify_file_flags_changed(this, ALL_DATA_PRESENT, 0);
-    }
+   }
 }
 
 void
 DjVuFile::progress_cb(int pos, void * cl_data)
 {
-  DEBUG_MSG("DjVuFile::progress_cb() called\n");
-  DEBUG_MAKE_INDENT(3);
-  
-  DjVuFile * th=(DjVuFile *) cl_data;
-  
-  int length=th->decode_data_pool->get_length();
-  if (length>0)
-  {
-    float progress=(float) pos/length;
-    DEBUG_MSG("progress=" << progress << "\n");
-    get_portcaster()->notify_decode_progress(th, progress);
-  } else
-  {
-    DEBUG_MSG("DataPool size is still unknown => ignoring\n");
-  }
+   DEBUG_MSG("DjVuFile::progress_cb() called\n");
+   DEBUG_MAKE_INDENT(3);
+
+   DjVuFile * th=(DjVuFile *) cl_data;
+
+   int length=th->decode_data_pool->get_length();
+   if (length>0)
+   {
+      float progress=(float) pos/length;
+      DEBUG_MSG("progress=" << progress << "\n");
+      get_portcaster()->notify_decode_progress(th, progress);
+   } else
+   {
+      DEBUG_MSG("DataPool size is still unknown => ignoring\n");
+   }
 }
 
 //*****************************************************************************

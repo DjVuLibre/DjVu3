@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: GPixmap.h,v 1.21 2000-12-18 17:13:42 bcr Exp $
+// $Id: GPixmap.h,v 1.22 2001-01-03 19:56:08 bcr Exp $
 // $Name:  $
 
 #ifndef _GPIXMAP_H_
@@ -53,7 +53,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: GPixmap.h,v 1.21 2000-12-18 17:13:42 bcr Exp $# */
+    #$Id: GPixmap.h,v 1.22 2001-01-03 19:56:08 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -118,6 +118,7 @@ class GPixmap : public GPEnabled
 {
 public:
   virtual ~GPixmap();
+  void destroy(void);
   /** @name Construction. */
   //@{
   /** Constructs an empty GBitmap object.  The returned GPixmap has zero rows

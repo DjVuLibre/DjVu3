@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: GScaler.h,v 1.14 2000-11-09 20:15:07 jmw Exp $
+// $Id: GScaler.h,v 1.15 2001-01-03 19:56:08 bcr Exp $
 // $Name:  $
 
 #ifndef _GSCALER_H_
@@ -62,7 +62,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: GScaler.h,v 1.14 2000-11-09 20:15:07 jmw Exp $# */
+    #$Id: GScaler.h,v 1.15 2001-01-03 19:56:08 bcr Exp $# */
 //@{
 
 
@@ -115,7 +115,9 @@ protected:
   int outw, outh;
   // Fixed point coordinates
   int *vcoord;
+  GPBuffer<int> gvcoord;
   int *hcoord;
+  GPBuffer<int> ghcoord;
   // Helper
   void make_rectangles(const GRect &desired, GRect &red, GRect &inp);
 };
@@ -174,9 +176,13 @@ protected:
   unsigned char *get_line(int, const GRect &, const GRect &, const GBitmap &);
   // Temporaries
   unsigned char *lbuffer;
+  GPBuffer<unsigned char> glbuffer;
   unsigned char *conv;
+  GPBuffer<unsigned char> gconv;
   unsigned char *p1;
+  GPBuffer<unsigned char> gp1;
   unsigned char *p2;
+  GPBuffer<unsigned char> gp2;
   int l1;
   int l2;
 };
@@ -232,8 +238,11 @@ protected:
   GPixel *get_line(int, const GRect &, const GRect &, const GPixmap &);
   // Temporaries
   GPixel *lbuffer;
+  GPBufferBase glbuffer;
   GPixel *p1;
+  GPBufferBase gp1;
   GPixel *p2;
+  GPBufferBase gp2;
   int    l1;
   int    l2;
 };

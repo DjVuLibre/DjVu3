@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: GOS.cpp,v 1.42 2001-01-03 15:49:36 fcrary Exp $
+// $Id: GOS.cpp,v 1.43 2001-01-03 19:56:08 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -90,11 +90,10 @@
 #else
 #define MAXPATHLEN 1024
 #endif
-#else    // MAXPATHLEN was originally defined.
+#endif
 #if ( MAXPATHLEN < 1024 )
 #undef MAXPATHLEN
 #define MAXPATHLEN 1024
-#endif
 #endif
 
 static const char localhost[] = "localhost";
@@ -108,6 +107,7 @@ static const char dot='.';
 static const char percent='%';
 static const char nillchar=0;
 #ifdef UNIX
+  static const char tilde='~';
   static const char root[] = "/";
 #else
 #ifdef WIN32
@@ -128,57 +128,59 @@ static const char nillchar=0;
 
 // is_file(filename) --
 // -- returns true if filename denotes a regular file.
-int 
+bool
 GOS::is_file(const char *filename)
 {
 #if defined(UNIX) || defined(macintosh)
   struct stat buf;
-  if (stat(filename,&buf)==-1)
-    return FALSE;
-  if (buf.st_mode & S_IFDIR) 
-    return FALSE;
+  bool retval;
+  if (!stat(filename,&buf))
+  {
+    retval=!(buf.st_mode & S_IFDIR);
+  }else
+  {
+    retval=false;
+  }
+  return retval;
 #elif defined(WIN32)
-   DWORD           dwAttrib;       ;
-   USES_CONVERSION ;
-   dwAttrib = GetFileAttributes(A2CT(filename)) ;
-   if (dwAttrib == 0xFFFFFFFF)
-         return FALSE ;
-   if( dwAttrib & FILE_ATTRIBUTE_DIRECTORY )
-         return FALSE ;
+  DWORD           dwAttrib;       ;
+  USES_CONVERSION ;
+  dwAttrib = GetFileAttributes(A2CT(filename)) ;
+  return !((dwAttrib == 0xFFFFFFFF)
+     ||( dwAttrib & FILE_ATTRIBUTE_DIRECTORY ));
 #else
 #error "Define something here for your operating system"
+    return false;
 #endif
-return TRUE;
-  
 }
 
 // is_dir(filename) --
 // -- returns true if filename denotes a directory.
-int 
+bool 
 GOS::is_dir(const char *filename)
 {
   if(!filename || !filename[0]) return FALSE;
   // UNIX implementation
 #if defined(UNIX) || defined(macintosh)
   struct stat buf;
-  if (stat(filename,&buf)==0)
-    if (buf.st_mode & S_IFDIR)
-      return TRUE;
+  bool retval;
+  if (!stat(filename,&buf))
+  {
+    retval=(buf.st_mode & S_IFDIR);
+  }else
+  {
+    retval=false;
+  }
+  return retval;
 #elif defined(WIN32)   // (either Windows or WCE)
    USES_CONVERSION ;
    DWORD           dwAttrib;       ;
    dwAttrib = GetFileAttributes(A2CT(filename)) ;
-   if (dwAttrib != 0xFFFFFFFF)
-    {
-      if( dwAttrib & FILE_ATTRIBUTE_DIRECTORY )
-      {
-        return TRUE ;
-      }
-    }
+   return ((dwAttrib != 0xFFFFFFFF)&&( dwAttrib & FILE_ATTRIBUTE_DIRECTORY ));
 #else
 #error "Define something here for your operating system"
+   return false;
 #endif  
-    return FALSE;
 }
 
 // dirname(filename) --
@@ -197,8 +199,9 @@ GOS::dirname(const char *fname)
   // Handle leading drive specifier
   if (fname[0] && fname[1]==colon)
   {
-    *q++ = *fname++;
-    *q++ = *fname++;
+    q[0] = *fname++;
+    q[1] = *fname++;
+    q+=2;
   }
 #endif
   char const *s = fname;
@@ -207,7 +210,7 @@ GOS::dirname(const char *fname)
 #ifdef UNIX
   while (*s)
   {
-    if (s[0] == slash && s[1])
+    if (s[0]=='/' && s[1])
       p = s;
     s++;
   }
@@ -220,12 +223,13 @@ GOS::dirname(const char *fname)
   // WIN32 implementation
 #ifdef WIN32
   // Search last non terminal slash or backslash
-  while (*s)
+  for(;*s;s++)
   {
-    if (s[0]==backslash || s[0]== slash)
-      if (s[1] && s[1] != slash && s[1]!= backslash)
-        p = s;
-    s++;
+    if ((s[0]==backslash || s[0]== slash)
+        &&(s[1] && s[1] != slash && s[1]!= backslash))
+    {
+      p = s;
+    }
   }
   // Cannot find non terminal slash or backslash
   if (!p)
@@ -285,7 +289,8 @@ GOS::dirname(const char *fname)
   // The normal case
   s = fname;
   do {
-    *q++ = *s++;
+    *q = *s++;
+    q++;
   } while (s<p);
   *q = 0;
   return retval;
@@ -419,8 +424,8 @@ GOS::cwd(const char *dirname)
 #if defined(UNIX) || defined(macintosh) 
   if (dirname && chdir(dirname)==-1)
     G_THROW(errmsg());
-  GString temp;
-  char *string_buffer = temp.getbuf(MAXPATHLEN+1);
+  char *string_buffer;
+  GPBuffer<char> gstring_buffer(string_buffer,MAXPATHLEN+1);
   char *result = getcwd(string_buffer,MAXPATHLEN);
   if (!result)
     G_THROW(errmsg());
@@ -432,8 +437,8 @@ GOS::cwd(const char *dirname)
   if (dirname && _chdir(dirname)==-1)
     G_THROW(errmsg());
   drv[0]= dot ; drv[1]=0;
-  GString temp;
-  char *string_buffer = temp.getbuf(MAXPATHLEN+1);
+  char *string_buffer;
+  GPBuffer<char> gstring_buffer(string_buffer,MAXPATHLEN+1);
   char *result = getcwd(string_buffer,MAXPATHLEN);
   GetFullPathName(drv, MAXPATHLEN, string_buffer, &result);
   return string_buffer;
@@ -454,30 +459,41 @@ GOS::cwd(const char *dirname)
 GString 
 GOS::expand_name(const char *fname, const char *from)
 {
-  GString temp;
-  char *string_buffer = temp.getbuf(MAXPATHLEN+10);
+  char * string_buffer;
+  GPBuffer<char> gstring_buffer(string_buffer,MAXPATHLEN+10);
   // UNIX implementation
 #ifdef UNIX
-  char *s;
   // Perform tilde expansion
   if (fname && fname[0]==tilde)
+  {
+    int n;
+    for(n=1;fname[n] && fname[n]!= slash;n++) 
+      EMPTY_LOOP;
+    struct passwd *pw=0;
+    char const *s;
+    if (n!=1)
     {
-      int n = 1;
-      while (fname[n] && fname[n]!= slash) 
-        n += 1;
       GString user(fname+1, n-1);
-      if (n==1 && (s=getenv("LOGNAME")))
-        user = s;
-      struct passwd *pw = getpwnam(user);
-      if (n==1 && pw==0)
-        pw = getpwuid(getuid());
-      if (pw) {
-        from = pw->pw_dir;
-        fname = fname + n;
-      }
-      while (fname[0] && fname[0]== slash)
-        fname += 1;
+      pw=getpwnam(user);
+    }else if ((s=getenv("HOME")))
+    {
+      from=s;
+      fname = fname + n;
+    }else if ((s=getenv("LOGNAME")))
+    {
+      pw = getpwnam(s);
+    }else
+    {
+      pw=getpwuid(getuid());
     }
+    if (pw)
+    {
+      from = pw->pw_dir;
+      fname = fname + n;
+    }
+    for(;fname[0] == slash; fname++)
+      EMPTY_LOOP;
+  }
   // Process absolute vs. relative path
   if (fname && fname[0]== slash)
   {
@@ -490,195 +506,215 @@ GOS::expand_name(const char *fname, const char *from)
   {
     strcpy(string_buffer, cwd());
   }
-  // Process path components
-  s = string_buffer + strlen(string_buffer);
-  for (;;) {
-    while (fname && fname[0]== slash)
-      fname++;
-    if (!fname || !fname[0]) {
-      while (s>string_buffer+1 && s[-1]== slash)
-  s--;
-      *s = 0;
-      return string_buffer;
-    }
-    if (fname[0]== dot ) {
-      if (fname[1]== slash || fname[1]==0) {
-  fname +=1;
-  continue;
+  char *s = string_buffer + strlen(string_buffer);
+  if(fname)
+  {
+    for(;fname[0]== slash;fname++)
+      EMPTY_LOOP;
+    // Process path components
+    while(fname[0])
+    {
+      if (fname[0] == dot )
+      {
+        if (!fname[1] || fname[1]== slash)
+        {
+          fname++;
+          continue;
+        }else if (fname[1]== dot && (fname[2]== slash || !fname[2]))
+        {
+          fname +=2;
+          for(;s>string_buffer+1 && *(s-1)== slash; s--)
+            EMPTY_LOOP;
+          for(;s>string_buffer+1 && *(s-1)!= slash; s--)
+            EMPTY_LOOP;
+          continue;
+        }
       }
-      if (fname[1]== dot )
-  if (fname[2]== slash || fname[2]==0) {
-    fname +=2;
-    while (s>string_buffer+1 && s[-1]== slash)
-      s--;
-    while (s>string_buffer+1 && s[-1]!= slash)
-      s--;
-    continue;
+      if ((s==string_buffer)||(*(s-1)!= slash))
+      {
+        *s = slash;
+        s++;
+      }
+      while (*fname &&(*fname!= slash))
+      {
+        *s = *fname++;
+        if ((++s)-string_buffer > MAXPATHLEN)
+          G_THROW("GOS.big_name");
+      }
+      *s = 0;
+      for(;fname[0]== slash;fname++)
+        EMPTY_LOOP;
+    }
   }
-    }
-    if (s==string_buffer || s[-1]!= slash)
-      *s++ = slash;
-    while (*fname!=0 && *fname!= slash) {
-      *s++ = *fname++;
-      if (s-string_buffer > MAXPATHLEN)
-        G_THROW("GOS.big_name");
-    }
+  if (!fname || !fname[0])
+  {
+    for(;s>string_buffer+1 && *(s-1) == slash; s--)
+      EMPTY_LOOP;
     *s = 0;
   }
+  return string_buffer;
 #else
   // WIN32 implementation
 #if defined (WIN32) && !defined (UNDER_CE)
-  char *s;
-  char  drv[4];
   // Handle base
-  if (from)
-    strcpy(string_buffer, expand_name(from));
-  else
-    strcpy(string_buffer, cwd());
-  s = string_buffer;
-  if (fname==0)
-    return s;
-  // Handle absolute part of fname
-  if (fname[0]== slash || fname[0]== backslash)
+  strcpy(string_buffer, (char const *)(from?expand_name(from):cwd()));
+  if (fname)
   {
-    if (fname[1]== slash || fname[1]== backslash)
-    { // Case "//abcd"
-      s[0]=s[1]= backslash; s[2]=0;
-    } else
-    { // Case "/abcd" 
-      if (s[0]==0 || s[1]!=colon)
-  s[0] = _getdrive() + 'A' - 1;
-      s[1]=colon; s[2]= 0;
-    }
-  } else if (fname[0] && fname[1]==colon)
-  {
-    if (fname[2]!= slash && fname[2]!= backslash)
-    { // Case "x:abcd"
-      if ( toupper((unsigned char)s[0])!=toupper((unsigned char)fname[0]) || s[1]!=colon) {
-  drv[0]=fname[0]; drv[1]=colon; drv[2]= dot ; drv[3]=0;
-  GetFullPathName(drv, MAXPATHLEN, string_buffer, &s);
-        s = string_buffer;
-      }
-      fname += 2;
-    } else if (fname[3]!= slash && fname[3]!= backslash)
-    { // Case "x:/abcd"
-      s[0]=toupper((unsigned char)fname[0]);
-      s[1]=colon;
-      s[2]=backslash;
-      s[3]=0;
-      fname += 3;
-    }else
-    { // Case "x://abcd"
-      s[0]=s[1]=backslash;
-      s[2]=0;
-      fname += 4;
-    }
-  }
-  // Process path components
-  while(*fname)
-  {
-    while (*fname== slash || *fname==backslash)
-      fname ++;
-    if (*fname == 0)
-      break;
-    if (fname[0]== dot )
+    char *s = string_buffer;
+    char  drv[4];
+    // Handle absolute part of fname
+    if (fname[0]== slash || fname[0]== backslash)
     {
-      if (fname[1]== slash || fname[1]==backslash || fname[1]==0)
+      if (fname[1]== slash || fname[1]== backslash)
+      { // Case "//abcd"
+        s[0]=s[1]= backslash; s[2]=0;
+      } else
+      { // Case "/abcd" 
+        if (s[0]==0 || s[1]!=colon)
+        {
+          s[0] = _getdrive() + 'A' - 1;
+        }
+        s[1]=colon;
+        s[2]= 0;
+      }
+    } else if (fname[0] && fname[1]==colon)
+    {
+      if (fname[2]!= slash && fname[2]!= backslash)
+      { // Case "x:abcd"
+        if ( toupper((unsigned char)s[0]) != toupper((unsigned char)fname[0])
+             || s[1]!=colon)
+        {
+          drv[0]=fname[0];
+          drv[1]=colon;
+          drv[2]= dot ;
+          drv[3]=0;
+          GetFullPathName(drv, MAXPATHLEN, string_buffer, &s);
+          s = string_buffer;
+        }
+        fname += 2;
+      } else if (fname[3]!= slash && fname[3]!= backslash)
+      { // Case "x:/abcd"
+        s[0]=toupper((unsigned char)fname[0]);
+        s[1]=colon;
+        s[2]=backslash;
+        s[3]=0;
+        fname += 3;
+      }else
+      { // Case "x://abcd"
+        s[0]=s[1]=backslash;
+        s[2]=0;
+        fname += 4;
+      }
+    }
+    // Process path components
+    for(;*fname== slash || *fname==backslash;fname++)
+      EMPTY_LOOP;
+    while(*fname)
+    {
+      if (fname[0]== dot )
       {
-        fname += 1;
-        continue;
-      }else if (fname[1]== dot )
-      {
-        if (fname[2]== slash || fname[2]==backslash || fname[2]==0)
+        if (fname[1]== slash || fname[1]==backslash || !fname[1])
+        {
+          fname++;
+          continue;
+        }else if ((fname[1] == dot)
+          && (fname[2]== slash || fname[2]==backslash || !fname[2]))
         {
           fname += 2;
           strcpy(string_buffer, dirname(string_buffer));
           s = string_buffer;
           continue;
         }
-        if (fname[1]== dot )
-          if (fname[2]== slash || fname[2]==backslash || fname[2]==0) {
-            fname += 2;
-            strcpy(string_buffer, dirname(string_buffer));
-            s = string_buffer;
-    continue;
-          }
+        for(;*s;s++) 
+          EMPTY_LOOP;
+        if ((s>string_buffer)&&(*(s-1)!= slash)&&(*(s-1)!= backslash))
+        {
+          *s = backslash;
+          s++;
+        }
+        while (*fname && *fname!= slash && *fname!=backslash)
+        {
+          *s = *fname++;
+          if ((++s)-string_buffer > MAXPATHLEN)
+            G_THROW("GOS.big_name");
+        }
+        *s = 0;
       }
-      while (*s) 
+      for(;*s;s++) 
+        EMPTY_LOOP;
+      if ((s == string_buffer)||((*(s-1)!= slash) && (*(s-1)!=backslash)))
+      {
+        *s = backslash;
         s++;
-      if (s[-1]!= slash && s[-1]!= backslash)
-        *s++ = backslash;
-      while (*fname && *fname!= slash && *fname!=backslash) {
-        *s++ = *fname++;
-        if (s-string_buffer > MAXPATHLEN)
+      }
+      while (*fname && (*fname!= slash) && (*fname!=backslash))
+      {
+        *s = *fname++;
+        if ((++s)-string_buffer > MAXPATHLEN)
           G_THROW("GOS.big_name");
       }
       *s = 0;
+      for(;(*fname== slash)||(*fname==backslash);fname++)
+        EMPTY_LOOP;
     }
-    while (*s) 
-      s++;
-    if ((s == string_buffer)||(*(s-1)!= slash && *(s-1)!=backslash))
-      *s++ = backslash;
-    while (*fname && *fname!= slash && *fname!=backslash)
-    {
-      *s++ = *fname++;
-      if (s-string_buffer > MAXPATHLEN)
-        G_THROW("GOS.big_name");
-    }
-    *s = 0;
   }
   return string_buffer;
 #else
   // MACINTOSH implementation
 #ifdef macintosh
-  char *s;
+  strcpy(string_buffer, (const char *)(from?from:cwd()));
 
-  if (from)
-    strcpy(string_buffer, from);
-  else
-    strcpy(string_buffer, cwd());
-    
   if (!strncmp(string_buffer,fname,strlen(string_buffer)) || is_file(fname))
+  {
     strcpy(string_buffer, "");//please don't expand, the logic of filename is chaos.
+  }
     
   // Process path components
-  s = string_buffer + strlen(string_buffer);
-  for (;;) {
-    while (fname && fname[0]==colon)
-      fname++;
-    if (!fname || !fname[0]) {
-      while (s>string_buffer+1 && s[-1]==colon)
-  s--;
-      *s = 0;
-      if (string_buffer[0]==colon)
-        return &string_buffer[1];
-      else
-        return string_buffer;
-    }
-    if (fname[0]== dot ) {
-      if (fname[1]==colon || fname[1]==0) {
-  fname +=1;
-  continue;
+  char *s = string_buffer + strlen(string_buffer);
+  if(fname)
+  {
+    for(;fname[0]==colon;fname++)
+      EMPTY_LOOP;
+    while(fname[0])
+    {
+      if (fname[0]== dot )
+      {
+        if (fname[1]==colon || !fname[1])
+        {
+          fname++;
+          continue;
+        }
+        if ((fname[1]== dot )
+             &&(fname[2]==colon || fname[2]==0))
+        {
+          fname +=2;
+          for(;(s>string_buffer+1)&&(*(s-1)==colon);s--)
+            EMPTY_LOOP;
+          for(;(s>string_buffer+1)&&(*(s-1)!=colon);s--)
+            EMPTY_LOOP;
+          continue;
+        }
       }
-      if (fname[1]== dot )
-  if (fname[2]==colon || fname[2]==0) {
-    fname +=2;
-    while (s>string_buffer+1 && s[-1]==colon)
-      s--;
-    while (s>string_buffer+1 && s[-1]!=colon)
-      s--;
-    continue;
-  }
+      if ((s==string_buffer)||(*(s-1)!=colon))
+      {
+        *s = colon;
+        s++;
+      }
+      while (*fname!=0 && *fname!=colon)
+      {
+        *s = *fname++;
+        if ((++s)-string_buffer > MAXPATHLEN)
+          G_THROW("GOS.big_name");
+      }
+      *s = 0;
+      for(;fname[0]==colon;fname++)
+        EMPTY_LOOP;
     }
-    if (s==string_buffer || s[-1]!=colon)
-      *s++ = colon;
-    while (*fname!=0 && *fname!=colon) {
-      *s++ = *fname++;
-      if (s-string_buffer > MAXPATHLEN)
-        G_THROW("GOS.big_name");
-    }
-    *s = 0;
   }
+  for(;(s>string_buffer+1) && (*(s-1)==colon);s--)
+    EMPTY_LOOP;
+  *s = 0;
+  return ((string_buffer[0]==colon)?(string_buffer+1):string_buffer);
 #else
 #if   defined (UNDER_CE) 
   strcpy(string_buffer, fname) ;    // CE has no concept of a "current directory"
@@ -687,7 +723,7 @@ GOS::expand_name(const char *fname, const char *from)
 #error "Define something here for your operating system"
 #endif  
 #endif  
-#endif
+#endif  
 #endif  
 }
 
@@ -703,19 +739,11 @@ GOS::deletefile(const char * filename)
   {
 #ifdef WIN32
    USES_CONVERSION;
-   if (is_dir(filename))
-   {
-      retval= RemoveDirectory(A2CT(filename));
-   }
-   else
-   {
-      retval = DeleteFile(A2CT(filename)) ;
-   }
+   retval (is_dir(filename)
+     ?RemoveDirectory(A2CT(filename))
+     :DeleteFile(A2CT(filename)));
 #else
-    if (is_dir(filename))
-      retval=rmdir(filename);
-    else
-      retval=unlink(filename);
+   retval=(is_dir(filename)?rmdir(filename):unlink(filename));
 #endif
   }
   return retval;
@@ -725,14 +753,16 @@ GOS::deletefile(const char * filename)
 int
 GOS::mkdir(const char * dirname)
 {
-   if (!dirname || !dirname[0]) return -1;
+   if (!dirname || !dirname[0])
+     return -1;
 
       // See if we need to create the parent directory
    GString parent=GOS::dirname(dirname);
    if (!GOS::is_dir(parent))
    {
       int rc=mkdir(parent);
-      if (rc<0) return rc;
+      if (rc<0)
+        return rc;
    }
 #ifdef WIN32
    USES_CONVERSION;
@@ -766,7 +796,6 @@ GOS::mkdir(const char * dirname)
 #endif 
 #endif
 
-
 int
 GOS::cleardir(const char * dirname)
 {
@@ -779,9 +808,11 @@ GOS::cleardir(const char * dirname)
        dirent * de;
        while((de=readdir(dir)))
          {
-           int len = NAMLEN(de);
-           if (de->d_name[0]== dot  && len==1) continue;
-           if (de->d_name[0]== dot  && de->d_name[1]== dot  && len==2) continue;
+           const int len = NAMLEN(de);
+           if (de->d_name[0]== dot  && len==1)
+             continue;
+           if (de->d_name[0]== dot  && de->d_name[1]== dot  && len==2)
+             continue;
            GString name = GOS::expand_name( GString(de->d_name, len), dirname);
            int status = 0;
            if (GOS::is_dir(name))
@@ -924,25 +955,26 @@ GOS::filename_to_url(const char *filename, const char *useragent)
   GString oname = expand_name(filename);
   const unsigned char *s = (const unsigned char*) (const char*) oname;
   unsigned char *d = (unsigned char*) nname.getbuf( oname.length() * 3 );
-  for (; *s; s++)
-    {
+  for (; *s; s++,d++)
+  {
       // Convert directory separator to slashes
 #ifdef WIN32
       if (*s == backslash || *s== slash)
-        { *d++ = slash; continue; }
 #else
 #ifdef macintosh
       if (*s == colon )
-        { *d++ = slash; continue; }
 #else
 #ifdef UNIX
       if (*s == slash )
-        { *d++ = slash; continue; }
 #else
 #error "Define something here for your operating system"
 #endif  
 #endif
 #endif
+      {
+        *d = slash; 
+        continue;
+      }
   // WARNING: Whenever you modify this conversion code,
   // make sure, that the following functions are in sync:
   //   encode_reserved()
@@ -954,12 +986,16 @@ GOS::filename_to_url(const char *filename, const char *useragent)
            (*s>='A' && *s<='Z') ||
            (*s>='0' && *s<='9') ||
            (strchr("$-_.+!*'(),:", *s)) )   // Added : because of windows!
-        { *d++ = *s; continue; }
+      {
+        *d = *s;
+        continue;
+      }
       // escape sequence
-      *d++ = percent;
-      *d++ = hex[ (*s >> 4) & 0xf ];
-      *d++ = hex[ (*s) & 0xf ];
-    }
+      d[0] = percent;
+      d[1] = hex[ (*s >> 4) & 0xf ];
+      d[2] = hex[ (*s) & 0xf ];
+      d+=2;
+  }
   *d = 0;
   // Preprend "file://" to file name. If file is on the local
   // machine, include "localhost".
@@ -989,13 +1025,12 @@ GOS::filename_to_url(const char *filename, const char *useragent)
 static int 
 hexval(char c)
 {
-  if (c>='0' && c<='9')
-    return c-'0';
-  if (c>='A' && c<='F')
-    return c-'A'+10;
-  if (c>='a' && c<='f')
-    return c-'a'+10;
-  return -1;
+  return ((c>='0' && c<='9')
+    ?(c-'0')
+    :((c>='A' && c<='F')
+      ?(c-'A'+10)
+      :((c>='a' && c<='f')
+        ?(c-'a'+10):(-1))));
 }
 
 
@@ -1007,7 +1042,9 @@ GString
 GOS::url_to_filename(const char *url)
 {
   if(!url||!strcmp(url,"about:blank"))
-    return GString("");
+  {
+    return "";
+  }
   
   // WARNING: Whenever you modify this conversion code,
   // make sure, that the following functions are in sync:
@@ -1019,23 +1056,22 @@ GOS::url_to_filename(const char *url)
   // Process hexadecimal character specification
   GString urlcopy;
   char *d = urlcopy.getbuf(strlen(url)+1);
-  while (*url)
+  for(;*url;d++)
   {
-    if (*url == percent)
+    int c1, c2;
+    if ((*url == percent)
+      && ((c1=hexval(url[1]))>=0)
+      && ((c2=hexval(url[2]))>=0))
     {
-      int c1 = hexval(url[1]);
-      int c2 = hexval(url[2]);
-      if (c1>=0 && c2>=0)
-      {
-        *d++ = (c1<<4)|c2;
-        url += 3;
-        continue;
-      }
+      *d = (c1<<4)|c2;
+      url += 3;
+    }else
+    {
+      *d = *url++;
     }
-    *d++ = *url++;
   }
   *d = 0;
-  url = (const char*)urlcopy;
+  url = (char const *)urlcopy;
   // Check if we have a simple file name already
   {
     GString tmp=expand_name(url,root);
@@ -1045,14 +1081,12 @@ GOS::url_to_filename(const char *url)
   // All file urls are expected to start with filespec which is "file:"
   if (strncmp(url, filespec, strlen(filespec)))  //if not
     return basename(url);
-  
-  //url does start with "file:", so move pointer to the position next to ":"
   url += strlen(filespec);
   
 #ifdef macintosh
   //remove all leading slashes
-  while(*url=='/')
-    url++;
+  for(;*url=='/';url++)
+    EMPTY_LOOP;
   // Remove possible localhost spec
   if ( !strncmp(url, localhost, strlen(localhost)) )
     url += strlen(localhost);
@@ -1064,20 +1098,23 @@ GOS::url_to_filename(const char *url)
   // Remove possible localhost spec
   if ( !strncmp(url, localhostspec, strlen(localhostspec)) )
     url += strlen(localhostspec);
-
 #endif
-  
+
   // Check if we are finished
+  GString retval;
 #ifdef macintosh
-  char l_url[1024];
-  strcpy(l_url,url);
-  char *s = l_url;
-  for (; *s; s++)
-    if (*s == slash )
-      *s=colon;
-  GString retval = expand_name(l_url,root);
+  {
+    char *l_url;
+    GPBuffer<char> gl_url(l_url,strlen(url)+1);
+    for (char *s=url,*r=l_url; *s; s++,r++)
+    {
+      *r=(*s == slash)?colon:*s;
+    }
+    *r=0;
+    retval = expand_name(l_url,root);
+  }
 #else  
-  GString retval = expand_name(url,root);
+  retval = expand_name(url,root);
 #endif
     
 #ifdef WIN32
@@ -1117,17 +1154,18 @@ GOS::encode_reserved(const char * filename)
 
    for(const char * ptr=filename;*ptr;ptr++)
    {
-      if ((*ptr>='a' && *ptr<='z') ||
-    (*ptr>='A' && *ptr<='Z') ||
-    (*ptr>='0' && *ptr<='9') ||
-    (strchr("$-_.+!*'(),:", *ptr))) // Added : because of windows!
-   res+=*ptr;
-      else
+      if ((*ptr>='a' && *ptr<='z')
+        || (*ptr>='A' && *ptr<='Z')
+        || (*ptr>='0' && *ptr<='9')
+        || (strchr("$-_.+!*'(),:", *ptr))) // Added : because of windows!
+      {
+        res+=*ptr;
+      }else
       {
       // escape sequence
-   res+=percent;
-   res+=hex[(*ptr >> 4) & 0xf];
-   res+=hex[(*ptr) & 0xf];
+        res+=percent;
+        res+=hex[(*ptr >> 4) & 0xf];
+        res+=hex[(*ptr) & 0xf];
       }
    }
    
@@ -1143,24 +1181,28 @@ GOS::decode_reserved(const char * url)
       //   url_to_filename()
       //   filename_to_url()
 {
-   GString res;
+  GString res;
 
-   for(const char * ptr=url;*ptr;ptr++)
-   {
-      if (*ptr!=percent) res+=*ptr;
-      else
+  for(const char * ptr=url;*ptr;ptr++)
+  {
+    if (*ptr!=percent)
+    {
+      res+=*ptr;
+    }else
+    {
+      int c1,c2;
+      if ( ((c1=hexval(ptr[1]))>=0)
+        && ((c2=hexval(ptr[2]))>=0) )
       {
-   int c1=hexval(ptr[1]);
-   int c2=hexval(ptr[2]);
-   if (c1>=0 && c2>=0)
-   {
-      res+=(c1<<4)|c2;
-      ptr+=2;
-   } else res+=*ptr;
+        res+=(c1<<4)|c2;
+        ptr+=2;
+      } else
+      {
+        res+=*ptr;
       }
-   }
-
-   return res;
+    }
+  }
+  return res;
 }
 
 
@@ -1195,7 +1237,7 @@ int main(int argc, char **argv)
   if (argc>1) 
     op = argv[1];
   if (op == "is_file" && argc==3) {
-      printf("%d\n", GOS::is_file(argv[2]));
+      printf("%d\n", GOS::is_file(argv[2])?1:0);
       return 0;
   } else if (op =="is_dir" && argc==3) {
     printf("%d\n", GOS::is_dir(argv[2]));
@@ -1244,3 +1286,4 @@ int main(int argc, char **argv)
 
 
 #endif
+
