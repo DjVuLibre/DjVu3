@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuImage.cpp,v 1.16 1999-06-08 21:33:30 leonb Exp $
+//C- $Id: DjVuImage.cpp,v 1.17 1999-06-09 21:42:36 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -282,12 +282,9 @@ class _DjVuImageNotifier : public DjVuPort
 public:
   _DjVuImageNotifier(DjVuInterface *notifier);
   GP<DataRange> request_data(const DjVuPort *src, const GURL & url);
-  bool notify_error(const DjVuPort *src, const char * msg);
   void notify_redisplay(const DjVuPort *);
   void notify_relayout(const DjVuPort *);
   void notify_chunk_done(const DjVuPort *, const char *);
-  void notify_file_stopped(const DjVuPort *);
-  void notify_file_failed(const DjVuPort *);
 };
 
 _DjVuImageNotifier::_DjVuImageNotifier(DjVuInterface *notifier)
@@ -301,13 +298,6 @@ _DjVuImageNotifier::request_data(const DjVuPort *src, const GURL & url)
   if (url!=stream_url)
     THROW("This stream cannot be decoded the old way.");
   return new DataRange(stream_pool);
-}
-
-bool
-_DjVuImageNotifier::notify_error(const DjVuPort * source, const char * msg)
-{
-  THROW(msg);
-  return 0;
 }
 
 void
@@ -332,25 +322,12 @@ _DjVuImageNotifier::notify_chunk_done(const DjVuPort *, const char *name)
 }
 
 void
-_DjVuImageNotifier::notify_file_stopped(const DjVuPort *)
-{
-  THROW("STOP");
-}
-
-void
-_DjVuImageNotifier::notify_file_failed(const DjVuPort *)
-{
-  THROW("EOF");
-}
-
-void
 DjVuImage::decode(ByteStream & str, DjVuInterface *notifier)
 {
   DEBUG_MSG("DjVuImage::decode(): decoding old way...\n");
   DEBUG_MAKE_INDENT(3);
   if (file) 
     THROW("To decode old way you should have been used default constructor.");
-  
   _DjVuImageNotifier port(notifier);
   port.stream_url="internal://fake_url_for_old_style_decoder";
   port.stream_pool=new DataPool();
@@ -364,8 +341,12 @@ DjVuImage::decode(ByteStream & str, DjVuInterface *notifier)
   GP<DjVuImage> dimg=doc->get_page(-1);
   file=dimg->get_djvu_file();
   file->wait_for_finish();
-  if (!file->is_decode_ok())
-    THROW("Decoding failed. Nothing can be done.");
+  if (file->is_decode_stopped())
+    THROW("STOP");
+  if (file->is_decode_failed())
+    THROW("EOF");  // a guess
+  if (! file->is_decode_ok())
+    THROW("Multiple errors while decoding");
   DEBUG_MSG("decode DONE\n");
 }
 
