@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GMapAreas.cpp,v 1.27 2001-07-24 17:52:04 bcr Exp $
+// $Id: GMapAreas.cpp,v 1.28 2001-07-27 23:58:34 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -965,7 +965,7 @@ GMapArea2xmltag(const GMapArea &area,const GUTF8String &coords)
     break;
   }
   retval=retval+"bordertype=\""+b_type+"\" ";
-  if( GUTF8String(area.border_type) != GMapArea::NO_BORDER)
+  if( area.border_type != GMapArea::NO_BORDER)
   {
     retval+="bordercolor=\""+GUTF8String().format("#%06X",area.border_color)
       +"\" border=\""+GUTF8String(area.border_width)+"\" ";

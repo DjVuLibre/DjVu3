@@ -387,6 +387,20 @@ xml2native.o: xml2native.cpp ../../../src/include/config.h \
  ../../../src/libdjvu++/DjVuMessageLite.h \
  ../../../src/libdjvu++/GURL.h \
  ../../../src/libdjvu++/GThreads.h
+xml2utf16.o: xml2utf16.cpp ../../../src/include/config.h \
+ ../../../src/libdjvu++/GException.h \
+ ../../../src/libdjvu++/DjVuGlobal.h \
+ ../../../src/include/DjVu.h \
+ ../../../src/libdjvu++/UnicodeByteStream.h \
+ ../../../src/libdjvu++/GString.h \
+ ../../../src/libdjvu++/GContainer.h \
+ ../../../src/libdjvu++/GSmartPointer.h \
+ ../../../src/libdjvu++/ByteStream.h \
+ ../../../src/libdjvu++/Arrays.h \
+ ../../../src/libdjvu++/DjVuMessage.h \
+ ../../../src/libdjvu++/DjVuMessageLite.h \
+ ../../../src/libdjvu++/GURL.h \
+ ../../../src/libdjvu++/GThreads.h
 xml2utf8.o: xml2utf8.cpp ../../../src/include/config.h \
  ../../../src/libdjvu++/GException.h \
  ../../../src/libdjvu++/DjVuGlobal.h \

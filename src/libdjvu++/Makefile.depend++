@@ -85,9 +85,9 @@ DjVuDumpHelper.o: DjVuDumpHelper.cpp \
  GRect.h IFFByteStream.h ByteStream.h
 DjVuDynamic.o: DjVuDynamic.cpp ../../src/include/config.h \
  GException.h DjVuGlobal.h \
- ../../src/include/DjVu.h DjVuDynamic.h GURL.h \
+ ../../src/include/DjVu.h DjVuDynamic.h \
  GString.h GContainer.h GSmartPointer.h \
- Arrays.h GThreads.h
+ GURL.h Arrays.h GThreads.h
 DjVuErrorList.o: DjVuErrorList.cpp \
  ../../src/include/config.h DjVuErrorList.h DjVuPort.h \
  GThreads.h DjVuGlobal.h \
@@ -311,9 +311,4 @@ ZPCodec.o: ZPCodec.cpp ../../src/include/config.h \
  ZPCodec.h GContainer.h GException.h \
  DjVuGlobal.h ../../src/include/DjVu.h \
  GSmartPointer.h ByteStream.h Arrays.h
-test.o: test.cpp DjVuDocEditor.h DjVuDocument.h \
- DjVuPort.h GThreads.h DjVuGlobal.h \
- GException.h GURL.h GString.h \
- GContainer.h GSmartPointer.h Arrays.h \
- DjVmDoc.h DjVmDir.h ByteStream.h
 ### END   C++ DEPENDENCIES

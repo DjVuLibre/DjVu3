@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.cpp,v 1.85 2001-07-24 17:52:03 bcr Exp $
+// $Id: ByteStream.cpp,v 1.86 2001-07-27 23:58:34 bcr Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 04/1997
@@ -685,7 +685,7 @@ GUTF8String
 ByteStream::Stdio::init(const GURL &url, const char mode[])
 {
   GUTF8String retval;
-  if (url.fname() != '-')
+  if (url.fname() != "-")
   {
 #ifdef macintosh
     fp = urlfopen(url,mode);

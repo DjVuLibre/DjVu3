@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.h,v 1.85 2001-07-24 17:52:04 bcr Exp $
+// $Id: GString.h,v 1.86 2001-07-27 23:58:34 bcr Exp $
 // $Name:  $
 
 #ifndef _GSTRING_H_
@@ -64,7 +64,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.85 2001-07-24 17:52:04 bcr Exp $# */
+    #$Id: GString.h,v 1.86 2001-07-27 23:58:34 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -662,12 +662,16 @@ public:
     { return !cmp(s2); }
   bool operator==(const char *s2) const
     { return !cmp(s2); }
+#if 0
   bool operator==(const char s2)  const
     { return !cmp(s2); }
+#endif
   friend bool operator==(const char    *s1, const GBaseString &s2) 
     { return !s2.cmp(s1); }
+#if 0
   friend bool operator==(const char s1, const GBaseString &s2) 
     { return !s2.cmp(s1); }
+#endif
 
   /** String comparison. Returns true if and only if character
       strings #s1# and #s2# are not equal (as with #strcmp#.)
@@ -676,12 +680,16 @@ public:
     { return !!cmp(s2); }
   bool operator!=(const char *s2) const
     { return !!cmp(s2); }
+#if 0
   bool operator!=(const char s2) const
     { return !!cmp(s2); }
+#endif
   friend bool operator!=(const char *s1, const GBaseString &s2)
     { return !!s2.cmp(s1); }
+#if 0
   friend bool operator!=(const char s1, const GBaseString &s2)
     { return !!s2.cmp(s1); }
+#endif
 
   /** String comparison. Returns true if and only if character
       strings #s1# is lexicographically greater than or equal to
