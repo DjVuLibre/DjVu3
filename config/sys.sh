@@ -17,6 +17,8 @@ if [ -z "$SYS_SET" ] ; then
   DEFS="-DUNIX"
   INCS=" "
   JOBJ=" "
+  WLWHOLEARCHIVE="-Wl,--whole-archive"
+  WLNOWHOLEARCHIVE="-Wl,--no-whole-archive"
   if [ "$SYS" = "Linux" ] ; then
     if [ -r /lib/libc.so.6 ] ; then
       SYS=linux-libc6
@@ -31,16 +33,19 @@ if [ -z "$SYS_SET" ] ; then
       SYS=Solaris
       if [ x$PROC = xi386 ]
       then
-	SYS=Solaris-i386
+        SYS=Solaris-i386
       elif [ x$PROC = xsparc ]
       then
-	SYS=Solaris-sparc
+        SYS=Solaris-sparc
         DEFS="$DEFS -DNEED_DJVU_MEMORY"
       fi
     fi
+  elif [ "$SYS" = "IRIX64" ] ; then
+    WLWHOLEARCHIVE="-Wl,-all"
+    WLNOWHOLEARCHIVE="-Wl,-notall"
   fi
-	SYS_SET=true
+  SYS_SET=true
   echo "$SYS"
-  CONFIG_VARS=`echo SYS SYS_SET DEFS INCS JOBJ $CONFIG_VARS`
+  CONFIG_VARS=`echo SYS SYS_SET DEFS INCS JOBJ WLWHOLEARCHIVE WLNOWHOLEARCHIVE $CONFIG_VARS`
 fi
 
