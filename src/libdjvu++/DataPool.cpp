@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.cpp,v 1.22 1999-09-19 21:20:32 eaf Exp $
+//C- $Id: DataPool.cpp,v 1.23 1999-09-22 18:06:06 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -26,6 +26,162 @@ call_callback(void (* callback)(void *), void * cl_data)
    TRY {
       if (callback) callback(cl_data);
    } CATCH(exc) {} ENDCATCH;
+}
+
+//****************************************************************************
+//****************************** OpenFiles ***********************************
+//****************************************************************************
+
+#define MAX_OPEN_FILES	15
+
+/** The purpose of this class is to limit the number of files open by
+    connected DataPools. Now, when a DataPool is connected to a file, it
+    doesn't necessarily has it open. Every time it needs access to data
+    it's supposed to ask this file for the StdioByteStream. It should
+    also inform the class when it's going to die (so that the file can
+    be closed). OpenFiles makes sure, that the number of open files
+    doesn't exceed MAX_OPEN_FILES. When it does, it looks for the oldest
+    file, closes it and asks all DataPools working with it to ZERO
+    their GP<> pointers. */
+class OpenFiles
+{
+private:
+   class File : public GPEnabled
+   {
+   public:
+      GString			name;
+      GP<StdioByteStream>	stream;		// Stream connected to 'name'
+      GCriticalSection		stream_lock;
+      GList<void *>		pools_list;	// List of pools using this stream
+      GCriticalSection		pools_lock;
+      time_t			open_time;	// Time when stream was open
+
+      int	add_pool(DataPool * pool);
+      int	del_pool(DataPool * pool);
+      
+      File(const char * name, DataPool * pool);
+      virtual ~File(void);
+   };
+   static OpenFiles	* global_ptr;
+
+   GPList<File>		files_list;
+   GCriticalSection	files_lock;
+public:
+   static OpenFiles	* get(void);
+   
+   void		request_stream(const char * name, DataPool * pool,
+			       GP<StdioByteStream> & stream,
+			       GCriticalSection ** stream_lock);
+   void		pool_dies(DataPool * pool);
+};
+
+OpenFiles * OpenFiles::global_ptr;
+
+OpenFiles::File::File(const char * xname, DataPool * pool) : name(xname)
+{
+   DEBUG_MSG("OpenFiles::File::File(): Opening file '" << name << "'\n");
+   
+   open_time=time(0);
+   stream=new StdioByteStream(name, "rb");
+   add_pool(pool);
+}
+
+OpenFiles::File::~File(void)
+{
+   DEBUG_MSG("OpenFiles::File::~File(): Closing file '" << name << "'\n");
+
+      // Make all DataPools using this stream release it (so that
+      // the stream can actually be closed)
+   GCriticalSectionLock lock(&pools_lock);
+   for(GPosition pos=pools_list;pos;++pos)
+      ((DataPool *) pools_list[pos])->clear_stream();
+}
+
+int
+OpenFiles::File::add_pool(DataPool * pool)
+{
+   GCriticalSectionLock lock(&pools_lock);
+   if (!pools_list.contains(pool)) pools_list.append(pool);
+   return pools_list.size();
+}
+
+int
+OpenFiles::File::del_pool(DataPool * pool)
+{
+   GCriticalSectionLock lock(&pools_lock);
+   GPosition pos;
+   if (pools_list.search(pool, pos)) pools_list.del(pos);
+   return pools_list.size();
+}
+
+inline OpenFiles *
+OpenFiles::get(void)
+{
+   if (!global_ptr) global_ptr=new OpenFiles();
+   return global_ptr;
+}
+
+void
+OpenFiles::request_stream(const char * name, DataPool * pool,
+			  GP<StdioByteStream> & stream,
+			  GCriticalSection ** stream_lock)
+{
+   DEBUG_MSG("OpenFiles::request_stream(): name='" << name << "'\n");
+   DEBUG_MAKE_INDENT(3);
+
+   GP<File> file;
+
+      // Check: maybe the stream has already been open by request of
+      // another DataPool
+   GCriticalSectionLock lock(&files_lock);
+   for(GPosition pos=files_list;pos;++pos)
+      if (files_list[pos]->name==name)
+      {
+	 DEBUG_MSG("found existing stream\n");
+	 file=files_list[pos];
+	 break;
+      }
+
+      // No? Open the stream, but check, that there are not
+      // too many streams open
+   if (!file)
+   {
+      file=new File(name, pool);
+      files_list.append(file);
+      if (files_list.size()>MAX_OPEN_FILES)
+      {
+	    // Too many open files (streams). Get rid of the oldest one.
+	 time_t oldest_time=time(0);
+	 GPosition oldest_pos=files_list;
+	 for(GPosition pos=files_list;pos;++pos)
+	    if (files_list[pos]->open_time<oldest_time)
+	    {
+	       oldest_time=files_list[pos]->open_time;
+	       oldest_pos=pos;
+	    }
+	 files_list.del(oldest_pos);
+      }
+   }
+   
+   file->add_pool(pool);
+   stream=file->stream;
+   *stream_lock=&file->stream_lock;
+}
+
+void
+OpenFiles::pool_dies(DataPool * pool)
+{
+   GCriticalSectionLock lock(&files_lock);
+   for(GPosition pos=files_list;pos;)
+   {
+      GP<File> f=files_list[pos];
+      if (f->del_pool(pool)==0)
+      {
+	 GPosition this_pos=pos;
+	 ++pos;
+	 files_list.del(this_pos);
+      } else ++pos;
+   }
 }
 
 //****************************************************************************
@@ -213,6 +369,8 @@ DataPool::DataPool(const char * fname, int start, int length)
 
 DataPool::~DataPool(void)
 {
+   OpenFiles::get()->pool_dies(this);
+   
    {
 	 // Wait until the static_trigger_cb() exits
       GCriticalSectionLock lock(&trigger_lock);
@@ -238,7 +396,7 @@ DataPool::connect(const GP<DataPool> & pool_in, int start_in, int length_in)
    DEBUG_MAKE_INDENT(3);
    
    if (pool) THROW("Already connected to another DataPool.");
-   if (stream) THROW("Already connected to a file.");
+   if (fname.length()) THROW("Already connected to a file.");
    if (start_in<0) THROW("Start must be non negative");
 
    pool=pool_in;
@@ -265,39 +423,61 @@ DataPool::connect(const GP<DataPool> & pool_in, int start_in, int length_in)
 }
 
 void
-DataPool::connect(const char * fname, int start_in, int length_in)
+DataPool::connect(const char * fname_in, int start_in, int length_in)
 {
    DEBUG_MSG("DataPool::connect(): connecting to a file\n");
    DEBUG_MAKE_INDENT(3);
    
    if (pool) THROW("Already connected to a DataPool.");
-   if (stream) THROW("Already connected to another file.");
+   if (fname.length()) THROW("Already connected to another file.");
    if (start_in<0) THROW("Start must be non negative");
-     
-   GP<StdioByteStream> str=new StdioByteStream(fname, "rb");
-   str->seek(0, SEEK_END);
-   int file_size=str->tell();
 
-   stream=str;
-   start=start_in;
-   length=length_in;
-   if (start>=file_size) length = 0;
-   else if (length<0 || start+length>=file_size) length=file_size-start;
-
-   eof_flag=true;
-
-   data=0;
-
-   wake_up_all_readers();
-   
-      // Call every trigger callback
-   GCriticalSectionLock lock(&triggers_lock);
-   for(GPosition pos=triggers_list;pos;++pos)
+   if (!strcmp(fname_in, "-"))
    {
-      GP<Trigger> t=triggers_list[pos];
-      call_callback(t->callback, t->cl_data);
+      DEBUG_MSG("This is stdin => just read the data...\n");
+      char buffer[1024];
+      int length;
+      StdioByteStream str("-", "rb");
+      while((length=str.read(buffer, 1024)))
+	 add_data(buffer, length);
+      set_eof();
+   } else
+   {
+	 // Open the stream (just in this function) too see if
+	 // the file is accessible. In future we will be using 'OpenFiles'
+	 // to request and release streams
+      GP<StdioByteStream> str=new StdioByteStream(fname_in, "rb");
+      str->seek(0, SEEK_END);
+      int file_size=str->tell();
+
+      fname=fname_in;
+      start=start_in;
+      length=length_in;
+      if (start>=file_size) length=0;
+      else if (length<0 || start+length>=file_size) length=file_size-start;
+
+      eof_flag=true;
+
+      data=0;
+
+      wake_up_all_readers();
+   
+	 // Call every trigger callback
+      GCriticalSectionLock lock(&triggers_lock);
+      for(GPosition pos=triggers_list;pos;++pos)
+      {
+	 GP<Trigger> t=triggers_list[pos];
+	 call_callback(t->callback, t->cl_data);
+      }
+      triggers_list.empty();
    }
-   triggers_list.empty();
+}
+
+inline void
+DataPool::check_stream(void)
+{
+   if (!stream)
+      OpenFiles::get()->request_stream(fname, this, stream, &stream_lock);
 }
 
 int
@@ -325,7 +505,7 @@ DataPool::get_size(int dstart, int dlength) const
    }
    
    if (pool) return pool->get_size(start+dstart, dlength);
-   else if (stream)
+   else if (fname.length())
    {
       if (start+dstart+dlength>length) return length-(start+dstart);
       else return dlength;
@@ -359,7 +539,7 @@ DataPool::add_data(const void * buffer, int offset, int size)
 	     offset << "...\n");
    DEBUG_MAKE_INDENT(3);
    
-   if (stream || pool)
+   if (fname.length() || pool)
       THROW("Function DataPool::add_data() may not be called for connected DataPools.");
    
       // Add data to the data storage
@@ -406,7 +586,7 @@ DataPool::has_data(int dstart, int dlength)
    if (dlength<0 && length>0) dlength=length-dstart;
 
    if (pool) return pool->has_data(start+dstart, dlength);
-   else if (stream) return start+dstart+dlength<=length;
+   else if (fname.length()) return start+dstart+dlength<=length;
    else if (dlength<0) return is_eof();
    else return block_list.get_bytes(dstart, dlength)==dlength;
 }
@@ -452,11 +632,12 @@ DataPool::get_data(void * buffer, int offset, int sz, int level)
 	 } ENDCATCH;
       }
    } 
-   else if (stream)
+   else if (fname.length())
    {
       if (length>0 && offset+sz>length) sz=length-offset;
       if (sz<0) sz=0;
-      GCriticalSectionLock lock(&stream_lock);
+      check_stream();	// Will open the stream if necessary
+      GCriticalSectionLock lock(stream_lock);
       stream->seek(start+offset, SEEK_SET);
       return stream->readall(buffer, sz);
    } 
@@ -539,7 +720,7 @@ DataPool::wait_for_data(const GP<Reader> & reader)
       if (stop_flag) THROW("STOP");
       if (reader->reenter_flag) THROW("DATA_POOL_REENTER");
       if (eof_flag || block_list.get_bytes(reader->offset, 1)) return;
-      if (pool || stream) return;
+      if (pool || fname.length()) return;
 
       if (stop_blocked_flag) THROW("STOP");
 
@@ -566,7 +747,7 @@ void
 DataPool::set_eof(void)
       // Has no effect on connected DataPools
 {
-   if (!stream && !pool)
+   if (!fname.length() && !pool)
    {
       eof_flag=true;
       
@@ -640,7 +821,7 @@ DataPool::check_triggers(void)
    DEBUG_MSG("DataPool::check_triggers(): calling activated trigger callbacks.\n");
    DEBUG_MAKE_INDENT(3);
 
-   if (!pool && !stream)
+   if (!pool && !fname.length())
       while(1)
       {
 	 GP<Trigger> trigger;
@@ -693,7 +874,7 @@ DataPool::add_trigger(int tstart, int tlength,
 	 pool->add_trigger(start+tstart, tlength, callback, cl_data);
 	 GCriticalSectionLock lock(&triggers_lock);
 	 triggers_list.append(trigger);
-      } else if (!stream)
+      } else if (!fname.length())
       {
 	    // We're not connected to anything and maintain our own data
 	 if (tlength>=0 && block_list.get_bytes(tstart, tlength)==tlength)
@@ -753,7 +934,7 @@ DataPool::trigger_cb(void)
 	 // We may be here when either EOF is set on the master DataPool
 	 // Or when it may have learnt its length (from IFF or whatever)
       if (pool->is_eof() || pool->has_data(start, length)) set_eof();
-   } else if (!stream)
+   } else if (!fname.length())
    {
 	 // Not connected to anything => Try to guess the length
       if (length<0) analyze_iff();

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.h,v 1.18 1999-09-20 16:06:30 eaf Exp $
+//C- $Id: DataPool.h,v 1.19 1999-09-22 18:06:06 eaf Exp $
  
 #ifndef _DATAPOOL_H
 #define _DATAPOOL_H
@@ -22,6 +22,7 @@
 #include "GThreads.h"
 #include "GSmartPointer.h"
 #include "GContainer.h"
+#include "GString.h"
 #include "Arrays.h"
 
 /** @name DataPool.h
@@ -43,7 +44,7 @@
 
     @memo Thread safe data storage
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DataPool.h,v 1.18 1999-09-20 16:06:30 eaf Exp $#
+    @version #$Id: DataPool.h,v 1.19 1999-09-22 18:06:06 eaf Exp $#
 */
 
 //@{
@@ -508,6 +509,9 @@ public:
 	  is about to be destroyed. */
    void		del_trigger(void (* callback)(void *), void * cl_data);
       //@}
+
+      // Internal. Used by 'OpenFiles'
+   void		clear_stream(void);
 private:
    bool		eof_flag;
    bool		stop_flag;
@@ -517,8 +521,9 @@ private:
    
       // Source or storage of data
    GP<DataPool>		pool;
+   GString		fname;
    GP<StdioByteStream>	stream;
-   GCriticalSection	stream_lock;
+   GCriticalSection	* stream_lock;
    GP<MemoryByteStream>	data;
    GCriticalSection	data_lock;
    BlockList		block_list;
@@ -535,6 +540,7 @@ private:
    GCriticalSection	trigger_lock;		// Lock for static_trigger_cb()
 
    void		init(void);
+   void		check_stream(void);
    void		wait_for_data(const GP<Reader> & reader);
    void		wake_up_all_readers(void);
    void		check_triggers(void);
@@ -556,13 +562,19 @@ DataPool::is_eof(void) const
 inline bool
 DataPool::is_connected(void) const
 {
-   return stream!=0 || pool!=0;
+   return fname.length()!=0 || pool!=0;
 }
 
 inline int
 DataPool::get_size(void) const
 {
    return get_size(0, -1);
+}
+
+inline void
+DataPool::clear_stream(void)
+{
+   stream=0;
 }
 
 inline
