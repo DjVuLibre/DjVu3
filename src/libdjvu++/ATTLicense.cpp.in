@@ -1,0 +1,88 @@
+//C-  -*- C++ -*-
+//C-
+//C-  Copyright (c) 1998 AT&T	
+//C-  All Rights Reserved 
+//C-
+//C-  THIS IS UNPUBLISHED PROPRIETARY SOURCE CODE OF AT&T
+//C-  The copyright notice above does not evidence any
+//C-  actual or intended publication of such source code.
+//C-
+//C-  $Id: ATTLicense.cpp.in,v 1.1 1999-02-27 00:53:17 leonb Exp $
+
+#include <stdlib.h>
+#include <stdio.h>
+#include "ATTLicense.h"
+#include "ByteStream.h"
+#include "BSByteStream.h"
+
+static const char the_copyright[] = 
+"copyright (c) AT&T 1999";
+
+static const char the_license[] = {
+  @ATTLICENSE@
+  255
+};
+
+
+GString
+ATTLicense::get_license_text()
+{
+  StaticByteStream input(the_license, sizeof(the_license));
+  BSByteStream decode(input);
+  MemoryByteStream temp;
+  temp.copy(decode);
+  GString str;
+  int len = temp.size();
+  char *buffer = str.getbuf(len);
+  temp.seek(0);
+  temp.read(buffer,len);
+  return str;
+}
+
+GString
+ATTLicense::get_copyright_text()
+{
+  return GString(the_copyright);
+}
+
+GString
+ATTLicense::get_usage_text(char *program)
+{
+  return "This program is " + GString(the_copyright) + ".\n" + 
+         "Type command \'" + program + " -license\' to see the licensing terms\n";
+}
+
+void
+ATTLicense::process_cmdline(int argc, char **argv)
+{
+  // Check cmdline
+  int i;
+  for (i=1; i<argc; i++)
+    {
+      char *s = argv[i];
+      while (*s=='-')
+        s++;
+      if (strcmp(s,"license")==0)
+        break;
+    }
+  if (i>=argc)
+    return;
+  // Display license
+#ifdef UNIX
+  char *pager = getenv("PAGER");
+  if (pager==0) 
+    pager="more";
+  FILE *f = popen(pager,"w");
+  if (f)
+    {
+      StaticByteStream input(the_license, sizeof(the_license));
+      BSByteStream decode(input);
+      StdioByteStream output(f, "w");
+      output.copy(decode);
+      if (pclose(f) >= 0)
+        exit(0);
+    }
+#endif
+  fprintf(stdout,"\n%s\n", (const char*)get_license_text());
+  exit(0);
+}

@@ -4,6 +4,18 @@
     990221
     @author
     Leon Bottou, 02/1999
+
+
+
+
+    The DjVu Reference Library is Copyright (c) AT&T 1999.  
+
+    YOU may use this software pursuant to the terms and conditions specified
+    in the \Ref{AT&T Source Code Agreement}.  Unless you have other agreements
+    with AT&T regarding this software, YOUR use of this software shall imply
+    YOUR acceptance of all the provisions specified in this agreement.
+
+
 */
 //@{
 
@@ -145,9 +157,14 @@
    
 
 //----------------------------------------
-/** @name AT&T Source Code License
+/** @name AT&T Source Code Agreement
 
-    NO WARRANTY.
+    Here is the text of the AT&T Source Code Agreement.
+
+    \begin{verbatim}
+    @ATTLICENSE@
+    \end{verbatim}
+    
   */
 //@{
 //@}

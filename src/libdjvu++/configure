@@ -17,7 +17,7 @@ DEFS=
 conf=`basename $0`
 SRCDIR=`dirname $0`
 TOPDIR=$SRCDIR
-if [ ! -r "$SRCDIR/libdjvu++.dxx" ] 
+if [ ! -r "$SRCDIR/libdjvu++.dxx.in" ] 
 then
    echo 1>&2 "$conf: Cannot recognize source directory."
    exit 1

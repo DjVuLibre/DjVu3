@@ -26,7 +26,7 @@ PROG= djvuinfo c44 d44 djvutopnm djvumake djvuextract ppmcoco bzz
 LIBOBJS= GString.o GException.o GContainer.o GRect.o GSmartPointer.o \
 	 GThreads.o ByteStream.o ZPCodec.o GBitmap.o GPixmap.o \
 	 IFFByteStream.o BSByteStream.o JB2Image.o GScaler.o IWImage.o \
-	 DjVuImage.o GOS.o DjVuGlobal.o
+	 DjVuImage.o GOS.o DjVuGlobal.o ATTLicense.o
 
 # Make all
 
@@ -80,17 +80,35 @@ annotate: $(ANNOTATEOBJS) $(LIB)
 bzz: $(BZZOBJS) $(LIB)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(BZZOBJS) $(LIB) $(LDLIBS)
 
+# License substitution
+
+ATTLicense.cpp: ATTLicense.cpp.in ATTLICENSE
+	#sed < $(TOP)/ATTLICENSE > ATTLICENSE.tmp \
+	#   -e '1,$$s/"/\\"/g' -e '1,$$s/.*/\"&\\n\"/'
+	test -x bzz && ( bzz $(TOP)/ATTLICENSE - | od -A n -v -t d1 |\
+	   sed -e 's/.*/  &/' -e 's/ *0*\([0-9][0-9]*\)/\1,/g' > ATTLICENSE.tmp )
+	sed < $(TOP)/ATTLicense.cpp.in > ATTLicense.cpp \
+	   -e '/@ATTLICENSE@/r ATTLICENSE.tmp' -e '/@ATTLICENSE@/d'
+	-rm ATTLICENSE.tmp
+
+libdjvu++.dxx: libdjvu++.dxx.in
+	sed < $(TOP)/libdjvu++.dxx.in > libdjvu++.dxx \
+	   -e '/@ATTLICENSE@/r $(TOP)/ATTLICENSE' -e '/@ATTLICENSE@/d' 
+
 # Documentation
 
-html:
+html: libdjvu++.dxx libdjvu++.footer
 	-rm -rf @Doc
 	-mkdir @Doc 2>/dev/null
-	${DOCXX} -d @Doc -B $(TOP)/libdjvu++.html $(TOP)/libdjvu++.dxx
+	${DOCXX} -d @Doc -B $(TOP)/libdjvu++.footer libdjvu++.dxx
 
-dvi:
+tex:  libdjvu++.dxx
 	-@mkdir @Doc 2>/dev/null
-	${DOCXX} -t -o @Doc/libdjvu++.tex $(TOP)/libdjvu++.dxx
+	${DOCXX} -t -o @Doc/libdjvu++.tex libdjvu++.dxx
 	( cd @Doc ; latex libdjvu++.tex ; latex libdjvu++.tex )
+	dvips @Doc/libdjvu++.dvi -o
+	gzip libdjvu++.ps
+
 
 # Generic rules
 
@@ -128,7 +146,7 @@ depend:
 	sed -e '1,$$s/^\(Test[A-Za-z0-9]*\)\.o:/\1:/g' < Makefile.new > Makefile
 	rm Makefile.new
 
-PHONY: html dvi clean realclean distclean install depend
+PHONY: html tex clean realclean distclean install depend
 
 
 # Handle cpp files as C++
