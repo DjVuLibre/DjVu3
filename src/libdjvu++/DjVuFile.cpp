@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: DjVuFile.cpp,v 1.135 2000-11-09 20:15:05 jmw Exp $
+// $Id: DjVuFile.cpp,v 1.136 2000-12-07 03:11:55 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -1112,9 +1112,9 @@ DjVuFile::decode(ByteStream & str)
   bool djvu = (chkid=="FORM:DJVU")?true:false;
   bool iw44 = ((chkid=="FORM:PM44") || (chkid=="FORM:BM44"));
   if (djvi || djvu)
-    mimetype = "image/djvu";
+    mimetype = "image/x.djvu";
   else if (iw44)
-    mimetype = "image/iw44";
+    mimetype = "image/x-iw44";
   else
     G_THROW("DjVuFile.unexp_image");
   
