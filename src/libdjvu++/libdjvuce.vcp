@@ -1,0 +1,3802 @@
+# Microsoft eMbedded Visual Tools Project File - Name="libdjvuce" - Package Owner=<4>
+# Microsoft eMbedded Visual Tools Generated Build File, Format Version 6.02
+# ** DO NOT EDIT **
+
+# TARGTYPE "Win32 (WCE x86em) Static Library" 0x7f04
+# TARGTYPE "Win32 (WCE SH3) Static Library" 0x8104
+
+CFG=libdjvuce - Win32 (WCE SH3) Debug
+!MESSAGE This is not a valid makefile. To build this project using NMAKE,
+!MESSAGE use the Export Makefile command and run
+!MESSAGE 
+!MESSAGE NMAKE /f "libdjvuce.vcn".
+!MESSAGE 
+!MESSAGE You can specify a configuration when running NMAKE
+!MESSAGE by defining the macro CFG on the command line. For example:
+!MESSAGE 
+!MESSAGE NMAKE /f "libdjvuce.vcn" CFG="libdjvuce - Win32 (WCE SH3) Debug"
+!MESSAGE 
+!MESSAGE Possible choices for configuration are:
+!MESSAGE 
+!MESSAGE "libdjvuce - Win32 (WCE SH3) Release" (based on "Win32 (WCE SH3) Static Library")
+!MESSAGE "libdjvuce - Win32 (WCE SH3) Debug" (based on "Win32 (WCE SH3) Static Library")
+!MESSAGE "libdjvuce - Win32 (WCE x86em) Release" (based on "Win32 (WCE x86em) Static Library")
+!MESSAGE "libdjvuce - Win32 (WCE x86em) Debug" (based on "Win32 (WCE x86em) Static Library")
+!MESSAGE 
+
+# Begin Project
+# PROP AllowPerConfigDependencies 0
+# PROP Scc_ProjName ""
+# PROP Scc_LocalPath ""
+# PROP ATL_Project 2
+
+!IF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
+
+# PROP BASE Use_MFC 0
+# PROP BASE Use_Debug_Libraries 0
+# PROP BASE Output_Dir "SH3Rel"
+# PROP BASE Intermediate_Dir "SH3Rel"
+# PROP BASE CPU_ID "{D6519020-710F-11D3-99F2-00105A0DF099}"
+# PROP BASE Platform_ID "{8A9A2F80-6887-11D3-842E-005004848CBA}"
+# PROP BASE Target_Dir ""
+# PROP Use_MFC 0
+# PROP Use_Debug_Libraries 0
+# PROP Output_Dir "SH3Rel"
+# PROP Intermediate_Dir "SH3Rel"
+# PROP CPU_ID "{D6519020-710F-11D3-99F2-00105A0DF099}"
+# PROP Platform_ID "{8A9A2F80-6887-11D3-842E-005004848CBA}"
+# PROP Target_Dir ""
+CPP=shcl.exe
+# ADD BASE CPP /nologo /W3 /D _WIN32_WCE=$(CEVersion) /D "$(CePlatform)" /D "SHx" /D "SH3" /D "_SH3_" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_UNICODE" /D "NDEBUG" /D "_LIB" /YX /Oxs /M$(CECrtMT) /c
+# ADD CPP /nologo /W3 /D "SHx" /D "SH3" /D "_SH3_" /D "NDEBUG" /D _WIN32_WCE=$(CEVersion) /D "$(CePlatform)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_UNICODE" /D "_LIB" /D "USE_EXCEPTION_EMULATION" /YX /Oxs /M$(CECrtMT) /c
+LIB32=link.exe -lib
+# ADD BASE LIB32 /nologo
+# ADD LIB32 /nologo
+BSC32=bscmake.exe
+# ADD BASE BSC32 /nologo
+# ADD BSC32 /nologo
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Debug"
+
+# PROP BASE Use_MFC 0
+# PROP BASE Use_Debug_Libraries 1
+# PROP BASE Output_Dir "SH3Dbg"
+# PROP BASE Intermediate_Dir "SH3Dbg"
+# PROP BASE CPU_ID "{D6519020-710F-11D3-99F2-00105A0DF099}"
+# PROP BASE Platform_ID "{8A9A2F80-6887-11D3-842E-005004848CBA}"
+# PROP BASE Target_Dir ""
+# PROP Use_MFC 0
+# PROP Use_Debug_Libraries 1
+# PROP Output_Dir "SH3Dbg"
+# PROP Intermediate_Dir "SH3Dbg"
+# PROP CPU_ID "{D6519020-710F-11D3-99F2-00105A0DF099}"
+# PROP Platform_ID "{8A9A2F80-6887-11D3-842E-005004848CBA}"
+# PROP Target_Dir ""
+CPP=shcl.exe
+# ADD BASE CPP /nologo /W3 /Zi /Od /D "DEBUG" /D _WIN32_WCE=$(CEVersion) /D "$(CePlatform)" /D "SHx" /D "SH3" /D "_SH3_" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_UNICODE" /D "_LIB" /YX /M$(CECrtMTDebug) /c
+# ADD CPP /nologo /W3 /Zi /Od /D "DEBUG" /D "SHx" /D "SH3" /D "_SH3_" /D "USE_EXCEPTION_EMULATION" /D "NEED_DECODER_ONLY" /D _WIN32_WCE=$(CEVersion) /D "$(CePlatform)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_UNICODE" /D "_LIB" /YX /M$(CECrtMTDebug) /c
+LIB32=link.exe -lib
+# ADD BASE LIB32 /nologo
+# ADD LIB32 /nologo
+BSC32=bscmake.exe
+# ADD BASE BSC32 /nologo
+# ADD BSC32 /nologo
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Release"
+
+# PROP BASE Use_MFC 0
+# PROP BASE Use_Debug_Libraries 0
+# PROP BASE Output_Dir "X86EMRel"
+# PROP BASE Intermediate_Dir "X86EMRel"
+# PROP BASE CPU_ID "{D6518FF4-710F-11D3-99F2-00105A0DF099}"
+# PROP BASE Platform_ID "{8A9A2F80-6887-11D3-842E-005004848CBA}"
+# PROP BASE Target_Dir ""
+# PROP Use_MFC 0
+# PROP Use_Debug_Libraries 0
+# PROP Output_Dir "X86EMRel"
+# PROP Intermediate_Dir "X86EMRel"
+# PROP CPU_ID "{D6518FF4-710F-11D3-99F2-00105A0DF099}"
+# PROP Platform_ID "{8A9A2F80-6887-11D3-842E-005004848CBA}"
+# PROP Target_Dir ""
+CPP=cl.exe
+# ADD BASE CPP /nologo /W3 /D _WIN32_WCE=$(CEVersion) /D "WIN32" /D "STRICT" /D "_WIN32_WCE_EMULATION" /D "INTERNATIONAL" /D "USA" /D "INTLMSG_CODEPAGE" /D "$(CePlatform)" /D "i486" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_UNICODE" /D "_X86_" /D "x86" /D "NDEBUG" /D "_LIB" /YX /Oxs /Gz /c
+# ADD CPP /nologo /W3 /D "WIN32" /D "STRICT" /D "_WIN32_WCE_EMULATION" /D "INTERNATIONAL" /D "USA" /D "INTLMSG_CODEPAGE" /D "i486" /D "_X86_" /D "x86" /D "NDEBUG" /D _WIN32_WCE=$(CEVersion) /D "$(CePlatform)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_UNICODE" /D "_LIB" /D "USE_EXCEPTION_EMULATION" /YX /Oxs /Gz /c
+LIB32=link.exe -lib
+# ADD BASE LIB32 /nologo
+# ADD LIB32 /nologo
+BSC32=bscmake.exe
+# ADD BASE BSC32 /nologo
+# ADD BSC32 /nologo
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Debug"
+
+# PROP BASE Use_MFC 0
+# PROP BASE Use_Debug_Libraries 1
+# PROP BASE Output_Dir "X86EMDbg"
+# PROP BASE Intermediate_Dir "X86EMDbg"
+# PROP BASE CPU_ID "{D6518FF4-710F-11D3-99F2-00105A0DF099}"
+# PROP BASE Platform_ID "{8A9A2F80-6887-11D3-842E-005004848CBA}"
+# PROP BASE Target_Dir ""
+# PROP Use_MFC 0
+# PROP Use_Debug_Libraries 1
+# PROP Output_Dir "X86EMDbg"
+# PROP Intermediate_Dir "X86EMDbg"
+# PROP CPU_ID "{D6518FF4-710F-11D3-99F2-00105A0DF099}"
+# PROP Platform_ID "{8A9A2F80-6887-11D3-842E-005004848CBA}"
+# PROP Target_Dir ""
+CPP=cl.exe
+# ADD BASE CPP /nologo /W3 /Zi /Od /D "DEBUG" /D _WIN32_WCE=$(CEVersion) /D "WIN32" /D "STRICT" /D "_WIN32_WCE_EMULATION" /D "INTERNATIONAL" /D "USA" /D "INTLMSG_CODEPAGE" /D "$(CePlatform)" /D "i486" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_UNICODE" /D "_X86_" /D "x86" /D "_LIB" /YX /Gz /c
+# ADD CPP /nologo /W3 /Zi /Od /D "DEBUG" /D "WIN32" /D "STRICT" /D "_WIN32_WCE_EMULATION" /D "INTERNATIONAL" /D "USA" /D "INTLMSG_CODEPAGE" /D "i486" /D "_X86_" /D "x86" /D "USE_EXCEPTION_EMULATION" /D _WIN32_WCE=$(CEVersion) /D "$(CePlatform)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_UNICODE" /D "_LIB" /YX /Gz /c
+LIB32=link.exe -lib
+# ADD BASE LIB32 /nologo
+# ADD LIB32 /nologo
+BSC32=bscmake.exe
+# ADD BASE BSC32 /nologo
+# ADD BSC32 /nologo
+
+!ENDIF 
+
+# Begin Target
+
+# Name "libdjvuce - Win32 (WCE SH3) Release"
+# Name "libdjvuce - Win32 (WCE SH3) Debug"
+# Name "libdjvuce - Win32 (WCE x86em) Release"
+# Name "libdjvuce - Win32 (WCE x86em) Debug"
+# Begin Group "Source Files"
+
+# PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
+# Begin Source File
+
+SOURCE="..\libdjvu++\Arrays.cpp"
+
+!IF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
+
+DEP_CPP_ARRAY=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Debug"
+
+DEP_CPP_ARRAY=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Release"
+
+DEP_CPP_ARRAY=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Debug"
+
+DEP_CPP_ARRAY=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE="..\libdjvu++\BSByteStream.cpp"
+
+!IF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
+
+DEP_CPP_BSBYT=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\BSByteStream.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GOS.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\ZPCodec.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Debug"
+
+DEP_CPP_BSBYT=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\BSByteStream.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GOS.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\ZPCodec.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Release"
+
+DEP_CPP_BSBYT=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\BSByteStream.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GOS.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\ZPCodec.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Debug"
+
+DEP_CPP_BSBYT=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\BSByteStream.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GOS.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\ZPCodec.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE="..\libdjvu++\ByteStream.cpp"
+
+!IF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
+
+DEP_CPP_BYTES=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GOS.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Debug"
+
+DEP_CPP_BYTES=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GOS.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Release"
+
+DEP_CPP_BYTES=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GOS.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Debug"
+
+DEP_CPP_BYTES=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GOS.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE="..\libdjvu++\DataPool.cpp"
+
+!IF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
+
+DEP_CPP_DATAP=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DataPool.h"\
+	"..\libdjvu++\debug.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GOS.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	"..\libdjvu++\IFFByteStream.h"\
+	
+NODEP_CPP_DATAP=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Debug"
+
+DEP_CPP_DATAP=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DataPool.h"\
+	"..\libdjvu++\debug.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GOS.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	"..\libdjvu++\IFFByteStream.h"\
+	
+NODEP_CPP_DATAP=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Release"
+
+DEP_CPP_DATAP=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DataPool.h"\
+	"..\libdjvu++\debug.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GOS.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	"..\libdjvu++\IFFByteStream.h"\
+	
+NODEP_CPP_DATAP=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Debug"
+
+DEP_CPP_DATAP=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DataPool.h"\
+	"..\libdjvu++\debug.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GOS.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	"..\libdjvu++\IFFByteStream.h"\
+	
+NODEP_CPP_DATAP=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE="..\libdjvu++\debug.cpp"
+
+!IF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
+
+DEP_CPP_DEBUG=\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\debug.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	
+NODEP_CPP_DEBUG=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Debug"
+
+DEP_CPP_DEBUG=\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\debug.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	
+NODEP_CPP_DEBUG=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Release"
+
+DEP_CPP_DEBUG=\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\debug.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	
+NODEP_CPP_DEBUG=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Debug"
+
+DEP_CPP_DEBUG=\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\debug.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	
+NODEP_CPP_DEBUG=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE="..\libdjvu++\DjVmDir.cpp"
+
+!IF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
+
+DEP_CPP_DJVMD=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\BSByteStream.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\debug.h"\
+	"..\libdjvu++\DjVmDir.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	"..\libdjvu++\ZPCodec.h"\
+	
+NODEP_CPP_DJVMD=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Debug"
+
+DEP_CPP_DJVMD=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\BSByteStream.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\debug.h"\
+	"..\libdjvu++\DjVmDir.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	"..\libdjvu++\ZPCodec.h"\
+	
+NODEP_CPP_DJVMD=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Release"
+
+DEP_CPP_DJVMD=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\BSByteStream.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\debug.h"\
+	"..\libdjvu++\DjVmDir.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	"..\libdjvu++\ZPCodec.h"\
+	
+NODEP_CPP_DJVMD=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Debug"
+
+DEP_CPP_DJVMD=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\BSByteStream.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\debug.h"\
+	"..\libdjvu++\DjVmDir.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	"..\libdjvu++\ZPCodec.h"\
+	
+NODEP_CPP_DJVMD=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE="..\libdjvu++\DjVmDir0.cpp"
+
+!IF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
+
+DEP_CPP_DJVMDI=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\debug.h"\
+	"..\libdjvu++\DjVmDir0.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Debug"
+
+DEP_CPP_DJVMDI=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\debug.h"\
+	"..\libdjvu++\DjVmDir0.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Release"
+
+DEP_CPP_DJVMDI=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\debug.h"\
+	"..\libdjvu++\DjVmDir0.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Debug"
+
+DEP_CPP_DJVMDI=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\debug.h"\
+	"..\libdjvu++\DjVmDir0.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE="..\libdjvu++\DjVmDoc.cpp"
+
+!IF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
+
+DEP_CPP_DJVMDO=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DataPool.h"\
+	"..\libdjvu++\debug.h"\
+	"..\libdjvu++\DjVmDir.h"\
+	"..\libdjvu++\DjVmDoc.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GOS.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	"..\libdjvu++\IFFByteStream.h"\
+	
+NODEP_CPP_DJVMDO=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Debug"
+
+DEP_CPP_DJVMDO=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DataPool.h"\
+	"..\libdjvu++\debug.h"\
+	"..\libdjvu++\DjVmDir.h"\
+	"..\libdjvu++\DjVmDoc.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GOS.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	"..\libdjvu++\IFFByteStream.h"\
+	
+NODEP_CPP_DJVMDO=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Release"
+
+DEP_CPP_DJVMDO=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DataPool.h"\
+	"..\libdjvu++\debug.h"\
+	"..\libdjvu++\DjVmDir.h"\
+	"..\libdjvu++\DjVmDoc.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GOS.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	"..\libdjvu++\IFFByteStream.h"\
+	
+NODEP_CPP_DJVMDO=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Debug"
+
+DEP_CPP_DJVMDO=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DataPool.h"\
+	"..\libdjvu++\debug.h"\
+	"..\libdjvu++\DjVmDir.h"\
+	"..\libdjvu++\DjVmDoc.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GOS.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	"..\libdjvu++\IFFByteStream.h"\
+	
+NODEP_CPP_DJVMDO=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE="..\libdjvu++\DjVuAnno.cpp"
+
+!IF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
+
+DEP_CPP_DJVUA=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\BSByteStream.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\debug.h"\
+	"..\libdjvu++\DjVuAnno.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GMapAreas.h"\
+	"..\libdjvu++\GRect.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	"..\libdjvu++\IFFByteStream.h"\
+	"..\libdjvu++\ZPCodec.h"\
+	
+NODEP_CPP_DJVUA=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Debug"
+
+DEP_CPP_DJVUA=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\BSByteStream.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\debug.h"\
+	"..\libdjvu++\DjVuAnno.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GMapAreas.h"\
+	"..\libdjvu++\GRect.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	"..\libdjvu++\IFFByteStream.h"\
+	"..\libdjvu++\ZPCodec.h"\
+	
+NODEP_CPP_DJVUA=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Release"
+
+DEP_CPP_DJVUA=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\BSByteStream.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\debug.h"\
+	"..\libdjvu++\DjVuAnno.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GMapAreas.h"\
+	"..\libdjvu++\GRect.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	"..\libdjvu++\IFFByteStream.h"\
+	"..\libdjvu++\ZPCodec.h"\
+	
+NODEP_CPP_DJVUA=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Debug"
+
+DEP_CPP_DJVUA=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\BSByteStream.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\debug.h"\
+	"..\libdjvu++\DjVuAnno.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GMapAreas.h"\
+	"..\libdjvu++\GRect.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	"..\libdjvu++\IFFByteStream.h"\
+	"..\libdjvu++\ZPCodec.h"\
+	
+NODEP_CPP_DJVUA=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE="..\libdjvu++\DjVuDocEditor.cpp"
+
+!IF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
+
+DEP_CPP_DJVUD=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DataPool.h"\
+	"..\libdjvu++\debug.h"\
+	"..\libdjvu++\DjVmDir.h"\
+	"..\libdjvu++\DjVmDir0.h"\
+	"..\libdjvu++\DjVmDoc.h"\
+	"..\libdjvu++\DjVuAnno.h"\
+	"..\libdjvu++\DjVuDocEditor.h"\
+	"..\libdjvu++\DjVuDocument.h"\
+	"..\libdjvu++\DjVuFile.h"\
+	"..\libdjvu++\DjVuFileCache.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\DjVuImage.h"\
+	"..\libdjvu++\DjVuInfo.h"\
+	"..\libdjvu++\DjVuNavDir.h"\
+	"..\libdjvu++\DjVuPalette.h"\
+	"..\libdjvu++\DjVuPort.h"\
+	"..\libdjvu++\GBitmap.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GMapAreas.h"\
+	"..\libdjvu++\GOS.h"\
+	"..\libdjvu++\GPixmap.h"\
+	"..\libdjvu++\GRect.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	"..\libdjvu++\GURL.h"\
+	"..\libdjvu++\IFFByteStream.h"\
+	"..\libdjvu++\IWImage.h"\
+	"..\libdjvu++\JB2Image.h"\
+	"..\libdjvu++\ZPCodec.h"\
+	
+NODEP_CPP_DJVUD=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Debug"
+
+DEP_CPP_DJVUD=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DataPool.h"\
+	"..\libdjvu++\debug.h"\
+	"..\libdjvu++\DjVmDir.h"\
+	"..\libdjvu++\DjVmDir0.h"\
+	"..\libdjvu++\DjVmDoc.h"\
+	"..\libdjvu++\DjVuAnno.h"\
+	"..\libdjvu++\DjVuDocEditor.h"\
+	"..\libdjvu++\DjVuDocument.h"\
+	"..\libdjvu++\DjVuFile.h"\
+	"..\libdjvu++\DjVuFileCache.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\DjVuImage.h"\
+	"..\libdjvu++\DjVuInfo.h"\
+	"..\libdjvu++\DjVuNavDir.h"\
+	"..\libdjvu++\DjVuPalette.h"\
+	"..\libdjvu++\DjVuPort.h"\
+	"..\libdjvu++\GBitmap.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GMapAreas.h"\
+	"..\libdjvu++\GOS.h"\
+	"..\libdjvu++\GPixmap.h"\
+	"..\libdjvu++\GRect.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	"..\libdjvu++\GURL.h"\
+	"..\libdjvu++\IFFByteStream.h"\
+	"..\libdjvu++\IWImage.h"\
+	"..\libdjvu++\JB2Image.h"\
+	"..\libdjvu++\ZPCodec.h"\
+	
+NODEP_CPP_DJVUD=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Release"
+
+DEP_CPP_DJVUD=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DataPool.h"\
+	"..\libdjvu++\debug.h"\
+	"..\libdjvu++\DjVmDir.h"\
+	"..\libdjvu++\DjVmDir0.h"\
+	"..\libdjvu++\DjVmDoc.h"\
+	"..\libdjvu++\DjVuAnno.h"\
+	"..\libdjvu++\DjVuDocEditor.h"\
+	"..\libdjvu++\DjVuDocument.h"\
+	"..\libdjvu++\DjVuFile.h"\
+	"..\libdjvu++\DjVuFileCache.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\DjVuImage.h"\
+	"..\libdjvu++\DjVuInfo.h"\
+	"..\libdjvu++\DjVuNavDir.h"\
+	"..\libdjvu++\DjVuPalette.h"\
+	"..\libdjvu++\DjVuPort.h"\
+	"..\libdjvu++\GBitmap.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GMapAreas.h"\
+	"..\libdjvu++\GOS.h"\
+	"..\libdjvu++\GPixmap.h"\
+	"..\libdjvu++\GRect.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	"..\libdjvu++\GURL.h"\
+	"..\libdjvu++\IFFByteStream.h"\
+	"..\libdjvu++\IWImage.h"\
+	"..\libdjvu++\JB2Image.h"\
+	"..\libdjvu++\ZPCodec.h"\
+	
+NODEP_CPP_DJVUD=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Debug"
+
+DEP_CPP_DJVUD=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DataPool.h"\
+	"..\libdjvu++\debug.h"\
+	"..\libdjvu++\DjVmDir.h"\
+	"..\libdjvu++\DjVmDir0.h"\
+	"..\libdjvu++\DjVmDoc.h"\
+	"..\libdjvu++\DjVuAnno.h"\
+	"..\libdjvu++\DjVuDocEditor.h"\
+	"..\libdjvu++\DjVuDocument.h"\
+	"..\libdjvu++\DjVuFile.h"\
+	"..\libdjvu++\DjVuFileCache.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\DjVuImage.h"\
+	"..\libdjvu++\DjVuInfo.h"\
+	"..\libdjvu++\DjVuNavDir.h"\
+	"..\libdjvu++\DjVuPalette.h"\
+	"..\libdjvu++\DjVuPort.h"\
+	"..\libdjvu++\GBitmap.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GMapAreas.h"\
+	"..\libdjvu++\GOS.h"\
+	"..\libdjvu++\GPixmap.h"\
+	"..\libdjvu++\GRect.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	"..\libdjvu++\GURL.h"\
+	"..\libdjvu++\IFFByteStream.h"\
+	"..\libdjvu++\IWImage.h"\
+	"..\libdjvu++\JB2Image.h"\
+	"..\libdjvu++\ZPCodec.h"\
+	
+NODEP_CPP_DJVUD=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE="..\libdjvu++\DjVuDocument.cpp"
+
+!IF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
+
+DEP_CPP_DJVUDO=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DataPool.h"\
+	"..\libdjvu++\debug.h"\
+	"..\libdjvu++\DjVmDir.h"\
+	"..\libdjvu++\DjVmDir0.h"\
+	"..\libdjvu++\DjVmDoc.h"\
+	"..\libdjvu++\DjVuAnno.h"\
+	"..\libdjvu++\DjVuDocument.h"\
+	"..\libdjvu++\DjVuFile.h"\
+	"..\libdjvu++\DjVuFileCache.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\DjVuImage.h"\
+	"..\libdjvu++\DjVuInfo.h"\
+	"..\libdjvu++\DjVuNavDir.h"\
+	"..\libdjvu++\DjVuPalette.h"\
+	"..\libdjvu++\DjVuPort.h"\
+	"..\libdjvu++\GBitmap.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GMapAreas.h"\
+	"..\libdjvu++\GOS.h"\
+	"..\libdjvu++\GPixmap.h"\
+	"..\libdjvu++\GRect.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	"..\libdjvu++\GURL.h"\
+	"..\libdjvu++\IFFByteStream.h"\
+	"..\libdjvu++\IWImage.h"\
+	"..\libdjvu++\JB2Image.h"\
+	"..\libdjvu++\ZPCodec.h"\
+	
+NODEP_CPP_DJVUDO=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Debug"
+
+DEP_CPP_DJVUDO=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DataPool.h"\
+	"..\libdjvu++\debug.h"\
+	"..\libdjvu++\DjVmDir.h"\
+	"..\libdjvu++\DjVmDir0.h"\
+	"..\libdjvu++\DjVmDoc.h"\
+	"..\libdjvu++\DjVuAnno.h"\
+	"..\libdjvu++\DjVuDocument.h"\
+	"..\libdjvu++\DjVuFile.h"\
+	"..\libdjvu++\DjVuFileCache.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\DjVuImage.h"\
+	"..\libdjvu++\DjVuInfo.h"\
+	"..\libdjvu++\DjVuNavDir.h"\
+	"..\libdjvu++\DjVuPalette.h"\
+	"..\libdjvu++\DjVuPort.h"\
+	"..\libdjvu++\GBitmap.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GMapAreas.h"\
+	"..\libdjvu++\GOS.h"\
+	"..\libdjvu++\GPixmap.h"\
+	"..\libdjvu++\GRect.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	"..\libdjvu++\GURL.h"\
+	"..\libdjvu++\IFFByteStream.h"\
+	"..\libdjvu++\IWImage.h"\
+	"..\libdjvu++\JB2Image.h"\
+	"..\libdjvu++\ZPCodec.h"\
+	
+NODEP_CPP_DJVUDO=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Release"
+
+DEP_CPP_DJVUDO=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DataPool.h"\
+	"..\libdjvu++\debug.h"\
+	"..\libdjvu++\DjVmDir.h"\
+	"..\libdjvu++\DjVmDir0.h"\
+	"..\libdjvu++\DjVmDoc.h"\
+	"..\libdjvu++\DjVuAnno.h"\
+	"..\libdjvu++\DjVuDocument.h"\
+	"..\libdjvu++\DjVuFile.h"\
+	"..\libdjvu++\DjVuFileCache.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\DjVuImage.h"\
+	"..\libdjvu++\DjVuInfo.h"\
+	"..\libdjvu++\DjVuNavDir.h"\
+	"..\libdjvu++\DjVuPalette.h"\
+	"..\libdjvu++\DjVuPort.h"\
+	"..\libdjvu++\GBitmap.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GMapAreas.h"\
+	"..\libdjvu++\GOS.h"\
+	"..\libdjvu++\GPixmap.h"\
+	"..\libdjvu++\GRect.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	"..\libdjvu++\GURL.h"\
+	"..\libdjvu++\IFFByteStream.h"\
+	"..\libdjvu++\IWImage.h"\
+	"..\libdjvu++\JB2Image.h"\
+	"..\libdjvu++\ZPCodec.h"\
+	
+NODEP_CPP_DJVUDO=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Debug"
+
+DEP_CPP_DJVUDO=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DataPool.h"\
+	"..\libdjvu++\debug.h"\
+	"..\libdjvu++\DjVmDir.h"\
+	"..\libdjvu++\DjVmDir0.h"\
+	"..\libdjvu++\DjVmDoc.h"\
+	"..\libdjvu++\DjVuAnno.h"\
+	"..\libdjvu++\DjVuDocument.h"\
+	"..\libdjvu++\DjVuFile.h"\
+	"..\libdjvu++\DjVuFileCache.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\DjVuImage.h"\
+	"..\libdjvu++\DjVuInfo.h"\
+	"..\libdjvu++\DjVuNavDir.h"\
+	"..\libdjvu++\DjVuPalette.h"\
+	"..\libdjvu++\DjVuPort.h"\
+	"..\libdjvu++\GBitmap.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GMapAreas.h"\
+	"..\libdjvu++\GOS.h"\
+	"..\libdjvu++\GPixmap.h"\
+	"..\libdjvu++\GRect.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	"..\libdjvu++\GURL.h"\
+	"..\libdjvu++\IFFByteStream.h"\
+	"..\libdjvu++\IWImage.h"\
+	"..\libdjvu++\JB2Image.h"\
+	"..\libdjvu++\ZPCodec.h"\
+	
+NODEP_CPP_DJVUDO=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE="..\libdjvu++\DjVuErrorList.cpp"
+
+!IF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
+
+DEP_CPP_DJVUE=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DataPool.h"\
+	"..\libdjvu++\DjVmDir.h"\
+	"..\libdjvu++\DjVmDoc.h"\
+	"..\libdjvu++\DjVuErrorList.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\DjVuPort.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GOS.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	"..\libdjvu++\GURL.h"\
+	
+NODEP_CPP_DJVUE=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Debug"
+
+DEP_CPP_DJVUE=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DataPool.h"\
+	"..\libdjvu++\DjVmDir.h"\
+	"..\libdjvu++\DjVmDoc.h"\
+	"..\libdjvu++\DjVuErrorList.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\DjVuPort.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GOS.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	"..\libdjvu++\GURL.h"\
+	
+NODEP_CPP_DJVUE=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Release"
+
+DEP_CPP_DJVUE=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DataPool.h"\
+	"..\libdjvu++\DjVmDir.h"\
+	"..\libdjvu++\DjVmDoc.h"\
+	"..\libdjvu++\DjVuErrorList.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\DjVuPort.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GOS.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	"..\libdjvu++\GURL.h"\
+	
+NODEP_CPP_DJVUE=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Debug"
+
+DEP_CPP_DJVUE=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DataPool.h"\
+	"..\libdjvu++\DjVmDir.h"\
+	"..\libdjvu++\DjVmDoc.h"\
+	"..\libdjvu++\DjVuErrorList.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\DjVuPort.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GOS.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	"..\libdjvu++\GURL.h"\
+	
+NODEP_CPP_DJVUE=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE="..\libdjvu++\DjVuFile.cpp"
+
+!IF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
+
+DEP_CPP_DJVUF=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\BSByteStream.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DataPool.h"\
+	"..\libdjvu++\debug.h"\
+	"..\libdjvu++\DjVuFile.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\DjVuInfo.h"\
+	"..\libdjvu++\DjVuNavDir.h"\
+	"..\libdjvu++\DjVuPalette.h"\
+	"..\libdjvu++\DjVuPort.h"\
+	"..\libdjvu++\GBitmap.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GOS.h"\
+	"..\libdjvu++\GPixmap.h"\
+	"..\libdjvu++\GRect.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	"..\libdjvu++\GURL.h"\
+	"..\libdjvu++\IFFByteStream.h"\
+	"..\libdjvu++\IWImage.h"\
+	"..\libdjvu++\JB2Image.h"\
+	"..\libdjvu++\JPEGDecoder.h"\
+	"..\libdjvu++\MMRDecoder.h"\
+	"..\libdjvu++\ZPCodec.h"\
+	
+NODEP_CPP_DJVUF=\
+	"..\libdjvu++\jerror.h"\
+	"..\libdjvu++\jinclude.h"\
+	"..\libdjvu++\jpeglib.h"\
+	"..\libdjvu++\jri.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Debug"
+
+DEP_CPP_DJVUF=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\BSByteStream.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DataPool.h"\
+	"..\libdjvu++\debug.h"\
+	"..\libdjvu++\DjVuFile.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\DjVuInfo.h"\
+	"..\libdjvu++\DjVuNavDir.h"\
+	"..\libdjvu++\DjVuPalette.h"\
+	"..\libdjvu++\DjVuPort.h"\
+	"..\libdjvu++\GBitmap.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GOS.h"\
+	"..\libdjvu++\GPixmap.h"\
+	"..\libdjvu++\GRect.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	"..\libdjvu++\GURL.h"\
+	"..\libdjvu++\IFFByteStream.h"\
+	"..\libdjvu++\IWImage.h"\
+	"..\libdjvu++\JB2Image.h"\
+	"..\libdjvu++\JPEGDecoder.h"\
+	"..\libdjvu++\MMRDecoder.h"\
+	"..\libdjvu++\ZPCodec.h"\
+	
+NODEP_CPP_DJVUF=\
+	"..\libdjvu++\jerror.h"\
+	"..\libdjvu++\jinclude.h"\
+	"..\libdjvu++\jpeglib.h"\
+	"..\libdjvu++\jri.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Release"
+
+DEP_CPP_DJVUF=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\BSByteStream.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DataPool.h"\
+	"..\libdjvu++\debug.h"\
+	"..\libdjvu++\DjVuFile.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\DjVuInfo.h"\
+	"..\libdjvu++\DjVuNavDir.h"\
+	"..\libdjvu++\DjVuPalette.h"\
+	"..\libdjvu++\DjVuPort.h"\
+	"..\libdjvu++\GBitmap.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GOS.h"\
+	"..\libdjvu++\GPixmap.h"\
+	"..\libdjvu++\GRect.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	"..\libdjvu++\GURL.h"\
+	"..\libdjvu++\IFFByteStream.h"\
+	"..\libdjvu++\IWImage.h"\
+	"..\libdjvu++\JB2Image.h"\
+	"..\libdjvu++\JPEGDecoder.h"\
+	"..\libdjvu++\MMRDecoder.h"\
+	"..\libdjvu++\ZPCodec.h"\
+	
+NODEP_CPP_DJVUF=\
+	"..\libdjvu++\jerror.h"\
+	"..\libdjvu++\jinclude.h"\
+	"..\libdjvu++\jpeglib.h"\
+	"..\libdjvu++\jri.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Debug"
+
+DEP_CPP_DJVUF=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\BSByteStream.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DataPool.h"\
+	"..\libdjvu++\debug.h"\
+	"..\libdjvu++\DjVuAnno.h"\
+	"..\libdjvu++\DjVuFile.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\DjVuInfo.h"\
+	"..\libdjvu++\DjVuNavDir.h"\
+	"..\libdjvu++\DjVuPalette.h"\
+	"..\libdjvu++\DjVuPort.h"\
+	"..\libdjvu++\GBitmap.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GMapAreas.h"\
+	"..\libdjvu++\GOS.h"\
+	"..\libdjvu++\GPixmap.h"\
+	"..\libdjvu++\GRect.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	"..\libdjvu++\GURL.h"\
+	"..\libdjvu++\IFFByteStream.h"\
+	"..\libdjvu++\IWImage.h"\
+	"..\libdjvu++\JB2Image.h"\
+	"..\libdjvu++\JPEGDecoder.h"\
+	"..\libdjvu++\MMRDecoder.h"\
+	"..\libdjvu++\ZPCodec.h"\
+	
+NODEP_CPP_DJVUF=\
+	"..\libdjvu++\jerror.h"\
+	"..\libdjvu++\jinclude.h"\
+	"..\libdjvu++\jpeglib.h"\
+	"..\libdjvu++\jri.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE="..\libdjvu++\DjVuFileCache.cpp"
+
+!IF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
+
+DEP_CPP_DJVUFI=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DataPool.h"\
+	"..\libdjvu++\debug.h"\
+	"..\libdjvu++\DjVuFile.h"\
+	"..\libdjvu++\DjVuFileCache.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\DjVuInfo.h"\
+	"..\libdjvu++\DjVuNavDir.h"\
+	"..\libdjvu++\DjVuPalette.h"\
+	"..\libdjvu++\DjVuPort.h"\
+	"..\libdjvu++\GBitmap.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GPixmap.h"\
+	"..\libdjvu++\GRect.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	"..\libdjvu++\GURL.h"\
+	"..\libdjvu++\IFFByteStream.h"\
+	"..\libdjvu++\IWImage.h"\
+	"..\libdjvu++\JB2Image.h"\
+	"..\libdjvu++\ZPCodec.h"\
+	
+NODEP_CPP_DJVUFI=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Debug"
+
+DEP_CPP_DJVUFI=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DataPool.h"\
+	"..\libdjvu++\debug.h"\
+	"..\libdjvu++\DjVuFile.h"\
+	"..\libdjvu++\DjVuFileCache.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\DjVuInfo.h"\
+	"..\libdjvu++\DjVuNavDir.h"\
+	"..\libdjvu++\DjVuPalette.h"\
+	"..\libdjvu++\DjVuPort.h"\
+	"..\libdjvu++\GBitmap.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GPixmap.h"\
+	"..\libdjvu++\GRect.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	"..\libdjvu++\GURL.h"\
+	"..\libdjvu++\IFFByteStream.h"\
+	"..\libdjvu++\IWImage.h"\
+	"..\libdjvu++\JB2Image.h"\
+	"..\libdjvu++\ZPCodec.h"\
+	
+NODEP_CPP_DJVUFI=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Release"
+
+DEP_CPP_DJVUFI=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DataPool.h"\
+	"..\libdjvu++\debug.h"\
+	"..\libdjvu++\DjVuFile.h"\
+	"..\libdjvu++\DjVuFileCache.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\DjVuInfo.h"\
+	"..\libdjvu++\DjVuNavDir.h"\
+	"..\libdjvu++\DjVuPalette.h"\
+	"..\libdjvu++\DjVuPort.h"\
+	"..\libdjvu++\GBitmap.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GPixmap.h"\
+	"..\libdjvu++\GRect.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	"..\libdjvu++\GURL.h"\
+	"..\libdjvu++\IFFByteStream.h"\
+	"..\libdjvu++\IWImage.h"\
+	"..\libdjvu++\JB2Image.h"\
+	"..\libdjvu++\ZPCodec.h"\
+	
+NODEP_CPP_DJVUFI=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Debug"
+
+DEP_CPP_DJVUFI=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DataPool.h"\
+	"..\libdjvu++\debug.h"\
+	"..\libdjvu++\DjVuFile.h"\
+	"..\libdjvu++\DjVuFileCache.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\DjVuInfo.h"\
+	"..\libdjvu++\DjVuNavDir.h"\
+	"..\libdjvu++\DjVuPalette.h"\
+	"..\libdjvu++\DjVuPort.h"\
+	"..\libdjvu++\GBitmap.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GPixmap.h"\
+	"..\libdjvu++\GRect.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	"..\libdjvu++\GURL.h"\
+	"..\libdjvu++\IFFByteStream.h"\
+	"..\libdjvu++\IWImage.h"\
+	"..\libdjvu++\JB2Image.h"\
+	"..\libdjvu++\ZPCodec.h"\
+	
+NODEP_CPP_DJVUFI=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE="..\libdjvu++\DjVuGlobal.cpp"
+
+!IF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
+
+DEP_CPP_DJVUG=\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GOS.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	
+NODEP_CPP_DJVUG=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Debug"
+
+DEP_CPP_DJVUG=\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GOS.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	
+NODEP_CPP_DJVUG=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Release"
+
+DEP_CPP_DJVUG=\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GOS.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	
+NODEP_CPP_DJVUG=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Debug"
+
+DEP_CPP_DJVUG=\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GOS.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	
+NODEP_CPP_DJVUG=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE="..\libdjvu++\DjVuGlobalMemory.cpp"
+
+!IF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
+
+DEP_CPP_DJVUGL=\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GException.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Debug"
+
+DEP_CPP_DJVUGL=\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GException.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Release"
+
+DEP_CPP_DJVUGL=\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GException.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Debug"
+
+DEP_CPP_DJVUGL=\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GException.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE="..\libdjvu++\DjVuImage.cpp"
+
+!IF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
+
+DEP_CPP_DJVUI=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DataPool.h"\
+	"..\libdjvu++\debug.h"\
+	"..\libdjvu++\DjVmDir.h"\
+	"..\libdjvu++\DjVmDir0.h"\
+	"..\libdjvu++\DjVmDoc.h"\
+	"..\libdjvu++\DjVuAnno.h"\
+	"..\libdjvu++\DjVuDocument.h"\
+	"..\libdjvu++\DjVuFile.h"\
+	"..\libdjvu++\DjVuFileCache.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\DjVuImage.h"\
+	"..\libdjvu++\DjVuInfo.h"\
+	"..\libdjvu++\DjVuNavDir.h"\
+	"..\libdjvu++\DjVuPalette.h"\
+	"..\libdjvu++\DjVuPort.h"\
+	"..\libdjvu++\GBitmap.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GMapAreas.h"\
+	"..\libdjvu++\GPixmap.h"\
+	"..\libdjvu++\GRect.h"\
+	"..\libdjvu++\GScaler.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	"..\libdjvu++\GURL.h"\
+	"..\libdjvu++\IFFByteStream.h"\
+	"..\libdjvu++\IWImage.h"\
+	"..\libdjvu++\JB2Image.h"\
+	"..\libdjvu++\ZPCodec.h"\
+	
+NODEP_CPP_DJVUI=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Debug"
+
+DEP_CPP_DJVUI=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DataPool.h"\
+	"..\libdjvu++\debug.h"\
+	"..\libdjvu++\DjVmDir.h"\
+	"..\libdjvu++\DjVmDir0.h"\
+	"..\libdjvu++\DjVmDoc.h"\
+	"..\libdjvu++\DjVuAnno.h"\
+	"..\libdjvu++\DjVuDocument.h"\
+	"..\libdjvu++\DjVuFile.h"\
+	"..\libdjvu++\DjVuFileCache.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\DjVuImage.h"\
+	"..\libdjvu++\DjVuInfo.h"\
+	"..\libdjvu++\DjVuNavDir.h"\
+	"..\libdjvu++\DjVuPalette.h"\
+	"..\libdjvu++\DjVuPort.h"\
+	"..\libdjvu++\GBitmap.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GMapAreas.h"\
+	"..\libdjvu++\GPixmap.h"\
+	"..\libdjvu++\GRect.h"\
+	"..\libdjvu++\GScaler.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	"..\libdjvu++\GURL.h"\
+	"..\libdjvu++\IFFByteStream.h"\
+	"..\libdjvu++\IWImage.h"\
+	"..\libdjvu++\JB2Image.h"\
+	"..\libdjvu++\ZPCodec.h"\
+	
+NODEP_CPP_DJVUI=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Release"
+
+DEP_CPP_DJVUI=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DataPool.h"\
+	"..\libdjvu++\debug.h"\
+	"..\libdjvu++\DjVmDir.h"\
+	"..\libdjvu++\DjVmDir0.h"\
+	"..\libdjvu++\DjVmDoc.h"\
+	"..\libdjvu++\DjVuAnno.h"\
+	"..\libdjvu++\DjVuDocument.h"\
+	"..\libdjvu++\DjVuFile.h"\
+	"..\libdjvu++\DjVuFileCache.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\DjVuImage.h"\
+	"..\libdjvu++\DjVuInfo.h"\
+	"..\libdjvu++\DjVuNavDir.h"\
+	"..\libdjvu++\DjVuPalette.h"\
+	"..\libdjvu++\DjVuPort.h"\
+	"..\libdjvu++\GBitmap.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GMapAreas.h"\
+	"..\libdjvu++\GPixmap.h"\
+	"..\libdjvu++\GRect.h"\
+	"..\libdjvu++\GScaler.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	"..\libdjvu++\GURL.h"\
+	"..\libdjvu++\IFFByteStream.h"\
+	"..\libdjvu++\IWImage.h"\
+	"..\libdjvu++\JB2Image.h"\
+	"..\libdjvu++\ZPCodec.h"\
+	
+NODEP_CPP_DJVUI=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Debug"
+
+DEP_CPP_DJVUI=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DataPool.h"\
+	"..\libdjvu++\debug.h"\
+	"..\libdjvu++\DjVmDir.h"\
+	"..\libdjvu++\DjVmDir0.h"\
+	"..\libdjvu++\DjVmDoc.h"\
+	"..\libdjvu++\DjVuAnno.h"\
+	"..\libdjvu++\DjVuDocument.h"\
+	"..\libdjvu++\DjVuFile.h"\
+	"..\libdjvu++\DjVuFileCache.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\DjVuImage.h"\
+	"..\libdjvu++\DjVuInfo.h"\
+	"..\libdjvu++\DjVuNavDir.h"\
+	"..\libdjvu++\DjVuPalette.h"\
+	"..\libdjvu++\DjVuPort.h"\
+	"..\libdjvu++\GBitmap.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GMapAreas.h"\
+	"..\libdjvu++\GPixmap.h"\
+	"..\libdjvu++\GRect.h"\
+	"..\libdjvu++\GScaler.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	"..\libdjvu++\GURL.h"\
+	"..\libdjvu++\IFFByteStream.h"\
+	"..\libdjvu++\IWImage.h"\
+	"..\libdjvu++\JB2Image.h"\
+	"..\libdjvu++\ZPCodec.h"\
+	
+NODEP_CPP_DJVUI=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE="..\libdjvu++\DjVuInfo.cpp"
+
+!IF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
+
+DEP_CPP_DJVUIN=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\DjVuInfo.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	
+NODEP_CPP_DJVUIN=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Debug"
+
+DEP_CPP_DJVUIN=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\DjVuInfo.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	
+NODEP_CPP_DJVUIN=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Release"
+
+DEP_CPP_DJVUIN=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\DjVuInfo.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	
+NODEP_CPP_DJVUIN=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Debug"
+
+DEP_CPP_DJVUIN=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\DjVuInfo.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	
+NODEP_CPP_DJVUIN=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE="..\libdjvu++\DjVuNavDir.cpp"
+
+!IF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
+
+DEP_CPP_DJVUN=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\debug.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\DjVuNavDir.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GOS.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	"..\libdjvu++\GURL.h"\
+	
+NODEP_CPP_DJVUN=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Debug"
+
+DEP_CPP_DJVUN=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\debug.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\DjVuNavDir.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GOS.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	"..\libdjvu++\GURL.h"\
+	
+NODEP_CPP_DJVUN=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Release"
+
+DEP_CPP_DJVUN=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\debug.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\DjVuNavDir.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GOS.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	"..\libdjvu++\GURL.h"\
+	
+NODEP_CPP_DJVUN=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Debug"
+
+DEP_CPP_DJVUN=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\debug.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\DjVuNavDir.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GOS.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	"..\libdjvu++\GURL.h"\
+	
+NODEP_CPP_DJVUN=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE="..\libdjvu++\DjVuPalette.cpp"
+
+!IF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
+
+DEP_CPP_DJVUP=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\BSByteStream.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\DjVuPalette.h"\
+	"..\libdjvu++\GBitmap.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GPixmap.h"\
+	"..\libdjvu++\GRect.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\ZPCodec.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Debug"
+
+DEP_CPP_DJVUP=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\BSByteStream.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\DjVuPalette.h"\
+	"..\libdjvu++\GBitmap.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GPixmap.h"\
+	"..\libdjvu++\GRect.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\ZPCodec.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Release"
+
+DEP_CPP_DJVUP=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\BSByteStream.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\DjVuPalette.h"\
+	"..\libdjvu++\GBitmap.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GPixmap.h"\
+	"..\libdjvu++\GRect.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\ZPCodec.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Debug"
+
+DEP_CPP_DJVUP=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\BSByteStream.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\DjVuPalette.h"\
+	"..\libdjvu++\GBitmap.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GPixmap.h"\
+	"..\libdjvu++\GRect.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\ZPCodec.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE="..\libdjvu++\DjVuPort.cpp"
+
+!IF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
+
+DEP_CPP_DJVUPO=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DataPool.h"\
+	"..\libdjvu++\debug.h"\
+	"..\libdjvu++\DjVmDir.h"\
+	"..\libdjvu++\DjVmDir0.h"\
+	"..\libdjvu++\DjVmDoc.h"\
+	"..\libdjvu++\DjVuAnno.h"\
+	"..\libdjvu++\DjVuDocument.h"\
+	"..\libdjvu++\DjVuFile.h"\
+	"..\libdjvu++\DjVuFileCache.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\DjVuImage.h"\
+	"..\libdjvu++\DjVuInfo.h"\
+	"..\libdjvu++\DjVuNavDir.h"\
+	"..\libdjvu++\DjVuPalette.h"\
+	"..\libdjvu++\DjVuPort.h"\
+	"..\libdjvu++\GBitmap.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GMapAreas.h"\
+	"..\libdjvu++\GOS.h"\
+	"..\libdjvu++\GPixmap.h"\
+	"..\libdjvu++\GRect.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	"..\libdjvu++\GURL.h"\
+	"..\libdjvu++\IFFByteStream.h"\
+	"..\libdjvu++\IWImage.h"\
+	"..\libdjvu++\JB2Image.h"\
+	"..\libdjvu++\ZPCodec.h"\
+	
+NODEP_CPP_DJVUPO=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Debug"
+
+DEP_CPP_DJVUPO=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DataPool.h"\
+	"..\libdjvu++\debug.h"\
+	"..\libdjvu++\DjVmDir.h"\
+	"..\libdjvu++\DjVmDir0.h"\
+	"..\libdjvu++\DjVmDoc.h"\
+	"..\libdjvu++\DjVuAnno.h"\
+	"..\libdjvu++\DjVuDocument.h"\
+	"..\libdjvu++\DjVuFile.h"\
+	"..\libdjvu++\DjVuFileCache.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\DjVuImage.h"\
+	"..\libdjvu++\DjVuInfo.h"\
+	"..\libdjvu++\DjVuNavDir.h"\
+	"..\libdjvu++\DjVuPalette.h"\
+	"..\libdjvu++\DjVuPort.h"\
+	"..\libdjvu++\GBitmap.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GMapAreas.h"\
+	"..\libdjvu++\GOS.h"\
+	"..\libdjvu++\GPixmap.h"\
+	"..\libdjvu++\GRect.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	"..\libdjvu++\GURL.h"\
+	"..\libdjvu++\IFFByteStream.h"\
+	"..\libdjvu++\IWImage.h"\
+	"..\libdjvu++\JB2Image.h"\
+	"..\libdjvu++\ZPCodec.h"\
+	
+NODEP_CPP_DJVUPO=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Release"
+
+DEP_CPP_DJVUPO=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DataPool.h"\
+	"..\libdjvu++\debug.h"\
+	"..\libdjvu++\DjVmDir.h"\
+	"..\libdjvu++\DjVmDir0.h"\
+	"..\libdjvu++\DjVmDoc.h"\
+	"..\libdjvu++\DjVuAnno.h"\
+	"..\libdjvu++\DjVuDocument.h"\
+	"..\libdjvu++\DjVuFile.h"\
+	"..\libdjvu++\DjVuFileCache.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\DjVuImage.h"\
+	"..\libdjvu++\DjVuInfo.h"\
+	"..\libdjvu++\DjVuNavDir.h"\
+	"..\libdjvu++\DjVuPalette.h"\
+	"..\libdjvu++\DjVuPort.h"\
+	"..\libdjvu++\GBitmap.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GMapAreas.h"\
+	"..\libdjvu++\GOS.h"\
+	"..\libdjvu++\GPixmap.h"\
+	"..\libdjvu++\GRect.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	"..\libdjvu++\GURL.h"\
+	"..\libdjvu++\IFFByteStream.h"\
+	"..\libdjvu++\IWImage.h"\
+	"..\libdjvu++\JB2Image.h"\
+	"..\libdjvu++\ZPCodec.h"\
+	
+NODEP_CPP_DJVUPO=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Debug"
+
+DEP_CPP_DJVUPO=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DataPool.h"\
+	"..\libdjvu++\debug.h"\
+	"..\libdjvu++\DjVmDir.h"\
+	"..\libdjvu++\DjVmDir0.h"\
+	"..\libdjvu++\DjVmDoc.h"\
+	"..\libdjvu++\DjVuAnno.h"\
+	"..\libdjvu++\DjVuDocument.h"\
+	"..\libdjvu++\DjVuFile.h"\
+	"..\libdjvu++\DjVuFileCache.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\DjVuImage.h"\
+	"..\libdjvu++\DjVuInfo.h"\
+	"..\libdjvu++\DjVuNavDir.h"\
+	"..\libdjvu++\DjVuPalette.h"\
+	"..\libdjvu++\DjVuPort.h"\
+	"..\libdjvu++\GBitmap.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GMapAreas.h"\
+	"..\libdjvu++\GOS.h"\
+	"..\libdjvu++\GPixmap.h"\
+	"..\libdjvu++\GRect.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	"..\libdjvu++\GURL.h"\
+	"..\libdjvu++\IFFByteStream.h"\
+	"..\libdjvu++\IWImage.h"\
+	"..\libdjvu++\JB2Image.h"\
+	"..\libdjvu++\ZPCodec.h"\
+	
+NODEP_CPP_DJVUPO=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE="..\libdjvu++\GBitmap.cpp"
+
+!IF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
+
+DEP_CPP_GBITM=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GBitmap.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GRect.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	
+NODEP_CPP_GBITM=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Debug"
+
+DEP_CPP_GBITM=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GBitmap.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GRect.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	
+NODEP_CPP_GBITM=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Release"
+
+DEP_CPP_GBITM=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GBitmap.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GRect.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	
+NODEP_CPP_GBITM=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Debug"
+
+DEP_CPP_GBITM=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GBitmap.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GRect.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	
+NODEP_CPP_GBITM=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE="..\libdjvu++\GContainer.cpp"
+
+!IF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
+
+DEP_CPP_GCONT=\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Debug"
+
+DEP_CPP_GCONT=\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Release"
+
+DEP_CPP_GCONT=\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Debug"
+
+DEP_CPP_GCONT=\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE="..\libdjvu++\GException.cpp"
+
+!IF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
+
+DEP_CPP_GEXCE=\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\debug.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GException.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Debug"
+
+DEP_CPP_GEXCE=\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\debug.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GException.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Release"
+
+DEP_CPP_GEXCE=\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\debug.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GException.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Debug"
+
+DEP_CPP_GEXCE=\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\debug.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GException.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE="..\libdjvu++\GIFFManager.cpp"
+
+!IF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
+
+DEP_CPP_GIFFM=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\debug.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GIFFManager.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\IFFByteStream.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Debug"
+
+DEP_CPP_GIFFM=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\debug.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GIFFManager.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\IFFByteStream.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Release"
+
+DEP_CPP_GIFFM=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\debug.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GIFFManager.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\IFFByteStream.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Debug"
+
+DEP_CPP_GIFFM=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\debug.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GIFFManager.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\IFFByteStream.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE="..\libdjvu++\GMapAreas.cpp"
+
+!IF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
+
+DEP_CPP_GMAPA=\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GMapAreas.h"\
+	"..\libdjvu++\GRect.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Debug"
+
+DEP_CPP_GMAPA=\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GMapAreas.h"\
+	"..\libdjvu++\GRect.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Release"
+
+DEP_CPP_GMAPA=\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GMapAreas.h"\
+	"..\libdjvu++\GRect.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Debug"
+
+DEP_CPP_GMAPA=\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GMapAreas.h"\
+	"..\libdjvu++\GRect.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE="..\libdjvu++\GOS.cpp"
+
+!IF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
+
+DEP_CPP_GOS_C=\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GOS.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	
+NODEP_CPP_GOS_C=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Debug"
+
+DEP_CPP_GOS_C=\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GOS.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	
+NODEP_CPP_GOS_C=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Release"
+
+DEP_CPP_GOS_C=\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GOS.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	
+NODEP_CPP_GOS_C=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Debug"
+
+DEP_CPP_GOS_C=\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GOS.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	
+NODEP_CPP_GOS_C=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE="..\libdjvu++\GPixmap.cpp"
+
+!IF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
+
+DEP_CPP_GPIXM=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GBitmap.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GPixmap.h"\
+	"..\libdjvu++\GRect.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	
+NODEP_CPP_GPIXM=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Debug"
+
+DEP_CPP_GPIXM=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GBitmap.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GPixmap.h"\
+	"..\libdjvu++\GRect.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	
+NODEP_CPP_GPIXM=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Release"
+
+DEP_CPP_GPIXM=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GBitmap.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GPixmap.h"\
+	"..\libdjvu++\GRect.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	
+NODEP_CPP_GPIXM=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Debug"
+
+DEP_CPP_GPIXM=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GBitmap.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GPixmap.h"\
+	"..\libdjvu++\GRect.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	
+NODEP_CPP_GPIXM=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE="..\libdjvu++\GRect.cpp"
+
+!IF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
+
+DEP_CPP_GRECT=\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GRect.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Debug"
+
+DEP_CPP_GRECT=\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GRect.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Release"
+
+DEP_CPP_GRECT=\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GRect.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Debug"
+
+DEP_CPP_GRECT=\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GRect.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE="..\libdjvu++\GScaler.cpp"
+
+!IF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
+
+DEP_CPP_GSCAL=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GBitmap.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GPixmap.h"\
+	"..\libdjvu++\GRect.h"\
+	"..\libdjvu++\GScaler.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Debug"
+
+DEP_CPP_GSCAL=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GBitmap.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GPixmap.h"\
+	"..\libdjvu++\GRect.h"\
+	"..\libdjvu++\GScaler.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Release"
+
+DEP_CPP_GSCAL=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GBitmap.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GPixmap.h"\
+	"..\libdjvu++\GRect.h"\
+	"..\libdjvu++\GScaler.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Debug"
+
+DEP_CPP_GSCAL=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GBitmap.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GPixmap.h"\
+	"..\libdjvu++\GRect.h"\
+	"..\libdjvu++\GScaler.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE="..\libdjvu++\GSmartPointer.cpp"
+
+!IF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
+
+DEP_CPP_GSMAR=\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GThreads.h"\
+	
+NODEP_CPP_GSMAR=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Debug"
+
+DEP_CPP_GSMAR=\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GThreads.h"\
+	
+NODEP_CPP_GSMAR=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Release"
+
+DEP_CPP_GSMAR=\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GThreads.h"\
+	
+NODEP_CPP_GSMAR=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Debug"
+
+DEP_CPP_GSMAR=\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GThreads.h"\
+	
+NODEP_CPP_GSMAR=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE="..\libdjvu++\GString.cpp"
+
+!IF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
+
+DEP_CPP_GSTRI=\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Debug"
+
+DEP_CPP_GSTRI=\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Release"
+
+DEP_CPP_GSTRI=\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Debug"
+
+DEP_CPP_GSTRI=\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE="..\libdjvu++\GThreads.cpp"
+
+!IF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
+
+DEP_CPP_GTHRE=\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GThreads.h"\
+	
+NODEP_CPP_GTHRE=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Debug"
+
+DEP_CPP_GTHRE=\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GThreads.h"\
+	
+NODEP_CPP_GTHRE=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Release"
+
+DEP_CPP_GTHRE=\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GThreads.h"\
+	
+NODEP_CPP_GTHRE=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Debug"
+
+DEP_CPP_GTHRE=\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GThreads.h"\
+	
+NODEP_CPP_GTHRE=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE="..\libdjvu++\GURL.cpp"
+
+!IF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
+
+DEP_CPP_GURL_=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GOS.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	"..\libdjvu++\GURL.h"\
+	
+NODEP_CPP_GURL_=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Debug"
+
+DEP_CPP_GURL_=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GOS.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	"..\libdjvu++\GURL.h"\
+	
+NODEP_CPP_GURL_=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Release"
+
+DEP_CPP_GURL_=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GOS.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	"..\libdjvu++\GURL.h"\
+	
+NODEP_CPP_GURL_=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Debug"
+
+DEP_CPP_GURL_=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GOS.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	"..\libdjvu++\GURL.h"\
+	
+NODEP_CPP_GURL_=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE="..\libdjvu++\IFFByteStream.cpp"
+
+!IF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
+
+DEP_CPP_IFFBY=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\IFFByteStream.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Debug"
+
+DEP_CPP_IFFBY=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\IFFByteStream.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Release"
+
+DEP_CPP_IFFBY=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\IFFByteStream.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Debug"
+
+DEP_CPP_IFFBY=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\IFFByteStream.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE="..\libdjvu++\IWImage.cpp"
+
+!IF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
+
+DEP_CPP_IWIMA=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GBitmap.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GPixmap.h"\
+	"..\libdjvu++\GRect.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\IFFByteStream.h"\
+	"..\libdjvu++\IWImage.h"\
+	"..\libdjvu++\IWTransform.h"\
+	"..\libdjvu++\ZPCodec.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Debug"
+
+DEP_CPP_IWIMA=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GBitmap.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GPixmap.h"\
+	"..\libdjvu++\GRect.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\IFFByteStream.h"\
+	"..\libdjvu++\IWImage.h"\
+	"..\libdjvu++\IWTransform.h"\
+	"..\libdjvu++\ZPCodec.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Release"
+
+DEP_CPP_IWIMA=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GBitmap.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GPixmap.h"\
+	"..\libdjvu++\GRect.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\IFFByteStream.h"\
+	"..\libdjvu++\IWImage.h"\
+	"..\libdjvu++\IWTransform.h"\
+	"..\libdjvu++\ZPCodec.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Debug"
+
+DEP_CPP_IWIMA=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GBitmap.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GPixmap.h"\
+	"..\libdjvu++\GRect.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\IFFByteStream.h"\
+	"..\libdjvu++\IWImage.h"\
+	"..\libdjvu++\IWTransform.h"\
+	"..\libdjvu++\ZPCodec.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE="..\libdjvu++\IWTransform.cpp"
+
+!IF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
+
+DEP_CPP_IWTRA=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GBitmap.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GOS.h"\
+	"..\libdjvu++\GPixmap.h"\
+	"..\libdjvu++\GRect.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\IWTransform.h"\
+	"..\libdjvu++\MMX.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Debug"
+
+DEP_CPP_IWTRA=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GBitmap.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GOS.h"\
+	"..\libdjvu++\GPixmap.h"\
+	"..\libdjvu++\GRect.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\IWTransform.h"\
+	"..\libdjvu++\MMX.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Release"
+
+DEP_CPP_IWTRA=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GBitmap.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GOS.h"\
+	"..\libdjvu++\GPixmap.h"\
+	"..\libdjvu++\GRect.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\IWTransform.h"\
+	"..\libdjvu++\MMX.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Debug"
+
+DEP_CPP_IWTRA=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GBitmap.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GOS.h"\
+	"..\libdjvu++\GPixmap.h"\
+	"..\libdjvu++\GRect.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\IWTransform.h"\
+	"..\libdjvu++\MMX.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE="..\libdjvu++\JB2Image.cpp"
+
+!IF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
+
+DEP_CPP_JB2IM=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GBitmap.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GRect.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	"..\libdjvu++\JB2Image.h"\
+	"..\libdjvu++\ZPCodec.h"\
+	
+NODEP_CPP_JB2IM=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Debug"
+
+DEP_CPP_JB2IM=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GBitmap.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GRect.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	"..\libdjvu++\JB2Image.h"\
+	"..\libdjvu++\ZPCodec.h"\
+	
+NODEP_CPP_JB2IM=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Release"
+
+DEP_CPP_JB2IM=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GBitmap.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GRect.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	"..\libdjvu++\JB2Image.h"\
+	"..\libdjvu++\ZPCodec.h"\
+	
+NODEP_CPP_JB2IM=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Debug"
+
+DEP_CPP_JB2IM=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GBitmap.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GRect.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\GThreads.h"\
+	"..\libdjvu++\JB2Image.h"\
+	"..\libdjvu++\ZPCodec.h"\
+	
+NODEP_CPP_JB2IM=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE="..\libdjvu++\JPEGDecoder.cpp"
+
+!IF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
+
+DEP_CPP_JPEGD=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GBitmap.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GPixmap.h"\
+	"..\libdjvu++\GRect.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\JPEGDecoder.h"\
+	
+NODEP_CPP_JPEGD=\
+	"..\libdjvu++\jerror.h"\
+	"..\libdjvu++\jinclude.h"\
+	"..\libdjvu++\jpeglib.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Debug"
+
+DEP_CPP_JPEGD=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GBitmap.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GPixmap.h"\
+	"..\libdjvu++\GRect.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\JPEGDecoder.h"\
+	
+NODEP_CPP_JPEGD=\
+	"..\libdjvu++\jerror.h"\
+	"..\libdjvu++\jinclude.h"\
+	"..\libdjvu++\jpeglib.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Release"
+
+DEP_CPP_JPEGD=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GBitmap.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GPixmap.h"\
+	"..\libdjvu++\GRect.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\JPEGDecoder.h"\
+	
+NODEP_CPP_JPEGD=\
+	"..\libdjvu++\jerror.h"\
+	"..\libdjvu++\jinclude.h"\
+	"..\libdjvu++\jpeglib.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Debug"
+
+DEP_CPP_JPEGD=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GBitmap.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GPixmap.h"\
+	"..\libdjvu++\GRect.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\JPEGDecoder.h"\
+	
+NODEP_CPP_JPEGD=\
+	"..\libdjvu++\jerror.h"\
+	"..\libdjvu++\jinclude.h"\
+	"..\libdjvu++\jpeglib.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE="..\libdjvu++\MMRDecoder.cpp"
+
+!IF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
+
+DEP_CPP_MMRDE=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GBitmap.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GRect.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\JB2Image.h"\
+	"..\libdjvu++\MMRDecoder.h"\
+	"..\libdjvu++\ZPCodec.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Debug"
+
+DEP_CPP_MMRDE=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GBitmap.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GRect.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\JB2Image.h"\
+	"..\libdjvu++\MMRDecoder.h"\
+	"..\libdjvu++\ZPCodec.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Release"
+
+DEP_CPP_MMRDE=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GBitmap.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GRect.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\JB2Image.h"\
+	"..\libdjvu++\MMRDecoder.h"\
+	"..\libdjvu++\ZPCodec.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Debug"
+
+DEP_CPP_MMRDE=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GBitmap.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GRect.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GString.h"\
+	"..\libdjvu++\JB2Image.h"\
+	"..\libdjvu++\MMRDecoder.h"\
+	"..\libdjvu++\ZPCodec.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE="..\libdjvu++\MMX.cpp"
+
+!IF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
+
+DEP_CPP_MMX_C=\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\MMX.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Debug"
+
+DEP_CPP_MMX_C=\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\MMX.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Release"
+
+DEP_CPP_MMX_C=\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\MMX.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Debug"
+
+DEP_CPP_MMX_C=\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\MMX.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE="..\libdjvu++\parseoptions.cpp"
+
+!IF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
+
+DEP_CPP_PARSE=\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GThreads.h"\
+	"..\libdjvu++\parseoptions.h"\
+	
+NODEP_CPP_PARSE=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Debug"
+
+DEP_CPP_PARSE=\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GThreads.h"\
+	"..\libdjvu++\parseoptions.h"\
+	
+NODEP_CPP_PARSE=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Release"
+
+DEP_CPP_PARSE=\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\GThreads.h"\
+	"..\libdjvu++\parseoptions.h"\
+	
+NODEP_CPP_PARSE=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Debug"
+
+DEP_CPP_PARSE=\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GThreads.h"\
+	"..\libdjvu++\parseoptions.h"\
+	
+NODEP_CPP_PARSE=\
+	"..\libdjvu++\jri.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE="..\libdjvu++\ZPCodec.cpp"
+
+!IF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
+
+DEP_CPP_ZPCOD=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\ZPCodec.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Debug"
+
+DEP_CPP_ZPCOD=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\ZPCodec.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Release"
+
+DEP_CPP_ZPCOD=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\ZPCodec.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Debug"
+
+DEP_CPP_ZPCOD=\
+	"..\libdjvu++\Arrays.h"\
+	"..\libdjvu++\ByteStream.h"\
+	"..\libdjvu++\c-wrappers\DjVu.h"\
+	"..\libdjvu++\DjVuGlobal.h"\
+	"..\libdjvu++\GContainer.h"\
+	"..\libdjvu++\GException.h"\
+	"..\libdjvu++\GSmartPointer.h"\
+	"..\libdjvu++\ZPCodec.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# End Group
+# Begin Group "Header Files"
+
+# PROP Default_Filter "h;hpp;hxx;hm;inl"
+# Begin Source File
+
+SOURCE="..\libdjvu++\Arrays.h"
+# End Source File
+# End Group
+# End Target
+# End Project

@@ -1,0 +1,57 @@
+TestArray.o: TestArray.cpp \
+ ../GContainer.h \
+ ../DjVuGlobal.h \
+ ../GException.h \
+ ../GSmartPointer.h \
+ ../GString.h
+TestBitmap.o: TestBitmap.cpp \
+ ../GBitmap.h \
+ ../DjVuGlobal.h \
+ ../GRect.h \
+ ../ByteStream.h \
+ ../GException.h \
+ ../GContainer.h \
+ ../GSmartPointer.h \
+ ../Arrays.h
+TestException.o: TestException.cpp \
+ ../GException.h \
+ ../DjVuGlobal.h \
+ ../GString.h \
+ ../GSmartPointer.h
+TestJB2.o: TestJB2.cpp \
+ ../JB2Image.h \
+ ../DjVuGlobal.h \
+ ../GString.h \
+ ../GException.h \
+ ../GSmartPointer.h \
+ ../ZPCodec.h \
+ ../ByteStream.h \
+ ../GContainer.h \
+ ../Arrays.h \
+ ../GRect.h \
+ ../GBitmap.h
+TestList.o: TestList.cpp \
+ ../GContainer.h \
+ ../DjVuGlobal.h \
+ ../GException.h \
+ ../GSmartPointer.h \
+ ../GString.h
+TestMap.o: TestMap.cpp \
+ ../GContainer.h \
+ ../DjVuGlobal.h \
+ ../GException.h \
+ ../GSmartPointer.h \
+ ../GString.h
+TestSmartPointer.o: \
+ TestSmartPointer.cpp \
+ ../GSmartPointer.h \
+ ../DjVuGlobal.h
+TestString.o: TestString.cpp \
+ ../GString.h \
+ ../DjVuGlobal.h \
+ ../GException.h \
+ ../GSmartPointer.h
+TestThreads.o: TestThreads.cpp \
+ ../GThreads.h \
+ ../DjVuGlobal.h \
+ ../GException.h

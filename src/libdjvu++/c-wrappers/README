@@ -1,0 +1,34 @@
+This directory contains the following header files:
+ 1. DjVu.h
+	Defines functions and callbacks not normally 
+	needed for DjVu usage, but available anyway.
+	This includes the generic option parsing functions,
+	progress callbacks, and memory callbacks.
+
+ 2. DjVuDecodeAPI.h
+	Defines the functions needed to decode djvu images into other
+    	formats with disk to disk operations.
+
+ 3. DjVuBitonalAPI.h
+	Defines the functions needed to encode bitonal images with
+	disk to disk operations.
+
+ 4. DjVuPhotoAPI.h
+	Defines the functions needed to encode photos with disk to
+	disk operations.
+
+ 5. DjVuDocumentAPI.h
+	Defines the functions needed to encode documents with disk to
+	disk operations.
+
+ 6. DjVuMultiAPI.h
+	Defines the functions needed to repackage pages with disk to 
+	disk operations.
+
+ 7. DjVuAPI.h
+	Defines the functions needed to do operations 2-5 with 
+	memory to disk, disk to memory, and memory to memory operations.
+
+ 8. DjVuPriv.h
+	Used for internal use.
+
