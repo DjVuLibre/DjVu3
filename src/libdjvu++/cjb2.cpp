@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: cjb2.cpp,v 1.2 2000-02-14 22:41:44 leonb Exp $
+//C- $Id: cjb2.cpp,v 1.3 2000-02-15 00:25:13 leonb Exp $
 
 
 /** @name cjb2
@@ -38,7 +38,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: cjb2.cpp,v 1.2 2000-02-14 22:41:44 leonb Exp $# */
+    #$Id: cjb2.cpp,v 1.3 2000-02-15 00:25:13 leonb Exp $# */
 //@{
 //@}
 
@@ -800,21 +800,21 @@ tune_jb2image(JB2Image *jimg,
           if (abs (lib[candidate].area - black_pixels) > best_score) continue;
           if (abs (cross_rows - rows) > 2) continue;
           if (abs (cross_columns - columns) > 2) continue;
-          // Compute alignment
+          // Compute alignment (these are always +1, 0 or -1)
           int cross_column_adjust = (cross_columns  - cross_columns/2) - (columns - columns/2);
           int cross_row_adjust = (cross_rows  - cross_rows/2) - (rows - rows/2);
           // Ensure adequate borders
-          cross_bitmap->minborder (1-cross_column_adjust);
-          cross_bitmap->minborder (1+columns-cross_columns+cross_column_adjust);
-          // Count pixel differences
+          cross_bitmap->minborder (2-cross_column_adjust);
+          cross_bitmap->minborder (2+columns-cross_columns+cross_column_adjust);
+          // Count pixel differences (including borders)
           int score = 0;
           unsigned char *p_row;
           unsigned char *p_cross_row;
-          for (row = 0; row < rows; row++) 
+          for (row = -1; row <= rows; row++) 
             {
               p_row = (*bitmap) [row];
               p_cross_row  = (*cross_bitmap)[row+cross_row_adjust] + cross_column_adjust;
-              for (column = 0; column < columns; column++) 
+              for (column = -1; column <= columns; column++) 
                 if (p_row [column] != p_cross_row [column])
                   score ++;
               if (score >= best_score)  // prune
@@ -830,19 +830,33 @@ tune_jb2image(JB2Image *jimg,
         {
           // This shape will be cross-coded
           jshp->parent = closest_match;
-          // Substitutions are marked by setting jshp->bits to zero
-          if ((best_score * 100) <= (substitute_threshold * rows * columns + 50))
-            lib[current].bits = jshp->bits = 0;
+          // Substitutions are marked by setting lib[current].bits to zero
+          if ((best_score * 100) <= (substitute_threshold * rows * columns))
+            lib[current].bits = 0;
         }
     }
-  
+
   // Process shape substitutions
   for (int blitno=0; blitno<jimg->get_blit_count(); blitno++)
     {
       JB2Blit *jblt = jimg->get_blit(blitno);
       JB2Shape *jshp = jimg->get_shape(jblt->shapeno);
-      if (jshp->bits==0 && jshp->parent>=0)
-        jblt->shapeno = jshp->parent; // blit directly accesses substitute
+      if (lib[jblt->shapeno].bits==0 && jshp->parent>=0)
+        {
+          // Compute coordinate adjustement
+          int columns = jshp->bits->columns();
+          int rows = jshp->bits->rows();
+          int cross_columns = lib[jshp->parent].bits->columns();
+          int cross_rows = lib[jshp->parent].bits->rows();
+          int cross_column_adjust = (cross_columns  - cross_columns/2) - (columns - columns/2);
+          int cross_row_adjust = (cross_rows  - cross_rows/2) - (rows - rows/2);
+          // Adjust blit record
+          jblt->shapeno = jshp->parent;
+          jblt->bottom -= cross_row_adjust;
+          jblt->left -= cross_column_adjust;
+          // Adjust shape record
+          jshp->bits = 0;
+        }
     }
 }
 
@@ -912,7 +926,6 @@ cjb2(const char *filein, const char *fileout, const cjb2opts &opts)
   iff.close_chunk();
   // -- terminate main composite chunk
   iff.close_chunk();
-
   // Finished!
 }
       
