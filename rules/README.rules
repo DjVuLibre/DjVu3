@@ -1,0 +1,16 @@
+This are files that define general rules used in various makes.
+To include them, use
+	%%%include <FILENAME>
+where the greaterthan and less than signs are litteral.
+
+The following rules are defined:
+	commands:	This includes MACRO's for most of the common shell
+			commands.  This allows you to use things like:
+				$(TRUE)
+			for
+				@%true%@
+			The advantage of a macro is the user can override
+			the value on the command line.
+
+	depend:		This defines a generic 'make depend' rule.  This
+			requires %%%include <commands>

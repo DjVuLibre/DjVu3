@@ -9,13 +9,14 @@ fi
 
 if [ -z "$CONFIG_CACHE" ] ; then
   echo "Setting default paths"
-  TOPSRCDIR=`cd "${CONFIG_DIR}/.." 1>>/dev/null 2>>/dev/null;pwd`
+  TOPSRCDIR=`cd "${CONFIG_DIR}/.." 1>>/dev/null 2>>/dev/null;"${pwdcmd}"`
   PROJECT=`echo  $PROGRAM_NAME|sed 's,^.*-,,g'`
-  if [ "$TOPSRCDIR" != "`pwd`" ] ; then
-    TOPBUILDDIR="`pwd`"
+  s=`${pwdcmd}`
+  if [ "$TOPSRCDIR" != "$s" ] ; then
+    TOPBUILDDIR="$s"
   else
     if [ -z "$TOPBUILDPREFIX" ] ; then
-    TOPBUILDDIR="`pwd`/build/${SYS}/$PROJECT"
+    TOPBUILDDIR="${s}/build/${SYS}/$PROJECT"
     else
       TOPBUILDDIR="${TOPBUILDPREFIX}/${SYS}/PROJECT"
     fi

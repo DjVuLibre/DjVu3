@@ -7,11 +7,12 @@ then
 fi
 if [ ! -z "$CONFIG_STATUS" ]
 then
-  echo "Writing the ${CONFIG_STATUS} file"|sed -e "s! `pwd`[/]*! !" 
+  p=`"${pwdcmd}"`
+  echo "Writing the ${CONFIG_STATUS} file"|sed -e "s! ${p}[/]*! !" 
   if [ ! -d "$TOPBUILDDIR" ] ; then
     mkdirp "$TOPBUILDDIR"
   fi
-  (sed -e 's,++,\\,g' -e 's,!!,#!,g' <<\EOF
+  ("${sed}" -e 's,++,\\,g' -e 's,!!,#!,g' <<\EOF
 !!/bin/sh
 c=1;in="$1";out="$2";tmpA="$2~A";tmpB="$2~B";tmpC="$3~C"
 SRCDIR=`dirname "$1"`
@@ -26,8 +27,8 @@ EOF
     s='echo $'"${i}"
     echo "-e 's!@%${i}%@!`eval $s`!g' \\"
   done
-  sed -e 's,+$,\\,g' <<EOF
-  -e 's!^%%%[ 	]*include[ 	]*<\(.*\)>!%%%include "${TOPSRCDIR}/\1"!g' +
+  "${sed}" -e 's,+$,\\,g' <<EOF
+  -e 's!^%%%[ 	]*include[ 	]*<\(.*\)>!%%%include "${RULES_DIR}/\1"!g' +
   -e '/^%%%[ 	]*BEGIN_SYS=(${SYS})/d' +
   -e '/^%%%[ 	]*END_SYS=(${SYS})/d' +
   -e '/^%%%[ 	]*BEGIN_SYS=(/,/^%%%[ 	]*END_SYS=(/d' +
@@ -42,10 +43,8 @@ EOF
   -e '/^%%%[ 	]*BEGIN_/d' +
   -e '/^%%%[ 	]*END_/d' +
 EOF
-#  sed -e 's,+$,\\,g' -e 's,++++++++,\\\\\\\\\\\\\\\\,' <<\EOF
-  sed -e 's,+$,\\,g' <<\EOF
+  "${sed}" -e 's,+$,\\,g' <<\EOF
   "$in" | tee "$out"| sed -n -e 's, ,!,g' -e 's,^%%%[!	]*include[!	]*"\(.*\)"[!	]*$,\1,p' > "$tmpA"
-#  "$in" | tee "$out"| sed -n -e 's,/,\\/,g' -e 's,^%%%[ 	]*include[ 	]*\(".*"\)[ 	]*$,-e '"'"'/^&$/r '"'"'`echo \1|sed -e '"'"'s!++++++++/!/!g'"'"'` \\,p' -e 's,/,\\/,g' > "$tmpA"
   c=`wc -l<"$tmpA"`
   if [ $c != 0 ]
   then
@@ -53,7 +52,7 @@ EOF
     for i in `cat $tmpA` ; do
       s=`echo "$i"|sed -n -e 's,^/,,p'`
       j=`echo "$i"|sed -e 's,!, ,g'`
-      k=`echo "$i"|sed -e 's,/,\\/,g'`
+      k=`echo "$i"|sed -e 's,/,\\\\/,g'`
       if [ -z "$s" ]
       then
         if [ -r "$BUILDDIR/$j" ] ; then
@@ -84,7 +83,7 @@ EOF2
   rm -f "$tmpA" "$tmpB" "$tmpC"
 EOF
 ) > "$CONFIG_STATUS"
-  chmod 755 "${CONFIG_STATUS}"
+  "${chmod}" 755 "${CONFIG_STATUS}"
   WROTE_STATUS=true
 fi
 

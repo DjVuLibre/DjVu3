@@ -8,7 +8,7 @@ fi
 
 if [ -z "$SYS" ] ; then
   echon "Checking system type ... "
-  SYS=`uname -s`
+  SYS=`"${uname}" -s`
   if [ "$SYS" = "Linux" ] ; then
     if [ -r /lib/libc.so.6 ] ; then
       SYS=linux-libc6
@@ -18,7 +18,8 @@ if [ -z "$SYS" ] ; then
       SYS=linux-libc5
     fi
   elif [ "$SYS" = "SunOS" ] ; then
-    if [ "`uname -r|sed 's,\(5.[4-9]\)[.0-9]*,SOLARIS,'`" = SOLARIS ] ; then
+    s=`"${uname}" -r|"${sed}" 's,\(5.[4-9]\)[.0-9]*,SOLARIS,'`
+    if [ "x$s" = xSOLARIS ] ; then
       SYS=Solaris
     fi
   fi

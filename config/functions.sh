@@ -105,16 +105,16 @@ if [ -d "$temp/test/test" ] ; then
   rm -rf "$temp"
   mkdirp()
   {
-    mkdir -p "$*"
+    "${mkdir}" -p "$*"
   }
-  MKDIRP="mkdir -p"
+  MKDIRP="'${mkdir}' -p"
 else
   mkdirp()
   {
     if [ -n "$*" -a "$*" != "." -a ! -d "$*" ]
     then
-      mkdirp `dirname "$*"`
-      mkdir "$*"
+      mkdirp `"${dirname}" "$*"`
+      "${mkdir}" "$*"
     fi
   }
   MKDIRP="'${CONFIG_DIR}/mkdirp.sh'"
@@ -125,7 +125,7 @@ fi
 testfile()
 {
     echo "------- ($*)" >> "$CONFIG_LOG"
-    tee "$*"            >> "$CONFIG_LOG"
+    "${tee}" "$*"            >> "$CONFIG_LOG"
 }
 
 
@@ -136,7 +136,7 @@ run()
     status=$?
     echo "------- (cmd)"   >> "$CONFIG_LOG"
     echo '%' "$*"          >> "$CONFIG_LOG"
-    cat "$temp.out"        >> "$CONFIG_LOG"
+    "${cat}" "$temp.out"        >> "$CONFIG_LOG"
     return $status
 }
 
@@ -157,7 +157,7 @@ get_option_value()
     then
       echo yes
     else
-      echo "$*" | sed 's/^[-A-Za-z_]*=//'
+      echo "$*" | "${sed}" 's/^[-A-Za-z_]*=//'
     fi
 }
 
@@ -193,7 +193,7 @@ process_general_option()
 
 list_general_options()
 {
-cat 1>&2 <<EOF
+"${cat}" 1>&2 <<EOF
   --prefix=PREFIXDIR                        set install directory.
   --with-debug, -g                          compile with debug enabled.
   --with-flag=FLAG                          pass specific optimization flag
@@ -445,25 +445,18 @@ check_make_stlib()
 int main(void) { return 1; }
 EOF
     run $CC $CCFLAGS $OPT $DEFS $WARN -c $temp.c
-    AR=${AR-ar}
-    MAKE_STLIB=${MAKE_STLIB-$AR cq}
-    if ( run $MAKE_STLIB $temp.a $temp.o ) 
+    if [ -z "$MAKE_STDLIB" ]
     then
-        echo $MAKE_STLIB
+      MAKE_STLIB="${ar} cq"
+    fi
+    if ( run "${MAKE_STLIB}" $temp.a $temp.o ) 
+    then
+        echo "${MAKE_STLIB}"
     else
         echo unknown.
         echo 1>&2 "${PROGRAM_NAME}: Cannot find how to make a static library."
         echo 1>&2 "-- Please set environment variable MAKE_STLIB or AR."
         exit 1
-    fi
-    echon Searching RANLIB program ...
-    RANLIB=${RANLIB-ranlib}
-    if ( run $RANLIB $temp.a )
-    then
-        echo $RANLIB
-    else
-        RANLIB=true
-        echo "none."
     fi
 }
 
@@ -502,7 +495,6 @@ generate_makefile()
   run "${CONFIG_STATUS}" "$TOPSRCDIR/$1/Makefile.in" "$TOPBUILDDIR/$1/Makefile"
   mv "$TOPBUILDDIR/$1/Makefile" "$temp"
   sed < "$temp" > "$TOPBUILDDIR/$1/Makefile" \
-    -e 's!@%prefix%@!'"${prefix}"'!g' \
     -e 's!@%PROJECT_PREFIX%@!'"${PROJECT_PREFIX}"'!g' \
     -e 's!@%MKDIRP%@!'"$MKDIRP"'!g' \
     -e 's!@%topsrcdir%@!'"$xtopsrcdir"'!g' \
@@ -514,7 +506,6 @@ generate_makefile()
     -e 's!@%opt%@!'"$OPT"'!g' \
     -e 's!@%warn%@!'"$WARN"'!g' \
     -e 's!@%libs%@!'"$LIBS"'!g' \
-    -e 's!@%ranlib%@!'"$RANLIB"'!g' \
     -e 's!@%rpo%@!'"$RPO"'!g' \
     -e 's!@%docxx%@!'"doc++"'!g' \
     -e 's!@%make_stlib%@!'"$MAKE_STLIB"'!g' \
@@ -537,7 +528,7 @@ generate_main_makefile()
     subdirs=$*
 
     # Generate Makefile header
-    cat > "$TOPBUILDDIR/Makefile" <<EOF
+    "${cat}" > "$TOPBUILDDIR/Makefile" <<EOF
 SHELL=/bin/sh
 TOPSRCDIR= $TOPSRCDIR
 TOPBUILDDIR= $TOPBUILDDIR
@@ -550,16 +541,19 @@ SUBDIRS= $subdirs
 EOF
 
     # Insert Makefile fragment
-    cat >> "${TOPBUILDDIR}/Makefile"
+    "${cat}" >> "${TOPBUILDDIR}/Makefile"
 
     # Add final rules
-    cat >> "${TOPBUILDDIR}/Makefile" <<\EOF
+    "${cat}" >> "${TOPBUILDDIR}/Makefile" <<\EOF
 
 clean:
 	for n in $(SUBDIRS) ; do ( cd $$n ; $(MAKE) clean ) ; done
 
 html:
 	for n in $(SUBDIRS) ; do ( cd $$n ; $(MAKE) html ) ; done
+
+update-depend:
+	for n in $(SUBDIRS) ; do ( cd $$n ; $(MAKE) depend ) ; done
 
 depend:
 	for n in $(SUBDIRS) ; do ( cd $$n ; $(MAKE) depend ) ; done
@@ -585,7 +579,6 @@ if [ -z "$PROGRAM" ] ; then
 fi
 PROGRAM_NAME=`basename "$PROGRAM"`
 
-
 # Now set the CONFIG_DIR variable.
 #
 
@@ -595,6 +588,12 @@ if [ -z "$CONFIG_DIR" ] ; then
   CONFIG_VARS=`echo CONFIG_DIR "${CONFIG_VARS}"`
 fi
 
+# Next we can read in the available commands
+#
+
+if [ -z "$whence" ] ; then
+  . "${CONFIG_DIR}/commands.sh"
+fi
 
 # Next we need to set the SYS variable.
 #
@@ -606,6 +605,13 @@ fi
 # Now we are ready to read the cache file.
 #
 . ${CONFIG_DIR}/read_cache.sh
+
+# Next we can read in the available commands agian, if needed
+#
+
+if [ -z "$whence" ] ; then
+  . "${CONFIG_DIR}/commands.sh"
+fi
 
 ### ------------------------------------------------------------------------
 ### General stuff

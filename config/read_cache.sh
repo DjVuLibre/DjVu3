@@ -9,7 +9,7 @@ if [ -z "${CONFIG_CACHE}" ] ; then
 fi
 
 if [ -r "${CONFIG_CACHE}" ] ; then
-  p=`pwd`
+  p=`"${pwdcmd}"`
   echon `echo "Checking the values in ${CONFIG_CACHE} ..."|sed -e "s! ${p}[/]*! !"` 
   THISSYS="$SYS"
   SYS=""

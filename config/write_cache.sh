@@ -6,7 +6,8 @@ if [ -z "$CONFIG_DIR" ] ; then
 fi
 
 if [ -z "$CONFIG_READONLY" ] ; then
-  echo "Writing the ${CONFIG_CACHE} file"|sed -e "s! `pwd`[/]*! !" 
+  p=`"${pwdcmd}"`
+  echo "Writing the ${CONFIG_CACHE} file"|"${sed}" -e "s! ${p}[/]*! !" 
   if [ ! -d "$TOPBUILDDIR" ] ; then
     mkdirp "$TOPBUILDDIR"
   fi

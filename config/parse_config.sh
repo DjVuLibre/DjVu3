@@ -14,7 +14,7 @@ if [ -z "$prefix" ] ; then
     if [ -r "$INSTALL_CONFIG" ] ; then
       . "$INSTALL_CONFIG"
     else
-      eval `grep '^[ 	]*prefix[ 	]*=' "$INSTALL_CONFIG_DIR"/*.conf` 2>>/dev/null
+      eval `"${grep}" '^[ 	]*prefix[ 	]*=' "$INSTALL_CONFIG_DIR"/*.conf` 2>>/dev/null
     fi
   fi
   if [ -z "$prefix" ] ; then

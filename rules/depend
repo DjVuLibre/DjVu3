@@ -1,0 +1,34 @@
+
+update-depend: depend
+%%%BEGIN_REQUIRE(@%cc_is_gcc%@&&@%cxx_is_gcc%@)
+	if [ -r Makefile.depend ] ; then \
+	  if [ -r @%srcdir%@/Makefile.depend ] ; then \
+	    if ( $(CMP) Makefile.depend @%srcdir%@/Makefile.depend ) ; then \
+	      echo No change ; \
+	    else \
+	      $(RM) -f @%srcdir%@/Makefile.depend ; $(CP) Makefile.depend @%srcdir%@/Makefile.depend ; \
+	    fi ; \
+	  else \
+	    $(RM) -f @%srcdir%@/Makefile.depend ; $(CP) Makefile.depend @%srcdir%@/Makefile.depend ; \
+	  fi ; \
+	fi
+%%%END_REQUIRE(@%cc_is_gcc%@&&@%cxx_is_gcc%@)
+	
+depend: $(SRC)
+%%%BEGIN_REQUIRE(@%cc_is_gcc%@&&@%cxx_is_gcc%@)
+	$(RM) -f Makefile.depend
+	(for n in *.c ; do if [ -r "$$n" ] ; then $(CC) -MM $(CFLAGS) $$n | $(SED) -e 's,\([	 ]\)@%srcdir%@/,\1,g' >> Makefile.depend;fi;done)
+	(for n in *.cpp ; do if [ -r "$$n" ] ; then $(CXX) -MM $(CXXFLAGS) $$n | $(SED) -e 's,\([	 ]\)@%srcdir%@/,\1,g' >> Makefile.depend;fi;done)
+	if [ ! -r Makefile.depend ] ; then \
+	  (for n in @%srcdir%@/*.c ; do if [ -r "$$n" ] ; then $(CC) -I. -I@%srcdir%@ -MM $(CFLAGS) $$n |$(SED) -e 's,\([ 	]\)@%srcdir%@/,\1,g' >> Makefile.depend;fi;done) ; \
+	  (for n in @%srcdir%@/*.cpp ; do if [ -r "$$n" ] ; then $(CXX) -I. -I@%srcdir%@ -MM $(CXXFLAGS) $$n |$(SED) -e 's,\([ 	]\)@%srcdir%@/,\1,g' >> Makefile.depend;fi;done ) ; \
+	fi
+	$(RM) -f Makefile.new
+	$(SED) -e '/^### DEPENDENCIES/,$$d' Makefile > Makefile.new
+	$(CHMOD) ugo+w Makefile
+	$(CAT) Makefile.new  > Makefile
+	$(RM) -f Makefile.new
+	echo "### DEPENDENCIES" >> Makefile
+	$(CAT) Makefile.depend >> Makefile
+%%%END_REQUIRE(@%cc_is_gcc%@&&@%cxx_is_gcc%@)
+

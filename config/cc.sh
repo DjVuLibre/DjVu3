@@ -35,8 +35,8 @@ then
   echon "Checking ${CC} version ... "
   if [ "$CC" != "$EGCS" ]
   then
-    CCprefix="`$CC -Vfoo 2>&1|fgrep 'file path prefix'|sed 's,.* .\([^ ]*/\)foo/. never.*,\1,'`"
-    if [ ! -z "$CCprefix" ]
+    s=`$CC -Vfoo 2>&1|"${grep}" 'file path prefix'|"${sed}" 's,.* .\([^ ]*/\)foo/. never.*,\1,'`
+    if [ ! -z "$s" ]
     then
       echo "egcs"
     else
@@ -79,7 +79,8 @@ then
   CCFLAGS=`echo "${CCPIPE}" "${CCFLAGS}"`
   
   CCMMX=""
-  if [ `uname -m` = i686 ]
+  m=`${uname} -m`
+  if [ "${m}" = i686 ]
   then
     echon "Chesking whether ${CC} -mpentiumpro and -mmx work ... "
     if ( run $CC ${CCFLAGS} -mpentiumpro -c $temp.c) 
@@ -100,7 +101,8 @@ then
 
   echon "Checking ${CC} symbolic option ... "
   CCSYMBOLIC=""
-  if [ -z "`( cd $tempdir 2>>/dev/null;${CC} ${CCFLAGS} -symbolic -c $temp.c 2>&1)|grep 'unrecognized option'`" ]
+  s=`( cd "$tempdir" 2>>/dev/null;${CC} ${CCFLAGS} -symbolic -c $temp.c 2>&1)|"${grep}" 'unrecognized option'`
+  if [ -z "$s" ]
   then
     CCSYMBOLIC='-symbolic'
   elif ( run ${CC} ${CCFLAGS} -shared -Wl,-Bsymbolic -o c$$.so $temp.c -lc -lm )
@@ -156,7 +158,7 @@ then
       CCOPT=""
     fi
   fi
-  rm -rf $temp.c $temp.o $temp.so
+  "${rm}" -rf $temp.c $temp.o $temp.so
   CONFIG_VARS=`echo CC CCFLAGS CCOPT CCSYMBOLIC CCPIC cc_is_gcc $CONFIG_VARS`
 fi
 

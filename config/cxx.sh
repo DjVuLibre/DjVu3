@@ -30,11 +30,12 @@ if [ -z "$CXX" ] ; then
   echon "Checking ${CXX} version ... "
   CXXVERSION=""
   if [ "$CXX" != "$EGXX" ] ; then
-    CXXprefix="`$CXX -Vfoo 2>&1|fgrep 'file path prefix'|sed 's,.* .\([^ ]*/\)foo/. never.*,\1,'`"
-    if [ ! -z "$CXXprefix" ] ; then
+    s=`$CXX -Vfoo 2>&1|"${grep}" 'file path prefix'|"${sed}" 's,.* .\([^ ]*/\)foo/. never.*,\1,'`
+    if [ ! -z "$s" ]
+    then
       echo "egcs"
     else
-      EGCSTEST=`($CXX -v 2>&1)|sed -n -e 's,.*/egcs-.*,Is EGCS,p' -e 's,.*/pgcc-.*,Is PGCC,p'`
+      EGCSTEST=`($CXX -v 2>&1)|"${sed}" -n -e 's,.*/egcs-.*,Is EGCS,p' -e 's,.*/pgcc-.*,Is PGCC,p'`
       if [ ! -z "$EGCSTEST" ] ; then
         echo "egcs"
       elif ( run $CXX -V2.8.1 -c $temp.cpp ) ; then
@@ -81,8 +82,10 @@ if [ -z "$CXX" ] ; then
 
   echon "Checking ${CXX} symbolic option ... "
   CXXSYMBOLIC=""
-  if [ -z "`(cd $tempdir 2>>/dev/null;${CXX} ${CXXFLAGS} -symbolic -c $temp.cpp 2>&1)|grep 'unrecognized option'`" ] ; then
-    echo "-symbolic"
+  s=`(cd $tempdir 2>>/dev/null;${CXX} ${CXXFLAGS} -symbolic -c $temp.cpp 2>&1)|"${grep}" 'unrecognized option'`
+  if [ -z "$s" ]
+  then
+    echo " -symbolic"
     CXXSYMBOLIC='-symbolic'
   elif ( run ${CXX} ${CXXFLAGS} -shared -Wl,-Bsymbolic -o $temp.so $temp.cpp -lc -lm ) ; then
     if [ "$SYS" != "linux-libc6" ] ; then
@@ -131,7 +134,7 @@ if [ -z "$CXX" ] ; then
       CXXOPT=""
     fi
   fi
-  rm -rf $temp.cpp $temp.so $temp.o
+  "${rm}" -rf $temp.cpp $temp.so $temp.o
   CONFIG_VARS=`echo CXX CXXFLAGS CXXOPT CXXSYMBOLIC CXXPIC cxx_is_gcc "$CONFIG_VARS"`
 fi
 
