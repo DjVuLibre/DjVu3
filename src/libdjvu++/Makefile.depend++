@@ -59,7 +59,7 @@ DjVuErrorList.o: DjVuErrorList.cpp DjVuErrorList.h \
  DjVuPort.h DjVuGlobal.h GException.h \
  GSmartPointer.h GURL.h GString.h Arrays.h \
  GThreads.h GContainer.h DataPool.h \
- ByteStream.h
+ ByteStream.h GOS.h
 DjVuFile.o: DjVuFile.cpp debug.h DjVuFile.h \
  GSmartPointer.h DjVuGlobal.h ByteStream.h \
  GException.h GContainer.h Arrays.h \
