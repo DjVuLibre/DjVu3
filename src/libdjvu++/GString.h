@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.h,v 1.83 2001-07-11 20:44:02 bcr Exp $
+// $Id: GString.h,v 1.84 2001-07-19 21:56:48 bcr Exp $
 // $Name:  $
 
 #ifndef _GSTRING_H_
@@ -64,7 +64,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.83 2001-07-11 20:44:02 bcr Exp $# */
+    #$Id: GString.h,v 1.84 2001-07-19 21:56:48 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -289,6 +289,7 @@ protected:
 
   virtual GP<Unicode> get_remainder( void ) const;
 
+public:
   /* Returns a copy of this string with characters used in XML with
       '<'  to "&lt;", '>'  to "&gt;",  '&' to "&amp;" '\'' to
       "&apos;", and  '\"' to  "&quot;".   Characters 0x01 through
@@ -297,7 +298,11 @@ protected:
 
   // Tests if a string is legally encoded in the current character set.
   virtual bool is_valid(void) const = 0;
-  
+
+  virtual int ncopy(wchar_t * const buf, const int buflen) const = 0;
+
+protected:
+
 // Actual string data.
   int  size;
   char *data;
@@ -366,6 +371,8 @@ public:
 
   // Tests if a string is legally encoded in the current character set.
   virtual bool is_valid(void) const;
+
+  virtual int ncopy(wchar_t * const buf, const int buflen) const;
 
   friend class GBaseString;
 
@@ -445,6 +452,8 @@ public:
 
   // Tests if a string is legally encoded in the current character set.
   virtual bool is_valid(void) const;
+
+  virtual int ncopy(wchar_t * const buf, const int buflen) const;
 
   friend class GBaseString;
 protected:
@@ -765,6 +774,10 @@ public:
   /// Tests if the string is legally encoded in the current codepage.
   bool is_valid(void) const
   { return ptr?((*this)->is_valid()):true; }
+
+  /// copy to a wchar_t buffer
+  int ncopy(wchar_t * const buf, const int buflen) const
+  {if(buf&&buflen)buf[0]=0;return ptr?((*this)->ncopy(buf,buflen)):0;}
 
 protected:
   const char *gstr;

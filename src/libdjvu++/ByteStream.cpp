@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.cpp,v 1.83 2001-07-16 15:46:04 bcr Exp $
+// $Id: ByteStream.cpp,v 1.84 2001-07-19 21:56:48 bcr Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 04/1997
@@ -650,7 +650,27 @@ ByteStream::Stdio::init(const char mode[])
 static FILE *
 urlfopen(const GURL &url,const char mode[])
 {
+#ifdef WIN32
+  FILE *retval=0;
+  const GUTF8String filename(url.UTF8Filename());
+  wchar_t *wfilename;
+  const size_t wfilename_size=filename.length()+1;
+  GPBuffer<wchar_t> gwfilename(wfilename,wfilename_size);
+  if(filename.ncopy(wfilename,wfilename_size) > 0)
+  {
+    const GUTF8String gmode(mode);
+    wchar_t *wmode;
+    const size_t wmode_size=gmode.length()+1;
+    GPBuffer<wchar_t> gwmode(wmode,wmode_size);
+	if(gmode.ncopy(wmode,wmode_size) > 0)
+	{
+	  retval=_wfopen(wfilename,wmode);
+	}
+  }
+  return retval?retval:fopen((const char *)url.NativeFilename(),mode);
+#else
   return fopen((const char *)url.NativeFilename(),mode);
+#endif
 }
 
 #ifdef UNIX

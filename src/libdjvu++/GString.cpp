@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.117 2001-07-17 17:25:17 bcr Exp $
+// $Id: GString.cpp,v 1.118 2001-07-19 21:56:48 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -985,6 +985,50 @@ GStringRep::UTF8::UCS4toString(
   const unsigned long w0,unsigned char *ptr, mbstate_t *) const
 {
   return UCS4toUTF8(w0,ptr);
+}
+
+int
+GStringRep::Native::ncopy(
+  wchar_t * const buf, const int buflen ) const
+{
+  return toUTF8()->ncopy(buf,buflen);
+}
+
+int
+GStringRep::UTF8::ncopy(
+  wchar_t * const buf, const int buflen ) const
+{
+  int retval=(-1);
+  if(buf && buflen)
+  {
+	buf[0]=0;
+    if(data[0])
+	{
+      const size_t length=strlen(data);
+      const unsigned char * const eptr=(const unsigned char *)(data+length);
+	  wchar_t *r=buf;
+	  wchar_t const * const rend=buf+buflen;
+      for(const unsigned char *s=(const unsigned char *)data;(r<rend)&&(s<eptr)&&*s;)
+	  {
+        const unsigned long w0=UTF8toUCS4(s,eptr);
+        unsigned short w1, w2;
+        for(int count=(sizeof(wchar_t) == sizeof(w1))?UCS4toUTF16(w0,w1,w2):1;
+          count&&(r<rend);--count,w1=w2,++r)
+		{
+		  r[0]=(sizeof(wchar_t) == sizeof(w1))?(wchar_t)w1:(wchar_t)w0;
+		}
+	  }
+	  if(r<rend)
+	  {
+	    r[0]=0;
+		retval=((size_t)r-(size_t)buf)/sizeof(wchar_t);
+	  }
+	}else
+	{
+	  retval=0;
+	}
+  }
+  return retval;
 }
 
 GP<GStringRep> 

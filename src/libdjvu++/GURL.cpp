@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GURL.cpp,v 1.81 2001-07-16 19:32:32 bcr Exp $
+// $Id: GURL.cpp,v 1.82 2001-07-19 21:56:48 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -451,8 +451,16 @@ GURL::GURL(const GNativeString & url_in)
 #endif
 }
 
-GURL::GURL(const GURL & url_in) : url(url_in.url), validurl(false)
+GURL::GURL(const GURL & url_in) : validurl(false)
 {
+  if(url_in.is_valid())
+  {
+    url=url_in.get_string();
+    init();
+  }else
+  {
+    url=url_in.url;
+  }
 }
 
 GURL &
@@ -462,7 +470,7 @@ GURL::operator=(const GURL & url_in)
    if(url_in.is_valid())
    {
      url=url_in.get_string();
-	 init();
+	 init(true);
    }else
    {
      url=url_in.url;
@@ -1378,9 +1386,28 @@ GURL::is_file(void) const
       retval=!(buf.st_mode & S_IFDIR);
     }
 #elif defined(WIN32)
-    DWORD           dwAttrib;       ;
-    USES_CONVERSION ;
-    dwAttrib = GetFileAttributes(A2CT(NativeFilename())) ;//MBCS cvt
+	GUTF8String filename(UTF8Filename());
+	if(filename.length() >= MAX_PATH)
+	{
+	  if(!filename.cmp("\\\\",2))
+	  {
+	    filename="\\\\?\\UNC"+filename.substr(1,-1);
+	  }else
+	  {
+        filename="\\\\?\\"+filename;
+	  }
+	}
+	wchar_t *wfilename;
+	const size_t wfilename_size=filename.length()+1;
+	GPBuffer<wchar_t> gwfilename(wfilename,wfilename_size);
+	filename.ncopy(wfilename,wfilename_size);
+    DWORD dwAttrib;
+	dwAttrib = GetFileAttributesW(wfilename);
+	if((dwAttrib|1) == 0xFFFFFFFF)
+	{
+      USES_CONVERSION ;
+	  dwAttrib = GetFileAttributes(A2CT(NativeFilename())) ;//MBCS cvt
+    }
     retval=!( dwAttrib & FILE_ATTRIBUTE_DIRECTORY );
 #else
 #error "Define something here for your operating system"
@@ -1399,10 +1426,29 @@ GURL::is_local_path(void) const
     struct stat buf;
     retval=!urlstat(*this,buf);
 #else
-    DWORD           dwAttrib;       ;
-    USES_CONVERSION ;
-    dwAttrib = GetFileAttributes(A2CT(NativeFilename())) ;//MBCS cvt
-    retval=!(dwAttrib == 0xFFFFFFFF);
+	GUTF8String filename(UTF8Filename());
+	if(filename.length() >= MAX_PATH)
+	{
+	  if(!filename.cmp("\\\\",2))
+	  {
+	    filename="\\\\?\\UNC"+filename.substr(1,-1);
+	  }else
+	  {
+        filename="\\\\?\\"+filename;
+	  }
+	}
+	wchar_t *wfilename;
+	const size_t wfilename_size=filename.length()+1;
+	GPBuffer<wchar_t> gwfilename(wfilename,wfilename_size);
+	filename.ncopy(wfilename,wfilename_size);
+    DWORD dwAttrib;
+	dwAttrib = GetFileAttributesW(wfilename);
+	if((dwAttrib|1) == 0xFFFFFFFF)
+	{
+      USES_CONVERSION ;
+	  dwAttrib = GetFileAttributes(A2CT(NativeFilename())) ;//MBCS cvt
+    }
+    retval=( (dwAttrib|1) != 0xFFFFFFFF);
 #endif
   }
   return retval;
@@ -1424,9 +1470,29 @@ GURL::is_dir(void) const
       retval=(buf.st_mode & S_IFDIR);
     }
 #elif defined(WIN32)   // (either Windows or WCE)
-    USES_CONVERSION ;
-    DWORD           dwAttrib;       ;
-    dwAttrib = GetFileAttributes(A2CT(NativeFilename())) ;//MBCS cvt
+	GUTF8String filename(UTF8Filename());
+	if(filename.length() >= MAX_PATH)
+	{
+	  if(!filename.cmp("\\\\",2))
+	  {
+	    filename="\\\\?\\UNC"+filename.substr(1,-1);
+	  }else
+	  {
+        filename="\\\\?\\"+filename;
+	  }
+	}
+
+	wchar_t *wfilename;
+	const size_t wfilename_size=filename.length()+1;
+	GPBuffer<wchar_t> gwfilename(wfilename,wfilename_size);
+	filename.ncopy(wfilename,wfilename_size);
+    DWORD dwAttrib;
+	dwAttrib = GetFileAttributesW(wfilename);
+	if((dwAttrib|1) == 0xFFFFFFFF)
+	{
+      USES_CONVERSION ;
+	  dwAttrib = GetFileAttributes(A2CT(NativeFilename())) ;//MBCS cvt
+    }
     retval=((dwAttrib != 0xFFFFFFFF)&&( dwAttrib & FILE_ATTRIBUTE_DIRECTORY ));
 #else
 #error "Define something here for your operating system"
