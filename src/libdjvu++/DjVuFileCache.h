@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFileCache.h,v 1.1 1999-09-10 21:52:36 eaf Exp $
+//C- $Id: DjVuFileCache.h,v 1.2 1999-09-22 15:38:23 eaf Exp $
 
 #ifndef _DJVUFILECACHE_H
 #define _DJVUFILECACHE_H
@@ -35,14 +35,19 @@
     
     @memo Simple DjVuFile caching class.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: DjVuFileCache.h,v 1.1 1999-09-10 21:52:36 eaf Exp $#
+    @version #$Id: DjVuFileCache.h,v 1.2 1999-09-22 15:38:23 eaf Exp $#
 */
 
 //@{
 
 /** #DjVuFileCache# is a simple list of \Ref{DjVuFile} instances. It keeps
     track of the total size of all elements and can get rid of the oldest
-    one once the total size becomes over some thresold. */
+    one once the total size becomes over some thresold. Its main purpose
+    is to keep the added \Ref{DjVuFile} instances alive until their size
+    exceeds some given threshould (set by \Ref{set_maximum_size}() function).
+    The user is supposed to use \Ref{DjVuPortcaster::name_to_port}() to
+    find a file corresponding to a given name. The cache provides no
+    naming services */
 class DjVuFileCache
 {
 public:
@@ -62,6 +67,8 @@ public:
 	  is greater than #max_size#, the cache will be deleting the oldest
 	  items until the size is OK. */
    void		set_max_size(int max_size);
+      /** Returns the maximum allowed size of the cache. */
+   int		get_max_size(void) const;
       /** Enables or disables the cache. See \Ref{is_enabled}() for details
 	  @param en - If {\em en} is TRUE, the cache will be enabled.
 	         Otherwise it will be disabled.
@@ -76,13 +83,6 @@ public:
 	  setting the {\em maximum size} of the cache to #ZERO#. */
    bool		is_enabled(void) const;
 protected:
-      /** This function is called right after the given file has been appended
-	  to the list */
-   virtual void	file_added(const GP<DjVuFile> & file);
-      /** This function is called right after the given file has been removed
-	  from the list. */
-   virtual void	file_deleted(const GP<DjVuFile> & file);
-private:
    class Item : public GPEnabled
    {
    public:
@@ -101,8 +101,21 @@ private:
       GPosition		list_pos;
       static int	qsort_func(const void * el1, const void * el2);
    };
-   GCriticalSection	list_lock;
-   GPList<Item>		list;
+   GCriticalSection	class_lock;
+   
+      /** This function is called right after the given file has been added
+	  to the cache for management. */
+   virtual void	file_added(const GP<DjVuFile> & file);
+      /** This function is called when the given file is no longer
+	  managed by the cache. */
+   virtual void	file_deleted(const GP<DjVuFile> & file);
+      /** This function is called when after the cache decides to get rid
+	  of the file. */
+   virtual void	file_cleared(const GP<DjVuFile> & file);
+
+   GPList<Item>	get_items(void);
+private:
+   GPList<Item>	list;
    bool		enabled;
    int		max_size;
    int		cur_size;
@@ -164,6 +177,12 @@ inline bool
 DjVuFileCache::is_enabled(void) const
 {
    return enabled;
+}
+
+inline int
+DjVuFileCache::get_max_size(void) const
+{
+   return max_size;
 }
 
 #endif

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFileCache.cpp,v 1.1 1999-09-10 21:52:36 eaf Exp $
+//C- $Id: DjVuFileCache.cpp,v 1.2 1999-09-22 15:38:23 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -33,7 +33,7 @@ DjVuFileCache::set_max_size(int xmax_size)
    DEBUG_MSG("DjVuFileCache::set_max_size(): resizing to " << xmax_size << "\n");
    DEBUG_MAKE_INDENT(3);
 
-   GCriticalSectionLock lock(&list_lock);
+   GCriticalSectionLock lock(&class_lock);
    
    max_size=xmax_size;
    cur_size=calculate_size();
@@ -54,7 +54,7 @@ DjVuFileCache::add_file(const GP<DjVuFile> & file)
    DEBUG_MSG("DjVuFileCache::add_file(): trying to add a new item\n");
    DEBUG_MAKE_INDENT(3);
 
-   GCriticalSectionLock lock(&list_lock);
+   GCriticalSectionLock lock(&class_lock);
 
       // See if the file is already cached
    GPosition pos;
@@ -90,7 +90,7 @@ DjVuFileCache::clear_to_size(int size)
    DEBUG_MSG("DjVuFileCache::clear_to_size(): dropping cache size to " << size << "\n");
    DEBUG_MAKE_INDENT(3);
 
-   GCriticalSectionLock lock(&list_lock);
+   GCriticalSectionLock lock(&class_lock);
    
    if (size==0)
    {
@@ -117,7 +117,9 @@ DjVuFileCache::clear_to_size(int size)
 	 {
 	    Item * item=(Item *) item_arr[i];
 	    cur_size-=item->get_size();
+	    GP<DjVuFile> file=item->file;
 	    list.del(item->list_pos);
+	    file_cleared(file);
 	    if (cur_size<=0) cur_size=calculate_size();
 	 }
       } else
@@ -139,7 +141,9 @@ DjVuFileCache::clear_to_size(int size)
 	       if (list[pos]->get_time()<list[oldest_pos]->get_time())
 		  oldest_pos=pos;
 	    cur_size-=list[oldest_pos]->get_size();
+	    GP<DjVuFile> file=list[oldest_pos]->file;
 	    list.del(oldest_pos);
+	    file_cleared(file);
 
 	       // cur_size *may* become negative because items may change their
 	       // size after they've been added to the cache
@@ -153,7 +157,7 @@ DjVuFileCache::clear_to_size(int size)
 int
 DjVuFileCache::calculate_size(void)
 {
-   GCriticalSectionLock lock(&list_lock);
+   GCriticalSectionLock lock(&class_lock);
    
    int size=0;
    for(GPosition pos=list;pos;++pos)
@@ -167,7 +171,7 @@ DjVuFileCache::del_file(const DjVuFile * file)
    DEBUG_MSG("DjVuFileCache::del_file(): Removing an item from cache\n");
    DEBUG_MAKE_INDENT(3);
 
-   GCriticalSectionLock lock(&list_lock);
+   GCriticalSectionLock lock(&class_lock);
 
    for(GPosition pos=list;pos;++pos)
       if (list[pos]->get_file()==file)
@@ -182,8 +186,19 @@ DjVuFileCache::del_file(const DjVuFile * file)
    DEBUG_MSG("current cache size=" << cur_size << "\n");
 }
 
+GPList<DjVuFileCache::Item>
+DjVuFileCache::get_items(void)
+{
+   GCriticalSectionLock lock(&class_lock);
+
+   return list;
+}
+
 void
 DjVuFileCache::file_added(const GP<DjVuFile> &) {}
 
 void
 DjVuFileCache::file_deleted(const GP<DjVuFile> &) {}
+
+void
+DjVuFileCache::file_cleared(const GP<DjVuFile> &) {}
