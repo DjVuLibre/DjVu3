@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: execdir.cpp,v 1.2 2001-07-25 17:10:42 mchen Exp $
+// $Id: execdir.cpp,v 1.3 2001-08-15 22:18:30 docbill Exp $
 // $Name:  $
 
 
@@ -49,9 +49,7 @@ QString
 getExecDir(QString argv0)
 {
    QString dir;
-   //BUGGY-utf8 doest work
-   //operate on utf8 
-   //const char *progname=argv0.utf8();
+
    const char *progname=argv0;
 
    if (progname && progname[0])

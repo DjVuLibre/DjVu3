@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: prefs.h,v 1.5 2001-08-13 16:08:33 docbill Exp $
+// $Id: prefs.h,v 1.6 2001-08-15 22:18:30 docbill Exp $
 // $Name:  $
 
 

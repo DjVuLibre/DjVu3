@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: GMarginCache.h,v 1.4 2001-08-13 16:08:33 docbill Exp $
+// $Id: GMarginCache.h,v 1.5 2001-08-15 22:18:30 docbill Exp $
 // $Name:  $
 
 
@@ -373,10 +373,13 @@ GMarginCache<TPixmap>::addRect(const GRect & grect, const GP<TPixmap> & pix)
       DEBUG_MSG("caching is disabled => returning\n");
       return;
    }
-   
-   if ((int) pix->columns()!=grect.width() ||
-       (int) pix->rows()!=grect.height())
+
+   // rotation may cause some round-off errors - exact fit may not be possible
+   if ((int) pix->columns() > grect.width() ||
+       (int) pix->rows() > grect.height())
+   {
       G_THROW("Pixmap being cached doesn't fit into the rectangle.");
+   }
    
    if (outer_rect.isempty())
    {

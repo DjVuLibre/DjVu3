@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qd_messenger.cpp,v 1.3 2001-07-25 17:10:43 mchen Exp $
+// $Id: qd_messenger.cpp,v 1.4 2001-08-15 22:18:30 docbill Exp $
 // $Name:  $
 
 
@@ -234,9 +234,8 @@ QDMessenger::sendSignal(QDMessageQueue::Item * item)
 	 {
 	    DEBUG_MSG("GET_URL request read by messenger, url='" <<
 		      item->url << "'\n");
-	    // BUGGY filename ?
 	    emit sigGetURL(GURL::UTF8(item->url), item->target.length() ?
-			   item->target : GUTF8String()); // is there GUTF8String::null ?
+			   item->target : GUTF8String()); 
 	    break;
 	 }
 	 case GENERAL_REQ:

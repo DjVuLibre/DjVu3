@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qd_viewer_menu.cpp,v 1.2 2001-07-25 17:10:41 mchen Exp $
+// $Id: qd_viewer_menu.cpp,v 1.3 2001-08-15 22:18:30 docbill Exp $
 // $Name:  $
 
 
@@ -49,6 +49,7 @@
 #include "qd_set_zoom.h"
 #include "qd_thumb.h"
 #include "qlib.h"
+#include "DjVuMessage.h"
 
 void
 QDViewer::createPopupMenu(void)
@@ -341,8 +342,8 @@ QDViewer::processCommand(int cmd)
 	 case IDC_ABOUT_PAGE:
 	    if (dimg && dimg->get_width() && dimg->get_height())
 	    {
-	       GUTF8String desc=dimg->get_long_description();
-	       showMessage(this, tr("DjVu: Page Information"), QStringFromGString(desc), 1, 1);
+	       GNativeString desc=DjVuMessageLite::LookUpNative(dimg->get_long_description());
+	       showMessage(this, tr("DjVu: Page Information"), QString((const char *)desc), 1, 1);
 	    }
 	    break;
 

@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qd_base_events.cpp,v 1.11 2001-08-13 16:08:33 docbill Exp $
+// $Id: qd_base_events.cpp,v 1.12 2001-08-15 22:18:30 docbill Exp $
 // $Name:  $
 
 
@@ -932,7 +932,7 @@ QDBase::slotCheckCache(void)
 	       DEBUG_MSG("caching rect=(" << grect.xmin << ", "
 			 << grect.ymin << ", " << grect.width() << ", "
 			 << grect.height() << ")\n");
-	 
+
 	       GRectMapper doc_mapper;
 	       doc_mapper.set_input(rectDocument);
 	       doc_mapper.set_output(GRect(0, 0, rectDocument.width(),
