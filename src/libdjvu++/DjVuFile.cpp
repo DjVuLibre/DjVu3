@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.45 1999-09-12 18:55:38 eaf Exp $
+//C- $Id: DjVuFile.cpp,v 1.46 1999-09-13 20:45:03 leonb Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -464,6 +464,7 @@ DjVuFile::get_fgjd(int block)
   if (DjVuFile::fgjd)
     return DjVuFile::fgjd;
   // Check wether included files
+  chunk_mon.enter();
   for(;;)
     {
       int active = 0;
@@ -475,7 +476,10 @@ DjVuFile::get_fgjd(int block)
             active = 1;
           GP<JB2Dict> fgjd = file->get_fgjd();
           if (fgjd) 
-            return fgjd;
+            {
+              chunk_mon.leave();
+              return fgjd;
+            }
         }
       // Exit if non-blocking mode
       if (! block) break;
@@ -484,6 +488,7 @@ DjVuFile::get_fgjd(int block)
       // Wait until a new chunk gets decoded
       wait_for_chunk();
     }
+  chunk_mon.leave();
   return 0;
 }
 
