@@ -1,6 +1,6 @@
 # This rule sets the following variables:
 #	CXX, CXXFLAGS, CXXSYMBOLIC, CXXPIC, CXXUNROLL, CXXWARN
-# $Id: cxx.sh,v 1.16 2000-02-05 02:09:36 bcr Exp $
+# $Id: cxx.sh,v 1.17 2000-02-05 02:13:33 bcr Exp $
 
 if [ -z "$CONFIG_DIR" ] ; then
   echo "You must source functions.sh" 1>&2
@@ -23,15 +23,17 @@ if [ -z "$CXX_SET" ] ; then
       CXX="$EGXX"
       echo "$CXX"
     elif [ ! -z "$CXX" ] ; then
-      if ( run g++ -c $temp.cpp ) ; then
+      if ( run $CXX -c $temp.cpp ) ; then
         echo "$CXX"
       else
         CXX=""
       fi
     fi
     if [ -z "$CXX" ] ; then
-      if ( run g++ -c $temp.cpp ) ; then
+      if ( run c++ -c $temp.cpp ) ; then
         CXX=c++
+      elif ( run g++ -c $temp.cpp ) ; then
+        CXX=g++
       elif ( run CC -c $temp.cpp ) ; then
         CXX=CC
       else 
