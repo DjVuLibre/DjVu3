@@ -9,10 +9,10 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GThreads.cpp,v 1.35 1999-10-29 22:09:00 praveen Exp $
+//C- $Id: GThreads.cpp,v 1.36 1999-11-16 14:12:50 leonb Exp $
 
 
-// **** File "$Id: GThreads.cpp,v 1.35 1999-10-29 22:09:00 praveen Exp $"
+// **** File "$Id: GThreads.cpp,v 1.36 1999-11-16 14:12:50 leonb Exp $"
 // This file defines machine independent classes
 // for running and synchronizing threads.
 // - Author: Leon Bottou, 01/1998
@@ -140,9 +140,8 @@ GThread::current()
 GMonitor::GMonitor()
   : ok(0), count(1)
 {
+  hev[0] = hev[1] = 0;
   InitializeCriticalSection(&cs);
-  hev[0] = CreateEvent(NULL,FALSE,FALSE,NULL);
-  hev[1] = CreateEvent(NULL,TRUE,FALSE,NULL);
   locker = GetCurrentThreadId();
   ok = 1;
 }
@@ -151,8 +150,8 @@ GMonitor::~GMonitor()
 {
   ok = 0;
   DeleteCriticalSection(&cs); 
-  CloseHandle(hev[0]);
-  CloseHandle(hev[1]);
+  if (hev[0]) CloseHandle(hev[0]);
+  if (hev[1]) CloseHandle(hev[1]);
 }
 
 void 
@@ -192,7 +191,8 @@ GMonitor::signal()
       DWORD self = GetCurrentThreadId();
       if (count>0 || self!=locker)
         THROW("Monitor was not acquired by this thread (GMonitor::signal)");
-      SetEvent(hev[0]);
+      if (hev[0])
+        SetEvent(hev[0]);
     }
 }
 
@@ -204,9 +204,21 @@ GMonitor::broadcast()
       DWORD self = GetCurrentThreadId();
       if (count>0 || self!=locker)
         THROW("Monitor was not acquired by this thread (GMonitor::broadcast)");
-      SetEvent(hev[1]);
+      if (hev[1])
+        SetEvent(hev[1]);
     }
 }
+
+
+static void
+create_events(HANDLE *hev)
+{
+  if (!hev[0])
+    hev[0] = CreateEvent(NULL,FALSE,FALSE,NULL);
+  if (!hev[1])
+    hev[1] = CreateEvent(NULL,TRUE,FALSE,NULL);
+}
+
 
 void
 GMonitor::wait()
@@ -218,6 +230,9 @@ GMonitor::wait()
   // Wait
   if (ok)
     {
+      // Lazy creation of events
+      if (!hev[0]) 
+        create_events(hev);
       // Release
       int sav_count = count;
       count = 1;
@@ -243,6 +258,9 @@ GMonitor::wait(unsigned long timeout)
   // Wait
   if (ok)
     {
+      // Lazy creation of events
+      if (!hev[0]) 
+        create_events(hev);
       // Release
       int sav_count = count;
       count = 1;
