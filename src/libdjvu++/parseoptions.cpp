@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: parseoptions.cpp,v 1.14 1999-12-08 03:22:54 bcr Exp $
+//C- $Id: parseoptions.cpp,v 1.15 1999-12-08 03:39:31 bcr Exp $
 #ifdef __GNUC__
 #pragma implementation
 #endif
@@ -500,15 +500,20 @@ DjVuParseOptions::ParseArguments
     if(argc)
     {
       char **oldargv=argv;
-      argv=new char *[argc+xargc-1];
-      for(i=0;i<argc;i++)
+      argv=new char *[optind+xargc-1];
+      for(i=0;i<optind;i++)
       {
         argv[i]=oldargv[i];
         oldargv[i]=0;
       }
+      for(j=i;j<argc;j++)
+      {
+        delete [] oldargv[j];
+        oldargv[j]=0;
+      }
       delete [] oldargv;
-      optind=args.optind+argc-1;
-      argc+=xargc-(j=1);
+      argc=optind+xargc-(j=1);
+      optind+=args.optind-1;
     }else
     {
       i=j=0;
