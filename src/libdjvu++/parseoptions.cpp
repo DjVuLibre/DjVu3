@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: parseoptions.cpp,v 1.82 2001-05-10 00:04:49 bcr Exp $
+// $Id: parseoptions.cpp,v 1.83 2001-05-10 00:20:04 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -41,7 +41,9 @@
 
 #define _PARSEOPTIONS_H_IMPLEMENTATION_ true
 #include "parseoptions.h"
-//#include "DjVuOptions.h"
+#if defined(BUILD_LIB) && defined(WIN32)
+#include "DjVuOptions.h"
+#endif
 #include "DjVuMessage.h"
 #include <string.h>
 #ifdef THREADMODEL
