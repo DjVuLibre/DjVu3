@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GSmartPointer.h,v 1.7 1999-03-17 19:24:58 leonb Exp $
+//C- $Id: GSmartPointer.h,v 1.8 1999-05-07 22:33:03 leonb Exp $
 
 #ifndef _GSMARTPOINTER_H_
 #define _GSMARTPOINTER_H_
@@ -31,7 +31,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation\\
     Andrei Erofeev <eaf@research.att.com> -- bug fix.
     @version 
-    #$Id: GSmartPointer.h,v 1.7 1999-03-17 19:24:58 leonb Exp $# 
+    #$Id: GSmartPointer.h,v 1.8 1999-05-07 22:33:03 leonb Exp $# 
     @args
 */
 //@{
@@ -54,6 +54,8 @@ class GPEnabled
 public:
   /// Null constructor.
   GPEnabled();
+  /// Copy construcotr
+  GPEnabled(const GPEnabled & obj);
   /// Virtual destructor.
   virtual ~GPEnabled();
   /// Copy operator
@@ -242,6 +244,12 @@ GPEnabled::GPEnabled()
 {
 }
 
+inline
+GPEnabled::GPEnabled(const GPEnabled & obj) 
+  : count(0) 
+{
+}
+
 inline GPEnabled & 
 GPEnabled::operator=(const GPEnabled & obj)
 { 
@@ -252,7 +260,6 @@ GPEnabled::operator=(const GPEnabled & obj)
      strategy. Thank you Andrei! */
   return *this; 
 }
-
 
 // INLINE FOR GPBASE
 
