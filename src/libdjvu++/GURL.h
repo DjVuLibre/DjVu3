@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GURL.h,v 1.18 2000-01-21 20:41:36 eaf Exp $
+//C- $Id: GURL.h,v 1.19 2000-01-24 22:55:24 eaf Exp $
 
 #ifndef _GURL_H_
 #define _GURL_H_
@@ -27,7 +27,7 @@
     \Ref{GURL} class used to store URLs in a system independent format.
     @memo System independent URL representation.
     @author Andrei Erofeev <eaf@research.att.com>
-    @version #$Id: GURL.h,v 1.18 2000-01-21 20:41:36 eaf Exp $#
+    @version #$Id: GURL.h,v 1.19 2000-01-24 22:55:24 eaf Exp $#
 */
 
 //@{
@@ -131,11 +131,16 @@ public:
 	  necessary */
    void		add_djvu_cgi_argument(const char * name, const char * value=0);
    
-      /** Returns the URL corresponding to the directory containing the document
-	  with this URL. */
+      /** Returns the URL corresponding to the directory containing
+	  the document with this URL. The function basically takes the
+	  URL and clears everything after the last slash. */
    GURL		base(void) const;
 
-      /// Returns the name part of this URL.
+      /** Returns the name part of this URL with escape sequences expanded.
+	  Some characters are not allowed in URLs, while they're perfectly
+	  legal for file names. These should have been encoded in the URL using
+	  {\em escape sequences} in the form #%XX#.
+	  See \Ref{GOS::encode_reserved}() for details. */
    GString	name(void) const;
 
       /// Returns the extention part of name of document in this URL.
@@ -150,13 +155,16 @@ public:
       /** @name Concatenation operators
 	  Concatenate the GURL with the passed {\em name}. If the {\em name}
 	  is absolute (has non empty protocol prefix), we just return
-	  #GURL(name)#. Otherwise the name is appended to the GURL after a
-	  separating slash preserving possible URL suffixes following #;# or #?#. */
+	  #GURL(name)#. Otherwise the #name# is appended to the GURL after a
+	  separating slash preserving possible URL suffixes following #;# or #?#.
+	  All illegal characters in #name# are encoded as described in
+	  \Ref{GOS::encode_reserved}().
+      */
       //@{
       ///
-   GURL		operator+(const char * xname) const;
+   GURL		operator+(const char * name) const;
       ///
-   GURL		operator+(const GString & xname) const;
+   GURL		operator+(const GString & name) const;
       //@}
 
       /// Returns TRUE if #gurl1# and #gurl2# are the same
