@@ -9,7 +9,7 @@
 # C- AT&T, you have an infringing copy of this software and cannot use it
 # C- without violating AT&T's intellectual property rights.
 # C-
-# C- $Id: configure,v 1.21 1999-08-19 14:55:40 leonb Exp $
+# C- $Id: configure,v 1.22 1999-08-31 14:51:28 leonb Exp $
 
 
 ### ------------------------------------------------------------------------
@@ -381,11 +381,9 @@ generate_makefile()
 ### ------------------------------------------------------------------------
 ### Generate makefiles
 
-if [ ! -d @Tools ] ; then mkdir @Tools ; fi
 if [ ! -d @Test ] ; then mkdir @Test ; fi
 
 generate_makefile .
-generate_makefile @Tools
 generate_makefile @Test
 
 
