@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.h,v 1.58 2000-02-27 23:19:49 eaf Exp $
+//C- $Id: DjVuDocument.h,v 1.59 2000-03-14 23:08:26 eaf Exp $
  
 #ifndef _DJVUDOCUMENT_H
 #define _DJVUDOCUMENT_H
@@ -33,7 +33,7 @@
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocument.h,v 1.58 2000-02-27 23:19:49 eaf Exp $#
+    @version #$Id: DjVuDocument.h,v 1.59 2000-03-14 23:08:26 eaf Exp $#
 */
 
 //@{
@@ -380,8 +380,8 @@ public:
 	  \end{itemize} */
    GURL		page_to_url(int page_num) const;
       /** Translates the page URL back to page number. Returns #-1# if the
-	  page is not in the document. If the document's structure has
-          not been learnt yet #0# will be returned.
+	  page is not in the document or the document's structure
+          has not been learnt yet.
 
 	  Depending on the document format, the function starts working
 	  properly as soon as:
