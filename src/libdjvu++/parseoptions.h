@@ -6,7 +6,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: parseoptions.h,v 1.18 2000-01-06 06:11:30 bcr Exp $
+//C- $Id: parseoptions.h,v 1.19 2000-01-19 23:39:10 leonb Exp $
 
 #endif /* __cplusplus */
 
@@ -67,14 +67,14 @@
    \Ref{DjVuParseOptions Examples}.
 
    @memo Class used for parsing options and configuration files.
-   @author: #$Author: bcr $#
-   @version #$Id: parseoptions.h,v 1.18 2000-01-06 06:11:30 bcr Exp $#
+   @author: #$Author: leonb $#
+   @version #$Id: parseoptions.h,v 1.19 2000-01-19 23:39:10 leonb Exp $#
  */
 
 //@{
 
 /** @name DjVuParseOptions Examples
-    The following #DjVuParseOptions examples# demonstrait how to use the
+    The following #DjVuParseOptions examples# demonstrates how to use the
     \Ref{DjVuParseOptions} class in your code.
 
 \begin{verbatim}                                        
@@ -229,7 +229,8 @@
 
 class DjVuTokenList;
 
-/** #DjVuParseOptions# is the only class you really need to declare.  This
+/** Main class for parsing options.
+    #DjVuParseOptions# is the only class you really need to declare.  This
     will handle all fo the details of parsing options from the command line
     and configuration files on disk. */
 
@@ -343,7 +344,7 @@ public:
   inline int GetBest(const char * const names[],bool=false);
 
   /** This just checks for TRUE, and if not does an atoi() conversion. 
-      Anything beginning with [Tt] is returned as 1, [Ff\0] is returned 
+      Anything beginning with [Tt] is returned as 1, [Ff] is returned 
       as 0, and anything else that is not a legal integer is returned 
       as errval. */
   int GetInteger(const int token,const int errval=0) const;
@@ -403,7 +404,8 @@ private:
   void AmbiguousOptions(const int,const char[],const int,const char[]);
 };
 
- /** This is a class very simmular to GMap, only it is limited much more
+ /** Token list.
+     This is a class very simmular to GMap, only it is limited much more
      limited scope.  It is an associative array "string" to integer.  But
      the integer is assigned uniquely by this class in sequental order.
      This is of use when you want to store items sequentially in an array
