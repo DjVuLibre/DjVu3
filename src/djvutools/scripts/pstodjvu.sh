@@ -1,12 +1,26 @@
 #!/bin/sh
+# DjVu Enterprise Commands
 
 documentcommand="documenttodjvu"
 bitonalcommand="documenttodjvu"
+bundlecommand=djvubundle
+joincommand=djvujoin
+
+
+# DjVu Open Source Commands
+
 electroniccommand=cpaldjvu
+mergecommand=djvm
+splitcommand=djvmcvt
+
+# Default settings
 
 defaultprofile="--profile=clean"
 defaultdpi="300"
 outputdev="pnmraw"
+
+# Parse arguments
+
 args=""
 j="$1"
 case "$j" in
@@ -55,6 +69,10 @@ case "$j" in
   *) ;;
 esac
 
+if [ -z "$electroniccommand" ]
+then
+  free=""
+fi
 if [ -z "$profile" ] 
 then
   if [ -z "$dpi" ] 
@@ -140,18 +158,42 @@ then
 fi
 gs -dBATCH -dNOPAUSE -q "-sDEVICE=$outputdev" "-r$rdpi" -sOutputFile="|'$script' '$tmpdir/$name-%04d.djvu'" "$input"
 
-if [ -d "$output" ] 
+if [ -z "$joincommand$bundlecommand" ]
 then
-  combine="djvujoin"
-  output="$output/index.djvu"
+  free="true"
+elif [ -z "$mergecommand" ]
+then
+  free=""
+fi
+if [ -n "$free" ]
+then
+  combine=$mergecommand 
+  split=$splitcommand
+  if [ -d "$output" ] 
+  then
+    output="$output/index.djvu"
+    echo "$combine -c $tmpdir/bundled.djvu $tmpdir/$name-*.djvu"
+    "$combine" -c "$tmpdir/bundled.djvu" "$tmpdir/$name-"*.djvu
+    echo "$split -i $tmpdir/bundled.djvu $output"
+    "$split" -i "$tmpdir/bundled.djvu" "$output"
+  else
+    echo "$combine -c $output $tmpdir/$name-*.djvu"
+    "$combine" -c "$output" "$tmpdir/$name-"*.djvu
+  fi
 else
-  combine="djvubundle"
+  if [ -d "$output" ] 
+  then
+    combine="$joincommand"
+    output="$output/index.djvu"
+  else
+    combine="$bundlecommand"
+  fi
+  rm -f "$output"
+  if [ -n "$verbose" ]
+  then
+    echo "$combine $cargs $tmpdir/$name-*.djvu $output"
+  fi
+  "$combine" $cargs "$tmpdir/$name-"*.djvu "$output"
 fi
-rm -f "$output"
-if [ -n "$verbose" ]
-then
-  echo "$combine $cargs $tmpdir/$name-*.djvu $output"
-fi
-"$combine" $cargs "$tmpdir/$name-"*.djvu "$output"
 rm -rf "$tmpdir"
 
