@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.82 1999-12-02 17:08:42 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.83 1999-12-02 22:37:31 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -1170,64 +1170,6 @@ DjVuDocument::request_data(const DjVuPort * source, const GURL & url)
    return data_pool;
 }
 
-static GP<DataPool>
-unlink_file(const GP<DataPool> & data, const char * name)
-      // Will process contents of data[] and remove any INCL chunk
-      // containing 'name'
-{
-   MemoryByteStream str_out;
-   IFFByteStream iff_out(str_out);
-
-   GP<ByteStream> str_in=data->get_stream();
-   IFFByteStream iff_in(*str_in);
-
-   int chksize;
-   GString chkid;
-   if (!iff_in.get_chunk(chkid)) return data;
-
-   iff_out.put_chunk(chkid);
-
-   while((chksize=iff_in.get_chunk(chkid)))
-   {
-      if (chkid=="INCL")
-      {
-	 GString incl_str;
-	 char buffer[1024];
-	 int length;
-	 while((length=iff_in.read(buffer, 1024)))
-	    incl_str+=GString(buffer, length);
-
-	    // Eat '\n' in the beginning and at the end
-	 while(incl_str.length() && incl_str[0]=='\n')
-	 {
-	    GString tmp=((const char *) incl_str)+1; incl_str=tmp;
-	 }
-	 while(incl_str.length()>0 && incl_str[(int)incl_str.length()-1]=='\n')
-	    incl_str.setat(incl_str.length()-1, 0);
-	    
-	 if (incl_str!=name)
-	 {
-	    iff_out.put_chunk(chkid);
-	    iff_out.writall((const char*)incl_str, incl_str.length());
-	    iff_out.close_chunk();
-	 }
-      } else
-      {
-	 iff_out.put_chunk(chkid);
-	 char buffer[1024];
-	 int length;
-	 while((length=iff_in.read(buffer, 1024)))
-	    iff_out.writall(buffer, length);
-	 iff_out.close_chunk();
-      }
-      iff_in.close_chunk();
-   }
-   iff_out.close_chunk();
-   iff_out.flush();
-   str_out.seek(0, SEEK_SET);
-   return new DataPool(str_out);
-}
-
 static void
 add_file_to_djvm(const GP<DjVuFile> & file, bool page,
 		 DjVmDoc & doc, GMap<GURL, void *> & map)
@@ -1253,7 +1195,7 @@ add_file_to_djvm(const GP<DjVuFile> & file, bool page,
 	 {
 	    GP<DjVuFile> f=files_list[pos];
 	    if (f->contains_chunk("NDIR"))
-	       data=unlink_file(data, f->get_url().name());
+	       data=DjVuFile::unlink_file(data, f->get_url().name());
 	 }
 	 
 	    // Finally add it to the document

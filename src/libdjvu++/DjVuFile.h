@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.h,v 1.51 1999-11-23 22:52:28 praveen Exp $
+//C- $Id: DjVuFile.h,v 1.52 1999-12-02 22:37:31 eaf Exp $
  
 #ifndef _DJVUFILE_H
 #define _DJVUFILE_H
@@ -46,7 +46,7 @@
 
     @memo Classes representing DjVu files.
     @author Andrei Erofeev <eaf@research.att.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuFile.h,v 1.51 1999-11-23 22:52:28 praveen Exp $#
+    @version #$Id: DjVuFile.h,v 1.52 1999-12-02 22:37:31 eaf Exp $#
 */
 
 //@{
@@ -376,6 +376,9 @@ public:
    void		insert_file(const char * id, int chunk_num=1);
       /// Will get rid of included file with the given #id#
    void		unlink_file(const char * id);
+      /** Will find an #INCL# chunk containing #name# in input #data# and
+	  will remove it */
+   static GP<DataPool>	unlink_file(const GP<DataPool> & data, const char * name);
 
       /// Returns the number of chunks in the IFF file data
    int		get_chunks_number(void);
