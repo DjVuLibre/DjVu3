@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GURL.cpp,v 1.86 2001-07-24 20:34:15 mchen Exp $
+// $Id: GURL.cpp,v 1.87 2001-07-25 23:42:20 fcrary Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -295,6 +295,7 @@ GURL::beautify_path(GUTF8String xurl)
   xurl=buffer;
   return (xurl+args);
 }
+
 /*
 GUTF8String
 GURL::beautify_path(GUTF8String xurl)
@@ -479,11 +480,11 @@ GURL::operator=(const GURL & url_in)
    if(url_in.is_valid())
    {
      url=url_in.get_string();
-	 init(true);
+	   init(true);
    }else
    {
      url=url_in.url;
-	 validurl=false;
+	   validurl=false;
    }
    return *this;
 }

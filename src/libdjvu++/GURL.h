@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GURL.h,v 1.46 2001-07-24 17:52:04 bcr Exp $
+// $Id: GURL.h,v 1.47 2001-07-25 23:42:20 fcrary Exp $
 // $Name:  $
 
 #ifndef _GURL_H_
@@ -49,7 +49,7 @@
     \Ref{GURL} class used to store URLs in a system independent format.
     @memo System independent URL representation.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: GURL.h,v 1.46 2001-07-24 17:52:04 bcr Exp $#
+    @version #$Id: GURL.h,v 1.47 2001-07-25 23:42:20 fcrary Exp $#
 */
 
 //@{
@@ -126,8 +126,8 @@ protected:
    void		parse_cgi_args(void);
    void		store_cgi_args(void);
 public:
-   /// Test if the URL is valid.
-   bool is_valid(void) const;
+   /// Test if the URL is valid. If invalid, reinitialize.
+   bool is_valid(void) const;     // const lies to the compiler because of dependency problems
 
       /// Extracts the {\em protocol} part from the URL and returns it
    GUTF8String	protocol(void) const;
@@ -379,6 +379,8 @@ GURL::is_empty(void) const
    return !url.length()||!get_string().length();
 }
 
+// Test if the URL is valid.
+// If invalid, reinitialize and return the result.
 inline bool
 GURL::is_valid(void) const
 {
