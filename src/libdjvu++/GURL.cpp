@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GURL.cpp,v 1.21 2000-01-19 22:45:17 eaf Exp $
+//C- $Id: GURL.cpp,v 1.22 2000-01-21 18:24:46 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -21,6 +21,8 @@
 
 #include <string.h>
 #include <ctype.h>
+
+static const char * DJVUOPTS="DJVUOPTS";
 
 static bool
 is_argument(const char * start)
@@ -181,6 +183,8 @@ GURL::hash_argument(void) const
 
 void
 GURL::parse_cgi_args(void)
+      // Will read CGI arguments from the URL into
+      // cgi_name_arr and cgi_value_arr
 {
    GCriticalSectionLock lock1(&url_lock);
    GCriticalSectionLock lock2(&cgi_lock);
@@ -234,6 +238,34 @@ GURL::parse_cgi_args(void)
    }
 }
 
+void
+GURL::store_cgi_args(void)
+      // Will store CGI arguments from the cgi_name_arr and cgi_value_arr
+      // back into the URL
+{
+   GCriticalSectionLock lock1(&url_lock);
+   GCriticalSectionLock lock2(&cgi_lock);
+
+   GString new_url;
+   for(const char * ptr=url;*ptr;ptr++)
+      if (ptr[0]=='?' || ptr[0]=='%' &&
+	  ptr[1]=='3' && toupper(ptr[2])=='F')
+      {
+	 new_url=GString(url, ptr-url);
+	 break;
+      }
+   
+   for(int i=0;i<cgi_name_arr.size();i++)
+   {
+      if (i) new_url+="&"+cgi_name_arr[i];
+      else new_url+="?"+cgi_name_arr[i];
+      if (cgi_value_arr[i].length())
+	 new_url+="="+cgi_value_arr[i];
+   }
+
+   url=new_url;
+}
+
 int
 GURL::cgi_arguments(void) const
 {
@@ -269,6 +301,50 @@ GURL::cgi_values(void) const
 {
    GCriticalSectionLock lock((GCriticalSection *) &cgi_lock);
    return cgi_value_arr;
+}
+
+DArray<GString>
+GURL::djvu_cgi_names(void) const
+{
+   GCriticalSectionLock lock((GCriticalSection *) &cgi_lock);
+
+   int i;
+   DArray<GString> arr;
+   for(i=0;i<cgi_name_arr.size();i++)
+      if (cgi_name_arr[i].upcase()==DJVUOPTS)
+	 break;
+
+   int size=cgi_name_arr.size()-(i+1);
+   if (size>0)
+   {
+      arr.resize(size-1);
+      for(i=0;i<arr.size();i++)
+	 arr[i]=cgi_name_arr[cgi_name_arr.size()-arr.size()+i];
+   }
+
+   return arr;
+}
+
+DArray<GString>
+GURL::djvu_cgi_values(void) const
+{
+   GCriticalSectionLock lock((GCriticalSection *) &cgi_lock);
+
+   int i;
+   DArray<GString> arr;
+   for(i=0;i<cgi_name_arr.size();i++)
+      if (cgi_name_arr[i].upcase()==DJVUOPTS)
+	 break;
+
+   int size=cgi_name_arr.size()-(i+1);
+   if (size>0)
+   {
+      arr.resize(size-1);
+      for(i=0;i<arr.size();i++)
+	 arr[i]=cgi_value_arr[cgi_value_arr.size()-arr.size()+i];
+   }
+
+   return arr;
 }
 
 void
@@ -310,6 +386,78 @@ GURL::clear_hash_argument(void)
    }
    url=new_url;
    parse_cgi_args();
+}
+
+void
+GURL::clear_cgi_arguments(void)
+{
+   GCriticalSectionLock lock1(&url_lock);
+   GCriticalSectionLock lock2(&cgi_lock);
+
+      // Clear the arrays
+   cgi_name_arr.empty();
+   cgi_value_arr.empty();
+
+      // And clear everything past the '?' sign in the URL
+   for(const char * ptr=url;*ptr;ptr++)
+      if (ptr[0]=='?' || ptr[0]=='%' &&
+	  ptr[1]=='3' && toupper(ptr[2])=='F')
+      {
+	 url.setat(ptr-url, 0);
+	 break;
+      }
+}
+
+void
+GURL::clear_djvu_cgi_arguments(void)
+{
+      // First - modify the arrays
+   GCriticalSectionLock lock(&cgi_lock);
+   for(int i=0;i<cgi_name_arr.size();i++)
+      if (cgi_name_arr[i].upcase()==DJVUOPTS)
+      {
+	 cgi_name_arr.resize(i-1);
+	 cgi_value_arr.resize(i-1);
+	 break;
+      }
+
+      // And store them back into the URL
+   store_cgi_args();
+}
+
+void
+GURL::add_djvu_cgi_argument(const char * name, const char * value)
+{
+   GCriticalSectionLock lock1(&url_lock);
+   GCriticalSectionLock lock2(&cgi_lock);
+
+      // Check if we already have the "DJVUOPTS" argument
+   bool have_djvuopts=false;
+   for(int i=0;i<cgi_name_arr.size();i++)
+      if (cgi_name_arr[i].upcase()==DJVUOPTS)
+      {
+	 have_djvuopts=true;
+	 break;
+      }
+
+      // If there is no DJVUOPTS, insert it
+   if (!have_djvuopts)
+   {
+      int pos=cgi_name_arr.size();
+      cgi_name_arr.resize(pos);
+      cgi_value_arr.resize(pos);
+      cgi_name_arr[pos]=DJVUOPTS;
+   }
+
+      // Add new argument to the array
+   int pos=cgi_name_arr.size();
+   cgi_name_arr.resize(pos);
+   cgi_value_arr.resize(pos);
+   cgi_name_arr[pos]=name;
+   cgi_value_arr[pos]=value;
+
+      // And update the URL
+   store_cgi_args();
 }
 
 bool
