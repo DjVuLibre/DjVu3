@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: DjVmDir.cpp,v 1.21 2000-05-19 19:00:05 bcr Exp $
+//C- $Id: DjVmDir.cpp,v 1.22 2000-06-19 17:40:43 bcr Exp $
 
 
 #ifdef __GNUC__
@@ -35,8 +35,6 @@ DjVmDir::File::is_legal_id(const char *id)
     return false;
   return true;
 }
-
-
 
 /* DjVmDir::File */
 
@@ -63,6 +61,23 @@ DjVmDir::File::File(const char *name, const char *id,
   flags=page ? PAGE : INCLUDE;
 }
    
+GString
+DjVmDir::File::get_str_type(void) const
+{
+   GString type;
+   switch(flags & TYPE_MASK)
+   {
+      case INCLUDE: type="INCLUDE"; break;
+      case PAGE: type="PAGE"; break;
+      case THUMBNAILS: type="THUMBNAILS"; break;
+      case SHARED_ANNO: type="SHARED_ANNO"; break;
+      default:
+	 THROW("Internal error: please modify DjVmDir::File::type_to_str()\n"
+	       "to contain all possible File types.");
+   }
+   return type;
+}
+
 
 const int DjVmDir::version=1;
 

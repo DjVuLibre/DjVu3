@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.126 2000-06-06 18:59:39 bcr Exp $
+//C- $Id: DjVuFile.cpp,v 1.127 2000-06-19 17:40:43 bcr Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -489,7 +489,17 @@ DjVuFile::process_incl_chunk(ByteStream & str, int file_num)
       }
       CATCH(ex) {
 	 unlink_file(incl_str);
-	 EXTHROW(ex);
+	    // In order to keep compatibility with the previous
+	    // release of the DjVu plugin, we will not interrupt
+	    // decoding here. We will just report the error.
+	    // NOTE, that it's now the responsibility of the
+	    // decoder to resolve all chunk dependencies, and
+	    // abort decoding if necessary.
+
+	    // EXTHROW(ex); /* commented out */
+	 
+	 get_portcaster()->notify_error(this,ex.get_cause());
+	 return 0;
       }
       ENDCATCH;
       if (!file)

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.h,v 1.62 2000-06-06 18:59:38 bcr Exp $
+//C- $Id: DjVuDocument.h,v 1.63 2000-06-19 17:40:43 bcr Exp $
  
 #ifndef _DJVUDOCUMENT_H
 #define _DJVUDOCUMENT_H
@@ -33,7 +33,7 @@
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocument.h,v 1.62 2000-06-06 18:59:38 bcr Exp $#
+    @version #$Id: DjVuDocument.h,v 1.63 2000-06-19 17:40:43 bcr Exp $#
 */
 
 //@{
@@ -647,7 +647,20 @@ public:
 	  learnt enough information about the document (#DOC_DIR_KNOWN# has
 	  not been set yet). Check \Ref{is_init_complete}() and \Ref{init}()
           for details. */
-   inline GP<DjVmDir>		get_djvm_dir(void) const;
+   GP<DjVmDir>		get_djvm_dir(void) const;
+      /** Returns pointer to the internal directory of the document, if it
+	  is in obsolete #OLD_BUNDLED# format.
+
+	  #ZERO# will also be returned if the initializing thread has not
+	  learnt enough information about the document (#DOC_DIR_KNOWN# has
+	  not been set yet). Check \Ref{is_init_complete}() and \Ref{init}()
+          for details. */
+   GP<DjVmDir0>		get_djvm_dir0(void) const;
+      /** Returns pointer to {\em navigation directory} of the document.
+	  The navigation directory is a DjVu file containing only one
+	  chunk #NDIR# inside a #FORM:DJVI# with the list of all
+	  document pages. */
+   GP<DjVuNavDir>	get_nav_dir(void) const;
 
       /// Returns TRUE if #class_name# is #"DjVuDocument"# or #"DjVuPort"#
    virtual bool		inherits(const char * class_name) const;
@@ -834,6 +847,20 @@ DjVuDocument::get_djvm_dir(void) const
    if (doc_type!=BUNDLED && doc_type!=INDIRECT)
       THROW("The document is in obsolete format => no DjVm directory.");
    return djvm_dir;
+}
+
+inline GP<DjVmDir0>
+DjVuDocument::get_djvm_dir0(void) const
+{
+   if (doc_type!=OLD_BUNDLED)
+      THROW("Only OLD_BUNDLED documents have DjVm v.0 directory.");
+   return djvm_dir0;
+}
+
+inline GP<DjVuNavDir>
+DjVuDocument::get_nav_dir(void) const
+{
+   return ndir;
 }
 
 inline void
