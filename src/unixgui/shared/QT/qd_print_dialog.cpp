@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qd_print_dialog.cpp,v 1.3 2001-07-25 17:10:43 mchen Exp $
+// $Id: qd_print_dialog.cpp,v 1.4 2001-07-31 17:37:12 mchen Exp $
 // $Name:  $
 
 
@@ -130,7 +130,8 @@ QDPrintDialog::setColorMode(bool color)
 void
 QDPrintDialog::setPSLevel(int level)
 {
-   if (level==2) level2_butt->setChecked(TRUE);
+   if (level==3) level3_butt->setChecked(TRUE);
+   else if (level==2) level2_butt->setChecked(TRUE);
    else level1_butt->setChecked(TRUE);
 }
 
@@ -318,7 +319,7 @@ QDPrintDialog::refresh_cb(void * cl_data)
 }
 
 void
-QDPrintDialog::decProgress_cb(float done, void * cl_data)
+QDPrintDialog::decProgress_cb(double done, void * cl_data)
 {
    QDPrintDialog * th=(QDPrintDialog *) cl_data;
    if (done<0)
@@ -332,7 +333,7 @@ QDPrintDialog::decProgress_cb(float done, void * cl_data)
 }
 
 void
-QDPrintDialog::prnProgress_cb(float done, void * cl_data)
+QDPrintDialog::prnProgress_cb(double done, void * cl_data)
 {
    QDPrintDialog * th=(QDPrintDialog *) cl_data;
    th->progress->setProgress(done*20);
@@ -404,7 +405,8 @@ QDPrintDialog::done(int rc)
 	 bool printColor=color_butt->isChecked();
 	 bool printPortrait=portrait_butt->isChecked();
 	 bool printPS=ps_butt->isChecked();
-	 bool printLevel2=level2_butt->isChecked();
+	 int printLevel=level3_butt->isChecked() ? 3 :
+	    level2_butt->isChecked() ? 2 : 1;
 	 int zoom=zoom_menu->currentText()==fit_page_str ?
 		  DjVuToPS::Options::FIT_PAGE :
 		  zoom_menu->currentText()==one_to_one_str ? 100 :
@@ -422,7 +424,8 @@ QDPrintDialog::done(int rc)
 
 	 prog_widget->setActiveWidget(progress);
 	 progress->reset();
-	 GP<DjVuToPS> print=DjVuToPS::create();
+	 //GP<DjVuToPS> print=DjVuToPS::create();
+	 GP<DjVuToPS> print=new DjVuToPS();
 	 if (prefs->dPrinterGamma>0)
 	    print->options.set_gamma(prefs->dPrinterGamma);
 	 else
@@ -434,7 +437,7 @@ QDPrintDialog::done(int rc)
 		      DjVuToPS::Options::COLOR);
 	 
 	 opt.set_format(printPS ? DjVuToPS::Options::PS : DjVuToPS::Options::EPS);
-	 opt.set_level(printLevel2 ? 2 : 1);
+	 opt.set_level(printLevel);
 	 opt.set_orientation(printPortrait ? DjVuToPS::Options::PORTRAIT :
 			     DjVuToPS::Options::LANDSCAPE);
 	 opt.set_color(printColor);
@@ -470,7 +473,7 @@ QDPrintDialog::done(int rc)
       
 	 DEBUG_MSG("updating preferences\n");
 	 DjVuPrefs disk_prefs;
-	 disk_prefs.printLevel2=prefs->printLevel2=printLevel2;
+	 disk_prefs.printLevel=prefs->printLevel=printLevel;
 	 disk_prefs.printPS=prefs->printPS=printPS;
 	 disk_prefs.printToFile=prefs->printToFile=printToFile;
 	 disk_prefs.printColor=prefs->printColor=printColor;
@@ -722,7 +725,7 @@ QDPrintDialog::QDPrintDialog(const GP<DjVuDocument> & _doc,
    vlay->addWidget(bg);
    bg_lay=new QVBoxLayout(bg, 10);
    bg_lay->addSpacing(bg->fontMetrics().height());
-   bgrid=new QGridLayout(2, 2, 20); bg_lay->addLayout(bgrid);
+   bgrid=new QGridLayout(3, 2, 20); bg_lay->addLayout(bgrid);
    level1_butt=new QeRadioButton(tr("Level &1"), bg, "level1_butt");
    bgrid->addWidget(level1_butt, 0, 0);
    label=new QeLabel(tr("Use this setting to generate a portable\nPostScript file. ")+
@@ -734,6 +737,12 @@ QDPrintDialog::QDPrintDialog(const GP<DjVuDocument> & _doc,
 		     tr("The file will not be\ncompatible with PS Level 1 printers."),
 		     bg, "level2_label");
    bgrid->addWidget(label, 1, 1);
+   level3_butt=new QeRadioButton(tr("Level &3"), bg, "level3_butt");
+   bgrid->addWidget(level3_butt, 2, 0);
+   label=new QeLabel(tr("Create an even smaller PostScript file. ")+
+		     tr("The file will\nnot be compatible with PS Level 1 or 2 printers."),
+		     bg, "level3_label");
+   bgrid->addWidget(label, 2, 1);
  
    bg_lay->activate();
 
@@ -830,7 +839,7 @@ QDPrintDialog::QDPrintDialog(const GP<DjVuDocument> & _doc,
    setPSFormat(prefs->printPS);
    setPortrait(prefs->printPortrait);
    setColorMode(prefs->printColor);
-   setPSLevel(prefs->printLevel2 ? 2 : 1);
+   setPSLevel(prefs->printLevel);
    setFileName(QStringFromGString(prefs->printFile));
    setCommand(QStringFromGString(prefs->printCommand));
    printToFile(prefs->printToFile);

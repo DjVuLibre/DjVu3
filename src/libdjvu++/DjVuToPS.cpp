@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuToPS.cpp,v 1.29 2001-07-31 16:15:38 bcr Exp $
+// $Id: DjVuToPS.cpp,v 1.30 2001-07-31 17:37:12 mchen Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -201,7 +201,7 @@ DjVuToPS::write(ByteStream &str, const char *format, ...)
   va_list args;
   va_start(args, format);
   GUTF8String tmp;
-  tmp.format(format, args);
+  tmp.vformat(format, args);
   str.writall((const char *) tmp, tmp.length());
 }
 

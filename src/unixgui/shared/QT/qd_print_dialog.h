@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qd_print_dialog.h,v 1.3 2001-07-25 17:10:43 mchen Exp $
+// $Id: qd_print_dialog.h,v 1.4 2001-07-31 17:37:12 mchen Exp $
 // $Name:  $
 
 
@@ -65,7 +65,7 @@ private:
    class QeRadioButton	* ps_butt, * eps_butt;
    class QeRadioButton	* portrait_butt, * landscape_butt;
    class QeRadioButton	* color_butt, * grey_butt;
-   class QeRadioButton	* level1_butt, * level2_butt;
+   class QeRadioButton	* level1_butt, * level2_butt, * level3_butt;
    class QeComboBox	* what_menu;
    class QeSpinBox	* copies_spin;
    class QeLabel	* custompages_label;
@@ -101,8 +101,8 @@ private:
    static int		str2id(const QString &);
    
    static void		refresh_cb(void * cl_data);
-   static void		prnProgress_cb(float done, void * cl_data);
-   static void		decProgress_cb(float done, void * cl_data);
+   static void		prnProgress_cb(double done, void * cl_data);
+   static void		decProgress_cb(double done, void * cl_data);
    static void		info_cb(int page_num, int page_cnt, int tot_pages,
 				DjVuToPS::Stage stage,void * cl_data);
 
