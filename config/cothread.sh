@@ -47,8 +47,8 @@ then
       CCCOTHREAD="-DTHREADMODEL=COTHREADS"
       echon "Testing exception handler patch for ${CC} ... "
       testfile $temp.c <<\EOF
-extern "C" void *(*__get_eh_context_ptr)(void);
-extern "C" void *__new_eh_context(void);
+void *(*__get_eh_context_ptr)(void);
+void *__new_eh_context(void);
 void main() { __get_eh_context_ptr = &__new_eh_context; }
 EOF
       if ( run $CC $CCFLAGS $temp.c -o $temp ) 
