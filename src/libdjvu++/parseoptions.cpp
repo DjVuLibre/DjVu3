@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: parseoptions.cpp,v 1.34 2000-02-01 19:11:37 bcr Exp $
+//C- $Id: parseoptions.cpp,v 1.35 2000-02-02 00:40:19 bcr Exp $
 #ifdef __GNUC__
 #pragma implementation
 #endif
@@ -502,8 +502,8 @@ DjVuParseOptions::GetInteger
 // else, excluding white space, the errval supplied will be returned.
 //
 int
-DjVuParseOptions::GetNumber
-(const int token,const int errval) const 
+DjVuParseOptions::GetNumber(
+  const int token,const int errval) const 
 {
   const char mesg[]="'%1.10s' is not a number";
   int retval=errval;
