@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.131 2001-09-13 23:44:21 docbill Exp $
+// $Id: GString.cpp,v 1.132 2001-09-19 15:53:35 leonb Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -2648,6 +2648,12 @@ GNativeString
 operator+(const char    *s1, const GNativeString &s2)
 { return GStringRep::Native::create(s1,s2); }
 
+GNativeString&
+GNativeString::operator+= (char ch)
+{
+  char s[2]; s[0]=ch; s[1]=0;
+  return init(GStringRep::Native::create((const char*)*this, s));
+}
 
 GNativeString&
 GNativeString::operator+= (const char *str)
