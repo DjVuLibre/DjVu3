@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.cpp,v 1.51 2001-02-15 22:28:22 fcrary Exp $
+// $Id: ByteStream.cpp,v 1.52 2001-02-26 23:24:48 fcrary Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 04/1997
@@ -75,21 +75,23 @@ __inline int dup2(int _a, int _b ) 	{ return _dup2(_a, _b);}
 class ByteStream::Stdio : public ByteStream {
 public:
   Stdio(void);
+
   /** Constructs a ByteStream for accessing the file named #filename#.
       Arguments #filename# and #mode# are similar to the arguments of the well
       known stdio function #fopen#. In addition a filename of #-# will be
       interpreted as the standard output or the standard input according to
       #mode#.  This constructor will open a stdio file and construct a
       ByteStream object accessing this file. Destroying the ByteStream object
-      will flush and close the associated stdio file.  Exception
-      \Ref{GException} is thrown with a plain text error message if the stdio
-      file cannot be opened. */
+      will flush and close the associated stdio file.  Returns an error code
+      if the stdio file cannot be opened. */
   GString init(const char filename[], const char * const mode);
+
   /** Constructs a ByteStream for accessing the stdio file #f#.
       Argument #mode# indicates the type of the stdio file, as in the
       well known stdio function #fopen#.  Destroying the ByteStream
       object will not close the stdio file #f# unless closeme is true. */
   GString init(FILE * const f, const char * const mode="rb", const bool closeme=false);
+
   // Virtual functions
   ~Stdio();
   virtual size_t read(void *buffer, size_t size);
@@ -491,6 +493,7 @@ ByteStream::Stdio::init(const char mode[])
     {
       case 'r':
         can_read=true;
+        break;
       case 'w': 
       case 'a':
         can_write=true;
@@ -528,7 +531,7 @@ ByteStream::Stdio::init(const char filename[], const char mode[])
   if (filename[0] != '-' || filename[1])
   {
 #ifdef macintosh
-	fp = fopen(filename, mode);
+	  fp = fopen(filename, mode);
 #else
     fp = fopen(GOS::expand_name(filename), mode);
 #endif
