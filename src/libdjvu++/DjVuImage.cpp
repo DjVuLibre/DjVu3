@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuImage.cpp,v 1.34 1999-11-16 02:05:56 leonb Exp $
+//C- $Id: DjVuImage.cpp,v 1.35 1999-11-16 19:01:01 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -684,6 +684,7 @@ DjVuImage::stencil(GPixmap *pm, const GRect &rect,
 		   int subsample, double gamma) const
 {
   // Warping and blending. 
+  if (!pm) return 0;
   // Access components
   int width = get_width();
   int height = get_height();
