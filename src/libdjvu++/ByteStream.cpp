@@ -25,7 +25,7 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.cpp,v 1.31 2000-11-02 01:08:34 bcr Exp $
+// $Id: ByteStream.cpp,v 1.32 2000-11-02 23:21:22 bcr Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 04/1997
@@ -320,22 +320,25 @@ StdioByteStream::read(void *buffer, size_t size)
 {
   if (!can_read)
     G_THROW("ByteStream.no_read");                    //  StdioByteStream not opened for reading
-#ifndef UNDER_CE
-restart:
-#endif
-  size_t nitems = fread(buffer, 1, size, fp); 
-  if (nitems<=0 && ferror(fp))
+  do
+  {
+    clearerr(fp);
+    size_t nitems = fread(buffer, 1, size, fp); 
+    if (nitems<=0 && ferror(fp))
     {
 #ifdef EINTR
-      if (errno==EINTR)
-	goto restart;
+      if (errno!=EINTR)
 #endif
 #ifndef UNDER_CE
         G_THROW(strerror(errno));                     //  (No error in the DjVuMessageFile)
 #else
         G_THROW("ByteStream.read_error2");            //  StdioByteStream::read, read error.
 #endif
+    }else
+    {
+      break;
     }
+  }while(true);
   pos += nitems;
   return nitems;
 }
@@ -345,22 +348,25 @@ StdioByteStream::write(const void *buffer, size_t size)
 {
   if (!can_write)
     G_THROW("ByteStream.no_write");                   //  StdioByteStream not opened for writing
-#ifndef UNDER_CE
- restart:
-#endif
-  size_t nitems = fwrite(buffer, 1, size, fp);
-  if (nitems<=0 && ferror(fp))
+  do
+  {
+    clearerr(fp);
+    size_t nitems = fwrite(buffer, 1, size, fp);
+    if (nitems<=0 && ferror(fp))
     {
 #ifdef EINTR
-      if (errno==EINTR)
-	goto restart;
+      if (errno!=EINTR)
 #endif
 #ifndef UNDER_CE
         G_THROW(strerror(errno));                     //  (No error in the DjVuMessageFile)
 #else
         G_THROW("ByteStream.write_error2");           //  StdioByteStream::write, write error.
 #endif
+    }else
+    {
+      break;
     }
+  }while(true);
   pos += nitems;
   return nitems;
 }
