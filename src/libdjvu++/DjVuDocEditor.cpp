@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: DjVuDocEditor.cpp,v 1.34 2000-05-22 23:58:08 mrosen Exp $
+//C- $Id: DjVuDocEditor.cpp,v 1.35 2000-05-23 01:30:51 bcr Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -241,8 +241,9 @@ DjVuDocEditor::url_to_file(const GURL & url, bool dont_create)
       GCriticalSectionLock lock(&files_lock);
       GPosition pos;
       if (files_map.contains(frec->id, pos))
+      {
 	 files_map[frec->id]->file=file;
-      else
+      }else
       {
 	 GP<File> f=new File();
 	 f->file=file;
@@ -1314,13 +1315,15 @@ DjVuDocEditor::file_thumbnails(void)
 {
    DEBUG_MSG("DjVuDocEditor::file_thumbnails(): updating DjVmDir\n");
    DEBUG_MAKE_INDENT(3);
-
    unfile_thumbnails();
 
       // Generate thumbnails if they're missing due to some reason.
    int thumb_num=get_thumbnails_num();
    int size=thumb_num>0 ? get_thumbnails_size() : 128;
-   if (thumb_num!=get_pages_num()) generate_thumbnails(size);
+   if (thumb_num!=get_pages_num())
+   {
+     generate_thumbnails(size);
+   }
 
    DEBUG_MSG("filing thumbnails\n");
 
@@ -1339,7 +1342,9 @@ DjVuDocEditor::file_thumbnails(void)
       GString id=page_to_id(page_num);
 
       if (!thumb_map.contains(id, pos))
+      {
 	 THROW("Internal error: Can't find thumbnail for page "+GString(page_num));
+      }
       TArray<char> & data=*(TArray<char> *) thumb_map[pos];
       iff->put_chunk("TH44");
       iff->write((const char *) data, data.size());
@@ -1355,7 +1360,7 @@ DjVuDocEditor::file_thumbnails(void)
          }
          id=id.substr(0,i)+".thumb";
 	    // Get unique ID for this file
-	 GString id=find_unique_id(id);
+	 id=find_unique_id(id);
 
 	    // Create a file record with the chosen ID
 	 GP<DjVmDir::File> file=new DjVmDir::File(id, id, id, DjVmDir::File::THUMBNAILS);
@@ -1589,8 +1594,13 @@ DjVuDocEditor::save_as(const char * where, bool bundled)
       // Otherwise we will remove the thumbnails completely because
       // we really don't want to deal with documents, which have only
       // some of their pages thumbnailed.
-   if (get_thumbnails_num()==get_pages_num()) file_thumbnails();
-   else remove_thumbnails();
+   if (get_thumbnails_num()==get_pages_num())
+   {
+     file_thumbnails();
+   }else
+   { 
+     remove_thumbnails();
+   }
 
    GURL save_doc_url;
    GString save_doc_name;
@@ -1722,7 +1732,10 @@ DjVuDocEditor::save_as(const char * where, bool bundled)
 
 	 // Also update DjVmDir (to reflect changes in offsets)
       djvm_dir=doc->get_djvm_dir();
-   } else THROW("Can't save the document. Use 'Save As'");
+   } else
+   {
+     THROW("Can't save the document. Use 'Save As'");
+   }
 
       // Now, after we have saved the document w/o any error, detach DataPools,
       // which are in the 'File's list to save memory. Detach everything.
