@@ -32,7 +32,7 @@
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #C- 
 #
-# $Id: pdftodjvu.pl,v 1.8 2001-05-17 00:16:24 debs Exp $
+# $Id: pdftodjvu.pl,v 1.9 2001-05-17 01:08:03 debs Exp $
 # $Name:  $
 
 # Perl libs to use
@@ -454,8 +454,7 @@ if ( $free )
 	$ictr = 0;
 	++$lctr;
 	$dfilelist = "";
-      } 
-      if ( $ctr == @ifiles ) {
+      } elsif ( $ctr == @ifiles ) {
         $ofile = sprintf("%s%s%04d%s", $odir, $obase, $lctr, $oext);
 	push @ofiles, $ofile;
 	if ( -f $ofile ) { unlink $ofile; }
