@@ -8,15 +8,13 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C- "$Id: djvutiffg4.h,v 1.3 2000-01-07 04:54:04 bcr Exp $"
+//C- "$Id: DjVuTiffG4API.h,v 1.1 2000-01-07 21:27:10 bcr Exp $"
 //C- -- Tiff G4 To DjVu
 //C- Author: Parag Deshmukh (Dec 99)
 #endif  /* __cplusplus */
 
 #ifndef _DJVUTIFFG4_H_
 #define _DJVUTIFFG4_H_
-
-#include <stdio.h>
 
 /** @name TiffG4ToDjVu.h
       functions used to convert multiple Tiff G4 images to DjVu multipage 
@@ -72,10 +70,10 @@ struct tiffg4todjvu_options_struct
   int vflip, hflip, invert, rotateAngle;
 
 /** logfile should be non-NULL to print verbose processing details */
-  FILE *logfile;
+  int logfilefd;
 
 /** helpfile should be non-NULL to print usage instructions */
-  FILE *helpfile;
+  int helpfileno;
 
 /** dpi should the resolution in dots per inch of input images. */
   int dpi;
@@ -134,7 +132,7 @@ const char * tiffg4todjvu_error(tiffg4todjvu_options []);
 void tiffg4todjvu_perror(tiffg4todjvu_options [],const char *);
 
 /** This will print usage instructions to the specified output. */
-void tiffg4todjvu_usage(FILE *out,const char *prog);
+void tiffg4todjvu_usage(int fd,const char *prog);
 
 #ifdef DOCXX_CODE
 //@}
@@ -159,11 +157,11 @@ struct djvutotiffg4_options_struct
     to avoid color images */
   int disable_mask;
 
-/** logfile should be non-NULL to print verbose processing details */
-  FILE *logfile;
+/** logfileno should be non-NULL to print verbose processing details */
+  int logfileno;
 
-/** helpfile should be non-NULL to print usage instructions */
-  FILE *helpfile;
+/** helpfileno should be non-NULL to print usage instructions */
+  int helpfileno;
 
 /** list of input filenames being the last. */
   const char * const * filelist;
