@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.h,v 1.37 1999-11-11 21:47:45 eaf Exp $
+//C- $Id: DjVuDocument.h,v 1.38 1999-11-17 03:29:15 bcr Exp $
  
 #ifndef _DJVUDOCUMENT_H
 #define _DJVUDOCUMENT_H
@@ -33,7 +33,7 @@
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@research.att.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocument.h,v 1.37 1999-11-11 21:47:45 eaf Exp $#
+    @version #$Id: DjVuDocument.h,v 1.38 1999-11-17 03:29:15 bcr Exp $#
 */
 
 //@{
@@ -265,9 +265,11 @@ public:
 		 tool, which should work with files on the hard disk only
 		 because #DjVuDocument# can access such files itself.
 	  @param cache It's used to cache decoded \Ref{DjVuFile}s and
-	         is actually useful in the plugin only. */
+	         is actually useful in the plugin only. 
+	  @param filelist This is only usefull in single threaded mode for
+		 finding all files opened in the pool. */
    void         init(const GURL & url, GP<DjVuPort> port=0, 
-                     DjVuFileCache * cache=0);
+                     DjVuFileCache * cache=0,GMap<GURL,GString> *filelist=0);
 
       /** Returns #TRUE# if the initialization thread finished successfully.
 	  As soon as it happens, the document becomes completely initialized

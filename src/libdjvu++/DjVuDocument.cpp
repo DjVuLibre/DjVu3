@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.61 1999-11-11 21:47:45 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.62 1999-11-17 03:29:15 bcr Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -41,9 +41,10 @@ DjVuDocument::DjVuDocument(void)
 {
 }
 
+
 void
 DjVuDocument::init(const GURL & url, GP<DjVuPort> xport,
-                   DjVuFileCache * xcache)
+                   DjVuFileCache * xcache,GMap<GURL,GString> *filelist)
 {
    if (init_called)
       THROW("DjVuDocument is already initialized");
@@ -58,6 +59,7 @@ DjVuDocument::init(const GURL & url, GP<DjVuPort> xport,
    init_url=url;
    DjVuPortcaster * pcaster=get_portcaster();
    if (!xport) xport=simple_port=new DjVuSimplePort();
+   simple_port->set_filelist(filelist);
    pcaster->add_route(this, xport);
    pcaster->add_route(this, this);
 

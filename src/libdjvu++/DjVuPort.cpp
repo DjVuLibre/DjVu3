@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuPort.cpp,v 1.21 1999-09-30 21:48:36 praveen Exp $
+//C- $Id: DjVuPort.cpp,v 1.22 1999-11-17 03:29:16 bcr Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -25,7 +25,6 @@
 //****************************************************************************
 //******************************* Globals ************************************
 //****************************************************************************
-
 
 static DjVuPortcaster *pcaster;
 
@@ -363,6 +362,12 @@ DjVuPortcaster::request_data(const DjVuPort * source, const GURL & url)
    for(GPosition pos=list;pos;++pos)
      if ((data = list[pos]->request_data(source, url)))
        break;
+   if (DjVuPort::filelist && url.is_local_file_url())
+   {
+     GString fname=GOS::url_to_filename(url);
+     if (GOS::basename(fname)=="-") fname="-";
+     (*DjVuPort::filelist)[url]=fname;
+   }
    return data;
 }
 
@@ -485,6 +490,13 @@ DjVuPort::notify_decode_progress(const DjVuPort *, float) {}
 //*************************** DjVuSimplePort *********************************
 //****************************************************************************
 
+GMap<GURL,GString> *DjVuPort::filelist=0;
+
+void
+DjVuPort::set_filelist(GMap<GURL,GString> *thisfilelist)
+{
+  filelist=thisfilelist;
+}
 
 GP<DataPool>
 DjVuSimplePort::request_data(const DjVuPort * source, const GURL & url)
@@ -494,7 +506,7 @@ DjVuSimplePort::request_data(const DjVuPort * source, const GURL & url)
       {
 	 GString fname=GOS::url_to_filename(url);
 	 if (GOS::basename(fname)=="-") fname="-";
-
+	 if(DjVuPort::filelist) (*DjVuPort::filelist)[url]=fname;
 	 return new DataPool(fname);
       }
    } CATCH(exc) {
@@ -533,6 +545,12 @@ DjVuMemoryPort::request_data(const DjVuPort * source, const GURL & url)
    for(GPosition pos=list;pos;++pos)
       if (list[pos]->url==url)
 	 return list[pos]->pool;
+   if (DjVuPort::filelist && url.is_local_file_url())
+   {
+     GString fname=GOS::url_to_filename(url);
+     if (GOS::basename(fname)=="-") fname="-";
+     (*DjVuPort::filelist)[url]=fname;
+   }
    return 0;
 }
 
