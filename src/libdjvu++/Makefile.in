@@ -1,42 +1,30 @@
-# Makefile for libDejaVu.a
-
-OBJS= 	GString.o		\
-	GException.o		\
-	GContainer.o		\
-	GRect.o			\
-	GSmartPointer.o		\
-	GThreads.o		\
-	ByteStream.o		\
-	ZPCodec.o		\
-	GBitmap.o		\
-	GPixmap.o		\
-	IFFByteStream.o		\
-	BSByteStream.o		\
-	JB2Image.o		\
-	GScaler.o               \
-	IWImage.o		\
-	DjVuImage.o             \
-	GOS.o                   \
-	DjVuGlobal.o            \
-	debug.o	
-
 SHELL=/bin/sh
+SRCDIR=@srcdir@
+TOP=@topdir@
+VPATH=@srcdir@
+CXX=@cxx@
+OPT=@opt@
+WARN=@warn@
+RANLIB=@ranlib@
+AR=@ar@
+DOCXX= doc++
+LDLIBS=@ldlibs@
+DEFS=@defs@
+CXXFLAGS= $(DEFS) $(OPT) $(WARN) -I$(TOP) -DUNIX
+LDFLAGS=
+
+# This 
+
 LIB= libdjvu++.a
 PROG= djvuinfo c44 d44 djvutopnm djvumake djvuextract ppmcoco bzz
 
-#CC=gcc
-#CXX=g++
-CC=egcs
-CXX=eg++
-OPT=-O3 -fomit-frame-pointer -funroll-all-loops
-CXXFLAGS= $(OPT) -Wall -Wno-unused -DUNIX
-CFLAGS= $(OPT) -Wall -Wno-unused -DUNIX
-LDFLAGS=
-SOFLAGS= $(LDFLAGS) -shared -Wl,-no_unresolved
-LDLIBS=-lm
-SOLIBS= $(LDLIBS) -lc -lgcc -lc
-RANLIB= :
-DOCXX= doc++
+
+# Makefile for libdjvu++.a
+
+LIBOBJS= GString.o GException.o GContainer.o GRect.o GSmartPointer.o \
+	 GThreads.o ByteStream.o ZPCodec.o GBitmap.o GPixmap.o \
+	 IFFByteStream.o BSByteStream.o JB2Image.o GScaler.o IWImage.o \
+	 DjVuImage.o GOS.o DjVuGlobal.o	debug.o	
 
 # Make all
 
@@ -45,9 +33,9 @@ all: $(LIB) $(PROG)
 
 # Rule for building the library
 
-$(LIB): $(OBJS) Makefile
+$(LIB): $(LIBOBJS) Makefile
 	if [ -r $(LIB) ] ; then rm $(LIB) ; fi
-	ar cq $(LIB) $(OBJS)
+	$(AR) cq $(LIB) $(LIBOBJS)
 	$(RANLIB) $(LIB)
 
 # Rules for building support programs
@@ -95,33 +83,41 @@ bzz: $(BZZOBJS) $(LIB) Makefile
 html:
 	-rm -rf @Doc
 	-mkdir @Doc 2>/dev/null
-	${DOCXX} -d @Doc -B libDejaVu.html libDejaVu.dxx
+	${DOCXX} -d @Doc -B $(TOP)/libdjvu++.html $(TOP)/libdjvu++.dxx
 
 dvi:
 	-@mkdir @Doc 2>/dev/null
-	${DOCXX} -t -o @Doc/libDejaVu.tex libDejaVu.dxx
-	( cd @Doc ; latex libDejaVu.tex ; latex libDejaVu.tex )
+	${DOCXX} -t -o @Doc/libdjvu++.tex $(TOP)/libdjvu++.dxx
+	( cd @Doc ; latex libdjvu++.tex ; latex libdjvu++.tex )
 
 # Generic rules
 
 clean:
-	-@rm 2>/dev/null -rf $(PROG) *.o *.a *.out ii_files
+	-rm 2>/dev/null -rf $(PROG) @Doc *.o *.a *.out *.rpo ii_files ; true
+	( cd @Tools ; $(MAKE) clean )
+	( cd @Test ; $(MAKE) clean )
+	-@echo Cleaned.
+
+distclean:
+	-rm 2>/dev/null -rf $(PROG) *.o *.a *.out *.rpo ii_files Makefile ; true
+	( cd @Tools ; $(MAKE) distclean )
+	( cd @Test ; $(MAKE) distclean )
 	-@echo Cleaned.
 
 depend:
 	sed -e '/^### DEPENDENCIES$$/,$$d' Makefile > Makefile.new
 	echo "### DEPENDENCIES" >> Makefile.new
-	for n in *.cpp ; do ${CXX} -MM $(CXXFLAGS) $$n >> Makefile.new ; done
+	for n in $(TOP)/*.cpp ; do ${CXX} -MM $(CXXFLAGS) $$n >> Makefile.new ; done
 	sed -e '1,$$s/^\(Test[A-Za-z0-9]*\)\.o:/\1:/g' < Makefile.new > Makefile
 	rm Makefile.new
 
-PHONY: html dvi clean depend disk
+PHONY: html dvi clean distclean depend disk
 
 
 # Handle cpp files as C++
 .SUFFIXES: .cpp
 .cpp.o:
-	$(CXX) $(CXXFLAGS) -c $< 
+	$(CXX) $(CXXFLAGS) -c $(SRCDIR)/$*.cpp
 
 
 

@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: TestThreads.cpp,v 1.2 1999-02-01 18:32:35 leonb Exp $
+//C-  $Id: TestThreads.cpp,v 1.3 1999-02-16 17:19:15 leonb Exp $
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -103,7 +103,7 @@ second(void *arg)
 
 GEvent sleeper;
 
-void
+int
 main()
 {
   th.create(second,(void*)1);

@@ -1,0 +1,82 @@
+SHELL=/bin/sh
+SRCDIR=@srcdir@
+VPATH=@srcdir@
+TOP=@topdir@
+CXX=@cxx@
+OPT=@opt@
+WARN=@warn@
+RANLIB=@ranlib@
+AR=@ar@
+DEFS=@defs@
+CXXFLAGS= $(DEFS) $(OPT) $(WARN) -I$(TOP) -DUNIX
+LDFLAGS=
+LDLIBS=@ldlibs@
+
+# Defs
+
+LIB= ../libdjvu++.a
+TARG= TestString TestException TestArray TestList TestMap\
+      TestBitmap TestSmartPointer TestJB2 TestThreads
+
+
+# Make all
+
+all: $(TARG)
+	echo Done.
+
+# Generic rules
+
+clean:
+	-rm 2>/dev/null -rf $(TARG) *.o *.out ii_files *.rpo ; true
+
+distclean:
+	-rm 2>/dev/null -rf $(TARG) *.o *.out ii_files *.rpo Makefile ; true
+
+PHONY: clean distclean
+
+# Handle cpp files as C++
+.SUFFIXES: .cpp
+.cpp.o:
+	$(CXX) $(CXXFLAGS) -c $(SRCDIR)/$*.cpp
+
+.cpp:
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $(SRCDIR)/$*.cpp $(LIB) $(LDLIBS)
+	@if test -f $(SRCDIR)/$@.exp ; then\
+	   if $@ > $@.out 2>&1  &&  cmp -s $@.out $(SRCDIR)/$@.exp  ;\
+	     then echo -- $@ passed ;\
+	     else echo -- $@ begin ; cat $@.out ; echo -- $@ end ;\
+           fi ;\
+	   else echo -- $@ compiled ;\
+	 fi
+
+TestThreads:
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o TestThreads $(SRCDIR)/TestThreads.cpp $(LIB) $(LDLIBS)
+	@if test -f $(SRCDIR)/$@.exp ; then\
+	   if $@ 2>&1 | sort > $@.out 2>&1  &&  cmp -s $@.out $(SRCDIR)/$@.exp  ;\
+	     then echo -- $@ passed ;\
+	     else echo -- $@ begin ; cat $@.out ; echo -- $@ end ;\
+           fi ;\
+	   else echo -- $@ compiled ;\
+	 fi
+
+
+### DEPENDENCIES
+TestArray: TestArray.cpp $(TOP)/GContainer.h $(TOP)/DjVuGlobal.h \
+ $(TOP)/GException.h $(TOP)/GString.h $(TOP)/GSmartPointer.h
+TestBitmap: TestBitmap.cpp $(TOP)/GBitmap.h $(TOP)/DjVuGlobal.h $(TOP)/GRect.h \
+ $(TOP)/ByteStream.h $(TOP)/GException.h $(TOP)/GContainer.h $(TOP)/GSmartPointer.h
+TestException: TestException.cpp $(TOP)/GException.h $(TOP)/DjVuGlobal.h \
+ $(TOP)/GString.h $(TOP)/GSmartPointer.h
+TestJB2: TestJB2.cpp $(TOP)/JB2Image.h $(TOP)/DjVuGlobal.h $(TOP)/GString.h \
+ $(TOP)/GException.h $(TOP)/GSmartPointer.h $(TOP)/GContainer.h $(TOP)/ZPCodec.h \
+ $(TOP)/ByteStream.h $(TOP)/GRect.h $(TOP)/GBitmap.h
+TestList: TestList.cpp $(TOP)/GContainer.h $(TOP)/DjVuGlobal.h \
+ $(TOP)/GException.h $(TOP)/GString.h $(TOP)/GSmartPointer.h
+TestMap: TestMap.cpp $(TOP)/GContainer.h $(TOP)/DjVuGlobal.h $(TOP)/GException.h \
+ $(TOP)/GString.h $(TOP)/GSmartPointer.h
+TestSmartPointer: TestSmartPointer.cpp $(TOP)/GSmartPointer.h \
+ $(TOP)/DjVuGlobal.h
+TestString: TestString.cpp $(TOP)/GString.h $(TOP)/DjVuGlobal.h \
+ $(TOP)/GException.h $(TOP)/GSmartPointer.h
+TestThreads: TestThreads.cpp $(TOP)/GThreads.h $(TOP)/DjVuGlobal.h \
+ $(TOP)/GException.h

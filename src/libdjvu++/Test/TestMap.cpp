@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: TestMap.cpp,v 1.2 1999-02-01 18:32:35 leonb Exp $
+//C-  $Id: TestMap.cpp,v 1.3 1999-02-16 17:19:15 leonb Exp $
 
 
 
@@ -56,29 +56,6 @@ PMAPIS(const GMap<int,GString> &map)
     printf("%d:%s ", map.key(pos), (const char*)map[pos]);
   printf(")\n");
 }
-
-void
-PCONTI(GContainer<int> &ga)
-{
-  int *np;
-  printf("( ");
-  GPosition pos(ga);
-  while (np = ga.next(pos))
-    printf("%d ", *np);
-  printf(")\n");
-}
-
-void
-PCONTS(GContainer<GString> &ga)
-{
-  GString *np;
-  printf("( ");
-  GPosition pos(ga);
-  while (np = ga.next(pos))
-    printf("\"%s\" ", (const char*)(*np));
-  printf(")\n");
-}
-
 
 int
 main()

@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: TestException.cpp,v 1.2 1999-02-01 18:32:35 leonb Exp $
+//C-  $Id: TestException.cpp,v 1.3 1999-02-16 17:19:15 leonb Exp $
 
 
 #include <stdio.h>
@@ -37,7 +37,7 @@ main()
     } 
   CATCH(ex) 
     {
-      ex.perror();
+      fprintf(stderr,"*** %s\n", ex.get_cause());
     }
   ENDCATCH;
   
@@ -51,7 +51,7 @@ main()
     }
   CATCH(ex)
     {
-      ex.perror();
+      fprintf(stderr,"*** %s\n", ex.get_cause());
     }
   ENDCATCH;
 
@@ -64,7 +64,7 @@ main()
     }
   CATCH(ex)
     {
-      ex.perror();
+      fprintf(stderr,"*** %s\n", ex.get_cause());
     }
   ENDCATCH;
 
@@ -80,7 +80,7 @@ main()
         }
       CATCH(ex)
         {
-          ex.perror();
+          fprintf(stderr,"*** %s\n", ex.get_cause());
           printf("Rethrown\n");
           RETHROW;
         }
@@ -89,7 +89,7 @@ main()
   CATCH(ex)
     {
       printf("Recatched\n");
-      ex.perror();
+      fprintf(stderr,"*** %s\n", ex.get_cause());
     }
   ENDCATCH;
 

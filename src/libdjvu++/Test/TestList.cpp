@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: TestList.cpp,v 1.2 1999-02-01 18:32:35 leonb Exp $
+//C-  $Id: TestList.cpp,v 1.3 1999-02-16 17:19:15 leonb Exp $
 
 
 
@@ -41,7 +41,7 @@ PCONTI(GContainer<int> &ga)
   int *np;
   printf("( ");
   GPosition pos(ga);
-  while (np = ga.next(pos))
+  while( (np = ga.next(pos)))
     printf("%d ", *np);
   printf(")\n");
 }
@@ -52,7 +52,7 @@ PCONTS(GContainer<GString> &ga)
   GString *np;
   printf("( ");
   GPosition pos(ga);
-  while (np = ga.next(pos))
+  while ((np = ga.next(pos)))
     printf("\"%s\" ", (const char*)(*np));
   printf(")\n");
 }

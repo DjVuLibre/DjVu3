@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: TestArray.cpp,v 1.2 1999-02-01 18:32:34 leonb Exp $
+//C-  $Id: TestArray.cpp,v 1.3 1999-02-16 17:19:15 leonb Exp $
 
 
 #include <stdio.h>
@@ -41,7 +41,7 @@ PCONT(GContainer<int> &ga)
 {
   int *np;
   GPosition pos(ga);
-  while (np = ga.next(pos))
+  while ((np = ga.next(pos)))
     printf("%d ", *np);
   printf("\n");
 }

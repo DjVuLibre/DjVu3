@@ -1,0 +1,210 @@
+#!/bin/sh
+
+### The substitutions
+SRCDIR=.
+TOPDIR=.
+CXX=${CXX-eg++}
+OPT=${OPT-"-O3 -fomit-frame-pointer -funroll-all-loops"}
+WARN=${WARN-"-Wall -Wno-unused"}
+RANLIB=${RANLIB-ranlib}
+AR=${AR-ar}
+LDLIBS=-lm
+DEFS=
+
+### Check top dir
+
+conf=`basename $0`
+SRCDIR=`dirname $0`
+TOPDIR=$SRCDIR
+if [ ! -r "$SRCDIR/libdjvu++.dxx" ] 
+then
+   echo 1>&2 "$conf: Cannot recognize source directory."
+   exit 1
+fi
+
+### Process arguments
+
+while [ -n "$1" ]
+do
+   case "$1" in 
+
+        --prefix=* )     
+           prefix=`echo $1 | sed 's/[-A-Za-z_]*=//'` ;; 
+        --prefix )
+           prefix=$2; shift ;;
+        --with-debug )
+           OPT=-g ;;
+        --with-threads=* )
+           threads=`echo $1 | sed 's/[-A-Za-z_]*=//'` ;; 
+        --with-threads )
+           threads=$2; shift ;;
+        --without-threads )
+           threads=no ;;
+
+        *)
+           echo 1>&2 "$conf: Unrecognized argument $1"
+           cat 1>&2 <<\EOF
+Recognized options:
+  --prefix=PREFIXDIR                    set install directory
+  --with-debug                          compile with debug enabled
+  --without-threads                     do not use threads
+  --with-threads=(no|co|posix|dce|jri)  choose thread implementation
+EOF
+           exit 1 ;;
+   esac
+   shift
+done
+
+### Check compiler
+
+echo 'int main(void) {return 0;}' > /tmp/$$.c
+trap "rm 2>/dev/null /tmp/$$ /tmp/$$.*" 0
+
+echo -n Testing C++ compiler ...
+if ( $CXX -c /tmp/$$.c -o /tmp/$$.o >/dev/null 1>&2 ) 
+then
+  echo $CXX.
+elif ( g++ -c /tmp/$$.c -o /tmp/$$.o >/dev/null 1>&2 ) 
+then
+  CXX=g++
+  echo $CXX.
+elif ( CC -c /tmp/$$.c -o /tmp/$$.o >/dev/null 1>&2 ) 
+then
+  CXX=CC
+  OPT=
+  WARN=
+  echo $CXX.
+else
+  echo
+  echo 1>&2 "$conf: Cannot find C++ compiler."
+  echo 1>&2 "$conf: Please set environment variable CXX."
+  exit 1
+fi
+
+if [ -z "$OPT" ] 
+then
+  echo -n Testing optimization option ... 
+  if ( $CXX -O -c /tmp/$$.c -o /tmp/$$ >/dev/null 2>/dev/null ) 
+  then
+     echo $OPT
+     OPT=-O
+  else
+     echo broken.
+  fi
+fi
+
+echo -n Testing pipe option ...
+if ( $CXX -pipe -c /tmp/$$.c -o /tmp/$$ >/dev/null 2>/dev/null ) 
+then
+  echo yes.
+  CXX="$CXX -pipe"
+else
+  echo no.
+fi
+
+
+### Set defines
+
+if [ -n "$threads" ] 
+then
+  case "$threads" in
+    no* )
+       DEFS="$DEFS -DTHREADMODEL=NOTHREADS" 
+       ;;       
+    jri* )
+       DEFS="$DEFS -DTHREADMODEL=JRITHREADS" 
+       ;;       
+    co* )
+       DEFS="$DEFS -DTHREADMODEL=COTHREADS" 
+       ;;       
+    posix | dce )
+       DEFS="$DEFS -DTHREADMODEL=POSIXTHREADS" 
+       echo -n "Check option -pthread ..."
+       if ( ( $CXX -pthread /tmp/$$.c -o /tmp/$$ >/tmp/$$.log 2>&1 ) \
+            && [ -z "`grep -i unrecognized /tmp/$$.log`" ] )
+       then
+         OPT="$OPT -pthread"
+         echo yes.
+       else
+         LDLIBS="-lpthread $LDLIBS"
+         echo no.
+       fi
+       ;;
+    *)
+       echo 1>&2 "$conf: unrecognized argument for --with-threads"
+  esac
+fi
+
+
+### Check programs
+
+echo -n Searching AR program ...
+if ( $AR cq /tmp/$$.a /tmp/$$.o ) 
+then
+  echo $AR
+elif ( ar cq /tmp/$$.a /tmp/$$.o ) 
+then 
+  AR=ar
+  echo $AR
+else
+  echo
+  echo 1>&2 "$conf: Cannot find archiving program."
+  echo 1>&2 "$conf: Please set environment variable AR."
+  exit 1
+fi
+
+echo -n Searching RANLIB program ...
+if ( $RANLIB /tmp/$$.a )
+then
+  echo $RANLIB
+else
+  RANLIB=:
+  echo "none."
+fi
+
+
+# Generate makefiles
+
+sed < $SRCDIR/Makefile.in > Makefile \
+  -e 's!@topdir@!'"$TOPDIR"'!g' \
+  -e 's!@srcdir@!'"$TOPDIR"'!g' \
+  -e 's!@cc@!'"$CC"'!g' \
+  -e 's!@cxx@!'"$CXX"'!g' \
+  -e 's!@defs@!'"$DEFS"'!g' \
+  -e 's!@opt@!'"$OPT"'!g' \
+  -e 's!@warn@!'"$WARN"'!g' \
+  -e 's!@ldlibs@!'"$LDLIBS"'!g' \
+  -e 's!@ranlib@!'"$RANLIB"'!g' \
+  -e 's!@ar@!'"$AR"'!g' \
+
+
+case "$TOPDIR" in
+  .*) # relative source directory
+     TOPDIR="../$TOPDIR" ;;
+esac
+
+if [ ! -d @Tools ] ; then mkdir @Tools ; fi
+sed < $SRCDIR/@Tools/Makefile.in > @Tools/Makefile \
+  -e 's!@topdir@!'"$TOPDIR"'!g' \
+  -e 's!@srcdir@!'"$TOPDIR"/@Tools'!g' \
+  -e 's!@cc@!'"$CC"'!g' \
+  -e 's!@cxx@!'"$CXX"'!g' \
+  -e 's!@defs@!'"$DEFS"'!g' \
+  -e 's!@opt@!'"$OPT"'!g' \
+  -e 's!@warn@!'"$WARN"'!g' \
+  -e 's!@ldlibs@!'"$LDLIBS"'!g' \
+  -e 's!@ranlib@!'"$RANLIB"'!g' \
+  -e 's!@ar@!'"$AR"'!g' \
+
+if [ ! -d @Test ] ; then mkdir @Test ; fi
+sed < $SRCDIR/@Test/Makefile.in > @Test/Makefile \
+  -e 's!@topdir@!'"$TOPDIR"'!g' \
+  -e 's!@srcdir@!'"$TOPDIR"/@Test'!g' \
+  -e 's!@cc@!'"$CC"'!g' \
+  -e 's!@cxx@!'"$CXX"'!g' \
+  -e 's!@defs@!'"$DEFS"'!g' \
+  -e 's!@opt@!'"$OPT"'!g' \
+  -e 's!@warn@!'"$WARN"'!g' \
+  -e 's!@ldlibs@!'"$LDLIBS"'!g' \
+  -e 's!@ranlib@!'"$RANLIB"'!g' \
+  -e 's!@ar@!'"$AR"'!g' \

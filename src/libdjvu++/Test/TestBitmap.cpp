@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: TestBitmap.cpp,v 1.2 1999-02-01 18:32:35 leonb Exp $
+//C-  $Id: TestBitmap.cpp,v 1.3 1999-02-16 17:19:15 leonb Exp $
 
 
 #include <stdlib.h>
@@ -83,7 +83,7 @@ compare_GBitmap(const GBitmap  &bm1, const GBitmap &bm2)
 #define PRI(i) \
  printf("%s --> %d\n", #i, i)
 
-void 
+int 
 main(void)
 {
 
