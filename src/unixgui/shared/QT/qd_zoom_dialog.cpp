@@ -4,7 +4,7 @@
 //C-              Unauthorized use prohibited.
 //C-
 // 
-// $Id: qd_zoom_dialog.cpp,v 1.2 2001-06-06 17:16:57 mchen Exp $
+// $Id: qd_zoom_dialog.cpp,v 1.3 2001-06-14 15:01:06 mchen Exp $
 // $Name:  $
 
 
@@ -126,11 +126,11 @@ static const struct MenuItems {
   {"75 %",75},
   {"50 %",50},
   {"25 %",25},
-  {QT_TRANSLATE_NOOP("QDZoomDialog","Fit Width",DjVuANT::ZOOM_WIDTH},
-  {QT_TRANSLATE_NOOP("QDZoomDialog","Fit Page",DjVuANT::ZOOM_PAGE},
-  {QT_TRANSLATE_NOOP("QDZoomDialog","One to one",DjVuANT::ZOOM_ONE2ONE},
-  {QT_TRANSLATE_NOOP("QDZoomDialog","Stretch",DjVuANT::ZOOM_STRETCH},
-  {QT_TRANSLATE_NOOP("QDZoomDialog","Default",DjVuANT::ZOOM_UNSPEC}
+  {QT_TRANSLATE_NOOP("QDZoomDialog","Fit Width"),DjVuANT::ZOOM_WIDTH},
+  {QT_TRANSLATE_NOOP("QDZoomDialog","Fit Page"),DjVuANT::ZOOM_PAGE},
+  {QT_TRANSLATE_NOOP("QDZoomDialog","One to one"),DjVuANT::ZOOM_ONE2ONE},
+  {QT_TRANSLATE_NOOP("QDZoomDialog","Stretch"),DjVuANT::ZOOM_STRETCH},
+  {QT_TRANSLATE_NOOP("QDZoomDialog","Default"),DjVuANT::ZOOM_UNSPEC}
 };
 
 QDZoomDialog::QDZoomDialog(int zoom, QWidget * parent,
