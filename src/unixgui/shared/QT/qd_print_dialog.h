@@ -4,7 +4,7 @@
 //C-              Unauthorized use prohibited.
 //C-
 // 
-// $Id: qd_print_dialog.h,v 1.1 2001-05-29 22:05:31 bcr Exp $
+// $Id: qd_print_dialog.h,v 1.2 2001-06-06 14:53:58 mchen Exp $
 // $Name:  $
 
 
@@ -69,8 +69,8 @@ private:
 
    GRect		print_rect;
 
-   static const char *	id2str(int id);
-   static int		str2id(const char * str);
+   static const QString	id2str(int id);
+   static int		str2id(const QString &);
    
    static void		refresh_cb(void * cl_data);
    static void		prnProgress_cb(float done, void * cl_data);

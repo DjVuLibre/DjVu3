@@ -4,7 +4,7 @@
 //C-              Unauthorized use prohibited.
 //C-
 // 
-// $Id: qd_messenger.cpp,v 1.1 2001-05-29 22:05:30 bcr Exp $
+// $Id: qd_messenger.cpp,v 1.2 2001-06-06 14:53:58 mchen Exp $
 // $Name:  $
 
 
@@ -156,7 +156,7 @@ QDMessageQueue::notifierActivated(int)
       if (queue_head) ::write(fd[1], "c", 1);
    } catch(const GException & exc)
    {
-      ::showError(0, "DjVu Error", exc);
+      ::showError(0, tr("DjVu Error"), exc);
    }
 }
 

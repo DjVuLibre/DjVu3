@@ -4,7 +4,7 @@
 //C-              Unauthorized use prohibited.
 //C-
 // 
-// $Id: qd_page_saver.h,v 1.1 2001-05-29 22:05:31 bcr Exp $
+// $Id: qd_page_saver.h,v 1.2 2001-06-06 14:53:58 mchen Exp $
 // $Name:  $
 
 
@@ -22,7 +22,7 @@
 
 #include "qt_fix.h"
 
-class QDPageSaver
+class QDPageSaver: public QObject
 {
 private:
    GP<DjVuFile>		djvu_file;

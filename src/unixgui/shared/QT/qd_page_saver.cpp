@@ -4,7 +4,7 @@
 //C-              Unauthorized use prohibited.
 //C-
 // 
-// $Id: qd_page_saver.cpp,v 1.1 2001-05-29 22:05:31 bcr Exp $
+// $Id: qd_page_saver.cpp,v 1.2 2001-06-06 14:53:58 mchen Exp $
 // $Name:  $
 
 
@@ -59,7 +59,7 @@ QDPageNameDialog::slotBrowse(void)
    if (!QFileInfo(page_dir).isDir()) page_dir=QDir::currentDirPath();
    page_full_name=GURL::expand_name(GOS::basename(page_full_name), page_dir);
    
-   static char * filters[]={ "*.djvu", "*.djv", "All files (*)", 0 };
+   static const char * filters[]={ "*.djvu", "*.djv", tr("All files (*)"), 0 };
    QeFileDialog fd(page_dir, filters[0], this, "djvu_fd", TRUE);
    fd.setFilters((const char **) filters);
    fd.setCaption(tr("Select DjVu page file name..."));
@@ -81,7 +81,7 @@ QDPageNameDialog::done(int rc)
       } catch(const GException & exc)
       {
          QString qmesg(exc.get_cause());
-	 showError(this, "DjVu Error", qmesg);
+	 showError(this, tr("DjVu Error"), qmesg);
 	 return;
       }
    }
@@ -382,7 +382,7 @@ QDPageSaver::saveSeparate(void)
 void
 QDPageSaver::saveBundled(void)
 {
-   static char * filters[]={ "*.djvu", "*.djv", "All files (*)", 0 };
+   static const char * filters[]={ "*.djvu", "*.djv", tr("All files (*)"), 0 };
  
    GURL file_url=djvu_file->get_url();
 
@@ -414,7 +414,7 @@ QDPageSaver::saveBundled(void)
 void
 QDPageSaver::saveMerged(void)
 {
-   static char * filters[]={ "*.djvu", "*.djv", "All files (*)", 0 };
+   static const char * filters[]={ "*.djvu", "*.djv", tr("All files (*)"), 0 };
  
    GURL file_url=djvu_file->get_url();
 

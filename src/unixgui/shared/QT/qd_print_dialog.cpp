@@ -4,7 +4,7 @@
 //C-              Unauthorized use prohibited.
 //C-
 // 
-// $Id: qd_print_dialog.cpp,v 1.1 2001-05-29 22:05:31 bcr Exp $
+// $Id: qd_print_dialog.cpp,v 1.2 2001-06-06 14:53:58 mchen Exp $
 // $Name:  $
 
 
@@ -48,34 +48,34 @@ static QMotifStyle *motif=0;
 #endif
 
 
-static const char print_page_str[]="current page";
-static const char print_custom_str[]="custom pages";
-static const char print_doc_str[]="document";
-static const char print_win_str[]="window";
+static const QString print_page_str=QT_TRANSLATE_NOOP("QDPrintDialog","current page");
+static const QString print_custom_str=QT_TRANSLATE_NOOP("QDPrintDialog","custom pages");
+static const QString print_doc_str=QT_TRANSLATE_NOOP("QDPrintDialog","document");
+static const QString print_win_str=QT_TRANSLATE_NOOP("QDPrintDialog","window");
 
-static const char fit_page_str[]="Reduce to Fit";
-static const char one_to_one_str[]="One to One";
-static const char current_zoom_str[]="Current Zoom";
-static const char custom_zoom_str[]="Custom Zoom:";
+static const QString fit_page_str=QT_TRANSLATE_NOOP("QDPrintDialog","Reduce to Fit");
+static const QString one_to_one_str=QT_TRANSLATE_NOOP("QDPrintDialog","One to One");
+static const QString current_zoom_str=QT_TRANSLATE_NOOP("QDPrintDialog","Current Zoom");
+static const QString custom_zoom_str=QT_TRANSLATE_NOOP("QDPrintDialog","Custom Zoom:");
 
-const char *
+const QString
 QDPrintDialog::id2str(int id)
 {
    return
       id==PRINT_PAGE ? print_page_str :
       id==PRINT_CUSTOM ? print_custom_str :
       id==PRINT_DOC ? print_doc_str :
-      id==PRINT_WIN ? print_win_str : 0;
+      id==PRINT_WIN ? print_win_str : QString::null;
 }
 
 int
-QDPrintDialog::str2id(const char * str)
+QDPrintDialog::str2id(const QString &str)
 {
    return
-      !strcmp(str, print_page_str) ? PRINT_PAGE :
-      !strcmp(str, print_custom_str) ? PRINT_CUSTOM :
-      !strcmp(str, print_doc_str) ? PRINT_DOC :
-      !strcmp(str, print_win_str) ? PRINT_WIN : -1;
+      str==print_page_str ? PRINT_PAGE :
+      str==print_custom_str ? PRINT_CUSTOM :
+      str==print_doc_str ? PRINT_DOC :
+      str==print_win_str ? PRINT_WIN : -1;
 }
 
 void
@@ -109,11 +109,7 @@ QDPrintDialog::setPSLevel(int level)
 void
 QDPrintDialog::setZoom(int zoom)
 {
-#ifdef QT1
-   const char *setting;
-#else
    QString setting;
-#endif
    if (zoom<0)
    {
       setting=fit_page_str;
@@ -134,16 +130,16 @@ void
 QDPrintDialog::setCurZoom(int zoom)
 {
    cur_zoom=zoom;
-   if (!strcmp(zoom_menu->currentText(), current_zoom_str))
+   if (zoom_menu->currentText()==current_zoom_str)
       zoom_spin->setValue(cur_zoom);
 }
 
 void
 QDPrintDialog::setPrint(What what)
 {
-   const char * str=id2str(what);
+   const QString str=id2str(what);
    for(int i=0;i<what_menu->count();i++)
-      if (!strcmp(what_menu->text(i), str))
+      if (what_menu->text(i)==str)
       {
 	 what_menu->setCurrentItem(i);
 	 break;
@@ -177,7 +173,7 @@ QDPrintDialog::slotBrowse(void)
 
    QeFileDialog dialog(QFileInfo(file_text->text()).dirPath(),
 		       filter, this, "file_dialog", TRUE);
-   dialog.setCaption("Select output file name");
+   dialog.setCaption(tr("Select output file name"));
    dialog.setForWriting(1);
 
    if (dialog.exec()==QDialog::Accepted)
@@ -189,11 +185,7 @@ QDPrintDialog::adjustScaling(void)
 {
    if (eps_butt->isChecked())
    {
-#ifdef QT1
-     const char *setting=one_to_one_str;
-#else
      const QString setting(one_to_one_str);
-#endif
      zoom_menu->setCurrentItem(setting);
    }
    zoom_menu->setEnabled(ps_butt->isChecked());
@@ -202,8 +194,7 @@ QDPrintDialog::adjustScaling(void)
 void
 QDPrintDialog::slotWhatChanged(const QString & qtext)
 {
-   const char * const text=qtext;
-   custompages_text->setEnabled(!(strcmp(text, print_custom_str)));
+   custompages_text->setEnabled(qtext==print_custom_str);
 }
 
 void
@@ -222,12 +213,12 @@ QDPrintDialog::adjustWhat(void)
    what_menu->clear();
    
    if (!force_one_page)
-      what_menu->insertItem(print_custom_str);
-   what_menu->insertItem(print_page_str);
+      what_menu->insertItem(tr(print_custom_str));
+   what_menu->insertItem(tr(print_page_str));
    if (!force_one_page)
-      what_menu->insertItem(print_doc_str);
+      what_menu->insertItem(tr(print_doc_str));
    if (!print_rect.isempty())
-      what_menu->insertItem(print_win_str);
+      what_menu->insertItem(tr(print_win_str));
    
    if (id>=0)
       setPrint((What) id);
@@ -281,10 +272,10 @@ void
 QDPrintDialog::slotZoomChanged(const QString & qtext)
 {
    const char * const text=qtext;
-   zoom_spin->setEnabled(!strcmp(text, custom_zoom_str));
-   if (!strcmp(text, one_to_one_str))
+   zoom_spin->setEnabled(text==custom_zoom_str);
+   if (text==one_to_one_str)
       zoom_spin->setValue(100);
-   else if (!strcmp(text, current_zoom_str))
+   else if (text==current_zoom_str)
       zoom_spin->setValue(cur_zoom);
 }
 
@@ -305,8 +296,7 @@ QDPrintDialog::decProgress_cb(float done, void * cl_data)
    if (done<0)
    {
 	 // Alas the progress is unknown.
-      char buffer[128];
-      sprintf(buffer, "Decoding: %d bytes", (int) -done);
+      QString buffer=tr("Decoding: ")+QString::number(-done)+tr(" bytes");
       th->progress->setPrefix(buffer);
       th->progress->setProgress(0);
       th->progress->show();
@@ -325,19 +315,17 @@ QDPrintDialog::info_cb(int page_num, int page_cnt, int tot_pages,
 		       DjVuToPS::Stage stage, void * cl_data)
 {
    QDPrintDialog * th=(QDPrintDialog *) cl_data;
-   QString prefix=stage==DjVuToPS::DECODING ? "Decoding" : "Printing";
+   QString prefix=stage==DjVuToPS::DECODING ? tr("Decoding") : tr("Printing");
    if (tot_pages>1)
    {
-      char buffer[128];
-      sprintf(buffer, " page #%d (%d/%d): ", page_num+1,
-	      page_cnt+1, tot_pages);
+      QString buffer=tr(" page #")+QString::number(page_num+1)+" ("+QString::number(page_cnt+1)+
+	 "/"+QString::number(tot_pages)+"): ";
       prefix=prefix+buffer;
    } else
    {
       if (th->doc && th->doc->get_pages_num()>1)
       {
-	 char buffer[128];
-	 sprintf(buffer, " page %d: ", page_num+1);
+	 QString buffer=tr(" page ")+ QString::number(page_num+1)+": ";
 	 prefix=prefix+buffer;
       } else prefix=prefix+": ";
    }
@@ -371,9 +359,9 @@ QDPrintDialog::done(int rc)
 	    struct stat st;
 	    if (stat(fname, &st)>=0)
 	       if (QMessageBox::warning(this, "DjVu",
-					"File '"+fname+"' already exists.\n"
-					"Are you sure you want to overwrite it?",
-					"&Yes", "&No", 0, 0, 1))
+					tr("File '")+fname+tr("' already exists.\n")+
+					tr("Are you sure you want to overwrite it?"),
+					tr("&Yes"), tr("&No"), 0, 0, 1))
 		  return;
 	 }
       
@@ -389,10 +377,10 @@ QDPrintDialog::done(int rc)
 	 bool printPortrait=portrait_butt->isChecked();
 	 bool printPS=ps_butt->isChecked();
 	 bool printLevel2=level2_butt->isChecked();
-	 int zoom=!strcmp(zoom_menu->currentText(), fit_page_str) ?
+	 int zoom=zoom_menu->currentText()==fit_page_str ?
 		  DjVuToPS::Options::FIT_PAGE :
-		  !strcmp(zoom_menu->currentText(), one_to_one_str) ? 100 :
-		  !strcmp(zoom_menu->currentText(), current_zoom_str) ? cur_zoom :
+		  zoom_menu->currentText()==one_to_one_str ? 100 :
+		  zoom_menu->currentText()==current_zoom_str ? cur_zoom :
 		  zoom_spin->value();
 	 	 
 	 QString printFile=file_text->text();
@@ -590,7 +578,7 @@ QDPrintDialog::QDPrintDialog(const GP<DjVuDocument> & _doc,
    QWidget * start=startWidget();
    QeLabel * label;
    
-   setCaption("DjVu Print Dialog");
+   setCaption(tr("DjVu Print Dialog"));
 
    start->installEventFilter(this);
    
@@ -607,33 +595,33 @@ QDPrintDialog::QDPrintDialog(const GP<DjVuDocument> & _doc,
    bg_lay=new QVBoxLayout(bg, 10);
    bg_lay->addSpacing(bg->fontMetrics().height());
    bg_lay->addStrut(bg->fontMetrics().width(bg->title()));
-   ps_butt=new QeRadioButton("&PostScript", bg, "ps_butt");
+   ps_butt=new QeRadioButton(tr("&PostScript"), bg, "ps_butt");
    bg_lay->addWidget(ps_butt);
    eps_butt=new QeRadioButton("&EPSF", bg, "eps_butt");
    bg_lay->addWidget(eps_butt);
    bg_lay->activate();
 
       //************* Creating 'Orientation' frame *******************
-   bg=orient_bg=new QeButtonGroup("Orientation", start);
+   bg=orient_bg=new QeButtonGroup(tr("Orientation"), start);
    hlay->addWidget(bg);
    bg_lay=new QVBoxLayout(bg, 10);
    bg_lay->addSpacing(bg->fontMetrics().height());
    bg_lay->addStrut(bg->fontMetrics().width(bg->title()));
-   portrait_butt=new QeRadioButton("Po&rtrait", bg, "portrait_butt");
+   portrait_butt=new QeRadioButton(tr("Po&rtrait"), bg, "portrait_butt");
    bg_lay->addWidget(portrait_butt);
-   landscape_butt=new QeRadioButton("&Landscape", bg, "landscape_butt");
+   landscape_butt=new QeRadioButton(tr("&Landscape"), bg, "landscape_butt");
    bg_lay->addWidget(landscape_butt);
    bg_lay->activate();
 
       //************* Creating 'Color model' frame *******************
-   bg=color_bg=new QeButtonGroup("Color model", start);
+   bg=color_bg=new QeButtonGroup(tr("Color model"), start);
    hlay->addWidget(bg);
    bg_lay=new QVBoxLayout(bg, 10);
    bg_lay->addSpacing(bg->fontMetrics().height());
    bg_lay->addStrut(bg->fontMetrics().width(bg->title()));
-   color_butt=new QeRadioButton("&Color", bg, "color_butt");
+   color_butt=new QeRadioButton(tr("&Color"), bg, "color_butt");
    bg_lay->addWidget(color_butt);
-   grey_butt=new QeRadioButton("&GreyScale", bg, "grey_butt");
+   grey_butt=new QeRadioButton(tr("&GreyScale"), bg, "grey_butt");
    bg_lay->addWidget(grey_butt);
    bg_lay->activate();
 
@@ -641,16 +629,16 @@ QDPrintDialog::QDPrintDialog(const GP<DjVuDocument> & _doc,
    vlay->addLayout(hlay);
    
    //************* Creating 'Scaling' frame *******************
-   bg=scale_bg=new QeButtonGroup("Scaling", start);
+   bg=scale_bg=new QeButtonGroup(tr("Scaling"), start);
    hlay->addWidget(bg);
    bg_lay=new QVBoxLayout(bg, 10);
    bg_lay->addSpacing(bg->fontMetrics().height());
    bg_lay->addStrut(bg->fontMetrics().width(bg->title()));
    zoom_menu=new QeComboBox(FALSE, bg, "zoom_menu");
-   zoom_menu->insertItem(fit_page_str);
-   zoom_menu->insertItem(one_to_one_str);
-   zoom_menu->insertItem(current_zoom_str);
-   zoom_menu->insertItem(custom_zoom_str);
+   zoom_menu->insertItem(tr(fit_page_str));
+   zoom_menu->insertItem(tr(one_to_one_str));
+   zoom_menu->insertItem(tr(current_zoom_str));
+   zoom_menu->insertItem(tr(custom_zoom_str));
    bg_lay->addWidget(zoom_menu);
    zoom_spin=new QeSpinBox(5, 999, 1, bg, "zoom_spin");
    zoom_spin->setSuffix("%");
@@ -662,7 +650,7 @@ QDPrintDialog::QDPrintDialog(const GP<DjVuDocument> & _doc,
    QHBoxLayout * bg_hlay;
    
    //************* Creating 'What to Print' frame *******************
-   bg=what_bg=new QeButtonGroup("What to print", start);
+   bg=what_bg=new QeButtonGroup(tr("What to print"), start);
    hlay->addWidget(bg);
    bg_lay=new QVBoxLayout(bg, 10);
    bg_lay->addSpacing(bg->fontMetrics().height());
@@ -671,12 +659,12 @@ QDPrintDialog::QDPrintDialog(const GP<DjVuDocument> & _doc,
    bg_lay->addLayout(bg_hlay);
    
    copies_spin=new QeSpinBox(1, 99, 1, bg, "print_spin");
-   copies_spin->setSpecialValueText("1 copy");
-   copies_spin->setSuffix(" copies");
+   copies_spin->setSpecialValueText(tr("1 copy"));
+   copies_spin->setSuffix(tr(" copies"));
    copies_spin->setValue(1);
    bg_hlay->addWidget(copies_spin);
 
-   label=new QeLabel("of the", bg);
+   label=new QeLabel(tr("of the"), bg);
    bg_hlay->addWidget(label);
    
    what_menu=new QeComboBox(FALSE, bg, "print_menu");
@@ -685,7 +673,7 @@ QDPrintDialog::QDPrintDialog(const GP<DjVuDocument> & _doc,
    bg_hlay=new QHBoxLayout(10);
    bg_lay->addLayout(bg_hlay);
 
-   custompages_label=new QeLabel("C&ustom pages:", bg);
+   custompages_label=new QeLabel(tr("C&ustom pages:"), bg);
    bg_hlay->addWidget(custompages_label);
    custompages_text=new QeLineEdit(bg, "custompages_text");
    custompages_text->setMaxLength(128);
@@ -693,37 +681,36 @@ QDPrintDialog::QDPrintDialog(const GP<DjVuDocument> & _doc,
    bg_hlay->addWidget(custompages_text, 1);
    custompages_label->setBuddy(custompages_text);
    bg_lay->activate();
-   static const char tip[]="Enter a list of page ranges here\n"
-			   "separated by commas like 1,2,10-12.\n"
-			   "To make multiple copies try 1,1,1,1.\n"
-			   "To print in reverse try 10-1.";
+   static const QString tip=tr("Enter a list of page ranges here\nseparated by commas like 1,2,10-12.\n")+
+      tr("To make multiple copies try 1,1,1,1.\n")+
+      tr("To print in reverse try 10-1.");
    QToolTip::add(custompages_label, tip);
    QToolTip::add(custompages_text, tip);
    
 
       //*********** Creating 'PostScript level' frame ****************
    QGridLayout * bgrid;
-   bg=new QeButtonGroup("PostScript level", start);
+   bg=new QeButtonGroup(tr("PostScript level"), start);
    vlay->addWidget(bg);
    bg_lay=new QVBoxLayout(bg, 10);
    bg_lay->addSpacing(bg->fontMetrics().height());
    bgrid=new QGridLayout(2, 2, 20); bg_lay->addLayout(bgrid);
-   level1_butt=new QeRadioButton("Level &1", bg, "level1_butt");
+   level1_butt=new QeRadioButton(tr("Level &1"), bg, "level1_butt");
    bgrid->addWidget(level1_butt, 0, 0);
-   label=new QeLabel("Use this setting to generate a portable\n"
-		     "PostScript file. Images will not be compressed.", bg, "level1_label");
+   label=new QeLabel(tr("Use this setting to generate a portable\nPostScript file. ")+
+		     tr("Images will not be compressed."), bg, "level1_label");
    bgrid->addWidget(label, 0, 1);
-   level2_butt=new QeRadioButton("Level &2", bg, "level2_butt");
+   level2_butt=new QeRadioButton(tr("Level &2"), bg, "level2_butt");
    bgrid->addWidget(level2_butt, 1, 0);
-   label=new QeLabel("Create a smaller PostScript file. The file will not be\n"
-		     "compatible with PS Level 1 printers.",
+   label=new QeLabel(tr("Create a smaller PostScript file. ")+
+		     tr("The file will not be\ncompatible with PS Level 1 printers."),
 		     bg, "level2_label");
    bgrid->addWidget(label, 1, 1);
  
    bg_lay->activate();
 
       //**************** Creating the "destination" frame *************
-   QeGroupBox * gb=new QeGroupBox("Print destination", start, "gb");
+   QeGroupBox * gb=new QeGroupBox(tr("Print destination"), start, "gb");
    vlay->addWidget(gb);
    QVBoxLayout * gb_lay=new QVBoxLayout(gb, 10, 5, "gb_lay");
    gb_lay->addSpacing(gb->fontMetrics().height());
@@ -739,15 +726,15 @@ QDPrintDialog::QDPrintDialog(const GP<DjVuDocument> & _doc,
 
       // *** top_w
    QHBoxLayout * top_lay=new QHBoxLayout(top_w, 0, 5, "top_lay");
-   label=new QeLabel("Send Image To:", top_w, "crazy_label");
+   label=new QeLabel(tr("Send Image To:"), top_w, "crazy_label");
    top_lay->addWidget(label);
    QeButtonGroup * dst_bg=new QeButtonGroup(top_w);
    dst_bg->setFrameStyle(QFrame::NoFrame);
    top_lay->addWidget(dst_bg);
    QHBoxLayout * dst_lay=new QHBoxLayout(dst_bg, 0, 5);
-   printer_butt=new QeRadioButton("Printe&r", dst_bg, "printer_butt");
+   printer_butt=new QeRadioButton(tr("Printe&r"), dst_bg, "printer_butt");
    dst_lay->addWidget(printer_butt);
-   file_butt=new QeRadioButton("F&ile", dst_bg, "file_butt");
+   file_butt=new QeRadioButton(tr("F&ile"), dst_bg, "file_butt");
    dst_lay->addWidget(file_butt);
    dst_lay->activate();
    top_lay->activate();
@@ -756,7 +743,7 @@ QDPrintDialog::QDPrintDialog(const GP<DjVuDocument> & _doc,
    dst_widget=bot_w;
    printer_widget=new QWidget(bot_w, "printer_widget");
    QHBoxLayout * print_lay=new QHBoxLayout(printer_widget, 0, 5, "print_lay");
-   label=new QeLabel("Print Command:", printer_widget);
+   label=new QeLabel(tr("Print Command:"), printer_widget);
    print_lay->addWidget(label);
    printer_text=new QeLineEdit(printer_widget, "printer_text");
    printer_text->setMaxLength(128);
@@ -765,12 +752,12 @@ QDPrintDialog::QDPrintDialog(const GP<DjVuDocument> & _doc,
 
    file_widget=new QWidget(bot_w, "file_widget");
    QHBoxLayout * file_lay=new QHBoxLayout(file_widget, 0, 5, "file_lay");
-   label=new QeLabel("File Name:", file_widget);
+   label=new QeLabel(tr("File Name:"), file_widget);
    file_lay->addWidget(label);
    file_text=new QeLineEdit(file_widget, "file_text");
    file_text->setMaxLength(128);
    file_lay->addWidget(file_text, 1);
-   QePushButton * browse_butt=new QePushButton("Browse...", file_widget, "browse_butt");
+   QePushButton * browse_butt=new QePushButton(tr("Browse..."), file_widget, "browse_butt");
    file_lay->addWidget(browse_butt);
    file_lay->activate();
 
@@ -780,20 +767,18 @@ QDPrintDialog::QDPrintDialog(const GP<DjVuDocument> & _doc,
    prog_widget=new QeNInOne(start, "prog_widget");
    prg_lay->addWidget(prog_widget, 1);
    progress=new QeProgressBar(20, prog_widget, "progress_bar");
-#ifdef QT1
-   progress->setStyle(MotifStyle);
-#else
+
    if(!motif)
      motif=new QMotifStyle();
    progress->setStyle(motif);
-#endif
-   save_butt=new QeCheckBox("&Save settings to disk", prog_widget, "save_butt");
+
+   save_butt=new QeCheckBox(tr("&Save settings to disk"), prog_widget, "save_butt");
    save_butt->setChecked(TRUE);
    prog_widget->setActiveWidget(save_butt);
-   QePushButton * ok_butt=new QePushButton("&OK", start, "ok_butt");
+   QePushButton * ok_butt=new QePushButton(tr("&OK"), start, "ok_butt");
    ok_butt->setDefault(TRUE);
    prg_lay->addWidget(ok_butt);
-   cancel_butt=new QePushButton("&Cancel", start, "cancel_butt");
+   cancel_butt=new QePushButton(tr("&Cancel"), start, "cancel_butt");
    prg_lay->addWidget(cancel_butt);
    
    vlay->activate();

@@ -4,7 +4,7 @@
 //C-              Unauthorized use prohibited.
 //C-
 // 
-// $Id: qd_nav_goto_page.cpp,v 1.1 2001-05-29 22:05:31 bcr Exp $
+// $Id: qd_nav_goto_page.cpp,v 1.2 2001-06-06 14:53:58 mchen Exp $
 // $Name:  $
 
 
@@ -85,14 +85,14 @@ QDNavGotoPage::QDNavGotoPage(GP<DjVuDocument> &doc,
 			     QWidget * parent, const char * name) :
       QeDialog(parent, name, TRUE)
 {
-   setCaption("DjVu: Goto Page");
+   setCaption(tr("DjVu: Goto Page"));
    QWidget * start=startWidget();
 
       // Create the menu
    QVBoxLayout * vlay=new QVBoxLayout(start, 10, 10);
    QHBoxLayout * hlay=new QHBoxLayout(10);
    vlay->addLayout(hlay);
-   QeLabel * label=new QeLabel("Goto page", start, "goto_label");
+   QeLabel * label=new QeLabel(tr("Goto page"), start, "goto_label");
    hlay->addWidget(label);
    menu=new QeComboBox(TRUE, start, "goto_menu");
    menu->setInsertionPolicy(QComboBox::NoInsertion);
@@ -103,10 +103,10 @@ QDNavGotoPage::QDNavGotoPage(GP<DjVuDocument> &doc,
    hlay=new QHBoxLayout(10);
    vlay->addLayout(hlay);
    hlay->addStretch(1);
-   QePushButton * ok_butt=new QePushButton("&OK", start, "ok_butt");
+   QePushButton * ok_butt=new QePushButton(tr("&OK"), start, "ok_butt");
    ok_butt->setDefault(TRUE);
    hlay->addWidget(ok_butt);
-   QePushButton * cancel_butt=new QePushButton("&Cancel", start, "cancel_butt");
+   QePushButton * cancel_butt=new QePushButton(tr("&Cancel"), start, "cancel_butt");
    hlay->addWidget(cancel_butt);
 
       // Set menu contents

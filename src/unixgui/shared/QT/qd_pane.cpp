@@ -4,7 +4,7 @@
 //C-              Unauthorized use prohibited.
 //C-
 // 
-// $Id: qd_pane.cpp,v 1.1 2001-05-29 22:05:31 bcr Exp $
+// $Id: qd_pane.cpp,v 1.2 2001-06-06 14:53:58 mchen Exp $
 // $Name:  $
 
 
@@ -147,7 +147,7 @@ QDPane::x11Event(XEvent * ev)
       }
    } catch(const GException & exc)
    {
-      showError(this, "DjVu Error", exc);
+      showError(this, tr("DjVu Error"), exc);
    }
    return FALSE;
 }
