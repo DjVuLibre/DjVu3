@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: cjb2.cpp,v 1.5 2000-02-15 15:45:59 leonb Exp $
+//C- $Id: cjb2.cpp,v 1.6 2000-02-16 22:06:46 leonb Exp $
 
 
 /** @name cjb2
@@ -43,7 +43,7 @@
     L\'eon Bottou <leonb@research.att.com>\\
     Paul Howard <pgh@research.att.com>
     @version
-    #$Id: cjb2.cpp,v 1.5 2000-02-15 15:45:59 leonb Exp $# */
+    #$Id: cjb2.cpp,v 1.6 2000-02-16 22:06:46 leonb Exp $# */
 //@{
 //@}
 
@@ -137,8 +137,8 @@ public:
   int smallsize;         // CCs smaller than that are special 
   int tinysize;          // CCs smaller than that may be removed 
   CCImage(int width, int height, int dpi);
-  void add_single_run(const int y, const int x1, const int x2, const int ccid=0);
-  void add_bitmap_runs(const GBitmap &bm, const int offx=0, const int offy=0, const int ccid=0);
+  void add_single_run(int y, int x1, int x2, int ccid=0);
+  void add_bitmap_runs(const GBitmap &bm, int offx=0, int offy=0, int ccid=0);
   GP<GBitmap> get_bitmap_for_cc(int ccid) const;
   GP<JB2Image> get_jb2image() const;
   void make_ccids_by_analysis();
