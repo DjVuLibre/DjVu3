@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocEditor.h,v 1.34 2001-03-06 19:55:42 bcr Exp $
+// $Id: DjVuDocEditor.h,v 1.35 2001-03-08 21:45:06 fcrary Exp $
 // $Name:  $
 
 #ifndef _DJVUDOCEDITOR_H
@@ -51,7 +51,7 @@
 
     @memo DjVu document editor class.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: DjVuDocEditor.h,v 1.34 2001-03-06 19:55:42 bcr Exp $#
+    @version #$Id: DjVuDocEditor.h,v 1.35 2001-03-08 21:45:06 fcrary Exp $#
 */
 
 //@{
@@ -86,9 +86,6 @@ protected:
 	  anything else with the #DjVuDocEditor#. */
    void		init(void);
 
-     /** Creates a DjVuDocEditor class and initializes an empty document. */
-   static GP<DjVuDocEditor> create_wait(void);
-
       /** Initialization function. Opens document with name #filename#.
 
 	  {\bf Note}: You must call either of the two
@@ -99,6 +96,9 @@ protected:
 public:
      /** Creates a DjVuDocEditor class and initializes with #fname#. */
    static GP<DjVuDocEditor> create_wait(char const filename[]);
+
+     /** Creates a DjVuDocEditor class and initializes an empty document. */
+   static GP<DjVuDocEditor> create_wait(void);
 
 
       /// Destructor

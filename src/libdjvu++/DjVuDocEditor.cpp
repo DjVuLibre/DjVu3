@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocEditor.cpp,v 1.66 2001-03-06 19:55:42 bcr Exp $
+// $Id: DjVuDocEditor.cpp,v 1.67 2001-03-08 21:45:06 fcrary Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -668,6 +668,7 @@ DjVuDocEditor::insert_group(const GList<GString> & file_names, int page_num,
       for(GPosition pos=file_names;pos;++pos)
       {
          GString fname=file_names[pos];
+         DEBUG_MSG( "Inserting file '" << fname << "'\n" );
          G_TRY {
                // Check if it's a multipage document...
             GP<DataPool> xdata_pool=DataPool::create(fname);
