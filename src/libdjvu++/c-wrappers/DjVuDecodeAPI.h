@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuDecodeAPI.h,v 1.20 2000-02-02 22:00:14 haffner Exp $
+ *C- $Id: DjVuDecodeAPI.h,v 1.21 2000-02-03 20:58:40 haffner Exp $
  */
 
 #ifndef _DJVUDECODE_H_
@@ -101,13 +101,13 @@ typedef struct djvu_transform_options_struct
   /** Specify the absolute size desired.  0,0 has the special meaning of 
      being unresized. */
   int hsize,vsize;
-  /// The amount to upsample the horizontal axis.
+  /** The amount to upsample the horizontal axis. */
   int hupsample;
-  /// The amount to subsample the horizontal axis.
+  /** The amount to subsample the horizontal axis. */
   int hsubsample;
-  /// The amount to upsample the vertical axis.
+  /** The amount to upsample the vertical axis. */
   int vupsample;
-  /// The amount to subsample the vertical axis.
+  /** The amount to subsample the vertical axis. */
   int vsubsample;
   /** The values xmin, ymin, seg_width, and seg_height, allow cropping
       (segmentation) of the image. */
@@ -133,7 +133,7 @@ typedef struct djvu_transform_options_struct
 
 typedef struct djvu_process_options_struct
 {
-  /// This keeps a string delimited by hypens(-) and commas(,)
+  /** This keeps a string delimited by hypens(-) and commas(,) */
   const char *page_range;
 
   /** warnfileno should be non-zero to print warning messages that may
@@ -143,19 +143,19 @@ typedef struct djvu_process_options_struct
     warning is issued. */
   int warnfileno;
 
-  /// logfileno should be non-zero to print verbose processing details
+  /** logfileno should be non-zero to print verbose processing details */
   int logfileno;
 
-  /// tracefileno should be non-zero to print trace information
+  /** tracefileno should be non-zero to print trace information */
   int tracefileno;
 
-  /// #helpfileno# should be non-zero to print usage instructions.
+  /** #helpfileno# should be non-zero to print usage instructions. */
   int helpfileno;
 
-  /// list of input filenames being the last
+  /** list of input filenames being the last */
   const char * const * filelist;
 
-  /// Number of files in filelist
+  /** Number of files in filelist */
   int filecount;
 
   /** You can an import stream.  If you specify both a filelist and an import
@@ -163,7 +163,7 @@ typedef struct djvu_process_options_struct
     will be used. */
   djvu_import input_stream;
 
-  /// The output filename (or directory)
+  /** The output filename (or directory) */
   const char *output;
 
   /** Instead of specifying an output filename, you can define a 
@@ -171,10 +171,10 @@ typedef struct djvu_process_options_struct
     output should be set to zero.  */
   djvu_export output_stream;
 
-  /// The program name
+  /** The program name */
   const char *prog;
 
-  /// This is where all memory is allocated and errors are listed.
+  /** This is where all memory is allocated and errors are listed. */
   void *priv;
 
 #ifdef __cplusplus
@@ -261,11 +261,11 @@ const char * djvu_decode_error(djvu_decode_options [1]);
 DJVUAPI
 const char * djvu_decode_warning(djvu_decode_options [1]);
 
-/// Prints all the errors to stderr.
+/** Prints all the errors to stderr. */
 DJVUAPI
 void djvu_decode_perror(djvu_decode_options [1],const char *mesg);
 
-/// This will print usage instructions to the specified output.
+/** This will print usage instructions to the specified output. */
 DJVUAPI
 void djvu_decode_usage(int fd,const char *prog);
 
