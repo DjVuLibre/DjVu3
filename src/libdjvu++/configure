@@ -88,6 +88,7 @@ do
        exit 0
     fi
 done
+echo
 
 
 ### Check compiler
