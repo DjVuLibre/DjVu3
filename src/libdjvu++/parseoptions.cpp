@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: parseoptions.cpp,v 1.88 2001-06-18 20:29:17 bcr Exp $
+// $Id: parseoptions.cpp,v 1.89 2001-07-16 19:32:32 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -682,10 +682,12 @@ DjVuParseOptions::ReadConfig(const GUTF8String &prog,
   if(readasprofile.length())
   {
     filename=prog;
-    FILE *f=fopen((const char *)GURL::Filename::UTF8(filename).NativeFilename(),"r");
     retval=ProfileTokens->SetToken(readasprofile);
     (void)(Configuration->Grow(retval+1));
-    if(f)
+    GURL::Filename::UTF8 url(filename);
+    FILE *f=0;
+    if(url.is_valid() && !url.is_empty() && url.is_file() &&
+  	  (f=fopen((const char *)url.NativeFilename(),"r")))
     {
       Configuration->Add(retval,profile_token,profile_token_default_string);
       ReadFile(line,f,retval);
@@ -697,7 +699,7 @@ DjVuParseOptions::ReadConfig(const GUTF8String &prog,
   }else
   {
 	const GURL::Filename::UTF8 xurl(prog);
-    const GUTF8String xname(xurl.is_valid()?xurl.fname():prog);
+    const GUTF8String xname((xurl.is_valid()&&!xurl.is_empty())?xurl.fname():prog);
     retval=ProfileTokens->GetToken(xname);
   // First check and see if we have already read in this profile.
     if(retval < 0)
@@ -705,11 +707,19 @@ DjVuParseOptions::ReadConfig(const GUTF8String &prog,
       retval=ProfileTokens->SetToken(xname);
       (void)(Configuration->Grow(retval+1));
       FILE *f=0;
-      if(ConfigFilename(xname)&&(f=fopen((const char *)GURL::Filename::UTF8(filename).NativeFilename(),"r")))
-      {
-        Configuration->Add(retval,profile_token,profile_token_read_string);
-        ReadFile(line,f,retval);
-        fclose(f);
+      if(ConfigFilename(xname) && filename.length())
+	  {
+	    GURL::Filename::UTF8 url(filename);
+	    if(url.is_valid() && !url.is_empty() && url.is_file() &&
+	  	  (f=fopen((const char *)url.NativeFilename(),"r")))
+		{
+          Configuration->Add(retval,profile_token,profile_token_read_string);
+          ReadFile(line,f,retval);
+          fclose(f);
+		}else
+		{
+          Configuration->Add(retval,profile_token,"");
+		}
       }else
       {
         Configuration->Add(retval,profile_token,"");

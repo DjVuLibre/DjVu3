@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GURL.cpp,v 1.80 2001-07-13 01:05:27 fcrary Exp $
+// $Id: GURL.cpp,v 1.81 2001-07-16 19:32:32 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -459,8 +459,15 @@ GURL &
 GURL::operator=(const GURL & url_in)
 {
    GCriticalSectionLock lock(&class_lock);
-   url=url_in.get_string();
-   init();
+   if(url_in.is_valid())
+   {
+     url=url_in.get_string();
+	 init();
+   }else
+   {
+     url=url_in.url;
+	 validurl=false;
+   }
    return *this;
 }
 
@@ -967,17 +974,21 @@ GURL::name(void) const
 {
    if(!validurl)
      const_cast<GURL *>(this)->init();
-   const GUTF8String xurl(url);
-   const int protocol_length=protocol(xurl).length();
-   const char * ptr, * xslash;
-   for(ptr=xslash=(const char *)xurl+protocol_length+1;
-     *ptr && !is_argument(ptr);ptr++)
+   GUTF8String retval;
+   if(!is_empty())
    {
-      if (*ptr==slash)
-        xslash=ptr;
+     const GUTF8String xurl(url);
+     const int protocol_length=protocol(xurl).length();
+     const char * ptr, * xslash=(const char *)xurl+protocol_length-1;
+     for(ptr=(const char *)xurl+protocol_length;
+       *ptr && !is_argument(ptr);ptr++)
+	 {
+       if (*ptr==slash)
+          xslash=ptr;
+	 }
+     retval=GUTF8String(xslash+1, ptr-xslash-1);
    }
-   
-   return GUTF8String(xslash+1, ptr-xslash-1);
+   return retval;
 }
 
 GUTF8String
@@ -1119,7 +1130,7 @@ url_from_UTF8filename(const GUTF8String &gfilename)
   // Special case for blank pages
   if(!filename || !filename[0])
   {
-    return "about:blank";
+    return GUTF8String();
   } 
 
   // Normalize file name to url slash-and-escape syntax
@@ -1370,8 +1381,7 @@ GURL::is_file(void) const
     DWORD           dwAttrib;       ;
     USES_CONVERSION ;
     dwAttrib = GetFileAttributes(A2CT(NativeFilename())) ;//MBCS cvt
-    retval=!((dwAttrib == 0xFFFFFFFF)
-     ||( dwAttrib & FILE_ATTRIBUTE_DIRECTORY ));
+    retval=!( dwAttrib & FILE_ATTRIBUTE_DIRECTORY );
 #else
 #error "Define something here for your operating system"
 #endif
@@ -1766,7 +1776,7 @@ GURL::expand_name(const GUTF8String &xfname, const char *from)
         while (*fname && *fname!= slash && *fname!=backslash)
         {
           *s = *fname++;
-          if ((++s)-string_buffer > maxlen)
+          if ((size_t)((++s)-string_buffer) > maxlen)
             G_THROW( ERR_MSG("GURL.big_name") );
         }
         *s = 0;
@@ -1784,7 +1794,7 @@ GURL::expand_name(const GUTF8String &xfname, const char *from)
       while (*fname && (*fname!= slash) && (*fname!=backslash))
       {
         *s = *fname++;
-        if ((++s)-string_buffer > maxlen)
+        if ((size_t)((++s)-string_buffer) > maxlen)
           G_THROW( ERR_MSG("GURL.big_name") );
       }
       *s = 0;
