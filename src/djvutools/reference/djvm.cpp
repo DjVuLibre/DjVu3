@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: djvm.cpp,v 1.15 2000-09-18 17:10:27 bcr Exp $
+//C- $Id: djvm.cpp,v 1.1 2000-10-02 22:56:51 bcr Exp $
 
 /** @name djvm
 
@@ -79,7 +79,7 @@
     @author
     Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: djvm.cpp,v 1.15 2000-09-18 17:10:27 bcr Exp $# */
+    #$Id: djvm.cpp,v 1.1 2000-10-02 22:56:51 bcr Exp $# */
 //@{
 //@}
 
