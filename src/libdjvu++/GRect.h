@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GRect.h,v 1.11 1999-10-13 19:54:05 leonb Exp $
+//C- $Id: GRect.h,v 1.12 1999-10-24 17:01:02 eaf Exp $
 
 
 #ifndef _GRECT_H_
@@ -30,7 +30,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GRect.h,v 1.11 1999-10-13 19:54:05 leonb Exp $# */
+    #$Id: GRect.h,v 1.12 1999-10-24 17:01:02 eaf Exp $# */
 //@{
 
 #include "DjVuGlobal.h"
@@ -96,8 +96,10 @@ public:
       (inclusive) to #xmax# (exclusive) and vertical coordinates #ymin#
       (inclusive) to #ymax# (exclusive). */
   int  contains(int x, int y) const;
-  /** Returns true iff rectangles #r1# and #r2# are equal. */
+  /** Returns true if rectangles #r1# and #r2# are equal. */
   friend int operator==(const GRect & r1, const GRect & r2);
+  /** Returns true if rectangles #r1# and #r2# are not equal. */
+  friend int operator!=(const GRect & r1, const GRect & r2);
   /** Resets the rectangle to the empty rectangle */
   void clear();
   /** Fatten the rectangle. Both vertical sides of the rectangle are pushed
@@ -256,7 +258,11 @@ GRect::clear()
   xmin = xmax = ymin = ymax = 0;
 }
 
-
+inline int
+operator!=(const GRect & r1, const GRect & r2)
+{
+   return !(r1==r2);
+}
 
 // ---- THE END
 #endif
