@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: Arrays.cpp,v 1.15 2000-12-18 17:13:40 bcr Exp $
+// $Id: Arrays.cpp,v 1.16 2000-12-21 01:22:45 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -149,7 +149,8 @@ ArrayRep::resize(int lo, int hi)
   }
   // allocate
   int bytesize=elsize*(nmaxhi-nminlo+1);
-  void * ndata=operator new(bytesize);
+  void * ndata;
+  GPBufferBase gndata(ndata,bytesize,1);
   memset(ndata, 0, bytesize);
   // initialize
   init1(ndata, lo-nminlo, lobound-1-nminlo);
@@ -157,9 +158,12 @@ ArrayRep::resize(int lo, int hi)
         data, lobound-minlo, hibound-minlo);
   init1(ndata, hibound+1-nminlo, hi-nminlo);
   destroy(data, lobound-minlo, hibound-minlo);
+
   // free and replace
-  operator delete (data);
+  void *tmp=data;
   data = ndata;
+  ndata=tmp;
+
   minlo = nminlo;
   maxhi = nmaxhi;
   lobound = lo;
@@ -199,13 +203,15 @@ ArrayRep::ins(int n, const void * what, unsigned int howmany)
       while (nmaxhi < nhi)
 	 nmaxhi += (nmaxhi < 8 ? 8 : (nmaxhi > 32768 ? 32768 : nmaxhi));
       int bytesize = elsize*(nmaxhi-minlo+1);
-      void *ndata = operator new (bytesize);
+      void *ndata;
+      GPBufferBase gndata(ndata,bytesize,1);
       memset(ndata, 0, bytesize);
       copy(ndata, lobound-minlo, hibound-minlo,
 	   data, lobound-minlo, hibound-minlo);
       destroy(data, lobound-minlo, hibound-minlo);
-      operator delete (data);
-      data = ndata;
+      void *tmp=data;
+      data=ndata;
+      tmp=data;
       maxhi = nmaxhi;
    }
 

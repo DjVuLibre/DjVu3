@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: GContainer.cpp,v 1.25 2000-12-18 17:13:42 bcr Exp $
+// $Id: GContainer.cpp,v 1.26 2000-12-21 01:22:45 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -47,12 +47,12 @@
 
 GArrayBase::GArrayBase(const GArrayBase &ref)
   : traits(ref.traits),
-    data(0),
+    gdata(data,0,1),
     minlo(ref.minlo), maxhi(ref.maxhi),
     lobound(ref.lobound), hibound(ref.hibound)
 {
   if (maxhi >= minlo)
-    data = operator new ( traits.size * (maxhi - minlo + 1) );
+    gdata.resize(traits.size * (maxhi - minlo + 1),1);
   if (hibound >= lobound)
     traits.copy(traits.lea(data, lobound-minlo), 
                 traits.lea(ref.data, lobound-minlo),
@@ -62,7 +62,7 @@ GArrayBase::GArrayBase(const GArrayBase &ref)
 
 GArrayBase::GArrayBase(const GCONT Traits &traits)
   : traits(traits),
-    data(0),
+    gdata(data,0,1),
     minlo(0), maxhi(-1),
     lobound(0), hibound(-1)
 {
@@ -71,7 +71,7 @@ GArrayBase::GArrayBase(const GCONT Traits &traits)
 
 GArrayBase::GArrayBase(const GCONT Traits &traits, int lobound, int hibound)
   : traits(traits),
-    data(0),
+    gdata(data,0,1),
     minlo(0), maxhi(-1),
     lobound(0), hibound(-1)
 {
@@ -113,9 +113,9 @@ GArrayBase::steal(GArrayBase &ga)
       minlo = ga.minlo;
       maxhi = ga.maxhi;
       data = ga.data;
+      ga.data = 0;
       ga.lobound = ga.minlo = 0;
       ga.hibound = ga.maxhi = -1;
-      ga.data = 0;
     }
 }
 
@@ -151,10 +151,9 @@ GArrayBase::resize(int lo, int hi)
       if (hibound >= lobound)
         traits.fini( traits.lea(data, lobound-minlo), hibound-lobound+1 );
       if (data)
-        operator delete (data);
+        gdata.resize(0,1);
       lobound = minlo = 0;
       hibound = maxhi = -1;
-      data = 0;
       return;
     }
   // Simple extension
@@ -189,7 +188,8 @@ GArrayBase::resize(int lo, int hi)
   int beg = lo;
   int end = hi;
   int bytesize = traits.size * (nmaxhi-nminlo+1);
-  void *ndata = operator new (bytesize);
+  void *ndata;
+  GPBufferBase gndata(ndata,bytesize,1);
 #if GCONTAINER_ZERO_FILL
   memset(ndata, 0, bytesize);  // slower but cleaner
 #endif
@@ -206,8 +206,9 @@ GArrayBase::resize(int lo, int hi)
                    traits.lea(data, beg-minlo),
                    end-beg+1, 1 ); }
   // free and replace
-  operator delete ((void*)(data));
-  data = ndata;
+  void *tmp=data;
+  data=ndata;
+  ndata=tmp;
   minlo = nminlo;
   maxhi = nmaxhi;
   lobound = lo;
@@ -272,14 +273,16 @@ GArrayBase::ins(int n, const void *src, int howmany)
         nmaxhi += (nmaxhi < 8 ? 8 : (nmaxhi > 32768 ? 32768 : nmaxhi));
       int bytesize = traits.size * (nmaxhi-minlo+1);
       void *ndata = operator new (bytesize);
+      GPBufferBase gndata(ndata,bytesize,1);
       memset(ndata, 0, bytesize);  // slower but cleaner
       if (hibound >= lobound)
         traits.copy( traits.lea(ndata, lobound-minlo),
                      traits.lea(data, lobound-minlo),
                      hibound-lobound+1, 1 );
-      operator delete (data);
       maxhi = nmaxhi;
+      void *tmp=data;
       data = ndata;
+      ndata=tmp;
     }
   // Shift data
   int elsize = traits.size;

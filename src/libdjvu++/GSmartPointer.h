@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: GSmartPointer.h,v 1.27 2000-12-20 01:41:43 bcr Exp $
+// $Id: GSmartPointer.h,v 1.28 2000-12-21 01:22:45 bcr Exp $
 // $Name:  $
 
 #ifndef _GSMARTPOINTER_H_
@@ -54,7 +54,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation\\
     Andrei Erofeev <eaf@geocities.com> -- bug fix.
     @version 
-    #$Id: GSmartPointer.h,v 1.27 2000-12-20 01:41:43 bcr Exp $# 
+    #$Id: GSmartPointer.h,v 1.28 2000-12-21 01:22:45 bcr Exp $# 
     @args
 */
 //@{
@@ -75,26 +75,34 @@
 
 class GPBufferBase
 {
-protected:
-  GPBufferBase(void *&,size_t n,size_t t);
-  void *&ptr;
 public:
+  GPBufferBase(void *&,const size_t n,const size_t t);
+  void resize(const size_t n,const size_t t);
   ~GPBufferBase();
+private:
+  void *&ptr;
+  size_t num;
 };
+
+inline
+GPBufferBase::GPBufferBase(void *&xptr,const size_t n,const size_t t) : ptr(xptr), num(n)
+{
+  xptr=(n*t)?(::operator new(n*t)):0;
+}
+
+inline
+GPBufferBase::~GPBufferBase()
+{
+  ::operator delete(ptr);
+}
 
 template<class TYPE>
 class GPBuffer : public GPBufferBase
 {
 public:
-  GPBuffer(TYPE *&xptr,size_t n) : GPBufferBase((void *&)xptr,n,sizeof(TYPE)) {}
+  GPBuffer(TYPE *&xptr,const size_t n) : GPBufferBase((void *&)xptr,n,sizeof(TYPE)) {}
+  inline void resize(const size_t n) {GPBufferBase::resize(n,sizeof(TYPE));}
 };
-
-inline
-GPBufferBase::GPBufferBase(void *&xptr,size_t n,size_t t) : ptr(xptr)
-{
-  xptr=::operator new(n*t);
-}
-
 
 /** Base class for reference counted objects.  
     This is the base class for all reference counted objects.

@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: GContainer.h,v 1.41 2000-12-18 17:13:42 bcr Exp $
+// $Id: GContainer.h,v 1.42 2000-12-21 01:22:45 bcr Exp $
 // $Name:  $
 
 #ifndef _GCONTAINER_H_
@@ -93,7 +93,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@geocities.com> -- bug fixes.
     @version 
-    #$Id: GContainer.h,v 1.41 2000-12-18 17:13:42 bcr Exp $# */
+    #$Id: GContainer.h,v 1.42 2000-12-21 01:22:45 bcr Exp $# */
 //@{
 
 
@@ -297,6 +297,7 @@ public:
 protected:
   const Traits &traits;
   void  *data;
+  GPBufferBase gdata;
   int   minlo;
   int   maxhi;
   int   lobound;

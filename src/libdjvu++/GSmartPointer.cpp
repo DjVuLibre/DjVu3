@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: GSmartPointer.cpp,v 1.19 2000-12-20 01:41:43 bcr Exp $
+// $Id: GSmartPointer.cpp,v 1.20 2000-12-21 01:22:45 bcr Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 05/1997
@@ -147,8 +147,22 @@ GPBase::assign (const GPBase &sptr)
   return *this;
 }
 
-GPBufferBase::~GPBufferBase()
+void
+GPBufferBase::resize(const size_t n, const size_t t)
 {
-  ::operator delete(ptr);
+  if(num != n)
+  {
+    void *nptr;
+    GPBufferBase gnptr(nptr, n,t);
+    const size_t s=((num<n)?num:n)*t;
+    if(s)
+    {
+      memcpy(nptr, ptr, s);
+    }
+    void *temp=nptr;
+    ptr=nptr;
+    nptr=temp;
+    num=gnptr.num;
+  }
 }
 

@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: JB2Image.cpp,v 1.45 2000-12-20 00:00:16 bcr Exp $
+// $Id: JB2Image.cpp,v 1.46 2000-12-21 01:22:46 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -63,23 +63,58 @@
 class _JB2Codec
 {
 public:
-  // Constructor Destructor
+  typedef unsigned int NumContext;
+  struct LibRect
+  {
+    short top,left,right,bottom;
+    void compute_bounding_box(GBitmap &cbm);
+  };
   virtual ~_JB2Codec();
-  // Functions
-  void set_dict_callback(JB2DecoderCallback *cb, void *arg);
-  virtual void code(JB2Image *jim) = 0;
-  virtual void code(JB2Dict *jim) = 0;
 protected:
-  // Forbidden assignment
+  // Constructors
   _JB2Codec(ByteStream &bs, const bool xencoding=false);
+  // Forbidden assignment
   _JB2Codec(const _JB2Codec &ref);
   _JB2Codec& operator=(const _JB2Codec &ref);
-//private:
+
+  int CodeNum(int lo, int hi, NumContext *pctx,int v);
+  void reset_numcoder(void);
+  inline void code_eventual_lossless_refinement();
+  void init_library(JB2Dict *jim);
+  int add_library(int shapeno, JB2Shape *jshp);
+  void code_relative_location(JB2Blit *jblt, int rows, int columns);
+  void code_bitmap_directly (GBitmap &bm);
+  void code_bitmap_by_cross_coding (GBitmap &bm, GBitmap *cbm, const int libno);
+  void code_record(int &rectype, JB2Dict *jim, JB2Shape *jshp);
+  void code_record(int &rectype, JB2Image *jim, JB2Shape *jshp, JB2Blit *jblt);
+  static void compute_bounding_box(GBitmap &cbm, LibRect &lrect);
+
+  virtual bool CodeBit(const bool bit, BitContext &ctx) = 0;
+  virtual void code_comment(GString &comment) = 0;
+  virtual void code_record_type(int &rectype) = 0;
+  virtual int code_match_index(int &index, JB2Dict *jim)=0;
+  virtual void code_inherited_shape_count(JB2Dict *jim)=0;
+  virtual void code_image_size(JB2Dict *jim);
+  virtual void code_image_size(JB2Image *jim);
+  virtual void code_absolute_location(JB2Blit *jblt,  int rows, int columns)=0;
+  virtual void code_absolute_mark_size(GBitmap *bm, int border=0) = 0;
+  virtual void code_relative_mark_size(GBitmap *bm, int cw, int ch, int border=0) = 0;
+  virtual void code_bitmap_directly(GBitmap &bm,const int dw, int dy,
+    unsigned char *up2, unsigned char *up1, unsigned char *up0 )=0;
+  virtual void code_bitmap_by_cross_coding (GBitmap &bm, GBitmap &cbm,
+    const int xd2c, const int dw, int dy, int cy,
+    unsigned char *up1, unsigned char *up0, unsigned char *xup1, 
+    unsigned char *xup0, unsigned char *xdn1 )=0;
+  // Code records
+  virtual int get_diff(const int x_diff,NumContext &rel_loc) = 0;
+
+private:
+  bool encoding;
+
+protected:
   // Coder
   ZPCodec zp;
-  bool encoding;
   // NumCoder
-  typedef unsigned int NumContext;
   static const int BIGPOSITIVE;
   static const int BIGNEGATIVE;
   static const int CELLCHUNK;
@@ -87,33 +122,26 @@ protected:
   int cur_ncell;
   int max_ncell;
   BitContext *bitcells;
+  GPBuffer<BitContext> gbitcells;
   NumContext *leftcell;
+  GPBuffer<NumContext> gleftcell;
   NumContext *rightcell;
-  virtual int CodeBit(const int bit, BitContext &ctx) = 0;
-  int CodeNum(int lo, int hi, NumContext &ctx,int v);
-  void reset_numcoder();
+  GPBuffer<NumContext> grightcell;
   // Info
-  char refinementp;
+  bool refinementp;
   char gotstartrecordp;
   JB2DecoderCallback *cbfunc;
   void *cbarg;
   // Code comment
   NumContext dist_comment_byte;
   NumContext dist_comment_length;
-  virtual void code_comment(GString &comment) = 0;
   // Code values
   NumContext dist_record_type;
   NumContext dist_match_index;
   BitContext dist_refinement_flag;
-  inline void code_eventual_lossless_refinement();
-  virtual void code_record_type(int &rectype) = 0;
-  virtual int code_match_index(int &index, JB2Dict *jim)=0;
   // Library
-  void init_library(JB2Dict *jim);
-  int add_library(int shapeno, JB2Shape *jshp);
   GTArray<int> shape2lib;
   GTArray<int> lib2shape;
-  struct LibRect { short top,left,right,bottom; };
   GTArray<LibRect> libinfo;
   // Code pairs
   NumContext abs_loc_x;
@@ -136,13 +164,6 @@ protected:
   int last_row_left;
   int image_columns;
   int image_rows;
-  virtual void code_inherited_shape_count(JB2Dict *jim)=0;
-  virtual void code_image_size(JB2Dict *jim);
-  virtual void code_image_size(JB2Image *jim);
-  void code_relative_location(JB2Blit *jblt, int rows, int columns);
-  virtual void code_absolute_location(JB2Blit *jblt,  int rows, int columns)=0;
-  virtual void code_absolute_mark_size(GBitmap *bm, int border=0) = 0;
-  virtual void code_relative_mark_size(GBitmap *bm, int cw, int ch, int border=0) = 0;
   int short_list[3];
   int short_list_pos;
   inline void fill_short_list(int v);
@@ -150,80 +171,79 @@ protected:
   // Code bitmaps
   BitContext bitdist[1024];
   BitContext cbitdist[2048];
-  void code_bitmap_directly (GBitmap &bm);
-  virtual void code_bitmap_directly(GBitmap &bm,const int dw, int dy,
-    unsigned char *up2, unsigned char *up1, unsigned char *up0 )=0;
-  void code_bitmap_by_cross_coding (GBitmap &bm, GBitmap *cbm, const int libno);
-  virtual void code_bitmap_by_cross_coding (GBitmap &bm, GBitmap &cbm,
-    const int xd2c, const int dw, int dy, int cy,
-    unsigned char *up1, unsigned char *up0, unsigned char *xup1, 
-    unsigned char *xup0, unsigned char *xdn1 )=0;
-  // Code records
-  void code_record(int &rectype, JB2Dict *jim, JB2Shape *jshp);
-  void code_record(int &rectype, JB2Image *jim, JB2Shape *jshp, JB2Blit *jblt);
-  // Helpers
-  void encode_libonly_shape(JB2Image *jim, int shapeno);
-  void compute_bounding_box(GBitmap *cbm, LibRect *lrect);
-  virtual int get_diff(int x_diff,NumContext &rel_loc) = 0;
 };
+
+////////////////////////////////////////
+//// CLASS JB2DECODECODEC:  DECLARATION
+////////////////////////////////////////
 
 class _JB2DecodeCodec : public _JB2Codec
 {
 public:
   _JB2DecodeCodec(ByteStream &bs);
-  virtual ~_JB2DecodeCodec();
-  virtual void code(JB2Image *jim);
-  virtual void code(JB2Dict *jim);
+// virtual
+  void code(JB2Image *jim);
+  void code(JB2Dict *jim);
+  void set_dict_callback(JB2DecoderCallback *cb, void *arg);
+
 protected:
-  int CodeNum(int lo, int hi, NumContext &ctx);
-  virtual int CodeBit(const int bit, BitContext &ctx);
-  virtual void code_comment(GString &comment);
-  virtual void code_record_type(int &rectype);
-  virtual int code_match_index(int &index, JB2Dict *jim);
-  virtual void code_inherited_shape_count(JB2Dict *jim);
-  virtual void code_image_size(JB2Dict *jim);
-  virtual void code_image_size(JB2Image *jim);
-  virtual void code_absolute_location(JB2Blit *jblt,  int rows, int columns);
-  virtual void code_absolute_mark_size(GBitmap *bm, int border=0);
-  virtual void code_relative_mark_size(GBitmap *bm, int cw, int ch, int border=0);
-  virtual void code_bitmap_directly(GBitmap &bm,const int dw, int dy,
+  int CodeNum(const int lo, const int hi, NumContext &ctx);
+
+// virtual
+  bool CodeBit(const bool bit, BitContext &ctx);
+  void code_comment(GString &comment);
+  void code_record_type(int &rectype);
+  int code_match_index(int &index, JB2Dict *jim);
+  void code_inherited_shape_count(JB2Dict *jim);
+  void code_image_size(JB2Dict *jim);
+  void code_image_size(JB2Image *jim);
+  void code_absolute_location(JB2Blit *jblt,  int rows, int columns);
+  void code_absolute_mark_size(GBitmap *bm, int border=0);
+  void code_relative_mark_size(GBitmap *bm, int cw, int ch, int border=0);
+  void code_bitmap_directly(GBitmap &bm,const int dw, int dy,
     unsigned char *up2, unsigned char *up1, unsigned char *up0 );
-  virtual void code_bitmap_by_cross_coding (GBitmap &bm, GBitmap &cbm,
+  void code_bitmap_by_cross_coding (GBitmap &bm, GBitmap &cbm,
     const int xd2c, const int dw, int dy, int cy,
     unsigned char *up1, unsigned char *up0, unsigned char *xup1, 
     unsigned char *xup0, unsigned char *xdn1 );
-  virtual int get_diff(int x_diff,NumContext &rel_loc);
+  int get_diff(const int x_diff,NumContext &rel_loc);
 };
 
-#ifndef NEED_DECODER_ONLY
+////////////////////////////////////////
+//// CLASS JB2ENCODECODEC:  DECLARATION
+////////////////////////////////////////
+
 class _JB2EncodeCodec : public _JB2Codec
 {
 public:
   _JB2EncodeCodec(ByteStream &bs);
-  virtual ~_JB2EncodeCodec();
-  virtual void code(JB2Image *jim);
-  virtual void code(JB2Dict *jim);
+//virtual
+  void code(JB2Image *jim);
+  void code(JB2Dict *jim);
+
 protected:
-  void CodeNum(int num, int lo, int hi, NumContext &ctx);
-  virtual int CodeBit(const int bit, BitContext &ctx);
-  virtual void code_comment(GString &comment);
-  virtual void code_record_type(int &rectype);
-  virtual int code_match_index(int &index, JB2Dict *jim);
-  virtual void code_inherited_shape_count(JB2Dict *jim);
-  virtual void code_image_size(JB2Dict *jim);
-  virtual void code_image_size(JB2Image *jim);
-  virtual void code_absolute_location(JB2Blit *jblt,  int rows, int columns);
-  virtual void code_absolute_mark_size(GBitmap *bm, int border=0);
-  virtual void code_relative_mark_size(GBitmap *bm, int cw, int ch, int border=0);
-  virtual void code_bitmap_directly(GBitmap &bm,const int dw, int dy,
+  void CodeNum(const int num, const int lo, const int hi, NumContext &ctx);
+  void encode_libonly_shape(JB2Image *jim, int shapeno);
+// virtual
+  bool CodeBit(const bool bit, BitContext &ctx);
+  void code_comment(GString &comment);
+  void code_record_type(int &rectype);
+  int code_match_index(int &index, JB2Dict *jim);
+  void code_inherited_shape_count(JB2Dict *jim);
+  void code_image_size(JB2Dict *jim);
+  void code_image_size(JB2Image *jim);
+  void code_absolute_location(JB2Blit *jblt,  int rows, int columns);
+  void code_absolute_mark_size(GBitmap *bm, int border=0);
+  void code_relative_mark_size(GBitmap *bm, int cw, int ch, int border=0);
+  void code_bitmap_directly(GBitmap &bm,const int dw, int dy,
     unsigned char *up2, unsigned char *up1, unsigned char *up0 );
-  virtual int get_diff(int x_diff,NumContext &rel_loc);
-  virtual void code_bitmap_by_cross_coding (GBitmap &bm, GBitmap &cbm,
+  int get_diff(const int x_diff,NumContext &rel_loc);
+  void code_bitmap_by_cross_coding (GBitmap &bm, GBitmap &cbm,
     const int xd2c, const int dw, int dy, int cy,
     unsigned char *up1, unsigned char *up0, unsigned char *xup1, 
     unsigned char *xup0, unsigned char *xdn1 );
 };
-#endif
+
 
 ////////////////////////////////////////
 //// CLASS JB2DICT: IMPLEMENTATION
@@ -455,12 +475,13 @@ _JB2EncodeCodec::_JB2EncodeCodec(ByteStream &bs) : _JB2Codec(bs,1) {}
 #endif
 
 _JB2Codec::_JB2Codec(ByteStream &bs, const bool xencoding)
-  : zp(bs, xencoding, true),
-    encoding(xencoding),
+  : encoding(xencoding),
+    zp(bs, xencoding, true),
     cur_ncell(0),
-    bitcells(0),
-    leftcell(0),
-    rightcell(0),
+    max_ncell(CELLCHUNK+CELLEXTRA),
+    gbitcells(bitcells,CELLCHUNK+CELLEXTRA),
+    gleftcell(leftcell,CELLCHUNK+CELLEXTRA),
+    grightcell(rightcell,CELLCHUNK+CELLEXTRA),
     refinementp(0),
     gotstartrecordp(0),
     cbfunc(0),
@@ -487,28 +508,12 @@ _JB2Codec::_JB2Codec(ByteStream &bs, const bool xencoding)
   memset(bitdist, 0, sizeof(bitdist));
   memset(cbitdist, 0, sizeof(cbitdist));
   // Initialize numcoder
-  max_ncell = CELLCHUNK+CELLEXTRA;
-  bitcells  = new BitContext[max_ncell];
-  leftcell  = new NumContext[max_ncell];
-  rightcell = new NumContext[max_ncell];
   bitcells[0] = 0; // dummy cell
   leftcell[0] = rightcell[0] = 0;
   cur_ncell = 1;
 }
 
-
-_JB2Codec::~_JB2Codec()
-{
-  delete [] bitcells;
-  delete [] rightcell;
-  delete [] leftcell;
-}
-
-_JB2DecodeCodec::~_JB2DecodeCodec() {}
-
-#ifndef NEED_DECODER_ONLY
-_JB2EncodeCodec::~_JB2EncodeCodec() {}
-#endif
+_JB2Codec::~_JB2Codec() {}
 
 void 
 _JB2Codec::reset_numcoder()
@@ -537,7 +542,7 @@ _JB2Codec::reset_numcoder()
 
 
 void 
-_JB2Codec::set_dict_callback(JB2DecoderCallback *cb, void *arg)
+_JB2DecodeCodec::set_dict_callback(JB2DecoderCallback *cb, void *arg)
 {
   cbfunc = cb;
   cbarg = arg;
@@ -547,16 +552,16 @@ _JB2Codec::set_dict_callback(JB2DecoderCallback *cb, void *arg)
 // CODE NUMBERS
 
 #ifndef NEED_DECODER_ONLY
-inline int
-_JB2EncodeCodec::CodeBit(const int bit, BitContext &ctx)
+inline bool
+_JB2EncodeCodec::CodeBit(const bool bit, BitContext &ctx)
 {
-    zp.encoder(bit, ctx);
+    zp.encoder(bit?1:0, ctx);
     return bit;
 }
 #endif
 
-inline int
-_JB2DecodeCodec::CodeBit(const int, BitContext &ctx)
+inline bool
+_JB2DecodeCodec::CodeBit(const bool, BitContext &ctx)
 {
   return zp.decoder(ctx);
 }
@@ -564,7 +569,7 @@ _JB2DecodeCodec::CodeBit(const int, BitContext &ctx)
 int
 _JB2DecodeCodec::CodeNum(int low, int high, NumContext &ctx)
 {
-  return _JB2Codec::CodeNum(low,high,ctx,0);
+  return _JB2Codec::CodeNum(low,high,&ctx,0);
 }
 
 #ifndef NEED_DECODER_ONLY
@@ -573,17 +578,16 @@ _JB2EncodeCodec::CodeNum(int num, int low, int high, NumContext &ctx)
 {
   if (num < low || num > high)
     G_THROW("JB2Image.bad_number");
-  _JB2Codec::CodeNum(low,high,ctx,num);
+  _JB2Codec::CodeNum(low,high,&ctx,num);
 }
 #endif
 
 int
-_JB2Codec::CodeNum(int low, int high, NumContext &ctx, int v)
+_JB2Codec::CodeNum(int low, int high, NumContext *pctx, int v)
 {
   int cutoff, decision, negative=0, phase, range, temp;
-  NumContext *pctx = &ctx;
   // Check
-  if ((int)ctx >= cur_ncell)
+  if (pctx && ((int)*pctx >= cur_ncell))
     G_THROW("JB2Image.bad_numcontext");
   // Start all phases
   phase = 1;
@@ -596,15 +600,9 @@ _JB2Codec::CodeNum(int low, int high, NumContext &ctx, int v)
           if (cur_ncell >= max_ncell)
             {
               int nmax_ncell = max_ncell + CELLCHUNK;
-              BitContext *nbitcells = new BitContext[nmax_ncell];
-              NumContext *nleftcell = new NumContext[nmax_ncell];
-              NumContext *nrightcell = new NumContext[nmax_ncell];
-              memcpy(nbitcells, bitcells, max_ncell*sizeof(BitContext));
-              memcpy(nleftcell, leftcell, max_ncell*sizeof(NumContext));
-              memcpy(nrightcell, rightcell, max_ncell*sizeof(NumContext));
-              delete bitcells; bitcells=nbitcells;
-              delete leftcell; leftcell=nleftcell;
-              delete rightcell; rightcell=nrightcell;
+              gbitcells.resize(nmax_ncell);
+              gleftcell.resize(nmax_ncell);
+              grightcell.resize(nmax_ncell);
               max_ncell = nmax_ncell;
             }
           *pctx = cur_ncell ++;
@@ -731,7 +729,7 @@ _JB2Codec::init_library(JB2Dict *jim)
       shape2lib[i] = i;
       lib2shape[i] = i;
       JB2Shape *jshp = jim->get_shape(i);
-      compute_bounding_box(jshp->bits, &(libinfo[i]));
+      libinfo[i].compute_bounding_box(*(jshp->bits));
     }
 }
 
@@ -744,7 +742,7 @@ _JB2Codec::add_library(int shapeno, JB2Shape *jshp)
   shape2lib.touch(shapeno);
   shape2lib[shapeno] = libno;
   libinfo.touch(libno);
-  compute_bounding_box(jshp->bits, &(libinfo[libno]));
+  libinfo[libno].compute_bounding_box(*(jshp->bits));
   return libno;
 }
 
@@ -770,7 +768,7 @@ _JB2DecodeCodec::code_record_type(int &rectype)
 inline void
 _JB2Codec::code_eventual_lossless_refinement()
 {
-  refinementp=CodeBit(refinementp, dist_refinement_flag);
+  refinementp=CodeBit(refinementp?true:false, dist_refinement_flag)?1:0;
 }
 
 #ifndef NEED_DECODER_ONLY
@@ -959,7 +957,7 @@ _JB2Codec::code_relative_location(JB2Blit *jblt, int rows, int columns)
       top = bottom + rows - 1;
     }
   // Code offset type
-  int new_row=CodeBit((left<last_left)?1:0, offset_type_dist);
+  int new_row=CodeBit((left<last_left), offset_type_dist);
   if (new_row)
     {
       // Begin a new row
@@ -1804,7 +1802,7 @@ _JB2DecodeCodec::code(JB2Image *jim)
 
 #ifndef NEED_DECODER_ONLY
 void 
-_JB2Codec::encode_libonly_shape(JB2Image *jim, int shapeno )
+_JB2EncodeCodec::encode_libonly_shape(JB2Image *jim, int shapeno )
 {
   // Recursively encode parent shape
   JB2Shape *jshp = jim->get_shape(shapeno);
@@ -1830,47 +1828,44 @@ _JB2Codec::encode_libonly_shape(JB2Image *jim, int shapeno )
 }
 #endif
 
+////////////////////////////////////////
+//// HELPERS
+////////////////////////////////////////
+
 void 
-_JB2Codec::compute_bounding_box(GBitmap *bm, LibRect *lib)
+_JB2Codec::LibRect::compute_bounding_box(GBitmap &bm)
 {
   // First lock the stuff.
-  GMonitorLock lock(bm->monitor());
+  GMonitorLock lock(bm.monitor());
   // Get size
-  int w = bm->columns();
-  int h = bm->rows();
-  int s = bm->rowsize();
+  int w = bm.columns();
+  int h = bm.rows();
+  int s = bm.rowsize();
   int n;
   // Right border
-  lib->right = w;
-  while (--lib->right >= 0)
+  if ((right=w-1) >= 0) do
     {
-      unsigned char *p = (*bm)[0] + lib->right;
-      for (n=0; n<h; n++,p+=s) if (*p) break;
-      if (n<h) break;
-    }
+      unsigned char const *p = bm[0] + right;
+      for (n=0;(n<h)&&(!*p); n++,p+=s);
+    } while ((n>=h)&&(--right >= 0));
   // Top border
-  lib->top = h;
-  while (--lib->top >= 0)
+  if ((top=h-1) >= 0) do
     {
-      unsigned char *p = (*bm)[lib->top];
-      for (n=0; n<w; n++,p++) if (*p) break;
+      unsigned char const *p = bm[top];
+      for (n=0;(n<w)&&(!*p); n++,p++);
       if (n<w) break;
-    }
+    } while ((n>=w)&&(--top >= 0));
   // Left border
-  lib->left = -1;
-  while (++lib->left <= lib->right)
+  if ((left=0) <= right) do
     {
-      unsigned char *p = (*bm)[0] + lib->left;
-      for (n=0; n<h; n++,p+=s) if (*p) break;
-      if (n<h) break;
-    }
+      unsigned char const *p = bm[0] + left;
+      for (n=0;(n<h)&&(!*p); n++,p+=s);
+    } while ((n>=h)&&(++left <= right));
   // Bottom border
-  lib->bottom = -1;
-  while (++lib->bottom <= lib->top)
+  if ((bottom=0) <= top) do
     {
-      unsigned char *p = (*bm)[lib->bottom];
-      for (n=0; n<w; n++,p++) if (*p) break;
-      if (n<w) break;
-    }
+      unsigned char const *p = bm[bottom];
+      for (n=0;(n<w)&&(!*p); n++,p++);
+    } while ((n>=w)&&(++bottom <= top));
 }
 

@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: DjVuAnno.cpp,v 1.62 2000-12-18 17:13:40 bcr Exp $
+// $Id: DjVuAnno.cpp,v 1.63 2000-12-21 01:22:45 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -269,15 +269,6 @@ GLObject::get_string(void) const
 {
    if (type!=STRING)
    {
-#if 0 //          Original preserved in case I screw up the works
-      char * buffer=new char[256], buffer1[256]; buffer1[0]=0;
-      sprintf(buffer, "Invalid object type. Can't convert ");
-      if (type==NUMBER) sprintf(buffer1, "number %d", number);
-      else if (type==SYMBOL) sprintf(buffer1, "symbol '%s'", (const char *) symbol);
-      else if (type==LIST) sprintf(buffer1, "compound object '%s'", (const char *) name);
-      strcat(buffer, buffer1); strcat(buffer, " to string.");
-      G_THROW(buffer);
-#endif
       throw_can_not_convert_to(STRING);
    }
    return string;
@@ -288,15 +279,6 @@ GLObject::get_symbol(void) const
 {
    if (type!=SYMBOL)
    {
-#if 0 //          Original preserved in case I screw up the works
-      char * buffer=new char[256], buffer1[256]; buffer1[0]=0;
-      sprintf(buffer, "Invalid object type. Can't convert ");
-      if (type==NUMBER) sprintf(buffer1, "number %d", number);
-      else if (type==STRING) sprintf(buffer1, "string '%s'", (const char *) string);
-      else if (type==LIST) sprintf(buffer1, "compound object '%s'", (const char *) name);
-      strcat(buffer, buffer1); strcat(buffer, " to symbol.");
-      G_THROW(buffer);
-#endif
       throw_can_not_convert_to(SYMBOL);
    }
    return symbol;
@@ -307,15 +289,6 @@ GLObject::get_number(void) const
 {
    if (type!=NUMBER)
    {
-#if 0 //          Original preserved in case I screw up the works
-      char * buffer=new char[256], buffer1[256];
-      sprintf(buffer, "Invalid object type. Can't convert ");
-      if (type==STRING) sprintf(buffer1, "string '%s'", (const char *) string);
-      else if (type==SYMBOL) sprintf(buffer1, "symbol '%s'", (const char *) symbol);
-      else if (type==LIST) sprintf(buffer1, "compound object '%s'", (const char *) name);
-      strcat(buffer, buffer1); strcat(buffer, " to integer.");
-      G_THROW(buffer);
-#endif
       throw_can_not_convert_to(NUMBER);
    }
    return number;
@@ -326,15 +299,6 @@ GLObject::get_name(void) const
 {
    if (type!=LIST)
    {
-#if 0 //          Original preserved in case I screw up the works
-      char * buffer=new char[256], buffer1[256];
-      sprintf(buffer, "Invalid object type. Can't convert ");
-      if (type==NUMBER) sprintf(buffer1, "number '%d'", number);
-      else if (type==STRING) sprintf(buffer1, "string '%s'", (const char *) string);
-      else if (type==SYMBOL) sprintf(buffer1, "symbol '%s'", (const char *) symbol);
-      strcat(buffer, buffer1); strcat(buffer, " to compound object.");
-      G_THROW(buffer);
-#endif
       throw_can_not_convert_to(LIST);
    }
    return name;
@@ -345,15 +309,6 @@ GLObject::operator[](int n) const
 {
    if (type!=LIST)
    {
-#if 0 //          Original preserved in case I screw up the works
-      char * buffer=new char[256], buffer1[256];
-      sprintf(buffer, "Invalid object type. Can't convert ");
-      if (type==NUMBER) sprintf(buffer1, "number '%d'", number);
-      else if (type==STRING) sprintf(buffer1, "string '%s'", (const char *) string);
-      else if (type==SYMBOL) sprintf(buffer1, "symbol '%s'", (const char *) symbol);
-      strcat(buffer, buffer1); strcat(buffer, " to compound object.");
-      G_THROW(buffer);
-#endif
       throw_can_not_convert_to(LIST);
    }
    if (n>=list.size()) G_THROW("DjVuAnno.too_few\t"+name);
@@ -368,15 +323,6 @@ GLObject::get_list(void)
 {
    if (type!=LIST)
    {
-#if 0 //          Original preserved in case I screw up the works
-      char * buffer=new char[256], buffer1[256];
-      sprintf(buffer, "Invalid object type. Can't convert ");
-      if (type==NUMBER) sprintf(buffer1, "number '%d'", number);
-      else if (type==STRING) sprintf(buffer1, "string '%s'", (const char *) string);
-      else if (type==SYMBOL) sprintf(buffer1, "symbol '%s'", (const char *) symbol);
-      strcat(buffer, buffer1); strcat(buffer, " to compound object.");
-      G_THROW(buffer);
-#endif
       throw_can_not_convert_to(LIST);
    }
    return list;
@@ -457,13 +403,6 @@ GLParser::parse(const char * cur_name, GPList<GLObject> & list,
     {
       if (isspace(*start))
       {
-#if 0 //          Original preserved in case I screw up the works
-        char * buffer=new char[128];
-        sprintf(buffer, "Error occurred when parsing contents of object '%s':\n"
-		                    "'(' must be IMMEDIATELY followed by an object name.",
-                        (const char *) cur_name);
-        G_THROW(buffer);
-#endif
         GString mesg=GString("DjVuAnno.paren\t")+cur_name;
         G_THROW(mesg);
       }
@@ -473,21 +412,6 @@ GLParser::parse(const char * cur_name, GPList<GLObject> & list,
       // We will convert it to LIST later
       if (tok.type!=GLToken::OBJECT || object->get_type()!=GLObject::SYMBOL)
       {
-#if 0 //          Original preserved in case I screw up the works
-        char * buffer=new char[512];
-        sprintf(buffer, "Error occurred when parsing contents of object '%s':\n"
-		                    "'(' must be followed by object name, not by ",
-                        (const char *) cur_name);
-        if (tok.type==GLToken::OPEN_PAR ||
-            tok.type==GLToken::CLOSE_PAR) strcat(buffer, "parenthesis.");
-        if (tok.type==GLToken::OBJECT)
-        {
-	         GLObject::GLObjectType type=object->get_type();
-           if (type==GLObject::NUMBER) strcat(buffer, "number.");
-           else if (type==GLObject::STRING) strcat(buffer, "string.");
-        }
-        G_THROW(buffer);
-#endif
         if (tok.type==GLToken::OPEN_PAR ||
           tok.type==GLToken::CLOSE_PAR)
         {

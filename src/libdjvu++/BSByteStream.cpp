@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: BSByteStream.cpp,v 1.22 2000-12-20 01:41:43 bcr Exp $
+// $Id: BSByteStream.cpp,v 1.23 2000-12-21 01:22:45 bcr Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 07/1998
@@ -96,7 +96,9 @@ private:
   int            size;
   unsigned char *data;
   unsigned int  *posn;
+  GPBuffer<unsigned int> gposn;
   int           *rank;
+  GPBuffer<int> grank;
   // Helpers
   inline int GT(int p1, int p2, int depth);
   inline int GTD(int p1, int p2, int depth);
@@ -127,18 +129,14 @@ blocksort(unsigned char *data, int size, int &markerpos)
 // _BSort construction
 
 _BSort::_BSort(unsigned char *data, int size)
-  : size(size), data(data), posn(0), rank(0)
+  : size(size), data(data), gposn(posn,size), grank(rank,size+1)
 {
   ASSERT(size>0 && size<0x1000000);
-  posn = new unsigned int [size];
-  rank = new int[size+1];
   rank[size] = -1;
 }
 
 _BSort::~_BSort()
 {
-  delete [] posn;
-  delete [] rank;
 }
 
 
@@ -938,8 +936,10 @@ BSByteStream::decode()
     {
       blocksize = size;
       if (data)
+      {
         delete [] data; 
-      data = 0;
+        data = 0;
+      }
     }
   if (! data) 
     data = new unsigned char[blocksize];
