@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: djvuextract.cpp,v 1.17 1999-09-27 14:03:39 leonb Exp $
+//C- $Id: djvuextract.cpp,v 1.18 1999-09-27 21:04:53 leonb Exp $
 
 /** @name djvuextract
 
@@ -54,7 +54,7 @@
     @memo
     Extract components from DjVu files.
     @version
-    #$Id: djvuextract.cpp,v 1.17 1999-09-27 14:03:39 leonb Exp $#
+    #$Id: djvuextract.cpp,v 1.18 1999-09-27 21:04:53 leonb Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> - Initial implementation\\
     Andrei Erofeev <eaf@geocities.com> - Multipage support */
@@ -89,30 +89,16 @@ struct SecondaryHeader {
 
 
 void
-djvuextract(const char *filename, int page_num,
-	    MemoryByteStream *pSjbz,
-	    MemoryByteStream *pBG44,
-	    MemoryByteStream *pFG44)
-  
+display_info_chunk(MemoryByteStream& ibs, const char *filename)
 {
-  GP<DjVuDocument> doc=new DjVuDocument;
-  doc->init(GOS::filename_to_url(filename));
-  GP<DjVuFile> file=doc->get_djvu_file(page_num);
-  GP<MemoryByteStream> pibs = file->get_djvu_bytestream(false, false);
-  IFFByteStream iff(*pibs);
-  
-  IFFByteStream BG44(*pBG44);
-  IFFByteStream FG44(*pFG44); 
-  int color_bg = 1;
-  int color_fg = 1;
-  
+  ibs.seek(0);
+  IFFByteStream iff(ibs);
   GString chkid;
   if (! iff.get_chunk(chkid))
     THROW("Malformed DJVU file");
-  if (chkid == "FORM:DJVM")
-     THROW("This is multipage DJVU file. Please break it into pieces.");
   if (chkid != "FORM:DJVU")
-    THROW("This IFF file is not a DJVU file");
+    THROW("This is not a layered DJVU file");
+  // Search info chunk
   while (iff.get_chunk(chkid))
     {
       if (chkid=="INFO")
@@ -125,56 +111,67 @@ djvuextract(const char *filename, int page_num,
                   (djvuinfo.height_hi<<8)+djvuinfo.height_lo,
                   djvuinfo.version );
         }
-      else if (chkid == "Sjbz")
-        {
-          pSjbz->copy(iff);
-        }
-      else if (chkid == "FG44")
-        {
-          MemoryByteStream temp;
-          temp.copy(iff);
-          temp.seek(0);
-          if (temp.readall((void*)&primary, sizeof(primary))<sizeof(primary))
-            THROW("Cannot read primary header in FG44 chunk");
-          if (primary.serial == 0)
-            {
-              if (temp.readall((void*)&secondary, sizeof(secondary))<sizeof(secondary))
-                THROW("Cannot read secondary header in FG44 chunk");
-              color_fg = ! (secondary.major & 0x80);
-              FG44.put_chunk(color_fg ? "FORM:PM44" : "FORM:BM44");
-            }
-          temp.seek(0);
-          FG44.put_chunk(color_fg ? "PM44" : "BM44");
-          FG44.copy(temp);
-          FG44.close_chunk();
-        }
-      else if (chkid == "BG44")
-        {
-          MemoryByteStream temp;
-          temp.copy(iff);
-          temp.seek(0);
-          if (temp.readall((void*)&primary, sizeof(primary))<sizeof(primary))
-            THROW("Cannot read primary header in BG44 chunk");
-          if (primary.serial == 0)
-            {
-              if (temp.readall((void*)&secondary, sizeof(secondary))<sizeof(secondary))
-                THROW("Cannot read secondary header in BG44 chunk");
-              color_bg = ! (secondary.major & 0x80);
-              BG44.put_chunk(color_bg ? "FORM:PM44" : "FORM:BM44");
-            }
-          temp.seek(0);
-          BG44.put_chunk(color_bg ? "PM44" : "BM44");
-          BG44.copy(temp);
-          BG44.close_chunk();
-        }
-      else if (chkid!="ANTa" && chkid!="INCL" &&
-	       chkid!="INCD" && chkid!="NDIR")
-        {
-          fprintf(stderr, "  unrecognized chunk %s\n", (const char*)chkid);
-        }
       iff.close_chunk();
     }
 }
+
+
+void
+extract_chunk(MemoryByteStream& ibs, const char *id, MemoryByteStream &out)
+{
+  ibs.seek(0);
+  IFFByteStream iff(ibs);
+  GString chkid;
+  if (! iff.get_chunk(chkid))
+    THROW("Malformed DJVU file");
+  if (chkid != "FORM:DJVU")
+    THROW("This is not a layered DJVU file");
+  
+
+  // Special case for FG44 and BG44
+  if (!strcmp(id,"BG44") || !strcmp(id,"FG44"))
+    {
+      // Rebuild IW44 file
+      IFFByteStream iffout(out);
+      int color_bg = -1;
+      while (iff.get_chunk(chkid))
+        {
+          if (chkid == id)
+            {
+              MemoryByteStream temp;
+              temp.copy(iff);
+              temp.seek(0);
+              if (temp.readall((void*)&primary, sizeof(primary))<sizeof(primary))
+                THROW("Cannot read primary header in BG44 chunk");
+              if (primary.serial == 0)
+                {
+                  if (temp.readall((void*)&secondary, sizeof(secondary))<sizeof(secondary))
+                    THROW("Cannot read secondary header in BG44 chunk");
+                  color_bg = ! (secondary.major & 0x80);
+                  iffout.put_chunk(color_bg ? "FORM:PM44" : "FORM:BM44");
+                }
+              if (color_bg < 0)
+                THROW("IW44 chunks are not in proper order");
+              temp.seek(0);
+              iffout.put_chunk(color_bg ? "PM44" : "BM44");
+              iffout.copy(temp);
+              iffout.close_chunk();
+            }
+          iff.close_chunk();
+        }
+    }
+  else
+    {
+      // Just concatenates all matching chunks
+      while (iff.get_chunk(chkid))
+        {
+          if (chkid == id)
+            out.copy(iff);
+          iff.close_chunk();
+        }
+    }
+}
+
 
 void 
 usage()
@@ -183,8 +180,7 @@ usage()
           "DJVUEXTRACT -- Extracts components of a DJVU file\n"
           "  Copyright (c) AT&T 1999.  All rights reserved\n"
           "Usage:\n"
-	  "   djvuextract <djvufile> [-page=<page_num>] [Sjbz=file] \\\n"
-	  "               [BG44=file] [FG44=file]\n");
+	  "   djvuextract <djvufile> [-page=<num>] {...<chunkid>=<file>...} \n");
   exit(1);
 }
 
@@ -195,71 +191,58 @@ main(int argc, char **argv)
   TRY
     {
       int i;
+
+      // Process page number
       int page_num=0;
       for(i=1;i<argc;i++)
 	 if (!strncmp(argv[i], "-page=", 6))
-	 {
-	    page_num=atoi(argv[i]+6);
-	    if (page_num<=0)
-	    {
-	       fprintf(stderr, "Invalid page number '%s' specified\n\n", argv[i]+6);
-	       usage();
-	    }
-	    for(int j=i;j<argc-1;j++) argv[j]=argv[j+1];
-	    argc--;
-	    break;
-	 } else if (!strcmp(argv[i], "-page"))
-	 {
-	    if (i+1>=argc)
-	    {
-	       fprintf(stderr, "Option '-page' must be followed by a number\n\n");
-	       usage();
-	    }
-	    page_num=atoi(argv[i+1]);
-	    if (page_num<=0)
-	    {
-	       fprintf(stderr, "Invalid page number '%s' specified\n\n", argv[i+1]);
-	       usage();
-	    }
-	    for(int j=i;j<argc-2;j++) argv[j]=argv[j+2];
-	    argc-=2;
-	    break;
-	 }
+           {
+             page_num = atoi(argv[i]+6) - 1;
+             for(int j=i;j<argc-1;j++) 
+               argv[j]=argv[j+1];
+             argc--;
+             break;
+           } 
+      if (page_num<0)
+        {
+          fprintf(stderr, "Invalid page number\n");
+          usage();
+        }
       
+      // Check that chunk names are legal
       if (argc<=2)
         usage();
-      MemoryByteStream Sjbz;
-      MemoryByteStream BG44;
-      MemoryByteStream FG44;
-      djvuextract(argv[1], page_num-1, &Sjbz, &BG44, &FG44);
+      for (i=2; i<argc; i++)
+        if (IFFByteStream::check_id(argv[i]) || argv[i][4]!='=' || argv[i][5]==0)
+          usage();
+
+      // Decode
+      GP<DjVuDocument> doc=new DjVuDocument;
+      doc->init(GOS::filename_to_url(argv[1]));
+      if (! doc->wait_for_complete_init())
+        THROW("Decoding failed. Nothing can be done.");        
+      GP<DjVuFile> file=doc->get_djvu_file(page_num);
+      GP<MemoryByteStream> pibs = file->get_djvu_bytestream(false, false);
+      // Search info chunk
+      display_info_chunk(*pibs, argv[1]);
+      // Extract required chunks
       for (i=2; i<argc; i++)
         {
-          Sjbz.seek(0);
-          BG44.seek(0);
-          FG44.seek(0);
-          if (! strncmp(argv[i],"Sjbz=",5))
+          MemoryByteStream mbs;
+          argv[i][4] = 0;
+          extract_chunk(*pibs, argv[i], mbs);
+          if (mbs.size() == 0)
             {
-              if (Sjbz.size()==0)
-                THROW("No chunk Sjbz in this DJVU file");
-              StdioByteStream obs(argv[i]+5,"wb");
-              obs.copy(Sjbz);
-            }
-          else if (! strncmp(argv[i],"BG44=",5))
-            {
-              if (BG44.size()==0)
-                THROW("No chunk BG44 in this DJVU file");
-              StdioByteStream obs(argv[i]+5,"wb");
-              obs.copy(BG44);
-            }
-          else if (! strncmp(argv[i],"FG44=",5))
-            {
-              if (FG44.size()==0)
-                THROW("No chunk FG44 in this DJVU file");
-              StdioByteStream obs(argv[i]+5,"wb");
-              obs.copy(FG44);
+              fprintf(stderr, "  %s --> not found!\n", argv[i]);
             }
           else
-            usage();
+            {
+              StdioByteStream obs(argv[i]+5,"wb");
+              mbs.seek(0);
+              obs.copy(mbs);
+              fprintf(stderr, "  %s --> \"%s\" (%d bytes)\n", 
+                      argv[i], argv[i]+5, mbs.size());
+            }
         }
     }
   CATCH(ex)

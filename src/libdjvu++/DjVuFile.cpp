@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.63 1999-09-27 15:25:31 leonb Exp $
+//C- $Id: DjVuFile.cpp,v 1.64 1999-09-27 21:04:53 leonb Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -17,6 +17,7 @@
 
 #include "DjVuFile.h"
 #include "BSByteStream.h"
+#include "MMRDecoder.h"
 #include "debug.h"
 
 class ProgressByteStream : public ByteStream
@@ -710,7 +711,9 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
     {
       if (DjVuFile::fgjb)
         THROW("DjVu Decoder: Corrupted data (Duplicate Sxxx chunk)");
-      desc.format("MMR-G4 encoded mask (Unimplemented)");
+      GP<JB2Image> fgjb = MMRDecoder::decode(iff);
+      DjVuFile::fgjb = fgjb;
+      desc.format("G4/MMR encoded mask (%dx%d)", fgjb->get_width(), fgjb->get_height());
     }
   
   // BG44 (background wavelets)

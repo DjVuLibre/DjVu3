@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: djvudump.cpp,v 1.4 1999-09-20 23:12:59 leonb Exp $
+//C- $Id: djvudump.cpp,v 1.5 1999-09-27 21:04:53 leonb Exp $
 
 
 
@@ -57,7 +57,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: djvudump.cpp,v 1.4 1999-09-20 23:12:59 leonb Exp $# */
+    #$Id: djvudump.cpp,v 1.5 1999-09-27 21:04:53 leonb Exp $# */
 //@{
 //@}
 
@@ -106,7 +106,13 @@ display_djbz(IFFByteStream &iff, GString, size_t, DjVmInfo& )
 void
 display_sjbz(IFFByteStream &iff, GString, size_t, DjVmInfo& )
 {
-  printf("JB2 page data");
+  printf("JB2 stencil data");
+}
+
+void
+display_smmr(IFFByteStream &iff, GString, size_t, DjVmInfo& )
+{
+  printf("G4/MMR stencil data");
 }
 
 void
@@ -187,6 +193,7 @@ struct displaysubr
 disproutines[] = 
 {
   { "DJVU.INFO", display_djvu_info },
+  { "DJVU.Smmr", display_smmr },
   { "DJVU.Sjbz", display_sjbz },
   { "DJVU.Djbz", display_djbz },
   { "DJVU.FG44", display_iw4 },

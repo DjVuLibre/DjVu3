@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: djvumake.cpp,v 1.11 1999-09-20 23:12:59 leonb Exp $
+//C- $Id: djvumake.cpp,v 1.12 1999-09-27 21:04:53 leonb Exp $
 
 /** @name djvumake
 
@@ -127,7 +127,7 @@
     @memo
     Assemble DjVu files.
     @version
-    #$Id: djvumake.cpp,v 1.11 1999-09-20 23:12:59 leonb Exp $#
+    #$Id: djvumake.cpp,v 1.12 1999-09-27 21:04:53 leonb Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> */
 //@{
@@ -138,6 +138,7 @@
 #include "GString.h"
 #include "GException.h"
 #include "DjVuImage.h"
+#include "MMRDecoder.h"
 
 #ifndef TRUE
 #define TRUE 1
@@ -152,10 +153,11 @@ int flag_contains_stencil = 0;
 int flag_contains_bg44    = 0;
 
 IFFByteStream *bg44iff    = 0;
-MemoryByteStream *jb2stencil = 0;
+GP<MemoryByteStream> jb2stencil = 0;
+GP<MemoryByteStream> mmrstencil = 0;
 
-int w;
-int h;
+int w = -1;
+int h = -1;
 
 
 void 
@@ -179,6 +181,46 @@ usage()
          "\n");
   exit(1);
 }
+
+
+void
+analyze_mmr_chunk(char *filename)
+{
+  if (!mmrstencil)
+    {
+      StdioByteStream bs(filename,"rb");
+      mmrstencil = new MemoryByteStream();
+      mmrstencil->copy(bs);
+      mmrstencil->seek(0);
+      int jw, jh, invert;
+      MMRDecoder::decode_header(*mmrstencil, jw, jh, invert);
+      if (w < 0) w = jw;
+      if (h < 0) h = jh;
+      if (jw!=w || jh!=h)
+        fprintf(stderr,"djvumake: stencil size (%s) does not match info size\n", filename);
+    }
+}
+
+void 
+analyze_jb2_chunk(char *filename)
+{
+  if (!jb2stencil)
+    {
+      StdioByteStream bs(filename,"rb");
+      JB2Image image;
+      jb2stencil = new MemoryByteStream();
+      jb2stencil->copy(bs);
+      jb2stencil->seek(0);
+      image.decode(*jb2stencil);
+      int jw = image.get_width();
+      int jh = image.get_height();
+      if (w < 0) w = jw;
+      if (h < 0) h = jh;
+      if (jw!=w || jh!=h)
+        fprintf(stderr,"djvumake: stencil size (%s) does not match info size\n", filename);
+    }
+}
+
 
 
 
@@ -208,20 +250,17 @@ create_info_chunk(IFFByteStream &iff, int argc, char **argv)
       for (int i=2; i<argc; i++)
         if (!strncmp(argv[i],"Sjbz=",5))
           {
-            JB2Image image;
-            StdioByteStream bs(argv[i]+5,"rb");
-            jb2stencil = new MemoryByteStream();
-            jb2stencil->copy(bs);
-            jb2stencil->seek(0);
-            image.decode(*jb2stencil);
-            w = image.get_width();
-            h = image.get_height();
-            jb2stencil->seek(0);
+            analyze_jb2_chunk(argv[i]+5);
+            break;
+          }
+      else if (!strncmp(argv[i],"Smmr=",5))
+          {
+            analyze_mmr_chunk(argv[i]+5);
             break;
           }
     }
   // warn
-  if (w==0 || h==0)
+  if (w<0 || h<0)
     fprintf(stderr,"djvumake: cannot determine image size\n");
   // write info chunk
   DjVuInfo info;
@@ -234,30 +273,24 @@ create_info_chunk(IFFByteStream &iff, int argc, char **argv)
 
 
 void 
+create_mmr_chunk(IFFByteStream &iff, char *chkid, char *filename)
+{
+  analyze_mmr_chunk(filename);
+  mmrstencil->seek(0);
+  iff.put_chunk(chkid);
+  iff.copy(*mmrstencil);
+  iff.close_chunk();
+}
+
+void 
 create_jb2_chunk(IFFByteStream &iff, char *chkid, char *filename)
 {
-  if (!jb2stencil)
-    {
-      StdioByteStream bs(filename,"rb");
-      JB2Image image;
-      jb2stencil = new MemoryByteStream();
-      jb2stencil->copy(bs);
-      jb2stencil->seek(0);
-      image.decode(*jb2stencil);
-      int jw = image.get_width();
-      int jh = image.get_height();
-      jb2stencil->seek(0);
-      if (jw!=w || jh!=h)
-        fprintf(stderr,"djvumake: stencil size (%s) does not match info size\n", filename);
-    }
+  analyze_jb2_chunk(filename);
   jb2stencil->seek(0);
   iff.put_chunk(chkid);
   iff.copy(*jb2stencil);
   iff.close_chunk();
-  delete jb2stencil;
-  jb2stencil = 0;
 }
-
 
 
 
@@ -422,7 +455,14 @@ main(int argc, char **argv)
             {
               create_jb2_chunk(iff, "Sjbz", argv[i]+5);
               if (flag_contains_stencil)
-                fprintf(stderr,"djvumake: duplicate 'Sjbz' chunk\n");
+                fprintf(stderr,"djvumake: duplicate stencil chunk\n");
+              flag_contains_stencil = 1;
+            }
+          else if (! strncmp(argv[i],"Smmr=",5))
+            {
+              create_mmr_chunk(iff, "Smmr", argv[i]+5);
+              if (flag_contains_stencil)
+                fprintf(stderr,"djvumake: duplicate stencil chunk\n");
               flag_contains_stencil = 1;
             }
           else if (! strncmp(argv[i],"FG44=",5))
