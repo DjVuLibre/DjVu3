@@ -627,6 +627,7 @@
 //@Include: DjVuFileCache.h
 //@Include: DjVuImage.h
 //@Include: DjVmDoc.h
+//@Include: DjVuDocEditor.h
 //@Include: parseoptions.h
 
 /** @name Quasi obsolete files.
@@ -654,6 +655,7 @@
 //@Include: djvumake.cpp
 //@Include: djvuextract.cpp
 //@Include: djvmcvt.cpp
+//@Include: djthumb.cpp
 //@}
 
 

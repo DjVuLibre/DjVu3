@@ -7,7 +7,7 @@
 # C- AT&T, you have an infringing copy of this software and cannot use it
 # C- without violating AT&T's intellectual property rights.
 # C-
-# C- $Id: Makefile.in,v 1.76 2000-01-13 00:06:39 leonb Exp $
+# C- $Id: Makefile.in,v 1.77 2000-01-13 21:57:44 eaf Exp $
 
 %%%include <paths>
 
@@ -27,6 +27,7 @@ DOCXX=@%docxx%@
 LIBS=@%LIBS%@ @%LIBJPEG%@ @%libmath%@
 MAKESTLIB=@%make_stlib%@
 MAKESHLIB=@%make_shlib%@
+LIBJPEG=@%LIBJPEG%@
 
 %%%include <commands>
 
@@ -37,7 +38,9 @@ VER= 3.0
 
 # This 
 LIB= $(LIBDJVUXX)
-PROG= $(BINPATH)/djvudump $(BINPATH)/c44 $(BINPATH)/d44 $(BINPATH)/djvutopnm $(BINPATH)/djvumake $(BINPATH)/djvuextract $(BINPATH)/ppmcoco $(BINPATH)/bzz $(BINPATH)/djvmcvt # djvm
+PROG= $(BINPATH)/djvudump $(BINPATH)/c44 $(BINPATH)/d44 $(BINPATH)/djvutopnm\
+	$(BINPATH)/djvumake $(BINPATH)/djvuextract $(BINPATH)/ppmcoco\
+	$(BINPATH)/bzz $(BINPATH)/djthumb #$(BINPATH)/djvmcvt # djvm
 
 # Makefile for libdjvu++.a
 
@@ -49,7 +52,7 @@ LIBOBJS= DjVuGlobal.o DjVuGlobalMemory.o GOS.o GException.o GContainer.o GString
 	 DataPool.o GURL.o DjVuFileCache.o DjVuPort.o GMapAreas.o \
 	 DjVuAnno.o DjVuInfo.o DjVuFile.o DjVuImage.o DjVuDocument.o\
 	 DjVmDir.o DjVmDoc.o DjVmDir0.o DjVuNavDir.o DjVuErrorList.o \
-	 parseoptions.o 
+	 parseoptions.o DjVuDocEditor.o
 
 # Make all
 
@@ -81,6 +84,7 @@ BREAKDEJAVUOBJS = djvuextract.o
 PPMCOCOOBJS = ppmcoco.o
 ANNOTATEOBJS = annotate.o
 BZZOBJS = bzz.o
+DJTHUMBOBJS = djthumb.o
 
 $(BINPATH)/djvmcvt: $(DJVMCVTOBJS) $(LIB)
 	if [ -n "$(RPO)" ] ; then $(RPO) $(DJVMCVTOBJS) $(LIB) ; fi
@@ -125,6 +129,13 @@ $(BINPATH)/annotate: $(ANNOTATEOBJS) $(LIB)
 $(BINPATH)/bzz: $(BZZOBJS) $(LIB)
 	if [ -n "$(RPO)" ] ; then $(RPO) $(BZZOBJS) $(LIB) ; fi
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(BZZOBJS) $(LIB) $(LIBS)
+
+$(BINPATH)/djthumb: $(DJTHUMBOBJS) $(LIB) @%LIBJPEG%@
+	if [ -n "$(RPO)" ] ; then $(RPO) $(DJTHUMBOBJS) $(LIB) @%LIBJPEG%@; fi
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(DJTHUMBOBJS) $(LIB) @%LIBJPEG%@ $(LIBS)
+
+$(LIBJPEG):
+	cd ./TOPDIR/src/3rd-party/libjpeg/; $(MAKE) $@
 
 # Documentation
 
