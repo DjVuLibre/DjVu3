@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.cpp,v 1.20 1999-09-17 20:19:59 eaf Exp $
+//C- $Id: DataPool.cpp,v 1.21 1999-09-19 20:40:19 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -469,9 +469,21 @@ DataPool::get_data(void * buffer, int offset, int sz, int level)
 	 data->seek(offset, SEEK_SET);
 	 return data->readall(buffer, size);
       }
-      
-	 // If nothing else is expected => return 0
-      if (eof_flag) return 0;
+
+	 // No data available.
+
+	 // If there is no data and nothing else is expected, we can do
+	 // two things: throw an "EOF" exception or return ZERO bytes.
+	 // The exception is for the cases when the data flow has been
+	 // terminated in the middle. ZERO bytes is for regular read() beyond
+	 // the boundaries of legal data. The problem is to distinguish
+	 // these two cases. We do it here with the help of analysis of the
+	 // IFF structure of the data (which sets the 'length' variable).
+	 // If we attempt to read beyond the [0, length[, ZERO bytes will be
+	 // returned. Otherwise an "EOF" exception will be thrown.
+      if (eof_flag)
+	 if (length>0 && offset<length) THROW("EOF");
+	 else return 0;
    
 	 // Some data is still expected => add this reader to the
 	 // list of readers and call virtual wait_for_data()
