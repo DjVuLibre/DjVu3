@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: csepdjvu.cpp,v 1.25 2001-05-14 22:31:45 bcr Exp $
+// $Id: csepdjvu.cpp,v 1.26 2001-05-31 23:28:47 lvincent Exp $
 // $Name:  $
 
 
@@ -108,7 +108,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: csepdjvu.cpp,v 1.25 2001-05-14 22:31:45 bcr Exp $# */
+    #$Id: csepdjvu.cpp,v 1.26 2001-05-31 23:28:47 lvincent Exp $# */
 //@{
 //@}
 
@@ -152,7 +152,7 @@ public:
 	enum {bufsize=512};
 private:
   ByteStream &bs;
-  char buffer[bufsize];
+  unsigned char buffer[bufsize];
   int bufpos;
   int bufend;
 public:
@@ -400,7 +400,7 @@ CRLEImage::CRLEImage(BufferByteStream &bs)
             x = (bs.get()) + ((x - 0xc0) << 8);
           if (c+x > width)
             G_THROW("csepdjvu: corrupted input file (lost RLE synchronization)");
-          else if (c+x < width && bs.eof())
+          else if (c+x < width)
             G_THROW("csepdjvu: corrupted input file (premature EOF)");
           if (p)
             {
@@ -422,10 +422,10 @@ CRLEImage::CRLEImage(BufferByteStream &bs)
         }
     } else if (magic == 0x5236) { // Color-RLE data 
       // Setup palette 
-      pal = DjVuPalette::create();
       int ncolors = read_integer(lookahead, bs);
       if (ncolors<1 || ncolors>4095) 
         G_THROW("csepdjvu: corrupted input file (bad number of colors)");
+      pal = DjVuPalette::create();
       pal->decode_rgb_entries(bs, ncolors);
       // RLE format
       int x, c, n, p;
@@ -444,9 +444,6 @@ CRLEImage::CRLEImage(BufferByteStream &bs)
           x = (x & 0xfffff);
           if (c+x > width)
             G_THROW("csepdjvu: corrupted input file (lost RLE synchronization)");
-          else if(c+x < width && bs.eof())
-            G_THROW("csepdjvu: corrupted input file (premature EOF)");
-
           if (p >= 0 && p < ncolors)
             {
               px[0] = c;
