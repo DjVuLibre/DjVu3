@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: GBitmap.cpp,v 1.38 2000-12-18 17:13:42 bcr Exp $
+// $Id: GBitmap.cpp,v 1.39 2000-12-18 18:00:13 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -43,9 +43,10 @@
 #include "GRect.h"
 #include "GString.h"
 #include "GThreads.h"
+#include "GException.h"
 #include <string.h>
 
-// File "$Id: GBitmap.cpp,v 1.38 2000-12-18 17:13:42 bcr Exp $"
+// File "$Id: GBitmap.cpp,v 1.39 2000-12-18 18:00:13 bcr Exp $"
 // - Author: Leon Bottou, 05/1997
 
 
