@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GURL.cpp,v 1.7 1999-06-09 22:12:36 eaf Exp $
+//C- $Id: GURL.cpp,v 1.8 1999-08-12 21:35:56 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -110,6 +110,28 @@ GURL::protocol(const char * url)
 	  *ptr!='+' && *ptr!='-' && *ptr!='.') break;
    if (*ptr==':') return GString(url, ptr-url);
    else return "";
+}
+
+GString
+GURL::hash_argument(void) const
+{
+   for(const char * start=url;*start;start++)
+      if (start[0]=='#' || start[0]=='%' &&
+	  start[1]=='2' && start[2]=='3')
+      {
+	 if (start[0]=='#') return start+1;
+	 else return start+3;
+      }
+   return GString();
+}
+
+void
+GURL::clear_hash_argument(void)
+{
+   for(const char * start=url;*start;start++)
+      if (start[0]=='#' || start[0]=='%' &&
+	  start[1]=='2' && start[2]=='3')
+	 url.setat(start-url, 0);
 }
 
 bool
