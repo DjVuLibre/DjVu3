@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: DjVuNavDir.h,v 1.11 2000-11-09 20:15:06 jmw Exp $
+// $Id: DjVuNavDir.h,v 1.12 2000-12-18 17:13:42 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUNAVDIR_H
@@ -41,13 +41,11 @@
 #pragma interface
 #endif
 
-#include "ByteStream.h"
-#include "GContainer.h"
-#include "GSmartPointer.h"
 #include "GString.h"
 #include "GThreads.h"
 #include "GURL.h"
-#include "Arrays.h"
+
+class ByteStream;
 
 /** @name DjVuNavDir.h
     Files #"DjVuNavDir.h"# and #"DjVuNavDir.cpp"# contain implementation of the
@@ -59,7 +57,7 @@
 
     @memo DjVu Navigation Directory
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: DjVuNavDir.h,v 1.11 2000-11-09 20:15:06 jmw Exp $#
+    @version #$Id: DjVuNavDir.h,v 1.12 2000-12-18 17:13:42 bcr Exp $#
 */
 
 //@{

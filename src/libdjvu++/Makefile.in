@@ -31,7 +31,7 @@
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #C- 
 #
-# $Id: Makefile.in,v 1.105 2000-11-09 20:15:08 jmw Exp $
+# $Id: Makefile.in,v 1.106 2000-12-18 17:13:43 bcr Exp $
 # $Name:  $
 
 %%%include <paths>
@@ -69,7 +69,7 @@ LIBOBJS= DjVuGlobal.o DjVuGlobalMemory.o GOS.o GException.o GContainer.o \
 	 ByteStream.o IFFByteStream.o BSByteStream.o ZPCodec.o \
 	 JB2Image.o IWTransform.o IWImage.o MMRDecoder.o JPEGDecoder.o \
 	 DataPool.o GURL.o DjVuFileCache.o DjVuPort.o GMapAreas.o \
-	 DjVuAnno.o DjVuInfo.o DjVuFile.o DjVuImage.o DjVuDocument.o\
+	 DjVuAnno.o DjVuText.o DjVuInfo.o DjVuFile.o DjVuImage.o DjVuDocument.o\
 	 DjVmDir.o DjVmDoc.o DjVmDir0.o DjVuNavDir.o DjVuErrorList.o \
 	 parseoptions.o DjVuDocEditor.o DjVuToPS.o DjVuDumpHelper.o \
 	 DjVuMessage.o

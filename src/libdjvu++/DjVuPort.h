@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: DjVuPort.h,v 1.33 2000-11-09 20:15:06 jmw Exp $
+// $Id: DjVuPort.h,v 1.34 2000-12-18 17:13:42 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUPORT_H
@@ -41,15 +41,12 @@
 #pragma interface
 #endif
 
-#include "DjVuGlobal.h"
-#include <stddef.h>
-#include <stdlib.h>
-#include "GException.h"
-#include "GSmartPointer.h"
-#include "GURL.h"
 #include "GThreads.h"
-#include "GContainer.h"
-#include "DataPool.h"
+#include "GURL.h"
+//include <stddef.h>
+//include <stdlib.h>
+
+class DataPool;
 
 /** @name DjVuPort.h
     Files #"DjVuPort.h"# and #"DjVuPort.cpp"# implement a communication
@@ -94,7 +91,7 @@
     @memo DjVu decoder communication mechanism.
     @author Andrei Erofeev <eaf@geocities.com>\\
             L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuPort.h,v 1.33 2000-11-09 20:15:06 jmw Exp $# */
+    @version #$Id: DjVuPort.h,v 1.34 2000-12-18 17:13:42 bcr Exp $# */
 //@{
 
 class DjVuPort;

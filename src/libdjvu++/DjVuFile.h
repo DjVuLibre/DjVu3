@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: DjVuFile.h,v 1.67 2000-11-09 20:15:06 jmw Exp $
+// $Id: DjVuFile.h,v 1.68 2000-12-18 17:13:42 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUFILE_H
@@ -41,19 +41,20 @@
 #pragma interface
 #endif
 
-#include "GSmartPointer.h"
-#include "ByteStream.h"
-#include "DataPool.h"
 #include "DjVuInfo.h"
-#include "JB2Image.h"
-#include "IWImage.h"
 #include "DjVuPalette.h"
-#include "GPixmap.h"
 #include "DjVuPort.h"
-#include "GContainer.h"
-#include "DjVuNavDir.h"
 
 class DjVuTXT;
+class ByteStream;
+class DataPool;
+class JB2Image;
+class JB2Dict;
+class IWPixmap;
+class IFFByteStream;
+class GPixmap;
+class DjVuNavDir;
+
 
 /** @name DjVuFile.h
     Files #"DjVuFile.h"# and #"DjVuFile.cpp"# contain implementation of the
@@ -71,7 +72,7 @@ class DjVuTXT;
 
     @memo Classes representing DjVu files.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuFile.h,v 1.67 2000-11-09 20:15:06 jmw Exp $#
+    @version #$Id: DjVuFile.h,v 1.68 2000-12-18 17:13:42 bcr Exp $#
 */
 
 //@{
@@ -194,6 +195,8 @@ public:
    GP<DjVuPalette>	fgbc;
       /// Pointer to collected annotation chunks.
    GP<ByteStream>	anno;
+      /// Pointer to collected hidden text chunks.
+   GP<ByteStream>	text;
       /// Pointer to the *old* navigation directory contained in this file
    GP<DjVuNavDir>	dir;
       /// Description of the file formed during decoding
@@ -436,6 +439,16 @@ public:
 	  when the \Ref{is_all_data_present}() returns #TRUE#. */
    GP<ByteStream>	get_merged_anno(int * max_level_ptr=0);
 
+      /** Processes the text chunks.  This function may be used even when
+          the #DjVuFile# has not been decoded yet. If all data has been
+          received for this #DjVuFile#, it will gather hidden text  and
+          return the result.  If no hidden text has been found, #ZERO# will
+          be returned.
+
+	  {\bf Summary:} This function will return complete hidden text layers
+	  only when the \Ref{is_all_data_present}() returns #TRUE#. */
+   GP<ByteStream>	get_text(void);
+
       /** Goes down the hierarchy of #DjVuFile#s and merges their annotations.
 
 	  @param max_level_ptr If this pointer is not ZERO, the function
@@ -449,11 +462,18 @@ public:
       /** Clears this file of all annotations. */
    void		remove_anno(void);
 
+      /** Clears the hidden text. */
+   void		remove_text(void);
+
       /** Returns #TRUE# if the file contains annotation chunks.
 	  Known annotation chunks at the time of writing this help are:
-	  {\bf ANTa}, {\bf ANTz}, {\bf TXTa}, {\bf TXTz}, and
-	  {\bf FORM:ANNO}. */
+	  {\bf ANTa}, {\bf ANTz}, {\bf FORM:ANNO}. */
    bool		contains_anno(void);
+
+      /** Returns #TRUE# if the file contains annotation chunks.
+	  Known annotation chunks at the time of writing this help are:
+	  {\bf TXTa}, and {\bf TXTz}. */
+   bool		contains_text(void);
 
      /** Changes the value of the text annotation. */
    void change_text(GP<DjVuTXT> txt, const bool do_reset);
@@ -495,6 +515,9 @@ public:
       // Internal. Used by DjVuImage
    void                 merge_anno(ByteStream &out);
 
+      // Internal. Used by DjVuImage
+   void                 get_text(ByteStream &out);
+
       // Internal. Used by DjVuDocEditor
    void			rebuild_data_pool(void);
 
@@ -515,6 +538,7 @@ protected:
    GPList<DjVuFile>	inc_files_list;
    GCriticalSection	inc_files_lock;
    GCriticalSection	anno_lock;
+   GCriticalSection	text_lock;
    ErrorRecoveryAction	recover_errors;
    bool			verbose_eof;
    int			chunks_number;
@@ -560,6 +584,8 @@ private:
 				const GList<GURL> & ignore_list,
 				int level, int & max_level,
 				GMap<GURL, void *> & map);
+   static void	get_text(const GP<DjVuFile> & file,
+				ByteStream & str_out);
 
    void          check() const;
    GP<DjVuNavDir>find_ndir(GMap<GURL, void *> & map);

@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: DjVuToPS.h,v 1.10 2000-11-09 20:15:06 jmw Exp $
+// $Id: DjVuToPS.h,v 1.11 2000-12-18 17:13:42 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVU_TO_PS_H_
@@ -45,15 +45,17 @@
     @memo PostScript file generator
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: DjVuToPS.h,v 1.10 2000-11-09 20:15:06 jmw Exp $#
+    #$Id: DjVuToPS.h,v 1.11 2000-12-18 17:13:42 bcr Exp $#
 */
 //@{
 
 #ifdef __GNUC__
 #pragma interface
 #endif
-#include "DjVuGlobal.h"
+
 #include "DjVuDocument.h"
+
+class GRect;
 
 /** DjVuImage to PostScript converter.
     Use this class to print \Ref{DjVuImage}s and \Ref{DjVuDocument}s.

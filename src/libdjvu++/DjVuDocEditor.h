@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: DjVuDocEditor.h,v 1.28 2000-11-09 20:15:05 jmw Exp $
+// $Id: DjVuDocEditor.h,v 1.29 2000-12-18 17:13:41 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUDOCEDITOR_H
@@ -42,6 +42,7 @@
 #endif
 
 #include "DjVuDocument.h"
+#include "DjVmDoc.h"
 
 /** @name DjVuDocEditor.h
     Files #"DjVuDocEditor.h"# and #"DjVuDocEditor.cpp"# contain extension
@@ -51,7 +52,7 @@
 
     @memo DjVu document editor class.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: DjVuDocEditor.h,v 1.28 2000-11-09 20:15:05 jmw Exp $#
+    @version #$Id: DjVuDocEditor.h,v 1.29 2000-12-18 17:13:41 bcr Exp $#
 */
 
 //@{

@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: GPixmap.h,v 1.20 2000-11-09 20:15:07 jmw Exp $
+// $Id: GPixmap.h,v 1.21 2000-12-18 17:13:42 bcr Exp $
 // $Name:  $
 
 #ifndef _GPIXMAP_H_
@@ -53,18 +53,18 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: GPixmap.h,v 1.20 2000-11-09 20:15:07 jmw Exp $# */
+    #$Id: GPixmap.h,v 1.21 2000-12-18 17:13:42 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
 #pragma interface
 #endif
 
-#include "DjVuGlobal.h"
-#include "GRect.h"
 #include "GSmartPointer.h"
-#include "ByteStream.h"
-#include "GBitmap.h"
+
+class GBitmap;
+class GRect;
+class ByteStream;
 
 
 /** Color pixel as a RGB triple.  
@@ -319,7 +319,7 @@ public:
   /** @name Miscellaneous. */
   //@{
   /** Returns the number of bytes allocated for this image. */
-  unsigned int get_memory_usage() const;
+  inline unsigned int get_memory_usage() const;
   /** Saves the image into ByteStream #bs# using the PPM format.
       Argument #raw# selects the ``Raw PPM'' (1) or the ``Ascii PPM'' (0) format.
       See \Ref{PNM and RLE file formats} for more information. */
@@ -443,6 +443,16 @@ GPixmap::borrow_data(GPixel &data, int w, int h)
   pixels_data=0;
 }
 
+//////////////////////////////////////////////////
+// Memory usage
+//////////////////////////////////////////////////
+
+
+inline unsigned int 
+GPixmap::get_memory_usage() const
+{
+  return  sizeof(GPixmap)+(nrows * ncolumns * sizeof(GPixel));
+}
 
 // ---------------------------------
 #endif

@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: JB2Image.h,v 1.24 2000-11-09 20:15:08 jmw Exp $
+// $Id: JB2Image.h,v 1.25 2000-12-18 17:13:42 bcr Exp $
 // $Name:  $
 
 #ifndef _JB2IMAGE_H
@@ -130,7 +130,7 @@
     \end{itemize}
 
     @version
-    #$Id: JB2Image.h,v 1.24 2000-11-09 20:15:08 jmw Exp $#
+    #$Id: JB2Image.h,v 1.25 2000-12-18 17:13:42 bcr Exp $#
     @memo
     Coding bilevel images with JB2.
     @author
@@ -142,15 +142,13 @@
 #pragma interface
 #endif
 
-#include "DjVuGlobal.h"
 #include "GString.h"
-#include "GSmartPointer.h"
-#include "ZPCodec.h"
-#include "GRect.h"
-#include "GBitmap.h"
 
 class JB2Dict;
 class JB2Image;
+class GRect;
+class GBitmap;
+class ByteStream;
 
 /** Blit data structure.  A #JB2Image# contains an array of #JB2Blit# data
     structures.  Each array entry instructs the decoder to render a particular

@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: DjVuFileCache.h,v 1.11 2000-11-09 20:15:06 jmw Exp $
+// $Id: DjVuFileCache.h,v 1.12 2000-12-18 17:13:42 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUFILECACHE_H
@@ -42,15 +42,12 @@
 #endif
 
 #include "DjVuFile.h"
-#include "Arrays.h"
-#include "debug.h"
-#if defined(macintosh) //MCW can't compile
-#else
+
+#ifndef macintosh //MCW can't compile
 #ifndef UNDER_CE
 #include <sys/types.h>
 #include <time.h>
 #endif 
-
 #endif
 
 /** @name DjVuFileCache.h
@@ -63,7 +60,7 @@
     
     @memo Simple DjVuFile caching class.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: DjVuFileCache.h,v 1.11 2000-11-09 20:15:06 jmw Exp $#
+    @version #$Id: DjVuFileCache.h,v 1.12 2000-12-18 17:13:42 bcr Exp $#
 */
 
 //@{

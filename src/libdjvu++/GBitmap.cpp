@@ -31,21 +31,21 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: GBitmap.cpp,v 1.37 2000-11-09 20:15:06 jmw Exp $
+// $Id: GBitmap.cpp,v 1.38 2000-12-18 17:13:42 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
 #pragma implementation
 #endif
 
-#include <string.h>
 #include "GBitmap.h"
 #include "ByteStream.h"
 #include "GRect.h"
 #include "GString.h"
 #include "GThreads.h"
+#include <string.h>
 
-// File "$Id: GBitmap.cpp,v 1.37 2000-11-09 20:15:06 jmw Exp $"
+// File "$Id: GBitmap.cpp,v 1.38 2000-12-18 17:13:42 bcr Exp $"
 // - Author: Leon Bottou, 05/1997
 
 

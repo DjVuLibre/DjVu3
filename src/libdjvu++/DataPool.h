@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: DataPool.h,v 1.37 2000-11-09 20:15:05 jmw Exp $
+// $Id: DataPool.h,v 1.38 2000-12-18 17:13:40 bcr Exp $
 // $Name:  $
 
 #ifndef _DATAPOOL_H
@@ -41,12 +41,10 @@
 #pragma interface
 #endif
 
-#include "ByteStream.h"
 #include "GThreads.h"
-#include "GSmartPointer.h"
-#include "GContainer.h"
 #include "GString.h"
-#include "Arrays.h"
+
+class ByteStream;
 
 /** @name DataPool.h
     Files #"DataPool.h"# and #"DataPool.cpp"# implement classes \Ref{DataPool}
@@ -67,7 +65,7 @@
 
     @memo Thread safe data storage
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DataPool.h,v 1.37 2000-11-09 20:15:05 jmw Exp $#
+    @version #$Id: DataPool.h,v 1.38 2000-12-18 17:13:40 bcr Exp $#
 */
 
 //@{

@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: GContainer.cpp,v 1.24 2000-11-09 20:15:06 jmw Exp $
+// $Id: GContainer.cpp,v 1.25 2000-12-18 17:13:42 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -39,7 +39,6 @@
 #endif
 
 #include "GContainer.h"
-
 
 // ------------------------------------------------------------
 // DYNAMIC ARRAYS
@@ -122,13 +121,6 @@ GArrayBase::steal(GArrayBase &ga)
 
 
 void 
-GArrayBase::throw_illegal_subscript()
-{
-  G_THROW("GContainer.bad_sub");
-}
-
-
-void 
 GArrayBase::empty()
 {
   resize(0, -1);
@@ -152,7 +144,7 @@ GArrayBase::resize(int lo, int hi)
   // Validation
   int nsize = hi - lo + 1;
   if (nsize < 0)
-    G_THROW("GContainer.bad_args");
+    G_THROW(_GCONTAINER_H_ "bad_args");
   // Destruction
   if (nsize == 0)
     {
@@ -237,11 +229,11 @@ void
 GArrayBase::del(int n, int howmany)
 {
   if (howmany < 0)
-    G_THROW("GContainer.bad_howmany");
+    G_THROW(_GCONTAINER_H_ "bad_howmany");
   if (howmany == 0)
     return;
   if ( n < lobound || n+(int)howmany-1 > hibound)
-    G_THROW("GContainer.bad_sub2");
+    G_THROW(_GCONTAINER_H_ "bad_sub2");
   traits.fini( traits.lea(data, n-minlo), howmany );
   if ( n+howmany-1 < hibound)
     traits.copy( traits.lea(data, n-minlo),
@@ -269,7 +261,7 @@ void
 GArrayBase::ins(int n, const void *src, int howmany)
 {
   if (howmany < 0)
-    G_THROW("GContainer.bad_howmany");
+    G_THROW(_GCONTAINER_H_ "bad_howmany");
   if (howmany == 0)
     return;
   // Make enough room
@@ -325,17 +317,6 @@ GArrayBase::ins(int n, const void *src, int howmany)
 // ------------------------------------------------------------
 
 
-void 
-GPosition::throw_invalid(void *c) const
-{
-  char *msg = "GContainer.bad_pos";
-  if (c != cont)
-    msg = "GContainer.bad_pos_cont";
-  if (! ptr)
-    msg = "GContainer.bad_pos_null";
-  // Throw exception
-  G_THROW(msg);
-}
 
 
 
@@ -753,11 +734,5 @@ GSetBase::empty()
   nelems = 0;
   for (int i=0; i<nbuckets; i++)
     table[i] = 0;
-}
-
-void 
-GSetBase::throw_cannot_add()
-{
-  G_THROW("GContainer.cant_add");
 }
 

@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: IWImage.cpp,v 1.35 2000-11-09 20:15:07 jmw Exp $
+// $Id: IWImage.cpp,v 1.36 2000-12-18 17:13:42 bcr Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 08/1998
@@ -39,17 +39,20 @@
 #ifdef __GNUC__
 #pragma implementation
 #endif
+
+#include "IWImage.h"
+#include "ZPCodec.h"
+#include "IWTransform.h"
+#include "GBitmap.h"
+#include "GPixmap.h"
+#include "IFFByteStream.h"
+#include "GRect.h"
+
 #ifndef UNDER_CE
 #include <assert.h>
 #endif
 #include <string.h>
 #include <math.h>
-#include "GRect.h"
-#include "GException.h"
-#include "GSmartPointer.h"
-#include "ZPCodec.h"
-#include "IWImage.h"
-#include "IWTransform.h"
 
 #define IWALLOCSIZE    4080
 #define IWCODEC_MAJOR     1

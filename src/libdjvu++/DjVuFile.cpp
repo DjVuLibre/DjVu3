@@ -31,22 +31,29 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: DjVuFile.cpp,v 1.137 2000-12-14 17:28:02 bcr Exp $
+// $Id: DjVuFile.cpp,v 1.138 2000-12-18 17:13:41 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
 #pragma implementation
 #endif
 
-#include "debug.h"
 #include "DjVuFile.h"
 #include "BSByteStream.h"
+#include "IFFByteStream.h"
 #include "GOS.h"
 #include "MMRDecoder.h"
 #ifdef NEED_JPEG_DECODER
 #include "JPEGDecoder.h"
 #endif
 #include "DjVuAnno.h"
+#include "DjVuText.h"
+#include "DataPool.h"
+#include "JB2Image.h"
+#include "IWImage.h"
+#include "DjVuNavDir.h"
+
+#include "debug.h"
 
 #define STRINGIFY(x) STRINGIFY_(x)
 #define STRINGIFY_(x) #x
@@ -207,6 +214,7 @@ DjVuFile::reset(void)
 {
    info = 0; 
    anno = 0; 
+   text = 0; 
    bg44 = 0; 
    fgbc = 0;
    fgjb = 0; 
@@ -227,6 +235,7 @@ DjVuFile::get_memory_usage(void) const
    if (fgpm) size+=fgpm->get_memory_usage();
    if (fgbc) size+=fgbc->size()*sizeof(int);
    if (anno) size+=anno->size();
+   if (text) size+=text->size();
    if (dir) size+=dir->get_memory_usage();
    return size;
 }
@@ -758,13 +767,15 @@ DjVuFile::get_dpi(int w, int h)
 static inline bool
 is_annotation(GString chkid)
 {
-  if (chkid=="ANTa" ||
+  return (chkid=="ANTa" ||
     chkid=="ANTz" ||
-    chkid=="TXTa" ||
-    chkid=="TXTz" ||
-    chkid=="FORM:ANNO" ) 
-    return true;
-  return false;
+    chkid=="FORM:ANNO" ); 
+}
+
+static inline bool
+is_text(GString chkid)
+{
+  return (chkid=="TXTa" || chkid=="TXTz");
 }
 
 
@@ -1043,8 +1054,10 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
         anno = mbs;
       }
       anno->seek(0,SEEK_END);
-      if (anno->tell() & 1)
+      if (anno->tell())
+      {
         anno->write((void*)"", 1);
+      }
       // Copy data
       anno->copy(achunk);
       desc.format("Annotations (bundled)");
@@ -1064,17 +1077,40 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
       }
       anno->seek(0,SEEK_END);
       if (anno->tell() & 1)
+      {
         anno->write((const void*)"", 1);
+      }
       // Recreate chunk header
       IFFByteStream iffout(*anno);
       iffout.put_chunk(id);
       iffout.copy(achunk);
       iffout.close_chunk();
       desc.format("Annotations");
-      if (chkid == "ANTa" || chkid == "ANTz")
-        desc = desc + " (hyperlinks, etc.)";
-      else if (chkid == "TXTa" || chkid == "TXTz")
-        desc = desc + " (text, etc.)";
+      desc = desc + " (hyperlinks, etc.)";
+    }
+  else if (is_text(chkid))
+    {
+      MemoryByteStream achunk;
+      achunk.copy(iff);
+      achunk.seek(0);
+      GCriticalSectionLock lock(&text_lock);
+      if (! text)
+      {
+        MemoryByteStream *mbs=new MemoryByteStream();
+        text = mbs;
+      }
+      text->seek(0,SEEK_END);
+      if (text->tell())
+      {
+        text->write((const void*)"", 1);
+      }
+      // Recreate chunk header
+      IFFByteStream iffout(*text);
+      iffout.put_chunk(id);
+      iffout.copy(achunk);
+      iffout.close_chunk();
+      desc.format("Text");
+      desc = desc + " (text, etc.)";
     }
 
   // Return description
@@ -1430,7 +1466,10 @@ DjVuFile::get_merged_anno(const GP<DjVuFile> & file,
         GCriticalSectionLock lock(&file->anno_lock);
         if (file->anno && file->anno->size())
         {
-          if (str_out.tell() & 1) str_out.write((void *) "", 1);
+          if (str_out.tell())
+          {
+            str_out.write((void *) "", 1);
+          }
           file->anno->seek(0);
           str_out.copy(*file->anno);
         }
@@ -1448,15 +1487,20 @@ DjVuFile::get_merged_anno(const GP<DjVuFile> & file,
             {
               if (max_level<level)
                 max_level=level;
-              if (str_out.tell() & 1)
+              if (str_out.tell())
+              {
                 str_out.write((void *) "", 1);
+              }
               str_out.copy(iff);
             } 
             else if (is_annotation(chkid)) // but not FORM:ANNO
             {
               if (max_level<level)
                 max_level=level;
-              if (str_out.tell() & 1) str_out.write((void *) "", 1);
+              if (str_out.tell())
+              {
+                str_out.write((void *) "", 1);
+              }
               IFFByteStream iff_out(str_out);
               iff_out.put_chunk(chkid);
               iff_out.copy(iff);
@@ -1501,10 +1545,73 @@ DjVuFile::get_merged_anno(int * max_level_ptr)
 // the top level page file settings will take precedence.
 //
 // NOTE! This function guarantees correct results only if the
-// DjVuFile as all data
+// DjVuFile has all data
 {
   GList<GURL> ignore_list;
   return get_merged_anno(ignore_list, max_level_ptr);
+}
+
+
+void
+DjVuFile::get_text(const GP<DjVuFile> & file,
+                          ByteStream & str_out)
+{
+  if (!file->is_data_present() ||
+    file->is_modified() && file->text)
+  {
+    // Process the decoded (?) text
+    GCriticalSectionLock lock(&file->text_lock);
+    if (file->text && file->text->size())
+    {
+      if (str_out.tell())
+      {
+        str_out.write((void *) "", 1);
+      }
+      file->text->seek(0);
+      str_out.copy(*file->text);
+    }
+  } else if (file->is_data_present())
+  {
+	       // Copy all text chunks, but do NOT modify
+	       // DjVuFile::text (to avoid correlation with DjVuFile::decode())
+    GP<ByteStream> str=file->data_pool->get_stream();
+    IFFByteStream iff(*str);
+    GString chkid;
+    if (iff.get_chunk(chkid))
+    {
+      while(iff.get_chunk(chkid))
+      {
+        if (is_text(chkid))
+        {
+          if (str_out.tell())
+          {
+            str_out.write((void *) "", 1);
+          }
+          IFFByteStream iff_out(str_out);
+          iff_out.put_chunk(chkid);
+          iff_out.copy(iff);
+          iff_out.close_chunk();
+        }
+        iff.close_chunk();
+      }
+    }
+  }
+}
+
+GP<ByteStream>
+DjVuFile::get_text(void)
+{
+  MemoryByteStream *mstr=new MemoryByteStream;
+  GP<ByteStream> str=mstr;
+  get_text(this, *str);
+  if (str->tell()==0)
+  { 
+    str=0;
+  }else
+  {
+    str->seek(0);
+  }
+  return str;
 }
 
 void
@@ -1759,6 +1866,26 @@ DjVuFile::contains_anno(void)
   return false;
 }
 
+bool
+DjVuFile::contains_text(void)
+{
+  GP<ByteStream> str=data_pool->get_stream();
+  
+  GString chkid;
+  IFFByteStream iff(*str);
+  if (!iff.get_chunk(chkid))
+    G_THROW("EOF");
+  
+  while(iff.get_chunk(chkid))
+  {
+    if (is_text(chkid))
+      return true;
+    iff.close_chunk();
+  }
+  
+  return false;
+}
+
 //*****************************************************************************
 //****************************** Save routines ********************************
 //*****************************************************************************
@@ -1793,6 +1920,7 @@ DjVuFile::add_djvu_data(IFFByteStream & ostr, GMap<GURL, void *> & map,
   bool top_level = !map.size();
   map[url]=0;
   bool processed_annotation = false;
+  bool processed_text = false;
   
   GP<ByteStream> str=data_pool->get_stream();
   GString chkid;
@@ -1832,6 +1960,15 @@ DjVuFile::add_djvu_data(IFFByteStream & ostr, GMap<GURL, void *> & map,
             processed_annotation = true;
             GCriticalSectionLock lock(&anno_lock);
             copy_chunks(anno, ostr);
+          }
+        }
+        else if (is_text(chkid) && text && text->size())
+        {
+          if (!processed_text)
+          {
+            processed_text = true;
+            GCriticalSectionLock lock(&text_lock);
+            copy_chunks(text, ostr);
           }
         }
         else if (chkid=="NDIR" && dir && !no_ndir)
@@ -1877,6 +2014,12 @@ DjVuFile::add_djvu_data(IFFByteStream & ostr, GMap<GURL, void *> & map,
       GCriticalSectionLock lock(&anno_lock);
       copy_chunks(anno, ostr);
     }
+    if (!processed_text && text && text->size())
+    {
+      processed_text = true;
+      GCriticalSectionLock lock(&text_lock);
+      copy_chunks(text, ostr);
+    }
     // Close iff
     if (top_level) 
       ostr.close_chunk();
@@ -1920,7 +2063,25 @@ DjVuFile::merge_anno(ByteStream &out)
   if (str)
   {
     str->seek(0);
-    if (out.tell() & 1) out.write((void *) "", 1);
+    if (out.tell())
+    {
+      out.write((void *) "", 1);
+    }
+    out.copy(*str);
+  }
+}
+
+void
+DjVuFile::get_text(ByteStream &out)
+{
+  GP<ByteStream> str=get_text();
+  if (str)
+  {
+    str->seek(0);
+    if (out.tell())
+    {
+      out.write((void *) "", 1);
+    }
     out.copy(*str);
   }
 }
@@ -1963,6 +2124,42 @@ DjVuFile::remove_anno(void)
   chunks_number=-1;
   
   anno=0;
+  
+  flags|=MODIFIED;
+}
+
+void
+DjVuFile::remove_text(void)
+{
+  GP<ByteStream> str_in=data_pool->get_stream();
+  MemoryByteStream str_out;
+  
+  GString chkid;
+  IFFByteStream iff_in(*str_in);
+  if (!iff_in.get_chunk(chkid))
+    G_THROW("EOF");
+  
+  IFFByteStream iff_out(str_out);
+  iff_out.put_chunk(chkid);
+  
+  while(iff_in.get_chunk(chkid))
+  {
+    if (!is_text(chkid))
+    {
+      iff_out.put_chunk(chkid);
+      iff_out.copy(iff_in);
+      iff_out.close_chunk();
+    }
+    iff_in.close_chunk();
+  }
+  
+  iff_out.close_chunk();
+  
+  str_out.seek(0, SEEK_SET);
+  data_pool=new DataPool(str_out);
+  chunks_number=-1;
+  
+  text=0;
   
   flags|=MODIFIED;
 }
@@ -2169,22 +2366,25 @@ DjVuFile::unlink_file(const char * id)
 void
 DjVuFile::change_text(GP<DjVuTXT> txt,const bool do_reset)
 {
-  DjVuAnno anno_c;
-  if(contains_anno())
+  
+  
+  DjVuText text_c;
+  if(contains_text())
   {
-    GP<ByteStream> file_anno=get_merged_anno();
-    if(file_anno)
+    GP<ByteStream> file_text=get_text();
+    if(file_text)
     {
-      anno_c.decode(*file_anno);
+      text_c.decode(*file_text);
     }
   }
   // Mark this as modified
   set_modified(true);
   if(do_reset)
     reset();
-  anno_c.txt = txt;
+  text_c.txt = txt;
   MemoryByteStream *mbs=new MemoryByteStream();
-  anno=mbs;
-  anno_c.encode(*anno);
+  text=mbs;
+  text_c.encode(*text);
 }
 #endif
+

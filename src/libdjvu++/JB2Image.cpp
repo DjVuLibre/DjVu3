@@ -31,17 +31,20 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: JB2Image.cpp,v 1.39 2000-11-09 20:15:07 jmw Exp $
+// $Id: JB2Image.cpp,v 1.40 2000-12-18 17:13:42 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
 #pragma implementation
 #endif
 
-#include <string.h>
 #include "JB2Image.h"
 #include "GException.h"
 #include "GThreads.h"
+#include "ZPCodec.h"
+#include "GRect.h"
+#include "GBitmap.h"
+#include <string.h>
 
 
 ////////////////////////////////////////

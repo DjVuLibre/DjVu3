@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: DjVuDumpHelper.cpp,v 1.12 2000-11-09 20:15:05 jmw Exp $
+// $Id: DjVuDumpHelper.cpp,v 1.13 2000-12-18 17:13:41 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -39,6 +39,7 @@
 #endif
 
 #include "DjVuDumpHelper.h"
+#include "DataPool.h"
 #include "DjVmDir.h"
 #include "DjVuInfo.h"
 #include "IFFByteStream.h"
@@ -218,10 +219,17 @@ display_anno(ByteStream & out_str, IFFByteStream &iff,
    printf(out_str, "Page annotation");
    GString id;
    iff.short_id(id);
-   if (id=="ANTa" || id=="ANTz")
-     printf(out_str, " (hyperlinks, etc.)");
-   if (id=="TXTa" || id=="TXTz")
-     printf(out_str, " (text, etc.)");
+   printf(out_str, " (hyperlinks, etc.)");
+}
+
+static void
+display_text(ByteStream & out_str, IFFByteStream &iff,
+	     GString, size_t, DjVmInfo&, int)
+{
+   printf(out_str, "Hidden text");
+   GString id;
+   iff.short_id(id);
+   printf(out_str, " (text, etc.)");
 }
 
 struct displaysubr
@@ -251,8 +259,8 @@ disproutines[] =
   { "INCL", display_incl },
   { "ANTa", display_anno },
   { "ANTz", display_anno },
-  { "TXTa", display_anno },
-  { "TXTz", display_anno },
+  { "TXTa", display_text },
+  { "TXTz", display_text },
   { 0, 0 },
 };
 

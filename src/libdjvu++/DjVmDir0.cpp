@@ -31,15 +31,15 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: DjVmDir0.cpp,v 1.12 2000-11-09 20:15:05 jmw Exp $
+// $Id: DjVmDir0.cpp,v 1.13 2000-12-18 17:13:40 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
 #pragma implementation
 #endif
 
-#include "ByteStream.h"
 #include "DjVmDir0.h"
+#include "ByteStream.h"
 #include "debug.h"
 
 int

@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: GMapAreas.h,v 1.18 2000-11-28 18:48:31 fcrary Exp $
+// $Id: GMapAreas.h,v 1.19 2000-12-18 17:13:42 bcr Exp $
 // $Name:  $
 
 #ifndef _GMAPAREAS_H
@@ -41,15 +41,10 @@
 #pragma interface
 #endif
 
-#include "DjVuGlobal.h"
-#include "GRect.h"
+#include "GSmartPointer.h"
 #include "GContainer.h"
 #include "GString.h"
-
-#ifndef U_INT32
-typedef unsigned int u_int32;
-#endif
-
+#include "GRect.h"
 
 /** @name GMapAreas.h
 
@@ -70,7 +65,7 @@ typedef unsigned int u_int32;
     @memo Definition of base map area classes
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: GMapAreas.h,v 1.18 2000-11-28 18:48:31 fcrary Exp $# */
+    #$Id: GMapAreas.h,v 1.19 2000-12-18 17:13:42 bcr Exp $# */
 //@{
 
 
@@ -161,14 +156,14 @@ public:
 	  it will be drawn when the mouse moves over the map area. */
    bool		border_always_visible;
       /// Border color (when relevant) in #0x00RRGGBB# format
-   u_int32	border_color;
+   unsigned long int	border_color;
       /// Border width in pixels
    int		border_width;
       /** Specified a color for highlighting the internal area of the map
 	  area. Will work with rectangular map areas only. The color is
 	  specified in \#00RRGGBB format. A special value of \#FFFFFFFF disables
           highlighting and \#FF000000 is for XOR highlighting. */
-   u_int32	hilite_color;
+   unsigned long int	hilite_color;
 
       /// Default constructor
    GMapArea(void);

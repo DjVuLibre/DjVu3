@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: djvutxt.cpp,v 1.6 2000-11-09 20:15:05 jmw Exp $
+// $Id: djvutxt.cpp,v 1.7 2000-12-18 17:13:40 bcr Exp $
 // $Name:  $
 
 // DJVUTXT -- DjVu TXT extractor
@@ -44,7 +44,7 @@
     \end{verbatim}
 
     {\bf Description} --- File #"djvutxt.cpp"# illustrates how to use
-    \Ref{DjVuDocument}, \Ref{DjVuImage}, \Ref{DjVuAnno>, and \Ref{DjVuTXT}
+    \Ref{DjVuDocument}, \Ref{DjVuImage}, \Ref{DjVuText>, and \Ref{DjVuTXT}
     to retrieve textual information stored inside a #TXT*# chunk of a DjVu
     document.
 
@@ -70,17 +70,21 @@
     @author
     Andrei Erofeev <eaf@geocities.com> -- initial implementation
     @version
-    #$Id: djvutxt.cpp,v 1.6 2000-11-09 20:15:05 jmw Exp $# */
+    #$Id: djvutxt.cpp,v 1.7 2000-12-18 17:13:40 bcr Exp $# */
 //@{
 //@}
+
+
+#include "DjVuDocument.h"
+#include "ByteStream.h"
+#include "DjVuText.h"
+#include "DjVuImage.h"
+#include "GString.h"
+#include "GOS.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/stat.h>
-
-#include "GString.h"
-#include "DjVuDocument.h"
-#include "GOS.h"
 
 static const char * progname;
 
@@ -111,15 +115,17 @@ doPage(const GP<DjVuDocument> & doc, int page_num,
    GP<DjVuImage> dimg=doc->get_page(page_num);
    if (!dimg)
       G_THROW("Failed to decode page.");
-   GP<ByteStream> anno_str=dimg->get_anno();
-   if (anno_str)
+   GP<ByteStream> text_str=dimg->get_text();
+   if (text_str)
    {
-      GP<DjVuAnno> anno=new DjVuAnno();
-      anno->decode(*anno_str);
-      GP<DjVuTXT> txt=anno->txt;
+      GP<DjVuText> text=new DjVuText();
+      text->decode(*text_str);
+      GP<DjVuTXT> txt=text->txt;
       if (txt)
-	 str_out.write((const char *) txt->textUTF8,
+      {
+        str_out.write((const char *) txt->textUTF8,
 		       txt->textUTF8.length());
+      }
    }
 }
 

@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: DjVuDocument.h,v 1.71 2000-12-05 21:41:21 fcrary Exp $
+// $Id: DjVuDocument.h,v 1.72 2000-12-18 17:13:41 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUDOCUMENT_H
@@ -41,13 +41,16 @@
 #pragma interface
 #endif
 
-#include "DjVuGlobal.h"
-#include "GSmartPointer.h"
-#include "DjVuFileCache.h"
-#include "DjVuFile.h"
-#include "DjVuImage.h"
-#include "DjVmDir0.h"
-#include "DjVmDoc.h"
+#include "DjVuPort.h"
+
+class DjVmDoc;
+class DjVmDir;
+class DjVmDir0;
+class DjVuImage;
+class DjVuFile;
+class DjVuFileCache;
+class DjVuNavDir;
+class ByteStream;
 
 /** @name DjVuDocument.h
     Files #"DjVuDocument.h"# and #"DjVuDocument.cpp"# contain implementation
@@ -56,7 +59,7 @@
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocument.h,v 1.71 2000-12-05 21:41:21 fcrary Exp $#
+    @version #$Id: DjVuDocument.h,v 1.72 2000-12-18 17:13:41 bcr Exp $#
 */
 
 //@{

@@ -31,14 +31,15 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: ZPCodec.h,v 1.19 2000-11-09 20:15:08 jmw Exp $
+// $Id: ZPCodec.h,v 1.20 2000-12-18 17:13:43 bcr Exp $
 // $Name:  $
 
 #ifndef _ZPCODEC_H
 #define _ZPCODEC_H
 
 #include "DjVuGlobal.h"
-#include "ByteStream.h"
+
+class ByteStream;
 
 #ifdef __GNUC__
 #pragma interface
@@ -153,7 +154,7 @@
     @memo
     Binary adaptive quasi-arithmetic coder.
     @version
-    #$Id: ZPCodec.h,v 1.19 2000-11-09 20:15:08 jmw Exp $#
+    #$Id: ZPCodec.h,v 1.20 2000-12-18 17:13:43 bcr Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> */
 //@{

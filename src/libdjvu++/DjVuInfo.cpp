@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: DjVuInfo.cpp,v 1.13 2000-11-09 20:15:06 jmw Exp $
+// $Id: DjVuInfo.cpp,v 1.14 2000-12-18 17:13:42 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -39,6 +39,8 @@
 #endif
 
 #include "DjVuInfo.h"
+#include "GException.h"
+#include "ByteStream.h"
 
 // ----------------------------------------
 // CLASS DJVUINFO

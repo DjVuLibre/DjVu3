@@ -31,11 +31,15 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: JPEGDecoder.cpp,v 1.13 2000-11-09 20:15:08 jmw Exp $
+// $Id: JPEGDecoder.cpp,v 1.14 2000-12-18 17:13:42 bcr Exp $
 // $Name:  $
 
 #include "JPEGDecoder.h"
+
 #ifdef NEED_JPEG_DECODER
+
+#include "ByteStream.h"
+#include "GPixmap.h"
 
 extern "C"
 {

@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: DjVuErrorList.h,v 1.11 2000-11-09 20:15:05 jmw Exp $
+// $Id: DjVuErrorList.h,v 1.12 2000-12-18 17:13:41 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUERRORLIST_H
@@ -42,8 +42,8 @@
 #endif
 
 #include "DjVuPort.h"
-#include "GContainer.h"
 
+class ByteStream;
 
 /** @name DjVuErrorList.h
     This file implements a very simple class for redirecting port caster
@@ -51,7 +51,7 @@
 
     @memo DjVuErrorList class.
     @author Bill C Riemers <bcr@lizardtech.com>
-    @version #$Id: DjVuErrorList.h,v 1.11 2000-11-09 20:15:05 jmw Exp $#
+    @version #$Id: DjVuErrorList.h,v 1.12 2000-12-18 17:13:41 bcr Exp $#
 */
 
 //@{

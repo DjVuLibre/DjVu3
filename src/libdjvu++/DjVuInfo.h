@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: DjVuInfo.h,v 1.10 2000-11-09 20:15:06 jmw Exp $
+// $Id: DjVuInfo.h,v 1.11 2000-12-18 17:13:42 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUINFO_H
@@ -47,7 +47,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: DjVuInfo.h,v 1.10 2000-11-09 20:15:06 jmw Exp $# */
+    #$Id: DjVuInfo.h,v 1.11 2000-12-18 17:13:42 bcr Exp $# */
 //@{
 
 
@@ -55,10 +55,9 @@
 #pragma interface
 #endif
 
-#include "GString.h"
-#include "GThreads.h"
 #include "GSmartPointer.h"
-#include "ByteStream.h"
+
+class ByteStream;
 
 /** @name DjVu version constants
     @memo DjVu file format version. */

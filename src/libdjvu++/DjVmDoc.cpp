@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: DjVmDoc.cpp,v 1.32 2000-11-18 00:21:12 fcrary Exp $
+// $Id: DjVmDoc.cpp,v 1.33 2000-12-18 17:13:40 bcr Exp $
 // $Name:  $
 
 
@@ -40,6 +40,7 @@
 #endif
 
 #include "DjVmDoc.h"
+#include "DataPool.h"
 #include "IFFByteStream.h"
 #include "GOS.h"
 #include "debug.h"

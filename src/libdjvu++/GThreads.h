@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: GThreads.h,v 1.42 2000-11-09 20:15:07 jmw Exp $
+// $Id: GThreads.h,v 1.43 2000-12-18 17:13:42 bcr Exp $
 // $Name:  $
 
 #ifndef _GTHREADS_H_
@@ -96,14 +96,15 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Praveen Guduru <praveen@sanskrit.lz.att.com> -- mac implementation.
     @version
-    #$Id: GThreads.h,v 1.42 2000-11-09 20:15:07 jmw Exp $# */
+    #$Id: GThreads.h,v 1.43 2000-12-18 17:13:42 bcr Exp $# */
 //@{
-
-#include "DjVuGlobal.h"
 
 #ifdef __GNUC__
 #pragma interface
 #endif
+
+#include "DjVuGlobal.h"
+#include "GException.h"
 
 #define NOTHREADS     0
 #define COTHREADS     1
@@ -121,8 +122,8 @@
 #define THREADMODEL MACTHREADS
 #endif
 #endif
+
 // Exception emulation is not thread safe
-#include "GException.h"
 #ifdef USE_EXCEPTION_EMULATION
 #undef  THREADMODEL
 #define THREADMODEL NOTHREADS

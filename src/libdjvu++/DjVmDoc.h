@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: DjVmDoc.h,v 1.18 2000-11-09 20:15:05 jmw Exp $
+// $Id: DjVmDoc.h,v 1.19 2000-12-18 17:13:40 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVMDOC_H
@@ -41,13 +41,10 @@
 #pragma interface
 #endif
 
-#include "DjVuGlobal.h"
-#include "ByteStream.h"
-#include "GSmartPointer.h"
-#include "GContainer.h"
-#include "GString.h"
 #include "DjVmDir.h"
-#include "DataPool.h"
+
+class ByteStream;
+class DataPool;
 
 /** @name DjVmDoc.h
     Files #"DjVmDoc.h"# and #"DjVmDoc.cpp"# contain implementation of the
@@ -55,7 +52,7 @@
 
     @memo DjVu multipage documents reader/writer.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: DjVmDoc.h,v 1.18 2000-11-09 20:15:05 jmw Exp $#
+    @version #$Id: DjVmDoc.h,v 1.19 2000-12-18 17:13:40 bcr Exp $#
 */
 
 //@{

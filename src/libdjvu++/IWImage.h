@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: IWImage.h,v 1.15 2000-11-09 20:15:07 jmw Exp $
+// $Id: IWImage.h,v 1.16 2000-12-18 17:13:42 bcr Exp $
 // $Name:  $
 
 
@@ -130,21 +130,25 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: IWImage.h,v 1.15 2000-11-09 20:15:07 jmw Exp $# */
+    #$Id: IWImage.h,v 1.16 2000-12-18 17:13:42 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
 #pragma interface
 #endif
 
-#include "DjVuGlobal.h"
-#include "GRect.h"
 #include "GSmartPointer.h"
-#include "GBitmap.h"
-#include "GPixmap.h"
-#include "ByteStream.h"
-#include "IFFByteStream.h"
+//include "GBitmap.h"
+//include "GPixmap.h"
+//include "ByteStream.h"
+//include "IFFByteStream.h"
+//include "GRect.h"
 
+class GRect;
+class IFFByteStream;
+class ByteStream;
+class GBitmap;
+class GPixmap;
 
 class _IWMap;
 class _IWBlock;

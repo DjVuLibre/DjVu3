@@ -31,18 +31,16 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: GContainer.h,v 1.40 2000-12-01 22:54:16 fcrary Exp $
+// $Id: GContainer.h,v 1.41 2000-12-18 17:13:42 bcr Exp $
 // $Name:  $
 
 #ifndef _GCONTAINER_H_
-#define _GCONTAINER_H_
+#define _GCONTAINER_H_ "GContainer."
 
 #ifdef __GNUC__
 #pragma interface
 #endif
 
-
-#include "DjVuGlobal.h"
 #include "GException.h"
 #include "GSmartPointer.h"
 #include <string.h>
@@ -95,7 +93,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@geocities.com> -- bug fixes.
     @version 
-    #$Id: GContainer.h,v 1.40 2000-12-01 22:54:16 fcrary Exp $# */
+    #$Id: GContainer.h,v 1.41 2000-12-18 17:13:42 bcr Exp $# */
 //@{
 
 
@@ -126,7 +124,6 @@ class GCont
 };
 #else
 {
-// protected:
 public:
 #endif
   // --- Pointers to type management functions
@@ -142,8 +139,9 @@ public:
 protected:
 #endif
   // --- Management of simple types
-  template <int SZ> struct TrivTraits
+  template <int SZ> class TrivTraits
   {
+  public:
     // The unique object
     static const Traits & traits();
     // Offset in an array of T
@@ -160,8 +158,9 @@ protected:
       { } ;
   };
   // --- Management of regular types
-  template <class T> struct NormTraits
+  template <class T> class NormTraits
   {
+  public:
     // The unique object
     static const Traits & traits();
     // Offset in an array of T
@@ -296,7 +295,6 @@ public:
   void ins(int n, const void *src, int howmany=1);
   void steal(GArrayBase &ga);
 protected:
-  static void throw_illegal_subscript() no_return;
   const Traits &traits;
   void  *data;
   int   minlo;
@@ -336,22 +334,14 @@ public:
       "#a[n]=v#") an array element.  This operation will not extend the valid
       subscript range: an exception \Ref{GException} is thrown if argument #n#
       is not in the valid subscript range. */
-  TYPE& operator[](int n) {
-#if GCONTAINER_BOUNDS_CHECK
-    if (n<lobound || n>hibound) throw_illegal_subscript(); 
-#endif
-    return ((TYPE*)data)[n-minlo]; }
+  inline TYPE& operator[](int const n);
   /** Returns a constant reference to the array element for subscript #n#.
       This reference can only be used for reading (as "#a[n]#") an array
       element.  This operation will not extend the valid subscript range: an
       exception \Ref{GException} is thrown if argument #n# is not in the valid
       subscript range.  This variant of #operator[]# is necessary when dealing
       with a #const GArray<TYPE>#. */
-  const TYPE& operator[](int n) const {
-#if GCONTAINER_BOUNDS_CHECK
-    if (n<lobound || n>hibound) throw_illegal_subscript(); 
-#endif
-    return ((const TYPE*)data)[n-minlo]; }
+  inline const TYPE& operator[](int n) const;
   // -- CONVERSION
   /** Returns a pointer for reading or writing the array elements.  This
       pointer can be used to access the array elements with the same
@@ -457,7 +447,7 @@ GArrayTemplate<TYPE>::sort(int lo, int hi)
   if (hi <= lo)
     return;
   if (hi > hibound || lo<lobound)
-    throw_illegal_subscript(); 
+    G_THROW(_GCONTAINER_H_ "illegal_subscript");
   TYPE *data = (TYPE*)(*this);
   // Test for insertion sort
   if (hi <= lo + 50)
@@ -500,6 +490,31 @@ GArrayTemplate<TYPE>::sort(int lo, int hi)
   // -- recursively restart
   sort(lo, h);
   sort(l, hi);
+}
+
+template<class TYPE> inline TYPE&
+GArrayTemplate<TYPE>::operator[](int const n)
+{
+#if GCONTAINER_BOUNDS_CHECK
+  if (n<lobound || n>hibound)
+  {
+    G_THROW(_GCONTAINER_H_ "illegal_subscript"); 
+  }
+#endif
+  return ((TYPE*)data)[n-minlo];
+}
+
+
+template<class TYPE> inline const TYPE &
+GArrayTemplate<TYPE>::operator[](int const n) const
+{
+#if GCONTAINER_BOUNDS_CHECK
+  if (n<lobound || n>hibound)
+  {
+    G_THROW(_GCONTAINER_H_ "illegal_subscript"); 
+  }
+#endif
+  return ((const TYPE*)data)[n-minlo];
 }
 
 
@@ -680,6 +695,12 @@ protected:
   friend class GSetBase;
   void throw_invalid(void *c) const no_return;
 };
+
+inline void 
+GPosition::throw_invalid(void *c) const
+{
+  G_THROW((c == cont)?(ptr?_GCONTAINER_H_ "bad_pos":_GCONTAINER_H_ "bad_pos_null"):_GCONTAINER_H_ "bad_pos_cont");
+}
 
 
 
@@ -964,7 +985,6 @@ protected:
   HNode *installnode(HNode *n);
   void   deletenode(HNode *n);
 protected:
-  static void throw_cannot_add() no_return;
   const Traits &traits;
   int nelems;
   int nbuckets;
@@ -980,7 +1000,6 @@ public:
   void del(GPosition &pos); 
   void empty();
 };
-
 
 template <class K>
 class GSetImpl : public GSetBase
@@ -1025,7 +1044,10 @@ template<class K> GCONT HNode *
 GSetImpl<K>::get_or_throw(const K &key) const
 { 
   HNode *m = get(key);
-  if (!m) throw_cannot_add();
+  if (!m)
+  {
+    G_THROW(_GCONTAINER_H_ "cannot_add");
+  }
   return m;
 }
 #else
@@ -1308,9 +1330,8 @@ hash(const double & x)
 //@}
 //@}
 
-
-
 // ------------ THE END
 
 #endif
+
 

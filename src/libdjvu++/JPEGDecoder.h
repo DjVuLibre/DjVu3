@@ -31,19 +31,18 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: JPEGDecoder.h,v 1.11 2000-11-09 20:15:08 jmw Exp $
+// $Id: JPEGDecoder.h,v 1.12 2000-12-18 17:13:42 bcr Exp $
 // $Name:  $
 
 #ifndef _JPEGDECODER_H_
 #define _JPEGDECODER_H_
 
-#include "DjVuGlobal.h"
+#include "GSmartPointer.h"
+
+class ByteStream;
+class GPixmap;
+
 #ifdef NEED_JPEG_DECODER
-
-#include "ByteStream.h"
-#include "GPixmap.h"
-#include "GException.h"
-
 
 #ifdef __cplusplus
 extern "C" {
@@ -66,7 +65,7 @@ extern "C" {
     @memo
     Decoding interface to the IJG JPEG library.
     @version
-    #$Id: JPEGDecoder.h,v 1.11 2000-11-09 20:15:08 jmw Exp $#
+    #$Id: JPEGDecoder.h,v 1.12 2000-12-18 17:13:42 bcr Exp $#
     @author
     Parag Deshmukh <parag@sanskrit.lz.att.com> 
 */

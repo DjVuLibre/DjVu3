@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: DjVuImage.cpp,v 1.46 2000-11-09 20:15:06 jmw Exp $
+// $Id: DjVuImage.cpp,v 1.47 2000-12-18 17:13:42 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -44,6 +44,12 @@
 #include "DjVuPalette.h"
 #include "GContainer.h"
 #include "GSmartPointer.h"
+#include "JB2Image.h"
+#include "IWImage.h"
+#include "DataPool.h"
+#include "ByteStream.h"
+
+#include "debug.h"
 #include <stdarg.h>
 
 
@@ -153,7 +159,7 @@ DjVuImage::get_info() const
    else return 0;
 }
 
-GP<ByteStream>   
+GP<ByteStream>
 DjVuImage::get_anno() const
 {
    MemoryByteStream *mbs = new MemoryByteStream;
@@ -164,7 +170,26 @@ DjVuImage::get_anno() const
    }
    mbs->seek(0);
    if(!mbs->size())
+   {
      out=0;
+   }
+   return out;
+}
+
+GP<ByteStream>
+DjVuImage::get_text() const
+{
+   MemoryByteStream *mbs = new MemoryByteStream;
+   GP<ByteStream> out = mbs;
+   if (file) 
+   {
+     file->get_text(*mbs);
+   }
+   mbs->seek(0);
+   if(!mbs->size())
+   {
+     out=0;
+   }
    return out;
 }
 

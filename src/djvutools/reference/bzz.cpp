@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: bzz.cpp,v 1.7 2000-11-09 20:15:05 jmw Exp $
+// $Id: bzz.cpp,v 1.8 2000-12-18 17:13:40 bcr Exp $
 // $Name:  $
 
 
@@ -59,13 +59,14 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation
     @version
-    $Id: bzz.cpp,v 1.7 2000-11-09 20:15:05 jmw Exp $ */
+    $Id: bzz.cpp,v 1.8 2000-12-18 17:13:40 bcr Exp $ */
 //@{
 //@}
 
 #include "GException.h"
 #include "ByteStream.h"
 #include "BSByteStream.h"
+#include <stdlib.h>
 
 char *program = "(unknown)";
 

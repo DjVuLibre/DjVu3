@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: BSByteStream.h,v 1.19 2000-11-09 20:15:05 jmw Exp $
+// $Id: BSByteStream.h,v 1.20 2000-12-18 17:13:40 bcr Exp $
 // $Name:  $
 
 #ifndef _BSBYTESTREAM_H
@@ -116,16 +116,15 @@
     @memo
     Simple Burrows-Wheeler general purpose compressor.
     @version
-    #$Id: BSByteStream.h,v 1.19 2000-11-09 20:15:05 jmw Exp $# */
+    #$Id: BSByteStream.h,v 1.20 2000-12-18 17:13:40 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
 #pragma interface
 #endif
 
-#include "DjVuGlobal.h"
-#include "GException.h"
 #include "ByteStream.h"
+#include "GException.h"
 #include "ZPCodec.h"
 
 

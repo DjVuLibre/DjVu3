@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: GString.h,v 1.23 2000-12-06 21:21:05 bcr Exp $
+// $Id: GString.h,v 1.24 2000-12-18 17:13:42 bcr Exp $
 // $Name:  $
 
 #ifndef _GSTRING_H_
@@ -58,7 +58,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.23 2000-12-06 21:21:05 bcr Exp $# */
+    #$Id: GString.h,v 1.24 2000-12-18 17:13:42 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -66,12 +66,11 @@
 #endif
 
 #include "DjVuGlobal.h"
-#include <string.h>
-#include <stdlib.h>
-#include <stdarg.h>
-#include "GException.h"
-#include "GSmartPointer.h"
 #include "GContainer.h"
+
+//include <string.h>
+//include <stdlib.h>
+#include <stdarg.h>
 #ifdef WIN32
 #include <windows.h>
 #endif

@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: DjVuErrorList.cpp,v 1.7 2000-11-09 20:15:05 jmw Exp $
+// $Id: DjVuErrorList.cpp,v 1.8 2000-12-18 17:13:41 bcr Exp $
 // $Name:  $
 
 
@@ -44,6 +44,7 @@
 #include "GException.h"
 #include "GContainer.h"
 #include "GOS.h"
+#include "DataPool.h"
 #include <string.h>
 
 DjVuErrorList::DjVuErrorList() {}

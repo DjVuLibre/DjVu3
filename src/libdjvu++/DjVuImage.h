@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: DjVuImage.h,v 1.33 2000-11-09 20:15:06 jmw Exp $
+// $Id: DjVuImage.h,v 1.34 2000-12-18 17:13:42 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUIMAGE_H
@@ -74,7 +74,7 @@
     L\'eon Bottou <leonb@research.att.com> - initial implementation
     Andrei Erofeev <eaf@geocities.com> - multipage support
     @version
-    #$Id: DjVuImage.h,v 1.33 2000-11-09 20:15:06 jmw Exp $# */
+    #$Id: DjVuImage.h,v 1.34 2000-12-18 17:13:42 bcr Exp $# */
 //@{
 
 
@@ -82,24 +82,7 @@
 #pragma interface
 #endif
 
-#include "GString.h"
-#include "GThreads.h"
-#include "GSmartPointer.h"
-#include "ByteStream.h"
-#include "IFFByteStream.h"
-#include "JB2Image.h"
-#include "IWImage.h"
-#include "GBitmap.h"
-#include "GPixmap.h"
-#include "DjVuInfo.h"
-#include "DjVuAnno.h"
 #include "DjVuFile.h"
-#include "DjVuPalette.h"
-
-#include "GURL.h"
-#include "DataPool.h"
-#include "DjVuPort.h"
-
 
 /* Obsolete class included for backward compatibility. */
 
@@ -180,6 +163,9 @@ public:
       retrieved using \Ref{IFFByteStream}. Returns NULL if no chunks have been
       collected yet. */
   GP<ByteStream> get_anno() const;
+  /** Returns a pointer to a ByteStream containing all the hidden text.
+      Returns NULL if no chunks have been collected yet. */
+  GP<ByteStream> get_text() const;
   //@}
 
   // NEW STYLE DECODING

@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: Arrays.cpp,v 1.14 2000-11-09 20:15:05 jmw Exp $
+// $Id: Arrays.cpp,v 1.15 2000-12-18 17:13:40 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -39,6 +39,7 @@
 #endif
 
 #include "Arrays.h"
+#include "GException.h"
 
 ArrayRep::ArrayRep(int xelsize,
 		   void (* xdestroy)(void *, int, int),

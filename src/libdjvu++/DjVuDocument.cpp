@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: DjVuDocument.cpp,v 1.133 2000-11-18 00:21:12 fcrary Exp $
+// $Id: DjVuDocument.cpp,v 1.134 2000-12-18 17:13:41 bcr Exp $
 // $Name:  $
 
 
@@ -40,8 +40,17 @@
 #endif
 
 #include "DjVuDocument.h"
+#include "DjVmDoc.h"
+#include "DjVmDir0.h"
+#include "DjVuNavDir.h"
+#include "DjVuImage.h"
+#include "DjVuFileCache.h"
 #include "IFFByteStream.h"
 #include "GOS.h"
+#include "DataPool.h"
+#include "IWImage.h"
+#include "GRect.h"
+
 #include "debug.h"
 
 static const char octets[4]={0x41,0x54,0x26,0x54};

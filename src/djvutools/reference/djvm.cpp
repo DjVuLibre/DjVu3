@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: djvm.cpp,v 1.5 2000-11-09 20:15:05 jmw Exp $
+// $Id: djvm.cpp,v 1.6 2000-12-18 17:13:40 bcr Exp $
 // $Name:  $
 
 /** @name djvm
@@ -100,7 +100,7 @@
     @author
     Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: djvm.cpp,v 1.5 2000-11-09 20:15:05 jmw Exp $# */
+    #$Id: djvm.cpp,v 1.6 2000-12-18 17:13:40 bcr Exp $# */
 //@{
 //@}
 
@@ -109,6 +109,7 @@
 #include "GOS.h"
 
 #include <stdlib.h>
+#include <stdio.h>
 #include <iostream.h>
 
 static char * progname;

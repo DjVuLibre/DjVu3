@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 //
-// $Id: djvumake.cpp,v 1.5 2000-12-15 17:11:52 bcr Exp $
+// $Id: djvumake.cpp,v 1.6 2000-12-18 17:13:40 bcr Exp $
 // $Name:  $
 
 /** @name djvumake
@@ -103,7 +103,7 @@
     @memo
     Assemble DjVu files.
     @version
-    #$Id: djvumake.cpp,v 1.5 2000-12-15 17:11:52 bcr Exp $#
+    #$Id: djvumake.cpp,v 1.6 2000-12-18 17:13:40 bcr Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> \\
     Patrick Haffner <haffner@research.att.com>
@@ -111,15 +111,19 @@
 //@{
 //@}
 
-#include <stdio.h>
-#include <stdlib.h>
 #include "GString.h"
 #include "GException.h"
 #include "DjVuImage.h"
 #include "MMRDecoder.h"
+#include "IFFByteStream.h"
+#include "JB2Image.h"
+#include "IWImage.h"
 
 #include "GPixmap.h"
 #include "GBitmap.h"
+
+#include <stdio.h>
+#include <stdlib.h>
 
 int flag_contains_fg      = 0;
 int flag_contains_bg      = 0;

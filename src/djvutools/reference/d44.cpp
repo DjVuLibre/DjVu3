@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: d44.cpp,v 1.5 2000-11-09 20:15:05 jmw Exp $
+// $Id: d44.cpp,v 1.6 2000-12-18 17:13:40 bcr Exp $
 // $Name:  $
 
 /** @name d44
@@ -85,16 +85,19 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: d44.cpp,v 1.5 2000-11-09 20:15:05 jmw Exp $# 
+    #$Id: d44.cpp,v 1.6 2000-12-18 17:13:40 bcr Exp $# 
 */
 //@{
 //@}
 
-#include <stdio.h>
 #include "GString.h"
 #include "GException.h"
 #include "IWImage.h"
 #include "GOS.h"
+#include "IFFByteStream.h"
+#include "GPixmap.h"
+#include "GBitmap.h"
+#include <stdlib.h>
 #ifdef UNDER_CE
 #include <windows.h>
 #endif

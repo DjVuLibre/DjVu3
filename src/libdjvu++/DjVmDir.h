@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: DjVmDir.h,v 1.28 2000-11-09 20:15:05 jmw Exp $
+// $Id: DjVmDir.h,v 1.29 2000-12-18 17:13:40 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVMDIR_H
@@ -85,7 +85,7 @@
     @memo Implements DjVu multipage document directory
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: DjVmDir.h,v 1.28 2000-11-09 20:15:05 jmw Exp $# */
+    #$Id: DjVmDir.h,v 1.29 2000-12-18 17:13:40 bcr Exp $# */
 //@{
 
 
@@ -93,12 +93,10 @@
 #pragma interface
 #endif
 
-#include "DjVuGlobal.h"
 #include "GString.h"
-#include "GContainer.h"
-#include "GContainer.h"
-#include "ByteStream.h"
 #include "GThreads.h"
+
+class ByteStream;
 
 /** Implements DjVu multipage document directory.  There are currently two
     multipage DjVu formats supported: {\em bundled} and {\em indirect}.  In

@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: DjVuDumpHelper.h,v 1.8 2000-11-09 20:15:05 jmw Exp $
+// $Id: DjVuDumpHelper.h,v 1.9 2000-12-18 17:13:41 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUDUMPHELPER_H
@@ -49,7 +49,7 @@
     L\'eon Bottou <leonb@research.att.com>,
     Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: DjVuDumpHelper.h,v 1.8 2000-11-09 20:15:05 jmw Exp $# */
+    #$Id: DjVuDumpHelper.h,v 1.9 2000-12-18 17:13:41 bcr Exp $# */
 //@{
 
 
@@ -57,7 +57,10 @@
 #pragma interface
 #endif
 
-#include "DataPool.h"
+#include "GSmartPointer.h"
+
+class DataPool;
+class ByteStream;
 
 /** DjVuDumpHelper.
     This class can dump information on any DjVu file without decoding it.

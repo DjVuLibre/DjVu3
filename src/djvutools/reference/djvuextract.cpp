@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: djvuextract.cpp,v 1.5 2000-11-09 20:15:05 jmw Exp $
+// $Id: djvuextract.cpp,v 1.6 2000-12-18 17:13:40 bcr Exp $
 // $Name:  $
 
 /** @name djvuextract
@@ -66,7 +66,7 @@
     @memo
     Extract components from DjVu files.
     @version
-    #$Id: djvuextract.cpp,v 1.5 2000-11-09 20:15:05 jmw Exp $#
+    #$Id: djvuextract.cpp,v 1.6 2000-12-18 17:13:40 bcr Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> - Initial implementation\\
     Andrei Erofeev <eaf@geocities.com> - Multipage support */
@@ -77,6 +77,7 @@
 #include "ByteStream.h"
 #include "IFFByteStream.h"
 #include "DjVuDocument.h"
+#include "DjVuFile.h"
 #include "GOS.h"
 
 

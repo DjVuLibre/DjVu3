@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: GPixmap.cpp,v 1.22 2000-11-09 20:15:07 jmw Exp $
+// $Id: GPixmap.cpp,v 1.23 2000-12-18 17:13:42 bcr Exp $
 // $Name:  $
 
 // -- Implements class PIXMAP
@@ -42,12 +42,13 @@
 #pragma implementation
 #endif
 
+#include "GPixmap.h"
+
 #include "GString.h"
 #include "GException.h"
 #include "ByteStream.h"
 #include "GRect.h"
 #include "GBitmap.h"
-#include "GPixmap.h"
 #include "GThreads.h"
 #include "Arrays.h"
 #include <stdlib.h>
@@ -465,18 +466,6 @@ GPixmap::save_ppm(ByteStream &bs, int raw) const
 }
 
 
-//////////////////////////////////////////////////
-// Memory usage
-//////////////////////////////////////////////////
-
-
-unsigned int 
-GPixmap::get_memory_usage() const
-{
-  unsigned long usage = sizeof(GPixmap);
-  usage += nrows * ncolumns * sizeof(GPixel);
-  return usage;
-}
 
 
 //////////////////////////////////////////////////

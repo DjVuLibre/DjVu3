@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: DjVuNavDir.cpp,v 1.14 2000-11-09 20:15:06 jmw Exp $
+// $Id: DjVuNavDir.cpp,v 1.15 2000-12-18 17:13:42 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -42,6 +42,7 @@
 #include "debug.h"
 #include "GException.h"
 #include "GOS.h"
+#include "ByteStream.h"
 #include <ctype.h>
 
 DjVuNavDir::DjVuNavDir(const char * dirURL)

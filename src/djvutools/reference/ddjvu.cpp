@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: ddjvu.cpp,v 1.6 2000-12-14 22:42:25 ndire Exp $
+// $Id: ddjvu.cpp,v 1.7 2000-12-18 17:13:40 bcr Exp $
 // $Name:  $
 
 /** @name ddjvu
@@ -112,11 +112,10 @@
     Yann Le Cun <yann@research.att.com>\\
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: ddjvu.cpp,v 1.6 2000-12-14 22:42:25 ndire Exp $# */
+    #$Id: ddjvu.cpp,v 1.7 2000-12-18 17:13:40 bcr Exp $# */
 //@{
 //@}
 
-#include <stdio.h>
 #include "GException.h"
 #include "GSmartPointer.h"
 #include "GRect.h"
@@ -125,6 +124,10 @@
 #include "DjVuImage.h"
 #include "DjVuDocument.h"
 #include "GOS.h"
+#include "ByteStream.h"
+
+#include <stdio.h>
+#include <stdlib.h>
 
 #ifdef UNDER_CE
 #include <windows.h>

@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: MMRDecoder.h,v 1.10 2000-11-09 20:15:08 jmw Exp $
+// $Id: MMRDecoder.h,v 1.11 2000-12-18 17:13:43 bcr Exp $
 // $Name:  $
 
 #ifndef _MMRDECODER_H_
@@ -41,11 +41,10 @@
 #pragma interface
 #endif
 
-#include "DjVuGlobal.h"
 #include "GSmartPointer.h"
-#include "ByteStream.h"
-#include "JB2Image.h"
 
+class ByteStream;
+class JB2Image;
 
 /** @name MMRDecoder.h
     Files #"MMRDecoder.h"# and #"MMRDecoder.cpp"# implement a 
@@ -102,7 +101,7 @@
     @memo
     CCITT-G4/MMR decoder.
     @version
-    #$Id: MMRDecoder.h,v 1.10 2000-11-09 20:15:08 jmw Exp $#
+    #$Id: MMRDecoder.h,v 1.11 2000-12-18 17:13:43 bcr Exp $#
     @author
     Parag Deshmukh <parag@sanskrit.lz.att.com> \\
     Leon Bottou <leonb@research.att.com> */

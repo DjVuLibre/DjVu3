@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: djvmcvt.cpp,v 1.5 2000-11-09 20:15:05 jmw Exp $
+// $Id: djvmcvt.cpp,v 1.6 2000-12-18 17:13:40 bcr Exp $
 // $Name:  $
 
 /** @name djvmcvt
@@ -107,16 +107,17 @@
     @author
     Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: djvmcvt.cpp,v 1.5 2000-11-09 20:15:05 jmw Exp $# */
+    #$Id: djvmcvt.cpp,v 1.6 2000-12-18 17:13:40 bcr Exp $# */
 
 #ifdef __GNUC__
 #pragma implementation
 #endif
 
-#include "debug.h"
-#include "DjVmDoc.h"
 #include "DjVuDocument.h"
+#include "DjVmDoc.h"
+#include "ByteStream.h"
 #include "GOS.h"
+#include "debug.h"
 
 #include <stdio.h>
 

@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: DjVmDir0.h,v 1.13 2000-11-09 20:15:05 jmw Exp $
+// $Id: DjVmDir0.h,v 1.14 2000-12-18 17:13:40 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVMDIR0_H
@@ -41,10 +41,9 @@
 #pragma interface
 #endif
 
-#include "GContainer.h"
 #include "GString.h"
-#include "ByteStream.h"
-#include "GSmartPointer.h"
+
+class ByteStream;
 
 /** @name DjVmDir0.h
 
@@ -60,7 +59,7 @@
 
     @memo Directory of DjVu all-in-one-file DjVu documents.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: DjVmDir0.h,v 1.13 2000-11-09 20:15:05 jmw Exp $# */
+    @version #$Id: DjVmDir0.h,v 1.14 2000-12-18 17:13:40 bcr Exp $# */
 
 //@{
 

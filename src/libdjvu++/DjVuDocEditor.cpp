@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: DjVuDocEditor.cpp,v 1.49 2000-11-18 00:21:12 fcrary Exp $
+// $Id: DjVuDocEditor.cpp,v 1.50 2000-12-18 17:13:41 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -39,7 +39,14 @@
 #endif
 
 #include "DjVuDocEditor.h"
+#include "DjVuImage.h"
+#include "IFFByteStream.h"
+#include "DataPool.h"
+#include "IWImage.h"
 #include "GOS.h"
+#include "DjVuAnno.h"
+#include "GRect.h"
+
 #include "debug.h"
 
 #include <ctype.h>

@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: ByteStream.h,v 1.28 2000-11-09 20:15:05 jmw Exp $
+// $Id: ByteStream.h,v 1.29 2000-12-18 17:13:40 bcr Exp $
 // $Name:  $
 
 #ifndef _BYTESTREAM_H
@@ -63,21 +63,17 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation\\
     Andrei Erofeev <eaf@geocities.com> -- 
     @version
-    #$Id: ByteStream.h,v 1.28 2000-11-09 20:15:05 jmw Exp $# */
+    #$Id: ByteStream.h,v 1.29 2000-12-18 17:13:40 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
 #pragma interface
 #endif
 
-#include "DjVuGlobal.h"
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include "GException.h"
-#include "GContainer.h"
 #include "Arrays.h"
-#include "GSmartPointer.h"
+#include <stdio.h>
+//include <stdlib.h>
+//include <string.h>
 
 
 /** Abstract class for a stream of bytes.  Class #ByteStream# represent an
