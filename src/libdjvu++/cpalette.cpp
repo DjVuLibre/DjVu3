@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: cpalette.cpp,v 1.1 2000-02-16 23:55:23 leonb Exp $
+//C- $Id: cpalette.cpp,v 1.2 2000-02-17 19:13:56 leonb Exp $
 
 
 /** @name cpalette
@@ -39,7 +39,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: cpalette.cpp,v 1.1 2000-02-16 23:55:23 leonb Exp $# */
+    #$Id: cpalette.cpp,v 1.2 2000-02-17 19:13:56 leonb Exp $# */
 //@{
 //@}
 
@@ -58,40 +58,10 @@
 #include "DjVuInfo.h"
 
 
-#ifndef IMPLEMENT_MAIN
-// Define IMPLEMENT_MAIN to zero before including this file
-#define IMPLEMENT_MAIN 1
-#endif
-
-
-
-
-
-// --------------------------------------------------
-// UTILITIES
-// --------------------------------------------------
-
-#ifdef MIN
 #undef MIN
-#endif
-
-inline int 
-MIN(int a, int b) 
-{ 
-  return ( a<b ?a :b); 
-}
-
-#ifdef MAX
 #undef MAX
-#endif
-
-inline int 
-MAX(int a, int b) 
-{ 
-  return ( a>b ?a :b); 
-}
-
-
+inline int MIN(int a, int b) { return ( a<b ?a :b); }
+inline int MAX(int a, int b) { return ( a>b ?a :b); }
 
 
 
@@ -169,7 +139,6 @@ CCImage::add_single_run(int y, int x1, int x2, int color, int ccid=0)
   run.ccid = ccid;
   
 }
-
 
 
 // -- Performs color connected component analysis
@@ -561,12 +530,14 @@ CCImage::get_bitmap_for_cc(const int ccid) const
 
 
 
-
-
-
 // --------------------------------------------------
-// PATTERN MATCHING
+// LOSSLESS PATTERN MATCHING
 // --------------------------------------------------
+
+// ISSUE: LOSSY PATTERN MATCHING
+// This is lossless because shapes with different colors
+// can touch each other.  Modifying such shapes may result
+// in unpleasant effects.  But not all shapes are like that...
 
 
 // -- Candidate descriptor for pattern matching
@@ -673,35 +644,47 @@ tune_jb2image(JB2Image *jimg, int refine_threshold=21)
 
 
 
-
-
-
-
 // --------------------------------------------------
 // MAIN COMPRESSION ROUTINE
 // --------------------------------------------------
 
 
-// Compresses input pixmap.
+// -- Options for low color compression
+struct cpaletteopts
+{
+  int ncolors;
+  int dpi;
+  bool verbose;
+};
+
+
+// -- Compresses low color pixmap.
 void 
-cpalette(GPixmap &input, const char *fileout, int ncolors, int dpi, bool verbose)
+cpalette(GPixmap &input, const char *fileout, const cpaletteopts &opts)
 {
   int w = input.columns();
   int h = input.rows();
+  int dpi = MAX(200, MIN(900, opts.dpi));
+  int largesize = MIN(500, MAX(64, dpi));
+  int smallsize = MAX(2, dpi/150);
 
   // Compute optimal palette and quantize input pixmap
   DjVuPalette pal;
-  int bgindex = pal.compute_palette_and_quantize(input, ncolors);
-  if (verbose)
+  pal.histogram_clear();
+  for (int j=0; j<h; j++) 
+    {
+      GPixel *p = input[j];
+      for (int i=0; i<w; i++)
+        pal.histogram_add(p[i], 1);
+    }
+  int bgindex = pal.compute_palette(opts.ncolors);
+  if (opts.verbose)
     fprintf(stderr,"Image %dx%d has %d colors\n", w, h, pal.size());
-
-  // Determine dominant color
   GPixel bgcolor;
   pal.index_to_color(bgindex, bgcolor);
-  if (verbose)
-    fprintf(stderr,"Background color is #%02x%02x%02x\n",
-            bgcolor.r, bgcolor.g, bgcolor.b);
-
+  if (opts.verbose)
+    fprintf(stderr,"Background color is #%02x%02x%02x\n", bgcolor.r, bgcolor.g, bgcolor.b);
+  
   // Fill CCImage with color runs
   CCImage rimg(w, h);
   for (int y=0; y<h; y++)
@@ -711,24 +694,18 @@ cpalette(GPixmap &input, const char *fileout, int ncolors, int dpi, bool verbose
       while (x<w)
         {
           int x1 = x;
-          GPixel color = row[x];
-          while (x<w && row[x]==color) 
-            x++;
-          if (color!=bgcolor)
-            rimg.add_single_run(y, x1, x-1, pal.color_to_index(color));
+          int index = pal.color_to_index(row[x++]);
+          while (x<w && pal.color_to_index(row[x])==index) { x++; }
+          if (index != bgindex)
+            rimg.add_single_run(y, x1, x-1, index);
         }
     }
   
   // Perform Color Connected Component Analysis
-  rimg.make_ccids_by_analysis();                  // obtain ccids
-  rimg.make_ccs_from_ccids();                     // compute cc descriptors
-
-  // Reorganize CCimage
-  dpi = MAX(200, MIN(900, dpi));
-  int largesize = MIN(500, MAX(64, dpi));
-  int smallsize = MAX(2, dpi/150);
-  rimg.merge_and_split_ccs(smallsize,largesize);  // avoid gross ccs
-  rimg.sort_in_reading_order();                   // sort cc descriptors
+  rimg.make_ccids_by_analysis();                  // Obtain ccids
+  rimg.make_ccs_from_ccids();                     // Compute cc descriptors
+  rimg.merge_and_split_ccs(smallsize,largesize);  // Eliminates gross ccs
+  rimg.sort_in_reading_order();                   // Sort cc descriptors
   
   // Create JB2Image and fill colordata
   JB2Image jimg;
@@ -752,6 +729,11 @@ cpalette(GPixmap &input, const char *fileout, int ncolors, int dpi, bool verbose
   
   // Organize JB2Image
   tune_jb2image(&jimg);
+  
+  // Create background image
+  IWPixmap iwimage;
+  GPixmap bgimage((h+11)/12, (w+11)/12, &bgcolor);
+  iwimage.init(&bgimage, 0);
 
   // Code
   StdioByteStream obs(fileout, "wb");
@@ -763,13 +745,11 @@ cpalette(GPixmap &input, const char *fileout, int ncolors, int dpi, bool verbose
   DjVuInfo info;
   info.height = h;
   info.width = w;
-  info.dpi = dpi;
+  info.dpi = opts.dpi;
   info.encode(iff);
   iff.close_chunk();
   // -- ``BG44'' chunk
   iff.put_chunk("BG44");
-  GPixmap bgimage((h+11)/12, (w+11)/12, &bgcolor);
-  IWPixmap iwimage(&bgimage, 0);
   IWEncoderParms iwparms;
   iwparms.slices = 100;
   iwimage.encode_chunk(iff, iwparms);
@@ -789,24 +769,19 @@ cpalette(GPixmap &input, const char *fileout, int ncolors, int dpi, bool verbose
 
 
 
-
-
-
-
 // --------------------------------------------------
 // MAIN
 // --------------------------------------------------
 
-
-#if IMPLEMENT_MAIN
 
 void
 usage()
 {
   fprintf(stderr,"Usage: cpalette [options] <inputppmfile> <outputdjvufile>\n"
           "Options are:\n"
-          "   -colors n    Specify maximal number of colors.\n"
-          "   -verbose     Enables verbose messages.\n" );
+          "   -colors n    Maximum number of colors during quantization (default 256).\n"
+          "   -dpi n       Resolution written into the output file (default 100).\n"
+          "   -verbose     Displays additional messages.\n" );
   exit(10);
 }
 
@@ -819,9 +794,10 @@ main(int argc, const char **argv)
       GString inputppmfile;
       GString outputdjvufile;
       // Defaults
-      int dpi = 100;
-      int ncolors = 256;
-      bool verbose = false;
+      cpaletteopts opts;
+      opts.dpi = 100;
+      opts.ncolors = 256;
+      opts.verbose = false;
       // Parse options
       for (int i=1; i<argc; i++)
         {
@@ -829,19 +805,19 @@ main(int argc, const char **argv)
           if (arg == "-colors" && i+1<argc)
             {
               char *end;
-              ncolors = strtol(argv[++i], &end, 10);
-              if (*end || ncolors<2 || ncolors>1024)
+              opts.ncolors = strtol(argv[++i], &end, 10);
+              if (*end || opts.ncolors<2 || opts.ncolors>1024)
                 usage();
             }
           else if (arg == "-dpi" && i+1<argc)
             {
               char *end;
-              dpi = strtol(argv[++i], &end, 10);
-              if (*end || dpi<75 || dpi>144000)
+              opts.dpi = strtol(argv[++i], &end, 10);
+              if (*end || opts.dpi<25 || opts.dpi>144000)
                 usage();
             }
           else if (arg == "-verbose")
-            verbose = true;
+            opts.verbose = true;
           else if (arg[0] == '-')
             usage();
           else if (!inputppmfile)
@@ -853,11 +829,10 @@ main(int argc, const char **argv)
         }
       if (!inputppmfile || !outputdjvufile)
         usage();
-      // Load
+      // Load and run
       StdioByteStream ibs(inputppmfile,"rb");
       GPixmap input(ibs);
-      // Execute
-      cpalette(input, outputdjvufile, ncolors, dpi, verbose);
+      cpalette(input, outputdjvufile, opts);
     }
   CATCH(ex)
     {
@@ -869,7 +844,6 @@ main(int argc, const char **argv)
 }
 
 
-#endif
 
 
 
