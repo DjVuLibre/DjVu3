@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DataPool.cpp,v 1.69 2001-02-22 21:07:45 fcrary Exp $
+// $Id: DataPool.cpp,v 1.69.2.1 2001-03-22 02:04:16 bcr Exp $
 // $Name:  $
 
 
@@ -42,6 +42,7 @@
 #include "IFFByteStream.h"
 #include "GString.h"
 #include "GOS.h"
+#include "GURL.h"
 #include "debug.h"
 
 #if defined(macintosh) //MCW can't compile
@@ -81,8 +82,8 @@ call_callback(void (* callback)(void *), void *cl_data)
    class DataPool::OpenFiles_File : public GPEnabled
    {
    public:
-      GString			name;
-      GP<ByteStream>	        stream;		// Stream connected to 'name'
+      GURL			url;
+      GP<ByteStream>	        stream;		// Stream connected to 'url'
       GCriticalSection		stream_lock;
       GPList<DataPool>		pools_list;	// List of pools using this stream
       GCriticalSection		pools_lock;
@@ -91,7 +92,7 @@ call_callback(void (* callback)(void *), void *cl_data)
       int	add_pool(GP<DataPool> &pool);
       int	del_pool(GP<DataPool> &pool);
       
-      OpenFiles_File(const char * name, GP<DataPool> &pool);
+      OpenFiles_File(const GURL &url, GP<DataPool> &pool);
       virtual ~OpenFiles_File(void);
    };
 class DataPool::OpenFiles : public GPEnabled
@@ -109,7 +110,7 @@ public:
       // with the stream. Whenever OpenFiles decides, that this stream
       // had better be closed, it will order every pool from the list to
       // ZERO their references to it
-   GP<DataPool::OpenFiles_File>		request_stream(const char * name, GP<DataPool> pool);
+   GP<DataPool::OpenFiles_File>		request_stream(const GURL &url, GP<DataPool> pool);
       // If there are more than MAX_STREAM_FILES open, close the oldest.
    void		prune(void);
       // Removes the pool from the list associated with the stream.
@@ -122,19 +123,19 @@ public:
 
 DataPool::OpenFiles * DataPool::OpenFiles::global_ptr;
 
-DataPool::OpenFiles_File::OpenFiles_File(const char * xname, GP<DataPool> &pool) : name(xname)
+DataPool::OpenFiles_File::OpenFiles_File(const GURL &xurl, GP<DataPool> &pool) : url(xurl)
 {
-   DEBUG_MSG("DataPool::OpenFiles_File::OpenFiles_File(): Opening file '" << name << "'\n");
+   DEBUG_MSG("DataPool::OpenFiles_File::OpenFiles_File(): Opening file '" << url << "'\n");
    DEBUG_MAKE_INDENT(3);
    
    open_time=GOS::ticks();
-   stream=ByteStream::create(name,"rb");
+   stream=ByteStream::create(url,"rb");
    add_pool(pool);
 }
 
 DataPool::OpenFiles_File::~OpenFiles_File(void)
 {
-   DEBUG_MSG("DataPool::OpenFiles_File::~OpenFiles_File(): Closing file '" << name << "'\n");
+   DEBUG_MSG("DataPool::OpenFiles_File::~OpenFiles_File(): Closing file '" << url << "'\n");
    DEBUG_MAKE_INDENT(3);
 
       // Make all DataPools using this stream release it (so that
@@ -202,21 +203,19 @@ DataPool::OpenFiles::prune(void)
 //			  GP<ByteStream> & stream,
 //			  GCriticalSection ** stream_lock)
 GP<DataPool::OpenFiles_File>
-DataPool::OpenFiles::request_stream(const char * name_in, GP<DataPool> pool)
+DataPool::OpenFiles::request_stream(const GURL &url, GP<DataPool> pool)
 {
-   DEBUG_MSG("DataPool::OpenFiles::request_stream(): name='" << name_in << "'\n");
+   DEBUG_MSG("DataPool::OpenFiles::request_stream(): url='" << url << "'\n");
    DEBUG_MAKE_INDENT(3);
 
    GP<DataPool::OpenFiles_File> file;
 
-   GString name=GOS::expand_name(name_in, GOS::cwd());
-   
       // Check: maybe the stream has already been open by request of
       // another DataPool
    GCriticalSectionLock lock(&files_lock);
    for(GPosition pos=files_list;pos;++pos)
    {
-      if (files_list[pos]->name==name)
+      if (files_list[pos]->url==url)
       {
 	 DEBUG_MSG("found existing stream\n");
 	 file=files_list[pos];
@@ -228,7 +227,7 @@ DataPool::OpenFiles::request_stream(const char * name_in, GP<DataPool> pool)
       // too many streams open
    if (!file)
    {
-      file=new DataPool::OpenFiles_File(name, pool);
+      file=new DataPool::OpenFiles_File(url, pool);
       files_list.append(file);
       prune();
    }
@@ -255,7 +254,7 @@ DataPool::OpenFiles::stream_released(GP<ByteStream> &stream, GP<DataPool> pool)
    }
 }
 
-// This isn't really an accurate name.  The files are not really
+// This isn't really an accurate url.  The files are not really
 // closed.  Instead they are dereferenced from the data pool.  If
 // a there is another reference to the respective bytestream, it
 // will remain open until dereferenced.
@@ -281,37 +280,36 @@ DataPool::OpenFiles::close_all(void)
 class FCPools
 {
 private:
-   GMap<GString, GPList<DataPool> >	map;	// GMap<GString, GPList<DataPool>> in fact
+   GMap<GURL, GPList<DataPool> >	map;	// GMap<GString, GPList<DataPool>> in fact
    GCriticalSection		map_lock;
 
    static FCPools	* global_ptr;
 public:
    static FCPools *	get(void);
-      // Adds the <fname, pool> pair into the list
-   void		add_pool(const char * fname, GP<DataPool> pool);
-      // Removes the <fname, pool> pair from the list
-   void		del_pool(const char * fname, GP<DataPool> pool);
-      // Looks for the list of DataPools connected to 'fname' and makes
+      // Adds the <furl, pool> pair into the list
+   void		add_pool(const GURL &furl, GP<DataPool> pool);
+      // Removes the <furl, pool> pair from the list
+   void		del_pool(const GURL &furl, GP<DataPool> pool);
+      // Looks for the list of DataPools connected to 'furl' and makes
       // each of them load the contents of the file into memory
-   void		load_file(const char * fname);
+   void		load_file(const GURL &url);
 };
 
 void
-FCPools::add_pool(const char * name_in, GP<DataPool> pool)
+FCPools::add_pool(const GURL &url, GP<DataPool> pool)
 {
-  DEBUG_MSG("FCPools::add_pool: name_in='" << name_in << "' pool=" << (void *)pool << "\n");
+  DEBUG_MSG("FCPools::add_pool: url='" << url << "' pool=" << (void *)pool << "\n");
   DEBUG_MAKE_INDENT(3);
    GCriticalSectionLock lock(&map_lock);
 
-   if (name_in && strlen(name_in))
+   if (url.is_local_file_url())
    {
-      GString name=GOS::expand_name(name_in, GOS::cwd());
       GPList<DataPool> list;
       GPosition pos;
-      if (!map.contains(name, pos))
+      if (!map.contains(url, pos))
       {
-        map[name]=list;
-        pos=map.contains(name);
+        map[url]=list;
+        pos=map.contains(url);
       }
       GPList<DataPool> &plist=map[pos];
       if (!plist.contains(pool))
@@ -320,17 +318,16 @@ FCPools::add_pool(const char * name_in, GP<DataPool> pool)
 }
 
 void
-FCPools::del_pool(const char * name_in, GP<DataPool> pool)
+FCPools::del_pool(const GURL &url, GP<DataPool> pool)
 {
-  DEBUG_MSG("FCPools::del_pool: name_in='" << name_in << "' pool=" << (void *)pool << "\n");
+  DEBUG_MSG("FCPools::del_pool: url='" << url << "' pool=" << (void *)pool << "\n");
   DEBUG_MAKE_INDENT(3);
    GCriticalSectionLock lock(&map_lock);
 
-   if (name_in && strlen(name_in))
+   if (url.is_local_file_url())
    {
-      GString name=GOS::expand_name(name_in, GOS::cwd());
       GPosition pos;
-      if (map.contains(name, pos))
+      if (map.contains(url, pos))
       {
 	 GPList<DataPool> &list=map[pos];
 	 GPosition list_pos;
@@ -345,17 +342,16 @@ FCPools::del_pool(const char * name_in, GP<DataPool> pool)
 }
 
 void
-FCPools::load_file(const char * name_in)
+FCPools::load_file(const GURL &url)
 {
-  DEBUG_MSG("FCPools::load_file: name_in='" << name_in << "'\n");
+  DEBUG_MSG("FCPools::load_file: url='" << url << "'\n");
   DEBUG_MAKE_INDENT(3);
    GCriticalSectionLock lock(&map_lock);
 
-   if (name_in && strlen(name_in))
+   if (url.is_local_file_url())
    {
-      GString name=GOS::expand_name(name_in, GOS::cwd());
       GPosition pos;
-      if (map.contains(name, pos))
+      if (map.contains(url, pos))
       {
 	    // We make here a copy of the list because DataPool::load_file()
 	    // will call FCPools::del_pool(), which will modify the list
@@ -687,15 +683,15 @@ DataPool::create(const GP<DataPool> & pool, int start, int length)
 }
 
 GP<DataPool>
-DataPool::create(const char * fname, int start, int length)
+DataPool::create(const GURL &furl, int start, int length)
 {
-  DEBUG_MSG("DataPool::DataPool: fname='" << fname << "' start=" << start << " length= " << length << "\n");
+  DEBUG_MSG("DataPool::DataPool: furl='" << furl << "' start=" << start << " length= " << length << "\n");
   DEBUG_MAKE_INDENT(3);
 
   DataPool *pool=new DataPool();
   GP<DataPool> retval=pool;
   pool->init();
-  pool->connect(fname, start, length);
+  pool->connect(furl, start, length);
   return retval;
 }
 
@@ -725,9 +721,9 @@ DataPool::~DataPool(void)
 
   clear_stream(true);
 
-  if (fname.length()) 
+  if (furl.is_local_file_url())
   {
-    FCPools::get()->del_pool(fname, this);
+    FCPools::get()->del_pool(furl, this);
   }
    
   {
@@ -758,7 +754,7 @@ DataPool::connect(const GP<DataPool> & pool_in, int start_in, int length_in)
    DEBUG_MAKE_INDENT(3);
    
    if (pool) G_THROW("DataPool.connected1");            //  Already connected to another DataPool.
-   if (fname.length()) G_THROW("DataPool.connected2");  //  Already connected to a file.
+   if (furl.is_local_file_url()) G_THROW("DataPool.connected2");  //  Already connected to a file.
    if (start_in<0) G_THROW("DataPool.neg_start");       //  The start offset of the range may not be negative.
 
    pool=pool_in;
@@ -788,40 +784,40 @@ DataPool::connect(const GP<DataPool> & pool_in, int start_in, int length_in)
 }
 
 void
-DataPool::connect(const char * fname_in, int start_in, int length_in)
+DataPool::connect(const GURL &furl_in, int start_in, int length_in)
 {
    DEBUG_MSG("DataPool::connect(): connecting to a file\n");
    DEBUG_MAKE_INDENT(3);
    
    if (pool)
      G_THROW("DataPool.connected1");              //  Already connected to another DataPool.
-   if (fname.length())
+   if (furl.is_local_file_url())
      G_THROW("DataPool.connected2");    //  Already connected to a file.
    if (start_in<0)
      G_THROW("DataPool.neg_start");         //  The start offset of the range may not be negative.
 
 
-   if (fname_in[0] == '-' && !fname_in[1])
+   if (furl_in.name() == "-")
    {
       DEBUG_MSG("This is stdin => just read the data...\n");
       DEBUG_MAKE_INDENT(3);
       char buffer[1024];
       int length;
-      GP<ByteStream> gstr=ByteStream::create("-", "rb");
+      GP<ByteStream> gstr=ByteStream::create(furl_in, "rb");
       ByteStream &str=*gstr;
       while((length=str.read(buffer, 1024)))
 	 add_data(buffer, length);
       set_eof();
-   } else
+   } else if(!furl_in.is_local_file_url())
    {
 	 // Open the stream (just in this function) too see if
 	 // the file is accessible. In future we will be using 'OpenFiles'
 	 // to request and release streams
-      GP<ByteStream> str=ByteStream::create(fname_in,"rb");
+      GP<ByteStream> str=ByteStream::create(furl_in,"rb");
       str->seek(0, SEEK_END);
       int file_size=str->tell();
 
-      fname=fname_in;
+      furl=furl_in;
       start=start_in;
       length=length_in;
       if (start>=file_size)
@@ -833,7 +829,7 @@ DataPool::connect(const char * fname_in, int start_in, int length_in)
 
       data=0;
 
-      FCPools::get()->add_pool(fname, this);
+      FCPools::get()->add_pool(furl, this);
 
       wake_up_all_readers();
    
@@ -877,7 +873,7 @@ DataPool::get_size(int dstart, int dlength) const
    }
    
    if (pool) return pool->get_size(start+dstart, dlength);
-   else if (fname.length())
+   else if (furl.is_local_file_url())
    {
       if (start+dstart+dlength>length) return length-(start+dstart);
       else return dlength;
@@ -910,7 +906,7 @@ DataPool::add_data(const void * buffer, int offset, int size)
 	     offset << "...\n");
    DEBUG_MAKE_INDENT(3);
 
-   if (fname.length() || pool)
+   if (furl.is_local_file_url() || pool)
       G_THROW("DataPool.add_data");     //  Function DataPool::add_data() may not be called for connected DataPools.
    
       // Add data to the data storage
@@ -968,7 +964,7 @@ DataPool::has_data(int dstart, int dlength)
    if (dlength<0 && length>0)
      dlength=length-dstart;
    return (pool?(pool->has_data(start+dstart, dlength))
-     :((fname.length())?(start+dstart+dlength<=length)
+     :((furl.is_local_file_url())?(start+dstart+dlength<=length)
        :((dlength<0)?is_eof()
          :(block_list->get_bytes(dstart, dlength)==dlength))));
 }
@@ -1039,7 +1035,7 @@ DataPool::get_data(void * buffer, int offset, int sz, int level)
          return retval;
       }
    } 
-   else if (fname.length())
+   else if (furl.is_local_file_url())
    {
       DEBUG_MSG("DataPool::get_data(): from file\n");
       DEBUG_MAKE_INDENT(3);
@@ -1055,7 +1051,7 @@ DataPool::get_data(void * buffer, int offset, int sz, int level)
         f=fstream;
         if(!f)
         {
-          fstream=f=OpenFiles::get()->request_stream(fname, this);
+          fstream=f=OpenFiles::get()->request_stream(furl, this);
         }
       }
       GCriticalSectionLock lock2(&(f->stream_lock));
@@ -1152,7 +1148,7 @@ DataPool::wait_for_data(const GP<Reader> & reader)
         G_THROW("DataPool.reenter");    //  DATA_POOL_REENTER
       if (eof_flag || block_list->get_bytes(reader->offset, 1))
         return;
-      if (pool || fname.length())
+      if (pool || furl.is_local_file_url())
         return;
 
       if (stop_blocked_flag)
@@ -1181,7 +1177,7 @@ void
 DataPool::set_eof(void)
       // Has no effect on connected DataPools
 {
-   if (!fname.length() && !pool)
+   if (!furl.is_local_file_url() && !pool)
    {
       eof_flag=true;
       
@@ -1264,23 +1260,23 @@ DataPool::load_file(void)
    {
       DEBUG_MSG("passing the request down.\n");
       pool->load_file();
-   } else if (fname.length())
+   } else if (furl.is_local_file_url())
    {
-      DEBUG_MSG("loading the data from \"" << fname << "\".\n");
+      DEBUG_MSG("loading the data from \"" << furl.is_local_file_url() << "\".\n");
 
       GCriticalSectionLock lock1(&class_stream_lock);
       GP<OpenFiles_File> f=fstream;
       if (!f)
       {
-        fstream=f=OpenFiles::get()->request_stream(fname, this);
+        fstream=f=OpenFiles::get()->request_stream(furl, this);
       }
       {  // Scope to de-allocate lock2 before stream gets released
          GCriticalSectionLock lock2(&(f->stream_lock));
 
          data=ByteStream::create();
          block_list->clear();
-         FCPools::get()->del_pool(fname, this);
-         fname="";
+         FCPools::get()->del_pool(furl, this);
+         furl="about:blank";
 
          f->stream->seek(0, SEEK_SET);
          char buffer[1024];
@@ -1295,9 +1291,9 @@ DataPool::load_file(void)
 }
 
 void
-DataPool::load_file(const char * name)
+DataPool::load_file(const GURL &url )
 {
-   FCPools::get()->load_file(name);
+   FCPools::get()->load_file(url);
 }
 
 void
@@ -1307,7 +1303,7 @@ DataPool::check_triggers(void)
   DEBUG_MSG("DataPool::check_triggers(): calling activated trigger callbacks.\n");
   DEBUG_MAKE_INDENT(3);
   
-  if (!pool && !fname.length())
+  if (!pool && !furl.is_local_file_url())
     while(true)
     {
       GP<Trigger> trigger;
@@ -1387,7 +1383,7 @@ DataPool::add_trigger(int tstart, int tlength,
 	    pool->add_trigger(start+tstart, tlength, callback, cl_data);
 	    GCriticalSectionLock lock(&triggers_lock);
 	    triggers_list.append(trigger);
-	 } else if (!fname.length())
+	 } else if (!furl.is_local_file_url())
 	 {
 	       // We're not connected to anything and maintain our own data
 	    if (tlength>=0 && block_list->get_bytes(tstart, tlength)==tlength)
@@ -1472,7 +1468,7 @@ DataPool::trigger_cb(void)
       // We may be here when either EOF is set on the master DataPool
       // Or when it may have learnt its length (from IFF or whatever)
       if (pool->is_eof() || pool->has_data(start, length)) eof_flag=true;
-   } else if (!fname.length())
+   } else if (!furl.is_local_file_url())
    {
 	    // Not connected to anything => Try to guess the length
       if (length<0) analyze_iff();
@@ -1494,7 +1490,7 @@ DataPool::analyze_iff(void)
       // DjVuFiles have IFF structure, which makes it possible to do it.
       // If due to some reason we fail, the length will remain -1.
 {
-   DEBUG_MSG("DataPool::analyze_iff(): Trying to decode IFF structure of " << fname << ".\n");
+   DEBUG_MSG("DataPool::analyze_iff(): Trying to decode IFF structure of " << furl << ".\n");
    DEBUG_MSG("in order to predict the DataPool's size\n");
    DEBUG_MAKE_INDENT(3);
 

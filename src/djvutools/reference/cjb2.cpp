@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: cjb2.cpp,v 1.11 2001-03-06 19:55:41 bcr Exp $
+// $Id: cjb2.cpp,v 1.11.2.1 2001-03-22 02:04:15 bcr Exp $
 // $Name:  $
 
 
@@ -70,7 +70,7 @@
     Paul Howard <pgh@research.att.com>\\
     Pascal Vincent <vincentp@iro.umontreal.ca>
     @version
-    $Id: cjb2.cpp,v 1.11 2001-03-06 19:55:41 bcr Exp $ */
+    $Id: cjb2.cpp,v 1.11.2.1 2001-03-22 02:04:15 bcr Exp $ */
 //@{
 //@}
 
@@ -85,6 +85,8 @@
 #include "GBitmap.h"
 #include "JB2Image.h"
 #include "DjVuInfo.h"
+#include "GOS.h"
+#include "GURL.h"
 
 
 
@@ -801,9 +803,9 @@ struct cjb2opts {
 
 
 void 
-cjb2(const char *filein, const char *fileout, const cjb2opts &opts)
+cjb2(const GURL &urlin, const GURL &urlout, const cjb2opts &opts)
 {
-  GP<ByteStream> ibs=ByteStream::create(filein, "rb");
+  GP<ByteStream> ibs=ByteStream::create(urlin, "rb");
   GP<GBitmap> ginput=GBitmap::create(*ibs);
   GBitmap &input=*ginput;
 
@@ -844,7 +846,7 @@ cjb2(const char *filein, const char *fileout, const cjb2opts &opts)
     }
   
   // Code
-  GP<ByteStream> obs=ByteStream::create(fileout, "wb");
+  GP<ByteStream> obs=ByteStream::create(urlout, "wb");
   GP<IFFByteStream> giff=IFFByteStream::create(obs);
   IFFByteStream &iff=*giff;
   // -- main composite chunk
@@ -895,8 +897,8 @@ main(int argc, const char **argv)
 {
   G_TRY
     {
-      GString inputpbmfile;
-      GString outputdjvufile;
+      GURL inputpbmurl;
+      GURL outputdjvuurl;
       cjb2opts opts;
       // Defaults
       opts.dpi = 300;
@@ -922,17 +924,17 @@ main(int argc, const char **argv)
             opts.verbose = true;
           else if (arg[0] == '-')
             usage();
-          else if (!inputpbmfile)
-            inputpbmfile = arg;
-          else if (!outputdjvufile)
-            outputdjvufile = arg;
+          else if (!inputpbmurl.is_valid())
+            inputpbmurl = GOS::filename_to_url(arg);
+          else if (!outputdjvuurl.is_valid())
+            outputdjvuurl = GOS::filename_to_url(arg);
           else
             usage();
         }
-      if (!inputpbmfile || !outputdjvufile)
+      if (!inputpbmurl.is_valid() || !outputdjvuurl.is_valid())
         usage();
       // Execute
-      cjb2(inputpbmfile, outputdjvufile, opts);
+      cjb2(inputpbmurl, outputdjvuurl, opts);
     }
   G_CATCH(ex)
     {

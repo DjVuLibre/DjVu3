@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ppmcoco.cpp,v 1.8 2001-03-06 19:55:41 bcr Exp $
+// $Id: ppmcoco.cpp,v 1.8.2.1 2001-03-22 02:04:16 bcr Exp $
 // $Name:  $
 
 /** @name ppmcoco
@@ -104,7 +104,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: ppmcoco.cpp,v 1.8 2001-03-06 19:55:41 bcr Exp $# */
+    #$Id: ppmcoco.cpp,v 1.8.2.1 2001-03-22 02:04:16 bcr Exp $# */
 //@{
 //@}
 
@@ -117,6 +117,8 @@
 #include "ByteStream.h"
 #include "GPixmap.h"
 #include "GString.h"
+#include "GOS.h"
+#include "GURL.h"
 
 double fromGamma = 2.2;
 double toGamma = 2.2;
@@ -147,8 +149,8 @@ str_to_gamma(const char *str)
 int 
 main (int argc, char **argv)
 {
-  GString infile("-");
-  GString outfile("-");
+  GURL inurl(GOS::filename_to_url("-"));
+  GURL outurl(GOS::filename_to_url("-"));
   G_TRY
     {
       // parse
@@ -168,12 +170,12 @@ main (int argc, char **argv)
           else if (flag==0)
             {
               flag = 1;
-              infile = argv[i];
+              inurl = GOS::filename_to_url(argv[i]);
             }
           else if (flag == 1)
             {
               flag = 2;
-              outfile = argv[i];
+              outurl = GOS::filename_to_url(argv[i]);
             }
           else
             usage();
@@ -189,10 +191,10 @@ main (int argc, char **argv)
       // perform
       GP<GPixmap> gpm=GPixmap::create();
       GPixmap &pm=*gpm;
-      GP<ByteStream> ibs=ByteStream::create(infile,"rb"); 
+      GP<ByteStream> ibs=ByteStream::create(inurl,"rb"); 
       pm.init(*ibs); 
       pm.color_correct(gamma_correction);
-      GP<ByteStream> obs=ByteStream::create(outfile,"wb"); 
+      GP<ByteStream> obs=ByteStream::create(outurl,"wb"); 
       pm.save_ppm(*obs); 
     }
   G_CATCH(ex)

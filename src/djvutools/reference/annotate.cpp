@@ -7,19 +7,21 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: annotate.cpp,v 1.7 2001-03-06 19:55:40 bcr Exp $
+//C-  $Id: annotate.cpp,v 1.7.2.1 2001-03-22 02:04:15 bcr Exp $
 
 /*****************************************************************************
  *
- *   $Revision: 1.7 $
- *   $Date: 2001-03-06 19:55:40 $
- *   @(#) $Id: annotate.cpp,v 1.7 2001-03-06 19:55:40 bcr Exp $
+ *   $Revision: 1.7.2.1 $
+ *   $Date: 2001-03-22 02:04:15 $
+ *   @(#) $Id: annotate.cpp,v 1.7.2.1 2001-03-22 02:04:15 bcr Exp $
  *
  *****************************************************************************/
 
-static const char RCSVersion[]="@(#) $Id: annotate.cpp,v 1.7 2001-03-06 19:55:40 bcr Exp $";
+static const char RCSVersion[]="@(#) $Id: annotate.cpp,v 1.7.2.1 2001-03-22 02:04:15 bcr Exp $";
 
 #include "GIFFManager.h"
+#include "GOS.h"
+#include "GURL.h"
 #include <stdio.h>
 #include <sys/stat.h>
 
@@ -45,7 +47,7 @@ static void remove_djvu(int argc, char ** argv)
 {
    if (argc<3) WrongParams();
    
-   GP<ByteStream> src=ByteStream::create(argv[2], "rb");
+   GP<ByteStream> src=ByteStream::create(GOS::filename_to_url(argv[2]), "rb");
    GP<GIFFManager> gmng=GIFFManager::create();
    GIFFManager &mng=*gmng;
    mng.load_file(src);
@@ -57,8 +59,8 @@ static void remove_djvu(int argc, char ** argv)
       if (*dot=='.') last_dot=dot;
    if (!last_dot) last_dot=argv[2]+strlen(argv[2]);
    else *last_dot++=0;
-   GP<ByteStream> dst=ByteStream::create(argc>3 ? GString(argv[3]) :
-		       GString(argv[2])+"_ant."+last_dot, "wb");
+   GP<ByteStream> dst=ByteStream::create(GOS::filename_to_url(argc>3 ? GString(argv[3]) :
+		       GString(argv[2])+"_ant."+last_dot), "wb");
    mng.save_file(dst);
 }
 
@@ -67,7 +69,7 @@ static void extract_djvu(int argc, char ** argv)
 {
    if (argc<4) WrongParams();
    
-   GP<ByteStream> src=ByteStream::create(argv[2], "rb");
+   GP<ByteStream> src=ByteStream::create(GOS::filename_to_url(argv[2]), "rb");
    GP<GIFFManager> gmng=GIFFManager::create();
    GIFFManager &mng=*gmng;
    mng.load_file(src);
@@ -82,13 +84,13 @@ static void extract_djvu(int argc, char ** argv)
      }
    }
    TArray<char> ant_contents=chunk->get_data();
-   GP<ByteStream> ant=ByteStream::create(argv[3], "wb");
+   GP<ByteStream> ant=ByteStream::create(GOS::filename_to_url(argv[3]), "wb");
    ant->write((const char *)ant_contents, ant_contents.size());
    
    if (argc>4)
    {
       del_anno(mng);
-      GP<ByteStream> dst=ByteStream::create(argv[4], "wb");
+      GP<ByteStream> dst=ByteStream::create(GOS::filename_to_url(argv[4]), "wb");
       mng.save_file(dst);
    }
 }
@@ -98,7 +100,7 @@ static void insert_djvu(int argc, char ** argv)
 {
    if (argc<4) WrongParams();
    
-   GP<ByteStream> src=ByteStream::create(argv[2], "rb");
+   GP<ByteStream> src=ByteStream::create(GOS::filename_to_url(argv[2]), "rb");
    GP<GIFFManager> gmng=GIFFManager::create();
    GIFFManager &mng=*gmng;
    mng.load_file(src);
@@ -107,7 +109,7 @@ static void insert_djvu(int argc, char ** argv)
    if (stat(argv[3], &st)<0)
       G_THROW("annotate.failed_stat");
    TArray<char> ant_contents(st.st_size-1);
-   GP<ByteStream> ant=ByteStream::create(argv[3], "rb");
+   GP<ByteStream> ant=ByteStream::create(GOS::filename_to_url(argv[3]), "rb");
    ant->read(ant_contents, ant_contents.size());
   
    del_anno(mng);
@@ -127,8 +129,8 @@ static void insert_djvu(int argc, char ** argv)
       if (*dot=='.') last_dot=dot;
    if (!last_dot) last_dot=argv[2]+strlen(argv[2]);
    else *last_dot++=0;
-   GP<ByteStream> dst=ByteStream::create(argc>4 ? GString(argv[4]) :
-		       GString(argv[2])+"_ant."+last_dot, "wb");
+   GP<ByteStream> dst=ByteStream::create(GOS::filename_to_url(argc>4 ? GString(argv[4]) :
+		       GString(argv[2])+"_ant."+last_dot), "wb");
    mng.save_file(dst);
 }
 

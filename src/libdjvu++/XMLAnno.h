@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: XMLAnno.h,v 1.5 2001-03-08 23:57:26 bcr Exp $
+// $Id: XMLAnno.h,v 1.5.2.1 2001-03-22 02:04:16 bcr Exp $
 // $Name:  $
 
 #ifndef _LT_XMLANNO__
@@ -67,8 +67,8 @@ public:
   /// erase.
   void empty(void);
 protected:
-  void ChangeAnno(const lt_XMLTags &map,const GURL url,const GString id,
-    const GString width,const GString height);
+  void ChangeAnno(const lt_XMLTags &map,const GURL &url,const GString &id,
+    const GString &width,const GString &height);
   GPList<DjVuFile> files;
   GMap<GString,GP<DjVuDocument> > docs;
   GString m_basedir;

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djvudump.cpp,v 1.12 2001-02-15 01:12:21 bcr Exp $
+// $Id: djvudump.cpp,v 1.12.2.1 2001-03-22 02:04:16 bcr Exp $
 // $Name:  $
 
 /** @name djvuinfo
@@ -78,13 +78,15 @@ xxx
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: djvudump.cpp,v 1.12 2001-02-15 01:12:21 bcr Exp $# */
+    #$Id: djvudump.cpp,v 1.12.2.1 2001-03-22 02:04:16 bcr Exp $# */
 //@{
 //@}
 
 #include "DjVuDumpHelper.h"
 #include "ByteStream.h"
 #include "GException.h"
+#include "GOS.h"
+#include "GURL.h"
 
 #include <stdio.h>
 #include <ctype.h>
@@ -93,13 +95,13 @@ xxx
 #endif
 
 void
-display(const char *s)
+display(const GURL &url)
 {
    DjVuDumpHelper helper;
-   GP<ByteStream> ibs=ByteStream::create(s, "rb");
+   GP<ByteStream> ibs=ByteStream::create(url, "rb");
    GP<ByteStream> str_out;
    str_out=helper.dump(ibs);
-   GP<ByteStream> obs=ByteStream::create("-", "w");
+   GP<ByteStream> obs=ByteStream::create("w");
    str_out->seek(0);
    obs->copy(*str_out);
 }
@@ -122,7 +124,7 @@ main(int argc, char **argv)
       if (argc<=1)
         usage();
       for (int i=1; i<argc; i++)
-        display(argv[i]);
+        display(GOS::filename_to_url(argv[i]));
     }
   G_CATCH(ex)
     {

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GOS.h,v 1.18.4.1 2001-03-20 00:29:40 bcr Exp $
+// $Id: GOS.h,v 1.18.4.2 2001-03-22 02:04:16 bcr Exp $
 // $Name:  $
 
 #ifndef _GOS_H_
@@ -53,7 +53,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- Initial implementation
     @version
-    #$Id: GOS.h,v 1.18.4.1 2001-03-20 00:29:40 bcr Exp $#
+    #$Id: GOS.h,v 1.18.4.2 2001-03-22 02:04:16 bcr Exp $#
 */
 //@{
 
@@ -62,6 +62,8 @@
 #endif
 #include "DjVuGlobal.h"
 #include "GString.h"
+
+class GURL;
 
 /** Operating System dependent functions. */
 class GOS 
@@ -140,7 +142,7 @@ class GOS
       standard syntax.  A brain damaged MSIE compatible syntax is generated
       when the optional argument #useragent# contains string #"MSIE"# or
       #"Microsoft"#. */
-  static GString filename_to_url(const char *filename, const char *useragent=0);
+  static GURL filename_to_url(const char *filename, const char *useragent=0);
 
   /** Returns a filename for a URL. Argument #url# must be a legal file URL.
       This function applies heuristic rules to convert the URL into a valid

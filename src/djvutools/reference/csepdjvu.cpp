@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: csepdjvu.cpp,v 1.12 2001-03-06 19:55:41 bcr Exp $
+// $Id: csepdjvu.cpp,v 1.12.2.1 2001-03-22 02:04:16 bcr Exp $
 // $Name:  $
 
 
@@ -108,7 +108,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: csepdjvu.cpp,v 1.12 2001-03-06 19:55:41 bcr Exp $# */
+    #$Id: csepdjvu.cpp,v 1.12.2.1 2001-03-22 02:04:16 bcr Exp $# */
 //@{
 //@}
 
@@ -126,7 +126,8 @@
 #include "IW44Image.h"
 #include "DjVuInfo.h"
 #include "DjVmDoc.h"
-
+#include "GOS.h"
+#include "GURL.h"
 
 #undef MIN
 #undef MAX
@@ -1268,7 +1269,7 @@ main(int argc, const char **argv)
     {
       GP<DjVmDoc> gdoc=DjVmDoc::create();
       DjVmDoc &doc=*gdoc;
-      GString outputfile;
+      GURL outputurl;
       GP<ByteStream> goutputpage=ByteStream::create();
       csepdjvuopts opts;
       int pageno = 0;
@@ -1280,9 +1281,9 @@ main(int argc, const char **argv)
       opts.slice[2] =  93;
       opts.slice[3] = 103;
       opts.slice[4] =   0;
-      // Read outputfile name
+      // Read outputurl name
       if (argc < 3) usage();
-      outputfile = argv[--argc];
+      outputurl = GOS::filename_to_url(argv[--argc]);
       // Process arguments
       for (int i=1; i<argc; i++)
         {
@@ -1307,7 +1308,7 @@ main(int argc, const char **argv)
           else 
             {
               // Process separation file
-              GP<ByteStream> fbs=ByteStream::create(arg,"rb");
+              GP<ByteStream> fbs=ByteStream::create(GOS::filename_to_url(arg),"rb");
               BufferByteStream ibs(*fbs);
               do {
                 char pagename[16];
@@ -1338,12 +1339,12 @@ main(int argc, const char **argv)
           ByteStream &outputpage=*goutputpage;
           // Save as a single page 
           outputpage.seek(0);
-          ByteStream::create(outputfile,"wb")->copy(outputpage);
+          ByteStream::create(outputurl,"wb")->copy(outputpage);
         }
       else if (pageno > 1)
         {
           // Save as a bundled file
-          doc.write(ByteStream::create(outputfile,"wb"));
+          doc.write(ByteStream::create(outputurl,"wb"));
         }
       else 
         usage();

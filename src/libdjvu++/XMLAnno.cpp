@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: XMLAnno.cpp,v 1.7 2001-03-08 23:57:26 bcr Exp $
+// $Id: XMLAnno.cpp,v 1.7.2.1 2001-03-22 02:04:16 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -102,7 +102,7 @@ convertToColor(const char s[])
 }
 
 void
-lt_XMLAnno::ChangeAnno(const lt_XMLTags &map,const GURL url,const GString id,const GString width,const GString height)
+lt_XMLAnno::ChangeAnno(const lt_XMLTags &map,const GURL &url,const GString &id,const GString &width,const GString &height)
 {
   const GString url_string((const char *)url);
   DjVuDocument &doc=*(docs[url_string]);

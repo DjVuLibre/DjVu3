@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: bzz.cpp,v 1.12 2001-03-06 19:55:41 bcr Exp $
+// $Id: bzz.cpp,v 1.12.2.1 2001-03-22 02:04:15 bcr Exp $
 // $Name:  $
 
 
@@ -58,13 +58,15 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation
     @version
-    $Id: bzz.cpp,v 1.12 2001-03-06 19:55:41 bcr Exp $ */
+    $Id: bzz.cpp,v 1.12.2.1 2001-03-22 02:04:15 bcr Exp $ */
 //@{
 //@}
 
 #include "GException.h"
 #include "ByteStream.h"
 #include "BSByteStream.h"
+#include "GOS.h"
+#include "GURL.h"
 #include <stdlib.h>
 
 char *program = "(unknown)";
@@ -121,17 +123,17 @@ main(int argc, char **argv)
       if (blocksize < 0)
         usage();
       // Obtain filenames
-      char *infile = "-";
-      char *outfile = "-";
+      GURL inurl(GOS::filename_to_url("-"));
+      GURL outurl(GOS::filename_to_url("-"));
       if (argc >= 2)
-        infile = argv[1];
+        inurl = GOS::filename_to_url(argv[1]);
       if (argc >= 3)
-        outfile = argv[2];
+        outurl = GOS::filename_to_url(argv[2]);
       if (argc >= 4)
         usage();
       // Action
-      GP<ByteStream> in=ByteStream::create(infile,"rb");
-      GP<ByteStream> out=ByteStream::create(outfile,"wb");
+      GP<ByteStream> in=ByteStream::create(inurl,"rb");
+      GP<ByteStream> out=ByteStream::create(outurl,"wb");
       if (blocksize)
         {
           GP<ByteStream> gbsb=BSByteStream::create(out, blocksize);

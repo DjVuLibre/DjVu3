@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GOS.cpp,v 1.47.2.1 2001-03-20 00:29:40 bcr Exp $
+// $Id: GOS.cpp,v 1.47.2.2 2001-03-22 02:04:16 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -40,7 +40,7 @@
 #include "GException.h"
 #include "GThreads.h"
 #include "GOS.h"
-
+#include "GURL.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -966,20 +966,23 @@ GOS::sleep(int milliseconds)
 // -- Returns a url for accessing a given file.
 //    If useragent is not provided, standard url will be created,
 //    but will not be understood by some versions if IE.
-GString 
+GURL
 GOS::filename_to_url(const char *filename, const char *useragent)
 {
+  if(filename && (unsigned char)filename[0] == (unsigned char)0xEF
+     && (unsigned char)filename[1] == (unsigned char)0xBB && (unsigned char)filename[2] == (unsigned char)0xBF)
+  {
+    filename+=3;
+  }
+
   // Special case for blank pages
   if(!filename || !filename[0])
+  {
     return GString("about:blank");
-
-  // Special case for stupid MSIE 
-  GString agent(useragent ? useragent : "default");
-  if (agent.search("MSIE")>=0 || agent.search("Microsoft")>=0)
-    return filespecslashes + expand_name(filename);
+  } 
 
   // Potentially unsafe characters (cf. RFC1738 and RFC1808)
-  const char *hex = "0123456789ABCDEF";
+  const char hex[] = "0123456789ABCDEF";
   
   // Normalize file name to url slash-and-escape syntax
   GString nname;
@@ -1065,6 +1068,15 @@ GOS::filename_to_url(const char *filename, const char *useragent)
   }else
   {
     retval += (localhostspec1+2) + nname;
+  }
+  // Special case for stupid MSIE 
+  GString agent(useragent ? useragent : "default");
+  if (agent.search("MSIE")>=0 || agent.search("Microsoft")>=0)
+  {
+    // We now remove all the escaping we just did.  The reason for adding
+    // it to begin with is so at least the slashes are converted.
+    retval=url_to_filename(retval);
+    retval=filespecslashes + expand_name(retval);
   }
   return retval;
 }
@@ -1233,7 +1245,7 @@ GOS::encode_mbcs_reserved(const char * filename)
      if ((*ptr>='a' && *ptr<='z')
         || (*ptr>='A' && *ptr<='Z')
         || (*ptr>='0' && *ptr<='9')
-        || (strchr("$-_.+!*'(),:", *ptr))) // Added : because of windows!
+        || (strchr("$-_.+!*'(),:;", *ptr))) // Added : because of windows!
       {
         res+=*ptr;
       }else

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.37.2.3 2001-03-20 23:43:52 bcr Exp $
+// $Id: GString.cpp,v 1.37.2.4 2001-03-22 02:04:16 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -52,9 +52,7 @@
 
 
 #include "iconv.h"//MBCS cvt
-#ifdef WIN32
 #include "iconv_string.h"
-#endif
 #include "libcharset.h"//MBCS cvt
 
 

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GUnicode.cpp,v 1.5 2001-03-13 01:34:50 bcr Exp $
+// $Id: GUnicode.cpp,v 1.5.2.1 2001-03-22 02:04:16 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -40,6 +40,82 @@
 #include "GUnicode.h"
 
 unsigned long const UnicodeRep::nill=0;
+
+static void const * 
+checkmarks(void const * const xbuf,size_t &bufsize,UnicodeRep::EncodeType &rep)
+{
+  unsigned char const *buf=(unsigned char const *)xbuf;
+  if(bufsize >= 2 || (!bufsize && rep != UnicodeRep::OTHER))
+  {
+    const unsigned int s=(((unsigned int)buf[0])<<8)+(unsigned int)buf[1];
+    switch(s)
+    {
+      case 0:
+        if((bufsize>=4)||(!bufsize && rep == UnicodeRep::UCS4BE)||(!bufsize && rep == UnicodeRep::UCS4_2143))
+        {
+          const unsigned int s=(((unsigned int)buf[2])<<8)+(unsigned int)buf[3];
+          if(s == 0xfeff)
+          { 
+            rep=UnicodeRep::UCS4BE;
+            buf+=4;
+          }else if(s == 0xfffe)
+          {
+            rep=UnicodeRep::UCS4_2143;
+            buf+=4;
+          }
+        }
+        break;
+      case 0xfffe:
+        if(((bufsize>=4)||(!bufsize && rep == UnicodeRep::UCS4LE)) && !(unsigned char *)buf[2] && !(unsigned char *)buf[3])
+        {
+          rep=UnicodeRep::UCS4LE;
+          buf+=4;
+        }else
+        {
+          rep=UnicodeRep::UTF16LE;
+          buf+=2;
+        }
+        break;
+      case 0xfeff:
+        if(((bufsize>=4)||(!bufsize && rep == UnicodeRep::UCS4_3412))&&!(unsigned char *)buf[2] && !(unsigned char *)buf[3])
+        {
+          rep=UnicodeRep::UCS4_3412;
+          buf+=4;
+        }else
+        {
+          rep=UnicodeRep::UTF16LE;
+          buf+=2;
+        }
+        break;
+      case 0xefbb:
+        if(((bufsize>=3)||(!bufsize && UnicodeRep::UTF8 == rep))&&(buf[2] == 0xbf))
+        {
+          rep=UnicodeRep::UTF8;
+          buf+=3;
+        }
+        break;
+      default:
+        break;
+    }
+  }
+  if(buf != xbuf)
+  {
+    if(bufsize)
+    {
+      const size_t s=(size_t)xbuf-(size_t)buf;
+      if(bufsize> s)
+      {
+        bufsize-=s;
+      }else
+      {
+        bufsize=0;
+        buf=(const unsigned char *)&UnicodeRep::nill;
+      }
+    }
+  }
+  return buf;
+}
+
 
 UnicodeRep::UnicodeRep(void)
 : len(0), remainder(UnicodeRep::Remainder::OTHER), gUnicodePtr(UnicodePtr)
@@ -80,7 +156,6 @@ UnicodeRep::~UnicodeRep()
 //    delete [] UnicodePtr;
 //  }
 }
-
 
 GUnicode::GUnicode(void)
 {
@@ -214,8 +289,9 @@ UnicodeRep::concat(const GP<UnicodeRep> &guni1,const GP<UnicodeRep> &guni2)
 
 void
 UnicodeRep::init(
-  void const * const buf,unsigned int const i,const EncodeType t)
+  void const * const xbuf,unsigned int bufsize,EncodeType t)
 { 
+  void const * const buf=checkmarks(xbuf,bufsize,t); 
   if(t != OTHER)
   {
     remainder.encodetype=(UnicodeRep::Remainder::EncodeType)t;
@@ -232,9 +308,9 @@ UnicodeRep::init(
       case UCS4_2143:
       case UCS4_3412:
         {
-          if(i)
+          if(bufsize)
           {
-            unsigned int const  ii=i/sizeof(unsigned long);
+            unsigned int const  ii=bufsize/sizeof(unsigned long);
             for(j=0;(j<ii)&&*(unsigned long const *)eptr;j++,eptr+=sizeof(unsigned long));
           }else
           {
@@ -248,9 +324,9 @@ UnicodeRep::init(
       case UTF16BE:
       case UTF16LE:
         {
-          if(i)
+          if(bufsize)
           {
-            unsigned int const  ii=i/sizeof(unsigned short);
+            unsigned int const  ii=bufsize/sizeof(unsigned short);
             for(j=0;(j<ii)&&*(unsigned short const *)eptr;j++,eptr+=sizeof(unsigned short));
           }else
           {
@@ -263,9 +339,9 @@ UnicodeRep::init(
       case UTF8:
       case EBCDIC:
         {
-          if(i)
+          if(bufsize)
           {
-            for(j=0;(j<i)&&*eptr;j++,eptr++);
+            for(j=0;(j<bufsize)&&*eptr;j++,eptr++);
           }else
           {
             while(*eptr)
@@ -340,14 +416,14 @@ UnicodeRep::init(
     }else
     {
       gs=(char const *)buf;
-      if((size_t)eptr<(size_t)buf+i)
+      if((size_t)eptr<(size_t)buf+bufsize)
       {
         gs.setat((size_t)eptr-(size_t)buf,0);
       }
     }
-    if((size_t)eptr<(size_t)buf+i)
+    if((size_t)eptr<(size_t)buf+bufsize)
     {
-      remainder.init(eptr,i+(size_t)buf-(size_t)eptr);
+      remainder.init(eptr,bufsize+(size_t)buf-(size_t)eptr);
     }
   }else
   {

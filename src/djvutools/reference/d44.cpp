@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: d44.cpp,v 1.12 2001-03-07 00:33:31 bcr Exp $
+// $Id: d44.cpp,v 1.12.2.1 2001-03-22 02:04:16 bcr Exp $
 // $Name:  $
 
 /** @name d44
@@ -84,7 +84,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: d44.cpp,v 1.12 2001-03-07 00:33:31 bcr Exp $# 
+    #$Id: d44.cpp,v 1.12.2.1 2001-03-22 02:04:16 bcr Exp $# 
 */
 //@{
 //@}
@@ -93,6 +93,7 @@
 #include "GException.h"
 #include "IW44Image.h"
 #include "GOS.h"
+#include "GURL.h"
 #include "IFFByteStream.h"
 #include "GPixmap.h"
 #include "GBitmap.h"
@@ -106,8 +107,8 @@
 int flag_verbose = 0;
 int flag_chunks = 9999;
 int flag_addsuffix = 0;
-GString pnmfile;
-GString iw4file;
+GURL pnmurl;
+GURL iw4url;
 
 
 
@@ -150,23 +151,24 @@ parse(int argc, char **argv)
           else
             usage();
         }
-      else if (!iw4file)
-        iw4file = argv[i];
-      else if (!pnmfile)
-        pnmfile = argv[i];
+      else if (!iw4url.is_valid())
+        iw4url = GOS::filename_to_url(argv[i]);
+      else if (!pnmurl.is_valid())
+        pnmurl = GOS::filename_to_url(argv[i]);
       else
         usage();
     }
-  if (!iw4file)
+  if (!iw4url.is_valid())
     usage();
-  if (!pnmfile)
+  if (!pnmurl.is_valid())
     {
+      GString iw4file=GOS::url_to_filename(iw4url);
       GString dir = GOS::dirname(iw4file);
       GString base = GOS::basename(iw4file);
       int dot = base.rsearch('.');
       if (dot >= 1)
         base = base.substr(0,dot);
-      pnmfile = GOS::expand_name(base,dir);
+      pnmurl = GOS::filename_to_url(GOS::expand_name(base,dir));
       flag_addsuffix = 1;
     }
 }
@@ -184,7 +186,7 @@ mymain(int argc, char **argv)
       // Parse arguments
       parse(argc, argv);
       // Check input file
-      GP<ByteStream> gibs=ByteStream::create(iw4file,"rb");
+      GP<ByteStream> gibs=ByteStream::create(iw4url,"rb");
       ByteStream &ibs=*gibs;
       GString chkid;
       // Determine file type
@@ -228,15 +230,15 @@ mymain(int argc, char **argv)
                 iw->get_width(), iw->get_height(), dtime, rtime, 
                 (iw->get_memory_usage()+512)/1024, iw->get_percent_memory());
       if (flag_addsuffix)
-        pnmfile = pnmfile + (color?".ppm":".pgm");
+        pnmurl = pnmurl + (color?".ppm":".pgm");
 #ifndef UNDER_CE
-      remove(pnmfile);
+      remove(GOS::url_to_filename(pnmurl));
 #else
       WCHAR tszPnmFile[MAX_PATH] ;
-      MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED,pnmfile,strlen(pnmfile)+1,tszPnmFile,sizeof(tszPnmFile)) ;
+      MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED,GOS::url_to_filename(pnmurl),GOS::url_to_filename(pnmurl).length()+1,tszPnmFile,sizeof(tszPnmFile)) ;
       DeleteFile(tszPnmFile) ;
 #endif
-      GP<ByteStream> obs=ByteStream::create(pnmfile,"wb");
+      GP<ByteStream> obs=ByteStream::create(pnmurl,"wb");
       if(color)
       {
         ppm->save_ppm(*obs);

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: cpaldjvu.cpp,v 1.11 2001-03-06 19:55:41 bcr Exp $
+// $Id: cpaldjvu.cpp,v 1.11.2.1 2001-03-22 02:04:15 bcr Exp $
 // $Name:  $
 
 
@@ -69,7 +69,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: cpaldjvu.cpp,v 1.11 2001-03-06 19:55:41 bcr Exp $# */
+    #$Id: cpaldjvu.cpp,v 1.11.2.1 2001-03-22 02:04:15 bcr Exp $# */
 //@{
 //@}
 
@@ -86,6 +86,8 @@
 #include "DjVuPalette.h"
 #include "IW44Image.h"
 #include "DjVuInfo.h"
+#include "GOS.h"
+#include "GURL.h"
 
 
 #undef MIN
@@ -723,7 +725,7 @@ struct cpaldjvuopts
 
 // -- Compresses low color pixmap.
 void 
-cpaldjvu(const GPixmap &input, const char *fileout, const cpaldjvuopts &opts)
+cpaldjvu(const GPixmap &input, GURL &urlout, const cpaldjvuopts &opts)
 {
   int w = input.columns();
   int h = input.rows();
@@ -826,7 +828,7 @@ cpaldjvu(const GPixmap &input, const char *fileout, const cpaldjvuopts &opts)
 #endif
 
   // Assemble DJVU file
-  GP<ByteStream> obs=ByteStream::create(fileout, "wb");
+  GP<ByteStream> obs=ByteStream::create(urlout, "wb");
   GP<IFFByteStream> giff=IFFByteStream::create(obs);
   IFFByteStream &iff=*giff;
   // -- main composite chunk
@@ -895,8 +897,8 @@ main(int argc, const char **argv)
 {
   G_TRY
     {
-      GString inputppmfile;
-      GString outputdjvufile;
+      GURL inputppmurl;
+      GURL outputdjvuurl;
       // Defaults
       cpaldjvuopts opts;
       opts.dpi = 100;
@@ -924,19 +926,19 @@ main(int argc, const char **argv)
             opts.verbose = true;
           else if (arg[0] == '-')
             usage();
-          else if (!inputppmfile)
-            inputppmfile = arg;
-          else if (!outputdjvufile)
-            outputdjvufile = arg;
+          else if (!inputppmurl.is_valid())
+            inputppmurl = GOS::filename_to_url(arg);
+          else if (!outputdjvuurl.is_valid())
+            outputdjvuurl = GOS::filename_to_url(arg);
           else
             usage();
         }
-      if (!inputppmfile || !outputdjvufile)
+      if (!inputppmurl.is_valid() || !outputdjvuurl.is_valid())
         usage();
       // Load and run
-      GP<ByteStream> ibs=ByteStream::create(inputppmfile,"rb");
+      GP<ByteStream> ibs=ByteStream::create(inputppmurl,"rb");
       GP<GPixmap> ginput=GPixmap::create(*ibs);
-      cpaldjvu(*ginput, outputdjvufile, opts);
+      cpaldjvu(*ginput, outputdjvuurl, opts);
     }
   G_CATCH(ex)
     {

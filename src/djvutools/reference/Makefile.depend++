@@ -174,7 +174,12 @@ djvudump.o: djvudump.cpp \
  ../../../src/include/DjVu.h \
  ../../../src/libdjvu++/ByteStream.h \
  ../../../src/libdjvu++/Arrays.h \
- ../../../src/libdjvu++/GException.h
+ ../../../src/libdjvu++/GException.h \
+ ../../../src/libdjvu++/GOS.h \
+ ../../../src/libdjvu++/GString.h \
+ ../../../src/libdjvu++/GContainer.h \
+ ../../../src/libdjvu++/GURL.h \
+ ../../../src/libdjvu++/GThreads.h
 djvuextract.o: djvuextract.cpp \
  ../../../src/libdjvu++/GException.h \
  ../../../src/libdjvu++/DjVuGlobal.h \

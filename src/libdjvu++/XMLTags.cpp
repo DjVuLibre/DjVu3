@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: XMLTags.cpp,v 1.6 2001-03-13 21:33:22 bcr Exp $
+// $Id: XMLTags.cpp,v 1.6.2.1 2001-03-22 02:04:16 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -172,9 +172,9 @@ lt_XMLTags::init(GP<ByteStream> &bs)
 }
 
 void
-lt_XMLTags::init(char const name[])
+lt_XMLTags::init(const GURL &url)
 {
-  GP<ByteStream> bs=ByteStream::create(name,"r");
+  GP<ByteStream> bs=ByteStream::create(url,"r");
   init(bs);
 }
 

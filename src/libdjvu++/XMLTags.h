@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: XMLTags.h,v 1.3 2001-03-06 19:55:42 bcr Exp $
+// $Id: XMLTags.h,v 1.3.2.1 2001-03-22 02:04:16 bcr Exp $
 // $Name:  $
 
 #ifndef _LT_XMLTAGS__
@@ -48,6 +48,7 @@ class DjVuFile;
 class DjVuDocument;
 class ByteStream;
 class XMLByteStream;
+class GURL;
 
 class lt_XMLTags : public GPEnabled
 {
@@ -69,7 +70,7 @@ public:
   inline const GPList<lt_XMLTags> & operator [] (const GPosition &pos) const;
   void init(XMLByteStream &xmlbs);
   void init(GP<ByteStream> &bs);
-  void init(char const name[]);
+  void init(const GURL & url);
   GPList<lt_XMLTags> getTags(char const tagname[]) const;
   static void ParseValues(char const *t, GMap<GString,GString> &args,bool downcase=true);
   static void getMaps(char const tagname[],char const argn[],

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessage.cpp,v 1.23 2001-03-15 21:59:31 bcr Exp $
+// $Id: DjVuMessage.cpp,v 1.23.2.1 2001-03-22 02:04:16 bcr Exp $
 // $Name:  $
 
 
@@ -39,11 +39,7 @@
 #include "GOS.h"
 #include "XMLTags.h"
 #include "ByteStream.h"
-#if 0
-#ifndef macintosh
-#include "parseoptions.h"
-#endif
-#endif
+#include "GURL.h"
 #include <ctype.h>
 #include <stdlib.h>
 // #include <stdio.h>
@@ -159,7 +155,11 @@ GetProfilePaths(void)
   {
     first=false;
     GString path;
+#ifdef WINCE
+    const char *envp=0;
+#else
     const char *envp=getenv(DjVuEnv);
+#endif
     if(envp && strlen(envp))
       paths.append((path=envp));
 #if defined(WIN32) || (defined(UNIX) && !defined(NO_DEBUG))
@@ -227,14 +227,14 @@ getbodies(
   bool isdone=false;
   for(GPosition pos=paths;!isdone && pos;++pos)
   {
-    const GString FileName=GOS::expand_name(MessageFileName,paths[pos]);
-    if(GOS::is_file(FileName))
+    const GURL url=GOS::filename_to_url(GOS::expand_name(MessageFileName,paths[pos]));
+    if(GOS::is_file(GOS::url_to_filename(url)))
     {
       map[MessageFileName]=0;
       GP<lt_XMLTags> gtags=lt_XMLTags::create();
       lt_XMLTags &tags=*gtags;
       {
-        GP<ByteStream> bs=ByteStream::create(FileName,"rb");
+        GP<ByteStream> bs=ByteStream::create(url,"rb");
         tags.init(bs);
       }
       GPList<lt_XMLTags> Bodies=tags.getTags(bodystring);
@@ -289,10 +289,10 @@ parse (GMap<GString,GP<lt_XMLTags> > &retval)
   GList<GString> &paths=GetProfilePaths();
   for(GPosition pos=paths;pos;++pos)
   {
-    GString FileName=GOS::expand_name(MessageFile,paths[pos]);
-    if(GOS::is_file(FileName))
+    const GURL url=GOS::filename_to_url(GOS::expand_name(MessageFileName,paths[pos]));
+    if(GOS::is_file(GOS::url_to_filename(url)))
     {
-      parse(retval,ByteStream::create(FileName,"rb"));
+      parse(retval,ByteStream::create(url,"rb"));
       if(retval.isempty())
       {
         break;
@@ -320,14 +320,6 @@ DjVuMessage::DjVuMessage( void )
 #endif
 {
   parse(Map);
-#if 0
-#ifndef macintosh
-  if(Map.isempty())
-  {
-    opts=new DjVuParseOptions(DjVuMessageFileName);
-  }
-#endif
-#endif
 }
 
 // Destructor

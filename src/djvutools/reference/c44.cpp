@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: c44.cpp,v 1.14 2001-03-06 19:55:41 bcr Exp $
+// $Id: c44.cpp,v 1.14.2.1 2001-03-22 02:04:15 bcr Exp $
 // $Name:  $
 
 
@@ -184,7 +184,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: c44.cpp,v 1.14 2001-03-06 19:55:41 bcr Exp $# */
+    #$Id: c44.cpp,v 1.14.2.1 2001-03-22 02:04:15 bcr Exp $# */
 //@{
 //@}
 
@@ -196,15 +196,16 @@
 #include "GOS.h"
 #include "GBitmap.h"
 #include "GPixmap.h"
+#include "GURL.h"
 
 #include <stdio.h>
 #include <string.h>
 
 // command line data
 
-GString pnmfile;
-GString iw4file;
-GString mskfile;
+GURL pnmurl;
+GURL iw4url;
+GURL mskurl;
 
 int flag_mask = 0;
 int flag_bpp = 0;
@@ -499,9 +500,9 @@ parse(int argc, char **argv)
             {
               if (++i >= argc)
                 G_THROW("c44: no argument for option '-mask'");
-              if (!! mskfile)
+              if (!! mskurl.is_valid())
                 G_THROW("c44: multiple mask specification");
-              mskfile = argv[i];
+              mskurl = GOS::filename_to_url(argv[i]);
             }
           else if (!strcmp(argv[i],"-dbfrac"))
             {
@@ -578,26 +579,27 @@ parse(int argc, char **argv)
           else
             usage();
         }
-      else if (!pnmfile)
-        pnmfile = argv[i];
-      else if (!iw4file)
-        iw4file = argv[i];
+      else if (!pnmurl.is_valid())
+        pnmurl = GOS::filename_to_url(argv[i]);
+      else if (!iw4url.is_valid())
+        iw4url = GOS::filename_to_url(argv[i]);
       else
         usage();
     }
-  if (!pnmfile)
+  if (!pnmurl.is_valid())
     usage();
-  if (!iw4file)
+  if (!iw4url.is_valid())
     {
+      GString pnmfile=GOS::url_to_filename(pnmurl);
       GString dir = GOS::dirname(pnmfile);
       GString base = GOS::basename(pnmfile);
       int dot = base.rsearch('.');
       if (dot >= 1)
         base = base.substr(0,dot);
       if (flag_dpi>0 || flag_gamma>0)
-        iw4file = GOS::expand_name(base,dir) + ".djvu";
+        iw4url = GOS::filename_to_url(GOS::expand_name(base,dir) + ".djvu");
       else
-        iw4file = GOS::expand_name(base,dir) + ".iw4";
+        iw4url = GOS::filename_to_url(GOS::expand_name(base,dir) + ".iw4");
     }
 }
 
@@ -607,9 +609,9 @@ GP<GBitmap>
 getmask(int w, int h)
 {
   GP<GBitmap> msk8;
-  if (!! mskfile)
+  if (!! mskurl.is_valid())
     {
-      GP<ByteStream> mbs=ByteStream::create(mskfile,"rb");
+      GP<ByteStream> mbs=ByteStream::create(mskurl,"rb");
       msk8 = GBitmap::create(*mbs);
       if (msk8->columns() != (unsigned int)w || 
           msk8->rows()    != (unsigned int)h  )
@@ -656,7 +658,7 @@ main(int argc, char **argv)
       // Parse arguments
       parse(argc, argv);
       // Check input file
-      GP<ByteStream> gibs=ByteStream::create(pnmfile,"rb");
+      GP<ByteStream> gibs=ByteStream::create(pnmurl,"rb");
       ByteStream &ibs=*gibs;
       char prefix[16];
       if (ibs.readall((void*)prefix, sizeof(prefix)) != sizeof(prefix))
@@ -701,7 +703,7 @@ main(int argc, char **argv)
           else
             G_THROW("Unrecognized file");
           // Check that no mask has been specified.
-          if (!! mskfile)
+          if (!! mskurl.is_valid())
             G_THROW("Cannot apply mask on an already compressed image");
         }
       else
@@ -714,8 +716,8 @@ main(int argc, char **argv)
       // Perform compression PM44 or BM44 as required
       if (iw)
         {
-          remove(iw4file);
-          GP<IFFByteStream> iff=IFFByteStream::create(ByteStream::create(iw4file,"wb"));
+          remove(GOS::url_to_filename(iw4url));
+          GP<IFFByteStream> iff=IFFByteStream::create(ByteStream::create(iw4url,"wb"));
           if (flag_crcbdelay >= 0)
             iw->parm_crcbdelay(flag_crcbdelay);
           if (flag_dbfrac > 0)
