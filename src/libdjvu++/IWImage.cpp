@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: IWImage.cpp,v 1.48 2001-02-14 02:30:56 bcr Exp $
+// $Id: IWImage.cpp,v 1.49 2001-02-14 19:11:10 praveen Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 08/1998
@@ -1296,6 +1296,7 @@ int
 IW44Image::encode_chunk(ByteStream &, const IWEncoderParms &)
 {
   G_THROW("IWImage.codec_open2");
+  return 0;
 }
 
 void 
@@ -1877,6 +1878,7 @@ int
 IW44Image::Codec::encode_prepare(int, int, int, IW44Image::Block &, IW44Image::Block &) 
 {
   G_THROW("IWImage.decoder_only");
+  return 0;
 }
 
 void 
@@ -1890,5 +1892,6 @@ float
 IW44Image::Codec::estimate_decibel(float frac)
 {
   G_THROW("IWImage.decoder_only");
+  return 0;
 }
 

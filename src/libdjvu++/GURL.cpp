@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GURL.cpp,v 1.48 2001-02-13 00:16:08 praveen Exp $
+// $Id: GURL.cpp,v 1.49 2001-02-14 19:11:10 praveen Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -156,7 +156,8 @@ GURL::init(void)
          {
            const char * const url_ptr=url;
            const char * ptr;
-           for(ptr=url_ptr;*ptr&&!is_argument(ptr);ptr++);
+           for(ptr=url_ptr;*ptr&&!is_argument(ptr);ptr++)
+           		EMPTY_LOOP;
            arg=ptr;
            url.setat((int)(ptr-url_ptr), 0);
          }
@@ -332,7 +333,8 @@ GURL::store_cgi_args(void)
 
    const char * const url_ptr=url;
    const char * ptr;
-   for(ptr=url_ptr;*ptr&&(*ptr!='?');ptr++);
+   for(ptr=url_ptr;*ptr&&(*ptr!='?');ptr++)
+   		EMPTY_LOOP;
    
    GString new_url(url_ptr, ptr-url_ptr);
    
@@ -453,7 +455,8 @@ GURL::djvu_cgi_names(void) const
    DArray<GString> arr;
    for(i=0;(i<cgi_name_arr.size())&&
      (cgi_name_arr[i].upcase()!=djvuopts)
-     ;i++);
+     ;i++)
+     	EMPTY_LOOP;
 
    int size=cgi_name_arr.size()-(i+1);
    if (size>0)
@@ -473,7 +476,8 @@ GURL::djvu_cgi_values(void) const
 
    int i;
    DArray<GString> arr;
-   for(i=0;i<cgi_name_arr.size()&&(cgi_name_arr[i].upcase()!=djvuopts);i++);
+   for(i=0;i<cgi_name_arr.size()&&(cgi_name_arr[i].upcase()!=djvuopts);i++)
+   		EMPTY_LOOP;
 
    int size=cgi_name_arr.size()-(i+1);
    if (size>0)
