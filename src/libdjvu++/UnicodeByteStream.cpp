@@ -1,7 +1,7 @@
 //C-  Copyright © 2000-2001, LizardTech, Inc. All Rights Reserved.
 //C-              Unauthorized use prohibited.
 //
-// $Id: UnicodeByteStream.cpp,v 1.7 2001-05-25 19:17:16 bcr Exp $
+// $Id: UnicodeByteStream.cpp,v 1.8 2001-05-31 22:43:11 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -48,8 +48,9 @@ UnicodeByteStream::gets(
   {
     int i;
     char *buf;
-    GPBuffer<char> gbuf(buf,327680);
-    while((i=read(buf,sizeof(buf))>0))
+	static const size_t bufsize=327680;
+    GPBuffer<char> gbuf(buf,bufsize);
+    while((i=read(buf,bufsize)>0))
     {
       if((len=buffer.length()-bufferpos))
         break;
