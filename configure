@@ -1,37 +1,81 @@
 #!/bin/sh
 
-program=`basename $0`
+
+### ---------------------------
+### Determine directories
+
+conf=`basename $0`
+topsrcdir=`dirname $0`
+topbuilddir=.
+if [ $topsrcdir = $topbuilddir ]
+then
+    echo 1>&2 "$conf: Cannot compile in the source directory"
+    echo 1>&2 "--  You must mkdir a compilation directory and"
+    echo 1>&2 "    call $conf from there."
+    exit 1
+fi
+if [ ! -r $topsrcdir/config/configure.sh ]
+then
+    echo 1>&2 "$conf: Cannot recognize source directory"
+    echo 1>&2 "--  Check that your source directory is complete."
+    exit 1
+fi
 
 
-cat 1>&2 <<EOF
+### ---------------------------
+### Get functions
 
-$program -- Not yet implemented.
-
-This file should be used to create a compilation directory
-for a particular product.  It runs config/configure.sh to
-detect the machine configuration and generates subdirectories
-and makefiles.
-
-Usage:
-
-% cd \$topbuilddir
-% \$topsrcdir/$program  --prefix=\$installdir  ...options... 
+. $topsrcdir/config/configure.sh
 
 
-Then you can do any of the following
+### ---------------------------
+### Process arguments
 
-   make clean		-- remove all object files and executables
-   make depend		-- update makefiles with dependency information
-   make all
-
-
-
-Most of the work is achieved using functions defined in
-file config/configure.sh.  There are functions
-  - to parse the command line options
-  - to detect compiler and compiler options
-  - to detect the presence of some features
-  - to update the makefiles
-
+for arg 
+do
+   case $arg in 
+        --with-threads=* )
+           threads=`echo $arg | sed 's/[-A-Za-z_]*=//'` 
+           ;; 
+        --with-rpo|--frepo )
+           rpo=yes
+           ;;
+        *)
+           if process_general_option $arg
+           then
+             :
+           else
+             test $arg = --help || echo 1>&2 "$conf: Unrecognized option '$arg'"
+             cat 1>&2 <<EOF
+Usage: $conf <options>
+Recognized options:
 EOF
+             list_general_options
+             cat 1>&2 <<EOF
+  --with-threads=(no|co|posix|dce)          choose a thread implementation.
+  --with-rpo,--frepo                        use --frepo option in G++.
+EOF
+             exit 1 
+           fi
+           ;;
+   esac
+   shift
+done
 
+
+
+### ---------------------------
+### Proceed
+
+check_compiler
+check_debug_option $debug
+check_thread_option $threads
+check_library log -lm
+check_rpo_option $rpo
+check_make_stlib
+
+
+### ---------------------------
+### Build makefile
+
+generate_makefile src/libdjvu++
