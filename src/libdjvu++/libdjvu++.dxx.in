@@ -569,6 +569,7 @@
 //@Include: IWImage.h
 //@Include: JB2Image.h
 //@Include: DjVuImage.h
+//@Include: ATTLicense.h
 //@}
 
 
