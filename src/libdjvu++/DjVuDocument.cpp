@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocument.cpp,v 1.178 2001-06-18 22:48:36 lchen Exp $
+// $Id: DjVuDocument.cpp,v 1.179 2001-06-25 18:24:46 bcr Exp $
 // $Name:  $
 
 
@@ -435,18 +435,19 @@ DjVuDocument::wait_for_complete_init(void)
 }
 
 int
-DjVuDocument::wait_get_pages_num(void)
+DjVuDocument::wait_get_pages_num(void) const
 {
-  flags.enter();
-  while(!(flags & DOC_TYPE_KNOWN) &&
-        !(flags & DOC_INIT_FAILED) &&
-        !(flags & DOC_INIT_OK)) flags.wait();
-  flags.leave();
+  GSafeFlags &f=const_cast<GSafeFlags &>(flags);
+  f.enter();
+  while(!(f & DOC_TYPE_KNOWN) &&
+        !(f & DOC_INIT_FAILED) &&
+        !(f & DOC_INIT_OK)) f.wait();
+  f.leave();
   return get_pages_num();
 }
 
 GUTF8String
-DjVuDocument::get_int_prefix(void)
+DjVuDocument::get_int_prefix(void) const
 {
       // These NAMEs are used to enable DjVuFile sharing inside the same
       // DjVuDocument using DjVuPortcaster. Since URLs are unique to the
@@ -792,7 +793,7 @@ DjVuDocument::id_to_url(const DjVuPort * source, const GUTF8String &id)
 }
 
 GP<DjVuFile>
-DjVuDocument::url_to_file(const GURL & url, bool dont_create)
+DjVuDocument::url_to_file(const GURL & url, bool dont_create) const
       // This function is private and is called from two places:
       // id_to_file() and get_djvu_file() ONLY when the structure is known
 {
@@ -828,15 +829,15 @@ DjVuDocument::url_to_file(const GURL & url, bool dont_create)
    if (!dont_create)
    {
       DEBUG_MSG("creating a new file\n");
-      file=DjVuFile::create(url,this,recover_errors,verbose_eof);
-      set_file_aliases(file);
+      file=DjVuFile::create(url,const_cast<DjVuDocument *>(this),recover_errors,verbose_eof);
+      const_cast<DjVuDocument *>(this)->set_file_aliases(file);
    }
 
    return file;
 }
 
 GP<DjVuFile>
-DjVuDocument::get_djvu_file(int page_num, bool dont_create)
+DjVuDocument::get_djvu_file(int page_num, bool dont_create) const
 {
    check();
    DEBUG_MSG("DjVuDocument::get_djvu_file(): request for page " << page_num << "\n");
@@ -850,7 +851,7 @@ DjVuDocument::get_djvu_file(int page_num, bool dont_create)
 	 // returns me, I'll be creating DjVuFile in different ways.
 	 // And I don't want the situation to change between the moment I call
 	 // id_to_url() and I actually create DjVuFile
-      GMonitorLock lock(&flags);
+      GMonitorLock lock(&(const_cast<DjVuDocument *>(this)->flags));
       url=page_to_url(page_num);
       if (url.is_empty())
       {
@@ -875,7 +876,7 @@ DjVuDocument::get_djvu_file(int page_num, bool dont_create)
             name+=".djvu";
             url=invent_url(name);
 
-	    GCriticalSectionLock lock(&ufiles_lock);
+            GCriticalSectionLock(&(const_cast<DjVuDocument *>(this)->ufiles_lock));
 	    for(GPosition pos=ufiles_list;pos;++pos)
 	    {
 	       GP<UnnamedFile> f=ufiles_list[pos];
@@ -890,10 +891,10 @@ DjVuDocument::get_djvu_file(int page_num, bool dont_create)
 	       //
 	       // We also want to keep ufiles_lock to make sure that when
 	       // request_data() is called, the record is still there
-	    ufiles_list.append(ufile);
+	    const_cast<DjVuDocument *>(this)->ufiles_list.append(ufile);
       
 	    GP<DjVuFile> file=
-              DjVuFile::create(url,this,recover_errors,verbose_eof);
+              DjVuFile::create(url,const_cast<DjVuDocument *>(this),recover_errors,verbose_eof);
 	    ufile->file=file;
 	    return file;
 	 } else url=((DjVuFile *) (DjVuPort *) port)->get_url();
@@ -902,7 +903,7 @@ DjVuDocument::get_djvu_file(int page_num, bool dont_create)
    
    GP<DjVuFile> file=url_to_file(url, dont_create);
    if (file) 
-     pcaster->add_route(file, this);
+     pcaster->add_route(file, const_cast<DjVuDocument *>(this));
    return file;
 }
 
@@ -993,7 +994,7 @@ DjVuDocument::get_djvu_file(const GURL& url, bool dont_create)
 }
 
 GP<DjVuImage>
-DjVuDocument::get_page(int page_num, bool sync, DjVuPort * port)
+DjVuDocument::get_page(int page_num, bool sync, DjVuPort * port) const
 {
    check();
    DEBUG_MSG("DjVuDocument::get_page(): request for page " << page_num << "\n");
@@ -1733,5 +1734,28 @@ DjVuDocument::save_as(const GURL &where, const bool bundled)
    {
      expand(where.base(), where.fname());
    }
+}
+
+static const char prolog[]="<!DOCTYPE DjVuXML PUBLIC \"-//W3C//DTD DjVuXML 1.1//EN\" \"pubtext/DjVuXML-s.dtd\">\n<DjVuXML>\n<HEAD>";
+static const char start_xml[]="</HEAD>\n<BODY>\n";
+static const char end_xml[]="</BODY>\n</DjVuXML>\n";
+
+void
+DjVuDocument::writeDjVuXML(const GP<ByteStream> &gstr_out,int flags) const
+{
+  ByteStream &str_out=*gstr_out;
+  str_out.writestring(
+    prolog+get_init_url().get_string().toEscaped()+start_xml);
+  const int pages=wait_get_pages_num();
+  for(int page_num=0;page_num<pages;++page_num)
+  {
+    const GP<DjVuImage> dimg(get_page(page_num,true));
+    if(!dimg)
+    {
+      G_THROW( ERR_MSG("DjVuToText.decode_failed") );
+    }
+    dimg->writeXML(str_out,get_init_url(),flags);
+  }
+  str_out.writestring(GUTF8String(end_xml));
 }
 

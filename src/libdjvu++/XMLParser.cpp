@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: XMLParser.cpp,v 1.13 2001-06-13 18:26:19 bcr Exp $
+// $Id: XMLParser.cpp,v 1.14 2001-06-25 18:24:47 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -494,6 +494,9 @@ lt_XMLParser::Impl::get_file(const GURL &url,GUTF8String id)
       const int xpage=id.toInt(); //atoi((char const *)page); 
       if(xpage>0)
         id=doc->page_to_id(xpage-1);
+    }else if(!id.length())
+    { 
+      id=doc->page_to_id(0);
     }
   }
   const GURL fileurl(doc->id_to_url(id));

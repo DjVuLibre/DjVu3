@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocEditor.cpp,v 1.79 2001-05-31 16:25:42 fcrary Exp $
+// $Id: DjVuDocEditor.cpp,v 1.80 2001-06-25 18:24:46 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -277,7 +277,7 @@ DjVuDocEditor::clean_files_map(void)
 }
 
 GP<DjVuFile>
-DjVuDocEditor::url_to_file(const GURL & url, bool dont_create)
+DjVuDocEditor::url_to_file(const GURL & url, bool dont_create) const
 {
    DEBUG_MSG("DjVuDocEditor::url_to_file(): url='" << url << "'\n");
    DEBUG_MAKE_INDENT(3);
@@ -289,7 +289,7 @@ DjVuDocEditor::url_to_file(const GURL & url, bool dont_create)
      frec=djvm_dir->name_to_file(url.fname());
    if (frec)
    {
-      GCriticalSectionLock lock(&files_lock);
+      GCriticalSectionLock lock(&(const_cast<DjVuDocEditor *>(this)->files_lock));
       GPosition pos;
       if (files_map.contains(frec->get_load_name(), pos))
       {
@@ -299,7 +299,7 @@ DjVuDocEditor::url_to_file(const GURL & url, bool dont_create)
       }
    }
 
-   clean_files_map();
+   const_cast<DjVuDocEditor *>(this)->clean_files_map();
 
       // We don't have the file cached. Let DjVuDocument create the file.
    const GP<DjVuFile> file(DjVuDocument::url_to_file(url, dont_create));
@@ -307,7 +307,7 @@ DjVuDocEditor::url_to_file(const GURL & url, bool dont_create)
       // And add it to our private "cache"
    if (file && frec)
    {
-      GCriticalSectionLock lock(&files_lock);
+      GCriticalSectionLock lock(&(const_cast<DjVuDocEditor *>(this)->files_lock));
       GPosition pos;
       if (files_map.contains(frec->get_load_name(), pos))
       {
@@ -316,7 +316,7 @@ DjVuDocEditor::url_to_file(const GURL & url, bool dont_create)
       {
          const GP<File> f(new File());
          f->file=file;
-         files_map[frec->get_load_name()]=f;
+         const_cast<DjVuDocEditor *>(this)->files_map[frec->get_load_name()]=f;
       }
    }
 

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuImage.h,v 1.45 2001-06-09 01:50:16 bcr Exp $
+// $Id: DjVuImage.h,v 1.46 2001-06-25 18:24:46 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUIMAGE_H
@@ -73,7 +73,7 @@
     L\'eon Bottou <leonb@research.att.com> - initial implementation
     Andrei Erofeev <eaf@geocities.com> - multipage support
     @version
-    #$Id: DjVuImage.h,v 1.45 2001-06-09 01:50:16 bcr Exp $# */
+    #$Id: DjVuImage.h,v 1.46 2001-06-25 18:24:46 bcr Exp $# */
 //@{
 
 
@@ -108,6 +108,7 @@ class DjVuImage : public DjVuPort
 protected:
   DjVuImage(void);
 public:
+  enum { NOINFO, NOTEXT=1, NOMAP=4 };
   // CONSTRUCTION
   /** @name Construction. */
   //@{
@@ -260,6 +261,14 @@ public:
   /** Returns pointer to \Ref{DjVuFile} which contains this image in
       compressed form. */
   GP<DjVuFile> get_djvu_file(void) const;
+  /// Write out a DjVuXML object tag and map tag.
+  void writeXML(ByteStream &str_out,const GURL &doc_url, const int flags=0) const;
+  /// Write out a DjVuXML object tag and map tag.
+  void writeXML(ByteStream &str_out) const;
+  /// Get a DjVuXML object tag and map tag.
+  GUTF8String get_XML(const GURL &doc_url, const int flags=0) const;
+  /// Get a DjVuXML object tag and map tag.
+  GUTF8String get_XML(void) const;
   //@}
 
   // CHECKING

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuImage.cpp,v 1.79 2001-06-21 21:38:14 bcr Exp $
+// $Id: DjVuImage.cpp,v 1.80 2001-06-25 18:24:46 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -48,6 +48,7 @@
 #include "DataPool.h"
 #include "ByteStream.h"
 #include "GMapAreas.h"
+#include "DjVuText.h"
 #include "debug.h"
 #include <stdarg.h>
 
@@ -1336,4 +1337,90 @@ DjVuImage::wait_for_complete_decode(void)
   return 0;
 }
 
+// Write out a DjVuXML object tag and map tag.
+void
+DjVuImage::writeXML(ByteStream &str_out,const GURL &doc_url,const int flags) const
+{
+  const int height=get_height();
+  
+  static const char *Object="<OBJECT data=\"";
+  const GURL url(get_djvu_file()->get_url());
+  const GUTF8String pagename(url.fname());
+  GUTF8String page_param;
+  if(doc_url.is_valid() && !doc_url.is_empty())
+  {
+    str_out.writestring(Object+doc_url.get_string());
+    page_param="<PARAM name=\"PAGE\" value=\""+pagename+"\" />\n";
+  }else
+  {
+    str_out.writestring(Object+doc_url.get_string());
+  }
+  str_out.writestring("\" type=\""+get_mimetype()+"\" height=\""
+    +GUTF8String(height)+"\" width=\""+GUTF8String(get_width())
+    +"\" usemap=\""+pagename.toEscaped()+"\" >\n");
+  if(!(flags & NOINFO))
+  {
+    const GP<DjVuInfo> info(get_info());
+    if(info)
+    {
+      info->writeParam(str_out);
+    }
+  }
+  str_out.writestring(page_param);
+  const GP<DjVuAnno> anno(DjVuAnno::create());
+  if(!(flags & NOINFO)||!(flags&NOMAP))
+  {
+    const GP<ByteStream> anno_str(get_anno());
+    if(anno_str)
+    {
+      anno->decode(anno_str);
+    }
+    if(!(flags & NOINFO))
+    {
+      anno->writeParam(str_out);
+    }
+  }
+  if(!(flags & NOTEXT))
+  {
+    const GP<DjVuText> text(DjVuText::create());
+    {
+      const GP<ByteStream> text_str(get_text());
+      if(text_str)
+      {
+        text->decode(text_str);
+      }
+      text->writeText(str_out,height);
+    }
+  }
+  str_out.writestring(GUTF8String("</OBJECT>\n"));
+  if(!(flags & NOMAP))
+  {
+    anno->writeMap(str_out,pagename,height);
+  }
+}
+
+// Write out a DjVuXML object tag and map tag.
+void
+DjVuImage::writeXML(ByteStream &str_out) const
+{
+  writeXML(str_out,GURL());
+}
+
+// Write out a DjVuXML object tag and map tag.
+GUTF8String
+DjVuImage::get_XML(const GURL &doc_url,const int flags) const
+{
+  GP<ByteStream> gbs(ByteStream::create());
+  ByteStream &bs=*gbs;
+  writeXML(bs,doc_url);
+  bs.seek(0L);
+  return bs.getAsUTF8();
+}
+
+// Write out a DjVuXML object tag and map tag.
+GUTF8String
+DjVuImage::get_XML(void) const
+{
+  return get_XML(GURL());
+}
 

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuAnno.cpp,v 1.85 2001-06-21 21:38:14 bcr Exp $
+// $Id: DjVuAnno.cpp,v 1.86 2001-06-25 18:24:46 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -579,6 +579,12 @@ DjVuANT::get_paramtags(void) const
   return retval;
 }
 
+void
+DjVuANT::writeParam(ByteStream &str_out) const
+{
+  str_out.writestring(get_paramtags());
+}
+
 GUTF8String
 DjVuANT::get_xmlmap(const GUTF8String &name,const int height) const
 {
@@ -588,6 +594,18 @@ DjVuANT::get_xmlmap(const GUTF8String &name,const int height) const
     retval+=map_areas[pos]->get_xmltag(height);
   }
   return retval+"</MAP>\n";
+}
+
+void
+DjVuANT::writeMap(
+  ByteStream &str_out,const GUTF8String &name,const int height) const
+{
+  str_out.writestring("<MAP name=\""+name.toEscaped()+"\" >\n");
+  for(GPosition pos(map_areas);pos;++pos)
+  {
+    str_out.writestring(GUTF8String(map_areas[pos]->get_xmltag(height)));
+  }
+  str_out.writestring(GUTF8String("</MAP>\n"));
 }
 
 GUTF8String
@@ -1190,7 +1208,19 @@ DjVuAnno::get_xmlmap(const GUTF8String &name,const int height) const
 {
   return ant
     ?(ant->get_xmlmap(name,height))
-    :("<MAP name=\""+name.toEscaped()+"\" />\n");
+    :("<MAP name=\""+name.toEscaped()+"\"/>\n");
+}
+
+void
+DjVuAnno::writeMap(ByteStream &str_out,const GUTF8String &name,const int height) const
+{
+  if(ant)
+  {
+    ant->writeMap(str_out,name,height);
+  }else
+  {
+    str_out.writestring(get_xmlmap(name,height));
+  }
 }
 
 GUTF8String
@@ -1200,6 +1230,13 @@ DjVuAnno::get_paramtags(void) const
     ?(ant->get_paramtags())
     :GUTF8String();
 }
+
+void
+DjVuAnno::writeParam(ByteStream &str_out) const
+{
+  str_out.writestring(get_paramtags());
+}
+
 
 void
 DjVuAnno::decode(const GP<ByteStream> &gbs)

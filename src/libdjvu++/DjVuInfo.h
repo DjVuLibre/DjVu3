@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuInfo.h,v 1.15 2001-06-21 21:38:14 bcr Exp $
+// $Id: DjVuInfo.h,v 1.16 2001-06-25 18:24:46 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUINFO_H
@@ -46,7 +46,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: DjVuInfo.h,v 1.15 2001-06-21 21:38:14 bcr Exp $# */
+    #$Id: DjVuInfo.h,v 1.16 2001-06-25 18:24:46 bcr Exp $# */
 //@{
 
 
@@ -139,6 +139,8 @@ public:
 
      /// Obtain the flags for the default specifications.
   GUTF8String get_paramtags(void) const;
+     /// Obtain the flags for the default specifications.
+  void writeParam(ByteStream &out_str) const;
 };
 
 

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuText.h,v 1.13 2001-04-26 23:58:12 bcr Exp $
+// $Id: DjVuText.h,v 1.14 2001-06-25 18:24:47 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUTEXT_H
@@ -55,7 +55,7 @@
     @memo Implements support for DjVuImage hidden text.
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: DjVuText.h,v 1.13 2001-04-26 23:58:12 bcr Exp $# */
+    #$Id: DjVuText.h,v 1.14 2001-06-25 18:24:47 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -150,6 +150,10 @@ public:
   void decode(const GP<ByteStream> &bs);
   /** Returns a copy of this object. */
   GP<DjVuTXT> copy(void) const;
+  /// Write XML formated text.
+  void writeText(ByteStream &bs,const int height) const;
+  /// Get XML formatted text.
+  GUTF8String get_xmlText(const int height) const;
   /** Searches the TXT chunk for the given string and returns a list of
       the smallest zones covering the text.
       @param string String to be found. May contain spaces as word separators.
@@ -221,6 +225,12 @@ public:
       /** Returns the number of bytes needed by this data structure. It's
 	  used by caching routines to estimate the size of a \Ref{DjVuImage}. */
    inline unsigned int get_memory_usage() const;
+
+   /// Write XML formated text.
+   void writeText(ByteStream &bs,const int height) const;
+
+   /// Get XML formatted text.
+   GUTF8String get_xmlText(const int height) const;
 
    GP<DjVuTXT>  txt;
 private: // dummy stuff

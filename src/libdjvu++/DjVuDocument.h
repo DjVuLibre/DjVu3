@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocument.h,v 1.88 2001-06-05 03:19:57 bcr Exp $
+// $Id: DjVuDocument.h,v 1.89 2001-06-25 18:24:46 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUDOCUMENT_H
@@ -58,7 +58,7 @@ class ByteStream;
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocument.h,v 1.88 2001-06-05 03:19:57 bcr Exp $#
+    @version #$Id: DjVuDocument.h,v 1.89 2001-06-25 18:24:46 bcr Exp $#
 */
 
 //@{
@@ -566,7 +566,7 @@ public:
 		      \Ref{DjVuFile::is_decode_ok}().
 	  @param port A pointer to \Ref{DjVuPort}, that the created image
 	  	      will be connected to. */
-   GP<DjVuImage> get_page(int page_num, bool sync=true, DjVuPort * port=0);
+   GP<DjVuImage> get_page(int page_num, bool sync=true, DjVuPort * port=0) const;
 
       /** Returns \Ref{GP} pointer to \Ref{DjVuImage} corresponding to the
 	  specified ID. This function behaves exactly as the #get_page()#
@@ -605,7 +605,7 @@ public:
 	  \Ref{wait_for_complete_init}(). For single threaded applications
 	  the initialization completes before the \Ref{init}() function
 	  returns. */
-   GP<DjVuFile>	get_djvu_file(int page_num, bool dont_create=false);
+   GP<DjVuFile>	get_djvu_file(int page_num, bool dont_create=false) const;
       /** Returns \Ref{DjVuFile} corresponding to the specified ID.
           This function behaves exactly as the #get_djvu_file()# function
 	  above. The only thing worth mentioning here is how the #ID#
@@ -652,7 +652,7 @@ public:
    bool    	   wait_for_complete_init(void);
 
           /** Wait until we known the number of pages and return. */
-   int wait_get_pages_num(void);
+   int wait_get_pages_num(void) const;
    
       /// Returns cache being used.
    DjVuFileCache * get_cache(void) const;
@@ -735,6 +735,9 @@ public:
 	  document pages. */
    GP<DjVuNavDir>	get_nav_dir(void) const;
 
+   /// Create a complete DjVuXML file.
+   void writeDjVuXML(const GP<ByteStream> &gstr_out,int flags) const;
+
       /// Returns TRUE if #class_name# is #"DjVuDocument"# or #"DjVuPort"#
    virtual bool		inherits(const GUTF8String &class_name) const;
 
@@ -760,7 +763,7 @@ protected:
      GP<DataPool> &pool, const GURL &url,bool &needs_compression, bool &needs_rename );
    static void (*djvu_compress_codec) (
      GP<ByteStream> &bs, const GURL &where, bool bundled);
-   virtual GP<DjVuFile>	url_to_file(const GURL & url, bool dont_create=false);
+   virtual GP<DjVuFile>	url_to_file(const GURL & url, bool dont_create=false) const;
    GURL			init_url;
    GP<DataPool>		init_data_pool;
    GP<DjVmDir>		djvm_dir;	// New-style DjVm directory
@@ -819,7 +822,7 @@ protected:
       
    void			add_to_cache(const GP<DjVuFile> & f);
    void			check_unnamed_files(void);
-   GUTF8String		get_int_prefix(void);
+   GUTF8String		get_int_prefix(void) const;
    void			set_file_aliases(const DjVuFile * file);
    GURL			invent_url(const GUTF8String &name) const;
 private: //dummy stuff

@@ -1,5 +1,6 @@
 ### BEGIN C++ DEPENDENCIES
-annotate.o: annotate.cpp ../../../src/include/config.h \
+annotate.o: annotate.cpp \
+ /home/bcr/build/debug/src/include/config.h \
  ../../../src/libdjvu++/GIFFManager.h \
  ../../../src/libdjvu++/IFFByteStream.h \
  ../../../src/libdjvu++/DjVuGlobal.h \
@@ -14,7 +15,7 @@ annotate.o: annotate.cpp ../../../src/include/config.h \
  ../../../src/libdjvu++/GThreads.h \
  ../../../src/libdjvu++/DjVuMessage.h \
  ../../../src/libdjvu++/DjVuMessageLite.h
-bzz.o: bzz.cpp ../../../src/include/config.h \
+bzz.o: bzz.cpp /home/bcr/build/debug/src/include/config.h \
  ../../../src/libdjvu++/GException.h \
  ../../../src/libdjvu++/DjVuGlobal.h \
  ../../../src/include/DjVu.h \
@@ -30,7 +31,7 @@ bzz.o: bzz.cpp ../../../src/include/config.h \
  ../../../src/libdjvu++/GThreads.h \
  ../../../src/libdjvu++/DjVuMessage.h \
  ../../../src/libdjvu++/DjVuMessageLite.h
-c44.o: c44.cpp ../../../src/include/config.h \
+c44.o: c44.cpp /home/bcr/build/debug/src/include/config.h \
  ../../../src/libdjvu++/GString.h \
  ../../../src/libdjvu++/DjVuGlobal.h \
  ../../../src/include/DjVu.h \
@@ -51,7 +52,7 @@ c44.o: c44.cpp ../../../src/include/config.h \
  ../../../src/libdjvu++/GThreads.h \
  ../../../src/libdjvu++/DjVuMessage.h \
  ../../../src/libdjvu++/DjVuMessageLite.h
-cjb2.o: cjb2.cpp ../../../src/include/config.h \
+cjb2.o: cjb2.cpp /home/bcr/build/debug/src/include/config.h \
  ../../../src/libdjvu++/DjVuGlobal.h \
  ../../../src/include/DjVu.h \
  ../../../src/libdjvu++/GException.h \
@@ -70,7 +71,8 @@ cjb2.o: cjb2.cpp ../../../src/include/config.h \
  ../../../src/libdjvu++/GThreads.h \
  ../../../src/libdjvu++/DjVuMessage.h \
  ../../../src/libdjvu++/DjVuMessageLite.h
-cpaldjvu.o: cpaldjvu.cpp ../../../src/include/config.h \
+cpaldjvu.o: cpaldjvu.cpp \
+ /home/bcr/build/debug/src/include/config.h \
  ../../../src/libdjvu++/DjVuGlobal.h \
  ../../../src/include/DjVu.h \
  ../../../src/libdjvu++/GException.h \
@@ -92,7 +94,8 @@ cpaldjvu.o: cpaldjvu.cpp ../../../src/include/config.h \
  ../../../src/libdjvu++/GThreads.h \
  ../../../src/libdjvu++/DjVuMessage.h \
  ../../../src/libdjvu++/DjVuMessageLite.h
-csepdjvu.o: csepdjvu.cpp ../../../src/include/config.h \
+csepdjvu.o: csepdjvu.cpp \
+ /home/bcr/build/debug/src/include/config.h \
  ../../../src/libdjvu++/DjVuGlobal.h \
  ../../../src/include/DjVu.h \
  ../../../src/libdjvu++/GException.h \
@@ -116,7 +119,7 @@ csepdjvu.o: csepdjvu.cpp ../../../src/include/config.h \
  ../../../src/libdjvu++/GOS.h ../../../src/libdjvu++/GURL.h \
  ../../../src/libdjvu++/DjVuMessage.h \
  ../../../src/libdjvu++/DjVuMessageLite.h
-d44.o: d44.cpp ../../../src/include/config.h \
+d44.o: d44.cpp /home/bcr/build/debug/src/include/config.h \
  ../../../src/libdjvu++/DjVuGlobal.h \
  ../../../src/include/DjVu.h \
  ../../../src/libdjvu++/GString.h \
@@ -134,7 +137,7 @@ d44.o: d44.cpp ../../../src/include/config.h \
  ../../../src/libdjvu++/GBitmap.h \
  ../../../src/libdjvu++/DjVuMessage.h \
  ../../../src/libdjvu++/DjVuMessageLite.h
-ddjvu.o: ddjvu.cpp ../../../src/include/config.h \
+ddjvu.o: ddjvu.cpp /home/bcr/build/debug/src/include/config.h \
  ../../../src/libdjvu++/GException.h \
  ../../../src/libdjvu++/DjVuGlobal.h \
  ../../../src/include/DjVu.h \
@@ -158,7 +161,8 @@ ddjvu.o: ddjvu.cpp ../../../src/include/config.h \
  ../../../src/libdjvu++/ByteStream.h \
  ../../../src/libdjvu++/DjVuMessage.h \
  ../../../src/libdjvu++/DjVuMessageLite.h
-djthumb.o: djthumb.cpp ../../../src/include/config.h \
+djthumb.o: djthumb.cpp \
+ /home/bcr/build/debug/src/include/config.h \
  ../../../src/libdjvu++/GString.h \
  ../../../src/libdjvu++/DjVuGlobal.h \
  ../../../src/include/DjVu.h \
@@ -176,7 +180,7 @@ djthumb.o: djthumb.cpp ../../../src/include/config.h \
  ../../../src/libdjvu++/GOS.h \
  ../../../src/libdjvu++/DjVuMessage.h \
  ../../../src/libdjvu++/DjVuMessageLite.h
-djvm.o: djvm.cpp ../../../src/include/config.h \
+djvm.o: djvm.cpp /home/bcr/build/debug/src/include/config.h \
  ../../../src/libdjvu++/GException.h \
  ../../../src/libdjvu++/DjVuGlobal.h \
  ../../../src/include/DjVu.h \
@@ -194,7 +198,8 @@ djvm.o: djvm.cpp ../../../src/include/config.h \
  ../../../src/libdjvu++/GOS.h \
  ../../../src/libdjvu++/DjVuMessage.h \
  ../../../src/libdjvu++/DjVuMessageLite.h
-djvmcvt.o: djvmcvt.cpp ../../../src/include/config.h \
+djvmcvt.o: djvmcvt.cpp \
+ /home/bcr/build/debug/src/include/config.h \
  ../../../src/libdjvu++/DjVuDocument.h \
  ../../../src/libdjvu++/DjVuPort.h \
  ../../../src/libdjvu++/GThreads.h \
@@ -213,7 +218,8 @@ djvmcvt.o: djvmcvt.cpp ../../../src/include/config.h \
  ../../../src/libdjvu++/DjVuMessage.h \
  ../../../src/libdjvu++/DjVuMessageLite.h \
  ../../../src/libdjvu++/debug.h
-djvudump.o: djvudump.cpp ../../../src/include/config.h \
+djvudump.o: djvudump.cpp \
+ /home/bcr/build/debug/src/include/config.h \
  ../../../src/libdjvu++/DjVuDumpHelper.h \
  ../../../src/libdjvu++/GSmartPointer.h \
  ../../../src/libdjvu++/DjVuGlobal.h \
@@ -228,7 +234,8 @@ djvudump.o: djvudump.cpp ../../../src/include/config.h \
  ../../../src/libdjvu++/GThreads.h \
  ../../../src/libdjvu++/DjVuMessage.h \
  ../../../src/libdjvu++/DjVuMessageLite.h
-djvuextract.o: djvuextract.cpp ../../../src/include/config.h \
+djvuextract.o: djvuextract.cpp \
+ /home/bcr/build/debug/src/include/config.h \
  ../../../src/libdjvu++/GException.h \
  ../../../src/libdjvu++/DjVuGlobal.h \
  ../../../src/include/DjVu.h \
@@ -250,7 +257,8 @@ djvuextract.o: djvuextract.cpp ../../../src/include/config.h \
  ../../../src/libdjvu++/GOS.h \
  ../../../src/libdjvu++/DjVuMessage.h \
  ../../../src/libdjvu++/DjVuMessageLite.h
-djvumake.o: djvumake.cpp ../../../src/include/config.h \
+djvumake.o: djvumake.cpp \
+ /home/bcr/build/debug/src/include/config.h \
  ../../../src/libdjvu++/GString.h \
  ../../../src/libdjvu++/DjVuGlobal.h \
  ../../../src/include/DjVu.h \
@@ -277,7 +285,8 @@ djvumake.o: djvumake.cpp ../../../src/include/config.h \
  ../../../src/libdjvu++/GBitmap.h \
  ../../../src/libdjvu++/DjVuMessage.h \
  ../../../src/libdjvu++/DjVuMessageLite.h
-djvutoxml.o: djvutoxml.cpp ../../../src/include/config.h \
+djvutoxml.o: djvutoxml.cpp \
+ /home/bcr/build/debug/src/include/config.h \
  ../../../src/libdjvu++/DjVuDocument.h \
  ../../../src/libdjvu++/DjVuPort.h \
  ../../../src/libdjvu++/GThreads.h \
@@ -303,7 +312,8 @@ djvutoxml.o: djvutoxml.cpp ../../../src/include/config.h \
  ../../../src/libdjvu++/DjVuPalette.h \
  ../../../src/libdjvu++/GPixmap.h \
  ../../../src/libdjvu++/debug.h
-djvutxt.o: djvutxt.cpp ../../../src/include/config.h \
+djvutxt.o: djvutxt.cpp \
+ /home/bcr/build/debug/src/include/config.h \
  ../../../src/libdjvu++/DjVuDocument.h \
  ../../../src/libdjvu++/DjVuPort.h \
  ../../../src/libdjvu++/GThreads.h \
@@ -329,7 +339,8 @@ djvutxt.o: djvutxt.cpp ../../../src/include/config.h \
  ../../../src/libdjvu++/DjVuMessage.h \
  ../../../src/libdjvu++/DjVuMessageLite.h
 djvuxmlparser.o: djvuxmlparser.cpp \
- ../../../src/include/config.h ../../../src/libdjvu++/XMLParser.h \
+ /home/bcr/build/debug/src/include/config.h \
+ ../../../src/libdjvu++/XMLParser.h \
  ../../../src/libdjvu++/GContainer.h \
  ../../../src/libdjvu++/GException.h \
  ../../../src/libdjvu++/DjVuGlobal.h \
@@ -346,7 +357,8 @@ djvuxmlparser.o: djvuxmlparser.cpp \
  ../../../src/libdjvu++/ByteStream.h \
  ../../../src/libdjvu++/DjVuMessage.h \
  ../../../src/libdjvu++/DjVuMessageLite.h
-native2utf8.o: native2utf8.cpp ../../../src/include/config.h \
+native2utf8.o: native2utf8.cpp \
+ /home/bcr/build/debug/src/include/config.h \
  ../../../src/libdjvu++/GException.h \
  ../../../src/libdjvu++/DjVuGlobal.h \
  ../../../src/include/DjVu.h \
@@ -359,7 +371,8 @@ native2utf8.o: native2utf8.cpp ../../../src/include/config.h \
  ../../../src/libdjvu++/GContainer.h \
  ../../../src/libdjvu++/GURL.h \
  ../../../src/libdjvu++/GThreads.h
-ppmcoco.o: ppmcoco.cpp ../../../src/include/config.h \
+ppmcoco.o: ppmcoco.cpp \
+ /home/bcr/build/debug/src/include/config.h \
  ../../../src/libdjvu++/GException.h \
  ../../../src/libdjvu++/DjVuGlobal.h \
  ../../../src/include/DjVu.h \
@@ -373,7 +386,8 @@ ppmcoco.o: ppmcoco.cpp ../../../src/include/config.h \
  ../../../src/libdjvu++/GThreads.h \
  ../../../src/libdjvu++/DjVuMessage.h \
  ../../../src/libdjvu++/DjVuMessageLite.h
-xml2native.o: xml2native.cpp ../../../src/include/config.h \
+xml2native.o: xml2native.cpp \
+ /home/bcr/build/debug/src/include/config.h \
  ../../../src/libdjvu++/GException.h \
  ../../../src/libdjvu++/DjVuGlobal.h \
  ../../../src/include/DjVu.h \
@@ -387,7 +401,8 @@ xml2native.o: xml2native.cpp ../../../src/include/config.h \
  ../../../src/libdjvu++/DjVuMessageLite.h \
  ../../../src/libdjvu++/GURL.h \
  ../../../src/libdjvu++/GThreads.h
-xml2utf8.o: xml2utf8.cpp ../../../src/include/config.h \
+xml2utf8.o: xml2utf8.cpp \
+ /home/bcr/build/debug/src/include/config.h \
  ../../../src/libdjvu++/GException.h \
  ../../../src/libdjvu++/DjVuGlobal.h \
  ../../../src/include/DjVu.h \

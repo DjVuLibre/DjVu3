@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuText.cpp,v 1.20 2001-05-18 00:06:56 fcrary Exp $
+// $Id: DjVuText.cpp,v 1.21 2001-06-25 18:24:46 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -705,5 +705,226 @@ DjVuText::copy(void) const
    if (txt)
      text->txt = txt->copy();
    return text;
+}
+
+static GUTF8String
+indent ( int spaces)
+{
+  GUTF8String ret;
+  for( int i = 0 ; i < spaces ; i++ )
+    ret += ' ';
+  return ret;
+}
+
+static const char *tags[8]=
+{ 0,
+  "HIDDENTEXT",
+  "PAGECOLUMN",
+  "REGION",
+  "PARAGRAPH",
+  "LINE",
+  "WORD",
+  "CHARACTER" };
+static const int tags_size=sizeof(tags)/sizeof(const char *);
+
+static GUTF8String
+start_tag(const DjVuTXT::ZoneType zone)
+{
+  GUTF8String retval;
+  if((tags_size > (int)zone)&&((int)zone > 0))
+  {
+    switch (zone)
+    {
+      case DjVuTXT::CHARACTER:
+        retval="<"+GUTF8String(tags[zone])+">";
+        break;
+      case DjVuTXT::WORD:
+        retval=indent(2*(int)zone+2)+"<"+tags[zone]+">";
+        break;
+      default:
+        retval=indent(2*(int)zone+2)+"<"+tags[zone]+">\n";
+        break;
+    }
+  }
+  return retval;
+}
+
+static GUTF8String
+start_tag(const DjVuTXT::ZoneType zone, const GUTF8String &attributes)
+{
+  GUTF8String retval;
+  if((tags_size > (int)zone)&&((int)zone > 0))
+  {
+    switch (zone)
+    {
+      case DjVuTXT::CHARACTER:
+        retval="<"+GUTF8String(tags[zone])+" "+attributes+">";
+        break;
+      case DjVuTXT::WORD:
+        retval=indent(2*(int)zone+2)+"<"+tags[zone]+" "+attributes+">";
+        break;
+      default:
+        retval=indent(2*(int)zone+2)+"<"+tags[zone]+" "+attributes+">\n";
+        break;
+    }
+  }
+  return retval;
+}
+
+static inline GUTF8String
+start_tag(const int layer)
+{
+  return start_tag((const DjVuTXT::ZoneType)layer);
+}
+
+
+static GUTF8String
+end_tag(const DjVuTXT::ZoneType zone)
+{
+  GUTF8String retval;
+  if((tags_size > (int)zone)&&((int)zone >= 0))
+  {
+    switch (zone)
+    {
+      case DjVuTXT::CHARACTER:
+        retval="</"+GUTF8String(tags[zone])+">";
+        break;
+      case DjVuTXT::WORD:
+        retval="</"+GUTF8String(tags[zone])+">\n";
+        break;
+      default:
+        retval=indent(2*(int)zone+2)+"</"+tags[zone]+">\n";
+        break;
+    }
+  }
+  return retval;
+}
+
+static inline GUTF8String
+end_tag(const int layer)
+{
+  return end_tag((const DjVuTXT::ZoneType)layer);
+}
+
+static GUTF8String
+tolayer(int &layer, const DjVuTXT::ZoneType next_layer)
+{
+  GUTF8String retval;
+  for( ;layer < (int)next_layer;layer++ )
+  {
+    retval+=start_tag(layer);
+  }
+  while (layer > (int)next_layer )
+  {
+    retval+=end_tag(--layer);
+  }
+  return retval;
+}
+
+static void
+writeText( ByteStream & str_out,
+            const GUTF8String &textUTF8,
+            const DjVuTXT::Zone &zone,
+            const int WindowHeight );
+
+static void
+writeText( ByteStream & str_out,
+           const GUTF8String &textUTF8,
+           const DjVuTXT::ZoneType zlayer,
+           const GList<DjVuTXT::Zone> &children,
+           const int WindowHeight )
+{
+//  assert( txt->has_valid_zones() );
+//  DEBUG_MSG( "--zonetype=" << txt->page_zone.ztype << "\n" );
+
+  //  Beginning tags for missing layers
+  int layer=(int)zlayer;
+  //  Output the next layer
+  for(GPosition pos=children ; pos ; ++pos )
+  {
+    str_out.writestring(tolayer(layer,children[pos].ztype));
+    writeText( str_out,
+                textUTF8,
+                children[pos],
+                WindowHeight );
+  }
+  str_out.writestring(tolayer(layer,zlayer));
+}
+
+static void
+writeText( ByteStream & str_out,
+            const GUTF8String &textUTF8,
+            const DjVuTXT::Zone &zone,
+            const int WindowHeight )
+{
+//  DEBUG_MSG( "--zonetype=" << zone.ztype << "\n" );
+
+  const GUTF8String xindent(indent( 2 * zone.ztype + 2 ));
+  GPosition pos=zone.children;
+  // Build attribute string
+  if( ! pos )
+  {
+    GUTF8String coords;
+    coords.format("coords=\"%d,%d,%d,%d\"",
+      zone.rect.xmin, WindowHeight - 1 - zone.rect.ymin,
+      zone.rect.xmax, WindowHeight - 1 - zone.rect.ymax);
+    const int start=zone.text_start;
+    const int end=textUTF8.firstEndSpace(start,zone.text_length);
+    str_out.writestring(start_tag(zone.ztype,coords));
+    str_out.writestring(textUTF8.substr(start,end-start).toEscaped());
+    str_out.writestring(end_tag(zone.ztype));
+  } else
+  {
+    writeText(str_out,textUTF8,zone.ztype,zone.children,WindowHeight);
+  }
+}
+
+void
+DjVuTXT::writeText(ByteStream &str_out,const int height) const
+{
+  if(has_valid_zones())
+  {
+    ::writeText(str_out,textUTF8,DjVuTXT::PAGE,page_zone.children,height);
+  }else
+  {
+    str_out.writestring(start_tag(DjVuTXT::PAGE));
+    str_out.writestring(end_tag(DjVuTXT::PAGE));
+  }
+}
+
+void
+DjVuText::writeText(ByteStream &str_out,const int height) const
+{
+  if(txt)
+  {
+    txt->writeText(str_out,height);
+  }else
+  {
+    str_out.writestring("<"+GUTF8String(tags[DjVuTXT::PAGE])+"/>\n");
+  }
+   
+}
+GUTF8String
+DjVuTXT::get_xmlText(const int height) const
+{
+  GP<ByteStream> gbs(ByteStream::create());
+  ByteStream &bs=*gbs;
+  writeText(bs,height);
+  bs.seek(0L);
+  return bs.getAsUTF8();
+}
+
+GUTF8String
+DjVuText::get_xmlText(const int height) const
+{
+  GUTF8String retval;
+  if(txt)
+  {
+    retval=txt->get_xmlText(height);
+  }else
+  {
+    retval="<"+GUTF8String(tags[DjVuTXT::PAGE])+"/>\n";
+  }
+  return retval;
 }
 

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuAnno.h,v 1.42 2001-06-21 21:38:14 bcr Exp $
+// $Id: DjVuAnno.h,v 1.43 2001-06-25 18:24:46 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUANNO_H
@@ -58,7 +58,7 @@
     @memo Implements support for DjVuImage annotations
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: DjVuAnno.h,v 1.42 2001-06-21 21:38:14 bcr Exp $# */
+    #$Id: DjVuAnno.h,v 1.43 2001-06-25 18:24:46 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -165,8 +165,13 @@ public:
    static unsigned long int	cvt_color(const char * color, unsigned long int def);
       /// Obtain the <MAP></MAP> tag for these annotations.
    GUTF8String get_xmlmap(const GUTF8String &name, const int height) const;
-      /// Obtain the flags for the default specifications.
+      /// Write the <MAP></MAP> tag for these annotations.
+   void writeMap(
+     ByteStream &bs,const GUTF8String &name, const int height) const;
+      /// Obtain the XML flags for the default specifications.
    GUTF8String get_paramtags(void) const;
+      /// Write the XML flags for the default specifications.
+   void writeParam(ByteStream &out_str) const;
 private:
    void			decode(class GLParser & parser);
    
@@ -224,7 +229,13 @@ public:
    inline unsigned int get_memory_usage() const;
       /// Obtain the <MAP></MAP> tag for these annotations.
    GUTF8String get_xmlmap(const GUTF8String &name, const int height) const;
+      /// Write the <MAP></MAP> tag for these annotations.
+   void writeMap(
+     ByteStream &bs,const GUTF8String &name, const int height) const;
+      /// Obtain the XML flags for the default specifications.
    GUTF8String get_paramtags(void) const;
+      /// Write the XML flags for the default specifications.
+   void writeParam(ByteStream &out_str) const;
 private: // dummy stuff
    static void decode(ByteStream *);
    static void encode(ByteStream *);

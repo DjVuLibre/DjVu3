@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuInfo.cpp,v 1.20 2001-06-21 21:38:14 bcr Exp $
+// $Id: DjVuInfo.cpp,v 1.21 2001-06-25 18:24:46 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -144,5 +144,11 @@ DjVuInfo::get_paramtags(void) const
     retval+="<PARAM name=\"vflip\" value=\"true\" />\n";
   }
   return retval;
+}
+
+void
+DjVuInfo::writeParam(ByteStream &str_out) const
+{
+  str_out.writestring(get_paramtags());
 }
 

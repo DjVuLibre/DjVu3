@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocEditor.h,v 1.41 2001-05-01 17:12:15 bcr Exp $
+// $Id: DjVuDocEditor.h,v 1.42 2001-06-25 18:24:46 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUDOCEDITOR_H
@@ -51,7 +51,7 @@
 
     @memo DjVu document editor class.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: DjVuDocEditor.h,v 1.41 2001-05-01 17:12:15 bcr Exp $#
+    @version #$Id: DjVuDocEditor.h,v 1.42 2001-06-25 18:24:46 bcr Exp $#
 */
 
 //@{
@@ -342,7 +342,7 @@ public:
    virtual bool		inherits(const GUTF8String &class_name) const;
    virtual GP<DataPool>	request_data(const DjVuPort * source, const GURL & url);
 protected:
-   virtual GP<DjVuFile>	url_to_file(const GURL & url, bool dont_create);
+   virtual GP<DjVuFile>	url_to_file(const GURL & url, bool dont_create) const;
    virtual GP<DataPool> get_thumbnail(int page_num, bool dont_decode);
    friend class CThumbNails;
 public:

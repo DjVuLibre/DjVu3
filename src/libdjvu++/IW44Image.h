@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: IW44Image.h,v 1.3 2001-03-06 19:55:42 bcr Exp $
+// $Id: IW44Image.h,v 1.4 2001-06-25 18:24:47 bcr Exp $
 // $Name:  $
 
 
@@ -129,7 +129,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: IW44Image.h,v 1.3 2001-03-06 19:55:42 bcr Exp $# */
+    #$Id: IW44Image.h,v 1.4 2001-06-25 18:24:47 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -361,12 +361,15 @@ private:
 class IWBitmap : public IW44Image
 {
 public:
+  friend IW44Image;
   class Encode;
+protected:
   /*x Null constructor.  Constructs an empty IWBitmap object. This object does
       not contain anything meaningful. You must call function \Ref{init},
       \Ref{decode_iff} or \Ref{decode_chunk} to populate the wavelet
       coefficient data structure. */
   IWBitmap(void);
+public:
   //x virtual destructor
   virtual ~IWBitmap();
   //x ACCESS
@@ -436,12 +439,15 @@ private:
 class IWPixmap : public IW44Image
 {
 public:
+  friend IW44Image;
+protected:
   class Encode;
   /*x Null constructor.  Constructs an empty IWPixmap object. This object does
       not contain anything meaningful. You must call function \Ref{init},
       \Ref{decode_iff} or \Ref{decode_chunk} to populate the wavelet
       coefficient data structure. */
   IWPixmap(void);
+public:
   // virtual destructor
   virtual ~IWPixmap();
   // ACCESS
