@@ -402,7 +402,7 @@ check_thread_option()
          if [ -z "$CXXCOTHREAD" ]
          then
            echo 1>&2 "${PROGRAM_NAME}: Cothreads does not work with ${CXX}."
-           echo 1>&2 "You need GNU g++ or a dirivative such as pgcc or egcs."
+           echo 1>&2 "You need GNU g++ or a derivative such as pgcc or egcs."
            exit 1
          fi
          C_CXXFLAGS=APPEND
@@ -416,7 +416,7 @@ check_thread_option()
          if [ -z "$CCCOTHREAD" ]
          then
            echo 1>&2 "${PROGRAM_NAME}: Cothreads does not work with ${CC}."
-           echo 1>&2 "You need GNU gcc or a dirivative such as pgcc or egcs."
+           echo 1>&2 "You need GNU gcc or a derivative such as pgcc or egcs."
            exit 1
          fi
          C_CCFLAGS=APPEND
