@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: djvutopnm.cpp,v 1.18 1999-05-25 19:42:30 eaf Exp $
+//C- $Id: djvutopnm.cpp,v 1.19 1999-05-26 18:21:30 eaf Exp $
 
 
 /** @name djvutopnm
@@ -79,6 +79,9 @@
     \item[-v] Causes #djvutopnm# to print abundant information about the
        structure of the DjVu file, the compression ratios, the memory usage,
        and the decoding and rendering times.
+    \item[-page N] This can be used to decode a specific page of a multipage
+       document. Page numbers start from #1#. If this option is omitted,
+       #1# is assumed.
     \end{description}
 
     @memo
@@ -87,7 +90,7 @@
     Yann Le Cun <yann@research.att.com>\\
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: djvutopnm.cpp,v 1.18 1999-05-25 19:42:30 eaf Exp $# */
+    #$Id: djvutopnm.cpp,v 1.19 1999-05-26 18:21:30 eaf Exp $# */
 //@{
 //@}
 
@@ -122,14 +125,6 @@ convert(const char *from, const char *to, int page_num)
   GURL from_url=GOS::filename_to_url(from);
   GP<DjVuDocument> doc=new DjVuDocument(from_url, 1);
 
-  if (page_num>0)
-  {
-	// Unfortunately, before we can access any page from the document,
-	// we have to decode ONE page, which will create navigation directory
-     GP<DjVuImage> dimg=doc->get_page(0);
-     dimg->get_djvu_file()->wait_for_finish();
-  }
-  
   start=GOS::ticks();
   GP<DjVuImage> dimg=doc->get_page(page_num);
   GP<DjVuFile> file=dimg->get_djvu_file();
