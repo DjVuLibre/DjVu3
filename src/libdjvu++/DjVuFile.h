@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.h,v 1.14 1999-08-25 22:06:34 eaf Exp $
+//C- $Id: DjVuFile.h,v 1.15 1999-08-26 19:27:16 eaf Exp $
  
 #ifndef _DJVUFILE_H
 #define _DJVUFILE_H
@@ -28,7 +28,6 @@
 #include "DjVuPort.h"
 #include "GContainer.h"
 #include "DjVuNavDir.h"
-#include "GCache.h"
 
 /** @name DjVuFile.h
     Files #"DjVuFile.h"# and #"DjVuFile.cpp"# contain implementation of the
@@ -46,7 +45,7 @@
 
     @memo Classes representing DjVu files.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuFile.h,v 1.14 1999-08-25 22:06:34 eaf Exp $#
+    @version #$Id: DjVuFile.h,v 1.15 1999-08-26 19:27:16 eaf Exp $#
 */
 
 //@{
@@ -123,8 +122,7 @@
     for caching, and that's why it supports this procedure. Whenever a
     #DjVuFile# is successfully decoded, it's added to the cache by
     \Ref{DjVuDocument}. Next time somebody needs it, it will be extracted
-    from the cache directly by another #DjVuFile# or \Ref{DjVuDocument}
-    and won't be decoded again.
+    from the cache directly by \Ref{DjVuDocument} and won't be decoded again.
 
     {\bf URLs.} Historically the biggest strain is put on making the decoder
     available for Netscape and IE plugins where the original files reside
@@ -178,8 +176,8 @@ public:
 	  #DjVuFile#s, which include other files.
 
 	  If the file is stored on the hard drive, you may also use the
-	  other constructor and pass it the file's URL, #ZERO# #port# and
-	  #ZERO# #cache#. The #DjVuFile# will read the data itself.
+	  other constructor and pass it the file's URL and #ZERO# #port#.
+	  The #DjVuFile# will read the data itself.
 
 	  If you want to receive error messages and notifications, you
 	  may connect the #DjVuFile# to your own \Ref{DjVuPort} after
@@ -216,12 +214,8 @@ public:
 		 is #ZERO# then #DjVuFile# will create an internal instance
 		 of \Ref{DjVuSimplePort} for accessing local files and
 		 reporting errors. It can later be disabled by means
-		 of \Ref{disable_standard_port}() function.
-	  @param cache Pointer to the cache of files. Before creating
-	         included files (if any) the #DjVuFile# will check the cache
-		 to see if they have already been decoded. */
-   DjVuFile(const GURL & url, DjVuPort * port=0,
-	    GCache<GURL, DjVuFile> * cache=0);
+		 of \Ref{disable_standard_port}() function. */
+   DjVuFile(const GURL & url, DjVuPort * port=0);
    virtual ~DjVuFile(void);
 
       /** Disables the built-in port for accessing local files, which may
@@ -370,14 +364,9 @@ public:
 protected:
    GURL			url;
    GP<DataRange>	data_range;
-   GCache<GURL, DjVuFile> * cache;
 
    GPList<DjVuFile>	inc_files_list;
    GCriticalSection	inc_files_lock;
-
-      // This function will be overriden in DjVuFileEditor
-   virtual GP<DjVuFile>	create_djvu_file(const GURL & url, DjVuPort * port,
-					 GCache<GURL, DjVuFile> * cache);
 private:
    GMonitor		status_mon;
    int			status;

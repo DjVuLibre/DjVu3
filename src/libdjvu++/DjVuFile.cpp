@@ -9,13 +9,14 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.21 1999-08-26 16:56:58 eaf Exp $
+//C- $Id: DjVuFile.cpp,v 1.22 1999-08-26 19:27:16 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
 #endif
 
 #include "DjVuFile.h"
+#include "debug.h"
 
 class ProgressByteStream : public ByteStream
 {
@@ -68,7 +69,7 @@ private:
    ProgressByteStream & operator=(const ProgressByteStream &);
 };
 
-DjVuFile::DjVuFile(ByteStream & str) : cache(0), status(0), simple_port(0)
+DjVuFile::DjVuFile(ByteStream & str) : status(0), simple_port(0)
 {
    DEBUG_MSG("DjVuFile::DjVuFile(): ByteStream constructor\n");
    DEBUG_MAKE_INDENT(3);
@@ -92,9 +93,8 @@ DjVuFile::DjVuFile(ByteStream & str) : cache(0), status(0), simple_port(0)
    data_range->add_trigger(-1, static_trigger_cb, this);
 }
 
-DjVuFile::DjVuFile(const GURL & xurl, DjVuPort * port,
-		   GCache<GURL, DjVuFile> * xcache) :
-      url(xurl), cache(xcache), status(0), simple_port(0)
+DjVuFile::DjVuFile(const GURL & xurl, DjVuPort * port) :
+      url(xurl), status(0), simple_port(0)
 {
    DEBUG_MSG("DjVuFile::DjVuFile(): url='" << url << "'\n");
    DEBUG_MAKE_INDENT(3);
@@ -131,13 +131,6 @@ DjVuFile::~DjVuFile(void)
    stop_decode(1);
 
    if (simple_port) { delete simple_port; simple_port=0; }
-}
-
-GP<DjVuFile>
-DjVuFile::create_djvu_file(const GURL & url, DjVuPort * port,
-			   GCache<GURL, DjVuFile> * cache)
-{
-   return new DjVuFile(url, port, cache);
 }
 
 int
@@ -442,13 +435,13 @@ DjVuFile::process_incl_chunk(ByteStream & str)
       }
       
 	 // No. We have to create a new file
-      GP<DjVuFile> file;
-      if (cache) file=cache->get_item(incl_url);
+      GPBase tmpfile=get_portcaster()->get_cached_file(this, incl_url);
+      GP<DjVuFile> file=(DjVuFile *) tmpfile.get();
       if (!file)
       {
 	 DEBUG_MSG("creating new file\n");
 	 TRY {
-	    file=create_djvu_file(incl_url, this, cache);
+	    file=new DjVuFile(incl_url, this);
 	 } CATCH(exc) {
 	    THROW("Failed to include file '"+incl_url+"'");
 	 } ENDCATCH;
