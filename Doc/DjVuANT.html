@@ -5,7 +5,7 @@
 </HEAD>
 <BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
 
-<H2>class  GMapAreaclass  ByteStreamclass  <A HREF="#DOC.DOCU">DjVuANT</A>: public <!1><A HREF="GPEnabled.html#DOC.1.4.4.1.2">GPEnabled</A></H2>
+<H2>class  GMapAreaclass  ByteStreamclass  <A HREF="#DOC.DOCU">DjVuANT</A>: public <!1><A HREF="GPEnabled.html#DOC.1.4.4.2">GPEnabled</A></H2>
 <BLOCKQUOTE>This class contains some trivial annotations of the page or of the document such as page border color, page alignment, initial zoom and display mode, hyperlinks and highlighted areas.</BLOCKQUOTE>
 <HR>
 
@@ -20,12 +20,69 @@
 <HR>
 
 <DL>
+<P><DL>
+<DT><H3>Public Fields</H3><DD><DT>
+<A HREF="#DOC.1.4.26.1.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>unsigned long int <B>bg_color</B>
+<DD><I>Background color.</I>
+<DT>
+<A HREF="#DOC.1.4.26.1.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>zoom</B>
+<DD><I>Initial zoom.</I>
+<DT>
+<A HREF="#DOC.1.4.26.1.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>mode</B>
+<DD><I>Initial mode.</I>
+<DT>
+<A HREF="#DOC.1.4.26.1.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>hor_align</B>
+<DD><I>Horizontal page alignment.</I>
+<DT>
+<A HREF="#DOC.1.4.26.1.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>ver_align</B>
+<DD><I>Vertical page alignment.</I>
+<DT>
+<A HREF="#DOC.1.4.26.1.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>GPList&lt;<!1><A HREF="GMapArea.html">GMapArea</A>&gt;  <B>map_areas</B>
+<DD><I>List of defined map areas.</I>
+</DL></P>
+
+<P><DL>
+<DT><H3>Public Methods</H3><DD><DT>
+<A HREF="#DOC.1.4.26.1.13"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVuANT.html#DOC.1.4.26.1.12">DjVuANT</A>&gt;  <B>create</B>(void)
+<DD><I>Creates an empty annotation object.</I>
+<DT>
+<A HREF="#DOC.1.4.26.1.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>bool <B>is_empty</B>(void) const 
+<DD><I>Returns TRUE if no features are specified or specified features are not different from default ones </I>
+<DT>
+<A HREF="#DOC.1.4.26.1.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>decode</B>(<!1><A HREF="ByteStream.html">ByteStream</A> &amp;bs)
+<DD><I>Decodes contents of annotation chunk <TT>ANTa</TT>.</I>
+<DT>
+<A HREF="#DOC.1.4.26.1.9"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>merge</B>(<!1><A HREF="ByteStream.html">ByteStream</A> &amp; bs)
+<DD><I>Same as <!1><A HREF="DjVuANT.html#DOC.1.4.26.1.8">decode</A>() but adds the new data to what has been decoded before.</I>
+<DT>
+<A HREF="#DOC.1.4.26.1.10"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>encode</B>(<!1><A HREF="ByteStream.html">ByteStream</A> &amp;bs)
+<DD><I>Encodes the <TT>ANTa</TT> chunk.</I>
+<DT>
+<A HREF="#DOC.1.4.26.1.14"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>GUTF8String <B>encode_raw</B>(void) const 
+<DD><I>Encodes data back into raw annotation data.</I>
+<DT>
+<A HREF="#DOC.1.4.26.1.15"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVuANT.html#DOC.1.4.26.1.12">DjVuANT</A>&gt;  <B>copy</B>(void) const 
+<DD><I>Returns a copy of this object</I>
+<DT>
+<A HREF="#DOC.1.4.26.1.11"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>unsigned int <B>get_memory_usage</B>() const 
+<DD><I>Returns the number of bytes needed by this data structure.</I>
+<DT>
+<A HREF="#DOC.1.4.26.1.16"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   unsigned long int <B>cvt_color</B>(const char * color, unsigned long int def)
+<DD><I>Converts color from string in #RRGGBB notation to an unsigned integer</I>
+</DL></P>
+
+<P><DL>
+<DT><H3>Protected Methods</H3><DD><DT>
+<A HREF="#DOC.1.4.26.1.12"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>DjVuANT</B>(void)
+<DD><I>Constructs an empty annotation object.</I>
+</DL></P>
+
 </DL>
 <HR><H3>Inherited from <A HREF="GPEnabled.html">GPEnabled</A>:</H3>
 <DL>
 <P><DL>
 <DT><H3>Public Methods</H3><DD><DT>
-<IMG ALT="o" SRC=icon2.gif><!1><A HREF="GPEnabled.html#DOC.1.4.4.1.2">GPEnabled</A>&amp; <B>operator=</B>(const <!1><A HREF="GPEnabled.html#DOC.1.4.4.1.2">GPEnabled</A> &amp; obj)
+<IMG ALT="o" SRC=icon2.gif><!1><A HREF="GPEnabled.html#DOC.1.4.4.2">GPEnabled</A>&amp; <B>operator=</B>(const <!1><A HREF="GPEnabled.html#DOC.1.4.4.2">GPEnabled</A> &amp; obj)
 <DT>
 <IMG ALT="o" SRC=icon2.gif>int <B>get_count</B>(void) const 
 </DL></P>
@@ -44,10 +101,121 @@
 document such as page border color, page alignment, initial zoom and
 display mode, hyperlinks and highlighted areas.  All this information is
 put inside a textual chunk <TT>ANTa</TT> in pseudo-lisp format. Decoding and
-encoding are normally done by <!1><A HREF="DjVuANT.html#DOC.1.4.24.1.8">decode</A>() and
-<!1><A HREF="DjVuANT.html#DOC.1.4.24.1.10">encode</A>() functions. </BLOCKQUOTE>
+encoding are normally done by <!1><A HREF="DjVuANT.html#DOC.1.4.26.1.8">decode</A>() and
+<!1><A HREF="DjVuANT.html#DOC.1.4.26.1.10">encode</A>() functions. </BLOCKQUOTE>
 <DL>
-</DL>
+
+<A NAME="DjVuANT">
+<A NAME="DOC.1.4.26.1.12">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> DjVuANT(void)</B></TT>
+<DD>Constructs an empty annotation object.
+<DL><DT><DD></DL><P>
+<A NAME="create">
+<A NAME="DOC.1.4.26.1.13">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVuANT.html#DOC.1.4.26.1.12">DjVuANT</A>&gt;  create(void)</B></TT>
+<DD>Creates an empty annotation object.
+<DL><DT><DD></DL><P>
+<A NAME="bg_color">
+<A NAME="DOC.1.4.26.1.1">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>unsigned long int bg_color</B></TT>
+<DD>Background color. Is in <TT>0x00RRBBGG</TT> format. <TT>0xffffffff</TT> if
+there were no background color records in the annotation chunk. 
+<DL><DT><DD></DL><P>
+<A NAME="zoom">
+<A NAME="DOC.1.4.26.1.2">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int zoom</B></TT>
+<DD>Initial zoom. Possible values are:
+<DL>
+<DT><B>ZOOM_STRETCH</B><DD> the image is stretched to the viewport.
+<DT><B>ZOOM_ONE2ONE</B><DD> the image is displayed pixel-to-pixel.
+<DT><B>ZOOM_WIDTH</B><DD> "Fit width" mode.
+<DT><B>ZOOM_PAGE</B><DD> "Fit page" mode.
+<DT><B>ZOOM_UNSPEC</B><DD> Annotation does not specify a zoom factor.
+</DL> 
+<DL><DT><DD></DL><P>
+<A NAME="mode">
+<A NAME="DOC.1.4.26.1.3">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int mode</B></TT>
+<DD>Initial mode. Possible values are:
+<DL>
+<DT><B>MODE_COLOR</B><DD> color mode.
+<DT><B>MODE_FORE</B><DD> foreground mode.
+<DT><B>MODE_BACK</B><DD> background mode.
+<DT><B>MODE_BW</B><DD> black and white mode.
+<DT><B>MODE_UNSPEC</B><DD> Annotation does not specify a display mode.
+<DT><B>Any positive number</B><DD> Zoom in %. Please note that
+all constants above are either negative or ZERO. Thus
+it's possible to distinguish numerical zoom from those
+special cases.
+</DL> 
+<DL><DT><DD></DL><P>
+<A NAME="hor_align">
+<A NAME="DOC.1.4.26.1.4">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int hor_align</B></TT>
+<DD>Horizontal page alignment. Possible values are <TT>ALIGN_LEFT</TT>,
+<TT>ALIGN_CENTER</TT>, <TT>ALIGN_RIGHT</TT> and <TT>ALIGN_UNSPEC</TT>. 
+<DL><DT><DD></DL><P>
+<A NAME="ver_align">
+<A NAME="DOC.1.4.26.1.5">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int ver_align</B></TT>
+<DD>Vertical page alignment. Possible values are <TT>ALIGN_TOP</TT>,
+<TT>ALIGN_CENTER</TT>, <TT>ALIGN_BOTTOM</TT> and <TT>ALIGN_UNSPEC</TT>. 
+<DL><DT><DD></DL><P>
+<A NAME="map_areas">
+<A NAME="DOC.1.4.26.1.6">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>GPList&lt;<!1><A HREF="GMapArea.html">GMapArea</A>&gt;  map_areas</B></TT>
+<DD>List of defined map areas. They may be just areas of highlighting
+or hyperlink. Please refer to <!1><A HREF="GMapArea.html">GMapArea</A>, <!1><A HREF="GMapRect.html">GMapRect</A>,
+<!1><A HREF="GMapPoly.html">GMapPoly</A> and <!1><A HREF="GMapOval.html">GMapOval</A> for details. 
+<DL><DT><DD></DL><P>
+<A NAME="is_empty">
+<A NAME="DOC.1.4.26.1.7">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>bool is_empty(void) const </B></TT>
+<DD>Returns TRUE if no features are specified or specified features
+are not different from default ones 
+<DL><DT><DD></DL><P>
+<A NAME="decode">
+<A NAME="DOC.1.4.26.1.8">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void decode(<!1><A HREF="ByteStream.html">ByteStream</A> &amp;bs)</B></TT>
+<DD>Decodes contents of annotation chunk <TT>ANTa</TT>. The chunk data is
+read from ByteStream <TT>bs</TT> until reaching an end-of-stream marker.
+This function is normally called after a call to
+<!1><A HREF="IFFByteStream.html#DOC.1.4.15.1.2">get_chunk</A>(). 
+<DL><DT><DD></DL><P>
+<A NAME="merge">
+<A NAME="DOC.1.4.26.1.9">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void merge(<!1><A HREF="ByteStream.html">ByteStream</A> &amp; bs)</B></TT>
+<DD>Same as <!1><A HREF="DjVuANT.html#DOC.1.4.26.1.8">decode</A>() but adds the new data to what has
+been decoded before. 
+<DL><DT><DD></DL><P>
+<A NAME="encode">
+<A NAME="DOC.1.4.26.1.10">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void encode(<!1><A HREF="ByteStream.html">ByteStream</A> &amp;bs)</B></TT>
+<DD>Encodes the <TT>ANTa</TT> chunk. The annotation data is simply written
+into ByteStream <TT>bs</TT> with no IFF header. This function is normally
+called after a call to <!1><A HREF="IFFByteStream.html#DOC.1.4.15.1.3">put_chunk</A>(). 
+<DL><DT><DD></DL><P>
+<A NAME="encode_raw">
+<A NAME="DOC.1.4.26.1.14">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>GUTF8String encode_raw(void) const </B></TT>
+<DD>Encodes data back into raw annotation data.
+<DL><DT><DD></DL><P>
+<A NAME="copy">
+<A NAME="DOC.1.4.26.1.15">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVuANT.html#DOC.1.4.26.1.12">DjVuANT</A>&gt;  copy(void) const </B></TT>
+<DD>Returns a copy of this object
+<DL><DT><DD></DL><P>
+<A NAME="get_memory_usage">
+<A NAME="DOC.1.4.26.1.11">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>unsigned int get_memory_usage() const </B></TT>
+<DD>Returns the number of bytes needed by this data structure. It's
+used by caching routines to estimate the size of a <!1><A HREF="DjVuImage.html">DjVuImage</A>. 
+<DL><DT><DD></DL><P>
+<A NAME="cvt_color">
+<A NAME="DOC.1.4.26.1.16">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static   unsigned long int cvt_color(const char * color, unsigned long int def)</B></TT>
+<DD>Converts color from string in #RRGGBB notation to an unsigned integer
+<DL><DT><DD></DL><P></DL>
 
 <HR><DL><DT><B>This class has no child classes.</B></DL>
 
