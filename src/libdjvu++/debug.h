@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: debug.h,v 1.8 2000-05-19 19:00:06 bcr Exp $
+//C-  $Id: debug.h,v 1.9 2000-06-30 23:32:00 mrosen Exp $
 
 
 #ifndef _DEBUG_H_
@@ -66,7 +66,7 @@
     @memo 
     Macros for printing debug messages.
     @version 
-    #$Id: debug.h,v 1.8 2000-05-19 19:00:06 bcr Exp $#
+    #$Id: debug.h,v 1.9 2000-06-30 23:32:00 mrosen Exp $#
     @author
     Andrew Erofeev <eaf@geocities.com> -- initial implementation \\
     Leon Bottou <leonb@research.att.com> -- cleanups */
@@ -138,14 +138,16 @@ private:
 public:
   DebugIndent(int inc=2);
   ~DebugIndent();
-#define DEBUG_MAKE_INDENT_2(x, y) DebugIndent debug_indent ## y ## (x)
-#define DEBUG_MAKE_INDENT_1(x, y) DEBUG_MAKE_INDENT_2(x, y)
+//#define DEBUG_MAKE_INDENT_2(x, y) DebugIndent debug_indent ## y ## (x)
+//#define DEBUG_MAKE_INDENT_1(x, y) DEBUG_MAKE_INDENT_2(x, y)
+#define DEBUG_MAKE_INDENT_1(x, y) DebugIndent debug_indent ## y ## (x)
 };
 
 // ------------ MAIN MACROS
 
 /** Indents all messages in the current scope. */
 #define DEBUG_MAKE_INDENT(x)     DEBUG_MAKE_INDENT_1(x, __LINE__)
+//#define DEBUG_MAKE_INDENT(x)     
 /** Sets the current debugging level. */
 #define DEBUG_SET_LEVEL(level)   Debug::set_debug_level(level)
 

@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C-  $Id: debug.cpp,v 1.9 2000-05-19 19:00:06 bcr Exp $
+//C-  $Id: debug.cpp,v 1.10 2000-06-30 23:32:01 mrosen Exp $
 
 #include "debug.h"
 
@@ -102,6 +102,7 @@ Debug::set_debug_level(int lvl)
 void
 Debug::set_debug_file(const char *fname)
 {
+#ifndef WIN32
   GCriticalSectionLock glock(&debug_lock);
   if (debug_file && (debug_file != stderr))
     fclose(debug_file);
@@ -110,15 +111,18 @@ Debug::set_debug_file(const char *fname)
     debug_file = fopen(fname, "w");
   if (! debug_file)
     debug_file = stderr;
+#endif
 }
 
 void
 Debug::set_debug_file(FILE * file)
 {
+#ifndef WIN32
   GCriticalSectionLock glock(&debug_lock);
   if (debug_file && (debug_file != stderr))
     fclose(debug_file);
   debug_file = file;
+#endif
 }
 
 void
