@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.107 2000-01-29 23:40:02 eaf Exp $
+//C- $Id: DjVuFile.cpp,v 1.108 2000-01-30 02:41:04 praveen Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -942,8 +942,8 @@ DjVuFile::decode(ByteStream & str)
      REPORT_EOF(true)
 
    // Check file format
-   bool djvi = (chkid=="FORM:DJVI");
-   bool djvu = (chkid=="FORM:DJVU");
+   bool djvi = (chkid=="FORM:DJVI")?true:false;
+   bool djvu = (chkid=="FORM:DJVU")?true:false;
    bool iw44 = ((chkid=="FORM:PM44") || (chkid=="FORM:BM44"));
    if (djvi || djvu)
      mimetype = "image/djvu";

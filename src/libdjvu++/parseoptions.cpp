@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: parseoptions.cpp,v 1.31 2000-01-30 00:07:47 bcr Exp $
+//C- $Id: parseoptions.cpp,v 1.32 2000-01-30 02:41:05 praveen Exp $
 #ifdef __GNUC__
 #pragma implementation
 #endif
@@ -177,8 +177,8 @@ DjVuParseOptions::DjVuParseOptions(const char prog[])
   }
   name[i]=0;
 #ifdef  WIN32
-  if(namelen > 4 && !strcasecmp(name+namelen-4,".exe"))
-    name[namelen-4]=0;
+//  if(namelen > 4 && (!strcmp(name+namelen-4,".exe") || !strcmp(name+namelen-4,".EXE")))
+//    name[namelen-4]=0;
 #endif
   currentProfile=ReadConfig(name);
 }

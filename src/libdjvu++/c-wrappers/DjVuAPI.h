@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuAPI.h,v 1.31 2000-01-30 01:18:42 bcr Exp $
+ *C- $Id: DjVuAPI.h,v 1.32 2000-01-30 02:41:04 praveen Exp $
  *
  * The main header file for the DjVu API
  */
@@ -17,7 +17,10 @@
 
 /* 
  * $Log: DjVuAPI.h,v $
- * Revision 1.31  2000-01-30 01:18:42  bcr
+ * Revision 1.32  2000-01-30 02:41:04  praveen
+ * updated and fixed bugs
+ *
+ * Revision 1.31  2000/01/30 01:18:42  bcr
  * Added import and export streams to the Process options.
  *
  * Revision 1.30  2000/01/27 20:36:18  haffner
@@ -525,7 +528,7 @@ typedef struct _djvu_image_priv * djvu_image_priv;
 
                // This is just a simple constructor that zeros the values.
              inline djvu_image_struct::djvu_image_struct()
-             : type(DJVU_UNKNOWN),orientation(0),w(0),h(0),pixsize(0),
+             : type(DJVU_UNKNOWN),orientation(0),w(0),h(0),pixsize(0), rowsize(0),
                datasize(0),xdpi(0),ydpi(0),data(0),start_alloc(0),priv(0) {}
                // Gets the width using bottom up coordinates.
              inline int djvu_image_struct::get_width(void) const
