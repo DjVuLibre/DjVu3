@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.10 1999-06-15 19:07:10 eaf Exp $
+//C- $Id: DjVuFile.cpp,v 1.11 1999-06-30 20:49:25 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -1415,6 +1415,8 @@ DjVuFile::add_djvu_data(IFFByteStream & ostr, GMap<GURL, void *> & map,
 
    ByteStream * str=0;
 
+   bool have_anta=contains_chunk("ANTa");
+   
    TRY {
       str=data_range->get_stream();
       int chksize;
@@ -1424,14 +1426,15 @@ DjVuFile::add_djvu_data(IFFByteStream & ostr, GMap<GURL, void *> & map,
         THROW("EOF");
 
       if (top_level) ostr.put_chunk(chkid);
-      
+
+      int chunk_num=0;
       while((chksize=iff.get_chunk(chkid)))
       {
 	 if ((chkid=="INCL" || chkid=="INCF") && included_too)
 	 {
 	    GP<DjVuFile> file=process_incl_chunk(iff, chkid=="INCL");
 	    if (file) file->add_djvu_data(ostr, map, included_too, no_ndir);
-	 } else if (chkid=="ANTa" && anno)
+	 } else if (chkid=="ANTa" && anno && !anno->is_empty())
 	 {
 	    ostr.put_chunk(chkid);
 	    anno->encode(ostr);
@@ -1451,6 +1454,15 @@ DjVuFile::add_djvu_data(IFFByteStream & ostr, GMap<GURL, void *> & map,
 	    ostr.close_chunk();
 	 }
 	 iff.close_chunk();
+
+	 if (!have_anta && chunk_num==0 &&
+	     anno && !anno->is_empty())
+	 {
+	    ostr.put_chunk("ANTa");
+	    anno->encode(ostr);
+	    ostr.close_chunk();
+	 }
+	 chunk_num++;
       }
 
       if (top_level) ostr.close_chunk();
