@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: DjVmDir.cpp,v 1.25 2000-10-06 21:47:21 fcrary Exp $
+//C- $Id: DjVmDir.cpp,v 1.26 2000-11-02 00:03:46 bcr Exp $
 
 
 #ifdef __GNUC__
@@ -122,10 +122,14 @@ DjVmDir::decode(ByteStream & str)
 	 if (bundled)
 	 {
 	    file->offset=str.read32();
-	    if (ver==0) file->size=str.read24();
+	    if (ver==0)
+              file->size=str.read24();
 	    if (file->offset==0)
 	       G_THROW("DjVmDir.no_indirect");    //  Directory error: no indirect entries allowed in bundled document.
-	 } else file->offset=file->size=0;
+	 } else
+         {
+           file->offset=file->size=0;
+         }
       }
 
       BSByteStream bs_str(str);
@@ -140,7 +144,7 @@ DjVmDir::decode(ByteStream & str)
       for(pos=files_list;pos;++pos)
 	 files_list[pos]->flags=bs_str.read8();
 
-      if (ver==0)
+      if (!ver)
       {
 	 DEBUG_MSG("converting flags from version 0...\n");
 	 for(pos=files_list;pos;++pos)
@@ -148,8 +152,10 @@ DjVmDir::decode(ByteStream & str)
 	    unsigned char flags_0=files_list[pos]->flags;
 	    unsigned char flags_1;
 	    flags_1=(flags_0 & File::IS_PAGE_0) ? File::PAGE : File::INCLUDE;
-	    if (flags_0 & File::HAS_NAME_0) flags_1|=File::HAS_NAME;
-	    if (flags_0 & File::HAS_TITLE_0) flags_1|=File::HAS_TITLE;
+	    if (flags_0 & File::HAS_NAME_0)
+              flags_1|=File::HAS_NAME;
+	    if (flags_0 & File::HAS_TITLE_0)
+              flags_1|=File::HAS_TITLE;
 	    files_list[pos]->flags=flags_1;
 	 }
       }
@@ -195,10 +201,14 @@ DjVmDir::decode(ByteStream & str)
 	 // Check that there is only one file with SHARED_ANNO flag on
       int shared_anno_cnt=0;
       for(pos=files_list;pos;++pos)
+      {
 	 if (files_list[pos]->is_shared_anno())
+         {
 	    shared_anno_cnt++;
+         }
+      }
       if (shared_anno_cnt>1)
-	      G_THROW("DjVmDir.corrupt");      //  DjVu document is corrupt. There may be only one file
+        G_THROW("DjVmDir.corrupt");      //  DjVu document is corrupt. There may be only one file
 	                                       //  with shared annotations in a multipage document.
 
 	 // Now generate page=>file array for direct access
@@ -271,8 +281,10 @@ DjVmDir::encode(ByteStream & str) const
 	 // Check that there is only one file with shared annotations
       int shared_anno_cnt=0;
       for(pos=files_list;pos;++pos)
+      {
 	 if (files_list[pos]->is_shared_anno())
 	    shared_anno_cnt++;
+      }
       if (shared_anno_cnt>1)
 	 G_THROW("DjVmDir.multi_save");       //  Cannot save a multipage document containing
                                         //  more than one file with shared annotations.
@@ -287,7 +299,7 @@ DjVmDir::encode(ByteStream & str) const
 	       for(pos=files_list;pos;++pos)
 	       {
 	          GP<File> file=files_list[pos];
-	          if (bundled ^ (file->offset!=0))
+	          if (!file->offset)
 	             G_THROW("DjVmDir.bad_dir");      //  The directory contains both indirect and bundled records.
 	          str.write32(file->offset);
 	       }
@@ -298,7 +310,7 @@ DjVmDir::encode(ByteStream & str) const
       for(pos=files_list;pos;++pos)
       {
 	 GP<File> file=files_list[pos];
-	 if (bundled ^ (file->offset!=0))
+	 if ((file->offset)?bundled:(!bundled))
 	    G_THROW("DjVmDir.bad_dir");               //  The directory contains both indirect and bundled records.
 	 bs_str.write24(file->size);
       }
@@ -307,10 +319,14 @@ DjVmDir::encode(ByteStream & str) const
       for(pos=files_list;pos;++pos)
       {
 	 GP<File> file=files_list[pos];
-	 if (file->name!=file->id) file->flags|=File::HAS_NAME;
-	 else file->flags&=~File::HAS_NAME;
-	 if (file->title!=file->id) file->flags|=File::HAS_TITLE;
-	 else file->flags&=~File::HAS_TITLE;
+	 if (file->name!=file->id)
+           file->flags|=File::HAS_NAME;
+	 else
+           file->flags&=~File::HAS_NAME;
+	 if (file->title!=file->id)
+           file->flags|=File::HAS_TITLE;
+	 else
+           file->flags&=~File::HAS_TITLE;
 	 bs_str.write8(file->flags);
       }
 
@@ -334,8 +350,7 @@ DjVmDir::page_to_file(int page_num) const
 {
    GCriticalSectionLock lock((GCriticalSection *) &class_lock);
 
-   if (page_num<page2file.size()) return page2file[page_num];
-   else return 0;
+   return (page_num<page2file.size())?page2file[page_num]:0;
 }
 
 GP<DjVmDir::File>
@@ -344,8 +359,7 @@ DjVmDir::name_to_file(const GString & name) const
    GCriticalSectionLock lock((GCriticalSection *) &class_lock);
 
    GPosition pos;
-   if (name2file.contains(name, pos)) return name2file[pos];
-   else return 0;
+   return (name2file.contains(name, pos))?name2file[pos]:0;
 }
 
 GP<DjVmDir::File>
@@ -354,8 +368,7 @@ DjVmDir::id_to_file(const char * id) const
    GCriticalSectionLock lock((GCriticalSection *) &class_lock);
 
    GPosition pos;
-   if (id2file.contains(id, pos)) return id2file[pos];
-   else return 0;
+   return (id2file.contains(id, pos))?id2file[pos]:0;
 }
 
 GP<DjVmDir::File>
@@ -364,8 +377,7 @@ DjVmDir::title_to_file(const char * title) const
    GCriticalSectionLock lock((GCriticalSection *) &class_lock);
 
    GPosition pos;
-   if (title2file.contains(title, pos)) return title2file[pos];
-   else return 0;
+   return (title2file.contains(title, pos))?title2file[pos]:0;
 }
 
 GPList<DjVmDir::File>
@@ -396,10 +408,8 @@ DjVmDir::get_file_pos(const File * f) const
    GCriticalSectionLock lock((GCriticalSection *) &class_lock);
    int cnt;
    GPosition pos;
-   for(pos=files_list, cnt=0;pos;++pos, cnt++)
-      if (files_list[pos]==f) break;
-   if (pos) return cnt;
-   else return -1;
+   for(pos=files_list, cnt=0;pos&&(files_list[pos]!=f);++pos, cnt++);
+   return (pos)?cnt:(-1);
 }
 
 int
@@ -408,8 +418,7 @@ DjVmDir::get_page_pos(int page_num) const
    GCriticalSectionLock lock((GCriticalSection *) &class_lock);
    
    GP<File> file=page_to_file(page_num);
-   if (file) return get_file_pos(file);
-   else return -1;
+   return (file)?get_file_pos(file):(-1);
 }
 
 GP<DjVmDir::File>
@@ -438,7 +447,8 @@ DjVmDir::insert_file(const GP<File> & file, int pos_num)
    
    GCriticalSectionLock lock((GCriticalSection *) &class_lock);
    
-   if (pos_num<0) pos_num=files_list.size();
+   if (pos_num<0)
+     pos_num=files_list.size();
 
       // Modify maps
    if (! File::is_legal_id(file->id))
@@ -468,10 +478,11 @@ DjVmDir::insert_file(const GP<File> & file, int pos_num)
       // Add the file to the list
    int cnt;
    GPosition pos;
-   for(pos=files_list, cnt=0;pos;++pos, cnt++)
-      if (cnt==pos_num) break;
-   if (pos) files_list.insert_before(pos, file);
-   else files_list.append(file);
+   for(pos=files_list, cnt=0;pos&&(cnt!=pos_num);++pos, cnt++);
+   if (pos)
+     files_list.insert_before(pos, file);
+   else
+     files_list.append(file);
 
    if (file->is_page())
    {
@@ -480,9 +491,11 @@ DjVmDir::insert_file(const GP<File> & file, int pos_num)
       int page_num=0;
       for(pos=files_list;pos;++pos)
       {
-	 GP<File> & f=files_list[pos];
-	 if (f==file) break;
-	 if (f->is_page()) page_num++;
+	 GP<File> &f=files_list[pos];
+	 if (f==file)
+           break;
+	 if (f->is_page())
+           page_num++;
       }
 
       int i;
@@ -512,7 +525,9 @@ DjVmDir::delete_file(const char * id)
 	 id2file.del(f->id);
 	 title2file.del(f->title);
 	 if (f->is_page())
+         {
 	    for(int page=0;page<page2file.size();page++)
+            {
 	       if (page2file[page]==f)
 	       {
 		  int i;
@@ -523,6 +538,8 @@ DjVmDir::delete_file(const char * id)
 		     page2file[i]->page_num=i;
 		  break;
 	       }
+            }
+         }
 	 files_list.del(pos);
 	 break;
       }
@@ -544,7 +561,7 @@ DjVmDir::set_file_name(const char * id, const char * name)
    {
       GP<File> file=files_list[pos];
       if (file->id!=id && file->name==name)
-	       G_THROW("DjVmDir.name_in_use\t" + GString(name));   //  Name 'xxx' is already in use");
+        G_THROW("DjVmDir.name_in_use\t" + GString(name));   //  Name 'xxx' is already in use");
    }
 
       // Check if ID is valid
@@ -571,7 +588,7 @@ DjVmDir::set_file_title(const char * id, const char * title)
    {
       GP<File> file=files_list[pos];
       if (file->id!=id && file->title==title)
-	 G_THROW("DjVmDir.title_in_use\t" + GString(title));  //  Title 'xxx' is already in use
+        G_THROW("DjVmDir.title_in_use\t" + GString(title));  //  Title 'xxx' is already in use
    }
 
       // Check if ID is valid
