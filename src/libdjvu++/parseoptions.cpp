@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: parseoptions.cpp,v 1.62 2000-11-14 23:55:37 fcrary Exp $
+// $Id: parseoptions.cpp,v 1.63 2000-11-17 19:34:18 mrosen Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -542,10 +542,7 @@ DjVuParseOptions::GetInteger(
         retval=errval;
       }
     }
-  } else
-  {
-    Errors->AddError("parseoptions.null_value");
-  }
+  } 
   return retval;
 }
 
@@ -575,9 +572,6 @@ DjVuParseOptions::GetNumber(
       Errors->AddError(GString("parseoptions.bad_number\t") + str);
       retval=errval;
     }
-  }else
-  {
-    Errors->AddError("parseoptions.null_number");
   }
   return retval;
 }
