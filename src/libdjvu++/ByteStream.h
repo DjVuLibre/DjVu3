@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: ByteStream.h,v 1.10.4.1 1999-04-06 21:20:05 eaf Exp $
+//C- $Id: ByteStream.h,v 1.10.4.2 1999-04-07 22:03:15 eaf Exp $
 
 
 #ifndef _BYTESTREAM_H
@@ -41,7 +41,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation\\
     Andrei Erofeev <eaf@research.att.com> -- 
     @version
-    #$Id: ByteStream.h,v 1.10.4.1 1999-04-06 21:20:05 eaf Exp $# */
+    #$Id: ByteStream.h,v 1.10.4.2 1999-04-07 22:03:15 eaf Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -54,6 +54,7 @@
 #include <string.h>
 #include "GException.h"
 #include "GContainer.h"
+#include "Arrays.h"
 #include "GSmartPointer.h"
 
 
@@ -271,6 +272,8 @@ public:
       used to read (as in #mbs[n]#) or modify (as in #mbs[n]=c#) the contents
       of the buffer. */
   char &operator[] (int n);
+  /** Copies all internal data into \Ref{TArray} and returns it */
+  TArray<char> get_data(void);
 private:
   // Cancel C++ default stuff
   MemoryByteStream(const MemoryByteStream &);
