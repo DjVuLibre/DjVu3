@@ -1,3 +1,4 @@
+/*
 //C-  -*- C++ -*-
 //C- DjVu® Reference Library (v. 3.0)
 //C- 
@@ -30,14 +31,17 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessage.h,v 1.11 2001-03-13 01:34:50 bcr Exp $
+// $Id: DjVuMessage.h,v 1.12 2001-03-31 01:18:11 fcrary Exp $
 // $Name:  $
-
+*/
 
 
 
 #ifndef __DJVU_MESSAGE_H__
 #define __DJVU_MESSAGE_H__
+
+
+#ifdef __cplusplus
 
 #include "GString.h"
 // class DjVuParseOptions;
@@ -136,5 +140,20 @@ private:
 //  object is in DjVuMessage.cpp).
 // extern DjVuMessage  DjVuMsg;
 #define DjVuMsg DjVuMessage::get_DjVuMessage()
+
+#endif /* __cplusplus */
+
+
+/*
+//  A C function to perform a message lookup. Arguments are a buffer to received the
+//  translated message, a buffer size (bytes), and a message_list. The translated
+//  result is returned in msg_buffer encoded in UTF-8. In case of error, msg_buffer is
+//  empty (i.e., msg_buffer[0] == '\0').
+*/
+#ifdef __cplusplus
+extern "C" 
+#endif
+  void DjVuMessage_LookUp( char *msg_buffer, const unsigned int buffer_size, const char *message ); 
+
 
 #endif /* __DJVU_MESSAGE_H__ */

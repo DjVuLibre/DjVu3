@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessage.cpp,v 1.24 2001-03-30 23:31:29 bcr Exp $
+// $Id: DjVuMessage.cpp,v 1.25 2001-03-31 01:18:11 fcrary Exp $
 // $Name:  $
 
 
@@ -301,6 +301,7 @@ parse (GMap<GString,GP<lt_XMLTags> > &retval)
 }
 #endif
 
+
 //  There is only object of class DjVuMessage in a program, and here it is:
 //DjVuMessage  DjVuMsg;
 const DjVuMessage &
@@ -515,5 +516,19 @@ DjVuMessage::InsertArg( GString &message, int ArgId, GString arg ) const
     //  Not found, fake it
     message += GString("\n\tParameter ") + GString(ArgId) + ":  " + arg;
   }
+}
+
+
+//  A C function to perform a message lookup. Arguments are a buffer to received the
+//  translated message, a buffer size (bytes), and a message_list. The translated
+//  result is returned in msg_buffer encoded in UTF-8. In case of error, msg_buffer is
+//  empty (i.e., msg_buffer[0] == '\0').
+void DjVuMessage_LookUp( char *msg_buffer, const unsigned int buffer_size, const char *message )
+{
+  GString converted = DjVuMessage::get_DjVuMessage().LookUp( message );
+  if( converted.length() >= buffer_size )
+    msg_buffer[0] = '\0';
+  else
+    strcpy( msg_buffer, converted );
 }
 
