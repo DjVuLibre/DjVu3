@@ -26,7 +26,7 @@
 #C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 #C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 #
-# $Id: configure,v 1.36 2000-11-02 07:27:12 bcr Exp $
+# $Id: configure,v 1.37 2000-11-02 08:15:33 bcr Exp $
 # $Name:  $
 
 #!/bin/ksh
@@ -82,6 +82,11 @@ do
       ;;
    esac
 done
+
+if [ ! -d "$TOPSRCDIR/src/3rd-party/libjpeg" ] 
+then
+  without_jpeg=true
+fi
 
 if [ -z "$without_jpeg" ] 
 then

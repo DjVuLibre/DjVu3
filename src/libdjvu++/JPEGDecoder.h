@@ -25,7 +25,7 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: JPEGDecoder.h,v 1.8 2000-11-02 01:08:35 bcr Exp $
+// $Id: JPEGDecoder.h,v 1.9 2000-11-02 08:15:33 bcr Exp $
 // $Name:  $
 
 
@@ -44,9 +44,9 @@
 extern "C" {
 #endif
 
-#include "jinclude.h"
-#include "jpeglib.h"
-#include "jerror.h"
+#include <jinclude.h>
+#include <jpeglib.h>
+#include <jerror.h>
 
 #ifdef __cplusplus
 }
@@ -61,7 +61,7 @@ extern "C" {
     @memo
     Decoding interface to the IJG JPEG library.
     @version
-    #$Id: JPEGDecoder.h,v 1.8 2000-11-02 01:08:35 bcr Exp $#
+    #$Id: JPEGDecoder.h,v 1.9 2000-11-02 08:15:33 bcr Exp $#
     @author
     Parag Deshmukh <parag@sanskrit.lz.att.com> 
 */
