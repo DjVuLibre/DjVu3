@@ -30,8 +30,12 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: debug.cpp,v 1.17 2001-01-04 22:04:55 bcr Exp $
+// $Id: debug.cpp,v 1.18 2001-01-25 20:09:04 bcr Exp $
 // $Name:  $
+
+#ifdef NO_DEBUG
+#undef NO_DEBUG
+#endif
 
 #include "debug.h"
 #include "GString.h"
@@ -70,19 +74,19 @@ static int              debug_file_count;
 #endif
 
 #if THREADMODEL==NOTHREADS
-static Debug debug_obj;
+static DjVuDebug debug_obj;
 #else
-static GMap<long, Debug> debug_map;
+static GMap<long, DjVuDebug> debug_map;
 #endif
 
-Debug::Debug()
+DjVuDebug::DjVuDebug()
   : block(0), indent(0)
 {
   id = debug_id++;
   set_debug_file(stderr);
 }
 
-Debug::~Debug()
+DjVuDebug::~DjVuDebug()
 {
 #ifdef UNIX
   if (--debug_file_count == 0)
@@ -95,7 +99,7 @@ Debug::~Debug()
 }
 
 void   
-Debug::format(const char *fmt, ... )
+DjVuDebug::format(const char *fmt, ... )
 {
   if (! block)
     {
@@ -117,13 +121,13 @@ Debug::format(const char *fmt, ... )
 }
 
 void   
-Debug::set_debug_level(int lvl)
+DjVuDebug::set_debug_level(int lvl)
 {
   debug_level = lvl;
 }
 
 void
-Debug::set_debug_file(const char *fname)
+DjVuDebug::set_debug_file(const char *fname)
 {
 #ifdef UNIX
   GCriticalSectionLock glock(&debug_lock);
@@ -138,7 +142,7 @@ Debug::set_debug_file(const char *fname)
 }
 
 void
-Debug::set_debug_file(FILE * file)
+DjVuDebug::set_debug_file(FILE * file)
 {
 #ifdef UNIX
   GCriticalSectionLock glock(&debug_lock);
@@ -149,24 +153,24 @@ Debug::set_debug_file(FILE * file)
 }
 
 void
-Debug::modify_indent(int rindent)
+DjVuDebug::modify_indent(int rindent)
 {
   indent += rindent;
 }
 
-Debug& 
-Debug::lock(int lvl, int noindent)
+DjVuDebug& 
+DjVuDebug::lock(int lvl, int noindent)
 {
   int threads_num=1;
   debug_lock.lock();
   // Find Debug object
 #if THREADMODEL==NOTHREADS
   // Get no-threads debug object
-  Debug &dbg = debug_obj;
+  DjVuDebug &dbg = debug_obj;
 #else
   // Get per-thread debug object
   long threadid = (long) GThread::current();
-  Debug &dbg = debug_map[threadid];
+  DjVuDebug &dbg = debug_map[threadid];
   threads_num=debug_map.size();
 #endif
   // Check level
@@ -195,16 +199,16 @@ Debug::lock(int lvl, int noindent)
 }
 
 void
-Debug::unlock()
+DjVuDebug::unlock()
 {
   debug_lock.unlock();
 }
 
 #define OP(type, fmt) \
-Debug& Debug::operator<<(type arg)\
+DjVuDebug& DjVuDebug::operator<<(type arg)\
 { format(fmt, arg); return *this; }
 
-Debug& Debug::operator<<(bool arg)
+DjVuDebug& DjVuDebug::operator<<(bool arg)
 {
    format("%s", arg ? "TRUE" : "FALSE"); return *this;
 }
@@ -221,7 +225,7 @@ OP(float, "%g")
 OP(double, "%g")
 OP(const void * const, "0x%08x")
 
-Debug& Debug::operator<<(const char * const ptr) 
+DjVuDebug& DjVuDebug::operator<<(const char * const ptr) 
 {
   char buffer[256];
   const char *s = ptr;
@@ -237,22 +241,22 @@ Debug& Debug::operator<<(const char * const ptr)
   return *this; 
 }
 
-Debug& Debug::operator<<(const unsigned char * const ptr) 
+DjVuDebug& DjVuDebug::operator<<(const unsigned char * const ptr) 
 { 
   return operator<<( (const char *) ptr );
 }
 
-DebugIndent::DebugIndent(int inc)
+DjVuDebugIndent::DjVuDebugIndent(int inc)
   : inc(inc)
 {
-  Debug &dbg = Debug::lock(0,1);
+  DjVuDebug &dbg = DjVuDebug::lock(0,1);
   dbg.modify_indent(inc);
   dbg.unlock();
 }
 
-DebugIndent::~DebugIndent()
+DjVuDebugIndent::~DjVuDebugIndent()
 {
-  Debug &dbg = Debug::lock(0,1);
+  DjVuDebug &dbg = DjVuDebug::lock(0,1);
   dbg.modify_indent(-inc);
   dbg.unlock();
 }

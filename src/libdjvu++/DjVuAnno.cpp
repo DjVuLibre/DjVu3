@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuAnno.cpp,v 1.65 2001-01-04 22:04:54 bcr Exp $
+// $Id: DjVuAnno.cpp,v 1.66 2001-01-25 20:09:04 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -1020,7 +1020,7 @@ DjVuAnno::encode(ByteStream &bs)
   IFFByteStream iff(bs);
   if (ant)
     {
-#ifdef DEBUG
+#ifndef NO_DEBUG
       iff.put_chunk("ANTa");
       ant->encode(iff);
       iff.close_chunk();

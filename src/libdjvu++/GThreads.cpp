@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GThreads.cpp,v 1.57 2001-01-10 19:45:51 bcr Exp $
+// $Id: GThreads.cpp,v 1.58 2001-01-25 20:09:04 bcr Exp $
 // $Name:  $
 
 
@@ -64,8 +64,10 @@
 #endif // THREADMODEL!=NOTHREADS
 
 #ifndef _DEBUG
-#if defined(DEBUG) || defined(DEBUGLVL)
-#define _DEBUG
+#if defined(DEBUG) 
+#define _DEBUG /* */
+#elif DEBUGLVL >= 1
+#define _DEBUG /* */
 #endif
 #endif
 

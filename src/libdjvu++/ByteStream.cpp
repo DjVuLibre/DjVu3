@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.cpp,v 1.41 2001-01-04 22:04:54 bcr Exp $
+// $Id: ByteStream.cpp,v 1.42 2001-01-25 20:09:04 bcr Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 04/1997
@@ -63,30 +63,48 @@ ByteStream::seek(long offset, int whence, bool nothrow)
   int ncurrent = tell();
   switch (whence)
     {
-    case SEEK_SET: nwhere=0; break;
-    case SEEK_CUR: nwhere=ncurrent; break;
-    case SEEK_END: nwhere=ncurrent-offset-1; break;
-    default: G_THROW("ByteStream.bad_arg");       //  Illegal argument in ByteStream::seek
+    case SEEK_SET:
+      nwhere=0; break;
+    case SEEK_CUR:
+      nwhere=ncurrent; break;
+    case SEEK_END: 
+    {
+      if(offset)
+      {
+        if (nothrow)
+          return -1;
+        G_THROW("ByteStream.backwards");
+      }
+      char buffer[1024];
+      int bytes;
+      while((bytes=read(buffer, sizeof(buffer))))
+        EMPTY_LOOP;
+      return 0;
+    }
+    default:
+      G_THROW("ByteStream.bad_arg");       //  Illegal argument in ByteStream::seek
     }
   nwhere += offset;
   if (nwhere < ncurrent) 
-    {
-      if (nothrow) return -1;
-      G_THROW("ByteStream.backward");             //  Seeking backwards is not supported by this ByteStream
-    }
+  {
+    //  Seeking backwards is not supported by this ByteStream
+    if (nothrow)
+      return -1;
+    G_THROW("ByteStream.backward");
+  }
   while (nwhere>ncurrent)
-    {
-      char buffer[512];
-      int bytes = sizeof(buffer);
-      if (ncurrent + bytes > nwhere)
-        bytes = nwhere - ncurrent;
-      bytes = read(buffer, bytes);
-      ncurrent += bytes;
-      if (ncurrent!=tell())
-        G_THROW("ByteStream.seek");               //  Seeking works funny on this ByteStream (ftell() acts strange)
-      if (bytes==0)
-        G_THROW("EOF");
-    }
+  {
+    char buffer[1024];
+    const int xbytes=(ncurrent+(int)sizeof(buffer)>nwhere)
+      ?(nwhere - ncurrent):(int)sizeof(buffer);
+    const int bytes = read(buffer, xbytes);
+    ncurrent += bytes;
+    if (!bytes)
+      G_THROW("EOF");
+    //  Seeking works funny on this ByteStream (ftell() acts strange)
+    if (ncurrent!=tell())
+      G_THROW("ByteStream.seek");
+  }
   return 0;
 }
 

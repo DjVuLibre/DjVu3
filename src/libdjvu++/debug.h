@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: debug.h,v 1.15 2001-01-04 22:04:55 bcr Exp $
+// $Id: debug.h,v 1.16 2001-01-25 20:09:04 bcr Exp $
 // $Name:  $
 
 #ifndef _DEBUG_H_
@@ -79,7 +79,7 @@
     user specifies option #-debug# in the command line. Usage of
     #RUNTIME_DEBUG_ONLY# implies #DEBUGLVL=1# if not specified otherwise.
 
-    Finally, #-DDEBUG# can be used instead of #-DDEBUGLVL=1#.
+    Finally, #-DNO_DEBUG# can be used instead of #-DDEBUGLVL=0#.
 
     {\bf Historical Comment} --- Debug macros are rarely used in the reference
     DjVu library because Leon thinks that debugging messages unnecessarily
@@ -92,37 +92,34 @@
     @memo 
     Macros for printing debug messages.
     @version 
-    #$Id: debug.h,v 1.15 2001-01-04 22:04:55 bcr Exp $#
+    #$Id: debug.h,v 1.16 2001-01-25 20:09:04 bcr Exp $#
     @author
     Andrew Erofeev <eaf@geocities.com> -- initial implementation \\
     Leon Bottou <leonb@research.att.com> -- cleanups */
 //@{
 
 #ifdef RUNTIME_DEBUG_ONLY
-#ifndef DEBUG
-#define DEBUG
+#ifdef NO_DEBUG
+#undef NO_DEBUG
 #endif
 #endif
 
 #ifndef DEBUGLVL
-#ifdef DEBUG
+#ifndef NO_DEBUG
 #define DEBUGLVL 1
-#endif
-#endif
-
-#ifndef DEBUGLVL
+#else
 #define DEBUGLVL 0
+#endif
 #endif
 
 #if DEBUGLVL >= 1
-
-#ifndef DEBUG
-#define DEBUG
+#ifdef NO_DEBUG
+#undef NO_DEBUG
 #endif
 
 // ------------ SUPPORT
 
-class Debug // DJVU_CLASS
+class DjVuDebug // DJVU_CLASS
 {
 private:
   int    id;
@@ -131,42 +128,42 @@ private:
   void   format(const char *fmt, ... );
 public:
   // construction
-  Debug();
-  ~Debug();
+  DjVuDebug();
+  ~DjVuDebug();
   // access
   static void   set_debug_level(int lvl);
   static void   set_debug_file(const char *fname);
   static void	set_debug_file(FILE * file);
   void          modify_indent(int rindent);
-  static Debug& lock(int lvl, int noindent);
+  static DjVuDebug& lock(int lvl, int noindent);
   void          unlock();
   // printing
-  Debug &	operator<<(bool b);
-  Debug &	operator<<(char c);
-  Debug &	operator<<(unsigned char c);
-  Debug &	operator<<(int i);
-  Debug &	operator<<(unsigned int i);
-  Debug &	operator<<(short int i);
-  Debug &	operator<<(unsigned short int i);
-  Debug &	operator<<(long i);
-  Debug &	operator<<(unsigned long i);
-  Debug &	operator<<(const char * const ptr);
-  Debug &	operator<<(const unsigned char * const ptr);
-  Debug &	operator<<(float f);
-  Debug &	operator<<(double d);
-  Debug &	operator<<(const void * const p);
+  DjVuDebug &	operator<<(bool b);
+  DjVuDebug &	operator<<(char c);
+  DjVuDebug &	operator<<(unsigned char c);
+  DjVuDebug &	operator<<(int i);
+  DjVuDebug &	operator<<(unsigned int i);
+  DjVuDebug &	operator<<(short int i);
+  DjVuDebug &	operator<<(unsigned short int i);
+  DjVuDebug &	operator<<(long i);
+  DjVuDebug &	operator<<(unsigned long i);
+  DjVuDebug &	operator<<(const char * const ptr);
+  DjVuDebug &	operator<<(const unsigned char * const ptr);
+  DjVuDebug &	operator<<(float f);
+  DjVuDebug &	operator<<(double d);
+  DjVuDebug &	operator<<(const void * const p);
 };
 
-class DebugIndent // DJVU_CLASS
+class DjVuDebugIndent // DJVU_CLASS
 {
 private:
   int inc;
 public:
-  DebugIndent(int inc=2);
-  ~DebugIndent();
-//#define DEBUG_MAKE_INDENT_2(x, y) DebugIndent debug_indent ## y ## (x)
+  DjVuDebugIndent(int inc=2);
+  ~DjVuDebugIndent();
+//#define DEBUG_MAKE_INDENT_2(x, y) DjVuDebugIndent debug_indent ## y ## (x)
 //#define DEBUG_MAKE_INDENT_1(x, y) DEBUG_MAKE_INDENT_2(x, y)
-#define DEBUG_MAKE_INDENT_1(x, y) DebugIndent debug_indent ## y ## (x)
+#define DEBUG_MAKE_INDENT_1(x, y) DjVuDebugIndent debug_indent ## y ## (x)
 };
 
 // ------------ MAIN MACROS
@@ -174,11 +171,11 @@ public:
 /** Indents all messages in the current scope. */
 #define DEBUG_MAKE_INDENT(x)     DEBUG_MAKE_INDENT_1(x, __LINE__)
 /** Sets the current debugging level. */
-#define DEBUG_SET_LEVEL(level)   Debug::set_debug_level(level)
+#define DEBUG_SET_LEVEL(level)   DjVuDebug::set_debug_level(level)
 
-#define DEBUG_MSG_LVL(level,x)   { ( Debug::lock(level,0) << x ).unlock(); }
-#define DEBUG_MSGN_LVL(level,x)  { ( Debug::lock(level,1) << x ).unlock(); }
-#define DEBUG_MSGF_LVL(level,x)  { ( Debug::lock(level,1) << x ).unlock(); }
+#define DEBUG_MSG_LVL(level,x)   { ( DjVuDebug::lock(level,0) << x ).unlock(); }
+#define DEBUG_MSGN_LVL(level,x)  { ( DjVuDebug::lock(level,1) << x ).unlock(); }
+#define DEBUG_MSGF_LVL(level,x)  { ( DjVuDebug::lock(level,1) << x ).unlock(); }
 
 #else /* DEBUGLVL <= 0 */
 

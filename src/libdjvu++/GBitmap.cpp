@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GBitmap.cpp,v 1.47 2001-01-10 21:09:07 bcr Exp $
+// $Id: GBitmap.cpp,v 1.48 2001-01-25 20:09:04 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -45,7 +45,7 @@
 #include "GException.h"
 #include <string.h>
 
-// File "$Id: GBitmap.cpp,v 1.47 2001-01-10 21:09:07 bcr Exp $"
+// File "$Id: GBitmap.cpp,v 1.48 2001-01-25 20:09:04 bcr Exp $"
 // - Author: Leon Bottou, 05/1997
 
 
@@ -1256,7 +1256,7 @@ GBitmap::decode(unsigned char *runs)
   grle.resize(0);
   grlerows.resize(0);
   rlelength = 0;
-#ifdef DEBUG
+#ifndef NO_DEBUG
   check_border();
 #endif
 }
@@ -1489,7 +1489,7 @@ GBitmap::append_line(unsigned char *&data,const unsigned char *row,
     }
 }
 
-#ifdef DEBUG
+#ifndef NO_DEBUG
 void 
 GBitmap::check_border() const
 {int col ;

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GBitmap.h,v 1.33 2001-01-10 20:56:04 bcr Exp $
+// $Id: GBitmap.h,v 1.34 2001-01-25 20:09:04 bcr Exp $
 // $Name:  $
 
 #ifndef _GBITMAP_H_
@@ -41,7 +41,7 @@
 #endif
 
 #include "GSmartPointer.h"
-#ifdef DEBUG
+#ifndef NO_DEBUG
 #include "GException.h"
 #endif
 
@@ -69,7 +69,7 @@ class ByteStream;
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: GBitmap.h,v 1.33 2001-01-10 20:56:04 bcr Exp $#
+    #$Id: GBitmap.h,v 1.34 2001-01-25 20:09:04 bcr Exp $#
 
  */
 //@{
@@ -436,7 +436,7 @@ private:
   friend class DjVu_Stream;
   friend class DjVu_PixImage;
 public:
-#ifdef DEBUG
+#ifndef NO_DEBUG
   void check_border() const;
 #endif
 };
@@ -513,7 +513,7 @@ GBitmap::operator[](int row)
 {
   if (!bytes) uncompress();
   if (row<0 || row>=nrows) {
-#ifdef DEBUG
+#ifndef NO_DEBUG
     if (zerosize < bytes_per_row + border)
       G_THROW("GBitmap.zero_small");
 #endif
@@ -527,7 +527,7 @@ GBitmap::operator[](int row) const
 {
   if (!bytes) ((GBitmap*)this)->uncompress();
   if (row<0 || row>=nrows) {
-#ifdef DEBUG
+#ifndef NO_DEBUG
     if (zerosize < bytes_per_row + border)
       G_THROW("GBitmap.zero_small");
 #endif

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: JB2Image.cpp,v 1.54 2001-01-20 01:55:40 bcr Exp $
+// $Id: JB2Image.cpp,v 1.55 2001-01-25 20:09:04 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -751,7 +751,7 @@ JB2Dict::JB2Codec::Decode::code_bitmap_directly(
           up1 = up0;
           up0 = bm[dy];
         }
-#ifdef DEBUG
+#ifndef NO_DEBUG
       bm.check_border();
 #endif
 }
@@ -789,7 +789,7 @@ JB2Dict::JB2Codec::code_bitmap_by_cross_coding (GBitmap &bm, GBitmap *cbm, const
   // Initialize row pointers
   const int dy = dh - 1;
   const int cy = dy + yd2c;
-#ifdef DEBUG
+#ifndef NO_DEBUG
   bm.check_border();
   cbm->check_border();
 #endif
@@ -821,7 +821,7 @@ JB2Dict::JB2Codec::Decode::code_bitmap_by_cross_coding (GBitmap &bm, GBitmap &cb
           xup1 = xup0;
           xup0 = xdn1;
           xdn1 = cbm[(--cy)-1] + xd2c;
-#ifdef DEBUG
+#ifndef NO_DEBUG
           bm.check_border();
 #endif
         }
