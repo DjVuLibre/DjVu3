@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.h,v 1.82 2001-07-02 19:48:07 bcr Exp $
+// $Id: GString.h,v 1.83 2001-07-11 20:44:02 bcr Exp $
 // $Name:  $
 
 #ifndef _GSTRING_H_
@@ -64,7 +64,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.82 2001-07-02 19:48:07 bcr Exp $# */
+    #$Id: GString.h,v 1.83 2001-07-11 20:44:02 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -294,6 +294,9 @@ protected:
       "&apos;", and  '\"' to  "&quot;".   Characters 0x01 through
       0x1f are also escaped. */
   GP<GStringRep> toEscaped( const bool tosevenbit ) const;
+
+  // Tests if a string is legally encoded in the current character set.
+  virtual bool is_valid(void) const = 0;
   
 // Actual string data.
   int  size;
@@ -360,6 +363,9 @@ public:
 
   virtual unsigned char *UCS4toString(
     const unsigned long w,unsigned char *ptr, mbstate_t *ps=0) const;
+
+  // Tests if a string is legally encoded in the current character set.
+  virtual bool is_valid(void) const;
 
   friend class GBaseString;
 
@@ -436,6 +442,9 @@ public:
 
   virtual unsigned char *UCS4toString(
     const unsigned long w,unsigned char *ptr, mbstate_t *ps=0) const;
+
+  // Tests if a string is legally encoded in the current character set.
+  virtual bool is_valid(void) const;
 
   friend class GBaseString;
 protected:
@@ -752,6 +761,11 @@ public:
   /// return the position after the last non-whitespace character.
   int firstEndSpace( const int from=0,const int len=(-1) ) const
   { return ptr?(*this)->firstEndSpace(from,len):0; }
+
+  /// Tests if the string is legally encoded in the current codepage.
+  bool is_valid(void) const
+  { return ptr?((*this)->is_valid()):true; }
+
 protected:
   const char *gstr;
   static void throw_illegal_subscript() no_return;

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GURL.cpp,v 1.76 2001-06-21 21:38:14 bcr Exp $
+// $Id: GURL.cpp,v 1.77 2001-07-11 20:44:02 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -437,8 +437,17 @@ GURL::GURL(const GUTF8String & url_in) : url(url_in), validurl(false)
 {
 }
 
-GURL::GURL(const GNativeString & url_in) : url(url_in), validurl(false)
+GURL::GURL(const GNativeString & url_in)
+: url(url_in.getNative2UTF8()), validurl(false)
 {
+#ifdef WIN32
+  if(is_valid() && is_local_file_url())
+  {
+    GURL::Filename::UTF8 xurl(UTF8Filename());
+    url=xurl.get_string(true);
+    validurl=false;
+  }
+#endif
 }
 
 GURL::GURL(const GURL & url_in) : url(url_in.url), validurl(false)
@@ -997,57 +1006,39 @@ GURL::extension(void) const
    return retval;
 }
 
-#if 0
-GURL
-GURL::operator+(const GUTF8String &gname) const
-{
-   const GUTF8String xurl(get_string());
-   GURL res;
-   if (!protocol(gname).length())
-   {
-     const int protocol_length=protocol(xurl).length();
-     const char * const url_ptr=(const char *)xurl;
-     const char * ptr;
-     for(ptr=url_ptr+protocol_length+1;*ptr&&!is_argument(ptr);ptr++)
-       EMPTY_LOOP;
-
-     res=GUTF8String(GUTF8String(url_ptr,(int)(ptr-url_ptr))
-       +((*(ptr-1) != slash)?GUTF8String(slash):GUTF8String())+gname+ptr);
-   } else
-   {
-     res=gname;
-   }
-   res.parse_cgi_args();
-   return res;
-}
-#endif
-
 GUTF8String
 GURL::decode_reserved(const GUTF8String &gurl)
 {
   const char *url=gurl;
-  GUTF8String res;
-
-  for(const char * ptr=url;*ptr;ptr++)
+  char *res;
+  GPBuffer<char> gres(res,gurl.length()+1);
+  char *r=res;
+  for(const char * ptr=url;*ptr;++ptr,++r)
   {
     if (*ptr!=percent)
     {
-      res+=*ptr;
+      r[0]=*ptr;
     }else
     {
       int c1,c2;
       if ( ((c1=hexval(ptr[1]))>=0)
         && ((c2=hexval(ptr[2]))>=0) )
       {
-        res+=(c1<<4)|c2;
+        r[0]=(c1<<4)|c2;
         ptr+=2;
       } else
       {
-        res+=*ptr;
+        r[0]=*ptr;
       }
     }
   }
-  return res;
+  r[0]=0;
+  GUTF8String retval(res);
+  if(!retval.is_valid())
+  {
+    retval=GNativeString(res);
+  }
+  return retval;
 }
 
 GUTF8String
@@ -1151,17 +1142,6 @@ url_from_UTF8filename(const GUTF8String &gfilename)
   {
     url += (localhostspec1+2) + nname;
   }
-#if 0
-  // Special case for stupid MSIE 
-  GUTF8String agent(useragent ? useragent : "default");
-  if (agent.search("MSIE")>=0 || agent.search("Microsoft")>=0)
-  {
-    // We now remove all the escaping we just did.  The reason for adding
-    // it to begin with is so at least the slashes are converted.
-    url=GOS::url_to_filename(url);
-    url=filespecslashes + GURL::expand_name(url);
-  }
-#endif
   return url;
 }
 
@@ -1192,7 +1172,13 @@ GURL::get_string(const GUTF8String &useragent) const
   return retval;
 }
 
+GURL::UTF8::UTF8(const GUTF8String &xurl)
+: GURL(xurl) {}
+
 GURL::UTF8::UTF8(const GUTF8String &xurl,const GURL &codebase)
+: GURL(xurl,codebase) {}
+
+GURL::GURL(const GUTF8String &xurl,const GURL &codebase)
 {
   if(GURL::UTF8(xurl).is_valid())
   {
@@ -1216,48 +1202,46 @@ GURL::UTF8::UTF8(const GUTF8String &xurl,const GURL &codebase)
 }
 
 GURL::Native::Native(const GNativeString &xurl)
-: GURL(xurl.getNative2UTF8())
-{
-#ifdef WIN32
-  if(is_valid() && is_local_file_url())
-  {
-	GURL::Filename::UTF8 retval(UTF8Filename());
-	url=retval.get_string(true);
-    validurl=false;
-  }
-#endif
-}
+: GURL(xurl) {}
 
 GURL::Native::Native(const GNativeString &xurl,const GURL &codebase)
+: GURL(xurl,codebase) {}
+
+GURL::GURL(const GNativeString &xurl,const GURL &codebase)
 {
-  GURL::UTF8 retval(xurl.getNative2UTF8(),codebase);
+  GURL retval(xurl.getNative2UTF8(),codebase);
   if(retval.is_valid())
   {
 #ifdef WIN32 // Hack for IE to change \\ to /
-	if(retval.is_local_file_url())
-	{
-		GURL::Filename::UTF8 retval2(retval.UTF8Filename());
-		url=retval2.get_string(true);
-		validurl=false;
-	}else
+    if(retval.is_local_file_url())
+    {
+      GURL::Filename::UTF8 retval2(retval.UTF8Filename());
+      url=retval2.get_string(true);
+      validurl=false;
+    }else
 #endif // WIN32
-	{
-	  url=retval.get_string(true);
-	  validurl=false;
-	}
+    {
+      url=retval.get_string(true);
+      validurl=false;
+    }
   }
 }
 
-GURL::Filename::Native::Native(const GNativeString &gfilename)
+GURL::Filename::Filename(const GNativeString &gfilename)
 {
   url=url_from_UTF8filename(gfilename.getNative2UTF8());
 }
 
+GURL::Filename::Native::Native(const GNativeString &gfilename)
+: GURL::Filename(gfilename) {}
 
-GURL::Filename::UTF8::UTF8(const GUTF8String &gfilename)
+GURL::Filename::Filename(const GUTF8String &gfilename)
 {
   url=url_from_UTF8filename(gfilename);
 }
+
+GURL::Filename::UTF8::UTF8(const GUTF8String &gfilename)
+: GURL::Filename(gfilename) {}
 
 // filename --
 // -- Applies heuristic rules to convert a url into a valid file name.  
@@ -1279,15 +1263,6 @@ GURL::UTF8Filename(void) const
 
     GUTF8String urlcopy=decode_reserved(url);
     url_ptr = urlcopy;
-
-#if 0
-    // Check if we have a simple file name already
-    {
-      GUTF8String tmp=expand_name(url_ptr,root);
-      if (GOS::is_file(tmp)) 
-        return tmp;
-    }
-#endif
 
     // All file urls are expected to start with filespec which is "file:"
     if (GStringRep::cmp(filespec, url_ptr, sizeof(filespec)-1))  //if not

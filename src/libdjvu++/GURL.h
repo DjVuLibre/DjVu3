@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GURL.h,v 1.43 2001-06-21 21:38:15 bcr Exp $
+// $Id: GURL.h,v 1.44 2001-07-11 20:44:02 bcr Exp $
 // $Name:  $
 
 #ifndef _GURL_H_
@@ -49,7 +49,7 @@
     \Ref{GURL} class used to store URLs in a system independent format.
     @memo System independent URL representation.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: GURL.h,v 1.43 2001-06-21 21:38:15 bcr Exp $#
+    @version #$Id: GURL.h,v 1.44 2001-07-11 20:44:02 bcr Exp $#
 */
 
 //@{
@@ -97,6 +97,10 @@ public:
    GURL(const GUTF8String & url_string);
 
    GURL(const GNativeString & url_string);
+
+   GURL(const GUTF8String &xurl, const GURL &codebase);
+
+   GURL(const GNativeString &xurl, const GURL &codebase);
 
       /// Copy constructor
    GURL(const GURL & gurl);
@@ -258,12 +262,6 @@ public:
       /// Escape special characters
    static GUTF8String encode_reserved(const GUTF8String &gs);
 
-#if 0
-      /// Escape special characters
-   static GUTF8String encode_reserved(char const * const s)
-   { return encode_reserved((unsigned char *)s); }
-#endif
-
    /** Decodes reserved characters from the URL.
       See also: \Ref{encode_reserved}(). */
    static GUTF8String decode_reserved(const GUTF8String &url);
@@ -330,7 +328,7 @@ public:
 class GURL::UTF8 : public GURL
 {
 public:
-  UTF8(const GUTF8String &xurl) : GURL(xurl) {}
+  UTF8(const GUTF8String &xurl);
   UTF8(const GUTF8String &xurl, const GURL &codebase);
 };
 
@@ -344,6 +342,8 @@ public:
 class GURL::Filename : public GURL
 {
 public:
+  Filename(const GUTF8String &filename);
+  Filename(const GNativeString &filename);
   class UTF8;
   class Native;
 };
@@ -360,13 +360,6 @@ public:
   Native(const GNativeString &filename);
 };
 
-#if 0
-inline GURL
-GURL::operator+(const char *xname) const
-{
-  return (*this)+xname;
-}
-#endif
 
 inline bool
 GURL::operator!=(const GURL & gurl2) const

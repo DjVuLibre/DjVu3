@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.112 2001-07-02 19:48:07 bcr Exp $
+// $Id: GString.cpp,v 1.113 2001-07-11 20:44:02 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -1039,6 +1039,28 @@ GStringRep::UTF8::toUTF8(const bool nothrow) const
   return const_cast<GStringRep::UTF8 *>(this);
 }
 
+// Tests if a string is legally encoded in the current character set.
+bool 
+GStringRep::UTF8::is_valid(void) const
+{
+  bool retval=true;
+  if(data && size)
+  {
+    const unsigned char * const eptr=(const unsigned char *)(data+size);
+    for(const unsigned char *s=(const unsigned char *)data;(s<eptr)&& *s;)
+    {
+      const unsigned char * const r=s;
+      (void)UTF8toUCS4(s,eptr);
+      if(r == s)
+      {
+        retval=false;
+        break;
+      }
+    }
+  }
+  return retval;
+}
+
 static inline unsigned long
 add_char(unsigned long const U, unsigned char const * const r)
 {
@@ -1994,6 +2016,37 @@ GStringRep::Native::getValidUCS4(const char *&source) const
     {
       source++;
     }
+  }
+  return retval;
+}
+
+// Tests if a string is legally encoded in the current character set.
+bool 
+GStringRep::Native::is_valid(void) const
+{
+  bool retval=true;
+  if(data && size)
+  {
+    size_t n=size;
+    const char *s=data;
+    mbstate_t ps;
+    (void)mbrlen(s, n, &ps);
+    do
+    {
+      size_t m=mbrlen(s,n,&ps);
+      if(m > n)
+      {
+        retval=false;
+        break;
+      }else if(m)
+      {
+        s+=m;
+        n-=m;
+      }else
+      {
+        break;
+      }
+    } while(n);
   }
   return retval;
 }
