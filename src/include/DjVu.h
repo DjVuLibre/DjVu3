@@ -1,5 +1,5 @@
 /*
- *C- DjVu® Reference Library (v. 3.0)
+ *C- DjVu® Reference Library (v. 3.5)
  *C- 
  *C- Copyright © 2000-2001 LizardTech, Inc. All Rights Reserved.
  *C- The DjVu Reference Library is protected by U.S. Pat. No.
@@ -30,7 +30,7 @@
  *C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
  *C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
  * 
- * $Id: DjVu.h,v 1.20 2001-01-04 22:04:54 bcr Exp $
+ * $Id: DjVu.h,v 1.21 2001-07-24 17:52:03 bcr Exp $
  */
 
 /*C-  -*- C -*-
@@ -52,7 +52,10 @@
 
 /*
  * $Log: DjVu.h,v $
- * Revision 1.20  2001-01-04 22:04:54  bcr
+ * Revision 1.21  2001-07-24 17:52:03  bcr
+ * *** empty log message ***
+ *
+ * Revision 1.20  2001/01/04 22:04:54  bcr
  * Update of copyright date.
  *
  * Revision 1.19  2000/11/09 20:15:05  jmw

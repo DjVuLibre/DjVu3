@@ -1,5 +1,5 @@
 //C-  -*- C++ -*-
-//C- DjVu® Reference Library (v. 3.0)
+//C- DjVu® Reference Library (v. 3.5)
 //C- 
 //C- Copyright © 1998-2001 LizardTech, Inc. All Rights Reserved.
 //C- The DjVu Reference Library is protected by U.S. Pat. No.
@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: debug.h,v 1.17 2001-04-05 16:06:27 bcr Exp $
+// $Id: debug.h,v 1.18 2001-07-24 17:52:04 bcr Exp $
 // $Name:  $
 
 #ifndef _DEBUG_H_
@@ -94,7 +94,7 @@ class GURL;
     @memo 
     Macros for printing debug messages.
     @version 
-    #$Id: debug.h,v 1.17 2001-04-05 16:06:27 bcr Exp $#
+    #$Id: debug.h,v 1.18 2001-07-24 17:52:04 bcr Exp $#
     @author
     Andrew Erofeev <eaf@geocities.com> -- initial implementation \\
     Leon Bottou <leonb@research.att.com> -- cleanups */

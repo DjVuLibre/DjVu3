@@ -1,6 +1,6 @@
 #!/bin/ksh
 #C-
-#C- DjVu® Reference Library (v. 3.0)
+#C- DjVu® Reference Library (v. 3.5)
 #C- 
 #C- Copyright © 2000-2001 LizardTech, Inc. All Rights Reserved.
 #C- The DjVu Reference Library is protected by U.S. Pat. No.
@@ -31,7 +31,7 @@
 #C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #
-# $Id: iconv.sh,v 1.1 2001-07-11 21:54:43 bcr Exp $
+# $Id: iconv.sh,v 1.2 2001-07-24 17:52:02 bcr Exp $
 # $Name:  $
 
 # This script sets the variables:

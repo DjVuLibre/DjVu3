@@ -1,5 +1,5 @@
 //C-  -*- C++ -*-
-//C- DjVu® Reference Library (v. 3.0)
+//C- DjVu® Reference Library (v. 3.5)
 //C- 
 //C- Copyright © 1999-2001 LizardTech, Inc. All Rights Reserved.
 //C- The DjVu Reference Library is protected by U.S. Pat. No.
@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDumpHelper.h,v 1.11 2001-02-15 01:12:22 bcr Exp $
+// $Id: DjVuDumpHelper.h,v 1.12 2001-07-24 17:52:03 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUDUMPHELPER_H
@@ -48,7 +48,7 @@
     L\'eon Bottou <leonb@research.att.com>,
     Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: DjVuDumpHelper.h,v 1.11 2001-02-15 01:12:22 bcr Exp $# */
+    #$Id: DjVuDumpHelper.h,v 1.12 2001-07-24 17:52:03 bcr Exp $# */
 //@{
 
 

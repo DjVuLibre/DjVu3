@@ -1,6 +1,6 @@
 #!/bin/ksh
 #C-
-#C- DjVu® Reference Library (v. 3.0)
+#C- DjVu® Reference Library (v. 3.5)
 #C- 
 #C- Copyright © 2000-2001 LizardTech, Inc. All Rights Reserved.
 #C- The DjVu Reference Library is protected by U.S. Pat. No.
@@ -31,7 +31,7 @@
 #C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #
-# $Id: sys.sh,v 1.28 2001-06-09 01:50:16 bcr Exp $
+# $Id: sys.sh,v 1.29 2001-07-24 17:52:03 bcr Exp $
 # $Name:  $
 
 # This sets the variable SYS INCS JOBJ

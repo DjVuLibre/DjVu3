@@ -1,5 +1,5 @@
 //C-  -*- C++ -*-
-//C- DjVu® Reference Library (v. 3.0)
+//C- DjVu® Reference Library (v. 3.5)
 //C- 
 //C- Copyright © 1999-2001 LizardTech, Inc. All Rights Reserved.
 //C- The DjVu Reference Library is protected by U.S. Pat. No.
@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: MMRDecoder.cpp,v 1.35 2001-04-12 22:40:14 fcrary Exp $
+// $Id: MMRDecoder.cpp,v 1.36 2001-07-24 17:52:04 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__

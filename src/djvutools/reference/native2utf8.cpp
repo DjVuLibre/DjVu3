@@ -1,5 +1,5 @@
 //C-  -*- C++ -*-
-//C- DjVu® Reference Library (v. 3.0)
+//C- DjVu® Reference Library (v. 3.5)
 //C- 
 //C- Copyright © 1999-2001 LizardTech, Inc. All Rights Reserved.
 //C- The DjVu Reference Library is protected by U.S. Pat. No.
@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: native2utf8.cpp,v 1.2 2001-06-05 03:19:57 bcr Exp $
+// $Id: native2utf8.cpp,v 1.3 2001-07-24 17:52:03 bcr Exp $
 // $Name:  $
 
 /** @name nativetoutf8
@@ -43,7 +43,7 @@
     @author
     Dr Bill C Riemers <bcr@lizardtech.com>
     @version
-    #$Id: native2utf8.cpp,v 1.2 2001-06-05 03:19:57 bcr Exp $# */
+    #$Id: native2utf8.cpp,v 1.3 2001-07-24 17:52:03 bcr Exp $# */
 //@{
 //@}
 

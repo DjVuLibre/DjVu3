@@ -1,5 +1,5 @@
 //C-  -*- C++ -*-
-//C- DjVu® Reference Library (v. 3.0)
+//C- DjVu® Reference Library (v. 3.5)
 //C- 
 //C- Copyright © 1999-2001 LizardTech, Inc. All Rights Reserved.
 //C- The DjVu Reference Library is protected by U.S. Pat. No.
@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djvm.cpp,v 1.21 2001-06-13 18:26:19 bcr Exp $
+// $Id: djvm.cpp,v 1.22 2001-07-24 17:52:03 bcr Exp $
 // $Name:  $
 
 /** @name djvm
@@ -99,7 +99,7 @@
     @author
     Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: djvm.cpp,v 1.21 2001-06-13 18:26:19 bcr Exp $# */
+    #$Id: djvm.cpp,v 1.22 2001-07-24 17:52:03 bcr Exp $# */
 //@{
 //@}
 

@@ -1,5 +1,5 @@
 //C-  -*- C++ -*-
-//C- DjVu® Reference Library (v. 3.0)
+//C- DjVu® Reference Library (v. 3.5)
 //C- 
 //C- Copyright © 1999-2001 LizardTech, Inc. All Rights Reserved.
 //C- The DjVu Reference Library is protected by U.S. Pat. No.
@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GIFFManager.h,v 1.18 2001-04-12 00:25:00 bcr Exp $
+// $Id: GIFFManager.h,v 1.19 2001-07-24 17:52:04 bcr Exp $
 // $Name:  $
 
 #ifndef _GIFFMANAGER_H
@@ -62,7 +62,7 @@
     @author 
     Andrei Erofeev <eaf@geocities.com> -- Initial implementation.
     @version 
-    #$Id: GIFFManager.h,v 1.18 2001-04-12 00:25:00 bcr Exp $# */
+    #$Id: GIFFManager.h,v 1.19 2001-07-24 17:52:04 bcr Exp $# */
 
 /** #GIFFChunk# is the base class for other IFF chunks understood by
     {\Ref GIFFManager}. It provides some basic interface, and is not supposed

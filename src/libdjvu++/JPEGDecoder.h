@@ -1,5 +1,5 @@
 //C-  -*- C++ -*-
-//C- DjVu® Reference Library (v. 3.0)
+//C- DjVu® Reference Library (v. 3.5)
 //C- 
 //C- Copyright © 1999-2001 LizardTech, Inc. All Rights Reserved.
 //C- The DjVu Reference Library is protected by U.S. Pat. No.
@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: JPEGDecoder.h,v 1.14 2001-07-12 23:33:16 bcr Exp $
+// $Id: JPEGDecoder.h,v 1.15 2001-07-24 17:52:04 bcr Exp $
 // $Name:  $
 
 #ifndef _JPEGDECODER_H_
@@ -68,7 +68,7 @@ extern "C" {
     @memo
     Decoding interface to the IJG JPEG library.
     @version
-    #$Id: JPEGDecoder.h,v 1.14 2001-07-12 23:33:16 bcr Exp $#
+    #$Id: JPEGDecoder.h,v 1.15 2001-07-24 17:52:04 bcr Exp $#
     @author
     Parag Deshmukh <parag@sanskrit.lz.att.com> 
 */

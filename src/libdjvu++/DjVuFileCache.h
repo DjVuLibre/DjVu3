@@ -1,5 +1,5 @@
 //C-  -*- C++ -*-
-//C- DjVu® Reference Library (v. 3.0)
+//C- DjVu® Reference Library (v. 3.5)
 //C- 
 //C- Copyright © 1999-2001 LizardTech, Inc. All Rights Reserved.
 //C- The DjVu Reference Library is protected by U.S. Pat. No.
@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuFileCache.h,v 1.16 2001-03-07 00:33:32 bcr Exp $
+// $Id: DjVuFileCache.h,v 1.17 2001-07-24 17:52:03 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUFILECACHE_H
@@ -62,7 +62,7 @@
     
     @memo Simple DjVuFile caching class.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: DjVuFileCache.h,v 1.16 2001-03-07 00:33:32 bcr Exp $#
+    @version #$Id: DjVuFileCache.h,v 1.17 2001-07-24 17:52:03 bcr Exp $#
 */
 
 //@{

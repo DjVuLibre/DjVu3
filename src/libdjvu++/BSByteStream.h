@@ -1,5 +1,5 @@
 //C-  -*- C++ -*-
-//C- DjVu® Reference Library (v. 3.0)
+//C- DjVu® Reference Library (v. 3.5)
 //C- 
 //C- Copyright © 1999-2001 LizardTech, Inc. All Rights Reserved.
 //C- The DjVu Reference Library is protected by U.S. Pat. No.
@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: BSByteStream.h,v 1.26 2001-03-06 19:55:41 bcr Exp $
+// $Id: BSByteStream.h,v 1.27 2001-07-24 17:52:03 bcr Exp $
 // $Name:  $
 
 #ifndef _BSBYTESTREAM_H
@@ -115,7 +115,7 @@
     @memo
     Simple Burrows-Wheeler general purpose compressor.
     @version
-    #$Id: BSByteStream.h,v 1.26 2001-03-06 19:55:41 bcr Exp $# */
+    #$Id: BSByteStream.h,v 1.27 2001-07-24 17:52:03 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__

@@ -1,5 +1,5 @@
 //C-  -*- C++ -*-
-//C- DjVu® Reference Library (v. 3.0)
+//C- DjVu® Reference Library (v. 3.5)
 //C- 
 //C- Copyright © 1999-2001 LizardTech, Inc. All Rights Reserved.
 //C- The DjVu Reference Library is protected by U.S. Pat. No.
@@ -30,18 +30,18 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: annotate.cpp,v 1.17 2001-06-05 03:19:57 bcr Exp $
+// $Id: annotate.cpp,v 1.18 2001-07-24 17:52:03 bcr Exp $
 // $Name:  $
 
 /*****************************************************************************
  *
- *   $Revision: 1.17 $
- *   $Date: 2001-06-05 03:19:57 $
- *   @(#) $Id: annotate.cpp,v 1.17 2001-06-05 03:19:57 bcr Exp $
+ *   $Revision: 1.18 $
+ *   $Date: 2001-07-24 17:52:03 $
+ *   @(#) $Id: annotate.cpp,v 1.18 2001-07-24 17:52:03 bcr Exp $
  *
  *****************************************************************************/
 
-static const char RCSVersion[]="@(#) $Id: annotate.cpp,v 1.17 2001-06-05 03:19:57 bcr Exp $";
+static const char RCSVersion[]="@(#) $Id: annotate.cpp,v 1.18 2001-07-24 17:52:03 bcr Exp $";
 
 #include "GIFFManager.h"
 #include "GOS.h"

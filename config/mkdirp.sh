@@ -1,6 +1,6 @@
 #!/bin/ksh
 #C-
-#C- DjVu® Reference Library (v. 3.0)
+#C- DjVu® Reference Library (v. 3.5)
 #C- 
 #C- Copyright © 2000-2001 LizardTech, Inc. All Rights Reserved.
 #C- The DjVu Reference Library is protected by U.S. Pat. No.
@@ -31,7 +31,7 @@
 #C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #
-# $Id: mkdirp.sh,v 1.8 2001-03-30 23:31:21 bcr Exp $
+# $Id: mkdirp.sh,v 1.9 2001-07-24 17:52:02 bcr Exp $
 # $Name:  $
 
 #!/bin/sh

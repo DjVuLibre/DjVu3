@@ -1,5 +1,5 @@
 //C-  -*- C++ -*-
-//C- DjVu® Reference Library (v. 3.0)
+//C- DjVu® Reference Library (v. 3.5)
 //C- 
 //C- Copyright © 1999-2001 LizardTech, Inc. All Rights Reserved.
 //C- The DjVu Reference Library is protected by U.S. Pat. No.
@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GContainer.h,v 1.48 2001-07-16 15:46:04 bcr Exp $
+// $Id: GContainer.h,v 1.49 2001-07-24 17:52:04 bcr Exp $
 // $Name:  $
 
 #ifndef _GCONTAINER_H_
@@ -93,7 +93,7 @@ static_const_GPBase(GPEnabled *foo);
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@geocities.com> -- bug fixes.
     @version 
-    #$Id: GContainer.h,v 1.48 2001-07-16 15:46:04 bcr Exp $# */
+    #$Id: GContainer.h,v 1.49 2001-07-24 17:52:04 bcr Exp $# */
 //@{
 
 
