@@ -9,10 +9,10 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GThreads.cpp,v 1.43 2000-02-03 22:18:04 leonb Exp $
+//C- $Id: GThreads.cpp,v 1.44 2000-02-17 17:52:11 praveen Exp $
 
 
-// **** File "$Id: GThreads.cpp,v 1.43 2000-02-03 22:18:04 leonb Exp $"
+// **** File "$Id: GThreads.cpp,v 1.44 2000-02-17 17:52:11 praveen Exp $"
 // This file defines machine independent classes
 // for running and synchronizing threads.
 // - Author: Leon Bottou, 01/1998
@@ -426,8 +426,8 @@ GThread::wait_for_finish()
 {
   if ((xentry || xarg) && (thid != kNoThreadID))
     {
-      if (thid == current())
-        THROW("Cannot wait for termination of calling thread.");
+      if (thid == (unsigned long)current())
+        THROW("Can't wait on calling thread.");
       if (! finished)
         macthread_wait(thid, (void*)this);
     }
