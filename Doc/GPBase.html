@@ -48,14 +48,11 @@
 <DT>
 <A HREF="#DOC.1.5.4.2.9"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>operator==</B>(const <!1><A HREF="GPBase.html#DOC.1.5.4.2.1">GPBase</A> &amp; g2) const 
 <DD><I>Comparison operator.</I>
-<DT>
-<A HREF="#DOC.1.5.4.2.10"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   void <B>preserve</B>(class <!1><A HREF="GPBase.html#DOC.1.5.4.2.1">GPBase</A> * gp)
-<DD><I>Preserve a <!1><A HREF="GPEnabled.html">GPEnabled</A> object for some time (guru only).</I>
 </DL></P>
 
 <P><DL>
 <DT><H3>Protected Fields</H3><DD><DT>
-<A HREF="#DOC.1.5.4.2.11"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GPEnabled.html">GPEnabled</A>* <B>ptr</B>
+<A HREF="#DOC.1.5.4.2.10"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GPEnabled.html">GPEnabled</A>* <B>ptr</B>
 <DD><I>Actual pointer </I>
 </DL></P>
 
@@ -125,24 +122,8 @@ Decrements the counter of the previous value of the pointer.
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int operator==(const <!1><A HREF="GPBase.html#DOC.1.5.4.2.1">GPBase</A> &amp; g2) const </B></TT>
 <DD>Comparison operator. 
 <DL><DT><DD></DL><P>
-<A NAME="preserve">
-<A NAME="DOC.1.5.4.2.10">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static   void preserve(class <!1><A HREF="GPBase.html#DOC.1.5.4.2.1">GPBase</A> * gp)</B></TT>
-<DD>Preserve a <!1><A HREF="GPEnabled.html">GPEnabled</A> object for some time (guru only).
-<!1><A HREF="GP.html">GP</A> pointers provide an excellent mechanism for automatic
-data destruction, which takes place when the last pointer to
-a <!1><A HREF="GPEnabled.html">GPEnabled</A> object is destroyed. Thus, it is common to have
-an automatic <!1><A HREF="GP.html">GP</A>&lt;<TT>TYPE</TT>&gt; object inside a pair of curl braces,
-which would be destroyed automatically as soon as program counter
-leaves the scope of the braces.<P>Sometimes, it is also desired to delay the object destruction
-a little longer, or even avoid destroying the object from the same
-thread.<P>This function transfers the pointer from the supplied <!1><A HREF="GP.html">GP</A> object
-to some static pointer thus giving the pointed <!1><A HREF="GPEnabled.html">GPEnabled</A>
-some extra time. The object will be destroyed when the <TT>preserve()</TT>
-function is called next time. 
-<DL><DT><DD></DL><P>
 <A NAME="ptr">
-<A NAME="DOC.1.5.4.2.11">
+<A NAME="DOC.1.5.4.2.10">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GPEnabled.html">GPEnabled</A>* ptr</B></TT>
 <DD>Actual pointer 
 <DL><DT><DD></DL><P></DL>
@@ -155,7 +136,7 @@ function is called next time.
 <!-- This is were the DOC++ footer is defined  -->
 
 <font face="arial,helvetica" size="2">
-DjVu is a trademark of LizardTech.   
+<a href=http://www.djvu.att.com>DjVu</a> is a trademark of AT&amp;T.  
 <br>All other products mentioned are registered trademarks or trademarks of
 their respective companies.
 </font>
