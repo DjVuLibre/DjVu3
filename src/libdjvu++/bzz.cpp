@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: bzz.cpp,v 1.3 1999-02-01 18:32:34 leonb Exp $
+//C-  $Id: bzz.cpp,v 1.4 1999-02-03 22:55:30 leonb Exp $
 
 // BZZ -- a frontend for BSByteStream
 
@@ -31,7 +31,7 @@
     @author
     Leon Bottou <leonb@research.att.com> -- initial implementation
     @version
-    #$Id: bzz.cpp,v 1.3 1999-02-01 18:32:34 leonb Exp $# */
+    #$Id: bzz.cpp,v 1.4 1999-02-03 22:55:30 leonb Exp $# */
 //@{
 //@}
 
@@ -50,56 +50,56 @@ usage(void)
           "  Argument <blocksize> must be in range [900..4096] (default 1100).\n"
           "  Arguments <infile> and <outfile> can be '-' for stdin/stdout.\n",
           program, program);
-  exit(10);
+  exit(1);
 }
 
 int 
 main(int argc, char **argv)
 {
-  // Get program name
-  program = strrchr(argv[0],'/');
-  if (program) 
-    program += 1; 
-  else 
-    program = argv[0];
-  // Obtain default mode from program name
-  int blocksize = -1;
-  if (!strcmp(program,"bzz"))
-    blocksize = 1100;
-  else if (!strcmp(program,"unbzz"))
-    blocksize = 0;
-  // Parse arguments
-  if (argc>=2 && argv[1][0]=='-')
-    {
-      if (argv[1][1]=='d' && argv[1][2]==0)
-        {
-          blocksize = 0;
-        }
-      else if (argv[1][1]=='e')
-        {
-          blocksize = 2048;
-          if (argv[1][2])
-            blocksize = atoi(argv[1]+2);
-        }
-      else 
-        usage();
-      argv++;
-      argc--;
-    }
-  if (blocksize < 0)
-    usage();
-  // Obtain filenames
-  char *infile = "-";
-  char *outfile = "-";
-  if (argc >= 2)
-    infile = argv[1];
-  if (argc >= 3)
-    outfile = argv[2];
-  if (argc >= 4)
-    usage();
-  // Action
   TRY
     {
+      // Get program name
+      program = strrchr(argv[0],'/');
+      if (program) 
+        program += 1; 
+      else 
+        program = argv[0];
+      // Obtain default mode from program name
+      int blocksize = -1;
+      if (!strcmp(program,"bzz"))
+        blocksize = 1100;
+      else if (!strcmp(program,"unbzz"))
+        blocksize = 0;
+      // Parse arguments
+      if (argc>=2 && argv[1][0]=='-')
+        {
+          if (argv[1][1]=='d' && argv[1][2]==0)
+            {
+              blocksize = 0;
+            }
+          else if (argv[1][1]=='e')
+            {
+              blocksize = 2048;
+              if (argv[1][2])
+                blocksize = atoi(argv[1]+2);
+            }
+          else 
+            usage();
+          argv++;
+          argc--;
+        }
+      if (blocksize < 0)
+        usage();
+      // Obtain filenames
+      char *infile = "-";
+      char *outfile = "-";
+      if (argc >= 2)
+        infile = argv[1];
+      if (argc >= 3)
+        outfile = argv[2];
+      if (argc >= 4)
+        usage();
+      // Action
       StdioByteStream in(infile,"rb");
       StdioByteStream out(outfile,"wb");
       if (blocksize)
@@ -116,7 +116,7 @@ main(int argc, char **argv)
   CATCH(ex)
     {
       ex.perror();
-      exit(10);
+      exit(1);
     }
   ENDCATCH;
   return 0;

@@ -21,7 +21,7 @@ OBJS= 	GString.o		\
 
 SHELL=/bin/sh
 TARG= libDejaVu.a
-PROG= showiff c44 d44 djvutopnm makedjvu breakdjvu ppmcoco bzz
+PROG= djvuinfo c44 d44 djvutopnm djvumake djvuextract ppmcoco bzz
 
 #CC=gcc
 #CXX=g++
@@ -53,10 +53,10 @@ $(TARG): $(OBJS) Makefile
 
 C44OBJS = c44.o
 D44OBJS = d44.o
-SHOWIFFOBJS = showiff.o
+DJVUINFOOBJS = djvuinfo.o
 DEJAVUTOPNMOBJS = djvutopnm.o
-MAKEDEJAVUOBJS = makedjvu.o
-BREAKDEJAVUOBJS = breakdjvu.o
+MAKEDEJAVUOBJS = djvumake.o
+BREAKDEJAVUOBJS = djvuextract.o
 PPMCOCOOBJS = ppmcoco.o
 ANNOTATEOBJS = annotate.o
 BZZOBJS = bzz.o
@@ -68,16 +68,16 @@ c44: $(C44OBJS) $(TARG) Makefile
 d44: $(D44OBJS) $(TARG) Makefile
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(D44OBJS) -L. -lDejaVu $(LDLIBS)
 
-showiff: $(SHOWIFFOBJS) $(TARG) Makefile
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(SHOWIFFOBJS) -L. -lDejaVu $(LDLIBS)
+djvuinfo: $(DJVUINFOOBJS) $(TARG) Makefile
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(DJVUINFOOBJS) -L. -lDejaVu $(LDLIBS)
 
 djvutopnm: $(DEJAVUTOPNMOBJS) $(TARG) Makefile
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(DEJAVUTOPNMOBJS) -L. -lDejaVu $(LDLIBS)
 
-makedjvu: $(MAKEDEJAVUOBJS) $(TARG) Makefile	
+djvumake: $(MAKEDEJAVUOBJS) $(TARG) Makefile	
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(MAKEDEJAVUOBJS) -L. -lDejaVu $(LDLIBS)
 
-breakdjvu: $(BREAKDEJAVUOBJS) $(TARG) Makefile	
+djvuextract: $(BREAKDEJAVUOBJS) $(TARG) Makefile	
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(BREAKDEJAVUOBJS) -L. -lDejaVu $(LDLIBS)
 
 ppmcoco: $(PPMCOCOOBJS) $(TARG) Makefile	
@@ -160,8 +160,6 @@ JB2Image.o: JB2Image.cpp JB2Image.h DjVuGlobal.h GString.h \
  GRect.h GBitmap.h
 ZPCodec.o: ZPCodec.cpp ZPCodec.h DjVuGlobal.h ByteStream.h \
  GException.h GContainer.h GSmartPointer.h
-breakdjvu.o: breakdjvu.cpp GException.h DjVuGlobal.h ByteStream.h \
- GContainer.h GSmartPointer.h IFFByteStream.h GString.h
 bzz.o: bzz.cpp GException.h DjVuGlobal.h ByteStream.h GContainer.h \
  GSmartPointer.h BSByteStream.h ZPCodec.h
 c44.o: c44.cpp GString.h DjVuGlobal.h GException.h GSmartPointer.h \
@@ -171,16 +169,19 @@ d44.o: d44.cpp GString.h DjVuGlobal.h GException.h GSmartPointer.h \
  IWImage.h GRect.h GBitmap.h ByteStream.h GContainer.h GPixmap.h \
  IFFByteStream.h GOS.h
 debug.o: debug.cpp
+djvuextract.o: djvuextract.cpp GException.h DjVuGlobal.h ByteStream.h \
+ GContainer.h GSmartPointer.h IFFByteStream.h GString.h
+djvuinfo.o: djvuinfo.cpp GException.h DjVuGlobal.h GString.h \
+ GSmartPointer.h ByteStream.h GContainer.h IFFByteStream.h DjVuImage.h \
+ GThreads.h JB2Image.h ZPCodec.h GRect.h GBitmap.h IWImage.h GPixmap.h \
+ GOS.h
+djvumake.o: djvumake.cpp GString.h DjVuGlobal.h GException.h \
+ GSmartPointer.h DjVuImage.h GThreads.h ByteStream.h GContainer.h \
+ IFFByteStream.h JB2Image.h ZPCodec.h GRect.h GBitmap.h IWImage.h \
+ GPixmap.h
 djvutopnm.o: djvutopnm.cpp GException.h DjVuGlobal.h GSmartPointer.h \
  GRect.h GPixmap.h ByteStream.h GContainer.h GBitmap.h DjVuImage.h \
  GString.h GThreads.h IFFByteStream.h JB2Image.h ZPCodec.h IWImage.h \
  GOS.h
-makedjvu.o: makedjvu.cpp GString.h DjVuGlobal.h GException.h \
- GSmartPointer.h DjVuImage.h GThreads.h ByteStream.h GContainer.h \
- IFFByteStream.h JB2Image.h ZPCodec.h GRect.h GBitmap.h IWImage.h \
- GPixmap.h
 ppmcoco.o: ppmcoco.cpp ByteStream.h DjVuGlobal.h GException.h \
  GContainer.h GSmartPointer.h GPixmap.h GRect.h GBitmap.h GString.h
-showiff.o: showiff.cpp GException.h DjVuGlobal.h GString.h \
- GSmartPointer.h ByteStream.h GContainer.h IFFByteStream.h DjVuImage.h \
- GThreads.h JB2Image.h ZPCodec.h GRect.h GBitmap.h IWImage.h GPixmap.h

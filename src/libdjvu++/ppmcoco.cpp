@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: ppmcoco.cpp,v 1.2 1999-02-01 18:32:34 leonb Exp $
+//C-  $Id: ppmcoco.cpp,v 1.3 1999-02-03 22:55:30 leonb Exp $
 
 
 
@@ -82,7 +82,7 @@
     @author
     Leon Bottou <leonb@research.att.com>
     @version
-    #$Id: ppmcoco.cpp,v 1.2 1999-02-01 18:32:34 leonb Exp $# */
+    #$Id: ppmcoco.cpp,v 1.3 1999-02-03 22:55:30 leonb Exp $# */
 //@{
 //@}
 
@@ -91,6 +91,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include "GException.h"
 #include "ByteStream.h"
 #include "GPixmap.h"
 #include "GString.h"
@@ -105,7 +106,7 @@ usage(void)
 {
   fprintf(stderr,
           "usage: ppmcoco [-from gamma] [-to gamma] [<ppmin>] [<ppmout>]\n");
-  exit(10);
+  exit(1);
 }
 
 double
@@ -124,47 +125,57 @@ str_to_gamma(const char *str)
 int 
 main (int argc, char **argv)
 {
-  // parse
-  if (argc==1)
-    usage();
-  int flag = 0;
-  for (int i=1; i<argc; i++)
+  TRY
     {
-      if (!strcmp(argv[i],"-from") && i+1<argc)
-        {
-          fromGamma = str_to_gamma(argv[++i]);
-        }
-      else if (!strcmp(argv[i],"-to") && i+1<argc)
-        {
-          toGamma = str_to_gamma(argv[++i]);
-        }
-      else if (flag==0)
-        {
-          flag = 1;
-          infile = argv[i];
-        }
-      else if (flag == 1)
-        {
-          flag = 2;
-          outfile = argv[i];
-        }
-      else
+      // parse
+      if (argc==1)
         usage();
+      int flag = 0;
+      for (int i=1; i<argc; i++)
+        {
+          if (!strcmp(argv[i],"-from") && i+1<argc)
+            {
+          fromGamma = str_to_gamma(argv[++i]);
+            }
+          else if (!strcmp(argv[i],"-to") && i+1<argc)
+            {
+              toGamma = str_to_gamma(argv[++i]);
+            }
+          else if (flag==0)
+            {
+              flag = 1;
+              infile = argv[i];
+            }
+          else if (flag == 1)
+            {
+              flag = 2;
+              outfile = argv[i];
+            }
+          else
+            usage();
+        }
+      // compute
+      double gamma_correction = toGamma / fromGamma;
+      if (gamma_correction<0.1)
+        gamma_correction = 0.1;
+      else if (gamma_correction>10)
+        gamma_correction = 10;
+      if (gamma_correction<0.2 || gamma_correction>5)
+        fprintf(stderr,"warning: strong correction reduces image quality\n");
+      // perform
+      GPixmap pm;
+      StdioByteStream ibs(infile,"rb"); 
+      pm.init(ibs); 
+      pm.color_correct(gamma_correction);
+      StdioByteStream obs(outfile,"wb"); 
+      pm.save_ppm(obs); 
     }
-  // compute
-  double gamma_correction = toGamma / fromGamma;
-  if (gamma_correction<0.1)
-    gamma_correction = 0.1;
-  else if (gamma_correction>10)
-    gamma_correction = 10;
-  if (gamma_correction<0.2 || gamma_correction>5)
-    fprintf(stderr,"warning: strong correction reduces image quality\n");
-  // perform
-  GPixmap pm;
-  { StdioByteStream ibs(infile,"rb"); pm.init(ibs); }
-  pm.color_correct(gamma_correction);
-  { StdioByteStream obs(outfile,"wb"); pm.save_ppm(obs); }
-  // finish
+  CATCH(ex)
+    {
+      ex.perror();
+      exit(1);
+    }
+  ENDCATCH;
   return 0;
 }
 

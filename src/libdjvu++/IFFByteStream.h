@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: IFFByteStream.h,v 1.3 1999-02-01 18:32:33 leonb Exp $
+//C-  $Id: IFFByteStream.h,v 1.4 1999-02-03 22:55:30 leonb Exp $
 
 
 #ifndef _IFFBYTESTREAM_H_
@@ -37,7 +37,7 @@
     files.  Member functions provide an easy mean to position the underlying
     \Ref{ByteStream} at the beginning of each chunk and to read or write the
     data until reaching the end of the chunk.  The utility program
-    \Ref{showiff} demonstrates how to use class #IFFByteStream#.
+    \Ref{djvuinfo} demonstrates how to use class #IFFByteStream#.
 
     {\bf IFF Files and ZP-Coder} ---
     Class #IFFByteStream# repositions the underlying ByteStream whenever a new
@@ -64,7 +64,7 @@
     @author
     Leon Bottou <leonb@research.att.com>
     @version
-    #$Id: IFFByteStream.h,v 1.3 1999-02-01 18:32:33 leonb Exp $# */
+    #$Id: IFFByteStream.h,v 1.4 1999-02-03 22:55:30 leonb Exp $# */
 //@{
 
 #ifdef __GNUC__

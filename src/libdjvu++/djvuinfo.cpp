@@ -7,29 +7,29 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: showiff.cpp,v 1.5 1999-02-01 18:57:34 leonb Exp $
+//C-  $Id: djvuinfo.cpp,v 1.1 1999-02-03 22:55:30 leonb Exp $
 
 
 
-/** @name showiff
+/** @name djvuinfo
 
     {\bf Synopsis}
     \begin{verbatim}
-        showiff <... iff_file_names ...>
+        djvuinfo <... iff_file_names ...>
     \end{verbatim}
 
     {\bf Description} ---
-    File #"showiff.cpp"# uses the facilities provided by \Ref{IFFByteStream.h}
+    File #"djvuinfo.cpp"# uses the facilities provided by \Ref{IFFByteStream.h}
     to display an indented representation of the chunk structure of an
     EA-IFF85 file.  Each line represent contains a chunk ID followed by the
     chunk size.  Additional information about the chunk is provided when
-    program #showiff.cpp# recognizes the chunk name and knows how to summarize
+    program #djvuinfo.cpp# recognizes the chunk name and knows how to summarize
     the chunk data.  Lines are indented in order to reflect the hierarchical
     structure of the IFF files.
 
     {\bf Example}
     \begin{verbatim}
-    % showiff graham1.djvu 
+    % djvuinfo graham1.djvu 
     graham1.djvu:
       FORM:DJVU [32553] 
         INFO [5]            3156x2325, version 17
@@ -51,7 +51,7 @@
     @author
     Leon Bottou <leonb@research.att.com>
     @version
-    #$Id: showiff.cpp,v 1.5 1999-02-01 18:57:34 leonb Exp $# */
+    #$Id: djvuinfo.cpp,v 1.1 1999-02-03 22:55:30 leonb Exp $# */
 //@{
 //@}
 
@@ -183,26 +183,28 @@ display(const char *s)
 }
 
 
+void
+usage()
+{
+  fprintf(stderr,"usage: djvuinfo <iff_filenames>\n");
+  exit(1);
+}
+
 int 
 main(int argc, const char **argv)
 {
-  if (argc<=1)
+  TRY
     {
-      fprintf(stderr,"usage: showiff <iff_filenames>\n");
-      exit(5);
+      if (argc<=1)
+        usage();
+      for (int i=1; i<argc; i++)
+        display(argv[i]);
     }
-  static int i;
-  for (i=1; i<argc; i++)
+  CATCH(ex)
     {
-      TRY
-        {
-          display(argv[i]);
-        }
-      CATCH(ex)
-        {
-          ex.perror();
-        }
-      ENDCATCH;
+      ex.perror();
+      exit(1);
     }
+  ENDCATCH;
   return 0;
 }

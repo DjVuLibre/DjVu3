@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: DjVuImage.h,v 1.2 1999-02-01 22:50:40 leonb Exp $
+//C-  $Id: DjVuImage.h,v 1.3 1999-02-03 22:55:29 leonb Exp $
 
 #ifndef _DJVUIMAGE_H
 #define _DJVUIMAGE_H
@@ -30,7 +30,7 @@
     {\bf Creating DjVu images} --- Class \Ref{DjVuImage} does not provide a
     direct way to create a DjVu image.  The recommended procedure consists of
     directly writing the required chunks into an \Ref{IFFByteStream} as
-    demonstrated in program \Ref{makedjvu}.  Dealing with too many encoding
+    demonstrated in program \Ref{djvumake}.  Dealing with too many encoding
     issues (such as chunk ordering and encoding quality) would indeed make the
     decoder unnecessarily complex.
 
@@ -58,7 +58,7 @@
     @author
     Leon Bottou <leonb@research.att.com>
     @version
-    #$Id: DjVuImage.h,v 1.2 1999-02-01 22:50:40 leonb Exp $# */
+    #$Id: DjVuImage.h,v 1.3 1999-02-03 22:55:29 leonb Exp $# */
 //@{
 
 

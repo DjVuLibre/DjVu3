@@ -7,10 +7,10 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: makedjvu.cpp,v 1.6 1999-02-01 18:57:34 leonb Exp $
+//C-  $Id: djvumake.cpp,v 1.1 1999-02-03 22:55:30 leonb Exp $
 
-// MakeDjVu -- Assemble IFF files
-// $Id: makedjvu.cpp,v 1.6 1999-02-01 18:57:34 leonb Exp $
+// Djvumake -- Assemble IFF files
+// $Id: djvumake.cpp,v 1.1 1999-02-03 22:55:30 leonb Exp $
 // Author: Leon Bottou 08/1997
 
 #include <stdio.h>
@@ -41,15 +41,15 @@ int h;
 void 
 usage()
 {
-  printf("MakeDjvu -- Create a DjVu file\n"
-         "              [makedjvu (c) AT&T Labs 1997 (Leon Bottou, HA6156)]\n\n"
-         "Usage: makedjvu djvufile ...arguments...\n"
+  printf("djvumake -- Create a DjVu file\n"
+         "              [djvumake (c) AT&T Labs 1997 (Leon Bottou, HA6156)]\n\n"
+         "Usage: djvumake djvufile ...arguments...\n"
          "\n"
          "The arguments describe the successive chunks of the DJVU file.\n"
          "Possible arguments are:\n"
          "   INFO=w,h                    --  Create the initial information chunk\n"
          "   Sjbz=jb2file                --  Create a JB2 stencil chunk\n"
-         "   FG44=iw4file                --  Create a 25dpi IW44 foreground chunk\n"
+         "   FG44=iw4file                --  Create an IW44 foreground chunk\n"
          "   BG44=[iw4file][:nchunks]    --  Create one or more IW44 background chunks\n"
          "\n"
          "* You may omit the specification of the information chunk. An information\n"
@@ -58,7 +58,7 @@ usage()
          "  incorrect djvu file. There is no guarantee that these warnings flag\n"
          "  all conditions.\n"
          "\n");
-  exit(-1);
+  exit(1);
 }
 
 
@@ -73,15 +73,15 @@ create_info_chunk(IFFByteStream &iff, int argc, char **argv)
       // size
       w = strtol(ptr, &ptr, 10);
       if (w<=0 || w>=16384)
-        THROW("makedjvu: incorrect width in INFO chunk specification\n");
+        THROW("djvumake: incorrect width in 'INFO' chunk specification\n");
       if (*ptr++ != ',')
-        THROW("makedjvu: comma expected in INFO chunk specification (before height)\n");
+        THROW("djvumake: comma expected in 'INFO' chunk specification (before height)\n");
       h = strtol(ptr, &ptr, 10);      
       if (h<=0 || h>=16384)
-        THROW("makedjvu: incorrect height in INFO chunk specification\n");
+        THROW("djvumake: incorrect height in 'INFO' chunk specification\n");
       // rest
       if (*ptr)
-        THROW("makedjvu: syntax error in INFO chunk specification\n");
+        THROW("djvumake: syntax error in 'INFO' chunk specification\n");
     }
   else
     {
@@ -103,7 +103,7 @@ create_info_chunk(IFFByteStream &iff, int argc, char **argv)
     }
   // warn
   if (w==0 || h==0)
-    fprintf(stderr,"makedjvu: cannot determine image size\n");
+    fprintf(stderr,"djvumake: cannot determine image size\n");
   // write info chunk
   DjVuInfo info;
   info.width = w;
@@ -129,7 +129,7 @@ create_jb2_chunk(IFFByteStream &iff, char *chkid, char *filename)
       int jh = image.get_height();
       jb2stencil->seek(0);
       if (jw!=w || jh!=h)
-        fprintf(stderr,"makedjvu: stencil size (%s) does not match info size\n", filename);
+        fprintf(stderr,"djvumake: stencil size (%s) does not match info size\n", filename);
     }
   jb2stencil->seek(0);
   iff.put_chunk(chkid);
@@ -164,23 +164,23 @@ create_fg44_chunk(IFFByteStream &iff, char *ckid, char *filename)
   GString chkid;
   bsi.get_chunk(chkid);
   if (chkid != "FORM:PM44" && chkid != "FORM:BM44")
-    THROW("makedjvu: FG44 file has incorrect format (wrong IFF header)");
+    THROW("djvumake: FG44 file has incorrect format (wrong IFF header)");
   bsi.get_chunk(chkid);
   if (chkid!="PM44" && chkid!="BM44")
-    THROW("makedjvu: FG44 file has incorrect format (wring IFF header)");
+    THROW("djvumake: FG44 file has incorrect format (wring IFF header)");
   MemoryByteStream mbs;
   mbs.copy(bsi);
   bsi.close_chunk();  
   if (bsi.get_chunk(chkid))
-    fprintf(stderr,"makedjvu: FG44 file contains more than one chunk\n");
+    fprintf(stderr,"djvumake: FG44 file contains more than one chunk\n");
   bsi.close_chunk();  
   mbs.seek(0);
   if (mbs.readall((void*)&primary, sizeof(primary)) != sizeof(primary))
-    THROW("makedjvu: FG44 file is corrupted (cannot read primary header)");    
+    THROW("djvumake: FG44 file is corrupted (cannot read primary header)");    
   if (primary.serial != 0)
-    THROW("makedjvu: FG44 file is corrupted (wrong serial number)");
+    THROW("djvumake: FG44 file is corrupted (wrong serial number)");
   if (mbs.readall((void*)&secondary, sizeof(secondary)) != sizeof(secondary))
-    THROW("makedjvu: FG44 file is corrupted (cannot read secondary header)");    
+    THROW("djvumake: FG44 file is corrupted (cannot read secondary header)");    
   int iw = (secondary.xhi<<8) + secondary.xlo;
   int ih = (secondary.yhi<<8) + secondary.ylo;
   int red;
@@ -188,7 +188,7 @@ create_fg44_chunk(IFFByteStream &iff, char *ckid, char *filename)
     if (iw==(w+red-1)/red && ih==(h+red-1)/red)
       break;
   if (red>12)
-    fprintf(stderr, "makedjvu: FG44 reduction is not in [1..12] range\n");
+    fprintf(stderr, "djvumake: FG44 reduction is not in [1..12] range\n");
   mbs.seek(0);
   iff.put_chunk(ckid);
   iff.copy(mbs);
@@ -204,7 +204,7 @@ create_bg44_chunk(IFFByteStream &iff, char *ckid, char *filespec)
     {
       char *s = strchr(filespec, ':');
       if (s == filespec)
-        THROW("makedjvu: no filename specified in first BG44 specification");
+        THROW("djvumake: no filename specified in first BG44 specification");
       if (!s)
         s = filespec + strlen(filespec);
       GString filename(filespec, s-filespec);
@@ -213,7 +213,7 @@ create_bg44_chunk(IFFByteStream &iff, char *ckid, char *filespec)
       GString chkid;
       bg44iff->get_chunk(chkid);
       if (chkid != "FORM:PM44" && chkid != "FORM:BM44")
-        THROW("makedjvu: BG44 file has incorrect format (wrong IFF header)");        
+        THROW("djvumake: BG44 file has incorrect format (wrong IFF header)");        
       if (*s == ':')
         filespec = s+1;
       else 
@@ -222,14 +222,14 @@ create_bg44_chunk(IFFByteStream &iff, char *ckid, char *filespec)
   else
     {
       if (*filespec!=':')
-        THROW("makedjvu: filename specified in BG44 refinement");
+        THROW("djvumake: filename specified in BG44 refinement");
       filespec += 1;
     }
   int nchunks = strtol(filespec, &filespec, 10);
   if (nchunks<1 || nchunks>99)
-    THROW("makedjvu: invalid number of chunks in BG44 specification");    
+    THROW("djvumake: invalid number of chunks in BG44 specification");    
   if (*filespec)
-    THROW("makedjvu: invalid BG44 specification (syntax error)");
+    THROW("djvumake: invalid BG44 specification (syntax error)");
   
   int flag = (nchunks>=99);
   GString chkid;
@@ -237,7 +237,7 @@ create_bg44_chunk(IFFByteStream &iff, char *ckid, char *filespec)
     {
       if (chkid!="PM44" && chkid!="BM44")
         {
-          fprintf(stderr,"makedjvu: BG44 file contains unrecognized chunks (ignored)\n");
+          fprintf(stderr,"djvumake: BG44 file contains unrecognized chunks (ignored)\n");
           nchunks += 1;
           bg44iff->close_chunk();
           continue;
@@ -247,11 +247,11 @@ create_bg44_chunk(IFFByteStream &iff, char *ckid, char *filespec)
       bg44iff->close_chunk();  
       mbs.seek(0);
       if (mbs.readall((void*)&primary, sizeof(primary)) != sizeof(primary))
-        THROW("makedjvu: BG44 file is corrupted (cannot read primary header)\n");    
+        THROW("djvumake: BG44 file is corrupted (cannot read primary header)\n");    
       if (primary.serial == 0)
         {
           if (mbs.readall((void*)&secondary, sizeof(secondary)) != sizeof(secondary))
-            THROW("makedjvu: BG44 file is corrupted (cannot read secondary header)\n");    
+            THROW("djvumake: BG44 file is corrupted (cannot read secondary header)\n");    
           int iw = (secondary.xhi<<8) + secondary.xlo;
           int ih = (secondary.yhi<<8) + secondary.ylo;
           int red;
@@ -259,7 +259,7 @@ create_bg44_chunk(IFFByteStream &iff, char *ckid, char *filespec)
             if (iw==(w+red-1)/red && ih==(h+red-1)/red)
               break;
           if (red>12)
-            fprintf(stderr, "makedjvu: BG44 reduction is not in [1..12] range\n");
+            fprintf(stderr, "djvumake: BG44 reduction is not in [1..12] range\n");
         }
       mbs.seek(0);
       iff.put_chunk(ckid);
@@ -268,7 +268,7 @@ create_bg44_chunk(IFFByteStream &iff, char *ckid, char *filespec)
       flag = 1;
     }
   if (!flag)
-    fprintf(stderr,"makedjvu: no more chunks in BG44 file\n");
+    fprintf(stderr,"djvumake: no more chunks in BG44 file\n");
 }
 
 
@@ -276,12 +276,12 @@ create_bg44_chunk(IFFByteStream &iff, char *ckid, char *filespec)
 int
 main(int argc, char **argv)
 {
-  // Print usage when called without enough arguments
-  if (argc <= 2)
-    usage();
-  // Open djvu file
   TRY
     {
+      // Print usage when called without enough arguments
+      if (argc <= 2)
+        usage();
+      // Open djvu file
       remove(argv[1]);
       StdioByteStream obs(argv[1],"wb");
       IFFByteStream iff(obs);
@@ -295,20 +295,20 @@ main(int argc, char **argv)
           if (! strncmp(argv[i],"INFO=",5))
             {
               if (i>2)
-                fprintf(stderr,"makedjvu: information chunk should appear first (ignored)\n");
+                fprintf(stderr,"djvumake: 'INFO' chunk should appear first (ignored)\n");
             }
           else if (! strncmp(argv[i],"Sjbz=",5))
             {
               create_jb2_chunk(iff, "Sjbz", argv[i]+5);
               if (flag_contains_stencil)
-                fprintf(stderr,"makedjvu: duplicate stencil specification\n");
+                fprintf(stderr,"djvumake: duplicate 'Sjbz' chunk\n");
               flag_contains_stencil = 1;
             }
           else if (! strncmp(argv[i],"FG44=",5))
             {
               create_fg44_chunk(iff, "FG44", argv[i]+5);
               if (flag_contains_fg)
-                fprintf(stderr,"makedjvu: duplicate foreground specification\n");
+                fprintf(stderr,"djvumake: duplicate 'FG44' chunk\n");
               flag_contains_fg = 1;
             }
           else if (! strncmp(argv[i],"BG44=",5))
@@ -318,22 +318,22 @@ main(int argc, char **argv)
             }
           else
             {
-              fprintf(stderr,"makedjvu: illegal argument %d (ignored) : %s\n", i, argv[i]);
+              fprintf(stderr,"djvumake: illegal argument %d (ignored) : %s\n", i, argv[i]);
             }
         }
       // Close
       iff.close_chunk();
       // Sanity checks
       if (! flag_contains_stencil)
-        fprintf(stderr,"makedjvu: djvu file contains no stencil\n");
+        fprintf(stderr,"djvumake: djvu file contains no 'Sjbz' chunk\n");
       if (flag_contains_bg && !flag_contains_fg)
-        fprintf(stderr,"makedjvu: djvu file contains background but no foreground\n");
+        fprintf(stderr,"djvumake: djvu file contains a 'BG44' chunk but no 'FG44' chunk\n");
     }
   CATCH(ex)
     {
       remove(argv[1]);
-      ex.perror("Type 'makedjvu' without arguments for more help");
-      return -1;
+      ex.perror("Type 'djvumake' without arguments for more help");
+      exit(1);
     }
   ENDCATCH;
   return 0;

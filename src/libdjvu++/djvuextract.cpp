@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: breakdjvu.cpp,v 1.3 1999-02-01 18:32:34 leonb Exp $
+//C-  $Id: djvuextract.cpp,v 1.1 1999-02-03 22:55:30 leonb Exp $
 
 // Obtains the components of a DJVU file
 // File "$Id"
@@ -40,7 +40,7 @@ struct SecondaryHeader {
 
 
 void
-breakdjvu(const char *filename,
+djvuextract(const char *filename,
           MemoryByteStream *pSjbz,
           MemoryByteStream *pBG44,
           MemoryByteStream *pFG44)
@@ -119,48 +119,61 @@ breakdjvu(const char *filename,
     }
 }
 
+void 
+usage()
+{
+  fprintf(stderr, 
+          "Usage: djvuextract <djvufile> [Sjbz=file] [BG44=file] [FG44=file]\n");
+  exit(1);
+}
 
 
 int
 main(int argc, char **argv)
 {
-  if (argc<2)
+  TRY
     {
-      fprintf(stderr, "Usage: %s <djvufile> [Sjbz=file] [BG44=file] [FG44=file]\n",argv[0]);
-      exit(10);
+      if (argc<2)
+        usage();
+      MemoryByteStream Sjbz;
+      MemoryByteStream BG44;
+      MemoryByteStream FG44;
+      djvuextract(argv[1], &Sjbz, &BG44, &FG44);
+      for (int i=2; i<argc; i++)
+        {
+          Sjbz.seek(0);
+          BG44.seek(0);
+          FG44.seek(0);
+          if (! strncmp(argv[i],"Sjbz=",5))
+            {
+              if (Sjbz.size()==0)
+                THROW("No chunk Sjbz in this DJVU file");
+              StdioByteStream obs(argv[i]+5,"wb");
+              obs.copy(Sjbz);
+            }
+          else if (! strncmp(argv[i],"BG44=",5))
+            {
+              if (BG44.size()==0)
+                THROW("No chunk BG44 in this DJVU file");
+              StdioByteStream obs(argv[i]+5,"wb");
+              obs.copy(BG44);
+            }
+          else if (! strncmp(argv[i],"FG44=",5))
+            {
+              if (FG44.size()==0)
+                THROW("No chunk FG44 in this DJVU file");
+              StdioByteStream obs(argv[i]+5,"wb");
+              obs.copy(FG44);
+            }
+          else
+            usage();
+        }
     }
-  MemoryByteStream Sjbz;
-  MemoryByteStream BG44;
-  MemoryByteStream FG44;
-  breakdjvu(argv[1], &Sjbz, &BG44, &FG44);
-  for (int i=2; i<argc; i++)
+  CATCH(ex)
     {
-      Sjbz.seek(0);
-      BG44.seek(0);
-      FG44.seek(0);
-      if (! strncmp(argv[i],"Sjbz=",5))
-        {
-          if (Sjbz.size()==0)
-            THROW("No chunk Sjbz in this DJVU file");
-          StdioByteStream obs(argv[i]+5,"wb");
-          obs.copy(Sjbz);
-        }
-      else if (! strncmp(argv[i],"BG44=",5))
-        {
-          if (BG44.size()==0)
-            THROW("No chunk BG44 in this DJVU file");
-          StdioByteStream obs(argv[i]+5,"wb");
-          obs.copy(BG44);
-        }
-      else if (! strncmp(argv[i],"FG44=",5))
-        {
-          if (FG44.size()==0)
-            THROW("No chunk FG44 in this DJVU file");
-          StdioByteStream obs(argv[i]+5,"wb");
-          obs.copy(FG44);
-        }
-      else
-        THROW("Unrecognized command line argument");
+      ex.perror();
+      exit(1);
     }
-  return (0);
+  ENDCATCH;
+  return 0;
 }

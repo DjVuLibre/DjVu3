@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: d44.cpp,v 1.4 1999-02-01 18:57:34 leonb Exp $
+//C-  $Id: d44.cpp,v 1.5 1999-02-03 22:55:30 leonb Exp $
 
 
 
@@ -62,7 +62,7 @@
     @author
     Leon Bottou <leonb@research.att.com>
     @version
-    #$Id: d44.cpp,v 1.4 1999-02-01 18:57:34 leonb Exp $# */
+    #$Id: d44.cpp,v 1.5 1999-02-03 22:55:30 leonb Exp $# */
 //#{
 //#}
 
@@ -96,7 +96,7 @@ usage()
          "    -verbose     -- report decoding time and memory use\n"
          "    -chunks n    -- select number of chunks to decode\n"
          "\n");
-  exit(-1);
+  exit(1);
 }
 
 
@@ -215,7 +215,7 @@ main(int argc, char **argv)
   CATCH(ex)
     {
       ex.perror("Exception while executing D44");
-      return -1;
+      exit(1);
     }
   ENDCATCH;
   return 0;

@@ -7,9 +7,9 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: djvutopnm.cpp,v 1.8 1999-02-01 18:57:34 leonb Exp $
+//C-  $Id: djvutopnm.cpp,v 1.9 1999-02-03 22:55:30 leonb Exp $
 
-// File "$Id: djvutopnm.cpp,v 1.8 1999-02-01 18:57:34 leonb Exp $"
+// File "$Id: djvutopnm.cpp,v 1.9 1999-02-03 22:55:30 leonb Exp $"
 // Author: Yann Le Cun 08/1997
 
 #include <stdio.h>
@@ -152,7 +152,7 @@ usage()
           "is sent to the standard output.  If <djvufile> is a single dash or\n"
           "omitted, the djvu file is read from the standard input.\n\n"
           );
-  exit(-1);
+  exit(1);
 }
 
 
@@ -276,7 +276,7 @@ main(int argc, char **argv)
   CATCH(ex)
     {
       ex.perror("Exception while executing DJVUTOPNM");
-      return -1;
+      exit(1);
     }
   ENDCATCH;
   return 0;

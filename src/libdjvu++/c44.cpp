@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: c44.cpp,v 1.4 1999-02-01 18:57:34 leonb Exp $
+//C-  $Id: c44.cpp,v 1.5 1999-02-03 22:55:30 leonb Exp $
 
 
 /** @name c44
@@ -148,7 +148,7 @@
     @author
     Leon Bottou <leonb@research.att.com>
     @version
-    #$Id: c44.cpp,v 1.4 1999-02-01 18:57:34 leonb Exp $# */
+    #$Id: c44.cpp,v 1.5 1999-02-03 22:55:30 leonb Exp $# */
 //@{
 //@}
 
@@ -228,7 +228,7 @@ usage()
          "    -crcbdelay n  -- select chrominance coding delay (default 10)\n"
          "                     for -crcbnormal and -crcbhalf modes\n"
          "\n");
-  exit(-1);
+  exit(1);
 }
 
 
@@ -640,7 +640,7 @@ main(int argc, char **argv)
   CATCH(ex)
     {
       ex.perror("Exception while executing C44");
-      return -1;
+      exit(1);
     }
   ENDCATCH;
   return 0;

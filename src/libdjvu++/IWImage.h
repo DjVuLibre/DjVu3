@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: IWImage.h,v 1.1 1999-02-01 18:57:33 leonb Exp $
+//C-  $Id: IWImage.h,v 1.2 1999-02-03 22:55:30 leonb Exp $
 
 #ifndef _IWIMAGE_H_
 #define _IWIMAGE_H_
@@ -28,9 +28,9 @@
     successive #"PM44"# or #"BM44"# data chunks contain successive refinements
     of the encoded image.  Each chunk contains a certain number of "data
     slices".  The first chunk also contains a small image header.  You can use
-    program \Ref{showiff} to display all this structural information:
+    program \Ref{djvuinfo} to display all this structural information:
     \begin{verbatim}
-    % showiff lag.iw4
+    % djvuinfo lag.iw4
     lag.iw4:
       FORM:PM44 [62598] 
         PM44 [10807]              #1 - 74 slices - v1.2 (color) - 684x510
@@ -44,9 +44,9 @@
     #"BG44"# chunks encoding the background layer and #"FG44"# chunks encoding
     the foreground color layer.  These #"BG44"# and #"FG44"# chunks are
     actually regular IW44 data chunks with a different chunk identifier.  This
-    information too can be displayed using program \Ref{showiff}.
+    information too can be displayed using program \Ref{djvuinfo}.
     \begin{verbatim}
-    % showiff graham1.djvu 
+    % djvuinfo graham1.djvu 
     graham1.djvu:
       FORM:DJVU [32553] 
         INFO [5]            3156x2325, version 17
@@ -97,7 +97,7 @@
     @author
     Leon Bottou <leonb@research.att.com>
     @version
-    #$Id: IWImage.h,v 1.1 1999-02-01 18:57:33 leonb Exp $# */
+    #$Id: IWImage.h,v 1.2 1999-02-03 22:55:30 leonb Exp $# */
 //@{
 
 #ifdef __GNUC__
