@@ -8,7 +8,7 @@
 # C- AT&T, you have an infringing copy of this software and cannot use it
 # C- without violating AT&T's intellectual property rights.
 # C-
-# C- $Id: Makefile.in,v 1.31 1999-08-18 16:12:39 eaf Exp $
+# C- $Id: Makefile.in,v 1.32 1999-08-18 18:47:24 leonb Exp $
 
 SHELL=/bin/sh
 prefix=@prefix@
@@ -158,7 +158,7 @@ clean:
 
 realclean:
 	-rm 2>/dev/null -rf @Doc libdjvu++.dxx libdjvu++.ps.gz ; true
-	-rm 2>/dev/null -rf ATTLicense.cpp Makefile.dep ; true
+	-rm 2>/dev/null -rf ATTLicense.cpp Makefile.depend ; true
 	-@$(MAKE) clean
 
 distclean:
@@ -179,9 +179,9 @@ install: $(PROG)
 
 depend:
 	( cd $(SRCDIR) ; echo "### DEPENDENCIES" ;\
-	  for n in *.cpp ; do ${CXX} -MM $(CXXFLAGS) $$n ; done ) > Makefile.dep
+	  for n in *.cpp ; do ${CXX} -MM $(CXXFLAGS) $$n ; done ) > Makefile.depend
 	sed -e '/^### DEPENDENCIES$$/,$$d' Makefile > Makefile.new
-	cat Makefile.dep >> Makefile.new
+	cat Makefile.depend >> Makefile.new
 	mv Makefile.new Makefile
 	  
 release:
