@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GContainer.cpp,v 1.9 1999-08-13 00:05:07 leonb Exp $
+//C- $Id: GContainer.cpp,v 1.10 1999-08-17 22:41:14 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -362,18 +362,21 @@ GListBase::prepend(Node *n)
 void 
 GListBase::insert_after(GPosition pos, Node *n)
 {
-  // Check
-  if (!pos) 
+  // Prepare
+  if (pos.ptr)
     {
-      append(n);
-      return;
+      if (pos.cont != (void*)this)
+        pos.throw_invalid((void*)this);
+      Node *p = pos.ptr;
+      n->prev = p;
+      n->next = p->next;
     }
-  if (pos.cont != (void*)this)
-    pos.throw_invalid((void*)this);
+  else
+    {
+      n->prev = 0;
+      n->next = head.next;
+    }
   // Link
-  Node *p = pos.ptr;
-  n->prev = p;
-  n->next = p->next;
   if (n->prev)
     n->prev->next = n;
   else
@@ -390,18 +393,21 @@ GListBase::insert_after(GPosition pos, Node *n)
 void 
 GListBase::insert_before(GPosition pos, Node *n)
 {
-  // Check
-  if (!pos) 
-    { 
-      prepend(n);
-      return;
+  // Prepare
+  if (pos.ptr)
+    {
+      if (pos.cont != (void*)this)
+        pos.throw_invalid((void*)this);
+      Node *p = pos.ptr;
+      n->prev = p->prev;
+      n->next = p;
     }
-  if (pos.cont != (void*)this)
-    pos.throw_invalid((void*)this);
+  else
+    {
+      n->prev = head.prev;
+      n->next = 0;
+    }
   // Link
-  Node *p = pos.ptr;
-  n->prev = p->prev;
-  n->next = p;
   if (n->prev)
     n->prev->next = n;
   else
@@ -411,6 +417,52 @@ GListBase::insert_before(GPosition pos, Node *n)
   else
     head.prev = n;
   // Finish
+  nelem += 1;
+}
+
+
+void
+GListBase::insert_before(GPosition pos, GListBase &fromlist, GPosition &frompos)
+{
+  // Check
+  if (!frompos.ptr || frompos.cont != (void*)&fromlist)
+    frompos.throw_invalid((void*)&fromlist);
+  if (pos.ptr && pos.cont != (void*)this)
+    pos.throw_invalid((void*)this);
+  // Update frompos
+  Node *n = frompos.ptr;
+  frompos.ptr = n->next;
+  // Unlink
+  if (n->next)
+    n->next->prev = n->prev;
+  else
+    fromlist.head.prev = n->prev;
+  if (n->prev)
+    n->prev->next = n->next;
+  else
+    fromlist.head.next = n->next;
+  fromlist.nelem -= 1;
+  // Prepare insertion
+  if (pos.ptr)
+    {
+      Node *p = pos.ptr;
+      n->prev = p->prev;
+      n->next = p;
+    }
+  else
+    {
+      n->prev = head.prev;
+      n->next = 0;
+    }
+  // Link
+  if (n->prev)
+    n->prev->next = n;
+  else
+    head.next = n;
+  if (n->next)
+    n->next->prev = n;
+  else
+    head.prev = n;
   nelem += 1;
 }
 
