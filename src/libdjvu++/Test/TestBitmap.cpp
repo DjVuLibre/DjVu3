@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: TestBitmap.cpp,v 1.3 1999-02-16 17:19:15 leonb Exp $
+//C-  $Id: TestBitmap.cpp,v 1.4 1999-02-26 22:23:28 leonb Exp $
 
 
 #include <stdlib.h>
@@ -16,7 +16,7 @@
 #include "ByteStream.h"
 
 
-MemoryByteStream bs1 ( 
+StaticByteStream bs1 ( 
 "P1  16 16\n"
 "0000000111000000\n"
 "0000001101100000\n"
@@ -35,7 +35,7 @@ MemoryByteStream bs1 (
 "0000000000000000\n"
 "0000000000000000\n" );
 
-MemoryByteStream bs2 ( 
+StaticByteStream bs2 ( 
 "P1  16 16\n"
 "0000000000000000\n"
 "0000000000000000\n"
