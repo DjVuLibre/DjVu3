@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.h,v 1.18 1999-09-10 19:24:20 eaf Exp $
+//C- $Id: DjVuDocument.h,v 1.19 1999-09-10 21:52:36 eaf Exp $
  
 #ifndef _DJVUDOCUMENT_H
 #define _DJVUDOCUMENT_H
@@ -20,7 +20,7 @@
 
 #include "DjVuGlobal.h"
 #include "GSmartPointer.h"
-#include "GCache.h"
+#include "DjVuFileCache.h"
 #include "DjVuFile.h"
 #include "DjVuImage.h"
 #include "DjVmDir0.h"
@@ -33,7 +33,7 @@
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocument.h,v 1.18 1999-09-10 19:24:20 eaf Exp $#
+    @version #$Id: DjVuDocument.h,v 1.19 1999-09-10 21:52:36 eaf Exp $#
 */
 
 //@{
@@ -60,7 +60,7 @@
 
     {\bf Decoding.} #DjVuDocument# provides convenient interface for obtaining
     \Ref{DjVuImage} corresponding to any page of the document. It uses
-    \Ref{GCache} to do caching thus avoiding unnecessary multiple decoding of
+    \Ref{DjVuFileCache} to do caching thus avoiding unnecessary multiple decoding of
     the same page. The real decoding though is accomplished by \Ref{DjVuFile}.
 
     {\bf Messenging.} Being derived from \Ref{DjVuPort}, #DjVuDocument#
@@ -166,7 +166,7 @@ public:
 	  @param cache It's used to cache decoded \Ref{DjVuFile}s and
 	         is actually useful in the plugin only. */
    void         init(const GURL & url, GP<DjVuPort> port=0, 
-                     GCache<GURL, DjVuFile> * cache=0);
+                     DjVuFileCache * cache=0);
 
       /** Returns type of the document: #DjVuDocument::OLD_BUNDLED# or
 	  #DjVuDocument::INDEXED# or #DjVuDocument:BUNDLED# or
@@ -246,7 +246,7 @@ public:
       //@}
 
       /// Returns cache being used.
-   GCache<GURL, DjVuFile> * get_cache(void) const;
+   DjVuFileCache * get_cache(void) const;
 
       /** @name Saving document to disk */
       //@{
@@ -298,7 +298,7 @@ protected:
    virtual void		file_destroyed(const DjVuFile *);
 private:
    bool                 initialized;
-   GCache<GURL, DjVuFile> *cache;
+   DjVuFileCache	* cache;
    GP<DjVuSimplePort>	simple_port;
    int			doc_type;
 
@@ -344,7 +344,7 @@ DjVuDocument::inherits(const char * class_name) const
       DjVuPort::inherits(class_name);
 }
 
-inline GCache<GURL, DjVuFile> *
+inline DjVuFileCache *
 DjVuDocument::get_cache(void) const
 {
    return cache;

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.31 1999-09-10 19:24:19 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.32 1999-09-10 21:52:36 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -29,7 +29,7 @@ DjVuDocument::DjVuDocument(void)
 
 void
 DjVuDocument::init(const GURL & url, GP<DjVuPort> xport,
-                   GCache<GURL, DjVuFile> * xcache)
+                   DjVuFileCache * xcache)
 {
    if (initialized)
      THROW("DjVuDocument is already initialized");
@@ -310,14 +310,14 @@ DjVuDocument::url_to_page(const GURL & url)
 
 static void
 add_to_cache(const GP<DjVuFile> & f, GMap<GURL, void *> & map,
-	     GCache<GURL, DjVuFile> * cache)
+	     DjVuFileCache * cache)
 {
    GURL url=f->get_url();
    
    if (!map.contains(url))
    {
       map[url]=0;
-      cache->add_item(url, f);	// Force overwrite even if item exists
+      cache->add_file(f);	// Force overwrite even if item exists
       
       GPList<DjVuFile> list;
       for(GPosition pos=list;pos;++pos)
@@ -392,8 +392,10 @@ DjVuDocument::get_cached_file(const DjVuPort * source, const GURL & url)
 
    GP<DjVuFile> file;
    
-      // First - check the cache of decoded files
-   if (cache) file=cache->get_item(url);
+      // First - check if there is a file with this URL globally registered
+   GP<DjVuPort> file_port=get_portcaster()->name_to_port(url);
+   if (file_port && file_port->inherits("DjVuFile"))
+      file=(DjVuFile *) (DjVuPort *) file_port;
    DEBUG_MSG("found file in the global cache=" << (file!=0) << "\n");
 
    if (!file)
@@ -524,6 +526,9 @@ DjVuDocument::notify_file_flags_changed(const DjVuFile * source,
 	       dummy_ndir=false;
 	    }
 	 }
+
+   if (set_mask & DjVuFile::DECODE_OK)
+      get_portcaster()->set_name(source, source->get_url());
 }
 
 GP<DjVuFile>
