@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: xml2utf16.cpp,v 1.3 2001-07-24 17:52:03 bcr Exp $
+// $Id: xml2utf16.cpp,v 1.4 2001-08-02 19:46:51 bcr Exp $
 // $Name:  $
 
 /** @name xml2utf16
@@ -43,7 +43,7 @@
     @author
     Dr Bill C Riemers <bcr@lizardtech.com>
     @version
-    #$Id: xml2utf16.cpp,v 1.3 2001-07-24 17:52:03 bcr Exp $# */
+    #$Id: xml2utf16.cpp,v 1.4 2001-08-02 19:46:51 bcr Exp $# */
 //@{
 //@}
 
@@ -86,7 +86,7 @@ main(int argc, char **argv)
   GURL::Filename::UTF8 outurl((argc<3)?GUTF8String("-"):dargv[argc-1]);
   G_TRY
   {
-    GP<ByteStream> bs(ByteStream::create(inurl,"r")); 
+    GP<ByteStream> bs(ByteStream::create(inurl,"rb")); 
     {
       GP<XMLByteStream> uni=XMLByteStream::create(bs);
       bs=ByteStream::create();
@@ -98,7 +98,7 @@ main(int argc, char **argv)
         ustr.ncopy(wbuf,ustr.length()+1);
         if(sizeof(wchar_t) == sizeof(unsigned short))
         {
-          bs->writall(wbuf,wcslen(wbuf));
+          bs->writall(wbuf,wcslen(wbuf)*sizeof(unsigned short));
         }else
         {
           for(wchar_t *ptr=wbuf;*ptr;++ptr)
@@ -119,7 +119,7 @@ main(int argc, char **argv)
       }
     }
     bs->seek(0L);
-    GP<ByteStream> outbs=ByteStream::create(outurl,"w");
+    GP<ByteStream> outbs=ByteStream::create(outurl,"wb");
     static const unsigned short tag=0xFEFF;
     outbs->writall(&tag,sizeof(tag));
     outbs->copy(*bs);

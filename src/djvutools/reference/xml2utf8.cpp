@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: xml2utf8.cpp,v 1.7 2001-07-24 17:52:03 bcr Exp $
+// $Id: xml2utf8.cpp,v 1.8 2001-08-02 19:46:51 bcr Exp $
 // $Name:  $
 
 /** @name xml2utf8
@@ -43,7 +43,7 @@
     @author
     Dr Bill C Riemers <bcr@lizardtech.com>
     @version
-    #$Id: xml2utf8.cpp,v 1.7 2001-07-24 17:52:03 bcr Exp $# */
+    #$Id: xml2utf8.cpp,v 1.8 2001-08-02 19:46:51 bcr Exp $# */
 //@{
 //@}
 
@@ -86,7 +86,7 @@ main(int argc, char **argv)
   GURL::Filename::UTF8 outurl((argc<3)?GUTF8String("-"):dargv[argc-1]);
   G_TRY
   {
-    GP<ByteStream> bs(ByteStream::create(inurl,"r")); 
+    GP<ByteStream> bs(ByteStream::create(inurl,"rb")); 
     {
       GP<XMLByteStream> uni=XMLByteStream::create(bs);
       bs=ByteStream::create();
@@ -97,7 +97,7 @@ main(int argc, char **argv)
       }
     }
     bs->seek(0L);
-    GP<ByteStream> outbs=ByteStream::create(outurl,"w");
+    GP<ByteStream> outbs=ByteStream::create(outurl,"wb");
     outbs->write24(0xEFBBBF);
     outbs->copy(*bs);
   }
