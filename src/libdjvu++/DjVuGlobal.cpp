@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuGlobal.cpp,v 1.9 1999-09-21 21:42:19 leonb Exp $
+//C- $Id: DjVuGlobal.cpp,v 1.10 1999-09-23 03:13:37 leonb Exp $
 
 
 
@@ -58,135 +58,80 @@ _djvu_memory_callback(djvu_delete_callback *dp, djvu_new_callback *np)
 
 #ifdef NEED_DJVU_PROGRESS
 #include "GOS.h"
+#include "GException.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 
-DjVuProgress::CheckPoint *DjVuProgress::chk = 0;
-DjVuProgress::Callback   *DjVuProgress::cb = 0;
-unsigned long             DjVuProgress::base = 0;
-void                     *DjVuProgress::log = 0;
-int                       DjVuProgress::taglen = 0;
-int                       DjVuProgress::tagmax = 0;
-char                     *DjVuProgress::tagbuf = 0;
+#define INITIAL  500
+#define INTERVAL 500
 
+DjVuProgressTask *DjVuProgressTask::head = 0;
 
-void 
-DjVuProgress::end()
+void (*DjVuProgressTask::callback)(unsigned long, unsigned long) = 0;
+
+unsigned long DjVuProgressTask::lastsigdate = 0;
+
+DjVuProgressTask::DjVuProgressTask(int nsteps)
+  : parent(0), nsteps(nsteps), runtostep(0)
 {
-  if ((FILE*)log && (FILE*)log!=stderr) 
-    fclose((FILE*)log);
-  chk = 0;
-  cb = 0;
-  log = 0;
-  tagmax = taglen = 0;
-  delete [] tagbuf;
-  tagbuf = 0;
-}
-
-void 
-DjVuProgress::start(DjVuProgress::CheckPoint *s, DjVuProgress::Callback *c)
-{
-  end();
-  chk = s;
-  cb = c;
-  log = 0;
-}
-
-void 
-DjVuProgress::start(const char *logname)
-{
-  end();
-  base = GOS::ticks();
-  log = (void*)stderr;
-  if (logname) 
-    log = (void*)fopen(logname,"w");
-}
-
-DjVuProgress::Event::~Event()
-{
-  taglen = n;
-  if (tagbuf && n<tagmax)  tagbuf[taglen] = 0;
-}
-
-DjVuProgress::Event::Event(const char *tag)
-  : n(taglen)
-{
-  if (!log && !chk) 
-    return;
-  enter(tag);
-}
-
-DjVuProgress::Event::Event(int tag)
-  : n(taglen)
-{
-  if (!log && !chk) 
-    return;
-  char buffer[16];
-  sprintf(buffer,"%d", tag);
-  enter(buffer);
-}
-
-void
-DjVuProgress::Event::enter(const char *tag)
-{
-  if (!log && !chk) 
-    return;
-  // Check tag buffer
-  int l = strlen(tag);
-  if (taglen+l+2 > tagmax) {
-    int newtagmax = tagmax + 256;
-    char *newbuf = new char[newtagmax];
-    strcpy(newbuf, tagbuf ? tagbuf : "");
-    delete [] tagbuf;
-    tagbuf = newbuf;
-    tagmax = newtagmax;
-  }
-  // Append tag component
-  if (taglen>0) {
-    strcpy(tagbuf+taglen, ".");
-    taglen += 1;
-  }
-  strcpy(tagbuf+taglen, tag);
-  taglen += l;
-  // Perform trace
-  if (log)
-    fprintf((FILE*)log, "  { %6ld, \"%s\" },\n", GOS::ticks()-base, tagbuf);
-  // Scan checkpoints
-  if (chk)
+  if (callback)
     {
-      int lastpassed = -1;
-      for (CheckPoint *k=chk; k->tag; k++)
-        if (! k->passed)
-          {
-            char *s = tagbuf;
-            char *d = (char*)(k->tag);
-            for(;;)
-              {
-                if (*s>='0' && *s<='9' && *d>='0' && *d<='9')
-                  {
-                    int si = strtol(s, &s, 10);
-                    int di = strtol(d, &d, 10);
-                    if (si >= di)
-                      continue;
-                    break;
-                  }
-                if (*s==0 && *d==0)
-                  { 
-                    k->passed = 1; 
-                    lastpassed = k-chk;
-                    break; 
-                  }
-                if (*s++ != *d++)
-                  break;
-              }
-          }
-      // Callback
-      if (lastpassed>=0 && cb)
-        (*cb)(lastpassed);
+      unsigned long curdate = GOS::ticks();
+      startdate = curdate;
+      if (head==0)
+        lastsigdate = curdate + INITIAL;
+      parent = head;
+      head = this;
     }
 }
 
+DjVuProgressTask::~DjVuProgressTask()
+{
+  if (callback)
+    {
+      if (parent==0)
+        lastsigdate -= INTERVAL;
+      run (nsteps+1);
+      if (head != this)
+        THROW("DjVuProgress is not compatible with multithreading");
+      head = parent;
+    }
+}
+
+void
+DjVuProgressTask::run(int tostep)
+{
+  if (callback && tostep>runtostep)
+    {
+      unsigned long curdate = GOS::ticks();
+      if (curdate > lastsigdate + INTERVAL)
+        signal(curdate, curdate);
+      runtostep = tostep;
+    }
+}
+
+void
+DjVuProgressTask::signal(unsigned long curdate, unsigned long estdate)
+{
+  int inprogress = runtostep;
+  if (inprogress > nsteps)
+    inprogress = nsteps;
+  if (inprogress > 0)
+    {
+      unsigned long enddate = startdate;
+      enddate += (estdate-startdate) * nsteps / inprogress;
+      if (parent)
+        {
+          parent->signal(curdate, enddate);
+        }
+      else if (callback)
+        {
+          (*callback)(curdate-startdate, enddate-startdate);
+          lastsigdate = curdate;
+        }
+    }
+}
 
 #endif
 

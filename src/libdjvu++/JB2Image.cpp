@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: JB2Image.cpp,v 1.20 1999-09-21 20:51:27 leonb Exp $
+//C- $Id: JB2Image.cpp,v 1.21 1999-09-23 03:13:37 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -1248,7 +1248,6 @@ _JB2Codec::code(JB2Dict *jim)
 {
   if (encoding)
     {
-      DJVU_PROGRESS("jb2dict");
       // -------------------------
       // THIS IS THE ENCODING PART
       // -------------------------
@@ -1268,12 +1267,10 @@ _JB2Codec::code(JB2Dict *jim)
         code_record(rectype, jim, NULL);
       // Encode every shape
       int shapeno;
+      DJVU_PROGRESS_TASK(jb2code, nshape-firstshape);
       for (shapeno=firstshape; shapeno<nshape; shapeno++)
         {
-#ifdef NEED_DJVU_PROGRESS
-          if ((shapeno & 0xff) == 0xff)
-            DJVU_PROGRESS((shapeno-firstshape)*100/(nshape-firstshape));
-#endif
+          DJVU_PROGRESS_RUN(jb2code, (shapeno-firstshape)|0xff);
           // Code shape
           JB2Shape *jshp = jim->get_shape(shapeno);
           rectype = NEW_MARK_LIBRARY_ONLY;
@@ -1514,7 +1511,6 @@ _JB2Codec::code(JB2Image *jim)
   // Test case
   if (encoding)
     {
-      DJVU_PROGRESS("jb2image");
       // -------------------------
       // THIS IS THE ENCODING PART
       // -------------------------
@@ -1558,12 +1554,10 @@ _JB2Codec::code(JB2Image *jim)
         code_record(rectype, jim, NULL, NULL);
       // Encode every blit
       int blitno;
+      DJVU_PROGRESS_TASK(jb2code, nblit);
       for (blitno=0; blitno<nblit; blitno++)
         {
-#ifdef NEED_DJVU_PROGRESS
-          if ((blitno & 0xff) == 0xff)
-            DJVU_PROGRESS(blitno*100/nblit);
-#endif
+          DJVU_PROGRESS_RUN(jb2code, blitno|0xff);
           JB2Blit *jblt = jim->get_blit(blitno);
           int shapeno = jblt->shapeno;
           JB2Shape *jshp = jim->get_shape(shapeno);

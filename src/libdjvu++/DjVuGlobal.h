@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuGlobal.h,v 1.15 1999-09-21 20:51:26 leonb Exp $
+//C- $Id: DjVuGlobal.h,v 1.16 1999-09-23 03:13:37 leonb Exp $
 
 
 #ifndef _DJVUGLOBAL_H
@@ -27,7 +27,7 @@
     @memo
     Global definitions.
     @version
-    #$Id: DjVuGlobal.h,v 1.15 1999-09-21 20:51:26 leonb Exp $#
+    #$Id: DjVuGlobal.h,v 1.16 1999-09-23 03:13:37 leonb Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> -- empty file.\\
     Bill Riemers <bcr@sanskrit.lz.att.com> -- real work.  */
@@ -113,138 +113,65 @@ operator delete [] (void *addr) delete_throw_spec
     implement a progress indicator for the encoding routines.  The decoding
     routines do not need such a facility because it is sufficient to monitor
     the calls to function \Ref{ByteStream::read} in class \Ref{ByteStream}.
-
+    
     {\bf Code tracing macros} ---
     Monitoring the progress of such complex algorithms requires significant
     code support.  This is achieved by inserting {\em code tracing macros}
-    in strategic regions of the code.  Tagged trace events are generated 
-    whenever the execution flow reaches these macros.
-
-    Macro #DJVU_PROGRESS(tag)# generates a such tagged event when it gets
-    executed. The event is said to remain ``active'' until the control flow
-    leaves the C++ scope containing the tag macro. The argument #tag# may be a
-    string (describing the currently running task) or an integer (describing a
-    percentage of completion for the task).  The actual tag of an event is
-    formed by concatenating the tags of all active events separated by dots.
-
-    {\bf Saving the trace} ---
-    Suppose you insert the following calls in 'main':
-    \begin{verbatim}
-    int main(int argc, char **argv)
-    {
-       DjVuProgress::start("logfile");
-       do_the_real_work(argc,argv);
-       DjVuProgress::end();
-    }
-    \end{verbatim}
-    Execution is going to create a file #"logfile"# recording all trace events.
-    Each line of this file contains a time stamp (in milliseconds) and the event
-    tag (composed by concatenating the tags of all active events), as in the
-    following example:
-    \begin{verbatim}
-    {     11, "mbwdjvu" },
-    {     23, "mbwdjvu.jb2image" },
-    {     54, "mbwdjvu.jb2image.15" },
-    {     69, "mbwdjvu.jb2image.31" },
-    {     79, "mbwdjvu.jb2image.46" },
-    {     90, "mbwdjvu.jb2image.62" },
-    {    103, "mbwdjvu.jb2image.77" },
-    {    114, "mbwdjvu.jb2image.93" },
-    \end{verbatim}
-
-    {\bf Selecting checkpoints} --- The next step consists of selecting a few
-    events to be used as checkpoints for ascertaining the progress of the
-    algorithm.  There is no systematic way to do this since the sequence of
-    events depend a lot on the program inputs.  Use good judgment to select
-    one to four dozen events should be enough for all purposes.
-
-    The checkpoints should be gathered in an array of #CheckPoint# records.
-    Each record contains a #tag#, an integer #userdata# that you may use as
-    you wish, and a flag #passed# that must be initialized to zero, as in the
-    following example: 
-    \begin{verbatim} 
-    static DjVuProgress::CheckPoint checkpoints[] = 
-    { { "mbwdjvu.jb2image.10", 10, 0 },
-      { "mbwdjvu.jb2image.30", 30, 0 },
-      { "mbwdjvu.jb2image.50", 50, 0 },
-      { "mbwdjvu.jb2image.70", 70, 0 },
-      { "mbwdjvu.jb2image.90", 90, 0 },
-      { 0 } };
-    \end{verbatim}.
-
-    Flag #passed# is set by the library when an event tag ``matches'' the
-    checkpoint tag.  A match means that both tags have the same letters, and
-    that numbers in the event tag are greater or equal to the numbers in the
-    checkpoint tag.
-
-    {\bf Tracking checkpoints} --- You can now initialize the progress
-    indicator system using another variant of #DjVuProgress::start#.  This
-    function takes a checkpoint array and a callback function which is called
-    whenever a checkpoint is passed.  This callback function can test which
-    checkpoints are passed, can access the #userdata# field as appropriate,
-    and should use appropriate logic in order to display a useful progress
-    indication.
-    \begin{verbatim}
-    static void callback(int chk) 
-    { // A minimal callback
-       printf("%d%%\n", checkpoints[chk].userdata); 
-    }
-     int main(int argc, char **argv)
-    {  // A main routine
-       DjVuProgress::start(checkpoints, callback);
-       do_the_real_work(argc,argv);
-       DjVuProgress::end();
-    }
-    \end{verbatim}
-    The callback function can of course become much more complex when the
-    program has many modes of operation resulting in many different sequences
-    of events.  Large checkpoint arrays can hurt the pewrformance.  It is
-    possible however to call #DjVuProgress::start# and redefine the checkpoint
-    array within the callback function. The resulting system is a state
-    machine mimicking the large features of the control flow. */
+    in strategic regions of the code.  
+    \begin{description}
+    \item[DJVU_PROGRESS_TASK(name,nsteps)]  indicates that the current
+         scope performs a task roughly divided in #nsteps# equal steps.
+    \item[DJVU_PROGRESS_RUN(name,tostep)] indicates that we are starting
+         an operation which will take us to step #tostep#.  The operation
+         will be considered finished when #DJVU_PROGRESS_RUN# will be called
+         again with an argument greater than #tostep#.  The execution of
+         this operation of course can be described by one subtask and so on.
+    \end{description}
+ 
+    {\bf Progress callback} --- The progresss callback function
+    #DjVuProgressTask::callback# should be defined {\em before defining the
+    outermost task}.  This function is called periodically with two #unsigned
+    long# arguments.  The first argument is the elapsed time. The second
+    argument is the estimated total execution time.  Both times are given in
+    milliseconds.  */
 //@{
-//@}
 
 #ifdef NEED_DJVU_PROGRESS
 
-#define DJVU_PROGRESS(tag) DjVuProgress::Event _event_(tag)
+#define DJVU_PROGRESS_TASK(name,nsteps)  DjVuProgressTask task_##name(nsteps)
+#define DJVU_PROGRESS_RUN(name,tostep)   { task_##name.run(tostep); }
 
-class DjVuProgress 
+/// Progress indication class.
+class DjVuProgressTask
 {
 public:
-  struct CheckPoint { const char *tag; int userdata; int passed; };
-  typedef void Callback(int checkpoint);
-  static void start(const char *filename);
-  static void start(CheckPoint *checkpoints, Callback *callback);
-  static void end();
-public:
-  class Event { 
-  public:
-    Event(const char *tag);
-    Event(int tag);
-    ~Event();
-  private:
-    void enter(const char *tag);
-    int n;
-  };
+  ~DjVuProgressTask();
+  DjVuProgressTask(int nsteps);
+  void run(int tostep);
+  /// Periodic callback function
+  static void (*callback)(unsigned long elapsed, unsigned long estimated);
 private:
-  friend class Event;
-  static CheckPoint *chk;
-  static Callback *cb;
-  static unsigned long base;
-  static void *log;
-  static int taglen;
-  static int tagmax;
-  static char *tagbuf;
+  DjVuProgressTask *parent;
+  int nsteps;
+  int runtostep;
+  unsigned long startdate;
+  // Statics
+  static unsigned long lastsigdate;
+  static DjVuProgressTask *head;
+  // Helpers
+  void signal(unsigned long curdate, unsigned long estdate);
 };
+
 
 #else  // ! NEED_DJVU_PROGRESS
 
-#ifndef DJVU_PROGRESS
-#define DJVU_PROGRESS(tag) /**/
-#endif
+#define DJVU_PROGRESS_TASK(name,nsteps)
+#define DJVU_PROGRESS_STEP(name,step)
 
-#endif // NEED_DJVU_PROGRESS
+#endif
+//@}
+
+
 
 
 

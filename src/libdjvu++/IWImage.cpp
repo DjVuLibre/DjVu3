@@ -9,9 +9,9 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: IWImage.cpp,v 1.18 1999-09-21 21:10:17 leonb Exp $
+//C- $Id: IWImage.cpp,v 1.19 1999-09-23 03:13:37 leonb Exp $
 
-// File "$Id: IWImage.cpp,v 1.18 1999-09-21 21:10:17 leonb Exp $"
+// File "$Id: IWImage.cpp,v 1.19 1999-09-23 03:13:37 leonb Exp $"
 // - Author: Leon Bottou, 08/1998
 
 #ifdef __GNUC__
@@ -86,8 +86,6 @@ interpolate_mask(short *data16, int w, int h, int rowsize,
                  const signed char *mask8, int mskrowsize)
 {
   int i,j;
-  // progress
-  DJVU_PROGRESS("interpolate");
   // count masked bits
   short *count = new short[h*w];
   short *cp = count;
@@ -200,7 +198,6 @@ forward_mask(short *data16, int w, int h, int rowsize, int begin, int end,
   for (i=0; i<h; i+=1, m+=w, mask8+=mskrowsize)
     memcpy((void*)m, (void*)mask8, w);
   // Loop over scale
-  DJVU_PROGRESS("mask");
   for (int scale=begin; scale<end; scale<<=1)
     {
       // Copy data into sdata buffer
@@ -611,7 +608,7 @@ _IWMap::create(const signed char *img8, int imgrowsize,
 {
   int i, j;
   // Progress
-  DJVU_PROGRESS("transform");
+  DJVU_PROGRESS_TASK(transf,4);
   // Allocate decomposition buffer
   short *data16 = new short[bw*bh];
   // Copy pixels
@@ -632,13 +629,16 @@ _IWMap::create(const signed char *img8, int imgrowsize,
   if (msk8)
     {
       // Interpolate pixels below mask
+      DJVU_PROGRESS_RUN(transf, 1);
       interpolate_mask(data16, iw, ih, bw, msk8, mskrowsize);
       // Multiscale iterative masked decomposition
+      DJVU_PROGRESS_RUN(transf, 3);
       forward_mask(data16, iw, ih, bw, 1, 32, msk8, mskrowsize);
     }
   else
     {
       // Perform traditional decomposition
+      DJVU_PROGRESS_RUN(transf, 4);
       IWTransform::forward(data16, iw, ih, bw, 1, 32);
     }
   // Copy coefficient into blocks
@@ -2008,7 +2008,6 @@ IWBitmap::decode_chunk(ByteStream &bs)
 int  
 IWBitmap::encode_chunk(ByteStream &bs, const IWEncoderParms &parm)
 {
-  DJVU_PROGRESS("chunk");
   // Check
   if (parm.slices==0 && parm.bytes==0 && parm.decibels==0)
     THROW("(IWBitmap::encode_chunk) Must specify a stopping criterion");
@@ -2030,6 +2029,7 @@ IWBitmap::encode_chunk(ByteStream &bs, const IWEncoderParms &parm)
   int flag = 1;
   int nslices = 0;
   MemoryByteStream mbs;
+  DJVU_PROGRESS_TASK(chunk, parm.slices-cslice);
   {
     float estdb = -1.0;
     _ZPCodecBias zp(mbs,1);
@@ -2041,15 +2041,12 @@ IWBitmap::encode_chunk(ByteStream &bs, const IWEncoderParms &parm)
           break;
         if (parm.slices>0 && nslices+cslice>=parm.slices)
           break;
+        DJVU_PROGRESS_RUN(chunk, (1+nslices-cslice)|0xf);
         flag = ycodec->code_slice(zp);
         if (flag && parm.decibels>0.0)
           if (ycodec->curband==0 || estdb>=parm.decibels-DECIBEL_PRUNE)
             estdb = ycodec->estimate_decibel(db_frac);
         nslices++;
-#ifdef NEED_DJVU_PROGRESS
-        if ((nslices & 0xf) == 0xf)
-          DJVU_PROGRESS((nslices-cslice)*100/(parm.slices-cslice));
-#endif
       }
   }
   // Write primary header
@@ -2496,7 +2493,6 @@ IWPixmap::decode_chunk(ByteStream &bs)
 int  
 IWPixmap::encode_chunk(ByteStream &bs, const IWEncoderParms &parm)
 {
-  DJVU_PROGRESS("chunk");
   // Check
   if (parm.slices==0 && parm.bytes==0 && parm.decibels==0)
     THROW("(IWPixmap::encode_chunk) Must specify a stopping criterion");
@@ -2523,6 +2519,7 @@ IWPixmap::encode_chunk(ByteStream &bs, const IWEncoderParms &parm)
   int flag = 1;
   int nslices = 0;
   MemoryByteStream mbs;
+  DJVU_PROGRESS_TASK(chunk, parm.slices-cslice);
   {
     float estdb = -1.0;
     _ZPCodecBias zp(mbs,1);
@@ -2534,6 +2531,7 @@ IWPixmap::encode_chunk(ByteStream &bs, const IWEncoderParms &parm)
           break;
         if (parm.slices>0 && nslices+cslice>=parm.slices)
           break;
+        DJVU_PROGRESS_RUN(chunk, (1+nslices-cslice)|0xf);
         flag = ycodec->code_slice(zp);
         if (flag && parm.decibels>0)
           if (ycodec->curband==0 || estdb>=parm.decibels-DECIBEL_PRUNE)
@@ -2544,10 +2542,6 @@ IWPixmap::encode_chunk(ByteStream &bs, const IWEncoderParms &parm)
             flag |= crcodec->code_slice(zp);
           }
         nslices++;
-#ifdef NEED_DJVU_PROGRESS
-        if ((nslices & 0xf) == 0xf)
-          DJVU_PROGRESS((nslices-cslice)*100/(parm.slices-cslice));
-#endif
       }
   }
   // Write primary header
