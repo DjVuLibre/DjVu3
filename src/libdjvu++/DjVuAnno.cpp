@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuAnno.cpp,v 1.18 1999-10-01 17:57:31 leonb Exp $
+//C- $Id: DjVuAnno.cpp,v 1.19 1999-10-04 16:06:42 eaf Exp $
 
 
 #ifdef __GNUC__
@@ -798,7 +798,6 @@ DjVuAnno::get_map_areas(GLParser & parser)
 	       map_area->comment=comment;
 	       for(int obj_num=3;obj_num<obj.get_list().size();obj_num++)
 	       {
-		     // Process border stuff
 		  GLObject * el=obj[obj_num];
 		  if (el->get_type()==GLObject::LIST)
 		  {
@@ -833,10 +832,10 @@ DjVuAnno::get_map_areas(GLParser & parser)
 			   }
 			}
 		     }	    
-		  }
-		  map_areas.append(map_area);
-	       }
-	    }
+		  } // if (el->get_type()==...)
+	       } // for(int obj_num=...)
+	       map_areas.append(map_area);
+	    } // if (map_area) ...
 	 } CATCH(exc) {} ENDCATCH;
       } // if (...get_name()==MAPAREA_TAG)
    } // while(item==...)
