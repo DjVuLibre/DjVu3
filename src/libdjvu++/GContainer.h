@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GContainer.h,v 1.14 1999-08-12 21:51:46 leonb Exp $
+//C- $Id: GContainer.h,v 1.15 1999-08-13 00:25:12 leonb Exp $
 
 
 #ifndef _GCONTAINER_H_
@@ -45,7 +45,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@research.att.com> -- bug fixes.
     @version 
-    #$Id: GContainer.h,v 1.14 1999-08-12 21:51:46 leonb Exp $# */
+    #$Id: GContainer.h,v 1.15 1999-08-13 00:25:12 leonb Exp $# */
 //@{
 
 
@@ -908,7 +908,7 @@ GSetImpl<K>::get_or_create(const K &key)
   HNode *m = get(key);
   if (m) return m;
   SNode *n = (SNode*) operator new (sizeof(SNode));
-  new ((void*)&(n->key)) K ( *(K*)key );
+  new ((void*)&(n->key)) K ( key );
   n->hashcode = hash((const K&)(n->key));
   installnode(n);
   return n;
