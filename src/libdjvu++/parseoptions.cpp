@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: parseoptions.cpp,v 1.26 2000-01-25 04:30:34 bcr Exp $
+//C- $Id: parseoptions.cpp,v 1.27 2000-01-25 05:26:31 bcr Exp $
 #ifdef __GNUC__
 #pragma implementation
 #endif
@@ -304,9 +304,11 @@ DjVuParseOptions::init
   for(i=0;i<i_max;i++)
   {
     s=tmp.ProfileTokens->Entry[i].Name;
-    int j=ProfileTokens->SetToken(s);
-    if(!(Configuration->Grow(j+1)))
+    int j=ProfileTokens->GetToken(s);
+    if(j<0)
     {
+      j=ProfileTokens->SetToken(s);
+      (void)(Configuration->Grow(j+1));
       delete [] Configuration->profiles[j].values;
     }
     Configuration->profiles[j].size=tmp.Configuration->profiles[i].size;
@@ -703,36 +705,38 @@ DjVuParseOptions::ReadConfig
     (void)(Configuration->Grow(retval+1));
     if(f)
     {
-      Add(profile,"profile:","read");
+      Configuration->Add(retval,VarTokens->SetToken("profile:"),"read");
       ReadFile(line,f,retval);
       fclose(f);
     }else
     {
-      Add(profile,"profile:","");
+      Configuration->Add(retval,VarTokens->SetToken("profile:"),"");
     }
   }else
   {
 #ifndef WIN32
     const char *xname=strrchr(prog,'/');
 #else
-	const char *xname=strrchr(prog,'\\');
+    const char *xname=strrchr(prog,'\\');
 #endif
     xname=xname?(xname+1):prog;
 
-    retval=ProfileTokens->SetToken(xname);
+    retval=ProfileTokens->GetToken(xname);
 	// First check and see if we have already read in this profile.
-    if(Configuration->Grow(retval+1))
+    if(retval < 0)
     {
+      retval=ProfileTokens->SetToken(xname);
+      (void)(Configuration->Grow(retval+1));
       FILE *f=0;
       if(((ConfigFilename(xname,0)&&(f=fopen(filename,"r"))))
          ||((ConfigFilename(xname,1)&&(f=fopen(filename,"r")))))
       {
-        Add(profile,"profile:","read");
+        Configuration->Add(retval,VarTokens->SetToken("profile:"),"read");
         ReadFile(line,f,retval);
         fclose(f);
       }else
       {
-        Add(profile,"profile:","");
+        Configuration->Add(retval,VarTokens->SetToken("profile:"),"");
       }
     }
   }
@@ -748,17 +752,19 @@ DjVuParseOptions::ReadNextConfig
 {
   const char *xname=strrchr(prog,'/');
   xname=xname?(xname+1):prog;
-  const int retval=ProfileTokens->SetToken(xname);
-  int profile=retval;
-	// First check and see if we have already read in this profile.
-  if(!Configuration->Grow(profile+1))
+  int profile=ProfileTokens->GetToken(xname);
+  if(profile<0)
   {
-    profile=(-1);
+    profile=ProfileTokens->SetToken(xname);
+	// First check and see if we have already read in this profile.
+    (void)(Configuration->Grow(profile+1));
+    Configuration->Add(profile,VarTokens->SetToken("profile:"),"read");
+    ReadFile(line,f,profile);
   }else if(f)
   {
-    ReadFile(line,f,profile);
+    profile=(-1);
   }
-  return retval;
+  return profile;
 }
 
 
@@ -1220,10 +1226,11 @@ DjVuParseOptions::ConfigFilename
 #ifndef WIN32
   const char *retval=0;
   const char *this_config=config[0]?config:default_string;
-	if ( filename ) {
-  	delete [] filename;
-  	filename=0;
-	}
+  if ( filename )
+  {
+    delete [] filename;
+    filename=0;
+  }
   if(level<=0)
   {
     static const char *home=0;
