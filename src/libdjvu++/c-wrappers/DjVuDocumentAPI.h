@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuDocumentAPI.h,v 1.17 2000-02-14 21:59:21 haffner Exp $
+ *C- $Id: DjVuDocumentAPI.h,v 1.18 2000-02-15 20:59:21 haffner Exp $
  */
 
 #ifndef _DJVUDOC_H_
@@ -355,7 +355,7 @@ typedef struct djvu_segmenter_options_struct
 
   /** Segmenter uses subsampled chrominance only.
       
-      This option designed to save memory. It shoud be avoided 
+      This option designed to save memory. It should be avoided 
       when maximum color saturation is desired for 
       the foreground image. Automatically turned off when
       \Ref{background_floss} is on.

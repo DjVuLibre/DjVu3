@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuAPI.h,v 1.37 2000-02-02 04:56:06 bcr Exp $
+ *C- $Id: DjVuAPI.h,v 1.38 2000-02-15 20:59:21 haffner Exp $
  *
  * The main header file for the DjVu API
  */
@@ -17,7 +17,11 @@
 
 /* 
  * $Log: DjVuAPI.h,v $
- * Revision 1.37  2000-02-02 04:56:06  bcr
+ * Revision 1.38  2000-02-15 20:59:21  haffner
+ * Spell check.
+ * Improved Mhistogrid to avoid bug reported in forbes/medieval2, buyback3
+ *
+ * Revision 1.37  2000/02/02 04:56:06  bcr
  * Fixed the Crop and rotate options.
  *
  * Revision 1.36  2000/02/01 19:11:37  bcr
@@ -829,7 +833,7 @@ DJVUAPI djvu_import
 djvu_import_image ( djvu_image * );
 
 /* This is a special type of djvu_export, intended for obtaining the
- * pixel image in memory...  An apon successfull decoding, the image
+ * pixel image in memory...  An apon successful decoding, the image
  * will be stored in the pointed passed.  The returned image should
  * be freed with djvu_image_free.
  */
@@ -848,10 +852,10 @@ typedef djvu_import djvu_import_sub ( void *arg, int filecount );
 DJVUAPI djvu_import
 djvu_import_streams(djvu_import_sub *);
 
-/* For decompressions, we need to define another type of callback to
+/* For decompression, we need to define another type of callback to
  * accept the streams from arbitrary sources.  The idea is quite
  * simply, after adding a single page to a stream type that does not
- * accept multipe pages, we make this callback to get a new stream 
+ * accept multiple pages, we make this callback to get a new stream 
  * for appending further pages to.
  */
 typedef djvu_import djvu_export_sub ( void *arg, int filecount );
