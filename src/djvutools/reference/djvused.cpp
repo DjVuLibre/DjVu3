@@ -30,9 +30,12 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //
-// $Id: djvused.cpp,v 1.10 2001-10-16 22:27:24 docbill Exp $
+// $Id: djvused.cpp,v 1.8.2.1 2001-10-18 15:33:34 leonb Exp $
 // $Name:  $
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
@@ -93,7 +96,8 @@ public:
   int unget(int c);
   inline int get();
   int get_spaces(bool skipseparator=false);
-  GNativeString get_token(bool skipseparator=false);
+  GUTF8String get_utf8_token(bool skipseparator=false);
+  GUTF8String get_native_token(bool skipseparator=false);
 };
 
 ParsingByteStream::ParsingByteStream(const GP<ByteStream> &xgbs)
@@ -180,10 +184,10 @@ ParsingByteStream::get_spaces(bool skipseparator)
    return c;
 }
   
-GNativeString
-ParsingByteStream::get_token(bool skipseparator)
+GUTF8String
+ParsingByteStream::get_utf8_token(bool skipseparator)
 {
-  GNativeString str;
+  GUTF8String str;
   int c = get_spaces(skipseparator);
   if (c == EOF)
     {
@@ -241,6 +245,14 @@ ParsingByteStream::get_token(bool skipseparator)
   return str;
 }
 
+GUTF8String
+ParsingByteStream::get_native_token(bool skipseparator)
+{
+  GUTF8String fake = get_utf8_token(skipseparator);
+  GNativeString nat((const char*)fake);
+  return GUTF8String(nat);
+}
+
 
 // --------------------------------------------------
 // COMMANDS
@@ -276,89 +288,14 @@ verror(const char *fmt, ... )
   GNativeString msg;
   va_list args;
   va_start(args, fmt);
-  msg.format(fmt, args);
+  msg.vformat(fmt, args);
   G_THROW((const char*)msg);
-}
-
-void 
-get_anno_sub(IFFByteStream &iff, IFFByteStream &out)
-{
-  GUTF8String chkid;
-  while (iff.get_chunk(chkid))
-    {
-      if (iff.composite())
-        get_anno_sub(iff, out);
-      else if (chkid == "ANTa" || chkid == "ANTz" ||
-               chkid == "TXTa" || chkid == "TXTz"   )
-        {
-          out.put_chunk(chkid);
-          out.copy(*iff.get_bytestream());
-          out.close_chunk();
-        }
-      iff.close_chunk();
-    }
-}
-
-ByteStream &
-get_anno(const GP<DjVuFile> &f)
-{
-  if (! f->anno) 
-    {
-      GP<ByteStream> bs = f->get_init_data_pool()->get_stream();
-      GP<ByteStream> anno=ByteStream::create();
-      GP<IFFByteStream> in=IFFByteStream::create(bs);
-      GP<IFFByteStream> out=IFFByteStream::create(anno);
-      get_anno_sub(*in, *out);
-      f->anno = anno;
-    }
-  f->anno->seek(0);
-  return *(f->anno);
-}
-
-void
-modify_anno(const GP<DjVuFile> &f, 
-            const char *newchunkid,
-            const GP<ByteStream> newchunk,
-            const char **excludeid)
-{
-  ByteStream &g=get_anno(f);
-  const GP<ByteStream> bs(&g);
-  const GP<IFFByteStream> in(IFFByteStream::create(bs));
-  const GP<ByteStream> anno(ByteStream::create());
-  const GP<IFFByteStream> out(IFFByteStream::create(anno));
-  GUTF8String chkid;
-  if (newchunkid && newchunk && newchunk->size())
-    {
-      newchunk->seek(0);
-      out->put_chunk(newchunkid);
-      out->copy(*newchunk);
-      out->close_chunk();
-    }
-  while (in->get_chunk(chkid))
-    {
-      const char **exclude;
-      for (exclude = excludeid; exclude && *exclude; exclude++)
-        if (! strcmp((const char*)chkid, *exclude))
-          break;
-      if (! (exclude && *exclude)) 
-        {
-          out->put_chunk(chkid);
-          out->copy(*in->get_bytestream());
-          out->close_chunk();
-        }
-      in->close_chunk();
-    }
-  f->anno = anno;
-  if (! anno->size())
-    f->remove_anno();
-  f->set_modified(true);
-  modified = true;
 }
 
 void
 get_data_from_file(const char *cmd, ParsingByteStream &pbs, ByteStream &out)
 {
-  GUTF8String fname = pbs.get_token();
+  GUTF8String fname = pbs.get_native_token();
 
   if (! fname)
     {
@@ -396,6 +333,34 @@ get_data_from_file(const char *cmd, ParsingByteStream &pbs, ByteStream &out)
       GP<ByteStream> in=ByteStream::create(GURL::Filename::UTF8(fname),"rb");
       out.copy(*in);
     }
+}
+
+void
+print_c_string(const char *data, int length, ByteStream &out)
+{
+  out.write("\"",1);
+  while (*data && length>0) 
+    {
+      int span = 0;
+      while (span<length && data[span]>=0x20 && 
+             data[span]<0x7f && data[span]!='"' && data[span]!='\\' )
+        span++;
+      if (span > 0) 
+        {
+          out.write(data, span);
+          data += span;
+          length -= span;
+        }
+      else
+        {
+          char buffer[5];
+          sprintf(buffer,"\\%03o", (int)*(unsigned char*)data);
+          out.write(buffer,4);
+          data += 1;
+          length -= 1;
+        }
+    }
+  out.write("\"",1);
 }
 
 void
@@ -509,7 +474,7 @@ command_size(ParsingByteStream &)
 void
 command_select(ParsingByteStream &pbs)
 {
-  GUTF8String pagid = pbs.get_token();
+  GUTF8String pagid = pbs.get_native_token();
   // Case of NULL
   if (pagid == "") 
     {
@@ -584,47 +549,14 @@ print_ant(IFFByteStream &iff, ByteStream &out)
 }
 
 void
-print_meta(IFFByteStream &iff, ByteStream &out)
-{
-  GUTF8String chkid;  
-
-  while (iff.get_chunk(chkid))
-  {
-    if (chkid == "METz") 
-    {
-         
-      GP<ByteStream> gbs=BSByteStream::create(iff.get_bytestream());
-      out.copy(*gbs);
-    }
-    else if (chkid == "METa") 
-    {
-      GP<ByteStream> gbs(iff.get_bytestream());
-      out.copy(*gbs);
-    }
-    out.write8('\n');
-    iff.close_chunk();
-  }
-}
-
-void 
-command_print_meta(ParsingByteStream &)
-{
-  if (!file)
-    verror("you must first select a page");
-  GP<ByteStream> out=ByteStream::create("w");
-  GP<ByteStream> bs(file->get_meta());
-  GP<IFFByteStream> iff=IFFByteStream::create(bs); 
-  print_meta(*iff,*out);
-}
-
-void
 command_print_ant(ParsingByteStream &)
 {
   if (!file)
     verror("you must first select a page");
   GP<ByteStream> out=ByteStream::create("w");
-  GP<ByteStream> bs(&(get_anno(file)));
-  GP<IFFByteStream> iff=IFFByteStream::create(bs);
+  GP<ByteStream> anno = file->get_anno();
+  if (! (anno && anno->size())) return;
+  GP<IFFByteStream> iff=IFFByteStream::create(anno);
   print_ant(*iff, *out);
 }
 
@@ -635,19 +567,39 @@ command_print_merged_ant(ParsingByteStream &)
     verror("you must first select a page");
   GP<ByteStream> out=ByteStream::create("w");
   GP<ByteStream> anno = file->get_merged_anno();
+  if (! (anno && anno->size())) return;
   GP<IFFByteStream> iff=IFFByteStream::create(anno);
   print_ant(*iff, *out);
+}
+
+
+static void
+modify_ant(const GP<DjVuFile> &f, 
+           const char *newchunkid,
+           const GP<ByteStream> newchunk )
+{
+  const GP<ByteStream> anno(ByteStream::create());
+  if (newchunkid && newchunk && newchunk->size())
+    {
+      const GP<IFFByteStream> out(IFFByteStream::create(anno));
+      newchunk->seek(0);
+      out->put_chunk(newchunkid);
+      out->copy(*newchunk);
+      out->close_chunk();
+    }
+  f->anno = anno;
+  if (! anno->size())
+    f->remove_anno();
+  f->set_modified(true);
+  modified = true;
 }
 
 void
 file_remove_ant(const GP<DjVuFile> &f, const char *id)
 {
-  if (f && (f->anno || f->contains_anno()))
-    {
-      static const char *exclude[] = { "ANTa", "ANTz", 0 };
-      modify_anno(f, 0, 0, exclude);
-      vprint("remove_ant: modified \"%s\"", id);
-    }
+  if (!f) return;
+  modify_ant(f, 0, 0);
+  vprint("remove_ant: modified \"%s\"", id);
 }
 
 void
@@ -670,52 +622,6 @@ command_remove_ant(ParsingByteStream &)
 }
 
 void
-remove_meta(void)
-{
-  file->remove_meta();
-}
-
-void 
-command_remove_meta(ParsingByteStream &)
-{
-  if (file) 
-    {
-      remove_meta();
-    }
-  else 
-    {
-      GPList<DjVmDir::File> lst = doc->get_djvm_dir()->get_files_list();      
-      for (GPosition p=lst; p; ++p)
-        {
-          fileid = lst[p]->get_load_name();
-          file = doc->get_djvu_file(fileid);
-          file->remove_meta();
-          file=0;
-          fileid="";
-        }
-    }
-  vprint("remove-meta: file modified");
-}
-
-void
-set_meta(const GP<ByteStream> &newmeta)
-{
-  file->change_meta(newmeta->getAsUTF8());
-}
-
-void
-command_set_meta(ParsingByteStream &pbs)
-{
-  if (!file)
-    verror("you must first select a page");
-  const GP<ByteStream> metastream=ByteStream::create();
-  get_data_from_file("set-meta", pbs, *metastream);
-  metastream->seek(0);
-  set_meta(metastream);
-  vprint("set-meta: file modified");
-}
-
-void
 command_set_ant(ParsingByteStream &pbs)
 {
   if (! file)
@@ -725,9 +631,219 @@ command_set_ant(ParsingByteStream &pbs)
     GP<ByteStream> bsant=BSByteStream::create(ant,100);
     get_data_from_file("set-ant", pbs, *bsant);
   }
-  static const char *exclude[] = { "ANTa", "ANTz", 0 }; 
-  modify_anno(file, "ANTz", ant, exclude);
+  modify_ant(file, "ANTz", ant);
   vprint("set-ant: modified \"%s\"", (const char*)(GNativeString)fileid);
+}
+
+void
+print_meta(IFFByteStream &iff, ByteStream &out)
+{
+  GUTF8String chkid;  
+  while (iff.get_chunk(chkid))
+    {
+      bool ok = false;
+      GP<DjVuANT> ant=DjVuANT::create();
+      if (chkid == "ANTz") {
+          GP<ByteStream> bsiff=BSByteStream::create(iff.get_bytestream());
+          ant->decode(*bsiff);
+          ok = true;
+      } else if (chkid == "ANTa") {
+        ant->decode(*iff.get_bytestream());
+        ok = true;
+      }
+      if (ok)
+        {
+          for (GPosition pos=ant->metadata; pos; ++pos)
+            { 
+              GUTF8String tmp;
+              tmp=ant->metadata.key(pos);
+              out.writestring(tmp); 
+              out.write8('\t');
+              tmp=ant->metadata[pos];
+              print_c_string((const char*)tmp, tmp.length(), out);
+              out.write8('\n');
+            }
+        }
+      iff.close_chunk();
+    }
+}
+
+void 
+command_print_meta(ParsingByteStream &)
+{
+  if (!file)
+    verror("you must first select a page");
+  GP<ByteStream> out=ByteStream::create("w");
+  GP<ByteStream> anno = file->get_anno();
+  if (! (anno && anno->size())) return;
+  GP<IFFByteStream> iff=IFFByteStream::create(anno); 
+  print_meta(*iff,*out);
+}
+
+static bool
+filter_meta_out(GP<ByteStream> in, GP<ByteStream> out)
+{
+  int c;
+  int plevel = 0;
+  bool copy = true;
+  bool unchanged = true;
+  GP<ParsingByteStream> inp = ParsingByteStream::create(in);
+  while ((c = inp->get()) != EOF)
+    if (c!=' ' && c!='\t' && c!='\r' && c!='\n')
+      break;
+  inp->unget(c);
+  while ((c = inp->get()) != EOF)
+    {
+      if (plevel == 0)
+        if (c !=' ' && c!='\t' && c!='\r' && c!='\n')
+          copy = true;
+      if (c == '#')
+        {
+          while (c!=EOF && c!='\n' && c!='\r') {
+            if (copy) 
+              out->write8(c);
+            c = inp->get();
+          }
+        }
+      else if (c == '\"')
+        {
+          inp->unget(c);
+          GUTF8String token = inp->get_utf8_token();
+          if (copy)
+            print_c_string(token, token.length(), *out);
+        }
+      else if (c == '(')
+        {
+          if (plevel == 0)
+            {
+              GUTF8String token = inp->get_utf8_token();
+              if (token == "metadata")
+                copy = unchanged = false;
+              if (copy) {
+                out->write8('(');
+                out->write((const char*)token, token.length());
+              }
+            }
+          else if (copy) 
+            out->write8(c);
+          plevel += 1;
+        }
+      else if (c == ')')
+        {
+          if (copy) 
+            out->write8(c);
+          if ( --plevel < 0)
+            plevel = 0;
+        }
+      else if (copy)
+        out->write8(c);
+    }
+  return !unchanged;
+}
+
+static bool
+modify_meta(const GP<DjVuFile> &f,
+            GMap<GUTF8String,GUTF8String> *newmeta)
+{
+  bool changed = false;
+  GP<ByteStream> newant = ByteStream::create();
+  if (newmeta && !newmeta->isempty())
+    {
+      newant->writestring(GUTF8String("(metadata"));
+      for (GPosition pos=newmeta->firstpos(); pos; ++pos)
+        {
+          GUTF8String key = newmeta->key(pos); 
+          GUTF8String val = (*newmeta)[pos];
+          newant->write("\n\t(",3);
+          newant->writestring(key);
+          newant->write(" ",1);
+          print_c_string((const char*)val, val.length(), *newant);
+          newant->write(")",1);
+        }
+      newant->write(" )\n",3);
+      changed = true;
+    }
+  GP<ByteStream> anno = f->get_anno();
+  if (anno && anno->size()) 
+    {
+      GP<IFFByteStream> iff=IFFByteStream::create(anno);
+      GP<ByteStream> oldant = ByteStream::create();
+      print_ant(*iff,*oldant);
+      oldant->seek(0);
+      if (filter_meta_out(oldant, newant))
+        changed = true;
+    }
+  const GP<ByteStream> newantz=ByteStream::create();
+  if (changed)
+    {
+      newant->seek(0);
+      { GP<ByteStream> bzz = BSByteStream::create(newantz,100); bzz->copy(*newant); }
+      newantz->seek(0);
+      modify_ant(f, "ANTz", newantz);
+    }
+  return changed;
+}
+
+void
+file_remove_meta(const GP<DjVuFile> &f, const char *id)
+{
+  if (modify_meta(f, 0))
+    vprint("remove_meta: modified \"%s\"", id);
+}
+
+void 
+command_remove_meta(ParsingByteStream &)
+{
+  if (file) 
+    {
+      file_remove_meta(file, fileid);
+    }
+  else 
+    {
+      GPList<DjVmDir::File> lst = doc->get_djvm_dir()->get_files_list();      
+      for (GPosition p=lst; p; ++p)
+        {
+          GUTF8String id = lst[p]->get_load_name();
+          const GP<DjVuFile> f(doc->get_djvu_file(id));
+          file_remove_meta(f, id);
+        }
+    }
+}
+
+void
+command_set_meta(ParsingByteStream &pbs)
+{
+  if (!file)
+    verror("you must first select a page");
+  // get metadata
+  GP<ByteStream> metastream = ByteStream::create();
+  get_data_from_file("set-meta", pbs, *metastream);
+  metastream->seek(0);
+  // parse metadata
+  GMap<GUTF8String,GUTF8String> metadata;
+  GP<ParsingByteStream> inp = ParsingByteStream::create(metastream);
+  int c;
+  while ( (c = inp->get_spaces(true)) != EOF )
+    {
+      GUTF8String key, val;
+      inp->unget(c);
+      key = inp->get_utf8_token();
+      c = inp->get_spaces(false);
+      if (c == '\"') {
+        inp->unget(c);
+        val = inp->get_utf8_token();
+      } else {
+        while (c!='\n' && c!='\r' && c!=EOF) {
+          val += c;
+          c = inp->get();
+        }
+      }
+      if (key.length()>0 && val.length()>0)
+        metadata[key] = val;
+    }
+  // set metadata
+  if (modify_meta(file, &metadata))
+    vprint("set-meta: modified \"%s\"", (const char*)(GNativeString)fileid);
 }
 
 static struct 
@@ -748,60 +864,34 @@ zone_names[] =
   { 0, (DjVuTXT::ZoneType)0 ,0 }
 };
 
-void
-print_c_string(const char *data, int length, ByteStream &out)
-{
-  out.write(" \"",2);
-  while (*data && length>0) 
-    {
-      int span = 0;
-      while (span<length && data[span]>=0x20 && 
-             data[span]<0x7f && data[span]!='"' && data[span]!='\\' )
-        span++;
-      if (span > 0) 
-        {
-          out.write(data, span);
-          data += span;
-          length -= span;
-        }
-      else
-        {
-          char buffer[5];
-          sprintf(buffer,"\\%03o", *data);
-          out.write(buffer,4);
-          data += 1;
-          length -= 1;
-        }
-    }
-  out.write("\"",1);
-}
-
 GP<DjVuTXT>
 get_text(const GP<DjVuFile> &file)
 { 
   GUTF8String chkid;
   const GP<ByteStream> bs(file->get_text());
-  const GP<IFFByteStream> iff(IFFByteStream::create(bs));
-  long int i=0;
-  while (iff->get_chunk(chkid))
+  if (bs) 
     {
-      i++;
-      if (chkid == GUTF8String("TXTa")) 
+      long int i=0;
+      const GP<IFFByteStream> iff(IFFByteStream::create(bs));
+      while (iff->get_chunk(chkid))
         {
-          GP<DjVuTXT> txt = DjVuTXT::create();
-          txt->decode(iff->get_bytestream());
-          return txt;
+          i++;
+          if (chkid == GUTF8String("TXTa")) 
+            {
+              GP<DjVuTXT> txt = DjVuTXT::create();
+              txt->decode(iff->get_bytestream());
+              return txt;
+            }
+          else if (chkid == GUTF8String("TXTz")) 
+            {
+              GP<DjVuTXT> txt = DjVuTXT::create();
+              GP<ByteStream> bsiff=BSByteStream::create(iff->get_bytestream());
+              txt->decode(bsiff);
+              return txt;
+            }
+          iff->close_chunk();
         }
-      else if (chkid == GUTF8String("TXTz")) 
-        {
-          GP<DjVuTXT> txt = DjVuTXT::create();
-          GP<ByteStream> bsiff=BSByteStream::create(iff->get_bytestream());
-          txt->decode(bsiff);
-          return txt;
-        }
-      iff->close_chunk();
     }
-  vprint("no chunk TXT found %ld",i);
   return 0;
 }
 
@@ -835,6 +925,7 @@ print_txt_sub(const GP<DjVuTXT> &txt, DjVuTXT::Zone &zone, ByteStream &out, int 
       int length = zone.text_length;
       if (data[length-1] == zone_names[zinfo].separator)
         length -= 1;
+      out.write(" ",1);
       print_c_string(data, length, out);
     }
   else
@@ -870,8 +961,7 @@ command_print_txt(ParsingByteStream &)
         {
           GUTF8String id = lst[p]->get_load_name();
           const GP<DjVuFile> f(doc->get_djvu_file(id));
-          if (f && (f->anno || f->contains_anno()))
-            print_txt(get_text(f), *out);
+          print_txt(get_text(f), *out);
         }
     }
 }
@@ -885,7 +975,7 @@ command_print_pure_txt(ParsingByteStream &)
     {
       if ((txt = get_text(file)))
         {
-          GNativeString ntxt = txt->textUTF8;
+          GUTF8String ntxt = txt->textUTF8;
           out->write((const char*)ntxt, ntxt.length());
         }
     }
@@ -896,26 +986,43 @@ command_print_pure_txt(ParsingByteStream &)
         {
           GUTF8String id = lst[p]->get_load_name();
           const GP<DjVuFile> f(doc->get_djvu_file(id));
-          if (f && (f->anno || f->contains_anno()))
-            if ((txt = get_text(f)))
-              {
-                GNativeString ntxt = txt->textUTF8;
-                out->write((const char*)ntxt, ntxt.length());
-              }
+          if ((txt = get_text(f)))
+            {
+              GUTF8String ntxt = txt->textUTF8;
+              out->write((const char*)ntxt, ntxt.length());
+            }
           out->write("\f",1);
         }
     }
 }
 
+static void
+modify_txt(const GP<DjVuFile> &f, 
+           const char *newchunkid,
+           const GP<ByteStream> newchunk )
+{
+  const GP<ByteStream> text(ByteStream::create());
+  if (newchunkid && newchunk && newchunk->size())
+    {
+      const GP<IFFByteStream> out(IFFByteStream::create(text));
+      newchunk->seek(0);
+      out->put_chunk(newchunkid);
+      out->copy(*newchunk);
+      out->close_chunk();
+    }
+  f->text = text;
+  if (! text->size())
+    f->remove_text();
+  f->set_modified(true);
+  modified = true;
+}
+
 void
 file_remove_txt(const GP<DjVuFile> &f, const char *id)
 {
-  if (f && (f->anno || f->contains_anno()))
-    {
-      static const char *exclude[] = { "TXTa", "TXTz", 0 };
-      modify_anno(f, 0, 0, exclude);
-      vprint("remove-txt: modified \"%s\"", id);
-    }
+  if (! f) return;
+  modify_txt(f, 0, 0);
+  vprint("remove-txt: modified \"%s\"", id);
 }
 
 void
@@ -948,7 +1055,7 @@ construct_djvutxt_sub(ParsingByteStream &pbs,
   c = pbs.get_spaces(true);
   if (c != '(')
     verror("syntax error in txt data: got '%c', expecting '('", c);
-  token = pbs.get_token(true);
+  token = pbs.get_utf8_token(true);
   int zinfo;
   for (zinfo=0; zone_names[zinfo].name; zinfo++)
     if (token == zone_names[zinfo].name)
@@ -962,20 +1069,20 @@ construct_djvutxt_sub(ParsingByteStream &pbs,
            (const char*)(GNativeString)token);           
   // Get zone rect
   GUTF8String str;
-  str = pbs.get_token(true);
+  str = pbs.get_utf8_token(true);
   if (!str || !str.is_int()) 
     nerror: verror("Syntax error in txt data: number expected, got '%s'",
                    (const char*)(GNativeString)str);  
   zone.rect.xmin = atoi(str);
-  str = pbs.get_token(true);
+  str = pbs.get_utf8_token(true);
   if (!str || !str.is_int()) 
     goto nerror;
   zone.rect.ymin = atoi(str);
-  str = pbs.get_token(true);
+  str = pbs.get_utf8_token(true);
   if (!str || !str.is_int()) 
     goto nerror;
   zone.rect.xmax = atoi(str);
-  str = pbs.get_token(true);
+  str = pbs.get_utf8_token(true);
   if (!str || !str.is_int()) 
     goto nerror;
   zone.rect.ymax = atoi(str);
@@ -997,7 +1104,7 @@ construct_djvutxt_sub(ParsingByteStream &pbs,
   if (c == '"') 
     {
       // This is a terminal
-      str = pbs.get_token(true);
+      str = pbs.get_utf8_token(true);
       zone.text_start = txt->textUTF8.length();
       zone.text_length = str.length();
       txt->textUTF8 += str;
@@ -1054,24 +1161,26 @@ command_set_txt(ParsingByteStream &pbs)
       txt->encode(bsout);
     }
   txtobs->seek(0);
-  static const char *exclude[] = { "TXTa", "TXTz", 0 };  
-  modify_anno(file, "TXTz", txtobs, exclude);
+  modify_txt(file, "TXTz", txtobs);
   vprint("set-txt: modified \"%s\"", (const char*)(GNativeString)fileid);
 }
 
 void
 output(const GP<DjVuFile> &f, ByteStream &out, int flag, const char *id=0)
 {
-  if (f && (f->anno || f->contains_anno()))
+  if (f)
     {
       const GP<ByteStream> ant(ByteStream::create());
       const GP<ByteStream> txt(ByteStream::create());
       if (flag & 1) 
         { 
-          const GP<ByteStream> bs(&(get_anno(f)));
-          const GP<IFFByteStream> iff(IFFByteStream::create(bs)); 
-          print_ant(*iff,*ant); 
-          ant->seek(0); 
+          const GP<ByteStream> anno(f->get_anno());
+          if (anno && anno->size()) 
+            {
+              const GP<IFFByteStream> iff(IFFByteStream::create(anno)); 
+              print_ant(*iff,*ant); 
+              ant->seek(0); 
+            }
         }
       if (flag & 2)
         { 
@@ -1117,7 +1226,6 @@ command_output_ant(ParsingByteStream &)
         {
           GUTF8String id = lst[p]->get_load_name();
           const GP<DjVuFile> f(doc->get_djvu_file(id));
-          if (f && (f->anno || f->contains_anno()))
           output(f, *out, 1, id);
         }
     }
@@ -1140,28 +1248,7 @@ command_output_txt(ParsingByteStream &)
         {
           GUTF8String id = lst[p]->get_load_name();
           const GP<DjVuFile> f(doc->get_djvu_file(id));
-          if (f && (f->anno || f->contains_anno()))
           output(f, *out, 2, id);
-        }
-    }
-}
-void
-command_output_lisp(ParsingByteStream &)
-{
-  const GP<ByteStream> out(ByteStream::create("w"));
-  if (file) 
-    {
-      print_txt(get_text(file), *out);
-    }
-  else 
-    {
-      GPList<DjVmDir::File> lst = doc->get_djvm_dir()->get_files_list();
-      for (GPosition p=lst; p; ++p)
-        {
-          GUTF8String id = lst[p]->get_load_name();
-          const GP<DjVuFile> f(doc->get_djvu_file(id));
-          if (f && (f->anno || f->contains_anno()))
-          print_txt(get_text(f), *out);
         }
     }
 }
@@ -1183,7 +1270,6 @@ command_output_all(ParsingByteStream &)
         {
           GUTF8String id = lst[p]->get_load_name();
           const GP<DjVuFile> f(doc->get_djvu_file(id));
-          if (f && (f->anno || f->contains_anno()))
           output(f, *out, 3, id);
         }
     }
@@ -1199,7 +1285,7 @@ callback_thumbnails(int page_num, void *)
 void
 command_set_thumbnails(ParsingByteStream &pbs)
 {
-  GUTF8String sizestr = pbs.get_token();
+  GUTF8String sizestr = pbs.get_native_token();
   if (! sizestr)
     sizestr = "128";
   if (! sizestr.is_int() )
@@ -1221,7 +1307,7 @@ command_remove_thumbnails(ParsingByteStream &)
 void
 command_save_page(ParsingByteStream &pbs)
 {
-  GUTF8String fname = pbs.get_token();
+  GUTF8String fname = pbs.get_native_token();
   if (! fname) 
     verror("empty filename");
   if (! file)
@@ -1231,7 +1317,7 @@ command_save_page(ParsingByteStream &pbs)
   if (nosave)
     return;
   const GP<ByteStream> bs(file->get_djvu_bytestream(false, false));
-  const GP<ByteStream> out(ByteStream::create(fname, "wb"));
+  const GP<ByteStream> out(ByteStream::create(GURL::Filename::UTF8(fname), "wb"));
   out->writall("AT&T",4);
   out->copy(*bs);
   vprint("saved \"%s\" as \"%s\"  (without inserting included files)",
@@ -1241,7 +1327,7 @@ command_save_page(ParsingByteStream &pbs)
 void
 command_save_page_with(ParsingByteStream &pbs)
 {
-  GUTF8String fname = pbs.get_token();
+  GUTF8String fname = pbs.get_native_token();
   if (! fname) 
     verror("empty filename");
   if (! file)
@@ -1251,7 +1337,7 @@ command_save_page_with(ParsingByteStream &pbs)
   if (nosave)
     return;
   const GP<ByteStream> bs(file->get_djvu_bytestream(true, false));
-  const GP<ByteStream> out(ByteStream::create(fname, "wb"));
+  const GP<ByteStream> out(ByteStream::create(GURL::Filename::UTF8(fname), "wb"));
   out->writall("AT&T",4);
   out->copy(*bs);
   vprint("saved \"%s\" as \"%s\"  (inserting included files)",
@@ -1261,26 +1347,26 @@ command_save_page_with(ParsingByteStream &pbs)
 void
 command_save_bundled(ParsingByteStream &pbs)
 {
-  GUTF8String fname = pbs.get_token();
+  GUTF8String fname = pbs.get_native_token();
   if (! fname) 
     verror("empty filename");
   if (nosave) 
     vprint("save-bundled: not saving anything (-n was specified)");
   else
-    doc->save_as(fname, true);
+    doc->save_as(GURL::Filename::UTF8(fname), true);
   modified = false;
 }
 
 void
 command_save_indirect(ParsingByteStream &pbs)
 {
-  GUTF8String fname = pbs.get_token();
+  GUTF8String fname = pbs.get_native_token();
   if (! fname) 
     verror("empty filename");
   if (nosave) 
     vprint("save-indirect: not saving anything (-n was specified)");
   else
-    doc->save_as(fname, false);
+    doc->save_as(GURL::Filename::UTF8(fname), false);
   modified = false;
 }
 
@@ -1441,11 +1527,11 @@ execute()
     cmdbs = ByteStream::create("r");
   const GP<ParsingByteStream> gcmd(ParsingByteStream::create(cmdbs));
   ParsingByteStream &cmd=*gcmd;
-  GNativeString token;
+  GUTF8String token;
   init_command_map();
   vprint("type \"help\" to see available commands.");
   vprint("ok.");
-  while (!! (token = cmd.get_token(true)))
+  while (!! (token = cmd.get_native_token(true)))
     {
       CommandFunc func = command_map[token];
       G_TRY
@@ -1467,8 +1553,8 @@ execute()
       G_CATCH(ex)
         {
 
-          vprint("djvused: Error (%s): %s",
-                 token.getbuf(), ex.get_cause());
+          vprint("Error (%s): %s",
+                 (const char*)(GNativeString)token, ex.get_cause());
           if (! verbose)
             G_RETHROW;
         }
@@ -1491,7 +1577,7 @@ main(int argc, char **argv)
         else if (!strcmp(argv[i],"-n"))
           nosave = true;
         else if (!strcmp(argv[i],"-f") && i+1<argc && !cmdbs) 
-          cmdbs = ByteStream::create(GUTF8String(argv[++i]), "r");
+          cmdbs = ByteStream::create(GURL::Filename::UTF8(argv[++i]), "r");
         else if (!strcmp(argv[i],"-e") && !cmdbs && ++i<argc) 
           cmdbs = ByteStream::create_static(argv[i],strlen(argv[i]));
         else if (argv[i][0] != '-' && !djvufile)
