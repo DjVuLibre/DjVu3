@@ -159,7 +159,9 @@
 //----------------------------------------
 /** @name AT&T Source Code Agreement
 
-    Here is the text of the AT&T Source Code Agreement.
+    Here is the {\em verbatim} text of the AT&T Source Code Agreement.
+    Additional explanation (as well as updated versions) can be found under
+    \URL{http://www.djvu.att.com/open}.
 
     \begin{verbatim}
     @ATTLICENSE@
