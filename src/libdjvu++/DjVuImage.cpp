@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuImage.cpp,v 1.80 2001-06-25 18:24:46 bcr Exp $
+// $Id: DjVuImage.cpp,v 1.81 2001-06-25 23:33:38 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -1347,7 +1347,7 @@ DjVuImage::writeXML(ByteStream &str_out,const GURL &doc_url,const int flags) con
   const GURL url(get_djvu_file()->get_url());
   const GUTF8String pagename(url.fname());
   GUTF8String page_param;
-  if(doc_url.is_valid() && !doc_url.is_empty())
+  if(doc_url.is_valid() && !doc_url.is_empty() && (doc_url != url))
   {
     str_out.writestring(Object+doc_url.get_string());
     page_param="<PARAM name=\"PAGE\" value=\""+pagename+"\" />\n";

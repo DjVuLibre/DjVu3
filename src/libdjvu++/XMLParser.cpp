@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: XMLParser.cpp,v 1.14 2001-06-25 18:24:47 bcr Exp $
+// $Id: XMLParser.cpp,v 1.15 2001-06-25 23:33:38 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -464,7 +464,6 @@ lt_XMLParser::Impl::ChangeAnno(
     }
   }
   dfile.set_modified(true);
-  dfile.reset();
   dfile.anno=ByteStream::create();
   anno.encode(dfile.anno);
 }
@@ -503,6 +502,10 @@ lt_XMLParser::Impl::get_file(const GURL &url,GUTF8String id)
   GPosition dpos(m_files.contains(fileurl.get_string()));
   if(!dpos)
   {
+    if(!doc->get_id_list().contains(id))
+    {
+      G_THROW( ERR_MSG("XMLAnno.bad_page") );
+    }
     dfile=doc->get_djvu_file(id,false);
     if(!dfile)
     {
@@ -910,32 +913,35 @@ lt_XMLParser::Impl::ChangeText(
   GP<ByteStream> textbs = ByteStream::create(); 
   
   const GP<DjVuInfo> info=(dfile.info);
-  const int h=info->height;
-  const int w=info->width;
-  txt->page_zone.text_start = 0;
-  DjVuTXT::Zone &parent=txt->page_zone;
-  parent.rect.xmin=0;
-  parent.rect.ymin=0;
-  parent.rect.ymax=h;
-  parent.rect.xmax=w;
-  double ws=1.0;
-  if(width && width != w)
+  if(info)
   {
-    ws=((double)w)/((double)width);
-  }
-  double hs=1.0;
-  if(height && height != h)
-  {
-    hs=((double)h)/((double)height);
-  }
-  make_child_layer(parent, tags, *textbs, h, ws,hs);
-  textbs->write8(0);
-  long len = textbs->tell();
-  txt->page_zone.text_length = len;
-  textbs->seek(0,SEEK_SET);
-  textbs->read(txt->textUTF8.getbuf(len), len);
+    const int h=info->height;
+    const int w=info->width;
+    txt->page_zone.text_start = 0;
+    DjVuTXT::Zone &parent=txt->page_zone;
+    parent.rect.xmin=0;
+    parent.rect.ymin=0;
+    parent.rect.ymax=h;
+    parent.rect.xmax=w;
+    double ws=1.0;
+    if(width && width != w)
+    {
+      ws=((double)w)/((double)width);
+    }
+    double hs=1.0;
+    if(height && height != h)
+    {
+      hs=((double)h)/((double)height);
+    }
+    make_child_layer(parent, tags, *textbs, h, ws,hs);
+    textbs->write8(0);
+    long len = textbs->tell();
+    txt->page_zone.text_length = len;
+    textbs->seek(0,SEEK_SET);
+    textbs->read(txt->textUTF8.getbuf(len), len);
   
-  dfile.change_text(txt,true);
+    dfile.change_text(txt,false);
+  }
 }
 
 void

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessage.cpp,v 1.63 2001-06-21 21:38:14 bcr Exp $
+// $Id: DjVuMessage.cpp,v 1.64 2001-06-25 23:33:38 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -462,38 +462,41 @@ getbodies(
         }
         G_ENDCATCH;
       }
-      lt_XMLTags &tags=*gtags;
-      GPList<lt_XMLTags> Bodies=tags.get_Tags(bodystring);
-      if(! Bodies.isempty())
+      if(gtags)
       {
-        isdone=true;
-        for(GPosition pos=Bodies;pos;++pos)
+        lt_XMLTags &tags=*gtags;
+        GPList<lt_XMLTags> Bodies=tags.get_Tags(bodystring);
+        if(! Bodies.isempty())
         {
-          body.append(Bodies[pos]);
-        }
-      }
-      GPList<lt_XMLTags> Head=tags.get_Tags(headstring);
-      if(! Head.isempty())
-      {
-        isdone=true;
-        GMap<GUTF8String, GP<lt_XMLTags> > includes;
-        lt_XMLTags::get_Maps(includestring,namestring,Head,includes);
-        for(GPosition pos=includes;pos;++pos)
-        {
-          const GUTF8String file=includes.key(pos);
-          if(! map.contains(file))
+          isdone=true;
+          for(GPosition pos=Bodies;pos;++pos)
           {
-            GList<GURL> xpaths;
-			xpaths.append(url.base());
-            const GUTF8String err2(getbodies(xpaths,file,body,map));
-            if(err2.length())
+            body.append(Bodies[pos]);
+          }
+        }
+        GPList<lt_XMLTags> Head=tags.get_Tags(headstring);
+        if(! Head.isempty())
+        {
+          isdone=true;
+          GMap<GUTF8String, GP<lt_XMLTags> > includes;
+          lt_XMLTags::get_Maps(includestring,namestring,Head,includes);
+          for(GPosition pos=includes;pos;++pos)
+          {
+            const GUTF8String file=includes.key(pos);
+            if(! map.contains(file))
             {
-              if(errors.length())
+              GList<GURL> xpaths;
+              xpaths.append(url.base());
+              const GUTF8String err2(getbodies(xpaths,file,body,map));
+              if(err2.length())
               {
-                errors+="\n"+err2;
-              }else
-              {
-                errors=err2;
+                if(errors.length())
+                {
+                  errors+="\n"+err2;
+                }else
+                {
+                  errors=err2;
+                }
               }
             }
           }

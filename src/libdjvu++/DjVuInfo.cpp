@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuInfo.cpp,v 1.21 2001-06-25 18:24:46 bcr Exp $
+// $Id: DjVuInfo.cpp,v 1.22 2001-06-25 23:33:38 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -137,11 +137,19 @@ DjVuInfo::get_paramtags(void) const
   GUTF8String retval;
   if(angle)
   {
-    retval+="<PARAM name=\"rotate\" value=\""+GUTF8String(angle)+"\" />\n";
+    retval+="<PARAM name=\"ROTATE\" value=\""+GUTF8String(angle)+"\" />\n";
   }
   if(orientation == GRect::rotate(angle,GRect::TDLRNR))
   {
-    retval+="<PARAM name=\"vflip\" value=\"true\" />\n";
+    retval+="<PARAM name=\"VFLIP\" value=\"true\" />\n";
+  }
+  if(dpi)
+  {
+    retval+="<PARAM name=\"DPI\" value=\""+GUTF8String(dpi)+"\" />\n";
+  }
+  if(gamma)
+  {
+    retval+="<PARAM name=\"GAMMA\" value=\""+GUTF8String(gamma)+"\" />\n";
   }
   return retval;
 }

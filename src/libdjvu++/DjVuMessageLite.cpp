@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessageLite.cpp,v 1.3 2001-06-13 18:26:19 bcr Exp $
+// $Id: DjVuMessageLite.cpp,v 1.4 2001-06-25 23:33:38 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -351,7 +351,7 @@ DjVuMessageLite::InsertArg( GUTF8String &message,
     //  Not found, fake it
     if( ArgId != 0 )
     {
-      message += "\n"+LookUpSingle(uparameter+("\t"+arg));
+      message += "\n"+LookUpSingle(uparameter+("\t"+arg))+"\n";
     }
   }
 }
@@ -389,7 +389,7 @@ DjVuWriteError( const char *message )
   if(errout)
   {
     const GUTF8String external = DjVuMessageLite::LookUpUTF8( message );
-    errout->writestring(external);
+    errout->writestring(external+"\n");
   }
 }
 
@@ -400,7 +400,7 @@ DjVuWriteMessage( const char *message )
   if(strout)
   {
     const GUTF8String external = DjVuMessageLite::LookUpUTF8( message );
-    strout->writestring(external);
+    strout->writestring(external+"\n");
   }
 }
 
