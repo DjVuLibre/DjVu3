@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: parseoptions.cpp,v 1.64 2000-12-08 18:47:41 fcrary Exp $
+// $Id: parseoptions.cpp,v 1.65 2000-12-12 00:55:46 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -781,7 +781,7 @@ DjVuParseOptions::ReadNextConfig (
   xname=xname?(xname+1):profilename;
   // First check and see if we have already read in this profile.
   int profile=ProfileTokens->GetToken(xname);
-  const char * const s=(profile>0)?Configuration->GetValue(profile,profile_token):0;
+//  const char * const s=(profile>0)?Configuration->GetValue(profile,profile_token):0;
 
     // We parse the rest of the current line so we can "inherit"
     // values from other profiles.

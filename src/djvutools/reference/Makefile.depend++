@@ -13,11 +13,11 @@ c44.o: c44.cpp ../../../src/libdjvu++/GString.h \
  ../../../src/include/DjVu.h \
  ../../../src/libdjvu++/GException.h \
  ../../../src/libdjvu++/GSmartPointer.h \
+ ../../../src/libdjvu++/GContainer.h \
  ../../../src/libdjvu++/IWImage.h \
  ../../../src/libdjvu++/GRect.h \
  ../../../src/libdjvu++/GBitmap.h \
  ../../../src/libdjvu++/ByteStream.h \
- ../../../src/libdjvu++/GContainer.h \
  ../../../src/libdjvu++/Arrays.h \
  ../../../src/libdjvu++/GPixmap.h \
  ../../../src/libdjvu++/IFFByteStream.h \
@@ -85,11 +85,11 @@ d44.o: d44.cpp ../../../src/libdjvu++/GString.h \
  ../../../src/include/DjVu.h \
  ../../../src/libdjvu++/GException.h \
  ../../../src/libdjvu++/GSmartPointer.h \
+ ../../../src/libdjvu++/GContainer.h \
  ../../../src/libdjvu++/IWImage.h \
  ../../../src/libdjvu++/GRect.h \
  ../../../src/libdjvu++/GBitmap.h \
  ../../../src/libdjvu++/ByteStream.h \
- ../../../src/libdjvu++/GContainer.h \
  ../../../src/libdjvu++/Arrays.h \
  ../../../src/libdjvu++/GPixmap.h \
  ../../../src/libdjvu++/IFFByteStream.h \
@@ -132,12 +132,12 @@ djthumb.o: djthumb.cpp ../../../src/libdjvu++/GString.h \
  ../../../src/include/DjVu.h \
  ../../../src/libdjvu++/GException.h \
  ../../../src/libdjvu++/GSmartPointer.h \
+ ../../../src/libdjvu++/GContainer.h \
  ../../../src/libdjvu++/DjVuDocEditor.h \
  ../../../src/libdjvu++/DjVuDocument.h \
  ../../../src/libdjvu++/DjVuFileCache.h \
  ../../../src/libdjvu++/DjVuFile.h \
  ../../../src/libdjvu++/ByteStream.h \
- ../../../src/libdjvu++/GContainer.h \
  ../../../src/libdjvu++/Arrays.h \
  ../../../src/libdjvu++/DataPool.h \
  ../../../src/libdjvu++/GThreads.h \
@@ -280,10 +280,10 @@ djvumake.o: djvumake.cpp \
  ../../../src/include/DjVu.h \
  ../../../src/libdjvu++/GException.h \
  ../../../src/libdjvu++/GSmartPointer.h \
+ ../../../src/libdjvu++/GContainer.h \
  ../../../src/libdjvu++/DjVuImage.h \
  ../../../src/libdjvu++/GThreads.h \
  ../../../src/libdjvu++/ByteStream.h \
- ../../../src/libdjvu++/GContainer.h \
  ../../../src/libdjvu++/Arrays.h \
  ../../../src/libdjvu++/IFFByteStream.h \
  ../../../src/libdjvu++/JB2Image.h \
@@ -307,11 +307,11 @@ djvutxt.o: djvutxt.cpp ../../../src/libdjvu++/GString.h \
  ../../../src/include/DjVu.h \
  ../../../src/libdjvu++/GException.h \
  ../../../src/libdjvu++/GSmartPointer.h \
+ ../../../src/libdjvu++/GContainer.h \
  ../../../src/libdjvu++/DjVuDocument.h \
  ../../../src/libdjvu++/DjVuFileCache.h \
  ../../../src/libdjvu++/DjVuFile.h \
  ../../../src/libdjvu++/ByteStream.h \
- ../../../src/libdjvu++/GContainer.h \
  ../../../src/libdjvu++/Arrays.h \
  ../../../src/libdjvu++/DataPool.h \
  ../../../src/libdjvu++/GThreads.h \
