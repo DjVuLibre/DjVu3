@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GBitmap.h,v 1.32 2001-01-10 18:39:36 bcr Exp $
+// $Id: GBitmap.h,v 1.33 2001-01-10 20:56:04 bcr Exp $
 // $Name:  $
 
 #ifndef _GBITMAP_H_
@@ -69,7 +69,7 @@ class ByteStream;
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: GBitmap.h,v 1.32 2001-01-10 18:39:36 bcr Exp $#
+    #$Id: GBitmap.h,v 1.33 2001-01-10 20:56:04 bcr Exp $#
 
  */
 //@{
@@ -412,9 +412,14 @@ protected:
   unsigned int   rlelength;
 private:
   GMonitor       *monitorptr;
+public:
+  class ZeroBuffer;
+  friend class ZeroBuffer;
+  GP<ZeroBuffer> gzerobuffer; 
+private:
   static int zerosize;
   static unsigned char *zerobuffer;
-  static void zeroes(int ncolumns);
+  static GP<ZeroBuffer> zeroes(int ncolumns);
   static unsigned int read_integer(char &lookahead, ByteStream &ref);
   static void euclidian_ratio(int a, int b, int &q, int &r);
   int encode(unsigned char *&pruns,GPBuffer<unsigned char> &gpruns) const;
