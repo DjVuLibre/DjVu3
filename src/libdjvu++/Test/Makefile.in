@@ -1,17 +1,22 @@
 SHELL=/bin/sh
+prefix=@prefix@
+bindir=@prefix@/bin
 SRCDIR=@srcdir@
-TOPSRCDIR=@srcdir@/..
+TOPSRCDIR=@topsrcdir@
+TOPBUILDDIR=@topbuilddir@
 VPATH=@srcdir@
 CXX=@cxx@
 OPT=@opt@
 WARN=@warn@
-RANLIB=@ranlib@
-RPO=@rpo@
-AR=@ar@
 DEFS=@defs@
-CXXFLAGS= $(DEFS) $(OPT) $(WARN) -I$(TOPSRCDIR) -DUNIX
+INCS=-I$(SRCDIR) -I$(SRCDIR)/..
+CXXFLAGS= $(DEFS) $(OPT) $(WARN) $(INCS) -DUNIX
 LDFLAGS=
-LDLIBS=@ldlibs@
+DOCXX=@docxx@
+LIBS=@libs@
+MAKESTLIB=@make_stlib@
+MAKESHLIB=@make_shlib@
+RANLIB=@ranlib@
 
 # Defs
 
@@ -43,7 +48,7 @@ PHONY: clean distclean
 .cpp: $(LIB)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -c $(SRCDIR)/$*.cpp
 	if [ -n "$(RPO)" ] ; then $(RPO) $*.o $(LIB) ; fi
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $*.o $(LIB) $(LDLIBS)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $*.o $(LIB) $(LIBS)
 	@if test -f $(SRCDIR)/$@.exp ; then\
 	   if $@ > $@.out 2>&1  &&  cmp -s $@.out $(SRCDIR)/$@.exp  ;\
 	     then echo -- $@ passed ;\
@@ -55,7 +60,7 @@ PHONY: clean distclean
 TestThreads: $(LIB)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -c $(SRCDIR)/TestThreads.cpp
 	if [ -n "$(RPO)" ] ; then $(RPO) TestThreads.o $(LIB) ; fi
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o TestThreads TestThreads.o $(LIB) $(LDLIBS)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o TestThreads TestThreads.o $(LIB) $(LIBS)
 	@if test -f $(SRCDIR)/$@.exp ; then\
 	   if $@ 2>&1 | sort > $@.out 2>&1  &&  cmp -s $@.out $(SRCDIR)/$@.exp  ;\
 	     then echo -- $@ passed ;\

@@ -9,20 +9,20 @@
 # C- AT&T, you have an infringing copy of this software and cannot use it
 # C- without violating AT&T's intellectual property rights.
 # C-
-# C- $Id: configure,v 1.22 1999-08-31 14:51:28 leonb Exp $
+# C- $Id: configure,v 1.23 1999-08-31 22:37:39 leonb Exp $
 
 
 ### ------------------------------------------------------------------------
 ### The substitutions
 
 prefix=/usr/local
-SRCDIR=.
+topsrcdir=.
 CXX=${CXX-eg++}
 OPT=${OPT}
 WARN=${WARN}
 RANLIB=${RANLIB-ranlib}
-AR=${AR-"ar cq"}
-LDLIBS=-lm
+MAKE_STLIB="ar cq"
+LIBS=-lm
 RPO=${RPO}
 DEFS=
 
@@ -46,8 +46,8 @@ fi
 ### Check top dir
 
 conf=`basename $0`
-SRCDIR=`dirname $0`
-if [ ! -r "$SRCDIR/libdjvu++.dxx.in" -o ! -r $SRCDIR/ATTLICENSE ] 
+topsrcdir=`dirname $0`
+if [ ! -r "$topsrcdir/libdjvu++.dxx.in" -o ! -r $topsrcdir/ATTLICENSE ] 
 then
    echo 1>&2 "$conf: Cannot recognize source directory."
    exit 1
@@ -107,7 +107,7 @@ then
   while [ "$accept" != yes -a "$accept" != no ]
   do
     if [ "$accept" = show ] ; then
-       ${PAGER-more} $SRCDIR/ATTLICENSE
+       ${PAGER-more} $topsrcdir/ATTLICENSE
     fi
     echo
     echon "Do you accept this license agreement (yes/no/show) ?"
@@ -229,7 +229,7 @@ EOF
           echo no.
           echo 1>&2 "$conf: --------------------------------------------------------"
           echo 1>&2 "$conf: ------ Using COTHREADS without the patch is unsafe."
-          echo 1>&2 "$conf: ------ See documentation and file $SRCDIR/@Tools/README."
+          echo 1>&2 "$conf: ------ See documentation and file $topsrcdir/@Tools/README."
           echo 1>&2 "$conf: --------------------------------------------------------"
           DEFS="$DEFS -DNO_LIBGCC_HOOKS"
        fi
@@ -253,7 +253,7 @@ EOF
            OPT="$OPT -threads"
          else
            echo no.
-           LDLIBS="-lpthread $LDLIBS"
+           LIBS="-lpthread $LIBS"
            DEFS="$DEFS -D_REENTRANT"
          fi
        fi
@@ -338,42 +338,71 @@ fi
 ### ------------------------------------------------------------------------
 ### Function to generate makefiles
 
+
+pathclean()
+{
+    echo $1 | sed \
+                -e 's://:/:g' \
+                -e 's:/\./:/:g' \
+                -e 's:\(.\)/\.$:\1:g'
+}
+
+
 generate_makefile()
 {
-  # compute srcdir
-  case $SRCDIR in
+  # compute xtopsrcdir
+  xtopsrcdir=$topsrcdir
+  case $xtopsrcdir in
       /*) # absolute path
-        srcdir=$SRCDIR/$1
         ;;
-      *) # relative path
+      *)  # relative path
         temp=$1
-        srcdir=$SRCDIR/$1
         while [ "$temp" != "." ] 
         do
-          srcdir=../$srcdir
+          xtopsrcdir=../$xtopsrcdir
           temp=`dirname $temp`
         done
         ;;
-  esac
+  esac 
+
+  #compute topbuilddir
+  temp=$1
+  xtopbuilddir=.
+  while [ "$temp" != "." ] 
+  do
+    xtopbuilddir=../$xtopbuilddir
+    temp=`dirname $temp`
+  done
+
+  # compute xsrcdir
+  xsrcdir=$xtopsrcdir/$1
+
+  # make nice pathnames
+  xsrcdir=`pathclean $xsrcdir`
+  xtopsrcdir=`pathclean $xtopsrcdir`
+  xtopbuilddir=`pathclean $xtopbuilddir`
 
   # substitute
-  sed < $SRCDIR/$1/Makefile.in > $1/Makefile \
+  sed < $topsrcdir/$1/Makefile.in > $1/Makefile \
     -e 's!@prefix@!'"$prefix"'!g' \
-    -e 's!@srcdir@!'"$srcdir"'!g' \
+    -e 's!@topsrcdir@!'"$xtopsrcdir"'!g' \
+    -e 's!@topbuilddir@!'"$xtopbuilddir"'!g' \
+    -e 's!@srcdir@!'"$xsrcdir"'!g' \
     -e 's!@cc@!'"$CC"'!g' \
     -e 's!@cxx@!'"$CXX"'!g' \
     -e 's!@defs@!'"$DEFS"'!g' \
     -e 's!@opt@!'"$OPT"'!g' \
     -e 's!@warn@!'"$WARN"'!g' \
-    -e 's!@ldlibs@!'"$LDLIBS"'!g' \
+    -e 's!@libs@!'"$LIBS"'!g' \
     -e 's!@ranlib@!'"$RANLIB"'!g' \
     -e 's!@rpo@!'"$RPO"'!g' \
-    -e 's!@ar@!'"$AR"'!g'
+    -e 's!@make_stlib@!'"$MAKE_STLIB"'!g' \
+    -e 's!@make_shlib@!'"$MAKE_SHLIB"'!g'
 
   # dependencies
-  if [ -r $SRCDIR/$1/Makefile.depend ]
+  if [ -r $topsrcdir/$1/Makefile.depend ]
   then
-    cat $SRCDIR/$1/Makefile.depend >> $1/Makefile
+    cat $topsrcdir/$1/Makefile.depend >> $1/Makefile
   fi
 }
 
