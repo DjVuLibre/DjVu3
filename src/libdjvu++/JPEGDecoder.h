@@ -8,7 +8,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: JPEGDecoder.h,v 1.5 2000-09-18 17:10:23 bcr Exp $
+//C- $Id: JPEGDecoder.h,v 1.6 2000-09-29 19:42:53 sforde Exp $
 
 #ifndef _JPEGDECODER_H_
 #define _JPEGDECODER_H_
@@ -19,9 +19,20 @@
 #include "ByteStream.h"
 #include "GPixmap.h"
 #include "GException.h"
+
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "jinclude.h"
 #include "jpeglib.h"
 #include "jerror.h"
+
+#ifdef __cplusplus
+}
+#endif
+
 #include <string.h>
 #include <setjmp.h>
 
@@ -31,7 +42,7 @@
     @memo
     Decoding interface to the IJG JPEG library.
     @version
-    #$Id: JPEGDecoder.h,v 1.5 2000-09-18 17:10:23 bcr Exp $#
+    #$Id: JPEGDecoder.h,v 1.6 2000-09-29 19:42:53 sforde Exp $#
     @author
     Parag Deshmukh <parag@sanskrit.lz.att.com> 
 */
