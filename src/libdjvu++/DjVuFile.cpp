@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.38 1999-09-07 15:59:53 leonb Exp $
+//C- $Id: DjVuFile.cpp,v 1.39 1999-09-07 20:47:25 leonb Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -682,27 +682,46 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
   else if (chkid == "INCL" && (djvi || djvu))
     {
       GP<DjVuFile> file=process_incl_chunk(iff);
-      if (file && !file->is_decoding())
+      if (file)
         {
-          if (file->is_decode_ok() || file->is_decode_failed()) 
+          int decode_was_already_started = 1;
+          {
+            GMonitorLock( &file->status_mon );
+            if (!file->is_decoding() &&
+                !file->is_decode_ok() &&
+                !file->is_decode_failed() )
+              {
+                // Start decoding
+                decode_was_already_started = 0;
+                file->start_decode();
+              }
+          }
+          // Send file notifications if previously started
+          if (decode_was_already_started)
             {
-              // Send chunk notifications
-              int chksize;
-              GString chkid;
-              GP<ByteStream> str=file->data_pool->get_stream();
-	      IFFByteStream iff(*str);
-	      if (!iff.get_chunk(chkid)) 
-		 THROW("EOF");
-	      while((chksize=iff.get_chunk(chkid)))
-	      {
-		 get_portcaster()->notify_chunk_done(file, chkid);
-		 iff.close_chunk();
-	      }
-            }
-          else
-            {
-              // Start decoding
-              file->start_decode();
+#ifndef DO_NOT_SEND_UNRELIABLE_NOTIFICATIONS
+              // Send chunk notifications 
+              // Unreliable but may be needed by the unix viewer.
+              if (!file->is_decoding())
+                {
+                  int chksize;
+                  GString chkid;
+                  GP<ByteStream> str=file->data_pool->get_stream();
+                  IFFByteStream iff(*str);
+                  if (!iff.get_chunk(chkid)) 
+                    THROW("EOF");
+                  while((chksize=iff.get_chunk(chkid)))
+                    {
+                      get_portcaster()->notify_chunk_done(file, chkid);
+                      iff.close_chunk();
+                    }
+                }
+#endif
+              // May send duplicate notifications...
+              if (file->is_decode_ok())
+                get_portcaster()->notify_file_done(file);
+              else if (file->is_decode_failed())
+                get_portcaster()->notify_file_failed(file);
             }
         }
       desc.format("Indirection chunk");
