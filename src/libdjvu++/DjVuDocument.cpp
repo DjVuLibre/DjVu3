@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.72 1999-11-21 09:21:36 bcr Exp $
+//C- $Id: DjVuDocument.cpp,v 1.73 1999-11-21 20:52:05 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -95,7 +95,6 @@ DjVuDocument::~DjVuDocument(void)
       ufiles_list.empty();
    }
 
-//bcr: This just seems to create a nice segmentation fault.
    GPList<DjVuPort> ports=get_portcaster()->prefix_to_ports(get_int_prefix(this));
    for(GPosition pos=ports;pos;++pos)
    {
@@ -120,7 +119,6 @@ DjVuDocument::stop(void)
    {
       if (init_data_pool) init_data_pool->stop(false);	// any operation
 
-//bcr: I don't understand this.  Isn't ndir_file stopped above?
       if (ndir_file) ndir_file->stop(false);
 
       GCriticalSectionLock lock(&ufiles_lock);
@@ -278,36 +276,6 @@ DjVuDocument::init_thread(void)
 	    ndir=new DjVuNavDir(init_url.base()+"directory");
 	    ndir->insert_page(-1, init_url.name());
 	 }
-      }
-      else
-      {
-//bcr: I don't really understand why ndir_file must point to a 
-//bcr: document.  But if it doesn't, then a segmentation fault
-//bcr: will be generated with the destructor is called from a THROW().
-//bcr: So we map ndir_file to the first page if init_url was the 
-//bcr: index file.
-        int page=ndir->url_to_page(init_url);
-        if(page<0)
-        {
-          int pages=ndir->get_pages_num(),i;
-          for(i=0;i<pages;i++)
-          {
-            TRY
-            {
-              ndir_file=get_djvu_file(i);
-              break;
-            }
-            CATCH(ex)
-            {
-		// We will ignore this error for now.
-            }
-            ENDCATCH;
-          }
-          if(i==pages)
-          {
-            THROW("No valid pages found in this document.");
-          }
-        }
       }
       flags|=DOC_NDIR_KNOWN;
       pcaster->notify_doc_flags_changed(this, DOC_NDIR_KNOWN, 0);
