@@ -11,13 +11,14 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: DjVuDocEditor.cpp,v 1.38 2000-06-06 18:59:38 bcr Exp $
+//C- $Id: DjVuDocEditor.cpp,v 1.39 2000-07-03 17:28:13 bcr Exp $
 
 #ifdef __GNUC__
 #pragma implementation
 #endif
 
 #include "DjVuDocEditor.h"
+#include "DataPool.h"
 #include "GOS.h"
 #include "debug.h"
 
@@ -49,6 +50,7 @@ DjVuDocEditor::~DjVuDocEditor(void)
       delete (TArray<char> *) thumb_map[pos];
       thumb_map.del(pos);
    }
+   DataPool::close_all();
 }
 
 void

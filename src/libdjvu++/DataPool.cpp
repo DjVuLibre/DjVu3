@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: DataPool.cpp,v 1.49 2000-06-28 19:25:34 mrosen Exp $
+//C- $Id: DataPool.cpp,v 1.50 2000-07-03 17:28:12 bcr Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -44,7 +44,7 @@ call_callback(void (* callback)(void *), void * cl_data)
 /** The purpose of this class is to limit the number of files open by
     connected DataPools. Now, when a DataPool is connected to a file, it
     doesn't necessarily has it open. Every time it needs access to data
-    it's supposed to ask this file for the StdioByteStream. It should
+    it's supposed to ask this file for the ByteStream. It should
     also inform the class when it's going to die (so that the file can
     be closed). OpenFiles makes sure, that the number of open files
     doesn't exceed MAX_OPEN_FILES. When it does, it looks for the oldest
@@ -81,13 +81,13 @@ public:
       // with the stream. Whenever OpenFiles decides, that this stream
       // had better be closed, it will order every pool from the list to
       // ZERO their references to it
-   void		request_stream(const char * name, DataPool * pool,
-			       GP<StdioByteStream> & stream,
-			       GCriticalSection ** stream_lock);
+   GP<File>		request_stream(const char * name, DataPool * pool);
       // Removes the pool from the list associated with the stream.
       // If there is nobody else using this stream, the stream will
       // be closed too.
-   void		stream_released(StdioByteStream * stream, DataPool * pool);
+   void		stream_released(ByteStream * stream, DataPool * pool);
+
+   void 	close_all(void);
 };
 
 OpenFiles * OpenFiles::global_ptr;
@@ -136,10 +136,10 @@ OpenFiles::get(void)
    return global_ptr;
 }
 
-void
-OpenFiles::request_stream(const char * name_in, DataPool * pool,
-			  GP<StdioByteStream> & stream,
-			  GCriticalSection ** stream_lock)
+//			  GP<ByteStream> & stream,
+//			  GCriticalSection ** stream_lock)
+GP<OpenFiles::File>
+OpenFiles::request_stream(const char * name_in, DataPool * pool)
 {
    DEBUG_MSG("OpenFiles::request_stream(): name='" << name_in << "'\n");
    DEBUG_MAKE_INDENT(3);
@@ -181,12 +181,13 @@ OpenFiles::request_stream(const char * name_in, DataPool * pool,
    }
    
    file->add_pool(pool);
-   stream=file->stream;
-   *stream_lock=&file->stream_lock;
+   return file;
+//   stream=file->stream;
+//   *stream_lock=&file->stream_lock;
 }
 
 void
-OpenFiles::stream_released(StdioByteStream * stream, DataPool * pool)
+OpenFiles::stream_released(ByteStream * stream, DataPool * pool)
 {
    GCriticalSectionLock lock(&files_lock);
    for(GPosition pos=files_list;pos;)
@@ -199,6 +200,17 @@ OpenFiles::stream_released(StdioByteStream * stream, DataPool * pool)
 	 files_list.del(this_pos);
       } else ++pos;
    }
+}
+
+// This isn't really an accurate name.  The files are not really
+// closed.  Instead they are dereferenced from the data pool.  If
+// a there is another reference to the respective bytestream, it
+// will remain open until dereferenced.
+void
+OpenFiles::close_all(void)
+{
+  GCriticalSectionLock lock(&files_lock);
+  files_list.empty();
 }
 
 //****************************************************************************
@@ -467,7 +479,7 @@ DataPool::init(void)
    data=new MemoryByteStream();
 }
 
-DataPool::DataPool(void)
+DataPool::DataPool(void) : fstream(0)
 {
    init();
 
@@ -476,7 +488,7 @@ DataPool::DataPool(void)
    add_trigger(0, 32, static_trigger_cb, this);
 }
 
-DataPool::DataPool(ByteStream & str)
+DataPool::DataPool(ByteStream & str) : fstream(0)
 {
    init();
 
@@ -491,12 +503,14 @@ DataPool::DataPool(ByteStream & str)
 }
 
 DataPool::DataPool(const GP<DataPool> & pool, int start, int length)
+: fstream(0)
 {
    init();
    connect(pool, start, length);
 }
 
 DataPool::DataPool(const char * fname, int start, int length)
+: fstream(0)
 {
    init();
    connect(fname, start, length);
@@ -504,10 +518,16 @@ DataPool::DataPool(const char * fname, int start, int length)
 
 DataPool::~DataPool(void)
 {
+   if(fstream)
    {
       GCriticalSectionLock lock(&class_stream_lock);
-      OpenFiles::get()->stream_released(stream, this);
-      stream=0;
+      if(fstream)
+      {
+        GP<OpenFiles::File> &f=*(GP<OpenFiles::File> *)fstream;
+        OpenFiles::get()->stream_released(f->stream, this);
+        delete (GP<OpenFiles::File> *)fstream;
+        fstream=0;
+      }
    }
 
    if (fname.length())
@@ -588,7 +608,7 @@ DataPool::connect(const char * fname_in, int start_in, int length_in)
 	 // Open the stream (just in this function) too see if
 	 // the file is accessible. In future we will be using 'OpenFiles'
 	 // to request and release streams
-      GP<StdioByteStream> str=new StdioByteStream(fname_in, "rb");
+      GP<ByteStream> str=new StdioByteStream(fname_in, "rb");
       str->seek(0, SEEK_END);
       int file_size=str->tell();
 
@@ -786,11 +806,16 @@ DataPool::get_data(void * buffer, int offset, int sz, int level)
       if (sz<0) sz=0;
       
       GCriticalSectionLock lock1(&class_stream_lock);
-      if (!stream || !stream_lock)
-	 OpenFiles::get()->request_stream(fname, this, stream, &stream_lock);
-      GCriticalSectionLock lock2(stream_lock);
-      stream->seek(start+offset, SEEK_SET);
-      return stream->readall(buffer, sz);
+      if (!fstream)
+      {
+        fstream=new GP<OpenFiles::File>;
+        GP<OpenFiles::File> &f=*(GP<OpenFiles::File> *)fstream;
+        f=OpenFiles::get()->request_stream(fname, this);
+      }
+      GP<OpenFiles::File> &f=*(GP<OpenFiles::File> *)fstream;
+      GCriticalSectionLock lock2(&(f->stream_lock));
+      f->stream->seek(start+offset, SEEK_SET);
+      return f->stream->readall(buffer, sz);
    } 
    else
    {
@@ -991,28 +1016,31 @@ DataPool::load_file(void)
       DEBUG_MSG("loading the data.\n");
 
       GCriticalSectionLock lock1(&class_stream_lock);
-      
-      if (!stream || !stream_lock)
-	      OpenFiles::get()->request_stream(fname, this, stream, &stream_lock);
-      {     // Extra scoping to work-around problem with stream being released 
-            // before the locks destructor is called.
-         GCriticalSectionLock lock2(stream_lock);
+      if (!fstream)
+      {
+        fstream=new GP<OpenFiles::File>;
+        (*(GP<OpenFiles::File> *)fstream)=OpenFiles::get()->request_stream(fname, this);
+      }
+      GP<OpenFiles::File> &f = *(GP<OpenFiles::File> *)fstream;
+      {  // Scope to de-allocate lock2 before stream gets released
+         GCriticalSectionLock lock2(&(f->stream_lock));
 
          data=new MemoryByteStream();
          block_list.clear();
          FCPools::get()->del_pool(fname, this);
          fname="";
 
-         stream->seek(0, SEEK_SET);
+         f->stream->seek(0, SEEK_SET);
          char buffer[1024];
          int length;
-         while((length=stream->read(buffer, 1024)))
+         while((length=f->stream->read(buffer, 1024)))
 	         add_data(buffer, length);
-	    // No need to set EOF. It should already be set.
+	      // No need to set EOF. It should already be set.
+        OpenFiles::get()->stream_released(f->stream, this);
       }
-      OpenFiles::get()->stream_released(stream, this);
-      stream=0;
-      } else DEBUG_MSG("Not connected\n");
+      delete (GP<OpenFiles::File> *)fstream;
+      fstream=0;
+   } else DEBUG_MSG("Not connected\n");
 }
 
 void
@@ -1241,6 +1269,7 @@ public:
    virtual size_t read(void *buffer, size_t size);
    virtual size_t write(const void *buffer, size_t size);
    virtual long tell();
+   virtual int seek(long offset, int whence = SEEK_SET, bool nothrow=false);
 private:
       // Don't make data_pool GP<>. The problem is that DataPool creates
       // and soon destroys this ByteStream from the constructor. Since
@@ -1306,8 +1335,71 @@ PoolByteStream::tell(void)
    return position;
 }
 
+int
+PoolByteStream::seek(long offset, int whence, bool nothrow)
+{
+  int retval=(-1);
+  switch(whence)
+  {
+    case SEEK_CUR:
+      offset+=position;
+      // fallthrough;
+    case SEEK_SET:
+      if(offset<position)
+      {
+        if((int)(offset+buffer_pos)>=(int)position)
+        {
+          buffer_pos-=position-offset;
+        }else
+        {
+          buffer_size=0;
+        }
+        position=offset;
+      }else if(offset>position)
+      {
+        buffer_pos+=(offset-position)-1;
+        position=offset-1;
+        unsigned char c;
+        if(read(&c,1)<1)
+        {
+          THROW("EOF");
+        }
+      }
+      retval=0;
+      break;
+    case SEEK_END:
+      if(! nothrow)
+        THROW("Seeking backwards from EOF is not supported by this ByteStream");
+      break;
+   }
+   return retval;
+}
+
+void
+DataPool::close_all(void)
+{
+  OpenFiles::get()->close_all();
+}
+
+
 inline GP<ByteStream>
 DataPool::get_stream(void)
 {
    return new PoolByteStream(this);
 }
+
+void
+DataPool::clear_stream(void)
+{
+  if(fstream)
+  {
+    GCriticalSectionLock lock(&class_stream_lock);
+    if(fstream)
+    {
+      GP<OpenFiles::File> &f=*(GP<OpenFiles::File> *)fstream;
+      delete *(GP<OpenFiles::File> *)fstream;
+      fstream=0;
+    }
+  }
+}
+

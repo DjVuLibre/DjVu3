@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.h,v 1.30 2000-02-27 23:19:49 eaf Exp $
+//C- $Id: DataPool.h,v 1.31 2000-07-03 17:28:13 bcr Exp $
  
 #ifndef _DATAPOOL_H
 #define _DATAPOOL_H
@@ -44,7 +44,7 @@
 
     @memo Thread safe data storage
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DataPool.h,v 1.30 2000-02-27 23:19:49 eaf Exp $#
+    @version #$Id: DataPool.h,v 1.31 2000-07-03 17:28:13 bcr Exp $#
 */
 
 //@{
@@ -536,6 +536,9 @@ public:
 	  not affecting the rest of the program. */
    static void	load_file(const char * name);
 
+      /** This function will remove OpenFiles filelist. */
+   static void	close_all(void);
+
       // Internal. Used by 'OpenFiles'
    void		clear_stream(void);
 private:
@@ -548,8 +551,8 @@ private:
       // Source or storage of data
    GP<DataPool>		pool;
    GString		fname;
-   GP<StdioByteStream>	stream;
-   GCriticalSection	* stream_lock, class_stream_lock;
+   void *fstream;
+   GCriticalSection	class_stream_lock;
    GP<MemoryByteStream>	data;
    GCriticalSection	data_lock;
    BlockList		block_list;
@@ -594,14 +597,6 @@ inline int
 DataPool::get_size(void) const
 {
    return get_size(0, -1);
-}
-
-inline void
-DataPool::clear_stream(void)
-{
-   GCriticalSectionLock lock(&class_stream_lock);
-   stream=0;
-   stream_lock=0;
 }
 
 inline

@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.122 2000-06-06 18:59:38 bcr Exp $
+//C- $Id: DjVuDocument.cpp,v 1.123 2000-07-03 17:28:14 bcr Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -19,6 +19,7 @@
 
 #include "DjVuDocument.h"
 #include "IFFByteStream.h"
+#include "DataPool.h"
 #include "GOS.h"
 #include "debug.h"
 
@@ -115,6 +116,7 @@ DjVuDocument::~DjVuDocument(void)
 	 file->stop(false);	// Disable any access to data
       }
    }
+   DataPool::close_all();
 }
 
 void
