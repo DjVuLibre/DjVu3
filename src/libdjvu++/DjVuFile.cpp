@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.48 1999-09-15 17:54:42 eaf Exp $
+//C- $Id: DjVuFile.cpp,v 1.49 1999-09-16 14:00:22 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -149,11 +149,8 @@ DjVuFile::~DjVuFile(void)
 {
    DEBUG_MSG("DjVuFile::~DjVuFile(): destroying...\n");
    DEBUG_MAKE_INDENT(3);
-   {
-     GCriticalSectionLock lock(&trigger_lock);
-     if (data_pool)
-	data_pool->del_trigger(static_trigger_cb, this);
-   }
+   
+   if (data_pool) data_pool->del_trigger(static_trigger_cb, this);
    stop_decode(1);
 }
 
@@ -1015,9 +1012,7 @@ DjVuFile::static_trigger_cb(void * cl_data)
 void
 DjVuFile::trigger_cb(void)
 {
-      // Don't want to be destroyed while I'm here. Can't use GP<> life saver
-      // as I'm can be called from the constructor
-   GCriticalSectionLock lock(&trigger_lock);
+   GP<DjVuFile> life_saver=this;
    
    DEBUG_MSG("DjVuFile::trigger_cb(): got data for '" << url << "'\n");
    DEBUG_MAKE_INDENT(3);
