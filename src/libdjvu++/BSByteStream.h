@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: BSByteStream.h,v 1.11 1999-07-30 19:08:55 leonb Exp $
+//C- $Id: BSByteStream.h,v 1.12 1999-09-02 02:16:53 leonb Exp $
 
 
 #ifndef _BSBYTESTREAM_H
@@ -94,7 +94,7 @@
     @memo
     Simple Burrows-Wheeler general purpose compressor.
     @version
-    #$Id: BSByteStream.h,v 1.11 1999-07-30 19:08:55 leonb Exp $# */
+    #$Id: BSByteStream.h,v 1.12 1999-09-02 02:16:53 leonb Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -156,7 +156,7 @@ public:
       data will be read from ByteStream #bs# and decompressed into an internal
       buffer. Function #read# can be used to access the decompressed data.
       \item[Compression]
-      Setting #blocksize# to a positive number between 100 and 4096
+      Setting #blocksize# to a positive number smaller than 4096
       initializes the compressor.  Data written to the BSByteStream will be
       accumulated into an internal buffer.  The buffered data will be
       compressed and written to ByteStream #bs# whenever the buffer sizes
@@ -164,7 +164,8 @@ public:
       kilobytes).  Using a larger block size usually increases the compression
       ratio at the expense of computation time.  There is no need however to
       specify a block size larger than the total number of bytes to compress.
-      Setting #blocksize# to #1024# is a good starting point.
+      Setting #blocksize# to #1024# is a good starting point.  A minimal block
+      size of 10 is silently enforced.
       \end{description} */
   BSByteStream(ByteStream &bs, int blocksize=0);
   // ByteStream Interface
