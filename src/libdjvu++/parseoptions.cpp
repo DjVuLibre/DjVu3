@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: parseoptions.cpp,v 1.87 2001-06-18 20:08:05 bcr Exp $
+// $Id: parseoptions.cpp,v 1.88 2001-06-18 20:29:17 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -358,7 +358,7 @@ DjVuParseOptions::AmbiguousOptions(
     if(name1 && name2)
     {
       GUTF8String s;
-      s.format( ERR_MSG("parseoptions.ambiguous") "\t%s\t%s\t%s\t%s", name1,value1,name2,value2 );
+      s.format( ERR_MSG("parseoptions.ambiguous") "\t%s\t%s\t%s\t%s", (const char *)name1,(const char *)value1,(const char *)name2,(const char *)value2 );
       Errors.append(s);
     }
   }
