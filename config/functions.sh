@@ -413,8 +413,8 @@ generate_makefile()
   xtopbuilddir=`pathclean $TOPBUILDDIR`
 
   # substitute
-  mkdirp $1
-  sed < $TOPSRCDIR/$1/Makefile.in > $1/Makefile \
+  mkdirp "$TOPBUILDDIR/$1"
+  sed < $TOPSRCDIR/$1/Makefile.in > "$TOPBUILDDIR/$1/Makefile" \
     -e 's!@prefix@!'"$prefix"'!g' \
     -e 's!@topsrcdir@!'"$xtopsrcdir"'!g' \
     -e 's!@topbuilddir@!'"$xtopbuilddir"'!g' \
@@ -434,7 +434,7 @@ generate_makefile()
   # dependencies
   if [ -r $TOPSRCDIR/$1/Makefile.depend ]
   then
-    cat $TOPSRCDIR/$1/Makefile.depend >> $1/Makefile
+    cat $TOPSRCDIR/$1/Makefile.depend >> "$TOPBUILDDIR/$1/Makefile"
   fi
 }
 
@@ -454,7 +454,7 @@ generate_main_makefile()
     subdirs=$*
 
     # Generate Makefile header
-    cat > Makefile <<EOF
+    cat > "$TOPBUILDDIR/Makefile" <<EOF
 SHELL=/bin/sh
 TOPSRCDIR= $TOPSRCDIR
 TOPBUILDDIR= $TOPBUILDDIR
@@ -467,10 +467,10 @@ SUBDIRS= $subdirs
 EOF
 
     # Insert Makefile fragment
-    cat >> ${TOPBUILDDIR}/Makefile 
+    cat >> "${TOPBUILDDIR}/Makefile"
 
     # Add final rules
-    cat >> ${TOPBUILDDIR}/Makefile <<\EOF
+    cat >> "${TOPBUILDDIR}/Makefile" <<\EOF
 
 clean:
 	for n in $(SUBDIRS) ; do ( cd $$n ; $(MAKE) clean ) ; done

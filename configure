@@ -95,9 +95,9 @@ EOF
 
 # --- save command line
 
-echo '#!/bin/sh' > reconfigure
-echo "$0 $*" >> reconfigure
-chmod 755 reconfigure
+echo '#!/bin/sh' > "$TOPBUILDDIR/reconfigure"
+echo "$0 $*" >> "$TOPBUILDDIR/reconfigure"
+chmod 755 "$TOPBUILDDIR/reconfigure"
 
 # --- display cool message
 
