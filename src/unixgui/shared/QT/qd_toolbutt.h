@@ -4,7 +4,7 @@
 //C-              Unauthorized use prohibited.
 //C-
 // 
-// $Id: qd_toolbutt.h,v 1.1 2001-05-29 22:05:31 bcr Exp $
+// $Id: qd_toolbutt.h,v 1.2 2001-06-07 22:13:55 mchen Exp $
 // $Name:  $
 
 
@@ -48,7 +48,7 @@ public:
    int		cmd;
    void		setOnPixmap(ByteStream & str);
    QDToolButton(ByteStream & str, bool shadow, int cmd,
-		QWidget * parent=0, const char * name=0);
+		QWidget * parent=0, const QString & name=QString::null);
    ~QDToolButton(void);
 };
 

@@ -4,7 +4,7 @@
 //C-              Unauthorized use prohibited.
 //C-
 // 
-// $Id: qd_tbar_mode_piece.cpp,v 1.1 2001-05-29 22:05:31 bcr Exp $
+// $Id: qd_tbar_mode_piece.cpp,v 1.2 2001-06-07 22:13:55 mchen Exp $
 // $Name:  $
 
 
@@ -31,10 +31,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#define ONE2ONE_STR	"1 : 1"
-#define STRETCH_STR	"Stretch"
-#define FIT_WIDTH_STR	"Fit Width"
-#define FIT_PAGE_STR	"Fit Page"
+//  #define ONE2ONE_STR	"1 : 1"
+//  #define STRETCH_STR	"Stretch"
+//  #define FIT_WIDTH_STR	"Fit Width"
+//  #define FIT_PAGE_STR	"Fit Page"
 
 class QDZoomValidator : public QValidator
 {
@@ -164,11 +164,11 @@ QDTBarModePiece::QDTBarModePiece(QWidget * toolbar) : QDTBarPiece(toolbar)
       ((QDToolBar *)toolbar)->addLeftWidget(zoom_menu);
 
    zoom_in_butt=new QDToolButton(*CINData::get("ppm_vzoom_in"), true,
-				 IDC_ZOOM_ZOOMIN, toolbar, "Zoom In");
+				 IDC_ZOOM_ZOOMIN, toolbar, tr("Zoom In"));
    connect(zoom_in_butt, SIGNAL(clicked(void)), this, SLOT(slotZoom(void)));
 
    zoom_out_butt=new QDToolButton(*CINData::get("ppm_vzoom_out"), true,
-				  IDC_ZOOM_ZOOMOUT, toolbar, "Zoom Out");
+				  IDC_ZOOM_ZOOMOUT, toolbar, tr("Zoom Out"));
    connect(zoom_out_butt, SIGNAL(clicked(void)), this, SLOT(slotZoom(void)));
    if ( qdtoolbar_child ) 
       ((QDToolBar *)toolbar)->addLeftWidgets(zoom_in_butt, zoom_out_butt);
@@ -176,7 +176,7 @@ QDTBarModePiece::QDTBarModePiece(QWidget * toolbar) : QDTBarPiece(toolbar)
    if ( qdtoolbar_child )
    {
       pin_butt=new QDToolButton(*CINData::get("ppm_vpin_out"), false,
-				-1, toolbar, "Stick");
+				-1, toolbar, tr("Stick"));
       pin_butt->setToggleButton(TRUE);
       pin_butt->setOnPixmap(*CINData::get("ppm_vpin_in"));
       connect(pin_butt, SIGNAL(toggled(bool)), this, SIGNAL(sigStick(bool)));

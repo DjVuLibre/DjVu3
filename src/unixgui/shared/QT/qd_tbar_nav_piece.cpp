@@ -4,7 +4,7 @@
 //C-              Unauthorized use prohibited.
 //C-
 // 
-// $Id: qd_tbar_nav_piece.cpp,v 1.1 2001-05-29 22:05:31 bcr Exp $
+// $Id: qd_tbar_nav_piece.cpp,v 1.2 2001-06-07 22:13:55 mchen Exp $
 // $Name:  $
 
 
@@ -118,27 +118,27 @@ QDTBarNavPiece::create(void)
       ((QDToolBar *)toolbar)->addLeftWidgets(label, page_menu);
 
    fpage_butt=new QDToolButton(*CINData::get("ppm_vfpage"), true,
-			       IDC_NAV_FIRST_PAGE, toolbar, "First page");
+			       IDC_NAV_FIRST_PAGE, toolbar, tr("First page"));
    connect(fpage_butt, SIGNAL(clicked(void)), this, SLOT(slotPage(void)));
    
    pppage_butt=new QDToolButton(*CINData::get("ppm_vpppage"), true,
-				IDC_NAV_PREV_PAGE10, toolbar, "-10 pages");
+				IDC_NAV_PREV_PAGE10, toolbar, tr("-10 pages"));
    connect(pppage_butt, SIGNAL(clicked(void)), this, SLOT(slotPage(void)));
    
    ppage_butt=new QDToolButton(*CINData::get("ppm_vppage"), true,
-			       IDC_NAV_PREV_PAGE, toolbar, "Previous Page");
+			       IDC_NAV_PREV_PAGE, toolbar, tr("Previous Page"));
    connect(ppage_butt, SIGNAL(clicked(void)), this, SLOT(slotPage(void)));
    
    npage_butt=new QDToolButton(*CINData::get("ppm_vnpage"), true,
-			       IDC_NAV_NEXT_PAGE, toolbar, "Next Page");
+			       IDC_NAV_NEXT_PAGE, toolbar, tr("Next Page"));
    connect(npage_butt, SIGNAL(clicked(void)), this, SLOT(slotPage(void)));
 
    nnpage_butt=new QDToolButton(*CINData::get("ppm_vnnpage"), true,
-				IDC_NAV_NEXT_PAGE10, toolbar, "+10 pages");
+				IDC_NAV_NEXT_PAGE10, toolbar, tr("+10 pages"));
    connect(nnpage_butt, SIGNAL(clicked(void)), this, SLOT(slotPage(void)));
 
    lpage_butt=new QDToolButton(*CINData::get("ppm_vlpage"), true,
-			       IDC_NAV_LAST_PAGE, toolbar, "Last page");
+			       IDC_NAV_LAST_PAGE, toolbar, tr("Last page"));
    connect(lpage_butt, SIGNAL(clicked(void)), this, SLOT(slotPage(void)));
 
    if ( qdtoolbar_child ) 

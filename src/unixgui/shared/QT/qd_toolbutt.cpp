@@ -4,7 +4,7 @@
 //C-              Unauthorized use prohibited.
 //C-
 // 
-// $Id: qd_toolbutt.cpp,v 1.1 2001-05-29 22:05:31 bcr Exp $
+// $Id: qd_toolbutt.cpp,v 1.2 2001-06-07 22:13:55 mchen Exp $
 // $Name:  $
 
 
@@ -30,7 +30,7 @@
 #include "qt_fix.h"
 
 QDToolButton::QDToolButton(ByteStream & str, bool _shadow, int _cmd,
-			   QWidget * parent, const char * name) :
+			   QWidget * parent, const QString & name) :
       QToolButton(parent, name), shadow(_shadow), cmd(_cmd)
 {
       // Make a copy of the data (I will have to rewind the stream and
@@ -61,7 +61,7 @@ QDToolButton::QDToolButton(ByteStream & str, bool _shadow, int _cmd,
    setMinimumWidth(set_off->pixmap().width()+4);
    setMinimumHeight(set_off->pixmap().height()+4);
       
-   if (name && strlen(name)) QToolTip::add(this, name);
+   if (!name.isEmpty()) QToolTip::add(this, name);
 
    connect(this, SIGNAL(toggled(bool)), this, SLOT(slotToggled(bool)));
    connect(this, SIGNAL(pressed(void)), this, SLOT(slotPressed(void)));

@@ -4,7 +4,7 @@
 //C-              Unauthorized use prohibited.
 //C-
 // 
-// $Id: qd_tbar_print_piece.cpp,v 1.1 2001-05-29 22:05:31 bcr Exp $
+// $Id: qd_tbar_print_piece.cpp,v 1.2 2001-06-07 22:13:55 mchen Exp $
 // $Name:  $
 
 
@@ -43,17 +43,17 @@ QDTBarPrintPiece::QDTBarPrintPiece(QDToolBar * toolbar) : QDTBarPiece(toolbar)
    toolbar->addLeftWidget(frame);
    
    find_butt=new QDToolButton(*CINData::get("ppm_vfind"), true,
-			      IDC_SEARCH, toolbar, "Find");
+			      IDC_SEARCH, toolbar, tr("Find"));
    connect(find_butt, SIGNAL(clicked(void)), this, SIGNAL(sigFind(void)));
    toolbar->addLeftWidget(find_butt);
 
    print_butt=new QDToolButton(*CINData::get("ppm_vprint"), true,
-			       IDC_PRINT, toolbar, "Print");
+			       IDC_PRINT, toolbar, tr("Print"));
    connect(print_butt, SIGNAL(clicked(void)), this, SIGNAL(sigPrint(void)));
    toolbar->addLeftWidget(print_butt);
 
    save_butt=new QDToolButton(*CINData::get("ppm_vsave"), true,
-			      IDC_SAVE_DOC, toolbar, "Save");
+			      IDC_SAVE_DOC, toolbar, tr("Save"));
    connect(save_butt, SIGNAL(clicked(void)), this, SIGNAL(sigSave(void)));
    toolbar->addLeftWidget(save_butt);
    

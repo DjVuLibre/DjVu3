@@ -4,7 +4,7 @@
 //C-              Unauthorized use prohibited.
 //C-
 // 
-// $Id: main.cpp,v 1.1 2001-05-29 22:05:29 bcr Exp $
+// $Id: main.cpp,v 1.2 2001-06-07 22:13:55 mchen Exp $
 // $Name:  $
 
 
@@ -31,6 +31,7 @@
 #include "qlib.h"
 #include "execdir.h"
 #include "mime_check.h"
+#include "version.h"
 
 char		* progname;
 
@@ -115,9 +116,8 @@ void operator delete[](void * addr)
 static void ShowUsage(void)
 {
    cout << "\
-DJVU Viewer Version 3.0\n\
-\n\
-Usage:\n\
+DJVU Viewer Version " << DJVIEW_VERSION_STR << "\n\n" <<
+"Usage:\n\
 	djview <options_list> <file_name>\n\
 Options:\n\
 	-file <file_name>	- alternative way to specify file name\n\
