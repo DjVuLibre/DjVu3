@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GThreads.h,v 1.26 1999-11-17 19:05:18 leonb Exp $
+//C- $Id: GThreads.h,v 1.27 1999-11-18 15:42:28 leonb Exp $
 
 #ifndef _GTHREADS_H_
 #define _GTHREADS_H_
@@ -73,7 +73,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Praveen Guduru <praveen@sanskrit.lz.att.com> -- mac implementation.
     @version
-    #$Id: GThreads.h,v 1.26 1999-11-17 19:05:18 leonb Exp $# */
+    #$Id: GThreads.h,v 1.27 1999-11-18 15:42:28 leonb Exp $# */
 //@{
 
 #include "DjVuGlobal.h"
@@ -421,6 +421,12 @@ public:
   ~GMonitorLock() 
     { if (gsec) gsec->leave(); };
 };
+
+
+
+// ----------------------------------------
+// GSAFEFLAGS (not so safe)
+
 
 /** A thread safe class representing a set of flags. The flags are protected
     by \Ref{GMonitor}, which is attempted to be locked whenever somebody
