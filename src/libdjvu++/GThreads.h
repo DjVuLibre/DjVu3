@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GThreads.h,v 1.34 2000-02-03 22:10:51 leonb Exp $
+//C- $Id: GThreads.h,v 1.35 2000-02-06 19:32:10 eaf Exp $
 
 #ifndef _GTHREADS_H_
 #define _GTHREADS_H_
@@ -73,7 +73,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Praveen Guduru <praveen@sanskrit.lz.att.com> -- mac implementation.
     @version
-    #$Id: GThreads.h,v 1.34 2000-02-03 22:10:51 leonb Exp $# */
+    #$Id: GThreads.h,v 1.35 2000-02-06 19:32:10 eaf Exp $# */
 //@{
 
 #include "DjVuGlobal.h"
@@ -181,7 +181,12 @@ public:
       negative value will be replaced by a suitable default value (128Kb as of
       12/1998). A minimum value of 32Kb is silently enforced. */
   GThread(int stacksize = -1);
-  /** Destructor. */
+  /** Destructor. If you attempt to destroy the #GThread# object before
+      the thread is actually terminated the destructor will block waiting
+      for the termination to happen (see \Ref{wait_for_finish}()). You
+      should be very careful not to destroy the #GThread# object from its
+      own thread, since this will abort the program, as no thread can wait
+      for itself. */
   ~GThread();
   /** Starts the thread. The new thread executes function #entry# with
       argument #arg#.  The thread terminates when the function returns.  A
