@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuBitonalAPI.h,v 1.2 2000-01-22 07:10:14 bcr Exp $
+ *C- $Id: DjVuBitonalAPI.h,v 1.3 2000-01-23 06:06:58 bcr Exp $
  */
 
 #ifndef _DJVUBITONAL_H_
@@ -47,57 +47,105 @@ extern "C"
 {
 #endif
 
-#ifdef DOCXX_CODE
-//@{
-#endif /*DOCXX_CODE*/
+/* Predeclarations. */
+ 
+struct djvu_parse;
 
-/** @name bitonaltodjvu_options struct
-    @memo Options used in bitonaltodjvu function 
-*/
 
-enum bitonaltodjvu_type_enum
+struct bitonaltodjvu_options_struct;
+typedef struct bitonaltodjvu_options_struct bitonaltodjvu_options;
+
+struct djvu_jb2_options_struct;
+typedef struct djvu_jb2_options_struct djvu_jb2_options;
+
+struct djvutobitonal_options_struct;
+typedef struct djvutobitonal_options_struct djvutobitonal_options;
+
+typedef enum bitonaltodjvu_type_enum
 {
   djvu_normal,
   djvu_conservative,
   djvu_lossless,
   djvu_aggressive,
   djvu_pseudo
+} bitonaltodjvu_type;
+
+/*@{*/
+
+/** @name djvu_jb2_options struct
+      
+    @memo Options to fine tune compression quality and speed.
+*/
+struct djvu_jb2_options_struct
+{
+/** pages_per_dict allows n number of pages to be matched together.
+    This value should never be too high or too low. Best values are
+    between 10 to 20.  A value of 1 has the special meaning of 
+    not using a shared dictionary, and should be when fewer than
+    ten or so pages are being processed. */
+  int pages_per_dict;
+
+/** These decides which predefined set of options to use. Quality
+  value is greatest in lossless. (lossless > normal > conservative
+  > aggressive).  pseudo will create the djvu output with data
+  stored in G4 format, that is same as input.  The relavent
+  configuration file option is lossless, normal, conservative,
+  aggressive, and pseudo as mutually exclusive options.
+ */
+  bitonaltodjvu_type compression;
+
+/** Halftone detection is used for dithered images.  The default
+    of zero, means halftone detection is on.  */
+  int halftone_off;
+
+/** These are tuning parameters which affect the compression
+    and the quality of the output image.  These are intended
+    primarily for use from profiles tuned to a particular
+    input source. Normal usage is to set these values by adjusting
+    the #compression# mode above. */
+  int tolerance_percent, tolerance4_size;
+
+#ifdef __cplusplus
+inline djvu_jb2_options_struct();
+#endif /* __cplusplus */
+
 };
-typedef enum bitonaltodjvu_type_enum bitonaltodjvu_type;
+
+/*@}*/
+
+
+/*@{*/
+
+/** @name bitonaltodjvu_options struct
+    @memo Options used in bitonaltodjvu function 
+*/
 
 struct bitonaltodjvu_options_struct
 {
 /** This keeps a string delimited by hypens(-) and commas(,) */
   const char *page_range;
 
-/** These are tuning parameters which affect the compression
-  and the quality of the output image */
-  int tolerance_percent, tolerance4_size;
-
-/** These decides which predefined set of options to use. They are
-  boolean values either 0 or 1. Quality  value is greatest in 
-  lossless. (lossless > normal > conservative > aggressive).
-  pseudo wil create the djvu output with data stored in G4 format,
-  that is same as input. */
-  bitonaltodjvu_type compression;
-
-/** Halftone detection is used for dithered images. */
-  int halftone_off;
-
-/** pages_per_dict allows n number of pages to be matched together.
-  This value should never be too high or too low. Best value  can
-  be between 10 to 20*/
-  int pages_per_dict;
+/** These are the compression options */
+  djvu_jb2_options jb2;
 
 /** They allow transformations to be done on the given input images. 
   vflip is verticle flip, hflip is horizontal flip, invert gives the
   negative of the image and rotateAngle will rotate image clockwise */
   int vflip, hflip, invert, rotateAngle;
 
-/** logfile should be non-NULL to print verbose processing details */
+/** warnfileno should be set to a fileno which is greater than zero to
+    print warning messages to the fileno specified.  (Warnings are errors
+    which are non-fatal. For example, specifying a negative dpi would
+    produce a warning, and then processing would continue with the default
+    dpi value. */
+  int warnfileno;
+
+/** logfileno should be set to a fileno which is greater than zero to
+    print verbose messages to the fileno specified. */
   int logfileno;
 
-/** helpfile should be non-NULL to print usage instructions */
+/** helpfileno should be set to a fileno which is greater than zero to
+    print warning messages to the fileno specified. */
   int helpfileno;
 
 /** dpi should the resolution in dots per inch of input images. */
@@ -117,8 +165,12 @@ struct bitonaltodjvu_options_struct
 
 /** This is where all memory is allocated and errors are listed. */
   void *priv;
+
+#ifdef __cplusplus
+  inline bitonaltodjvu_options_struct::bitonaltodjvu_options_struct();
+#endif /* __cplusplus */
+
 };
-typedef struct bitonaltodjvu_options_struct bitonaltodjvu_options;
 
 struct djvu_parse;
 
@@ -167,14 +219,9 @@ void bitonaltodjvu_perror(bitonaltodjvu_options [1],const char *mesg);
 DJVUAPI
 void bitonaltodjvu_usage(int fd,const char *prog);
 
-#ifdef DOCXX_CODE
-//@}
-#endif /*DOCXX_CODE*/
+/*@}*/
 
-
-#ifdef DOCXX_CODE
-//@{
-#endif /*DOCXX_CODE*/
+/*@{*/
 
 /** @name djvutobitonal_options struct
       
@@ -189,6 +236,10 @@ struct djvutobitonal_options_struct
 /** This option should be non-zero, if we want to force the application
     to avoid color images */
   int disable_mask;
+
+/** logfileno should be non-zero to print verbose processing details */
+  int warnfileno;
+
 /** logfileno should be non-zero to print verbose processing details */
   int logfileno;
 
@@ -209,10 +260,12 @@ struct djvutobitonal_options_struct
 
 /** This is where all memory is allocated and errors are listed. */
   void *priv;
-};
-typedef struct djvutobitonal_options_struct djvutobitonal_options;
 
-struct djvu_parse;
+#ifdef __cplusplus
+  inline djvutobitonal_options_struct::djvutobitonal_options_struct();
+#endif /* __cplusplus */
+};
+
 
 /** @name djvutobitonal_options_alloc function 
     This is the primary allocation routine for djvutobitonal_options.
@@ -254,12 +307,24 @@ void djvutobitonal_perror(djvutobitonal_options [1],const char *mesg);
 DJVUAPI
 void djvutobitonal_usage(int fd,const char *prog);
 
-#ifdef DOCXX_CODE
-//@}
-#endif /*DOCXX_CODE*/
+/*@}*/
 
 #ifdef __cplusplus
 }
+
+inline djvu_jb2_options_struct::djvu_jb2_options_struct() :
+  pages_per_dict(10), compression(djvu_normal), halftone_off(0),
+  tolerance_percent(-1), tolerance4_size(-1) {}
+
+inline bitonaltodjvu_options_struct::bitonaltodjvu_options_struct() :
+  page_range(0), jb2(), vflip(0), hflip(0), invert(0),
+  rotateAngle(0), warnfileno(0), logfileno(0), helpfileno(0), filelist(0),
+  filecount(0), output(0), prog(0), priv(0) {}
+
+inline djvutobitonal_options_struct::djvutobitonal_options_struct() :
+  page_range(0), disable_mask(0), warnfileno(0), logfileno(0), helpfileno(0),
+  filelist(0), filecount(0), output(0), prog(0), priv(0) {}
+
 #endif
 
 #endif /* _DJVUBITONAL_H_ */
