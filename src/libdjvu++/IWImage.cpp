@@ -9,9 +9,9 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: IWImage.cpp,v 1.17 1999-09-21 20:51:26 leonb Exp $
+//C- $Id: IWImage.cpp,v 1.18 1999-09-21 21:10:17 leonb Exp $
 
-// File "$Id: IWImage.cpp,v 1.17 1999-09-21 20:51:26 leonb Exp $"
+// File "$Id: IWImage.cpp,v 1.18 1999-09-21 21:10:17 leonb Exp $"
 // - Author: Leon Bottou, 08/1998
 
 #ifdef __GNUC__
@@ -2046,6 +2046,10 @@ IWBitmap::encode_chunk(ByteStream &bs, const IWEncoderParms &parm)
           if (ycodec->curband==0 || estdb>=parm.decibels-DECIBEL_PRUNE)
             estdb = ycodec->estimate_decibel(db_frac);
         nslices++;
+#ifdef NEED_DJVU_PROGRESS
+        if ((nslices & 0xf) == 0xf)
+          DJVU_PROGRESS((nslices-cslice)*100/(parm.slices-cslice));
+#endif
       }
   }
   // Write primary header
@@ -2540,6 +2544,10 @@ IWPixmap::encode_chunk(ByteStream &bs, const IWEncoderParms &parm)
             flag |= crcodec->code_slice(zp);
           }
         nslices++;
+#ifdef NEED_DJVU_PROGRESS
+        if ((nslices & 0xf) == 0xf)
+          DJVU_PROGRESS((nslices-cslice)*100/(parm.slices-cslice));
+#endif
       }
   }
   // Write primary header
