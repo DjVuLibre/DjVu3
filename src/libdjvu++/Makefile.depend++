@@ -219,17 +219,6 @@ d44.o: d44.cpp GString.h DjVuGlobal.h \
  GContainer.h Arrays.h GPixmap.h \
  IFFByteStream.h GOS.h
 debug.o: debug.cpp debug.h
-djvm.o: djvm.cpp GException.h DjVuGlobal.h \
- c-wrappers/DjVu.h DjVuDocument.h GSmartPointer.h \
- DjVuFileCache.h DjVuFile.h ByteStream.h \
- GContainer.h Arrays.h DataPool.h \
- GThreads.h GString.h DjVuInfo.h \
- JB2Image.h ZPCodec.h GRect.h GBitmap.h \
- IWImage.h GPixmap.h IFFByteStream.h \
- DjVuPalette.h DjVuPort.h GURL.h \
- DjVuNavDir.h debug.h DjVuImage.h \
- DjVuAnno.h GMapAreas.h DjVmDir0.h \
- DjVmDoc.h DjVmDir.h GOS.h
 djvmcvt.o: djvmcvt.cpp debug.h DjVmDoc.h \
  DjVuGlobal.h c-wrappers/DjVu.h ByteStream.h \
  GException.h GContainer.h GSmartPointer.h \
