@@ -22,46 +22,46 @@
 <DL>
 <P><DL>
 <DT><H3>Public Fields</H3><DD><DT>
-<A HREF="#DOC.1.4.8.2.2.13"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Inserts an element after the last element of the list.</B>
+<A HREF="#DOC.1.5.6.2.2.13"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Inserts an element after the last element of the list.</B>
 <DD><I></I>
 </DL></P>
 
 <P><DL>
 <DT><H3>Public Methods</H3><DD><DT>
-<A HREF="#DOC.1.4.8.2.2.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>size</B>() const 
+<A HREF="#DOC.1.5.6.2.2.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>size</B>() const 
 <DD><I>Returns the number of elements in the list.</I>
 <DT>
-<A HREF="#DOC.1.4.8.2.2.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GPosition.html">GPosition</A> <B>firstpos</B>() const 
+<A HREF="#DOC.1.5.6.2.2.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GPosition.html">GPosition</A> <B>firstpos</B>() const 
 <DD><I>Returns the first position in the list.</I>
 <DT>
-<A HREF="#DOC.1.4.8.2.2.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GPosition.html">GPosition</A> <B>lastpos</B>() const 
+<A HREF="#DOC.1.5.6.2.2.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GPosition.html">GPosition</A> <B>lastpos</B>() const 
 <DD><I>Returns the last position in the list.</I>
 <DT>
-<A HREF="#DOC.1.4.8.2.2.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>operator GPosition</B>() const 
+<A HREF="#DOC.1.5.6.2.2.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>operator GPosition</B>() const 
 <DD><I>Implicit notation for GList::firstpos().</I>
 <DT>
-<A HREF="#DOC.1.4.8.2.2.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>TYPE&amp; <B>operator[]</B>(<!1><A HREF="GPosition.html">GPosition</A> pos)
+<A HREF="#DOC.1.5.6.2.2.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>TYPE&amp; <B>operator[]</B>(<!1><A HREF="GPosition.html">GPosition</A> pos)
 <DD><I>Returns a reference to the list element at position <TT>pos</TT>.</I>
 <DT>
-<A HREF="#DOC.1.4.8.2.2.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>const TYPE&amp; <B>operator[]</B>(<!1><A HREF="GPosition.html">GPosition</A> pos) const 
+<A HREF="#DOC.1.5.6.2.2.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>const TYPE&amp; <B>operator[]</B>(<!1><A HREF="GPosition.html">GPosition</A> pos) const 
 <DD><I>Returns a constant reference to the list element at position <TT>pos</TT>.</I>
 <DT>
-<A HREF="#DOC.1.4.8.2.2.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>isempty</B>() const 
+<A HREF="#DOC.1.5.6.2.2.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>isempty</B>() const 
 <DD><I>Tests whether a list is empty.</I>
 <DT>
-<A HREF="#DOC.1.4.8.2.2.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>operator==</B>(const <!1><A HREF="GListTemplate.html">GListTemplate</A>&lt;TYPE, TI&gt; &amp;l2) const 
+<A HREF="#DOC.1.5.6.2.2.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>operator==</B>(const <!1><A HREF="GListTemplate.html">GListTemplate</A>&lt;TYPE, TI&gt; &amp;l2) const 
 <DD><I>Compares two lists.</I>
 <DT>
-<A HREF="#DOC.1.4.8.2.2.9"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GPosition.html">GPosition</A> <B>nth</B>(unsigned int n) const 
+<A HREF="#DOC.1.5.6.2.2.9"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GPosition.html">GPosition</A> <B>nth</B>(unsigned int n) const 
 <DD><I>Returns the position <TT>pos</TT> of the <TT>n</TT>-th list element.</I>
 <DT>
-<A HREF="#DOC.1.4.8.2.2.10"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GPosition.html">GPosition</A> <B>contains</B>(const TYPE &amp;elt) const 
+<A HREF="#DOC.1.5.6.2.2.10"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GPosition.html">GPosition</A> <B>contains</B>(const TYPE &amp;elt) const 
 <DD><I>Tests whether the list contains a given element.</I>
 <DT>
-<A HREF="#DOC.1.4.8.2.2.11"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>search</B>(const TYPE &amp;elt, <!1><A HREF="GPosition.html">GPosition</A> &amp;pos) const 
+<A HREF="#DOC.1.5.6.2.2.11"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>search</B>(const TYPE &amp;elt, <!1><A HREF="GPosition.html">GPosition</A> &amp;pos) const 
 <DD><I>Searches the list for a given element.</I>
 <DT>
-<A HREF="#DOC.1.4.8.2.2.12"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>empty</B>()
+<A HREF="#DOC.1.5.6.2.2.12"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>empty</B>()
 <DD><I>Erases the list contents.</I>
 </DL></P>
 
@@ -77,36 +77,36 @@ this class. You should instead use class GList or GPList. </BLOCKQUOTE>
 <DL>
 
 <A NAME="size">
-<A NAME="DOC.1.4.8.2.2.1">
+<A NAME="DOC.1.5.6.2.2.1">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int size() const </B></TT>
 <DD>Returns the number of elements in the list. 
 <DL><DT><DD></DL><P>
 <A NAME="firstpos">
-<A NAME="DOC.1.4.8.2.2.2">
+<A NAME="DOC.1.5.6.2.2.2">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GPosition.html">GPosition</A> firstpos() const </B></TT>
 <DD>Returns the first position in the list. See <!1><A HREF="GPosition.html">GPosition</A>. 
 <DL><DT><DD></DL><P>
 <A NAME="lastpos">
-<A NAME="DOC.1.4.8.2.2.3">
+<A NAME="DOC.1.5.6.2.2.3">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GPosition.html">GPosition</A> lastpos() const </B></TT>
 <DD>Returns the last position in the list. See <!1><A HREF="GPosition.html">GPosition</A>. 
 <DL><DT><DD></DL><P>
 <A NAME="operator GPosition">
-<A NAME="DOC.1.4.8.2.2.4">
+<A NAME="DOC.1.5.6.2.2.4">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> operator GPosition() const </B></TT>
 <DD>Implicit notation for GList::firstpos(). 
 <DL><DT><DD></DL><P>
 <A NAME="operator[]">
-<A NAME="DOC.1.4.8.2.2.5">
+<A NAME="DOC.1.5.6.2.2.5">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>TYPE&amp; operator[](<!1><A HREF="GPosition.html">GPosition</A> pos)</B></TT>
 <DD>Returns a reference to the list element at position <TT>pos</TT>.  This
 reference can be used for both reading (as "<TT>a[n]</TT>") and modifying (as
-"<TT>a[n]=v</TT>") a list element.  Using an invalid position will cause a
+"<TT>a[n]=v</TT>") a list element.  Using an invalid positions will cause a
 segmentation violation. See <!1><A HREF="GPosition.html">GPosition</A> for efficient operations on
 positions. 
 <DL><DT><DD></DL><P>
 <A NAME="operator[]">
-<A NAME="DOC.1.4.8.2.2.6">
+<A NAME="DOC.1.5.6.2.2.6">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>const TYPE&amp; operator[](<!1><A HREF="GPosition.html">GPosition</A> pos) const </B></TT>
 <DD>Returns a constant reference to the list element at position <TT>pos</TT>.
 This reference only be used for reading a list element.  An exception
@@ -114,20 +114,20 @@ This reference only be used for reading a list element.  An exception
 variant of <TT>operator[]</TT> is necessary when dealing with a <TT>const</TT>GList&lt;TYPE&gt;<TT>.  See \Ref{GPosition} for efficient operations on</TT>positions. 
 <DL><DT><DD></DL><P>
 <A NAME="isempty">
-<A NAME="DOC.1.4.8.2.2.7">
+<A NAME="DOC.1.5.6.2.2.7">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int isempty() const </B></TT>
 <DD>Tests whether a list is empty.  
 Returns a non zero value if the list contains no elements. 
 <DL><DT><DD></DL><P>
 <A NAME="operator==">
-<A NAME="DOC.1.4.8.2.2.8">
+<A NAME="DOC.1.5.6.2.2.8">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int operator==(const <!1><A HREF="GListTemplate.html">GListTemplate</A>&lt;TYPE, TI&gt; &amp;l2) const </B></TT>
 <DD>Compares two lists. Returns a non zero value if and only if both lists
 contain the same elements (as tested by <TT>TYPE::operator==(const TYPE&amp;)</TT>
 in the same order. 
 <DL><DT><DD></DL><P>
 <A NAME="nth">
-<A NAME="DOC.1.4.8.2.2.9">
+<A NAME="DOC.1.5.6.2.2.9">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GPosition.html">GPosition</A> nth(unsigned int n) const </B></TT>
 <DD>Returns the position <TT>pos</TT> of the <TT>n</TT>-th list element.  An invalid
 position is returned if the list contains less than <TT>n</TT> elements. The
@@ -135,13 +135,13 @@ operation works by sequentially scanning the list until reaching the
 <TT>n</TT>-th element. 
 <DL><DT><DD></DL><P>
 <A NAME="contains">
-<A NAME="DOC.1.4.8.2.2.10">
+<A NAME="DOC.1.5.6.2.2.10">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GPosition.html">GPosition</A> contains(const TYPE &amp;elt) const </B></TT>
 <DD>Tests whether the list contains a given element.  If the list contains<P>checked by <TT>TYPE::operator==(const TYPE&amp;)</TT> is returned.  Otherwise an
 invalid position is returned. 
 <DL><DT><DD></DL><P>
 <A NAME="search">
-<A NAME="DOC.1.4.8.2.2.11">
+<A NAME="DOC.1.5.6.2.2.11">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int search(const TYPE &amp;elt, <!1><A HREF="GPosition.html">GPosition</A> &amp;pos) const </B></TT>
 <DD>Searches the list for a given element. If position <TT>pos</TT> is a valid
 position for this list, the search starts at the specified position. If
@@ -152,18 +152,18 @@ reaches the end of the list, function <TT>search</TT> returns 0 and leaves
 <TT>pos</TT> unchanged. 
 <DL><DT><DD></DL><P>
 <A NAME="empty">
-<A NAME="DOC.1.4.8.2.2.12">
+<A NAME="DOC.1.5.6.2.2.12">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void empty()</B></TT>
 <DD>Erases the list contents.  All list elements are destroyed and
 unlinked. The list is left with zero elements. 
 <DL><DT><DD></DL><P>
 <A NAME="Inserts an element after the last element of the list.">
-<A NAME="DOC.1.4.8.2.2.13">
+<A NAME="DOC.1.5.6.2.2.13">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> Inserts an element after the last element of the list.</B></TT>
 <DD>Inserts an element after the last element of the list. 
 The new element is initialized with a copy of argument
 void append(const TYPE &amp;elt)
-{ GListImpl&lt;TI&gt;::append(newnode((const TI&amp;)elt)); }
+{ GListImpl&lt;TI&gt;::append(newnode((const TI&amp;)elt)); } ;
 
 <DL><DT><DD></DL><P></DL>
 
@@ -173,7 +173,7 @@ void append(const TYPE &amp;elt)
 <!-- This is were the DOC++ footer is defined  -->
 
 <font face="arial,helvetica" size="2">
-<a href=http://www.lizardtech.com>DjVu</a> is a trademark of LizardTech, Inc.  
+<a href=http://www.djvu.att.com>DjVu</a> is a trademark of AT&amp;T.  
 <br>All other products mentioned are registered trademarks or trademarks of
 their respective companies.
 </font>
