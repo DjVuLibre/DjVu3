@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DataPool.cpp,v 1.67 2001-02-17 02:38:41 bcr Exp $
+// $Id: DataPool.cpp,v 1.68 2001-02-20 19:36:50 fcrary Exp $
 // $Name:  $
 
 
@@ -1304,54 +1304,54 @@ void
 DataPool::check_triggers(void)
       // This function is for not connected DataPools only
 {
-   DEBUG_MSG("DataPool::check_triggers(): calling activated trigger callbacks.\n");
-   DEBUG_MAKE_INDENT(3);
-
-   if (!pool && !fname.length())
-      while(true)
+  DEBUG_MSG("DataPool::check_triggers(): calling activated trigger callbacks.\n");
+  DEBUG_MAKE_INDENT(3);
+  
+  if (!pool && !fname.length())
+    while(true)
+    {
+      GP<Trigger> trigger;
+      
+      // First find a candidate (trigger, which needs to be called)
+      // Don't remove it from the list yet. del_trigger() should
+      // be able to find it if necessary and disable.
       {
-	 GP<Trigger> trigger;
-	 
-	    // First find a candidate (trigger, which needs to be called)
-	    // Don't remove it from the list yet. del_trigger() should
-	    // be able to find it if necessary and disable.
-	 {
-	    GCriticalSectionLock list_lock(&triggers_lock);
-	    for(GPosition pos=triggers_list;pos;++pos)
-	    {
-	       GP<Trigger> t=triggers_list[pos];
-	       if (is_eof() || t->length>=0 &&
-		   block_list->get_bytes(t->start, t->length)==t->length)
-	       {
-		  trigger=t;
-		  break;
-	       }
-	    }
-	 }
-	 
-	 if (trigger)
-	 {
+        GCriticalSectionLock list_lock(&triggers_lock);
+        for(GPosition pos=triggers_list;pos;++pos)
+        {
+          GP<Trigger> t=triggers_list[pos];
+          if (is_eof() || t->length>=0 &&
+            block_list->get_bytes(t->start, t->length)==t->length)
+          {
+            trigger=t;
+            break;
+          }
+        }
+      }
+      
+      if (trigger)
+      {
 	       // Now check that the trigger is not disabled
 	       // and lock the trigger->disabled lock for the duration
 	       // of the trigger. This will block the del_trigger() and
 	       // will postpone client's destruction (usually following
 	       // the call to del_trigger())
-	    {
-	       GMonitorLock lock(&trigger->disabled);
-	       if (!trigger->disabled)
-		  call_callback(trigger->callback, trigger->cl_data);
-	    }
-	    
+        {
+          GMonitorLock lock(&trigger->disabled);
+          if (!trigger->disabled)
+            call_callback(trigger->callback, trigger->cl_data);
+        }
+        
 	       // Finally - remove the trigger from the list.
-	    GCriticalSectionLock list_lock(&triggers_lock);
-	    for(GPosition pos=triggers_list;pos;++pos)
-	       if (triggers_list[pos]==trigger)
-	       {
-		  triggers_list.del(pos);
-		  break;
-	       }
-	 } else break;
-      }
+        GCriticalSectionLock list_lock(&triggers_lock);
+        for(GPosition pos=triggers_list;pos;++pos)
+          if (triggers_list[pos]==trigger)
+          {
+            triggers_list.del(pos);
+            break;
+          }
+      } else break;
+    }
 }
 
 void
@@ -1468,20 +1468,20 @@ DataPool::trigger_cb(void)
 
    if (pool)
    {
-	 // Connected to a pool
-	 // We may be here when either EOF is set on the master DataPool
-	 // Or when it may have learnt its length (from IFF or whatever)
+      // Connected to a pool
+      // We may be here when either EOF is set on the master DataPool
+      // Or when it may have learnt its length (from IFF or whatever)
       if (pool->is_eof() || pool->has_data(start, length)) eof_flag=true;
    } else if (!fname.length())
    {
-	 // Not connected to anything => Try to guess the length
+	    // Not connected to anything => Try to guess the length
       if (length<0) analyze_iff();
       
-	 // Failed to analyze? Check, maybe it's EOF already
+	    // Failed to analyze? Check, maybe it's EOF already
       if (length<0 && is_eof())
       {
-	 GCriticalSectionLock lock(&data_lock);
-	 length=data->size();
+	       GCriticalSectionLock lock(&data_lock);
+	       length=data->size();
       }
    }
 }
