@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GRect.h,v 1.26 2001-06-21 21:38:14 bcr Exp $
+// $Id: GRect.h,v 1.27 2001-06-28 15:59:26 lchen Exp $
 // $Name:  $
 
 #ifndef _GRECT_H_
@@ -51,7 +51,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GRect.h,v 1.26 2001-06-21 21:38:14 bcr Exp $# */
+    #$Id: GRect.h,v 1.27 2001-06-28 15:59:26 lchen Exp $# */
 //@{
 
 #include "DjVuGlobal.h"
@@ -297,8 +297,8 @@ private:
   int   code;
   // Helper
   void  precalc();
-  friend int operator*(int n, GRatio r ) { return (n * r.p + r.q/2) / r.q; };
-  friend int operator/(int n, GRatio r ) { return (n * r.q + r.p/2) / r.p; };
+  friend int operator*(int n, GRatio r ) { return (int)(((double)n * (double)r.p + (double)r.q/2) / (double)r.q); };
+  friend int operator/(int n, GRatio r ) { return (int)(((double)n * (double)r.q + (double)r.p/2) / (double)r.p); };
   GRatio rw;
   GRatio rh;
 };
