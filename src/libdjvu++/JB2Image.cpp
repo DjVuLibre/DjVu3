@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: JB2Image.cpp,v 1.43 2000-12-19 23:38:56 bcr Exp $
+// $Id: JB2Image.cpp,v 1.44 2000-12-19 23:43:51 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -153,7 +153,11 @@ protected:
   void code_bitmap_directly (GBitmap &bm);
   virtual void code_bitmap_directly(GBitmap &bm,const int dw, int dy,
     unsigned char *up2, unsigned char *up1, unsigned char *up0 )=0;
-  void code_bitmap_by_cross_coding (GBitmap *bm, GBitmap *cbm, int libno);
+  void code_bitmap_by_cross_coding (GBitmap &bm, GBitmap *cbm, const int libno);
+  virtual void code_bitmap_by_cross_coding (GBitmap &bm, GBitmap &cbm,
+    const int xd2c, const int dw, int dy, int cy,
+    unsigned char *up1, unsigned char *up0, unsigned char *xup1, 
+    unsigned char *xup0, unsigned char *xdn1 )=0;
   // Code records
   void code_record(int &rectype, JB2Dict *jim, JB2Shape *jshp);
   void code_record(int &rectype, JB2Image *jim, JB2Shape *jshp, JB2Blit *jblt);
@@ -184,6 +188,10 @@ protected:
   virtual void code_relative_mark_size(GBitmap *bm, int cw, int ch, int border=0);
   virtual void code_bitmap_directly(GBitmap &bm,const int dw, int dy,
     unsigned char *up2, unsigned char *up1, unsigned char *up0 );
+  virtual void code_bitmap_by_cross_coding (GBitmap &bm, GBitmap &cbm,
+    const int xd2c, const int dw, int dy, int cy,
+    unsigned char *up1, unsigned char *up0, unsigned char *xup1, 
+    unsigned char *xup0, unsigned char *xdn1 );
   virtual int get_diff(int x_diff,NumContext &rel_loc);
 };
 
@@ -210,6 +218,10 @@ protected:
   virtual void code_bitmap_directly(GBitmap &bm,const int dw, int dy,
     unsigned char *up2, unsigned char *up1, unsigned char *up0 );
   virtual int get_diff(int x_diff,NumContext &rel_loc);
+  virtual void code_bitmap_by_cross_coding (GBitmap &bm, GBitmap &cbm,
+    const int xd2c, const int dw, int dy, int cy,
+    unsigned char *up1, unsigned char *up0, unsigned char *xup1, 
+    unsigned char *xup0, unsigned char *xdn1 );
 };
 #endif
 
@@ -725,7 +737,7 @@ _JB2Codec::init_library(JB2Dict *jim)
 int 
 _JB2Codec::add_library(int shapeno, JB2Shape *jshp)
 {
-  int libno = lib2shape.hbound() + 1;
+  const int libno = lib2shape.hbound() + 1;
   lib2shape.touch(libno);
   lib2shape[libno] = shapeno;
   shape2lib.touch(shapeno);
@@ -949,10 +961,7 @@ _JB2Codec::code_relative_location(JB2Blit *jblt, int rows, int columns)
       bottom = jblt->bottom + 1;
       right = left + columns - 1;
       top = bottom + rows - 1;
-      if (left < last_left)
-        new_row = 1;
-      else
-        new_row = 0;
+      new_row=(left < last_left)?1:0;
     }
   // Code offset type
   CodeBit(new_row, offset_type_dist);
@@ -1162,16 +1171,15 @@ _JB2DecodeCodec::code_bitmap_directly(
 // CODE BITMAP BY CROSS CODING
 
 
-static inline void
-get_cross_context( int &context,
-                   unsigned char *up1,
-                   unsigned char *up0,
-                   unsigned char *xup1,
-                   unsigned char *xup0,
-                   unsigned char *xdn1,
-                   int column )
+static inline int
+get_cross_context( unsigned char const * const up1,
+                   unsigned char const * const up0,
+                   unsigned char const * const xup1,
+                   unsigned char const * const xup0,
+                   unsigned char const * const xdn1,
+                   const int column )
 {
-  context = ( ( up1[column - 1] << 10) |
+  return ( ( up1[column - 1] << 10) |
               ( up1[column    ] <<  9) |
               ( up1[column + 1] <<  8) |
               ( up0[column - 1] <<  7) |
@@ -1185,26 +1193,26 @@ get_cross_context( int &context,
 }
 
 
-static inline void
-shift_cross_context( int &context, int next,
-                     unsigned char *up1,
-                     unsigned char *up0,
-                     unsigned char *xup1,
-                     unsigned char *xup0,
-                     unsigned char *xdn1,
-                     int column )
+static inline int
+shift_cross_context( const int context, const int n,
+                     unsigned char const * const up1,
+                     unsigned char const * const up0,
+                     unsigned char const * const xup1,
+                     unsigned char const * const xup0,
+                     unsigned char const * const xdn1,
+                     const int column )
 {
-  context = ( ((context<<1) & 0x636)  |
+  return ( ((context<<1) & 0x636)  |
               ( up1[column + 1] << 8) |
               (xup1[column    ] << 6) |
               (xup0[column + 1] << 3) |
               (xdn1[column + 1] << 0) |
-              (next << 7)             );
+              (n << 7)             );
 }
 
 
 void 
-_JB2Codec::code_bitmap_by_cross_coding (GBitmap *bm, GBitmap *cbm, int libno)
+_JB2Codec::code_bitmap_by_cross_coding (GBitmap &bm, GBitmap *cbm, const int libno)
 {
   // Make sure bitmaps will not be disturbed
   GBitmap copycbm;
@@ -1215,87 +1223,89 @@ _JB2Codec::code_bitmap_by_cross_coding (GBitmap *bm, GBitmap *cbm, int libno)
       copycbm.init(*cbm);
       cbm = &copycbm;
     }
-  GMonitorLock lock1(bm->monitor());
+  GMonitorLock lock1(bm.monitor());
   // Center bitmaps
-  int cw = cbm->columns();
-  int dw = bm->columns();
-  int dh = bm->rows();
-  LibRect &l = libinfo[libno];
-  int xd2c = (dw/2 - dw + 1) - ((l.right - l.left + 1)/2 - l.right);
-  int yd2c = (dh/2 - dh + 1) - ((l.top - l.bottom + 1)/2 - l.top);
+  const int cw = cbm->columns();
+  const int dw = bm.columns();
+  const int dh = bm.rows();
+  const LibRect &l = libinfo[libno];
+  const int xd2c = (dw/2 - dw + 1) - ((l.right - l.left + 1)/2 - l.right);
+  const int yd2c = (dh/2 - dh + 1) - ((l.top - l.bottom + 1)/2 - l.top);
   // Ensure borders are adequate
-  bm->minborder(2);
+  bm.minborder(2);
   cbm->minborder(2-xd2c);
   cbm->minborder(2+dw+xd2c-cw);
   // Initialize row pointers
-  int next;
-  int context;
-  int dy = dh - 1;
-  int cy = dy + yd2c;
-  unsigned char *up1  =  (*bm)[dy+1];
-  unsigned char *up0  =  (*bm)[dy  ];
-  unsigned char *xup1 = (*cbm)[cy+1] + xd2c;
-  unsigned char *xup0 = (*cbm)[cy  ] + xd2c;
-  unsigned char *xdn1 = (*cbm)[cy-1] + xd2c;
+  const int dy = dh - 1;
+  const int cy = dy + yd2c;
 #ifdef DEBUG
-  bm->check_border();
+  bm.check_border();
   cbm->check_border();
 #endif
-  // Test case
-  if (encoding)
-    {
+  code_bitmap_by_cross_coding (bm,*cbm, xd2c, dw, dy, cy, bm[dy+1], bm[dy],
+    (*cbm)[cy+1] + xd2c, (*cbm)[cy  ] + xd2c, (*cbm)[cy-1] + xd2c);
+}
+
+void 
+_JB2EncodeCodec::code_bitmap_by_cross_coding (GBitmap &bm, GBitmap &cbm,
+  const int xd2c, const int dw, int dy, int cy,
+  unsigned char *up1, unsigned char *up0, unsigned char *xup1, 
+  unsigned char *xup0, unsigned char *xdn1 )
+{
       // iterate on rows (encoding)
       while (dy >= 0)
         {
-          int dx = 0;
-          get_cross_context(context, up1, up0, xup1, xup0, xdn1, 0);
-          while (dx < dw)
+          int context=get_cross_context(up1, up0, xup1, xup0, xdn1, 0);
+          for(int dx=0;dx < dw;)
             {
-              next = up0[dx];
-              zp.encoder(next, cbitdist[context]);
+              const int n = up0[dx];
+              zp.encoder(n, cbitdist[context]);
               dx += 1;
-              shift_cross_context(context, next,  
+              context=shift_cross_context(context, n,  
                                   up1, up0, xup1, xup0, xdn1, dx);
             }
           // next row
           dy -= 1;
           cy -= 1;
           up1 = up0;
-          up0 = (*bm)[dy];
+          up0 = bm[dy];
           xup1 = xup0;
           xup0 = xdn1;
-          xdn1 = (*cbm)[cy-1] + xd2c;
+          xdn1 = cbm[cy-1] + xd2c;
         }
-    }
-  else
-    {
+}
+
+void 
+_JB2DecodeCodec::code_bitmap_by_cross_coding (GBitmap &bm, GBitmap &cbm,
+  const int xd2c, const int dw, int dy, int cy,
+  unsigned char *up1, unsigned char *up0, unsigned char *xup1, 
+  unsigned char *xup0, unsigned char *xdn1 )
+{
       // iterate on rows (decoding)      
       while (dy >= 0)
         {
-          int dx = 0;
-          get_cross_context(context, 
+          int context=get_cross_context(
                             up1, up0, xup1, xup0, xdn1, 0);
-          while (dx < dw)
+          for(int dx=0;dx < dw;)
             {
-              next = zp.decoder(cbitdist[context]);
-              up0[dx] = next;
+              const int n = zp.decoder(cbitdist[context]);
+              up0[dx] = n;
               dx += 1;
-              shift_cross_context(context, next,  
+              context=shift_cross_context(context, n,  
                                   up1, up0, xup1, xup0, xdn1, dx);
             }
           // next row
           dy -= 1;
           cy -= 1;
           up1 = up0;
-          up0 = (*bm)[dy];
+          up0 = bm[dy];
           xup1 = xup0;
           xup0 = xdn1;
-          xdn1 = (*cbm)[cy-1] + xd2c;
+          xdn1 = cbm[cy-1] + xd2c;
 #ifdef DEBUG
-          bm->check_border();
+          bm.check_border();
 #endif
         }
-    }
 }
 
 
@@ -1349,7 +1359,7 @@ _JB2Codec::code_record(int &rectype, JB2Dict *jim, JB2Shape *jshp)
         cbm = jim->get_shape(jshp->parent)->bits;
         LibRect &l = libinfo[match];
         code_relative_mark_size (bm, l.right-l.left+1, l.top-l.bottom+1, 4);
-        code_bitmap_by_cross_coding (bm, cbm, jshp->parent);
+        code_bitmap_by_cross_coding (*bm, cbm, jshp->parent);
         break;
       }
     case PRESERVED_COMMENT:
@@ -1535,7 +1545,7 @@ _JB2Codec::code_record(int &rectype, JB2Image *jim, JB2Shape *jshp, JB2Blit *jbl
         cbm = jim->get_shape(jshp->parent)->bits;
         LibRect &l = libinfo[match];
         code_relative_mark_size (bm, l.right-l.left+1, l.top-l.bottom+1, 4); 
-        code_bitmap_by_cross_coding (bm, cbm, match);
+        code_bitmap_by_cross_coding (*bm, cbm, match);
         code_relative_location (jblt, bm->rows(), bm->columns() );
         break;
       }
@@ -1553,7 +1563,7 @@ _JB2Codec::code_record(int &rectype, JB2Image *jim, JB2Shape *jshp, JB2Blit *jbl
         cbm = jim->get_shape(jshp->parent)->bits;
         LibRect &l = libinfo[match];
         code_relative_mark_size (bm, l.right-l.left+1, l.top-l.bottom+1, 4);
-        code_bitmap_by_cross_coding (bm, cbm, match);
+        code_bitmap_by_cross_coding (*bm, cbm, match);
         code_relative_location (jblt, bm->rows(), bm->columns() );
         break;
       }
