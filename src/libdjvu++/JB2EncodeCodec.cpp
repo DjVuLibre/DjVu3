@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: JB2EncodeCodec.cpp,v 1.1 2000-12-22 01:06:11 bcr Exp $
+// $Id: JB2EncodeCodec.cpp,v 1.2 2000-12-22 01:49:35 bcr Exp $
 // $Name:  $
 
 #ifndef NEED_DECODER_ONLY
@@ -59,6 +59,8 @@ public:
 //virtual
   void code(JB2Image *jim);
   void code(JB2Dict *jim);
+  void code_image_size(JB2Dict *jim);
+  void code_image_size(JB2Image *jim);
 
 protected:
   void CodeNum(const int num, const int lo, const int hi, NumContext &ctx);
@@ -69,8 +71,6 @@ protected:
   void code_record_type(int &rectype);
   int code_match_index(int &index, JB2Dict *jim);
   void code_inherited_shape_count(JB2Dict *jim);
-  void code_image_size(JB2Dict *jim);
-  void code_image_size(JB2Image *jim);
   void code_absolute_location(JB2Blit *jblt,  int rows, int columns);
   void code_absolute_mark_size(GBitmap *bm, int border=0);
   void code_relative_mark_size(GBitmap *bm, int cw, int ch, int border=0);
@@ -150,7 +150,7 @@ JB2Dict::JB2EncodeCodec::CodeNum(int num, int low, int high, NumContext &ctx)
 {
   if (num < low || num > high)
     G_THROW("JB2Image.bad_number");
-  JB2Dict::JB2Codec::CodeNum(low,high,&ctx,num);
+  JB2Codec::CodeNum(low,high,&ctx,num);
 }
 
 // CODE COMMENTS
@@ -197,7 +197,7 @@ JB2Dict::JB2EncodeCodec::code_image_size(JB2Dict *jim)
 {
   CodeNum(0, 0, BIGPOSITIVE, image_size_dist);
   CodeNum(0, 0, BIGPOSITIVE, image_size_dist);
-  JB2Dict::JB2Codec::code_image_size(jim);
+  JB2Codec::code_image_size(jim);
 }
 
 void 
@@ -207,7 +207,7 @@ JB2Dict::JB2EncodeCodec::code_image_size(JB2Image *jim)
   CodeNum(image_columns, 0, BIGPOSITIVE, image_size_dist);
   image_rows = jim->get_height();
   CodeNum(image_rows, 0, BIGPOSITIVE, image_size_dist);
-  JB2Dict::JB2Codec::code_image_size(jim);
+  JB2Codec::code_image_size(jim);
 }
 
 inline int

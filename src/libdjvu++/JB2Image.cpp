@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: JB2Image.cpp,v 1.48 2000-12-22 01:06:11 bcr Exp $
+// $Id: JB2Image.cpp,v 1.49 2000-12-22 01:49:35 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -64,6 +64,9 @@ public:
   void code(JB2Image *jim);
   void code(JB2Dict *jim);
   void set_dict_callback(JB2DecoderCallback *cb, void *arg);
+  void code_image_size(JB2Dict *jim);
+  void code_image_size(JB2Image *jim);
+
 protected:
   int CodeNum(const int lo, const int hi, NumContext &ctx);
 
@@ -73,8 +76,6 @@ protected:
   void code_record_type(int &rectype);
   int code_match_index(int &index, JB2Dict *jim);
   void code_inherited_shape_count(JB2Dict *jim);
-  void code_image_size(JB2Dict *jim);
-  void code_image_size(JB2Image *jim);
   void code_absolute_location(JB2Blit *jblt,  int rows, int columns);
   void code_absolute_mark_size(GBitmap *bm, int border=0);
   void code_relative_mark_size(GBitmap *bm, int cw, int ch, int border=0);
@@ -376,7 +377,7 @@ JB2Dict::JB2DecodeCodec::set_dict_callback(JB2DecoderCallback *cb, void *arg)
 inline bool
 JB2Dict::JB2DecodeCodec::CodeBit(const bool, BitContext &ctx)
 {
-  return zp.decoder(ctx);
+	return zp.decoder(ctx)?true:false;
 }
 
 int
@@ -586,7 +587,7 @@ JB2Dict::JB2DecodeCodec::code_image_size(JB2Dict *jim)
   int h=CodeNum(0, BIGPOSITIVE, image_size_dist);
   if (w || h)
     G_THROW("JB2Image.bad_dict2");
-  JB2Dict::JB2Codec::code_image_size(jim);
+  JB2Codec::code_image_size(jim);
 }
 
 void 
@@ -608,7 +609,7 @@ JB2Dict::JB2DecodeCodec::code_image_size(JB2Image *jim)
   if (!image_columns || !image_rows)
     G_THROW("JB2Image.zero_dim");
   jim->set_dimension(image_columns, image_rows);
-  JB2Dict::JB2Codec::code_image_size(jim);
+  JB2Codec::code_image_size(jim);
 }
 
 void 
