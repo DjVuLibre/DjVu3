@@ -574,23 +574,21 @@
     the color image (see \Ref{IWPixmap}).  */
 
 
-/** @name DjVu Annotations
+/** @name Annotations and Textual Information.
 
-    All types of DjVu images may contain annotation chunks.  Annotation chunks
-    are currently used to describe hyperlinks as well as specifying more
-    closely the behavior of the viewers.  Annotation chunks can be edited with
-    the DjVu editor #djedit#.  Annotation chunks can be inserted or removed
-    using command #djvuiff#.
-
-    Annotations are contained in #"ANTa"# or #"ANTz"# chunks.  The #"ANTa"#
-    chunks contain the annotation in plain ASCII. The #"ANTz"# chunks contain
-    the same information compressed with the BZZ encoder
-    (cf. \Ref{BSByteStream.h}).  The syntax of the uncompressed annotation
-    chunk uses a simple parenthesized notation. Erroneous and unrecognized
-    constructs are silently ignored.  The following constructs are recognized:
+    {\bf Annotation chunks} --- All types of DjVu images may contain
+    annotation chunks.  Annotation chunks are currently used to describe
+    hyperlinks as well as specifying more closely the behavior of the viewers.
+    Annotation chunks can be edited with the DjVu editor #djedit#.  Annotation
+    chunks can be inserted or removed using command #djvuiff#.  Annotations
+    are contained in #"ANTa"# or #"ANTz"# chunks.  The #"ANTa"# chunks contain
+    the annotation in plain text. The #"ANTz"# chunks contain the same
+    information compressed with the BZZ encoder (cf. \Ref{BSByteStream.h}).
+    The syntax of the uncompressed annotation chunk uses a simple
+    parenthesized notation. Erroneous and unrecognized constructs are silently
+    ignored.  The following constructs are recognized:
 
     \begin{description}
-
     \item[(background <color>)]
        Sets the color of the viewer area surrounding the DjVu image.
        The color argument #color# are always represented using X11 
@@ -663,9 +661,21 @@
        \end{verbatim}
        This is often used with an empty URL for simply emphasizing a specific
        segment of an image.
+    \end{description}
 
-    \end{description} */
 
+    {\bf Textual Information Chunks} --- DjVu image files also contain a
+    computer readable description of the text appearing on the page.  This
+    information is contained by either a #"TXTa"# chunk or #"TXTz"# chunk.
+    The #"TXTa"# chunk contains uncompressed data.  The #"TXTz"# chunk
+    contains the same data compressed with the \Ref{bzz} compressor
+    (cf. \Ref{BSByteStream.h}).  The #"TXTa"# chunks begins by a 24 bit
+    integer (most significant byte first) describing the length of the text in
+    bytes.  Then come the ISO10646/UTF8 text.  Additional information
+    indicates the position of each column/region/paragraph/line/word in the
+    document.  More information about the capabilities of the chunk can be
+    found in section \Ref{DjVuTXT}.  More information about the encoding of
+    textual information can be found in file #"DjVuAnno.cpp"#.  */
 
 
 /** @name Multipage DjVu documents.
