@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.101 1999-12-22 20:59:29 eaf Exp $
+//C- $Id: DjVuFile.cpp,v 1.102 2000-01-11 21:50:37 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -619,6 +619,7 @@ DjVuFile::get_fgjd(int block)
       wait_for_chunk();
    }
    chunk_mon.leave();
+   if (is_decode_stopped()) THROW("STOP");
    return 0;
 }
 
