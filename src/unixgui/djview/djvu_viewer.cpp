@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: djvu_viewer.cpp,v 1.3 2001-07-25 17:10:41 mchen Exp $
+// $Id: djvu_viewer.cpp,v 1.4 2001-07-31 20:26:24 mchen Exp $
 // $Name:  $
 
 
@@ -307,8 +307,7 @@ DjVuViewer::newStream(const GURL & _url, const GP<DataPool> & pool)
       
       if (plugin_data.cache==QDViewer::PluginData::CACHE_OFF) cache=0;
       
-      url.clear_hash_argument();
-      url.clear_djvu_cgi_arguments();
+      url.clear_all_arguments();
       doc_pool=pool;
       doc_url=url;
 
