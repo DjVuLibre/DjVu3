@@ -9,9 +9,9 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: BSByteStream.cpp,v 1.7 1999-03-17 19:24:56 leonb Exp $
+//C- $Id: BSByteStream.cpp,v 1.8 1999-07-30 14:17:26 leonb Exp $
 
-// "$Id: BSByteStream.cpp,v 1.7 1999-03-17 19:24:56 leonb Exp $"
+// "$Id: BSByteStream.cpp,v 1.8 1999-07-30 14:17:26 leonb Exp $"
 // - Author: Leon Bottou, 07/1998
 
 
@@ -23,6 +23,11 @@
 #include <stdio.h>
 #include <string.h>
 #include "BSByteStream.h"
+#define BSORT_TIMER
+#ifdef BSORT_TIMER
+#include "GOS.h"
+#endif
+
 
 // ========================================
 // --- Assertion
@@ -594,7 +599,9 @@ _BSort::run(int &markerpos)
   int lo, hi;
   ASSERT(size>0);
   ASSERT(data[size-1]==0);
-  
+#ifdef BSORT_TIMER
+  long start = GOS::ticks();
+#endif  
   // Step 1: Radix sort 
   int depth = 0;
   if (size > RADIX_THRESH)
@@ -679,6 +686,10 @@ _BSort::run(int &markerpos)
         }
     }
   ASSERT(markerpos>=0 && markerpos<size);
+#ifdef BSORT_TIMER
+  long end = GOS::ticks();
+  fprintf(stderr,"Sorting time: %d bytes in %ldms\n", size-1, end-start);
+#endif  
 }
 
 
@@ -738,6 +749,14 @@ BSByteStream::encode()
 
   // Header
   encode_raw(zp, 24, size);
+  // Determine and Encode Estimation Speed
+  int fshift = 0;
+  if (size < FREQS0)
+    { fshift=0; zp.encoder(0); }
+  else if (size < FREQS1)
+    { fshift = 1; zp.encoder(1); zp.encoder(0); }
+  else
+    { fshift = 2; zp.encoder(1); zp.encoder(1); }
   // MTF
   unsigned char mtf[256];
   unsigned char rmtf[256];
@@ -750,11 +769,6 @@ BSByteStream::encode()
   int fadd = 4;
   for (m=0; m<FREQMAX; m++)
     freq[m] = 0;
-  int fshift = 0;
-  if (size > FREQS0)
-    fshift += 1;
-  if (size > FREQS1)
-    fshift += 1;
   // Encode
   int i;
   int mtfno = 3;
@@ -901,7 +915,15 @@ BSByteStream::decode()
     }
   if (! data) 
     data = new unsigned char[blocksize];
-  // MTF
+  // Decode Estimation Speed
+  int fshift = 0;
+  if (zp.decoder())
+    {
+      fshift += 1;
+      if (zp.decoder())
+        fshift += 1;
+    }
+  // Prepare Quasi MTF
   unsigned char mtf[256];
   unsigned int freq[FREQMAX];
   int m = 0;
@@ -910,11 +932,6 @@ BSByteStream::decode()
   int fadd = 4;
   for (m=0; m<FREQMAX; m++)
     freq[m]= 0;
-  int fshift = 0;
-  if (size > FREQS0)
-    fshift += 1;
-  if (size > FREQS1)
-    fshift += 1;
   // Decode
   int mtfno = 3;
   int markerpos = -1;
