@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocEditor.h,v 1.1 1999-10-29 18:10:09 eaf Exp $
+//C- $Id: DjVuDocEditor.h,v 1.2 1999-11-06 16:16:37 eaf Exp $
  
 #ifndef _DJVUDOCEDITOR_H
 #define _DJVUDOCEDITOR_H
@@ -19,7 +19,6 @@
 #endif
 
 #include "DjVuDocument.h"
-#include "DjVuFileEditor.h"
 
 /** @name DjVuDocEditor.h
     Files #"DjVuDocument.h"# and #"DjVuDocument.cpp"# contain implementation
@@ -28,7 +27,7 @@
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocEditor.h,v 1.1 1999-10-29 18:10:09 eaf Exp $#
+    @version #$Id: DjVuDocEditor.h,v 1.2 1999-11-06 16:16:37 eaf Exp $#
 */
 
 //@{
@@ -79,27 +78,16 @@ public:
    GString	insert_page(const char * fname, int page_num=-1);
    GString	insert_file(const char * fname, const char * parent_id,
 			    int chunk_num=1);
-   
-   
-      /** Inserts the given \Ref{DjVuFile} as page #page_num#. If #page_num#
-	  is negative, the page will be appended. This will change the
-	  file's URL, will update the document's navigation directory,
-	  will insert a link to this directory into the file, and finally
-	  will insert the file into the internal list. If there was {\em no}
-          navigation directory before, it will be created automatically. */
-   void		insert_page(const GP<DjVuFileEditor> & file, int page_num=-1);
-      /** Removes page #page_num# from the document. This will update the
-	  navigation directory. If there will be only one page left, the
-          navigation directory will be removed from the document automatically. */
-   void		delete_page(int page_num);
-
+   void		generate_thumbnails(int thumb_size, int images_per_file,
+				    void (* cb)(int page_num, void *)=0,
+				    void * cl_data=0);
    
       /** Returns TRUE if #class_name# is #"DjVuDocEditor"#,
 	  #"DjVuDocument"# or #"DjVuPort"# */
    virtual bool		inherits(const char * class_name) const;
    virtual GP<DataPool>	request_data(const DjVuPort * source, const GURL & url);
 protected:
-   virtual GP<DjVuFile>	url_to_file(const GURL & url);
+   virtual GP<DjVuFile>	url_to_file(const GURL & url, bool dont_create);
 private:
       // This is a structure for active files and DataPools. It may contain
       // a DjVuFile, which is currently being used by someone (I check the list

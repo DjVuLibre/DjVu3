@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocEditor.cpp,v 1.1 1999-10-29 18:10:09 eaf Exp $
+//C- $Id: DjVuDocEditor.cpp,v 1.2 1999-11-06 16:16:37 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -164,7 +164,7 @@ DjVuDocEditor::clean_files_map(void)
 }
 
 GP<DjVuFile>
-DjVuDocEditor::url_to_file(const GURL & url)
+DjVuDocEditor::url_to_file(const GURL & url, bool dont_create)
 {
    DEBUG_MSG("DjVuDocEditor::url_to_file(): url='" << url << "'\n");
    DEBUG_MAKE_INDENT(3);
@@ -184,9 +184,10 @@ DjVuDocEditor::url_to_file(const GURL & url)
    clean_files_map();
 
       // We don't have the file cached. Let DjVuDocument create the file.
-   GP<DjVuFile> file=DjVuDocument::url_to_file(url);
+   GP<DjVuFile> file=DjVuDocument::url_to_file(url, dont_create);
 
       // And add it to our private "cache"
+   if (file)
    {
       GCriticalSectionLock lock(&files_lock);
       GPosition pos;
@@ -215,8 +216,8 @@ DjVuDocEditor::find_unique_id(const char * id_in)
       base=GString(id_in, dot-id_in);
       ext=dot+1;
    } else base=id_in;
-   
-   GString id=base+"."+ext;
+
+   GString id=id_in;
    int cnt=0;
    while(1)
    {
@@ -224,7 +225,8 @@ DjVuDocEditor::find_unique_id(const char * id_in)
 	  !dir->name_to_file(id) &&
 	  !dir->title_to_file(id)) break;
       cnt++;
-      id=base+"_"+GString(cnt)+"."+ext;
+      id=base+"_"+GString(cnt);
+      if (ext.length()) id+="."+ext;
    }
    return id;
 }
@@ -357,6 +359,112 @@ DjVuDocEditor::insert_page(const char * file_name, int page_num)
       // knows about it from DjVmDir, and we will provide data for it
       // as soon as somebody requests it.
    return id;
+}
+
+void
+DjVuDocEditor::generate_thumbnails(int thumb_size, int images_per_file,
+				   void (* cb)(int page_num, void *),
+				   void * cl_data)
+{
+   DEBUG_MSG("DjVuDocEditor::generate_thumbnails(): doing it\n");
+   DEBUG_MAKE_INDENT(3);
+
+   GP<DjVmDir> djvm_dir=get_djvm_dir();
+   
+   DEBUG_MSG("removing any existing thumbnails\n");
+   GPList<DjVmDir::File> files_list=djvm_dir->get_files_list();
+   for(GPosition pos=files_list;pos;++pos)
+   {
+      GP<DjVmDir::File> f=files_list[pos];
+      if (f->is_thumbnails()) djvm_dir->delete_file(f->id);
+   }
+
+   DEBUG_MSG("creating new thumbnails\n");
+   int page_num, pages_num=djvm_dir->get_pages_num();
+   GPArray<MemoryByteStream> thumb_str(pages_num-1);
+   for(page_num=0;page_num<pages_num;page_num++)
+   {
+      if (cb) cb(page_num, cl_data);
+      
+      GP<DjVuImage> dimg=get_page(page_num);
+      dimg->wait_for_complete_decode();
+      
+      GRect rect(0, 0, thumb_size, dimg->get_height()*thumb_size/dimg->get_width());
+      GP<GPixmap> pm=dimg->get_pixmap(rect, rect, get_thumbnails_gamma());
+      if (!pm)
+      {
+	 GP<GBitmap> bm=dimg->get_bitmap(rect, rect, sizeof(int));
+	 pm=new GPixmap(*bm);
+      }
+      if (!pm) THROW("Unable to render image of page "+GString(page_num));
+      
+	 // Store and compress the pixmap
+      GP<IWPixmap> iwpix=new IWPixmap(pm);
+      GP<MemoryByteStream> str=new MemoryByteStream;
+      IWEncoderParms parms;
+      parms.slices=97;
+      parms.bytes=0;
+      parms.decibels=0;
+      iwpix->encode_chunk(*str, parms);
+      str->seek(0);
+      thumb_str[page_num]=str;
+   }
+
+   DEBUG_MSG("creating DjVuFiles to contain new thumbnails...\n");
+   
+      // The first thumbnail file always contains only one thumbnail
+   int ipf=1;
+   int image_num=0;
+   page_num=0;
+   GP<MemoryByteStream> str=new MemoryByteStream;
+   GP<IFFByteStream> iff=new IFFByteStream(*str);
+   iff->put_chunk("FORM:THUM");
+   while(true)
+   {
+      iff->put_chunk("TH44");
+      iff->copy(*thumb_str[page_num]);
+      iff->close_chunk();
+      image_num++;
+      page_num++;
+      if (image_num>=ipf || page_num>=pages_num)
+      {
+	    // Get unique ID for this file
+	 GString id=find_unique_id("thumb");
+
+	    // Create a file record with the chosen ID
+	 GP<DjVmDir::File> file=new DjVmDir::File(id, id, id, DjVmDir::File::THUMBNAILS);
+
+	    // Set correct file position (so that it will cover the next
+	    // ipf pages)
+	 int file_pos=djvm_dir->get_page_pos(page_num-image_num);
+	 djvm_dir->insert_file(file, file_pos);
+
+	    // Now add the File record (containing the file URL and DataPool)
+	    // After we do it a simple save_as() will save the document
+	    // with the thumbnails. This is because DjVuDocument will see
+	    // the file in DjVmDir and will ask for data. We will intercept
+	    // the request for data and will provide this DataPool
+	 iff->close_chunk();
+	 str->seek(0);
+	 GP<DataPool> file_pool=new DataPool(*str);
+	 GURL file_url=id_to_url(id);
+	 GP<File> f=new File;
+	 f->pool=file_pool;
+	 GCriticalSectionLock lock(&files_lock);
+	 files_map[file_url]=f;
+
+	    // And create new streams
+	 str=new MemoryByteStream;
+	 iff=new IFFByteStream(*str);
+	 iff->put_chunk("FORM:THUM");
+	 image_num=0;
+
+	    // Reset ipf to correct value (after we stored first
+	    // "exceptional" file with thumbnail for the first page)
+	 if (page_num==1) ipf=images_per_file;
+	 if (page_num>=pages_num) break;
+      }
+   }
 }
 
 void
