@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.100 2000-01-19 23:35:59 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.101 2000-01-20 21:00:00 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -631,13 +631,16 @@ DjVuDocument::url_to_file(const GURL & url, bool dont_create)
       // Try DjVuPortcaster to find existing files.
    DjVuPortcaster * pcaster=DjVuPort::get_portcaster();
    GP<DjVuPort> port;
-   
-      // First - fully decoded files
-   port=pcaster->alias_to_port(url);
-   if (port && port->inherits("DjVuFile"))
+
+   if (cache)
    {
-      DEBUG_MSG("found fully decoded file using DjVuPortcaster\n");
-      return (DjVuFile *) (DjVuPort *) port;
+	 // First - fully decoded files
+      port=pcaster->alias_to_port(url);
+      if (port && port->inherits("DjVuFile"))
+      {
+	 DEBUG_MSG("found fully decoded file using DjVuPortcaster\n");
+	 return (DjVuFile *) (DjVuPort *) port;
+      }
    }
 
       // Second - internal files
@@ -688,7 +691,9 @@ DjVuDocument::get_djvu_file(int page_num, bool dont_create)
 	 if (is_init_complete()) return 0;
 	 
 	 DEBUG_MSG("Structure is not known => check <doc_url>#<page_num> alias...\n");
-	 GP<DjVuPort> port=pcaster->alias_to_port((GString)(const char*) init_url+"#"+GString(page_num));
+	 GP<DjVuPort> port;
+	 if (cache)
+	    port=pcaster->alias_to_port((GString)(const char*) init_url+"#"+GString(page_num));
 	 if (!port || !port->inherits("DjVuFile"))
 	 {
 	    DEBUG_MSG("failed => invent dummy URL and proceed\n");
