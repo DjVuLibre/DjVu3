@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GRect.h,v 1.12 1999-10-24 17:01:02 eaf Exp $
+//C- $Id: GRect.h,v 1.13 1999-10-28 18:37:41 leonb Exp $
 
 
 #ifndef _GRECT_H_
@@ -30,7 +30,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GRect.h,v 1.12 1999-10-24 17:01:02 eaf Exp $# */
+    #$Id: GRect.h,v 1.13 1999-10-28 18:37:41 leonb Exp $# */
 //@{
 
 #include "DjVuGlobal.h"
@@ -89,6 +89,10 @@ public:
   int  width() const;
   /** Returns the rectangle height. */
   int  height() const;
+  /** Returns true iff the rectangle is empty. */
+  int  height() const;
+  /** Returns the area of the rectangle. */
+  int  area() const;
   /** Returns true iff the rectangle is empty. */
   int  isempty() const;
   /** Returns true iff the rectangle contains pixel (#x#,#y#).  A rectangle
@@ -244,6 +248,12 @@ inline int
 GRect::isempty() const
 {
   return (xmin>=xmax || ymin>=ymax);
+}
+
+inline int 
+GRect::area() const
+{
+  return isempty() ? 0 : (xmax-xmin)*(ymax-ymin);
 }
 
 inline int
