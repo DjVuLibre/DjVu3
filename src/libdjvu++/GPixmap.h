@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GPixmap.h,v 1.12 2000-01-17 07:34:16 bcr Exp $
+//C- $Id: GPixmap.h,v 1.13 2000-01-18 00:23:27 bcr Exp $
 
 #ifndef _GPIXMAP_H_
 #define _GPIXMAP_H_
@@ -30,7 +30,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: GPixmap.h,v 1.12 2000-01-17 07:34:16 bcr Exp $# */
+    #$Id: GPixmap.h,v 1.13 2000-01-18 00:23:27 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -342,6 +342,7 @@ protected:
   unsigned short nrowsize;
   GPixel *pixels;
   GPixel *pixels_data;
+  friend class DjVu_PixImage;
 };
 
 //@}

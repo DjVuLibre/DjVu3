@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: djvutopnm.cpp,v 1.30 1999-11-04 00:20:15 bcr Exp $
+//C- $Id: djvutopnm.cpp,v 1.31 2000-01-18 00:23:27 bcr Exp $
 
 
 /** @name djvutopnm
@@ -94,7 +94,7 @@
     Yann Le Cun <yann@research.att.com>\\
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: djvutopnm.cpp,v 1.30 1999-11-04 00:20:15 bcr Exp $# */
+    #$Id: djvutopnm.cpp,v 1.31 2000-01-18 00:23:27 bcr Exp $# */
 //@{
 //@}
 
@@ -222,9 +222,14 @@ convert(const char *from, const char *to, int page_num)
     {
       StdioByteStream out (to,"wb");
       if (bm->get_grays() == 2)
+      {
         bm->save_pbm(out);
+      }
       else 
+      {
+        bm->change_grays(256);
         bm->save_pgm(out);
+      }
     }
   else 
     {
