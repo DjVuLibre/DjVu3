@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: undo_redo.cpp,v 1.3 2001-08-08 19:02:17 docbill Exp $
+// $Id: undo_redo.cpp,v 1.4 2001-08-13 16:08:33 docbill Exp $
 // $Name:  $
 
 

@@ -33,7 +33,7 @@
  *C-
  * 
  * $Id: zoom_select_mask.bm,v 1.2 2001/07/25 17:10:43 mchen Exp $
- * $Name: OSI_3_5_1 $
+ * $Name:  $
  */
 #define zoom_select_mask_width 24
 #define zoom_select_mask_height 24
