@@ -10,7 +10,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDecodeAPI.h,v 1.2 2000-01-07 16:58:50 praveen Exp $
+//C- $Id: DjVuDecodeAPI.h,v 1.3 2000-01-07 22:44:29 orost Exp $
 #endif
 
 #ifndef _DJVU_DECODE_API_H
@@ -18,7 +18,10 @@
 
 /* 
  * $Log: DjVuDecodeAPI.h,v $
- * Revision 1.2  2000-01-07 16:58:50  praveen
+ * Revision 1.3  2000-01-07 22:44:29  orost
+ * added comments
+ *
+ * Revision 1.2  2000/01/07 16:58:50  praveen
  * updated
  *
  * Revision 1.1  2000/01/06 20:10:44  praveen
@@ -29,10 +32,11 @@
  *
  */
 
-
-// This file contains the decode, rendering and output functions
-// needed to decode DjVu images to various other formats like,
-// PNM, BMP, TIFF, JPEG etc.
+/*
+     This file contains the decode, rendering and output functions
+     needed to decode DjVu images to various other formats like,
+     PNM, BMP, TIFF, JPEG etc.
+*/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -221,43 +225,94 @@ void djvu_decode_write_image(djvu_decode_options *d_obj, djvu_pixel_image *pimg,
 DJVUAPI
 void djvu_decode_options_free(djvu_decode_options* d_obj);
 
+/*
+   This function sets the segment and full rectangles. The full rectangle is the rectangle
+   into which the djvu image is decoded to and segment rectanlge is the rectangle which
+   is a portion of the full rect. The final output image will have dimensions as that of
+   segment rectangle. 'xmin' and 'ymin' represent the bottom left corner of the rectangle
+   and w, h represet the 'width' and 'height' of the rectangle. 'xmin' and 'ymin' for the
+   full rectangle should always be zero. Otherwise exception will be thrown.
+*/
 DJVUAPI
 void djvu_decode_set_rectangles(djvu_decode_options *d_obj,int seg_xmin,int seg_ymin,int seg_w,int seg_h,
                                 int all_xmin, int all_ymin, int all_w, int all_h);
 
+
+/*
+   Sets the VFLIP option for vertical flip to ON if the 
+   input argument 'vf' is non-zero else sets it to OFF.
+*/
 DJVUAPI
 void djvu_decode_set_vflip(djvu_decode_options *d_obj, char vf);
 
+/*
+   Sets the HFLIP option for horizontal flip to ON if the 
+   input argument 'hf' is non-zero else sets it to OFF.
+*/
 DJVUAPI
 void djvu_decode_set_hflip(djvu_decode_options *d_obj, char hf);
 
+/* 
+   Sets the GRAY option for color to gray image converion to ON if
+   the input argument 'gray' is non-zero else sets it to OFF.
+*/
 DJVUAPI
 void djvu_decode_set_gray(djvu_decode_options *d_obj, char gray);
 
+/*
+   Sets the angle of rotation to 'ang'. The output image will
+   be oriented at an angle of 'ang' with respect to the original
+   image. The input angles must be multiples of 90.
+*/
 DJVUAPI
 void djvu_decode_set_angle(djvu_decode_options *d_obj, int ang);
 
+/*
+   Sets the 'input djvu file' to 'inf'. This facilitates the
+   the use of same decoder object with same command line options
+   to decode various djvu images.
+*/
 DJVUAPI
 void djvu_decode_change_infile(djvu_decode_options *d_obj, char *inf);
 
+/* Sets the 'output file' to 'outf'. */
 DJVUAPI
 void djvu_decode_change_outfile(djvu_decode_options *d_obj, char *outf);
 
+/* Returns the current input file name */
 DJVUAPI
 char* djvu_decode_get_infile(djvu_decode_options *d_obj);
 
+/* Returns the current output file name */
 DJVUAPI
 char* djvu_decode_get_outfile(djvu_decode_options *d_obj);
 
+/*
+   Sets the layer of the input djvu image to be decoded
+   to one of DECODE_MASK for black & white mask layer,
+   DECODE_FOREGROUND for foreground layer and DECODE_BACKGROUND
+   to background layer.
+*/
 DJVUAPI
 void djvu_decode_set_layer(djvu_decode_options *d_obj, Layer l);
 
+/*
+   Returns a non-zero value if any errors occur during decoding
+   and writing the output to the specified format.
+*/
 DJVUAPI
 int djvu_decode_has_error(djvu_decode_options *d_obj);
 
+/*
+   Returns the recent error from the list of errors and
+   deletes it from the list of errors.
+*/
 DJVUAPI
 const char* djvu_decode_error(djvu_decode_options *d_obj);
 
+/*
+   Prints all the errors in the list to stderr.
+*/
 DJVUAPI
 void djvu_decode_perror(djvu_decode_options *d_obj);
 
