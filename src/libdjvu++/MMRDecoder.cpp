@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: MMRDecoder.cpp,v 1.24 2000-12-22 05:31:05 bcr Exp $
+// $Id: MMRDecoder.cpp,v 1.25 2001-01-03 20:29:04 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -42,7 +42,6 @@
 #include "JB2Image.h"
 #include "ByteStream.h"
 #include "GBitmap.h"
-
 
 // ----------------------------------------
 // MMR CODEBOOKS
@@ -331,13 +330,8 @@ public:
     { codeword<<=n; lowbits+=n; if (lowbits>=16) preload(); }
 };
 
-
-
-
 MMRDecoder::VLSource::VLSource(ByteStream &inp, int striped)
-  : inp(inp), codeword(0), 
-    lowbits(0), bufpos(0), bufmax(0),
-    readmax(-1)
+: inp(inp), codeword(0), lowbits(0), bufpos(0), bufmax(0), readmax(-1)
 {
   if (striped)
     readmax = inp.read32();
@@ -397,12 +391,12 @@ MMRDecoder::VLSource::preload()
 class MMRDecoder::VLTable
 {
 public:
-  const VLCode *code;
+  VLCode const * const code;
   int codewordshift;
   unsigned char *index;
   GPBuffer<unsigned char> gindex;
   // Construct a VLTable given a codebook with #nbits# long codes.
-  VLTable(const VLCode *codes, int nbits);
+  VLTable(VLCode const codes[], const int nbits);
   // Reads one symbol from a VLSource
   int decode(MMRDecoder::VLSource *src);
 };
@@ -415,40 +409,49 @@ MMRDecoder::VLTable::decode(MMRDecoder::VLSource *src)
   return c.value; 
 }
 
-MMRDecoder::VLTable::VLTable(const VLCode *codes, int nbits)
+MMRDecoder::VLTable::VLTable(VLCode const *codes, const int nbits)
   : code(codes), codewordshift(0), gindex(index,0)
 {
-  int i;
-  // count entries
-  int ncodes = 0;
-  while (codes[ncodes].codelen)
-    ncodes++;
   // check arguments
-  if (nbits<=1 || nbits>16)
+  if ((nbits<=1)||(nbits>16))
     G_THROW(invalid_mmr_data);
-  if (ncodes>=256)
-    G_THROW(invalid_mmr_data);
+
+  // count entries
+  int ncodes;
+  for(ncodes=0;codes[ncodes].codelen;)
+  {
+    if(++ncodes >= 256)
+    {
+      G_THROW(invalid_mmr_data);
+    }
+  }
+
   codewordshift = 32 - nbits;
   // allocate table
   int size = (1<<nbits);
   gindex.resize(size);
   // fill table with pointer to illegal entry
-  for (i=0; i<size; i++)
-    index[i] = ncodes;
+  {
+    const int size = (1<<nbits);
+    gindex.resize(size);
+    const unsigned char * const se=index+size;
+    for (unsigned char *s=index; s<se; s++)
+      *s = ncodes;
+  }
   // process codes
-  for (i=0; i<ncodes; i++) {
-    int c = codes[i].code;
-    int b = codes[i].codelen;
+  for (int i=0; i<ncodes; i++)
+  {
+    const int b = codes->codelen;
     if(b<=0 || b>nbits)
     {
       G_THROW(invalid_mmr_data);
     }
+    const int c = (codes++)->code;
     // fill table entries whose index high bits are code.
-    int n = c + (1<<(nbits-b));
-    while ( --n >= c ) {
-      if(index[n] != ncodes)
+    for(int n = c + (1<<(nbits-b)); n > c;)
+    {
+      if(index[--n] != ncodes)
        G_THROW("MMRDecoder.bad_codebook");
-      index[n] = i;
     }
   }
 }
@@ -467,7 +470,6 @@ MMRDecoder::~MMRDecoder()
 }
 
 
-
 MMRDecoder::MMRDecoder(ByteStream &bs, int width, int height, int striped)
   : width(width), height(height), lineno(0), 
     striplineno(0), rowsperstrip(0), gline(line,width+8),
@@ -481,9 +483,21 @@ MMRDecoder::MMRDecoder(ByteStream &bs, int width, int height, int striped)
   prevruns[0] = width;
   rowsperstrip = (striped ? bs.read16() : height);
   src = new VLSource(bs, striped);
-  mrtable = new VLTable(mrcodes, 7);
-  btable = new VLTable(bcodes, 13);
-  wtable = new VLTable(wcodes, 13);
+  G_TRY
+  {
+    mrtable = new VLTable(mrcodes, 7);
+    btable = new VLTable(bcodes, 13);
+    wtable = new VLTable(wcodes, 13);
+  }
+  G_CATCH_ALL
+  {
+    delete src; src=0;
+    delete mrtable; mrtable=0;
+    delete btable; btable=0;
+    delete wtable; wtable=0;
+    G_RETHROW;
+  }
+  G_ENDCATCH;
 }
 
 
@@ -506,16 +520,14 @@ MMRDecoder::scanruns(const unsigned short **endptr)
   prevruns = pr;
   lineruns = xr;
   // Loop until scanline is complete
-  char a0color = 0;
-  int a0 = 0;
-  int inc = 0;
-  int rle = 0;
-  int b1 = *pr++;
-  while (a0 < width)
+  bool a0color = false;
+  int a0, rle, b1;
+  for( b1=*pr++, rle=0, a0=0 ; a0 < width;)
     {
-      // Process MMR codes
-      switch ( mrtable->decode(src) )
-        {
+      // Process MMR codes 
+      const int c=mrtable->decode(src);
+      switch ( c )
+      {
           /* Pass Mode */
         case P: 
           { 
@@ -528,46 +540,60 @@ MMRDecoder::scanruns(const unsigned short **endptr)
           /* Horizontal Mode */
         case H: 
           { 
-            // First run
-            VLTable *table = (a0color ? btable : wtable);
-            do { inc=table->decode(src); a0+=inc; rle+=inc; } while (inc>=64);
-            *xr = rle; xr++; rle = 0;
-            // Second run
-            table = (!a0color ? btable : wtable);
-            do { inc=table->decode(src); a0+=inc; rle+=inc; } while (inc>=64);
-            *xr = rle; xr++; rle = 0;
+            int i=1;
+            do
+            {
+              VLTable *table=(i?(a0color?btable:wtable):(a0color?wtable:btable));
+              int inc;
+              do { a0+=(inc=table->decode(src)); rle+=inc; } while (inc>=64);
+              *xr = rle;
+              xr++;
+              rle = 0;
+              table=(a0color?wtable:btable);
+            } while(i--);
             break;
           }
           /* Vertical Modes */
         case V0:
-          inc = b1-a0;
-        vertical_r:
-          b1 += *pr; pr++;
-        vertical_l:
-          *xr = inc+rle; xr++; a0 += inc; rle = 0;
-          a0color = !a0color;
-          break;
         case VR3:
-          inc = b1-a0+3;
-          goto vertical_r;
         case VR2:
-          inc = b1-a0+2; 
-          goto vertical_r;
         case VR1:
-          inc = b1-a0+1; 
-          goto vertical_r;
-        case VL3:
-          inc = b1-a0-3;
-          b1 -= *--pr;
-          goto vertical_l;
-        case VL2:
-          inc = b1-a0-2;
-          b1 -= *--pr;
-          goto vertical_l;
         case VL1:
-          inc = b1-a0-1;
-          b1 -= *--pr;
-          goto vertical_l;
+        case VL2:
+        case VL3:
+        {
+          int a;
+          switch ( c )
+          {
+            case VR1:
+              a=(b1+=*pr++)+1;
+              break;
+            case VR2:
+              a=(b1+=*pr++)+2;
+              break;
+            case VR3:
+              a=(b1+=*pr++)+3;
+              break;
+            case VL1:
+              a=(b1+=*--pr)-1;
+              break;
+            case VL2:
+              a=(b1+=*--pr)-2;
+              break;
+            case VL3:
+              a=(b1+=*--pr)-3;
+              break;
+            default:
+              a=(b1+=*pr++);
+              break;
+          }
+          *xr = rle+(a-a0);
+          xr++;
+          a0=a;
+          a0color=!a0color;
+          rle=0;
+          break;
+        }
           /* Uncommon modes */
         default: 
           {
@@ -596,7 +622,7 @@ MMRDecoder::scanruns(const unsigned short **endptr)
                       {
                         src->shift(6);
                         if (a0color)
-                          { *xr = rle; xr++; rle = 0; a0color = !a0color; }
+                          { *xr = rle; xr++; rle = 0; a0color = false; }
                         rle += 5;
                         a0 += 5;
                       }
@@ -627,39 +653,39 @@ MMRDecoder::scanruns(const unsigned short **endptr)
             // -- Unknown MMR code.
             G_THROW(invalid_mmr_data);
           }
-        }
+      }
       // Next reference run
-      while (b1<=a0 && b1<width)
-        {
-          b1 += pr[0]+pr[1];
-          pr += 2;
-        }
+      for(const int s=(a0<width)?a0:width ; b1 <= s ; pr += 2 )
+      {
+        b1 += pr[0]+pr[1];
+      }
     }
   // Final P must be followed by V0 (they say!)
   if (rle > 0)
   {
     if (mrtable->decode(src) != V0)
     {
-      G_THROW("3");
-//      G_THROW(invalid_mmr_data);
+      G_THROW(invalid_mmr_data);
     }
-  }
-  if (rle > 0)
-  {
-    *xr = rle; xr++;
+    *xr = rle;
+    xr++;
   }
   // At this point we should have A0 equal to WIDTH
   // But there are buggy files around (Kofax!)
   // and we are not the CCITT police.
-  if (a0 > width) 
+  if ((a0 > width)&&(xr > lineruns)) 
+  {
+    do 
     {
-      while (a0 > width && xr > lineruns)
-        a0 -= *--xr;
-      if (a0 < width)
-      {
-        *xr = width-a0; xr++;
-      }
+      a0 -= *--xr;
+    } while (a0 > width && xr > lineruns);
+
+    if (a0 < width)
+    {
+      *xr = width-a0;
+      xr++;
     }
+  }
   /* Increment and return */
   if (endptr) 
     *endptr = xr;
@@ -777,7 +803,7 @@ MMRDecoder::decode(ByteStream &inp)
 	{
 	  // Decode one scanline
 	  const unsigned short *s = dcd.scanruns();
-          if (s == 0)
+          if (!s)
             continue;
 	  // Loop on blocks
           int x = 0;
