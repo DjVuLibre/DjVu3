@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.39 1999-09-16 15:43:18 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.40 1999-09-16 17:49:14 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -60,11 +60,26 @@ DjVuDocument::init(const GURL & url, GP<DjVuPort> xport,
 DjVuDocument::~DjVuDocument(void)
 {
       // Before we proceed with destroy we must stop the initializing
-      // thread (involves stopping the init_data_pool and the file
-      // used to decode NDIR chunks (if any))
-   init_data_pool->stop();
-   if (ndir_file) ndir_file->stop_decode(true);
-   wait_for_complete_init();
+      // thread (involves stopping the init_data_pool, the file
+      // used to decode NDIR chunks (if any) and all unnamed files)
+   if (init_data_pool) init_data_pool->stop();
+   while(!(flags & DOC_INIT_FAILED) &&
+	 !(flags & DOC_INIT_COMPLETE))
+   {
+      if (ndir_file) ndir_file->stop();
+      ndir_file=0;
+
+      {
+	 GCriticalSectionLock lock(&ufiles_lock);
+	 for(GPosition pos=ufiles_list;pos;++pos)
+	    ufiles_list[pos]->file->stop();
+	 ufiles_list.empty();
+      }
+
+      flags.enter();
+      flags.wait(500);
+      flags.leave();
+   }
 }
 
 void
@@ -266,7 +281,10 @@ DjVuDocument::check_unnamed_files(void)
 		  if (!new_url.is_empty())
 		  {
 		     ufile=f;
-		     ufiles_list.del(pos);
+			// Don't take it off the list. We want to be
+			// able to stop the init from ~DjVuDocument();
+			//
+			// ufiles_list.del(pos);
 		     break;
 		  }
 		  ++pos;
@@ -301,6 +319,15 @@ DjVuDocument::check_unnamed_files(void)
       } CATCH(exc) {
 	 pcaster->notify_error(this, exc.get_cause());
       } ENDCATCH;
+      
+	 // Remove the 'ufile' from the list
+      GCriticalSectionLock lock(&ufiles_lock);
+      for(GPosition pos=ufiles_list;pos;++pos)
+	 if (ufiles_list[pos]==ufile)
+	 {
+	    ufiles_list.del(pos);
+	    break;
+	 }
    } // while(1)
 }
 
