@@ -1,6 +1,6 @@
 # This rule sets the following variables:
 #	CXX, CXXFLAGS, CXXSYMBOLIC, CXXPIC, CXXUNROLL, CXXWARN
-# $Id: cxx.sh,v 1.18 2000-02-06 22:24:04 bcr Exp $
+# $Id: cxx.sh,v 1.19 2000-02-06 22:26:34 bcr Exp $
 
 if [ -z "$CONFIG_DIR" ] ; then
   echo "You must source functions.sh" 1>&2
@@ -12,8 +12,7 @@ if [ -z "$CXX_SET" ] ; then
   echo 'extern "C" {void exit(int);};void foo(void) {exit(0);}' |testfile $temp.cpp
   
   CXXFLAGS=""
-  CXXSYMBOLIC=""
-  CXXPIC=""
+  CXXPIC_SET=""
   cxx_is_gcc=
   echon "Searching for C++ compiler ... "
   if [ -n "$CXX" ] ; then

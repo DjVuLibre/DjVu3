@@ -1,6 +1,6 @@
 # This rule sets the following variables:
 #	CXXSYMBOLIC, CXXPIC
-# $Id: cxxpic.sh,v 1.1 2000-02-06 22:24:27 bcr Exp $
+# $Id: cxxpic.sh,v 1.2 2000-02-06 22:26:34 bcr Exp $
 
 if [ -z "$CXX_SET" ] ; then
   echo "You must source cxx.sh" 1>&2
@@ -8,10 +8,11 @@ if [ -z "$CXX_SET" ] ; then
 fi
 
 if [ -z "$CXXPIC_SET" ] ; then
+  CXXSYMBOLIC=""
+  CXXPIC=""
   echo 'extern "C" {void exit(int);};void foo(void) {exit(0);}' |testfile $temp.cpp
   
   echon "Checking ${CXX} symbolic option ... "
-  CXXSYMBOLIC=""
   SYSTEMGXX=`echo $SYS | tr A-Z a-z `-$cxx_is_gcc
   case $SYSTEMGXX in
     linux-*)
