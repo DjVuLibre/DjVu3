@@ -4,7 +4,7 @@
 //C-              Unauthorized use prohibited.
 //C-
 // 
-// $Id: qd_viewer_shell.cpp,v 1.1 2001-05-30 17:29:32 mchen Exp $
+// $Id: qd_viewer_shell.cpp,v 1.2 2001-05-31 21:25:10 mchen Exp $
 // $Name:  $
 
 
@@ -177,7 +177,7 @@ QDViewerShell::about(void)
    vlay->addWidget(frame);
    QVBoxLayout * frame_vlay=new QVBoxLayout(frame, 20, 10);
 
-   label=new QeLabel(tr("AT&T DjVu(tm) standalone viewer"), frame);
+   label=new QeLabel(tr("LizardTech DjVu(tm) standalone viewer"), frame);
    QFont font=label->font();
    font.setBold(TRUE);
    font.setPointSize(font.pointSize()+5);
