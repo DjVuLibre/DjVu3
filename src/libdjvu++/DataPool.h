@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.h,v 1.11 1999-09-07 18:47:23 eaf Exp $
+//C- $Id: DataPool.h,v 1.12 1999-09-07 19:16:52 leonb Exp $
  
 #ifndef _DATAPOOL_H
 #define _DATAPOOL_H
@@ -43,7 +43,7 @@
 
     @memo Thread safe data storage
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DataPool.h,v 1.11 1999-09-07 18:47:23 eaf Exp $#
+    @version #$Id: DataPool.h,v 1.12 1999-09-07 19:16:52 leonb Exp $#
 */
 
 //@{
@@ -515,12 +515,6 @@ inline bool
 DataPool::is_connected(void) const
 {
    return stream!=0 || pool!=0;
-}
-
-inline void
-DataPool::add_trigger(int thresh, void (* callback)(void *), void * cl_data)
-{
-   add_trigger(0, thresh+1, callback, cl_data);
 }
 
 inline int

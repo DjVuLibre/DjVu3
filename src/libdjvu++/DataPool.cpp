@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.cpp,v 1.12 1999-09-07 18:47:23 eaf Exp $
+//C- $Id: DataPool.cpp,v 1.13 1999-09-07 19:16:52 leonb Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -145,7 +145,8 @@ DataPool::BlockList::get_range(int start, int length) const
       // of intersection of this range with [start, start+length[
       // 0 is returned if nothing can be found
 {
-   if (length<0) THROW("Length must be positive.");
+   if (start<0) THROW("Start must be non negative.");
+   if (length<=0) THROW("Length must be positive.");
 
    GCriticalSectionLock lk((GCriticalSection *) &lock);
    int block_start=0, block_end=0;
@@ -223,6 +224,7 @@ DataPool::connect(const GP<DataPool> & pool_in, int start_in, int length_in)
 {
    if (pool) THROW("Already connected to another DataPool.");
    if (stream) THROW("Already connected to a file.");
+   if (start_in<0) THROW("Start must be non negative");
 
    pool=pool_in;
    start=start_in;
@@ -240,7 +242,8 @@ DataPool::connect(const char * fname, int start_in, int length_in)
 {
    if (pool) THROW("Already connected to a DataPool.");
    if (stream) THROW("Already connected to another file.");
-
+   if (start_in<0) THROW("Start must be non negative");
+     
    GP<StdioByteStream> str=new StdioByteStream(fname, "rb");
    str->seek(0, SEEK_END);
    int file_size=str->tell();
@@ -248,8 +251,8 @@ DataPool::connect(const char * fname, int start_in, int length_in)
    stream=str;
    start=start_in;
    length=length_in;
-   if (length<0) length=file_size-start;
-   else if (start+length>file_size) length=file_size-start;
+   if (start>=file_size) length = 0;
+   else if (length<0 || start+length>=file_size) length=file_size-start;
 
    eof_flag=true;
 
@@ -377,20 +380,24 @@ int
 DataPool::get_data(void * buffer, int offset, int sz, void * reader_id)
 {
    if (stop_flag) THROW("STOP");
+   if (sz < 0) THROW("Size must be non negative");
+   if (sz == 0) return 0;
 
    if (pool)
    {
       if (length>0 && offset+sz>length) sz=length-offset;
-      if (sz>0) return pool->get_data(buffer, start+offset, sz, reader_id);
-   } else if (stream)
+      if (sz<0) sz=0;
+      return pool->get_data(buffer, start+offset, sz, reader_id);
+   } 
+   else if (stream)
    {
-      if (start+offset<length)
-      {
-	 GCriticalSectionLock lock(&stream_lock);
-	 stream->seek(start+offset, SEEK_SET);
-	 return stream->readall(buffer, sz);
-      } else return 0;
-   } else
+      if (length>0 && offset+sz>length) sz=length-offset;
+      if (sz<0) sz=0;
+      GCriticalSectionLock lock(&stream_lock);
+      stream->seek(start+offset, SEEK_SET);
+      return stream->readall(buffer, sz);
+   } 
+   else
    {
 	 // We're not connected to anybody => handle the data
       int size=block_list.get_range(offset, sz);
@@ -564,6 +571,17 @@ DataPool::call_triggers(void)
 	 else if (trigger->callback) trigger->callback(trigger->cl_data);
       }
 }
+
+
+inline void
+DataPool::add_trigger(int thresh, void (* callback)(void *), void * cl_data)
+{
+  if (thresh>=0)
+    add_trigger(0, thresh+1, callback, cl_data);
+  else
+    add_trigger(0, -1, callback, cl_data);
+}
+
 
 void
 DataPool::add_trigger(int tstart, int tlength,
