@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GSmartPointer.h,v 1.9 1999-05-25 19:42:29 eaf Exp $
+//C- $Id: GSmartPointer.h,v 1.10 1999-09-09 21:38:42 leonb Exp $
 
 #ifndef _GSMARTPOINTER_H_
 #define _GSMARTPOINTER_H_
@@ -31,7 +31,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation\\
     Andrei Erofeev <eaf@research.att.com> -- bug fix.
     @version 
-    #$Id: GSmartPointer.h,v 1.9 1999-05-25 19:42:29 eaf Exp $# 
+    #$Id: GSmartPointer.h,v 1.10 1999-09-09 21:38:42 leonb Exp $# 
     @args
 */
 //@{
@@ -41,8 +41,6 @@
 #endif
 
 #include "DjVuGlobal.h"
-
-
 
 /** Base class for reference counted objects.  
     This is the base class for all reference counted objects.
@@ -60,17 +58,13 @@ public:
   virtual ~GPEnabled();
   /// Copy operator
   GPEnabled & operator=(const GPEnabled & obj);
-  /// Returns the number of references to this object
+  /** Returns the number of references to this object.  This should be only
+      used for debugging purposes. Other uses are not thread-safe. */
   int get_count(void) const;
 protected:
   /// The reference counter
   volatile int count;
-  /** Called when this object must be destroyed.  
-      The virtual function #destroy# is called when the reference counter is
-      decremented from one to zero. The default implementation just calls
-      #operator delete#. This default implementation should be enough for most
-      purposes.  See the implementation of \Ref{GString} for an example of
-      overriding #destroy#. */
+  // Deprecated: do not use or overidde.
   virtual void destroy();
 private:
   friend class GPBase;
@@ -100,15 +94,18 @@ public:
       Increments the reference count.
       @param nptr pointer to a #GPEnabled# object. */
   GPBase(GPEnabled *nptr);
-  /** Destructor.
-      Decrements the reference count. */
+  /** Destructor. Decrements the reference count. */
   ~GPBase();
   /** Accesses the actual pointer. */
   GPEnabled* get() const;
-  /** Assignment. 
+  /** Assignment from smartpointer. 
       Increments the counter of the new value of the pointer.
-      Decrements the counter of the previous value of the pointer.
-      @param nptr new #GPEnabled# pointer assigned to this object. */
+      Decrements the counter of the previous value of the pointer. */
+  GPBase& assign(const GPBase &sptr);
+  /** Assignment from pointer. 
+      Checks that the object is not being destroyed.
+      Increments the counter of the new value of the pointer.
+      Decrements the counter of the previous value of the pointer. */
   GPBase& assign(GPEnabled *nptr);
   /** Assignment operator. */
   GPBase & operator=(const GPBase & obj);
@@ -247,7 +244,10 @@ GPEnabled::GPEnabled()
 }
 
 inline
-GPEnabled::GPEnabled(const GPEnabled & obj) : count(0) {}
+GPEnabled::GPEnabled(const GPEnabled & obj) 
+  : count(0) 
+{
+}
 
 inline int
 GPEnabled::get_count(void) const
@@ -258,11 +258,9 @@ GPEnabled::get_count(void) const
 inline GPEnabled & 
 GPEnabled::operator=(const GPEnabled & obj)
 { 
-  /* The copy operator should do nothing
-     because the count should not be changed.
-     Subclasses of GPEnabled will call this version of the
-     copy operator as part of the default 'memberwise copy'
-     strategy. Thank you Andrei! */
+  /* The copy operator should do nothing because the count should not be
+     changed.  Subclasses of GPEnabled will call this version of the copy
+     operator as part of the default 'memberwise copy' strategy. */
   return *this; 
 }
 
@@ -278,9 +276,7 @@ inline
 GPBase::GPBase(GPEnabled *nptr)
   : ptr(0)
 {
-  if (nptr)
-    nptr->ref();
-  ptr = nptr;
+  assign(nptr);
 }
 
 inline
@@ -300,7 +296,6 @@ GPBase::~GPBase()
     old->unref();
 }
 
-
 inline GPEnabled* 
 GPBase::get() const
 {
@@ -310,13 +305,13 @@ GPBase::get() const
 inline GPBase &
 GPBase::operator=(const GPBase & obj)
 {
-   return assign(obj.get());
+  return assign(obj);
 }
 
 inline int 
 GPBase::operator==(const GPBase & g2) const
 {
-   return get() == g2.get();
+  return ptr == g2.ptr;
 }
 
 
@@ -335,42 +330,40 @@ GP<TYPE>::GP(TYPE *nptr)
 {
 }
 
-
 template <class TYPE> inline
 GP<TYPE>::GP(const GP<TYPE> &sptr)
-: GPBase((GPEnabled*) sptr)
+: GPBase((const GPBase&) sptr)
 {
 }
-
 
 template <class TYPE> inline
 GP<TYPE>::operator TYPE* () const
 {
-  return (TYPE*)(this->get());
+  return (TYPE*) ptr;
 }
 
 template <class TYPE> inline TYPE*
 GP<TYPE>::operator->() const
 {
-  return (TYPE*)(this->get());
+  return (TYPE*) ptr;
 }
 
 template <class TYPE> inline TYPE&
 GP<TYPE>::operator*() const
 {
-  return *(TYPE*)(this->get());
+  return *(TYPE*) ptr;
 }
 
 template <class TYPE> inline GP<TYPE>& 
 GP<TYPE>::operator= (TYPE *nptr)
 {
-  return (GP<TYPE>&)( this->assign(nptr) );
+  return (GP<TYPE>&)( assign(nptr) );
 }
 
 template <class TYPE> inline GP<TYPE>& 
 GP<TYPE>::operator= (const GP<TYPE> &sptr)
 {
-  return (GP<TYPE>&)( this->assign(sptr.get()) );
+  return (GP<TYPE>&)( assign((const GPBase&)sptr) );
 }
 
 template <class TYPE> inline int

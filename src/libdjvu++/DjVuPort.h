@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuPort.h,v 1.11 1999-09-09 20:48:33 eaf Exp $
+//C- $Id: DjVuPort.h,v 1.12 1999-09-09 21:38:42 leonb Exp $
  
 #ifndef _DJVUPORT_H
 #define _DJVUPORT_H
@@ -44,74 +44,67 @@
     should send the information to each of the clients. This could be done by
     means of callback {\em lists}, of course, but we want to achieve more
     bulletproof results: we want to be sure that the client, that we're about
-    to contact is still alive (has not been destroyed yet). Indeed, it's so
-    easy to forget to unregister a callback in the client destructor...
+    to contact is still alive, and is not being destroyed by another thread.
+    Besides, we are going to call these "callbacks" from many places, from
+    many different classes.  Maintaining multi-thread safe callback lists is
+    very difficult.
 
-    Besides, we're going to call these "callbacks" from many places, from many
-    different classes. Maintaining synchronized versions of the callback lists
-    can be a pain...
-
-    Finally, we want to provide some default implementation of these "callbacks"
-    in the library, which should attempt to process the requests themselves
-    if they can, and contact the client only if they're unable to do it (like
-    in the case of \Ref{DjVuPort::request_data}() with local URL where
-    \Ref{DjVuDocument} can get the data from the hard drive itself not
+    Finally, we want to provide some default implementation of these
+    "callbacks" in the library, which should attempt to process the requests
+    themselves if they can, and contact the client only if they're unable to
+    do it (like in the case of \Ref{DjVuPort::request_data}() with local URL
+    where \Ref{DjVuDocument} can get the data from the hard drive itself not
     disturbing the document's creator.
 
-    In short, we have implemented a communication mechanism supported by
-    two classes defined here: \Ref{DjVuPort} and \Ref{DjVuPortcaster}. Any
-    sender and recepient of requests should be a subclass of \Ref{DjVuPort}.
-    \Ref{DjVuPortcaster} maintains a map of routes between \Ref{DjVuPort}s,
-    which should be configured by somebody else. Whenever a port wants to
-    send a request, it calls the corresponding function of \Ref{DjVuPortcaster},
-    and the portcaster relays the request to all the destinations that it
-    sees in the internal map.
+    Two class implemente a general communication mechanism: \Ref{DjVuPort} and
+    \Ref{DjVuPortcaster}. Any sender and recepient of requests should be a
+    subclass of \Ref{DjVuPort}.  \Ref{DjVuPortcaster} maintains a map of
+    routes between \Ref{DjVuPort}s, which should be configured by somebody
+    else. Whenever a port wants to send a request, it calls the corresponding
+    function of \Ref{DjVuPortcaster}, and the portcaster relays the request to
+    all the destinations that it sees in the internal map.
 
-    The \Ref{DjVuPortcaster} is responsible for keeping the map up to date
-    by getting rid of destinations that have been destroyed.
+    The \Ref{DjVuPortcaster} is responsible for keeping the map up to date by
+    getting rid of destinations that have been destroyed.  Map updates are
+    performed from a single place and are serialized by a global monitor.
     
     @memo DjVu decoder communication mechanism.
-    @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuPort.h,v 1.11 1999-09-09 20:48:33 eaf Exp $#
-*/
+    @author Andrei Erofeev <eaf@geocities.com>\\
+            L\'eon Bottou <leonb@research.att.com>
+    @version #$Id: DjVuPort.h,v 1.12 1999-09-09 21:38:42 leonb Exp $# */
 //@{
 
 class DjVuPort;
 class DjVuPortcaster;
 
-/** #DjVuPort# provides base functionality for classes willing to take
-    part in sending and receiving messages generated during decoding process.
+/** #DjVuPort# provides base functionality for classes willing to take part in
+    sending and receiving messages generated during decoding process.  You
+    need to derive your class from #DjVuPort# if you want it to be able to
+    send or receive requests. In addition, for receiving requests you should
+    override one or more virtual function.
 
-    You need to derive your class from #DjVuPort# if you want it to be able
-    to send or receive requests. In addition, for receiving requests you
-    should override one or more virtual function.
-    */
+    {\bf Important remark} --- All ports should be allocated on the heap using
+    #operator new# and immediatlely secured using a \Ref{GP} smartpointer.
+    Ports which are not secured by a smart-pointer are not considered
+    ``alive'' and never receive notifications! */
 
 class DjVuPort : public GPEnabled
 {
 public:
-
-      /**  Use this function to get a copy of the global \Ref{DjVuPortcaster}. */
-  static DjVuPortcaster *get_portcaster(void);
-
-      /** The constructor. You can neglect the #dont_add_to_pcaster#
-	  parameter as it's used for internal purposes (the reason is that
-	  \Ref{DjVuPortcaster} is implemented as a \Ref{DjVuPort} too and we
-	  don't want to add the portcaster to the portcaster). */
    DjVuPort();
-
-      /** Copy constructor. #DjVuPort#s may be copied. When this happens,
-	  \Ref{DjVuPortcaster} copies all incoming and outcoming routes
-	  from the original to the copy */
-   DjVuPort(const DjVuPort & port);
-
-   virtual void destroy();
+   virtual ~DjVuPort();
    static void *operator new (size_t sz);
    static void operator delete(void *addr) { ::operator delete(addr); } ;
 
-      /** Copy operator. Similarily to the copy constructor, the copy
-	  operator results in copying of all incoming and outcoming routes
-	  (inside \Ref{DjVuPortcaster}) from the original to the copy */
+      /**  Use this function to get a copy of the global \Ref{DjVuPortcaster}. */
+   static DjVuPortcaster *get_portcaster(void);
+
+      /** Copy constructor. When #DjVuPort#s are copied, the portcaster
+          copies all incoming and outgoinf routes of the original. */
+   DjVuPort(const DjVuPort & port);
+
+      /** Copy operator. Similarily to the copy constructor, the portcaster
+          copies all incoming and outgoingcoming routes of the original. */
    DjVuPort & operator=(const DjVuPort & port);
 
       /** Should return 1 if the called class inherits class #class_name#.
@@ -124,6 +117,13 @@ public:
 	  is either #DjVuPort# or #DjVuFile# */
    virtual bool		inherits(const char * class_name) const;
 
+      /** @name Notifications. 
+          These virtual functions may be overidden by the subclasses
+          of #DjVuPort#.  They are called by the \Ref{DjVuPortcaster}
+          when the port is alive and when there is a route between the 
+          source of the notification and this port. */
+      //@{
+
       /** This request is issued to request translation of the ID, used
 	  in an DjVu INCL chunk to a URL, which may be used to request
 	  data associated with included file. \Ref{DjVuDocument} usually
@@ -135,53 +135,32 @@ public:
 	  This request is issued by \Ref{DjVuFile} and \Ref{DjVuDocument}
 	  when they want to create a new instance of \Ref{DjVuFile}. Normally
 	  \Ref{DjVuDocument} handles all these requests itself.
-
-	  If a port can not fulfil the request, it should return #ZERO#.
-
-	  @param source The sender of the request
-	  @param url	The URL of the cached file to be returned */
+	  If a port can not fulfil the request, it should return #0#. */
    virtual GPBase	get_cached_file(const DjVuPort * source, const GURL & url);
 
       /** This request is issued to add a given file to cache. It is called by
 	  \Ref{DjVuFile} at least in two cases: after the file has just been
-	  constructed and after it has been decoded.
-
-	  @param source The sender of the request
-	  @param file	File to be cached. */
+	  constructed and after it has been decoded. */
    virtual void		cache_djvu_file(const DjVuPort * source, class DjVuFile * file);
 	  
       /** This request is issued when decoder needs additional data
-	  for decoding. Both \Ref{DjVuFile} and \Ref{DjVuDocument} are
-	  initialized with a #URL#, not the document data. As soon as
-	  they need the data, they call this function, which responsibility
+	  for decoding.  Both \Ref{DjVuFile} and \Ref{DjVuDocument} are
+	  initialized with a URL, not the document data.  As soon as
+	  they need the data, they call this function, whose responsibility
 	  is to locate the source of the data basing on the #URL# passed
 	  and return it back in the form of the \Ref{DataPool}. If this
 	  particular receiver is unable to fullfil the request, it should
-	  return #ZERO#.
-
-	  @param source The sender of the request
-	  @param url The URL of the data.
-	  @return The \Ref{DataPool} with data. */
+	  return #0#. */
    virtual GP<DataPool>	request_data(const DjVuPort * source, const GURL & url);
 
       /** This notification is sent when an error occurs and the error message
-	  should be shown to the user. If the receiver is unable to process
-	  the request, it should return #ZERO# so that the \Ref{DjVuPortcaster}
-	  can call somebody else.
-
-	  @param source The sender of the request
-	  @param msg The error message
-	  @return 1 if the request has been processed. */
+	  should be shown to the user.  The receiver should return #0# if it is 
+          unable to process the request. Otherwise the receiver should return 1. */
    virtual bool		notify_error(const DjVuPort * source, const char * msg);
 
-      /** This notification is sent to update the decoding status. If the
-	  receiver is unable to process the notification (display the status),
-	  it should return #ZERO# so that the \Ref{DjVuPortcaster} can call
-	  somebody else.
-
-	  @param source The sender of the request
-	  @param msg The status message
-	  @return 1 if the request has been processed. */
+      /** This notification is sent to update the decoding status.  The
+          receiver should return #0# if it is unable to process the
+          request. Otherwise the receiver should return 1. */
    virtual bool		notify_status(const DjVuPort * source, const char * msg);
 
       /** This notification is sent by \Ref{DjVuImage} when it should be
@@ -192,84 +171,59 @@ public:
 
       /** This notification is sent by \ref{DjVuImage} when its geometry
 	  has been changed as a result of decoding. It may be used to
-	  implement progressive redisplay.
-
-	  @param source The sender of the request */
+	  implement progressive redisplay. */
    virtual void		notify_relayout(const class DjVuImage * source);
 
-      /** This notification is sent when a new chunk has been decoded.
-
-	  @param source The sender of the request
-	  @param name The name of the chunk that has been decoded */
+      /** This notification is sent when a new chunk has been decoded. */
    virtual void		notify_chunk_done(const DjVuPort * source, const char * name);
 
       /** This notification is sent after decoding of a particular file
-	  has been finished successfully.
-
-	  @param source The sender of the request (the file finished) */
+	  has been finished successfully. */
    virtual void		notify_file_done(const DjVuPort * source);
 
       /** This notification is sent when decoding of a particular file
-	  has been stopped.
-
-	  @param source The sender of the request (the file stopped) */
+	  has been stopped by the user. */
    virtual void		notify_file_stopped(const DjVuPort * source);
 
       /** This notification is sent when decoding of a particular file
-	  has failed.
-
-	  @param source The sender of the request (the file failed) */
+	  has failed. */
    virtual void		notify_file_failed(const DjVuPort * source);
 
-      /** This notification is sent from time to time while decoding is
-	  in progress. The purpose is obvious: to provide a way to know how
-	  much is done and how long the decoding will continue.
-
-	  @param source The sender of the request (the file being decoded)
-	  @param done Number from 0 to 1 reflecting the progress */
+      /** This notification is sent from time to time while decoding is in
+	  progress. The purpose is obvious: to provide a way to know how much
+	  is done and how long the decoding will continue.  Argument #done# is
+	  a number from 0 to 1 reflecting the progress. */
    virtual void		notify_decode_progress(const DjVuPort * source, float done);
 
       /** This notification is sent after a given file received all the data.
 	  The reason why we have it is because the data is passed to the
-	  \Ref{DjVuFile}s and \Ref{DjVuDocument}s in the form of \Ref{DataPool},
-	  which may have all the data, some of the data or nothing at all.
-	  The data may be added later (as it happens in the Netscape plugin)
-	  and we may want to know when it's done.
-
-	  @param source The sender of the request (the file with data) */
+	  \Ref{DjVuFile}s and \Ref{DjVuDocument}s in the form of
+	  \Ref{DataPool}, which may have all the data, some of the data or
+	  nothing at all.  The data may be added later (as it happens in the
+	  Netscape plugin) and we may want to know when it's done. */
    virtual void		notify_file_data_received(const DjVuPort * source);
 
       /** This notification is send after a given file {\em and all files
-	  included into it} received all the data.
-
-	  @param source The sender of the request (the file with all data) */
+	  included into it} received all the data. */
    virtual void		notify_all_data_received(const DjVuPort * source);
+      //@}
 };
 
-/** This is a {\em simple port} capable of retrieving data from the hard drive
-    and showing error messages on #stderr#.
+/** Simple port.  
+    An instance of #DjVuSimplePort# is automatically created when you create a
+    \Ref{DjVuFile} or a \Ref{DjVuDocument} without specifying a port.  This
+    simple port can retrieve data for local urls (i.e. urls referring to local
+    files) and display error messages on #stderr#.  All other notifications
+    are ignored. */
 
-    When all the #URL#s used in decoding refer to local files, there is no
-    reason to ask client (\Ref{DjVuDocument} creator) for data: the library
-    can get it itself. All you need to do is to create \Ref{DjVuFile} and
-    \Ref{DjVuDocument} passing #ZERO# port in the arguments, and the
-    library will create this #DjVuSimplePort# and will use it to work
-    with files stored locally.
-
-    The #DjVuSimplePort# responds to only one request (\Ref{request_data}())
-    and accepts two notifications (\Ref{notify_error}() and
-    \Ref{notify_status}()). The rest is ignored.
-
-*/
 class DjVuSimplePort : public DjVuPort
 {
 public:
       /// Returns 1 if #class_name# is #"DjVuPort"# or #"DjVuSimplePort"#.
    virtual bool		inherits(const char * class_name) const;
 
-      /** If #url# is local, it created a \Ref{DataPool}, connects it
-	  to the file with the given name and returns.
-	  Otherwise returns #ZERO#. */
+      /** If #url# is local, it created a \Ref{DataPool}, connects it to the
+	  file with the given name and returns.  Otherwise returns #0#. */
    virtual GP<DataPool>	request_data(const DjVuPort * source, const GURL & url);
 
       /// Displays error on #stderr#. Always returns 1.
@@ -279,17 +233,14 @@ public:
    virtual bool		notify_status(const DjVuPort * source, const char * msg);
 };
 
-/** This \Ref{DjVuPort} maps an abstract URL to data in the memory.
-    It's useful when you have the data necessary for decoding in the memory,
-    not on the hard drive or anywhere else. If this is the case, then you
-    should initialize #DjVuMemoryPort#, add as many pairs #<url, pool># to
-    it as you need and connect the \Ref{DjVuDocument} or \Ref{DjVuFile} to
-    it by means of \Ref{DjVuPortcaster}.
 
-    The #DjVuMemoryPort# will be listening for \Ref{request_data}() requests
-    and in case if it recognizes the {\em URL} passed with the request, it
-    will return the associated data to the caller.
-*/
+/** Memory based port.
+    This \Ref{DjVuPort} maintains a map associating pseudo urls with data
+    segments.  It processes the #request_data# notifications according to this
+    map.  After initializing the port, you should add as many pairs #<url,
+    pool># as needed need and add a route from a \Ref{DjVuDocument} or
+    \Ref{DjVuFile} to this port. */
+
 class DjVuMemoryPort : public DjVuPort
 {
 public:
@@ -316,24 +267,31 @@ private:
    GPList<Pair>		list;
 };
 
-/** This class maintains associations between different \Ref{DjVuPort}s.
 
-    It monitors ports status (have they been destructed yet?), accepts
-    requests and notifications from them and forwards them to destinations
-    according to internally maintained map of routes.
 
-    The caller can modify the route map any way he likes (see \Ref{add_route}(),
-    \Ref{del_route}(), \Ref{copy_routes}(), etc. functions). Any port can be
-    either a sender of a message, an intermediary receiver or a final
-    destination.
+/** Maintains associations between ports.
+    It monitors the status of all ports (have they been destructed yet?),
+    accepts requests and notifications from them and forwards them to
+    destinations according to internally maintained map of routes.
+
+    The caller can modify the route map any way he likes (see
+    \Ref{add_route}(), \Ref{del_route}(), \Ref{copy_routes}(),
+    etc. functions). Any port can be either a sender of a message, an
+    intermediary receiver or a final destination.  
 
     When a request is sent, the #DjVuPortcaster# computes the list of
-    destinations by consulting with the route map. It sorts the destinations
-    basing on their distance from the source. And then sends the request
-    following this order. For example, if port {\bf A} is connected to ports
-    {\bf B} and {\bf C} directly, and port {\bf B} is connected to {\bf D},
-    then {\bf B} and {\bf C} are assumed to be one unit away from {\bf A},
-    while {\bf D} is two units away from {\bf A}.
+    destinations by consulting with the route map.  Notifications are only
+    sent to ``alive'' ports.  A port is alive if it is referenced by a valid
+    \Ref{GP} smartpointer.  As a consequence, a port usually becomes alive
+    after running the constructor (since the returned pointer is then assigned
+    to a smartpointer) and is no longer alive when the port is destroyed
+    (because it would not be destroyed if a smartpointer was referencing it).
+
+    Destination ports are sorted according to their distance from the source.
+    For example, if port {\bf A} is connected to ports {\bf B} and {\bf C}
+    directly, and port {\bf B} is connected to {\bf D}, then {\bf B} and {\bf
+    C} are assumed to be one hop away from {\bf A}, while {\bf D} is two hops
+    away from {\bf A}.
 
     In some cases the requests and notifications are sent to every possible
     destination, and the order is not significant (like it is for
@@ -343,8 +301,7 @@ private:
     \Ref{notify_error}() and \Ref{notify_status}().
 
     The user is not expected to create the #DjVuPortcaster# itselt. He should
-    use \Ref{get_portcaster}() global function instead.
-    */
+    use \Ref{get_portcaster}() global function instead.  */
 class DjVuPortcaster
 {
 public:

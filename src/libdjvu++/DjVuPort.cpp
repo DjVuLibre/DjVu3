@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuPort.cpp,v 1.15 1999-09-09 20:48:33 eaf Exp $
+//C- $Id: DjVuPort.cpp,v 1.16 1999-09-09 21:38:42 leonb Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -77,23 +77,9 @@ DjVuPort::operator=(const DjVuPort & port)
    return *this;
 }
 
-void
-DjVuPort::destroy(void)
+DjVuPort::~DjVuPort(void)
 {
-  int ok_to_destroy = 0;
-  {
-    GCriticalSectionLock lock(& pcaster->map_lock );
-    // Avoid destroying when count is not zero.  This can happens if
-    // is_port_alive() has been called by another thread between the time the
-    // count was decremented to zero and the time destroy is called.
-    if (get_count() == 0)
-      {
-        get_portcaster()->del_port(this);
-        ok_to_destroy = 1;
-      }
-  }
-  if (ok_to_destroy)
-    GPEnabled::destroy();
+  get_portcaster()->del_port(this);
 }
 
 
@@ -117,18 +103,17 @@ DjVuPortcaster::~DjVuPortcaster(void)
 GP<DjVuPort>
 DjVuPortcaster::is_port_alive(DjVuPort *port)
 {
-   GCriticalSectionLock lock(&map_lock);
-   GPosition pos = cont_map.contains(port);
-   if (pos && cont_map[pos] == port)
-     return GP<DjVuPort>( (DjVuPort*) port );
-   return 0;
+  GCriticalSectionLock lock(&map_lock);
+  GPosition pos = cont_map.contains(port);
+  if (pos && cont_map[pos])
+    return GP<DjVuPort>((DjVuPort*)port);
+  return 0;
 }
 
 void
 DjVuPortcaster::set_name(const DjVuPort * port, const char * name)
 {
    GCriticalSectionLock lock(&map_lock);
-
    GPosition pos;
    if (p2n_map.contains(port, pos))
    {
@@ -136,19 +121,17 @@ DjVuPortcaster::set_name(const DjVuPort * port, const char * name)
       delete (const char *) p2n_map[pos];
       p2n_map.del(pos);
    }
-   
-   p2n_map[port]=strdup(name);
-   n2p_map[name]=port;
+   p2n_map[port] = strdup(name);
+   n2p_map[name] = port;
 }
 
 GP<DjVuPort>
 DjVuPortcaster::name_to_port(const char * name)
 {
    GCriticalSectionLock lock(&map_lock);
-
    GPosition pos;
    if (n2p_map.contains(name, pos))
-      return (DjVuPort *) n2p_map[pos];
+      return GP<DjVuPort> ( (DjVuPort *)n2p_map[pos] );
    else return 0;
 }
 
@@ -156,10 +139,9 @@ GString
 DjVuPortcaster::port_to_name(const DjVuPort * port)
 {
    GCriticalSectionLock lock(&map_lock);
-
    GPosition pos;
    if (p2n_map.contains(port, pos))
-      return (const char *) p2n_map[pos];
+      return GString( (const char *) p2n_map[pos] );
    else return GString();
 }
 
@@ -211,10 +193,6 @@ DjVuPortcaster::add_route(const DjVuPort * src, DjVuPort * dst)
       // Adds route src->dst
 {
    GCriticalSectionLock lock(&map_lock);
-   if (!src->get_count())
-     THROW("Source port is not secured by a smart pointer.");
-   if (!dst->get_count())
-     THROW("Destination port is not secured by a smart pointer.");
    if (cont_map.contains(src) && cont_map.contains(dst))
    {
       if (!route_map.contains(src)) route_map[src]=new GList<void *>();
@@ -312,13 +290,19 @@ DjVuPortcaster::compute_closure(const DjVuPort * src, GPList<DjVuPort> &list, bo
          lists[(int) set[pos]].append(set.key(pos));
        for(int dist=0;dist<=max_dist;dist++)
          for(pos=lists[dist];pos;++pos)
-           list.append( (DjVuPort*) lists[dist][pos] );
+           {
+             GP<DjVuPort> p = (DjVuPort*) lists[dist][pos];
+             if (p) list.append(p);
+           }
      }
    else
      {
        // Gather ports without order
        for(pos=set;pos;++pos)
-         list.append( (DjVuPort*) set.key(pos) );
+         {
+           GP<DjVuPort> p = (DjVuPort*) set.key(pos);
+           if (p) list.append(p);
+         }
      }
 }
 

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GString.h,v 1.10 1999-08-18 18:05:43 leonb Exp $
+//C- $Id: GString.h,v 1.11 1999-09-09 21:38:42 leonb Exp $
 
 
 #ifndef _GSTRING_H_
@@ -36,7 +36,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.10 1999-08-18 18:05:43 leonb Exp $# */
+    #$Id: GString.h,v 1.11 1999-09-09 21:38:42 leonb Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -58,12 +58,9 @@ class GStringRep : public GPEnabled
   friend class GString;
   friend unsigned int hash(const GString &ref);
 public:
-  virtual ~GStringRep();
   static GStringRep *xnew(unsigned int sz = 0);
-protected:
-  virtual void destroy();
 private:
-  unsigned int size;
+  int  size;
   char data[1];
 };
 
@@ -93,9 +90,11 @@ class GString : protected GP<GStringRep>
 public: 
   // -- CONSTRUCTORS
   /** Null constructor. Constructs an empty string. */
-  GString();
+  GString()
+    { } 
   /** Copy constructor. Constructs a string by copying the string #gs#. */
-  GString(const GString &gs);
+  GString(const GString &gs)
+    : GP<GStringRep>(gs) { } 
   /** Constructs a string from a null terminated character array. */ 
   GString(const char *dat);
   /** Constructs a string from a character array.  Elements of the character
@@ -120,7 +119,8 @@ public:
       This operation is efficient because string memory is allocated using a
       "copy-on-write" strategy. Both strings will share the same segment of
       memory until one of the strings is modified. */
-  GString& operator= (const GString &gs);
+  GString& operator= (const GString &gs)
+    { GP<GStringRep>::operator= (gs); return *this; }
   /** Copy a null terminated character array. Resets this string with the
       character string contained in the null terminated character array
       #str#. */
@@ -130,9 +130,11 @@ public:
       conversion operator is very efficient because it simply returns a
       pointer to the internal string data. The returned pointer remains valid
       as long as the string is unmodified. */
-  operator const char* () const  { return (*this)->data; }
+  operator const char* () const  
+    { return ptr ? (*this)->data : nullstr; }
   /** Returns the string length. */
-  unsigned int length() const { return (*this)->size; }
+  unsigned int length() const 
+    { return ptr ? (*this)->size : 0; }
   /** Returns true if and only if the string contains zero characters.  This
       operator is useful for conditional expression in control structures.
       \begin{verbatim}
@@ -142,14 +144,18 @@ public:
       Class #GString# does not to support syntax "#if# #(str)# #{}#" because
       the required conversion operator introduces dangerous ambiguities with
       certain compilers. */
-  int operator! () const { return ((*this)->data[0] == 0); }
+  int operator! () const 
+    { return !ptr; } ;
   // -- INDEXING
   /** Returns the character at position #n#. An exception \Ref{GException} is
       thrown if number #n# is not in range #-len# to #len-1#, where #len# is
       the length of the string.  The first character of a string is numbered
       zero.  Negative positions represent characters relative to the end of
       the string. */
-  char operator[] (int n) const;
+  char operator[] (int n) const
+    { if (n<0 && ptr) n += (*this)->size;
+      if (n<0 || !ptr || n>=(int)(*this)->size) throw_illegal_subscript();
+      return (*this)->data[n]; }
   /** Set the character at position #n# to value #ch#.  An exception
       \Ref{GException} is thrown if number #n# is not in range #-len# to
       #len#, where #len# is the length of the string.  If character #ch# is
@@ -164,7 +170,8 @@ public:
       characters starting at position #from# in this string.  The length of
       the resulting string may be smaller than #len# if the specified range is
       too large. */
-  GString substr(int from, unsigned int len=1) const;
+  GString substr(int from, unsigned int len=1) const
+    { return GString((GString&)(*this), from, len); }
   /** Returns an upper case copy of this string.  The returned string
       contains a copy of the current string with all letters turned into 
       upper case letters. */
@@ -282,65 +289,16 @@ public:
   friend unsigned int hash(const GString &ref);
   // -- HELPERS
 protected:
-  GString(GStringRep* rep);
-  GString& operator= (GStringRep *rep);
+  GString(GStringRep* rep)
+    : GP<GStringRep>(rep) { }
+  GString& operator= (GStringRep *rep)
+    {  GP<GStringRep>::operator= (rep); return *this; }
   static GString concat (const char *str1, const char *str2);
   static void throw_illegal_subscript() no_return;
+  static const char *nullstr;
 };
 
 //@}
-
-
-// ------------------- Inline functions
-
-inline
-GString::GString(GStringRep *rep)
-  : GP<GStringRep> ( rep )
-{
-}
-
-inline
-GString::GString(const GString &gs)
-  : GP<GStringRep> ( gs )
-{
-}
-
-inline GString& 
-GString::operator= (GStringRep *rep)
-{
-  GP<GStringRep>::operator= (rep);
-  return *this;
-}
-
-inline  GString& 
-GString::operator= (const GString &gs)
-{
-  GP<GStringRep>::operator= (gs);
-  return *this;
-}
-
-inline GString 
-GString::substr(int from, unsigned int len) const
-{
-  return GString((GString&)*this, from, len);
-}
-
-inline char
-GString::operator[] (int n) const
-{
-  if (n < 0)  
-    n += (*this)->size;
-  if (n < 0 || n>=(int)(*this)->size)
-    throw_illegal_subscript();
-  return (*this)->data[n];
-}
-
-inline 
-GString & GString::operator+=(char ch)
-{
-   setat((*this)->size, ch);
-   return *this;
-}
 
 
 // ------------------- The end

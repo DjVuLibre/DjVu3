@@ -9,9 +9,9 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GSmartPointer.cpp,v 1.5 1999-03-17 19:24:58 leonb Exp $
+//C- $Id: GSmartPointer.cpp,v 1.6 1999-09-09 21:38:42 leonb Exp $
 
-// File "$Id: GSmartPointer.cpp,v 1.5 1999-03-17 19:24:58 leonb Exp $"
+// File "$Id: GSmartPointer.cpp,v 1.6 1999-09-09 21:38:42 leonb Exp $"
 // - Author: Leon Bottou, 05/1997
 
 /* Put this into *one* file, which instantiates all the required containers
@@ -35,14 +35,14 @@ static GCriticalSection gcsCounter;
 
 GPEnabled::~GPEnabled()
 {
-  if (count)
+  if (count > 0)
     THROW("Suspicious destruction of referenced GPEnabled object");
 }
 
 void
 GPEnabled::destroy()
 {
-  if (count)
+  if (count >= 0)
     THROW("Suspicious destruction of referenced GPEnabled object");
   delete this;
 }
@@ -59,9 +59,10 @@ void
 GPEnabled::unref()
 {
   gcsCounter.lock();
-  int newcount = --count;
+  if (! --count) 
+    count = -1;
   gcsCounter.unlock();
-  if (newcount==0)
+  if (count < 0)
     destroy();
 }
 
@@ -73,22 +74,53 @@ GPBase&
 GPBase::assign (GPEnabled *nptr)
 {
   gcsCounter.lock();
-  if (nptr) 
+  if (nptr)
     {
-      nptr->count++;
+      if (nptr->count >= 0)  
+        nptr->count++;
+      else
+        nptr = 0;
     }
   if (ptr)
     {
       GPEnabled *old = ptr;
       ptr = nptr;
-      int newcount = --old->count;
+      if (! --old->count) 
+        old->count = -1;
       gcsCounter.unlock();      
-      if (newcount == 0)
+      if (old->count < 0)
         old->destroy();
     }
   else
     {
       ptr = nptr;
+      gcsCounter.unlock();
+    }
+  return *this;
+}
+
+
+GPBase&
+GPBase::assign (const GPBase &sptr)
+{
+  gcsCounter.lock();
+  if (sptr.ptr) 
+    {
+      sptr.ptr->count++;
+    }
+  if (ptr)
+    {
+      GPEnabled *old = ptr;
+      ptr = sptr.ptr;
+      if (! --old->count) 
+        old->count = -1;
+      gcsCounter.unlock();      
+      if (old->count < 0)
+        old->destroy();
+    }
+  else
+    {
+      ptr = sptr.ptr;
       gcsCounter.unlock();
     }
   return *this;
