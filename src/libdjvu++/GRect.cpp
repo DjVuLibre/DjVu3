@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GRect.cpp,v 1.21 2001-03-29 18:50:06 praveen Exp $
+// $Id: GRect.cpp,v 1.22 2001-04-12 18:50:50 fcrary Exp $
 // $Name:  $
 
 // -- Implementation of class GRect and GRectMapper
@@ -190,7 +190,7 @@ GRectMapper::GRatio::GRatio(int p, int q)
   : p(p), q(q)
 {
   if (q == 0) 
-    G_THROW("GRect.div_zero");
+    G_THROW( ERR_MSG("GRect.div_zero") );
   if (p == 0)
     q = 1;
   if (q < 0)
@@ -246,7 +246,7 @@ void
 GRectMapper::set_input(const GRect &rect)
 {
   if (rect.isempty())
-    G_THROW("GRect.empty_rect1");
+    G_THROW( ERR_MSG("GRect.empty_rect1") );
   rectFrom = rect;
   if (code & SWAPXY)
   {
@@ -260,7 +260,7 @@ void
 GRectMapper::set_output(const GRect &rect)
 {
   if (rect.isempty())
-    G_THROW("GRect.empty_rect2");
+    G_THROW( ERR_MSG("GRect.empty_rect2") );
   rectTo = rect;
   rw = rh = GRatio();
 }
@@ -307,7 +307,7 @@ void
 GRectMapper::precalc()
 {
   if (rectTo.isempty() || rectFrom.isempty())
-    G_THROW("GRect.empty_rect3");
+    G_THROW( ERR_MSG("GRect.empty_rect3") );
   rw = GRatio(rectTo.width(), rectFrom.width());
   rh = GRatio(rectTo.height(), rectFrom.height());
 }

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GScaler.cpp,v 1.15 2001-01-04 22:04:55 bcr Exp $
+// $Id: GScaler.cpp,v 1.16 2001-04-12 18:50:50 fcrary Exp $
 // $Name:  $
 
 // Rescale images with fast bilinear interpolation
@@ -161,7 +161,7 @@ prepare_coord(int *coord, int inmax, int outmax, int in, int out)
     }
   // Result must fit exactly
   if (out==outmax && y!=beg+len)
-    G_THROW("GScaler.assertion");
+    G_THROW( ERR_MSG("GScaler.assertion") );
 }
 
 
@@ -169,13 +169,13 @@ void
 GScaler::set_horz_ratio(int numer, int denom)
 {
   if (! (inw>0 && inh>0 && outw>0 && outh>0))
-    G_THROW("GScaler.undef_size");
+    G_THROW( ERR_MSG("GScaler.undef_size") );
   // Implicit ratio (determined by the input/output sizes)
   if (numer==0 && denom==0) {
     numer = outw;
     denom = inw;
   } else if (numer<=0 || denom<=0)
-    G_THROW("GScaler.ratios");
+    G_THROW( ERR_MSG("GScaler.ratios") );
   // Compute horz reduction
   xshift = 0;
   redw = inw;
@@ -195,13 +195,13 @@ void
 GScaler::set_vert_ratio(int numer, int denom)
 {
   if (! (inw>0 && inh>0 && outw>0 && outh>0))
-    G_THROW("GScaler.undef_size");
+    G_THROW( ERR_MSG("GScaler.undef_size") );
   // Implicit ratio (determined by the input/output sizes)
   if (numer==0 && denom==0) {
     numer = outh;
     denom = inh;
   } else if (numer<=0 || denom<=0)
-    G_THROW("GScaler.ratios");
+    G_THROW( ERR_MSG("GScaler.ratios") );
   // Compute horz reduction
   yshift = 0;
   redh = inh;
@@ -225,7 +225,7 @@ GScaler::make_rectangles(const GRect &desired, GRect &red, GRect &inp)
   // Parameter validation
   if (desired.xmin<0 || desired.ymin<0 ||
       desired.xmax>outw || desired.ymax>outh )
-    G_THROW("GScaler.too_big");
+    G_THROW( ERR_MSG("GScaler.too_big") );
   // Compute ratio (if not done yet)
   if (!vcoord) 
     set_vert_ratio(0,0);
@@ -366,12 +366,12 @@ GBitmapScaler::scale( const GRect &provided_input, const GBitmap &input,
   // Parameter validation
   if (provided_input.width() != (int)input.columns() ||
       provided_input.height() != (int)input.rows() )
-    G_THROW("GScaler.no_match");
+    G_THROW( ERR_MSG("GScaler.no_match") );
   if (provided_input.xmin > required_input.xmin ||
       provided_input.ymin > required_input.ymin ||
       provided_input.xmax < required_input.xmax ||
       provided_input.ymax < required_input.ymax  )
-    G_THROW("GScaler.too_small");
+    G_THROW( ERR_MSG("GScaler.too_small") );
   // Adjust output pixmap
   if (desired_output.width() != (int)output.columns() ||
       desired_output.height() != (int)output.rows() )
@@ -557,12 +557,12 @@ GPixmapScaler::scale( const GRect &provided_input, const GPixmap &input,
   // Parameter validation
   if (provided_input.width() != (int)input.columns() ||
       provided_input.height() != (int)input.rows() )
-    G_THROW("GScaler.no_match");
+    G_THROW( ERR_MSG("GScaler.no_match") );
   if (provided_input.xmin > required_input.xmin ||
       provided_input.ymin > required_input.ymin ||
       provided_input.xmax < required_input.xmax ||
       provided_input.ymax < required_input.ymax  )
-    G_THROW("GScaler.too_small");
+    G_THROW( ERR_MSG("GScaler.too_small") );
   // Adjust output pixmap
   if (desired_output.width() != (int)output.columns() ||
       desired_output.height() != (int)output.rows() )

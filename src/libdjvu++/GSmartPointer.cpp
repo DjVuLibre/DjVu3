@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GSmartPointer.cpp,v 1.25 2001-01-10 19:47:37 bcr Exp $
+// $Id: GSmartPointer.cpp,v 1.26 2001-04-12 18:50:50 fcrary Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 05/1997
@@ -58,14 +58,14 @@ static GCriticalSection gcsCounter;
 GPEnabled::~GPEnabled()
 {
   if (count > 0)
-    G_THROW("GSmartPointer.suspicious");
+    G_THROW( ERR_MSG("GSmartPointer.suspicious") );
 }
 
 void
 GPEnabled::destroy()
 {
   if (count >= 0)
-    G_THROW("GSmartPointer.suspicious");
+    G_THROW( ERR_MSG("GSmartPointer.suspicious") );
   delete this;
 }
 

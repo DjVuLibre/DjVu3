@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuGlobal.cpp,v 1.32 2001-01-04 22:04:55 bcr Exp $
+// $Id: DjVuGlobal.cpp,v 1.33 2001-04-12 18:50:50 fcrary Exp $
 // $Name:  $
 
 /** This file impliments the DjVuProgressTask elements.  The memory
@@ -142,7 +142,7 @@ DjVuProgressTask::~DjVuProgressTask()
   if (data && data->callback)
   {
     if (data->head != this)
-      G_THROW("DjVuGlobal.not_compatible");
+      G_THROW( ERR_MSG("DjVuGlobal.not_compatible") );
     data->head = parent;
     if (!parent)
     {

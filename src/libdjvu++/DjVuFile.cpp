@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuFile.cpp,v 1.159 2001-04-12 17:05:31 fcrary Exp $
+// $Id: DjVuFile.cpp,v 1.160 2001-04-12 18:50:50 fcrary Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -123,7 +123,7 @@ void
 DjVuFile::check() const
 {
   if (!initialized)
-    G_THROW("DjVuFile.not_init");
+    G_THROW( ERR_MSG("DjVuFile.not_init") );
 }
 
 GP<DjVuFile>
@@ -146,9 +146,9 @@ DjVuFile::init(ByteStream & str)
   DEBUG_MAKE_INDENT(3);
   
   if (initialized)
-    G_THROW("DjVuFile.2nd_init");
+    G_THROW( ERR_MSG("DjVuFile.2nd_init") );
   if (!get_count())
-    G_THROW("DjVuFile.not_secured");
+    G_THROW( ERR_MSG("DjVuFile.not_secured") );
   
   file_size=0;
   decode_thread=0;
@@ -188,11 +188,11 @@ DjVuFile::init(const GURL & xurl, GP<DjVuPort> port)
   DEBUG_MAKE_INDENT(3);
   
   if (initialized)
-    G_THROW("DjVuFile.2nd_init");
+    G_THROW( ERR_MSG("DjVuFile.2nd_init") );
   if (!get_count())
-    G_THROW("DjVuFile.not_secured");
+    G_THROW( ERR_MSG("DjVuFile.not_secured") );
   if (xurl.is_empty())
-    G_THROW("DjVuFile.empty_URL");
+    G_THROW( ERR_MSG("DjVuFile.empty_URL") );
   
   url = xurl;
   file_size=0;
@@ -210,7 +210,7 @@ DjVuFile::init(const GURL & xurl, GP<DjVuPort> port)
   initialized=true;
   
   if (!(data_pool=DataPool::create(pcaster->request_data(this, url))))
-    G_THROW("DjVuFile.no_data\t"+url.get_string());
+    G_THROW( ERR_MSG("DjVuFile.no_data") "\t"+url.get_string());
   data_pool->add_trigger(-1, static_trigger_cb, this);
 }
 
@@ -452,7 +452,7 @@ DjVuFile::decode_func(void)
     for(GPosition pos=inc_files_list;pos;++pos)
     {
       GP<DjVuFile> & f=inc_files_list[pos];
-      if (f->is_decode_failed()) G_THROW("DjVuFile.decode_fail");
+      if (f->is_decode_failed()) G_THROW( ERR_MSG("DjVuFile.decode_fail") );
       if (f->is_decode_stopped()) G_THROW("STOP");
       if (!f->is_decode_ok())
       {
@@ -460,7 +460,7 @@ DjVuFile::decode_func(void)
         DEBUG_MSG("incl_url='" << f->get_url() << "'\n");
         DEBUG_MSG("decoding=" << f->is_decoding() << "\n");
         DEBUG_MSG("status='" << f->get_flags() << "\n");
-        G_THROW("DjVuFile.not_finished");
+        G_THROW( ERR_MSG("DjVuFile.not_finished") );
       }
     }
   } G_CATCH(exc) {
@@ -470,14 +470,14 @@ DjVuFile::decode_func(void)
         flags.enter();
         flags=flags & ~DECODING | DECODE_STOPPED;
         flags.leave();
-        pcaster->notify_status(this, GUTF8String("DjVuFile.stopped\t") + GUTF8String(url));
+        pcaster->notify_status(this, GUTF8String( ERR_MSG("DjVuFile.stopped") "\t") + GUTF8String(url));
         pcaster->notify_file_flags_changed(this, DECODE_STOPPED, DECODING);
       } else
       {
         flags.enter();
         flags=flags & ~DECODING | DECODE_FAILED;
         flags.leave();
-        pcaster->notify_status(this, GUTF8String("DjVuFile.failed\t") + GUTF8String(url));
+        pcaster->notify_status(this, GUTF8String( ERR_MSG("DjVuFile.failed") "\t") + GUTF8String(url));
         pcaster->notify_error(this, exc.get_cause());
         pcaster->notify_file_flags_changed(this, DECODE_FAILED, DECODING);
       }
@@ -522,7 +522,7 @@ DjVuFile::process_incl_chunk(ByteStream & str, int file_num)
   if (incl_str.length()>0)
   {
     if (strchr(incl_str, '/'))
-      G_THROW("DjVuFile.malformed");
+      G_THROW( ERR_MSG("DjVuFile.malformed") );
     
     DEBUG_MSG("incl_str='" << incl_str << "'\n");
     
@@ -561,7 +561,7 @@ DjVuFile::process_incl_chunk(ByteStream & str, int file_num)
     G_ENDCATCH;
     if (!file)
     {
-      G_THROW("DjVuFile.no_create\t"+incl_str);
+      G_THROW( ERR_MSG("DjVuFile.no_create") "\t"+incl_str);
     }
     if (recover_errors!=ABORT)
       file->set_recover_errors(recover_errors);
@@ -623,7 +623,7 @@ DjVuFile::report_error
 //    if (url.is_local_file_url())
 //      url_str=url.filename();
     
-    GUTF8String msg = GUTF8String("DjVuFile.EOF\t") + url;
+    GUTF8String msg = GUTF8String( ERR_MSG("DjVuFile.EOF") "\t") + url;
     if(throw_errors)
     {
       G_EXTHROW(ex, msg);
@@ -763,7 +763,7 @@ DjVuFile::get_dpi(int w, int h)
         if ((info->height+red-1)/red==h)
           break;
         if (red>12)
-          G_THROW("DjVuFile.corrupt_BG44");
+          G_THROW( ERR_MSG("DjVuFile.corrupt_BG44") );
         dpi=info->dpi;
   }
   return (dpi ? dpi : 300)/red;
@@ -805,9 +805,9 @@ DjVuFile::decode_chunk(const GUTF8String &id, GP<ByteStream> gbs, bool djvi, boo
   if (chkid == "INFO" && (djvu || djvi))
   {
     if (DjVuFile::info)
-      G_THROW("DjVuFile.corrupt_dupl");
+      G_THROW( ERR_MSG("DjVuFile.corrupt_dupl") );
     if (djvi)
-      G_THROW("DjVuFile.corrupt_INFO");
+      G_THROW( ERR_MSG("DjVuFile.corrupt_INFO") );
     // DjVuInfo::decode no longer throws version exceptions
     GP<DjVuInfo> info=DjVuInfo::create();
     info->decode(bs);
@@ -815,9 +815,9 @@ DjVuFile::decode_chunk(const GUTF8String &id, GP<ByteStream> gbs, bool djvi, boo
     desc.format("Page information");
     // Consistency checks (previously in DjVuInfo::decode)
     if (info->width<0 || info->height<0)
-      G_THROW("DjVuFile.corrupt_zero");
+      G_THROW( ERR_MSG("DjVuFile.corrupt_zero") );
     if (info->version >= DJVUVERSION_TOO_NEW)
-      G_THROW("DjVuFile.new_version\t" STRINGIFY(DJVUVERSION_TOO_NEW) );
+      G_THROW( ERR_MSG("DjVuFile.new_version") "\t" STRINGIFY(DJVUVERSION_TOO_NEW) );
     if(info->compressable)
       set_can_compress(true);
   }
@@ -857,9 +857,9 @@ DjVuFile::decode_chunk(const GUTF8String &id, GP<ByteStream> gbs, bool djvi, boo
   else if (chkid == "Djbz" && (djvu || djvi))
   {
     if (DjVuFile::fgjd)
-      G_THROW("DjVuFile.dupl_Dxxx");
+      G_THROW( ERR_MSG("DjVuFile.dupl_Dxxx") );
     if (DjVuFile::fgjd)
-      G_THROW("DjVuFile.Dxxx_after_Sxxx");
+      G_THROW( ERR_MSG("DjVuFile.Dxxx_after_Sxxx") );
     GP<JB2Dict> fgjd = JB2Dict::create();
     fgjd->decode(gbs);
     DjVuFile::fgjd = fgjd;
@@ -870,7 +870,7 @@ DjVuFile::decode_chunk(const GUTF8String &id, GP<ByteStream> gbs, bool djvi, boo
   else if (chkid=="Sjbz" && (djvu || djvi))
   {
     if (DjVuFile::fgjb)
-      G_THROW("DjVuFile.dupl_Sxxx");
+      G_THROW( ERR_MSG("DjVuFile.dupl_Sxxx") );
     GP<JB2Image> fgjb=JB2Image::create();
     // ---- begin hack
     if (info && info->version <=18)
@@ -887,7 +887,7 @@ DjVuFile::decode_chunk(const GUTF8String &id, GP<ByteStream> gbs, bool djvi, boo
   else if (chkid=="Smmr" && (djvu || djvi))
   {
     if (DjVuFile::fgjb)
-      G_THROW("DjVuFile.dupl_Sxxx");
+      G_THROW( ERR_MSG("DjVuFile.dupl_Sxxx") );
     set_can_compress(true);
     DjVuFile::fgjb = MMRDecoder::decode(gbs);
     desc.format("G4/MMR encoded mask (%dx%d, %d dpi)",
@@ -901,7 +901,7 @@ DjVuFile::decode_chunk(const GUTF8String &id, GP<ByteStream> gbs, bool djvi, boo
     if (!bg44)
     {
       if (bgpm)
-        G_THROW("DjVuFile.dupl_backgrnd");
+        G_THROW( ERR_MSG("DjVuFile.dupl_backgrnd") );
       // First chunk
       GP<IW44Image> bg44=IW44Image::create_decode(IW44Image::COLOR);
       bg44->decode_chunk(gbs);
@@ -923,7 +923,7 @@ DjVuFile::decode_chunk(const GUTF8String &id, GP<ByteStream> gbs, bool djvi, boo
   else if (chkid == "FG44" && (djvu || djvu))
   {
     if (fgpm || fgbc)
-      G_THROW("DjVuFile.dupl_foregrnd");
+      G_THROW( ERR_MSG("DjVuFile.dupl_foregrnd") );
     GP<IW44Image> gfg44=IW44Image::create_decode(IW44Image::COLOR);
     IW44Image &fg44=*gfg44;
     fg44.decode_chunk(gbs);
@@ -937,7 +937,7 @@ DjVuFile::decode_chunk(const GUTF8String &id, GP<ByteStream> gbs, bool djvi, boo
   else if (chkid == "LINK" && (djvu || djvi))
   {
     if (bg44 || bgpm)
-      G_THROW("DjVuFile.dupl_backgrnd");
+      G_THROW( ERR_MSG("DjVuFile.dupl_backgrnd") );
     if(djvu_decode_codec)
     {
       set_modified(true);
@@ -957,7 +957,7 @@ DjVuFile::decode_chunk(const GUTF8String &id, GP<ByteStream> gbs, bool djvi, boo
   else if (chkid == "BGjp" && (djvu || djvi))
   {
     if (bg44 || bgpm)
-      G_THROW("DjVuFile.dupl_backgrnd");
+      G_THROW( ERR_MSG("DjVuFile.dupl_backgrnd") );
     set_can_compress(true);
 #ifdef NEED_JPEG_DECODER
     DjVuFile::bgpm = JPEGDecoder::decode(bs);
@@ -973,7 +973,7 @@ DjVuFile::decode_chunk(const GUTF8String &id, GP<ByteStream> gbs, bool djvi, boo
   else if (chkid == "FGjp" && (djvu || djvi))
   {
     if (fgpm || fgbc)
-      G_THROW("DjVuFile.dupl_foregrnd");
+      G_THROW( ERR_MSG("DjVuFile.dupl_foregrnd") );
 #ifdef NEED_JPEG_DECODER
     DjVuFile::fgpm = JPEGDecoder::decode(bs);
     desc.format("JPEG foreground colors (%dx%d, %d dpi)",
@@ -988,7 +988,7 @@ DjVuFile::decode_chunk(const GUTF8String &id, GP<ByteStream> gbs, bool djvi, boo
   else if (chkid == "BG2k" && (djvu || djvi))
   {
     if (bg44)
-      G_THROW("DjVuFile.dupl_backgrnd");
+      G_THROW( ERR_MSG("DjVuFile.dupl_backgrnd") );
     desc.format("JPEG-2000 background (Unimplemented)");
   } 
   
@@ -996,7 +996,7 @@ DjVuFile::decode_chunk(const GUTF8String &id, GP<ByteStream> gbs, bool djvi, boo
   else if (chkid == "FG2k" && (djvu || djvi))
   {
     if (fgpm || fgbc)
-      G_THROW("DjVuFile.dupl_foregrnd");
+      G_THROW( ERR_MSG("DjVuFile.dupl_foregrnd") );
     desc.format("JPEG-2000 foreground colors (Unimplemented)");
   } 
   
@@ -1004,7 +1004,7 @@ DjVuFile::decode_chunk(const GUTF8String &id, GP<ByteStream> gbs, bool djvi, boo
   else if (chkid == "FGbz" && (djvu || djvi))
   {
     if (fgpm || fgbc)
-      G_THROW("DjVuFile.dupl_foregrnd");
+      G_THROW( ERR_MSG("DjVuFile.dupl_foregrnd") );
     GP<DjVuPalette> fgbc = DjVuPalette::create();
     fgbc->decode(gbs);
     DjVuFile::fgbc = fgbc;
@@ -1159,7 +1159,7 @@ DjVuFile::decode(GP<ByteStream> gbs)
   else if (iw44)
     mimetype = "image/x-iw44";
   else
-    G_THROW("DjVuFile.unexp_image");
+    G_THROW( ERR_MSG("DjVuFile.unexp_image") );
   
   // Process chunks
   int size_so_far=iff.tell();
@@ -1211,9 +1211,9 @@ DjVuFile::decode(GP<ByteStream> gbs)
   
   // Complete description
   if (djvu && !info)
-    G_THROW("DjVuFile.corrupt_missing_info");
+    G_THROW( ERR_MSG("DjVuFile.corrupt_missing_info") );
   if (iw44 && !info)
-    G_THROW("DjVuFile.corrupt_missing_IW44");
+    G_THROW( ERR_MSG("DjVuFile.corrupt_missing_IW44") );
   if (info)
   {
     GUTF8String desc;
@@ -1795,11 +1795,11 @@ DjVuFile::get_chunk_name(int chunk_num)
 {
   if(chunk_num < 0)
   {
-    G_THROW("DjVuFile.illegal_chunk");
+    G_THROW( ERR_MSG("DjVuFile.illegal_chunk") );
   }
   if((chunks_number >= 0)&&(chunk_num > chunks_number))
   {
-    G_THROW("DjVuFile.missing_chunk");
+    G_THROW( ERR_MSG("DjVuFile.missing_chunk") );
   }
   check();
   
@@ -1833,7 +1833,7 @@ DjVuFile::get_chunk_name(int chunk_num)
   if (!name.length())
   {
     if (chunks_number < 0) chunks_number=chunks;
-    G_THROW("DjVuFile.missing_chunk");
+    G_THROW( ERR_MSG("DjVuFile.missing_chunk") );
   }
   return name;
 }

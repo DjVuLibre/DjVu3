@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuInfo.cpp,v 1.17 2001-04-12 17:05:31 fcrary Exp $
+// $Id: DjVuInfo.cpp,v 1.18 2001-04-12 18:50:50 fcrary Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -73,7 +73,7 @@ DjVuInfo::decode(ByteStream &bs)
   if (size == 0)
     G_THROW( ERR_MSG("EOF") );
   if (size < 5)
-    G_THROW("DjVuInfo.corrupt_file");
+    G_THROW( ERR_MSG("DjVuInfo.corrupt_file") );
   // Analyze data with backward compatibility in mind!
   if (size>=2)
     width = (buffer[0]<<8) + buffer[1];

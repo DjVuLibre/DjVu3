@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocument.h,v 1.83 2001-04-12 00:24:59 bcr Exp $
+// $Id: DjVuDocument.h,v 1.84 2001-04-12 18:50:50 fcrary Exp $
 // $Name:  $
 
 #ifndef _DJVUDOCUMENT_H
@@ -58,7 +58,7 @@ class ByteStream;
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocument.h,v 1.83 2001-04-12 00:24:59 bcr Exp $#
+    @version #$Id: DjVuDocument.h,v 1.84 2001-04-12 18:50:50 fcrary Exp $#
 */
 
 //@{
@@ -949,9 +949,9 @@ inline GP<DjVmDir>
 DjVuDocument::get_djvm_dir(void) const
 {
    if (doc_type==SINGLE_PAGE)
-      G_THROW("DjVuDocument.no_dir");
+      G_THROW( ERR_MSG("DjVuDocument.no_dir") );
    if (doc_type!=BUNDLED && doc_type!=INDIRECT)
-      G_THROW("DjVuDocument.obsolete");
+      G_THROW( ERR_MSG("DjVuDocument.obsolete") );
    return djvm_dir;
 }
 
@@ -959,7 +959,7 @@ inline GP<DjVmDir0>
 DjVuDocument::get_djvm_dir0(void) const
 {
    if (doc_type!=OLD_BUNDLED)
-      G_THROW("DjVuDocument.old_bundle");
+      G_THROW( ERR_MSG("DjVuDocument.old_bundle") );
    return djvm_dir0;
 }
 

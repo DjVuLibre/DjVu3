@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: GPixmap.cpp,v 1.31 2001-04-12 17:05:32 fcrary Exp $
+// $Id: GPixmap.cpp,v 1.32 2001-04-12 18:50:50 fcrary Exp $
 // $Name:  $
 
 // -- Implements class PIXMAP
@@ -412,7 +412,7 @@ read_integer(char &c, ByteStream &bs)
     }
   // check integer
   if (c<'0' || c>'9')
-    G_THROW("GPixmap.no_int");
+    G_THROW( ERR_MSG("GPixmap.no_int") );
   // eat integer
   while (c>='0' && c<='9') 
     {
@@ -437,7 +437,7 @@ GPixmap::init(ByteStream &bs)
   else if (magic[0]=='P' && magic[1]=='6')
     raw = 1;
   else
-    G_THROW("GPixmap.unk_PPM");
+    G_THROW( ERR_MSG("GPixmap.unk_PPM") );
   // Read image size
   char lookahead = '\n';
   int acolumns = read_integer(lookahead, bs);
@@ -547,7 +547,7 @@ color_correction_table(double gamma, unsigned char gtable[256] )
 {
   // Check argument
   if (gamma<0.1 || gamma>10.0)
-    G_THROW("GPixmap.bad_param");
+    G_THROW( ERR_MSG("GPixmap.bad_param") );
   if (gamma<1.001 && gamma>0.999)
     {
       // Trivial correction
@@ -771,7 +771,7 @@ GPixmap::downsample(const GPixmap *src, int factor, const GRect *pdr)
         pdr->ymin < rect.ymin || 
         pdr->xmax > rect.xmax || 
         pdr->ymax > rect.ymax  )
-      G_THROW("GPixmap.overflow1");
+      G_THROW( ERR_MSG("GPixmap.overflow1") );
     rect = *pdr;
   }
 
@@ -857,7 +857,7 @@ GPixmap::upsample(const GPixmap *src, int factor, const GRect *pdr)
         pdr->ymin < rect.ymin || 
         pdr->xmax > rect.xmax || 
         pdr->ymax > rect.ymax  )
-      G_THROW("GPixmap.overflow2");
+      G_THROW( ERR_MSG("GPixmap.overflow2") );
     rect = *pdr;
   }
   // initialise pixmap
@@ -1061,7 +1061,7 @@ GPixmap::downsample43(const GPixmap *src, const GRect *pdr)
         pdr->ymin < rect.ymin || 
         pdr->xmax > rect.xmax || 
         pdr->ymax > rect.ymax  )
-      G_THROW("GPixmap.overflow3");
+      G_THROW( ERR_MSG("GPixmap.overflow3") );
     rect = *pdr;
     destwidth = rect.width();
     destheight = rect.height();
@@ -1151,7 +1151,7 @@ GPixmap::upsample23(const GPixmap *src, const GRect *pdr)
         pdr->ymin < rect.ymin || 
         pdr->xmax > rect.xmax || 
         pdr->ymax > rect.ymax  )
-      G_THROW("GPixmap.overflow4");
+      G_THROW( ERR_MSG("GPixmap.overflow4") );
     rect = *pdr;
     destwidth = rect.width();
     destheight = rect.height();
@@ -1247,7 +1247,7 @@ void
 GPixmap::attenuate(const GBitmap *bm, int xpos, int ypos)
 {
   // Check
-  if (!bm) G_THROW("GPixmap.null_alpha");
+  if (!bm) G_THROW( ERR_MSG("GPixmap.null_alpha") );
   // Compute number of rows and columns
   int xrows = mini(ypos + (int)bm->rows(), nrows) - maxi(0, ypos),
     xcolumns = mini(xpos + (int) bm->columns(), ncolumns) - maxi(0, xpos);
@@ -1297,7 +1297,7 @@ void
 GPixmap::blit(const GBitmap *bm, int xpos, int ypos, const GPixel *color)
 {
   // Check
-  if (!bm) G_THROW("GPixmap.null_alpha");
+  if (!bm) G_THROW( ERR_MSG("GPixmap.null_alpha") );
   if (!clipok) compute_clip();
   if (!color) return;
   // Compute number of rows and columns
@@ -1353,11 +1353,11 @@ void
 GPixmap::blit(const GBitmap *bm, int xpos, int ypos, const GPixmap *color)
 {
   // Check
-  if (!bm) G_THROW("GPixmap.null_alpha");
-  if (!color) G_THROW("GPixmap.null_color");
+  if (!bm) G_THROW( ERR_MSG("GPixmap.null_alpha") );
+  if (!color) G_THROW( ERR_MSG("GPixmap.null_color") );
   if (!clipok) compute_clip();
   if (bm->rows()!=color->rows() || bm->columns()!=color->columns())
-    G_THROW("GPixmap.diff_size");
+    G_THROW( ERR_MSG("GPixmap.diff_size") );
   // Compute number of rows and columns
   int xrows = mini(ypos + (int)bm->rows(), nrows) - maxi(0, ypos),
       xcolumns = mini(xpos + (int) bm->columns(), ncolumns) - maxi(0, xpos);
@@ -1411,11 +1411,11 @@ void
 GPixmap::blend(const GBitmap *bm, int xpos, int ypos, const GPixmap *color)
 {
   // Check
-  if (!bm) G_THROW("GPixmap.null_alpha");
-  if (!color) G_THROW("GPixmap.null_color");
+  if (!bm) G_THROW( ERR_MSG("GPixmap.null_alpha") );
+  if (!color) G_THROW( ERR_MSG("GPixmap.null_color") );
   if (!clipok) compute_clip();
   if (bm->rows()!=color->rows() || bm->columns()!=color->columns())
-    G_THROW("GPixmap.diff_size");
+    G_THROW( ERR_MSG("GPixmap.diff_size") );
   // Compute number of rows and columns
   int xrows = mini(ypos + (int)bm->rows(), nrows) - maxi(0, ypos),
       xcolumns = mini(xpos + (int) bm->columns(), ncolumns) - maxi(0, xpos);
@@ -1479,7 +1479,7 @@ GPixmap::stencil(const GBitmap *bm,
           pmr->ymin < rect.ymin || 
           pmr->xmax > rect.xmax || 
           pmr->ymax > rect.ymax  )
-        G_THROW("GPixmap.overflow5");
+        G_THROW( ERR_MSG("GPixmap.overflow5") );
       rect = *pmr;
     }
   // Compute number of rows

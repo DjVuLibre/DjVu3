@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocument.cpp,v 1.158 2001-04-12 17:05:31 fcrary Exp $
+// $Id: DjVuDocument.cpp,v 1.159 2001-04-12 18:50:50 fcrary Exp $
 // $Name:  $
 
 
@@ -125,13 +125,13 @@ DjVuDocument::start_init(
    DEBUG_MSG("DjVuDocument::start_init(): initializing class...\n");
    DEBUG_MAKE_INDENT(3);
    if (init_started)
-      G_THROW("DjVuDocument.2nd_init");
+      G_THROW( ERR_MSG("DjVuDocument.2nd_init") );
    if (!get_count())
-      G_THROW("DjVuDocument.not_secure");
+      G_THROW( ERR_MSG("DjVuDocument.not_secure") );
    if(url.is_empty())
    {
      if (!init_data_pool)
-       G_THROW("DjVuDocument.empty_url");
+       G_THROW( ERR_MSG("DjVuDocument.empty_url") );
      if(!init_url)
      {
        init_url=invent_url("document.djvu");
@@ -163,7 +163,7 @@ DjVuDocument::start_init(
      }
      if (!init_data_pool) 
      {
-       G_THROW("DjVuDocument.fail_URL\t"+init_url.get_string());
+       G_THROW( ERR_MSG("DjVuDocument.fail_URL") "\t"+init_url.get_string());
      }
    }
       // Now we say it is ready
@@ -237,7 +237,7 @@ void
 DjVuDocument::check() const
 {
   if (!init_started)
-    G_THROW("DjVuDocument.not_init");
+    G_THROW( ERR_MSG("DjVuDocument.not_init") );
 }
 
 void
@@ -253,9 +253,9 @@ DjVuDocument::static_init_thread(void * cl_data)
     G_TRY {
       th->check_unnamed_files();
       if ((GUTF8String("EOF") == exc.get_cause()) && th->verbose_eof)
-        get_portcaster()->notify_error(th, "DjVuDocument.init_eof");
+        get_portcaster()->notify_error(th, ERR_MSG("DjVuDocument.init_eof") );
       else if (GUTF8String("STOP") == exc.get_cause())
-        get_portcaster()->notify_status(th, "DjVuDocument.stopped");
+        get_portcaster()->notify_status(th, ERR_MSG("DjVuDocument.stopped") );
       else
         get_portcaster()->notify_error(th, exc.get_cause());
     } G_CATCH_ALL {} G_ENDCATCH;
@@ -283,10 +283,10 @@ DjVuDocument::init_thread(void)
    if (!size)
      G_THROW( ERR_MSG("EOF") );
    if (size < 0)
-     G_THROW("DjVuDocument.no_file");
+     G_THROW( ERR_MSG("DjVuDocument.no_file") );
    if (size<8)
    {
-     G_THROW("DjVuDocument.not_DjVu");
+     G_THROW( ERR_MSG("DjVuDocument.not_DjVu") );
    }
    if (chkid=="FORM:DJVM")
    {
@@ -318,7 +318,7 @@ DjVuDocument::init_thread(void)
 	 flags|=DOC_TYPE_KNOWN;
 	 pcaster->notify_doc_flags_changed(this, DOC_TYPE_KNOWN, 0);
 	 check_unnamed_files();
-      } else G_THROW("DjVuDocument.bad_format");
+      } else G_THROW( ERR_MSG("DjVuDocument.bad_format") );
 
       if (doc_type==OLD_BUNDLED)
       {
@@ -337,7 +337,7 @@ DjVuDocument::init_thread(void)
 	 {
 	    int offset;
 	    size=iff.get_chunk(chkid, &offset);
-	    if (size==0) G_THROW("DjVuDocument.no_page");
+	    if (size==0) G_THROW( ERR_MSG("DjVuDocument.no_page") );
 	    if (chkid=="FORM:DJVU" || chkid=="FORM:PM44" || chkid=="FORM:BM44")
 	    {
 	       DEBUG_MSG("Got 1st page offset=" << offset << "\n");
@@ -358,7 +358,7 @@ DjVuDocument::init_thread(void)
 	    }
 	 }
 	 if (!first_page_name.length())
-	    G_THROW("DjVuDocument.no_page");
+	    G_THROW( ERR_MSG("DjVuDocument.no_page") );
 
 	 flags|=DOC_DIR_KNOWN;
 	 pcaster->notify_doc_flags_changed(this, DOC_DIR_KNOWN, 0);
@@ -551,9 +551,9 @@ DjVuDocument::check_unnamed_files(void)
             f->data_pool->set_eof();
             GUTF8String msg;
             if (f->id_type==UnnamedFile::ID)
-              msg="DjVuDocument.miss_page_name\t"+f->id;
+              msg= ERR_MSG("DjVuDocument.miss_page_name") "\t"+f->id;
             else 
-              msg="DjVuDocument.miss_page_num\t"+GUTF8String(f->page_num);
+              msg= ERR_MSG("DjVuDocument.miss_page_num") "\t"+GUTF8String(f->page_num);
             G_THROW(msg);
           }
           ++pos;
@@ -587,7 +587,7 @@ DjVuDocument::check_unnamed_files(void)
             GP<DataPool> new_pool=pcaster->request_data(ufile->file, new_url);
             if(!new_pool)
             {
-              G_THROW("DjVuDocument.fail_URL\t"+new_url.get_string());
+              G_THROW( ERR_MSG("DjVuDocument.fail_URL") "\t"+new_url.get_string());
             }
             ufile->data_pool->connect(new_pool);
 	         }
@@ -659,7 +659,7 @@ DjVuDocument::page_to_url(int page_num) const
 	    if (flags & DOC_DIR_KNOWN)
 	    {
 	       GP<DjVmDir::File> file=djvm_dir->page_to_file(page_num);
-	       if (!file) G_THROW("DjVuDocument.big_num");
+	       if (!file) G_THROW( ERR_MSG("DjVuDocument.big_num") );
 	       url=GURL::UTF8(file->name,init_url);
 	    }
 	    break;
@@ -670,13 +670,13 @@ DjVuDocument::page_to_url(int page_num) const
 	    if (flags & DOC_DIR_KNOWN)
 	    {
 	       GP<DjVmDir::File> file=djvm_dir->page_to_file(page_num);
-	       if (!file) G_THROW("DjVuDocument.big_num");
+	       if (!file) G_THROW( ERR_MSG("DjVuDocument.big_num") );
 	       url=GURL::UTF8(file->name,init_url.base());
 	    }
 	    break;
 	 }
 	 default:
-	    G_THROW("DjVuDocument.unk_type");
+	    G_THROW( ERR_MSG("DjVuDocument.unk_type") );
       }
    return url;
 }
@@ -720,7 +720,7 @@ DjVuDocument::url_to_page(const GURL & url) const
 	    break;
 	 }
 	 default:
-	    G_THROW("DjVuDocument.unk_type");
+	    G_THROW( ERR_MSG("DjVuDocument.unk_type") );
       }
    return page_num;
 }
@@ -1022,24 +1022,24 @@ DjVuDocument::process_threqs(void)
     if (req->thumb_file)
     {
       G_TRY {
-	       // There supposed to be a file with thumbnails
+	       // There is supposed to be a file with thumbnails
         if (req->thumb_file->is_data_present())
         {
-          // Cool we can extract the thumbnail now
+          // Cool, we can extract the thumbnail now
           GP<ByteStream> str=req->thumb_file->get_init_data_pool()->get_stream();
           GP<IFFByteStream> giff=IFFByteStream::create(str);
           IFFByteStream &iff=*giff;
           GUTF8String chkid;
           if (!iff.get_chunk(chkid) || chkid!="FORM:THUM")
-            G_THROW("DjVuDocument.bad_thumb");
+            G_THROW( ERR_MSG("DjVuDocument.bad_thumb") );
           
           for(int i=0;i<req->thumb_chunk;i++)
           {
-            if (!iff.get_chunk(chkid)) G_THROW("DjVuDocument.bad_thumb");
+            if (!iff.get_chunk(chkid)) G_THROW( ERR_MSG("DjVuDocument.bad_thumb") );
             iff.close_chunk();
           }
           if (!iff.get_chunk(chkid) || chkid!="TH44")
-            G_THROW("DjVuDocument.bad_thumb");
+            G_THROW( ERR_MSG("DjVuDocument.bad_thumb") );
           
           // Copy the data
           char buffer[1024];
@@ -1057,7 +1057,7 @@ DjVuDocument::process_threqs(void)
           remove=true;
         }
       } G_CATCH(exc) {
-        GUTF8String msg="DjVuDocument.cant_extract\n";
+        GUTF8String msg= ERR_MSG("DjVuDocument.cant_extract") "\n";
         msg+=exc.get_cause();
         get_portcaster()->notify_error(this, msg);
 	       // Switch this request to the "decoding" mode
@@ -1102,7 +1102,7 @@ DjVuDocument::process_threqs(void)
                   pm=GPixmap::create(*bm);
               }
               if (!pm) 
-                G_THROW("DjVuDocument.cant_render\t"+GUTF8String(req->page_num+1));
+                G_THROW( ERR_MSG("DjVuDocument.cant_render") "\t"+GUTF8String(req->page_num+1));
               
               // Store and compress the pixmap
               GP<IW44Image> iwpix=IW44Image::create_encode(*pm);
@@ -1362,10 +1362,10 @@ DjVuDocument::request_data(const DjVuPort * source, const GURL & url)
 	    {
 	       DEBUG_MSG("The document is in OLD_BUNDLED format\n");
 	       if (url.base()!=init_url)
-		        G_THROW("DjVuDocument.URL_outside\t"+url.get_string());
+		        G_THROW( ERR_MSG("DjVuDocument.URL_outside") "\t"+url.get_string());
 	 
 	       GP<DjVmDir0::FileRec> file=djvm_dir0->get_file(url.fname());
-	       if (!file) G_THROW("DjVuDocument.file_outside\t"+url.fname());
+	       if (!file) G_THROW( ERR_MSG("DjVuDocument.file_outside") "\t"+url.fname());
 	       data_pool=DataPool::create(init_data_pool, file->offset, file->size);
 	    }
 	    break;
@@ -1376,10 +1376,10 @@ DjVuDocument::request_data(const DjVuPort * source, const GURL & url)
 	    {
 	       DEBUG_MSG("The document is in new BUNDLED format\n");
 	       if (url.base()!=init_url)
-		        G_THROW("DjVuDocument.URL_outside\t"+url.get_string());
+		        G_THROW( ERR_MSG("DjVuDocument.URL_outside") "\t"+url.get_string());
 	 
 	       GP<DjVmDir::File> file=djvm_dir->name_to_file(url.fname());
-	       if (!file) G_THROW("DjVuDocument.file_outside\t"+url.fname());
+	       if (!file) G_THROW( ERR_MSG("DjVuDocument.file_outside") "\t"+url.fname());
 	       data_pool=DataPool::create(init_data_pool, file->offset, file->size);
 	    }
 	    break;
@@ -1391,7 +1391,7 @@ DjVuDocument::request_data(const DjVuPort * source, const GURL & url)
 	    DEBUG_MSG("The document is in SINGLE_PAGE or OLD_INDEXED or INDIRECT format\n");
 	    if (flags & DOC_DIR_KNOWN)
 	       if (doc_type==INDIRECT && !djvm_dir->name_to_file(url.fname()))
-		        G_THROW("DjVuDocument.URL_outside2\t"+url.get_string());
+		        G_THROW( ERR_MSG("DjVuDocument.URL_outside2") "\t"+url.get_string());
 	 
 	    if (url.is_local_file_url())
 	    {
@@ -1524,7 +1524,7 @@ DjVuDocument::get_url_names(void)
         // Why is this try/catch block here?
         G_TRY { 
           get_portcaster()->notify_error(this, ex.get_cause()); 
-          GUTF8String emsg = "DjVuDocument.exclude_page\t" + (i+1);
+          GUTF8String emsg = ERR_MSG("DjVuDocument.exclude_page") "\t" + (i+1);
           get_portcaster()->notify_error(this, emsg);
         }
         G_CATCH_ALL
@@ -1555,7 +1555,7 @@ DjVuDocument::get_djvm_doc()
    DEBUG_MSG("DjVuDocument::get_djvm_doc(): creating the DjVmDoc\n");
    DEBUG_MAKE_INDENT(3);
 
-   if (!is_init_complete()) G_THROW("DjVuDocument.init_not_done");
+   if (!is_init_complete()) G_THROW( ERR_MSG("DjVuDocument.init_not_done") );
 
    GP<DjVmDoc> doc=DjVmDoc::create();
 
@@ -1604,7 +1604,7 @@ DjVuDocument::get_djvm_doc()
           {
             G_TRY { 
               get_portcaster()->notify_error(this, ex.get_cause());
-              GUTF8String emsg = "DjVuDocument.skip_page\t" + (page_num+1);
+              GUTF8String emsg = ERR_MSG("DjVuDocument.skip_page") "\t" + (page_num+1);
               get_portcaster()->notify_error(this, emsg);
             }
             G_CATCH_ALL
@@ -1663,7 +1663,7 @@ DjVuDocument::save_as(const GURL &where, const bool bundled)
    { 
      if(!djvu_compress_codec)
      {
-       G_THROW("DjVuDocument.comp_codec");
+       G_THROW( ERR_MSG("DjVuDocument.comp_codec") );
      }
      GP<ByteStream> gmbs=ByteStream::create();
      write(gmbs);

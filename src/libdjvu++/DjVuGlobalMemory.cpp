@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuGlobalMemory.cpp,v 1.14 2001-01-11 20:56:19 bcr Exp $
+// $Id: DjVuGlobalMemory.cpp,v 1.15 2001-04-12 18:50:50 fcrary Exp $
 // $Name:  $
 
 #ifdef NEED_DJVU_MEMORY
@@ -149,7 +149,7 @@ _djvu_new(size_t siz)
 #endif
     if(!(ptr=(*_djvu_new_handler)(siz?siz:1)))
     {
-      G_THROW("DjVuGlobalMemory.exhausted	");
+      G_THROW( ERR_MSG("DjVuGlobalMemory.exhausted") );
     }
 #ifndef UNIX
   }else
@@ -185,7 +185,7 @@ _djvu_newArray(size_t siz)
 #endif
     if(!(ptr=(*newArray_handler)(siz?siz:1)))
     {
-      G_THROW("DjVuGlobalMemory.exhausted	");
+      G_THROW( ERR_MSG("DjVuGlobalMemory.exhausted") );
     }
 #ifndef UNIX
   }else

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: IW44Image.cpp,v 1.8 2001-04-05 19:19:23 bcr Exp $
+// $Id: IW44Image.cpp,v 1.9 2001-04-12 18:50:51 fcrary Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 08/1998
@@ -707,12 +707,12 @@ IW44Image::Map::image(int subsample, const GRect &rect,
   int boxsize = 1<<nlevel;
   // Parameter check
   if (subsample!=(32>>nlevel))
-    G_THROW("IW44Image.sample_factor");
+    G_THROW( ERR_MSG("IW44Image.sample_factor") );
   if (rect.isempty())
-    G_THROW("IW44Image.empty_rect");    
+    G_THROW( ERR_MSG("IW44Image.empty_rect") );    
   GRect irect(0,0,(iw+subsample-1)/subsample,(ih+subsample-1)/subsample);
   if (rect.xmin<0 || rect.ymin<0 || rect.xmax>irect.xmax || rect.ymax>irect.ymax)
-    G_THROW("IW44Image.bad_rect");
+    G_THROW( ERR_MSG("IW44Image.bad_rect") );
   // Multiresolution rectangles 
   // -- needed[i] tells which coeffs are required for the next step
   // -- recomp[i] tells which coeffs need to be computed at this level
@@ -1292,14 +1292,14 @@ IW44Image::create_decode(const ImageType itype)
 int
 IW44Image::encode_chunk(GP<ByteStream>, const IWEncoderParms &)
 {
-  G_THROW("IW44Image.codec_open2");
+  G_THROW( ERR_MSG("IW44Image.codec_open2") );
   return 0;
 }
 
 void 
 IW44Image::encode_iff(IFFByteStream &, int nchunks, const IWEncoderParms *)
 {
-  G_THROW("IW44Image.codec_open2");
+  G_THROW( ERR_MSG("IW44Image.codec_open2") );
 }
 
   
@@ -1431,27 +1431,27 @@ IWBitmap::decode_chunk(GP<ByteStream> gbs)
   struct IW44Image::PrimaryHeader primary;
   ByteStream &bs=*gbs;
   if (bs.readall((void*)&primary, sizeof(primary)) != sizeof(primary))
-    G_THROW("IW44Image.cant_read_primary");
+    G_THROW( ERR_MSG("IW44Image.cant_read_primary") );
   if (primary.serial != cserial)
-    G_THROW("IW44Image.wrong_serial");
+    G_THROW( ERR_MSG("IW44Image.wrong_serial") );
   int nslices = cslice + primary.slices;
   // Read auxilliary headers
   if (cserial == 0)
     {
       struct IW44Image::SecondaryHeader secondary;
       if (bs.readall((void*)&secondary, sizeof(secondary)) != sizeof(secondary))
-        G_THROW("IW44Image.cant_read_secondary");
+        G_THROW( ERR_MSG("IW44Image.cant_read_secondary") );
       if ((secondary.major & 0x7f) != IWCODEC_MAJOR)
-        G_THROW("IW44Image.incompat_codec");
+        G_THROW( ERR_MSG("IW44Image.incompat_codec") );
       if (secondary.minor > IWCODEC_MINOR)
-        G_THROW("IW44Image.recent_codec");
+        G_THROW( ERR_MSG("IW44Image.recent_codec") );
       // Read tertiary header
       struct IW44Image::TertiaryHeader2 tertiary;
       unsigned int header3size = sizeof(tertiary);
       if (bs.readall((void*)&tertiary, header3size) != header3size)
-        G_THROW("IW44Image.cant_read_tertiary");
+        G_THROW( ERR_MSG("IW44Image.cant_read_tertiary") );
       if (! (secondary.major & 0x80))
-        G_THROW("IW44Image.has_color");
+        G_THROW( ERR_MSG("IW44Image.has_color") );
       // Create ymap and ycodec
       int w = (tertiary.xhi << 8) | tertiary.xlo;
       int h = (tertiary.yhi << 8) | tertiary.ylo;
@@ -1488,7 +1488,7 @@ IWBitmap::parm_dbfrac(float frac)
   if (frac>0 && frac<=1)
     db_frac = frac;
   else
-    G_THROW("IW44Image.param_range");
+    G_THROW( ERR_MSG("IW44Image.param_range") );
 }
 
 
@@ -1502,11 +1502,11 @@ void
 IWBitmap::decode_iff(IFFByteStream &iff, int maxchunks)
 {
   if (ycodec)
-    G_THROW("IW44Image.left_open2");
+    G_THROW( ERR_MSG("IW44Image.left_open2") );
   GString chkid;
   iff.get_chunk(chkid);
   if (chkid != "FORM:BM44")
-    G_THROW("IW44Image.corrupt_BM44");
+    G_THROW( ERR_MSG("IW44Image.corrupt_BM44") );
   while (--maxchunks>=0 && iff.get_chunk(chkid))
     {
       if (chkid == "BM44")
@@ -1681,27 +1681,27 @@ IWPixmap::decode_chunk(GP<ByteStream> gbs)
   struct IW44Image::PrimaryHeader primary;
   ByteStream &bs=*gbs;
   if (bs.readall((void*)&primary, sizeof(primary)) != sizeof(primary))
-    G_THROW("IW44Image.cant_read_primary2");
+    G_THROW( ERR_MSG("IW44Image.cant_read_primary2") );
   if (primary.serial != cserial)
-    G_THROW("IW44Image.wrong_serial2");
+    G_THROW( ERR_MSG("IW44Image.wrong_serial2") );
   int nslices = cslice + primary.slices;
   // Read secondary header
   if (cserial == 0)
     {
       struct IW44Image::SecondaryHeader secondary;
       if (bs.readall((void*)&secondary, sizeof(secondary)) != sizeof(secondary))
-        G_THROW("IW44Image.cant_read_secondary2");
+        G_THROW( ERR_MSG("IW44Image.cant_read_secondary2") );
       if ((secondary.major & 0x7f) != IWCODEC_MAJOR)
-        G_THROW("IW44Image.incompat_codec2");
+        G_THROW( ERR_MSG("IW44Image.incompat_codec2") );
       if (secondary.minor > IWCODEC_MINOR)
-        G_THROW("IW44Image.recent_codec2");
+        G_THROW( ERR_MSG("IW44Image.recent_codec2") );
       // Read tertiary header
       struct IW44Image::TertiaryHeader2 tertiary;
       unsigned int header3size = sizeof(tertiary);
       if (secondary.minor < 2)
         header3size = sizeof(IW44Image::TertiaryHeader1);
       if (bs.readall((void*)&tertiary, header3size) != header3size)
-        G_THROW("IW44Image.cant_read_tertiary2");
+        G_THROW( ERR_MSG("IW44Image.cant_read_tertiary2") );
       // Handle header information
       int w = (tertiary.xhi << 8) | tertiary.xlo;
       int h = (tertiary.yhi << 8) | tertiary.ylo;
@@ -1766,7 +1766,7 @@ IWPixmap::parm_dbfrac(float frac)
   if (frac>0 && frac<=1)
     db_frac = frac;
   else
-    G_THROW("IW44Image.param_range2");
+    G_THROW( ERR_MSG("IW44Image.param_range2") );
 }
 
 int 
@@ -1780,11 +1780,11 @@ void
 IWPixmap::decode_iff(IFFByteStream &iff, int maxchunks)
 {
   if (ycodec)
-    G_THROW("IW44Image.left_open4");
+    G_THROW( ERR_MSG("IW44Image.left_open4") );
   GString chkid;
   iff.get_chunk(chkid);
   if (chkid!="FORM:PM44" && chkid!="FORM:BM44")
-    G_THROW("IW44Image.corrupt_BM44_2");
+    G_THROW( ERR_MSG("IW44Image.corrupt_BM44_2") );
   while (--maxchunks>=0 && iff.get_chunk(chkid))
     {
       if (chkid=="PM44" || chkid=="BM44")

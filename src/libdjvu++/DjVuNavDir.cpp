@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuNavDir.cpp,v 1.18 2001-04-12 00:24:59 bcr Exp $
+// $Id: DjVuNavDir.cpp,v 1.19 2001-04-12 18:50:50 fcrary Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -47,13 +47,13 @@
 
 DjVuNavDir::DjVuNavDir(const GURL &dirURL)
 {
-   if (!dirURL) G_THROW("DjVuNavDir.zero_dir");
+   if (!dirURL) G_THROW( ERR_MSG("DjVuNavDir.zero_dir") );
    baseURL=dirURL.base();
 }
 
 DjVuNavDir::DjVuNavDir(ByteStream & str, const GURL &dirURL)
 {
-   if (!dirURL) G_THROW("DjVuNavDir.zero_dir");
+   if (!dirURL) G_THROW( ERR_MSG("DjVuNavDir.zero_dir") );
    
    baseURL=GURL(dirURL).base();
    
@@ -73,7 +73,7 @@ DjVuNavDir::decode(ByteStream & str)
       char * ptr;
       for(ptr=buffer;ptr-buffer<1024;ptr++)
 	 if ((eof=!str.read(ptr, 1)) || *ptr=='\n') break;
-      if (ptr-buffer==1024) G_THROW("DjVuNavDir.long_line");
+      if (ptr-buffer==1024) G_THROW( ERR_MSG("DjVuNavDir.long_line") );
       *ptr=0;
       if (!strlen(buffer)) continue;
 
@@ -144,9 +144,10 @@ DjVuNavDir::page_to_name(int page) const
 {
    GCriticalSectionLock lk((GCriticalSection *)&lock);
    
-   if (page<0) G_THROW("DjVuNavDir.neg_page");
+   if (page<0) 
+      G_THROW( ERR_MSG("DjVuNavDir.neg_page") );
    if (page>=page2name.size())
-      G_THROW("DjVuNavDir.large_page");
+      G_THROW( ERR_MSG("DjVuNavDir.large_page") );
    return page2name[page];
 }
 
@@ -183,7 +184,7 @@ DjVuNavDir::delete_page(int page_num)
    int pages=page2name.size();
    
    if (page_num<0 || page_num>=pages)
-      G_THROW("DjVuNavDir.bad_page");
+      G_THROW( ERR_MSG("DjVuNavDir.bad_page") );
 
    for(int i=page_num;i<pages-1;i++)
       page2name[i]=page2name[i+1];

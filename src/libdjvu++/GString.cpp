@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.50 2001-04-12 17:05:32 fcrary Exp $
+// $Id: GString.cpp,v 1.51 2001-04-12 18:50:50 fcrary Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -572,7 +572,7 @@ GString::GString(const char fmt[], va_list args)
   {
     // This isn't as fatal since it is on the stack, but we
     // definitely should stop the current operation.
-    G_THROW("GString.overwrite");
+    G_THROW( ERR_MSG("GString.overwrite") );
   }
 #endif
   // Go altering the string
@@ -734,7 +734,7 @@ hash(const GString &str)
 void 
 GString::throw_illegal_subscript()
 {
-  G_THROW("GString.bad_subscript");
+  G_THROW( ERR_MSG("GString.bad_subscript") );
 }
 
 #ifdef HAS_ICONV

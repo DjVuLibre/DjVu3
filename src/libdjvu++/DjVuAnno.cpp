@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuAnno.cpp,v 1.76 2001-04-12 17:05:31 fcrary Exp $
+// $Id: DjVuAnno.cpp,v 1.77 2001-04-12 18:50:50 fcrary Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -234,6 +234,19 @@ GLObject::print(ByteStream & str, int compact, int indent, int * cur_pos) const
   if (aldel_cur_pos) delete cur_pos;
 }
 
+//  This function constructs message names for external lookup.
+//  The message names are constructed to avoid the problems of concatenating
+//  phrases (which does not translate well into other languages). The
+//  message names that can be generated are (listed here to appease the
+//  auditing program which reads comments):
+//    ERR_MSG("DjVuAnno.invalid2number"), ERR_MSG("DjVuAnno.string2number"),
+//    ERR_MSG("DjVuAnno.symbol2number"), ERR_MSG("DjVuAnno.list2number")
+//    ERR_MSG("DjVuAnno.invalid2string"), ERR_MSG("DjVuAnno.number2string"),
+//    ERR_MSG("DjVuAnno.symbol2string"), ERR_MSG("DjVuAnno.list2string")
+//    ERR_MSG("DjVuAnno.invalid2symbol"), ERR_MSG("DjVuAnno.number2symbol"),
+//    ERR_MSG("DjVuAnno.string2symbol"), ERR_MSG("DjVuAnno.list2symbol")
+//    ERR_MSG("DjVuAnno.invalid2list"), ERR_MSG("DjVuAnno.number2list"),
+//    ERR_MSG("DjVuAnno.string2list"), ERR_MSG("DjVuAnno.symbol2list")
 void
 GLObject::throw_can_not_convert_to(const GLObjectType to) const
 {

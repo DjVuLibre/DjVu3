@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuImage.cpp,v 1.68 2001-04-12 17:05:31 fcrary Exp $
+// $Id: DjVuImage.cpp,v 1.69 2001-04-12 18:50:50 fcrary Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -441,7 +441,7 @@ GP<DataPool>
 DjVuImageNotifier::request_data(const DjVuPort *src, const GURL & url)
 {
   if (url!=stream_url)
-    G_THROW("DjVuImage.not_decode");
+    G_THROW( ERR_MSG("DjVuImage.not_decode") );
   return stream_pool;
 }
 
@@ -472,7 +472,7 @@ DjVuImage::decode(ByteStream & str, DjVuInterface *notifier)
   DEBUG_MSG("DjVuImage::decode(): decoding old way...\n");
   DEBUG_MAKE_INDENT(3);
   if (file) 
-    G_THROW("DjVuImage.bad_call");
+    G_THROW( ERR_MSG("DjVuImage.bad_call") );
   GP<DjVuImageNotifier> pport = new DjVuImageNotifier(notifier);
   pport->stream_url=GURL::UTF8("internal://fake/fake.djvu");
   pport->stream_pool=DataPool::create();
@@ -490,7 +490,7 @@ DjVuImage::decode(ByteStream & str, DjVuInterface *notifier)
   if (file->is_decode_failed())
     G_THROW( ERR_MSG("EOF") );  // a guess
   if (!file->is_decode_ok())
-    G_THROW("DjVuImage.mult_error");
+    G_THROW( ERR_MSG("DjVuImage.mult_error") );
   DEBUG_MSG("decode DONE\n");
 }
 
@@ -858,7 +858,7 @@ DjVuImage::stencil(GPixmap *pm, const GRect &rect,
           int lastx = 0;
           int colorindex = fg->colordata[components[pos]];
           if (colorindex >= palettesize)
-            G_THROW("DjVuImage.corrupted");
+            G_THROW( ERR_MSG("DjVuImage.corrupted") );
           // Gather relevant components and relevant rectangle
           GList<int> compset;
           GRect comprect;
@@ -1068,7 +1068,7 @@ do_bitmap(const DjVuImage &dimg, BImager get,
   // Sanity
   if (! ( all.contains(rect.xmin, rect.ymin) &&
           all.contains(rect.xmax-1, rect.ymax-1) ))
-    G_THROW("DjVuImage.bad_rect");
+    G_THROW( ERR_MSG("DjVuImage.bad_rect") );
   // Check for integral reduction
   int red;
   int w = dimg.get_real_width();
@@ -1147,7 +1147,7 @@ do_pixmap(const DjVuImage &dimg, PImager get,
   // Sanity
   if (! ( all.contains(rect.xmin, rect.ymin) &&
           all.contains(rect.xmax-1, rect.ymax-1) ))
-    G_THROW("DjVuImage.bad_rect2");
+    G_THROW( ERR_MSG("DjVuImage.bad_rect2") );
   // Check for integral reduction
   int red, w=0, h=0, rw=0, rh=0;
   w = dimg.get_real_width();

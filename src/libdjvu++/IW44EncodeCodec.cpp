@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: IW44EncodeCodec.cpp,v 1.12 2001-04-05 19:19:23 bcr Exp $
+// $Id: IW44EncodeCodec.cpp,v 1.13 2001-04-12 18:50:51 fcrary Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 08/1998
@@ -1394,9 +1394,9 @@ IWBitmap::Encode::encode_chunk(GP<ByteStream> gbs, const IWEncoderParms &parm)
 {
   // Check
   if (parm.slices==0 && parm.bytes==0 && parm.decibels==0)
-    G_THROW("IW44Image.need_stop");
+    G_THROW( ERR_MSG("IW44Image.need_stop") );
   if (! ymap)
-    G_THROW("IW44Image.empty_object");
+    G_THROW( ERR_MSG("IW44Image.empty_object") );
   // Open codec
   if (!ycodec_enc)
   {
@@ -1468,7 +1468,7 @@ void
 IWBitmap::Encode::encode_iff(IFFByteStream &iff, int nchunks, const IWEncoderParms *parms)
 {
   if (ycodec_enc)
-    G_THROW("IW44Image.left_open1");
+    G_THROW( ERR_MSG("IW44Image.left_open1") );
   int flag = 1;
   iff.put_chunk("FORM:BM44", 1);
   DJVU_PROGRESS_TASK(iff,"encode iff chunk",nchunks);
@@ -1577,7 +1577,7 @@ void
 IWPixmap::Encode::encode_iff(IFFByteStream &iff, int nchunks, const IWEncoderParms *parms)
 {
   if (ycodec_enc)
-    G_THROW("IW44Image.left_open3");
+    G_THROW( ERR_MSG("IW44Image.left_open3") );
   int flag = 1;
   iff.put_chunk("FORM:PM44", 1);
   DJVU_PROGRESS_TASK(iff,"encode pixmap chunk", nchunks);
@@ -1607,9 +1607,9 @@ IWPixmap::Encode::encode_chunk(GP<ByteStream> gbs, const IWEncoderParms &parm)
 {
   // Check
   if (parm.slices==0 && parm.bytes==0 && parm.decibels==0)
-    G_THROW("IW44Image.need_stop2");
+    G_THROW( ERR_MSG("IW44Image.need_stop2") );
   if (!ymap)
-    G_THROW("IW44Image.empty_object2");
+    G_THROW( ERR_MSG("IW44Image.empty_object2") );
   // Open
   if (!ycodec_enc)
   {

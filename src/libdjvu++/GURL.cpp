@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GURL.cpp,v 1.59 2001-04-12 17:05:32 fcrary Exp $
+// $Id: GURL.cpp,v 1.60 2001-04-12 18:50:51 fcrary Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -277,7 +277,7 @@ GURL::init(const bool nothrow)
       {
         validurl=false;
         if(!nothrow)
-          G_THROW("GURL.no_protocol\t"+url);
+          G_THROW( ERR_MSG("GURL.no_protocol") "\t"+url);
         return;
       }
 
@@ -304,7 +304,7 @@ GURL::init(const bool nothrow)
          {
            validurl=false;
            if(!nothrow)
-             G_THROW("GURL.fail_to_file");
+             G_THROW( ERR_MSG("GURL.fail_to_file") );
            return;
          }
          url=GURL::Filename::UTF8(tmp).get_string();
@@ -312,7 +312,7 @@ GURL::init(const bool nothrow)
          {
            validurl=false;
            if(!nothrow)
-             G_THROW("GURL.fail_to_URL");
+             G_THROW( ERR_MSG("GURL.fail_to_URL") );
            return;
          }
             // Return the argument back
