@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuPort.cpp,v 1.4 1999-06-03 16:46:45 eaf Exp $
+//C- $Id: DjVuPort.cpp,v 1.5 1999-06-22 19:14:51 leonb Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -129,11 +129,11 @@ DjVuPortcaster::copy_routes(DjVuPort * dst, const DjVuPort * src)
    for(GPosition pos=route_map;pos;++pos)
    {
       GList<void *> & list=*(GList<void *> *) route_map[pos];
-      if (route_map.key(pos)==src)
+      if (route_map.key(pos) == src)
 	 for(GPosition pos=list;pos;++pos)
 	    add_route(dst, (DjVuPort *) list[pos]);
       for(GPosition pos=list;pos;++pos)
-	 if (list[pos]==src)
+	 if ((DjVuPort*)(list[pos]) == src)
 	    add_route((DjVuPort *) route_map.key(pos), dst);
    }
 }

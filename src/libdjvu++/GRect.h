@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GRect.h,v 1.9 1999-03-17 19:24:57 leonb Exp $
+//C- $Id: GRect.h,v 1.10 1999-06-22 19:14:51 leonb Exp $
 
 
 #ifndef _GRECT_H_
@@ -30,7 +30,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GRect.h,v 1.9 1999-03-17 19:24:57 leonb Exp $# */
+    #$Id: GRect.h,v 1.10 1999-06-22 19:14:51 leonb Exp $# */
 //@{
 
 #include "DjVuGlobal.h"
@@ -163,8 +163,8 @@ private:
   int   code;
   // Helper
   void  precalc();
-  friend int operator*(int, GRatio);
-  friend int operator/(int, GRatio);
+  friend int operator*(int n, GRatio r ) { return (n * r.p + r.q/2) / r.q; };
+  friend int operator/(int n, GRatio r ) { return (n * r.q + r.p/2) / r.p; };
   GRatio rw;
   GRatio rh;
 };

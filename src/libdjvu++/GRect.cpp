@@ -9,11 +9,11 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GRect.cpp,v 1.6 1999-03-17 19:24:57 leonb Exp $
+//C- $Id: GRect.cpp,v 1.7 1999-06-22 19:14:51 leonb Exp $
 
 
 // -- Implementation of class GRect and GRectMapper
-// - File "$Id: GRect.cpp,v 1.6 1999-03-17 19:24:57 leonb Exp $"
+// - File "$Id: GRect.cpp,v 1.7 1999-06-22 19:14:51 leonb Exp $"
 // - Author: Leon Bottou, 05/1997
 
 #ifdef __GNUC__
@@ -171,18 +171,6 @@ GRectMapper::GRatio::GRatio(int p, int q)
     }
   p /= gcd;
   q /= gcd;
-}
-
-inline int
-operator* (int n, GRectMapper::GRatio r )
-{
-  return (n * r.p + r.q/2) / r.q;
-}
-
-inline int
-operator/ (int n, GRectMapper::GRatio r )
-{
-  return (n * r.q + r.p/2) / r.p;
 }
 
 

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: MMX.cpp,v 1.2 1999-06-08 16:02:46 leonb Exp $
+//C- $Id: MMX.cpp,v 1.3 1999-06-22 19:14:51 leonb Exp $
 
 
 
@@ -124,7 +124,8 @@ MMXControl::enable_mmx()
            and     eax,4
            jnz     fini
            mov     eax,1           ; execute CPUID
-           cpuid
+           _emit   0xf
+           _emit   0xa2
          fini:
            mov     cpuflags,edx 
          }
