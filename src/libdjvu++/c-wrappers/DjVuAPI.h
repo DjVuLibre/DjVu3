@@ -1,4 +1,4 @@
-/* File "$Id: DjVuAPI.h,v 1.20 2000-01-07 16:58:50 praveen Exp $"
+/* File "$Id: DjVuAPI.h,v 1.21 2000-01-12 14:29:31 bcr Exp $"
  *
  * The main header file for the DjVu API
  */
@@ -8,7 +8,10 @@
 
 /* 
  * $Log: DjVuAPI.h,v $
- * Revision 1.20  2000-01-07 16:58:50  praveen
+ * Revision 1.21  2000-01-12 14:29:31  bcr
+ * Removed djvu_run_image and exposed more of GBitmap to the rest of the libraries.
+ *
+ * Revision 1.20  2000/01/07 16:58:50  praveen
  * updated
  *
  * Revision 1.19  2000/01/06 04:34:03  bcr
@@ -181,42 +184,7 @@ extern "C" {
 
 
 
-/*		  to allocate, or they may use their own allocation routine.
- * 
- *      djvu_run_image
- *		See DjVuAPI-2_0.html#djvu_run_image
- */
-             typedef enum { BIT_RUN=0, GRAY_RUN, COLOR_RUN , BITMAP_RUNS, BIT_FLAGS} djvu_run_image_type;
-             typedef struct djvu_run_image_struct
-             {
-               unsigned int    w;      /* width of the image in pixels */
-               unsigned int    h;      /* height of the image in pixels */
-               unsigned int    nruns;  /* number of runs */
-               unsigned char   *runs;  /* pointer to the run data */
-               unsigned int    xdpi;    /* DPI of the mask */
-               unsigned int    ydpi;    /* DPI of the mask */
-               djvu_run_image_type runtype;
-							 int flags;
-#ifdef __cplusplus
-               djvu_run_image_struct();
-#endif
-             }
-             djvu_run_image;
-#ifdef __cplusplus
-             inline
-             djvu_run_image_struct::djvu_run_image_struct()
-             : w(0), h(0), nruns(0), runs(0), xdpi(0), ydpi(0), flags(0) {}
-#endif
 /* 
- *           Deallocation:
- */
-                  DJVUAPI void
-                  djvu_run_image_free(djvu_run_image *);
-/* 
- *                Deallocates any allocated pointers and the
- *                structure.  Only use if the structure was
- *                allocated by another DjVu API call.
- * 
  *      djvu_halfcoded_image
  *		See DjVuAPI-2_0.html#djvu_halfcoded_image
  */
@@ -582,37 +550,7 @@ extern "C" {
  *                Use free() to deallocate this structure if it
  *                was allocated using djvu_render_parms_init.
  */ 
-             typedef struct djvu_pixel_to_bitonal_parms_struct
-             {
-               /* size --
-                * -- Size in bytes of the parameters data structure
-                */
-                size_t size;
 
-               /* threshold --
-                * if USER_SPECIFIED flag is set
-                * contains the user specified threshold value
-                * else contains the computed optimum threshold value
-                */
-
-                unsigned char threshold;
-                int flags;
-#define         USER_SPECIFIED  0x01
-#define         OPTIMIZED       0x02
-
-#ifdef __cplusplus
-                djvu_pixel_to_bitonal_parms_struct();
-#endif
-
-             } djvu_pixel_to_bitonal_parms;
-
-#ifdef __cplusplus
-             inline
-             djvu_pixel_to_bitonal_parms_struct::djvu_pixel_to_bitonal_parms_struct()
-                                         : size(sizeof(djvu_pixel_to_bitonal_parms)),
-                                           threshold(128), flags(2)
-             { }
-#endif   
 /*
  * ----------------------------------------------------------------------------
  * 
@@ -707,9 +645,9 @@ djvu_error_callback ( const char cause[], const char file[], const int line);
  *
  * 		See DjVuAPI-2_0.html#djvu_mask
  */
-             DJVUAPI djvu_run_image *
+             DJVUAPI djvu_image *
              djvu_mask ( const djvu_mask_parms  *parms,
-                         const djvu_pixel_image img[]
+                         const djvu_image img[]
                          );
 /* 
  *      djvu_encode_document
@@ -718,8 +656,8 @@ djvu_error_callback ( const char cause[], const char file[], const int line);
  */
              DJVUAPI int
              djvu_encode_document( const djvu_encode_document_parms *parms,
-                          const djvu_run_image     *mask,
-                          const djvu_pixel_image   *img, /* Optional */
+                          const djvu_image     *mask,
+                          const djvu_image   *img, /* Optional */
                           djvu_output_sub *outf,
                           void *arg
                           );
@@ -730,7 +668,7 @@ djvu_error_callback ( const char cause[], const char file[], const int line);
  */
              DJVUAPI int
              djvu_encode_photo( const djvu_encode_photo_parms *parms,
-                          const djvu_pixel_image   img[],
+                          const djvu_image   img[],
                           djvu_output_sub *outf,
                           void *arg
                           );
@@ -748,7 +686,7 @@ djvu_error_callback ( const char cause[], const char file[], const int line);
  *
  * 		See DjVuAPI-2_0.html#djvu_render
  */
-             DJVUAPI djvu_pixel_image *
+             DJVUAPI djvu_image *
              djvu_render ( const djvu_render_parms *parms,
                            const djvu_halfcoded_image *dimg,
                            const int subsample,
@@ -760,7 +698,7 @@ djvu_error_callback ( const char cause[], const char file[], const int line);
  *
  * 		See DjVuAPI-2_0.html#djvu_render
  */
-             DJVUAPI djvu_pixel_image *
+             DJVUAPI djvu_image *
              djvu_render_area ( const djvu_render_parms *parms,
                            const djvu_halfcoded_image *dimg,
                            const int xmin, const int ymin,
@@ -768,68 +706,60 @@ djvu_error_callback ( const char cause[], const char file[], const int line);
 			   const int angle, const int width, const int height
                          );
 /* 
- *      djvu_pnm_to_pixel
+ *      djvu_dstrea_to_image
  *
- * 		See DjVuAPI-2_0.html#djvu_pnm_to_pixel
+ * 		See DjVuAPI-2_0.html#djvu_dstream_to_image
  */
-DJVUAPI djvu_pixel_image * 
-djvu_pnm_to_pixel(djvu_input_sub *, void *);
-DJVUAPI djvu_pixel_image * 
-djvu_bmp_to_pixel(djvu_input_sub *, void *);
-DJVUAPI djvu_pixel_image * 
-djvu_pict_to_pixel(djvu_input_sub *, void *);
 #ifdef NEED_JPEG_DECODER
-DJVUAPI djvu_pixel_image * 
-djvu_jpeg_to_pixel(djvu_input_sub *, void *);
+DJVUAPI djvu_image * 
+djvu_dstream_to_image(djvu_input_sub *, void *);
 #endif
 /* 
- *      djvu_pixel_flip
+ *      djvu_image_flip
  *
- * 		See DjVuAPI-2_0.html#djvu_pixel_flip
+ * 		See DjVuAPI-2_0.html#djvu_image_flip
  */
-DJVUAPI djvu_pixel_image * 
-djvu_pixel_flip(djvu_pixel_image []);
+DJVUAPI djvu_image * 
+djvu_image_flip(djvu_image []);
 /* 
- *      djvu_pixel_mirror
+ *      djvu_image_mirror
  *
- * 		See DjVuAPI-2_0.html#djvu_pixel_mirror
+ * 		See DjVuAPI-2_0.html#djvu_image_mirror
  */
-DJVUAPI djvu_pixel_image * 
-djvu_pixel_mirror(djvu_pixel_image []);
+DJVUAPI djvu_image * 
+djvu_image_mirror(djvu_image []);
 /* 
- *      djvu_pixel_gray
+ *      djvu_image_gray
  *
- * 		See DjVuAPI-2_0.html#djvu_pixel_gray
+ * 		See DjVuAPI-2_0.html#djvu_image_gray
  */
-DJVUAPI djvu_pixel_image *
-djvu_pixel_gray(djvu_pixel_image []);
+DJVUAPI djvu_image *
+djvu_image_gray(djvu_image []);
 /* 
- *      djvu_pixel_to_native
+ *      djvu_image_to_native
  *
- * 		See DjVuAPI-2_0.html#djvu_pixel_to_native
+ * 		See DjVuAPI-2_0.html#djvu_image_to_native
  */
-DJVUAPI djvu_pixel_image *
-djvu_pixel_to_native(djvu_pixel_image []);
+DJVUAPI djvu_image *
+djvu_image_to_native(djvu_image []);
 /* 
- *      djvu_pixel_to_pnm
+ *      djvu_image_to_pnm
  *
- * 		See DjVuAPI-2_0.html#djvu_pixel_to_pnm
+ * 		See DjVuAPI-2_0.html#djvu_image_to_pnm
  */
 DJVUAPI int
-djvu_pixel_to_pnm(djvu_pixel_image [],djvu_output_sub *,void *);
+djvu_image_to_pnm(djvu_image [],djvu_output_sub *,void *);
 DJVUAPI int
-djvu_pixel_to_bmp(djvu_pixel_image [],djvu_output_sub *,void *);
+djvu_image_to_bmp(djvu_image [],djvu_output_sub *,void *);
 DJVUAPI int
-djvu_pixel_to_pict(djvu_pixel_image [],djvu_output_sub *,void *);
+djvu_image_to_pict(djvu_image [],djvu_output_sub *,void *);
 DJVUAPI int
-djvu_pixel_to_ps(djvu_pixel_image [],djvu_output_sub *,void *);
+djvu_image_to_ps(djvu_image [],djvu_output_sub *,void *);
 /* 
  *      djvu_pnm_to_run
  *
  * 		See DjVuAPI-2_0.html#djvu_pnm_to_run
  */
-DJVUAPI djvu_run_image *
-djvu_pnm_to_run(djvu_input_sub *inpf, void *arg);
 
 // alloc functions return a handle which is used for 
 // further calls
@@ -837,81 +767,50 @@ DJVUAPI void *
 djvu_alloc_mtiff_reader(djvu_input_sub * inpf,djvu_seek_sub *seekf,void * iarg);
 DJVUAPI void *
 djvu_alloc_mtiff_writer(djvu_output_sub * outf, void * oarg);
-DJVUAPI djvu_run_image *
-djvu_mtiff_to_run(void * handle, int pageNum);
-DJVUAPI djvu_pixel_image *
-djvu_mtiff_to_pixel(void * handle, int pageNum);
+DJVUAPI djvu_image *
+djvu_mtiff_to_dstream(void * handle, int pageNum);
 DJVUAPI int
-djvu_run_to_mtiff(void * handle, djvu_run_image rimg[]);
-DJVUAPI int
-djvu_pixel_to_mtiff(void * handle, djvu_pixel_image pimg[]);
+djvu_image_to_mtiff(void * handle, djvu_image pimg[]);
 DJVUAPI void
 djvu_free_mtiff(void * handle);
-/*
- *      djvu_set_pixel_to_bitonal
- *  Set the djvu_pixel_to_bitonal falg to OFF
- *  so that, djvu_pixel_to_run conversion uses the
- *  COLOR_RUN, GRAY_RUN encoding for COLOR, GRAY images
- *  respectively.
- *  Default behaviour is COLOR or GRAY images are converted
- *  into bitonal and then are encoded as BIT_RUN type.
- */
-typedef enum {OFF, ON}OnOff;
-void djvu_set_pixel_to_bitonal(OnOff val);
-char djvu_get_pixel_to_bitonal();
 
 /* 
- *      djvu_pixel_to_run
+ *      djvu_image_to_bitonal
  *
- * 		See DjVuAPI-2_0.html#djvu_pixel_to_run
+ * 		See DjVuAPI-2_0.html#djvu_image_to_bitonal
  */
-DJVUAPI djvu_run_image *
-djvu_pixel_to_run(const djvu_pixel_image pimg[]);
-/* 
- *      djvu_run_to_pixel
- *
- * 		See DjVuAPI-2_0.html#djvu_run_to_pixel
- */
-DJVUAPI djvu_pixel_image *
-djvu_run_to_pixel(const djvu_run_image rimg[]);
+DJVUAPI djvu_image *
+djvu_image_to_bitonal(const djvu_image pimg[],const int threshold);
 
-DJVUAPI djvu_pixel_image *
-io_run_to_pixel(const djvu_run_image rimg[]); /** ONLY internally used */
 /*
  * For freeing memory allocated by the callbacks
  */ 
 DJVUAPI void
 io_free_callback(void * callbackStruct);
 /*
- *      djvu_pixel_copy_transformed
+ *      djvu_image_copy_transformed
  *
  *		Not documented yet.
  */
-DJVUAPI djvu_pixel_image *
-djvu_pixel_copy_transformed
-(const djvu_pixel_image im[],int angle,int w,int h);
+DJVUAPI djvu_image *
+djvu_image_copy_transformed
+(const djvu_image im[],int angle,int w,int h);
 /*
- *      djvu_pixel_transform
+ *      djvu_image_transform
  *
  *		Not documented yet.
  */
-DJVUAPI djvu_pixel_image *
-djvu_pixel_transform
-(djvu_pixel_image pimg[],int angle,int w,int h);
+DJVUAPI djvu_image *
+djvu_image_transform
+(djvu_image pimg[],int angle,int w,int h);
 /*
- *      djvu_pixel_rotate
+ *      djvu_image_rotate
  *
  *		Not documented yet.
  */
-DJVUAPI djvu_pixel_image *
-djvu_pixel_rotate(djvu_pixel_image pimg[], int angle);
-/* 
- *      djvu_run_to_pnm
- *
- * 		See DjVuAPI-2_0.html#djvu_run_to_pnm
- */
-DJVUAPI int
-djvu_run_to_pnm(const djvu_run_image [],djvu_output_sub *,void *);
+DJVUAPI djvu_image *
+djvu_image_rotate(djvu_image pimg[], int angle);
+
 /* 
  *      djvu_counts_left
  *
@@ -919,15 +818,6 @@ djvu_run_to_pnm(const djvu_run_image [],djvu_output_sub *,void *);
  */
 DJVUAPI int
 djvu_counts_left();
-/*
- *      djvu_pixel_to_bitonal_run
- *
- *          Converts a pixel Image to Bitonal Run Image;
- */
-DJVUAPI djvu_run_image*
-djvu_pixel_to_bitonal_run(const djvu_pixel_to_bitonal_parms *parms, const djvu_pixel_image pimg[]);
-DJVUAPI djvu_run_image*
-djvu_run_to_native(djvu_run_image rimg[]);
 
 #ifdef __cplusplus
 }

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GBitmap.h,v 1.15 1999-12-20 01:16:38 bcr Exp $
+//C- $Id: GBitmap.h,v 1.16 2000-01-12 14:29:31 bcr Exp $
 
 #ifndef _GBITMAP_H_
 #define _GBITMAP_H_
@@ -45,7 +45,7 @@ class GMonitor;
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: GBitmap.h,v 1.15 1999-12-20 01:16:38 bcr Exp $#
+    #$Id: GBitmap.h,v 1.16 2000-01-12 14:29:31 bcr Exp $#
 
  */
 //@{
@@ -320,6 +320,8 @@ public:
       null pointer if the GBitmap object does not ``own'' the buffer in the
       first place.  */
   unsigned char *take_data(size_t &offset);
+  /** Return a pointer to the rle data */
+  const unsigned char *get_rle(unsigned int &rle_length);
   /** Initializes this GBitmap by borrowing a memory segment.  The GBitmap
       then directly addresses the memory buffer #data# provided by the user.
       This buffer must be large enough to hold #w*h# bytes representing each
@@ -373,6 +375,15 @@ private:
   void read_pbm_raw(ByteStream &ref); 
   void read_pgm_raw(ByteStream &ref); 
   void read_rle_raw(ByteStream &ref); 
+  static void append_run(unsigned char *&data,const int count);
+  static void append_line
+  (unsigned char *&data,const unsigned char *row,const int rowlen,bool invert=true);
+
+  static inline int read_run(unsigned char *&data);
+  static inline int read_run(const unsigned char *&data);
+  static unsigned char ** makerows(int,int, unsigned char *);
+  friend class DjVu_Stream;
+  friend class DjVu_PixImage;
 public:
 #ifdef DEBUG
   void check_border() const;
@@ -497,6 +508,23 @@ GBitmap::euclidian_ratio(int a, int b, int &q, int &r)
     q -= 1;
     r += b;
   }
+}
+
+
+inline int
+GBitmap::read_run(unsigned char *&data)
+{
+  register int z=*data++;
+  return (z>=RUNOVERFLOWVALUE)?
+    ((z&~RUNOVERFLOWVALUE)<<8)|(*data++):z;
+}
+
+inline int
+GBitmap::read_run(const unsigned char *&data)
+{
+  register int z=*data++;
+  return (z>=RUNOVERFLOWVALUE)?
+    ((z&~RUNOVERFLOWVALUE)<<8)|(*data++):z;
 }
 
 // ---------------- THE END

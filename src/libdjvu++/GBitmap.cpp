@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GBitmap.cpp,v 1.20 1999-12-20 01:16:38 bcr Exp $
+//C- $Id: GBitmap.cpp,v 1.21 2000-01-12 14:29:31 bcr Exp $
 
 
 #ifdef __GNUC__
@@ -23,7 +23,7 @@
 #include "GString.h"
 #include "GThreads.h"
 
-// File "$Id: GBitmap.cpp,v 1.20 1999-12-20 01:16:38 bcr Exp $"
+// File "$Id: GBitmap.cpp,v 1.21 2000-01-12 14:29:31 bcr Exp $"
 // - Author: Leon Bottou, 05/1997
 
 
@@ -278,7 +278,14 @@ GBitmap::take_data(size_t &offset)
   return ret;
 }
 
-
+const unsigned char *
+GBitmap::get_rle(unsigned int &rle_length)
+{
+  if(!rle)
+    compress();
+  rle_length=rlelength;
+  return rle; 
+}
 
 // ----- compression
 
@@ -482,9 +489,7 @@ GBitmap::blit(const GBitmap *bm, int x, int y)
       char p = 0;
       while (sr >= 0)
         {
-          int z = *runs++;
-          if (z >= (int)RUNOVERFLOWVALUE)
-            z = *runs++ + ((z - (int)RUNOVERFLOWVALUE) << 8);
+          const int z = read_run(runs);
           if (sc+z > bm->ncolumns)
             THROW("RLE: synchronization lost");
           int nc = sc + z;
@@ -585,9 +590,7 @@ GBitmap::blit(const GBitmap *bm, int xh, int yh, int subsample)
       int dc1 = zdc1;
       while (sr >= 0)
         {
-          int z = *runs++;
-          if (z >= (int)RUNOVERFLOWVALUE)
-            z = *runs++ + ((z - (int)RUNOVERFLOWVALUE) << 8);
+          int z = read_run(runs);
           if (sc+z > bm->ncolumns)
             THROW("RLE: synchronization lost");
           int nc = sc + z;
@@ -748,17 +751,16 @@ void
 GBitmap::read_rle_raw(ByteStream &bs)
 {
   // interpret runs data
-  int x, c, n;
   unsigned char h;
   unsigned char p = 0;
   unsigned char *row = bytes_data + border;
-  n = nrows - 1;
+  int n = nrows - 1;
   row += n * bytes_per_row;
-  c = 0;
+  int c = 0;
   while (n >= 0)
     {
       bs.read(&h, 1);
-      x = h;
+      int x = h;
       if (x >= (int)RUNOVERFLOWVALUE)
         {
           bs.read(&h, 1);
@@ -912,24 +914,18 @@ GBitmap::save_rle(ByteStream &bs)
 // ------ runs
 
 
-static unsigned char **
-makerows(int nrows, int ncolumns, unsigned char *runs)
+unsigned char **
+GBitmap::makerows(int nrows, int ncolumns, unsigned char *runs)
 {
   int r = nrows;
   unsigned char **rlerows = new unsigned char* [nrows];
   while (r-- > 0)
     {
-      int c=0;
       rlerows[r] = runs;
-      while (c<ncolumns)
-        {
-          int x = *runs++;
-          if (x>=(int)GBitmap::RUNOVERFLOWVALUE)
-            x = ((x&(int)GBitmap::RUNMSBMASK)<<8) | (*runs++);
-          c += x;
-          if (c > ncolumns)
-            THROW("(GBitmap::decode) RLE synchronization lost");
-        }
+      int c;
+      for(c=0;c<ncolumns;c+=GBitmap::read_run(runs));
+      if (c > ncolumns)
+        THROW("(GBitmap::decode) RLE synchronization lost");
     }
   return rlerows;
 }
@@ -950,11 +946,8 @@ GBitmap::rle_get_bits(int rowno, unsigned char *bits) const
   unsigned char *runs = rlerows[rowno];
   while (c < ncolumns)
     {
-      int x = *runs++;
-      if (x>=(int)RUNOVERFLOWVALUE)
-        x = ((x&(int)RUNMSBMASK)<<8) | (*runs++);
-      c += x;
-      if (c>ncolumns)
+      const int x=read_run(runs);
+      if ((c+=x)>ncolumns)
         c = ncolumns;
       while (n<c)
         bits[n++] = p;
@@ -979,10 +972,7 @@ GBitmap::rle_get_runs(int rowno, int *rlens) const
   unsigned char *runs = rlerows[rowno];
   while (c < ncolumns)
     {
-      int x = *runs++;
-      if (x>=(int)RUNOVERFLOWVALUE)
-        x = ((x&(int)RUNMSBMASK)<<8) | (*runs++);
-      c += x;
+      const int x=read_run(runs);
       if (n>0 && !x)
         {
           n--;
@@ -990,7 +980,7 @@ GBitmap::rle_get_runs(int rowno, int *rlens) const
         }
       else 
         {
-          rlens[n++] = c-d;
+          rlens[n++] = (c+=x)-d;
           d = c;
         }
     }
@@ -1017,18 +1007,22 @@ GBitmap::rle_get_rect(GRect &rect) const
       int n = 0;
       while (c < ncolumns)
         {
-          int x = *runs++;
-          if (x>=(int)RUNOVERFLOWVALUE)
-            x = ((x&(int)RUNMSBMASK)<<8) | (*runs++);
-          if (p && x>0)
+          const int x=read_run(runs);
+          if(x)
             {
-              if (c < rect.xmin) 
-                rect.xmin = c;
-              if (c+x > rect.xmax) 
-                rect.xmax = c+x-1;
-              n += x;
+              if (p)
+                {
+                  if (c < rect.xmin) 
+                    rect.xmin = c;
+                  if ((c += x) > rect.xmax) 
+                    rect.xmax = c-1;
+                  n += x;
+                }
+              else
+                {
+                  c += x;
+                }
             }
-          c += x;
           p = 1-p;
         }
       area += n;
@@ -1072,8 +1066,6 @@ GBitmap::encode(unsigned char **pruns) const
   row += n * bytes_per_row;
   while (n >= 0)
     {
-      int c = 0;
-      unsigned char p = 0;
       if (maxpos < pos+ncolumns+ncolumns+2)
         {
           maxpos += 1024 + ncolumns + ncolumns;
@@ -1082,31 +1074,11 @@ GBitmap::encode(unsigned char **pruns) const
           delete [] runs;
           runs = newruns;
         }
-      while (c < ncolumns)
-        {
-          int x = 0;
-          if (p) 
-            {
-              while (c<ncolumns && row[c]) 
-                x++, c++;
-            } 
-          else 
-            {
-              while (c<ncolumns && !row[c]) 
-                x++, c++;            
-            }
-          while (x > (int)MAXRUNSIZE)
-            {
-              runs[pos++] = 0xFF;
-              runs[pos++] = 0xFF;
-              runs[pos++] = 0;
-              x -= (int)MAXRUNSIZE;
-            }
-          if (x >= (int)RUNOVERFLOWVALUE) 
-            runs[pos++] = (x>>8 | (int)RUNOVERFLOWVALUE);
-          runs[pos++] = x & (int)RUNLSBMASK;
-          p = 1 - p;
-        }
+
+      unsigned char *runs_pos=runs+pos;
+      const unsigned char * const runs_pos_start=runs_pos;
+      append_line(runs_pos,row,ncolumns);
+      pos+=(size_t)runs_pos-(size_t)runs_pos_start;
       row -= bytes_per_row;
       n -= 1;
     }
@@ -1132,7 +1104,7 @@ GBitmap::decode(unsigned char *runs)
   memset(bytes_data, 0, npixels);
   zeroes(bytes_per_row + border);
   // interpret runs data
-  int x, c, n;
+  int c, n;
   unsigned char p = 0;
   unsigned char *row = bytes_data + border;
   n = nrows - 1;
@@ -1140,9 +1112,7 @@ GBitmap::decode(unsigned char *runs)
   c = 0;
   while (n >= 0)
     {
-      x = *runs++;
-      if (x >= (int)RUNOVERFLOWVALUE)
-        x = *runs++ + ((x - (int)RUNOVERFLOWVALUE) << 8);
+      int x = read_run(runs);
       if (c+x > ncolumns)
         THROW("(GBitmap::decode) RLE synchronization lost");
       while (x-- > 0)
@@ -1204,6 +1174,46 @@ GBitmap::fill(unsigned char value)
     }
 }
 
+void
+GBitmap::append_run(unsigned char *&data,const int count)
+{
+  if(count<GBitmap::RUNOVERFLOWVALUE)
+  {
+    data++[0]=count;
+  }else if(count<=GBitmap::MAXRUNSIZE)
+  {
+    data++[0]=((count>>8)&RUNMSBMASK)|RUNOVERFLOWVALUE;
+    data++[0]=(count&GBitmap::RUNLSBMASK);
+  }else
+  {
+    data++[0]=0xff;
+    data++[0]=0xff;
+    data++[0]=0;
+    append_run(data,count-MAXRUNSIZE);
+  }
+}
+
+void
+GBitmap::append_line(
+  unsigned char *&data,const unsigned char *row,const int rowlen,bool invert)
+{
+  const unsigned char *rowend=row+rowlen;
+  bool p=invert;
+  while(row<rowend)
+    {
+      int count=0;
+      if ((p=!p)) 
+        {
+          if(*row)
+            for(++count,++row;(row<rowend)&&*row;++count,++row);
+        } 
+      else if(!*row)
+        {
+            for(++count,++row;(row<rowend)&&!*row;++count,++row);
+        }
+      append_run(data,count);
+    }
+}
 
 #ifdef DEBUG
 void 
