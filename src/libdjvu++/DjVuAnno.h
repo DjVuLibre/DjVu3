@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuAnno.h,v 1.10 1999-10-05 17:36:37 leonb Exp $
+//C- $Id: DjVuAnno.h,v 1.11 1999-10-07 19:32:15 eaf Exp $
 
 #ifndef _DJVUANNO_H
 #define _DJVUANNO_H
@@ -36,7 +36,7 @@
     @memo Implements support for DjVuImage annotations
     @author Andrei Erofeev <eaf@research.att.com>
     @version
-    #$Id: DjVuAnno.h,v 1.10 1999-10-05 17:36:37 leonb Exp $# */
+    #$Id: DjVuAnno.h,v 1.11 1999-10-07 19:32:15 eaf Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -84,11 +84,15 @@ public:
    int		zoom;
       /** Initial mode. Possible values are:
 	  \begin{description}
-          \item[MODE_COLOR] color mode.
-          \item[MODE_FORE] foreground mode.
-          \item[MODE_BACK] background mode.
-          \item[MODE_BW] black and white mode.
-          \item[MODE_UNSPEC] Annotation does not specify a display mode.
+             \item[MODE_COLOR] color mode.
+             \item[MODE_FORE] foreground mode.
+             \item[MODE_BACK] background mode.
+             \item[MODE_BW] black and white mode.
+             \item[MODE_UNSPEC] Annotation does not specify a display mode.
+	     \item[Any positive number] Zoom in %%. Please note that
+                   all constants above are either negative or ZERO. Thus
+                   it's possible to distinguish numerical zoom from those
+                   special cases.
           \end{description} */
    int		mode;
       /** Horizontal page alignment. Possible values are #ALIGN_LEFT#,
