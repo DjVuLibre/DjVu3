@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: djvutopnm.cpp,v 1.27 1999-11-03 23:31:08 bcr Exp $
+//C- $Id: djvutopnm.cpp,v 1.28 1999-11-04 00:02:47 bcr Exp $
 
 
 /** @name djvutopnm
@@ -94,7 +94,7 @@
     Yann Le Cun <yann@research.att.com>\\
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: djvutopnm.cpp,v 1.27 1999-11-03 23:31:08 bcr Exp $# */
+    #$Id: djvutopnm.cpp,v 1.28 1999-11-04 00:02:47 bcr Exp $# */
 //@{
 //@}
 
@@ -252,6 +252,7 @@ usage()
           "  -#                  Subsampling factor from full resolution.\n"
           "  -subsample N       Same as above.\n"
 	  "  -page <page>       Decode page <page> (for multipage documents).\n"
+	  "  -profile <profile> Name of a profile to read defaults from.\n"
           "\n"
           "The output will be a PBM, PGM or PPM file depending of its content."
           "If <pnmfile> is a single dash or omitted, the decompressed image\n"
@@ -290,6 +291,7 @@ geometry(const char *r, GRect &rect)
 static const djvu_option long_options[] = {
 {"verbose",0,0,'v'},
 {"help",0,0,'h'},
+{"profile",0,0,'h'},
 {"scale",1,0,0},
 {"size",1,0,0},
 {"segment",1,0,0},
@@ -327,6 +329,11 @@ main(int argc, char *argv[], char *[])
       {
         Opts.perror();
         usage();
+      }
+      const char *profile=Opts.GetValue("profile");
+      if(profile)
+      {
+        Opts.ChangeProfile(profile);
       }
       flag_verbose=Opts.GetInteger("verbose",0);
       const char *segment=Opts.GetValue("segment");
