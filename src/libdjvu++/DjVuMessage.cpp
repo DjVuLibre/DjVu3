@@ -65,6 +65,7 @@ GString
 DjVuMessage::LookUp( const GString & MessageList ) const
 {
   GString result;                           // Result string; begins empty
+
   int start = 0;                            // Beginning of next message
   int end = MessageList.length();           // End of the message string
 
@@ -86,7 +87,7 @@ DjVuMessage::LookUp( const GString & MessageList ) const
       start = next_ending;
     }
   }
-
+/*
   //  Process any formatting strings
   int posn;
   while( ( posn = result.search( "\\n" ) ) > 0 )
@@ -101,7 +102,7 @@ DjVuMessage::LookUp( const GString & MessageList ) const
              GString("\t") +
              result.substr(posn+2, result.length()-posn-1);
   }
-
+*/
   //  All done
   return result;
 }
@@ -122,14 +123,13 @@ DjVuMessage::LookUpSingle( const GString &Single_Message ) const
   if( !msg_text )
   {
     //  Didn't find anything, fabricate a message
-    msg_text = GString("** Unrecognized DjVu Message: [Contact LizardTech for assistance]\\n") + 
-               "\\tMessage name:  " +
+    msg_text = GString("** Unrecognized DjVu Message: [Contact LizardTech for assistance]\n") + 
+               "\tMessage name:  " +
                Single_Message.substr(0,ending_posn);
   }
-#ifdef DEBUG
+#ifdef _DEBUG
   else
   {
-                                              // temporary debug
     msg_text = "*!* " + msg_text + " *!*";    // temporary debug
   }
 #endif
@@ -158,7 +158,7 @@ DjVuMessage::LookUpID( const GString &msgID ) const
 {
   GString result=opts->GetValue(msgID);
   opts->perror();
-#if 0
+/*
   //  Find the message file
   const char *ss;
   struct djvu_parse opt = djvu_parse_init( "-" );
@@ -193,7 +193,7 @@ DjVuMessage::LookUpID( const GString &msgID ) const
   }
   else
     result.empty();  // Message text file not open
-#endif
+*/
   return result;
 }
 
@@ -210,8 +210,8 @@ DjVuMessage::InsertArg( GString &message, int ArgId, GString arg ) const
   {
     int format_end = format_start;
     while( !isalpha( message[format_end++] ) ) {}  // locate end of format
-    GString format = "%" + message.substr( format_start + target.length(),
-                                           format_end - format_start - target.length() );
+    //GString format = "%" + message.substr( format_start + target.length(),
+    //                                       format_end - format_start - target.length() );
     message = message.substr( 0, format_start ) +
               arg +
               message.substr( format_end, message.length() - format_end );
@@ -219,7 +219,7 @@ DjVuMessage::InsertArg( GString &message, int ArgId, GString arg ) const
   else
   {
     //  Not found, fake it
-    message += GString("\\n\\tParameter ") + GString(ArgId) + ":  " + arg;
+    message += GString("\n\tParameter ") + GString(ArgId) + ":  " + arg;
   }
 }
 
