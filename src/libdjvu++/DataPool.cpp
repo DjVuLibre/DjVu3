@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.cpp,v 1.3 1999-08-06 21:09:22 eaf Exp $
+//C- $Id: DataPool.cpp,v 1.4 1999-08-18 19:06:31 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -364,7 +364,7 @@ DataRange::~DataRange(void)
 
    GCriticalSectionLock lock2(&triggers_lock);
    for(GPosition pos=passed_triggers_list;pos;++pos)
-      pool->del_trigger(static_trigger_relay_cb, passed_triggers_list[pos]);
+      pool->del_trigger(static_trigger_relay_cb, (Trigger *) passed_triggers_list[pos]);
 
    DEBUG_MSG("done destroying DataRange\n");
 }
