@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //
-// $Id: djvumake.cpp,v 1.9 2001-02-10 01:16:56 bcr Exp $
+// $Id: djvumake.cpp,v 1.10 2001-02-13 00:11:40 bcr Exp $
 // $Name:  $
 
 /** @name djvumake
@@ -102,7 +102,7 @@
     @memo
     Assemble DjVu files.
     @version
-    #$Id: djvumake.cpp,v 1.9 2001-02-10 01:16:56 bcr Exp $#
+    #$Id: djvumake.cpp,v 1.10 2001-02-13 00:11:40 bcr Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> \\
     Patrick Haffner <haffner@research.att.com>
@@ -565,9 +565,9 @@ create_masksub_chunks(IFFByteStream &iff, char *filespec)
   // Encode foreground
   {
     GPixmap fg_img;
-    GBitmap fg_mask;
-    processForeground(&raw_pm, stencil, fg_img, fg_mask);
-    GP<IWPixmap> fg_pm = new IWPixmap(&fg_img, &fg_mask, IWPixmap::CRCBfull);
+    GP<GBitmap> fg_mask=new GBitmap();
+    processForeground(&raw_pm, stencil, fg_img, *fg_mask);
+    GP<IWPixmap> fg_pm = new IWPixmap(fg_img, fg_mask, IWPixmap::CRCBfull);
     IWEncoderParms parms[8];
     iff.put_chunk("FG44");
     parms[0].slices = 100;
@@ -577,9 +577,9 @@ create_masksub_chunks(IFFByteStream &iff, char *filespec)
   // Encode backgound 
   {
     GPixmap bg_img;
-    GBitmap bg_mask;
-    processBackground(&raw_pm, stencil, bg_img, bg_mask);
-    GP<IWPixmap> bg_pm = new IWPixmap(&bg_img, &bg_mask, IWPixmap::CRCBnormal);
+    GP<GBitmap> bg_mask=new GBitmap();
+    processBackground(&raw_pm, stencil, bg_img, *bg_mask);
+    GP<IWPixmap> bg_pm = new IWPixmap(bg_img, bg_mask, IWPixmap::CRCBnormal);
     IWEncoderParms parms[4];
     parms[0].bytes = 10000;
     parms[0].slices = 74;

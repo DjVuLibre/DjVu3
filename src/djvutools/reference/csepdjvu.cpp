@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: csepdjvu.cpp,v 1.8 2001-02-10 01:16:56 bcr Exp $
+// $Id: csepdjvu.cpp,v 1.9 2001-02-13 00:11:40 bcr Exp $
 // $Name:  $
 
 
@@ -108,7 +108,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: csepdjvu.cpp,v 1.8 2001-02-10 01:16:56 bcr Exp $# */
+    #$Id: csepdjvu.cpp,v 1.9 2001-02-13 00:11:40 bcr Exp $# */
 //@{
 //@}
 
@@ -376,7 +376,8 @@ CRLEImage::CRLEImage(BufferByteStream &bs)
       // Setup palette with one color
       pal = new DjVuPalette();
       static char zeroes[4];
-      StaticByteStream zbs(zeroes,4);
+      GP<ByteStream> gzbs=ByteStream::create_static(zeroes,4);
+      ByteStream &zbs=*gzbs;
       pal->decode_rgb_entries(zbs, 1);
       // RLE format
       int x, c, n;
@@ -1114,7 +1115,7 @@ csepdjvu_page(BufferByteStream &bs, ByteStream &obs, const csepdjvuopts &opts)
       mask->binarize_grays(bgred*bgred-1);
       IWPixmap::CRCBMode mode = IWPixmap::CRCBnormal;
       if (gray_background) mode = IWPixmap::CRCBnone;
-      iwp = new IWPixmap(bgpix, mask, mode);
+      iwp = new IWPixmap(*bgpix, mask, mode);
       bgpix = 0;
     } 
   else if (! bitonal) 
@@ -1122,7 +1123,7 @@ csepdjvu_page(BufferByteStream &bs, ByteStream &obs, const csepdjvuopts &opts)
       /* Compute white background */
       GPixel bgcolor = GPixel::WHITE;
       GPixmap inputsub((h+11)/12, (w+11)/12, &bgcolor);
-      iwp = new IWPixmap(&inputsub, 0, IWPixmap::CRCBnone);
+      iwp = new IWPixmap(inputsub, 0, IWPixmap::CRCBnone);
     }
   
   // Assemble DJVU file

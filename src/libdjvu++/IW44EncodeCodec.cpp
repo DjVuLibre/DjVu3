@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: IW44EncodeCodec.cpp,v 1.3 2001-02-10 01:16:57 bcr Exp $
+// $Id: IW44EncodeCodec.cpp,v 1.4 2001-02-13 00:11:40 bcr Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 08/1998
@@ -1182,14 +1182,14 @@ IW44Image::Codec::estimate_decibel(float frac)
 }
 
 
-IWBitmap::IWBitmap(const GBitmap *bm, const GBitmap *mask)
+IWBitmap::IWBitmap(const GBitmap &bm, const GP<GBitmap> mask)
 : IW44Image()
 {
   init(bm, mask);
 }
 
 void
-IWBitmap::init(const GBitmap *bm, const GBitmap *mask)
+IWBitmap::init(const GBitmap &bm, const GP<GBitmap> gmask)
 {
   // Free
   close_codec();
@@ -1197,9 +1197,9 @@ IWBitmap::init(const GBitmap *bm, const GBitmap *mask)
   ymap = 0;
   // Init
   int i, j;
-  int w = bm->columns();
-  int h = bm->rows();
-  int g = bm->get_grays()-1;
+  int w = bm.columns();
+  int h = bm.rows();
+  int g = bm.get_grays()-1;
   signed char *buffer;
   GPBuffer<signed char> gbuffer(buffer,w*h);
   // Prepare gray level conversion table
@@ -1210,16 +1210,17 @@ IWBitmap::init(const GBitmap *bm, const GBitmap *mask)
   // Prepare mask information
   const signed char *msk8 = 0;
   int mskrowsize = 0;
-  if (mask)
-    {
-      msk8 = (const signed char*)((*mask)[0]);
-      mskrowsize = mask->rowsize();
-    }
+  GBitmap *mask=gmask;
+  if (gmask)
+  {
+    msk8 = (const signed char*)((*mask)[0]);
+    mskrowsize = mask->rowsize();
+  }
   // Prepare a buffer of signed bytes
   for (i=0; i<h; i++)
     {
       signed char *bufrow = buffer + i*w;
-      const unsigned char *bmrow = (*bm)[i];
+      const unsigned char *bmrow = bm[i];
       for (j=0; j<w; j++)
         bufrow[j] = bconv[bmrow[j]];
     }
@@ -1322,14 +1323,15 @@ IWBitmap::encode_iff(IFFByteStream &iff, int nchunks, const IWEncoderParms *parm
   close_codec();
 }
 
-IWPixmap::IWPixmap(const GPixmap *pm, const GBitmap *mask, CRCBMode crcbmode)
+IWPixmap::IWPixmap(
+  const GPixmap &pm, const GP<GBitmap> gmask, CRCBMode crcbmode)
 : IW44Image(), crcb_delay(10), crcb_half(0)
 {
-  init(pm, mask, crcbmode);
+  init(pm, gmask, crcbmode);
 }
 
 void
-IWPixmap::init(const GPixmap *pm, const GBitmap *mask, CRCBMode crcbmode)
+IWPixmap::init(const GPixmap &pm, const GP<GBitmap> gmask, CRCBMode crcbmode)
 {
   /* Free */
   close_codec();
@@ -1338,8 +1340,8 @@ IWPixmap::init(const GPixmap *pm, const GBitmap *mask, CRCBMode crcbmode)
   delete crmap;
   ymap = cbmap = crmap = 0;
   /* Create */
-  int w = pm->columns();
-  int h = pm->rows();
+  int w = pm.columns();
+  int h = pm.rows();
   signed char *buffer;
   GPBuffer<signed char> gbuffer(buffer,w*h);
   // Create maps
@@ -1355,15 +1357,16 @@ IWPixmap::init(const GPixmap *pm, const GBitmap *mask, CRCBMode crcbmode)
   // Prepare mask information
   const signed char *msk8 = 0;
   int mskrowsize = 0;
+  GBitmap *mask=gmask;
   if (mask)
-    {
-      msk8 = (const signed char*)((*mask)[0]);
-      mskrowsize = mask->rowsize();
-    }
+  {
+    msk8 = (signed char const *)((*mask)[0]);
+    mskrowsize = mask->rowsize();
+  }
   // Fill buffer with luminance information
   DJVU_PROGRESS_TASK(create,"initialize pixmap",3);
   DJVU_PROGRESS_RUN(create,(crcb_delay>=0 ? 1 : 3));
-  Transform::Encode::RGB_to_Y((*pm)[0], w, h, pm->rowsize(), buffer, w);
+  Transform::Encode::RGB_to_Y(pm[0], w, h, pm.rowsize(), buffer, w);
   if (crcb_delay < 0)
     {
       // Stupid inversion for gray images
@@ -1380,11 +1383,11 @@ IWPixmap::init(const GPixmap *pm, const GBitmap *mask, CRCBMode crcbmode)
       crmap = new Map(w,h);
       // Process CB information
       DJVU_PROGRESS_RUN(create,2);
-      Transform::Encode::RGB_to_Cb((*pm)[0], w, h, pm->rowsize(), buffer, w);
+      Transform::Encode::RGB_to_Cb(pm[0], w, h, pm.rowsize(), buffer, w);
       cbmap->create(buffer, w, msk8, mskrowsize);
       // Process CR information
       DJVU_PROGRESS_RUN(create,3);
-      Transform::Encode::RGB_to_Cr((*pm)[0], w, h, pm->rowsize(), buffer, w); 
+      Transform::Encode::RGB_to_Cr(pm[0], w, h, pm.rowsize(), buffer, w); 
       crmap->create(buffer, w, msk8, mskrowsize);
       // Perform chrominance reduction (CRCBhalf)
       if (crcb_half)

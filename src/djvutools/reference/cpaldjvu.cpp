@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: cpaldjvu.cpp,v 1.7 2001-02-09 01:06:42 bcr Exp $
+// $Id: cpaldjvu.cpp,v 1.8 2001-02-13 00:11:40 bcr Exp $
 // $Name:  $
 
 
@@ -69,7 +69,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: cpaldjvu.cpp,v 1.7 2001-02-09 01:06:42 bcr Exp $# */
+    #$Id: cpaldjvu.cpp,v 1.8 2001-02-13 00:11:40 bcr Exp $# */
 //@{
 //@}
 
@@ -819,7 +819,7 @@ cpaldjvu(const GPixmap &input, const char *fileout, const cpaldjvuopts &opts)
 #else
   // -- but who cares since the background is uniform.
   GPixmap inputsub((h+11)/12, (w+11)/12, &bgcolor);
-  iwimage.init(&inputsub);
+  iwimage.init(inputsub);
 #endif
 
   // Assemble DJVU file

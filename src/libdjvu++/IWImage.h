@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: IWImage.h,v 1.22 2001-01-24 00:15:11 bcr Exp $
+// $Id: IWImage.h,v 1.23 2001-02-13 00:11:40 bcr Exp $
 // $Name:  $
 
 
@@ -129,7 +129,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: IWImage.h,v 1.22 2001-01-24 00:15:11 bcr Exp $# */
+    #$Id: IWImage.h,v 1.23 2001-02-13 00:11:40 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -324,10 +324,10 @@ public:
       performs the wavelet decomposition of image #bm# and records the
       corresponding wavelet coefficient.  Argument #mask# is an optional
       bilevel image specifying the masked pixels (see \Ref{IWImage.h}). */
-  void init(const GBitmap *bm, const GBitmap *mask=0);
+  void init(const GBitmap &bm, const GP<GBitmap> mask=0);
   /** Convenience constructor. This constructors creates an empty IWBitmap
       and then calls function \Ref{init} above. */
-  IWBitmap(const GBitmap *bm, const GBitmap *mask=0);
+  IWBitmap(const GBitmap &bm, const GP<GBitmap> mask=0);
   // ACCESS
   /** Reconstructs the complete image.  The reconstructed image
       is then returned as a GBitmap object. */
@@ -433,10 +433,10 @@ public:
       bilevel image specifying the masked pixels (see \Ref{IWImage.h}).
       Argument #crcbmode# specifies how the chrominance information should be
       encoded (see \Ref{CRCBMode}). */
-  void init(const GPixmap *bm, const GBitmap *mask=0, CRCBMode crcbmode=CRCBnormal);
+  void init(const GPixmap &bm, const GP<GBitmap> mask=0, CRCBMode crcbmode=CRCBnormal);
   /** Convenience constructor. This constructors creates an empty IWBitmap
       and then calls function \Ref{init} above. */
-  IWPixmap(const GPixmap *bm, const GBitmap *mask=0, CRCBMode crcbmode=CRCBnormal );
+  IWPixmap(const GPixmap &bm, const GP<GBitmap> mask=0, CRCBMode crcbmode=CRCBnormal );
   // ACCESS
   /** Reconstructs the complete image.  The reconstructed image
       is then returned as a GPixmap object. */

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocument.cpp,v 1.140 2001-02-10 01:16:57 bcr Exp $
+// $Id: DjVuDocument.cpp,v 1.141 2001-02-13 00:11:40 bcr Exp $
 // $Name:  $
 
 
@@ -1110,7 +1110,7 @@ DjVuDocument::process_threqs(void)
                 G_THROW("Unable to render page "+GString(req->page_num+1));
               
               // Store and compress the pixmap
-              GP<IWPixmap> iwpix=new IWPixmap(pm);
+              GP<IWPixmap> iwpix=new IWPixmap(*pm);
               GP<ByteStream> gstr=ByteStream::create();
               ByteStream &str=*gstr;
               IWEncoderParms parms;

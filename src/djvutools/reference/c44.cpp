@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: c44.cpp,v 1.8 2001-02-09 01:06:42 bcr Exp $
+// $Id: c44.cpp,v 1.9 2001-02-13 00:11:40 bcr Exp $
 // $Name:  $
 
 
@@ -184,7 +184,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: c44.cpp,v 1.8 2001-02-09 01:06:42 bcr Exp $# */
+    #$Id: c44.cpp,v 1.9 2001-02-13 00:11:40 bcr Exp $# */
 //@{
 //@}
 
@@ -676,7 +676,7 @@ main(int argc, char **argv)
           GPixmap ipm(ibs);
           w = ipm.columns();
           h = ipm.rows();
-          iwp = new IWPixmap(&ipm, getmask(w,h), arg_crcbmode);
+          iwp = new IWPixmap(ipm, getmask(w,h), arg_crcbmode);
         }
       else if (prefix[0]=='P' && (prefix[1]=='2' || prefix[1]=='5'))
         {
@@ -685,7 +685,7 @@ main(int argc, char **argv)
           GBitmap ibm(ibs);
           w = ibm.columns();
           h = ibm.rows();
-          iwb = new IWBitmap(&ibm, getmask(w,h));
+          iwb = new IWBitmap(ibm, getmask(w,h));
         }
       else if (!strncmp(prefix,"AT&TFORM",8) || !strncmp(prefix,"FORM",4))
         {
