@@ -1,4 +1,4 @@
-/* File "$Id: DjVuAPI.h,v 1.8 1999-12-03 00:23:10 parag Exp $"
+/* File "$Id: DjVuAPI.h,v 1.9 1999-12-14 04:44:08 parag Exp $"
  *
  * The main header file for the DjVu API
  */
@@ -11,7 +11,10 @@
 
 /* 
  * $Log: DjVuAPI.h,v $
- * Revision 1.8  1999-12-03 00:23:10  parag
+ * Revision 1.9  1999-12-14 04:44:08  parag
+ * C Wrapers for libio
+ *
+ * Revision 1.8  1999/12/03 00:23:10  parag
  * Added C Compatibility
  *
  * Revision 1.7  1999/11/24 19:21:50  orost
@@ -844,6 +847,12 @@ DJVUAPI djvu_pixel_image *
 djvu_pnm_to_pixel(djvu_input_sub *, void *);
 DJVUAPI djvu_pixel_image * 
 djvu_bmp_to_pixel(djvu_input_sub *, void *);
+DJVUAPI djvu_pixel_image * 
+djvu_pict_to_pixel(djvu_input_sub *, void *);
+#ifdef NEED_JPEG_DECODER
+DJVUAPI djvu_pixel_image * 
+djvu_jpeg_to_pixel(djvu_input_sub *, void *);
+#endif
 /* 
  *      djvu_pixel_flip
  *
@@ -878,9 +887,15 @@ djvu_pixel_to_native(djvu_pixel_image *);
  * 		See DjVuAPI-2_0.html#djvu_pixel_to_pnm
  */
 DJVUAPI int
-djvu_pixel_to_pnm(const djvu_pixel_image *,djvu_output_sub *,void *);
+djvu_pixel_to_pnm(djvu_pixel_image *,djvu_output_sub *,void *);
 DJVUAPI int
-djvu_pixel_to_bmp(const djvu_pixel_image *,djvu_output_sub *,void *);
+djvu_pixel_to_bmp(djvu_pixel_image *,djvu_output_sub *,void *);
+DJVUAPI int
+djvu_pixel_to_pict(djvu_pixel_image *,djvu_output_sub *,void *);
+DJVUAPI int
+djvu_pixel_to_ps(djvu_pixel_image *,djvu_output_sub *,void *);
+DJVUAPI int
+djvu_run_to_g4tiff(djvu_run_image *,djvu_output_sub *,void *);
 /* 
  *      djvu_pnm_to_run
  *
@@ -888,6 +903,8 @@ djvu_pixel_to_bmp(const djvu_pixel_image *,djvu_output_sub *,void *);
  */
 DJVUAPI djvu_run_image *
 djvu_pnm_to_run(djvu_input_sub *inpf, void *arg);
+DJVUAPI djvu_run_image *
+djvu_g4tiff_to_run(djvu_input_sub *inpf, void *arg);
 
 /*
  *      djvu_set_pixel_to_bitonal
