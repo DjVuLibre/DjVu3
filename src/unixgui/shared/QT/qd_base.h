@@ -4,7 +4,7 @@
 //C-              Unauthorized use prohibited.
 //C-
 // 
-// $Id: qd_base.h,v 1.2 2001-06-20 18:15:17 mchen Exp $
+// $Id: qd_base.h,v 1.3 2001-06-21 20:59:45 mchen Exp $
 // $Name:  $
 
 
@@ -144,6 +144,7 @@ private:
 
    bool		display_all_hlinks;
 
+   void         drawSelectionRect(const QRect &rect);
    void		createCursors(void);
    void		paint(const GRect & grect);
    void		paint(QPaintDevice * drawable, int dr_x,

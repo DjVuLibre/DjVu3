@@ -4,7 +4,7 @@
 //C-              Unauthorized use prohibited.
 //C-
 // 
-// $Id: qd_base_events.cpp,v 1.3 2001-06-20 21:32:16 mchen Exp $
+// $Id: qd_base_events.cpp,v 1.4 2001-06-21 20:59:45 mchen Exp $
 // $Name:  $
 
 
@@ -294,6 +294,18 @@ QDBase::getLensHotKey(void) const
    return key;
 }
 
+void
+QDBase::drawSelectionRect(const QRect &rect)
+{
+   if ( !pane || rect.isEmpty() ) return;
+   
+   QPainter p(pane);
+   p.setRasterOp(XorROP);
+   p.setPen(QColor(0xff, 0xff, 0xff));
+   p.drawRect(rect);      
+}
+
+
 bool
 QDBase::processMouseMoveEvent(QMouseEvent * ev)
 {
@@ -326,15 +338,8 @@ QDBase::processMouseMoveEvent(QMouseEvent * ev)
       { //IDC_ZOOM_SELECT || IDC_TEXT_SELECT
 	 if ( pane )
 	 {
-	    QPainter p(pane);
-	    p.setRasterOp(XorROP);
-	    p.setPen(QColor(0xff, 0xff, 0xff));
-
 	    if ( lastrect )
-	    {
-	       p.setClipRect(G2Q(*lastrect));
-	       p.drawRect(G2Q(*lastrect));
-	    }
+	       drawSelectionRect(G2Q(*lastrect));
 	    
 	    int rw=ev->x()-zoom_select_x0;
 	    int rh=ev->y()-zoom_select_y0;
@@ -347,8 +352,7 @@ QDBase::processMouseMoveEvent(QMouseEvent * ev)
 	       currect= rh<0 ? new GRect(zoom_select_x0,ev->y(),rw,-rh) :
 	       new GRect(zoom_select_x0,zoom_select_y0,rw,rh);
 
-	    p.setClipRect(G2Q(*currect));
-	    p.drawRect(G2Q(*currect));
+	    drawSelectionRect(G2Q(*currect));
 
 	    if (lastrect) delete lastrect;
 	    lastrect=currect;
@@ -421,9 +425,6 @@ QDBase::processMouseMoveEvent(QMouseEvent * ev)
    
    return true;
 }
-
-#define MAX_ZOOM 1200
-#define MIN_ZOOM 5
 
 bool
 QDBase::eventFilter(QObject *obj, QEvent *e)
@@ -541,8 +542,8 @@ QDBase::eventFilter(QObject *obj, QEvent *e)
 			lastrect->intersect(*lastrect, rectDocument);
 
 			int cur_zoom_factor=getZoom();
-			int hzoom = cur_zoom_factor*((float)rectVisible.height()/lastrect->height());
-			int wzoom = cur_zoom_factor*((float)rectVisible.width()/lastrect->width());
+			int hzoom = int(cur_zoom_factor*((float)rectVisible.height()/lastrect->height()));
+			int wzoom = int(cur_zoom_factor*((float)rectVisible.width()/lastrect->width()));
 			
 			int new_zoom_factor=hzoom<wzoom?hzoom:wzoom;
 			int new_zoom_cmd=new_zoom_factor+IDC_ZOOM_MIN;
@@ -552,24 +553,20 @@ QDBase::eventFilter(QObject *obj, QEvent *e)
 			   setZoom(new_zoom_cmd, true, ZOOM_MANUAL);
 
 			   // centering the new zoomed area 
-			   int dx = -(rectVisible.xmax+rectVisible.xmin-lastrect->xmax-lastrect->xmin)/2;
-			   int dy = -(rectVisible.ymax+rectVisible.ymin-lastrect->ymax-lastrect->ymin)/2;
+			   int dx = (lastrect->xmax+lastrect->xmin-rectVisible.xmax-rectVisible.xmin)/2;
+			   int dy = (lastrect->ymax+lastrect->ymin-rectVisible.ymax-rectVisible.ymin)/2;
 			   float zf = new_zoom_factor/float(cur_zoom_factor);
 			   dx *= zf; dy *= zf;
 			   scroll(dx,dy);
 			} else
 			{
-			   QPainter p(pane);
-			   p.setRasterOp(XorROP);
-			   p.setPen(QColor(0xff, 0xff, 0xff));
-			   p.setClipRect(G2Q(*lastrect));
-			   p.drawRect(G2Q(*lastrect));
+			   drawSelectionRect(G2Q(*lastrect));
 			}
 	    
 			delete lastrect;
 			lastrect=0;
 		     }
-		  } else
+		  } else if ( pane_mode == IDC_PANE )
 		     if (cur_map_area && cur_map_area->isHyperlink())
 			getURL(cur_map_area->getURL(), cur_map_area->getTarget());
 		  return TRUE;
@@ -734,6 +731,15 @@ QDBase::eventFilter(QObject *obj, QEvent *e)
 		     case Key_Minus:
 		     case Key_F24:	// Thanks to Solaris
 			setZoom(IDC_ZOOM_ZOOMOUT, 1, ZOOM_MANUAL);
+			break;
+			
+		     case Key_Escape:
+			if ( in_zoom_select && lastrect)
+			{
+			   drawSelectionRect(G2Q(*lastrect));
+			   delete lastrect;
+			   lastrect=0;
+			}
 			break;
 		  } // switch(ev->key())
 		  return TRUE;
