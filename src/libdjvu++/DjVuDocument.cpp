@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.102 2000-01-20 21:18:57 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.103 2000-01-20 21:39:30 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -411,10 +411,23 @@ DjVuDocument::check_unnamed_files(void)
 			//
 			// ufiles_list.del(pos);
 		     break;
+		  } else if (is_init_complete())
+		  {
+			// No empty URLs are allowed at this point.
+			// We now know all information about the document
+			// and can determine if a page is inside it or not
+		     GString msg;
+		     if (f->id_type==UnnamedFile::ID)
+			msg="Page with name '"+f->id+"' is not in this document.";
+		     else msg="Page "+GString(f->page_num)+" does not exist in this document.";
+		     THROW(msg);
 		  }
 		  ++pos;
 	       } CATCH(exc) {
 		  pcaster->notify_error(this, exc.get_cause());
+		  GP<DataPool> pool=ufiles_list[pos]->data_pool;
+		  if (pool) pool->stop();
+		  
 		  GPosition this_pos=pos;
 		  ++pos;
 		  ufiles_list.del(this_pos);
