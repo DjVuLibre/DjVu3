@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GMapAreas.cpp,v 1.3 1999-10-04 20:35:40 eaf Exp $
+//C- $Id: GMapAreas.cpp,v 1.4 1999-10-18 16:50:39 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -121,7 +121,7 @@ GMapArea::is_point_inside(int x, int y)
 {
    if (!bounds_initialized) initialize_bounds();
    return (x>=xmin && x<xmax && y>=ymin && y<ymax) ?
-	      gma_is_point_inside(x, y) : 0;
+	      gma_is_point_inside(x, y) : false;
 }
 
 GString
@@ -141,19 +141,19 @@ GMapArea::print(void)
       char ch=url_str[i];
       if (ch=='"') url1+='\\';
       url1+=ch;
-   };
+   }
    for(i=0;i<(int) target.length();i++)
    {
       char ch=target[i];
       if (ch=='"') target1+='\\';
       target1+=ch;
-   };
+   }
    for(i=0;i<(int) comment.length();i++)
    {
       char ch=comment[i];
       if (ch=='"') comment1+='\\';
       comment1+=ch;
-   };
+   }
    
    char border_width_str[128];
    sprintf(border_width_str, "%d", border_width);
@@ -177,7 +177,7 @@ GMapArea::print(void)
       case SHADOW_EIN_BORDER: border_type_str=GString("(" SHADOW_EIN_BORDER_TAG " ")+border_width_str+")"; break;
       case SHADOW_EOUT_BORDER: border_type_str=GString("(" SHADOW_EOUT_BORDER_TAG " ")+border_width_str+")"; break;
       default: border_type_str="(" XOR_BORDER_TAG ")"; break;
-   };
+   }
 
    GString hilite_str;
    if (hilite_color!=0xffffffff)
@@ -240,6 +240,13 @@ GMapPoly::does_side_cross_rect(const GRect & grect, int side)
 {
    int x1=xx[side], x2=xx[(side+1)%points];
    int y1=yy[side], y2=yy[(side+1)%points];
+   int xmin=x1<x2 ? x1 : x2;
+   int ymin=y1<y2 ? y1 : y2;
+   int xmax=x1+x2-xmin;
+   int ymax=y1+y2-ymin;
+   if (xmax<grect.xmin || xmin>grect.xmax ||
+       ymax<grect.ymin || ymin>grect.ymax) return false;
+   
    return
       x1>=grect.xmin && x1<grect.xmax && y1>=grect.ymin && y1<grect.ymax ||
       x2>=grect.xmin && x2<grect.xmax && y2>=grect.ymin && y2<grect.ymax ||
@@ -273,10 +280,10 @@ GMapPoly::do_segments_intersect(int x11, int y11, int x12, int y12,
 	 is_projection_on_segment(x12, y12, x21, y21, x22, y22) ||
 	 is_projection_on_segment(x21, y21, x11, y11, x12, y12) ||
 	 is_projection_on_segment(x22, y22, x11, y11, x12, y12);
-   };
+   }
    int sign1=sign(res11)*sign(res12);
    int sign2=sign(res21)*sign(res22);
-   return sign1<=0 && sign2<=0 || sign1<=0 && sign2<=0;
+   return sign1<=0 && sign2<=0;
 }
 
 bool
@@ -311,11 +318,11 @@ GMapPoly::optimize_data(void)
 	 for(int k=(i+1)%points;k<points-1;k++)
 	 {
 	    xx[k]=xx[k+1]; yy[k]=yy[k+1];
-	 };
+	 }
 	 points--; sides--;
 	 if (!points) return;
-      };
-   };
+      }
+   }
    // Concatenating consequitive parallel segments
    for(i=0;i<sides;i++)
    {
@@ -328,17 +335,17 @@ GMapPoly::optimize_data(void)
 	 for(int k=(i+1)%points;k<points-1;k++)
 	 {
 	    xx[k]=xx[k+1]; yy[k]=yy[k+1];
-	 };
+	 }
 	 points--; sides--;
 	 if (!points) return;
-      };
-   };
+      }
+   }
 }
 
 bool
 GMapPoly::gma_is_point_inside(int xin, int yin)
 {
-   if (open) return 0;
+   if (open) return false;
    
    int xfar=get_xmax()+(get_xmax()-get_xmin());
    
@@ -356,9 +363,9 @@ GMapPoly::gma_is_point_inside(int xin, int yin)
 	     (xx[i%points]-xin)<=0)
 	 {
 	    // Test point is exactly on the boundary
-	    return 1;
-	 };
-      };
+	    return true;
+	 }
+      }
       if (res1<0 && res2>0 || res1>0 && res2<0)
       {
 	 int x1=xx[i%points], y1=yy[i%points];
@@ -368,12 +375,12 @@ GMapPoly::gma_is_point_inside(int xin, int yin)
 	 if (!_res1 || !_res2)
 	 {
 	    // The point is on this boundary
-	    return 1;
-	 };
+	    return true;
+	 }
 	 if (sign(_res1)*sign(_res2)<0) intersections++;
-      };
-   };
-   return intersections%2;
+      }
+   }
+   return (intersections % 2)!=0;
 }
 
 int
@@ -418,7 +425,7 @@ GMapPoly::gma_move(int dx, int dy)
    for(int i=0;i<points;i++)
    {
       xx[i]+=dx; yy[i]+=dy;
-   };
+   }
 }
 
 void
@@ -431,7 +438,7 @@ GMapPoly::gma_resize(int new_width, int new_height)
    {
       xx[i]=xmin+(xx[i]-xmin)*new_width/width;
       yy[i]=ymin+(yy[i]-ymin)*new_height/height;
-   };
+   }
 }
 
 void
@@ -444,7 +451,7 @@ GMapPoly::gma_transform(const GRect & grect)
    {
       xx[i]=grect.xmin+(xx[i]-xmin)*grect.width()/width;
       yy[i]=grect.ymin+(yy[i]-ymin)*grect.height()/height;
-   };
+   }
 }
 
 GString
@@ -470,7 +477,7 @@ GMapPoly::GMapPoly(const int * _xx, const int * _yy, int _points, bool _open) :
    for(int i=0;i<points;i++)
    {
       xx[i]=_xx[i]; yy[i]=_yy[i];
-   };
+   }
    optimize_data();
    GString res=check_data();
    if (res.length()) THROW(res);
@@ -485,7 +492,7 @@ GMapPoly::gma_print(void)
       char buffer[128];
       sprintf(buffer, "%d %d ", xx[i], yy[i]);
       res+=buffer;
-   };
+   }
    res.setat(res.length()-1, 0);
    res+=") ";
    return res;
@@ -550,7 +557,7 @@ GMapOval::initialize(void)
       rmin=a; rmax=b;
       f=(int) sqrt(rmax*rmax-rmin*rmin);
       yf1=yc+f; yf2=yc-f; xf1=xf2=xc;
-   };
+   }
 }
 
 GMapOval::GMapOval(const GRect & rect) : xmin(rect.xmin), ymin(rect.ymin),
