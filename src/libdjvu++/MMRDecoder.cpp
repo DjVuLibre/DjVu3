@@ -8,7 +8,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: MMRDecoder.cpp,v 1.13 2000-02-03 02:25:58 leonb Exp $
+//C- $Id: MMRDecoder.cpp,v 1.14 2000-02-23 01:08:51 bcr Exp $
 
 
 #ifdef __GNUC__
@@ -393,7 +393,7 @@ MMRDecoder::VLTable::decode(MMRDecoder::VLSource *src)
 }
 
 MMRDecoder::VLTable::VLTable(const VLCode *codes, int nbits)
-  : code(codes)
+  : code(codes), codewordshift(0), index(0)
 {
   int i;
   // count entries
@@ -432,7 +432,7 @@ MMRDecoder::VLTable::VLTable(const VLCode *codes, int nbits)
 
 MMRDecoder::VLTable::~VLTable()
 {
-  delete index;
+  delete [] index;
 }
 
 
@@ -460,10 +460,13 @@ MMRDecoder::~MMRDecoder()
 MMRDecoder::MMRDecoder(ByteStream &bs, int width, int height, int striped)
   : width(width), height(height), lineno(0), 
     striplineno(0), rowsperstrip(0),
-    line(0), lineruns(0), prevruns(0)
+    line(0), lineruns(0), prevruns(0),
+    src(0), mrtable(0), wtable(0), btable(0)
 {
   lineruns = new unsigned short[width+4];
+  memset(lineruns,0,width+4);
   prevruns = new unsigned short[width+4];
+  memset(prevruns,0,width+4);
   lineruns[0] = width;
   prevruns[0] = width;
   rowsperstrip = (striped ? bs.read16() : height);
@@ -624,8 +627,12 @@ MMRDecoder::scanruns(const unsigned short **endptr)
     }
   // Final P must be followed by V0 (they say!)
   if (rle > 0)
+  {
     if (mrtable->decode(src) != V0)
+    {
       THROW(invalid_mmr_data);
+    }
+  }
   if (rle > 0)
     *xr++ = rle;
   // At this point we should have A0 equal to WIDTH
@@ -658,7 +665,11 @@ MMRDecoder::scanrle(int invert, const unsigned char **endptr)
   if (!xr) return 0;
   // Allocate data buffer if needed
   unsigned char *p = line;
-  if (!p)  line = p = new unsigned char[width+8];
+  if (!p) 
+  {
+    line = p = new unsigned char[width+8];
+    memset(line,0,width+8);
+  }
   // Process inversion
   if (invert)
     {
@@ -692,7 +703,11 @@ MMRDecoder::scanline()
   if (!xr) return 0;
   // Allocate data buffer if needed
   unsigned char *p = line;
-  if (!p)  line = p = new unsigned char[width+8];
+  if (!p)
+  {
+    line = p = new unsigned char[width+8];
+    memset(line,0,width+8);
+  }
   // Decode run lengths
   int a0 = 0;
   int a0color = 0;
