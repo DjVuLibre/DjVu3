@@ -9,9 +9,9 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: ByteStream.cpp,v 1.9 1999-03-17 19:24:56 leonb Exp $
+//C- $Id: ByteStream.cpp,v 1.10 1999-05-25 19:42:27 eaf Exp $
 
-// File "$Id: ByteStream.cpp,v 1.9 1999-03-17 19:24:56 leonb Exp $"
+// File "$Id: ByteStream.cpp,v 1.10 1999-05-25 19:42:27 eaf Exp $"
 // - Author: Leon Bottou, 04/1997
 
 #ifdef __GNUC__
@@ -444,6 +444,13 @@ MemoryByteStream::seek(long offset, int whence)
   where = nwhere;
 }
 
+TArray<char>
+MemoryByteStream::get_data(void)
+{
+   TArray<char> data(0, size()-1);
+   readat(data, size(), 0);
+   return data;
+}
 
 ///////// STATICBYTESTREAM
 

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: d44.cpp,v 1.13 1999-03-17 19:24:59 leonb Exp $
+//C- $Id: d44.cpp,v 1.14 1999-05-25 19:42:30 eaf Exp $
 
 
 
@@ -64,7 +64,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: d44.cpp,v 1.13 1999-03-17 19:24:59 leonb Exp $# 
+    #$Id: d44.cpp,v 1.14 1999-05-25 19:42:30 eaf Exp $# 
 */
 //@{
 //@}
@@ -167,6 +167,8 @@ main(int argc, char **argv)
         ibs.seek(0);
       }
       // Go decoding
+      if (chkid == "FORM:DJVM")
+	 THROW("This is multipage DJVU file. Please break it into pieces.");
       if (chkid == "FORM:BM44")
         {
           IFFByteStream iff(ibs);

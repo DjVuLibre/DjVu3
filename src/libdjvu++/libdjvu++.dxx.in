@@ -402,7 +402,12 @@
     The DjVu specification mandates that the decoder should silently skip
     chunks whose identifier is not recognized.  This mechanism provides a
     backward compatible way to extend the initial format by allocating new
-    chunk identifiers.  */
+    chunk identifiers.
+
+    Now DjVu files may include other files by means of #INCL# chunks. After
+    recognizing such a chunk, the decoder should open the specified file
+    and start decoding it possibly in another thread (if threads have been
+    enabled at compilation time) */
 //@{
 
 /** @name DjVu Image Files
@@ -496,33 +501,39 @@
     the color image (see \Ref{IWPixmap}).  */
 
 
-/** @name Experimental Features.
-    
-    The DjVu format already delivers extremely high compression ratios.  Yet
-    we keep evaluating new ideas and experimenting with new features.  Here is
-    a brief description of the various enhancements under evaluation.  We
-    intend to update the DjVu Reference Library as soon as we are satisfied
-    with such enhancements.
+/** @name DjVu annotations
 
-    {\bf Hyper-links} --- We are considering an {\em annotation chunk}
-    containing directives for the DjVu image browser, such as hyper-links,
-    image placement, border color or default zoom factor.  Such directives
-    will be described using an extensible text syntax and stored into an
-    #"ANTa"# or #"ANTz"# chunk.
+    Now DjVu files may contain another chunk: #ANTa# called {\em annotation
+    chunk}. It may contain textual information in pseudo-lisp format about
+    page hyper-links, image placement, border color, default zoom factor.
+
+    There are three types of hyperlinks supported so far:
+    \begin{itemize}
+       \item Rectangles (see \Ref{GHLRect})
+       \item Ovals (see \Ref{GHLOval})
+       \item Polygins (see \Ref{GHLPoly})
+    \end{itemize}
+
+    This data is decoded by \Ref{DjVuFile} and is placed into a \Ref{DjVuAnno}
+    structure, pointer to which is available from DjVu image.
+
+    #ANTa# chunks contain uncompressed ASCII data. We may add a compressed
+    analogue of #ANTa# called #ANTz" later.
+    */
+
+/** @name Multipage DjVu documents
 
     {\bf Included Files} --- Multiple DjVu files may share information such as
     background layer or character shapes.  There are many benefits associated
     with storing such shared information in separate files.  A well designed
     browser may keep pre-decoded copies of these files in a cache.  This
     procedure would reduce the size of the data transferred over the Internet
-    and also increase the display speed.  The currently envisioned scheme
+    and also increase the display speed.  The currently implemented scheme
     involves an {\em inclusion chunk} (chunk identifier #"INCL"#) containing
-    the URL of a file to include.  The included file would be a #"FORM:DJVI"#
+    the URL of a file to include.  The included file should be a #"FORM:DJVI"#
     chunk potentially containing any information otherwise allowed in a DjVu
-    file (except for the #"INFO"# chunk of course).  The challenge consists in
-    making this system fast enough to hide the cost of an extra round-trip
-    between the browser and the web server.
-
+    file (except for the #"INFO"# chunk of course).
+    
     {\bf Document Navigation} --- Documents can be represented using one DjVu
     file per page. Each DjVu file may contain (or better: may include a file
     containing) a {\em navigation directory chunk} (chunk identifier
@@ -538,9 +549,22 @@
     provide a random access to each page.  Web designers would have the choice
     of either (a) unpacking the archive, or (b) use an appropriate Apache
     module or CGI script for unpacking the requested file on the fly.  The
-    preferred archive format is a single #"FORM:DJVM"# chunk containing a
-    directory (chunk identifier #"DIR0"#) and all the archived files with
-    their natural IFF structure.
+    archive format is a single #"FORM:DJVM"# chunk containing a directory
+    (chunk identifier #"DIR0"#) and all the archived files with their natural
+    IFF structure. We will refer sometimes to these all-in-one-file multipage
+    DjVu documents as to DjVm documents for briefness. \Ref{DjVmFile} can be
+    used to create such documents. Another type of multipage DjVu documents,
+    which we have already covered above, is ideal for web publishing: when
+    every page is stored in one or more files. Convertion between these
+    two formats can be done by \Ref{DjVuDocument} class.
+    
+/** @name Experimental Features.
+    
+    The DjVu format already delivers extremely high compression ratios.  Yet
+    we keep evaluating new ideas and experimenting with new features.  Here is
+    a brief description of the various enhancements under evaluation.  We
+    intend to update the DjVu Reference Library as soon as we are satisfied
+    with such enhancements.
 
     {\bf Per-Character Color} --- Compound DjVu files represent the colors of
     the text and drawings using a low resolution color image named the
@@ -564,23 +588,39 @@
 
 //@{
 //@Include: DjVuGlobal.h
+//@Include: debug.h
 //@Include: GException.h
 //@Include: GSmartPointer.h
 //@Include: GString.h
 //@Include: GContainer.h
+//@Include: GPContainer.h
+//@Include: Arrays.h
+//@Include: GCache.h
 //@Include: GRect.h
 //@Include: GThreads.h
 //@Include: GOS.h
+//@Include: GURL.h
 //@Include: ByteStream.h
 //@Include: IFFByteStream.h
+//@Include: DataPool.h
 //@Include: ZPCodec.h
 //@Include: BSByteStream.h
 //@Include: GBitmap.h
 //@Include: GPixmap.h
 //@Include: GScaler.h
+//@Include: IWTransform.h
 //@Include: IWImage.h
 //@Include: JB2Image.h
+//@Include: DjVuInfo.h
+//@Include: DjVuAnno.h
 //@Include: DjVuImage.h
+//@Include: DjVuNavDir.h
+//@Include: GHLObjects.h
+//@Include: DjVuPort.h
+//@Include: DjVuFile.h
+//@Include: DjVuDocument.h
+//@Include: DjVmDir0.h
+//@Include: DjVmFile.h
 //@Include: ATTLicense.h
 //@}
 
@@ -597,6 +637,7 @@
 //@Include: djvutopnm.cpp
 //@Include: djvumake.cpp
 //@Include: djvuextract.cpp
+//@Include: djvm.cpp
 //@}
 
 

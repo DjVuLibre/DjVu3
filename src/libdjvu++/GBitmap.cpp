@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GBitmap.cpp,v 1.7 1999-05-19 19:09:51 leonb Exp $
+//C- $Id: GBitmap.cpp,v 1.8 1999-05-25 19:42:28 eaf Exp $
 
 
 #ifdef __GNUC__
@@ -21,9 +21,10 @@
 #include "ByteStream.h"
 #include "GRect.h"
 #include "GString.h"
+#include "Arrays.h"
 
 
-// File "$Id: GBitmap.cpp,v 1.7 1999-05-19 19:09:51 leonb Exp $"
+// File "$Id: GBitmap.cpp,v 1.8 1999-05-25 19:42:28 eaf Exp $"
 // - Author: Leon Bottou, 05/1997
 
 // ----- constructor and destructor
@@ -843,7 +844,7 @@ GBitmap::encode(unsigned char **pruns) const
   // create run array
   int pos = 0;
   int size = 0;
-  GArray<unsigned char> runs;
+  TArray<unsigned char> runs;
   // encode bitmap as rle
   const unsigned char *row = bytes + border;
   int n = nrows - 1;

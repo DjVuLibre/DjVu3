@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GSmartPointer.h,v 1.8 1999-05-07 22:33:03 leonb Exp $
+//C- $Id: GSmartPointer.h,v 1.9 1999-05-25 19:42:29 eaf Exp $
 
 #ifndef _GSMARTPOINTER_H_
 #define _GSMARTPOINTER_H_
@@ -31,7 +31,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation\\
     Andrei Erofeev <eaf@research.att.com> -- bug fix.
     @version 
-    #$Id: GSmartPointer.h,v 1.8 1999-05-07 22:33:03 leonb Exp $# 
+    #$Id: GSmartPointer.h,v 1.9 1999-05-25 19:42:29 eaf Exp $# 
     @args
 */
 //@{
@@ -60,6 +60,8 @@ public:
   virtual ~GPEnabled();
   /// Copy operator
   GPEnabled & operator=(const GPEnabled & obj);
+  /// Returns the number of references to this object
+  int get_count(void) const;
 protected:
   /// The reference counter
   volatile int count;
@@ -245,9 +247,12 @@ GPEnabled::GPEnabled()
 }
 
 inline
-GPEnabled::GPEnabled(const GPEnabled & obj) 
-  : count(0) 
+GPEnabled::GPEnabled(const GPEnabled & obj) : count(0) {}
+
+inline int
+GPEnabled::get_count(void) const
 {
+   return count;
 }
 
 inline GPEnabled & 
