@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.h,v 1.16 1999-09-17 20:19:59 eaf Exp $
+//C- $Id: DataPool.h,v 1.17 1999-09-19 21:20:32 eaf Exp $
  
 #ifndef _DATAPOOL_H
 #define _DATAPOOL_H
@@ -43,7 +43,7 @@
 
     @memo Thread safe data storage
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DataPool.h,v 1.16 1999-09-17 20:19:59 eaf Exp $#
+    @version #$Id: DataPool.h,v 1.17 1999-09-19 21:20:32 eaf Exp $#
 */
 
 //@{
@@ -172,6 +172,25 @@
 class DataPool : public GPEnabled
 {
 private:
+   class Counter
+   {
+   private:
+      int		counter;
+      GCriticalSection	lock;
+   public:
+      operator int(void) const;
+      void		inc(void);
+      void		dec(void);
+      Counter(void);
+   };
+   class Incrementor
+   {
+   private:
+      DataPool::Counter	& counter;
+   public:
+      Incrementor(DataPool::Counter & counter);
+      ~Incrementor(void);
+   };
    class Reader : public GPEnabled
    {
    public:
@@ -476,6 +495,8 @@ private:
    bool		stop_flag;
    bool		stop_blocked_flag;
 
+   Counter	active_readers;
+   
       // Source or storage of data
    GP<DataPool>		pool;
    GP<StdioByteStream>	stream;
@@ -524,6 +545,44 @@ inline int
 DataPool::get_size(void) const
 {
    return get_size(0, -1);
+}
+
+inline
+DataPool::Counter::operator int(void) const
+{
+   GCriticalSectionLock lk((GCriticalSection *) &lock);
+   int cnt=counter;
+   return cnt;
+}
+
+inline void
+DataPool::Counter::inc(void)
+{
+   GCriticalSectionLock lk(&lock);
+   counter++;
+}
+
+inline void
+DataPool::Counter::dec(void)
+{
+   GCriticalSectionLock lk(&lock);
+   counter--;
+}
+
+inline
+DataPool::Counter::Counter(void) : counter(0) {}
+
+inline
+DataPool::Incrementor::Incrementor(DataPool::Counter & xcounter) :
+      counter(xcounter)
+{
+   counter.inc();
+}
+
+inline
+DataPool::Incrementor::~Incrementor(void)
+{
+   counter.dec();
 }
 
 //@}

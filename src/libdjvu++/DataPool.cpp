@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.cpp,v 1.21 1999-09-19 20:40:19 eaf Exp $
+//C- $Id: DataPool.cpp,v 1.22 1999-09-19 21:20:32 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -420,6 +420,8 @@ DataPool::get_data(void * buffer, int offset, int sz)
 int
 DataPool::get_data(void * buffer, int offset, int sz, int level)
 {
+   Incrementor inc(active_readers);
+   
    if (stop_flag) THROW("STOP");
    if (stop_blocked_flag && !is_eof() &&
        !has_data(offset, sz)) THROW("STOP");
@@ -601,7 +603,17 @@ DataPool::stop(bool only_blocked)
       // thru this DataPool again and will be stopped ("STOP" exception)
       // Others (which entered the master DataPool thru other slave DataPools)
       // will simply continue waiting for their data.
-   if (pool) pool->restart_readers();
+   if (pool)
+   {
+	 // This loop is necessary because there may be another thread, which
+	 // is going down thru the DataPool chain and did not reach the
+	 // lowest "master" DataPool yet. Since it didn't reach it yet,
+	 // the "pool->restart_readers()" will not restart it. So we're going
+	 // to continue issuing this command until we get rid of all
+	 // "active_readers"
+      while(active_readers)
+	 pool->restart_readers();
+   }
 }
 
 void
