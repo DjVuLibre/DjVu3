@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.35 2001-03-13 01:34:50 bcr Exp $
+// $Id: GString.cpp,v 1.36 2001-03-13 21:33:22 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -282,11 +282,11 @@ GString::fromEscaped( const GMap<GString,GString> ConvMap ) const
 
   while( (amp_locn = search( '&', start_locn )) > -1 )
   {                             // Found the next apostrophe
-    ret += substr( start_locn, amp_locn - start_locn );
                                 // Locate the closing semicolon
     int semi_locn = search( ';', amp_locn );
     if( semi_locn < 0 ) break;  // No closing semicolon, exit and copy
                                 //  the rest of the string.
+    ret += substr( start_locn, amp_locn - start_locn );
     int const len=semi_locn-amp_locn-1;
     if(len)
     {

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: XMLTags.cpp,v 1.5 2001-03-13 01:34:50 bcr Exp $
+// $Id: XMLTags.cpp,v 1.6 2001-03-13 21:33:22 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -149,7 +149,7 @@ lt_XMLTags::ParseValues(char const *t, GMap<GString,GString> &args,bool downcase
   {
     if(downcase)
       argn=argn.downcase();
-    args[argn]=getargv(tt,t).toEscaped();
+    args[argn]=getargv(tt,t).fromEscaped();
   }
 }
 
