@@ -4229,6 +4229,173 @@ NODEP_CPP_DJVUPO=\
 # End Source File
 # Begin Source File
 
+SOURCE=.\DjVuText.cpp
+
+!IF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Release"
+
+DEP_CPP_DJVUT=\
+	"..\include\DjVu.h"\
+	".\Arrays.h"\
+	".\BSByteStream.h"\
+	".\ByteStream.h"\
+	".\debug.h"\
+	".\DjVuGlobal.h"\
+	".\DjVuText.h"\
+	".\GContainer.h"\
+	".\GException.h"\
+	".\GMapAreas.h"\
+	".\GRect.h"\
+	".\GSmartPointer.h"\
+	".\GString.h"\
+	".\IFFByteStream.h"\
+	".\ZPCodec.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Debug"
+
+DEP_CPP_DJVUT=\
+	"..\include\DjVu.h"\
+	".\Arrays.h"\
+	".\BSByteStream.h"\
+	".\ByteStream.h"\
+	".\debug.h"\
+	".\DjVuGlobal.h"\
+	".\DjVuText.h"\
+	".\GContainer.h"\
+	".\GException.h"\
+	".\GMapAreas.h"\
+	".\GRect.h"\
+	".\GSmartPointer.h"\
+	".\GString.h"\
+	".\IFFByteStream.h"\
+	".\ZPCodec.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE MIPS) Debug"
+
+DEP_CPP_DJVUT=\
+	"..\include\DjVu.h"\
+	".\Arrays.h"\
+	".\BSByteStream.h"\
+	".\ByteStream.h"\
+	".\debug.h"\
+	".\DjVuGlobal.h"\
+	".\DjVuText.h"\
+	".\GContainer.h"\
+	".\GException.h"\
+	".\GMapAreas.h"\
+	".\GRect.h"\
+	".\GSmartPointer.h"\
+	".\GString.h"\
+	".\IFFByteStream.h"\
+	".\ZPCodec.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE MIPS) Release"
+
+DEP_CPP_DJVUT=\
+	"..\include\DjVu.h"\
+	".\Arrays.h"\
+	".\BSByteStream.h"\
+	".\ByteStream.h"\
+	".\debug.h"\
+	".\DjVuGlobal.h"\
+	".\DjVuText.h"\
+	".\GContainer.h"\
+	".\GException.h"\
+	".\GMapAreas.h"\
+	".\GRect.h"\
+	".\GSmartPointer.h"\
+	".\GString.h"\
+	".\IFFByteStream.h"\
+	".\ZPCodec.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE ARM) Debug"
+
+DEP_CPP_DJVUT=\
+	"..\include\DjVu.h"\
+	".\Arrays.h"\
+	".\BSByteStream.h"\
+	".\ByteStream.h"\
+	".\debug.h"\
+	".\DjVuGlobal.h"\
+	".\DjVuText.h"\
+	".\GContainer.h"\
+	".\GException.h"\
+	".\GMapAreas.h"\
+	".\GRect.h"\
+	".\GSmartPointer.h"\
+	".\GString.h"\
+	".\IFFByteStream.h"\
+	".\ZPCodec.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE ARM) Release"
+
+DEP_CPP_DJVUT=\
+	"..\include\DjVu.h"\
+	".\Arrays.h"\
+	".\BSByteStream.h"\
+	".\ByteStream.h"\
+	".\debug.h"\
+	".\DjVuGlobal.h"\
+	".\DjVuText.h"\
+	".\GContainer.h"\
+	".\GException.h"\
+	".\GMapAreas.h"\
+	".\GRect.h"\
+	".\GSmartPointer.h"\
+	".\GString.h"\
+	".\IFFByteStream.h"\
+	".\ZPCodec.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Debug"
+
+DEP_CPP_DJVUT=\
+	"..\include\DjVu.h"\
+	".\Arrays.h"\
+	".\BSByteStream.h"\
+	".\ByteStream.h"\
+	".\debug.h"\
+	".\DjVuGlobal.h"\
+	".\DjVuText.h"\
+	".\GContainer.h"\
+	".\GException.h"\
+	".\GMapAreas.h"\
+	".\GRect.h"\
+	".\GSmartPointer.h"\
+	".\GString.h"\
+	".\IFFByteStream.h"\
+	".\ZPCodec.h"\
+	
+
+!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
+
+DEP_CPP_DJVUT=\
+	"..\include\DjVu.h"\
+	".\Arrays.h"\
+	".\BSByteStream.h"\
+	".\ByteStream.h"\
+	".\debug.h"\
+	".\DjVuGlobal.h"\
+	".\DjVuText.h"\
+	".\GContainer.h"\
+	".\GException.h"\
+	".\GMapAreas.h"\
+	".\GRect.h"\
+	".\GSmartPointer.h"\
+	".\GString.h"\
+	".\IFFByteStream.h"\
+	".\ZPCodec.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
 SOURCE="..\libdjvu++\GBitmap.cpp"
 
 !IF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Release"
