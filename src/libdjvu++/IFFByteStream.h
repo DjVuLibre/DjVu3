@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: IFFByteStream.h,v 1.12 1999-03-17 19:24:58 leonb Exp $
+//C- $Id: IFFByteStream.h,v 1.13 1999-09-27 20:30:33 leonb Exp $
 
 
 #ifndef _IFFBYTESTREAM_H_
@@ -68,7 +68,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: IFFByteStream.h,v 1.12 1999-03-17 19:24:58 leonb Exp $# */
+    #$Id: IFFByteStream.h,v 1.13 1999-09-27 20:30:33 leonb Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -191,7 +191,7 @@ public:
       returns #+1# if this is a reserved composite chunk identifier.  It
       returns #-1# if this is an illegal or otherwise reserved identifier
       which should not be used.  */
-  int check_id(const char *id);
+  static int check_id(const char *id);
 private:
   // private datatype
   struct IFFContext
