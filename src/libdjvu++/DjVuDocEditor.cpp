@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: DjVuDocEditor.cpp,v 1.28 2000-05-01 16:15:21 bcr Exp $
+//C- $Id: DjVuDocEditor.cpp,v 1.29 2000-05-02 16:00:58 bcr Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -1092,19 +1092,13 @@ DjVuDocEditor::file_thumbnails(void)
    }
 }
 
-void
-DjVuDocEditor::generate_thumbnails(int thumb_size,
-				   bool (* cb)(int page_num, void *),
-				   void * cl_data)
+int
+DjVuDocEditor::generate_thumbnails(int thumb_size, int page_num)
 {
    DEBUG_MSG("DjVuDocEditor::generate_thumbnails(): doing it\n");
    DEBUG_MAKE_INDENT(3);
 
-   DEBUG_MSG("creating missing thumbnails\n");
-   GCriticalSectionLock lock(&thumb_lock);
-   
-   int pages_num=djvm_dir->get_pages_num();
-   for(int page_num=0;page_num<pages_num;page_num++)
+   if(page_num<(djvm_dir->get_pages_num()))
    {
       GString id=page_to_id(page_num);
       if (!thumb_map.contains(id))
@@ -1130,8 +1124,25 @@ DjVuDocEditor::generate_thumbnails(int thumb_size,
 	 iwpix->encode_chunk(*str, parms);
 	 thumb_map[id]=new TArray<char>(str->get_data());
       }
-      if (cb) if (cb(page_num, cl_data)) return;
+      ++page_num;
+   }else
+   {
+      page_num=(-1);
    }
+   return page_num;
+}
+
+void
+DjVuDocEditor::generate_thumbnails(int thumb_size,
+				   bool (* cb)(int page_num, void *),
+				   void * cl_data)
+{
+   int page_num=0;
+   do
+   {
+     page_num=generate_thumbnails(thumb_size,page_num);
+     if (cb) if (cb(page_num, cl_data)) return;
+   } while(page_num>=0);
 }
 
 void

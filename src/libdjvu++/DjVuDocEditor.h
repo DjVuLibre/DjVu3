@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocEditor.h,v 1.18 2000-02-24 22:23:54 haffner Exp $
+//C- $Id: DjVuDocEditor.h,v 1.19 2000-05-02 16:00:58 bcr Exp $
  
 #ifndef _DJVUDOCEDITOR_H
 #define _DJVUDOCEDITOR_H
@@ -28,7 +28,7 @@
 
     @memo DjVu document editor class.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: DjVuDocEditor.h,v 1.18 2000-02-24 22:23:54 haffner Exp $#
+    @version #$Id: DjVuDocEditor.h,v 1.19 2000-05-02 16:00:58 bcr Exp $#
 */
 
 //@{
@@ -216,6 +216,17 @@ public:
 
       /** Removes all thumbnails from the document */
    void		remove_thumbnails(void);
+
+      /** Generates thumbnails for the specified page, if and only if
+          it does not have a thumbnail yet.  If you want to regenerate
+          thumbnails for all pages, call \Ref{remove_thumbnails}() prior
+          to calling this function.
+
+	  @param thumb_size The size of the thumbnails in pixels. DjVu viewer
+	         is able to rescale the thumbnail images if necessary, so this
+		 parameter affects thumbnails quality only. 128 is a good number.
+	  @param page_num The page number to genate the thumbnail for.  */
+   int		generate_thumbnails(int thumb_size, int page_num);
 
       /** Generates thumbnails for those pages, which do not have them yet.
 	  If you want to regenerate thumbnails for all pages, call
