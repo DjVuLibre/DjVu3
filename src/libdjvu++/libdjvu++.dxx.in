@@ -661,7 +661,7 @@
 
 //@{
 //@Include: bzz.cpp
-//@Include: djvuinfo.cpp
+//@Include: djvuiff.cpp
 //@Include: ppmcoco.cpp
 //@Include: c44.cpp
 //@Include: d44.cpp
