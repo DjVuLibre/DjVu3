@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: csepdjvu.cpp,v 1.28 2001-06-05 03:19:57 bcr Exp $
+// $Id: csepdjvu.cpp,v 1.29 2001-06-13 18:26:19 bcr Exp $
 // $Name:  $
 
 
@@ -108,7 +108,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: csepdjvu.cpp,v 1.28 2001-06-05 03:19:57 bcr Exp $# */
+    #$Id: csepdjvu.cpp,v 1.29 2001-06-13 18:26:19 bcr Exp $# */
 //@{
 //@}
 
@@ -1023,7 +1023,7 @@ csepdjvu_page(BufferByteStream &bs, GP<ByteStream> obs, const csepdjvuopts &opts
   int w = rimg.width;
   int h = rimg.height;
   if (opts.verbose > 1)
-    DjVuFormatError( "%s\t%d\t%d\t%d\t%d",
+    DjVuFormatErrorUTF8( "%s\t%d\t%d\t%d\t%d",
                      ERR_MSG("csepdjvu.summary"), 
                      w, h, rimg.pal->size(), rimg.runs.size());
   
@@ -1031,14 +1031,14 @@ csepdjvu_page(BufferByteStream &bs, GP<ByteStream> obs, const csepdjvuopts &opts
   rimg.make_ccids_by_analysis();                  // Obtain ccids
   rimg.make_ccs_from_ccids();                     // Compute cc descriptors
   if (opts.verbose > 1)
-    DjVuFormatError( "%s\t%d", ERR_MSG("csepdjvu.analyzed"), rimg.ccs.size());
+    DjVuFormatErrorUTF8( "%s\t%d", ERR_MSG("csepdjvu.analyzed"), rimg.ccs.size());
   
   // Post-process Color Connected Components
   int largesize = MIN(500, MAX(64, opts.dpi));
   int smallsize = MAX(2, opts.dpi/150);
   rimg.merge_and_split_ccs(smallsize,largesize);  // Eliminates gross ccs
   if (opts.verbose > 1)
-    DjVuFormatError( "%s\t%d",
+    DjVuFormatErrorUTF8( "%s\t%d",
                      ERR_MSG("csepdjvu.merge_split"), 
                      rimg.ccs.size());
   rimg.sort_in_reading_order();                   // Sort cc descriptors
@@ -1076,7 +1076,7 @@ csepdjvu_page(BufferByteStream &bs, GP<ByteStream> obs, const csepdjvuopts &opts
           if (jimg.get_shape(i).parent >= 0) nrefine++; 
           nshape++; 
         }
-      DjVuFormatError( "%s\t%d\t%d",
+      DjVuFormatErrorUTF8( "%s\t%d\t%d",
                        ERR_MSG("csepdjvu.cross_code"), 
                        nshape, nrefine);
     }
@@ -1085,7 +1085,7 @@ csepdjvu_page(BufferByteStream &bs, GP<ByteStream> obs, const csepdjvuopts &opts
   int bgred;
   GP<GPixmap> bgpix = read_background(bs, w, h, bgred);
   if (opts.verbose > 1 && bgpix)
-    DjVuFormatError( "%s\t%d", ERR_MSG("csepdjvu.reduction"), bgred);
+    DjVuFormatErrorUTF8( "%s\t%d", ERR_MSG("csepdjvu.reduction"), bgred);
   
   // Compute flags for simplifying output format
   bool white_background = (bgpix ? false : true);
@@ -1197,20 +1197,20 @@ check_for_another_page(BufferByteStream &bs, const csepdjvuopts &opts)
         return true;
       } else if (lookahead != '#') {
         if (lookahead != EOF) 
-          DjVuPrintError("%s","csepdjvu: found corrupted data\n");
+          DjVuPrintErrorUTF8("%s","csepdjvu: found corrupted data\n");
         break;
       }
       // Skip comment line.
       if (opts.verbose > 1)
-        DjVuPrintError("%s","csepdjvu: comment \"#");
+        DjVuPrintErrorUTF8("%s","csepdjvu: comment \"#");
       lookahead = bs.get();
       while (lookahead!=EOF && lookahead!='\n' && lookahead!='\r') {
         if (opts.verbose > 1)
-          DjVuPrintError("%c",lookahead);
+          DjVuPrintErrorUTF8("%c",lookahead);
         lookahead = bs.get();
       }
       if (opts.verbose > 1)
-        DjVuPrintError("%s","\"\n");
+        DjVuPrintErrorUTF8("%s","\"\n");
     }
   return false;
 }
@@ -1220,7 +1220,7 @@ check_for_another_page(BufferByteStream &bs, const csepdjvuopts &opts)
 void
 usage()
 {
-  DjVuPrintError("%s","Usage: csepdjvu <...options_or_separatedfiles...> <outputdjvufile>\n"
+  DjVuPrintErrorUTF8("%s","Usage: csepdjvu <...options_or_separatedfiles...> <outputdjvufile>\n"
           "Options are:\n"
           "   -d <n>     Sets resolution to <n> dpi (default: 300).\n"
           "   -q <spec>  Selects quality level for background (default: 72+11+10+10)\n"
@@ -1323,18 +1323,18 @@ main(int argc, const char **argv)
                 char pagename[16];
                 sprintf(pagename, "p%04d.djvu", ++pageno);
                 if (opts.verbose > 1)
-                  DjVuPrintError("%s","-------------------------------------\n");
+                  DjVuPrintErrorUTF8("%s","-------------------------------------\n");
                 // Compress page 
                 goutputpage=ByteStream::create();
                 ByteStream &outputpage=*goutputpage;
                 csepdjvu_page(ibs, goutputpage, opts);
                 if (opts.verbose) {
-                  DjVuPrintError("%s","csepdjvu: %d bytes for page %d",
+                  DjVuPrintErrorUTF8("%s","csepdjvu: %d bytes for page %d",
                           outputpage.size(), pageno);
                   if (arg == "-")
-                    DjVuPrintError("%s"," (from stdin)\n");
+                    DjVuPrintErrorUTF8("%s"," (from stdin)\n");
                   else
-                    DjVuPrintError(" (from file '%s')\n", (const char*)arg);
+                    DjVuPrintErrorUTF8(" (from file '%s')\n", (const char*)arg);
                 }
                 // Insert page into document
                 outputpage.seek(0);

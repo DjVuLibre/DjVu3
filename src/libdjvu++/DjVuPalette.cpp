@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuPalette.cpp,v 1.26 2001-04-12 17:05:32 fcrary Exp $
+// $Id: DjVuPalette.cpp,v 1.27 2001-06-13 18:26:19 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -564,7 +564,7 @@ int main(int argc, char **argv)
       GPixmap pm(*ibs);
       DjVuPalette pal;
       int ncolors = pal.compute_palette_and_quantize(pm, maxcolors, minboxsize);
-      DjVuPrintError("%d colors allocated\n", ncolors);
+      DjVuPrintErrorUTF8("%d colors allocated\n", ncolors);
       GP<ByteStream> obs=ByteStream::create(stdout,"wb",false);
       pm.save_ppm(*obs);
     }

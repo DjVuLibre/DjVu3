@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djvutxt.cpp,v 1.22 2001-06-05 03:19:57 bcr Exp $
+// $Id: djvutxt.cpp,v 1.23 2001-06-13 18:26:19 bcr Exp $
 // $Name:  $
 
 // DJVUTXT -- DjVu TXT extractor
@@ -69,7 +69,7 @@
     @author
     Andrei Erofeev <eaf@geocities.com> -- initial implementation
     @version
-    #$Id: djvutxt.cpp,v 1.22 2001-06-05 03:19:57 bcr Exp $# */
+    #$Id: djvutxt.cpp,v 1.23 2001-06-13 18:26:19 bcr Exp $# */
 //@{
 //@}
 
@@ -92,7 +92,7 @@ static const char * progname;
 static void
 usage(void)
 {
-   DjVuPrintError("\
+   DjVuPrintErrorUTF8("\
 DJVUTXT -- DjVu TXT* chunks extractor\n\
    Copyright © 1999-2000 LizardTech, Inc. All Rights Reserved.\n\
 \n\
@@ -166,7 +166,7 @@ main(int argc, char ** argv)
 	    {
 	       if (dargv[i] == GUTF8String( "-"))
 	       {
-		  DjVuPrintError("%s","Can't read from standard input.\n\n");
+		  DjVuPrintErrorUTF8("%s","Can't read from standard input.\n\n");
 		  usage();
 		  exit(1);
 	       } else name_in=dargv[i];
@@ -188,7 +188,7 @@ main(int argc, char ** argv)
 	    {
 	       if (i+1>=argc)
 	       {
-		  DjVuPrintError("%s","--page option must be followed by a number.\n\n");
+		  DjVuPrintErrorUTF8("%s","--page option must be followed by a number.\n\n");
 		  usage();
 		  exit(1);
 	       }
@@ -196,7 +196,7 @@ main(int argc, char ** argv)
 	       page_num=dargv[i].toInt() - 1;//atoi(dargv[i])-1;
 	       if (page_num<0)
 	       {
-		  DjVuPrintError("%s","Page number must be positive.\n\n");
+		  DjVuPrintErrorUTF8("%s","Page number must be positive.\n\n");
 		  usage();
 		  exit(1);
 	       }
@@ -206,14 +206,14 @@ main(int argc, char ** argv)
 	       exit(1);
 	    } else
             {
-               DjVuPrintError("Unrecognized option '%s' encountered.\n\n", (const char *)dargv[i]);
+               DjVuPrintErrorUTF8("Unrecognized option '%s' encountered.\n\n", (const char *)dargv[i]);
             }
 	 }
       }
 
       if (name_in.length()==0)
       {
-	 DjVuPrintError("%s","The name of the input file is missing.\n\n");
+	 DjVuPrintErrorUTF8("%s","The name of the input file is missing.\n\n");
 	 usage();
 	 exit(1);
       }

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessage.cpp,v 1.60 2001-06-11 18:26:40 bcr Exp $
+// $Id: DjVuMessage.cpp,v 1.61 2001-06-13 18:26:19 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -62,8 +62,8 @@
 #include <locale.h>
 #endif
 
-static GUTF8String &
-programname(void)
+GUTF8String &
+DjVuMessage::programname(void)
 {
   static GUTF8String xprogramname;
   return xprogramname;
@@ -189,7 +189,7 @@ static GURL
 GetModulePath( void )
 {
  GURL retval;
- GUTF8String &xprogramname=programname();
+ GUTF8String &xprogramname=DjVuMessage::programname();
 #ifndef NO_DEBUG
  if(!xprogramname.length())
  {
@@ -568,8 +568,8 @@ const char *
 djvu_programname(const char *xprogramname)
 {
   if(xprogramname)
-    programname()=GNativeString(xprogramname);
-  return programname();
+    DjVuMessage::programname()=GNativeString(xprogramname);
+  return DjVuMessage::programname();
 }
 
 //  A C function to perform a message lookup. Arguments are a buffer to receiv
@@ -577,7 +577,7 @@ djvu_programname(const char *xprogramname)
 //  result is returned in msg_buffer encoded in Native MBS encoding. In case
 // of error, msg_b empty (i.e., msg_buffer[0] == '\0').
 void
-DjVuMessage_LookUp( 
+DjVuMessageLookUpNative( 
   char *msg_buffer, const unsigned int buffer_size, const char *message)
 {
   const GNativeString converted(DjVuMessage::LookUpNative( message ));
@@ -587,13 +587,36 @@ DjVuMessage_LookUp(
     strcpy( msg_buffer, converted );
 }
 
+//  A C function to perform a message lookup. Arguments are a buffer to receiv
+//  translated message, a buffer size (bytes), and a message_list. The transla
+//  result is returned in msg_buffer encoded in UTF8 encoding. In case
+// of error, msg_b empty (i.e., msg_buffer[0] == '\0').
+void
+DjVuMessageLookUpUTF8( 
+  char *msg_buffer, const unsigned int buffer_size, const char *message)
+{
+  const GUTF8String converted(DjVuMessage::LookUpUTF8( message ));
+  if( converted.length() >= buffer_size )
+    msg_buffer[0] = '\0';
+  else
+    strcpy( msg_buffer, converted );
+}
 
 void
-DjVuFormatError( const char *fmt, ... )
+DjVuFormatErrorUTF8( const char *fmt, ... )
 {
   va_list args;
   va_start(args, fmt); 
   const GUTF8String message(fmt,args);
+  DjVuWriteError( message );
+}
+
+void
+DjVuFormatErrorNative( const char *fmt, ... )
+{
+  va_list args;
+  va_start(args, fmt); 
+  const GNativeString message(fmt,args);
   DjVuWriteError( message );
 }
 

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: d44.cpp,v 1.21 2001-06-11 22:53:30 bcr Exp $
+// $Id: d44.cpp,v 1.22 2001-06-13 18:26:19 bcr Exp $
 // $Name:  $
 
 /** @name d44
@@ -84,7 +84,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: d44.cpp,v 1.21 2001-06-11 22:53:30 bcr Exp $# 
+    #$Id: d44.cpp,v 1.22 2001-06-13 18:26:19 bcr Exp $# 
 */
 //@{
 //@}
@@ -232,7 +232,7 @@ mymain(int argc, char **argv)
       if (flag_verbose)
       {
         GUTF8String kind = DjVuMessage::LookUpUTF8( color ? ERR_MSG("color.color") : ERR_MSG("color.gray") );
-        DjVuFormatError( "%s\t%s\t%d\t%d\t%d\t%d\t%d\t%d", 
+        DjVuFormatErrorUTF8( "%s\t%s\t%d\t%d\t%d\t%d\t%d\t%d", 
                          ERR_MSG("d44.summary"),
                          (const char *)kind,
                          iw->get_width(), iw->get_height(), dtime, rtime, 

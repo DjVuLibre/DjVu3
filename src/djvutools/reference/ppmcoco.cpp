@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ppmcoco.cpp,v 1.17 2001-06-05 03:19:57 bcr Exp $
+// $Id: ppmcoco.cpp,v 1.18 2001-06-13 18:26:19 bcr Exp $
 // $Name:  $
 
 /** @name ppmcoco
@@ -104,7 +104,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: ppmcoco.cpp,v 1.17 2001-06-05 03:19:57 bcr Exp $# */
+    #$Id: ppmcoco.cpp,v 1.18 2001-06-13 18:26:19 bcr Exp $# */
 //@{
 //@}
 
@@ -129,7 +129,7 @@ double toGamma = 2.2;
 int 
 usage(void)
 {
-  DjVuPrintError("%s",
+  DjVuPrintErrorUTF8("%s",
           "PPMCOCO -- Color correction program\n"
           "  Copyright © 1999-2000 LizardTech, Inc. All Rights Reserved.\n"
           "usage: ppmcoco [-from gamma] [-to gamma] [<ppmin>] [<ppmout>]\n" );
@@ -196,7 +196,7 @@ main(int argc, char **argv)
       else if (gamma_correction>10)
         gamma_correction = 10;
       if (gamma_correction<0.2 || gamma_correction>5)
-        DjVuPrintError("%s","warning: strong correction reduces image quality\n");
+        DjVuPrintErrorUTF8("%s","warning: strong correction reduces image quality\n");
       // perform
       GP<GPixmap> gpm=GPixmap::create();
       GPixmap &pm=*gpm;

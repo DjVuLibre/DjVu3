@@ -1,7 +1,7 @@
 //C-  Copyright © 2000-2001, LizardTech, Inc. All Rights Reserved.
 //C-              Unauthorized use prohibited.
 //
-// $Id: djvuxmlparser.cpp,v 1.8 2001-06-09 01:50:16 bcr Exp $
+// $Id: djvuxmlparser.cpp,v 1.9 2001-06-13 18:26:19 bcr Exp $
 // $Name:  $
 
 #include "XMLParser.h"
@@ -34,14 +34,14 @@ main(int argc,char *argv[],char *[])
         if(! GURL::Filename::Native(argv[i]).is_file())
         {
           is_valid=false;
-          DjVuPrintError("Error: File '%s' does not exist.\n",argv[i]);
+          DjVuPrintErrorUTF8("Error: File '%s' does not exist.\n",argv[i]);
           exit(1);
         }
       } while (++i<argc);
     }
     if(! is_valid)
     {
-      DjVuPrintError("Usage: %s <inputfiles>\n",argc?argv[0]:"-");
+      DjVuPrintErrorUTF8("Usage: %s <inputfiles>\n",argc?argv[0]:"-");
       exit(1);
     }
 

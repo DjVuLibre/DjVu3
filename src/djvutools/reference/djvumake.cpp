@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //
-// $Id: djvumake.cpp,v 1.22 2001-06-05 03:19:57 bcr Exp $
+// $Id: djvumake.cpp,v 1.23 2001-06-13 18:26:19 bcr Exp $
 // $Name:  $
 
 /** @name djvumake
@@ -102,7 +102,7 @@
     @memo
     Assemble DjVu files.
     @version
-    #$Id: djvumake.cpp,v 1.22 2001-06-05 03:19:57 bcr Exp $#
+    #$Id: djvumake.cpp,v 1.23 2001-06-13 18:26:19 bcr Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> \\
     Patrick Haffner <haffner@research.att.com>
@@ -224,7 +224,7 @@ analyze_mmr_chunk(const GURL &url)
       if (w < 0) w = jw;
       if (h < 0) h = jh;
       if (jw!=w || jh!=h)
-        DjVuPrintError("djvumake: mask size (%s) does not match info size\n", (const char *)url);
+        DjVuPrintErrorUTF8("djvumake: mask size (%s) does not match info size\n", (const char *)url);
     }
 }
 
@@ -275,7 +275,7 @@ analyze_jb2_chunk(const GURL &url)
       if (w < 0) w = jw;
       if (h < 0) h = jh;
       if (jw!=w || jh!=h)
-        DjVuPrintError("djvumake: mask size (%s) does not match info size\n", (const char *)url);
+        DjVuPrintErrorUTF8("djvumake: mask size (%s) does not match info size\n", (const char *)url);
     }
 }
 
@@ -436,7 +436,7 @@ create_fg44_chunk(IFFByteStream &iff, char *ckid, const GURL &url)
   mbs.copy(bsi);
   bsi.close_chunk();  
   if (bsi.get_chunk(chkid))
-    DjVuPrintError("%s","djvumake: FG44 file contains more than one chunk\n");
+    DjVuPrintErrorUTF8("%s","djvumake: FG44 file contains more than one chunk\n");
   bsi.close_chunk();  
   mbs.seek(0);
   if (mbs.readall((void*)&primary, sizeof(primary)) != sizeof(primary))
@@ -453,7 +453,7 @@ create_fg44_chunk(IFFByteStream &iff, char *ckid, const GURL &url)
       break;
   flag_contains_fg = red;
   if (red>12)
-    DjVuPrintError("%s","djvumake: FG44 subsampling is not in [1..12] range\n");
+    DjVuPrintErrorUTF8("%s","djvumake: FG44 subsampling is not in [1..12] range\n");
   mbs.seek(0);
   iff.put_chunk(ckid);
   iff.copy(mbs);
@@ -470,7 +470,7 @@ create_bg44_chunk(IFFByteStream &iff, char *ckid, GUTF8String filespec)
   if (! bg44iff)
     {
       if (flag_contains_bg)
-        DjVuPrintError("%s","djvumake: Duplicate BGxx chunk\n");
+        DjVuPrintErrorUTF8("%s","djvumake: Duplicate BGxx chunk\n");
       const int i=filespec.rsearch(':');
       if (!i)
         G_THROW("djvumake: no filename specified in first BG44 specification");
@@ -504,7 +504,7 @@ create_bg44_chunk(IFFByteStream &iff, char *ckid, GUTF8String filespec)
     {
       if (chkid!="PM44" && chkid!="BM44")
         {
-          DjVuPrintError("%s","djvumake: BG44 file contains unrecognized chunks (fixed)\n");
+          DjVuPrintErrorUTF8("%s","djvumake: BG44 file contains unrecognized chunks (fixed)\n");
           nchunks += 1;
           bg44iff->close_chunk();
           continue;
@@ -528,7 +528,7 @@ create_bg44_chunk(IFFByteStream &iff, char *ckid, GUTF8String filespec)
               break;
           flag_contains_bg = red;
           if (red>12)
-            DjVuPrintError("%s","djvumake: BG44 subsampling is not in [1..12] range\n");
+            DjVuPrintErrorUTF8("%s","djvumake: BG44 subsampling is not in [1..12] range\n");
         }
       mbs.seek(0);
       iff.put_chunk(ckid);
@@ -537,7 +537,7 @@ create_bg44_chunk(IFFByteStream &iff, char *ckid, GUTF8String filespec)
       flag = 1;
     }
   if (!flag)
-    DjVuPrintError("%s","djvumake: no more chunks in BG44 file\n");
+    DjVuPrintErrorUTF8("%s","djvumake: no more chunks in BG44 file\n");
 }
 
 
@@ -638,26 +638,26 @@ main(int argc, char **argv)
           if (!dargv[i].cmp("INFO=",5))
             {
               if (i>2)
-                DjVuPrintError("%s","djvumake: 'INFO' chunk should appear first (ignored)\n");
+                DjVuPrintErrorUTF8("%s","djvumake: 'INFO' chunk should appear first (ignored)\n");
             }
           else if (!dargv[i].cmp("Sjbz=",5))
             {
               create_jb2_chunk(iff, "Sjbz", GURL::Filename::UTF8(5+(const char *)dargv[i]));
               if (flag_contains_stencil)
-                DjVuPrintError("%s","djvumake: duplicate stencil chunk\n");
+                DjVuPrintErrorUTF8("%s","djvumake: duplicate stencil chunk\n");
               flag_contains_stencil = 1;
             }
           else if (!dargv[i].cmp("Smmr=",5))
             {
               create_mmr_chunk(iff, "Smmr", GURL::Filename::UTF8(5+(const char *)dargv[i]));
               if (flag_contains_stencil)
-                DjVuPrintError("%s","djvumake: duplicate stencil chunk\n");
+                DjVuPrintErrorUTF8("%s","djvumake: duplicate stencil chunk\n");
               flag_contains_stencil = 1;
             }
           else if (!dargv[i].cmp("FG44=",5))
             {
               if (flag_contains_fg)
-                DjVuPrintError("%s","djvumake: duplicate 'FGxx' chunk\n");
+                DjVuPrintErrorUTF8("%s","djvumake: duplicate 'FGxx' chunk\n");
               create_fg44_chunk(iff, "FG44", GURL::Filename::UTF8(5+(const char *)dargv[i]));
             }
           else if (!dargv[i].cmp("BG44=",5))
@@ -668,7 +668,7 @@ main(int argc, char **argv)
                    !dargv[i].cmp("BG2k=",5)  )
             {
               if (flag_contains_bg)
-                DjVuPrintError("%s","djvumake: Duplicate BGxx chunk\n");
+                DjVuPrintErrorUTF8("%s","djvumake: Duplicate BGxx chunk\n");
               dargv[i].setat(4,0);
               create_raw_chunk(iff, dargv[i], GURL::Filename::UTF8(5+(const char *)dargv[i]));
               flag_contains_bg = 1;
@@ -677,7 +677,7 @@ main(int argc, char **argv)
                    !dargv[i].cmp("FG2k=",5)  )
             {
               if (flag_contains_fg)
-                DjVuPrintError("%s","djvumake: duplicate 'FGxx' chunk\n");
+                DjVuPrintErrorUTF8("%s","djvumake: duplicate 'FGxx' chunk\n");
               dargv[i].setat(4,0);
               create_raw_chunk(iff, dargv[i], GURL::Filename::UTF8(5+(const char *)dargv[i]));
               flag_contains_fg = 1;
@@ -690,14 +690,14 @@ main(int argc, char **argv)
           else if (!dargv[i].cmp("PPM=",4))
             {
               if (flag_contains_bg || flag_contains_fg)
-                DjVuPrintError("%s","djvumake: Duplicate 'FGxx' or 'BGxx' chunk\n");
+                DjVuPrintErrorUTF8("%s","djvumake: Duplicate 'FGxx' or 'BGxx' chunk\n");
               create_masksub_chunks(iff, GURL::Filename::UTF8(4+(const char *)dargv[i]));
               flag_contains_bg = 1;
               flag_contains_fg = 1;
             }
           else 
             {
-              DjVuPrintError("djvumake: illegal argument : ``%s'' (ignored)\n", (const char *)dargv[i]);
+              DjVuPrintErrorUTF8("djvumake: illegal argument : ``%s'' (ignored)\n", (const char *)dargv[i]);
             }
         }
       // Close
@@ -707,20 +707,20 @@ main(int argc, char **argv)
         {
           // Compound or Bilevel
           if (flag_contains_bg && ! flag_contains_fg)
-            DjVuPrintError("%s","djvumake: djvu file contains a BGxx chunk but no FGxx chunk\n");
+            DjVuPrintErrorUTF8("%s","djvumake: djvu file contains a BGxx chunk but no FGxx chunk\n");
           if (flag_contains_fg && ! flag_contains_bg)
-            DjVuPrintError("%s","djvumake: djvu file contains a FGxx chunk but no BGxx chunk\n");
+            DjVuPrintErrorUTF8("%s","djvumake: djvu file contains a FGxx chunk but no BGxx chunk\n");
         }
       else if (flag_contains_bg)
         {
           // Photo DjVu Image
           if (flag_contains_bg!=1)
-            DjVuPrintError("%s","djvumake: photo djvu image has subsampled BGxx chunk\n"); 
+            DjVuPrintErrorUTF8("%s","djvumake: photo djvu image has subsampled BGxx chunk\n"); 
           if (flag_contains_fg)
-            DjVuPrintError("%s","djvumake: photo djvu file contains FGxx chunk\n");            
+            DjVuPrintErrorUTF8("%s","djvumake: photo djvu file contains FGxx chunk\n");            
         }
       else
-        DjVuPrintError("%s","djvumake: djvu file contains neither Sxxx nor BGxx chunks\n");
+        DjVuPrintErrorUTF8("%s","djvumake: djvu file contains neither Sxxx nor BGxx chunks\n");
     }
   G_CATCH(ex)
     {

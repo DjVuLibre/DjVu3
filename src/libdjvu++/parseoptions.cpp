@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: parseoptions.cpp,v 1.85 2001-06-05 23:02:38 fcrary Exp $
+// $Id: parseoptions.cpp,v 1.86 2001-06-13 18:26:19 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -636,10 +636,10 @@ void DjVuParseOptions::perror(const GUTF8String &mesg)
   {
     if(mesg.length())
     {
-      DjVuPrintError("%s\n",(const char *)DjVuMessage::LookUpUTF8(mesg+"\v"+s));
+      DjVuPrintErrorUTF8("%s\n",(const char *)DjVuMessage::LookUpUTF8(mesg+"\v"+s));
     }else
     {
-      DjVuPrintError("%s\n",(const char *)DjVuMessage::LookUpUTF8(s));
+      DjVuPrintErrorUTF8("%s\n",(const char *)DjVuMessage::LookUpUTF8(s));
     }
   }
 }

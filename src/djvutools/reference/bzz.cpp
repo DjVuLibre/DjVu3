@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: bzz.cpp,v 1.21 2001-06-05 03:19:57 bcr Exp $
+// $Id: bzz.cpp,v 1.22 2001-06-13 18:26:19 bcr Exp $
 // $Name:  $
 
 
@@ -58,7 +58,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation
     @version
-    $Id: bzz.cpp,v 1.21 2001-06-05 03:19:57 bcr Exp $ */
+    $Id: bzz.cpp,v 1.22 2001-06-13 18:26:19 bcr Exp $ */
 //@{
 //@}
 
@@ -76,7 +76,7 @@ static const char *program = "(unknown)";
 void
 usage(void)
 {
-  DjVuPrintError(
+  DjVuPrintErrorUTF8(
           "BZZ -- ZPCoded Burrows Wheeler compression\n"
           "  Copyright © 1999-2000 LizardTech, Inc. All Rights Reserved.\n"
           "Usage [encoding]: %s -e[<blocksize>] <infile> <outfile>\n"

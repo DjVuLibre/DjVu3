@@ -4,7 +4,7 @@
 //C-              Unauthorized use prohibited.
 //C-
 // 
-// $Id: djvutoxml.cpp,v 1.4 2001-06-05 03:19:57 bcr Exp $
+// $Id: djvutoxml.cpp,v 1.5 2001-06-13 18:26:19 bcr Exp $
 // $Name:  $
 
 #include "DjVuDocument.h"
@@ -24,40 +24,38 @@
 #include <assert.h>
 #include <ctype.h>
 
-static char const * progname="";
-static char const * version="1.0";
-static int notext=0;		// You can turn off outputting text
-static int noanno=-1;		//  or annotations here!
+class DjVuXMLExtractor
+{
+public:
+  DjVuXMLExtractor(void);
+  char const * version;
+  int notext;		// You can turn off outputting text
+  int noanno;		//  or annotations here!
+  void writeXMLprolog ( ByteStream & str_out );
+  void doPage( ByteStream & str_out,
+    const GP<DjVuDocument> & doc, int external_page_num );
+  void writeDocBody( ByteStream & str_out,
+              const GP<DjVuDocument> & doc, 
+              int page_num );
+  void writeMainElement( ByteStream & str_out,
+                  const GP<DjVuDocument> & doc, 
+                  int page_num );
+};
+
+DjVuXMLExtractor::DjVuXMLExtractor(void)
+: version("1.0"), notext(0), noanno(-1) {}
 
 static void
 usage(void)
 {
-  DjVuPrintError("Usage: %s [--version=1.[01]] [--with[out]-anno] [--with[out]-text] <inputfile> <outputfile>\n",progname);
+  DjVuPrintErrorUTF8("Usage: %s [--version=1.[01]] [--with[out]-anno] [--with[out]-text] <inputfile> <outputfile>\n",(const char *)GOS::basename(DjVuMessage::programname()));
 }
 
 //------------------------ prototypes ------------------------
 
 static void
-writeXMLprolog ( ByteStream & str_out );
-
-static void
-writeMainElement( ByteStream & str_out,
-                  const GP<DjVuDocument> & doc, 
-                  int page_num );
-
-static void
-doPage( ByteStream & str_out,
-        const GP<DjVuDocument> & doc, 
-        int external_page_num);
-
-static void
 writeDocHead( ByteStream & str_out,
               const GP<DjVuDocument> & doc );
-
-static void
-writeDocBody( ByteStream & str_out,
-              const GP<DjVuDocument> & doc, 
-              int page_num );
 
 static void
 writeArea( ByteStream & str_out,
@@ -99,50 +97,50 @@ main(int argc, char * argv[], char *env[])
     dargv[i]=GNativeString(argv[i]);
 
   GUTF8String name;
+  DjVuXMLExtractor extract;
   if(argc>0)
   {
     const char * prog=(const char *)dargv[0];
     name=GOS::basename(dargv[0]);
-    progname=name;
     for(;argc>1;--argc, dargv.shift(-1))
     {
-      const char * const arg=dargv[1];
-      if((arg == GUTF8String("--version=1.1")))
+      const GUTF8String &arg=dargv[1];
+      if(arg == "--version=1.1")
       {
-        version="1.1";
-        if(notext<0)
-          notext=0;
-        if(noanno<0)
-          noanno=0;
-      }else if((arg == GUTF8String("--version=1.0")))
+        extract.version="1.1";
+        if(extract.notext<0)
+          extract.notext=0;
+        if(extract.noanno<0)
+          extract.noanno=0;
+      }else if(arg == "--version=1.0")
       {
-        version="1.0";
-        notext=1;
-        if(noanno<0)
-          noanno=0;
-      }else if((arg == GUTF8String("--with-text")))
+        extract.version="1.0";
+        extract.notext=1;
+        if(extract.noanno<0)
+          extract.noanno=0;
+      }else if(arg == "--with-text")
       {
-        version="1.1";
-        notext=0;
-        if(noanno<0)
-          noanno=1;
-      }else if((arg == GUTF8String("--without-text")))
+        extract.version="1.1";
+        extract.notext=0;
+        if(extract.noanno<0)
+          extract.noanno=1;
+      }else if(arg == "--without-text")
       {
-        notext=1;
-        if(noanno<0)
-          noanno=0;
-      }else if((arg == GUTF8String("--with-anno")))
+        extract.notext=1;
+        if(extract.noanno<0)
+          extract.noanno=0;
+      }else if(arg == "--with-anno")
       {
-        noanno=0;
-        if(notext<0)
-          notext=1;
-      }else if((arg == GUTF8String("--without-anno")))
+        extract.noanno=0;
+        if(extract.notext<0)
+          extract.notext=1;
+      }else if(arg == "--without-anno")
       {
-        noanno=1;
-        if(notext<0)
+        extract.noanno=1;
+        if(extract.notext<0)
         {
-          version="1.1";
-          notext=0;
+          extract.version="1.1";
+          extract.notext=0;
         }
       }else
       {
@@ -151,10 +149,10 @@ main(int argc, char * argv[], char *env[])
     }
     dargv[0]=prog;
   }
-  if(noanno<0 && notext<0)
+  if(extract.noanno<0 && extract.notext<0)
   {
-    noanno=0;
-    notext=1;
+    extract.noanno=0;
+    extract.notext=1;
   }
 #ifdef DEBUG_SET_LEVEL
   {
@@ -237,8 +235,8 @@ main(int argc, char * argv[], char *env[])
 
       GP<ByteStream> gstr_out=ByteStream::create(GURL::Filename::UTF8(name_out), "w");
       ByteStream &str_out=*gstr_out;
-      writeXMLprolog( str_out);
-      writeMainElement( str_out, doc, page_num );
+      extract.writeXMLprolog( str_out);
+      extract.writeMainElement( str_out, doc, page_num );
 
   }
   G_CATCH(exc)
@@ -251,8 +249,8 @@ main(int argc, char * argv[], char *env[])
 }
 
 
-static void
-writeXMLprolog ( ByteStream & str_out )
+void
+DjVuXMLExtractor::writeXMLprolog ( ByteStream & str_out )
 {
   // Write XMLDecl
   static char const XMLDecl[] = "<?xml version=\"%s\" ?>\n";
@@ -267,10 +265,9 @@ writeXMLprolog ( ByteStream & str_out )
 }
 
 
-static void
-writeMainElement( ByteStream & str_out,
-                  const GP<DjVuDocument> & doc, 
-                  int page_num )
+void
+DjVuXMLExtractor::writeMainElement(
+  ByteStream & str_out, const GP<DjVuDocument> & doc, int page_num )
 {
   static char const Stag[] = "<DjVuXML>\n";
   static char const Etag[] = "</DjVuXML>\n";
@@ -299,8 +296,8 @@ writeDocHead( ByteStream & str_out,
 }
 
 
-static void
-writeDocBody( ByteStream & str_out,
+void
+DjVuXMLExtractor::writeDocBody( ByteStream & str_out,
               const GP<DjVuDocument> & doc, 
               int page_num )
 {
@@ -335,8 +332,8 @@ startMap( ByteStream &str_out, const int external_page_num, const bool isEmpty)
 //  Generate output for a single page
 //  If there are no maps, no output is generated. Otherwise, we generate an 
 //  OBJECT and a MAP.
-static void
-doPage( ByteStream & str_out,
+void
+DjVuXMLExtractor::doPage( ByteStream & str_out,
         const GP<DjVuDocument> & doc,
         int external_page_num )
 {

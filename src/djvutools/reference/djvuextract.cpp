@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djvuextract.cpp,v 1.23 2001-06-05 03:19:57 bcr Exp $
+// $Id: djvuextract.cpp,v 1.24 2001-06-13 18:26:19 bcr Exp $
 // $Name:  $
 
 /** @name djvuextract
@@ -65,7 +65,7 @@
     @memo
     Extract components from DjVu files.
     @version
-    #$Id: djvuextract.cpp,v 1.23 2001-06-05 03:19:57 bcr Exp $#
+    #$Id: djvuextract.cpp,v 1.24 2001-06-13 18:26:19 bcr Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> - Initial implementation\\
     Andrei Erofeev <eaf@geocities.com> - Multipage support */
@@ -121,7 +121,7 @@ display_info_chunk(GP<ByteStream> ibs, const GURL &url)
         {
           if (iff.readall((void*)&djvuinfo,sizeof(djvuinfo)) < sizeof(djvuinfo))
             G_THROW("Cannot read INFO chunk");
-          DjVuPrintError("%s: (%d x %d) version %d\n", 
+          DjVuPrintErrorUTF8("%s: (%d x %d) version %d\n", 
                   (const char *)url, 
                   (djvuinfo.width_hi<<8)+djvuinfo.width_lo, 
                   (djvuinfo.height_hi<<8)+djvuinfo.height_lo,
@@ -195,7 +195,7 @@ extract_chunk(GP<ByteStream> ibs, const GUTF8String &id, GP<ByteStream> out)
 void 
 usage()
 {
-  DjVuPrintError("%s",
+  DjVuPrintErrorUTF8("%s",
           "DJVUEXTRACT -- Extracts components of a DJVU file\n"
           "  Copyright © 1999-2000 LizardTech, Inc. All Rights Reserved.\n"
           "Usage:\n"
@@ -229,7 +229,7 @@ main(int argc, char **argv)
            } 
       if (page_num<0)
         {
-          DjVuPrintError("%s", "Invalid page number\n");
+          DjVuPrintErrorUTF8("%s", "Invalid page number\n");
           usage();
         }
       
@@ -258,7 +258,7 @@ main(int argc, char **argv)
           ByteStream &mbs=*gmbs;
           if (mbs.size() == 0)
             {
-              DjVuPrintError("  %s --> not found!\n", (const char *)dargv[i]);
+              DjVuPrintErrorUTF8("  %s --> not found!\n", (const char *)dargv[i]);
             }
           else
             {
@@ -266,7 +266,7 @@ main(int argc, char **argv)
               GP<ByteStream> obs=ByteStream::create(url,"wb");
               mbs.seek(0);
               obs->copy(mbs);
-              DjVuPrintError("  %s --> \"%s\" (%d bytes)\n", 
+              DjVuPrintErrorUTF8("  %s --> \"%s\" (%d bytes)\n", 
                       (const char *)dargv[i], (const char *)dargv[i]+5, mbs.size());
             }
         }

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: IW44Image.cpp,v 1.10 2001-04-21 00:16:58 bcr Exp $
+// $Id: IW44Image.cpp,v 1.11 2001-06-13 18:26:19 bcr Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 08/1998
@@ -1846,7 +1846,7 @@ IW44Image::Transform::Decode::backward(short *p, int w, int h, int rowsize, int 
       filter_bh(p, w, h, rowsize, scale);
 #ifdef IWTRANSFORM_TIMER
       th = GOS::ticks()-th;
-      DjVuPrintError("back%d\tv=%dms h=%dms\n", scale,tv,th);
+      DjVuPrintErrorUTF8("back%d\tv=%dms h=%dms\n", scale,tv,th);
 #endif
     }
   // TERMINATE

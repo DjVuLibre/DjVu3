@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.cpp,v 1.81 2001-06-05 03:19:57 bcr Exp $
+// $Id: ByteStream.cpp,v 1.82 2001-06-13 18:26:19 bcr Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 04/1997
@@ -1285,7 +1285,7 @@ MemoryMapByteStream::~MemoryMapByteStream()
 ByteStream::Wrapper::~Wrapper() {}
 
 void
-DjVuPrintError(const char *fmt, ... )
+DjVuPrintErrorUTF8(const char *fmt, ... )
 {
   static GP<ByteStream> errout=ByteStream::create(2,0,false);
   if(errout)
@@ -1299,7 +1299,21 @@ DjVuPrintError(const char *fmt, ... )
 }
 
 void
-DjVuPrintMessage(const char *fmt, ... )
+DjVuPrintErrorNative(const char *fmt, ... )
+{
+  static GP<ByteStream> errout=ByteStream::create(2,0,false);
+  if(errout)
+  {
+    errout->cp=ByteStream::NATIVE;
+    va_list args;
+    va_start(args, fmt); 
+    const GNativeString message(fmt,args);
+    errout->writestring(message);
+  }
+}
+
+void
+DjVuPrintMessageUTF8(const char *fmt, ... )
 {
   static GP<ByteStream> strout=ByteStream::create(1,0,false);
   if(strout)
@@ -1313,24 +1327,16 @@ DjVuPrintMessage(const char *fmt, ... )
 }
 
 void
-DjVuWriteError( const char *message )
-{
-  static GP<ByteStream> errout=ByteStream::create(2,0,false);
-  if(errout)
-  {
-    const GUTF8String external = DjVuMessage::LookUpUTF8( message );
-    errout->writestring(external);
-  }
-}
-
-void
-DjVuWriteMessage( const char *message )
+DjVuPrintMessageNative(const char *fmt, ... )
 {
   static GP<ByteStream> strout=ByteStream::create(1,0,false);
   if(strout)
   {
-    const GUTF8String external = DjVuMessage::LookUpUTF8( message );
-    strout->writestring(external);
+    strout->cp=ByteStream::NATIVE;
+    va_list args;
+    va_start(args, fmt);
+    const GNativeString message(fmt,args);
+    strout->writestring(message);
   }
 }
 

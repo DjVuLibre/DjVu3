@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: cjb2.cpp,v 1.20 2001-06-05 03:19:57 bcr Exp $
+// $Id: cjb2.cpp,v 1.21 2001-06-13 18:26:19 bcr Exp $
 // $Name:  $
 
 
@@ -70,7 +70,7 @@
     Paul Howard <pgh@research.att.com>\\
     Pascal Vincent <vincentp@iro.umontreal.ca>
     @version
-    $Id: cjb2.cpp,v 1.20 2001-06-05 03:19:57 bcr Exp $ */
+    $Id: cjb2.cpp,v 1.21 2001-06-13 18:26:19 bcr Exp $ */
 //@{
 //@}
 
@@ -813,19 +813,19 @@ cjb2(const GURL &urlin, const GURL &urlout, const cjb2opts &opts)
   rimg.add_bitmap_runs(input);       // fill CCImage
   input.init(0,0);                   // save memory
   if (opts.verbose)
-    DjVuFormatError( "%s\t%d", ERR_MSG("cjb2.runs"), rimg.runs.size() );
+    DjVuFormatErrorUTF8( "%s\t%d", ERR_MSG("cjb2.runs"), rimg.runs.size() );
   
   // Component analysis
   rimg.make_ccids_by_analysis();             // obtain ccids
   rimg.make_ccs_from_ccids();                // compute cc descriptors
   if (opts.verbose)
-    DjVuFormatError( "%s\t%d", ERR_MSG("cjb2.ccs_before"), rimg.ccs.size());
+    DjVuFormatErrorUTF8( "%s\t%d", ERR_MSG("cjb2.ccs_before"), rimg.ccs.size());
   if (opts.clean) 
     rimg.erase_tiny_ccs();                   // clean
   rimg.merge_and_split_ccs();                // reorganize weird ccs
   rimg.sort_in_reading_order();              // sort cc descriptors
   if (opts.verbose)
-    DjVuFormatError( "%s\t%d", ERR_MSG("cjb2.ccs_after"), rimg.ccs.size());
+    DjVuFormatErrorUTF8( "%s\t%d", ERR_MSG("cjb2.ccs_after"), rimg.ccs.size());
   
   // Pattern matching
   GP<JB2Image> jimg = rimg.get_jb2image();          // get ``raw'' jb2image
@@ -840,7 +840,7 @@ cjb2(const GURL &urlin, const GURL &urlout, const cjb2opts &opts)
         if (jimg->get_shape(i).parent >= 0) nrefine++; 
         nshape++; 
       }
-      DjVuFormatError( "%s\t%d\t%d", ERR_MSG("cjb2.shapes"), nshape, nrefine);
+      DjVuFormatErrorUTF8( "%s\t%d\t%d", ERR_MSG("cjb2.shapes"), nshape, nrefine);
     }
   
   // Code
@@ -879,7 +879,7 @@ cjb2(const GURL &urlin, const GURL &urlout, const cjb2opts &opts)
 void
 usage()
 {
-  DjVuPrintError("Usage: cjb2 [options] <inputpbmfile> <outputdjvufile>\n"
+  DjVuPrintErrorUTF8("Usage: cjb2 [options] <inputpbmfile> <outputdjvufile>\n"
           "Options are:\n"
           "   -dpi xxx     Specify image resolution (default 300).\n"
           "   -clean       Remove small flyspecs (lossy).\n"

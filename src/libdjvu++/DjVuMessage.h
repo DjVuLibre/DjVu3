@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessage.h,v 1.25 2001-06-05 03:19:58 bcr Exp $
+// $Id: DjVuMessage.h,v 1.26 2001-06-13 18:26:19 bcr Exp $
 // $Name:  $
 
 
@@ -55,6 +55,7 @@ public:
 
   /// Set the program name used when searching for XML files on disk.
   static void set_programname(const GUTF8String &programname);
+  static GUTF8String &programname(void);
 
   /// creates this class specifically.
   static const DjVuMessageLite &create_full(void);

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessageLite.cpp,v 1.2 2001-06-05 03:19:58 bcr Exp $
+// $Id: DjVuMessageLite.cpp,v 1.3 2001-06-13 18:26:19 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -130,7 +130,7 @@ DjVuMessageLite::~DjVuMessageLite( ) {}
 void
 DjVuMessageLite::perror( const GUTF8String & MessageList )
 {
-  DjVuPrintError("%s\n",(const char *)DjVuMessageLite::LookUpUTF8(MessageList));
+  DjVuPrintErrorUTF8("%s\n",(const char *)DjVuMessageLite::LookUpUTF8(MessageList));
 }
 
 
@@ -381,4 +381,27 @@ DjVuMessageLite::AddByteStream(const GP<ByteStream> &bs)
     lt_XMLTags::get_Maps(messagestring,namestring,Bodies,Map);
   }
 }
+
+void
+DjVuWriteError( const char *message )
+{
+  static GP<ByteStream> errout=ByteStream::create(2,0,false);
+  if(errout)
+  {
+    const GUTF8String external = DjVuMessageLite::LookUpUTF8( message );
+    errout->writestring(external);
+  }
+}
+
+void
+DjVuWriteMessage( const char *message )
+{
+  static GP<ByteStream> strout=ByteStream::create(1,0,false);
+  if(strout)
+  {
+    const GUTF8String external = DjVuMessageLite::LookUpUTF8( message );
+    strout->writestring(external);
+  }
+}
+
 

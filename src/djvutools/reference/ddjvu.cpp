@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ddjvu.cpp,v 1.23 2001-06-11 18:32:27 fcrary Exp $
+// $Id: ddjvu.cpp,v 1.24 2001-06-13 18:26:19 bcr Exp $
 // $Name:  $
 
 /** @name ddjvu
@@ -111,7 +111,7 @@
     Yann Le Cun <yann@research.att.com>\\
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: ddjvu.cpp,v 1.23 2001-06-11 18:32:27 fcrary Exp $# */
+    #$Id: ddjvu.cpp,v 1.24 2001-06-13 18:26:19 bcr Exp $# */
 //@{
 //@}
 
@@ -169,8 +169,8 @@ convert(const GURL &from, const GURL &to, int page_num)
   // Verbose
   if (flag_verbose)
     {
-      DjVuPrintError( (const char*)dimg->get_long_description() );
-      DjVuFormatError( "%s\t%lu", ERR_MSG("ddjvu.decode"), stop - start);
+      DjVuPrintErrorUTF8( "%s",(const char*)dimg->get_long_description() );
+      DjVuFormatErrorUTF8( "%s\t%lu", ERR_MSG("ddjvu.decode"), stop - start);
     }
 
   // Check
@@ -187,12 +187,12 @@ convert(const GURL &from, const GURL &to, int page_num)
       else if (blackp)
         DjVuWriteError( ERR_MSG("ddjvu.bilevel") );
       // Without included files
-      DjVuFormatError( "%s\t%4.1f", ERR_MSG("ddjvu.memory"), 
+      DjVuFormatErrorUTF8( "%s\t%4.1f", ERR_MSG("ddjvu.memory"), 
               (double)(dimg->get_djvu_file()->get_memory_usage())/1024 );
     }    
   if (!compoundp && !colorp && !blackp)
     { 
-      DjVuPrintError("%s","Warning: This is not a well formed DjVu image\n");
+      DjVuPrintErrorUTF8("%s","Warning: This is not a well formed DjVu image\n");
       if (!info)
         G_THROW( ERR_MSG("ddjvu.no_info") ); 
     }
@@ -237,7 +237,7 @@ convert(const GURL &from, const GURL &to, int page_num)
   stop = GOS::ticks();
   if (flag_verbose)
     {
-      DjVuFormatError( "%d\t%lu", ERR_MSG("ddjvu.render"), stop - start);
+      DjVuFormatErrorUTF8( "%d\t%lu", ERR_MSG("ddjvu.render"), stop - start);
     }
 
   // Save image
@@ -264,7 +264,7 @@ convert(const GURL &from, const GURL &to, int page_num)
 void
 usage()
 {
-  DjVuPrintError("%s",
+  DjVuPrintErrorUTF8("%s",
           "DDJVU -- DjVu decompression utility\n"
           "  Copyright © 1999-2000 LizardTech, Inc. All Rights Reserved.\n"
           "Usage: ddjvu [options] [<djvufile> [<pnmfile>]]\n\n"

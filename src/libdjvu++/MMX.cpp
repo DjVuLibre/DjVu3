@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: MMX.cpp,v 1.16 2001-04-05 19:19:23 bcr Exp $
+// $Id: MMX.cpp,v 1.17 2001-06-13 18:26:19 bcr Exp $
 // $Name:  $
 
 #include "MMX.h"
@@ -59,7 +59,7 @@ mmx_show()
   MMXra( movq,  mm7, &mmregs[14]);
   MMXemms;
   for (int i=0; i<8; i++)
-    DjVuPrintMessage("mm%d: %08x%08x\n", i, 
+    DjVuPrintMessageUTF8("mm%d: %08x%08x\n", i, 
            mmregs[i+i+1], mmregs[i+i]);
   MMXar( movq,  &mmregs[0], mm0);
   MMXar( movq,  &mmregs[2], mm1);

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: XMLParser.cpp,v 1.12 2001-06-09 01:50:17 bcr Exp $
+// $Id: XMLParser.cpp,v 1.13 2001-06-13 18:26:19 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -572,7 +572,7 @@ lt_XMLParser::Impl::parse(const lt_XMLTags &tags)
       {
         if(args[typePos] != mimetype)
         {
-//          DjVuPrintError("Ignoring %s Object tag\n",mimetype);
+//          DjVuPrintErrorUTF8("Ignoring %s Object tag\n",mimetype);
           continue;
         }
         isDjVuType=true;

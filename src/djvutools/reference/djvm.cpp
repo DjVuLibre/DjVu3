@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djvm.cpp,v 1.20 2001-06-05 03:19:57 bcr Exp $
+// $Id: djvm.cpp,v 1.21 2001-06-13 18:26:19 bcr Exp $
 // $Name:  $
 
 /** @name djvm
@@ -99,7 +99,7 @@
     @author
     Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: djvm.cpp,v 1.20 2001-06-05 03:19:57 bcr Exp $# */
+    #$Id: djvm.cpp,v 1.21 2001-06-13 18:26:19 bcr Exp $# */
 //@{
 //@}
 
@@ -209,7 +209,11 @@ del(DArray<GUTF8String> &argv)
 
       // Delete the page
    int page_num=atoi(argv[3])-1;
-   if (page_num<0) { DjVuPrintError("%s","Page number must be positive.\n"); exit(1); }
+   if (page_num<0)
+   {
+     DjVuPrintErrorUTF8("%s","Page number must be positive.\n");
+     exit(1);
+   }
    doc->remove_page(page_num);
 
       // Save the document

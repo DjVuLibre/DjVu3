@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djvmcvt.cpp,v 1.21 2001-06-05 03:19:57 bcr Exp $
+// $Id: djvmcvt.cpp,v 1.22 2001-06-13 18:26:19 bcr Exp $
 // $Name:  $
 
 /** @name djvmcvt
@@ -106,7 +106,7 @@
     @author
     Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: djvmcvt.cpp,v 1.21 2001-06-05 03:19:57 bcr Exp $# */
+    #$Id: djvmcvt.cpp,v 1.22 2001-06-13 18:26:19 bcr Exp $# */
 
 #ifdef __GNUC__
 #pragma implementation
@@ -127,7 +127,7 @@ static const char * progname;
 
 static void Usage(void)
 {
-   DjVuPrintError("\
+   DjVuPrintErrorUTF8("\
 DJVMCVT -- DjVu multipage document conversion utility\n\
    Copyright © 1999-2000 LizardTech, Inc. All Rights Reserved.\n\
 \n\
@@ -195,7 +195,7 @@ main(int argc, char ** argv)
       if (bundled) do_bundled(dargv);
       else do_indirect(dargv);
    } G_CATCH(exc) {
-      DjVuPrintError("%s\n", exc.get_cause());
+      DjVuPrintErrorUTF8("%s\n", exc.get_cause());
       exit(1);
    } G_ENDCATCH;
 

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GUnicode.cpp,v 1.22 2001-06-12 19:38:31 bcr Exp $
+// $Id: GUnicode.cpp,v 1.23 2001-06-13 18:26:19 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -157,7 +157,6 @@ protected:
 static unsigned long xUTF16toUCS4(unsigned short const *&s,void const * const);
 static unsigned long UTF16BEtoUCS4(unsigned char const *&s,void const * const);
 static unsigned long UTF16LEtoUCS4(unsigned char const *&s,void const * const);
-static unsigned long UTS4BEtoUCS4(unsigned char const *&s,void const * const);
 static unsigned long UCS4BEtoUCS4(unsigned char const *&s,void const * const);
 static unsigned long UCS4LEtoUCS4(unsigned char const *&s,void const * const);
 static unsigned long UCS4_3412toUCS4(unsigned char const *&s,void const * const);

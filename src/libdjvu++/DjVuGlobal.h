@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuGlobal.h,v 1.54 2001-06-05 03:19:58 bcr Exp $
+// $Id: DjVuGlobal.h,v 1.55 2001-06-13 18:26:19 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUGLOBAL_H
@@ -86,7 +86,7 @@
     @memo
     Global definitions.
     @version
-    #$Id: DjVuGlobal.h,v 1.54 2001-06-05 03:19:58 bcr Exp $#
+    #$Id: DjVuGlobal.h,v 1.55 2001-06-13 18:26:19 bcr Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> -- empty file.\\
     Bill Riemers <bcr@lizardtech.com> -- real work.  */
@@ -317,14 +317,24 @@ class dummy /* This makes doc++ ignore this block */
 #endif
 
 /** This replaces fprintf(stderr,...), but with UTF8 encoded strings. */
-DJVUEXTERNCAPI(void DjVuPrintError(const char *fmt, ...));
+DJVUEXTERNCAPI(void DjVuPrintErrorUTF8(const char *fmt, ...));
+
+/** This replaces fprintf(stderr,...), but with UTF8 encoded strings. */
+DJVUEXTERNCAPI(void DjVuPrintErrorNative(const char *fmt, ...));
 
 /** This replaces printf(...), but requires UTF8 encoded strings. */
-DJVUEXTERNCAPI(void DjVuPrintMessage(const char *fmt, ...));
+DJVUEXTERNCAPI(void DjVuPrintMessageUTF8(const char *fmt, ...));
+
+/** This replaces printf(...), but requires UTF8 encoded strings. */
+DJVUEXTERNCAPI(void DjVuPrintMessageNative(const char *fmt, ...));
 
 /** The format (fmt) and arguments define a MessageList to be looked
     up in the external messages and printed to stderr. */
-DJVUEXTERNCAPI(void DjVuFormatError(const char *fmt, ...));
+DJVUEXTERNCAPI(void DjVuFormatErrorUTF8(const char *fmt, ...));
+
+/** The format (fmt) and arguments define a MessageList to be looked
+    up in the external messages and printed to stderr. */
+DJVUEXTERNCAPI(void DjVuFormatErrorNative(const char *fmt, ...));
 
 /** Prints the translation of message to stderr. */
 DJVUEXTERNCAPI(void DjVuWriteError( const char *message ));
@@ -338,7 +348,10 @@ DJVUEXTERNCAPI(void DjVuWriteMessage( const char *message ));
   in UTF-8. In case of error, msg_buffer is empty
   (i.e., msg_buffer[0] == '\0').
 */
-DJVUEXTERNCAPI(void DjVuMessage_LookUp(
+DJVUEXTERNCAPI(void DjVuMessageLookUpUTF8(
+  char *msg_buffer, const unsigned int buffer_size, 
+  const char *message ));
+DJVUEXTERNCAPI(void DjVuMessageLookUpNative(
   char *msg_buffer, const unsigned int buffer_size, 
   const char *message ));
 
