@@ -8,7 +8,7 @@
 # C- AT&T, you have an infringing copy of this software and cannot use it
 # C- without violating AT&T's intellectual property rights.
 # C-
-# C- $Id: Makefile.in,v 1.43 1999-09-20 23:12:59 leonb Exp $
+# C- $Id: Makefile.in,v 1.44 1999-09-20 23:14:43 leonb Exp $
 
 SHELL=/bin/sh
 prefix=@prefix@
@@ -181,12 +181,11 @@ install-lib: $(LIB)
 # Dependencies
 
 depend:
-	if [ -r $(SRCDIR)/Makefile.depend ] ; then rm -f $(SRCDIR)/Makefile.depend ; fi
 	( echo "### DEPENDENCIES" ;\
 	  for n in $(SRCDIR)/*.cpp ; \
-	  do ${CXX} -MM $(CXXFLAGS) $$n ; done ) > $(SRCDIR)/Makefile.depend
+	  do ${CXX} -MM $(CXXFLAGS) $$n ; done ) > Makefile.depend
 	sed -e '/^### DEPENDENCIES$$/,$$d' Makefile > Makefile.new
-	cat $(SRCDIR)/Makefile.depend >> Makefile.new
+	cat Makefile.depend >> Makefile.new
 	mv Makefile.new Makefile
 	  
 
