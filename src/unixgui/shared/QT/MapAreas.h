@@ -4,7 +4,7 @@
 //C-              Unauthorized use prohibited.
 //C-
 // 
-// $Id: MapAreas.h,v 1.1 2001-05-29 22:05:30 bcr Exp $
+// $Id: MapAreas.h,v 1.2 2001-06-18 19:26:28 mchen Exp $
 // $Name:  $
 
 
@@ -118,6 +118,7 @@ private:
    QWidget	* pane;
    
    bool		in_motion;
+   //bool         first_move;
    bool		active_outline_mode, inactive_outline_mode;
    bool		active;
    bool		force_always_active;
@@ -278,6 +279,7 @@ MapArea::startMoving(int x, int y)
 {
    start_x=x; start_y=y;
    in_motion=true;
+   //first_move=true;
    ma_saveData();
 }
 
@@ -312,11 +314,11 @@ protected:
    virtual GPQCursor	ma_getCursor(int vic_code, int vic_data) { QCursor *q=new QCursor(ArrowCursor); return GPQCursor(q);}
    virtual void		ma_move(const GRect & doc_rect, int x, int y,
 				int vic_code, int vic_data) {}
-   virtual void		ma_saveData(void) { saved_rect=gmap_rect; }
-   virtual void		ma_restoreSavedData(void) { gmap_rect=saved_rect; }
+   virtual void		ma_saveData(void) { *saved_rect=*gmap_rect; }
+   virtual void		ma_restoreSavedData(void) { *gmap_rect=*saved_rect; }
    virtual GMapArea *	ma_getCopiedData(void) { return copy_rect; }
-   virtual void		ma_loadCopy(void) { gmap_rect=copy_rect; }
-   virtual void		ma_copySaved(void) { copy_rect=saved_rect; }
+   virtual void		ma_loadCopy(void) { *gmap_rect=*copy_rect; }
+   virtual void		ma_copySaved(void) { *copy_rect=*saved_rect; }
 public:
    MapRect(const GP<GMapRect> & rect);
    virtual ~MapRect(void) {}
@@ -347,11 +349,15 @@ protected:
    virtual GPQCursor	ma_getCursor(int vic_code, int vic_data);
    virtual void 	ma_move(const GRect & doc_rect, int x, int y,
 				int vic_code, int vic_data);
-   virtual void		ma_saveData(void) { saved_poly=gmap_poly; }
-   virtual void		ma_restoreSavedData(void) { gmap_poly=saved_poly; }
+   //virtual void		ma_saveData(void) { saved_poly=gmap_poly; }
+   //virtual void		ma_restoreSavedData(void) { gmap_poly=saved_poly; }
+   virtual void		ma_saveData(void);
+   virtual void		ma_restoreSavedData(void);
    virtual GMapArea *	ma_getCopiedData(void) { return copy_poly; }
-   virtual void		ma_loadCopy(void) { gmap_poly=copy_poly; }
-   virtual void		ma_copySaved(void) { copy_poly=saved_poly; }
+   //virtual void		ma_loadCopy(void) { gmap_poly=copy_poly; }
+   //virtual void		ma_copySaved(void) { copy_poly=saved_poly; }
+   virtual void		ma_loadCopy(void);
+   virtual void		ma_copySaved(void);
 public:
    MapPoly(const GP<GMapPoly> & poly);
    virtual ~MapPoly(void) {}
@@ -375,11 +381,11 @@ protected:
    virtual GPQCursor	ma_getCursor(int vic_code, int vic_data) { return new QCursor(ArrowCursor);}
    virtual void 	ma_move(const GRect & doc_rect, int x, int y,
 				int vic_code, int vic_data) {}
-   virtual void		ma_saveData(void) { saved_oval=gmap_oval; }
-   virtual void		ma_restoreSavedData(void) { gmap_oval=saved_oval; }
+   virtual void		ma_saveData(void) { saved_oval->transform(gmap_oval->get_bound_rect()); }
+   virtual void		ma_restoreSavedData(void) { gmap_oval->transform(saved_oval->get_bound_rect()); }
    virtual GMapArea *	ma_getCopiedData(void) { return copy_oval; }
-   virtual void		ma_loadCopy(void) { gmap_oval=copy_oval; }
-   virtual void 	ma_copySaved(void) { copy_oval=saved_oval; }
+   virtual void		ma_loadCopy(void) { gmap_oval->transform(copy_oval->get_bound_rect()); }
+   virtual void 	ma_copySaved(void) { copy_oval->transform(saved_oval->get_bound_rect()); }
 public:
    MapOval(const GP<GMapOval> & oval);
    virtual ~MapOval(void) {}
