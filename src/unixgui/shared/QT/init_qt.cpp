@@ -32,13 +32,13 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: init_qt.cpp,v 1.7 2001-10-16 18:01:45 docbill Exp $
+// $Id: init_qt.cpp,v 1.6.2.1 2001-10-19 00:59:18 leonb Exp $
 // $Name:  $
 
-
-#ifdef __GNUC__
-#pragma implementation
+#ifdef HAVE_CONFIG_H
+#include "config.h"
 #endif
+
 
 #include <qfileinfo.h>
 #include <qtranslator.h>
@@ -68,19 +68,27 @@ extern char             * progname;
 
 #include <qwindowsstyle.h>
 #include <qmotifstyle.h>
+#if ( QT_VERSION >= 220 )
 #include <qmotifplusstyle.h>
 #include <qsgistyle.h>
+#endif
+#if ( QT_VERSION >= 210 )
 #include <qplatinumstyle.h>
 #include <qcdestyle.h>
+#endif
 
 #include <q1xcompatibility.h>
 
-static QWindowsStyle *windows=0;
-static QMotifStyle *motif=0;
-static QMotifPlusStyle *motifplus=0;
-static QSGIStyle *sgi=0;
-static QPlatinumStyle *platinum=0;
-static QCDEStyle *cde=0;
+static QWindowsStyle *windows = 0;
+static QMotifStyle *motif = 0;
+#if ( QT_VERSION >= 220 )
+static QMotifPlusStyle *motifplus = 0;
+static QSGIStyle *sgi = 0;
+#endif
+#if ( QT_VERSION >= 210 )
+static QPlatinumStyle *platinum = 0;
+static QCDEStyle *cde = 0;
+#endif
 
 #define QTNAMESPACE_QT Qt
 
@@ -196,9 +204,9 @@ InstallLangTranslator(void)
    
    // load language translation files
    bool have_translation=false;
-   QString lang = "lang_"+encoding+".qm";
-   GList<GURL> paths=DjVuMessage::GetProfilePaths();
-   for(GPosition pos=paths;!have_translation && pos;++pos)
+   QString lang = "lang_"+encoding+".qm";     /// encoding and not locale ???  LYB
+   GList<GURL> paths = DjVuMessage::GetProfilePaths();
+   for(GPosition pos=paths; !have_translation && pos; ++pos)
    {
       const GURL::UTF8 url(GStringFromQString(lang),paths[pos]);
       if(url.is_file())
@@ -213,14 +221,14 @@ InstallLangTranslator(void)
    // load locale sepcific font 
    QFont font;
    font.setCharSet(char_set);
-// for testing only 
-#if 1
-   if ( char_set == QFont::Set_Big5 ||
-	char_set == QFont::Big5 )
-   {
-      font.setPointSize(16);
-      font.setWeight(50);
-   }
+   // for testing only 
+#if ( QT_VERSION >= 220 )
+   if ( char_set == QFont::Set_Big5 
+        || char_set == QFont::Big5 )
+     {
+       font.setPointSize(16);
+       font.setWeight(50);
+     }
 #endif
    if ( font != QApplication::font() ) {
       //cout << "loading new font\n";
@@ -396,18 +404,21 @@ InitializeQT(int argc, char ** argv)
       {
 	 if ( !motif ) motif = new QMotifStyle();
 	 QApplication::setStyle(motif);
+#if ( QT_VERSION >= 220 )
       }else if (style=="motifplus")
       {
 	 if ( !motifplus ) motifplus = new QMotifPlusStyle();
 	 QApplication::setStyle(motifplus);
-      }else if (style=="platinum")
-      {
-	 if ( !platinum ) platinum = new QPlatinumStyle();
-	 QApplication::setStyle(platinum);
       }else if (style=="sgi")
       {
 	 if ( !sgi ) sgi = new QSGIStyle();
 	 QApplication::setStyle(sgi);
+#endif
+#if ( QT_VERSION >= 210 )
+      }else if (style=="platinum")
+      {
+	 if ( !platinum ) platinum = new QPlatinumStyle();
+	 QApplication::setStyle(platinum);
       }else if (style=="cde")
       {
 	 // from example themes.cpp
@@ -433,6 +444,7 @@ InitializeQT(int argc, char ** argv)
 	 p.setColor( QPalette::Disabled, QColorGroup::Text, Qt::lightGray );
 	 p.setColor( QPalette::Disabled, QColorGroup::ButtonText, Qt::lightGray );
 	 qApp->setPalette( p, TRUE );
+#endif
       }else if (style=="windows")
       {
 	 if ( !windows ) windows=new QWindowsStyle();
