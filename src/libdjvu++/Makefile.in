@@ -93,13 +93,19 @@ dvi:
 # Generic rules
 
 clean:
-	-rm 2>/dev/null -rf $(PROG) @Doc *.o *.a *.out *.rpo ii_files ; true
+	-rm 2>/dev/null -rf $(PROG) ; true
+	-rm 2>/dev/null *.o *.a *.out *.rpo ii_files ; true
 	( cd @Tools ; $(MAKE) clean )
 	( cd @Test ; $(MAKE) clean )
 	-@echo Cleaned.
 
+realclean:
+	-rm 2>/dev/null -rf @Doc ; true
+	-@$(MAKE) clean
+
 distclean:
-	-rm 2>/dev/null -rf $(PROG) *.o *.a *.out *.rpo ii_files Makefile ; true
+	-rm 2>/dev/null -rf $(PROG) ; true
+	-rm 2>/dev/null *.o *.a *.out *.rpo ii_files Makefile ; true
 	( cd @Tools ; $(MAKE) distclean )
 	( cd @Test ; $(MAKE) distclean )
 	-@echo Cleaned.
