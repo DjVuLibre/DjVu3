@@ -23,3 +23,5 @@ LIBMASKFINDXX=$(LIBPATH)/libmaskfind++.a
 LIBMASKFINDXX_INC=-I./TOPDIR/src/libmaskfind++ -I./TOPDIR/SRCDIR/src/libmaskfind++
 LIBJPEG=@%LIBJPEG%@
 LIBJPEG_INC=-I./TOPDIR/src/3rd-party/libjpeg -I./TOPDIR/SRCDIR/src/3rd-party/libjpeg
+LIBTIFF=@%LIBTIFF%@
+LIBTIFF_INC=-I./TOPDIR/src/3rd-party/tiff-v3.4/libtiff -I./TOPDIR/SRCDIR/src/3rd-party/tiff-v3.4/libtiff
