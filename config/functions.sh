@@ -266,12 +266,12 @@ EOF
 
 check_compiler()
 {
-  if [ -z "$CC$CXX" ]
+  if [ -z "$CC_SET$CXX_SET" ]
   then
     compilers="$*"
     if [ -z "$compilers" ]
     then
-      compilers="cc cxx"
+      compilers="cxx cc"
     fi
     LIBS=
     CONFIG_VARS=`echo LIBS $CONFIG_VARS`
@@ -279,13 +279,13 @@ check_compiler()
     do
       case $i in 
       cxx|CXX|c++|C++)
-        if [ -z "$CXX" ]
+        if [ -z "$CXX_SET" ]
         then
           . ${CONFIG_DIR}/cxx.sh
         fi
         ;;
       c|C|cc|CC)
-        if [ -z "$CC" ]
+        if [ -z "$CC_SET" ]
         then
           . ${CONFIG_DIR}/cc.sh
         fi

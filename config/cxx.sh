@@ -7,7 +7,7 @@ if [ -z "$CONFIG_DIR" ] ; then
 fi
 
 ECXX="eg++"
-if [ -z "$CXX" ] ; then
+if [ -z "$CXX_SET" ] ; then
   echo 'extern "C" {void exit(int);};void foo(void) {exit(0);}' |testfile $temp.cpp
   CXXFLAGS=""
   CXXSYMBOLIC=""
@@ -16,17 +16,30 @@ if [ -z "$CXX" ] ; then
   echon "Searching for C++ compiler ... "
   if ( run $EGXX -c $temp.cpp ) ; then
     CXX="$EGXX"
-  elif ( run g++ -c $temp.cpp ) ; then
-    CXX=c++
-  elif ( run CC -c $temp.cpp ) ; then
-    CXX=CC
-  else 
-    echo "none available"
-    echo "Error: Can't find a C++ compiler" 1>&2
-    exit 1
+    echo "$CXX"
+  elif [ ! -z "$CXX" ] ; then
+    if ( run g++ -c $temp.cpp ) ; then
+      echo "$CXX"
+    else
+      CXX=""
+    fi
   fi
-  echo "$CXX"
-
+  if [ -z "$CXX" ] ; then
+    if ( run g++ -c $temp.cpp ) ; then
+      CXX=c++
+    elif ( run CC -c $temp.cpp ) ; then
+      CXX=CC
+    else 
+      echo "none available"
+      echo "Error: Can't find a C++ compiler" 1>&2
+      exit 1
+    fi
+    echo "$CXX"
+  fi
+  if [ -z "$CC" ] 
+  then
+    CC="$CXX -x c -fexceptions"
+  fi
   echon "Checking ${CXX} version ... "
   CXXVERSION=""
   if [ "$CXX" != "$EGXX" ] ; then
@@ -132,7 +145,8 @@ if [ -z "$CXX" ] ; then
       CXXOPT=""
     fi
   fi
+  CXX_SET=true
   "${rm}" -rf $temp.cpp $temp.so $temp.o
-  CONFIG_VARS=`echo CXX CXXFLAGS CXXOPT CXXUNROLL CXXWARN CXXSYMBOLIC CXXPIC cxx_is_gcc $CONFIG_VARS`
+  CONFIG_VARS=`echo CXX_SET CXX CXXFLAGS CXXOPT CXXUNROLL CXXWARN CXXSYMBOLIC CXXPIC cxx_is_gcc $CONFIG_VARS`
 fi
 

@@ -8,7 +8,7 @@ then
 fi
 
 EGCS="egcs"
-if [ -z "$CC" ]
+if [ -z "$CC_SET" ]
 then
   CCFLAGS=""
   CCSYMBOLIC=""
@@ -16,20 +16,34 @@ then
   cc_is_gcc=""
   (echo '#include <stdio.h>';echo 'int main(void) {puts("Hello World\n");return 0;}')|testfile $temp.c
   echon "Searching for C compiler ... "
-  if ( run $EGCS -c $temp.c ) ; then
-    CC="$EGCS"
-  elif ( run gcc -c $temp.c ) ; then
-    CC=gcc
-  elif ( run cc -c $temp.c ) ; then
-    CC=cc
-  elif ( run CC -c $temp.c ) ; then
-    CC=CC
-  else
-    echo "none available"
-    echo "Error: Can't find a C compiler" 1>&2
-    exit 1
+  if [ -n "$CC" ] ; then
+    if ( run "$CC" -c $temp.c ) ; then
+      echo $CC"
+    else
+      CC=""
+    fi
   fi
-  echo "$CC"
+  if [ -z "$CC" ] ; then
+    if ( run $EGCS -c $temp.c ) ; then
+      CC="$EGCS"
+      echo $CC"
+    if ( run gcc -c $temp.c ) ; then
+      CC=gcc
+    elif ( run cc -c $temp.c ) ; then
+      CC=cc
+    elif ( run CC -c $temp.c ) ; then
+      CC=CC
+    else
+      echo "none available"
+      echo "Error: Can't find a C compiler" 1>&2
+      exit 1
+    fi
+    echo "$CC"
+  fi
+  if [ -z "$CXX" ] 
+  then
+    CXX="$CC -x c++"
+  fi
 
   CCVERSION=""
   echon "Checking ${CC} version ... "
@@ -170,6 +184,7 @@ then
     fi
   fi
   "${rm}" -rf $temp.c $temp.o $temp.so
-  CONFIG_VARS=`echo CC CCFLAGS CCOPT CCWARN CCUNROLL CCSYMBOLIC CCPIC cc_is_gcc $CONFIG_VARS`
+  CC_SET=true
+  CONFIG_VARS=`echo CC CC_SET CCFLAGS CCOPT CCWARN CCUNROLL CCSYMBOLIC CCPIC cc_is_gcc $CONFIG_VARS`
 fi
 
