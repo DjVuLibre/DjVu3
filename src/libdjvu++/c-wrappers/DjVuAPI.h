@@ -1,4 +1,4 @@
-/* File "$Id: DjVuAPI.h,v 1.1 1999-11-04 20:41:06 orost Exp $"
+/* File "$Id: DjVuAPI.h,v 1.2 1999-11-10 17:18:30 parag Exp $"
  *
  * The main header file for the DjVu API
  */
@@ -11,7 +11,10 @@
 
 /* 
  * $Log: DjVuAPI.h,v $
- * Revision 1.1  1999-11-04 20:41:06  orost
+ * Revision 1.2  1999-11-10 17:18:30  parag
+ * Added Orientation Flags in run and pixel img
+ *
+ * Revision 1.1  1999/11/04 20:41:06  orost
  * It is a common file used by different libraries.
  * Mostly contains the image structures.
  *
@@ -151,6 +154,14 @@ typedef enum {
   binaryCOLOR
 } pnm;
 
+
+ /* Mirror and Rotate90 is added to represent the orientation of any tiff
+  * image.
+	*/
+#define 						 DJVU_PIXEL_MIRROR     0x20
+#define 						 DJVU_PIXEL_ROTATE90   0x40
+#define              DJVU_PIXEL_BOTTOM_UP  0x02
+
 // This class is for PNM IO.
 /*
  * DjVu Image Formats
@@ -162,7 +173,6 @@ typedef enum {
              typedef struct djvu_pixel_image_struct
              {
                int flags;
-#define              DJVU_PIXEL_BOTTOM_UP  0x02
 #define              DJVU_PIXEL_RGB        0x04
 #define              DJVU_PIXEL_BGR        0x08
 #define              DJVU_PIXEL_GRAY       0x10
@@ -214,7 +224,7 @@ typedef enum {
  *      djvu_run_image
  *		See DjVuAPI-2_0.html#djvu_run_image
  */
-             typedef enum { BIT_RUN=0, GRAY_RUN, COLOR_RUN } djvu_run_image_type;
+             typedef enum { BIT_RUN=0, GRAY_RUN, COLOR_RUN , BITMAP_RUNS, BIT_FLAGS} djvu_run_image_type;
              typedef struct djvu_run_image_struct
              {
                unsigned int    w;      /* width of the image in pixels */
@@ -224,6 +234,7 @@ typedef enum {
                unsigned int    xdpi;    /* DPI of the mask */
                unsigned int    ydpi;    /* DPI of the mask */
                djvu_run_image_type runtype;
+							 int flags;
 #ifdef __cplusplus
                djvu_run_image_struct();
 #endif
@@ -232,7 +243,7 @@ typedef enum {
 #ifdef __cplusplus
              inline
              djvu_run_image_struct::djvu_run_image_struct()
-             : w(0), h(0), nruns(0), runs(0), xdpi(0), ydpi(0) {}
+             : w(0), h(0), nruns(0), runs(0), xdpi(0), ydpi(0), flags(0) {}
 #endif
 /* 
  *           Deallocation:
