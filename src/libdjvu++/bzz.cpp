@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: bzz.cpp,v 1.1 1999-01-22 00:40:19 leonb Exp $
+//C-  $Id: bzz.cpp,v 1.2 1999-01-26 19:42:39 leonb Exp $
 
 // BZZ -- a frontend for BSByteStream
 
@@ -31,7 +31,7 @@
     @author
     Leon Bottou <leonb@research.att.com> -- initial implementation
     @version
-    #$Id: bzz.cpp,v 1.1 1999-01-22 00:40:19 leonb Exp $# */
+    #$Id: bzz.cpp,v 1.2 1999-01-26 19:42:39 leonb Exp $# */
 //@{
 //@}
 
@@ -104,12 +104,12 @@ main(int argc, char **argv)
       StdioByteStream out(outfile,"wb");
       if (blocksize)
         {
-          BSByteStream bsb(&out, blocksize);
+          BSByteStream bsb(out, blocksize);
           bsb.copy(in);
         }
       else 
         {
-          BSByteStream bsb(&in);
+          BSByteStream bsb(in);
           out.copy(bsb);
         }
     }

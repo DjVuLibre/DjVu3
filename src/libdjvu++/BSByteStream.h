@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: BSByteStream.h,v 1.1 1999-01-22 00:40:19 leonb Exp $
+//C-  $Id: BSByteStream.h,v 1.2 1999-01-26 19:42:39 leonb Exp $
 
 
 #ifndef _BSBYTESTREAM_H
@@ -90,7 +90,7 @@
     @memo
     Simple Burrows-Wheeler general purpose compressor.
     @version
-    #$Id: BSByteStream.h,v 1.1 1999-01-22 00:40:19 leonb Exp $# */
+    #$Id: BSByteStream.h,v 1.2 1999-01-26 19:42:39 leonb Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -153,7 +153,7 @@ public:
       specify a block size larger than the total number of bytes to compress.
       Setting #blocksize# to #1024# is a good starting point.
       \end{description} */
-  BSByteStream(ByteStream *bs, int blocksize=0);
+  BSByteStream(ByteStream &bs, int blocksize=0);
   // ByteStream Interface
   ~BSByteStream();
   size_t read(void *buffer, size_t size);

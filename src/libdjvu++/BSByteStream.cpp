@@ -7,9 +7,9 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: BSByteStream.cpp,v 1.1 1999-01-22 00:40:19 leonb Exp $
+//C-  $Id: BSByteStream.cpp,v 1.2 1999-01-26 19:42:39 leonb Exp $
 
-// "$Id: BSByteStream.cpp,v 1.1 1999-01-22 00:40:19 leonb Exp $"
+// "$Id: BSByteStream.cpp,v 1.2 1999-01-26 19:42:39 leonb Exp $"
 // - Author: Leon Bottou, 07/1998
 
 
@@ -1041,10 +1041,10 @@ BSByteStream::decode()
 
 
 
-BSByteStream::BSByteStream(ByteStream *bs_in, int encoding)
+BSByteStream::BSByteStream(ByteStream &xbs, int encoding)
   : encoding(encoding), offset(0), bptr(0), blocksize(0), 
-    data(0), size(0), eof(0), bs(bs_in),
-    zp(*bs_in, encoding)
+    data(0), size(0), eof(0), bs(&xbs),
+    zp(*bs, encoding)
 {
   if (encoding)
     {
