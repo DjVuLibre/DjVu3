@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuDocumentAPI.h,v 1.18 2000-02-15 20:59:21 haffner Exp $
+ *C- $Id: DjVuDocumentAPI.h,v 1.19 2000-02-18 08:02:06 bcr Exp $
  */
 
 #ifndef _DJVUDOC_H_
@@ -306,6 +306,19 @@ typedef struct djvu_segmenter_options_struct
       \end{description}
    */
   int bg_subsampling;
+
+  /** Subsampling target for viewing the image.
+
+      \begin{description}
+      \item[Option type] Pixel size.
+      \item[Range] 1..6
+      \item[1] 300dpi bg
+      \item[6] 50dpi bg
+      \item[Default] 3
+      \item[Command line] yes
+      \end{description}
+   */
+  int target_subsampling;
 
   /*@}*/
 

@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuOptions.h,v 1.6 2000-02-15 00:09:36 haffner Exp $
+ *C- $Id: DjVuOptions.h,v 1.7 2000-02-18 08:02:06 bcr Exp $
  */
 
 #ifndef _DJVU_OPTIONS_H_
@@ -136,6 +136,7 @@ extern const char djvu_render_size_string[];
 extern const char djvu_blurring_size_string[];
 extern const char djvu_fg_subsampling_string[];
 extern const char djvu_bg_subsampling_string[];
+extern const char djvu_target_subsampling_string[];
 extern const char djvu_resolution_multiplier_string[];
 extern const char djvu_high_variation_foreground_string[];
 extern const char djvu_refine_string[];
@@ -154,6 +155,7 @@ extern const char djvu_background_floss_string[];
 #define djvu_blurring_size_option {djvu_blurring_size_string+2,1,0,0xee}
 #define djvu_fg_subsampling_option {djvu_fg_subsampling_string+2,1,0,0xec}
 #define djvu_bg_subsampling_option {djvu_bg_subsampling_string+2,1,0,0xeb}
+#define djvu_target_subsampling_option {djvu_bg_subsampling_string+2,1,0,0xe7}
 #define djvu_resolution_multiplier_option {djvu_resolution_multiplier_string+2,1,0,0xea}
 #define djvu_high_variation_foreground_option {djvu_high_variation_foreground_string+2,2,0,0xe9}
 #define djvu_refine_option {djvu_refine_string+2, 2, 0, 0xe8}
