@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GURL.h,v 1.32 2001-01-04 22:04:55 bcr Exp $
+// $Id: GURL.h,v 1.33 2001-03-08 23:57:26 bcr Exp $
 // $Name:  $
 
 #ifndef _GURL_H_
@@ -49,7 +49,7 @@
     \Ref{GURL} class used to store URLs in a system independent format.
     @memo System independent URL representation.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: GURL.h,v 1.32 2001-01-04 22:04:55 bcr Exp $#
+    @version #$Id: GURL.h,v 1.33 2001-03-08 23:57:26 bcr Exp $#
 */
 
 //@{
@@ -82,8 +82,9 @@ private:
    GCriticalSection	class_lock;
    GString		url;
    DArray<GString>	cgi_name_arr, cgi_value_arr;
+   bool validurl;
 
-   void		init(void);
+   void		init(const bool nothrow=false);
    void		convert_slashes(void);
    void		beautify_path(void);
 
@@ -91,6 +92,9 @@ private:
    void		parse_cgi_args(void);
    void		store_cgi_args(void);
 public:
+   /// Test if the URL is valid.
+   bool is_valid(void) const;
+
       /// Extracts the {\em protocol} part from the URL and returns it
    GString	protocol(void) const;
 
@@ -260,14 +264,24 @@ hash(const GURL & gurl)
 inline GString
 GURL::protocol(void) const
 {
+   if(!validurl) const_cast<GURL *>(this)->init();
    return protocol(url);
 }
 
 inline bool
 GURL::is_empty(void) const
 {
+   if(!validurl) const_cast<GURL *>(this)->init();
    return !url.length();
 }
+
+inline bool
+GURL::is_valid(void) const
+{
+  if(!validurl) const_cast<GURL *>(this)->init(true);
+  return validurl;
+}
+
 
 //@}
 

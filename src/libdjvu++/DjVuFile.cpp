@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuFile.cpp,v 1.153 2001-03-06 19:55:42 bcr Exp $
+// $Id: DjVuFile.cpp,v 1.154 2001-03-08 23:57:26 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -1949,7 +1949,7 @@ copy_chunks(GP<ByteStream> from, IFFByteStream &ostr)
 
 void
 DjVuFile::add_djvu_data(IFFByteStream & ostr, GMap<GURL, void *> & map,
-                        bool included_too, bool no_ndir)
+                        const bool included_too, const bool no_ndir)
 {
   check();
   if (map.contains(url)) return;
@@ -2008,20 +2008,8 @@ DjVuFile::add_djvu_data(IFFByteStream & ostr, GMap<GURL, void *> & map,
             copy_chunks(text, ostr);
           }
         }
-        else if (chkid=="NDIR" && dir && !no_ndir)
-        {
-#ifndef NEED_DECODER_ONLY   
-          // Decoder should never generate old NDIR chunks
-          if (dir && !no_ndir)
-          {
-            ostr.put_chunk(chkid);
-            dir->encode(ostr);
-            ostr.close_chunk();
-          }
-#endif
-        } 
-        else if (chkid!="NDIR" || !no_ndir)
-        {
+        else if (chkid!="NDIR"||!(no_ndir || dir))
+        {  // Copy NDIR chunks, but never generate new ones.
           ostr.put_chunk(chkid);
           ostr.copy(iff);
           ostr.close_chunk();
@@ -2066,7 +2054,7 @@ DjVuFile::add_djvu_data(IFFByteStream & ostr, GMap<GURL, void *> & map,
 
 
 GP<ByteStream>  
-DjVuFile::get_djvu_bytestream(bool included_too, bool no_ndir)
+DjVuFile::get_djvu_bytestream(const bool included_too, const bool no_ndir)
 {
    check();
    DEBUG_MSG("DjVuFile::get_djvu_bytestream(): creating DjVu raw file\n");
@@ -2082,7 +2070,7 @@ DjVuFile::get_djvu_bytestream(bool included_too, bool no_ndir)
 }
 
 GP<DataPool>
-DjVuFile::get_djvu_data(bool included_too, bool no_ndir)
+DjVuFile::get_djvu_data(const bool included_too, const bool no_ndir)
 {
   GP<ByteStream> pbs = get_djvu_bytestream(included_too, no_ndir);
   return DataPool::create(*pbs);
@@ -2214,7 +2202,7 @@ DjVuFile::remove_text(void)
 void
 DjVuFile::rebuild_data_pool(void)
 {
-  data_pool=get_djvu_data(false, false);
+  data_pool=get_djvu_data(false,false);
   chunks_number=1;
   flags|=MODIFIED;
 }

@@ -30,17 +30,40 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessage.cpp,v 1.14 2001-01-04 22:04:55 bcr Exp $
+// $Id: DjVuMessage.cpp,v 1.15 2001-03-08 23:57:26 bcr Exp $
 // $Name:  $
 
 
 
 #include "DjVuMessage.h"
+#include "GOS.h"
 #ifndef macintosh
 #include "parseoptions.h"
 #endif
 #include <ctype.h>
 #include <stdio.h>
+#include <unistd.h>
+#ifdef WIN32
+#include <tchar.h>
+#include <atlbase.h>
+#include <windows.h>
+#include <winreg.h>
+#endif
+#ifdef UNIX
+#include <pwd.h>
+#include <sys/types.h>
+#endif
+
+#ifdef WIN32
+static const char LocalDjVuDir[] ="Profiles"; // appended to the home directory.
+static const char RootDjVuDir[] ="C:/Program Files/LizardTech/Profiles";
+#else
+static const char LocalDjVuDir[] =".DjVu"; // appended to the home directory.
+static const char RootDjVuDir[] ="/etc/DjVu/";
+static const char registerypath[]="Software\\LizardTech\\DjVu\\Profile Path";
+#endif
+static const char DjVuEnv[]="DJVU_CONFIG_DIR";
+
 
 //  There is only object of class DjVuMessage in a program, and here it is:
 //DjVuMessage  DjVuMsg;
@@ -61,20 +84,6 @@ DjVuMessage::DjVuMessage( void ) : opts(0)
 #ifndef macintosh
    opts=new DjVuParseOptions(DjVuMessageFileName);
 #endif
-//  const char *ss;
-//  struct djvu_parse opt = djvu_parse_init( "-" );
-//  ss = djvu_parse_configfile( opt, DjVuMessageFileName, -1 );
-//  FILE *MessageFile = fopen( ss, "r" );
-//
-//  if( MessageFile == NULL )
-//  {
-//    fprintf( stderr, "*** Unable to find message file (%s)\n*** Expect cryptic error messages\n\n",
-//                   DjVuMessageFileName );
-//  }
-//  else
-//  {
-//    fclose( MessageFile );
-//  }
 }
 
 // Destructor
@@ -256,3 +265,103 @@ DjVuMessage::InsertArg( GString &message, int ArgId, GString arg ) const
   }
 }
 
+#if 0
+#ifdef WIN32
+static GString
+RegOpenReadConfig ( HKEY hParentKey )
+{
+  GString retval;
+   // To do:  This needs to be shared with SetProfile.cpp
+  LPCTSTR path = TEXT(registerypath) ;
+
+  HKEY hKey = 0;
+  // MultiByteToWideChar(CP_ACP,MB_PRECOMPOSED,argv[1],strlen(argv[1])+1,wszSrcFile,sizeof(wszSrcFile));
+  if (RegOpenKeyEx(hParentKey, path, 0,
+              KEY_READ, &hKey) == ERROR_SUCCESS )
+  {
+    TCHAR path[1024];
+    // Success
+    LPCTSTR szPathValue = path;
+    LPCTSTR lpszEntry = TEXT("");
+    DWORD dwCount = (sizeof(path)/sizeof(TCHAR))-1;
+    DWORD dwType;
+
+//    LONG lResult = RegQueryValueEx(hKey, lpszEntry, NULL,
+//             &dwType, (LPBYTE) szPathValue, &dwCount);
+    LONG lResult = RegQueryValueEx(hKey, lpszEntry, NULL,
+             &dwType, szPathValue, &dwCount);
+
+    RegCloseKey(hKey);
+
+    if ((lResult == ERROR_SUCCESS))
+    {
+      szPathValue[dwCount] = 0;
+      USES_CONVERSION;
+      strcpy(retval.getbuf(_tcslen(path)),T2CA(path));
+    }
+  } 
+//  if (hKey)  RegCloseKey(hKey); 
+  return retval;
+}
+
+static GString
+GetModualPath( void )
+{
+  TCHAR path[1024];
+  DWORD dwCount = (sizeof(path)/sizeof(TCHAR))-1;
+  GetModuleFileName(0, path, dwCount);
+  GString retval;
+  USES_CONVERSION;
+  strcpy(retval.getbuf(_tcslen(path)),T2CA(path));
+  return GOS::expand_name(LocalDjVuDir,GOS::dirname(retval));
+}
+#endif
+
+GList<GString> &
+GetProfilePaths(void)
+{
+  static bool first=true;
+  static GList<GString> paths;
+  if(first)
+  {
+    first=false;
+    const char *envp=getenv(DjVuEnv);
+    if(envp)
+      paths.append(envp);
+#ifdef WIN32
+    GString path(GetModulePath());
+    if(path.length() && GOS::is_dir(path))
+      paths.append(path);
+    path=RegOpenReadConfig (HKEY_CURRENT_USER);
+    if(path.length() && GOS::is_dir(path))
+      paths.append(path);
+    path=(RegOpenReadConfig (HKEY_LOCAL_MACHINE));
+    if(path.length() && GOS::is_dir(path))
+      paths.append(path);
+#else
+    GString path;
+    const char* home=getenv("HOME");
+    struct passwd *pw=0;
+    if(!home)
+    {
+      pw=getpwuid(getuid());
+      if(pw)
+        home=pw->pw_dir;
+    }
+    if(home)
+    {
+      path=GOS::expand_name(LocalDjVuDir,home);
+      if(path.length() && GOS::is_dir(path))
+        paths.append(path);
+    }
+    if(pw)
+    {
+      free(pw);
+    }
+#endif
+    if(GOS::is_dir(RootDjVuDir))
+      paths.append(RootDjVuDir);
+  }
+  return paths;
+}
+#endif

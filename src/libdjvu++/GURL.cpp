@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GURL.cpp,v 1.49 2001-02-14 19:11:10 praveen Exp $
+// $Id: GURL.cpp,v 1.50 2001-03-08 23:57:26 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -59,6 +59,7 @@ is_argument(const char * start)
 void
 GURL::convert_slashes(void)
 {
+   if(!validurl) init();
 #ifndef UNIX
    GCriticalSectionLock lock(&class_lock);
    for(char *ptr=(url.getbuf()+protocol().length());*ptr;ptr++)
@@ -84,6 +85,7 @@ collapse(char * ptr, const int chars)
 void
 GURL::beautify_path(void)
 {
+  if(!validurl) init();
   GCriticalSectionLock lock(&class_lock);
    
   // Eats parts like ./ or ../ or ///
@@ -135,15 +137,21 @@ GURL::beautify_path(void)
 }
 
 void
-GURL::init(void)
+GURL::init(const bool nothrow)
 {
    GCriticalSectionLock lock(&class_lock);
+   validurl=true;
    
    if (url.length())
    {
       GString proto=protocol();
       if (!proto.length())
-        G_THROW("GURL.no_protocol\t"+url);
+      {
+        validurl=false;
+        if(!nothrow)
+          G_THROW("GURL.no_protocol\t"+url);
+        return;
+      }
 
          // Below we have to make this complex test to detect URLs really
          // referring to *local* files. Surprisingly, file://hostname/dir/file
@@ -165,34 +173,39 @@ GURL::init(void)
             // Do double conversion
          GString tmp=GOS::url_to_filename(url);
          if (!tmp.length())
-           G_THROW("GURL.fail_to_file");
+         {
+           validurl=false;
+           if(!nothrow)
+             G_THROW("GURL.fail_to_file");
+           return;
+         }
          url=GOS::filename_to_url(tmp);
          if (!url.length())
-           G_THROW("GURL.fail_to_URL");
-
+         {
+           validurl=false;
+           if(!nothrow)
+             G_THROW("GURL.fail_to_URL");
+           return;
+         }
             // Return the argument back
          url+=arg;
       }
-
       convert_slashes();
       beautify_path();
       parse_cgi_args();
    }
 }
 
-GURL::GURL(const char * url_in) : url(url_in ? url_in : "")
+GURL::GURL(const char * url_in) : url(url_in ? url_in : ""), validurl(false)
 {
-   init();
 }
 
-GURL::GURL(const GString & url_in) : url(url_in)
+GURL::GURL(const GString & url_in) : url(url_in), validurl(false)
 {
-   init();
 }
 
-GURL::GURL(const GURL & url_in) : url(url_in.url)
+GURL::GURL(const GURL & url_in) : url(url_in.url), validurl(false)
 {
-   init();
 }
 
 GURL &
@@ -219,6 +232,7 @@ GString
 GURL::hash_argument(void) const
       // Returns the HASH argument (anything after '#' and before '?')
 {
+   if(!validurl) const_cast<GURL *>(this)->init();
    GCriticalSectionLock lock((GCriticalSection *) &class_lock);
    bool found=false;
    GString arg;
@@ -240,6 +254,7 @@ GURL::hash_argument(void) const
 void
 GURL::set_hash_argument(const char * arg)
 {
+   if(!validurl) init();
    GCriticalSectionLock lock((GCriticalSection *) &class_lock);
 
    GString new_url;
@@ -268,6 +283,7 @@ GURL::parse_cgi_args(void)
       // Will read CGI arguments from the URL into
       // cgi_name_arr and cgi_value_arr
 {
+   if(!validurl) init();
    GCriticalSectionLock lock1(&class_lock);
    cgi_name_arr.empty();
    cgi_value_arr.empty();
@@ -329,6 +345,7 @@ GURL::store_cgi_args(void)
       // Will store CGI arguments from the cgi_name_arr and cgi_value_arr
       // back into the URL
 {
+   if(!validurl) init();
    GCriticalSectionLock lock1(&class_lock);
 
    const char * const url_ptr=url;
@@ -353,6 +370,7 @@ GURL::store_cgi_args(void)
 int
 GURL::cgi_arguments(void) const
 {
+   if(!validurl) const_cast<GURL *>(this)->init();
    GCriticalSectionLock lock((GCriticalSection *) &class_lock);
    return cgi_name_arr.size();
 }
@@ -360,6 +378,7 @@ GURL::cgi_arguments(void) const
 int
 GURL::djvu_cgi_arguments(void) const
 {
+   if(!validurl) const_cast<GURL *>(this)->init();
    GCriticalSectionLock lock((GCriticalSection *) &class_lock);
 
    int args=0;
@@ -377,6 +396,7 @@ GURL::djvu_cgi_arguments(void) const
 GString
 GURL::cgi_name(int num) const
 {
+   if(!validurl) const_cast<GURL *>(this)->init();
    GCriticalSectionLock lock((GCriticalSection *) &class_lock);
    return (num<cgi_name_arr.size())?cgi_name_arr[num]:GString();
 }
@@ -384,6 +404,7 @@ GURL::cgi_name(int num) const
 GString
 GURL::djvu_cgi_name(int num) const
 {
+   if(!validurl) const_cast<GURL *>(this)->init();
    GCriticalSectionLock lock((GCriticalSection *) &class_lock);
 
    GString arg;
@@ -404,6 +425,7 @@ GURL::djvu_cgi_name(int num) const
 GString
 GURL::cgi_value(int num) const
 {
+   if(!validurl) const_cast<GURL *>(this)->init();
    GCriticalSectionLock lock((GCriticalSection *) &class_lock);
    return (num<cgi_value_arr.size())?cgi_value_arr[num]:GString();
 }
@@ -411,6 +433,7 @@ GURL::cgi_value(int num) const
 GString
 GURL::djvu_cgi_value(int num) const
 {
+   if(!validurl) const_cast<GURL *>(this)->init();
    GCriticalSectionLock lock((GCriticalSection *) &class_lock);
 
    GString arg;
@@ -435,6 +458,7 @@ GURL::djvu_cgi_value(int num) const
 DArray<GString>
 GURL::cgi_names(void) const
 {
+   if(!validurl) const_cast<GURL *>(this)->init();
    GCriticalSectionLock lock((GCriticalSection *) &class_lock);
    return cgi_name_arr;
 }
@@ -442,6 +466,7 @@ GURL::cgi_names(void) const
 DArray<GString>
 GURL::cgi_values(void) const
 {
+   if(!validurl) const_cast<GURL *>(this)->init();
    GCriticalSectionLock lock((GCriticalSection *) &class_lock);
    return cgi_value_arr;
 }
@@ -449,6 +474,7 @@ GURL::cgi_values(void) const
 DArray<GString>
 GURL::djvu_cgi_names(void) const
 {
+   if(!validurl) const_cast<GURL *>(this)->init();
    GCriticalSectionLock lock((GCriticalSection *) &class_lock);
 
    int i;
@@ -472,6 +498,7 @@ GURL::djvu_cgi_names(void) const
 DArray<GString>
 GURL::djvu_cgi_values(void) const
 {
+   if(!validurl) const_cast<GURL *>(this)->init();
    GCriticalSectionLock lock((GCriticalSection *) &class_lock);
 
    int i;
@@ -501,6 +528,7 @@ void
 GURL::clear_hash_argument(void)
       // Clear anything after first '#' and before the following '?'
 {
+   if(!validurl) init();
    GCriticalSectionLock lock(&class_lock);
    bool found=false;
    GString new_url;
@@ -527,6 +555,7 @@ GURL::clear_hash_argument(void)
 void
 GURL::clear_cgi_arguments(void)
 {
+   if(!validurl) init();
    GCriticalSectionLock lock1(&class_lock);
 
       // Clear the arrays
@@ -545,6 +574,7 @@ GURL::clear_cgi_arguments(void)
 void
 GURL::clear_djvu_cgi_arguments(void)
 {
+   if(!validurl) init();
       // First - modify the arrays
    GCriticalSectionLock lock(&class_lock);
    for(int i=0;i<cgi_name_arr.size();i++)
@@ -564,6 +594,7 @@ GURL::clear_djvu_cgi_arguments(void)
 void
 GURL::add_djvu_cgi_argument(const char * name, const char * value)
 {
+   if(!validurl) init();
    GCriticalSectionLock lock1(&class_lock);
 
       // Check if we already have the "DJVUOPTS" argument
@@ -600,6 +631,7 @@ GURL::add_djvu_cgi_argument(const char * name, const char * value)
 bool
 GURL::is_local_file_url(void) const
 {
+   if(!validurl) const_cast<GURL *>(this)->init();
    GCriticalSectionLock lock((GCriticalSection *) &class_lock);
    return (protocol()=="file" && url[5]=='/');
 }
@@ -607,6 +639,7 @@ GURL::is_local_file_url(void) const
 GURL
 GURL::base(void) const
 {
+   if(!validurl) const_cast<GURL *>(this)->init();
    GCriticalSectionLock lock((GCriticalSection *) &class_lock);
 
    const char * const url_ptr=url;
@@ -627,6 +660,7 @@ GURL::base(void) const
 GString
 GURL::name(void) const
 {
+   if(!validurl) const_cast<GURL *>(this)->init();
    GCriticalSectionLock lock((GCriticalSection *) &class_lock);
    const char * ptr, * slash;
    for(ptr=slash=(const char *)url+protocol().length()+1;
@@ -642,12 +676,14 @@ GURL::name(void) const
 GString
 GURL::fname(void) const
 {
+   if(!validurl) const_cast<GURL *>(this)->init();
    return GOS::decode_reserved(name());
 }
 
 GString
 GURL::extension(void) const
 {
+   if(!validurl) const_cast<GURL *>(this)->init();
    GString filename=name();
    GString retval;
 
@@ -665,6 +701,7 @@ GURL::extension(void) const
 GURL
 GURL::operator+(const char * xname) const
 {
+   if(!validurl) const_cast<GURL *>(this)->init();
    GCriticalSectionLock lock((GCriticalSection *) &class_lock);
    GURL res;
    if (!protocol(xname).length())
@@ -683,3 +720,4 @@ GURL::operator+(const char * xname) const
    res.parse_cgi_args();
    return res;
 }
+

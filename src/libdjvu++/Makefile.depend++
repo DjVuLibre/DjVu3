@@ -5,7 +5,12 @@ Arrays.o: Arrays.cpp Arrays.h GException.h \
 BSByteStream.o: BSByteStream.cpp BSByteStream.h \
  ByteStream.h Arrays.h GException.h \
  DjVuGlobal.h ../../src/include/DjVu.h \
- GSmartPointer.h ZPCodec.h
+ GSmartPointer.h ZPCodec.h GContainer.h
+BSEncodeByteStream.o: BSEncodeByteStream.cpp \
+ BSByteStream.h ByteStream.h Arrays.h \
+ GException.h DjVuGlobal.h \
+ ../../src/include/DjVu.h GSmartPointer.h \
+ ZPCodec.h GContainer.h GString.h
 ByteStream.o: ByteStream.cpp ByteStream.h \
  Arrays.h GException.h DjVuGlobal.h \
  ../../src/include/DjVu.h GSmartPointer.h GOS.h \
@@ -117,8 +122,8 @@ DjVuNavDir.o: DjVuNavDir.cpp DjVuNavDir.h \
 DjVuPalette.o: DjVuPalette.cpp GException.h \
  DjVuGlobal.h ../../src/include/DjVu.h \
  ByteStream.h Arrays.h GSmartPointer.h \
- BSByteStream.h ZPCodec.h DjVuPalette.h \
- GContainer.h GPixmap.h
+ BSByteStream.h ZPCodec.h GContainer.h \
+ DjVuPalette.h GPixmap.h
 DjVuPort.o: DjVuPort.cpp DjVuPort.h GThreads.h \
  DjVuGlobal.h ../../src/include/DjVu.h \
  GException.h GURL.h GString.h \
@@ -197,15 +202,15 @@ IFFByteStream.o: IFFByteStream.cpp IFFByteStream.h \
  GSmartPointer.h ByteStream.h Arrays.h
 IW44EncodeCodec.o: IW44EncodeCodec.cpp IW44Image.h \
  GSmartPointer.h DjVuGlobal.h \
- ../../src/include/DjVu.h ZPCodec.h GBitmap.h \
- GException.h GPixmap.h IFFByteStream.h \
- GString.h GContainer.h ByteStream.h \
+ ../../src/include/DjVu.h ZPCodec.h GContainer.h \
+ GException.h GBitmap.h GPixmap.h \
+ IFFByteStream.h GString.h ByteStream.h \
  Arrays.h GRect.h MMX.h
 IW44Image.o: IW44Image.cpp IW44Image.h \
  GSmartPointer.h DjVuGlobal.h \
- ../../src/include/DjVu.h ZPCodec.h GBitmap.h \
- GException.h GPixmap.h IFFByteStream.h \
- GString.h GContainer.h ByteStream.h \
+ ../../src/include/DjVu.h ZPCodec.h GContainer.h \
+ GException.h GBitmap.h GPixmap.h \
+ IFFByteStream.h GString.h ByteStream.h \
  Arrays.h GRect.h MMX.h
 JB2EncodeCodec.o: JB2EncodeCodec.cpp JB2Image.h \
  GString.h DjVuGlobal.h ../../src/include/DjVu.h \
@@ -247,7 +252,8 @@ XMLTags.o: XMLTags.cpp XMLTags.h GContainer.h \
  ../../src/include/DjVu.h GSmartPointer.h \
  GString.h UnicodeByteStream.h GUnicode.h \
  ByteStream.h Arrays.h
-ZPCodec.o: ZPCodec.cpp ZPCodec.h DjVuGlobal.h \
- ../../src/include/DjVu.h ByteStream.h Arrays.h \
- GException.h GSmartPointer.h
+ZPCodec.o: ZPCodec.cpp ZPCodec.h GContainer.h \
+ GException.h DjVuGlobal.h \
+ ../../src/include/DjVu.h GSmartPointer.h \
+ ByteStream.h Arrays.h
 ### END   C++ DEPENDENCIES

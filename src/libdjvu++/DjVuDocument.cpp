@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocument.cpp,v 1.149 2001-03-06 19:55:42 bcr Exp $
+// $Id: DjVuDocument.cpp,v 1.150 2001-03-08 23:57:26 bcr Exp $
 // $Name:  $
 
 
@@ -1439,7 +1439,7 @@ add_file_to_djvm(const GP<DjVuFile> & file, bool page,
 	    // anything else.
 	 GPosition pos;
 	 GPList<DjVuFile> files_list=file->get_included_files(false);
-	 GP<DataPool> data=file->get_djvu_data(false, true);
+	 GP<DataPool> data=file->get_djvu_data(false);
 	 for(pos=files_list;pos;++pos)
 	 {
 	    GP<DjVuFile> f=files_list[pos];
@@ -1586,7 +1586,7 @@ DjVuDocument::get_djvm_doc()
 	 GP<DjVmDir::File> f=new DjVmDir::File(*files_list[pos]);
 	 GP<DjVuFile> file=url_to_file(id_to_url(f->id));
 	 GP<DataPool> data;
-	 if (file->is_modified()) data=file->get_djvu_data(false, true);
+	 if (file->is_modified()) data=file->get_djvu_data(false);
 	 else data=file->get_init_data_pool();
 	 doc->insert_file(f, data);
       }

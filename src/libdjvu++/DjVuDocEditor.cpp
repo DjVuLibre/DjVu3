@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocEditor.cpp,v 1.67 2001-03-08 21:45:06 fcrary Exp $
+// $Id: DjVuDocEditor.cpp,v 1.68 2001-03-08 23:57:26 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -261,7 +261,7 @@ DjVuDocEditor::clean_files_map(void)
       {
          DEBUG_MSG("ZEROing file '" << f->file->get_url() << "'\n");
          if (f->file->is_modified())
-            f->pool=f->file->get_djvu_data(false, true);
+            f->pool=f->file->get_djvu_data(false);
          f->file=0;
       }
       if (!f->file && !f->pool)
@@ -1598,7 +1598,7 @@ store_file(const GP<DjVmDir> & src_djvm_dir, const GP<DjVmDoc> & djvm_doc,
          store_file(src_djvm_dir, djvm_doc, djvu_files_list[pos], map);
 
          // Now store contents of this file
-      GP<DataPool> file_data=djvu_file->get_djvu_data(false, true);
+      GP<DataPool> file_data=djvu_file->get_djvu_data(false);
       GP<DjVmDir::File> frec=src_djvm_dir->name_to_file(url.name());
       if (frec)
       {
@@ -1648,7 +1648,7 @@ DjVuDocEditor::save_file(const char * file_id, const char * save_dir,
          bool file_modified=file_rec->pool || file_rec->file &&
                             file_rec->file->is_modified();
          if (file_rec->file)
-            file_pool=file_rec->file->get_djvu_data(false, true);
+            file_pool=file_rec->file->get_djvu_data(false);
          else
             file_pool=file_rec->pool;
          if (!file_modified && only_modified)
@@ -1817,7 +1817,7 @@ DjVuDocEditor::save_as(const char * where, bool bundled)
          if (file_rec->pool && (!file_rec->file ||
                                 !file_rec->file->is_modified()))
             file_pool=file_rec->pool;
-         else if (file_rec->file) file_pool=file_rec->file->get_djvu_data(false, true);
+         else if (file_rec->file) file_pool=file_rec->file->get_djvu_data(false);
         }
          // Even if file has not been modified (pool==0) we still want
          // to save it.

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: XMLAnno.cpp,v 1.6 2001-03-06 19:55:42 bcr Exp $
+// $Id: XMLAnno.cpp,v 1.7 2001-03-08 23:57:26 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -45,6 +45,7 @@
 #include "GMapAreas.h"
 #include "DjVuAnno.h"
 #include "DjVuFile.h"
+#include "debug.h"
 #include <stdio.h>
 #include <ctype.h>
 #include <stdlib.h>
@@ -55,7 +56,7 @@ static void intList
   char *ptr=0;
   if(coords && *coords)
   {
-    for(unsigned long i=strtoul(coords,&ptr,10);ptr;i=strtoul(coords,&ptr,10))
+    for(unsigned long i=strtoul(coords,&ptr,10);ptr&&ptr!=coords;i=strtoul(coords,&ptr,10))
     {
       retval.append(i);
       for(coords=ptr;isspace(*coords);++coords);
@@ -76,6 +77,7 @@ BorderTypeMap(void)
   typeMap["none"]=GMapArea::NO_BORDER;
   typeMap["xor"]=GMapArea::XOR_BORDER;
   typeMap["solid"]=GMapArea::SOLID_BORDER;
+  typeMap["default"]=GMapArea::SOLID_BORDER;
   typeMap["shadowout"]=GMapArea::SHADOW_OUT_BORDER;
   typeMap["shadowin"]=GMapArea::SHADOW_IN_BORDER;
   typeMap["etchedin"]=GMapArea::SHADOW_EIN_BORDER;
@@ -187,6 +189,12 @@ lt_XMLAnno::ChangeAnno(const lt_XMLTags &map,const GURL url,const GString id,con
         lt_XMLTags &areas=*(gareas[pos]);
         GMap<GString,GString> args=areas.args;
         GList<int> coords;
+        // ******************************************************
+        // Parse the coords attribute:  first read the raw data into
+        // a list, then scale the x, y data into another list.  For
+        // circles, you also get a radius element with (looks like an x
+        // with no matching y).
+        // ******************************************************
         {
           GPosition coords_pos=args.contains("coords");
           if(coords_pos)
@@ -268,9 +276,9 @@ lt_XMLAnno::ChangeAnno(const lt_XMLTags &map,const GURL url,const GString id,con
           if(rect_pos)
           {
             coords.append(coords[rect_pos]);
-            for(rect_pos=coords;(rect_pos)&&((i++)<4);++rect_pos)
+            for(rect_pos=coords;(rect_pos)&&(i<4);++rect_pos)
             {
-              xx[i]=coords[rect_pos];
+              xx[i++]=coords[rect_pos];
             }
           }
           if(i!=4)
@@ -278,7 +286,7 @@ lt_XMLAnno::ChangeAnno(const lt_XMLTags &map,const GURL url,const GString id,con
             G_THROW("Too few coords for circular region");
           }
           int x=xx[0],y=xx[1],rx=xx[2],ry=(h-xx[3])-1;
-          GRect rect(x-rx,y-ry,x+rx,y+ry);
+          GRect rect(x-rx,y-ry,2*rx,2*ry);
           a=GMapOval::create(rect);
         }else if(shape == "oval")
         {
@@ -410,8 +418,9 @@ lt_XMLAnno::save(void)
 }
 
 void
-lt_XMLAnno::parse(const char xmlfile[])
+lt_XMLAnno::parse(const char xmlfile[],GString basedir)
 {
+  m_basedir=basedir;
   GP<lt_XMLTags> tags=lt_XMLTags::create();
   tags->init(xmlfile);
   parse(*tags);
@@ -451,11 +460,34 @@ lt_XMLAnno::parse(const lt_XMLTags &tags)
     lt_XMLTags const * const GObject=Objects[Objpos];
     if(GObject)
     {
+      // Map of attributes to value (e.g. "width" --> "500")
       const GMap<GString,GString> &args=GObject->args;
+      GURL codebase;
+      {
+        DEBUG_MSG("Setting up codebase... m_basedir = " << m_basedir << "\n");
+        GPosition codebasePos=args.contains("codebase");
+        // If user specified a codebase attribute, assume it is correct (absolute URL):
+        //  the GURL constructor will throw an exception if it isn't
+        if(codebasePos)
+        {
+          codebase=GURL(args[codebasePos]);
+        }else if (GOS::is_dir(m_basedir))
+        {
+          codebase=GOS::filename_to_url(m_basedir);
+        }else
+        {
+          codebase=GOS::filename_to_url(GOS::cwd());
+        }
+        DEBUG_MSG("codebase = " << codebase << "\n");
+      }
+      // the data attribute specifies the input file.  This can be
+      //  either an absolute URL (starts with file:/) or a relative
+      //  URL (for now, just a path and file name).  If it's absolute,
+      //  our GURL will adequately wrap it.  If it's relative, we need
+      //  to use the codebase attribute to form an absolute URL first.
       GPosition datapos=args.contains("data");
       if(datapos)
       {
-        GURL url(args[datapos]);
         bool isDjVuType=false;
         GPosition typePos=args.contains("type");
         if(typePos)
@@ -466,6 +498,19 @@ lt_XMLAnno::parse(const lt_XMLTags &tags)
             continue;
           }
           isDjVuType=true;
+        }
+        GURL url;
+        GURL simpleURL(args[datapos]);
+        if (simpleURL.is_valid())
+        {
+          url=simpleURL;
+        }else if(args[datapos][0] == '/')
+        {
+          url=codebase.base()+args[datapos];
+        }else            // relative URL
+        {
+          url=codebase+args[datapos];
+          DEBUG_MSG("relative URL converted to absolute URL= " << url << "\n");
         }
         GString width;
         {
