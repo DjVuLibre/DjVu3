@@ -106,17 +106,20 @@ while ( <> )
 }
 close OUT;
 unlink("$filename.save");
-if(@removelist)
+if(@removelist || @filelist)
 {
-  foreach $file ( @removelist )
+  if(@removelist)
   {
-    unlink $file;
+    foreach $file ( @removelist )
+    {
+      unlink $file;
+    }
   }
   foreach $file ( @filelist )
   {
     if(rename("$file","$file.save"))
     {
-      if(open(OUT,"<$file")&&open(FILE,"<$file.save"))
+      if(open(OUT,">$file")&&open(FILE,"<$file.save"))
       {
         while(<FILE>)
         {
@@ -125,10 +128,45 @@ if(@removelist)
           {
             $line=~s,HREF=(["]*)\Q$oldlink\E(["]*),HREF="$linklist{$oldlink}",g;
           }
+# We only detect one broken link per line...
+          if($line =~ /^(.*)(HREF=")([^"]*)(#[^"]*)(".*)$/i)
+          {
+            ($c1,$c2,$c3,$c4,$c5)=($1,$2,$3,$4,$5);
+            if( $c3 ne "" && $c3 !~ /\//)
+            {
+              $in="$file/$c3";
+              $in=~ s,[^/]+/([^/]*)$,\1,g;
+              if(open(TEST,"<$in"))
+              {
+                close TEST;
+              }else
+              {
+                 print STDERR "Removing broken link in $file line $line";
+                $line = "$c1$c5";
+              }
+            }
+          } elsif($line =~ /^(.*)(HREF=")([^"]+)(".*)$/i)
+          {
+            ($c1,$c2,$c3,$c4)=($1,$2,$3,$4);
+            if( $c3 !~ /\//)
+            {
+              $in="$file/$c3";
+              $in=~ s,[^/]+/([^/]*)$,\1,g;
+              if(open(TEST,"<$in"))
+              {
+                close TEST;
+              }else
+              {
+                print STDERR "Broken link in $file line $line";
+                $line = "$c1$c4";
+              }
+            }
+          }
           print OUT $line;
         }
         close FILE;
         close OUT;
+        unlink("$file.save");
       }else
       {
         rename("$file.save","$file");
