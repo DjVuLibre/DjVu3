@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: GContainer.h,v 1.39 2000-11-28 18:48:31 fcrary Exp $
+// $Id: GContainer.h,v 1.40 2000-12-01 22:54:16 fcrary Exp $
 // $Name:  $
 
 #ifndef _GCONTAINER_H_
@@ -95,7 +95,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@geocities.com> -- bug fixes.
     @version 
-    #$Id: GContainer.h,v 1.39 2000-11-28 18:48:31 fcrary Exp $# */
+    #$Id: GContainer.h,v 1.40 2000-12-01 22:54:16 fcrary Exp $# */
 //@{
 
 
@@ -783,7 +783,7 @@ public:
     { return firstpos(); } ;    
   /** Returns a reference to the list element at position #pos#.  This
       reference can be used for both reading (as "#a[n]#") and modifying (as
-      "#a[n]=v#") a list element.  Using an invalid positions will cause a
+      "#a[n]=v#") a list element.  Using an invalid position will cause a
       segmentation violation. See \Ref{GPosition} for efficient operations on
       positions. */
   TYPE& operator[](GPosition pos)

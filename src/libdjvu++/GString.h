@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: GString.h,v 1.20 2000-12-01 17:44:28 fcrary Exp $
+// $Id: GString.h,v 1.21 2000-12-01 22:54:16 fcrary Exp $
 // $Name:  $
 
 #ifndef _GSTRING_H_
@@ -58,7 +58,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.20 2000-12-01 17:44:28 fcrary Exp $# */
+    #$Id: GString.h,v 1.21 2000-12-01 22:54:16 fcrary Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -71,6 +71,7 @@
 #include <stdarg.h>
 #include "GException.h"
 #include "GSmartPointer.h"
+#include "GContainer.h"
 #ifdef WIN32
 #include <windows.h>
 #endif
@@ -222,6 +223,18 @@ public:
           '\"' -->  "&quot;"
       Also escapes characters 0x00 through 0x1f should they appear.*/
   GString toEscaped() const;
+
+  /** Converts strings containing HTML/XML escaped characters (e.g.,
+      "&lt;" for "<") into their unescaped forms. The conversion is partially
+      defined by the ConvMap argument which specifies the conversion strings
+      to be recognized. The default BasicMap inverts the actions of toEscaped().
+      Numeric representation of characters (e.g., "&#38;" or "&#x26;" for "*")
+      are always converted. */
+  GString fromEscaped( GMap<GString,GString> ConvMap = BasicMap() );
+
+  /** BasicMap provides a conversion map for fromEscaped that inverts the
+      action of toEscaped(). */
+  static GMap<GString,GString> BasicMap( void );
 
   // -- ALTERING
   /** Reinitializes a string with the null string. */

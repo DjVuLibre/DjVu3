@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: GString.cpp,v 1.27 2000-12-01 17:44:28 fcrary Exp $
+// $Id: GString.cpp,v 1.28 2000-12-01 22:54:16 fcrary Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -223,6 +223,100 @@ GString::toEscaped() const
   }
   DEBUG_MSG( "Escaped string is '" << ret << "'\n" );
   return ret;
+}
+
+
+GString
+GString::fromEscaped( GMap<GString,GString> ConvMap )
+{
+#if 0
+  //  Available for debugging ConvMap arguments if needed
+  for (GPosition here = ConvMap ; here; ++here)
+  {
+    DEBUG_MSG( "'" << ConvMap.key(here) << "' --> '" << ConvMap[here] << "'\n" );
+  }
+#endif
+
+  GString ret;                  // Build output string here
+  int start_locn = 0;           // Beginning of substring to skip
+  int amp_locn;                 // Location of a found ampersand
+
+  while( (amp_locn = this->search( '&', start_locn )) > -1 )
+  {                             // Found the next apostrophe
+    ret += this->substr( start_locn, amp_locn - start_locn );
+                                // Locate the closing semicolon
+    int semi_locn = this->search( ';', amp_locn );
+    if( semi_locn < 0 ) break;  // No closing semicolon, exit and copy
+                                //  the rest of the string.
+    GString key = this->substr( amp_locn, semi_locn-amp_locn+1 );
+    //DEBUG_MSG( "key = '" << key << "'\n" );
+    GPosition map_entry = ConvMap.contains( key );
+    if( map_entry != NULL)
+    {                           // Found in the conversion map, substitute
+      ret += ConvMap[key];
+    } else {
+                                // Not found in the conversion map,
+                                //  try to do a numerical conversion.
+      int char_value = 0 ;      // Value of converted key
+      bool succeeded = false;
+      int scan_locn;
+      int c;
+      if( key.length() > 3 &&   // minimum length for a key
+          key[1] == '#' &&      // must always be present
+          ( tolower(key[2]) != 'x' || key.length() > 4 )
+                                // minimum length for a hexadecimal key
+        )
+      {
+        if( key[2] == 'x' || key[2] == 'X' )
+        {                       // Hexadecimal constant
+          for( scan_locn = 3 ; isxdigit(c = key[scan_locn]) ; scan_locn++ )
+          {
+            if( isdigit(c) )
+              c = c - '0';
+            else
+              c = 10 + tolower(c) - 'a';
+            char_value = char_value<<4 | c;
+          }
+        } else {
+                                // Decimal constant
+          for( scan_locn = 2 ; isdigit(c = key[scan_locn]) ; scan_locn++ )
+          {
+            char_value = char_value*10 + (c - '0');
+          }
+        }
+                                // success if we have encountered only digits
+                                // up to the semicolon
+        succeeded = ( key[scan_locn] == ';' );
+      }
+      if( succeeded )
+      {
+        ret += "?";
+        ret.setat( -1, char_value );
+      } else {
+        ret += key;
+      }
+    }
+    start_locn = semi_locn + 1;
+    DEBUG_MSG( "ret = '" << ret << "'\n" );
+  }
+
+                                // Copy the end of the string to the output
+  ret += this->substr( start_locn, this->length()-start_locn );
+
+  DEBUG_MSG( "Unescaped string is '" << ret << "'\n" );
+  return ret;
+}
+
+GMap<GString,GString>
+GString::BasicMap( void )
+{
+  GMap<GString,GString> Basic;
+  Basic["&lt;"]   = GString("<");
+  Basic["&gt;"]   = GString(">");
+  Basic["&amp;"]  = GString("&");
+  Basic["&apos;"] = GString("'");
+  Basic["&quot;"] = GString("\"");
+  return Basic;
 }
 
 
