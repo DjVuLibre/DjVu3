@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: IW44EncodeCodec.cpp,v 1.6 2001-02-14 19:49:02 bcr Exp $
+// $Id: IW44EncodeCodec.cpp,v 1.7 2001-02-16 00:10:58 bcr Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 08/1998
@@ -144,7 +144,7 @@ public:
       reset the coder and release the associated memory. */
   virtual void close_codec(void);
 protected:
-  Codec::Encode *ycodec;
+  Codec::Encode *ycodec_enc;
 };
 
 /** IW44 encoded color image. This class provided functions for managing a
@@ -197,7 +197,7 @@ public:
       reset the coder and release the associated memory. */
   virtual void close_codec(void);
 protected:
-  Codec::Encode *ycodec, *cbcodec, *crcodec;
+  Codec::Encode *ycodec_enc, *cbcodec_enc, *crcodec_enc;
 };
 
 class IW44Image::Map::Encode : public IW44Image::Map // DJVU_CLASS
@@ -214,7 +214,7 @@ public:
 class IW44Image::Codec::Encode : public IW44Image::Codec
 {
 public:
-  Encode(IW44Image::Map &map) : Codec(map) {}
+  Encode(IW44Image::Map &map) : Codec(map) {emap = new IW44Image::Map(map.iw, map.ih);}
   // Coding
   virtual int code_slice(ZPCodec &zp);
   float estimate_decibel(float frac);
@@ -1325,7 +1325,7 @@ IW44Image::create(const GBitmap &bm, const GP<GBitmap> mask)
 }
 
 IWBitmap::Encode::Encode(void)
-: IWBitmap(), ycodec(0)
+: IWBitmap(), ycodec_enc(0)
 {}
 
 IWBitmap::Encode::~Encode()
@@ -1378,8 +1378,8 @@ IWBitmap::Encode::init(const GBitmap &bm, const GP<GBitmap> gmask)
 void 
 IWBitmap::Encode::close_codec(void)
 {
-  delete ycodec;
-  ycodec = 0;
+  delete ycodec_enc;
+  ycodec_enc = 0;
   IWBitmap::close_codec();
 }
 
@@ -1392,10 +1392,10 @@ IWBitmap::Encode::encode_chunk(ByteStream &bs, const IWEncoderParms &parm)
   if (! ymap)
     G_THROW("IW44Image.empty_object");
   // Open codec
-  if (!ycodec)
+  if (!ycodec_enc)
   {
     cslice = cserial = cbytes = 0;
-    ycodec = new Codec::Encode(*ymap);
+    ycodec_enc = new Codec::Encode(*ymap);
   }
   // Adjust cbytes
   cbytes += sizeof(struct IW44Image::PrimaryHeader);
@@ -1419,10 +1419,10 @@ IWBitmap::Encode::encode_chunk(ByteStream &bs, const IWEncoderParms &parm)
         if (parm.slices>0 && nslices+cslice>=parm.slices)
           break;
         DJVU_PROGRESS_RUN(chunk, (1+nslices-cslice)|0xf);
-        flag = ycodec->code_slice(zp);
+        flag = ycodec_enc->code_slice(zp);
         if (flag && parm.decibels>0.0)
-          if (ycodec->curband==0 || estdb>=parm.decibels-DECIBEL_PRUNE)
-            estdb = ycodec->estimate_decibel(db_frac);
+          if (ycodec_enc->curband==0 || estdb>=parm.decibels-DECIBEL_PRUNE)
+            estdb = ycodec_enc->estimate_decibel(db_frac);
         nslices++;
       }
   }
@@ -1459,7 +1459,7 @@ IWBitmap::Encode::encode_chunk(ByteStream &bs, const IWEncoderParms &parm)
 void 
 IWBitmap::Encode::encode_iff(IFFByteStream &iff, int nchunks, const IWEncoderParms *parms)
 {
-  if (ycodec)
+  if (ycodec_enc)
     G_THROW("IW44Image.left_open1");
   int flag = 1;
   iff.put_chunk("FORM:BM44", 1);
@@ -1486,7 +1486,7 @@ IW44Image::create(
 }
 
 IWPixmap::Encode::Encode(void)
-: IWPixmap(), ycodec(0), cbcodec(0), crcodec(0)
+: IWPixmap(), ycodec_enc(0), cbcodec_enc(0), crcodec_enc(0)
 {}
 
 IWPixmap::Encode::~Encode()
@@ -1568,7 +1568,7 @@ IWPixmap::Encode::init(const GPixmap &pm, const GP<GBitmap> gmask, CRCBMode crcb
 void 
 IWPixmap::Encode::encode_iff(IFFByteStream &iff, int nchunks, const IWEncoderParms *parms)
 {
-  if (ycodec)
+  if (ycodec_enc)
     G_THROW("IW44Image.left_open3");
   int flag = 1;
   iff.put_chunk("FORM:PM44", 1);
@@ -1587,10 +1587,10 @@ IWPixmap::Encode::encode_iff(IFFByteStream &iff, int nchunks, const IWEncoderPar
 void 
 IWPixmap::Encode::close_codec(void)
 {
-  delete ycodec;
-  delete cbcodec;
-  delete crcodec;
-  ycodec = crcodec = cbcodec = 0;
+  delete ycodec_enc;
+  delete cbcodec_enc;
+  delete crcodec_enc;
+  ycodec_enc = crcodec_enc = cbcodec_enc = 0;
   IWPixmap::close_codec();
 }
 
@@ -1603,14 +1603,14 @@ IWPixmap::Encode::encode_chunk(ByteStream &bs, const IWEncoderParms &parm)
   if (!ymap)
     G_THROW("IW44Image.empty_object2");
   // Open
-  if (!ycodec)
+  if (!ycodec_enc)
   {
     cslice = cserial = cbytes = 0;
-    ycodec = new Codec::Encode(*ymap);
+    ycodec_enc = new Codec::Encode(*ymap);
     if (crmap && cbmap)
     {
-      cbcodec = new Codec::Encode(*cbmap);
-      crcodec = new Codec::Encode(*crmap);
+      cbcodec_enc = new Codec::Encode(*cbmap);
+      crcodec_enc = new Codec::Encode(*crmap);
     }
   }
 
@@ -1636,14 +1636,14 @@ IWPixmap::Encode::encode_chunk(ByteStream &bs, const IWEncoderParms &parm)
         if (parm.slices>0 && nslices+cslice>=parm.slices)
           break;
         DJVU_PROGRESS_RUN(chunk,(1+nslices-cslice)|0xf);
-        flag = ycodec->code_slice(zp);
+        flag = ycodec_enc->code_slice(zp);
         if (flag && parm.decibels>0)
-          if (ycodec->curband==0 || estdb>=parm.decibels-DECIBEL_PRUNE)
-            estdb = ycodec->estimate_decibel(db_frac);
-        if (crcodec && cbcodec && cslice+nslices>=crcb_delay)
+          if (ycodec_enc->curband==0 || estdb>=parm.decibels-DECIBEL_PRUNE)
+            estdb = ycodec_enc->estimate_decibel(db_frac);
+        if (crcodec_enc && cbcodec_enc && cslice+nslices>=crcb_delay)
           {
-            flag |= cbcodec->code_slice(zp);
-            flag |= crcodec->code_slice(zp);
+            flag |= cbcodec_enc->code_slice(zp);
+            flag |= crcodec_enc->code_slice(zp);
           }
         nslices++;
       }

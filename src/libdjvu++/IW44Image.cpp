@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: IW44Image.cpp,v 1.2 2001-02-15 21:49:20 fcrary Exp $
+// $Id: IW44Image.cpp,v 1.3 2001-02-16 00:10:58 bcr Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 08/1998
@@ -1340,7 +1340,7 @@ IW44Image::get_height(void) const
 //////////////////////////////////////////////////////
 
 IWBitmap::IWBitmap(void )
-: IW44Image()
+: IW44Image(), ycodec(0)
 {}
 
 IWBitmap::~IWBitmap()
@@ -1540,7 +1540,7 @@ IWEncoderParms::IWEncoderParms(void)
 
 
 IWPixmap::IWPixmap(void)
-: IW44Image(), crcb_delay(10), crcb_half(0)
+: IW44Image(), crcb_delay(10), crcb_half(0), ycodec(0), cbcodec(0), crcodec(0)
 {}
 
 IWPixmap::~IWPixmap()
