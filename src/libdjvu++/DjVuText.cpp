@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuText.cpp,v 1.2 1999-09-02 19:05:24 leonb Exp $
+//C- $Id: DjVuText.cpp,v 1.3 1999-09-02 19:21:58 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -100,24 +100,6 @@ DjVuText::Zone::normtext(const char *instr, GString &outstr)
 }
 
 
-int 
-DjVuText::Zone::check(int maxtext) const
-{
-  // Sanity checks
-  if (ztype<PAGE || ztype>CHARACTER)
-    return 0;
-  if (rect.isempty())
-    return 0;
-  if (text_start<0 || text_start+text_length>maxtext)
-    return 0;
-  for (GPosition i=children; i; ++i)
-    if (! children[i].check(maxtext) )
-      return 0;
-  return 1;
-}
-
-
-
 void 
 DjVuText::Zone::encode(ByteStream &bs) const
 {
@@ -139,9 +121,8 @@ DjVuText::Zone::encode(ByteStream &bs) const
 }
 
 
-
 void 
-DjVuText::Zone::decode(ByteStream &bs)
+DjVuText::Zone::decode(ByteStream &bs, int maxtext)
 {
   // Decode type
   ztype = (ZoneType) bs.read8();
@@ -157,11 +138,18 @@ DjVuText::Zone::decode(ByteStream &bs)
   text_length = bs.read24();
   // Get children size
   int size = bs.read24();
+  // Checks
+  if (ztype<PAGE || 
+      ztype>CHARACTER ||
+      rect.isempty() ||
+      text_start<0 || 
+      text_start+text_length>maxtext )
+    THROW("DjVu Decoder: Corrupted text zone hierarchy");
   // Process children
   children.empty();
   while (size-- > 0) {
     Zone *z = append_child();
-    z->decode(bs);
+    z->decode(bs, maxtext);
   }
 }
 
@@ -180,15 +168,10 @@ DjVuText::normalize_text()
 int 
 DjVuText::has_valid_zones() const
 {
-  if ( !textUTF8)
-    return 0;
-  if ( main.children.isempty() )
-    return 0;
-  if (! main.check(textUTF8.length()))
-    return 0;
-  return 1;
+  return ( !! textUTF8 && 
+           ! main.children.isempty() &&
+           ! main.rect.isempty() );
 }
-
 
 
 void 
@@ -207,12 +190,14 @@ void
 DjVuText::decode_zones(ByteStream &bs)
 {
   BSByteStream bsb(bs);
+  if (! textUTF8)
+    THROW("DjVu Decoder: Cannot decode text zone hierarchy without text");
   // Check version number
   int version = bsb.read8();
   if (version != Zone::version)
     THROW("Unsupported version tag in text zone information");
   // Decode zones
-  main.decode(bsb);
+  main.decode(bsb, textUTF8.length());
 }
 
 

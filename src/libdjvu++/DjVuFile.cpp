@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.29 1999-09-02 19:05:24 leonb Exp $
+//C- $Id: DjVuFile.cpp,v 1.30 1999-09-02 19:21:58 leonb Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -586,7 +586,7 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
       info->decode(iff);
       DjVuFile::info = info;
       pcaster->notify_relayout(this);
-      desc.format("Page information (DjVu version %d)", info->version);
+      desc.format("Page information");
     }
 
   // ANTa (annotation)

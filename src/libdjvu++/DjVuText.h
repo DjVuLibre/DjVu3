@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuText.h,v 1.1 1999-09-02 03:12:22 leonb Exp $
+//C- $Id: DjVuText.h,v 1.2 1999-09-02 19:21:58 leonb Exp $
 
 
 #ifndef _DJVUTEXT_H_
@@ -42,7 +42,7 @@
     @memo 
     Encoding of textual information for a DjVu image.
     @version 
-    #$Id: DjVuText.h,v 1.1 1999-09-02 03:12:22 leonb Exp $# 
+    #$Id: DjVuText.h,v 1.2 1999-09-02 19:21:58 leonb Exp $# 
     @author: 
     Steven Pigeon <pigeon@research.att.com> -- initial implementation \\
     L\'eon Bottou <leonb@research.att.com> -- made it square 
@@ -88,10 +88,9 @@ public:
     friend class DjVuText;
     void cleartext();
     void normtext(const char *instr, GString &outstr);
-    int check(int maxtext) const;
     static const int version = 0;
     void encode(ByteStream &bs) const;
-    void decode(ByteStream &bs);
+    void decode(ByteStream &bs, int maxtext);
   };
 
   /** Textual data for this page.  
