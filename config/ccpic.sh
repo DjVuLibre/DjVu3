@@ -16,11 +16,11 @@ then
 
   echon "Checking ${CC} symbolic option ... "
   CCSYMBOLIC=""
-  s=`( cd "$tempdir" 2>>/dev/null;${CC} ${CCFLAGS} -symbolic -c $temp.c 2>&1)|"${grep}" 'unrecognized option'`
-  if [ -z "$s" ]
-  then
-    CCSYMBOLIC='-symbolic'
-  else 
+#  s=`( cd "$tempdir" 2>>/dev/null;${CC} ${CCFLAGS} -symbolic -c $temp.c 2>&1)|"${grep}" 'unrecognized option'`
+#  if [ -z "$s" ]
+#  then
+#    CCSYMBOLIC='-symbolic'
+#  else 
     SYSTEMGCC=`echo $SYS | tr A-Z a-z `-$cc_is_gcc
     case $SYSTEMGCC in
       linux-*) 
@@ -29,19 +29,19 @@ then
         ;;
       solaris-*-yes)
         if [ -z "$CROSSCOMPILER" ] ; then 
-          TESTCCSYMBOLIC="-shared"
+          TESTCCSYMBOLIC="-shared -L/usr/lib -R/usr/lib "
         else
-          TESTCCSYMBOLIC="-shared"
+          TESTCCSYMBOLIC="-shared -Wl,-rpath,/usr/lib:/usr/ccs/lib:/usr/openwin/lib "
         fi
         TESTCCPIC="-fPIC"
         ;;
       solaris-*)
         if [ -z "$CROSSCOMPILER" ] ; then 
-          TESTCCSYMBOLIC="-shared"
+          TESTCCSYMBOLIC="-G -L/usr/lib -R/usr/lib "
         else
-          TESTCCSYMBOLIC="-shared"
+          TESTCCSYMBOLIC="-shared -Wl,-rpath,/usr/lib:/usr/ccs/lib:/usr/openwin/lib "
         fi
-        TESTCCPIC="-fPIC"
+        TESTCCPIC="-K PIC"
         ;;
       irix*-*) 
         TESTCCSYMBOLIC="-shared"
@@ -54,7 +54,7 @@ then
      esac
 
     check_shared_link_flags CCSYMBOLIC $temp.c "$TESTCCSYMBOLIC"
-  fi
+#  fi
   if [ -z "$CCSYMBOLIC" ]
   then
     echo "none"
@@ -62,7 +62,7 @@ then
     echo "$CCSYMBOLIC"
   fi
 
-  echon "Checking whether ${CC} -fPIC works ... "
+  echon "Checking whether ${CC} ${TESTCCPIC} works ... "
   if ( run $CC ${CCFLAGS} $TESTCCPIC -c $temp.c )
   then
     CCPIC=$TESTCCPIC
