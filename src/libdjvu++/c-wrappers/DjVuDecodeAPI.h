@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuDecodeAPI.h,v 1.18 2000-01-30 01:18:42 bcr Exp $
+ *C- $Id: DjVuDecodeAPI.h,v 1.19 2000-01-30 01:28:36 bcr Exp $
  */
 
 #ifndef _DJVUDECODE_H_
@@ -155,9 +155,9 @@ typedef struct djvu_process_options_struct
   /// Number of files in filelist
   int filecount;
 
-  /** You can specify an import stream instead of a filelist as defined in
-    DjVuAPI.h.  When using an input_stream filelist and filecount should both
-    be set to 0. */
+  /** You can an import stream.  If you specify both a filelist and an import
+    stream, then the file list will be exhausted first, then the input_stream
+    will be used. */
   djvu_import input_stream;
 
   /// The output filename (or directory)
