@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: GMapAreas.h,v 1.21 2001-01-03 16:34:39 fcrary Exp $
+// $Id: GMapAreas.h,v 1.22 2001-01-04 19:56:26 bcr Exp $
 // $Name:  $
 
 #ifndef _GMAPAREAS_H
@@ -65,7 +65,7 @@
     @memo Definition of base map area classes
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: GMapAreas.h,v 1.21 2001-01-03 16:34:39 fcrary Exp $# */
+    #$Id: GMapAreas.h,v 1.22 2001-01-04 19:56:26 bcr Exp $# */
 //@{
 
 
@@ -100,10 +100,6 @@
     \end{itemize}
 */
 
-// Enumeration for reporting the type of map area. "MapUnknown" is reported
-// for objects of type GMapArea (there shouldn't be any).
-enum MapAreaType { MapUnknown, MapRect, MapOval, MapPoly };
-
 class GMapArea : public GPEnabled
 {
 public:
@@ -128,6 +124,11 @@ public:
 		     SHADOW_EIN_BORDER=5, SHADOW_EOUT_BORDER=6 };
 
    enum Special_Hilite_Color{ NO_HILITE=0xFFFFFFFF, XOR_HILITE=0xFF000000};
+
+   // Enumeration for reporting the type of map area. "MapUnknown" is reported
+   // for objects of type GMapArea (there shouldn't be any).
+   enum MapAreaType { UNKNOWN, RECT, OVAL, POLY };
+
       /** Optional URL which this map area can be associated with.
 	  If it's not empty then clicking this map area with the mouse
 	  will make the browser load the HTML page referenced by
@@ -208,7 +209,7 @@ public:
    GString	print(void);
 
       /// Virtual function returning the shape type.
-   virtual MapAreaType const get_shape_type( void ) const { return MapUnknown; };
+   virtual MapAreaType const get_shape_type( void ) const { return UNKNOWN; };
       /// Virtual function returning the shape name.
    virtual char const * const	get_shape_name(void) const=0;
       /// Virtual function generating a copy of this object
@@ -274,7 +275,7 @@ public:
    virtual ~GMapRect(void);
 
       /// Returns MapRect
-   virtual MapAreaType const get_shape_type( void ) const { return MapRect; };
+   virtual MapAreaType const get_shape_type( void ) const { return RECT; };
       /// Returns #"rect"#
    virtual char const * const	get_shape_name(void) const;
       /// Returns a copy of the rectangle
@@ -406,7 +407,7 @@ public:
    char const * const	check_data(void);
 
       /// Returns MapPoly
-   virtual MapAreaType const get_shape_type( void ) const { return MapPoly; };
+   virtual MapAreaType const get_shape_type( void ) const { return POLY; };
       /// Returns #"poly"# all the time
    virtual char const * const 	get_shape_name(void) const;
       /// Returns a copy of the polygon
@@ -492,7 +493,7 @@ public:
    int		get_rmax(void) const;
 
       /// Returns MapOval
-   virtual MapAreaType const get_shape_type( void ) const { return MapOval; };
+   virtual MapAreaType const get_shape_type( void ) const { return OVAL; };
       /// Returns #"oval"#
    virtual char const * const get_shape_name(void) const;
       /// Returns a copy of the oval
