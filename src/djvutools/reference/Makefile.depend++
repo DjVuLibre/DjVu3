@@ -366,7 +366,7 @@ ppmcoco.o: ppmcoco.cpp \
  ../../../src/libdjvu++/GThreads.h \
  ../../../src/libdjvu++/DjVuMessage.h \
  ../../../src/libdjvu++/DjVuMessageLite.h
-ucs2native.o: ucs2native.cpp \
+xml2native.o: xml2native.cpp \
  ../../../src/libdjvu++/GException.h \
  ../../../src/libdjvu++/DjVuGlobal.h \
  ../../../src/include/DjVu.h \
@@ -381,7 +381,7 @@ ucs2native.o: ucs2native.cpp \
  ../../../src/libdjvu++/DjVuMessageLite.h \
  ../../../src/libdjvu++/GURL.h \
  ../../../src/libdjvu++/GThreads.h
-ucs2utf8.o: ucs2utf8.cpp \
+xml2utf8.o: xml2utf8.cpp \
  ../../../src/libdjvu++/GException.h \
  ../../../src/libdjvu++/DjVuGlobal.h \
  ../../../src/include/DjVu.h \

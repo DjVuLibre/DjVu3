@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GUnicode.cpp,v 1.14 2001-04-23 18:14:22 bcr Exp $
+// $Id: GUnicode.cpp,v 1.15 2001-05-18 23:02:33 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -453,9 +453,12 @@ UnicodeRep::initUTF8(void)
   unsigned char *buf;
   GPBuffer<unsigned char> gbuf(buf,length()*6+1);
   unsigned char *ptr=buf;
-  for(unsigned long *wide=UnicodePtr;*wide;wide++)
+  if(UnicodePtr)
   {
-    ptr=GStringRep::UCS4toUTF8(wide[0],ptr);
+    for(unsigned long *wide=UnicodePtr;*wide;wide++)
+    {
+      ptr=GStringRep::UCS4toUTF8(wide[0],ptr);
+    }
   }
   *ptr=0;
   gs=GStringRep::UTF8::create((char const *)buf);

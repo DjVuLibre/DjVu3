@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ucs2native.cpp,v 1.1 2001-05-18 22:04:08 bcr Exp $
+// $Id: xml2native.cpp,v 1.1 2001-05-18 23:02:33 bcr Exp $
 // $Name:  $
 
 /** @name nativetoutf8
@@ -43,7 +43,7 @@
     @author
     Dr Bill C Riemers <bcr@lizardtech.com>
     @version
-    #$Id: ucs2native.cpp,v 1.1 2001-05-18 22:04:08 bcr Exp $# */
+    #$Id: xml2native.cpp,v 1.1 2001-05-18 23:02:33 bcr Exp $# */
 //@{
 //@}
 
@@ -72,15 +72,19 @@ main(int argc, char **argv)
   GURL::Filename::UTF8 outurl((argc<3)?GUTF8String("-"):dargv[argc-1]);
   G_TRY
   {
-    GP<ByteStream> bs(ByteStream::create(inurl,"r"));
-    bs=UnicodeByteStream::create(bs)->duplicate();
-    const int size=bs->size();
-    char *buf;
-    GPBuffer<char> gbuf(buf,size);
-    bs->readall(buf,size);
-    GUTF8String str(buf,size);
-    bs=ByteStream::create(outurl,"w");
-    bs->writestring(GNativeString(str));
+    GP<ByteStream> bs(ByteStream::create(inurl,"r")); 
+    {
+      GP<XMLByteStream> uni=XMLByteStream::create(bs);
+      bs=ByteStream::create();
+      GUnicode ustr;
+      while((ustr=uni->gets()).length())
+      {
+        bs->writestring(ustr->get_GUTF8String().getUTF82Native());
+      }
+    }
+    bs->seek(0L);
+    GP<ByteStream> outbs=ByteStream::create(outurl,"w");
+    outbs->copy(*bs);
   }
   G_CATCH(ex)
   {
