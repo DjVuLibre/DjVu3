@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.90 1999-11-21 20:44:53 bcr Exp $
+//C- $Id: DjVuFile.cpp,v 1.91 1999-11-21 21:19:16 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -427,8 +427,7 @@ DjVuFile::decode_func(void)
 }
 
 void
-DjVuFile::set_recover_errors
-(ErrorRecoveryAction recover)
+DjVuFile::set_recover_errors(ErrorRecoveryAction recover)
 {
   if(recover != recover_errors)
   {
@@ -446,8 +445,7 @@ DjVuFile::set_recover_errors
 }
 
 void
-DjVuFile::set_verbose_eof
-(bool verbose)
+DjVuFile::set_verbose_eof(bool verbose)
 {
   if(verbose != verbose_eof)
   {
@@ -538,8 +536,7 @@ DjVuFile::process_incl_chunk(ByteStream & str, int file_num)
 
 
 void
-DjVuFile::report_error
-(const GException &ex,bool throw_errors)
+DjVuFile::report_error(const GException &ex,bool throw_errors)
 {
   const char eof_msg[]="Unexpected End Of File Encountered Reading:\n\t%0.1024s";
   if((verbose_eof)||strcmp(ex.get_cause(),"EOF"))
