@@ -10,7 +10,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDecodeAPI.h,v 1.12 2000-01-18 19:53:31 praveen Exp $
+//C- $Id: DjVuDecodeAPI.h,v 1.13 2000-01-21 02:47:51 bcr Exp $
 #endif
 
 #ifndef _DJVU_DECODE_API_H
@@ -18,7 +18,11 @@
 
 /* 
  * $Log: DjVuDecodeAPI.h,v $
- * Revision 1.12  2000-01-18 19:53:31  praveen
+ * Revision 1.13  2000-01-21 02:47:51  bcr
+ *
+ * I forgot the RGB test as part of the isNative() test.
+ *
+ * Revision 1.12  2000/01/18 19:53:31  praveen
  * updated
  *
  * Revision 1.11  2000/01/17 07:34:15  bcr
@@ -163,7 +167,7 @@ typedef struct _djvu_image_priv * djvu_image_priv;
 
 #define DJVU_IMAGE_IS_NATIVE(image) \
   (((image)->type==DJVU_RLE)?((image)->orientation==DJVU_TDLRNR):\
-  (((image)->orientation==DJVU_BULRNR)&&\
+  (((image)->orientation==DJVU_BULRNR)&&((image)->type!=DJVU_RGB)&&\
     ((image)->pixsize==(unsigned int)((image)->type==DJVU_GRAY)?1:3)))
 
 #define DJVU_IMAGE_ROTATE(image,angle) \
