@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GThreads.h,v 1.21 1999-09-09 22:07:09 eaf Exp $
+//C- $Id: GThreads.h,v 1.22 1999-09-09 22:25:31 eaf Exp $
 
 #ifndef _GTHREADS_H_
 #define _GTHREADS_H_
@@ -73,7 +73,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Praveen Guduru <praveen@sanskrit.lz.att.com> -- mac implementation.
     @version
-    #$Id: GThreads.h,v 1.21 1999-09-09 22:07:09 eaf Exp $# */
+    #$Id: GThreads.h,v 1.22 1999-09-09 22:25:31 eaf Exp $# */
 //@{
 
 #include "DjVuGlobal.h"
@@ -426,8 +426,11 @@ private:
    volatile long flags;
 public:
       /// Constructs #GSafeFlags# object.
-   GSafeFlags(void);
+   GSafeFlags(long flags=0);
 
+      /** Assignment operator. Will also wake up threads waiting for the
+	  flags to change. */
+   GSafeFlags & operator=(const GSafeFlags & f);
       /** Clears those bits of the flags, which are zero in the #mask#.
 	  It will also wake up threads waiting for the flags to change. */
    GSafeFlags &	operator&=(long mask);
@@ -435,17 +438,27 @@ public:
 	  It will also wake up threads waiting for the flags to change. */
    GSafeFlags &	operator|=(long mask);
       /** Returns the value of the flags */
-   operator long(void);
+   operator long(void) const;
 
       /// Computes and returns binary AND of the flags and the #mask#
-   long	operator&(long mask);
+   long	operator&(long mask) const;
 
       /// Waits until at least one bit mentioned in #mask# is set in flags
-   void	wait_for_flags(long mask);
+   void	wait_for_flags(long mask) const;
 };
 
 inline
-GSafeFlags::GSafeFlags(void) : flags(0) {}
+GSafeFlags::GSafeFlags(long xflags) : flags(xflags) {}
+
+inline GSafeFlags &
+GSafeFlags::operator=(const GSafeFlags & f)
+{
+   enter();
+   flags=f.flags;
+   broadcast();
+   leave();
+   return *this;
+}
 
 inline GSafeFlags &
 GSafeFlags::operator&=(long mask)
@@ -468,31 +481,31 @@ GSafeFlags::operator|=(long mask)
 }
 
 inline long
-GSafeFlags::operator&(long mask)
+GSafeFlags::operator&(long mask) const
 {
    long f;
-   enter();
+   ((GSafeFlags *) this)->enter();
    f=flags & mask;
-   leave();
+   ((GSafeFlags *) this)->leave();
    return f;
 }
 
 inline
-GSafeFlags::operator long(void)
+GSafeFlags::operator long(void) const
 {
    long f;
-   enter();
+   ((GSafeFlags *) this)->enter();
    f=flags;
-   leave();
+   ((GSafeFlags *) this)->leave();
    return f;
 }
 
 inline void
-GSafeFlags::wait_for_flags(long mask)
+GSafeFlags::wait_for_flags(long mask) const
 {
-   enter();
-   while((flags & mask)==0) wait();
-   leave();
+   ((GSafeFlags *) this)->enter();
+   while((flags & mask)==0) ((GSafeFlags *) this)->wait();
+   ((GSafeFlags *) this)->leave();
 }
 
 //@}
