@@ -1,0 +1,27 @@
+.SUFFIXES: .txt .1 .html .pod
+.1.txt:
+	@echo "nroff -man $*.1|sed -e 's,.^H,,g' > $*.txt"
+	@if [ -r "$*.1" ] ; then i="$*.1" ; else i="SRCDIR/$*.1" ; fi ; \
+	if ( nroff -man "$$i"|cat -s|$(SED) -e 's,.,,g' > "$*.txt" ) ; \
+	then $(TRUE) ; else \
+		$(RM) -f "$*.txt" ; \
+		exit 1 ; \
+	fi
+
+.pod.1:
+	@echo "pod2man --section=1 $*.pod > $*.1"
+	@if [ -r "$*.pod" ] ; then i="$*.pod" ; else i="SRCDIR/$*.pod" ; fi ; \
+	if ( pod2man --section=1 --release=" " --center=" " "$$i" > "$*.1" ) ; \
+	then $(TRUE) ; else \
+		$(RM) -f "$*.1" ; \
+		exit 1 ; \
+	fi	
+
+.pod.html:
+	@echo "pod2html --infile=$*.pod --outfile=$*.html"
+	@if [ -r "$*.pod" ] ; then i="$*.pod" ; else i="SRCDIR/$*.pod" ; fi ; \
+	pod2html --infile="$$i" --outfile="$*.tmp"
+	if ( $(SED) -e 's,^<BODY>,<BODY BGCOLOR=\#fefefe>,' -e 's,H1>,H3>,g' < "$*.tmp" > "$*.html" ) ; \
+	then $(RM) -f "$*.tmp" pod2html-* ; else $(RM) -f "$*.tmp" "$*.html" pod2html-* ; exit 1 ; fi
+
+
