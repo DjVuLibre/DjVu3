@@ -68,6 +68,9 @@ Package=<4>
     Begin Project Dependency
     Project_Dep_Name xml2utf8
     End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name xml2utf16
+    End Project Dependency
 }}}
 
 ###############################################################################
@@ -419,6 +422,9 @@ Package=<5>
 
 Package=<4>
 {{{
+    Begin Project Dependency
+    Project_Dep_Name ReferenceLibrary
+    End Project Dependency
 }}}
 
 ###############################################################################
