@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.h,v 1.44 1999-10-24 21:34:36 eaf Exp $
+//C- $Id: DjVuFile.h,v 1.45 1999-10-24 22:44:01 eaf Exp $
  
 #ifndef _DJVUFILE_H
 #define _DJVUFILE_H
@@ -45,7 +45,7 @@
 
     @memo Classes representing DjVu files.
     @author Andrei Erofeev <eaf@research.att.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuFile.h,v 1.44 1999-10-24 21:34:36 eaf Exp $#
+    @version #$Id: DjVuFile.h,v 1.45 1999-10-24 22:44:01 eaf Exp $#
 */
 
 //@{
@@ -385,12 +385,16 @@ public:
 	  annotations. This function may be used even when the #DjVuFile#
 	  has not been decoded yet. If all data has been received for
 	  this #DjVuFile# and all included #DjVuFile#s, it will will
-	  gather annotations from them and will return it. If no annotations
-	  have been found, or either this or any of the included files
-	  do not have all data, #ZERO# will be returned. To distinguish
-	  between the cases of insufficient data and missing annotations
-	  you may use \Ref{is_all_data_present}() function. */
-   GP<MemoryByteStream>	get_all_anno(void);
+	  gather annotations from them and will return the result.
+	  If no annotations have been found, #ZERO# will be returned.
+	  If either this #DjVuFile# or any of the included files do not
+	  have all the data, the function will use the results of
+	  decoding, which may have been started with the \Ref{start_decode}()
+	  function. Otherwise #ZERO# will be returned as well.
+
+	  {\bf Summary:} This function will return complete annotations only
+	  when the \Ref{is_all_data_present}() returns #TRUE#. */
+   GP<MemoryByteStream>	get_merged_anno(void);
    
       /** @name Encoding routines */
       //@{
@@ -434,6 +438,7 @@ protected:
 
    GPList<DjVuFile>	inc_files_list;
    GCriticalSection	inc_files_lock;
+   GCriticalSection	anno_lock;
 private:
    bool                 initialized;
    GSafeFlags		flags;
@@ -469,9 +474,9 @@ private:
    
       // Progress callback: called from time to time
    static void	progress_cb(int pos, void *);
-   static void	get_all_anno(const GP<DjVuFile> & file,
-			     ByteStream & str_out,
-			     GMap<GURL, void *> & map);
+   static void	get_merged_anno(const GP<DjVuFile> & file,
+				ByteStream & str_out,
+				GMap<GURL, void *> & map);
 
    void          check() const;
    GP<DjVuNavDir>find_ndir(GMap<GURL, void *> & map);

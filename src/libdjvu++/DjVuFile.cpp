@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.77 1999-10-24 21:34:36 eaf Exp $
+//C- $Id: DjVuFile.cpp,v 1.78 1999-10-24 22:44:01 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -597,8 +597,7 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
 
   else if (chkid == "FORM:ANNO") 
     {
-      // Borrow inc_files_lock since MemoryByteStream is not thread safe
-      GCriticalSectionLock lock(&inc_files_lock);  // anno_lock ?
+      GCriticalSectionLock lock(&anno_lock);
       if (! anno) anno = new MemoryByteStream;
       anno->seek(0,SEEK_END);
       if (anno->tell() & 1)  anno->write((void*)"", 1);
@@ -609,8 +608,7 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
 
   else if (chkid == "ANTa")
     {
-      // Borrow inc_files_lock since MemoryByteStream is not thread safe
-      GCriticalSectionLock lock(&inc_files_lock); // anno_lock ?
+      GCriticalSectionLock lock(&anno_lock);
       if (! anno) anno = new MemoryByteStream;
       anno->seek(0,SEEK_END);
       if (anno->tell() & 1) anno->write((const void*)"", 1);
@@ -1070,53 +1068,81 @@ DjVuFile::decode_ndir(void)
 }
 
 void
-DjVuFile::get_all_anno(const GP<DjVuFile> & file, ByteStream & str_out,
-		       GMap<GURL, void *> & map)
+DjVuFile::get_merged_anno(const GP<DjVuFile> & file,
+			  ByteStream & str_out,
+			  GMap<GURL, void *> & map)
 {
    GURL url=file->get_url();
    if (!map.contains(url))
    {
       map[url]=0;
 
-      GP<ByteStream> str=file->data_pool->get_stream();
-      IFFByteStream iff(*str);
-      GString chkid;
-      if (iff.get_chunk(chkid))
-	 while(iff.get_chunk(chkid))
+      if (!file->is_data_present())
+      {
+	    // Return smth using the 'anno' and partially decoded
+	    // list of included files. The result is only an approximation
+	    // due to two things:
+	    //    1. 'anno' may not contain all data
+	    //    2. annotations are merged regardless of where a child
+	    //       DjVuFile is included.
+	 if (file->anno && file->anno->size())
 	 {
-	    if (chkid=="INCL")
-	    {
-	       GP<DjVuFile> inc_file=file->process_incl_chunk(iff);
-	       if (inc_file) get_all_anno(inc_file, str_out, map);
-	    } else if (chkid == "FORM:ANNO")
-	    {
-	       if (str_out.tell() & 1) str_out.write((void *) "", 1);
-	       str_out.copy(iff);
-	    } else if (chkid == "ANTa")
-	    {
-	       if (str_out.tell() & 1) str_out.write((void *) "", 1);
-	       
-	       IFFByteStream iff_out(str_out);
-	       iff_out.put_chunk(chkid);
-	       iff_out.copy(iff);
-	       iff_out.close_chunk();
-	    }
-	    iff.close_chunk();
+	    GCriticalSectionLock lock(&file->anno_lock);
+	    if (str_out.tell() & 1) str_out.write((void *) "", 1);
+	    file->anno->seek(0);
+	    str_out.copy(*file->anno);
 	 }
+	 GPList<DjVuFile> list=file->get_included_files();
+	 for(GPosition pos=list;pos;++pos)
+	    get_merged_anno(list[pos], str_out, map);
+      } else
+      {
+	    // Process the DjVuFile's data by decoding the annotations
+	    // and included annotations from lower-level files where necessary
+	    // Note, that using 'anno' and included files list is not
+	    // a good idea because we want to insert annotations of the
+	    // included files into correct places
+	 GP<ByteStream> str=file->data_pool->get_stream();
+	 IFFByteStream iff(*str);
+	 GString chkid;
+	 if (iff.get_chunk(chkid))
+	    while(iff.get_chunk(chkid))
+	    {
+	       if (chkid=="INCL")
+	       {
+		  GP<DjVuFile> inc_file=file->process_incl_chunk(iff);
+		  if (inc_file) get_merged_anno(inc_file, str_out, map);
+	       } else if (chkid == "FORM:ANNO")
+	       {
+		  if (str_out.tell() & 1) str_out.write((void *) "", 1);
+		  str_out.copy(iff);
+	       } else if (chkid == "ANTa")
+	       {
+		  if (str_out.tell() & 1) str_out.write((void *) "", 1);
+	       
+		  IFFByteStream iff_out(str_out);
+		  iff_out.put_chunk(chkid);
+		  iff_out.copy(iff);
+		  iff_out.close_chunk();
+	       }
+	       iff.close_chunk();
+	    }
+      }
    }
 }
    
 GP<MemoryByteStream>
-DjVuFile::get_all_anno(void)
+DjVuFile::get_merged_anno(void)
+      // Will go down the DjVuFile's hierarchy and decode all DjVuAnno even
+      // when the DjVuFile is not fully decoded yet. To avoid correlations
+      // with DjVuFile::decode(), we do not modify DjVuFile::anno data.
+      // NOTE! This function guarantees correct results only if the
+      // DjVuFile as all data
 {
-   GP<MemoryByteStream> str;
-   if (is_all_data_present())
-   {
-      str=new MemoryByteStream;
-      GMap<GURL, void *> map;
-      get_all_anno(this, *str, map);
-      if (str->tell()==0) str=0;
-   }
+   GP<MemoryByteStream> str=new MemoryByteStream;
+   GMap<GURL, void *> map;
+   get_merged_anno(this, *str, map);
+   if (str->tell()==0) str=0;
    return str;
 }
 
@@ -1329,8 +1355,7 @@ DjVuFile::add_djvu_data(IFFByteStream & ostr, GMap<GURL, void *> & map,
           if (!processed_annotation)
             {
               processed_annotation = true;
-              // Borrow inc_files_lock since MemoryByteStreams are not thread safe
-              GCriticalSectionLock lock(&inc_files_lock);  // anno_lock ?
+              GCriticalSectionLock lock(&anno_lock);
               ostr.put_chunk("FORM:ANNO");
               anno->seek(0);
               ostr.copy(*anno);
@@ -1359,8 +1384,7 @@ DjVuFile::add_djvu_data(IFFByteStream & ostr, GMap<GURL, void *> & map,
    // Otherwise, writes annotation at the end (annotations could be big)
    if (!processed_annotation && anno && anno->size())
      {
-       // Borrow inc_files_lock since MemoryByteStreams are not thread safe
-       GCriticalSectionLock lock(&inc_files_lock);  // anno_lock ?
+       GCriticalSectionLock lock(&anno_lock);
        ostr.put_chunk("FORM:ANNO");
        anno->seek(0);
        ostr.copy(*anno);
@@ -1397,18 +1421,17 @@ DjVuFile::get_djvu_data(bool included_too, bool no_ndir)
 void
 DjVuFile::merge_anno(MemoryByteStream &out)
 {
-  // Borrow inc_files_lock since MemoryByteStreams are not thread safe
-  GCriticalSectionLock lock(&inc_files_lock);   // used as anno_lock as well  
-  GPList<DjVuFile> incl = get_included_files(); // locked!
-  for (GPosition pos=incl; pos; ++pos)
-    incl[pos]->merge_anno(out);
-  if (anno && anno->size())
-    {
-      if (out.tell() & 1)
-        out.write((void*)"", 1);
-      anno->seek(0);
-      out.copy(*anno);
-    }
+      // Reuse get_merged_anno(), which is better than the previous
+      // implementation due to three things:
+      //  1. It works even before the file is completely decoded
+      //  2. It merges annotations taking into account where a child DjVuFile
+      //     is included.
+      //  3. It handles loops in DjVuFile's hierarchy
+   
+   GP<MemoryByteStream> str=get_merged_anno();
+   str->seek(0);
+   if (out.tell() & 1) out.write((void *) "", 1);
+   out.copy(*str);
 }
 
 
