@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.h,v 1.29 2001-03-30 23:31:29 bcr Exp $
+// $Id: GString.h,v 1.30 2001-04-02 22:04:07 bcr Exp $
 // $Name:  $
 
 #ifndef _GSTRING_H_
@@ -57,7 +57,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.29 2001-03-30 23:31:29 bcr Exp $# */
+    #$Id: GString.h,v 1.30 2001-04-02 22:04:07 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -83,6 +83,7 @@ class GStringRep : public GPEnabled
   friend unsigned int hash(const GString &ref);
 public:
   static GStringRep *xnew(unsigned int sz = 0);
+  ~GStringRep() { data[0]=0; }
 private:
   int  size;
 #ifndef NO_DEBUG
