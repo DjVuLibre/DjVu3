@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.105 2000-01-21 20:27:20 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.106 2000-01-25 00:44:59 leonb Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -1216,11 +1216,9 @@ DjVuDocument::request_data(const DjVuPort * source, const GURL & url)
 	 case SINGLE_PAGE:
 	 case OLD_INDEXED:
 	 case INDIRECT:
-	 {
-	    DEBUG_MSG("The document is in SINGLE_PAGE or OLD_INDEXED or INDIRECT format\n");
-	    if (url.base()!=init_url.base())
-	       THROW("URL '"+url+"' points outside of the document's directory.");
-	    if (flags & DOC_DIR_KNOWN)
+           {
+             DEBUG_MSG("The document is in SINGLE_PAGE or OLD_INDEXED or INDIRECT format\n");
+             if (flags & DOC_DIR_KNOWN)
 	       if (doc_type==INDIRECT && !djvm_dir->name_to_file(url.name()))
 		  THROW("URL '"+url+"' points outside of the INDIRECT document.");
 	 
