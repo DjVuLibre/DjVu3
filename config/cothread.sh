@@ -16,7 +16,7 @@ then
     if [ ! -z "$cxx_is_gcc" ] 
     then
       CXXCOTHREAD="-DTHREADMODEL=COTHREADS"
-      echon "Testing exception handler patch for ${CC} ... "
+      echon "Testing exception handler patch for ${CXX} ... "
       testfile $temp.cpp <<\EOF
 extern "C" void *(*__get_eh_context_ptr)(void);
 extern "C" void *__new_eh_context(void);
@@ -45,7 +45,7 @@ then
     if [ ! -z "$cc_is_gcc" ] 
     then
       CCCOTHREAD="-DTHREADMODEL=COTHREADS"
-      echon "Testing exception handler patch for ${CXX} ... "
+      echon "Testing exception handler patch for ${CC} ... "
       testfile $temp.c <<\EOF
 extern "C" void *(*__get_eh_context_ptr)(void);
 extern "C" void *__new_eh_context(void);
