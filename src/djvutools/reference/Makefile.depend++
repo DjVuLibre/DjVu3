@@ -3,24 +3,27 @@ bzz.o: bzz.cpp ../../../src/libdjvu++/GException.h \
  ../../../src/libdjvu++/DjVuGlobal.h \
  ../../../src/include/DjVu.h \
  ../../../src/libdjvu++/ByteStream.h \
- ../../../src/libdjvu++/Arrays.h \
+ ../../../src/libdjvu++/GContainer.h \
  ../../../src/libdjvu++/GSmartPointer.h \
+ ../../../src/libdjvu++/Arrays.h \
  ../../../src/libdjvu++/BSByteStream.h \
  ../../../src/libdjvu++/ZPCodec.h
 c44.o: c44.cpp ../../../src/libdjvu++/GString.h \
  ../../../src/libdjvu++/DjVuGlobal.h \
  ../../../src/include/DjVu.h \
- ../../../src/libdjvu++/GContainer.h \
  ../../../src/libdjvu++/GException.h \
  ../../../src/libdjvu++/GSmartPointer.h \
  ../../../src/libdjvu++/IWImage.h \
- ../../../src/libdjvu++/DjVuInfo.h \
- ../../../src/libdjvu++/IFFByteStream.h \
- ../../../src/libdjvu++/ByteStream.h \
- ../../../src/libdjvu++/Arrays.h \
- ../../../src/libdjvu++/GOS.h \
+ ../../../src/libdjvu++/GRect.h \
  ../../../src/libdjvu++/GBitmap.h \
- ../../../src/libdjvu++/GPixmap.h
+ ../../../src/libdjvu++/ByteStream.h \
+ ../../../src/libdjvu++/GContainer.h \
+ ../../../src/libdjvu++/Arrays.h \
+ ../../../src/libdjvu++/GPixmap.h \
+ ../../../src/libdjvu++/IFFByteStream.h \
+ ../../../src/libdjvu++/DjVuInfo.h \
+ ../../../src/libdjvu++/GThreads.h \
+ ../../../src/libdjvu++/GOS.h
 cjb2.o: cjb2.cpp ../../../src/libdjvu++/DjVuGlobal.h \
  ../../../src/include/DjVu.h \
  ../../../src/libdjvu++/GException.h \
@@ -34,7 +37,8 @@ cjb2.o: cjb2.cpp ../../../src/libdjvu++/DjVuGlobal.h \
  ../../../src/libdjvu++/GBitmap.h \
  ../../../src/libdjvu++/JB2Image.h \
  ../../../src/libdjvu++/ZPCodec.h \
- ../../../src/libdjvu++/DjVuInfo.h
+ ../../../src/libdjvu++/DjVuInfo.h \
+ ../../../src/libdjvu++/GThreads.h
 cpaldjvu.o: cpaldjvu.cpp \
  ../../../src/libdjvu++/DjVuGlobal.h \
  ../../../src/include/DjVu.h \
@@ -52,7 +56,8 @@ cpaldjvu.o: cpaldjvu.cpp \
  ../../../src/libdjvu++/DjVuPalette.h \
  ../../../src/libdjvu++/GPixmap.h \
  ../../../src/libdjvu++/IWImage.h \
- ../../../src/libdjvu++/DjVuInfo.h
+ ../../../src/libdjvu++/DjVuInfo.h \
+ ../../../src/libdjvu++/GThreads.h
 csepdjvu.o: csepdjvu.cpp \
  ../../../src/libdjvu++/DjVuGlobal.h \
  ../../../src/include/DjVu.h \
@@ -71,54 +76,88 @@ csepdjvu.o: csepdjvu.cpp \
  ../../../src/libdjvu++/GPixmap.h \
  ../../../src/libdjvu++/IWImage.h \
  ../../../src/libdjvu++/DjVuInfo.h \
+ ../../../src/libdjvu++/GThreads.h \
  ../../../src/libdjvu++/DjVmDoc.h \
  ../../../src/libdjvu++/DjVmDir.h \
- ../../../src/libdjvu++/GThreads.h
+ ../../../src/libdjvu++/DataPool.h
 d44.o: d44.cpp ../../../src/libdjvu++/GString.h \
  ../../../src/libdjvu++/DjVuGlobal.h \
  ../../../src/include/DjVu.h \
- ../../../src/libdjvu++/GContainer.h \
  ../../../src/libdjvu++/GException.h \
  ../../../src/libdjvu++/GSmartPointer.h \
  ../../../src/libdjvu++/IWImage.h \
- ../../../src/libdjvu++/GOS.h \
- ../../../src/libdjvu++/IFFByteStream.h \
+ ../../../src/libdjvu++/GRect.h \
+ ../../../src/libdjvu++/GBitmap.h \
  ../../../src/libdjvu++/ByteStream.h \
+ ../../../src/libdjvu++/GContainer.h \
  ../../../src/libdjvu++/Arrays.h \
  ../../../src/libdjvu++/GPixmap.h \
- ../../../src/libdjvu++/GBitmap.h
+ ../../../src/libdjvu++/IFFByteStream.h \
+ ../../../src/libdjvu++/GOS.h
 ddjvu.o: ddjvu.cpp ../../../src/libdjvu++/GException.h \
  ../../../src/libdjvu++/DjVuGlobal.h \
  ../../../src/include/DjVu.h \
  ../../../src/libdjvu++/GSmartPointer.h \
  ../../../src/libdjvu++/GRect.h \
  ../../../src/libdjvu++/GPixmap.h \
+ ../../../src/libdjvu++/ByteStream.h \
+ ../../../src/libdjvu++/GContainer.h \
+ ../../../src/libdjvu++/Arrays.h \
  ../../../src/libdjvu++/GBitmap.h \
  ../../../src/libdjvu++/DjVuImage.h \
- ../../../src/libdjvu++/DjVuFile.h \
- ../../../src/libdjvu++/DjVuInfo.h \
- ../../../src/libdjvu++/DjVuPalette.h \
- ../../../src/libdjvu++/GContainer.h \
- ../../../src/libdjvu++/DjVuPort.h \
- ../../../src/libdjvu++/GThreads.h \
- ../../../src/libdjvu++/GURL.h \
  ../../../src/libdjvu++/GString.h \
- ../../../src/libdjvu++/Arrays.h \
+ ../../../src/libdjvu++/GThreads.h \
+ ../../../src/libdjvu++/IFFByteStream.h \
+ ../../../src/libdjvu++/JB2Image.h \
+ ../../../src/libdjvu++/ZPCodec.h \
+ ../../../src/libdjvu++/IWImage.h \
+ ../../../src/libdjvu++/DjVuInfo.h \
+ ../../../src/libdjvu++/DjVuAnno.h \
+ ../../../src/libdjvu++/GMapAreas.h \
+ ../../../src/libdjvu++/DjVuFile.h \
+ ../../../src/libdjvu++/DataPool.h \
+ ../../../src/libdjvu++/DjVuPalette.h \
+ ../../../src/libdjvu++/DjVuPort.h \
+ ../../../src/libdjvu++/GURL.h \
+ ../../../src/libdjvu++/DjVuNavDir.h \
  ../../../src/libdjvu++/DjVuDocument.h \
- ../../../src/libdjvu++/GOS.h \
- ../../../src/libdjvu++/ByteStream.h
+ ../../../src/libdjvu++/DjVuFileCache.h \
+ ../../../src/libdjvu++/debug.h \
+ ../../../src/libdjvu++/DjVmDir0.h \
+ ../../../src/libdjvu++/DjVmDoc.h \
+ ../../../src/libdjvu++/DjVmDir.h \
+ ../../../src/libdjvu++/GOS.h
 djthumb.o: djthumb.cpp ../../../src/libdjvu++/GString.h \
  ../../../src/libdjvu++/DjVuGlobal.h \
  ../../../src/include/DjVu.h \
- ../../../src/libdjvu++/GContainer.h \
  ../../../src/libdjvu++/GException.h \
  ../../../src/libdjvu++/GSmartPointer.h \
  ../../../src/libdjvu++/DjVuDocEditor.h \
  ../../../src/libdjvu++/DjVuDocument.h \
- ../../../src/libdjvu++/DjVuPort.h \
- ../../../src/libdjvu++/GThreads.h \
- ../../../src/libdjvu++/GURL.h \
+ ../../../src/libdjvu++/DjVuFileCache.h \
+ ../../../src/libdjvu++/DjVuFile.h \
+ ../../../src/libdjvu++/ByteStream.h \
+ ../../../src/libdjvu++/GContainer.h \
  ../../../src/libdjvu++/Arrays.h \
+ ../../../src/libdjvu++/DataPool.h \
+ ../../../src/libdjvu++/GThreads.h \
+ ../../../src/libdjvu++/DjVuInfo.h \
+ ../../../src/libdjvu++/JB2Image.h \
+ ../../../src/libdjvu++/ZPCodec.h \
+ ../../../src/libdjvu++/GRect.h \
+ ../../../src/libdjvu++/GBitmap.h \
+ ../../../src/libdjvu++/IWImage.h \
+ ../../../src/libdjvu++/GPixmap.h \
+ ../../../src/libdjvu++/IFFByteStream.h \
+ ../../../src/libdjvu++/DjVuPalette.h \
+ ../../../src/libdjvu++/DjVuPort.h \
+ ../../../src/libdjvu++/GURL.h \
+ ../../../src/libdjvu++/DjVuNavDir.h \
+ ../../../src/libdjvu++/debug.h \
+ ../../../src/libdjvu++/DjVuImage.h \
+ ../../../src/libdjvu++/DjVuAnno.h \
+ ../../../src/libdjvu++/GMapAreas.h \
+ ../../../src/libdjvu++/DjVmDir0.h \
  ../../../src/libdjvu++/DjVmDoc.h \
  ../../../src/libdjvu++/DjVmDir.h \
  ../../../src/libdjvu++/GOS.h
@@ -127,112 +166,153 @@ djvm.o: djvm.cpp ../../../src/libdjvu++/GException.h \
  ../../../src/include/DjVu.h \
  ../../../src/libdjvu++/DjVuDocEditor.h \
  ../../../src/libdjvu++/DjVuDocument.h \
- ../../../src/libdjvu++/DjVuPort.h \
- ../../../src/libdjvu++/GThreads.h \
- ../../../src/libdjvu++/GURL.h \
- ../../../src/libdjvu++/GString.h \
- ../../../src/libdjvu++/GContainer.h \
  ../../../src/libdjvu++/GSmartPointer.h \
+ ../../../src/libdjvu++/DjVuFileCache.h \
+ ../../../src/libdjvu++/DjVuFile.h \
+ ../../../src/libdjvu++/ByteStream.h \
+ ../../../src/libdjvu++/GContainer.h \
  ../../../src/libdjvu++/Arrays.h \
+ ../../../src/libdjvu++/DataPool.h \
+ ../../../src/libdjvu++/GThreads.h \
+ ../../../src/libdjvu++/GString.h \
+ ../../../src/libdjvu++/DjVuInfo.h \
+ ../../../src/libdjvu++/JB2Image.h \
+ ../../../src/libdjvu++/ZPCodec.h \
+ ../../../src/libdjvu++/GRect.h \
+ ../../../src/libdjvu++/GBitmap.h \
+ ../../../src/libdjvu++/IWImage.h \
+ ../../../src/libdjvu++/GPixmap.h \
+ ../../../src/libdjvu++/IFFByteStream.h \
+ ../../../src/libdjvu++/DjVuPalette.h \
+ ../../../src/libdjvu++/DjVuPort.h \
+ ../../../src/libdjvu++/GURL.h \
+ ../../../src/libdjvu++/DjVuNavDir.h \
+ ../../../src/libdjvu++/debug.h \
+ ../../../src/libdjvu++/DjVuImage.h \
+ ../../../src/libdjvu++/DjVuAnno.h \
+ ../../../src/libdjvu++/GMapAreas.h \
+ ../../../src/libdjvu++/DjVmDir0.h \
  ../../../src/libdjvu++/DjVmDoc.h \
  ../../../src/libdjvu++/DjVmDir.h \
  ../../../src/libdjvu++/GOS.h
 djvmcvt.o: djvmcvt.cpp \
  ../../../src/libdjvu++/DjVuDocument.h \
- ../../../src/libdjvu++/DjVuPort.h \
+ ../../../src/libdjvu++/DjVuGlobal.h \
+ ../../../src/include/DjVu.h \
+ ../../../src/libdjvu++/GSmartPointer.h \
+ ../../../src/libdjvu++/DjVuFileCache.h \
+ ../../../src/libdjvu++/DjVuFile.h \
+ ../../../src/libdjvu++/ByteStream.h \
+ ../../../src/libdjvu++/GException.h \
+ ../../../src/libdjvu++/GContainer.h \
+ ../../../src/libdjvu++/Arrays.h \
+ ../../../src/libdjvu++/DataPool.h \
  ../../../src/libdjvu++/GThreads.h \
+ ../../../src/libdjvu++/GString.h \
+ ../../../src/libdjvu++/DjVuInfo.h \
+ ../../../src/libdjvu++/JB2Image.h \
+ ../../../src/libdjvu++/ZPCodec.h \
+ ../../../src/libdjvu++/GRect.h \
+ ../../../src/libdjvu++/GBitmap.h \
+ ../../../src/libdjvu++/IWImage.h \
+ ../../../src/libdjvu++/GPixmap.h \
+ ../../../src/libdjvu++/IFFByteStream.h \
+ ../../../src/libdjvu++/DjVuPalette.h \
+ ../../../src/libdjvu++/DjVuPort.h \
+ ../../../src/libdjvu++/GURL.h \
+ ../../../src/libdjvu++/DjVuNavDir.h \
+ ../../../src/libdjvu++/debug.h \
+ ../../../src/libdjvu++/DjVuImage.h \
+ ../../../src/libdjvu++/DjVuAnno.h \
+ ../../../src/libdjvu++/GMapAreas.h \
+ ../../../src/libdjvu++/DjVmDir0.h \
+ ../../../src/libdjvu++/DjVmDoc.h \
+ ../../../src/libdjvu++/DjVmDir.h \
+ ../../../src/libdjvu++/GOS.h
+djvudump.o: djvudump.cpp \
+ ../../../src/libdjvu++/DjVuDumpHelper.h \
+ ../../../src/libdjvu++/DataPool.h \
+ ../../../src/libdjvu++/ByteStream.h \
  ../../../src/libdjvu++/DjVuGlobal.h \
  ../../../src/include/DjVu.h \
  ../../../src/libdjvu++/GException.h \
- ../../../src/libdjvu++/GURL.h \
- ../../../src/libdjvu++/GString.h \
  ../../../src/libdjvu++/GContainer.h \
  ../../../src/libdjvu++/GSmartPointer.h \
  ../../../src/libdjvu++/Arrays.h \
- ../../../src/libdjvu++/DjVmDoc.h \
- ../../../src/libdjvu++/DjVmDir.h \
- ../../../src/libdjvu++/ByteStream.h \
- ../../../src/libdjvu++/GOS.h ../../../src/libdjvu++/debug.h
-djvudump.o: djvudump.cpp \
- ../../../src/libdjvu++/DjVuDumpHelper.h \
- ../../../src/libdjvu++/GSmartPointer.h \
- ../../../src/libdjvu++/DjVuGlobal.h \
- ../../../src/include/DjVu.h \
- ../../../src/libdjvu++/ByteStream.h \
- ../../../src/libdjvu++/Arrays.h \
- ../../../src/libdjvu++/GException.h
+ ../../../src/libdjvu++/GThreads.h \
+ ../../../src/libdjvu++/GString.h
 djvuextract.o: djvuextract.cpp \
  ../../../src/libdjvu++/GException.h \
  ../../../src/libdjvu++/DjVuGlobal.h \
  ../../../src/include/DjVu.h \
  ../../../src/libdjvu++/ByteStream.h \
- ../../../src/libdjvu++/Arrays.h \
+ ../../../src/libdjvu++/GContainer.h \
  ../../../src/libdjvu++/GSmartPointer.h \
+ ../../../src/libdjvu++/Arrays.h \
  ../../../src/libdjvu++/IFFByteStream.h \
  ../../../src/libdjvu++/GString.h \
- ../../../src/libdjvu++/GContainer.h \
  ../../../src/libdjvu++/DjVuDocument.h \
- ../../../src/libdjvu++/DjVuPort.h \
- ../../../src/libdjvu++/GThreads.h \
- ../../../src/libdjvu++/GURL.h \
+ ../../../src/libdjvu++/DjVuFileCache.h \
  ../../../src/libdjvu++/DjVuFile.h \
+ ../../../src/libdjvu++/DataPool.h \
+ ../../../src/libdjvu++/GThreads.h \
  ../../../src/libdjvu++/DjVuInfo.h \
- ../../../src/libdjvu++/DjVuPalette.h \
+ ../../../src/libdjvu++/JB2Image.h \
+ ../../../src/libdjvu++/ZPCodec.h \
+ ../../../src/libdjvu++/GRect.h \
+ ../../../src/libdjvu++/GBitmap.h \
+ ../../../src/libdjvu++/IWImage.h \
  ../../../src/libdjvu++/GPixmap.h \
+ ../../../src/libdjvu++/DjVuPalette.h \
+ ../../../src/libdjvu++/DjVuPort.h \
+ ../../../src/libdjvu++/GURL.h \
+ ../../../src/libdjvu++/DjVuNavDir.h \
+ ../../../src/libdjvu++/debug.h \
+ ../../../src/libdjvu++/DjVuImage.h \
+ ../../../src/libdjvu++/DjVuAnno.h \
+ ../../../src/libdjvu++/GMapAreas.h \
+ ../../../src/libdjvu++/DjVmDir0.h \
+ ../../../src/libdjvu++/DjVmDoc.h \
+ ../../../src/libdjvu++/DjVmDir.h \
  ../../../src/libdjvu++/GOS.h
 djvumake.o: djvumake.cpp \
  ../../../src/libdjvu++/GString.h \
  ../../../src/libdjvu++/DjVuGlobal.h \
  ../../../src/include/DjVu.h \
- ../../../src/libdjvu++/GContainer.h \
  ../../../src/libdjvu++/GException.h \
  ../../../src/libdjvu++/GSmartPointer.h \
  ../../../src/libdjvu++/DjVuImage.h \
- ../../../src/libdjvu++/DjVuFile.h \
- ../../../src/libdjvu++/DjVuInfo.h \
- ../../../src/libdjvu++/DjVuPalette.h \
- ../../../src/libdjvu++/GPixmap.h \
- ../../../src/libdjvu++/DjVuPort.h \
  ../../../src/libdjvu++/GThreads.h \
- ../../../src/libdjvu++/GURL.h \
- ../../../src/libdjvu++/Arrays.h \
- ../../../src/libdjvu++/MMRDecoder.h \
- ../../../src/libdjvu++/IFFByteStream.h \
  ../../../src/libdjvu++/ByteStream.h \
+ ../../../src/libdjvu++/GContainer.h \
+ ../../../src/libdjvu++/Arrays.h \
+ ../../../src/libdjvu++/IFFByteStream.h \
  ../../../src/libdjvu++/JB2Image.h \
  ../../../src/libdjvu++/ZPCodec.h \
- ../../../src/libdjvu++/IWImage.h \
- ../../../src/libdjvu++/GBitmap.h
-djvutxt.o: djvutxt.cpp \
- ../../../src/libdjvu++/DjVuDocument.h \
- ../../../src/libdjvu++/DjVuPort.h \
- ../../../src/libdjvu++/GThreads.h \
- ../../../src/libdjvu++/DjVuGlobal.h \
- ../../../src/include/DjVu.h \
- ../../../src/libdjvu++/GException.h \
- ../../../src/libdjvu++/GURL.h \
- ../../../src/libdjvu++/GString.h \
- ../../../src/libdjvu++/GContainer.h \
- ../../../src/libdjvu++/GSmartPointer.h \
- ../../../src/libdjvu++/Arrays.h \
- ../../../src/libdjvu++/ByteStream.h \
- ../../../src/libdjvu++/DjVuText.h \
- ../../../src/libdjvu++/GMapAreas.h \
  ../../../src/libdjvu++/GRect.h \
- ../../../src/libdjvu++/DjVuImage.h \
- ../../../src/libdjvu++/DjVuFile.h \
- ../../../src/libdjvu++/DjVuInfo.h \
- ../../../src/libdjvu++/DjVuPalette.h \
+ ../../../src/libdjvu++/GBitmap.h \
+ ../../../src/libdjvu++/IWImage.h \
  ../../../src/libdjvu++/GPixmap.h \
- ../../../src/libdjvu++/GOS.h
+ ../../../src/libdjvu++/DjVuInfo.h \
+ ../../../src/libdjvu++/DjVuAnno.h \
+ ../../../src/libdjvu++/GMapAreas.h \
+ ../../../src/libdjvu++/DjVuFile.h \
+ ../../../src/libdjvu++/DataPool.h \
+ ../../../src/libdjvu++/DjVuPalette.h \
+ ../../../src/libdjvu++/DjVuPort.h \
+ ../../../src/libdjvu++/GURL.h \
+ ../../../src/libdjvu++/DjVuNavDir.h \
+ ../../../src/libdjvu++/MMRDecoder.h
 ppmcoco.o: ppmcoco.cpp \
  ../../../src/libdjvu++/GException.h \
  ../../../src/libdjvu++/DjVuGlobal.h \
  ../../../src/include/DjVu.h \
  ../../../src/libdjvu++/ByteStream.h \
- ../../../src/libdjvu++/Arrays.h \
+ ../../../src/libdjvu++/GContainer.h \
  ../../../src/libdjvu++/GSmartPointer.h \
+ ../../../src/libdjvu++/Arrays.h \
  ../../../src/libdjvu++/GPixmap.h \
- ../../../src/libdjvu++/GString.h \
- ../../../src/libdjvu++/GContainer.h
+ ../../../src/libdjvu++/GRect.h \
+ ../../../src/libdjvu++/GBitmap.h \
+ ../../../src/libdjvu++/GString.h
 ### END   C++ DEPENDENCIES

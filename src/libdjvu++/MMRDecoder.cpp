@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: MMRDecoder.cpp,v 1.27 2001-01-04 00:11:05 bcr Exp $
+// $Id: MMRDecoder.cpp,v 1.28 2001-01-04 00:45:56 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -506,16 +506,14 @@ MMRDecoder::scanruns(const unsigned short **endptr)
   prevruns = pr;
   lineruns = xr;
   // Loop until scanline is complete
-  char a0color = 0;
-  int a0 = 0;
-  int inc = 0;
-  int rle = 0;
-  int b1 = *pr++;
-  while (a0 < width)
+  bool a0color = false;
+  int a0,rle,b1;
+  for(a0=0,rle=0,b1=*pr++;a0 < width;)
     {
       // Process MMR codes
-      switch ( mrtable->decode(src) )
-        {
+      const int c=mrtable->decode(src);
+      switch ( c )
+      {
           /* Pass Mode */
         case P: 
           { 
@@ -530,6 +528,7 @@ MMRDecoder::scanruns(const unsigned short **endptr)
           { 
             // First run
             VLTable *table = (a0color ? btable : wtable);
+            int inc;
             do { inc=table->decode(src); a0+=inc; rle+=inc; } while (inc>=64);
             *xr = rle; xr++; rle = 0;
             // Second run
@@ -540,34 +539,52 @@ MMRDecoder::scanruns(const unsigned short **endptr)
           }
           /* Vertical Modes */
         case V0:
-          inc = b1-a0;
-        vertical_r:
-          b1 += *pr; pr++;
-        vertical_l:
-          *xr = inc+rle; xr++; a0 += inc; rle = 0;
+        case VR3:
+        case VR2:
+        case VR1:
+        case VL3:
+        case VL2:
+        case VL1:
+        {
+          int inc=b1;
+          switch ( c )
+          {
+          case V0:
+            inc = b1;
+            b1 += *pr++;
+            break;
+          case VR3:
+            inc = b1+3;
+            b1 += *pr++;
+            break;
+          case VR2:
+            inc = b1+2;
+            b1 += *pr++;
+            break;
+          case VR1:
+            inc = b1+1;
+            b1 += *pr++;
+            break;
+          case VL3:
+            inc = b1-3;
+            b1 -= *--pr;
+            break;
+          case VL2:
+            inc = b1-2;
+            b1 -= *--pr;
+            break;
+          case VL1:
+            inc = b1-1;
+            b1 -= *--pr;
+            break;
+          }
+          *xr = inc+rle-a0;
+          xr++;
+          a0 = inc;
+          rle = 0;
           a0color = !a0color;
           break;
-        case VR3:
-          inc = b1-a0+3;
-          goto vertical_r;
-        case VR2:
-          inc = b1-a0+2; 
-          goto vertical_r;
-        case VR1:
-          inc = b1-a0+1; 
-          goto vertical_r;
-        case VL3:
-          inc = b1-a0-3;
-          b1 -= *--pr;
-          goto vertical_l;
-        case VL2:
-          inc = b1-a0-2;
-          b1 -= *--pr;
-          goto vertical_l;
-        case VL1:
-          inc = b1-a0-1;
-          b1 -= *--pr;
-          goto vertical_l;
+        }
           /* Uncommon modes */
         default: 
           {
@@ -596,7 +613,12 @@ MMRDecoder::scanruns(const unsigned short **endptr)
                       {
                         src->shift(6);
                         if (a0color)
-                          { *xr = rle; xr++; rle = 0; a0color = !a0color; }
+                        {
+                          *xr = rle;
+                          xr++;
+                          rle = 0;
+                          a0color = !a0color;
+                        }
                         rle += 5;
                         a0 += 5;
                       }
@@ -604,7 +626,12 @@ MMRDecoder::scanruns(const unsigned short **endptr)
                       { 
                         src->shift(1);
                         if (a0color == !(m & 0x80000000))
-                          { *xr = rle; xr++; rle = 0; a0color = !a0color; }
+                        {
+                          *xr = rle;
+                          xr++;
+                          rle = 0;
+                          a0color = !a0color;
+                        }
                         rle++;
                         a0++;
                       }
@@ -616,10 +643,20 @@ MMRDecoder::scanruns(const unsigned short **endptr)
                 src->shift(8);
                 if ( (m & 0xfe000000) != 0x02000000 )
                   G_THROW(invalid_mmr_data);
-                if (rle!=0)
-                  { *xr = rle; xr++; rle = 0; a0color = !a0color; }                  
+                if (rle)
+                {
+                  *xr = rle;
+                  xr++;
+                  rle = 0;
+                  a0color = !a0color;
+                }                  
                 if (a0color == !(m & 0x01000000))
-                  { *xr = rle; xr++; rle = 0; a0color = !a0color; }
+                {
+                  *xr = rle;
+                  xr++;
+                  rle = 0;
+                  a0color = !a0color;
+                }
                 // Cross fingers and proceed ...
                 break;
 #endif
@@ -627,26 +664,25 @@ MMRDecoder::scanruns(const unsigned short **endptr)
             // -- Unknown MMR code.
             G_THROW(invalid_mmr_data);
           }
-        }
+      }
       // Next reference run
-      while (b1<=a0 && b1<width)
-        {
-          b1 += pr[0]+pr[1];
-          pr += 2;
-        }
+      for(;b1<=a0 && b1<width;pr+=2)
+      {
+        b1 += pr[0]+pr[1];
+      }
     }
   // Final P must be followed by V0 (they say!)
   if (rle > 0)
   {
     if (mrtable->decode(src) != V0)
     {
-      G_THROW("3");
-//      G_THROW(invalid_mmr_data);
+      G_THROW(invalid_mmr_data);
     }
   }
   if (rle > 0)
   {
-    *xr = rle; xr++;
+    *xr = rle;
+    xr++;
   }
   // At this point we should have A0 equal to WIDTH
   // But there are buggy files around (Kofax!)
@@ -657,7 +693,8 @@ MMRDecoder::scanruns(const unsigned short **endptr)
         a0 -= *--xr;
       if (a0 < width)
       {
-        *xr = width-a0; xr++;
+        *xr = width-a0;
+        xr++;
       }
     }
   /* Increment and return */
@@ -673,7 +710,7 @@ MMRDecoder::scanruns(const unsigned short **endptr)
 
 
 const unsigned char *
-MMRDecoder::scanrle(int invert, const unsigned char **endptr)
+MMRDecoder::scanrle(const bool invert, const unsigned char **endptr)
 {
   // Obtain run lengths
   const unsigned short *xr = scanruns();
@@ -683,20 +720,20 @@ MMRDecoder::scanrle(int invert, const unsigned char **endptr)
   if (invert)
     {
       if (! *xr) 
+      {
         xr++;
-      else
+      }else
       {
         *p = 0; p++;
       }
     }
   // Encode lenghts using the RLE format
-  int a0 = 0;
-  while (a0 < width)
-    {
-      int count = *xr++;
-      a0 += count;
-      GBitmap::append_run(p, count);
-    }
+  for(int a0=0;a0 < width;)
+  {
+    int count = *xr++;
+    a0 += count;
+    GBitmap::append_run(p, count);
+  }
   if (endptr)
     *endptr = p;
   p[0] = 0;
@@ -774,16 +811,16 @@ MMRDecoder::decode(ByteStream &inp)
       GPArray<GBitmap> blocks(0,blocksperline-1);
       // Loop on scanlines
       for(; bandline >= 0; bandline--,line--)
-	{
-	  // Decode one scanline
-	  const unsigned short *s = dcd.scanruns();
-          if (s == 0)
-            continue;
+      {
+        // Decode one scanline
+        const unsigned short *s = dcd.scanruns();
+        if (s)
+        {
 	  // Loop on blocks
           int x = 0;
           int b = 0;
           int firstx = 0;
-          int c = (invert ? 1 : 0);
+          bool c = invert;
           while (x < width)
             {
               int xend = x + *s++;
@@ -809,6 +846,7 @@ MMRDecoder::decode(ByteStream &inp)
               c = !c; 
             }
 	}
+      }
       // Insert blocks into JB2Image
       for (int b=0; b<blocksperline; b++)
 	{

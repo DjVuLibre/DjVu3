@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: MMRDecoder.h,v 1.14 2001-01-04 00:11:05 bcr Exp $
+// $Id: MMRDecoder.h,v 1.15 2001-01-04 00:45:56 bcr Exp $
 // $Name:  $
 
 #ifndef _MMRDECODER_H_
@@ -101,7 +101,7 @@ class JB2Image;
     @memo
     CCITT-G4/MMR decoder.
     @version
-    #$Id: MMRDecoder.h,v 1.14 2001-01-04 00:11:05 bcr Exp $#
+    #$Id: MMRDecoder.h,v 1.15 2001-01-04 00:45:56 bcr Exp $#
     @author
     Parag Deshmukh <parag@sanskrit.lz.att.com> \\
     Leon Bottou <leonb@research.att.com> */
@@ -151,7 +151,7 @@ public:
       stored in the pointer specified by the optional argument #endptr#.  The
       buffer data should be processed before calling this function again. This
       is implemented by calling \Ref{MMRDecoder::scanruns}. */
-  const unsigned char  *scanrle(int invert, const unsigned char **endptr=0);
+  const unsigned char  *scanrle(const bool invert, const unsigned char **endptr=0);
 #if 0
   /** Decodes a scanline and returns a pointer to an array of #0# or #1# bytes.
       Returns a pointer to the scanline buffer containing one byte per pixel. 
