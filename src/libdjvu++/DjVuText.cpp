@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuText.cpp,v 1.18 2001-04-26 23:58:12 bcr Exp $
+// $Id: DjVuText.cpp,v 1.19 2001-04-27 18:53:47 praveen Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -374,7 +374,7 @@ DjVuTXT::find_zones(int string_start, int string_length) const
   {
     // Get rid of the leading and terminating spaces
     const int start=textUTF8.nextNonSpace(string_start,string_length);
-    const int end=textUTF8.firstEndSpace(start,string_length-start);
+    const int end=textUTF8.firstEndSpace(start,string_length+string_start-start);
     if (start==end)
       return zone_list;
     string_start=start;
