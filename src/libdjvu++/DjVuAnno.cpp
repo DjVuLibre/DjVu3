@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuAnno.cpp,v 1.108 2001-10-17 18:56:46 docbill Exp $
+// $Id: DjVuAnno.cpp,v 1.109 2001-10-17 22:33:28 leonb Exp $
 // $Name:  $
 
 #include "DjVuAnno.h"
@@ -976,7 +976,8 @@ DjVuANT::get_metadata(GLParser & parser)
               for(int obj_num=0;obj_num<obj.get_list().size();obj_num++)
                 {
                   GLObject & el=*obj[obj_num];
-                  if (el.get_type()==GLObject::GLObject::LIST)
+                  const int type = el.get_type();
+                  if (type == GLObject::LIST)
                     { 
                       const GUTF8String & name=el.get_name();  
                       mdata[name]=(el[0])->get_string();
