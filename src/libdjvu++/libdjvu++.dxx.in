@@ -189,15 +189,11 @@
     {\bf Directories} --- The structure of the distribution is essentially
     flat.  All the source code files, for both the library and the utility
     programs, are found in the main directory #"libdjvu++"#.  A few
-    subdirectories contain accessory material.  Directory #"@Doc"# contains
+    subdirectories contain accessory material.  Directory #"Doc"# contains
     the HTML documentation generated from the source files.  Directory
-    #"@Samples"# contains sample DjVu files for testing purposes.  Directory
-    #"@Test"# contains a few test programs for the library basic features.
-    Directory #"@Tools"# contains tools that may be useful for building the
-    library or its documentation.  The character #"@"# in the directory names
-    is a probably misguided attempt to emphasize the directory names when you
-    type #ls#.
-
+    #"Samples"# contains sample DjVu files for testing purposes.  Directory
+    #"Test"# contains a few test programs for the library basic features.
+    
     {\bf Prerequisites} --- The DjVu Reference Library should compile and run
     on any well behaved Unix system, {\em provided that you use a good C++
     compiler} supporting templates, exceptions and possibly multithreading.
