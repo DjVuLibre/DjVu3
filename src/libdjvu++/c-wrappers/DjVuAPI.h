@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuAPI.h,v 1.42 2000-02-24 19:30:37 parag Exp $
+ *C- $Id: DjVuAPI.h,v 1.43 2000-02-24 22:24:52 haffner Exp $
  *
  * The main header file for the DjVu API
  */
@@ -17,7 +17,10 @@
 
 /* 
  * $Log: DjVuAPI.h,v $
- * Revision 1.42  2000-02-24 19:30:37  parag
+ * Revision 1.43  2000-02-24 22:24:52  haffner
+ * speel check
+ *
+ * Revision 1.42  2000/02/24 19:30:37  parag
  * EXPS dependency removed.
  *
  * Revision 1.41  2000/02/24 15:30:03  parag
@@ -27,7 +30,7 @@
  * Adding the DjVu_CallbackStream class.
  *
  * Revision 1.39  2000/02/16 00:44:08  bcr
- * Commented out an unimplimented method.
+ * Commented out an unimplemented method.
  *
  * Revision 1.38  2000/02/15 20:59:21  haffner
  * Spell check.
@@ -846,7 +849,7 @@ djvu_import_image ( djvu_image * );
  *
  * (This method is planned for the a future release of DjVu.
  *  contact djvu@research.att.com if you need this function
- *  implimented.)
+ *  implemented.)
  */
 
 /* This is a special type of djvu_export, intended for obtaining the
