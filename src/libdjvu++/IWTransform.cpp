@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: IWTransform.cpp,v 1.9 1999-06-09 19:43:44 leonb Exp $
+//C- $Id: IWTransform.cpp,v 1.10 1999-06-10 17:01:46 eaf Exp $
 
 
 
@@ -20,7 +20,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#define IWTRANSFORM_TIMER
+#undef IWTRANSFORM_TIMER
 #ifdef IWTRANSFORM_TIMER
 #include "GOS.h"
 #endif
