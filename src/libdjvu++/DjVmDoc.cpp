@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVmDoc.cpp,v 1.4 1999-09-03 23:03:06 eaf Exp $
+//C- $Id: DjVmDoc.cpp,v 1.5 1999-09-22 18:12:13 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -240,16 +240,7 @@ DjVmDoc::read(const char * name)
       
 	 DEBUG_MSG("reading contents of file '" << f->id << "'\n");
 
-	    // We could have initialized DataPool() with the file_name,
-	    // but this would lead to too many open files
-	 GP<DataPool> pool=new DataPool();
-	 StdioByteStream str(GOS::expand_name(f->name, dir_name), "rb");
-	 char buffer[1024];
-	 int length;
-	 while((length=str.read(buffer, 1024)))
-	    pool->add_data(buffer, length);
-	 pool->set_eof();
-	 data[f->id]=pool;
+	 data[f->id]=new DataPool(GOS::expand_name(f->name, dir_name));
       }
    }
 }

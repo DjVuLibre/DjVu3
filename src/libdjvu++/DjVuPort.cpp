@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuPort.cpp,v 1.19 1999-09-20 21:59:43 eaf Exp $
+//C- $Id: DjVuPort.cpp,v 1.20 1999-09-22 18:12:13 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -495,14 +495,7 @@ DjVuSimplePort::request_data(const DjVuPort * source, const GURL & url)
 	 GString fname=GOS::url_to_filename(url);
 	 if (GOS::basename(fname)=="-") fname="-";
 
-	 GP<DataPool> pool=new DataPool();
-	 StdioByteStream str(fname, "rb");
-	 char buffer[1024];
-	 int length;
-	 while((length=str.read(buffer, 1024)))
-	    pool->add_data(buffer, length);
-	 pool->set_eof();
-	 return pool;
+	 return new DataPool(fname);
       }
    } CATCH(exc) {
    } ENDCATCH;

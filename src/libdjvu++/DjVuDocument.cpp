@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.46 1999-09-20 22:05:24 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.47 1999-09-22 18:12:13 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -853,13 +853,7 @@ DjVuDocument::request_data(const DjVuPort * source, const GURL & url)
 	       if (GOS::basename(fname)=="-") fname="-";
 	       DEBUG_MSG("fname=" << fname << "\n");
 
-	       data_pool=new DataPool();
-	       StdioByteStream str(fname, "rb");
-	       char buffer[1024];
-	       int length;
-	       while((length=str.read(buffer, 1024)))
-		  data_pool->add_data(buffer, length);
-	       data_pool->set_eof();
+	       data_pool=new DataPool(fname);
 	    }
 	 }
       }
