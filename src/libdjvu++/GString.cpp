@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.115 2001-07-16 15:57:34 bcr Exp $
+// $Id: GString.cpp,v 1.116 2001-07-16 22:39:55 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -1715,10 +1715,10 @@ GStringRep::UCS4toNative(
     {
       break;
     }
-    if((w0&~0x7f))
-    {
-      fprintf(stderr,"converted %lu to %s\n",w0,(char *)ptr);
-    }
+//    if((w0&~0x7f))
+//    {
+//      fprintf(stderr,"converted %lu to %s\n",w0,(char *)ptr);
+//    }
     ptr+=i;
   }
   ptr[0]=0;
