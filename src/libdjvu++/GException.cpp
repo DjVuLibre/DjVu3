@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: GException.cpp,v 1.1 1999-01-22 00:40:19 leonb Exp $
+//C-  $Id: GException.cpp,v 1.2 1999-01-27 22:15:23 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -22,7 +22,7 @@
 #include "debug.h"
 
 
-// File "$Id: GException.cpp,v 1.1 1999-01-22 00:40:19 leonb Exp $"
+// File "$Id: GException.cpp,v 1.2 1999-01-27 22:15:23 leonb Exp $"
 // - Author: Leon Bottou, 05/1997
 
 static const char *outofmemory = "Out of memory";
@@ -158,13 +158,13 @@ throw_memory_error(size_t)
   return 0;
 }
 
-class SetNewHandler { 
+class _SetNewHandler { // DJVU_CLASS
   int (*old_handler)(size_t);
 public:
-  SetNewHandler() {
+  _SetNewHandler() {
     old_handler = _set_new_handler(throw_memory_error);
   }
-  ~SetNewHandler() {
+  ~_SetNewHandler() {
     _set_new_handler(old_handler);
   }
 };
@@ -180,17 +180,17 @@ throw_memory_error()
   THROW(outofmemory);
 }
 
-class SetNewHandler { 
+class _SetNewHandler {  // DJVU_CLASS
   void (*old_handler)();
 public:
-  SetNewHandler() {
+  _SetNewHandler() {
     old_handler = set_new_handler(throw_memory_error);
   }
-  ~SetNewHandler() {
+  ~_SetNewHandler() {
     set_new_handler(old_handler);
   }
 };
 
 #endif
 
-static SetNewHandler junk;
+static _SetNewHandler junk;

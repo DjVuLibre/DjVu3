@@ -7,9 +7,9 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: BSByteStream.cpp,v 1.2 1999-01-26 19:42:39 leonb Exp $
+//C-  $Id: BSByteStream.cpp,v 1.3 1999-01-27 22:15:23 leonb Exp $
 
-// "$Id: BSByteStream.cpp,v 1.2 1999-01-26 19:42:39 leonb Exp $"
+// "$Id: BSByteStream.cpp,v 1.3 1999-01-27 22:15:23 leonb Exp $"
 // - Author: Leon Bottou, 07/1998
 
 
@@ -55,11 +55,11 @@
 
   
 
-class BSort
+class _BSort  // DJVU_CLASS
 {
 public:
-  ~BSort();
-  BSort(unsigned char *data, int size);
+  ~_BSort();
+  _BSort(unsigned char *data, int size);
   void run(int &markerpos);
 private:
   // Members
@@ -89,14 +89,14 @@ private:
 static void 
 blocksort(unsigned char *data, int size, int &markerpos)
 {
-  BSort bsort(data, size);
+  _BSort bsort(data, size);
   bsort.run(markerpos);
 }
 
 
-// BSort construction
+// _BSort construction
 
-BSort::BSort(unsigned char *data, int size)
+_BSort::_BSort(unsigned char *data, int size)
   : size(size), data(data), posn(0), rank(0)
 {
   ASSERT(size>0 && size<0x1000000);
@@ -105,7 +105,7 @@ BSort::BSort(unsigned char *data, int size)
   rank[size] = -1;
 }
 
-BSort::~BSort()
+_BSort::~_BSort()
 {
   delete [] posn;
   delete [] rank;
@@ -116,7 +116,7 @@ BSort::~BSort()
 // GT -- compare suffixes using rank information
 
 inline int 
-BSort::GT(int p1, int p2, int depth)
+_BSort::GT(int p1, int p2, int depth)
 {
   int r1, r2;
   int twod = depth + depth;
@@ -154,11 +154,11 @@ BSort::GT(int p1, int p2, int depth)
 }
 
 
-// BSort::ranksort -- 
+// _BSort::ranksort -- 
 // -- a simple insertion sort based on GT
 
 void 
-BSort::ranksort(int lo, int hi, int depth)
+_BSort::ranksort(int lo, int hi, int depth)
 {
   int i,j;
   for (i=lo+1; i<=hi; i++)
@@ -175,7 +175,7 @@ BSort::ranksort(int lo, int hi, int depth)
 // pivot -- return suitable pivot
 
 inline int
-BSort::pivot3r(int *rr, int lo, int hi)
+_BSort::pivot3r(int *rr, int lo, int hi)
 {
   int c1, c2, c3;
   if (hi-lo > 256)
@@ -202,7 +202,7 @@ BSort::pivot3r(int *rr, int lo, int hi)
 }
 
 
-// BSort::quicksort3r -- Three way quicksort algorithm 
+// _BSort::quicksort3r -- Three way quicksort algorithm 
 //    Sort suffixes based on rank at pos+depth
 //    The algorithm breaks into ranksort when size is 
 //    smaller than RANKSORT_THRESH
@@ -221,7 +221,7 @@ vswap(int i, int j, int n, unsigned int *x)
 }
 
 void 
-BSort::quicksort3r(int lo, int hi, int depth)
+_BSort::quicksort3r(int lo, int hi, int depth)
 {
   /* Initialize stack */
   int slo[QUICKSORT_STACK];
@@ -318,7 +318,7 @@ BSort::quicksort3r(int lo, int hi, int depth)
 //  (up to depth PRESORT_DEPTH)
 
 inline int 
-BSort::GTD(int p1, int p2, int depth)
+_BSort::GTD(int p1, int p2, int depth)
 {
   unsigned char c1, c2;
   p1+=depth; p2+=depth;
@@ -341,7 +341,7 @@ BSort::GTD(int p1, int p2, int depth)
 // pivot3d -- return suitable pivot
 
 inline unsigned char
-BSort::pivot3d(unsigned char *rr, int lo, int hi)
+_BSort::pivot3d(unsigned char *rr, int lo, int hi)
 {
   unsigned char c1, c2, c3;
   if (hi-lo > 256)
@@ -368,14 +368,14 @@ BSort::pivot3d(unsigned char *rr, int lo, int hi)
 }
 
 
-// BSort::quicksort3d -- Three way quicksort algorithm 
+// _BSort::quicksort3d -- Three way quicksort algorithm 
 //    Sort suffixes based on strings until reaching
 //    depth rank at pos+depth
 //    The algorithm breaks into ranksort when size is 
 //    smaller than PRESORT_THRESH
 
 void 
-BSort::quicksort3d(int lo, int hi, int depth)
+_BSort::quicksort3d(int lo, int hi, int depth)
 {
   /* Initialize stack */
   int slo[QUICKSORT_STACK];
@@ -494,10 +494,10 @@ BSort::quicksort3d(int lo, int hi, int depth)
 
 
 
-// BSort::radixsort8 -- 8 bit radix sort
+// _BSort::radixsort8 -- 8 bit radix sort
 
 void 
-BSort::radixsort8(void)
+_BSort::radixsort8(void)
 {
   int i;
   // Initialize frequency array
@@ -532,10 +532,10 @@ BSort::radixsort8(void)
 }
 
 
-// BSort::radixsort16 -- 16 bit radix sort
+// _BSort::radixsort16 -- 16 bit radix sort
 
 void 
-BSort::radixsort16(void)
+_BSort::radixsort16(void)
 {
   int i;
   // Initialize frequency array
@@ -584,10 +584,10 @@ BSort::radixsort16(void)
 
 
 
-// BSort::run -- main sort loop
+// _BSort::run -- main sort loop
 
 void
-BSort::run(int &markerpos)
+_BSort::run(int &markerpos)
 {
   int lo, hi;
   ASSERT(size>0);

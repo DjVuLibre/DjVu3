@@ -7,9 +7,9 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: IWCodec.cpp,v 1.1 1999-01-22 00:40:19 leonb Exp $
+//C-  $Id: IWCodec.cpp,v 1.2 1999-01-27 22:15:23 leonb Exp $
 
-// File "$Id: IWCodec.cpp,v 1.1 1999-01-22 00:40:19 leonb Exp $"
+// File "$Id: IWCodec.cpp,v 1.2 1999-01-27 22:15:23 leonb Exp $"
 // - Author: Leon Bottou, 08/1998
 
 #ifdef __GNUC__
@@ -611,7 +611,7 @@ static int zigzagloc[1024] = {
 // Represents a block of 32x32 coefficients after zigzagging and scaling
 
 
-class _IWBlock 
+class _IWBlock // DJVU_CLASS
 {
 public:
   // creating
@@ -639,14 +639,14 @@ private:
 
 
 
-struct _IWAlloc
+struct _IWAlloc // DJVU_CLASS
 {
   struct _IWAlloc *next;
   short data[IWALLOCSIZE];
 };
 
 
-class _IWMap
+class _IWMap // DJVU_CLASS
 {
   // construction
 public:
@@ -1121,14 +1121,14 @@ _IWMap::image(int subsample, const GRect &rect,
 
 
 //-----------------------------------------------
-//**** This subclass reproduces a bug in the ZPCodec passthru functions.
+// This subclass reproduces a bug in the ZPCodec passthru functions.
 // The bug was discovered long after the initial release of DjVu. 
 // Reproducing the bug maintains bitstream compatibility.
 
-class ZPCodecOops : public ZPCodec
+class _ZPCodecOops : public ZPCodec // DJVU_CLASS
 {
 public:
-  ZPCodecOops(ByteStream &bs, int encoding=0) : ZPCodec(bs,encoding) {}
+  _ZPCodecOops(ByteStream &bs, int encoding=0) : ZPCodec(bs,encoding) {}
   void encoder(int bit, BitContext &ctx) { ZPCodec::encoder(bit,ctx); }
   int decoder(BitContext &ctx) { return ZPCodec::decoder(ctx); }
   void encoder(int bit);
@@ -1136,7 +1136,7 @@ public:
 };
 
 inline void 
-ZPCodecOops::encoder(int bit)
+_ZPCodecOops::encoder(int bit)
 {
   BitContext junk = 0;
   unsigned int z = 0x8000 + (a>>1);
@@ -1147,7 +1147,7 @@ ZPCodecOops::encoder(int bit)
 }
 
 inline int 
-ZPCodecOops::decoder()
+_ZPCodecOops::decoder()
 {
   BitContext junk = 0;
   unsigned int z = 0x8000 + (a>>1);
@@ -1156,7 +1156,7 @@ ZPCodecOops::decoder()
 
 
 //-----------------------------------------------
-//**** Class _IWCodec [declaration+implementation]
+// Class _IWCodec [declaration+implementation]
 // Maintains information shared while encoding or decoding
 
 
@@ -1167,7 +1167,7 @@ public:
   _IWCodec(_IWMap &map, int encoding=0);
   ~_IWCodec();
   // Coding
-  int code_slice(ZPCodecOops &zp);
+  int code_slice(_ZPCodecOops &zp);
   float estimate_decibel(float frac);
   // Data
   _IWMap &map;                  // working map
@@ -1194,10 +1194,10 @@ public:
   // helper
   int  next_quant(void);
   int  is_null_slice(int bit, int band);
-  void encode_buckets(ZPCodecOops &zp, int bit, int band, 
+  void encode_buckets(_ZPCodecOops &zp, int bit, int band, 
                       _IWBlock &blk, _IWBlock &eblk,
                       int fbucket, int nbucket);
-  void decode_buckets(ZPCodecOops &zp, int bit, int band,
+  void decode_buckets(_ZPCodecOops &zp, int bit, int band,
                       _IWBlock &blk,
                       int fbucket, int nbucket);
 };
@@ -1322,7 +1322,7 @@ _IWCodec::is_null_slice(int bit, int band)
 // -- read/write a slice of datafile
 
 int
-_IWCodec::code_slice(ZPCodecOops &zp)
+_IWCodec::code_slice(_ZPCodecOops &zp)
 {
   // Check that code_slice can still run
   if (curbit < 0)
@@ -1367,7 +1367,7 @@ _IWCodec::code_slice(ZPCodecOops &zp)
 // -- code a sequence of buckets in a given block
 
 void
-_IWCodec::encode_buckets(ZPCodecOops &zp, int bit, int band, 
+_IWCodec::encode_buckets(_ZPCodecOops &zp, int bit, int band, 
                          _IWBlock &blk, _IWBlock &eblk,
                          int fbucket, int nbucket)
 {
@@ -1566,7 +1566,7 @@ _IWCodec::encode_buckets(ZPCodecOops &zp, int bit, int band,
 // -- code a sequence of buckets in a given block
 
 void
-_IWCodec::decode_buckets(ZPCodecOops &zp, int bit, int band, 
+_IWCodec::decode_buckets(_ZPCodecOops &zp, int bit, int band, 
                          _IWBlock &blk,
                          int fbucket, int nbucket)
 {
@@ -2217,7 +2217,7 @@ IWBitmap::decode_chunk(ByteStream &bs)
   // Read data
   assert(ymap);
   assert(ycodec);
-  ZPCodecOops zp(bs, 0);
+  _ZPCodecOops zp(bs, 0);
   int flag = 1;
   while (flag && cslice<nslices)
     {
@@ -2256,7 +2256,7 @@ IWBitmap::encode_chunk(ByteStream &bs, const IWEncoderParms &parm)
   MemoryByteStream mbs;
   {
     float estdb = -1.0;
-    ZPCodecOops zp(mbs,1);
+    _ZPCodecOops zp(mbs,1);
     while (flag)
       {
         if (parm.decibels>0  && estdb>=parm.decibels)
@@ -2717,7 +2717,7 @@ IWPixmap::decode_chunk(ByteStream &bs)
   // Read data
   assert(ymap);
   assert(ycodec);
-  ZPCodecOops zp(bs, 0);
+  _ZPCodecOops zp(bs, 0);
   int flag = 1;
   while (flag && cslice<nslices)
     {
@@ -2766,7 +2766,7 @@ IWPixmap::encode_chunk(ByteStream &bs, const IWEncoderParms &parm)
   MemoryByteStream mbs;
   {
     float estdb = -1.0;
-    ZPCodecOops zp(mbs,1);
+    _ZPCodecOops zp(mbs,1);
     while (flag)
       {
         if (parm.decibels>0  && estdb>=parm.decibels)
