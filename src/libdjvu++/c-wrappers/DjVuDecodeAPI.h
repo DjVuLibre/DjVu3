@@ -10,7 +10,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDecodeAPI.h,v 1.7 2000-01-13 16:04:01 bcr Exp $
+//C- $Id: DjVuDecodeAPI.h,v 1.8 2000-01-14 01:20:44 bcr Exp $
 #endif
 
 #ifndef _DJVU_DECODE_API_H
@@ -18,7 +18,10 @@
 
 /* 
  * $Log: DjVuDecodeAPI.h,v $
- * Revision 1.7  2000-01-13 16:04:01  bcr
+ * Revision 1.8  2000-01-14 01:20:44  bcr
+ * Added more short inline functions.
+ *
+ * Revision 1.7  2000/01/13 16:04:01  bcr
  * Changed the djvu_image flags field to type and orientation.
  *
  * Revision 1.6  2000/01/12 16:15:21  bcr
@@ -135,14 +138,58 @@ typedef struct _djvu_image_priv * djvu_image_priv;
                djvu_image_priv priv;
 #ifdef __cplusplus
                djvu_image_struct();
+                 // Gets the width using bottom up cooridinates.
                inline int get_width(void) const
                {return(orientation&DJVU_ROTATE90_CW)?h:w;}
+
+                 // Gets the height using bottom up cooridinates.
                inline int get_height(void) const
                {return(orientation&DJVU_ROTATE90_CW)?w:h;}
+
+                 // Gets the horizontal DPI using bottom up cooridinates.
                inline unsigned int get_xdpi(void) const
                {return(orientation&DJVU_ROTATE90_CW)?ydpi:xdpi;}
+
+                 // Gets the vertical DPI using bottom up cooridinates.
                inline unsigned int get_ydpi(void) const
                {return(orientation&DJVU_ROTATE90_CW)?xdpi:ydpi;}
+
+                 // Does a rotate of 0,90,180, or 270 degress.
+               inline void Rotate(int angle)
+               {for(int a=((angle%360)+405)%360;a>90;a-=90) orientation^=(orientation&DJVU_ROTATE90_CW)?(DJVU_BOTTOM_UP|DJVU_MIRROR):DJVU_ROTATE90_CW;}
+
+		 // This does a vertical flip in the raw coordinate system.
+               inline void VFlipRaw(void)
+               {orientation^=DJVU_BOTTOM_UP;}
+
+                 // This flips using corrected bottom up cooridinates.
+               inline void VFlip(void)
+               {orientation^=(orientation&DJVU_ROTATE90_CW)?DJVU_BOTTOM_UP:DJVU_MIRROR;}
+
+		 // This does a horizontal flip in the raw coordinate system.
+               inline void HFlipRaw(void)
+               {orientation^=DJVU_MIRROR;}
+
+                 // This flips using corrected bottom up cooridinates.
+               inline void HFlip(void)
+               {orientation^=(orientation&DJVU_ROTATE90_CW)?DJVU_MIRROR:DJVU_ROTATE90_CW;}
+
+                 // This crops using cooridinates in the raw coordinate system.
+               inline void CropRaw(const int x,const int y,
+                 const unsigned int xw,const unsigned int xh)
+               {data+=x*pixsize+y*rowsize;w=xw;h=xh;}
+
+                 // This crops using corrected bottom up cooridinates.
+               inline void Crop(const int x,const int y,
+                 const unsigned int xw,const unsigned int xh)
+               {
+                 if(orientation&DJVU_ROTATE90_CW)
+                   CropRaw( ((orientation&DJVU_BOTTOM_UP)?(h-y-xh):y),
+                     ((orientation&DJVU_MIRROR)?(w-x-xw):x),xh,xw);
+                 else
+                   CropRaw( ((orientation&DJVU_MIRROR)?(w-x-xw):x),
+                     ((orientation&DJVU_BOTTOM_UP)?y:(h-y-xh)),xw,xh);
+               }
 #endif
              }
              djvu_image;
