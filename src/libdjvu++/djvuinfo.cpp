@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: djvuinfo.cpp,v 1.9 1999-05-27 17:33:09 eaf Exp $
+//C- $Id: djvuinfo.cpp,v 1.10 1999-05-28 21:09:52 eaf Exp $
 
 
 
@@ -57,7 +57,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: djvuinfo.cpp,v 1.9 1999-05-27 17:33:09 eaf Exp $# */
+    #$Id: djvuinfo.cpp,v 1.10 1999-05-28 21:09:52 eaf Exp $# */
 //@{
 //@}
 
@@ -201,7 +201,7 @@ disproutines[] =
   { "FORM:BM44", display_djvi_info },
   { "NDIR", display_ndir_info },
   { "INCL", display_incl_info },
-  { "INCD", display_incl_info },
+  { "INCF", display_incl_info },
   { "ANTa", display_anta_info },
   { 0, 0 },
 };

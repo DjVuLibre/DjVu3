@@ -443,11 +443,11 @@
     backward compatible way to extend the initial format by allocating new
     chunk identifiers.
 
-    Now DjVu files may include other files by means of #INCL# and #INCD# chunks.
+    Now DjVu files may include other files by means of #INCL# and #INCF# chunks.
     After recognizing such chunks, the decoder should open the specified file
     and start decoding it possibly in another thread (if threads have been
-    enabled at compilation time). The difference between #INCL# and #INCD#
-    is that if a missing file is included via #INCL# chunk, the decoding will
+    enabled at compilation time). The difference between #INCL# and #INCF#
+    is that if a missing file is included via #INCF# chunk, the decoding will
     fail. Otherwise only an error message will be issued. */
 //@{
 
@@ -570,7 +570,7 @@
     browser may keep pre-decoded copies of these files in a cache.  This
     procedure would reduce the size of the data transferred over the Internet
     and also increase the display speed.  The currently implemented scheme
-    involves an {\em inclusion chunk} (chunk identifier #"INCL"# and #"INCD"#)
+    involves {\em inclusion chunks} (chunk identifiers #"INCL"# and #"INCF"#)
     containing the name of a file to include.  The included file should be a
     #"FORM:DJVI"# chunk potentially containing any information otherwise
     allowed in a DjVu file (except for the #"INFO"# chunk of course).
@@ -597,7 +597,7 @@
     used to create such documents. Another type of multipage DjVu documents,
     which we have already covered above, is ideal for web publishing: when
     every page is stored in one or more files. Convertion between these
-    two formats can be done by \Ref{DjVuDocument} class.
+    two formats can be done by \Ref{DjVuDocument} class or \Ref{djvm} program.
     
 /** @name Experimental Features.
     
