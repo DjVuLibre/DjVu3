@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.h,v 1.46 2001-04-16 17:55:04 bcr Exp $
+// $Id: GString.h,v 1.47 2001-04-16 18:11:31 bcr Exp $
 // $Name:  $
 
 #ifndef _GSTRING_H_
@@ -57,7 +57,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.46 2001-04-16 17:55:04 bcr Exp $# */
+    #$Id: GString.h,v 1.47 2001-04-16 18:11:31 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -114,9 +114,9 @@ public:
   // Convert strings to numbers.
   virtual int toInt() const;
   virtual long int toLong(
-    GP<GStringRep>& endptr, bool &isLong, const int base) const;
+    GP<GStringRep>& endptr, bool &isLong, const int base=10) const;
   virtual unsigned long int toULong(
-    GP<GStringRep>& endptr, bool &isULong, const int base) const;
+    GP<GStringRep>& endptr, bool &isULong, const int base=10) const;
   virtual double toDouble(
     GP<GStringRep>& endptr, bool &isDouble) const;
 
@@ -594,12 +594,12 @@ public:
 
   /** Returns a long intenger.  Implments i18n strtol.  */
   long int toLong(
-    GString& endptr, bool &isLong, const int base=0) const
+    GString& endptr, bool &isLong, const int base=10) const
   { return ptr?(*this)->toLong(endptr, isLong, base):0; }
 
   /** Returns a unsigned long integer.  Implements i18n strtoul. */
   unsigned long int toULong(
-    GString& endptr, bool &isULong, const int base=0) const
+    GString& endptr, bool &isULong, const int base=10) const
   { return ptr?(*this)->toLong(endptr, isULong, base):0; }
 
   /** Returns a double.  Implements the i18n strtod.  */
