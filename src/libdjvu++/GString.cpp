@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.119 2001-07-20 23:14:16 bcr Exp $
+// $Id: GString.cpp,v 1.120 2001-07-20 23:44:27 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -250,7 +250,7 @@ GStringRep::substr(const char *s,const int start,const int len) const
         endptr=startptr;
       }else
       {
-        endptr=s+length+1-len;
+        endptr=s+length+1+len;
       } 
     }else
     {
