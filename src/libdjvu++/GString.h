@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: GString.h,v 1.19 2000-11-09 20:15:07 jmw Exp $
+// $Id: GString.h,v 1.20 2000-12-01 17:44:28 fcrary Exp $
 // $Name:  $
 
 #ifndef _GSTRING_H_
@@ -58,7 +58,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.19 2000-11-09 20:15:07 jmw Exp $# */
+    #$Id: GString.h,v 1.20 2000-12-01 17:44:28 fcrary Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -151,6 +151,7 @@ public:
       character string contained in the null terminated character array
       #str#. */
   GString& operator= (const char *str);
+
   // -- ACCESS
   /** Converts a string into a constant null terminated character array.  This
       conversion operator is very efficient because it simply returns a
@@ -172,6 +173,7 @@ public:
       certain compilers. */
   int operator! () const 
     { return !ptr; } ;
+
   // -- INDEXING
   /** Returns the character at position #n#. An exception \Ref{GException} is
       thrown if number #n# is not in range #-len# to #len-1#, where #len# is
@@ -202,6 +204,7 @@ public:
       too large. */
   GString substr(int from, unsigned int len=1) const
     { return GString((GString&)(*this), from, len); }
+
   /** Returns an upper case copy of this string.  The returned string
       contains a copy of the current string with all letters turned into 
       upper case letters. */
@@ -210,6 +213,16 @@ public:
       contains a copy of the current string with all letters turned into 
       lower case letters. */
   GString downcase() const;
+
+  /** Returns a copy of this string with characters used in XML escaped as follows:
+          '<'  -->  "&lt;"
+          '>'  -->  "&gt;"
+          '&'  -->  "&amp;"
+          '\'' -->  "&apos;"
+          '\"' -->  "&quot;"
+      Also escapes characters 0x00 through 0x1f should they appear.*/
+  GString toEscaped() const;
+
   // -- ALTERING
   /** Reinitializes a string with the null string. */
   void empty();
@@ -256,6 +269,7 @@ public:
       function returns the position of the first matching character of the
       sub-string. It returns #-1# if string #str# cannot be found. */
   int rsearch(const char *str, int from=-1) const;
+
   // -- CONCATENATION
   /** Appends character #ch# to the string. */
   GString& operator+= (char ch);
@@ -269,6 +283,7 @@ public:
     { return GString::concat(s1,s2);}
   friend GString operator+(const char    *s1, const GString &s2) 
     { return GString::concat(s1,s2);}
+
   // -- COMPARISONS
   /** String comparison. Returns true if and only if character strings #s1# and #s2#
       are equal (as with #strcmp#.) */
@@ -318,6 +333,7 @@ public:
     { return strcmp(s1,s2)< 0; }
   friend int operator< (const char    *s1, const GString &s2) 
     { return strcmp(s1,s2)< 0; }
+
   // -- HASHING
   /** Returns a hash code for the string.  This hashing function helps when
       creating associative maps with string keys (see \Ref{GMap}).  This hash
@@ -325,6 +341,7 @@ public:
       modulo the upper bound of the range. */
   friend unsigned int hash(const GString &ref);
   // -- HELPERS
+
 protected:
   GString(GStringRep* rep)
     : GP<GStringRep>(rep) { }

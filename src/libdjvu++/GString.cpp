@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: GString.cpp,v 1.26 2000-11-16 22:20:36 mrosen Exp $
+// $Id: GString.cpp,v 1.27 2000-12-01 17:44:28 fcrary Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -44,6 +44,7 @@
 #include <ctype.h>
 
 #include "GString.h"
+#include "debug.h"
 
 // - Author: Leon Bottou, 04/1997
 
@@ -177,6 +178,50 @@ GString::downcase() const
   for (; d && *d; d++)
     if (isupper(*d))
       *d = tolower(*d);
+  return ret;
+}
+
+
+/** Returns a copy of this string with characters used in XML escaped as follows:
+        '<'  -->  "&lt;"
+        '>'  -->  "&gt;"
+        '&'  -->  "&amp;"
+        '\'' -->  "&apos;"
+        '\"' -->  "&quot;"
+    Also escapes characters 0x00 through 0x1f should they appear.*/
+GString
+GString::toEscaped() const
+{
+  GString ret;
+  for( unsigned i = 0 ; i < length() ; i++ )
+  {
+    char d = (*this)->data[i];
+    switch( d )
+    {
+    case '<':
+      ret += "&lt;";
+      break;
+    case '>':
+      ret += "&gt;";
+      break;
+    case '&':
+      ret += "&amp;";
+      break;
+    case '\'':
+      ret += "&apos;";
+      break;
+    case '\"':
+      ret += "&quot;";
+      break;
+    default:
+      if( d < ' ' )
+        ret += "&#" + GString(int( d )) + ";";
+      else
+        ret += d;
+      break;
+    }
+  }
+  DEBUG_MSG( "Escaped string is '" << ret << "'\n" );
   return ret;
 }
 
