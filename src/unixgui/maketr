@@ -1,0 +1,34 @@
+#!/bin/sh
+
+# run this script in $DJVUSRC/src/unixgui to generate ALL
+# translation entries for unixgui sources 
+# ( file $DJVUHOME/src/unixgui/shared/res/lang_$encoding.po )
+# and then run "mergetr" and "msg2qm" to generate corresponding 
+# message files in $DJVUSRC/profiles/$language/lang_$encoding.qm
+
+tmp_file=/tmp/$0$$
+body=
+outfile=
+for i in `find . -name \*.cpp`;  do 
+    if [ x"$body" = x ]; then 
+	findtr "$i" >| $tmp_file
+        body=true;
+    else 
+	findtr "$i" >> $tmp_file 
+    fi 
+done
+
+if [ x"$1" != x ]; then 
+    outfile="lang_$1_tmp.po"
+    echo "Charset=$1"
+    sed -e "s,charset *=[_0-9a-zA-Z-]*,charset=$1,g" < $tmp_file > $outfile
+else
+    outfile="lang_unknown_tmp.po"
+    echo "Charset not specified. use default"
+    mv $tmp_file $outfile
+fi  
+
+rm -f $tmp_file
+
+echo "Output file = $outfile"
+

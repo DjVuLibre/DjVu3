@@ -1,0 +1,143 @@
+# $Id: Makefile.in,v 1.1 2001-08-08 17:00:32 docbill Exp $
+%%%include <commands>
+%%%include <versions>
+
+LIBDIRS=@%libdirs%@
+TOOLDIRS=@%tooldirs%@
+DOCDIRS=@%docdirs%@
+SUBDIRS=$(LIBDIRS) $(TOOLDIRS)
+DYNAMICLIBS=@%DYNAMICLIBS%@
+
+SHELL=$(SMARTSHELL)
+
+all: libs shared
+	for i in $(TOOLDIRS) ; do \
+	  if ( cd "$$i" ) ; then \
+	    if ( cd "$$i";exec $(MAKE) all ) ; then $(TRUE) ; else exit 1 ; fi ; \
+	  else exit 1 ; fi ; \
+	done
+%%%BEGIN_REQUIRE(@%DYNAMICLIBS%@)
+	if [ -n "$(STRIP)" ] ; then $(STRIP) `find bin -type f -print|grep -v 'bin/cdjvu'` ; fi
+%%%END_REQUIRE(@%DYNAMICLIBS%@)
+
+%%%BEGIN_REQUIRE(@%LIBICONV%@)
+$(LIBICONV):
+	if [ ! -r lib/libiconv.a ] ; then \
+	  if ( cd ./src/3rd-party/libiconv-1.5.1 ) ; then \
+            if ( cd ./src/3rd-party/libiconv-1.5.1; exec $(MAKE) ) ; then $(TRUE) ; else exit 1 ; fi ; \
+	    $(MAKESTLIB) lib/libiconv.a ./src/3rd-party/libiconv-1.5.1/lib/iconv.o  ./src/3rd-party/libiconv-1.5.1/lib/libcharset.a ; \
+	  else exit 1 ; fi ; \
+	fi
+
+$(LIBICONVSO): $(LIBICONV)
+	if [ -r "$(LIBICONVSO)" ] ; then $(RM) $(LIBICONVSO) ; fi
+	$(MAKESHLIB) $(LIBICONVSOLINK) \
+		$(LIBICONVSO) \
+		$(LIBICONVSONAME) \
+		$(LIBICONV) $(CXXPTHREAD_LIB) -lm -lc
+	if [ -n "$(STRIP)" ] ; then $(STRIP) --strip-unneeded $(LIBICONVSO) ; fi
+
+%%%END_REQUIRE(@%LIBICONV%@)
+
+libs: $(LIBICONVSO)
+	for i in $(LIBDIRS) ; do \
+	  if ( cd "$$i" ) ; then \
+	    if ( cd "$$i" ; exec $(MAKE) lib ) ; then $(TRUE) ; else exit 1 ; fi ; \
+	  else exit 1 ; fi ; \
+	done
+
+%%%BEGIN_REQUIRE!(@%DYNAMICLIBS%@)
+shared:
+# Dummy rule
+
+$(LIBICONV) $(LIBJPEG) $(LIBDJVUXX) : libs
+
+shared: $(DYNAMICLIBS)
+
+$(LIBJPEGSO): $(LIBJPEG)
+	if [ -r "$(LIBJPEGSO)" ] ; then $(RM) $(LIBJPEGSO) ; fi
+	$(MAKESHLIB) $(LIBJPEGSOLINK) \
+		$(LIBJPEGSO) \
+		$(LIBJPEGSONAME) \
+		$(LIBJPEG) $(CXXPTHREAD_LIB) -lm -lc
+	if [ -n "$(STRIP)" ] ; then $(STRIP) --strip-unneeded $(LIBJPEGSO) ; fi
+
+
+%%%END_REQUIRE(@%DYNAMICLIBS%@)
+
+
+clean:
+	for n in $(SUBDIRS) ; do \
+	  if ( cd "$$n" ) ; then \
+	    if ( cd "$$n"; exec $(MAKE) clean ) ; then $(TRUE) ; else exit 1 ; fi ; \
+	  else exit 1 ; fi ; \
+	done
+	$(RM) -rf lib/* bin/* 2>>/dev/null ; true
+
+html:
+	-$(RM) 2>>/dev/null -rf html/* ; $(TRUE)
+	for n in `find . -name Makefile -exec grep '^html:' \{\} /dev/null \;|sed 's,/Makefile:.*,,'|grep -v '^[.]$$'|sort -u`; do ( cd "$$n" ; $(MAKE) html ) ; done
+	$(MKDIRP) html/DjVuAPI
+	$(DOCXX) -d html/DjVuAPI -B ./SRCDIR/src/include/DjVuAPI.footer ./SRCDIR/src/include/DjVuAPI.dxx
+	cd html/DjVuAPI;$(DOCXXCLEAN) *.html
+
+doc: html
+	for n in $(SUBDIRS) $(DOCDIRS) ; do ( cd $$n ; $(MAKE) doc ) ; done
+	$(RM) -rf html/DjVuAPI
+	$(MKDIRP) html/DjVuAPI
+	$(DOCXX) -d html/DjVuAPI -B ./SRCDIR/src/include/DjVuAPI.footer ./SRCDIR/src/include/DjVuAPI.dxx
+	cd html/DjVuAPI;$(DOCXXCLEAN) *.html
+
+
+update-html: html
+	for i in `find html -name CVS -prune -o -name SDKTools -prune -o -type d -print` ; do \
+	  html="" ; bin="" ; \
+	  for j in `echo "$$i"/*` dummy ; do \
+	    if [ ! -d "SRCDIR/$$j" ] ; then \
+	      if [ -r "SRCDIR/$$j" ] ; then \
+	        if ( cmp "$$j" "SRCDIR/$$j" ) ; then $(TRUE) ; else ( \
+	          $(RM) -f "SRCDIR/$$j" ; \
+	          $(CP) "$$j" "SRCDIR/$$j" ) ; \
+	        fi ; \
+	      elif [ -r "$$j" ] ; then \
+	        $(CP) "$$j" "SRCDIR/$$j" ; \
+	        l=`$(BASENAME) "$$j"`;h=`$(BASENAME) "$$l" .html`; \
+	        if [ "$$l" = "$$h" ] ; then \
+	          bin="$$l $$bin" ; \
+	        else \
+	          html="$$l $$html" ; \
+	        fi ; \
+	      fi ; \
+	    fi ; \
+	  done ; \
+	  if [ -d SRCDIR/"$$i"/CVS ] ; then \
+	    if [ -n "$$html" ] ; then \
+	      (cd ./SRCDIR/"$$i";cvs add $$html ) ; \
+	    fi ; \
+	    if [ -n "$$bin" ] ; then \
+	      (cd ./SRCDIR/"$$i";cvs add -ko $$bin ) ; \
+	    fi ; \
+	  fi ; \
+	done
+
+update-doc: update-html doc
+	for i in man/* ; do ( \
+	  if [ -r "SRCDIR/$$i" ] ; then \
+	    if ( cmp "$$i" "SRCDIR/$$i" ) ; then $(TRUE) ; else \
+	      $(RM) -f "SRCDIR/$$i" ; \
+	      $(CP) $$i SRCDIR/$$i ; \
+	    fi ; \
+	  else \
+	    $(CP) $$i SRCDIR/$$i ; \
+	  fi ) ; \
+	done
+
+update-depend:
+	for n in $(SUBDIRS) ; do ( cd $$n ; $(MAKE) update-depend ) ; done
+
+depend:
+	for n in $(SUBDIRS) ; do ( cd $$n ; $(MAKE) depend ) ; done
+
+.PHONY: all libs install clean html doc shared update-depend depend
+
+
