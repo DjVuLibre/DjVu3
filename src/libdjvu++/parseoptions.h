@@ -6,7 +6,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: parseoptions.h,v 1.27 2000-02-03 05:36:14 bcr Exp $
+//C- $Id: parseoptions.h,v 1.28 2000-02-11 06:57:59 bcr Exp $
 
 #endif /* __cplusplus */
 
@@ -67,7 +67,7 @@
 
    @memo Class used for parsing options and configuration files.
    @author Bill Riemers
-   @version #$Id: parseoptions.h,v 1.27 2000-02-03 05:36:14 bcr Exp $#
+   @version #$Id: parseoptions.h,v 1.28 2000-02-11 06:57:59 bcr Exp $#
  */
 
 /*@{*/
@@ -427,14 +427,14 @@ private:
      limited scope.  It is an associative array "string" to integer.  But
      the integer is assigned uniquely by this class in sequential order.
      This is of use when you want to store items sequentially in an array
-     without making the array to large.  This list is always sorted, so
+     without making the array too large.  This list is always sorted, so
      this class is also useful for creating a sorted unique list of words.
 
-     At some point the TokenList class may be replaced by a wrapper to the
-     GMap class.  We will have to evaluate CPU and memory usage to see if
-     the GMap replacement would be adequate.
+     At some point the TokenList class could easily be replace by GMap, but
+     is left as a separate class so static install programs can link just
+     one object from the libdjvu++ library.
 
-     The DjVuTokenList keeps track of string,integer pairs.  One unique     
+     The DjVuTokenList keeps track of string/integer pairs.  One unique     
      integer is assigned per string.  With the integer range stored from   
      zero to the number of strings present.  This is primarily intended to  
      allow a simple mapping between strings and a fixed size array. */
