@@ -171,7 +171,7 @@
 <MESSAGE name="DjVuAnno.no_number" number="12214"
   value="[1-%0!05u!] オブジェクト &apos;%1!s!&apos; の内容を走査中にエラーが発生しました：;&apos;(&apos; のあとには数値でなくオブジェクト名を記述します。" />
 <MESSAGE name="DjVuAnno.no_paren" number="12215"
-  value="[1-%0!05u!] オブジェクト &apos;%1!s!&apos ;の内容を走査中にエラーが発生しました：;&apos;(&apos; のあとにはパーレンでなくオブジェクト名を記述します。" />
+  value="[1-%0!05u!] オブジェクト &apos;%1!s!&apos; の内容を走査中にエラーが発生しました：;&apos;(&apos; のあとにはパーレンでなくオブジェクト名を記述します。" />
 <MESSAGE name="DjVuAnno.no_string" number="12216"
   value="[1-%0!05u!] オブジェクト &apos;%1!s!&apos; の内容を走査中にエラーが発生しました：;&apos;(&apos; のあとには文字列でなくオブジェクト名を記述します。" />
 <MESSAGE name="DjVuAnno.no_text" number="12217"
@@ -263,7 +263,7 @@
 <MESSAGE name="DjVuDocument.init_not_done" number="12414"
   value="[1-%0!05u!] 文章は正常に初期化されませんでした。" />
 <MESSAGE name="DjVuDocument.miss_page_name" number="12415"
-  value="[1-%0!05u!] 名称 &apos;%1!s!&apos のページはこの文章中にありません。" />
+  value="[1-%0!05u!] 名称 &apos;%1!s!&apos; のページはこの文章中にありません。" />
 <MESSAGE name="DjVuDocument.miss_page_num" number="12416"
   value="[1-%0!05u!] &apos;%1!d!&apos; ページはこの文章中にありません。" />
 <MESSAGE name="DjVuDocument.no_dir" number="12417"
