@@ -7,35 +7,14 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuDocumentAPI.h,v 1.7 2000-01-26 19:49:16 bcr Exp $
+ *C- $Id: DjVuDocumentAPI.h,v 1.8 2000-01-26 21:51:13 bcr Exp $
  */
 
 #ifndef _DJVUDOC_H_
 #define _DJVUDOC_H_
 
-#ifndef DJVUAPI
-
-#ifndef DJVU_STATIC_LIBRARY
-#ifdef WIN32 
-#define DLLIMPORT __declspec(dllimport)
-#define DLLEXPORT __declspec(dllexport)
-#else
-#define DLLIMPORT /**/
-#define DLLEXPORT /**/
-#endif
-#else /* DJVU_STATIC_LIBRARY */
-#define DLLIMPORT /**/
-#define DLLEXPORT /**/
-#endif /* DJVU_STATIC_LIBRARY */
-
-#ifdef BUILD_LIB
-#define DJVUAPI DLLEXPORT
-#else
-#define DJVUAPI DLLIMPORT
-#endif  /*BUILD_LIB*/
-
-#endif /*DJVUAPI*/
-
+#include "DjVuBitonalAPI.h"
+#include "DjVuPhotoAPI.h"
 
 /** @name djvudocument.h
       functions used to convert multiple documents (contains color text or
@@ -45,6 +24,9 @@
 #ifdef __cplusplus
 extern "C"
 {
+#ifndef __cplusplus
+}
+#endif
 #endif
 
   /*@{*/
@@ -374,13 +356,78 @@ typedef struct djvu_segmenter_options_struct
 
   /*@}*/
 
+#ifdef __cplusplus 
+  inline djvu_segmenter_options_struct();
+  inline void standard(void);
+  inline void dpi600(void);
+  inline void dpi200(void);
+  inline void dpi100(void);
+  inline void comic(void);
+  inline void ancient(void);
+  inline void very_clean(void);
+#endif 
+
+} djvu_segmenter_options;
+
+/** @name documenttodjvu_options struct
+    @memo Options used in the documenttodjvu function
+*/
+
+typedef struct documenttodjvu_options_struct
+{
+  /** The #djvu_process_options struct# defines the pages to be parsed,
+    input, and output, and contains the pointer for storing errors. */
+  djvu_process_options process;
+
+  /** These are the transformation options.  These will take place before
+    compression. */
+  djvu_transform_options transform;
+
+  /** These options control the separation of the foreground and background. */
+  djvu_segmenter_options segment;
+
+  /** These options are the options that control the quality and speed
+    and format of the foreground compression.  */
+  djvu_foreground_options foreground;
+
+  /** These options are the options that control the quality and speed
+    of the mask layer compression.  */
+  djvu_jb2_options jb2;
+
+  /** These options are the options that control the quality and speed
+    of the background compression.  */
+  djvu_iw44_options iw44;
+
 #ifdef __cplusplus
+inline documenttodjvu_options_struct();
+#endif /* __cplusplus */
+
+} documenttodjvu_options;
+
+#ifdef __cplusplus
+#ifndef __cplusplus
+{
+#endif
+}
+
+inline documenttodjvu_options_struct::phototodjvu_options_struct() :
+  process(), transform(), segment(), foreground(), jb2(), iw44() {}
+
+inline djvu_segmenter_options_struct::djvu_segmenter_options_struct() :
+  threshold_level(75), mark_filter_level(50), pix_filter_level(25),
+  inversion_level(25), inhibit_foreback_level(40), edge_size(3),
+  render_size(3), smoothing_size(3), fg_pixel_size(12), bg_pixel_size(3),
+  upsample_size(1), high_variation_foreground(false), masksub_refine(true) {}
+
+// These examples will be modified to show configuration file examples,
+// instead of inline functions at a future date.
+
   /** @name Profiles examples */
   /*@{*/
 
   /** Standard profile
    */
-  void standard()
+  inline void djvu_segmenter_options_struct::standard(void)
     {
       threshold_level= 75;
       mark_filter_level= 50;
@@ -406,7 +453,7 @@ typedef struct djvu_segmenter_options_struct
     }
   
   /** Dpi600 profile */
-  void dpi600()
+  inline void djvu_segmenter_options_struct::dpi600(void)
     {
       threshold_level= 75;
       mark_filter_level= 50;
@@ -428,7 +475,7 @@ typedef struct djvu_segmenter_options_struct
   
 
   /** Dpi200 profile */
-  void dpi200()
+  inline void djvu_segmenter_options_struct::dpi200(void)
     {
       threshold_level= 75;
       mark_filter_level= 25;
@@ -449,7 +496,7 @@ typedef struct djvu_segmenter_options_struct
     }
   
   /** Dpi100 screen dump profile */
-  void dpi100()
+  inline void djvu_segmenter_options_struct::dpi100(void)
     {
       threshold_level= 75;
       mark_filter_level= 50;
@@ -482,7 +529,7 @@ typedef struct djvu_segmenter_options_struct
       high_variation_foreground= true
       \end{verbatim}
   */
-  void comic()
+  inline void djvu_segmenter_options_struct::comic(void)
     {
       threshold_level= 75;
       mark_filter_level= 50;
@@ -515,7 +562,7 @@ typedef struct djvu_segmenter_options_struct
       threshold_level= 50
       \end{verbatim}
   */
-  void ancient()
+  inline void djvu_segmenter_options_struct::ancient(void)
     {
       threshold_level= 75;
       mark_filter_level= 50;
@@ -546,7 +593,7 @@ typedef struct djvu_segmenter_options_struct
       masksub_refine= false;
       \end{verbatim}
   */
-  void very_clean()
+  inline void djvu_segmenter_options_struct::very_clean(void)
     {
       threshold_level= 75;
       mark_filter_level= 50;
@@ -566,17 +613,9 @@ typedef struct djvu_segmenter_options_struct
       masksub_refine= false;
     }
   /*@}*/
-
-  /** C++ constructor */
-  djvu_segmenter_options_struct() {standard();};
 #endif
-} djvu_segmenter_options;
-
   /*@}*/
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* _DJVUDOC_H_ */
 

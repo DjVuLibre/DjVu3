@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuPhotoAPI.h,v 1.10 2000-01-26 19:27:06 bcr Exp $
+ *C- $Id: DjVuPhotoAPI.h,v 1.11 2000-01-26 21:51:13 bcr Exp $
  */
 
 #ifndef _DJVUPHOTO_H_
@@ -87,7 +87,7 @@ inline djvu_iw44_options_struct();
 /*@{*/
 
 /** @name phototodjvu_options struct
-    @memo Options used in phototodjvu function 
+    @memo Options used in the phototodjvu function 
 */
 
 typedef struct phototodjvu_options_struct
