@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GBitmap.cpp,v 1.27 2000-02-02 19:59:10 eaf Exp $
+//C- $Id: GBitmap.cpp,v 1.28 2000-02-14 16:50:42 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -23,7 +23,7 @@
 #include "GString.h"
 #include "GThreads.h"
 
-// File "$Id: GBitmap.cpp,v 1.27 2000-02-02 19:59:10 eaf Exp $"
+// File "$Id: GBitmap.cpp,v 1.28 2000-02-14 16:50:42 leonb Exp $"
 // - Author: Leon Bottou, 05/1997
 
 
@@ -103,6 +103,7 @@ GBitmap::GBitmap(const GBitmap &ref, const GRect &rect, int border)
 void 
 GBitmap::init(int arows, int acolumns, int aborder)
 {
+  GMonitorLock lock(monitor());
   delete [] bytes_data;
   delete [] rle;
   delete [] rlerows;
@@ -126,25 +127,27 @@ GBitmap::init(int arows, int acolumns, int aborder)
 void 
 GBitmap::init(const GBitmap &ref, int aborder)
 {
+  GMonitorLock lock(monitor());
   if (this != &ref) 
-  {
-    GMonitorLock lock(ref.monitor());
-    init(ref.nrows, ref.ncolumns, aborder);
-    grays = ref.grays;
-    unsigned char *row = bytes_data+border;
-    for (int n=0; n<nrows; n++, row+=bytes_per_row)
+    {
+      GMonitorLock lock(ref.monitor());
+      init(ref.nrows, ref.ncolumns, aborder);
+      grays = ref.grays;
+      unsigned char *row = bytes_data+border;
+      for (int n=0; n<nrows; n++, row+=bytes_per_row)
       memcpy( (void*)row, (void*)ref[n],  ncolumns );
-  }
+    }
   else if (aborder > border)
-  {
-    minborder(aborder);
-  }
+    {
+      minborder(aborder);
+    }
 }
 
 
 void 
 GBitmap::init(const GBitmap &ref, const GRect &rect, int border)
 {
+  GMonitorLock lock(monitor());
   // test bitmap physical equality
   if (this == &ref)
     {
@@ -189,6 +192,8 @@ GBitmap::init(const GBitmap &ref, const GRect &rect, int border)
 void 
 GBitmap::init(ByteStream &ref, int aborder)
 {
+  GMonitorLock lock(monitor());
+  // Get magic number
   char magic[2];
   magic[0] = magic[1] = 0;
   ref.readall((void*)magic, sizeof(magic));
@@ -250,8 +255,7 @@ GBitmap::donate_data(unsigned char *data, int w, int h)
 }
 
 void
-GBitmap::donate_rle(
-  unsigned char *rledata, unsigned int rledatalen, int w, int h)
+GBitmap::donate_rle(unsigned char *rledata, unsigned int rledatalen, int w, int h)
 {
   delete [] bytes_data;
   delete [] rle;
@@ -378,6 +382,7 @@ GBitmap::set_grays(int ngrays)
   if (ngrays<2 || ngrays>256)
     THROW("(GBitmap::set_grays) Illegal number of gray levels");
   // set gray levels
+  GMonitorLock lock(monitor());
   grays = ngrays;
   if (ngrays>2 && !bytes)
     uncompress();
@@ -386,6 +391,7 @@ GBitmap::set_grays(int ngrays)
 void 
 GBitmap::change_grays(int ngrays)
 {
+  GMonitorLock lock(monitor());
   // set number of grays
   int ng = ngrays - 1;
   int og = grays - 1;
@@ -403,7 +409,6 @@ GBitmap::change_grays(int ngrays)
   for (int row=0; row<nrows; row++)
     {
       unsigned char *p = (*this)[row];
-//      for (int n=0; n<ncolumns; n++,p++)
       for (int n=0; n<ncolumns; n++)
         p[n] = conv[ p[n] ];
     }
@@ -412,15 +417,14 @@ GBitmap::change_grays(int ngrays)
 void 
 GBitmap::binarize_grays(int threshold)
 {
-  if (!bytes)
-    return;
-  for (int row=0; row<nrows; row++)
-    {
-      unsigned char *p = (*this)[row];
-//      for (int n=0; n<ncolumns; n++,p++)
-      for (int n=0; n<ncolumns; n++)
-        *p = (*p>threshold ? 1 : 0);
-    }
+  GMonitorLock lock(monitor());
+  if (bytes)
+    for (int row=0; row<nrows; row++)
+      {
+        unsigned char *p = (*this)[row];
+        for (int n=0; n<ncolumns; n++)
+          *p = (*p>threshold ? 1 : 0);
+      }
   grays = 2;
 }
 
@@ -936,6 +940,7 @@ GBitmap::makerows(int nrows, int ncolumns, unsigned char *runs)
 int 
 GBitmap::rle_get_bits(int rowno, unsigned char *bits) const
 {
+  GMonitorLock lock(monitor());
   if (!rle)
     return 0;
   if (rowno<0 || rowno>=nrows)
@@ -962,6 +967,7 @@ GBitmap::rle_get_bits(int rowno, unsigned char *bits) const
 int 
 GBitmap::rle_get_runs(int rowno, int *rlens) const
 {
+  GMonitorLock lock(monitor());
   if (!rle)
     return 0;
   if (rowno<0 || rowno>=nrows)
@@ -993,6 +999,7 @@ GBitmap::rle_get_runs(int rowno, int *rlens) const
 int 
 GBitmap::rle_get_rect(GRect &rect) const
 {
+  GMonitorLock lock(monitor());
   if (!rle) 
     return 0;
   int area = 0;
