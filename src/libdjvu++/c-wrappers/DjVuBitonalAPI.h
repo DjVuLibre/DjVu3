@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuBitonalAPI.h,v 1.7 2000-01-27 20:36:18 haffner Exp $
+ *C- $Id: DjVuBitonalAPI.h,v 1.8 2000-02-03 19:17:51 bcr Exp $
  */
 
 #ifndef _DJVUBITONAL_H_
@@ -65,7 +65,7 @@ typedef struct djvu_jb2_options_struct
 
 /** Halftone detection is used for dithered images.  The default
     of zero, means halftone detection is on.  */
-  int halftone_off;
+  int disable_halftone;
 
 /** These are tuning parameters which affect the compression
     and the quality of the output image.  These are intended
@@ -169,7 +169,7 @@ void bitonaltodjvu_usage(int fd,const char *prog);
 }
 
 inline djvu_jb2_options_struct::djvu_jb2_options_struct() :
-  pages_per_dict(10), compression(djvu_normal), halftone_off(0),
+  pages_per_dict(10), compression(djvu_normal), disable_halftone(0),
   tolerance_percent(-1), tolerance4_size(-1) {}
 
 inline bitonaltodjvu_options_struct::bitonaltodjvu_options_struct() :
