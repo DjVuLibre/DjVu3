@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.h,v 1.8 1999-07-20 15:52:50 leonb Exp $
+//C- $Id: DjVuFile.h,v 1.9 1999-08-08 23:27:05 leonb Exp $
  
 #ifndef _DJVUFILE_H
 #define _DJVUFILE_H
@@ -26,7 +26,7 @@
 #include "IWImage.h"
 #include "GPixmap.h"
 #include "DjVuPort.h"
-#include "GPContainer.h"
+#include "GContainer.h"
 #include "DjVuNavDir.h"
 #include "GCache.h"
 #include "DjVmFile.h"
@@ -47,7 +47,7 @@
 
     @memo Classes representing DjVu files.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuFile.h,v 1.8 1999-07-20 15:52:50 leonb Exp $#
+    @version #$Id: DjVuFile.h,v 1.9 1999-08-08 23:27:05 leonb Exp $#
 */
 
 //@{

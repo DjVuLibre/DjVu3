@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.h,v 1.5 1999-08-06 21:09:22 eaf Exp $
+//C- $Id: DataPool.h,v 1.6 1999-08-08 23:27:05 leonb Exp $
  
 #ifndef _DATAPOOL_H
 #define _DATAPOOL_H
@@ -21,7 +21,7 @@
 #include "ByteStream.h"
 #include "GThreads.h"
 #include "GSmartPointer.h"
-#include "GPContainer.h"
+#include "GContainer.h"
 
 /** @name DataPool.h
     Files #"DataPool.h"# and #"DataPool.cpp"# implement classes \Ref{DataPool}
@@ -38,7 +38,7 @@
 
     @memo Thread safe data storage
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DataPool.h,v 1.5 1999-08-06 21:09:22 eaf Exp $#
+    @version #$Id: DataPool.h,v 1.6 1999-08-08 23:27:05 leonb Exp $#
 */
 
 //@{

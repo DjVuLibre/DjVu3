@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVmFile.h,v 1.2 1999-05-25 19:42:27 eaf Exp $
+//C- $Id: DjVmFile.h,v 1.3 1999-08-08 23:27:05 leonb Exp $
  
 #ifndef _DJVMFILE_H
 #define _DJVMFILE_H
@@ -20,7 +20,7 @@
 
 #include "ByteStream.h"
 #include "GSmartPointer.h"
-#include "GPContainer.h"
+#include "GContainer.h"
 #include "Arrays.h"
 #include "GString.h"
 #include "DjVmDir0.h"
@@ -40,7 +40,7 @@
 
     @memo DjVm documents reader/writer.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: DjVmFile.h,v 1.2 1999-05-25 19:42:27 eaf Exp $#
+    @version #$Id: DjVmFile.h,v 1.3 1999-08-08 23:27:05 leonb Exp $#
 */
 
 //@{

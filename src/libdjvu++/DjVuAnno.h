@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuAnno.h,v 1.3 1999-06-04 16:04:05 leonb Exp $
+//C- $Id: DjVuAnno.h,v 1.4 1999-08-08 23:27:05 leonb Exp $
 
 #ifndef _DJVUANNO_H
 #define _DJVUANNO_H
@@ -38,7 +38,7 @@
     @memo Implements support for DjVuImage annotations
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: DjVuAnno.h,v 1.3 1999-06-04 16:04:05 leonb Exp $# */
+    #$Id: DjVuAnno.h,v 1.4 1999-08-08 23:27:05 leonb Exp $# */
 //@{
 
 
@@ -52,7 +52,7 @@
 #include "ByteStream.h"
 #include "DjVuGlobal.h"
 #include "GHLObjects.h"
-#include "GPContainer.h"
+#include "GContainer.h"
 
 /** Implements support for \Ref{DjVuImage} annotations.
     The annotation chunk contains directives for displaying DjVu image, such
