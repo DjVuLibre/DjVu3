@@ -30,11 +30,11 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GContainer.cpp,v 1.36 2001-10-16 18:01:44 docbill Exp $
+// $Id: GContainer.cpp,v 1.35.2.1 2001-10-17 22:01:25 leonb Exp $
 // $Name:  $
 
-#ifdef __GNUC__
-#pragma implementation
+#ifdef HAVE_CONFIG_H
+#include "config.h"
 #endif
 
 #include "GContainer.h"
@@ -352,7 +352,6 @@ GListBase::~GListBase()
   }
   G_CATCH_ALL
   {
-    DjVuPrintErrorUTF8("%s","Exception\n");
   }
   G_ENDCATCH;
 }
@@ -684,7 +683,6 @@ GSetBase::rehash(int newbuckets)
   typedef HNode *HNodePtr;
 // table = new HNodePtr[nbuckets];
   gtable.resize(nbuckets);
-//  DjVuPrintErrorUTF8("GSetBase::rehash table=%x\n",table);
   gtable.clear();
 //  for (int i=0; i<nbuckets; i++)
 //    table[i] = 0;
