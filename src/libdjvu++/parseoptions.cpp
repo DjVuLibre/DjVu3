@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: parseoptions.cpp,v 1.2 1999-11-03 05:17:00 bcr Exp $
+//C- $Id: parseoptions.cpp,v 1.3 1999-11-03 06:16:00 bcr Exp $
 #ifdef __GNUC__
 #pragma implementation
 #endif
@@ -211,11 +211,11 @@ DjVuParseOptions::AmbiguousOptions
 {
   if(token1 != token2)
   {
-    const char *emsg="Ambiguous options: '%s=%s' and '%s=%s' specified.";
     const char *name1=GetVarName(token1);
     const char *name2=GetVarName(token2);
     if(name1 && name2)
     {
+      const char *emsg="Ambiguous options: '%s=%s' and '%s=%s' specified.";
       char *s=new char [sizeof(emsg)+strlen(name1)+strlen(name2)+strlen(value1)+strlen(value2)];
       sprintf(s,emsg,name1,value1,name2,value2);
       Errors->AddError(s);
@@ -234,30 +234,33 @@ DjVuParseOptions::GetBestToken
   int retval=(-1);
   int i;
   for(i=0;!r&&(i<listsize);
-    r=Arguments->GetValue(tokens[i]));
-  for(retval=i;r&&(i<listsize);i++)
+    r=Arguments->GetValue(tokens[i++]));
+  if(i<listsize)
+  for(retval=tokens[i];r&&(i<listsize);i++)
   {
     const char *s=Arguments->GetValue(tokens[i]);
-    if(s) AmbiguousOptions(retval,r,i,s);
+    if(s) AmbiguousOptions(retval,r,tokens[i],s);
   }
   if(!r)
   {
     for(i=0;!r&&(i<listsize);
-      r=Configuration->GetValue(currentProfile,tokens[i]));
-    for(retval=i;r&&(i<listsize);i++)
+      r=Configuration->GetValue(currentProfile,tokens[i++]));
+    if(i<listsize)
+    for(retval=tokens[i];r&&(i<listsize);i++)
     {
       const char *s=Configuration->GetValue(currentProfile,tokens[i]);
-      if(s) AmbiguousOptions(retval,r,i,s);
+      if(s) AmbiguousOptions(retval,r,tokens[i],s);
     }
   }
   if(!r)
   {
     for(i=0;!r&&(i<listsize);
       r=Configuration->GetValue(defaultProfile,tokens[i++]));
-    for(retval=i;r&&(i<listsize);i++)
+    if(i<listsize)
+    for(retval=tokens[i];r&&(i<listsize);i++)
     {
       const char *s=Configuration->GetValue(defaultProfile,tokens[i]);
-      if(s) AmbiguousOptions(retval,r,i,s);
+      if(s) AmbiguousOptions(retval,r,tokens[i],s);
     }
   }
   return retval;
@@ -272,15 +275,15 @@ DjVuParseOptions::GetBestToken
   int retval=(-1);
   if(xname && listsize > 0)
   {
-    int i,j=0;
+    int i,j;
     int *tokens=new int[listsize];
-    for(i=0;i<listsize;i++)
+    for(i=j=0;i<listsize;i++)
     {
       if(xname[i])
       {
         const int token=GetVarToken(xname[i]);
         if(token>=0)
-          tokens[i++]=token;
+          tokens[j++]=token;
       } 
     }
     if(j>0)
@@ -813,12 +816,12 @@ DjVuParseOptions::Profiles::Add
       char **NewValues=new char *[new_size];
       if(size)
       {
-        memcpy(NewValues,values,size);
-        memset(NewValues+size,0,new_size-size);
+        memcpy(NewValues,values,size*sizeof(char *));
+        memset(NewValues+size,0,(new_size-size)*sizeof(char *));
         delete [] values;
       }else
       {
-        memset(NewValues,0,new_size);
+        memset(NewValues,0,new_size*sizeof(char *));
       }
       values=NewValues;
       size=new_size;
