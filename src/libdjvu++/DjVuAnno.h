@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuAnno.h,v 1.4 1999-08-08 23:27:05 leonb Exp $
+//C- $Id: DjVuAnno.h,v 1.5 1999-09-28 16:19:13 eaf Exp $
 
 #ifndef _DJVUANNO_H
 #define _DJVUANNO_H
@@ -38,7 +38,7 @@
     @memo Implements support for DjVuImage annotations
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: DjVuAnno.h,v 1.4 1999-08-08 23:27:05 leonb Exp $# */
+    #$Id: DjVuAnno.h,v 1.5 1999-09-28 16:19:13 eaf Exp $# */
 //@{
 
 
@@ -124,6 +124,9 @@ public:
 	  function is normally called after a call to
 	  \Ref{IFFByteStream::get_chunk}(). */
    void decode(ByteStream &bs);
+      /** Decode an annotation chunk. This is a "convenience" function, which
+	  differs from the function above only by the source of data. */
+   void	decode(const char * data);
       /** Same as \Ref{decode}() but adds the new data to one that has
 	  been decoded before. */
    void merge(ByteStream & bs);
