@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: djvutopnm.cpp,v 1.25 1999-09-28 20:23:14 leonb Exp $
+//C- $Id: djvutopnm.cpp,v 1.26 1999-11-03 21:33:13 bcr Exp $
 
 
 /** @name djvutopnm
@@ -37,6 +37,7 @@
     \item[-N] This option (e.g #"-3"# or #"-19"#) specifies a subsampling
        factor #N#.  Rendering the full DjVu image would create an image whose
        dimensions are #N# times smaller than the DjVu image size.
+    \item[-subsample N] Same as above.
     \item[-scale N] This option takes advantage of the #dpi# field stored in
        the #"INFO"# chunk of the DjVu image (cf. \Ref{DjVuInfo}).  Argument
        #N# is a magnification percentage relative to the adequate resolution
@@ -59,12 +60,15 @@
        work with IW44 files because these files have no foreground layer mask.
        The output file will be a PBM file if the subsampling factor is 1.
        Otherwise the output file will be an anti-aliased PGM file.
+    \item[-layer black] Same as above.
     \item[-foreground] Renders only the foreground layer on a white
        background.  This mode works only with Compound DjVu files. The output
        file always is a PPM file.
+    \item[-layer foreground] Same as above.
     \item[-background] Renders only the background layer. This mode works only
        with Compound DjVu files and IW44 files. The output file always is a PPM
        file.
+    \item[-layer background] Same as above.
     \end{description}
 
     {\bf Other Options} --- The following two options are less commonly used:
@@ -90,7 +94,7 @@
     Yann Le Cun <yann@research.att.com>\\
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: djvutopnm.cpp,v 1.25 1999-09-28 20:23:14 leonb Exp $# */
+    #$Id: djvutopnm.cpp,v 1.26 1999-11-03 21:33:13 bcr Exp $# */
 //@{
 //@}
 
@@ -103,7 +107,7 @@
 #include "DjVuImage.h"
 #include "DjVuDocument.h"
 #include "GOS.h"
-
+#include "parseoptions.h"
 
 static double flag_scale = -1;
 static int    flag_size = -1;
@@ -237,15 +241,17 @@ usage()
           "  Copyright (c) AT&T 1999.  All rights reserved\n"
           "Usage: djvutopnm [options] [<djvufile> [<pnmfile>]]\n\n"
           "Options:\n"
-          "  -v                  Prints various informational messages.\n"
-          "  -scale N            Selects display scale (default: 100%%).\n"
-          "  -size  WxH          Selects size of rendered image.\n"
-          "  -segment WxH+X+Y    Selects which segment of the rendered image\n"
-          "  -black              Only renders the stencil(s).\n"
-          "  -foreground         Only renders the foreground layer.\n"
-          "  -background         Only renders the background layer.\n"
-          "  -N                  Subsampling factor from full resolution.\n"
-	  "  -page <page>        Decode page <page> (for multipage documents).\n"
+          "  -verbose           Prints various informational messages.\n"
+          "  -scale N           Selects display scale (default: 100%%).\n"
+          "  -size  WxH         Selects size of rendered image.\n"
+          "  -segment WxH+X+Y   Selects which segment of the rendered image\n"
+          "  -black             Only renders the stencil(s).\n"
+          "  -foreground        Only renders the foreground layer.\n"
+          "  -background        Only renders the background layer.\n"
+          "  -layer <layer>     Same as the above three options.\n"
+          "  -#                  Subsampling factor from full resolution.\n"
+          "  -subsample N       Same as above.\n"
+	  "  -page <page>       Decode page <page> (for multipage documents).\n"
           "\n"
           "The output will be a PBM, PGM or PPM file depending of its content."
           "If <pnmfile> is a single dash or omitted, the decompressed image\n"
@@ -256,11 +262,12 @@ usage()
 
 
 void
-geometry(char *s, GRect &rect)
+geometry(const char *r, GRect &rect)
 {
   int w,h;
+  char *s;
   rect.xmin = rect.ymin = 0;
-  w = strtol(s, &s,10);
+  w = strtol(r, &s,10);
   if (w<=0 || *s++!='x') goto error;
   h = strtol(s,&s,10);
   if (h<=0 || (*s && *s!='+' && *s!='-')) goto error;
@@ -280,101 +287,136 @@ geometry(char *s, GRect &rect)
 
 
 
+static const djvu_option long_options[] = {
+{"verbose",0,0,'v'},
+{"help",0,0,'h'},
+{"scale",1,0,0},
+{"size",1,0,0},
+{"segment",1,0,0},
+{"layer",0,0,0},
+{"black",0,0,'s'},
+{"foreground",0,0,'f'},
+{"background",0,0,'b'},
+{"page",1,0,0},
+{"subsample",3,0,'1'},
+{"subsample",3,0,'2'},
+{"subsample",3,0,'3'},
+{"subsample",3,0,'4'},
+{"subsample",3,0,'5'},
+{"subsample",3,0,'6'},
+{"subsample",3,0,'7'},
+{"subsample",3,0,'8'},
+{"subsample",3,0,'9'},
+{0,0,0,0}
+};
+
 
 int
-main(int argc, char **argv)
+main(int argc, char *argv[], char *[])
 {
   TRY
     {
+      DjVuParseOptions Opts("djvutopnm");
+      int nextarg=Opts.ParseArguments(argc,argv,long_options,1)-1;
+      argc -= nextarg;
+      argv+=nextarg;
       // Process options
       int page_num=-1;
-      while (argc>1 && argv[1][0]=='-' && argv[1][1])
+      if(Opts.GetInteger("help",0))
+      {
+        Opts.perror();
+        usage();
+      }
+      flag_verbose=Opts.GetInteger("verbose",0);
+      const static char *duplicates[3] = {
+        "scale","size","subsample"
+      };
+          // We can't use the value directly, because we don't know which
+          // one we got.  But if more than one was specified, the GetValue
+          // command will generate an error message.
+      int token;
+      if((token=Opts.GetBestToken(4,duplicates)) >= 0)
+      {
+        if(token == Opts.GetVarToken(duplicates[0]))
         {
-          char *s = argv[1];
-          if (!strcmp(argv[1],"-v"))
-            {
-              flag_verbose = 1;
-            }
-          else if (!strcmp(s,"-scale"))
-            {
-              if (argc<=2)
-                THROW("No argument for option '-scale'");
-              if (flag_subsample>=0 || flag_scale>=0 || flag_size>=0)
-                THROW("Duplicate scaling specification");
-              argc -=1; argv +=1; s = argv[1];
-              flag_scale = strtod(s,&s);
-              if (*s == '%') 
-                s++;
-              if (*s)
-                THROW("Illegal argument for option '-scale'");
-            }
-          else if (! strcmp(s,"-size"))
-            {
-              if (argc<=2)
-                THROW("No argument for option '-size'");
-              if (flag_subsample>=0 || flag_scale>=0 || flag_size>=0)
-                THROW("Duplicate scaling specification");
-              argc -=1; argv +=1; s = argv[1];
-              geometry(s, fullrect);
-              flag_size = 1;
-              if (fullrect.xmin || fullrect.ymin)
-                THROW("Illegal size specification");
-            }
-          else if (! strcmp(s,"-segment"))
-            {
-              if (argc<=2)
-                THROW("No argument for option '-segment'");
-              if (flag_segment>=0)
-                THROW("Duplicate segment specification");
-              argc -=1; argv +=1; s = argv[1];
-              geometry(s, segmentrect);
-              flag_segment = 1;
-            }
-          else if (! strcmp(s,"-black"))
-            {
-              if (flag_mode)
-                THROW("Duplicate rendering mode specification");
-              flag_mode = 's';
-            }
-          else if (! strcmp(s,"-foreground"))
-            {
-              if (flag_mode)
-                THROW("Duplicate rendering mode specification");
-              flag_mode = 'f';
-            }
-          else if (! strcmp(s,"-background"))
-            {
-              if (flag_mode)
-                THROW("Duplicate rendering mode specification");
-              flag_mode = 'b';
-            }
-	  else if (! strcmp(s,"-page"))
-	    {
-	      if (argc<=2)
-                THROW("No argument for option '-page'");
-              if (page_num>=0)
-                THROW("Duplicate page specification");
-              argc -=1; argv +=1; s = argv[1];
-	      page_num=atoi(s);
-	      if (page_num<=0) THROW("Page number must be positive.");
-	      page_num--;
-	    }
-          else if (s[1]>='1' && s[1]<='9')
-            {
-              int arg = strtol(s+1,&s,10);
-              if (arg<0 || *s) usage();
-              if (flag_subsample>=0 || flag_scale>=0 || flag_size>=0)
-                THROW("Duplicate scaling specification");
-              flag_subsample = arg;
-            }
-          else
-            {
-              usage();
-            }
-          argc -= 1;
-          argv += 1;
+          const char *s=Opts.GetValue(token);
+          char *r;
+          flag_scale = strtod(s,&r);
+          if (*r == '%') 
+            r++;
+          if (*r)
+            THROW("Illegal argument for option '-scale'");
+        }else if(token == Opts.GetVarToken(duplicates[1]))
+        {
+          const char *s=Opts.GetValue(token);
+          geometry(s, fullrect);
+          flag_size = 1;
+          if (fullrect.xmin || fullrect.ymin)
+            THROW("Illegal -size specification");
+        }else
+        {
+          int i=Opts.GetInteger(token,0);
+          if (i<0)
+          {
+            Opts.perror();
+            usage();
+          }
+          flag_subsample = i;
         }
+      }
+      const char *segment=Opts.GetValue("segment");
+      if(segment)
+      {
+        geometry(segment, segmentrect);
+        flag_segment = 1;
+      }
+      const static char *duplicates2[4] = {
+        "layer","black","foreground","background"
+      };
+      if((token=Opts.GetBestToken(4,duplicates2)) >= 0)
+      {
+        if(token == Opts.GetVarToken(duplicates2[0]))
+        {
+          const char *s=Opts.GetValue(token);
+          if(!strcmp(s,duplicates2[1]))
+          {
+            flag_mode = 's';
+          }else if(!strcmp(s,duplicates2[2]))
+          {
+            flag_mode = 'f';
+          }else if(!strcmp(s,duplicates2[3]))
+          {
+            flag_mode = 'b';
+          }else
+          {
+            THROW("Illegal -layer specification.");
+          }
+        }else if(Opts.GetInteger(duplicates2[token],0))
+        {
+          if(token == Opts.GetVarToken(duplicates2[1]))
+          {
+            flag_mode = 's';
+          }else if(token == Opts.GetVarToken(duplicates2[2]))
+          {
+            flag_mode = 'f';
+          }else if(token == Opts.GetVarToken(duplicates2[3]))
+          {
+            flag_mode = 'b';
+          }
+        }
+      }
+      page_num=Opts.GetInteger("page",-1);
+      if(page_num != -1)
+      {
+	if (page_num<=0) THROW("Page number must be positive.");
+	page_num--;
+      }
       if (page_num<0) page_num=0;
+      if(Opts.HasError())
+      {
+        Opts.perror();
+        usage();
+      }
       // Process remaining arguments
       if (argc == 1) 
         convert("-","-", page_num); 
