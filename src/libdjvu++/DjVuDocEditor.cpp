@@ -25,7 +25,7 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocEditor.cpp,v 1.45 2000-11-02 01:08:34 bcr Exp $
+// $Id: DjVuDocEditor.cpp,v 1.46 2000-11-02 02:59:20 bcr Exp $
 // $Name:  $
 
 
@@ -38,6 +38,8 @@
 #include "debug.h"
 
 #include <ctype.h>
+
+static const char octets[4]={0x41,0x54,0x41,0x25};
 
 int        DjVuDocEditor::thumbnails_per_file=10;
 
@@ -1652,7 +1654,7 @@ DjVuDocEditor::save_file(const char * file_id, const char * save_dir,
          DEBUG_MSG("Saving '" << file_id << "' to '" << save_name << "'\n");
          DataPool::load_file(save_name);
          StdioByteStream str_out(save_name, "wb");
-         str_out.writall("AT&T", 4);
+         str_out.writall(octets, 4);
          GP<ByteStream> str_in=file_pool->get_stream();
          str_out.copy(*str_in);
 
@@ -1792,7 +1794,7 @@ DjVuDocEditor::save_as(const char * where, bool bundled)
          DEBUG_MSG("Saving '" << file_url << "' to '" << save_doc_url << "'\n");
          DataPool::load_file(save_doc_name);
          StdioByteStream str_out(save_doc_name, "wb");
-         str_out.writall("AT&T", 4);
+         str_out.writall(octets, 4);
          GP<ByteStream> str_in=file_pool->get_stream();
          str_out.copy(*str_in);
         }

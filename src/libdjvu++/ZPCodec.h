@@ -25,7 +25,7 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ZPCodec.h,v 1.16 2000-11-02 01:08:35 bcr Exp $
+// $Id: ZPCodec.h,v 1.17 2000-11-02 02:59:20 bcr Exp $
 // $Name:  $
 
 
@@ -135,21 +135,21 @@
     policies have made these coders very difficult to use in general purpose
     applications.  The Z-Coder is constructed using a new approach based on an
     extension of the Golomb codes (Bottou, Howard, Bengio, IEEE DCC 98, 1998
-    \URL[DjVu]{http://www.research.att.com/~leonb/DJVU/bottou-howard-bengio}
+    \URL[DjVu]{http://www.research.att.com/~leonb/DJVU/bottou-howard-bengio/}
     \URL[PostScript]{http://www.research.att.com/~leonb/PS/bottou-howard-bengio.ps.gz})
     This new approach does not infringe the QM-Coder patents.  Unfortunately
     the Z-Coder is dangerously close to the patented Arithmetic MEL Coder.
     Therefore we wrote the ZP-Coder (pronounce Zee-Prime Coder) which we
     believe is clear of legal problems.  Needless to say, AT&T has patents
-    pending for both the Z-Coder and the ZP-Coder. The good news however is
-    that we can grant a license to use the ZP-Coder in ``free software''
-    without further complication. See the \Ref{AT&T Source Code Agreement} for
-    more information.
+    pending for both the Z-Coder and the ZP-Coder, licenced to LizardTech.
+    The good news however is that we can grant a license to use the ZP-Coder
+    in ``free software'' without further complication. See the Copyright
+    for more information.
     
     @memo
     Binary adaptive quasi-arithmetic coder.
     @version
-    #$Id: ZPCodec.h,v 1.16 2000-11-02 01:08:35 bcr Exp $#
+    #$Id: ZPCodec.h,v 1.17 2000-11-02 02:59:20 bcr Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> */
 //@{

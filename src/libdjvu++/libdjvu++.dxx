@@ -3,13 +3,13 @@
 
     DjVu® Reference Library (v. 3.0)
 
-    Copyright © 19xx-2000 LizardTech, Inc. All Rights Reserved.
+    Copyright © 2000 LizardTech, Inc. All Rights Reserved.
      
     This software (the "Original Code") is subject to, and may be
     distributed under, the GNU General Public License, Version 2.
     The license should have accompanied the Original Code or you
     may obtain a copy of the license from the Free Software
-    Foundation at http://www.fsf.org .
+    Foundation at \URL{http://www.fsf.org} .
      
     With respect to the Original Code, and subject to any third
     party intellectual property claims, LizardTech grants recipient
@@ -27,6 +27,8 @@
     ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
     MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 
+    {\bf Powered by AT&T Labs Technology}
+
     {\bf Acknowledgements} --- The ideas discussed in this library are the
     result of endless discussions with Yoshua Bengio, Patrick Haffner, Paul
     Howard, and Yann Le Cun.  Many improvements have suggested by Andrei
@@ -34,13 +36,18 @@
     possible.  Finally, this document would be much worse without Joe Orost's
     and Paul Howard's careful proofreading.
 
+    {\bf Current Status} --- DjVu now is maintained by Bill C Riemers at
+    LizardTech, Inc.  However, Leon, Patrick, and Yann continue to
+    innovate and improve DjVu.
+
     @version
     3.0
     @author
-    L\'eon Bottou, 02/1999 */
+    L\'eon Bottou, 02/1999
+    */
 //@{
 
-// $Id: libdjvu++.dxx,v 1.35 2000-11-02 02:17:05 bcr Exp $
+// $Id: libdjvu++.dxx,v 1.36 2000-11-02 02:59:21 bcr Exp $
 // $Name:  $
 
 
@@ -101,22 +108,13 @@
 
    {\bf DjVu Reference Library} --- The DjVu Reference Library implements the
    components of the DjVu technology that are essential for the definition of
-   the file formats.  AT&T Labs \URL{http://www.att.com/attlabs}
-   releases the full source code of the DjVu Reference Library under the terms
-   of the \Ref{AT&T Source Code License}.
+   the file formats.  
    
-   To understand the meaning of this release, it is important to realize that
-   the separation of AT&T, NCR and Lucent Technologies has significantly
-   changed the business equation.  AT&T is not in the business of selling
-   software.  The DjVu technology is interesting for AT&T because it gives
-   the means to propose enhanced services to its customers.  This can only
-   happen if we ensure that the DjVu technology is widely disseminated.
-
    This source code release serves three purposes:
    \begin{itemize}
    \item It demonstrates our intention to create a lasting technology.
-      Regardless of AT&T involvement, developers around the world now have a
-      permanent access to critical parts of DjVu technology.
+      Regardless of LizardTech's involvement, developers around the world
+      now have a permanent access to critical parts of DjVu technology.
    \item It allows developers around the world to work with the DjVu
       technology, to create new advances using our basic building blocks, to
       create bridges between DjVu and other document representation formats,
@@ -176,22 +174,6 @@
    prefer to release less software but make it really {\em free} (in the sense
    of {\em free speech} not {\em free lunch} as you probably know.)  */
    
-
-//----------------------------------------
-/** @name AT&T Source Code Agreement
-
-    The {\em verbatim} text of the AT&T Source Code Agreement.
-    Additional explanation (as well as updated versions) can be found under
-    \URL{http://www.lizardtech.com/open} or in file #"ATTLICENSE"#.
-    They say you must read it and accept it.
-    
-    @author
-    Jeffrey S. Dickey <jsdickey@att.com>\\
-    James Tramontana <jtramontana@att.com>\\
-    Marya Lenn Yee <myee@yeellp.com> */
-//@{
-//@}
-
 
 //----------------------------------------
 /** @name Getting Started
@@ -453,7 +435,7 @@
     identifier}.  For convenience, both identifiers are gathered as an
     extended chunk identifier such as #"FORM:DJVU"#.
 
-    The four octets #"AT&T"# may be inserted in front of the IFF compliant
+    The four octets #0x41,0x54,0x26,0x54# may be inserted in front of the IFF compliant
     byte stream.  The decoder simply ignores these four octets when they are
     present.  These four octets are not part of the IFF format and are not
     required components of a valid DjVu file.  Certain versions of MSIE

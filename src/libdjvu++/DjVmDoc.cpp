@@ -25,7 +25,7 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVmDoc.cpp,v 1.29 2000-11-02 01:08:34 bcr Exp $
+// $Id: DjVmDoc.cpp,v 1.30 2000-11-02 02:59:20 bcr Exp $
 // $Name:  $
 
 
@@ -37,6 +37,8 @@
 #include "IFFByteStream.h"
 #include "GOS.h"
 #include "debug.h"
+
+static const char octets[4]={0x41,0x54,0x41,0x25};
 
 DjVmDoc::DjVmDoc(void)
 {
@@ -61,7 +63,7 @@ DjVmDoc::insert_file(const GP<DjVmDir::File> & f,
 
    char buffer[4];
    if (data_pool->get_data(buffer, 0, 4)==4 &&
-       !memcmp(buffer, "AT&T", 4))
+       !memcmp(buffer, octets, 4))
    {
       data_pool=new DataPool(data_pool, 4, -1);
    } 
@@ -334,7 +336,7 @@ DjVmDoc::expand(const char * dir_name, const char * idx_name)
       GP<ByteStream> str_in=data[data_pos]->get_stream();
       DataPool::load_file(file_name);
       StdioByteStream str_out(file_name, "wb");
-      str_out.writall("AT&T", 4);
+      str_out.writall(octets, 4);
       str_out.copy(*str_in);
    }
 

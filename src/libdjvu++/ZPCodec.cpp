@@ -25,7 +25,7 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ZPCodec.cpp,v 1.13 2000-11-02 01:08:35 bcr Exp $
+// $Id: ZPCodec.cpp,v 1.14 2000-11-02 02:59:20 bcr Exp $
 // $Name:  $
 
 
@@ -58,7 +58,7 @@
 // The ZCODER option is provided for documentation purposes only. The ZCODER
 // might come dangerously close to U.S. patent 5059976 (Mitsubishi).  This is
 // why we always use the ZPCODER, although it usually produces 1% larger files.
-#warning "The ZCODER may infringe non-AT&T patent(s)."
+#warning "The ZCODER may infringe non-LizardTech patent(s)."
 #warning "You should use the ZPCODER instead."
 #endif
 

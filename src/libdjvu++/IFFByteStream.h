@@ -25,7 +25,7 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: IFFByteStream.h,v 1.20 2000-11-02 01:08:35 bcr Exp $
+// $Id: IFFByteStream.h,v 1.21 2000-11-02 02:59:20 bcr Exp $
 // $Name:  $
 
 
@@ -66,16 +66,16 @@
     without worrying about the final file position. See class \Ref{ZPCodec}
     for more details.
     
-    {\bf AT&T IFF Files} --- We had initially planned to exactly follow the
+    {\bf DjVu IFF Files} --- We had initially planned to exactly follow the
     IFF specifications.  Then we realized that certain versions of MSIE
     recognize any IFF file as a Microsoft AIFF sound file and pop a message
     box "Cannot play that sound".  It appears that the structure of AIFF files
     is entirely modeled after the IFF standard, with small variations
     regarding the endianness of numbers and the padding rules.  We eliminate
-    this problem by casting the AT&T protection spell.  Our IFF files always
-    start with the four octets #"AT&T"# followed by the fully conformant IFF
-    byte stream.  Class #IFFByteStream# silently skips these four
-    octets when it encounters them.
+    this problem by casting the octet protection spell.  Our IFF files always
+    start with the four octets #0x41,0x54,0x26,0x54# followed by the fully
+    conformant IFF byte stream.  Class #IFFByteStream# silently skips these
+    four octets when it encounters them.
 
     {\bf References} --- EA IFF 85 Interchange File Format specification:\\
     \URL{http://www.cica.indiana.edu/graphics/image_specs/ilbm.format.txt} or
@@ -86,7 +86,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: IFFByteStream.h,v 1.20 2000-11-02 01:08:35 bcr Exp $# */
+    #$Id: IFFByteStream.h,v 1.21 2000-11-02 02:59:20 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__

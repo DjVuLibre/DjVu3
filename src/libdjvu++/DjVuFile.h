@@ -25,7 +25,7 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuFile.h,v 1.64 2000-11-02 01:08:34 bcr Exp $
+// $Id: DjVuFile.h,v 1.65 2000-11-02 02:59:20 bcr Exp $
 // $Name:  $
 
  
@@ -66,7 +66,7 @@ class DjVuTXT;
 
     @memo Classes representing DjVu files.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuFile.h,v 1.64 2000-11-02 01:08:34 bcr Exp $#
+    @version #$Id: DjVuFile.h,v 1.65 2000-11-02 02:59:20 bcr Exp $#
 */
 
 //@{
@@ -460,7 +460,8 @@ public:
 	  chunk structure, annotation chunks and navigation directory
 	  chunk #NDIR#.
 
-	  {\bf Note:} The file stream will not have the magic #AT&T#
+	  {\bf Note:} The file stream will not have the magic
+          #0x41,0x54,0x26,0x54#
 	  at the beginning.
 	  
 	  @param included_too Process included files too

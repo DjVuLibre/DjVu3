@@ -25,7 +25,7 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocument.cpp,v 1.130 2000-11-02 01:08:34 bcr Exp $
+// $Id: DjVuDocument.cpp,v 1.131 2000-11-02 02:59:20 bcr Exp $
 // $Name:  $
 
 
@@ -38,6 +38,7 @@
 #include "GOS.h"
 #include "debug.h"
 
+static const char octets[4]={0x41,0x54,0x26,0x41};
 const float	DjVuDocument::thumb_gamma=(float)2.20;
 
 void (* DjVuDocument::djvu_import_codec)(
@@ -1600,7 +1601,7 @@ DjVuDocument::write(ByteStream & str, bool force_djvm)
       GPList<DjVmDir::File> files_list=dir->get_files_list();
       GP<DataPool> pool=doc->get_data(files_list[files_list]->id);
       GP<ByteStream> pool_str=pool->get_stream();
-      str.writall("AT&T",4);
+      str.writall(octets,4);
       str.copy(*pool_str);
    }
 }
