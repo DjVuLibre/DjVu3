@@ -1,4 +1,4 @@
-/* File "$Id: DjVuAPI.h,v 1.9 1999-12-14 04:44:08 parag Exp $"
+/* File "$Id: DjVuAPI.h,v 1.10 1999-12-14 18:11:40 parag Exp $"
  *
  * The main header file for the DjVu API
  */
@@ -11,7 +11,10 @@
 
 /* 
  * $Log: DjVuAPI.h,v $
- * Revision 1.9  1999-12-14 04:44:08  parag
+ * Revision 1.10  1999-12-14 18:11:40  parag
+ * C Wrapper for MTiff added
+ *
+ * Revision 1.9  1999/12/14 04:44:08  parag
  * C Wrapers for libio
  *
  * Revision 1.8  1999/12/03 00:23:10  parag
@@ -906,6 +909,22 @@ djvu_pnm_to_run(djvu_input_sub *inpf, void *arg);
 DJVUAPI djvu_run_image *
 djvu_g4tiff_to_run(djvu_input_sub *inpf, void *arg);
 
+// alloc functions return a handle which is used for 
+// further calls
+DJVUAPI void *
+djvu_alloc_mtiff_reader(djvu_input_sub * inpf, void * iarg);
+DJVUAPI void *
+djvu_alloc_mtiff_writer(djvu_output_sub * outf, void * oarg);
+DJVUAPI djvu_run_image *
+djvu_mtiff_to_run(void * handle, int pageNum);
+DJVUAPI djvu_pixel_image *
+djvu_mtiff_to_pixel(void * handle, int pageNum);
+DJVUAPI int
+djvu_run_to_mtiff(void * handle, djvu_run_image * rimg);
+DJVUAPI int
+djvu_pixel_to_mtiff(void * handle, djvu_pixel_image * pimg);
+DJVUAPI void
+djvu_free_mtiff(void * handle);
 /*
  *      djvu_set_pixel_to_bitonal
  *  Set the djvu_pixel_to_bitonal falg to OFF
