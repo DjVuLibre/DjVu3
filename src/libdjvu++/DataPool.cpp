@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.cpp,v 1.1.2.7 1999-05-04 20:37:13 eaf Exp $
+//C- $Id: DataPool.cpp,v 1.1.2.8 1999-05-05 22:05:43 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -92,6 +92,8 @@ DataPool::get_data(void * buffer, int offset, int sz, void * reader_id)
       // Some data is still expected => add this reader to the
       // list of readers and call virtual wait_for_data()
    DEBUG_MSG("DataPool::get_data(): There is no data in the pool.\n");
+   DEBUG_MSG("offset=" << offset << ", size=" << sz <<
+	     ", pool_size=" << size() << "\n");
    GP<Reader> reader=new Reader(reader_id, offset, sz);
    TRY {
       {
@@ -377,7 +379,8 @@ DataRange::get_data(void * buffer, int offset, int size)
       if (offset+size>length) size=length-offset;
    };
 
-   return pool->get_data(buffer, start+offset, size, this);
+   if (size==0) return 0;
+   else return pool->get_data(buffer, start+offset, size, this);
 }
 
 void
