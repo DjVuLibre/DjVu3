@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GUnicode.cpp,v 1.27 2001-07-11 21:10:47 bcr Exp $
+// $Id: GUnicode.cpp,v 1.28 2001-07-11 21:54:43 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -38,9 +38,6 @@
 #endif
 
 #include "GString.h"
-#ifdef UNIX
-#define HAS_ICONV
-#endif
 #ifdef HAS_ICONV
 #include <iconv.h>
 #endif
@@ -270,7 +267,7 @@ GStringRep::Unicode::create(
     retval=create(xbuf,bufsize,XUCS4);
   }else
   {
-#ifdef HAS_ICONV
+#if HAS_ICONV
     EncodeType t=XOTHER;
     void const * const buf=checkmarks(xbuf,bufsize,t); 
     if(t != XOTHER)
@@ -307,8 +304,13 @@ GStringRep::Unicode::create(
             GPBuffer<char> gutf8buf(utf8buf,pleft);
             char *p=utf8buf;
             unsigned char const *last=ptr;
-            for(;iconv(cv,(const char **)&ptr,&ptrleft,&p,&pleft);last=ptr)
+#if (HAS_ICONV == 2)
+            for(;iconv(cv,&(char *)ptr,&ptrleft,&p,&pleft);last=ptr)
               EMPTY_LOOP;
+#else
+            for(;iconv(cv,&(const char *)ptr,&ptrleft,&p,&pleft);last=ptr)
+              EMPTY_LOOP;
+#endif
             iconv_close(cv);
             retval=create(utf8buf,(size_t)last-(size_t)buf,t);
             retval->set_remainder(last,(size_t)eptr-(size_t)last,e);

@@ -31,7 +31,7 @@
 #C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #
-# $Id: functions.sh,v 1.69 2001-07-10 17:38:14 mchen Exp $
+# $Id: functions.sh,v 1.70 2001-07-11 21:54:43 bcr Exp $
 # $Name:  $
 
 #
@@ -566,6 +566,13 @@ check_dlopen()
 {
   if [ -z "$DLOPEN_TEST" ]  ; then
     . "${CONFIG_DIR}/dlopen.sh"
+  fi
+}
+
+check_iconv()
+{
+  if [ -z "$ICONV_TEST" ]  ; then
+    . "${CONFIG_DIR}/iconv.sh"
   fi
 }
 
