@@ -12,7 +12,7 @@
     create multipage DjVu documents.  It does not describe how to compress 
     single pages.    
     @author
-    Praveen K Guduru <guduru@att.com>
+    Dr Bill C Riemers <bcr@att.com>
     @version
 */
 #ifdef DOCXX_CODE
@@ -21,7 +21,11 @@
 
 /* 
  * $Log: DjVuMultiAPI.h,v $
- * Revision 1.12  2000-01-21 21:09:52  leonb
+ * Revision 1.13  2000-01-22 00:15:04  bcr
+ * Removed "backwards compatability macros".  We shouldn't use such hacks while
+ * still in beta.  Corrected the author field.
+ *
+ * Revision 1.12  2000/01/21 21:09:52  leonb
  * Replaced initial comment (copyright notice).
  *
  * Revision 1.11  2000/01/21 14:46:29  leonb
@@ -196,20 +200,6 @@ djvu_combine_error(djvu_combine_options *options);
     error messages to #stderr# together with message #mesg#.  */
 DJVUAPI void 
 djvu_combine_perror(djvu_combine_options *options, const char *mesg);
-
-// Do not even bother documenting these aliases.
-#define djvu_bundle_options         djvu_combine_options
-#define djvu_join_options           djvu_combine_options
-#define djvu_bundle_options_alloc   djvu_combine_options_alloc
-#define djvu_join_options_alloc     djvu_combine_options_alloc
-#define djvu_bundle_options_free    djvu_combine_options_free
-#define djvu_join_options_free      djvu_combine_options_free
-#define djvu_bundle_haserror        djvu_combine_haserror
-#define djvu_join_haserror          djvu_combine_haserror
-#define djvu_bundle_error           djvu_combine_error
-#define djvu_join_error             djvu_combine_error
-#define djvu_bundle_perror          djvu_combine_perror
-#define djvu_join_perror            djvu_combine_perror
 
 /** Alias for #djvu_combine# for implementing program #djvubundle#.
     This function is similar to \Ref{djvu_combine}
