@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.h,v 1.58 2001-07-24 17:52:03 bcr Exp $
+// $Id: ByteStream.h,v 1.59 2001-09-04 20:07:59 leonb Exp $
 // $Name:  $
 
 #ifndef _BYTESTREAM_H
@@ -62,7 +62,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation\\
     Andrei Erofeev <eaf@geocities.com> -- 
     @version
-    #$Id: ByteStream.h,v 1.58 2001-07-24 17:52:03 bcr Exp $# */
+    #$Id: ByteStream.h,v 1.59 2001-09-04 20:07:59 leonb Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -275,7 +275,7 @@ public:
       file cannot be opened. */
   static GP<ByteStream> create(
     const GURL &url, char const * const mode);
-  /** Same as the above, but uses stdio. */
+  /** Same as the above, but uses stdin or stdout */
   static GP<ByteStream> create( char const * const mode);
 
   /** Constructs a ByteStream for accessing the stdio file #f#.
