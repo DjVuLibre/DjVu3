@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.h,v 1.26 1999-09-10 19:24:20 eaf Exp $
+//C- $Id: DjVuFile.h,v 1.27 1999-09-11 15:18:52 eaf Exp $
  
 #ifndef _DJVUFILE_H
 #define _DJVUFILE_H
@@ -46,7 +46,7 @@
 
     @memo Classes representing DjVu files.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuFile.h,v 1.26 1999-09-10 19:24:20 eaf Exp $#
+    @version #$Id: DjVuFile.h,v 1.27 1999-09-11 15:18:52 eaf Exp $#
 */
 
 //@{
@@ -224,10 +224,6 @@ public:
 		 of \Ref{disable_standard_port}() function. */
    void init(const GURL & url, GP<DjVuPort> port=0);
 
-      /** Specifies what function should be called when this instance
-	  of #DjVuFile# is about to be destroyed. */
-   void		add_destroy_cb(void (* destroy_cb)(const DjVuFile *, void *), void * cl_data);
-
       /** Disables the built-in port for accessing local files, which may
 	  have been created in the case when the #port# argument to
 	  the \Ref{DjVuFile::DjVuFile}() constructor is #ZERO# */
@@ -382,17 +378,7 @@ protected:
 
    GPList<DjVuFile>	inc_files_list;
    GCriticalSection	inc_files_lock;
-
-   virtual void		destroy();
 private:
-   class DestroyCB : public GPEnabled
-   {
-   public:
-      void	(* cb)(const DjVuFile *, void *);
-      void	* cl_data;
-      DestroyCB(void (* cb)(const DjVuFile *, void *), void * cl_data) :
-	    cb(cb), cl_data(cl_data) {};
-   };
    bool                 initialized;
    GSafeFlags		flags;
 
@@ -406,9 +392,6 @@ private:
    GP<DjVuPort>		simple_port;
 
    GMonitor		chunk_mon, finish_mon;
-
-   GCriticalSection	destroy_lock;
-   GPList<DestroyCB>	destroy_list;
 
       // Functions called when the decoding thread starts
    static void	static_decode_func(void *);

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.43 1999-09-10 22:47:53 eaf Exp $
+//C- $Id: DjVuFile.cpp,v 1.44 1999-09-11 15:18:51 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -172,28 +172,6 @@ DjVuFile::reset(void)
    dir  = 0; 
    description = ""; 
    mimetype = "";
-}
-
-
-void
-DjVuFile::destroy(void)
-{
-   {
-      GCriticalSectionLock lock(&destroy_lock);
-      for(GPosition pos=destroy_list;pos;++pos)
-      {
-	 DestroyCB * cb=destroy_list[pos];
-	 if (cb->cb) cb->cb(this, cb->cl_data);
-      }
-   }
-   DjVuPort::destroy();
-}
-
-void
-DjVuFile::add_destroy_cb(void (* cb)(const DjVuFile *, void *), void * cl_data)
-{
-   GCriticalSectionLock lock(&destroy_lock);
-   destroy_list.append(new DestroyCB(cb, cl_data));
 }
 
 unsigned int
