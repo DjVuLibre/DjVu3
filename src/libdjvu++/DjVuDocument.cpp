@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.89 1999-12-20 21:45:00 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.90 1999-12-21 20:53:41 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -125,10 +125,12 @@ DjVuDocument::stop(void)
 
       if (ndir_file) ndir_file->stop(false);
 
-      GCriticalSectionLock lock(&ufiles_lock);
-      for(GPosition pos=ufiles_list;pos;++pos)
-	 ufiles_list[pos]->file->stop(false);	// Disable any access to data
-      ufiles_list.empty();
+      {
+	 GCriticalSectionLock lock(&ufiles_lock);
+	 for(GPosition pos=ufiles_list;pos;++pos)
+	    ufiles_list[pos]->file->stop(false);	// Disable any access to data
+	 ufiles_list.empty();
+      }
 
       init_thread_flags.wait(50);
    }
