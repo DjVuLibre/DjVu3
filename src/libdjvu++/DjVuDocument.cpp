@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.1.2.4 1999-05-04 21:19:53 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.1.2.5 1999-05-05 18:54:47 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -535,6 +535,25 @@ DjVuDocument::notify_chunk_done(const DjVuPort * source, const char * name)
       };
 }
 
+static GP<DjVuNavDir>
+get_ndir(const GP<DjVuFile> & file, GMap<GURL, void *> & map)
+{
+   GURL url=file->get_url();
+   if (!map.contains(url))
+   {
+      map[url]=0;
+      if (file->dir) return file->dir;
+
+      GPList<DjVuFile> list=file->get_included_files();
+      for(GPosition pos=list;pos;++pos)
+      {
+	 GP<DjVuNavDir> dir=get_ndir(list[pos], map);
+	 if (dir) return dir;
+      }
+   }
+   return 0;
+}
+
 GP<DjVuFile>
 DjVuDocument::get_djvu_file(const GURL & url)
 {
@@ -547,7 +566,17 @@ DjVuDocument::get_djvu_file(const GURL & url)
    {
       file=new DjVuFile(url, this, cache);
       if (cache) cache->add_item(url, file);
-   };
+   } else
+      if (dir->get_pages_num()==1)
+      {
+	 GMap<GURL, void *> map;
+	 GP<DjVuNavDir> fdir=get_ndir(file, map);
+	 if (fdir)
+	 {
+	    DEBUG_MSG("updating nav. directory from the cached file.\n");
+	    dir=fdir;
+	 }
+      }
    get_portcaster()->add_route(file, this);
 
    return file;
