@@ -32,7 +32,7 @@
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #C- 
 #
-# $Id: pstodjvu.sh,v 1.3 2001-02-02 17:56:07 bcr Exp $
+# $Id: pstodjvu.sh,v 1.4 2001-02-02 18:19:02 bcr Exp $
 # $Name:  $
 
 # DjVu Enterprise Commands
@@ -91,19 +91,46 @@ case "$j" in
            args="$args '$j'" ;;
         "--page-range="*|"--pages-per-dict=*")
            echo "Option $j is not supported by %0" 1>&2
-           exit 1 ;;
+           usage=1 ;;
+	"--help")
+	   usage=0 ;;
         *)
            free=""
            args="$args '$j'" ;;
       esac
       shift
-      case "$1" in
-        "--"?*) j="$1" ;;
-        *) j="" ;;
-      esac
+      if [ -z "$usage" ]
+      then
+        case "$1" in
+          "--"?*) j="$1" ;;
+          *) j="" ;;
+        esac
+      else
+        j="";
+      fi
     done ;;
   *) ;;
 esac
+
+if [ -n "$usage" ] 
+then
+cat <<+
+For usage with the DjVu3 Open Source:
+   Bundled output:
+	$0 --free [$electroniccommand options] <inputfile> <outputfile>
+   Indirect output:
+	$0 --free [$electroniccommand options] <inputfile> <outputdir>
+
+For usage with DjVu Enterprise
+
+   Bundled output:
+	$0 --profile=[profilename] [$documentcommand options] <inputfile> <outputfile>
+   Indirect output:
+	$0 --profile=[profilename] [$documentcommand options] <inputfile> <outputdir>
++
+  
+  exit $usage
+fi
 
 if [ -z "$electroniccommand" ]
 then
