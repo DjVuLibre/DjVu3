@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuAnno.cpp,v 1.78 2001-04-13 00:41:16 bcr Exp $
+// $Id: DjVuAnno.cpp,v 1.79 2001-04-13 23:12:25 praveen Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -772,7 +772,7 @@ DjVuANT::get_map_areas(GLParser & parser)
   for(GPosition pos=list;pos;++pos)
   {
     GLObject & obj=*list[pos];
-    const GUTF8String type=obj.get_type();
+    const int type=obj.get_type();
     if (type == GLObject::LIST)
     {
       const GUTF8String name=obj.get_name();
