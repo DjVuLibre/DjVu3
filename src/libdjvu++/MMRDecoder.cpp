@@ -8,7 +8,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: MMRDecoder.cpp,v 1.4 1999-09-28 14:03:55 leonb Exp $
+//C- $Id: MMRDecoder.cpp,v 1.5 1999-09-28 14:09:27 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -326,18 +326,11 @@ _VLSource::preload()
     {
       if (bufpos >= bufmax) 
 	{
-	  // Refill buffer
-	  bufpos = 0;
+	  bufpos = 0; // Refill buffer
 	  bufmax = inp.read((void*)buffer, sizeof(buffer));
-	  if (! bufmax)
-	    {
-	      // Return if not yet beyond EOF
-	      if (lowbits <= 32)
-		return;
-	      THROW("EOF");
-	    }
+	  if (bufmax <= 0)
+            return;   // Fill with zeroes (invalid code)
 	}
-      // Load one byte
       lowbits -= 8;
       codeword |= buffer[bufpos++] << lowbits;
     }
