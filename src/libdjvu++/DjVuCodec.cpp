@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: DjVuCodec.cpp,v 1.4 1999-01-28 16:51:36 leonb Exp $
+//C-  $Id: DjVuCodec.cpp,v 1.5 1999-01-28 17:02:34 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -333,9 +333,10 @@ DjVuImage::is_legal_bilevel() const
   if (! (width>0 && height>0))
     return 0;
   // Check stencil
-  if (stencil)
-    if (stencil->get_width()!=width || stencil->get_height()!=height)
-      return 0;
+  if (!stencil)
+    return 0;
+  if (stencil->get_width()!=width || stencil->get_height()!=height)
+    return 0;
   // Check that color information is not present.
   if (get_bg44() || get_bgpm() || get_fgpm())
     return 0;
@@ -898,6 +899,7 @@ DjVuImage::decode(ByteStream &bs, DjVuInterface *notifier)
                   info->width = img44->get_width();
                   info->height = img44->get_height();
                   info->dpi = 100;
+                  bg44 = img44;
                   if (notifier) notifier->notify_relayout();
                 }
               else

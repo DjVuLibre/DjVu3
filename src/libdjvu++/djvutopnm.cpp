@@ -7,9 +7,9 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: djvutopnm.cpp,v 1.5 1999-01-28 16:51:37 leonb Exp $
+//C-  $Id: djvutopnm.cpp,v 1.6 1999-01-28 17:02:34 leonb Exp $
 
-// File "$Id: djvutopnm.cpp,v 1.5 1999-01-28 16:51:37 leonb Exp $"
+// File "$Id: djvutopnm.cpp,v 1.6 1999-01-28 17:02:34 leonb Exp $"
 // Author: Yann Le Cun 08/1997
 
 #include <stdio.h>
@@ -33,7 +33,7 @@ GRect fullrect;
 GRect segmentrect;
 
 static void
-convert(const char *from, const char *to, int subsample=1)
+convert(const char *from, const char *to)
 {
   unsigned long start, stop;
 
