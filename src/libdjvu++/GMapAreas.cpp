@@ -9,24 +9,24 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GHLObjects.cpp,v 1.3 1999-05-25 19:42:29 eaf Exp $
+//C- $Id: GMapAreas.cpp,v 1.1 1999-09-30 19:15:28 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
 #endif
 
-#include "GHLObjects.h"
+#include "GMapAreas.h"
 #include "GException.h"
 
 #include <math.h>
 #include <stdio.h>
 
 /****************************************************************************
-*************************** GHLObject declaration ***************************
+***************************** GMapArea definition ***************************
 ****************************************************************************/
 
 GString
-GHLObject::print(void)
+GMapArea::print(void)
 {
    int i;
    GString tmp;
@@ -51,55 +51,72 @@ GHLObject::print(void)
       comment1+=ch;
    };
    
-   char thick[128];
-   sprintf(thick, "%d", shadow_thick);
+   char border_width_str[128];
+   sprintf(border_width_str, "%d", border_width);
    
-   GString color;
+   GString border_color_str;
    char buffer[128];
    sprintf(buffer, "#%02X%02X%02X",
-	   (hlcolor_rgb & 0xff0000) >> 16,
-	   (hlcolor_rgb & 0xff00) >> 8,
-	   (hlcolor_rgb & 0xff));
-   color=buffer;
+	   (border_color & 0xff0000) >> 16,
+	   (border_color & 0xff00) >> 8,
+	   (border_color & 0xff));
+   border_color_str=buffer;
    
-   GString hlstr;
-   switch(hltype)
+   GString border_type_str;
+   switch(border_type)
    {
-      case NONE: hlstr="(" NONE_TAG ")"; break;
-      case XOR: hlstr="(" XOR_TAG ")"; break;
-      case BORDER: hlstr="(" BORDER_TAG " "+color+")"; break;
-      case SHADOW_IN: hlstr=GString("(" SHADOW_IN_TAG " ")+thick+")"; break;
-      case SHADOW_OUT: hlstr=GString("(" SHADOW_OUT_TAG " ")+thick+")"; break;
-      case SHADOW_EIN: hlstr=GString("(" SHADOW_EIN_TAG " ")+thick+")"; break;
-      case SHADOW_EOUT: hlstr=GString("(" SHADOW_EOUT_TAG " ")+thick+")"; break;
-      default: hlstr="(" XOR_TAG ")"; break;
+      case NO_BORDER: border_type_str="(" NO_BORDER_TAG ")"; break;
+      case XOR_BORDER: border_type_str="(" XOR_BORDER_TAG ")"; break;
+      case SOLID_BORDER: border_type_str="(" SOLID_BORDER_TAG " "+border_color_str+")"; break;
+      case SHADOW_IN_BORDER: border_type_str=GString("(" SHADOW_IN_BORDER_TAG " ")+border_width_str+")"; break;
+      case SHADOW_OUT_BORDER: border_type_str=GString("(" SHADOW_OUT_BORDER_TAG " ")+border_width_str+")"; break;
+      case SHADOW_EIN_BORDER: border_type_str=GString("(" SHADOW_EIN_BORDER_TAG " ")+border_width_str+")"; break;
+      case SHADOW_EOUT_BORDER: border_type_str=GString("(" SHADOW_EOUT_BORDER_TAG " ")+border_width_str+")"; break;
+      default: border_type_str="(" XOR_BORDER_TAG ")"; break;
    };
+
+   GString hilite_str;
+   if (hilite_color!=0xffffffff)
+   {
+      char buffer[128];
+      sprintf(buffer, "(" HILITE_TAG " #%02X%02X%02X)",
+	      (hilite_color & 0xff0000) >> 16,
+	      (hilite_color & 0xff00) >> 8,
+	      (hilite_color & 0xff));
+      hilite_str=buffer;
+   }
+   
    GString URL;
    if (target1=="_self") URL="\""+url1+"\"";
    else URL="(url \""+url1+"\" \""+target1+"\")";
-   return "(" MAPAREA_TAG " "+URL+" \""+comment1+"\" "+GHL_print()+hlstr+")";
+
+   GString total="(" MAPAREA_TAG " "+URL+" \""+comment1+"\" "+gma_print()+border_type_str;
+   if (border_always_visible) total+=" (" BORDER_AVIS_TAG ")";
+   if (hilite_str.length()) total+=" "+hilite_str;
+   total+=")";
+   return total;
 }
 
 /****************************************************************************
-**************************** GHLRect declaration ****************************
+**************************** GMapRect definition ****************************
 ****************************************************************************/
 
 void
-GHLRect::GHL_resize(int new_width, int new_height)
+GMapRect::gma_resize(int new_width, int new_height)
 {
    xmax=xmin+new_width;
    ymax=ymin+new_height;
 }
 
 void
-GHLRect::GHL_transform(const GRect & grect)
+GMapRect::gma_transform(const GRect & grect)
 {
    xmin=grect.xmin; ymin=grect.ymin;
    xmax=grect.xmax; ymax=grect.ymax;
 }
 
 GString
-GHLRect::GHL_print(void)
+GMapRect::gma_print(void)
 {
    char buffer[128];
    sprintf(buffer, "(" RECT_TAG " %d %d %d %d) ",
@@ -108,14 +125,14 @@ GHLRect::GHL_print(void)
 }
 
 /****************************************************************************
-**************************** GHLPoly declaration ****************************
+**************************** GMapPoly definition ****************************
 ****************************************************************************/
 
 inline int
-GHLPoly::sign(int x) { return x<0 ? -1 : x>0 ? 1 : 0; }
+GMapPoly::sign(int x) { return x<0 ? -1 : x>0 ? 1 : 0; }
 
 bool
-GHLPoly::does_side_cross_rect(const GRect & grect, int side)
+GMapPoly::does_side_cross_rect(const GRect & grect, int side)
 {
    int x1=xx[side], x2=xx[(side+1)%points];
    int y1=yy[side], y2=yy[(side+1)%points];
@@ -129,7 +146,7 @@ GHLPoly::does_side_cross_rect(const GRect & grect, int side)
 }
 
 bool
-GHLPoly::is_projection_on_segment(int x, int y, int x1, int y1, int x2, int y2)
+GMapPoly::is_projection_on_segment(int x, int y, int x1, int y1, int x2, int y2)
 {
    int res1=(x-x1)*(x2-x1)+(y-y1)*(y2-y1);
    int res2=(x-x2)*(x2-x1)+(y-y2)*(y2-y1);
@@ -137,8 +154,8 @@ GHLPoly::is_projection_on_segment(int x, int y, int x1, int y1, int x2, int y2)
 }
 
 bool
-GHLPoly::do_segments_intersect(int x11, int y11, int x12, int y12,
-			       int x21, int y21, int x22, int y22)
+GMapPoly::do_segments_intersect(int x11, int y11, int x12, int y12,
+				int x21, int y21, int x22, int y22)
 {
    int res11=(x11-x21)*(y22-y21)-(y11-y21)*(x22-x21);
    int res12=(x12-x21)*(y22-y21)-(y12-y21)*(x22-x21);
@@ -159,27 +176,27 @@ GHLPoly::do_segments_intersect(int x11, int y11, int x12, int y12,
 }
 
 bool
-GHLPoly::are_segments_parallel(int x11, int y11, int x12, int y12,
-			       int x21, int y21, int x22, int y22)
+GMapPoly::are_segments_parallel(int x11, int y11, int x12, int y12,
+				int x21, int y21, int x22, int y22)
 {
    return (x12-x11)*(y22-y21)-(y12-y11)*(x22-x21)==0;
 }
 
 GString
-GHLPoly::check_data(void)
+GMapPoly::check_data(void)
 {
-   if (open && points<2 || !open && points<3) return "GHLPoly::check_data(): Too few points.";
+   if (open && points<2 || !open && points<3) return "GMapPoly::check_data(): Too few points.";
    for(int i=0;i<sides;i++)
       for(int j=i+2;j<sides;j++)
          if ((j+1)%points!=i)
 	    if (do_segments_intersect(xx[i], yy[i], xx[i+1], yy[i+1],
 				      xx[j], yy[j], xx[(j+1)%points], yy[(j+1)%points]))
-		return "GHLPoly::check_data(): Some segments intersect.";
+		return "GMapPoly::check_data(): Some segments intersect.";
    return "";
 }
 
 void
-GHLPoly::optimize_data(void)
+GMapPoly::optimize_data(void)
 {
    // Removing segments of length zero
    int i;
@@ -215,7 +232,7 @@ GHLPoly::optimize_data(void)
 }
 
 bool
-GHLPoly::GHL_is_point_inside(int xin, int yin)
+GMapPoly::gma_is_point_inside(int xin, int yin)
 {
    if (open) return 0;
    
@@ -256,7 +273,7 @@ GHLPoly::GHL_is_point_inside(int xin, int yin)
 }
 
 int
-GHLPoly::GHL_get_xmin(void)
+GMapPoly::gma_get_xmin(void)
 {
    int x=xx[0];
    for(int i=1;i<points;i++)
@@ -265,7 +282,7 @@ GHLPoly::GHL_get_xmin(void)
 }
 
 int
-GHLPoly::GHL_get_xmax(void)
+GMapPoly::gma_get_xmax(void)
 {
    int x=xx[0];
    for(int i=1;i<points;i++)
@@ -274,7 +291,7 @@ GHLPoly::GHL_get_xmax(void)
 }
 
 int
-GHLPoly::GHL_get_ymin(void)
+GMapPoly::gma_get_ymin(void)
 {
    int y=yy[0];
    for(int i=1;i<points;i++)
@@ -283,7 +300,7 @@ GHLPoly::GHL_get_ymin(void)
 }
 
 int
-GHLPoly::GHL_get_ymax(void)
+GMapPoly::gma_get_ymax(void)
 {
    int y=yy[0];
    for(int i=1;i<points;i++)
@@ -292,7 +309,7 @@ GHLPoly::GHL_get_ymax(void)
 }
 
 void
-GHLPoly::GHL_move(int dx, int dy)
+GMapPoly::gma_move(int dx, int dy)
 {
    for(int i=0;i<points;i++)
    {
@@ -301,7 +318,7 @@ GHLPoly::GHL_move(int dx, int dy)
 }
 
 void
-GHLPoly::GHL_resize(int new_width, int new_height)
+GMapPoly::gma_resize(int new_width, int new_height)
 {
    int width=get_xmax()-get_xmin();
    int height=get_ymax()-get_ymin();
@@ -314,7 +331,7 @@ GHLPoly::GHL_resize(int new_width, int new_height)
 }
 
 void
-GHLPoly::GHL_transform(const GRect & grect)
+GMapPoly::gma_transform(const GRect & grect)
 {
    int width=get_xmax()-get_xmin();
    int height=get_ymax()-get_ymin();
@@ -327,13 +344,13 @@ GHLPoly::GHL_transform(const GRect & grect)
 }
 
 bool
-GHLPoly::GHL_check_object(void)
+GMapPoly::gma_check_object(void)
 {
    GString res=check_data();
    return res.length()==0;
 }
 
-GHLPoly::GHLPoly(const int * _xx, const int * _yy, int _points, bool _open) :
+GMapPoly::GMapPoly(const int * _xx, const int * _yy, int _points, bool _open) :
    open(_open), points(_points)
 {
    sides=points-(open!=0);
@@ -349,7 +366,7 @@ GHLPoly::GHLPoly(const int * _xx, const int * _yy, int _points, bool _open) :
 }
 
 GString
-GHLPoly::GHL_print(void)
+GMapPoly::gma_print(void)
 {
    GString res="(" POLY_TAG " ";
    for(int i=0;i<points;i++)
@@ -364,11 +381,11 @@ GHLPoly::GHL_print(void)
 }
 
 /****************************************************************************
-**************************** GHLOval declaration ****************************
+**************************** GMapOval definition ****************************
 ****************************************************************************/
 
 void
-GHLOval::GHL_resize(int new_width, int new_height)
+GMapOval::gma_resize(int new_width, int new_height)
 {
    xmax=xmin+new_width;
    ymax=ymin+new_height;
@@ -376,7 +393,7 @@ GHLOval::GHL_resize(int new_width, int new_height)
 }
 
 void
-GHLOval::GHL_transform(const GRect & grect)
+GMapOval::gma_transform(const GRect & grect)
 {
    xmin=grect.xmin; ymin=grect.ymin;
    xmax=grect.xmax; ymax=grect.ymax;
@@ -384,7 +401,7 @@ GHLOval::GHL_transform(const GRect & grect)
 }
 
 bool
-GHLOval::GHL_is_point_inside(int x, int y)
+GMapOval::gma_is_point_inside(int x, int y)
 {
    return
       sqrt((x-xf1)*(x-xf1)+(y-yf1)*(y-yf1))+
@@ -392,7 +409,7 @@ GHLOval::GHL_is_point_inside(int x, int y)
 }
 
 void
-GHLOval::initialize(void)
+GMapOval::initialize(void)
 {
    int xc=(xmax+xmin)/2;
    int yc=(ymax+ymin)/2;
@@ -413,14 +430,14 @@ GHLOval::initialize(void)
    };
 }
 
-GHLOval::GHLOval(const GRect & rect) : xmin(rect.xmin), ymin(rect.ymin),
+GMapOval::GMapOval(const GRect & rect) : xmin(rect.xmin), ymin(rect.ymin),
    xmax(rect.xmax), ymax(rect.ymax)
 {
    initialize();
 }
 
 GString
-GHLOval::GHL_print(void)
+GMapOval::gma_print(void)
 {
    char buffer[128];
    sprintf(buffer, "(" OVAL_TAG " %d %d %d %d) ",
