@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocument.cpp,v 1.165 2001-04-30 23:30:45 bcr Exp $
+// $Id: DjVuDocument.cpp,v 1.166 2001-05-01 17:12:15 bcr Exp $
 // $Name:  $
 
 
@@ -1657,7 +1657,7 @@ DjVuDocument::write(GP<ByteStream> gstr, bool force_djvm)
     doc->write(gstr);
   }else
   {
-    GPList<DjVmDir::File> files_list=dir->get_files_list();
+    GPList<DjVmDir::File> files_list=dir->resolve_duplicates(false);
     GP<DataPool> pool=doc->get_data(files_list[files_list]->get_load_name());
     GP<ByteStream> pool_str=pool->get_stream();
     ByteStream &str=*gstr;

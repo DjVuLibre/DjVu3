@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocEditor.cpp,v 1.75 2001-04-30 23:30:45 bcr Exp $
+// $Id: DjVuDocEditor.cpp,v 1.76 2001-05-01 17:12:15 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -1758,7 +1758,7 @@ DjVuDocEditor::save_as(const GURL &where, bool bundled)
 
    GURL save_doc_url;
 
-   if (!where.is_empty())
+   if (where.is_empty())
    {
          // Assume, that we just want to 'save'. Check, that it's possible
          // and proceed.
@@ -1846,6 +1846,7 @@ DjVuDocEditor::save_as(const GURL &where, bool bundled)
      {
        DEBUG_MSG("Saving in INDIRECT format to '" << save_doc_url << "'\n");
        bool save_only_modified=!(save_doc_url!=doc_url || save_doc_type!=orig_doc_type);
+       GPList<DjVmDir::File> xfiles_list=djvm_dir->resolve_duplicates(false);
        const GURL codebase=save_doc_url.base();
        int pages_num=djvm_dir->get_pages_num();
        GMap<GUTF8String, GUTF8String> map;
@@ -1856,7 +1857,6 @@ DjVuDocEditor::save_as(const GURL &where, bool bundled)
          save_file(id, codebase, save_only_modified, map);
        }
        // Next go thru thumbnails and similar stuff
-       GPList<DjVmDir::File> xfiles_list=djvm_dir->get_files_list();
        GPosition pos;
        for(pos=xfiles_list;pos;++pos)
          save_file(xfiles_list[pos]->get_load_name(), codebase, save_only_modified, map);

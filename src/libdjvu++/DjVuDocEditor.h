@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocEditor.h,v 1.40 2001-04-30 23:30:45 bcr Exp $
+// $Id: DjVuDocEditor.h,v 1.41 2001-05-01 17:12:15 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUDOCEDITOR_H
@@ -51,7 +51,7 @@
 
     @memo DjVu document editor class.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: DjVuDocEditor.h,v 1.40 2001-04-30 23:30:45 bcr Exp $#
+    @version #$Id: DjVuDocEditor.h,v 1.41 2001-05-01 17:12:15 bcr Exp $#
 */
 
 //@{
@@ -423,11 +423,16 @@ inline int
 DjVuDocEditor::get_save_doc_type(void) const
 {
    if (orig_doc_type==SINGLE_PAGE)
-      if (djvm_dir->get_files_num()==1) return SINGLE_PAGE;
-      else return BUNDLED;
-   else if (orig_doc_type==INDIRECT) return INDIRECT;
-   else if (orig_doc_type==OLD_BUNDLED || orig_doc_type==BUNDLED) return BUNDLED;
-   else return UNKNOWN_TYPE;
+      if (djvm_dir->get_files_num()==1)
+        return SINGLE_PAGE;
+      else
+        return BUNDLED;
+   else if (orig_doc_type==INDIRECT)
+     return INDIRECT;
+   else if (orig_doc_type==OLD_BUNDLED || orig_doc_type==BUNDLED)
+     return BUNDLED;
+   else
+     return UNKNOWN_TYPE;
 }
 
 inline GURL

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.h,v 1.69 2001-04-30 23:30:46 bcr Exp $
+// $Id: GString.h,v 1.70 2001-05-01 17:12:16 bcr Exp $
 // $Name:  $
 
 #ifndef _GSTRING_H_
@@ -57,7 +57,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.69 2001-04-30 23:30:46 bcr Exp $# */
+    #$Id: GString.h,v 1.70 2001-05-01 17:12:16 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -74,14 +74,15 @@
 #include <windows.h>
 #endif
 
+#ifndef UNDER_CE
 #include <wchar.h> // needed for mbstate_t
-
 #if defined(__linux__) || defined(WIN32)
 #define HAS_MBSTATE 1
 #endif
+#endif
 #ifndef HAS_MBSTATE
 typedef int mbstate_t;
-#endif // HAS_MBSTATE
+#endif
 
 // Internal string representation.
 class GStringRep : public GPEnabled

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVmDoc.cpp,v 1.46 2001-04-30 23:30:45 bcr Exp $
+// $Id: DjVmDoc.cpp,v 1.47 2001-05-01 17:12:15 bcr Exp $
 // $Name:  $
 
 
@@ -223,7 +223,7 @@ DjVmDoc::write(const GP<ByteStream> &gstr)
 
   GPosition pos;
 
-  GPList<DjVmDir::File> files_list=dir->get_files_list();
+  GPList<DjVmDir::File> files_list=dir->resolve_duplicates(true);
   for(pos=files_list;pos;++pos)
   {
     GP<DjVmDir::File> file=files_list[pos];
@@ -477,11 +477,12 @@ DjVmDoc::expand(const GURL &codebase, const GUTF8String &idx_name)
    DEBUG_MSG("DjVmDoc::expand(): Expanding into '" << codebase << "'\n");
    DEBUG_MAKE_INDENT(3);
 
-   GPosition pos;
-   
-      // First - store each file
-   GPList<DjVmDir::File> files_list=dir->get_files_list();
-   for(pos=files_list;pos;++pos)
+   // Resolve any name conflicts
+   // Find the list of all files.
+   GPList<DjVmDir::File> files_list=dir->resolve_duplicates(false);
+
+      // store each file
+   for(GPosition pos=files_list;pos;++pos)
    {
      save_file(codebase,*files_list[pos]);
    }

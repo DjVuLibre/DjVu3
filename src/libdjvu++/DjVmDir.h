@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVmDir.h,v 1.36 2001-04-30 23:30:45 bcr Exp $
+// $Id: DjVmDir.h,v 1.37 2001-05-01 17:12:15 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVMDIR_H
@@ -84,7 +84,7 @@
     @memo Implements DjVu multipage document directory
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: DjVmDir.h,v 1.36 2001-04-30 23:30:45 bcr Exp $# */
+    #$Id: DjVmDir.h,v 1.37 2001-05-01 17:12:15 bcr Exp $# */
 //@{
 
 
@@ -153,6 +153,8 @@ public:
    int get_file_pos(const File * f) const;
       /** Returns position of the given page in the directory. */
    int get_page_pos(int page_num) const;
+      /** Check for duplicate names, and resolve them. */
+   GPList<DjVmDir::File> resolve_duplicates(const bool save_as_bundled);
       /** Returns a copy of the list of file records. */
    GPList<File> get_files_list(void) const;
       /** Returns the number of file records. */
@@ -216,6 +218,10 @@ public:
      const GUTF8String &save_name, const GUTF8String &title,
      const FILE_TYPE file_type);
 
+  /** Check for filenames that are not valid for the native encoding,
+      and change them. */
+  const GUTF8String &check_save_name(const bool is_bundled);
+
   /** File name.  The optional file name must be unique and is the name
       that will be used when the document is saved to an indirect file.
       If not assigned, the value of #id# will be used for this purpose.
@@ -224,7 +230,6 @@ public:
       still have the same names, if the name is legal on a given filesystem.
     */
   const GUTF8String &get_save_name(void) const;
-  void set_save_name(const GUTF8String &name);
 
   /** File identifier.  The encoder assigns a unique identifier to each file
       in a multipage document. This is the name used when loading files.
@@ -287,6 +292,7 @@ protected:
   GUTF8String oldname;
   GUTF8String id;
   GUTF8String title; 
+  void set_save_name(const GUTF8String &name);
 private:
       friend class DjVmDir;
       enum FLAGS_0 { IS_PAGE_0=1, HAS_NAME_0=2, HAS_TITLE_0=4 };

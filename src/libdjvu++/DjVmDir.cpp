@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVmDir.cpp,v 1.40 2001-04-30 23:30:45 bcr Exp $
+// $Id: DjVmDir.cpp,v 1.41 2001-05-01 17:12:15 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -59,11 +59,11 @@ DjVmDir::File::create(const GUTF8String &load_name,
 }
 
 const GUTF8String &
-DjVmDir::File::get_save_name(void) const
+DjVmDir::File::check_save_name(const bool xis_bundled)
 {
-  GUTF8String retval=name.length()?name:id;
-  if(!valid_name)
+  if(!xis_bundled && !valid_name)
   {
+    GUTF8String retval=name.length()?name:id;
     if(GUTF8String(GNativeString(retval)) != retval)
     {
       const_cast<bool &>(valid_name)=true;
@@ -90,11 +90,17 @@ DjVmDir::File::get_save_name(void) const
         }
       }
       s++[0]=0;
-      const_cast<GUTF8String &>(oldname)=retval;
-      const_cast<GUTF8String &>(name)=buf;
+      oldname=retval;
+      name=buf;
     }
     const_cast<bool &>(valid_name)=true;
   }
+  return *(name.length()?&name:&id);
+}
+
+const GUTF8String &
+DjVmDir::File::get_save_name(void) const
+{
   return *(name.length()?&name:&id);
 }
 
@@ -113,6 +119,7 @@ void
 DjVmDir::File::set_save_name(const GUTF8String &xname)
 {
   GURL url;
+  valid_name=false;
   if(!xname.length())
   {
     GURL url=GURL::UTF8(id);
@@ -528,16 +535,15 @@ DjVmDir::title_to_file(const GUTF8String &title) const
 GPList<DjVmDir::File>
 DjVmDir::get_files_list(void) const
 {
-//bcr: I doubt this lock is needed....
-   GCriticalSectionLock lock((GCriticalSection *) &class_lock);
-   return files_list;
+  GCriticalSectionLock lock((GCriticalSection *) &class_lock);
+  return files_list;
 }
 
 int
 DjVmDir::get_files_num(void) const
 {
-   GCriticalSectionLock lock((GCriticalSection *) &class_lock);
-   return files_list.size();
+  GCriticalSectionLock lock((GCriticalSection *) &class_lock);
+  return files_list.size();
 }
 
 int
@@ -744,5 +750,51 @@ DjVmDir::set_file_title(const GUTF8String &id, const GUTF8String &title)
    title2file.del(file->title);
    file->title=title;
    title2file[title]=file;
+}
+
+GPList<DjVmDir::File>
+DjVmDir::resolve_duplicates(const bool save_as_bundled)
+{
+  GCriticalSectionLock lock((GCriticalSection *) &class_lock);
+  // Make sure all the filenames are unique.
+  GPosition pos;
+  GMap<GUTF8String,void *> save_map;
+  GMap<GUTF8String,GPList<DjVmDir::File> > conflicts;
+  for(pos=files_list;pos;++pos)
+  {
+    const GUTF8String save_name=files_list[pos]->check_save_name(save_as_bundled).downcase();
+    if(save_map.contains(save_name))
+    {
+      conflicts[save_name].append(files_list[pos]);
+    }else
+    {
+      save_map[save_name]=0;
+    }
+  }
+  for(pos=conflicts;pos;++pos)
+  {
+    const GUTF8String &save_name=conflicts.key(pos);
+    const int dot=save_name.rsearch('.',0);
+    GPList<DjVmDir::File> &cfiles=conflicts[pos];
+    int count=1;
+    for(GPosition qpos=cfiles;qpos;++qpos)
+    {
+      GUTF8String new_name=cfiles[qpos]->get_load_name();
+      if((new_name != GUTF8String(GNativeString(new_name)))
+        ||conflicts.contains(new_name))
+      {
+        do
+        {
+          new_name=(dot<0)
+            ?(save_name+"-"+GUTF8String(count++))
+            :(save_name.substr(0,dot)+"-"+GUTF8String(count++)+
+              save_name.substr(dot,(unsigned int)(-1)));
+        } while(save_map.contains(new_name.downcase()));
+      }
+      cfiles[qpos]->set_save_name(new_name);
+      save_map[new_name]=0;
+    }
+  }
+  return files_list;
 }
 
