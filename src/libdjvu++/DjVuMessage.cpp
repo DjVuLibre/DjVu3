@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessage.cpp,v 1.28 2001-04-04 22:12:11 bcr Exp $
+// $Id: DjVuMessage.cpp,v 1.29 2001-04-06 17:17:16 bcr Exp $
 // $Name:  $
 
 
@@ -205,10 +205,10 @@ GetProfilePaths(void)
       if(!path.is_empty() && path.is_dir())
         paths.append(path);
     }
-    if(pw)
-    {
-      free(pw);
-    }
+//    if(pw)
+//    {
+//      free(pw);
+//    }
 #endif
     path=GURL::Filename::UTF8(RootDjVuDir);
     if(!path.is_empty() && path.is_dir())
@@ -333,7 +333,7 @@ void
 DjVuMessage::perror( const GString & MessageList ) const
 {
   GString mesg=LookUp(MessageList);
-  DjVuPrintError("%s",mesg);
+  DjVuPrintError("%s",(const char *)mesg);
 }
 
 
