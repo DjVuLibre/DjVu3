@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GURL.h,v 1.21 2000-01-25 20:08:59 eaf Exp $
+//C- $Id: GURL.h,v 1.22 2000-01-26 22:11:52 eaf Exp $
 
 #ifndef _GURL_H_
 #define _GURL_H_
@@ -27,7 +27,7 @@
     \Ref{GURL} class used to store URLs in a system independent format.
     @memo System independent URL representation.
     @author Andrei Erofeev <eaf@research.att.com>
-    @version #$Id: GURL.h,v 1.21 2000-01-25 20:08:59 eaf Exp $#
+    @version #$Id: GURL.h,v 1.22 2000-01-26 22:11:52 eaf Exp $#
 */
 
 //@{
@@ -142,12 +142,17 @@ public:
 	  URL and clears everything after the last slash. */
    GURL		base(void) const;
 
-      /** Returns the name part of this URL with escape sequences expanded.
-	  Some characters are not allowed in URLs, while they're perfectly
-	  legal for file names. These should have been encoded in the URL using
-	  {\em escape sequences} in the form #%XX#.
-	  See \Ref{GOS::encode_reserved}() for details. */
+      /** Returns the name part of this URL.
+	  For example, if the URL is #http://www.djvu.com/file%201.djvu# then
+          this function will return #file%201.djvu#. \Ref{fname}() will
+          return #file 1.djvu# at the same time. */
    GString	name(void) const;
+
+      /** Returns the name part of this URL with escape sequences expanded.
+	  For example, if the URL is #http://www.djvu.com/file%201.djvu# then
+          this function will return #file 1.djvu#. \Ref{name}() will
+          return #file%201.djvu# at the same time. */
+   GString	fname(void) const;
 
       /// Returns the extention part of name of document in this URL.
    GString	extension(void) const;
@@ -162,9 +167,7 @@ public:
 	  Concatenate the GURL with the passed {\em name}. If the {\em name}
 	  is absolute (has non empty protocol prefix), we just return
 	  #GURL(name)#. Otherwise the #name# is appended to the GURL after a
-	  separating slash preserving possible URL suffixes following #;# or #?#.
-	  All illegal characters in #name# are encoded as described in
-	  \Ref{GOS::encode_reserved}().
+	  separating slash.
       */
       //@{
       ///
