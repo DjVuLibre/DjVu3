@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.120 2001-07-20 23:44:27 bcr Exp $
+// $Id: GString.cpp,v 1.121 2001-07-24 16:33:11 mchen Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -475,6 +475,7 @@ GStringRep::tocase(
       }else
       {
         mbstate_t ps;
+        memset(&ps,0,sizeof(mbstate_t));
         buf_ptr=UCS4toString(xtowcase(w),buf_ptr,&ps);
       }
     }
@@ -1043,6 +1044,7 @@ GStringRep::UTF8::toNative(const EscapeMode escape) const
     GPBuffer<unsigned char> gbuf(buf,12*length+12); 
     unsigned char *r=buf;
     mbstate_t ps;
+    memset(&ps,0,sizeof(mbstate_t));
     for(const unsigned char *s=(const unsigned char *)data;(s<eptr)&& *s;)
     {
       const unsigned long w0=UTF8toUCS4(s,eptr);
@@ -1790,7 +1792,8 @@ GStringRep::Native::toUTF8(const bool) const
     const char *source=data;
     mbstate_t ps;
     unsigned char *ptr=buf;
-    (void)mbrlen(source, n, &ps);
+    //(void)mbrlen(source, n, &ps);
+    memset(&ps,0,sizeof(mbstate_t));
     int i=0;
     if(sizeof(wchar_t) == sizeof(unsigned long))
     {
@@ -2028,7 +2031,8 @@ GStringRep::Native::getValidUCS4(const char *&source) const
   if(source && (n > 0))
   {
     mbstate_t ps;
-    (void)mbrlen(source, n, &ps);
+    //(void)mbrlen(source, n, &ps);
+    memset(&ps,0,sizeof(mbstate_t));
     wchar_t wt;
     const int len=mbrtowc(&wt,source,n,&ps); 
     if(len>=0)
@@ -2078,7 +2082,8 @@ GStringRep::Native::is_valid(void) const
     size_t n=size;
     const char *s=data;
     mbstate_t ps;
-    (void)mbrlen(s, n, &ps);
+    //(void)mbrlen(s, n, &ps);
+    memset(&ps,0,sizeof(mbstate_t));
     do
     {
       size_t m=mbrlen(s,n,&ps);
