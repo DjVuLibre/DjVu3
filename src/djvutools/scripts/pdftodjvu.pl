@@ -32,7 +32,7 @@
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #C- 
 #
-# $Id: pdftodjvu.pl,v 1.6 2001-05-15 00:46:25 debs Exp $
+# $Id: pdftodjvu.pl,v 1.7 2001-05-16 16:11:51 debs Exp $
 # $Name:  $
 
 # Perl libs to use
@@ -55,8 +55,13 @@ $curdir =~ s,/,$slash,g;
 
 # max number of djvu files which can be bundled (this is to support a 
 # workaround for a # known limitation of DjVu Enterprise for Win32)
-$max_bundle = 5;
-$max_files = 10;
+if ( $ENV{'PDFTODJVU_DEBUG'} ) {
+  $max_bundle = 5;
+  $max_files = 10;
+} else {
+  $max_bundle = 250;
+  $max_files = 500;
+}
 $max_ifiles = $max_files / $max_bundle;
 $_ = $max_ifiles;
 if ( /\./ ) { $max_ifiles = sprintf("%d", ++$max_ifiles); }
