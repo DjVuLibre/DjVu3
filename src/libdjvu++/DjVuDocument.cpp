@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocument.cpp,v 1.183 2001-07-25 19:53:02 fcrary Exp $
+// $Id: DjVuDocument.cpp,v 1.184 2001-07-25 23:52:11 bcr Exp $
 // $Name:  $
 
 
@@ -1765,7 +1765,7 @@ DjVuDocument::save_as(const GURL &where, const bool bundled)
    }
 }
 
-static const char prolog[]="<?XML?>\n<!DOCTYPE DjVuXML PUBLIC \"-//W3C//DTD DjVuXML 1.1//EN\" \"pubtext/DjVuXML-s.dtd\">\n<DjVuXML>\n<HEAD>";
+static const char prolog[]="<?xml version=\"1.0\" ?>\n<!DOCTYPE DjVuXML PUBLIC \"-//W3C//DTD DjVuXML 1.1//EN\" \"pubtext/DjVuXML-s.dtd\">\n<DjVuXML>\n<HEAD>";
 static const char start_xml[]="</HEAD>\n<BODY>\n";
 static const char end_xml[]="</BODY>\n</DjVuXML>\n";
 
