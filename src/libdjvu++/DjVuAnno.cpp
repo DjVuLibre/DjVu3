@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuAnno.cpp,v 1.41 1999-11-02 16:41:00 eaf Exp $
+//C- $Id: DjVuAnno.cpp,v 1.42 1999-11-04 20:32:18 eaf Exp $
 
 
 #ifdef __GNUC__
@@ -960,7 +960,7 @@ const char DjVuTXT::end_of_region    = 035;      // GS: Group Separator
 const char DjVuTXT::end_of_paragraph = 037;      // US: Unit Separator
 const char DjVuTXT::end_of_line      = 012;      // LF: Line Feed
 
-const int DjVuTXT::Zone::version  = 0;
+const int DjVuTXT::Zone::version  = 1;
 
 DjVuTXT::Zone::Zone()
   : ztype(DjVuTXT::PAGE), text_start(0), text_length(0)
@@ -1048,52 +1048,112 @@ DjVuTXT::Zone::memuse() const
 
 #ifndef NEED_DECODER_ONLY
 void 
-DjVuTXT::Zone::encode(ByteStream &bs) const
+DjVuTXT::Zone::encode(ByteStream &bs, const Zone * parent, const Zone * prev) const
 {
-  // Encode type
-  bs.write8(ztype);
-  // Encode rectangle
-  bs.write24(rect.xmin);
-  bs.write24(rect.xmax);
-  bs.write24(rect.ymin);
-  bs.write24(rect.ymax);
-  // Encode text info
-  bs.write24(text_start);
-  bs.write24(text_length);
-  // Encode number of children
-  bs.write24(children.size());
-  // Encode all children
-  for (GPosition i=children; i; ++i)
-    children[i].encode(bs);
+      // Encode type
+   bs.write8(ztype);
+
+      // Modify text_start and bounding rectangle based on the context
+      // (whether there is a previous non-zero same-level-child or parent)
+   int start=text_start;
+   int x=rect.xmin, y=rect.ymin;
+   int width=rect.width(), height=rect.height();
+   if (prev)
+   {
+      if (ztype==PAGE || ztype==PARAGRAPH || ztype==LINE)
+      {
+	    // Encode offset from the lower left corner of the previous
+	    // child in the coord system in that corner with x to the
+	    // right and y down
+	 x=x-prev->rect.xmin;
+	 y=prev->rect.ymin-(y+height);
+      } else // Either COLUMN or WORD or CHARACTER
+      {
+	    // Encode offset from the lower right corner of the previous
+	    // child in the coord system in that corner with x to the
+	    // right and y up
+	 x=x-prev->rect.xmax;
+	 y=y-prev->rect.ymin;
+      }
+      start-=prev->text_start+prev->text_length;
+   } else if (parent)
+   {
+	 // Encode offset from the upper left corner of the parent
+	 // in the coord system in that corner with x to the right and y down
+      x=x-parent->rect.xmin;
+      y=parent->rect.ymax-(y+height);
+      start-=parent->text_start;
+   }
+      // Encode rectangle
+   bs.write16(0x8000+x);
+   bs.write16(0x8000+y);
+   bs.write16(0x8000+width);
+   bs.write16(0x8000+height);
+      // Encode text info
+   bs.write16(0x8000+start);
+   bs.write24(text_length);
+      // Encode number of children
+   bs.write24(children.size());
+  
+   const Zone * prev_child=0;
+      // Encode all children
+   for (GPosition i=children; i; ++i)
+   {
+      children[i].encode(bs, this, prev_child);
+      prev_child=&children[i];
+   }
 }
 #endif
 
 void 
-DjVuTXT::Zone::decode(ByteStream &bs, int maxtext)
+DjVuTXT::Zone::decode(ByteStream &bs, int maxtext,
+		      const Zone * parent, const Zone * prev)
 {
-  // Decode type
-  ztype = (ZoneType) bs.read8();
-  if ( ztype<PAGE || ztype>CHARACTER )
-    THROW("Corrupted text zone hierarchy");
-  // Decode rectangle
-  rect.xmin = bs.read24();
-  rect.xmax = bs.read24();
-  rect.ymin = bs.read24();
-  rect.ymax = bs.read24();
-  // Decode text info
-  text_start = bs.read24();
-  text_length = bs.read24();
-  // Get children size
-  int size = bs.read24();
-  // Checks
-  if (rect.isempty() || text_start<0 || text_start+text_length>maxtext )
-    THROW("Corrupted text zone hierarchy");
-  // Process children
-  children.empty();
-  while (size-- > 0) {
-    Zone *z = append_child();
-    z->decode(bs, maxtext);
-  }
+      // Decode type
+   ztype = (ZoneType) bs.read8();
+   if ( ztype<PAGE || ztype>CHARACTER )
+      THROW("Corrupted text zone hierarchy");
+      // Decode coordinates
+   int x=(int) bs.read16()-0x8000;
+   int y=(int) bs.read16()-0x8000;
+   int width=(int) bs.read16()-0x8000;
+   int height=(int) bs.read16()-0x8000;
+      // Decode text info
+   text_start = (int) bs.read16()-0x8000;
+   text_length = bs.read24();
+   if (prev)
+   {
+      if (ztype==PAGE || ztype==PARAGRAPH || ztype==LINE)
+      {
+	 x=x+prev->rect.xmin;
+	 y=prev->rect.ymin-(y+height);
+      } else // Either COLUMN or WORD or CHARACTER
+      {
+	 x=x+prev->rect.xmax;
+	 y=y+prev->rect.ymin;
+      }
+      text_start+=prev->text_start+prev->text_length;
+   } else if (parent)
+   {
+      x=x+parent->rect.xmin;
+      y=parent->rect.ymax-(y+height);
+      text_start+=parent->text_start;
+   }
+   rect=GRect(x, y, width, height);
+
+      // Get children size
+   int size = bs.read24();
+      // Checks
+   if (rect.isempty() || text_start<0 || text_start+text_length>maxtext )
+      THROW("Corrupted text zone hierarchy");
+      // Process children
+   const Zone * prev_child=0;
+   children.empty();
+   while (size-- > 0) {
+      Zone *z = append_child();
+      z->decode(bs, maxtext, this, prev_child);
+      prev_child=z;
+   }
 }
 
 void 
@@ -1150,7 +1210,7 @@ DjVuTXT::decode(ByteStream &bs)
   if ( bs.read( (void*) &version, 1 ) == 1) 
     {
       if (version != Zone::version)
-        THROW("Unsupported version tag in text zone information");
+        THROW("Version "+GString(version)+" of text zone information is not supported.");
       main.decode(bs, textsize);
     }
 }

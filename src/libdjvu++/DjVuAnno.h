@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuAnno.h,v 1.20 1999-11-02 16:41:00 eaf Exp $
+//C- $Id: DjVuAnno.h,v 1.21 1999-11-04 20:32:18 eaf Exp $
 
 #ifndef _DJVUANNO_H
 #define _DJVUANNO_H
@@ -36,7 +36,7 @@
     @memo Implements support for DjVuImage annotations
     @author Andrei Erofeev <eaf@research.att.com>
     @version
-    #$Id: DjVuAnno.h,v 1.20 1999-11-02 16:41:00 eaf Exp $# */
+    #$Id: DjVuAnno.h,v 1.21 1999-11-04 20:32:18 eaf Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -194,8 +194,9 @@ public:
     void normtext(const char *instr, GString &outstr);
     unsigned int memuse() const;
     static const int version;
-    void encode(ByteStream &bs) const;
-    void decode(ByteStream &bs, int maxtext);
+    void encode(ByteStream &bs, const Zone * parent=0, const Zone * prev=0) const;
+    void decode(ByteStream &bs, int maxtext,
+		const Zone * parent=0, const Zone * prev=0);
   };
   /** Textual data for this page.  
       The content of this string is encoded using the UTF8 code.
