@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.10 1999-06-08 20:36:24 leonb Exp $
+//C- $Id: DjVuDocument.cpp,v 1.11 1999-06-08 20:43:27 leonb Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -20,8 +20,6 @@
 #include "GOS.h"
 #include "DjVmFile.h"
 #include "debug.h"
-
-#include <unistd.h>
 
 DjVuDocument::DjVuDocument(DjVuPort * xport) : cache(0), simple_port(0),
    readonly(0), dummy_dir(0), djvm(0)
@@ -412,7 +410,7 @@ DjVuDocument::check_nav_structure(void)
 	 iff.close_chunk();
 	 iff.close_chunk();
 	 dir_file=new DjVuFile(GOS::filename_to_url(name));
-	 unlink(name);
+	 GOS::deletefile(name);
 
 	    // Now assign it a decent name
 	 GURL url=dir->page_to_url(0);
