@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: JB2Image.cpp,v 1.13 1999-07-20 15:52:50 leonb Exp $
+//C- $Id: JB2Image.cpp,v 1.14 1999-08-12 18:42:05 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -161,7 +161,7 @@ JB2Dict::set_inherited_dict(GP<JB2Dict> dict)
   if (inherited_dict)
     THROW("Cannot change dictionary once set");
   inherited_dict = dict;
-  inherited_shapes = dict->get_shape_count();
+  inherited_shapes = (dict ? dict->get_shape_count() : 0);
 }
 
 void
