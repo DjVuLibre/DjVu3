@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuGlobal.h,v 1.55 2001-06-13 18:26:19 bcr Exp $
+// $Id: DjVuGlobal.h,v 1.56 2001-07-06 17:19:36 fcrary Exp $
 // $Name:  $
 
 #ifndef _DJVUGLOBAL_H
@@ -86,7 +86,7 @@
     @memo
     Global definitions.
     @version
-    #$Id: DjVuGlobal.h,v 1.55 2001-06-13 18:26:19 bcr Exp $#
+    #$Id: DjVuGlobal.h,v 1.56 2001-07-06 17:19:36 fcrary Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> -- empty file.\\
     Bill Riemers <bcr@lizardtech.com> -- real work.  */
@@ -214,7 +214,7 @@ operator delete [] (void *addr) delete_throw_spec
     \begin{description}
     \item[DJVU_PROGRESS_TASK(name,task,nsteps)]  indicates that the current
          scope performs a task roughly divided in #nsteps# equal steps, with
-	 the specified #task# string used in the callback.
+	       the specified #task# string used in the callback.
     \item[DJVU_PROGRESS_RUN(name,tostep)] indicates that we are starting
          an operation which will take us to step #tostep#.  The operation
          will be considered finished when #DJVU_PROGRESS_RUN# will be called
