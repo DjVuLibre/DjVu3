@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.8 1999-06-09 21:24:20 leonb Exp $
+//C- $Id: DjVuFile.cpp,v 1.9 1999-06-10 23:30:49 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -297,6 +297,8 @@ DjVuFile::decode_func(void)
       decode_stream=decode_data_range->get_stream();
       ProgressByteStream pstr(decode_stream);
       pstr.set_progress_cb(progress_cb, this);
+      decode_thread_started_ev.set();
+      
       decode(pstr);
 
 	 // Wait for all child files to finish
@@ -708,7 +710,12 @@ DjVuFile::start_decode(void)
 	 decode_thread=new GThread();
 	 decode_life_saver=this;	// To prevent unexpected destruction
 	 decode_thread->create(static_decode_func, this);
-      };
+
+	    // We want to wait until the other thread actually starts.
+	    // One of the reasons is that if somebody tries to terminate the decoding
+	    // before its thread actually starts, it will NOT be terminated
+	 decode_thread_started_ev.wait();
+      }
    } CATCH(exc) {
       status&=~DECODING;
       status|=DECODE_FAILED;
