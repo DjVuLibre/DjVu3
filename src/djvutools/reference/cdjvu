@@ -1,0 +1,35 @@
+#!/bin/sh 
+# Copyright (c) 2000 AT&T -- All Rights Reserved
+# Written 01/00 by Patrick Haffner
+
+ppmfile=$1
+djvufile=$2
+if [ -z "$1" -o -z "$2" -o -n "$3" ]
+then
+    echo 1>&2 "Usage: cdjvu <ppmfile> <djvufile>"
+    echo 1>&2 " Simple script for encoding compound DjVu files."
+    echo 1>&2 " Not the real thing!."
+    exit 10
+fi
+
+# Setup root name of tmporary files
+tmp=${TMPDIR:-/tmp}/cdjvu$$
+trap 'rm -f "$tmp"*' 0 2 3
+
+# Display command while executing
+run() {
+ echo 1>&2 "  $1"
+ eval $1 
+} 
+
+echo 1>&2 "-- Compute a binary mask"
+run "ppmtopgm $ppmfile > $tmp.pgm"
+run "pgmtopbm -threshold $tmp.pgm > $tmp.pbm"
+
+echo 1>&2 "-- Perform jb2 compression"
+run "cjb2 -loose -clean $tmp.pbm $tmp.djvu"
+
+echo 1>&2 "-- Subsample, mask and assemble DjVu file."
+run "djvumake $djvufile Sjbz=$tmp.djvu PPM=$ppmfile"
+
+echo 1>&2 "-- Finished."
