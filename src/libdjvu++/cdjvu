@@ -1,0 +1,28 @@
+#!/bin/sh
+#
+# Copyright (c) 2000 AT&T
+# All Rights Reserved
+# written 01/00 by Patrick Haffner
+
+# Setup root name of temporary files
+temp=${TMPDIR:-/tmp}/cdj$$
+# Ensure temporary files are deleted 
+trap 'rm -f "$temp"*; exit 1' 2 3
+
+
+# Display command while executing
+run()
+{
+        echo 1>&2 $1
+        eval $1
+}
+
+# compute the binary mask from the color image
+run "ppmtopgm $1 | pgmtopbm -threshold > $temp.pbm"
+
+# JB2 compression
+run "cjb2 -loose -clean $temp.pbm $temp.djvu"
+run "djvuextract  $temp.djvu Sjbz=$temp.jb2"
+
+# masksub and djvumake
+run "djvumake $2 Sjbz=$temp.jb2 ppm=$1"
