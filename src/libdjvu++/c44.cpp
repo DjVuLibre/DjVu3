@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: c44.cpp,v 1.5 1999-02-03 22:55:30 leonb Exp $
+//C-  $Id: c44.cpp,v 1.6 1999-02-15 23:26:05 leonb Exp $
 
 
 /** @name c44
@@ -119,8 +119,8 @@
     \item[-mask pbmfile] 
     This option can be used when we know that certain pixels of a background
     image are going to be covered by foreground objects like text or drawings.
-    File mask must be a PBM file whose size matches the size of the input
-    file.  Each black pixel in mask means that the value of the corresponding
+    File #pbmfile# must be a PBM file whose size matches the size of the input
+    file.  Each black pixel in #pbmfile# means that the value of the corresponding
     pixel in the input file is irrelevant.  The DjVu IW44 Encoder will replace
     the masked pixels by a color value whose coding cost is minimal (see
     \URL{http://www.research.att.com/~leonb/DJVU/mask}).
@@ -148,7 +148,7 @@
     @author
     Leon Bottou <leonb@research.att.com>
     @version
-    #$Id: c44.cpp,v 1.5 1999-02-03 22:55:30 leonb Exp $# */
+    #$Id: c44.cpp,v 1.6 1999-02-15 23:26:05 leonb Exp $# */
 //@{
 //@}
 
