@@ -9,11 +9,24 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuGlobal.h,v 1.24 2000-01-04 16:23:44 bcr Exp $
+//C- $Id: DjVuGlobal.h,v 1.25 2000-01-04 20:01:47 bcr Exp $
 
 
 #ifndef _DJVUGLOBAL_H
 #define _DJVUGLOBAL_H
+
+#ifndef DJVU_STATIC_LIBRARY
+#ifdef WIN32 
+#define DLLIMPORT __declspec(dllimport)
+#define DLLEXPORT __declspec(dllexport)
+#else
+#define DLLIMPORT /**/
+#define DLLEXPORT /**/
+#endif
+#else /* DJVU_STATIC_LIBRARY */
+#define DLLIMPORT /**/
+#define DLLEXPORT /**/
+#endif /* DJVU_STATIC_LIBRARY */
 
 /** @name DjVuGlobal.h 
 
@@ -27,7 +40,7 @@
     @memo
     Global definitions.
     @version
-    #$Id: DjVuGlobal.h,v 1.24 2000-01-04 16:23:44 bcr Exp $#
+    #$Id: DjVuGlobal.h,v 1.25 2000-01-04 20:01:47 bcr Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> -- empty file.\\
     Bill Riemers <bcr@sanskrit.lz.att.com> -- real work.  */
@@ -51,7 +64,7 @@
 // We also define these typedefs in the API header file.
 //
 #ifndef HAS_DJVU_CALLBACKS
-#define HAS_DJVU_BALLBACKS
+#define HAS_DJVU_CALLBACKS
 extern "C"
 {
   typedef void djvu_free_callback (void *);
@@ -103,17 +116,17 @@ int djvu_memoryArray_callback ( djvu_delete_callback*, djvu_new_callback*);
 #endif  /* delete_throw_spec */
 
 // Replacement functions.
-void * _djvu_new(size_t);
-void * _djvu_newArray(size_t);
-void _djvu_delete(void *);
-void _djvu_deleteArray(void *);
+DLLEXPORT void * _djvu_new(size_t);
+DLLEXPORT void * _djvu_newArray(size_t);
+DLLEXPORT void _djvu_delete(void *);
+DLLEXPORT void _djvu_deleteArray(void *);
 
 // We also need classic memory functions, for routines that need realloc.
 //
-void *_djvu_malloc(size_t);
-void *_djvu_calloc(size_t, size_t);
-void *_djvu_realloc(void*, size_t);
-void _djvu_free(void*);
+DLLEXPORT void *_djvu_malloc(size_t);
+DLLEXPORT void *_djvu_calloc(size_t, size_t);
+DLLEXPORT void *_djvu_realloc(void*, size_t);
+DLLEXPORT void _djvu_free(void*);
 
 
 #ifdef UNIX
@@ -161,6 +174,13 @@ operator delete [] (void *addr) delete_throw_spec
 
 #endif /* UNIX */
 
+#else
+
+#define _djvu_free(ptr) free((ptr))
+#define _djvu_malloc(siz) malloc((siz))
+#define _djvu_realloc(ptr,siz) realloc((ptr),(siz))
+#define _djvu_calloc(siz,items) calloc((siz),(items))
+
 #endif /* NEED_DJVU_MEMORY */
 
 
@@ -204,7 +224,8 @@ extern "C"
 {
   typedef void
   djvu_progress_callback (const char *task,unsigned long,unsigned long);
-  djvu_progress_callback *djvu_set_progress_callback(djvu_progress_callback *);
+  DLLEXPORT djvu_progress_callback *
+  djvu_set_progress_callback(djvu_progress_callback *);
 };
 
 #ifdef NEED_DJVU_PROGRESS

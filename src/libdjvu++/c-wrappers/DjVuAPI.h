@@ -1,4 +1,4 @@
-/* File "$Id: DjVuAPI.h,v 1.14 2000-01-04 05:31:30 bcr Exp $"
+/* File "$Id: DjVuAPI.h,v 1.15 2000-01-04 20:01:46 bcr Exp $"
  *
  * The main header file for the DjVu API
  */
@@ -8,7 +8,10 @@
 
 /* 
  * $Log: DjVuAPI.h,v $
- * Revision 1.14  2000-01-04 05:31:30  bcr
+ * Revision 1.15  2000-01-04 20:01:46  bcr
+ * Made streams resumable, and fixed a few minor bugs.
+ *
+ * Revision 1.14  2000/01/04 05:31:30  bcr
  * Refinement of previous patch, so we don't have unused variables.
  *
  * Revision 1.13  2000/01/04 04:48:37  bcr
@@ -755,21 +758,17 @@ typedef enum {
  *
  * 	See DjVuAPI-2_0.html#djvu_error_callback
  */
-#ifndef _API_GLOBAL_H__
-
 typedef void
 djvu_error_callback ( const char cause[], const char file[], const int line);
 typedef void
 djvu_progress_callback (const char [],unsigned long,unsigned long);
-typedef void 
-djvu_free_callback(void *);
-typedef void *
-djvu_realloc_callback(void *,size_t);
-typedef void *
-djvu_malloc_callback(size_t);
-typedef void *
-djvu_calloc_callback(size_t,size_t);
-#endif /* _API_GLOBAL_H__ */
+#ifndef HAS_DJVU_CALLBACKS
+#define HAS_DJVU_CALLBACKS
+  typedef void djvu_free_callback (void *);
+  typedef void *djvu_realloc_callback (void *, size_t);
+  typedef void *djvu_malloc_callback (size_t);
+  typedef void *djvu_calloc_callback (size_t,size_t);
+#endif
 
 /* DjVu Error Handling
  *
