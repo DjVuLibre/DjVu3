@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.108 2000-01-28 02:46:02 praveen Exp $
+//C- $Id: DjVuDocument.cpp,v 1.109 2000-02-05 22:22:02 bcr Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -183,12 +183,10 @@ DjVuDocument::init_thread(void)
    GString chkid;
    int size=iff.get_chunk(chkid);
    if (size==0) THROW("EOF");
-   if (size<0 || size>10*1024*1024)
-      THROW("Not a DjVu file.\n\n"
-	    "Either the requested file does not exist,\n"
-	    "or it exists but its type is not supported\n"
-	    "by the DjVu plugin.");
-
+   if (size < 0)
+      THROW("The requested file does not exist.");
+   if (size<8)
+      THROW("The requested input is not a DjVu File");
    if (chkid=="FORM:DJVM")
    {
       DEBUG_MSG("Got DJVM document here\n");
@@ -1442,8 +1440,9 @@ DjVuDocument::write(ByteStream & str, bool force_djvm)
    GP<DjVmDoc> doc=get_djvm_doc();
    GP<DjVmDir> dir=doc->get_djvm_dir();
    if (force_djvm || dir->get_files_num()>1)
+   {
      doc->write(str);
-   else
+   }else
    {
       GPList<DjVmDir::File> files_list=dir->get_files_list();
       GP<DataPool> pool=doc->get_data(files_list[files_list]->id);
@@ -1477,6 +1476,9 @@ DjVuDocument::save_as(const char where[], const bool bundled)
       DataPool::load_file(full_name);
       StdioByteStream str(full_name, "wb");
       write(str);
-   } else expand(GOS::dirname(full_name), GOS::basename(full_name));
+   } else 
+   {
+     expand(GOS::dirname(full_name), GOS::basename(full_name));
+   }
 }
 

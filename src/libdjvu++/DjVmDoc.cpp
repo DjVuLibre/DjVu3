@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVmDoc.cpp,v 1.21 2000-01-14 16:22:29 eaf Exp $
+//C- $Id: DjVmDoc.cpp,v 1.22 2000-02-05 22:22:02 bcr Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -35,14 +35,17 @@ DjVmDoc::insert_file(DjVmDir::File * f, GP<DataPool> data_pool, int pos)
 	     "' at pos " << pos << "\n");
    DEBUG_MAKE_INDENT(3);
 
-   if (!f) THROW("Can't insert ZERO file.");
-   if (data.contains(f->id)) THROW("Attempt to insert the same file twice.");
+   if (!f)
+     THROW("Can't insert ZERO file.");
+   if (data.contains(f->id))
+     THROW("Attempt to insert the same file twice.");
 
    char buffer[4];
    if (data_pool->get_data(buffer, 0, 4)==4 &&
        !memcmp(buffer, "AT&T", 4))
+   {
       data_pool=new DataPool(data_pool, 4, -1);
-   
+   } 
    data[f->id]=data_pool;
    dir->insert_file(f, pos);
 }
@@ -107,7 +110,8 @@ DjVmDoc::write(ByteStream & str)
       if (!data.contains(file->id, data_pos))
 	 THROW("Strange: there is no data for file '"+file->id+"'\n");
       file->size=data[data_pos]->get_length();
-      if (!file->size) THROW("Strange: File size is zero.");
+      if (!file->size)
+         THROW("Strange: File size is zero.");
    }
    
    MemoryByteStream tmp_str;

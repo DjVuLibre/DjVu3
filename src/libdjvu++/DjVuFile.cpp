@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.110 2000-02-02 21:08:58 eaf Exp $
+//C- $Id: DjVuFile.cpp,v 1.111 2000-02-05 22:22:02 bcr Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -475,7 +475,17 @@ DjVuFile::process_incl_chunk(ByteStream & str, int file_num)
       }
       
 	 // No. We have to request a new file
-      GP<DjVuFile> file=(DjVuFile *) pcaster->id_to_file(this, incl_str).get();
+      GP<DjVuFile> file;
+      TRY
+      {
+        file=(DjVuFile *)pcaster->id_to_file(this, incl_str).get();
+      }
+      CATCH(ex)
+      {
+        unlink_file(incl_str);
+        RETHROW;
+      }
+      ENDCATCH;
       if (!file)
       {
 	 const char mesg[]="Internal error: id_to_file(%1.1023s) did not create any file.";
@@ -483,13 +493,17 @@ DjVuFile::process_incl_chunk(ByteStream & str, int file_num)
 	 sprintf(buf,mesg,(const char *)incl_str);
 	 THROW(buf);
       }
-      if (recover_errors!=ABORT) file->set_recover_errors(recover_errors);
-      if (verbose_eof) file->set_verbose_eof(verbose_eof);
+      if (recover_errors!=ABORT)
+        file->set_recover_errors(recover_errors);
+      if (verbose_eof)
+        file->set_verbose_eof(verbose_eof);
       pcaster->add_route(file, this);
       
 	 // We may have been stopped. Make sure the child will be stopped too.
-      if (flags & STOPPED) file->stop(false);
-      if (flags & BLOCKED_STOPPED) file->stop(true);
+      if (flags & STOPPED)
+        file->stop(false);
+      if (flags & BLOCKED_STOPPED)
+        file->stop(true);
 
 	 // Lock the list again and check if the file has already been
 	 // added by someone else
@@ -497,11 +511,20 @@ DjVuFile::process_incl_chunk(ByteStream & str, int file_num)
 	 GCriticalSectionLock lock(&inc_files_lock);
 	 GPosition pos;
 	 for(pos=inc_files_list;pos;++pos)
-	    if (inc_files_list[pos]->url.fname()==incl_url.fname()) break;
-	 if (pos) file=inc_files_list[pos];
-	 else if (file_num<0 || !(pos=inc_files_list.nth(file_num)))
+         {
+	    if (inc_files_list[pos]->url.fname()==incl_url.fname())
+              break;
+         }
+	 if (pos)
+         {
+           file=inc_files_list[pos];
+	 }else if (file_num<0 || !(pos=inc_files_list.nth(file_num)))
+         {
 	    inc_files_list.append(file);
-	 else inc_files_list.insert_before(pos, file);
+	 }else 
+         {
+           inc_files_list.insert_before(pos, file);
+         }
 		
       }
       return file;
@@ -566,7 +589,17 @@ DjVuFile::process_incl_chunks(void)
          {
             chunks++;
 	    if (chkid=="INCL")
-              process_incl_chunk(iff, incl_cnt++);
+            {
+              TRY
+              {
+                process_incl_chunk(iff, incl_cnt++);
+              }
+              CATCH(ex);
+              {
+                report_error(ex,(recover_errors <= SKIP_PAGES));
+              }
+              ENDCATCH;
+            }
 	    iff.seek_close_chunk();
          }
          if (chunks_number < 0) chunks_number=last_chunk;
@@ -616,9 +649,11 @@ DjVuFile::get_fgjd(int block)
 	 }
       }
 	 // Exit if non-blocking mode
-      if (! block) break;
+      if (! block)
+        break;
 	 // Exit if there is no decoding activity
-      if (! active) break;
+      if (! active)
+        break;
 	 // Wait until a new chunk gets decoded
       wait_for_chunk();
    }
@@ -1277,11 +1312,13 @@ DjVuFile::get_merged_anno(const GP<DjVuFile> & file,
 	       if (chkid=="INCL")
 	       {
 		  GP<DjVuFile> inc_file=file->process_incl_chunk(iff);
-		  if (inc_file) get_merged_anno(inc_file, str_out, map);
+		  if (inc_file)
+                    get_merged_anno(inc_file, str_out, map);
 	       } 
                else if (chkid=="FORM:ANNO")
 	       {
-		  if (str_out.tell() & 1) str_out.write((void *) "", 1);
+		  if (str_out.tell() & 1)
+                    str_out.write((void *) "", 1);
 		  str_out.copy(iff);
 	       } 
                else if (is_annotation(chkid)) // but not FORM:ANNO
@@ -1605,8 +1642,10 @@ DjVuFile::add_djvu_data(IFFByteStream & ostr, GMap<GURL, void *> & map,
           GP<DjVuFile> file = process_incl_chunk(iff);
           if (file)
           {
-            if(recover_errors!=ABORT) file->set_recover_errors(recover_errors);
-            if(verbose_eof) file->set_verbose_eof(verbose_eof);
+            if(recover_errors!=ABORT)
+              file->set_recover_errors(recover_errors);
+            if(verbose_eof)
+              file->set_verbose_eof(verbose_eof);
             file->add_djvu_data(ostr, map, included_too, no_ndir);
           }
         } 

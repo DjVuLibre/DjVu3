@@ -6,12 +6,12 @@
 //C- Corp. ("AT&T"). A copy of AT&T's Source Code Agreement is available at
 //C- AT&T's Internet website having the URL <http://www.djvu.att.com/open>.
 //C- If you received this software without first entering into a license with
-//C- AT&T, you have an infringing copy of this software and cannot use it
+//C- AT&T, you have an infringing copy of this software and can not use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: ByteStream.cpp,v 1.20 2000-01-23 22:20:14 eaf Exp $
+//C- $Id: ByteStream.cpp,v 1.21 2000-02-05 22:22:02 bcr Exp $
 
-// File "$Id: ByteStream.cpp,v 1.20 2000-01-23 22:20:14 eaf Exp $"
+// File "$Id: ByteStream.cpp,v 1.21 2000-02-05 22:22:02 bcr Exp $"
 // - Author: Leon Bottou, 04/1997
 
 #ifdef __GNUC__
@@ -250,7 +250,7 @@ StdioByteStream::StdioByteStream(const char *filename, const char *mode)
       if (!fp)
       {
 	 char buffer[4096];
-	 sprintf(buffer, "Cannot open '%s': %s",
+	 sprintf(buffer, "Failed to open '%s': %s",
 		 filename, strerror(errno));
 	 THROW(buffer);
       };
@@ -474,7 +474,7 @@ MemoryByteStream::seek(long offset, int whence, bool nothrow)
     }
   nwhere += offset;
   if (nwhere<0)
-    THROW("Cannot seek before the beginning of the file");
+    THROW("Attempt to seek before the beginning of the file");
   where = nwhere;
   return 0;
 }
@@ -542,7 +542,7 @@ StaticByteStream::seek(long offset, int whence, bool nothrow)
     }
   nwhere += offset;
   if (nwhere<0)
-    THROW("Cannot seek before the beginning of the file");
+    THROW("Attempt to seek before the beginning of the file");
   where = nwhere;
   return 0;
 }
