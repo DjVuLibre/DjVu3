@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DataPool.cpp,v 1.64 2001-02-09 01:06:42 bcr Exp $
+// $Id: DataPool.cpp,v 1.65 2001-02-10 01:16:57 bcr Exp $
 // $Name:  $
 
 
@@ -618,8 +618,7 @@ DataPool::init(void)
   G_TRY
   {   
     block_list=new BlockList;
-    MemoryByteStream *mbs=new MemoryByteStream;
-    data=mbs;
+    data=ByteStream::create();
   }
   G_CATCH_ALL
   {
@@ -1255,8 +1254,7 @@ DataPool::load_file(void)
       {  // Scope to de-allocate lock2 before stream gets released
          GCriticalSectionLock lock2(&(f->stream_lock));
 
-         MemoryByteStream *mbs=new MemoryByteStream;
-         data=mbs;
+         data=ByteStream::create();
          block_list->clear();
          FCPools::get()->del_pool(fname, this);
          fname="";

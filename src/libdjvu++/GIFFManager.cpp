@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GIFFManager.cpp,v 1.13 2001-01-10 19:45:51 bcr Exp $
+// $Id: GIFFManager.cpp,v 1.14 2001-02-10 01:16:57 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -489,8 +489,8 @@ GIFFManager::load_chunk(IFFByteStream & istr, GP<GIFFChunk> chunk)
 void
 GIFFManager::load_file(const TArray<char> & data)
 {
-   MemoryByteStream str(data, data.size());
-   load_file(str);
+   GP<ByteStream> str=ByteStream::create((const char *)data, data.size());
+   load_file(*str);
 }
 
 void
@@ -514,9 +514,9 @@ GIFFManager::load_file(ByteStream & str)
 void
 GIFFManager::save_file(TArray<char> & data)
 {
-   MemoryByteStream str;
+   GP<ByteStream> gstr=ByteStream::create();
+   ByteStream &str=*gstr;
    save_file(str);
-
    data=str.get_data();
 }
 

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocument.cpp,v 1.139 2001-02-09 01:06:42 bcr Exp $
+// $Id: DjVuDocument.cpp,v 1.140 2001-02-10 01:16:57 bcr Exp $
 // $Name:  $
 
 
@@ -1111,7 +1111,8 @@ DjVuDocument::process_threqs(void)
               
               // Store and compress the pixmap
               GP<IWPixmap> iwpix=new IWPixmap(pm);
-              MemoryByteStream str;
+              GP<ByteStream> gstr=ByteStream::create();
+              ByteStream &str=*gstr;
               IWEncoderParms parms;
               parms.slices=97;
               parms.bytes=0;
@@ -1682,11 +1683,12 @@ DjVuDocument::save_as(const char where[], const bool bundled)
      {
        G_THROW("DjVuDocument.comp_codec");
      }
-     GP<ByteStream> mbs=new MemoryByteStream();
-     write(*mbs);
-     mbs->flush();
-     mbs->seek(0,SEEK_SET);
-     (*djvu_compress_codec)(mbs,where,bundled);
+     GP<ByteStream> gmbs=ByteStream::create();
+     ByteStream &mbs=*gmbs;
+     write(mbs);
+     mbs.flush();
+     mbs.seek(0,SEEK_SET);
+     (*djvu_compress_codec)(gmbs,where,bundled);
    }else if (bundled)
    {
       DataPool::load_file(full_name);

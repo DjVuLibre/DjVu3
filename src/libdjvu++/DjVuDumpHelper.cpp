@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDumpHelper.cpp,v 1.14 2001-01-04 22:04:54 bcr Exp $
+// $Id: DjVuDumpHelper.cpp,v 1.15 2001-02-10 01:16:57 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -322,8 +322,7 @@ DjVuDumpHelper::dump(const GP<DataPool> & pool)
 GP<ByteStream>
 DjVuDumpHelper::dump(ByteStream & str)
 {
-   MemoryByteStream *mout_str=new MemoryByteStream;
-   GP<ByteStream> out_str=mout_str;
+   GP<ByteStream> out_str=ByteStream::create();
    GString head="  ";
    IFFByteStream iff(str);
    DjVmInfo djvminfo;

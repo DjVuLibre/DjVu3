@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //
-// $Id: djvumake.cpp,v 1.8 2001-02-09 01:06:42 bcr Exp $
+// $Id: djvumake.cpp,v 1.9 2001-02-10 01:16:56 bcr Exp $
 // $Name:  $
 
 /** @name djvumake
@@ -102,7 +102,7 @@
     @memo
     Assemble DjVu files.
     @version
-    #$Id: djvumake.cpp,v 1.8 2001-02-09 01:06:42 bcr Exp $#
+    #$Id: djvumake.cpp,v 1.9 2001-02-10 01:16:56 bcr Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> \\
     Patrick Haffner <haffner@research.att.com>
@@ -131,8 +131,8 @@ int flag_contains_bg44    = 0;
 int flag_contains_incl    = 0;
 
 IFFByteStream *bg44iff    = 0;
-GP<MemoryByteStream> jb2stencil = 0;
-GP<MemoryByteStream> mmrstencil = 0;
+GP<ByteStream> jb2stencil = 0;
+GP<ByteStream> mmrstencil = 0;
 GP<JB2Image> stencil      = 0;
 
 int w = -1;
@@ -186,7 +186,7 @@ analyze_mmr_chunk(char *filename)
     {
       GP<ByteStream> gbs=ByteStream::create(filename,"rb");
       ByteStream &bs=*gbs;
-      mmrstencil = new MemoryByteStream();
+      mmrstencil = ByteStream::create();
       // Check if file is an IFF file
       char magic[4];
       memset(magic,0,sizeof(magic));
@@ -235,7 +235,7 @@ analyze_jb2_chunk(char *filename)
     {
       GP<ByteStream> gbs=ByteStream::create(filename,"rb");
       ByteStream &bs=*gbs;
-      jb2stencil = new MemoryByteStream();
+      jb2stencil = ByteStream::create();
       // Check if file is an IFF file
       char magic[4];
       memset(magic,0,sizeof(magic));
@@ -425,7 +425,8 @@ create_fg44_chunk(IFFByteStream &iff, char *ckid, char *filename)
   bsi.get_chunk(chkid);
   if (chkid!="PM44" && chkid!="BM44")
     G_THROW("djvumake: FG44 file has incorrect format (wring IFF header)");
-  MemoryByteStream mbs;
+  GP<ByteStream> gmbs=ByteStream::create();
+  ByteStream &mbs=*gmbs;
   mbs.copy(bsi);
   bsi.close_chunk();  
   if (bsi.get_chunk(chkid))
@@ -505,7 +506,8 @@ create_bg44_chunk(IFFByteStream &iff, char *ckid, char *filespec)
           bg44iff->close_chunk();
           continue;
         }
-      MemoryByteStream mbs;
+      GP<ByteStream> gmbs=ByteStream::create();
+      ByteStream &mbs=*gmbs;
       mbs.copy(*bg44iff);
       bg44iff->close_chunk();  
       mbs.seek(0);

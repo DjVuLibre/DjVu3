@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuFile.cpp,v 1.143 2001-01-09 00:17:37 bcr Exp $
+// $Id: DjVuFile.cpp,v 1.144 2001-02-10 01:16:57 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -1021,14 +1021,14 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
   // FORM:ANNO (obsolete) (must be before other annotations)
   else if (chkid == "FORM:ANNO") 
     {
-      MemoryByteStream achunk;
+      GP<ByteStream> gachunk=ByteStream::create();
+      ByteStream &achunk=*gachunk;
       achunk.copy(iff);
       achunk.seek(0);
       GCriticalSectionLock lock(&anno_lock);
       if (! anno)
       {
-        MemoryByteStream *mbs=new MemoryByteStream();
-        anno = mbs;
+        anno=ByteStream::create();
       }
       anno->seek(0,SEEK_END);
       if (anno->tell())
@@ -1043,14 +1043,14 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
   // ANTa/ANTx/TXTa/TXTz annotations
   else if (is_annotation(chkid))  // but not FORM:ANNO
     {
-      MemoryByteStream achunk;
+      GP<ByteStream> gachunk=ByteStream::create();
+      ByteStream &achunk=*gachunk;
       achunk.copy(iff);
       achunk.seek(0);
       GCriticalSectionLock lock(&anno_lock);
       if (! anno)
       {
-        MemoryByteStream *mbs=new MemoryByteStream();
-        anno = mbs;
+        anno = ByteStream::create();
       }
       anno->seek(0,SEEK_END);
       if (anno->tell() & 1)
@@ -1067,14 +1067,14 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
     }
   else if (is_text(chkid))
     {
-      MemoryByteStream achunk;
+      GP<ByteStream> gachunk=ByteStream::create();
+      ByteStream &achunk=*gachunk;
       achunk.copy(iff);
       achunk.seek(0);
       GCriticalSectionLock lock(&text_lock);
       if (! text)
       {
-        MemoryByteStream *mbs=new MemoryByteStream();
-        text = mbs;
+        text = ByteStream::create();
       }
       text->seek(0,SEEK_END);
       if (text->tell())
@@ -1503,18 +1503,21 @@ DjVuFile::get_merged_anno(const GList<GURL> & ignore_list,
                           // Will do the same thing as get_merged_anno(int *), but will
                           // ignore DjVuFiles with URLs from the ignore_list
 {
-  MemoryByteStream *mstr=new MemoryByteStream;
-  GP<ByteStream> str=mstr;
+  GP<ByteStream> gstr=ByteStream::create();
+  ByteStream &str=*gstr;
   GMap<GURL, void *> map;
   int max_level=0;
-  get_merged_anno(this, *str, ignore_list, 0, max_level, map);
+  get_merged_anno(this, str, ignore_list, 0, max_level, map);
   if (max_level_ptr)
     *max_level_ptr=max_level;
-  if (str->tell()==0) 
-    str=0;
-  else
-    str->seek(0);
-  return str;
+  if (!str.tell()) 
+  {
+    gstr=0;
+  }else
+  {
+    str.seek(0);
+  }
+  return gstr;
 }
 
 GP<ByteStream>
@@ -1586,17 +1589,17 @@ DjVuFile::get_text(const GP<DjVuFile> & file,
 GP<ByteStream>
 DjVuFile::get_text(void)
 {
-  MemoryByteStream *mstr=new MemoryByteStream;
-  GP<ByteStream> str=mstr;
-  get_text(this, *str);
-  if (str->tell()==0)
+  GP<ByteStream> gstr=ByteStream::create();
+  ByteStream &str=*gstr;
+  get_text(this, str);
+  if (!str.tell())
   { 
-    str=0;
+    gstr=0;
   }else
   {
-    str->seek(0);
+    str.seek(0);
   }
-  return str;
+  return gstr;
 }
 
 void
@@ -2020,13 +2023,13 @@ DjVuFile::get_djvu_bytestream(bool included_too, bool no_ndir)
    check();
    DEBUG_MSG("DjVuFile::get_djvu_bytestream(): creating DjVu raw file\n");
    DEBUG_MAKE_INDENT(3);
-   MemoryByteStream *mbs=new MemoryByteStream();
-   GP<ByteStream> pbs =mbs;
-   IFFByteStream iff(*mbs);
+   GP<ByteStream> pbs=ByteStream::create();
+   ByteStream &mbs=*pbs;
+   IFFByteStream iff(mbs);
    GMap<GURL, void *> map;
    add_djvu_data(iff, map, included_too, no_ndir);
    iff.flush();
-   mbs->seek(0, SEEK_SET);
+   mbs.seek(0, SEEK_SET);
    return pbs;
 }
 
@@ -2084,7 +2087,8 @@ void
 DjVuFile::remove_anno(void)
 {
   GP<ByteStream> str_in=data_pool->get_stream();
-  MemoryByteStream str_out;
+  GP<ByteStream> gstr_out=ByteStream::create();
+  ByteStream &str_out=*gstr_out;
   
   GString chkid;
   IFFByteStream iff_in(*str_in);
@@ -2121,7 +2125,8 @@ void
 DjVuFile::remove_text(void)
 {
   GP<ByteStream> str_in=data_pool->get_stream();
-  MemoryByteStream str_out;
+  GP<ByteStream> gstr_out=ByteStream::create();
+  ByteStream &str_out=*gstr_out;
   
   GString chkid;
   IFFByteStream iff_in(*str_in);
@@ -2170,7 +2175,8 @@ DjVuFile::unlink_file(const GP<DataPool> & data, const char * name)
 // Will process contents of data[] and remove any INCL chunk
 // containing 'name'
 {
-  MemoryByteStream str_out;
+  GP<ByteStream> gstr_out=ByteStream::create();
+  ByteStream &str_out=*gstr_out;
   IFFByteStream iff_out(str_out);
   
   GP<ByteStream> str_in=data->get_stream();
@@ -2236,7 +2242,8 @@ DjVuFile::insert_file(const char * id, int chunk_num)
   GP<ByteStream> str_in=data_pool->get_stream();
   IFFByteStream iff_in(*str_in);
   
-  MemoryByteStream str_out;
+  GP<ByteStream> gstr_out=ByteStream::create();
+  ByteStream &str_out=*gstr_out;
   IFFByteStream iff_out(str_out);
   
   int chunk_cnt=0;
@@ -2304,7 +2311,8 @@ DjVuFile::unlink_file(const char * id)
   GP<ByteStream> str_in=data_pool->get_stream();
   IFFByteStream iff_in(*str_in);
   
-  MemoryByteStream str_out;
+  GP<ByteStream> gstr_out=ByteStream::create();
+  ByteStream &str_out=*gstr_out;
   IFFByteStream iff_out(str_out);
   
   GString chkid;
@@ -2374,8 +2382,7 @@ DjVuFile::change_text(GP<DjVuTXT> txt,const bool do_reset)
   if(do_reset)
     reset();
   text_c.txt = txt;
-  MemoryByteStream *mbs=new MemoryByteStream();
-  text=mbs;
+  text=ByteStream::create();
   text_c.encode(*text);
 }
 #endif

@@ -88,31 +88,36 @@ main(void)
 
   //// Test File I/O
   {
-    MemoryByteStream mb;
+    GP<ByteStream> gmb=ByteStream::create();
+    ByteStream &mb=gmb;
     b.save_pbm( mb,0 );  mb.seek(0);
     GBitmap p1 ( mb );
     COMPBM(p1, b);
   }
   {
-    MemoryByteStream mb;
+    GP<ByteStream> gmb=ByteStream::create();
+    ByteStream &mb=gmb;
     b.save_pbm( mb );  mb.seek(0);
     GBitmap p4 ( mb );
     COMPBM(p4, b);
   }
   {
-    MemoryByteStream mb;
+    GP<ByteStream> gmb=ByteStream::create();
+    ByteStream &mb=gmb;
     b.save_pgm( mb,0 );  mb.seek(0);
     GBitmap p2 ( mb );
     COMPBM(p2, b);
   }
   {
-    MemoryByteStream mb;
+    GP<ByteStream> gmb=ByteStream::create();
+    ByteStream &mb=gmb;
     b.save_pgm( mb,0 );  mb.seek(0);
     GBitmap p5 ( mb );
     COMPBM(p5, b);
   }
   {
-    MemoryByteStream mb;
+    GP<ByteStream> gmb=ByteStream::create();
+    ByteStream &mb=gmb;
     b.save_rle( mb );  mb.seek(0);
     GBitmap r4 ( mb );
     COMPBM(r4, b);

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: IW44EncodeCodec.cpp,v 1.2 2001-01-20 02:03:56 bcr Exp $
+// $Id: IW44EncodeCodec.cpp,v 1.3 2001-02-10 01:16:57 bcr Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 08/1998
@@ -1251,7 +1251,8 @@ IWBitmap::encode_chunk(ByteStream &bs, const IWEncoderParms &parm)
   // Prepare zcoded slices
   int flag = 1;
   int nslices = 0;
-  MemoryByteStream mbs;
+  GP<ByteStream> gmbs=ByteStream::create();
+  ByteStream &mbs=*gmbs;
   DJVU_PROGRESS_TASK(chunk,"encode chunk",parm.slices-cslice);
   {
     float estdb = -1.0;

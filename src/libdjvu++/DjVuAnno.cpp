@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuAnno.cpp,v 1.66 2001-01-25 20:09:04 bcr Exp $
+// $Id: DjVuAnno.cpp,v 1.67 2001-02-10 01:16:57 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -946,7 +946,8 @@ DjVuANT::encode_raw(void) const
    for(GPosition pos=map_areas;pos;++pos)
       parser.parse(map_areas[pos]->print());
 
-   MemoryByteStream str;
+   GP<ByteStream> gstr=ByteStream::create();
+   ByteStream &str=*gstr;
    parser.print(str, 1);
    GString ans;
    int size = str.size();
@@ -1053,7 +1054,8 @@ DjVuAnno::merge(const GP<DjVuAnno> & anno)
 {
    if (anno)
    {
-      MemoryByteStream str;
+      GP<ByteStream> gstr=ByteStream::create();
+      ByteStream &str=*gstr;
       encode(str);
       anno->encode(str);
       str.seek(0);

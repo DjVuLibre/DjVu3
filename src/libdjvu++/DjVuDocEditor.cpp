@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocEditor.cpp,v 1.55 2001-02-08 23:30:05 bcr Exp $
+// $Id: DjVuDocEditor.cpp,v 1.56 2001-02-10 01:16:57 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -121,7 +121,8 @@ DjVuDocEditor::init(void)
    doc_url=GOS::filename_to_url(GOS::expand_name("noname.djvu", GOS::cwd()));
 
    DjVmDoc doc;
-   MemoryByteStream str;
+   GP<ByteStream> gstr=ByteStream::create();
+   ByteStream &str=*gstr;
    doc.write(str);
    str.seek(0, SEEK_SET);
    doc_pool=new DataPool(str);
@@ -367,7 +368,8 @@ DjVuDocEditor::strip_incl_chunks(GP<DataPool> & pool_in)
    GP<ByteStream> str_in=pool_in->get_stream();
    IFFByteStream iff_in(*str_in);
 
-   MemoryByteStream str_out;
+   GP<ByteStream> gstr_out=ByteStream::create();
+   ByteStream &str_out=*gstr_out;
    IFFByteStream iff_out(str_out);
 
    bool have_incl=false;
@@ -558,7 +560,8 @@ DjVuDocEditor::insert_file(const char * file_name, bool is_page,
       GString chkid;
       GP<ByteStream> str_in=file_pool->get_stream();
       IFFByteStream iff_in(*str_in);
-      MemoryByteStream str_out;
+      GP<ByteStream> gstr_out=ByteStream::create();
+      ByteStream &str_out=*gstr_out;
       IFFByteStream iff_out(str_out);
 
       GP<DjVmDir::File> shared_frec=djvm_dir->get_shared_anno_file();
@@ -1227,10 +1230,10 @@ DjVuDocEditor::simplify_anno(void (* progress_cb)(float progress, void *),
             // Merge all chunks in one by decoding and encoding DjVuAnno
          GP<DjVuAnno> dec_anno=new DjVuAnno;
          dec_anno->decode(*anno);
-         MemoryByteStream *mbs=new MemoryByteStream;
-         GP<ByteStream> new_anno=mbs;
-         dec_anno->encode(*mbs);
-         mbs->seek(0);
+         GP<ByteStream> new_anno=ByteStream::create();
+         ByteStream &mbs=*new_anno;
+         dec_anno->encode(mbs);
+         mbs.seek(0);
 
             // And store it in the file
          djvu_file->anno=new_anno;
@@ -1276,7 +1279,8 @@ DjVuDocEditor::create_shared_anno_file(void (* progress_cb)(float progress, void
       G_THROW("DjVuDocEditor.share_fail");
 
       // Prepare file with ANTa chunk inside
-   MemoryByteStream str;
+   GP<ByteStream> gstr=ByteStream::create();
+   ByteStream &str=*gstr;
    IFFByteStream iff(str);
    iff.put_chunk("FORM:DJVI");
    iff.put_chunk("ANTa");
@@ -1381,7 +1385,8 @@ DjVuDocEditor::get_thumbnails_size(void) const
       if (thumb_map.contains(page_to_id(page_num), pos))
       {
          TArray<char> & data=*(TArray<char> *) thumb_map[pos];
-         MemoryByteStream str;
+         GP<ByteStream> gstr=ByteStream::create();
+         ByteStream &str=*gstr;
          str.writall((const char *) data, data.size());
          str.seek(0);
          GP<IWPixmap> iwpix=new IWPixmap;
@@ -1465,8 +1470,8 @@ DjVuDocEditor::file_thumbnails(void)
    int ipf=1;
    int image_num=0;
    int page_num=0, pages_num=djvm_dir->get_pages_num();
-   MemoryByteStream *mbs=new MemoryByteStream;
-   GP<ByteStream> str=mbs;
+   GP<ByteStream> str=ByteStream::create();
+   ByteStream *mbs=str;
    GP<IFFByteStream> iff=new IFFByteStream(*mbs);
    iff->put_chunk("FORM:THUM");
    while(true)
@@ -1517,7 +1522,7 @@ DjVuDocEditor::file_thumbnails(void)
          files_map[id]=f;
 
             // And create new streams
-         str=mbs=new MemoryByteStream;
+         mbs=str=ByteStream::create();
          iff=new IFFByteStream(*mbs);
          iff->put_chunk("FORM:THUM");
          image_num=0;
@@ -1554,14 +1559,14 @@ DjVuDocEditor::generate_thumbnails(int thumb_size, int page_num)
 
             // Store and compress the pixmap
          GP<IWPixmap> iwpix=new IWPixmap(pm);
-         MemoryByteStream *mbs=new MemoryByteStream;
-         GP<ByteStream> str=mbs;
+         GP<ByteStream> str=ByteStream::create();
+         ByteStream &mbs=*str;
          IWEncoderParms parms;
          parms.slices=97;
          parms.bytes=0;
          parms.decibels=0;
-         iwpix->encode_chunk(*mbs, parms);
-         thumb_map[id]=new TArray<char>(mbs->get_data());
+         iwpix->encode_chunk(mbs, parms);
+         thumb_map[id]=new TArray<char>(mbs.get_data());
       }
       ++page_num;
    }else
@@ -1794,7 +1799,7 @@ DjVuDocEditor::save_as(const char * where, bool bundled)
        G_THROW("DjVuDocEditor.no_codec");
      }
      GP<DjVmDoc> doc=get_djvm_doc();
-     GP<ByteStream> mbs=new MemoryByteStream();
+     GP<ByteStream> mbs=ByteStream::create();
      doc->write(*mbs);
      mbs->flush();
      mbs->seek(0,SEEK_SET);
@@ -1835,7 +1840,8 @@ DjVuDocEditor::save_as(const char * where, bool bundled)
 
          // Update the document's DataPool (to save memory)
         GP<DjVmDoc> doc=get_djvm_doc();
-        MemoryByteStream str;        // One page: we can do it in the memory
+        GP<ByteStream> gstr=ByteStream::create();// One page: we can do it in the memory
+        ByteStream &str=*gstr;
         doc->write(str);
         str.seek(0, SEEK_SET);
         GP<DataPool> pool=new DataPool(str);

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djvuextract.cpp,v 1.8 2001-02-09 01:06:42 bcr Exp $
+// $Id: djvuextract.cpp,v 1.9 2001-02-10 01:16:56 bcr Exp $
 // $Name:  $
 
 /** @name djvuextract
@@ -65,7 +65,7 @@
     @memo
     Extract components from DjVu files.
     @version
-    #$Id: djvuextract.cpp,v 1.8 2001-02-09 01:06:42 bcr Exp $#
+    #$Id: djvuextract.cpp,v 1.9 2001-02-10 01:16:56 bcr Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> - Initial implementation\\
     Andrei Erofeev <eaf@geocities.com> - Multipage support */
@@ -150,7 +150,8 @@ extract_chunk(ByteStream& ibs, const char *id, ByteStream &out)
         {
           if (chkid == id)
             {
-              MemoryByteStream temp;
+              GP<ByteStream> gtemp=ByteStream::create();
+              ByteStream &temp=*gtemp;
               temp.copy(iff);
               temp.seek(0);
               if (temp.readall((void*)&primary, sizeof(primary))<sizeof(primary))
@@ -240,7 +241,8 @@ main(int argc, char **argv)
       // Extract required chunks
       for (i=2; i<argc; i++)
         {
-          MemoryByteStream mbs;
+          GP<ByteStream> gmbs=ByteStream::create();
+          ByteStream &mbs=*gmbs;
           argv[i][4] = 0;
           extract_chunk(*pibs, argv[i], mbs);
           if (mbs.size() == 0)

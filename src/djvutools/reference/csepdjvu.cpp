@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: csepdjvu.cpp,v 1.7 2001-02-09 01:06:42 bcr Exp $
+// $Id: csepdjvu.cpp,v 1.8 2001-02-10 01:16:56 bcr Exp $
 // $Name:  $
 
 
@@ -108,7 +108,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: csepdjvu.cpp,v 1.7 2001-02-09 01:06:42 bcr Exp $# */
+    #$Id: csepdjvu.cpp,v 1.8 2001-02-10 01:16:56 bcr Exp $# */
 //@{
 //@}
 
@@ -1264,7 +1264,7 @@ main(int argc, const char **argv)
     {
       DjVmDoc doc;
       GString outputfile;
-      MemoryByteStream outputpage;
+      GP<ByteStream> goutputpage=ByteStream::create();
       csepdjvuopts opts;
       int pageno = 0;
       // Defaults
@@ -1310,7 +1310,8 @@ main(int argc, const char **argv)
                 if (opts.verbose > 1)
                   fprintf(stderr,"-------------------------------------\n");
                 // Compress page 
-                outputpage.empty();
+                goutputpage=ByteStream::create();
+                ByteStream &outputpage=*goutputpage;
                 csepdjvu_page(ibs, outputpage, opts);
                 if (opts.verbose) {
                   fprintf(stderr,"csepdjvu: %d bytes for page %d",
@@ -1329,6 +1330,7 @@ main(int argc, const char **argv)
       // Save file
       if (pageno == 1) 
         {
+          ByteStream &outputpage=*goutputpage;
           // Save as a single page 
           outputpage.seek(0);
           GP<ByteStream> obs=ByteStream::create(outputfile,"wb");

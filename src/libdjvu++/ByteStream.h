@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.h,v 1.35 2001-02-08 23:30:05 bcr Exp $
+// $Id: ByteStream.h,v 1.36 2001-02-10 01:16:57 bcr Exp $
 // $Name:  $
 
 #ifndef _BYTESTREAM_H
@@ -62,7 +62,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation\\
     Andrei Erofeev <eaf@geocities.com> -- 
     @version
-    #$Id: ByteStream.h,v 1.35 2001-02-08 23:30:05 bcr Exp $# */
+    #$Id: ByteStream.h,v 1.36 2001-02-10 01:16:57 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -223,6 +223,8 @@ private:
   ByteStream(const ByteStream &);
   ByteStream & operator=(const ByteStream &);
 public:
+  static GP<ByteStream> create(void);
+  static GP<ByteStream> create(const void *buffer, const size_t size);
   static GP<ByteStream> create(
     const int fd, const char * const mode, const bool closeme);
   static GP<ByteStream> create(

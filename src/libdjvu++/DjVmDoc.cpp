@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVmDoc.cpp,v 1.35 2001-02-08 23:30:05 bcr Exp $
+// $Id: DjVmDoc.cpp,v 1.36 2001-02-10 01:16:57 bcr Exp $
 // $Name:  $
 
 
@@ -141,8 +141,8 @@ DjVmDoc::write(ByteStream & str)
          G_THROW("DjVmDoc.zero_file");                //  Strange: File size is zero.
    }
    
-   MemoryByteStream tmp_str;
-   IFFByteStream tmp_iff(tmp_str);
+   GP<ByteStream> tmp_str=ByteStream::create();
+   IFFByteStream tmp_iff(*tmp_str);
    tmp_iff.put_chunk("FORM:DJVM", 1);
    tmp_iff.put_chunk("DIRM");
    dir->encode(tmp_iff);

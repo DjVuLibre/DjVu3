@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.cpp,v 1.45 2001-02-08 23:58:01 bcr Exp $
+// $Id: ByteStream.cpp,v 1.46 2001-02-10 01:16:57 bcr Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 04/1997
@@ -713,6 +713,18 @@ long
 StaticByteStream::tell() const
 {
   return where;
+}
+
+GP<ByteStream>
+ByteStream::create(void)
+{
+  return new MemoryByteStream();
+}
+
+GP<ByteStream>
+ByteStream::create(const void *buffer, const size_t size)
+{
+  return new MemoryByteStream(buffer,size);
 }
 
 GP<ByteStream>

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuImage.cpp,v 1.48 2001-01-04 22:04:55 bcr Exp $
+// $Id: DjVuImage.cpp,v 1.49 2001-02-10 01:16:57 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -161,14 +161,14 @@ DjVuImage::get_info() const
 GP<ByteStream>
 DjVuImage::get_anno() const
 {
-   MemoryByteStream *mbs = new MemoryByteStream;
-   GP<ByteStream> out = mbs;
+   GP<ByteStream> out = ByteStream::create();
+   ByteStream &mbs = *out;
    if (file) 
    {
-     file->merge_anno(*mbs);
+     file->merge_anno(mbs);
    }
-   mbs->seek(0);
-   if(!mbs->size())
+   mbs.seek(0);
+   if(!mbs.size())
    {
      out=0;
    }
@@ -178,14 +178,14 @@ DjVuImage::get_anno() const
 GP<ByteStream>
 DjVuImage::get_text() const
 {
-   MemoryByteStream *mbs = new MemoryByteStream;
-   GP<ByteStream> out = mbs;
+   GP<ByteStream> out = ByteStream::create();
+   ByteStream &mbs = *out;
    if (file) 
    {
-     file->get_text(*mbs);
+     file->get_text(mbs);
    }
-   mbs->seek(0);
-   if(!mbs->size())
+   mbs.seek(0);
+   if(!mbs.size())
    {
      out=0;
    }

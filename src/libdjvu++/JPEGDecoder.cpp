@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: JPEGDecoder.cpp,v 1.15 2001-01-04 22:04:55 bcr Exp $
+// $Id: JPEGDecoder.cpp,v 1.16 2001-02-10 01:16:57 bcr Exp $
 // $Name:  $
 
 #include "JPEGDecoder.h"
@@ -120,7 +120,8 @@ JPEGDecoder::decode(ByteStream & bs )
 
   sprintf(tempBuf,"P6\n%d %d\n%d\n",cinfo.output_width, 
                                  cinfo.output_height,255);
-  MemoryByteStream outputBlock;
+  GP<ByteStream> goutputBlock=ByteStream::create();
+  ByteStream &outputBlock=*goutputBlock;
   outputBlock.write((char *)tempBuf,strlen(tempBuf));
 
   isGrey = ( cinfo.out_color_space == JCS_GRAYSCALE) ? 1 : 0; 
