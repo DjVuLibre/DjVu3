@@ -9,13 +9,13 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: MMX.h,v 1.3 1999-06-08 16:03:34 leonb Exp $
+//C- $Id: MMX.h,v 1.4 1999-06-08 16:06:07 leonb Exp $
 
 #ifndef _MMX_H_
 #define _MMX_H_
 
 #include "DjVuGlobal.h"
-#include "GPixmap.h"
+
 
 /** @name MMX.h
     Files #"MMX.h"# and #"MMX.cpp"# implement basic routines for
@@ -49,7 +49,7 @@
     @memo
     Essential support for MMX.
     @version 
-    #$Id: MMX.h,v 1.3 1999-06-08 16:03:34 leonb Exp $#
+    #$Id: MMX.h,v 1.4 1999-06-08 16:06:07 leonb Exp $#
     @author: 
     L\'eon Bottou <leonb@research.att.com> -- initial implementation 
 */    
