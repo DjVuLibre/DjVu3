@@ -120,7 +120,7 @@ clean:
 
 realclean:
 	-rm 2>/dev/null -rf @Doc ; true
-	-rm 2>/dev/null -rf ATTLicense.cpp ; true
+	-rm 2>/dev/null -rf ATTLicense.cpp libdjvu++.dxx libdjvu++.ps.gz ; true
 	-@$(MAKE) clean
 
 distclean:
