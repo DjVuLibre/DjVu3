@@ -1,0 +1,16 @@
+VPATH=./SRCDIR
+LIBJB2XX=./TOPDIR/src/libjb2++/libjb2++.a
+LIBJB2XX_INC=-I./TOPDIR/src/libjb2++  -I./TOPDIR/SRCDIR/src/libjb2++
+LIBDJVUAPIXX=./TOPDIR/src/libapi/libapidjvu++.a
+LIBDJVUAPIXX_INC=-I./TOPDIR/src/libapi -I./TOPDIR/SRCDIR/src/libapi
+LIBDJVUXX=./TOPDIR/src/libdjvu++/libdjvu++.a
+LIBDJVUXX_INC=-I./TOPDIR/src/libdjvu++ -I./TOPDIR/SRCDIR/src/libdjvu++
+LIBDJVUIOXX=./TOPDIR/src/libio++/libdjvuio++.a
+LIBDJVUIOXX_INC=-I./TOPDIR/src/libio++ -I./TOPDIR/SRCDIR/src/libio++
+LIBDJVUIMAGE=./TOPDIR/src/libimage/libdjvuimage.a
+LIBDJVUIMAGE_INC=-I./TOPDIR/src/libimage -I./TOPDIR/SRCDIR/src/libimage
+LIBDJVUMMR=./TOPDIR/src/libapi/libdjvummr/libdjvummr.a
+LIBDJVUMMR_INC=-I./TOPDIR/src/libapi/libdjvummr -I./TOPDIR/SRCDIR/src/libapi/libdjvummr
+LIBMASKFINDXX=./TOPDIR/src/libmaskfind++/libmaskfind++.a
+LIBMASKFINDXX_INC=-I./TOPDIR/src/libmaskfind++ -I./TOPDIR/SRCDIR/src/libmaskfind++
+LIBJPEG=@%LIBJPEG%@

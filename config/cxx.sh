@@ -41,10 +41,11 @@ if [ -z "$CXX_SET" ] ; then
       echo "$CXX"
     fi
   fi
-  if [ -z "$CC" ] 
-  then
-    CC="$CXX -x c -fexceptions"
-  fi
+#     The -x option doesn't work correctly when linking files.
+#  if [ -z "$CC" ] 
+#  then
+#    CC="$CXX -x c -fexceptions"
+#  fi
   echon "Checking ${CXX} version ... "
   CXXVERSION=""
   if [ "$CXX" != "$EGXX" ] ; then

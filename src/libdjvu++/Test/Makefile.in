@@ -1,17 +1,25 @@
-%%%include <commands>
+# C- Copyright (c) 1999 AT&T Corp.  All rights reserved.
+# C-
+# C- This software may only be used by you under license from AT&T
+# C- Corp. ("AT&T"). A copy of AT&T's Source Code Agreement is available at
+# C- AT&T's Internet website having the URL <http://www.djvu.att.com/open>.
+# C- If you received this software without first entering into a license with
+# C- AT&T, you have an infringing copy of this software and cannot use it
+# C- without violating AT&T's intellectual property rights.
+# C-
+# C- $Id: Makefile.in,v 1.15 1999-12-15 04:02:18 bcr Exp $
+
+%%%include <paths>
 
 SHELL=/bin/sh
 prefix=@%prefix%@
 bindir=@%PROJECT_PREFIX%@/bin
-SRCDIR=@%srcdir%@
-TOPSRCDIR=@%TOPSRCDIR%@
-TOPBUILDDIR=@%TOPBUILDDIR%@
-VPATH=@%srcdir%@
+VPATH=./SRCDIR
 CXX=@%CXX%@
 CXXOPT=@%CXXOPT%@ @%CXXUNROLL%@
 CXXWARN=@%CXXWARN%@
 DEFS=@%DEFS%@
-INCS=-I.. -I$(SRCDIR)/..
+INCS=@%INCS%@ -I.. -I./SRCDIR)/..
 CXXFLAGS=@%CXXFLAGS%@ $(CXXOPT) $(CXXWARN) $(DEFS) $(INCS)
 LDFLAGS=
 DOCXX=@%docxx%@

@@ -321,6 +321,8 @@ require_compiler()
         ;;
       esac
     done
+    CC_SET=$CC_SET_NEW
+    CXX_SET=$CXX_SET_NEW
   fi
 }
 

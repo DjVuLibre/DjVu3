@@ -44,10 +44,11 @@ then
       echo "$CC"
     fi
   fi
-  if [ -z "$CXX" ] 
-  then
-    CXX="$CC -x c++"
-  fi
+#     The -x option doesn't work correctly when linking files.
+#  if [ -z "$CXX" ] 
+#  then
+#    CXX="$CC -x c++"
+#  fi
 
   CCVERSION=""
   echon "Checking ${CC} version ... "

@@ -32,14 +32,8 @@ do
     --with-rpo|--frepo )
       use_rpo=yes
       ;;
-    --with-jpeg )
-      with_jpeg=yes
-      C_DEFS=APPEND
-      A_DEFS="$A_DEFS -DNEED_JPEG_DECODER"
-      C_INCS=APPEND
-      A_INCS="$A_INCS -I\$(TOPSRCDIR)/src/3rd-party/libjpeg"
-      C_LIBS=APPEND
-      A_LIBS="$A_LIBS \$(TOPBUILDDIR)/src/3rd-party/libjpeg/libdjpeg.a"
+    --without-jpeg )
+      without_jpeg=yes
       ;;
     *)
       if process_general_option $arg
@@ -51,13 +45,24 @@ do
         list_general_options
         echo 1>&2 "  --with-threads=(no|co|posix|dce)          choose a thread implementation."
         echo 1>&2 "  --with-rpo,--frepo                        use --frepo option in G++."
-        echo 1>&2 "  --with-jpeg                               include JPEG decoder (bulky)."
+        echo 1>&2 "  --without-jpeg                            excludes  JPEG decoder (bulky)."
         exit 1 
       fi
       ;;
    esac
 done
 
+if [ -z "$without_jpeg" ] 
+then
+      C_DEFS=APPEND
+      A_DEFS="$A_DEFS -DNEED_JPEG_DECODER"
+      C_INCS=APPEND
+      A_INCS="$A_INCS -I./TOPDIR/src/3rd-party/libjpeg -I./TOPDIR/SRCDIR/src/3rd-party/libjpeg"
+      LIBJPEG=./TOPDIR/src/3rd-party/libjpeg/libdjpeg.a
+else
+      LIBJPEG=""
+fi
+CONFIG_VARS=`echo LIBJPEG $CONFIG_VARS`
 
 ### ---------------------------
 ### Want a distinct compilation directory
@@ -74,7 +79,7 @@ fi
 ### ---------------------------
 ### Proceed
 
-if [ "$with_jpeg" = yes ] 
+if [ -z "$without_jpeg" ] 
 then
     require_compiler c c++
 else
@@ -95,7 +100,7 @@ generate_makefile src/libdjvu++
 generate_makefile src/libdjvu++/Test
 generate_makefile src/libdjvu++/Tools
 
-if [ "$with_jpeg" = yes ] 
+if [ -z "$without_jpeg" ] 
 then
     ## This is the version with JPEG 
     generate_makefile src/3rd-party/libjpeg
