@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: JB2Image.h,v 1.30 2001-01-10 02:13:18 bcr Exp $
+// $Id: JB2Image.h,v 1.31 2001-01-18 01:33:50 bcr Exp $
 // $Name:  $
 
 #ifndef _JB2IMAGE_H
@@ -129,7 +129,7 @@
     \end{itemize}
 
     @version
-    #$Id: JB2Image.h,v 1.30 2001-01-10 02:13:18 bcr Exp $#
+    #$Id: JB2Image.h,v 1.31 2001-01-18 01:33:50 bcr Exp $#
     @memo
     Coding bilevel images with JB2.
     @author
@@ -569,7 +569,7 @@ JB2Image::get_blit(int blitno) const
 // The JB2Codec's Contains all contextual information for encoding/decoding
 // a JB2Image.
 
-class JB2Image::JB2Codec
+class JB2Dict::JB2Codec
 {
 public:
   typedef unsigned int NumContext;
@@ -690,20 +690,20 @@ protected:
 };
 
 inline void
-JB2Image::JB2Codec::code_eventual_lossless_refinement()
+JB2Dict::JB2Codec::code_eventual_lossless_refinement()
 {
   refinementp=CodeBit(refinementp, dist_refinement_flag);
 }
 
 inline void
-JB2Image::JB2Codec::fill_short_list(const int v)
+JB2Dict::JB2Codec::fill_short_list(const int v)
 {
   short_list[0] = short_list[1] = short_list[2] = v;
   short_list_pos = 0;
 }
 
 inline int
-JB2Image::JB2Codec::get_direct_context( unsigned char const * const up2,
+JB2Dict::JB2Codec::get_direct_context( unsigned char const * const up2,
                     unsigned char const * const up1,
                     unsigned char const * const up0,
                     const int column)
@@ -721,7 +721,7 @@ JB2Image::JB2Codec::get_direct_context( unsigned char const * const up2,
 }
 
 inline int
-JB2Image::JB2Codec::shift_direct_context(const int context, const int next,
+JB2Dict::JB2Codec::shift_direct_context(const int context, const int next,
                      unsigned char const * const up2,
                      unsigned char const * const up1,
                      unsigned char const * const up0,
@@ -734,7 +734,7 @@ JB2Image::JB2Codec::shift_direct_context(const int context, const int next,
 }
 
 inline int
-JB2Image::JB2Codec::get_cross_context( unsigned char const * const up1,
+JB2Dict::JB2Codec::get_cross_context( unsigned char const * const up1,
                    unsigned char const * const up0,
                    unsigned char const * const xup1,
                    unsigned char const * const xup0,
@@ -755,7 +755,7 @@ JB2Image::JB2Codec::get_cross_context( unsigned char const * const up1,
 }
 
 inline int
-JB2Image::JB2Codec::shift_cross_context( const int context, const int n,
+JB2Dict::JB2Codec::shift_cross_context( const int context, const int n,
                      unsigned char const * const up1,
                      unsigned char const * const up0,
                      unsigned char const * const xup1,
