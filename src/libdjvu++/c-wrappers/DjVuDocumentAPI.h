@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuDocumentAPI.h,v 1.13 2000-01-30 01:18:42 bcr Exp $
+ *C- $Id: DjVuDocumentAPI.h,v 1.14 2000-01-31 03:04:48 haffner Exp $
  */
 
 #ifndef _DJVUDOC_H_
@@ -85,7 +85,7 @@ typedef struct djvu_segmenter_options_struct
   /** Pixel filter level.
 
       This pixel filter parameter corresponds to the Markov Transition
-      probability.  Increase to remove very small marks, smooth out edges and
+      probability.  Increase to remove very small shapes, smooth out edges and
       remove halftoning.  Decrease to avoid dropping of characters.  This is
       the most efficient option level to manage the foreground/background
       tradeoff, always try to tune it first.
@@ -132,7 +132,7 @@ typedef struct djvu_segmenter_options_struct
   */
   int threshold_level;
 
-  /** Mark filter level.
+  /** Shape filter level.
 
       \begin{description}
       \item[Option type] quality slider.
@@ -146,10 +146,10 @@ typedef struct djvu_segmenter_options_struct
       \item[Command line] no
       \end{description}
 
-      Mark (i.e. connected components) with a score higher than this filter
+      Shape (i.e. connected components) with a score higher than this filter
       level are kept.
   */
-  int mark_filter_level;
+  int shape_filter_level;
   
 
   /** inhibit_foreback level.
@@ -258,9 +258,9 @@ typedef struct djvu_segmenter_options_struct
   int render_size;
 
 
-  /** Smoothing size parameter. 
+  /** Blurring size parameter. 
 
-      Defines the size (in pixel) of smoothing convolutions applied in the
+      Defines the size (in pixel) of blurring convolutions applied in the
       segmenter.  Generally very similar to edge size, handling similar
       problems:
       \begin{itemize}
@@ -278,7 +278,7 @@ typedef struct djvu_segmenter_options_struct
       \item[Command line] no
       \end{description}
   */
-  int smoothing_size;
+  int blurring_size;
 
   /*@}*/
   
@@ -479,9 +479,9 @@ inline documenttodjvu_options_struct::documenttodjvu_options_struct() :
   process(), transform(), segment(), foreground(), jb2(), iw44() {}
 
 inline djvu_segmenter_options_struct::djvu_segmenter_options_struct() :
-  pix_filter_level(25), threshold_level(75), mark_filter_level(50),
+  pix_filter_level(25), threshold_level(75), shape_filter_level(50),
   inhibit_foreback_level(40), inversion_level(25), edge_size(3),
-  render_size(3), smoothing_size(3), fg_subsampling(12), bg_subsampling(3),
+  render_size(3), blurring_size(3), fg_subsampling(12), bg_subsampling(3),
   upsample_size(1), high_variation_foreground(false), masksub_refine(true) {}
 
 // These examples will be modified to show configuration file examples,
@@ -496,7 +496,7 @@ inline djvu_segmenter_options_struct::djvu_segmenter_options_struct() :
   inline void djvu_segmenter_options_struct::standard(void)
     {
       threshold_level= 75;
-      mark_filter_level= 50;
+      shape_filter_level= 50;
       /* must be conservative here, other characters are lost on 200dpi
          images, or documents with small low-contrast fonts. */
       pix_filter_level= 25;
@@ -508,7 +508,7 @@ inline djvu_segmenter_options_struct::djvu_segmenter_options_struct() :
 
       edge_size= 3;
       render_size= 3;
-      smoothing_size= 3;
+      blurring_size= 3;
       fg_subsampling= 12; 
       bg_subsampling= 3; 
       upsample_size=1;
@@ -522,14 +522,14 @@ inline djvu_segmenter_options_struct::djvu_segmenter_options_struct() :
   inline void djvu_segmenter_options_struct::dpi600(void)
     {
       threshold_level= 75;
-      mark_filter_level= 50;
+      shape_filter_level= 50;
       pix_filter_level= 50;
       inversion_level= 25;
       inhibit_foreback_level=40;
       
       edge_size= 3;
       render_size= 3;
-      smoothing_size= 3;
+      blurring_size= 3;
       fg_subsampling= 12; 
       bg_subsampling= 4; 
       upsample_size=2;
@@ -544,14 +544,14 @@ inline djvu_segmenter_options_struct::djvu_segmenter_options_struct() :
   inline void djvu_segmenter_options_struct::dpi200(void)
     {
       threshold_level= 75;
-      mark_filter_level= 25;
+      shape_filter_level= 25;
       pix_filter_level= 25;
       inversion_level= 25;
       inhibit_foreback_level=40;
       
       edge_size= 2;
       render_size= 3;
-      smoothing_size= 3;
+      blurring_size= 3;
       fg_subsampling= 8; 
       bg_subsampling= 2; 
       upsample_size=1;
@@ -565,13 +565,13 @@ inline djvu_segmenter_options_struct::djvu_segmenter_options_struct() :
   inline void djvu_segmenter_options_struct::dpi100(void)
     {
       threshold_level= 75;
-      mark_filter_level= 50;
+      shape_filter_level= 50;
       pix_filter_level= 50;
       inversion_level= 25;
       
       edge_size= 1;
       render_size= 1;
-      smoothing_size= 2;
+      blurring_size= 2;
       fg_subsampling= 6; 
       bg_subsampling= 1; 
       upsample_size=1;
@@ -598,14 +598,14 @@ inline djvu_segmenter_options_struct::djvu_segmenter_options_struct() :
   inline void djvu_segmenter_options_struct::comic(void)
     {
       threshold_level= 75;
-      mark_filter_level= 50;
+      shape_filter_level= 50;
       pix_filter_level= 50;
       inversion_level= 25;
       inhibit_foreback_level=40;
       
       edge_size= 3;
       render_size= 3;
-      smoothing_size= 3;
+      blurring_size= 3;
       fg_subsampling= 12; 
       bg_subsampling= 3; 
       upsample_size=1;
@@ -631,14 +631,14 @@ inline djvu_segmenter_options_struct::djvu_segmenter_options_struct() :
   inline void djvu_segmenter_options_struct::ancient(void)
     {
       threshold_level= 75;
-      mark_filter_level= 50;
+      shape_filter_level= 50;
       pix_filter_level= 50;
       inversion_level= 25;
       inhibit_foreback_level=40;
       
       edge_size= 3;
       render_size= 3;
-      smoothing_size= 3;
+      blurring_size= 3;
       fg_subsampling= 12; 
       bg_subsampling= 3; 
       upsample_size=1;
@@ -654,7 +654,7 @@ inline djvu_segmenter_options_struct::djvu_segmenter_options_struct() :
       \begin{verbatim}
       edge_size= 1;
       render_size= 1;
-      smoothing_size= 1;
+      blurring_size= 1;
       high_variation_foreground= true;
       masksub_refine= false;
       \end{verbatim}
@@ -662,14 +662,14 @@ inline djvu_segmenter_options_struct::djvu_segmenter_options_struct() :
   inline void djvu_segmenter_options_struct::very_clean(void)
     {
       threshold_level= 75;
-      mark_filter_level= 50;
+      shape_filter_level= 50;
       pix_filter_level= 50;
       inversion_level= 25;
       inhibit_foreback_level=40;
      
       edge_size= 1;
       render_size= 1;
-      smoothing_size= 1;
+      blurring_size= 1;
       fg_subsampling= 12; 
       bg_subsampling= 3; 
       upsample_size=1;
