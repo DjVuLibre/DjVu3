@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: ATTLicense.cpp.in,v 1.2 1999-03-01 17:02:44 leonb Exp $
+//C-  $Id: ATTLicense.cpp.in,v 1.3 1999-03-15 17:16:45 leonb Exp $
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -22,14 +22,39 @@ static const char *the_usage =
 "\tThis program is copyright (c) AT&T 1999.\n"
 "\tUse option \'-license\' to see the licensing terms\n";
 
+static const char *the_notice = 
+"This software contains software code or other information proprietary to AT&T\n"
+"Corp. (\"AT&T\").  Unless you accept a license to use this software, you shall\n"
+"not use, execute, compile, modify, redistribute, reverse compile, disassemble,\n"
+"or otherwise reverse engineer the AT&T software or any derived work of the\n"
+"AT&T software.  The text of a license can be found in file \"ATTLICENSE\" or\n"
+"at the Internet website having the URL \"http://www.djvu.att.com/open\".\n"
+"\n"
+"This software is provided to you \"AS IS\".  YOU ASSUME TOTAL RESPONSIBILITY\n"
+"AND RISK FOR USE OF THE AT&T SOFTWARE.  AT&T DOES NOT MAKE, AND EXPRESSLY\n"
+"DISCLAIMS, ANY EXPRESS OR IMPLIED WARRANTIES OF ANY KIND WHATSOEVER,\n"
+"INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF MERCHANTABILITY OR\n"
+"FITNESS FOR A PARTICULAR PURPOSE, WARRANTIES OF TITLE OR NON-INFRINGEMENT OF\n"
+"ANY INTELLECTUAL PROPERTY RIGHTS, ANY WARRANTIES ARISING BY USAGE OF TRADE,\n"
+"COURSE OF DEALING OR COURSE OF PERFORMANCE, OR ANY WARRANTY THAT THE AT&T\n"
+"SOFTWARE IS ERROR FREE OR WILL MEET YOUR REQUIREMENTS.\n"
+"\n"
+"(C) AT&T Corp. All rights reserved.\n"
+"    AT&T is a registered trademark of AT&T Corp.\n"
+"\n";
+
+#ifdef INCLUDE_ATT_LICENSE_EVERYWHERE
+// This is too big to include in every binary...
 static const char *the_license = 
 @ATTLICENSE@
 "\000";
+#endif
+
 
 const char*
-ATTLicense::get_license_text()
+ATTLicense::get_notice_text()
 {
-  return the_license;
+  return the_notice;
 }
 
 const char*
@@ -67,13 +92,13 @@ ATTLicense::process_cmdline(int argc, char **argv)
   FILE *f = popen(pager,"w");
   if (f)
     {
-      StaticByteStream input(the_license);
+      StaticByteStream input(the_notice);
       StdioByteStream output(f, "w");
       output.copy(input);
       if (pclose(f) >= 0)
         exit(0);
     }
 #endif
-  fprintf(stdout,"\n%s\n", (const char*)get_license_text());
+  fprintf(stdout,"\n%s\n", (const char*)get_notice_text());
   exit(0);
 }
