@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: parseoptions.cpp,v 1.17 1999-12-15 21:50:26 bcr Exp $
+//C- $Id: parseoptions.cpp,v 1.18 1999-12-15 21:57:53 bcr Exp $
 #ifdef __GNUC__
 #pragma implementation
 #endif
@@ -479,26 +479,26 @@ DjVuParseOptions::GetNumber
 (const int token,const int errval) const 
 {
   const char mesg[]="'%1.10s' is not a number";
-  const char * endptr=mesg;
   int retval=errval;
   const char * const str=GetValue(token);
   if(str)
   {
     const char *s=str;
+    const char *endptr=mesg;
     if(s[0])
     {
-      for(;isspace(s);s++);
+      for(;isspace(s[0]);s++);
       if(s[0] == '+')
         s++;
-      for(retval=(int)strtol(s,&(char *)endptr,10);isspace(*endptr);endptr++);
+      for(retval=(int)strtol(s,(char **)&endptr,10);isspace(endptr[0]);endptr++);
     }
-  }
-  if(*endptr)
-  {
-    char sbuf[sizeof(mesg)+10];
-    sprintf(sbuf,mesg,str?str:"(NULL)");
-    Errors->AddError(sbuf);
-    retval=errval;
+    if(*endptr)
+    {
+      char sbuf[sizeof(mesg)+10];
+      sprintf(sbuf,mesg,str?str:"(NULL)");
+      Errors->AddError(sbuf);
+      retval=errval;
+    }
   }
   return retval;
 }
