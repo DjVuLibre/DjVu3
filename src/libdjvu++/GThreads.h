@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: GThreads.h,v 1.10 1999-03-05 20:51:04 leonb Exp $
+//C-  $Id: GThreads.h,v 1.11 1999-03-08 15:18:01 leonb Exp $
 
 #ifndef _GTHREADS_H_
 #define _GTHREADS_H_
@@ -76,7 +76,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Praveen Guduru <praveen@sanskrit.lz.att.com> -- mac implementation.
     @version
-    #$Id: GThreads.h,v 1.10 1999-03-05 20:51:04 leonb Exp $# */
+    #$Id: GThreads.h,v 1.11 1999-03-08 15:18:01 leonb Exp $# */
 //@{
 
 #include "DjVuGlobal.h"
@@ -203,10 +203,8 @@ public:
       provide an explicit way to relinquish the processor. This is often the
       case with preemptive multithreading models like #POSIXTHREADS# or
       #WINTHREADS#.  The scheduling code does not need such a feature.
-      Function #yield# may return #+1# if the scheduler has to immediately
-      return control to the current thread because no other thread is ready to
-      run.  Otherwise function #yield# returns #0# when the current thread is
-      resumed. */
+      Function #yield# returns #+1# when only the current thread is ready to
+      run.  Otherwise function #yield# returns #0#. */
   static int yield();
   /** Returns a value which uniquely identifies the current thread. */
   static void *current();
