@@ -7,9 +7,9 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: IWImage.cpp,v 1.5 1999-02-10 23:07:51 leonb Exp $
+//C-  $Id: IWImage.cpp,v 1.6 1999-03-04 19:12:57 leonb Exp $
 
-// File "$Id: IWImage.cpp,v 1.5 1999-02-10 23:07:51 leonb Exp $"
+// File "$Id: IWImage.cpp,v 1.6 1999-03-04 19:12:57 leonb Exp $"
 // - Author: Leon Bottou, 08/1998
 
 #ifdef __GNUC__
@@ -232,17 +232,6 @@ static int iw_quant[16] = {
   0x100000, 0x100000, 0x200000, 
   0x100000, 0x100000, 0x200000
 };
-
-#ifdef ALTERNATE_QUANTIZATION
-static int iw_quant[16] = {
-  0x010000, 
-  0x01e000, 0x01e000, 0x039000,
-  0x03c000, 0x03c000, 0x073000,
-  0x079000, 0x079000, 0x0e5000,
-  0x0ec000, 0x0ec000, 0x1b8000,
-  0x0ec000, 0x0ec000, 0x1b8000,
-};
-#endif
 
 static float iw_norm[16] = {
   2.627989e+03F,
@@ -1286,18 +1275,14 @@ _IWCodec::next_quant(void)
   int i;
   int flag = 0;
   // Quantization coefficients for first band
-  for (i=0; i<16; i++)
-    if (quant_lo[i] > 1)
-      { flag=1; quant_lo[i] = (quant_lo[i]+1)>>1; } 
-    else 
-      { quant_lo[i]=0; }
+  for (i=0; i<16; i++) 
+    if ((quant_lo[i] = quant_lo[i]>>1))
+      flag=1; 
   // Quantization coefficients for other bands
   for (i=0; i<10; i++)
-    if (quant_hi[i] > 1)
-      { flag=1; quant_hi[i] = (quant_hi[i]+1)>>1; } 
-    else 
-      { quant_hi[i]=0; }
-  // Still meaningful ?
+    if ((quant_hi[i] = quant_hi[i]>>1))
+      flag = 1;
+  // Return 1 if there is still a non null threshold
   return flag;
 }
 
@@ -1563,10 +1548,7 @@ _IWCodec::encode_buckets(_ZPCodecBias &zp, int bit, int band,
                   else
                     zp.encoder(pix);
                   // adjust epcoeff
-                  if (pix)
-                    epcoeff[i] = ecoeff + ((thres+1)>>1);
-                  else
-                    epcoeff[i] = ecoeff - (thres>>1);
+                  epcoeff[i] = ecoeff - (pix ? 0 : thres) + (thres>>1);
                 }
           }
     }
@@ -1767,16 +1749,16 @@ _IWCodec::decode_buckets(_ZPCodecBias &zp, int bit, int band,
                       // second mantissa bit
                       coeff = coeff + (thres>>2);
                       if (zp.decoder(ctxMant))
-                        coeff = coeff + ((thres+1)>>1);
+                        coeff = coeff + (thres>>1);
                       else
-                        coeff = coeff - ((thres)>>1);
+                        coeff = coeff - thres + (thres>>1);
                     }
                   else
                     {
                       if (zp.decoder())
-                        coeff = coeff + ((thres+1)>>1);
+                        coeff = coeff + (thres>>1);
                       else
-                        coeff = coeff - ((thres)>>1);
+                        coeff = coeff - thres + (thres>>1);
                     }
                   // store coefficient
                   if (pcoeff[i] > 0)
