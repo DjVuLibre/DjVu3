@@ -119,6 +119,15 @@ DjVuPort.o: DjVuPort.cpp DjVuPort.h \
  GMapAreas.h DjVuFile.h DjVuPalette.h \
  DjVuNavDir.h DjVuDocument.h DjVuFileCache.h \
  debug.h DjVmDir0.h DjVmDoc.h DjVmDir.h
+DjVuToPS.o: DjVuToPS.cpp DjVuToPS.h \
+ DjVuGlobal.h DjVuImage.h GString.h \
+ GException.h GSmartPointer.h GThreads.h \
+ ByteStream.h GContainer.h Arrays.h \
+ IFFByteStream.h JB2Image.h ZPCodec.h \
+ GRect.h GBitmap.h IWImage.h GPixmap.h \
+ DjVuInfo.h DjVuAnno.h GMapAreas.h \
+ DjVuFile.h DataPool.h DjVuPalette.h \
+ DjVuPort.h GURL.h DjVuNavDir.h debug.h
 GBitmap.o: GBitmap.cpp GBitmap.h DjVuGlobal.h \
  GRect.h ByteStream.h GException.h \
  GContainer.h GSmartPointer.h Arrays.h \
