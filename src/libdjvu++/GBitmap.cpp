@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: GBitmap.cpp,v 1.29 2000-05-01 16:15:21 bcr Exp $
+//C- $Id: GBitmap.cpp,v 1.30 2000-07-03 21:59:44 mrosen Exp $
 
 
 #ifdef __GNUC__
@@ -25,7 +25,7 @@
 #include "GString.h"
 #include "GThreads.h"
 
-// File "$Id: GBitmap.cpp,v 1.29 2000-05-01 16:15:21 bcr Exp $"
+// File "$Id: GBitmap.cpp,v 1.30 2000-07-03 21:59:44 mrosen Exp $"
 // - Author: Leon Bottou, 05/1997
 
 
@@ -1238,17 +1238,18 @@ GBitmap::check_border() const
 {
   if (bytes)
     {
+      int col;
       const unsigned char *p = (*this)[-1];
-      for (int col=-border; col<ncolumns+border; col++)
+      for (col=-border; col<ncolumns+border; col++)
         if (p[col])
           THROW("debug: zero array is damaged");
       for (int row=0; row<nrows; row++)
         {
           p = (*this)[row];
-          for (int col=-border; col<0; col++)
+          for (col=-border; col<0; col++)
             if (p[col])
               THROW("debug: left border is damaged");
-          for (int col=ncolumns; col<ncolumns+border; col++)
+          for (col=ncolumns; col<ncolumns+border; col++)
             if (p[col])
               THROW("debug: right border is damaged");
         }

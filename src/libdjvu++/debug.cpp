@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C-  $Id: debug.cpp,v 1.10 2000-06-30 23:32:01 mrosen Exp $
+//C-  $Id: debug.cpp,v 1.11 2000-07-03 21:59:44 mrosen Exp $
 
 #include "debug.h"
 
@@ -22,6 +22,10 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <errno.h>
+#ifdef WIN32
+#define WIN32_LEAN_AND_MEAN
+#include "windows.h"
+#endif
 
 #ifdef __GNUC__
 #pragma implementation
