@@ -1,4 +1,4 @@
-/* File "$Id: DjVuAPI.h,v 1.5 1999-11-18 00:17:12 parag Exp $"
+/* File "$Id: DjVuAPI.h,v 1.6 1999-11-23 15:54:08 orost Exp $"
  *
  * The main header file for the DjVu API
  */
@@ -11,7 +11,10 @@
 
 /* 
  * $Log: DjVuAPI.h,v $
- * Revision 1.5  1999-11-18 00:17:12  parag
+ * Revision 1.6  1999-11-23 15:54:08  orost
+ * additions for DjVu3
+ *
+ * Revision 1.5  1999/11/18 00:17:12  parag
  * After changing Callback for djvu_fin
  *
  * Revision 1.4  1999/11/16 20:04:16  orost
@@ -875,6 +878,20 @@ djvu_pixel_to_bmp(const djvu_pixel_image *,djvu_output_sub *,void *);
  */
 DJVUAPI djvu_run_image *
 djvu_pnm_to_run(djvu_input_sub *inpf, void *arg);
+
+/*
+ *      djvu_set_pixel_to_bitonal
+ *  Set the djvu_pixel_to_bitonal falg to OFF
+ *  so that, djvu_pixel_to_run conversion uses the
+ *  COLOR_RUN, GRAY_RUN encoding for COLOR, GRAY images
+ *  respectively.
+ *  Default behaviour is COLOR or GRAY images are converted
+ *  into bitonal and then are encoded as BIT_RUN type.
+ */
+typedef enum {OFF, ON}OnOff;
+void djvu_set_pixel_to_bitonal(OnOff val);
+char djvu_get_pixel_to_bitonal();
+
 /* 
  *      djvu_pixel_to_run
  *
@@ -942,6 +959,8 @@ djvu_counts_left();
  */
 DJVUAPI djvu_run_image*
 djvu_pixel_to_bitonal_run(const djvu_pixel_to_bitonal_parms *parms, const djvu_pixel_image * pimg);
+DJVUAPI djvu_run_image*
+djvu_run_to_native(djvu_run_image* rimg);
 
 #ifdef __cplusplus
 }
