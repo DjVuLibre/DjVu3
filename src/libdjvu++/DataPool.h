@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DataPool.h,v 1.47 2001-07-24 17:52:03 bcr Exp $
+// $Id: DataPool.h,v 1.48 2001-08-23 23:04:34 docbill Exp $
 // $Name:  $
 
 #ifndef _DATAPOOL_H
@@ -65,7 +65,7 @@ class ByteStream;
 
     @memo Thread safe data storage
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DataPool.h,v 1.47 2001-07-24 17:52:03 bcr Exp $#
+    @version #$Id: DataPool.h,v 1.48 2001-08-23 23:04:34 docbill Exp $#
 */
 
 //@{
@@ -565,6 +565,7 @@ private:
    void		added_data(const int offset, const int size);
 public:
   static const char *Stop;
+  friend class FCPools;
 };
 
 inline bool 

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DataPool.cpp,v 1.87 2001-08-23 21:43:20 docbill Exp $
+// $Id: DataPool.cpp,v 1.88 2001-08-23 23:04:34 docbill Exp $
 // $Name:  $
 
 
@@ -311,6 +311,8 @@ public:
       // Looks for the list of DataPools connected to 'furl' and makes
       // each of them load the contents of the file into memory
    void		load_file(const GURL &url);
+      // Retrieve a local URL, if available.
+   GP<DataPool> get_pool(const GURL &url, int start, int length);
    void clean(void);
 };
 
@@ -321,7 +323,7 @@ FCPools::clean(void)
   for(GPosition pos=map;pos;++pos)
   {
     GPList<DataPool> &p=map[pos];
-    for(GPosition pos2=p;pos;++pos)
+    for(GPosition pos2=p;pos2;++pos2)
     {
       if(p[pos2]->get_count() < 2)
       {
@@ -355,6 +357,34 @@ FCPools::add_pool(const GURL &url, GP<DataPool> pool)
         plist.append(pool);
    }
   clean();
+}
+
+GP<DataPool>
+FCPools::get_pool(const GURL &url, int start, int length)
+{
+  DEBUG_MSG("FCPools::get_pool: url='" << url << "\n");
+  DEBUG_MAKE_INDENT(3);
+  GP<DataPool> retval;
+  if (url.is_local_file_url())
+  {
+    GCriticalSectionLock lock(&map_lock);
+    GPosition pos(map.contains(url));
+    if (pos)
+    {
+      GPList<DataPool> &plist=map[pos];
+      for(pos=plist;pos;++pos)
+      {
+        DataPool &pool=*plist[pos];
+        if(start == pool.start && (length < 0 || (length == pool.length)))
+        {
+          retval=plist[pos];
+          break;
+        }
+      }
+    }
+    clean();
+  }
+  return retval;
 }
 
 void
@@ -732,10 +762,14 @@ DataPool::create(const GURL &furl, int start, int length)
   DEBUG_MSG("DataPool::DataPool: furl='" << furl << "' start=" << start << " length= " << length << "\n");
   DEBUG_MAKE_INDENT(3);
 
-  DataPool *pool=new DataPool();
-  GP<DataPool> retval=pool;
-  pool->init();
-  pool->connect(furl, start, length);
+  GP<DataPool> retval=FCPools::get()->get_pool(furl,start,length);
+  if(! retval)
+  {
+    DataPool *pool=new DataPool();
+    retval=pool;
+    pool->init();
+    pool->connect(furl, start, length);
+  }
   return retval;
 }
 

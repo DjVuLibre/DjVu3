@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.124 2001-08-23 21:43:20 docbill Exp $
+// $Id: GString.cpp,v 1.125 2001-08-23 23:04:34 docbill Exp $
 // $Name:  $
 
 #ifdef __GNUC__
