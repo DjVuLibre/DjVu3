@@ -8,7 +8,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVu.h,v 1.2 2000-01-05 20:00:22 bcr Exp $
+//C- $Id: DjVu.h,v 1.3 2000-01-06 20:00:30 bcr Exp $
 #endif /* __cplusplus */
 
 #include <stdlib.h>
@@ -75,10 +75,18 @@ DJVUAPI void _djvu_free(void*);
 
 #else
 
+#ifndef _djvu_free
 #define _djvu_free(ptr) free((ptr))
+#endif
+#ifndef _djvu_malloc
 #define _djvu_malloc(siz) malloc((siz))
+#endif
+#ifndef _djvu_realloc
 #define _djvu_realloc(ptr,siz) realloc((ptr),(siz))
+#endif
+#ifndef _djvu_calloc
 #define _djvu_calloc(siz,items) calloc((siz),(items))
+#endif
 
 #endif /* NEED_DJVU_MEMORY */
 
