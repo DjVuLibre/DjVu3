@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.h,v 1.23 1999-09-03 23:55:22 leonb Exp $
+//C- $Id: DjVuFile.h,v 1.24 1999-09-07 15:21:49 leonb Exp $
  
 #ifndef _DJVUFILE_H
 #define _DJVUFILE_H
@@ -46,7 +46,7 @@
 
     @memo Classes representing DjVu files.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuFile.h,v 1.23 1999-09-03 23:55:22 leonb Exp $#
+    @version #$Id: DjVuFile.h,v 1.24 1999-09-07 15:21:49 leonb Exp $#
 */
 
 //@{
@@ -448,7 +448,7 @@ private:
 inline void
 DjVuFile::disable_standard_port(void)
 {
-   delete simple_port; simple_port=0;
+   simple_port=0;
 }
 
 inline bool
