@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qd_tbar_mode_piece.cpp,v 1.5 2001-07-26 23:47:51 mchen Exp $
+// $Id: qd_tbar_mode_piece.cpp,v 1.6 2001-07-30 18:29:55 mchen Exp $
 // $Name:  $
 
 
@@ -130,12 +130,11 @@ QDTBarModePiece::setEnabled(bool en)
    mode_menu->setEnabled(en);
    zoom_in_butt->setEnabled(en);
    zoom_out_butt->setEnabled(en);
-#if 1
+
    zoom_select_butt->setEnabled(en);
-   //text_select_butt->setEnabled(en);
-   text_select_butt->setEnabled(false);
+   text_select_butt->setEnabled(en);
    pane_butt->setEnabled(en);
-#endif
+
    if ( pin_butt )
       pin_butt->setEnabled(en);
 }
@@ -208,7 +207,6 @@ QDTBarModePiece::QDTBarModePiece(QWidget * toolbar) : QDTBarPiece(toolbar)
    if ( qdtoolbar_child ) 
       ((QDToolBar *)toolbar)->addLeftWidgets(zoom_in_butt, zoom_out_butt);
 
-#if 1
    QFrame *frame2=new QFrame(toolbar, "separator");
    frame2->setFrameStyle(QFrame::VLine | QFrame::Sunken);
    frame2->setMinimumWidth(10);
@@ -232,7 +230,6 @@ QDTBarModePiece::QDTBarModePiece(QWidget * toolbar) : QDTBarPiece(toolbar)
 
    if ( qdtoolbar_child ) 
       ((QDToolBar *)toolbar)->addLeftWidgets(pane_butt, zoom_select_butt, text_select_butt);
-#endif
 
    if ( qdtoolbar_child )
    {

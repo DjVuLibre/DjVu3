@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qd_base_events.cpp,v 1.6 2001-07-26 23:47:51 mchen Exp $
+// $Id: qd_base_events.cpp,v 1.7 2001-07-30 18:29:55 mchen Exp $
 // $Name:  $
 
 
@@ -46,6 +46,7 @@
 #include "qt_imager.h"
 #include "qlib.h"
 
+#include <qclipboard.h>
 #include <qkeycode.h>
 #include <qsplitter.h>
 #include <qapplication.h>
@@ -362,8 +363,8 @@ QDBase::processMouseMoveEvent(QMouseEvent * ev)
 	    hand_scroll_x=ev->x();
 	    hand_scroll_y=ev->y();
 	 }
-      } else if ( pane_mode == IDC_ZOOM_SELECT ) 
-      { //IDC_ZOOM_SELECT
+      } else //IDC_ZOOM_SELECT || IDC_TEXT_SELECT
+      { 
 	 if ( pane )
 	 {
 	    if ( lastrect )
@@ -385,7 +386,6 @@ QDBase::processMouseMoveEvent(QMouseEvent * ev)
 	    if (lastrect) delete lastrect;
 	    lastrect=currect;
 	 }
-      } else { // IDC_TEXT_SELECT
       }
    } else if (!(ev->state() & (LeftButton | MidButton | RightButton |
 			       getLensHotKey())))
@@ -566,32 +566,76 @@ QDBase::eventFilter(QObject *obj, QEvent *e)
             
 		     if(lastrect && !lastrect->isempty())
 		     {
-			//save current view ?
-			
-			lastrect->intersect(*lastrect, rectDocument);
-
-			int cur_zoom_factor=getZoom();
-			int hzoom = int(cur_zoom_factor*((float)rectVisible.height()/lastrect->height()));
-			int wzoom = int(cur_zoom_factor*((float)rectVisible.width()/lastrect->width()));
-			
-			int new_zoom_factor=hzoom<wzoom?hzoom:wzoom;
-			int new_zoom_cmd=new_zoom_factor+IDC_ZOOM_MIN;
-
-			if ( new_zoom_cmd < IDC_ZOOM_MAX )
+			if ( pane_mode == IDC_ZOOM_SELECT )
 			{
-			   setZoom(new_zoom_cmd, true, ZOOM_MANUAL);
+			   GRect zoom_rect=*lastrect;
 
-			   // centering the new zoomed area 
-			   int dx = (lastrect->xmax+lastrect->xmin-rectVisible.xmax-rectVisible.xmin)/2;
-			   int dy = (lastrect->ymax+lastrect->ymin-rectVisible.ymax-rectVisible.ymin)/2;
-			   float zf = new_zoom_factor/float(cur_zoom_factor);
-			   dx *= zf; dy *= zf;
-			   scroll(dx,dy);
-			} else
+			   zoom_rect.intersect(zoom_rect, rectDocument);
+
+			   int cur_zoom_factor=getZoom();
+			   int hzoom = int(cur_zoom_factor*((float)rectVisible.height()/zoom_rect.height()));
+			   int wzoom = int(cur_zoom_factor*((float)rectVisible.width()/zoom_rect.width()));
+			
+			   int new_zoom_factor=hzoom<wzoom?hzoom:wzoom;
+			   int new_zoom_cmd=new_zoom_factor+IDC_ZOOM_MIN;
+
+			   if ( new_zoom_cmd < IDC_ZOOM_MAX )
+			   {
+			      setZoom(new_zoom_cmd, true, ZOOM_MANUAL);
+
+			      // centering the new zoomed area 
+			      int dx = (zoom_rect.xmax+zoom_rect.xmin-rectVisible.xmax-rectVisible.xmin)/2;
+			      int dy = (zoom_rect.ymax+zoom_rect.ymin-rectVisible.ymax-rectVisible.ymin)/2;
+			      float zf = new_zoom_factor/float(cur_zoom_factor);
+			      dx *= zf; dy *= zf;
+			      scroll(dx,dy);
+			   } else
+			   {
+			      drawSelectionRect(G2Q(zoom_rect));
+			   }
+			} else // IDC_TEXT_SELECT
 			{
 			   drawSelectionRect(G2Q(*lastrect));
+			   GRect text_rect=*lastrect;
+
+			   GRect rect=rectDocument;
+			   text_rect.intersect(text_rect, rect);
+			   
+			   setMappers();
+			   ma_mapper.unmap(text_rect);
+  			   dimg->map(text_rect);			
+
+			   static GUTF8String UTF8selectedtext;
+			   GP<ByteStream> bs=dimg->get_djvu_file()->get_text();
+			   if( bs )
+			   {
+			      GP<DjVuText> djvutext = DjVuText::create();
+			      djvutext->decode(bs);
+			      if( djvutext->txt )
+			      {
+				 GList<GRect> rects=djvutext->txt->find_text_with_rect(text_rect,UTF8selectedtext);
+
+				 eraseSearchResults();
+				 for(GPosition pos=rects;pos;++pos)
+				 {
+				    GRect irect=rects[pos];
+				    GP<GMapRect> gma=GMapRect::create(rects[pos]);
+				    gma->comment=search_results_name;
+				    gma->hilite_color=0xff000000;
+				    gma->border_type=GMapArea::NO_BORDER;
+				    gma->url="";
+				    GP<MapArea> ma=new MapRect(gma);
+				    map_areas.append(ma);
+				    ma->attachWindow(pane, &ma_mapper);
+				    ma->layout(GRect(0, 0, dimg->get_width(), dimg->get_height()));
+				    ma->repaint();
+				 }
+
+				 QApplication::clipboard()->setText((const char *)UTF8selectedtext);
+			      }
+			   }
 			}
-	    
+			
 			delete lastrect;
 			lastrect=0;
 		     }
