@@ -29,10 +29,11 @@ if [ -z "$SYS" ] ; then
       then
 	SYS=Solaris-i386
       elif [ x$PROC = xsparc ]
+      then
 	SYS=Solaris-sparc
+        DEFS="$DEFS -DNEED_DJVU_MEMORY"
       fi
     fi
-    DEFS="$DEFS -DNEED_DJVU_MEMORY"
   fi
   echo "$SYS"
   CONFIG_VARS=`echo SYS DEFS INCS JOBJ $CONFIG_VARS`
