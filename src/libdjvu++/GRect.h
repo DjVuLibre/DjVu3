@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GRect.h,v 1.15 1999-11-03 18:13:12 eaf Exp $
+//C- $Id: GRect.h,v 1.16 2000-03-16 19:38:59 eaf Exp $
 
 
 #ifndef _GRECT_H_
@@ -30,7 +30,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GRect.h,v 1.15 1999-11-03 18:13:12 eaf Exp $# */
+    #$Id: GRect.h,v 1.16 2000-03-16 19:38:59 eaf Exp $# */
 //@{
 
 #include "DjVuGlobal.h"
@@ -98,6 +98,10 @@ public:
       (inclusive) to #xmax# (exclusive) and vertical coordinates #ymin#
       (inclusive) to #ymax# (exclusive). */
   int  contains(int x, int y) const;
+  /** Returns true if this rectangle contains the passed rectangle #rect#.
+      The function basically checks, that the intersection of this rectangle
+      with #rect# is #rect#. */
+  int  contains(const GRect & rect) const;
   /** Returns true if rectangles #r1# and #r2# are equal. */
   friend int operator==(const GRect & r1, const GRect & r2);
   /** Returns true if rectangles #r1# and #r2# are not equal. */

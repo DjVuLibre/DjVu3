@@ -9,11 +9,11 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GRect.cpp,v 1.9 1999-10-22 15:52:39 eaf Exp $
+//C- $Id: GRect.cpp,v 1.10 2000-03-16 19:38:59 eaf Exp $
 
 
 // -- Implementation of class GRect and GRectMapper
-// - File "$Id: GRect.cpp,v 1.9 1999-10-22 15:52:39 eaf Exp $"
+// - File "$Id: GRect.cpp,v 1.10 2000-03-16 19:38:59 eaf Exp $"
 // - Author: Leon Bottou, 05/1997
 
 #ifdef __GNUC__
@@ -131,6 +131,13 @@ GRect::recthull(const GRect &rect1, const GRect &rect2)
   return 1;
 }
 
+int
+GRect::contains(const GRect & rect) const
+{
+   GRect tmp_rect;
+   tmp_rect.intersect(*this, rect);
+   return tmp_rect==rect;
+}
 
 // -- Class GRatio
 
