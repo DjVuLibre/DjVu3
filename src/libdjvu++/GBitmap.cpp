@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GBitmap.cpp,v 1.18 1999-11-17 19:47:29 leonb Exp $
+//C- $Id: GBitmap.cpp,v 1.19 1999-11-18 18:14:57 praveen Exp $
 
 
 #ifdef __GNUC__
@@ -23,7 +23,7 @@
 #include "GString.h"
 #include "GThreads.h"
 
-// File "$Id: GBitmap.cpp,v 1.18 1999-11-17 19:47:29 leonb Exp $"
+// File "$Id: GBitmap.cpp,v 1.19 1999-11-18 18:14:57 praveen Exp $"
 // - Author: Leon Bottou, 05/1997
 
 
@@ -444,7 +444,8 @@ GBitmap::blit(const GBitmap *bm, int x, int y)
     return;
 
   // Perform blit
-  GMonitorLock lock(monitor());
+  GMonitorLock lock1(monitor());
+  GMonitorLock lock2(bm->monitor());
   if (bm->bytes)
     {
       if (!bytes_data)
@@ -527,7 +528,8 @@ GBitmap::blit(const GBitmap *bm, int xh, int yh, int subsample)
     return;
 
   // Perform subsampling blit
-  GMonitorLock lock(monitor());
+  GMonitorLock lock1(monitor());
+  GMonitorLock lock2(bm->monitor());
   if (bm->bytes)
     {
       if (!bytes_data)
