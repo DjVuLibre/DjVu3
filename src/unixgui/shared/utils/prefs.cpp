@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: prefs.cpp,v 1.2 2001-08-08 17:44:52 docbill Exp $
+// $Id: prefs.cpp,v 1.3 2001-08-08 17:47:53 docbill Exp $
 // $Name:  $
 
 
@@ -129,7 +129,7 @@ DjVuPrefs::load(void)
 		  "PrintPortrait:	1\n"
 	  	  "PrintToFile:		0\n"
 		  "PrintPS:		1\n"
-	  	  "PrintLevel2:		1\n"
+	  	  "PrintLevel:		1\n"
 	  	  "PrintFitPage:	1\n"
 	  	  "PrintAllPages:	0\n"
 		  "PrintCommand:	lp\n"
@@ -192,7 +192,9 @@ DjVuPrefs::load(void)
   printPortrait=getInt("PrintPortrait");
   printToFile=getInt("PrintToFile");
   printPS=getInt("PrintPS");
-  printLevel2=getInt("PrintLevel2");
+  printLevel=getInt("PrintLevel");
+  if (printLevel<1) printLevel=1;
+  else if (printLevel>3) printLevel=3;
   printFitPage=getInt("PrintFitPage");
   printAllPages=getInt("PrintAllPages");
   printCommand=getString("PrintCommand");
@@ -238,7 +240,7 @@ DjVuPrefs::save()
   setInt("PrintPortrait", printPortrait);
   setInt("PrintToFile", printToFile);
   setInt("PrintPS", printPS);
-  setInt("PrintLevel2", printLevel2);
+  setInt("PrintLevel", printLevel);
   setInt("PrintFitPage", printFitPage);
   setInt("PrintAllPages", printAllPages);
   setString("PrintCommand", printCommand);

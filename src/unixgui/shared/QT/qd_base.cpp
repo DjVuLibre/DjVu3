@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qd_base.cpp,v 1.8 2001-08-08 18:04:25 docbill Exp $
+// $Id: qd_base.cpp,v 1.9 2001-08-08 18:07:06 docbill Exp $
 // $Name:  $
 
 
@@ -662,7 +662,7 @@ QDBase::layout(bool allow_redraw)
 
       for(GPosition pos=map_areas;pos;++pos)
 	 map_areas[pos]->layout(GRect(0, 0, dimg->get_width(), dimg->get_height()));
-
+      
 	 // Resizing margin caches:
       bm_cache.resize(rectDocument.width(), rectDocument.height(),
 		      rectVisible.width(), rectVisible.height());
@@ -826,9 +826,28 @@ QDBase::setRotate(int cmd)
    if( rotate == rotate_cur )
       return;
 
+   for (GPosition pos=map_areas; pos; ++pos)
+   {
+      MapArea *ma=map_areas[pos];
+      GRect rect=ma->get_bound_rect();
+      dimg->map(rect);
+      if ( ma->getComment()==search_results_name )
+	 ma->gmap_area->transform(rect);
+   }
+
    dimg->set_rotate(rotate);
    decodeAnno(false);
-   layout(0);   
+   layout(0);
+
+   for (GPosition pos=map_areas; pos; ++pos)
+   {
+      MapArea *ma=map_areas[pos];
+      GRect rect=ma->get_bound_rect();
+      dimg->unmap(rect);
+      if ( ma->getComment()==search_results_name )
+	 ma->gmap_area->transform(rect);
+   }
+
    redraw();
 }
 
@@ -906,6 +925,7 @@ QDBase::setCursor(void)
       in_zoom_select ? cur_zoom_select :
       isLensVisible() ? cur_blank :
       in_paint ? cur_wait :
+      pane_mode!=IDC_PANE ? cur_hand_hl :
       (cur_map_area && cur_map_area->isHyperlink()) ? cur_hand_hl : cur_hand1;
    
    if (((const QCursor *)cur)->handle()!=((const QCursor *)cur_last)->handle())
@@ -1242,7 +1262,9 @@ QDBase::updateToolBar(void)
 {
    if (mode_tbar)
       mode_tbar->update(getMode(), dimg && dimg->is_legal_compound(),
-			cmd_zoom, getZoom(), pane_mode);
+			cmd_zoom, getZoom(), pane_mode,
+			dimg && dimg->get_djvu_file()->get_text());
+   
    if (toolbar)
    {
       if (!dimg) toolbar->setEnabled(FALSE);
@@ -1479,6 +1501,7 @@ void
 QDBase::slotSetPaneMode(int cmd_pane)
 {
    pane_mode=cmd_pane;
+   setCursor();
 }
 
 void

@@ -63,8 +63,23 @@
 <HR><H3>Inherited from <A HREF="ByteStream.html">ByteStream</A>:</H3>
 <DL>
 <P><DL>
+<DT><H3>Public Methods</H3><DD><DT>
+<IMG ALT="o" SRC=icon2.gif>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="ByteStream.html">ByteStream</A>&gt;  <B>create</B>(void)
+<DT>
+<IMG ALT="o" SRC=icon2.gif>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="ByteStream.html">ByteStream</A>&gt;  <B>create</B>(void const * const buffer, const size_t <!1><A HREF="ByteStream.html#DOC.1.4.12.1.2.12">size</A>)
+<DT>
+<IMG ALT="o" SRC=icon2.gif>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="ByteStream.html">ByteStream</A>&gt;  <B>create</B>( const char filename[], char const * const mode)
+<DT>
+<IMG ALT="o" SRC=icon2.gif>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="ByteStream.html">ByteStream</A>&gt;  <B>create</B>( const int fd, char const * const mode, const bool closeme)
+<DT>
+<IMG ALT="o" SRC=icon2.gif>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="ByteStream.html">ByteStream</A>&gt;  <B>create</B>( FILE * const f, char const * const mode, const bool closeme)
+<DT>
+<IMG ALT="o" SRC=icon2.gif>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="ByteStream.html">ByteStream</A>&gt;  <B>create_static</B>( void const * const buffer, const size_t <!1><A HREF="ByteStream.html#DOC.1.4.12.1.2.12">size</A>)
+</DL></P>
+
+<P><DL>
 <DT><H3>Public</H3><DD><DT>
-<P> <B>Virtual Functions.</B>
+<P>class  Stdioclass  Staticclass  Memoryclass  <B>Virtual Functions.</B>
 <P><DL>
 <DT>
 <A HREF="#DOC.1.4.12.1.1.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   <B>~ByteStream</B>()
@@ -124,6 +139,12 @@
 <DT>
 <A HREF="#DOC.1.4.12.1.2.12"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   int <B>size</B>(void) const 
 <DD><I>Returns the total number of bytes contained in the buffer, file, etc.</I>
+<DT>
+<A HREF="#DOC.1.4.12.1.2.14"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="TArray.html">TArray</A>&lt;char&gt;  <B>get_data</B>(void)
+<DD><I>Use at your own risk, only guarenteed to work for ByteStream::Memorys.</I>
+<DT>
+<A HREF="#DOC.1.4.12.1.2.13"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   size_t <B>readat</B>(void *buffer, size_t sz, int pos)
+<DD><I>Reads data from a random position.</I>
 </DL></P>
 </DL></P>
 

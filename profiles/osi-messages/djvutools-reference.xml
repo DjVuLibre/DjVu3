@@ -1,115 +1,115 @@
 <?xml version="1.0" ?>
 <!DOCTYPE DjVuMessages PUBLIC "-//W3C/DTD DjVuMessages 1.0//EN" "pubtext/DjVuMessages.dtd">
 <!-- Error messages from the reference library -->
-<!-- $Id: djvutools-reference.xml,v 1.3 2001/03/31 01:18:11 fcrary Exp $ -->
+<!-- $Id: djvutools-reference.xml,v 1.4 2001/04/02 22:53:24 fcrary Exp $ -->
 <DjVuMessages>
 <BODY>
-<MESSAGE name="annotate.failed_chunk" value="Failed to find chunk %#1#d in the source file." />
-<MESSAGE name="annotate.failed_stat" value="Failed to stat annotation file." />
-<MESSAGE name="annotate.usage" value="USAGE:&#10;    annotate -extract|-insert &lt;djvu_in&gt; &lt;ant_file&gt; [&lt;djvu_out&gt;]&#10;or  annotate -remove &lt;djvu_in&gt; [&lt;djvu_out&gt;]." />
-<MESSAGE name="c44.already_compressed" value="Cannot apply mask on an already compressed image" />
-<MESSAGE name="c44.bad_arg_crcbdelay" value="c44: illegal argument for option &apos;-crcbdelay&apos;" />
-<MESSAGE name="c44.bad_arg_dpi" value="c44: illegal argument for option &apos;-dpi&apos;" />
-<MESSAGE name="c44.bad_dbfrac" value="c44: illegal dbfrac specification" />
-<MESSAGE name="c44.bad_gamma" value="c44: illegal gamma specification" />
-<MESSAGE name="c44.cant_read" value="c44: cannot read pnm file header" />
-<MESSAGE name="c44.decibel_bad_num" value="c44: illegal decibel specification (number out of range)" />
-<MESSAGE name="c44.decibel_many_chunks" value="c44: illegal decibel specification (too many chunks)" />
-<MESSAGE name="c44.decibel_no_chunks" value="c44: illegal decibel specification (no chunks)" />
-<MESSAGE name="c44.decibel_no_comma" value="c44: illegal decibel specification (comma or plus expected)" />
-<MESSAGE name="c44.decibel_not_num" value="c44: illegal decibel specification (number expected)" />
-<MESSAGE name="c44.different_size" value="c44: mask and image have different size" />
-<MESSAGE name="c44.excl_options" value="Options -size and -bpp are exclusive" />
-<MESSAGE name="c44.incompat_chrom_opt" value="c44: incompatible chrominance options" />
-<MESSAGE name="c44.multiple_dbfrac" value="c44: multiple dbfrac specification" />
-<MESSAGE name="c44.multiple_decibel" value="c44: multiple decibel specification" />
-<MESSAGE name="c44.multiple_dpi" value="c44: duplicate dpi option" />
-<MESSAGE name="c44.multiple_gamma" value="c44: duplicate gamma option" />
-<MESSAGE name="c44.multiple_mask" value="c44: multiple mask specification" />
-<MESSAGE name="c44.multiple_rate" value="c44: multiple bitrate specification" />
-<MESSAGE name="c44.multiple_slice" value="c44: multiple slice specification" />
-<MESSAGE name="c44.no_arg_bpp" value="c44: no argument for option &apos;-bpp&apos;" />
-<MESSAGE name="c44.no_arg_crcbdelay" value="c44: no argument for option &apos;-crcbdelay&apos;" />
-<MESSAGE name="c44.no_arg_dbfrac" value="c44: no argument for option &apos;-dbfrac&apos;" />
-<MESSAGE name="c44.no_arg_decibel" value="c44: no argument for option &apos;-decibel&apos;" />
-<MESSAGE name="c44.no_arg_dpi" value="c44: no argument for option &apos;-dpi&apos;" />
-<MESSAGE name="c44.no_arg_gamma" value="c44: no argument for option &apos;-gamma&apos;" />
-<MESSAGE name="c44.no_arg_mask" value="c44: no argument for option &apos;-mask&apos;" />
-<MESSAGE name="c44.no_arg_size" value="c44: no argument for option &apos;-size&apos;" />
-<MESSAGE name="c44.no_arg_slice" value="c44: no argument for option &apos;-slice&apos;" />
-<MESSAGE name="c44.rate_bad_num" value="c44: illegal bitrate specification (number out of range)" />
-<MESSAGE name="c44.rate_many_chunks" value="c44: illegal bitrate specification (too many chunks)" />
-<MESSAGE name="c44.rate_no_chunks" value="c44: illegal bitrate specification (no chunks)" />
-<MESSAGE name="c44.rate_no_comma" value="c44: illegal bitrate specification (comma expected)" />
-<MESSAGE name="c44.rate_not_num" value="c44: illegal bitrate specification (number expected)" />
-<MESSAGE name="c44.size_bad_num" value="c44: illegal size specification (number out of range)" />
-<MESSAGE name="c44.size_many_chunks" value="c44: illegal size specification (too many chunks)" />
-<MESSAGE name="c44.size_no_chunks" value="c44: illegal size specification (no chunks)" />
-<MESSAGE name="c44.size_no_comma" value="c44: illegal size specification (comma expected)" />
-<MESSAGE name="c44.size_not_num" value="c44: illegal size specification (number expected)" />
-<MESSAGE name="c44.slice_bad_num" value="c44: illegal slice specification (number out of range)" />
-<MESSAGE name="c44.slice_many_chunks" value="c44: illegal slice specification (too many chunks)" />
-<MESSAGE name="c44.slice_no_chunks" value="c44: illegal slice specification (no chunks)" />
-<MESSAGE name="c44.slice_no_comma" value="c44: illegal slice specification (comma expected)" />
-<MESSAGE name="c44.slice_not_num" value="c44: illegal slice specification (number expected)" />
-<MESSAGE name="c44.unrecog_file" value="Unrecognized file" />
-<MESSAGE name="Callback.seek_failed" value="Failed seek" />
-<MESSAGE name="cjb2.bad_x" value="Internal error (x bounds)" />
-<MESSAGE name="cjb2.bad_y" value="Internal error (y bounds)" />
-<MESSAGE name="cjb2.cc_first" value="Must first perform a cc analysis" />
-<MESSAGE name="convert_io.read_failed" value="Failed to read page." />
-<MESSAGE name="cpaldjvu.bad_x" value="Internal error (x bounds)" />
-<MESSAGE name="cpaldjvu.bad_y" value="Internal error (y bounds)" />
-<MESSAGE name="d44.bad_arg_chunks" value="d44: illegal argument after option -chunks" />
-<MESSAGE name="d44.bad_IW4" value="d44: malformed IW4 file" />
-<MESSAGE name="d44.break_file" value="This is multipage DJVU file. Please break it into pieces." />
-<MESSAGE name="d44.no_arg_chunks" value="d44: missing argument after option -chunks" />
-<MESSAGE name="d44.unexpected_chunk" value="d44: expected BM44 or PM44 chunk in IW4 file" />
-<MESSAGE name="ddjvu.bad_arg_scale" value="Illegal argument for option &apos;-scale&apos;" />
-<MESSAGE name="ddjvu.bad_arg_size" value="Illegal size specification" />
-<MESSAGE name="ddjvu.bad_geometry" value="Syntax error in geometry specification" />
-<MESSAGE name="ddjvu.bad_page" value="Page number must be positive." />
-<MESSAGE name="ddjvu.cant_render" value="Cannot render the requested image" />
-<MESSAGE name="ddjvu.decoding_failed" value="Decoding failed. Nothing can be done." />
-<MESSAGE name="ddjvu.dupl_page" value="Duplicate page specification" />
-<MESSAGE name="ddjvu.dupl_render" value="Duplicate rendering mode specification" />
-<MESSAGE name="ddjvu.dupl_scale" value="Duplicate scaling specification" />
-<MESSAGE name="ddjvu.dupl_segment" value="Duplicate segment specification" />
-<MESSAGE name="ddjvu.no_arg_page" value="No argument for option &apos;-page&apos;" />
-<MESSAGE name="ddjvu.no_arg_scale" value="No argument for option &apos;-scale&apos;" />
-<MESSAGE name="ddjvu.no_arg_segment" value="No argument for option &apos;-segment&apos;" />
-<MESSAGE name="ddjvu.no_arg_size" value="No argument for option &apos;-size&apos;" />
-<MESSAGE name="ddjvu.no_info" value="Cannot find INFO chunk. Aborting." />
-<MESSAGE name="djthumb.no_thumb" value="Thumbnails cannot be generated for one-page documents." />
-<MESSAGE name="djvuextract.bad_info" value="Cannot read INFO chunk" />
-<MESSAGE name="djvuextract.bad_order" value="IW44 chunks are not in proper order" />
-<MESSAGE name="djvuextract.bad_primary" value="Cannot read primary header in BG44 chunk" />
-<MESSAGE name="djvuextract.bad_secondary" value="Cannot read secondary header in BG44 chunk" />
-<MESSAGE name="djvuextract.decode_fail" value="Decoding failed. Nothing can be done." />
-<MESSAGE name="djvuextract.malformed" value="Malformed DJVU file" />
-<MESSAGE name="djvuextract.not_layered" value="This is not a layered DJVU file" />
-<MESSAGE name="djvumake.bad_BG44_spec" value="djvumake: invalid BG44 specification (syntax error)" />
-<MESSAGE name="djvumake.bad_chunks" value="djvumake: invalid number of chunks in BG44 specification" />
-<MESSAGE name="djvumake.bad_dpi" value="djvumake: incorrect dpi in &apos;INFO&apos; chunk specification" />
-<MESSAGE name="djvumake.bad_height" value="djvumake: incorrect height in &apos;INFO&apos; chunk specification" />
-<MESSAGE name="djvumake.bad_IFF_header" value="djvumake: %#1#s file has incorrect format (wrong IFF header)" />
-<MESSAGE name="djvumake.bad_info" value="djvumake: incorrect &apos;INFO&apos; chunk specification" />
-<MESSAGE name="djvumake.bad_primary_header" value="djvumake: %#1#s file is corrupted (cannot read primary header)" />
-<MESSAGE name="djvumake.bad_secondary_header" value="djvumake: %#1#s file is corrupted (cannot read secondary header)" />
-<MESSAGE name="djvumake.bad_serial" value="djvumake: FG44 file is corrupted (wrong serial number)" />
-<MESSAGE name="djvumake.bad_size" value="djvumake: cannot determine image size" />
-<MESSAGE name="djvumake.bad_width" value="djvumake: incorrect width in &apos;INFO&apos; chunk specification" />
-<MESSAGE name="djvumake.diff_height" value="Stencil and raw image have different heights!" />
-<MESSAGE name="djvumake.diff_width" value="Stencil and raw image have different widths!" />
-<MESSAGE name="djvumake.filename_in_BG44" value="djvumake: filename specified in BG44 refinement" />
-<MESSAGE name="djvumake.no_comma" value="djvumake: comma expected in &apos;INFO&apos; chunk specification" />
-<MESSAGE name="djvumake.no_filename" value="djvumake: no filename specified in first BG44 specification" />
-<MESSAGE name="djvumake.no_JB2" value="Could not find JB2 data" />
-<MESSAGE name="djvumake.no_MMR" value="Could not find MMR data" />
-<MESSAGE name="djvumake.no_stencil" value="The use of a raw ppm image requires a stencil" />
-<MESSAGE name="djvumake.not_djvu" value="Expecting a DjVu file!" />
-<MESSAGE name="djvutxt.decode_fail" value="Failed to decode page." />
-<MESSAGE name="ppmcoco.bad_gamma" value="gamma out of range (0.25 , 5)" />
-<MESSAGE name="ppmcoco.bad_gamma_spec" value="incorrect gamma specification" />
+<MESSAGE name="annotate.failed_chunk" number="10000" value="[%#0#s] Failed to find chunk %#1#d in the source file." />
+<MESSAGE name="annotate.failed_stat" number="10001" value="[%#0#s] Failed to stat annotation file." />
+<MESSAGE name="annotate.usage" number="10002" value="[%#0#s] USAGE:&#10;    annotate -extract|-insert &lt;djvu_in&gt; &lt;ant_file&gt; [&lt;djvu_out&gt;]&#10;or  annotate -remove &lt;djvu_in&gt; [&lt;djvu_out&gt;]." />
+<MESSAGE name="c44.already_compressed" number="10100" value="[%#0#s] Cannot apply mask on an already compressed image" />
+<MESSAGE name="c44.bad_arg_crcbdelay" number="10101" value="[%#0#s] c44: illegal argument for option &apos;-crcbdelay&apos;" />
+<MESSAGE name="c44.bad_arg_dpi" number="10102" value="[%#0#s] c44: illegal argument for option &apos;-dpi&apos;" />
+<MESSAGE name="c44.bad_dbfrac" number="10103" value="[%#0#s] c44: illegal dbfrac specification" />
+<MESSAGE name="c44.bad_gamma" number="10104" value="[%#0#s] c44: illegal gamma specification" />
+<MESSAGE name="c44.cant_read" number="10105" value="[%#0#s] c44: cannot read pnm file header" />
+<MESSAGE name="c44.decibel_bad_num" number="10106" value="[%#0#s] c44: illegal decibel specification (number out of range)" />
+<MESSAGE name="c44.decibel_many_chunks" number="10107" value="[%#0#s] c44: illegal decibel specification (too many chunks)" />
+<MESSAGE name="c44.decibel_no_chunks" number="10108" value="[%#0#s] c44: illegal decibel specification (no chunks)" />
+<MESSAGE name="c44.decibel_no_comma" number="10109" value="[%#0#s] c44: illegal decibel specification (comma or plus expected)" />
+<MESSAGE name="c44.decibel_not_num" number="10110" value="[%#0#s] c44: illegal decibel specification (number expected)" />
+<MESSAGE name="c44.different_size" number="10111" value="[%#0#s] c44: mask and image have different size" />
+<MESSAGE name="c44.excl_options" number="10112" value="[%#0#s] Options -size and -bpp are exclusive" />
+<MESSAGE name="c44.incompat_chrom_opt" number="10113" value="[%#0#s] c44: incompatible chrominance options" />
+<MESSAGE name="c44.multiple_dbfrac" number="10114" value="[%#0#s] c44: multiple dbfrac specification" />
+<MESSAGE name="c44.multiple_decibel" number="10115" value="[%#0#s] c44: multiple decibel specification" />
+<MESSAGE name="c44.multiple_dpi" number="10116" value="[%#0#s] c44: duplicate dpi option" />
+<MESSAGE name="c44.multiple_gamma" number="10117" value="[%#0#s] c44: duplicate gamma option" />
+<MESSAGE name="c44.multiple_mask" number="10118" value="[%#0#s] c44: multiple mask specification" />
+<MESSAGE name="c44.multiple_rate" number="10119" value="[%#0#s] c44: multiple bitrate specification" />
+<MESSAGE name="c44.multiple_slice" number="10120" value="[%#0#s] c44: multiple slice specification" />
+<MESSAGE name="c44.no_arg_bpp" number="10121" value="[%#0#s] c44: no argument for option &apos;-bpp&apos;" />
+<MESSAGE name="c44.no_arg_crcbdelay" number="10122" value="[%#0#s] c44: no argument for option &apos;-crcbdelay&apos;" />
+<MESSAGE name="c44.no_arg_dbfrac" number="10123" value="[%#0#s] c44: no argument for option &apos;-dbfrac&apos;" />
+<MESSAGE name="c44.no_arg_decibel" number="10124" value="[%#0#s] c44: no argument for option &apos;-decibel&apos;" />
+<MESSAGE name="c44.no_arg_dpi" number="10125" value="[%#0#s] c44: no argument for option &apos;-dpi&apos;" />
+<MESSAGE name="c44.no_arg_gamma" number="10126" value="[%#0#s] c44: no argument for option &apos;-gamma&apos;" />
+<MESSAGE name="c44.no_arg_mask" number="10127" value="[%#0#s] c44: no argument for option &apos;-mask&apos;" />
+<MESSAGE name="c44.no_arg_size" number="10128" value="[%#0#s] c44: no argument for option &apos;-size&apos;" />
+<MESSAGE name="c44.no_arg_slice" number="10129" value="[%#0#s] c44: no argument for option &apos;-slice&apos;" />
+<MESSAGE name="c44.rate_bad_num" number="10130" value="[%#0#s] c44: illegal bitrate specification (number out of range)" />
+<MESSAGE name="c44.rate_many_chunks" number="10131" value="[%#0#s] c44: illegal bitrate specification (too many chunks)" />
+<MESSAGE name="c44.rate_no_chunks" number="10132" value="[%#0#s] c44: illegal bitrate specification (no chunks)" />
+<MESSAGE name="c44.rate_no_comma" number="10133" value="[%#0#s] c44: illegal bitrate specification (comma expected)" />
+<MESSAGE name="c44.rate_not_num" number="10134" value="[%#0#s] c44: illegal bitrate specification (number expected)" />
+<MESSAGE name="c44.size_bad_num" number="10135" value="[%#0#s] c44: illegal size specification (number out of range)" />
+<MESSAGE name="c44.size_many_chunks" number="10136" value="[%#0#s] c44: illegal size specification (too many chunks)" />
+<MESSAGE name="c44.size_no_chunks" number="10137" value="[%#0#s] c44: illegal size specification (no chunks)" />
+<MESSAGE name="c44.size_no_comma" number="10138" value="[%#0#s] c44: illegal size specification (comma expected)" />
+<MESSAGE name="c44.size_not_num" number="10139" value="[%#0#s] c44: illegal size specification (number expected)" />
+<MESSAGE name="c44.slice_bad_num" number="10140" value="[%#0#s] c44: illegal slice specification (number out of range)" />
+<MESSAGE name="c44.slice_many_chunks" number="10141" value="[%#0#s] c44: illegal slice specification (too many chunks)" />
+<MESSAGE name="c44.slice_no_chunks" number="10142" value="[%#0#s] c44: illegal slice specification (no chunks)" />
+<MESSAGE name="c44.slice_no_comma" number="10143" value="[%#0#s] c44: illegal slice specification (comma expected)" />
+<MESSAGE name="c44.slice_not_num" number="10144" value="[%#0#s] c44: illegal slice specification (number expected)" />
+<MESSAGE name="c44.unrecog_file" number="10145" value="[%#0#s] Unrecognized file" />
+<MESSAGE name="Callback.seek_failed" number="10200" value="[%#0#s] Failed seek" />
+<MESSAGE name="cjb2.bad_x" number="10300" value="[%#0#s] Internal error (x bounds)" />
+<MESSAGE name="cjb2.bad_y" number="10301" value="[%#0#s] Internal error (y bounds)" />
+<MESSAGE name="cjb2.cc_first" number="10302" value="[%#0#s] Must first perform a cc analysis" />
+<MESSAGE name="convert_io.read_failed" number="10400" value="[%#0#s] Failed to read page." />
+<MESSAGE name="cpaldjvu.bad_x" number="10500" value="[%#0#s] Internal error (x bounds)" />
+<MESSAGE name="cpaldjvu.bad_y" number="10501" value="[%#0#s] Internal error (y bounds)" />
+<MESSAGE name="d44.bad_arg_chunks" number="10600" value="[%#0#s] d44: illegal argument after option -chunks" />
+<MESSAGE name="d44.bad_IW4" number="10601" value="[%#0#s] d44: malformed IW4 file" />
+<MESSAGE name="d44.break_file" number="10602" value="[%#0#s] This is multipage DJVU file. Please break it into pieces." />
+<MESSAGE name="d44.no_arg_chunks" number="10603" value="[%#0#s] d44: missing argument after option -chunks" />
+<MESSAGE name="d44.unexpected_chunk" number="10604" value="[%#0#s] d44: expected BM44 or PM44 chunk in IW4 file" />
+<MESSAGE name="ddjvu.bad_arg_scale" number="10700" value="[%#0#s] Illegal argument for option &apos;-scale&apos;" />
+<MESSAGE name="ddjvu.bad_arg_size" number="10701" value="[%#0#s] Illegal size specification" />
+<MESSAGE name="ddjvu.bad_geometry" number="10702" value="[%#0#s] Syntax error in geometry specification" />
+<MESSAGE name="ddjvu.bad_page" number="10703" value="[%#0#s] Page number must be positive." />
+<MESSAGE name="ddjvu.cant_render" number="10704" value="[%#0#s] Cannot render the requested image" />
+<MESSAGE name="ddjvu.decoding_failed" number="10705" value="[%#0#s] Decoding failed. Nothing can be done." />
+<MESSAGE name="ddjvu.dupl_page" number="10706" value="[%#0#s] Duplicate page specification" />
+<MESSAGE name="ddjvu.dupl_render" number="10707" value="[%#0#s] Duplicate rendering mode specification" />
+<MESSAGE name="ddjvu.dupl_scale" number="10708" value="[%#0#s] Duplicate scaling specification" />
+<MESSAGE name="ddjvu.dupl_segment" number="10709" value="[%#0#s] Duplicate segment specification" />
+<MESSAGE name="ddjvu.no_arg_page" number="10710" value="[%#0#s] No argument for option &apos;-page&apos;" />
+<MESSAGE name="ddjvu.no_arg_scale" number="10711" value="[%#0#s] No argument for option &apos;-scale&apos;" />
+<MESSAGE name="ddjvu.no_arg_segment" number="10712" value="[%#0#s] No argument for option &apos;-segment&apos;" />
+<MESSAGE name="ddjvu.no_arg_size" number="10713" value="[%#0#s] No argument for option &apos;-size&apos;" />
+<MESSAGE name="ddjvu.no_info" number="10714" value="[%#0#s] Cannot find INFO chunk. Aborting." />
+<MESSAGE name="djthumb.no_thumb" number="10800" value="[%#0#s] Thumbnails cannot be generated for one-page documents." />
+<MESSAGE name="djvuextract.bad_info" number="10900" value="[%#0#s] Cannot read INFO chunk" />
+<MESSAGE name="djvuextract.bad_order" number="10901" value="[%#0#s] IW44 chunks are not in proper order" />
+<MESSAGE name="djvuextract.bad_primary" number="10902" value="[%#0#s] Cannot read primary header in BG44 chunk" />
+<MESSAGE name="djvuextract.bad_secondary" number="10903" value="[%#0#s] Cannot read secondary header in BG44 chunk" />
+<MESSAGE name="djvuextract.decode_fail" number="10904" value="[%#0#s] Decoding failed. Nothing can be done." />
+<MESSAGE name="djvuextract.malformed" number="10905" value="[%#0#s] Malformed DJVU file" />
+<MESSAGE name="djvuextract.not_layered" number="10906" value="[%#0#s] This is not a layered DJVU file" />
+<MESSAGE name="djvumake.bad_BG44_spec" number="11000" value="[%#0#s] djvumake: invalid BG44 specification (syntax error)" />
+<MESSAGE name="djvumake.bad_chunks" number="11001" value="[%#0#s] djvumake: invalid number of chunks in BG44 specification" />
+<MESSAGE name="djvumake.bad_dpi" number="11002" value="[%#0#s] djvumake: incorrect dpi in &apos;INFO&apos; chunk specification" />
+<MESSAGE name="djvumake.bad_height" number="11003" value="[%#0#s] djvumake: incorrect height in &apos;INFO&apos; chunk specification" />
+<MESSAGE name="djvumake.bad_IFF_header" number="11004" value="[%#0#s] djvumake: %#1#s file has incorrect format (wrong IFF header)" />
+<MESSAGE name="djvumake.bad_info" number="11005" value="[%#0#s] djvumake: incorrect &apos;INFO&apos; chunk specification" />
+<MESSAGE name="djvumake.bad_primary_header" number="11006" value="[%#0#s] djvumake: %#1#s file is corrupted (cannot read primary header)" />
+<MESSAGE name="djvumake.bad_secondary_header" number="11007" value="[%#0#s] djvumake: %#1#s file is corrupted (cannot read secondary header)" />
+<MESSAGE name="djvumake.bad_serial" number="11008" value="[%#0#s] djvumake: FG44 file is corrupted (wrong serial number)" />
+<MESSAGE name="djvumake.bad_size" number="11009" value="[%#0#s] djvumake: cannot determine image size" />
+<MESSAGE name="djvumake.bad_width" number="11010" value="[%#0#s] djvumake: incorrect width in &apos;INFO&apos; chunk specification" />
+<MESSAGE name="djvumake.diff_height" number="11011" value="[%#0#s] Stencil and raw image have different heights!" />
+<MESSAGE name="djvumake.diff_width" number="11012" value="[%#0#s] Stencil and raw image have different widths!" />
+<MESSAGE name="djvumake.filename_in_BG44" number="11013" value="[%#0#s] djvumake: filename specified in BG44 refinement" />
+<MESSAGE name="djvumake.no_comma" number="11014" value="[%#0#s] djvumake: comma expected in &apos;INFO&apos; chunk specification" />
+<MESSAGE name="djvumake.no_filename" number="11015" value="[%#0#s] djvumake: no filename specified in first BG44 specification" />
+<MESSAGE name="djvumake.no_JB2" number="11016" value="[%#0#s] Could not find JB2 data" />
+<MESSAGE name="djvumake.no_MMR" number="11017" value="[%#0#s] Could not find MMR data" />
+<MESSAGE name="djvumake.no_stencil" number="11018" value="[%#0#s] The use of a raw ppm image requires a stencil" />
+<MESSAGE name="djvumake.not_djvu" number="11019" value="[%#0#s] Expecting a DjVu file!" />
+<MESSAGE name="djvutxt.decode_fail" number="11100" value="[%#0#s] Failed to decode page." />
+<MESSAGE name="ppmcoco.bad_gamma" number="11200" value="[%#0#s] gamma out of range (0.25 , 5)" />
+<MESSAGE name="ppmcoco.bad_gamma_spec" number="11201" value="[%#0#s] incorrect gamma specification" />
 </BODY>
 </DjVuMessages>

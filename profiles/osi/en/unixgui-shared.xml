@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" ?>
 <!DOCTYPE DjVuMessages PUBLIC "-//W3C/DTD DjVuMessages 1.0//EN" "../../../pubtext/DjVuMessages.dtd">
 <!-- Messages from libdjvu++ -->
-<!-- $Id: unixgui-shared.xml,v 1.1 2001/07/19 19:37:27 mchen Exp $ -->
+<!-- $Id: unixgui-shared.xml,v 1.2 2001/07/24 23:47:45 mchen Exp $ -->
 <DjVuMessages>
 <BODY>
 <MESSAGE name="QDBase.bitmap_not_found" number="00100">
@@ -12,6 +12,9 @@
 </MESSAGE>
 <MESSAGE name="MapArea.unknown_border_type" number="00300">
 [3-%0!05u!] Unknown border type. 
+</MESSAGE>
+<MESSAGE name="WorkStandalone.fail_to_get_visuals" number="00400">
+[3-%0!05u!] Failed to get the list of supported visuals 
 </MESSAGE>
 </BODY>
 </DjVuMessages>

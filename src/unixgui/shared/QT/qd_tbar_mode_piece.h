@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qd_tbar_mode_piece.h,v 1.3 2001-07-25 17:10:43 mchen Exp $
+// $Id: qd_tbar_mode_piece.h,v 1.4 2001-08-08 17:51:09 docbill Exp $
 // $Name:  $
 
 
@@ -69,7 +69,7 @@ public:
    void		stick(bool en);
    bool		isStuck(void) const;
    void		update(int cmd_mode, bool mode_enabled,
-		       int cmd_zoom, int zoom, int pane_mode);
+		       int cmd_zoom, int zoom, int pane_mode, int has_text);
    
    QDTBarModePiece(QWidget * toolbar);
 };

@@ -22,13 +22,12 @@ if [ x"$1" != x ]; then
     outfile="lang_$1_tmp.po"
     echo "Charset=$1"
     sed -e "s,charset *=[_0-9a-zA-Z-]*,charset=$1,g" < $tmp_file > $outfile
+    rm -f $tmp_file
 else
     outfile="lang_unknown_tmp.po"
     echo "Charset not specified. use default"
     mv $tmp_file $outfile
 fi  
-
-rm -f $tmp_file
 
 echo "Output file = $outfile"
 

@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qd_base_ant.cpp,v 1.3 2001-08-08 17:47:53 docbill Exp $
+// $Id: qd_base_ant.cpp,v 1.4 2001-08-08 17:51:09 docbill Exp $
 // $Name:  $
 
 
@@ -75,6 +75,7 @@ QDBase::displaySearchResults(const GList<DjVuTXT::Zone *> & zones_list)
 {
    eraseSearchResults();
 
+   search_results_name="Search results";
    for(GPosition pos=zones_list;pos;++pos)
    {
       GRect irect=zones_list[pos]->rect;

@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qd_base_events.cpp,v 1.8 2001-08-08 18:04:25 docbill Exp $
+// $Id: qd_base_events.cpp,v 1.9 2001-08-08 18:07:06 docbill Exp $
 // $Name:  $
 
 
@@ -405,7 +405,8 @@ QDBase::processMouseMoveEvent(QMouseEvent * ev)
       for(GPosition pos=map_areas;pos;++pos)
       {
 	 GP<MapArea> ma=map_areas[pos];
-	 if (ma->is_point_inside(_xPos, _yPos))
+	 if (ma->getComment() != search_results_name &&
+	     ma->is_point_inside(_xPos, _yPos))
 	 {
 	    if (!new_cur_map_area || ma->isHyperlink()) new_cur_map_area=ma;
 	    if (new_cur_map_area->isHyperlink()) break;
@@ -492,10 +493,7 @@ QDBase::eventFilter(QObject *obj, QEvent *e)
 	 switch(e->type())
 	 {
 	    case Event_MouseButtonPress:
-	    {
-                if (pane_mode==IDC_TEXT_SELECT)
-                   eraseSearchResults();
-     
+	    {     
 	       DEBUG_MSGN("Event_MousePress\n");
 	       QMouseEvent * ev=(QMouseEvent *) e;
 
@@ -566,6 +564,9 @@ QDBase::eventFilter(QObject *obj, QEvent *e)
 		  {
 		     in_zoom_select=0;
 		     setCursor();
+		     
+		     if (pane_mode==IDC_TEXT_SELECT)
+			eraseSearchResults();
             
 		     if(lastrect && !lastrect->isempty())
 		     {
@@ -604,7 +605,6 @@ QDBase::eventFilter(QObject *obj, QEvent *e)
 			   GRect rect=rectDocument;
 			   text_rect.intersect(text_rect, rect);
 			   
-                           //setMappers();
 			   ma_mapper.unmap(text_rect);
   			   dimg->map(text_rect);			
 
@@ -617,6 +617,7 @@ QDBase::eventFilter(QObject *obj, QEvent *e)
 			      if( djvutext->txt )
 			      {
 				 GList<GRect> rects=djvutext->txt->find_text_with_rect(text_rect,UTF8selectedtext);
+				 search_results_name="Selected Text";
 				 for(GPosition pos=rects;pos;++pos)
 				 {
 				    GRect irect=rects[pos];

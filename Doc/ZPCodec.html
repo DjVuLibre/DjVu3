@@ -12,25 +12,25 @@
 <DL>
 <P><DL>
 <DT><H3>Public Fields</H3><DD><DT>
-<A HREF="#DOC.1.5.15.2.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>bitcount</B>
+<A HREF="#DOC.1.4.15.2.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>bitcount</B>
 <DD><I>Counter for code bits (requires <TT>-DZPCODEC_BITCOUNT</TT>).</I>
 </DL></P>
 
 <P><DL>
 <DT><H3>Public Methods</H3><DD><DT>
-<A HREF="#DOC.1.5.15.2.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>ZPCodec</B>(<!1><A HREF="ByteStream.html">ByteStream</A> &amp;bs, bool encoding, bool djvucompat=false)
+<A HREF="#DOC.1.4.15.2.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>ZPCodec</B>(<!1><A HREF="ByteStream.html">ByteStream</A> &amp;bs, bool encoding, bool djvucompat=false)
 <DD><I>Constructs a ZP-Coder.</I>
 <DT>
-<A HREF="#DOC.1.5.15.2.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>encoder</B>(int bit, <!1><A HREF="BitContext.html">BitContext</A> &amp;ctx)
+<A HREF="#DOC.1.4.15.2.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>encoder</B>(int bit, <!1><A HREF="BitContext.html">BitContext</A> &amp;ctx)
 <DD><I>Encodes bit <TT>bit</TT> using context variable <TT>ctx</TT>.</I>
 <DT>
-<A HREF="#DOC.1.5.15.2.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>decoder</B>(<!1><A HREF="BitContext.html">BitContext</A> &amp;ctx)
+<A HREF="#DOC.1.4.15.2.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>decoder</B>(<!1><A HREF="BitContext.html">BitContext</A> &amp;ctx)
 <DD><I>Decodes a bit using context variable <TT>ctx</TT>.</I>
 <DT>
-<A HREF="#DOC.1.5.15.2.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>encoder</B>(int bit)
+<A HREF="#DOC.1.4.15.2.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>encoder</B>(int bit)
 <DD><I>Encodes bit <TT>bit</TT> without compression (pass-thru encoder).</I>
 <DT>
-<A HREF="#DOC.1.5.15.2.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>decoder</B>()
+<A HREF="#DOC.1.4.15.2.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>decoder</B>()
 <DD><I>Decodes a bit without compression (pass-thru decoder).</I>
 </DL></P>
 
@@ -43,13 +43,13 @@
 constructed for encoding or for decoding.  The ZPCodec object is connected
 with a <!1><A HREF="ByteStream.html">ByteStream</A> object specified at construction time.  A ZPCodec
 object constructed for decoding reads code bits from the ByteStream and
-returns a message bit whenever function <!1><A HREF="ZPCodec.html#DOC.1.5.15.2.3">decoder</A> is called.  A
+returns a message bit whenever function <!1><A HREF="ZPCodec.html#DOC.1.4.15.2.3">decoder</A> is called.  A
 ZPCodec constructed for encoding processes the message bits provided by
-function <!1><A HREF="ZPCodec.html#DOC.1.5.15.2.4">encoder</A> and writes the corresponding code bits to
+function <!1><A HREF="ZPCodec.html#DOC.1.4.15.2.4">encoder</A> and writes the corresponding code bits to
 ByteStream <TT>bs</TT>.<P>You should never directly access a ByteStream object connected to a valid
 ZPCodec object. The most direct way to access the ByteStream object
-consists of using the "pass-thru" versions of functions <!1><A HREF="ZPCodec.html#DOC.1.5.15.2.4">encoder</A> and
-<!1><A HREF="ZPCodec.html#DOC.1.5.15.2.3">decoder</A>.<P>The ByteStream object can be accessed again after the destruction of the
+consists of using the "pass-thru" versions of functions <!1><A HREF="ZPCodec.html#DOC.1.4.15.2.4">encoder</A> and
+<!1><A HREF="ZPCodec.html#DOC.1.4.15.2.3">decoder</A>.<P>The ByteStream object can be accessed again after the destruction of the
 ZPCodec object.  Note that the encoder always flushes its internal buffers
 and writes a few final code bytes when the ZPCodec object is destroyed.
 Note also that the decoder often reads a few bytes beyond the last code byte
@@ -64,7 +64,7 @@ terminated string).  </BLOCKQUOTE>
 <DL>
 
 <A NAME="ZPCodec">
-<A NAME="DOC.1.5.15.2.1">
+<A NAME="DOC.1.4.15.2.1">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> ZPCodec(<!1><A HREF="ByteStream.html">ByteStream</A> &amp;bs, bool encoding, bool djvucompat=false)</B></TT>
 <DD>Constructs a ZP-Coder.  If argument
 object will read code bits from the ByteStream <TT>bs</TT> and return a message
@@ -75,7 +75,7 @@ bitstream compatibility.  You should not use this flag unless you want
 to decode JB2, IW44 or BZZ encoded data. 
 <DL><DT><DD></DL><P>
 <A NAME="encoder">
-<A NAME="DOC.1.5.15.2.2">
+<A NAME="DOC.1.4.15.2.2">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void encoder(int bit, <!1><A HREF="BitContext.html">BitContext</A> &amp;ctx)</B></TT>
 <DD>Encodes bit <TT>bit</TT> using context variable <TT>ctx</TT>.  Argument <TT>bit</TT> must be
 <TT>0</TT> or <TT>1</TT>. This function should only be used with ZP-Coder objects
@@ -83,14 +83,14 @@ created for encoding. It may modify the contents of variable <TT>ctx</TT> in
 order to perform context adaptation. 
 <DL><DT><DD></DL><P>
 <A NAME="decoder">
-<A NAME="DOC.1.5.15.2.3">
+<A NAME="DOC.1.4.15.2.3">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int decoder(<!1><A HREF="BitContext.html">BitContext</A> &amp;ctx)</B></TT>
 <DD>Decodes a bit using context variable <TT>ctx</TT>. This function should only be
 used with ZP-Coder objects created for decoding. It may modify the
 contents of variable <TT>ctx</TT> in order to perform context adaptation. 
 <DL><DT><DD></DL><P>
 <A NAME="encoder">
-<A NAME="DOC.1.5.15.2.4">
+<A NAME="DOC.1.4.15.2.4">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void encoder(int bit)</B></TT>
 <DD>Encodes bit <TT>bit</TT> without compression (pass-thru encoder).  Argument
 <TT>bit</TT> must be <TT>0</TT> or <TT>1</TT>. No compression will be applied. Calling this
@@ -98,13 +98,13 @@ function always increases the length of the code bit sequence by one
 bit. 
 <DL><DT><DD></DL><P>
 <A NAME="decoder">
-<A NAME="DOC.1.5.15.2.5">
+<A NAME="DOC.1.4.15.2.5">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int decoder()</B></TT>
 <DD>Decodes a bit without compression (pass-thru decoder).  This function
 retrieves bits encoded with the pass-thru encoder. 
 <DL><DT><DD></DL><P>
 <A NAME="bitcount">
-<A NAME="DOC.1.5.15.2.6">
+<A NAME="DOC.1.4.15.2.6">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int bitcount</B></TT>
 <DD>Counter for code bits (requires <TT>-DZPCODEC_BITCOUNT</TT>). This member
 variable is available when the ZP-Coder is compiled with option
@@ -120,7 +120,7 @@ components of the message.
 <!-- This is were the DOC++ footer is defined  -->
 
 <font face="arial,helvetica" size="2">
-<a href=http://www.lizardtech.com>DjVu</a> is a trademark of AT&amp;T.  
+<a href=http://www.lizardtech.com>DjVu</a> is a trademark of LizardTech, Inc.  
 <br>All other products mentioned are registered trademarks or trademarks of
 their respective companies.
 </font>

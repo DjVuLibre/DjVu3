@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qd_tbar_mode_piece.cpp,v 1.6 2001-07-30 18:29:55 mchen Exp $
+// $Id: qd_tbar_mode_piece.cpp,v 1.7 2001-08-08 18:01:31 docbill Exp $
 // $Name:  $
 
 
@@ -249,7 +249,8 @@ QDTBarModePiece::QDTBarModePiece(QWidget * toolbar) : QDTBarPiece(toolbar)
 }
 
 void
-QDTBarModePiece::update(int cmd_mode, bool mode_enabled, int cmd_zoom, int zoom, int pane_mode)
+QDTBarModePiece::update(int cmd_mode, bool mode_enabled, int cmd_zoom, int zoom,
+			int pane_mode, int has_text)
 {
    int i;
    for(i=0;i<menu_items_size;i++)
@@ -272,7 +273,18 @@ QDTBarModePiece::update(int cmd_mode, bool mode_enabled, int cmd_zoom, int zoom,
 
    pane_butt->setOn(pane_mode==IDC_PANE);
    zoom_select_butt->setOn(pane_mode==IDC_ZOOM_SELECT);
-   text_select_butt->setOn(pane_mode==IDC_TEXT_SELECT);
+   if (has_text)
+   {
+      if (!text_select_butt->isEnabled())
+	 text_select_butt->setEnabled(true);
+      text_select_butt->setOn(pane_mode==IDC_TEXT_SELECT);
+   }
+   else
+   {
+      if (text_select_butt->isEnabled())
+	 text_select_butt->setEnabled(false);
+   }
+   
    
    switch(cmd_mode)
    {
@@ -293,7 +305,7 @@ QDTBarModePiece::update(int cmd_mode, bool mode_enabled, int cmd_zoom, int zoom,
    }
 
    if ( !qdtoolbar_child )
-      zoom_menu->setEnabled(TRUE);
+      zoom_menu->setEnabled(true);
    
    mode_menu->setEnabled(mode_enabled);
 

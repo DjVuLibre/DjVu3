@@ -146,75 +146,79 @@ msgstr ""
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
 "Content-Type: text/plain; charset=Big5\n"
 
-#: ./djview/qd_viewer.cpp:771
+#: ./djview/qd_viewer.cpp:774
 msgid "QDViewer::&Download"
 msgstr "¤U¸ü"
 
-#: ./djview/qd_viewer.cpp:771
+#: ./djview/qd_viewer.cpp:774
 msgid "QDViewer::&Ignore"
 msgstr "¤£²z·|"
 
-#: ./djview/qd_viewer.cpp:1278
+#: ./djview/qd_viewer.cpp:1281
 msgid "QDViewer::DjVu Error"
 msgstr "DjVu ¿ù»~"
 
-#: ./djview/qd_viewer.cpp:390
+#: ./djview/qd_viewer.cpp:393
 msgid "QDViewer::DjVu Viewer - "
 msgstr "DjVu Âsø°¾¹ - "
 
-#: ./djview/qd_viewer.cpp:993
+#: ./djview/qd_viewer.cpp:996
 msgid "QDViewer::Finish printing first"
 msgstr "¥ý§¹¦¨¥´¦L"
 
-#: ./djview/qd_viewer.cpp:864
+#: ./djview/qd_viewer.cpp:867
 msgid "QDViewer::Page decoding done ("
 msgstr "¸Ñ½Xµ²§ô("
 
-#: ./djview/qd_viewer.cpp:994
+#: ./djview/qd_viewer.cpp:997
 msgid "QDViewer::Please close the Print dialog first."
 msgstr "½Ð¥ýÃö³¬¥´¦L¹ï¸Üµ¡"
 
-#: ./djview/qd_viewer.cpp:776
+#: ./djview/qd_viewer.cpp:779
 msgid "QDViewer::Please upgrade the viewer to\nview this document.\n"
 msgstr "¦pªG­n¾\Åª¸Ó¤å¥ó, ±z¥²¶·§ó·s±zªºÂsø°¾¹"
 
-#: ./djview/qd_viewer.cpp:862
+#: ./djview/qd_viewer.cpp:865
 msgid "QDViewer::Plese send a flame to the webmaster who\nuses outdated tools.\n"
 msgstr ""
 
-#: ./djview/qd_viewer.cpp:735
+#: ./djview/qd_viewer.cpp:738
 msgid "QDViewer::Printing prohibited"
 msgstr "¤£¥i¥´¦L"
 
-#: ./djview/qd_viewer.cpp:1050
+#: ./djview/qd_viewer.cpp:1053
 msgid "QDViewer::Requesting URL "
 msgstr "¯Á­nURL"
 
-#: ./djview/qd_viewer.cpp:1344
+#: ./djview/qd_viewer.cpp:1347
 msgid "QDViewer::Subprocess diagnostics"
 msgstr "¤l¹Lµ{¶EÂ_"
 
-#: ./djview/qd_viewer.cpp:861
+#: ./djview/qd_viewer.cpp:864
 msgid "QDViewer::This DjVu document uses an inferior\ntechnology, which is no longer supported.\n"
 msgstr "¸ÓDjVu¤å¥ó®æ¦¡¹LÂÂ"
 
-#: ./djview/qd_viewer.cpp:769
+#: ./djview/qd_viewer.cpp:772
 msgid "QDViewer::To install the newest\nversion click \"Download\" and "
 msgstr "½Ð«ö\"¤U¸ü\"Áä¦w¸Ë³Ì·sªºµ{§Ç"
 
-#: ./djview/qd_viewer.cpp:860
+#: ./djview/qd_viewer.cpp:863
 msgid "QDViewer::Upgrade DjVu now!"
 msgstr "²{¦b´N§ó·sDjVU!"
 
-#: ./djview/qd_viewer.cpp:736
+#: ./djview/qd_viewer.cpp:739
 msgid "QDViewer::We are sorry, but printing of this image\nhas been disallowed."
 msgstr "©êºp, ¸Ó¹Ï¹³µLªk¥´¦L"
 
-#: ./djview/qd_viewer.cpp:775
+#: ./djview/qd_viewer.cpp:778
 msgid "QDViewer::You are using an obsolete version of the\nDjVu plugin. "
 msgstr ""
 
-#: ./djview/qd_viewer.cpp:770
+# #: ./djview/qd_viewer.cpp:387
+# msgid "QDViewer::exception test exception test ...."
+# msgstr "´úÅç¿ù»~...¿ù»~...¿ù»~"
+
+#: ./djview/qd_viewer.cpp:773
 msgid "QDViewer::follow the\ninstructions.\n"
 msgstr "½Ð¨Ì»¡©ú"
 
@@ -430,175 +434,175 @@ msgstr ""
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
 "Content-Type: text/plain; charset=Big5\n"
 
-#: ./djview/qd_viewer_shell.cpp:446
+#: ./djview/qd_viewer_shell.cpp:445
 msgid "QDViewerShell::&+10 Pages"
 msgstr "+10 ­¶"
 
-#: ./djview/qd_viewer_shell.cpp:447
+#: ./djview/qd_viewer_shell.cpp:446
 msgid "QDViewerShell::&-10 Pages"
 msgstr "-10 ­¶"
 
-#: ./djview/qd_viewer_shell.cpp:463
+#: ./djview/qd_viewer_shell.cpp:462
 msgid "QDViewerShell::&About"
 msgstr "Ãö©ó"
 
-#: ./djview/qd_viewer_shell.cpp:418
+#: ./djview/qd_viewer_shell.cpp:417
 msgid "QDViewerShell::&Background"
 msgstr "­I´º"
 
-#: ./djview/qd_viewer_shell.cpp:409
+#: ./djview/qd_viewer_shell.cpp:408
 msgid "QDViewerShell::&Close"
 msgstr "Ãö³¬"
 
-#: ./djview/qd_viewer_shell.cpp:416
+#: ./djview/qd_viewer_shell.cpp:415
 msgid "QDViewerShell::&Color"
 msgstr "ÃC¦â"
 
-#: ./djview/qd_viewer_shell.cpp:431
+#: ./djview/qd_viewer_shell.cpp:430
 msgid "QDViewerShell::&Custom..."
 msgstr "¦Û¿ï..."
 
-#: ./djview/qd_viewer_shell.cpp:421
+#: ./djview/qd_viewer_shell.cpp:420
 msgid "QDViewerShell::&Display"
 msgstr "Åã¥Ü"
 
-#: ./djview/qd_viewer_shell.cpp:456
+#: ./djview/qd_viewer_shell.cpp:455
 msgid "QDViewerShell::&Document Information"
 msgstr "¤å¥ó«H®§"
 
-#: ./djview/qd_viewer_shell.cpp:401
+#: ./djview/qd_viewer_shell.cpp:400
 msgid "QDViewerShell::&Export page"
 msgstr "¿é¥X¥»­¶"
 
-#: ./djview/qd_viewer_shell.cpp:412
+#: ./djview/qd_viewer_shell.cpp:411
 msgid "QDViewerShell::&File"
 msgstr "¤å¥ó"
 
-#: ./djview/qd_viewer_shell.cpp:403
+#: ./djview/qd_viewer_shell.cpp:402
 msgid "QDViewerShell::&Find"
 msgstr "´M§ä"
 
-#: ./djview/qd_viewer_shell.cpp:448
+#: ./djview/qd_viewer_shell.cpp:447
 msgid "QDViewerShell::&First Page"
 msgstr "­º­¶"
 
-#: ./djview/qd_viewer_shell.cpp:419
+#: ./djview/qd_viewer_shell.cpp:418
 msgid "QDViewerShell::&Foreground"
 msgstr "«e´º"
 
-#: ./djview/qd_viewer_shell.cpp:450
+#: ./djview/qd_viewer_shell.cpp:449
 msgid "QDViewerShell::&Goto Page..."
 msgstr "´«­¶..."
 
-#: ./djview/qd_viewer_shell.cpp:466
+#: ./djview/qd_viewer_shell.cpp:465
 msgid "QDViewerShell::&Help"
 msgstr "À°§U"
 
-#: ./djview/qd_viewer_shell.cpp:459
+#: ./djview/qd_viewer_shell.cpp:458
 msgid "QDViewerShell::&Info"
 msgstr "«H®§"
 
-#: ./djview/qd_viewer_shell.cpp:449
+#: ./djview/qd_viewer_shell.cpp:448
 msgid "QDViewerShell::&Last Page"
 msgstr "¥½­¶"
 
-#: ./djview/qd_viewer_shell.cpp:452
+#: ./djview/qd_viewer_shell.cpp:451
 msgid "QDViewerShell::&Navigate"
 msgstr "Âsø°"
 
-#: ./djview/qd_viewer_shell.cpp:397
+#: ./djview/qd_viewer_shell.cpp:396
 msgid "QDViewerShell::&New Window"
 msgstr "·sµ¡¤f"
 
-#: ./djview/qd_viewer_shell.cpp:444
+#: ./djview/qd_viewer_shell.cpp:443
 msgid "QDViewerShell::&Next Page"
 msgstr "¤U¤@­¶"
 
-#: ./djview/qd_viewer_shell.cpp:396
+#: ./djview/qd_viewer_shell.cpp:395
 msgid "QDViewerShell::&Open"
 msgstr "¶}°_·s¤å¥ó"
 
-#: ./djview/qd_viewer_shell.cpp:455
+#: ./djview/qd_viewer_shell.cpp:454
 msgid "QDViewerShell::&Page Information"
 msgstr "¥»­¶«H®§"
 
-#: ./djview/qd_viewer_shell.cpp:404
+#: ./djview/qd_viewer_shell.cpp:403
 msgid "QDViewerShell::&Preferences"
 msgstr "°¾¦n­È³]¸m"»
 
-#: ./djview/qd_viewer_shell.cpp:445
+#: ./djview/qd_viewer_shell.cpp:444
 msgid "QDViewerShell::&Previous Page"
 msgstr "¤W¤@­¶"
 
-#: ./djview/qd_viewer_shell.cpp:434
+#: ./djview/qd_viewer_shell.cpp:433
 msgid "QDViewerShell::&Stretch"
 msgstr "©µÝª"
 
-#: ./djview/qd_viewer_shell.cpp:441
+#: ./djview/qd_viewer_shell.cpp:440
 msgid "QDViewerShell::&Zoom"
 msgstr "©ñÁY"
 
-#: ./djview/qd_viewer_shell.cpp:168
+#: ./djview/qd_viewer_shell.cpp:167
 msgid "QDViewerShell::About DjVu"
 msgstr "DjVu Â²¤¶"
 
-#: ./djview/qd_viewer_shell.cpp:235
+#: ./djview/qd_viewer_shell.cpp:234
 msgid "QDViewerShell::All files (*)"
 msgstr "©Ò¦³¤å¥ó"
 
-#: ./djview/qd_viewer_shell.cpp:417
+#: ./djview/qd_viewer_shell.cpp:416
 msgid "QDViewerShell::Black and &White"
 msgstr "¶Â¥Õ"¥
 
-#: ./djview/qd_viewer_shell.cpp:314
+#: ./djview/qd_viewer_shell.cpp:313
 msgid "QDViewerShell::DjVu Error"
 msgstr "DjVu ¿ù»~"
 
-#: ./djview/qd_viewer_shell.cpp:380
+#: ./djview/qd_viewer_shell.cpp:379
 msgid "QDViewerShell::DjVu Standalone Viewer"
 msgstr "DjVu(tm) Âsø°¾¹"
 
-#: ./djview/qd_viewer_shell.cpp:239
+#: ./djview/qd_viewer_shell.cpp:238
 msgid "QDViewerShell::DjVu: Select DjVu file to open"
 msgstr "DjVu: ¿ï¾ÜDjVu¤å¥ó"
 
-#: ./djview/qd_viewer_shell.cpp:410
+#: ./djview/qd_viewer_shell.cpp:409
 msgid "QDViewerShell::E&xit"
 msgstr "°h¥X"
 
-#: ./djview/qd_viewer_shell.cpp:296
+#: ./djview/qd_viewer_shell.cpp:295
 msgid "QDViewerShell::Failed to open file '"
 msgstr "¤å¥óµLªk¥´¶}"
 
-#: ./djview/qd_viewer_shell.cpp:436
+#: ./djview/qd_viewer_shell.cpp:435
 msgid "QDViewerShell::Fit &Page"
 msgstr "°t¦X¾ã­¶"
 
-#: ./djview/qd_viewer_shell.cpp:435
+#: ./djview/qd_viewer_shell.cpp:434
 msgid "QDViewerShell::Fit &Width"
 msgstr "°t¦X¼e«×"
 
-#: ./djview/qd_viewer_shell.cpp:180
+#: ./djview/qd_viewer_shell.cpp:179
 msgid "QDViewerShell::LizardTech DjVu(tm) standalone viewer"
 msgstr "LizardTech DjVu(tm) Âsø°¾¹"
 
-#: ./djview/qd_viewer_shell.cpp:433
+#: ./djview/qd_viewer_shell.cpp:432
 msgid "QDViewerShell::One &to One"
 msgstr "¤@¹ï¤@"
 
-#: ./djview/qd_viewer_shell.cpp:406
+#: ./djview/qd_viewer_shell.cpp:405
 msgid "QDViewerShell::P&rint Page"
 msgstr "¥´¦L¥»­¶"
 
-#: ./djview/qd_viewer_shell.cpp:407
+#: ./djview/qd_viewer_shell.cpp:406
 msgid "QDViewerShell::Pr&int Document"
 msgstr "¥´¦L¥»¤å¥ó"
 
-#: ./djview/qd_viewer_shell.cpp:399
+#: ./djview/qd_viewer_shell.cpp:398
 msgid "QDViewerShell::Save D&ocument As..."
 msgstr "¦s¶J¥»¤å¥ó..."
 
-#: ./djview/qd_viewer_shell.cpp:400
+#: ./djview/qd_viewer_shell.cpp:399
 msgid "QDViewerShell::Save P&age As..."
 msgstr "¦s¶J¥»­¶..."
 
@@ -606,23 +610,23 @@ msgstr "¦s¶J¥»­¶..."
 msgid "QDViewerShell::Select \"File\" and then \"Open\" to load a DjVu file"
 msgstr "¥Î\"¤å¥ó\"©M\"¶}°_\"¥´¶}DjVu¤å¥ó"
 
-#: ./djview/qd_viewer_shell.cpp:457
+#: ./djview/qd_viewer_shell.cpp:456
 msgid "QDViewerShell::Show &Thumbnails"
 msgstr "Åã¥ÜÁY¼v¹Ï"
 
-#: ./djview/qd_viewer_shell.cpp:477
+#: ./djview/qd_viewer_shell.cpp:476
 msgid "QDViewerShell::Status bar"
 msgstr "ª¬ºAÄæ"
 
-#: ./djview/qd_viewer_shell.cpp:188
+#: ./djview/qd_viewer_shell.cpp:187
 msgid "QDViewerShell::Version "
 msgstr "ª©¥»"
 
-#: ./djview/qd_viewer_shell.cpp:438
+#: ./djview/qd_viewer_shell.cpp:437
 msgid "QDViewerShell::Zoom &In"
 msgstr "©ñ¤j"
 
-#: ./djview/qd_viewer_shell.cpp:439
+#: ./djview/qd_viewer_shell.cpp:438
 msgid "QDViewerShell::Zoom &Out"
 msgstr "ÁY¤p"
 
@@ -638,43 +642,43 @@ msgstr ""
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
 "Content-Type: text/plain; charset=Big5\n"
 
-#: ./indep/QT/qlib.cpp:144
+#: ./indep/QT/qlib.cpp:145
 msgid "QeExcMessage::&Details"
 msgstr "²Ó¸`"
 
-#: ./indep/QT/qlib.cpp:141
+#: ./indep/QT/qlib.cpp:142
 msgid "QeExcMessage::&OK"
 msgstr "½T»{"
 
-#: ./indep/QT/qlib.cpp:425
+#: ./indep/QT/qlib.cpp:426
 msgid "QeExcMessage::Error"
 msgstr "¿ù»~"
 
-#: ./indep/QT/qlib.cpp:118
+#: ./indep/QT/qlib.cpp:119
 msgid "QeExcMessage::File name"
 msgstr "¤å¥ó¦W"
 
-#: ./indep/QT/qlib.cpp:110
+#: ./indep/QT/qlib.cpp:111
 msgid "QeExcMessage::Function name"
 msgstr "¨ç¼Æ¦W"
 
-#: ./indep/QT/qlib.cpp:67
+#: ./indep/QT/qlib.cpp:68
 msgid "QeExcMessage::Hide &Details"
 msgstr "ÁôÂÃ²Ó¸`"
 
-#: ./indep/QT/qlib.cpp:126
+#: ./indep/QT/qlib.cpp:127
 msgid "QeExcMessage::Line number"
 msgstr "½u¸¹"
 
-#: ./indep/QT/qlib.cpp:717
+#: ./indep/QT/qlib.cpp:718
 msgid "QeGrid::Error"
 msgstr "¿ù»~"
 
-#: ./indep/QT/qlib.cpp:503
+#: ./indep/QT/qlib.cpp:504
 msgid "QePushButton::&Close"
 msgstr "Ãö³¬"
 
-#: ./indep/QT/qlib.cpp:357
+#: ./indep/QT/qlib.cpp:358
 msgid "QeRowColumn::Error"
 msgstr "¿ù»~"
 
@@ -1038,59 +1042,79 @@ msgstr ""
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
 "Content-Type: text/plain; charset=Big5\n"
 
-#: ./shared/QT/qd_base.cpp:979
-msgid "QDBase::#Image generated by DjVu"
-msgstr "#DjVu ¥Í¦¨ªº¹Ï¹³"
+# This is a Qt message file in .po format.  Each msgid starts with
+# a scope.  This scope should *NOT* be translated - eg. translating
+# from French to English, "Foo::Bar" would be translated to "Pub",
+# not "Foo::Pub".
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"POT-Creation-Date: 2001-07-18 10:01:25 AM PDT\n"
+"PO-Revision-Date: YYYY-MM-DD\n"
+"Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
+"Content-Type: text/plain; charset=iso-8859-1\n"
 
-#: ./shared/QT/qd_base.cpp:964
+# This is a Qt message file in .po format.  Each msgid starts with
+# a scope.  This scope should *NOT* be translated - eg. translating
+# from French to English, "Foo::Bar" would be translated to "Pub",
+# not "Foo::Pub".
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"POT-Creation-Date: 2001-07-18 10:01:25 AM PDT\n"
+"PO-Revision-Date: YYYY-MM-DD\n"
+"Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
+"Content-Type: text/plain; charset=iso-8859-1\n"
+
+#: ./shared/QT/qd_base.cpp:976
 msgid "QDBase::&Abort"
 msgstr ""
 
-#: ./shared/QT/qd_base.cpp:922
+#: ./shared/QT/qd_base.cpp:934
 msgid "QDBase::&Ascii"
 msgstr ""
 
-#: ./shared/QT/qd_base.cpp:922
+#: ./shared/QT/qd_base.cpp:934
 msgid "QDBase::&Cancel"
 msgstr "¨ú®ø"
 
-#: ./shared/QT/qd_base.cpp:922
+#: ./shared/QT/qd_base.cpp:934
 msgid "QDBase::&Raw"
 msgstr ""
 
-#: ./shared/QT/qd_base.cpp:919
+#: ./shared/QT/qd_base.cpp:931
 msgid "QDBase::' format. Which one do you prefer?\n"
 msgstr "®æ¦¡. ±z­n¨º¤@®æ¦¡?"
 
-#: ./shared/QT/qd_base.cpp:930
+#: ./shared/QT/qd_base.cpp:942
 msgid "QDBase::All files (*)"
 msgstr "©Ò¦³¤å¥ó (*)"
 
-#: ./shared/QT/qd_base.cpp:1188
+#: ./shared/QT/qd_base.cpp:1201
 msgid "QDBase::DjVu Error"
 msgstr "DjVu ¿ù»~"
 
-#: ./shared/QT/qd_base.cpp:966
+#: ./shared/QT/qd_base.cpp:978
 msgid "QDBase::DjVu: Exporting image..."
 msgstr "DjVu: ¿é¥X¹Ï¹³..."
 
-#: ./shared/QT/qd_base.cpp:921
+#: ./shared/QT/qd_base.cpp:933
 msgid "QDBase::Exporting DjVu image..."
 msgstr "¿é¥XDjVu¹Ï¹³..."
 
-#: ./shared/QT/qd_base.cpp:963
+#: ./shared/QT/qd_base.cpp:975
 msgid "QDBase::Please stand by..."
 msgstr "½Ðµ¥­Ô..."
 
-#: ./shared/QT/qd_base.cpp:955
+#: ./shared/QT/qd_base.cpp:967
 msgid "QDBase::Select export file name..."
 msgstr "½Ð¿ï¾Ü¿é¥X¤å¥ó¦W..."
 
-#: ./shared/QT/qd_base.cpp:918
+#: ./shared/QT/qd_base.cpp:930
 msgid "QDBase::This will export the DjVu image in either 'Raw "
 msgstr "DjVu ¹Ï¹³¥i¥H¿é¥X¬°'Raw "
 
-#: ./shared/QT/qd_base.cpp:919
+#: ./shared/QT/qd_base.cpp:931
 msgid "QDBase::or 'ASCII "
 msgstr "©ÎªÌ 'ASCII "
 
@@ -2150,51 +2174,63 @@ msgstr ""
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
 "Content-Type: text/plain; charset=Big5\n"
 
-#: ./shared/QT/qd_tbar_mode_piece.cpp:137
+#: ./shared/QT/qd_tbar_mode_piece.cpp:142
 msgid "QDTBarModePiece::B&W"
 msgstr "¶Â¥Õ"
 
-#: ./shared/QT/qd_tbar_mode_piece.cpp:139
+#: ./shared/QT/qd_tbar_mode_piece.cpp:144
 msgid "QDTBarModePiece::Back"
 msgstr "­I´º"
 
-#: ./shared/QT/qd_tbar_mode_piece.cpp:136
+#: ./shared/QT/qd_tbar_mode_piece.cpp:141
 msgid "QDTBarModePiece::Color"
 msgstr "±m¦â"
 
-#: ./shared/QT/qd_tbar_mode_piece.cpp:141
+#: ./shared/QT/qd_tbar_mode_piece.cpp:146
 msgid "QDTBarModePiece::Display mode"
 msgstr "Åã¥Üª¬ºA"
 
-#: ./shared/QT/qd_tbar_mode_piece.cpp:121
+#: ./shared/QT/qd_tbar_mode_piece.cpp:126
 msgid "QDTBarModePiece::Fit Page"
 msgstr "°t¦X¾ã­¶"
 
-#: ./shared/QT/qd_tbar_mode_piece.cpp:120
+#: ./shared/QT/qd_tbar_mode_piece.cpp:125
 msgid "QDTBarModePiece::Fit Width"
 msgstr "°t¦X¼e«×"
 
-#: ./shared/QT/qd_tbar_mode_piece.cpp:138
+#: ./shared/QT/qd_tbar_mode_piece.cpp:143
 msgid "QDTBarModePiece::Fore"
 msgstr "«e´º"
 
-#: ./shared/QT/qd_tbar_mode_piece.cpp:179
+#: ./shared/QT/qd_tbar_mode_piece.cpp:190
+msgid "QDTBarModePiece::Pane Mode"
+msgstr ""
+
+#: ./shared/QT/qd_tbar_mode_piece.cpp:200
+msgid "QDTBarModePiece::Select Text in Selected Area"
+msgstr ""
+
+#: ./shared/QT/qd_tbar_mode_piece.cpp:211
 msgid "QDTBarModePiece::Stick"
 msgstr ""
 
-#: ./shared/QT/qd_tbar_mode_piece.cpp:123
+#: ./shared/QT/qd_tbar_mode_piece.cpp:128
 msgid "QDTBarModePiece::Stretch"
 msgstr "©µ®i"
 
-#: ./shared/QT/qd_tbar_mode_piece.cpp:167
+#: ./shared/QT/qd_tbar_mode_piece.cpp:172
 msgid "QDTBarModePiece::Zoom In"
 msgstr "©ñ¤j"
 
-#: ./shared/QT/qd_tbar_mode_piece.cpp:171
+#: ./shared/QT/qd_tbar_mode_piece.cpp:176
 msgid "QDTBarModePiece::Zoom Out"
 msgstr "ÁY¤p"
 
-#: ./shared/QT/qd_tbar_mode_piece.cpp:162
+#: ./shared/QT/qd_tbar_mode_piece.cpp:195
+msgid "QDTBarModePiece::Zoom Selected Area"
+msgstr ""
+
+#: ./shared/QT/qd_tbar_mode_piece.cpp:167
 msgid "QDTBarModePiece::Zoom"
 msgstr "©ñÁY"
 
@@ -2205,10 +2241,10 @@ msgstr "©ñÁY"
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-07 09h40m49s PDT\n"
+"POT-Creation-Date: 2001-07-18 10:01:30 AM PDT\n"
 "PO-Revision-Date: YYYY-MM-DD\n"
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
-"Content-Type: text/plain; charset=Big5\n"
+"Content-Type: text/plain; charset=iso-8859-1\n"
 
 #: ./shared/QT/qd_tbar_nav_piece.cpp:137
 msgid "QDTBarNavPiece::+10 pages"
@@ -2526,6 +2562,10 @@ msgstr "¨ú®ø"
 msgid "QDZoomDialog::&OK"
 msgstr "½T»{"
 
+#: ./shared/QT/qd_zoom_dialog.cpp:133
+msgid "QDZoomDialog::Default"
+msgstr ""
+
 #: ./shared/QT/qd_zoom_dialog.cpp:95
 msgid "QDZoomDialog::DjVu: Input error"
 msgstr "DjVu ¿é¤J¿ù»~"
@@ -2534,8 +2574,20 @@ msgstr "DjVu ¿é¤J¿ù»~"
 msgid "QDZoomDialog::DjVu: Recommended Zoom"
 msgstr ""
 
+#: ./shared/QT/qd_zoom_dialog.cpp:130
+msgid "QDZoomDialog::Fit Page"
+msgstr ""
+
+#: ./shared/QT/qd_zoom_dialog.cpp:129
+msgid "QDZoomDialog::Fit Width"
+msgstr ""
+
 #: ./shared/QT/qd_zoom_dialog.cpp:94
 msgid "QDZoomDialog::Invalid zoom specified: '"
+msgstr ""
+
+#: ./shared/QT/qd_zoom_dialog.cpp:131
+msgid "QDZoomDialog::One to one"
 msgstr ""
 
 #: ./shared/QT/qd_zoom_dialog.cpp:145
@@ -2546,17 +2598,9 @@ msgstr ""
 msgid "QDZoomDialog::Recommended zoom:"
 msgstr ""
 
-# This is a Qt message file in .po format.  Each msgid starts with
-# a scope.  This scope should *NOT* be translated - eg. translating
-# from French to English, "Foo::Bar" would be translated to "Pub",
-# not "Foo::Pub".
-msgid ""
+#: ./shared/QT/qd_zoom_dialog.cpp:132
+msgid "QDZoomDialog::Stretch"
 msgstr ""
-"Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-06 08h53m29s PDT\n"
-"PO-Revision-Date: YYYY-MM-DD\n"
-"Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
-"Content-Type: text/plain; charset=Big5\n"
 
 # This is a Qt message file in .po format.  Each msgid starts with
 # a scope.  This scope should *NOT* be translated - eg. translating
@@ -2565,10 +2609,10 @@ msgstr ""
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-06 08h53m29s PDT\n"
+"POT-Creation-Date: 2001-07-18 10:01:32 AM PDT\n"
 "PO-Revision-Date: YYYY-MM-DD\n"
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
-"Content-Type: text/plain; charset=Big5\n"
+"Content-Type: text/plain; charset=iso-8859-1\n"
 
 # This is a Qt message file in .po format.  Each msgid starts with
 # a scope.  This scope should *NOT* be translated - eg. translating
@@ -2577,10 +2621,10 @@ msgstr ""
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-06 08h53m29s PDT\n"
+"POT-Creation-Date: 2001-07-18 10:01:32 AM PDT\n"
 "PO-Revision-Date: YYYY-MM-DD\n"
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
-"Content-Type: text/plain; charset=Big5\n"
+"Content-Type: text/plain; charset=iso-8859-1\n"
 
 # This is a Qt message file in .po format.  Each msgid starts with
 # a scope.  This scope should *NOT* be translated - eg. translating
@@ -2589,10 +2633,10 @@ msgstr ""
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-06 08h53m29s PDT\n"
+"POT-Creation-Date: 2001-07-18 10:01:32 AM PDT\n"
 "PO-Revision-Date: YYYY-MM-DD\n"
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
-"Content-Type: text/plain; charset=Big5\n"
+"Content-Type: text/plain; charset=iso-8859-1\n"
 
 # This is a Qt message file in .po format.  Each msgid starts with
 # a scope.  This scope should *NOT* be translated - eg. translating
@@ -2601,10 +2645,10 @@ msgstr ""
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-06 08h53m30s PDT\n"
+"POT-Creation-Date: 2001-07-18 10:01:32 AM PDT\n"
 "PO-Revision-Date: YYYY-MM-DD\n"
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
-"Content-Type: text/plain; charset=Big5\n"
+"Content-Type: text/plain; charset=iso-8859-1\n"
 
 # This is a Qt message file in .po format.  Each msgid starts with
 # a scope.  This scope should *NOT* be translated - eg. translating
@@ -2613,10 +2657,10 @@ msgstr ""
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-06 08h53m30s PDT\n"
+"POT-Creation-Date: 2001-07-18 10:01:32 AM PDT\n"
 "PO-Revision-Date: YYYY-MM-DD\n"
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
-"Content-Type: text/plain; charset=Big5\n"
+"Content-Type: text/plain; charset=iso-8859-1\n"
 
 # This is a Qt message file in .po format.  Each msgid starts with
 # a scope.  This scope should *NOT* be translated - eg. translating
@@ -2625,10 +2669,10 @@ msgstr ""
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-06 08h53m30s PDT\n"
+"POT-Creation-Date: 2001-07-18 10:01:32 AM PDT\n"
 "PO-Revision-Date: YYYY-MM-DD\n"
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
-"Content-Type: text/plain; charset=Big5\n"
+"Content-Type: text/plain; charset=iso-8859-1\n"
 
 # This is a Qt message file in .po format.  Each msgid starts with
 # a scope.  This scope should *NOT* be translated - eg. translating
@@ -2637,10 +2681,10 @@ msgstr ""
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-06 08h53m30s PDT\n"
+"POT-Creation-Date: 2001-07-18 10:01:33 AM PDT\n"
 "PO-Revision-Date: YYYY-MM-DD\n"
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
-"Content-Type: text/plain; charset=Big5\n"
+"Content-Type: text/plain; charset=iso-8859-1\n"
 
 # This is a Qt message file in .po format.  Each msgid starts with
 # a scope.  This scope should *NOT* be translated - eg. translating
@@ -2649,20 +2693,8 @@ msgstr ""
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-06 08h53m30s PDT\n"
+"POT-Creation-Date: 2001-07-18 10:01:33 AM PDT\n"
 "PO-Revision-Date: YYYY-MM-DD\n"
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
-"Content-Type: text/plain; charset=Big5\n"
-
-# This is a Qt message file in .po format.  Each msgid starts with
-# a scope.  This scope should *NOT* be translated - eg. translating
-# from French to English, "Foo::Bar" would be translated to "Pub",
-# not "Foo::Pub".
-msgid ""
-msgstr ""
-"Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-06 08h53m30s PDT\n"
-"PO-Revision-Date: YYYY-MM-DD\n"
-"Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
-"Content-Type: text/plain; charset=Big5\n"
+"Content-Type: text/plain; charset=iso-8859-1\n"
 

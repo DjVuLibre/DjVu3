@@ -34,7 +34,7 @@
 <A HREF="#DOC.1.5.12.3.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>empty</B>()
 <DD><I>Erases everything in the MemoryByteStream.</I>
 <DT>
-<A HREF="#DOC.1.5.12.3.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>size</B>() const 
+<A HREF="#DOC.1.5.12.3.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   int <B>size</B>(void) const 
 <DD><I>Returns the total number of bytes contained in the buffer.</I>
 <DT>
 <A HREF="#DOC.1.5.12.3.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>char&amp; <B>operator[] </B>(int n)
@@ -73,32 +73,32 @@
 <A HREF="#DOC.1.5.12.1.1.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   <B>~ByteStream</B>()
 <DD><I>Virtual destructor.</I>
 <DT>
-<A HREF="#DOC.1.5.12.1.1.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   size_t <B>read</B>(void *buffer, size_t size)
+<A HREF="#DOC.1.5.12.1.1.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   size_t <B>read</B>(void *buffer, size_t <!1><A HREF="ByteStream.html#DOC.1.5.12.1.2.12">size</A>)
 <DD><I>Reads data from a ByteStream.</I>
 <DT>
-<A HREF="#DOC.1.5.12.1.1.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   size_t <B>write</B>(const void *buffer, size_t size)
+<A HREF="#DOC.1.5.12.1.1.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   size_t <B>write</B>(const void *buffer, size_t <!1><A HREF="ByteStream.html#DOC.1.5.12.1.2.12">size</A>)
 <DD><I>Writes data to a ByteStream.</I>
 <DT>
-<A HREF="#DOC.1.5.12.1.1.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   long <B>tell</B>(void)
+<A HREF="#DOC.1.5.12.1.1.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   long <B>tell</B>(void) const 
 <DD><I>Returns the offset of the current position in the ByteStream.</I>
 <DT>
 <A HREF="#DOC.1.5.12.1.1.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   int <B>seek</B>(long offset, int whence = SEEK_SET, bool nothrow=false)
 <DD><I>Sets the current position for reading or writing the ByteStream.</I>
 <DT>
-<A HREF="#DOC.1.5.12.1.1.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>flush</B>()
+<A HREF="#DOC.1.5.12.1.1.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>flush</B>(void)
 <DD><I>Flushes all buffers in the ByteStream.</I>
 </DL></P>
 <DT>
 <P> <B>Utility Functions.  </B>
 <P><DL>
 <DT>
-<A HREF="#DOC.1.5.12.1.2.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>size_t <B>readall</B>(void *buffer, size_t size)
+<A HREF="#DOC.1.5.12.1.2.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>size_t <B>readall</B>(void *buffer, size_t <!1><A HREF="ByteStream.html#DOC.1.5.12.1.2.12">size</A>)
 <DD><I>Reads data and blocks until everything has been read.</I>
 <DT>
-<A HREF="#DOC.1.5.12.1.2.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>size_t <B>writall</B>(const void *buffer, size_t size)
+<A HREF="#DOC.1.5.12.1.2.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>size_t <B>writall</B>(const void *buffer, size_t <!1><A HREF="ByteStream.html#DOC.1.5.12.1.2.12">size</A>)
 <DD><I>Writes data and blocks until everything has been written.</I>
 <DT>
-<A HREF="#DOC.1.5.12.1.2.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>size_t <B>copy</B>(<!1><A HREF="ByteStream.html">ByteStream</A> &amp;bsfrom, size_t size=0)
+<A HREF="#DOC.1.5.12.1.2.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>size_t <B>copy</B>(<!1><A HREF="ByteStream.html">ByteStream</A> &amp;bsfrom, size_t <!1><A HREF="ByteStream.html#DOC.1.5.12.1.2.12">size</A>=0)
 <DD><I>Copy data from another ByteStream.</I>
 <DT>
 <A HREF="#DOC.1.5.12.1.2.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>write8</B>(unsigned int card8)
@@ -124,6 +124,9 @@
 <DT>
 <A HREF="#DOC.1.5.12.1.2.11"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>unsigned int <B>read32</B>()
 <DD><I>Reads a four-bytes integer from a ByteStream.</I>
+<DT>
+<A HREF="#DOC.1.5.12.1.2.12"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   int <B>size</B>(void) const 
+<DD><I>Returns the total number of bytes contained in the buffer, file, etc.</I>
 </DL></P>
 </DL></P>
 
@@ -183,7 +186,7 @@ The current location is reset to zero.
 <DL><DT><DD></DL><P>
 <A NAME="size">
 <A NAME="DOC.1.5.12.3.5">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int size() const </B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   int size(void) const </B></TT>
 <DD>Returns the total number of bytes contained in the buffer.  Valid
 offsets for function <TT>seek</TT> range from 0 to the value returned by this
 function. 
