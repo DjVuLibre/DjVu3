@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.h,v 1.53 2001-04-19 20:42:21 bcr Exp $
+// $Id: GString.h,v 1.54 2001-04-19 20:58:50 bcr Exp $
 // $Name:  $
 
 #ifndef _GSTRING_H_
@@ -57,7 +57,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.53 2001-04-19 20:42:21 bcr Exp $# */
+    #$Id: GString.h,v 1.54 2001-04-19 20:58:50 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -316,7 +316,7 @@ public:
   friend class GString;
 protected:
   // Return the next character and increment the source pointer.
-  unsigned long getValidUCS4(const char *&source) const;
+  virtual unsigned long getValidUCS4(const char *&source) const;
 };
 
 inline GP<GStringRep> 
@@ -397,7 +397,7 @@ public:
   friend class GString;
 protected:
   // Return the next character and increment the source pointer.
-  unsigned long getValidUCS4(const char *&source) const;
+  virtual unsigned long getValidUCS4(const char *&source) const;
 };
 
 inline GP<GStringRep> 
