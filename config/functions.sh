@@ -31,7 +31,7 @@
 #C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #
-# $Id: functions.sh,v 1.66 2001-06-19 19:06:16 bcr Exp $
+# $Id: functions.sh,v 1.67 2001-06-19 22:03:34 kmckelvey Exp $
 # $Name:  $
 
 #
@@ -1183,7 +1183,7 @@ version=""
 # version=`sed -n -e 's,.* DJVU_CVS_NAME[^0-9]*\([1-9][-_0-9A-Za-z]*\).*,\1,p' < "$i"`
 if [ -z "$version" ] 
 then 
-  version=`sed -n -e 's,.* DJVU_VERSION  *"\(.*\)".*$,\1,p' -e 's,.*DJVU_CVS_REV.*Revision: \([0-9][.0-9]*\) .*,\1,p' < "$i"|tr '\n' '-'|sed 's,-$,,g'`
+  version=`awk '/DJVU_VERSION/ {split($0,x,"\"")} /DJVU_CVS_REV/ {split($0,y,"\"");split(y[2],z)} END {print x[2] "-" z[2]}' < $i`
 fi
 if [ -z "$version" ] 
 then
