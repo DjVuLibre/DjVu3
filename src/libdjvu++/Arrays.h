@@ -31,12 +31,13 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: Arrays.h,v 1.22 2000-12-18 17:13:40 bcr Exp $
+// $Id: Arrays.h,v 1.23 2000-12-19 00:38:19 mchen Exp $
 // $Name:  $
 
 #ifndef _ARRAYS_H_
 #define _ARRAYS_H_
 
+#include "GException.h"
 #include "GSmartPointer.h"
 #include <string.h>
 
@@ -91,7 +92,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@geocities.com> -- Copy-on-demand implementation.
     @version 
-    #$Id: Arrays.h,v 1.22 2000-12-18 17:13:40 bcr Exp $# */
+    #$Id: Arrays.h,v 1.23 2000-12-19 00:38:19 mchen Exp $# */
 //@{
 
 // Auxiliary classes: Will be used in place of GPBase and GPEnabled objects
