@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.75 1999-11-22 03:38:43 bcr Exp $
+//C- $Id: DjVuDocument.cpp,v 1.76 1999-11-22 03:46:19 bcr Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -95,7 +95,6 @@ DjVuDocument::~DjVuDocument(void)
       ufiles_list.empty();
    }
 
-//bcr: This just seems to create a nice segmentation fault.
    GPList<DjVuPort> ports=get_portcaster()->prefix_to_ports(get_int_prefix(this));
    for(GPosition pos=ports;pos;++pos)
    {
@@ -120,7 +119,7 @@ DjVuDocument::stop(void)
    {
       if (init_data_pool) init_data_pool->stop(false);	// any operation
 
-//bcr: I don't understand this.  Isn't ndir_file stopped above?
+//bcr: I don't understand the point of this.
       if (ndir_file) ndir_file->stop(false);
 
       GCriticalSectionLock lock(&ufiles_lock);
@@ -279,13 +278,12 @@ DjVuDocument::init_thread(void)
 	    ndir->insert_page(-1, init_url.name());
 	 }
       }
+#if 0
+//bcr: The following code is a nice idea.  But it is commented out
+//bcr: because the bug it works around has been fixed, and we don't
+//bcr: want to add non-essiential code right now.
       else
       {
-//bcr: I don't really understand why ndir_file must point to a 
-//bcr: document.  But if it doesn't, then a segmentation fault
-//bcr: will be generated with the destructor is called from a THROW().
-//bcr: So we map ndir_file to the first page if init_url was the 
-//bcr: index file.
         int page=ndir->url_to_page(init_url);
         if(page<0)
         {
@@ -309,6 +307,7 @@ DjVuDocument::init_thread(void)
           }
         }
       }
+#endif
       flags|=DOC_NDIR_KNOWN;
       pcaster->notify_doc_flags_changed(this, DOC_NDIR_KNOWN, 0);
       check_unnamed_files();
