@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.h,v 1.15 1999-08-26 19:27:16 eaf Exp $
+//C- $Id: DjVuFile.h,v 1.16 1999-08-27 22:30:43 eaf Exp $
  
 #ifndef _DJVUFILE_H
 #define _DJVUFILE_H
@@ -45,7 +45,7 @@
 
     @memo Classes representing DjVu files.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuFile.h,v 1.15 1999-08-26 19:27:16 eaf Exp $#
+    @version #$Id: DjVuFile.h,v 1.16 1999-08-27 22:30:43 eaf Exp $#
 */
 
 //@{
@@ -218,6 +218,10 @@ public:
    DjVuFile(const GURL & url, DjVuPort * port=0);
    virtual ~DjVuFile(void);
 
+      /** Specifies what function should be called when this instance
+	  of #DjVuFile# is about to be destroyed. */
+   void		set_destroy_cb(void (* destroy_cb)(const DjVuFile *, void *), void * cl_data);
+
       /** Disables the built-in port for accessing local files, which may
 	  have been created in the case when the #port# argument to
 	  the \Ref{DjVuFile::DjVuFile}() constructor is #ZERO# */
@@ -367,6 +371,8 @@ protected:
 
    GPList<DjVuFile>	inc_files_list;
    GCriticalSection	inc_files_lock;
+
+   virtual void		destroy();
 private:
    GMonitor		status_mon;
    int			status;
@@ -380,9 +386,10 @@ private:
 
    DjVuPort		* simple_port;
 
-   GMonitor		chunk_mon;
+   GMonitor		chunk_mon, finish_mon;
 
-   GMonitor		finish_mon;
+   void			(* destroy_cb)(const DjVuFile *, void *);
+   void			* destroy_cl_data;
    
       // Functions called when the decoding thread starts
    static void	static_decode_func(void *);
@@ -444,6 +451,13 @@ DjVuFile::reset(void)
 {
    info=0; anno=0; bg44=0; fgjb=0; fgpm=0;
    dir=0; description=""; mimetype="";
+}
+
+inline void
+DjVuFile::set_destroy_cb(void (* cb)(const DjVuFile *, void *), void * cl_data)
+{
+   destroy_cb=cb;
+   destroy_cl_data=cl_data;
 }
 
 //@}
