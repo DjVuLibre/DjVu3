@@ -30,20 +30,20 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: xml2native.cpp,v 1.5 2001-07-02 19:48:07 bcr Exp $
+// $Id: xml2native.cpp,v 1.6 2001-07-24 00:15:12 bcr Exp $
 // $Name:  $
 
-/** @name nativetoutf8
+/** @name xml2native
 
     {\bf Synopsis}
     \begin{verbatim}
-        nativetoutf8 [<inputfile>] [<outputfile>]
+        xml2native [<inputfile>] [<outputfile>]
     \end{verbatim}
 
     @author
     Dr Bill C Riemers <bcr@lizardtech.com>
     @version
-    #$Id: xml2native.cpp,v 1.5 2001-07-02 19:48:07 bcr Exp $# */
+    #$Id: xml2native.cpp,v 1.6 2001-07-24 00:15:12 bcr Exp $# */
 //@{
 //@}
 
@@ -59,6 +59,15 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+void
+usage(const GUTF8String &name)
+{
+  DjVuPrintErrorUTF8(
+          "%s -- xml to native MBS encoding conversion\n"
+          "  Copyright © 2001 LizardTech, Inc. All Rights Reserved.\n"
+          "Usage: %s <infile> <outfile>\n",name,name);
+}
+
 int 
 main(int argc, char **argv)
 {
@@ -67,6 +76,11 @@ main(int argc, char **argv)
   DArray<GUTF8String> dargv(0,argc-1);
   for(int i=0;i<argc;++i)
     dargv[i]=GNativeString(argv[i]);
+  if(argc < 3 || dargv[1] == "-help" || dargv[1] == "--help")
+  {
+    usage(GURL::Filename::UTF8(dargv[0]).fname());
+    exit(0);
+  }
   GURL::Filename::UTF8 inurl((argc<2)?GUTF8String("-"):dargv[1]);
   GURL::Filename::UTF8 outurl((argc<3)?GUTF8String("-"):dargv[argc-1]);
   G_TRY
