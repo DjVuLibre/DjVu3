@@ -7,9 +7,9 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: GOS.cpp,v 1.2 1999-02-01 18:32:32 leonb Exp $
+//C-  $Id: GOS.cpp,v 1.3 1999-02-15 23:54:11 leonb Exp $
 
-// "$Id: GOS.cpp,v 1.2 1999-02-01 18:32:32 leonb Exp $"
+// "$Id: GOS.cpp,v 1.3 1999-02-15 23:54:11 leonb Exp $"
 
 #ifdef __GNUC__
 #pragma implementation
@@ -86,7 +86,7 @@
 
 
 // This code is derived from TL3 file fileio.c that I wrote a while ago.
-// I, Leon Bottou, thereby give AT&T a royalty-free non-exclusive
+// I, Leon Bottou, hereby give AT&T a royalty-free non-exclusive
 // license to do whatever they want with this code.
 
 
