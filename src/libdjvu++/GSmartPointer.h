@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GSmartPointer.h,v 1.14 2000-01-19 23:50:38 bcr Exp $
+//C- $Id: GSmartPointer.h,v 1.15 2000-02-06 21:27:10 eaf Exp $
 
 #ifndef _GSMARTPOINTER_H_
 #define _GSMARTPOINTER_H_
@@ -31,7 +31,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation\\
     Andrei Erofeev <eaf@research.att.com> -- bug fix.
     @version 
-    #$Id: GSmartPointer.h,v 1.14 2000-01-19 23:50:38 bcr Exp $# 
+    #$Id: GSmartPointer.h,v 1.15 2000-02-06 21:27:10 eaf Exp $# 
     @args
 */
 //@{
@@ -95,6 +95,12 @@ public:
   GPBase(GPEnabled *nptr);
   /** Destructor. Decrements the reference count. */
   ~GPBase();
+  /** Preserve a \Ref{GPEnabled} object for some time.
+      This function increments the counter in the referenced object, so
+      that it will be kept alive for some extra time (until the next call
+      to #preserve#). This is useful to protect an object, which destruction
+      would destroy the running thread.  */
+  static void preserve(GPEnabled *obj);
   /** Accesses the actual pointer. */
   GPEnabled* get() const;
   /** Assignment from smartpointer. 
