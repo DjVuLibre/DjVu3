@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessage.cpp,v 1.58 2001-06-11 16:20:35 bcr Exp $
+// $Id: DjVuMessage.cpp,v 1.59 2001-06-11 17:10:39 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -83,7 +83,7 @@ static const char messagestring[]="MESSAGE";
 static const char localestring[]="locale";
 
 
-#define opensourcedir[]="osi";
+static const char opensourcedir[]="osi";
 #ifndef NO_DEBUG
 #if defined(UNIX)
   // appended to the home directory.
@@ -328,6 +328,7 @@ DjVuMessage::GetProfilePaths(void)
       }
     } 
     GList<GURL> localepaths;
+    GList<GURL> osilocalepaths;
     for(int loop=0;loop++<2;)
     {
       static const char sepchars[]=" _.@";
@@ -363,6 +364,11 @@ DjVuMessage::GetProfilePaths(void)
                   {
                     localepaths.append(path);
                   }
+                  path=GURL::UTF8(GUTF8String(opensourcedir)+"/"+src,paths[pos]);
+                  if(path.is_dir())
+                  {
+                    osilocalepaths.append(path);
+                  }
                 }
               }
               // We don't need to check anymore language files.
@@ -378,6 +384,11 @@ DjVuMessage::GetProfilePaths(void)
               if(path.is_dir())
               {
                 localepaths.append(path);
+              }
+              path=GURL::UTF8(GUTF8String(opensourcedir)+"/"+sublocale,paths[pos]);
+              if(path.is_dir())
+              {
+                osilocalepaths.append(path);
               }
             }
           }
@@ -396,6 +407,20 @@ DjVuMessage::GetProfilePaths(void)
     {
       appendPath(paths[pos],pathsmap,realpaths);
     }
+#ifndef UNDER_CE
+    for(pos=localepaths;pos;++pos)
+    {
+      appendPath(osilocalepaths[pos],pathsmap,realpaths);
+    }
+#endif
+    for(pos=paths;pos;++pos)
+    {
+      path=GURL::UTF8(opensourcedir,paths[pos]);
+      if(path.is_dir())
+      {
+        appendPath(path,pathsmap,realpaths);
+      }
+    }
   }
   return realpaths;
 }
@@ -409,9 +434,10 @@ getbodies(
 {
   GUTF8String errors;
   bool isdone=false;
-  for(GPosition pos=paths;!isdone && pos;++pos)
+  GPosition firstpathpos=paths;
+  for(GPosition pathpos=firstpathpos;!isdone && pathpos;++pathpos)
   {
-    const GURL::UTF8 url(MessageFileName,paths[pos]);
+    const GURL::UTF8 url(MessageFileName,paths[pathpos]);
     if(url.is_file())
     {
       map[MessageFileName]=0;
@@ -457,7 +483,9 @@ getbodies(
           const GUTF8String file=includes.key(pos);
           if(! map.contains(file))
           {
-            const GUTF8String err2(getbodies(paths,file,body,map));
+            GList<GURL> xpaths;
+			xpaths.append(url.base());
+            const GUTF8String err2(getbodies(xpaths,file,body,map));
             if(err2.length())
             {
               if(errors.length())
