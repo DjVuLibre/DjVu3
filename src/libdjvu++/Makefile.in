@@ -50,7 +50,7 @@ MAKEDEJAVUOBJS = djvumake.o
 BREAKDEJAVUOBJS = djvuextract.o
 PPMCOCOOBJS = ppmcoco.o
 ANNOTATEOBJS = annotate.o
-BZZOBJS = bzz.o
+BZZOBJS = bzz.o BSByteStream.o ZPCodec.o ByteStream.o GException.o
 LIBDJVUOBJS = libdjvu.o 
 
 c44: $(C44OBJS) $(LIB)
@@ -77,15 +77,14 @@ ppmcoco: $(PPMCOCOOBJS) $(LIB)
 annotate: $(ANNOTATEOBJS) $(LIB)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(ANNOTATEOBJS) $(LIB) $(LDLIBS)
 
-bzz: $(BZZOBJS) $(LIB)
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(BZZOBJS) $(LIB) $(LDLIBS)
+bzz: $(BZZOBJS)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(BZZOBJS) $(LDLIBS)
 
 # License substitution
 
-ATTLicense.cpp: ATTLicense.cpp.in ATTLICENSE
-	#sed < $(TOP)/ATTLICENSE > ATTLICENSE.tmp \
-	#   -e '1,$$s/"/\\"/g' -e '1,$$s/.*/\"&\\n\"/'
-	test -x bzz && ( bzz $(TOP)/ATTLICENSE - | od -A n -v -t d1 |\
+ATTLicense.cpp: ATTLicense.cpp.in ATTLICENSE bzz
+	@echo nay > ATTLICENSE.tmp
+	-test -x bzz && ( bzz $(TOP)/ATTLICENSE - | od -A n -v -t d1 |\
 	   sed -e 's/.*/  &/' -e 's/ *0*\([0-9][0-9]*\)/\1,/g' > ATTLICENSE.tmp )
 	sed < $(TOP)/ATTLicense.cpp.in > ATTLicense.cpp \
 	   -e '/@ATTLICENSE@/r ATTLICENSE.tmp' -e '/@ATTLICENSE@/d'
@@ -121,6 +120,7 @@ clean:
 
 realclean:
 	-rm 2>/dev/null -rf @Doc ; true
+	-rm 2>/dev/null -rf ATTLicense.cpp ; true
 	-@$(MAKE) clean
 
 distclean:
