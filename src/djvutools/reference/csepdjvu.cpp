@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: csepdjvu.cpp,v 1.32 2001-07-24 17:52:03 bcr Exp $
+// $Id: csepdjvu.cpp,v 1.33 2001-07-26 22:34:47 fcrary Exp $
 // $Name:  $
 
 
@@ -108,7 +108,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: csepdjvu.cpp,v 1.32 2001-07-24 17:52:03 bcr Exp $# */
+    #$Id: csepdjvu.cpp,v 1.33 2001-07-26 22:34:47 fcrary Exp $# */
 //@{
 //@}
 
@@ -1159,7 +1159,7 @@ csepdjvu_page(BufferByteStream &bs, GP<ByteStream> obs, const csepdjvuopts &opts
     {
       // -- ``FGbz'' chunk
       iff.put_chunk("FGbz");
-      rimg.pal->encode(obs);
+      rimg.pal->encode(iff.get_bytestream());
       iff.close_chunk();
       // -- ``BG44'' chunk
       IWEncoderParms iwparms;
@@ -1337,7 +1337,7 @@ main(int argc, const char **argv)
                 ByteStream &outputpage=*goutputpage;
                 csepdjvu_page(ibs, goutputpage, opts);
                 if (opts.verbose) {
-                  DjVuPrintErrorUTF8("%s","csepdjvu: %d bytes for page %d",
+                  DjVuPrintErrorUTF8("csepdjvu: %d bytes for page %d",
                           outputpage.size(), pageno);
                   if (arg == "-")
                     DjVuPrintErrorUTF8("%s"," (from stdin)\n");
