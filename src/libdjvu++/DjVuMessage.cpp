@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessage.cpp,v 1.15 2001-03-08 23:57:26 bcr Exp $
+// $Id: DjVuMessage.cpp,v 1.16 2001-03-09 00:06:33 bcr Exp $
 // $Name:  $
 
 
@@ -42,7 +42,6 @@
 #endif
 #include <ctype.h>
 #include <stdio.h>
-#include <unistd.h>
 #ifdef WIN32
 #include <tchar.h>
 #include <atlbase.h>
@@ -50,6 +49,7 @@
 #include <winreg.h>
 #endif
 #ifdef UNIX
+#include <unistd.h>
 #include <pwd.h>
 #include <sys/types.h>
 #endif
