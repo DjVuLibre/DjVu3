@@ -25,7 +25,7 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djthumb.cpp,v 1.3 2000-11-02 01:08:34 bcr Exp $
+// $Id: djthumb.cpp,v 1.4 2000-11-02 22:33:07 bcr Exp $
 // $Name:  $
 
 
@@ -64,7 +64,7 @@
     @author
     Andrei Erofeev <eaf@geocities.com> -- initial implementation
     @version
-    #$Id: djthumb.cpp,v 1.3 2000-11-02 01:08:34 bcr Exp $# */
+    #$Id: djthumb.cpp,v 1.4 2000-11-02 22:33:07 bcr Exp $# */
 //@{
 //@}
 
@@ -85,7 +85,7 @@ usage(void)
 {
    fprintf(stderr, "\
 DJTHUMB -- DjVu thumbnails generating utility\n\
-   Copyright (c) AT&T 1999.  All rights reserved\n\
+   Copyright © 1999-2000 LizardTech, Inc. All Rights Reserved.\n\
 \n\
 Usage:\n\
 	%s [options] <djvu_file_in> <djvu_file_out>\n\

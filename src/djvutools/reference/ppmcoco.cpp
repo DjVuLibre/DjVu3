@@ -25,7 +25,7 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ppmcoco.cpp,v 1.2 2000-11-02 01:08:34 bcr Exp $
+// $Id: ppmcoco.cpp,v 1.3 2000-11-02 22:33:07 bcr Exp $
 // $Name:  $
 
 
@@ -100,7 +100,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: ppmcoco.cpp,v 1.2 2000-11-02 01:08:34 bcr Exp $# */
+    #$Id: ppmcoco.cpp,v 1.3 2000-11-02 22:33:07 bcr Exp $# */
 //@{
 //@}
 
@@ -122,7 +122,7 @@ usage(void)
 {
   fprintf(stderr,
           "PPMCOCO -- Color correction program\n"
-          "  Copyright (c) AT&T 1999.  All rights reserved\n"
+          "  Copyright © 1999-2000 LizardTech, Inc. All Rights Reserved.\n"
           "usage: ppmcoco [-from gamma] [-to gamma] [<ppmin>] [<ppmout>]\n" );
   exit(1);
 }

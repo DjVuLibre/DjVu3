@@ -25,7 +25,7 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djvutxt.cpp,v 1.3 2000-11-02 01:08:34 bcr Exp $
+// $Id: djvutxt.cpp,v 1.4 2000-11-02 22:33:07 bcr Exp $
 // $Name:  $
 
 
@@ -65,7 +65,7 @@
     @author
     Andrei Erofeev <eaf@geocities.com> -- initial implementation
     @version
-    #$Id: djvutxt.cpp,v 1.3 2000-11-02 01:08:34 bcr Exp $# */
+    #$Id: djvutxt.cpp,v 1.4 2000-11-02 22:33:07 bcr Exp $# */
 //@{
 //@}
 
@@ -84,7 +84,7 @@ usage(void)
 {
    fprintf(stderr, "\
 DJVUTXT -- DjVu TXT* chunks extractor\n\
-   Copyright (c) AT&T 1999, 2000.  All rights reserved\n\
+   Copyright © 1999-2000 LizardTech, Inc. All Rights Reserved.\n\
 \n\
 Usage:\n\
 	%s [--page <page_num>] <djvu_file_in> [<txt_file_out>]\n\

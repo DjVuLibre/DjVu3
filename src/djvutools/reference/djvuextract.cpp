@@ -25,7 +25,7 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djvuextract.cpp,v 1.2 2000-11-02 01:08:34 bcr Exp $
+// $Id: djvuextract.cpp,v 1.3 2000-11-02 22:33:07 bcr Exp $
 // $Name:  $
 
 
@@ -61,7 +61,7 @@
     @memo
     Extract components from DjVu files.
     @version
-    #$Id: djvuextract.cpp,v 1.2 2000-11-02 01:08:34 bcr Exp $#
+    #$Id: djvuextract.cpp,v 1.3 2000-11-02 22:33:07 bcr Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> - Initial implementation\\
     Andrei Erofeev <eaf@geocities.com> - Multipage support */
@@ -185,7 +185,7 @@ usage()
 {
   fprintf(stderr, 
           "DJVUEXTRACT -- Extracts components of a DJVU file\n"
-          "  Copyright (c) AT&T 1999.  All rights reserved\n"
+          "  Copyright © 1999-2000 LizardTech, Inc. All Rights Reserved.\n"
           "Usage:\n"
 	  "   djvuextract <djvufile> [-page=<num>] {...<chunkid>=<file>...} \n");
   exit(1);

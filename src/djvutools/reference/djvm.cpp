@@ -25,7 +25,7 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djvm.cpp,v 1.2 2000-11-02 01:08:34 bcr Exp $
+// $Id: djvm.cpp,v 1.3 2000-11-02 22:33:07 bcr Exp $
 // $Name:  $
 
 
@@ -95,7 +95,7 @@
     @author
     Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: djvm.cpp,v 1.2 2000-11-02 01:08:34 bcr Exp $# */
+    #$Id: djvm.cpp,v 1.3 2000-11-02 22:33:07 bcr Exp $# */
 //@{
 //@}
 
@@ -113,7 +113,7 @@ usage(void)
 {
    cerr << "\
 DJVM -- DjVu multipage document manipulation utility\n\
-   Copyright (c) AT&T 1999.  All rights reserved\n\
+   Copyright © 1999-2000 LizardTech, Inc. All Rights Reserved.\n\
 \n\
 Usage:\n\
    To compose a multipage document:\n\

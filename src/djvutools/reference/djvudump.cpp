@@ -25,7 +25,7 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djvudump.cpp,v 1.3 2000-11-02 01:08:34 bcr Exp $
+// $Id: djvudump.cpp,v 1.4 2000-11-02 22:33:07 bcr Exp $
 // $Name:  $
 
 
@@ -74,7 +74,7 @@ xxx
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: djvudump.cpp,v 1.3 2000-11-02 01:08:34 bcr Exp $# */
+    #$Id: djvudump.cpp,v 1.4 2000-11-02 22:33:07 bcr Exp $# */
 //@{
 //@}
 
@@ -99,7 +99,7 @@ usage()
 {
   fprintf(stderr,
           "DJVUDUMP -- Describes IFF85 files\n"
-          "  Copyright (c) AT&T 1999.\n  Copyright (c) LizardTech 2000.\n  All rights reserved\n"
+          "  Copyright © 1999-2000 LizardTech, Inc. All Rights Reserved.\n"
           "Usage: djvudump <iff_filenames>\n" );
   exit(1);
 }

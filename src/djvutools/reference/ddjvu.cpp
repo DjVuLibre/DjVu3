@@ -25,7 +25,7 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ddjvu.cpp,v 1.2 2000-11-02 01:08:34 bcr Exp $
+// $Id: ddjvu.cpp,v 1.3 2000-11-02 22:33:07 bcr Exp $
 // $Name:  $
 
 
@@ -108,7 +108,7 @@
     Yann Le Cun <yann@research.att.com>\\
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: ddjvu.cpp,v 1.2 2000-11-02 01:08:34 bcr Exp $# */
+    #$Id: ddjvu.cpp,v 1.3 2000-11-02 22:33:07 bcr Exp $# */
 //@{
 //@}
 
@@ -256,7 +256,7 @@ usage()
 {
   fprintf(stderr,
           "DDJVU -- DjVu decompression utility\n"
-          "  Copyright (c) AT&T 1999.  All rights reserved\n"
+          "  Copyright © 1999-2000 LizardTech, Inc. All Rights Reserved.\n"
           "Usage: ddjvu [options] [<djvufile> [<pnmfile>]]\n\n"
           "Options:\n"
           "  -v                  Prints various informational messages.\n"

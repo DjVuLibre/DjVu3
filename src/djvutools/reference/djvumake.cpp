@@ -25,7 +25,7 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djvumake.cpp,v 1.2 2000-11-02 01:08:34 bcr Exp $
+// $Id: djvumake.cpp,v 1.3 2000-11-02 22:33:07 bcr Exp $
 // $Name:  $
 
 
@@ -94,7 +94,7 @@
     @memo
     Assemble DjVu files.
     @version
-    #$Id: djvumake.cpp,v 1.2 2000-11-02 01:08:34 bcr Exp $#
+    #$Id: djvumake.cpp,v 1.3 2000-11-02 22:33:07 bcr Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> \\
     Patrick Haffner <haffner@research.att.com>
@@ -132,7 +132,7 @@ void
 usage()
 {
   printf("DJVUMAKE -- Create a DjVu file\n"
-          "  Copyright (c) AT&T 1999.  All rights reserved\n"
+         "  Copyright © 1999-2000 LizardTech, Inc. All Rights Reserved.\n"
          "Usage: djvumake djvufile ...arguments...\n"
          "\n"
          "The arguments describe the successive chunks of the DJVU file.\n"
