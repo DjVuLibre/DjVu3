@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.1.2.2 1999-04-26 19:20:46 eaf Exp $
+//C- $Id: DjVuFile.cpp,v 1.1.2.3 1999-04-29 18:46:12 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -747,6 +747,7 @@ DjVuFile::trigger_cb(void)
    DEBUG_MSG("DjVuFile::trigger_cb(): got data for '" << url << "'\n");
    DEBUG_MAKE_INDENT(3);
 
+   file_size=data_range->get_length();
    status|=DATA_PRESENT;
    get_portcaster()->notify_file_data_received(this);
 
