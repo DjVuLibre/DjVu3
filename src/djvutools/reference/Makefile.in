@@ -1,10 +1,9 @@
-#C-  -*- Shell -*-
 #C-
 #C-  Copyright © 1999-2001, LizardTech, Inc. All Rights Reserved.
 #C-              Unauthorized use prohibited.
 #C-
 #
-# $Id: Makefile.in,v 1.6 2001-01-05 01:23:43 bcr Exp $
+# $Id: Makefile.in,v 1.7 2001-01-05 16:56:22 bcr Exp $
 # $Name:  $
 
 %%%include <paths>
