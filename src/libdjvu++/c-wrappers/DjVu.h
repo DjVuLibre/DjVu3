@@ -8,20 +8,15 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVu.h,v 1.1 2000-01-05 19:34:24 bcr Exp $
+//C- $Id: DjVu.h,v 1.2 2000-01-05 20:00:22 bcr Exp $
 #endif /* __cplusplus */
 
 #include <stdlib.h>
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif /* __cplusplus */
-
-
 #ifndef _DJVU_GLOBAL_H
 #define _DJVU_GLOBAL_H
 
+#ifndef DJVUAPI
 #ifndef DJVU_STATIC_LIBRARY
 #ifdef WIN32 
 #define DLLIMPORT __declspec(dllimport)
@@ -35,13 +30,29 @@ extern "C"
 #define DLLEXPORT /**/
 #endif /* DJVU_STATIC_LIBRARY */
 
+#ifdef BUILD_LIB
+#ifndef DJVUAPI
+#define DJVUAPI DLLEXPORT
+#endif  /*DJVUAPI*/
+#else
+#ifndef DJVUAPI
+#define DJVUAPI DLLIMPORT
+#endif  /*DJVUAPI*/
+#endif  /*BUILD_LIB*/
+#endif DJVUAPI
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif /* __cplusplus */
+
 typedef void djvu_free_callback (void *);
 typedef void *djvu_realloc_callback (void *, size_t);
 typedef void *djvu_malloc_callback (size_t);
 typedef void *djvu_calloc_callback (size_t,size_t);
 
 #ifdef NEED_DJVU_MEMORY
-DLLEXPORT int djvu_set_memory_callbacks(
+DJVUAPI int djvu_set_memory_callbacks(
            djvu_free_callback *,
            djvu_realloc_callback *,
            djvu_malloc_callback *,
