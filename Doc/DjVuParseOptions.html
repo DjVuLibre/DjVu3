@@ -12,113 +12,113 @@
 <DL>
 <P><DL>
 <DT><H3>Public</H3><DD><DT>
-<A HREF="#DOC.1.4.35.2.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Creation/destruction.</B>
+<A HREF="#DOC.1.4.34.2.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Creation/destruction.</B>
 <DD><I></I>
 <P><DL>
 <DT>
-<A HREF="#DOC.1.4.35.2.1.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>~DjVuParseOptions</B>()
+<A HREF="#DOC.1.4.34.2.1.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>~DjVuParseOptions</B>()
 <DD><I>Normal Destructor.</I>
 <DT>
-<A HREF="#DOC.1.4.35.2.1.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>DjVuParseOptions</B>(const char [])
+<A HREF="#DOC.1.4.34.2.1.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>DjVuParseOptions</B>(const char [])
 <DD><I>This is the normal constructor.  A profile name must be specified.   </I>
 <DT>
-<A HREF="#DOC.1.4.35.2.1.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>DjVuParseOptions</B>(const char [], const char [], <!1><A HREF="DjVuTokenList.html">DjVuTokenList</A> *VarTokens=0)
+<A HREF="#DOC.1.4.34.2.1.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>DjVuParseOptions</B>(const char [], const char [], <!1><A HREF="DjVuTokenList.html">DjVuTokenList</A> *VarTokens=0)
 <DD><I>This constructor is for using an alternate configuration file </I>
 <DT>
-<A HREF="#DOC.1.4.35.2.1.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>init</B>(const char [], const char [])
+<A HREF="#DOC.1.4.34.2.1.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>init</B>(const char [], const char [])
 <DD><I>This reinitallizes with the above constructor </I>
 <DT>
-<A HREF="#DOC.1.4.35.2.1.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>DjVuParseOptions</B>(<!1><A HREF="DjVuParseOptions.html#DOC.1.4.35.2.1.3">DjVuParseOptions</A> &amp;)
+<A HREF="#DOC.1.4.34.2.1.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>DjVuParseOptions</B>(<!1><A HREF="DjVuParseOptions.html#DOC.1.4.34.2.1.3">DjVuParseOptions</A> &amp;)
 <DD><I>This is a copy constructor.</I>
 </DL></P>
 <DT>
-<A HREF="#DOC.1.4.35.2.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Accessing options</B>
+<A HREF="#DOC.1.4.34.2.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Accessing options</B>
 <DD><I></I>
 <P><DL>
 <DT>
-<A HREF="#DOC.1.4.35.2.2.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>inline   int <B>SetVarToken</B>(const char xname[]) const 
+<A HREF="#DOC.1.4.34.2.2.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>inline   int <B>SetVarToken</B>(const char xname[]) const 
 <DD><I>This is the same as GetVarToken() except if a variable name is NOT     currently tokenized, a new token is created and returned.</I>
 <DT>
-<A HREF="#DOC.1.4.35.2.2.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>inline   int <B>GetProfileToken</B>(const char xname[]) const 
+<A HREF="#DOC.1.4.34.2.2.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>inline   int <B>GetProfileToken</B>(const char xname[]) const 
 <DD><I>This is similar to GetVarToken(), but it looks up the token for        profile name instead.</I>
 <DT>
-<A HREF="#DOC.1.4.35.2.2.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>inline   int <B>SetProfileToken</B>(const char xname[]) const 
+<A HREF="#DOC.1.4.34.2.2.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>inline   int <B>SetProfileToken</B>(const char xname[]) const 
 <DD><I>This is similar to SetVarToken(), but it looks up the token for       profile name instead.</I>
 <DT>
-<A HREF="#DOC.1.4.35.2.2.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>inline   const char* const <B>GetVarName</B>(const int token) const 
+<A HREF="#DOC.1.4.34.2.2.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>inline   const char* const <B>GetVarName</B>(const int token) const 
 <DD><I>This is the reverse transform of the GetVarToken() routine.</I>
 <DT>
-<A HREF="#DOC.1.4.35.2.2.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>inline   const char* const <B>GetProfileName</B>(const int token) const 
+<A HREF="#DOC.1.4.34.2.2.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>inline   const char* const <B>GetProfileName</B>(const int token) const 
 <DD><I>This is the reverse transform of the GetProfileToken() routine.</I>
 <DT>
-<A HREF="#DOC.1.4.35.2.2.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>const char* const <B>GetValue</B>(const int token) const 
+<A HREF="#DOC.1.4.34.2.2.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>const char* const <B>GetValue</B>(const int token) const 
 <DD><I>This is the primary lookup routine.</I>
 <DT>
-<A HREF="#DOC.1.4.35.2.2.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>GetBest</B>(const int listsize, const int tokens[], bool=false)
+<A HREF="#DOC.1.4.34.2.2.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>GetBest</B>(const int listsize, const int tokens[], bool=false)
 <DD><I>Multiple tokens may be in an array of the specified listsize.</I>
 <DT>
-<A HREF="#DOC.1.4.35.2.2.14"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>inline   int <B>GetBest</B>(const int tokens[], bool=false)
+<A HREF="#DOC.1.4.34.2.2.14"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>inline   int <B>GetBest</B>(const int tokens[], bool=false)
 <DD><I>Same as above, but -1 terminated </I>
 <DT>
-<A HREF="#DOC.1.4.35.2.2.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>inline   const char* const <B>GetValue</B>(const char xname[]) const 
+<A HREF="#DOC.1.4.34.2.2.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>inline   const char* const <B>GetValue</B>(const char xname[]) const 
 <DD><I>This is just a short cut, when a token value is only needed for one  lookup.</I>
 <DT>
-<A HREF="#DOC.1.4.35.2.2.9"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>GetBest</B>(const int listsize, const char * const[], bool=false)
+<A HREF="#DOC.1.4.34.2.2.9"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>GetBest</B>(const int listsize, const char * const[], bool=false)
 <DD><I>Multiple names may be in an array of the specified listsize.</I>
 <DT>
-<A HREF="#DOC.1.4.35.2.2.15"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>inline   int <B>GetBest</B>(const char * const names[], bool=false)
+<A HREF="#DOC.1.4.34.2.2.15"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>inline   int <B>GetBest</B>(const char * const names[], bool=false)
 <DD><I>Same as above, but NULL terminated </I>
 <DT>
-<A HREF="#DOC.1.4.35.2.2.10"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>GetInteger</B>( const int token, const int errval=0, const int falseval=0, const int trueval=1) const 
-<DD><I>This just checks for TRUE, and if not does an atoi() conversion.</I>
+<A HREF="#DOC.1.4.34.2.2.10"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>GetInteger</B>( const int token, const int errval=0, const int falseval=0, const int trueval=1) const 
+<DD><I>This just checks for TRUE, and it not does an atoi() conversion.</I>
 <DT>
-<A HREF="#DOC.1.4.35.2.2.11"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>inline   int <B>GetInteger</B>(const char xname[], const int errval=0, const int falseval=0, const int trueval=1) const 
+<A HREF="#DOC.1.4.34.2.2.11"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>inline   int <B>GetInteger</B>(const char xname[], const int errval=0, const int falseval=0, const int trueval=1) const 
 <DD><I>This is just a short cut, when a token value is only needed for one  lookup.</I>
 <DT>
-<A HREF="#DOC.1.4.35.2.2.12"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>GetNumber</B>(const int token, const int errval=0) const 
+<A HREF="#DOC.1.4.34.2.2.12"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>GetNumber</B>(const int token, const int errval=0) const 
 <DD><I>This just checks for valid integer numbers only.</I>
 <DT>
-<A HREF="#DOC.1.4.35.2.2.13"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>inline   int <B>GetNumber</B>(const char xname[], const int errval=0) const 
+<A HREF="#DOC.1.4.34.2.2.13"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>inline   int <B>GetNumber</B>(const char xname[], const int errval=0) const 
 <DD><I>This is just a short cut, when a token value is only needed for one  lookup.</I>
 </DL></P>
 <DT>
-<A HREF="#DOC.1.4.35.2.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Error handling</B>
+<A HREF="#DOC.1.4.34.2.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Error handling</B>
 <DD><I></I>
 <P><DL>
 <DT>
-<A HREF="#DOC.1.4.35.2.3.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>HasError</B>() const 
+<A HREF="#DOC.1.4.34.2.3.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>HasError</B>() const 
 <DD><I>This method allows us to check if any errors occurred.           </I>
 <DT>
-<A HREF="#DOC.1.4.35.2.3.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>const char* <B>GetError</B>()
+<A HREF="#DOC.1.4.34.2.3.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>const char* <B>GetError</B>()
 <DD><I>This allows us to retrieve and clear errors one at a time.</I>
 <DT>
-<A HREF="#DOC.1.4.35.2.3.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>ClearError</B>()
+<A HREF="#DOC.1.4.34.2.3.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>ClearError</B>()
 <DD><I>This deletes and recreates the Errors object, to clear all errors     without the need to do a GetError() loop.</I>
 <DT>
-<A HREF="#DOC.1.4.35.2.3.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>perror</B>(const char *mesg=0)
+<A HREF="#DOC.1.4.34.2.3.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>perror</B>(const char *mesg=0)
 <DD><I>This simple perror() type function prints all errors to stderr, with  a GetError() loop, so the errors are cleared.</I>
 </DL></P>
 <DT>
-<A HREF="#DOC.1.4.35.2.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Parsing profiles or arguments</B>
+<A HREF="#DOC.1.4.34.2.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Parsing profiles or arguments</B>
 <DD><I></I>
 <P><DL>
 <DT>
-<A HREF="#DOC.1.4.35.2.4.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>bool <B>ChangeProfile</B>(const char [])
+<A HREF="#DOC.1.4.34.2.4.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>bool <B>ChangeProfile</B>(const char [])
 <DD><I>This is the only method of reading a new profile, and changing it to  the current profile that will be used with the Get*() methods.</I>
 <DT>
-<A HREF="#DOC.1.4.35.2.4.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>ParseArguments</B>(const int, const char * const [], const djvu_option [], const int=0)
-<DD><I>This is the primary function for reading command  line arguments.  </I>
+<A HREF="#DOC.1.4.34.2.4.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>ParseArguments</B>(const int, const char * const [], const djvu_option [], const int=0)
+<DD><I>This is the primary function for reading command line arguments.  </I>
 <DT>
-<A HREF="#DOC.1.4.35.2.4.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>inline   const char* const* <B>get_argv</B>(void) const 
+<A HREF="#DOC.1.4.34.2.4.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>inline   const char* const* <B>get_argv</B>(void) const 
 <DD><I>These are the arguments sent to ParseArguments</I>
 <DT>
-<A HREF="#DOC.1.4.35.2.4.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>inline   int <B>get_argc</B>(void) const 
+<A HREF="#DOC.1.4.34.2.4.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>inline   int <B>get_argc</B>(void) const 
 <DD><I>These are the arguments sent to ParseArguments</I>
 <DT>
-<A HREF="#DOC.1.4.35.2.4.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>inline   int <B>get_optind</B>(void) const 
+<A HREF="#DOC.1.4.34.2.4.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>inline   int <B>get_optind</B>(void) const 
 <DD><I>These are the arguments sent to ParseArguments</I>
 <DT>
-<A HREF="#DOC.1.4.35.2.4.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>const char* const <B>ConfigFilename</B>(const char [], int)
+<A HREF="#DOC.1.4.34.2.4.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>const char* const <B>ConfigFilename</B>(const char [], int)
 <DD><I>Get the name of the last configuration file corresponding to the profile </I>
 </DL></P>
 </DL></P>
@@ -130,51 +130,51 @@
 <H2>Documentation</H2>
 <BLOCKQUOTE>Main class for parsing options.
 <TT>DjVuParseOptions</TT> is the only class you really need to declare.  This
-will handle all fo the details of parsing options from the command line
+will handle all of the details of parsing options from the command line
 and configuration files on disk. </BLOCKQUOTE>
 <DL>
 
 <A NAME="Creation/destruction.">
-<A NAME="DOC.1.4.35.2.1">
+<A NAME="DOC.1.4.34.2.1">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> Creation/destruction.</B></TT>
 <DL><DT><DD></DL><P><DL>
 
 <A NAME="~DjVuParseOptions">
-<A NAME="DOC.1.4.35.2.1.1">
+<A NAME="DOC.1.4.34.2.1.1">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> ~DjVuParseOptions()</B></TT>
 <DD>Normal Destructor.  This uses reference counts to decide when        
 references should be destroyed. 
 <DL><DT><DD></DL><P>
 <A NAME="DjVuParseOptions">
-<A NAME="DOC.1.4.35.2.1.3">
+<A NAME="DOC.1.4.34.2.1.3">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> DjVuParseOptions(const char [])</B></TT>
 <DD>This is the normal constructor.  A profile name must be specified.   
 <DL><DT><DD></DL><P>
 <A NAME="DjVuParseOptions">
-<A NAME="DOC.1.4.35.2.1.4">
+<A NAME="DOC.1.4.34.2.1.4">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> DjVuParseOptions(const char [], const char [], <!1><A HREF="DjVuTokenList.html">DjVuTokenList</A> *VarTokens=0)</B></TT>
 <DD>This constructor is for using an alternate configuration file 
 <DL><DT><DD></DL><P>
 <A NAME="init">
-<A NAME="DOC.1.4.35.2.1.5">
+<A NAME="DOC.1.4.34.2.1.5">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void init(const char [], const char [])</B></TT>
 <DD>This reinitallizes with the above constructor 
 <DL><DT><DD></DL><P>
 <A NAME="DjVuParseOptions">
-<A NAME="DOC.1.4.35.2.1.2">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> DjVuParseOptions(<!1><A HREF="DjVuParseOptions.html#DOC.1.4.35.2.1.3">DjVuParseOptions</A> &amp;)</B></TT>
+<A NAME="DOC.1.4.34.2.1.2">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> DjVuParseOptions(<!1><A HREF="DjVuParseOptions.html#DOC.1.4.34.2.1.3">DjVuParseOptions</A> &amp;)</B></TT>
 <DD>This is a copy constructor.  Arguments, and ErrorLists are not       
 copied.   VarTokens, ProfileTokens, and Configuration are copied by  
 reference, not value. 
 <DL><DT><DD></DL><P></DL>
 
 <A NAME="Accessing options">
-<A NAME="DOC.1.4.35.2.2">
+<A NAME="DOC.1.4.34.2.2">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> Accessing options</B></TT>
 <DL><DT><DD></DL><P><DL>
 
 <A NAME="SetVarToken">
-<A NAME="DOC.1.4.35.2.2.1">
+<A NAME="DOC.1.4.34.2.2.1">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>inline   int SetVarToken(const char xname[]) const </B></TT>
 <DD>This is the same as GetVarToken() except if a variable name is NOT    
 currently tokenized, a new token is created and returned.  If you are 
@@ -182,13 +182,13 @@ Use of this is recommended when the token value is to be stored
 statically. 
 <DL><DT><DD></DL><P>
 <A NAME="GetProfileToken">
-<A NAME="DOC.1.4.35.2.2.2">
+<A NAME="DOC.1.4.34.2.2.2">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>inline   int GetProfileToken(const char xname[]) const </B></TT>
 <DD>This is similar to GetVarToken(), but it looks up the token for       
 profile name instead. 
 <DL><DT><DD></DL><P>
 <A NAME="SetProfileToken">
-<A NAME="DOC.1.4.35.2.2.3">
+<A NAME="DOC.1.4.34.2.2.3">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>inline   int SetProfileToken(const char xname[]) const </B></TT>
 <DD>This is similar to SetVarToken(), but it looks up the token for      
 profile name instead.   Care should be used when using this method.  
@@ -198,28 +198,28 @@ profile did not exist.  An empty profile will be created...
 Perhaps this method should be private instead. 
 <DL><DT><DD></DL><P>
 <A NAME="GetVarName">
-<A NAME="DOC.1.4.35.2.2.4">
+<A NAME="DOC.1.4.34.2.2.4">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>inline   const char* const GetVarName(const int token) const </B></TT>
 <DD>This is the reverse transform of the GetVarToken() routine.   
 Given the token, it returns the var name.  This is handy for  
 creating readable messages for log files and such. 
 <DL><DT><DD></DL><P>
 <A NAME="GetProfileName">
-<A NAME="DOC.1.4.35.2.2.5">
+<A NAME="DOC.1.4.34.2.2.5">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>inline   const char* const GetProfileName(const int token) const </B></TT>
 <DD>This is the reverse transform of the GetProfileToken() routine.   
 Given the token, it returns the profile name.  This is handy for  
 creating readable messages for log files and such. 
 <DL><DT><DD></DL><P>
 <A NAME="GetValue">
-<A NAME="DOC.1.4.35.2.2.6">
+<A NAME="DOC.1.4.34.2.2.6">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>const char* const GetValue(const int token) const </B></TT>
 <DD>This is the primary lookup routine.  Input is the token as returned by 
 GetToken(), and the return value is the string associated with the     
 token.  Multiple tokens may be in an array of the specified listsize. 
 <DL><DT><DD></DL><P>
 <A NAME="GetBest">
-<A NAME="DOC.1.4.35.2.2.7">
+<A NAME="DOC.1.4.34.2.2.7">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int GetBest(const int listsize, const int tokens[], bool=false)</B></TT>
 <DD>Multiple tokens may be in an array of the specified listsize.  The   
 index of the token with a value of the highest precedence will be    
@@ -228,121 +228,121 @@ Default profile values have the lowest precedence.  It is an error
 to have two values f the same precedence. 
 <DL><DT><DD></DL><P>
 <A NAME="GetBest">
-<A NAME="DOC.1.4.35.2.2.14">
+<A NAME="DOC.1.4.34.2.2.14">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>inline   int GetBest(const int tokens[], bool=false)</B></TT>
 <DD>Same as above, but -1 terminated 
 <DL><DT><DD></DL><P>
 <A NAME="GetValue">
-<A NAME="DOC.1.4.35.2.2.8">
+<A NAME="DOC.1.4.34.2.2.8">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>inline   const char* const GetValue(const char xname[]) const </B></TT>
 <DD>This is just a short cut, when a token value is only needed for one 
 lookup.  A list of tokens may be specified as well. 
 <DL><DT><DD></DL><P>
 <A NAME="GetBest">
-<A NAME="DOC.1.4.35.2.2.9">
+<A NAME="DOC.1.4.34.2.2.9">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int GetBest(const int listsize, const char * const[], bool=false)</B></TT>
 <DD>Multiple names may be in an array of the specified listsize.  The    
 index of the name with a value of the highest precedence will be     
 is returned.  Command line arguments have the highest precedence.    
 Default profile values have the lowest precedence.  It is an error   
-to have two values f the same precedence. 
+to have two values with the same precedence. 
 <DL><DT><DD></DL><P>
 <A NAME="GetBest">
-<A NAME="DOC.1.4.35.2.2.15">
+<A NAME="DOC.1.4.34.2.2.15">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>inline   int GetBest(const char * const names[], bool=false)</B></TT>
 <DD>Same as above, but NULL terminated 
 <DL><DT><DD></DL><P>
 <A NAME="GetInteger">
-<A NAME="DOC.1.4.35.2.2.10">
+<A NAME="DOC.1.4.34.2.2.10">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int GetInteger( const int token, const int errval=0, const int falseval=0, const int trueval=1) const </B></TT>
-<DD>This just checks for TRUE, and if not does an atoi() conversion. 
+<DD>This just checks for TRUE, and it not does an atoi() conversion. 
 Anything beginning with [Tt] is returned as trueval, [Ff] is returned 
 as falseval, and anything else that is not a legal integer is returned 
 as errval. 
 <DL><DT><DD></DL><P>
 <A NAME="GetInteger">
-<A NAME="DOC.1.4.35.2.2.11">
+<A NAME="DOC.1.4.34.2.2.11">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>inline   int GetInteger(const char xname[], const int errval=0, const int falseval=0, const int trueval=1) const </B></TT>
 <DD>This is just a short cut, when a token value is only needed for one 
 lookup. 
 <DL><DT><DD></DL><P>
 <A NAME="GetNumber">
-<A NAME="DOC.1.4.35.2.2.12">
+<A NAME="DOC.1.4.34.2.2.12">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int GetNumber(const int token, const int errval=0) const </B></TT>
 <DD>This just checks for valid integer numbers only.  If the string
 contains something other than [-0-9] the supplied errval is returned.
 Otherwise an integer is returned. 
 <DL><DT><DD></DL><P>
 <A NAME="GetNumber">
-<A NAME="DOC.1.4.35.2.2.13">
+<A NAME="DOC.1.4.34.2.2.13">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>inline   int GetNumber(const char xname[], const int errval=0) const </B></TT>
 <DD>This is just a short cut, when a token value is only needed for one 
 lookup. 
 <DL><DT><DD></DL><P></DL>
 
 <A NAME="Error handling">
-<A NAME="DOC.1.4.35.2.3">
+<A NAME="DOC.1.4.34.2.3">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> Error handling</B></TT>
 <DL><DT><DD></DL><P><DL>
 
 <A NAME="HasError">
-<A NAME="DOC.1.4.35.2.3.4">
+<A NAME="DOC.1.4.34.2.3.4">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int HasError() const </B></TT>
 <DD>This method allows us to check if any errors occurred.           
 <DL><DT><DD></DL><P>
 <A NAME="GetError">
-<A NAME="DOC.1.4.35.2.3.1">
+<A NAME="DOC.1.4.34.2.3.1">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>const char* GetError()</B></TT>
 <DD>This allows us to retrieve and clear errors one at a time.  A NULL is 
 returned when all errors have been cleared. 
 <DL><DT><DD></DL><P>
 <A NAME="ClearError">
-<A NAME="DOC.1.4.35.2.3.2">
+<A NAME="DOC.1.4.34.2.3.2">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void ClearError()</B></TT>
 <DD>This deletes and recreates the Errors object, to clear all errors    
 without the need to do a GetError() loop. 
 <DL><DT><DD></DL><P>
 <A NAME="perror">
-<A NAME="DOC.1.4.35.2.3.3">
+<A NAME="DOC.1.4.34.2.3.3">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void perror(const char *mesg=0)</B></TT>
 <DD>This simple perror() type function prints all errors to stderr, with 
 a GetError() loop, so the errors are cleared. 
 <DL><DT><DD></DL><P></DL>
 
 <A NAME="Parsing profiles or arguments">
-<A NAME="DOC.1.4.35.2.4">
+<A NAME="DOC.1.4.34.2.4">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> Parsing profiles or arguments</B></TT>
 <DL><DT><DD></DL><P><DL>
 
 <A NAME="ChangeProfile">
-<A NAME="DOC.1.4.35.2.4.1">
+<A NAME="DOC.1.4.34.2.4.1">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>bool ChangeProfile(const char [])</B></TT>
 <DD>This is the only method of reading a new profile, and changing it to 
 the current profile that will be used with the Get*() methods. 
 Returns true if the profile exists. 
 <DL><DT><DD></DL><P>
 <A NAME="ParseArguments">
-<A NAME="DOC.1.4.35.2.4.2">
+<A NAME="DOC.1.4.34.2.4.2">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int ParseArguments(const int, const char * const [], const djvu_option [], const int=0)</B></TT>
-<DD>This is the primary function for reading command  line arguments.  
+<DD>This is the primary function for reading command line arguments.  
 <DL><DT><DD></DL><P>
 <A NAME="get_argv">
-<A NAME="DOC.1.4.35.2.4.3">
+<A NAME="DOC.1.4.34.2.4.3">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>inline   const char* const* get_argv(void) const </B></TT>
 <DD>These are the arguments sent to ParseArguments
 <DL><DT><DD></DL><P>
 <A NAME="get_argc">
-<A NAME="DOC.1.4.35.2.4.4">
+<A NAME="DOC.1.4.34.2.4.4">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>inline   int get_argc(void) const </B></TT>
 <DD>These are the arguments sent to ParseArguments
 <DL><DT><DD></DL><P>
 <A NAME="get_optind">
-<A NAME="DOC.1.4.35.2.4.5">
+<A NAME="DOC.1.4.34.2.4.5">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>inline   int get_optind(void) const </B></TT>
 <DD>These are the arguments sent to ParseArguments
 <DL><DT><DD></DL><P>
 <A NAME="ConfigFilename">
-<A NAME="DOC.1.4.35.2.4.6">
+<A NAME="DOC.1.4.34.2.4.6">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>const char* const ConfigFilename(const char [], int)</B></TT>
 <DD>Get the name of the last configuration file corresponding to the profile 
 <DL><DT><DD></DL><P></DL>
