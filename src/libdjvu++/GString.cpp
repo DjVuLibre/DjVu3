@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.130 2001-09-04 23:01:51 docbill Exp $
+// $Id: GString.cpp,v 1.131 2001-09-13 23:44:21 docbill Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -190,7 +190,7 @@ GStringRep::UTF8::create(const char fmt[],va_list args)
 class GStringRep::ChangeLocale
 {
 public:
-  ChangeLocale(const int,const char) {}
+  ChangeLocale(const int,const char *) {}
   ~ChangeLocale();
 };
 
@@ -1214,38 +1214,59 @@ GStringRep::nextCharType(
 bool
 GStringRep::giswspace(const unsigned long w)
 {
+#if HAS_WCHAR
   return 
     ((sizeof(wchar_t) == 2)&&(w&~0xffff))
     ||((unsigned long)iswspace((wchar_t)w))
     ||((w == '\r')||(w == '\n'));
+#else
+  return 
+    (w&~0xff)?(true):(((unsigned long)isspace((char)w))||((w == '\r')||(w == '\n')));
+#endif
 }
 
 bool
 GStringRep::giswupper(const unsigned long w)
 {
+#if HAS_WCHAR
   return ((sizeof(wchar_t) == 2)&&(w&~0xffff))
     ?(true):((unsigned long)iswupper((wchar_t)w)?true:false);
+#else
+  return (w&~0xff)?(true):((unsigned long)isupper((char)w)?true:false);
+#endif
 }
 
 bool
 GStringRep::giswlower(const unsigned long w)
 {
+#if HAS_WCHAR
   return ((sizeof(wchar_t) == 2)&&(w&~0xffff))
     ?(true):((unsigned long)iswlower((wchar_t)w)?true:false);
+#else
+  return (w&~0xff)?(true):((unsigned long)islower((char)w)?true:false);
+#endif
 }
 
 unsigned long
 GStringRep::gtowupper(const unsigned long w)
 {
+#if HAS_WCHAR
   return ((sizeof(wchar_t) == 2)&&(w&~0xffff))
     ?w:((unsigned long)towupper((wchar_t)w));
+#else
+  return (w&~0xff)?w:((unsigned long)toupper((char)w));
+#endif
 }
 
 unsigned long
 GStringRep::gtowlower(const unsigned long w)
 {
+#if HAS_WCHAR
   return ((sizeof(wchar_t) == 2)&&(w&~0xffff))
     ?w:((unsigned long)towlower((wchar_t)w));
+#else
+  return (w&~0xff)?w:((unsigned long)tolower((char)w));
+#endif
 }
 
 GP<GStringRep>
@@ -1396,14 +1417,6 @@ BasicMap( void )
 GUTF8String
 GUTF8String::fromEscaped( const GMap<GUTF8String,GUTF8String> ConvMap ) const
 {
-#if 0
-  //  Available for debugging ConvMap arguments if needed
-  for (GPosition here = ConvMap ; here; ++here)
-  {
-    DEBUG_MSG( "'" << ConvMap.key(here) << "' --> '" << ConvMap[here] << "'\n" );
-  }
-#endif
-
   GUTF8String ret;                  // Build output string here
   int start_locn = 0;           // Beginning of substring to skip
   int amp_locn;                 // Location of a found ampersand
@@ -1604,7 +1617,7 @@ GStringRep::vformat(va_list &args) const
       char *buffer;
       GPBuffer<char> gbuffer(buffer,buflen);
 
-      ChangeLocale(LC_ALL,(isNative()?0:"C"));
+      ChangeLocale locale(LC_ALL,(isNative()?0:"C"));
 
       // Format string
 #ifdef USE_VSNPRINTF
@@ -2611,19 +2624,14 @@ GUTF8String& GUTF8String::operator= (const char *str)
 GUTF8String GBaseString::operator+(const GUTF8String &s2) const
 { return GStringRep::UTF8::create(*this,s2); }
 
-GNativeString&
-GNativeString::operator+= (char ch)
-{
-  return init(GStringRep::Native::create(
-    *this,GStringRep::UTF8::create(&ch,0,1)));
-}
-
+#if HAS_WCHAR
 GUTF8String
 GNativeString::operator+(const GUTF8String &s2) const
 {
   return GStringRep::UTF8::create(
     ptr?(*this)->toUTF8(true):(*this),s2);
 }
+#endif
 
 GUTF8String
 GUTF8String::operator+(const GNativeString &s2) const
@@ -2635,6 +2643,7 @@ GUTF8String
 operator+(const char    *s1, const GUTF8String &s2)
 { return GStringRep::UTF8::create(s1,s2); }
 
+#if HAS_WCHAR
 GNativeString
 operator+(const char    *s1, const GNativeString &s2)
 { return GStringRep::Native::create(s1,s2); }
@@ -2687,4 +2696,7 @@ GNativeString::setat(const int n, const char ch)
     init((*this)->setat(CheckSubscript(n),ch));
   }
 }
+
+#endif
+
 

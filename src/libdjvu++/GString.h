@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //
-// $Id: GString.h,v 1.96 2001-09-05 19:24:22 docbill Exp $
+// $Id: GString.h,v 1.97 2001-09-13 23:44:21 docbill Exp $
 // $Name:  $
 
 #ifndef _GSTRING_H_
@@ -64,7 +64,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.96 2001-09-05 19:24:22 docbill Exp $# */
+    #$Id: GString.h,v 1.97 2001-09-13 23:44:21 docbill Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -107,8 +107,8 @@ public:
   class Unicode;
   friend Unicode;
 
-#if HAS_WCHAR
   class ChangeLocale;
+#if HAS_WCHAR
   class Native;
 
   friend Native;
@@ -1384,7 +1384,7 @@ GUTF8String::create( const char *buf, const unsigned int bufsize )
 #if HAS_WCHAR
   return GNativeString(buf,bufsize);
 #else
-  return GUTF8String(buf,0,bufsize);
+  return GUTF8String(buf,bufsize);
 #endif
 }
 
@@ -1401,32 +1401,6 @@ GUTF8String::create( const unsigned long *buf, const unsigned int bufsize )
 }
 
 inline GNativeString::GNativeString(void) {}
-
-/// Initialize this string class
-inline void
-GNativeString::init(void)
-{ GBaseString::init(); }
-
-/// Initialize this string class
-inline GNativeString &
-GNativeString::init(const GP<GStringRep> &rep)
-{
-  GP<GStringRep>::operator=(rep?rep->toNative(GStringRep::NOT_ESCAPED):rep);
-  init();
-  return *this;
-}
-
-inline GNativeString 
-GNativeString::substr(int from, unsigned int len) const
-{ return GNativeString(*this, from, len); }
-
-inline GNativeString &
-GNativeString::vformat(const GNativeString &fmt, va_list &args)
-{ return (*this = (fmt.ptr?GNativeString(fmt,args):fmt)); }
-
-inline GNativeString
-GNativeString::toEscaped( const bool tosevenbit ) const
-{ return ptr?GNativeString((*this)->toEscaped(tosevenbit)):(*this); }
 
 #if !HAS_WCHAR
 // For Windows CE, GNativeString is essentially GUTF8String
@@ -1488,6 +1462,32 @@ GNativeString::GNativeString(const GNativeString &fmt, va_list &args)
 : GUTF8String(fmt,args) {}
 
 #else // HAS_WCHAR
+
+/// Initialize this string class
+inline void
+GNativeString::init(void)
+{ GBaseString::init(); }
+
+/// Initialize this string class
+inline GNativeString &
+GNativeString::init(const GP<GStringRep> &rep)
+{
+  GP<GStringRep>::operator=(rep?rep->toNative(GStringRep::NOT_ESCAPED):rep);
+  init();
+  return *this;
+}
+
+inline GNativeString 
+GNativeString::substr(int from, unsigned int len) const
+{ return GNativeString(*this, from, len); }
+
+inline GNativeString &
+GNativeString::vformat(const GNativeString &fmt, va_list &args)
+{ return (*this = (fmt.ptr?GNativeString(fmt,args):fmt)); }
+
+inline GNativeString
+GNativeString::toEscaped( const bool tosevenbit ) const
+{ return ptr?GNativeString((*this)->toEscaped(tosevenbit)):(*this); }
 
 inline
 GNativeString::GNativeString(const GUTF8String &str)

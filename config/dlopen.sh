@@ -31,7 +31,7 @@
 #C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #
-# $Id: dlopen.sh,v 1.6 2001-08-24 21:50:09 docbill Exp $
+# $Id: dlopen.sh,v 1.7 2001-09-13 23:44:21 docbill Exp $
 # $Name:  $
 
 # This script sets the variables:
@@ -55,7 +55,7 @@ then
   then
     echo yes
     add_defs HAS_DLOPEN 1
-    search_for_library dl dlopen /usr/lib/libdl.a /lib/libdl.a /usr/lib/libdl.so /lib/libdl.so -ldl
+    search_for_library dl dlopen /usr/lib/libdl.a /lib/libdl.a -ldl /usr/lib/libdl.so /lib/libdl.so
     LIBDL="$libdl"
   else
     add_undefs HAS_DLOPEN

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuFile.cpp,v 1.179 2001-08-02 23:54:05 bcr Exp $
+// $Id: DjVuFile.cpp,v 1.180 2001-09-13 23:44:21 docbill Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -1368,7 +1368,7 @@ DjVuFile::stop_decode(bool sync)
       for(GPosition pos=inc_files_list;pos;++pos)
         inc_files_list[pos]->stop_decode(0);
       
-      if (decode_data_pool) decode_data_pool->stop();
+//      if (decode_data_pool) decode_data_pool->stop();
     }
     
     if (sync)
@@ -1398,9 +1398,9 @@ DjVuFile::stop_decode(bool sync)
       // reimplemented somehow at the GThread level.
       // delete decode_thread; decode_thread=0;
     }
-    flags&=~DONT_START_DECODE;
+    flags&=~(DONT_START_DECODE);
   } G_CATCH_ALL {
-    flags&=~DONT_START_DECODE;
+    flags&=~(DONT_START_DECODE);
     G_RETHROW;
   } G_ENDCATCH;
 }
@@ -2240,7 +2240,6 @@ DjVuFile::add_djvu_data(IFFByteStream & ostr, GMap<GURL, void *> & map,
 
   data_pool->clear_stream();
 }
-
 
 GP<ByteStream>  
 DjVuFile::get_djvu_bytestream(const bool included_too, const bool no_ndir)

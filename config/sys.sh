@@ -31,7 +31,7 @@
 #C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #
-# $Id: sys.sh,v 1.29 2001-07-24 17:52:03 bcr Exp $
+# $Id: sys.sh,v 1.30 2001-09-13 23:44:21 docbill Exp $
 # $Name:  $
 
 # This sets the variable SYS INCS JOBJ
@@ -52,7 +52,7 @@ if [ -z "$SYS_SET" ] ; then
   fi
   INCS=" "
   JOBJ=" "
-  SECURITYMODE="-D_LOCK_ID_"
+  SECURITYMODE="_LOCK_ID_ 1"
   SENTINAL_NEED_LIB=""
   SENTINAL=""
   WHOLEARCHIVESEP=" "
