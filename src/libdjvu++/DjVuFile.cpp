@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.78 1999-10-24 22:44:01 eaf Exp $
+//C- $Id: DjVuFile.cpp,v 1.79 1999-10-25 16:37:36 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -1429,9 +1429,12 @@ DjVuFile::merge_anno(MemoryByteStream &out)
       //  3. It handles loops in DjVuFile's hierarchy
    
    GP<MemoryByteStream> str=get_merged_anno();
-   str->seek(0);
-   if (out.tell() & 1) out.write((void *) "", 1);
-   out.copy(*str);
+   if (str)
+   {
+      str->seek(0);
+      if (out.tell() & 1) out.write((void *) "", 1);
+      out.copy(*str);
+   }
 }
 
 
