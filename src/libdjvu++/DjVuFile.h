@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.h,v 1.1.2.3 1999-04-30 21:23:13 eaf Exp $
+//C- $Id: DjVuFile.h,v 1.1.2.4 1999-05-03 19:21:23 eaf Exp $
  
 #ifndef _DJVUFILE_H
 #define _DJVUFILE_H
@@ -72,6 +72,7 @@ public:
    void		stop_decode(bool sync);
    void		start_decode(void);
    void		wait_for_finish(void);
+   void		reset(void);
    
       // Function needed by the cache
    unsigned int	get_memory_usage(void) const;
@@ -187,6 +188,13 @@ inline void
 DjVuFile::set_name(const char * name)
 {
    url=url.baseURL()+name;
+}
+
+inline void
+DjVuFile::reset(void)
+{
+   info=0; anno=0; bg44=0; fgjb=0; fgpm=0;
+   dir=0; description=""; mimetype="";
 }
 
 #endif
