@@ -6,7 +6,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: parseoptions.h,v 1.21 2000-01-27 02:48:41 haffner Exp $
+//C- $Id: parseoptions.h,v 1.22 2000-01-27 14:41:15 haffner Exp $
 
 #endif /* __cplusplus */
 
@@ -53,7 +53,7 @@
 
    The next step is to declare the \Ref{DjVuParseOptions} class, passing
    it the name of the default profile to read values from.  Profiles are
-   normally contained in "/etc/DjVu" or "~/.DjVu" for unix.  The location
+   normally contained in "/etc/DjVu" or "~/.DjVu" for UNIX.  The location
    is stored in the registry for Windows.  Legal profile variables can be
    any name beginning with a letter consisting of characters [-A-Za-z0-9].
    This includes all command long options of this format in the
@@ -66,11 +66,11 @@
    \Ref{DjVuParseOptions Examples}.
 
    @memo Class used for parsing options and configuration files.
-   @author: #$Author: haffner $#
-   @version #$Id: parseoptions.h,v 1.21 2000-01-27 02:48:41 haffner Exp $#
+   @author Bill Riemers
+   @version #$Id: parseoptions.h,v 1.22 2000-01-27 14:41:15 haffner Exp $#
  */
 
-//@{
+/*@{*/
 
 /** @name DjVuParseOptions Examples
     The following #DjVuParseOptions examples# demonstrates how to use the
@@ -257,6 +257,10 @@ private:
   int optind;
 
 public:
+/** @name Creation/destruction.
+ */
+  /*@{*/
+
   /** Normal Destructor.  This uses reference counts to decide when        
       references should be destroyed. */
   ~DjVuParseOptions();
@@ -274,12 +278,11 @@ public:
       copied.   VarTokens, ProfileTokens, and Configuration are copied by  
       reference, not value. */
   DjVuParseOptions(DjVuParseOptions &);
+  /*@}*/
 
-  /** This is the only method of reading a new profile, and changing it to 
-      the current profile that will be used with the Get*() methods. 
-      Returns true if the profile exists. */
-  bool ChangeProfile(const char []);
-
+/** @name Accessing options
+ */
+  /*@{*/
   /** If you wish to retrieve the same variable multiple times, or from    
       multiple profiles, we recommend retrieving the token value for that  
       variable, to avoid repeated lookups of the string.                   
@@ -362,6 +365,11 @@ public:
       lookup. */
   inline int GetNumber(const char xname[],const int errval=0) const;
 
+  /*@}*/
+
+/** @name Error handling
+ */
+  /*@{*/
   /// This method allows us to check if any errors occurred.           
   int HasError() const;
 
@@ -376,6 +384,15 @@ public:
   /** This simple perror() type function prints all errors to stderr, with 
       a GetError() loop, so the errors are cleared. */
   void perror(const char *mesg=0);
+  /*@}*/
+
+/** @name Parsing profiles or arguments
+ */
+  /*@{*/
+  /** This is the only method of reading a new profile, and changing it to 
+      the current profile that will be used with the Get*() methods. 
+      Returns true if the profile exists. */
+  bool ChangeProfile(const char []);
 
   /// This is the primary function for reading command  line arguments.  
   int ParseArguments(const int,const char * const [],const djvu_option [],const int=0);
@@ -390,6 +407,7 @@ public:
 
   /// Get the name of the last configuration file corresponding to the profile 
   const char * const ConfigFilename(const char [],int);
+ /*@}*/
 
 
 private:
