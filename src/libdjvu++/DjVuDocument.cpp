@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.16 1999-08-17 23:48:04 leonb Exp $
+//C- $Id: DjVuDocument.cpp,v 1.17 1999-08-19 22:21:43 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -499,35 +499,69 @@ DjVuDocument::get_page(int page_num)
    return new DjVuImage(file);
 }
 
-static void
-get_rid_of_ndir(const GP<DjVuFile> & file, GMap<GURL, void *> & map)
+static TArray<char>
+unlink_file(const TArray<char> & data, const char * name)
+      // Will process contents of data[] and remove any INCL chunk
+      // containing 'name'
 {
-   GURL url=file->get_url();
+   MemoryByteStream str_out;
+   IFFByteStream iff_out(str_out);
 
-   if (!map.contains(url))
+   MemoryByteStream str_in(data, data.size());
+   IFFByteStream iff_in(str_in);
+
+   int chksize;
+   GString chkid;
+   if (!iff_in.get_chunk(chkid)) return data;
+
+   iff_out.put_chunk(chkid);
+
+   while((chksize=iff_in.get_chunk(chkid)))
    {
-      map[url]=0;
-
-	 // First - delete NDIR chunk
-      file->delete_chunks("NDIR");
-      GPosition pos;
-      GPList<DjVuFile> files_list=file->get_included_files();
-      for(pos=files_list;pos;++pos)
-	 get_rid_of_ndir(files_list[pos], map);
-
-	 // Now - unlink empty files
-      for(pos=files_list;pos;++pos)
+      if (chkid=="INCL")
       {
-	 GP<DjVuFile> f=files_list[pos];
-	 if (f->get_chunks_number()==0)
-	    file->unlink_file(f->get_url().name());
+	 GString incl_str;
+	 char buffer[1024];
+	 int length;
+	 while((length=iff_in.read(buffer, 1024)))
+	    incl_str+=GString(buffer, length);
+
+	    // Eat '\n' in the beginning and at the end
+	 while(incl_str.length() && incl_str[0]=='\n')
+	 {
+	    GString tmp=((const char *) incl_str)+1; incl_str=tmp;
+	 }
+	 while(incl_str.length()>0 && incl_str[incl_str.length()-1]=='\n')
+	    incl_str.setat(incl_str.length()-1, 0);
+	    
+	 if (incl_str!=name)
+	 {
+	    iff_out.put_chunk(chkid);
+	    iff_out.writall((const char*)incl_str, incl_str.length());
+	    iff_out.close_chunk();
+	 }
+      } else
+      {
+	 iff_out.put_chunk(chkid);
+	 char buffer[1024];
+	 int length;
+	 while((length=iff_in.read(buffer, 1024)))
+	    iff_out.writall(buffer, length);
+	 iff_out.close_chunk();
       }
+      iff_in.close_chunk();
    }
+   iff_out.close_chunk();
+   iff_out.flush();
+   return str_out.get_data();
 }
 
 static void
 add_file_to_djvm(const GP<DjVuFile> & file, bool page,
 		 DjVmDoc & doc, GMap<GURL, void *> & map)
+      // This function is used only for obsolete formats.
+      // For new formats there is no need to process files recursively.
+      // All information is already available from the DJVM chunk
 {
    GURL url=file->get_url();
 
@@ -535,19 +569,30 @@ add_file_to_djvm(const GP<DjVuFile> & file, bool page,
    {
       map[url]=0;
 
-      if (file->get_chunks_number()>1 ||
-	  file->get_chunk_name(0)!="NDIR")
+      if (file->get_chunks_number()>0 && !file->contains_chunk("NDIR"))
       {
-	    // If it's not just a directory file, add it to the document
+	    // Get the data and unlink any file containing NDIR chunk.
+	    // Yes. We're lazy. We don't check if those files contain
+	    // anything else.
+	 GPosition pos;
+	 GPList<DjVuFile> files_list=file->get_included_files();
+	 TArray<char> data=file->get_djvu_data(false, true);
+	 for(pos=files_list;pos;++pos)
+	 {
+	    GP<DjVuFile> f=files_list[pos];
+	    if (f->contains_chunk("NDIR"))
+	       data=unlink_file(data, f->get_url().name());
+	 }
+	 
+	    // Finally add it to the document
 	 GString name=file->get_url().name();
 	 GP<DjVmDir::File> file_rec=new DjVmDir::File(name, name, name, page);
-	 TArray<char> data=file->get_djvu_data(false, true);
 	 doc.insert_file(file_rec, data, -1);
+
+	    // And repeat for all included files
+	 for(pos=files_list;pos;++pos)
+	    add_file_to_djvm(files_list[pos], false, doc, map);
       }
-      
-      GPList<DjVuFile> files_list=file->get_included_files();
-      for(GPosition pos=files_list;pos;++pos)
-	 add_file_to_djvm(files_list[pos], false, doc, map);
    }
 }
 
@@ -592,7 +637,6 @@ DjVuDocument::get_djvm_doc(void)
       {
 	 GP<DjVuFile> file=get_djvu_file(ndir->page_to_url(page_num));
 	 GMap<GURL, void *> map_del;
-	 get_rid_of_ndir(file, map_del);
 	 add_file_to_djvm(file, true, *doc, map_add);
       }
    }
