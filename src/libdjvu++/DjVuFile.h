@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.h,v 1.39 1999-09-23 22:19:50 eaf Exp $
+//C- $Id: DjVuFile.h,v 1.40 1999-09-27 14:03:39 leonb Exp $
  
 #ifndef _DJVUFILE_H
 #define _DJVUFILE_H
@@ -46,7 +46,7 @@
 
     @memo Classes representing DjVu files.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuFile.h,v 1.39 1999-09-23 22:19:50 eaf Exp $#
+    @version #$Id: DjVuFile.h,v 1.40 1999-09-27 14:03:39 leonb Exp $#
 */
 
 //@{
@@ -390,10 +390,15 @@ public:
 	  The data returned will reflect possible changes made into the
 	  chunk structure, annotation chunk #ANTa# and navigation directory
 	  chunk #NDIR#.
+	  @param included_too Process included files too
+	  @param no_ndir Get rid of #NDIR# chunks. */
+  GP<MemoryByteStream>  get_djvu_bytestream(bool included_too, bool no_ndir);
 
+      /** Same, returning a DataPool.
 	  @param included_too Process included files too
 	  @param no_ndir Get rid of #NDIR# chunks. */
    GP<DataPool>		get_djvu_data(bool included_too, bool no_ndir);
+
       //@}
 
       // Internal. Used by DjVuDocument

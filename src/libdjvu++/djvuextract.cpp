@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: djvuextract.cpp,v 1.16 1999-09-20 23:12:59 leonb Exp $
+//C- $Id: djvuextract.cpp,v 1.17 1999-09-27 14:03:39 leonb Exp $
 
 /** @name djvuextract
 
@@ -54,7 +54,7 @@
     @memo
     Extract components from DjVu files.
     @version
-    #$Id: djvuextract.cpp,v 1.16 1999-09-20 23:12:59 leonb Exp $#
+    #$Id: djvuextract.cpp,v 1.17 1999-09-27 14:03:39 leonb Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> - Initial implementation\\
     Andrei Erofeev <eaf@geocities.com> - Multipage support */
@@ -98,9 +98,8 @@ djvuextract(const char *filename, int page_num,
   GP<DjVuDocument> doc=new DjVuDocument;
   doc->init(GOS::filename_to_url(filename));
   GP<DjVuFile> file=doc->get_djvu_file(page_num);
-  TArray<char> data=file->get_djvu_data(0, 0);
-  MemoryByteStream ibs( (const char*)data, data.size());
-  IFFByteStream iff(ibs);
+  GP<MemoryByteStream> pibs = file->get_djvu_bytestream(false, false);
+  IFFByteStream iff(*pibs);
   
   IFFByteStream BG44(*pBG44);
   IFFByteStream FG44(*pFG44); 

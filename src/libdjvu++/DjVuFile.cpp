@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.61 1999-09-24 18:46:34 leonb Exp $
+//C- $Id: DjVuFile.cpp,v 1.62 1999-09-27 14:03:39 leonb Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -1307,23 +1307,27 @@ DjVuFile::add_djvu_data(IFFByteStream & ostr, GMap<GURL, void *> & map,
    if (top_level) ostr.close_chunk();
 }
 
+
+GP<MemoryByteStream>  
+DjVuFile::get_djvu_bytestream(bool included_too, bool no_ndir)
+{
+   check();
+   DEBUG_MSG("DjVuFile::get_djvu_bytestream(): creating DjVu raw file\n");
+   DEBUG_MAKE_INDENT(3);
+   GP<MemoryByteStream> pbs = new MemoryByteStream;
+   IFFByteStream iff(*pbs);
+   GMap<GURL, void *> map;
+   add_djvu_data(iff, map, included_too, no_ndir);
+   iff.flush();
+   pbs->seek(0, SEEK_SET);
+   return pbs;
+}
+
 GP<DataPool>
 DjVuFile::get_djvu_data(bool included_too, bool no_ndir)
 {
-   check();
-   
-   DEBUG_MSG("DjVuFile::get_djvu_data(): creating DjVu raw file\n");
-   DEBUG_MAKE_INDENT(3);
-   
-   MemoryByteStream str;
-   IFFByteStream iff(str);
-   GMap<GURL, void *> map;
-
-   add_djvu_data(iff, map, included_too, no_ndir);
-
-   iff.flush();
-   str.seek(0, SEEK_SET);
-   return new DataPool(str);
+   GP<MemoryByteStream> pbs = get_djvu_bytestream(included_too, no_ndir);
+   return new DataPool(*pbs);
 }
 
 //****************************************************************************
