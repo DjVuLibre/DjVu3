@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: GMapAreas.cpp,v 1.16 2000-11-22 21:29:20 fcrary Exp $
+// $Id: GMapAreas.cpp,v 1.17 2000-11-28 18:48:31 fcrary Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -299,11 +299,23 @@ GMapArea::print(void)
    GString total=left+MAPAREA_TAG+space+URL+space+quote+comment1+quote+space+gma_print()+border_type_str;
    if (border_always_visible)
      total+=space+left+BORDER_AVIS_TAG+right;
-   if ( !!hilite_str && hilite_str[0] )
+   if ( hilite_str.length() > 0 )
      total+=space+hilite_str;
    total+=right;
    return total;
 }
+
+
+/// Virtual function generating a list of defining coordinates
+/// (default are the opposite corners of the enclosing rectangle)
+void GMapArea::get_coords( GList<int> & CoordList )
+{
+  CoordList.append( get_xmin() );
+  CoordList.append( get_ymin() );
+  CoordList.append( get_xmax() );
+  CoordList.append( get_ymax() );
+}
+
 
 /****************************************************************************
 **************************** GMapRect definition ****************************
@@ -631,6 +643,18 @@ GMapPoly::gma_print(void)
    res+=space;
    return res;
 }
+
+/// Virtual function generating a list of defining coordinates
+void GMapPoly::get_coords( GList<int> & CoordList )
+{
+  for(int i = 0 ; i < points ; i++)
+  {
+    CoordList.append( xx[i] );
+    CoordList.append( yy[i] );
+  }
+}
+
+
 
 /****************************************************************************
 **************************** GMapOval definition ****************************

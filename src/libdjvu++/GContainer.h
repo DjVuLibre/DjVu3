@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: GContainer.h,v 1.38 2000-11-16 22:20:36 mrosen Exp $
+// $Id: GContainer.h,v 1.39 2000-11-28 18:48:31 fcrary Exp $
 // $Name:  $
 
 #ifndef _GCONTAINER_H_
@@ -95,7 +95,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@geocities.com> -- bug fixes.
     @version 
-    #$Id: GContainer.h,v 1.38 2000-11-16 22:20:36 mrosen Exp $# */
+    #$Id: GContainer.h,v 1.39 2000-11-28 18:48:31 fcrary Exp $# */
 //@{
 
 
@@ -376,7 +376,7 @@ public:
       The valid subscript range is set to the empty range. */
   void empty()
     { GArrayBase::empty(); } ;
-  /** Extends the subscript range so that is contains #n#.
+  /** Extends the subscript range so that it contains #n#.
       This function does nothing if #n# is already int the valid subscript range.
       If the valid range was empty, both the lower bound and the upper bound
       are set to #n#.  Otherwise the valid subscript range is extended
@@ -387,7 +387,7 @@ public:
        GArray<GString> a;
        while (! end_of_file()) { 
          a.touch(lineno); 
-	 a[lineno++] = read_a_line(); 
+         a[lineno++] = read_a_line(); 
        }
       \end{verbatim} */
   void touch(int n)
