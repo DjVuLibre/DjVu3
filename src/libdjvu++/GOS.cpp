@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: GOS.cpp,v 1.39 2000-12-24 23:59:48 praveen Exp $
+// $Id: GOS.cpp,v 1.40 2001-01-02 21:40:39 fcrary Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -498,24 +498,24 @@ GOS::expand_name(const char *fname, const char *from)
       fname++;
     if (!fname || !fname[0]) {
       while (s>string_buffer+1 && s[-1]== slash)
-	s--;
+  s--;
       *s = 0;
       return string_buffer;
     }
     if (fname[0]== dot ) {
       if (fname[1]== slash || fname[1]==0) {
-	fname +=1;
-	continue;
+  fname +=1;
+  continue;
       }
       if (fname[1]== dot )
-	if (fname[2]== slash || fname[2]==0) {
-	  fname +=2;
-	  while (s>string_buffer+1 && s[-1]== slash)
-	    s--;
-	  while (s>string_buffer+1 && s[-1]!= slash)
-	    s--;
-	  continue;
-	}
+  if (fname[2]== slash || fname[2]==0) {
+    fname +=2;
+    while (s>string_buffer+1 && s[-1]== slash)
+      s--;
+    while (s>string_buffer+1 && s[-1]!= slash)
+      s--;
+    continue;
+  }
     }
     if (s==string_buffer || s[-1]!= slash)
       *s++ = slash;
@@ -543,12 +543,12 @@ GOS::expand_name(const char *fname, const char *from)
   if (fname[0]== slash || fname[0]== backslash)
   {
     if (fname[1]== slash || fname[1]== backslash)
-    {	// Case "//abcd"
+    { // Case "//abcd"
       s[0]=s[1]= backslash; s[2]=0;
     } else
-    {	// Case "/abcd" 
+    { // Case "/abcd" 
       if (s[0]==0 || s[1]!=colon)
-	s[0] = _getdrive() + 'A' - 1;
+  s[0] = _getdrive() + 'A' - 1;
       s[1]=colon; s[2]= 0;
     }
   } else if (fname[0] && fname[1]==colon)
@@ -556,20 +556,20 @@ GOS::expand_name(const char *fname, const char *from)
     if (fname[2]!= slash && fname[2]!= backslash)
     { // Case "x:abcd"
       if ( toupper((unsigned char)s[0])!=toupper((unsigned char)fname[0]) || s[1]!=colon) {
-	drv[0]=fname[0]; drv[1]=colon; drv[2]= dot ; drv[3]=0;
-	GetFullPathName(drv, MAXPATHLEN, string_buffer, &s);
+  drv[0]=fname[0]; drv[1]=colon; drv[2]= dot ; drv[3]=0;
+  GetFullPathName(drv, MAXPATHLEN, string_buffer, &s);
         s = string_buffer;
       }
       fname += 2;
     } else if (fname[3]!= slash && fname[3]!= backslash)
-    {	// Case "x:/abcd"
+    { // Case "x:/abcd"
       s[0]=toupper((unsigned char)fname[0]);
       s[1]=colon;
       s[2]=backslash;
       s[3]=0;
       fname += 3;
     }else
-    {	// Case "x://abcd"
+    { // Case "x://abcd"
       s[0]=s[1]=backslash;
       s[2]=0;
       fname += 4;
@@ -602,7 +602,7 @@ GOS::expand_name(const char *fname, const char *from)
             fname += 2;
             strcpy(string_buffer, dirname(string_buffer));
             s = string_buffer;
-	  continue;
+    continue;
           }
       }
       while (*s) 
@@ -649,27 +649,27 @@ GOS::expand_name(const char *fname, const char *from)
       fname++;
     if (!fname || !fname[0]) {
       while (s>string_buffer+1 && s[-1]==colon)
-	s--;
+  s--;
       *s = 0;
       if (string_buffer[0]==colon)
-      	return &string_buffer[1];
+        return &string_buffer[1];
       else
-      	return string_buffer;
+        return string_buffer;
     }
     if (fname[0]== dot ) {
       if (fname[1]==colon || fname[1]==0) {
-	fname +=1;
-	continue;
+  fname +=1;
+  continue;
       }
       if (fname[1]== dot )
-	if (fname[2]==colon || fname[2]==0) {
-	  fname +=2;
-	  while (s>string_buffer+1 && s[-1]==colon)
-	    s--;
-	  while (s>string_buffer+1 && s[-1]!=colon)
-	    s--;
-	  continue;
-	}
+  if (fname[2]==colon || fname[2]==0) {
+    fname +=2;
+    while (s>string_buffer+1 && s[-1]==colon)
+      s--;
+    while (s>string_buffer+1 && s[-1]!=colon)
+      s--;
+    continue;
+  }
     }
     if (s==string_buffer || s[-1]!=colon)
       *s++ = colon;
@@ -944,13 +944,13 @@ GOS::filename_to_url(const char *filename, const char *useragent)
 #endif  
 #endif
 #endif
-	// WARNING: Whenever you modify this conversion code,
-	// make sure, that the following functions are in sync:
-	//   encode_reserved()
-	//   decode_reserved()
-	//   url_to_filename()
-	//   filename_to_url()
-	// unreserved characters
+  // WARNING: Whenever you modify this conversion code,
+  // make sure, that the following functions are in sync:
+  //   encode_reserved()
+  //   decode_reserved()
+  //   url_to_filename()
+  //   filename_to_url()
+  // unreserved characters
       if ( (*s>='a' && *s<='z') ||
            (*s>='A' && *s<='Z') ||
            (*s>='0' && *s<='9') ||
@@ -1009,31 +1009,32 @@ GOS::url_to_filename(const char *url)
 {
   if(!url||!strcmp(url,"about:blank"))
     return GString("");
+  
+  // WARNING: Whenever you modify this conversion code,
+  // make sure, that the following functions are in sync:
+  //   encode_reserved()
+  //   decode_reserved()
+  //   url_to_filename()
+  //   filename_to_url()
 
-	// WARNING: Whenever you modify this conversion code,
-	// make sure, that the following functions are in sync:
-	//   encode_reserved()
-	//   decode_reserved()
-	//   url_to_filename()
-	//   filename_to_url()
-  // Process hexdecimal character specification
+  // Process hexadecimal character specification
   GString urlcopy;
   char *d = urlcopy.getbuf(strlen(url)+1);
   while (*url)
+  {
+    if (*url == percent)
     {
-      if (*url== percent)
-        {
-          int c1 = hexval(url[1]);
-          int c2 = hexval(url[2]);
-          if (c1>=0 && c2>=0)
-            {
-              *d++ = (c1<<4)|c2;
-              url += 3;
-              continue;
-            }
-        }
-      *d++ = *url++;
+      int c1 = hexval(url[1]);
+      int c2 = hexval(url[2]);
+      if (c1>=0 && c2>=0)
+      {
+        *d++ = (c1<<4)|c2;
+        url += 3;
+        continue;
+      }
     }
+    *d++ = *url++;
+  }
   *d = 0;
   url = (const char*)urlcopy;
   // Check if we have a simple file name already
@@ -1045,21 +1046,27 @@ GOS::url_to_filename(const char *url)
   // All file urls are expected to start with filespec which is "file:"
   if (strncmp(url, filespec, strlen(filespec)))  //if not
     return basename(url);
-
+  
   //url does start with "file:", so move pointer to the position next to ":"
   url += strlen(filespec);
-
+  
+#ifdef macintosh
   //remove all leading slashes
   while(*url=='/')
-	  url++;
+    url++;
+#endif
+  
   // Remove possible localhost spec
   if (!strncmp(url, localhost, strlen(localhost)))
-	  url += strlen(localhost);
+    url += strlen(localhost);
+  
+#ifdef macintosh
   //remove all leading slashes
   while(*url=='/')
-	  url++;
+    url++;
+#endif
+  
   // Check if we are finished
-
 #ifdef macintosh
   char l_url[1024];
   strcpy(l_url,url);
@@ -1071,23 +1078,24 @@ GOS::url_to_filename(const char *url)
 #else  
   GString retval = expand_name(url,root);
 #endif
-
+    
 #ifdef WIN32
   if (!is_file(retval)) 
   {
-  // Search for a drive letter (encoded a la netscape)
+    // Search for a drive letter (encoded a la netscape)
     if (url[1]=='|' && url[2]== slash)
     {
-	  if ((url[0]>='a' && url[0]<='z') 
-          || (url[0]>='A' && url[0]<='Z'))
-	  {
-          GString drive;
-          drive.format("%c:\\", url[0]);
-          retval = expand_name(url+3, drive);
-	  }
-	}
+      if ((url[0]>='a' && url[0]<='z') 
+        || (url[0]>='A' && url[0]<='Z'))
+      {
+        GString drive;
+        drive.format("%c:\\", url[0]);
+        retval = expand_name(url+3, drive);
+      }
+    }
   }
 #endif
+
   // Return what we have
   return retval;
 }
@@ -1109,16 +1117,16 @@ GOS::encode_reserved(const char * filename)
    for(const char * ptr=filename;*ptr;ptr++)
    {
       if ((*ptr>='a' && *ptr<='z') ||
-	  (*ptr>='A' && *ptr<='Z') ||
-	  (*ptr>='0' && *ptr<='9') ||
-	  (strchr("$-_.+!*'(),:", *ptr)))	// Added : because of windows!
-	 res+=*ptr;
+    (*ptr>='A' && *ptr<='Z') ||
+    (*ptr>='0' && *ptr<='9') ||
+    (strchr("$-_.+!*'(),:", *ptr))) // Added : because of windows!
+   res+=*ptr;
       else
       {
-	    // escape sequence
-	 res+=percent;
-	 res+=hex[(*ptr >> 4) & 0xf];
-	 res+=hex[(*ptr) & 0xf];
+      // escape sequence
+   res+=percent;
+   res+=hex[(*ptr >> 4) & 0xf];
+   res+=hex[(*ptr) & 0xf];
       }
    }
    
@@ -1141,13 +1149,13 @@ GOS::decode_reserved(const char * url)
       if (*ptr!=percent) res+=*ptr;
       else
       {
-	 int c1=hexval(ptr[1]);
-	 int c2=hexval(ptr[2]);
-	 if (c1>=0 && c2>=0)
-	 {
-	    res+=(c1<<4)|c2;
-	    ptr+=2;
-	 } else res+=*ptr;
+   int c1=hexval(ptr[1]);
+   int c2=hexval(ptr[2]);
+   if (c1>=0 && c2>=0)
+   {
+      res+=(c1<<4)|c2;
+      ptr+=2;
+   } else res+=*ptr;
       }
    }
 
