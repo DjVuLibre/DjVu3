@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.cpp,v 1.14 1999-09-07 20:26:46 leonb Exp $
+//C- $Id: DataPool.cpp,v 1.15 1999-09-14 22:28:34 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -171,6 +171,9 @@ DataPool::BlockList::get_range(int start, int length) const
 void
 DataPool::init(void)
 {
+   DEBUG_MSG("DataPool::init(): Initializing\n");
+   DEBUG_MAKE_INDENT(3);
+   
    start=0; length=-1; add_at=0;
    eof_flag=false;
    stop_flag=false;
@@ -222,6 +225,9 @@ DataPool::~DataPool(void)
 void
 DataPool::connect(const GP<DataPool> & pool_in, int start_in, int length_in)
 {
+   DEBUG_MSG("DataPool::connect(): connecting to another DataPool\n");
+   DEBUG_MAKE_INDENT(3);
+   
    if (pool) THROW("Already connected to another DataPool.");
    if (stream) THROW("Already connected to a file.");
    if (start_in<0) THROW("Start must be non negative");
@@ -235,11 +241,28 @@ DataPool::connect(const GP<DataPool> & pool_in, int start_in, int length_in)
    else pool->add_trigger(start, length, static_trigger_cb, this);
 
    data=0;
+
+   wake_up_all_readers();
+   
+      // Pass registered trigger callbacks to the DataPool
+   GCriticalSectionLock lock(&triggers_lock);
+   for(GPosition pos=triggers_list;pos;++pos)
+   {
+      GP<Trigger> t=triggers_list[pos];
+      int tstart=t->start;
+      int tlength=t->length;
+      if (tlength<0 && length>0) tlength=length-t->start;
+      tstart+=start;
+      pool->add_trigger(tstart, tlength, t->callback, t->cl_data);
+   }
 }
 
 void
 DataPool::connect(const char * fname, int start_in, int length_in)
 {
+   DEBUG_MSG("DataPool::connect(): connecting to a file\n");
+   DEBUG_MAKE_INDENT(3);
+   
    if (pool) THROW("Already connected to a DataPool.");
    if (stream) THROW("Already connected to another file.");
    if (start_in<0) THROW("Start must be non negative");
@@ -257,6 +280,17 @@ DataPool::connect(const char * fname, int start_in, int length_in)
    eof_flag=true;
 
    data=0;
+
+   wake_up_all_readers();
+   
+      // Call every trigger callback
+   GCriticalSectionLock lock(&triggers_lock);
+   for(GPosition pos=triggers_list;pos;++pos)
+   {
+      GP<Trigger> t=triggers_list[pos];
+      t->callback(t->cl_data);
+   }
+   triggers_list.empty();
 }
 
 int
@@ -356,7 +390,7 @@ DataPool::add_data(const void * buffer, int offset, int size)
    }
 
       // And call triggers
-   call_triggers();
+   check_triggers();
 }
 
 bool
@@ -474,6 +508,17 @@ DataPool::wait_for_data(const GP<Reader> & reader)
 }
 
 void
+DataPool::wake_up_all_readers(void)
+{
+   DEBUG_MSG("DataPool::wake_up_all_readers(): waking up all readers\n");
+   DEBUG_MAKE_INDENT(3);
+
+   GCriticalSectionLock lock(&readers_lock);
+   for(GPosition pos=readers_list;pos;++pos)
+      readers_list[pos]->event.set();
+}
+
+void
 DataPool::set_eof(void)
       // Has no effect on connected DataPools
 {
@@ -496,7 +541,7 @@ DataPool::set_eof(void)
       }
    
 	 // Activate all trigger callbacks with negative threshold
-      call_triggers();
+      check_triggers();
    }
 }
 
@@ -507,15 +552,10 @@ DataPool::stop(void)
    DEBUG_MAKE_INDENT(3);
 
    stop_flag=true;
+
+   wake_up_all_readers();
    
    if (pool) pool->stop_reader(this);
-   else if (!stream)
-   {
-	 // Wake up everybody to let them rescan flags
-      GCriticalSectionLock slock(&readers_lock);
-      for(GPosition pos=readers_list;pos;++pos)
-	 readers_list[pos]->event.set();
-   }
 }
 
 void
@@ -524,29 +564,27 @@ DataPool::stop_reader(void * reader_id)
    DEBUG_MSG("DataPool::stop_reader(): Stopping reader with ID=" << reader_id << "\n");
    DEBUG_MAKE_INDENT(3);
 
-   if (pool) pool->stop_reader(reader_id);
-   else if (!stream)
+      // Find the reader object with given reader_id
+   GCriticalSectionLock slock(&readers_lock);
+   for(GPosition pos=readers_list;pos;++pos)
    {
-	 // Find the reader object with given reader_id
-      GCriticalSectionLock slock(&readers_lock);
-      for(GPosition pos=readers_list;pos;++pos)
+      Reader & str=*(readers_list[pos]);
+      if (str.reader_id==reader_id)
       {
-	 Reader & str=*(readers_list[pos]);
-	 if (str.reader_id==reader_id)
-	 {
-	    DEBUG_MSG("found one!\n");
-	    str.stop_flag=true;	// Set the flag
-	    str.event.set();	// And wake the reader up
-	 }
+	 DEBUG_MSG("found one!\n");
+	 str.stop_flag=true;	// Set the flag
+	 str.event.set();	// And wake the reader up
       }
    }
+      
+   if (pool) pool->stop_reader(reader_id);
 }
 
 void
-DataPool::call_triggers(void)
+DataPool::check_triggers(void)
       // This function is for not connected DataPools only
 {
-   DEBUG_MSG("DataPool::call_triggers(): calling activated trigger callbacks.\n");
+   DEBUG_MSG("DataPool::check_triggers(): calling activated trigger callbacks.\n");
    DEBUG_MAKE_INDENT(3);
 
    if (!pool && !stream)
@@ -572,7 +610,6 @@ DataPool::call_triggers(void)
       }
 }
 
-
 void
 DataPool::add_trigger(int thresh, void (* callback)(void *), void * cl_data)
 {
@@ -582,11 +619,14 @@ DataPool::add_trigger(int thresh, void (* callback)(void *), void * cl_data)
     add_trigger(0, -1, callback, cl_data);
 }
 
-
 void
 DataPool::add_trigger(int tstart, int tlength,
 		      void (* callback)(void *), void * cl_data)
 {
+   DEBUG_MSG("DataPool::add_trigger(): start=" << tstart <<
+	     ", length=" << tlength << ", func=" << (void *) callback << "\n");
+   DEBUG_MAKE_INDENT(3);
+   
    if (callback)
    {
       if (is_eof()) callback(cl_data);
@@ -595,9 +635,10 @@ DataPool::add_trigger(int tstart, int tlength,
       {
 	    // We're connected to a DataPool
 	    // Just pass the triggers down remembering it in the list
-	 GP<Trigger> trigger=new Trigger(start+tstart, tlength, callback, cl_data);
-	 if (tlength<0 && length>0) trigger->length=length-tstart;
-	 pool->add_trigger(trigger->start, trigger->length, callback, cl_data);
+	 GP<Trigger> trigger=new Trigger(tstart, tlength, callback, cl_data);
+	 tstart+=start;
+	 if (tlength<0 && length>0) tlength=length-tstart;
+	 pool->add_trigger(tstart, tlength, callback, cl_data);
 	 GCriticalSectionLock lock(&triggers_lock);
 	 triggers_list.append(trigger);
       } else if (!stream)
@@ -617,6 +658,9 @@ DataPool::add_trigger(int tstart, int tlength,
 void
 DataPool::del_trigger(void (* callback)(void *), void * cl_data)
 {
+   DEBUG_MSG("DataPool::del_trigger(): func=" << (void *) callback << "\n");
+   DEBUG_MAKE_INDENT(3);
+   
    GCriticalSectionLock lock(&triggers_lock);
    for(GPosition pos=triggers_list;pos;)
    {
