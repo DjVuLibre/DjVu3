@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: plugin.cpp,v 1.5 2001-07-26 20:42:08 mchen Exp $
+// $Id: plugin.cpp,v 1.6 2001-09-25 23:31:23 leonb Exp $
 // $Name:  $
 
 
@@ -1308,7 +1308,12 @@ NPP_New(NPMIMEType, NPP np_inst, uint16 np_mode, int16 argc,
       id=ReadPointer(pipe_read);
       DEBUG_MSG("got id=" << id << "\n");
       if (instance.contains(id))
-	 G_THROW("Internal error: id already exists.");
+        {
+          // This can happen because we do not clear
+          // the instance array when restarting djview.
+          // We just undo it...
+          instance.del(id);
+        }
       np_inst->pdata=id;
       instance[id]=Instance(np_inst, np_mode==NP_FULL);
    } G_CATCH(exc)
