@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: JB2Image.cpp,v 1.11 1999-06-24 22:07:57 leonb Exp $
+//C- $Id: JB2Image.cpp,v 1.12 1999-06-24 22:24:29 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -1106,12 +1106,11 @@ _JB2Codec::code_record(int &rectype, JB2Image *jim, JB2Shape *jshp, JB2Blit *jbl
         LibRect &l = libinfo[match];
         jblt->left += l.left;
         jblt->bottom += l.bottom;
-        // -- Theoretically we should do
-        // code_relative_location (jblt, l.top-l.bottom+1, l.right-l.left+1 );
-        //    but there is still something which does not match
-        //    Paul's code. So we keep doing what the old plugin does
-        //    because the new encoder does not use Paul's code either.
+#ifdef REPRODUCE_OLD_BUG
         code_relative_location (jblt, bm->rows(), bm->columns() );
+#else
+        code_relative_location (jblt, l.top-l.bottom+1, l.right-l.left+1 );
+#endif
         jblt->left -= l.left;
         jblt->bottom -= l.bottom; 
 #else
