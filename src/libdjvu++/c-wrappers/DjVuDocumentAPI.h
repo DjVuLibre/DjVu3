@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuDocumentAPI.h,v 1.12 2000-01-28 23:44:38 haffner Exp $
+ *C- $Id: DjVuDocumentAPI.h,v 1.13 2000-01-30 01:18:42 bcr Exp $
  */
 
 #ifndef _DJVUDOC_H_
@@ -24,6 +24,9 @@
 #ifdef __cplusplus
 extern "C"
 {
+#ifndef __cplusplus
+}
+#endif
 #endif
 
   /*@{*/
@@ -462,10 +465,11 @@ DJVUAPI
 void documenttodjvu_usage(int fd,const char *prog);
 
 #ifdef __cplusplus
-}
+#ifndef __cplusplus
+{
 #endif
+}
 
-#ifdef __cplusplus 
 inline
 djvu_foreground_options_struct::djvu_foreground_options_struct() :
   high_saturation(false), color_jb2(false), quality(75)

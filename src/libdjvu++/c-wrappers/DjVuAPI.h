@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuAPI.h,v 1.30 2000-01-27 20:36:18 haffner Exp $
+ *C- $Id: DjVuAPI.h,v 1.31 2000-01-30 01:18:42 bcr Exp $
  *
  * The main header file for the DjVu API
  */
@@ -17,7 +17,10 @@
 
 /* 
  * $Log: DjVuAPI.h,v $
- * Revision 1.30  2000-01-27 20:36:18  haffner
+ * Revision 1.31  2000-01-30 01:18:42  bcr
+ * Added import and export streams to the Process options.
+ *
+ * Revision 1.30  2000/01/27 20:36:18  haffner
  * Spell check.
  *
  * Reimplemented with Bill BitonalToDjVu.cpp
@@ -100,9 +103,9 @@ struct djvuio_struct
   const char *filename;
   void *priv;
 };
-typedef djvuio_struct* djvu_import;
-typedef djvuio_struct* djvu_export;
-/*
+/* typedef struct djvuio_struct* djvu_import;
+ * typedef struct djvuio_struct* djvu_export;
+ *
  * In general import means to load a file from disk, and export means to
  * save a file to disk.  However, as you will see, it is possible to use
  * any type of device, not just a disk with this functions.

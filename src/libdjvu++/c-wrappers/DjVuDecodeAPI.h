@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuDecodeAPI.h,v 1.17 2000-01-26 04:40:46 bcr Exp $
+ *C- $Id: DjVuDecodeAPI.h,v 1.18 2000-01-30 01:18:42 bcr Exp $
  */
 
 #ifndef _DJVUDECODE_H_
@@ -49,6 +49,11 @@ extern "C"
 /* Predeclarations. */
  
 struct djvu_parse;
+
+struct djvuio_struct;
+
+typedef struct djvuio_struct* djvu_import;
+typedef struct djvuio_struct* djvu_export;
 
 typedef enum djvu_layer_type_enum
 {
@@ -150,8 +155,18 @@ typedef struct djvu_process_options_struct
   /// Number of files in filelist
   int filecount;
 
+  /** You can specify an import stream instead of a filelist as defined in
+    DjVuAPI.h.  When using an input_stream filelist and filecount should both
+    be set to 0. */
+  djvu_import input_stream;
+
   /// The output filename (or directory)
   const char *output;
+
+  /** Instead of specifying an output filename, you can define a 
+    djvu_export stream as defined in DjVuAPI.h.  When using an output_stream
+    output should be set to zero.  */
+  djvu_export output_stream;
 
   /// The program name
   const char *prog;
@@ -263,7 +278,8 @@ inline djvu_transform_options_struct::djvu_transform_options_struct() :
 
 inline djvu_process_options_struct::djvu_process_options_struct() :
   page_range(0), warnfileno(0), logfileno(0), helpfileno(0), filelist(0),
-  filecount(0), output(0), prog(0), priv(0) {}
+  filecount(0), input_stream(0), output(0), output_stream(0), prog(0),
+  priv(0) {}
 
 inline djvu_decode_options_struct::djvu_decode_options_struct() :
   process(), transform(), output_format(0), layer(DJVU_ALL) {}
