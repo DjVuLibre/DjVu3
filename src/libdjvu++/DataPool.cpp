@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.cpp,v 1.1.2.3 1999-05-03 18:50:08 eaf Exp $
+//C- $Id: DataPool.cpp,v 1.1.2.4 1999-05-03 21:58:01 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -251,7 +251,7 @@ DataPool::del_trigger(void (* callback)(void *))
 class PoolByteStream : public ByteStream
 {
 public:
-   PoolByteStream(const GP<DataRange> & data_range);
+   PoolByteStream(DataRange * data_range);
    virtual ~PoolByteStream() {};
 
    virtual size_t read(void *buffer, size_t size);
@@ -260,7 +260,11 @@ public:
    virtual long tell();
    virtual int  is_seekable(void) const { return 1; };
 private:
-   GP<DataRange>	data_range;
+      // Don't make data_range GP<>. The problem is that DataRange creates
+      // and soon destroys this ByteStream from the constructor. Since
+      // there are no other pointers to the DataRange created yet, it becomes
+      // destroyed immediately :(
+   DataRange		* data_range;
    long			position;
 
       // Cancel C++ default stuff
@@ -268,7 +272,7 @@ private:
 };
 
 inline
-PoolByteStream::PoolByteStream(const GP<DataRange> & xdata_range) :
+PoolByteStream::PoolByteStream(DataRange * xdata_range) :
    data_range(xdata_range), position(0)
 {
    if (!data_range) THROW("Internal error: ZERO DataRange passed as input.");
@@ -324,10 +328,14 @@ PoolByteStream::tell(void)
 void
 DataRange::init(void)
 {
+   DEBUG_MSG("DataRange::init(): initializing\n");
+   DEBUG_MAKE_INDENT(3);
+
    if (!pool) THROW("ZERO data pool passed as input.");
    if (length<0 && pool->is_eof()) length=pool->get_size()-start;
    if (length<0)
    {
+      GPosition pos=triggers_list;
       pool->add_trigger(-1, static_trigger_cb, this);
       pool->add_trigger(start+32, static_trigger_cb, this);
    }
@@ -347,7 +355,13 @@ DataRange::DataRange(const DataRange & r) : pool(r.pool),
 
 DataRange::~DataRange(void)
 {
+   DEBUG_MSG("DataRange::~DataRange(): destroying, this=" << this << "\n");
+   DEBUG_MAKE_INDENT(3);
+
+   GCriticalSectionLock lock(&trigger_lock);
    pool->del_trigger(static_trigger_cb);
+
+   DEBUG_MSG("done destroying DataRange\n");
 }
 
 int
@@ -389,6 +403,13 @@ DataRange::static_trigger_cb(void * cl_data)
 void
 DataRange::trigger_cb(void)
 {
+      // Don't want to be destroyed while I'm here. Can't use GP<> life saver
+      // because it may be called from the constructor
+   GCriticalSectionLock lock(&trigger_lock);
+   
+   DEBUG_MSG("DataRange::trigger_cb(): DataPool has enough data now\n");
+   DEBUG_MAKE_INDENT(3);
+
    if (length<0 && pool->is_eof())
       length=pool->get_size()-start;
    if (length<0) analyze_iff();
@@ -463,7 +484,7 @@ DataRange::analyze_iff(void)
       {
 	 DEBUG_MSG("Got size=" << size << "\n");
 	 length=size;
-      };
+      }
    } CATCH(exc) {
       delete str; str=0;
       RETHROW;

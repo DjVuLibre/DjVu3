@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.h,v 1.1.2.3 1999-05-03 18:50:08 eaf Exp $
+//C- $Id: DataPool.h,v 1.1.2.4 1999-05-03 21:58:01 eaf Exp $
  
 #ifndef _DATAPOOL_H
 #define _DATAPOOL_H
@@ -31,7 +31,7 @@
 
     @memo Data storage with compatible byte streams.
     @author Andrei Erofeev
-    @version #$Id: DataPool.h,v 1.1.2.3 1999-05-03 18:50:08 eaf Exp $#
+    @version #$Id: DataPool.h,v 1.1.2.4 1999-05-03 21:58:01 eaf Exp $#
 */
 
 //@{
@@ -246,7 +246,7 @@ private:
    bool		stop_flag;
 
    GPList<Trigger>	triggers_list;
-   GCriticalSection	triggers_lock;
+   GCriticalSection	triggers_lock, trigger_lock;
 
    static void	static_trigger_cb(void *);
    void		trigger_cb(void);
