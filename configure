@@ -5,8 +5,10 @@
 ### ---------------------------
 ### Determine directories
 
-conf=`basename $0`
-if [ ! -r `dirname $0`/config/functions.sh ]
+PROGRAM="$0"
+CONFIG_FILE=`dirname "$PROGRAM"`"/config/functions.sh"
+conf=`basename "$PROGRAM"`
+if [ ! -r "$CONFIG_FILE" ]
 then
     echo 1>&2 "$conf: Cannot recognize source directory"
     echo 1>&2 "--  Check that your source directory is complete."
@@ -17,7 +19,7 @@ fi
 ### ---------------------------
 ### Get functions
 
-. `dirname $0`/config/functions.sh
+. "$CONFIG_FILE"
 
 ### ---------------------------
 ### Process arguments
@@ -96,7 +98,12 @@ EOF
 # --- save command line
 
 echo '#!/bin/sh' > "$TOPBUILDDIR/reconfigure"
-echo "$0 $*" >> "$TOPBUILDDIR/reconfigure"
+echo "'$PROGRAM' \\" >> "$TOPBUILDDIR/reconfigure"
+while [ $# != 0 ] ; do
+  echon "'$1' \\" >> "$TOPBUILDDIR/reconfigure"
+  shift
+done
+echo " "  >> "$TOPBUILDDIR/reconfigure"
 chmod 755 "$TOPBUILDDIR/reconfigure"
 
 # --- save configuration variables

@@ -3,6 +3,72 @@
 # Configuration scripts should source this file 
 # and call the relevant functions.
 #
+# The basic variables needed for all configuration files are preset,
+# and the names are stored in "$CONFIG_VARS".  The previous config.cache
+# file is also read.
+#
+# The functions defined are:
+#
+# echon ...
+#   Print the arguments to standard output without a line feed.
+#
+# pathclean PATH
+#   Replace things like /./ with / in the PATH specified.
+#
+# mkdirp PATH
+#   Equivalent to the GNU command "mkdir -p PATH"
+#
+# testfile FILENAME
+#   Output standard input to the specified FILENAME and the logfile.
+#
+# run COMMAND
+#   Evaluates the specified command, and writes the output to $temp.out and
+#   the logfile.
+#
+# get_option_value OPTION
+#   Extracts the value of a long option string.  For example the following
+#   would return "fi".
+#      get_option_value --foo=fi
+#
+# process_general_option OPTION
+#   This processes the options --prefix=*,--with-debug,-g,--with-flag=*
+#
+# list_general_options
+#   Outputs usage instructions for general options to standard error.
+#
+# check_compiler
+#   Queries the C and C++ compilers
+#
+# check_debug_option ARG
+#   Seems to be a dummy function that is the same as:
+#	process_general_option -g
+#   if and only if a none empty argument is supplied.
+#
+# check_thread_option
+#   (to be documented)
+#   
+# check_rpo_option
+#   (to be documented)
+#
+# check_library
+#   (to be documented)
+#
+# check_make_stlib
+#   (to be documented)
+#
+# generate_makefile
+#   (to be documented)
+#
+# generate_main_makefile
+#   (to be documented)
+
+
+# --- Prefix for temporary files
+tempdir=/tmp
+temp="${tempdir}"/c$$
+
+# --- Make sure that all temp files are removed
+trap "rm 2>>/dev/null $temp $temp.*" 0
 
 ### ------------------------------------------------------------------------
 ### Support functions
@@ -31,22 +97,30 @@ pathclean()
 
 
 # Make directory and all parents unless they exist already
-mkdirp()
-{
-    if [ -n "$1" ] && [ "$1" != "." ] && [ ! -d "$1" ]
+mkdir -p "$temp/test/test" 2>>/dev/null 1>>/dev/null
+if [ -d "$temp/test/test" ] ; then
+  rm -rf "$temp"
+  mkdirp()
+  {
+    mkdir -p "$*"
+  }
+else
+  mkdirp()
+  {
+    if [ -n "$*" -a "$*" != "." -a ! -d "$*" ]
     then
-      mkdirp `dirname $1`
-      mkdir $1
+      mkdirp `dirname "$*"`
+      mkdir "$*"
     fi
-}
+  }
+fi
 
 
 # Make a test file with echo on CONFIG_LOG
 testfile()
 {
-    cat > $1
-    echo "------- ($1)" >> $CONFIG_LOG
-    cat $1              >> $CONFIG_LOG
+    echo "------- ($*)" >> "$CONFIG_LOG"
+    tee "$*"            >> "$CONFIG_LOG"
 }
 
 
@@ -55,9 +129,9 @@ run()
 {
     ( cd "$tempdir" 2>>/dev/null 1>>/dev/null; $* ) > $temp.out 2>&1 
     status=$?
-    echo "------- (cmd)"   >> $CONFIG_LOG
-    echo '%' $*            >> $CONFIG_LOG
-    cat $temp.out          >> $CONFIG_LOG
+    echo "------- (cmd)"   >> "$CONFIG_LOG"
+    echo '%' "$*"          >> "$CONFIG_LOG"
+    cat "$temp.out"        >> "$CONFIG_LOG"
     return $status
 }
 
@@ -72,11 +146,13 @@ run()
 
 get_option_value()
 {
-    if [ `expr "$1" : '[-A-Za-z_]*='` = 0 ]
+# This won't work with many types of Bourne Shell.  I need to fix it.
+#
+    if [ `expr "$*" : '[-A-Za-z_]*='` = 0 ]
     then
       echo yes
     else
-      echo $1 | sed 's/^[-A-Za-z_]*=//'
+      echo "$*" | sed 's/^[-A-Za-z_]*=//'
     fi
 }
 
@@ -88,7 +164,7 @@ get_option_value()
 
 process_general_option()
 {
-  case "$1" in
+  case "$*" in
         --prefix=* )     
             prefix=`get_option_value $1`
             ;; 
@@ -145,11 +221,11 @@ check_compiler()
 
     # -----
 
-    if [ -n "$cc_is_gcc" ] && [ -n "$cxx_is_gcc" ]
+    if [ -n "$cc_is_gcc" -a -n "$cxx_is_gcc" ]
     then
       compiler_is_gcc=yes
-      test -z "$OPT" && OPT="-O3 -funroll-loops"
-      test -z "$WARN" && WARN="-Wall -Wno-unused"
+      if [ -z "$OPT" ] ; then  OPT="-O3 -funroll-loops" ; fi
+      if [ -z "$WARN" ] ; then  WARN="-Wall -Wno-unused" ; fi
     else
       compiler_is_gcc=
     fi
@@ -180,9 +256,9 @@ check_compiler()
 
 check_debug_option()
 {
-  if [ -z "$1" ] ; then return; fi
+  if [ -z "$*" ] ; then return; fi
   # We could test that one ...
-  OPT=-g
+  OPT="-g"
   DEFS="$DEFS -DDEBUG"
 }
 
@@ -202,7 +278,7 @@ check_thread_option()
   if [ -z "$1" ] ; then return; fi
   case "$1" in
     yes )
-       echo 2>&1 "$conf: Autodetermination of thread model is not yet implemented."
+       echo 2>&1 "${PROGRAM_NAME}: Autodetermination of thread model is not yet implemented."
        echo 2>&1 "-- Please specify one of nothreads, cothreads, posixthreads."
        exit 1
        ;;
@@ -216,7 +292,7 @@ check_thread_option()
        DEFS="$DEFS -DTHREADMODEL=COTHREADS" 
        if [ -z "$compiler_is_gcc" ] 
        then
-          echo 1>&2 "$conf: Cothreads only work with gcc."
+          echo 1>&2 "${PROGRAM_NAME}: Cothreads only work with gcc."
           exit 1
        fi
        echon "Testing exception handler patch for gcc ... "
@@ -230,7 +306,7 @@ EOF
           echo yes.
        else
           echo no.
-          echo 1>&2 "$conf: Using COTHREADS without the patch is unsafe."
+          echo 1>&2 "${PROGRAM_NAME}: Using COTHREADS without the patch is unsafe."
           echo 1>&2 "-- See documentation for libdjvu++."
           DEFS="$DEFS -DNO_LIBGCC_HOOKS"
        fi
@@ -239,8 +315,8 @@ EOF
        DEFS="$DEFS -DTHREADMODEL=POSIXTHREADS" 
        echo 'int main(void) {return 0;}' | testfile $temp.cpp
        echon "Check option -pthread ... "
-       if ( ( run $CXX $CXXFLAGS -pthread $temp.cpp -o $temp ) \
-            && [ -z "`grep -i unrecognized $temp.out`" ] )
+       run $CXX $CXXFLAGS -pthread $temp.cpp -o $temp
+       if [ $? = 0 -a -z "`grep -i unrecognized $temp.out`" ]
        then
          echo yes.
          CC="$CC -pthread"
@@ -248,8 +324,8 @@ EOF
        else
          echo no.
          echon "Check option -threads ... "
-         if ( ( run $CXX $CXXFLAGS -threads $temp.cpp -o $temp ) \
-              && [ -z "`grep -i unrecognized $temp.out`" ] )
+         run $CXX $CXXFLAGS -threads $temp.cpp -o $temp
+         if [ $? = 0 -a -z "`grep -i unrecognized $temp.out`" ]
          then
            echo yes.
            CC="$CC -threads"
@@ -262,7 +338,7 @@ EOF
        fi
        ;;
     *)
-       echo 1>&2 "$conf: unrecognized multithreading option."
+       echo 1>&2 "${PROGRAM_NAME}: unrecognized multithreading option."
        exit 1
        ;;
   esac
@@ -286,22 +362,22 @@ check_rpo_option()
   if [ -z "$compiler_is_gcc" ] 
   then
      echo no.
-     echo 2>&1 "$conf: Option '-frepo' only work with gcc."
+     echo 2>&1 "${PROGRAM_NAME}: Option '-frepo' only work with gcc."
      exit 1
   fi
   echo 'int main(void) {return 0;}' | testfile $temp.cpp
-  if ( ( run $CXX $CXXFLAGS -frepo $temp.cpp -o $temp ) \
-         && [ -z "`grep -i unrecognized $temp.out`" ] )
+  run $CXX $CXXFLAGS -frepo $temp.cpp -o $temp
+  if [ $? = 0 -a -z "`grep -i unrecognized $temp.out`" ]
   then
     echo yes.
     OPT="$OPT -frepo"
   else
     echo no.
-    echo 1>&2 "$conf: Compiler does not support option '-frepo'."
+    echo 1>&2 "${PROGRAM_NAME}: Compiler does not support option '-frepo'."
     exit 1
   fi
   echon "Searching rpo program ... "
-  test -z "$RPO" && RPO=rpo
+  if [ -z "$RPO" ] ; then RPO=rpo ; fi
   if ( run $RPO ) 
   then
     echo $RPO
@@ -311,7 +387,7 @@ check_rpo_option()
     #
     # We could build it instead of complaining
     #
-    echo 1>&2 "$conf: Cannot find program RPO."
+    echo 1>&2 "${PROGRAM_NAME}: Cannot find program RPO."
     echo 1>&2 "-- You cannot use option -frepo without this program."
     exit 1
   fi
@@ -327,12 +403,12 @@ check_rpo_option()
 
 check_library()
 {
-  func=$1
+  func="$1"
   shift
-  echon "Searching library containing $func() ... "
+  echon "Searching library containing ${func}() ... "
   testfile $temp.cpp <<EOF
-extern "C" int $func(void);
-int main(void) { return $func(); }
+extern "C" int ${func}(void);
+int main(void) { return ${func}(); }
 EOF
   for lib
   do
@@ -344,7 +420,7 @@ EOF
     fi
   done
   echo "not found."
-  echo 2>&1 "$conf: Function $func() not found."
+  echo 2>&1 "${PROGRAM_NAME}: Function ${func}() not found."
   exit 1
 }
 
@@ -371,7 +447,7 @@ EOF
         echo $MAKE_STLIB
     else
         echo unknown.
-        echo 1>&2 "$conf: Cannot find how to make a static library."
+        echo 1>&2 "${PROGRAM_NAME}: Cannot find how to make a static library."
         echo 1>&2 "-- Please set environment variable MAKE_STLIB or AR."
         exit 1
     fi
@@ -485,7 +561,15 @@ PHONY: all install clean html depend
 EOF
 }
 
-# First we set the CONFIG_DIR and SYS variables.
+# We always need to know the program name and directory.
+#
+if [ -z "$PROGRAM" ] ; then
+  PROGRAM="$0"
+fi
+PROGRAM_NAME=`basename "$PROGRAM"`
+
+
+# Now set the CONFIG_DIR variable.
 #
 
 if [ -z "$CONFIG_DIR" ] ; then
@@ -493,27 +577,27 @@ if [ -z "$CONFIG_DIR" ] ; then
   CONFIG_DIR=`cd "$CONFIG_DIR" 2>>/dev/null 1>>/dev/null;pwd`
   CONFIG_VARS=`echo CONFIG_DIR "${CONFIG_VARS}"`
 fi
+
+
+# Next we need to set the SYS variable.
+#
+
 if [ -z "$SYS" ] ; then
   . "${CONFIG_DIR}"/sys.sh
 fi
 
-# Now we read the cache file.
+# Now we are ready to read the cache file.
 #
 . ${CONFIG_DIR}/read_cache.sh
 
 ### ------------------------------------------------------------------------
 ### General stuff
 
-# --- Prefix for temporary files
-tempdir=/tmp
-temp="${tempdir}"/c$$
 
 # --- Log file
-date > $CONFIG_LOG
-
-# --- Make sure that all temp files are removed
-trap "rm 2>/dev/null $temp $temp.*" 0
-
+date > "$CONFIG_LOG"
 # --- Default prefix directory
-prefix=/usr/local
+if [ -z "$prefix" ] ; then
+. ${CONFIG_DIR}/parse_config.sh
+fi
 
