@@ -30,15 +30,15 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: debug.h,v 1.20 2001-10-12 17:58:30 leonb Exp $
+// $Id: debug.h,v 1.21 2001-10-16 18:01:44 docbill Exp $
 // $Name:  $
 
 #ifndef _DEBUG_H_
 #define _DEBUG_H_
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
 
+#ifdef __GNUC__
+#pragma interface
+#endif
 
 #include <stdio.h>
 #ifdef WIN32
@@ -81,8 +81,7 @@ class GURL;
     user specifies option #-debug# in the command line. Usage of
     #RUNTIME_DEBUG_ONLY# implies #DEBUGLVL=1# if not specified otherwise.
 
-    Finally, #-DNO_DEBUG# or #-DNDEBUG# can be used instead of #-DDEBUGLVL=0#,
-    and #-D_DEBUG# can be used instead of #-DDEBUGLVL=0#.
+    Finally, #-DNO_DEBUG# can be used instead of #-DDEBUGLVL=0#.
 
     {\bf Historical Comment} --- Debug macros are rarely used in the reference
     DjVu library because Leon thinks that debugging messages unnecessarily
@@ -95,63 +94,29 @@ class GURL;
     @memo 
     Macros for printing debug messages.
     @version 
-    #$Id: debug.h,v 1.20 2001-10-12 17:58:30 leonb Exp $#
+    #$Id: debug.h,v 1.21 2001-10-16 18:01:44 docbill Exp $#
     @author
     Andrew Erofeev <eaf@geocities.com> -- initial implementation \\
     Leon Bottou <leonb@research.att.com> -- cleanups */
 //@{
 
-#ifndef DEBUGLVL
-# ifdef NDEBUG
-#  define DEBUGLVL 0
-# endif 
-#endif
-#ifndef DEBUGLVL
-# ifdef NO_DEBUG
-#  define DEBUGLVL 0
-# endif 
-#endif
-#ifndef DEBUGLVL
-# ifdef RUNTIME_DEBUG_ONLY
-#  define DEBUGLVL 1
-# endif 
-#endif
-#ifndef DEBUGLVL
-# ifdef _DEBUG
-#  define DEBUGLVL 1
-# endif 
-#endif
-#ifndef DEBUGLVL
-#  define DEBUGLVL 0
-#endif
-
-#if DEBUGLVL <= 0
-
-#ifndef NO_DEBUG
-#define NO_DEBUG
-#endif
-#ifndef NDEBUG
-#define NDEBUG
-#endif
-#ifdef _DEBUG
-#undef _DEBUG
-#endif
-
-#define DEBUG_MAKE_INDENT(x)
-#define DEBUG_SET_LEVEL(level)
-#define DEBUG_MSG_LVL(level,x)
-#define DEBUG_MSGN_LVL(level,x)
-
-#else
-
+#ifdef RUNTIME_DEBUG_ONLY
 #ifdef NO_DEBUG
 #undef NO_DEBUG
 #endif
-#ifdef NDEBUG
-#undef NDEBUG
 #endif
-#ifndef _DEBUG
-#define _DEBUG
+
+#ifndef DEBUGLVL
+#ifndef NO_DEBUG
+#define DEBUGLVL 1
+#else
+#define DEBUGLVL 0
+#endif
+#endif
+
+#if DEBUGLVL >= 1
+#ifdef NO_DEBUG
+#undef NO_DEBUG
 #endif
 
 // ------------ SUPPORT
@@ -213,6 +178,13 @@ public:
 #define DEBUG_MSG_LVL(level,x)   { ( DjVuDebug::lock(level,0) << x ).unlock(); }
 #define DEBUG_MSGN_LVL(level,x)  { ( DjVuDebug::lock(level,1) << x ).unlock(); }
 #define DEBUG_MSGF_LVL(level,x)  { ( DjVuDebug::lock(level,1) << x ).unlock(); }
+
+#else /* DEBUGLVL <= 0 */
+
+#define DEBUG_MAKE_INDENT(x)
+#define DEBUG_SET_LEVEL(level)
+#define DEBUG_MSG_LVL(level,x)
+#define DEBUG_MSGN_LVL(level,x)
 
 #endif
 

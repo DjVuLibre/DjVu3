@@ -30,11 +30,11 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuAnno.cpp,v 1.106 2001-10-12 17:58:30 leonb Exp $
+// $Id: DjVuAnno.cpp,v 1.107 2001-10-16 18:01:43 docbill Exp $
 // $Name:  $
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
+#ifdef __GNUC__
+#pragma implementation
 #endif
 
 #include "DjVuAnno.h"
@@ -1300,7 +1300,8 @@ DjVuAnno::decode(const GP<ByteStream> &gbs)
   {
     if (chkid == "ANTa")
     {
-      if (ant) {
+      if (ant) 
+      {
         ant->merge(*iff.get_bytestream());
       } else {
         ant=DjVuANT::create();
@@ -1310,7 +1311,8 @@ DjVuAnno::decode(const GP<ByteStream> &gbs)
     else if (chkid == "ANTz")
     {
       GP<ByteStream> gbsiff=BSByteStream::create(giff->get_bytestream());
-      if (ant) {
+      if (ant) 
+      {
         ant->merge(*gbsiff);
       } else {
         ant=DjVuANT::create();
@@ -1328,21 +1330,21 @@ DjVuAnno::encode(const GP<ByteStream> &gbs)
   GP<IFFByteStream> giff=IFFByteStream::create(gbs);
   IFFByteStream &iff=*giff;
   if (ant)
-    {
+  {
 #if 0
-      iff.put_chunk("ANTa");
-      ant->encode(iff);
-      iff.close_chunk();
+    iff.put_chunk("ANTa");
+    ant->encode(iff);
+    iff.close_chunk();
 #else
-      iff.put_chunk("ANTz");
-      {
-//	 GP<ByteStream> bsbinput = giff.get_bytestream();
-	 GP<ByteStream> bsb = BSByteStream::create(giff->get_bytestream(), 50);
-	 ant->encode(*bsb);
-      }
-      iff.close_chunk();
-#endif
+    iff.put_chunk("ANTz");
+    {
+      //   GP<ByteStream> bsbinput = giff.get_bytestream();
+      GP<ByteStream> bsb = BSByteStream::create(giff->get_bytestream(), 50);
+      ant->encode(*bsb);
     }
+    iff.close_chunk();
+#endif
+  }
   // Add encoding of other chunks here
 }
 

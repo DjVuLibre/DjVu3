@@ -30,15 +30,15 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocEditor.h,v 1.49 2001-10-12 17:58:30 leonb Exp $
+// $Id: DjVuDocEditor.h,v 1.50 2001-10-16 18:01:43 docbill Exp $
 // $Name:  $
 
 #ifndef _DJVUDOCEDITOR_H
 #define _DJVUDOCEDITOR_H
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
 
+#ifdef __GNUC__
+#pragma interface
+#endif
 
 #include "DjVuDocument.h"
 #include "DjVmDoc.h"
@@ -51,7 +51,7 @@
 
     @memo DjVu document editor class.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: DjVuDocEditor.h,v 1.49 2001-10-12 17:58:30 leonb Exp $#
+    @version #$Id: DjVuDocEditor.h,v 1.50 2001-10-16 18:01:43 docbill Exp $#
 */
 
 //@{
@@ -226,14 +226,17 @@ public:
 	  	 Negative value means "append" */
    void		insert_group(const GList<GURL> & furl_list, int page_num=-1,
 			     void (* refresh_cb)(void *)=0, void * cl_data=0);
+
       /** Removes the specified page from the document. If #remove_unref#
 	  is #TRUE#, the function will also remove from the document any file,
 	  which became unreferenced due to the page's removal */
    void		remove_page(int page_num, bool remove_unref=true);
+
       /** Removes the specified pages from the document. If #remove_unref#
 	  is #TRUE#, the function will also remove from the document any file,
 	  which became unreferenced due to the pages' removal */
    void		remove_pages(const GList<int> & page_list, bool remove_unref=true);
+
       /** Removes a DjVu file with the specified #id#.
 
 	  If some other files include this file, the corresponding #INCL#
@@ -242,10 +245,12 @@ public:
 	  If #remove_unref# is #TRUE#, the function will also remove every
 	  file, which will become unreferenced after the removal of this file. */
    void		remove_file(const GUTF8String &id, bool remove_unref=true);
+
       /** Makes page number #page_num# to be #new_page_num#. If #new_page_num#
 	  is negative or too big, the function will move page #page_num# to
 	  the end of the document. */
    void		move_page(int page_num, int new_page_num);
+
       /** Shifts all pags from the #page_list# according to the #shift#.
 	  The #shift# can be positive (shift toward the end of the document)
 	  or negative (shift toward the beginning of the document).
@@ -259,14 +264,17 @@ public:
 	  Refer to \Ref{DjVmDir} for the explanation of {\em IDs},
           {\em names} and {\em titles}. */
    void		set_file_name(const GUTF8String &id, const GUTF8String &name);
+
       /** Changes the name of the page #page_num# to #name#.
 	  Refer to \Ref{DjVmDir} for the explanation of {\em IDs},
           {\em names} and {\em titles}. */
    void		set_page_name(int page_num, const GUTF8String &name);
+
       /** Changes the title of the file with ID #id# to #title#.
 	  Refer to \Ref{DjVmDir} for the explanation of {\em IDs},
           {\em names} and {\em titles}. */
    void		set_file_title(const GUTF8String &id, const GUTF8String &title);
+
       /** Changes the title of the page #page_num# to #title#.
 	  Refer to \Ref{DjVmDir} for the explanation of {\em IDs},
           {\em names} and {\em titles}. */
@@ -323,17 +331,18 @@ public:
 		 #pages_num# is the total number of pages in the document.
 		 The callback should return #FALSE# if thumbnails generating
 		 should proceed. #TRUE# will stop it. */
-   void		generate_thumbnails(int thumb_size,
-				    bool (* cb)(int page_num, void *)=0,
-				    void * cl_data=0);
+   void generate_thumbnails(int thumb_size,
+				                    bool (* cb)(int page_num, void *)=0,
+				                    void * cl_data=0);
       //@}
+
       /** Use this function to simplify annotations in the document.
         The "simplified" format is when annotations are only allowed
         either in top-level page files or in a special file with
         #SHARED_ANNO# flag on. This file is supposed to be included into
         every page. */
-   void               simplify_anno(void (* progress_cb)(float progress, void *)=0,
-                            void * cl_data=0);
+   void simplify_anno(void (* progress_cb)(float progress, void *)=0,
+                      void * cl_data=0);
 
       /** Will create a file that will be included into every page and
         marked with the #SHARED_ANNO# flag. This file can be used
@@ -341,17 +350,17 @@ public:
 
         {\bf Note:} There may be only one #SHARED_ANNO# file in any
         DjVu multipage document. */
-   void               create_shared_anno_file(void (* progress_cb)(float progress, void *)=0,
-                                      void * cl_data=0);
+   void create_shared_anno_file(void (* progress_cb)(float progress, void *)=0,
+                                void * cl_data=0);
 
       /** Returns a pointer to the file with #SHARED_ANNO# flag on.
         This file should be used for storing document-wide annotations.
 
         {\bf Note:} There may be only one #SHARED_ANNO# file in any
         DjVu multipage document. */
-   GP<DjVuFile>       get_shared_anno_file(void);
+   GP<DjVuFile> get_shared_anno_file(void);
 
-   GURL               get_doc_url(void) const;
+   GURL get_doc_url(void) const;
                                                                               
       /** Returns TRUE if #class_name# is #"DjVuDocEditor"#,
 	  #"DjVuDocument"# or #"DjVuPort"# */
@@ -361,56 +370,102 @@ protected:
    virtual GP<DjVuFile>	url_to_file(const GURL & url, bool dont_create) const;
    virtual GP<DataPool> get_thumbnail(int page_num, bool dont_decode);
    friend class CThumbNails;
-public:
-   class File;
-private:
-   bool		initialized;
-   GURL		doc_url;
-   GP<DataPool>	doc_pool;
-   GURL		tmp_doc_url;
-   int		orig_doc_type;
-   int		orig_doc_pages;
 
-   GPMap<GUTF8String, File>	files_map; 	// files_map[id]=GP<File>
+   class File;                          // Internal datapool/file class. See DjVuDocEditor.cpp
+                                        //   for the definition
+private:
+   bool		initialized;                  // has the object been initialized?
+   GURL		doc_url;                      // URL of file (noname.djvu if initialized with no file)
+   GP<DataPool> doc_pool;               // A datapool for the document
+   GURL		tmp_doc_url;                  // if converted to a new style format, this is the url of
+                                        //   of the converted document
+   int		orig_doc_type;                // Since the type may change, note the original type here
+   int		orig_doc_pages;               // and similarly for the number of pages
+
+   GPMap<GUTF8String, File>	files_map; 	// files_map[id]=DjVuDocEditor::File
    GCriticalSection	files_lock;
 
-   GPMap<GUTF8String,DataPool> thumb_map;
+   GPMap<GUTF8String,DataPool> thumb_map; // thumb_map[id] = GP<DataPool>  --  predecoded thumbnails
    GCriticalSection	thumb_lock;
 
-   void		(* refresh_cb)(void *);
-   void		* refresh_cl_data;
+   void		(* refresh_cb)(void *);       // pointer to callback routine
+   void		* refresh_cl_data;            // data for callback routine
 
+   // Throws an exception if the object is not initialized.
    void		check(void);
+
+   // Check the id to see if it unique, otherwise modify it until
+   // we get a unique one.
    GUTF8String	find_unique_id(GUTF8String id);
+
+   // Remove any include chunks and return the result
    GP<DataPool>	strip_incl_chunks(const GP<DataPool> & pool);
+
+   // Clean out the file map. Zero any files that are unreferenced and delete
+   // any entries which have neither a file nor a datapool.
    void		clean_files_map(void);
-   bool		insert_file_type(const GURL &file_url,
-                  DjVmDir::File::FILE_TYPE page_type,
-		  int & file_pos,
-                  GMap<GUTF8String, GUTF8String> & name2id);
-   bool		insert_file( const GP<DataPool> &pool,
-                  const GURL &file_url, bool is_page,
-		  int & file_pos,
-                  GMap<GUTF8String,GUTF8String> & name2id,
-                  DjVuPort *source=0 );
-   bool		insert_file(
-                  const GURL &file_url, bool is_page,
-		  int & file_pos,
-                  GMap<GUTF8String,GUTF8String> & name2id,
-                  DjVuPort *source=0 );
-   void		remove_file(const GUTF8String &id, bool remove_unref,
-			    GMap<GUTF8String, void *> & ref_map);
-   void		generate_ref_map(const GP<DjVuFile> & file,
-				 GMap<GUTF8String, void *> & ref_map,
-				 GMap<GURL, void *> & visit_map);
-   void		move_file(const GUTF8String &id, int & file_pos,
-			  GMap<GUTF8String, void *> & map);
-   void		unfile_thumbnails(void);
-   void		file_thumbnails(void);
-   void	save_file(const GUTF8String &id, const GURL &codebase,
-     const bool only_modified, GMap<GUTF8String, GUTF8String> & map);
-   void	save_file(const GUTF8String &id, const GURL &codebase,
-     GMap<GUTF8String, GUTF8String> & map);
+
+   // Unused and unimplemented
+   //bool insert_file_type( const GURL &file_url,
+   //                       DjVmDir::File::FILE_TYPE page_type,
+   //                       int & file_pos,
+   //                       GMap<GUTF8String, GUTF8String> & name2id );
+
+   bool	insert_file( const GP<DataPool> &pool,
+                     const GURL &file_url,
+                     bool is_page,
+                     int & file_pos,
+                     GMap<GUTF8String,GUTF8String> & name2id,
+                     DjVuPort *source=0 );
+
+   // First it will insert the 'file_url' at position 'file_pos'.
+   //
+   // Then it will process all the INCL chunks in the file and try to do
+   // the same thing with the included files. If insertion of an included
+   // file fails, it will proceed with other INCL chunks until it does
+   // them all. In the very end we will throw an exception to let the caller
+   // know about problems with included files.
+   //
+   // If the name of a file being inserted conflicts with some other
+   // name, which has been in DjVmDir prior to call to this function,
+   // it will be modified. name2id is the translation table to
+   // keep track of these modifications.
+   //
+   // Also, if a name is in name2id, we will not insert that file again.
+   //
+   // Will return TRUE if the file has been successfully inserted;
+   // FALSE, if the file contains an NDIR chunk and has been skipped.
+   //
+   // source, if supplied, is the source of the inserted file. If not supplied,
+   // the inserted file is assumed to be in the current document.
+   bool insert_file( const GURL &file_url,
+                     bool is_page,
+                     int & file_pos,
+                     GMap<GUTF8String,GUTF8String> & name2id,
+                     DjVuPort *source=0 );
+
+   void	remove_file( const GUTF8String &id, 
+                     bool remove_unref,
+			               GMap<GUTF8String, void *> & ref_map );
+
+   void	generate_ref_map( const GP<DjVuFile> & file,
+				                  GMap<GUTF8String, void *> & ref_map,
+			                	  GMap<GURL, void *> & visit_map );
+
+   void	move_file( const GUTF8String &id,
+                   int & file_pos,
+			             GMap<GUTF8String, void *> & map );
+
+   void	unfile_thumbnails(void);
+   void	file_thumbnails(void);
+
+   void	save_file( const GUTF8String &id,
+                   const GURL &codebase,
+                   const bool only_modified, 
+                   GMap<GUTF8String, GUTF8String> & map );
+   void	save_file( const GUTF8String &id,
+                   const GURL &codebase,
+                   GMap<GUTF8String, GUTF8String> & map );
 };
 
 //@}

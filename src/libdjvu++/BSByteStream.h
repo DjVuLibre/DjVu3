@@ -30,14 +30,11 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: BSByteStream.h,v 1.28 2001-10-12 17:58:30 leonb Exp $
+// $Id: BSByteStream.h,v 1.29 2001-10-16 18:01:43 docbill Exp $
 // $Name:  $
 
 #ifndef _BSBYTESTREAM_H
 #define _BSBYTESTREAM_H
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
 
 /** @name BSByteStream.h
     
@@ -118,9 +115,12 @@
     @memo
     Simple Burrows-Wheeler general purpose compressor.
     @version
-    #$Id: BSByteStream.h,v 1.28 2001-10-12 17:58:30 leonb Exp $# */
+    #$Id: BSByteStream.h,v 1.29 2001-10-16 18:01:43 docbill Exp $# */
 //@{
 
+#ifdef __GNUC__
+#pragma interface
+#endif
 
 #include "ByteStream.h"
 #include "GException.h"

@@ -30,15 +30,15 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: XMLTags.h,v 1.12 2001-10-12 17:58:30 leonb Exp $
+// $Id: XMLTags.h,v 1.13 2001-10-16 18:01:44 docbill Exp $
 // $Name:  $
 
 #ifndef _LT_XMLTAGS__
 #define _LT_XMLTAGS__
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
 
+#ifdef __GNUC__
+#pragma interface
+#endif
 
 #include "GContainer.h"
 #include "GString.h"

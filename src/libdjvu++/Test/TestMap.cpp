@@ -5,9 +5,6 @@
 //C-
 //C-
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
 #include "GContainer.h"
 #include "GString.h"
 #include <stdlib.h>

@@ -30,15 +30,15 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GURL.h,v 1.48 2001-10-12 17:58:30 leonb Exp $
+// $Id: GURL.h,v 1.49 2001-10-16 18:01:44 docbill Exp $
 // $Name:  $
 
 #ifndef _GURL_H_
 #define _GURL_H_
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
 
+#ifdef __GNUC__
+#pragma interface
+#endif
 
 #include "GString.h"
 #include "Arrays.h"
@@ -49,7 +49,7 @@
     \Ref{GURL} class used to store URLs in a system independent format.
     @memo System independent URL representation.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: GURL.h,v 1.48 2001-10-12 17:58:30 leonb Exp $#
+    @version #$Id: GURL.h,v 1.49 2001-10-16 18:01:44 docbill Exp $#
 */
 
 //@{
@@ -274,9 +274,6 @@ public:
 
   /// Test if this url is an existing directory.
   bool is_dir(void) const;
-
-  /// Follows symbolic links.
-  GURL follow_symlinks(void) const;
 
   /// Creates the specified directory.
   int mkdir(void) const;

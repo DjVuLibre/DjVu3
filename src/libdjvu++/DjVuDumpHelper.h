@@ -30,14 +30,11 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDumpHelper.h,v 1.13 2001-10-12 17:58:30 leonb Exp $
+// $Id: DjVuDumpHelper.h,v 1.14 2001-10-16 18:01:43 docbill Exp $
 // $Name:  $
 
 #ifndef _DJVUDUMPHELPER_H
 #define _DJVUDUMPHELPER_H
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
 
 
 /** @name DjVuDupmHelper.h
@@ -51,10 +48,13 @@
     L\'eon Bottou <leonb@research.att.com>,
     Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: DjVuDumpHelper.h,v 1.13 2001-10-12 17:58:30 leonb Exp $# */
+    #$Id: DjVuDumpHelper.h,v 1.14 2001-10-16 18:01:43 docbill Exp $# */
 //@{
 
 
+#ifdef __GNUC__
+#pragma interface
+#endif
 
 #include "GSmartPointer.h"
 

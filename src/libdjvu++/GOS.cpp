@@ -30,11 +30,11 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GOS.cpp,v 1.64 2001-10-12 17:58:30 leonb Exp $
+// $Id: GOS.cpp,v 1.65 2001-10-16 18:01:44 docbill Exp $
 // $Name:  $
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
+#ifdef __GNUC__
+#pragma implementation
 #endif
 
 #include "GException.h"
@@ -336,12 +336,7 @@ GOS::encode_mbcs_reserved(const char * filename)
 // Testing
 // -----------------------------------------
 
-#if defined(AUTOCONF) && !defined(HAVE_STRERROR)
-#define NEED_STRERROR
-#elif defined(sun) && ! defined(svr4)
-#define NEED_STRERROR
-#endif
-#ifdef NEED_STRERROR
+#if defined(sun) && ! defined(svr4)
 // strerror() is not defined under SunOS.
 char *
 strerror(int errno)

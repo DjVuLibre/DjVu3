@@ -31,7 +31,7 @@
 #C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #
-# $Id: make_shlib.sh,v 1.18 2001-07-24 17:52:02 bcr Exp $
+# $Id: make_shlib.sh,v 1.19 2001-10-16 18:01:42 docbill Exp $
 # $Name:  $
 
 if [ ! -r ./TOPDIR/config.cache ] ; then

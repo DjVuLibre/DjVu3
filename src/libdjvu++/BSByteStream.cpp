@@ -30,15 +30,15 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: BSByteStream.cpp,v 1.31 2001-10-12 17:58:30 leonb Exp $
+// $Id: BSByteStream.cpp,v 1.32 2001-10-16 18:01:43 docbill Exp $
 // $Name:  $
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
 // - Author: Leon Bottou, 07/1998
 
 
+#ifdef __GNUC__
+#pragma implementation
+#endif
 
 #include <stdlib.h>
 #include <stdio.h>

@@ -30,15 +30,19 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuGlobal.h,v 1.59 2001-10-12 17:58:30 leonb Exp $
+// $Id: DjVuGlobal.h,v 1.60 2001-10-16 18:01:43 docbill Exp $
 // $Name:  $
 
 #ifndef _DJVUGLOBAL_H
 #define _DJVUGLOBAL_H
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
 
+#ifndef _DEBUG
+#ifdef NDEBUG
+#ifndef NO_DEBUG
+#define NO_DEBUG 1
+#endif
+#endif
+#endif
 //Placement new support.
 //There is no new.h for WinCE, so we define a placement new here.
 // (lifted from wcealt.h which can not be included in the library header files
@@ -82,7 +86,7 @@
     @memo
     Global definitions.
     @version
-    #$Id: DjVuGlobal.h,v 1.59 2001-10-12 17:58:30 leonb Exp $#
+    #$Id: DjVuGlobal.h,v 1.60 2001-10-16 18:01:43 docbill Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> -- empty file.\\
     Bill Riemers <bcr@lizardtech.com> -- real work.  */
@@ -389,22 +393,9 @@ DJVUEXTERNCAPI(void static_destruct(void));
 //  effect on the executed program. It should be used to surround each
 //  message name that will need to be looked up in the external message
 //  files. In particular, it should use on all strings passed to G_THROW.
-#ifndef HAS_CTRL_C_IN_ERR_MSG
-#define HAS_CTRL_C_IN_ERR_MSG 1
-#endif
 #ifndef ERR_MSG
-#if HAS_CTRL_C_IN_ERR_MSG
-// This hack allows for the coexistence of internationalized
-// and non-internationalized code.  All internationalized error
-// message names are prefixed with a ctrl-c.  Only these will
-// be looked for in the message files.  Messages that do no 
-// start with a ctrl-c will remain untranslated.
-#define ERR_MSG(x) "\003" x
-#else
 #define ERR_MSG(x) x
-#endif
 #endif
 
 #endif /* _DJVUGLOBAL_H_ */
-
 

@@ -5,7 +5,7 @@
 <DjVuMessages>
 <BODY>
 <MESSAGE name="DjVuMessage.Unrecognized" number="10000">
-[1-%0!05u!] Unrecognized message:
+[1-%0!05u!] Unrecognized error message:
 	Message name: %1!s!.
 </MESSAGE>
 <MESSAGE name="DjVuMessage.Parameter" number="10001">
@@ -580,7 +580,7 @@ There may be only one such file in a multipage document.
 <MESSAGE name="DjVuFile.JB2_fg" number="12545"
   value="%3!5.1f! Kb '%4!4s!' JB2 foreground colors (%1!d! colors, %2!d! ccs)." />
 <MESSAGE name="DjVuFile.IW44_data1" number="12546"
-  value="%4!5.1f! Kb '%5!4s!' IW44 data (%1!d!x%2!d!, %3!d! dpi)." />
+  value="[1-%0!05u!] %4!5.1f! Kb '%5!4s!' IW44 data (%1!d!x%2!d!, %3!d! dpi)." />
 <MESSAGE name="DjVuFile.IW44_data2" number="12547"
   value="%3!5.1f! Kb '%4!4s!' IW44 data (part %1!d!, %2!d! dpi)." />
 <MESSAGE name="DjVuFile.nav_dir" number="12548"

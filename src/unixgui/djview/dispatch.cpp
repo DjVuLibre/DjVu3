@@ -32,14 +32,12 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: dispatch.cpp,v 1.4 2001-10-12 17:58:31 leonb Exp $
+// $Id: dispatch.cpp,v 1.5 2001-10-16 18:01:44 docbill Exp $
 // $Name:  $
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-#ifdef DJVU_VIEWER
-#define REPARENT 1
+
+#ifdef __GNUC__
+#pragma implementation
 #endif
 
 #include <sys/time.h>

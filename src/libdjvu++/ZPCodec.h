@@ -30,19 +30,19 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ZPCodec.h,v 1.27 2001-10-12 17:58:30 leonb Exp $
+// $Id: ZPCodec.h,v 1.28 2001-10-16 18:01:44 docbill Exp $
 // $Name:  $
 
 #ifndef _ZPCODEC_H
 #define _ZPCODEC_H
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
 
 #include "GContainer.h"
 
 class ByteStream;
 
+#ifdef __GNUC__
+#pragma interface
+#endif
 
 
 /** @name ZPCodec.h
@@ -153,7 +153,7 @@ class ByteStream;
     @memo
     Binary adaptive quasi-arithmetic coder.
     @version
-    #$Id: ZPCodec.h,v 1.27 2001-10-12 17:58:30 leonb Exp $#
+    #$Id: ZPCodec.h,v 1.28 2001-10-16 18:01:44 docbill Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> */
 //@{

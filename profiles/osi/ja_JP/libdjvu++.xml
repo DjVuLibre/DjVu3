@@ -10,6 +10,9 @@
   value="パラメーター &apos;%1!s!&apos;" />
 <MESSAGE name="DjVuMessage.failed_to_parse_XML" number="10002"
   value="[%0!05u!] XMLメッセージを解析することができません。ファイル：;&#09;&apos;%1!s!&apos;" />
+<MESSAGE name="DjVuText.corrupt_text" number="10100">
+[1-%0!05u!] Text layer hierarchy is corrupt"
+</MESSAGE>
 <MESSAGE name="DjVuText.no_text" number="10101">
 [1-%0!05u!] テキストが必要です。テキストが見つかりませんでした。
 </MESSAGE>
@@ -17,7 +20,7 @@
 [1-%0!05u!] ファイルチャンクが不正です。ファイルチャンクが短すぎます。
 </MESSAGE>
 <MESSAGE name="DjVuText.bad_version" number="10103">
-[1-%0!05u!] テキストバージョン &apos;%1!c!&apos; はサポートしていません。
+[1-%0!05u!] テキストバージョン '%1!c!' はサポートしていません。
 </MESSAGE>
 <MESSAGE name="DjVuText.one_word" number="10104">
 [1-%0!05u!] 単語中にセパレータが見つかりました。
@@ -85,6 +88,8 @@
   value="[%0!05u!] 範囲の起点は負の値ではいけません。" />
 <MESSAGE name="DataPool.no_threadless" number="11806"
   value="[%0!05u!] 内部エラーです：このファンクションはスレッドレスモードで使用することは出来ません。" />
+<MESSAGE name="DataPool.reenter" number="11807"
+  value="[%0!05u!] DATA_POOL_REENTER" />
 <MESSAGE name="DataPool.seek_backward" number="11808"
   value="[%0!05u!] この ByteStream では EOF から後方に走査することができません。" />
 <MESSAGE name="DataPool.zero_DataPool" number="11809"
@@ -151,6 +156,7 @@
   value="[%0!05u!] GLObject()：誤ったオブジェクト型が渡されました。STRING または SYMBOL を指定してください。" />
 <MESSAGE name="DjVuAnno.bad_url" number="12201"
   value="[%0!05u!] URL仕様が無効です。" />
+はテキストゾーン情報をサポートしていません。" />
 <MESSAGE name="DjVuAnno.bad_zoom" number="12203"
   value="[%0!05u!] ズーム仕様が正しくありません。" />
 <MESSAGE name="DjVuAnno.invalid2list" number="12207"
@@ -311,6 +317,8 @@
   value="[%0!05u!] デコーダ：データが破損しています。(Sxxx チャンクの後に Dxxx チャンクがあります。)" />
 <MESSAGE name="DjVuFile.empty_URL" number="12513"
   value="[%0!05u!] DjVuFile が空の URL を参照しています。" />
+<MESSAGE name="DjVuFile.EOF" number="12514"
+  value="[%0!05u!] %1!s! を読み込み中に予期しない EOF が見つかりました。" />
 <MESSAGE name="DjVuFile.failed" number="12515"
   value="[%0!05u!] &apos;%1!s!&apos; 失敗しました。" />
 <MESSAGE name="DjVuFile.illegal_chunk" number="12516"
@@ -374,7 +382,7 @@
 <MESSAGE name="DjVuFile.JB2_fg" number="12545"
   value="%3!5.1f! Kb '%4!4s!' JB2フォアグラウンドカラー (%1!d! colors, %2!d! ccs)." />
 <MESSAGE name="DjVuFile.IW44_data1" number="12546"
-  value="%4!5.1f! Kb '%5!4s!' IW44データ (%1!d!x%2!d!, %3!d! dpi)." />
+  value="[1-%0!05u!] %4!5.1f! Kb '%5!4s!' IW44データ (%1!d!x%2!d!, %3!d! dpi)." />
 <MESSAGE name="DjVuFile.IW44_data2" number="12547"
   value="%3!5.1f! Kb '%4!4s!' IW44データ (part %1!d!, %2!d! dpi)." />
 <MESSAGE name="DjVuFile.nav_dir" number="12548"
@@ -475,6 +483,10 @@
   value="[%0!05u!] EPSフォーマットでは複数のページを印刷することができません。" />
 <MESSAGE name="EOF" number="13400"
   value="予想外の位置でファイルが終了しています。" />
+<MESSAGE name="Error" number="13500"
+  value="エラー: %1!s!" />
+<MESSAGE name="error" number="13600"
+  value="エラー: %1!s!" />
 <MESSAGE name="Failed" number="13700"
   value="失敗しました。" />
 <MESSAGE name="GBitmap.bad_format" number="13800"
@@ -860,35 +872,18 @@
   value="[%0!05u!] 整形式XML文書エラー。終了タグが多すぎます。" />
 <MESSAGE name="XMLTags.no_body" number="16306"
   value="[%0!05u!] ボディがありません。" />
+<MESSAGE name="XMLTags.unmatched_end" number="16307"
+  value="[%0!05u!] 行 %2!u! のXMLタグ &apos;%1!s!&apos; は行 %4!u! のXMLタグ &apos;%3!s!&apos; で終了しています。" />
 <MESSAGE name="ZPCodec.no_encoding" number="16400"
   value="[%0!05u!] エンコードの ZPCodec が作成されていません。" />
 <MESSAGE name="ZPCodec.write_error" number="16401"
   value="[%0!05u!] ZPCodec 書込みエラー" />
-<MESSAGE name="DjVuText.corrupt_text" number="10100">
-[1-%0!05u!] Text layer hierarchy is corrupt"
-</MESSAGE>
-<MESSAGE name="DataPool.reenter" number="11807"
-  value="[%0!05u!] DATA_POOL_REENTER" />
-<MESSAGE name="DjVuFile.EOF" number="12514">
-[1-%0!05u!] Unexpected End Of File Encountered Reading:
-	%1!s!.
-</MESSAGE>
-<MESSAGE name="Error" number="13500">
-Error: %1!s!.
-</MESSAGE>
-<MESSAGE name="error" number="13600">
-Error: %1!s!.
-</MESSAGE>
-<MESSAGE name="XMLTags.unmatched_end" number="16307">
-[1-%0!05u!] XML tag &apos;%1!s!&apos; on line %2!u! was terminated with XML
-tag &apos;%3!s!&apos; line %4!u!.
-</MESSAGE>
 <MESSAGE name="DjVuDynamicLib.failed_open2" number="16402">
-[1-%0!05u!] Failed to open dynamic library '%1!s!'.
-	System reported: '%2!s!'.
+[1-%0!05u!] ダイナミックライブラリー '%1!s!'を開くことが出来ませんでした。
+	システムエラー: '%2!s!'.
 </MESSAGE>
 <MESSAGE name="DjVuDynamicLib.failed_open" number="16403">
-[1-%0!05u!] Failed to open dynamic library '%1!s!'.
+[1-%0!05u!] ダイナミックライブラリー '%1!s!'を開くことが出来ませんでした。
 </MESSAGE>
 </BODY>
 </DjVuMessages>

@@ -32,12 +32,9 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: bin2cpp.cpp,v 1.3 2001-10-12 17:58:31 leonb Exp $
+// $Id: bin2cpp.cpp,v 1.4 2001-10-16 18:01:44 docbill Exp $
 // $Name:  $
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
 
 #include <stdio.h>
 #include <stdlib.h>

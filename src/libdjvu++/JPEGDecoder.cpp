@@ -30,30 +30,12 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: JPEGDecoder.cpp,v 1.24 2001-10-12 17:58:30 leonb Exp $
+// $Id: JPEGDecoder.cpp,v 1.25 2001-10-16 18:01:44 docbill Exp $
 // $Name:  $
-
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
-
-#ifdef NEED_JPEG_DECODER
 
 #include "JPEGDecoder.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-#undef HAVE_STDLIB_H
-#undef HAVE_STDDEF_H
-#include <stdio.h>
-#include <jconfig.h>
-#include <jpeglib.h>
-#include <jerror.h>
-#ifdef __cplusplus
-}
-#endif
+#ifdef NEED_JPEG_DECODER
 
 #include "ByteStream.h"
 #include "GPixmap.h"

@@ -30,15 +30,15 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVmDoc.h,v 1.30 2001-10-12 17:58:30 leonb Exp $
+// $Id: DjVmDoc.h,v 1.31 2001-10-16 18:01:43 docbill Exp $
 // $Name:  $
 
 #ifndef _DJVMDOC_H
 #define _DJVMDOC_H
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
 
+#ifdef __GNUC__
+#pragma interface
+#endif
 
 #include "DjVmDir.h"
 
@@ -53,7 +53,7 @@ class GUTF8String;
 
     @memo DjVu multipage documents reader/writer.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: DjVmDoc.h,v 1.30 2001-10-12 17:58:30 leonb Exp $#
+    @version #$Id: DjVmDoc.h,v 1.31 2001-10-16 18:01:43 docbill Exp $#
 */
 
 //@{

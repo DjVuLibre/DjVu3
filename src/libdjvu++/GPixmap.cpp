@@ -30,16 +30,16 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GPixmap.cpp,v 1.38 2001-10-12 17:58:30 leonb Exp $
+// $Id: GPixmap.cpp,v 1.39 2001-10-16 18:01:44 docbill Exp $
 // $Name:  $
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
 // -- Implements class PIXMAP
 // Author: Leon Bottou 07/1997
 
 
+#ifdef __GNUC__
+#pragma implementation
+#endif
 
 #include "GPixmap.h"
 

@@ -30,14 +30,11 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuInfo.h,v 1.18 2001-10-12 17:58:30 leonb Exp $
+// $Id: DjVuInfo.h,v 1.19 2001-10-16 18:01:43 docbill Exp $
 // $Name:  $
 
 #ifndef _DJVUINFO_H
 #define _DJVUINFO_H
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
 
 
 /** @name DjVuInfo.h
@@ -49,10 +46,13 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: DjVuInfo.h,v 1.18 2001-10-12 17:58:30 leonb Exp $# */
+    #$Id: DjVuInfo.h,v 1.19 2001-10-16 18:01:43 docbill Exp $# */
 //@{
 
 
+#ifdef __GNUC__
+#pragma interface
+#endif
 
 #include "GSmartPointer.h"
 #include "GRect.h"
@@ -128,7 +128,7 @@ public:
       rendering functions can use this information in order to perform color
       correction for the intended display device. */
   double gamma;
-  /** The following boolian values are stored in the last character of the
+  /** The following boolean values are stored in the last character of the
       info structure.  Unused bits are reserved for possible future extensions
       and backwards compatability. */
   bool compressable;
@@ -139,7 +139,7 @@ public:
 
      /// Obtain the flags for the default specifications.
   GUTF8String get_paramtags(void) const;
-     /// Obtain the flags for the default specifications.
+     /// Write the flags for the default specifications to a ByteStream.
   void writeParam(ByteStream &out_str) const;
 };
 

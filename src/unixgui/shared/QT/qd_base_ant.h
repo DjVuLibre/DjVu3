@@ -32,15 +32,16 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qd_base_ant.h,v 1.3 2001-10-12 17:58:31 leonb Exp $
+// $Id: qd_base_ant.h,v 1.4 2001-10-16 18:01:45 docbill Exp $
 // $Name:  $
+
 
 #ifndef HDR_QD_BASE_ANT
 #define HDR_QD_BASE_ANT
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
 
+#ifdef __GNUC__
+#pragma interface
+#endif
 
 #include "qd_base.h"
 

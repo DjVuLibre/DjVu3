@@ -1,7 +1,7 @@
 #  Name:    bootstrap
 #  Purpose: Shell script to configure autotools.
 #
-#  $Id: bootstrap,v 1.5 2001-08-24 21:50:10 docbill Exp $
+#  $Id: bootstrap,v 1.6 2001-10-16 18:01:44 docbill Exp $
 
 set -x
 

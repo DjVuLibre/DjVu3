@@ -31,7 +31,7 @@
 #C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #
-# $Id: dlopen.sh,v 1.7 2001-09-13 23:44:21 docbill Exp $
+# $Id: dlopen.sh,v 1.8 2001-10-16 18:01:42 docbill Exp $
 # $Name:  $
 
 # This script sets the variables:

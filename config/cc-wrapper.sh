@@ -31,7 +31,7 @@
 #C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #
-# $Id: cc-wrapper.sh,v 1.1 2001-09-05 23:25:34 docbill Exp $
+# $Id: cc-wrapper.sh,v 1.2 2001-10-16 18:01:42 docbill Exp $
 # $Name:  $
 
 # This rule sets the following variables:

@@ -30,12 +30,9 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: xml2utf8.cpp,v 1.10 2001-10-12 17:58:29 leonb Exp $
+// $Id: xml2utf8.cpp,v 1.11 2001-10-16 18:01:43 docbill Exp $
 // $Name:  $
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
 /** @name xml2utf8
 
     {\bf Synopsis}
@@ -46,7 +43,7 @@
     @author
     Dr Bill C Riemers <bcr@lizardtech.com>
     @version
-    #$Id: xml2utf8.cpp,v 1.10 2001-10-12 17:58:29 leonb Exp $# */
+    #$Id: xml2utf8.cpp,v 1.11 2001-10-16 18:01:43 docbill Exp $# */
 //@{
 //@}
 

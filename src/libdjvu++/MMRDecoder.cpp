@@ -30,11 +30,11 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: MMRDecoder.cpp,v 1.37 2001-10-12 17:58:30 leonb Exp $
+// $Id: MMRDecoder.cpp,v 1.38 2001-10-16 18:01:44 docbill Exp $
 // $Name:  $
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
+#ifdef __GNUC__
+#pragma implementation
 #endif
 
 #include "MMRDecoder.h"

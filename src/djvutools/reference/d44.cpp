@@ -30,12 +30,9 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: d44.cpp,v 1.27 2001-10-12 17:58:29 leonb Exp $
+// $Id: d44.cpp,v 1.28 2001-10-16 18:01:43 docbill Exp $
 // $Name:  $
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
 /** @name d44
 
     {\bf Synopsis}\\
@@ -87,7 +84,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: d44.cpp,v 1.27 2001-10-12 17:58:29 leonb Exp $# 
+    #$Id: d44.cpp,v 1.28 2001-10-16 18:01:43 docbill Exp $# 
 */
 //@{
 //@}

@@ -30,14 +30,11 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GSmartPointer.h,v 1.36 2001-10-12 17:58:30 leonb Exp $
+// $Id: GSmartPointer.h,v 1.37 2001-10-16 18:01:44 docbill Exp $
 // $Name:  $
 
 #ifndef _GSMARTPOINTER_H_
 #define _GSMARTPOINTER_H_
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
 
 /** @name GSmartPointer.h
 
@@ -56,16 +53,21 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation\\
     Andrei Erofeev <eaf@geocities.com> -- bug fix.
     @version 
-    #$Id: GSmartPointer.h,v 1.36 2001-10-12 17:58:30 leonb Exp $# 
+    #$Id: GSmartPointer.h,v 1.37 2001-10-16 18:01:44 docbill Exp $# 
     @args
 */
 //@{
+
+#if defined(EXTERNAL_TEMPLATES) && defined(__GNUC__)
+#pragma interface
+#endif
 
 #if defined(_MSC_VER)
 // Language lawyer say MSVC6 is wrong on that one. 
 // Cf section 5.4.7 in november 1997 draft.
 #pragma warning( disable : 4243 )
 #endif
+
 
 #include "DjVuGlobal.h"
 

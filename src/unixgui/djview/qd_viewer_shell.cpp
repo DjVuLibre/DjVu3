@@ -32,13 +32,13 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qd_viewer_shell.cpp,v 1.9 2001-10-12 17:58:31 leonb Exp $
+// $Id: qd_viewer_shell.cpp,v 1.10 2001-10-16 18:01:45 docbill Exp $
 // $Name:  $
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
 
+#ifdef __GNUC__
+#pragma implementation
+#endif
 
 #include "DjVuImage.h"
 #include "DataPool.h"

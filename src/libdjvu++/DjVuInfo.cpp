@@ -30,11 +30,11 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuInfo.cpp,v 1.24 2001-10-12 17:58:30 leonb Exp $
+// $Id: DjVuInfo.cpp,v 1.25 2001-10-16 18:01:43 docbill Exp $
 // $Name:  $
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
+#ifdef __GNUC__
+#pragma implementation
 #endif
 
 #include "DjVuInfo.h"
@@ -111,8 +111,8 @@ DjVuInfo::encode(ByteStream &bs)
 {
   bs.write16(width);
   bs.write16(height);
-  bs.write8(version & 0xff);
-  bs.write8(version >> 8);
+  bs.write8(DJVUVERSION & 0xff);
+  bs.write8(DJVUVERSION >> 8);
   bs.write8(dpi & 0xff);
   bs.write8(dpi >> 8);
   bs.write8((int)(10.0*gamma+0.5) );

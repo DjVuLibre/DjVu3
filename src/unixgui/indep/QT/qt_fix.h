@@ -32,13 +32,13 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qt_fix.h,v 1.6 2001-10-12 17:58:31 leonb Exp $
+// $Id: qt_fix.h,v 1.7 2001-10-16 18:01:45 docbill Exp $
 // $Name:  $
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
 
+#ifdef __GNUC__
+#pragma interface
+#endif
 
 #include "qwidget.h"
 

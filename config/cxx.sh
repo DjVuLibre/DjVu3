@@ -31,12 +31,12 @@
 #C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #
-# $Id: cxx.sh,v 1.39 2001-09-24 20:30:35 leonb Exp $
+# $Id: cxx.sh,v 1.40 2001-10-16 18:01:42 docbill Exp $
 # $Name:  $
 
 # This rule sets the following variables:
 #	CXX, CXXFLAGS, CXXSYMBOLIC, CXXPIC, CXXUNROLL, CXXWARN
-# $Id: cxx.sh,v 1.39 2001-09-24 20:30:35 leonb Exp $
+# $Id: cxx.sh,v 1.40 2001-10-16 18:01:42 docbill Exp $
 
 if [ -z "$CONFIG_DIR" ]
 then

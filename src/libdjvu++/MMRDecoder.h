@@ -30,15 +30,15 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: MMRDecoder.h,v 1.19 2001-10-12 17:58:30 leonb Exp $
+// $Id: MMRDecoder.h,v 1.20 2001-10-16 18:01:44 docbill Exp $
 // $Name:  $
 
 #ifndef _MMRDECODER_H_
 #define _MMRDECODER_H_
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
 
+#ifdef __GNUC__
+#pragma interface
+#endif
 
 #include "GSmartPointer.h"
 
@@ -100,7 +100,7 @@ class JB2Image;
     @memo
     CCITT-G4/MMR decoder.
     @version
-    #$Id: MMRDecoder.h,v 1.19 2001-10-12 17:58:30 leonb Exp $#
+    #$Id: MMRDecoder.h,v 1.20 2001-10-16 18:01:44 docbill Exp $#
     @author
     Parag Deshmukh <parag@sanskrit.lz.att.com> \\
     Leon Bottou <leonb@research.att.com> */

@@ -30,15 +30,15 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: IFFByteStream.cpp,v 1.33 2001-10-12 17:58:30 leonb Exp $
+// $Id: IFFByteStream.cpp,v 1.34 2001-10-16 18:01:44 docbill Exp $
 // $Name:  $
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
 // -- Implementation of IFFByteStream
 // - Author: Leon Bottou, 06/1998
 
+#ifdef __GNUC__
+#pragma implementation
+#endif
 #ifndef UNDER_CE
 #include <assert.h>
 #endif
@@ -149,9 +149,11 @@ IFFByteStream::get_chunk(GUTF8String &chkid, int *rawoffsetptr, int *rawsizeptr)
       offset = seekto;
     }
 
-  // Skip padding byte
+  // Check for end of data
   if (ctx && offset == ctx->offEnd)
     return 0;
+
+  // Skip padding byte
   if (offset & 1)
     {
       bytes = bs->read( (void*)buffer, 1);

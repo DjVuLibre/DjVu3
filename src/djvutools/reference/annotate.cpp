@@ -30,21 +30,18 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: annotate.cpp,v 1.20 2001-10-12 17:58:29 leonb Exp $
+// $Id: annotate.cpp,v 1.21 2001-10-16 18:01:42 docbill Exp $
 // $Name:  $
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
 /*****************************************************************************
  *
- *   $Revision: 1.20 $
- *   $Date: 2001-10-12 17:58:29 $
- *   @(#) $Id: annotate.cpp,v 1.20 2001-10-12 17:58:29 leonb Exp $
+ *   $Revision: 1.21 $
+ *   $Date: 2001-10-16 18:01:42 $
+ *   @(#) $Id: annotate.cpp,v 1.21 2001-10-16 18:01:42 docbill Exp $
  *
  *****************************************************************************/
 
-static const char RCSVersion[]="@(#) $Id: annotate.cpp,v 1.20 2001-10-12 17:58:29 leonb Exp $";
+static const char RCSVersion[]="@(#) $Id: annotate.cpp,v 1.21 2001-10-16 18:01:42 docbill Exp $";
 
 #include "GIFFManager.h"
 #include "GOS.h"

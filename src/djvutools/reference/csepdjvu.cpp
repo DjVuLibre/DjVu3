@@ -30,12 +30,9 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: csepdjvu.cpp,v 1.35 2001-10-12 17:58:29 leonb Exp $
+// $Id: csepdjvu.cpp,v 1.36 2001-10-16 18:01:42 docbill Exp $
 // $Name:  $
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
 
 
 /** @name csepdjvu
@@ -111,7 +108,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: csepdjvu.cpp,v 1.35 2001-10-12 17:58:29 leonb Exp $# */
+    #$Id: csepdjvu.cpp,v 1.36 2001-10-16 18:01:42 docbill Exp $# */
 //@{
 //@}
 
@@ -1227,8 +1224,7 @@ check_for_another_page(BufferByteStream &bs, const csepdjvuopts &opts)
 void
 usage()
 {
-  DjVuPrintErrorUTF8("%s",
-          "Usage: csepdjvu <...options_or_separatedfiles...> <outputdjvufile>\n"
+  DjVuPrintErrorUTF8("%s","Usage: csepdjvu <...options_or_separatedfiles...> <outputdjvufile>\n"
           "Options are:\n"
           "   -d <n>     Sets resolution to <n> dpi (default: 300).\n"
           "   -q <spec>  Selects quality level for background (default: 72+11+10+10)\n"

@@ -32,11 +32,11 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // $Name:  $
-static char RCSVersion[]="@(#) $Id: djvu_file_cache.cpp,v 1.16 2001-10-12 17:58:31 leonb Exp $";
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
+static char RCSVersion[]="@(#) $Id: djvu_file_cache.cpp,v 1.17 2001-10-16 18:01:45 docbill Exp $";
 
+#ifdef __GNUC__
+#pragma implementation
+#endif
 
 #include "djvu_file_cache.h"
 

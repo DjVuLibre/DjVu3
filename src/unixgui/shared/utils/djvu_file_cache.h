@@ -32,15 +32,16 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: djvu_file_cache.h,v 1.16 2001-10-12 17:58:31 leonb Exp $
+// $Id: djvu_file_cache.h,v 1.17 2001-10-16 18:01:45 docbill Exp $
 // $Name:  $
+
 
 #ifndef HDR_DJVU_FILE_CACHE
 #define HDR_DJVU_FILE_CACHE
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
 
+#ifdef __GNUC__
+#pragma interface
+#endif
 
 #include "DjVuFileCache.h"
 

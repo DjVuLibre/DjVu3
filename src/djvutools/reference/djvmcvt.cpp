@@ -30,12 +30,9 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djvmcvt.cpp,v 1.25 2001-10-12 17:58:29 leonb Exp $
+// $Id: djvmcvt.cpp,v 1.26 2001-10-16 18:01:43 docbill Exp $
 // $Name:  $
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
 /** @name djvmcvt
 
     {\bf Synopsis}\\
@@ -109,8 +106,11 @@
     @author
     Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: djvmcvt.cpp,v 1.25 2001-10-12 17:58:29 leonb Exp $# */
+    #$Id: djvmcvt.cpp,v 1.26 2001-10-16 18:01:43 docbill Exp $# */
 
+#ifdef __GNUC__
+#pragma implementation
+#endif
 
 #include "DjVuDocument.h"
 #include "DjVmDoc.h"

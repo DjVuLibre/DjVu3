@@ -30,15 +30,15 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: XMLParser.h,v 1.4 2001-10-12 17:58:30 leonb Exp $
+// $Id: XMLParser.h,v 1.5 2001-10-16 18:01:44 docbill Exp $
 // $Name:  $
 
 #ifndef _LT_XMLPARSER__
 #define _LT_XMLPARSER__
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
 
+#ifdef __GNUC__
+#pragma interface
+#endif
 
 #include "GContainer.h"
 #include "GURL.h"

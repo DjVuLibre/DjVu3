@@ -31,7 +31,7 @@
 #C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #
-# $Id: sys.sh,v 1.30 2001-09-13 23:44:21 docbill Exp $
+# $Id: sys.sh,v 1.31 2001-10-16 18:01:42 docbill Exp $
 # $Name:  $
 
 # This sets the variable SYS INCS JOBJ

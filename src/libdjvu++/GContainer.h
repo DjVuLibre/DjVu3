@@ -30,15 +30,15 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GContainer.h,v 1.50 2001-10-12 17:58:30 leonb Exp $
+// $Id: GContainer.h,v 1.51 2001-10-16 18:01:44 docbill Exp $
 // $Name:  $
 
 #ifndef _GCONTAINER_H_
 #define _GCONTAINER_H_
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
 
+#ifdef __GNUC__
+#pragma interface
+#endif
 
 #include "GException.h"
 #include "GSmartPointer.h"
@@ -93,7 +93,7 @@ static_const_GPBase(GPEnabled *foo);
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@geocities.com> -- bug fixes.
     @version 
-    #$Id: GContainer.h,v 1.50 2001-10-12 17:58:30 leonb Exp $# */
+    #$Id: GContainer.h,v 1.51 2001-10-16 18:01:44 docbill Exp $# */
 //@{
 
 

@@ -26,15 +26,12 @@
  *C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
  *C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
  * 
- * $Id: DjVu.h,v 1.24 2001-10-12 17:58:29 leonb Exp $
+ * $Id: DjVu.h,v 1.25 2001-10-16 18:01:43 docbill Exp $
  * $Name:  $
  */
 
 #ifndef _DJVU_GLOBAL_API_H
 #define _DJVU_GLOBAL_API_H
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
 
 /** @name DjVu.h
 
@@ -525,20 +522,8 @@ djvu_programname( const char *programname );
  Macro ERR_MSG is used by LizardTech to maintain the message files.
  It is used by an external auditing script and has no effect on the program. 
  */
-#ifndef HAS_CTRL_C_IN_ERR_MSG
-#define HAS_CTRL_C_IN_ERR_MSG 1
-#endif
 #ifndef ERR_MSG
-#if HAS_CTRL_C_IN_ERR_MSG
-// This hack allows for the coexistence of internationalized
-// and non-internationalized code.  All internationalized error
-// message names are prefixed with a ctrl-c.  Only these will
-// be looked for in the message files.  Messages that do no 
-// start with a ctrl-c will remain untranslated.
-#define ERR_MSG(x) "\003" x
-#else
 #define ERR_MSG(x) x
-#endif
 #endif
 
 #ifdef __cplusplus

@@ -30,11 +30,11 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GURL.cpp,v 1.89 2001-10-12 17:58:30 leonb Exp $
+// $Id: GURL.cpp,v 1.90 2001-10-16 18:01:44 docbill Exp $
 // $Name:  $
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
+#ifdef __GNUC__
+#pragma implementation
 #endif
 
 #include "GException.h"
@@ -51,78 +51,62 @@
 #ifdef WIN32
 #include <atlbase.h>
 #include <windows.h>
+
 #ifndef UNDER_CE
 #include <direct.h>
-#endif /* UNDER CE */
-#endif /* WIN32 */
+#endif
+#endif   // end win32
 
 // -- MAXPATHLEN
 #ifndef MAXPATHLEN
-# ifdef _MAX_PATH
-#  define MAXPATHLEN _MAX_PATH
-# else
-#  define MAXPATHLEN 1024
-# endif
+#ifdef _MAX_PATH
+#define MAXPATHLEN _MAX_PATH
 #else
-# if ( MAXPATHLEN < 1024 )
-#  undef MAXPATHLEN
-#  define MAXPATHLEN 1024
-# endif
+#define MAXPATHLEN 1024
+#endif
+#else
+#if ( MAXPATHLEN < 1024 )
+#undef MAXPATHLEN
+#define MAXPATHLEN 1024
+#endif
 #endif
 
 #ifdef UNIX
-# include <unistd.h>
+#include <sys/types.h>
+// Handle the few systems without dirent.h
+// 1 -- systems with /usr/include/sys/ndir.h
+#if defined(XENIX)
+#define USE_DIRECT
+#include <sys/ndir.h>
+#endif
+// 2 -- systems with /usr/include/sys/dir.h
+#if defined(OLDBSD)
+#define USE_DIRECT
+#include <sys/dir.h>
+#endif
+// The rest should be generic
+#ifdef USE_DIRECT
+#define dirent direct
+#define NAMLEN(dirent) (dirent)->d_namlen
+#else
+#include <dirent.h>
+#define NAMLEN(dirent) strlen((dirent)->d_name)
+#endif 
+#endif
+
+
+
+
+#ifdef UNIX
+# include <errno.h>
 # include <sys/types.h>
 # include <sys/stat.h>
-# include <errno.h>
+# include <sys/time.h>
 # include <fcntl.h>
 # include <pwd.h>
 # include <stdio.h>
-# ifdef AUTOCONF
-#  ifdef TIME_WITH_SYS_TIME
-#   include <sys/time.h>
-#   include <time.h>
-#  else
-#   ifdef HAVE_SYS_TIME_H
-#    include <sys/time.h>
-#   else
-#    include <time.h>
-#   endif
-#  endif
-#  ifdef HAVE_DIRENT_H
-#   include <dirent.h>
-#   define NAMLEN(dirent) strlen((dirent)->d_name)
-#  else
-#   define dirent direct
-#   define NAMLEN(dirent) (dirent)->d_namlen
-#   ifdef HAVE_SYS_NDIR_H
-#    include <sys/ndir.h>
-#   endif
-#   ifdef HAVE_SYS_DIR_H
-#    include <sys/dir.h>
-#   endif
-#   ifdef HAVE_NDIR_H
-#    include <ndir.h>
-#   endif
-#  endif
-# else /* !AUTOCONF */ 
-#  include <sys/time.h>
-#  if defined(XENIX)
-#   define USE_DIRECT
-#   include <sys/ndir.h>
-#  elif defined(OLDBSD)
-#   define USE_DIRECT
-#   include <sys/dir.h>
-#  endif
-#  ifdef USE_DIRECT
-#   define dirent direct
-#   define NAMLEN(dirent) (dirent)->d_namlen
-#  else
-#   include <dirent.h>
-#   define NAMLEN(dirent) strlen((dirent)->d_name)
-#  endif 
-# endif /* !AUTOCONF */
-#endif /* UNIX */
+# include <unistd.h>
+#endif
 
 #ifdef macintosh
 #include <unix.h>
@@ -133,7 +117,7 @@
 static const char djvuopts[]="DJVUOPTS";
 static const char localhost[]="file://localhost/";
 static const char fileproto[]="file:";
-static const char backslash='\\';  
+static const char backslash='\\';
 static const char colon=':';
 static const char dot='.';
 static const char filespecslashes[] = "file://";
@@ -1012,23 +996,23 @@ GURL::operator==(const GURL & gurl2) const
 GUTF8String
 GURL::name(void) const
 {
-   if(!validurl)
-     const_cast<GURL *>(this)->init();
-   GUTF8String retval;
-   if(!is_empty())
-   {
-     const GUTF8String xurl(url);
-     const int protocol_length=protocol(xurl).length();
-     const char * ptr, * xslash=(const char *)xurl+protocol_length-1;
-     for(ptr=(const char *)xurl+protocol_length;
-       *ptr && !is_argument(ptr);ptr++)
-	 {
-       if (*ptr==slash)
-          xslash=ptr;
-	 }
-     retval=GUTF8String(xslash+1, ptr-xslash-1);
-   }
-   return retval;
+  if(!validurl)
+    const_cast<GURL *>(this)->init();
+  GUTF8String retval;
+  if(!is_empty())
+  {
+    const GUTF8String xurl(url);
+    const int protocol_length=protocol(xurl).length();
+    const char * ptr, * xslash=(const char *)xurl+protocol_length-1;
+    for(ptr=(const char *)xurl+protocol_length ;
+        *ptr && !is_argument(ptr) ; ptr++)
+    {
+      if (*ptr==slash)
+        xslash=ptr;
+    }
+    retval=GUTF8String(xslash+1, ptr-xslash-1);
+  }
+  return retval;
 }
 
 GUTF8String
@@ -1531,29 +1515,6 @@ GURL::is_dir(void) const
 #endif
   }
   return retval;
-}
-
-// Follows symbolic links.
-GURL 
-GURL::follow_symlinks(void) const
-{
-  GURL ret = *this;
-#if defined(S_IFLNK)
-#if defined(UNIX) || defined(macintosh)
-  int lnklen;
-  char lnkbuf[MAXPATHLEN+1];
-  struct stat buf;
-  while ( (urlstat(ret, buf) >= 0) &&
-          (buf.st_mode & S_IFLNK) &&
-          ((lnklen = readlink(ret.NativeFilename(),lnkbuf,sizeof(lnkbuf))) > 0) )
-    {
-      lnkbuf[lnklen] = 0;
-      GNativeString lnk(lnkbuf);
-      ret = GURL(lnk, ret.base());
-    }
-#endif
-#endif
-  return ret;
 }
 
 int

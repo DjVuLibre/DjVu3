@@ -30,14 +30,11 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuImage.h,v 1.49 2001-10-12 17:58:30 leonb Exp $
+// $Id: DjVuImage.h,v 1.50 2001-10-16 18:01:43 docbill Exp $
 // $Name:  $
 
 #ifndef _DJVUIMAGE_H
 #define _DJVUIMAGE_H
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
 
 
 /** @name DjVuImage.h
@@ -76,10 +73,13 @@
     L\'eon Bottou <leonb@research.att.com> - initial implementation
     Andrei Erofeev <eaf@geocities.com> - multipage support
     @version
-    #$Id: DjVuImage.h,v 1.49 2001-10-12 17:58:30 leonb Exp $# */
+    #$Id: DjVuImage.h,v 1.50 2001-10-16 18:01:43 docbill Exp $# */
 //@{
 
 
+#ifdef __GNUC__
+#pragma interface
+#endif
 
 #include "DjVuFile.h"
 #include "DjVuAnno.h"
@@ -283,12 +283,14 @@ public:
       #get_pixmap# works as soon as sufficient information is present,
       regardless of the fact that the image follows the rules or not. */
   int is_legal_photo() const;
+
   /** This function returns true if this object contains a well formed {\em
       Bilevel DjVu Image}.  Calling function #get_bitmap# on a well formed
       bilevel image should always return a non zero value.  Note that function
       #get_bitmap# works as soon as a foreground mask component is present,
       regardless of the fact that the image follows the rules or not. */
   int is_legal_bilevel() const;
+
   /** This function returns true if this object contains a well formed {\em
       Compound DjVu Image}.  Calling function #get_bitmap# or #get_pixmap# on
       a well formed compound DjVu image should always return a non zero value.
@@ -319,6 +321,7 @@ public:
       This function returns a null pointer if there is not enough information
       in the DjVu image to properly render the desired image. */
   GP<GPixmap>  get_pixmap(const GRect &rect, const GRect &all, double gamma=0) const;
+
   /** Renders the mask of the foreground layer of the DjVu image.  This
       functions is a wrapper for \Ref{JB2Image::get_bitmap}.  Argument #align#
       specified the alignment of the rows of the returned images.  Setting
@@ -328,6 +331,7 @@ public:
       enough information in the DjVu image to properly render the desired
       image. */
   GP<GBitmap>  get_bitmap(const GRect &rect, const GRect &all, int align = 1) const;
+
   /** Renders the background layer of the DjVu image.  Rectangles #rect# and
       #all# are used as explained above. Color correction is performed
       according to argument #gamma#, which represents the gamma coefficient of
@@ -336,6 +340,7 @@ public:
       function returns a null pointer if there is not enough information in
       the DjVu image to properly render the desired image. */
   GP<GPixmap>  get_bg_pixmap(const GRect &rect, const GRect &all, double gamma=0) const;
+
   /** Renders the foreground layer of the DjVu image.  Rectangles #rect# and
       #all# are used as explained above. Color correction is performed
       according to argument #gamma#, which represents the gamma coefficient of
@@ -349,20 +354,26 @@ public:
   /** set the rotation count(angle) in counter clock wise for the image
     values (0,1,2,3) correspond to (0,90,180,270) degree rotation*/
   void set_rotate(int count=0);
+
   /** returns the rotation count*/
   int get_rotate() const;
+
   /** returns decoded annotations in DjVuAnno object in which all hyperlinks
       and hilighted areas are rotated as per rotation setting*/
   GP<DjVuAnno> get_decoded_anno();
+
   /** maps the given #rect# from rotated co-ordinates to unrotated document 
       co-ordinates*/
   void map(GRect &rect) const;
+
   /** unmaps the given #rect# from unrotated document co-ordinates to rotated  
       co-ordinates*/
   void unmap(GRect &rect) const;
+
   /** maps the given #x#, #y# from rotated co-ordinates to unrotated document 
       co-ordinates*/
   void map(int &x, int &y) const;
+
   /** unmaps the given #x#, #y# from unrotated document co-ordinates to rotated  
       co-ordinates*/
   void unmap(int &x, int &y) const;

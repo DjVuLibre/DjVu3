@@ -1,12 +1,9 @@
 //C-  Copyright © 2000-2001, LizardTech, Inc. All Rights Reserved.
 //C-              Unauthorized use prohibited.
 //
-// $Id: djvuxmlparser.cpp,v 1.11 2001-10-12 17:58:29 leonb Exp $
+// $Id: djvuxmlparser.cpp,v 1.12 2001-10-16 18:01:43 docbill Exp $
 // $Name:  $
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
 #include "XMLParser.h"
 #include "XMLTags.h"
 #include "GOS.h"

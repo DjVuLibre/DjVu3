@@ -4,12 +4,9 @@
 //C-              Unauthorized use prohibited.
 //C-
 // 
-// $Id: djvutoxml.cpp,v 1.9 2001-10-12 17:58:29 leonb Exp $
+// $Id: djvutoxml.cpp,v 1.10 2001-10-16 18:01:43 docbill Exp $
 // $Name:  $
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
 #include "DjVuDocument.h"
 #include "GOS.h"
 #include "DjVuMessage.h"

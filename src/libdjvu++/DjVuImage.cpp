@@ -30,11 +30,11 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuImage.cpp,v 1.85 2001-10-12 17:58:30 leonb Exp $
+// $Id: DjVuImage.cpp,v 1.86 2001-10-16 18:01:43 docbill Exp $
 // $Name:  $
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
+#ifdef __GNUC__
+#pragma implementation
 #endif
 
 #include "DjVuImage.h"
@@ -53,7 +53,7 @@
 #include "BSByteStream.h"
 #include "debug.h"
 #include <stdarg.h>
-
+#include <assert.h>
 
 
 
@@ -1112,12 +1112,16 @@ do_bitmap(const DjVuImage &dimg, BImager get,
 }
 
 static GP<GPixmap>
-do_pixmap(const DjVuImage &dimg, PImager get,
-          const GRect &inrect, const GRect &inall, double gamma )
+do_pixmap( const DjVuImage &dimg,       // image to be displayed
+           PImager get,                 // 
+           const GRect &inrect,         // portion of the image to be extracted
+           const GRect &inall,          // complete image rectangle
+           double gamma )               // 
 {
+    assert( inall.contains( inrect ) ); // initial sanity check
 
-    GRect rect=inrect;
-    GRect all=inall;
+    GRect rect=inrect;                  // extract portion
+    GRect all=inall;                    // complete image
 ///* rotate code
     if( dimg.get_rotate()%4 )
     {
@@ -1424,7 +1428,7 @@ DjVuImage::writeXML(ByteStream &str_out,const GURL &doc_url,const int flags) con
         GP<ByteStream> gbs(iff.get_bytestream());
         if(chkid == "METa")
         {
-	   str_out.copy(*gbs);
+	        str_out.copy(*gbs);
           //str_out.writestring(gbs->getAsUTF8());
         }else if(chkid == "METz")
         {

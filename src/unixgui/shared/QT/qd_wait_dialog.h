@@ -32,15 +32,16 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qd_wait_dialog.h,v 1.3 2001-10-12 17:58:31 leonb Exp $
+// $Id: qd_wait_dialog.h,v 1.4 2001-10-16 18:01:45 docbill Exp $
 // $Name:  $
+
 
 #ifndef HDR_QD_WAIT_DIALOG
 #define HDR_QD_WAIT_DIALOG
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
 
+#ifdef __GNUC__
+#pragma interface
+#endif
 
 #include <qsemimodal.h>
 
