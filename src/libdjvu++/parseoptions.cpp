@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: parseoptions.cpp,v 1.19 2000-01-05 19:57:51 praveen Exp $
+//C- $Id: parseoptions.cpp,v 1.20 2000-01-05 21:54:56 praveen Exp $
 #ifdef __GNUC__
 #pragma implementation
 #endif
@@ -1250,7 +1250,14 @@ DjVuParseOptions::ConfigFilename
 		root = (char *) RegOpenReadConfig (HKEY_CURRENT_USER);
 	else
 		root = (char *) RegOpenReadConfig (HKEY_LOCAL_MACHINE);
-	if (root[0]) {
+    if( !root )
+    {
+        char *defl="c:\\";
+        retval = filename = new char [strlen(defl)+1];
+        strcpy(filename, defl);
+        return retval;
+    }
+	if (root && root[0]) {
 		rootlen = strlen(root);
 		retval=filename=new char [rootlen+strlen(this_config)+sizeof(ConfigExt)+1];
 		strcpy(filename,root);

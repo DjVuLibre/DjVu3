@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuGlobal.h,v 1.26 2000-01-05 20:02:24 bcr Exp $
+//C- $Id: DjVuGlobal.h,v 1.27 2000-01-05 21:54:56 praveen Exp $
 
 
 #ifndef _DJVUGLOBAL_H
@@ -40,7 +40,7 @@
     @memo
     Global definitions.
     @version
-    #$Id: DjVuGlobal.h,v 1.26 2000-01-05 20:02:24 bcr Exp $#
+    #$Id: DjVuGlobal.h,v 1.27 2000-01-05 21:54:56 praveen Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> -- empty file.\\
     Bill Riemers <bcr@sanskrit.lz.att.com> -- real work.  */
@@ -230,7 +230,8 @@ private:
 #define DJVU_PROGRESS_TASK(name,task,nsteps)
 #define DJVU_PROGRESS_RUN(name,step)
 
-#endif
+#endif // ! NEED_DJVU_PROGRESS
+#endif /*HAS_DJVU_PROGRESS_CALLBACKS*/
 //@}
 
 
