@@ -31,7 +31,7 @@
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #C-
 #
-# $Id: Makefile.in,v 1.7 2001-09-25 22:52:55 leonb Exp $
+# $Id: Makefile.in,v 1.8 2001-09-25 22:58:12 leonb Exp $
 # $Name:  $
 
 %%%include <paths>
@@ -162,8 +162,7 @@ OBJS		+= $(OBJ_SHARED_QT)
 #############################################################################
 DIR_SHARED_UTILS:= $(DIR_UNIXGUI)/shared/utils
 VPATH		:= $(VPATH):$(DIR_SHARED_UTILS)
-SRC_SHARED_UTILS:= undo_redo.cpp GMarginCache.cpp \
-	djvu_file_cache.cpp io.cpp prefs.cpp mime_utils.cpp
+SRC_SHARED_UTILS:= GMarginCache.cpp djvu_file_cache.cpp io.cpp prefs.cpp mime_utils.cpp
 HDR_SHARED_UTILS:= $(patsubst %.cpp,%.h,$(SRC_SHARED_UTILS))
 OBJ_SHARED_UTILS:= $(patsubst %.cpp,%.o,$(SRC_SHARED_UTILS))
 SRCS		+= $(SRC_SHARED_UTILS)
