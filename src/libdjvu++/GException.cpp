@@ -30,11 +30,11 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GException.cpp,v 1.38 2001-10-16 18:01:44 docbill Exp $
+// $Id: GException.cpp,v 1.37.2.1 2001-10-17 22:02:27 leonb Exp $
 // $Name:  $
 
-#ifdef __GNUC__
-#pragma implementation
+#ifdef HAVE_CONFIG_H
+#include "config.h"
 #endif
 
 #include <stdlib.h>
@@ -123,6 +123,7 @@ GException::operator=(const GException & exc)
 void
 GException::perror(void) const
 {
+#ifndef USE_SILENT_EXCEPTIONS
   fflush(0);
   DjVuPrintErrorUTF8("*** ");
   DjVuMessageLite::perror(get_cause());
@@ -133,6 +134,7 @@ GException::perror(void) const
   if (func)
     DjVuPrintErrorUTF8("*** '%s'\n", func);    
   DjVuPrintErrorUTF8("\n");
+#endif
 }
 
 const char* 
@@ -184,8 +186,10 @@ GExceptionHandler::emthrow(const GException &gex)
     }
   else
     {
+#ifndef USE_SILENT_EXCEPTIONS
       DjVuPrintErrorUTF8("\n*** Unhandled exception");
       gex.perror();
+#endif
 #ifndef UNDER_CE
       abort();
 #else
