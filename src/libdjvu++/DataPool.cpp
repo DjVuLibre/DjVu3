@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.cpp,v 1.1.2.5 1999-05-03 22:09:13 eaf Exp $
+//C- $Id: DataPool.cpp,v 1.1.2.6 1999-05-04 15:16:15 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -482,8 +482,8 @@ DataRange::analyze_iff(void)
       if ((size=iff.get_chunk(chkid)) &&
 	  size>=0 && size<10*1024*1024)
       {
-	 DEBUG_MSG("Got size=" << size << "\n");
-	 length=size;
+	 length=size+iff.tell()-4;
+	 DEBUG_MSG("Got size=" << size << ", length=" << length << "\n");
       }
    } CATCH(exc) {
       delete str; str=0;
