@@ -32,13 +32,13 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: plugin.cpp,v 1.8 2001-10-16 18:01:45 docbill Exp $
+// $Id: plugin.cpp,v 1.7.2.1 2001-10-17 17:38:29 leonb Exp $
 // $Name:  $
 
-
-#ifdef __GNUC__
-#pragma implementation
+#ifdef HAVE_CONFIG_H
+#include "config.h"
 #endif
+
 
 #include "plugin.h"
 #include "path.h"
@@ -49,7 +49,10 @@
 #include "debug.h"
 #include "GContainer.h"
 #include "GException.h"
+
+#ifndef DJVIEW_VERSION_STR
 #include "DjVuVersion.h"
+#endif
 
 #include <sys/stat.h>
 #include <sys/types.h>
