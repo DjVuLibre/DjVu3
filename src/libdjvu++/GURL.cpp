@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GURL.cpp,v 1.13 1999-12-21 00:09:28 eaf Exp $
+//C- $Id: GURL.cpp,v 1.14 1999-12-22 00:11:41 praveen Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -145,13 +145,18 @@ GURL::parse_cgi_args(void)
       GString arg;	// Storage for another argument
       while(*start)	// Seek for the end of it
       {
-	 if (start[0]=='&' || start[0]=='%' &&
-	     start[1]=='2' && start[2]=='6')
-	 {
-	    if (start[0]=='&') start++;
-	    else start+=3;
-	    break;
-	 } else arg+=start[0];
+	     if (start[0]=='&' || start[0]=='%' &&
+	         start[1]=='2' && start[2]=='6')
+	     {
+	        if (start[0]=='&') start++;
+	        else start+=3;
+	        break;
+	     } 
+         else 
+         {
+             arg+=start[0];
+             start++;
+         }
       }
       if (arg.length())
       {
