@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuImage.cpp,v 1.29 1999-09-17 21:09:52 leonb Exp $
+//C- $Id: DjVuImage.cpp,v 1.30 1999-09-20 22:02:19 eaf Exp $
 
 
 #ifdef __GNUC__
@@ -118,19 +118,6 @@ DjVuImage::get_fgpm(const GP<DjVuFile> & file) const
    {
       GP<GPixmap> fgpm=get_fgpm(list[pos]);
       if (fgpm) return fgpm;
-   }
-   return 0;
-}
-
-GP<DjVuNavDir>
-DjVuImage::get_dir(const GP<DjVuFile> & file) const
-{
-   if (file->dir) return file->dir;
-   GPList<DjVuFile> list=file->get_included_files();
-   for(GPosition pos=list;pos;++pos)
-   {
-      GP<DjVuNavDir> dir=get_dir(list[pos]);
-      if (dir) return dir;
    }
    return 0;
 }
