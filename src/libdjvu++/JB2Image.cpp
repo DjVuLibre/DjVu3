@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: JB2Image.cpp,v 1.46 2000-12-21 01:22:46 bcr Exp $
+// $Id: JB2Image.cpp,v 1.47 2000-12-21 07:02:02 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -67,7 +67,7 @@ public:
   struct LibRect
   {
     short top,left,right,bottom;
-    void compute_bounding_box(GBitmap &cbm);
+    void compute_bounding_box(const GBitmap &cbm);
   };
   virtual ~_JB2Codec();
 protected:
@@ -166,8 +166,8 @@ protected:
   int image_rows;
   int short_list[3];
   int short_list_pos;
-  inline void fill_short_list(int v);
-  int update_short_list(int v);
+  inline void fill_short_list(const int v);
+  int update_short_list(const int v);
   // Code bitmaps
   BitContext bitdist[1024];
   BitContext cbitdist[2048];
@@ -585,15 +585,14 @@ _JB2EncodeCodec::CodeNum(int num, int low, int high, NumContext &ctx)
 int
 _JB2Codec::CodeNum(int low, int high, NumContext *pctx, int v)
 {
-  int cutoff, decision, negative=0, phase, range, temp;
+  bool negative=false;
+  int cutoff;
   // Check
   if (pctx && ((int)*pctx >= cur_ncell))
     G_THROW("JB2Image.bad_numcontext");
   // Start all phases
-  phase = 1;
   cutoff = 0;
-  range = 0xffffffff;
-  while (range != 1)
+  for(int phase=1,range=0xffffffff;range != 1;)
     {
       if (! *pctx)
         {
@@ -610,26 +609,13 @@ _JB2Codec::CodeNum(int low, int high, NumContext *pctx, int v)
           leftcell[*pctx] = rightcell[*pctx] = 0;
         }
       // encode
-      if (encoding)
-        {
-          decision = (v >= cutoff);
-          if (low < cutoff && high >= cutoff)
-            zp.encoder(decision, bitcells[*pctx]);
-        }
-      else
-        {
-          if (low >= cutoff)
-            decision = 1;
-          else if (high < cutoff) 
-            decision = 0;
-          else 
-            decision = zp.decoder (bitcells[*pctx]);
-	}
+      const bool decision = encoding
+        ? ((low < cutoff && high >= cutoff)
+          ? CodeBit((v>=cutoff),bitcells[*pctx])
+          : (v >= cutoff))
+        : ((low>=cutoff)||((high>=cutoff)&&CodeBit(false,bitcells[*pctx])));
       // context for new bit
-      if (decision)
-        pctx = &rightcell[*pctx];
-      else
-        pctx = &leftcell[*pctx];
+      pctx = decision?(&rightcell[*pctx]):(&leftcell[*pctx]);
       // phase dependent part
       switch (phase) 
         {
@@ -639,7 +625,7 @@ _JB2Codec::CodeNum(int low, int high, NumContext *pctx, int v)
             {
               if (encoding)
                 v = - v - 1;
-              temp = - low - 1; 
+              const int temp = - low - 1; 
               low = - high - 1; 
               high = temp;
 	    }
@@ -654,27 +640,26 @@ _JB2Codec::CodeNum(int low, int high, NumContext *pctx, int v)
               if (range == 1)
                 cutoff = 0;
               else
-                cutoff = cutoff - range / 2;
+                cutoff -= range / 2;
 	    }
           else 
             { 
-              cutoff = 2 * cutoff + 1; 
+              cutoff += cutoff + 1; 
             }
           break;
 
 	case 3:
           range /= 2;
-          if (range == 1) 
-            {
-              if (!decision) 
-                cutoff --;
-	    }
-          else 
+          if (range != 1) 
             {
               if (!decision)
                 cutoff -= range / 2;
               else               
                 cutoff += range / 2;
+	    }
+          else if (!decision) 
+            {
+                cutoff --;
 	    }
           break;
 	}
@@ -793,36 +778,23 @@ _JB2DecodeCodec::code_match_index(int &index, JB2Dict *jim)
 // HANDLE SHORT LIST
 
 inline void 
-_JB2Codec::fill_short_list(int v)
+_JB2Codec::fill_short_list(const int v)
 {
   short_list[0] = short_list[1] = short_list[2] = v;
   short_list_pos = 0;
 }
 
 int 
-_JB2Codec::update_short_list(int v)
+_JB2Codec::update_short_list(const int v)
 {
   if (++ short_list_pos == 3)
     short_list_pos = 0;
-  int *s = short_list;
+  int * const s = short_list;
   s[short_list_pos] = v;
 
-  if (s[0] >= s[1])
-    if (s[0] > s[2])
-      if (s[1] >= s[2])
-        return s[1];
-      else
-        return s[2];
-    else
-      return s[0];
-  else
-    if (s[0] < s[2])
-      if (s[1] >= s[2])
-        return s[2];
-      else
-        return s[1];
-    else
-      return s[0];
+  return (s[0] >= s[1])
+    ?((s[0] > s[2])?((s[1] >= s[2])?s[1]:s[2]):s[0])
+    :((s[0] < s[2])?((s[1] >= s[2])?s[2]:s[1]):s[0]);
 }
 
 
@@ -1251,20 +1223,17 @@ _JB2EncodeCodec::code_bitmap_by_cross_coding (GBitmap &bm, GBitmap &cbm,
           int context=get_cross_context(up1, up0, xup1, xup0, xdn1, 0);
           for(int dx=0;dx < dw;)
             {
-              const int n = up0[dx];
+              const int n = up0[dx++];
               zp.encoder(n, cbitdist[context]);
-              dx += 1;
               context=shift_cross_context(context, n,  
                                   up1, up0, xup1, xup0, xdn1, dx);
             }
           // next row
-          dy -= 1;
-          cy -= 1;
           up1 = up0;
-          up0 = bm[dy];
+          up0 = bm[--dy];
           xup1 = xup0;
           xup0 = xdn1;
-          xdn1 = cbm[cy-1] + xd2c;
+          xdn1 = cbm[(--cy)-1] + xd2c;
         }
 }
 
@@ -1282,19 +1251,16 @@ _JB2DecodeCodec::code_bitmap_by_cross_coding (GBitmap &bm, GBitmap &cbm,
           for(int dx=0;dx < dw;)
             {
               const int n = zp.decoder(cbitdist[context]);
-              up0[dx] = n;
-              dx += 1;
+              up0[dx++] = n;
               context=shift_cross_context(context, n,  
                                   up1, up0, xup1, xup0, xdn1, dx);
             }
           // next row
-          dy -= 1;
-          cy -= 1;
           up1 = up0;
-          up0 = bm[dy];
+          up0 = bm[--dy];
           xup1 = xup0;
           xup0 = xdn1;
-          xdn1 = cbm[cy-1] + xd2c;
+          xdn1 = cbm[(--cy)-1] + xd2c;
 #ifdef DEBUG
           bm.check_border();
 #endif
@@ -1833,39 +1799,49 @@ _JB2EncodeCodec::encode_libonly_shape(JB2Image *jim, int shapeno )
 ////////////////////////////////////////
 
 void 
-_JB2Codec::LibRect::compute_bounding_box(GBitmap &bm)
+_JB2Codec::LibRect::compute_bounding_box(const GBitmap &bm)
 {
   // First lock the stuff.
   GMonitorLock lock(bm.monitor());
   // Get size
-  int w = bm.columns();
-  int h = bm.rows();
-  int s = bm.rowsize();
-  int n;
+  const int w = bm.columns();
+  const int h = bm.rows();
+  const int s = bm.rowsize();
   // Right border
-  if ((right=w-1) >= 0) do
+  for(right=w-1;right >= 0;--right)
     {
       unsigned char const *p = bm[0] + right;
-      for (n=0;(n<h)&&(!*p); n++,p+=s);
-    } while ((n>=h)&&(--right >= 0));
+      unsigned char const * const pe = p+(s*h);
+      for (;(p<pe)&&(!*p);p+=s);
+      if (p<pe)
+        break;
+    }
   // Top border
-  if ((top=h-1) >= 0) do
+  for(top=h-1;top >= 0;--top)
     {
       unsigned char const *p = bm[top];
-      for (n=0;(n<w)&&(!*p); n++,p++);
-      if (n<w) break;
-    } while ((n>=w)&&(--top >= 0));
+      unsigned char const * const pe = p+w;
+      for (;(p<pe)&&(!*p); ++p);
+      if (p<pe)
+        break;
+    }
   // Left border
-  if ((left=0) <= right) do
+  for (left=0;left <= right;++left)
     {
       unsigned char const *p = bm[0] + left;
-      for (n=0;(n<h)&&(!*p); n++,p+=s);
-    } while ((n>=h)&&(++left <= right));
+      unsigned char const * const pe=p+(s*h);
+      for (;(p<pe)&&(!*p);p+=s);
+      if (p<pe)
+        break;
+    }
   // Bottom border
-  if ((bottom=0) <= top) do
+  for(bottom=0;bottom <= top;++bottom)
     {
       unsigned char const *p = bm[bottom];
-      for (n=0;(n<w)&&(!*p); n++,p++);
-    } while ((n>=w)&&(++bottom <= top));
+      unsigned char const * const pe = p+w;
+      for (;(p<pe)&&(!*p); ++p);
+      if (p<pe)
+        break;
+    }
 }
 
