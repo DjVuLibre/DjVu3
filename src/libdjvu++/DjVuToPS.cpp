@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuToPS.cpp,v 1.9 2000-03-23 23:07:39 eaf Exp $
+//C- $Id: DjVuToPS.cpp,v 1.10 2000-03-23 23:16:30 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -193,18 +193,21 @@ DjVuToPS::store_doc_prolog(ByteStream & str, int pages, const GRect & grect)
 #ifdef UNIX
    passwd * pswd;
    group  * grp;
-   const char * gecos="unknown", * u_name="unknown", * g_name="unknown";
+   const char * gecos="Name unknown", * u_name="unknown", * g_name="unknown";
    pswd=getpwuid(getuid());
    if (pswd)
    {
       char * ptr;
       for(ptr=pswd->pw_gecos;*ptr!=0;ptr++)
 	 if (*ptr==',') { *ptr=0;break; }
-      u_name=pswd->pw_name;
-      gecos=pswd->pw_gecos;
+      if (pswd->pw_name && strlen(pswd->pw_name))
+	 u_name=pswd->pw_name;
+      if (pswd->pw_gecos && strlen(pswd->pw_gecos))
+	 gecos=pswd->pw_gecos;
    }
    grp=getgrgid(getgid());
-   if (grp) g_name=grp->gr_name;
+   if (grp && grp->gr_name && strlen(grp->gr_name))
+      g_name=grp->gr_name;
 #endif
    write(str,
 	 "%%%%Title: DjVu PostScript document\n"
