@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: JB2Image.cpp,v 1.10 1999-06-08 20:36:25 leonb Exp $
+//C- $Id: JB2Image.cpp,v 1.10.2.1 1999-06-22 19:18:33 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -49,6 +49,7 @@ public:
   ~_JB2Codec();
   // Functions
   void code(JB2Image *jim);
+  void code(JB2Dict *jim);
 protected:
   // Forbidden assignment
   _JB2Codec(const _JB2Codec &ref);
@@ -81,7 +82,10 @@ private:
   BitContext dist_refinement_flag;
   void code_eventual_lossless_refinement();
   void code_record_type(int &rectype);
-  void code_match_index(int &index);
+  int code_match_index(int &index, JB2Dict *jim);
+  // Library
+  int add_library(int shapeno, JB2Dict *jim);
+  int libindex;
   TArray<int> shape2lib;
   TArray<int> lib2shape;
   // Code pairs
@@ -119,6 +123,7 @@ private:
   void code_bitmap_directly (GBitmap *bm);
   void code_bitmap_by_cross_coding (GBitmap *bm, GBitmap *cbm, int libno);
   // Code records
+  void code_record(int &rectype, JB2Dict *jim, JB2Shape *jshp);
   void code_record(int &rectype, JB2Image *jim, JB2Shape *jshp, JB2Blit *jblt);
   // Private helpers
   void encode_libonly_shape(JB2Image *jim, int shapeno);
@@ -129,6 +134,83 @@ private:
 #endif
 };
 
+
+
+
+////////////////////////////////////////
+//// CLASS JB2DICT: IMPLEMENTATION
+////////////////////////////////////////
+
+
+JB2Dict::JB2Dict()
+  : inherited_shapes(0)
+{
+}
+
+void
+JB2Dict::init()
+{
+  inherited_shapes = 0;
+  inherited_dict = 0;
+  shapes.empty();
+}
+
+void 
+JB2Dict::set_inherited_dict(GP<JB2Dict> dict)
+{
+  if (shapes.size() > 0)
+    THROW("Cannot set dictionary after adding shapes");
+  if (inherited_dict)
+    THROW("Cannot change dictionary once set");
+  inherited_dict = dict;
+  inherited_shapes = dict->get_shape_count();
+}
+
+void
+JB2Dict::compress()
+{
+  for (int i=shapes.lbound(); i<=shapes.hbound(); i++)
+    shapes[i].bits->compress();
+  if (inherited_dict)
+    inherited_dict->compress();
+}
+
+unsigned int
+JB2Dict::get_memory_usage() const
+{
+  unsigned int usage = sizeof(JB2Dict);
+  usage += sizeof(JB2Shape) * shapes.size();
+  for (int i=shapes.lbound(); i<=shapes.hbound(); i++)
+    if (shapes[i].bits)
+      usage += shapes[i].bits->get_memory_usage();
+  return usage;
+}
+
+int  
+JB2Dict::add_shape(const JB2Shape &shape)
+{
+  if (shape.parent >= get_shape_count())
+    THROW("Illegal parent shape number in JB2Shape");
+  int index = shapes.size();
+  shapes.touch(index);
+  shapes[index] = shape;
+  return index + inherited_shapes;
+}
+
+void 
+JB2Dict::encode(ByteStream &bs) const
+{
+  _JB2Codec codec(bs, 1);
+  codec.code((JB2Dict*)this);
+}
+
+void 
+JB2Dict::decode(ByteStream &bs, JB2DecoderCallback *cb, void *arg)
+{
+  init();
+  _JB2Codec codec(bs);
+  codec.code(this);
+}
 
 
 
@@ -146,26 +228,16 @@ void
 JB2Image::init()
 {
   width = height = 0;
-  shapes.empty();
   blits.empty();
-}
-
-void
-JB2Image::compress()
-{
-  for (int i=shapes.lbound(); i<=shapes.hbound(); i++)
-    shapes[i].bits->compress();
+  JB2Dict::init();
 }
 
 unsigned int
 JB2Image::get_memory_usage() const
 {
-  unsigned int usage = sizeof(JB2Image);
+  unsigned int usage = JB2Dict::get_memory_usage();
+  usage += sizeof(JB2Image) - sizeof(JB2Dict);
   usage += sizeof(JB2Blit) * blits.size();
-  usage += sizeof(JB2Shape) * shapes.size();
-  for (int i=shapes.lbound(); i<=shapes.hbound(); i++)
-    if (shapes[i].bits)
-      usage += shapes[i].bits->get_memory_usage();
   return usage;
 }
 
@@ -177,17 +249,10 @@ JB2Image::set_dimension(int awidth, int aheight)
 }
 
 int  
-JB2Image::add_shape(const JB2Shape &shape)
-{
-  int index = shapes.size();
-  shapes.touch(index);
-  shapes[index] = shape;
-  return index;
-}
-
-int  
 JB2Image::add_blit(const JB2Blit &blit)
 {
+  if (blit.shapeno >= (unsigned int)get_shape_count())
+    THROW("Illegal shape number in JB2Blit");
   int index = blits.size();
   blits.touch(index);
   blits[index] = blit;
@@ -238,14 +303,14 @@ JB2Image::get_bitmap(const GRect &rect, int subsample, int align, int dispy) con
 
 
 void 
-JB2Image::encode(ByteStream &bs, int) const
+JB2Image::encode(ByteStream &bs) const
 {
   _JB2Codec codec(bs, 1);
   codec.code((JB2Image*)this);
 }
 
 void 
-JB2Image::decode(ByteStream &bs, int)
+JB2Image::decode(ByteStream &bs, JB2DecoderCallback *cb, void *arg)
 {
   init();
   _JB2Codec codec(bs);
@@ -297,6 +362,7 @@ _JB2Codec::_JB2Codec(ByteStream &bs, int encoding)
     dist_record_type(0),
     dist_match_index(0),
     dist_refinement_flag(0),
+    libindex(-1),
     abs_loc_x(0),
     abs_loc_y(0),
     abs_size_x(0),
@@ -490,6 +556,23 @@ _JB2Codec::code_comment(GString &comment)
 }
 
 
+// LIBRARY
+
+
+int 
+_JB2Codec::add_library(int shapeno, JB2Dict *jim)
+{
+  if (libindex < 0)
+    libindex = jim->get_inherited_shape_count() - 1;
+  libindex = libindex + 1;
+  lib2shape.touch(libindex);
+  lib2shape[libindex] = shapeno;
+  shape2lib.touch(shapeno);
+  shape2lib[shapeno] = libindex;
+  return libindex;
+}
+
+
 // CODE SIMPLE VALUES
 
 void 
@@ -511,12 +594,26 @@ _JB2Codec::code_eventual_lossless_refinement()
     refinementp = bit;
 }
 
-void 
-_JB2Codec::code_match_index(int &index)
+int 
+_JB2Codec::code_match_index(int &index, JB2Dict *jim)
 {
-  CodeNum(index,
-             lib2shape.lbound(), lib2shape.hbound(), 
-             dist_match_index);
+  int match;
+  if (libindex < 0)
+    libindex = jim->get_inherited_shape_count() - 1;
+  if (encoding)
+    {
+      match = index;
+      if (index >= jim->get_inherited_shape_count())
+        match = shape2lib[index]; 
+    }
+  CodeNum(match, 0, libindex, dist_match_index);
+  if (! encoding)
+    {
+      index = match;
+      if (match >= jim->get_inherited_shape_count())
+        index = lib2shape[match];
+    }
+  return match;
 }
 
 
@@ -976,6 +1073,90 @@ _JB2Codec::code_bitmap_by_cross_coding (GBitmap *bm, GBitmap *cbm, int libno)
 // CODE RECORDS
 
 void
+_JB2Codec::code_record(int &rectype, JB2Dict *jim, JB2Shape *jshp)
+{
+  GBitmap *cbm = 0;
+  GBitmap *bm = 0;
+  int shapeno = -1;
+  int indexno = -1;
+
+  // Code record type
+  code_record_type(rectype);
+  
+  // Pre-coding actions
+  switch(rectype)
+    {
+    case NEW_MARK_LIBRARY_ONLY:
+    case MATCHED_REFINE_LIBRARY_ONLY:
+      if (!encoding) 
+        {
+          jshp->bits = new GBitmap;
+          jshp->parent = -1;
+        }
+      bm = jshp->bits;
+      break;
+    }
+  // Coding actions
+  switch (rectype)
+    {
+    case NEW_MARK_LIBRARY_ONLY:
+      {
+        code_absolute_mark_size (bm, 4);
+        code_bitmap_directly (bm);
+        break;
+      }
+    case MATCHED_REFINE_LIBRARY_ONLY:
+      {
+        int match = code_match_index (jshp->parent, jim);
+        cbm = jim->get_shape(jshp->parent)->bits;
+#ifdef STRICT_PGH
+        LibRect &l = libinfo[match];
+        code_relative_mark_size (bm, l.right-l.left+1, l.top-l.bottom+1, 4);
+#else
+        code_relative_mark_size (bm, cbm->columns(), cbm->rows(), 4);
+#endif
+        code_bitmap_by_cross_coding (bm, cbm, jshp->parent);
+        break;
+      }
+    case PRESERVED_COMMENT:
+      {
+        code_comment(jim->comment);
+        break;
+      }
+    case END_OF_DATA:
+      {
+        break;
+      }
+    default:
+      {
+        THROW("Corrupted file: Illegal record type for shape dictionary");
+      }
+    }
+  // Post-coding action
+  if (!encoding)
+    {
+      // add shape to dictionary
+      switch(rectype)
+        {
+        case NEW_MARK_LIBRARY_ONLY:
+        case MATCHED_REFINE_LIBRARY_ONLY:
+          shapeno = jim->add_shape(*jshp);
+          indexno = add_library(shapeno, jim);
+#ifdef STRICT_PGH
+          compute_pgh_size(indexno, bm);
+#endif
+          break;
+        }
+      // make sure everything is compacted
+      // decompaction will occur automatically when needed
+      if (bm)
+        bm->compress();
+    }
+}
+
+
+
+void
 _JB2Codec::code_record(int &rectype, JB2Image *jim, JB2Shape *jshp, JB2Blit *jblt)
 {
   GBitmap *bm = 0;
@@ -986,7 +1167,7 @@ _JB2Codec::code_record(int &rectype, JB2Image *jim, JB2Shape *jshp, JB2Blit *jbl
 
   // Code record type
   code_record_type(rectype);
-
+  
   // Pre-coding actions
   switch(rectype)
     {
@@ -1000,7 +1181,9 @@ _JB2Codec::code_record(int &rectype, JB2Image *jim, JB2Shape *jshp, JB2Blit *jbl
       if (!encoding) 
         {
           jshp->bits = new GBitmap;
-          jshp->parent = (rectype==NON_MARK_DATA ? -2 : -1);
+          jshp->parent = -1;
+          if (rectype == NON_MARK_DATA)
+            jshp->parent = -2;
         }
       bm = jshp->bits;
       break;
@@ -1036,11 +1219,7 @@ _JB2Codec::code_record(int &rectype, JB2Image *jim, JB2Shape *jshp, JB2Blit *jbl
       }
     case MATCHED_REFINE:
       {
-        if (encoding)
-          match = shape2lib[jshp->parent];
-        code_match_index (match);
-        if (!encoding)
-          jshp->parent = lib2shape[match];
+        match = code_match_index (jshp->parent, jim);
         cbm = jim->get_shape(jshp->parent)->bits;
 #ifdef STRICT_PGH
         LibRect &l = libinfo[match];
@@ -1054,11 +1233,7 @@ _JB2Codec::code_record(int &rectype, JB2Image *jim, JB2Shape *jshp, JB2Blit *jbl
       }
     case MATCHED_REFINE_LIBRARY_ONLY:
       {
-        if (encoding)
-          match = shape2lib[jshp->parent];
-        code_match_index (match);
-        if (!encoding)
-          jshp->parent = lib2shape[match];
+        match = code_match_index (jshp->parent, jim);
         cbm = jim->get_shape(jshp->parent)->bits;
 #ifdef STRICT_PGH
         LibRect &l = libinfo[match];
@@ -1071,11 +1246,7 @@ _JB2Codec::code_record(int &rectype, JB2Image *jim, JB2Shape *jshp, JB2Blit *jbl
       }
     case MATCHED_REFINE_IMAGE_ONLY:
       {
-        if (encoding)
-          match = shape2lib[jshp->parent];
-        code_match_index (match);
-        if (!encoding)
-          jshp->parent = lib2shape[match];
+        match = code_match_index (jshp->parent, jim);
         cbm = jim->get_shape(jshp->parent)->bits;
 #ifdef STRICT_PGH
         LibRect &l = libinfo[match];
@@ -1089,11 +1260,10 @@ _JB2Codec::code_record(int &rectype, JB2Image *jim, JB2Shape *jshp, JB2Blit *jbl
       }
     case MATCHED_COPY:
       {
-        if (encoding)
-          match = shape2lib[(int)(jblt->shapeno)];
-        code_match_index (match);
-        if (!encoding)
-          jblt->shapeno = lib2shape[match];
+        int temp;
+        if (encoding) temp = jblt->shapeno;
+        match = code_match_index (temp, jim);
+        if (!encoding) jblt->shapeno = temp;
         bm = jim->get_shape(jblt->shapeno)->bits;
 #ifdef STRICT_PGH
         LibRect &l = libinfo[match];
@@ -1126,9 +1296,13 @@ _JB2Codec::code_record(int &rectype, JB2Image *jim, JB2Shape *jshp, JB2Blit *jbl
       }
     case LOSSLESS_REFINEMENT:
     case END_OF_DATA:
-      break;
+      {
+        break;
+      }
     default:
-      THROW("Corrupted file: Unknown record type");
+      {
+        THROW("Corrupted file: Unknown record type");
+      }
     }
   
   // Post-coding action
@@ -1156,10 +1330,7 @@ _JB2Codec::code_record(int &rectype, JB2Image *jim, JB2Shape *jshp, JB2Blit *jbl
         case NEW_MARK_LIBRARY_ONLY:
         case MATCHED_REFINE:
         case MATCHED_REFINE_LIBRARY_ONLY:
-          indexno = lib2shape.hbound() + 1;
-          lib2shape.touch(indexno);
-          lib2shape[indexno] = shapeno;
-          shape2lib[shapeno] = indexno;
+          indexno = add_library(shapeno, jim);
 #ifdef STRICT_PGH
           compute_pgh_size(indexno, bm);
 #endif
@@ -1217,6 +1388,15 @@ _JB2Codec::code_record(int &rectype, JB2Image *jim, JB2Shape *jshp, JB2Blit *jbl
 }
 
 
+// CODE DICT
+
+void 
+_JB2Codec::code(JB2Dict *jim)
+{
+  THROW("Unsupported");
+}
+
+
 // CODE IMAGE
 
 void 
@@ -1232,11 +1412,12 @@ _JB2Codec::code(JB2Image *jim)
     // THIS IS THE ENCODING PART
     {
       int i;
+      int firstshape = jim->get_inherited_shape_count();
       int nshape = jim->get_shape_count();
       int nblit = jim->get_blit_count();
       // Initialize shape2lib 
-      shape2lib.resize(0, nshape-1);
-      for (i=0; i<nshape; i++)
+      shape2lib.resize(firstshape, nshape-1);
+      for (i=firstshape; i<nshape; i++)
         shape2lib[i] = -1;
       // Determine shapes that go into library
       //  shape2lib is -2 if used by one blit
@@ -1246,10 +1427,12 @@ _JB2Codec::code(JB2Image *jim)
         {
           JB2Blit *jblt = jim->get_blit(i);
           int shapeno = jblt->shapeno;
+          if (shapeno < firstshape)
+            continue;
           if (shape2lib[shapeno] >= -2) 
             shape2lib[shapeno] -= 1;
           shapeno = jim->get_shape(shapeno)->parent;
-          while (shapeno>=0 && shape2lib[shapeno]>=-3)
+          while (shapeno>=firstshape && shape2lib[shapeno]>=-3)
             {
               shape2lib[shapeno] = -4;
               shapeno = jim->get_shape(shapeno)->parent;
@@ -1271,8 +1454,8 @@ _JB2Codec::code(JB2Image *jim)
           JB2Shape *jshp = jim->get_shape(shapeno);
           // Progress indicator
           DJVU_PROGRESS("code_record", blitno*100/nblit);
-          // Test if shape is already in library
-          if (shape2lib[shapeno] >= 0)
+          // Test if shape is in dictionary or already in library
+          if (shapeno < firstshape || shape2lib[shapeno] >= 0)
             {
               int rectype = MATCHED_COPY;
               code_record(rectype, jim, NULL, jblt);
@@ -1281,21 +1464,23 @@ _JB2Codec::code(JB2Image *jim)
           else if (jshp->bits) 
             {
               // Make sure all parents have been coded
-              if (jshp->parent>=0 && shape2lib[jshp->parent]<0)
+              if (jshp->parent>=firstshape && shape2lib[jshp->parent]<0)
                 encode_libonly_shape(jim, jshp->parent);
               // Allocate library entry when needed
+              if (libindex < 0)
+                libindex = jim->get_inherited_shape_count() - 1;
 #define LIBRARY_CONTAINS_ALL
               int libno = -1;
 #ifdef LIBRARY_CONTAINS_MARKS // baseline
               if (jshp->parent >= -1)
-                libno = lib2shape.hbound() + 1;
+                libno = libindex = libindex+1;
 #endif
 #ifdef LIBRARY_CONTAINS_SHARED // worse             
               if (shape2lib[shapeno] <= -3)
-                libno = lib2shape.hbound() + 1;
+                libno = libindex = libindex+1;
 #endif
 #ifdef LIBRARY_CONTAINS_ALL // better
-              libno = lib2shape.hbound() + 1;
+              libno = libindex = libindex+1;
 #endif
               // Test all blit cases
               if (jshp->parent < -1 && libno<0)
@@ -1360,8 +1545,9 @@ void
 _JB2Codec::encode_libonly_shape(JB2Image *jim, int shapeno )
 {
   // Recursively encode parent shape
+  int firstshape = jim->get_inherited_shape_count();
   JB2Shape *jshp = jim->get_shape(shapeno);
-  if (jshp->parent>=0 && shape2lib[jshp->parent]<0)
+  if (jshp->parent>=firstshape && shape2lib[jshp->parent]<0)
     encode_libonly_shape(jim, jshp->parent);
   // Test that library shape must be encoded
   if (shape2lib[shapeno] < 0)
