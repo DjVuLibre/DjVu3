@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuPort.h,v 1.10 1999-09-09 18:55:33 eaf Exp $
+//C- $Id: DjVuPort.h,v 1.11 1999-09-09 20:48:33 eaf Exp $
  
 #ifndef _DJVUPORT_H
 #define _DJVUPORT_H
@@ -72,7 +72,7 @@
     
     @memo DjVu decoder communication mechanism.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuPort.h,v 1.10 1999-09-09 18:55:33 eaf Exp $#
+    @version #$Id: DjVuPort.h,v 1.11 1999-09-09 20:48:33 eaf Exp $#
 */
 //@{
 
@@ -184,19 +184,18 @@ public:
 	  @return 1 if the request has been processed. */
    virtual bool		notify_status(const DjVuPort * source, const char * msg);
 
-      /** This notification is sent when the image corresponding to the
-	  decoded file should be redrawn. It may be used to implement
-	  progressive redisplay.
+      /** This notification is sent by \Ref{DjVuImage} when it should be
+	  redrawn. It may be used to implement progressive redisplay.
 
 	  @param source The sender of the request */
-   virtual void		notify_redisplay(const DjVuPort * source);
+   virtual void		notify_redisplay(const class DjVuImage * source);
 
-      /** This notification is sent when the image geometry has been changed
-	  as a result of decoding. It may be used to implement progressive
-	  redisplay.
+      /** This notification is sent by \ref{DjVuImage} when its geometry
+	  has been changed as a result of decoding. It may be used to
+	  implement progressive redisplay.
 
 	  @param source The sender of the request */
-   virtual void		notify_relayout(const DjVuPort * source);
+   virtual void		notify_relayout(const class DjVuImage * source);
 
       /** This notification is sent when a new chunk has been decoded.
 
@@ -424,12 +423,12 @@ public:
       /** Computes destination list for #source# and calls the corresponding
 	  function in each of the ports from the destination list starting from
 	  the closest. */
-   virtual void		notify_redisplay(const DjVuPort * source);
+   virtual void		notify_redisplay(const class DjVuImage * source);
 
       /** Computes destination list for #source# and calls the corresponding
 	  function in each of the ports from the destination list starting from
 	  the closest. */
-   virtual void		notify_relayout(const DjVuPort * source);
+   virtual void		notify_relayout(const class DjVuImage * source);
 
       /** Computes destination list for #source# and calls the corresponding
 	  function in each of the ports from the destination list starting from

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuPort.cpp,v 1.14 1999-09-09 18:55:33 eaf Exp $
+//C- $Id: DjVuPort.cpp,v 1.15 1999-09-09 20:48:33 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -17,7 +17,7 @@
 
 #include "DjVuPort.h"
 #include "GOS.h"
-
+#include "DjVuImage.h"
 
 
 //****************************************************************************
@@ -393,7 +393,7 @@ DjVuPortcaster::notify_status(const DjVuPort * source, const char * msg)
 }
 
 void
-DjVuPortcaster::notify_redisplay(const DjVuPort * source)
+DjVuPortcaster::notify_redisplay(const DjVuImage * source)
 {
    GPList<DjVuPort> list;
    compute_closure(source, list);
@@ -402,7 +402,7 @@ DjVuPortcaster::notify_redisplay(const DjVuPort * source)
 }
 
 void
-DjVuPortcaster::notify_relayout(const DjVuPort * source)
+DjVuPortcaster::notify_relayout(const DjVuImage * source)
 {
    GPList<DjVuPort> list;
    compute_closure(source, list);
@@ -496,10 +496,10 @@ bool
 DjVuPort::notify_status(const DjVuPort *, const char *) { return 0; }
 
 void
-DjVuPort::notify_redisplay(const DjVuPort *) {}
+DjVuPort::notify_redisplay(const DjVuImage *) {}
 
 void
-DjVuPort::notify_relayout(const DjVuPort *) {}
+DjVuPort::notify_relayout(const DjVuImage *) {}
 
 void
 DjVuPort::notify_chunk_done(const DjVuPort *, const char *) {}

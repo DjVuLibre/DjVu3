@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuImage.cpp,v 1.24 1999-09-09 17:32:41 eaf Exp $
+//C- $Id: DjVuImage.cpp,v 1.25 1999-09-09 20:48:33 eaf Exp $
 
 
 #ifdef __GNUC__
@@ -24,7 +24,7 @@
 
 //// DJVUIMAGE: CONSTRUCTION
 
-DjVuImage::DjVuImage(void) {};
+DjVuImage::DjVuImage(void) : relayout_sent(false) {};
 
 void
 DjVuImage::connect(const GP<DjVuFile> & xfile)
@@ -274,6 +274,23 @@ DjVuImage::get_long_description() const
   return result;
 }
 
+void
+DjVuImage::notify_chunk_done(const DjVuPort *, const char * name)
+{
+   if (!relayout_sent &&
+       (!strcmp(name, "INFO") ||
+	!strcmp(name, "PM44") ||
+	!strcmp(name, "BM44")))
+   {
+      DjVuPort::get_portcaster()->notify_relayout(this);
+      relayout_sent=true;
+   } else
+      if (!strcmp(name, "Sjbz") ||
+	  !strcmp(name, "BG44") ||
+	  !strcmp(name, "BM44"))
+	 DjVuPort::get_portcaster()->notify_redisplay(this);
+}
+
 //// DJVUIMAGE: OLD-STYLE DECODING
 
 
@@ -283,16 +300,15 @@ class DjVuImageNotifier : public DjVuPort
   DjVuInterface  *notifier;
   GP<DataPool>	  stream_pool;
   GURL		  stream_url;
+  bool		  relayout_sent;
 public:
   DjVuImageNotifier(DjVuInterface *notifier);
   GP<DataPool> request_data(const DjVuPort *src, const GURL & url);
-  void notify_redisplay(const DjVuPort *);
-  void notify_relayout(const DjVuPort *);
   void notify_chunk_done(const DjVuPort *, const char *);
 };
 
 DjVuImageNotifier::DjVuImageNotifier(DjVuInterface *notifier)
-  : notifier(notifier)
+  : notifier(notifier), relayout_sent(false)
 {
 }
 
@@ -304,25 +320,26 @@ DjVuImageNotifier::request_data(const DjVuPort *src, const GURL & url)
   return stream_pool;
 }
 
-void
-DjVuImageNotifier::notify_redisplay(const DjVuPort *)
-{
-  if (notifier)
-    notifier->notify_redisplay();
-}
-
-void 
-DjVuImageNotifier::notify_relayout(const DjVuPort *)
-{
-  if (notifier)
-    notifier->notify_relayout();
-}
-
 void 
 DjVuImageNotifier::notify_chunk_done(const DjVuPort *, const char *name)
 {
-  if (notifier)
-    notifier->notify_chunk(name, "");
+   if (notifier)
+   {
+      notifier->notify_chunk(name, "");
+
+      if (!relayout_sent &&
+	  (!strcmp(name, "INFO") ||
+	   !strcmp(name, "PM44") ||
+	   !strcmp(name, "BM44")))
+      {
+	 notifier->notify_relayout();
+	 relayout_sent=true;
+      } else
+	 if (!strcmp(name, "Sjbz") ||
+	     !strcmp(name, "BG44") ||
+	     !strcmp(name, "BM44"))
+	    notifier->notify_redisplay();
+   }
 }
 
 void

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.39 1999-09-07 20:47:25 leonb Exp $
+//C- $Id: DjVuFile.cpp,v 1.40 1999-09-09 20:48:33 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -606,7 +606,6 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
       GP<DjVuInfo> info=new DjVuInfo();
       info->decode(iff);
       DjVuFile::info = info;
-      pcaster->notify_relayout(this);
       desc.format("Page information");
     }
 
@@ -750,7 +749,6 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
       GP<JB2Image> fgjb=new JB2Image();
       fgjb->decode(iff, static_get_fgjd, (void*)this);
       DjVuFile::fgjb = fgjb;
-      pcaster->notify_redisplay(this);
       desc.format("JB2 foreground mask (%dx%d)", fgjb->get_width(), fgjb->get_height());
     }
  
@@ -773,14 +771,12 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
           GP<IWPixmap> bg44=new IWPixmap();
           bg44->decode_chunk(iff);
           DjVuFile::bg44=bg44;
-          pcaster->notify_redisplay(this);
           desc.format("IW44 background (%dx%d)", bg44->get_width(), bg44->get_height());
         } 
       else
         {
           // Refinement chunks
           bg44->decode_chunk(iff);
-          pcaster->notify_redisplay(this);
           desc.format("IW44 background (part %d)", bg44->get_serial());
         }
     }
@@ -794,7 +790,6 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
       IWPixmap fg44;
       fg44.decode_chunk(iff);
       fgpm=fg44.get_pixmap();
-      pcaster->notify_redisplay(this);
       desc.format("IW44 foreground colors (%dx%d)", fg44.get_width(), fg44.get_height());
     } 
 
@@ -832,14 +827,12 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
           info->dpi=100;
           DjVuFile::bg44=bg44;
           DjVuFile::info=info;
-          pcaster->notify_relayout(this);
           desc.format("IW44 data (%dx%d)", bg44->get_width(), bg44->get_height());
         } 
       else
         {
           // Refinement chunks
           bg44->decode_chunk(iff);
-          pcaster->notify_redisplay(this);
           desc.format("IW44 data (part %d)", bg44->get_serial());
         }
     }
