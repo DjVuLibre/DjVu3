@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.h,v 1.15 1999-09-16 19:56:15 eaf Exp $
+//C- $Id: DataPool.h,v 1.16 1999-09-17 20:19:59 eaf Exp $
  
 #ifndef _DATAPOOL_H
 #define _DATAPOOL_H
@@ -43,7 +43,7 @@
 
     @memo Thread safe data storage
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DataPool.h,v 1.15 1999-09-16 19:56:15 eaf Exp $#
+    @version #$Id: DataPool.h,v 1.16 1999-09-17 20:19:59 eaf Exp $#
 */
 
 //@{
@@ -264,12 +264,17 @@ public:
    void		connect(const char * file_name, int start=0, int length=-1);
       //@}
 
-      /** Tells the #DataPool# to stop all readers waiting for data.
-	  This will unlock the threads (readers) and will throw an exceptions
-	  in each of them with text #STOP#. From this moment on any attempt
-	  to receive data from this #DataPool# or from any other #DataPool#
-	  connected to it will result in #STOP# exception. */
-   void		stop(void);
+      /** Tells the #DataPool# to stop serving readers.
+
+	  If #only_blocked# flag is #TRUE# then only those requests will
+	  be processed, which would not block. Any attempt to get nonexisting
+	  data would result in a #STOP# exception (instead of blocking until
+	  data is available).
+
+	  If #only_blocked# flas is #FALSE# then any further attempt to read
+	  from this #DataPool# (as well as from any #DataPool# connected
+	  to this one) will result in a #STOP# exception. */
+   void		stop(bool only_blocked=false);
 
       /** @name Adding data.
 	  Plese note, that these functions are for not connected #DataPool#s
@@ -469,6 +474,7 @@ public:
 private:
    bool		eof_flag;
    bool		stop_flag;
+   bool		stop_blocked_flag;
 
       // Source or storage of data
    GP<DataPool>		pool;

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.cpp,v 1.19 1999-09-16 19:56:15 eaf Exp $
+//C- $Id: DataPool.cpp,v 1.20 1999-09-17 20:19:59 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -185,6 +185,7 @@ DataPool::init(void)
    start=0; length=-1; add_at=0;
    eof_flag=false;
    stop_flag=false;
+   stop_blocked_flag=false;
 
    data=new MemoryByteStream();
 }
@@ -420,6 +421,9 @@ int
 DataPool::get_data(void * buffer, int offset, int sz, int level)
 {
    if (stop_flag) THROW("STOP");
+   if (stop_blocked_flag && !is_eof() &&
+       !has_data(offset, sz)) THROW("STOP");
+   
    if (sz < 0) THROW("Size must be non negative");
    if (sz == 0) return 0;
 
@@ -437,7 +441,8 @@ DataPool::get_data(void * buffer, int offset, int sz, int level)
 	    // DataPools hierarchy. Some of them will be stopped by "STOP"
 	    // exception.
 	 TRY {
-	    if (stop_flag) THROW("STOP");
+	    if (stop_flag || stop_blocked_flag && !is_eof() &&
+		!has_data(offset, sz)) THROW("STOP");
 	    return pool->get_data(buffer, start+offset, sz, level+1);
 	 } CATCH(exc) {
 	    if (strcmp(exc.get_cause(), "DATA_POOL_REENTER") || level)
@@ -522,6 +527,8 @@ DataPool::wait_for_data(const GP<Reader> & reader)
       if (eof_flag || block_list.get_bytes(reader->offset, 1)) return;
       if (pool || stream) return;
 
+      if (stop_blocked_flag) THROW("STOP");
+
       DEBUG_MSG("calling event.wait()...\n");
       reader->event.wait();
    }
@@ -565,12 +572,15 @@ DataPool::set_eof(void)
 }
 
 void
-DataPool::stop(void)
+DataPool::stop(bool only_blocked)
 {
-   DEBUG_MSG("DataPool::stop(): Stopping this and dependent DataPools\n");
+   DEBUG_MSG("DataPool::stop(): Stopping this and dependent DataPools, only_blocked="
+	     << only_blocked << "\n");
    DEBUG_MAKE_INDENT(3);
 
-   stop_flag=true;
+   if (only_blocked) stop_blocked_flag=true;
+   else stop_flag=true;
+   
 
    wake_up_all_readers();
 
