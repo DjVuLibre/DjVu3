@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: XMLTags.cpp,v 1.14 2001-04-20 17:53:19 bcr Exp $
+// $Id: XMLTags.cpp,v 1.15 2001-04-20 18:29:20 praveen Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -131,7 +131,7 @@ isspaces(unsigned long const *s)
   {
     while(*s)
     {
-      if(!iswspace(*s++))
+      if(!iswspace((wint_t)*s++))
       {
         retval=false;
         break;

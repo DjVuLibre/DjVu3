@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GUnicode.cpp,v 1.10 2001-04-19 16:42:49 bcr Exp $
+// $Id: GUnicode.cpp,v 1.11 2001-04-20 18:29:20 praveen Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -509,9 +509,9 @@ UnicodeRep::UTF16BEtoUCS4(unsigned char const *&s,void const * const eptr)
   if(r <= eptr)
   {
     unsigned long const C1MSB=s[0];
-    if((C1MSB<0xD8)&&(C1MSB>0xDF))
+    if((C1MSB<0xD8)||(C1MSB>0xDF))
     {
-      if((U=(((C1MSB&0x3)<<8)|((unsigned long)s[1]))))
+      if((U=((C1MSB<<8)|((unsigned long)s[1]))))
       {
         s=r;
       }
@@ -528,7 +528,7 @@ UnicodeRep::UTF16BEtoUCS4(unsigned char const *&s,void const * const eptr)
           s=rr;
         }else
         {
-          U=(unsigned int)(-1)-(((C1MSB&0x3)<<8)|((unsigned long)s[1]));
+          U=(unsigned int)(-1)-((C1MSB<<8)|((unsigned long)s[1]));
           s=r;
         }
       }
@@ -545,9 +545,9 @@ UnicodeRep::UTF16LEtoUCS4(unsigned char const *&s,void const * const eptr)
   unsigned char const * const r=s+2;
   if(r <= eptr)
   {
-    if((C1MSB<0xD8)&&(C1MSB>0xDF))
+    if((C1MSB<0xD8)||(C1MSB>0xDF))
     {
-      if((U=(((C1MSB&0x3)<<8)|((unsigned long)s[1]))))
+      if((U=((C1MSB<<8)|((unsigned long)s[0]))))
       {
         s=r;
       }
@@ -564,7 +564,7 @@ UnicodeRep::UTF16LEtoUCS4(unsigned char const *&s,void const * const eptr)
           s=rr;
         }else
         {
-          U=(((C1MSB&0x3)<<8)|((unsigned long)s[1]));
+          U=((C1MSB<<8)|((unsigned long)s[1]));
           s=r;
         }
       }

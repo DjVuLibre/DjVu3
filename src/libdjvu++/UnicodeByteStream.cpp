@@ -1,7 +1,7 @@
 //C-  Copyright © 2000-2001, LizardTech, Inc. All Rights Reserved.
 //C-              Unauthorized use prohibited.
 //
-// $Id: UnicodeByteStream.cpp,v 1.2 2001-03-06 19:55:42 bcr Exp $
+// $Id: UnicodeByteStream.cpp,v 1.3 2001-04-20 18:29:20 praveen Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -187,13 +187,13 @@ XMLByteStream::init(void)
     }
     case 0xFFFE:
     {
-      encodetype=GUnicode::UTF16BE;
+      encodetype=GUnicode::UTF16LE;
       buffer=GUnicode(buf+2,sizeof(buf)-2,encodetype);
       break;
     }
     case 0xFEFF:
     {
-      encodetype=GUnicode::UTF16LE;
+      encodetype=GUnicode::UTF16BE;
       buffer=GUnicode(buf+2,sizeof(buf)-2,encodetype);
       break;
     }
