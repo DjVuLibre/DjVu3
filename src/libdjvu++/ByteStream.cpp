@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.cpp,v 1.59 2001-04-05 16:06:26 bcr Exp $
+// $Id: ByteStream.cpp,v 1.60 2001-04-05 19:02:02 praveen Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 04/1997
@@ -998,6 +998,7 @@ GP<ByteStream>
 ByteStream::create(const int fd,char const * const mode,const bool closeme)
 {
   GP<ByteStream> retval;
+  const char *default_mode="rb";
 #ifdef UNIX
   if((!mode&&(fd!=1)&&(fd!=2))||(mode&&!strcmp(mode,"rb")))
   {
@@ -1009,7 +1010,7 @@ ByteStream::create(const int fd,char const * const mode,const bool closeme)
       retval=0;
     }
   }
-  const char *default_mode="rb";
+  default_mode="rb";
   if(!retval)
 #endif
   {
