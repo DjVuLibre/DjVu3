@@ -93,6 +93,7 @@ require_make_stlib
 
 generate_makefile src/libdjvu++
 generate_makefile src/libdjvu++/Test
+generate_makefile src/libdjvu++/Tools
 
 if [ "$with_jpeg" = yes ] 
 then
