@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.91 1999-12-21 22:12:37 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.92 2000-01-05 20:31:53 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -154,6 +154,7 @@ DjVuDocument::static_init_thread(void * cl_data)
    } CATCH(exc) {
       th->flags|=DjVuDocument::DOC_INIT_FAILED;
       TRY {
+	 th->check_unnamed_files();
 	 if (strcmp(exc.get_cause(), "STOP"))
 	    get_portcaster()->notify_error(th, exc.get_cause());
 	 else
@@ -180,7 +181,10 @@ DjVuDocument::init_thread(void)
    int size=iff.get_chunk(chkid);
    if (size==0) THROW("EOF");
    if (size<0 || size>10*1024*1024)
-      THROW("The main stream is not IFF stream.");
+      THROW("Not a DjVu file.\n\n"
+	    "Either the requested file does not exist,\n"
+	    "or it exists but its type is not supported\n"
+	    "by the DjVu plugin.");
 
    if (chkid=="FORM:DJVM")
    {
@@ -345,12 +349,26 @@ DjVuDocument::check_unnamed_files(void)
    DEBUG_MSG("DjVuDocument::check_unnamed_files(): Seeing if we can fix some...\n");
    DEBUG_MAKE_INDENT(3);
 
+   if (flags & DOC_INIT_FAILED)
+   {
+	 // Init failed. All unnamed files should be terminated
+      GCriticalSectionLock lock(&ufiles_lock);
+      for(GPosition pos=ufiles_list;pos;++pos)
+      {
+          GP<DjVuFile> file=ufiles_list[pos]->file;
+          file->stop_decode(true);
+	  file->stop(false);	// Disable any access to data
+      }
+      ufiles_list.empty();
+      return;
+   }
+   
    if ((flags & DOC_TYPE_KNOWN)==0) return;
    
       // See the list of unnamed files (created when there was insufficient
       // information about DjVuDocument structure) and try to fix those,
       // which can be fixed at this time
-   while(1)
+   while(true)
    {
       DjVuPortcaster * pcaster=get_portcaster();
 
