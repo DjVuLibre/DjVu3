@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuImage.cpp,v 1.20 1999-08-17 21:27:34 eaf Exp $
+//C- $Id: DjVuImage.cpp,v 1.21 1999-09-03 23:03:06 eaf Exp $
 
 
 #ifdef __GNUC__
@@ -281,7 +281,7 @@ class _DjVuImageNotifier : public DjVuPort
   GURL		  stream_url;
 public:
   _DjVuImageNotifier(DjVuInterface *notifier);
-  GP<DataRange> request_data(const DjVuPort *src, const GURL & url);
+  GP<DataPool> request_data(const DjVuPort *src, const GURL & url);
   void notify_redisplay(const DjVuPort *);
   void notify_relayout(const DjVuPort *);
   void notify_chunk_done(const DjVuPort *, const char *);
@@ -292,12 +292,12 @@ _DjVuImageNotifier::_DjVuImageNotifier(DjVuInterface *notifier)
 {
 }
 
-GP<DataRange> 
+GP<DataPool> 
 _DjVuImageNotifier::request_data(const DjVuPort *src, const GURL & url)
 {
   if (url!=stream_url)
     THROW("This stream cannot be decoded the old way.");
-  return new DataRange(stream_pool);
+  return stream_pool;
 }
 
 void

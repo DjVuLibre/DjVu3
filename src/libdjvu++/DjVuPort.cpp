@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuPort.cpp,v 1.9 1999-08-27 22:28:29 eaf Exp $
+//C- $Id: DjVuPort.cpp,v 1.10 1999-09-03 23:03:06 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -263,7 +263,7 @@ DjVuPortcaster::cache_djvu_file(const DjVuPort * source, class DjVuFile * file)
    }
 }
 
-GP<DataRange>
+GP<DataPool>
 DjVuPortcaster::request_data(const DjVuPort * source, const GURL & url)
 {
    GMap<const void *, void *> set;
@@ -271,7 +271,7 @@ DjVuPortcaster::request_data(const DjVuPort * source, const GURL & url)
    compute_closure(set, source);
    sort_closure(set, list);
 
-   GP<DataRange> data;
+   GP<DataPool> data;
    for(GPosition pos=list;pos;++pos)
    {
       DjVuPort * port=(DjVuPort *) list[pos];
@@ -457,7 +457,7 @@ DjVuPort::get_cached_file(const DjVuPort *, const GURL &) { return 0; }
 void
 DjVuPort::cache_djvu_file(const DjVuPort *, class DjVuFile *) {}
 
-GP<DataRange>
+GP<DataPool>
 DjVuPort::request_data(const DjVuPort *, const GURL &) { return 0; }
 
 bool
@@ -497,23 +497,24 @@ DjVuPort::notify_all_data_received(const DjVuPort *) {}
 //*************************** DjVuSimplePort *********************************
 //****************************************************************************
 
-GP<DataRange>
+GP<DataPool>
 DjVuSimplePort::request_data(const DjVuPort * source, const GURL & url)
 {
    TRY {
-      GString fname=GOS::url_to_filename(url);
-      if (GOS::basename(fname)=="-") fname="-";
-      
-      StdioByteStream str(fname, "rb");
-      GP<DataPool> pool=new DataPool();
+      if (url.is_local_file_url())
+      {
+	 GString fname=GOS::url_to_filename(url);
+	 if (GOS::basename(fname)=="-") fname="-";
 
-      char buffer[1024];
-      int length;
-      while((length=str.read(buffer, 1024)))
-	 pool->add_data(buffer, length);
-   
-      pool->set_eof();
-      return new DataRange(pool);
+	 GP<DataPool> pool=new DataPool();
+	 StdioByteStream str(fname, "rb");
+	 char buffer[1024];
+	 int length;
+	 while((length=str.read(buffer, 1024)))
+	    pool->add_data(buffer, length);
+	 pool->set_eof();
+	 return pool;
+      }
    } CATCH(exc) {
    } ENDCATCH;
    return 0;
@@ -537,16 +538,13 @@ DjVuSimplePort::notify_status(const DjVuPort * source, const char * msg)
 //*************************** DjVuMemoryPort *********************************
 //****************************************************************************
 
-GP<DataRange>
+GP<DataPool>
 DjVuMemoryPort::request_data(const DjVuPort * source, const GURL & url)
 {
-   TRY {
-      GCriticalSectionLock lk(&lock);
-      for(GPosition pos=list;pos;++pos)
-	 if (list[pos]->url==url)
-	    return new DataRange(list[pos]->pool);
-   } CATCH(exc) {
-   } ENDCATCH;
+   GCriticalSectionLock lk(&lock);
+   for(GPosition pos=list;pos;++pos)
+      if (list[pos]->url==url)
+	 return list[pos]->pool;
    return 0;
 }
 

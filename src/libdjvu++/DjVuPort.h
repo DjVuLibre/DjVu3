@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuPort.h,v 1.5 1999-08-27 22:28:29 eaf Exp $
+//C- $Id: DjVuPort.h,v 1.6 1999-09-03 23:03:06 eaf Exp $
  
 #ifndef _DJVUPORT_H
 #define _DJVUPORT_H
@@ -68,7 +68,7 @@
     
     @memo DjVu decoder communication mechanism.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuPort.h,v 1.5 1999-08-27 22:28:29 eaf Exp $#
+    @version #$Id: DjVuPort.h,v 1.6 1999-09-03 23:03:06 eaf Exp $#
 */
 
 //@{
@@ -143,14 +143,14 @@ public:
 	  initialized with a #URL#, not the document data. As soon as
 	  they need the data, they call this function, which responsibility
 	  is to locate the source of the data basing on the #URL# passed
-	  and return it back in the form of the \Ref{DataRange}. If this
+	  and return it back in the form of the \Ref{DataPool}. If this
 	  particular receiver is unable to fullfil the request, it should
 	  return #ZERO#.
 
 	  @param source The sender of the request
 	  @param url The URL of the data.
-	  @return The \Ref{DataRange} attached to the \Ref{DataPool} with data. */
-   virtual GP<DataRange>request_data(const DjVuPort * source, const GURL & url);
+	  @return The \Ref{DataPool} with data. */
+   virtual GP<DataPool>	request_data(const DjVuPort * source, const GURL & url);
 
       /** This notification is sent when an error occurs and the error message
 	  should be shown to the user. If the receiver is unable to process
@@ -256,10 +256,10 @@ public:
       /// Returns 1 if #class_name# is #"DjVuPort"# or #"DjVuSimplePort"#.
    virtual bool		inherits(const char * class_name) const;
 
-      /** If #url# is local, it opens the corresponding file, creates and
-	  fills \Ref{DataPool} and returns \Ref{DataRange} attached to it.
+      /** If #url# is local, it created a \Ref{DataPool}, connects it
+	  to the file with the given name and returns.
 	  Otherwise returns #ZERO#. */
-   virtual GP<DataRange>request_data(const DjVuPort * source, const GURL & url);
+   virtual GP<DataPool>	request_data(const DjVuPort * source, const GURL & url);
 
       /// Displays error on #stderr#. Always returns 1.
    virtual bool		notify_error(const DjVuPort * source, const char * msg);
@@ -288,7 +288,7 @@ public:
       /** If #url# is one of those, that have been added before by means
 	  of \Ref{add_data}() function, it will return the associated
 	  \Ref{DataPool}. #ZERO# otherwize. */
-   virtual GP<DataRange>request_data(const DjVuPort * source, const GURL & url);
+   virtual GP<DataPool>	request_data(const DjVuPort * source, const GURL & url);
 
       /** Adds #<url, pool># pair to the internal map. From now on, if
 	  somebody asks for data corresponding to the #url#, it will
@@ -391,8 +391,8 @@ public:
    virtual void		cache_djvu_file(const DjVuPort * source, class DjVuFile * file);
       /** Computes destination list for #source# and calls the corresponding
 	  function in each of the ports from the destination list starting from
-	  the closest until one of them returns non-zero \Ref{DataRange}. */
-   virtual GP<DataRange>request_data(const DjVuPort * source, const GURL & url);
+	  the closest until one of them returns non-zero \Ref{DataPool}. */
+   virtual GP<DataPool>	request_data(const DjVuPort * source, const GURL & url);
 
       /** Computes destination list for #source# and calls the corresponding.
 	  function in each of the ports from the destination starting from

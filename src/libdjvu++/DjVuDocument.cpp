@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.24 1999-09-01 18:39:56 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.25 1999-09-03 23:03:06 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -53,110 +53,101 @@ DjVuDocument::detect_doc_type(const GURL & doc_url)
    DEBUG_MAKE_INDENT(3);
 
    DjVuPortcaster * pcaster=get_portcaster();
-   GP<DataRange> data_range=pcaster->request_data(this, doc_url);
-   if (!data_range) 
-     THROW("Failed to get data for URL '"+doc_url+"'");
+   GP<DataPool> data_pool=pcaster->request_data(this, doc_url);
+   if (!data_pool) 
+      THROW("Failed to get data for URL '"+doc_url+"'");
 
-   init_data_pool=data_range->get_pool();
+   init_data_pool=data_pool;
    
-   ByteStream * stream=0;
-   TRY {
-      stream=data_range->get_stream();
-      IFFByteStream iff(*stream);
-      GString chkid;
-      int size=iff.get_chunk(chkid);
-      if (size==0) THROW("EOF");
-      if (size<0 || size>10*1024*1024)
-         THROW("The main stream is not IFF stream.");
+   GP<ByteStream> stream=data_pool->get_stream();
+   IFFByteStream iff(*stream);
+   GString chkid;
+   int size=iff.get_chunk(chkid);
+   if (size==0) THROW("EOF");
+   if (size<0 || size>10*1024*1024)
+      THROW("The main stream is not IFF stream.");
 
-      if (chkid=="FORM:DJVM")
+   if (chkid=="FORM:DJVM")
+   {
+      DEBUG_MSG("Got DJVM document here\n");
+      DEBUG_MAKE_INDENT(3);
+
+      size=iff.get_chunk(chkid);
+      if (chkid=="DIRM")
       {
-	 DEBUG_MSG("Got DJVM document here\n");
-	 DEBUG_MAKE_INDENT(3);
-
-	 size=iff.get_chunk(chkid);
-	 if (chkid=="DIRM")
+	 djvm_dir=new DjVmDir();
+	 djvm_dir->decode(iff);
+	 iff.close_chunk();
+	 if (djvm_dir->is_bundled())
 	 {
-	    djvm_dir=new DjVmDir();
-	    djvm_dir->decode(iff);
-	    iff.close_chunk();
-	    if (djvm_dir->is_bundled())
-	    {
-	       DEBUG_MSG("Got BUNDLED file.\n");
-	       doc_type=BUNDLED;
-	    } else
-	    {
-	       DEBUG_MSG("Got INDIRECT file.\n");
-	       doc_type=INDIRECT;
-	    }
-	 } else if (chkid=="DIR0")
+	    DEBUG_MSG("Got BUNDLED file.\n");
+	    doc_type=BUNDLED;
+	 } else
 	 {
-	    DEBUG_MSG("Got OLD_BUNDLED file.\n");
-	    doc_type=OLD_BUNDLED;
-	 } else THROW("Unknown document format. Can't decode.");
-
-	 if (doc_type==OLD_BUNDLED)
-	 {
-	       // Read the DjVmDir0 directory. We are unable to tell what
-	       // files are pages and what are included at this point.
-	       // We only know that the first file with DJVU (BM44 or PM44)
-	       // form *is* the first page. The rest will become known
-	       // after we decode DjVuNavDir
-	    djvm_dir0=new DjVmDir0();
-	    djvm_dir0->decode(iff);
-	    iff.close_chunk();
-
-	       // Get offset to the first DJVU, PM44 or BM44 chunk
-	    int first_page_offset=0;
-	    while(!first_page_offset)
-	    {
-	       int offset;
-	       size=iff.get_chunk(chkid, &offset);
-	       if (size==0) THROW("Failed to find any page in this document.");
-	       if (chkid=="FORM:DJVU" || chkid=="FORM:PM44" || chkid=="FORM:BM44")
-	       {
-		  DEBUG_MSG("Got 1st page offset=" << offset << "\n");
-		  first_page_offset=offset;
-	       }
-	       iff.close_chunk();
-	    }
-
-	       // Now get the name of this file
-	    int file_num;
-	    GString first_page_name;
-	    for(file_num=0;file_num<djvm_dir0->get_files_num();file_num++)
-	    {
-	       DjVmDir0::FileRec & file=*djvm_dir0->get_file(file_num);
-	       if (file.offset==first_page_offset)
-	       {
-		  first_page_name=file.name;
-		  break;
-	       }
-	    }
-	    if (!first_page_name.length())
-	       THROW("Failed to find any page in this document.");
-
-	       // Create dummy DjVuNavDir and insert the first page into it
-	    ndir=new DjVuNavDir(init_url+"directory");
-	    ndir->insert_page(-1, first_page_name);
+	    DEBUG_MSG("Got INDIRECT file.\n");
+	    doc_type=INDIRECT;
 	 }
-      } else // chkid!="FORM:DJVM"
+      } else if (chkid=="DIR0")
       {
-	    // DJVU format
-	 DEBUG_MSG("Got DJVU INDEXED document here.\n");
-	 doc_type=INDEXED;
+	 DEBUG_MSG("Got OLD_BUNDLED file.\n");
+	 doc_type=OLD_BUNDLED;
+      } else THROW("Unknown document format. Can't decode.");
 
-	    // Create dummy DjVuNavDir and insert this page into it
-	 ndir=new DjVuNavDir(init_url.base()+"directory");
-	 ndir->insert_page(-1, init_url.name());
+      if (doc_type==OLD_BUNDLED)
+      {
+	    // Read the DjVmDir0 directory. We are unable to tell what
+	    // files are pages and what are included at this point.
+	    // We only know that the first file with DJVU (BM44 or PM44)
+	    // form *is* the first page. The rest will become known
+	    // after we decode DjVuNavDir
+	 djvm_dir0=new DjVmDir0();
+	 djvm_dir0->decode(iff);
+	 iff.close_chunk();
+
+	    // Get offset to the first DJVU, PM44 or BM44 chunk
+	 int first_page_offset=0;
+	 while(!first_page_offset)
+	 {
+	    int offset;
+	    size=iff.get_chunk(chkid, &offset);
+	    if (size==0) THROW("Failed to find any page in this document.");
+	    if (chkid=="FORM:DJVU" || chkid=="FORM:PM44" || chkid=="FORM:BM44")
+	    {
+	       DEBUG_MSG("Got 1st page offset=" << offset << "\n");
+	       first_page_offset=offset;
+	    }
+	    iff.close_chunk();
+	 }
+
+	    // Now get the name of this file
+	 int file_num;
+	 GString first_page_name;
+	 for(file_num=0;file_num<djvm_dir0->get_files_num();file_num++)
+	 {
+	    DjVmDir0::FileRec & file=*djvm_dir0->get_file(file_num);
+	    if (file.offset==first_page_offset)
+	    {
+	       first_page_name=file.name;
+	       break;
+	    }
+	 }
+	 if (!first_page_name.length())
+	    THROW("Failed to find any page in this document.");
+
+	    // Create dummy DjVuNavDir and insert the first page into it
+	 ndir=new DjVuNavDir(init_url+"directory");
+	 ndir->insert_page(-1, first_page_name);
       }
-   } CATCH(exc) {
-      delete stream; 
-      stream=0;
-      RETHROW;
-   } ENDCATCH;
-   delete stream; 
-   stream=0;
+   } else // chkid!="FORM:DJVM"
+   {
+	 // DJVU format
+      DEBUG_MSG("Got DJVU INDEXED document here.\n");
+      doc_type=INDEXED;
+
+	 // Create dummy DjVuNavDir and insert this page into it
+      ndir=new DjVuNavDir(init_url.base()+"directory");
+      ndir->insert_page(-1, init_url.name());
+   }
 }
 
 void
@@ -413,7 +404,7 @@ DjVuDocument::cache_djvu_file(const DjVuPort * source, DjVuFile * file)
    }
 }
 
-GP<DataRange>
+GP<DataPool>
 DjVuDocument::request_data(const DjVuPort * source, const GURL & url)
 {
    DEBUG_MSG("DjVuDocument::request_data(): seeing if we can do it\n");
@@ -431,7 +422,7 @@ DjVuDocument::request_data(const DjVuPort * source, const GURL & url)
 	 
 	 GP<DjVmDir0::FileRec> file=djvm_dir0->get_file(url.name());
 	 if (!file) THROW("File '"+url.name()+"' is not in this bundle.");
-	 return new DataRange(init_data_pool, file->offset, file->size);
+	 return new DataPool(init_data_pool, file->offset, file->size);
       }
       case BUNDLED:
       {
@@ -441,7 +432,7 @@ DjVuDocument::request_data(const DjVuPort * source, const GURL & url)
 	 
 	 GP<DjVmDir::File> file=djvm_dir->name_to_file(url.name());
 	 if (!file) THROW("File '"+url.name()+"' is not in this bundle.");
-	 return new DataRange(init_data_pool, file->offset, file->size);
+	 return new DataPool(init_data_pool, file->offset, file->size);
       }
       case INDEXED:
       case INDIRECT:
@@ -465,7 +456,7 @@ DjVuDocument::request_data(const DjVuPort * source, const GURL & url)
 	    while((length=str.read(buffer, 1024)))
 	       pool->add_data(buffer, length);
 	    pool->set_eof();
-	    return new DataRange(pool);
+	    return pool;
 	 }
       }
    }
@@ -704,7 +695,7 @@ DjVuDocument::get_djvm_doc(void)
       {
 	 GP<DjVmDir::File> f=new DjVmDir::File(*files_list[pos]);
 	 GP<DjVuFile> file=get_djvu_file(id_to_url(f->id));
-	 doc->insert_file(f, file->get_data_range());
+	 doc->insert_file(f, file->get_data_pool());
       }
    } else
    {

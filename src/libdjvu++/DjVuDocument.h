@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.h,v 1.13 1999-09-01 23:47:55 leonb Exp $
+//C- $Id: DjVuDocument.h,v 1.14 1999-09-03 23:03:06 eaf Exp $
  
 #ifndef _DJVUDOCUMENT_H
 #define _DJVUDOCUMENT_H
@@ -33,7 +33,7 @@
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocument.h,v 1.13 1999-09-01 23:47:55 leonb Exp $#
+    @version #$Id: DjVuDocument.h,v 1.14 1999-09-03 23:03:06 eaf Exp $#
 */
 
 //@{
@@ -280,7 +280,7 @@ public:
    virtual GURL		id_to_url(const DjVuPort * source, const char * id);
    virtual GPBase	get_cached_file(const DjVuPort * source, const GURL & url);
    virtual void		cache_djvu_file(const DjVuPort * source, DjVuFile * file);
-   virtual GP<DataRange>request_data(const DjVuPort * source, const GURL & url);
+   virtual GP<DataPool>	request_data(const DjVuPort * source, const GURL & url);
    virtual void		notify_chunk_done(const DjVuPort * source, const char * name);
    virtual void		notify_all_data_received(const DjVuPort * source);
 protected:

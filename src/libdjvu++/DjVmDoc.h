@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVmDoc.h,v 1.4 1999-09-01 23:47:55 leonb Exp $
+//C- $Id: DjVmDoc.h,v 1.5 1999-09-03 23:03:06 eaf Exp $
  
 #ifndef _DJVMDOC_H
 #define _DJVMDOC_H
@@ -33,7 +33,7 @@
 
     @memo DjVu multipage documents reader/writer.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: DjVmDoc.h,v 1.4 1999-09-01 23:47:55 leonb Exp $#
+    @version #$Id: DjVmDoc.h,v 1.5 1999-09-03 23:03:06 eaf Exp $#
 */
 
 //@{
@@ -67,7 +67,7 @@ class DjVmDoc : public GPEnabled
 {
 private:
    GP<DjVmDir>			dir;
-   GMap<GString, GP<DataRange> >	data;
+   GMap<GString, GP<DataPool> >	data;
 
       // Internal function.
    
@@ -85,7 +85,7 @@ public:
 	  This is the same function as the previous one except for the
 	  way in which data is provided.
       */
-   void		insert_file(DjVmDir::File * f, GP<DataRange> data, int pos=-1);
+   void		insert_file(DjVmDir::File * f, GP<DataPool> data, int pos=-1);
    
       /** Removes file with the specified #id# from the document. Every
 	  file inside a new DjVu multipage document has its unique ID
@@ -100,7 +100,7 @@ public:
       /** Returns contents of file with ID #id# from the document.
 	  Please refer to \Ref{DjVmDir} for the explanation of what
           IDs mean. */
-   GP<DataRange>get_data(const char * id);
+   GP<DataPool>	get_data(const char * id);
 
       /** Reading routines */
       //@{

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.h,v 1.20 1999-09-02 19:05:24 leonb Exp $
+//C- $Id: DjVuFile.h,v 1.21 1999-09-03 23:03:06 eaf Exp $
  
 #ifndef _DJVUFILE_H
 #define _DJVUFILE_H
@@ -46,7 +46,7 @@
 
     @memo Classes representing DjVu files.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuFile.h,v 1.20 1999-09-02 19:05:24 leonb Exp $#
+    @version #$Id: DjVuFile.h,v 1.21 1999-09-03 23:03:06 eaf Exp $#
 */
 
 //@{
@@ -367,7 +367,7 @@ public:
       //@}
 
       // Internal: used by DjVuDocument
-   GP<DataRange>	get_data_range(void) const { return data_range; };
+   GP<DataPool>		get_data_pool(void) const { return data_pool; };
 
       // Functions inherited from DjVuPort
    virtual bool		inherits(const char * class_name) const;
@@ -378,7 +378,7 @@ public:
    virtual void		notify_all_data_received(const DjVuPort * source);
 protected:
    GURL			url;
-   GP<DataRange>	data_range;
+   GP<DataPool	>	data_pool;
 
    GPList<DjVuFile>	inc_files_list;
    GCriticalSection	inc_files_lock;
@@ -401,7 +401,7 @@ private:
    GThread		* decode_thread;
    GEvent		decode_thread_started_ev;
    GP<DjVuFile>		decode_life_saver;
-   GP<DataRange>	decode_data_range;
+   GP<DataPool>		decode_data_pool;
 
    DjVuPort		* simple_port;
 
@@ -428,7 +428,7 @@ private:
       // INCL chunk processor
    GP<DjVuFile>	process_incl_chunk(ByteStream & str);
 
-      // Trigger: called when DataRange has all data
+      // Trigger: called when DataPool has all data
    static void	static_trigger_cb(void *);
    void		trigger_cb(void);
       // Progress callback: called from time to time

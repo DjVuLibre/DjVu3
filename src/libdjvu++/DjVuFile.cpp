@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.30 1999-09-02 19:21:58 leonb Exp $
+//C- $Id: DjVuFile.cpp,v 1.31 1999-09-03 23:03:06 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -19,12 +19,10 @@
 #include "BSByteStream.h"
 #include "debug.h"
 
-
-
 class ProgressByteStream : public ByteStream
 {
 public:
-   ProgressByteStream(ByteStream * xstr) : str(xstr),
+   ProgressByteStream(const GP<ByteStream> & xstr) : str(xstr),
       last_call_pos(0) {}
    virtual ~ProgressByteStream() {}
 
@@ -63,7 +61,7 @@ public:
       progress_cl_data=xprogress_cl_data;
    }
 private:
-   ByteStream	* str;
+   GP<ByteStream> str;
    void		* progress_cl_data;
    void		(* progress_cb)(int pos, void *);
    int		last_call_pos;
@@ -81,7 +79,7 @@ DjVuFile::DjVuFile(ByteStream & str) : status(0), simple_port(0)
    decode_thread=0;
 
       // Read the data from the stream
-   GP<DataPool> data_pool=new DataPool();
+   data_pool=new DataPool();
    char buffer[1024];
    int length;
    while((length=str.read(buffer, 1024)))
@@ -91,9 +89,8 @@ DjVuFile::DjVuFile(ByteStream & str) : status(0), simple_port(0)
    sprintf(buffer, "djvufile:/%p.djvu", this);
    url=buffer;
 
-      // Create the DataRange
-   data_range=new DataRange(data_pool);
-   data_range->add_trigger(-1, static_trigger_cb, this);
+      // Add (basically - call) the trigger
+   data_pool->add_trigger(-1, static_trigger_cb, this);
 
       // Ask to cache the newly created file
    get_portcaster()->cache_djvu_file(this, this);
@@ -119,9 +116,9 @@ DjVuFile::DjVuFile(const GURL & xurl, DjVuPort * port) :
       pcaster->add_route(this, simple_port);
    }
       
-   if (!(data_range=pcaster->request_data(this, url)))
+   if (!(data_pool=pcaster->request_data(this, url)))
       THROW("Failed get data for URL '"+url+"'");
-   data_range->add_trigger(-1, static_trigger_cb, this);
+   data_pool->add_trigger(-1, static_trigger_cb, this);
 
       // Ask to cache newly created file
    get_portcaster()->cache_djvu_file(this, this);
@@ -134,7 +131,7 @@ DjVuFile::~DjVuFile(void)
 
    {
       GCriticalSectionLock lock(&trigger_lock);
-      data_range->del_trigger(static_trigger_cb, this);
+      data_pool->del_trigger(static_trigger_cb, this);
    }
    
    stop_decode(1);
@@ -397,16 +394,15 @@ DjVuFile::decode_func(void)
    decode_life_saver=0;
 
    DjVuPortcaster * pcaster=get_portcaster();
-   ByteStream * decode_stream=0;
-   
+
    TRY {
-      decode_data_range=new DataRange(*data_range);
-      decode_stream=decode_data_range->get_stream();
-      ProgressByteStream pstr(decode_stream);
-      pstr.set_progress_cb(progress_cb, this);
+      decode_data_pool=new DataPool(data_pool);
+      GP<ByteStream> decode_stream=decode_data_pool->get_stream();
+      GP<ProgressByteStream> pstr=new ProgressByteStream(decode_stream);
+      pstr->set_progress_cb(progress_cb, this);
       decode_thread_started_ev.set();
       
-      decode(pstr);
+      decode(*pstr);
 
 	 // Wait for all child files to finish
       while(wait_for_finish(0));
@@ -430,7 +426,6 @@ DjVuFile::decode_func(void)
       }
    } CATCH(exc) {
       TRY {
-	 delete decode_stream; decode_stream=0;
 	 if (strcmp(exc.get_cause(), "STOP") == 0)
 	 {
 	    status_mon.enter();
@@ -453,8 +448,6 @@ DjVuFile::decode_func(void)
    } ENDCATCH;
 
    TRY {
-      delete decode_stream; decode_stream=0;
-      
       status_mon.enter();
       if (is_decoding())
       {
@@ -668,28 +661,15 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
               // Send chunk notifications
               int chksize;
               GString chkid;
-              ByteStream *str=0;
-              TRY 
-                {
-                  str=file->data_range->get_stream();
-                  IFFByteStream iff(*str);
-                  if (!iff.get_chunk(chkid)) 
-                    THROW("EOF");
-                  while((chksize=iff.get_chunk(chkid)))
-                    {
-                      get_portcaster()->notify_chunk_done(file, chkid);
-                      iff.close_chunk();
-                    }
-                } 
-              CATCH(exc) 
-                {
-                  delete str; 
-                  str=0;
-                  RETHROW;
-                } 
-              ENDCATCH;
-              delete str; 
-              str=0;
+              GP<ByteStream> str=file->data_pool->get_stream();
+	      IFFByteStream iff(*str);
+	      if (!iff.get_chunk(chkid)) 
+		 THROW("EOF");
+	      while((chksize=iff.get_chunk(chkid)))
+	      {
+		 get_portcaster()->notify_chunk_done(file, chkid);
+		 iff.close_chunk();
+	      }
             }
           else
             {
@@ -942,7 +922,7 @@ DjVuFile::stop_decode(bool sync)
       for(GPosition pos=inc_files_list;pos;++pos)
 	 inc_files_list[pos]->stop_decode(0);
 
-      if (decode_data_range) decode_data_range->stop();
+      if (decode_data_pool) decode_data_pool->stop();
    }
 
    if (sync)
@@ -975,25 +955,18 @@ DjVuFile::stop_decode(bool sync)
 void
 DjVuFile::process_incl_chunks(void)
 {
-   ByteStream * str=0;
-   TRY {
-      str=data_range->get_stream();
-      int chksize;
-      GString chkid;
-      IFFByteStream iff(*str);
-      if (iff.get_chunk(chkid))
+   GP<ByteStream> str=data_pool->get_stream();
+   int chksize;
+   GString chkid;
+   IFFByteStream iff(*str);
+   if (iff.get_chunk(chkid))
+   {
+      while((chksize=iff.get_chunk(chkid)))
       {
-	 while((chksize=iff.get_chunk(chkid)))
-	 {
-	    if (chkid=="INCL") process_incl_chunk(iff);
-	    iff.close_chunk();
-	 }
+	 if (chkid=="INCL") process_incl_chunk(iff);
+	 iff.close_chunk();
       }
-   } CATCH(exc) {
-      delete str; str=0;
-      RETHROW;
-   } ENDCATCH;
-   delete str; str=0;
+   }
    status|=INCL_FILES_CREATED;
 }
 
@@ -1038,34 +1011,25 @@ DjVuFile::decode_ndir(GMap<GURL, void *> & map)
    {
       map[url]=0;
       
-      ByteStream * str=0;
-
-      TRY {
-	 str=data_range->get_stream();
+      GP<ByteStream> str=data_pool->get_stream();
       
-	 int chksize;
-	 GString chkid;
-	 IFFByteStream iff(*str);
-	 if (!iff.get_chunk(chkid)) 
-           THROW("EOF");
+      int chksize;
+      GString chkid;
+      IFFByteStream iff(*str);
+      if (!iff.get_chunk(chkid)) 
+	 THROW("EOF");
 
-	 while((chksize=iff.get_chunk(chkid)))
+      while((chksize=iff.get_chunk(chkid)))
+      {
+	 if (chkid=="NDIR")
 	 {
-	    if (chkid=="NDIR")
-	    {
-	       GP<DjVuNavDir> d=new DjVuNavDir(url);
-	       d->decode(iff);
-	       dir=d;
-	       break;
-	    }
-	    iff.close_chunk();
+	    GP<DjVuNavDir> d=new DjVuNavDir(url);
+	    d->decode(iff);
+	    dir=d;
+	    break;
 	 }
-      } CATCH(exc) {
-	 delete str; str=0;
-	 RETHROW;
-      } ENDCATCH;
-   
-      delete str; str=0;
+	 iff.close_chunk();
+      }
 
       if (dir) return dir;
 
@@ -1137,7 +1101,7 @@ DjVuFile::trigger_cb(void)
    DEBUG_MSG("DjVuFile::trigger_cb(): got data for '" << url << "'\n");
    DEBUG_MAKE_INDENT(3);
 
-   file_size=data_range->get_length();
+   file_size=data_pool->get_length();
    status|=DATA_PRESENT;
    get_portcaster()->notify_file_data_received(this);
 
@@ -1168,7 +1132,7 @@ DjVuFile::progress_cb(int pos, void * cl_data)
 
    DjVuFile * th=(DjVuFile *) cl_data;
 
-   int length=th->decode_data_range->get_length();
+   int length=th->decode_data_pool->get_length();
    if (length>0)
    {
       float progress=(float) pos/length;
@@ -1176,7 +1140,7 @@ DjVuFile::progress_cb(int pos, void * cl_data)
       get_portcaster()->notify_decode_progress(th, progress);
    } else
    {
-      DEBUG_MSG("DataRange size is still unknown => ignoring\n");
+      DEBUG_MSG("DataPool size is still unknown => ignoring\n");
    };
 }
 
@@ -1188,24 +1152,17 @@ int
 DjVuFile::get_chunks_number(void)
 {
    int chunks=0;
-   ByteStream * str=0;
-   TRY {
-      str=data_range->get_stream();
-      int chksize;
-      GString chkid;
-      IFFByteStream iff(*str);
-      if (!iff.get_chunk(chkid)) 
-        THROW("EOF");
-      while((chksize=iff.get_chunk(chkid)))
-      {
-	 chunks++;
-	 iff.close_chunk();
-      }
-   } CATCH(exc) {
-      delete str; str=0;
-      RETHROW;
-   } ENDCATCH;
-   delete str; str=0;
+   GP<ByteStream> str=data_pool->get_stream();
+   int chksize;
+   GString chkid;
+   IFFByteStream iff(*str);
+   if (!iff.get_chunk(chkid)) 
+      THROW("EOF");
+   while((chksize=iff.get_chunk(chkid)))
+   {
+      chunks++;
+      iff.close_chunk();
+   }
    return chunks;
 }
 
@@ -1213,25 +1170,18 @@ GString
 DjVuFile::get_chunk_name(int chunk_num)
 {
    GString name;
-   ByteStream * str=0;
-   TRY {
-      str=data_range->get_stream();
-      int chksize;
-      GString chkid;
-      IFFByteStream iff(*str);
-      if (!iff.get_chunk(chkid)) 
-        THROW("EOF");
-      int chunk=0;
-      while((chksize=iff.get_chunk(chkid)))
-      {
-	 if (chunk++==chunk_num) { name=chkid; break; }
-	 iff.close_chunk();
-      }
-   } CATCH(exc) {
-      delete str; str=0;
-      RETHROW;
-   } ENDCATCH;
-   delete str; str=0;
+   GP<ByteStream> str=data_pool->get_stream();
+   int chksize;
+   GString chkid;
+   IFFByteStream iff(*str);
+   if (!iff.get_chunk(chkid)) 
+      THROW("EOF");
+   int chunk=0;
+   while((chksize=iff.get_chunk(chkid)))
+   {
+      if (chunk++==chunk_num) { name=chkid; break; }
+      iff.close_chunk();
+   }
    if (!name.length()) THROW("Too few chunks.");
    return name;
 }
@@ -1244,24 +1194,17 @@ DjVuFile::contains_chunk(const char * chunk_name)
    DEBUG_MAKE_INDENT(3);
    
    bool contains=0;
-   ByteStream * str=0;
-   TRY {
-      str=data_range->get_stream();
-      int chksize;
-      GString chkid;
-      IFFByteStream iff(*str);
-      if (!iff.get_chunk(chkid)) 
-        THROW("EOF");
-      while((chksize=iff.get_chunk(chkid)))
-      {
-	 if (chkid==chunk_name) { contains=1; break; }
-	 iff.close_chunk();
-      }
-   } CATCH(exc) {
-      delete str; str=0;
-      RETHROW;
-   } ENDCATCH;
-   delete str; str=0;
+   GP<ByteStream> str=data_pool->get_stream();
+   int chksize;
+   GString chkid;
+   IFFByteStream iff(*str);
+   if (!iff.get_chunk(chkid)) 
+      THROW("EOF");
+   while((chksize=iff.get_chunk(chkid)))
+   {
+      if (chkid==chunk_name) { contains=1; break; }
+      iff.close_chunk();
+   }
    return contains;
 }
 
@@ -1279,65 +1222,56 @@ DjVuFile::add_djvu_data(IFFByteStream & ostr, GMap<GURL, void *> & map,
    
    map[url]=0;
 
-   ByteStream * str=0;
-
    bool have_anta=contains_chunk("ANTa");
    
-   TRY {
-      str=data_range->get_stream();
-      int chksize;
-      GString chkid;
-      IFFByteStream iff(*str);
-      if (!iff.get_chunk(chkid)) 
-        THROW("EOF");
+   GP<ByteStream> str=data_pool->get_stream();
+   int chksize;
+   GString chkid;
+   IFFByteStream iff(*str);
+   if (!iff.get_chunk(chkid)) 
+      THROW("EOF");
 
-      if (top_level) ostr.put_chunk(chkid);
+   if (top_level) ostr.put_chunk(chkid);
 
-      int chunk_num=0;
-      while((chksize=iff.get_chunk(chkid)))
+   int chunk_num=0;
+   while((chksize=iff.get_chunk(chkid)))
+   {
+      if (chkid=="INCL" && included_too)
       {
-	 if (chkid=="INCL" && included_too)
-	 {
-	    GP<DjVuFile> file=process_incl_chunk(iff);
-	    if (file) file->add_djvu_data(ostr, map, included_too, no_ndir);
-	 } else if (chkid=="ANTa" && anno && !anno->is_empty())
-	 {
-	    ostr.put_chunk(chkid);
-	    anno->encode(ostr);
-	    ostr.close_chunk();
-	 } else if (chkid=="NDIR" && dir && !no_ndir)
-	 {
-	    ostr.put_chunk(chkid);
-	    dir->encode(ostr);
-	    ostr.close_chunk();
-	 } else if (!no_ndir || chkid!="NDIR")
-	 {
-	    ostr.put_chunk(chkid);
-	    char buffer[1024];
-	    int length;
-	    while((length=iff.read(buffer, 1024)))
-	       ostr.writall(buffer, length);
-	    ostr.close_chunk();
-	 }
-	 iff.close_chunk();
-
-	 if (!have_anta && chunk_num==0 &&
-	     anno && !anno->is_empty())
-	 {
-	    ostr.put_chunk("ANTa");
-	    anno->encode(ostr);
-	    ostr.close_chunk();
-	 }
-	 chunk_num++;
+	 GP<DjVuFile> file=process_incl_chunk(iff);
+	 if (file) file->add_djvu_data(ostr, map, included_too, no_ndir);
+      } else if (chkid=="ANTa" && anno && !anno->is_empty())
+      {
+	 ostr.put_chunk(chkid);
+	 anno->encode(ostr);
+	 ostr.close_chunk();
+      } else if (chkid=="NDIR" && dir && !no_ndir)
+      {
+	 ostr.put_chunk(chkid);
+	 dir->encode(ostr);
+	 ostr.close_chunk();
+      } else if (!no_ndir || chkid!="NDIR")
+      {
+	 ostr.put_chunk(chkid);
+	 char buffer[1024];
+	 int length;
+	 while((length=iff.read(buffer, 1024)))
+	    ostr.writall(buffer, length);
+	 ostr.close_chunk();
       }
+      iff.close_chunk();
 
-      if (top_level) ostr.close_chunk();
-   } CATCH(exc) {
-      delete str; str=0;
-      RETHROW;
-   } ENDCATCH;
+      if (!have_anta && chunk_num==0 &&
+	  anno && !anno->is_empty())
+      {
+	 ostr.put_chunk("ANTa");
+	 anno->encode(ostr);
+	 ostr.close_chunk();
+      }
+      chunk_num++;
+   }
 
-   delete str; str=0;
+   if (top_level) ostr.close_chunk();
 }
 
 TArray<char>
