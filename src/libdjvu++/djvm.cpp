@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: djvm.cpp,v 1.3 1999-05-25 19:42:30 eaf Exp $
+//C- $Id: djvm.cpp,v 1.4 1999-05-26 20:36:43 eaf Exp $
 
 /** @name djvm
 
@@ -55,7 +55,7 @@
 
 	     This will insert page represented by file #<page.djvu># into
 	     document #<doc.djvu># at the position number #<page_num># (starts
-	     from 0).
+	     from #1#).
 	     
        \item To delete a page
 
@@ -64,7 +64,7 @@
 	     This will remove page number #<page_num># from document
 	     #<doc.djvu>#. If there will be only one page left in #<doc.djvu>#
 	     after deletion, it will automatically be converted into a
-	     single page DjVu file format.
+	     single page DjVu file format. Page numbering starts from #1#.
 
        \item To view document contents
 
@@ -78,7 +78,7 @@
     @author
     Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: djvm.cpp,v 1.3 1999-05-25 19:42:30 eaf Exp $# */
+    #$Id: djvm.cpp,v 1.4 1999-05-26 20:36:43 eaf Exp $# */
 //@{
 //@}
 
@@ -140,7 +140,9 @@ insert(int argc, char ** argv)
    if (argc!=5) { usage(); exit(1); }
    GP<DjVuDocument> doc=new DjVuDocument(GOS::filename_to_url(argv[2]), 0);
    GP<DjVuFile> file=new DjVuFile(GOS::filename_to_url(argv[3]));
-   doc->insert_page(file, atoi(argv[4]));
+   int page_num=atoi(argv[4])-1;
+   if (page_num<0) { fprintf(stderr, "Page number must be positive.\n"); exit(1); }
+   doc->insert_page(file, page_num);
    doc->save_as_djvm(argv[2]);
 }
 
@@ -150,7 +152,9 @@ del(int argc, char ** argv)
 {
    if (argc!=4) { usage(); exit(1); }
    GP<DjVuDocument> doc=new DjVuDocument(GOS::filename_to_url(argv[2]), 0);
-   doc->delete_page(atoi(argv[3]));
+   int page_num=atoi(argv[3])-1;
+   if (page_num<0) { fprintf(stderr, "Page number must be positive.\n"); exit(1); }
+   doc->delete_page(page_num);
    doc->save_as_djvm(argv[2]);
 }
 
