@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.73 1999-10-12 19:42:21 eaf Exp $
+//C- $Id: DjVuFile.cpp,v 1.74 1999-10-12 20:10:59 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -1269,7 +1269,6 @@ DjVuFile::add_djvu_data(IFFByteStream & ostr, GMap<GURL, void *> & map,
               GCriticalSectionLock lock(&inc_files_lock);  // anno_lock ?
               ostr.put_chunk("FORM:ANNO");
               anno->seek(0);
-	      fprintf(stderr, "size=%d\n", anno->size());
               ostr.copy(*anno);
               ostr.close_chunk();
             }
@@ -1300,7 +1299,6 @@ DjVuFile::add_djvu_data(IFFByteStream & ostr, GMap<GURL, void *> & map,
        GCriticalSectionLock lock(&inc_files_lock);  // anno_lock ?
        ostr.put_chunk("FORM:ANNO");
        anno->seek(0);
-       fprintf(stderr, "size=%d\n", anno->size());
        ostr.copy(*anno);
        ostr.close_chunk();
      }
