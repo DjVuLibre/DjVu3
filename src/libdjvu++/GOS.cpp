@@ -7,9 +7,9 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: GOS.cpp,v 1.3 1999-02-15 23:54:11 leonb Exp $
+//C-  $Id: GOS.cpp,v 1.4 1999-02-26 17:18:24 leonb Exp $
 
-// "$Id: GOS.cpp,v 1.3 1999-02-15 23:54:11 leonb Exp $"
+// "$Id: GOS.cpp,v 1.4 1999-02-26 17:18:24 leonb Exp $"
 
 #ifdef __GNUC__
 #pragma implementation
@@ -728,6 +728,26 @@ GOS::url_to_filename(const char *url)
   // Return what we have
   return tmp;
 }
+
+
+// -----------------------------------------
+// Testing
+// -----------------------------------------
+
+#if defined(sun) && ! defined(svr4)
+// strerror() is not defined under SunOS.
+char *
+strerror(int errno)
+{
+  extern int sys_nerr;
+  extern char *sys_errlist[];
+  if (errno>0 && errno<sys_nerr) 
+    return sys_errlist[errno];
+  return "unknown stdio error";
+}
+#endif
+
+
 
 // -----------------------------------------
 // Testing
