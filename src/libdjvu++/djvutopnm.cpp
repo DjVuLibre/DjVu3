@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: djvutopnm.cpp,v 1.17.4.2 1999-04-29 20:11:30 eaf Exp $
+//C- $Id: djvutopnm.cpp,v 1.17.4.3 1999-05-04 15:22:35 eaf Exp $
 
 
 /** @name djvutopnm
@@ -87,7 +87,7 @@
     Yann Le Cun <yann@research.att.com>\\
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: djvutopnm.cpp,v 1.17.4.2 1999-04-29 20:11:30 eaf Exp $# */
+    #$Id: djvutopnm.cpp,v 1.17.4.3 1999-05-04 15:22:35 eaf Exp $# */
 //@{
 //@}
 
@@ -120,7 +120,7 @@ convert(const char *from, const char *to, int page_num)
 
      // Create DjVuDocument
   GURL from_url=GOS::filename_to_url(from);
-  GP<DjVuDocument> doc=new DjVuDocument(from_url);
+  GP<DjVuDocument> doc=new DjVuDocument(from_url, 1);
 
   if (page_num>0)
   {
