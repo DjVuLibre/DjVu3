@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVmDoc.cpp,v 1.22 2000-02-05 22:22:02 bcr Exp $
+//C- $Id: DjVmDoc.cpp,v 1.23 2000-02-28 17:42:53 parag Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -153,7 +153,7 @@ DjVmDoc::write(ByteStream & str)
 	 int size;
 	 GString chkid;
 	 size=iff_in.get_chunk(chkid);
-	 if (size<0 || size>1024*1024)
+	 if (size<0 || size>0x7fffffff)
 	    THROW("File '"+file->id+"' is not in IFF format.");
       } CATCH(exc) {
 	 THROW("File '"+file->id+"' is not in IFF format.");
