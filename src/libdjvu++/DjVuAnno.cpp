@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuAnno.cpp,v 1.5 1999-06-09 21:24:20 leonb Exp $
+//C- $Id: DjVuAnno.cpp,v 1.6 1999-06-30 15:12:17 eaf Exp $
 
 
 #ifdef __GNUC__
@@ -523,6 +523,16 @@ DjVuAnno::decode(ByteStream & str)
 }
 
 void
+DjVuAnno::decode(const char * str)
+{
+   GCriticalSectionLock lock(&class_lock);
+
+   raw=str;
+   GLParser parser(raw);
+   decode(parser);
+}
+
+void
 DjVuAnno::merge(ByteStream & str)
 {
    GCriticalSectionLock lock(&class_lock);
@@ -885,10 +895,10 @@ DjVuAnno::encode_raw(void) const
    del_all_items(MODE_TAG, parser);
    if (mode!=MODE_UNSPEC)
    {
-      if (mode==MODE_COLOR) strcpy(buffer, "(" ZOOM_TAG " color)");
-      else if (mode==MODE_FORE) strcpy(buffer, "(" ZOOM_TAG " fore)");
-      else if (mode==MODE_BACK) strcpy(buffer, "(" ZOOM_TAG " back)");
-      else if (mode==MODE_BW) strcpy(buffer, "(" ZOOM_TAG " bw)");
+      if (mode==MODE_COLOR) strcpy(buffer, "(" MODE_TAG " color)");
+      else if (mode==MODE_FORE) strcpy(buffer, "(" MODE_TAG " fore)");
+      else if (mode==MODE_BACK) strcpy(buffer, "(" MODE_TAG " back)");
+      else if (mode==MODE_BW) strcpy(buffer, "(" MODE_TAG " bw)");
       parser.parse(buffer);
    }
 
