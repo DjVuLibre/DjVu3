@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.81 1999-10-28 17:32:59 snwiz Exp $
+//C- $Id: DjVuFile.cpp,v 1.82 1999-11-09 17:41:22 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -563,6 +563,23 @@ DjVuFile::get_fgjd(int block)
    return 0;
 }
 
+int
+DjVuFile::get_dpi(int w, int h)
+{
+   int dpi=0, red=1;
+   if (info)
+   {
+      for(red=1; red<=12; red++)
+	 if ((info->width+red-1)/red==w)
+	    if ((info->height+red-1)/red==h)
+	       break;
+      if (red>12)
+	 THROW("DjVu Decoder: Corrupted data (Incorrect size in BG44 chunk)\n");
+      dpi=info->dpi;
+   }
+   return (dpi ? dpi : 300)/red;
+}
+
 GString
 DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bool iw44)
 {
@@ -714,13 +731,16 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
           GP<IWPixmap> bg44=new IWPixmap();
           bg44->decode_chunk(iff);
           DjVuFile::bg44=bg44;
-          desc.format("IW44 background (%dx%d)", bg44->get_width(), bg44->get_height());
+          desc.format("IW44 background (%dx%d, %d dpi)",
+		      bg44->get_width(), bg44->get_height(),
+		      get_dpi(bg44->get_width(), bg44->get_height()));
         } 
       else
         {
           // Refinement chunks
           bg44->decode_chunk(iff);
-          desc.format("IW44 background (part %d)", bg44->get_serial());
+          desc.format("IW44 background (part %d, %d dpi)",
+		      bg44->get_serial(), get_dpi(bg44->get_width(), bg44->get_height()));
         }
     }
 
@@ -733,7 +753,9 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
       IWPixmap fg44;
       fg44.decode_chunk(iff);
       fgpm=fg44.get_pixmap();
-      desc.format("IW44 foreground colors (%dx%d)", fg44.get_width(), fg44.get_height());
+      desc.format("IW44 foreground colors (%dx%d, %d dpi)",
+		  fg44.get_width(), fg44.get_height(),
+		  get_dpi(fg44.get_width(), fg44.get_height()));
     } 
 
   // BGjp (background JPEG)
@@ -744,7 +766,9 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
         THROW("DjVu Decoder: Corrupted data (Duplicate background layer)");
 #ifdef NEED_JPEG_DECODER
       DjVuFile::bgpm = JPEGDecoder::decode(iff);
-      desc.format("JPEG background (%dx%d)", bgpm->columns(), bgpm->rows());
+      desc.format("JPEG background (%dx%d, %d dpi)",
+		  bgpm->columns(), bgpm->rows(),
+		  get_dpi(bgpm->columns(), bgpm->rows()));
 #else
       desc.format("JPEG background (Unimplemented)");
 #endif
@@ -758,7 +782,9 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
         THROW("DjVu Decoder: Corrupted data (Duplicate foreground color layer)");
 #ifdef NEED_JPEG_DECODER
       DjVuFile::fgpm = JPEGDecoder::decode(iff);
-      desc.format("JPEG foreground colors (%dx%d)", fgpm->columns(), fgpm->rows());
+      desc.format("JPEG foreground colors (%dx%d, %d dpi)",
+		  fgpm->columns(), fgpm->rows(),
+		  get_dpi(fgpm->columns(), fgpm->rows()));
 #else
       desc.format("JPEG foreground colors (Unimplemented)");
 #endif
@@ -797,13 +823,17 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
           info->dpi=100;
           DjVuFile::bg44=bg44;
           DjVuFile::info=info;
-          desc.format("IW44 data (%dx%d)", bg44->get_width(), bg44->get_height());
+          desc.format("IW44 data (%dx%d, %d dpi)",
+		      bg44->get_width(), bg44->get_height(),
+		      get_dpi(bg44->get_width(), bg44->get_height()));
         } 
       else
         {
           // Refinement chunks
           bg44->decode_chunk(iff);
-          desc.format("IW44 data (part %d)", bg44->get_serial());
+          desc.format("IW44 data (part %d, %d dpi)",
+		      bg44->get_serial(),
+		      get_dpi(bg44->get_width(), bg44->get_height()));
         }
     }
 

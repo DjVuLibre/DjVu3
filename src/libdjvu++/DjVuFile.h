@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.h,v 1.45 1999-10-24 22:44:01 eaf Exp $
+//C- $Id: DjVuFile.h,v 1.46 1999-11-09 17:41:22 eaf Exp $
  
 #ifndef _DJVUFILE_H
 #define _DJVUFILE_H
@@ -45,7 +45,7 @@
 
     @memo Classes representing DjVu files.
     @author Andrei Erofeev <eaf@research.att.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuFile.h,v 1.45 1999-10-24 22:44:01 eaf Exp $#
+    @version #$Id: DjVuFile.h,v 1.46 1999-11-09 17:41:22 eaf Exp $#
 */
 
 //@{
@@ -456,6 +456,7 @@ private:
    void	decode(ByteStream & str);
    GString decode_chunk(const char *chkid, ByteStream & str, 
                         bool djvi, bool djvu, bool iw44);
+   int		get_dpi(int w, int h);
 
       // Functions dealing with the shape directory (fgjd)
    static GP<JB2Dict> static_get_fgjd(void *);
