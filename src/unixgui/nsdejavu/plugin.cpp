@@ -4,7 +4,7 @@
 //C-              Unauthorized use prohibited.
 //C-
 // 
-// $Id: plugin.cpp,v 1.2 2001-07-17 20:49:51 mchen Exp $
+// $Id: plugin.cpp,v 1.3 2001-07-24 23:47:45 mchen Exp $
 // $Name:  $
 
 
@@ -1172,9 +1172,9 @@ StartProgram(void)
 NPError
 NPP_Initialize(void)
 {
-//#ifdef DEBUG
-//     FILE *df=fopen("/dev/tty", "w");
-//     if (df) DjVuDebug::set_debug_file(df);
+//#ifndef NO_DEBUG
+//    FILE *df=fopen("/dev/tty", "a");
+//   if (df) DjVuDebug::set_debug_file(df);
 //#endif
    DEBUG_MSG("NPP_Initialize() called\n");
    DEBUG_MAKE_INDENT(3);

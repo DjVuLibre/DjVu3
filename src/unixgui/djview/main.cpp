@@ -4,7 +4,7 @@
 //C-              Unauthorized use prohibited.
 //C-
 // 
-// $Id: main.cpp,v 1.4 2001-07-19 16:59:10 mchen Exp $
+// $Id: main.cpp,v 1.5 2001-07-24 23:47:45 mchen Exp $
 // $Name:  $
 
 
@@ -25,6 +25,7 @@
 #include "GThreads.h"
 #include "init_qt.h"
 #include "qd_viewer_shell.h"
+#include "exc_msg.h"
 #include "DjVuDocument.h"
 #include "GURL.h"
 #include "djvu_file_cache.h"
@@ -125,7 +126,7 @@ Options:\n\
 	-visual <number>	- use given visual instead of \"the best\"\n\
 	-install		- force installation of private colormap\n\
 	-help			- print this message\n"
-#ifdef DEBUG
+#ifndef NO_DEBUG
 "	-debug[=<level>]	- print debug information\n"
 #endif
 "	-style=motif		- Motif look and feel\n\
@@ -169,7 +170,7 @@ main(int argc, char ** argv)
 	       ptr[0]=ptr[1];
       }
 
-#ifdef DEBUG
+#ifndef NO_DEBUG
       {
 	 const char * debug=getenv("DEBUG");
 	 if (debug)
@@ -179,8 +180,8 @@ main(int argc, char ** argv)
 	    if (level>32) level=32;
 	    DEBUG_SET_LEVEL(level);
 	 }
-//  	 FILE *df=fopen("/dev/tty", "w");
-//  	 if (df) DjVuDebug::set_debug_file(df);
+  	 FILE *df=fopen("/dev/tty", "a");
+  	 if (df) DjVuDebug::set_debug_file(df);
       }
 #endif
 
@@ -189,7 +190,7 @@ main(int argc, char ** argv)
       int page_num=0;
       GUTF8String file_name;
       for(i=1;i<argc;i++)
-#ifdef DEBUG
+#ifndef NO_DEBUG
 	 if (!strncmp(argv[i], "-debug", 6))
 	 {
 	    DEBUG_MSG("found '-debug' flag\n");
@@ -286,7 +287,7 @@ main(int argc, char ** argv)
 	       } catch(...) {}
 
 	       if (!url.is_local_file_url())
-		  G_THROW("Cannot display remote documents in standalone mode.");
+		  throw ERROR_MESSAGE("main","main.cant_display_remote");
 	       if (page_num>0)
 	       {
 		     // Get rid of page specification via '#'
