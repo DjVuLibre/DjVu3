@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.37 1999-09-04 01:36:49 leonb Exp $
+//C- $Id: DjVuFile.cpp,v 1.38 1999-09-07 15:59:53 leonb Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -192,7 +192,7 @@ DjVuFile::destroy(void)
 	 if (cb->cb) cb->cb(this, cb->cl_data);
       }
    }
-   GPEnabled::destroy();
+   DjVuPort::destroy();
 }
 
 void

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuPort.h,v 1.7 1999-09-03 23:35:40 leonb Exp $
+//C- $Id: DjVuPort.h,v 1.8 1999-09-07 15:59:53 leonb Exp $
  
 #ifndef _DJVUPORT_H
 #define _DJVUPORT_H
@@ -72,7 +72,7 @@
     
     @memo DjVu decoder communication mechanism.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuPort.h,v 1.7 1999-09-03 23:35:40 leonb Exp $#
+    @version #$Id: DjVuPort.h,v 1.8 1999-09-07 15:59:53 leonb Exp $#
 */
 
 
@@ -107,7 +107,7 @@ public:
 	  from the original to the copy */
    DjVuPort(const DjVuPort & port);
 
-   virtual ~DjVuPort(void);
+   virtual void destroy();
    static void *operator new (size_t sz);
    static void operator delete(void *addr) { ::operator delete(addr); } ;
 

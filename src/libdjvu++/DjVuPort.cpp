@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuPort.cpp,v 1.12 1999-09-03 23:55:22 leonb Exp $
+//C- $Id: DjVuPort.cpp,v 1.13 1999-09-07 15:59:53 leonb Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -77,9 +77,23 @@ DjVuPort::operator=(const DjVuPort & port)
    return *this;
 }
 
-DjVuPort::~DjVuPort(void)
+void
+DjVuPort::destroy(void)
 {
-   get_portcaster()->del_port(this);
+  int ok_to_destroy = 0;
+  {
+    GCriticalSectionLock lock(& pcaster->map_lock );
+    // Avoid destroying when count is not zero.  This can happens if
+    // is_port_alive() has been called by another thread between the time the
+    // count was decremented to zero and the time destroy is called.
+    if (get_count() == 0)
+      {
+        get_portcaster()->del_port(this);
+        ok_to_destroy = 1;
+      }
+  }
+  if (ok_to_destroy)
+    GPEnabled::destroy();
 }
 
 
