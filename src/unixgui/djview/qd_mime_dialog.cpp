@@ -4,7 +4,7 @@
 //C-              Unauthorized use prohibited.
 //C-
 // 
-// $Id: qd_mime_dialog.cpp,v 1.1 2001-05-30 17:29:32 mchen Exp $
+// $Id: qd_mime_dialog.cpp,v 1.2 2001-06-05 21:56:29 mchen Exp $
 // $Name:  $
 
 
@@ -52,14 +52,11 @@ QDMimeDialog::QDMimeDialog(const QString & mime_fname, QWidget * parent,
 
    QVBoxLayout * frame_vlay=new QVBoxLayout(frame, 20, 10);
    
-   QString msg=tr("\
-We have just found that your MIME type file ")+mime_fname+tr(" \
-should be updated in order for the DjVu plugin to work properly. \
-Invalid ")+mime_fname+tr(" can prevent Netscape from correctly \
-displaying DjVu documents loaded from the hard disc and can make Netscape \
-use incorrect MIME type when sending DjVu documents via e-mail.\n\
-\n\
-Would you like to update the ")+mime_fname+tr(" now?");
+   QString msg=tr("We have just found that your MIME type file ")+mime_fname+
+      tr(" should be updated in order for the DjVu plugin to work properly. Invalid ")+
+      mime_fname+
+      tr(" can prevent Netscape from correctly displaying DjVu documents loaded from the hard disc and")+
+      tr(" can make Netscape use incorrect MIME type when sending DjVu documents via e-mail.\n\nWould you like to update the ")+mime_fname+tr(" now?");
    QeLabel * label=new QeLabel(msg, frame);
    label->setAlignment(AlignLeft | WordBreak);
    frame_vlay->addWidget(label);

@@ -4,7 +4,7 @@
 //C-              Unauthorized use prohibited.
 //C-
 // 
-// $Id: qd_viewer_shell.cpp,v 1.3 2001-06-01 18:44:21 mchen Exp $
+// $Id: qd_viewer_shell.cpp,v 1.4 2001-06-05 21:56:29 mchen Exp $
 // $Name:  $
 
 
@@ -39,7 +39,7 @@
 
 #include "qt_fix.h"
 
-#define START_STATUS	"Select \"File\" and then \"Open\" to load a DjVu file"
+#define START_STATUS	QT_TRANSLATE_NOOP("QDViewerShell","Select \"File\" and then \"Open\" to load a DjVu file")
 
 int	QDViewerShell::instances;
 
@@ -218,7 +218,7 @@ QDViewerShell::help(void)
    } else
    {
      QString mesg=tr("Failed to open file '")+QStringFromGString(fname)+"'";
-     showError(this, "DjVu Error", mesg);
+     showError(this, tr("DjVu Error"), mesg);
    }
 }
 

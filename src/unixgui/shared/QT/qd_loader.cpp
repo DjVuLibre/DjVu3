@@ -4,7 +4,7 @@
 //C-              Unauthorized use prohibited.
 //C-
 // 
-// $Id: qd_loader.cpp,v 1.1 2001-05-29 22:05:30 bcr Exp $
+// $Id: qd_loader.cpp,v 1.2 2001-06-05 21:56:30 mchen Exp $
 // $Name:  $
 
 
@@ -38,7 +38,7 @@
 void
 QDLoader::slotNotifyError(const GP<DjVuPort> &, const GUTF8String &qmsg)
 {
-   ::showError(this, "DjVu error", QStringFromGString(qmsg));
+   ::showError(this, tr("DjVu error"), QStringFromGString(qmsg));
 }
 
 void
@@ -96,10 +96,10 @@ QDLoader::keyPressEvent(QKeyEvent * ev)
 void
 QDLoader::slotBrowse(void)
 {
-   static char * filters[]={ "*.djvu", "*.djv", "*.iw44", "*.iw4", "All files (*)", 0 };
+   static const char * filters[]={ "*.djvu", "*.djv", "*.iw44", "*.iw4", tr("All files (*)"), 0 };
    QeFileDialog dialog(QeFileDialog::lastLoadDir, filters[0],
 		       this, "file_dialog", TRUE);
-   dialog.setCaption("Select a DjVu file to open");
+   dialog.setCaption(tr("Select a DjVu file to open"));
    dialog.setForWriting(FALSE);
    dialog.setFilters((const char **) filters);
 
@@ -116,7 +116,7 @@ QDLoader::slotCancel(void)
       else if (image) image->get_djvu_file()->stop_decode(0);
    } catch(const GException & exc)
    {
-      ::showError(this, "DjVu Error", exc);
+      ::showError(this, tr("DjVu Error"), exc);
    }
 }
 
@@ -138,7 +138,7 @@ QDLoader::slotOK(void)
       startDecoding();
    } catch(const GException & exc)
    {
-      ::showError(this, "DjVu Error", exc);
+      ::showError(this, tr("DjVu Error"), exc);
    }
 }
 
@@ -188,7 +188,7 @@ QDLoader::show(void)
       }
    } catch(const GException & exc)
    {
-      ::showError(this, "DjVu Error", exc);
+      ::showError(this, tr("DjVu Error"), exc);
    }
    QeDialog::show();
 }
@@ -214,7 +214,7 @@ QDLoader::setUpForLoad(const QString &qname)
    DEBUG_MSG("QDLoader:setUpForLoad(): letting user to set up the file name...\n");
    DEBUG_MAKE_INDENT(3);
 
-   setCaption("Select DjVu file to open...");
+   setCaption(tr("Select DjVu file to open..."));
 
    GUTF8String load_dir=QeFileDialog::lastLoadDir;
    GUTF8String file_name;
@@ -250,28 +250,28 @@ QDLoader::init(void)
       // Creating the "load" widget
    load_w=new QWidget(form, "load_w");
    QVBoxLayout * lvlay=new QVBoxLayout(load_w, 0, 20, "lvlay");
-   label=new QeLabel("Please enter the DjVu file name to load in the field below",
+   label=new QeLabel(tr("Please enter the DjVu file name to load in the field below"),
 		     load_w, "load_title_label");
    font=label->font(); font.setWeight(QFont::Bold); label->setFont(font);
    label->setAlignment(AlignCenter);
    lvlay->addWidget(label);
    QHBoxLayout * lhlay=new QHBoxLayout(10, "lhlay");
    lvlay->addLayout(lhlay);
-   label=new QeLabel("DjVu file:", load_w);
+   label=new QeLabel(tr("DjVu file:"), load_w);
    lhlay->addWidget(label);
    text=new QLineEdit(load_w, "load_text");
    font=text->font(); font.setFamily("courier");
    text->setFont(font);
    text->setMinimumWidth(text->fontMetrics().width("abcdezyxvu")*4);
    lhlay->addWidget(text, 1);
-   QePushButton * browse_butt=new QePushButton("&Browse", load_w, "browse_butt");
+   QePushButton * browse_butt=new QePushButton(tr("&Browse"), load_w, "browse_butt");
    lhlay->addWidget(browse_butt);
    lvlay->activate();
 
       // Creating the "decode" widget
    decode_w=new QWidget(form, "decode_w");
    QVBoxLayout * dvlay=new QVBoxLayout(decode_w, 0, 20, "dvlay");
-   label=new QeLabel("DjVu page is being decoded... Please stand by...",
+   label=new QeLabel(tr("DjVu page is being decoded... Please stand by..."),
 		     decode_w, "decode_title_label");
    font=label->font(); font.setWeight(QFont::Bold); label->setFont(font);
    label->setAlignment(AlignCenter);
@@ -282,7 +282,7 @@ QDLoader::init(void)
    dvlay->activate();
    progress_bar=new QProgressBar(100, progress_form, "progress_bar");
    progress_bar->setMinimumHeight(progress_bar->sizeHint().height());
-   progress_label=new QeLabel("Completed % is unknown", progress_form, "progress_label");
+   progress_label=new QeLabel(tr("Completed % is unknown"), progress_form, "progress_label");
    progress_label->setAlignment(AlignCenter);
 
       // Creating the buttons
@@ -292,10 +292,10 @@ QDLoader::init(void)
    status_label->setAutoResize(TRUE);
    butt_lay->addWidget(status_label);
    butt_lay->addStretch(1);
-   ok_butt=new QePushButton("&Load", start, "ok_butt");
+   ok_butt=new QePushButton(tr("&Load"), start, "ok_butt");
    ok_butt->setDefault(TRUE);
    butt_lay->addWidget(ok_butt);
-   cancel_butt=new QePushButton("&Cancel", start, "cancel_butt");
+   cancel_butt=new QePushButton(tr("&Cancel"), start, "cancel_butt");
    butt_lay->addWidget(cancel_butt);
 
    vlay->activate();
