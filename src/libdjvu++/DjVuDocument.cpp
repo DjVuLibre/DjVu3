@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.54 1999-09-29 20:17:54 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.55 1999-09-30 15:44:37 leonb Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -35,7 +35,7 @@ get_int_prefix(void * ptr)
 }
 
 DjVuDocument::DjVuDocument(void)
-  : init_called(false), cache(0), doc_type(UNKNOWN_TYPE)
+  : doc_type(UNKNOWN_TYPE), init_called(false), cache(0)
 {
 }
 
