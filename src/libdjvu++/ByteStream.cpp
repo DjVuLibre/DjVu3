@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.cpp,v 1.75 2001-05-01 23:40:58 bcr Exp $
+// $Id: ByteStream.cpp,v 1.76 2001-05-01 23:41:22 bcr Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 04/1997
@@ -454,7 +454,7 @@ ByteStream::copy(ByteStream &bsfrom, size_t size)
   size_t total = 0;
   static const size_t buffer_size=1024*1024;
   char *buffer;
-  GPBuffer<char> gbuf(buf,buffer_size);
+  GPBuffer<char> gbuf(buffer,buffer_size);
   for(;;)
     {
       size_t bytes = buffer_size;
