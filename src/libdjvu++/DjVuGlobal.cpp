@@ -9,140 +9,15 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuGlobal.cpp,v 1.15 1999-12-08 16:47:58 bcr Exp $
+//C- $Id: DjVuGlobal.cpp,v 1.16 1999-12-08 20:56:43 bcr Exp $
 
+/** This file impliments the DjVuProgressTask elements.  The memory
+    functions are implimented in a separate file, because only the memory
+    functions should be compiled with out overloading of the memory functions.
+ */
+  
 
-
-
-// ----------------------------------------
-
-#define NEED_DJVU_MEMORY_IMPLEMENTATION
 #include "DjVuGlobal.h"
-
-
-// ----------------------------------------
-
-#ifdef NEED_DJVU_MEMORY
-#include "GException.h"
-
-static djvu_delete_callback *_djvu_delete_handler = 0;
-static djvu_new_callback *_djvu_new_handler = 0;
-static djvu_delete_callback *deleteArray_handler = 0;
-static djvu_new_callback *newArray_handler = 0;
-
-int
-djvu_memoryObject_callback (
-  djvu_delete_callback* delete_handler,
-  djvu_new_callback* new_handler
-) {
-  if(delete_handler && new_handler)
-  {
-#ifdef UNIX
-    _djvu_new_ptr=&_djvu_new;
-    _djvu_delete_ptr=&_djvu_delete;
-#endif
-    _djvu_delete_handler=delete_handler;
-    _djvu_new_handler=new_handler;
-    return 1;
-  }else
-  {
-#ifdef UNIX
-    _djvu_new_ptr=(djvu_new_callback *)&(operator new);
-    _djvu_delete_ptr=(djvu_delete_callback *)&(operator delete);
-#endif
-    _djvu_delete_handler=0;
-    _djvu_new_handler=0;
-    return (delete_handler||new_handler)?0:1;
-  }
-  return 0;
-}
-
-void *
-_djvu_new(size_t siz)
-{
-  void *ptr;
-#ifndef UNIX
-  if(_djvu_new_handler)
-  {
-#endif
-    if(!(ptr=(*_djvu_new_handler)(siz)))
-    {
-      THROW("Memory Exhausted");
-    }
-#ifndef UNIX
-  }else
-  {
-#ifdef WIN32
-          ptr = (void *) new char[siz] ;
-#else
-    ptr=operator new(siz);
-#endif
-  }
-#endif
-  return ptr;
-}
-
-void  
-_djvu_delete(void *addr)
-{
-  if(addr)
-  {
-    if(_djvu_delete_handler)
-    {
-      (*_djvu_delete_handler)(addr);
-    }else
-    {
-      operator delete(addr);
-    }
-  }
-}
-
-void *
-_djvu_newArray(size_t siz)
-{
-  void *ptr;
-#ifndef UNIX
-  if(newArray_handler)
-  {
-#endif
-    if(!(ptr=(*newArray_handler)(siz)))
-    {
-      THROW("Memory Exhausted");
-    }
-#ifndef UNIX
-  }else
-  {
-#ifdef WIN32
-          ptr = (void *) new char[siz] ;
-#else
-          ptr=operator new [] (siz);
-#endif
-  }
-#endif
-  return ptr;
-}
-
-void
-_djvu_deleteArray(void *addr)
-{
-  if(addr)
-  {
-    if(deleteArray_handler)
-    {
-      (*deleteArray_handler)(addr);
-    }else
-    {
-#ifdef WIN32
-                delete [] (addr) ;
-#else
-        operator delete [] (addr);
-#endif
-    }
-  }
-}
-
-#endif
-
 
 
 // ----------------------------------------

@@ -8,7 +8,7 @@
 # C- AT&T, you have an infringing copy of this software and cannot use it
 # C- without violating AT&T's intellectual property rights.
 # C-
-# C- $Id: Makefile.in,v 1.69 1999-12-08 16:47:58 bcr Exp $
+# C- $Id: Makefile.in,v 1.70 1999-12-08 20:56:43 bcr Exp $
 
 SHELL=/bin/sh
 prefix=@%prefix%@
@@ -44,7 +44,7 @@ PROG= djvudump c44 d44 djvutopnm djvumake djvuextract ppmcoco bzz djvmcvt # djvm
 
 # Makefile for libdjvu++.a
 
-LIBOBJS= DjVuGlobal.o DjVuGlobalUnix.o GOS.o GException.o GContainer.o GString.o \
+LIBOBJS= DjVuGlobal.o DjVuGlobalMemory.o DjVuGlobalUnix.o GOS.o GException.o GContainer.o GString.o \
 	 GThreads.o GRect.o GSmartPointer.o  MMX.o Arrays.o debug.o \
 	 GBitmap.o GPixmap.o GScaler.o DjVuPalette.o \
 	 ByteStream.o IFFByteStream.o BSByteStream.o ZPCodec.o \
