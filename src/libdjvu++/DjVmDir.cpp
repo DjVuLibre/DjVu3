@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVmDir.cpp,v 1.9 1999-10-24 20:25:53 eaf Exp $
+//C- $Id: DjVmDir.cpp,v 1.10 1999-10-25 16:49:41 eaf Exp $
 
 
 #ifdef __GNUC__
@@ -29,17 +29,26 @@ DjVmDir::File::File(void)
 { 
 }
 
-DjVmDir::File::File(const char *name, const char *id, const char *title, bool page)
-  : name(name), id(id), title(title), offset(0), size(0), flags(0), page_num(-1)
+DjVmDir::File::File(const char *name, const char *id,
+		    const char *title, FILE_TYPE file_type)
+  : name(name), id(id), title(title), offset(0), size(0), page_num(-1)
 { 
   // Ask Leon if you get this one!
   if (id && id[0]=='#')
     THROW("DjVm File IDs should not start with character '#'");
-  // Set page flag
-  if (page) 
-    flags |= IS_PAGE; 
+  flags=(file_type & TYPE_MASK);
 }
 
+DjVmDir::File::File(const char *name, const char *id,
+		    const char *title, bool page)
+   : name(name), id(id), title(title), offset(0), size(0), page_num(-1)
+{ 
+  // Ask Leon if you get this one!
+  if (id && id[0]=='#')
+    THROW("DjVm File IDs should not start with character '#'");
+  flags=page ? PAGE : INCLUDE;
+}
+   
 /* Directory file format
 
    char8		(version number | (bundled or not) << 7)
@@ -115,6 +124,20 @@ DjVmDir::decode(ByteStream & str)
       DEBUG_MSG("reading and decompressing flags...\n");
       for(pos=files_list;pos;++pos)
 	 files_list[pos]->flags=bs_str.read8();
+
+      if (ver==0)
+      {
+	 DEBUG_MSG("converting flags from version 0...\n");
+	 for(pos=files_list;pos;++pos)
+	 {
+	    unsigned char flags_0=files_list[pos]->flags;
+	    unsigned char flags_1;
+	    flags_1=(flags_0 & File::IS_PAGE_0) ? File::PAGE : File::INCLUDE;
+	    if (flags_0 & File::HAS_NAME_0) flags_1|=File::HAS_NAME;
+	    if (flags_0 & File::HAS_TITLE_0) flags_1|=File::HAS_TITLE;
+	    files_list[pos]->flags=flags_1;
+	 }
+      }
    
       DEBUG_MSG("reading and decompressing names...\n");
       GTArray<char> strings;

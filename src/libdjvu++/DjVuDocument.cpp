@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.57 1999-10-19 19:59:11 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.58 1999-10-25 16:49:41 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -946,7 +946,9 @@ add_file_to_djvm(const GP<DjVuFile> & file, bool page,
 	 
 	    // Finally add it to the document
 	 GString name=file->get_url().name();
-	 GP<DjVmDir::File> file_rec=new DjVmDir::File(name, name, name, page);
+	 GP<DjVmDir::File> file_rec=new DjVmDir::File(name, name, name,
+						      page ? DjVmDir::File::PAGE :
+						      DjVmDir::File::INCLUDE);
 	 doc.insert_file(file_rec, data, -1);
 
 	    // And repeat for all included files

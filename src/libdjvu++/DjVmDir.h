@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVmDir.h,v 1.11 1999-10-18 14:07:33 leonb Exp $
+//C- $Id: DjVmDir.h,v 1.12 1999-10-25 16:49:41 eaf Exp $
 
 #ifndef _DJVMDIR_H
 #define _DJVMDIR_H
@@ -22,7 +22,7 @@
     @memo Implements DjVu multipage document directory
     @author Andrei Erofeev <eaf@research.att.com>
     @version
-    #$Id: DjVmDir.h,v 1.11 1999-10-18 14:07:33 leonb Exp $# */
+    #$Id: DjVmDir.h,v 1.12 1999-10-25 16:49:41 eaf Exp $# */
 //@{
 
 
@@ -69,6 +69,7 @@
 class DjVmDir : public GPEnabled
 {
 public:
+      
   static const int version;
   /** This class represents the directory records managed by 
       class \Ref{DjVmDir}. */
@@ -76,6 +77,22 @@ public:
   {
     friend class DjVmDir;
   public:
+	// Out of the record: INCLUDE below must be zero and PAGE must be one.
+	// This is to avoid problems with the File constructor, which now takes
+	// 'int file_type' as the last argument instead of 'bool is_page'
+   
+    /** Describes the type of the file, which may be:
+        \begin{description}
+           \item[PAGE] This is a top level page file. It may include other
+	               #INCLUDE#d files, which may in turn be shared between
+		       different pages.
+	   \item[INCLUDE] This file is included into some other file inside
+	 	       this document.
+	   \item[THUMBNAILS] This file contains thumbnails for the document
+	 	       pages.
+        \end{description} */
+    enum FILE_TYPE { INCLUDE=0, PAGE=1, THUMBNAILS=2 };
+     
     /** File name.  The optional file name must be unique and is assigned
         either by encoder or by user when the document is composed.  In the
         case of an {\em indirect} document, this is the relative URL of the
@@ -101,7 +118,14 @@ public:
     int size;
     /** Tests if this file represents a page of the document. */
     bool is_page(void) const 
-      { return (flags & IS_PAGE)!=0; } ;
+      { return (flags & TYPE_MASK)==PAGE; }
+    /** Returns #TRUE# if this file is included into some other files of
+	this document */
+    bool is_include(void) const
+      { return (flags & TYPE_MASK)==INCLUDE; }
+    /** Returns #TRUE# if this file contains thumbnails for the document pages */
+    bool is_thumbnails(void) const
+      { return (flags & TYPE_MASK)==THUMBNAILS; }
     /** Returns the page number of this file. This function returns
         #-1# if this file does not represent a page of the document. */
     int	get_page_num(void) const 
@@ -109,10 +133,13 @@ public:
     /** Default constructor. */
     File(void);
     /** Full constructor. */
+    File(const char *name, const char *id, const char *title, FILE_TYPE file_type);
+	// Obsolete
     File(const char *name, const char *id, const char *title, bool page);
   private:
-    enum FLAGS { IS_PAGE=1, HAS_NAME=2, HAS_TITLE=4 };
-    char flags;
+    enum FLAGS_0 { IS_PAGE_0=1, HAS_NAME_0=2, HAS_TITLE_0=4 };
+    enum FLAGS_1 { HAS_NAME=0x80, HAS_TITLE=0x40, TYPE_MASK=0x3f };
+    unsigned char flags;
     int	page_num;
   };
 

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVmDoc.h,v 1.9 1999-10-05 16:00:05 leonb Exp $
+//C- $Id: DjVmDoc.h,v 1.10 1999-10-25 16:49:41 eaf Exp $
  
 #ifndef _DJVMDOC_H
 #define _DJVMDOC_H
@@ -32,7 +32,7 @@
 
     @memo DjVu multipage documents reader/writer.
     @author Andrei Erofeev <eaf@research.att.com>
-    @version #$Id: DjVmDoc.h,v 1.9 1999-10-05 16:00:05 leonb Exp $#
+    @version #$Id: DjVmDoc.h,v 1.10 1999-10-25 16:49:41 eaf Exp $#
 */
 
 //@{
@@ -72,13 +72,14 @@ private:
 public:
       /** Inserts a file into the document.
           @param data  ByteStream containing the file data.
-          @param page  Indicates whether this file is a page of the document.
+          @param file_type Describes the type of the file to be inserted.
+	  	 See \Ref{DjVmDir::File} for details.
           @param name  Name of the file in the document (e.g. an URL).
           @param id    Identifier of the file (as used in INCL chunks).
           @param title Optional title of the file (shown in browsers).
           @param pos   Position of the file in the document (default is append).
       */
-   void		insert_file(ByteStream &data, bool page,
+   void		insert_file(ByteStream &data, DjVmDir::File::FILE_TYPE file_type,
                             const char *name, const char *id, 
                             const char *title=0, int pos=-1);
 
