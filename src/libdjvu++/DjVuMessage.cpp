@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessage.cpp,v 1.51 2001-05-16 22:57:50 bcr Exp $
+// $Id: DjVuMessage.cpp,v 1.52 2001-05-18 20:25:51 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -162,8 +162,8 @@ GetModulePath( void )
 }
 #endif
 
-static GList<GURL>
-GetProfilePaths(void)
+GList<GURL>
+DjVuMessage::GetProfilePaths(void)
 {
   static bool first=true;
   static GList<GURL> realpaths;

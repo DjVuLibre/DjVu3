@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessage.h,v 1.22 2001-05-09 00:38:26 bcr Exp $
+// $Id: DjVuMessage.h,v 1.23 2001-05-18 20:25:51 bcr Exp $
 // $Name:  $
 
 
@@ -75,6 +75,8 @@ public:
   /// This is a simple alias to the above class, but does an fprintf to stderr.
   static void perror( const GUTF8String & MessageList )
   { use_locale();DjVuMessageLite::perror(MessageList); }
+
+  static GList<GURL> GetProfilePaths(void);
 };
 
 // There is only object of class DjVuMessage in a program, and here it

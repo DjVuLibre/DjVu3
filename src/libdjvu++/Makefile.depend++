@@ -14,7 +14,8 @@ BSEncodeByteStream.o: BSEncodeByteStream.cpp \
 ByteStream.o: ByteStream.cpp ByteStream.h \
  Arrays.h GException.h DjVuGlobal.h \
  ../../src/include/DjVu.h GSmartPointer.h GOS.h \
- GString.h GContainer.h GURL.h GThreads.h
+ GString.h GContainer.h GURL.h GThreads.h \
+ DjVuMessage.h DjVuMessageLite.h
 DataPool.o: DataPool.cpp DataPool.h GThreads.h \
  DjVuGlobal.h ../../src/include/DjVu.h \
  GException.h GString.h GContainer.h \
@@ -247,8 +248,7 @@ MMX.o: MMX.cpp MMX.h DjVuGlobal.h \
 parseoptions.o: parseoptions.cpp parseoptions.h \
  GString.h DjVuGlobal.h ../../src/include/DjVu.h \
  GContainer.h GException.h GSmartPointer.h \
- Arrays.h ../../src/include/DjVuOptions.h \
- DjVuMessage.h DjVuMessageLite.h
+ Arrays.h DjVuMessage.h DjVuMessageLite.h
 UnicodeByteStream.o: UnicodeByteStream.cpp \
  UnicodeByteStream.h DjVuGlobal.h \
  ../../src/include/DjVu.h GUnicode.h GString.h \
