@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocument.cpp,v 1.172 2001-05-02 23:46:13 bcr Exp $
+// $Id: DjVuDocument.cpp,v 1.173 2001-05-03 20:43:11 mchen Exp $
 // $Name:  $
 
 
@@ -918,6 +918,11 @@ DjVuDocument::get_djvu_file(const GUTF8String& id, bool dont_create)
   DEBUG_MAKE_INDENT(3);
   if (!id.length())
     return get_djvu_file(-1);
+
+// Integers are not supported, only ID's  
+//  if (id.is_int())
+//     return get_djvu_file(id.toInt(),dont_create);
+  
   GURL url;
   // I'm locking the flags because depending on what id_to_url()
   // returns me, I'll be creating DjVuFile in different ways.
@@ -961,9 +966,8 @@ DjVuDocument::get_djvu_file(const GUTF8String& id, bool dont_create)
       return file;
     }
   }
-  return url.is_empty()
-    ?get_djvu_file(id.toInt(),dont_create)
-    :get_djvu_file(url,dont_create);
+     
+  return get_djvu_file(url,dont_create);
 }
 
 GP<DjVuFile>
