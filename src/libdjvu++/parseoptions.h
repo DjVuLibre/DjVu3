@@ -6,7 +6,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: parseoptions.h,v 1.25 2000-02-01 19:11:37 bcr Exp $
+//C- $Id: parseoptions.h,v 1.26 2000-02-02 01:12:11 bcr Exp $
 
 #endif /* __cplusplus */
 
@@ -67,7 +67,7 @@
 
    @memo Class used for parsing options and configuration files.
    @author Bill Riemers
-   @version #$Id: parseoptions.h,v 1.25 2000-02-01 19:11:37 bcr Exp $#
+   @version #$Id: parseoptions.h,v 1.26 2000-02-02 01:12:11 bcr Exp $#
  */
 
 /*@{*/
@@ -635,7 +635,7 @@ class DjVuTokenList::Entries
 {
 public:
   int Token;
-  char *Name;
+  const char *Name;
   Entries() : Token(0),Name(0) {};
   ~Entries();
 };

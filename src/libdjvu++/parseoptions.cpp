@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: parseoptions.cpp,v 1.35 2000-02-02 00:40:19 bcr Exp $
+//C- $Id: parseoptions.cpp,v 1.36 2000-02-02 01:12:11 bcr Exp $
 #ifdef __GNUC__
 #pragma implementation
 #endif
@@ -1628,10 +1628,7 @@ DjVuTokenList::GetToken
   return (-1-MinGuess);
 }
 
-DjVuTokenList::Entries::~Entries()
-{
-  delete [] Name;
-}
+DjVuTokenList::Entries::~Entries() {}
 
 int
 DjVuTokenList::SetToken
@@ -1669,7 +1666,8 @@ DjVuTokenList::SetToken
         memmove(&(Entry[MinGuess+1]),&(Entry[MinGuess]),sizeof(Entries)*(NextToken-MinGuess));
       }
     }
-    strcpy((Strings[NextToken]=Entry[MinGuess].Name=new char [strlen(name)+1]),name);
+    strcpy((Strings[NextToken]=new char [strlen(name)+1]),name);
+    Entry[MinGuess].Name=Strings[NextToken];
     retval=Entry[MinGuess].Token=NextToken++;
   }
   return retval;
