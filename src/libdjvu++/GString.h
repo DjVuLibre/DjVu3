@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.h,v 1.38 2001-04-12 00:27:54 bcr Exp $
+// $Id: GString.h,v 1.39 2001-04-12 15:24:20 bcr Exp $
 // $Name:  $
 
 #ifndef _GSTRING_H_
@@ -57,7 +57,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.38 2001-04-12 00:27:54 bcr Exp $# */
+    #$Id: GString.h,v 1.39 2001-04-12 15:24:20 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -715,13 +715,13 @@ GString::init(void)
   gstr=ptr?((*this)->data):nullstr;
 }
 
-GP<GStringRep> 
+inline GP<GStringRep> 
 GStringRep::UTF8ToNative( const char *s )
 {
   return GStringRep::UTF8::create(s)->toNative();
 }
 
-GP<GStringRep> 
+inline GP<GStringRep> 
 GStringRep::NativeToUTF8( const char *s )
 {
   return GStringRep::Native::create(s)->toUTF8();
