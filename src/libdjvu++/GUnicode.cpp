@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GUnicode.cpp,v 1.31 2001-10-12 17:58:30 leonb Exp $
+// $Id: GUnicode.cpp,v 1.32 2001-10-12 20:07:45 leonb Exp $
 // $Name:  $
 
 #ifdef HAVE_CONFIG_H
@@ -306,7 +306,12 @@ GStringRep::Unicode::create(
             GPBuffer<char> gutf8buf(utf8buf,pleft);
             char *p=utf8buf;
             unsigned char const *last=ptr;
-            for(;iconv(cv, (const char **)&ptr, &ptrleft, &p, &pleft);last=ptr)
+#ifdef HAVE_CONST_CHAR_ICONV
+            const char **iptr = (const char**)&ptr;
+#else
+            char **iptr = (char**)&ptr;
+#endif
+            for(;iconv(cv, iptr, &ptrleft, &p, &pleft);last=ptr)
               EMPTY_LOOP;
             iconv_close(cv);
             retval=create(utf8buf,(size_t)last-(size_t)buf,t);
