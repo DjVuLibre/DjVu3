@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocument.cpp,v 1.166 2001-05-01 17:12:15 bcr Exp $
+// $Id: DjVuDocument.cpp,v 1.167 2001-05-01 21:28:33 praveen Exp $
 // $Name:  $
 
 
@@ -920,45 +920,48 @@ DjVuDocument::get_djvu_file(const GUTF8String& id, bool dont_create)
     return get_djvu_file(-1);
   if (id.is_int())
     return get_djvu_file(id.toInt());
+  GURL url;
   // I'm locking the flags because depending on what id_to_url()
   // returns me, I'll be creating DjVuFile in different ways.
   // And I don't want the situation to change between the moment I call
   // id_to_url() and I actually create DjVuFile
-  GMonitorLock lock(&flags);
-  GURL url=id_to_url(id);
-  if(url.is_empty())
   {
-    // If init is complete, we know for sure, that there is no such
-    // file with ID 'id' in the document. Otherwise we have to
-    // create a temporary file and wait for the init to finish
-    if (is_init_complete())
-      return 0;
-    // Invent some dummy temporary URL. I don't care what it will
-    // be. I'll remember the ID and will generate the correct URL
-    // after I learn what the document is
-    url=invent_url(id);
-    DEBUG_MSG("Invented url='" << url << "'\n");
-
-    GCriticalSectionLock lock(&ufiles_lock);
-    for(GPosition pos=ufiles_list;pos;++pos)
+    GMonitorLock lock(&flags);
+    url=id_to_url(id);
+    if(url.is_empty())
     {
-      GP<UnnamedFile> f=ufiles_list[pos];
-      if (f->url==url)
-        return f->file;
-    }
-    GP<UnnamedFile> ufile=new UnnamedFile(UnnamedFile::ID, id, 0, url, 0);
+      // If init is complete, we know for sure, that there is no such
+      // file with ID 'id' in the document. Otherwise we have to
+      // create a temporary file and wait for the init to finish
+      if (is_init_complete())
+        return 0;
+      // Invent some dummy temporary URL. I don't care what it will
+      // be. I'll remember the ID and will generate the correct URL
+      // after I learn what the document is
+      url=invent_url(id);
+      DEBUG_MSG("Invented url='" << url << "'\n");
 
-    // We're adding the record to the list before creating the DjVuFile
-    // because DjVuFile::init() will call request_data(), and the
-    // latter should be able to find the record.
-    //
-    // We also want to keep ufiles_lock to make sure that when
-    // request_data() is called, the record is still there
-    ufiles_list.append(ufile);
+      GCriticalSectionLock lock(&ufiles_lock);
+      for(GPosition pos=ufiles_list;pos;++pos)
+      {
+        GP<UnnamedFile> f=ufiles_list[pos];
+        if (f->url==url)
+          return f->file;
+      }
+      GP<UnnamedFile> ufile=new UnnamedFile(UnnamedFile::ID, id, 0, url, 0);
+
+      // We're adding the record to the list before creating the DjVuFile
+      // because DjVuFile::init() will call request_data(), and the
+      // latter should be able to find the record.
+      //
+      // We also want to keep ufiles_lock to make sure that when
+      // request_data() is called, the record is still there
+      ufiles_list.append(ufile);
       
-    GP<DjVuFile> file=DjVuFile::create(url,this,recover_errors,verbose_eof);
-    ufile->file=file;
-    return file;
+      GP<DjVuFile> file=DjVuFile::create(url,this,recover_errors,verbose_eof);
+      ufile->file=file;
+      return file;
+    }
   }
   return get_djvu_file(url,dont_create);
 }

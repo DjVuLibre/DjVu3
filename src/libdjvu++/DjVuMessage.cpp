@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessage.cpp,v 1.40 2001-05-01 18:44:17 bcr Exp $
+// $Id: DjVuMessage.cpp,v 1.41 2001-05-01 21:28:33 praveen Exp $
 // $Name:  $
 
 
@@ -390,7 +390,7 @@ DjVuMessage::create(void)
     message=new DjVuMessage;
   }
   DjVuMessage &m=*message;
-  GPList<ByteStream> &bs(getByteStream());
+  GPList<ByteStream> &bs = getByteStream();
   for(GPosition pos;(pos=bs);bs.del(pos))
   {
     m.AddByteStream(bs[pos]);
