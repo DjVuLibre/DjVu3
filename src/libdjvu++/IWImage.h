@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: IWImage.h,v 1.18 2001-01-19 01:16:21 bcr Exp $
+// $Id: IWImage.h,v 1.19 2001-01-19 01:23:27 bcr Exp $
 // $Name:  $
 
 
@@ -129,7 +129,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: IWImage.h,v 1.18 2001-01-19 01:16:21 bcr Exp $# */
+    #$Id: IWImage.h,v 1.19 2001-01-19 01:23:27 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -443,7 +443,7 @@ protected:
   static void filter_end(void);
 };
 
-class GPixel;
+struct GPixel;
 class IWTransform::Decode : public IWTransform
 {
 public:

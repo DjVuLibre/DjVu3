@@ -382,6 +382,10 @@ SOURCE=.\GThreads.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\GUnicode.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\GURL.cpp
 # End Source File
 # Begin Source File
@@ -391,10 +395,6 @@ SOURCE=.\IFFByteStream.cpp
 # Begin Source File
 
 SOURCE=.\IWImage.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\IWTransform.cpp
 # End Source File
 # Begin Source File
 
@@ -419,6 +419,18 @@ SOURCE=.\MMX.cpp
 # Begin Source File
 
 SOURCE=.\parseoptions.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\UnicodeByteStream.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\XMLAnno.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\XMLTags.cpp
 # End Source File
 # Begin Source File
 
@@ -562,6 +574,10 @@ SOURCE=.\GThreads.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\GUnicode.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\GURL.h
 # End Source File
 # Begin Source File
@@ -571,10 +587,6 @@ SOURCE=.\IFFByteStream.h
 # Begin Source File
 
 SOURCE=.\IWImage.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\IWTransform.h
 # End Source File
 # Begin Source File
 
@@ -595,6 +607,18 @@ SOURCE=.\MMX.h
 # Begin Source File
 
 SOURCE=.\parseoptions.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\UnicodeByteStream.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\XMLAnno.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\XMLTags.h
 # End Source File
 # Begin Source File
 
