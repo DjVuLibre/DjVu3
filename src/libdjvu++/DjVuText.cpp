@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuText.cpp,v 1.12 2001-03-21 20:08:08 praveen Exp $
+// $Id: DjVuText.cpp,v 1.13 2001-04-02 23:30:19 praveen Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -421,8 +421,8 @@ DjVuTXT::find_text_in_rect(GRect target_rect, GString &text) const
 
   int text_start = 0;
   int text_end = 0;
+  text = ""; //initialize to null string
 
-  
   int zone_type=CHARACTER;
   while(zone_type>=PAGE)
   {
@@ -447,6 +447,7 @@ DjVuTXT::find_text_in_rect(GRect target_rect, GString &text) const
 		  {
             for(GPosition pos=temp_list; pos; ++pos)
                 zone_list.append(temp_list[pos]);
+            
             temp_list.empty();
             /////
 			zone_list.append(zone);
@@ -460,31 +461,19 @@ DjVuTXT::find_text_in_rect(GRect target_rect, GString &text) const
 		  else 
 		  if( found_status == finding && ((target_rect.ymin > zone->rect.ymax) || (target_rect.ymax < zone->rect.ymin)))
 		  {
-
-			  text_end = end;
 			  found_status = found;
 		  }
 		  else if( found_status == finding )
 		  {
-			  //zone_list.append(zone);
               temp_list.append(zone);
-			  text_end = end;
-		  }
-
-
-		  
-      } else
-      {
-        //zone_type--;
-        //zone_list.empty();
-        //break;
+		  }	  
       }
       start=end;
 	  end=textUTF8.length();
     }
     if (zone_list.size()) 
 	{
-		text = textUTF8.substr(text_start, text_end-text_start+1);
+		text = textUTF8.substr(text_start, text_end-text_start);
 		break;
 	}
 	else
