@@ -300,25 +300,121 @@
  */
 //@{
 
-/** @name Compiling the Library
+/** @name Compiling the Library (Unix)
 
 
+    {\bf Directories} --- The structure of the distribution is essentially
+    flat.  Everything important, including the source code for the library and
+    utilities is directly placed into directory #"libdjvu++"#.  The few
+    subdirectories contain accessory material.  Directory #"@Doc"# contains
+    the HTML documentation generated from the source files.  Directory
+    #"@Samples"# contains sample DjVu files for testing purposes.  Directory
+    #"@Test"# contains a few test programs for the library basic features.
+    Directory #"@Tools"# contains tools that may be useful for building the
+    library or its documentation.
+
+
+    {\bf Prerequisites} --- The DjVu Reference Library should compile and run
+    on any well behaved Unix system, {\em provided that you use a good C++
+    compiler} supporting templates, exceptions and possibly multithreading.
+    Workstation makers usually provide good compilers.  You can certainly
+    compile and run the library with these compilers if you find out which
+    options apply to your system and your particular version of the compiler.
+    We find that there are just too many different compilers around.  This is
+    why we recommend using #gcc# or #egcs#.
+
+    You can safely proceed to the compilation if you have #gcc-2.8.x# or any
+    version #egcs# greater than #egcs-1.0.2#.  Use command #g++ -v# to find
+    out what is installed on your system.  If you have an earlier version of
+    #g++# such as #gcc-2.7.23#, you must upgrade because it is not going to
+    work.  We strongly recomment upgrading directly to #egcs-1.1.1# or better.
+    The easiest way consists of picking a binary distribution somewhere on the
+    Internet.  Linux users may have a look at \URL{http://www.gcc.ml.org} or
+    \URL{http://rufus.w3.org/linux/RPM}.
+
+    {\bf Building your compiler (advanced)} --- You should really skip this
+    section if you can avoid reading it.  Keep reading only if (a) you cannot
+    find a suitable binary distribution of #egcs# for your workstation, or (b)
+    you want to experiment with the #COTHREADS# multi-threading implementation
+    (see \Ref{GThreads.h}).
+
+    You will first need the GNU make tool.  If you do not have GNU make, you
+    can find the source code at \URL{ftp://gatekeeper.dec.com/pub/GNU/make} or
+    at \URL{ftp://prep.ai.mit.edu/pub/gnu}.  Download the most recent release,
+    unpack it, read the instructions, compile and install.
+
+    You must then obtain the source distribution of the latest release of
+    #egcs# at \URL{http://egcs.cygnus.com}.  After unpacking this distribution
+    you should consider applying our small patch for file
+    #"egcs/gcc/libgcc2.c"#.  This is required if you want to use the
+    #COTHREADS# multi-threading implementation.  This patch has been tested
+    with #egcs-1.1# and #egcs-1.1.1#.  We hope that the EGCS people will
+    consider it for the future releases.  Use the following command to apply
+    the patch. If anything suspicious happens during the execution of #patch#,
+    you should probably go back to the original version.  Program #patch#
+    always creates a copy of the original file in #libgcc2.c.orig#.
     \begin{verbatim}
-       % configure
-       Testing C++ compiler ...eg++.
-       Testing pipe option ...yes.
-       Searching AR program ...ar
-       Searching RANLIB program ...ranlib
+      % cd egcs/gcc
+      % patch < $HOME/libdjvu++/@Tools/libgcc2.c.diff
+      Patching file libgcc2.c using Plan A...
+      Hunk #1 succeeded at 3063.
+      Hunk #2 succeeded at 3118.
+      done
     \end{verbatim}
 
+    You must then configure and compile #egcs#.  Everything is pretty well 
+    described at \URL{http://egcs.cygnus.com}.  I could use for instance
+    the following commands on my SGI workstation running Irix-6.4:
+    \begin{verbatim}
+      % cd egcs
+      % configure --prefix=$HOME/egcs  mips-sgi-irix-5.3
+      % gnu-make
+      % gnu-make install
+    \end{verbatim}
+    You are reading correctly: I am pretending that my workstation has
+    Irix-5.3 because I want to create backward compatible binaries.  I also
+    use my own version of the assembler and my own version of the debugger.
+    You do not really need to do this right now.  Welcome to the wonderful
+    world of compilers.
+
+    {\bf Compiling the DjVu Reference Library} --- Compiling the DjVu
+    Reference Library is a two step process.  You must first invoke the script
+    #configure# which searches the compiler, selects the compilation options
+    and creates the makefiles.
+    \begin{verbatim}
+       % configure --prefix=$HOME/djvu
+    \end{verbatim}
+    The optional argument #--prefix# indicates where the binary files will be
+    installed.  You are now ready to compile everything by typing the
+    following command:
     \begin{verbatim}
        % make
     \end{verbatim}
-       
+    Finally, you can install the utility programs by typing #make install#.
+    The executable files are copied in the #bin# subdirectory of the directory
+    specified with the configuration option #--prefix#.
+    
+    {\bf Using the DjVu Reference Library} --- At this point, you have
+    generated a collection of small executables documented in section
+    \Ref{Utility Programs}.  This is not very exciting.  It is now time to
+    remember that the DjVu Reference Library is a source code library.  Its
+    purpose is to allow you to do stuff with our stuff.  Almost everything you
+    can use safely is documented in section \Ref{Library Reference}.  You may
+    want however to start with sections \Ref{Decoding DjVu content} and
+    \Ref{Creating DjVu content}.  */
 
 
+/** @name Compiling the Library (Systems other than Unix)       
+
+   This library compiles without modification under Windows using Visual C++
+   version 5.0.  It should also compile under MacOS using the MetroWerks
+   compiler, although some system dependent functions are still missing.  In
+   both cases however, you have to provide your makefile (or your project, or
+   your workspace or whatever) using the Unix makefile as a template.
 
  */
+
+
 
 /** @name Decoding DjVu content
  */
@@ -332,7 +428,7 @@
 
 
 //----------------------------------------
-/** @name Library Reference.
+/** @name Library Reference
  */             
 
 //@{
@@ -358,7 +454,7 @@
 //@}
 
 
-/** @name Utility Programs.
+/** @name Utility Programs
  */             
 
 //@{
