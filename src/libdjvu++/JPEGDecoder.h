@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: JPEGDecoder.h,v 1.15 2001-07-24 17:52:04 bcr Exp $
+// $Id: JPEGDecoder.h,v 1.16 2001-07-26 19:34:09 bcr Exp $
 // $Name:  $
 
 #ifndef _JPEGDECODER_H_
@@ -47,9 +47,6 @@ class GPixmap;
 extern "C" {
 #endif
 
-#if HAS_DLOPEN && defined(__linux__)
-#define LIBJPEGNAME "libjpeg.so"
-#endif
 #include <stdio.h>
 #include <jconfig.h>
 #include <jpeglib.h>
@@ -68,7 +65,7 @@ extern "C" {
     @memo
     Decoding interface to the IJG JPEG library.
     @version
-    #$Id: JPEGDecoder.h,v 1.15 2001-07-24 17:52:04 bcr Exp $#
+    #$Id: JPEGDecoder.h,v 1.16 2001-07-26 19:34:09 bcr Exp $#
     @author
     Parag Deshmukh <parag@sanskrit.lz.att.com> 
 */
