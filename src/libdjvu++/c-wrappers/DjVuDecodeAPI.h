@@ -10,7 +10,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDecodeAPI.h,v 1.3 2000-01-07 22:44:29 orost Exp $
+//C- $Id: DjVuDecodeAPI.h,v 1.4 2000-01-08 22:44:32 parag Exp $
 #endif
 
 #ifndef _DJVU_DECODE_API_H
@@ -18,7 +18,10 @@
 
 /* 
  * $Log: DjVuDecodeAPI.h,v $
- * Revision 1.3  2000-01-07 22:44:29  orost
+ * Revision 1.4  2000-01-08 22:44:32  parag
+ * TIFF enum replaced with MTIFF as it conflicted with libtiff symbol
+ *
+ * Revision 1.3  2000/01/07 22:44:29  orost
  * added comments
  *
  * Revision 1.2  2000/01/07 16:58:50  praveen
@@ -35,7 +38,7 @@
 /*
      This file contains the decode, rendering and output functions
      needed to decode DjVu images to various other formats like,
-     PNM, BMP, TIFF, JPEG etc.
+     PNM, BMP, MTIFF, JPEG etc.
 */
 
 #include <stdio.h>
@@ -122,7 +125,7 @@ typedef enum {
 		  djvu_pixel_image_allocate(int rows,int cols,int grayscale);
 
 typedef enum{DECODE_MASK, DECODE_FOREGROUND, DECODE_BACKGROUND, DECODE_ALL} Layer;
-typedef enum{PNM, BMP, PS, TIFF, JPEG} OUTFORMAT;
+typedef enum{PNM, BMP, PS, MTIFF, JPEG} OUTFORMAT;
 enum{percent=100};
 
 typedef struct{
