@@ -39,7 +39,7 @@ PHONY: clean distclean
 .cpp.o:
 	$(CXX) $(CXXFLAGS) -c $(SRCDIR)/$*.cpp
 
-.cpp:
+.cpp: $(LIB)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $(SRCDIR)/$*.cpp $(LIB) $(LDLIBS)
 	@if test -f $(SRCDIR)/$@.exp ; then\
 	   if $@ > $@.out 2>&1  &&  cmp -s $@.out $(SRCDIR)/$@.exp  ;\
@@ -49,7 +49,7 @@ PHONY: clean distclean
 	   else echo -- $@ compiled ;\
 	 fi
 
-TestThreads:
+TestThreads: $(LIB)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o TestThreads $(SRCDIR)/TestThreads.cpp $(LIB) $(LDLIBS)
 	@if test -f $(SRCDIR)/$@.exp ; then\
 	   if $@ 2>&1 | sort > $@.out 2>&1  &&  cmp -s $@.out $(SRCDIR)/$@.exp  ;\
@@ -60,23 +60,30 @@ TestThreads:
 	 fi
 
 
-### DEPENDENCIES
 TestArray: TestArray.cpp ../GContainer.h ../DjVuGlobal.h \
  ../GException.h ../GString.h ../GSmartPointer.h
+
 TestBitmap: TestBitmap.cpp ../GBitmap.h ../DjVuGlobal.h \
  ../GRect.h ../ByteStream.h ../GException.h \
  ../GContainer.h ../GSmartPointer.h
+
 TestException: TestException.cpp ../GException.h ../DjVuGlobal.h \
  ../GString.h ../GSmartPointer.h
+
 TestJB2: TestJB2.cpp ../JB2Image.h ../DjVuGlobal.h ../GString.h \
  ../GException.h ../GSmartPointer.h ../GContainer.h ../ZPCodec.h \
  ../ByteStream.h ../GRect.h ../GBitmap.h
+
 TestList: TestList.cpp ../GContainer.h ../DjVuGlobal.h \
  ../GException.h ../GString.h ../GSmartPointer.h
+
 TestMap: TestMap.cpp ../GContainer.h ../DjVuGlobal.h ../GException.h \
  ../GString.h ../GSmartPointer.h
+
 TestSmartPointer: TestSmartPointer.cpp ../GSmartPointer.h ../DjVuGlobal.h
+
 TestString: TestString.cpp ../GString.h ../DjVuGlobal.h \
  ../GException.h ../GSmartPointer.h
+
 TestThreads: TestThreads.cpp ../GThreads.h ../DjVuGlobal.h \
  ../GException.h
