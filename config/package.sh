@@ -64,7 +64,21 @@ fi
 
 echo "Copying files"
 rm -rf "$packagedir"
-(cd ./SRCDIR;tar cf - "$packagedir")|(tar xvvf -)
+mkdir packages 2>>/dev/null
+mkdir "$packagedir" 2>>/dev/null
+for i in `cd ./SRCDIR;echo $packagedir/*` 
+do
+  if [ ! -d "./SRCDIR/$i" ]
+  then
+    if [ "$i" != "$filelist" ] 
+    then
+      cp "./SRCDIR/$i" "$i"
+      chmod u+w "$i"
+      sed -e "s,@%VERSION%@,$version,g" -e "s,@%SYS%@,$SYS,g" < "./SRCDIR/$i" > "$i"
+      chmod u-w "$i"
+    fi
+  fi
+done
 rm -f "$filelist" "$packagedir/CVS"
 archive=`cd "$packagedir" 1>>/dev/null 2>>/dev/null;pwd`/archive.tar
 action="cvf"
