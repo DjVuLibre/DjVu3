@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GContainer.h,v 1.18 1999-08-18 16:01:47 eaf Exp $
+//C- $Id: GContainer.h,v 1.19 1999-08-30 19:46:04 leonb Exp $
 
 
 #ifndef _GCONTAINER_H_
@@ -25,9 +25,18 @@
 #include "GException.h"
 #include "GSmartPointer.h"
 
-#define GCONTAINER_OLD_ITERATORS
-#define GCONTAINER_BOUNDS_CHECK
-
+// Supports old iterators (first/last/next/prev) on lists and maps?
+#ifndef GCONTAINER_OLD_ITERATORS
+#define GCONTAINER_OLD_ITERATORS 1
+#endif
+// Check array bounds at runtime ?
+#ifndef GCONTAINER_BOUNDS_CHECK
+#define GCONTAINER_BOUNDS_CHECK 1
+#endif
+// Clears allocated memory prior to running constructors ?
+#ifndef GCONTAINER_ZERO_FILL
+#define GCONTAINER_ZERO_FILL 1
+#endif
 
 /** @name GContainer.h
 
@@ -46,7 +55,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@research.att.com> -- bug fixes.
     @version 
-    #$Id: GContainer.h,v 1.18 1999-08-18 16:01:47 eaf Exp $# */
+    #$Id: GContainer.h,v 1.19 1999-08-30 19:46:04 leonb Exp $# */
 //@{
 
 
@@ -262,7 +271,7 @@ public:
       subscript range: an exception \Ref{GException} is thrown if argument #n#
       is not in the valid subscript range. */
   TYPE& operator[](int n) {
-#ifdef GCONTAINER_BOUNDS_CHECK
+#if GCONTAINER_BOUNDS_CHECK
     if (n<lobound || n>hibound) throw_illegal_subscript(); 
 #endif
     return ((TYPE*)data)[n-minlo]; }
@@ -273,7 +282,7 @@ public:
       subscript range.  This variant of #operator[]# is necessary when dealing
       with a #const GArray<TYPE>#. */
   const TYPE& operator[](int n) const {
-#ifdef GCONTAINER_BOUNDS_CHECK
+#if GCONTAINER_BOUNDS_CHECK
     if (n<lobound || n>hibound) throw_illegal_subscript(); 
 #endif
     return ((const TYPE*)data)[n-minlo]; }
@@ -574,7 +583,7 @@ public:
   // Internal. Do not use.
   GPosition(Node *p, void *c) 
     : ptr(p), cont(c) { } ;
-#ifdef GCONTAINER_BOUNDS_CHECK
+#if GCONTAINER_BOUNDS_CHECK
   Node *check(void *c) 
     { if (!ptr || c!=cont) throw_invalid(c); return ptr; } ;
   const Node *check(void *c) const
@@ -642,6 +651,9 @@ template<class TI> GCont::Node *
 GListImpl<TI>::newnode(const TI &elt)
 {
   LNode *n = (LNode*) operator new (sizeof(LNode));
+#if GCONTAINER_ZERO_FILL
+  memset(n, 0, sizeof(LNode));
+#endif
   new ((void*)&(n->val)) TI(elt);
   return (Node*) n;
 }
@@ -777,7 +789,7 @@ public:
   void del(GPosition &pos)
     { GListImpl<TI>::del(pos); } ;
   /* Old iterators. Do not use. */
-#ifdef GCONTAINER_OLD_ITERATORS
+#if GCONTAINER_OLD_ITERATORS
   void first(GPosition &pos) const { pos = firstpos(); } ;
   void last(GPosition &pos) const { pos = lastpos(); } ;
   const TYPE *next(GPosition &pos) const 
@@ -923,7 +935,7 @@ GSetImpl<K>::get(const K &key) const
   return 0;
 }
 
-#ifdef GCONTAINER_BOUNDS_CHECK
+#if GCONTAINER_BOUNDS_CHECK
 template<class K> GCont::HNode *
 GSetImpl<K>::get_or_throw(const K &key) const
 { 
@@ -945,6 +957,9 @@ GSetImpl<K>::get_or_create(const K &key)
   HNode *m = get(key);
   if (m) return m;
   SNode *n = (SNode*) operator new (sizeof(SNode));
+#if GCONTAINER_ZERO_FILL
+  memset(n, 0, sizeof(SNode));
+#endif
   new ((void*)&(n->key)) K ( key );
   n->hashcode = hash((const K&)(n->key));
   installnode(n);
@@ -979,6 +994,9 @@ GMapImpl<K,TI>::get_or_create(const K &key)
   HNode *m = get(key);
   if (m) return m;
   MNode *n = (MNode*) operator new (sizeof(MNode));
+#if GCONTAINER_ZERO_FILL
+  memset(n, 0, sizeof(MNode));
+#endif
   new ((void*)&(n->key)) K  (key);
   new ((void*)&(n->val)) TI ();
   n->hashcode = hash((const K&)(n->key));
@@ -1065,7 +1083,7 @@ public:
   void del(const KTYPE &key)
     { GMapImpl<KTYPE,TI>::del(key); } ;
   /* Old iterators. Do not use. */
-#ifdef GCONTAINER_OLD_ITERATORS
+#if GCONTAINER_OLD_ITERATORS
   void first(GPosition &pos) const { pos = firstpos(); } ;
   void last(GPosition &pos) const { pos = lastpos(); } ;
   const VTYPE *next(GPosition &pos) const 

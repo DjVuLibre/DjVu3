@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GContainer.cpp,v 1.10 1999-08-17 22:41:14 leonb Exp $
+//C- $Id: GContainer.cpp,v 1.11 1999-08-30 19:46:04 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -160,7 +160,9 @@ GArrayBase::resize(int lo, int hi)
   int end = hi;
   int bytesize = traits.size * (nmaxhi-nminlo+1);
   void *ndata = operator new (bytesize);
+#if GCONTAINER_ZERO_FILL
   memset(ndata, 0, bytesize);  // slower but cleaner
+#endif
   if (lo < lobound)
     { traits.init( traits.lea(ndata,lo-nminlo), lobound-lo ); beg=lobound; }
   else if (lobound < lo)
