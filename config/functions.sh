@@ -285,8 +285,9 @@ check_compiler()
 
 require_compiler()
 {
-  if [ -z "$CC_SET" -o -z "$CXX_SET" ]
+  if [ -z "$CC_SET" -o -z "$CXX_SET" -o -z "$CCPIC_SET" -o -z "$CXXPIC_SET" ]
   then
+    need_shared=
     compilers="$*"
     if [ -z "$compilers" ]
     then
@@ -319,8 +320,32 @@ require_compiler()
           fi
         fi
         ;;
+      [Ss][Hh][Aa][Rr][Ee][Dd])
+        need_shared=true
+        ;;
+      [Ss][Tt][Aa][Tt][Ii][Cc])
+        need_shared=
+        ;;
       esac
     done
+    if [ -n "$need_shared" ]
+    then
+      if [ -n "$CC_SET" -a -z "$CCPIC_SET" ]
+      then
+        . ${CONFIG_DIR}/ccpic.sh
+      fi
+      if [ -n "$CXX_SET" -a -z "$CXXPIC_SET" ]
+      then
+        . ${CONFIG_DIR}/cxxpic.sh
+      fi
+    else
+      CCPIC_SET=
+      CCPIC=
+      CCSYMBOLIC=
+      CXXPIC_SET=
+      CXXPIC=
+      CXXSYMBOLIC=
+    fi
   fi
 }
 
