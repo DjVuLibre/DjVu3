@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.88 1999-12-20 02:02:00 praveen Exp $
+//C- $Id: DjVuDocument.cpp,v 1.89 1999-12-20 21:45:00 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -91,9 +91,9 @@ DjVuDocument::~DjVuDocument(void)
       GCriticalSectionLock lock(&ufiles_lock);
       for(GPosition pos=ufiles_list;pos;++pos)
       {
-          GP<DjVuFile> file = ufiles_list[pos]->file;
+          GP<DjVuFile> file=ufiles_list[pos]->file;
           file->stop_decode(true);
-	      file->stop(false);	// Disable any access to data
+	  file->stop(false);	// Disable any access to data
       }
       ufiles_list.empty();
    }
@@ -104,9 +104,9 @@ DjVuDocument::~DjVuDocument(void)
       GP<DjVuPort> port=ports[pos];
       if (port->inherits("DjVuFile"))
       {
-	     DjVuFile * file=(DjVuFile *) (DjVuPort *) port;
+	 DjVuFile * file=(DjVuFile *) (DjVuPort *) port;
          file->stop_decode(true);
-	     file->stop(false);	// Disable any access to data
+	 file->stop(false);	// Disable any access to data
       }
    }
 }
