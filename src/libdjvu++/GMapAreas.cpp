@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: GMapAreas.cpp,v 1.15 2000-11-09 20:15:06 jmw Exp $
+// $Id: GMapAreas.cpp,v 1.16 2000-11-22 21:29:20 fcrary Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -40,6 +40,7 @@
 
 #include "GMapAreas.h"
 #include "GException.h"
+#include "debug.h"
 
 #include <math.h>
 #include <stdio.h>
@@ -298,7 +299,7 @@ GMapArea::print(void)
    GString total=left+MAPAREA_TAG+space+URL+space+quote+comment1+quote+space+gma_print()+border_type_str;
    if (border_always_visible)
      total+=space+left+BORDER_AVIS_TAG+right;
-   if (hilite_str[0])
+   if ( !!hilite_str && hilite_str[0] )
      total+=space+hilite_str;
    total+=right;
    return total;
@@ -571,14 +572,11 @@ GMapPoly::gma_transform(const GRect & grect)
 char const * const
 GMapPoly::gma_check_object(void) const
 {
-   const char * str=(const_cast<GMapPoly *>(this))->check_object();
-   if (!str[0])
-   {
-     str=(border_type!=NO_BORDER &&
-       border_type!=SOLID_BORDER &&
-       border_type!=XOR_BORDER)?error_poly_border:
-         ((hilite_color!=0xffffffff)?error_poly_hilite:"");
-   }
+   const char * str;
+   str=(border_type!=NO_BORDER &&
+        border_type!=SOLID_BORDER &&
+        border_type!=XOR_BORDER) ? error_poly_border:
+       ((hilite_color!=0xffffffff) ? error_poly_hilite:"");
    return str;
 }
 

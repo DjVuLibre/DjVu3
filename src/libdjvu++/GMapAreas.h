@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: GMapAreas.h,v 1.16 2000-11-09 20:15:06 jmw Exp $
+// $Id: GMapAreas.h,v 1.17 2000-11-22 21:29:20 fcrary Exp $
 // $Name:  $
 
 #ifndef _GMAPAREAS_H
@@ -70,7 +70,7 @@ typedef unsigned int u_int32;
     @memo Definition of base map area classes
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: GMapAreas.h,v 1.16 2000-11-09 20:15:06 jmw Exp $# */
+    #$Id: GMapAreas.h,v 1.17 2000-11-22 21:29:20 fcrary Exp $# */
 //@{
 
 
@@ -204,7 +204,7 @@ public:
 	  string describing it. */
    char const *	const check_object(void);
       /** Stores the contents of the hyperlink object in a lisp-like format
-	  for sving into #ANTa# chunk (see \Ref{DjVuAnno}) */
+	  for saving into #ANTa# chunk (see \Ref{DjVuAnno}) */
    GString	print(void);
 
       /// Virtual function returning the shape name.
