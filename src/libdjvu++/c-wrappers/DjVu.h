@@ -7,13 +7,13 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVu.h,v 1.7 2000-01-25 04:30:16 bcr Exp $
+ *C- $Id: DjVu.h,v 1.8 2000-01-26 23:30:21 bcr Exp $
  */
 
 #include <stdlib.h>
 
-#ifndef _DJVU_GLOBAL_H
-#define _DJVU_GLOBAL_H
+#ifndef _DJVU_GLOBAL_API_H
+#define _DJVU_GLOBAL_API_H
 
 #ifndef DJVUAPI
 
@@ -41,6 +41,9 @@
 #ifdef __cplusplus
 extern "C"
 {
+#ifndef __cplusplus
+}
+#endif
 #endif /* __cplusplus */
 
 typedef void djvu_free_callback (void *);
@@ -99,7 +102,8 @@ djvu_set_progress_callback(djvu_progress_callback *);
     @memo The djvu_option structure wraps the DjVuParseOptions class 
   */
 
-struct djvu_option {
+struct djvu_option
+{
   /** This is the option long name without the leading double dash */
   const char *name;
   /** has_arg is one if the option has a value, and 2 if the value
@@ -116,9 +120,7 @@ struct djvu_option {
     The \Ref{DjVuParseOptions} class is wrapped by the following
     the following set of wrapper functions.
     @memo Wrapper functions for \Ref{DjVuParseOptions} */
-#ifdef DOCXX_CODE
-//@{
-#endif /* DOCXX_CODE */
+/*@{*/
 
 /** The #djvu_parse# structure is used for exporting and \Ref{DjVuParseOptions}
     methods from C++ into C.  */
@@ -182,13 +184,14 @@ djvu_parse_perror(struct djvu_parse,const char *mesg);
 const char *
 djvu_parse_configfile(struct djvu_parse,const char[],int);
 
-#ifdef DOCXX_CODE
-//@}
-#endif /* DOCXX_CODE */
+/*@}*/
 #ifdef __cplusplus
+#ifndef __cplusplus
+{
+#endif
 }
 #endif /* __cplusplus */
 
-#endif /* __DJVU_GLOBAL_H__ */
+#endif /* __DJVU_GLOBAL_API_H__ */
 
 

@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuAPI.h,v 1.27 2000-01-26 04:40:46 bcr Exp $
+ *C- $Id: DjVuAPI.h,v 1.28 2000-01-26 23:30:21 bcr Exp $
  *
  * The main header file for the DjVu API
  */
@@ -17,7 +17,10 @@
 
 /* 
  * $Log: DjVuAPI.h,v $
- * Revision 1.27  2000-01-26 04:40:46  bcr
+ * Revision 1.28  2000-01-26 23:30:21  bcr
+ * Added remaining functions definitions needed for the API.
+ *
+ * Revision 1.27  2000/01/26 04:40:46  bcr
  * Began splitting PhotoToDjVu.
  *
  * Revision 1.26  2000/01/24 22:19:10  bcr
@@ -49,6 +52,9 @@
 
 #include "DjVu.h"
 #include "DjVuDecodeAPI.h"
+#include "DjVuBitonalAPI.h"
+#include "DjVuPhotoAPI.h"
+#include "DjVuDocumentAPI.h"
 
 /*
  *  ------------------------------------------------------------------------
@@ -771,6 +777,58 @@ djvu_image_const_hflip(const djvu_image in_img[1], djvu_image out_img[1]);
 DJVUAPI void
 djvu_image_hflip(djvu_image *ximg);
 
+/** @name djvu_decode function
+    This function converts the source multipage DjVu document to
+    a document image according to options structure. */
+/*
+ *  ------------------------------------------------------------------------
+ *  DjVu Image manipulation
+ *
+ *    The following set of routines that allow users to use the various 
+ *    API libraries for memory to memory operations.
+ */
+
+/* The @djvu_decode_page@ function will ignore the page range in the
+ * the djvu_decode_options structure, but use the structure to define
+ * all other processing variables.  The decoded image will be returned
+ * instead of being output to a file.
+ */
+DJVUAPI
+djvu_image *djvu_decode_page(djvu_decode_options[1],int page);
+
+/* For compressions, we need to define another type of callback to
+ * accept the image from memory.  The djvu_import_sub will be passed
+ * the argument "arg" specified when initializing the callback, and the
+ * name of the "filename" being parsed.  You will be expected to return
+ * a valid djvu_import stream for that file.
+ */
+typedef djvu_import djvu_import_sub ( void *arg,  const char filename[]);
+
+/* The output filename will be ignored if you specify an djvu_output_sub
+ */
+DJVUAPI int
+djvu_bitonaltodjvu_callback(
+  bitonaltodjvu_options[1], djvu_import_sub *, djvu_output_sub *);
+
+/* The output filename will be ignored if you specify an djvu_output_sub
+ */
+DJVUAPI int
+djvu_phototodjvu_callback(
+  phototodjvu_options[1], djvu_import_sub *, djvu_output_sub *);
+
+/* The output filename will be ignored if you specify an djvu_output_sub
+ */
+DJVUAPI int
+djvu_documenttodjvu_callback(
+  phototodjvu_options[1], djvu_import_sub *, djvu_output_sub *);
+
+/* This is a special type of djvu_import, intended for cases when you have
+ * defined your own decoding, and want to map it to a stream for use with
+ * one of the above functions.  The image will be passed directly and
+ * may be modified by the encoder.
+ */
+DJVUAPI djvu_import
+djvu_import_image( djvu_image * );
 
 #ifdef __cplusplus
 }
