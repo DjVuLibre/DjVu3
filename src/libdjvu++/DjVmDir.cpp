@@ -25,7 +25,7 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVmDir.cpp,v 1.28 2000-11-02 07:15:24 bcr Exp $
+// $Id: DjVmDir.cpp,v 1.29 2000-11-02 22:26:00 fcrary Exp $
 // $Name:  $
 
 
@@ -326,7 +326,7 @@ DjVmDir::encode(ByteStream & str) const
       for(pos=files_list;pos;++pos)
       {
 	 GP<File> file=files_list[pos];
-	 if ((file->offset)?bundled:(!bundled))
+	 if ((file->offset)?(!bundled):bundled)
 	    G_THROW("DjVmDir.bad_dir");               //  The directory contains both indirect and bundled records.
 	 bs_str.write24(file->size);
       }
