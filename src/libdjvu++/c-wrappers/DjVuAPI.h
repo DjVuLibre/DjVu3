@@ -1,4 +1,4 @@
-/* File "$Id: DjVuAPI.h,v 1.16 2000-01-05 19:34:24 bcr Exp $"
+/* File "$Id: DjVuAPI.h,v 1.17 2000-01-05 19:39:48 praveen Exp $"
  *
  * The main header file for the DjVu API
  */
@@ -8,7 +8,10 @@
 
 /* 
  * $Log: DjVuAPI.h,v $
- * Revision 1.16  2000-01-05 19:34:24  bcr
+ * Revision 1.17  2000-01-05 19:39:48  praveen
+ * *** empty log message ***
+ *
+ * Revision 1.16  2000/01/05 19:34:24  bcr
  * Generic header file.
  *
  * Revision 1.15  2000/01/04 20:01:46  bcr
@@ -182,9 +185,15 @@ extern "C" {
 #define DLLEXPORT /**/
 #endif /* DJVU_STATIC_LIBRARY */
 
+#ifdef BUILD_LIB
+#ifndef DJVUAPI
+#define DJVUAPI DLLEXPORT
+#endif  /*DJVUAPI*/
+#else
 #ifndef DJVUAPI
 #define DJVUAPI DLLIMPORT
-#endif
+#endif  /*DJVUAPI*/
+#endif  /*BUILD_LIB*/
 
 typedef enum {
   asciiBW='1',
