@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //
-// $Id: djvused.cpp,v 1.2 2001-09-04 23:48:41 docbill Exp $
+// $Id: djvused.cpp,v 1.3 2001-09-05 19:27:33 docbill Exp $
 // $Name:  $
 
 #include <stdio.h>

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: c44.cpp,v 1.36 2001-08-27 19:50:57 docbill Exp $
+// $Id: c44.cpp,v 1.37 2001-09-05 19:27:33 docbill Exp $
 // $Name:  $
 
 
@@ -185,7 +185,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: c44.cpp,v 1.36 2001-08-27 19:50:57 docbill Exp $# */
+    #$Id: c44.cpp,v 1.37 2001-09-05 19:27:33 docbill Exp $# */
 //@{
 //@}
 
