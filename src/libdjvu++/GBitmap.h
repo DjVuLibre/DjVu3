@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GBitmap.h,v 1.11 1999-05-25 20:36:25 leonb Exp $
+//C- $Id: GBitmap.h,v 1.12 1999-06-02 23:33:53 leonb Exp $
 
 #ifndef _GBITMAP_H_
 #define _GBITMAP_H_
@@ -44,7 +44,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: GBitmap.h,v 1.11 1999-05-25 20:36:25 leonb Exp $#
+    #$Id: GBitmap.h,v 1.12 1999-06-02 23:33:53 leonb Exp $#
 
  */
 //@{
@@ -187,8 +187,8 @@ public:
   //@}
 
   /** @name Accessing RLE data.
-      The next two functions are useful for processing bilevel images
-      encoded using the run length encoding scheme.  Both functions return
+      The next functions are useful for processing bilevel images
+      encoded using the run length encoding scheme.  These functions always return
       zero if the bitmap is not RLE encoded.  Function \Ref{compress} must
       be used to ensure that the bitmap is RLE encoded.  */
   //@{
@@ -198,12 +198,16 @@ public:
       pixels is returned. */
   int rle_get_bits(int rowno, unsigned char *bits) const;
   /** Gets the lengths of all runs in line #rowno#.  The array #rlens# must be
-      large enough to accomodate #w# integers where #w# is the number of
+      large enough to accomodate #w+2# integers where #w# is the number of
       columns in the image.  These integers represent the lengths of
       consecutive runs of alternatively white or black pixels.  Lengths can be
       zero in order to allow for lines starting with black pixels.  This
       function returns the total number of runs in the line. */
   int rle_get_runs(int rowno, int *rlens) const;
+  /** Gets the smallest rectangle enclosing black pixels.
+      Rectangle rect gives the coordinates of the smallest rectangle
+      containing all black pixels. Returns the number of black pixels. */
+  int rle_get_rect(GRect &rect) const;
   //@}
 
   /** @name Additive Blit.  

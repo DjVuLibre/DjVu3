@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: JB2Image.h,v 1.10 1999-05-25 19:42:29 eaf Exp $
+//C- $Id: JB2Image.h,v 1.11 1999-06-02 23:33:53 leonb Exp $
 
 #ifndef _JB2IMAGE_H
 #define _JB2IMAGE_H
@@ -99,7 +99,7 @@
     \end{itemize}
 
     @version
-    #$Id: JB2Image.h,v 1.10 1999-05-25 19:42:29 eaf Exp $#
+    #$Id: JB2Image.h,v 1.11 1999-06-02 23:33:53 leonb Exp $#
     @memo
     Coding bilevel images with JB2.
     @author
@@ -295,7 +295,7 @@ private:
   int width;
   int height;
   DArray<JB2Shape> shapes;
-  DArray<JB2Blit> blits;
+  TArray<JB2Blit> blits;
 };
 
 

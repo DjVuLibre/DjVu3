@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: Arrays.cpp,v 1.2 1999-05-25 19:42:27 eaf Exp $
+//C- $Id: Arrays.cpp,v 1.3 1999-06-02 23:33:53 leonb Exp $
 
 
 /* Put this into *one* file, which instantiates all the required containers
@@ -88,24 +88,24 @@ ArrayRep::operator= (const ArrayRep & rep)
 void
 ArrayRep::resize(int lo, int hi)
 {
-   int i;
-   int nsize = hi - lo + 1;
-      // Validation
-   if (nsize < 0)
-      THROW("Invalid low and high bounds in DArray resize");
-      // Destruction
-   if (nsize == 0)
-   {
+  int i;
+  int nsize = hi - lo + 1;
+  // Validation
+  if (nsize < 0)
+    THROW("Invalid low and high bounds in DArray resize");
+  // Destruction
+  if (nsize == 0)
+    {
       destroy(data, lobound-minlo, hibound-minlo);
       operator delete(data);
       data = 0;
       lobound = minlo = lo; 
       hibound = maxhi = hi; 
       return;
-   }
-      // Simple extension
-   if (lo >= minlo && hi <= maxhi)
-   {
+    }
+  // Simple extension
+  if (lo >= minlo && hi <= maxhi)
+    {
       init1(data, lo-minlo, lobound-1-minlo);
       destroy(data, lobound-minlo, lo-1-minlo);
       init1(data, hibound+1-minlo, hi-minlo);
@@ -113,37 +113,37 @@ ArrayRep::resize(int lo, int hi)
       lobound = lo;
       hibound = hi;
       return;
-   }
-      // General case
-   int nminlo = minlo;
-   int nmaxhi = maxhi;
-   if (nminlo > nmaxhi)
-      nminlo = nmaxhi = lo;
-   while (nminlo > lo) {
-      int incr = nmaxhi - nminlo;
-      nminlo -= (incr < 8 ? 8 : (incr > 32768 ? 32768 : incr));
-   }
-   while (nmaxhi < hi) {
-      int incr = nmaxhi - nminlo;
-      nmaxhi += (incr < 8 ? 8 : (incr > 32768 ? 32768 : incr));
-   }
-      // allocate
-   int bytesize=elsize*(nmaxhi-nminlo+1);
-   void * ndata=operator new(bytesize);
-   memset(ndata, 0, bytesize);
-
-   init1(ndata, lo-nminlo, lobound-1-nminlo);
-   init2(ndata, lobound-nminlo, hibound-nminlo,
-	 data, lobound-minlo, hibound-minlo);
-   init1(ndata, hibound+1-nminlo, hi-nminlo);
-   destroy(data, lobound-minlo, hibound-minlo);
-      // free and replace
-   operator delete (data);
-   data = ndata;
-   minlo = nminlo;
-   maxhi = nmaxhi;
-   lobound = lo;
-   hibound = hi;
+    }
+  // General case
+  int nminlo = minlo;
+  int nmaxhi = maxhi;
+  if (nminlo > nmaxhi)
+    nminlo = nmaxhi = lo;
+  while (nminlo > lo) {
+    int incr = nmaxhi - nminlo;
+    nminlo -= (incr < 8 ? 8 : (incr > 32768 ? 32768 : incr));
+  }
+  while (nmaxhi < hi) {
+    int incr = nmaxhi - nminlo;
+    nmaxhi += (incr < 8 ? 8 : (incr > 32768 ? 32768 : incr));
+  }
+  // allocate
+  int bytesize=elsize*(nmaxhi-nminlo+1);
+  void * ndata=operator new(bytesize);
+  memset(ndata, 0, bytesize);
+  // initialize
+  init1(ndata, lo-nminlo, lobound-1-nminlo);
+  init2(ndata, lobound-nminlo, hibound-nminlo,
+        data, lobound-minlo, hibound-minlo);
+  init1(ndata, hibound+1-nminlo, hi-nminlo);
+  destroy(data, lobound-minlo, hibound-minlo);
+  // free and replace
+  operator delete (data);
+  data = ndata;
+  minlo = nminlo;
+  maxhi = nmaxhi;
+  lobound = lo;
+  hibound = hi;
 }
 
 void

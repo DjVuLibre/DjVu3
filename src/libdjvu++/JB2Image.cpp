@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: JB2Image.cpp,v 1.8 1999-05-25 19:42:29 eaf Exp $
+//C- $Id: JB2Image.cpp,v 1.9 1999-06-02 23:33:53 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -124,7 +124,7 @@ private:
   void encode_libonly_shape(JB2Image *jim, int shapeno);
 #ifdef STRICT_PGH
   struct LibRect { short top,left,right,bottom; };
-  DArray<LibRect> libinfo;
+  TArray<LibRect> libinfo;
   void compute_pgh_size(int libno, GBitmap *cbm);
 #endif
 };
@@ -1165,7 +1165,8 @@ JB2Image::JB2Codec::code_record(int &rectype, JB2Image *jim, JB2Shape *jshp, JB2
 #endif
           break;
         }
-      // save memory (almost zero impact on decompression time)
+      // make sure everything is compacted
+      // decompaction will occur automatically on cross-coding bitmaps
       if (bm)
         bm->compress();
       // add blit to image
@@ -1384,38 +1385,21 @@ JB2Image::JB2Codec::encode_libonly_shape(JB2Image *jim, int shapeno )
 
 
 #ifdef STRICT_PGH
+
 void 
 JB2Image::JB2Codec::compute_pgh_size(int libno, GBitmap *cbm)
 {
-  int nrows = cbm->rows();
-  int ncolumns = cbm->columns();
-  int top, bottom, left, right;
-  top = 0;
-  bottom = nrows;
-  right = 0;
-  left = ncolumns;
-  for (int r = 0; r < nrows; r++)
-    {
-      unsigned char *row = (*cbm)[r];
-      for (int c = 0; c < ncolumns; c++)
-        if (row[c])
-          {
-            if (c < left)   left = c;
-            if (c > right)  right = c;
-            if (r > top)    top = r;
-            if (r < bottom) bottom = r;
-          }
-    }
-  if (top < bottom)
-    top = bottom = 0;
-  if (right < left)
-    right = left = 0;
+  GRect rect;
+  cbm->compress();
+  cbm->rle_get_rect(rect);
   libinfo.touch(libno);
-  libinfo[libno].right = right;
-  libinfo[libno].left = left;
-  libinfo[libno].top = top;
-  libinfo[libno].bottom = bottom;
+  LibRect *lib = &libinfo[libno];
+  lib->right  = rect.xmax;
+  lib->left   = rect.xmin;
+  lib->top    = rect.ymax;
+  lib->bottom = rect.ymin;
 }
+
 #endif
 
 

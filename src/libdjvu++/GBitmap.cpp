@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GBitmap.cpp,v 1.10 1999-05-25 20:53:18 leonb Exp $
+//C- $Id: GBitmap.cpp,v 1.11 1999-06-02 23:33:53 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -24,7 +24,7 @@
 #include "Arrays.h"
 
 
-// File "$Id: GBitmap.cpp,v 1.10 1999-05-25 20:53:18 leonb Exp $"
+// File "$Id: GBitmap.cpp,v 1.11 1999-06-02 23:33:53 leonb Exp $"
 // - Author: Leon Bottou, 05/1997
 
 // ----- constructor and destructor
@@ -928,6 +928,54 @@ GBitmap::rle_get_runs(int rowno, int *rlens) const
 }
 
 
+int 
+GBitmap::rle_get_rect(GRect &rect) const
+{
+  if (!rle) 
+    return 0;
+  int area = 0;
+  unsigned char *runs = rle;
+  rect.xmin = ncolumns;
+  rect.ymin = nrows;
+  rect.xmax = 0;
+  rect.ymax = 0;
+  int r = nrows;
+  while (--r >= 0)
+    {
+      int p = 0;
+      int c = 0;
+      int n = 0;
+      while (c < ncolumns)
+        {
+          int x = *runs++;
+          if (x>=0xC0)
+            x = ((x&0x3f)<<8) | (*runs++);
+          if (p && x>0)
+            {
+              if (c < rect.xmin) 
+                rect.xmin = c;
+              if (c+x > rect.xmax) 
+                rect.xmax = c+x-1;
+              n += x;
+            }
+          c += x;
+          p = 1-p;
+        }
+      area += n;
+      if (n)
+        {
+          rect.ymin = r;
+          if (r > rect.ymax) 
+            rect.ymax = r;
+        }
+    }
+  if (area==0)
+    rect.clear();
+  return area;
+}
+
+
+
 // ------ helpers
 
 int
@@ -946,7 +994,8 @@ GBitmap::encode(unsigned char **pruns) const
   // create run array
   int pos = 0;
   int size = 0;
-  TArray<unsigned char> runs(0,0);
+  int maxpos = 1024 + ncolumns + ncolumns;
+  unsigned char *runs = new unsigned char[maxpos];
   // encode bitmap as rle
   const unsigned char *row = bytes + border;
   int n = nrows - 1;
@@ -955,6 +1004,14 @@ GBitmap::encode(unsigned char **pruns) const
     {
       int c = 0;
       unsigned char p = 0;
+      if (maxpos < pos+ncolumns+ncolumns+2)
+        {
+          maxpos += 1024 + ncolumns + ncolumns;
+          unsigned char *newruns = new unsigned char[maxpos];
+          memcpy(newruns, runs, pos);
+          delete [] runs;
+          runs = newruns;
+        }
       while (c < ncolumns)
         {
           int x = 0;
@@ -970,13 +1027,11 @@ GBitmap::encode(unsigned char **pruns) const
             }
           while (x >= 0x4000)
             {
-              runs.touch(pos+2);
               runs[pos++] = 0xFF;
               runs[pos++] = 0xFF;
               runs[pos++] = 0;
               x -= 0x3FFF;
             }
-          runs.touch(pos+1);
           if (x >= 0xC0) 
             runs[pos++] = (x>>8 | 0xc0);
           runs[pos++] = x & 0xFF;
@@ -988,6 +1043,7 @@ GBitmap::encode(unsigned char **pruns) const
   // return result
   *pruns = new unsigned char[pos];
   memcpy((void*)*pruns, (void*)(unsigned char*)runs, pos);
+  delete [] runs;
   return pos;
 }
 
