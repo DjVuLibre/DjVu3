@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GException.h,v 1.25 2001-04-17 22:20:14 bcr Exp $
+// $Id: GException.h,v 1.26 2001-04-18 17:54:24 praveen Exp $
 // $Name:  $
 
 #ifndef _GEXCEPTION_H_
@@ -92,7 +92,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@geocities.com> -- fixed message memory allocation.
     @version 
-    #$Id: GException.h,v 1.25 2001-04-17 22:20:14 bcr Exp $# */
+    #$Id: GException.h,v 1.26 2001-04-18 17:54:24 praveen Exp $# */
 //@{
 
 #include "DjVuGlobal.h"
@@ -224,7 +224,7 @@ public:
   (GException(msg, __FILE__, __LINE__, __PRETTY_FUNCTION__, xtype))
 #else
 #define G_THROW_TYPE(msg,xtype) GExceptionHandler::exthrow \
-  (GException(msg, __FILE__, __LINE__,xtype)
+  (GException(msg, __FILE__, __LINE__,0, xtype))
 #endif
 
 #else // USE_EXCEPTION_EMULATION
@@ -264,7 +264,7 @@ public:
 #define G_EMTHROW(ex) GExceptionHandler::emthrow(ex)
 #else
 #define G_THROW_TYPE(m,xtype) GExceptionHandler::emthrow \
-  (GException(m, __FILE__, __LINE__,xtype)) no_return
+  (GException(m, __FILE__, __LINE__,0, xtype)) no_return
 #define G_EMTHROW(ex) GExceptionHandler::emthrow(ex) no_return
 #endif
 

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.64 2001-04-17 22:20:14 bcr Exp $
+// $Id: GString.cpp,v 1.65 2001-04-18 17:54:24 praveen Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -1690,7 +1690,7 @@ int
 GStringRep::Native::nextNonSpace(int from) const
 {
   int retval;
-  if(retval<size)
+  if(from<size)
   {
     int n=0;
     sscanf(data+from, " %n", &n);

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: Arrays.h,v 1.25 2001-04-12 22:40:14 fcrary Exp $
+// $Id: Arrays.h,v 1.26 2001-04-18 17:54:24 praveen Exp $
 // $Name:  $
 
 #ifndef _ARRAYS_H_
@@ -91,7 +91,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@geocities.com> -- Copy-on-demand implementation.
     @version 
-    #$Id: Arrays.h,v 1.25 2001-04-12 22:40:14 fcrary Exp $# */
+    #$Id: Arrays.h,v 1.26 2001-04-18 17:54:24 praveen Exp $# */
 //@{
 
 // Auxiliary classes: Will be used in place of GPBase and GPEnabled objects
@@ -517,7 +517,7 @@ template <class TYPE> inline TYPE&
 ArrayBaseT<TYPE>::operator[](int n)
 {
    check();
-   
+
    ArrayRep * rep=(ArrayRep *) get();
    if (n<rep->lobound || n>rep->hibound)
       G_THROW( ERR_MSG("arrays.ill_sub") );
