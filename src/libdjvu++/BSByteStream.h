@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: BSByteStream.h,v 1.3 1999-02-01 18:32:31 leonb Exp $
+//C-  $Id: BSByteStream.h,v 1.4 1999-02-19 19:03:43 leonb Exp $
 
 
 #ifndef _BSBYTESTREAM_H
@@ -86,11 +86,11 @@
 
     @author
     Leon Bottou <leonb@research.att.com> -- Initial implementation\\
-    Andrei Erofeev <eaf@geocities.com> -- Improved Block Sorting algorithm.
+    Andrei Erofeev <eaf@research.att.com> -- Improved Block Sorting algorithm.
     @memo
     Simple Burrows-Wheeler general purpose compressor.
     @version
-    #$Id: BSByteStream.h,v 1.3 1999-02-01 18:32:31 leonb Exp $# */
+    #$Id: BSByteStream.h,v 1.4 1999-02-19 19:03:43 leonb Exp $# */
 //@{
 
 #ifdef __GNUC__

@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: GException.h,v 1.3 1999-02-08 19:38:36 leonb Exp $
+//C-  $Id: GException.h,v 1.4 1999-02-19 19:03:43 leonb Exp $
 
 
 #ifndef _GEXCEPTION_H_
@@ -58,9 +58,9 @@
     Portable exceptions.
     @author 
     Leon Bottou <leonb@research.att.com> -- initial implementation.\\
-    Andrei Erofeev <eaf@geocities.com> -- fixed message memory allocation.
+    Andrei Erofeev <eaf@research.att.com> -- fixed message memory allocation.
     @version 
-    #$Id: GException.h,v 1.3 1999-02-08 19:38:36 leonb Exp $# */
+    #$Id: GException.h,v 1.4 1999-02-19 19:03:43 leonb Exp $# */
 //@{
 
 #include "DjVuGlobal.h"

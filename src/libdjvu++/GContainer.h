@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: GContainer.h,v 1.3 1999-02-11 14:33:11 leonb Exp $
+//C-  $Id: GContainer.h,v 1.4 1999-02-19 19:03:43 leonb Exp $
 
 
 #ifndef _GCONTAINER_H_
@@ -44,9 +44,9 @@
     Template class for generic containers.
     @author 
     Leon Bottou <leonb@research.att.com> -- initial implementation.\\
-    Andrei Erofeev <eaf@geocities.com> -- bug fixes.
+    Andrei Erofeev <eaf@research.att.com> -- bug fixes.
     @version 
-    #$Id: GContainer.h,v 1.3 1999-02-11 14:33:11 leonb Exp $# */
+    #$Id: GContainer.h,v 1.4 1999-02-19 19:03:43 leonb Exp $# */
 //@{
 
 class GContainerBase;
