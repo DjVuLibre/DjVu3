@@ -9,9 +9,9 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GOS.cpp,v 1.9 1999-11-09 19:26:52 eaf Exp $
+//C- $Id: GOS.cpp,v 1.10 1999-11-18 16:28:04 bcr Exp $
 
-// "$Id: GOS.cpp,v 1.9 1999-11-09 19:26:52 eaf Exp $"
+// "$Id: GOS.cpp,v 1.10 1999-11-18 16:28:04 bcr Exp $"
 
 #ifdef __GNUC__
 #pragma implementation
@@ -120,6 +120,7 @@ GOS::is_file(const char *filename)
 int 
 GOS::is_dir(const char *filename)
 {
+  if(!filename || !filename[0]) return FALSE;
   /* UNIX implementation */
 #ifdef UNIX
   struct stat buf;
@@ -154,8 +155,9 @@ GOS::is_dir(const char *filename)
 GString 
 GOS::dirname(const char *fname)
 {
+//  if (!fname) fname="";
+  if(!fname || !fname[0]) return GString("");
   /* UNIX implementation */  
-  if (!fname) fname="";
 #ifdef UNIX
   GString temp;
   char *string_buffer = temp.getbuf(strlen(fname)+16);
@@ -243,7 +245,8 @@ GOS::dirname(const char *fname)
 GString 
 GOS::basename(const char *fname, const char *suffix)
 {
-  if (!fname) fname="";
+//  if (!fname) fname="";
+  if(!fname || fname[0]) return GString("");
   /* UNIX implementation */
 #ifdef UNIX
   char *s = strrchr(fname,'/');
@@ -253,7 +256,7 @@ GOS::basename(const char *fname, const char *suffix)
   if (suffix==0 || suffix[0]==0)
     return fname;
   if (suffix[0]=='.')
-    suffix += 1;
+    suffix++;
   if (suffix[0]==0)
     return fname;
   GString temp;
@@ -520,17 +523,20 @@ GOS::expand_name(const char *fname, const char *from)
 int
 GOS::deletefile(const char * filename)
 {
+  if(filename && filename[0])
+  {
 #ifdef WIN32
-  if (is_dir(filename))
-    return _rmdir(filename);
-  else
-    return _unlink(filename);
+    if (is_dir(filename))
+      return _rmdir(filename);
+    else
+      return _unlink(filename);
 #else
-  if (is_dir(filename))
-    return rmdir(filename);
-  else
-    return unlink(filename);
+    if (is_dir(filename))
+      return rmdir(filename);
+    else
+      return unlink(filename);
 #endif
+  }
 }
 
 
@@ -595,6 +601,10 @@ GOS::sleep(int milliseconds)
 GString 
 GOS::filename_to_url(const char *filename, const char *useragent)
 {
+  // Special case for blank pages
+  if(!filename || !filename[0])
+    return GString("about:blank");
+
   // Special case for stupid MSIE 
   GString agent(useragent ? useragent : "default");
   if (agent.search("MSIE")>=0 || agent.search("Microsoft")>=0)
@@ -667,6 +677,9 @@ hexval(char c)
 GString 
 GOS::url_to_filename(const char *url)
 {
+  if(!url||!strcmp(url,"about:blank"))
+    return GString("");
+
   GString tmp;
 #ifdef UNIX
   const char *root = "/";
