@@ -7,9 +7,9 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: IWImage.cpp,v 1.1 1999-02-01 18:57:33 leonb Exp $
+//C-  $Id: IWImage.cpp,v 1.2 1999-02-04 21:48:47 leonb Exp $
 
-// File "$Id: IWImage.cpp,v 1.1 1999-02-01 18:57:33 leonb Exp $"
+// File "$Id: IWImage.cpp,v 1.2 1999-02-04 21:48:47 leonb Exp $"
 // - Author: Leon Bottou, 08/1998
 
 #ifdef __GNUC__
@@ -1277,12 +1277,19 @@ _IWCodec::next_quant(void)
 {
   int i;
   int flag = 0;
+  // Quantization coefficients for first band
   for (i=0; i<16; i++)
-    if ((quant_lo[i] = (quant_lo[i]+1)>>1))
-      flag = 1;
+    if (quant_lo[i] > 1)
+      { flag=1; quant_lo[i] = (quant_lo[i]+1)>>1; } 
+    else 
+      { quant_lo[i]=0; }
+  // Quantization coefficients for other bands
   for (i=0; i<10; i++)
-    if ((quant_hi[i] = (quant_hi[i]+1)>>1))
-      flag = 1;
+    if (quant_hi[i] > 1)
+      { flag=1; quant_hi[i] = (quant_hi[i]+1)>>1; } 
+    else 
+      { quant_hi[i]=0; }
+  // Still meaningful ?
   return flag;
 }
 
