@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: IFFByteStream.h,v 1.13 1999-09-27 20:30:33 leonb Exp $
+//C- $Id: IFFByteStream.h,v 1.14 1999-11-22 03:35:17 bcr Exp $
 
 
 #ifndef _IFFBYTESTREAM_H_
@@ -68,7 +68,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: IFFByteStream.h,v 1.13 1999-09-27 20:30:33 leonb Exp $# */
+    #$Id: IFFByteStream.h,v 1.14 1999-11-22 03:35:17 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -162,6 +162,9 @@ public:
       IFFByteStream is then ready to process the next chunk at the same
       hierarchical level. */
   void close_chunk();
+  /** This is identical to the above, plus it adds a seek to the start of
+      the next chunk.  This way we catch EOF errors with the current chunk.*/
+  void seek_close_chunk();
   /** Returns true when it is legal to call #read# or #write#. */
   int ready();
   /** Returns true when the current chunk is a composite chunk. */

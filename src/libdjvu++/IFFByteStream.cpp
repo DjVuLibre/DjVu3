@@ -9,9 +9,9 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: IFFByteStream.cpp,v 1.9 1999-03-17 19:24:58 leonb Exp $
+//C- $Id: IFFByteStream.cpp,v 1.10 1999-11-22 03:35:17 bcr Exp $
 
-// File "$Id: IFFByteStream.cpp,v 1.9 1999-03-17 19:24:58 leonb Exp $"
+// File "$Id: IFFByteStream.cpp,v 1.10 1999-11-22 03:35:17 bcr Exp $"
 // -- Implementation of IFFByteStream
 // - Author: Leon Bottou, 06/1998
 
@@ -318,6 +318,22 @@ IFFByteStream::close_chunk()
   assert(ctx==0 || ctx->bComposite);
   delete octx;
 }
+
+// This is the same as above, but adds a seek to the close
+// Otherwise an EOF in this chunk won't be reported until we
+// try to open the next chunk, which makes error recovery
+// very difficult.
+void  
+IFFByteStream::seek_close_chunk(void)
+{
+  close_chunk();
+  if ((dir <= 0)&&((!ctx)||(ctx->bComposite))&&(seekto > offset))
+  {
+    bs->seek(seekto);
+    offset = seekto;
+  }
+}
+
 
 
 // IFFByteStream::short_id
