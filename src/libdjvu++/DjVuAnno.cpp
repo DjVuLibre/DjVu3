@@ -30,11 +30,11 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuAnno.cpp,v 1.107 2001-10-16 18:01:43 docbill Exp $
+// $Id: DjVuAnno.cpp,v 1.106.2.1 2001-10-17 22:31:18 leonb Exp $
 // $Name:  $
 
-#ifdef __GNUC__
-#pragma implementation
+#ifdef HAVE_CONFIG_H
+#include "config.h"
 #endif
 
 #include "DjVuAnno.h"
@@ -980,7 +980,7 @@ DjVuANT::get_metadata(GLParser & parser)
               for(int obj_num=0;obj_num<obj.get_list().size();obj_num++)
                 {
                   GLObject & el=*obj[obj_num];
-                  if (el.get_type()==GLObject::GLObject::LIST)
+                  if (el.get_type()==GLObject::LIST)
                     { 
                       const GUTF8String & name=el.get_name();  
                       mdata[name]=(el[0])->get_string();
@@ -1300,8 +1300,7 @@ DjVuAnno::decode(const GP<ByteStream> &gbs)
   {
     if (chkid == "ANTa")
     {
-      if (ant) 
-      {
+      if (ant) {
         ant->merge(*iff.get_bytestream());
       } else {
         ant=DjVuANT::create();
@@ -1311,8 +1310,7 @@ DjVuAnno::decode(const GP<ByteStream> &gbs)
     else if (chkid == "ANTz")
     {
       GP<ByteStream> gbsiff=BSByteStream::create(giff->get_bytestream());
-      if (ant) 
-      {
+      if (ant) {
         ant->merge(*gbsiff);
       } else {
         ant=DjVuANT::create();
@@ -1330,21 +1328,21 @@ DjVuAnno::encode(const GP<ByteStream> &gbs)
   GP<IFFByteStream> giff=IFFByteStream::create(gbs);
   IFFByteStream &iff=*giff;
   if (ant)
-  {
-#if 0
-    iff.put_chunk("ANTa");
-    ant->encode(iff);
-    iff.close_chunk();
-#else
-    iff.put_chunk("ANTz");
     {
-      //   GP<ByteStream> bsbinput = giff.get_bytestream();
-      GP<ByteStream> bsb = BSByteStream::create(giff->get_bytestream(), 50);
-      ant->encode(*bsb);
-    }
-    iff.close_chunk();
+#if 0
+      iff.put_chunk("ANTa");
+      ant->encode(iff);
+      iff.close_chunk();
+#else
+      iff.put_chunk("ANTz");
+      {
+//	 GP<ByteStream> bsbinput = giff.get_bytestream();
+	 GP<ByteStream> bsb = BSByteStream::create(giff->get_bytestream(), 50);
+	 ant->encode(*bsb);
+      }
+      iff.close_chunk();
 #endif
-  }
+    }
   // Add encoding of other chunks here
 }
 
