@@ -25,7 +25,7 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: bzz.cpp,v 1.5 2000-11-04 08:12:56 bcr Exp $
+// $Id: bzz.cpp,v 1.6 2000-11-04 08:41:09 bcr Exp $
 // $Name:  $
 
 
@@ -53,7 +53,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation
     @version
-    $Id: bzz.cpp,v 1.5 2000-11-04 08:12:56 bcr Exp $
+    $Id: bzz.cpp,v 1.6 2000-11-04 08:41:09 bcr Exp $ */
 //@{
 //@}
 

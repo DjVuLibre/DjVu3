@@ -25,7 +25,7 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: cjb2.cpp,v 1.4 2000-11-03 02:08:36 bcr Exp $
+// $Id: cjb2.cpp,v 1.5 2000-11-04 08:41:09 bcr Exp $
 // $Name:  $
 
 
@@ -65,6 +65,7 @@
     Paul Howard <pgh@research.att.com>\\
     Pascal Vincent <vincentp@iro.umontreal.ca>
     @version
+    $Id: cjb2.cpp,v 1.5 2000-11-04 08:41:09 bcr Exp $ */
 //@{
 //@}
 
