@@ -19,6 +19,12 @@ CFG=libdjvu - Win32 Debug
 !MESSAGE 
 !MESSAGE "libdjvu - Win32 Release" (based on "Win32 (x86) Static Library")
 !MESSAGE "libdjvu - Win32 Debug" (based on "Win32 (x86) Static Library")
+!MESSAGE "libdjvu - Win32 Debug_md" (based on "Win32 (x86) Static Library")
+!MESSAGE "libdjvu - Win32 Release_md" (based on "Win32 (x86) Static Library")
+!MESSAGE "libdjvu - Win64 Release_md" (based on "Win32 (x86) Static Library")
+!MESSAGE "libdjvu - Win64 Debug_md" (based on "Win32 (x86) Static Library")
+!MESSAGE "libdjvu - Win64 Release" (based on "Win32 (x86) Static Library")
+!MESSAGE "libdjvu - Win64 Debug" (based on "Win32 (x86) Static Library")
 !MESSAGE 
 
 # Begin Project
@@ -41,7 +47,7 @@ RSC=rc.exe
 # PROP Intermediate_Dir "Release"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /FD /c
-# ADD CPP /nologo /MT /W3 /GX /O2 /I "..\include" /I "..\3rd-party\libjpeg" /D "NDEBUG" /D "NEED_JPEG_DECODER" /D "WIN32" /D "_WINDOWS" /D "DJVU_STATIC_LIBRARY" /D "GCONTAINER_NO_MEMBER_TEMPLATES" /D "NEED_DJVU_PROGRESS" /FR /YX /FD /c
+# ADD CPP /nologo /MT /W3 /GX /O2 /I "..\3rd-party\libjpeg" /D "NDEBUG" /D "NEED_JPEG_DECODER" /D "WIN32" /D "_WINDOWS" /D "DJVU_STATIC_LIBRARY" /D "GCONTAINER_NO_MEMBER_TEMPLATES" /D "NEED_DJVU_PROGRESS" /FR /YX /FD /c
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
 # ADD RSC /l 0x409 /d "NDEBUG"
 BSC32=bscmake.exe
@@ -64,7 +70,7 @@ LIB32=link.exe -lib
 # PROP Intermediate_Dir "Debug"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /FD /GZ /c
-# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "..\include" /I "..\3rd-party\libjpeg" /I "..\..\..\MrSID\libjpeg" /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "DJVU_STATIC_LIBRARY" /D "NEED_JPEG_DECODER" /D "GCONTAINER_NO_MEMBER_TEMPLATES" /D "NEED_DJVU_PROGRESS" /FR /YX /FD /GZ /c
+# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "..\3rd-party\libjpeg" /I "..\..\..\MrSID\libjpeg" /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "DJVU_STATIC_LIBRARY" /D "NEED_JPEG_DECODER" /D "GCONTAINER_NO_MEMBER_TEMPLATES" /D "NEED_DJVU_PROGRESS" /FR /YX /FD /GZ /c
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
 # ADD RSC /l 0x409 /d "_DEBUG"
 BSC32=bscmake.exe
@@ -74,12 +80,159 @@ LIB32=link.exe -lib
 # ADD BASE LIB32 /nologo
 # ADD LIB32 /nologo /out:"../../Debug/lib/LibDjVu.lib" /nodefaultlib
 
+!ELSEIF  "$(CFG)" == "libdjvu - Win32 Debug_md"
+
+# PROP BASE Use_MFC 0
+# PROP BASE Use_Debug_Libraries 1
+# PROP BASE Output_Dir "libdjvu___Win32_Debug_md"
+# PROP BASE Intermediate_Dir "libdjvu___Win32_Debug_md"
+# PROP BASE Target_Dir ""
+# PROP Use_MFC 0
+# PROP Use_Debug_Libraries 1
+# PROP Output_Dir "Debug"
+# PROP Intermediate_Dir "Debug\lib_md_temp"
+# PROP Target_Dir ""
+# ADD BASE CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "..\3rd-party\libjpeg" /I "..\..\..\MrSID\libjpeg" /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "DJVU_STATIC_LIBRARY" /D "NEED_JPEG_DECODER" /D "GCONTAINER_NO_MEMBER_TEMPLATES" /D "NEED_DJVU_MEMORY" /D "NEED_DJVU_PROGRESS" /FR /YX /FD /GZ /c
+# ADD CPP /nologo /MDd /W3 /Gm /GX /ZI /Od /I "..\3rd-party\libjpeg" /I "..\..\..\MrSID\libjpeg" /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "DJVU_STATIC_LIBRARY" /D "NEED_JPEG_DECODER" /D "GCONTAINER_NO_MEMBER_TEMPLATES" /D "NEED_DJVU_MEMORY" /D "NEED_DJVU_PROGRESS" /FR /YX /FD /GZ /c
+# ADD BASE RSC /l 0x409 /d "_DEBUG"
+# ADD RSC /l 0x409 /d "_DEBUG"
+BSC32=bscmake.exe
+# ADD BASE BSC32 /nologo
+# ADD BSC32 /nologo
+LIB32=link.exe -lib
+# ADD BASE LIB32 /nologo /nodefaultlib
+# ADD LIB32 /nologo /out:"Debug\libdjvu_md.lib" /nodefaultlib
+
+!ELSEIF  "$(CFG)" == "libdjvu - Win32 Release_md"
+
+# PROP BASE Use_MFC 0
+# PROP BASE Use_Debug_Libraries 0
+# PROP BASE Output_Dir "libdjvu___Win32_Release_md"
+# PROP BASE Intermediate_Dir "libdjvu___Win32_Release_md"
+# PROP BASE Target_Dir ""
+# PROP Use_MFC 0
+# PROP Use_Debug_Libraries 0
+# PROP Output_Dir "Release\"
+# PROP Intermediate_Dir "Release\lib_md_temp"
+# PROP Target_Dir ""
+# ADD BASE CPP /nologo /MT /W3 /GX /O2 /I "..\3rd-party\libjpeg" /I "..\..\..\MrSID\libjpeg" /D "NDEBUG" /D "NEED_JPEG_DECODER" /D "WIN32" /D "_WINDOWS" /D "DJVU_STATIC_LIBRARY" /D "GCONTAINER_NO_MEMBER_TEMPLATES" /D "NEED_DJVU_MEMORY" /D "NEED_DJVU_PROGRESS" /FR /YX /FD /c
+# ADD CPP /nologo /MD /W3 /GX /O2 /I "..\3rd-party\libjpeg" /I "..\..\..\MrSID\libjpeg" /D "NDEBUG" /D "NEED_JPEG_DECODER" /D "WIN32" /D "_WINDOWS" /D "DJVU_STATIC_LIBRARY" /D "GCONTAINER_NO_MEMBER_TEMPLATES" /D "NEED_DJVU_MEMORY" /D "NEED_DJVU_PROGRESS" /FR /YX /FD /c
+# ADD BASE RSC /l 0x409 /d "NDEBUG"
+# ADD RSC /l 0x409 /d "NDEBUG"
+BSC32=bscmake.exe
+# ADD BASE BSC32 /nologo
+# ADD BSC32 /nologo
+LIB32=link.exe -lib
+# ADD BASE LIB32 /nologo /nodefaultlib
+# ADD LIB32 /nologo /out:"Release\libdjvu_md.lib" /nodefaultlib
+
+!ELSEIF  "$(CFG)" == "libdjvu - Win64 Release_md"
+
+# PROP BASE Use_MFC 0
+# PROP BASE Use_Debug_Libraries 0
+# PROP BASE Output_Dir "libdjvu___Win64_Release_md"
+# PROP BASE Intermediate_Dir "libdjvu___Win64_Release_md"
+# PROP BASE Target_Dir ""
+# PROP Use_MFC 0
+# PROP Use_Debug_Libraries 0
+# PROP Output_Dir "libdjvu___Win64_Release_md"
+# PROP Intermediate_Dir "libdjvu___Win64_Release_md"
+# PROP Target_Dir ""
+# ADD BASE CPP /nologo /MD /W3 /GX /O2 /I "..\3rd-party\libjpeg" /I "..\..\..\MrSID\libjpeg" /D "NDEBUG" /D "NEED_JPEG_DECODER" /D "WIN32" /D "_WINDOWS" /D "DJVU_STATIC_LIBRARY" /D "GCONTAINER_NO_MEMBER_TEMPLATES" /D "NEED_DJVU_MEMORY" /D "NEED_DJVU_PROGRESS" /FR /YX /FD /c
+# ADD CPP /nologo /MD /W3 /GX /O2 /I "..\3rd-party\libjpeg" /I "..\..\..\MrSID\libjpeg" /D "NDEBUG" /D "NEED_JPEG_DECODER" /D "WIN32" /D "_WINDOWS" /D "DJVU_STATIC_LIBRARY" /D "GCONTAINER_NO_MEMBER_TEMPLATES" /D "NEED_DJVU_MEMORY" /D "NEED_DJVU_PROGRESS" /D "WIN64" /Wp64 /c
+# SUBTRACT CPP /YX
+# ADD BASE RSC /l 0x409 /d "NDEBUG"
+# ADD RSC /l 0x409 /d "NDEBUG"
+BSC32=bscmake.exe
+# ADD BASE BSC32 /nologo
+# ADD BSC32 /nologo
+LIB32=link.exe -lib
+# ADD BASE LIB32 /nologo /out:"Release\libdjvu_md.lib" /nodefaultlib
+# ADD LIB32 /nologo /out:"Release\libdjvu_md.lib" /nodefaultlib
+
+!ELSEIF  "$(CFG)" == "libdjvu - Win64 Debug_md"
+
+# PROP BASE Use_MFC 0
+# PROP BASE Use_Debug_Libraries 1
+# PROP BASE Output_Dir "libdjvu___Win64_Debug_md"
+# PROP BASE Intermediate_Dir "libdjvu___Win64_Debug_md"
+# PROP BASE Target_Dir ""
+# PROP Use_MFC 0
+# PROP Use_Debug_Libraries 1
+# PROP Output_Dir "libdjvu___Win64_Debug_md"
+# PROP Intermediate_Dir "libdjvu___Win64_Debug_md"
+# PROP Target_Dir ""
+# ADD BASE CPP /nologo /MDd /W3 /Gm /GX /ZI /Od /I "..\3rd-party\libjpeg" /I "..\..\..\MrSID\libjpeg" /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "DJVU_STATIC_LIBRARY" /D "NEED_JPEG_DECODER" /D "GCONTAINER_NO_MEMBER_TEMPLATES" /D "NEED_DJVU_MEMORY" /D "NEED_DJVU_PROGRESS" /FR /YX /FD /GZ /c
+# ADD CPP /nologo /MDd /W3 /GX /Od /I "..\3rd-party\libjpeg" /I "..\..\..\MrSID\libjpeg" /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "DJVU_STATIC_LIBRARY" /D "NEED_JPEG_DECODER" /D "GCONTAINER_NO_MEMBER_TEMPLATES" /D "NEED_DJVU_MEMORY" /D "NEED_DJVU_PROGRESS" /D "WIN64" /GZ /Wp64 /c
+# ADD BASE RSC /l 0x409 /d "_DEBUG"
+# ADD RSC /l 0x409 /d "_DEBUG"
+BSC32=bscmake.exe
+# ADD BASE BSC32 /nologo
+# ADD BSC32 /nologo
+LIB32=link.exe -lib
+# ADD BASE LIB32 /nologo /out:"Debug\libdjvu_md.lib" /nodefaultlib
+# ADD LIB32 /nologo /out:"Debug\libdjvu_md.lib" /nodefaultlib
+
+!ELSEIF  "$(CFG)" == "libdjvu - Win64 Release"
+
+# PROP BASE Use_MFC 0
+# PROP BASE Use_Debug_Libraries 0
+# PROP BASE Output_Dir "libdjvu___Win64_Release"
+# PROP BASE Intermediate_Dir "libdjvu___Win64_Release"
+# PROP BASE Target_Dir ""
+# PROP Use_MFC 0
+# PROP Use_Debug_Libraries 0
+# PROP Output_Dir "libdjvu___Win64_Release"
+# PROP Intermediate_Dir "libdjvu___Win64_Release"
+# PROP Target_Dir ""
+# ADD BASE CPP /nologo /MT /W3 /GX /O2 /I "..\3rd-party\libjpeg" /I "..\..\..\MrSID\libjpeg" /D "NDEBUG" /D "NEED_JPEG_DECODER" /D "WIN32" /D "_WINDOWS" /D "DJVU_STATIC_LIBRARY" /D "GCONTAINER_NO_MEMBER_TEMPLATES" /D "NEED_DJVU_MEMORY" /D "NEED_DJVU_PROGRESS" /FR /YX /FD /c
+# ADD CPP /nologo /MT /W3 /GX /O2 /I "..\3rd-party\libjpeg" /I "..\..\..\MrSID\libjpeg" /D "NDEBUG" /D "NEED_JPEG_DECODER" /D "WIN32" /D "_WINDOWS" /D "DJVU_STATIC_LIBRARY" /D "GCONTAINER_NO_MEMBER_TEMPLATES" /D "NEED_DJVU_MEMORY" /D "NEED_DJVU_PROGRESS" /D "WIN64" /Wp64 /c
+# SUBTRACT CPP /YX
+# ADD BASE RSC /l 0x409 /d "NDEBUG"
+# ADD RSC /l 0x409 /d "NDEBUG"
+BSC32=bscmake.exe
+# ADD BASE BSC32 /nologo
+# ADD BSC32 /nologo
+LIB32=link.exe -lib
+# ADD BASE LIB32 /nologo /nodefaultlib
+# ADD LIB32 /nologo /nodefaultlib
+
+!ELSEIF  "$(CFG)" == "libdjvu - Win64 Debug"
+
+# PROP BASE Use_MFC 0
+# PROP BASE Use_Debug_Libraries 1
+# PROP BASE Output_Dir "libdjvu___Win64_Debug"
+# PROP BASE Intermediate_Dir "libdjvu___Win64_Debug"
+# PROP BASE Target_Dir ""
+# PROP Use_MFC 0
+# PROP Use_Debug_Libraries 1
+# PROP Output_Dir "libdjvu___Win64_Debug"
+# PROP Intermediate_Dir "libdjvu___Win64_Debug"
+# PROP Target_Dir ""
+# ADD BASE CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "..\3rd-party\libjpeg" /I "..\..\..\MrSID\libjpeg" /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "DJVU_STATIC_LIBRARY" /D "NEED_JPEG_DECODER" /D "GCONTAINER_NO_MEMBER_TEMPLATES" /D "NEED_DJVU_MEMORY" /D "NEED_DJVU_PROGRESS" /FR /YX /FD /GZ /c
+# ADD CPP /nologo /MTd /W3 /GX /Od /I "..\3rd-party\libjpeg" /I "..\..\..\MrSID\libjpeg" /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "DJVU_STATIC_LIBRARY" /D "NEED_JPEG_DECODER" /D "GCONTAINER_NO_MEMBER_TEMPLATES" /D "NEED_DJVU_MEMORY" /D "NEED_DJVU_PROGRESS" /D "WIN64" /GZ /Wp64 /c
+# SUBTRACT CPP /YX
+# ADD BASE RSC /l 0x409 /d "_DEBUG"
+# ADD RSC /l 0x409 /d "_DEBUG"
+BSC32=bscmake.exe
+# ADD BASE BSC32 /nologo
+# ADD BSC32 /nologo
+LIB32=link.exe -lib
+# ADD BASE LIB32 /nologo /nodefaultlib
+# ADD LIB32 /nologo /nodefaultlib
+
 !ENDIF 
 
 # Begin Target
 
 # Name "libdjvu - Win32 Release"
 # Name "libdjvu - Win32 Debug"
+# Name "libdjvu - Win32 Debug_md"
+# Name "libdjvu - Win32 Release_md"
+# Name "libdjvu - Win64 Release_md"
+# Name "libdjvu - Win64 Debug_md"
+# Name "libdjvu - Win64 Release"
+# Name "libdjvu - Win64 Debug"
 # Begin Group "Source Files"
 
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
