@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.h,v 1.66 2001-04-25 21:30:06 bcr Exp $
+// $Id: GString.h,v 1.67 2001-04-26 18:38:44 bcr Exp $
 // $Name:  $
 
 #ifndef _GSTRING_H_
@@ -57,7 +57,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.66 2001-04-25 21:30:06 bcr Exp $# */
+    #$Id: GString.h,v 1.67 2001-04-26 18:38:44 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -93,6 +93,8 @@ public:
   friend Native;
   friend UTF8;
   friend class GBaseString;
+  friend class GUTF8String;
+  friend class GNativeString;
   friend unsigned int hash(const GBaseString &ref);
 
 public:
@@ -103,31 +105,35 @@ public:
 
     // Other virtual methods.
       // Create an empty string.
-  virtual GP<GStringRep> blank(const unsigned int sz = 0) const;
+  virtual GP<GStringRep> blank(const unsigned int sz) const = 0;
+      // Create a duplicate at the given size.
+  GP<GStringRep>  getbuf(int n) const;
+      // Change the value of one of the bytes.
+  GP<GStringRep> setat(int n, char ch) const;
       // Append a string.
-  virtual GP<GStringRep> append(const GP<GStringRep> &s2) const;
+  virtual GP<GStringRep> append(const GP<GStringRep> &s2) const = 0;
       // Test if isUTF8.
   virtual bool isUTF8(void) const { return false; }
       // Test if Native.
   virtual bool isNative(void) const { return false; }
       // Convert to Native.
-  virtual GP<GStringRep> toNative(const bool noconvert=false) const;
+  virtual GP<GStringRep> toNative(const bool nothrow=false) const = 0;
       // Convert to UTF8.
-  virtual GP<GStringRep> toUTF8(const bool noconvert=false) const;
+  virtual GP<GStringRep> toUTF8(const bool nothrow=false) const = 0;
       // Convert to same as current class.
   virtual GP<GStringRep> toThis(
-    const GP<GStringRep> &rep,const GP<GStringRep> &locale=0) const;
+    const GP<GStringRep> &rep,const GP<GStringRep> &locale=0) const = 0;
       // Compare with #s2#.
-  virtual int cmp(const GP<GStringRep> &s2,const int len=(-1)) const;
+  virtual int cmp(const GP<GStringRep> &s2,const int len=(-1)) const = 0;
 
   // Convert strings to numbers.
-  virtual int toInt() const;
+  virtual int toInt() const = 0;
   virtual long int toLong(
-    GP<GStringRep>& endptr, bool &isLong, const int base=10) const;
+    GP<GStringRep>& endptr, bool &isLong, const int base=10) const = 0;
   virtual unsigned long int toULong(
-    GP<GStringRep>& endptr, bool &isULong, const int base=10) const;
+    GP<GStringRep>& endptr, bool &isULong, const int base=10) const = 0;
   virtual double toDouble(
-    GP<GStringRep>& endptr, bool &isDouble) const;
+    GP<GStringRep>& endptr, bool &isDouble) const = 0;
 
   // return next non space position
   int nextNonSpace( const int from=0, const int len=(-1) ) const;
@@ -141,17 +147,11 @@ public:
     // Create an empty string.
   template <class TYPE> static GP<GStringRep> create(
     const unsigned int sz,TYPE *);
-  static GP<GStringRep> create(const unsigned int sz = 0)
-  { return create(sz,(GStringRep *)0); }
-
     // Creates with a strdup string.
   GP<GStringRep> strdup(const char *s) const;
 
     // Creates by appending to the current string
   GP<GStringRep> append(const char *s2) const;
-
-  static GP<GStringRep> create(const char *s)
-  { GStringRep dummy; return dummy.strdup(s); }
 
     // Creates with a concat operation.
   GP<GStringRep> concat(const GP<GStringRep> &s1,const GP<GStringRep> &s2) const;
@@ -159,25 +159,11 @@ public:
   GP<GStringRep> concat(const GP<GStringRep> &s1,const char *s2) const;
   GP<GStringRep> concat(const char *s1,const char *s2) const;
 
-  static GP<GStringRep> create(
-    const GP<GStringRep> &s1,const GP<GStringRep> &s2)
-  { GStringRep dummy; return dummy.concat(s1,s2); }
-  static GP<GStringRep> create( const GP<GStringRep> &s1,const char *s2)
-  { GStringRep dummy; return dummy.concat(s1,s2); }
-  static GP<GStringRep> create( const char *s1, const GP<GStringRep> &s2)
-  { GStringRep dummy; return dummy.concat(s1,s2); }
-  static GP<GStringRep> create(const char *s1,const char *s2)
-  { GStringRep dummy; return dummy.concat(s1,s2); }
-
    /* Creates with a strdup and substr.  Negative values have strlen(s)+1
       added to them.
    */
   GP<GStringRep> substr(
     const char *s,const int start,const int length=(-1)) const;
-
-  static GP<GStringRep> create(
-    const char *s,const int start,const int length)
-  { GStringRep dummy; return dummy.substr(s,start,length); }
 
   /** Initializes a string with a formatted string (as in #vprintf#).  The
       string is re-initialized with the characters generated according to the
@@ -186,9 +172,6 @@ public:
       will cause a segmentation violation if the resulting string is longer
       than 32768 characters. */
   GP<GStringRep> format(va_list &args) const;
-  static GP<GStringRep> create_format(const char fmt[],...);
-  static GP<GStringRep> create(const char fmt[],va_list &args);
-
   // -- SEARCHING
 
   static GP<GStringRep> UTF8ToNative( const char *s );
@@ -230,7 +213,7 @@ public:
   int getUCS4(unsigned long &w, const int from) const;
 
   virtual unsigned char *UCS4toString(
-    const unsigned long w, unsigned char *ptr, mbstate_t *ps=0) const;
+    const unsigned long w, unsigned char *ptr, mbstate_t *ps=0) const = 0;
 
   static unsigned char *UCS4toUTF8(
     const unsigned long w,unsigned char *ptr);
@@ -248,7 +231,7 @@ public:
 
 protected:
   // Return the next character and increment the source pointer.
-  virtual unsigned long getValidUCS4(const char *&source) const;
+  virtual unsigned long getValidUCS4(const char *&source) const = 0;
 
   GP<GStringRep> tocase(
     bool (*xiswcase)(const unsigned long wc),
@@ -265,36 +248,22 @@ protected:
     bool (*xiswtest)(const unsigned long wc),const int from,const int len,
     const bool reverse=false) const;
 
-  static bool iswspace(const unsigned long w);
-  static bool iswupper(const unsigned long w);
-  static bool iswlower(const unsigned long w);
-  static unsigned long towupper(const unsigned long w);
-  static unsigned long towlower(const unsigned long w);
+  static bool giswspace(const unsigned long w);
+  static bool giswupper(const unsigned long w);
+  static bool giswlower(const unsigned long w);
+  static unsigned long gtowupper(const unsigned long w);
+  static unsigned long gtowlower(const unsigned long w);
 
 private:
   int  size;
   char *data;
 };
 
-inline GP<GStringRep>
-GStringRep::blank(const unsigned int sz) const
-{ 
-  return create(sz);
-}
+inline GP<GStringRep> GStringRep::upcase(void) const
+{ return tocase(giswupper,gtowupper); }
 
-inline GP<GStringRep>
-GStringRep::toThis(
-  const GP<GStringRep> &rep,const GP<GStringRep> &locale) const
-{
-   return (locale?(locale->toThis(rep)):rep);
-}
-
-inline GP<GStringRep> 
-GStringRep::create(const char fmt[],va_list &args)
-{ 
-  GP<GStringRep> s=create(fmt);
-  return (s?(s->format(args)):s);
-}
+inline GP<GStringRep> GStringRep::downcase(void) const
+{ return tocase(giswlower,gtowlower); }
 
 class GStringRep::Native : public GStringRep
 {
@@ -313,7 +282,9 @@ public:
   virtual bool isNative(void) const;
       // Convert to Native.
   virtual GP<GStringRep> toNative(const bool nothrow=false) const;
-      // Convert to same as current class.
+      // Convert to UTF8.
+  virtual GP<GStringRep> toUTF8(const bool nothrow=false) const;
+      // Convert to UTF8.
   virtual GP<GStringRep> toThis(
      const GP<GStringRep> &rep,const GP<GStringRep> &) const;
       // Compare with #s2#.
@@ -322,9 +293,9 @@ public:
   // Convert strings to numbers.
   virtual int toInt() const;
   virtual long int toLong(
-    GP<GStringRep>& endptr, bool &isLong, const int base) const;
+    GP<GStringRep>& endptr, bool &isLong, const int base=10) const;
   virtual unsigned long int toULong(
-    GP<GStringRep>& endptr, bool &isULong, const int base) const;
+    GP<GStringRep>& endptr, bool &isULong, const int base=10) const;
   virtual double toDouble(
     GP<GStringRep>& endptr, bool &isDouble) const;
 
@@ -406,6 +377,8 @@ public:
   virtual GP<GStringRep> append(const GP<GStringRep> &s2) const;
       // Test if Native.
   virtual bool isUTF8(void) const;
+      // Convert to Native.
+  virtual GP<GStringRep> toNative(const bool nothrow=false) const;
       // Convert to UTF8.
   virtual GP<GStringRep> toUTF8(const bool nothrow=false) const;
       // Convert to same as current class.
@@ -416,6 +389,15 @@ public:
 
   static GP<GStringRep> create(const unsigned int sz = 0)
   { return GStringRep::create(sz,(GStringRep::UTF8 *)0); }
+
+  // Convert strings to numbers.
+  virtual int toInt() const;
+  virtual long int toLong(
+    GP<GStringRep>& endptr, bool &isLong, const int base=10) const;
+  virtual unsigned long int toULong(
+    GP<GStringRep>& endptr, bool &isULong, const int base=10) const;
+  virtual double toDouble(
+    GP<GStringRep>& endptr, bool &isDouble) const;
 
     // Create a strdup string.
   static GP<GStringRep> create(const char *s)
@@ -504,6 +486,7 @@ protected:
   // Sets the gstr pointer;
   void init(void);
 
+  ~GBaseString();
   GBaseString &init(const GP<GStringRep> &rep)
   { GP<GStringRep>::operator=(rep); init(); return *this;}
 
@@ -538,18 +521,7 @@ public:
       zero.  Negative positions represent characters relative to the end of
       the string. */
   char operator[] (int n) const
-    { if (n<0 && ptr) n += (*this)->size;
-      if (n<0 || !ptr || n>=(int)(*this)->size) throw_illegal_subscript();
-      return ((*this)->data)[n]; }
-  /** Set the character at position #n# to value #ch#.  An exception
-      \Ref{GException} is thrown if number #n# is not in range #-len# to
-      #len#, where #len# is the length of the string.  If character #ch# is
-      zero, the string is truncated at position #n#.  The first character of a
-      string is numbered zero. Negative positions represent characters
-      relative to the end of the string. If position #n# is equal to the
-      length of the string, this function appends character #ch# to the end of
-      the string. */
-  void setat(int n, char ch);
+    { return ((n||ptr)?((*this)->data[CheckSubscript(n)]):0); }
   /// Returns #TRUE# if the string contains an integer number.
   bool is_int(void) const;
   /// Returns #TRUE# if the string contains a float number.
@@ -562,14 +534,6 @@ public:
   // -- ALTERING
   /// Reinitializes a string with the null string.
   void empty( void );
-  /** Provides a direct access to the string buffer.  Returns a pointer for
-      directly accessing the string buffer.  This pointer valid remains valid
-      as long as the string is not modified by other means.  Positive values
-      for argument #n# represent the length of the returned buffer.  The
-      returned string buffer will be large enough to hold at least #n#
-      characters plus a null character.  If #n# is positive but smaller than
-      the string length, the string will be truncated to #n# characters. */
-  char *getbuf(int n = -1);
   // -- SEARCHING
   /** Searches character #c# in the string, starting at position #from# and
       scanning forward until reaching the end of the string.  This function
@@ -644,19 +608,10 @@ public:
     /// Returns an #int#.  Compares #s2# with #s2# and returns sorting order.
   static int cmp(const char *s1, const char *s2, const int len=(-1))
     { return GStringRep::cmp(s1,s2,len); }
-  /** Returns a boolean.  Compares string with #s2# and a given length
-      of #len# */
-//  bool ncmp(const GBaseString& s2, const int len) const
-//    { return !cmp(s2,len); }
-//  bool ncmp(const char *s2, const int len) const
-//    { return !cmp(s2,len); }
   /** Returns a boolean. The Standard C strncmp takes two string and
       compares the first N characters.  static bool GBaseString::ncmp will
       compare #s1# with #s2# 
       with the #len# characters starting from the beginning of the string.*/
-//  static bool ncmp(const char *s1, const char *s2, const int len)
-//    { return !GStringRep::cmp(s1,s2,len); }
-
   /** String comparison. Returns true if and only if character strings #s1#
       and #s2# are equal (as with #strcmp#.)
     */
@@ -770,11 +725,23 @@ protected:
   static const char *nullstr;
   GNativeString UTF8ToNative(const bool currentlocale=false) const;
   GUTF8String NativeToUTF8(void) const;
+  int CheckSubscript(int n) const
+  {
+    if(n)
+    {
+      if (n<0 && ptr)
+        n += (*this)->size;
+      if (n<0 || !ptr || n > (int)(*this)->size)
+        throw_illegal_subscript();
+    }
+    return n;
+  }
 };
 
 class GUTF8String : public GBaseString
 {
 public:
+  ~GUTF8String();
   void init(void)
   { GBaseString::init(); }
 
@@ -942,11 +909,48 @@ public:
     { return GStringRep::UTF8::create(*this,s2); }
   friend GUTF8String operator+(const char    *s1, const GUTF8String &s2) 
     { return GStringRep::UTF8::create(s1,s2); }
+
+  /** Provides a direct access to the string buffer.  Returns a pointer for
+      directly accessing the string buffer.  This pointer valid remains valid
+      as long as the string is not modified by other means.  Positive values
+      for argument #n# represent the length of the returned buffer.  The
+      returned string buffer will be large enough to hold at least #n#
+      characters plus a null character.  If #n# is positive but smaller than
+      the string length, the string will be truncated to #n# characters. */
+  char *getbuf(int n = -1)
+  {
+    if(ptr)
+      init((*this)->getbuf(n));
+    else if(n>0)
+      init(GStringRep::UTF8::create(n));
+    else
+      init(0);
+    return ptr?((*this)->data):0;
+  }
+  /** Set the character at position #n# to value #ch#.  An exception
+      \Ref{GException} is thrown if number #n# is not in range #-len# to
+      #len#, where #len# is the length of the string.  If character #ch# is
+      zero, the string is truncated at position #n#.  The first character of a
+      string is numbered zero. Negative positions represent characters
+      relative to the end of the string. If position #n# is equal to the
+      length of the string, this function appends character #ch# to the end of
+      the string. */
+  void setat(const int n, const char ch)
+  { 
+    if((!n)&&(!ptr))
+    {
+      init(GStringRep::UTF8::create(&ch,0,1));
+    }else
+    {
+      init((*this)->setat(CheckSubscript(n),ch));
+    }
+  }
 };
 
 class GNativeString : public GBaseString
 {
 public:
+  ~GNativeString();
   void init(void)
   { GBaseString::init(); }
 
@@ -1088,6 +1092,42 @@ public:
       than 32768 characters. */
   GNativeString &format(const GNativeString &fmt, va_list &args)
   { return (*this = (fmt.ptr?GNativeString(fmt,args):fmt)); }
+
+  /** Provides a direct access to the string buffer.  Returns a pointer for
+      directly accessing the string buffer.  This pointer valid remains valid
+      as long as the string is not modified by other means.  Positive values
+      for argument #n# represent the length of the returned buffer.  The
+      returned string buffer will be large enough to hold at least #n#
+      characters plus a null character.  If #n# is positive but smaller than
+      the string length, the string will be truncated to #n# characters. */
+  char *getbuf(int n = -1)
+  {
+    if(ptr)
+      init((*this)->getbuf(n));
+    else if(n>0)
+      init(GStringRep::Native::create(n));
+    else
+      init(0);
+    return ptr?((*this)->data):0;
+  }
+  /** Set the character at position #n# to value #ch#.  An exception
+      \Ref{GException} is thrown if number #n# is not in range #-len# to
+      #len#, where #len# is the length of the string.  If character #ch# is
+      zero, the string is truncated at position #n#.  The first character of a
+      string is numbered zero. Negative positions represent characters
+      relative to the end of the string. If position #n# is equal to the
+      length of the string, this function appends character #ch# to the end of
+      the string. */
+  void setat(const int n, const char ch)
+  {
+    if((!n)&&(!ptr))
+    {
+      init(GStringRep::Native::create(&ch,0,1));
+    }else
+    {
+      init((*this)->setat(CheckSubscript(n),ch));
+    }
+  }
 };
 
 //@}

@@ -1,7 +1,7 @@
 //C-  Copyright © 2000-2001, LizardTech, Inc. All Rights Reserved.
 //C-              Unauthorized use prohibited.
 //
-// $Id: djvuxmlparser.cpp,v 1.3 2001-04-25 23:04:15 bcr Exp $
+// $Id: djvuxmlparser.cpp,v 1.4 2001-04-26 18:38:44 bcr Exp $
 // $Name:  $
 
 #include "XMLParser.h"
@@ -44,16 +44,17 @@ main(int argc,char *argv[],char *[])
 // if we had a global list of the mod files we would 
 // only have to decode them once and save them once
 
-    GP<lt_XMLParser> anno = lt_XMLParser::create_anno();
-    GP<lt_XMLParser> text = lt_XMLParser::create_text();
     for(int i=1;i<argc;i++)
     {
       GP<lt_XMLTags> tag = lt_XMLTags::create();
       tag->init(GURL::Filename::Native(argv[i]));
+      GP<lt_XMLParser> anno = lt_XMLParser::create_anno();
       anno->parse(*tag);
       // if we try to change the text here we will 
       // lose the anno changes when we save
       anno->save();
+      anno=0;
+      GP<lt_XMLParser> text = lt_XMLParser::create_text();
       text->parse(*tag);
       text->save();
     }

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: XMLParser.cpp,v 1.1 2001-04-24 19:50:38 bcr Exp $
+// $Id: XMLParser.cpp,v 1.2 2001-04-26 18:38:44 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -532,19 +532,7 @@ lt_XMLParser::Anno::parse(const lt_XMLTags &tags)
           }
           isDjVuType=true;
         }
-        GURL url;
-        const GURL::UTF8 simpleURL(args[datapos]);
-        if (simpleURL.is_empty())
-        {
-          url=simpleURL;
-        }else if(args[datapos][0] == '/')
-        {
-          url=codebase.base()+args[datapos];
-        }else            // relative URL
-        {
-          url=codebase+args[datapos];
-          DEBUG_MSG("relative URL converted to absolute URL= " << url << "\n");
-        }
+        GURL url=GURL::UTF8(args[datapos],(args[datapos][0] == '/')?codebase.base():codebase);
         GUTF8String width;
         {
           GPosition widthPos=args.contains("width");
@@ -823,20 +811,7 @@ lt_XMLParser::Text::parse(const lt_XMLTags &tags)
             isDjVuType=true;
           }
           
-          GURL url;
-          const GURL::UTF8 simpleURL(args[datapos]);
-          if (simpleURL.is_empty())
-          {
-            url=simpleURL;
-          }else if(args[datapos][0] == '/')
-          {
-            url=codebase.base()+args[datapos];
-          }else            // relative URL
-          {
-            url=codebase+args[datapos];
-            DEBUG_MSG("relative URL converted to absolute URL= " << url << "\n");
-          }
-          
+          GURL url=GURL::UTF8(args[datapos],(args[datapos][0] == '/')?codebase.base():codebase);
           GUTF8String width;
           {
             GPosition widthPos=args.contains("width");
