@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GRect.h,v 1.14 1999-10-28 18:40:32 leonb Exp $
+//C- $Id: GRect.h,v 1.15 1999-11-03 18:13:12 eaf Exp $
 
 
 #ifndef _GRECT_H_
@@ -30,7 +30,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GRect.h,v 1.14 1999-10-28 18:40:32 leonb Exp $# */
+    #$Id: GRect.h,v 1.15 1999-11-03 18:13:12 eaf Exp $# */
 //@{
 
 #include "DjVuGlobal.h"
@@ -91,9 +91,9 @@ public:
   int  height() const;
   /** Returns the area of the rectangle. */
   int  area() const;
-  /** Returns true iff the rectangle is empty. */
+  /** Returns true if the rectangle is empty. */
   int  isempty() const;
-  /** Returns true iff the rectangle contains pixel (#x#,#y#).  A rectangle
+  /** Returns true if the rectangle contains pixel (#x#,#y#).  A rectangle
       contains all pixels with horizontal pixel coordinates in range #xmin#
       (inclusive) to #xmax# (exclusive) and vertical coordinates #ymin#
       (inclusive) to #ymax# (exclusive). */
@@ -114,11 +114,11 @@ public:
       units vertically. */
   int  translate(int dx, int dy);
   /** Sets the rectangle to the intersection of rectangles #rect1# and #rect2#.
-      This function returns true iff the intersection rectangle is not empty. */
+      This function returns true if the intersection rectangle is not empty. */
   int  intersect(const GRect &rect1, const GRect &rect2);
   /** Sets the rectangle to the smallest rectangle containing the points of
-      both rectangles #rect1# and #rect2#. This function returns true iff the
-      intersection rectangle is not empty. */
+      both rectangles #rect1# and #rect2#. This function returns true if the
+      created rectangle is not empty. */
   int  recthull(const GRect &rect1, const GRect &rect2);
   /** Minimal horizontal point coordinate of the rectangle. */
   int xmin;
