@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DataPool.cpp,v 1.85 2001-07-24 17:52:03 bcr Exp $
+// $Id: DataPool.cpp,v 1.86 2001-07-24 18:33:44 lchen Exp $
 // $Name:  $
 
 
@@ -716,7 +716,7 @@ DataPool::create(const GURL &furl, int start, int length)
 }
 
 void
-DataPool::clear_stream(const bool /* release */)
+DataPool::clear_stream(const bool release)
 {
   DEBUG_MSG("DataPool::clear_stream()\n");
   DEBUG_MAKE_INDENT(3);
@@ -728,7 +728,7 @@ DataPool::clear_stream(const bool /* release */)
     {
       GCriticalSectionLock lock2(&(f->stream_lock));
       fstream=0;
-//      if(release)
+      if(release)
         OpenFiles::get()->stream_released(f->stream, this);
     }
   }
