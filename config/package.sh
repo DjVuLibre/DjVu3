@@ -85,6 +85,7 @@ echo "Copying files"
 rm -rf "$packagedir"
 mkdir packages 2>>/dev/null
 mkdir "$packagedir" 2>>/dev/null
+abspackagedir=`cd "$packagedir" 1>>/dev/null 2>>/dev/null;pwd`
 for i in `cd $srcdir 2>>/dev/null 1>>/dev/null;echo *` 
 do
   j="$srcdir/$i"
@@ -112,10 +113,19 @@ archive=`cd "$packagedir" 1>>/dev/null 2>>/dev/null;pwd`/archive.tar
   do
     if [ -d "./$i" ]
     then
-      find "$i" -name CVS -prune -o -type f -exec tar "$action" "$archive" \{\} \;
+      for j in `find "$i" -name CVS -prune -o -type f -print` ; do
+        tar "$action" "$archive" "$j"
+        action=rvf
+      done
     elif [ -d "./SRCDIR/$i" ]
     then
-      (cd ./SRCDIR;find "$i" -name CVS -prune -o -type f -exec tar "$action" "$archive" \{\} \;)
+      (
+        cd ./SRCDIR;
+        for j in `find "$i" -name CVS -prune -o -type f -print` ; do
+          tar "$action" "$archive" "$j"
+          action=rvf
+        done
+      )
     else
       (
         if [ -r "./examples/$i" ] 
@@ -132,13 +142,26 @@ archive=`cd "$packagedir" 1>>/dev/null 2>>/dev/null;pwd`/archive.tar
         then
           (cd ./SRCDIR;tar "$action" "$archive" "$i")
         else
-          echo "$i does not exist." 1>&2
-          rm -rf "$packagedir"
-          exit 1
+	  j=`echo $i|sed 's,^.\/.*,,g'`
+	  if [ -n "$j" ]
+          then
+            echo "$i does not exist." 1>&2
+            rm -rf "$abspackagedir"
+            exit 1
+          else
+            echo "skipping $i"
+          fi
         fi
       )
     fi
-    action="rvf"
+    if [ ! -d "$abspackagedir" ]
+    then
+      exit 1
+    fi
+    if [ -r "$archive" ]
+    then
+      action="rvf"
+    fi
   done
 )
 cd packages

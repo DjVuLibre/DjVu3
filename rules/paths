@@ -45,17 +45,23 @@ LIBMASKFINDXX=$(LIBPATH)/libmaskfind++.a
 LIBMASKFINDXX_LINK=-lmaskfind++
 LIBMASKFINDXX_INC=-I./TOPDIR/src/libmaskfind++ -I./TOPDIR/SRCDIR/src/libmaskfind++
 
+%%%BEGIN_REQUIRE(@%LIBJPEG%@)
 LIBJPEG=@%LIBJPEG%@
 LIBJPEG_LINK=-ljpeg
 LIBJPEG_INC=-I./TOPDIR/src/3rd-party/libjpeg -I./TOPDIR/SRCDIR/src/3rd-party/libjpeg
+%%%END_REQUIRE(@%LIBJPEG%@)
 
+%%%BEGIN_REQUIRE(@%LIBTIFF%@)
 LIBTIFF=@%LIBTIFF%@
 LIBTIFF_LINK=-ltiff
 LIBTIFF_INC=-I./TOPDIR/src/3rd-party/tiff-v3.5.4/libtiff -I./TOPDIR/SRCDIR/src/3rd-party/tiff-v3.5.4/libtiff
+%%%END_REQUIRE(@%LIBTIFF%@)
 
+%%%BEGIN_REQUIRE(@%LIBUNGIF%@)
 LIBUNGIF=@%LIBUNGIF%@
 LIBUNGIF_LINK=-lungif
 LIBUNGIF_INC=-I./TOPDIR/src/3rd-party/libungif-4.1.0 -I./TOPDIR/SRCDIR/src/3rd-party/libungif-4.1.0
+%%%END_REQUIRE(@%LIBUNGIF%@)
 
 SECURITY=$(LIBPATH)/authorized.o
 
