@@ -9,10 +9,10 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GThreads.cpp,v 1.23 1999-05-11 19:57:54 leonb Exp $
+//C- $Id: GThreads.cpp,v 1.24 1999-06-15 19:16:23 eaf Exp $
 
 
-// **** File "$Id: GThreads.cpp,v 1.23 1999-05-11 19:57:54 leonb Exp $"
+// **** File "$Id: GThreads.cpp,v 1.24 1999-06-15 19:16:23 eaf Exp $"
 // This file defines machine independent classes
 // for running and synchronizing threads.
 // - Author: Leon Bottou, 01/1998
@@ -973,6 +973,66 @@ cotask_yield()
   goto reschedule;
 }
 
+unsigned long
+GThread::get_minwait(void)
+{
+   if (!curtask) return 0;
+   
+   bool found=false;
+   unsigned long minwait=1000000;
+
+   cotask * next=curtask->next;
+   cotask * q=next;
+   do 
+   {
+      if (q->maxwait) found=true;
+      if (q->maxwait && *q->maxwait<minwait) minwait=*q->maxwait;
+      q=q->next;
+   } while(q!=next);
+   
+   return found ? minwait : 0;
+}
+
+void
+GThread::get_select(int & nfds, fd_set & read_fds, fd_set & write_fds, fd_set & except_fds)
+{
+   if (!curtask)
+   {
+      nfds=0;
+      return;
+   }
+   
+   coselect allfds;
+   allfds.nfds=0;
+   FD_ZERO(&allfds.rset);
+   FD_ZERO(&allfds.wset);
+   FD_ZERO(&allfds.eset);
+
+   cotask * next=curtask->next;
+   cotask * q=next;
+   do 
+   {
+      if (q->wselect) coselect_merge(&allfds, q->wselect);
+      q=q->next;
+   } while(q!=next);
+
+   nfds=allfds.nfds;
+   read_fds=allfds.rset;
+   write_fds=allfds.wset;
+   except_fds=allfds.eset;
+}
+
+int
+GThread::get_cothreads_num(void)
+{
+   if (!curtask) return 1;
+
+   int tasks=1;
+   cotask * task;
+   for(task=curtask->next;task!=curtask;task=task->next) tasks++;
+
+   return tasks;
+}
 
 // -------------------------------------- select
 

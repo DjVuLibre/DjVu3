@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GThreads.h,v 1.17 1999-06-04 21:53:24 leonb Exp $
+//C- $Id: GThreads.h,v 1.18 1999-06-15 19:16:23 eaf Exp $
 
 #ifndef _GTHREADS_H_
 #define _GTHREADS_H_
@@ -74,7 +74,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Praveen Guduru <praveen@sanskrit.lz.att.com> -- mac implementation.
     @version
-    #$Id: GThreads.h,v 1.17 1999-06-04 21:53:24 leonb Exp $# */
+    #$Id: GThreads.h,v 1.18 1999-06-15 19:16:23 eaf Exp $# */
 //@{
 
 #include "DjVuGlobal.h"
@@ -244,6 +244,20 @@ public:
       }
       \end{verbatim} */
   static int select(int, fd_set*, fd_set*, fd_set*, struct timeval*);
+  /** Return period of time after which a thread should wake up after waiting on
+      timer. If there are no such threads, #ZERO# will be returned. This function
+      is only relevant in #COTHREAD# model.*/
+  static unsigned long get_minwait(void);
+  /** Return union of all file descriptors which threads are waiting for. This
+      function is only relevant in #COTHREAD# model when the internal scheduler keeps
+      track of what thread is waiting for what. Function \Ref{GThread::select}()
+      should be used to wait for data or wait for some given period of time.
+      #get_select()# will set #*nfds# to #ZERO# if there are no thread waiting in
+      \Ref{GThread::select}(). */
+  static void get_select(int & nfds, fd_set & read_fd, fd_set & write_fd, fd_set & except_fd);
+  /** Return the number of running cothreads. Is relevant in #COTHREAD# model only. */
+  static int get_cothreads_num(void);
+      
   /** Install hooks in the scheduler (COTHREADS only).  The hook function
       #call# is called when a new thread is created (argument is
       #GThread::CallbackCreate#), when a thread terminates (argument is
