@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.76 1999-11-22 03:46:19 bcr Exp $
+//C- $Id: DjVuDocument.cpp,v 1.77 1999-11-22 20:03:30 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -1353,7 +1353,7 @@ DjVuDocument::get_djvm_doc()
 
    GP<DjVmDoc> doc=new DjVmDoc();
 
-   if (doc_type==BUNDLED || doc_type==INDIRECT || doc_type==SINGLE_PAGE)
+   if (doc_type==BUNDLED || doc_type==INDIRECT)
    {
       DEBUG_MSG("Trivial: the document is either INDIRECT or BUNDLED: follow DjVmDir.\n");
 
