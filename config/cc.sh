@@ -1,5 +1,5 @@
 # This rule sets the following variables:
-#	CC, CCFLAGS, CCSYMBOLIC, CCPIC, CCWARN, CCUNROLL
+#	CC, CCFLAGS, CCWARN, CCUNROLL
 
 if [ -z "$CONFIG_DIR" ]
 then
@@ -11,44 +11,36 @@ EGCS="egcs"
 if [ -z "$CC_SET" ]
 then
   (echo '#include <stdio.h>';echo 'int main(void) {puts("Hello World\n");return 0;}')|testfile $temp.c
-  # I added CC_OVERRIDE to be able to select compiler myself and let
-  # you do the rest (flags and options) -eaf
-  if [ -z "$CC_OVERRIDE" ]; then
-    CCFLAGS=""
-    CCSYMBOLIC=""
-    CCPIC=""
-    cc_is_gcc=""
-    echon "Searching for C compiler ... "
-    if [ -n "$CC" ] ; then
-      if ( run "$CC" -c $temp.c ) ; then
-        echo "$CC"
-      else
-        CC=""
-      fi
-    fi
-    if [ -z "$CC" ]
-    then
-      if ( run "$EGCS" -c $temp.c ) ; then
-        CC="$EGCS"
-      elif ( run gcc -c $temp.c ) ; then
-        CC=gcc
-      elif ( run cc -c $temp.c ) ; then
-        CC=cc
-      elif ( run CC -c $temp.c ) ; then
-        CC=CC
-      else
-        echo "none available"
-        echo "Error: Can't find a C compiler" 1>&2
-        exit 1
-      fi
+  CCPIC_SET=""
+  CCFLAGS=""
+  CCSYMBOLIC=""
+  CCPIC=""
+  cc_is_gcc=""
+  echon "Searching for C compiler ... "
+  if [ -n "$CC" ] ; then
+    if ( run "$CC" -c $temp.c ) ; then
       echo "$CC"
+    else
+      CC=""
     fi
   fi
-#     The -x option doesn't work correctly when linking files.
-#  if [ -z "$CXX" ] 
-#  then
-#    CXX="$CC -x c++"
-#  fi
+  if [ -z "$CC" ]
+  then
+    if ( run "$EGCS" -c $temp.c ) ; then
+      CC="$EGCS"
+    elif ( run gcc -c $temp.c ) ; then
+      CC=gcc
+    elif ( run cc -c $temp.c ) ; then
+      CC=cc
+    elif ( run CC -c $temp.c ) ; then
+      CC=CC
+    else
+      echo "none available"
+      echo "Error: Can't find a C compiler" 1>&2
+      exit 1
+    fi
+    echo "$CC"
+  fi
 
   CCVERSION=""
   echon "Checking ${CC} version ... "
@@ -93,16 +85,19 @@ then
 	if [ -n "$MAJOR" -a -n "$MINOR" ]
 	then
 	  echon "$MAJOR.$MINOR"
-	  if [ $MAJOR -eq 2 -a $MINOR -ge 9 -o $MAJOR -ge 3 ]
+	  if [ $MAJOR -eq 2 -a $MINOR -ge 9 ]
 	  then
 	    echo " (egcs)"
+	  elif [ $MAJOR -ge 3 ]
+	  then
+	    echo " (gcc)"
 	  else
 	    echo
-	    echo WARNING: version 2.7.2.3 of gcc is recommended. 1>&2
+	    echo WARNING: DjVu requires 2.7.2.3 of gcc, or greater than 2.95. 1>&2
 	  fi
 	else
           echo unknown
-          echo WARNING: version 2.7.2.3 of gcc is recommended. 1>&2
+	  echo WARNING: DjVu requires 2.7.2.3 of gcc, or greater than 2.95. 1>&2
 	fi
 	rm -f $temp.exe
       fi
@@ -186,72 +181,8 @@ then
     fi
   fi
 
-  echon "Checking ${CC} symbolic option ... "
-  CCSYMBOLIC=""
-  s=`( cd "$tempdir" 2>>/dev/null;${CC} ${CCFLAGS} -symbolic -c $temp.c 2>&1)|"${grep}" 'unrecognized option'`
-  if [ -z "$s" ]
-  then
-    CCSYMBOLIC='-symbolic'
-  else 
-	  SYSTEMGCC=`echo $SYS | tr A-Z a-z `-$cc_is_gcc
-		case $SYSTEMGCC in
-		  linux-*) 
-			  TESTCCSYMBOLIC="-shared"
-				TESTCCPIC="-fPIC"
-				;;
-      solaris-*-yes)
-        if [ -z "$CROSSCOMPILER" ] ; then 
-          TESTCCSYMBOLIC="-shared -L/usr/lib -R/usr/lib "
-        else
-          TESTCCSYMBOLIC="-shared -Wl,-rpath,/usr/lib:/usr/ccs/lib:/usr/openwin/lib "
-        fi
-        TESTCCPIC="-fPIC"
-        ;;
-      solaris-*)
-        if [ -z "$CROSSCOMPILER" ] ; then 
-          TESTCCSYMBOLIC="-G -L/usr/lib -R/usr/lib "
-        else
-          TESTCCSYMBOLIC="-shared -Wl,-rpath,/usr/lib:/usr/ccs/lib:/usr/openwin/lib "
-        fi
-        TESTCCPIC="-K PIC"
-        ;;
-		  irix*-*) 
-			  TESTCCSYMBOLIC="-shared"
-				TESTCCPIC=""
-				;;
-		  aix*-*) 
-			  TESTCCSYMBOLIC="-r"
-				TESTCCPIC="-bM\:SRE"
-				;;
-		esac
-
-	check_shared_link_flags CCSYMBOLIC $temp.c "$TESTCCSYMBOLIC"
-#	check_link_flags CCSYMBOLIC $temp.c "-shared -symbolic" "-shared -Wl,-Bsymbolic" "-shared -Wl,-Bsymbolic -lc" "-shared -Wl,-Bsymbolic -lc -lm"
-#  elif ( run ${CC} ${CCFLAGS} -shared -Wl,-Bsymbolic -o c$$.so $temp.c -lc -lm )
-#  then
-#    if [ "$SYS" != "linux-libc6" ]; then
-#      CCSYMBOLIC='-Wl,-Bsymbolic'
-#    fi
-  fi
-  if [ -z "$CCSYMBOLIC" ]
-  then
-    echo "none"
-  else
-    echo "$CCSYMBOLIC"
-  fi
-
-  echon "Checking whether ${CC} -fPIC works ... "
-#  if ( run $CC ${CCFLAGS} -fPIC -c $temp.c )
-  if ( run $CC ${CCFLAGS} $TESTCCPIC -c $temp.c )
-  then
-    CCPIC=$TESTCCPIC
-    echo yes
-  else
-    echo no
-  fi
-
   "${rm}" -rf $temp.c $temp.o $temp.so
   CC_SET=true
-  CONFIG_VARS=`echo CC CC_SET CCFLAGS CCOPT CCWARN CCUNROLL CCSYMBOLIC CCPIC cc_is_gcc $CONFIG_VARS`
+  CONFIG_VARS=`echo CC CC_SET CCFLAGS CCOPT CCWARN CCUNROLL $CONFIG_VARS`
 fi
 

@@ -76,6 +76,8 @@ then
     mkdirp="${mkdir} -p"
   fi
 
+  makeshlib="${CONFIG_DIR}/make_shlib.sh"
+
   RULES_DIR=`cd ${CONFIG_DIR}/../rules/ 1>>/dev/null 2>>/dev/null;"${pwdcmd}"`
   CONFIG_VARS=`echo RULES_DIR ${CONFIG_VARS}`
   for i in `"${sed}" -n -e 's,^.*=@%\(.*\)%@,\1,p'<"${RULES_DIR}/commands"|"${sort}" -u`

@@ -1,6 +1,6 @@
 # This rule sets the following variables:
 #	CXX, CXXFLAGS, CXXSYMBOLIC, CXXPIC, CXXUNROLL, CXXWARN
-# $Id: cxx.sh,v 1.17 2000-02-05 02:13:33 bcr Exp $
+# $Id: cxx.sh,v 1.18 2000-02-06 22:24:04 bcr Exp $
 
 if [ -z "$CONFIG_DIR" ] ; then
   echo "You must source functions.sh" 1>&2
@@ -11,44 +11,35 @@ ECXX="eg++"
 if [ -z "$CXX_SET" ] ; then
   echo 'extern "C" {void exit(int);};void foo(void) {exit(0);}' |testfile $temp.cpp
   
-  # I added CXX_OVERRIDE to be able to select compiler myself and let
-  # you do the rest (flags and options) -eaf
-  if [ -z "$CXX_OVERRIDE" ]; then
-    CXXFLAGS=""
-    CXXSYMBOLIC=""
-    CXXPIC=""
-    cxx_is_gcc=
-    echon "Searching for C++ compiler ... "
+  CXXFLAGS=""
+  CXXSYMBOLIC=""
+  CXXPIC=""
+  cxx_is_gcc=
+  echon "Searching for C++ compiler ... "
+  if [ -n "$CXX" ] ; then
+    if ( run $CXX -c $temp.cpp ) ; then
+      echo "$CXX"
+    else
+      CXX=""
+    fi
+  if
+  if [ -z "$CXX" ] ; then  
     if ( run $EGXX -c $temp.cpp ) ; then
-      CXX="$EGXX"
-      echo "$CXX"
-    elif [ ! -z "$CXX" ] ; then
-      if ( run $CXX -c $temp.cpp ) ; then
-        echo "$CXX"
-      else
-        CXX=""
-      fi
+        CXX="$EGXX"
+    elif ( run c++ -c $temp.cpp ) ; then
+      CXX=c++
+    elif ( run g++ -c $temp.cpp ) ; then
+      CXX=g++
+    elif ( run CC -c $temp.cpp ) ; then
+      CXX=CC
+    else 
+      echo "none available"
+      echo "Error: Can't find a C++ compiler" 1>&2
+      exit 1
     fi
-    if [ -z "$CXX" ] ; then
-      if ( run c++ -c $temp.cpp ) ; then
-        CXX=c++
-      elif ( run g++ -c $temp.cpp ) ; then
-        CXX=g++
-      elif ( run CC -c $temp.cpp ) ; then
-        CXX=CC
-      else 
-        echo "none available"
-        echo "Error: Can't find a C++ compiler" 1>&2
-        exit 1
-      fi
-      echo "$CXX"
-    fi
+    echo "$CXX"
   fi
-#     The -x option doesn't work correctly when linking files.
-#  if [ -z "$CC" ] 
-#  then
-#    CC="$CXX -x c -fexceptions"
-#  fi
+
   echon "Checking ${CXX} version ... "
   CXXVERSION=""
   if [ "$CXX" != "$EGXX" ] ; then
@@ -80,16 +71,19 @@ if [ -z "$CXX_SET" ] ; then
 	if [ -n "$MAJOR" -a -n "$MINOR" ]
 	then
 	  echon "$MAJOR.$MINOR"
-	  if [ $MAJOR -eq 2 -a $MINOR -ge 9 -o $MAJOR -ge 3 ]
+	  if [ $MAJOR -eq 2 -a $MINOR -ge 9 ]
 	  then
 	    echo " (egcs)"
-	  else
+	  elif [ $MAJOR -ge 3 ]
+          then
+            echo " (gcc)" 
+          else
 	    echo
-	    echo WARNING: version 2.7.2.3 of gcc is recommended. 1>&2
+            echo WARNING: DjVu needs egcs or g++ version 2.8.1 or newer 1>&2
 	  fi
 	else
           echo "unknown"
-          echo WARNING: DjVu is designed to compile with egcs or g++ version 2.8.1 1>&2
+          echo WARNING: DjVu needs egcs or g++ version 2.8.1 or newer 1>&2
 	fi
 	rm -f $temp.exe
       fi
