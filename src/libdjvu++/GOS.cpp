@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: GOS.cpp,v 1.43 2001-01-03 19:56:08 bcr Exp $
+// $Id: GOS.cpp,v 1.44 2001-01-04 17:00:21 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -90,10 +90,11 @@
 #else
 #define MAXPATHLEN 1024
 #endif
-#endif
+#else
 #if ( MAXPATHLEN < 1024 )
 #undef MAXPATHLEN
 #define MAXPATHLEN 1024
+#endif
 #endif
 
 static const char localhost[] = "localhost";
@@ -739,9 +740,10 @@ GOS::deletefile(const char * filename)
   {
 #ifdef WIN32
    USES_CONVERSION;
-   retval (is_dir(filename)
-     ?RemoveDirectory(A2CT(filename))
-     :DeleteFile(A2CT(filename)));
+   if(is_dir(filename))
+     return RemoveDirectory(A2CT(filename));
+   else
+	 return DeleteFile(A2CT(filename));
 #else
    retval=(is_dir(filename)?rmdir(filename):unlink(filename));
 #endif

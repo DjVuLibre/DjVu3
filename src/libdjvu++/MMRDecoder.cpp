@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: MMRDecoder.cpp,v 1.29 2001-01-04 00:48:06 bcr Exp $
+// $Id: MMRDecoder.cpp,v 1.30 2001-01-04 17:00:21 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -831,7 +831,7 @@ MMRDecoder::decode(ByteStream &inp)
           int x = 0;
           int b = 0;
           int firstx = 0;
-          bool c = invert;
+          bool c = !!invert;
           while (x < width)
             {
               int xend = x + *s++;
