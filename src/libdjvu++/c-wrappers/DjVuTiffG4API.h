@@ -8,7 +8,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C- "$Id: DjVuTiffG4API.h,v 1.1 2000-01-07 21:27:10 bcr Exp $"
+//C- "$Id: DjVuTiffG4API.h,v 1.2 2000-01-07 22:05:17 bcr Exp $"
 //C- -- Tiff G4 To DjVu
 //C- Author: Parag Deshmukh (Dec 99)
 #endif  /* __cplusplus */
@@ -70,7 +70,7 @@ struct tiffg4todjvu_options_struct
   int vflip, hflip, invert, rotateAngle;
 
 /** logfile should be non-NULL to print verbose processing details */
-  int logfilefd;
+  int logfileno;
 
 /** helpfile should be non-NULL to print usage instructions */
   int helpfileno;
@@ -217,7 +217,7 @@ const char * djvutotiffg4_error(djvutotiffg4_options []);
 void djvutotiffg4_perror(djvutotiffg4_options [],const char *);
 
 /** This will print usage instructions to the specified output. */
-void djvutotiffg4_usage(FILE *out,const char *prog);
+void djvutotiffg4_usage(int fd,const char *prog);
 
 #ifdef DOCXX_CODE
 //@}

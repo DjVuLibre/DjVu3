@@ -185,7 +185,7 @@ JB2Image.o: JB2Image.cpp JB2Image.h \
  ByteStream.h GContainer.h Arrays.h \
  GRect.h GBitmap.h GThreads.h
 JPEGDecoder.o: JPEGDecoder.cpp JPEGDecoder.h \
- DjVuGlobal.h c-wrappers/DjVu.h ByteStream.h \
+ ByteStream.h DjVuGlobal.h c-wrappers/DjVu.h \
  GException.h GContainer.h GSmartPointer.h \
  Arrays.h GPixmap.h GRect.h GBitmap.h \
  ../../src/3rd-party/libjpeg/jinclude.h \
