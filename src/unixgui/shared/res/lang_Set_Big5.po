@@ -34,6 +34,10 @@ msgstr ""
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
 "Content-Type: text/plain; charset=Big5\n"
 
+#: ./djview/djvu_viewer.cpp:149
+msgid "DjVuViewer::Unexpected end of file encountered"
+msgstr ""
+
 # This is a Qt message file in .po format.  Each msgid starts with
 # a scope.  This scope should *NOT* be translated - eg. translating
 # from French to English, "Foo::Bar" would be translated to "Pub",
@@ -41,7 +45,7 @@ msgstr ""
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-05 01:58:23 PM PDT\n"
+"POT-Creation-Date: 2001-06-06 08h53m14s PDT\n"
 "PO-Revision-Date: YYYY-MM-DD\n"
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
 "Content-Type: text/plain; charset=Big5\n"
@@ -53,7 +57,23 @@ msgstr ""
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-05 01:58:23 PM PDT\n"
+"POT-Creation-Date: 2001-06-06 08h53m14s PDT\n"
+"PO-Revision-Date: YYYY-MM-DD\n"
+"Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
+"Content-Type: text/plain; charset=Big5\n"
+
+#: ./djview/mime_check.cpp:62
+msgid "QMimeChecker::Please restart Netscape for the changes to take effect"
+msgstr ""
+
+# This is a Qt message file in .po format.  Each msgid starts with
+# a scope.  This scope should *NOT* be translated - eg. translating
+# from French to English, "Foo::Bar" would be translated to "Pub",
+# not "Foo::Pub".
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"POT-Creation-Date: 2001-06-06 08h53m14s PDT\n"
 "PO-Revision-Date: YYYY-MM-DD\n"
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
 "Content-Type: text/plain; charset=Big5\n"
@@ -65,30 +85,10 @@ msgstr ""
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-05 01:58:23 PM PDT\n"
+"POT-Creation-Date: 2001-06-06 08h53m15s PDT\n"
 "PO-Revision-Date: YYYY-MM-DD\n"
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
 "Content-Type: text/plain; charset=Big5\n"
-
-# This is a Qt message file in .po format.  Each msgid starts with
-# a scope.  This scope should *NOT* be translated - eg. translating
-# from French to English, "Foo::Bar" would be translated to "Pub",
-# not "Foo::Pub".
-msgid ""
-msgstr ""
-"Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-05 01:58:23 PM PDT\n"
-"PO-Revision-Date: YYYY-MM-DD\n"
-"Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
-"Content-Type: text/plain; charset=Big5\n"
-
-# #: ./djview/qd_mime_dialog.cpp:59
-# msgid "QDMimeDialog:: can make Netscape use incorrect MIME type when sending DjVu documents via e-mail.\n\n"
-# msgstr ""
-
-# #: ./djview/qd_mime_dialog.cpp:59
-# msgid "QDMimeDialog:: can make Netscape use incorrect MIME type when sending DjVu documents via e-mail.\n\n"
-# msgstr ""
 
 #: ./djview/qd_mime_dialog.cpp:59
 msgid "QDMimeDialog:: can make Netscape use incorrect MIME type when sending DjVu documents via e-mail.\n\nWould you like to update the "
@@ -141,7 +141,7 @@ msgstr ""
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-05 01:58:23 PM PDT\n"
+"POT-Creation-Date: 2001-06-06 09h33m44s PDT\n"
 "PO-Revision-Date: YYYY-MM-DD\n"
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
 "Content-Type: text/plain; charset=Big5\n"
@@ -192,7 +192,7 @@ msgstr "¯Á­nURL"
 
 #: ./djview/qd_viewer.cpp:1344
 msgid "QDViewer::Subprocess diagnostics"
-msgstr ""
+msgstr "¤l¹Lµ{¶EÂ_"
 
 #: ./djview/qd_viewer.cpp:861
 msgid "QDViewer::This DjVu document uses an inferior\ntechnology, which is no longer supported.\n"
@@ -200,7 +200,7 @@ msgstr "¸ÓDjVu¤å¥ó®æ¦¡¹LÂÂ"
 
 #: ./djview/qd_viewer.cpp:769
 msgid "QDViewer::To install the newest\nversion click \"Download\" and "
-msgstr ""
+msgstr "½Ð«ö\"¤U¸ü\"Áä¦w¸Ë³Ì·sªºµ{§Ç"
 
 #: ./djview/qd_viewer.cpp:860
 msgid "QDViewer::Upgrade DjVu now!"
@@ -208,7 +208,7 @@ msgstr "²{¦b´N§ó·sDjVU!"
 
 #: ./djview/qd_viewer.cpp:736
 msgid "QDViewer::We are sorry, but printing of this image\nhas been disallowed."
-msgstr ""
+msgstr "©êºp, ¸Ó¹Ï¹³µLªk¥´¦L"
 
 #: ./djview/qd_viewer.cpp:775
 msgid "QDViewer::You are using an obsolete version of the\nDjVu plugin. "
@@ -216,7 +216,7 @@ msgstr ""
 
 #: ./djview/qd_viewer.cpp:770
 msgid "QDViewer::follow the\ninstructions.\n"
-msgstr ""
+msgstr "½Ð¨Ì»¡©ú"
 
 # This is a Qt message file in .po format.  Each msgid starts with
 # a scope.  This scope should *NOT* be translated - eg. translating
@@ -225,7 +225,7 @@ msgstr ""
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-05 01:58:24 PM PDT\n"
+"POT-Creation-Date: 2001-06-06 09h33m44s PDT\n"
 "PO-Revision-Date: YYYY-MM-DD\n"
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
 "Content-Type: text/plain; charset=Big5\n"
@@ -368,7 +368,7 @@ msgstr "©ñ¤j"
 
 #: ./djview/qd_viewer_menu.cpp:59
 msgid "QDViewer::Zoom &Out"
-msgstr ""
+msgstr "ÁY¤p"
 
 # This is a Qt message file in .po format.  Each msgid starts with
 # a scope.  This scope should *NOT* be translated - eg. translating
@@ -377,7 +377,7 @@ msgstr ""
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-05 01:58:24 PM PDT\n"
+"POT-Creation-Date: 2001-06-06 09h33m44s PDT\n"
 "PO-Revision-Date: YYYY-MM-DD\n"
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
 "Content-Type: text/plain; charset=Big5\n"
@@ -425,7 +425,7 @@ msgstr "§ó·s©Ò¦³ªº°¾¦n­È"
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-05 01:58:24 PM PDT\n"
+"POT-Creation-Date: 2001-06-06 09h33m44s PDT\n"
 "PO-Revision-Date: YYYY-MM-DD\n"
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
 "Content-Type: text/plain; charset=Big5\n"
@@ -633,7 +633,59 @@ msgstr "ÁY¤p"
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-05 01:58:25 PM PDT\n"
+"POT-Creation-Date: 2001-06-06 14h46m09s PDT\n"
+"PO-Revision-Date: YYYY-MM-DD\n"
+"Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
+"Content-Type: text/plain; charset=Big5\n"
+
+#: ./indep/QT/qlib.cpp:144
+msgid "QeExcMessage::&Details"
+msgstr "²Ó¸`"
+
+#: ./indep/QT/qlib.cpp:141
+msgid "QeExcMessage::&OK"
+msgstr "½T»{"
+
+#: ./indep/QT/qlib.cpp:425
+msgid "QeExcMessage::Error"
+msgstr "¿ù»~"
+
+#: ./indep/QT/qlib.cpp:118
+msgid "QeExcMessage::File name"
+msgstr "¤å¥ó¦W"
+
+#: ./indep/QT/qlib.cpp:110
+msgid "QeExcMessage::Function name"
+msgstr "¨ç¼Æ¦W"
+
+#: ./indep/QT/qlib.cpp:67
+msgid "QeExcMessage::Hide &Details"
+msgstr "ÁôÂÃ²Ó¸`"
+
+#: ./indep/QT/qlib.cpp:126
+msgid "QeExcMessage::Line number"
+msgstr "½u¸¹"
+
+#: ./indep/QT/qlib.cpp:717
+msgid "QeGrid::Error"
+msgstr "¿ù»~"
+
+#: ./indep/QT/qlib.cpp:503
+msgid "QePushButton::&Close"
+msgstr "Ãö³¬"
+
+#: ./indep/QT/qlib.cpp:357
+msgid "QeRowColumn::Error"
+msgstr "¿ù»~"
+
+# This is a Qt message file in .po format.  Each msgid starts with
+# a scope.  This scope should *NOT* be translated - eg. translating
+# from French to English, "Foo::Bar" would be translated to "Pub",
+# not "Foo::Pub".
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"POT-Creation-Date: 2001-06-06 08h53m16s PDT\n"
 "PO-Revision-Date: YYYY-MM-DD\n"
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
 "Content-Type: text/plain; charset=Big5\n"
@@ -645,7 +697,7 @@ msgstr ""
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-05 01:58:25 PM PDT\n"
+"POT-Creation-Date: 2001-06-06 08h53m16s PDT\n"
 "PO-Revision-Date: YYYY-MM-DD\n"
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
 "Content-Type: text/plain; charset=Big5\n"
@@ -657,7 +709,7 @@ msgstr ""
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-05 01:58:25 PM PDT\n"
+"POT-Creation-Date: 2001-06-06 08h53m17s PDT\n"
 "PO-Revision-Date: YYYY-MM-DD\n"
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
 "Content-Type: text/plain; charset=Big5\n"
@@ -669,7 +721,7 @@ msgstr ""
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-05 01:58:25 PM PDT\n"
+"POT-Creation-Date: 2001-06-06 08h53m17s PDT\n"
 "PO-Revision-Date: YYYY-MM-DD\n"
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
 "Content-Type: text/plain; charset=Big5\n"
@@ -681,7 +733,7 @@ msgstr ""
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-05 01:58:26 PM PDT\n"
+"POT-Creation-Date: 2001-06-06 08h53m17s PDT\n"
 "PO-Revision-Date: YYYY-MM-DD\n"
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
 "Content-Type: text/plain; charset=Big5\n"
@@ -693,7 +745,7 @@ msgstr ""
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-05 01:58:26 PM PDT\n"
+"POT-Creation-Date: 2001-06-06 08h53m17s PDT\n"
 "PO-Revision-Date: YYYY-MM-DD\n"
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
 "Content-Type: text/plain; charset=Big5\n"
@@ -705,7 +757,7 @@ msgstr ""
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-05 01:58:26 PM PDT\n"
+"POT-Creation-Date: 2001-06-06 08h53m17s PDT\n"
 "PO-Revision-Date: YYYY-MM-DD\n"
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
 "Content-Type: text/plain; charset=Big5\n"
@@ -717,7 +769,7 @@ msgstr ""
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-05 01:58:26 PM PDT\n"
+"POT-Creation-Date: 2001-06-06 08h53m18s PDT\n"
 "PO-Revision-Date: YYYY-MM-DD\n"
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
 "Content-Type: text/plain; charset=Big5\n"
@@ -729,7 +781,7 @@ msgstr ""
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-05 01:58:26 PM PDT\n"
+"POT-Creation-Date: 2001-06-06 08h53m18s PDT\n"
 "PO-Revision-Date: YYYY-MM-DD\n"
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
 "Content-Type: text/plain; charset=Big5\n"
@@ -741,7 +793,7 @@ msgstr ""
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-05 01:58:26 PM PDT\n"
+"POT-Creation-Date: 2001-06-06 08h53m18s PDT\n"
 "PO-Revision-Date: YYYY-MM-DD\n"
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
 "Content-Type: text/plain; charset=Big5\n"
@@ -753,7 +805,7 @@ msgstr ""
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-05 01:58:27 PM PDT\n"
+"POT-Creation-Date: 2001-06-06 08h53m18s PDT\n"
 "PO-Revision-Date: YYYY-MM-DD\n"
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
 "Content-Type: text/plain; charset=Big5\n"
@@ -765,7 +817,7 @@ msgstr ""
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-05 01:58:27 PM PDT\n"
+"POT-Creation-Date: 2001-06-06 08h53m19s PDT\n"
 "PO-Revision-Date: YYYY-MM-DD\n"
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
 "Content-Type: text/plain; charset=Big5\n"
@@ -777,7 +829,7 @@ msgstr ""
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-05 01:58:27 PM PDT\n"
+"POT-Creation-Date: 2001-06-06 08h53m19s PDT\n"
 "PO-Revision-Date: YYYY-MM-DD\n"
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
 "Content-Type: text/plain; charset=Big5\n"
@@ -789,7 +841,7 @@ msgstr ""
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-05 01:58:27 PM PDT\n"
+"POT-Creation-Date: 2001-06-06 08h53m19s PDT\n"
 "PO-Revision-Date: YYYY-MM-DD\n"
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
 "Content-Type: text/plain; charset=Big5\n"
@@ -801,7 +853,7 @@ msgstr ""
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-05 01:58:28 PM PDT\n"
+"POT-Creation-Date: 2001-06-06 08h53m19s PDT\n"
 "PO-Revision-Date: YYYY-MM-DD\n"
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
 "Content-Type: text/plain; charset=Big5\n"
@@ -813,7 +865,7 @@ msgstr ""
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-05 01:58:28 PM PDT\n"
+"POT-Creation-Date: 2001-06-06 08h53m19s PDT\n"
 "PO-Revision-Date: YYYY-MM-DD\n"
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
 "Content-Type: text/plain; charset=Big5\n"
@@ -825,7 +877,7 @@ msgstr ""
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-05 01:58:28 PM PDT\n"
+"POT-Creation-Date: 2001-06-06 08h53m19s PDT\n"
 "PO-Revision-Date: YYYY-MM-DD\n"
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
 "Content-Type: text/plain; charset=Big5\n"
@@ -837,7 +889,7 @@ msgstr ""
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-05 01:58:28 PM PDT\n"
+"POT-Creation-Date: 2001-06-06 08h53m20s PDT\n"
 "PO-Revision-Date: YYYY-MM-DD\n"
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
 "Content-Type: text/plain; charset=Big5\n"
@@ -849,7 +901,7 @@ msgstr ""
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-05 01:58:28 PM PDT\n"
+"POT-Creation-Date: 2001-06-06 08h53m20s PDT\n"
 "PO-Revision-Date: YYYY-MM-DD\n"
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
 "Content-Type: text/plain; charset=Big5\n"
@@ -861,7 +913,7 @@ msgstr ""
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-05 01:58:28 PM PDT\n"
+"POT-Creation-Date: 2001-06-06 08h53m20s PDT\n"
 "PO-Revision-Date: YYYY-MM-DD\n"
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
 "Content-Type: text/plain; charset=Big5\n"
@@ -873,7 +925,7 @@ msgstr ""
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-05 01:58:28 PM PDT\n"
+"POT-Creation-Date: 2001-06-06 08h53m20s PDT\n"
 "PO-Revision-Date: YYYY-MM-DD\n"
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
 "Content-Type: text/plain; charset=Big5\n"
@@ -885,7 +937,7 @@ msgstr ""
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-05 01:58:29 PM PDT\n"
+"POT-Creation-Date: 2001-06-06 08h53m20s PDT\n"
 "PO-Revision-Date: YYYY-MM-DD\n"
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
 "Content-Type: text/plain; charset=Big5\n"
@@ -897,7 +949,7 @@ msgstr ""
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-05 01:58:29 PM PDT\n"
+"POT-Creation-Date: 2001-06-06 08h53m20s PDT\n"
 "PO-Revision-Date: YYYY-MM-DD\n"
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
 "Content-Type: text/plain; charset=Big5\n"
@@ -909,7 +961,7 @@ msgstr ""
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-05 01:58:29 PM PDT\n"
+"POT-Creation-Date: 2001-06-06 08h53m20s PDT\n"
 "PO-Revision-Date: YYYY-MM-DD\n"
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
 "Content-Type: text/plain; charset=Big5\n"
@@ -921,7 +973,7 @@ msgstr ""
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-05 01:58:29 PM PDT\n"
+"POT-Creation-Date: 2001-06-06 08h53m21s PDT\n"
 "PO-Revision-Date: YYYY-MM-DD\n"
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
 "Content-Type: text/plain; charset=Big5\n"
@@ -933,7 +985,7 @@ msgstr ""
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-05 01:58:29 PM PDT\n"
+"POT-Creation-Date: 2001-06-06 08h53m21s PDT\n"
 "PO-Revision-Date: YYYY-MM-DD\n"
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
 "Content-Type: text/plain; charset=Big5\n"
@@ -945,7 +997,7 @@ msgstr ""
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-05 01:58:30 PM PDT\n"
+"POT-Creation-Date: 2001-06-06 08h53m21s PDT\n"
 "PO-Revision-Date: YYYY-MM-DD\n"
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
 "Content-Type: text/plain; charset=Big5\n"
@@ -957,7 +1009,7 @@ msgstr ""
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-05 01:58:30 PM PDT\n"
+"POT-Creation-Date: 2001-06-06 08h53m22s PDT\n"
 "PO-Revision-Date: YYYY-MM-DD\n"
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
 "Content-Type: text/plain; charset=Big5\n"
@@ -969,7 +1021,7 @@ msgstr ""
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-05 01:58:30 PM PDT\n"
+"POT-Creation-Date: 2001-06-06 08h53m22s PDT\n"
 "PO-Revision-Date: YYYY-MM-DD\n"
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
 "Content-Type: text/plain; charset=Big5\n"
@@ -981,26 +1033,14 @@ msgstr ""
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-05 01:58:30 PM PDT\n"
-"PO-Revision-Date: YYYY-MM-DD\n"
-"Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
-"Content-Type: text/plain; charset=Big5\n"
-
-# This is a Qt message file in .po format.  Each msgid starts with
-# a scope.  This scope should *NOT* be translated - eg. translating
-# from French to English, "Foo::Bar" would be translated to "Pub",
-# not "Foo::Pub".
-msgid ""
-msgstr ""
-"Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-05 01:58:31 PM PDT\n"
+"POT-Creation-Date: 2001-06-06 08h53m22s PDT\n"
 "PO-Revision-Date: YYYY-MM-DD\n"
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
 "Content-Type: text/plain; charset=Big5\n"
 
 #: ./shared/QT/qd_base.cpp:979
 msgid "QDBase::#Image generated by DjVu"
-msgstr ""
+msgstr "#DjVu ¥Í¦¨ªº¹Ï¹³"
 
 #: ./shared/QT/qd_base.cpp:964
 msgid "QDBase::&Abort"
@@ -1012,7 +1052,7 @@ msgstr ""
 
 #: ./shared/QT/qd_base.cpp:922
 msgid "QDBase::&Cancel"
-msgstr ""
+msgstr "¨ú®ø"
 
 #: ./shared/QT/qd_base.cpp:922
 msgid "QDBase::&Raw"
@@ -1020,39 +1060,39 @@ msgstr ""
 
 #: ./shared/QT/qd_base.cpp:919
 msgid "QDBase::' format. Which one do you prefer?\n"
-msgstr ""
+msgstr "®æ¦¡. ±z­n¨º¤@®æ¦¡?"
 
 #: ./shared/QT/qd_base.cpp:930
 msgid "QDBase::All files (*)"
-msgstr ""
+msgstr "©Ò¦³¤å¥ó (*)"
 
 #: ./shared/QT/qd_base.cpp:1188
 msgid "QDBase::DjVu Error"
-msgstr ""
+msgstr "DjVu ¿ù»~"
 
 #: ./shared/QT/qd_base.cpp:966
 msgid "QDBase::DjVu: Exporting image..."
-msgstr ""
+msgstr "DjVu: ¿é¥X¹Ï¹³..."
 
 #: ./shared/QT/qd_base.cpp:921
 msgid "QDBase::Exporting DjVu image..."
-msgstr ""
+msgstr "¿é¥XDjVu¹Ï¹³..."
 
 #: ./shared/QT/qd_base.cpp:963
 msgid "QDBase::Please stand by..."
-msgstr ""
+msgstr "½Ðµ¥­Ô..."
 
 #: ./shared/QT/qd_base.cpp:955
 msgid "QDBase::Select export file name..."
-msgstr ""
+msgstr "½Ð¿ï¾Ü¿é¥X¤å¥ó¦W..."
 
 #: ./shared/QT/qd_base.cpp:918
 msgid "QDBase::This will export the DjVu image in either 'Raw "
-msgstr ""
+msgstr "DjVu ¹Ï¹³¥i¥H¿é¥X¬°'Raw "
 
 #: ./shared/QT/qd_base.cpp:919
 msgid "QDBase::or 'ASCII "
-msgstr ""
+msgstr "©ÎªÌ 'ASCII "
 
 # This is a Qt message file in .po format.  Each msgid starts with
 # a scope.  This scope should *NOT* be translated - eg. translating
@@ -1061,7 +1101,7 @@ msgstr ""
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-05 01:58:31 PM PDT\n"
+"POT-Creation-Date: 2001-06-06 09h33m52s PDT\n"
 "PO-Revision-Date: YYYY-MM-DD\n"
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
 "Content-Type: text/plain; charset=Big5\n"
@@ -1073,7 +1113,7 @@ msgstr ""
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-05 01:58:31 PM PDT\n"
+"POT-Creation-Date: 2001-06-06 01:48:50 PM PDT\n"
 "PO-Revision-Date: YYYY-MM-DD\n"
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
 "Content-Type: text/plain; charset=Big5\n"
@@ -1085,7 +1125,7 @@ msgstr ""
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-05 01:58:32 PM PDT\n"
+"POT-Creation-Date: 2001-06-06 01:48:50 PM PDT\n"
 "PO-Revision-Date: YYYY-MM-DD\n"
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
 "Content-Type: text/plain; charset=Big5\n"
@@ -1097,7 +1137,7 @@ msgstr ""
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-05 01:58:32 PM PDT\n"
+"POT-Creation-Date: 2001-06-06 01:48:50 PM PDT\n"
 "PO-Revision-Date: YYYY-MM-DD\n"
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
 "Content-Type: text/plain; charset=Big5\n"
@@ -1109,7 +1149,7 @@ msgstr ""
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-05 01:58:32 PM PDT\n"
+"POT-Creation-Date: 2001-06-06 01:48:50 PM PDT\n"
 "PO-Revision-Date: YYYY-MM-DD\n"
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
 "Content-Type: text/plain; charset=Big5\n"
@@ -1269,7 +1309,7 @@ msgstr "¥¼ª¾"
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-05 01:58:32 PM PDT\n"
+"POT-Creation-Date: 2001-06-06 08h53m24s PDT\n"
 "PO-Revision-Date: YYYY-MM-DD\n"
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
 "Content-Type: text/plain; charset=Big5\n"
@@ -1281,7 +1321,7 @@ msgstr ""
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-05 01:58:33 PM PDT\n"
+"POT-Creation-Date: 2001-06-06 08h53m24s PDT\n"
 "PO-Revision-Date: YYYY-MM-DD\n"
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
 "Content-Type: text/plain; charset=Big5\n"
@@ -1292,7 +1332,7 @@ msgstr ""
 
 #: ./shared/QT/qd_loader.cpp:298
 msgid "QDLoader::&Cancel"
-msgstr ""
+msgstr "¨ú®ø"
 
 #: ./shared/QT/qd_loader.cpp:295
 msgid "QDLoader::&Load"
@@ -1341,10 +1381,14 @@ msgstr ""
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-05 02:48:39 PM PDT\n"
+"POT-Creation-Date: 2001-06-06 08h53m24s PDT\n"
 "PO-Revision-Date: YYYY-MM-DD\n"
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
 "Content-Type: text/plain; charset=Big5\n"
+
+#: ./shared/QT/qd_messenger.cpp:159
+msgid "QDMessageQueue::DjVu Error"
+msgstr ""
 
 # This is a Qt message file in .po format.  Each msgid starts with
 # a scope.  This scope should *NOT* be translated - eg. translating
@@ -1353,10 +1397,26 @@ msgstr ""
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-05 02:48:40 PM PDT\n"
+"POT-Creation-Date: 2001-06-06 08h53m25s PDT\n"
 "PO-Revision-Date: YYYY-MM-DD\n"
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
 "Content-Type: text/plain; charset=Big5\n"
+
+#: ./shared/QT/qd_nav_goto_page.cpp:109
+msgid "QDNavGotoPage::&Cancel"
+msgstr "¨ú®ø"
+
+#: ./shared/QT/qd_nav_goto_page.cpp:106
+msgid "QDNavGotoPage::&OK"
+msgstr ""
+
+#: ./shared/QT/qd_nav_goto_page.cpp:88
+msgid "QDNavGotoPage::DjVu: Goto Page"
+msgstr ""
+
+#: ./shared/QT/qd_nav_goto_page.cpp:95
+msgid "QDNavGotoPage::Goto page"
+msgstr ""
 
 # This is a Qt message file in .po format.  Each msgid starts with
 # a scope.  This scope should *NOT* be translated - eg. translating
@@ -1365,18 +1425,18 @@ msgstr ""
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-05 02:48:40 PM PDT\n"
+"POT-Creation-Date: 2001-06-06 08h53m25s PDT\n"
 "PO-Revision-Date: YYYY-MM-DD\n"
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
 "Content-Type: text/plain; charset=Big5\n"
 
 #: ./shared/QT/qd_page_saver.cpp:234
 msgid "QDFileFormatDialog::&Cancel"
-msgstr ""
+msgstr "¨ú®ø"
 
 #: ./shared/QT/qd_page_saver.cpp:232
 msgid "QDFileFormatDialog::&OK"
-msgstr ""
+msgstr "½T»{"
 
 #: ./shared/QT/qd_page_saver.cpp:204
 msgid "QDFileFormatDialog::(so called BUNDLED format). This is convenient because "
@@ -1464,27 +1524,39 @@ msgstr ""
 
 #: ./shared/QT/qd_page_saver.cpp:126
 msgid "QDPageNameDialog::&Cancel"
-msgstr ""
+msgstr "¨ú®ø"
 
 #: ./shared/QT/qd_page_saver.cpp:124
 msgid "QDPageNameDialog::&OK"
-msgstr ""
+msgstr "½T»{"
+
+#: ./shared/QT/qd_page_saver.cpp:62
+msgid "QDPageNameDialog::All files (*)"
+msgstr "©Ò¦³¤å¥ó (*)"
+
+#: ./shared/QT/qd_page_saver.cpp:84
+msgid "QDPageNameDialog::DjVu Error"
+msgstr "DjVu ¿ù»~"
 
 #: ./shared/QT/qd_page_saver.cpp:109
 msgid "QDPageNameDialog::File name: "
-msgstr ""
+msgstr "¤å¥ó¦W: "
 
 #: ./shared/QT/qd_page_saver.cpp:97
 msgid "QDPageNameDialog::Page file name"
-msgstr ""
+msgstr "¥»­¶¤å¥ó¦W"
 
 #: ./shared/QT/qd_page_saver.cpp:65
 msgid "QDPageNameDialog::Select DjVu page file name..."
-msgstr ""
+msgstr "½Ð¿ï¾ÜDjVu¤å¥ó¦W..."
+
+#: ./shared/QT/qd_page_saver.cpp:417
+msgid "QDPageSaver::All files (*)"
+msgstr "©Ò¦³¤å¥ó (*)"
 
 #: ./shared/QT/qd_page_saver.cpp:429
 msgid "QeFileDialog::Select DjVu page output file name..."
-msgstr ""
+msgstr "½Ð¿ï¾ÜDjVu¿é¥X¤å¥ó¦W..."
 
 #: ./shared/QT/qd_page_saver.cpp:369
 msgid "QeFileDialog::Select directory for page files..."
@@ -1514,6 +1586,10 @@ msgstr ""
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
 "Content-Type: text/plain; charset=Big5\n"
 
+#: ./shared/QT/qd_pane.cpp:150
+msgid "QDPane::DjVu Error"
+msgstr "DjVu ¿ù»~"
+
 # This is a Qt message file in .po format.  Each msgid starts with
 # a scope.  This scope should *NOT* be translated - eg. translating
 # from French to English, "Foo::Bar" would be translated to "Pub",
@@ -1521,7 +1597,7 @@ msgstr ""
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-05 01:58:34 PM PDT\n"
+"POT-Creation-Date: 2001-06-05 04:14:02 PM PDT\n"
 "PO-Revision-Date: YYYY-MM-DD\n"
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
 "Content-Type: text/plain; charset=Big5\n"
@@ -1533,7 +1609,7 @@ msgstr ""
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-05 01:58:34 PM PDT\n"
+"POT-Creation-Date: 2001-06-05 04:14:02 PM PDT\n"
 "PO-Revision-Date: YYYY-MM-DD\n"
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
 "Content-Type: text/plain; charset=Big5\n"
@@ -1602,6 +1678,18 @@ msgstr "¥´¦L¾÷ÃC¦â½Õ¾ã"
 msgid "QDGammaPrefs::Screen color correction."
 msgstr "«Ì¹õÃC¦â½Õ¾ã"
 
+#: ./shared/QT/qd_prefs.cpp:354
+msgid "QDLensPrefs:: pixels"
+msgstr ""
+
+#: ./shared/QT/qd_prefs.cpp:281
+msgid "QDLensPrefs::Alt key"
+msgstr ""
+
+#: ./shared/QT/qd_prefs.cpp:279
+msgid "QDLensPrefs::Control key"
+msgstr "±±¨îÁä"
+
 #: ./shared/QT/qd_prefs.cpp:364
 msgid "QDLensPrefs::Magnification: "
 msgstr "©ñ¤j:"
@@ -1609,6 +1697,14 @@ msgstr "©ñ¤j:"
 #: ./shared/QT/qd_prefs.cpp:335
 msgid "QDLensPrefs::Magnifying Glass"
 msgstr "©ñ¤jÃè"
+
+#: ./shared/QT/qd_prefs.cpp:282
+msgid "QDLensPrefs::Middle mouse button"
+msgstr "¦Ñ¹«¤¤¶¡Áä"
+
+#: ./shared/QT/qd_prefs.cpp:280
+msgid "QDLensPrefs::Shift key"
+msgstr ""
 
 #: ./shared/QT/qd_prefs.cpp:346
 msgid "QDLensPrefs::Size: "
@@ -1666,17 +1762,221 @@ msgstr ""
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
 "Content-Type: text/plain; charset=Big5\n"
 
-# This is a Qt message file in .po format.  Each msgid starts with
-# a scope.  This scope should *NOT* be translated - eg. translating
-# from French to English, "Foo::Bar" would be translated to "Pub",
-# not "Foo::Pub".
-msgid ""
+#: ./shared/QT/qd_print_dialog.cpp:299
+msgid "QDPrintDialog:: bytes"
 msgstr ""
-"Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-05 01:58:35 PM PDT\n"
-"PO-Revision-Date: YYYY-MM-DD\n"
-"Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
-"Content-Type: text/plain; charset=Big5\n"
+
+#: ./shared/QT/qd_print_dialog.cpp:663
+msgid "QDPrintDialog:: copies"
+msgstr ""
+
+#: ./shared/QT/qd_print_dialog.cpp:328
+msgid "QDPrintDialog:: page "
+msgstr " ­¶ "
+
+#: ./shared/QT/qd_print_dialog.cpp:321
+msgid "QDPrintDialog:: page #"
+msgstr " ­¶¸¹# "
+
+#: ./shared/QT/qd_print_dialog.cpp:781
+msgid "QDPrintDialog::&Cancel"
+msgstr "¨ú®ø"
+
+#: ./shared/QT/qd_print_dialog.cpp:622
+msgid "QDPrintDialog::&Color"
+msgstr "±m¦â"
+
+#: ./shared/QT/qd_print_dialog.cpp:624
+msgid "QDPrintDialog::&GreyScale"
+msgstr "¦Ç¦â"
+
+#: ./shared/QT/qd_print_dialog.cpp:612
+msgid "QDPrintDialog::&Landscape"
+msgstr ""
+
+#: ./shared/QT/qd_print_dialog.cpp:364
+msgid "QDPrintDialog::&No"
+msgstr ""
+
+#: ./shared/QT/qd_print_dialog.cpp:778
+msgid "QDPrintDialog::&OK"
+msgstr ""
+
+#: ./shared/QT/qd_print_dialog.cpp:598
+msgid "QDPrintDialog::&PostScript"
+msgstr ""
+
+#: ./shared/QT/qd_print_dialog.cpp:775
+msgid "QDPrintDialog::&Save settings to disk"
+msgstr ""
+
+#: ./shared/QT/qd_print_dialog.cpp:364
+msgid "QDPrintDialog::&Yes"
+msgstr ""
+
+#: ./shared/QT/qd_print_dialog.cpp:362
+msgid "QDPrintDialog::' already exists.\n"
+msgstr ""
+
+#: ./shared/QT/qd_print_dialog.cpp:662
+msgid "QDPrintDialog::1 copy"
+msgstr ""
+
+#: ./shared/QT/qd_print_dialog.cpp:363
+msgid "QDPrintDialog::Are you sure you want to overwrite it?"
+msgstr ""
+
+#: ./shared/QT/qd_print_dialog.cpp:760
+msgid "QDPrintDialog::Browse..."
+msgstr ""
+
+#: ./shared/QT/qd_print_dialog.cpp:676
+msgid "QDPrintDialog::C&ustom pages:"
+msgstr ""
+
+#: ./shared/QT/qd_print_dialog.cpp:617
+msgid "QDPrintDialog::Color model"
+msgstr ""
+
+#: ./shared/QT/qd_print_dialog.cpp:705
+msgid "QDPrintDialog::Create a smaller PostScript file. "
+msgstr ""
+
+#: ./shared/QT/qd_print_dialog.cpp:58
+msgid "QDPrintDialog::Current Zoom"
+msgstr ""
+
+#: ./shared/QT/qd_print_dialog.cpp:59
+msgid "QDPrintDialog::Custom Zoom:"
+msgstr ""
+
+#: ./shared/QT/qd_print_dialog.cpp:318
+msgid "QDPrintDialog::Decoding"
+msgstr ""
+
+#: ./shared/QT/qd_print_dialog.cpp:299
+msgid "QDPrintDialog::Decoding: "
+msgstr ""
+
+#: ./shared/QT/qd_print_dialog.cpp:581
+msgid "QDPrintDialog::DjVu Print Dialog"
+msgstr ""
+
+#: ./shared/QT/qd_print_dialog.cpp:684
+msgid "QDPrintDialog::Enter a list of page ranges here\nseparated by commas like 1,2,10-12.\n"
+msgstr ""
+
+#: ./shared/QT/qd_print_dialog.cpp:737
+msgid "QDPrintDialog::F&ile"
+msgstr ""
+
+#: ./shared/QT/qd_print_dialog.cpp:362
+msgid "QDPrintDialog::File '"
+msgstr ""
+
+#: ./shared/QT/qd_print_dialog.cpp:755
+msgid "QDPrintDialog::File Name:"
+msgstr ""
+
+#: ./shared/QT/qd_print_dialog.cpp:701
+msgid "QDPrintDialog::Images will not be compressed."
+msgstr ""
+
+#: ./shared/QT/qd_print_dialog.cpp:698
+msgid "QDPrintDialog::Level &1"
+msgstr "¤@¯Å"
+
+#: ./shared/QT/qd_print_dialog.cpp:703
+msgid "QDPrintDialog::Level &2"
+msgstr "¤G¯Å"
+
+#: ./shared/QT/qd_print_dialog.cpp:57
+msgid "QDPrintDialog::One to One"
+msgstr "¤@¹ï¤@"
+
+#: ./shared/QT/qd_print_dialog.cpp:605
+msgid "QDPrintDialog::Orientation"
+msgstr ""
+
+#: ./shared/QT/qd_print_dialog.cpp:610
+msgid "QDPrintDialog::Po&rtrait"
+msgstr ""
+
+#: ./shared/QT/qd_print_dialog.cpp:693
+msgid "QDPrintDialog::PostScript level"
+msgstr ""
+
+#: ./shared/QT/qd_print_dialog.cpp:746
+msgid "QDPrintDialog::Print Command:"
+msgstr ""
+
+#: ./shared/QT/qd_print_dialog.cpp:713
+msgid "QDPrintDialog::Print destination"
+msgstr ""
+
+#: ./shared/QT/qd_print_dialog.cpp:735
+msgid "QDPrintDialog::Printe&r"
+msgstr ""
+
+#: ./shared/QT/qd_print_dialog.cpp:318
+msgid "QDPrintDialog::Printing"
+msgstr ""
+
+#: ./shared/QT/qd_print_dialog.cpp:56
+msgid "QDPrintDialog::Reduce to Fit"
+msgstr ""
+
+#: ./shared/QT/qd_print_dialog.cpp:632
+msgid "QDPrintDialog::Scaling"
+msgstr ""
+
+#: ./shared/QT/qd_print_dialog.cpp:176
+msgid "QDPrintDialog::Select output file name"
+msgstr ""
+
+#: ./shared/QT/qd_print_dialog.cpp:729
+msgid "QDPrintDialog::Send Image To:"
+msgstr ""
+
+#: ./shared/QT/qd_print_dialog.cpp:706
+msgid "QDPrintDialog::The file will not be\ncompatible with PS Level 1 printers."
+msgstr ""
+
+#: ./shared/QT/qd_print_dialog.cpp:685
+msgid "QDPrintDialog::To make multiple copies try 1,1,1,1.\n"
+msgstr ""
+
+#: ./shared/QT/qd_print_dialog.cpp:686
+msgid "QDPrintDialog::To print in reverse try 10-1."
+msgstr ""
+
+#: ./shared/QT/qd_print_dialog.cpp:700
+msgid "QDPrintDialog::Use this setting to generate a portable\nPostScript file. "
+msgstr ""
+
+#: ./shared/QT/qd_print_dialog.cpp:653
+msgid "QDPrintDialog::What to print"
+msgstr ""
+
+#: ./shared/QT/qd_print_dialog.cpp:51
+msgid "QDPrintDialog::current page"
+msgstr ""
+
+#: ./shared/QT/qd_print_dialog.cpp:52
+msgid "QDPrintDialog::custom pages"
+msgstr ""
+
+#: ./shared/QT/qd_print_dialog.cpp:53
+msgid "QDPrintDialog::document"
+msgstr ""
+
+#: ./shared/QT/qd_print_dialog.cpp:667
+msgid "QDPrintDialog::of the"
+msgstr ""
+
+#: ./shared/QT/qd_print_dialog.cpp:54
+msgid "QDPrintDialog::window"
+msgstr ""
 
 # This is a Qt message file in .po format.  Each msgid starts with
 # a scope.  This scope should *NOT* be translated - eg. translating
@@ -1685,10 +1985,130 @@ msgstr ""
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-05 01:58:35 PM PDT\n"
+"POT-Creation-Date: 2001-06-05 04:14:03 PM PDT\n"
 "PO-Revision-Date: YYYY-MM-DD\n"
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
 "Content-Type: text/plain; charset=Big5\n"
+
+#: ./shared/QT/qd_search_dialog.cpp:140
+msgid "QDSearchDialog:: reached. Continue from the beginning?"
+msgstr ""
+
+#: ./shared/QT/qd_search_dialog.cpp:143
+msgid "QDSearchDialog:: reached. Continue from the end?"
+msgstr ""
+
+#: ./shared/QT/qd_search_dialog.cpp:304
+msgid "QDSearchDialog::&Case sensitive"
+msgstr ""
+
+#: ./shared/QT/qd_search_dialog.cpp:331
+msgid "QDSearchDialog::&Clear"
+msgstr "²M°£"
+
+#: ./shared/QT/qd_search_dialog.cpp:328
+msgid "QDSearchDialog::&Find"
+msgstr "´M§ä"
+
+#: ./shared/QT/qd_search_dialog.cpp:145
+msgid "QDSearchDialog::&No"
+msgstr "¨ú®ø"
+
+#: ./shared/QT/qd_search_dialog.cpp:56
+msgid "QDSearchDialog::&Stop"
+msgstr "°±¤î"
+
+#: ./shared/QT/qd_search_dialog.cpp:309
+msgid "QDSearchDialog::&Whole word"
+msgstr "³æ¦r"
+
+#: ./shared/QT/qd_search_dialog.cpp:145
+msgid "QDSearchDialog::&Yes"
+msgstr "½T»{"
+
+#: ./shared/QT/qd_search_dialog.cpp:196
+msgid "QDSearchDialog::After looking through every page of this document\n"
+msgstr ""
+
+#: ./shared/QT/qd_search_dialog.cpp:143
+msgid "QDSearchDialog::Beginning of "
+msgstr ""
+
+#: ./shared/QT/qd_search_dialog.cpp:333
+msgid "QDSearchDialog::C&lose"
+msgstr "Ãö³¬"
+
+#: ./shared/QT/qd_search_dialog.cpp:201
+msgid "QDSearchDialog::DjVu Search Failed"
+msgstr "DjVu ·j¯Á¥¢±Ñ"
+
+#: ./shared/QT/qd_search_dialog.cpp:274
+msgid "QDSearchDialog::DjVu: Find"
+msgstr "DjVu ´M§ä"
+
+#: ./shared/QT/qd_search_dialog.cpp:140
+msgid "QDSearchDialog::End of "
+msgstr ""
+
+#: ./shared/QT/qd_search_dialog.cpp:284
+msgid "QDSearchDialog::Find: "
+msgstr "´M§ä: "
+
+#: ./shared/QT/qd_search_dialog.cpp:85
+msgid "QDSearchDialog::Loading page "
+msgstr ""
+
+#: ./shared/QT/qd_search_dialog.cpp:320
+msgid "QDSearchDialog::Loading page WWWWWWW"
+msgstr ""
+
+#: ./shared/QT/qd_search_dialog.cpp:323
+msgid "QDSearchDialog::Page "
+msgstr "­¶¸¹: "
+
+#: ./shared/QT/qd_search_dialog.cpp:293
+msgid "QDSearchDialog::Search &all pages"
+msgstr "·j¯Á©Ò¦³­¶¼Æ"
+
+#: ./shared/QT/qd_search_dialog.cpp:314
+msgid "QDSearchDialog::Search &backwards"
+msgstr "¦V«á·j¯Á"
+
+#: ./shared/QT/qd_search_dialog.cpp:206
+msgid "QDSearchDialog::Search string not found"
+msgstr "¦r²Å¦êµLªk§ä¨ì"²
+
+#: ./shared/QT/qd_search_dialog.cpp:205
+msgid "QDSearchDialog::The search is impossible."
+msgstr "µLªk´M§ä"
+
+#: ./shared/QT/qd_search_dialog.cpp:198
+msgid "QDSearchDialog::This means, that the document\ncreator did not run an OCR engine on this document.\n\n"
+msgstr ""
+
+#: ./shared/QT/qd_search_dialog.cpp:202
+msgid "QDSearchDialog::This page does not contain textual information,\n"
+msgstr "¸Ó­¶¨S¦³¤å¦r«H®§"
+
+#: ./shared/QT/qd_search_dialog.cpp:137
+msgid "QDSearchDialog::document"
+msgstr ""
+
+#: ./shared/QT/qd_search_dialog.cpp:204
+msgid "QDSearchDialog::or the OCR engine did not recognize any text on this page.\n\n"
+msgstr ""
+
+#: ./shared/QT/qd_search_dialog.cpp:137
+msgid "QDSearchDialog::page"
+msgstr "­¶"
+
+#: ./shared/QT/qd_search_dialog.cpp:197
+msgid "QDSearchDialog::we have found, that neither of them contain\ntextual information."
+msgstr ""
+
+#: ./shared/QT/qd_search_dialog.cpp:203
+msgid "QDSearchDialog::which means that either creator of this document did not run an OCR engine on it, "
+msgstr ""
 
 # This is a Qt message file in .po format.  Each msgid starts with
 # a scope.  This scope should *NOT* be translated - eg. translating
@@ -1697,7 +2117,35 @@ msgstr ""
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-05 01:58:35 PM PDT\n"
+"POT-Creation-Date: 2001-06-06 08h26m28s PDT\n"
+"PO-Revision-Date: YYYY-MM-DD\n"
+"Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
+"Content-Type: text/plain; charset=Big5\n"
+
+#: ./shared/QT/qd_set_zoom.cpp:103
+msgid "QDSetZoom::&Cancel"
+msgstr "¨ú®ø"
+
+#: ./shared/QT/qd_set_zoom.cpp:100
+msgid "QDSetZoom::&OK"
+msgstr ""
+
+#: ./shared/QT/qd_set_zoom.cpp:87
+msgid "QDSetZoom::Custom zoom"
+msgstr ""
+
+#: ./shared/QT/qd_set_zoom.cpp:79
+msgid "QDSetZoom::DjVu: Set Zoom"
+msgstr ""
+
+# This is a Qt message file in .po format.  Each msgid starts with
+# a scope.  This scope should *NOT* be translated - eg. translating
+# from French to English, "Foo::Bar" would be translated to "Pub",
+# not "Foo::Pub".
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"POT-Creation-Date: 2001-06-06 08h26m28s PDT\n"
 "PO-Revision-Date: YYYY-MM-DD\n"
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
 "Content-Type: text/plain; charset=Big5\n"
@@ -1810,9 +2258,13 @@ msgstr ""
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
 "Content-Type: text/plain; charset=Big5\n"
 
-#: ./shared/QT/qd_thumb.cpp:782
+#: ./shared/QT/qd_thumb.cpp:783
 msgid "QDThumbnails::&Close thumbnails"
-msgstr ""
+msgstr "Ãö³¬ÁY¼v¹Ï"
+
+#: ./shared/QT/qd_thumb.cpp:166
+msgid "QDThumbnails::Page "
+msgstr "­¶¸¹ "
 
 # This is a Qt message file in .po format.  Each msgid starts with
 # a scope.  This scope should *NOT* be translated - eg. translating
@@ -1832,15 +2284,15 @@ msgstr ""
 
 #: ./shared/QT/qd_thumb_gen.cpp:182
 msgid "QDThumbGen::&Cancel"
-msgstr ""
+msgstr "¨ú®ø"
 
 #: ./shared/QT/qd_thumb_gen.cpp:179
 msgid "QDThumbGen::&OK"
-msgstr ""
+msgstr "½T»{"
 
 #: ./shared/QT/qd_thumb_gen.cpp:86
 msgid "QDThumbGen::Cancel"
-msgstr ""
+msgstr "¨ú®ø"
 
 #: ./shared/QT/qd_thumb_gen.cpp:88
 msgid "QDThumbGen::DjVu Thumbnails integrator"
@@ -1942,6 +2394,46 @@ msgstr ""
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
 "Content-Type: text/plain; charset=Big5\n"
 
+#: ./shared/QT/qd_welcome.cpp:63
+msgid "QDWelcome::&About"
+msgstr "Ãö©ó"
+
+#: ./shared/QT/qd_welcome.cpp:81
+msgid "QDWelcome::&Close"
+msgstr "Ãö³¬"
+
+#: ./shared/QT/qd_welcome.cpp:58
+msgid "QDWelcome::&Help"
+msgstr "À°§U"
+
+#: ./shared/QT/qd_welcome.cpp:83
+msgid "QDWelcome::&Never show this window again"
+msgstr "¤£­n¦A¥X¥Ü¸Óµ¡"
+
+#: ./shared/QT/qd_welcome.cpp:53
+msgid "QDWelcome::&Preferences"
+msgstr "°¾¦n­È"
+
+#: ./shared/QT/qd_welcome.cpp:56
+msgid "QDWelcome::Adjust gamma correction, caches, etc."
+msgstr "½Õ¾ãGamma ®Õ¥¿, ¦sÀx..."
+
+#: ./shared/QT/qd_welcome.cpp:66
+msgid "QDWelcome::Credit and links"
+msgstr ""
+
+#: ./shared/QT/qd_welcome.cpp:61
+msgid "QDWelcome::Learn how to use DjVu"
+msgstr "¾Ç²ß¨Ï¥ÎDjVu"
+
+#: ./shared/QT/qd_welcome.cpp:75
+msgid "QDWelcome::These functions and many others can be\naccessed from within a DjVu document\nby clicking the right mouse button."
+msgstr ""
+
+#: ./shared/QT/qd_welcome.cpp:45
+msgid "QDWelcome::Welcome to the DjVu Plug-in"
+msgstr "Åwªï¨Ï¥ÎDjVu"
+
 # This is a Qt message file in .po format.  Each msgid starts with
 # a scope.  This scope should *NOT* be translated - eg. translating
 # from French to English, "Foo::Bar" would be translated to "Pub",
@@ -1949,7 +2441,71 @@ msgstr ""
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-05 01:58:37 PM PDT\n"
+"POT-Creation-Date: 2001-06-06 08h26m30s PDT\n"
+"PO-Revision-Date: YYYY-MM-DD\n"
+"Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
+"Content-Type: text/plain; charset=Big5\n"
+
+#: ./shared/QT/qd_wpaper.cpp:36
+msgid "QDWPaper::DjVu Error"
+msgstr ""
+
+# This is a Qt message file in .po format.  Each msgid starts with
+# a scope.  This scope should *NOT* be translated - eg. translating
+# from French to English, "Foo::Bar" would be translated to "Pub",
+# not "Foo::Pub".
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"POT-Creation-Date: 2001-06-06 08h53m29s PDT\n"
+"PO-Revision-Date: YYYY-MM-DD\n"
+"Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
+"Content-Type: text/plain; charset=Big5\n"
+
+#: ./shared/QT/qd_zoom_dialog.cpp:111
+msgid "QDZComboBox::DjVu: Input error"
+msgstr ""
+
+#: ./shared/QT/qd_zoom_dialog.cpp:110
+msgid "QDZComboBox::Invalid zoom specified: '"
+msgstr ""
+
+#: ./shared/QT/qd_zoom_dialog.cpp:183
+msgid "QDZoomDialog::&Cancel"
+msgstr "¨ú®ø"
+
+#: ./shared/QT/qd_zoom_dialog.cpp:180
+msgid "QDZoomDialog::&OK"
+msgstr "½T»{"
+
+#: ./shared/QT/qd_zoom_dialog.cpp:95
+msgid "QDZoomDialog::DjVu: Input error"
+msgstr "DjVu ¿é¤J¿ù»~"
+
+#: ./shared/QT/qd_zoom_dialog.cpp:140
+msgid "QDZoomDialog::DjVu: Recommended Zoom"
+msgstr ""
+
+#: ./shared/QT/qd_zoom_dialog.cpp:94
+msgid "QDZoomDialog::Invalid zoom specified: '"
+msgstr ""
+
+#: ./shared/QT/qd_zoom_dialog.cpp:145
+msgid "QDZoomDialog::Please specify the recommended resolution in which\nthe page should be displayed by the browser.\n"
+msgstr ""
+
+#: ./shared/QT/qd_zoom_dialog.cpp:151
+msgid "QDZoomDialog::Recommended zoom:"
+msgstr ""
+
+# This is a Qt message file in .po format.  Each msgid starts with
+# a scope.  This scope should *NOT* be translated - eg. translating
+# from French to English, "Foo::Bar" would be translated to "Pub",
+# not "Foo::Pub".
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"POT-Creation-Date: 2001-06-06 08h53m29s PDT\n"
 "PO-Revision-Date: YYYY-MM-DD\n"
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
 "Content-Type: text/plain; charset=Big5\n"
@@ -1961,7 +2517,7 @@ msgstr ""
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-05 01:58:37 PM PDT\n"
+"POT-Creation-Date: 2001-06-06 08h53m29s PDT\n"
 "PO-Revision-Date: YYYY-MM-DD\n"
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
 "Content-Type: text/plain; charset=Big5\n"
@@ -1973,7 +2529,7 @@ msgstr ""
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-05 01:58:37 PM PDT\n"
+"POT-Creation-Date: 2001-06-06 08h53m29s PDT\n"
 "PO-Revision-Date: YYYY-MM-DD\n"
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
 "Content-Type: text/plain; charset=Big5\n"
@@ -1985,7 +2541,7 @@ msgstr ""
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-05 01:58:37 PM PDT\n"
+"POT-Creation-Date: 2001-06-06 08h53m29s PDT\n"
 "PO-Revision-Date: YYYY-MM-DD\n"
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
 "Content-Type: text/plain; charset=Big5\n"
@@ -1997,7 +2553,7 @@ msgstr ""
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-05 01:58:38 PM PDT\n"
+"POT-Creation-Date: 2001-06-06 08h53m30s PDT\n"
 "PO-Revision-Date: YYYY-MM-DD\n"
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
 "Content-Type: text/plain; charset=Big5\n"
@@ -2009,7 +2565,7 @@ msgstr ""
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-05 01:58:38 PM PDT\n"
+"POT-Creation-Date: 2001-06-06 08h53m30s PDT\n"
 "PO-Revision-Date: YYYY-MM-DD\n"
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
 "Content-Type: text/plain; charset=Big5\n"
@@ -2021,7 +2577,7 @@ msgstr ""
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-05 01:58:38 PM PDT\n"
+"POT-Creation-Date: 2001-06-06 08h53m30s PDT\n"
 "PO-Revision-Date: YYYY-MM-DD\n"
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
 "Content-Type: text/plain; charset=Big5\n"
@@ -2033,7 +2589,7 @@ msgstr ""
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-05 01:58:38 PM PDT\n"
+"POT-Creation-Date: 2001-06-06 08h53m30s PDT\n"
 "PO-Revision-Date: YYYY-MM-DD\n"
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
 "Content-Type: text/plain; charset=Big5\n"
@@ -2045,7 +2601,7 @@ msgstr ""
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-05 01:58:38 PM PDT\n"
+"POT-Creation-Date: 2001-06-06 08h53m30s PDT\n"
 "PO-Revision-Date: YYYY-MM-DD\n"
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
 "Content-Type: text/plain; charset=Big5\n"
@@ -2057,31 +2613,7 @@ msgstr ""
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-05 01:58:38 PM PDT\n"
-"PO-Revision-Date: YYYY-MM-DD\n"
-"Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
-"Content-Type: text/plain; charset=Big5\n"
-
-# This is a Qt message file in .po format.  Each msgid starts with
-# a scope.  This scope should *NOT* be translated - eg. translating
-# from French to English, "Foo::Bar" would be translated to "Pub",
-# not "Foo::Pub".
-msgid ""
-msgstr ""
-"Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-05 01:58:39 PM PDT\n"
-"PO-Revision-Date: YYYY-MM-DD\n"
-"Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
-"Content-Type: text/plain; charset=Big5\n"
-
-# This is a Qt message file in .po format.  Each msgid starts with
-# a scope.  This scope should *NOT* be translated - eg. translating
-# from French to English, "Foo::Bar" would be translated to "Pub",
-# not "Foo::Pub".
-msgid ""
-msgstr ""
-"Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2001-06-05 01:58:39 PM PDT\n"
+"POT-Creation-Date: 2001-06-06 08h53m30s PDT\n"
 "PO-Revision-Date: YYYY-MM-DD\n"
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
 "Content-Type: text/plain; charset=Big5\n"
