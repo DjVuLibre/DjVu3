@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocEditor.cpp,v 1.21 2000-01-14 15:04:19 bcr Exp $
+//C- $Id: DjVuDocEditor.cpp,v 1.22 2000-01-14 15:20:03 bcr Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -1282,8 +1282,6 @@ DjVuDocEditor::save_as(const char * where, bool bundled)
 	 // Can't be very smart here. Simply overwrite the file.
       GP<DjVmDoc> doc=get_djvm_doc();
       DataPool::load_file(save_doc_name);
-      StdioByteStream str_out(file_name, "wb");
-      str_out.writall("AT&T", 4);
       StdioByteStream str(save_doc_name, "wb");
       doc->write(str);
       str.flush();
