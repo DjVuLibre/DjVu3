@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GCache.h,v 1.1.2.2 1999-04-20 21:03:12 eaf Exp $
+//C- $Id: GCache.h,v 1.1.2.3 1999-04-27 15:29:53 eaf Exp $
 
 #ifndef _GCACHE_H
 #define _GCACHE_H
@@ -107,9 +107,12 @@ public:
    void		del_item(const Key & key);
    void		add_item(const Key & key, const GP<Value> & value);
    void		set_max_size(int max_size);
+   void		enable(bool en);
+   bool		is_enabled(void) const;
 private:
    GCriticalSection		cache_lock;
    GMap<Key, GCacheItem<Value> >cache;
+   bool		enabled;
    int		max_size;
    int		cur_size;
 
@@ -119,7 +122,7 @@ private:
 
 template<class Key, class Value> inline
 GCache<Key, Value>::GCache(int xmax_size) :
-      max_size(xmax_size), cur_size(0) {}
+      enabled(1), max_size(xmax_size), cur_size(0) {}
 
 template<class Key, class Value> inline
 GCache<Key, Value>::~GCache(void) {}
@@ -238,16 +241,19 @@ GCache<Key, Value>::add_item(const Key & k, const GP<Value> & v)
 
    GCriticalSectionLock lock(&cache_lock);
 
+   int _max_size=enabled ? max_size : 0;
+   if (max_size<0) _max_size=max_size;
+
    int add_size=v->get_memory_usage();
    
-   if (max_size>=0 && add_size>max_size)
+   if (_max_size>=0 && add_size>_max_size)
    {
       DEBUG_MSG("but this item is way too large => doing nothing\n");
       return;
    };
 
    del_item(k);
-   if (max_size>=0) clear_to_size(max_size-add_size);
+   if (_max_size>=0) clear_to_size(_max_size-add_size);
    
    cache[k]=v;
    cur_size+=add_size;
@@ -264,7 +270,19 @@ GCache<Key, Value>::set_max_size(int xmax_size)
    max_size=xmax_size;
    cur_size=calculate_size();
 
-   if (max_size>=0) clear_to_size(max_size);
+   if (max_size>=0) clear_to_size(enabled ? max_size : 0);
+}
+
+template<class Key, class Value> void
+GCache<Key, Value>::enable(bool en)
+{
+   enabled=en;
+}
+
+template<class Key, class Value> bool
+GCache<Key, Value>::is_enabled(void) const
+{
+   return enabled;
 }
 
 #endif
