@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.h,v 1.27 1999-09-16 15:43:18 eaf Exp $
+//C- $Id: DjVuDocument.h,v 1.28 1999-09-16 21:50:10 eaf Exp $
  
 #ifndef _DJVUDOCUMENT_H
 #define _DJVUDOCUMENT_H
@@ -33,7 +33,7 @@
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocument.h,v 1.27 1999-09-16 15:43:18 eaf Exp $#
+    @version #$Id: DjVuDocument.h,v 1.28 1999-09-16 21:50:10 eaf Exp $#
 */
 
 //@{
@@ -185,6 +185,7 @@ public:
           \end{enumerate} */
    enum DOC_TYPE { OLD_BUNDLED=1, OLD_INDEXED, BUNDLED, INDIRECT,
 		   UNKNOWN_TYPE };
+   enum THREAD_FLAGS { STARTED=1, FINISHED=2 };
 
       /** Default constructor. Please call function \Ref{init}() before
 	  you start working with the #DjVuDocument#. */
@@ -575,6 +576,7 @@ private:
    };
    bool                 init_called;
    GSafeFlags		flags;
+   GSafeFlags		init_thread_flags;
    DjVuFileCache	* cache;
    GP<DjVuSimplePort>	simple_port;
    int			doc_type;

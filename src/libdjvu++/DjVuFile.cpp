@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.52 1999-09-16 17:48:18 eaf Exp $
+//C- $Id: DjVuFile.cpp,v 1.53 1999-09-16 21:50:11 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -152,6 +152,11 @@ DjVuFile::~DjVuFile(void)
    
    if (data_pool) data_pool->del_trigger(static_trigger_cb, this);
    stop();
+   
+   GMonitorLock lock(&decode_thread_flags);
+   while((decode_thread_flags & STARTED) &&
+	 !(decode_thread_flags & FINISHED))
+      decode_thread_flags.wait();
 }
 
 void
@@ -325,6 +330,8 @@ DjVuFile::static_decode_func(void * cl_data)
       th->decode_func();
    } CATCH(exc) {
    } ENDCATCH;
+
+   TRY { th->decode_thread_flags=th->decode_thread_flags | FINISHED; } CATCH(exc) {} ENDCATCH;
 }
 
 void
@@ -347,7 +354,6 @@ DjVuFile::decode_func(void)
       GP<ByteStream> decode_stream=decode_data_pool->get_stream();
       GP<ProgressByteStream> pstr=new ProgressByteStream(decode_stream);
       pstr->set_progress_cb(progress_cb, this);
-      decode_thread_started_ev.set();
       
       decode(*pstr);
 
@@ -397,6 +403,10 @@ DjVuFile::decode_func(void)
    TRY {
       if (flags.test_and_modify(DECODING, 0, DECODE_OK | INCL_FILES_CREATED, DECODING))
 	 pcaster->notify_file_flags_changed(this, DECODE_OK | INCL_FILES_CREATED, DECODING);
+
+      decode_thread_flags=decode_thread_flags | FINISHED;
+	 // Nothing below this point please. The object may already
+	 // be destroyed.
    } CATCH(exc) {} ENDCATCH;
    DEBUG_MSG("decoding thread for url='" << url << "' ended\n");
 }
@@ -851,6 +861,7 @@ DjVuFile::start_decode(void)
 	 if (flags & DECODE_STOPPED) reset();
 	 flags=flags & ~(DECODE_OK | DECODE_STOPPED | DECODE_FAILED);
 	 flags=flags | DECODING;
+	 decode_thread_flags=STARTED;
       
 	 delete decode_thread; decode_thread=0;
 	 decode_thread=new GThread();
@@ -860,7 +871,7 @@ DjVuFile::start_decode(void)
 	    // We want to wait until the other thread actually starts.
 	    // One of the reasons is that if somebody tries to terminate the decoding
 	    // before its thread actually starts, it will NOT be terminated
-	 decode_thread_started_ev.wait();
+	 while(!decode_data_pool) GThread::yield();
       }
    } CATCH(exc) {
       flags=flags & ~DECODING;

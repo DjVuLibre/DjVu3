@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.40 1999-09-16 17:49:14 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.41 1999-09-16 21:50:10 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -52,7 +52,8 @@ DjVuDocument::init(const GURL & url, GP<DjVuPort> xport,
 
       // Now we say it is ready
    init_called=true;
-   
+
+   init_thread_flags=STARTED;
    init_life_saver=this;
    init_thr.create(static_init_thread, this);
 }
@@ -63,8 +64,9 @@ DjVuDocument::~DjVuDocument(void)
       // thread (involves stopping the init_data_pool, the file
       // used to decode NDIR chunks (if any) and all unnamed files)
    if (init_data_pool) init_data_pool->stop();
-   while(!(flags & DOC_INIT_FAILED) &&
-	 !(flags & DOC_INIT_COMPLETE))
+   GMonitorLock lock(&init_thread_flags);
+   while((init_thread_flags & STARTED) &&
+	 !(init_thread_flags & FINISHED))
    {
       if (ndir_file) ndir_file->stop();
       ndir_file=0;
@@ -76,9 +78,7 @@ DjVuDocument::~DjVuDocument(void)
 	 ufiles_list.empty();
       }
 
-      flags.enter();
-      flags.wait(500);
-      flags.leave();
+      init_thread_flags.wait(500);
    }
 }
 
@@ -101,6 +101,7 @@ DjVuDocument::static_init_thread(void * cl_data)
 	 get_portcaster()->notify_error(th, exc.get_cause());
       } CATCH(exc) {} ENDCATCH;
    } ENDCATCH;
+   TRY { th->init_thread_flags=th->init_thread_flags | FINISHED; } CATCH(exc) {} ENDCATCH;
 }
 
 void
@@ -242,6 +243,10 @@ DjVuDocument::init_thread(void)
    flags=flags | DOC_INIT_COMPLETE;
    pcaster->notify_doc_flags_changed(this, DOC_INIT_COMPLETE, 0);
    check_unnamed_files();
+
+   init_thread_flags=init_thread_flags | FINISHED;
+      // Nothing else after this point, please. The object may already
+      // be destroyed.
    
    DEBUG_MSG("DOCUMENT IS FULLY INITIALIZED now: doc_type='" <<
 	     (doc_type==BUNDLED ? "BUNDLED" :

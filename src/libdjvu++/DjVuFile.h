@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.h,v 1.31 1999-09-16 17:48:18 eaf Exp $
+//C- $Id: DjVuFile.h,v 1.32 1999-09-16 21:50:11 eaf Exp $
  
 #ifndef _DJVUFILE_H
 #define _DJVUFILE_H
@@ -46,7 +46,7 @@
 
     @memo Classes representing DjVu files.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuFile.h,v 1.31 1999-09-16 17:48:18 eaf Exp $#
+    @version #$Id: DjVuFile.h,v 1.32 1999-09-16 21:50:11 eaf Exp $#
 */
 
 //@{
@@ -148,6 +148,7 @@ public:
    enum { DECODING=1, DECODE_OK=2, DECODE_FAILED=4, DECODE_STOPPED=8,
 	  DATA_PRESENT=16, ALL_DATA_PRESENT=32, INCL_FILES_CREATED=64,
           MODIFIED=128 };
+   enum { STARTED=1, FINISHED=2 };
 
       /** @name Decoded file contents */
       //@{
@@ -394,9 +395,9 @@ protected:
 private:
    bool                 initialized;
    GSafeFlags		flags;
+   GSafeFlags		decode_thread_flags;
 
    GThread		* decode_thread;
-   GEvent		decode_thread_started_ev;
    GP<DataPool>		decode_data_pool;
    GP<DjVuFile>		decode_life_saver;
 
