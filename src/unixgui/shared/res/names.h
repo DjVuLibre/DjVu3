@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: names.h,v 1.15 2001-08-24 21:50:10 docbill Exp $
+// $Id: names.h,v 1.16 2001-08-31 21:48:53 docbill Exp $
 // $Name:  $
 
 
@@ -52,6 +52,6 @@
 #define DJVIEW_NAME	"djview"
 #define DJEDIT_NAME	"djedit"
 #define DEJAVU_DIR	"DjVu/"
-#define DJVU_URL	"http://www.lizardtech.com/pluginfiles/unix/3.0"
+#define DJVU_URL	"http://www.lizardtech.com/pluginfiles/unix/3.0/"
 
 #endif
