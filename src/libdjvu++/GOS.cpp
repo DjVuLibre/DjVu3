@@ -9,9 +9,9 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GOS.cpp,v 1.12 1999-11-19 15:57:00 bcr Exp $
+//C- $Id: GOS.cpp,v 1.13 1999-11-19 16:30:16 bcr Exp $
 
-// "$Id: GOS.cpp,v 1.12 1999-11-19 15:57:00 bcr Exp $"
+// "$Id: GOS.cpp,v 1.13 1999-11-19 16:30:16 bcr Exp $"
 
 #ifdef __GNUC__
 #pragma implementation
@@ -538,11 +538,7 @@ GOS::deletefile(const char * filename)
       retval=unlink(filename);
 #endif
   }
-<<<<<<< GOS.cpp
   return retval;
-=======
-  return -1;
->>>>>>> 1.11
 }
 
 

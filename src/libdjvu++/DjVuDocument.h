@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.h,v 1.41 1999-11-19 15:57:00 bcr Exp $
+//C- $Id: DjVuDocument.h,v 1.42 1999-11-19 16:30:16 bcr Exp $
  
 #ifndef _DJVUDOCUMENT_H
 #define _DJVUDOCUMENT_H
@@ -33,7 +33,7 @@
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@research.att.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocument.h,v 1.41 1999-11-19 15:57:00 bcr Exp $#
+    @version #$Id: DjVuDocument.h,v 1.42 1999-11-19 16:30:16 bcr Exp $#
 */
 
 //@{
@@ -191,6 +191,8 @@ public:
    enum DOC_TYPE { OLD_BUNDLED=1, OLD_INDEXED, BUNDLED, INDIRECT,
 		   SINGLE_PAGE, UNKNOWN_TYPE };
    enum THREAD_FLAGS { STARTED=1, FINISHED=2 };
+
+   GMap<GURL,GString> *filelist;
 
       /** Default constructor. Please call function \Ref{init}() before
 	  you start working with the #DjVuDocument#. */

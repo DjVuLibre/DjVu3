@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.66 1999-11-19 15:56:59 bcr Exp $
+//C- $Id: DjVuDocument.cpp,v 1.67 1999-11-19 16:30:16 bcr Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -37,15 +37,16 @@ get_int_prefix(void * ptr)
 }
 
 DjVuDocument::DjVuDocument(void)
-  : doc_type(UNKNOWN_TYPE), init_called(false), cache(0)
+  : doc_type(UNKNOWN_TYPE), init_called(false), cache(0), filelist(0)
 {
 }
 
 
 void
 DjVuDocument::init(const GURL & url, GP<DjVuPort> xport,
-                   DjVuFileCache * xcache,GMap<GURL,GString> *filelist)
+                   DjVuFileCache * xcache,GMap<GURL,GString> *thisfilelist)
 {
+   filelist=thisfilelist;
    if (init_called)
       THROW("DjVuDocument is already initialized");
    if (!get_count())
@@ -1255,7 +1256,6 @@ DjVuDocument::get_djvm_doc(const bool SkipErrors)
         for(int page_num=0;page_num<ndir->get_pages_num();page_num++)
         {
   	   GP<DjVuFile> file=url_to_file(ndir->page_to_url(page_num));
-	   GMap<GURL, void *> map_del;
 	   add_file_to_djvm(file, true, *doc, map_add);
         }
       }else
@@ -1263,9 +1263,22 @@ DjVuDocument::get_djvm_doc(const bool SkipErrors)
         for(int page_num=0;page_num<ndir->get_pages_num();page_num++)
         {
            TRY {
-  	     GP<DjVuFile> file=url_to_file(ndir->page_to_url(page_num));
-	     GMap<GURL, void *> map_del;
-	     add_file_to_djvm(file, true, *doc, map_add);
+             if(filelist)
+             {	// Only add pages to the filelist when successfull.
+               GMap<GURL,GString> tmplist;
+               simple_port->set_filelist(&tmplist);
+  	       GP<DjVuFile> file=url_to_file(ndir->page_to_url(page_num));
+	       add_file_to_djvm(file, true, *doc, map_add);
+               simple_port->set_filelist(filelist);
+               for (GPosition i = tmplist; i; ++i)
+               {
+                 (*filelist)[tmplist.key(i)]=tmplist[i];
+               }
+             }else
+             {
+  	       GP<DjVuFile> file=url_to_file(ndir->page_to_url(page_num));
+	       add_file_to_djvm(file, true, *doc, map_add);
+             }
            }
            CATCH(ex)
            {
