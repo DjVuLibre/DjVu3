@@ -9,7 +9,7 @@
 conf=`basename $0`
 topsrcdir=`dirname $0`
 topbuilddir=.
-if [ ! -r $topsrcdir/config/configure.sh ]
+if [ ! -r $topsrcdir/config/functions.sh ]
 then
     echo 1>&2 "$conf: Cannot recognize source directory"
     echo 1>&2 "--  Check that your source directory is complete."
@@ -20,7 +20,7 @@ fi
 ### ---------------------------
 ### Get functions
 
-. $topsrcdir/config/configure.sh
+. $topsrcdir/config/functions.sh
 
 
 ### ---------------------------
