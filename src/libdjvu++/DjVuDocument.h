@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.h,v 1.9 1999-08-26 19:29:59 eaf Exp $
+//C- $Id: DjVuDocument.h,v 1.10 1999-08-27 22:33:02 eaf Exp $
  
 #ifndef _DJVUDOCUMENT_H
 #define _DJVUDOCUMENT_H
@@ -32,7 +32,7 @@
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocument.h,v 1.9 1999-08-26 19:29:59 eaf Exp $#
+    @version #$Id: DjVuDocument.h,v 1.10 1999-08-27 22:33:02 eaf Exp $#
 */
 
 //@{
@@ -267,9 +267,12 @@ public:
 
    virtual GURL		id_to_url(const DjVuPort * source, const char * id);
    virtual GPBase	get_cached_file(const DjVuPort * source, const GURL & url);
+   virtual void		cache_djvu_file(const DjVuPort * source, DjVuFile * file);
    virtual GP<DataRange>request_data(const DjVuPort * source, const GURL & url);
    virtual void		notify_chunk_done(const DjVuPort * source, const char * name);
-   virtual void		notify_file_done(const DjVuPort * source);
+protected:
+   GMap<GURL, void *>	active_files;
+   GCriticalSection	active_files_lock;
 private:
    GCache<GURL, DjVuFile> * cache;
    DjVuSimplePort	* simple_port;
@@ -289,6 +292,9 @@ private:
    GURL			id_to_url(const char * id);
 
    void			add_to_cache(const GP<DjVuFile> & f);
+
+   static void		static_destroy_cb(const DjVuFile *, void *);
+   void			destroy_cb(const DjVuFile *);
 };
 
 inline int

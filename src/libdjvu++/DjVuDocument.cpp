@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.20 1999-08-26 19:29:59 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.21 1999-08-27 22:33:02 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -324,18 +324,6 @@ DjVuDocument::add_to_cache(const GP<DjVuFile> & f)
    }
 }
 
-void
-DjVuDocument::notify_file_done(const DjVuPort * source)
-{
-   if (source->inherits("DjVuFile"))
-   {
-      DjVuFile * file=(DjVuFile *) source;
-      DEBUG_MSG("DjVuDocument::notify_file_done(): done decoding for '" <<
-		file->get_url() << "'\n");
-      add_to_cache(file);
-   }
-}
-
 GURL
 DjVuDocument::id_to_url(const char * id)
 {
@@ -372,15 +360,63 @@ DjVuDocument::id_to_url(const DjVuPort * source, const char * id)
 
 GPBase
 DjVuDocument::get_cached_file(const DjVuPort * source, const GURL & url)
+      /* There are two caches in use:
+	   1. One of them is global. It's passed from outside and is used
+	      to cache fully decoded pages, shared between all documents.
+	   2. The other one is local. Any file created inside this document
+	      is added to it.
+	      
+	 The difference between these two caches is that global cache
+	 *holds* the files, that is it keeps GP<> pointers and prevents
+	 even unused DjVuFiles from destruction (as long as the cache is
+	 not full). The local cache just keeps track of still alive files,
+	 which have been created inside this document. As soon as a file
+	 is destroyed, it's removed from the local cache too.
+	 Thus we manage to reuse most of the files created inside this
+	 or another document. */
 {
    DEBUG_MSG("DjVuDocument::get_cached_file(): url='" << url << "'\n");
    DEBUG_MAKE_INDENT(3);
 
    GP<DjVuFile> file;
+   
+      // First - check the cache of decoded files
    if (cache) file=cache->get_item(url);
+   DEBUG_MSG("found file in the global cache=" << (file!=0) << "\n");
 
-   DEBUG_MSG("found file in the cache=" << (file!=0) << "\n");
+   if (!file)
+   {
+         // Next - check files, that have ever been created inside this
+	 // document, and are still alive.
+      GCriticalSectionLock lock(&active_files_lock);
+      GPosition pos;
+      if (active_files.contains(url, pos)) file=(DjVuFile *) active_files[pos];
+      DEBUG_MSG("found file in the local cache=" << (file!=0) << "\n");
+   } else
+   {
+	 // Heh. Add the file retrieved from the global cache to the local one.
+      GCriticalSectionLock lock(&active_files_lock);
+      if (!active_files.contains(file->get_url()))
+      {
+	 file->set_destroy_cb(static_destroy_cb, this);
+	 active_files[file->get_url()]=file;
+      }
+   }
+
    return (DjVuFile *) file;
+}
+
+void
+DjVuDocument::cache_djvu_file(const DjVuPort * source, DjVuFile * file)
+{
+   if (cache && file->is_decode_ok()) add_to_cache(file);
+
+   GCriticalSectionLock lock(&active_files_lock);
+   if (!active_files.contains(file->get_url()))
+   {
+      file->set_destroy_cb(static_destroy_cb, this);
+      active_files[file->get_url()]=file;
+   }
 }
 
 GP<DataRange>
@@ -465,20 +501,25 @@ DjVuDocument::get_djvu_file(const GURL & url)
    DEBUG_MSG("DjVuDocument::get_djvu_file(): request for '" << url << "'\n");
    DEBUG_MAKE_INDENT(3);
 
-   GPBase tmpfile=get_portcaster()->get_cached_file(this, url);
+   DjVuPortcaster * pcaster=get_portcaster();
+   
+   GPBase tmpfile=pcaster->get_cached_file(this, url);
    GP<DjVuFile> file=(DjVuFile *) tmpfile.get();
    if (!file) file=new DjVuFile(url, this);
-   else if (dummy_ndir)
+   else
    {
-      GP<DjVuNavDir> dir=file->find_ndir();
-      if (dir)
+      pcaster->add_route(file, this);
+      if (dummy_ndir)
       {
-	 DEBUG_MSG("updating nav. directory from the cached file.\n");
-	 ndir=dir;
+	 GP<DjVuNavDir> dir=file->find_ndir();
+	 if (dir)
+	 {
+	    DEBUG_MSG("updating nav. directory from the cached file.\n");
+	    ndir=dir;
+	 }
       }
    }
-   get_portcaster()->add_route(file, this);
-
+   
    return file;
 }
 
@@ -512,6 +553,23 @@ DjVuDocument::get_page(int page_num)
       file->start_decode();
    
    return new DjVuImage(file);
+}
+
+void
+DjVuDocument::static_destroy_cb(const DjVuFile * file, void * cl_data)
+{
+   ((DjVuDocument *) cl_data)->destroy_cb(file);
+}
+
+void
+DjVuDocument::destroy_cb(const DjVuFile * file)
+{
+   DEBUG_MSG("DjVuDocument::destroy_cb(): file '" << file->get_url() << "' is about to destroy\n");
+   DEBUG_MAKE_INDENT(3);
+
+   GCriticalSectionLock lock(&active_files_lock);
+   GPosition pos;
+   if (active_files.contains(file->get_url(), pos)) active_files.del(pos);
 }
 
 static TArray<char>
