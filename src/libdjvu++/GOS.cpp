@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: GOS.cpp,v 1.36 2000-11-09 20:15:06 jmw Exp $
+// $Id: GOS.cpp,v 1.37 2000-11-29 22:44:10 lchen Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -1016,7 +1016,6 @@ GOS::url_to_filename(const char *url)
   if(!url||!strcmp(url,"about:blank"))
     return GString("");
 
-  GString tmp;
 	// WARNING: Whenever you modify this conversion code,
 	// make sure, that the following functions are in sync:
 	//   encode_reserved()
@@ -1044,17 +1043,29 @@ GOS::url_to_filename(const char *url)
   *d = 0;
   url = (const char*)urlcopy;
   // Check if we have a simple file name already
-  tmp = expand_name(url,root);
-  if (is_file(tmp)) 
-    return tmp;
-  // All file urls are expected to start with "file:"
-  if (strncmp(url, filespec, sizeof(filespec)-1) != 0)
+  {
+    GString tmp=expand_name(url,root);
+    if (is_file(tmp)) 
+      return tmp;
+  }
+  // All file urls are expected to start with filespec which is "file:"
+  if (strncmp(url, filespec, strlen(filespec)))  //if not
     return basename(url);
-  url += sizeof(filespec)-1;
+
+  //url does start with "file:", so move pointer to the position next to ":"
+  url += strlen(filespec);
+
+  //remove all leading slashes
+  while(*url=='/')
+	  url++;
   // Remove possible localhost spec
-  if (strncmp(url, localhostspec, sizeof(localhostspec)-1) == 0)
-    url += sizeof(localhostspec)-1;
+  if (!strncmp(url, localhost, strlen(localhost)))
+	  url += strlen(localhost);
+  //remove all leading slashes
+  while(*url=='/')
+	  url++;
   // Check if we are finished
+
 #ifdef macintosh
   char l_url[1024];
   strcpy(l_url,url);
@@ -1062,26 +1073,31 @@ GOS::url_to_filename(const char *url)
   for (; *s; s++)
     if (*s == slash )
       *s=colon;
-  tmp = expand_name(l_url,root);
+  GString retval = expand_name(l_url,root);
 #else  
-  tmp = expand_name(url,root);
+  GString retval = expand_name(url,root);
 #endif
-  if (is_file(tmp)) 
-    return tmp;
-  // Search for a drive letter (encoded a la netscape)
+
 #ifdef WIN32
-  if (url[1]=='|' && url[2]== slash)
-    if ((url[0]>='a' && url[0]<='z') 
-        || (url[0]>='A' && url[0]<='Z'))
-      {
-        GString drive;
-        drive.format("%c:\\", url[0]);
-        tmp = expand_name(url+3, drive);
-      }
+  if (!is_file(retval)) 
+  {
+  // Search for a drive letter (encoded a la netscape)
+    if (url[1]=='|' && url[2]== slash)
+    {
+	  if ((url[0]>='a' && url[0]<='z') 
+          || (url[0]>='A' && url[0]<='Z'))
+	  {
+          GString drive;
+          drive.format("%c:\\", url[0]);
+          retval = expand_name(url+3, drive);
+	  }
+	}
+  }
 #endif
   // Return what we have
-  return tmp;
+  return retval;
 }
+
 
 GString
 GOS::encode_reserved(const char * filename)
