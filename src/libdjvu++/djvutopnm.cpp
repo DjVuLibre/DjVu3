@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: djvutopnm.cpp,v 1.29 1999-11-04 00:05:04 bcr Exp $
+//C- $Id: djvutopnm.cpp,v 1.30 1999-11-04 00:20:15 bcr Exp $
 
 
 /** @name djvutopnm
@@ -94,7 +94,7 @@
     Yann Le Cun <yann@research.att.com>\\
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: djvutopnm.cpp,v 1.29 1999-11-04 00:05:04 bcr Exp $# */
+    #$Id: djvutopnm.cpp,v 1.30 1999-11-04 00:20:15 bcr Exp $# */
 //@{
 //@}
 
@@ -405,18 +405,21 @@ main(int argc, char *argv[], char *[])
         case 0:  // layer
         {
           const char *s=Opts.GetValue(duplicates[0]);
-          if(!strcmp(s,"black"))
+          if(s[0])
           {
-            flag_mode = 's';
-          }else if(!strcmp(s,"foreground"))
-          {
-            flag_mode = 'f';
-          }else if(!strcmp(s,"background"))
-          {
-            flag_mode = 'b';
-          }else
-          {
-            THROW("Illegal -layer specification.");
+            if(!strcmp(s,"black"))
+            {
+              flag_mode = 's';
+            }else if(!strcmp(s,"foreground"))
+            {
+              flag_mode = 'f';
+            }else if(!strcmp(s,"background"))
+            {
+              flag_mode = 'b';
+            }else
+            {
+              THROW("Illegal -layer specification.");
+            }
           }
           break;
         }
