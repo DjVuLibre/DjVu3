@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.55 1999-09-17 20:21:07 eaf Exp $
+//C- $Id: DjVuFile.cpp,v 1.56 1999-09-19 19:24:36 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -320,7 +320,7 @@ DjVuFile::notify_file_flags_changed(const DjVuFile * src,
 	 if (all)
 	 {
 	    DEBUG_MSG("Just got ALL data for '" << url << "'\n");
-	    flags=flags | ALL_DATA_PRESENT;
+	    flags|=ALL_DATA_PRESENT;
 	    get_portcaster()->notify_file_flags_changed(this, ALL_DATA_PRESENT, 0);
 	 }
       }
@@ -335,7 +335,7 @@ DjVuFile::static_decode_func(void * cl_data)
       th->decode_func();
 	 // Don't do ANYTHING below this line.
    } CATCH(exc) {
-      th->decode_thread_flags=th->decode_thread_flags | FINISHED;
+      th->decode_thread_flags|=FINISHED;
 	 // Don't do ANYTHING below this line.
    } ENDCATCH;
    // Don't do ANYTHING below this line.
@@ -411,7 +411,7 @@ DjVuFile::decode_func(void)
       if (flags.test_and_modify(DECODING, 0, DECODE_OK | INCL_FILES_CREATED, DECODING))
 	 pcaster->notify_file_flags_changed(this, DECODE_OK | INCL_FILES_CREATED, DECODING);
 
-      decode_thread_flags=decode_thread_flags | FINISHED;
+      decode_thread_flags|=FINISHED;
 	 // Nothing below this point please. The object may already
 	 // be destroyed.
    } CATCH(exc) {} ENDCATCH;
@@ -499,7 +499,7 @@ DjVuFile::process_incl_chunks(void)
 	 iff.close_chunk();
       }
    }
-   flags=flags | INCL_FILES_CREATED;
+   flags|=INCL_FILES_CREATED;
 }
 
 GP<JB2Dict>
@@ -863,11 +863,11 @@ DjVuFile::start_decode(void)
 
    flags.enter();
    TRY {
-      if (!is_decoding())
+      if (!(flags & DONT_START_DECODE) && !is_decoding())
       {
 	 if (flags & DECODE_STOPPED) reset();
-	 flags=flags & ~(DECODE_OK | DECODE_STOPPED | DECODE_FAILED);
-	 flags=flags | DECODING;
+	 flags&=~(DECODE_OK | DECODE_STOPPED | DECODE_FAILED);
+	 flags|=DECODING;
 	 decode_thread_flags=STARTED;
       
 	 delete decode_thread; decode_thread=0;
@@ -881,8 +881,8 @@ DjVuFile::start_decode(void)
 	 while(!decode_data_pool) GThread::yield();
       }
    } CATCH(exc) {
-      flags=flags & ~DECODING;
-      flags=flags | DECODE_FAILED;
+      flags&=~DECODING;
+      flags|=DECODE_FAILED;
       flags.leave();
       get_portcaster()->notify_file_flags_changed(this, DECODE_FAILED, DECODING);
       RETHROW;
@@ -896,44 +896,52 @@ DjVuFile::stop_decode(bool sync)
    check();
    
    DEBUG_MSG("DjVuFile::stop_decode(), url='" << url <<
-            "', sync=" << (int) sync << "\n");
+	     "', sync=" << (int) sync << "\n");
    DEBUG_MAKE_INDENT(3);
 
-      // Don't stop SYNCHRONOUSLY from the thread where the decoding is going!!!
-   {
-	 // First - ask every included child to stop in async mode
-      GCriticalSectionLock lock(&inc_files_lock);
-      for(GPosition pos=inc_files_list;pos;++pos)
-	 inc_files_list[pos]->stop_decode(0);
+   TRY {
+      flags|=DONT_START_DECODE;
 
-      if (decode_data_pool) decode_data_pool->stop();
-   }
-
-   if (sync)
-   {
-      while(1)
+	 // Don't stop SYNCHRONOUSLY from the thread where the decoding is going!!!
       {
-	 GP<DjVuFile> file;
+	    // First - ask every included child to stop in async mode
+	 GCriticalSectionLock lock(&inc_files_lock);
+	 for(GPosition pos=inc_files_list;pos;++pos)
+	    inc_files_list[pos]->stop_decode(0);
+
+	 if (decode_data_pool) decode_data_pool->stop();
+      }
+
+      if (sync)
+      {
+	 while(1)
 	 {
-	    GCriticalSectionLock lock(&inc_files_lock);
-	    for(GPosition pos=inc_files_list;pos;++pos)
+	    GP<DjVuFile> file;
 	    {
-	       GP<DjVuFile> & f=inc_files_list[pos];
-	       if (f->is_decoding())
+	       GCriticalSectionLock lock(&inc_files_lock);
+	       for(GPosition pos=inc_files_list;pos;++pos)
 	       {
-		  file=f; break;
+		  GP<DjVuFile> & f=inc_files_list[pos];
+		  if (f->is_decoding())
+		  {
+		     file=f; break;
+		  };
 	       };
-	    };
+	    }
+	    if (!file) break;
+
+	    file->stop_decode(1);
 	 }
-	 if (!file) break;
 
-	 file->stop_decode(1);
-      };
+	 wait_for_finish(1);	// Wait for self termination
 
-      wait_for_finish(1);	// Wait for self termination
-
-      delete decode_thread; decode_thread=0;
-   }
+	 delete decode_thread; decode_thread=0;
+      }
+      flags&=~DONT_START_DECODE;
+   } CATCH(exc) {
+      flags&=~DONT_START_DECODE;
+      RETHROW;
+   } ENDCATCH;
 }
 
 void
@@ -1054,7 +1062,7 @@ DjVuFile::trigger_cb(void)
    DEBUG_MAKE_INDENT(3);
 
    file_size=data_pool->get_length();
-   flags=flags | DATA_PRESENT;
+   flags|=DATA_PRESENT;
    get_portcaster()->notify_file_flags_changed(this, DATA_PRESENT, 0);
 
    if (!are_incl_files_created()) process_incl_chunks();
@@ -1071,7 +1079,7 @@ DjVuFile::trigger_cb(void)
    if (all)
    {
       DEBUG_MSG("It appears, that we have ALL data for '" << url << "'\n");
-      flags=flags | ALL_DATA_PRESENT;
+      flags|=ALL_DATA_PRESENT;
       get_portcaster()->notify_file_flags_changed(this, ALL_DATA_PRESENT, 0);
    }
 }

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.h,v 1.35 1999-09-17 20:21:07 eaf Exp $
+//C- $Id: DjVuFile.h,v 1.36 1999-09-19 19:24:36 eaf Exp $
  
 #ifndef _DJVUFILE_H
 #define _DJVUFILE_H
@@ -46,7 +46,7 @@
 
     @memo Classes representing DjVu files.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuFile.h,v 1.35 1999-09-17 20:21:07 eaf Exp $#
+    @version #$Id: DjVuFile.h,v 1.36 1999-09-19 19:24:36 eaf Exp $#
 */
 
 //@{
@@ -147,7 +147,7 @@ class DjVuFile : public DjVuPort
 public:
    enum { DECODING=1, DECODE_OK=2, DECODE_FAILED=4, DECODE_STOPPED=8,
 	  DATA_PRESENT=16, ALL_DATA_PRESENT=32, INCL_FILES_CREATED=64,
-          MODIFIED=128 };
+          MODIFIED=128, DONT_START_DECODE=256 };
    enum { STARTED=1, FINISHED=2 };
 
       /** @name Decoded file contents */
