@@ -7,13 +7,6 @@
 conf=`basename $0`
 topsrcdir=`dirname $0`
 topbuilddir=.
-if [ $topsrcdir = $topbuilddir ]
-then
-    echo 1>&2 "$conf: Cannot compile in the source directory"
-    echo 1>&2 "--  You must mkdir a compilation directory and"
-    echo 1>&2 "    call $conf from there."
-    exit 1
-fi
 if [ ! -r $topsrcdir/config/configure.sh ]
 then
     echo 1>&2 "$conf: Cannot recognize source directory"
@@ -63,6 +56,17 @@ EOF
 done
 
 
+### ---------------------------
+### Want a distinct compilation directory
+
+if [ $topsrcdir = $topbuilddir ]
+then
+    echo 1>&2 "$conf: Cannot compile in the source directory"
+    echo 1>&2 "--  You must mkdir a compilation directory and"
+    echo 1>&2 "    call $conf from there."
+    exit 1
+fi
+
 
 ### ---------------------------
 ### Proceed
@@ -76,6 +80,24 @@ check_make_stlib
 
 
 ### ---------------------------
-### Build makefile
+### Build makefiles
 
 generate_makefile src/libdjvu++
+generate_main_makefile src/libdjvu++
+
+
+### ------------------------------------------------------------------------
+### Success
+
+echo
+echo Configuration is complete.
+echo You can proceed with the compilation by typing:
+                              echo "    make clean"
+test -n "$compiler_is_gcc" && echo "    make depend"
+                              echo "    make all"
+echo
+
+
+
+
+

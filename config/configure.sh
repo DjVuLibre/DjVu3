@@ -23,21 +23,41 @@ prefix=/usr/local
 
 
 ### ------------------------------------------------------------------------
-### Echo without newline
-
+### Support functions
 
 # Usage: echon ...ARGUMENTS...
-
 if [ "`echo -n`" = "-n" ]
 then
   echon() { 
-    echo $* "\c" 
+    echo $* "" "\c" 
   }
 else
   echon() { 
-    echo -n $* 
+    echo -n $* ""
   }
 fi
+
+
+# Renmove excess /./ in pathnames
+pathclean()
+{
+    echo $1 | sed \
+                -e 's://:/:g' \
+                -e 's:/\./:/:g' \
+                -e 's:\(.\)/\.$:\1:g'
+}
+
+
+# Make directory and all parents unless they exist already
+mkdirp()
+{
+    if [ -n "$1" ] && [ "$1" != "." ] && [ ! -d "$1" ]
+    then
+      mkdirp `dirname $1`
+      mkdir $1
+    fi
+}
+
 
 
 ### ------------------------------------------------------------------------
@@ -442,29 +462,8 @@ check_make_stlib()
 
 
 ### ------------------------------------------------------------------------
-### Function to generate makefiles
+### Function to generate sub makefiles
 
-
-# Internal function
-
-pathclean()
-{
-    echo $1 | sed \
-                -e 's://:/:g' \
-                -e 's:/\./:/:g' \
-                -e 's:\(.\)/\.$:\1:g'
-}
-
-# Internal function
-
-mkdirp()
-{
-    if [ -n "$1" ] && [ "$1" != "." ] && [ ! -d "$1" ]
-    then
-      mkdirp `dirname $1`
-      mkdir $1
-    fi
-}
 
 
 # Usage: generate_makefile DIRNAME
@@ -530,3 +529,43 @@ generate_makefile()
   fi
 }
 
+
+
+
+### ------------------------------------------------------------------------
+### Function to generate main makefiles
+
+# Usage: generate_main_makefile  SUBDIRS
+
+generate_main_makefile()
+{
+    subdirs=$*
+    targets="all clean depend html tex install"
+    cat > Makefile <<EOF
+SHELL=/bin/sh
+TOPSRCDIR= $topsrcdir
+TOPBUILDDIR= $topbuilddir
+CC= $CC
+CXX= $CXX
+OPT= $OPT
+WARN= $WARN
+DEFS= $DEFS
+SUBDIRS=$subdirs
+
+EOF
+     for target in $targets
+     do
+        cat >>Makefile <<EOF 
+$target:
+	@for n in \${SUBDIRS} ; do ( cd \$\$n ; \${MAKE} $target ) ; done
+	@echo Done.
+
+EOF
+     done
+
+        cat >>Makefile <<EOF 
+.PHONY: $targets
+EOF
+
+EOF
+}
