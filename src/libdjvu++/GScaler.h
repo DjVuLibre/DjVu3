@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: GScaler.h,v 1.2 1999-02-01 18:32:32 leonb Exp $
+//C-  $Id: GScaler.h,v 1.3 1999-02-15 23:37:50 leonb Exp $
 
 #ifndef _GSCALER_H_
 #define _GSCALER_H_
@@ -29,7 +29,7 @@
 
     {\bf Remark} --- The bilinear interpolation code relies on fixed precision
     tables.  It becomes suboptimal when supersampling (i.e. zooming into) an
-    image by a factor greater than eight.  Very contracted images displayed at
+    image by a factor greater than eight.  Very contrasted images displayed at
     high magnification may contain visible jaggies.
 
     @memo
@@ -37,7 +37,7 @@
     @author
     Leon Bottou <leonb@research.att.com>
     @version
-    #$Id: GScaler.h,v 1.2 1999-02-01 18:32:32 leonb Exp $# */
+    #$Id: GScaler.h,v 1.3 1999-02-15 23:37:50 leonb Exp $# */
 //@{
 
 
