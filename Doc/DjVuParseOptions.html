@@ -19,13 +19,13 @@
 <A HREF="#DOC.1.4.36.2.1.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>~DjVuParseOptions</B>()
 <DD><I>Normal Destructor.</I>
 <DT>
-<A HREF="#DOC.1.4.36.2.1.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>DjVuParseOptions</B>(const char [])
+<A HREF="#DOC.1.4.36.2.1.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>DjVuParseOptions</B>(const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;)
 <DD><I>This is the normal constructor.  A profile name must be specified.   </I>
 <DT>
-<A HREF="#DOC.1.4.36.2.1.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>DjVuParseOptions</B>(const char [], const char [], <!1><A HREF="DjVuTokenList.html">DjVuTokenList</A> *VarTokens=0)
+<A HREF="#DOC.1.4.36.2.1.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>DjVuParseOptions</B>(const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;, const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;, <!1><A HREF="DjVuTokenList.html">DjVuTokenList</A> *VarTokens=0)
 <DD><I>This constructor is for using an alternate configuration file </I>
 <DT>
-<A HREF="#DOC.1.4.36.2.1.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>init</B>(const char [], const char [])
+<A HREF="#DOC.1.4.36.2.1.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>init</B>(const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;, const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;)
 <DD><I>This reinitallizes with the above constructor </I>
 <DT>
 <A HREF="#DOC.1.4.36.2.1.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>DjVuParseOptions</B>(<!1><A HREF="DjVuParseOptions.html#DOC.1.4.36.2.1.3">DjVuParseOptions</A> &amp;)
@@ -36,13 +36,13 @@
 <DD><I></I>
 <P><DL>
 <DT>
-<A HREF="#DOC.1.4.36.2.2.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>inline   int <B>SetVarToken</B>(const char xname[]) const 
+<A HREF="#DOC.1.4.36.2.2.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>inline   int <B>SetVarToken</B>(const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;) const 
 <DD><I>This is the same as GetVarToken() except if a variable name is NOT     currently tokenized, a new token is created and returned.</I>
 <DT>
-<A HREF="#DOC.1.4.36.2.2.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>inline   int <B>GetProfileToken</B>(const char xname[]) const 
+<A HREF="#DOC.1.4.36.2.2.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>inline   int <B>GetProfileToken</B>(const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;) const 
 <DD><I>This is similar to GetVarToken(), but it looks up the token for        profile name instead.</I>
 <DT>
-<A HREF="#DOC.1.4.36.2.2.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>inline   int <B>SetProfileToken</B>(const char xname[]) const 
+<A HREF="#DOC.1.4.36.2.2.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>inline   int <B>SetProfileToken</B>(const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;) const 
 <DD><I>This is similar to SetVarToken(), but it looks up the token for       profile name instead.</I>
 <DT>
 <A HREF="#DOC.1.4.36.2.2.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>inline   const char* const <B>GetVarName</B>(const int token) const 
@@ -60,7 +60,7 @@
 <A HREF="#DOC.1.4.36.2.2.14"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>inline   int <B>GetBest</B>(const int tokens[], bool=false)
 <DD><I>Same as above, but -1 terminated </I>
 <DT>
-<A HREF="#DOC.1.4.36.2.2.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>inline   const char* const <B>GetValue</B>(const char xname[]) const 
+<A HREF="#DOC.1.4.36.2.2.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>inline   const char* const <B>GetValue</B>(const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;xname) const 
 <DD><I>This is just a short cut, when a token value is only needed for one  lookup.</I>
 <DT>
 <A HREF="#DOC.1.4.36.2.2.9"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>GetBest</B>(const int listsize, const char * const[], bool=false)
@@ -72,13 +72,13 @@
 <A HREF="#DOC.1.4.36.2.2.10"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>GetInteger</B>( const int token, const int errval=0, const int falseval=0, const int trueval=1) const 
 <DD><I>This just checks for TRUE, and it not does an atoi() conversion.</I>
 <DT>
-<A HREF="#DOC.1.4.36.2.2.11"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>inline   int <B>GetInteger</B>(const char xname[], const int errval=0, const int falseval=0, const int trueval=1) const 
+<A HREF="#DOC.1.4.36.2.2.11"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>inline   int <B>GetInteger</B>(const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;xname, const int errval=0, const int falseval=0, const int trueval=1) const 
 <DD><I>This is just a short cut, when a token value is only needed for one  lookup.</I>
 <DT>
 <A HREF="#DOC.1.4.36.2.2.12"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>GetNumber</B>(const int token, const int errval=0) const 
 <DD><I>This just checks for valid integer numbers only.</I>
 <DT>
-<A HREF="#DOC.1.4.36.2.2.13"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>inline   int <B>GetNumber</B>(const char xname[], const int errval=0) const 
+<A HREF="#DOC.1.4.36.2.2.13"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>inline   int <B>GetNumber</B>(const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;xname, const int errval=0) const 
 <DD><I>This is just a short cut, when a token value is only needed for one  lookup.</I>
 </DL></P>
 <DT>
@@ -95,7 +95,7 @@
 <A HREF="#DOC.1.4.36.2.3.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>ClearError</B>()
 <DD><I>This deletes and recreates the Errors object, to clear all errors     without the need to do a GetError() loop.</I>
 <DT>
-<A HREF="#DOC.1.4.36.2.3.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>perror</B>(const char *mesg=0)
+<A HREF="#DOC.1.4.36.2.3.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>perror</B>(const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;mesg=<!1><A HREF="GUTF8String.html">GUTF8String</A>())
 <DD><I>This simple perror() type function prints all errors, with  a GetError() loop, so the errors are cleared.</I>
 </DL></P>
 <DT>
@@ -103,13 +103,13 @@
 <DD><I></I>
 <P><DL>
 <DT>
-<A HREF="#DOC.1.4.36.2.4.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>bool <B>ChangeProfile</B>(const char [])
+<A HREF="#DOC.1.4.36.2.4.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>bool <B>ChangeProfile</B>(const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;profile)
 <DD><I>This is the only method of reading a new profile, and changing it to  the current profile that will be used with the Get*() methods.</I>
 <DT>
-<A HREF="#DOC.1.4.36.2.4.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>ParseArguments</B>(const int, const char * const [], const djvu_option [], const int=0)
+<A HREF="#DOC.1.4.36.2.4.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>ParseArguments</B>(const <!1><A HREF="DArray.html">DArray</A>&lt;<!1><A HREF="GUTF8String.html">GUTF8String</A>&gt;&amp;argv, const djvu_option [], const int=0)
 <DD><I>This is the primary function for reading command line arguments.  </I>
 <DT>
-<A HREF="#DOC.1.4.36.2.4.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>inline   const char* const* <B>get_argv</B>(void) const 
+<A HREF="#DOC.1.4.36.2.4.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>inline   const <!1><A HREF="DArray.html">DArray</A>&lt;<!1><A HREF="GUTF8String.html">GUTF8String</A>&gt; &amp; <B>get_argv</B>(void) const 
 <DD><I>These are the arguments sent to ParseArguments</I>
 <DT>
 <A HREF="#DOC.1.4.36.2.4.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>inline   int <B>get_argc</B>(void) const 
@@ -118,7 +118,7 @@
 <A HREF="#DOC.1.4.36.2.4.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>inline   int <B>get_optind</B>(void) const 
 <DD><I>These are the arguments sent to ParseArguments</I>
 <DT>
-<A HREF="#DOC.1.4.36.2.4.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>const char* const <B>ConfigFilename</B>(const char [], int)
+<A HREF="#DOC.1.4.36.2.4.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>const char* const <B>ConfigFilename</B>(const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;name)
 <DD><I>Get the name of the last configuration file corresponding to the profile </I>
 </DL></P>
 </DL></P>
@@ -147,17 +147,17 @@ references should be destroyed.
 <DL><DT><DD></DL><P>
 <A NAME="DjVuParseOptions">
 <A NAME="DOC.1.4.36.2.1.3">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> DjVuParseOptions(const char [])</B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> DjVuParseOptions(const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;)</B></TT>
 <DD>This is the normal constructor.  A profile name must be specified.   
 <DL><DT><DD></DL><P>
 <A NAME="DjVuParseOptions">
 <A NAME="DOC.1.4.36.2.1.4">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> DjVuParseOptions(const char [], const char [], <!1><A HREF="DjVuTokenList.html">DjVuTokenList</A> *VarTokens=0)</B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> DjVuParseOptions(const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;, const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;, <!1><A HREF="DjVuTokenList.html">DjVuTokenList</A> *VarTokens=0)</B></TT>
 <DD>This constructor is for using an alternate configuration file 
 <DL><DT><DD></DL><P>
 <A NAME="init">
 <A NAME="DOC.1.4.36.2.1.5">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void init(const char [], const char [])</B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void init(const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;, const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;)</B></TT>
 <DD>This reinitallizes with the above constructor 
 <DL><DT><DD></DL><P>
 <A NAME="DjVuParseOptions">
@@ -175,7 +175,7 @@ reference, not value.
 
 <A NAME="SetVarToken">
 <A NAME="DOC.1.4.36.2.2.1">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>inline   int SetVarToken(const char xname[]) const </B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>inline   int SetVarToken(const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;) const </B></TT>
 <DD>This is the same as GetVarToken() except if a variable name is NOT    
 currently tokenized, a new token is created and returned.  If you are 
 Use of this is recommended when the token value is to be stored       
@@ -183,13 +183,13 @@ statically.
 <DL><DT><DD></DL><P>
 <A NAME="GetProfileToken">
 <A NAME="DOC.1.4.36.2.2.2">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>inline   int GetProfileToken(const char xname[]) const </B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>inline   int GetProfileToken(const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;) const </B></TT>
 <DD>This is similar to GetVarToken(), but it looks up the token for       
 profile name instead. 
 <DL><DT><DD></DL><P>
 <A NAME="SetProfileToken">
 <A NAME="DOC.1.4.36.2.2.3">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>inline   int SetProfileToken(const char xname[]) const </B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>inline   int SetProfileToken(const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;) const </B></TT>
 <DD>This is similar to SetVarToken(), but it looks up the token for      
 profile name instead.   Care should be used when using this method.  
 Once a token is assigned to a profile, then the profile is assumed   
@@ -234,7 +234,7 @@ to have two values f the same precedence.
 <DL><DT><DD></DL><P>
 <A NAME="GetValue">
 <A NAME="DOC.1.4.36.2.2.8">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>inline   const char* const GetValue(const char xname[]) const </B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>inline   const char* const GetValue(const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;xname) const </B></TT>
 <DD>This is just a short cut, when a token value is only needed for one 
 lookup.  A list of tokens may be specified as well. 
 <DL><DT><DD></DL><P>
@@ -262,7 +262,7 @@ as errval.
 <DL><DT><DD></DL><P>
 <A NAME="GetInteger">
 <A NAME="DOC.1.4.36.2.2.11">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>inline   int GetInteger(const char xname[], const int errval=0, const int falseval=0, const int trueval=1) const </B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>inline   int GetInteger(const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;xname, const int errval=0, const int falseval=0, const int trueval=1) const </B></TT>
 <DD>This is just a short cut, when a token value is only needed for one 
 lookup. 
 <DL><DT><DD></DL><P>
@@ -275,7 +275,7 @@ Otherwise an integer is returned.
 <DL><DT><DD></DL><P>
 <A NAME="GetNumber">
 <A NAME="DOC.1.4.36.2.2.13">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>inline   int GetNumber(const char xname[], const int errval=0) const </B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>inline   int GetNumber(const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;xname, const int errval=0) const </B></TT>
 <DD>This is just a short cut, when a token value is only needed for one 
 lookup. 
 <DL><DT><DD></DL><P></DL>
@@ -304,7 +304,7 @@ without the need to do a GetError() loop.
 <DL><DT><DD></DL><P>
 <A NAME="perror">
 <A NAME="DOC.1.4.36.2.3.3">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void perror(const char *mesg=0)</B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void perror(const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;mesg=<!1><A HREF="GUTF8String.html">GUTF8String</A>())</B></TT>
 <DD>This simple perror() type function prints all errors, with 
 a GetError() loop, so the errors are cleared. 
 <DL><DT><DD></DL><P></DL>
@@ -316,19 +316,19 @@ a GetError() loop, so the errors are cleared.
 
 <A NAME="ChangeProfile">
 <A NAME="DOC.1.4.36.2.4.1">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>bool ChangeProfile(const char [])</B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>bool ChangeProfile(const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;profile)</B></TT>
 <DD>This is the only method of reading a new profile, and changing it to 
 the current profile that will be used with the Get*() methods. 
 Returns true if the profile exists. 
 <DL><DT><DD></DL><P>
 <A NAME="ParseArguments">
 <A NAME="DOC.1.4.36.2.4.2">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int ParseArguments(const int, const char * const [], const djvu_option [], const int=0)</B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int ParseArguments(const <!1><A HREF="DArray.html">DArray</A>&lt;<!1><A HREF="GUTF8String.html">GUTF8String</A>&gt;&amp;argv, const djvu_option [], const int=0)</B></TT>
 <DD>This is the primary function for reading command line arguments.  
 <DL><DT><DD></DL><P>
 <A NAME="get_argv">
 <A NAME="DOC.1.4.36.2.4.3">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>inline   const char* const* get_argv(void) const </B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>inline   const <!1><A HREF="DArray.html">DArray</A>&lt;<!1><A HREF="GUTF8String.html">GUTF8String</A>&gt; &amp; get_argv(void) const </B></TT>
 <DD>These are the arguments sent to ParseArguments
 <DL><DT><DD></DL><P>
 <A NAME="get_argc">
@@ -343,7 +343,7 @@ Returns true if the profile exists.
 <DL><DT><DD></DL><P>
 <A NAME="ConfigFilename">
 <A NAME="DOC.1.4.36.2.4.6">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>const char* const ConfigFilename(const char [], int)</B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>const char* const ConfigFilename(const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;name)</B></TT>
 <DD>Get the name of the last configuration file corresponding to the profile 
 <DL><DT><DD></DL><P></DL>
 </DL>

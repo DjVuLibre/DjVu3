@@ -22,14 +22,8 @@
 <DL>
 <P><DL>
 <DT><H3>Public Classes</H3><DD><DT>
-<A HREF="#DOC.1.5.36.1.1.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>class  <B>FileRec</B>: public <!1><A HREF="GPEnabled.html#DOC.1.5.4.1.2">GPEnabled</A>
-<DD><I>Describes a file record inside a DjVm document (archive) </I>
-</DL></P>
-
-<P><DL>
-<DT><H3>Public Fields</H3><DD><DT>
-<A HREF="#DOC.1.5.36.1.1.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Creates a new file record with name <TT>name</TT> at offset <TT>offset</TT> and size <TT>size</TT>, which is in IFF format if</B>
-<DD><I></I>
+<A HREF="#DOC.1.5.36.1.1.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>class  <B>DjVmDir0</B>: :<!1><A HREF="DjVmDir0.2.html#DOC.1.5.36.1.1.2.5">FileRec</A> : public <!1><A HREF="GPEnabled.html#DOC.1.5.4.1.2">GPEnabled</A>
+<DD><I>Creates a new file record with name <TT>name</TT> at offset <TT>offset</TT> and size <TT>size</TT>, which is in IFF format if</I>
 </DL></P>
 
 <P><DL>
@@ -37,10 +31,10 @@
 <A HREF="#DOC.1.5.36.1.1.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_files_num</B>(void) const 
 <DD><I>Returns the number of files in the DjVm archive</I>
 <DT>
-<A HREF="#DOC.1.5.36.1.1.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="FileRec.html">FileRec</A>&gt;  <B>get_file</B>(const char * name)
+<A HREF="#DOC.1.5.36.1.1.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;FileRec&gt;  <B>get_file</B>(const char * name)
 <DD><I>Returns the file record with name <TT>name</TT></I>
 <DT>
-<A HREF="#DOC.1.5.36.1.1.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="FileRec.html">FileRec</A>&gt;  <B>get_file</B>(int file_num)
+<A HREF="#DOC.1.5.36.1.1.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;FileRec&gt;  <B>get_file</B>(int file_num)
 <DD><I>Returns the file record number <TT>file_num</TT></I>
 </DL></P>
 
@@ -82,44 +76,13 @@ DjVmFile class will do it for you. </BLOCKQUOTE>
 <DL><DT><DD></DL><P>
 <A NAME="get_file">
 <A NAME="DOC.1.5.36.1.1.4">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="FileRec.html">FileRec</A>&gt;  get_file(const char * name)</B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GP.html">GP</A>&lt;FileRec&gt;  get_file(const char * name)</B></TT>
 <DD>Returns the file record with name <TT>name</TT>
 <DL><DT><DD></DL><P>
 <A NAME="get_file">
 <A NAME="DOC.1.5.36.1.1.5">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="FileRec.html">FileRec</A>&gt;  get_file(int file_num)</B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GP.html">GP</A>&lt;FileRec&gt;  get_file(int file_num)</B></TT>
 <DD>Returns the file record number <TT>file_num</TT>
-<DL><DT><DD></DL><P>
-<A NAME="Creates a new file record with name #name# at offset #offset# and size #size#, which is in IFF format if">
-<A NAME="DOC.1.5.36.1.1.2">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> Creates a new file record with name <TT>name</TT> at offset <TT>offset</TT> and size <TT>size</TT>, which is in IFF format if</B></TT>
-<DD>Creates a new file record with name <TT>name</TT> at offset
-<TT>offset</TT> and size <TT>size</TT>, which is in IFF format if<P>void		add_file(const char * name, bool iff_file,
-int offset=-1, int size=-1);<P>int		get_size(void) const;<P>
-void		encode(ByteStream &amp; bs);<P>
-void		decode(ByteStream &amp; bs);<P>DjVmDir0(const DjVmDir0 &amp; d);<P>DjVmDir0(void) {};
-virtual ~DjVmDir0(void) {};
-};<P>inline
-DjVmDir0::FileRec::FileRec(const char * name_in, bool iff_file_in,
-int offset_in, int size_in) :
-name(name_in), iff_file(iff_file_in),
-offset(offset_in), size(size_in)
-{
-}<P>inline
-DjVmDir0::FileRec::FileRec(void) : iff_file(0), offset(-1), size(-1)
-{
-}<P>inline
-DjVmDir0::FileRec::~FileRec(void)
-{
-}<P>inline int
-DjVmDir0::get_files_num(void) const
-{
-return num2file.size();
-}<P>inline
-DjVmDir0::DjVmDir0(const DjVmDir0 &amp; d) :
-name2file(d.name2file), num2file(d.num2file)
-{
-}<P>
 <DL><DT><DD></DL><P></DL>
 
 <HR><DL><DT><B>This class has no child classes.</B></DL>
@@ -128,7 +91,7 @@ name2file(d.name2file), num2file(d.num2file)
 <!-- This is were the DOC++ footer is defined  -->
 
 <font face="arial,helvetica" size="2">
-<a href=http://www.djvu.att.com>DjVu</a> is a trademark of AT&amp;T.  
+<a href=http://www.lizardtech.com>DjVu</a> is a trademark of AT&amp;T.  
 <br>All other products mentioned are registered trademarks or trademarks of
 their respective companies.
 </font>

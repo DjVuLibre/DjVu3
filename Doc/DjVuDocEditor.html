@@ -5,8 +5,8 @@
 </HEAD>
 <BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
 
-<H2>class  <A HREF="#DOC.DOCU">DjVuDocEditor</A>: public <!1><A HREF="DjVuDocument.html#DOC.1.4.30.1.3">DjVuDocument</A></H2>
-<BLOCKQUOTE><TT>DjVuDocEditor</TT> is an extension of <!1><A HREF="DjVuDocument.html#DOC.1.4.30.1.3">DjVuDocument</A> class with additional capabilities for editing the document contents.</BLOCKQUOTE>
+<H2>class  <A HREF="#DOC.DOCU">DjVuDocEditor</A>: public <!1><A HREF="DjVuDocument.html#DOC.1.4.29.1.3">DjVuDocument</A></H2>
+<BLOCKQUOTE><TT>DjVuDocEditor</TT> is an extension of <!1><A HREF="DjVuDocument.html#DOC.1.4.29.1.3">DjVuDocument</A> class with additional capabilities for editing the document contents.</BLOCKQUOTE>
 <HR>
 
 <H2>Inheritance:</H2>
@@ -22,107 +22,107 @@
 <DL>
 <P><DL>
 <DT><H3>Public Methods</H3><DD><DT>
-<A HREF="#DOC.1.4.34.1.27"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>DjVuDocEditor</B>(void)
+<A HREF="#DOC.1.4.33.1.27"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>DjVuDocEditor</B>(void)
 <DD><I>Default constructor</I>
 <DT>
-<A HREF="#DOC.1.4.34.1.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>init</B>(void)
+<A HREF="#DOC.1.4.33.1.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>init</B>(void)
 <DD><I>Initialization function.</I>
 <DT>
-<A HREF="#DOC.1.4.34.1.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>init</B>(const char * fname)
+<A HREF="#DOC.1.4.33.1.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>init</B>(const char * fname)
 <DD><I>Initialization function.</I>
 <DT>
-<A HREF="#DOC.1.4.34.1.28"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   <B>~DjVuDocEditor</B>(void)
+<A HREF="#DOC.1.4.33.1.28"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   <B>~DjVuDocEditor</B>(void)
 <DD><I>Destructor</I>
 <DT>
-<A HREF="#DOC.1.4.34.1.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_orig_doc_type</B>(void) const 
+<A HREF="#DOC.1.4.33.1.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_orig_doc_type</B>(void) const 
 <DD><I>Returns type of open document.</I>
 <DT>
-<A HREF="#DOC.1.4.34.1.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>bool <B>can_be_saved</B>(void) const 
+<A HREF="#DOC.1.4.33.1.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>bool <B>can_be_saved</B>(void) const 
 <DD><I>Returns <TT>TRUE</TT> if the document can be "saved" (sometimes the only possibility is to do a "save as").</I>
 <DT>
-<A HREF="#DOC.1.4.34.1.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_save_doc_type</B>(void) const 
-<DD><I>Returns type of the document, which can be created by <!1><A HREF="DjVuDocEditor.html#DOC.1.4.34.1.6">save</A>() function.</I>
+<A HREF="#DOC.1.4.33.1.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_save_doc_type</B>(void) const 
+<DD><I>Returns type of the document, which can be created by <!1><A HREF="DjVuDocEditor.html#DOC.1.4.33.1.6">save</A>() function.</I>
 <DT>
-<A HREF="#DOC.1.4.34.1.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>save</B>(void)
+<A HREF="#DOC.1.4.33.1.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>save</B>(void)
 <DD><I>Saves the document.</I>
 <DT>
-<A HREF="#DOC.1.4.34.1.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>save_as</B>(const char * where, bool bundled)
+<A HREF="#DOC.1.4.33.1.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>save_as</B>(const char * where, bool bundled)
 <DD><I>Saves the document.</I>
 <DT>
-<A HREF="#DOC.1.4.34.1.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>save_pages_as</B>(<!1><A HREF="ByteStream.html">ByteStream</A> &amp; str, const GList&lt;int&gt; &amp; page_list)
+<A HREF="#DOC.1.4.33.1.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>save_pages_as</B>(<!1><A HREF="ByteStream.html">ByteStream</A> &amp; str, const GList&lt;int&gt; &amp; page_list)
 <DD><I>Saves the specified pages in DjVu <TT>BUNDLED</TT> multipage document.</I>
 <DT>
-<A HREF="#DOC.1.4.34.1.9"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GString.html">GString</A> <B>page_to_id</B>(int page_num) const 
+<A HREF="#DOC.1.4.33.1.9"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GString.html">GString</A> <B>page_to_id</B>(int page_num) const 
 <DD><I>Translates page number <TT>page_num</TT> to ID.</I>
 <DT>
-<A HREF="#DOC.1.4.34.1.10"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>insert_page</B>(const char * fname, int page_num=-1)
+<A HREF="#DOC.1.4.33.1.10"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>insert_page</B>(const char * fname, int page_num=-1)
 <DD><I>Inserts the referenced file into this DjVu document.</I>
 <DT>
-<A HREF="#DOC.1.4.34.1.11"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>insert_page</B>(<!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DataPool.html">DataPool</A>&gt; &amp; file_pool, const char * fname, int page_num=-1)
+<A HREF="#DOC.1.4.33.1.11"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>insert_page</B>(<!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DataPool.html">DataPool</A>&gt; &amp; file_pool, const char * fname, int page_num=-1)
 <DD><I>Inserts a new page with data inside the <TT>data_pool</TT> as page number <TT>page_num.</I>
 <DT>
-<A HREF="#DOC.1.4.34.1.12"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>insert_group</B>(const GList&lt;<!1><A HREF="GString.html">GString</A>&gt; &amp; fname_list, int page_num=-1, void (* refresh_cb)(void *)=0, void * cl_data=0)
+<A HREF="#DOC.1.4.33.1.12"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>insert_group</B>(const GList&lt;<!1><A HREF="GString.html">GString</A>&gt; &amp; fname_list, int page_num=-1, void (* refresh_cb)(void *)=0, void * cl_data=0)
 <DD><I>Inserts a group of pages into this DjVu document.</I>
 <DT>
-<A HREF="#DOC.1.4.34.1.13"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>remove_page</B>(int page_num, bool remove_unref=true)
+<A HREF="#DOC.1.4.33.1.13"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>remove_page</B>(int page_num, bool remove_unref=true)
 <DD><I>Removes the specified page from the document.</I>
 <DT>
-<A HREF="#DOC.1.4.34.1.14"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>remove_pages</B>(const GList&lt;int&gt; &amp; page_list, bool remove_unref=true)
+<A HREF="#DOC.1.4.33.1.14"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>remove_pages</B>(const GList&lt;int&gt; &amp; page_list, bool remove_unref=true)
 <DD><I>Removes the specified pages from the document.</I>
 <DT>
-<A HREF="#DOC.1.4.34.1.15"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>remove_file</B>(const char * id, bool remove_unref=true)
+<A HREF="#DOC.1.4.33.1.15"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>remove_file</B>(const char * id, bool remove_unref=true)
 <DD><I>Removes a DjVu file with the specified</I>
 <DT>
-<A HREF="#DOC.1.4.34.1.16"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>move_page</B>(int page_num, int new_page_num)
+<A HREF="#DOC.1.4.33.1.16"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>move_page</B>(int page_num, int new_page_num)
 <DD><I>Makes page number <TT>page_num</TT> to be <TT>new_page_num</TT>.</I>
 <DT>
-<A HREF="#DOC.1.4.34.1.17"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>move_pages</B>(const GList&lt;int&gt; &amp; page_list, int shift)
+<A HREF="#DOC.1.4.33.1.17"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>move_pages</B>(const GList&lt;int&gt; &amp; page_list, int shift)
 <DD><I>Shifts all pags from the <TT>page_list</TT> according to the <TT>shift</TT>.</I>
 <DT>
-<A HREF="#DOC.1.4.34.1.18"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>set_file_name</B>(const char * id, const char * name)
+<A HREF="#DOC.1.4.33.1.18"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>set_file_name</B>(const char * id, const char * name)
 <DD><I>Changes the name of the file with ID Refer to <!1><A HREF="DjVmDir.html">DjVmDir</A> for the explanation of <EM>IDs</EM>, <EM>names</EM> and <EM>titles</EM>.</I>
 <DT>
-<A HREF="#DOC.1.4.34.1.19"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>set_page_name</B>(int page_num, const char * name)
+<A HREF="#DOC.1.4.33.1.19"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>set_page_name</B>(int page_num, const char * name)
 <DD><I>Changes the name of the page <TT>page_num</TT> to <TT>name</TT>.</I>
 <DT>
-<A HREF="#DOC.1.4.34.1.20"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>set_file_title</B>(const char * id, const char * title)
+<A HREF="#DOC.1.4.33.1.20"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>set_file_title</B>(const char * id, const char * title)
 <DD><I>Changes the title of the file with ID Refer to <!1><A HREF="DjVmDir.html">DjVmDir</A> for the explanation of <EM>IDs</EM>, <EM>names</EM> and <EM>titles</EM>.</I>
 <DT>
-<A HREF="#DOC.1.4.34.1.21"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>set_page_title</B>(int page_num, const char * title)
+<A HREF="#DOC.1.4.33.1.21"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>set_page_title</B>(int page_num, const char * title)
 <DD><I>Changes the title of the page <TT>page_num</TT> to <TT>title</TT>.</I>
 <DT>
-<A HREF="#DOC.1.4.34.1.23"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>simplify_anno</B>(void (* progress_cb)(float progress, void *)=0, void * cl_data=0)
+<A HREF="#DOC.1.4.33.1.23"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>simplify_anno</B>(void (* progress_cb)(float progress, void *)=0, void * cl_data=0)
 <DD><I>Use this function to simplify annotations in the document.</I>
 <DT>
-<A HREF="#DOC.1.4.34.1.24"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>create_shared_anno_file</B>(void (* progress_cb)(float progress, void *)=0, void * cl_data=0)
+<A HREF="#DOC.1.4.33.1.24"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>create_shared_anno_file</B>(void (* progress_cb)(float progress, void *)=0, void * cl_data=0)
 <DD><I>Will create a file that will be included into every page and marked with the <TT>SHARED_ANNO</TT> flag.</I>
 <DT>
-<A HREF="#DOC.1.4.34.1.25"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVuFile.html">DjVuFile</A>&gt;  <B>get_shared_anno_file</B>(void)
+<A HREF="#DOC.1.4.33.1.25"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVuFile.html">DjVuFile</A>&gt;  <B>get_shared_anno_file</B>(void)
 <DD><I>Returns a pointer to the file with <TT>SHARED_ANNO</TT> flag on.</I>
 <DT>
-<A HREF="#DOC.1.4.34.1.26"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   bool <B>inherits</B>(const char * class_name) const 
+<A HREF="#DOC.1.4.33.1.26"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   bool <B>inherits</B>(const char * class_name) const 
 <DD><I>Returns TRUE if <TT>class_name</TT> is <TT>&quot;DjVuDocEditor&quot;</TT>, <TT>&quot;DjVuDocument&quot;</TT> or <TT>&quot;DjVuPort&quot;</TT> </I>
 </DL></P>
 
 <P><DL>
 <DT><H3>Public</H3><DD><DT>
-<A HREF="#DOC.1.4.34.1.22"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Thumbnails </B>
+<A HREF="#DOC.1.4.33.1.22"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Thumbnails </B>
 <DD><I></I>
 <P><DL>
 <DT>
-<A HREF="#DOC.1.4.34.1.22.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_thumbnails_num</B>(void) const 
+<A HREF="#DOC.1.4.33.1.22.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_thumbnails_num</B>(void) const 
 <DD><I>Returns the number of thumbnails stored inside this document.</I>
 <DT>
-<A HREF="#DOC.1.4.34.1.22.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_thumbnails_size</B>(void) const 
+<A HREF="#DOC.1.4.33.1.22.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_thumbnails_size</B>(void) const 
 <DD><I>Returns the size of the first encountered thumbnail image.</I>
 <DT>
-<A HREF="#DOC.1.4.34.1.22.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>remove_thumbnails</B>(void)
+<A HREF="#DOC.1.4.33.1.22.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>remove_thumbnails</B>(void)
 <DD><I>Removes all thumbnails from the document </I>
 <DT>
-<A HREF="#DOC.1.4.34.1.22.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>generate_thumbnails</B>(int thumb_size, int page_num)
+<A HREF="#DOC.1.4.33.1.22.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>generate_thumbnails</B>(int thumb_size, int page_num)
 <DD><I>Generates thumbnails for the specified page, if and only if it does not have a thumbnail yet.</I>
 <DT>
-<A HREF="#DOC.1.4.34.1.22.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>generate_thumbnails</B>(int thumb_size, bool (* cb)(int page_num, void *)=0, void * cl_data=0)
+<A HREF="#DOC.1.4.33.1.22.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>generate_thumbnails</B>(int thumb_size, bool (* cb)(int page_num, void *)=0, void * cl_data=0)
 <DD><I>Generates thumbnails for those pages, which do not have them yet.</I>
 </DL></P>
 </DL></P>
@@ -139,7 +139,13 @@
 
 <P><DL>
 <DT><H3>Public Methods</H3><DD><DT>
-<IMG ALT="o" SRC=icon2.gif>void <B>start_init</B>(const <!1><A HREF="GURL.html">GURL</A> &amp; url, <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVuPort.html#DOC.1.4.27.1.2">DjVuPort</A>&gt; port=0, <!1><A HREF="DjVuFileCache.html">DjVuFileCache</A> * cache=0)
+<IMG ALT="o" SRC=icon2.gif>void <B>start_init</B>(const <!1><A HREF="GURL.html">GURL</A> &amp; url, <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVuPort.html#DOC.1.4.26.1.2">DjVuPort</A>&gt; port=0, <!1><A HREF="DjVuFileCache.html">DjVuFileCache</A> * cache=0)
+<DT>
+<IMG ALT="o" SRC=icon2.gif>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVuDocument.html#DOC.1.4.29.1.3">DjVuDocument</A>&gt;  <B>create</B>( const <!1><A HREF="GURL.html">GURL</A> &amp;url, <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVuPort.html#DOC.1.4.26.1.2">DjVuPort</A>&gt; xport=0, <!1><A HREF="DjVuFileCache.html">DjVuFileCache</A> * const xcache=0)
+<DT>
+<IMG ALT="o" SRC=icon2.gif>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVuDocument.html#DOC.1.4.29.1.3">DjVuDocument</A>&gt;  <B>create</B>( <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DataPool.html">DataPool</A>&gt; pool, <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVuPort.html#DOC.1.4.26.1.2">DjVuPort</A>&gt; xport=0, <!1><A HREF="DjVuFileCache.html">DjVuFileCache</A> * const xcache=0)
+<DT>
+<IMG ALT="o" SRC=icon2.gif>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVuDocument.html#DOC.1.4.29.1.3">DjVuDocument</A>&gt;  <B>create</B>( <!1><A HREF="ByteStream.html">ByteStream</A> &amp;bs, <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVuPort.html#DOC.1.4.26.1.2">DjVuPort</A>&gt; xport=0, <!1><A HREF="DjVuFileCache.html">DjVuFileCache</A> * const xcache=0)
 <DT>
 <IMG ALT="o" SRC=icon2.gif>void <B>stop_init</B>(void)
 <DT>
@@ -169,6 +175,8 @@
 <DT>
 <IMG ALT="o" SRC=icon2.gif>bool <B>wait_for_complete_init</B>(void)
 <DT>
+<IMG ALT="o" SRC=icon2.gif>int <B>wait_get_pages_num</B>(void)
+<DT>
 <IMG ALT="o" SRC=icon2.gif><!1><A HREF="DjVuFileCache.html">DjVuFileCache</A>* <B>get_cache</B>(void) const 
 <DT>
 <IMG ALT="o" SRC=icon2.gif><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVmDir.html">DjVmDir</A>&gt;  <B>get_djvm_dir</B>(void) const 
@@ -183,48 +191,48 @@
 <P> <B>Accessing pages </B>
 <P><DL>
 <DT>
-<A HREF="#DOC.1.4.30.1.18.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_pages_num</B>(void) const 
+<A HREF="#DOC.1.4.29.1.21.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_pages_num</B>(void) const 
 <DD><I>Returns the number of pages in the document.</I>
 <DT>
-<A HREF="#DOC.1.4.30.1.18.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GURL.html">GURL</A> <B>page_to_url</B>(int page_num) const 
+<A HREF="#DOC.1.4.29.1.21.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GURL.html">GURL</A> <B>page_to_url</B>(int page_num) const 
 <DD><I>Translates the page number to the full URL of the page.</I>
 <DT>
-<A HREF="#DOC.1.4.30.1.18.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>url_to_page</B>(const <!1><A HREF="GURL.html">GURL</A> &amp; url) const 
+<A HREF="#DOC.1.4.29.1.21.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>url_to_page</B>(const <!1><A HREF="GURL.html">GURL</A> &amp; url) const 
 <DD><I>Translates the page URL back to page number.</I>
 <DT>
-<A HREF="#DOC.1.4.30.1.18.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GURL.html">GURL</A> <B>id_to_url</B>(const char * id) const 
+<A HREF="#DOC.1.4.29.1.21.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GURL.html">GURL</A> <B>id_to_url</B>(const char * id) const 
 <DD><I>Translates the textual ID to the complete URL if possible.</I>
 <DT>
-<A HREF="#DOC.1.4.30.1.18.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVuImage.html">DjVuImage</A>&gt;  <B>get_page</B>(int page_num, bool sync=true, <!1><A HREF="DjVuPort.html#DOC.1.4.27.1.2">DjVuPort</A> * port=0)
+<A HREF="#DOC.1.4.29.1.21.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVuImage.html">DjVuImage</A>&gt;  <B>get_page</B>(int page_num, bool sync=true, <!1><A HREF="DjVuPort.html#DOC.1.4.26.1.2">DjVuPort</A> * port=0)
 <DD><I>Returns <!1><A HREF="GP.html">GP</A> pointer to <!1><A HREF="DjVuImage.html">DjVuImage</A> corresponding to page <TT>page_num</TT>.</I>
 <DT>
-<A HREF="#DOC.1.4.30.1.18.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVuImage.html">DjVuImage</A>&gt;  <B>get_page</B>(const char * id, bool sync=true, <!1><A HREF="DjVuPort.html#DOC.1.4.27.1.2">DjVuPort</A> * port=0)
+<A HREF="#DOC.1.4.29.1.21.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVuImage.html">DjVuImage</A>&gt;  <B>get_page</B>(const char * id, bool sync=true, <!1><A HREF="DjVuPort.html#DOC.1.4.26.1.2">DjVuPort</A> * port=0)
 <DD><I>Returns <!1><A HREF="GP.html">GP</A> pointer to <!1><A HREF="DjVuImage.html">DjVuImage</A> corresponding to the specified ID.</I>
 <DT>
-<A HREF="#DOC.1.4.30.1.18.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVuFile.html">DjVuFile</A>&gt;  <B>get_djvu_file</B>(int page_num, bool dont_create=false)
+<A HREF="#DOC.1.4.29.1.21.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVuFile.html">DjVuFile</A>&gt;  <B>get_djvu_file</B>(int page_num, bool dont_create=false)
 <DD><I>Returns <!1><A HREF="DjVuFile.html">DjVuFile</A> corresponding to the specified page.</I>
 <DT>
-<A HREF="#DOC.1.4.30.1.18.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVuFile.html">DjVuFile</A>&gt;  <B>get_djvu_file</B>(const char * id, bool dont_create=false)
+<A HREF="#DOC.1.4.29.1.21.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVuFile.html">DjVuFile</A>&gt;  <B>get_djvu_file</B>(const char * id, bool dont_create=false)
 <DD><I>Returns <!1><A HREF="DjVuFile.html">DjVuFile</A> corresponding to the specified ID.</I>
 <DT>
-<A HREF="#DOC.1.4.30.1.18.9"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DataPool.html">DataPool</A>&gt;  <B>get_thumbnail</B>(int page_num, bool dont_decode)
+<A HREF="#DOC.1.4.29.1.21.9"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DataPool.html">DataPool</A>&gt;  <B>get_thumbnail</B>(int page_num, bool dont_decode)
 <DD><I>Returns a <!1><A HREF="DataPool.html">DataPool</A> containing one chunk <TT>TH44</TT> with the encoded thumbnail for the specified page.</I>
 </DL></P>
 <DT>
 <P> <B>Saving document to disk </B>
 <P><DL>
 <DT>
-<A HREF="#DOC.1.4.30.1.20.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVmDoc.html">DjVmDoc</A>&gt;  <B>get_djvm_doc</B>(void)
+<A HREF="#DOC.1.4.29.1.24.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVmDoc.html">DjVmDoc</A>&gt;  <B>get_djvm_doc</B>(void)
 <DD><I>Returns pointer to the <!1><A HREF="DjVmDoc.html">DjVmDoc</A> class, which can save the document contents on the hard disk in one of the two new formats: <EM>bundled</EM> and <EM>indirect</EM>.</I>
 <DT>
-<A HREF="#DOC.1.4.30.1.20.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>write</B>(<!1><A HREF="ByteStream.html">ByteStream</A> &amp; str, bool force_djvm=false)
+<A HREF="#DOC.1.4.29.1.24.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>write</B>(<!1><A HREF="ByteStream.html">ByteStream</A> &amp; str, bool force_djvm=false)
 <DD><I>Saves the document in the <EM>new bundled</EM> format.</I>
 <DT>
-<A HREF="#DOC.1.4.30.1.20.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>expand</B>(const char * dir_name, const char * idx_name)
+<A HREF="#DOC.1.4.29.1.24.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>expand</B>(const char * dir_name, const char * idx_name)
 <DD><I>Saves the document in the <EM>new indirect</EM> format when every page and component are stored in separate files.</I>
 <DT>
-<A HREF="#DOC.1.4.30.1.20.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>save_as</B>(const char where[], const bool bundled=0)
-<DD><I>This function can be used instead of <!1><A HREF="DjVuDocument.html#DOC.1.4.30.1.20.2">write</A>() and <!1><A HREF="DjVuDocument.html#DOC.1.4.30.1.20.3">expand</A>().</I>
+<A HREF="#DOC.1.4.29.1.24.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>save_as</B>(const char where[], const bool bundled=0)
+<DD><I>This function can be used instead of <!1><A HREF="DjVuDocument.html#DOC.1.4.29.1.24.2">write</A>() and <!1><A HREF="DjVuDocument.html#DOC.1.4.29.1.24.3">expand</A>().</I>
 </DL></P>
 </DL></P>
 
@@ -235,7 +243,7 @@
 <DT><H3>Public Methods</H3><DD><DT>
 <IMG ALT="o" SRC=icon2.gif>static   <!1><A HREF="DjVuPortcaster.html">DjVuPortcaster</A>* <B>get_portcaster</B>(void)
 <DT>
-<IMG ALT="o" SRC=icon2.gif><!1><A HREF="DjVuPort.html#DOC.1.4.27.1.2">DjVuPort</A>&amp; <B>operator=</B>(const <!1><A HREF="DjVuPort.html#DOC.1.4.27.1.2">DjVuPort</A> &amp; port)
+<IMG ALT="o" SRC=icon2.gif><!1><A HREF="DjVuPort.html#DOC.1.4.26.1.2">DjVuPort</A>&amp; <B>operator=</B>(const <!1><A HREF="DjVuPort.html#DOC.1.4.26.1.2">DjVuPort</A> &amp; port)
 </DL></P>
 
 <P><DL>
@@ -243,40 +251,40 @@
 <P> <B>Notifications. </B>
 <P><DL>
 <DT>
-<A HREF="#DOC.1.4.27.1.5.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   <!1><A HREF="GURL.html">GURL</A> <B>id_to_url</B>(const <!1><A HREF="DjVuPort.html#DOC.1.4.27.1.2">DjVuPort</A> * source, const char * id)
+<A HREF="#DOC.1.4.26.1.5.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   <!1><A HREF="GURL.html">GURL</A> <B>id_to_url</B>(const <!1><A HREF="DjVuPort.html#DOC.1.4.26.1.2">DjVuPort</A> * source, const char * id)
 <DD><I>This request is issued to request translation of the ID, used in an DjVu INCL chunk to a URL, which may be used to request data associated with included file.</I>
 <DT>
-<A HREF="#DOC.1.4.27.1.5.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   <!1><A HREF="GPBase.html">GPBase</A> <B>id_to_file</B>(const <!1><A HREF="DjVuPort.html#DOC.1.4.27.1.2">DjVuPort</A> * source, const char * id)
+<A HREF="#DOC.1.4.26.1.5.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   <!1><A HREF="GPBase.html">GPBase</A> <B>id_to_file</B>(const <!1><A HREF="DjVuPort.html#DOC.1.4.26.1.2">DjVuPort</A> * source, const char * id)
 <DD><I>This request is used to get a file corresponding to the given ID.</I>
 <DT>
-<A HREF="#DOC.1.4.27.1.5.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DataPool.html">DataPool</A>&gt;  <B>request_data</B>(const <!1><A HREF="DjVuPort.html#DOC.1.4.27.1.2">DjVuPort</A> * source, const <!1><A HREF="GURL.html">GURL</A> &amp; url)
+<A HREF="#DOC.1.4.26.1.5.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DataPool.html">DataPool</A>&gt;  <B>request_data</B>(const <!1><A HREF="DjVuPort.html#DOC.1.4.26.1.2">DjVuPort</A> * source, const <!1><A HREF="GURL.html">GURL</A> &amp; url)
 <DD><I>This request is issued when decoder needs additional data for decoding.</I>
 <DT>
-<A HREF="#DOC.1.4.27.1.5.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   bool <B>notify_error</B>(const <!1><A HREF="DjVuPort.html#DOC.1.4.27.1.2">DjVuPort</A> * source, const char * msg)
+<A HREF="#DOC.1.4.26.1.5.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   bool <B>notify_error</B>(const <!1><A HREF="DjVuPort.html#DOC.1.4.26.1.2">DjVuPort</A> * source, const char * msg)
 <DD><I>This notification is sent when an error occurs and the error message should be shown to the user.</I>
 <DT>
-<A HREF="#DOC.1.4.27.1.5.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   bool <B>notify_status</B>(const <!1><A HREF="DjVuPort.html#DOC.1.4.27.1.2">DjVuPort</A> * source, const char * msg)
+<A HREF="#DOC.1.4.26.1.5.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   bool <B>notify_status</B>(const <!1><A HREF="DjVuPort.html#DOC.1.4.26.1.2">DjVuPort</A> * source, const char * msg)
 <DD><I>This notification is sent to update the decoding status.</I>
 <DT>
-<A HREF="#DOC.1.4.27.1.5.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>notify_redisplay</B>(const class <!1><A HREF="DjVuImage.html">DjVuImage</A> * source)
+<A HREF="#DOC.1.4.26.1.5.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>notify_redisplay</B>(const class <!1><A HREF="DjVuImage.html">DjVuImage</A> * source)
 <DD><I>This notification is sent by <!1><A HREF="DjVuImage.html">DjVuImage</A> when it should be redrawn.</I>
 <DT>
-<A HREF="#DOC.1.4.27.1.5.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>notify_relayout</B>(const class <!1><A HREF="DjVuImage.html">DjVuImage</A> * source)
+<A HREF="#DOC.1.4.26.1.5.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>notify_relayout</B>(const class <!1><A HREF="DjVuImage.html">DjVuImage</A> * source)
 <DD><I>This notification is sent by \ref{DjVuImage} when its geometry has been changed as a result of decoding.</I>
 <DT>
-<A HREF="#DOC.1.4.27.1.5.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>notify_chunk_done</B>(const <!1><A HREF="DjVuPort.html#DOC.1.4.27.1.2">DjVuPort</A> * source, const char * name)
+<A HREF="#DOC.1.4.26.1.5.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>notify_chunk_done</B>(const <!1><A HREF="DjVuPort.html#DOC.1.4.26.1.2">DjVuPort</A> * source, const char * name)
 <DD><I>This notification is sent when a new chunk has been decoded.</I>
 <DT>
-<A HREF="#DOC.1.4.27.1.5.9"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>notify_file_flags_changed</B>(const class <!1><A HREF="DjVuFile.html">DjVuFile</A> * source, long set_mask, long clr_mask)
+<A HREF="#DOC.1.4.26.1.5.9"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>notify_file_flags_changed</B>(const class <!1><A HREF="DjVuFile.html">DjVuFile</A> * source, long set_mask, long clr_mask)
 <DD><I>This notification is sent after the <!1><A HREF="DjVuFile.html">DjVuFile</A> flags have been changed.</I>
 <DT>
-<A HREF="#DOC.1.4.27.1.5.10"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>notify_doc_flags_changed</B>(const class <!1><A HREF="DjVuDocument.html">DjVuDocument</A> * source, long set_mask, long clr_mask)
+<A HREF="#DOC.1.4.26.1.5.10"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>notify_doc_flags_changed</B>(const class <!1><A HREF="DjVuDocument.html">DjVuDocument</A> * source, long set_mask, long clr_mask)
 <DD><I>This notification is sent after the <!1><A HREF="DjVuDocument.html">DjVuDocument</A> flags have been changed.</I>
 <DT>
-<A HREF="#DOC.1.4.27.1.5.11"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>notify_decode_progress</B>(const <!1><A HREF="DjVuPort.html#DOC.1.4.27.1.2">DjVuPort</A> * source, float done)
+<A HREF="#DOC.1.4.26.1.5.11"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>notify_decode_progress</B>(const <!1><A HREF="DjVuPort.html#DOC.1.4.26.1.2">DjVuPort</A> * source, float done)
 <DD><I>This notification is sent from time to time while decoding is in progress.</I>
 <DT>
-<A HREF="#DOC.1.4.27.1.5.12"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>enum  <B>ErrorRecoveryAction</B>
+<A HREF="#DOC.1.4.26.1.5.12"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>enum  <B>ErrorRecoveryAction</B>
 <DD><I>This is the standard types for defining what to do in case of errors.</I>
 </DL></P>
 </DL></P>
@@ -299,7 +307,7 @@
 <A NAME="DOC.DOCU">
 <HR>
 <H2>Documentation</H2>
-<BLOCKQUOTE><TT>DjVuDocEditor</TT> is an extension of <!1><A HREF="DjVuDocument.html#DOC.1.4.30.1.3">DjVuDocument</A> class with
+<BLOCKQUOTE><TT>DjVuDocEditor</TT> is an extension of <!1><A HREF="DjVuDocument.html#DOC.1.4.29.1.3">DjVuDocument</A> class with
 additional capabilities for editing the document contents.<P>It can be used to:
 <OL>
 <LI> Create (compose) new multipage DjVu documents using single
@@ -312,40 +320,40 @@ of files composing the DjVu document.
 <DL>
 
 <A NAME="DjVuDocEditor">
-<A NAME="DOC.1.4.34.1.27">
+<A NAME="DOC.1.4.33.1.27">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> DjVuDocEditor(void)</B></TT>
 <DD>Default constructor
 <DL><DT><DD></DL><P>
 <A NAME="init">
-<A NAME="DOC.1.4.34.1.1">
+<A NAME="DOC.1.4.33.1.1">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void init(void)</B></TT>
 <DD>Initialization function. Initializes an empty document.<P><B>Note</B>: You must call either of the two
-available <!1><A HREF="DjVuDocEditor.html#DOC.1.4.34.1.2">init</A>() function before you start doing
+available <!1><A HREF="DjVuDocEditor.html#DOC.1.4.33.1.2">init</A>() function before you start doing
 anything else with the <TT>DjVuDocEditor</TT>. 
 <DL><DT><DD></DL><P>
 <A NAME="init">
-<A NAME="DOC.1.4.34.1.2">
+<A NAME="DOC.1.4.33.1.2">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void init(const char * fname)</B></TT>
 <DD>Initialization function. Opens document with name <TT>fname</TT>.<P><B>Note</B>: You must call either of the two
-available <!1><A HREF="DjVuDocEditor.html#DOC.1.4.34.1.2">init</A>() function before you start doing
+available <!1><A HREF="DjVuDocEditor.html#DOC.1.4.33.1.2">init</A>() function before you start doing
 anything else with the <TT>DjVuDocEditor</TT>. 
 <DL><DT><DD></DL><P>
 <A NAME="~DjVuDocEditor">
-<A NAME="DOC.1.4.34.1.28">
+<A NAME="DOC.1.4.33.1.28">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   ~DjVuDocEditor(void)</B></TT>
 <DD>Destructor
 <DL><DT><DD></DL><P>
 <A NAME="get_orig_doc_type">
-<A NAME="DOC.1.4.34.1.3">
+<A NAME="DOC.1.4.33.1.3">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int get_orig_doc_type(void) const </B></TT>
 <DD>Returns type of open document. <TT>DjVuDocEditor</TT> silently
 converts any open DjVu document to <TT>BUNDLED</TT> format (see
-<!1><A HREF="DjVuDocument.html#DOC.1.4.30.1.3">DjVuDocument</A>. Thus, <!1><A HREF="DjVuDocument.html#DOC.1.4.30.1.14">get_doc_type</A>()
+<!1><A HREF="DjVuDocument.html#DOC.1.4.29.1.3">DjVuDocument</A>. Thus, <!1><A HREF="DjVuDocument.html#DOC.1.4.29.1.17">get_doc_type</A>()
 will always be returning <TT>BUNDLED</TT>. Use this function to
 learn the original format of the document being edited. 
 <DL><DT><DD></DL><P>
 <A NAME="can_be_saved">
-<A NAME="DOC.1.4.34.1.4">
+<A NAME="DOC.1.4.33.1.4">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>bool can_be_saved(void) const </B></TT>
 <DD>Returns <TT>TRUE</TT> if the document can be "saved" (sometimes
 the only possibility is to do a "save as"). The reason why
@@ -361,39 +369,39 @@ these formats are too different, and the best thing to do
 is to use "save as" capability. 
 <DL><DT><DD></DL><P>
 <A NAME="get_save_doc_type">
-<A NAME="DOC.1.4.34.1.5">
+<A NAME="DOC.1.4.33.1.5">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int get_save_doc_type(void) const </B></TT>
 <DD>Returns type of the document, which can be created by
-<!1><A HREF="DjVuDocEditor.html#DOC.1.4.34.1.6">save</A>() function. Can be <TT>INDIRECT</TT>, <TT>BUNDLED</TT>,
+<!1><A HREF="DjVuDocEditor.html#DOC.1.4.33.1.6">save</A>() function. Can be <TT>INDIRECT</TT>, <TT>BUNDLED</TT>,
 <TT>SINGLE_PAGE</TT>, or <TT>UNKNOWN_TYPE</TT>. The latter indicates,
-that <!1><A HREF="DjVuDocEditor.html#DOC.1.4.34.1.6">save</A>() will fail, and that <!1><A HREF="DjVuDocEditor.html#DOC.1.4.34.1.7">save_as</A>()
+that <!1><A HREF="DjVuDocEditor.html#DOC.1.4.33.1.6">save</A>() will fail, and that <!1><A HREF="DjVuDocEditor.html#DOC.1.4.33.1.7">save_as</A>()
 should be used instead 
 <DL><DT><DD></DL><P>
 <A NAME="save">
-<A NAME="DOC.1.4.34.1.6">
+<A NAME="DOC.1.4.33.1.6">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void save(void)</B></TT>
 <DD>Saves the document. May generate exception if the document
-can not be saved, and <!1><A HREF="DjVuDocEditor.html#DOC.1.4.34.1.7">save_as</A>() should be used.
-See <!1><A HREF="DjVuDocEditor.html#DOC.1.4.34.1.4">can_be_saved</A>() for details. 
+can not be saved, and <!1><A HREF="DjVuDocEditor.html#DOC.1.4.33.1.7">save_as</A>() should be used.
+See <!1><A HREF="DjVuDocEditor.html#DOC.1.4.33.1.4">can_be_saved</A>() for details. 
 <DL><DT><DD></DL><P>
 <A NAME="save_as">
-<A NAME="DOC.1.4.34.1.7">
+<A NAME="DOC.1.4.33.1.7">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   void save_as(const char * where, bool bundled)</B></TT>
 <DD>Saves the document. 
 <DL><DT><DD></DL><P>
 <A NAME="save_pages_as">
-<A NAME="DOC.1.4.34.1.8">
+<A NAME="DOC.1.4.33.1.8">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void save_pages_as(<!1><A HREF="ByteStream.html">ByteStream</A> &amp; str, const GList&lt;int&gt; &amp; page_list)</B></TT>
 <DD>Saves the specified pages in DjVu <TT>BUNDLED</TT> multipage document. 
 <DL><DT><DD></DL><P>
 <A NAME="page_to_id">
-<A NAME="DOC.1.4.34.1.9">
+<A NAME="DOC.1.4.33.1.9">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GString.html">GString</A> page_to_id(int page_num) const </B></TT>
 <DD>Translates page number <TT>page_num</TT> to ID. If <TT>page_num</TT> is invalid,
 an exception is thrown. 
 <DL><DT><DD></DL><P>
 <A NAME="insert_page">
-<A NAME="DOC.1.4.34.1.10">
+<A NAME="DOC.1.4.33.1.10">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void insert_page(const char * fname, int page_num=-1)</B></TT>
 <DD>Inserts the referenced file into this DjVu document.<P>
 <DL><DT><DT><B>Parameters:</B><DD><B>fname</B> -  Name of the top-level file containing the image of
@@ -408,7 +416,7 @@ to be unique in the DjVu document.
 <BR><B>page_num</B> -  Position where the new page should be inserted at.
 Negative value means "append" <BR><DD></DL><P>
 <A NAME="insert_page">
-<A NAME="DOC.1.4.34.1.11">
+<A NAME="DOC.1.4.33.1.11">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void insert_page(<!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DataPool.html">DataPool</A>&gt; &amp; file_pool, const char * fname, int page_num=-1)</B></TT>
 <DD>Inserts a new page with data inside the <TT>data_pool</TT> as page
 number <TT>page_num.</TT>
@@ -424,15 +432,15 @@ to the page.
 <BR><B>page_num</B> -  Describes where the page should be inserted.
 Negative number means "append". <BR><DD></DL><P>
 <A NAME="insert_group">
-<A NAME="DOC.1.4.34.1.12">
+<A NAME="DOC.1.4.33.1.12">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void insert_group(const GList&lt;<!1><A HREF="GString.html">GString</A>&gt; &amp; fname_list, int page_num=-1, void (* refresh_cb)(void *)=0, void * cl_data=0)</B></TT>
-<DD>Inserts a group of pages into this DjVu document.<P>Like <!1><A HREF="DjVuDocEditor.html#DOC.1.4.34.1.10">insert_page</A>() it will insert every page into the document.
+<DD>Inserts a group of pages into this DjVu document.<P>Like <!1><A HREF="DjVuDocEditor.html#DOC.1.4.33.1.10">insert_page</A>() it will insert every page into the document.
 The main advantage of calling this function once for the whole
-group instead of calling <!1><A HREF="DjVuDocEditor.html#DOC.1.4.34.1.10">insert_page</A>() for every page is
+group instead of calling <!1><A HREF="DjVuDocEditor.html#DOC.1.4.33.1.10">insert_page</A>() for every page is
 the processing of included files:<P>The group of files may include one or more files, which are thus
-shared by them. If you call <!1><A HREF="DjVuDocEditor.html#DOC.1.4.34.1.10">insert_page</A>() for every page,
+shared by them. If you call <!1><A HREF="DjVuDocEditor.html#DOC.1.4.33.1.10">insert_page</A>() for every page,
 this shared file will be inserted into the document more than once
-though under different names. This is how <!1><A HREF="DjVuDocEditor.html#DOC.1.4.34.1.10">insert_page</A>() works:
+though under different names. This is how <!1><A HREF="DjVuDocEditor.html#DOC.1.4.33.1.10">insert_page</A>() works:
 whenever it inserts something, it checks for duplicate names with
 only one purpose: invent a new name if a given one is already in
 use.<P>On the other hand, if you call
@@ -443,35 +451,35 @@ are shared and thus should be inserted only once.<P>
 <BR><B>page_num</B> -  Position where the new pages should be inserted at.
 Negative value means "append" <BR><DD></DL><P>
 <A NAME="remove_page">
-<A NAME="DOC.1.4.34.1.13">
+<A NAME="DOC.1.4.33.1.13">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void remove_page(int page_num, bool remove_unref=true)</B></TT>
 <DD>Removes the specified page from the document. If <TT>remove_unref</TT>
 is <TT>TRUE</TT>, the function will also remove from the document any file,
 which became unreferenced due to the page's removal 
 <DL><DT><DD></DL><P>
 <A NAME="remove_pages">
-<A NAME="DOC.1.4.34.1.14">
+<A NAME="DOC.1.4.33.1.14">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void remove_pages(const GList&lt;int&gt; &amp; page_list, bool remove_unref=true)</B></TT>
 <DD>Removes the specified pages from the document. If <TT>remove_unref</TT>
 is <TT>TRUE</TT>, the function will also remove from the document any file,
 which became unreferenced due to the pages' removal 
 <DL><DT><DD></DL><P>
 <A NAME="remove_file">
-<A NAME="DOC.1.4.34.1.15">
+<A NAME="DOC.1.4.33.1.15">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void remove_file(const char * id, bool remove_unref=true)</B></TT>
 <DD>Removes a DjVu file with the specified<P>If some other files include this file, the corresponding <TT>INCL</TT>
 chunks will be removed to avoid dead links.<P>If <TT>remove_unref</TT> is <TT>TRUE</TT>, the function will also remove every
 file, which will become unreferenced after the removal of this file. 
 <DL><DT><DD></DL><P>
 <A NAME="move_page">
-<A NAME="DOC.1.4.34.1.16">
+<A NAME="DOC.1.4.33.1.16">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void move_page(int page_num, int new_page_num)</B></TT>
 <DD>Makes page number <TT>page_num</TT> to be <TT>new_page_num</TT>. If <TT>new_page_num</TT>
 is negative or too big, the function will move page <TT>page_num</TT> to
 the end of the document. 
 <DL><DT><DD></DL><P>
 <A NAME="move_pages">
-<A NAME="DOC.1.4.34.1.17">
+<A NAME="DOC.1.4.33.1.17">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void move_pages(const GList&lt;int&gt; &amp; page_list, int shift)</B></TT>
 <DD>Shifts all pags from the <TT>page_list</TT> according to the <TT>shift</TT>.
 The <TT>shift</TT> can be positive (shift toward the end of the document)
@@ -480,40 +488,40 @@ moved to the end (or to the beginning, depending on the <TT>shift</TT>
 sign) of the document. 
 <DL><DT><DD></DL><P>
 <A NAME="set_file_name">
-<A NAME="DOC.1.4.34.1.18">
+<A NAME="DOC.1.4.33.1.18">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void set_file_name(const char * id, const char * name)</B></TT>
 <DD>Changes the name of the file with ID
 Refer to <!1><A HREF="DjVmDir.html">DjVmDir</A> for the explanation of <EM>IDs</EM>,
 <EM>names</EM> and <EM>titles</EM>. 
 <DL><DT><DD></DL><P>
 <A NAME="set_page_name">
-<A NAME="DOC.1.4.34.1.19">
+<A NAME="DOC.1.4.33.1.19">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void set_page_name(int page_num, const char * name)</B></TT>
 <DD>Changes the name of the page <TT>page_num</TT> to <TT>name</TT>.
 Refer to <!1><A HREF="DjVmDir.html">DjVmDir</A> for the explanation of <EM>IDs</EM>,
 <EM>names</EM> and <EM>titles</EM>. 
 <DL><DT><DD></DL><P>
 <A NAME="set_file_title">
-<A NAME="DOC.1.4.34.1.20">
+<A NAME="DOC.1.4.33.1.20">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void set_file_title(const char * id, const char * title)</B></TT>
 <DD>Changes the title of the file with ID
 Refer to <!1><A HREF="DjVmDir.html">DjVmDir</A> for the explanation of <EM>IDs</EM>,
 <EM>names</EM> and <EM>titles</EM>. 
 <DL><DT><DD></DL><P>
 <A NAME="set_page_title">
-<A NAME="DOC.1.4.34.1.21">
+<A NAME="DOC.1.4.33.1.21">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void set_page_title(int page_num, const char * title)</B></TT>
 <DD>Changes the title of the page <TT>page_num</TT> to <TT>title</TT>.
 Refer to <!1><A HREF="DjVmDir.html">DjVmDir</A> for the explanation of <EM>IDs</EM>,
 <EM>names</EM> and <EM>titles</EM>. 
 <DL><DT><DD></DL><P>
 <A NAME="Thumbnails ">
-<A NAME="DOC.1.4.34.1.22">
+<A NAME="DOC.1.4.33.1.22">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> Thumbnails </B></TT>
 <DL><DT><DD></DL><P><DL>
 
 <A NAME="get_thumbnails_num">
-<A NAME="DOC.1.4.34.1.22.1">
+<A NAME="DOC.1.4.33.1.22.1">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int get_thumbnails_num(void) const </B></TT>
 <DD>Returns the number of thumbnails stored inside this document.<P>It may be <TT>ZERO</TT>, which means, that there are no thumbnails at all.<P>It may be equal to the number of pages, which is what should
 normally be.<P>Finally, it may be greater than <TT>ZERO</TT> and less than the number
@@ -521,36 +529,36 @@ of pages, in which case thumbnails should be regenerated before
 the document can be saved. 
 <DL><DT><DD></DL><P>
 <A NAME="get_thumbnails_size">
-<A NAME="DOC.1.4.34.1.22.2">
+<A NAME="DOC.1.4.33.1.22.2">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int get_thumbnails_size(void) const </B></TT>
 <DD>Returns the size of the first encountered thumbnail image. Since
-thumbnails can currently be generated by <!1><A HREF="DjVuDocEditor.html#DOC.1.4.34.1.22.4">generate_thumbnails</A>()
+thumbnails can currently be generated by <!1><A HREF="DjVuDocEditor.html#DOC.1.4.33.1.22.4">generate_thumbnails</A>()
 only, all thumbnail images should be of the same size. Thus,
 the number returned is actually the size of <EM>all</EM>
 document thumbnails.<P>The function will return <TT>-1</TT> if there are no thumbnails. 
 <DL><DT><DD></DL><P>
 <A NAME="remove_thumbnails">
-<A NAME="DOC.1.4.34.1.22.3">
+<A NAME="DOC.1.4.33.1.22.3">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void remove_thumbnails(void)</B></TT>
 <DD>Removes all thumbnails from the document 
 <DL><DT><DD></DL><P>
 <A NAME="generate_thumbnails">
-<A NAME="DOC.1.4.34.1.22.4">
+<A NAME="DOC.1.4.33.1.22.4">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int generate_thumbnails(int thumb_size, int page_num)</B></TT>
 <DD>Generates thumbnails for the specified page, if and only if
 it does not have a thumbnail yet.  If you want to regenerate
-thumbnails for all pages, call <!1><A HREF="DjVuDocEditor.html#DOC.1.4.34.1.22.3">remove_thumbnails</A>() prior
+thumbnails for all pages, call <!1><A HREF="DjVuDocEditor.html#DOC.1.4.33.1.22.3">remove_thumbnails</A>() prior
 to calling this function.<P>
 <DL><DT><DT><B>Parameters:</B><DD><B>thumb_size</B> -  The size of the thumbnails in pixels. DjVu viewer
 is able to rescale the thumbnail images if necessary, so this
 parameter affects thumbnails quality only. 128 is a good number.
 <BR><B>page_num</B> -  The page number to genate the thumbnail for.  <BR><DD></DL><P>
 <A NAME="generate_thumbnails">
-<A NAME="DOC.1.4.34.1.22.5">
+<A NAME="DOC.1.4.33.1.22.5">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void generate_thumbnails(int thumb_size, bool (* cb)(int page_num, void *)=0, void * cl_data=0)</B></TT>
 <DD>Generates thumbnails for those pages, which do not have them yet.
 If you want to regenerate thumbnails for all pages, call
-<!1><A HREF="DjVuDocEditor.html#DOC.1.4.34.1.22.3">remove_thumbnails</A>() prior to calling this function.<P>
+<!1><A HREF="DjVuDocEditor.html#DOC.1.4.33.1.22.3">remove_thumbnails</A>() prior to calling this function.<P>
 <DL><DT><DT><B>Parameters:</B><DD><B>thumb_size</B> -  The size of the thumbnails in pixels. DjVu viewer
 is able to rescale the thumbnail images if necessary, so this
 parameter affects thumbnails quality only. 128 is a good number.
@@ -563,7 +571,7 @@ The callback should return <TT>FALSE</TT> if thumbnails generating
 should proceed. <TT>TRUE</TT> will stop it. <BR><DD></DL><P></DL>
 
 <A NAME="simplify_anno">
-<A NAME="DOC.1.4.34.1.23">
+<A NAME="DOC.1.4.33.1.23">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void simplify_anno(void (* progress_cb)(float progress, void *)=0, void * cl_data=0)</B></TT>
 <DD>Use this function to simplify annotations in the document.
 The "simplified" format is when annotations are only allowed
@@ -572,7 +580,7 @@ either in top-level page files or in a special file with
 every page. 
 <DL><DT><DD></DL><P>
 <A NAME="create_shared_anno_file">
-<A NAME="DOC.1.4.34.1.24">
+<A NAME="DOC.1.4.33.1.24">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void create_shared_anno_file(void (* progress_cb)(float progress, void *)=0, void * cl_data=0)</B></TT>
 <DD>Will create a file that will be included into every page and
 marked with the <TT>SHARED_ANNO</TT> flag. This file can be used
@@ -580,14 +588,14 @@ to store global annotations (annotations applicable to every page).<P><B>Note:</
 DjVu multipage document. 
 <DL><DT><DD></DL><P>
 <A NAME="get_shared_anno_file">
-<A NAME="DOC.1.4.34.1.25">
+<A NAME="DOC.1.4.33.1.25">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVuFile.html">DjVuFile</A>&gt;  get_shared_anno_file(void)</B></TT>
 <DD>Returns a pointer to the file with <TT>SHARED_ANNO</TT> flag on.
 This file should be used for storing document-wide annotations.<P><B>Note:</B> There may be only one <TT>SHARED_ANNO</TT> file in any
 DjVu multipage document. 
 <DL><DT><DD></DL><P>
 <A NAME="inherits">
-<A NAME="DOC.1.4.34.1.26">
+<A NAME="DOC.1.4.33.1.26">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   bool inherits(const char * class_name) const </B></TT>
 <DD>Returns TRUE if <TT>class_name</TT> is <TT>&quot;DjVuDocEditor&quot;</TT>,
 <TT>&quot;DjVuDocument&quot;</TT> or <TT>&quot;DjVuPort&quot;</TT> 

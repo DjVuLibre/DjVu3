@@ -33,7 +33,7 @@
 <A HREF="#DOC.1.4.28.4.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVuPort.html">DjVuPort</A>&gt;  <B>is_port_alive</B>(<!1><A HREF="DjVuPort.html">DjVuPort</A> *port)
 <DD><I>Returns a smart pointer to the port if <TT>port</TT> is a valid pointer to an existing <TT>DjVuPort</TT>.</I>
 <DT>
-<A HREF="#DOC.1.4.28.4.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>add_alias</B>(const <!1><A HREF="DjVuPort.html">DjVuPort</A> * port, const GUTF8String &amp;alias)
+<A HREF="#DOC.1.4.28.4.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>add_alias</B>(const <!1><A HREF="DjVuPort.html">DjVuPort</A> * port, const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;alias)
 <DD><I>Assigns one more <EM>alias</EM> for the specified <!1><A HREF="DjVuPort.html">DjVuPort</A>.</I>
 <DT>
 <A HREF="#DOC.1.4.28.4.9"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   void <B>clear_all_aliases</B>(void)
@@ -42,25 +42,25 @@
 <A HREF="#DOC.1.4.28.4.10"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>clear_aliases</B>(const <!1><A HREF="DjVuPort.html">DjVuPort</A> * port)
 <DD><I>Removes all aliases associated with the given <!1><A HREF="DjVuPort.html">DjVuPort</A>.</I>
 <DT>
-<A HREF="#DOC.1.4.28.4.11"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVuPort.html">DjVuPort</A>&gt;  <B>alias_to_port</B>(const GUTF8String &amp;name)
+<A HREF="#DOC.1.4.28.4.11"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVuPort.html">DjVuPort</A>&gt;  <B>alias_to_port</B>(const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;name)
 <DD><I>Returns <!1><A HREF="DjVuPort.html">DjVuPort</A> associated with the given <TT>alias</TT>.</I>
 <DT>
-<A HREF="#DOC.1.4.28.4.12"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>GPList&lt;<!1><A HREF="DjVuPort.html">DjVuPort</A>&gt;  <B>prefix_to_ports</B>(const GUTF8String &amp;prefix)
+<A HREF="#DOC.1.4.28.4.12"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>GPList&lt;<!1><A HREF="DjVuPort.html">DjVuPort</A>&gt;  <B>prefix_to_ports</B>(const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;prefix)
 <DD><I>Returns a list of <!1><A HREF="DjVuPort.html">DjVuPort</A>s with aliases starting with <TT>prefix</TT>.</I>
 <DT>
-<A HREF="#DOC.1.4.28.4.13"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   <!1><A HREF="GURL.html">GURL</A> <B>id_to_url</B>(const <!1><A HREF="DjVuPort.html">DjVuPort</A> * source, const GUTF8String &amp;id)
+<A HREF="#DOC.1.4.28.4.13"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   <!1><A HREF="GURL.html">GURL</A> <B>id_to_url</B>(const <!1><A HREF="DjVuPort.html">DjVuPort</A> * source, const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;id)
 <DD><I>Computes destination list for <TT>source</TT> and calls the corresponding function in each of the ports from the destination list starting from the closest until one of them returns non-empty <!1><A HREF="GURL.html">GURL</A>.</I>
 <DT>
-<A HREF="#DOC.1.4.28.4.14"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   <!1><A HREF="GPBase.html">GPBase</A> <B>id_to_file</B>(const <!1><A HREF="DjVuPort.html">DjVuPort</A> * source, const GUTF8String &amp;id)
+<A HREF="#DOC.1.4.28.4.14"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVuFile.html">DjVuFile</A>&gt;  <B>id_to_file</B>(const <!1><A HREF="DjVuPort.html">DjVuPort</A> * source, const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;id)
 <DD><I>Computes destination list for <TT>source</TT> and calls the corresponding function in each of the ports from the destination list starting from the closest until one of them returns non-zero pointer to <!1><A HREF="DjVuFile.html">DjVuFile</A>.</I>
 <DT>
 <A HREF="#DOC.1.4.28.4.15"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DataPool.html">DataPool</A>&gt;  <B>request_data</B>(const <!1><A HREF="DjVuPort.html">DjVuPort</A> * source, const <!1><A HREF="GURL.html">GURL</A> &amp; url)
 <DD><I>Computes destination list for <TT>source</TT> and calls the corresponding function in each of the ports from the destination list starting from the closest until one of them returns non-zero <!1><A HREF="DataPool.html">DataPool</A>.</I>
 <DT>
-<A HREF="#DOC.1.4.28.4.16"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   bool <B>notify_error</B>(const <!1><A HREF="DjVuPort.html">DjVuPort</A> * source, const GUTF8String &amp;msg)
+<A HREF="#DOC.1.4.28.4.16"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   bool <B>notify_error</B>(const <!1><A HREF="DjVuPort.html">DjVuPort</A> * source, const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;msg)
 <DD><I>Computes destination list for <TT>source</TT> and calls the corresponding.</I>
 <DT>
-<A HREF="#DOC.1.4.28.4.17"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   bool <B>notify_status</B>(const <!1><A HREF="DjVuPort.html">DjVuPort</A> * source, const GUTF8String &amp;msg)
+<A HREF="#DOC.1.4.28.4.17"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   bool <B>notify_status</B>(const <!1><A HREF="DjVuPort.html">DjVuPort</A> * source, const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;msg)
 <DD><I>Computes destination list for <TT>source</TT> and calls the corresponding function in each of the ports from the destination list starting from the closest until one of them returns 1.</I>
 <DT>
 <A HREF="#DOC.1.4.28.4.18"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>notify_redisplay</B>(const class <!1><A HREF="DjVuImage.html">DjVuImage</A> * source)
@@ -69,7 +69,7 @@
 <A HREF="#DOC.1.4.28.4.19"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>notify_relayout</B>(const class <!1><A HREF="DjVuImage.html">DjVuImage</A> * source)
 <DD><I>Computes destination list for <TT>source</TT> and calls the corresponding function in each of the ports from the destination list starting from the closest.</I>
 <DT>
-<A HREF="#DOC.1.4.28.4.20"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>notify_chunk_done</B>(const <!1><A HREF="DjVuPort.html">DjVuPort</A> * source, const GUTF8String &amp;name)
+<A HREF="#DOC.1.4.28.4.20"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>notify_chunk_done</B>(const <!1><A HREF="DjVuPort.html">DjVuPort</A> * source, const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;name)
 <DD><I>Computes destination list for <TT>source</TT> and calls the corresponding function in each of the ports from the destination list starting from the closest.</I>
 <DT>
 <A HREF="#DOC.1.4.28.4.21"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>notify_file_flags_changed</B>(const class <!1><A HREF="DjVuFile.html">DjVuFile</A> * source, long set_mask, long clr_mask)
@@ -158,7 +158,7 @@ to an existing <TT>DjVuPort</TT>.  Returns a null pointer otherwise.
 <DL><DT><DD></DL><P>
 <A NAME="add_alias">
 <A NAME="DOC.1.4.28.4.8">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void add_alias(const <!1><A HREF="DjVuPort.html">DjVuPort</A> * port, const GUTF8String &amp;alias)</B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void add_alias(const <!1><A HREF="DjVuPort.html">DjVuPort</A> * port, const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;alias)</B></TT>
 <DD>Assigns one more <EM>alias</EM> for the specified <!1><A HREF="DjVuPort.html">DjVuPort</A>.
 <EM>Aliases</EM> are names, which can be used later to retrieve this
 <!1><A HREF="DjVuPort.html">DjVuPort</A>, if it still exists. Any <!1><A HREF="DjVuPort.html">DjVuPort</A> may have
@@ -179,28 +179,28 @@ removed.
 <DL><DT><DD></DL><P>
 <A NAME="alias_to_port">
 <A NAME="DOC.1.4.28.4.11">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVuPort.html">DjVuPort</A>&gt;  alias_to_port(const GUTF8String &amp;name)</B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVuPort.html">DjVuPort</A>&gt;  alias_to_port(const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;name)</B></TT>
 <DD>Returns <!1><A HREF="DjVuPort.html">DjVuPort</A> associated with the given <TT>alias</TT>. If nothing
 is known about name <TT>alias</TT>, or the port associated with it has
 already been destroyed <TT>ZERO</TT> pointer will be returned. 
 <DL><DT><DD></DL><P>
 <A NAME="prefix_to_ports">
 <A NAME="DOC.1.4.28.4.12">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>GPList&lt;<!1><A HREF="DjVuPort.html">DjVuPort</A>&gt;  prefix_to_ports(const GUTF8String &amp;prefix)</B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>GPList&lt;<!1><A HREF="DjVuPort.html">DjVuPort</A>&gt;  prefix_to_ports(const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;prefix)</B></TT>
 <DD>Returns a list of <!1><A HREF="DjVuPort.html">DjVuPort</A>s with aliases starting with
 <TT>prefix</TT>. If no <!1><A HREF="DjVuPort.html">DjVuPort</A>s have been found, empty
 list is returned. 
 <DL><DT><DD></DL><P>
 <A NAME="id_to_url">
 <A NAME="DOC.1.4.28.4.13">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   <!1><A HREF="GURL.html">GURL</A> id_to_url(const <!1><A HREF="DjVuPort.html">DjVuPort</A> * source, const GUTF8String &amp;id)</B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   <!1><A HREF="GURL.html">GURL</A> id_to_url(const <!1><A HREF="DjVuPort.html">DjVuPort</A> * source, const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;id)</B></TT>
 <DD>Computes destination list for <TT>source</TT> and calls the corresponding
 function in each of the ports from the destination list starting from
 the closest until one of them returns non-empty <!1><A HREF="GURL.html">GURL</A>. 
 <DL><DT><DD></DL><P>
 <A NAME="id_to_file">
 <A NAME="DOC.1.4.28.4.14">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   <!1><A HREF="GPBase.html">GPBase</A> id_to_file(const <!1><A HREF="DjVuPort.html">DjVuPort</A> * source, const GUTF8String &amp;id)</B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVuFile.html">DjVuFile</A>&gt;  id_to_file(const <!1><A HREF="DjVuPort.html">DjVuPort</A> * source, const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;id)</B></TT>
 <DD>Computes destination list for <TT>source</TT> and calls the corresponding
 function in each of the ports from the destination list starting from
 the closest until one of them returns non-zero pointer to
@@ -215,14 +215,14 @@ the closest until one of them returns non-zero <!1><A HREF="DataPool.html">DataP
 <DL><DT><DD></DL><P>
 <A NAME="notify_error">
 <A NAME="DOC.1.4.28.4.16">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   bool notify_error(const <!1><A HREF="DjVuPort.html">DjVuPort</A> * source, const GUTF8String &amp;msg)</B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   bool notify_error(const <!1><A HREF="DjVuPort.html">DjVuPort</A> * source, const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;msg)</B></TT>
 <DD>Computes destination list for <TT>source</TT> and calls the corresponding.
 function in each of the ports from the destination starting from
 the closest until one of them returns 1. 
 <DL><DT><DD></DL><P>
 <A NAME="notify_status">
 <A NAME="DOC.1.4.28.4.17">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   bool notify_status(const <!1><A HREF="DjVuPort.html">DjVuPort</A> * source, const GUTF8String &amp;msg)</B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   bool notify_status(const <!1><A HREF="DjVuPort.html">DjVuPort</A> * source, const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;msg)</B></TT>
 <DD>Computes destination list for <TT>source</TT> and calls the corresponding
 function in each of the ports from the destination list starting from
 the closest until one of them returns 1. 
@@ -243,7 +243,7 @@ the closest.
 <DL><DT><DD></DL><P>
 <A NAME="notify_chunk_done">
 <A NAME="DOC.1.4.28.4.20">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   void notify_chunk_done(const <!1><A HREF="DjVuPort.html">DjVuPort</A> * source, const GUTF8String &amp;name)</B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   void notify_chunk_done(const <!1><A HREF="DjVuPort.html">DjVuPort</A> * source, const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;name)</B></TT>
 <DD>Computes destination list for <TT>source</TT> and calls the corresponding
 function in each of the ports from the destination list starting from
 the closest. 

@@ -70,7 +70,7 @@
 <A HREF="#DOC.1.4.27.3.16"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GMapArea.html">GMapArea</A>&gt;  <B>get_copy</B>(void) const 
 <DD><I>Returns a copy of the polygon</I>
 <DT>
-<A HREF="#DOC.1.4.27.3.17"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>get_coords</B>( GList&lt;int&gt; &amp; CoordList )
+<A HREF="#DOC.1.4.27.3.17"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>get_coords</B>( GList&lt;int&gt; &amp; CoordList ) const 
 <DD><I>Virtual function generating a list of defining coordinates</I>
 <DT>
 <A HREF="#DOC.1.4.27.3.18"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>map</B>(<!1><A HREF="GRectMapper.html">GRectMapper</A> &amp;mapper)
@@ -85,11 +85,11 @@
 <DL>
 <P><DL>
 <DT><H3>Public Fields</H3><DD><DT>
-<IMG ALT="o" SRC=icon2.gif>GUTF8String <B>url</B>
+<IMG ALT="o" SRC=icon2.gif><!1><A HREF="GURL.html">GURL</A> <B>url</B>
 <DT>
-<IMG ALT="o" SRC=icon2.gif>GUTF8String <B>target</B>
+<IMG ALT="o" SRC=icon2.gif><!1><A HREF="GUTF8String.html">GUTF8String</A> <B>target</B>
 <DT>
-<IMG ALT="o" SRC=icon2.gif>GUTF8String <B>comment</B>
+<IMG ALT="o" SRC=icon2.gif><!1><A HREF="GUTF8String.html">GUTF8String</A> <B>comment</B>
 <DT>
 <IMG ALT="o" SRC=icon2.gif>BorderType <B>border_type</B>
 <DT>
@@ -104,17 +104,17 @@
 
 <P><DL>
 <DT><H3>Public Methods</H3><DD><DT>
-<IMG ALT="o" SRC=icon2.gif>bool <B>is_point_inside</B>(int x, int y)
+<IMG ALT="o" SRC=icon2.gif>bool <B>is_point_inside</B>(int x, int y) const 
 <DT>
-<IMG ALT="o" SRC=icon2.gif>int <B>get_xmin</B>(void)
+<IMG ALT="o" SRC=icon2.gif>int <B>get_xmin</B>(void) const 
 <DT>
-<IMG ALT="o" SRC=icon2.gif>int <B>get_ymin</B>(void)
+<IMG ALT="o" SRC=icon2.gif>int <B>get_ymin</B>(void) const 
 <DT>
-<IMG ALT="o" SRC=icon2.gif>int <B>get_xmax</B>(void)
+<IMG ALT="o" SRC=icon2.gif>int <B>get_xmax</B>(void) const 
 <DT>
-<IMG ALT="o" SRC=icon2.gif>int <B>get_ymax</B>(void)
+<IMG ALT="o" SRC=icon2.gif>int <B>get_ymax</B>(void) const 
 <DT>
-<IMG ALT="o" SRC=icon2.gif><!1><A HREF="GRect.html">GRect</A> <B>get_bound_rect</B>(void)
+<IMG ALT="o" SRC=icon2.gif><!1><A HREF="GRect.html">GRect</A> <B>get_bound_rect</B>(void) const 
 <DT>
 <IMG ALT="o" SRC=icon2.gif>void <B>move</B>(int dx, int dy)
 <DT>
@@ -124,7 +124,7 @@
 <DT>
 <IMG ALT="o" SRC=icon2.gif>char const* const <B>check_object</B>(void)
 <DT>
-<IMG ALT="o" SRC=icon2.gif>GUTF8String <B>print</B>(void)
+<IMG ALT="o" SRC=icon2.gif><!1><A HREF="GUTF8String.html">GUTF8String</A> <B>print</B>(void)
 </DL></P>
 
 <P><DL>
@@ -242,7 +242,7 @@ the polygonal hyperlink. </BLOCKQUOTE>
 <DL><DT><DD></DL><P>
 <A NAME="get_coords">
 <A NAME="DOC.1.4.27.3.17">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void get_coords( GList&lt;int&gt; &amp; CoordList )</B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void get_coords( GList&lt;int&gt; &amp; CoordList ) const </B></TT>
 <DD>Virtual function generating a list of defining coordinates
 <DL><DT><DD></DL><P>
 <A NAME="map">

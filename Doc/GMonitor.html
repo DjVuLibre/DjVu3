@@ -22,10 +22,10 @@
 <DL>
 <P><DL>
 <DT><H3>Public Methods</H3><DD><DT>
-<A HREF="#DOC.1.4.9.2.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GMonitorLock</B>(<!1><A HREF="GMonitor.html">GMonitor</A> *gsec)
+<A HREF="#DOC.1.4.11.2.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GMonitorLock</B>(<!1><A HREF="GMonitor.html">GMonitor</A> *gsec)
 <DD><I>Enters the monitor.</I>
 <DT>
-<A HREF="#DOC.1.4.9.2.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>~GMonitorLock</B>()
+<A HREF="#DOC.1.4.11.2.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>~GMonitorLock</B>()
 <DD><I>Destructor.</I>
 </DL></P>
 
@@ -41,7 +41,7 @@ basic mutual exclusion (mutex) and thread notification facilities
 enter and leave can be used to acquire and release the
 monitor. This mutual exclusion provides an efficient way to protect
 segment of codes (<EM>critical sections</EM>) which should not be
-simultaneously executed by two threads. Class <!1><A HREF="GMonitor.html#DOC.1.4.9.2.1">GMonitorLock</A> provides
+simultaneously executed by two threads. Class <!1><A HREF="GMonitor.html#DOC.1.4.11.2.1">GMonitorLock</A> provides
 a convenient way to do this effectively.<P>When the thread owning the monitor calls function wait, the monitor
 is released and the thread starts waiting until another thread calls
 function signal or broadcast.  When the thread wakes-up, it
@@ -54,7 +54,7 @@ of instances of this class, as implied by the class semantic. </BLOCKQUOTE>
 <DL>
 
 <A NAME="GMonitorLock">
-<A NAME="DOC.1.4.9.2.1">
+<A NAME="DOC.1.4.11.2.1">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> GMonitorLock(<!1><A HREF="GMonitor.html">GMonitor</A> *gsec)</B></TT>
 <DD>Enters the monitor.  If the monitor is acquired by another thread this
 function waits until the monitor is released.  The current thread then
@@ -102,7 +102,7 @@ public:
 /** Constructor. Enters the monitor <TT>gsec</TT>. 
 <DL><DT><DD></DL><P>
 <A NAME="~GMonitorLock">
-<A NAME="DOC.1.4.9.2.2">
+<A NAME="DOC.1.4.11.2.2">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> ~GMonitorLock()</B></TT>
 <DD>Destructor. Leaves the associated monitor. 
 <DL><DT><DD></DL><P></DL>

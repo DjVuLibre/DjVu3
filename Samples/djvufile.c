@@ -85,7 +85,7 @@ main(int argc, char **argv)
   /* Usage */
   if (argc<= 1)
     {
-      fprintf(stderr, 
+      DjVuPrintError("%s",
               "Usage  djvufile [-q] <filenames>\n"
               "  Identifies a djvu file.\n"
               "  Option '-q' makes the command silent.\n"

@@ -33,7 +33,13 @@
    	int
     	main(int argc,const char **argv,char **env)
       {
+                  // Set the locale.
+        setlocale(LC_ALL,&quot;&quot;);
+        DArray&lt;GUTF8String&gt; dargv(argc-1);
+        for(int i=0;i&lt;argc;++i)
+          dargv[i]=GNativeString(argv[i]);
    	    char *profile,*topping,*color;
+
         int redo,bignumber;
 
    		  // This will read in the default configuration file
@@ -44,7 +50,7 @@
         DjVuParseOptions MyOptions(&quot;MyConfigFile&quot;);
 
    		  // This parses the command line arguments.
-        MyOptions.ParseArguments(argc,argv,long_options);
+        MyOptions.ParseArguments(dargv,long_options);
 
    		  // We could for example, check the value of a profile
    		  // option, and switch which profile we are using.
@@ -93,7 +99,7 @@ references.  So when you pass by "value," the profile information is
 still passed by reference.  Consequently if you do something like:<P><PRE>                                        
    	  int foo(DjVuParseOptions);
    	  DjVuParseOptions Opts(&quot;Config&quot;);
-   	  Opts.ParseArguments(argc,argv,long_opts,long_only);
+   	  Opts.ParseArguments(argv,long_opts,long_only);
    	  foo(Opts);
 </PRE><P>the copy of Opts passed to foo will not contain any information from
 the argv[] array.  But it will contain the profile information.

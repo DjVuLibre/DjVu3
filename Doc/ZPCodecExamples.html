@@ -1,6 +1,6 @@
 <HTML>
 <HEAD>
-   <TITLE> </TITLE>
+   <TITLE> ByteStream::</TITLE>
    <META NAME="GENERATOR" CONTENT="DOC++ 3.4.1">
 </HEAD>
 <BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
@@ -105,7 +105,7 @@ The decoding function is very similar to the encoding function:
 <PRE>
     int decode_points(const char *filename, int *x, int *y)
     {
-       StdioByteStream bs(filename, &quot;rb&quot;);
+       StdioByteStream bs(filename,&quot;rb&quot;);
        int n = bs.read32();      // Read number of points.
        ZPCodec zp(bs, 0);        // Construct decoder and context vars.
        BitContext ctxX[255], ctxY[255];

@@ -12,25 +12,38 @@
 <DL>
 <DT>
 
-<IMG ALT="o" BORDER=0 SRC=icon1.gif><A NAME="GString"></A>
-<B>class  GUTF8Stringclass  GNativeStringclass  </B><A HREF=GString.html><B>GString</B></A><B>: protected <!1><A HREF="GP.html#DOC.1.4.6.1">GP</A>&lt;GStringRep&gt;</B><DD><I>General purpose character string.</I>
+<IMG ALT="o" BORDER=0 SRC=icon1.gif><A NAME="GBaseString"></A>
+<B>class  GUTF8Stringclass  GNativeStringclass  </B><A HREF=GBaseString.html><B>GBaseString</B></A><B>: protected <!1><A HREF="GP.html#DOC.1.4.6.1">GP</A>&lt;GStringRep&gt;</B><DD><I>General purpose character string.</I>
+<DT>
+
+<IMG ALT="o" BORDER=0 SRC=icon1.gif><A NAME="GUTF8String"></A>
+<B>class  </B><A HREF=GUTF8String.html><B>GUTF8String</B></A><B>: public <!1><A HREF="GBaseString.html#DOC.1.4.7.1.5">GBaseString</A></B><DD><I>General purpose character string.</I>
+<DT>
+
+<IMG ALT="o" BORDER=0 SRC=icon1.gif><A NAME="GNativeString"></A>
+<B>class  </B><A HREF=GNativeString.html><B>GNativeString</B></A><B>: public <!1><A HREF="GBaseString.html#DOC.1.4.7.1.5">GBaseString</A></B><DD><I>General purpose character string.</I>
 </DL>
 <A NAME="DOC.DOCU">
 <BLOCKQUOTE>
-Files <TT>&quot;GString.h&quot;</TT> and <TT>&quot;GString.cpp&quot;</TT> implement a general purpose string
-class <!1><A HREF="GString.html">GString</A>. This implementation relies on smart pointers (see
-GSmartPointer.h).<P><B>Historical Comments</B> --- At some point during the DjVu research era,
-it became clear that C++ compilers rarely provided portable libraries. We
-then decided to avoid fancy classes (like
-rely only on the good old C library.  A good string class however is very
-useful.  We had already randomly picked letter 'G' to prefix class names
-and we logically derived the new class name.  Native English speakers kept
-laughing in hiding.  This is ironic because we completely forgot this
-letter 'G' when creating more challenging things like the ZP Coder or the
-IW44 wavelets.<P></BLOCKQUOTE>
+Files <TT>&quot;GString.h&quot;</TT> and <TT>&quot;GString.cpp&quot;</TT> implement a general
+purpose string class <!1><A HREF="GBaseString.html">GBaseString</A>, with dirived types
+<!1><A HREF="GUTF8String.html">GUTF8String</A> and <!1><A HREF="GNativeString.html">GNativeString</A> for UTF8 MBS encoding
+and the current Native MBS encoding respectively.  This
+implementation relies on smart pointers (see
+GSmartPointer.h).<P><B>Historical Comments</B> --- At some point during the DjVu
+research era, it became clear that C++ compilers rarely provided
+portable libraries. We then decided to avoid fancy classes (like<P>library.  A good string class however is very useful.  We had
+already randomly picked letter 'G' to prefix class names and we
+logically derived the new class name.  Native English speakers
+kept laughing in hiding.  This is ironic because we completely
+forgot this letter 'G' when creating more challenging things
+like the ZP Coder or the IW44 wavelets.  When converting to
+I18N, we realized two string classes where needing, replacing
+the original GString with <!1><A HREF="GUTF8String.html">GUTF8String</A> and 
+<!1><A HREF="GNativeString.html">GNativeString</A>.<P></BLOCKQUOTE>
 <DL><DT><DT><B>Author:</B><DD>L&eacute;on Bottou &lt;leonb@research.att.com&gt; -- initial implementation.
 
-<DT><B>Version:</B><DD><TT>$Id: GString.h.html,v 1.12 2001-08-08 18:15:45 docbill Exp $</TT> 
+<DT><B>Version:</B><DD><TT>$Id: GString.h.html,v 1.13 2001-08-08 18:17:07 docbill Exp $</TT> 
 <DD></DL><P><I><A HREF="index.html">Alphabetic index</A></I> <I><A HREF="HIER.html">Hierarchy of classes</A></I></P><HR>
 <!-- This is were the DOC++ footer is defined  -->
 

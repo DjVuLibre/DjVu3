@@ -22,16 +22,16 @@
 <DL>
 <P><DL>
 <DT><H3>Public Methods</H3><DD><DT>
-<A HREF="#DOC.1.4.28.2.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   bool <B>inherits</B>(const GUTF8String &amp;class_name) const 
+<A HREF="#DOC.1.4.28.2.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   bool <B>inherits</B>(const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;class_name) const 
 <DD><I>Returns 1 if <TT>class_name</TT> is <TT>&quot;DjVuPort&quot;</TT> or <TT>&quot;DjVuSimplePort&quot;</TT>.</I>
 <DT>
 <A HREF="#DOC.1.4.28.2.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DataPool.html">DataPool</A>&gt;  <B>request_data</B>(const <!1><A HREF="DjVuPort.html#DOC.1.4.28.1.2">DjVuPort</A> * source, const <!1><A HREF="GURL.html">GURL</A> &amp; url)
 <DD><I>If <TT>url</TT> is local, it created a <!1><A HREF="DataPool.html">DataPool</A>, connects it to the file with the given name and returns.</I>
 <DT>
-<A HREF="#DOC.1.4.28.2.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   bool <B>notify_error</B>(const <!1><A HREF="DjVuPort.html#DOC.1.4.28.1.2">DjVuPort</A> * source, const GUTF8String &amp;msg)
+<A HREF="#DOC.1.4.28.2.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   bool <B>notify_error</B>(const <!1><A HREF="DjVuPort.html#DOC.1.4.28.1.2">DjVuPort</A> * source, const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;msg)
 <DD><I>Displays error on <TT>stderr</TT>. Always returns 1.</I>
 <DT>
-<A HREF="#DOC.1.4.28.2.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   bool <B>notify_status</B>(const <!1><A HREF="DjVuPort.html#DOC.1.4.28.1.2">DjVuPort</A> * source, const GUTF8String &amp;msg)
+<A HREF="#DOC.1.4.28.2.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   bool <B>notify_status</B>(const <!1><A HREF="DjVuPort.html#DOC.1.4.28.1.2">DjVuPort</A> * source, const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;msg)
 <DD><I>Displays status on <TT>stderr</TT>. Always returns 1.</I>
 </DL></P>
 
@@ -50,19 +50,19 @@
 <P> <B>Notifications. </B>
 <P><DL>
 <DT>
-<A HREF="#DOC.1.4.28.1.5.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   <!1><A HREF="GURL.html">GURL</A> <B>id_to_url</B>(const <!1><A HREF="DjVuPort.html#DOC.1.4.28.1.2">DjVuPort</A> * source, const GUTF8String &amp;id)
+<A HREF="#DOC.1.4.28.1.5.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   <!1><A HREF="GURL.html">GURL</A> <B>id_to_url</B>(const <!1><A HREF="DjVuPort.html#DOC.1.4.28.1.2">DjVuPort</A> * source, const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;id)
 <DD><I>This request is issued to request translation of the ID, used in an DjVu INCL chunk to a URL, which may be used to request data associated with included file.</I>
 <DT>
-<A HREF="#DOC.1.4.28.1.5.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   <!1><A HREF="GPBase.html">GPBase</A> <B>id_to_file</B>(const <!1><A HREF="DjVuPort.html#DOC.1.4.28.1.2">DjVuPort</A> * source, const GUTF8String &amp;id)
+<A HREF="#DOC.1.4.28.1.5.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVuFile.html">DjVuFile</A>&gt;  <B>id_to_file</B>(const <!1><A HREF="DjVuPort.html#DOC.1.4.28.1.2">DjVuPort</A> * source, const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;id)
 <DD><I>This request is used to get a file corresponding to the given ID.</I>
 <DT>
 <A HREF="#DOC.1.4.28.1.5.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DataPool.html">DataPool</A>&gt;  <B>request_data</B>(const <!1><A HREF="DjVuPort.html#DOC.1.4.28.1.2">DjVuPort</A> * source, const <!1><A HREF="GURL.html">GURL</A> &amp; url)
 <DD><I>This request is issued when decoder needs additional data for decoding.</I>
 <DT>
-<A HREF="#DOC.1.4.28.1.5.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   bool <B>notify_error</B>(const <!1><A HREF="DjVuPort.html#DOC.1.4.28.1.2">DjVuPort</A> * source, const GUTF8String &amp;msg)
+<A HREF="#DOC.1.4.28.1.5.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   bool <B>notify_error</B>(const <!1><A HREF="DjVuPort.html#DOC.1.4.28.1.2">DjVuPort</A> * source, const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;msg)
 <DD><I>This notification is sent when an error occurs and the error message should be shown to the user.</I>
 <DT>
-<A HREF="#DOC.1.4.28.1.5.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   bool <B>notify_status</B>(const <!1><A HREF="DjVuPort.html#DOC.1.4.28.1.2">DjVuPort</A> * source, const GUTF8String &amp;msg)
+<A HREF="#DOC.1.4.28.1.5.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   bool <B>notify_status</B>(const <!1><A HREF="DjVuPort.html#DOC.1.4.28.1.2">DjVuPort</A> * source, const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;msg)
 <DD><I>This notification is sent to update the decoding status.</I>
 <DT>
 <A HREF="#DOC.1.4.28.1.5.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>notify_redisplay</B>(const class <!1><A HREF="DjVuImage.html">DjVuImage</A> * source)
@@ -71,7 +71,7 @@
 <A HREF="#DOC.1.4.28.1.5.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>notify_relayout</B>(const class <!1><A HREF="DjVuImage.html">DjVuImage</A> * source)
 <DD><I>This notification is sent by \ref{DjVuImage} when its geometry has been changed as a result of decoding.</I>
 <DT>
-<A HREF="#DOC.1.4.28.1.5.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>notify_chunk_done</B>(const <!1><A HREF="DjVuPort.html#DOC.1.4.28.1.2">DjVuPort</A> * source, const GUTF8String &amp;name)
+<A HREF="#DOC.1.4.28.1.5.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>notify_chunk_done</B>(const <!1><A HREF="DjVuPort.html#DOC.1.4.28.1.2">DjVuPort</A> * source, const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;name)
 <DD><I>This notification is sent when a new chunk has been decoded.</I>
 <DT>
 <A HREF="#DOC.1.4.28.1.5.9"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>notify_file_flags_changed</B>(const class <!1><A HREF="DjVuFile.html">DjVuFile</A> * source, long set_mask, long clr_mask)
@@ -116,7 +116,7 @@ are ignored. </BLOCKQUOTE>
 
 <A NAME="inherits">
 <A NAME="DOC.1.4.28.2.2">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   bool inherits(const GUTF8String &amp;class_name) const </B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   bool inherits(const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;class_name) const </B></TT>
 <DD>Returns 1 if <TT>class_name</TT> is <TT>&quot;DjVuPort&quot;</TT> or <TT>&quot;DjVuSimplePort&quot;</TT>.
 <DL><DT><DD></DL><P>
 <A NAME="request_data">
@@ -127,12 +127,12 @@ file with the given name and returns.  Otherwise returns <TT>0</TT>.
 <DL><DT><DD></DL><P>
 <A NAME="notify_error">
 <A NAME="DOC.1.4.28.2.3">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   bool notify_error(const <!1><A HREF="DjVuPort.html#DOC.1.4.28.1.2">DjVuPort</A> * source, const GUTF8String &amp;msg)</B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   bool notify_error(const <!1><A HREF="DjVuPort.html#DOC.1.4.28.1.2">DjVuPort</A> * source, const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;msg)</B></TT>
 <DD>Displays error on <TT>stderr</TT>. Always returns 1.
 <DL><DT><DD></DL><P>
 <A NAME="notify_status">
 <A NAME="DOC.1.4.28.2.4">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   bool notify_status(const <!1><A HREF="DjVuPort.html#DOC.1.4.28.1.2">DjVuPort</A> * source, const GUTF8String &amp;msg)</B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   bool notify_status(const <!1><A HREF="DjVuPort.html#DOC.1.4.28.1.2">DjVuPort</A> * source, const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;msg)</B></TT>
 <DD>Displays status on <TT>stderr</TT>. Always returns 1.
 <DL><DT><DD></DL><P></DL>
 

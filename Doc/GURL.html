@@ -16,18 +16,18 @@
 <DD><I>Copy constructor</I>
 <DT>
 <A HREF="#DOC.1.4.13.1.27"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   <B>~GURL</B>(void)
-<DD><I>The descructor</I>
+<DD><I>The destructor</I>
 <DT>
 <A HREF="#DOC.1.4.13.1.28"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>bool <B>is_valid</B>(void) const 
 <DD><I>Test if the URL is valid.</I>
 <DT>
-<A HREF="#DOC.1.4.13.1.29"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>GUTF8String <B>protocol</B>(void) const 
+<A HREF="#DOC.1.4.13.1.29"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GUTF8String.html">GUTF8String</A> <B>protocol</B>(void) const 
 <DD><I>Extracts the <EM>protocol</EM> part from the URL and returns it</I>
 <DT>
-<A HREF="#DOC.1.4.13.1.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>GUTF8String <B>hash_argument</B>(void) const 
+<A HREF="#DOC.1.4.13.1.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GUTF8String.html">GUTF8String</A> <B>hash_argument</B>(void) const 
 <DD><I>Returns string after the first '#' with decoded escape sequences.</I>
 <DT>
-<A HREF="#DOC.1.4.13.1.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>set_hash_argument</B>(const GUTF8String &amp;arg)
+<A HREF="#DOC.1.4.13.1.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>set_hash_argument</B>(const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;arg)
 <DD><I>Inserts the <TT>arg</TT> after a separating hash into the URL.</I>
 <DT>
 <A HREF="#DOC.1.4.13.1.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>cgi_arguments</B>(void) const 
@@ -36,28 +36,28 @@
 <A HREF="#DOC.1.4.13.1.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>djvu_cgi_arguments</B>(void) const 
 <DD><I>Returns the total number of DjVu-related CGI arguments (arguments following <TT>DJVUOPTS</TT> in the URL).</I>
 <DT>
-<A HREF="#DOC.1.4.13.1.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>GUTF8String <B>cgi_name</B>(int num) const 
+<A HREF="#DOC.1.4.13.1.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GUTF8String.html">GUTF8String</A> <B>cgi_name</B>(int num) const 
 <DD><I>Returns that part of CGI argument number <TT>num</TT>, which is before the equal sign.</I>
 <DT>
-<A HREF="#DOC.1.4.13.1.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>GUTF8String <B>djvu_cgi_name</B>(int num) const 
+<A HREF="#DOC.1.4.13.1.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GUTF8String.html">GUTF8String</A> <B>djvu_cgi_name</B>(int num) const 
 <DD><I>Returns that part of DjVu-related CGI argument number <TT>num</TT>, which is before the equal sign.</I>
 <DT>
-<A HREF="#DOC.1.4.13.1.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>GUTF8String <B>cgi_value</B>(int num) const 
+<A HREF="#DOC.1.4.13.1.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GUTF8String.html">GUTF8String</A> <B>cgi_value</B>(int num) const 
 <DD><I>Returns that part of CGI argument number <TT>num</TT>, which is after the equal sign.</I>
 <DT>
-<A HREF="#DOC.1.4.13.1.9"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>GUTF8String <B>djvu_cgi_value</B>(int num) const 
+<A HREF="#DOC.1.4.13.1.9"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GUTF8String.html">GUTF8String</A> <B>djvu_cgi_value</B>(int num) const 
 <DD><I>Returns that part of DjVu-related CGI argument number <TT>num</TT>, which is after the equal sign.</I>
 <DT>
-<A HREF="#DOC.1.4.13.1.10"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="DArray.html">DArray</A>&lt;GUTF8String&gt;  <B>cgi_names</B>(void) const 
+<A HREF="#DOC.1.4.13.1.10"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="DArray.html">DArray</A>&lt;<!1><A HREF="GUTF8String.html">GUTF8String</A>&gt;  <B>cgi_names</B>(void) const 
 <DD><I>Returns array of all known CGI names (part of CGI argument before the equal sign) </I>
 <DT>
-<A HREF="#DOC.1.4.13.1.11"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="DArray.html">DArray</A>&lt;GUTF8String&gt;  <B>djvu_cgi_names</B>(void) const 
+<A HREF="#DOC.1.4.13.1.11"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="DArray.html">DArray</A>&lt;<!1><A HREF="GUTF8String.html">GUTF8String</A>&gt;  <B>djvu_cgi_names</B>(void) const 
 <DD><I>Returns array of names of DjVu-related CGI arguments (arguments following <TT>DJVUOPTS</TT> option.</I>
 <DT>
-<A HREF="#DOC.1.4.13.1.12"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="DArray.html">DArray</A>&lt;GUTF8String&gt;  <B>cgi_values</B>(void) const 
+<A HREF="#DOC.1.4.13.1.12"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="DArray.html">DArray</A>&lt;<!1><A HREF="GUTF8String.html">GUTF8String</A>&gt;  <B>cgi_values</B>(void) const 
 <DD><I>Returns array of all known CGI names (part of CGI argument before the equal sign) </I>
 <DT>
-<A HREF="#DOC.1.4.13.1.13"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="DArray.html">DArray</A>&lt;GUTF8String&gt;  <B>djvu_cgi_values</B>(void) const 
+<A HREF="#DOC.1.4.13.1.13"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="DArray.html">DArray</A>&lt;<!1><A HREF="GUTF8String.html">GUTF8String</A>&gt;  <B>djvu_cgi_values</B>(void) const 
 <DD><I>Returns array of values of DjVu-related CGI arguments (arguments following <TT>DJVUOPTS</TT> option.</I>
 <DT>
 <A HREF="#DOC.1.4.13.1.30"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>clear_all_arguments</B>(void)
@@ -72,22 +72,22 @@
 <A HREF="#DOC.1.4.13.1.33"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>clear_cgi_arguments</B>(void)
 <DD><I>Erases all CGI arguments (following the first '?')</I>
 <DT>
-<A HREF="#DOC.1.4.13.1.14"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>add_djvu_cgi_argument</B>(const GUTF8String &amp;<!1><A HREF="GURL.html#DOC.1.4.13.1.16">name</A>, const char * value=0)
+<A HREF="#DOC.1.4.13.1.14"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>add_djvu_cgi_argument</B>(const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;<!1><A HREF="GURL.html#DOC.1.4.13.1.16">name</A>, const char * value=0)
 <DD><I>Appends the specified CGI argument.</I>
 <DT>
 <A HREF="#DOC.1.4.13.1.15"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GURL.html#DOC.1.4.13.1.26">GURL</A> <B>base</B>(void) const 
 <DD><I>Returns the URL corresponding to the directory containing the document with this URL.</I>
 <DT>
-<A HREF="#DOC.1.4.13.1.34"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>GUTF8String <B>pathname</B>(void) const 
+<A HREF="#DOC.1.4.13.1.34"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GUTF8String.html">GUTF8String</A> <B>pathname</B>(void) const 
 <DD><I>Returns the aboslute URL without the host part.</I>
 <DT>
-<A HREF="#DOC.1.4.13.1.16"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>GUTF8String <B>name</B>(void) const 
+<A HREF="#DOC.1.4.13.1.16"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GUTF8String.html">GUTF8String</A> <B>name</B>(void) const 
 <DD><I>Returns the name part of this URL.</I>
 <DT>
-<A HREF="#DOC.1.4.13.1.17"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>GUTF8String <B>fname</B>(void) const 
+<A HREF="#DOC.1.4.13.1.17"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GUTF8String.html">GUTF8String</A> <B>fname</B>(void) const 
 <DD><I>Returns the name part of this URL with escape sequences expanded.</I>
 <DT>
-<A HREF="#DOC.1.4.13.1.35"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>GUTF8String <B>extension</B>(void) const 
+<A HREF="#DOC.1.4.13.1.35"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GUTF8String.html">GUTF8String</A> <B>extension</B>(void) const 
 <DD><I>Returns the extention part of name of document in this URL.</I>
 <DT>
 <A HREF="#DOC.1.4.13.1.36"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>bool <B>is_empty</B>(void) const 
@@ -96,10 +96,10 @@
 <A HREF="#DOC.1.4.13.1.37"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>bool <B>is_local_file_url</B>(void) const 
 <DD><I>Checks if the URL is local (starts from <TT>file:/</TT>) or not</I>
 <DT>
-<A HREF="#DOC.1.4.13.1.38"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>friend int <B>operator==</B>(const <!1><A HREF="GURL.html#DOC.1.4.13.1.26">GURL</A> &amp; gurl1, const <!1><A HREF="GURL.html#DOC.1.4.13.1.26">GURL</A> &amp; gurl2)
+<A HREF="#DOC.1.4.13.1.38"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>bool <B>operator==</B>(const <!1><A HREF="GURL.html#DOC.1.4.13.1.26">GURL</A> &amp; gurl2) const 
 <DD><I>Returns TRUE if <TT>gurl1</TT> and <TT>gurl2</TT> are the same</I>
 <DT>
-<A HREF="#DOC.1.4.13.1.39"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>friend int <B>operator!=</B>(const <!1><A HREF="GURL.html#DOC.1.4.13.1.26">GURL</A> &amp; gurl1, const <!1><A HREF="GURL.html#DOC.1.4.13.1.26">GURL</A> &amp; gurl2)
+<A HREF="#DOC.1.4.13.1.39"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>bool <B>operator!=</B>(const <!1><A HREF="GURL.html#DOC.1.4.13.1.26">GURL</A> &amp; gurl2) const 
 <DD><I>Returns TRUE if <TT>gurl1</TT> and <TT>gurl2</TT> are different</I>
 <DT>
 <A HREF="#DOC.1.4.13.1.40"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GURL.html#DOC.1.4.13.1.26">GURL</A>&amp; <B>operator=</B>(const <!1><A HREF="GURL.html#DOC.1.4.13.1.26">GURL</A> &amp; url)
@@ -108,16 +108,16 @@
 <A HREF="#DOC.1.4.13.1.41"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>operator	const char*</B>(void) const 
 <DD><I>Returns Internal URL representation</I>
 <DT>
-<A HREF="#DOC.1.4.13.1.19"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>GUTF8String <B>get_string</B>(const GUTF8String &amp;useragent=GUTF8String()) const 
+<A HREF="#DOC.1.4.13.1.19"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GUTF8String.html">GUTF8String</A> <B>get_string</B>(const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;useragent) const 
 <DD><I>Returns a string representing the URL.</I>
 <DT>
-<A HREF="#DOC.1.4.13.1.42"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   GUTF8String <B>encode_reserved</B>(const GUTF8String &amp;gs)
+<A HREF="#DOC.1.4.13.1.42"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   <!1><A HREF="GUTF8String.html">GUTF8String</A> <B>encode_reserved</B>(const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;gs)
 <DD><I>Escape special characters</I>
 <DT>
-<A HREF="#DOC.1.4.13.1.43"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   GUTF8String <B>encode_reserved</B>(char const * const s)
+<A HREF="#DOC.1.4.13.1.43"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   <!1><A HREF="GUTF8String.html">GUTF8String</A> <B>encode_reserved</B>(char const * const s)
 <DD><I>Escape special characters</I>
 <DT>
-<A HREF="#DOC.1.4.13.1.20"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   GUTF8String <B>decode_reserved</B>(const GUTF8String &amp;url)
+<A HREF="#DOC.1.4.13.1.20"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   <!1><A HREF="GUTF8String.html">GUTF8String</A> <B>decode_reserved</B>(const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;url)
 <DD><I>Decodes reserved characters from the URL.</I>
 <DT>
 <A HREF="#DOC.1.4.13.1.44"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>bool <B>is_local_path</B>(void) const 
@@ -144,16 +144,16 @@
 <A HREF="#DOC.1.4.13.1.49"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>GList&lt;<!1><A HREF="GURL.html#DOC.1.4.13.1.26">GURL</A>&gt;  <B>listdir</B>(void) const 
 <DD><I>List the contents of a directory. </I>
 <DT>
-<A HREF="#DOC.1.4.13.1.23"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>GUTF8String <B>UTF8Filename</B>(void) const 
+<A HREF="#DOC.1.4.13.1.23"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GUTF8String.html">GUTF8String</A> <B>UTF8Filename</B>(void) const 
 <DD><I>Returns a filename for a URL.</I>
 <DT>
-<A HREF="#DOC.1.4.13.1.50"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>GNativeString <B>NativeFilename</B>(void) const 
+<A HREF="#DOC.1.4.13.1.50"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GNativeString.html">GNativeString</A> <B>NativeFilename</B>(void) const 
 <DD><I>Same but returns a native string.</I>
 <DT>
 <A HREF="#DOC.1.4.13.1.24"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>friend unsigned int <B>hash</B>(const <!1><A HREF="GURL.html#DOC.1.4.13.1.26">GURL</A> &amp; gurl)
 <DD><I>Hashing function.</I>
 <DT>
-<A HREF="#DOC.1.4.13.1.25"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   GUTF8String <B>expand_name</B>(const GUTF8String &amp;filename, const char *fromdirname=0)
+<A HREF="#DOC.1.4.13.1.25"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   <!1><A HREF="GUTF8String.html">GUTF8String</A> <B>expand_name</B>(const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;filename, const char *fromdirname=0)
 <DD><I>Returns fully qualified file names.</I>
 </DL></P>
 
@@ -161,11 +161,6 @@
 <DT><H3>Public</H3><DD><DT>
 <A HREF="#DOC.1.4.13.1.18"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Concatenation operators</B>
 <DD><I></I>
-<P><DL>
-<DT>
-<A HREF="#DOC.1.4.13.1.18.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GURL.html#DOC.1.4.13.1.26">GURL</A> <B>operator+</B>(const GUTF8String &amp;<!1><A HREF="GURL.html#DOC.1.4.13.1.16">name</A>) const 
-<DD><I></I>
-</DL></P>
 </DL></P>
 
 <P><DL>
@@ -174,10 +169,7 @@
 <DD><I></I>
 <P><DL>
 <DT>
-<A HREF="#DOC.1.4.13.1.1.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GURL</B>(const GUTF8String &amp; url_string)
-<DD><I></I>
-<DT>
-<A HREF="#DOC.1.4.13.1.1.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GURL</B>(const char * url_string)
+<A HREF="#DOC.1.4.13.1.1.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GURL</B>(const char * url_string)
 <DD><I></I>
 </DL></P>
 </DL></P>
@@ -209,10 +201,6 @@ representation.
 
 <A NAME="GURL">
 <A NAME="DOC.1.4.13.1.1.1">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> GURL(const GUTF8String &amp; url_string)</B></TT>
-<DL><DT><DD></DL><P>
-<A NAME="GURL">
-<A NAME="DOC.1.4.13.1.1.2">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> GURL(const char * url_string)</B></TT>
 <DL><DT><DD></DL><P></DL>
 
@@ -224,7 +212,7 @@ representation.
 <A NAME="~GURL">
 <A NAME="DOC.1.4.13.1.27">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   ~GURL(void)</B></TT>
-<DD>The descructor
+<DD>The destructor
 <DL><DT><DD></DL><P>
 <A NAME="is_valid">
 <A NAME="DOC.1.4.13.1.28">
@@ -233,18 +221,18 @@ representation.
 <DL><DT><DD></DL><P>
 <A NAME="protocol">
 <A NAME="DOC.1.4.13.1.29">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>GUTF8String protocol(void) const </B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GUTF8String.html">GUTF8String</A> protocol(void) const </B></TT>
 <DD>Extracts the <EM>protocol</EM> part from the URL and returns it
 <DL><DT><DD></DL><P>
 <A NAME="hash_argument">
 <A NAME="DOC.1.4.13.1.2">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>GUTF8String hash_argument(void) const </B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GUTF8String.html">GUTF8String</A> hash_argument(void) const </B></TT>
 <DD>Returns string after the first '#' with decoded
 escape sequences. 
 <DL><DT><DD></DL><P>
 <A NAME="set_hash_argument">
 <A NAME="DOC.1.4.13.1.3">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void set_hash_argument(const GUTF8String &amp;arg)</B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void set_hash_argument(const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;arg)</B></TT>
 <DD>Inserts the <TT>arg</TT> after a separating hash into the URL.
 The function encodes any illegal character in <TT>arg</TT> using
 GOS::encode_reserved(). 
@@ -263,49 +251,49 @@ following <TT>DJVUOPTS</TT> in the URL).
 <DL><DT><DD></DL><P>
 <A NAME="cgi_name">
 <A NAME="DOC.1.4.13.1.6">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>GUTF8String cgi_name(int num) const </B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GUTF8String.html">GUTF8String</A> cgi_name(int num) const </B></TT>
 <DD>Returns that part of CGI argument number <TT>num</TT>, which is
 before the equal sign. 
 <DL><DT><DD></DL><P>
 <A NAME="djvu_cgi_name">
 <A NAME="DOC.1.4.13.1.7">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>GUTF8String djvu_cgi_name(int num) const </B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GUTF8String.html">GUTF8String</A> djvu_cgi_name(int num) const </B></TT>
 <DD>Returns that part of DjVu-related CGI argument number <TT>num</TT>,
 which is before the equal sign. 
 <DL><DT><DD></DL><P>
 <A NAME="cgi_value">
 <A NAME="DOC.1.4.13.1.8">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>GUTF8String cgi_value(int num) const </B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GUTF8String.html">GUTF8String</A> cgi_value(int num) const </B></TT>
 <DD>Returns that part of CGI argument number <TT>num</TT>, which is
 after the equal sign. 
 <DL><DT><DD></DL><P>
 <A NAME="djvu_cgi_value">
 <A NAME="DOC.1.4.13.1.9">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>GUTF8String djvu_cgi_value(int num) const </B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GUTF8String.html">GUTF8String</A> djvu_cgi_value(int num) const </B></TT>
 <DD>Returns that part of DjVu-related CGI argument number <TT>num</TT>,
 which is after the equal sign. 
 <DL><DT><DD></DL><P>
 <A NAME="cgi_names">
 <A NAME="DOC.1.4.13.1.10">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="DArray.html">DArray</A>&lt;GUTF8String&gt;  cgi_names(void) const </B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="DArray.html">DArray</A>&lt;<!1><A HREF="GUTF8String.html">GUTF8String</A>&gt;  cgi_names(void) const </B></TT>
 <DD>Returns array of all known CGI names (part of CGI argument before
 the equal sign) 
 <DL><DT><DD></DL><P>
 <A NAME="djvu_cgi_names">
 <A NAME="DOC.1.4.13.1.11">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="DArray.html">DArray</A>&lt;GUTF8String&gt;  djvu_cgi_names(void) const </B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="DArray.html">DArray</A>&lt;<!1><A HREF="GUTF8String.html">GUTF8String</A>&gt;  djvu_cgi_names(void) const </B></TT>
 <DD>Returns array of names of DjVu-related CGI arguments (arguments
 following <TT>DJVUOPTS</TT> option. 
 <DL><DT><DD></DL><P>
 <A NAME="cgi_values">
 <A NAME="DOC.1.4.13.1.12">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="DArray.html">DArray</A>&lt;GUTF8String&gt;  cgi_values(void) const </B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="DArray.html">DArray</A>&lt;<!1><A HREF="GUTF8String.html">GUTF8String</A>&gt;  cgi_values(void) const </B></TT>
 <DD>Returns array of all known CGI names (part of CGI argument before
 the equal sign) 
 <DL><DT><DD></DL><P>
 <A NAME="djvu_cgi_values">
 <A NAME="DOC.1.4.13.1.13">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="DArray.html">DArray</A>&lt;GUTF8String&gt;  djvu_cgi_values(void) const </B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="DArray.html">DArray</A>&lt;<!1><A HREF="GUTF8String.html">GUTF8String</A>&gt;  djvu_cgi_values(void) const </B></TT>
 <DD>Returns array of values of DjVu-related CGI arguments (arguments
 following <TT>DJVUOPTS</TT> option. 
 <DL><DT><DD></DL><P>
@@ -331,7 +319,7 @@ following <TT>DJVUOPTS</TT> option.
 <DL><DT><DD></DL><P>
 <A NAME="add_djvu_cgi_argument">
 <A NAME="DOC.1.4.13.1.14">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void add_djvu_cgi_argument(const GUTF8String &amp;<!1><A HREF="GURL.html#DOC.1.4.13.1.16">name</A>, const char * value=0)</B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void add_djvu_cgi_argument(const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;<!1><A HREF="GURL.html#DOC.1.4.13.1.16">name</A>, const char * value=0)</B></TT>
 <DD>Appends the specified CGI argument. Will insert "<TT>DJVUOPTS</TT>" if
 necessary 
 <DL><DT><DD></DL><P>
@@ -344,24 +332,24 @@ URL and clears everything after the last slash.
 <DL><DT><DD></DL><P>
 <A NAME="pathname">
 <A NAME="DOC.1.4.13.1.34">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>GUTF8String pathname(void) const </B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GUTF8String.html">GUTF8String</A> pathname(void) const </B></TT>
 <DD>Returns the aboslute URL without the host part.
 <DL><DT><DD></DL><P>
 <A NAME="name">
 <A NAME="DOC.1.4.13.1.16">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>GUTF8String name(void) const </B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GUTF8String.html">GUTF8String</A> name(void) const </B></TT>
 <DD>Returns the name part of this URL.
 For example, if the URL is <TT>http:          this function will return </TT>file%201.djvu<TT>. \Ref{fname}() will</TT>return <TT>file 1.djvu</TT> at the same time. 
 <DL><DT><DD></DL><P>
 <A NAME="fname">
 <A NAME="DOC.1.4.13.1.17">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>GUTF8String fname(void) const </B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GUTF8String.html">GUTF8String</A> fname(void) const </B></TT>
 <DD>Returns the name part of this URL with escape sequences expanded.
 For example, if the URL is <TT>http:          this function will return </TT>file 1.djvu<TT>. \Ref{name}() will</TT>return <TT>file%201.djvu</TT> at the same time. 
 <DL><DT><DD></DL><P>
 <A NAME="extension">
 <A NAME="DOC.1.4.13.1.35">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>GUTF8String extension(void) const </B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GUTF8String.html">GUTF8String</A> extension(void) const </B></TT>
 <DD>Returns the extention part of name of document in this URL.
 <DL><DT><DD></DL><P>
 <A NAME="is_empty">
@@ -381,21 +369,15 @@ For example, if the URL is <TT>http:          this function will return </TT>fil
 is absolute (has non empty protocol prefix), we just return
 <TT>GURL(name)</TT>. Otherwise the <TT>name</TT> is appended to the GURL after a
 separating slash.
-<DL><DT><DD></DL><P><DL>
-
-<A NAME="operator+">
-<A NAME="DOC.1.4.13.1.18.1">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GURL.html#DOC.1.4.13.1.26">GURL</A> operator+(const GUTF8String &amp;<!1><A HREF="GURL.html#DOC.1.4.13.1.16">name</A>) const </B></TT>
-<DL><DT><DD></DL><P></DL>
-
+<DL><DT><DD></DL><P>
 <A NAME="operator==">
 <A NAME="DOC.1.4.13.1.38">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>friend int operator==(const <!1><A HREF="GURL.html#DOC.1.4.13.1.26">GURL</A> &amp; gurl1, const <!1><A HREF="GURL.html#DOC.1.4.13.1.26">GURL</A> &amp; gurl2)</B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>bool operator==(const <!1><A HREF="GURL.html#DOC.1.4.13.1.26">GURL</A> &amp; gurl2) const </B></TT>
 <DD>Returns TRUE if <TT>gurl1</TT> and <TT>gurl2</TT> are the same
 <DL><DT><DD></DL><P>
 <A NAME="operator!=">
 <A NAME="DOC.1.4.13.1.39">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>friend int operator!=(const <!1><A HREF="GURL.html#DOC.1.4.13.1.26">GURL</A> &amp; gurl1, const <!1><A HREF="GURL.html#DOC.1.4.13.1.26">GURL</A> &amp; gurl2)</B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>bool operator!=(const <!1><A HREF="GURL.html#DOC.1.4.13.1.26">GURL</A> &amp; gurl2) const </B></TT>
 <DD>Returns TRUE if <TT>gurl1</TT> and <TT>gurl2</TT> are different
 <DL><DT><DD></DL><P>
 <A NAME="operator=">
@@ -410,7 +392,7 @@ separating slash.
 <DL><DT><DD></DL><P>
 <A NAME="get_string">
 <A NAME="DOC.1.4.13.1.19">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>GUTF8String get_string(const GUTF8String &amp;useragent=GUTF8String()) const </B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GUTF8String.html">GUTF8String</A> get_string(const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;useragent) const </B></TT>
 <DD>Returns a string representing the URL.  This function normally
 returns a standard file URL as described in RFC 1738.  
 Some versions of MSIE do not support this standard syntax.
@@ -420,17 +402,17 @@ when the optional argument <TT>useragent</TT> contains string <TT>&quot;MSIE&quo
 <DL><DT><DD></DL><P>
 <A NAME="encode_reserved">
 <A NAME="DOC.1.4.13.1.42">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static   GUTF8String encode_reserved(const GUTF8String &amp;gs)</B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static   <!1><A HREF="GUTF8String.html">GUTF8String</A> encode_reserved(const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;gs)</B></TT>
 <DD>Escape special characters
 <DL><DT><DD></DL><P>
 <A NAME="encode_reserved">
 <A NAME="DOC.1.4.13.1.43">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static   GUTF8String encode_reserved(char const * const s)</B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static   <!1><A HREF="GUTF8String.html">GUTF8String</A> encode_reserved(char const * const s)</B></TT>
 <DD>Escape special characters
 <DL><DT><DD></DL><P>
 <A NAME="decode_reserved">
 <A NAME="DOC.1.4.13.1.20">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static   GUTF8String decode_reserved(const GUTF8String &amp;url)</B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static   <!1><A HREF="GUTF8String.html">GUTF8String</A> decode_reserved(const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;url)</B></TT>
 <DD>Decodes reserved characters from the URL.
 See also: <!1><A HREF="GURL.html#DOC.1.4.13.1.42">encode_reserved</A>(). 
 <DL><DT><DD></DL><P>
@@ -479,7 +461,7 @@ itself will not be removed.
 <DL><DT><DD></DL><P>
 <A NAME="UTF8Filename">
 <A NAME="DOC.1.4.13.1.23">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>GUTF8String UTF8Filename(void) const </B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GUTF8String.html">GUTF8String</A> UTF8Filename(void) const </B></TT>
 <DD>Returns a filename for a URL. Argument <TT>url</TT> must be a legal file URL.
 This function applies heuristic rules to convert the URL into a valid
 file name. It is guaranteed that this function can properly parse all
@@ -491,7 +473,7 @@ formats for files on the local host:<P>file:                file:               
 <DL><DT><DD></DL><P>
 <A NAME="NativeFilename">
 <A NAME="DOC.1.4.13.1.50">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>GNativeString NativeFilename(void) const </B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GNativeString.html">GNativeString</A> NativeFilename(void) const </B></TT>
 <DD>Same but returns a native string.
 <DL><DT><DD></DL><P>
 <A NAME="hash">
@@ -502,7 +484,7 @@ formats for files on the local host:<P>file:                file:               
 <DL><DT><DT><B>Returns:</B><DD>  hash suitable for usage in <!1><A HREF="GMap.html">GMap</A> <BR><DD></DL><P>
 <A NAME="expand_name">
 <A NAME="DOC.1.4.13.1.25">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static   GUTF8String expand_name(const GUTF8String &amp;filename, const char *fromdirname=0)</B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static   <!1><A HREF="GUTF8String.html">GUTF8String</A> expand_name(const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;filename, const char *fromdirname=0)</B></TT>
 <DD>Returns fully qualified file names.  This functions constructs the fully
 qualified name of file or directory <TT>filename</TT>. When provided, the
 optional argument <TT>fromdirname</TT> is used as the current directory when

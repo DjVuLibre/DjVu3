@@ -12,7 +12,7 @@
 <DL>
 <P><DL>
 <DT><H3>Public Methods</H3><DD><DT>
-<A HREF="#DOC.1.4.3.1.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GException</B>(const char *cause, const char *file=0, int line=0, const char *func=0)
+<A HREF="#DOC.1.4.3.1.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GException</B>(const char *cause, const char *file=0, int line=0, const char *func=0, const source_type source=GINTERNAL)
 <DD><I>Constructs a GException.</I>
 <DT>
 <A HREF="#DOC.1.4.3.1.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GException</B>(const <!1><A HREF="GException.html#DOC.1.4.3.1.1">GException</A> &amp; exc)
@@ -33,13 +33,22 @@
 <A HREF="#DOC.1.4.3.1.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>const char* <B>get_cause</B>(void) const 
 <DD><I>Returns the string describing the cause of the exception.</I>
 <DT>
-<A HREF="#DOC.1.4.3.1.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>const char* <B>get_function</B>(void) const 
+<A HREF="#DOC.1.4.3.1.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>cmp_cause</B>(const char s2[]) const 
+<DD><I>Compares the cause with the specified string, ignoring anything after the first tab.</I>
+<DT>
+<A HREF="#DOC.1.4.3.1.9"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   int <B>cmp_cause</B>(const char s1[], const char s2[])
+<DD><I>Compares the cause with the specified string, ignoring anything after the first tab.</I>
+<DT>
+<A HREF="#DOC.1.4.3.1.10"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>const char* <B>get_function</B>(void) const 
 <DD><I>Returns the function name from which the exception was thrown.</I>
 <DT>
-<A HREF="#DOC.1.4.3.1.9"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>const char* <B>get_file</B>(void) const 
+<A HREF="#DOC.1.4.3.1.11"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>const char* <B>get_file</B>(void) const 
 <DD><I>Returns the file name from which the exception was thrown.</I>
 <DT>
-<A HREF="#DOC.1.4.3.1.10"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_line</B>(void) const 
+<A HREF="#DOC.1.4.3.1.12"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>source_type <B>get_source</B>(void) const 
+<DD><I>Returns the exception source </I>
+<DT>
+<A HREF="#DOC.1.4.3.1.13"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_line</B>(void) const 
 <DD><I>Returns the line number from which the exception was thrown.</I>
 </DL></P>
 
@@ -56,11 +65,11 @@ only deal with exceptions of type <TT>GException</TT>. </BLOCKQUOTE>
 
 <A NAME="GException">
 <A NAME="DOC.1.4.3.1.1">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> GException(const char *cause, const char *file=0, int line=0, const char *func=0)</B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> GException(const char *cause, const char *file=0, int line=0, const char *func=0, const source_type source=GINTERNAL)</B></TT>
 <DD>Constructs a GException.  This constructor is usually called by macro
-<TT>THROW</TT>.  Argument <TT>cause</TT> is a plain text error message. As a
-convention, string <TT>&quot;EOF&quot;</TT> is used when reaching an unexpected
-end-of-file condition and string <TT>&quot;STOP&quot;</TT> is used when the user
+<TT>G_THROW</TT>.  Argument <TT>cause</TT> is a plain text error message. As a
+convention, string <TT>ByteStream::EndOfFile</TT> is used when reaching an unexpected
+end-of-file condition and string <TT>DataPool::Stop</TT> is used when the user
 interrupts the execution. The remaining arguments are usually provided
 by the predefined macros <TT>__FILE__</TT>, <TT>__LINE__</TT>, and (G++ and EGCS only)
 <TT>__PRETTY_FUNCTION__</TT>.  
@@ -96,27 +105,46 @@ by the predefined macros <TT>__FILE__</TT>, <TT>__LINE__</TT>, and (G++ and EGCS
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>const char* get_cause(void) const </B></TT>
 <DD>Returns the string describing the cause of the exception.  The returned
 pointer is never null.  Exception handlers should not rely on the value
-of the string <TT>cause</TT>.  As a convention however, string <TT>&quot;EOF&quot;</TT> is used
-when reaching an unexpected end-of-file condition and string <TT>&quot;STOP&quot;</TT> is
-used when the user interrupts the execution. These strings can be tested
-by the exception handlers. Similar conventional strings may be defined
+of the string <TT>cause</TT>.  As a convention however, string
+<TT>ByteStream::EndOfFile</TT> is used
+when reaching an unexpected end-of-file condition and string
+<TT>DataPool::Stop</TT> is used when the user interrupts the execution. These
+strings can be tested by the exception handlers, with
+<TT>cmp_cause</TT>. Similar conventional strings may be defined
 in the future. They all will be small strings with only uppercase
 characters. 
 <DL><DT><DD></DL><P>
-<A NAME="get_function">
+<A NAME="cmp_cause">
 <A NAME="DOC.1.4.3.1.8">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int cmp_cause(const char s2[]) const </B></TT>
+<DD>Compares the cause with the specified string, ignoring anything after
+the first tab. 
+<DL><DT><DD></DL><P>
+<A NAME="cmp_cause">
+<A NAME="DOC.1.4.3.1.9">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static   int cmp_cause(const char s1[], const char s2[])</B></TT>
+<DD>Compares the cause with the specified string, ignoring anything after
+the first tab. 
+<DL><DT><DD></DL><P>
+<A NAME="get_function">
+<A NAME="DOC.1.4.3.1.10">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>const char* get_function(void) const </B></TT>
 <DD>Returns the function name from which the exception was thrown.
 A null pointer is returned if no function name is available. 
 <DL><DT><DD></DL><P>
 <A NAME="get_file">
-<A NAME="DOC.1.4.3.1.9">
+<A NAME="DOC.1.4.3.1.11">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>const char* get_file(void) const </B></TT>
 <DD>Returns the file name from which the exception was thrown.
 A null pointer is returned if no file name is available. 
 <DL><DT><DD></DL><P>
+<A NAME="get_source">
+<A NAME="DOC.1.4.3.1.12">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>source_type get_source(void) const </B></TT>
+<DD>Returns the exception source 
+<DL><DT><DD></DL><P>
 <A NAME="get_line">
-<A NAME="DOC.1.4.3.1.10">
+<A NAME="DOC.1.4.3.1.13">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int get_line(void) const </B></TT>
 <DD>Returns the line number from which the exception was thrown.
 A zero is returned if no line number is available. 

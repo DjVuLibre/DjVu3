@@ -21,13 +21,13 @@
 <A HREF="#DOC.1.4.36.3.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>inline   const char* const <B>GetString</B>(const int token) const 
 <DD><I>Lookup up a string given the token </I>
 <DT>
-<A HREF="#DOC.1.4.36.3.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>GetToken</B>(const char name[]) const 
+<A HREF="#DOC.1.4.36.3.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>GetToken</B>(const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;name) const 
 <DD><I>Lookup up a token given a string </I>
 <DT>
-<A HREF="#DOC.1.4.36.3.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>SetToken</B>(const char name[])
+<A HREF="#DOC.1.4.36.3.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>SetToken</B>(const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;name)
 <DD><I>Assign a token if not already assigned and return it given the string </I>
 <DT>
-<A HREF="#DOC.1.4.36.3.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>friend void <B>DjVuParseOptions::init</B>(const char [], const char [])
+<A HREF="#DOC.1.4.36.3.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>friend void <B>DjVuParseOptions::init</B>(const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;, const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;)
 <DD><I>Everybody needs friends </I>
 </DL></P>
 
@@ -67,17 +67,17 @@ allow a simple mapping between strings and a fixed size array. </BLOCKQUOTE>
 <DL><DT><DD></DL><P>
 <A NAME="GetToken">
 <A NAME="DOC.1.4.36.3.4">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int GetToken(const char name[]) const </B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int GetToken(const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;name) const </B></TT>
 <DD>Lookup up a token given a string 
 <DL><DT><DD></DL><P>
 <A NAME="SetToken">
 <A NAME="DOC.1.4.36.3.5">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int SetToken(const char name[])</B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int SetToken(const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;name)</B></TT>
 <DD>Assign a token if not already assigned and return it given the string 
 <DL><DT><DD></DL><P>
 <A NAME="DjVuParseOptions::init">
 <A NAME="DOC.1.4.36.3.6">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>friend void DjVuParseOptions::init(const char [], const char [])</B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>friend void DjVuParseOptions::init(const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;, const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;)</B></TT>
 <DD>Everybody needs friends 
 <DL><DT><DD></DL><P></DL>
 

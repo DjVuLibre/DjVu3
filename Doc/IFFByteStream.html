@@ -31,7 +31,7 @@
 <A HREF="#DOC.1.4.15.1.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="IFFByteStream.html">IFFByteStream</A>&gt;  <B>create</B>(<!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="ByteStream.html">ByteStream</A>&gt; bs)
 <DD><I>Constructs an IFFByteStream object attached to ByteStream <TT>bs</TT>.</I>
 <DT>
-<A HREF="#DOC.1.4.15.1.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_chunk</B>(GUTF8String &amp;chkid, int *rawoffsetptr=0, int *rawsizeptr=0)
+<A HREF="#DOC.1.4.15.1.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_chunk</B>(<!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;chkid, int *rawoffsetptr=0, int *rawsizeptr=0)
 <DD><I>Enters a chunk for reading.</I>
 <DT>
 <A HREF="#DOC.1.4.15.1.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>put_chunk</B>(const char *chkid, int insertmagic=0)
@@ -49,10 +49,10 @@
 <A HREF="#DOC.1.4.15.1.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>composite</B>()
 <DD><I>Returns true when the current chunk is a composite chunk.</I>
 <DT>
-<A HREF="#DOC.1.4.15.1.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>short_id</B>(GUTF8String &amp;chkid)
+<A HREF="#DOC.1.4.15.1.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>short_id</B>(<!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;chkid)
 <DD><I>Returns the current chunk identifier of the current chunk.</I>
 <DT>
-<A HREF="#DOC.1.4.15.1.9"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>full_id</B>(GUTF8String &amp;chkid)
+<A HREF="#DOC.1.4.15.1.9"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>full_id</B>(<!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;chkid)
 <DD><I>Returns the qualified chunk identifier of the current chunk.</I>
 <DT>
 <A HREF="#DOC.1.4.15.1.10"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   int <B>check_id</B>(const char *id)
@@ -103,7 +103,7 @@ an IFF file however requires a seekable ByteStream.
 <DL><DT><DD></DL><P>
 <A NAME="get_chunk">
 <A NAME="DOC.1.4.15.1.2">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int get_chunk(GUTF8String &amp;chkid, int *rawoffsetptr=0, int *rawsizeptr=0)</B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int get_chunk(<!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;chkid, int *rawoffsetptr=0, int *rawsizeptr=0)</B></TT>
 <DD>Enters a chunk for reading.  Function <TT>get_chunk</TT> returns zero when the
 last chunk has already been accessed.  Otherwise it parses a chunk
 header, positions the IFFByteStream at the beginning of the chunk data,
@@ -152,7 +152,7 @@ the next chunk.  This way we catch EOF errors with the current chunk.
 <DL><DT><DD></DL><P>
 <A NAME="short_id">
 <A NAME="DOC.1.4.15.1.8">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void short_id(GUTF8String &amp;chkid)</B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void short_id(<!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;chkid)</B></TT>
 <DD>Returns the current chunk identifier of the current chunk.  String
 <TT>chkid</TT> is overwritten with the <EM>extended chunk identifier</EM> of the
 current chunk.  The extended chunk identifier of a regular chunk is
@@ -163,7 +163,7 @@ as in <TT>&quot;FORM:DJVU&quot;</TT>.
 <DL><DT><DD></DL><P>
 <A NAME="full_id">
 <A NAME="DOC.1.4.15.1.9">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void full_id(GUTF8String &amp;chkid)</B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void full_id(<!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;chkid)</B></TT>
 <DD>Returns the qualified chunk identifier of the current chunk.  String
 <TT>chkid</TT> is overwritten with the <EM>qualified chunk identifier</EM> of the
 current chunk.  The qualified chunk identifier of a composite chunk is
