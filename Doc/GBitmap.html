@@ -1,11 +1,11 @@
 <HTML>
 <HEAD>
-   <TITLE>class  ByteStream::GBitmap</TITLE>
+   <TITLE>class  GMonitor::GBitmap</TITLE>
    <META NAME="GENERATOR" CONTENT="DOC++ 3.4.1">
 </HEAD>
 <BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
 
-<H2>class  <A HREF="#DOC.DOCU">GBitmap</A>: public <!1><A HREF="GPEnabled.html#DOC.1.4.4.2">GPEnabled</A></H2>
+<H2>class  <A HREF="#DOC.DOCU">GBitmap</A>: public <!1><A HREF="GPEnabled.html#DOC.1.5.4.1.2">GPEnabled</A></H2>
 <BLOCKQUOTE>Bilevel and gray-level images.</BLOCKQUOTE>
 <HR>
 
@@ -22,181 +22,178 @@
 <DL>
 <P><DL>
 <DT><H3>Public</H3><DD><DT>
-<A HREF="#DOC.1.4.19.1.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Construction. </B>
+<A HREF="#DOC.1.5.17.1.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Construction. </B>
 <DD><I></I>
 <P><DL>
 <DT>
-<A HREF="#DOC.1.4.19.1.1.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GBitmap.html">GBitmap</A>&gt;  <B>create</B>(void)
+<A HREF="#DOC.1.5.17.1.1.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GBitmap</B>()
 <DD><I>Constructs an empty GBitmap object.</I>
 <DT>
-<A HREF="#DOC.1.4.19.1.1.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GBitmap.html">GBitmap</A>&gt;  <B>create</B>(const int nrows, const int ncolumns, const int border=0)
+<A HREF="#DOC.1.5.17.1.1.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GBitmap</B>(int nrows, int ncolumns, int border=0)
 <DD><I>Constructs a GBitmap with <TT>nrows</TT> rows and <TT>ncolumns</TT> columns.</I>
 <DT>
-<A HREF="#DOC.1.4.19.1.1.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GBitmap.html">GBitmap</A>&gt;  <B>create</B>(const <!1><A HREF="GBitmap.html">GBitmap</A> &amp;ref)
+<A HREF="#DOC.1.5.17.1.1.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GBitmap</B>(const <!1><A HREF="GBitmap.html#DOC.1.5.17.1.1.1">GBitmap</A> &amp;ref)
 <DD><I>Copy constructor.</I>
 <DT>
-<A HREF="#DOC.1.4.19.1.1.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GBitmap.html">GBitmap</A>&gt;  <B>create</B>(const <!1><A HREF="GBitmap.html">GBitmap</A> &amp;ref, const int border)
+<A HREF="#DOC.1.5.17.1.1.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GBitmap</B>(const <!1><A HREF="GBitmap.html#DOC.1.5.17.1.1.1">GBitmap</A> &amp;ref, int border)
 <DD><I>Constructs a GBitmap by copying the contents of GBitmap <TT>ref</TT>.</I>
 <DT>
-<A HREF="#DOC.1.4.19.1.1.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GBitmap.html">GBitmap</A>&gt;  <B>create</B>(const <!1><A HREF="GBitmap.html">GBitmap</A> &amp;ref, const <!1><A HREF="GRect.html">GRect</A> &amp;rect, const int border=0)
+<A HREF="#DOC.1.5.17.1.1.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GBitmap</B>(const <!1><A HREF="GBitmap.html#DOC.1.5.17.1.1.1">GBitmap</A> &amp;ref, const <!1><A HREF="GRect.html">GRect</A> &amp;rect, int border=0)
 <DD><I>Constructs a GBitmap by copying a rectangular segment <TT>rect</TT> of GBitmap <TT>ref</TT>.</I>
 <DT>
-<A HREF="#DOC.1.4.19.1.1.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GBitmap.html">GBitmap</A>&gt;  <B>create</B>(<!1><A HREF="ByteStream.html">ByteStream</A> &amp;ref, const int border=0)
+<A HREF="#DOC.1.5.17.1.1.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GBitmap</B>(<!1><A HREF="ByteStream.html">ByteStream</A> &amp;ref, int border=0)
 <DD><I>Constructs a GBitmap by reading PBM, PGM or RLE data from ByteStream <TT>ref</TT> into this GBitmap.</I>
 </DL></P>
 <DT>
-<A HREF="#DOC.1.4.19.1.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Initialization. </B>
+<A HREF="#DOC.1.5.17.1.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Initialization. </B>
 <DD><I></I>
 <P><DL>
 <DT>
-<A HREF="#DOC.1.4.19.1.2.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>init</B>(int nrows, int ncolumns, int border=0)
+<A HREF="#DOC.1.5.17.1.2.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>init</B>(int nrows, int ncolumns, int border=0)
 <DD><I>Resets this GBitmap size to <TT>nrows</TT> rows and <TT>ncolumns</TT> columns and sets all pixels to white.</I>
 <DT>
-<A HREF="#DOC.1.4.19.1.2.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>init</B>(const <!1><A HREF="GBitmap.html">GBitmap</A> &amp;ref, int border=0)
+<A HREF="#DOC.1.5.17.1.2.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>init</B>(const <!1><A HREF="GBitmap.html#DOC.1.5.17.1.1.1">GBitmap</A> &amp;ref, int border=0)
 <DD><I>Initializes this GBitmap with the contents of the GBitmap <TT>ref</TT>.</I>
 <DT>
-<A HREF="#DOC.1.4.19.1.2.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>init</B>(const <!1><A HREF="GBitmap.html">GBitmap</A> &amp;ref, const <!1><A HREF="GRect.html">GRect</A> &amp;rect, int border=0)
+<A HREF="#DOC.1.5.17.1.2.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>init</B>(const <!1><A HREF="GBitmap.html#DOC.1.5.17.1.1.1">GBitmap</A> &amp;ref, const <!1><A HREF="GRect.html">GRect</A> &amp;rect, int border=0)
 <DD><I>Initializes this GBitmap with a rectangular segment <TT>rect</TT> of GBitmap <TT>ref</TT>.</I>
 <DT>
-<A HREF="#DOC.1.4.19.1.2.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>init</B>(<!1><A HREF="ByteStream.html">ByteStream</A> &amp;ref, int border=0)
+<A HREF="#DOC.1.5.17.1.2.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>init</B>(<!1><A HREF="ByteStream.html">ByteStream</A> &amp;ref, int border=0)
 <DD><I>Reads PBM, PGM or RLE data from ByteStream <TT>ref</TT> into this GBitmap.</I>
 <DT>
-<A HREF="#DOC.1.4.19.1.2.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GBitmap.html">GBitmap</A>&amp; <B>operator=</B>(const <!1><A HREF="GBitmap.html">GBitmap</A> &amp;ref)
+<A HREF="#DOC.1.5.17.1.2.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GBitmap.html#DOC.1.5.17.1.1.1">GBitmap</A>&amp; <B>operator=</B>(const <!1><A HREF="GBitmap.html#DOC.1.5.17.1.1.1">GBitmap</A> &amp;ref)
 <DD><I>Assignment operator.</I>
 <DT>
-<A HREF="#DOC.1.4.19.1.2.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>fill</B>(unsigned char value)
+<A HREF="#DOC.1.5.17.1.2.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>fill</B>(unsigned char value)
 <DD><I>Initializes all the GBitmap pixels to value <TT>value</TT>.</I>
 </DL></P>
 <DT>
-<A HREF="#DOC.1.4.19.1.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Accessing the pixels. </B>
+<A HREF="#DOC.1.5.17.1.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Accessing the pixels. </B>
 <DD><I></I>
 <P><DL>
 <DT>
-<A HREF="#DOC.1.4.19.1.3.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>unsigned int <B>rows</B>() const 
+<A HREF="#DOC.1.5.17.1.3.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>unsigned int <B>rows</B>() const 
 <DD><I>Returns the number of rows (the image height).</I>
 <DT>
-<A HREF="#DOC.1.4.19.1.3.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>unsigned int <B>columns</B>() const 
+<A HREF="#DOC.1.5.17.1.3.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>unsigned int <B>columns</B>() const 
 <DD><I>Returns the number of columns (the image width).</I>
 <DT>
-<A HREF="#DOC.1.4.19.1.3.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>const unsigned char* <B>operator[] </B>(int row) const 
+<A HREF="#DOC.1.5.17.1.3.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>const unsigned char* <B>operator[] </B>(int row) const 
 <DD><I>Returns a constant pointer to the first byte of row <TT>row</TT>.</I>
 <DT>
-<A HREF="#DOC.1.4.19.1.3.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>unsigned char* <B>operator[] </B>(int row)
+<A HREF="#DOC.1.5.17.1.3.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>unsigned char* <B>operator[] </B>(int row)
 <DD><I>Returns a pointer to the first byte of row <TT>row</TT>.</I>
 <DT>
-<A HREF="#DOC.1.4.19.1.3.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>unsigned int <B>rowsize</B>() const 
+<A HREF="#DOC.1.5.17.1.3.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>unsigned int <B>rowsize</B>() const 
 <DD><I>Returns the size of a row in memory (in pixels).</I>
 <DT>
-<A HREF="#DOC.1.4.19.1.3.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>minborder</B>(int minimum)
+<A HREF="#DOC.1.5.17.1.3.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>minborder</B>(int minimum)
 <DD><I>Makes sure that the border is at least <TT>minimum</TT> pixels large.</I>
 </DL></P>
 <DT>
-<A HREF="#DOC.1.4.19.1.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Managing gray levels. </B>
+<A HREF="#DOC.1.5.17.1.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Managing gray levels. </B>
 <DD><I></I>
 <P><DL>
 <DT>
-<A HREF="#DOC.1.4.19.1.4.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_grays</B>() const 
+<A HREF="#DOC.1.5.17.1.4.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_grays</B>() const 
 <DD><I>Returns the number of gray levels.</I>
 <DT>
-<A HREF="#DOC.1.4.19.1.4.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>set_grays</B>(int grays)
+<A HREF="#DOC.1.5.17.1.4.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>set_grays</B>(int grays)
 <DD><I>Sets the number of gray levels without changing the pixels.</I>
 <DT>
-<A HREF="#DOC.1.4.19.1.4.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>change_grays</B>(int grays)
+<A HREF="#DOC.1.5.17.1.4.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>change_grays</B>(int grays)
 <DD><I>Changes the number of gray levels.</I>
 <DT>
-<A HREF="#DOC.1.4.19.1.4.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>binarize_grays</B>(int threshold=0)
+<A HREF="#DOC.1.5.17.1.4.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>binarize_grays</B>(int threshold=0)
 <DD><I>Binarizes a gray level image using a threshold.</I>
 </DL></P>
 <DT>
-<A HREF="#DOC.1.4.19.1.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Optimizing the memory usage.  </B>
+<A HREF="#DOC.1.5.17.1.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Optimizing the memory usage.  </B>
 <DD><I></I>
 <P><DL>
 <DT>
-<A HREF="#DOC.1.4.19.1.5.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>compress</B>()
+<A HREF="#DOC.1.5.17.1.5.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>compress</B>()
 <DD><I>Reduces the memory required for a bilevel image by using a run-length encoded representation.</I>
 <DT>
-<A HREF="#DOC.1.4.19.1.5.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>uncompress</B>()
+<A HREF="#DOC.1.5.17.1.5.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>uncompress</B>()
 <DD><I>Decodes run-length encoded bitmaps and recreate the pixel array.</I>
 <DT>
-<A HREF="#DOC.1.4.19.1.5.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>unsigned int <B>get_memory_usage</B>() const 
+<A HREF="#DOC.1.5.17.1.5.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>unsigned int <B>get_memory_usage</B>() const 
 <DD><I>Returns the number of bytes allocated for this image.</I>
 <DT>
-<A HREF="#DOC.1.4.19.1.5.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GMonitor.html">GMonitor</A>* <B>monitor</B>() const 
+<A HREF="#DOC.1.5.17.1.5.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GMonitor.html">GMonitor</A>* <B>monitor</B>() const 
 <DD><I>Returns a possibly null pointer to a <!1><A HREF="GMonitor.html">GMonitor</A> for this bitmap.</I>
 <DT>
-<A HREF="#DOC.1.4.19.1.5.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>share</B>()
+<A HREF="#DOC.1.5.17.1.5.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>share</B>()
 <DD><I>Associates a <!1><A HREF="GMonitor.html">GMonitor</A> with this bitmap.</I>
 </DL></P>
 <DT>
-<A HREF="#DOC.1.4.19.1.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Accessing RLE data.</B>
+<A HREF="#DOC.1.5.17.1.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Accessing RLE data.</B>
 <DD><I></I>
 <P><DL>
 <DT>
-<A HREF="#DOC.1.4.19.1.6.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>rle_get_bits</B>(int rowno, unsigned char *bits) const 
+<A HREF="#DOC.1.5.17.1.6.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>rle_get_bits</B>(int rowno, unsigned char *bits) const 
 <DD><I>Gets the pixels for line <TT>rowno</TT>.</I>
 <DT>
-<A HREF="#DOC.1.4.19.1.6.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   void <B>rle_get_bitmap</B>(const int ncolumns, const unsigned char *&amp;runs, unsigned char *bitmap, const bool invert )
+<A HREF="#DOC.1.5.17.1.6.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   void <B>rle_get_bitmap</B>(const int ncolumns, const unsigned char *&amp;runs, unsigned char *bitmap, const bool invert )
 <DD><I>Gets the bitmap line rle data passed.</I>
 <DT>
-<A HREF="#DOC.1.4.19.1.6.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>rle_get_runs</B>(int rowno, int *rlens) const 
+<A HREF="#DOC.1.5.17.1.6.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>rle_get_runs</B>(int rowno, int *rlens) const 
 <DD><I>Gets the lengths of all runs in line <TT>rowno</TT>.</I>
 <DT>
-<A HREF="#DOC.1.4.19.1.6.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>rle_get_rect</B>(<!1><A HREF="GRect.html">GRect</A> &amp;rect) const 
+<A HREF="#DOC.1.5.17.1.6.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>rle_get_rect</B>(<!1><A HREF="GRect.html">GRect</A> &amp;rect) const 
 <DD><I>Gets the smallest rectangle enclosing black pixels.</I>
 </DL></P>
 <DT>
-<A HREF="#DOC.1.4.19.1.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Additive Blit.  </B>
+<A HREF="#DOC.1.5.17.1.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Additive Blit.  </B>
 <DD><I></I>
 <P><DL>
 <DT>
-<A HREF="#DOC.1.4.19.1.7.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>blit</B>(const <!1><A HREF="GBitmap.html">GBitmap</A> *bm, int x, int y)
+<A HREF="#DOC.1.5.17.1.7.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>blit</B>(const <!1><A HREF="GBitmap.html#DOC.1.5.17.1.1.1">GBitmap</A> *bm, int x, int y)
 <DD><I>Performs an additive blit of the GBitmap <TT>bm</TT>.</I>
 <DT>
-<A HREF="#DOC.1.4.19.1.7.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>blit</B>(const <!1><A HREF="GBitmap.html">GBitmap</A> *shape, int x, int y, int subsample)
+<A HREF="#DOC.1.5.17.1.7.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>blit</B>(const <!1><A HREF="GBitmap.html#DOC.1.5.17.1.1.1">GBitmap</A> *shape, int x, int y, int subsample)
 <DD><I>Performs an additive blit of the GBitmap <TT>bm</TT> with anti-aliasing.</I>
 </DL></P>
 <DT>
-<A HREF="#DOC.1.4.19.1.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Saving images.  </B>
+<A HREF="#DOC.1.5.17.1.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Saving images.  </B>
 <DD><I></I>
 <P><DL>
 <DT>
-<A HREF="#DOC.1.4.19.1.8.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>save_pbm</B>(<!1><A HREF="ByteStream.html">ByteStream</A> &amp;bs, int raw=1)
+<A HREF="#DOC.1.5.17.1.8.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>save_pbm</B>(<!1><A HREF="ByteStream.html">ByteStream</A> &amp;bs, int raw=1)
 <DD><I>Saves the image into ByteStream <TT>bs</TT> using the PBM format.</I>
 <DT>
-<A HREF="#DOC.1.4.19.1.8.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>save_pgm</B>(<!1><A HREF="ByteStream.html">ByteStream</A> &amp;bs, int raw=1)
+<A HREF="#DOC.1.5.17.1.8.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>save_pgm</B>(<!1><A HREF="ByteStream.html">ByteStream</A> &amp;bs, int raw=1)
 <DD><I>Saves the image into ByteStream <TT>bs</TT> using the PGM format.</I>
 <DT>
-<A HREF="#DOC.1.4.19.1.8.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>save_rle</B>(<!1><A HREF="ByteStream.html">ByteStream</A> &amp;bs)
+<A HREF="#DOC.1.5.17.1.8.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>save_rle</B>(<!1><A HREF="ByteStream.html">ByteStream</A> &amp;bs)
 <DD><I>Saves the image into ByteStream <TT>bs</TT> using the RLE file format.</I>
 </DL></P>
 <DT>
-<A HREF="#DOC.1.4.19.1.9"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Stealing or borrowing the memory buffer (advanced). </B>
+<A HREF="#DOC.1.5.17.1.9"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Stealing or borrowing the memory buffer (advanced). </B>
 <DD><I></I>
 <P><DL>
 <DT>
-<A HREF="#DOC.1.4.19.1.9.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>unsigned char* <B>take_data</B>(size_t &amp;offset)
+<A HREF="#DOC.1.5.17.1.9.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>unsigned char* <B>take_data</B>(size_t &amp;offset)
 <DD><I>Steals the memory buffer of a GBitmap.</I>
 <DT>
-<A HREF="#DOC.1.4.19.1.9.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>inline   void <B>borrow_data</B>(unsigned char &amp;data, int w, int h)
+<A HREF="#DOC.1.5.17.1.9.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>inline   void <B>borrow_data</B>(unsigned char &amp;data, int w, int h)
 <DD><I>Initializes this GBitmap by borrowing a memory segment.</I>
 <DT>
-<A HREF="#DOC.1.4.19.1.9.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>donate_data</B>(unsigned char *data, int w, int h)
+<A HREF="#DOC.1.5.17.1.9.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>donate_data</B>(unsigned char *data, int w, int h)
 <DD><I>Same as borrow_data, except GBitmap will call <TT>delete[]</TT>.</I>
 <DT>
-<A HREF="#DOC.1.4.19.1.9.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>const unsigned char* <B>get_rle</B>(unsigned int &amp;rle_length)
+<A HREF="#DOC.1.5.17.1.9.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>const unsigned char* <B>get_rle</B>(unsigned int &amp;rle_length)
 <DD><I>Return a pointer to the rle data.</I>
 <DT>
-<A HREF="#DOC.1.4.19.1.9.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>donate_rle</B>(unsigned char *rledata, unsigned int rledatalen, int w, int h)
+<A HREF="#DOC.1.5.17.1.9.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>donate_rle</B>(unsigned char *rledata, unsigned int rledatalen, int w, int h)
 <DD><I>Initializes this GBitmap by setting the size to <TT>h</TT> rows and <TT>w</TT> columns, and directly addressing the memory buffer <TT>rledata</TT> provided by the user.</I>
 <DT>
-<A HREF="#DOC.1.4.19.1.9.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static inline   int <B>read_run</B>(const unsigned char *&amp;data)
+<A HREF="#DOC.1.5.17.1.9.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static inline   int <B>read_run</B>(const unsigned char *&amp;data)
 <DD><I>Static function for parsing run data.</I>
 <DT>
-<A HREF="#DOC.1.4.19.1.9.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static inline   void <B>append_run</B>(unsigned char *&amp;data, int <!1><A HREF="GPEnabled.html#DOC.1.4.4.6">count</A>)
+<A HREF="#DOC.1.5.17.1.9.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static inline   void <B>append_run</B>(unsigned char *&amp;data, int <!1><A HREF="GPEnabled.html#DOC.1.5.4.1.6">count</A>)
 <DD><I>Static function for generating run data.</I>
-<DT>
-<A HREF="#DOC.1.4.19.1.9.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GBitmap.html">GBitmap</A>&gt;  <B>rotate</B>(int <!1><A HREF="GPEnabled.html#DOC.1.4.4.6">count</A>=0)
-<DD><I>Rotates bitmap by 90, 180 or 270 degrees anticlockwise and returns a new pixmap, input bitmap is not changed.</I>
 </DL></P>
 </DL></P>
 
@@ -205,7 +202,7 @@
 <DL>
 <P><DL>
 <DT><H3>Public Methods</H3><DD><DT>
-<IMG ALT="o" SRC=icon2.gif><!1><A HREF="GPEnabled.html#DOC.1.4.4.2">GPEnabled</A>&amp; <B>operator=</B>(const <!1><A HREF="GPEnabled.html#DOC.1.4.4.2">GPEnabled</A> &amp; obj)
+<IMG ALT="o" SRC=icon2.gif><!1><A HREF="GPEnabled.html#DOC.1.5.4.1.2">GPEnabled</A>&amp; <B>operator=</B>(const <!1><A HREF="GPEnabled.html#DOC.1.5.4.1.2">GPEnabled</A> &amp; obj)
 <DT>
 <IMG ALT="o" SRC=icon2.gif>int <B>get_count</B>(void) const 
 </DL></P>
@@ -224,59 +221,59 @@
 bilevel or gray-level images.  Images are usually represented using one
 byte per pixel.  Value zero represents a white pixel.  A value equal to
 the number of gray levels minus one represents a black pixel.  The number
-of gray levels is returned by the function <!1><A HREF="GBitmap.html#DOC.1.4.19.1.4.1">get_grays</A> and can be
-manipulated by the functions <!1><A HREF="GBitmap.html#DOC.1.4.19.1.4.2">set_grays</A> and <!1><A HREF="GBitmap.html#DOC.1.4.19.1.4.3">change_grays</A>.<P>The bracket operator returns a pointer to the bytes composing one line of
+of gray levels is returned by the function <!1><A HREF="GBitmap.html#DOC.1.5.17.1.4.1">get_grays</A> and can be
+manipulated by the functions <!1><A HREF="GBitmap.html#DOC.1.5.17.1.4.2">set_grays</A> and <!1><A HREF="GBitmap.html#DOC.1.5.17.1.4.3">change_grays</A>.<P>The bracket operator returns a pointer to the bytes composing one line of
 the image.  This pointer can be used to read or write the image pixels.
 Line zero represents the bottom line of the image.<P>The memory organization is setup in such a way that you can safely read a
 few pixels located in a small border surrounding all four sides of the
 image.  The width of this border can be modified using the function
-<!1><A HREF="GBitmap.html#DOC.1.4.19.1.3.6">minborder</A>.  The border pixels are initialized to zero and therefore
+<!1><A HREF="GBitmap.html#DOC.1.5.17.1.3.6">minborder</A>.  The border pixels are initialized to zero and therefore
 represent white pixels.  You should never write anything into border
 pixels because they are shared between images and between lines.  </BLOCKQUOTE>
 <DL>
 
 <A NAME="Construction. ">
-<A NAME="DOC.1.4.19.1.1">
+<A NAME="DOC.1.5.17.1.1">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> Construction. </B></TT>
 <DL><DT><DD></DL><P><DL>
 
-<A NAME="create">
-<A NAME="DOC.1.4.19.1.1.1">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GBitmap.html">GBitmap</A>&gt;  create(void)</B></TT>
+<A NAME="GBitmap">
+<A NAME="DOC.1.5.17.1.1.1">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> GBitmap()</B></TT>
 <DD>Constructs an empty GBitmap object.  The returned GBitmap has zero rows
-and zero columns.  Use function <!1><A HREF="GBitmap.html#DOC.1.4.19.1.2.2">init</A> to change the size of the
+and zero columns.  Use function <!1><A HREF="GBitmap.html#DOC.1.5.17.1.2.2">init</A> to change the size of the
 image. 
 <DL><DT><DD></DL><P>
-<A NAME="create">
-<A NAME="DOC.1.4.19.1.1.2">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GBitmap.html">GBitmap</A>&gt;  create(const int nrows, const int ncolumns, const int border=0)</B></TT>
+<A NAME="GBitmap">
+<A NAME="DOC.1.5.17.1.1.2">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> GBitmap(int nrows, int ncolumns, int border=0)</B></TT>
 <DD>Constructs a GBitmap with <TT>nrows</TT> rows and <TT>ncolumns</TT> columns.  All
 pixels are initialized to white. The optional argument <TT>border</TT>
 specifies the size of the optional border of white pixels surrounding
 the image.  The number of gray levels is initially set to <TT>2</TT>.  
 <DL><DT><DD></DL><P>
-<A NAME="create">
-<A NAME="DOC.1.4.19.1.1.3">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GBitmap.html">GBitmap</A>&gt;  create(const <!1><A HREF="GBitmap.html">GBitmap</A> &amp;ref)</B></TT>
+<A NAME="GBitmap">
+<A NAME="DOC.1.5.17.1.1.3">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> GBitmap(const <!1><A HREF="GBitmap.html#DOC.1.5.17.1.1.1">GBitmap</A> &amp;ref)</B></TT>
 <DD>Copy constructor. Constructs a GBitmap by replicating the size, the
 border and the contents of GBitmap <TT>ref</TT>. 
 <DL><DT><DD></DL><P>
-<A NAME="create">
-<A NAME="DOC.1.4.19.1.1.4">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GBitmap.html">GBitmap</A>&gt;  create(const <!1><A HREF="GBitmap.html">GBitmap</A> &amp;ref, const int border)</B></TT>
+<A NAME="GBitmap">
+<A NAME="DOC.1.5.17.1.1.4">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> GBitmap(const <!1><A HREF="GBitmap.html#DOC.1.5.17.1.1.1">GBitmap</A> &amp;ref, int border)</B></TT>
 <DD>Constructs a GBitmap by copying the contents of GBitmap <TT>ref</TT>.  
 Argument <TT>border</TT> specifies the width of the optional border. 
 <DL><DT><DD></DL><P>
-<A NAME="create">
-<A NAME="DOC.1.4.19.1.1.5">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GBitmap.html">GBitmap</A>&gt;  create(const <!1><A HREF="GBitmap.html">GBitmap</A> &amp;ref, const <!1><A HREF="GRect.html">GRect</A> &amp;rect, const int border=0)</B></TT>
+<A NAME="GBitmap">
+<A NAME="DOC.1.5.17.1.1.5">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> GBitmap(const <!1><A HREF="GBitmap.html#DOC.1.5.17.1.1.1">GBitmap</A> &amp;ref, const <!1><A HREF="GRect.html">GRect</A> &amp;rect, int border=0)</B></TT>
 <DD>Constructs a GBitmap by copying a rectangular segment <TT>rect</TT> of GBitmap
 <TT>ref</TT>.  The optional argument <TT>border</TT> specifies the size of the
 optional border of white pixels surrounding the image. 
 <DL><DT><DD></DL><P>
-<A NAME="create">
-<A NAME="DOC.1.4.19.1.1.6">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GBitmap.html">GBitmap</A>&gt;  create(<!1><A HREF="ByteStream.html">ByteStream</A> &amp;ref, const int border=0)</B></TT>
+<A NAME="GBitmap">
+<A NAME="DOC.1.5.17.1.1.6">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> GBitmap(<!1><A HREF="ByteStream.html">ByteStream</A> &amp;ref, int border=0)</B></TT>
 <DD>Constructs a GBitmap by reading PBM, PGM or RLE data from ByteStream
 <TT>ref</TT> into this GBitmap. The optional argument <TT>border</TT> specifies the
 size of the optional border of white pixels surrounding the image.  See
@@ -284,12 +281,12 @@ size of the optional border of white pixels surrounding the image.  See
 <DL><DT><DD></DL><P></DL>
 
 <A NAME="Initialization. ">
-<A NAME="DOC.1.4.19.1.2">
+<A NAME="DOC.1.5.17.1.2">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> Initialization. </B></TT>
 <DL><DT><DD></DL><P><DL>
 
 <A NAME="init">
-<A NAME="DOC.1.4.19.1.2.1">
+<A NAME="DOC.1.5.17.1.2.1">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void init(int nrows, int ncolumns, int border=0)</B></TT>
 <DD>Resets this GBitmap size to <TT>nrows</TT> rows and <TT>ncolumns</TT> columns and sets
 all pixels to white.  The optional argument <TT>border</TT> specifies the size
@@ -297,21 +294,21 @@ of the optional border of white pixels surrounding the image.  The
 number of gray levels is initialized to <TT>2</TT>. 
 <DL><DT><DD></DL><P>
 <A NAME="init">
-<A NAME="DOC.1.4.19.1.2.2">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void init(const <!1><A HREF="GBitmap.html">GBitmap</A> &amp;ref, int border=0)</B></TT>
+<A NAME="DOC.1.5.17.1.2.2">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void init(const <!1><A HREF="GBitmap.html#DOC.1.5.17.1.1.1">GBitmap</A> &amp;ref, int border=0)</B></TT>
 <DD>Initializes this GBitmap with the contents of the GBitmap <TT>ref</TT>.  The
 optional argument <TT>border</TT> specifies the size of the optional border of
 white pixels surrounding the image. 
 <DL><DT><DD></DL><P>
 <A NAME="init">
-<A NAME="DOC.1.4.19.1.2.3">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void init(const <!1><A HREF="GBitmap.html">GBitmap</A> &amp;ref, const <!1><A HREF="GRect.html">GRect</A> &amp;rect, int border=0)</B></TT>
+<A NAME="DOC.1.5.17.1.2.3">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void init(const <!1><A HREF="GBitmap.html#DOC.1.5.17.1.1.1">GBitmap</A> &amp;ref, const <!1><A HREF="GRect.html">GRect</A> &amp;rect, int border=0)</B></TT>
 <DD>Initializes this GBitmap with a rectangular segment <TT>rect</TT> of GBitmap
 <TT>ref</TT>.  The optional argument <TT>border</TT> specifies the size of the
 optional border of white pixels surrounding the image. 
 <DL><DT><DD></DL><P>
 <A NAME="init">
-<A NAME="DOC.1.4.19.1.2.4">
+<A NAME="DOC.1.5.17.1.2.4">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void init(<!1><A HREF="ByteStream.html">ByteStream</A> &amp;ref, int border=0)</B></TT>
 <DD>Reads PBM, PGM or RLE data from ByteStream <TT>ref</TT> into this GBitmap.  The
 previous content of the GBitmap object is lost. The optional argument
@@ -320,46 +317,46 @@ surrounding the image. See <!1><A HREF="PNMandRLEfileformats.html">PNM and RLE f
 information. 
 <DL><DT><DD></DL><P>
 <A NAME="operator=">
-<A NAME="DOC.1.4.19.1.2.5">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GBitmap.html">GBitmap</A>&amp; operator=(const <!1><A HREF="GBitmap.html">GBitmap</A> &amp;ref)</B></TT>
+<A NAME="DOC.1.5.17.1.2.5">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GBitmap.html#DOC.1.5.17.1.1.1">GBitmap</A>&amp; operator=(const <!1><A HREF="GBitmap.html#DOC.1.5.17.1.1.1">GBitmap</A> &amp;ref)</B></TT>
 <DD>Assignment operator. Initializes this GBitmap by copying the size, the
 border and the contents of GBitmap <TT>ref</TT>. 
 <DL><DT><DD></DL><P>
 <A NAME="fill">
-<A NAME="DOC.1.4.19.1.2.6">
+<A NAME="DOC.1.5.17.1.2.6">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void fill(unsigned char value)</B></TT>
 <DD>Initializes all the GBitmap pixels to value <TT>value</TT>. 
 <DL><DT><DD></DL><P></DL>
 
 <A NAME="Accessing the pixels. ">
-<A NAME="DOC.1.4.19.1.3">
+<A NAME="DOC.1.5.17.1.3">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> Accessing the pixels. </B></TT>
 <DL><DT><DD></DL><P><DL>
 
 <A NAME="rows">
-<A NAME="DOC.1.4.19.1.3.1">
+<A NAME="DOC.1.5.17.1.3.1">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>unsigned int rows() const </B></TT>
 <DD>Returns the number of rows (the image height). 
 <DL><DT><DD></DL><P>
 <A NAME="columns">
-<A NAME="DOC.1.4.19.1.3.2">
+<A NAME="DOC.1.5.17.1.3.2">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>unsigned int columns() const </B></TT>
 <DD>Returns the number of columns (the image width). 
 <DL><DT><DD></DL><P>
 <A NAME="operator[] ">
-<A NAME="DOC.1.4.19.1.3.3">
+<A NAME="DOC.1.5.17.1.3.3">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>const unsigned char* operator[] (int row) const </B></TT>
 <DD>Returns a constant pointer to the first byte of row <TT>row</TT>.
 This pointer can be used as an array to read the row elements. 
 <DL><DT><DD></DL><P>
 <A NAME="operator[] ">
-<A NAME="DOC.1.4.19.1.3.4">
+<A NAME="DOC.1.5.17.1.3.4">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>unsigned char* operator[] (int row)</B></TT>
 <DD>Returns a pointer to the first byte of row <TT>row</TT>.
 This pointer can be used as an array to read or write the row elements. 
 <DL><DT><DD></DL><P>
 <A NAME="rowsize">
-<A NAME="DOC.1.4.19.1.3.5">
+<A NAME="DOC.1.5.17.1.3.5">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>unsigned int rowsize() const </B></TT>
 <DD>Returns the size of a row in memory (in pixels).  This number is equal
 to the difference between pointers to pixels located in the same column
@@ -367,7 +364,7 @@ in consecutive rows.  This difference can be larger than the number of
 columns in the image. 
 <DL><DT><DD></DL><P>
 <A NAME="minborder">
-<A NAME="DOC.1.4.19.1.3.6">
+<A NAME="DOC.1.5.17.1.3.6">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void minborder(int minimum)</B></TT>
 <DD>Makes sure that the border is at least <TT>minimum</TT> pixels large.  This
 function does nothing it the border width is already larger than
@@ -376,31 +373,31 @@ border of <TT>minimum</TT> pixels.
 <DL><DT><DD></DL><P></DL>
 
 <A NAME="Managing gray levels. ">
-<A NAME="DOC.1.4.19.1.4">
+<A NAME="DOC.1.5.17.1.4">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> Managing gray levels. </B></TT>
 <DL><DT><DD></DL><P><DL>
 
 <A NAME="get_grays">
-<A NAME="DOC.1.4.19.1.4.1">
+<A NAME="DOC.1.5.17.1.4.1">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int get_grays() const </B></TT>
 <DD>Returns the number of gray levels. 
 Value <TT>2</TT> denotes a bilevel image. 
 <DL><DT><DD></DL><P>
 <A NAME="set_grays">
-<A NAME="DOC.1.4.19.1.4.2">
+<A NAME="DOC.1.5.17.1.4.2">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void set_grays(int grays)</B></TT>
 <DD>Sets the number of gray levels without changing the pixels.
 Argument <TT>grays</TT> must be in range <TT>2</TT> to <TT>256</TT>. 
 <DL><DT><DD></DL><P>
 <A NAME="change_grays">
-<A NAME="DOC.1.4.19.1.4.3">
+<A NAME="DOC.1.5.17.1.4.3">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void change_grays(int grays)</B></TT>
 <DD>Changes the number of gray levels.  The argument <TT>grays</TT> must be in the
 range <TT>2</TT> to <TT>256</TT>.  All the pixel values are then rescaled and clipped
 in range <TT>0</TT> to <TT>grays-1</TT>. 
 <DL><DT><DD></DL><P>
 <A NAME="binarize_grays">
-<A NAME="DOC.1.4.19.1.4.4">
+<A NAME="DOC.1.5.17.1.4.4">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void binarize_grays(int threshold=0)</B></TT>
 <DD>Binarizes a gray level image using a threshold.  The number of gray
 levels is reduced to <TT>2</TT> as in a bilevel image.  All pixels whose value
@@ -409,37 +406,37 @@ are set to white.
 <DL><DT><DD></DL><P></DL>
 
 <A NAME="Optimizing the memory usage.  ">
-<A NAME="DOC.1.4.19.1.5">
+<A NAME="DOC.1.5.17.1.5">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> Optimizing the memory usage.  </B></TT>
 <DD>The amount of memory used by bilevel images can be reduced using
-function <!1><A HREF="GBitmap.html#DOC.1.4.19.1.5.1">compress</A>, which encodes the image using a run-length
+function <!1><A HREF="GBitmap.html#DOC.1.5.17.1.5.1">compress</A>, which encodes the image using a run-length
 encoding scheme.  The bracket operator decompresses the image on demand.
-A few highly optimized functions (e.g. <!1><A HREF="GBitmap.html#DOC.1.4.19.1.7.1">blit</A>) can use a run-length
+A few highly optimized functions (e.g. <!1><A HREF="GBitmap.html#DOC.1.5.17.1.7.1">blit</A>) can use a run-length
 encoded bitmap without decompressing it.  There are unfortunate locking
-issues associated with this capability (c.f. <!1><A HREF="GBitmap.html#DOC.1.4.19.1.5.5">share</A> and
-<!1><A HREF="GBitmap.html#DOC.1.4.19.1.5.4">monitor</A>). 
+issues associated with this capability (c.f. <!1><A HREF="GBitmap.html#DOC.1.5.17.1.5.5">share</A> and
+<!1><A HREF="GBitmap.html#DOC.1.5.17.1.5.4">monitor</A>). 
 <DL><DT><DD></DL><P><DL>
 
 <A NAME="compress">
-<A NAME="DOC.1.4.19.1.5.1">
+<A NAME="DOC.1.5.17.1.5.1">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void compress()</B></TT>
 <DD>Reduces the memory required for a bilevel image by using a run-length
 encoded representation.  Functions that need to access the pixel array
 will decompress the image on demand. 
 <DL><DT><DD></DL><P>
 <A NAME="uncompress">
-<A NAME="DOC.1.4.19.1.5.2">
+<A NAME="DOC.1.5.17.1.5.2">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void uncompress()</B></TT>
 <DD>Decodes run-length encoded bitmaps and recreate the pixel array.
 This function is usually called by <TT>operator[]</TT> when needed. 
 <DL><DT><DD></DL><P>
 <A NAME="get_memory_usage">
-<A NAME="DOC.1.4.19.1.5.3">
+<A NAME="DOC.1.5.17.1.5.3">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>unsigned int get_memory_usage() const </B></TT>
 <DD>Returns the number of bytes allocated for this image. 
 <DL><DT><DD></DL><P>
 <A NAME="monitor">
-<A NAME="DOC.1.4.19.1.5.4">
+<A NAME="DOC.1.5.17.1.5.4">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GMonitor.html">GMonitor</A>* monitor() const </B></TT>
 <DD>Returns a possibly null pointer to a <!1><A HREF="GMonitor.html">GMonitor</A> for this bitmap.
 You should use this monitor to ensure that the data representation of the 
@@ -447,25 +444,25 @@ bitmap will not change while you are using it.  We suggest using
 class GMonitorLock which properly handles null monitor pointers. 
 <DL><DT><DD></DL><P>
 <A NAME="share">
-<A NAME="DOC.1.4.19.1.5.5">
+<A NAME="DOC.1.5.17.1.5.5">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void share()</B></TT>
 <DD>Associates a <!1><A HREF="GMonitor.html">GMonitor</A> with this bitmap. This function should be
 called on all bitmaps susceptible of being simultaneously used by
-several threads.  It will make sure that function <!1><A HREF="GBitmap.html#DOC.1.4.19.1.5.4">monitor</A> returns
+several threads.  It will make sure that function <!1><A HREF="GBitmap.html#DOC.1.5.17.1.5.4">monitor</A> returns
 a pointer to a suitable monitor for this bitmap. 
 <DL><DT><DD></DL><P></DL>
 
 <A NAME="Accessing RLE data.">
-<A NAME="DOC.1.4.19.1.6">
+<A NAME="DOC.1.5.17.1.6">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> Accessing RLE data.</B></TT>
 <DD>The next functions are useful for processing bilevel images
 encoded using the run length encoding scheme.  These functions always return
-zero if the bitmap is not RLE encoded.  Function <!1><A HREF="GBitmap.html#DOC.1.4.19.1.5.1">compress</A> must
+zero if the bitmap is not RLE encoded.  Function <!1><A HREF="GBitmap.html#DOC.1.5.17.1.5.1">compress</A> must
 be used to ensure that the bitmap is RLE encoded.  
 <DL><DT><DD></DL><P><DL>
 
 <A NAME="rle_get_bits">
-<A NAME="DOC.1.4.19.1.6.1">
+<A NAME="DOC.1.5.17.1.6.1">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int rle_get_bits(int rowno, unsigned char *bits) const </B></TT>
 <DD>Gets the pixels for line <TT>rowno</TT>.  One line of pixel is stored as
 <TT>unsigned char</TT> values into array <TT>bits</TT>.  Each pixel is either 1 or 0.
@@ -473,14 +470,14 @@ The array must be large enough to hold the whole line.  The number of
 pixels is returned. 
 <DL><DT><DD></DL><P>
 <A NAME="rle_get_bitmap">
-<A NAME="DOC.1.4.19.1.6.2">
+<A NAME="DOC.1.5.17.1.6.2">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static   void rle_get_bitmap(const int ncolumns, const unsigned char *&amp;runs, unsigned char *bitmap, const bool invert )</B></TT>
 <DD>Gets the bitmap line rle data passed.  One line of pixel is stored one
 with 8 bits per <TT>unsigned char</TT> in an array.  The array must be large
 enough to hold the whole line.  
 <DL><DT><DD></DL><P>
 <A NAME="rle_get_runs">
-<A NAME="DOC.1.4.19.1.6.3">
+<A NAME="DOC.1.5.17.1.6.3">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int rle_get_runs(int rowno, int *rlens) const </B></TT>
 <DD>Gets the lengths of all runs in line <TT>rowno</TT>.  The array <TT>rlens</TT> must be
 large enough to accomodate <TT>w+2</TT> integers where <TT>w</TT> is the number of
@@ -490,7 +487,7 @@ zero in order to allow for lines starting with black pixels.  This
 function returns the total number of runs in the line. 
 <DL><DT><DD></DL><P>
 <A NAME="rle_get_rect">
-<A NAME="DOC.1.4.19.1.6.4">
+<A NAME="DOC.1.5.17.1.6.4">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int rle_get_rect(<!1><A HREF="GRect.html">GRect</A> &amp;rect) const </B></TT>
 <DD>Gets the smallest rectangle enclosing black pixels.
 Rectangle rect gives the coordinates of the smallest rectangle
@@ -498,13 +495,13 @@ containing all black pixels. Returns the number of black pixels.
 <DL><DT><DD></DL><P></DL>
 
 <A NAME="Additive Blit.  ">
-<A NAME="DOC.1.4.19.1.7">
+<A NAME="DOC.1.5.17.1.7">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> Additive Blit.  </B></TT>
 <DD>The blit functions are designed to efficiently construct an anti-aliased
 image by copying smaller images at predefined locations.  The image of a
 page, for instance, is composed by copying the images of characters at
 predefined locations.  These functions are fairly optimized.  They can
-directly use compressed GBitmaps (see <!1><A HREF="GBitmap.html#DOC.1.4.19.1.5.1">compress</A>).  We consider in
+directly use compressed GBitmaps (see <!1><A HREF="GBitmap.html#DOC.1.5.17.1.5.1">compress</A>).  We consider in
 this section that each GBitmap comes with a coordinate system defined as
 follows.  Position (<TT>0</TT>,<TT>0</TT>) corresponds to the bottom left corner of
 the bottom left pixel.  Position (<TT>1</TT>,<TT>1</TT>) corresponds to the top right
@@ -515,8 +512,8 @@ of the top right pixel.
 <DL><DT><DD></DL><P><DL>
 
 <A NAME="blit">
-<A NAME="DOC.1.4.19.1.7.1">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void blit(const <!1><A HREF="GBitmap.html">GBitmap</A> *bm, int x, int y)</B></TT>
+<A NAME="DOC.1.5.17.1.7.1">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void blit(const <!1><A HREF="GBitmap.html#DOC.1.5.17.1.1.1">GBitmap</A> *bm, int x, int y)</B></TT>
 <DD>Performs an additive blit of the GBitmap <TT>bm</TT>.  The GBitmap <TT>bm</TT> is
 first positioned above the current GBitmap in such a way that position
 (<TT>u</TT>,<TT>v</TT>) in GBitmap <TT>bm</TT> corresponds to position (<TT>u</TT>+<TT>x</TT>,<TT>v</TT>+<TT>y</TT>) in
@@ -525,12 +522,12 @@ added to the value of the corresponding pixel in the current GBitmap.<P><B>Examp
 white (all pixels have value zero).  This operation copies the pixel
 values of GBitmap <TT>bm</TT> at position (<TT>x</TT>,<TT>y</TT>) into the current GBitmap.
 Note that function <TT>blit</TT> does not change the number of gray levels in
-the current GBitmap.  You may have to call <!1><A HREF="GBitmap.html#DOC.1.4.19.1.4.2">set_grays</A> to specify
+the current GBitmap.  You may have to call <!1><A HREF="GBitmap.html#DOC.1.5.17.1.4.2">set_grays</A> to specify
 how the pixel values should be interpreted. 
 <DL><DT><DD></DL><P>
 <A NAME="blit">
-<A NAME="DOC.1.4.19.1.7.2">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void blit(const <!1><A HREF="GBitmap.html">GBitmap</A> *shape, int x, int y, int subsample)</B></TT>
+<A NAME="DOC.1.5.17.1.7.2">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void blit(const <!1><A HREF="GBitmap.html#DOC.1.5.17.1.1.1">GBitmap</A> *shape, int x, int y, int subsample)</B></TT>
 <DD>Performs an additive blit of the GBitmap <TT>bm</TT> with anti-aliasing.  The
 GBitmap <TT>bm</TT> is first positioned above the current GBitmap in such a
 way that position (<TT>u</TT>,<TT>v</TT>) in GBitmap <TT>bm</TT> corresponds to position
@@ -547,7 +544,7 @@ for instance GBitmap <TT>bm</TT> is a bilevel image (pixels can be <TT>0</TT> or
 the pixels of the current GBitmap can take values in range <TT>0</TT> to
 <TT>subsample*subsample</TT>.  Note that function <TT>blit</TT> does not change the
 number of gray levels in the current GBitmap.  You must call
-<!1><A HREF="GBitmap.html#DOC.1.4.19.1.4.2">set_grays</A> to indicate that there are <TT>subsample^2+1</TT> gray
+<!1><A HREF="GBitmap.html#DOC.1.5.17.1.4.2">set_grays</A> to indicate that there are <TT>subsample^2+1</TT> gray
 levels.  Since there is at most 256 gray levels, this also means that
 <TT>subsample</TT> should never be greater than <TT>15</TT>.<P><B>Remark</B>: Arguments <TT>x</TT> and <TT>y</TT> do not represent a position in the
 coordinate system of the current GBitmap.  According to the above
@@ -557,7 +554,7 @@ resulting anti-aliasing changes are paramount to the image quality.
 <DL><DT><DD></DL><P></DL>
 
 <A NAME="Saving images.  ">
-<A NAME="DOC.1.4.19.1.8">
+<A NAME="DOC.1.5.17.1.8">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> Saving images.  </B></TT>
 <DD>The following functions write PBM, PGM and RLE files.  PBM and PGM are
 well known formats for bilevel and gray-level images.  The RLE is a
@@ -567,7 +564,7 @@ See <!1><A HREF="PNMandRLEfileformats.html">PNM and RLE file formats</A> for mor
 <DL><DT><DD></DL><P><DL>
 
 <A NAME="save_pbm">
-<A NAME="DOC.1.4.19.1.8.1">
+<A NAME="DOC.1.5.17.1.8.1">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void save_pbm(<!1><A HREF="ByteStream.html">ByteStream</A> &amp;bs, int raw=1)</B></TT>
 <DD>Saves the image into ByteStream <TT>bs</TT> using the PBM format.  Argument
 <TT>raw</TT> selects the ``Raw PBM'' (1) or the ``Ascii PBM'' (0) format.  The
@@ -575,7 +572,7 @@ image is saved as a bilevel image.  All non zero pixels are considered
 black pixels. See section <!1><A HREF="PNMandRLEfileformats.html">PNM and RLE file formats</A>. 
 <DL><DT><DD></DL><P>
 <A NAME="save_pgm">
-<A NAME="DOC.1.4.19.1.8.2">
+<A NAME="DOC.1.5.17.1.8.2">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void save_pgm(<!1><A HREF="ByteStream.html">ByteStream</A> &amp;bs, int raw=1)</B></TT>
 <DD>Saves the image into ByteStream <TT>bs</TT> using the PGM format.  Argument
 <TT>raw</TT> selects the ``Raw PGM'' (1) or the ``Ascii PGM'' (0) format.  The
@@ -583,7 +580,7 @@ image is saved as a gray level image.  See section
 <!1><A HREF="PNMandRLEfileformats.html">PNM and RLE file formats</A>. 
 <DL><DT><DD></DL><P>
 <A NAME="save_rle">
-<A NAME="DOC.1.4.19.1.8.3">
+<A NAME="DOC.1.5.17.1.8.3">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void save_rle(<!1><A HREF="ByteStream.html">ByteStream</A> &amp;bs)</B></TT>
 <DD>Saves the image into ByteStream <TT>bs</TT> using the RLE file format.
 The image is saved as a bilevel image. All non zero pixels are
@@ -591,18 +588,18 @@ considered black pixels. See section <!1><A HREF="PNMandRLEfileformats.html">PNM
 <DL><DT><DD></DL><P></DL>
 
 <A NAME="Stealing or borrowing the memory buffer (advanced). ">
-<A NAME="DOC.1.4.19.1.9">
+<A NAME="DOC.1.5.17.1.9">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> Stealing or borrowing the memory buffer (advanced). </B></TT>
 <DL><DT><DD></DL><P><DL>
 
 <A NAME="take_data">
-<A NAME="DOC.1.4.19.1.9.1">
+<A NAME="DOC.1.5.17.1.9.1">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>unsigned char* take_data(size_t &amp;offset)</B></TT>
 <DD>Steals the memory buffer of a GBitmap.  This function returns the
 address of the memory buffer allocated by this GBitmap object.  The
 offset of the first pixel in the bottom line is written into variable
 <TT>offset</TT>.  Other lines can be accessed using pointer arithmetic (see
-<!1><A HREF="GBitmap.html#DOC.1.4.19.1.3.5">rowsize</A>).  The GBitmap object no longer ``owns'' the buffer: you
+<!1><A HREF="GBitmap.html#DOC.1.5.17.1.3.5">rowsize</A>).  The GBitmap object no longer ``owns'' the buffer: you
 must explicitly de-allocate the buffer using <TT>operator delete []</TT>.  This
 de-allocation should take place after the destruction or the
 re-initialization of the GBitmap object.  This function will return a
@@ -610,7 +607,7 @@ null pointer if the GBitmap object does not ``own'' the buffer in the
 first place.  
 <DL><DT><DD></DL><P>
 <A NAME="borrow_data">
-<A NAME="DOC.1.4.19.1.9.2">
+<A NAME="DOC.1.5.17.1.9.2">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>inline   void borrow_data(unsigned char &amp;data, int w, int h)</B></TT>
 <DD>Initializes this GBitmap by borrowing a memory segment.  The GBitmap
 then directly addresses the memory buffer <TT>data</TT> provided by the user.
@@ -621,17 +618,17 @@ de-allocation should take place after the destruction or the
 re-initialization of the GBitmap object.  
 <DL><DT><DD></DL><P>
 <A NAME="donate_data">
-<A NAME="DOC.1.4.19.1.9.3">
+<A NAME="DOC.1.5.17.1.9.3">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void donate_data(unsigned char *data, int w, int h)</B></TT>
 <DD>Same as borrow_data, except GBitmap will call <TT>delete[]</TT>. 
 <DL><DT><DD></DL><P>
 <A NAME="get_rle">
-<A NAME="DOC.1.4.19.1.9.4">
+<A NAME="DOC.1.5.17.1.9.4">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>const unsigned char* get_rle(unsigned int &amp;rle_length)</B></TT>
 <DD>Return a pointer to the rle data. 
 <DL><DT><DD></DL><P>
 <A NAME="donate_rle">
-<A NAME="DOC.1.4.19.1.9.5">
+<A NAME="DOC.1.5.17.1.9.5">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void donate_rle(unsigned char *rledata, unsigned int rledatalen, int w, int h)</B></TT>
 <DD>Initializes this GBitmap by setting the size to <TT>h</TT> rows and <TT>w</TT>
 columns, and directly addressing the memory buffer <TT>rledata</TT> provided by
@@ -644,28 +641,19 @@ data segment of the RLE file format (without the header) documented in
 <!1><A HREF="PNMandRLEfileformats.html">PNM and RLE file formats</A>.  
 <DL><DT><DD></DL><P>
 <A NAME="read_run">
-<A NAME="DOC.1.4.19.1.9.6">
+<A NAME="DOC.1.5.17.1.9.6">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static inline   int read_run(const unsigned char *&amp;data)</B></TT>
 <DD>Static function for parsing run data.
 This function returns one run length encoded at position <TT>data</TT> 
 and increments the pointer <TT>data</TT> accordingly. 
 <DL><DT><DD></DL><P>
 <A NAME="append_run">
-<A NAME="DOC.1.4.19.1.9.7">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static inline   void append_run(unsigned char *&amp;data, int <!1><A HREF="GPEnabled.html#DOC.1.4.4.6">count</A>)</B></TT>
+<A NAME="DOC.1.5.17.1.9.7">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static inline   void append_run(unsigned char *&amp;data, int <!1><A HREF="GPEnabled.html#DOC.1.5.4.1.6">count</A>)</B></TT>
 <DD>Static function for generating run data.
 This function encoded run length <TT>count</TT> at position <TT>data</TT>
 and increments the pointer accordingly.  The pointer must
 initially point to a large enough data buffer. 
-<DL><DT><DD></DL><P>
-<A NAME="rotate">
-<A NAME="DOC.1.4.19.1.9.8">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GBitmap.html">GBitmap</A>&gt;  rotate(int <!1><A HREF="GPEnabled.html#DOC.1.4.4.6">count</A>=0)</B></TT>
-<DD>Rotates bitmap by 90, 180 or 270 degrees anticlockwise
-and returns a new pixmap, input bitmap is not changed. 
-count can be 1, 2, or 3 for 90, 180, 270 degree rotation.
-It returns the same bitmap if not rotated. 
-The input bitmap will be uncompressed for rotation
 <DL><DT><DD></DL><P></DL>
 </DL>
 
@@ -675,7 +663,7 @@ The input bitmap will be uncompressed for rotation
 <!-- This is were the DOC++ footer is defined  -->
 
 <font face="arial,helvetica" size="2">
-<a href=http://www.lizardtech.com>DjVu</a> is a trademark of LizardTech, Inc.  
+<a href=http://www.djvu.att.com>DjVu</a> is a trademark of AT&amp;T.  
 <br>All other products mentioned are registered trademarks or trademarks of
 their respective companies.
 </font>
