@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVmFile.cpp,v 1.2 1999-05-25 19:42:27 eaf Exp $
+//C- $Id: DjVmFile.cpp,v 1.3 1999-06-08 20:36:24 leonb Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -102,14 +102,13 @@ DjVmFile::get_first_file(const char * form_name)
       if (file->iff_file)
       {
 	 TArray<char> data=get_file(file->name);
-	 MemoryByteStream str(data, data.size());
+	 MemoryByteStream str((const char*)data, data.size());
 	 IFFByteStream iff(str);
 
-	 int chksize;
 	 GString chkid;
 	 if (!iff.get_chunk(chkid)) THROW("File does not appear to be in IFF format.");
 
-	 while((chksize=iff.get_chunk(chkid)))
+	 while((iff.get_chunk(chkid)))
 	 {
 	    if (chkid==form_name) return file->name;
 	    iff.close_chunk();
@@ -140,8 +139,9 @@ DjVmFile::get_djvm_dir(void)
    {
       GString fname=files[pos]->name;
       TArray<char> & data=files[pos]->data;
-      MemoryByteStream file_str(data, data.size());
+      MemoryByteStream file_str((const char*)data, data.size());
       int iff_file=0;
+
       TRY {
 	 IFFByteStream file_iff(file_str);
 	 int size;
@@ -244,12 +244,12 @@ DjVmFile::write(ByteStream & ostr)
 	 DEBUG_MSG(fname << ": is an IFF file\n");
 	 if (!strncmp(data, "AT&T", 4))
 	    iff.writall((const char *) data+4, data.size()-4);
-	 else iff.writall(data, data.size());
+	 else iff.writall((const char*) data, data.size());
       } else
       {
 	 DEBUG_MSG(fname << ": is NOT an IFF file\n");
 	 iff.put_chunk("RAW ");
-	 iff.writall(data, data.size());
+	 iff.writall((const char*) data, data.size());
 	 iff.close_chunk();
       };
    };
@@ -314,7 +314,7 @@ DjVmFile::read(ByteStream & str)
 		", size=" << file.size << "\n");
 
       TArray<char> data(file.size+3);
-      memcpy(data, "AT&T", 4);
+      memcpy((char*) data, "AT&T", 4);
       str.seek(file.offset, SEEK_SET);
       str.readall((char *) data+4, data.size()-4);
       files.append(new File(file.name, data));
@@ -334,6 +334,6 @@ DjVmFile::expand(const char * dir_name)
       if (dir_name[strlen(dir_name)-1]!='/') name+='/';
       name+=file.name;
       StdioByteStream str(name, "wb");
-      str.writall(file.data, file.data.size());
+      str.writall((const char*)file.data, file.data.size());
    }
 }

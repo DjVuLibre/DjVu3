@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: Arrays.cpp,v 1.3 1999-06-02 23:33:53 leonb Exp $
+//C- $Id: Arrays.cpp,v 1.4 1999-06-08 20:36:24 leonb Exp $
 
 
 /* Put this into *one* file, which instantiates all the required containers
@@ -88,7 +88,6 @@ ArrayRep::operator= (const ArrayRep & rep)
 void
 ArrayRep::resize(int lo, int hi)
 {
-  int i;
   int nsize = hi - lo + 1;
   // Validation
   if (nsize < 0)
@@ -171,7 +170,6 @@ ArrayRep::del(int n, unsigned int howmany)
 void
 ArrayRep::ins(int n, const void * what, unsigned int howmany)
 {
-   int i;
    int nhi = hibound + howmany;
    if (howmany == 0) return;
    if (maxhi < nhi)

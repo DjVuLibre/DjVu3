@@ -9,9 +9,9 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GOS.cpp,v 1.7 1999-03-17 19:24:57 leonb Exp $
+//C- $Id: GOS.cpp,v 1.8 1999-06-08 20:36:25 leonb Exp $
 
-// "$Id: GOS.cpp,v 1.7 1999-03-17 19:24:57 leonb Exp $"
+// "$Id: GOS.cpp,v 1.8 1999-06-08 20:36:25 leonb Exp $"
 
 #ifdef __GNUC__
 #pragma implementation
@@ -599,7 +599,6 @@ GOS::filename_to_url(const char *filename, const char *useragent)
     return "file:/" "/" + expand_name(filename);
 
   // Potentially unsafe characters (cf. RFC1738 and RFC1808)
-  const char *safe = "\\\"/@?#;%<>{}[]";
   const char *hex = "0123456789ABCDEF";
   
   // Normalize file name to url slash-and-escape syntax

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: Arrays.h,v 1.2 1999-05-25 19:42:27 eaf Exp $
+//C- $Id: Arrays.h,v 1.3 1999-06-08 20:36:24 leonb Exp $
 
 
 #ifndef _ARRAYS_H_
@@ -71,7 +71,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@research.att.com> -- Copy-on-demand implementation.
     @version 
-    #$Id: Arrays.h,v 1.2 1999-05-25 19:42:27 eaf Exp $# */
+    #$Id: Arrays.h,v 1.3 1999-06-08 20:36:24 leonb Exp $# */
 //@{
 
 // Internal "Array repository" holding the pointer to the actual data,
@@ -261,16 +261,16 @@ public:
 };
 
 inline void
-ArrayBase::check(void)
-{
-   if (get()->get_count()>1) detach();
-}
-
-inline void
 ArrayBase::detach(void)
 {
    ArrayRep * new_rep=new ArrayRep(*(ArrayRep *) get());
    assign(new_rep);
+}
+
+inline void
+ArrayBase::check(void)
+{
+   if (get()->get_count()>1) detach();
 }
 
 inline int
@@ -295,8 +295,14 @@ inline void
 ArrayBase::empty()
 {
    check();
-   
    ((ArrayRep *) get())->empty();
+}
+
+inline void
+ArrayBase::resize(int lo, int hi)
+{
+   check();
+   ((ArrayRep *) get())->resize(lo, hi);
 }
 
 inline void
@@ -309,23 +315,13 @@ inline void
 ArrayBase::touch(int n)
 {
    check();
-   
    ((ArrayRep *) get())->touch(n);
-}
-
-inline void
-ArrayBase::resize(int lo, int hi)
-{
-   check();
-   
-   ((ArrayRep *) get())->resize(lo, hi);
 }
 
 inline void
 ArrayBase::shift(int disp)
 {
    check();
-   
    ((ArrayRep *) get())->shift(disp);
 }
 

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GCache.h,v 1.4 1999-06-08 15:58:58 eaf Exp $
+//C- $Id: GCache.h,v 1.5 1999-06-08 20:36:24 leonb Exp $
 
 #ifndef _GCACHE_H
 #define _GCACHE_H
@@ -36,7 +36,7 @@
     
     @memo Simple template data caching class.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: GCache.h,v 1.4 1999-06-08 15:58:58 eaf Exp $#
+    @version #$Id: GCache.h,v 1.5 1999-06-08 20:36:24 leonb Exp $#
 */
 
 //@{
@@ -242,7 +242,7 @@ GCache<Key, Value>::clear_to_size(int size)
 	    item_arr[i]=item;
 	 };
 
-	 qsort(item_arr, item_arr.size(), sizeof(item_arr[0]),
+	 qsort((void**)item_arr, item_arr.size(), sizeof(item_arr[0]),
 	       GCacheItemBase::qsort_func);
 
 	 for(i=0;i<item_arr.size() && cur_size>(int) size;i++)

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GBitmap.cpp,v 1.11 1999-06-02 23:33:53 leonb Exp $
+//C- $Id: GBitmap.cpp,v 1.12 1999-06-08 20:36:24 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -24,7 +24,7 @@
 #include "Arrays.h"
 
 
-// File "$Id: GBitmap.cpp,v 1.11 1999-06-02 23:33:53 leonb Exp $"
+// File "$Id: GBitmap.cpp,v 1.12 1999-06-08 20:36:24 leonb Exp $"
 // - Author: Leon Bottou, 05/1997
 
 // ----- constructor and destructor
@@ -846,7 +846,7 @@ static unsigned char **
 makerows(int nrows, int ncolumns, unsigned char *runs)
 {
   int r = nrows;
-  unsigned char **rlerows = new (unsigned char*)[nrows];
+  unsigned char **rlerows = new unsigned char* [nrows];
   while (r-- > 0)
     {
       int c=0;

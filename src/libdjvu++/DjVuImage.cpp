@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuImage.cpp,v 1.14 1999-05-26 21:08:25 eaf Exp $
+//C- $Id: DjVuImage.cpp,v 1.15 1999-06-08 20:36:24 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -109,63 +109,63 @@ DjVuImage::get_dir(const GP<DjVuFile> & file) const
    return 0;
 }
 
-inline GP<DjVuInfo>   
+GP<DjVuInfo>   
 DjVuImage::get_info() const
 {
-   return (file && (info==0 || file->is_decoding())) ?
+   return (file && (!info || file->is_decoding())) ?
 	  ((DjVuImage *) this)->info=get_info(file) : info;
 }
 
-inline GP<DjVuAnno>   
+GP<DjVuAnno>   
 DjVuImage::get_anno() const
 {
-   return (file && (anno==0 || file->is_decoding())) ?
+   return (file && (!anno || file->is_decoding())) ?
 	  ((DjVuImage *) this)->anno=get_anno(file) : anno;
 }
 
-inline GP<IWPixmap>   
+GP<IWPixmap>   
 DjVuImage::get_bg44() const
 {
-   return (file && (bg44==0 || file->is_decoding())) ?
+   return (file && (!bg44 || file->is_decoding())) ?
 	  ((DjVuImage *) this)->bg44=get_bg44(file) : bg44;
 }
 
-inline GP<JB2Image>   
+GP<JB2Image>   
 DjVuImage::get_fgjb() const
 {
-   return (file && (fgjb==0 || file->is_decoding())) ?
+   return (file && (!fgjb || file->is_decoding())) ?
 	  ((DjVuImage *) this)->fgjb=get_fgjb(file) : fgjb;
 }
 
-inline GP<GPixmap>    
+GP<GPixmap>    
 DjVuImage::get_fgpm() const
 {
-   return (file && (fgpm==0 || file->is_decoding())) ?
+   return (file && (!fgpm || file->is_decoding())) ?
 	  ((DjVuImage *) this)->fgpm=get_fgpm(file) : fgpm;
 }
 
-inline int
+int
 DjVuImage::get_width() const
 {
    GP<DjVuInfo> info=get_info();
    return info ? info->width : 0;
 }
 
-inline int
+int
 DjVuImage::get_height() const
 {
    GP<DjVuInfo> info=get_info();
    return info ? info->height : 0;
 }
 
-inline int
+int
 DjVuImage::get_version() const
 {
    GP<DjVuInfo> info=get_info();
    return info ? info->version : DJVUVERSION;
 }
 
-inline int
+int
 DjVuImage::get_dpi() const
 {
    GP<DjVuInfo> info=get_info();
@@ -191,18 +191,19 @@ DjVuImage::get_rounded_dpi() const
    return std_dpi[min_idx];
 }
 
-inline double
+double
 DjVuImage::get_gamma() const
 {
    GP<DjVuInfo> info=get_info();
    return info ? info->gamma : 2.2;
 }
 
-inline GString
+GString
 DjVuImage::get_mimetype() const
 {
    return file->mimetype;
 }
+
 
 //// DJVUIMAGE: UTILITIES
 
@@ -311,7 +312,7 @@ DjVuImage::decode(ByteStream & str)
       stream_pool->add_data(buffer, length);
    stream_pool->set_eof();
    
-   GP<DjVuDocument> doc=new DjVuDocument(stream_url, this);
+   GP<DjVuDocument> doc = new DjVuDocument( stream_url, 1, this );
    GP<DjVuImage> dimg=doc->get_page(-1);
    file=dimg->get_djvu_file();
    file->wait_for_finish();

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: djvuextract.cpp,v 1.12 1999-06-04 15:55:17 leonb Exp $
+//C- $Id: djvuextract.cpp,v 1.13 1999-06-08 20:36:25 leonb Exp $
 
 /** @name djvuextract
 
@@ -54,7 +54,7 @@
     @memo
     Extract components from DjVu files.
     @version
-    #$Id: djvuextract.cpp,v 1.12 1999-06-04 15:55:17 leonb Exp $#
+    #$Id: djvuextract.cpp,v 1.13 1999-06-08 20:36:25 leonb Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> - Initial implementation\\
     Andrei Erofeev <eaf@geocities.com> - Multipage support */
@@ -99,7 +99,7 @@ djvuextract(const char *filename, int page_num,
   GP<DjVuDocument> doc=new DjVuDocument(GOS::filename_to_url(filename), 1);
   GP<DjVuFile> file=doc->get_djvu_file(page_num);
   TArray<char> data=file->get_djvu_data(0, 0);
-  MemoryByteStream ibs(data, data.size());
+  MemoryByteStream ibs( (const char*)data, data.size());
   IFFByteStream iff(ibs);
   
   IFFByteStream BG44(*pBG44);
@@ -196,9 +196,10 @@ main(int argc, char **argv)
 {
   TRY
     {
+      int i;
       ATTLicense::process_cmdline(argc,argv);
       int page_num=0;
-      for(int i=1;i<argc;i++)
+      for(i=1;i<argc;i++)
 	 if (!strncmp(argv[i], "-page=", 6))
 	 {
 	    page_num=atoi(argv[i]+6);
@@ -234,7 +235,7 @@ main(int argc, char **argv)
       MemoryByteStream BG44;
       MemoryByteStream FG44;
       djvuextract(argv[1], page_num-1, &Sjbz, &BG44, &FG44);
-      for (int i=2; i<argc; i++)
+      for (i=2; i<argc; i++)
         {
           Sjbz.seek(0);
           BG44.seek(0);

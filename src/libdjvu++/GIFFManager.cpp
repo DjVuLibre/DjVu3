@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GIFFManager.cpp,v 1.3 1999-05-25 19:42:29 eaf Exp $
+//C- $Id: GIFFManager.cpp,v 1.4 1999-06-08 20:36:25 leonb Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -89,7 +89,7 @@ GIFFChunk::save(IFFByteStream & istr, bool use_trick)
    } else
    {
       istr.put_chunk(get_name(), use_trick);
-      istr.writall((char *) data, data.size());
+      istr.writall((const char *) data, data.size());
       istr.close_chunk();
    };
 }
@@ -463,7 +463,7 @@ GIFFManager::load_chunk(IFFByteStream & istr, GP<GIFFChunk> chunk)
       } else
       {
 	 TArray<char> data(chunk_size-1);
-	 istr.readall(data, data.size());
+	 istr.readall( (char*)data, data.size());
 	 GP<GIFFChunk> ch=new GIFFChunk(chunk_id, data);
 	 chunk->add_chunk(ch);
       };

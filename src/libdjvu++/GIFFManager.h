@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GIFFManager.h,v 1.3 1999-05-25 19:42:29 eaf Exp $
+//C- $Id: GIFFManager.h,v 1.4 1999-06-08 20:36:25 leonb Exp $
 
 #ifndef _GIFFMANAGER_H
 #define _GIFFMANAGER_H
@@ -40,7 +40,7 @@
     @author 
     Andrei Erofeev <eaf@geocities.com> -- Initial implementation.
     @version 
-    #$Id: GIFFManager.h,v 1.3 1999-05-25 19:42:29 eaf Exp $# */
+    #$Id: GIFFManager.h,v 1.4 1999-06-08 20:36:25 leonb Exp $# */
 
 /** #GIFFChunk# is the base class for other IFF chunks understood by
     {\Ref GIFFManager}. It provides some basic interface, and is not supposed
@@ -111,10 +111,10 @@ inline GString
 GIFFChunk::get_name(void) const { return GString(name, 4); }
 
 inline GString
-GIFFChunk::get_full_name(void) const { return get_type()+":"+get_name(); };
+GIFFChunk::get_type(void) const { return type; };
 
 inline GString
-GIFFChunk::get_type(void) const { return type; };
+GIFFChunk::get_full_name(void) const { return get_type()+":"+get_name(); };
 
 inline bool
 GIFFChunk::is_container(void) const { return type.length()!=0; };
