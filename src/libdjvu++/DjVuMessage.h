@@ -6,22 +6,24 @@
 
 
 
-#if !defined(__DJVU_MESSAGE_H__)
+#ifndef __DJVU_MESSAGE_H__
 #define __DJVU_MESSAGE_H__
 
 #include "GString.h"
 
-
 class DjVuMessage
 {
-public:
-
+private:
   // Constructor:
   DjVuMessage( void );
 
+public:
+
+  static const DjVuMessage &get_DjVuMessage(void);
+
   // Destructor: Does any necessary cleanup. Actions depend on how the message
   //    file is implemented.
-  ~DjVuMessage( );
+  ~DjVuMessage();
 
   //  Exception causes and external messages are passed as message lists which
   //  have the following syntax:
@@ -74,27 +76,31 @@ public:
   //  arguments into the retrieved messages.
   //  N.B. The resulting string may be encoded in UTF-8 format (ISO 10646-1 Annex R)
   //       and SHOULD NOT BE ASSUMED TO BE ASCII.
-  GString LookUp( GString MessageList );
+  GString LookUp( const GString & MessageList ) const;
+
+  // This is a simple alias to the above class, but does an fprintf to stderr.
+  void perror( const GString & MessageList ) const;
 
 private:
 
   //  Looks up the msgID in the file of messages and returns a pointer to the beginning
   //  of the translated message, if found; and an empty string otherwise.
-  GString LookUpID( GString msgID );
+  GString LookUpID( const GString & msgID ) const;
 
   //  Expands a single message and inserts the arguments. Single_Message contains no
   //  separators (newlines), but includes all the parameters.
-  GString LookUpSingle( GString Single_Message );
+  GString LookUpSingle( const GString & Single_Message ) const;
 
   //  Insert a string into the message text. Will insert into any field description.
   //  If the ArgId is not found, adds a line with the parameter so information will
   //  not be lost.
-  void InsertArg( GString &message, int ArgId, GString arg );
+  void InsertArg( GString &message, int ArgId, GString arg ) const;
 };
 
 
 //  There is only object of class CDjVuMessage in a program, and here it is (the actual
 //  object is in DjVuMessage.cpp).
-extern DjVuMessage  DjVuMsg;
+// extern DjVuMessage  DjVuMsg;
+#define DjVuMsg DjVuMessage::get_DjVuMessage()
 
-#endif // __DJVU_MESSAGE_H__
+#endif /* __DJVU_MESSAGE_H__ */

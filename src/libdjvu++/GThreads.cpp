@@ -9,10 +9,10 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GThreads.cpp,v 1.51 2000-10-06 21:47:21 fcrary Exp $
+//C- $Id: GThreads.cpp,v 1.52 2000-10-10 21:44:57 bcr Exp $
 
 
-// **** File "$Id: GThreads.cpp,v 1.51 2000-10-06 21:47:21 fcrary Exp $"
+// **** File "$Id: GThreads.cpp,v 1.52 2000-10-10 21:44:57 bcr Exp $"
 // This file defines machine independent classes
 // for running and synchronizing threads.
 // - Author: Leon Bottou, 01/1998
@@ -84,7 +84,7 @@ start(void *arg)
       G_CATCH(ex)
         {
           ex.perror();
-          fprintf(stderr, DjVuMsg.LookUp("GThreads.uncaught"));
+          DjVuMsg.perror("GThreads.uncaught");
 #ifdef _DEBUG
           abort();
 #endif
@@ -93,7 +93,7 @@ start(void *arg)
     }
   catch(...)
     {
-      fprintf(stderr, DjVuMsg.LookUp("GThreads.unrecognized"));
+      DjVuMsg.perror("GThreads.unrecognized");
 #ifdef _DEBUG
       abort();
 #endif
@@ -396,7 +396,7 @@ GThread::start(void *arg)
       G_CATCH(ex)
         {
           ex.perror();
-          fprintf(stderr, DjVuMsg.LookUp("GThreads.uncaught"));
+          DjVuMsg.perror("GThreads.uncaught");
 #ifdef _DEBUG
           abort();
 #endif
@@ -405,7 +405,7 @@ GThread::start(void *arg)
     }
   catch(...)
     {
-      fprintf(stderr, DjVuMsg.LookUp("GThreads.unrecognized"));
+      DjVuMsg.perror("GThreads.unrecognized");
 #ifdef _DEBUG
       abort();
 #endif
@@ -606,7 +606,7 @@ GThread::start(void *arg)
       G_CATCH(ex)
         {
           ex.perror();
-          fprintf(stderr, DjVuMsg.LookUp("GThreads.uncaught"));
+          DjVuMsg.perror("GThreads.uncaught");
 #ifdef _DEBUG
           abort();
 #endif
@@ -616,7 +616,7 @@ GThread::start(void *arg)
     }
   catch(...)
     {
-          fprintf(stderr, DjVuMsg.LookUp("GThreads.unrecognized"));
+          DjVuMsg.perror("GThreads.unrecognized");
 #ifdef _DEBUG
       abort();
 #endif
@@ -1201,7 +1201,7 @@ cotask_yield()
   while (q != n);
   // abort on deadlock
   if (count == 0) {
-    fprintf(stderr, DjVuMsg.LookUp("GThreads.panic") );
+    DjVuMsg.perror("GThreads.panic");
     abort();
   }
   // select
@@ -1374,7 +1374,7 @@ cotask_get_eh_context()
     return curtask->ehctx;
   else if (maintask)
     return maintask->ehctx;
-  fprintf(stderr, DjVuMsg.LookUp("GThreads.co_panic") );
+  DjVuMsg.perror("GThreads.co_panic") );
   abort();
 }
 #endif
@@ -1473,7 +1473,7 @@ starttwo(GThread *thr)
       G_CATCH(ex)
         {
           ex.perror();
-          fprintf(stderr, DjVuMsg.LookUp("GThreads.uncaught"));
+          DjVuMsg.perror("GThreads.uncaught");
 #ifdef _DEBUG
           abort();
 #endif
@@ -1483,7 +1483,7 @@ starttwo(GThread *thr)
     }
   catch(...)
     {
-          fprintf(stderr, DjVuMsg.LookUp("GThreads.unrecognized"));
+          DjVuMsg.perror("GThreads.unrecognized");
 #ifdef _DEBUG
       abort();
 #endif

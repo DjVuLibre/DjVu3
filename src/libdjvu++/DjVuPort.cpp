@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: DjVuPort.cpp,v 1.36 2000-10-06 21:47:21 fcrary Exp $
+//C- $Id: DjVuPort.cpp,v 1.37 2000-10-10 21:44:57 bcr Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -608,14 +608,14 @@ DjVuSimplePort::request_data(const DjVuPort * source, const GURL & url)
 bool
 DjVuSimplePort::notify_error(const DjVuPort * source, const char * msg)
 {
-   fprintf(stderr, "%s\n", DjVuMsg.LookUp(msg));
+   DjVuMsg.perror(msg);
    return 1;
 }
 
 bool
 DjVuSimplePort::notify_status(const DjVuPort * source, const char * msg)
 {
-   fprintf(stderr, "%s\n", DjVuMsg.LookUp(msg));
+   DjVuMsg.perror(msg);
    return 1;
 }
 

@@ -1,6 +1,7 @@
 ### BEGIN C++ DEPENDENCIES
 bzz.o: bzz.cpp ../../../src/libdjvu++/GException.h \
  ../../../src/libdjvu++/DjVuGlobal.h \
+ ../../../src/include/DjVu.h \
  ../../../src/libdjvu++/ByteStream.h \
  ../../../src/libdjvu++/GContainer.h \
  ../../../src/libdjvu++/GSmartPointer.h \
@@ -9,6 +10,7 @@ bzz.o: bzz.cpp ../../../src/libdjvu++/GException.h \
  ../../../src/libdjvu++/ZPCodec.h
 c44.o: c44.cpp ../../../src/libdjvu++/GString.h \
  ../../../src/libdjvu++/DjVuGlobal.h \
+ ../../../src/include/DjVu.h \
  ../../../src/libdjvu++/GException.h \
  ../../../src/libdjvu++/GSmartPointer.h \
  ../../../src/libdjvu++/IWImage.h \
@@ -23,6 +25,7 @@ c44.o: c44.cpp ../../../src/libdjvu++/GString.h \
  ../../../src/libdjvu++/GThreads.h \
  ../../../src/libdjvu++/GOS.h
 cjb2.o: cjb2.cpp ../../../src/libdjvu++/DjVuGlobal.h \
+ ../../../src/include/DjVu.h \
  ../../../src/libdjvu++/GException.h \
  ../../../src/libdjvu++/GSmartPointer.h \
  ../../../src/libdjvu++/GContainer.h \
@@ -38,6 +41,7 @@ cjb2.o: cjb2.cpp ../../../src/libdjvu++/DjVuGlobal.h \
  ../../../src/libdjvu++/GThreads.h
 cpaldjvu.o: cpaldjvu.cpp \
  ../../../src/libdjvu++/DjVuGlobal.h \
+ ../../../src/include/DjVu.h \
  ../../../src/libdjvu++/GException.h \
  ../../../src/libdjvu++/GSmartPointer.h \
  ../../../src/libdjvu++/GContainer.h \
@@ -56,6 +60,7 @@ cpaldjvu.o: cpaldjvu.cpp \
  ../../../src/libdjvu++/GThreads.h
 d44.o: d44.cpp ../../../src/libdjvu++/GString.h \
  ../../../src/libdjvu++/DjVuGlobal.h \
+ ../../../src/include/DjVu.h \
  ../../../src/libdjvu++/GException.h \
  ../../../src/libdjvu++/GSmartPointer.h \
  ../../../src/libdjvu++/IWImage.h \
@@ -69,6 +74,7 @@ d44.o: d44.cpp ../../../src/libdjvu++/GString.h \
  ../../../src/libdjvu++/GOS.h
 ddjvu.o: ddjvu.cpp ../../../src/libdjvu++/GException.h \
  ../../../src/libdjvu++/DjVuGlobal.h \
+ ../../../src/include/DjVu.h \
  ../../../src/libdjvu++/GSmartPointer.h \
  ../../../src/libdjvu++/GRect.h \
  ../../../src/libdjvu++/GPixmap.h \
@@ -101,6 +107,7 @@ ddjvu.o: ddjvu.cpp ../../../src/libdjvu++/GException.h \
  ../../../src/libdjvu++/GOS.h
 djthumb.o: djthumb.cpp ../../../src/libdjvu++/GString.h \
  ../../../src/libdjvu++/DjVuGlobal.h \
+ ../../../src/include/DjVu.h \
  ../../../src/libdjvu++/GException.h \
  ../../../src/libdjvu++/GSmartPointer.h \
  ../../../src/libdjvu++/DjVuDocEditor.h \
@@ -132,9 +139,44 @@ djthumb.o: djthumb.cpp ../../../src/libdjvu++/GString.h \
  ../../../src/libdjvu++/DjVmDoc.h \
  ../../../src/libdjvu++/DjVmDir.h \
  ../../../src/libdjvu++/GOS.h
+djvm.o: djvm.cpp ../../../src/libdjvu++/GException.h \
+ ../../../src/libdjvu++/DjVuGlobal.h \
+ ../../../src/include/DjVu.h \
+ ../../../src/libdjvu++/DjVuDocEditor.h \
+ ../../../src/libdjvu++/DjVuDocument.h \
+ ../../../src/libdjvu++/GSmartPointer.h \
+ ../../../src/libdjvu++/DjVuFileCache.h \
+ ../../../src/libdjvu++/DjVuFile.h \
+ ../../../src/libdjvu++/ByteStream.h \
+ ../../../src/libdjvu++/GContainer.h \
+ ../../../src/libdjvu++/Arrays.h \
+ ../../../src/libdjvu++/DataPool.h \
+ ../../../src/libdjvu++/GThreads.h \
+ ../../../src/libdjvu++/GString.h \
+ ../../../src/libdjvu++/DjVuInfo.h \
+ ../../../src/libdjvu++/JB2Image.h \
+ ../../../src/libdjvu++/ZPCodec.h \
+ ../../../src/libdjvu++/GRect.h \
+ ../../../src/libdjvu++/GBitmap.h \
+ ../../../src/libdjvu++/IWImage.h \
+ ../../../src/libdjvu++/GPixmap.h \
+ ../../../src/libdjvu++/IFFByteStream.h \
+ ../../../src/libdjvu++/DjVuPalette.h \
+ ../../../src/libdjvu++/DjVuPort.h \
+ ../../../src/libdjvu++/GURL.h \
+ ../../../src/libdjvu++/DjVuNavDir.h \
+ ../../../src/libdjvu++/debug.h \
+ ../../../src/libdjvu++/DjVuImage.h \
+ ../../../src/libdjvu++/DjVuAnno.h \
+ ../../../src/libdjvu++/GMapAreas.h \
+ ../../../src/libdjvu++/DjVmDir0.h \
+ ../../../src/libdjvu++/DjVmDoc.h \
+ ../../../src/libdjvu++/DjVmDir.h \
+ ../../../src/libdjvu++/GOS.h
 djvmcvt.o: djvmcvt.cpp ../../../src/libdjvu++/debug.h \
  ../../../src/libdjvu++/DjVmDoc.h \
  ../../../src/libdjvu++/DjVuGlobal.h \
+ ../../../src/include/DjVu.h \
  ../../../src/libdjvu++/ByteStream.h \
  ../../../src/libdjvu++/GException.h \
  ../../../src/libdjvu++/GContainer.h \
@@ -168,6 +210,7 @@ djvudump.o: djvudump.cpp DjVuDumpHelper.h \
  ../../../src/libdjvu++/DataPool.h \
  ../../../src/libdjvu++/ByteStream.h \
  ../../../src/libdjvu++/DjVuGlobal.h \
+ ../../../src/include/DjVu.h \
  ../../../src/libdjvu++/GException.h \
  ../../../src/libdjvu++/GContainer.h \
  ../../../src/libdjvu++/GSmartPointer.h \
@@ -178,6 +221,7 @@ DjVuDumpHelper.o: DjVuDumpHelper.cpp DjVuDumpHelper.h \
  ../../../src/libdjvu++/DataPool.h \
  ../../../src/libdjvu++/ByteStream.h \
  ../../../src/libdjvu++/DjVuGlobal.h \
+ ../../../src/include/DjVu.h \
  ../../../src/libdjvu++/GException.h \
  ../../../src/libdjvu++/GContainer.h \
  ../../../src/libdjvu++/GSmartPointer.h \
@@ -190,6 +234,7 @@ DjVuDumpHelper.o: DjVuDumpHelper.cpp DjVuDumpHelper.h \
 djvuextract.o: djvuextract.cpp \
  ../../../src/libdjvu++/GException.h \
  ../../../src/libdjvu++/DjVuGlobal.h \
+ ../../../src/include/DjVu.h \
  ../../../src/libdjvu++/ByteStream.h \
  ../../../src/libdjvu++/GContainer.h \
  ../../../src/libdjvu++/GSmartPointer.h \
@@ -223,6 +268,7 @@ djvuextract.o: djvuextract.cpp \
 djvumake.o: djvumake.cpp \
  ../../../src/libdjvu++/GString.h \
  ../../../src/libdjvu++/DjVuGlobal.h \
+ ../../../src/include/DjVu.h \
  ../../../src/libdjvu++/GException.h \
  ../../../src/libdjvu++/GSmartPointer.h \
  ../../../src/libdjvu++/DjVuImage.h \
@@ -249,6 +295,7 @@ djvumake.o: djvumake.cpp \
  ../../../src/libdjvu++/MMRDecoder.h
 djvutxt.o: djvutxt.cpp ../../../src/libdjvu++/GString.h \
  ../../../src/libdjvu++/DjVuGlobal.h \
+ ../../../src/include/DjVu.h \
  ../../../src/libdjvu++/GException.h \
  ../../../src/libdjvu++/GSmartPointer.h \
  ../../../src/libdjvu++/DjVuDocument.h \
@@ -282,6 +329,7 @@ djvutxt.o: djvutxt.cpp ../../../src/libdjvu++/GString.h \
 ppmcoco.o: ppmcoco.cpp \
  ../../../src/libdjvu++/GException.h \
  ../../../src/libdjvu++/DjVuGlobal.h \
+ ../../../src/include/DjVu.h \
  ../../../src/libdjvu++/ByteStream.h \
  ../../../src/libdjvu++/GContainer.h \
  ../../../src/libdjvu++/GSmartPointer.h \

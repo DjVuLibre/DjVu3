@@ -10,8 +10,13 @@
 #include <stdio.h>
 
 //  There is only object of class DjVuMessage in a program, and here it is:
-DjVuMessage  DjVuMsg;
-
+//DjVuMessage  DjVuMsg;
+const DjVuMessage &
+DjVuMessage::get_DjVuMessage(void)
+{
+  static const DjVuMessage m;
+  return m;
+}
 
 //  The name of the message file
 static const char DjVuMessageFileName[] = "DjVuMessageFile.txt";
@@ -39,11 +44,19 @@ DjVuMessage::~DjVuMessage( )
 };
 
 
+void
+DjVuMessage::perror( const GString & MessageList ) const
+{
+  GString mesg=LookUp(MessageList);
+  fputs((const char *)mesg,stderr);
+}
+
 //  Expands message lists by looking up the message IDs and inserting
 //  arguments into the retrieved messages.
 //  N.B. The resulting string may be encoded in UTF-8 format (ISO 10646-1 Annex R)
 //       and SHOULD NOT BE ASSUMED TO BE ASCII.
-GString DjVuMessage::LookUp( GString MessageList )
+GString
+DjVuMessage::LookUp( const GString & MessageList ) const
 {
   GString result;                           // Result string; begins empty
   int start = 0;                            // Beginning of next message
@@ -90,7 +103,8 @@ GString DjVuMessage::LookUp( GString MessageList )
 
 //  Expands a single message and inserts the arguments. Single_Message contains no
 //  separators (newlines), but includes all the parameters.
-GString DjVuMessage::LookUpSingle( GString Single_Message )
+GString
+DjVuMessage::LookUpSingle( const GString &Single_Message ) const
 {
   //  Isolate the message ID and get the corresponding message text
   int ending_posn = Single_Message.search('\t');
@@ -128,7 +142,8 @@ GString DjVuMessage::LookUpSingle( GString Single_Message )
 
 //  Looks up the msgID in the file of messages and returns a pointer to the beginning
 //  of the translated message, if found; and an empty string otherwise.
-GString DjVuMessage::LookUpID( GString msgID )
+GString
+DjVuMessage::LookUpID( const GString &msgID ) const
 {
   //  Find the message file
   const char *ss;
@@ -173,7 +188,8 @@ GString DjVuMessage::LookUpID( GString msgID )
 //  Insert a string into the message text. Will insert into any field description.
 //  If the ArgId is not found, adds a line with the parameter so information will
 //  not be lost.
-void DjVuMessage::InsertArg( GString &message, int ArgId, GString arg )
+void
+DjVuMessage::InsertArg( GString &message, int ArgId, GString arg ) const
 {
   GString target = GString("%#") + GString(ArgId) + "#";           // argument target string
   int format_start = message.search( target );            // location of target string
