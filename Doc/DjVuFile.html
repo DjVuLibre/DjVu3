@@ -1,6 +1,6 @@
 <HTML>
 <HEAD>
-   <TITLE>class  DjVuFile</TITLE>
+   <TITLE>class  DjVuTXT::DjVuFile</TITLE>
    <META NAME="GENERATOR" CONTENT="DOC++ 3.4.1">
 </HEAD>
 <BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
@@ -34,7 +34,7 @@
 <A HREF="#DOC.1.5.28.1.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVuNavDir.html">DjVuNavDir</A>&gt;  <B>find_ndir</B>(void)
 <DD><I>Looks for <TT>decoded</TT> navigation directory (<!1><A HREF="DjVuNavDir.html">DjVuNavDir</A>) in this or included files.</I>
 <DT>
-<A HREF="#DOC.1.5.28.1.16"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GURL.html">GURL</A> <B>get_url</B>(void) const 
+<A HREF="#DOC.1.5.28.1.17"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GURL.html">GURL</A> <B>get_url</B>(void) const 
 <DD><I>Returns the URL assigned to this file</I>
 <DT>
 <A HREF="#DOC.1.5.28.1.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>GPList&lt;<!1><A HREF="DjVuFile.html">DjVuFile</A>&gt;  <B>get_included_files</B>(bool only_created=true)
@@ -43,22 +43,22 @@
 <A HREF="#DOC.1.5.28.1.9"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>insert_file</B>(const char * id, int chunk_num=1)
 <DD><I>Includes a <TT>DjVuFile</TT> with the specified This function will also insert an <TT>INCL</TT> chunk at position <TT>chunk_num</TT>.</I>
 <DT>
-<A HREF="#DOC.1.5.28.1.17"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>unlink_file</B>(const char * id)
+<A HREF="#DOC.1.5.28.1.18"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>unlink_file</B>(const char * id)
 <DD><I>Will get rid of included file with the given</I>
 <DT>
 <A HREF="#DOC.1.5.28.1.10"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DataPool.html">DataPool</A>&gt;  <B>unlink_file</B>(const <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DataPool.html">DataPool</A>&gt; &amp; data, const char * name)
 <DD><I>Will find an <TT>INCL</TT> chunk containing <TT>name</TT> in input <TT>data</TT> and will remove it </I>
 <DT>
-<A HREF="#DOC.1.5.28.1.18"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_chunks_number</B>(void)
+<A HREF="#DOC.1.5.28.1.19"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_chunks_number</B>(void)
 <DD><I>Returns the number of chunks in the IFF file data</I>
 <DT>
-<A HREF="#DOC.1.5.28.1.19"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GString.html">GString</A> <B>get_chunk_name</B>(int chunk_num)
+<A HREF="#DOC.1.5.28.1.20"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GString.html">GString</A> <B>get_chunk_name</B>(int chunk_num)
 <DD><I>Returns the name of chunk number <TT>chunk_num</TT></I>
 <DT>
-<A HREF="#DOC.1.5.28.1.20"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>bool <B>contains_chunk</B>(const char * chunk_name)
+<A HREF="#DOC.1.5.28.1.21"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>bool <B>contains_chunk</B>(const char * chunk_name)
 <DD><I>Returns 1 if this file contains chunk with name <TT>chunk_name</TT></I>
 <DT>
-<A HREF="#DOC.1.5.28.1.11"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="MemoryByteStream.html">MemoryByteStream</A>&gt;  <B>get_merged_anno</B>(int * max_level_ptr=0)
+<A HREF="#DOC.1.5.28.1.11"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="ByteStream.html">ByteStream</A>&gt;  <B>get_merged_anno</B>(int * max_level_ptr=0)
 <DD><I>Processes the included files hierarchy and returns merged annotations.</I>
 <DT>
 <A HREF="#DOC.1.5.28.1.12"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>remove_anno</B>(void)
@@ -67,7 +67,10 @@
 <A HREF="#DOC.1.5.28.1.13"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>bool <B>contains_anno</B>(void)
 <DD><I>Returns <TT>TRUE</TT> if the file contains annotation chunks.</I>
 <DT>
-<A HREF="#DOC.1.5.28.1.15"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>set_name</B>(const char * name)
+<A HREF="#DOC.1.5.28.1.14"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>change_text</B>(<!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVuTXT.html">DjVuTXT</A>&gt; txt, const bool do_reset)
+<DD><I>Changes the value of the text annotation.</I>
+<DT>
+<A HREF="#DOC.1.5.28.1.16"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>set_name</B>(const char * name)
 <DD><I>Internal.</I>
 </DL></P>
 
@@ -95,7 +98,7 @@
 <A HREF="#DOC.1.5.28.1.1.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;DjVuPalette&gt;  <B>fgbc</B>
 <DD><I>Pointer to a colors vector for the foreground component of DjVu image.</I>
 <DT>
-<A HREF="#DOC.1.5.28.1.1.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="MemoryByteStream.html">MemoryByteStream</A>&gt;  <B>anno</B>
+<A HREF="#DOC.1.5.28.1.1.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="ByteStream.html">ByteStream</A>&gt;  <B>anno</B>
 <DD><I>Pointer to collected annotation chunks.</I>
 <DT>
 <A HREF="#DOC.1.5.28.1.1.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVuNavDir.html">DjVuNavDir</A>&gt;  <B>dir</B>
@@ -166,15 +169,15 @@
 <DD><I>Processes <TT>INCL</TT> chunks and creates included files.</I>
 </DL></P>
 <DT>
-<A HREF="#DOC.1.5.28.1.14"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Encoding routines </B>
+<A HREF="#DOC.1.5.28.1.15"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Encoding routines </B>
 <DD><I></I>
 <P><DL>
 <DT>
-<A HREF="#DOC.1.5.28.1.14.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="ByteStream.html">ByteStream</A>&gt;  <B>get_djvu_bytestream</B>(bool included_too, bool no_ndir)
+<A HREF="#DOC.1.5.28.1.15.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="ByteStream.html">ByteStream</A>&gt;  <B>get_djvu_bytestream</B>(bool included_too, bool no_ndir)
 <DD><I>The main function that encodes data back into binary stream.</I>
 <DT>
-<A HREF="#DOC.1.5.28.1.14.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DataPool.html">DataPool</A>&gt;  <B>get_djvu_data</B>(bool included_too, bool no_ndir)
-<DD><I>Same as <!1><A HREF="DjVuFile.html#DOC.1.5.28.1.14.1">get_djvu_bytestream</A>(), returning a DataPool.</I>
+<A HREF="#DOC.1.5.28.1.15.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DataPool.html">DataPool</A>&gt;  <B>get_djvu_data</B>(bool included_too, bool no_ndir)
+<DD><I>Same as <!1><A HREF="DjVuFile.html#DOC.1.5.28.1.15.1">get_djvu_bytestream</A>(), returning a DataPool.</I>
 </DL></P>
 </DL></P>
 
@@ -263,7 +266,7 @@ have been extracted from the <!1><A HREF="DjVuImage.html">DjVuImage</A> and put 
 class <TT>DjVuFile</TT>.<P>As <!1><A HREF="DjVuImage.html">DjVuImage</A> before, <TT>DjVuFile</TT> now contains public class
 variables corresponding to every component, that can ever be decoded
 from a DjVu file (such as <TT>INFO</TT> chunk, <TT>BG44</TT> chunk, <TT>SJBZ</TT> chunk, etc.).<P>As before, the decoding is initiated by a single function
-(<!1><A HREF="DjVuFile.html#DOC.1.5.28.1.7.1">start_decode</A>() in this case, and <!1><A HREF="DjVuImage.html#DOC.1.5.32.1.4.1">decode</A>() before).
+(<!1><A HREF="DjVuFile.html#DOC.1.5.28.1.7.1">start_decode</A>() in this case, and <!1><A HREF="DjVuImage.html#DOC.1.5.32.1.15.1">decode</A>() before).
 The difference is that <TT>DjVuFile</TT> now handles threads creation itself.
 When you call the <!1><A HREF="DjVuFile.html#DOC.1.5.28.1.7.1">start_decode</A>() function, it creates the decoding
 thread, which starts decoding, and which can create additional threads:
@@ -360,7 +363,7 @@ too. </BLOCKQUOTE>
 <DL><DT><DD></DL><P>
 <A NAME="anno">
 <A NAME="DOC.1.5.28.1.1.7">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="MemoryByteStream.html">MemoryByteStream</A>&gt;  anno</B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="ByteStream.html">ByteStream</A>&gt;  anno</B></TT>
 <DD>Pointer to collected annotation chunks.
 <DL><DT><DD></DL><P>
 <A NAME="dir">
@@ -511,7 +514,7 @@ the correct information.
 <DL><DT><DD></DL><P></DL>
 
 <A NAME="get_url">
-<A NAME="DOC.1.5.28.1.16">
+<A NAME="DOC.1.5.28.1.17">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GURL.html">GURL</A> get_url(void) const </B></TT>
 <DD>Returns the URL assigned to this file
 <DL><DT><DD></DL><P>
@@ -610,7 +613,7 @@ This function will also insert an <TT>INCL</TT> chunk at position
 file and will create it before returning. 
 <DL><DT><DD></DL><P>
 <A NAME="unlink_file">
-<A NAME="DOC.1.5.28.1.17">
+<A NAME="DOC.1.5.28.1.18">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void unlink_file(const char * id)</B></TT>
 <DD>Will get rid of included file with the given
 <DL><DT><DD></DL><P>
@@ -621,23 +624,23 @@ file and will create it before returning.
 will remove it 
 <DL><DT><DD></DL><P>
 <A NAME="get_chunks_number">
-<A NAME="DOC.1.5.28.1.18">
+<A NAME="DOC.1.5.28.1.19">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int get_chunks_number(void)</B></TT>
 <DD>Returns the number of chunks in the IFF file data
 <DL><DT><DD></DL><P>
 <A NAME="get_chunk_name">
-<A NAME="DOC.1.5.28.1.19">
+<A NAME="DOC.1.5.28.1.20">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GString.html">GString</A> get_chunk_name(int chunk_num)</B></TT>
 <DD>Returns the name of chunk number <TT>chunk_num</TT>
 <DL><DT><DD></DL><P>
 <A NAME="contains_chunk">
-<A NAME="DOC.1.5.28.1.20">
+<A NAME="DOC.1.5.28.1.21">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>bool contains_chunk(const char * chunk_name)</B></TT>
 <DD>Returns 1 if this file contains chunk with name <TT>chunk_name</TT>
 <DL><DT><DD></DL><P>
 <A NAME="get_merged_anno">
 <A NAME="DOC.1.5.28.1.11">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="MemoryByteStream.html">MemoryByteStream</A>&gt;  get_merged_anno(int * max_level_ptr=0)</B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="ByteStream.html">ByteStream</A>&gt;  get_merged_anno(int * max_level_ptr=0)</B></TT>
 <DD>Processes the included files hierarchy and returns merged
 annotations. This function may be used even when the <TT>DjVuFile</TT>
 has not been decoded yet. If all data has been received for
@@ -662,7 +665,7 @@ will use it to store the maximum level at which annotations
 were found. Top-level page files have ZERO <TT>level</TT>.
 <BR><B>ignore_list</B> -  The function will not process included <TT>DjVuFile</TT>s
 with URLs matching those mentioned in this
-GP&lt;MemoryByteStream&gt;	get_merged_anno(const GList&lt;GURL&gt; &amp; ignore_list,
+GP&lt;ByteStream&gt;	get_merged_anno(const GList&lt;GURL&gt; &amp; ignore_list,
 int * max_level_ptr);
 /** Clears this file of all annotations. <BR><DD></DL><P>
 <A NAME="contains_anno">
@@ -673,13 +676,18 @@ Known annotation chunks at the time of writing this help are:
 <B>ANTa</B>, <B>ANTz</B>, <B>TXTa</B>, <B>TXTz</B>, and
 <B>FORM:ANNO</B>. 
 <DL><DT><DD></DL><P>
-<A NAME="Encoding routines ">
+<A NAME="change_text">
 <A NAME="DOC.1.5.28.1.14">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void change_text(<!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVuTXT.html">DjVuTXT</A>&gt; txt, const bool do_reset)</B></TT>
+<DD>Changes the value of the text annotation. 
+<DL><DT><DD></DL><P>
+<A NAME="Encoding routines ">
+<A NAME="DOC.1.5.28.1.15">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> Encoding routines </B></TT>
 <DL><DT><DD></DL><P><DL>
 
 <A NAME="get_djvu_bytestream">
-<A NAME="DOC.1.5.28.1.14.1">
+<A NAME="DOC.1.5.28.1.15.1">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="ByteStream.html">ByteStream</A>&gt;  get_djvu_bytestream(bool included_too, bool no_ndir)</B></TT>
 <DD>The main function that encodes data back into binary stream.
 The data returned will reflect possible changes made into the
@@ -689,15 +697,15 @@ at the beginning.<P>
 <DL><DT><DT><B>Parameters:</B><DD><B>included_too</B> -  Process included files too
 <BR><B>no_ndir</B> -  Get rid of <TT>NDIR</TT> chunks. <BR><DD></DL><P>
 <A NAME="get_djvu_data">
-<A NAME="DOC.1.5.28.1.14.2">
+<A NAME="DOC.1.5.28.1.15.2">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DataPool.html">DataPool</A>&gt;  get_djvu_data(bool included_too, bool no_ndir)</B></TT>
-<DD>Same as <!1><A HREF="DjVuFile.html#DOC.1.5.28.1.14.1">get_djvu_bytestream</A>(), returning a DataPool.
+<DD>Same as <!1><A HREF="DjVuFile.html#DOC.1.5.28.1.15.1">get_djvu_bytestream</A>(), returning a DataPool.
 
 <DL><DT><DT><B>Parameters:</B><DD><B>included_too</B> -  Process included files too
 <BR><B>no_ndir</B> -  Get rid of <TT>NDIR</TT> chunks. <BR><DD></DL><P></DL>
 
 <A NAME="set_name">
-<A NAME="DOC.1.5.28.1.15">
+<A NAME="DOC.1.5.28.1.16">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void set_name(const char * name)</B></TT>
 <DD>Internal. Used by DjVuDocument. The <TT>name</TT> should <B>not</B>
 be encoded with <!1><A HREF="GOS.html#DOC.1.5.10.1.14">encode_reserved</A>(). 
@@ -709,7 +717,7 @@ be encoded with <!1><A HREF="GOS.html#DOC.1.5.10.1.14">encode_reserved</A>().
 <!-- This is were the DOC++ footer is defined  -->
 
 <font face="arial,helvetica" size="2">
-<a href=http://www.djvu.att.com>DjVu</a> is a trademark of AT&amp;T.  
+<a href=http://www.lizardtech.com>DjVu</a> is a trademark of AT&amp;T.  
 <br>All other products mentioned are registered trademarks or trademarks of
 their respective companies.
 </font>
