@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuGlobal.cpp,v 1.13 1999-10-05 22:04:37 leonb Exp $
+//C- $Id: DjVuGlobal.cpp,v 1.14 1999-10-19 20:42:24 haffner Exp $
 
 
 
@@ -64,7 +64,7 @@ _djvu_memory_callback(djvu_delete_callback *dp, djvu_new_callback *np)
 #include <string.h>
 
 #define INITIAL  500
-#define INTERVAL 500
+#define INTERVAL 250
 
 DjVuProgressTask *DjVuProgressTask::head = 0;
 
