@@ -49,7 +49,7 @@ main()
       int a = 2;
       int b = 2+a;
       DjVuPrintMessage("a=%d, b=%d, c=%d\n",a,b,a+b);
-      G_THROW("TextException.test");
+      G_THROW( ERR_MSG("TextException.test") );
     }
   G_CATCH(ex)
     {
