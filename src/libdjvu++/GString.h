@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.h,v 1.50 2001-04-17 19:51:00 bcr Exp $
+// $Id: GString.h,v 1.51 2001-04-19 00:05:28 bcr Exp $
 // $Name:  $
 
 #ifndef _GSTRING_H_
@@ -57,7 +57,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.50 2001-04-17 19:51:00 bcr Exp $# */
+    #$Id: GString.h,v 1.51 2001-04-19 00:05:28 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -81,6 +81,7 @@ class GStringRep : public GPEnabled
 public:
   class Native;
   class UTF8;
+  class ChangeLocale;
   friend Native;
   friend UTF8;
   friend class GString;
@@ -164,6 +165,18 @@ public:
     const char *s,const int start,const int length)
   { GStringRep dummy; return dummy.substr(s,start,length); }
 
+  /** Initializes a string with a formatted string (as in #vprintf#).  The
+      string is re-initialized with the characters generated according to the
+      specified format #fmt# and using the optional arguments.  See the ANSI-C
+      function #vprintf()# for more information. The current implementation
+      will cause a segmentation violation if the resulting string is longer
+      than 32768 characters. */
+  GP<GStringRep> format(va_list &args) const;
+  static GP<GStringRep> format(const char fmt[],...);
+  static GP<GStringRep> create(const char fmt[],va_list &args);
+
+  // -- SEARCHING
+
   static GP<GStringRep> UTF8ToNative( const char *s );
   static GP<GStringRep> NativeToUTF8( const char *s );
 
@@ -172,8 +185,22 @@ public:
   // Creates a lowercase version of the current string.
   GP<GStringRep> downcase(void) const;
 
+  /** Returns the next UCS4 character, and updates the pointer s. */
   static unsigned long UTF8toUCS4(
     unsigned char const *&s, void const * const endptr );
+
+  /** Returns the number of bytes in next UCS4 character, 
+      and sets #w# to the next UCS4 chacter.  */
+  static int UTF8toUCS4(
+    unsigned long &w, unsigned char const s[], void const * const endptr )
+  { unsigned char const *r=s;w=UTF8toUCS4(r,endptr);return (int)((size_t)r-(size_t)s); }
+
+  /** Returns the next UCS4 word from the UTF16 string. */
+  static int UTF16toUCS4(
+     unsigned long &w, unsigned short const * const s,void const * const eptr);
+
+  static int UCS4toUTF16(
+    unsigned long w, unsigned short &w1, unsigned short &w2);
 
   static unsigned char *UCS4toUTF8(
     const unsigned long w,unsigned char *ptr);
@@ -206,6 +233,14 @@ GStringRep::toThis(
 {
    return (locale?(locale->toThis(rep)):rep);
 }
+
+inline GP<GStringRep> 
+GStringRep::create(const char fmt[],va_list &args)
+{ 
+  GP<GStringRep> s=create(fmt);
+  return (s?(s->format(args)):s);
+}
+
 
 class GStringRep::Native : public GStringRep
 {
@@ -268,6 +303,8 @@ public:
     const char *s,const int start,const int length=(-1))
   { GStringRep::Native dummy; return dummy.substr(s,start,length); }
 
+  static GP<GStringRep> format(const char fmt[],...);
+  static GP<GStringRep> create(const char fmt[],va_list args);
 
   friend class GString;
 };
@@ -289,6 +326,13 @@ GStringRep::Native::toThis(
      const GP<GStringRep> &rep,const GP<GStringRep> &) const
 {
   return rep?(rep->toNative(true)):rep;
+}
+
+inline GP<GStringRep> 
+GStringRep::Native::create(const char fmt[],va_list args)
+{ 
+  GP<GStringRep> s=create(fmt);
+  return (s?(s->format(args)):s);
 }
 
 class GStringRep::UTF8 : public GStringRep
@@ -333,7 +377,9 @@ public:
   static GP<GStringRep> create(
     const char *s,const int start,const int length=(-1))
   { GStringRep::UTF8 dummy; return dummy.substr(s,start,length); }
-  // Creates by appending to the current string
+
+  static GP<GStringRep> format(const char fmt[],...);
+  static GP<GStringRep> create(const char fmt[],va_list args);
 
   // return position of next non space.
   virtual int nextNonSpace( const int from ) const;
@@ -358,6 +404,13 @@ GStringRep::UTF8::toThis(
     const GP<GStringRep> &rep,const GP<GStringRep> &) const
 {
   return rep?(rep->toUTF8(true)):rep;
+}
+
+inline GP<GStringRep> 
+GStringRep::UTF8::create(const char fmt[],va_list args)
+{ 
+  GP<GStringRep> s=create(fmt);
+  return (s?(s->format(args)):s);
 }
 
 /** General purpose character string.
@@ -429,15 +482,15 @@ public:
       point number #number#. The format is similar to format #"%f"# in
       function #printf#.  */
   GString(const double number);
-public:
   /** Constructs a string with a formatted string (as in #vprintf#).  The
       string is re-initialized with the characters generated according to the
       specified format #fmt# and using the optional arguments.  See the ANSI-C
       function #vprintf()# for more information. The current implementation
       will cause a segmentation violation if the resulting string is longer
       than 32768 characters. */
-  GString(const char fmt[], va_list args);
+  GString(const GString &fmt, va_list &args);
   
+public:
   /** Copy operator. Resets this string with the value of the string #gs#.
       This operation is efficient because string memory is allocated using a
       "copy-on-write" strategy. Both strings will share the same segment of
@@ -554,7 +607,8 @@ public:
       function #vprintf()# for more information. The current implementation
       will cause a segmentation violation if the resulting string is longer
       than 32768 characters. */
-  GString &format(const char *fmt, va_list args);
+  GString &format(const GString &fmt, va_list &args)
+  { return (*this = (fmt.ptr?GString(fmt,args):fmt)); }
   // -- SEARCHING
   /** Searches character #c# in the string, starting at position #from# and
       scanning forward until reaching the end of the string.  This function
@@ -778,8 +832,15 @@ public:
   GUTF8String& operator= (const GUTF8String &str);
   GUTF8String& operator= (const GNativeString &str);
 
-  /// Constructs a string from a character.
+  /** Constructs a string with a formatted string (as in #vprintf#).  The
+      string is re-initialized with the characters generated according to the
+      specified format #fmt# and using the optional arguments.  See the ANSI-C
+      function #vprintf()# for more information. The current implementation
+      will cause a segmentation violation if the resulting string is longer
+      than 32768 characters. */
+  GUTF8String(const GUTF8String &fmt, va_list &args);
 
+  /// Constructs a string from a character.
   /** Constructs a string with a human-readable representation of integer
       #number#.  The format is similar to format #"%d"# in function
       #printf#. */
@@ -791,6 +852,21 @@ public:
   GUTF8String(const double number);
 
 
+  /** Initializes a string with a formatted string (as in #printf#).  The
+      string is re-initialized with the characters generated according to the
+      specified format #fmt# and using the optional arguments.  See the ANSI-C
+      function #printf()# for more information. The current implementation
+      will cause a segmentation violation if the resulting string is longer
+      than 32768 characters. */
+  GUTF8String &format(const char *fmt, ... );
+  /** Initializes a string with a formatted string (as in #vprintf#).  The
+      string is re-initialized with the characters generated according to the
+      specified format #fmt# and using the optional arguments.  See the ANSI-C
+      function #vprintf()# for more information. The current implementation
+      will cause a segmentation violation if the resulting string is longer
+      than 32768 characters. */
+  GUTF8String &format(const GUTF8String &fmt, va_list &args)
+  { return (*this = (fmt.ptr?GUTF8String(fmt,args):fmt)); }
 
   /** Returns a copy of this string with characters used in XML with
       '<'  to "&lt;", '>'  to "&gt;",  '&' to "&amp;" '\'' to "&apos;",
@@ -906,6 +982,14 @@ public:
   GNativeString(const GNativeString &str);
   GNativeString(const GString &gs, int from, unsigned int len);
 
+  /** Constructs a string with a formatted string (as in #vprintf#).  The
+      string is re-initialized with the characters generated according to the
+      specified format #fmt# and using the optional arguments.  See the ANSI-C
+      function #vprintf()# for more information. The current implementation
+      will cause a segmentation violation if the resulting string is longer
+      than 32768 characters. */
+  GNativeString(const GNativeString &fmt, va_list &args);
+
   /** Constructs a string with a human-readable representation of integer
       #number#.  The format is similar to format #"%d"# in function
       #printf#. */
@@ -992,6 +1076,22 @@ public:
     { return GStringRep::Native::create(*this,s2); }
   friend GNativeString operator+(const char    *s1, const GNativeString &s2) 
     { return GStringRep::Native::create(s1,s2); }
+
+  /** Initializes a string with a formatted string (as in #printf#).  The
+      string is re-initialized with the characters generated according to the
+      specified format #fmt# and using the optional arguments.  See the ANSI-C
+      function #printf()# for more information. The current implementation
+      will cause a segmentation violation if the resulting string is longer
+      than 32768 characters. */
+  GNativeString &format(const char *fmt, ... );
+  /** Initializes a string with a formatted string (as in #vprintf#).  The
+      string is re-initialized with the characters generated according to the
+      specified format #fmt# and using the optional arguments.  See the ANSI-C
+      function #vprintf()# for more information. The current implementation
+      will cause a segmentation violation if the resulting string is longer
+      than 32768 characters. */
+  GNativeString &format(const GNativeString &fmt, va_list &args)
+  { return (*this = (fmt.ptr?GNativeString(fmt,args):fmt)); }
 
 };
 
@@ -1095,9 +1195,9 @@ inline GString::GString(const GNativeString &str)
 inline GString::GString(const GString &gs, int from, unsigned int len)
 { init(GStringRep::create(gs,from,((int)len<0)?(-1):(int)len)); }
 inline GString::GString(const int number)
-{ format("%d",number); }
+{ init(GStringRep::format("%d",number)); }
 inline GString::GString(const double number)
-{ format("%f",number); }
+{ init(GStringRep::format("%f",number)); }
 
 inline GString& GString::operator= (const char str)
 { return init(GStringRep::create(&str,0,1)); }
@@ -1132,10 +1232,12 @@ inline GUTF8String::GUTF8String(const GUTF8String &str)
 //{ init(str); }
 inline GUTF8String::GUTF8String(const GString &gs, int from, unsigned int len)
 { init(GStringRep::UTF8::create(gs,from,((int)len<0)?(-1):(int)len)); }
+inline GUTF8String::GUTF8String(const GUTF8String &fmt,va_list &args)
+: GString(fmt,args) {}
 inline GUTF8String::GUTF8String(const int number)
-{ format("%d",number); }
+{ init(GStringRep::UTF8::format("%d",number)); }
 inline GUTF8String::GUTF8String(const double number)
-{ format("%f",number); }
+{ init(GStringRep::UTF8::format("%f",number)); }
 
 inline GUTF8String& GUTF8String::operator= (const char str)
 { return init(GStringRep::UTF8::create(&str,0,1)); }
@@ -1169,10 +1271,12 @@ inline GNativeString::GNativeString(const GNativeString &str)
 { init(str); }
 inline GNativeString::GNativeString(const GString &gs, int from, unsigned int len)
 { init(GStringRep::Native::create(gs,from,((int)len<0)?(-1):(int)len)); }
+inline GNativeString::GNativeString(const GNativeString &fmt,va_list &args)
+: GString(fmt,args) {}
 inline GNativeString::GNativeString(const int number)
-{ format("%d",number); }
+{ init(GStringRep::Native::format("%d",number)); }
 inline GNativeString::GNativeString(const double number)
-{ format("%f",number); }
+{ init(GStringRep::Native::format("%f",number)); }
 
 inline GNativeString& GNativeString::operator= (const char str)
 { return init(GStringRep::Native::create(&str,0,1)); }

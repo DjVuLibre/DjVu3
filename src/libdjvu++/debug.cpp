@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: debug.cpp,v 1.22 2001-04-12 00:25:00 bcr Exp $
+// $Id: debug.cpp,v 1.23 2001-04-19 00:05:28 bcr Exp $
 // $Name:  $
 
 #ifdef NO_DEBUG
@@ -106,7 +106,7 @@ DjVuDebug::format(const char *fmt, ... )
     {
       va_list ap;
       va_start(ap, fmt);
-      GString buffer(fmt,ap);
+      GUTF8String buffer(fmt,ap);
       va_end(ap);
       GCriticalSectionLock glock(&debug_lock);
       if(debug_file)

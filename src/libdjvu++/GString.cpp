@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.65 2001-04-18 17:54:24 praveen Exp $
+// $Id: GString.cpp,v 1.66 2001-04-19 00:05:28 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -82,6 +82,43 @@ mbrtowc(wchar_t *w,const char *s, size_t n, mbstate_t &)
 #endif
 // #include <locale.h>
 
+class GStringRep::ChangeLocale
+{
+public:
+  ChangeLocale(const int category,const char locale[]);
+  ~ChangeLocale();
+private:
+  GUTF8String locale;
+  int category;
+};
+
+GStringRep::ChangeLocale::ChangeLocale(
+  const int xcategory, const char xlocale[] )
+: category(xcategory)
+{
+  if(xlocale)
+  {
+    locale=setlocale(xcategory,0);
+    if(locale.length() &&(locale!=xlocale))
+    {
+      if(locale == setlocale(category,xlocale))
+      {
+        locale.empty();
+      }
+    }else
+    {
+      locale.empty();
+    }
+  } 
+}
+
+GStringRep::ChangeLocale::~ChangeLocale()
+{
+  if(locale.length())
+  {
+    setlocale(category,(const char *)locale);
+  }
+}
 
 // - Author: Leon Bottou, 04/1997
 
@@ -541,24 +578,68 @@ GString::format(const char fmt[], ... )
 {
   va_list args;
   va_start(args, fmt);
-  return (*this = GString(fmt,args));
+  init(GStringRep::create(fmt,args));
+  va_end(args);
+  return *this;
 }
 
-GString &
-GString::format(const char fmt[], va_list args)
+GUTF8String &
+GUTF8String::format(const char fmt[], ... )
 {
-  return (*this = GString(fmt,args));
+  va_list args;
+  va_start(args, fmt);
+  return init(GStringRep::UTF8::create(fmt,args));
 }
 
-GString::GString(const char fmt[], va_list args)
+GNativeString &
+GNativeString::format(const char fmt[], ... )
+{
+  va_list args;
+  va_start(args, fmt);
+  return init(GStringRep::Native::create(fmt,args));
+}
+
+GP<GStringRep>
+GStringRep::format(const char fmt[],...)
+{
+  va_list args;
+  va_start(args, fmt);
+  return create(fmt,args);
+}
+
+GP<GStringRep>
+GStringRep::UTF8::format(const char fmt[],...)
+{
+  va_list args;
+  va_start(args, fmt);
+  return create(fmt,args);
+}
+
+GP<GStringRep>
+GStringRep::Native::format(const char fmt[],...)
+{
+  va_list args;
+  va_start(args, fmt);
+  return create(fmt,args);
+}
+
+GP<GStringRep>
+GStringRep::format(va_list &args) const
 {
   int buflen=32768;
   char *buffer;
   GPBuffer<char> gbuffer(buffer,buflen);
 
+  ChangeLocale(LC_ALL,(isNative()?0:"C"));
+  const GUTF8String clocale=setlocale(LC_CTYPE,0);
+  const GUTF8String nlocale=setlocale(LC_NUMERIC,0);
+  if(clocale != "C")
+    setlocale(LC_CTYPE,"C");
+  if(nlocale != "C")
+    setlocale(LC_NUMERIC,"C");
   // Format string
 #ifdef USE_VSNPRINTF
-  while(USE_VSNPRINTF(buffer, buflen, fmt, args)<0)
+  while(USE_VSNPRINTF(buffer, buflen, data, args)<0)
   {
     gbuffer.resize(0);
     gbuffer.resize(buflen+32768);
@@ -566,8 +647,14 @@ GString::GString(const char fmt[], va_list args)
   va_end(args);
 #else
   buffer[buflen-1] = 0;
-  vsprintf(buffer, fmt, args);
+  vsprintf(buffer, data, args);
   va_end(args);
+  const GUTF8String clocale=setlocale(LC_CTYPE,0);
+  const GUTF8String nlocale=setlocale(LC_NUMERIC,0);
+  if(clocale != "C")
+    setlocale(LC_CTYPE,"C");
+  if(nlocale != "C")
+    setlocale(LC_NUMERIC,"C");
   if (buffer[buflen-1])
   {
     // This isn't as fatal since it is on the stack, but we
@@ -576,7 +663,7 @@ GString::GString(const char fmt[], va_list args)
   }
 #endif
   // Go altering the string
-  (*this) = GStringRep::create((const char *)buffer); 
+  return strdup((const char *)buffer); 
 }
 
 int 
@@ -869,21 +956,28 @@ GStringRep::toNative(const bool noconvert) const
       mbstate_t ps;
       for(const unsigned char *s=(const unsigned char *)data;(s<eptr)&& *s;)
       {
-        const wchar_t w=(wchar_t)UTF8toUCS4(s,eptr);
-        char bytes[12];
-        int i=wcrtomb(bytes,w,&ps);
-        if(i<0)
+        const unsigned long w0=UTF8toUCS4(s,eptr);
+        unsigned short w1, w2;
+        for(int count=(sizeof(wchar_t) == sizeof(w1))?UCS4toUTF16(w0,w1,w2):1;
+          count;--count,w1=w2)
         {
-          r=buf;
-          break;
-        }else if(!i)
-        {
-          break;
-        }else
-        {
-          for(int j=0;j<i;++j)
+            // wchar_t can be either UCS4 or UCS2
+          const wchar_t w=(sizeof(wchar_t) == sizeof(w1))?(wchar_t)w1:(wchar_t)w0;
+          char bytes[12];
+          int i=wcrtomb(bytes,w,&ps);
+          if(i<0)
           {
-            (r++)[0]=bytes[j];
+            r=buf;
+            break;
+          }else if(!i)
+          {
+            break;
+          }else
+          {
+            for(int j=0;j<i;++j)
+            {
+              (r++)[0]=bytes[j];
+            }
           }
         }
       }
@@ -916,25 +1010,57 @@ GStringRep::toUTF8(const bool noconvert) const
   {
     size_t n=size;
     const char *source=data;
-    int i;
     mbstate_t ps;
     unsigned char *buf;
     GPBuffer<unsigned char> gbuf(buf,n*6+1);
     unsigned char *ptr=buf;
     (void)mbrlen(source, n, &ps);
-    for(wchar_t w;
-      (n>0)&&(i=mbrtowc(&w,source,n,&ps));
-      n-=i,source+=i)
+    int i=0;
+    if(sizeof(wchar_t) == sizeof(unsigned long))
     {
-      if(i<0)
+      for(wchar_t w;
+        (n>0)&&((i=mbrtowc(&w,source,n,&ps))>=0);
+        n-=i,source+=i)
       {
-        gbuf.resize(1);
-        ptr=buf;
-        break;
+        ptr=UCS4toUTF8(w,ptr);
       }
-      ptr=UCS4toUTF8(w,ptr);
+    }else
+    { 
+      for(wchar_t w;
+        (n>0)&&((i=mbrtowc(&w,source,n,&ps))>=0);
+        n-=i,source+=i)
+      {
+        unsigned short s[2];
+        s[0]=w;
+        unsigned long w0;
+        if(UTF16toUCS4(w0,s,s+1)<=0)
+        {
+          source+=i;
+          n-=i;
+          if((n>0)&&((i=mbrtowc(&w,source,n,&ps))>=0))
+          {
+            s[1]=w;
+            if(!UTF16toUCS4(w0,s,s+2)<=0)
+            {
+              i=(-1);
+              break;
+            }
+          }else
+          {
+            i=(-1);
+            break;
+          }
+        }
+        ptr=UCS4toUTF8(w0,ptr);
+      }
     }
-    ptr[0]=0;
+    if(i<0)
+    {
+      gbuf.resize(0);
+    }else
+    {
+      ptr[0]=0;
+    }
     retval=GStringRep::UTF8::create((const char *)buf);
   }
   return retval;
@@ -1463,21 +1589,18 @@ GStringRep::Native::toInt() const
   return atoi(data);
 }
 
+static inline long
+Cstrtol(char *data,char **edata, const int base)
+{
+  GStringRep::ChangeLocale locale(LC_ALL,"C");
+  return strtol(data,edata,base);
+}
+
 long 
 GStringRep::toLong( GP<GStringRep>& eptr, bool &isLong, const int base) const
 {
   char *edata=0;
-  const GUTF8String clocale=setlocale(LC_CTYPE,0);
-  const GUTF8String nlocale=setlocale(LC_NUMERIC,0);
-  if(clocale != "C")
-    setlocale(LC_CTYPE,"C");
-  if(nlocale != "C")
-    setlocale(LC_NUMERIC,"C");
-  long retval=strtol(data, &edata, base);
-  if(clocale != "C")
-    setlocale(LC_CTYPE,(const char *)clocale);
-  if(nlocale != "C")
-    setlocale(LC_NUMERIC,(const char *)nlocale);
+  long retval=Cstrtol(data,&edata, base);
   if(edata)
   {
     eptr=GStringRep::create(data);
@@ -1518,21 +1641,18 @@ GStringRep::Native::toLong(
    return retval;
 }
 
+static inline unsigned long
+Cstrtoul(char *data,char **edata, const int base)
+{
+  GStringRep::ChangeLocale locale(LC_ALL,"C");
+  return strtoul(data,edata,base);
+}
+
 unsigned long 
 GStringRep::toULong( GP<GStringRep>& eptr, bool &isULong, const int base) const
 {
   char *edata=0;
-  const GUTF8String clocale=setlocale(LC_CTYPE,0);
-  const GUTF8String nlocale=setlocale(LC_NUMERIC,0);
-  if(clocale != "C")
-    setlocale(LC_CTYPE,"C");
-  if(nlocale != "C")
-    setlocale(LC_NUMERIC,"C");
-  unsigned long retval=strtoul(data, &edata, base);
-  if(clocale != "C")
-    setlocale(LC_CTYPE,(const char *)clocale);
-  if(nlocale != "C")
-    setlocale(LC_NUMERIC,(const char *)nlocale);
+  unsigned long retval=Cstrtoul(data,&edata,base);
   if(edata)
   {
     eptr=GStringRep::create(edata);
@@ -1573,21 +1693,18 @@ GStringRep::Native::toULong(
   return retval;
 }
 
+static inline double
+Cstrtod(char *data,char **edata)
+{
+  GStringRep::ChangeLocale locale(LC_ALL,"C");
+  return strtod(data,edata);
+}
+
 double
 GStringRep::toDouble( GP<GStringRep>& eptr, bool &isDouble) const
 {
   char *edata=0;
-  const GUTF8String clocale=setlocale(LC_CTYPE,0);
-  const GUTF8String nlocale=setlocale(LC_NUMERIC,0);
-  if(clocale != "C")
-    setlocale(LC_CTYPE,"C");
-  if(nlocale != "C")
-    setlocale(LC_NUMERIC,"C");
-  double retval=strtod(data, &edata);
-  if(clocale != "C")
-    setlocale(LC_CTYPE,(const char *)clocale);
-  if(nlocale != "C")
-    setlocale(LC_NUMERIC,(const char *)nlocale);
+  double retval=Cstrtod(data, &edata);
   if(edata)
   {
     eptr=GStringRep::create(edata);
@@ -1628,6 +1745,13 @@ GStringRep::Native::toDouble(
   return retval;
 }
 
+static int
+Csscanf1(const char src[],const char fmt[], void *arg)
+{
+  GStringRep::ChangeLocale locale(LC_ALL,"C");
+  return sscanf(src,fmt,arg);
+}
+
 int
 GStringRep::nextNonSpace(int from) const
 {
@@ -1635,23 +1759,9 @@ GStringRep::nextNonSpace(int from) const
   if(from<size)
   {
     // Store current locale;
-    const GString clocale=setlocale(LC_CTYPE,0);
-    const GString nlocale=setlocale(LC_NUMERIC,0);
-
-    // set locale to C
-    if(clocale != "C")
-      setlocale(LC_CTYPE,"C");
-    if(nlocale != "C")
-      setlocale(LC_NUMERIC,"C");
-
     int n=0;
-    sscanf(data+from, " %n", &n);
+    Csscanf1(data+from, " %n", &n);
     retval=n+from;
-    // return locale to previous state.
-    if(clocale != "C")
-      setlocale(LC_CTYPE,(const char *)clocale);
-    if(nlocale != "C")
-      setlocale(LC_NUMERIC,(const char *)nlocale);
   }else
   {
     retval=size;
@@ -1700,5 +1810,124 @@ GStringRep::Native::nextNonSpace(int from) const
     retval=size;
   }
   return retval;
+}
+
+int
+GStringRep::UCS4toUTF16(
+  const unsigned long w,unsigned short &w1, unsigned short &w2)
+{
+  int retval;
+  if(w<=0xFFFF && (w<0xD800||w>0xDFFF))
+  {
+    w1=w;
+    w2=0;
+    retval=1;
+  }else
+  {
+    w1=((w>>10)&0x3ff)+0xD800;
+    w2=(w&0x3ff)+0xDC00;
+    retval=2;
+  }
+  return retval;
+}
+
+int
+GStringRep::UTF16toUCS4(
+  unsigned long &U,unsigned short const * const s,void const * const eptr)
+{
+  int retval=0;
+  U=0;
+  unsigned short const * const r=s+1;
+  if(r <= eptr)
+  {
+    unsigned long const W1=s[0];
+    if((W1<0xD800)&&(W1>0xDFFF))
+    {
+      if((U=W1))
+      {
+        retval=1;
+      }
+    }else if(W1<=0xDBFF)
+    {
+      unsigned short const * const rr=r+1;
+      if(rr <= eptr)
+      {
+        unsigned long const W2=s[1];
+        if(((W2>=0xDC00)||(W2<=0xDFFF))&&((U=((W1&0x3ff)<<10)|(W2&0x3ff))))
+        {
+          retval=2;
+        }else
+        {
+          retval=(-1);
+        }
+      }
+    }
+  }
+  return retval;
+}
+
+GString::GString(const GString &fmt, va_list &args)
+{
+  if(fmt.length())
+  {
+#ifndef WIN32
+    GString nfmt;
+#endif
+    int start, from=0;
+    while((from=fmt.search('%',from+1)) >= 0)
+    {
+      if(fmt[++from] != '%')
+      {
+        int m,n=0;
+        sscanf(((const char *)fmt)+from,"%d!%n",&m,&n);
+        if(n)
+        {
+#ifdef WIN32
+          LPCTSTR lpszFormat=(const char *)fmt;
+          LPTSTR lpszTemp;
+          if((!::FormatMessage(
+            FORMAT_MESSAGE_FROM_STRING|FORMAT_MESSAGE_ALLOCATE_BUFFER,
+              lpszFormat, 0, 0, (LPTSTR)&lpszTemp,0,&args))
+            || !lpszTemp)
+          {
+            G_THROW(GException::outofmemory);
+          }
+          va_end(args); 
+          init(lpszTemp);
+          LocalFree(lpszTemp);
+          return;
+#else
+          from+=n;
+          const int end=fmt.search('!',from);
+          if(end>=0)
+          {
+            nfmt+=fmt.substr(start,end-start);
+            nfmt.setat(from-1,'$');
+            start=from=end+1;
+          }else
+          {
+            nfmt.empty();
+            break;
+          }
+#endif
+        }else
+        {
+#ifndef WIN32
+          nfmt.empty();
+#endif
+          break;
+        }
+      }
+    }
+#ifndef WIN32
+    if(nfmt.length())
+    {
+      init(nfmt->format(args));
+    }else
+#endif
+    {
+      init(fmt->format(args));
+    }
+  }
 }
 

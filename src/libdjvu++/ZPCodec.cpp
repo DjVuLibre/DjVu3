@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ZPCodec.cpp,v 1.20 2001-04-12 22:40:15 fcrary Exp $
+// $Id: ZPCodec.cpp,v 1.21 2001-04-19 00:05:28 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -732,7 +732,7 @@ ZPCodec::preload(void)
         {
           byte = 0xff;
           if (--delay < 1)
-            G_THROW( ERR_MSG("EOF") );
+            G_THROW( ByteStream::EndOfFile );
         }
       buffer = (buffer<<8) | byte;
       scount += 8;

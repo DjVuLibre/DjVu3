@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DataPool.h,v 1.42 2001-03-30 23:31:28 bcr Exp $
+// $Id: DataPool.h,v 1.43 2001-04-19 00:05:27 bcr Exp $
 // $Name:  $
 
 #ifndef _DATAPOOL_H
@@ -65,7 +65,7 @@ class ByteStream;
 
     @memo Thread safe data storage
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DataPool.h,v 1.42 2001-03-30 23:31:28 bcr Exp $#
+    @version #$Id: DataPool.h,v 1.43 2001-04-19 00:05:27 bcr Exp $#
 */
 
 //@{
@@ -154,7 +154,7 @@ class ByteStream;
 	     (and any other slave connected to it), but not the master.
 
 	     \Ref{set_eof}() function is meaningless for slaves. They obtain
-	     the #EOF# status from their master.
+	     the #ByteStream::EndOfFile# status from their master.
 
 	     Depending on the offsets range passed to the constructor,
 	     \Ref{get_length}() returns different values. If the length
@@ -329,7 +329,7 @@ public:
       /** Tells the #DataPool# that all data has been added and nothing else
 	  is anticipated. When #EOF# is true, any reader attempting to read
 	  non existing data will not be blocked. It will either read #ZERO#
-	  bytes or will get an #"EOF"# exception (see \Ref{get_data}()).
+	  bytes or will get an #ByteStream::EndOfFile# exception (see \Ref{get_data}()).
 	  Calling this function will also activate all registered trigger
 	  callbacks.
 
@@ -370,7 +370,7 @@ public:
 		            data, that its size should be greater than it
 			    really is, then any attempt to read non-existing
 			    data in the range of {\em valid} offsets will
-			    result in an #"EOF"# exception. This is done to
+			    result in an #ByteStream::EndOfFile# exception. This is done to
 			    indicate, that there was an error in adding data,
 			    and the data requested is {\bf supposed} to be
 			    there, but has actually not been added.

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.cpp,v 1.69 2001-04-18 17:18:35 lvincent Exp $
+// $Id: ByteStream.cpp,v 1.70 2001-04-19 00:05:27 bcr Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 04/1997
@@ -69,6 +69,8 @@ __inline int dup2(int _a, int _b ) 	{ return _dup2(_a, _b);}
 #ifndef UNDER_CE
 #include <errno.h>
 #endif
+
+const char *ByteStream::EndOfFile=ERR_MSG("EOF");
 
 /** ByteStream interface for stdio files. 
     The virtual member functions #read#, #write#, #tell# and #seek# are mapped
@@ -328,7 +330,7 @@ ByteStream::seek(long offset, int whence, bool nothrow)
     const int bytes = read(buffer, xbytes);
     ncurrent += bytes;
     if (!bytes)
-      G_THROW( ERR_MSG("EOF") );
+      G_THROW( ByteStream::EndOfFile );
     //  Seeking works funny on this ByteStream (ftell() acts strange)
     if (ncurrent!=tell())
       G_THROW( ERR_MSG("ByteStream.seek") );
@@ -367,15 +369,23 @@ ByteStream::format(const char *fmt, ... )
 {
   va_list args;
   va_start(args, fmt); 
-  const GString message(fmt,args);
+  const GUTF8String message(fmt,args);
   return writestring(message);
 }
 
 size_t
-ByteStream::writestring(const GString &s)
+ByteStream::writestring(const GUTF8String &s)
 {
-  const GString msg((cp==NATIVE)?s.getUTF82Native():(GNativeString &) s);
-  return writall((const char *)msg,msg.length());
+  int retval;
+  if(cp == UTF8)
+  {
+    retval=writall((const char *)s,s.length());
+  }else
+  { 
+    const GNativeString msg(s.getUTF82Native());
+    retval=writall((const char *)msg,msg.length());
+  }
+  return retval;
 }
 
 size_t 
@@ -479,7 +489,7 @@ ByteStream::read8 ()
 {
   unsigned char c[1];
   if (readall((void*)c, sizeof(c)) != sizeof(c))
-    G_THROW( ERR_MSG("EOF") );
+    G_THROW( ByteStream::EndOfFile );
   return c[0];
 }
 
@@ -488,7 +498,7 @@ ByteStream::read16()
 {
   unsigned char c[2];
   if (readall((void*)c, sizeof(c)) != sizeof(c))
-    G_THROW( ERR_MSG("EOF") );
+    G_THROW( ByteStream::EndOfFile );
   return (c[0]<<8)+c[1];
 }
 
@@ -497,7 +507,7 @@ ByteStream::read24()
 {
   unsigned char c[3];
   if (readall((void*)c, sizeof(c)) != sizeof(c))
-    G_THROW( ERR_MSG("EOF") );
+    G_THROW( ByteStream::EndOfFile );
   return (((c[0]<<8)+c[1])<<8)+c[2];
 }
 
@@ -506,7 +516,7 @@ ByteStream::read32()
 {
   unsigned char c[4];
   if (readall((void*)c, sizeof(c)) != sizeof(c))
-    G_THROW( ERR_MSG("EOF") );
+    G_THROW( ByteStream::EndOfFile );
   return (((((c[0]<<8)+c[1])<<8)+c[2])<<8)+c[3];
 }
 
@@ -1189,7 +1199,7 @@ DjVuPrintError(const char *fmt, ... )
     errout->cp=ByteStream::NATIVE;
     va_list args;
     va_start(args, fmt); 
-    const GString message(fmt,args);
+    const GUTF8String message(fmt,args);
     errout->writestring(message);
   }
 }
@@ -1203,7 +1213,7 @@ DjVuPrintMessage(const char *fmt, ... )
     strout->cp=ByteStream::NATIVE;
     va_list args;
     va_start(args, fmt);
-    const GString message(fmt,args);
+    const GUTF8String message(fmt,args);
     strout->writestring(message);
   }
 }

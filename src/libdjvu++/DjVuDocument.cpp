@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocument.cpp,v 1.159 2001-04-12 18:50:50 fcrary Exp $
+// $Id: DjVuDocument.cpp,v 1.160 2001-04-19 00:05:27 bcr Exp $
 // $Name:  $
 
 
@@ -252,7 +252,7 @@ DjVuDocument::static_init_thread(void * cl_data)
     th->flags|=DjVuDocument::DOC_INIT_FAILED;
     G_TRY {
       th->check_unnamed_files();
-      if ((GUTF8String("EOF") == exc.get_cause()) && th->verbose_eof)
+      if (!GString::cmp(ByteStream::EndOfFile,exc.get_cause()) && th->verbose_eof)
         get_portcaster()->notify_error(th, ERR_MSG("DjVuDocument.init_eof") );
       else if (GUTF8String("STOP") == exc.get_cause())
         get_portcaster()->notify_status(th, ERR_MSG("DjVuDocument.stopped") );
@@ -281,7 +281,7 @@ DjVuDocument::init_thread(void)
    GUTF8String chkid;
    int size=iff.get_chunk(chkid);
    if (!size)
-     G_THROW( ERR_MSG("EOF") );
+     G_THROW( ByteStream::EndOfFile );
    if (size < 0)
      G_THROW( ERR_MSG("DjVuDocument.no_file") );
    if (size<8)

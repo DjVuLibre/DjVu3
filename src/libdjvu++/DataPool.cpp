@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DataPool.cpp,v 1.75 2001-04-12 22:40:14 fcrary Exp $
+// $Id: DataPool.cpp,v 1.76 2001-04-19 00:05:27 bcr Exp $
 // $Name:  $
 
 
@@ -1076,19 +1076,19 @@ DataPool::get_data(void * buffer, int offset, int sz, int level)
 	 // No data available.
 
 	 // If there is no data and nothing else is expected, we can do
-	 // two things: throw an "EOF" exception or return ZERO bytes.
+	 // two things: throw ByteStream::EndOfFile exception or return ZERO bytes.
 	 // The exception is for the cases when the data flow has been
 	 // terminated in the middle. ZERO bytes is for regular read() beyond
 	 // the boundaries of legal data. The problem is to distinguish
 	 // these two cases. We do it here with the help of analysis of the
 	 // IFF structure of the data (which sets the 'length' variable).
 	 // If we attempt to read beyond the [0, length[, ZERO bytes will be
-	 // returned. Otherwise an "EOF" exception will be thrown.
+	 // returned. Otherwise an ByteStream::EndOfFile exception will be thrown.
       if (eof_flag)
       {
 	 if (length>0 && offset<length) 
          {
-           G_THROW( ERR_MSG("EOF") );
+           G_THROW( ByteStream::EndOfFile );
 	 }else 
          {
            return 0;
@@ -1619,7 +1619,7 @@ PoolByteStream::seek(long offset, int whence, bool nothrow)
         unsigned char c;
         if(read(&c,1)<1)
         {
-          G_THROW( ERR_MSG("EOF") );
+          G_THROW( ByteStream::EndOfFile );
         }
       }
       retval=0;

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuFile.cpp,v 1.161 2001-04-12 22:40:14 fcrary Exp $
+// $Id: DjVuFile.cpp,v 1.162 2001-04-19 00:05:27 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -58,7 +58,7 @@
 
 
 #define REPORT_EOF(x) \
-  {G_TRY{G_THROW( ERR_MSG("EOF") );}G_CATCH(ex){report_error(ex,(x));}G_ENDCATCH;}
+  {G_TRY{G_THROW( ByteStream::EndOfFile );}G_CATCH(ex){report_error(ex,(x));}G_ENDCATCH;}
 
 static GP<GPixmap> (*djvu_decode_codec)(ByteStream &bs)=0;
 
@@ -607,7 +607,7 @@ DjVuFile::report_error
 (const GException &ex,bool throw_errors)
 {
   data_pool->clear_stream();
-  if((!verbose_eof)|| (ex.get_cause() != GUTF8String("EOF")))
+  if((!verbose_eof)|| (GString::cmp(ex.get_cause(),ByteStream::EndOfFile)))
   {
     if(throw_errors)
     {
@@ -1189,7 +1189,7 @@ DjVuFile::decode(GP<ByteStream> gbs)
   }
   G_CATCH(ex)
   {
-    if(ex.get_cause() == GUTF8String("EOF"))
+    if(!GString::cmp(ex.get_cause(),ByteStream::EndOfFile))
     {
       if (chunks_number < 0)
         chunks_number=(recover_errors>SKIP_CHUNKS)?chunks:last_chunk;
@@ -1422,7 +1422,7 @@ DjVuFile::decode_ndir(GMap<GURL, void *> & map)
     }
     G_CATCH(ex)
     {
-       if(ex.get_cause() == GUTF8String("EOF"))
+       if(!GString::cmp(ex.get_cause(),ByteStream::EndOfFile))
        {
           if (chunks_number < 0)
              chunks_number=(recover_errors>SKIP_CHUNKS)?chunks:last_chunk;
@@ -1888,7 +1888,7 @@ DjVuFile::contains_anno(void)
   GP<IFFByteStream> giff=IFFByteStream::create(str);
   IFFByteStream &iff=*giff;
   if (!iff.get_chunk(chkid))
-    G_THROW( ERR_MSG("EOF") );
+    G_THROW( ByteStream::EndOfFile );
   
   while(iff.get_chunk(chkid))
   {
@@ -1910,7 +1910,7 @@ DjVuFile::contains_text(void)
   GP<IFFByteStream> giff=IFFByteStream::create(str);
   IFFByteStream &iff=*giff;
   if (!iff.get_chunk(chkid))
-    G_THROW( ERR_MSG("EOF") );
+    G_THROW( ByteStream::EndOfFile );
   
   while(iff.get_chunk(chkid))
   {
@@ -1943,7 +1943,7 @@ copy_chunks(GP<ByteStream> from, IFFByteStream &ostr)
     iff.seek_close_chunk();
     if(ochksize != chksize)
     {
-      G_THROW( ERR_MSG("EOF") );
+      G_THROW( ByteStream::EndOfFile );
     }
   }
 }
@@ -2022,7 +2022,7 @@ DjVuFile::add_djvu_data(IFFByteStream & ostr, GMap<GURL, void *> & map,
     }
     G_CATCH(ex)
     {
-      if(ex.get_cause() == GUTF8String("EOF"))
+      if(!GString::cmp(ex.get_cause(),ByteStream::EndOfFile))
       {
         if (chunks_number < 0)
           chunks_number=(recover_errors>SKIP_CHUNKS)?chunks:last_chunk;
@@ -2132,7 +2132,7 @@ DjVuFile::remove_anno(void)
   GP<IFFByteStream> giff_in=IFFByteStream::create(str_in);
   IFFByteStream &iff_in=*giff_in;
   if (!iff_in.get_chunk(chkid))
-    G_THROW( ERR_MSG("EOF") );
+    G_THROW( ByteStream::EndOfFile );
   
   GP<IFFByteStream> giff_out=IFFByteStream::create(gstr_out);
   IFFByteStream &iff_out=*giff_out;
@@ -2172,7 +2172,7 @@ DjVuFile::remove_text(void)
   GP<IFFByteStream> giff_in=IFFByteStream::create(str_in);
   IFFByteStream &iff_in=*giff_in;
   if (!iff_in.get_chunk(chkid))
-    G_THROW( ERR_MSG("EOF") );
+    G_THROW( ByteStream::EndOfFile );
   
   GP<IFFByteStream> giff_out=IFFByteStream::create(gstr_out);
   IFFByteStream &iff_out=*giff_out;

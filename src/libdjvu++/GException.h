@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GException.h,v 1.26 2001-04-18 17:54:24 praveen Exp $
+// $Id: GException.h,v 1.27 2001-04-19 00:05:28 bcr Exp $
 // $Name:  $
 
 #ifndef _GEXCEPTION_H_
@@ -92,7 +92,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@geocities.com> -- fixed message memory allocation.
     @version 
-    #$Id: GException.h,v 1.26 2001-04-18 17:54:24 praveen Exp $# */
+    #$Id: GException.h,v 1.27 2001-04-19 00:05:28 bcr Exp $# */
 //@{
 
 #include "DjVuGlobal.h"
@@ -107,8 +107,8 @@ class GException {
 public:
   enum source_type { GINTERNAL=0, GEXTERNAL, GAPPLICATION, GOTHER };
   /** Constructs a GException.  This constructor is usually called by macro
-      #THROW#.  Argument #cause# is a plain text error message. As a
-      convention, string #"EOF"# is used when reaching an unexpected
+      #G_THROW#.  Argument #cause# is a plain text error message. As a
+      convention, string #ByteStream::EndOfFile# is used when reaching an unexpected
       end-of-file condition and string #"STOP"# is used when the user
       interrupts the execution. The remaining arguments are usually provided
       by the predefined macros #__FILE__#, #__LINE__#, and (G++ and EGCS only)
@@ -175,6 +175,7 @@ private:
 #undef G_ENDCATCH
 #undef G_RETHROW
 #undef G_THROW
+#undef G_THROW_TYPE
 #undef G_THROW_INTERNAL
 #undef G_THROW_EXTERNAL
 #undef G_THROW_APPLICATION

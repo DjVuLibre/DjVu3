@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: IFFByteStream.cpp,v 1.26 2001-04-13 00:41:16 bcr Exp $
+// $Id: IFFByteStream.cpp,v 1.27 2001-04-19 00:05:28 bcr Exp $
 // $Name:  $
 
 // -- Implementation of IFFByteStream
@@ -176,7 +176,7 @@ IFFByteStream::get_chunk(GString &chkid, int *rawoffsetptr, int *rawsizeptr)
     if (bytes==0 && !ctx)
       return 0;
     if (bytes != 4)
-      G_THROW( ERR_MSG("EOF") );
+      G_THROW( ByteStream::EndOfFile );
     if(buffer[0] != 0x41 || buffer[1] != 0x54 ||
        buffer[2] != 0x26 || buffer[3] != 0x54 )
       break;
@@ -189,7 +189,7 @@ IFFByteStream::get_chunk(GString &chkid, int *rawoffsetptr, int *rawsizeptr)
   bytes = bs->readall( (void*)&buffer[4], 4);
   offset = seekto = offset + bytes;
   if (bytes != 4)
-    G_THROW( ERR_MSG("EOF") );
+    G_THROW( ByteStream::EndOfFile );
   long size = ((unsigned char)buffer[4]<<24) |
               ((unsigned char)buffer[5]<<16) |
               ((unsigned char)buffer[6]<<8)  |
@@ -210,7 +210,7 @@ IFFByteStream::get_chunk(GString &chkid, int *rawoffsetptr, int *rawsizeptr)
     bytes = bs->readall( (void*)&buffer[4], 4);
     offset += bytes;
     if (bytes != 4)
-      G_THROW( ERR_MSG("EOF") );
+      G_THROW( ByteStream::EndOfFile );
     if (check_id(&buffer[4]))
       G_THROW( ERR_MSG("IFFByteStream.corrupt_2nd_id") );
   }

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.h,v 1.50 2001-04-12 00:24:58 bcr Exp $
+// $Id: ByteStream.h,v 1.51 2001-04-19 00:05:27 bcr Exp $
 // $Name:  $
 
 #ifndef _BYTESTREAM_H
@@ -62,7 +62,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation\\
     Andrei Erofeev <eaf@geocities.com> -- 
     @version
-    #$Id: ByteStream.h,v 1.50 2001-04-12 00:24:58 bcr Exp $# */
+    #$Id: ByteStream.h,v 1.51 2001-04-19 00:05:27 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -75,7 +75,8 @@
 //include <string.h>
 
 class GURL;
-class GString;
+class GUTF8String;
+class GNativeString;
 
 /** Abstract class for a stream of bytes.  Class #ByteStream# represent an
     object from which (resp. to which) bytes can be read (resp. written) as
@@ -192,7 +193,7 @@ public:
   /// Allows scanf() type operations on a bytestream.
   int scanf(const char *fmt, ... );
   /** Writes the string as is, to the specified stream. */
-  size_t writestring(const GString &s);
+  size_t writestring(const GUTF8String &s);
   /** Writes a one-byte integer to a ByteStream. */
   void write8 (unsigned int card8);
   /** Writes a two-bytes integer to a ByteStream.
@@ -284,6 +285,7 @@ public:
     content remain valid long enough.  */
   static GP<ByteStream> create_static(
     void const * const buffer, const size_t size);
+  static const char *EndOfFile;
 };
 
 inline size_t
