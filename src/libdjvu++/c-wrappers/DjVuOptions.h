@@ -7,13 +7,13 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuOptions.h,v 1.13 2000-03-26 16:16:41 haffner Exp $
+ *C- $Id: DjVuOptions.h,v 1.14 2000-06-01 22:37:04 bcr Exp $
  */
 
 #ifndef _DJVU_OPTIONS_H_
 #define _DJVU_OPTIONS_H_
 
-/** These options are available in DjVuIO.cpp as part of libdjvuio++.a */
+/* These options are available in DjVuIO.cpp as part of libdjvuio++.a */
 extern const char djvu_config_string[];
 extern const char djvu_filelist_string[];
 extern const char djvu_verbose_string[];
@@ -44,34 +44,40 @@ extern const char djvu_help_string[];
 #define djvu_page_size_option {djvu_page_size_string+2,1,0,0xff}
 #define djvu_render_size_option {djvu_render_size_string+2,1,0,0xfe}
 #define djvu_rotate_option {djvu_rotate_string+2,1,0,'r'}
-#define djvu_vflip_option {djvu_vflip_string+2,2,0,'V'}
-#define djvu_hflip_option {djvu_hflip_string+2,2,0,'H'}
+#define djvu_vflip_option {djvu_vflip_string+2,0,0,'V'}
+#define djvu_hflip_option {djvu_hflip_string+2,0,0,'H'}
 #define djvu_invert_option {djvu_invert_string+2,0,0,'x'}
 #define djvu_help_option {djvu_help_string+2,0,0,'h'}
 
-/** These are defined in DjVuProcess.cpp as part of libdjvudecode.a */
+/* These are defined in DjVuProcess.cpp as part of libdjvudecode.a */
 
 extern const char djvu_page_range_string[];
 extern const char djvu_trace_string[];
 #define djvu_page_range_option {djvu_page_range_string+2,1,0,'p'}
 #define djvu_trace_option {djvu_trace_string+2,0,0,'Z'}
 
-/** These are defined in DjVuTransform.cpp as part of libdjvudecode.a */
+/* These are defined in DjVuTransform.cpp as part of libdjvudecode.a */
 
+extern const char djvu_black_normalize_string[];
+extern const char djvu_white_normalize_string[];
+extern const char djvu_scale_normalize_string[];
 extern const char djvu_togray_string[];
 extern const char djvu_tobitonal_string[];
 extern const char djvu_resize_string[];
 extern const char djvu_upsample_string[];
 extern const char djvu_subsample_string[];
 extern const char djvu_crop_string[];
-#define djvu_togray_option {djvu_togray_string+2,2,0,'G'}
+#define djvu_black_normalize_option {djvu_black_normalize_string+2,2,0,0xe1}
+#define djvu_white_normalize_option {djvu_white_normalize_string+2,2,0,0xe2}
+#define djvu_scale_normalize_option {djvu_scale_normalize_string+2,1,0,0xe3}
+#define djvu_togray_option {djvu_togray_string+2,0,0,'G'}
 #define djvu_tobitonal_option {djvu_tobitonal_string+2,2,0,'B'}
 #define djvu_resize_option {djvu_resize_string+2,1,0,'R'}
 #define djvu_upsample_option {djvu_upsample_string+2,1,0,'u'}
 #define djvu_subsample_option {djvu_subsample_string+2,1,0,'s'}
 #define djvu_crop_option {djvu_crop_string+2,1,0,'S'}
 
-/** These are defined in DjVuJB2Parse.cpp as part of libdjvuphoto.a */
+/* These are defined in DjVuJB2Parse.cpp as part of libdjvuphoto.a */
 
 extern const char djvu_normal_string[];
 extern const char djvu_conservative_string[];
@@ -85,13 +91,13 @@ extern const char djvu_tolerance_percent_string[];
 #define djvu_conservative_option {djvu_conservative_string+2,0,0,'C'}
 #define djvu_lossless_option {djvu_lossless_string+2,0,0,'l'}
 #define djvu_aggressive_option {djvu_aggressive_string+2,0,0,'a'}
-#define djvu_disable_halftone_option {djvu_disable_halftone_string+2,2,0,'t'}
+#define djvu_disable_halftone_option {djvu_disable_halftone_string+2,0,0,'t'}
 #define djvu_pages_per_dict_option {djvu_pages_per_dict_string+2,1,0,'D'}
-#define djvu_pseudo_option {djvu_pseudo_string+2,2,0,'g'}
+#define djvu_pseudo_option {djvu_pseudo_string+2,0,0,'g'}
 #define djvu_tolerance_percent_option {djvu_tolerance_percent_string+2,1,0,0xfd}
 #define djvu_tolerance4_size_option {djvu_tolerance4_size_string+2,1,0,0xfc}
 
-/** These are defined in DjVuIW44Parse.cpp as part of libdjvuphoto.a */
+/* These are defined in DjVuIW44Parse.cpp as part of libdjvuphoto.a */
 
 extern const char djvu_sizes_string[];
 extern const char djvu_decibels_string[];
@@ -114,9 +120,9 @@ extern const char djvu_jpeg_string[];
 #define djvu_crcbnone_option {djvu_crcbnone_string+2,0,0,0xfb}
 #define djvu_crcbdelay_option {djvu_crcbdelay_string+2,1,0,0xfa}
 #define djvu_gamma_option {djvu_gamma_string+2,1,0,0xf9}
-#define djvu_jpeg_option {djvu_jpeg_string+2,2,0,'j'}
+#define djvu_jpeg_option {djvu_jpeg_string+2,0,0,'j'}
 
-/** These are defined in DjVuForegroundParse.cpp as part of libdjvudocument.a */
+/* These are defined in DjVuForegroundParse.cpp as part of libdjvudocument.a */
 
 extern const char djvu_color_jb2_string[];
 extern const char djvu_fg_quality_string[];
@@ -124,7 +130,7 @@ extern const char djvu_fg_quality_string[];
 #define djvu_color_jb2_option {djvu_color_jb2_string+2,0,0,0xf7}
 #define djvu_fg_quality_option {djvu_fg_quality_string+2,1,0,0xf6}
 
-/** These are defined in DjVuSegParse.cpp as part of libdjvudocument.a */
+/* These are defined in DjVuSegParse.cpp as part of libdjvudocument.a */
 
 extern const char djvu_threshold_level_string[];
 extern const char djvu_shape_filter_level_string[];
@@ -164,7 +170,7 @@ extern const char djvu_limit_mem_usage_string[];
 #define djvu_mask_upsample_option {djvu_mask_upsample_string+2,1,0,0xeb}
 #define djvu_target_subsample_option {djvu_bg_subsample_string+2,1,0,0xe7}
 #define djvu_resolution_multiplier_option {djvu_resolution_multiplier_string+2,1,0,0xea}
-#define djvu_high_variation_foreground_option {djvu_high_variation_foreground_string+2,2,0,0xe9}
+#define djvu_high_variation_foreground_option {djvu_high_variation_foreground_string+2,0,0,0xe9}
 #define djvu_refine_option {djvu_refine_string+2, 2, 0, 0xe8}
 #define djvu_limit_mem_usage_option {djvu_limit_mem_usage_string+2, 2, 0, 0xe4}
 

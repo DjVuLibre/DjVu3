@@ -6,7 +6,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: parseoptions.h,v 1.32 2000-03-15 21:16:41 bcr Exp $
+//C- $Id: parseoptions.h,v 1.33 2000-06-01 22:37:04 bcr Exp $
 */
 
 #ifndef __DJVUPARSEOPTIONS_H__
@@ -42,7 +42,7 @@
 
    @memo Class used for parsing options and configuration files.
    @author Bill Riemers
-   @version #$Id: parseoptions.h,v 1.32 2000-03-15 21:16:41 bcr Exp $#
+   @version #$Id: parseoptions.h,v 1.33 2000-06-01 22:37:04 bcr Exp $#
  */
 
 /*@{*/
@@ -335,14 +335,17 @@ public:
   inline int GetBest(const char * const names[],bool=false);
 
   /** This just checks for TRUE, and if not does an atoi() conversion. 
-      Anything beginning with [Tt] is returned as 1, [Ff] is returned 
-      as 0, and anything else that is not a legal integer is returned 
+      Anything beginning with [Tt] is returned as trueval, [Ff] is returned 
+      as falseval, and anything else that is not a legal integer is returned 
       as errval. */
-  int GetInteger(const int token,const int errval=0) const;
+  int GetInteger(
+    const int token, const int errval=0,
+    const int falseval=0, const int trueval=1) const;
 
   /** This is just a short cut, when a token value is only needed for one 
       lookup. */
-  inline int GetInteger(const char xname[],const int errval=0) const;
+  inline int GetInteger(const char xname[],const int errval=0,
+    const int falseval=0, const int trueval=1) const;
 
   /** This just checks for valid integer numbers only.  If the string
       contains something other than [-0-9] the supplied errval is returned.
@@ -513,8 +516,8 @@ DjVuParseOptions::GetBest
 
 inline int
 DjVuParseOptions::GetInteger
-(const char xname[],const int errval) const
-{ return GetInteger(GetVarToken(xname),errval); }
+(const char xname[],const int errval,const int falseval,const int trueval) const
+{ return GetInteger(GetVarToken(xname),errval,falseval,trueval); }
 
 inline int
 DjVuParseOptions::GetNumber

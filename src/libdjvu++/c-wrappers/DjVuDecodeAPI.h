@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuDecodeAPI.h,v 1.26 2000-03-09 22:27:59 bcr Exp $
+ *C- $Id: DjVuDecodeAPI.h,v 1.27 2000-06-01 22:37:04 bcr Exp $
  */
 
 #ifndef _DJVUDECODE_H_
@@ -27,7 +27,10 @@
 
 /*
  * $Log: DjVuDecodeAPI.h,v $
- * Revision 1.26  2000-03-09 22:27:59  bcr
+ * Revision 1.27  2000-06-01 22:37:04  bcr
+ * Added support for the --white-normalize and --black-normalize in documenttodjvu
+ *
+ * Revision 1.26  2000/03/09 22:27:59  bcr
  * Updated the documentation, again.
  *
  * Revision 1.25  2000/03/08 22:59:46  bcr
@@ -102,6 +105,16 @@ struct djvu_transform_options_struct
      as the #tobitonal# option.  Set #tobitonal# to a non-zero value to
      perform this conversion. */
   int tobitonal;
+  /** Normalize of the image will be done if #blackNormalize# or
+    #whiteNormalize# are non-zero.  The
+    #blackNormalize#:#scaleNormalize# is the ratio of black pixels
+    that will be removed, and #whiteNormalize#:#scaleNormalize# is
+    the ratio of white pixels that will be removed.  If #scale# is lessthan or
+    equal to zero, it will be treated as 100.  If #blackNormalize# or
+    #whiteNormalize# are negative, the image will be normalized up to
+    the first channel that is at or above the average for the respective
+    color. */
+  int blackNormalize, whiteNormalize, scaleNormalize;
   /** The #invert# option swaps black and white in a bitonal (RLE) image.
      There will be no effect on color and gray scale documents unless the
      #tobitonal# flag has also been used.  Set #invert# to a non-zero value
@@ -379,6 +392,7 @@ void djvu_decode_usage(int fd,const char *prog);
 
 inline djvu_transform_options_struct::djvu_transform_options_struct() :
   hflip(0), vflip(0), rotateAngle(0), togray(0), tobitonal(0),
+  blackNormalize(0), whiteNormalize(0), scaleNormalize(0), 
   invert(0), hsize(0), vsize(0), hupsample(1), hsubsample(1), vupsample(1),
   vsubsample(1), xmin(0), ymin(0), seg_width(0), seg_height(0), dpi(0) {}
 

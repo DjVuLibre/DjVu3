@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: parseoptions.cpp,v 1.50 2000-05-11 19:36:09 mrosen Exp $
+//C- $Id: parseoptions.cpp,v 1.51 2000-06-01 22:37:04 bcr Exp $
 #ifdef __GNUC__
 #pragma implementation
 #endif
@@ -479,31 +479,45 @@ DjVuParseOptions::GetBest(
 }
 
 // This does a simple strtol() conversion.  Any string beginning with 'T' or
-// 't' is always returned as 1.  Any string starting with 'F', 'f', or '\0'
-// is returned as 0.  Otherwise if strtol() is successfull a value is returned.
-// In the even of failure, the errval is returned.
+// 't' is always returned as trueval.
+// Any string starting with 'F', 'f', or '\0' is returned as falseval.
+// Otherwise we parse for a number.  In the even of failure, the errval
+// is returned.
 //
 int
 DjVuParseOptions::GetInteger(
-  const int token,const int errval) const 
+  const int token,const int errval,const int falseval,const int trueval) const 
 {
   const char * const str=GetValue(token);
-  int retval;
-  if(!str)
+  int retval=errval;
+  if(str)
   {
-    retval=errval;
-  }else if((str[0] == 'T')||(str[0] == 't'))
-  {
-    retval=1;
-  }else if((!str[0])||(str[0] == 'F')||(str[0] == 'f'))
-  {
-    retval=0;
-  }else 
-  {  // We should try and detect errors.
-    char *endptr;
-    retval=(int)strtol(str,&endptr,10);
-    if(errval&&(!retval)&&(*endptr)&&((endptr==str)||!isdigit(*(endptr-1))))
-      retval=(errval);
+    if((str[0] == 'T')||(str[0] == 't'))
+    {
+      retval=trueval;
+    }else if((!str[0])||(str[0] == 'F')||(str[0] == 'f'))
+    {
+      retval=falseval;
+    }else 
+    {  // We should try and detect errors.
+      const char mesg[]="'%1.10s' is not a number or boolian value.";
+      const char *s=str;
+      const char *endptr=mesg;
+      if(s[0])
+      {
+        for(;isspace(s[0]);s++);
+        if(s[0] == '+')
+          s++;
+        for(retval=(int)strtol(s,(char **)&endptr,10);isspace(endptr[0]);endptr++);
+      }
+      if(*endptr)
+      {
+        char sbuf[sizeof(mesg)+10];
+        sprintf(sbuf,mesg,str?str:"(NULL)");
+        Errors->AddError(sbuf);
+        retval=errval;
+      }
+    }
   }
   return retval;
 }
