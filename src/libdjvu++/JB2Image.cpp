@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: JB2Image.cpp,v 1.44 2000-12-19 23:43:51 bcr Exp $
+// $Id: JB2Image.cpp,v 1.45 2000-12-20 00:00:16 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -89,7 +89,7 @@ protected:
   BitContext *bitcells;
   NumContext *leftcell;
   NumContext *rightcell;
-  virtual void CodeBit(int &bit, BitContext &ctx) = 0;
+  virtual int CodeBit(const int bit, BitContext &ctx) = 0;
   int CodeNum(int lo, int hi, NumContext &ctx,int v);
   void reset_numcoder();
   // Info
@@ -105,7 +105,7 @@ protected:
   NumContext dist_record_type;
   NumContext dist_match_index;
   BitContext dist_refinement_flag;
-  void code_eventual_lossless_refinement();
+  inline void code_eventual_lossless_refinement();
   virtual void code_record_type(int &rectype) = 0;
   virtual int code_match_index(int &index, JB2Dict *jim)=0;
   // Library
@@ -145,7 +145,7 @@ protected:
   virtual void code_relative_mark_size(GBitmap *bm, int cw, int ch, int border=0) = 0;
   int short_list[3];
   int short_list_pos;
-  void fill_short_list(int v);
+  inline void fill_short_list(int v);
   int update_short_list(int v);
   // Code bitmaps
   BitContext bitdist[1024];
@@ -176,7 +176,7 @@ public:
   virtual void code(JB2Dict *jim);
 protected:
   int CodeNum(int lo, int hi, NumContext &ctx);
-  virtual void CodeBit(int &bit, BitContext &ctx);
+  virtual int CodeBit(const int bit, BitContext &ctx);
   virtual void code_comment(GString &comment);
   virtual void code_record_type(int &rectype);
   virtual int code_match_index(int &index, JB2Dict *jim);
@@ -205,7 +205,7 @@ public:
   virtual void code(JB2Dict *jim);
 protected:
   void CodeNum(int num, int lo, int hi, NumContext &ctx);
-  virtual void CodeBit(int &bit, BitContext &ctx);
+  virtual int CodeBit(const int bit, BitContext &ctx);
   virtual void code_comment(GString &comment);
   virtual void code_record_type(int &rectype);
   virtual int code_match_index(int &index, JB2Dict *jim);
@@ -547,17 +547,18 @@ _JB2Codec::set_dict_callback(JB2DecoderCallback *cb, void *arg)
 // CODE NUMBERS
 
 #ifndef NEED_DECODER_ONLY
-inline void 
-_JB2EncodeCodec::CodeBit(int &bit, BitContext &ctx)
+inline int
+_JB2EncodeCodec::CodeBit(const int bit, BitContext &ctx)
 {
     zp.encoder(bit, ctx);
+    return bit;
 }
 #endif
 
-inline void 
-_JB2DecodeCodec::CodeBit(int &bit, BitContext &ctx)
+inline int
+_JB2DecodeCodec::CodeBit(const int, BitContext &ctx)
 {
-  bit = zp.decoder(ctx);
+  return zp.decoder(ctx);
 }
 
 int
@@ -763,18 +764,13 @@ _JB2EncodeCodec::code_record_type(int &rectype)
 inline void 
 _JB2DecodeCodec::code_record_type(int &rectype)
 {
-  rectype=CodeNum(
-             START_OF_DATA, END_OF_DATA, 
-             dist_record_type);
+  rectype=CodeNum( START_OF_DATA, END_OF_DATA, dist_record_type);
 }
 
-void
+inline void
 _JB2Codec::code_eventual_lossless_refinement()
 {
-  int bit=refinementp;
-  CodeBit(bit, dist_refinement_flag);
-  if (!encoding)
-    refinementp = bit;
+  refinementp=CodeBit(refinementp, dist_refinement_flag);
 }
 
 #ifndef NEED_DECODER_ONLY
@@ -798,7 +794,7 @@ _JB2DecodeCodec::code_match_index(int &index, JB2Dict *jim)
 
 // HANDLE SHORT LIST
 
-void 
+inline void 
 _JB2Codec::fill_short_list(int v)
 {
   short_list[0] = short_list[1] = short_list[2] = v;
@@ -932,7 +928,7 @@ _JB2Codec::code_image_size(JB2Image *jim)
 }
 
 #ifndef NEED_DECODER_ONLY
-int
+inline int
 _JB2EncodeCodec::get_diff(int x_diff,NumContext &rel_loc)
 {
    CodeNum(x_diff, BIGNEGATIVE, BIGPOSITIVE, rel_loc);
@@ -940,7 +936,7 @@ _JB2EncodeCodec::get_diff(int x_diff,NumContext &rel_loc)
 }
 #endif
 
-int
+inline int
 _JB2DecodeCodec::get_diff(int,NumContext &rel_loc)
 {
    return CodeNum(BIGNEGATIVE, BIGPOSITIVE, rel_loc);
@@ -954,17 +950,16 @@ _JB2Codec::code_relative_location(JB2Blit *jblt, int rows, int columns)
     G_THROW("JB2Image.no_start");
   // Find location
   int bottom=0, left=0, top=0, right=0;
-  int new_row, x_diff, y_diff;
+  int x_diff, y_diff;
   if (encoding)
     {
       left = jblt->left + 1;
       bottom = jblt->bottom + 1;
       right = left + columns - 1;
       top = bottom + rows - 1;
-      new_row=(left < last_left)?1:0;
     }
   // Code offset type
-  CodeBit(new_row, offset_type_dist);
+  int new_row=CodeBit((left<last_left)?1:0, offset_type_dist);
   if (new_row)
     {
       // Begin a new row
