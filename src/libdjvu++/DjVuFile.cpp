@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.103 2000-01-20 21:34:10 eaf Exp $
+//C- $Id: DjVuFile.cpp,v 1.104 2000-01-20 21:38:16 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -471,16 +471,15 @@ DjVuFile::process_incl_chunk(ByteStream & str, int file_num)
       
 	 // No. We have to request a new file
       GP<DjVuFile> file=(DjVuFile *) pcaster->id_to_file(this, incl_str).get();
-      if(recover_errors != ABORT) file->set_recover_errors(recover_errors);
-      if(verbose_eof) file->set_verbose_eof(verbose_eof);
       if (!file)
       {
-        const char mesg[]="Internal error: id_to_file(%1.1023s) did not create any file.";
-        char buf[1024+sizeof(mesg)];
-        sprintf(buf,mesg,(const char *)incl_str);
-        abort();
-        THROW(buf);
+	 const char mesg[]="Internal error: id_to_file(%1.1023s) did not create any file.";
+	 char buf[1024+sizeof(mesg)];
+	 sprintf(buf,mesg,(const char *)incl_str);
+	 THROW(buf);
       }
+      if (recover_errors!=ABORT) file->set_recover_errors(recover_errors);
+      if (verbose_eof) file->set_verbose_eof(verbose_eof);
       pcaster->add_route(file, this);
       
 	 // We may have been stopped. Make sure the child will be stopped too.
