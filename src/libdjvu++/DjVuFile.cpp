@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.84 1999-11-11 19:50:34 leonb Exp $
+//C- $Id: DjVuFile.cpp,v 1.85 1999-11-12 00:01:13 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -1122,11 +1122,12 @@ DjVuFile::get_merged_anno(const GP<DjVuFile> & file,
    {
       map[url]=0;
 
-      if (!file->is_data_present())
+      if (!file->is_data_present() || file->is_modified())
       {
 	    // Return smth using the 'anno' and partially decoded
-	    // list of included files. The result is only an approximation
-	    // due to two things:
+	    // list of included files. If the file has not been modified
+	    // and we're here due to the lack of data, the result will be
+	    // only an approximation due to two things:
 	    //    1. 'anno' may not contain all data
 	    //    2. annotations are merged regardless of where a child
 	    //       DjVuFile is included.
@@ -1147,6 +1148,7 @@ DjVuFile::get_merged_anno(const GP<DjVuFile> & file,
 	    // Note, that using 'anno' and included files list is not
 	    // a good idea because we want to insert annotations of the
 	    // included files into correct places
+	    // The file is not modified so we don't care about decoded 'anno'
 	 GP<ByteStream> str=file->data_pool->get_stream();
 	 IFFByteStream iff(*str);
 	 GString chkid;
@@ -1158,7 +1160,7 @@ DjVuFile::get_merged_anno(const GP<DjVuFile> & file,
 		  GP<DjVuFile> inc_file=file->process_incl_chunk(iff);
 		  if (inc_file) get_merged_anno(inc_file, str_out, map);
 	       } 
-               else if (chkid == "FORM:ANNO")
+               else if (chkid=="FORM:ANNO")
 	       {
 		  if (str_out.tell() & 1) str_out.write((void *) "", 1);
 		  str_out.copy(iff);
