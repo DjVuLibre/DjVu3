@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.h,v 1.67 2001-04-26 18:38:44 bcr Exp $
+// $Id: GString.h,v 1.68 2001-04-27 15:38:34 bcr Exp $
 // $Name:  $
 
 #ifndef _GSTRING_H_
@@ -57,7 +57,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.67 2001-04-26 18:38:44 bcr Exp $# */
+    #$Id: GString.h,v 1.68 2001-04-27 15:38:34 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -171,7 +171,7 @@ public:
       function #vprintf()# for more information. The current implementation
       will cause a segmentation violation if the resulting string is longer
       than 32768 characters. */
-  GP<GStringRep> format(va_list &args) const;
+  GP<GStringRep> vformat(va_list &args) const;
   // -- SEARCHING
 
   static GP<GStringRep> UTF8ToNative( const char *s );
@@ -361,7 +361,7 @@ inline GP<GStringRep>
 GStringRep::Native::create(const char fmt[],va_list &args)
 { 
   GP<GStringRep> s=create(fmt);
-  return (s?(s->format(args)):s);
+  return (s?(s->vformat(args)):s);
 }
 
 class GStringRep::UTF8 : public GStringRep
@@ -453,7 +453,7 @@ inline GP<GStringRep>
 GStringRep::UTF8::create(const char fmt[],va_list args)
 { 
   GP<GStringRep> s=create(fmt);
-  return (s?(s->format(args)):s);
+  return (s?(s->vformat(args)):s);
 }
 
 /** General purpose character string.
@@ -814,7 +814,7 @@ public:
       function #vprintf()# for more information. The current implementation
       will cause a segmentation violation if the resulting string is longer
       than 32768 characters. */
-  GUTF8String &format(const GUTF8String &fmt, va_list &args)
+  GUTF8String &vformat(const GUTF8String &fmt, va_list &args)
   { return (*this = (fmt.ptr?GUTF8String(fmt,args):fmt)); }
 
   /** Returns a copy of this string with characters used in XML with
@@ -1090,7 +1090,7 @@ public:
       function #vprintf()# for more information. The current implementation
       will cause a segmentation violation if the resulting string is longer
       than 32768 characters. */
-  GNativeString &format(const GNativeString &fmt, va_list &args)
+  GNativeString &vformat(const GNativeString &fmt, va_list &args)
   { return (*this = (fmt.ptr?GNativeString(fmt,args):fmt)); }
 
   /** Provides a direct access to the string buffer.  Returns a pointer for
@@ -1236,7 +1236,7 @@ inline GUTF8String::GUTF8String(const int number)
 inline GUTF8String::GUTF8String(const double number)
 { init(GStringRep::UTF8::create_format("%f",number)); }
 inline GUTF8String::GUTF8String(const GUTF8String &fmt, va_list &args)
-{ init(fmt.ptr?fmt->format(args):fmt); }
+{ init(fmt.ptr?fmt->vformat(args):fmt); }
 
 inline GUTF8String& GUTF8String::operator= (const char str)
 { return init(GStringRep::UTF8::create(&str,0,1)); }
@@ -1275,7 +1275,7 @@ inline GNativeString::GNativeString(const int number)
 inline GNativeString::GNativeString(const double number)
 { init(GStringRep::Native::create_format("%f",number)); }
 inline GNativeString::GNativeString(const GNativeString &fmt, va_list &args)
-{ init(fmt.ptr?fmt->format(args):fmt); }
+{ init(fmt.ptr?fmt->vformat(args):fmt); }
 
 inline GNativeString& GNativeString::operator= (const char str)
 { return init(GStringRep::Native::create(&str,0,1)); }

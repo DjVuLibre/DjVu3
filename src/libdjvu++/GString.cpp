@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.87 2001-04-26 18:58:05 bcr Exp $
+// $Id: GString.cpp,v 1.88 2001-04-27 15:38:34 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -659,7 +659,7 @@ GStringRep::Native::create_format(const char fmt[],...)
 }
 
 GP<GStringRep>
-GStringRep::format(va_list &args) const
+GStringRep::vformat(va_list &args) const
 {
   GP<GStringRep> retval;
   if(size)
