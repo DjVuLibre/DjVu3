@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: JB2Image.cpp,v 1.25 1999-11-13 18:21:15 leonb Exp $
+//C- $Id: JB2Image.cpp,v 1.26 1999-11-17 19:47:30 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -19,6 +19,7 @@
 #include <string.h>
 #include "JB2Image.h"
 #include "GException.h"
+#include "GThreads.h"
 
 
 ////////////////////////////////////////
@@ -162,8 +163,14 @@ JB2Dict::set_inherited_dict(GP<JB2Dict> dict)
     THROW("Cannot set dictionary after adding shapes");
   if (inherited_dict)
     THROW("Cannot change dictionary once set");
-  inherited_dict = dict;
-  inherited_shapes = (dict ? dict->get_shape_count() : 0);
+  inherited_dict = dict; 
+  inherited_shapes = dict->get_shape_count();
+  // Make sure that inherited bitmaps are marked as shared
+  for (int i=0; i<inherited_shapes; i++)
+    {
+      JB2Shape *jshp = dict->get_shape(i);
+      if (jshp->bits) jshp->bits->share();
+    }
 }
 
 void
@@ -948,6 +955,8 @@ shift_direct_context(int &context, int next,
 void 
 _JB2Codec::code_bitmap_directly (GBitmap *bm)
 {
+  // Make sure bitmap will not be disturbed
+  GMonitorLock lock(bm->monitor());
   // ensure borders are adequate
   bm->minborder(3);
   // initialize row pointers
@@ -1061,18 +1070,18 @@ _JB2Codec::code_bitmap_by_cross_coding (GBitmap *bm, GBitmap *cbm, int libno)
   int cw = cbm->columns();
   int dw = bm->columns();
   int dh = bm->rows();
-  
-  // center bitmaps
+  // Make sure bitmaps will not be disturbed
+  GMonitorLock lock1(bm->monitor());
+  GMonitorLock lock2(cbm->monitor());
+  // Center bitmaps
   LibRect &l = libinfo[libno];
   int xd2c = (dw/2 - dw + 1) - ((l.right - l.left + 1)/2 - l.right);
   int yd2c = (dh/2 - dh + 1) - ((l.top - l.bottom + 1)/2 - l.top);
-
-  // ensure borders are adequate
+  // Ensure borders are adequate
   bm->minborder(2);
   cbm->minborder(2-xd2c);
   cbm->minborder(2+dw+xd2c-cw);
-
-  // initialize row pointers
+  // Initialize row pointers
   int next;
   int context;
   int dy = dh - 1;
@@ -1086,8 +1095,7 @@ _JB2Codec::code_bitmap_by_cross_coding (GBitmap *bm, GBitmap *cbm, int libno)
   bm->check_border();
   cbm->check_border();
 #endif
-
-  // test case
+  // Test case
   if (encoding)
     {
       // iterate on rows (encoding)

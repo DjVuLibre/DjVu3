@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GBitmap.h,v 1.13 1999-11-13 18:43:06 leonb Exp $
+//C- $Id: GBitmap.h,v 1.14 1999-11-17 19:47:30 leonb Exp $
 
 #ifndef _GBITMAP_H_
 #define _GBITMAP_H_
@@ -22,6 +22,7 @@
 #include "GRect.h"
 #include "ByteStream.h"
 #include "GSmartPointer.h"
+class GMonitor;
 
 
 /** @name GBitmap.h
@@ -44,7 +45,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: GBitmap.h,v 1.13 1999-11-13 18:43:06 leonb Exp $#
+    #$Id: GBitmap.h,v 1.14 1999-11-17 19:47:30 leonb Exp $#
 
  */
 //@{
@@ -176,7 +177,9 @@ public:
       function \Ref{compress}, which encodes the image using a run-length
       encoding scheme.  The bracket operator decompresses the image on demand.
       A few highly optimized functions (e.g. \Ref{blit}) can use a run-length
-      encoded bitmap without decompressing it.  */
+      encoded bitmap without decompressing it.  There are unfortunate locking
+      issues associated with this capability (c.f. \Ref{share} and
+      \Ref{monitor}). */
   //@{
   /** Reduces the memory required for a bilevel image by using a run-length
       encoded representation.  Functions that need to access the pixel array
@@ -187,6 +190,16 @@ public:
   void uncompress();
   /** Returns the number of bytes allocated for this image. */
   unsigned int get_memory_usage() const;
+  /** Returns a possibly null pointer to a \Ref{GMonitor} for this bitmap.
+      You should use this monitor to ensure that the data representation of the 
+      bitmap will not change while you are using it.  We suggest using
+      class \Ref{GMonitorLock} which properly handles null monitor pointers. */
+  GMonitor *monitor() const;
+  /** Associates a \Ref{GMonitor} with this bitmap. This function should be
+      called on all bitmaps susceptible of being simultaneously used by
+      several threads.  It will make sure that function \Ref{monitor} returns
+      a pointer to a suitable monitor for this bitmap. */
+  void share();
   //@}
 
   /** @name Accessing RLE data.
@@ -341,7 +354,7 @@ protected:
   unsigned char  **rlerows;
   unsigned int   rlelength;
 private:
-  // helpers
+  GMonitor       *monitorptr;
   static int zerosize;
   static unsigned char *zerobuffer;
   static void zeroes(int ncolumns);
@@ -462,6 +475,11 @@ GBitmap::operator=(const GBitmap &ref)
   return *this;
 }
 
+inline GMonitor *
+GBitmap::monitor() const
+{
+  return monitorptr;
+}
 
 inline void 
 GBitmap::euclidian_ratio(int a, int b, int &q, int &r)

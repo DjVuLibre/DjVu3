@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GBitmap.cpp,v 1.17 1999-11-15 00:09:06 praveen Exp $
+//C- $Id: GBitmap.cpp,v 1.18 1999-11-17 19:47:29 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -23,15 +23,8 @@
 #include "GString.h"
 #include "GThreads.h"
 
-
-// File "$Id: GBitmap.cpp,v 1.17 1999-11-15 00:09:06 praveen Exp $"
+// File "$Id: GBitmap.cpp,v 1.18 1999-11-17 19:47:29 leonb Exp $"
 // - Author: Leon Bottou, 05/1997
-
-
-
-// ----- global lock used by some rare operations
-
-static GMonitor bitmap_monitor;
 
 
 // ----- constructor and destructor
@@ -49,14 +42,16 @@ GBitmap::~GBitmap()
 GBitmap::GBitmap()
   : nrows(0), ncolumns(0), border(0), 
     bytes_per_row(0), grays(0), bytes(0), bytes_data(0), 
-    rle(0), rlerows(0), rlelength(0)
+    rle(0), rlerows(0), rlelength(0),
+    monitorptr(0)
 {
 }
 
 GBitmap::GBitmap(int nrows, int ncolumns, int border)
   : nrows(0), ncolumns(0), border(0), 
     bytes_per_row(0), grays(0), bytes(0), bytes_data(0), 
-    rle(0), rlerows(0), rlelength(0)
+    rle(0), rlerows(0), rlelength(0),
+    monitorptr(0)
 {
   init(nrows, ncolumns, border);
 }
@@ -64,7 +59,8 @@ GBitmap::GBitmap(int nrows, int ncolumns, int border)
 GBitmap::GBitmap(ByteStream &ref, int border)
   : nrows(0), ncolumns(0), border(0), 
     bytes_per_row(0), grays(0), bytes(0), bytes_data(0),
-    rle(0), rlerows(0), rlelength(0)
+    rle(0), rlerows(0), rlelength(0),
+    monitorptr(0)
 {
   init(ref, border);
 }
@@ -72,7 +68,8 @@ GBitmap::GBitmap(ByteStream &ref, int border)
 GBitmap::GBitmap(const GBitmap &ref)
   : nrows(0), ncolumns(0), border(0), 
     bytes_per_row(0), grays(0), bytes(0), bytes_data(0), 
-    rle(0), rlerows(0), rlelength(0)
+    rle(0), rlerows(0), rlelength(0),
+    monitorptr(0)
 {
   init(ref, ref.border);
 }
@@ -80,7 +77,8 @@ GBitmap::GBitmap(const GBitmap &ref)
 GBitmap::GBitmap(const GBitmap &ref, int border)
   : nrows(0), ncolumns(0), border(0), 
     bytes_per_row(0), grays(0), bytes(0), bytes_data(0),
-    rle(0), rlerows(0), rlelength(0)
+    rle(0), rlerows(0), rlelength(0),
+    monitorptr(0)
 {
   init(ref, border);
 }
@@ -89,7 +87,8 @@ GBitmap::GBitmap(const GBitmap &ref, int border)
 GBitmap::GBitmap(const GBitmap &ref, const GRect &rect, int border)
   : nrows(0), ncolumns(0), border(0), 
     bytes_per_row(0), grays(0), bytes(0), bytes_data(0),
-    rle(0), rlerows(0), rlelength(0)
+    rle(0), rlerows(0), rlelength(0),
+    monitorptr(0)
 {
   init(ref, rect, border);
 }
@@ -129,6 +128,7 @@ GBitmap::init(const GBitmap &ref, int aborder)
 {
   if (this != &ref) 
   {
+    GMonitorLock lock(ref.monitor());
     init(ref.nrows, ref.ncolumns, aborder);
     grays = ref.grays;
     unsigned char *row = bytes_data+border;
@@ -163,6 +163,7 @@ GBitmap::init(const GBitmap &ref, const GRect &rect, int border)
     }
   else
     {
+      GMonitorLock lock(ref.monitor());
       // create empty bitmap
       init(rect.height(), rect.width(), border);
       grays = ref.grays;
@@ -270,6 +271,7 @@ GBitmap::borrow_rle(unsigned char *rledata, unsigned int rledatalen, int w, int 
 unsigned char *
 GBitmap::take_data(size_t &offset)
 {
+  GMonitorLock lock(monitor());
   unsigned char *ret = bytes_data;
   if (ret) offset = (size_t)border;
   bytes_data=0;
@@ -286,8 +288,7 @@ GBitmap::compress()
 {
   if (grays > 2)
     THROW("Cannot compress gray level bitmap");
-  // Critical section
-  GMonitorLock lock(&bitmap_monitor);
+  GMonitorLock lock(monitor());
   if (bytes)
     {
       delete [] rle;
@@ -306,8 +307,7 @@ GBitmap::compress()
 void
 GBitmap::uncompress()
 {
-  // Critical section
-  GMonitorLock lock(&bitmap_monitor);
+  GMonitorLock lock(monitor());
   if (!bytes && rle)
     decode(rle);
 }
@@ -331,18 +331,34 @@ GBitmap::minborder(int minimum)
 {
   if (border < minimum)
     {
-      // Critical section
-      GMonitorLock lock(&bitmap_monitor);
-      if (bytes)
+      GMonitorLock lock(monitor());
+      if (border < minimum)
         {
-          GBitmap tmp(*this, minimum);
-          delete [] bytes_data;
-          bytes_per_row = tmp.bytes_per_row;
-          bytes = bytes_data = tmp.bytes_data;
-          tmp.bytes = tmp.bytes_data = 0;
+          if (bytes)
+            {
+              GBitmap tmp(*this, minimum);
+              delete [] bytes_data;
+              bytes_per_row = tmp.bytes_per_row;
+              bytes = bytes_data = tmp.bytes_data;
+              tmp.bytes = tmp.bytes_data = 0;
+            }
+          border = minimum;
+          zeroes(border + ncolumns + border);
         }
-      border = minimum;
-      zeroes(border + ncolumns + border);
+    }
+}
+
+
+#define NMONITORS 8
+static GMonitor monitors[NMONITORS];
+
+void
+GBitmap::share()
+{
+  if (!monitorptr)
+    {
+      unsigned long x = (unsigned long)this;
+      monitorptr = &monitors[(x^(x>>5)) % NMONITORS];
     }
 }
 
@@ -425,11 +441,10 @@ GBitmap::blit(const GBitmap *bm, int x, int y)
       (y >= nrows)                 ||
       (x + (int)bm->columns() < 0) || 
       (y + (int)bm->rows() < 0)     )
-  {
     return;
-  }
 
   // Perform blit
+  GMonitorLock lock(monitor());
   if (bm->bytes)
     {
       if (!bytes_data)
@@ -509,11 +524,10 @@ GBitmap::blit(const GBitmap *bm, int xh, int yh, int subsample)
       (yh >= nrows * subsample)    ||
       (xh + (int)bm->columns() < 0)   || 
       (yh + (int)bm->rows() < 0)     )
-  {
     return;
-  }
 
   // Perform subsampling blit
+  GMonitorLock lock(monitor());
   if (bm->bytes)
     {
       if (!bytes_data)
@@ -772,6 +786,7 @@ GBitmap::save_pbm(ByteStream &bs, int raw)
   // check arguments
   if (grays > 2)
     THROW("Cannot make PBM file with a gray level bitmap");
+  GMonitorLock lock(monitor());
   if (!bytes)
     uncompress();
   // header
@@ -826,6 +841,7 @@ void
 GBitmap::save_pgm(ByteStream &bs, int raw)
 {
   // checks
+  GMonitorLock lock(monitor());
   if (!bytes)
     uncompress();
   // header
@@ -869,6 +885,7 @@ GBitmap::save_rle(ByteStream &bs)
   // checks
   if (ncolumns==0 || nrows==0)
     THROW("Uninitialized bitmap");
+  GMonitorLock lock(monitor());
   if (grays > 2)
     THROW("Cannot make PBM file with a gray level bitmap");
   // header
@@ -1157,7 +1174,7 @@ GBitmap::zeroes(int required)
 {
   if (zerosize < required)
     {
-      GMonitorLock lock(&bitmap_monitor);
+      GMonitorLock lock(&monitors[0]); // any monitor would do
       if (zerosize < required)
         {
           if (zerosize < 256)
@@ -1176,6 +1193,7 @@ GBitmap::zeroes(int required)
 void 
 GBitmap::fill(unsigned char value)
 {
+  GMonitorLock lock(monitor());
   for(unsigned int y=0; y<rows(); y++)
     {
       unsigned char* bm_y = (*this)[y];
