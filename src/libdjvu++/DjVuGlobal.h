@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: DjVuGlobal.h,v 1.6 1999-02-19 19:03:43 leonb Exp $
+//C-  $Id: DjVuGlobal.h,v 1.7 1999-02-22 20:35:01 leonb Exp $
 
 
 #ifndef _DJVUGLOBAL_H
@@ -18,13 +18,14 @@
     This file is included by all include files in the DjVu reference library.
     It does nothing unless compilation symbols #NEED_DJVU_MEMORY#,
     #NEED_DJVU_PROGRESS# or #NEED_DJVU_NAMES# are defined.  These compilation
-    symbols enable features that are useful for certain applications of the
-    DjVu Reference Library.  These features still are poorly documented.
+    symbols enable features which are useful for certain applications of the
+    DjVu Reference Library.  These features are still experimental and
+    therefore poorly documented.
     
     @memo
     Global definitions.
     @version
-    #$Id: DjVuGlobal.h,v 1.6 1999-02-19 19:03:43 leonb Exp $#
+    #$Id: DjVuGlobal.h,v 1.7 1999-02-22 20:35:01 leonb Exp $#
     @author
     Leon Bottou <leonb@research.att.com> -- empty file.\\
     Bill Riemers <bcr@sanskrit.lz.att.com> -- real work.  */
@@ -37,11 +38,11 @@
 /** @name DjVu Memory 
 
     This section is enabled when compilation symbol #NEED_DJVU_MEMORY# is
-    defined.  It redefines the C++ memory allocation operators.  Some
-    operating systems (e.g. Macintoshes) require very peculiar memory
-    allocation in shared objects.  We redefine new and delete as
-    #inline_as_macro# because we do not want to export the redefined versions
-    to other libraries. */
+    defined.  Function #_djvu_memory_callback# can be used to redefine the C++
+    memory allocation operators.  Some operating systems (e.g. Macintoshes)
+    require very peculiar memory allocation in shared objects.  We redefine
+    the operators #new# and #delete# as #inline_as_macro# because we do not
+    want to export these redefined versions to other libraries.  */
 //@{
 //@}
 
@@ -105,12 +106,10 @@ operator delete [] (void *addr) delete_throw_spec
 /** @name DjVu Progress  
 
     This section is enabled when compilation symbol #NEED_DJVU_PROGRESS# is
-    defined.  This section allows for defining a callback function called at
-    predefined points in the encoding routines.  There is not such facility
-    for the decoding routines at the moment. The encoding routines call macro
-    #DJVU_PROGRESS# in various critical points. The code called by this macro
-    matches the current point with predefined points in an array of
-    #DjVuProgressScale#. The callback is called when a match occurs.  */
+    defined.  This macro setups callback function that may be used to
+    implement a progress indicator for the encoding routines.  The decoding
+    routines do not need such a facility because it is sufficient to monitor
+    the calls to function \Ref{ByteStream::read} in class \Ref{ByteStream}.  */
 //@{
 //@}
 
@@ -140,12 +139,11 @@ void _djvu_progress(const char*, const char*, int);
 
 
 /** @name DjVu Names  
-    This section is enabled when compilation symbol #NEED_DJVU_NAMES# is defined.
-    This section redefines class names in order to unclutter the name space of
-    shared objects.  This is useful on systems which automatically export all
-    global symbols when building a shared object.
 
-    {\bf Note} --- This is {\em unfinished}. Do not enable. 
+    This section is enabled when compilation symbol #NEED_DJVU_NAMES# is
+    defined.  This section redefines class names in order to unclutter the
+    name space of shared objects.  This is useful on systems which
+    automatically export all global symbols when building a shared object.
     @args */
 //@{
 //@}
