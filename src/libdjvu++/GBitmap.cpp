@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GBitmap.cpp,v 1.51 2001-04-02 21:17:15 bcr Exp $
+// $Id: GBitmap.cpp,v 1.52 2001-04-12 17:05:32 fcrary Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -45,7 +45,7 @@
 #include "GException.h"
 #include <string.h>
 
-// File "$Id: GBitmap.cpp,v 1.51 2001-04-02 21:17:15 bcr Exp $"
+// File "$Id: GBitmap.cpp,v 1.52 2001-04-12 17:05:32 fcrary Exp $"
 // - Author: Leon Bottou, 05/1997
 
 
@@ -301,7 +301,7 @@ GBitmap::init(ByteStream &ref, int aborder)
           return;
         }
     }
-  G_THROW("GBitmap.bad_format");
+  G_THROW( ERR_MSG("GBitmap.bad_format") );
 }
 
 void
@@ -359,7 +359,7 @@ void
 GBitmap::compress()
 {
   if (grays > 2)
-    G_THROW("GBitmap.cant_compress");
+    G_THROW( ERR_MSG("GBitmap.cant_compress") );
   GMonitorLock lock(monitor());
   if (bytes)
     {
@@ -439,7 +439,7 @@ void
 GBitmap::set_grays(int ngrays)
 {
   if (ngrays<2 || ngrays>256)
-    G_THROW("GBitmap.bad_levels");
+    G_THROW( ERR_MSG("GBitmap.bad_levels") );
   // set gray levels
   GMonitorLock lock(monitor());
   grays = ngrays;
@@ -558,7 +558,7 @@ GBitmap::blit(const GBitmap *bm, int x, int y)
         {
           const int z = read_run(runs);
           if (sc+z > bm->ncolumns)
-            G_THROW("GBitmap.lost_sync");
+            G_THROW( ERR_MSG("GBitmap.lost_sync") );
           int nc = sc + z;
           if (p && sr+y>=0 && sr+y<nrows) 
             {
@@ -659,7 +659,7 @@ GBitmap::blit(const GBitmap *bm, int xh, int yh, int subsample)
         {
           int z = read_run(runs);
           if (sc+z > bm->ncolumns)
-            G_THROW("GBitmap.lost_sync");
+            G_THROW( ERR_MSG("GBitmap.lost_sync") );
           int nc = sc + z;
 
           if (dr>=0 && dr<nrows)
@@ -718,7 +718,7 @@ GBitmap::read_integer(char &c, ByteStream &bs)
     }
   // check integer
   if (c<'0' || c>'9')
-    G_THROW("GBitmap.not_int");
+    G_THROW( ERR_MSG("GBitmap.not_int") );
   // eat integer
   while (c>='0' && c<='9') 
     {
@@ -751,7 +751,7 @@ GBitmap::read_pbm_text(ByteStream &bs)
           else if (bit=='0')
             row[c] = 0;
           else
-            G_THROW("GBitmap.bad_PBM");
+            G_THROW( ERR_MSG("GBitmap.bad_PBM") );
         }
       row -= bytes_per_row;
     }
@@ -834,7 +834,7 @@ GBitmap::read_rle_raw(ByteStream &bs)
           x = h + ((x - (int)RUNOVERFLOWVALUE) << 8);
         }
       if (c+x > ncolumns)
-        G_THROW("GBitmap.lost_sync");
+        G_THROW( ERR_MSG("GBitmap.lost_sync") );
       while (x-- > 0)
         row[c++] = p;
       p = 1 - p;
@@ -856,7 +856,7 @@ GBitmap::save_pbm(ByteStream &bs, int raw)
 {
   // check arguments
   if (grays > 2)
-    G_THROW("GBitmap.cant_make_PBM");
+    G_THROW( ERR_MSG("GBitmap.cant_make_PBM") );
   GMonitorLock lock(monitor());
   // header
   {
@@ -951,10 +951,10 @@ GBitmap::save_rle(ByteStream &bs)
 {
   // checks
   if (ncolumns==0 || nrows==0)
-    G_THROW("GBitmap.not_init");
+    G_THROW( ERR_MSG("GBitmap.not_init") );
   GMonitorLock lock(monitor());
   if (grays > 2)
-    G_THROW("GBitmap.cant_make_PBM");
+    G_THROW( ERR_MSG("GBitmap.cant_make_PBM") );
   // header
   GString head;
   head.format("R4\n%d %d\n", ncolumns, nrows);
@@ -988,7 +988,7 @@ GBitmap::makerows(
     for(c=0;c<ncolumns;c+=GBitmap::read_run(runs))
       EMPTY_LOOP;
     if (c > ncolumns)
-      G_THROW("GBitmap.lost_sync2");
+      G_THROW( ERR_MSG("GBitmap.lost_sync2") );
   }
 }
 
@@ -1217,10 +1217,10 @@ GBitmap::decode(unsigned char *runs)
 {
   // initialize pixel array
   if (nrows==0 || ncolumns==0)
-    G_THROW("GBitmap.not_init");
+    G_THROW( ERR_MSG("GBitmap.not_init") );
   bytes_per_row = ncolumns + border;
   if (runs==0)
-    G_THROW("GBitmap.null_arg");
+    G_THROW( ERR_MSG("GBitmap.null_arg") );
   int npixels = nrows * bytes_per_row + border;
   if (!bytes_data)
   {
@@ -1240,7 +1240,7 @@ GBitmap::decode(unsigned char *runs)
     {
       int x = read_run(runs);
       if (c+x > ncolumns)
-        G_THROW("GBitmap.lost_sync2");
+        G_THROW( ERR_MSG("GBitmap.lost_sync2") );
       while (x-- > 0)
         row[c++] = p;
       p = 1 - p;
@@ -1569,16 +1569,16 @@ GBitmap::check_border() const
       const unsigned char *p = (*this)[-1];
       for (col=-border; col<ncolumns+border; col++)
         if (p[col])
-          G_THROW("GBitmap.zero_damaged");
+          G_THROW( ERR_MSG("GBitmap.zero_damaged") );
       for (int row=0; row<nrows; row++)
         {
           p = (*this)[row];
           for (col=-border; col<0; col++)
             if (p[col])
-              G_THROW("GBitmap.left_damaged");
+              G_THROW( ERR_MSG("GBitmap.left_damaged") );
           for (col=ncolumns; col<ncolumns+border; col++)
             if (p[col])
-              G_THROW("GBitmap.right_damaged");
+              G_THROW( ERR_MSG("GBitmap.right_damaged") );
         }
     }
 }

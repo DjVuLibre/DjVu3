@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuGlobal.h,v 1.48 2001-04-06 18:59:35 bcr Exp $
+// $Id: DjVuGlobal.h,v 1.49 2001-04-12 17:05:31 fcrary Exp $
 // $Name:  $
 
 #ifndef _DJVUGLOBAL_H
@@ -79,7 +79,7 @@
     @memo
     Global definitions.
     @version
-    #$Id: DjVuGlobal.h,v 1.48 2001-04-06 18:59:35 bcr Exp $#
+    #$Id: DjVuGlobal.h,v 1.49 2001-04-12 17:05:31 fcrary Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> -- empty file.\\
     Bill Riemers <bcr@lizardtech.com> -- real work.  */
@@ -340,6 +340,13 @@ DJVUEXTERNCAPI(void DjVuPrintMessage(const char *fmt, ...));
 #else
 #define EMPTY_LOOP /* nop */
 #endif
+
+//  The ERR_MSG(x) macro is intended to permit automated checking of the
+//  externalized error message names against the source code. It has no
+//  effect on the executed program. It should be used to surround each
+//  message name that will need to be looked up in the external message
+//  files. In particular, it should use on all strings passed to G_THROW.
+#define ERR_MSG(x) x
 
 #endif /* _DJVUGLOBAL_H_ */
 

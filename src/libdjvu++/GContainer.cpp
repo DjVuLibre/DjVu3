@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GContainer.cpp,v 1.29 2001-04-04 22:12:11 bcr Exp $
+// $Id: GContainer.cpp,v 1.30 2001-04-12 17:05:32 fcrary Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -143,7 +143,7 @@ GArrayBase::resize(int lo, int hi)
   // Validation
   int nsize = hi - lo + 1;
   if (nsize < 0)
-    G_THROW(_GCONTAINER_H_ "bad_args");
+    G_THROW( ERR_MSG("GContainer.bad_args") );
   // Destruction
   if (nsize == 0)
     {
@@ -229,11 +229,11 @@ void
 GArrayBase::del(int n, int howmany)
 {
   if (howmany < 0)
-    G_THROW(_GCONTAINER_H_ "bad_howmany");
+    G_THROW( ERR_MSG("GContainer.bad_howmany") );
   if (howmany == 0)
     return;
   if ( n < lobound || n+(int)howmany-1 > hibound)
-    G_THROW(_GCONTAINER_H_ "bad_sub2");
+    G_THROW( ERR_MSG("GContainer.bad_sub2") );
   traits.fini( traits.lea(data, n-minlo), howmany );
   if ( n+howmany-1 < hibound)
     traits.copy( traits.lea(data, n-minlo),
@@ -261,7 +261,7 @@ void
 GArrayBase::ins(int n, const void *src, int howmany)
 {
   if (howmany < 0)
-    G_THROW(_GCONTAINER_H_ "bad_howmany");
+    G_THROW( ERR_MSG("GContainer.bad_howmany") );
   if (howmany == 0)
     return;
   // Make enough room

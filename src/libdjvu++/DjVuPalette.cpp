@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuPalette.cpp,v 1.25 2001-04-09 17:42:13 chrisp Exp $
+// $Id: DjVuPalette.cpp,v 1.26 2001-04-12 17:05:32 fcrary Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -192,9 +192,9 @@ int
 DjVuPalette::compute_palette(int maxcolors, int minboxsize)
 {
   if (!hcube)
-    G_THROW("DjVuPalette.no_color");
+    G_THROW( ERR_MSG("DjVuPalette.no_color") );
   if (maxcolors<1 || maxcolors>MAXPALETTESIZE)
-    G_THROW("DjVuPalette.many_colors");
+    G_THROW( ERR_MSG("DjVuPalette.many_colors") );
   
   // Paul Heckbert: "Color Image Quantization for Frame Buffer Display", 
   // SIGGRAPH '82 Proceedings, page 297.  (also in ppmquant)
@@ -351,7 +351,7 @@ DjVuPalette::color_to_index_slow(const unsigned char *bgr)
   const int ncolors = palette.size();
   if (! ncolors)
   {
-    G_THROW("DjVuPalette.not_init");
+    G_THROW( ERR_MSG("DjVuPalette.not_init") );
   }
   PColor *pal = palette;
   // Should be able to do better
@@ -504,11 +504,11 @@ DjVuPalette::decode(GP<ByteStream> gbs)
   // Code version
   int version = bs.read8();
   if ( (version & 0x7f) != DJVUPALETTEVERSION)
-    G_THROW("DjVuPalette.bad_version");
+    G_THROW( ERR_MSG("DjVuPalette.bad_version") );
   // Code palette
   const int palettesize = bs.read16();
   if (palettesize<0 || palettesize>MAXPALETTESIZE)
-    G_THROW("DjVuPalette.bad_palette");
+    G_THROW( ERR_MSG("DjVuPalette.bad_palette") );
   palette.resize(0,palettesize-1);
   for (int c=0; c<palettesize; c++)
     {
@@ -524,7 +524,7 @@ DjVuPalette::decode(GP<ByteStream> gbs)
     {
       int datasize = bs.read24();
       if (datasize<0)
-        G_THROW("DjVuPalette.bad_palette");
+        G_THROW( ERR_MSG("DjVuPalette.bad_palette") );
       colordata.resize(0,datasize-1);
       GP<ByteStream> gbsb=BSByteStream::create(gbs);
       ByteStream &bsb=*gbsb;
@@ -532,7 +532,7 @@ DjVuPalette::decode(GP<ByteStream> gbs)
         {
           short s = bsb.read16();
           if (s<0 || s>=palettesize)
-            G_THROW("DjVuPalette.bad_palette");        
+            G_THROW( ERR_MSG("DjVuPalette.bad_palette") );        
           colordata[d] = s;
         }
     }
@@ -557,7 +557,7 @@ int main(int argc, char **argv)
     {
 
       if (argc!=4)
-        G_THROW("DjVuPalette.test_usage");
+        G_THROW( ERR_MSG("DjVuPalette.test_usage") );
       int maxcolors = dargv[1].toInt(); //atoi(argv[1]);
       int minboxsize = dargv[2].toInt(); //atoi(argv[2]);
       GP<ByteStream> ibs=ByteStream::create(dargv[3],"rb");

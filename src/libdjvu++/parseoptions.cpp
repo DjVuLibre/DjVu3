@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: parseoptions.cpp,v 1.75 2001-04-12 00:25:00 bcr Exp $
+// $Id: parseoptions.cpp,v 1.76 2001-04-12 17:05:32 fcrary Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -383,13 +383,13 @@ DjVuParseOptions::AmbiguousOptions(
     if(name1 && name2)
     {
       GString s;
-      s.format( "parseoptions.ambiguous\t%s\t%s\t%s\t%s", name1,value1,name2,value2 );
+      s.format( ERR_MSG("parseoptions.ambiguous") "\t%s\t%s\t%s\t%s", name1,value1,name2,value2 );
       Errors->AddError(s);
     }
   }
 }
 
-// This function is usefull when the same option has multiple names.
+// This function is useful when the same option has multiple names.
 // The variable index of the highest priority variable will be returned.
 // Command line arguments have higher priority than current profile values,
 // which are higher priority than default profile values.
@@ -538,7 +538,7 @@ DjVuParseOptions::GetInteger(
       }
       if(*endptr)
       {
-        Errors->AddError(GUTF8String("parseoptions.bad_value\t") + str);
+        Errors->AddError(GUTF8String( ERR_MSG("parseoptions.bad_value") "\t") + str);
         retval=errval;
       }
     }
@@ -569,7 +569,7 @@ DjVuParseOptions::GetNumber(
     }
     if(*endptr)
     {
-      Errors->AddError(GUTF8String("parseoptions.bad_number\t") + str);
+      Errors->AddError(GUTF8String( ERR_MSG("parseoptions.bad_number") "\t") + str);
       retval=errval;
     }
   }
@@ -686,8 +686,8 @@ DjVuParseOptions::Add(
 {
   if(var<0)
   {
-    static const char emesg1[]="parseoptions.illegal_profile";
-    static const char emesg2[]="parseoptions.profile_error";
+    static const char emesg1[]= ERR_MSG("parseoptions.illegal_profile");
+    static const char emesg2[]= ERR_MSG("parseoptions.profile_error");
     const char *emesg;
     if(value[0] && strchr(value,':'))
     {
@@ -850,7 +850,8 @@ DjVuParseOptions::ReadNextConfig (
             }
           }else
           {
-            Errors->AddError(GUTF8String("parseoptions.cant_inherit") + "\t" + filename +
+            Errors->AddError(GUTF8String( ERR_MSG("parseoptions.cant_inherit") ) + 
+                                                                    "\t" + filename +
                                                                     "\t" + GString(line) +
                                                                     "\t" + profilename +
                                                                     "\t" + name);
@@ -1500,7 +1501,7 @@ DjVuParseOptions::ConfigFilename(const char config[],int level)
     return retval;        
   }else
   {
-    Errors->AddError("parseoptions.bad_install");
+    Errors->AddError( ERR_MSG("parseoptions.bad_install") );
     return 0;
   }
 #endif
@@ -1713,7 +1714,7 @@ DjVuParseOptions::GetOpt::getopt_long()
     }
     if(has_dash)
     {
-      Errors.AddError(GUTF8String("parseoptions.unrecog_option\t") + argv[optind]);
+      Errors.AddError(GUTF8String( ERR_MSG("parseoptions.unrecog_option") "\t") + argv[optind]);
       return -1;
     }
   }
@@ -1723,7 +1724,8 @@ DjVuParseOptions::GetOpt::getopt_long()
     if(nextchar > 1 || argv[optind][nextchar] != '-' ||
       (argv[optind][nextchar+1]&&argv[optind][nextchar+1]!='-'))
     {
-      Errors.AddError(GUTF8String("parseoptions.unrecog_option_c\t") + GString(argv[optind][nextchar]));
+      Errors.AddError(GUTF8String( ERR_MSG("parseoptions.unrecog_option_c") "\t")
+                      + GUTF8String(argv[optind][nextchar]));
       return -1;
     }
     nextchar=1;
@@ -1752,7 +1754,7 @@ DjVuParseOptions::GetOpt::getopt_long()
     }else
     {
       const char * const xname=opts.name;
-      Errors.AddError(GUTF8String("parseoptions.missing_arg_option\t") + xname);
+      Errors.AddError(GUTF8String( ERR_MSG("parseoptions.missing_arg_option") "\t") + xname);
       return -1;
     }
     optind++;

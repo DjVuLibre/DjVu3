@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVmDir0.cpp,v 1.15 2001-04-12 00:24:59 bcr Exp $
+// $Id: DjVmDir0.cpp,v 1.16 2001-04-12 17:05:31 fcrary Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -116,7 +116,7 @@ DjVmDir0::add_file(const char * name, bool iff_file, int offset, int size)
    DEBUG_MSG("DjVmDir0::add_file(): name='" << name << "', iff=" << iff_file <<
 	     ", offset=" << offset << "\n");
    
-   if (strchr(name, '/')) G_THROW("DjVmDir0.no_slash");   //  File name may not contain slashes.
+   if (strchr(name, '/')) G_THROW( ERR_MSG("DjVmDir0.no_slash") );
    
    GP<FileRec> file=new FileRec(name, iff_file, offset, size);
    name2file[name]=file;

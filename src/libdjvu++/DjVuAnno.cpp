@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuAnno.cpp,v 1.75 2001-04-12 00:24:59 bcr Exp $
+// $Id: DjVuAnno.cpp,v 1.76 2001-04-12 17:05:31 fcrary Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -162,9 +162,9 @@ GLObject::GLObject(int xnumber) : type(NUMBER), number(xnumber) {}
 GLObject::GLObject(GLObjectType xtype, const char * str) : type(xtype)
 {
    if (type!=STRING && type!=SYMBOL)
-      G_THROW("DjVuAnno.bad_type");     //  GLObject(): Wrong object type passed. Should be either STRING or SYMBOL.
-   if (type==STRING)
-     string=str;
+      G_THROW( ERR_MSG("DjVuAnno.bad_type") );
+   if (type==STRING) 
+      string=str;
    else symbol=str;
 }
 
@@ -308,7 +308,7 @@ GLObject::operator[](int n) const
    {
       throw_can_not_convert_to(LIST);
    }
-   if (n>=list.size()) G_THROW("DjVuAnno.too_few\t"+name);
+   if (n>=list.size()) G_THROW( ERR_MSG("DjVuAnno.too_few") "\t"+name);
    int i;
    GPosition pos;
    for(i=0, pos=list;i<n && pos;i++, ++pos)
@@ -333,7 +333,7 @@ GLParser::skip_white_space(const char * & start)
 {
    while(*start && isspace(*start)) start++;
    if (!*start) 
-       G_THROW("EOF");
+       G_THROW( ERR_MSG("EOF") );
 }
 
 GLToken
@@ -363,7 +363,7 @@ GLParser::get_token(const char * & start)
        while(1)
 	 {
            char ch=*start++;
-           if (!ch) G_THROW("EOF");
+           if (!ch) G_THROW( ERR_MSG("EOF") );
            if (ch=='"')
              {
 	       if (str.length()>0 && str[(int)str.length()-1]=='\\')
@@ -379,7 +379,7 @@ GLParser::get_token(const char * & start)
        while(1)
 	 {
            char ch=*start++;
-           if (!ch) G_THROW("EOF");
+           if (!ch) G_THROW( ERR_MSG("EOF") );
            if (ch==')') { start--; break; }
            if (isspace(ch)) break;
            str+=ch;
@@ -402,7 +402,7 @@ GLParser::parse(const char * cur_name, GPList<GLObject> & list,
     {
       if (isspace(*start))
       {
-        GUTF8String mesg=GUTF8String("DjVuAnno.paren\t")+cur_name;
+        GUTF8String mesg=GUTF8String( ERR_MSG("DjVuAnno.paren") "\t")+cur_name;
         G_THROW(mesg);
       }
       
@@ -414,7 +414,7 @@ GLParser::parse(const char * cur_name, GPList<GLObject> & list,
         if (tok.type==GLToken::OPEN_PAR ||
           tok.type==GLToken::CLOSE_PAR)
         {
-          GUTF8String mesg=GUTF8String("DjVuAnno.no_paren\t")+cur_name;
+          GUTF8String mesg=GUTF8String( ERR_MSG("DjVuAnno.no_paren") "\t")+cur_name;
           G_THROW(mesg);
         }
         if (tok.type==GLToken::OBJECT)
@@ -422,13 +422,13 @@ GLParser::parse(const char * cur_name, GPList<GLObject> & list,
           GLObject::GLObjectType type=object->get_type();
           if (type==GLObject::NUMBER)
           {
-            GUTF8String mesg("DjVuAnno.no_number\t");
+            GUTF8String mesg( ERR_MSG("DjVuAnno.no_number") "\t");
             mesg += cur_name;
             G_THROW(mesg);
           }
           else if (type==GLObject::STRING)
           {
-            GUTF8String mesg("DjVuAnno.no_string\t");
+            GUTF8String mesg( ERR_MSG("DjVuAnno.no_string") "\t");
             mesg += cur_name;
             G_THROW(mesg);
           }
@@ -671,7 +671,7 @@ DjVuANT::get_zoom(GLParser & parser)
       else if (zoom=="width") return ZOOM_WIDTH;
       else if (zoom=="page") return ZOOM_PAGE;
       else if (zoom[0]!='d')
-        G_THROW("DjVuAnno.bad_zoom");
+        G_THROW( ERR_MSG("DjVuAnno.bad_zoom") );
       else return zoom.substr(1, zoom.length()).toInt(); //atoi((const char *) zoom+1);
       } else { DEBUG_MSG("can't find any.\n"); }
   } G_CATCH_ALL {} G_ENDCATCH;
@@ -769,7 +769,7 @@ DjVuANT::get_map_areas(GLParser & parser)
         if (url_obj.get_type()==GLObject::LIST)
         {
           if (url_obj.get_name()!=GMapArea::URL_TAG)
-            G_THROW("DjVuAnno.bad_url");
+            G_THROW( ERR_MSG("DjVuAnno.bad_url") );
           url=(url_obj[0])->get_string();
           target=(url_obj[1])->get_string();
         } else url=url_obj.get_string();

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVmDir.cpp,v 1.38 2001-04-12 00:24:58 bcr Exp $
+// $Id: DjVmDir.cpp,v 1.39 2001-04-12 17:05:31 fcrary Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -67,7 +67,7 @@ DjVmDir::File::File(const char *name, const char *id,
   : name(name), id(id), title(title), offset(0), size(0), page_num(-1)
 { 
   if (! File::is_legal_id(id) )
-    G_THROW("DjVmDir.bad_file\t" + GUTF8String(id));    //  DjVm File ID 'xxxx' contains illegal character(s)
+    G_THROW( ERR_MSG("DjVmDir.bad_file") "\t" + GUTF8String(id));
   flags=(file_type & TYPE_MASK);
 }
 
@@ -76,7 +76,7 @@ DjVmDir::File::File(const char *name, const char *id,
   : name(name), id(id), title(title), offset(0), size(0), page_num(-1)
 { 
   if (! File::is_legal_id(id) )
-    G_THROW("DjVmDir.bad_file\t" + GUTF8String(id));    //  DjVm File ID 'xxxx' contains illegal character(s)
+    G_THROW( ERR_MSG("DjVmDir.bad_file") "\t" + GUTF8String(id));
   flags=page ? PAGE : INCLUDE;
 }
    
@@ -99,9 +99,9 @@ DjVmDir::File::get_str_type(void) const
         type="SHARED_ANNO";
         break;
       default:
-         //  Internal error: please modify DjVmDir::File::get_str_type()
-         //  to contain all possible File types.
-         G_THROW("DjVmDir.get_str_type");
+        //  Internal error: please modify DjVmDir::File::get_str_type()
+        //  to contain all possible File types.
+	      G_THROW( ERR_MSG("DjVmDir.get_str_type") );
    }
    return type;
 }
@@ -132,7 +132,7 @@ DjVmDir::decode(GP<ByteStream> gstr)
 
    DEBUG_MSG("DIRM version=" << ver << ", our version=" << version << "\n");
    if (ver>version)
-      G_THROW("DjVmDir.version_error\t" + GUTF8String(version) + "\t" + GUTF8String(ver));
+      G_THROW( ERR_MSG("DjVmDir.version_error") "\t" + GUTF8String(version) + "\t" + GUTF8String(ver));
                                            // Unable to read DJVM directories of versions higher than xxx
                                            // Data version number is yyy.
    DEBUG_MSG("bundled directory=" << bundled << "\n");
@@ -154,7 +154,7 @@ DjVmDir::decode(GP<ByteStream> gstr)
             if (ver==0)
               file->size=str.read24();
             if (file->offset==0)
-               G_THROW("DjVmDir.no_indirect");    //  Directory error: no indirect entries allowed in bundled document.
+               G_THROW( ERR_MSG("DjVmDir.no_indirect") );
          } else
          {
            file->offset=file->size=0;
@@ -240,8 +240,7 @@ DjVmDir::decode(GP<ByteStream> gstr)
          }
       }
       if (shared_anno_cnt>1)
-        G_THROW("DjVmDir.corrupt");      //  DjVu document is corrupt. There may be only one file
-                                               //  with shared annotations in a multipage document.
+        G_THROW( ERR_MSG("DjVmDir.corrupt") );
 
          // Now generate page=>file array for direct access
       int pages=0;
@@ -263,31 +262,31 @@ DjVmDir::decode(GP<ByteStream> gstr)
          // Generate name2file map
       for(pos=files_list;pos;++pos)
       {
-               GP<File> file=files_list[pos];
-               if (name2file.contains(file->name))
-                  G_THROW("DjVmDir.dupl_name\t" + file->name );   //  Error in 'DIRM' chunk: two records for the same NAME 'xxx'
-               name2file[file->name]=file;
+	       GP<File> file=files_list[pos];
+	       if (name2file.contains(file->name))
+	          G_THROW( ERR_MSG("DjVmDir.dupl_name") "\t" + file->name );
+	       name2file[file->name]=file;
       }
 
          // Generate id2file map
       for(pos=files_list;pos;++pos)
       {
-               GP<File> file=files_list[pos];
-               if (id2file.contains(file->id))
-                  G_THROW("DjVmDir.dupl_id\t" + file->id);        //  Error in 'DIRM' chunk: two records for the same ID 'xxx'
-               id2file[file->id]=file;
+	       GP<File> file=files_list[pos];
+	       if (id2file.contains(file->id))
+	          G_THROW( ERR_MSG("DjVmDir.dupl_id") "\t" + file->id);
+	       id2file[file->id]=file;
       }
 
          // Generate title2file map
       for(pos=files_list;pos;++pos)
       {
-               GP<File> file=files_list[pos];
-               if (file->title.length())
-               {
-                  if (title2file.contains(file->title))
-                     G_THROW("DjVmDir.dupl_title\t" + file->title); //  Error in 'DIRM' chunk: two records for the same TITLE 'xxx'
-                  title2file[file->title]=file;
-               }
+	       GP<File> file=files_list[pos];
+	       if (file->title.length())
+	       {
+	          if (title2file.contains(file->title))
+	             G_THROW( ERR_MSG("DjVmDir.dupl_title") "\t" + file->title);
+	          title2file[file->title]=file;
+	       }
       }
    }
 }
@@ -319,26 +318,25 @@ DjVmDir::encode(GP<ByteStream> gstr, const bool rename) const
             shared_anno_cnt++;
       }
       if (shared_anno_cnt>1)
-         G_THROW("DjVmDir.multi_save");       //  Cannot save a multipage document containing
-                                        //  more than one file with shared annotations.
+         G_THROW( ERR_MSG("DjVmDir.multi_save") );
       
       if (bundled)
       {
-        // We need to store offsets uncompressed. That's because when
-        // we save a DjVmDoc, we first compress the DjVmDir with dummy
-        // offsets and after computing the real offsets we rewrite the
-        // DjVmDir, which should not change its size during this operation
-        DEBUG_MSG("storing offsets for every record\n");
-        for(pos=files_list;pos;++pos)
-        {
-          GP<File> file=files_list[pos];
-          if (!file->offset)
-          {
-            //  The directory contains both indirect and bundled records.
-            G_THROW("DjVmDir.bad_dir");
-          }
-          str.write32(file->offset);
-        }
+	      // We need to store offsets uncompressed. That's because when
+	      // we save a DjVmDoc, we first compress the DjVmDir with dummy
+	      // offsets and after computing the real offsets we rewrite the
+	      // DjVmDir, which should not change its size during this operation
+	      DEBUG_MSG("storing offsets for every record\n");
+	      for(pos=files_list;pos;++pos)
+	      {
+	         GP<File> file=files_list[pos];
+	         if (!file->offset)
+           {
+             //  The directory contains both indirect and bundled records.
+	           G_THROW( ERR_MSG("DjVmDir.bad_dir") );
+           }
+	         str.write32(file->offset);
+	      }
       }
 
       GP<ByteStream> gbs_str=BSByteStream::create(gstr, 50);
@@ -350,7 +348,7 @@ DjVmDir::encode(GP<ByteStream> gstr, const bool rename) const
         if ((file->offset)?(!bundled):bundled)
         {
           //  The directory contains both indirect and bundled records.
-          G_THROW("DjVmDir.bad_dir");
+          G_THROW( ERR_MSG("DjVmDir.bad_dir") );
         }
         bs_str.write24(file->size);
       }
@@ -506,17 +504,17 @@ DjVmDir::insert_file(const GP<File> & file, int pos_num)
 
       // Modify maps
    if (! File::is_legal_id(file->id))
-     G_THROW("DjVmDir.bad_file\t" + file->id);    //  DjVm File ID 'xxx' contains illegal character(s)
+     G_THROW( ERR_MSG("DjVmDir.bad_file") "\t" + file->id);
    if (id2file.contains(file->id))
-     G_THROW("DjVmDir.dupl_id2\t" + file->id);    //  File with ID 'xxx' already exists in the DJVM directory.
+     G_THROW( ERR_MSG("DjVmDir.dupl_id2") "\t" + file->id);
    if (name2file.contains(file->name))
-      G_THROW("DjVmDir.dupl_name2\t" + file->name); //  File with NAME 'xxx' already exists in the DJVM directory.
+     G_THROW( ERR_MSG("DjVmDir.dupl_name2") "\t" + file->name);
    name2file[file->name]=file;
    id2file[file->id]=file;
    if (file->title.length())
      {
-       if (title2file.contains(file->title))  // duplicate titles make become ok some day
-         G_THROW("DjVmDir.dupl_title2\t" + file->title);  //File with TITLE 'xxx' already exists in the DJVM directory.
+       if (title2file.contains(file->title))  // duplicate titles may become ok some day
+         G_THROW( ERR_MSG("DjVmDir.dupl_title2") "\t" + file->title);
        title2file[file->title]=file;
      }
 
@@ -525,8 +523,7 @@ DjVmDir::insert_file(const GP<File> & file, int pos_num)
    {
       for(GPosition pos=files_list;pos;++pos)
          if (files_list[pos]->is_shared_anno())
-            G_THROW("DjVmDir.multi_save2");         //  Current DjVu multipage format does not support
-                                              //  more than one file with shared annotations.
+            G_THROW( ERR_MSG("DjVmDir.multi_save2") );
    }
    
       // Add the file to the list
@@ -617,12 +614,12 @@ DjVmDir::set_file_name(const char * id, const char * name)
    {
       GP<File> file=files_list[pos];
       if (file->id!=id && file->name==name)
-        G_THROW("DjVmDir.name_in_use\t" + GUTF8String(name));   //  Name 'xxx' is already in use");
+        G_THROW( ERR_MSG("DjVmDir.name_in_use") "\t" + GUTF8String(name));
    }
 
       // Check if ID is valid
    if (!id2file.contains(id, pos))
-      G_THROW("DjVmDir.no_info\t" + GUTF8String(id));       //  Nothing is known about file with ID 'xxx'
+      G_THROW( ERR_MSG("DjVmDir.no_info") "\t" + GUTF8String(id));
    GP<File> file=id2file[pos];
    name2file.del(file->name);
    file->name=name;
@@ -644,12 +641,12 @@ DjVmDir::set_file_title(const char * id, const char * title)
    {
       GP<File> file=files_list[pos];
       if (file->id!=id && file->title==title)
-        G_THROW("DjVmDir.title_in_use\t" + GUTF8String(title));  //  Title 'xxx' is already in use
+        G_THROW( ERR_MSG("DjVmDir.title_in_use") "\t" + GUTF8String(title));
    }
 
       // Check if ID is valid
    if (!id2file.contains(id, pos))
-      G_THROW("DjVmDir.no_info\t" + GUTF8String(id));       //  Nothing is known about file with ID 'xxx'
+      G_THROW( ERR_MSG("DjVmDir.no_info") "\t" + GUTF8String(id));
    GP<File> file=id2file[pos];
    title2file.del(file->title);
    file->title=title;

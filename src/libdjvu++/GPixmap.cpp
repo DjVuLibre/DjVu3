@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: GPixmap.cpp,v 1.30 2001-03-31 01:14:31 bcr Exp $
+// $Id: GPixmap.cpp,v 1.31 2001-04-12 17:05:32 fcrary Exp $
 // $Name:  $
 
 // -- Implements class PIXMAP
@@ -453,7 +453,7 @@ GPixmap::init(ByteStream &bs)
         GPixel *p = (*this)[y];
         unsigned char *rgb = &line[0];
         if ( bs.readall((void*)rgb, ncolumns*3) < (size_t)(ncolumns*3))
-          G_THROW("EOF");
+          G_THROW( ERR_MSG("EOF") );
         for (int x=0; x<ncolumns; x+=1, rgb+=3)
           {
             p[x].r = rgb[0];

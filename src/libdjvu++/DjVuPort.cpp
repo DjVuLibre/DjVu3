@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuPort.cpp,v 1.48 2001-04-12 00:24:59 bcr Exp $
+// $Id: DjVuPort.cpp,v 1.49 2001-04-12 17:05:32 fcrary Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -176,7 +176,7 @@ DjVuPort::DjVuPort()
   DjVuPortcaster *pcaster = get_portcaster();
   GCriticalSectionLock lock(& pcaster->map_lock );
   GPosition p = pcaster->cont_map.contains(this);
-  if (!p) G_THROW("DjVuPort.not_alloc");
+  if (!p) G_THROW( ERR_MSG("DjVuPort.not_alloc") );
   pcaster->cont_map[p] = (void*)this;
 }
 
@@ -185,7 +185,7 @@ DjVuPort::DjVuPort(const DjVuPort & port)
   DjVuPortcaster *pcaster = get_portcaster();
   GCriticalSectionLock lock(& pcaster->map_lock );
   GPosition p = pcaster->cont_map.contains(this);
-  if (!p) G_THROW("DjVuPort.not_alloc");
+  if (!p) G_THROW( ERR_MSG("DjVuPort.not_alloc") );
   pcaster->cont_map[p] = (void*)this;
   pcaster->copy_routes(this, &port);
 }

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GBitmap.h,v 1.36 2001-03-27 20:15:30 praveen Exp $
+// $Id: GBitmap.h,v 1.37 2001-04-12 17:05:32 fcrary Exp $
 // $Name:  $
 
 #ifndef _GBITMAP_H_
@@ -69,7 +69,7 @@ class ByteStream;
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: GBitmap.h,v 1.36 2001-03-27 20:15:30 praveen Exp $#
+    #$Id: GBitmap.h,v 1.37 2001-04-12 17:05:32 fcrary Exp $#
 
  */
 //@{
@@ -539,7 +539,7 @@ GBitmap::operator[](int row)
   if (row<0 || row>=nrows) {
 #ifndef NO_DEBUG
     if (zerosize < bytes_per_row + border)
-      G_THROW("GBitmap.zero_small");
+      G_THROW( ERR_MSG("GBitmap.zero_small") );
 #endif
     return zerobuffer + border;
   }
@@ -553,7 +553,7 @@ GBitmap::operator[](int row) const
   if (row<0 || row>=nrows) {
 #ifndef NO_DEBUG
     if (zerosize < bytes_per_row + border)
-      G_THROW("GBitmap.zero_small");
+      G_THROW( ERR_MSG("GBitmap.zero_small") );
 #endif
     return zerobuffer + border;
   }

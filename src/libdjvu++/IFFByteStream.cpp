@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: IFFByteStream.cpp,v 1.24 2001-02-15 20:31:57 bcr Exp $
+// $Id: IFFByteStream.cpp,v 1.25 2001-04-12 17:05:32 fcrary Exp $
 // $Name:  $
 
 // -- Implementation of IFFByteStream
@@ -137,9 +137,9 @@ IFFByteStream::get_chunk(GString &chkid, int *rawoffsetptr, int *rawsizeptr)
   
   // Check that we are allowed to read a chunk
   if (dir > 0)
-    G_THROW("IFFByteStream.read_write");
+    G_THROW( ERR_MSG("IFFByteStream.read_write") );
   if (ctx && !ctx->bComposite)
-    G_THROW("IFFByteStream.not_ready");
+    G_THROW( ERR_MSG("IFFByteStream.not_ready") );
   dir = -1;
 
   // Seek to end of previous chunk if necessary
@@ -170,13 +170,13 @@ IFFByteStream::get_chunk(GString &chkid, int *rawoffsetptr, int *rawsizeptr)
     if (ctx && offset == ctx->offEnd)
       return 0;
     if (ctx && offset+4 > ctx->offEnd)
-      G_THROW("IFFByteStream.corrupt_end");
+      G_THROW( ERR_MSG("IFFByteStream.corrupt_end") );
     bytes = bs->readall( (void*)&buffer[0], 4);
     offset = seekto = offset + bytes;
     if (bytes==0 && !ctx)
       return 0;
     if (bytes != 4)
-      G_THROW("EOF");
+      G_THROW( ERR_MSG("EOF") );
     if(buffer[0] != 0x41 || buffer[1] != 0x54 ||
        buffer[2] != 0x26 || buffer[3] != 0x54 )
       break;
@@ -185,34 +185,34 @@ IFFByteStream::get_chunk(GString &chkid, int *rawoffsetptr, int *rawsizeptr)
   
   // Read chunk size
   if (ctx && offset+4 > ctx->offEnd)
-    G_THROW("IFFByteStream.corrupt_end2");
+    G_THROW( ERR_MSG("IFFByteStream.corrupt_end2") );
   bytes = bs->readall( (void*)&buffer[4], 4);
   offset = seekto = offset + bytes;
   if (bytes != 4)
-    G_THROW("EOF");
+    G_THROW( ERR_MSG("EOF") );
   long size = ((unsigned char)buffer[4]<<24) |
               ((unsigned char)buffer[5]<<16) |
               ((unsigned char)buffer[6]<<8)  |
               ((unsigned char)buffer[7]);
   if (ctx && offset+size > ctx->offEnd)
-    G_THROW("IFFByteStream.corrupt_mangled");
+    G_THROW( ERR_MSG("IFFByteStream.corrupt_mangled") );
   
   // Check if composite 
   int composite = check_id(buffer);
   if (composite < 0)
-    G_THROW("IFFByteStream.corrupt_id");
+    G_THROW( ERR_MSG("IFFByteStream.corrupt_id") );
   
   // Read secondary id of composite chunk
   if (composite)
   {
     if (ctx && ctx->offEnd<offset+4)
-      G_THROW("IFFByteStream.corrupt_header");
+      G_THROW( ERR_MSG("IFFByteStream.corrupt_header") );
     bytes = bs->readall( (void*)&buffer[4], 4);
     offset += bytes;
     if (bytes != 4)
-      G_THROW("EOF");
+      G_THROW( ERR_MSG("EOF") );
     if (check_id(&buffer[4]))
-      G_THROW("IFFByteStream.corrupt_2nd_id");
+      G_THROW( ERR_MSG("IFFByteStream.corrupt_2nd_id") );
   }
 
   // Create context record
@@ -269,16 +269,16 @@ IFFByteStream::put_chunk(const char *chkid, int insert_magic)
 
   // Check that we are allowed to write a chunk
   if (dir < 0)
-    G_THROW("IFFByteStream.read_write");
+    G_THROW( ERR_MSG("IFFByteStream.read_write") );
   if (ctx && !ctx->bComposite)
-    G_THROW("IFFByteStream.not_ready2");
+    G_THROW( ERR_MSG("IFFByteStream.not_ready2") );
   dir = +1;
 
   // Check primary id
   int composite = check_id(chkid);
   if ((composite<0) || (composite==0 && chkid[4])
       || (composite && (chkid[4]!=':' || check_id(&chkid[5]) || chkid[9])) )
-    G_THROW("IFFByteStream.bad_chunk");
+    G_THROW( ERR_MSG("IFFByteStream.bad_chunk") );
 
   // Write padding byte
 #ifndef UNDER_CE
@@ -349,7 +349,7 @@ IFFByteStream::close_chunk()
 {
   // Check that this is ok
   if (!ctx)
-    G_THROW("IFFByteStream.cant_close");
+    G_THROW( ERR_MSG("IFFByteStream.cant_close") );
   // Patch size field in new chunk
   if (dir > 0)
     {
@@ -397,7 +397,7 @@ void
 IFFByteStream::short_id(GString &chkid)
 {
   if (!ctx)
-    G_THROW("IFFByteStream.no_chunk_id");
+    G_THROW( ERR_MSG("IFFByteStream.no_chunk_id") );
   if (ctx->bComposite)
     chkid = GString(ctx->idOne, 4) + ":" + GString(ctx->idTwo, 4);
   else
@@ -433,7 +433,7 @@ size_t
 IFFByteStream::read(void *buffer, size_t size)
 {
   if (! (ctx && dir < 0))
-    G_THROW("IFFByteStream.not_ready3");
+    G_THROW( ERR_MSG("IFFByteStream.not_ready3") );
   // Seek if necessary
   if (seekto > offset) {
     bs->seek(seekto);
@@ -441,7 +441,7 @@ IFFByteStream::read(void *buffer, size_t size)
   }
   // Ensure that read does not extend beyond chunk
   if (offset > ctx->offEnd)
-    G_THROW("IFFByteStream.bad_offset");
+    G_THROW( ERR_MSG("IFFByteStream.bad_offset") );
   if (offset + (long)size >  ctx->offEnd)
     size = (size_t) (ctx->offEnd - offset);
   // Read bytes
@@ -458,9 +458,9 @@ size_t
 IFFByteStream::write(const void *buffer, size_t size)
 {
   if (! (ctx && dir > 0))
-    G_THROW("IFFByteStream.not_ready4");
+    G_THROW( ERR_MSG("IFFByteStream.not_ready4") );
   if (seekto > offset)
-    G_THROW("IFFByteStream.cant_write");
+    G_THROW( ERR_MSG("IFFByteStream.cant_write") );
   size_t bytes = bs->write(buffer, size);
   offset += bytes;
   return bytes;

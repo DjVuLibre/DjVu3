@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocument.cpp,v 1.157 2001-04-12 00:24:59 bcr Exp $
+// $Id: DjVuDocument.cpp,v 1.158 2001-04-12 17:05:31 fcrary Exp $
 // $Name:  $
 
 
@@ -281,7 +281,7 @@ DjVuDocument::init_thread(void)
    GUTF8String chkid;
    int size=iff.get_chunk(chkid);
    if (!size)
-     G_THROW("EOF");
+     G_THROW( ERR_MSG("EOF") );
    if (size < 0)
      G_THROW("DjVuDocument.no_file");
    if (size<8)

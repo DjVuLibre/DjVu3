@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GIFFManager.cpp,v 1.20 2001-04-12 00:25:00 bcr Exp $
+// $Id: GIFFManager.cpp,v 1.21 2001-04-12 17:05:32 fcrary Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -75,13 +75,13 @@ GIFFChunk::set_name(GUTF8String name)
     type=name.substr(0,colon);
     name=name.substr(colon+1,(unsigned int)-1);
     if(name.search(':')>=0)
-      G_THROW("GIFFManager.one_colon");
+      G_THROW( ERR_MSG("GIFFManager.one_colon") );
   }
 
   DEBUG_MSG("auto-setting type to '" << type << "'\n");
 
   if (name.contains(".[]")>=0)
-    G_THROW("GIFFManager.bad_char");
+    G_THROW( ERR_MSG("GIFFManager.bad_char") );
    
   strncpy(GIFFChunk::name, (const char *)name, 4);
   GIFFChunk::name[4]=0;
@@ -174,7 +174,7 @@ GIFFChunk::decode_name(const GUTF8String &name, int &number)
   DEBUG_MAKE_INDENT(3);
    
   if (name.search('.')>=0)
-    G_THROW("GIFFManager.no_dots");
+    G_THROW( ERR_MSG("GIFFManager.no_dots") );
 
   number=0;
   const int obracket=name.search('[');
@@ -183,9 +183,9 @@ GIFFChunk::decode_name(const GUTF8String &name, int &number)
   {
     const int cbracket=name.search(']',obracket+1);
     if (cbracket < 0)
-      G_THROW("GIFFManager.unmatched");
+      G_THROW( ERR_MSG("GIFFManager.unmatched") );
     if (name.length() > (unsigned int)(cbracket+1))
-      G_THROW("GIFFManager.garbage");
+      G_THROW( ERR_MSG("GIFFManager.garbage") );
 //    number =atoi((const char *)name.substr(obracket+1,cbracket-obracket-1));
     number= name.substr(obracket+1,cbracket-obracket-1).toInt(); 
     short_name=name.substr(0,obracket);
@@ -229,7 +229,7 @@ GIFFChunk::del_chunk(const GUTF8String &name)
   }
   if(! pos)
   {
-    G_THROW("GIFFManager.no_chunk\t"+short_name+"\t"+GUTF8String(number)+"\t"+get_name());
+    G_THROW( ERR_MSG("GIFFManager.no_chunk") "\t"+short_name+"\t"+GUTF8String(number)+"\t"+get_name());
   }
 }
 
@@ -278,7 +278,7 @@ GIFFChunk::get_chunks_number(const GUTF8String &name)
   DEBUG_MAKE_INDENT(3);
 
   if (name.contains("[]")>=0)
-    G_THROW("GIFFManager.no_brackets");
+    G_THROW( ERR_MSG("GIFFManager.no_brackets") );
   
   int number; 
   GUTF8String short_name=decode_name(name,number);
@@ -305,13 +305,13 @@ GIFFManager::add_chunk(GUTF8String parent_name, const GP<GIFFChunk> & chunk,
   if (!top_level->get_name().length())
   {
     if ((!parent_name.length())||(parent_name[0]!='.'))
-      G_THROW("GIFFManager.no_top_name");
+      G_THROW( ERR_MSG("GIFFManager.no_top_name") );
     if (parent_name.length() < 2)
     {
       // 'chunk' is actually the new top-level chunk
       DEBUG_MSG("since parent_name=='.', making the chunk top-level\n");
       if (!chunk->is_container())
-        G_THROW("GIFFManager.no_top_cont");
+        G_THROW( ERR_MSG("GIFFManager.no_top_cont") );
       top_level=chunk;
       return;
     }
@@ -338,7 +338,7 @@ GIFFManager::add_chunk(GUTF8String parent_name, const GP<GIFFChunk> & chunk,
     }
     GUTF8String top_name=parent_name.substr(1,next_dot-1);
     if (!top_level->check_name(top_name))
-      G_THROW("GIFFManager.wrong_name\t"+top_name);
+      G_THROW( ERR_MSG("GIFFManager.wrong_name") "\t"+top_name);
     parent_name=parent_name.substr(next_dot,(unsigned int)-1);
   }
 
@@ -358,7 +358,7 @@ GIFFManager::add_chunk(GUTF8String parent_name, const GP<GIFFChunk> & chunk,
       {
         const int cbracket=name.search(']',obracket+1);
         if (cbracket < 0)
-          G_THROW("GIFFManager.unmatched");
+          G_THROW( ERR_MSG("GIFFManager.unmatched") );
 //        number=atoi((const char *)name.substr(obracket+1,cbracket-obracket-1));
         number = name.substr(obracket+1,cbracket-obracket-1).toInt();
         short_name=name.substr(0,obracket);
@@ -371,7 +371,7 @@ GIFFManager::add_chunk(GUTF8String parent_name, const GP<GIFFChunk> & chunk,
         cur_sec->add_chunk(GIFFChunk::create(short_name));
       cur_sec=cur_sec->get_chunk(name);
       if (!cur_sec)
-        G_THROW("GIFFManager.unknown\t"+name);
+        G_THROW( ERR_MSG("GIFFManager.unknown") "\t"+name);
     }
   } while(*end);
   cur_sec->add_chunk(chunk, pos);
@@ -403,9 +403,9 @@ GIFFManager::add_chunk(GUTF8String name, const TArray<char> & data)
   {
     const int cbracket=chunk_name.search(']',obracket+1);
     if (cbracket < 0)
-      G_THROW("GIFFManager.unmatched");
+      G_THROW( ERR_MSG("GIFFManager.unmatched") );
     if (name.length() > (unsigned int)(cbracket+1))
-      G_THROW("GIFFManager.garbage");
+      G_THROW( ERR_MSG("GIFFManager.garbage") );
 //    pos=atoi((const char *)chunk_name.substr(obracket+1,cbracket-obracket-1));
     pos = chunk_name.substr(obracket+1,cbracket-obracket-1).toInt();
     chunk_name=chunk_name.substr(0,obracket);
@@ -422,7 +422,7 @@ GIFFManager::del_chunk(void)
   DEBUG_MSG("GIFFManager::del_chunk(): Deleting chunk\n");
   DEBUG_MAKE_INDENT(3);
    
-  G_THROW("GIFFManager.del_empty");
+  G_THROW( ERR_MSG("GIFFManager.del_empty") );
 }
 
 void
@@ -434,7 +434,7 @@ GIFFManager::del_chunk(GUTF8String name)
   DEBUG_MAKE_INDENT(3);
    
   if (!name.length())
-    G_THROW("GIFFManager.del_empty");
+    G_THROW( ERR_MSG("GIFFManager.del_empty") );
 
   if (name[0]=='.')
   {
@@ -447,11 +447,11 @@ GIFFManager::del_chunk(GUTF8String name)
         top_level=GIFFChunk::create();
         return;
       }
-      G_THROW("GIFFManager.wrong_name2\t"+name.substr(1,(unsigned int)-1));
+      G_THROW( ERR_MSG("GIFFManager.wrong_name2") "\t"+name.substr(1,(unsigned int)-1));
     }
     const GUTF8String top_name=name.substr(1,next_dot-1);
     if (!top_level->check_name(top_name))
-      G_THROW("GIFFManager.wrong_name2\t"+top_name);
+      G_THROW( ERR_MSG("GIFFManager.wrong_name2") "\t"+top_name);
     name=name.substr(next_dot+1,(unsigned int)-1);
   }
    
@@ -464,12 +464,12 @@ GIFFManager::del_chunk(GUTF8String name)
     if (end>start && *end=='.')
       cur_sec=cur_sec->get_chunk(GUTF8String(start, end-start));
     if (!cur_sec)
-      G_THROW("GIFFManager.cant_find\t"+GUTF8String(name));
+      G_THROW( ERR_MSG("GIFFManager.cant_find") "\t"+GUTF8String(name));
   } while(*end);
    
   if (!start[0])
   {
-    G_THROW(GUTF8String("GIFFManager.malformed\t")+name);
+    G_THROW(GUTF8String( ERR_MSG("GIFFManager.malformed") "\t")+name);
   }
    
   cur_sec->del_chunk(start);
@@ -484,7 +484,7 @@ GIFFManager::get_chunk(GUTF8String name, int * pos_num)
   DEBUG_MAKE_INDENT(3);
    
   if (!name.length())
-    G_THROW("GIFFManager.get_empty");
+    G_THROW( ERR_MSG("GIFFManager.get_empty") );
 
   if (name[0]=='.')
   {
@@ -496,11 +496,11 @@ GIFFManager::get_chunk(GUTF8String name, int * pos_num)
         DEBUG_MSG("Removing top level chunk..\n");
         return top_level;
       }
-      G_THROW("GIFFManager.wrong_name2\t"+name.substr(1,(unsigned int)-1));
+      G_THROW( ERR_MSG("GIFFManager.wrong_name2") "\t"+name.substr(1,(unsigned int)-1));
     }
     const GUTF8String top_name=name.substr(1,next_dot-1);
     if (!top_level->check_name(top_name))
-      G_THROW("GIFFManager.wrong_name2\t"+top_name);
+      G_THROW( ERR_MSG("GIFFManager.wrong_name2") "\t"+top_name);
     name=name.substr(next_dot+1,(unsigned int)-1);
   }
    
@@ -598,7 +598,7 @@ GIFFManager::load_file(GP<ByteStream> str)
   if (istr.get_chunk(chunk_id))
   {
     if (chunk_id.substr(0,5) != "FORM:")
-      G_THROW("GIFFManager.cant_find2");
+      G_THROW( ERR_MSG("GIFFManager.cant_find2") );
     set_name(chunk_id);
     load_chunk(istr, top_level);
     istr.close_chunk();

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuFile.cpp,v 1.158 2001-04-12 00:24:59 bcr Exp $
+// $Id: DjVuFile.cpp,v 1.159 2001-04-12 17:05:31 fcrary Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -58,7 +58,7 @@
 
 
 #define REPORT_EOF(x) \
-  {G_TRY{G_THROW("EOF");}G_CATCH(ex){report_error(ex,(x));}G_ENDCATCH;}
+  {G_TRY{G_THROW( ERR_MSG("EOF") );}G_CATCH(ex){report_error(ex,(x));}G_ENDCATCH;}
 
 static GP<GPixmap> (*djvu_decode_codec)(ByteStream &bs)=0;
 
@@ -1888,7 +1888,7 @@ DjVuFile::contains_anno(void)
   GP<IFFByteStream> giff=IFFByteStream::create(str);
   IFFByteStream &iff=*giff;
   if (!iff.get_chunk(chkid))
-    G_THROW("EOF");
+    G_THROW( ERR_MSG("EOF") );
   
   while(iff.get_chunk(chkid))
   {
@@ -1910,7 +1910,7 @@ DjVuFile::contains_text(void)
   GP<IFFByteStream> giff=IFFByteStream::create(str);
   IFFByteStream &iff=*giff;
   if (!iff.get_chunk(chkid))
-    G_THROW("EOF");
+    G_THROW( ERR_MSG("EOF") );
   
   while(iff.get_chunk(chkid))
   {
@@ -1943,7 +1943,7 @@ copy_chunks(GP<ByteStream> from, IFFByteStream &ostr)
     iff.seek_close_chunk();
     if(ochksize != chksize)
     {
-      G_THROW("EOF");
+      G_THROW( ERR_MSG("EOF") );
     }
   }
 }
@@ -2132,7 +2132,7 @@ DjVuFile::remove_anno(void)
   GP<IFFByteStream> giff_in=IFFByteStream::create(str_in);
   IFFByteStream &iff_in=*giff_in;
   if (!iff_in.get_chunk(chkid))
-    G_THROW("EOF");
+    G_THROW( ERR_MSG("EOF") );
   
   GP<IFFByteStream> giff_out=IFFByteStream::create(gstr_out);
   IFFByteStream &iff_out=*giff_out;
@@ -2172,7 +2172,7 @@ DjVuFile::remove_text(void)
   GP<IFFByteStream> giff_in=IFFByteStream::create(str_in);
   IFFByteStream &iff_in=*giff_in;
   if (!iff_in.get_chunk(chkid))
-    G_THROW("EOF");
+    G_THROW( ERR_MSG("EOF") );
   
   GP<IFFByteStream> giff_out=IFFByteStream::create(gstr_out);
   IFFByteStream &iff_out=*giff_out;

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuImage.cpp,v 1.67 2001-04-12 00:24:59 bcr Exp $
+// $Id: DjVuImage.cpp,v 1.68 2001-04-12 17:05:31 fcrary Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -488,7 +488,7 @@ DjVuImage::decode(ByteStream & str, DjVuInterface *notifier)
   if (file->is_decode_stopped())
     G_THROW("STOP");
   if (file->is_decode_failed())
-    G_THROW("EOF");  // a guess
+    G_THROW( ERR_MSG("EOF") );  // a guess
   if (!file->is_decode_ok())
     G_THROW("DjVuImage.mult_error");
   DEBUG_MSG("decode DONE\n");

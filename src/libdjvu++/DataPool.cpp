@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DataPool.cpp,v 1.73 2001-04-12 00:24:58 bcr Exp $
+// $Id: DataPool.cpp,v 1.74 2001-04-12 17:05:31 fcrary Exp $
 // $Name:  $
 
 
@@ -414,9 +414,9 @@ DataPool::BlockList::add_range(int start, int length)
   DEBUG_MSG("DataPool::BlockList::add_range: start=" << start << " length=" << length << "\n");
   DEBUG_MAKE_INDENT(3);
    if (start<0)
-     G_THROW("DataPool.neg_start");        //  The start offset of the range may not be negative.
+     G_THROW( ERR_MSG("DataPool.neg_start") );
    if (length<=0)
-     G_THROW("DataPool.bad_length");     //  The length must be positive.
+     G_THROW( ERR_MSG("DataPool.bad_length") );
    if (length>0)
    {
       GCriticalSectionLock lk(&lock);
@@ -496,7 +496,7 @@ DataPool::BlockList::get_bytes(int start, int length) const
   DEBUG_MAKE_INDENT(3);
 
    if (length<0)
-     G_THROW("DataPool.bad_length");        //  The length must be positive.
+     G_THROW( ERR_MSG("DataPool.bad_length") );
 
    GCriticalSectionLock lk((GCriticalSection *) &lock);
    int bytes=0;
@@ -532,9 +532,9 @@ DataPool::BlockList::get_range(int start, int length) const
   DEBUG_MSG("DataPool::BlockList::get_range: start=" << start << " length=" << length << "\n");
   DEBUG_MAKE_INDENT(3);
    if (start<0)
-     G_THROW("DataPool.neg_start");    //  The start offset of the range may not be negative.
+     G_THROW( ERR_MSG("DataPool.neg_start") );
    if (length<=0)
-      G_THROW("DataPool.bad_length"); //  The length must be positive.
+      G_THROW( ERR_MSG("DataPool.bad_length") );
 
    GCriticalSectionLock lk((GCriticalSection *) &lock);
    int block_start=0, block_end=0;
@@ -753,9 +753,9 @@ DataPool::connect(const GP<DataPool> & pool_in, int start_in, int length_in)
    DEBUG_MSG("DataPool::connect(): connecting to another DataPool\n");
    DEBUG_MAKE_INDENT(3);
    
-   if (pool) G_THROW("DataPool.connected1");            //  Already connected to another DataPool.
-   if (furl.is_local_file_url()) G_THROW("DataPool.connected2");  //  Already connected to a file.
-   if (start_in<0) G_THROW("DataPool.neg_start");       //  The start offset of the range may not be negative.
+   if (pool) G_THROW( ERR_MSG("DataPool.connected1") );
+   if (furl.is_local_file_url()) G_THROW( ERR_MSG("DataPool.connected2") );
+   if (start_in<0) G_THROW( ERR_MSG("DataPool.neg_start") );
 
    pool=pool_in;
    start=start_in;
@@ -790,11 +790,11 @@ DataPool::connect(const GURL &furl_in, int start_in, int length_in)
    DEBUG_MAKE_INDENT(3);
    
    if (pool)
-     G_THROW("DataPool.connected1");              //  Already connected to another DataPool.
+     G_THROW( ERR_MSG("DataPool.connected1") );
    if (furl.is_local_file_url())
-     G_THROW("DataPool.connected2");    //  Already connected to a file.
+     G_THROW( ERR_MSG("DataPool.connected2") );
    if (start_in<0)
-     G_THROW("DataPool.neg_start");         //  The start offset of the range may not be negative.
+     G_THROW( ERR_MSG("DataPool.neg_start") );
 
 
    if (furl_in.name() == "-")
@@ -907,7 +907,7 @@ DataPool::add_data(const void * buffer, int offset, int size)
    DEBUG_MAKE_INDENT(3);
 
    if (furl.is_local_file_url() || pool)
-      G_THROW("DataPool.add_data");     //  Function DataPool::add_data() may not be called for connected DataPools.
+      G_THROW( ERR_MSG("DataPool.add_data") );
    
       // Add data to the data storage
    {
@@ -998,7 +998,7 @@ DataPool::get_data(void * buffer, int offset, int sz, int level)
      G_THROW("STOP");
    
    if (sz < 0)
-     G_THROW("DataPool.bad_size");        //  Size must be non negative
+     G_THROW( ERR_MSG("DataPool.bad_size") );
 
    if (! sz)
      return 0;
@@ -1029,7 +1029,7 @@ DataPool::get_data(void * buffer, int offset, int sz, int level)
 	 } G_CATCH(exc) {
             pool->clear_stream();
 //            if (strcmp(exc.get_cause(), "DataPool.reenter") || level)
-            if ((exc.get_cause() != GUTF8String("DataPool.reenter") ) || level)
+            if ((exc.get_cause() != GUTF8String( ERR_MSG("DataPool.reenter") ) ) || level)
 	      G_RETHROW;
 	 } G_ENDCATCH;
          pool->clear_stream();
@@ -1088,7 +1088,7 @@ DataPool::get_data(void * buffer, int offset, int sz, int level)
       {
 	 if (length>0 && offset<length) 
          {
-           G_THROW("EOF");
+           G_THROW( ERR_MSG("EOF") );
 	 }else 
          {
            return 0;
@@ -1139,14 +1139,14 @@ DataPool::wait_for_data(const GP<Reader> & reader)
    DEBUG_MAKE_INDENT(3);
 
 #if THREADMODEL==NOTHREADS
-   G_THROW("DataPool.no_threadless");  // Internal error. This function can't be used in threadless mode.
+   G_THROW( ERR_MSG("DataPool.no_threadless") );
 #else
    for(;;)
    {
       if (stop_flag)
         G_THROW("STOP");
       if (reader->reenter_flag)
-        G_THROW("DataPool.reenter");    //  DATA_POOL_REENTER
+        G_THROW( ERR_MSG("DataPool.reenter") );
       if (eof_flag || block_list->get_bytes(reader->offset, 1))
         return;
       if (pool || furl.is_local_file_url())
@@ -1549,7 +1549,7 @@ PoolByteStream::PoolByteStream(GP<DataPool> xdata_pool) :
    data_pool(xdata_pool), position(0), buffer_size(0), buffer_pos(0)
 {
    if (!data_pool) 
-       G_THROW("DataPool.zero_DataPool");   //  Internal error: ZERO DataPool passed as input.
+       G_THROW( ERR_MSG("DataPool.zero_DataPool") );
 
       // Secure the DataPool if possible. If we're called from DataPool
       // constructor (get_count()==0) there is no need to secure at all.
@@ -1582,7 +1582,7 @@ PoolByteStream::read(void *data, size_t size)
 size_t
 PoolByteStream::write(const void *buffer, size_t size)
 {
-   G_THROW("not_implemented_n\tPoolByteStream::write()");   //  PoolByteStream::write() is not implemented.
+   G_THROW( ERR_MSG("not_implemented_n") "\tPoolByteStream::write()");   //  PoolByteStream::write() is not implemented.
    return 0;	// For compiler not to bark
 }
 
@@ -1619,14 +1619,14 @@ PoolByteStream::seek(long offset, int whence, bool nothrow)
         unsigned char c;
         if(read(&c,1)<1)
         {
-          G_THROW("EOF");
+          G_THROW( ERR_MSG("EOF") );
         }
       }
       retval=0;
       break;
     case SEEK_END:
       if(! nothrow)
-        G_THROW("DataPool.seek_backward");  //  Seeking backwards from EOF is not supported by this ByteStream
+        G_THROW( ERR_MSG("DataPool.seek_backward") );
       break;
    }
    return retval;

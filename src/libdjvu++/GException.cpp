@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GException.cpp,v 1.29 2001-04-04 22:12:11 bcr Exp $
+// $Id: GException.cpp,v 1.30 2001-04-12 17:05:32 fcrary Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -52,7 +52,7 @@ GException::GException()
 }
 
 const char * const
-GException::outofmemory = "GException.outofmemory";
+GException::outofmemory = ERR_MSG("GException.outofmemory");
 
 GException::GException(const GException & exc) 
   : file(exc.file), func(exc.func), line(exc.line)

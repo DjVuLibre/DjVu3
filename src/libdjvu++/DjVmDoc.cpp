@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVmDoc.cpp,v 1.44 2001-04-12 00:24:59 bcr Exp $
+// $Id: DjVmDoc.cpp,v 1.45 2001-04-12 17:05:31 fcrary Exp $
 // $Name:  $
 
 
@@ -76,9 +76,9 @@ DjVmDoc::insert_file(const GP<DjVmDir::File> & f,
    DEBUG_MAKE_INDENT(3);
 
    if (!f)
-     G_THROW("DjVmDoc.no_zero_file");       //  Can't insert ZERO file.
+     G_THROW( ERR_MSG("DjVmDoc.no_zero_file") );
    if (data.contains(f->id))
-     G_THROW("DjVmDoc.no_duplicate");       //  Attempt to insert the same file twice.
+     G_THROW( ERR_MSG("DjVmDoc.no_duplicate") );
 
    char buffer[4];
    if (data_pool->get_data(buffer, 0, 4)==4 &&
@@ -115,7 +115,7 @@ DjVmDoc::delete_file(const char * id)
    DEBUG_MAKE_INDENT(3);
    
    if (!data.contains(id))
-      G_THROW(GUTF8String("DjVmDoc.cant_delete\t") + id);      //  There is no file with ID 'xxx' to delete.
+      G_THROW(GUTF8String( ERR_MSG("DjVmDoc.cant_delete") "\t") + id);
    
    data.del(id);
    dir->delete_file(id);
@@ -126,7 +126,7 @@ DjVmDoc::get_data(const char * id)
 {
    GPosition pos;
    if (!data.contains(id, pos))
-      G_THROW(GUTF8String("DjVmDoc.cant_find\t") + id);       //  Can't find file with ID 'xxx'.
+      G_THROW(GUTF8String( ERR_MSG("DjVmDoc.cant_find") "\t") + id);
    return data[pos];
 }
 
@@ -148,10 +148,10 @@ DjVmDoc::write(GP<ByteStream> gstr)
       file->offset=0xffffffff;
       GPosition data_pos;
       if (!data.contains(file->id, data_pos))
-	       G_THROW("DjVmDoc.no_data\t" + file->id);     //  Strange: there is no data for file 'xxx'
+	       G_THROW( ERR_MSG("DjVmDoc.no_data") "\t" + file->id);
       file->size=data[data_pos]->get_length();
       if (!file->size)
-         G_THROW("DjVmDoc.zero_file");                //  Strange: File size is zero.
+         G_THROW( ERR_MSG("DjVmDoc.zero_file") );
    }
    
    GP<ByteStream> tmp_str=ByteStream::create();
@@ -197,9 +197,9 @@ DjVmDoc::write(GP<ByteStream> gstr)
 	       GUTF8String chkid;
 	       size=iff_in.get_chunk(chkid);
 	       if (size<0 || size>0x7fffffff)
-	          G_THROW("DjVmDoc.not_IFF\t" + file->id);    //  File 'xxx' is not in IFF format.
+	          G_THROW( ERR_MSG("DjVmDoc.not_IFF") "\t" + file->id);
       } G_CATCH_ALL {
-	       G_THROW("DjVmDoc.not_IFF\t" + file->id);       //  File 'xxx' is not in IFF format.
+	       G_THROW( ERR_MSG("DjVmDoc.not_IFF") "\t" + file->id);
       } G_ENDCATCH;
 
 	 // Now copy the file contents
@@ -227,18 +227,18 @@ DjVmDoc::read(const GP<DataPool> & pool)
    GUTF8String chkid;
    iff.get_chunk(chkid);
    if (chkid!="FORM:DJVM")
-      G_THROW("DjVmDoc.no_form_djvm");      //  Can't find form DJVM in the input data.
+      G_THROW( ERR_MSG("DjVmDoc.no_form_djvm") );
 
    iff.get_chunk(chkid);
    if (chkid!="DIRM")
-      G_THROW("DjVmDoc.no_dirm_chunk");     //  The first chunk of a DJVM document must be DIRM: must be an old format.
+      G_THROW( ERR_MSG("DjVmDoc.no_dirm_chunk") );
    dir->decode(iff.get_bytestream());
    iff.close_chunk();
 
    data.empty();
 
    if (dir->is_indirect())
-      G_THROW("DjVmDoc.cant_read_indr");    //  Can't read indirect DjVm documents from DataPools or ByteStreams.
+      G_THROW( ERR_MSG("DjVmDoc.cant_read_indr") );
 
    GPList<DjVmDir::File> files_list=dir->get_files_list();
    for(GPosition pos=files_list;pos;++pos)
@@ -279,11 +279,11 @@ DjVmDoc::read(const GURL &url)
    GUTF8String chkid;
    iff.get_chunk(chkid);
    if (chkid!="FORM:DJVM")
-      G_THROW("DjVmDoc.no_form_djvm2");       //  Can't find form DJVM. The document is not in new multipage format.
+      G_THROW( ERR_MSG("DjVmDoc.no_form_djvm2") );
 
    iff.get_chunk(chkid);
    if (chkid!="DIRM")
-      G_THROW("DjVmDoc.no_dirm_chunk");       //  The first chunk of a DJVM document must be DIRM: must be an old format.
+      G_THROW( ERR_MSG("DjVmDoc.no_dirm_chunk") );
    dir->decode(str);
    iff.close_chunk();
 
@@ -325,9 +325,9 @@ DjVmDoc::write_index(GP<ByteStream> str)
 
       GPosition data_pos;
       if (!data.contains(file->id, data_pos))
-	       G_THROW("DjVmDoc.no_data\t" + file->id);     //  Strange: there is no data for file 'xxx'
+	       G_THROW( ERR_MSG("DjVmDoc.no_data") "\t" + file->id);
       file->size=data[data_pos]->get_length();
-      if (!file->size) G_THROW("DjVmDoc.zero_file");  //  Strange: File size is zero.
+      if (!file->size) G_THROW( ERR_MSG("DjVmDoc.zero_file") );
    }
 
    GP<IFFByteStream> giff=IFFByteStream::create(str);
@@ -356,7 +356,7 @@ DjVmDoc::expand(const GURL &codebase, const char * idx_name)
       
       GPosition data_pos;
       if (!data.contains(file->id, data_pos))
-	       G_THROW("DjVmDoc.no_data\t" + file->id);     //  Strange: there is no data for file 'xxx'.
+	       G_THROW( ERR_MSG("DjVmDoc.no_data") "\t" + file->id);
 
 //      const GURL::Filename::UTF8 url(GOS::expand_name(file->name, GOS::url_to_filename(codebase)));
       const GURL::UTF8 url(file->name,codebase);

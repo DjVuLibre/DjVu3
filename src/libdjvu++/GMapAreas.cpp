@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GMapAreas.cpp,v 1.23 2001-04-12 00:25:00 bcr Exp $
+// $Id: GMapAreas.cpp,v 1.24 2001-04-12 17:05:32 fcrary Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -63,16 +63,16 @@ const char GMapArea::BORDER_AVIS_TAG[] = 	"border_avis";
 const char GMapArea::HILITE_TAG[] = 		"hilite";
 const char GMapArea::URL_TAG[] = 		"url";
 const char GMapArea::TARGET_SELF[] = 		"_self";
-static const char zero_width[] = "GMapAreas.zero_width";
-static const char zero_height[] = "GMapAreas.zero_height";
-static const char width_1[] = "GMapAreas.width_1";
-static const char width_3_32 [] = "GMapAreas.width_3-32";
-static const char error_poly_border [] = "GMapAreas.poly_border";
-static const char error_poly_hilite [] = "GMapAreas.poly_hilite";
-static const char error_oval_border [] = "GMapAreas.oval_border";
-static const char error_oval_hilite [] = "GMapAreas.oval_hilite";
-static const char error_too_few_points [] = "GMapAreas.too_few_points";
-static const char error_intersect [] = "GMapAreas.intersect";
+static const char zero_width[] = ERR_MSG("GMapAreas.zero_width");
+static const char zero_height[] = ERR_MSG("GMapAreas.zero_height");
+static const char width_1[] = ERR_MSG("GMapAreas.width_1");
+static const char width_3_32 [] = ERR_MSG("GMapAreas.width_3-32");
+static const char error_poly_border [] = ERR_MSG("GMapAreas.poly_border");
+static const char error_poly_hilite [] = ERR_MSG("GMapAreas.poly_hilite");
+static const char error_oval_border [] = ERR_MSG("GMapAreas.oval_border");
+static const char error_oval_hilite [] = ERR_MSG("GMapAreas.oval_hilite");
+static const char error_too_few_points [] = ERR_MSG("GMapAreas.too_few_points");
+static const char error_intersect [] = ERR_MSG("GMapAreas.intersect");
 
 GMapArea::~GMapArea() {}
 

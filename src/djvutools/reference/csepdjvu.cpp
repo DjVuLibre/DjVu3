@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: csepdjvu.cpp,v 1.15 2001-04-06 18:38:31 chrisp Exp $
+// $Id: csepdjvu.cpp,v 1.16 2001-04-12 17:05:31 fcrary Exp $
 // $Name:  $
 
 
@@ -108,7 +108,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: csepdjvu.cpp,v 1.15 2001-04-06 18:38:31 chrisp Exp $# */
+    #$Id: csepdjvu.cpp,v 1.16 2001-04-12 17:05:31 fcrary Exp $# */
 //@{
 //@}
 
@@ -389,7 +389,7 @@ CRLEImage::CRLEImage(BufferByteStream &bs)
       while (n >= 0)
         {
           if (bs.eof())
-            G_THROW("EOF");
+            G_THROW( ERR_MSG("EOF") );
           x = bs.get();
           if (x >= 0xc0)
             x = (bs.get()) + ((x - 0xc0) << 8);
@@ -430,7 +430,7 @@ CRLEImage::CRLEImage(BufferByteStream &bs)
       while (n >= 0)
         {
           if (bs.eof())
-            G_THROW("EOF");
+            G_THROW( ERR_MSG("EOF") );
           x  = (bs.get() << 24);
           x  |= (bs.get() << 16);
           x  |= (bs.get() << 8);

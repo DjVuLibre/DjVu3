@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.49 2001-04-12 16:07:04 mchen Exp $
+// $Id: GString.cpp,v 1.50 2001-04-12 17:05:32 fcrary Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -694,7 +694,9 @@ GString::operator+= (const char *str2)
 GString& 
 GString::operator+= (const GString &str2)
 {
-  return ((*this)=(*this)->concat(*this,str2));
+  GP<GStringRep> retval=(*this);
+  retval=retval->concat(retval,str2);
+  return ((*this)=retval);
 }
 
 bool
@@ -844,7 +846,7 @@ GStringRep::toNative(const bool noconvert) const
       mbstate_t ps;
       for(const unsigned char *s=(const unsigned char *)data;(s<eptr)&& *s;)
       {
-        const wchar_t w=UTF8toUCS4(s,eptr);
+        const wchar_t w=(wchar_t)UTF8toUCS4(s,eptr);
         char bytes[12];
         int i=wcrtomb(bytes,w,&ps);
         if(i<0)
@@ -923,7 +925,7 @@ GStringRep::UTF8::toUTF8(const bool nothrow) const
 }
 
 GNativeString
-GString::UTF8ToNative(const bool currentlocale=false) const
+GString::UTF8ToNative(const bool currentlocale) const
 {
   const char *source=(*this);
   GP<GStringRep> retval;

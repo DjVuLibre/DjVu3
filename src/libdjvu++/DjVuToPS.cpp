@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuToPS.cpp,v 1.23 2001-04-05 16:06:27 bcr Exp $
+// $Id: DjVuToPS.cpp,v 1.24 2001-04-12 17:05:32 fcrary Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -76,7 +76,7 @@ void
 DjVuToPS::Options::set_format(Format _format)
 {
    if (_format!=PS && _format!=EPS)
-      G_THROW("DjVuToPS.bad_format");
+      G_THROW( ERR_MSG("DjVuToPS.bad_format") );
    
    format=_format;
    if (format==EPS)
@@ -90,7 +90,7 @@ void
 DjVuToPS::Options::set_level(int _level)
 {
    if (_level!=1 && _level!=2)
-      G_THROW("DjVuToPS.bad_level\t"+GString(_level));
+      G_THROW( ERR_MSG("DjVuToPS.bad_level") "\t"+GString(_level));
    
    level=_level;
 }
@@ -99,9 +99,9 @@ void
 DjVuToPS::Options::set_orientation(Orientation _orientation)
 {
    if (_orientation!=PORTRAIT && _orientation!=LANDSCAPE)
-      G_THROW("DjVuToPS.bad_orient");
+      G_THROW( ERR_MSG("DjVuToPS.bad_orient") );
    if (format==EPS && _orientation==LANDSCAPE)
-      G_THROW("DjVuToPS.no_landscape");
+      G_THROW( ERR_MSG("DjVuToPS.no_landscape") );
    
    orientation=_orientation;
 }
@@ -110,7 +110,7 @@ void
 DjVuToPS::Options::set_mode(Mode _mode)
 {
    if (_mode!=COLOR && _mode!=FORE && _mode!=BACK && _mode!=BW)
-      G_THROW("DjVuToPS.bad_mode");
+      G_THROW( ERR_MSG("DjVuToPS.bad_mode") );
    
    mode=_mode;
 }
@@ -119,7 +119,7 @@ void
 DjVuToPS::Options::set_zoom(Zoom _zoom)
 {
    if (_zoom!=FIT_PAGE && !(_zoom>=5 && _zoom<=999))
-      G_THROW("DjVuToPS.bad_zoom");
+      G_THROW( ERR_MSG("DjVuToPS.bad_zoom") );
    
    zoom=_zoom;
 }
@@ -134,7 +134,7 @@ void
 DjVuToPS::Options::set_gamma(float _gamma)
 {
    if (_gamma<0.3-0.0001 || _gamma>5.0+0.0001)
-      G_THROW("DjVuToPS.bad_gamma");
+      G_THROW( ERR_MSG("DjVuToPS.bad_gamma") );
    gamma=_gamma;
 }
 
@@ -142,9 +142,9 @@ void
 DjVuToPS::Options::set_copies(int _copies)
 {
    if (_copies<=0)
-      G_THROW("DjVuToPS.bad_number");
+      G_THROW( ERR_MSG("DjVuToPS.bad_number") );
    if (format==EPS && _copies!=1)
-      G_THROW("DjVuToPS.bad_EPS_num");
+      G_THROW( ERR_MSG("DjVuToPS.bad_EPS_num") );
    
    copies=_copies;
 }
@@ -709,11 +709,11 @@ DjVuToPS::print_image(ByteStream & str, const GP<DjVuImage> & dimg,
   DEBUG_MAKE_INDENT(3);
   
   if (!dimg)
-    G_THROW("DjVuToPS.empty_image");
+    G_THROW( ERR_MSG("DjVuToPS.empty_image") );
   if (prn_rect.isempty())
-    G_THROW("DjVuToPS.empty_rect");
+    G_THROW( ERR_MSG("DjVuToPS.empty_rect") );
   if (img_rect.isempty())
-    G_THROW("DjVuToPS.bad_scale");
+    G_THROW( ERR_MSG("DjVuToPS.bad_scale") );
   
   if (prn_progress_cb)
     prn_progress_cb(0, prn_progress_cl_data);
@@ -1083,11 +1083,11 @@ DjVuToPS::print(ByteStream & str, const GP<DjVuImage> & dimg,
 	     img_rect.width() << ", " << img_rect.height() << ")\n");
 
    if (!dimg)
-      G_THROW("DjVuToPS.empty_image");
+      G_THROW( ERR_MSG("DjVuToPS.empty_image") );
    if (prn_rect.isempty())
-      G_THROW("DjVuToPS.empty_rect");
+      G_THROW( ERR_MSG("DjVuToPS.empty_rect") );
    if (img_rect.isempty())
-      G_THROW("DjVuToPS.bad_scale");
+      G_THROW( ERR_MSG("DjVuToPS.bad_scale") );
 
       // Store document-level directives
    store_doc_prolog(str, 1, prn_rect);
@@ -1187,25 +1187,25 @@ DjVuToPS::print(ByteStream & str, const GP<DjVuDocument> & doc,
           const char * ptr;
           int start_page=strtol(start, (char **) &ptr, 10);
           if (ptr<dash || start_page<=0)
-            G_THROW("DjVuToPS.bad_page\t"+GString(start, dash-start));
+            G_THROW( ERR_MSG("DjVuToPS.bad_page") "\t"+GString(start, dash-start));
           if (start_page>doc_pages)
-            G_THROW("DjVuToPS.big_page\t"+GString(start_page));
+            G_THROW( ERR_MSG("DjVuToPS.big_page") "\t"+GString(start_page));
           
           if (dash<end)
           {
             if (dash==end-1)
-              G_THROW("DjVuToPS.no_to\t"+GString(start, end-start));
+              G_THROW( ERR_MSG("DjVuToPS.no_to") "\t"+GString(start, end-start));
             
             for(ptr=dash+1;ptr<end;ptr++)
               if (*ptr=='-')
-                G_THROW("DjVuToPS.bad_range\t"+GString(start, end-start));
+                G_THROW( ERR_MSG("DjVuToPS.bad_range") "\t"+GString(start, end-start));
               
               int end_page=strtol(dash+1, (char **) &ptr, 10);
               if (ptr<end || end_page<=0)
-                G_THROW("DjVuToPS.bad_page\t"+GString(dash+1, end-dash-1));
+                G_THROW( ERR_MSG("DjVuToPS.bad_page") "\t"+GString(dash+1, end-dash-1));
               
               if (end_page>doc_pages)
-                G_THROW("DjVuToPS.big_page\t"+GString(end_page));
+                G_THROW( ERR_MSG("DjVuToPS.big_page") "\t"+GString(end_page));
               
               if (start_page<end_page)
                 for(int page_num=start_page;page_num<=end_page;page_num++)
@@ -1220,7 +1220,7 @@ DjVuToPS::print(ByteStream & str, const GP<DjVuDocument> & doc,
   }
   
   if (pages_todo.size()>1 && options.get_format()==Options::EPS)
-    G_THROW("DjVuToPS.only_one_page");
+    G_THROW( ERR_MSG("DjVuToPS.only_one_page") );
   
   int page_cnt;
   GPosition pos;
@@ -1268,7 +1268,7 @@ DjVuToPS::print(ByteStream & str, const GP<DjVuDocument> & doc,
           port->decode_event_received=false;
           if (djvu_file->is_decode_failed() ||
             djvu_file->is_decode_stopped())
-            G_THROW("DjVuToPS.cant_decode\t"+GString(page_num));
+            G_THROW( ERR_MSG("DjVuToPS.cant_decode") "\t"+GString(page_num));
           if (dec_progress_cb)
             dec_progress_cb(port->decode_done, dec_progress_cl_data);
         }
@@ -1279,7 +1279,7 @@ DjVuToPS::print(ByteStream & str, const GP<DjVuDocument> & doc,
     } else dimg=doc->get_page(page_num, false);
     
     if (!dimg)
-      G_THROW("DjVuToPS.no_image\t"+page_num);
+      G_THROW( ERR_MSG("DjVuToPS.no_image") "\t"+page_num);
     
     if (info_cb)
       info_cb(page_num, page_cnt, pages_todo.size(),

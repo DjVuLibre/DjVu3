@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GURL.cpp,v 1.58 2001-04-12 00:25:00 bcr Exp $
+// $Id: GURL.cpp,v 1.59 2001-04-12 17:05:32 fcrary Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -787,12 +787,12 @@ GURL::base(void) const
       if (*ptr==slash)
         xslash=ptr;
    }
-   return
+   return GURL::UTF8(
 #ifdef WIN32
    (*(xslash-1) == colon)?
      GUTF8String(url,(int)(xslash-url))+"/"+GUTF8String(ptr,url.length()-(int)(ptr-url_ptr)) :
 #endif
-     GUTF8String(url.substr(0,(int)(xslash-url_ptr))+GUTF8String(ptr,url.length()-(int)(ptr-url_ptr)));
+     GUTF8String(url.substr(0,(int)(xslash-url_ptr))+GUTF8String(ptr,url.length()-(int)(ptr-url_ptr))) );
 }
 
 GUTF8String
@@ -1359,7 +1359,7 @@ GURL::listdir(void) const
     }
 #else
     // WCE and MAC is missing
-    G_THROW("GOS.cleardir");
+    G_THROW( ERR_MSG("GURL.cleardir") );
 #endif
   }
   return retval;
@@ -1489,7 +1489,7 @@ GURL::expand_name(const char *fname, const char *from)
       {
         *s = *fname++;
         if ((++s)-string_buffer > MAXPATHLEN)
-          G_THROW("GOS.big_name");
+          G_THROW( ERR_MSG("GURL.big_name") );
       }
       *s = 0;
       for(;fname[0]== slash;fname++)
@@ -1604,7 +1604,7 @@ GURL::expand_name(const char *fname, const char *from)
 	      if (IsDBCSLeadByte((BYTE)*fname)) {*s = *fname++;}//MBCS DBCS
           *s = *fname++;
           if ((++s)-string_buffer > MAXPATHLEN)
-            G_THROW("GOS.big_name");
+            G_THROW( ERR_MSG("GURL.big_name") );
         }
         *s = 0;
       }
@@ -1625,7 +1625,7 @@ GURL::expand_name(const char *fname, const char *from)
 		}//MBCS DBCS
         *s = *fname++;
         if ((++s)-string_buffer > MAXPATHLEN)
-          G_THROW("GOS.big_name");
+          G_THROW( ERR_MSG("GURL.big_name") );
       }
       *s = 0;
       for(;(*fname== slash)||(*fname==backslash);fname++)
@@ -1675,7 +1675,7 @@ GURL::expand_name(const char *fname, const char *from)
       {
         *s = *fname++;
         if ((++s)-string_buffer > MAXPATHLEN)
-          G_THROW("GOS.big_name");
+          G_THROW( ERR_MSG("GURL.big_name") );
       }
       *s = 0;
       for(;fname[0]==colon;fname++)

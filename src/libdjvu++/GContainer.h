@@ -30,11 +30,11 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GContainer.h,v 1.45 2001-04-06 00:11:23 bcr Exp $
+// $Id: GContainer.h,v 1.46 2001-04-12 17:05:32 fcrary Exp $
 // $Name:  $
 
 #ifndef _GCONTAINER_H_
-#define _GCONTAINER_H_ "GContainer."
+#define _GCONTAINER_H_
 
 #ifdef __GNUC__
 #pragma interface
@@ -92,7 +92,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@geocities.com> -- bug fixes.
     @version 
-    #$Id: GContainer.h,v 1.45 2001-04-06 00:11:23 bcr Exp $# */
+    #$Id: GContainer.h,v 1.46 2001-04-12 17:05:32 fcrary Exp $# */
 //@{
 
 
@@ -447,7 +447,7 @@ GArrayTemplate<TYPE>::sort(int lo, int hi)
   if (hi <= lo)
     return;
   if (hi > hibound || lo<lobound)
-    G_THROW(_GCONTAINER_H_ "illegal_subscript");
+    G_THROW( ERR_MSG("GContainer.illegal_subscript") );
   TYPE *data = (TYPE*)(*this);
   // Test for insertion sort
   if (hi <= lo + 50)
@@ -498,7 +498,7 @@ GArrayTemplate<TYPE>::operator[](int const n)
 #if GCONTAINER_BOUNDS_CHECK
   if (n<lobound || n>hibound)
   {
-    G_THROW(_GCONTAINER_H_ "illegal_subscript"); 
+    G_THROW( ERR_MSG("GContainer.illegal_subscript") ); 
   }
 #endif
   return ((TYPE*)data)[n-minlo];
@@ -511,7 +511,7 @@ GArrayTemplate<TYPE>::operator[](int const n) const
 #if GCONTAINER_BOUNDS_CHECK
   if (n<lobound || n>hibound)
   {
-    G_THROW(_GCONTAINER_H_ "illegal_subscript"); 
+    G_THROW( ERR_MSG("GContainer.illegal_subscript") ); 
   }
 #endif
   return ((const TYPE*)data)[n-minlo];
@@ -699,7 +699,7 @@ protected:
 inline void 
 GPosition::throw_invalid(void *c) const
 {
-  G_THROW((c == cont)?(ptr?_GCONTAINER_H_ "bad_pos":_GCONTAINER_H_ "bad_pos_null"):_GCONTAINER_H_ "bad_pos_cont");
+  G_THROW((c == cont)?(ptr? ERR_MSG("GContainer.bad_pos") : ERR_MSG("GContainer.bad_pos_null") ): ERR_MSG("GContainer.bad_pos_cont") );
 }
 
 
@@ -1047,7 +1047,7 @@ GSetImpl<K>::get_or_throw(const K &key) const
   HNode *m = get(key);
   if (!m)
   {
-    G_THROW(_GCONTAINER_H_ "cannot_add");
+    G_THROW( ERR_MSG("GContainer.cannot_add") );
   }
   return m;
 }
