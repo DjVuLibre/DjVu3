@@ -49,8 +49,8 @@ jpeg-6b may be obtained from: http://www.ijg.org
 If you wish to build the reference library with JPEG support, then
 copy the source code to DjVu3/src/3rd-party/libjpeg .
 
-HOW TO BUILD UNDER UNIX:
-------------------------
+HOW TO BUILD:
+-------------
 
 Once you have installed the above 3rd-party packages you are ready
 to build the the Reference Library.
@@ -75,19 +75,6 @@ To install: (as root)
 	mkdir /etc/DjVu
 	cp -r profiles/. /etc/DjVu
 
-Alternatively, you may use the DJVU_CONFIG_DIR environmental variables, or
-copy the profiles to a path relative to the executables.  i.e.
-
-	cp bin/* /usr/local/bin/.
-	cp lib/* /usr/local/lib/.
-	cp -r profiles /usr/local/profiles
-
-Note: Relative paths work based on argv[0], so symbolic links may cause
-problems.
-
-
-HOW TO BUILD UNDER WINDOWS:
-------------------------
 
 To build under Windows:
         1. Open the project file DjVu3/src/libdjvu++/libdjvu++.dsw
