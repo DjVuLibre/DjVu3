@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuPort.h,v 1.12 1999-09-09 21:38:42 leonb Exp $
+//C- $Id: DjVuPort.h,v 1.13 1999-09-09 21:42:14 leonb Exp $
  
 #ifndef _DJVUPORT_H
 #define _DJVUPORT_H
@@ -71,13 +71,14 @@
     @memo DjVu decoder communication mechanism.
     @author Andrei Erofeev <eaf@geocities.com>\\
             L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuPort.h,v 1.12 1999-09-09 21:38:42 leonb Exp $# */
+    @version #$Id: DjVuPort.h,v 1.13 1999-09-09 21:42:14 leonb Exp $# */
 //@{
 
 class DjVuPort;
 class DjVuPortcaster;
 
-/** #DjVuPort# provides base functionality for classes willing to take part in
+/** Base class for notification targets.
+    #DjVuPort# provides base functionality for classes willing to take part in
     sending and receiving messages generated during decoding process.  You
     need to derive your class from #DjVuPort# if you want it to be able to
     send or receive requests. In addition, for receiving requests you should
