@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: DjVuCodec.cpp,v 1.3 1999-01-28 16:33:25 leonb Exp $
+//C-  $Id: DjVuCodec.cpp,v 1.4 1999-01-28 16:51:36 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -654,8 +654,8 @@ do_bitmap(const DjVuImage &dimg, BImager get,
   bs.get_input_rect(zrect, srect);
   GP<GBitmap> sbm = (dimg.*get)(srect, red, 1);
   if (!sbm) return 0;
-  int border = ((rw + align - 1) & ~(align - 1)) - rw;
-  GP<GBitmap> bm = new GBitmap(rw, rh, border);
+  int border = ((zrect.width() + align - 1) & ~(align - 1)) - zrect.width();
+  GP<GBitmap> bm = new GBitmap(zrect.width(), zrect.height(), border);
   bs.scale(srect, *sbm, zrect, *bm);
   return bm;
 }

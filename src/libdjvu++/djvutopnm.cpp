@@ -7,9 +7,9 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: djvutopnm.cpp,v 1.4 1999-01-28 16:33:25 leonb Exp $
+//C-  $Id: djvutopnm.cpp,v 1.5 1999-01-28 16:51:37 leonb Exp $
 
-// File "$Id: djvutopnm.cpp,v 1.4 1999-01-28 16:33:25 leonb Exp $"
+// File "$Id: djvutopnm.cpp,v 1.5 1999-01-28 16:51:37 leonb Exp $"
 // Author: Yann Le Cun 08/1997
 
 #include <stdio.h>
@@ -77,6 +77,8 @@ convert(const char *from, const char *to, int subsample=1)
     {
       int w = (int)(dimg.get_width() * flag_scale / info->dpi);
       int h = (int)(dimg.get_height() * flag_scale / info->dpi);
+      if (w<1) w=1;
+      if (h<1) h=1;
       fullrect = GRect(0,0, w, h);
     }
   if (flag_segment < 0)
