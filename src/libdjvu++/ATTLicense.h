@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: ATTLicense.h,v 1.1 1999-02-27 00:53:17 leonb Exp $
+//C-  $Id: ATTLicense.h,v 1.2 1999-02-27 01:13:49 leonb Exp $
 
 #ifndef _ATTLICENSE_H_
 #define _ATTLICENSE_H_
@@ -17,22 +17,21 @@
 /** @name ATTLicense.h
     
     Files #"ATTLicense.h"# and #"ATTLicense.cpp"# implement a few simple
-    functions for obtaining and displaying the text of the AT&T Source Code
-    License.  This is just to make sure that this text is not replicated a
-    million times in the code.
+    functions for obtaining and displaying the text of the 
+    \Ref{AT&T Source Code Agreement}.
 
     @memo
     Support for AT&T Source Code Licensing
     @version
-    #$Id: ATTLicense.h,v 1.1 1999-02-27 00:53:17 leonb Exp $#
-    @authors
+    #$Id: ATTLicense.h,v 1.2 1999-02-27 01:13:49 leonb Exp $#
+    @author
     Leon Bottou <leonb@research.att.com>\\
     Jeffrey S. Dickey <jsdickey@att.com>\\
     James Tramontana <jtramontana@att.com>\\
     Marya Yee <myee@yeellp.com> */
+//@{
 
-/** Functions for displaying license information.
- */
+/** Functions for displaying license information. */
 class ATTLicense
 {
 public:
@@ -47,6 +46,7 @@ public:
   static void process_cmdline(int argc, char **argv);
 };
 
+//@}
 
 // --------- END
 #endif
