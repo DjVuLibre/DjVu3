@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: Arrays.h,v 1.11 2000-02-24 22:23:53 haffner Exp $
+//C- $Id: Arrays.h,v 1.12 2000-02-27 23:19:49 eaf Exp $
 
 
 #ifndef _ARRAYS_H_
@@ -70,9 +70,9 @@
     @memo Template array classes.
     @author 
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
-    Andrei Erofeev <eaf@research.att.com> -- Copy-on-demand implementation.
+    Andrei Erofeev <eaf@geocities.com> -- Copy-on-demand implementation.
     @version 
-    #$Id: Arrays.h,v 1.11 2000-02-24 22:23:53 haffner Exp $# */
+    #$Id: Arrays.h,v 1.12 2000-02-27 23:19:49 eaf Exp $# */
 //@{
 
 // Auxiliary classes: Will be used in place of GPBase and GPEnabled objects

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.h,v 1.29 2000-02-24 22:23:53 haffner Exp $
+//C- $Id: DataPool.h,v 1.30 2000-02-27 23:19:49 eaf Exp $
  
 #ifndef _DATAPOOL_H
 #define _DATAPOOL_H
@@ -43,8 +43,8 @@
     routines, \Ref{DataPool} supports file mode as well.
 
     @memo Thread safe data storage
-    @author Andrei Erofeev <eaf@research.att.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DataPool.h,v 1.29 2000-02-24 22:23:53 haffner Exp $#
+    @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
+    @version #$Id: DataPool.h,v 1.30 2000-02-27 23:19:49 eaf Exp $#
 */
 
 //@{

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuAnno.h,v 1.24 2000-02-24 22:23:54 haffner Exp $
+//C- $Id: DjVuAnno.h,v 1.25 2000-02-27 23:19:49 eaf Exp $
 
 #ifndef _DJVUANNO_H
 #define _DJVUANNO_H
@@ -34,9 +34,9 @@
     for parsing, which initializes \Ref{DjVuAnno::ANT} and \Ref{DjVuAnno::TXT}
     and fills them with decoded data. 
     @memo Implements support for DjVuImage annotations
-    @author Andrei Erofeev <eaf@research.att.com>
+    @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: DjVuAnno.h,v 1.24 2000-02-24 22:23:54 haffner Exp $# */
+    #$Id: DjVuAnno.h,v 1.25 2000-02-27 23:19:49 eaf Exp $# */
 //@{
 
 #ifdef __GNUC__

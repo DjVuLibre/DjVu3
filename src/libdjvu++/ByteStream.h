@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: ByteStream.h,v 1.17 2000-02-24 22:23:53 haffner Exp $
+//C- $Id: ByteStream.h,v 1.18 2000-02-27 23:19:49 eaf Exp $
 
 
 #ifndef _BYTESTREAM_H
@@ -39,9 +39,9 @@
     Input/output classes
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation\\
-    Andrei Erofeev <eaf@research.att.com> -- 
+    Andrei Erofeev <eaf@geocities.com> -- 
     @version
-    #$Id: ByteStream.h,v 1.17 2000-02-24 22:23:53 haffner Exp $# */
+    #$Id: ByteStream.h,v 1.18 2000-02-27 23:19:49 eaf Exp $# */
 //@{
 
 #ifdef __GNUC__

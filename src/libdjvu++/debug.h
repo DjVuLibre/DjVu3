@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: debug.h,v 1.6 2000-02-10 14:31:30 leonb Exp $
+//C-  $Id: debug.h,v 1.7 2000-02-27 23:19:50 eaf Exp $
 
 
 #ifndef _TEMPLATE_H_
@@ -65,9 +65,9 @@
     @memo 
     Macros for printing debug messages.
     @version 
-    #$Id: debug.h,v 1.6 2000-02-10 14:31:30 leonb Exp $#
+    #$Id: debug.h,v 1.7 2000-02-27 23:19:50 eaf Exp $#
     @author
-    Andrew Erofeev <eaf@research.att.com> -- initial implementation \\
+    Andrew Erofeev <eaf@geocities.com> -- initial implementation \\
     Leon Bottou <leonb@research.att.com> -- cleanups */
 //@{
 

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GIFFManager.h,v 1.6 1999-10-05 16:00:06 leonb Exp $
+//C- $Id: GIFFManager.h,v 1.7 2000-02-27 23:19:50 eaf Exp $
 
 #ifndef _GIFFMANAGER_H
 #define _GIFFMANAGER_H
@@ -38,9 +38,9 @@
     
     Interface to IFF files.
     @author 
-    Andrei Erofeev <eaf@research.att.com> -- Initial implementation.
+    Andrei Erofeev <eaf@geocities.com> -- Initial implementation.
     @version 
-    #$Id: GIFFManager.h,v 1.6 1999-10-05 16:00:06 leonb Exp $# */
+    #$Id: GIFFManager.h,v 1.7 2000-02-27 23:19:50 eaf Exp $# */
 
 /** #GIFFChunk# is the base class for other IFF chunks understood by
     {\Ref GIFFManager}. It provides some basic interface, and is not supposed

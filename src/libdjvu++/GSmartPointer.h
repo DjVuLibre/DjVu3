@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GSmartPointer.h,v 1.17 2000-02-08 19:57:43 eaf Exp $
+//C- $Id: GSmartPointer.h,v 1.18 2000-02-27 23:19:50 eaf Exp $
 
 #ifndef _GSMARTPOINTER_H_
 #define _GSMARTPOINTER_H_
@@ -29,9 +29,9 @@
     Thread-Safe reference counting smart-pointers.
     @author 
     L\'eon Bottou <leonb@research.att.com> -- initial implementation\\
-    Andrei Erofeev <eaf@research.att.com> -- bug fix.
+    Andrei Erofeev <eaf@geocities.com> -- bug fix.
     @version 
-    #$Id: GSmartPointer.h,v 1.17 2000-02-08 19:57:43 eaf Exp $# 
+    #$Id: GSmartPointer.h,v 1.18 2000-02-27 23:19:50 eaf Exp $# 
     @args
 */
 //@{

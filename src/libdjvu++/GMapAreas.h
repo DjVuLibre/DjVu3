@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GMapAreas.h,v 1.8 2000-01-19 23:46:15 leonb Exp $
+//C- $Id: GMapAreas.h,v 1.9 2000-02-27 23:19:50 eaf Exp $
 
 #ifndef _GMAPAREAS_H
 #define _GMAPAREAS_H
@@ -45,9 +45,9 @@ typedef unsigned int u_int32;
     manipulations
 
     @memo Definition of base map area classes
-    @author Andrei Erofeev <eaf@research.att.com>
+    @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: GMapAreas.h,v 1.8 2000-01-19 23:46:15 leonb Exp $# */
+    #$Id: GMapAreas.h,v 1.9 2000-02-27 23:19:50 eaf Exp $# */
 //@{
 
 

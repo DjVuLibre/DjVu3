@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GContainer.h,v 1.29 2000-02-18 16:22:22 leonb Exp $
+//C- $Id: GContainer.h,v 1.30 2000-02-27 23:19:50 eaf Exp $
 
 
 #ifndef _GCONTAINER_H_
@@ -71,9 +71,9 @@
     Template class for generic containers.
     @author 
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
-    Andrei Erofeev <eaf@research.att.com> -- bug fixes.
+    Andrei Erofeev <eaf@geocities.com> -- bug fixes.
     @version 
-    #$Id: GContainer.h,v 1.29 2000-02-18 16:22:22 leonb Exp $# */
+    #$Id: GContainer.h,v 1.30 2000-02-27 23:19:50 eaf Exp $# */
 //@{
 
 

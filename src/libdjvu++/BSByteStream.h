@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: BSByteStream.h,v 1.12 1999-09-02 02:16:53 leonb Exp $
+//C- $Id: BSByteStream.h,v 1.13 2000-02-27 23:19:49 eaf Exp $
 
 
 #ifndef _BSBYTESTREAM_H
@@ -90,11 +90,11 @@
 
     @author
     L\'eon Bottou <leonb@research.att.com> -- Initial implementation\\
-    Andrei Erofeev <eaf@research.att.com> -- Improved Block Sorting algorithm.
+    Andrei Erofeev <eaf@geocities.com> -- Improved Block Sorting algorithm.
     @memo
     Simple Burrows-Wheeler general purpose compressor.
     @version
-    #$Id: BSByteStream.h,v 1.12 1999-09-02 02:16:53 leonb Exp $# */
+    #$Id: BSByteStream.h,v 1.13 2000-02-27 23:19:49 eaf Exp $# */
 //@{
 
 #ifdef __GNUC__

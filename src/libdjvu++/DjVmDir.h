@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVmDir.h,v 1.19 2000-02-24 22:23:53 haffner Exp $
+//C- $Id: DjVmDir.h,v 1.20 2000-02-27 23:19:49 eaf Exp $
 
 #ifndef _DJVMDIR_H
 #define _DJVMDIR_H
@@ -60,9 +60,9 @@
     file title identical.
 
     @memo Implements DjVu multipage document directory
-    @author Andrei Erofeev <eaf@research.att.com>
+    @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: DjVmDir.h,v 1.19 2000-02-24 22:23:53 haffner Exp $# */
+    #$Id: DjVmDir.h,v 1.20 2000-02-27 23:19:49 eaf Exp $# */
 //@{
 
 

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: Template.h,v 1.6 1999-03-17 19:24:59 leonb Exp $
+//C- $Id: Template.h,v 1.7 2000-02-27 23:19:50 eaf Exp $
 
 
 //T// This is a template for the header files in the
@@ -76,10 +76,10 @@
     @memo 
     Template header file
     @version 
-    #$Id: Template.h,v 1.6 1999-03-17 19:24:59 leonb Exp $# 
+    #$Id: Template.h,v 1.7 2000-02-27 23:19:50 eaf Exp $# 
     @author: 
     L\'eon Bottou <leonb@research.att.com> -- initial implementation \\
-    Andrew Erofeev <eaf@research.att.com> -- implemented EXTERNAL_TEMPLATES */
+    Andrew Erofeev <eaf@geocities.com> -- implemented EXTERNAL_TEMPLATES */
 //@{
 //T// The magic doc++ comment above opens a doc++ context.
 

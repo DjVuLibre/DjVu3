@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVmDir0.h,v 1.7 2000-02-24 22:23:53 haffner Exp $
+//C- $Id: DjVmDir0.h,v 1.8 2000-02-27 23:19:49 eaf Exp $
  
 #ifndef _DJVMDIR0_H
 #define _DJVMDIR0_H
@@ -36,8 +36,8 @@
     
 
     @memo Directory of DjVu all-in-one-file DjVu documents.
-    @author Andrei Erofeev <eaf@research.att.com>
-    @version #$Id: DjVmDir0.h,v 1.7 2000-02-24 22:23:53 haffner Exp $# */
+    @author Andrei Erofeev <eaf@geocities.com>
+    @version #$Id: DjVmDir0.h,v 1.8 2000-02-27 23:19:49 eaf Exp $# */
 
 //@{
 

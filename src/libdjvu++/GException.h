@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GException.h,v 1.15 1999-11-21 09:21:36 bcr Exp $
+//C- $Id: GException.h,v 1.16 2000-02-27 23:19:50 eaf Exp $
 
 
 #ifndef _GEXCEPTION_H_
@@ -58,9 +58,9 @@
     Portable exceptions.
     @author 
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
-    Andrei Erofeev <eaf@research.att.com> -- fixed message memory allocation.
+    Andrei Erofeev <eaf@geocities.com> -- fixed message memory allocation.
     @version 
-    #$Id: GException.h,v 1.15 1999-11-21 09:21:36 bcr Exp $# */
+    #$Id: GException.h,v 1.16 2000-02-27 23:19:50 eaf Exp $# */
 //@{
 
 #include "DjVuGlobal.h"
