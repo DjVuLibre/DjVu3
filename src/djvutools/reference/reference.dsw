@@ -3,7 +3,7 @@ Microsoft Developer Studio Workspace File, Format Version 6.00
 
 ###############################################################################
 
-Project: "BuildAll"=.\BuildAll\BuildAll.dsp - Package Owner=<4>
+Project: "BuildAll"=..\..\..\examples\src\djvutools\BuildAll.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -61,6 +61,12 @@ Package=<4>
     End Project Dependency
     Begin Project Dependency
     Project_Dep_Name ppmcoco
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name xml2native
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name xml2utf8
     End Project Dependency
 }}}
 
@@ -351,7 +357,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "dummyjpeg"=..\..\..\examples\src\djvutools\reference\dummyjpeg.dsp - Package Owner=<4>
+Project: "dummyjpeg"=.\dummyjpeg.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -376,6 +382,36 @@ Package=<4>
 ###############################################################################
 
 Project: "ppmcoco"=.\ppmcoco.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name ReferenceLibrary
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "xml2native"=.\xml2native.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name ReferenceLibrary
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "xml2utf8"=.\xml2utf8.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
