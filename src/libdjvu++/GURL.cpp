@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GURL.cpp,v 1.47 2001-01-04 22:04:55 bcr Exp $
+// $Id: GURL.cpp,v 1.48 2001-02-13 00:16:08 praveen Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -109,7 +109,7 @@ GURL::beautify_path(void)
   }
 
   // Eat multiple slashes
-  for(;(ptr=strstr(start, "////"));collapse(ptr, 3));
+  for(;(ptr=strstr(start, "////"));collapse(ptr, 3))
     EMPTY_LOOP;
   for(;(ptr=strstr(start, "//"));collapse(ptr, 1))
     EMPTY_LOOP;

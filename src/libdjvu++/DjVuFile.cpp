@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuFile.cpp,v 1.145 2001-02-13 00:11:40 bcr Exp $
+// $Id: DjVuFile.cpp,v 1.146 2001-02-13 00:15:33 praveen Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -1639,7 +1639,7 @@ DjVuFile::trigger_cb(void)
   inc_files_lock.lock();
   GPList<DjVuFile> files_list=inc_files_list;
   inc_files_lock.unlock();
-  for(GPosition pos=files_list;pos&&!(all=!files_list[pos]->is_all_data_present());++pos)
+  for(GPosition pos=files_list;pos&&(all=files_list[pos]->is_all_data_present());++pos)
     EMPTY_LOOP;
   if (all)
   {

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GOS.cpp,v 1.46 2001-01-15 23:49:06 fcrary Exp $
+// $Id: GOS.cpp,v 1.47 2001-02-13 00:15:53 praveen Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -1123,7 +1123,8 @@ GOS::url_to_filename(const char *url)
   {
     char *l_url;
     GPBuffer<char> gl_url(l_url,strlen(url)+1);
-    for (char *s=url,*r=l_url; *s; s++,r++)
+    char *s, *r;
+    for ( s=(char*)url,r=(char*)l_url; *s; s++,r++)
     {
       *r=(*s == slash)?colon:*s;
     }

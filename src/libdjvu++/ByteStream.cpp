@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.cpp,v 1.48 2001-02-12 22:31:52 bcr Exp $
+// $Id: ByteStream.cpp,v 1.49 2001-02-13 00:14:58 praveen Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 04/1997
@@ -48,7 +48,20 @@
 #include <unistd.h>
 #include <sys/mman.h>
 #else
+#ifdef macintosh
+#include <unistd.h>
+
+_MSL_IMP_EXP_C int _dup(int);
+_MSL_IMP_EXP_C int _dup2(int,int);
+_MSL_IMP_EXP_C int _close(int);
+
+							
+__inline int dup(int _a ) 			{ return _dup(_a);}
+__inline int dup2(int _a, int _b ) 	{ return _dup2(_a, _b);}
+
+#else
 #include <io.h>
+#endif
 #endif
 #ifndef UNDER_CE
 #include <errno.h>
@@ -514,7 +527,11 @@ ByteStream::Stdio::init(const char filename[], const char mode[])
   GString retval;
   if (filename[0] != '-' || filename[1])
   {
+#ifdef macintosh
+	fp = fopen(filename, mode);
+#else
     fp = fopen(GOS::expand_name(filename), mode);
+#endif
     if (!fp)
     {
 #ifndef UNDER_CE
@@ -932,7 +949,7 @@ ByteStream::create(const int fd,char const * const mode,const bool closeme)
 #endif
   {
     const int fd2=closeme?fd:dup(fd);
-    FILE * const f=fdopen(fd2,mode?mode:"rb");
+    FILE * const f=fdopen(fd2,(char*)(mode?mode:"rb"));
     if(!f)
     {
       close(fd2);
