@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: parseoptions.cpp,v 1.56 2000-10-06 19:01:18 mrosen Exp $
+//C- $Id: parseoptions.cpp,v 1.57 2000-10-11 21:12:36 bcr Exp $
 #ifdef __GNUC__
 #pragma implementation
 #endif
@@ -946,7 +946,7 @@ DjVuParseOptions::ReadFile(int &line,FILE *f,int profile)
               }
               break;
             case READ_NAME:
-              for(;isalnum(c)||(c == '-');c=getc(f))
+              for(;isalnum(c)||(c == '-')||(c == '.')||(c == '_');c=getc(f))
               {
                 (s++)[0]=c;
                 if(s==value_end) break;
@@ -1784,6 +1784,7 @@ DjVuTokenList::SetToken( const char name[] )
     if(NextToken == ListSize)
     {
       Entries *NewEntry=new Entries[(ListSize+=inc_size)];
+      memset(&NewEntry[NextToken],0,inc_size*sizeof(char *));
   // Copy the lower entries.
       if(MinGuess)
       {
@@ -1794,7 +1795,6 @@ DjVuTokenList::SetToken( const char name[] )
       {
         memcpy(&(NewEntry[MinGuess+1]),&(Entry[MinGuess]),sizeof(Entries)*(NextToken-MinGuess));
       }
-      memset(NewEntry,0,NextToken*sizeof(char *));
       delete [] Entry;
       Entry=NewEntry;
       char **NewStrings=new char *[ListSize];

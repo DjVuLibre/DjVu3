@@ -10,12 +10,15 @@
 #define __DJVU_MESSAGE_H__
 
 #include "GString.h"
+class DjVuParseOptions;
 
 class DjVuMessage
 {
 private:
   // Constructor:
   DjVuMessage( void );
+
+  DjVuParseOptions *opts;
 
 public:
 

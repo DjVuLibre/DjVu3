@@ -6,6 +6,7 @@
 
 
 #include "DjVuMessage.h"
+#include "parseoptions.h"
 #include <ctype.h>
 #include <stdio.h>
 
@@ -19,32 +20,33 @@ DjVuMessage::get_DjVuMessage(void)
 }
 
 //  The name of the message file
-#define DjVuMessageFileName "DjVuMessageFile"
+static const char DjVuMessageFileName[] = "message";
 
 
 // Constructor
-DjVuMessage::DjVuMessage( void )
+DjVuMessage::DjVuMessage( void ) : opts(0)
 {
-  const char *ss;
-  struct djvu_parse opt = djvu_parse_init( "-" );
-  ss = djvu_parse_configfile( opt, DjVuMessageFileName, -1 );
-  FILE *MessageFile = fopen( ss, "r" );
-
-  if( MessageFile == NULL )
-  {
+   opts=new DjVuParseOptions(DjVuMessageFileName);
+//  const char *ss;
+//  struct djvu_parse opt = djvu_parse_init( "-" );
+//  ss = djvu_parse_configfile( opt, DjVuMessageFileName, -1 );
+//  FILE *MessageFile = fopen( ss, "r" );
+//
+//  if( MessageFile == NULL )
+//  {
 //    fprintf( stderr, "*** Unable to find message file (%s)\n*** Expect cryptic error messages\n\n",
 //                   DjVuMessageFileName );
-  }
-  else
-  {
-    fclose( MessageFile );
-  }
-};
+//  }
+//  else
+//  {
+//    fclose( MessageFile );
+//  }
+}
 
 // Destructor
 DjVuMessage::~DjVuMessage( )
 {
-};
+}
 
 
 void
@@ -124,8 +126,13 @@ DjVuMessage::LookUpSingle( const GString &Single_Message ) const
                "\\tMessage name:  " +
                Single_Message.substr(0,ending_posn);
   }
-  else                                        // temporary debug
+#ifdef DEBUG
+  else
+  {
+                                              // temporary debug
     msg_text = "*!* " + msg_text + " *!*";    // temporary debug
+  }
+#endif
     
   //  Insert the parameters (if any)
   unsigned int param_num = 0;
@@ -149,12 +156,14 @@ DjVuMessage::LookUpSingle( const GString &Single_Message ) const
 GString
 DjVuMessage::LookUpID( const GString &msgID ) const
 {
+  GString result=opts->GetValue(msgID);
+  opts->perror();
+#if 0
   //  Find the message file
   const char *ss;
   struct djvu_parse opt = djvu_parse_init( "-" );
   ss = djvu_parse_configfile( opt, DjVuMessageFileName, -1 );
   FILE *MessageFile = fopen( ss, "r" );
-
   GString result;
   if( MessageFile != NULL )
   {
@@ -184,7 +193,7 @@ DjVuMessage::LookUpID( const GString &msgID ) const
   }
   else
     result.empty();  // Message text file not open
-
+#endif
   return result;
 }
 
@@ -200,7 +209,7 @@ DjVuMessage::InsertArg( GString &message, int ArgId, GString arg ) const
   if( format_start >= 0 )
   {
     int format_end = format_start;
-    while( !isalpha( message[format_end++] ) ) {};  // locate end of format
+    while( !isalpha( message[format_end++] ) ) {}  // locate end of format
     GString format = "%" + message.substr( format_start + target.length(),
                                            format_end - format_start - target.length() );
     message = message.substr( 0, format_start ) +
