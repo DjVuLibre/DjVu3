@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GSmartPointer.h,v 1.19 2000-02-29 19:06:26 praveen Exp $
+//C- $Id: GSmartPointer.h,v 1.20 2000-03-01 00:23:03 leonb Exp $
 
 #ifndef _GSMARTPOINTER_H_
 #define _GSMARTPOINTER_H_
@@ -31,7 +31,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation\\
     Andrei Erofeev <eaf@geocities.com> -- bug fix.
     @version 
-    #$Id: GSmartPointer.h,v 1.19 2000-02-29 19:06:26 praveen Exp $# 
+    #$Id: GSmartPointer.h,v 1.20 2000-03-01 00:23:03 leonb Exp $# 
     @args
 */
 //@{
@@ -39,6 +39,13 @@
 #if defined(EXTERNAL_TEMPLATES) && defined(__GNUC__)
 #pragma interface
 #endif
+
+#ifdef (_MSC_VER)
+// Language lawyer say MSVC6 is wrong on that one. 
+// Cf section 5.4.7 in november 1997 draft.
+#pragma warning( disable : 4243 )
+#endif
+
 
 #include "DjVuGlobal.h"
 
@@ -189,7 +196,7 @@ protected:
     But one has to be aware of its existence.  */
 
 template <class TYPE>
-class GP : public GPBase
+class GP : protected GPBase
 {
 public:
   /** Constructs a null smart-pointer. */
