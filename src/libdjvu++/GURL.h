@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GURL.h,v 1.15 2000-01-19 23:14:26 leonb Exp $
+//C- $Id: GURL.h,v 1.16 2000-01-19 23:20:30 leonb Exp $
 
 #ifndef _GURL_H_
 #define _GURL_H_
@@ -27,7 +27,7 @@
     \Ref{GURL} class used to store URLs in a system independent format.
     @memo System independent URL representation.
     @author Andrei Erofeev <eaf@research.att.com>
-    @version #$Id: GURL.h,v 1.15 2000-01-19 23:14:26 leonb Exp $#
+    @version #$Id: GURL.h,v 1.16 2000-01-19 23:20:30 leonb Exp $#
 */
 
 //@{
@@ -71,7 +71,7 @@ public:
       /// Extracts the {\em protocol} part from the URL and returns it
    GString	protocol(void) const;
 
-      /// Returns string after the first '#' or '%23'
+      /// Returns string after the first '\#' or '%23'
    GString	hash_argument(void) const;
 
       /** Returns the total number of CGI arguments in the URL.
