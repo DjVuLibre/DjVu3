@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuImage.cpp,v 1.60 2001-04-03 22:31:37 bcr Exp $
+// $Id: DjVuImage.cpp,v 1.61 2001-04-03 22:46:09 praveen Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -81,7 +81,7 @@ DjVuImage::get_info(const GP<DjVuFile> & file) const
    {
      if(rotate_count<0)
      {
-       init_rotate(*(file->info));
+       const_cast<DjVuImage *>(this)->init_rotate(*(file->info));
      }
      return file->info;
    }
@@ -93,7 +93,7 @@ DjVuImage::get_info(const GP<DjVuFile> & file) const
       {
         if(rotate_count<0)
         {
-          init_rotate(*(file->info));
+          const_cast<DjVuImage *>(this)->init_rotate(*(file->info));
         }
         return info;
       }
@@ -251,14 +251,14 @@ int
 DjVuImage::get_width() const
 {
    GP<DjVuInfo> info=get_info();
-   return info?(info->orientation&GRect::ROTATE90_CW)?(info->height):(info->width):0;
+   return info?((rotate_count&1)?(info->height):(info->width)):0;
 }
 
 int
 DjVuImage::get_height() const
 {
    GP<DjVuInfo> info=get_info();
-   return info?(info->orientation&GRect::ROTATE90_CW)?(info->width):(info->height):0;
+   return info?((rotate_count&1)?(info->width):(info->height)):0;
 }
 
 int
@@ -1083,9 +1083,9 @@ do_bitmap(const DjVuImage &dimg, BImager get,
     {
         GP<GBitmap> bm=(dimg.*get)(zrect, red, align);
         if(bm)
-	   return bm->rotate((4-dimg.get_rotate())%4);
+            return bm->rotate((4-dimg.get_rotate())%4);
         else
-	   return NULL;
+	        return NULL;
     }
   // Find best reduction
   for (red=15; red>1; red--)
@@ -1229,7 +1229,7 @@ void
 DjVuImage::init_rotate(const DjVuInfo &info)
 { 
   rotate_count=4;
-  for(int a=(int)(info->orientation);(a!=(int)GRect::BULRNR)&&(a!=(int)GRect::BURLNR);--rotate_count)
+  for(int a=(int)(info.orientation);(a!=(int)GRect::BULRNR)&&(a!=(int)GRect::BURLNR);--rotate_count)
   {
     a^=((a&(int)GRect::ROTATE90_CW)
       ?(int)(GRect::BOTTOM_UP|GRect::MIRROR|GRect::ROTATE90_CW)

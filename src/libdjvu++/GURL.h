@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GURL.h,v 1.34 2001-03-30 23:31:29 bcr Exp $
+// $Id: GURL.h,v 1.35 2001-04-03 22:46:09 praveen Exp $
 // $Name:  $
 
 #ifndef _GURL_H_
@@ -49,7 +49,7 @@
     \Ref{GURL} class used to store URLs in a system independent format.
     @memo System independent URL representation.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: GURL.h,v 1.34 2001-03-30 23:31:29 bcr Exp $#
+    @version #$Id: GURL.h,v 1.35 2001-04-03 22:46:09 praveen Exp $#
 */
 
 //@{
@@ -338,6 +338,7 @@ public:
 
 class GURL::Native : public GURL
 {
+public:
   Native(const GString &url) : GURL(url.getNative2UTF8()) {}
   Native(const GString &url, const GURL &codebase);
 };
