@@ -621,7 +621,6 @@
 //@Include: GString.h
 //@Include: GContainer.h
 //@Include: Arrays.h
-//@Include: GCache.h
 //@Include: GRect.h
 //@Include: GThreads.h
 //@Include: GOS.h
@@ -645,9 +644,9 @@
 //@Include: DjVuFile.h
 //@Include: DjVmDir.h
 //@Include: DjVuDocument.h
+//@Include: DjVuFileCache.h
 //@Include: DjVuImage.h
 //@Include: DjVmDoc.h
-//@Include: ATTLicense.h
 
 
 /** @name Quasi obsolete files.
