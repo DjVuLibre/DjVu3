@@ -1,4 +1,4 @@
-dnl  $Id: configure.ac,v 1.1 2001-08-23 23:45:23 docbill Exp $
+dnl  $Id: configure.ac,v 1.2 2001-08-24 00:05:47 docbill Exp $
 dnl
 dnl   Name:     libdjvu++-configure.ac
 dnl
@@ -68,7 +68,7 @@ dnl      for present.
 dnl AM_CONFIG_HEADER(config.h)
 
 dnl Write CVS revision info to top of script file.
-AC_REVISION($Id: configure.ac,v 1.1 2001-08-23 23:45:23 docbill Exp $)
+AC_REVISION($Id: configure.ac,v 1.2 2001-08-24 00:05:47 docbill Exp $)
 
 dnl Write the copyright to the configure file.
 AC_COPYRIGHT([                

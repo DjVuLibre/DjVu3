@@ -31,7 +31,7 @@
 #C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #
-# $Id: dlopen.sh,v 1.2 2001-07-24 17:52:02 bcr Exp $
+# $Id: dlopen.sh,v 1.3 2001-08-24 00:05:47 docbill Exp $
 # $Name:  $
 
 # This script sets the variables:
@@ -46,6 +46,7 @@ if [ -z "${DLOPEN_TEST}" ]
 then
   DLOPEN_TEST=true
   (echo '#include <dlfcn.h>'
+  echo '#include <unistd.h>'
   echo 'int main(int argc,char *[],char *[]){dlopen("foo",RTLD_LAZY);exit(0);}')|testfile $temp.cpp
   echon "Checking for dlopen in the dlfcn.h header file ... "
   check_compile_flags HAS_DLOPEN $temp.cpp -DHAS_DLOPEN=1

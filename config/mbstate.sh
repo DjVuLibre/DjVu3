@@ -31,7 +31,7 @@
 #C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #
-# $Id: mbstate.sh,v 1.1 2001-08-23 23:45:23 docbill Exp $
+# $Id: mbstate.sh,v 1.2 2001-08-24 00:05:47 docbill Exp $
 # $Name:  $
 
 # This script sets the variables:
@@ -55,6 +55,7 @@ then
     echo yes
     add_defs HAS_WCHAR 1
     (echo '#include <wchar.h>'
+    echo '#include <unistd.h>'
     echo 'int main(int argc,char *[],char *[])'
     echo '{mbstate_t ps;exit(mbrtowc(0,0,0,&ps));}'
     )|testfile $temp.cpp

@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: execdir.cpp,v 1.9 2001-08-23 23:04:34 docbill Exp $
+// $Id: execdir.cpp,v 1.10 2001-08-24 00:05:47 docbill Exp $
 // $Name:  $
 
 
