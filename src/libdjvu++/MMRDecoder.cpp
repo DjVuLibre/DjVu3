@@ -8,7 +8,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: MMRDecoder.cpp,v 1.3 1999-09-28 01:22:34 leonb Exp $
+//C- $Id: MMRDecoder.cpp,v 1.4 1999-09-28 14:03:55 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -296,7 +296,6 @@ private:
   int lowbits;
   int bufpos;
   int bufmax;
-  void preload();
 public:
   // Initializes a bit source on a bytestream
   _VLSource(ByteStream &inp);
@@ -304,6 +303,9 @@ public:
   // next sixteen code bits in the high order bits.
   unsigned int peek() 
     { return codeword; }
+  // Ensures that next #peek()# contains at least
+  // the next 24 code bits.
+  void preload();
   // Consumes #n# bits.
   void shift(int n)
     { codeword<<=n; lowbits+=n; if (lowbits>=16) preload(); }
@@ -442,10 +444,7 @@ MMRDecoder::scanline()
 {
   // Check if all lines have been returned
   if (lineno >= height)
-    {
-      memset(refline, 0, width);
-      return refline;
-    }
+    return 0;
   // Loop until scanline is complete
   char a0color=0;
   int a0=0, a1, b1, b2;
@@ -453,8 +452,7 @@ MMRDecoder::scanline()
   while (a0 < width)
     {
       // Compute b1, b2 
-      // -- (I can't understand this - Leon)
-      // -- Optimization idea: Make #refline# an array of run lengths.
+      // (Optimization idea: Make #refline# an array of run lengths.)
       for (b1=a0; b1<width; b1++)
 	if (refline[b1] == a0color)
 	  ignore = false;
@@ -526,19 +524,30 @@ MMRDecoder::scanline()
             refline[a0++] = a0color;
           a0color = !a0color;
           break;
-          /* Uncommon codes */
+          /* Uncommon modes */
         default: 
           {
-            // UNCOMPRESSED ``0000001111'' (cf TIFF 6.0) 
-            if ((src->peek() & 0xffc00000) == 0x03c00000)
+            src->preload();
+            unsigned int m = src->peek();
+            // -- Could be EOFB ``000000000001000000000001''
+            //    TIFF6 says remaining lines are white
+            //    What about the current line ?
+            if ((m & 0xffffff00) == 0x00100100)
               {
-                // This code is *untested* -- never seen that!
-                unsigned int m;
+                lineno = height;
+                return 0;
+              }
+            // -- Could be UNCOMPRESSED ``0000001111''
+            //    TIFF6 says people should not do this.
+            //    RFC1314 says people should do this.
+            else if ((m & 0xffc00000) == 0x03c00000)
+              {
                 src->shift(10);
-                while ((m = src->peek() & 0xfc000000))
+                while ((m = (src->peek() & 0xfc000000)))
                   {
                     if (m == 0x04000000)       // 000001
                       {
+                        src->shift(6);
                         if (a0+4 >= width)
                           throw_corrupted();
                         refline[a0++] = 0;
@@ -546,44 +555,29 @@ MMRDecoder::scanline()
                         refline[a0++] = 0;
                         refline[a0++] = 0;
                         refline[a0++] = 0;
-                        src->shift(6);
                       } 
-                    else                       // 000010...111111
+                    else                       // 000010 to 111111 
                       {
+                        src->shift(1);
                         if (a0 >= width)
                           throw_corrupted();
-                        refline[a0++] = ((src->peek() & 0x80000000)?1:0);
-                        src->shift(1);
+                        refline[a0++] = ((m & 0x80000000) ? 1 : 0);
                       }
                   }
+                // Analyze uncompressed termination code.
                 m = src->peek() & 0xff000000;  
+                src->shift(8);
                 if (m == 0x03000000)           // 00000011
                   a0color = 1;
                 else if (m == 0x02000000)      // 00000010
                   a0color = 0;
                 else
                   throw_corrupted();
-                src->shift(8);
-                // Hope that everything is ok.
+                // Cross fingers and proceed ...
                 break;
               }
-            // EOFB ``000000000001000000000001'' (cf TIFF 6.0)
-            if ((src->peek() & 0xfff00000) == 0x00100000)
-              {
-                src->shift(12);
-                if ((src->peek() & 0xfff00000) == 0x00100000)
-                  {
-                    // Terminate decoding and make sure all 
-                    // remaining pixels are white.
-                    while (a0 < width)
-                      refline[a0++] = 0;
-                    lineno = height;
-                    return refline;
-                  }
-              }
-            // UNKNOWN: This has to be a corrupted file.
+            // -- Unknown MMR code.
             throw_corrupted();
-            break;
           }
         }
     }
@@ -637,39 +631,39 @@ MMRDecoder::decode(ByteStream &inp)
       int stripeline = MIN(blocksize-1,line);
       GPArray<GBitmap> blocks(0,blocksperline-1);
       // Loop on scanlines
-      while (stripeline >= 0)
+      for(; stripeline >= 0; stripeline--,line--)
 	{
 	  // Decode one scanline
 	  const unsigned char *s = dcd.scanline();
+          if (s == 0)
+            continue;
 	  // Loop on blocks
-	  int x = 0;
-	  for (int b=0; b<blocksperline; b++)
-	    {
-	      unsigned char *bptr = 0;
-	      int firstx = x;
-	      int lastx = MIN(x+blocksize,width);
-	      for(; x<lastx; x++)
-		{
-		  if (s[x] ^ invert)
-		    {
-		      // Get pointer to line if needed
-		      if (! bptr)
-			{
-			  // Create block if needed
-			  if (! blocks[b])
-			    {
-			      int w = lastx - firstx;
-			      int h = stripeline + 1;
-			      blocks[b] = new GBitmap(h,w);
-			    }
-			  bptr = (*blocks[b])[stripeline] - firstx;
-			}
-		      bptr[x] = 1;
-		    }
-		}
-	    }
-	  stripeline--;
-	  line--;
+          int x = 0;
+          for (int b=0; b<blocksperline; b++)
+            {
+              unsigned char *bptr = 0;
+              int firstx = x;
+              int lastx = MIN(x+blocksize,width);
+              for(; x<lastx; x++)
+                {
+                  if (s[x] ^ invert)
+                    {
+                      // Get pointer to line if needed
+                      if (! bptr)
+                        {
+                          // Create block if needed
+                          if (! blocks[b])
+                            {
+                              int w = lastx - firstx;
+                              int h = stripeline + 1;
+                              blocks[b] = new GBitmap(h,w);
+                            }
+                          bptr = (*blocks[b])[stripeline] - firstx;
+                        }
+                      bptr[x] = 1;
+                    }
+                }
+            }
 	}
       // Insert blocks into JB2Image
       for (int b=0; b<blocksperline; b++)
