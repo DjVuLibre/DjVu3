@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: Arrays.h,v 1.4 1999-06-15 21:25:27 eaf Exp $
+//C- $Id: Arrays.h,v 1.5 1999-08-08 23:17:19 leonb Exp $
 
 
 #ifndef _ARRAYS_H_
@@ -19,6 +19,8 @@
 #include <string.h>
 #include <new.h>
 #include "GException.h"
+#include "GSmartPointer.h"
+
 
 #if defined(EXTERNAL_TEMPLATES) && defined(__GNUC__)
 #pragma interface
@@ -70,7 +72,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@research.att.com> -- Copy-on-demand implementation.
     @version 
-    #$Id: Arrays.h,v 1.4 1999-06-15 21:25:27 eaf Exp $# */
+    #$Id: Arrays.h,v 1.5 1999-08-08 23:17:19 leonb Exp $# */
 //@{
 
 // Auxiliary classes: Will be used in place of GPBase and GPEnabled objects
@@ -419,6 +421,7 @@ public:
        subscript range, you must stop using the pointers returned by prior
        invocation of this conversion operator. */
    operator TYPE* ();
+   operator const TYPE* () { return (TYPE*)(*this); } ;
    /** Returns a pointer for reading (but not modifying) the array elements.
        This pointer can be used to access the array elements with the same
        subscripts and the usual bracket syntax.  This pointer remains valid as
@@ -803,6 +806,96 @@ DArray<TYPE>::DArray(int lo, int hi)
    assign(new ArrayRep(sizeof(TYPE), destroy, init1,
 		       init2, copy, insert, lo, hi));
 }
+
+
+/** Dynamic array.
+
+    The only thing we have to say here is that #DPArray<TYPE># is the same
+    as #DArray<GP<TYPE>>#. Use #DPArray# if you have many arrays of \Ref{GP}
+    pointers in your program. This will reduce its size.
+  */
+
+template <class TYPE>
+class DPArray : public DArray<GPBase> {
+public:
+  // -- CONSTRUCTORS
+  DPArray();
+  DPArray(int hibound);
+  DPArray(int lobound, int hibound);
+  DPArray(const DPArray<TYPE> &gc);
+  // -- DESTRUCTOR
+  virtual ~DPArray();
+  // -- ACCESS
+  GP<TYPE>& operator[](int n);
+  const GP<TYPE>& operator[](int n) const;
+  // -- CONVERSION
+  operator GP<TYPE>* ();
+  operator const GP<TYPE>* () const;
+  // -- ALTERATION
+  void ins(int n, const GP<TYPE> &val, unsigned int howmany=1);
+  DPArray<TYPE>& operator= (const DPArray &ga);
+};
+
+template<class TYPE>
+DPArray<TYPE>::DPArray() {}
+
+template<class TYPE>
+DPArray<TYPE>::DPArray(int hibound) :
+      DArray<GPBase>(hibound) {}
+
+template<class TYPE>
+DPArray<TYPE>::DPArray(int lobound, int hibound) :
+      DArray<GPBase>(lobound, hibound) {}
+
+template<class TYPE>
+DPArray<TYPE>::DPArray(const DPArray<TYPE> &gc) :
+      DArray<GPBase>(gc) {}
+
+template<class TYPE>
+DPArray<TYPE>::~DPArray() {}
+
+template<class TYPE>
+inline GP<TYPE> &
+DPArray<TYPE>::operator[](int n)
+{
+   return (GP<TYPE> &) DArray<GPBase>::operator[](n);
+}
+
+template<class TYPE>
+inline const GP<TYPE> &
+DPArray<TYPE>::operator[](int n) const
+{
+   return (const GP<TYPE> &) DArray<GPBase>::operator[](n);
+}
+
+template<class TYPE>
+inline DPArray<TYPE>::operator GP<TYPE>* ()
+{
+   return (GP<TYPE> *) DArray<GPBase>::operator GPBase*();
+}
+
+template<class TYPE>
+inline DPArray<TYPE>::operator const GP<TYPE>* () const
+{
+   return (const GP<TYPE> *) DArray<GPBase>::operator const GPBase*();
+}
+
+template<class TYPE>
+inline void
+DPArray<TYPE>::ins(int n, const GP<TYPE> & val, unsigned int howmany)
+{
+   DArray<GPBase>::ins(n, val, howmany);
+}
+
+template<class TYPE>
+inline DPArray<TYPE> &
+DPArray<TYPE>::operator= (const DPArray &ga)
+{
+   DArray<GPBase>::operator=(ga);
+   return *this;
+}
+
+
 
 // ------------ THE END
 

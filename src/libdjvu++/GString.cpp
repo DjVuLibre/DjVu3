@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GString.cpp,v 1.8 1999-08-02 20:23:36 leonb Exp $
+//C- $Id: GString.cpp,v 1.9 1999-08-08 23:17:19 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -25,7 +25,7 @@
 
 #include "GString.h"
 
-// File "$Id: GString.cpp,v 1.8 1999-08-02 20:23:36 leonb Exp $"
+// File "$Id: GString.cpp,v 1.9 1999-08-08 23:17:19 leonb Exp $"
 // - Author: Leon Bottou, 04/1997
 
 static GStringRep nullstring;
@@ -305,7 +305,7 @@ hash(const GString &str)
   unsigned int x = 0;
   const char *s = str->data;
   while (*s) 
-    x = (x<<6) ^ (unsigned char)(*s++);
+    x = x ^ (x<<6) ^ (unsigned char)(*s++);
   return x;
 }
 

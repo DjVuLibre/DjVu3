@@ -9,12 +9,12 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: TestArray.cpp,v 1.7 1999-05-25 19:42:30 eaf Exp $
+//C- $Id: TestArray.cpp,v 1.8 1999-08-08 23:17:19 leonb Exp $
 
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "Arrays.h"
+#include "GContainer.h"
 #include "GString.h"
 
 
@@ -36,7 +36,7 @@ void operator delete(void *x) {
 #endif
 
 void
-PARR(DArray<int> &ga)
+PARR(GArray<int> &ga)
 {
   for(int i=ga.lbound();i<=ga.hbound();i++)
     printf("%d ", ga[i]);
@@ -46,7 +46,7 @@ PARR(DArray<int> &ga)
 void
 test_integer()
 {
-  DArray<int> ga;
+  GArray<int> ga;
 
   ga.resize(0,12);
   ga[0] = 1;
@@ -69,8 +69,10 @@ test_integer()
   PRI(ga.lbound());
   PRI(ga.hbound());
   PARR(ga);
-
-
+#if 0
+  ga.sort(-2,5);
+  PARR(ga);
+#endif
 }
 
 
@@ -79,7 +81,7 @@ test_integer()
 void
 test_string()
 {
-  DArray<GString> ga(0,9);
+  GArray<GString> ga(0,9);
   // Test of allocation
   ga[0] = "zero";
   ga[2] = "two";
@@ -114,12 +116,16 @@ test_string()
   ga.ins(1,"hello",2);
   for(i=ga.lbound();i<=ga.hbound();i++) PRS(ga[i]);
   // Test of copy
-  DArray<GString> gb (ga);
+  GArray<GString> gb (ga);
   PRI(gb.size());
   PRI(gb.lbound());
   PRI(gb.hbound());
   for(i=gb.lbound();i<=gb.hbound();i++) PRS(gb[i]);
-
+#if 0
+  gb.sort();
+  printf("sorted\n");
+  for(i=gb.lbound();i<=gb.hbound();i++) PRS(gb[i]);
+#endif
 }
 
 
