@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: c44.cpp,v 1.28 2001-07-24 17:52:03 bcr Exp $
+// $Id: c44.cpp,v 1.29 2001-08-24 20:04:52 docbill Exp $
 // $Name:  $
 
 
@@ -184,7 +184,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: c44.cpp,v 1.28 2001-07-24 17:52:03 bcr Exp $# */
+    #$Id: c44.cpp,v 1.29 2001-08-24 20:04:52 docbill Exp $# */
 //@{
 //@}
 
@@ -675,16 +675,7 @@ main(int argc, char **argv)
       ibs.seek(0);
       GP<IW44Image> iw;
       // Check color vs gray
-      if (prefix[0]=='P' && (prefix[1]=='3' || prefix[1]=='6'))
-        {
-          // color file
-          GP<GPixmap> gipm=GPixmap::create(ibs);
-          GPixmap &ipm=*gipm;
-          w = ipm.columns();
-          h = ipm.rows();
-          iw = IW44Image::create_encode(ipm, getmask(w,h), arg_crcbmode);
-        }
-      else if (prefix[0]=='P' && (prefix[1]=='2' || prefix[1]=='5'))
+      if (prefix[0]=='P' && (prefix[1]=='2' || prefix[1]=='5'))
         {
           // gray file
           GP<GBitmap> gibm=GBitmap::create(ibs);
@@ -714,7 +705,13 @@ main(int argc, char **argv)
         }
       else
         {
-          G_THROW( ERR_MSG("c44.unrecognized") );
+          // color file
+          GP<GPixmap> gipm=GPixmap::create(ibs);
+          GPixmap &ipm=*gipm;
+          w = ipm.columns();
+          h = ipm.rows();
+          iw = IW44Image::create_encode(ipm, getmask(w,h), arg_crcbmode);
+//          G_THROW( ERR_MSG("c44.unrecognized") );
         }
       // Call destructor on input file
       gibs=0;

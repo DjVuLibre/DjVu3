@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GPixmap.cpp,v 1.35 2001-07-24 17:52:04 bcr Exp $
+// $Id: GPixmap.cpp,v 1.36 2001-08-24 20:04:52 docbill Exp $
 // $Name:  $
 
 // -- Implements class PIXMAP
@@ -50,6 +50,7 @@
 #include "GBitmap.h"
 #include "GThreads.h"
 #include "Arrays.h"
+#include "JPEGDecoder.h"
 #include <stdlib.h>
 #include <math.h>
 #ifndef UNDER_CE
@@ -432,11 +433,22 @@ GPixmap::init(ByteStream &bs)
   magic[0] = magic[1] = 0;
   bs.readall((void*)magic, sizeof(magic));
   if (magic[0]=='P' && magic[1]=='3')
+  {
     raw = 0;
-  else if (magic[0]=='P' && magic[1]=='6')
+  }else if (magic[0]=='P' && magic[1]=='6')
+  {
     raw = 1;
-  else
+  }else
+  {
+#ifdef NEED_JPEG_DECODER
+    bs.seek(0L);
+    JPEGDecoder::decode(bs,*this);
+    return;
+#else // NEED_JPEG_DECODER
+  
     G_THROW( ERR_MSG("GPixmap.unk_PPM") );
+#endif // NEED_JPEG_DECODER
+  }
   // Read image size
   char lookahead = '\n';
   int acolumns = read_integer(lookahead, bs);

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: JPEGDecoder.cpp,v 1.21 2001-07-24 17:52:04 bcr Exp $
+// $Id: JPEGDecoder.cpp,v 1.22 2001-08-24 20:04:52 docbill Exp $
 // $Name:  $
 
 #include "JPEGDecoder.h"
@@ -81,6 +81,21 @@ djvu_error_exit (j_common_ptr cinfo)
 GP<GPixmap>
 JPEGDecoder::decode(ByteStream & bs )
 {
+  GP<GPixmap> retval=GPixmap::create();
+  G_TRY
+  {
+    decode(bs,*retval);
+  } G_CATCH_ALL
+  {
+    retval=0;
+  }
+  G_ENDCATCH;
+  return retval;
+}
+
+void
+JPEGDecoder::decode(ByteStream & bs,GPixmap &pix)
+{
   struct jpeg_decompress_struct cinfo;
 
   /* We use our private extension JPEG error handler. */
@@ -99,7 +114,7 @@ JPEGDecoder::decode(ByteStream & bs )
   {
 
     jpeg_destroy_decompress(&cinfo);
-    return 0;
+    G_THROW( ERR_MSG("GPixmap.unk_PPM") );
   }
 
   jpeg_create_decompress(&cinfo);
@@ -157,7 +172,7 @@ JPEGDecoder::decode(ByteStream & bs )
   
   outputBlock.seek(0,SEEK_SET);
 
-  return GPixmap::create(outputBlock);
+  pix.init(outputBlock);
 }         
 
 /*** From here onwards code is to make ByteStream as the data

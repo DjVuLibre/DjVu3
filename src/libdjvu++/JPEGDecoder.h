@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: JPEGDecoder.h,v 1.16 2001-07-26 19:34:09 bcr Exp $
+// $Id: JPEGDecoder.h,v 1.17 2001-08-24 20:04:52 docbill Exp $
 // $Name:  $
 
 #ifndef _JPEGDECODER_H_
@@ -65,7 +65,7 @@ extern "C" {
     @memo
     Decoding interface to the IJG JPEG library.
     @version
-    #$Id: JPEGDecoder.h,v 1.16 2001-07-26 19:34:09 bcr Exp $#
+    #$Id: JPEGDecoder.h,v 1.17 2001-08-24 20:04:52 docbill Exp $#
     @author
     Parag Deshmukh <parag@sanskrit.lz.att.com> 
 */
@@ -81,6 +81,7 @@ public:
 
   /** Decodes the JPEG formated ByteStream */ 
   static GP<GPixmap> decode(ByteStream & bs);
+  static void decode(ByteStream & bs,GPixmap &pix);
 #ifdef LIBJPEGNAME
   static void *jpeg_lookup(const GUTF8String &name);
   static jpeg_error_mgr *jpeg_std_error(jpeg_error_mgr *x);
