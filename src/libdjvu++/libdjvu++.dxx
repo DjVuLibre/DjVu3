@@ -1,8 +1,7 @@
 // -*- C++ -*-
 /** @name DjVu Reference Library
-
-    Disclaimer: Spelling has not been checked yet!
-    
+    @version
+    990221
     @author
     Leon Bottou, 02/1999
 */
@@ -36,17 +35,17 @@
 
     There are in fact three kinds of DjVu files:
     \begin{description}
-    \item[IW44 Files] 
+    \item[IW44 Files] ---
       IW44 Files are best used to compress photographic images in colors or in
       shades of gray.  The IW44 decoder is able to quickly perform progressive
       rendering of any image segment using only a small amount of memory.
-    \item[Bilevel DjVu Files] 
+    \item[Bilevel DjVu Files] ---
        Bilevel DjVu Files are used to compress black and white images
-       representing text and simple drawings.  The data compression
+       representing text and simple drawings.  The JB2 data compression
        model uses a the "soft pattern matching" technique which essentially
        consists of encoding each character by describing how it differs from a
-       well chosen character which has already been encoded.
-   \item[Color DjVu Files] 
+       well chosen already encoded character.
+   \item[Color DjVu Files] ---
        Color DjVu Files are an extremely efficient way to compress high
        resolution color document images containing both pictures and text,
        such as a page of a magazine.  Color DjVu Files represent the document
@@ -55,19 +54,20 @@
        layer} is used for encoding the text and the drawings.
    \end{description}
 
-   {\bf DjVu Reference Library} --- The DjVu Reference Library is a source
-   code implementation of several components of the DjVu technology.  It is
-   released by AT&T Laboratories \URL{http://www.att.com/attlabs} under the
-   terms of the \Ref{AT&T Source Code License}.
+   {\bf DjVu Reference Library} --- The DjVu Reference Library implements the
+   components of the DjVu technology that are essential for the definition of
+   the file formats.  AT&T Laboratories \URL{http://www.att.com/attlabs}
+   releases the full source code of the DjVu Reference Library under the terms
+   of the \Ref{AT&T Source Code License}.
    
    To understand the meaning of this release, it is important to realize that
    the separation of AT&T, NCR and Lucent Technologies has significantly
-   changed the business equation.  We are not in the business of selling
+   changed the business equation.  AT&T is not in the business of selling
    software.  The DjVu technology is interesting for AT&T because it may give
-   us the means to propose enhanced services to our customers.  This can only
+   the means to propose enhanced services to its customers.  This can only
    happen if we ensure that the DjVu technology is widely disseminated.
 
-   This release serves three purposes:
+   This source code release serves three purposes:
    \begin{itemize}
    \item It demonstrates our intention to create a lasting technology.
       Regardless of AT&T involvement, developers around the world now have a
@@ -84,35 +84,45 @@
    License makes sure that any work containing or derived from the DjVu
    Reference Library will be available to anyone in source code form.  This is
    to ensure the greatest dissemination of AT&T's technology.  We know however
-   that these terms will not fit everyone's needs.  Our intellectual property
-   department will be glad to setup other agreements on the basis of fair
-   revenue sharing.
+   that these terms will not fit everyone's needs.  You may contact our
+   intellectual property department to setup other agreements on the basis of
+   fair revenue sharing.
 
    The DjVu Reference Library currently contains:
    \begin{itemize}
-   \item The {\em DjVu Decoder}
-   \item The {\em DjVu Rendering Engine},
-   \item The {\em IW44 Progressive Wavelet Encoder},
-   \item The {\em Bilevel DjVu Encoder Back-end} which should be
-         sufficient for creating DjVu files from electronically 
-         created documents.
+   \item The {\em DjVu Decoder}, which decodes IW44 and DjVu files into 
+         a compact internal data structure (see \Ref{DjVuImage}) which
+         can be used to render the image.
+   \item The {\em DjVu Rendering Engine}, which uses this data structure
+         and produces the pixel representation of any part of the image 
+         at any resolution.
+   \item The {\em IW44 Wavelet Encoder}, which processes color or gray level
+         images and create IW44 Files.
+   \item The {\em Bilevel DjVu Encoder Back-end}, which processes structured
+         bilevel images (see \Ref{JB2Image}) and creates a file using the JB2
+         data compression model.
    \end{itemize}
    We also intend to release the source code for:
    \begin{itemize}
-   \item A {\em Viewer for DjVu documents}, 
-   \item A {\em Simple Encoder for Bilevel DjVu documents}.
+   \item A {\em Viewer for DjVu documents}, which uses the DjVu Decoder and
+         the DjVu Rendering Engine in order to provide progressive decoding,
+         on-the-fly rendering, etc.
+   \item A {\em Simple Encoder for Bilevel DjVu Files}, which processes a
+         bitmap image, creates a structured bilevel image, calls the Bilevel
+         DjVu Encoder Back-End, and packages the result as a Bilevel DjVu
+         File.  
    \end{itemize}
 
    The DjVu Reference Library however {\em does not contain} certain parts of
-   the DjVu technology such as {\em the lossy black-and-white encoder} or the
-   {\em the background-foreground separation code}.  There are in fact several
-   reasons for not releasing these components today.  These missing parts have
-   no impact on the file format: a different implementation would only make
-   the encoder more or less efficient.  The current source code is so
-   intricate that it would not help anyone without a very significant
-   documentation effort.  Furthermore, releasing this code today would
-   negatively affect the business of our business partners and eventually
-   reduce the dissemination of the DjVu technology.  */
+   the DjVu technology such as the {\em Lossy Bilevel Encoder} or the {\em
+   Background-Foreground Separation}.  These missing parts have no impact on
+   the file format. Different implementations are possible and will only make
+   the encoder more or less efficient.  There are in fact several reasons for
+   not releasing these components now.  The current source code is so
+   intricate that it would not help anyone without a huge documentation
+   effort.  Furthermore, releasing this code today would negatively affect the
+   business of our business partners and eventually reduce the dissemination
+   of the DjVu technology.  */
    
 
 //----------------------------------------
@@ -131,14 +141,14 @@
     DjVu files are organized according to the EA IFF85 layout.  Pointers to
     the appropriate reference document are provided in section
     \Ref{IFFByteStream.h}.  IFF files are logically composed of a sequence of
-    data {\em chunks}.  Each chunk is identified by a four character {\em
-    chunk identifier} describing the type of the data stored in the chunk.  A
-    few special chunk identifiers, for instance #"FORM"#, are reserved for
-    {\em composite chunks} which themselves contain a sequence of data chunks.
-    This conventions effectively provides IFF files with a convenient
-    hierarchical structure.  Composite chunks are further identified by a {\em
-    secondary chunk identifier}.  For convenience, both identifiers are
-    gathered as an extended chunk identifier such as #"FORM:DJVU"#.
+    data {\em chunks}.  Each chunk comes with a four character {\em chunk
+    identifier} describing the type of the data stored in the chunk.  A few
+    special chunk identifiers, for instance #"FORM"#, are reserved for so
+    called {\em composite chunks} containing a sequence of data chunks.  This
+    convention effectively provides IFF files with a hierarchical structure.
+    Composite chunks are further identified by a {\em secondary chunk
+    identifier}.  For convenience, both identifiers are gathered as an
+    extended chunk identifier such as #"FORM:DJVU"#.
 
     The four octets #"AT&T"# may be inserted in front of the IFF compliant
     byte stream.  The decoder simply ignores these four octets when they are
@@ -147,12 +157,10 @@
     incorrectly recognize any IFF file as a Microsoft AIFF sound file.  The
     presence of these four octets prevents this incorrect identification.
 
-    The DjVu specification mandates that the decoder must silently skip chunks
-    when the identifier is not recognized. This mechanism provides a backward
-    compatible way to extend the initial format by allocating new chunk
-    identifiers.  Possible extensions include new encoding schemes for the
-    image components, of additional data required by particular applications.  
-*/
+    The DjVu specification mandates that the decoder should silently skip
+    chunks whose identifier is not recognized.  This mechanism provides a
+    backward compatible way to extend the initial format by allocating new
+    chunk identifiers.  */
 //@{
 
 /** @name IW44 Files
@@ -166,13 +174,12 @@
       only a small amount of memory.
 
       Gray Level IW44 Files are composed of a single #"FORM:BM44"# composite
-      chunk.  This composite chunk itself contains one or more #"BM44" chunks
+      chunk.  This composite chunk itself contains one or more #"BM44"# chunks
       containing successive refinements of the gray level image (see
       \Ref{IWBitmap}).  Color IW44 Files are composed of a single
       #"FORM:PM44"# composite chunk.  This composite chunk itself contains one
-      or more #"PM44" chunks containing successive refinements of the color
-      image (see \Ref{IWPixmap}).  
-*/
+      or more #"PM44"# chunks containing successive refinements of the color
+      image (see \Ref{IWPixmap}).  */
 
 /** @name Bilevel DjVu Files
 
@@ -181,15 +188,13 @@
       for encoding heavily dithered bilevel images.  The data compression
       model uses a the "soft pattern matching" technique which essentially
       consists of encoding each character by describing how it differs from a
-      well chosen character which has already been encoded (see
-      \Ref{JB2Image.h}).
+      well chosen already encoded character (see \Ref{JB2Image.h}).
 
       Bilevel DjVu Files are composed of a single #"FORM:DJVU"# composite
       chunk.  This composite chunk always begins with one #"INFO"# chunk
       describing the image size and resolution (see \Ref{DjVuInfo}).  An
       additional #"Sjbz"# chunk contains the bilevel data encoded with soft
-      pattern matching (see \Ref{JB2Image}).  
-*/
+      pattern matching (see \Ref{JB2Image}).  */
 
 /** @name Color DjVu Files
 
@@ -215,27 +220,26 @@
       IW44 data (see \Ref{IWPixmap} or \Ref{IWBitmap}).  Color DjVu images are
       rendered by painting the foreground color image on top of the background
       color image using the foreground mask as a stencil.  The size of the
-      foreground color image is computed by rounding up the ratio between the
-      size of the mask and an integer sub-sampling factor ranging from 1 to 12.
-      Most DjVu image use a foreground color sub-sampling factor equal to 12.
+      foreground color image is computed by rounding up the quotient of the
+      mask size by an integer sub-sampling factor ranging from 1 to 12.  Most
+      DjVu image use a foreground color sub-sampling factor equal to 12.
       Smaller sub-sampling factors hardly produce better images.
 
       The background layer is encoded as a color image, the {\em background
       color image}, encoded by an arbitrary number of #"BG44"# chunks
       containing successive IW44 refinements (see \Ref{IWPixmap} or
       \Ref{IWBitmap}).  The size of this image is computed by rounding up the
-      ratio between the size of the mask and an integer sub-sampling factor
-      ranging from 1 to 12.  Most DjVu image use a background sub-sampling
-      factor equal to 3.  Smaller sub-sampling factors are adequate for images
-      with a very rich paper texture.  Larger sub-sampling factors are adequate
-      for images containing no pictures.
+      quotient of the mask size by an integer sub-sampling factor ranging from
+      1 to 12.  Most DjVu image use a background sub-sampling factor equal to
+      3.  Smaller sub-sampling factors are adequate for images with a very
+      rich paper texture.  Larger sub-sampling factors are adequate for images
+      containing no pictures.
 
       There are no ordering or interleaving constraints on these chunks except
       that (a) the #"INFO"# chunk must appear first, and (b) the successive
       #"BG44"# refinements must appear with their natural order.  The chunk
       order simply affects the progressive rendering of DjVu images on a web
-      browser.  
-*/
+      browser.  */
 
 
 /** @name Experimental Features.
@@ -284,13 +288,19 @@
     directory (chunk identifier #"DIR0"#) and all the archived files with
     their natural IFF structure.
 
+    {\bf Per-Character Color} --- Color DjVu files represent the colors of the
+    text and drawings using a low resolution color image named the foreground
+    color image.  We are considering an alternative representation using one
+    color for each character (or more specifically, for each mask component).
+    This alternative representation would be more appropriate for encoding
+    electronically produced documents.
+
     {\bf Semantic Markups} --- DjVu files already contain a lot of information
     about the structure of the page.  We could create a real {\em multi-valued
     document} by adding a #"DXML"# chunk containing the textual information in
     the page with adequate semantic markups.  The association between the
     textual information and the image would be described by a #"DX2I"# chunk.
-    That would finally allow us to do Copy/Paste with DjVu documents. 
- */
+    That would finally allow us to do Copy/Paste with DjVu documents.  */
 //@}
 
 
@@ -304,8 +314,8 @@
 
 
     {\bf Directories} --- The structure of the distribution is essentially
-    flat.  Everything important, including the source code for the library and
-    utilities is directly placed into directory #"libdjvu++"#.  The few
+    flat.  All the source code files, for both the library and the utility
+    programs, are found in the main directory #"libdjvu++"#.  A few
     subdirectories contain accessory material.  Directory #"@Doc"# contains
     the HTML documentation generated from the source files.  Directory
     #"@Samples"# contains sample DjVu files for testing purposes.  Directory
@@ -333,26 +343,21 @@
     \URL{http://rufus.w3.org/linux/RPM}.
 
     {\bf Building your compiler (advanced)} --- You should really skip this
-    section if you can avoid reading it.  Keep reading only if (a) you cannot
-    find a suitable binary distribution of #egcs# for your workstation, or (b)
-    you want to experiment with the #COTHREADS# multi-threading implementation
-    (see \Ref{GThreads.h}).
+    section if you can avoid reading it.  You should only read it if (a) you
+    cannot find a suitable binary distribution of #egcs#, or (b) you want to
+    experiment with the multi-threading features of the library.
 
-    You will first need the GNU make tool.  If you do not have GNU make, you
-    can find the source code at \URL{ftp://gatekeeper.dec.com/pub/GNU/make} or
-    at \URL{ftp://prep.ai.mit.edu/pub/gnu}.  Download the most recent release,
-    unpack it, read the instructions, compile and install.
+    Building the #egcs# compilers requires GNU Make.  The Linux operating
+    systems uses GNU Make by default.  Many Unix systems provide GNU Make
+    under the name #gmake#.  You must otherwise download the source code at
+    \URL{ftp://gatekeeper.dec.com/pub/GNU/make} or
+    \URL{ftp://prep.ai.mit.edu/pub/gnu}, unpack it, read the instructions,
+    compile and install.
 
-    You must then obtain the source distribution of the latest release of
-    #egcs# at \URL{http://egcs.cygnus.com}.  After unpacking this distribution
-    you should consider applying our small patch for file
-    #"egcs/gcc/libgcc2.c"#.  This is required if you want to use the
-    #COTHREADS# multi-threading implementation.  This patch has been tested
-    with #egcs-1.1# and #egcs-1.1.1#.  We hope that the EGCS people will
-    consider it for the future releases.  Use the following command to apply
-    the patch. If anything suspicious happens during the execution of #patch#,
-    you should probably go back to the original version.  Program #patch#
-    always creates a copy of the original file in #libgcc2.c.orig#.
+    You must then download the source distribution of the latest release of
+    #egcs# from \URL{http://egcs.cygnus.com}.  We provide a small patch for
+    #"egcs/gcc/libgcc2.c"# which is required by our multi-threading code.
+    You can apply the patch using command #patch#. 
     \begin{verbatim}
       % cd egcs/gcc
       % patch < $HOME/libdjvu++/@Tools/libgcc2.c.diff
@@ -361,10 +366,15 @@
       Hunk #2 succeeded at 3118.
       done
     \end{verbatim}
+    This patch has been tested with #egcs-1.1# and #egcs-1.1.1#.  We hope that
+    the EGCS people will either include the patch in their future releases, or
+    provide a similar capability.  If anything suspicious happens during the
+    patching process, we suggest that you restore the original version of
+    #"libgcc2.c"# which is automatically saved as #"libgcc2.c.orig"#.
 
-    You must then configure and compile #egcs#.  Everything is pretty well 
-    described at \URL{http://egcs.cygnus.com}.  I could use for instance
-    the following commands on my SGI workstation running Irix-6.4:
+    You must then configure and compile #egcs#.  Everything is pretty well
+    described at \URL{http://egcs.cygnus.com}.  I could use for instance the
+    following commands on my SGI workstation running Irix-6.4:
     \begin{verbatim}
       % cd egcs
       % configure --prefix=$HOME/egcs  mips-sgi-irix-5.3
@@ -372,10 +382,8 @@
       % gnu-make install
     \end{verbatim}
     You are reading correctly: I am pretending that my workstation has
-    Irix-5.3 because I want to create backward compatible binaries.  I also
-    use my own version of the assembler and my own version of the debugger.
-    You do not really need to do this right now.  Welcome to the wonderful
-    world of compilers.
+    Irix-5.3 because I want to create backward compatible binaries.  Welcome
+    to the wonderful world of compilers.
 
     {\bf Compiling the DjVu Reference Library} --- Compiling the DjVu
     Reference Library is a two step process.  You must first invoke the script
@@ -384,10 +392,22 @@
     \begin{verbatim}
        % configure --prefix=$HOME/djvu
     \end{verbatim}
-    The options supported by the configuration script are displayed by typing
-    #configure --help#.  The option #-prefix# indicates where the binary files
-    will be installed.  You can also specify which compiler to use by setting 
-    the environment variable #CXX# before invoking #configure#.
+
+    You can specify a particular compiler by setting environment variable
+    #CXX# before invoking the configuration script. This script also 
+    supports the following options:
+    \begin{description}
+    \item[--prefix=PREFIXDIR] indicates where the binary files will be installed.
+    \item[--with-debug] enables the debugging options of the compiler.
+    \item[--with-cxxflag=FLAG] passes a particular option to the compiler.
+    \item[--without-threads] disables multi-threading (the default).
+    \item[--with-threads=(cothreads|posix|dce)] enables multithreading and
+         selects a multithreading implementation (see \Ref{GThreads.h}). You
+         must make sure that your C++ compiler is compatible with the chosen
+         thread implementation.  The safest option consists of using the
+         patched version of #egcs# (see above) and the #cothreads#
+         implementation.
+    \end{description}
 
     You are now ready to compile and install everything by typing:
     \begin{verbatim}
@@ -399,9 +419,9 @@
     generated a collection of small executables documented in section
     \Ref{Utility Programs}.  This is not very exciting.  It is now time to
     remember that the DjVu Reference Library is a source code library.  Almost
-    everything you can use safely is documented in section \Ref{Library
-    Reference}.  You may want however to start with sections \Ref{Decoding
-    DjVu content} and \Ref{Creating DjVu content}.  */
+    everything you can use safely is documented in section 
+    \Ref{Library Reference}.  You may want however to start with 
+    sections \Ref{Decoding DjVu content} and \Ref{Creating DjVu content}.  */
 
 
 /** @name Compiling the Library (Systems other than Unix)       
