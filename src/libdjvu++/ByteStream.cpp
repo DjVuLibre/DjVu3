@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.cpp,v 1.46 2001-02-10 01:16:57 bcr Exp $
+// $Id: ByteStream.cpp,v 1.47 2001-02-12 21:23:35 bcr Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 04/1997
@@ -54,12 +54,173 @@
 #include <errno.h>
 #endif
 
+/** ByteStream interface for stdio files. 
+    The virtual member functions #read#, #write#, #tell# and #seek# are mapped
+    to the well known stdio functions #fread#, #fwrite#, #ftell# and #fseek#.
+    @see Unix man page fopen(3), fread(3), fwrite(3), ftell(3), fseek(3) */
+
+class ByteStream::Stdio : public ByteStream {
+public:
+  Stdio(void);
+  /** Constructs a ByteStream for accessing the file named #filename#.
+      Arguments #filename# and #mode# are similar to the arguments of the well
+      known stdio function #fopen#. In addition a filename of #-# will be
+      interpreted as the standard output or the standard input according to
+      #mode#.  This constructor will open a stdio file and construct a
+      ByteStream object accessing this file. Destroying the ByteStream object
+      will flush and close the associated stdio file.  Exception
+      \Ref{GException} is thrown with a plain text error message if the stdio
+      file cannot be opened. */
+  void init(const char filename[], const char * const mode);
+  /** Constructs a ByteStream for accessing the stdio file #f#.
+      Argument #mode# indicates the type of the stdio file, as in the
+      well known stdio function #fopen#.  Destroying the ByteStream
+      object will not close the stdio file #f# unless closeme is true. */
+  void init(FILE * const f, const char * const mode="rb", const bool closeme=false);
+  // Virtual functions
+  ~Stdio();
+  virtual size_t read(void *buffer, size_t size);
+  virtual size_t write(const void *buffer, size_t size);
+  virtual void flush(void);
+  virtual int seek(long offset, int whence = SEEK_SET, bool nothrow=false);
+  virtual long tell() const;
+private:
+  // Cancel C++ default stuff
+  Stdio(const Stdio &);
+  Stdio & operator=(const Stdio &);
+  void init(const char mode[]);
+private:
+  // Implementation
+  bool can_read;
+  bool can_write;
+  bool must_close;
+protected:
+  FILE *fp;
+  long pos;
+};
+
+inline void
+ByteStream::Stdio::init(FILE * const f,const char mode[],const bool closeme)
+{
+  fp=f;
+  must_close=closeme;
+  init(mode);
+}
+
+
+/** ByteStream interface managing a memory buffer.  
+    Class #ByteStream::Memory# manages a dynamically resizable buffer from
+    which data can be read or written.  The buffer itself is organized as an
+    array of blocks of 4096 bytes.  */
+
+class ByteStream::Memory : public ByteStream
+{
+public:
+  /** Constructs an empty ByteStream::Memory.
+      The buffer is initially empty. You must first use function #write#
+      to store data into the buffer, use function #seek# to rewind the
+      current position, and function #read# to read the data back. */
+  Memory();
+  /** Constructs a Memory by copying initial data.  The
+      Memory buffer is initialized with #size# bytes copied from the
+      memory area pointed to by #buffer#. */
+  void init(const void * const buffer, const size_t size);
+  // Virtual functions
+  ~Memory();
+  virtual size_t read(void *buffer, size_t size);
+  virtual size_t write(const void *buffer, size_t size);
+  virtual int    seek(long offset, int whence=SEEK_SET, bool nothrow=false);
+  virtual long   tell(void) const;
+  /** Erases everything in the Memory.
+      The current location is reset to zero. */
+  void empty();
+  /** Returns the total number of bytes contained in the buffer.  Valid
+      offsets for function #seek# range from 0 to the value returned by this
+      function. */
+  virtual int size(void) const;
+  /** Returns a reference to the byte at offset #n#. This reference can be
+      used to read (as in #mbs[n]#) or modify (as in #mbs[n]=c#) the contents
+      of the buffer. */
+  char &operator[] (int n);
+  /** Copies all internal data into \Ref{TArray} and returns it */
+private:
+  // Cancel C++ default stuff
+  Memory(const Memory &);
+  Memory & operator=(const Memory &);
+  // Current position
+  int where;
+protected:
+  /** Reads data from a random position. This function reads at most #sz#
+      bytes at position #pos# into #buffer# and returns the actual number of
+      bytes read.  The current position is unchanged. */
+  virtual size_t readat(void *buffer, size_t sz, int pos);
+  /** Number of bytes in internal buffer. */
+  int bsize;
+  /** Number of 4096 bytes blocks. */
+  int nblocks;
+  /** Pointers (possibly null) to 4096 bytes blocks. */
+  char **blocks;
+  /** Pointers (possibly null) to 4096 bytes blocks. */
+  GPBuffer<char *> gblocks;
+};
+
+
+
+inline int
+ByteStream::Memory::size(void) const
+{
+  return bsize;
+}
+
+inline char &
+ByteStream::Memory::operator[] (int n)
+{
+  return blocks[n>>12][n&0xfff];
+}
+
+
+
+/** Read-only ByteStream interface to a memory area.  
+    Class #ByteStream::Static# implements a read-only ByteStream interface for a
+    memory area specified by the user at construction time. Calls to function
+    #read# directly access this memory area.  The user must therefore make
+    sure that its content remain valid long enough.  */
+
+class ByteStream::Static : public ByteStream
+{
+public:
+  /** Creates a Static object for allocating the memory area of
+      length #sz# starting at address #buffer#. */
+  Static(const void * const buffer, const size_t sz);
+  // Virtual functions
+  virtual size_t read(void *buffer, size_t sz);
+  virtual size_t write(const void *buffer, size_t sz);
+  virtual int    seek(long offset, int whence = SEEK_SET, bool nothrow=false);
+  virtual long tell(void) const;
+  /** Returns the total number of bytes contained in the buffer, file, etc.
+      Valid offsets for function #seek# range from 0 to the value returned
+      by this function. */
+  virtual int size(void) const;
+protected:
+  const char *data;
+  int bsize;
+private:
+  int where;
+};
+
+
+inline int
+ByteStream::Static::size(void) const
+{
+  return bsize;
+}
+
 #ifdef UNIX
 /** Read-only ByteStream interface to a memmap area.
     Class #MemoryMapByteStream# implements a read-only ByteStream interface
     for a memory map to a file. */
 
-class MemoryMapByteStream : public StaticByteStream
+class MemoryMapByteStream : public ByteStream::Static
 {
 public:
   MemoryMapByteStream(void);
@@ -109,7 +270,7 @@ ByteStream::seek(long offset, int whence, bool nothrow)
       return 0;
     }
     default:
-      G_THROW("ByteStream.bad_arg");       //  Illegal argument in ByteStream::seek
+      G_THROW("ByteStream.bad_arg");       //  Illegal argument in seek
     }
   nwhere += offset;
   if (nwhere < ncurrent) 
@@ -150,7 +311,7 @@ ByteStream::readall(void *buffer, size_t size)
 #ifndef UNDER_CE
         G_THROW(strerror(errno));               //  (No error in the DjVuMessageFile)
 #else
-        G_THROW("ByteStream.read_error");       //  ByteStream::readall, read error.
+        G_THROW("ByteStream.read_error");       //  readall, read error.
 #endif
       if (nitems == 0)
         break;
@@ -169,7 +330,7 @@ ByteStream::writall(const void *buffer, size_t size)
     {
       size_t nitems = write(buffer, size);
       if (nitems == 0)
-        G_THROW("ByteStream.write_error");      //  Unknown error in ByteStream::write
+        G_THROW("ByteStream.write_error");      //  Unknown error in write
       total += nitems;
       size -= nitems; 
       buffer = (void*)((char*)buffer + nitems);
@@ -208,7 +369,7 @@ ByteStream::write8 (unsigned int card)
 #ifndef UNDER_CE
         G_THROW(strerror(errno));                     //  (No error in the DjVuMessageFile)
 #else
-        G_THROW("ByteStream.write\t8");               //  ByteStream::write8, write error.
+        G_THROW("ByteStream.write\t8");               //  write8, write error.
 #endif
 }
 
@@ -222,7 +383,7 @@ ByteStream::write16(unsigned int card)
 #ifndef UNDER_CE
         G_THROW(strerror(errno));                     //  (No error in the DjVuMessageFile)
 #else
-  G_THROW("ByteStream.write\t16");                    //  ByteStream::write16, write error.
+  G_THROW("ByteStream.write\t16");                    //  write16, write error.
 #endif
 }
 
@@ -237,7 +398,7 @@ ByteStream::write24(unsigned int card)
 #ifndef UNDER_CE
         G_THROW(strerror(errno));                     //  (No error in the DjVuMessageFile)
 #else
-        G_THROW("ByteStream.write\t24");              //  ByteStream::write24, write error.
+        G_THROW("ByteStream.write\t24");              //  write24, write error.
 #endif
 }
 
@@ -253,7 +414,7 @@ ByteStream::write32(unsigned int card)
 #ifndef UNDER_CE
         G_THROW(strerror(errno));                     //  (No error in the DjVuMessageFile)
 #else
-        G_THROW("ByteStream.write\t32");              //  ByteStream::write32, write error.
+        G_THROW("ByteStream.write\t32");              //  write32, write error.
 #endif
 }
 
@@ -295,32 +456,20 @@ ByteStream::read32()
 
 
 
-//// CLASS STDIOBYTESTREAM
+//// CLASS ByteStream::Stdio
 
-StdioByteStream::StdioByteStream(void)
+ByteStream::Stdio::Stdio(void)
 : can_read(false),can_write(false),must_close(true),fp(0),pos(0)
 {}
 
-StdioByteStream::StdioByteStream(FILE * const f,const char * const mode, const bool closeme)
-: can_read(false),can_write(false),must_close(closeme),fp(f),pos(0)
-{
-  init(mode);
-}
-
-StdioByteStream::StdioByteStream(const char filename[],const char * const mode)
-: can_read(false),can_write(false),must_close(true),fp(0),pos(0)
-{
-  init(filename,mode);
-}
-
-StdioByteStream::~StdioByteStream()
+ByteStream::Stdio::~Stdio()
 {
   if (fp && must_close)
     fclose(fp);
 }
 
 void
-StdioByteStream::init(const char mode[])
+ByteStream::Stdio::init(const char mode[])
 { 
   G_TRY
   {
@@ -340,7 +489,7 @@ StdioByteStream::init(const char mode[])
         case 'b':
           break;
         default:
-          G_THROW("ByteStream.bad_mode"); //  Illegal mode in StdioByteStream
+          G_THROW("ByteStream.bad_mode"); //  Illegal mode in Stdio
       }
     }
     tell();
@@ -359,7 +508,7 @@ StdioByteStream::init(const char mode[])
 }
 
 void
-StdioByteStream::init(const char filename[], const char mode[])
+ByteStream::Stdio::init(const char filename[], const char mode[])
 {
   if (filename[0] != '-' || filename[1])
   {
@@ -370,7 +519,7 @@ StdioByteStream::init(const char filename[], const char mode[])
       G_THROW(GString("ByteStream.open_fail\t")+filename+strerror(errno));
          //  Failed to open '%s': %s
 #else
-      G_THROW("ByteStream.open_fail2");                  //  StdioByteStream::StdioByteStream, failed to open file.
+      G_THROW("ByteStream.open_fail2");                  //  Stdio, failed to open file.
 #endif
     }
   }else 
@@ -401,10 +550,10 @@ StdioByteStream::init(const char filename[], const char mode[])
 }
 
 size_t 
-StdioByteStream::read(void *buffer, size_t size)
+ByteStream::Stdio::read(void *buffer, size_t size)
 {
   if (!can_read)
-    G_THROW("ByteStream.no_read");                    //  StdioByteStream not opened for reading
+    G_THROW("ByteStream.no_read");                    //  Stdio not opened for reading
   size_t nitems;
   do
   {
@@ -418,7 +567,7 @@ StdioByteStream::read(void *buffer, size_t size)
 #ifndef UNDER_CE
         G_THROW(strerror(errno));                     //  (No error in the DjVuMessageFile)
 #else
-        G_THROW("ByteStream.read_error2");            //  StdioByteStream::read, read error.
+        G_THROW("ByteStream.read_error2");            //  read, read error.
 #endif
     }else
     {
@@ -430,10 +579,10 @@ StdioByteStream::read(void *buffer, size_t size)
 }
 
 size_t 
-StdioByteStream::write(const void *buffer, size_t size)
+ByteStream::Stdio::write(const void *buffer, size_t size)
 {
   if (!can_write)
-    G_THROW("ByteStream.no_write");                   //  StdioByteStream not opened for writing
+    G_THROW("ByteStream.no_write");                   //  Stdio not opened for writing
   size_t nitems;
   do
   {
@@ -447,7 +596,7 @@ StdioByteStream::write(const void *buffer, size_t size)
 #ifndef UNDER_CE
         G_THROW(strerror(errno));                     //  (No error in the DjVuMessageFile)
 #else
-        G_THROW("ByteStream.write_error2");           //  StdioByteStream::write, write error.
+        G_THROW("ByteStream.write_error2");           //  write, write error.
 #endif
     }else
     {
@@ -459,23 +608,23 @@ StdioByteStream::write(const void *buffer, size_t size)
 }
 
 void
-StdioByteStream::flush()
+ByteStream::Stdio::flush()
 {
   if (fflush(fp) < 0)
 #ifndef UNDER_CE
         G_THROW(strerror(errno));                     //  (No error in the DjVuMessageFile)
 #else
-        G_THROW("ByteStream.flush_error");            //  StdioByteStream::flush, flush error.
+        G_THROW("ByteStream.flush_error");            //  flush, flush error.
 #endif
 }
 
 long 
-StdioByteStream::tell() const
+ByteStream::Stdio::tell() const
 {
   long x = ftell(fp);
   if (x >= 0)
   {
-    StdioByteStream *sbs=const_cast<StdioByteStream *>(this);
+    Stdio *sbs=const_cast<Stdio *>(this);
     (sbs->pos) = x;
   }else
   {
@@ -485,7 +634,7 @@ StdioByteStream::tell() const
 }
 
 int
-StdioByteStream::seek(long offset, int whence, bool nothrow)
+ByteStream::Stdio::seek(long offset, int whence, bool nothrow)
 {
   if (whence==SEEK_SET && offset>=0 && offset==ftell(fp))
     return 0;
@@ -495,7 +644,7 @@ StdioByteStream::seek(long offset, int whence, bool nothrow)
 #ifndef UNDER_CE
         G_THROW(strerror(errno));                     //  (No error in the DjVuMessageFile)
 #else
-        G_THROW("ByteStream.seek_error");             //  StdioByteStream::seek, seek error.
+        G_THROW("ByteStream.seek_error");             //  seek, seek error.
 #endif
     }
   tell();
@@ -505,29 +654,22 @@ StdioByteStream::seek(long offset, int whence, bool nothrow)
 
 
 
-///////// MEMORYBYTESTREAM
+///////// ByteStream::Memory
 
-MemoryByteStream::MemoryByteStream()
+ByteStream::Memory::Memory()
   : where(0), bsize(0), nblocks(0), gblocks(blocks,0)
 {
 }
 
-MemoryByteStream::MemoryByteStream(const void *buffer, size_t sz)
-  : where(0), bsize(0), nblocks(0), gblocks(blocks,0)
+void
+ByteStream::Memory::init(void const * const buffer, const size_t sz)
 {
-  MemoryByteStream::write(buffer, sz);
-  where = 0;
-}
-
-MemoryByteStream::MemoryByteStream(const char *buffer)
-  : where(0), bsize(0), nblocks(0), gblocks(blocks,0)
-{
-  MemoryByteStream::write(buffer, strlen(buffer));
+  write(buffer, sz);
   where = 0;
 }
 
 void 
-MemoryByteStream::empty()
+ByteStream::Memory::empty()
 {
   for (int b=0; b<nblocks; b++)
   {
@@ -539,13 +681,13 @@ MemoryByteStream::empty()
   nblocks = 0;
 }
 
-MemoryByteStream::~MemoryByteStream()
+ByteStream::Memory::~Memory()
 {
   empty();
 }
 
 size_t 
-MemoryByteStream::write(const void *buffer, size_t sz)
+ByteStream::Memory::write(const void *buffer, size_t sz)
 {
   int nsz = (int)sz;
   if (nsz <= 0)
@@ -590,7 +732,7 @@ MemoryByteStream::write(const void *buffer, size_t sz)
 }
 
 size_t 
-MemoryByteStream::readat(void *buffer, size_t sz, int pos)
+ByteStream::Memory::readat(void *buffer, size_t sz, int pos)
 {
   if ((int) sz > bsize - pos)
     sz = bsize - pos;
@@ -611,7 +753,7 @@ MemoryByteStream::readat(void *buffer, size_t sz, int pos)
 }
 
 size_t 
-MemoryByteStream::read(void *buffer, size_t sz)
+ByteStream::Memory::read(void *buffer, size_t sz)
 {
   sz = readat(buffer,sz,where);
   where += sz;
@@ -619,13 +761,13 @@ MemoryByteStream::read(void *buffer, size_t sz)
 }
 
 long 
-MemoryByteStream::tell() const
+ByteStream::Memory::tell() const
 {
   return where;
 }
 
 int
-MemoryByteStream::seek(long offset, int whence, bool nothrow)
+ByteStream::Memory::seek(long offset, int whence, bool nothrow)
 {
   int nwhere = 0;
   switch (whence)
@@ -633,7 +775,7 @@ MemoryByteStream::seek(long offset, int whence, bool nothrow)
     case SEEK_SET: nwhere = 0; break;
     case SEEK_CUR: nwhere = where; break;
     case SEEK_END: nwhere = bsize; break;
-    default: G_THROW("bad_arg\tMemoryByteStream::seek()");      // Illegal argument in MemoryByteStream::seek()
+    default: G_THROW("bad_arg\tByteStream::Memory::seek()");      // Illegal argument in ByteStream::Memory::seek()
     }
   nwhere += offset;
   if (nwhere<0)
@@ -658,21 +800,15 @@ ByteStream::get_data(void)
 #endif
 
 
-///////// STATICBYTESTREAM
+///////// ByteStream::Static
 
-StaticByteStream::StaticByteStream(const char *buffer, size_t sz)
-  : data(buffer), bsize(sz), where(0)
+ByteStream::Static::Static(const void * const buffer, const size_t sz)
+  : data((const char *)buffer), bsize(sz), where(0)
 {
-}
-
-StaticByteStream::StaticByteStream(const char *buffer)
-  : data(buffer), bsize(0), where(0)
-{
-  bsize = strlen(data);
 }
 
 size_t 
-StaticByteStream::read(void *buffer, size_t sz)
+ByteStream::Static::read(void *buffer, size_t sz)
 {
   int nsz = (int)sz;
   if (nsz > bsize - where)
@@ -685,14 +821,14 @@ StaticByteStream::read(void *buffer, size_t sz)
 }
 
 size_t 
-StaticByteStream::write(const void *buffer, size_t sz)
+ByteStream::Static::write(const void *buffer, size_t sz)
 {
-  G_THROW("ByteStream.write_error3");                           //  Attempt to write into a StaticByteStream
+  G_THROW("ByteStream.write_error3");                           //  Attempt to write into a Static
   return 0;
 }
 
 int
-StaticByteStream::seek(long offset, int whence, bool nothrow)
+ByteStream::Static::seek(long offset, int whence, bool nothrow)
 {
   int nwhere = 0;
   switch (whence)
@@ -700,7 +836,7 @@ StaticByteStream::seek(long offset, int whence, bool nothrow)
     case SEEK_SET: nwhere = 0; break;
     case SEEK_CUR: nwhere = where; break;
     case SEEK_END: nwhere = bsize; break;
-    default: G_THROW("bad_arg\tStaticByteStream::seek()");      //  Illegal argument to StaticByteStream::seek()
+    default: G_THROW("bad_arg\tByteStream::Static::seek()");      //  Illegal argument to ByteStream::Static::seek()
     }
   nwhere += offset;
   if (nwhere<0)
@@ -710,7 +846,7 @@ StaticByteStream::seek(long offset, int whence, bool nothrow)
 }
 
 long 
-StaticByteStream::tell() const
+ByteStream::Static::tell() const
 {
   return where;
 }
@@ -718,17 +854,20 @@ StaticByteStream::tell() const
 GP<ByteStream>
 ByteStream::create(void)
 {
-  return new MemoryByteStream();
+  return new Memory();
 }
 
 GP<ByteStream>
-ByteStream::create(const void *buffer, const size_t size)
+ByteStream::create(void const * const buffer, const size_t size)
 {
-  return new MemoryByteStream(buffer,size);
+  Memory *mbs=new Memory();
+  GP<ByteStream> retval=mbs;
+  mbs->init(buffer,size);
+  return retval;
 }
 
 GP<ByteStream>
-ByteStream::create(const char filename[],const char * const mode)
+ByteStream::create(const char filename[],char const * const mode)
 {
   GP<ByteStream> retval;
 #ifdef UNIX
@@ -753,13 +892,15 @@ ByteStream::create(const char filename[],const char * const mode)
   if(!retval)
 #endif
   {
-    retval=new StdioByteStream(filename,mode?mode:"rb");
+    Stdio *sbs=new Stdio();
+    retval=sbs;
+    sbs->init(filename,mode?mode:"rb");
   }
   return retval;
 }
 
 GP<ByteStream>
-ByteStream::create(const int fd,const char * const mode,const bool closeme)
+ByteStream::create(const int fd,char const * const mode,const bool closeme)
 {
   GP<ByteStream> retval;
 #ifdef UNIX
@@ -787,13 +928,15 @@ ByteStream::create(const int fd,const char * const mode,const bool closeme)
       close(fd2);
       G_THROW("ByteStream.open_fail2");
     }
-    retval=new StdioByteStream(f,mode?mode:"rb",true);
+    Stdio *sbs=new Stdio();
+    retval=sbs;
+    sbs->init(f,mode?mode:"rb",true);
   }
   return retval;
 }
 
 GP<ByteStream>
-ByteStream::create(FILE * const f,const char * const mode,const bool closeme)
+ByteStream::create(FILE * const f,char const * const mode,const bool closeme)
 {
   GP<ByteStream> retval;
 #ifdef UNIX
@@ -815,14 +958,22 @@ ByteStream::create(FILE * const f,const char * const mode,const bool closeme)
   if(!retval)
 #endif
   {
-    retval=new StdioByteStream(f,mode?mode:"rb",closeme);
+    Stdio *sbs=new Stdio();
+    retval=sbs;
+    sbs->init(f,mode?mode:"rb",closeme);
   }
   return retval;
 }
 
+GP<ByteStream>
+ByteStream::create_static(const void * const buffer, size_t sz)
+{
+  return new Static(buffer, sz);
+}
+
 #ifdef UNIX
 MemoryMapByteStream::MemoryMapByteStream(void)
-: StaticByteStream(0,0)
+: ByteStream::Static(0,0)
 {}
 
 void

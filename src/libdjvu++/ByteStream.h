@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.h,v 1.36 2001-02-10 01:16:57 bcr Exp $
+// $Id: ByteStream.h,v 1.37 2001-02-12 21:23:35 bcr Exp $
 // $Name:  $
 
 #ifndef _BYTESTREAM_H
@@ -42,10 +42,10 @@
     similar in spirit to the well known C++ #iostream# classes.  Class
     \Ref{ByteStream} is an abstract base class for all byte streams.  It
     defines a virtual interface and also provides useful functions.  These
-    files provide two subclasses. Class \Ref{StdioByteStream} provides a
+    files provide two subclasses. Class \Ref{ByteStream::Stdio} provides a
     simple interface to the Ansi C buffered input/output functions. Class
-    \Ref{MemoryByteStream} provides stream-like access to a dynamical array
-    maintained in memory. Class \Ref{StaticByteStream} provides read-only
+    \Ref{ByteStream::Memory} provides stream-like access to a dynamical array
+    maintained in memory. Class \Ref{ByteStream::Static} provides read-only
     stream-like access to a user allocated data buffer.
 
     {\bf Notes} --- These classes were partly written because we did not want to
@@ -62,7 +62,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation\\
     Andrei Erofeev <eaf@geocities.com> -- 
     @version
-    #$Id: ByteStream.h,v 1.36 2001-02-10 01:16:57 bcr Exp $# */
+    #$Id: ByteStream.h,v 1.37 2001-02-12 21:23:35 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -87,6 +87,10 @@
 */
 class ByteStream : public GPEnabled {
 public:
+  class Stdio;
+  class Static;
+  class Memory;
+  class Obsolete;
   /** @name Virtual Functions.
       These functions are usually implemented by each subclass of #ByteStream#. */
   //@{
@@ -209,7 +213,7 @@ public:
       Valid offsets for function #seek# range from 0 to the value returned
       by this function. */
   virtual int size(void) const;
-  /// Use at your own risk, only guarenteed to work for MemoryByteStreams.
+  /// Use at your own risk, only guarenteed to work for ByteStream::Memorys.
   TArray<char> get_data(void);
   /** Reads data from a random position. This function reads at most #sz#
       bytes at position #pos# into #buffer# and returns the actual number of
@@ -223,14 +227,47 @@ private:
   ByteStream(const ByteStream &);
   ByteStream & operator=(const ByteStream &);
 public:
+  /** Constructs an empty Memory ByteStream.  The buffer itself is organized
+      as an array of 4096 byte blocks.  The buffer is initially empty. You
+      must first use function #write# to store data into the buffer, use
+      function #seek# to rewind the current position, and function #read# to
+      read the data back. */
   static GP<ByteStream> create(void);
-  static GP<ByteStream> create(const void *buffer, const size_t size);
+  /** Constructs a Memory ByteStream by copying initial data.  The
+      Memory buffer is initialized with #size# bytes copied from the
+      memory area pointed to by #buffer#. */
+  static GP<ByteStream> create(void const * const buffer, const size_t size);
+  /** Constructs a ByteStream for accessing the file named #filename#.
+      Arguments #filename# and #mode# are similar to the arguments of the well
+      known stdio function #fopen#. In addition a filename of #-# will be
+      interpreted as the standard output or the standard input according to
+      #mode#.  This constructor will open a stdio file and construct a
+      ByteStream object accessing this file. Destroying the ByteStream object
+      will flush and close the associated stdio file.  Exception
+      \Ref{GException} is thrown with a plain text error message if the stdio
+      file cannot be opened. */
   static GP<ByteStream> create(
-    const int fd, const char * const mode, const bool closeme);
+    const char filename[], char const * const mode);
+  /** Constructs a ByteStream for accessing the stdio file #f#.
+      Argument #mode# indicates the type of the stdio file, as in the
+      well known stdio function #fopen#.  Destroying the ByteStream
+      object will not close the stdio file #f# unless closeme is true. */
   static GP<ByteStream> create(
-    FILE * const f, const char * const mode, const bool closeme);
+    const int fd, char const * const mode, const bool closeme);
+  /** Constructs a ByteStream for accessing the stdio file #f#.
+      Argument #mode# indicates the type of the stdio file, as in the
+      well known stdio function #fopen#.  Destroying the ByteStream
+      object will not close the stdio file #f# unless closeme is true. */
   static GP<ByteStream> create(
-    const char filename[], const char * const mode);
+    FILE * const f, char const * const mode, const bool closeme);
+  /** Creates a ByteStream object for allocating the memory area of
+    length #sz# starting at address #buffer#.  This call impliments 
+    a read-only ByteStream interface for a memory area specified by
+    the user at construction time. Calls to function #read# directly
+    access this memory area.  The user must therefore make sure that its
+    content remain valid long enough.  */
+  static GP<ByteStream> create_static(
+    void const * const buffer, const size_t size);
 };
 
 inline size_t
@@ -258,12 +295,37 @@ ByteStream::size(void) const
   return bsize;
 }
 
+/** ByteStream::Obsolete impliments backwards compatable ByteStreams
+    to support old code.  Since an exception in a constructor will leak
+    memory in your program, we recommend to use the #ByteStream::create# 
+    methods instead.  */
+class ByteStream::Obsolete : public ByteStream
+{
+protected:
+  GP<ByteStream> gbs;
+  ByteStream *bs;
+public:
+  ByteStream * operator & () const {return bs;}
+  ByteStream * operator & () {return bs;}
+  virtual size_t read(void *buffer, size_t size)
+  { return bs->read(buffer,size); }
+  virtual size_t write(const void *buffer, size_t size)
+  { return bs->write(buffer,size); }
+  virtual long tell(void) const
+  { return bs->tell(); }
+  virtual int seek(long offset, int whence = SEEK_SET, bool nothrow=false)
+  { return bs->seek(offset,whence,nothrow); }
+  virtual void flush(void)
+  { return bs->flush(); }
+};
+
 /** ByteStream interface for stdio files. 
     The virtual member functions #read#, #write#, #tell# and #seek# are mapped
     to the well known stdio functions #fread#, #fwrite#, #ftell# and #fseek#.
     @see Unix man page fopen(3), fread(3), fwrite(3), ftell(3), fseek(3) */
 
-class StdioByteStream : public ByteStream {
+class StdioByteStream : public ByteStream::Obsolete
+{
 public:
   /** Constructs a ByteStream for accessing the file named #filename#.
       Arguments #filename# and #mode# are similar to the arguments of the well
@@ -274,175 +336,69 @@ public:
       will flush and close the associated stdio file.  Exception
       \Ref{GException} is thrown with a plain text error message if the stdio
       file cannot be opened. */
-  StdioByteStream(const char filename[], const char * const mode="rb");
+  StdioByteStream(const char filename[], const char * const mode="rb")
+  { gbs=ByteStream::create(filename,mode); bs=gbs;}
+
   /** Constructs a ByteStream for accessing the stdio file #f#.
       Argument #mode# indicates the type of the stdio file, as in the
       well known stdio function #fopen#.  Destroying the ByteStream
       object will not close the stdio file #f# unless closeme is true. */
-  StdioByteStream(FILE * const f, const char * const mode="rb", const bool closeme=false);
-  // Virtual functions
-  ~StdioByteStream();
-  virtual size_t read(void *buffer, size_t size);
-  virtual size_t write(const void *buffer, size_t size);
-  virtual void flush(void);
-  virtual int seek(long offset, int whence = SEEK_SET, bool nothrow=false);
-  virtual long tell() const;
-  virtual int ungetc(int x);
-private:
-  // Cancel C++ default stuff
-  StdioByteStream(const StdioByteStream &);
-  StdioByteStream & operator=(const StdioByteStream &);
-  void init(const char mode[]);
-private:
-  // Implementation
-  bool can_read;
-  bool can_write;
-  bool must_close;
-protected:
-  FILE *fp;
-  long pos;
-  StdioByteStream(void);
-  void init(FILE * const f,const char mode[],const bool closeme);
-  void init(const char filename[],const char mode[]);
+  StdioByteStream(
+    FILE * const f, const char * const mode="rb", const bool closeme=false)
+  { gbs=ByteStream::create(f,mode,closeme);bs=gbs;}
+
 };
 
-inline int
-StdioByteStream::ungetc(int x)
-{
-  int retval;
-  if((retval=ungetc(x))!=EOF)
-  {
-    --pos;
-  }
-  return retval;
-}
-
-inline void
-StdioByteStream::init(FILE * const f,const char mode[],const bool closeme)
-{
-  fp=f;
-  must_close=closeme;
-  init(mode);
-}
-
-
 /** ByteStream interface managing a memory buffer.  
-    Class #MemoryByteStream# manages a dynamically resizable buffer from
+    Class #ByteStream::Memory# manages a dynamically resizable buffer from
     which data can be read or written.  The buffer itself is organized as an
     array of blocks of 4096 bytes.  */
 
-class MemoryByteStream : public ByteStream
+class MemoryByteStream : public ByteStream::Obsolete
 {
 public:
-  /** Constructs an empty MemoryByteStream.
+  /** Constructs an empty ByteStream::Memory.
       The buffer is initially empty. You must first use function #write#
       to store data into the buffer, use function #seek# to rewind the
       current position, and function #read# to read the data back. */
-  MemoryByteStream();
-  /** Constructs a MemoryByteStream by copying initial data.  The
-      MemoryByteStream buffer is initialized with #size# bytes copied from the
+  MemoryByteStream()
+  { gbs=create(); bs=gbs; }
+  /** Constructs a Memory by copying initial data.  The
+      Memory buffer is initialized with #size# bytes copied from the
       memory area pointed to by #buffer#. */
-  MemoryByteStream(const void *buffer, size_t size);
-  /** Constructs a MemoryByteStream by copying an initial string.  The
-      MemoryByteStream buffer is initialized with the null terminated string
+  MemoryByteStream(const void *buffer, size_t size)
+  { gbs=create(buffer,size); bs=gbs; }
+  /** Constructs a Memory by copying an initial string.  The
+      Memory buffer is initialized with the null terminated string
       #buffer#. */
-  MemoryByteStream(const char *buffer);
-  // Virtual functions
-  ~MemoryByteStream();
-  virtual size_t read(void *buffer, size_t size);
-  virtual size_t write(const void *buffer, size_t size);
-  virtual int    seek(long offset, int whence=SEEK_SET, bool nothrow=false);
-  virtual long   tell(void) const;
-  /** Erases everything in the MemoryByteStream.
+  MemoryByteStream(const char *buffer)
+  { gbs=create(buffer,strlen(buffer)); bs=gbs; }
+  /** Erases everything in the Memory.
       The current location is reset to zero. */
-  void empty();
-  /** Returns the total number of bytes contained in the buffer.  Valid
-      offsets for function #seek# range from 0 to the value returned by this
-      function. */
-  virtual int size(void) const;
-  /** Returns a reference to the byte at offset #n#. This reference can be
-      used to read (as in #mbs[n]#) or modify (as in #mbs[n]=c#) the contents
-      of the buffer. */
-  char &operator[] (int n);
-  /** Copies all internal data into \Ref{TArray} and returns it */
-private:
-  // Cancel C++ default stuff
-  MemoryByteStream(const MemoryByteStream &);
-  MemoryByteStream & operator=(const MemoryByteStream &);
-  // Current position
-  int where;
-protected:
-  /** Reads data from a random position. This function reads at most #sz#
-      bytes at position #pos# into #buffer# and returns the actual number of
-      bytes read.  The current position is unchanged. */
-  virtual size_t readat(void *buffer, size_t sz, int pos);
-  /** Number of bytes in internal buffer. */
-  int bsize;
-  /** Number of 4096 bytes blocks. */
-  int nblocks;
-  /** Pointers (possibly null) to 4096 bytes blocks. */
-  char **blocks;
-  /** Pointers (possibly null) to 4096 bytes blocks. */
-  GPBuffer<char *> gblocks;
+  void empty(void)
+  { gbs=create();bs=gbs; }
 };
 
-
-
-inline int
-MemoryByteStream::size(void) const
-{
-  return bsize;
-}
-
-inline char &
-MemoryByteStream::operator[] (int n)
-{
-  return blocks[n>>12][n&0xfff];
-}
-
-
-
 /** Read-only ByteStream interface to a memory area.  
-    Class #StaticByteStream# implements a read-only ByteStream interface for a
+    Class #ByteStream::Static# implements a read-only ByteStream interface for a
     memory area specified by the user at construction time. Calls to function
     #read# directly access this memory area.  The user must therefore make
     sure that its content remain valid long enough.  */
 
-class StaticByteStream : public ByteStream
+class StaticByteStream : public ByteStream::Obsolete
 {
 public:
-  /** Creates a StaticByteStream object for allocating the memory area of
+  /** Creates a ByteStream object for allocating the memory area of
       length #sz# starting at address #buffer#. */
-  StaticByteStream(const char *buffer, size_t sz);
-  /** Creates a StaticByteStream object for allocating the null terminated
+  StaticByteStream(const char *buffer, size_t sz)
+  { gbs=create_static(buffer,sz);bs=gbs; }
+  /** Creates a ByteStream object for allocating the null terminated
       memory area starting at address #buffer#. */
-  StaticByteStream(const char *buffer);
-  // Virtual functions
-  virtual size_t read(void *buffer, size_t sz);
-  virtual size_t write(const void *buffer, size_t sz);
-  virtual int    seek(long offset, int whence = SEEK_SET, bool nothrow=false);
-  virtual long tell(void) const;
-  /** Returns the total number of bytes contained in the buffer, file, etc.
-      Valid offsets for function #seek# range from 0 to the value returned
-      by this function. */
-  virtual int size(void) const;
-protected:
-  const char *data;
-  int bsize;
-private:
-  int where;
+  StaticByteStream(const char *buffer)
+  { gbs=create_static(buffer,strlen(buffer));bs=gbs; }
 };
 
-
-inline int
-StaticByteStream::size(void) const
-{
-  return bsize;
-}
-
 //@}
-
-
 
 // ------------ THE END
 #endif
