@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.61 2001-04-16 23:59:13 bcr Exp $
+// $Id: GString.cpp,v 1.62 2001-04-17 15:41:15 chrisp Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -1570,3 +1570,44 @@ GStringRep::Native::toDouble(
    return retval;
 }
 
+int
+GStringRep::nextNonSpace(int from) const
+{
+  // Store current locale;
+  const GString clocale=setlocale(LC_CTYPE,0);
+  const GString nlocale=setlocale(LC_NUMERIC,0);
+
+  // set locale to C
+  setlocale(LC_CTYPE,"C");
+  setlocale(LC_NUMERIC,"C");
+
+  // We want to return the position of the next
+  // non white space starting from the #from#
+  // location.  isspace should work in any locale
+  // so we should only need to do this for the non-
+  // native locales (UTF8)
+  int retval=from;
+  const size_t length=strlen(data) - from;
+  const unsigned char * const eptr=(const unsigned char *)(data+from)+length;
+  mbstate_t ps;
+  for(const unsigned char *s=(const unsigned char *)(data+from);(s<=eptr)&& *s;)
+  {
+     const wchar_t w=(wchar_t)UTF8toUCS4(s,eptr);
+     if (isspace(w)) retval++;
+     char bytes[12];
+     int i=wcrtomb(bytes,w,&ps);
+  }
+  // return locale to previous state.
+  setlocale(LC_CTYPE,(const char *)clocale);
+  setlocale(LC_NUMERIC,(const char *)nlocale);
+   
+  return retval;
+}
+
+int
+GStringRep::Native::nextNonSpace(int from) const
+{
+   int retval;
+   sscanf(data+from, " %n", &retval);
+   return (retval+from);
+}

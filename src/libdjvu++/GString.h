@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.h,v 1.48 2001-04-16 23:59:13 bcr Exp $
+// $Id: GString.h,v 1.49 2001-04-17 15:41:14 chrisp Exp $
 // $Name:  $
 
 #ifndef _GSTRING_H_
@@ -57,7 +57,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.48 2001-04-16 23:59:13 bcr Exp $# */
+    #$Id: GString.h,v 1.49 2001-04-17 15:41:14 chrisp Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -119,6 +119,9 @@ public:
     GP<GStringRep>& endptr, bool &isULong, const int base=10) const;
   virtual double toDouble(
     GP<GStringRep>& endptr, bool &isDouble) const;
+
+   // return next non space position
+   virtual int nextNonSpace( int from ) const;
 
     // Create an empty string.
   template <class TYPE> static GP<GStringRep> create(
@@ -230,6 +233,9 @@ public:
     GP<GStringRep>& endptr, bool &isULong, const int base) const;
   virtual double toDouble(
     GP<GStringRep>& endptr, bool &isDouble) const;
+
+   // return position of next non space.
+   virtual int nextNonSpace( int from ) const;
 
     // Create an empty string
   static GP<GStringRep> create(const unsigned int sz = 0)
@@ -824,6 +830,11 @@ public:
     const GUTF8String& src, GUTF8String& endptr, bool& isDouble)
   { return src.toDouble(endptr,isDouble); }
 
+
+   /** Returns an integer.  Gives the position of the next non white space */
+   int nextNonSpace( int from  ) const
+      { return ptr?(*this)->nextNonSpace( from ):0; }
+
   // -- CONCATENATION
   /// Appends character #ch# to the string.
   GUTF8String& operator+= (char ch)
@@ -934,6 +945,10 @@ public:
     init(GStringRep::Native::create(*this,str));
     return *this;
   }
+
+   /** Return an integer.  Returns position of next non space value */
+   int nextNonSpace( int from )
+      { return ptr?(*this)->nextNonSpace(from):0; }
 
   /** Returns a sub-string.  The sub-string is composed by copying #len#
       characters starting at position #from# in this string.  The length of
