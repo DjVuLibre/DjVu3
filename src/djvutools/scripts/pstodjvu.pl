@@ -32,13 +32,14 @@
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #C- 
 #
-# $Id: pstodjvu.pl,v 1.5 2001-05-04 21:41:30 debs Exp $
+# $Id: pstodjvu.pl,v 1.6 2001-05-15 00:46:25 debs Exp $
 # $Name:  $
 
 # Perl libs to use
 use File::Basename;
 use Cwd;
 use File::Find;
+use File::Copy;
 
 # slash conversion for Win32
 if ( $ENV{'windir'} ) {
@@ -51,6 +52,14 @@ if ( $ENV{'windir'} ) {
 # capture working directory
 $curdir=getcwd;
 $curdir =~ s,/,$slash,g;
+
+# max number of djvu files which can be bundled (this is to support a 
+# workaround for a # known limitation of DjVu Enterprise for Win32)
+$max_bundle = 5;
+$max_files = 10;
+$max_ifiles = $max_files / $max_bundle;
+$_ = $max_ifiles;
+if ( /\./ ) { $max_ifiles = sprintf("%d", ++$max_ifiles); }
 
 # DjVu Enterprise Commands
 
@@ -280,44 +289,84 @@ if ( $free ) {
 }
 
 $tmpdir="${output}.tmp";
-$name=basename("$input",".ps");
-$name=basename("$name",".pdf");
+($name, $dir, $type) = fileparse($input, '\..*');
+$type = lc($type);
 if ( -d "$tmpdir" ) 
 {
   print STDERR "$tmpdir exists\n";
   exit 1
 }
-
 mkdir($tmpdir, 0777);
-$tfile="${tmpdir}/gs$$.pnm";
-$tfile2=sprintf("${tmpdir}/${name}-%04d.djvu");
-## $script="${tmpdir}${slash}run.pl";
-## $script="${curdir}${slash}${tmpdir}${slash}run.pl";
-## open(SFILE,">$script");
-## $script_str="#!perl\n"
-##   . '$verbose="' . $verbose . '";' . "\n"
-##   . '$cmdstr="' . "$djvucommand $args " . '$ARGV[0] $ARGV[1]";' . "\n"
-##   . 'if ( $verbose ) { print "$cmdstr\n";}' . "\n"
-##   . '$stat=system($cmdstr);' . "\n"
-##   . 'unlink $tmpfile;' . "\n"
-##   . 'exit $stat;' . "\n"
-## ;
-## print SFILE $script_str;
-## close SFILE;
-## $cmdstr="gswin32c -dBATCH -dNOPAUSE -q -sDEVICE=$outputdev -r$rdpi -sOutputFile=$tfile $input; $script $tfile $tfile2";
-## $cmdstr="gswin32c -dBATCH -dNOPAUSE -q -sDEVICE=$outputdev -r$rdpi -sOutputFile=$tfile $input; $djvucommand $args $tfile $tfile2";
-$cmdstr="gswin32c -dBATCH -dNOPAUSE -q -sDEVICE=$outputdev -r$rdpi -sOutputFile=" . '"' . $tfile . '" "' . $input . '" 2>&1';
-if ( $verbose ) { print "$cmdstr\n"; }
-$outputstr=`$cmdstr`;
-$outputstr =~ s/\*+Unknown operator: ri\n//g;
-if ( $verbose ) { print $outputstr; }
-$cmdstr="$djvucommand $args " . '"' . $tfile . '" "' . $tfile2 . '" 2>&1';
-if ( $verbose ) { print "$cmdstr\n"; }
-$outputstr=`$cmdstr`;
-$outputstr =~ s/Failed to read page [0-9]//g;
-if ( $verbose ) { print $outputstr; }
 
+# if this is a postscript file, convert it to a PDF first.
+
+if ( $type eq ".ps" ) {
+  $pdffile = "$tmpdir/$name.pdf";
+  $cmdstr="gswin32c -dBATCH -dNOPAUSE -q -sDEVICE=pdfwrite -r$rdpi " . 
+    "-sOutputFile=" . '"' . $pdffile . '" "' .  $input . '" 2>&1';
+  if ( $verbose ) { print "$cmdstr\n"; }
+  $outputstr = `$cmdstr`;
+  $outputstr =~ s/\*+Unknown operator: ri\n//g;
+  if ( $verbose ) { print $outputstr; }
+} else {
+  $pdffile = $input;
+}
+
+# create a DjVu file for each page of the PDF file being converted
+$pg=0;
+$do_next=1;
+while ( $do_next ) {
+  ++$pg;
+  $gsname = $tmpdir . "/gs$$.pnm";
+  $djname = $tmpdir . "/gs$$" . sprintf("%04d", $pg) . '.djvu';
+  $cmdstr="gswin32c -dBATCH -dNOPAUSE -dFirstPage=$pg -dLastPage=$pg -q " .
+    "-sDEVICE=$outputdev -r$rdpi -sOutputFile=" . '"' . "$gsname" . '" "' .
+    $pdffile . '" 2>&1';
+  if ( $verbose ) { print "$cmdstr\n"; }
+  $outputstr=`$cmdstr`;
+  $outputstr =~ s/\*+Unknown operator: ri\n//g;
+  @lines = split /\n/, $outputstr;
+  if ( $lines[0] eq  "Error: /rangecheck in --get--" ) { 
+    $do_next = 0; 
+  } elsif ( substr($lines[0], 0, 5) eq "Error" ) {
+    if ( $verbose ) { print "$outputstr\n"; }
+    die "Ghostscript command failed for page $pg of $input.\n";
+  } else {
+    if ( $verbose ) { print "$outputstr\n"; }
+    $cmdstr="$djvucommand $args " . '"' . $gsname . '" "' . $djname . 
+      '" 2>&1';
+    if ( $verbose ) { print "$cmdstr\n"; }
+    $outputstr2=`$cmdstr`;
+    $outputstr2 =~ s/Failed to read page 2\n//;
+    if ( $verbose ) { print "$outputstr2\n"; }
+  }
+}
+
+# The following logic gets the names of the DjVu files created for each page
+# of the target PDF, and splits up the file names for intermediate bundling, 
+# using the maximum allowed number of files per bundle
+@filelist = ();
 find(\&wanted,$tmpdir);
+$lctr = 1;
+$fctr = 0;
+$dfilelist = "$tmpdir/files$$_" . sprintf("%04d", $lctr) . ".txt";
+push @listfiles, $dfilelist;
+open(OFILE, ">$dfilelist") or die "Could not open $dfilelist for writing.\n";
+foreach $file ( @filelist ) { 
+  ++$fctr;
+  if ( $fctr <= $max_bundle ) {
+    print OFILE "$file\n"; 
+  } else {
+    close OFILE;
+    ++$lctr;
+    $fctr = 1;
+    $dfilelist = "$tmpdir/files$$_" . sprintf("%04d", $lctr) . ".txt";
+    push @listfiles, $dfilelist;
+    open(OFILE, ">$dfilelist") or die "Could not open $dfilelist for writing.\n";
+    print OFILE "$file\n"; 
+  }
+}
+close OFILE;
 
 if ( ! "$joincommand$bundlecommand" )
 {
@@ -332,18 +381,22 @@ if ( $free )
   if ( -d $output )
   {
     $output="$output/index.djvu";
-    $cmdstr="$combine -c $tmpdir/bundled.djvu $filelist";
-    print "$cmdstr\n";
+    $cmdstr="$combine -c $tmpdir/bundled.djvu --filelist=" . '"' . $dfilelist .
+      '"';
+    if ( $verbose ) { print "$cmdstr\n"; }
     system("$cmdstr");
     $cmdstr="$split -i $tmpdir/bundled.djvu " . '"' . $output . '"';
-    print "$cmdstr\n";
+    if ( $verbose ) { print "$cmdstr\n"; }
     system("$cmdstr");
   } else {
-    $cmdstr="$combine -c " . '"' . $output . '" ' . $filelist;
-    print "$cmdstr\n";
+    $cmdstr="$combine -c " . '"' . $output . '" --filelist="' . $dfilelist . '"';
+    if ( $verbose ) { print "$cmdstr\n"; }
     system("$cmdstr");
   }
 } else {
+  # The logic below is the workaround for a known limitation in DjVu Enterprise
+  # for Win32 (max open files).  It was done for supporting DjVu Enterprise;
+  # similar logic remains to be put in place for OSI (above).
   if ( -d $output )
   {
     $combine="$joincommand";
@@ -352,13 +405,80 @@ if ( $free )
     $combine="$bundlecommand";
   }
   unlink $output;
-  $cmdstr="$combine $cargs $filelist " . '"' . $output . '"';
-  if ( $verbose ) { print "$cmdstr\n"; }
-  system("$cmdstr");
+  @ifiles=();
+  # create the intermediate bundled DjVu files, and capture the intermediate
+  # file names
+  foreach $dfilelist (@listfiles) {
+    $ifile = "$tmpdir/" . basename($dfilelist) . '.djvu';
+    push @ifiles, $ifile;
+    $cmdstr="$combine $cargs --filelist=" . '"' . $dfilelist . '" "' . $ifile . '"';
+    if ( $verbose ) { print "$cmdstr\n"; }
+    system("$cmdstr");
+  }
+  # if we have more than the maximum number of intermediate bundled files,
+  # create multiple output files
+  if ( @ifiles > $max_ifiles ) {
+    $dfilelist = "";
+    $ictr = 0;
+    $lctr = 1;
+    $ctr = 0;
+    @ofiles = ();
+    ($obase, $odir, $oext) = fileparse($output, "\\\..*");
+    foreach $file ( @ifiles ) {
+      ++$ictr;
+      ++$ctr;
+      if ( $ictr < $max_ifiles ) {
+        $dfilelist .= '"' . $file . '" ';
+      } elsif ( $ictr == $max_ifiles  ) {
+        $dfilelist .= '"' . $file . '" ';
+        $ofile = sprintf("%s%s%04d%s", $odir, $obase, $lctr, $oext);
+	push @ofiles, $ofile;
+	if ( -f $ofile ) { unlink $ofile; }
+        $cmdstr="$combine $cargs $dfilelist " . '"' . $ofile . '"';
+        if ( $verbose ) { print "$cmdstr\n"; }
+        system("$cmdstr");
+	$ictr = 0;
+	++$lctr;
+	$dfilelist = "";
+      } 
+      if ( $ctr == @ifiles ) {
+        $ofile = sprintf("%s%s%04d%s", $odir, $obase, $lctr, $oext);
+	push @ofiles, $ofile;
+	if ( -f $ofile ) { unlink $ofile; }
+        $cmdstr="$combine $cargs $dfilelist " . '"' . $ofile . '"';
+        if ( $verbose ) { print "$cmdstr\n"; }
+        system("$cmdstr");
+      }
+    }
+    print "Number of pages exceeded maximum number which can be converted " .
+      "into a single DjVu file on this operating system.  Multiple files " .
+      "were created:\n" . join("\n", @ofiles) . "\n";
+  # if we have more than 1 intermediate file, but not more than the maximum
+  # allowed number of intermediate files, combine them all into a single
+  # output file
+  } elsif ( (@ifiles > 1) && (@ifiles <= $max_ifiles)  ) {
+    $dfilelist = "";
+    foreach $file (@ifiles) { $dfilelist .= '"' . $file . '" '; }
+    $cmdstr="$combine $cargs $dfilelist " . '"' . $output . '"';
+    if ( $verbose ) { print "$cmdstr\n"; }
+    system("$cmdstr");
+  # Otherwise, we only have one intermediate file; copy it to the target
+  # output file
+  } else {
+    copy($ifiles[0], $output);
+  }
 }
-foreach $file (<$tmpdir/*>) { unlink $file; }
+@tmpdirlist=();
+find(\&wanted2, $tmpdir);
+foreach $file ( @tmpdirlist ) { 
+  if ( $file ne $tmpdir ) { unlink $file; }
+}
 rmdir $tmpdir;
 
 sub wanted {
-    /^$name-.*$/ && {$filelist = "$filelist" . '"' . "$tmpdir/$_" . '" '};
+    /^.*\.djvu$/ && { push @filelist, $File::Find::name };
+}
+
+sub wanted2 {
+  push @tmpdirlist, $File::Find::name;
 }
