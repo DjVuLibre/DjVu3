@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.h,v 1.38 1999-11-17 03:29:15 bcr Exp $
+//C- $Id: DjVuDocument.h,v 1.39 1999-11-18 16:38:40 eaf Exp $
  
 #ifndef _DJVUDOCUMENT_H
 #define _DJVUDOCUMENT_H
@@ -33,7 +33,7 @@
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@research.att.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocument.h,v 1.38 1999-11-17 03:29:15 bcr Exp $#
+    @version #$Id: DjVuDocument.h,v 1.39 1999-11-18 16:38:40 eaf Exp $#
 */
 
 //@{
@@ -178,13 +178,18 @@ public:
 	     \item #OLD_INDEXED# - Obsolete multipage format where every page
 	           is stored in a separate file and "includes" (by means
 		   of an #INCL# chunk) the file with the document directory.
+	     \item #SINGLE_PAGE# - Single page document. Basically a file
+	     	   with either #FORM:DJVU# or #FORM:IW44# and no multipage
+		   information. For example, #OLD_INDEXED# documents with
+		   document directory do not qualify even if they contain only
+		   one page.
 	     \item #BUNDLED# - Currently supported bundled format
 	     \item #INDIRECT# - Currently supported "expanded" format, where
 	           every page and component is stored in a separate file. There
 		   is also a {\em top-level} file with the document directory.
           \end{enumerate} */
    enum DOC_TYPE { OLD_BUNDLED=1, OLD_INDEXED, BUNDLED, INDIRECT,
-		   UNKNOWN_TYPE };
+		   SINGLE_PAGE, UNKNOWN_TYPE };
    enum THREAD_FLAGS { STARTED=1, FINISHED=2 };
 
       /** Default constructor. Please call function \Ref{init}() before
@@ -290,10 +295,10 @@ public:
 
       /** If the document has already learnt its type, the function will
 	  returns it: #DjVuDocument::OLD_BUNDLED# or
-	  #DjVuDocument::OLD_INDEXED# or #DjVuDocument:BUNDLED# or
-	  #DjVuDocument::INDIRECT#. The first two formats are obsolete.
-	  Otherwise (if the type is unknown yet), #UNKNOWN_TYPE# will
-	  be returned.
+	  #DjVuDocument::OLD_INDEXED# or #DjVuDocument::SINGLE_PAGE# or
+	  #DjVuDocument:BUNDLED# or #DjVuDocument::INDIRECT#. The first
+	  two formats are obsolete. Otherwise (if the type is unknown yet),
+	  #UNKNOWN_TYPE# will be returned.
 
 	  {\bf Note:} To check the stage of the document initialization
 	  use \Ref{get_flags}() or \Ref{is_init_complete}() functions. To
@@ -368,7 +373,8 @@ public:
 	  Depending on the document format, the function starts working
 	  properly as soon as:
 	  \begin{itemize}
-	     \item #OLD_INDEXED# and #OLD_BUNDLED#: #DOC_NDIR_KNOWN# is set
+	     \item #OLD_INDEXED# and #OLD_BUNDLED# and #SINGLE_PAGE#:
+	           #DOC_NDIR_KNOWN# is set
 	     \item #INDIRECT# and #BUNDLED#: #DOC_DIR_KNOWN# is set.
 	  \end{itemize} */
    int		url_to_page(const GURL & url) const;
@@ -396,9 +402,9 @@ public:
 		   with internal name of every file inside the bundle and
 		   composes an artificial URL by appending the file name to
 		   the document's URL.
-	     \item For #OLD_INDEXED# documents the function composes the
-	           URL by appending the ID to the URL of the directory
-		   containing the document.
+	     \item For #OLD_INDEXED# or #SINGLE_PAGE# documents the function
+		   composes the URL by appending the ID to the URL of the
+		   directory containing the document.
 	  \end{itemize}
 
 	  If information obtained by the initialization thread is not
@@ -406,7 +412,8 @@ public:
 	  Depending on the document type, the information is sufficient when
 	  \begin{itemize}
 	     \item #BUNDLED# and #INDIRECT#: #DOC_DIR_KNOWN# flag is set.
-	     \item #OLD_BUNDLED# and #OLD_INDEXED#: #DOC_TYPE_KNOWN# flag is set.
+	     \item #OLD_BUNDLED# and #OLD_INDEXED# and #SINGLE_PAGE#:
+	           #DOC_TYPE_KNOWN# flag is set.
 	  \end{itemize} */
    GURL		id_to_url(const char * id) const;
 

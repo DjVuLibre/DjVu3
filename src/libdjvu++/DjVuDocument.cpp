@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.63 1999-11-17 03:36:01 bcr Exp $
+//C- $Id: DjVuDocument.cpp,v 1.64 1999-11-18 16:38:40 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -248,7 +248,7 @@ DjVuDocument::init_thread(void)
    } else // chkid!="FORM:DJVM"
    {
 	 // DJVU format
-      DEBUG_MSG("Got DJVU OLD_INDEXED document here.\n");
+      DEBUG_MSG("Got DJVU OLD_INDEXED or SINGLE_PAGE document here.\n");
       doc_type=OLD_INDEXED;
 
       flags|=DOC_TYPE_KNOWN;
@@ -270,6 +270,7 @@ DjVuDocument::init_thread(void)
 	    ndir->insert_page(-1, first_page_name);
 	 } else
 	 {
+	    doc_type=SINGLE_PAGE;
 	    ndir=new DjVuNavDir(init_url.base()+"directory");
 	    ndir->insert_page(-1, init_url.name());
 	 }
@@ -290,6 +291,7 @@ DjVuDocument::init_thread(void)
 	      doc_type==OLD_BUNDLED ? "OLD_BUNDLED" :
 	      doc_type==INDIRECT ? "INDIRECT" :
 	      doc_type==OLD_INDEXED ? "OLD_INDEXED" :
+	      doc_type==SINGLE_PAGE ? "SINGLE_PAGE" :
 	      "UNKNOWN") << "'\n");
 }
 
@@ -410,6 +412,7 @@ DjVuDocument::page_to_url(int page_num) const
    if (flags & DOC_TYPE_KNOWN)
       switch(doc_type)
       {
+	 case SINGLE_PAGE:
 	 case OLD_INDEXED:
 	 {
 	    if (page_num<0) url=init_url;
@@ -464,6 +467,7 @@ DjVuDocument::url_to_page(const GURL & url) const
    if (flags & DOC_TYPE_KNOWN)
       switch(doc_type)
       {
+	 case SINGLE_PAGE:
 	 case OLD_BUNDLED:
 	 case OLD_INDEXED:
 	 {
@@ -527,6 +531,7 @@ DjVuDocument::id_to_url(const char * id) const
 	 case OLD_BUNDLED:
 	    return init_url+id;
 	 case OLD_INDEXED:
+	 case SINGLE_PAGE:
 	    return init_url.base()+id;
       }
    return GURL();
@@ -1075,10 +1080,11 @@ DjVuDocument::request_data(const DjVuPort * source, const GURL & url)
 	    }
 	    break;
 	 }
+	 case SINGLE_PAGE:
 	 case OLD_INDEXED:
 	 case INDIRECT:
 	 {
-	    DEBUG_MSG("The document is in OLD_INDEXED or INDIRECT format\n");
+	    DEBUG_MSG("The document is in SINGLE_PAGE or OLD_INDEXED or INDIRECT format\n");
 	    if (url.base()!=init_url.base())
 	       THROW("URL '"+url+"' points outside of the document's directory.");
 	    if (flags & DOC_DIR_KNOWN)
