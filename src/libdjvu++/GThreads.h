@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: GThreads.h,v 1.4 1999-02-01 18:32:33 leonb Exp $
+//C-  $Id: GThreads.h,v 1.5 1999-02-15 23:44:28 leonb Exp $
 
 #ifndef _GTHREADS_H_
 #define _GTHREADS_H_
@@ -46,7 +46,7 @@
           check whether it is going to block and yield control explicitely if
           this is the case.  This code must be compiled with a patched version
           of egcs-1.1.1 \URL{http://egcs.cygnus.com}. The patch addresses
-          exception thread-safety and is provided in #"@Gcc/libgcc2.c.diff"#.
+          exception thread-safety and is provided in #"@Tools/libgcc2.c.diff"#.
           Once you get the right compiler, this implementation is remarkably
           compact and portable. A variety of processors are supported,
           including mips, intel, sparc, hppa, and alpha.
@@ -76,7 +76,7 @@
     Leon Bottou <leonb@research.att.com> -- initial implementation.\\
     Praveen Guduru <praveen@sanskrit.lz.att.com> -- mac implementation.
     @version
-    #$Id: GThreads.h,v 1.4 1999-02-01 18:32:33 leonb Exp $# */
+    #$Id: GThreads.h,v 1.5 1999-02-15 23:44:28 leonb Exp $# */
 //@{
 
 #include "DjVuGlobal.h"
