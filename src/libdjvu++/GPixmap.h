@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GPixmap.h,v 1.9 1999-11-16 00:00:21 leonb Exp $
+//C- $Id: GPixmap.h,v 1.10 1999-11-16 02:05:57 leonb Exp $
 
 #ifndef _GPIXMAP_H_
 #define _GPIXMAP_H_
@@ -30,7 +30,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: GPixmap.h,v 1.9 1999-11-16 00:00:21 leonb Exp $# */
+    #$Id: GPixmap.h,v 1.10 1999-11-16 02:05:57 leonb Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -64,8 +64,6 @@ struct GPixel
   friend int operator==(const GPixel & p1, const GPixel & p2);
   /** Returns true iff colors are different. */
   friend int operator!=(const GPixel & p1, const GPixel & p2);
-  /** Color correction (see \Ref{GPixmap::color_correct}). */
-  void color_correct(double gamma_correction);
   /** @name Predefined colors. */
   //@{ 
   /// GPixel::WHITE is initialized to #rgb:255/255/255#.
@@ -289,6 +287,9 @@ public:
       ad-hoc formula which limits this effect.  The resulting image is less
       accurate but more pleasant! */
   void color_correct(double corr);
+  /** Applies color correction to an array of pixels. */
+  static void color_correct(double corr, GPixel *pixels, int npixels);
+
   //@}
   
   /** @name Miscellaneous. */

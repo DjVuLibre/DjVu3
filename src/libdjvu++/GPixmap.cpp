@@ -9,9 +9,9 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GPixmap.cpp,v 1.12 1999-11-16 00:00:21 leonb Exp $
+//C- $Id: GPixmap.cpp,v 1.13 1999-11-16 02:05:56 leonb Exp $
 
-// File "$Id: GPixmap.cpp,v 1.12 1999-11-16 00:00:21 leonb Exp $"
+// File "$Id: GPixmap.cpp,v 1.13 1999-11-16 02:05:56 leonb Exp $"
 // -- Implements class PIXMAP
 // Author: Leon Bottou 07/1997
 
@@ -538,7 +538,7 @@ GPixmap::color_correct(double gamma_correction)
 
 
 void 
-GPixel::color_correct(double gamma_correction)
+GPixmap::color_correct(double gamma_correction, GPixel *pix, int npixels)
 {
   // Trivial corrections
   if (gamma_correction>0.999 && gamma_correction<1.001)
@@ -547,9 +547,13 @@ GPixel::color_correct(double gamma_correction)
   unsigned char gtable[256];
   color_correction_table_cache(gamma_correction, gtable);
   // Perform correction
-  r = gtable[r];
-  g = gtable[g];
-  b = gtable[b];
+  while (--npixels>=0)
+    {
+      pix->r = gtable[pix->r];
+      pix->g = gtable[pix->g];
+      pix->b = gtable[pix->b];
+      pix++;
+    }
 }
 
 

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuImage.cpp,v 1.33 1999-11-16 00:00:21 leonb Exp $
+//C- $Id: DjVuImage.cpp,v 1.34 1999-11-16 02:05:56 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -677,6 +677,8 @@ DjVuImage::get_bg_pixmap(const GRect &rect,
   return 0;
 }
 
+
+
 int  
 DjVuImage::stencil(GPixmap *pm, const GRect &rect,
 		   int subsample, double gamma) const
@@ -700,7 +702,7 @@ DjVuImage::stencil(GPixmap *pm, const GRect &rect,
   else if (gamma_correction > 10)
     gamma_correction = 10;
 
-  // Compute alphaq map and relevant JB2Image components
+  // Compute alpha map and relevant JB2Image components
   GList<int> components;
   GP<GBitmap> bm;
   if (fgjb)
@@ -741,11 +743,18 @@ DjVuImage::stencil(GPixmap *pm, const GRect &rect,
       DjVuPalette *fg = fgbc;
       if (jimg->get_blit_count() != fg->colordata.size())
         return 0;
+      // Copy and color correct palette
+      int palettesize = fg->size();
+      GTArray<GPixel> colors(0,palettesize-1);
+      for (int i=0; i<palettesize; i++)
+        fg->index_to_color(i, colors[i]);
+      GPixmap::color_correct(gamma_correction, colors, palettesize);
       // Blit all components (one color at a time)
       while (components.size() > 0)
         {
           GPosition nullpos;
           GPosition pos = components;
+          int lastx = 0;
           int colorindex = fg->colordata[components[pos]];
           // Gather relevant components and relevant rectangle
           GList<int> compset;
@@ -753,9 +762,11 @@ DjVuImage::stencil(GPixmap *pm, const GRect &rect,
           while (pos)
             {
               int blitno = components[pos];
+              const JB2Blit *pblit = jimg->get_blit(blitno);
+              if (pblit->left < lastx) break; 
+              lastx = pblit->left;
               if (fg->colordata[blitno] == colorindex)
                 {
-                  const JB2Blit *pblit = jimg->get_blit(blitno);
                   const JB2Shape  *pshape = jimg->get_shape(pblit->shapeno);
                   GRect rect(pblit->left, pblit->bottom, 
                              pshape->bits->columns(), pshape->bits->rows());
@@ -786,11 +797,8 @@ DjVuImage::stencil(GPixmap *pm, const GRect &rect,
                        pblit->left - rxmin, pblit->bottom - rymin, 
                        subsample);
             }
-          // Blit
-          GPixel color;
-          fg->index_to_color(colorindex, color);
-          color.color_correct(gamma_correction);
-          pm->blit(bm, comprect.xmin-rect.xmin, comprect.ymin-rect.ymin, &color);
+          // Blend color into background pixmap
+          pm->blit(bm, comprect.xmin-rect.xmin, comprect.ymin-rect.ymin, &colors[colorindex]);
         }
       return 1;
     }
@@ -799,12 +807,12 @@ DjVuImage::stencil(GPixmap *pm, const GRect &rect,
   // THREE LAYER MODEL
   if (bm && fgpm)
     {
-#ifndef OLD_THREE_LAYER_RENDERING
       // This follows fig. 4 in Adelson "Layered representations for image
       // coding" (1991) http://www-bcs.mit.edu/people/adelson/papers.html.
       // The properly warped background is already in PM.  The properly warped
       // alpha map is already in BM.  We just have to warp the foreground and
       // perform alpha blending.
+#ifdef SIMPLE_THREE_LAYER_RENDERING
       int w = fgpm->columns();
       int h = fgpm->rows();
       // Determine foreground reduction
@@ -822,7 +830,11 @@ DjVuImage::stencil(GPixmap *pm, const GRect &rect,
       nfg->color_correct(gamma_correction);
       pm->blend(bm, 0, 0, nfg); // blend == attenuate + blit
       return 1;
-#else // OLD_THREE_LAYER_RENDERING
+#else 
+      // Things are now a little bit more complex because the convenient
+      // function GPixmap::stencil() simultaneously upsamples the foreground 
+      // by an integer factor and performs the alpha blending.  We have
+      // to determine how and when this facility can be used.
       int w = fgpm->columns();
       int h = fgpm->rows();
       // Determine foreground reduction
@@ -841,7 +853,7 @@ DjVuImage::stencil(GPixmap *pm, const GRect &rect,
         }
       else 
         {
-          // Must rescale foreground pixmap first
+          // Must pre-warp foreground pixmap
           GP<GPixmap> nfg;
           int desw = (w*red+wantedred-1)/wantedred;
           int desh = (h*red+wantedred-1)/wantedred;
@@ -866,19 +878,21 @@ DjVuImage::stencil(GPixmap *pm, const GRect &rect,
               GRect desired(0,0,desw,desh);
               ps.scale(provided, *fgpm, desired, *nfg);
             }
-          // Compute
+          // Use combined warp+blend function
           pm->stencil(bm, nfg, supersample, &rect, gamma_correction);
           // Cache
           tagimage = this;
           tagfgpm = fgpm;
           cachednfg = nfg;
           return 1;
-#endif // OLD_THREE_LAYER_RENDERING
+        }
+#endif
     }
   
   // FAILURE
   return 0;
 }
+
 
 GP<GPixmap>
 DjVuImage::get_fg_pixmap(const GRect &rect, 
@@ -897,6 +911,7 @@ DjVuImage::get_fg_pixmap(const GRect &rect,
     }
   return 0;
 }
+
 
 GP<GPixmap>
 DjVuImage::get_pixmap(const GRect &rect, int subsample, double gamma) const
