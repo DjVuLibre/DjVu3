@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: c44.cpp,v 1.11 1999-03-02 16:51:34 leonb Exp $
+//C-  $Id: c44.cpp,v 1.12 1999-03-04 18:39:45 leonb Exp $
 
 
 /** @name c44
@@ -149,7 +149,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: c44.cpp,v 1.11 1999-03-02 16:51:34 leonb Exp $# */
+    #$Id: c44.cpp,v 1.12 1999-03-04 18:39:45 leonb Exp $# */
 //@{
 //@}
 
@@ -525,7 +525,7 @@ parse(int argc, char **argv)
       int dot = base.rsearch('.');
       if (dot >= 1)
         base = base.substr(0,dot);
-      iw4file = GOS::expand_name(dir,base) + ".iw4";
+      iw4file = GOS::expand_name(base,dir) + ".iw4";
     }
 }
 
