@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: GBitmap.h,v 1.28 2000-12-18 17:13:42 bcr Exp $
+// $Id: GBitmap.h,v 1.29 2000-12-18 19:06:42 mchen Exp $
 // $Name:  $
 
 #ifndef _GBITMAP_H_
@@ -42,6 +42,9 @@
 #endif
 
 #include "GSmartPointer.h"
+#ifdef DEBUG
+#include "GException.h"
+#endif
 
 class GRect;
 class GMonitor;
@@ -67,7 +70,7 @@ class ByteStream;
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: GBitmap.h,v 1.28 2000-12-18 17:13:42 bcr Exp $#
+    #$Id: GBitmap.h,v 1.29 2000-12-18 19:06:42 mchen Exp $#
 
  */
 //@{
