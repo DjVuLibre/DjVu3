@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuAPI.h,v 1.36 2000-02-01 19:11:37 bcr Exp $
+ *C- $Id: DjVuAPI.h,v 1.37 2000-02-02 04:56:06 bcr Exp $
  *
  * The main header file for the DjVu API
  */
@@ -17,7 +17,10 @@
 
 /* 
  * $Log: DjVuAPI.h,v $
- * Revision 1.36  2000-02-01 19:11:37  bcr
+ * Revision 1.37  2000-02-02 04:56:06  bcr
+ * Fixed the Crop and rotate options.
+ *
+ * Revision 1.36  2000/02/01 19:11:37  bcr
  * Replaced RotateCW and RotateCCW with a DoRotate method.  I also fixed various memory leaks.
  *
  * Revision 1.35  2000/01/31 21:30:19  bcr
@@ -528,12 +531,12 @@ typedef struct _djvu_image_priv * djvu_image_priv;
  */
 #define DJVU_IMAGE_CROP(image,x0,y0,width,height) \
      { \
-       djvu_image *IMAGE=(image); \
-       int o=IMAGE->orientation,x=(x0),y=(y0),xw=(width),xh=(height); \
+       djvu_image *IMAGEX=(image); \
+       int o=IMAGEX->orientation,x=(x0),y=(y0),xw=(width),xh=(height); \
        if(o&DJVU_ROTATE90_CW) \
-         DJVU_IMAGE_CROP_RAW(IMAGE,((o&DJVU_BOTTOM_UP)?(h-y-xh):y),((o&DJVU_MIRROR)?(w-x-xw):x),xh,xw) \
+         DJVU_IMAGE_CROP_RAW(IMAGEX,((o&DJVU_BOTTOM_UP)?((IMAGEX->w)-y-xh):y),((o&DJVU_MIRROR)?((IMAGEX->h)-x-xw):x),xh,xw) \
        else \
-         DJVU_IMAGE_CROP_RAW(IMAGE,((o&DJVU_MIRROR)?(w-x-xw):x),((o&DJVU_BOTTOM_UP)?y:(h-y-xh)),xw,xh) \
+         DJVU_IMAGE_CROP_RAW(IMAGEX,((o&DJVU_MIRROR)?((IMAGEX->w)-x-xw):x),((o&DJVU_BOTTOM_UP)?y:((IMAGEX->h)-y-xh)),xw,xh) \
      }
 
 #ifdef __cplusplus
