@@ -1062,11 +1062,14 @@ then
 else
   i="${CONFIG_DIR}/../src/include/DjVuVersion.h"
 fi
-version=`sed -n -e 's,.* DJVU_CVS_NAME[^0-9]*\([1-9][-_0-9A-Za-z]*\).*,\1,p' < "$i"`
+version=`sed -n -e 's,.* DJVU_CVS_NAME[^0-9]*\([1-9][-_0-9A-Za-z]*\).*,\1,p' < "$i"|tr '\n' '-'`
 if [ -z "$version" ] 
 then 
   version=`sed -n -e 's,.* DJVU_VERSION  *"\(.*\)".*$,\1,p' -e 's,.*DJVU_CVS_REV.*Revision: \([0-9][.0-9]*\) .*,\1,p' < "$i"|tr '\n' '-'|sed 's,-$,,g'`
 fi
-version=`echo "$version"|tr ' ' '_'`
+set -x
+version=`echo $version|tr ' ' '-'`
+echo Building version $version
+set +x
 CONFIG_VARS=`echo version $CONFIG_VARS`
 
