@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.94 2001-05-02 01:05:59 praveen Exp $
+// $Id: GString.cpp,v 1.95 2001-05-02 22:32:43 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -774,8 +774,12 @@ GStringRep::search(char c, int from) const
 int 
 GStringRep::search(char const *ptr, int from) const
 {
-  if (from<0)
-    from += size;
+  if(from<0)
+  {
+    from+=size;
+    if(from<0)
+      G_THROW( ERR_MSG("GString.bad_subscript") );
+  }
   int retval=(-1);
   if (from>=0 && from<size)
   {
@@ -789,8 +793,12 @@ GStringRep::search(char const *ptr, int from) const
 int 
 GStringRep::rsearch(char c, int from) const
 {
-  if (from<0)
-    from += size;
+  if(from<0)
+  {
+    from+=size;
+    if(from<0)
+      G_THROW( ERR_MSG("GString.bad_subscript") );
+  }
   int retval=(-1);
   if (from>=0 && from<size)
   {
@@ -813,40 +821,34 @@ GStringRep::rsearch(char const *ptr, int from) const
 }
 
 int
-GBaseString::contains(const char accept[],int from) const
+GStringRep::contains(const char accept[],int from) const
 {
-  int retval=(-1);
   if(from<0)
   {
-	from+=length();
-	if(from<0)
-	  G_THROW( ERR_MSG("GString.bad_subscript") );
+    from+=size;
+    if(from<0)
+      G_THROW( ERR_MSG("GString.bad_subscript") );
   }
-  if(accept && strlen(accept) && (from < (int)length()))
+  int retval=(-1);
+  if (accept && accept[0] && from>=0 && from<size)
   {
-    const char *src = (const char*)(*this)+((from<0)?0:from);
-    const char *ptr;
-    if((ptr=strpbrk(src,accept)))
+    char const * const src = data+from;
+    char const *ptr=strpbrk(src,accept);
+    if(ptr)
     {
-		retval=(int)(ptr-src)+((from<0)?0:from);
+      retval=(int)(ptr-src)+from;
     }
   }
   return retval;
 }
 
 int
-GBaseString::rcontains(const char accept[],int from) const
+GStringRep::rcontains(const char accept[],int from) const
 {
-  if(from<0)
-  {
-	from+=length();
-	if(from<0)
-	  G_THROW( ERR_MSG("GString.bad_subscript") );
-  }
   int retval=(-1);
   while((from=contains(accept,from)) >= 0)
   {
-    retval=++from;
+    retval=from++;
   }
   return retval;
 }

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.h,v 1.71 2001-05-02 01:05:59 praveen Exp $
+// $Id: GString.h,v 1.72 2001-05-02 22:32:43 bcr Exp $
 // $Name:  $
 
 #ifndef _GSTRING_H_
@@ -57,7 +57,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.71 2001-05-02 01:05:59 praveen Exp $# */
+    #$Id: GString.h,v 1.72 2001-05-02 22:32:43 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -232,6 +232,10 @@ public:
   int rsearch(char c, int from=0) const;
 
   int rsearch(char const *str, int from=0) const;
+
+  int contains(char const accept[], int from=0) const;
+
+  int rcontains(char const accept[], int from=0) const;
 
 protected:
   // Return the next character and increment the source pointer.
@@ -557,22 +561,24 @@ public:
       scanning backwards until reaching the beginning of the string.  This
       function returns the position of the matching character.  It returns
       #-1# if character #c# cannot be found. */
-  int rsearch(char c, int from=-1) const
+  int rsearch(char c, const int from=0) const
   { return ptr?((*this)->rsearch(c,from)):(-1); }
   /** Searches sub-string #str# in the string, starting at position #from# and
       scanning backwards until reaching the beginning of the string.  This
       function returns the position of the first matching character of the
       sub-string. It returns #-1# if string #str# cannot be found. */
-  int rsearch(const char *str, int from=-1) const
+  int rsearch(const char *str, const int from=0) const
   { return ptr?((*this)->rsearch(str,from)):(-1); }
   /** Searches for any of the specified characters in the accept string.
       It returns #-1# if the none of the characters and be found, otherwise
       the position of the first match. */
-  int contains(const char accept[], int from=0) const;
+  int contains(const char accept[], const int from=0) const
+  { return ptr?((*this)->contains(accept,from)):(-1); }
   /** Searches for any of the specified characters in the accept string.
       It returns #-1# if the none of the characters and be found, otherwise
       the position of the last match. */
-  int rcontains(const char accept[], int from=0) const;
+  int rcontains(const char accept[], const int from=0) const
+  { return ptr?((*this)->rcontains(accept,from)):(-1); }
 
   /** Concatenates strings. Returns a string composed by concatenating
       the characters of strings #s1# and #s2#. */

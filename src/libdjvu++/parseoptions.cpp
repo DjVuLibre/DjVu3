@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: parseoptions.cpp,v 1.79 2001-05-01 22:40:13 bcr Exp $
+// $Id: parseoptions.cpp,v 1.80 2001-05-02 22:32:43 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -202,7 +202,6 @@ DjVuParseOptions::DjVuParseOptions(const char prog[])
   ProfileTokens=new DjVuTokenList;
   Configuration=new ProfileList;
   Arguments=new Profiles;
-  Errors=new ErrorList;
   filename=0;
   profile_token=VarTokens->SetToken(profile_token_string);
   defaultProfile=ReadConfig(default_string);
@@ -236,7 +235,6 @@ DjVuParseOptions::DjVuParseOptions (
   ProfileTokens=new DjVuTokenList;
   Configuration=new ProfileList;
   Arguments=new Profiles;
-  Errors=new ErrorList;
   name=new char [strlen(readasprofile)+1];
   strcpy(name,readasprofile);
   filename=0;
@@ -258,7 +256,6 @@ DjVuParseOptions::DjVuParseOptions(
   argv(0),
   optind(0)
 {
-  Errors=new ErrorList;
   VarTokens->links++;
   ProfileTokens->links++;
   Configuration->links++;
@@ -294,7 +291,6 @@ DjVuParseOptions::~DjVuParseOptions()
   if(!ProfileTokens->links--) delete ProfileTokens;
   if(!Configuration->links--) delete Configuration;
   delete Arguments;
-  delete Errors;
   delete [] name;
   delete [] filename;
 }
@@ -310,10 +306,10 @@ DjVuParseOptions::init(
 {
   DjVuParseOptions tmp(readfilename,readasprofile,VarTokens);
 
-  const char *s;  // Append the error messages from the tmp object.
-  while((s=tmp.Errors->GetError()))
+  GUTF8String s;  // Append the error messages from the tmp object.
+  while((s=tmp.GetError()).length())
   {
-    Errors->AddError(s);
+    Errors.append(s);
   }
     // Now we copy all the new profiles
   const int i_max=tmp.ProfileTokens->NextToken;
@@ -385,7 +381,7 @@ DjVuParseOptions::AmbiguousOptions(
     {
       GUTF8String s;
       s.format( ERR_MSG("parseoptions.ambiguous") "\t%s\t%s\t%s\t%s", name1,value1,name2,value2 );
-      Errors->AddError(s);
+      Errors.append(s);
     }
   }
 }
@@ -539,7 +535,7 @@ DjVuParseOptions::GetInteger(
       }
       if(*endptr)
       {
-        Errors->AddError(GUTF8String( ERR_MSG("parseoptions.bad_value") "\t") + str);
+        const_cast<GList<GUTF8String> &>(Errors).append(GUTF8String( ERR_MSG("parseoptions.bad_value") "\t") + str);
         retval=errval;
       }
     }
@@ -570,7 +566,7 @@ DjVuParseOptions::GetNumber(
     }
     if(*endptr)
     {
-      Errors->AddError(GUTF8String( ERR_MSG("parseoptions.bad_number") "\t") + str);
+      const_cast<GList<GUTF8String> &>(Errors).append(GUTF8String( ERR_MSG("parseoptions.bad_number") "\t") + str);
       retval=errval;
     }
   }
@@ -649,24 +645,32 @@ DjVuParseOptions::ParseArguments(
 int
 DjVuParseOptions::HasError() const 
 {
-  return Errors->HasError();
+  return ((GPosition)Errors)?1:0;
 }
 
 const char *DjVuParseOptions::GetError()
 {
-  return Errors->GetError();
+  GPosition pos=Errors;
+  if(pos)
+  {
+    PrevError=Errors[pos];
+    Errors.del(pos);
+  }else
+  {
+    PrevError.empty();
+  }
+  return PrevError;
 }
 
 void DjVuParseOptions::ClearError()
 {
-  delete Errors;
-  Errors=new ErrorList;
+  Errors.empty();
 }
 
 void DjVuParseOptions::perror(const GUTF8String &mesg)
 {
-  const char *s;
-  while((s=Errors->GetError()))
+  GUTF8String s;
+  while((s=GetError()).length())
   {
     if(mesg.length())
     {
@@ -698,7 +702,7 @@ DjVuParseOptions::Add(
       emesg=emesg2;
     }
     const char *p=GetProfileName(profile);
-    Errors->AddError(GUTF8String(emesg) + "\t" + filename +
+    Errors.append(GUTF8String(emesg) + "\t" + filename +
                                       "\t" + GUTF8String(line) + 
                                       "\t" + p + 
                                       "\t" + value);
@@ -851,7 +855,7 @@ DjVuParseOptions::ReadNextConfig (
             }
           }else
           {
-            Errors->AddError(GUTF8String( ERR_MSG("parseoptions.cant_inherit") ) + 
+            Errors.append(GUTF8String( ERR_MSG("parseoptions.cant_inherit") ) + 
                                                                     "\t" + filename +
                                                                     "\t" + GUTF8String(line) +
                                                                     "\t" + profilename +
@@ -1134,83 +1138,6 @@ DjVuParseOptions::ReadFile(int &line,FILE *f,int profile)
   delete [] value;
 }
 
-
-//////////////////////////////////////////////////////////////////////////
-// Now we define the private ErrorList Class
-//////////////////////////////////////////////////////////////////////////
-
-// This is a private constructor, for adding elements to the linked
-// list.
-DjVuParseOptions::ErrorList::ErrorList(
-  ErrorList *old,const char mesg[]) : next(0),prev(old),retvalue(0) 
-{
-  old->next=this;
-  strcpy(value=new char [strlen(mesg)+1],mesg);
-}
-
-// This destructor will destroy the everything in the linked list after
-// it's location, as well as itself.
-DjVuParseOptions::ErrorList::~ErrorList()
-{
-  delete [] retvalue;
-  delete [] value;
-  if(prev) prev->next=0;
-  delete next;
-}
-
-
-// This is a function for adding more error messages.  Each error message
-// is an element of the double linked list.  The new element will be add to
-// the end of the list.  We can find this element quickly by using the 
-// prev pointer of the first element.
-//
-const char *
-DjVuParseOptions::ErrorList::AddError(const char mesg[])
-{
-  char *retval;
-  if(value)
-  {
-    prev=new ErrorList(prev,mesg);
-    retval=(prev->value);
-  }else
-  {
-    value=new char[strlen(mesg)+1];
-    strcpy((retval=value),mesg);
-  }
-  return retval;
-}
-
-// This function is the reverse of AddError.  Only we peel off the error
-// message from the top of the list, and AddError to the bottom.  So something
-// like AddError(GetError()) would rotate the end of the list to the top.
-//
-const char *
-DjVuParseOptions::ErrorList::GetError()
-{
-  delete [] retvalue;
-  retvalue=value;
-  if(next)
-  {
-    // Move the next value into the current element
-    ErrorList *next_save=next;
-    value=next->value;
-    next->value=0;
-    if((next=next->next))
-    {
-      next->prev=this;
-    }else
-    {
-      prev=this;
-    }
-    next_save->prev=next_save->next=0;
-    // delete the next element
-    delete next_save;
-  }else
-  {
-    value=0;
-  }
-  return retvalue;
-}
 
 // These constructors and destructors are as simple as it gets.
 DjVuParseOptions::ProfileList::ProfileList()
@@ -1502,7 +1429,7 @@ DjVuParseOptions::ConfigFilename(const char config[],int level)
     return retval;        
   }else
   {
-    Errors->AddError( ERR_MSG("parseoptions.bad_install") );
+    Errors.append( ERR_MSG("parseoptions.bad_install") );
     return 0;
   }
 #endif
@@ -1603,7 +1530,7 @@ DjVuParseOptions::GetOpt::GetOpt(DjVuParseOptions *xopt,
                                  const int only)
 : optind(1),
   VarTokens(*(xopt->VarTokens)),
-  Errors(*(xopt->Errors)),
+  Errors(xopt->Errors),
   argc(xargc),
   nextchar(1),
   argv(xargv),
@@ -1715,7 +1642,7 @@ DjVuParseOptions::GetOpt::getopt_long()
     }
     if(has_dash)
     {
-      Errors.AddError(GUTF8String( ERR_MSG("parseoptions.unrecog_option") "\t") + argv[optind]);
+      Errors.append(GUTF8String( ERR_MSG("parseoptions.unrecog_option") "\t") + argv[optind]);
       return -1;
     }
   }
@@ -1725,7 +1652,7 @@ DjVuParseOptions::GetOpt::getopt_long()
     if(nextchar > 1 || argv[optind][nextchar] != '-' ||
       (argv[optind][nextchar+1]&&argv[optind][nextchar+1]!='-'))
     {
-      Errors.AddError(GUTF8String( ERR_MSG("parseoptions.unrecog_option_c") "\t")
+      Errors.append(GUTF8String( ERR_MSG("parseoptions.unrecog_option_c") "\t")
                       + GUTF8String(argv[optind][nextchar]));
       return -1;
     }
@@ -1755,7 +1682,7 @@ DjVuParseOptions::GetOpt::getopt_long()
     }else
     {
       const char * const xname=opts.name;
-      Errors.AddError(GUTF8String( ERR_MSG("parseoptions.missing_arg_option") "\t") + xname);
+      Errors.append(GUTF8String( ERR_MSG("parseoptions.missing_arg_option") "\t") + xname);
       return -1;
     }
     optind++;

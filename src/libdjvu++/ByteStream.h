@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.h,v 1.52 2001-04-26 23:58:11 bcr Exp $
+// $Id: ByteStream.h,v 1.53 2001-05-02 22:32:43 bcr Exp $
 // $Name:  $
 
 #ifndef _BYTESTREAM_H
@@ -62,7 +62,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation\\
     Andrei Erofeev <eaf@geocities.com> -- 
     @version
-    #$Id: ByteStream.h,v 1.52 2001-04-26 23:58:11 bcr Exp $# */
+    #$Id: ByteStream.h,v 1.53 2001-05-02 22:32:43 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -292,6 +292,10 @@ public:
   static GP<ByteStream> create_static(
     void const * const buffer, const size_t size);
   static const char *EndOfFile;
+  /** Returns the contents of the file as a GNativeString */
+  GNativeString getAsNative(void);
+  /** Returns the contents of the file as a GUTF8String */
+  GUTF8String getAsUTF8(void);
 };
 
 inline size_t
@@ -344,6 +348,7 @@ public:
   virtual void flush(void)
     { bs->flush(); }
 };
+
 
 //@}
 

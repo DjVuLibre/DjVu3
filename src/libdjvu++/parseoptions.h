@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: parseoptions.h,v 1.44 2001-05-01 22:40:13 bcr Exp $
+// $Id: parseoptions.h,v 1.45 2001-05-02 22:32:43 bcr Exp $
 // $Name:  $
 
 #ifndef __DJVUPARSEOPTIONS_H__
@@ -66,7 +66,7 @@
 
    @memo Class used for parsing options and configuration files.
    @author Bill Riemers
-   @version #$Id: parseoptions.h,v 1.44 2001-05-01 22:40:13 bcr Exp $#
+   @version #$Id: parseoptions.h,v 1.45 2001-05-02 22:32:43 bcr Exp $#
  */
 
 /*@{*/
@@ -266,7 +266,6 @@ class DjVuParseOptions
 {
 
 public: // These are just class declarations.
-  class ErrorList;
   class Profiles;
   class ProfileList;
   class GetOpt;
@@ -279,7 +278,8 @@ private:
   char *name; // This is the name of the function.
   int defaultProfile;
   int currentProfile;
-  ErrorList *Errors;
+  GList<GUTF8String> Errors;
+  GUTF8String PrevError;
   DjVuTokenList *VarTokens;
   DjVuTokenList *ProfileTokens;
   ProfileList *Configuration;
@@ -588,33 +588,6 @@ DjVuParseOptions::get_optind(void) const
 
 #define DEFAULT_STRING "global"
 
-// This is a double linked list for appending error messages.  This
-// is used to queue up error messages, so we can parse all the configuration
-// files without interruption, or trying to figure out how to resume if 
-// the user wishes to ignore the error.
-//
-class DjVuParseOptions::ErrorList
-{  // This is a double linked list, that wraps around at the beginning.
-private:
-  class ErrorList *next,*prev;
-  char *value,*retvalue;
-  ErrorList(class ErrorList *,const char[]);
-public:
-  ErrorList()
-  {
-      next = 0;
-      prev = this;
-      value = 0;
-      retvalue = 0;
-  };
-  ErrorList(const char[]);
-  ~ErrorList();
-  const char *AddError(const char value[]);
-  const char *GetError(); // Each get removes the error message.
-  inline int HasError() const 
-  { return !!value; };
-};
-
 // This is just a simple array of strings.  We could just use a structure,
 // but some compilers incorrectly treat structures differently from all public
 // classes...
@@ -669,7 +642,7 @@ public:
   int optind;
 private:
   DjVuTokenList &VarTokens;
-  ErrorList &Errors;
+  GList<GUTF8String> Errors;
   int argc;
   int nextchar;
   const char * const *argv;

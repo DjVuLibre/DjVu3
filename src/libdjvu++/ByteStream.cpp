@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.cpp,v 1.76 2001-05-01 23:41:22 bcr Exp $
+// $Id: ByteStream.cpp,v 1.77 2001-05-02 22:32:43 bcr Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 04/1997
@@ -452,7 +452,9 @@ size_t
 ByteStream::copy(ByteStream &bsfrom, size_t size)
 {
   size_t total = 0;
-  static const size_t buffer_size=1024*1024;
+  const size_t max_buffer_size=200*1024;
+  const size_t buffer_size=(size>0 && size<max_buffer_size)
+    ?size:max_buffer_size;
   char *buffer;
   GPBuffer<char> gbuf(buffer,buffer_size);
   for(;;)
@@ -1288,5 +1290,45 @@ DjVuPrintMessage(const char *fmt, ... )
     const GUTF8String message(fmt,args);
     strout->writestring(message);
   }
+}
+
+static void 
+read_file(ByteStream &bs,char buffer[],GPBuffer<char> &gbuffer)
+{
+  const int size=bs.size();
+  int pos=0;
+  if(size>0)
+  {
+    size_t readsize=size+1;
+    gbuffer.resize(readsize);
+    for(int i;readsize&&(i=bs.read(buffer+pos,readsize))>0;pos+=i,readsize-=i)
+      EMPTY_LOOP;
+  }else
+  {
+    const size_t readsize=32768;
+    gbuffer.resize(readsize);
+    for(int i;((i=bs.read(buffer+pos,readsize))>0);
+      gbuffer.resize((pos+=i)+readsize))
+      EMPTY_LOOP;
+  }
+  buffer[pos]=0;
+}
+
+GNativeString
+ByteStream::getAsNative(void)
+{
+  char *buffer;
+  GPBuffer<char> gbuffer(buffer);
+  read_file(*this,buffer,gbuffer);
+  return GNativeString(buffer);
+}
+
+GUTF8String
+ByteStream::getAsUTF8(void)
+{
+  char *buffer;
+  GPBuffer<char> gbuffer(buffer);
+  read_file(*this,buffer,gbuffer);
+  return GUTF8String(buffer);
 }
 

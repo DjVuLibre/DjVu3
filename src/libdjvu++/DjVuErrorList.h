@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuErrorList.h,v 1.17 2001-04-21 23:22:04 mchen Exp $
+// $Id: DjVuErrorList.h,v 1.18 2001-05-02 22:32:43 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUERRORLIST_H
@@ -50,7 +50,7 @@ class ByteStream;
 
     @memo DjVuErrorList class.
     @author Bill C Riemers <bcr@lizardtech.com>
-    @version #$Id: DjVuErrorList.h,v 1.17 2001-04-21 23:22:04 mchen Exp $#
+    @version #$Id: DjVuErrorList.h,v 1.18 2001-05-02 22:32:43 bcr Exp $#
 */
 
 //@{
@@ -86,7 +86,7 @@ public:
   inline void ClearError(void);
 
      /// Get one error message and clear that message from the list.
-  const char *GetError(void);
+  GUTF8String GetError(void);
 
      /// Check if there are anymore error messages.
   inline bool HasError(void) const;
@@ -98,7 +98,7 @@ public:
   inline void ClearStatus(void);
 
      /// Get one status message and clear that message from the list.
-  const char *GetStatus(void);
+  GUTF8String GetStatus(void);
 
      /// Check if there are any more status messages.
   inline bool HasStatus(void) const;
@@ -112,9 +112,7 @@ private:
   GURL pool_url;
   GP<DataPool> pool;
   GList<GUTF8String> Errors;
-  GUTF8String PrevError;
   GList<GUTF8String> Status;
-  GUTF8String PrevStatus;
 private: //dummy stuff
   static GURL set_stream(ByteStream *);
 };

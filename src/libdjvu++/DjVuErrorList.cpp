@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuErrorList.cpp,v 1.15 2001-04-26 23:58:12 bcr Exp $
+// $Id: DjVuErrorList.cpp,v 1.16 2001-05-02 22:32:43 bcr Exp $
 // $Name:  $
 
 
@@ -74,32 +74,30 @@ DjVuErrorList::notify_status(const DjVuPort * source, const GUTF8String &msg)
   return 1;
 }  
 
-const char *
+GUTF8String
 DjVuErrorList::GetError(void)
 {
-  const char *retval=0;
+  GUTF8String PrevError;
   GPosition pos;
   if((pos=Errors))
   {
     PrevError=Errors[pos];
     Errors.del(pos);
-    retval=(const char *)PrevError;
   }
-  return retval;
+  return PrevError;
 }
 
-const char *
+GUTF8String
 DjVuErrorList::GetStatus(void)
 {
-  const char *retval=0;
+  GUTF8String PrevStatus;
   GPosition pos;
   if((pos=Status))
   {
     PrevStatus=Status[pos];
     Status.del(pos);
-    retval=(const char *)PrevStatus;
   }
-  return retval;
+  return PrevStatus;
 }
 
 GP<DataPool>

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocument.h,v 1.86 2001-04-30 23:30:45 bcr Exp $
+// $Id: DjVuDocument.h,v 1.87 2001-05-02 22:32:43 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUDOCUMENT_H
@@ -58,7 +58,7 @@ class ByteStream;
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocument.h,v 1.86 2001-04-30 23:30:45 bcr Exp $#
+    @version #$Id: DjVuDocument.h,v 1.87 2001-05-02 22:32:43 bcr Exp $#
 */
 
 //@{
@@ -417,6 +417,9 @@ public:
       /// Returns the URL passed to the \Ref{init}() function
    GURL		get_init_url(void) const;
 
+      /** Returns a listing of id's used by this document. */
+   GList<GUTF8String> get_id_list(void);
+
       /** Returns data corresponding to the URL passed to the \Ref{init}()
 	  function.
 
@@ -598,10 +601,10 @@ public:
 	  above. The only thing worth mentioning here is how the #ID#
 	  parameter is treated.
 
-	  First of all the function checks, if the ID contains a number.
+          First off, \Ref{id_to_url}() is called.  If not successfull,
+	  the function checks, if the ID contains a number.
 	  If so, it just calls the #get_djvu_file()# function above. If ID is
-	  #ZERO# or just empty, page number #-1# is assumed. Otherwise
-	  the ID is translated to the URL using \Ref{id_to_url}().
+	  #ZERO# or just empty, page number #-1# is assumed.
 
 	  If #dont_create# is #FALSE# the function will return the file
 	  only if it already exists. */

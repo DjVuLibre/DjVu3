@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocument.cpp,v 1.168 2001-05-02 01:05:59 praveen Exp $
+// $Id: DjVuDocument.cpp,v 1.169 2001-05-02 22:32:43 bcr Exp $
 // $Name:  $
 
 
@@ -918,8 +918,6 @@ DjVuDocument::get_djvu_file(const GUTF8String& id, bool dont_create)
   DEBUG_MAKE_INDENT(3);
   if (!id.length())
     return get_djvu_file(-1);
-  if (id.is_int())
-    return get_djvu_file(id.toInt());
   GURL url;
   // I'm locking the flags because depending on what id_to_url()
   // returns me, I'll be creating DjVuFile in different ways.
@@ -928,7 +926,7 @@ DjVuDocument::get_djvu_file(const GUTF8String& id, bool dont_create)
   {
     GMonitorLock lock(&flags);
     url=id_to_url(id);
-    if(url.is_empty())
+    if(url.is_empty() && !id.is_int())
     {
       // If init is complete, we know for sure, that there is no such
       // file with ID 'id' in the document. Otherwise we have to
@@ -963,7 +961,9 @@ DjVuDocument::get_djvu_file(const GUTF8String& id, bool dont_create)
       return file;
     }
   }
-  return get_djvu_file(url,dont_create);
+  return url.is_empty()
+    ?get_djvu_file(id.toInt(),dont_create)
+    :get_djvu_file(url,dont_create);
 }
 
 GP<DjVuFile>
@@ -1193,6 +1193,21 @@ DjVuDocument::add_thumb_req(const GP<ThumbReq> & thumb_req)
    }
    threqs_list.append(thumb_req);
    return thumb_req;
+}
+
+GList<GUTF8String>
+DjVuDocument::get_id_list(void)
+{
+  GList<GUTF8String> ids;
+  if (is_init_complete())
+  {
+    GPList<DjVmDir::File> files_list=djvm_dir->get_files_list();
+    for(GPosition pos=files_list;pos;++pos)
+    {
+      ids.append(files_list[pos]->get_load_name());
+    }
+  }
+  return ids;
 }
 
 GP<DataPool>
