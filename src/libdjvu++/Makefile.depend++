@@ -224,8 +224,12 @@ djvutopnm.o: djvutopnm.cpp GException.h \
  DjVuPort.h GURL.h DjVuNavDir.h \
  DjVuDocument.h DjVuFileCache.h debug.h \
  DjVmDir0.h DjVmDoc.h DjVmDir.h GOS.h
+parseoptions.o: parseoptions.cpp parseoptions.h \
+ tokenlist.h DjVuGlobal.h
 ppmcoco.o: ppmcoco.cpp GException.h \
  DjVuGlobal.h ByteStream.h GContainer.h \
  GSmartPointer.h Arrays.h GPixmap.h \
  GRect.h GBitmap.h GString.h
+tokenlist.o: tokenlist.cpp tokenlist.h \
+ DjVuGlobal.h
 ### END   C++ DEPENDENCIES
