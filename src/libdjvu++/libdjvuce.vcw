@@ -3,7 +3,7 @@ Microsoft eMbedded Visual Tools Workspace File, Format Version 3.00
 
 ###############################################################################
 
-Project: "ddjvuce"=".\ddjvuce.vcp" - Package Owner=<4>
+Project: "ddjvuce"="..\djvutools\reference\ddjvuce.vcp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -11,6 +11,9 @@ Package=<5>
 
 Package=<4>
 {{{
+    Begin Project Dependency
+    Project_Dep_Name libdjvuce
+    End Project Dependency
 }}}
 
 ###############################################################################
