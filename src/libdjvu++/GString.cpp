@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.54 2001-04-13 01:49:20 praveen Exp $
+// $Id: GString.cpp,v 1.55 2001-04-13 17:36:01 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -48,12 +48,36 @@
 #include "debug.h"
 
 
-// #ifndef WIN32
-#define LIBICONV_PLUG true
-// #endif
+#if defined(__linux__) || defined(WIN32)
+#define HAS_MBSTATE 1
+#endif
+
+#ifndef HAS_MBSTATE
+// Under some systems, wctomb() and mbtowc() are not thread
+// safe.  In those cases, wcrtomb and mbrtowc are prefered.
+// For Solaris, wctomb() and mbtowc() are thread safe, and 
+// wcrtomb() and mbrtowc() don't exist.
+
+typedef int mbstate_t;
+static inline  int
+wcrtomb(char *bytes,wchar_t w,mbstate_t &);
+{
+  return wctomb(bytes,w);
+}
+
+static inline int
+mbrtowc(wchar_t *w,const char *s, size_t n, mbstate_t &)
+{
+  return mbtowc(&w,source,n);
+}
+#endif
+
 
 
 #ifdef HAS_ICONV
+// #ifndef WIN32
+#define LIBICONV_PLUG true
+// #endif
 #include <iconv.h>//MBCS cvt
 #include "libcharset.h"//MBCS cvt
 #endif
@@ -219,6 +243,7 @@ GString::GString( const GP<GStringRep> &rep) : GP<GStringRep>(rep)
   init();
 }
 
+#if 0
 GString &
 GString::operator= ( const GP<GStringRep> &rep)
 {
@@ -226,6 +251,7 @@ GString::operator= ( const GP<GStringRep> &rep)
   gstr=(*this)->data;
   return (*this);
 }
+#endif
 
 #if 0
 GString& 

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.h,v 1.42 2001-04-13 15:53:06 bcr Exp $
+// $Id: GString.h,v 1.43 2001-04-13 17:36:01 bcr Exp $
 // $Name:  $
 
 #ifndef _GSTRING_H_
@@ -57,7 +57,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.42 2001-04-13 15:53:06 bcr Exp $# */
+    #$Id: GString.h,v 1.43 2001-04-13 17:36:01 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -360,6 +360,9 @@ public:
   // Sets the gstr pointer;
   void init(void);
 
+  GString &init(const GP<GStringRep> &rep)
+  { GP<GStringRep>::operator=(rep); init(); return *this;}
+
   // -- CONSTRUCTORS
   /** Null constructor. Constructs an empty string. */
   GString( void ) { init(); } 
@@ -414,26 +417,16 @@ public:
   GString(const char fmt[], va_list args);
   // -- SEARCHING
   
-  // -- COPY OPERATOR
-  GString& operator= (const GP<GStringRep> &rep);
-
   /** Copy operator. Resets this string with the value of the string #gs#.
       This operation is efficient because string memory is allocated using a
       "copy-on-write" strategy. Both strings will share the same segment of
       memory until one of the strings is modified. */
-  GString& operator= (const GString &gs);
-
-  /** Copy a null terminated character array, in the native mbs format.
-      Resets this string with the character string contained in the null
-      terminated character array #str#. */
-  GString& assignNative(const char *str)
-  { return ((*this)=GStringRep::Native::create(str)); }
-
-  /** Copy a null terminated character array, in the native mbs format.
-      Resets this string with the character string contained in the null
-      terminated character array #str#. */
-  GString& assignUTF8(const char *str)
-  { return ((*this)=GStringRep::UTF8::create(str)); }
+  GString& operator= (const char str);
+  GString& operator= (const char *str);
+  GString& operator= (const GP<GStringRep> &str);
+  GString& operator= (const GString &str);
+  GString& operator= (const GUTF8String &str);
+  GString& operator= (const GNativeString &str);
 
   // -- ACCESS
   /** Converts a string into a constant null terminated character array.  This
@@ -558,6 +551,10 @@ public:
 
   /** Concatenates strings. Returns a string composed by concatenating
       the characters of strings #s1# and #s2#. */
+  friend GUTF8String operator+(const GUTF8String &s1, const GString &s2);
+  friend GUTF8String operator+(const GString &s1, const GUTF8String &s2);
+  friend GNativeString operator+(const GNativeString &s1, const GString &s2);
+  friend GNativeString operator+(const GString &s1, const GNativeString &s2);
   friend GString operator+(const GString &s1, const GString &s2) 
     { return GStringRep::create(s1,s2); }
   friend GString operator+(const GString &s1, const char    *s2) 
@@ -698,6 +695,12 @@ protected:
 class GUTF8String : public GString
 {
 public:
+  void init(void)
+  { GString::init(); }
+
+  GUTF8String &init(const GP<GStringRep> &rep)
+  {  GP<GStringRep>::operator=(rep?rep->toUTF8(true):rep); init(); return *this; }
+
   GUTF8String(void) { init(); }
   GUTF8String(const char *str)
     : GString(GStringRep::UTF8::create(str)) { init(); }
@@ -742,16 +745,12 @@ public:
   /** Copy a null terminated character array. Resets this string with the
       character string contained in the null terminated character array
       #str#. */
-  GUTF8String& operator= (GUTF8String &str)
-  { 
-    GP<GStringRep>(*this)=str;
-    init();
-    return *this;
-  }
-
-  template <class TYPE>
-  GUTF8String& operator= (const TYPE &str)
-  { return (*this=GUTF8String(str)); }
+  GUTF8String& operator= (const char str);
+  GUTF8String& operator= (const char *str);
+  GUTF8String& operator= (const GP<GStringRep> &str);
+  GUTF8String& operator= (const GString &str);
+  GUTF8String& operator= (const GUTF8String &str);
+  GUTF8String& operator= (const GNativeString &str);
 
 
   /** Returns a copy of this string with characters used in XML with
@@ -782,23 +781,37 @@ public:
   /// Appends character #ch# to the string.
   GUTF8String& operator+= (char ch)
   {
-      return (*this=GStringRep::UTF8::create((const char*)*this,GStringRep::UTF8::create(&ch,1)));
+    init(GStringRep::UTF8::create((const char*)*this,GStringRep::UTF8::create(&ch,1)));
+    return *this;
   }
 
   /// Appends the null terminated character array #str# to the string.
   GUTF8String& operator+= (const char *str)
   {
-    return (*this=GStringRep::UTF8::create(*this,str));
+    init(GStringRep::UTF8::create(*this,str));
+    return *this;
   }
   /// Appends the specified GString to the string.
   GUTF8String& operator+= (const GString &str)
   { 
-    return (*this=GStringRep::UTF8::create(*this,str));
+    init(GStringRep::UTF8::create(*this,str));
+    return *this;
   }
+
+  /** Returns a sub-string.  The sub-string is composed by copying #len#
+      characters starting at position #from# in this string.  The length of
+      the resulting string may be smaller than #len# if the specified range is
+      too large. */
+  GUTF8String substr(int from, unsigned int len=1) const
+    { return GUTF8String(*this, from, len); }
 
   /** Concatenates strings. Returns a string composed by concatenating
       the characters of strings #s1# and #s2#.
   */
+  friend GUTF8String operator+(const GUTF8String &s1, const GString &s2) 
+    { return GStringRep::UTF8::create(s1,s2); }
+  friend GUTF8String operator+(const GString &s1, const GUTF8String &s2) 
+    { return GStringRep::UTF8::create(s1,s2); }
   friend GUTF8String operator+(const GUTF8String &s1, const GUTF8String &s2) 
     { return GStringRep::UTF8::create(s1,s2); }
   friend GUTF8String operator+(const GUTF8String &s1, const char    *s2) 
@@ -810,6 +823,12 @@ public:
 class GNativeString : public GString
 {
 public:
+  void init(void)
+  { GString::init(); }
+
+  GNativeString &init(const GP<GStringRep> &rep)
+  {  GP<GStringRep>::operator=(rep?rep->toNative(true):rep); init(); return *this; }
+
   GNativeString(void)
   { init(); }
   GNativeString(const char *str)
@@ -853,16 +872,12 @@ public:
   /** Copy a null terminated character array. Resets this string with the
       character string contained in the null terminated character array
       #str#. */
-  GNativeString& operator= (GNativeString &str)
-  { 
-    GP<GStringRep>(*this)=str;
-    init();
-    return *this;
-  }
-
-  template <class TYPE>
-  GNativeString& operator= (const TYPE &str)
-  { return (*this=GNativeString(str)); }
+  GNativeString& operator= (const char str);
+  GNativeString& operator= (const char *str);
+  GNativeString& operator= (const GP<GStringRep> &str);
+  GNativeString& operator= (const GString &str);
+  GNativeString& operator= (const GUTF8String &str);
+  GNativeString& operator= (const GNativeString &str);
 
    /** Returns a boolean. The Standard C strncmp takes two string and compares the 
        first N characters.  static bool GString::ncmp will compare #s1# with #s2# 
@@ -875,19 +890,33 @@ public:
   /// Appends character #ch# to the string.
   GNativeString& operator+= (char ch)
   {
-    return (*this=GStringRep::Native::create((const char*)*this,GStringRep::UTF8::create(&ch,1)));
+    init(GStringRep::Native::create((const char*)*this,GStringRep::UTF8::create(&ch,1)));
+    return *this;
   }
   /// Appends the null terminated character array #str# to the string.
   GNativeString& operator+= (const char *str)
   {
-    return (*this=GStringRep::Native::create(*this,str));
+    init(GStringRep::Native::create(*this,str));
+    return *this;
   }
   /// Appends the specified GString to the string.
   GNativeString& operator+= (const GString &str)
   { 
-    return (*this=GStringRep::Native::create(*this,str));
+    init(GStringRep::Native::create(*this,str));
+    return *this;
   }
 
+  /** Returns a sub-string.  The sub-string is composed by copying #len#
+      characters starting at position #from# in this string.  The length of
+      the resulting string may be smaller than #len# if the specified range is
+      too large. */
+  GNativeString substr(int from, unsigned int len=1) const
+    { return GNativeString(*this, from, len); }
+
+  friend GNativeString operator+(const GNativeString &s1, const GString &s2) 
+    { return GStringRep::Native::create(s1,s2); }
+  friend GNativeString operator+(const GString &s1, const GNativeString &s2) 
+    { return GStringRep::Native::create(s1,s2); }
   friend GNativeString operator+(const GNativeString &s1, const GNativeString &s2) 
     { return GStringRep::Native::create(s1,s2); }
   friend GNativeString operator+(const GNativeString &s1, const char    *s2) 
@@ -902,14 +931,6 @@ inline
 GString::operator const char* ( void ) const  
 {
   return ptr?(*this)->data:nullstr;
-}
-
-inline GString&
-GString::operator= (const GString &gs)
-{
-  GP<GStringRep>::operator=(gs);
-  gstr=(*this)->data;
-  return *this;
 }
 
 inline unsigned int
@@ -1016,6 +1037,45 @@ GStringRep::cmp(const char *s1, const GP<GStringRep> &s2)
 {
   return (s2?(-s2->cmp(s1)):(s1?1:0));
 }
+
+inline GString& GString::operator= (const char str)
+{ return init(GStringRep::create(&str,1)); }
+inline GString& GString::operator= (const char *str)
+{ return init(GStringRep::create(str)); }
+inline GString& GString::operator= (const GP<GStringRep> &str)
+{ return init(str); }
+inline GString& GString::operator= (const GString &str)
+{ return init(str); }
+inline GString& GString::operator= (const GUTF8String &str)
+{ return init(str); }
+inline GString& GString::operator= (const GNativeString &str)
+{ return init(str); }
+
+inline GUTF8String& GUTF8String::operator= (const char str)
+{ return init(GStringRep::UTF8::create(&str,1)); }
+inline GUTF8String& GUTF8String::operator= (const char *str)
+{ return init(GStringRep::UTF8::create(str)); }
+inline GUTF8String& GUTF8String::operator= (const GP<GStringRep> &str)
+{ return init(str); }
+inline GUTF8String& GUTF8String::operator= (const GString &str)
+{ return init(str); }
+inline GUTF8String& GUTF8String::operator= (const GUTF8String &str)
+{ return init(str); }
+inline GUTF8String& GUTF8String::operator= (const GNativeString &str)
+{ return init(str); }
+
+inline GNativeString& GNativeString::operator= (const char str)
+{ return init(GStringRep::Native::create(&str,1)); }
+inline GNativeString& GNativeString::operator= (const char *str)
+{ return init(GStringRep::Native::create(str)); }
+inline GNativeString& GNativeString::operator= (const GP<GStringRep> &str)
+{ return init(str); }
+inline GNativeString& GNativeString::operator= (const GString &str)
+{ return init(str); }
+inline GNativeString& GNativeString::operator= (const GUTF8String &str)
+{ return init(str); }
+inline GNativeString& GNativeString::operator= (const GNativeString &str)
+{ return init(str); }
 
 // ------------------- The end
 
