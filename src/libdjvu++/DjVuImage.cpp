@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuImage.cpp,v 1.37 2000-01-26 23:59:32 eaf Exp $
+//C- $Id: DjVuImage.cpp,v 1.38 2000-02-27 22:11:52 eaf Exp $
 
 
 #ifdef __GNUC__
@@ -209,6 +209,10 @@ DjVuImage::get_dpi() const
 int
 DjVuImage::get_rounded_dpi() const
 {
+   return (get_dpi()+5)/10*10;
+   
+      /* This code used to round the reported dpi to 25, 50, 75, 100, 150,
+	 300, and 600. Now we just round the dpi to 10ths and return it
    int dpi=get_dpi();
    if (dpi>700) return dpi;
   
@@ -223,6 +227,7 @@ DjVuImage::get_rounded_dpi() const
          min_idx=i;
       };
    return std_dpi[min_idx];
+   */
 }
 
 double
