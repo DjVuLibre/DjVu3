@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.84 1999-12-05 21:46:17 bcr Exp $
+//C- $Id: DjVuDocument.cpp,v 1.85 1999-12-07 22:19:23 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -119,7 +119,6 @@ DjVuDocument::stop(void)
    {
       if (init_data_pool) init_data_pool->stop(false);	// any operation
 
-//bcr: I don't understand the point of this.
       if (ndir_file) ndir_file->stop(false);
 
       GCriticalSectionLock lock(&ufiles_lock);
@@ -264,6 +263,7 @@ DjVuDocument::init_thread(void)
       DEBUG_MSG("Searching for NDIR chunks...\n");
       ndir_file=get_djvu_file(-1);
       ndir=ndir_file->decode_ndir();
+      ndir_file=0;	// Otherwise ~DjVuDocument() will stop (=kill) it
       if (!ndir)
       {
 	    // Seems to be 1-page old-style document. Create dummy NDIR

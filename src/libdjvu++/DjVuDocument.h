@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.h,v 1.49 1999-12-03 23:33:07 bcr Exp $
+//C- $Id: DjVuDocument.h,v 1.50 1999-12-07 22:19:23 eaf Exp $
  
 #ifndef _DJVUDOCUMENT_H
 #define _DJVUDOCUMENT_H
@@ -33,7 +33,7 @@
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@research.att.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocument.h,v 1.49 1999-12-03 23:33:07 bcr Exp $#
+    @version #$Id: DjVuDocument.h,v 1.50 1999-12-07 22:19:23 eaf Exp $#
 */
 
 //@{
@@ -663,7 +663,11 @@ private:
    GP<DjVuNavDir>	ndir;		// Old-style navigation directory
    GString		first_page_name;// For OLD_BUNDLED docs only
 
-   GP<DjVuFile>		ndir_file;	// Used to query NDIR.
+      // The following is used in init() and destructor to query NDIR
+      // DO NOT USE FOR ANYTHING ELSE. THE FILE IS ZEROED IMMEDIATELY
+      // AFTER IT'S NO LONGER NEEDED. If you don't zero it, ~DjVuDocument()
+      // will kill it, which is a BAD thing if the file's already in cache.
+   GP<DjVuFile>		ndir_file;
    
    GPList<UnnamedFile>	ufiles_list;
    GCriticalSection	ufiles_lock;
