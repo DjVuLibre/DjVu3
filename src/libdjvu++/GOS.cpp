@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GOS.cpp,v 1.46 2001-01-15 23:49:06 fcrary Exp $
+// $Id: GOS.cpp,v 1.46.2.1 2001-02-14 23:47:16 lchen Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -1133,6 +1133,7 @@ GOS::url_to_filename(const char *url)
 #else  
   retval = expand_name(url,root);
 #endif
+
     
 #ifdef WIN32
   if (!is_file(retval)) 
