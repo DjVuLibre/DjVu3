@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuPalette.h,v 1.17 2000-10-11 21:15:45 bcr Exp $
+//C- $Id: DjVuPalette.h,v 1.18 2000-11-01 18:52:51 bcr Exp $
 
 
 
@@ -41,7 +41,7 @@
     @memo 
     DjVuPalette header file
     @version 
-    #$Id: DjVuPalette.h,v 1.17 2000-10-11 21:15:45 bcr Exp $#
+    #$Id: DjVuPalette.h,v 1.18 2000-11-01 18:52:51 bcr Exp $#
     @author: 
     L\'eon Bottou <leonb@research.att.com> */
 //@{
@@ -143,12 +143,21 @@ public:
       color sequence \Ref{colordata}. */
   void get_color(int nth, GPixel &out) const;
   // CODING
-  /** Encodes the palette and the color index sequence into bytestream #bs#. 
-      Note that the color histogram is never saved. */
+  /** Writes the palette colors.  This function writes each palette color as a
+      RGB triple into bytestream #bs#. */
+  void encode_rgb_entries(ByteStream &bs) const;
+  /** Reads palette colors.  This function initializes the palette colors by
+      reading #palettesize# RGB triples from bytestream #bs#. */
+  void decode_rgb_entries(ByteStream &bs, const int palettesize);
+  /** Encodes the palette and the color index sequence. This function encodes
+      the a version byte, the palette size, the palette colors and the color
+      index sequence into bytestream #bs#.  Note that the color histogram is
+      never saved. */
   void encode(ByteStream &bs) const;
-  /** Initializes the object by reading data from bytestream #bs#.  This will
-      populate the palette, and optionally populate the \Ref{colordata}
-      array. Note that the color histogram is never saved. */
+  /** Initializes the object by reading data from bytestream #bs#.  This
+      function reads a version byte, the palette size, the palette and the
+      color index sequence from bytestream #bs#.  Note that the color
+      histogram is never saved. */
   void decode(ByteStream &bs);
 
 private:

@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: DjVuPalette.cpp,v 1.13 2000-10-06 21:47:21 fcrary Exp $
+//C- $Id: DjVuPalette.cpp,v 1.14 2000-11-01 18:52:51 bcr Exp $
 
 
 #ifdef __GNUC__
@@ -329,8 +329,11 @@ DjVuPalette::compute_pixmap_palette(const GPixmap &pm, int ncolors, int minboxsi
 int 
 DjVuPalette::color_to_index_slow(const unsigned char *bgr)
 {
-  int ncolors = palette.size();
-  if (! ncolors) G_THROW("DjVuPalette.not_init");
+  const int ncolors = palette.size();
+  if (! ncolors)
+  {
+    G_THROW("DjVuPalette.not_init");
+  }
   PColor *pal = palette;
   // Should be able to do better
   int found = 0;
@@ -375,7 +378,7 @@ DjVuPalette::compute_palette_and_quantize(GPixmap &pm, int maxcolors, int minbox
 void 
 DjVuPalette::color_correct(double corr)
 {
-  int palettesize = palette.size();
+  const int palettesize = palette.size();
   if (palettesize > 0)
     {
       // Copy colors
@@ -408,17 +411,31 @@ DjVuPalette::color_correct(double corr)
 
 #define DJVUPALETTEVERSION 0
 
+void
+DjVuPalette::encode_rgb_entries(ByteStream &bs) const
+{
+  const int palettesize = palette.size();
+  for (int c=0; c<palettesize; c++)
+    {
+      unsigned char p[3];
+      p[2] = palette[c].p[0];
+      p[1] = palette[c].p[1];
+      p[0] = palette[c].p[2];
+      bs.writall((const void*)p, 3);
+    }
+}
+
 void 
 DjVuPalette::encode(ByteStream &bs) const
 {
-  int palettesize = palette.size();
-  int datasize = colordata.size();
+  const int palettesize = palette.size();
+  const int datasize = colordata.size();
   // Code version number
   int version = DJVUPALETTEVERSION;
   if (datasize>0) version |= 0x80;
   bs.write8(version);
   // Code palette
-  bs.write16(palette.size());
+  bs.write16(palettesize);
   for (int c=0; c<palettesize; c++)
     {
       unsigned char p[3];
@@ -438,6 +455,21 @@ DjVuPalette::encode(ByteStream &bs) const
 }
 
 void 
+DjVuPalette::decode_rgb_entries(ByteStream &bs, const int palettesize)
+{
+  palette.resize(0,palettesize-1);
+  for (int c=0; c<palettesize; c++)
+    {
+      unsigned char p[3];
+      bs.readall((void*)p, 3);
+      palette[c].p[0] = p[2];
+      palette[c].p[1] = p[1];
+      palette[c].p[2] = p[0];
+      palette[c].p[3] = (p[0]*BMUL+p[1]*GMUL+p[2]*RMUL)/SMUL;
+    }
+}
+
+void 
 DjVuPalette::decode(ByteStream &bs)
 {
   // Make sure that everything is clear
@@ -452,7 +484,7 @@ DjVuPalette::decode(ByteStream &bs)
   if ( (version & 0x7f) != DJVUPALETTEVERSION)
     G_THROW("DjVuPalette.bad_version");
   // Code palette
-  int palettesize = bs.read16();
+  const int palettesize = bs.read16();
   if (palettesize<0 || palettesize>MAXPALETTESIZE)
     G_THROW("DjVuPalette.bad_palette");
   palette.resize(0,palettesize-1);
