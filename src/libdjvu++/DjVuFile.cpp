@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.79 1999-10-25 16:37:36 eaf Exp $
+//C- $Id: DjVuFile.cpp,v 1.80 1999-10-27 21:41:28 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -1116,7 +1116,10 @@ DjVuFile::get_merged_anno(const GP<DjVuFile> & file,
 	       {
 		  if (str_out.tell() & 1) str_out.write((void *) "", 1);
 		  str_out.copy(iff);
-	       } else if (chkid == "ANTa")
+	       } else if (chkid == "ANTa" ||
+			  chkid == "ANTz" ||
+			  chkid == "TXTa" ||
+			  chkid == "TXTz")
 	       {
 		  if (str_out.tell() & 1) str_out.write((void *) "", 1);
 	       
