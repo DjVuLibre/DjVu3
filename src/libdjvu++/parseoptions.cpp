@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: parseoptions.cpp,v 1.55 2000-09-21 22:37:06 bcr Exp $
+//C- $Id: parseoptions.cpp,v 1.56 2000-10-06 19:01:18 mrosen Exp $
 #ifdef __GNUC__
 #pragma implementation
 #endif
@@ -1309,9 +1309,8 @@ RegOpenReadConfig ( HKEY hParentKey )
 static bool
 is_dir(TCHAR *filename)
 {
-   USES_CONVERSION ;
    DWORD           dwAttrib;       ;
-   dwAttrib = GetFileAttributes(A2CT(filename)) ;
+   dwAttrib = GetFileAttributes(filename) ;
    if (dwAttrib != 0xFFFFFFFF)
     {
       if( dwAttrib & FILE_ATTRIBUTE_DIRECTORY )
