@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.cpp,v 1.63 2001-04-06 00:11:23 bcr Exp $
+// $Id: ByteStream.cpp,v 1.64 2001-04-06 17:50:22 fcrary Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 04/1997
@@ -1019,7 +1019,6 @@ ByteStream::create(const int fd,char const * const mode,const bool closeme)
       retval=0;
     }
   }
-  default_mode="rb";
   if(!retval)
 #endif
   {

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuGlobal.h,v 1.46 2001-04-05 19:19:22 bcr Exp $
+// $Id: DjVuGlobal.h,v 1.47 2001-04-06 17:50:22 fcrary Exp $
 // $Name:  $
 
 #ifndef _DJVUGLOBAL_H
@@ -79,7 +79,7 @@
     @memo
     Global definitions.
     @version
-    #$Id: DjVuGlobal.h,v 1.46 2001-04-05 19:19:22 bcr Exp $#
+    #$Id: DjVuGlobal.h,v 1.47 2001-04-06 17:50:22 fcrary Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> -- empty file.\\
     Bill Riemers <bcr@lizardtech.com> -- real work.  */
@@ -275,11 +275,7 @@ private:
     system calls without any other header file dependancies.
  */
 
-#ifdef __cplusplus
-extern "C"
-#endif
-/** This replaces fprintf(stderr,...), but requires UTF8 encoded strings. */
-void DjVuPrintError(const char *fmt, ...);
+#include "DjVu.h"
 
 /** This replaces printf(...), but requires UTF8 encoded strings. */
 void DjVuPrintMessage(const char *fmt, ...);
