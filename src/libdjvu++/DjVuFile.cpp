@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.15 1999-08-17 23:48:04 leonb Exp $
+//C- $Id: DjVuFile.cpp,v 1.16 1999-08-19 20:40:46 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -204,9 +204,9 @@ DjVuFile::get_memory_usage(void) const
 GPList<DjVuFile>
 DjVuFile::get_included_files(void)
 {
-   GCriticalSectionLock lock(&inc_files_lock);
-
    if (!are_incl_files_created()) process_incl_chunks();
+
+   GCriticalSectionLock lock(&inc_files_lock);
    GPList<DjVuFile> list=inc_files_list;	// Get a copy when locked
    return list;
 }
@@ -283,22 +283,24 @@ DjVuFile::notify_chunk_done(const DjVuPort *, const char *)
 void
 DjVuFile::notify_file_done(const DjVuPort * src)
 {
-  if (src!=this)
-    {
+   if (src!=this)
+   {
       GCriticalSectionLock inc_lock(&inc_files_lock);
       GPosition pos;
       for(pos=inc_files_list;pos;++pos)
-        if (inc_files_list[pos]==src) break;
+	 if (inc_files_list[pos]==src) break;
       if (!pos) return;
-    }
-  // Signal threads waiting for file termination
-  finish_mon.enter();
-  finish_mon.broadcast();
-  finish_mon.leave();
-  // In case a thread is still waiting for a chunk
-  chunk_mon.enter();
-  chunk_mon.broadcast();
-  chunk_mon.leave();
+   }
+   
+      // Signal threads waiting for file termination
+   finish_mon.enter();
+   finish_mon.broadcast();
+   finish_mon.leave();
+   
+      // In case a thread is still waiting for a chunk
+   chunk_mon.enter();
+   chunk_mon.broadcast();
+   chunk_mon.leave();
 }
 
 void
@@ -919,10 +921,10 @@ DjVuFile::find_ndir(GMap<GURL, void *> & map)
 
       if (!are_incl_files_created()) process_incl_chunks();
 
-      GCriticalSectionLock lock(&inc_files_lock);
-      for(GPosition pos=inc_files_list;pos;++pos)
+      GPList<DjVuFile> list=get_included_files();
+      for(GPosition pos=list;pos;++pos)
       {
-	 GP<DjVuNavDir> d=inc_files_list[pos]->find_ndir(map);
+	 GP<DjVuNavDir> d=list[pos]->find_ndir(map);
 	 if (d) return d;
       }
    }
@@ -1013,11 +1015,17 @@ DjVuFile::notify_all_data_received(const DjVuPort * src)
    if ((status & INCL_FILES_CREATED) && src!=this)
    {
 	 // Check if all children have data
-      GCriticalSectionLock lock(&inc_files_lock);
-      GPosition pos;
-      for(pos=inc_files_list;pos;++pos)
-	 if (!inc_files_list[pos]->is_all_data_present()) break;
-      if (!pos)
+      bool all=true;
+      {
+	 GCriticalSectionLock lock(&inc_files_lock);
+	 for(GPosition pos=inc_files_list;pos;++pos)
+	    if (!inc_files_list[pos]->is_all_data_present())
+	    {
+	       all=false;
+	       break;
+	    }
+      }
+      if (all)
       {
 	 DEBUG_MSG("Just got ALL data for '" << url << "'\n");
 	 status|=ALL_DATA_PRESENT;
@@ -1049,11 +1057,16 @@ DjVuFile::trigger_cb(void)
 
    if (!are_incl_files_created()) process_incl_chunks();
 
-   GCriticalSectionLock flock(&inc_files_lock);
-   GPosition pos;
-   for(pos=inc_files_list;pos;++pos)
-      if (!inc_files_list[pos]->is_all_data_present()) break;
-   if (!pos)
+   bool all=true;
+   {
+      GCriticalSectionLock flock(&inc_files_lock);
+      for(GPosition pos=inc_files_list;pos;++pos)
+	 if (!inc_files_list[pos]->is_all_data_present())
+	 {
+	    all=false; break;
+	 }
+   }
+   if (all)
    {
       DEBUG_MSG("It appears, that we have ALL data for '" << url << "'\n");
       status|=ALL_DATA_PRESENT;
@@ -1585,9 +1598,9 @@ DjVuFile::move(GMap<GURL, void *> & map, const GURL & dir_url)
 
       if (!are_incl_files_created()) process_incl_chunks();
 
-      GCriticalSectionLock lock(&inc_files_lock);
-      for(GPosition pos=inc_files_list;pos;++pos)
-	 inc_files_list[pos]->move(map, dir_url);
+      GPList<DjVuFile> list=get_included_files();
+      for(GPosition pos=list;pos;++pos)
+	 list[pos]->move(map, dir_url);
    }
 }
 
@@ -1612,9 +1625,9 @@ DjVuFile::change_cache(GMap<GURL, void *> & map,
 
    if (!are_incl_files_created()) process_incl_chunks();
 
-   GCriticalSectionLock lock(&inc_files_lock);
-   for(GPosition pos=inc_files_list;pos;++pos)
-      inc_files_list[pos]->change_cache(map, xcache);
+   GPList<DjVuFile> list=get_included_files();
+   for(GPosition pos=list;pos;++pos)
+      list[pos]->change_cache(map, xcache);
 }
 
 void
