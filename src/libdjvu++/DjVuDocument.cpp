@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.111 2000-02-07 22:54:38 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.112 2000-02-08 19:57:43 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -169,10 +169,7 @@ DjVuDocument::static_init_thread(void * cl_data)
 
    // The following is to avoid destroying DjVuDocument from init thread.
    TRY {
-      static GCriticalSection lock;
-      GCriticalSectionLock lk(&lock);
-      GPBase::preserve(life_saver);
-      life_saver=0;
+      GPBase::preserve((GPBase *) &life_saver);
    } CATCH(exc) {} ENDCATCH;
 }
 

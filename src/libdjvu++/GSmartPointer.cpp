@@ -9,9 +9,9 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GSmartPointer.cpp,v 1.10 2000-02-06 21:27:10 eaf Exp $
+//C- $Id: GSmartPointer.cpp,v 1.11 2000-02-08 19:57:43 eaf Exp $
 
-// File "$Id: GSmartPointer.cpp,v 1.10 2000-02-06 21:27:10 eaf Exp $"
+// File "$Id: GSmartPointer.cpp,v 1.11 2000-02-08 19:57:43 eaf Exp $"
 // - Author: Leon Bottou, 05/1997
 
 /* Put this into *one* file, which instantiates all the required containers
@@ -126,12 +126,21 @@ GPBase::assign (const GPBase &sptr)
   return *this;
 }
 
-// 2Leon: Passing GPBase wasn't a good idea since it's hard to cast
-// GP<> back to GPBase (protected inheritance). Besides it *appears*
-// to be enough just to use GPBase::assign().
 void
-GPBase::preserve(GPEnabled * obj)
+GPBase::preserve(GPBase * gp)
 {
    static GPBase ephemeron;
-   ephemeron.assign(obj);
+   gcsCounter.lock();
+   GPEnabled *old=ephemeron.ptr;
+   ephemeron.ptr=0;
+   if (gp)
+   {
+      ephemeron.ptr=gp->ptr;
+      gp->ptr=0;
+   }
+   if (old && !--old->count) 
+      old->count=-1;
+   gcsCounter.unlock();      
+   if (old && old->count<0)
+      old->destroy();
 }

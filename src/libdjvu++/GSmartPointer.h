@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GSmartPointer.h,v 1.16 2000-02-07 18:36:00 leonb Exp $
+//C- $Id: GSmartPointer.h,v 1.17 2000-02-08 19:57:43 eaf Exp $
 
 #ifndef _GSMARTPOINTER_H_
 #define _GSMARTPOINTER_H_
@@ -31,7 +31,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation\\
     Andrei Erofeev <eaf@research.att.com> -- bug fix.
     @version 
-    #$Id: GSmartPointer.h,v 1.16 2000-02-07 18:36:00 leonb Exp $# 
+    #$Id: GSmartPointer.h,v 1.17 2000-02-08 19:57:43 eaf Exp $# 
     @args
 */
 //@{
@@ -111,11 +111,22 @@ public:
   /** Comparison operator. */
   int operator==(const GPBase & g2) const;
   /** Preserve a \Ref{GPEnabled} object for some time (guru only).
-      This function increments the counter in the referenced object, so
-      that it will be kept alive for some extra time (until the next call
-      to #preserve#). This is useful to protect an object, which destruction
-      would destroy the running thread.  */
-  static void preserve(GPEnabled *obj);
+      \Ref{GP} pointers provide an excellent mechanism for automatic
+      data destruction, which takes place when the last pointer to
+      a \Ref{GPEnabled} object is destroyed. Thus, it is common to have
+      an automatic \Ref{GP}<#TYPE#> object inside a pair of curl braces,
+      which would be destroyed automatically as soon as program counter
+      leaves the scope of the braces.
+
+      Sometimes, it is also desired to delay the object destruction
+      a little longer, or even avoid destroying the object from the same
+      thread.
+
+      This function transfers the pointer from the supplied \Ref{GP} object
+      to some static pointer thus giving the pointed \Ref{GPEnabled}
+      some extra time. The object will be destroyed when the #preserve()#
+      function is called next time. */
+  static void preserve(class GPBase * gp);
 protected:
   /** Actual pointer */
   GPEnabled *ptr;
