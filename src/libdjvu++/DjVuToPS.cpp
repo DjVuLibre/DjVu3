@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuToPS.cpp,v 1.6 2000-03-20 22:58:22 eaf Exp $
+//C- $Id: DjVuToPS.cpp,v 1.7 2000-03-22 23:41:46 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -41,6 +41,7 @@ DjVuToPS::Options::Options(void)
    color=true;
    gamma=2.60;
    copies=1;
+   frame=false;
 }
 
 void
@@ -118,6 +119,12 @@ DjVuToPS::Options::set_copies(int _copies)
       THROW("Only one copy can be printed in EPS format.");
    
    copies=_copies;
+}
+
+void
+DjVuToPS::Options::set_frame(bool _frame)
+{
+   frame=_frame;
 }
 
 //****************************************************************************
@@ -1020,14 +1027,15 @@ image\n",
       delete rle_out; rle_out=0;
       RETHROW;
    } ENDCATCH;
+   char frc=options.get_frame() ? ' ' : '%';
    write(str, "\
 \n\
 %% Drawing gray rectangle surrounding the image\n\
-%%gsave\n\
-%%[ a11 a21 a12 a22 a13 a23 ] concat\n\
-%%0.7 setgray\n\
-%%0 0 %d %d rectstroke\n\
-%%grestore\n\n", prn_rect.width(), prn_rect.height());
+%cgsave\n\
+%c[ a11 a21 a12 a22 a13 a23 ] concat\n\
+%c0.7 setgray\n\
+%c0 0 %d %d rectstroke\n\
+%cgrestore\n\n", frc, frc, frc, frc, prn_rect.width(), prn_rect.height(), frc);
 
    if (prn_progress_cb)
       prn_progress_cb(1, prn_progress_cl_data);

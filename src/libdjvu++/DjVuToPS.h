@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuToPS.h,v 1.3 2000-03-20 22:58:22 eaf Exp $
+//C- $Id: DjVuToPS.h,v 1.4 2000-03-22 23:41:46 eaf Exp $
 
 #ifndef _DJVU_TO_PS_H_
 #define _DJVU_TO_PS_H_
@@ -22,7 +22,7 @@
     @memo PostScript file generator
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: DjVuToPS.h,v 1.3 2000-03-20 22:58:22 eaf Exp $#
+    #$Id: DjVuToPS.h,v 1.4 2000-03-22 23:41:46 eaf Exp $#
 */
 //@{
 
@@ -106,6 +106,7 @@ public:
       bool	color;
       float	gamma;
       int	copies;
+      bool	frame;
    public:
 	 /// Sets output image format to #PS# or #EPS#
       void	set_format(Format format);
@@ -124,6 +125,8 @@ public:
 	 /** Specifies the number of copies to be printed. This parameter
 	     does {\bf not} affect the size of output file. */
       void	set_copies(int copies);
+	 /** Specifies if a gray frame around the image should be printed. */
+      void	set_frame(bool on);
 
 	 /// Returns output image format (#PS# or #EPS#)
       Format	get_format(void) const;
@@ -144,6 +147,9 @@ public:
 	 /** Returns the number of copies, which will be printed by printer
 	     This parameter does {\bf not} affect the size of output file */
       int	get_copies(void) const;
+	 /** Returns #TRUE# if there will be a gray frame printed
+	     around the image. */
+      bool	get_frame(void) const;
       
       Options(void);
    };
@@ -433,6 +439,12 @@ inline int
 DjVuToPS::Options::get_copies(void) const
 {
    return copies;
+}
+
+inline bool
+DjVuToPS::Options::get_frame(void) const
+{
+   return frame;
 }
 
 //****************************************************************************
