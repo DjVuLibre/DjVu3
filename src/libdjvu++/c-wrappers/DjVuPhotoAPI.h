@@ -7,11 +7,11 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuPhotoAPI.h,v 1.6 2000-01-22 07:10:14 bcr Exp $
+ *C- $Id: DjVuPhotoAPI.h,v 1.7 2000-01-23 20:29:17 bcr Exp $
  */
 
-#ifndef _DJVUPHTO_H_
-#define _DJVUPHTO_H_
+#ifndef _DJVUPHOTO_H_
+#define _DJVUPHOTO_H_
 
 #ifndef DJVUAPI
 
@@ -299,5 +299,5 @@ void djvutophoto_usage(int fd,const char *prog);
 }
 #endif
 
-#endif /* _DJVUPHTO_H_ */
+#endif /* _DJVUPHOTO_H_ */
 
