@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: GMapAreas.h,v 1.20 2000-12-24 23:59:48 praveen Exp $
+// $Id: GMapAreas.h,v 1.21 2001-01-03 16:34:39 fcrary Exp $
 // $Name:  $
 
 #ifndef _GMAPAREAS_H
@@ -65,7 +65,7 @@
     @memo Definition of base map area classes
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: GMapAreas.h,v 1.20 2000-12-24 23:59:48 praveen Exp $# */
+    #$Id: GMapAreas.h,v 1.21 2001-01-03 16:34:39 fcrary Exp $# */
 //@{
 
 
@@ -99,6 +99,11 @@
              also be highlighted with some given color.
     \end{itemize}
 */
+
+// Enumeration for reporting the type of map area. "MapUnknown" is reported
+// for objects of type GMapArea (there shouldn't be any).
+enum MapAreaType { MapUnknown, MapRect, MapOval, MapPoly };
+
 class GMapArea : public GPEnabled
 {
 public:
@@ -202,6 +207,8 @@ public:
 	  for saving into #ANTa# chunk (see \Ref{DjVuAnno}) */
    GString	print(void);
 
+      /// Virtual function returning the shape type.
+   virtual MapAreaType const get_shape_type( void ) const { return MapUnknown; };
       /// Virtual function returning the shape name.
    virtual char const * const	get_shape_name(void) const=0;
       /// Virtual function generating a copy of this object
@@ -266,6 +273,8 @@ public:
    GMapRect(const GRect & rect);
    virtual ~GMapRect(void);
 
+      /// Returns MapRect
+   virtual MapAreaType const get_shape_type( void ) const { return MapRect; };
       /// Returns #"rect"#
    virtual char const * const	get_shape_name(void) const;
       /// Returns a copy of the rectangle
@@ -396,6 +405,8 @@ public:
       /// Checks validity of the polygon 
    char const * const	check_data(void);
 
+      /// Returns MapPoly
+   virtual MapAreaType const get_shape_type( void ) const { return MapPoly; };
       /// Returns #"poly"# all the time
    virtual char const * const 	get_shape_name(void) const;
       /// Returns a copy of the polygon
@@ -480,6 +491,8 @@ public:
       /// Returns the greater of \Ref{get_a}() and \Ref{get_b}()
    int		get_rmax(void) const;
 
+      /// Returns MapOval
+   virtual MapAreaType const get_shape_type( void ) const { return MapOval; };
       /// Returns #"oval"#
    virtual char const * const get_shape_name(void) const;
       /// Returns a copy of the oval
