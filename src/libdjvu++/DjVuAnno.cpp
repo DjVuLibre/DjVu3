@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuAnno.cpp,v 1.8 1999-07-13 15:29:38 leonb Exp $
+//C- $Id: DjVuAnno.cpp,v 1.9 1999-08-04 22:15:51 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -541,7 +541,7 @@ DjVuAnno::encode(ByteStream &bs)
   GCriticalSectionLock lock(&class_lock);
   
   raw=encode_raw();
-  bs.writall((const void*)raw, raw.length());
+  bs.writall((const char*)raw, raw.length());
 }
 
 unsigned int 
