@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.59 2001-04-16 18:09:41 bcr Exp $
+// $Id: GString.cpp,v 1.60 2001-04-16 22:39:16 praveen Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -929,6 +929,7 @@ GStringRep::toUTF8(const bool noconvert) const
     unsigned char *buf;
     GPBuffer<unsigned char> gbuf(buf,n*6+1);
     unsigned char *ptr=buf;
+	int len = mbrlen(source, n, &ps);
     for(wchar_t w;
       (n>0)&&(i=mbrtowc(&w,source,n,&ps));
       n-=i,source+=i)
@@ -960,10 +961,9 @@ GString::UTF8ToNative(const bool currentlocale) const
 {
   const char *source=(*this);
   GP<GStringRep> retval;
-  GString lc_ctype;
   if(source && source[0]) 
   {
-    GString lc_ctype(setlocale(LC_CTYPE,0));
+    GUTF8String lc_ctype(setlocale(LC_CTYPE,0));
     bool repeat;
     for(repeat=!currentlocale;;repeat=false)
     {
@@ -978,7 +978,7 @@ GString::UTF8ToNative(const bool currentlocale) const
       setlocale(LC_CTYPE,(const char *)lc_ctype);
     }
   }
-  return GString(retval);
+  return GNativeString(retval);
 }
 
 /*MBCS*/
@@ -1023,7 +1023,7 @@ GString::getUTF82Native(char* tocode) const
         retval=*this; //invalid codeset
       }
 #else /* HAS_ICONV */
-      retval=*this;
+      retval=(const char*)*this;
 #endif /* HAS_ICONV */
     }
   }
