@@ -113,6 +113,8 @@ distclean:
 	-@echo Cleaned.
 
 install: $(PROG)
+	-@mkdir $(prefix) 2>/dev/null
+	-@mkdir $(bindir) 2>/dev/null
 	for n in $(PROG); do        \
 	  cp $$n $(bindir)        ; \
 	  chmod 755 $(bindir)/$$n ; \
