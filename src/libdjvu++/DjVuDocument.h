@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.h,v 1.39 1999-11-18 16:38:40 eaf Exp $
+//C- $Id: DjVuDocument.h,v 1.40 1999-11-18 23:24:19 eaf Exp $
  
 #ifndef _DJVUDOCUMENT_H
 #define _DJVUDOCUMENT_H
@@ -33,7 +33,7 @@
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@research.att.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocument.h,v 1.39 1999-11-18 16:38:40 eaf Exp $#
+    @version #$Id: DjVuDocument.h,v 1.40 1999-11-18 23:24:19 eaf Exp $#
 */
 
 //@{
@@ -678,7 +678,7 @@ private:
       
    void			add_to_cache(const GP<DjVuFile> & f);
    void			check_unnamed_files(void);
-   void			set_file_name(const DjVuFile * file);
+   void			set_file_aliases(const DjVuFile * file);
 };
 
 inline

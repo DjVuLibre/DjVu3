@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.64 1999-11-18 16:38:40 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.65 1999-11-18 23:24:20 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -296,17 +296,27 @@ DjVuDocument::init_thread(void)
 }
 
 void
-DjVuDocument::set_file_name(const DjVuFile * file)
+DjVuDocument::set_file_aliases(const DjVuFile * file)
 {
-   DEBUG_MSG("DjVuDocument::set_file_name(): setting global name for file '"
+   DEBUG_MSG("DjVuDocument::set_file_aliases(): setting global aliases for file '"
 	     << file->get_url() << "'\n");
    DEBUG_MAKE_INDENT(3);
 
    DjVuPortcaster * pcaster=DjVuPort::get_portcaster();
    
    GMonitorLock lock(&((DjVuFile *) file)->get_safe_flags());
-   if (file->is_decode_ok()) pcaster->set_name(file, file->get_url());
-   else pcaster->set_name(file, get_int_prefix(this)+file->get_url());
+   pcaster->clear_aliases(file);
+   if (file->is_decode_ok())
+   {
+      pcaster->add_alias(file, file->get_url());
+      if (is_init_complete())
+      {
+	 int page_num=url_to_page(file->get_url());
+	 if (page_num==0) pcaster->add_alias(file, init_url+"#-1");
+	 pcaster->add_alias(file, init_url+"#"+GString(page_num));
+      }
+      pcaster->add_alias(file, file->get_url()+"#-1");
+   } else pcaster->add_alias(file, get_int_prefix(this)+file->get_url());
 }
 
 void
@@ -369,10 +379,9 @@ DjVuDocument::check_unnamed_files(void)
 	       if (!new_pool) THROW("Failed to get data for URL '"+new_url+"'");
 	       ufile->data_pool->connect(new_pool);
 	    }
-	    
-	    ufile->file->set_name(new_url.name());
+
 	    ufile->file->move(new_url.base());
-	    set_file_name(ufile->file);
+	    set_file_aliases(ufile->file);
 	 } else break;
       } CATCH(exc) {
 	 pcaster->notify_error(this, exc.get_cause());
@@ -557,7 +566,7 @@ DjVuDocument::url_to_file(const GURL & url, bool dont_create)
    GP<DjVuPort> port;
    
       // First - fully decoded files
-   port=pcaster->name_to_port(url);
+   port=pcaster->alias_to_port(url);
    if (port && port->inherits("DjVuFile"))
    {
       DEBUG_MSG("found fully decoded file using DjVuPortcaster\n");
@@ -565,7 +574,7 @@ DjVuDocument::url_to_file(const GURL & url, bool dont_create)
    }
 
       // Second - internal files
-   port=pcaster->name_to_port(get_int_prefix(this)+url);
+   port=pcaster->alias_to_port(get_int_prefix(this)+url);
    if (port && port->inherits("DjVuFile"))
    {
       DEBUG_MSG("found internal file using DjVuPortcaster\n");
@@ -579,7 +588,7 @@ DjVuDocument::url_to_file(const GURL & url, bool dont_create)
       DEBUG_MSG("creating a new file\n");
       file=new DjVuFile();
       file->init(url, this);
-      set_file_name(file);
+      set_file_aliases(file);
    }
 
    return file;
@@ -592,6 +601,8 @@ DjVuDocument::get_djvu_file(int page_num, bool dont_create)
    DEBUG_MSG("DjVuDocument::get_djvu_file(): request for page " << page_num << "\n");
    DEBUG_MAKE_INDENT(3);
 
+   DjVuPortcaster * pcaster=DjVuPort::get_portcaster();
+   
    GURL url;
    {
 	 // I'm locking the flags because depending on what page_to_url()
@@ -602,41 +613,46 @@ DjVuDocument::get_djvu_file(int page_num, bool dont_create)
       url=page_to_url(page_num);
       if (url.is_empty())
       {
-	 DEBUG_MSG("Structure is not known => inventing dummy URL.\n");
-	 
-	    // Invent some dummy temporary URL. I don't care what it will
-	    // be. I'll remember the page_num and will generate the correct URL
-	    // after I learn what the document is
-	 char buffer[128];
-	 sprintf(buffer, "djvufileurl://%p/page%d.djvu", this, page_num);
-	 url=buffer;
-
-	 GCriticalSectionLock lock(&ufiles_lock);
-	 for(GPosition pos=ufiles_list;pos;++pos)
+	 DEBUG_MSG("Structure is not known => check <doc_url>#<page_num> alias...\n");
+	 GP<DjVuPort> port=pcaster->alias_to_port(init_url+"#"+GString(page_num));
+	 if (!port || !port->inherits("DjVuFile"))
 	 {
-	    GP<UnnamedFile> f=ufiles_list[pos];
-	    if (f->url==url) return f->file;
-	 }
-	 GP<UnnamedFile> ufile=new UnnamedFile(UnnamedFile::PAGE_NUM, 0,
-					       page_num, url, 0);
+	    DEBUG_MSG("failed => invent dummy URL and proceed\n");
+	 
+	       // Invent some dummy temporary URL. I don't care what it will
+	       // be. I'll remember the page_num and will generate the correct URL
+	       // after I learn what the document is
+	    char buffer[128];
+	    sprintf(buffer, "djvufileurl://%p/page%d.djvu", this, page_num);
+	    url=buffer;
 
-	    // We're adding the record to the list before creating the DjVuFile
-	    // because DjVuFile::init() will call request_data(), and the
-	    // latter should be able to find the record.
-	    //
-	    // We also want to keep ufiles_lock to make sure that when
-	    // request_data() is called, the record is still there
-	 ufiles_list.append(ufile);
+	    GCriticalSectionLock lock(&ufiles_lock);
+	    for(GPosition pos=ufiles_list;pos;++pos)
+	    {
+	       GP<UnnamedFile> f=ufiles_list[pos];
+	       if (f->url==url) return f->file;
+	    }
+	    GP<UnnamedFile> ufile=new UnnamedFile(UnnamedFile::PAGE_NUM, 0,
+						  page_num, url, 0);
+
+	       // We're adding the record to the list before creating the DjVuFile
+	       // because DjVuFile::init() will call request_data(), and the
+	       // latter should be able to find the record.
+	       //
+	       // We also want to keep ufiles_lock to make sure that when
+	       // request_data() is called, the record is still there
+	    ufiles_list.append(ufile);
       
-	 GP<DjVuFile> file=new DjVuFile();
-	 file->init(url, this);
-	 ufile->file=file;
-	 return file;
+	    GP<DjVuFile> file=new DjVuFile();
+	    file->init(url, this);
+	    ufile->file=file;
+	    return file;
+	 } else url=((DjVuFile *) (DjVuPort *) port)->get_url();
       }
    }
    
    GP<DjVuFile> file=url_to_file(url, dont_create);
-   if (file) get_portcaster()->add_route(file, this);
+   if (file) pcaster->add_route(file, this);
    
    return file;
 }
@@ -1001,7 +1017,7 @@ DjVuDocument::notify_file_flags_changed(const DjVuFile * source,
    check();
    if (set_mask & DjVuFile::DECODE_OK)
    {
-      set_file_name(source);
+      set_file_aliases(source);
       if (cache) add_to_cache((DjVuFile *) source);
       process_threqs();
    }
