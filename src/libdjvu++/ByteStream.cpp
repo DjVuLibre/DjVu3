@@ -9,9 +9,9 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: ByteStream.cpp,v 1.19 2000-01-22 22:01:12 bcr Exp $
+//C- $Id: ByteStream.cpp,v 1.20 2000-01-23 22:20:14 eaf Exp $
 
-// File "$Id: ByteStream.cpp,v 1.19 2000-01-22 22:01:12 bcr Exp $"
+// File "$Id: ByteStream.cpp,v 1.20 2000-01-23 22:20:14 eaf Exp $"
 // - Author: Leon Bottou, 04/1997
 
 #ifdef __GNUC__
@@ -74,8 +74,12 @@ ByteStream::readall(void *buffer, size_t size)
   while (size > 0)
     {
       size_t nitems = read(buffer, size);
+      // Replaced perror() below with THROW(). It still makes little sense
+      // as there is no guarantee, that errno is right. Still, throwing
+      // exception instead of continuing to loop is better.
+      // - eaf
       if(nitems < 0) 
-        ::perror("read");
+        THROW(strerror(errno));
       if (nitems == 0)
         break;
       total += nitems;
