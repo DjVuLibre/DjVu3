@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocEditor.h,v 1.13 1999-12-03 23:33:07 bcr Exp $
+//C- $Id: DjVuDocEditor.h,v 1.14 1999-12-14 20:48:17 eaf Exp $
  
 #ifndef _DJVUDOCEDITOR_H
 #define _DJVUDOCEDITOR_H
@@ -27,7 +27,7 @@
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocEditor.h,v 1.13 1999-12-03 23:33:07 bcr Exp $#
+    @version #$Id: DjVuDocEditor.h,v 1.14 1999-12-14 20:48:17 eaf Exp $#
 */
 
 //@{
@@ -139,6 +139,22 @@ public:
 	  is negative or too big, the function will move page #page_num# to
 	  the end of the document. */
    void		move_page(int page_num, int new_page_num);
+      /** Changes the name of the file with ID #id# to #name#.
+	  Refer to \Ref{DjVmDir} for the explanation of {\em IDs},
+          {\em names} and {\em titles}. */
+   void		set_file_name(const char * id, const char * name);
+      /** Changes the name of the page #page_num# to #name#.
+	  Refer to \Ref{DjVmDir} for the explanation of {\em IDs},
+          {\em names} and {\em titles}. */
+   void		set_page_name(int page_num, const char * name);
+      /** Changes the title of the file with ID #id# to #title#.
+	  Refer to \Ref{DjVmDir} for the explanation of {\em IDs},
+          {\em names} and {\em titles}. */
+   void		set_file_title(const char * id, const char * title);
+      /** Changes the title of the page #page_num# to #title#.
+	  Refer to \Ref{DjVmDir} for the explanation of {\em IDs},
+          {\em names} and {\em titles}. */
+   void		set_page_title(int page_num, const char * title);
 
       /** @name Thumbnails */
       //@{

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocEditor.cpp,v 1.17 1999-12-03 21:16:35 eaf Exp $
+//C- $Id: DjVuDocEditor.cpp,v 1.18 1999-12-14 20:48:17 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -814,7 +814,7 @@ DjVuDocEditor::move_page(int page_num, int new_page_num)
    
    int pages_num=get_pages_num();
    if (page_num<0 || page_num>=pages_num)
-      THROW("Invalid page number");
+      THROW("Invalid page number "+GString(page_num));
 
    GString id=page_to_id(page_num);
    int file_pos=-1;
@@ -827,6 +827,67 @@ DjVuDocEditor::move_page(int page_num, int new_page_num)
 
    GMap<GString, void *> map;
    move_file(id, file_pos, map);
+}
+
+void
+DjVuDocEditor::set_file_name(const char * id, const char * name)
+{
+   DEBUG_MSG("DjVuDocEditor::set_file_name(), id='" << id << "', name='" << name << "'\n");
+   DEBUG_MAKE_INDENT(3);
+
+      // It's important to get the URL now, because later (after we
+      // change DjVmDir) id_to_url() will be returning a modified value
+   GURL url=id_to_url(id);
+   
+      // Change DjVmDir. It will check if the name is unique
+   djvm_dir->set_file_name(id, name);
+   
+      // Now find DjVuFile (if any) and rename it
+   GPosition pos;
+   if (files_map.contains(url, pos))
+   {
+      GP<File> file=files_map[pos];
+      GP<DataPool> pool=file->pool;
+      if (pool) pool->load_file();
+      GP<DjVuFile> djvu_file=file->file;
+      if (djvu_file) djvu_file->set_name(name);
+      files_map.del(pos);
+      files_map[url.base()+name]=file;
+   }
+}
+
+void
+DjVuDocEditor::set_page_name(int page_num, const char * name)
+{
+   DEBUG_MSG("DjVuDocEditor::set_page_name(), page_num='" << page_num << "'\n");
+   DEBUG_MAKE_INDENT(3);
+
+   if (page_num<0 || page_num>=get_pages_num())
+      THROW("Invalid page number "+GString(page_num));
+
+   set_file_name(page_to_id(page_num), name);
+}
+
+void
+DjVuDocEditor::set_file_title(const char * id, const char * title)
+{
+   DEBUG_MSG("DjVuDocEditor::set_file_title(), id='" << id << "', title='" << title << "'\n");
+   DEBUG_MAKE_INDENT(3);
+
+      // Just change DjVmDir. It will check if the title is unique
+   djvm_dir->set_file_title(id, title);
+}
+
+void
+DjVuDocEditor::set_page_title(int page_num, const char * title)
+{
+   DEBUG_MSG("DjVuDocEditor::set_page_title(), page_num='" << page_num << "'\n");
+   DEBUG_MAKE_INDENT(3);
+
+   if (page_num<0 || page_num>=get_pages_num())
+      THROW("Invalid page number "+GString(page_num));
+
+   set_file_title(page_to_id(page_num), title);
 }
 
 GP<DataPool>
@@ -1153,12 +1214,7 @@ DjVuDocEditor::save_as(const char * where, bool bundled)
       GP<DataPool> pool=new DataPool(str);
       doc_pool=pool;
       init_data_pool=pool;
-      if (doc_url!=save_doc_url)
-      {
-	    // Also update document's URL (we moved, didn't we?)
-	 doc_url=save_doc_url;
-	 init_url=save_doc_url;
-      }
+      
 	 // Also update DjVmDir (to reflect changes in offsets)
       djvm_dir=doc->get_djvm_dir();
    } else if (save_doc_type==INDIRECT)
@@ -1220,12 +1276,7 @@ DjVuDocEditor::save_as(const char * where, bool bundled)
 	 // Update the document data pool (not required, but will save memory)
       doc_pool=new DataPool(save_doc_name);
       init_data_pool=doc_pool;
-      if (doc_url!=save_doc_url)
-      {
-	    // Also update the document's URL. We moved, didn't we?
-	 doc_url=save_doc_url;
-	 init_url=save_doc_url;
-      }
+      
 	 // No reason to update DjVmDir as for this format it doesn't
 	 // contain DJVM offsets
    } else if (save_doc_type==BUNDLED || save_doc_type==OLD_BUNDLED)
@@ -1242,12 +1293,7 @@ DjVuDocEditor::save_as(const char * where, bool bundled)
 	 // Update the document data pool (not required, but will save memory)
       doc_pool=new DataPool(save_doc_name);
       init_data_pool=doc_pool;
-      if (doc_url!=save_doc_url)
-      {
-	    // Also update the document's URL.
-	 doc_url=save_doc_url;
-	 init_url=save_doc_url;
-      }
+      
 	 // Also update DjVmDir (to reflect changes in offsets)
       djvm_dir=doc->get_djvm_dir();
    } else THROW("Can't save the document. Use 'Save As'");
@@ -1285,6 +1331,16 @@ DjVuDocEditor::save_as(const char * where, bool bundled)
       }
    }
 
+      // Another problem: we need to do smth with files_map[URL]. Namely
+      // we need to recreate all items under new URL.
+
    orig_doc_type=save_doc_type;
    doc_type=save_doc_type;
+
+   if (doc_url!=save_doc_url)
+   {
+	 // Also update document's URL (we moved, didn't we?)
+      doc_url=save_doc_url;
+      init_url=save_doc_url;
+   }
 }
