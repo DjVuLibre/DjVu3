@@ -30,10 +30,9 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
-// 
-// $Id: djvumake.cpp,v 1.4 2000-11-09 20:15:05 jmw Exp $
+//
+// $Id: djvumake.cpp,v 1.5 2000-12-15 17:11:52 bcr Exp $
 // $Name:  $
-
 
 /** @name djvumake
 
@@ -81,7 +80,11 @@
       Creates a JPEG foreground chunk.\\
       {#FG2k=<jpegfile>#} &
       Creates a JPEG-2000 foreground chunk.\\
-      {#PPM=<ppmfile>#} &
+      {#INCL=<fileid>#} &
+      Creates an include chunk pointing to <fileid>.
+      The resulting file should then be included into a 
+      multipage document.\\
+      {#PPM=<ppmfile>#} (psuedo-chunk) &
       Create IW44 foreground and background chunks
       by masking and subsampling PPM file #ppmfile#.
       This is used by program \Ref{cdjvu}.
@@ -100,7 +103,7 @@
     @memo
     Assemble DjVu files.
     @version
-    #$Id: djvumake.cpp,v 1.4 2000-11-09 20:15:05 jmw Exp $#
+    #$Id: djvumake.cpp,v 1.5 2000-12-15 17:11:52 bcr Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> \\
     Patrick Haffner <haffner@research.att.com>
@@ -122,6 +125,8 @@ int flag_contains_fg      = 0;
 int flag_contains_bg      = 0;
 int flag_contains_stencil = 0;
 int flag_contains_bg44    = 0;
+int flag_contains_incl    = 0;
+
 IFFByteStream *bg44iff    = 0;
 GP<MemoryByteStream> jb2stencil = 0;
 GP<MemoryByteStream> mmrstencil = 0;
@@ -151,9 +156,10 @@ usage()
          "   BGjp=jpegfile               --  Create a JPEG background chunk\n"
          "   BG2k=jpeg2000file           --  Create a JPEG-2000 background chunk\n"
          "   FG44=iw4file                --  Create an IW44 foreground chunk\n"
+         "   FGbz=bzzfile                --  Create a BZZ foreground chunk\n"
          "   FGjp=jpegfile               --  Create a JPEG foreground chunk\n"
          "   FG2k=jpeg2000file           --  Create a JPEG-2000 foreground chunk\n"
-         "   FGbz=bzzfile                --  Create a BZZ foreground chunk\n"
+         "   INCL=fileid                 --  Create an INCL chunk\n"
          "\n"
          "   PPM=ppmfile                 --  Create IW44 foreground and background chunks\n"
          "                                   by masking and subsampling a PPM file.\n"
@@ -357,6 +363,17 @@ create_jb2_chunk(IFFByteStream &iff, char *chkid, char *filename)
   jb2stencil->seek(0);
   iff.put_chunk(chkid);
   iff.copy(*jb2stencil);
+  iff.close_chunk();
+}
+
+
+// -- Create inclusion chunk
+
+void 
+create_incl_chunk(IFFByteStream &iff, char *chkid, const char *fileid)
+{
+  iff.put_chunk("INCL");
+  iff.write(fileid, strlen(fileid));
   iff.close_chunk();
 }
 
@@ -635,6 +652,11 @@ main(int argc, char **argv)
               argv[i][4] = 0;
               create_raw_chunk(iff, argv[i], argv[i]+5);
               flag_contains_fg = 1;
+            }
+          else if (! strncmp(argv[i],"INCL=",5))
+            {
+              create_incl_chunk(iff, "INCL", argv[i]+5);
+              flag_contains_incl = 1;
             }
           else if (! strncmp(argv[i],"PPM=",4))
             {
@@ -926,6 +948,5 @@ processBackground(const GPixmap* image, const JB2Image *mask,
                   subsampled_image, subsampled_mask, 
                   3, 0);   // background subsample is 3 (300dpi->100dpi)
 }
-
 
 
