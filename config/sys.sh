@@ -23,10 +23,19 @@ if [ -z "$SYS_SET" ] ; then
   WHOLEARCHIVESEP=" "
   WHOLEARCHIVE="-Wl,--whole-archive"
   NOWHOLEARCHIVE="-Wl,--no-whole-archive"
+  LIBDL=""
+  LIBC=""
   if [ "$SYS" = "Linux" ] ; then
+    if [ -r /usr/lib/libdl.a ] ; then
+      LIBDL=/usr/lib/libdl.a
+    elif [ -r /lib/libdl.a ] ; then
+      LIBDL=/lib/libdl.a
+    fi
     if [ -r /lib/libc.so.6 ] ; then
+      LIBC="libc.so.6"
       SYS=linux-libc6
     elif [ -r /usr/lib/libc.so.6 ] ; then
+      LIBC="libc.so.5"
       SYS=linux-libc6
     else
       SYS=linux-libc5
@@ -64,6 +73,6 @@ if [ -z "$SYS_SET" ] ; then
   fi
   SYS_SET=true
   echo "$SYS"
-  CONFIG_VARS=`echo SYS SYS_SET DEFS INCS JOBJ WHOLEARCHIVE WHOLEARCHIVESEP NOWHOLEARCHIVE SENTINAL SENTINAL_NEED_LIB $CONFIG_VARS`
+  CONFIG_VARS=`echo SYS SYS_SET LIBC LIBDL DEFS INCS JOBJ WHOLEARCHIVE WHOLEARCHIVESEP NOWHOLEARCHIVE SENTINAL SENTINAL_NEED_LIB $CONFIG_VARS`
 fi
 
