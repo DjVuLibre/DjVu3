@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.cpp,v 1.50 2001-02-15 20:31:57 bcr Exp $
+// $Id: ByteStream.cpp,v 1.51 2001-02-15 22:28:22 fcrary Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 04/1997
@@ -1060,11 +1060,12 @@ MemoryMapByteStream::~MemoryMapByteStream()
   }
 }
 
+#endif
+
 ByteStream::Wrapper::~Wrapper() {}
 StdioByteStream::~StdioByteStream() {}
 MemoryByteStream::~MemoryByteStream() {}
 StaticByteStream::~StaticByteStream() {}
 
-#endif
 
 
