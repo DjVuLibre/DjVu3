@@ -90,6 +90,10 @@ then
   exit 1
 fi
 
+# --- Save command line options
+CONFIGURATION_OPTIONS="$*"
+
+
 ### ------------------------------------------------------------------------
 ### Support functions
 
