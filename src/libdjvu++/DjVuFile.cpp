@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.102 2000-01-11 21:50:37 eaf Exp $
+//C- $Id: DjVuFile.cpp,v 1.103 2000-01-20 21:34:10 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -1390,9 +1390,6 @@ DjVuFile::move(GMap<GURL, void *> & map, const GURL & dir_url)
       map[url]=0;
 
       url=dir_url+url.name();
-
-      if (!are_incl_files_created())
-        process_incl_chunks();
 
       GPList<DjVuFile> list=get_included_files(false);
       for(GPosition pos=list;pos;++pos)
