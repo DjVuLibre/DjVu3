@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.58 2001-04-16 17:55:04 bcr Exp $
+// $Id: GString.cpp,v 1.59 2001-04-16 18:09:41 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -1401,6 +1401,14 @@ GStringRep::Native::cmp(const GP<GStringRep> &s2) const
     }
   }
   return retval;
+}
+
+int
+GStringRep::toInt() const
+{
+  bool isLong;
+  GP<GStringRep> eptr;
+  return (int)toLong(eptr,isLong);
 }
 
 int
