@@ -19,17 +19,27 @@ while ( <> )
       exit 1;
     }
   }
-  if($last =~ /<IMG ALT="o" BORDER=0 SRC=icon1[.]gif><A NAME=".*"><.A>/i 
-    && $line =~ /(<A HREF=)(.*[.]html)(><B>)(.*)(<.B><.A>)(<DD>.*)/i)
+  if(($last =~ /<IMG ALT="o" BORDER=0 SRC=icon1[.]gif><A NAME=".*"><.A>/i) 
+    &&($line =~ /(<A HREF=)(.*[.]html)(><B>)(.*)(<.B><.A>)(<DD>.*)/i))
   {
     ($current1,$current2,$current3,$current4,$current5,$current6)=($1,$2,$3,$4,$5,$6);
-    if(open(FILE,"<$2"))
+    $file="$filename/$current2";
+    $file=~s,[^/]*/$current2,$current2,g;
+    if(open(FILE,"<$file"))
     {
       while( <FILE> )
       {
-        if($_ =~ /(<H2>[ ]*)([^(]*)(<A HREF="[^"]+">)([^(]+)(<\/A>)(.*)(<\/H2>.*)$/i)
+        $in=$_;
+        if ($in =~ /(<H2>[ ]*)([^<]*)(<A HREF="[^"]+">)([^<]+)(<\/A>)([^\(]*[^\)]*)(<\/H2>.*)$/i)
+        {
+          $line="<B>$2$current1$current2$current3$current4$current5$6</B>$current6\n";
+          break;
+        }elsif($in =~ /(<H2>[ ]*)([^(]*)(<A HREF="[^"]+">)([^(]+)(<\/A>)(.*)(<\/H2>.*)$/i)
         {
           $line="<B>$2</B>$current1$current2$current3$current4$current5<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<B>$6</B>$current6\n";
+          break;
+        }elsif ($in =~ /^<H2>/)
+        {
           break;
         }
       }
