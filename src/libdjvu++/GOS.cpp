@@ -9,9 +9,9 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GOS.cpp,v 1.24 2000-02-04 21:18:01 parag Exp $
+//C- $Id: GOS.cpp,v 1.25 2000-02-07 19:56:07 leonb Exp $
 
-// "$Id: GOS.cpp,v 1.24 2000-02-04 21:18:01 parag Exp $"
+// "$Id: GOS.cpp,v 1.25 2000-02-07 19:56:07 leonb Exp $"
 
 #ifdef __GNUC__
 #pragma implementation
@@ -62,7 +62,7 @@
 # include <unistd.h>
 #endif
 
-#if defined(macintosh)
+#ifdef macintosh
 #include <unix.h>
 #include <errno.h>
 #include <unistd.h>
@@ -118,7 +118,7 @@ GOS::is_file(const char *filename)
   if (buf.st_mode & S_IFDIR) 
     return FALSE;
 #else
-  error ( define something here for your operating system )
+#error "Define something here for your operating system"
 #endif  
 #endif
   return TRUE;
@@ -155,7 +155,7 @@ GOS::is_dir(const char *filename)
     if (buf.st_mode & S_IFDIR)
       return TRUE;
 #else
-  error ( define something here for your operating system )
+#error "Define something here for your operating system"
 #endif  
 #endif
   return FALSE;
@@ -248,7 +248,7 @@ GOS::dirname(const char *fname)
   *q = 0;
   return string_buffer;
 #else
-#if defined(macintosh)
+#ifdef macintosh
   GString temp;
   char *string_buffer = temp.getbuf(strlen(fname)+16);
   const char *s = fname;
@@ -272,7 +272,7 @@ GOS::dirname(const char *fname)
   *q = 0;
   return string_buffer;
 #else
-  error ( define something here for your operating system )
+#error "Define something here for your operating system"
 #endif
 #endif  
 #endif
@@ -352,7 +352,7 @@ GOS::basename(const char *fname, const char *suffix)
   }
   return string_buffer;
 #else
-#if defined(macintosh)
+#ifdef macintosh
     char l_fname[1024], *l_fname2;
     l_fname2 = l_fname;
     strcpy(l_fname,fname);
@@ -382,7 +382,7 @@ GOS::basename(const char *fname, const char *suffix)
   }
   return string_buffer;
 #else  
-  error ( define something here for your operating system )
+#error "Define something here for your operating system"
 #endif
 #endif
 #endif
@@ -439,7 +439,7 @@ GOS::cwd(const char *dirname)
   GetFullPathName(drv, MAXPATHLEN, string_buffer, &result);
   return string_buffer;
 #else
-  error ( define something here for your operating system )
+#error "Define something here for your operating system"
 #endif 
 #endif
 }
@@ -519,8 +519,6 @@ GOS::expand_name(const char *fname, const char *from)
     *s = 0;
   }
 #else
-  
-  
   /* WIN32 implementation */
 #ifdef WIN32
   char *s;
@@ -591,7 +589,8 @@ GOS::expand_name(const char *fname, const char *from)
     }
   return string_buffer;
 #else
-#if defined(macintosh)
+  /* MACINTOSH implementation */
+#ifdef macintosh
   char *s;
 
   if (from)
@@ -641,7 +640,7 @@ GOS::expand_name(const char *fname, const char *from)
     *s = 0;
   }
 #else
-  error ( define something here for your operating system )
+#error "Define something here for your operating system"
 #endif  
 #endif  
 #endif  
@@ -697,49 +696,61 @@ GOS::mkdir(const char * dirname)
    return -1;
 }
 
-#if defined(sun) || defined(__osf__) || defined(hpux)
-#include <dirent.h>
-#else
-#if !defined(WIN32) && !defined(macintosh)
+
+#ifdef UNIX
+#include <sys/types.h>
+// Handle the few systems without dirent.h
+// 1 -- systems with /usr/include/sys/ndir.h
+#if defined(XENIX)
+#define USE_DIRECT
+#include <sys/ndir.h>
+#endif
+// 2 -- systems with /usr/include/sys/dir.h
+#if defined(OLDBSD)
+#define USE_DIRECT
 #include <sys/dir.h>
 #endif
+// The rest should be generic
+#ifdef USE_DIRECT
+#define dirent direct
+#define NAMLEN(dirent) (dirent)->d_namlen
+#else
+#include <dirent.h>
+#define NAMLEN(dirent) strlen((dirent)->d_name)
+#endif 
 #endif
+
 
 int
 GOS::cleardir(const char * dirname)
 {
    if (!dirname || !dirname[0]) return -1;
-
+   
 #ifdef UNIX
    DIR * dir=opendir(dirname);
    if (dir)
-   {
-#if defined(sun) || defined(__osf__) || defined(hpux) || defined(_AIX)
-      dirent * de;
+     {
+       dirent * de;
+       while((de=readdir(dir)))
+         {
+           int len = NAMLEN(de);
+           if (de->d_name[0]=='.' && len==1) continue;
+           if (de->d_name[0]=='.' && de->d_name[1]=='.' && len==2) continue;
+           GString name = GOS::expand_name( GString(de->d_name, len), dirname);
+           int status = 0;
+           if (GOS::is_dir(name))
+             status = cleardir(name);
+           if (status < 0) return status;
+           status = GOS::deletefile(name);
+           if (status < 0) return status;
+         }
+       closedir(dir);
+       return 0;
+     }
 #else
-      direct * de;
-#endif
-      while((de=readdir(dir)))
-	 if (strcmp(de->d_name, ".") &&
-	     strcmp(de->d_name, ".."))
-	 {
-	    GString name=GOS::expand_name(de->d_name, dirname);
-	    int rc=0;
-	    if (GOS::is_dir(name)) rc=cleardir(name);
-	    if (rc<0) return rc;
-	    rc=GOS::deletefile(name);
-	    if (rc<0) return rc;
-	 }
-      closedir(dir);
-      return 0;
-   }
-#else
-#if defined(macintosh)
-#else
+   // WIN32 and MAC is missing
    THROW("Please provide correct implementation of GOS::cleardir() for this platform");
 #endif
-#endif
-
    return -1;
 }
 
@@ -764,10 +775,10 @@ GOS::ticks()
   DWORD clk = GetTickCount();
   return (unsigned long)clk;
 #else
-#if defined(macintosh)
+#ifdef macintosh
   return (unsigned long)((double)TickCount()*16.66);
 #else
-  error ( define something here for your operating system )
+#error "Define something here for your operating system"
 #endif
 #endif  
 #endif
@@ -791,7 +802,7 @@ GOS::sleep(int milliseconds)
 #ifdef WIN32
   Sleep(milliseconds);
 #endif
-#if defined(macintosh)
+#ifdef macintosh
     unsigned long tick = ticks(), now;
     while (1) {
         now = ticks();
@@ -848,7 +859,7 @@ GOS::filename_to_url(const char *filename, const char *useragent)
       if (*s == '/' )
         { *d++ ='/'; continue; }
 #else
-  error ( define something here for your operating system )
+#error "Define something here for your operating system"
 #endif  
 #endif
 #endif
@@ -912,10 +923,10 @@ GOS::url_to_filename(const char *url)
 #ifdef WIN32
   const char *root = "C:\\";
 #else
-#if defined(macintosh)
-  const char *root = "";//don't no it works or not
+#ifdef macintosh
+  const char *root = ""; 
 #else
-  error ( define something here for your operating system )
+#error "Define something here for your operating system"
 #endif
 #endif  
 #endif
@@ -965,18 +976,17 @@ GOS::url_to_filename(const char *url)
   while (*url=='/')
     url ++;
   // Check if we are finished
-  #if defined(macintosh)
-    char l_url[1024];
-    strcpy(l_url,url);
-    char *s = l_url;
-    for (; *s; s++)
-      if (*s == '/' )
-         *s=':';
-    
-    tmp = expand_name(l_url,root);
-  #else  
-    tmp = expand_name(url,root);
-  #endif
+#ifdef macintosh
+  char l_url[1024];
+  strcpy(l_url,url);
+  char *s = l_url;
+  for (; *s; s++)
+    if (*s == '/' )
+      *s=':';
+  tmp = expand_name(l_url,root);
+#else  
+  tmp = expand_name(url,root);
+#endif
   if (is_file(tmp)) 
     return tmp;
   // Search for a drive letter (encoded a la netscape)
@@ -1105,6 +1115,9 @@ int main(int argc, char **argv)
     return 0;
   } else if (op == "cwd" && argc==3) {
     printf("%s\n", (const char*)GOS::cwd(argv[2]));
+    return 0;
+  } else if (op == "cleardir" && argc==3) {
+    printf("%d\n", GOS::cleardir(argv[2]));
     return 0;
   } else if (op == "expand_name" && argc==3) {
     printf("%s\n", (const char*)GOS::expand_name(argv[2]));
