@@ -34,7 +34,7 @@ depend: $(SRC)
 	@%chmod%@ ugo+w Makefile
 	@%cat%@ Makefile.new  > Makefile
 	@%rm%@ -f Makefile.new
-	@%cat%@ Makefile.depend++ >> Makefile
+	if [ `@%wc%@ -l<Makefile.depend++` -gt 2 ] ; then @%cat%@ Makefile.depend++ >> Makefile ; else @%rm%@ Makefile.depend++; fi
 %%%END_REQUIRE(@%cxx_is_gcc%@)
 %%%BEGIN_REQUIRE(@%cc_is_gcc%@)
 	@%rm%@ -f Makefile.depend
@@ -46,6 +46,6 @@ depend: $(SRC)
 	@%chmod%@ ugo+w Makefile
 	@%cat%@ Makefile.new  > Makefile
 	@%rm%@ -f Makefile.new
-	if [ `@%wc%@ -l<Makefile.depend` -lt 3 ] ; then @%cat%@ Makefile.depend >> Makefile ; else @%rm%@ Makefile.depend; fi
+	if [ `@%wc%@ -l<Makefile.depend` -gt 2 ] ; then @%cat%@ Makefile.depend >> Makefile ; else @%rm%@ Makefile.depend; fi
 %%%END_REQUIRE(@%cc_is_gcc%@)
 
