@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GBitmap.cpp,v 1.44 2001-01-06 00:54:56 bcr Exp $
+// $Id: GBitmap.cpp,v 1.45 2001-01-10 18:39:35 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -45,7 +45,7 @@
 #include "GException.h"
 #include <string.h>
 
-// File "$Id: GBitmap.cpp,v 1.44 2001-01-06 00:54:56 bcr Exp $"
+// File "$Id: GBitmap.cpp,v 1.45 2001-01-10 18:39:35 bcr Exp $"
 // - Author: Leon Bottou, 05/1997
 
 
@@ -53,34 +53,30 @@
 
 GBitmap::~GBitmap()
 {
-  delete [] bytes_data;
-  delete [] rle;
-  delete [] rlerows;
 }
 
 void
 GBitmap::destroy(void)
 {
-  delete [] bytes_data;
-  delete [] rle;
-  delete [] rlerows;
-  bytes = bytes_data = rle = 0;
-  rlerows = 0;
+  gbytes_data.resize(0);
+  bytes = 0;
+  grle.resize(0);
+  grlerows.resize(0);
   rlelength = 0;
 }
 
 GBitmap::GBitmap()
   : nrows(0), ncolumns(0), border(0), 
-    bytes_per_row(0), grays(0), bytes(0), bytes_data(0), 
-    rle(0), rlerows(0), rlelength(0),
+    bytes_per_row(0), grays(0), bytes(0), gbytes_data(bytes_data), 
+    grle(rle), grlerows(rlerows), rlelength(0),
     monitorptr(0)
 {
 }
 
 GBitmap::GBitmap(int nrows, int ncolumns, int border)
   : nrows(0), ncolumns(0), border(0), 
-    bytes_per_row(0), grays(0), bytes(0), bytes_data(0), 
-    rle(0), rlerows(0), rlelength(0),
+    bytes_per_row(0), grays(0), bytes(0), gbytes_data(bytes_data), 
+    grle(rle), grlerows(rlerows), rlelength(0),
     monitorptr(0)
 {
   G_TRY
@@ -97,8 +93,8 @@ GBitmap::GBitmap(int nrows, int ncolumns, int border)
 
 GBitmap::GBitmap(ByteStream &ref, int border)
   : nrows(0), ncolumns(0), border(0), 
-    bytes_per_row(0), grays(0), bytes(0), bytes_data(0),
-    rle(0), rlerows(0), rlelength(0),
+    bytes_per_row(0), grays(0), bytes(0), gbytes_data(bytes_data),
+    grle(rle), grlerows(rlerows), rlelength(0),
     monitorptr(0)
 {
   G_TRY
@@ -115,8 +111,8 @@ GBitmap::GBitmap(ByteStream &ref, int border)
 
 GBitmap::GBitmap(const GBitmap &ref)
   : nrows(0), ncolumns(0), border(0), 
-    bytes_per_row(0), grays(0), bytes(0), bytes_data(0), 
-    rle(0), rlerows(0), rlelength(0),
+    bytes_per_row(0), grays(0), bytes(0), gbytes_data(bytes_data), 
+    grle(rle), grlerows(rlerows), rlelength(0),
     monitorptr(0)
 {
   G_TRY
@@ -133,8 +129,8 @@ GBitmap::GBitmap(const GBitmap &ref)
 
 GBitmap::GBitmap(const GBitmap &ref, int border)
   : nrows(0), ncolumns(0), border(0), 
-    bytes_per_row(0), grays(0), bytes(0), bytes_data(0),
-    rle(0), rlerows(0), rlelength(0),
+    bytes_per_row(0), grays(0), bytes(0), gbytes_data(bytes_data),
+    grle(rle), grlerows(rlerows), rlelength(0),
     monitorptr(0)
 {
   G_TRY
@@ -152,8 +148,8 @@ GBitmap::GBitmap(const GBitmap &ref, int border)
 
 GBitmap::GBitmap(const GBitmap &ref, const GRect &rect, int border)
   : nrows(0), ncolumns(0), border(0), 
-    bytes_per_row(0), grays(0), bytes(0), bytes_data(0),
-    rle(0), rlerows(0), rlelength(0),
+    bytes_per_row(0), grays(0), bytes(0), gbytes_data(bytes_data),
+    grle(rle), grlerows(rlerows), rlelength(0),
     monitorptr(0)
 {
   G_TRY
@@ -189,8 +185,9 @@ GBitmap::init(int arows, int acolumns, int aborder)
   zeroes(bytes_per_row + border);
   if (npixels > 0) 
     {
-      bytes = bytes_data = new unsigned char [ npixels ];
-      memset((void*)bytes_data, 0, npixels);
+      gbytes_data.resize(npixels);
+      gbytes_data.clear();
+      bytes = bytes_data;
     }
 }
 
@@ -229,10 +226,9 @@ GBitmap::init(const GBitmap &ref, const GRect &rect, int border)
       tmp.ncolumns = ncolumns;
       tmp.nrows = nrows;
       tmp.bytes = bytes;
-      tmp.bytes_data = bytes_data;
-      tmp.rle = rle;
-      bytes = bytes_data = 0;
-      rle = 0;
+      tmp.gbytes_data.swap(gbytes_data);
+      tmp.grle.swap(grle);
+      bytes = 0 ;
       init(tmp, rect, border);
     }
   else
@@ -317,7 +313,8 @@ GBitmap::donate_data(unsigned char *data, int w, int h)
   ncolumns = w;
   border = 0;
   bytes_per_row = w;
-  bytes = bytes_data = data;
+  gbytes_data.replace(data,w*h);
+  bytes = bytes_data;
   rlelength = 0;
 }
 
@@ -325,13 +322,13 @@ void
 GBitmap::donate_rle(unsigned char *rledata, unsigned int rledatalen, int w, int h)
 {
   destroy();
-  rlerows = 0;
   grays = 2;
   nrows = h;
   ncolumns = w;
   border = 0;
   bytes_per_row = w;
-  rle = rledata;
+//  rle = rledata;
+  grle.replace(rledata,rledatalen);
   rlelength = rledatalen;
 }
 
@@ -366,15 +363,13 @@ GBitmap::compress()
   GMonitorLock lock(monitor());
   if (bytes)
     {
-      delete [] rle;
-      delete [] rlerows;
-      rle = 0;
-      rlerows = 0;
-      rlelength = encode(&rle);
+      grle.resize(0);
+      grlerows.resize(0);
+      rlelength = encode(rle,grle);
       if (rlelength)
         {
-          delete [] bytes_data;
-          bytes = bytes_data = 0;
+          gbytes_data.resize(0);
+          bytes = 0;
         }
     }
 }
@@ -412,10 +407,10 @@ GBitmap::minborder(int minimum)
           if (bytes)
             {
               GBitmap tmp(*this, minimum);
-              delete [] bytes_data;
               bytes_per_row = tmp.bytes_per_row;
-              bytes = bytes_data = tmp.bytes_data;
-              tmp.bytes = tmp.bytes_data = 0;
+              tmp.gbytes_data.swap(gbytes_data);
+              bytes = bytes_data;
+              tmp.bytes = 0;
             }
           border = minimum;
           zeroes(border + ncolumns + border);
@@ -877,7 +872,7 @@ GBitmap::save_pbm(ByteStream &bs, int raw)
     const unsigned char *runs=rle;
     const unsigned char * const runs_end=rle+rlelength;
     const int count=(ncolumns+7)>>3;
-    unsigned char *buf=new unsigned char[count];
+    unsigned char *buf;
     GPBuffer<unsigned char> gbuf(buf,count);
     while(runs<runs_end)
     {
@@ -972,9 +967,9 @@ GBitmap::save_rle(ByteStream &bs)
   else
     {
       unsigned char *runs = 0;
-      int size = encode(&runs);
+      GPBuffer<unsigned char> gruns(runs);
+      int size = encode(runs,gruns);
       bs.writall((void*)runs, size);
-      delete [] runs;
     }
 }
 
@@ -982,21 +977,19 @@ GBitmap::save_rle(ByteStream &bs)
 // ------ runs
 
 
-unsigned char **
-GBitmap::makerows(int nrows, int ncolumns, unsigned char *runs)
+void
+GBitmap::makerows(
+  int nrows, const int ncolumns, unsigned char *runs, unsigned char *rlerows[])
 {
-  int r = nrows;
-  unsigned char **rlerows = new unsigned char* [nrows];
-  while (r-- > 0)
-    {
-      rlerows[r] = runs;
-      int c;
-      for(c=0;c<ncolumns;c+=GBitmap::read_run(runs))
-      	EMPTY_LOOP;
-      if (c > ncolumns)
-        G_THROW("GBitmap.lost_sync2");
-    }
-  return rlerows;
+  while (nrows-- > 0)
+  {
+    rlerows[nrows] = runs;
+    int c;
+    for(c=0;c<ncolumns;c+=GBitmap::read_run(runs))
+      EMPTY_LOOP;
+    if (c > ncolumns)
+      G_THROW("GBitmap.lost_sync2");
+  }
 }
 
 
@@ -1060,7 +1053,10 @@ GBitmap::rle_get_bits(int rowno, unsigned char *bits) const
   if (rowno<0 || rowno>=nrows)
     return 0;
   if (!rlerows)
-    (unsigned char**&)rlerows = makerows(nrows,ncolumns,rle);
+  {
+    const_cast<GPBuffer<unsigned char *> &>(grlerows).resize(nrows);
+    makerows(nrows,ncolumns,rle,const_cast<unsigned char **>(rlerows));
+  }
   int n = 0;
   int p = 0;
   int c = 0;
@@ -1087,7 +1083,10 @@ GBitmap::rle_get_runs(int rowno, int *rlens) const
   if (rowno<0 || rowno>=nrows)
     return 0;
   if (!rlerows)
-    *(unsigned char***)&rlerows = makerows(nrows,ncolumns,rle);
+  {
+    const_cast<GPBuffer<unsigned char *> &>(grlerows).resize(nrows);
+    makerows(nrows,ncolumns,rle,const_cast<unsigned char **>(rlerows));
+  }
   int n = 0;
   int d = 0;
   int c = 0;
@@ -1166,23 +1165,28 @@ GBitmap::rle_get_rect(GRect &rect) const
 // ------ helpers
 
 int
-GBitmap::encode(unsigned char **pruns) const
+GBitmap::encode(unsigned char *&pruns,GPBuffer<unsigned char> &gpruns) const
 {
   // uncompress rle information
-  *pruns = 0;
   if (nrows==0 || ncolumns==0)
+  {
+    gpruns.resize(0);
     return 0;
+  }
   if (!bytes)
     {
-      unsigned char *runs = new unsigned char[rlelength];
+      unsigned char *runs;
+      GPBuffer<unsigned char> gruns(runs,rlelength);
       memcpy((void*)runs, rle, rlelength);
-      *pruns = runs;
+      gruns.swap(gpruns);
       return rlelength;
     }
+  gpruns.resize(0);
   // create run array
   int pos = 0;
   int maxpos = 1024 + ncolumns + ncolumns;
-  unsigned char *runs = new unsigned char[maxpos];
+  unsigned char *runs;
+  GPBuffer<unsigned char> gruns(runs,maxpos);
   // encode bitmap as rle
   const unsigned char *row = bytes + border;
   int n = nrows - 1;
@@ -1192,10 +1196,7 @@ GBitmap::encode(unsigned char **pruns) const
       if (maxpos < pos+ncolumns+ncolumns+2)
         {
           maxpos += 1024 + ncolumns + ncolumns;
-          unsigned char *newruns = new unsigned char[maxpos];
-          memcpy(newruns, runs, pos);
-          delete [] runs;
-          runs = newruns;
+          gruns.resize(maxpos);
         }
 
       unsigned char *runs_pos=runs+pos;
@@ -1206,9 +1207,8 @@ GBitmap::encode(unsigned char **pruns) const
       n -= 1;
     }
   // return result
-  *pruns = new unsigned char[pos];
-  memcpy((void*)*pruns, (void*)(unsigned char*)runs, pos);
-  delete [] runs;
+  gruns.resize(pos);
+  gpruns.swap(gruns);
   return pos;
 }
 
@@ -1223,8 +1223,11 @@ GBitmap::decode(unsigned char *runs)
     G_THROW("GBitmap.null_arg");
   int npixels = nrows * bytes_per_row + border;
   if (!bytes_data)
-    bytes = bytes_data = new unsigned char [ npixels ];
-  memset(bytes_data, 0, npixels);
+  {
+    gbytes_data.resize(npixels);
+    bytes = bytes_data;
+  }
+  gbytes_data.clear();
   zeroes(bytes_per_row + border);
   // interpret runs data
   int c, n;
@@ -1250,10 +1253,8 @@ GBitmap::decode(unsigned char *runs)
         }
     }
   // Free rle data possibly attached to this bitmap
-  delete [] rle;
-  delete [] rlerows;
-  rle = 0;
-  rlerows = 0;
+  grle.resize(0);
+  grlerows.resize(0);
   rlelength = 0;
 #ifdef DEBUG
   check_border();
@@ -1269,16 +1270,17 @@ GBitmap::zeroes(int required)
 {
   if (zerosize < required)
     {
+      static GPBuffer<unsigned char> gzerobuffer(zerobuffer);
       GMonitorLock lock(&monitors[0]); // any monitor would do
       if (zerosize < required)
         {
-          if (zerosize < 256)
-            zerosize = 256;
+          if (zerosize < 32768)
+            zerosize = 32768;
           while (zerosize < required)
             zerosize = 2*zerosize;
-          delete [] zerobuffer;
-          zerobuffer = new unsigned char[zerosize];
-          memset(zerobuffer, 0, zerosize);
+          gzerobuffer.resize(0);
+          gzerobuffer.resize(zerosize);
+          gzerobuffer.clear();
         }
     }
 }

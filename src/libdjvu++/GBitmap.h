@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GBitmap.h,v 1.31 2001-01-04 22:04:55 bcr Exp $
+// $Id: GBitmap.h,v 1.32 2001-01-10 18:39:36 bcr Exp $
 // $Name:  $
 
 #ifndef _GBITMAP_H_
@@ -69,7 +69,7 @@ class ByteStream;
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: GBitmap.h,v 1.31 2001-01-04 22:04:55 bcr Exp $#
+    #$Id: GBitmap.h,v 1.32 2001-01-10 18:39:36 bcr Exp $#
 
  */
 //@{
@@ -404,8 +404,11 @@ protected:
   unsigned short grays;
   unsigned char  *bytes;
   unsigned char  *bytes_data;
+  GPBuffer<unsigned char> gbytes_data;
   unsigned char  *rle;
+  GPBuffer<unsigned char> grle;
   unsigned char  **rlerows;
+  GPBuffer<unsigned char *> grlerows;
   unsigned int   rlelength;
 private:
   GMonitor       *monitorptr;
@@ -414,7 +417,7 @@ private:
   static void zeroes(int ncolumns);
   static unsigned int read_integer(char &lookahead, ByteStream &ref);
   static void euclidian_ratio(int a, int b, int &q, int &r);
-  int encode(unsigned char **pruns) const;
+  int encode(unsigned char *&pruns,GPBuffer<unsigned char> &gpruns) const;
   void decode(unsigned char *runs);
   void read_pbm_text(ByteStream &ref); 
   void read_pgm_text(ByteStream &ref); 
@@ -424,7 +427,7 @@ private:
   static void append_long_run(unsigned char *&data, int count);
   static void append_line(unsigned char *&data,const unsigned char *row,
                           const int rowlen,bool invert=false);
-  static unsigned char ** makerows(int,int, unsigned char *);
+  static void makerows(int,const int, unsigned char *, unsigned char *[]);
   friend class DjVu_Stream;
   friend class DjVu_PixImage;
 public:
