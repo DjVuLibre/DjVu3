@@ -9,11 +9,15 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GContainer.h,v 1.12 1999-08-08 23:27:05 leonb Exp $
+//C- $Id: GContainer.h,v 1.13 1999-08-12 20:24:49 leonb Exp $
 
 
 #ifndef _GCONTAINER_H_
 #define _GCONTAINER_H_
+
+#ifdef __GNUC__
+#pragma interface
+#endif
 
 #include "DjVuGlobal.h"
 #include <new.h>
@@ -41,7 +45,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@research.att.com> -- bug fixes.
     @version 
-    #$Id: GContainer.h,v 1.12 1999-08-08 23:27:05 leonb Exp $# */
+    #$Id: GContainer.h,v 1.13 1999-08-12 20:24:49 leonb Exp $# */
 //@{
 
 
