@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: debug.cpp,v 1.5 1999-05-25 19:42:30 eaf Exp $
+//C-  $Id: debug.cpp,v 1.6 1999-11-04 18:41:39 bcr Exp $
 
 
 #include "debug.h"
@@ -69,7 +69,7 @@ Debug::~Debug()
 #ifdef UNIX
   if (--debug_file_count == 0)
     {
-      if (debug_file != stderr)
+      if (debug_file && (debug_file != stderr))
         fclose(debug_file);
       debug_file = 0;
     }

@@ -9,9 +9,9 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: ByteStream.cpp,v 1.17 1999-09-30 15:06:26 leonb Exp $
+//C- $Id: ByteStream.cpp,v 1.18 1999-11-04 18:41:39 bcr Exp $
 
-// File "$Id: ByteStream.cpp,v 1.17 1999-09-30 15:06:26 leonb Exp $"
+// File "$Id: ByteStream.cpp,v 1.18 1999-11-04 18:41:39 bcr Exp $"
 // - Author: Leon Bottou, 04/1997
 
 #ifdef __GNUC__
@@ -262,7 +262,7 @@ StdioByteStream::StdioByteStream(const char *filename, const char *mode)
 StdioByteStream::~StdioByteStream()
 {
   if (must_close)
-    if (fclose(fp) < 0)
+    if (fp && (fclose(fp) < 0))
       THROW(strerror(errno));
 }
 
