@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GThreads.h,v 1.33 2000-01-22 00:52:49 leonb Exp $
+//C- $Id: GThreads.h,v 1.34 2000-02-03 22:10:51 leonb Exp $
 
 #ifndef _GTHREADS_H_
 #define _GTHREADS_H_
@@ -73,7 +73,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Praveen Guduru <praveen@sanskrit.lz.att.com> -- mac implementation.
     @version
-    #$Id: GThreads.h,v 1.33 2000-01-22 00:52:49 leonb Exp $# */
+    #$Id: GThreads.h,v 1.34 2000-02-03 22:10:51 leonb Exp $# */
 //@{
 
 #include "DjVuGlobal.h"
@@ -159,9 +159,9 @@
     represented by a #GThread# object.  The amount of memory required for the
     stack of a secondary thread is defined when the #GThread# object is
     constructed.  The execution thread is started when function
-    \Ref{GThread::create} is called.  The execution can be terminated
-    at all times by destroying the #GThread# object or calling
-    \Ref{GThread::terminate}.
+    \Ref{GThread::create} is called.  The destructor of class GThread waits
+    until the thread terminanes.  Note that the execution can be terminated at
+    any time (with possible prejudice) by calling \Ref{GThread::terminate}.
 
     Several static member functions control the thread scheduler.  Function
     \Ref{GThread::yield} relinquishes the processor to another thread.
