@@ -1,0 +1,37 @@
+#!/bin/sh
+
+program=`basename $0`
+
+
+cat 1>&2 <<EOF
+
+$program -- Not yet implemented.
+
+This file should be used to create a compilation directory
+for a particular product.  It runs config/configure.sh to
+detect the machine configuration and generates subdirectories
+and makefiles.
+
+Usage:
+
+% cd \$topbuilddir
+% \$topsrcdir/$program  --prefix=\$installdir  ...options... 
+
+
+Then you can do any of the following
+
+   make clean		-- remove all object files and executables
+   make depend		-- update makefiles with dependency information
+   make all
+
+
+
+Most of the work is achieved using functions defined in
+file config/configure.sh.  There are functions
+  - to parse the command line options
+  - to detect compiler and compiler options
+  - to detect the presence of some features
+  - to update the makefiles
+
+EOF
+
