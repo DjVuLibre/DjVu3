@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GURL.cpp,v 1.19 2000-01-19 19:50:37 parag Exp $
+//C- $Id: GURL.cpp,v 1.20 2000-01-19 22:39:14 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -153,16 +153,30 @@ GURL::protocol(const char * url)
 
 GString
 GURL::hash_argument(void) const
+      // Returns the HASH argument (anything after '#' and before '?')
 {
    GCriticalSectionLock lock((GCriticalSection *) &url_lock);
+   bool found=false;
+   GString arg;
    for(const char * start=url;*start;start++)
-      if (start[0]=='#' || start[0]=='%' &&
-	  start[1]=='2' && start[2]=='3')
+   {
+	 // Break if CGI argument is found
+      if (start[0]=='?' || start[0]=='%' &&
+	  start[1]=='3' && toupper(start[2])=='F')
+	 break;
+
+      if (found) arg+=*start;
+      else
       {
-	 if (start[0]=='#') return start+1;
-	 else return start+3;
+	 if (start[0]=='#' || start[0]=='%' &&
+	     start[1]=='2' && start[2]=='3')
+	 {
+	    if (start[0]=='%') start+=2;
+	    found=true;
+	 }
       }
-   return GString();
+   }
+   return arg;
 }
 
 void
@@ -272,15 +286,29 @@ GURL::clear_all_arguments(void)
 
 void
 GURL::clear_hash_argument(void)
+      // Clear anything after first '#' and before the following '?'
 {
    GCriticalSectionLock lock(&url_lock);
+   bool found=false;
+   GString new_url;
    for(const char * start=url;*start;start++)
-      if (start[0]=='#' || start[0]=='%' &&
-	  start[1]=='2' && start[2]=='3')
+   {
+	 // Break on first CGI arg.
+      if (start[0]=='?' || start[0]=='%' &&
+	  start[1]=='3' && toupper(start[2])=='F')
       {
-	 url.setat(start-url, 0);
+	 new_url+=start;
 	 break;
       }
+
+      if (!found)
+	 if (start[0]=='#' || start[0]=='%' &&
+	     start[1]=='2' && start[2]=='3')
+	    found=true;
+
+      if (!found) new_url+=*start;
+   }
+   url=new_url;
    parse_cgi_args();
 }
 
