@@ -283,16 +283,16 @@ check_compiler()
     for i in $compilers
     do
       case $i in 
-      cxx|CXX|c++|C++)
-        if [ -z "$CXX_SET" ]
-        then
-          . ${CONFIG_DIR}/cxx.sh
-        fi
-        ;;
       c|C|cc|CC)
         if [ -z "$CC_SET" ]
         then
           . ${CONFIG_DIR}/cc.sh
+        fi
+        ;;
+      [Cc][Xx+][Xx+])
+        if [ -z "$CXX_SET" ]
+        then
+          . ${CONFIG_DIR}/cxx.sh
         fi
         ;;
       esac
@@ -314,24 +314,24 @@ require_compiler()
     for i in $compilers
     do
       case $i in 
-      cxx|CXX|c++|C++)
-        if [ -z "$CXX" ]
-        then
-          . ${CONFIG_DIR}/cxx.sh
-          if [ -z "$CXX" ]
-          then
-            echo 1>&2 "${PROGRAM_NAME}: C++ compiler not found.""
-            exit 1
-          fi
-        fi
-        ;;
       c|C|cc|CC)
-        if [ -z "$CC" ]
+        if [ -z "$CC_SET" ]
         then
           . ${CONFIG_DIR}/cc.sh
           if [ -z "$CC" ]
           then
-            echo 1>&2 "${PROGRAM_NAME}: C compiler not found.""
+            echo 1>&2 "${PROGRAM_NAME}: C compiler not found."
+            exit 1
+          fi
+        fi
+        ;;
+      [Cc][Xx+][Xx+])
+        if [ -z "$CXX_SET" ]
+        then
+          . ${CONFIG_DIR}/cxx.sh
+          if [ -z "$CXX" ]
+          then
+            echo 1>&2 "${PROGRAM_NAME}: C++ compiler not found."
             exit 1
           fi
         fi

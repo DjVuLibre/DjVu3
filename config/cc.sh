@@ -18,16 +18,16 @@ then
   echon "Searching for C compiler ... "
   if [ -n "$CC" ] ; then
     if ( run "$CC" -c $temp.c ) ; then
-      echo $CC"
+      echo "$CC"
     else
       CC=""
     fi
   fi
-  if [ -z "$CC" ] ; then
-    if ( run $EGCS -c $temp.c ) ; then
+  if [ -z "$CC" ]
+  then
+    if ( run "$EGCS" -c $temp.c ) ; then
       CC="$EGCS"
-      echo $CC"
-    if ( run gcc -c $temp.c ) ; then
+    elif ( run gcc -c $temp.c ) ; then
       CC=gcc
     elif ( run cc -c $temp.c ) ; then
       CC=cc
