@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.93 1999-11-23 18:20:47 eaf Exp $
+//C- $Id: DjVuFile.cpp,v 1.94 1999-12-02 21:09:00 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -1610,7 +1610,7 @@ DjVuFile::add_djvu_data(IFFByteStream & ostr, GMap<GURL, void *> & map,
             }
 #endif
         } 
-      else
+      else if (chkid!="NDIR" || !no_ndir)
         {
           ostr.put_chunk(chkid);
           int ochksize=ostr.copy(iff);
