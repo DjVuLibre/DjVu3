@@ -2,19 +2,16 @@ This is the DjVu 3.0 Reference Library.
 
 This code is intended to:
 	- define the DjVu format
-	- allow GNU projects to develop code that renders and
+	- allow GNU projects to develop code that renders,
 	  displays, and updates DjVu documents
 	- allows the creation of unoptimized images from pre-segmented
-	  image sources.
+	  image sources
 
-We this package does not contain value added libraries, like
-our SDK, JB2 optimizer, segmenter, optimizer, or GUI products.
-Even if we were to release these additional items as open source,
-most likely, patent rights would exclude there use in the open
-source community.
+This package does not contain value added libraries such as
+our SDK, JB2 optimizer, segmentor, optimizer, or GUI products.
 
-The provided code base, is what we are using for current product
-development.  So, you will find features, like our message catalog
+This code base, is what we are using for current product
+development:  you will find features, like our message catalog,
 that don't exist in any of our currently released products.
 
 
@@ -31,10 +28,9 @@ To install: (as root)
 
 
 To build under Windows:
-	1. First build the src/libdjvu++ files.
-	2. Next build src/djvutools/reference files.
-
-	3. Copy the profiles folder into the folder with your
+	1. Build the src/libdjvu++ files.
+	2. Build src/djvutools/reference files.
+	3. Copy the profiles folder into the directory that contains your
 	   executables.
 
 

@@ -133,11 +133,11 @@ require_make_stlib
 #############################################################################
 ### Fix DEBUG options
 #############################################################################
-have_debug=`echo "$A_DEFS" | grep -- DEBUG`
-if [ -z "$have_debug" ];
-then
-   C_DEFS=APPEND
-   A_DEFS="$A_DEFS -DNO_DEBUG"
+if [ -z "$HAS_DEBUG" ]
+    then
+       append_defs NO_DEBUG 1
+#   C_DEFS=APPEND
+#   A_DEFS="$A_DEFS -DNO_DEBUG"
 fi
 
 ### CHECK options
