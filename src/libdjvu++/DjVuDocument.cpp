@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.92 2000-01-05 20:31:53 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.93 2000-01-06 19:48:58 praveen Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -332,14 +332,14 @@ DjVuDocument::set_file_aliases(const DjVuFile * file)
 	 int page_num=url_to_page(file->get_url());
 	 if (page_num>=0)
 	 {
-	    if (page_num==0) pcaster->add_alias(file, (GString) init_url+"#-1");
-	    pcaster->add_alias(file, (GString) init_url+"#"+GString(page_num));
+	    if (page_num==0) pcaster->add_alias(file, (GString)(const char*)init_url+"#-1");
+	    pcaster->add_alias(file, (GString)(const char*)init_url+"#"+GString(page_num));
 	 }
       }
 	 // The following line MUST stay here. For OLD_INDEXED documents
 	 // a page may finish decoding before DIR or NDIR becomes known
 	 // (multithreading, remember), so the code above would not execute
-      pcaster->add_alias(file, (GString) file->get_url()+"#-1");
+      pcaster->add_alias(file, (GString)(const char*) file->get_url()+"#-1");
    } else pcaster->add_alias(file, get_int_prefix(this)+file->get_url());
 }
 
@@ -660,7 +660,7 @@ DjVuDocument::get_djvu_file(int page_num, bool dont_create)
 	 if (is_init_complete()) return 0;
 	 
 	 DEBUG_MSG("Structure is not known => check <doc_url>#<page_num> alias...\n");
-	 GP<DjVuPort> port=pcaster->alias_to_port((GString) init_url+"#"+GString(page_num));
+	 GP<DjVuPort> port=pcaster->alias_to_port((GString)(const char*) init_url+"#"+GString(page_num));
 	 if (!port || !port->inherits("DjVuFile"))
 	 {
 	    DEBUG_MSG("failed => invent dummy URL and proceed\n");

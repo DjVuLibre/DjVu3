@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFileCache.h,v 1.3 1999-10-05 16:00:06 leonb Exp $
+//C- $Id: DjVuFileCache.h,v 1.4 2000-01-06 19:48:58 praveen Exp $
 
 #ifndef _DJVUFILECACHE_H
 #define _DJVUFILECACHE_H
@@ -21,8 +21,10 @@
 #include "DjVuFile.h"
 #include "Arrays.h"
 #include "debug.h"
-
+#if defined(macintosh) //MCW can't compile
+#else
 #include <sys/types.h>
+#endif
 #include <time.h>
 
 /** @name DjVuFileCache.h
@@ -35,7 +37,7 @@
     
     @memo Simple DjVuFile caching class.
     @author Andrei Erofeev <eaf@research.att.com>
-    @version #$Id: DjVuFileCache.h,v 1.3 1999-10-05 16:00:06 leonb Exp $#
+    @version #$Id: DjVuFileCache.h,v 1.4 2000-01-06 19:48:58 praveen Exp $#
 */
 
 //@{

@@ -9,9 +9,9 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GOS.cpp,v 1.19 1999-12-01 04:18:58 bcr Exp $
+//C- $Id: GOS.cpp,v 1.20 2000-01-06 19:48:58 praveen Exp $
 
-// "$Id: GOS.cpp,v 1.19 1999-12-01 04:18:58 bcr Exp $"
+// "$Id: GOS.cpp,v 1.20 2000-01-06 19:48:58 praveen Exp $"
 
 #ifdef __GNUC__
 #pragma implementation
@@ -62,6 +62,12 @@
 # include <unistd.h>
 #endif
 
+#if defined(macintosh)
+#include <unix.h>
+#include <errno.h>
+#include <unistd.h>
+#endif
+
 // -- TRUE FALSE
 #undef TRUE
 #undef FALSE
@@ -98,7 +104,7 @@
 int 
 GOS::is_file(const char *filename)
 {
-#ifdef UNIX
+#if defined(UNIX) || defined(macintosh)
   struct stat buf;
   if (stat(filename,&buf)==-1)
     return FALSE;
@@ -126,7 +132,7 @@ GOS::is_dir(const char *filename)
 {
   if(!filename || !filename[0]) return FALSE;
   /* UNIX implementation */
-#ifdef UNIX
+#if defined(UNIX) || defined(macintosh)
   struct stat buf;
   if (stat(filename,&buf)==0)
     if (buf.st_mode & S_IFDIR)
@@ -242,7 +248,32 @@ GOS::dirname(const char *fname)
   *q = 0;
   return string_buffer;
 #else
+#if defined(macintosh)
+  GString temp;
+  char *string_buffer = temp.getbuf(strlen(fname)+16);
+  const char *s = fname;
+  const char *p = 0;
+  char *q = string_buffer;
+  while (*s) {
+    if (s[0]==':' && s[1])
+      p = s;
+    s++;
+  }
+  if (!p) {
+    if (fname[0]==':')
+      return fname;
+    else
+      return "";
+  }
+  s = fname;
+  do {
+    *q++ = *s++;
+  } while (s<p);
+  *q = 0;
+  return string_buffer;
+#else
   error ( define something here for your operating system )
+#endif
 #endif  
 #endif
 }
@@ -321,7 +352,38 @@ GOS::basename(const char *fname, const char *suffix)
   }
   return string_buffer;
 #else
+#if defined(macintosh)
+    char l_fname[1024], *l_fname2;
+    l_fname2 = l_fname;
+    strcpy(l_fname,fname);
+    char *s = l_fname;
+    for (; *s; s++)
+      if (*s == '/' )
+         *s=':';
+  s = strrchr(l_fname,':');
+  if (s)
+    l_fname2 = s+1;
+  /* Process suffix */
+  if (suffix==0 || suffix[0]==0)
+    return l_fname2;
+  if (suffix[0]=='.')
+    suffix ++;
+  if (suffix[0]==0)
+    return l_fname2;
+  GString temp;
+  char *string_buffer = temp.getbuf(strlen(l_fname2)+16);
+  strcpy(string_buffer,l_fname2);
+  int sl = strlen(suffix);
+  s = string_buffer + strlen(string_buffer);
+  if (s > string_buffer + sl) {
+    s =  s - (sl + 1);
+    if (s[0]=='.' && strcmp(s+1,suffix)==0)
+      *s = 0;
+  }
+  return string_buffer;
+#else  
   error ( define something here for your operating system )
+#endif
 #endif
 #endif
 }
@@ -356,7 +418,7 @@ errmsg()
 GString 
 GOS::cwd(const char *dirname)
 {
-#ifdef UNIX
+#if defined(UNIX) || defined(macintosh)
   if (dirname && chdir(dirname)==-1)
     THROW(errmsg());
   GString temp;
@@ -529,7 +591,58 @@ GOS::expand_name(const char *fname, const char *from)
     }
   return string_buffer;
 #else
+#if defined(macintosh)
+  char *s;
+
+  if (from)
+    strcpy(string_buffer, from);
+  else
+    strcpy(string_buffer, cwd());
+    
+  if (!strncmp(string_buffer,fname,strlen(string_buffer)) || is_file(fname))
+    strcpy(string_buffer, "");//please don't expand, the logic of filename is chaos.
+    
+  /* Process path components */
+  s = string_buffer + strlen(string_buffer);
+  for (;;) {
+    while (fname && fname[0]==':')
+      fname++;
+    if (!fname || !fname[0]) {
+      while (s>string_buffer+1 && s[-1]==':')
+	s--;
+      *s = 0;
+      if (string_buffer[0]==':')
+      	return &string_buffer[1];
+      else
+      	return string_buffer;
+    }
+    if (fname[0]=='.') {
+      if (fname[1]==':' || fname[1]==0) {
+	fname +=1;
+	continue;
+      }
+      if (fname[1]=='.')
+	if (fname[2]==':' || fname[2]==0) {
+	  fname +=2;
+	  while (s>string_buffer+1 && s[-1]==':')
+	    s--;
+	  while (s>string_buffer+1 && s[-1]!=':')
+	    s--;
+	  continue;
+	}
+    }
+    if (s==string_buffer || s[-1]!=':')
+      *s++ = ':';
+    while (*fname!=0 && *fname!=':') {
+      *s++ = *fname++;
+      if (s-string_buffer > MAXPATHLEN)
+	THROW("filename length exceeds system limits");
+    }
+    *s = 0;
+  }
+#else
   error ( define something here for your operating system )
+#endif  
 #endif  
 #endif  
 }
@@ -587,7 +700,7 @@ GOS::mkdir(const char * dirname)
 #if defined(sun) || defined(__osf__) || defined(hpux)
 #include <dirent.h>
 #else
-#ifndef WIN32
+#if !defined(WIN32) && !defined(macintosh)
 #include <sys/dir.h>
 #endif
 #endif
@@ -621,7 +734,10 @@ GOS::cleardir(const char * dirname)
       return 0;
    }
 #else
+#if defined(macintosh)
+#else
    THROW("Please provide correct implementation of GOS::cleardir() for this platform");
+#endif
 #endif
 
    return -1;
@@ -648,7 +764,11 @@ GOS::ticks()
   DWORD clk = GetTickCount();
   return (unsigned long)clk;
 #else
+#if defined(macintosh)
+  return (unsigned long)((double)TickCount()*16.66);
+#else
   error ( define something here for your operating system )
+#endif
 #endif  
 #endif
 }
@@ -670,6 +790,15 @@ GOS::sleep(int milliseconds)
 #endif
 #ifdef WIN32
   Sleep(milliseconds);
+#endif
+#if defined(macintosh)
+    unsigned long tick = ticks(), now;
+    while (1) {
+        now = ticks();
+        if ((tick+milliseconds) < now)
+            break;
+        GThread::yield();
+    }
 #endif
 }
 
@@ -777,7 +906,11 @@ GOS::url_to_filename(const char *url)
 #ifdef WIN32
   const char *root = "C:\\";
 #else
+#if defined(macintosh)
+  const char *root = "";//don't no it works or not
+#else
   error ( define something here for your operating system )
+#endif
 #endif  
 #endif
   // Process hexdecimal character specification
@@ -820,7 +953,18 @@ GOS::url_to_filename(const char *url)
   while (*url=='/')
     url ++;
   // Check if we are finished
-  tmp = expand_name(url,root);
+  #if defined(macintosh)
+    char l_url[1024];
+    strcpy(l_url,url);
+    char *s = l_url;
+    for (; *s; s++)
+      if (*s == '/' )
+         *s=':';
+    
+    tmp = expand_name(l_url,root);
+  #else  
+    tmp = expand_name(url,root);
+  #endif
   if (is_file(tmp)) 
     return tmp;
   // Search for a drive letter (encoded a la netscape)

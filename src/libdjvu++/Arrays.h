@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: Arrays.h,v 1.9 1999-12-01 20:09:36 parag Exp $
+//C- $Id: Arrays.h,v 1.10 2000-01-06 19:48:58 praveen Exp $
 
 
 #ifndef _ARRAYS_H_
@@ -72,7 +72,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@research.att.com> -- Copy-on-demand implementation.
     @version 
-    #$Id: Arrays.h,v 1.9 1999-12-01 20:09:36 parag Exp $# */
+    #$Id: Arrays.h,v 1.10 2000-01-06 19:48:58 praveen Exp $# */
 //@{
 
 // Auxiliary classes: Will be used in place of GPBase and GPEnabled objects
@@ -428,8 +428,11 @@ public:
        subscript range, you must stop using the pointers returned by prior
        invocation of this conversion operator. */
    operator const TYPE* () const;
+   
+#if defined(macintosh) //MCW can't compile
+#else  
    operator const TYPE* ();
-  
+#endif  
    /** Insert new elements into an array. This function inserts
        #howmany# elements at position #n# into the array. The initial value #val#
        is copied into the new elements. All array elements previously located at subscripts
@@ -476,12 +479,15 @@ ArrayBaseT<TYPE>::operator TYPE* ()
    return &((TYPE *) rep->data)[-rep->minlo];
 }
 
+#if defined(macintosh) //MCW can't compile
+#else
 template <class TYPE> inline
 ArrayBaseT<TYPE>::operator const TYPE* ()
 {
    const ArrayRep * rep=(const ArrayRep *) get();
    return &((const TYPE *) rep->data)[-rep->minlo];
 }
+#endif
 
 template <class TYPE> inline
 ArrayBaseT<TYPE>::operator const TYPE* () const
@@ -849,7 +855,12 @@ public:
   const GP<TYPE>& operator[](int n) const;
   // -- CONVERSION
   operator GP<TYPE>* ();
+  
+#if defined(macintosh) //MCW can't compile
+#else  
   operator const GP<TYPE>* ();
+#endif 
+ 
   operator const GP<TYPE>* () const;
   // -- ALTERATION
   void ins(int n, const GP<TYPE> &val, unsigned int howmany=1);
@@ -894,11 +905,14 @@ inline DPArray<TYPE>::operator GP<TYPE>* ()
    return (GP<TYPE> *) DArray<GPBase>::operator GPBase*();
 }
 
+#if defined(macintosh) //MCW can't compile
+#else
 template<class TYPE>
 inline DPArray<TYPE>::operator const GP<TYPE>* ()
 {
    return (const GP<TYPE> *) DArray<GPBase>::operator const GPBase*();
 }
+#endif
 
 template<class TYPE>
 inline DPArray<TYPE>::operator const GP<TYPE>* () const

@@ -9,13 +9,16 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.cpp,v 1.41 2000-01-05 15:39:20 eaf Exp $
+//C- $Id: DataPool.cpp,v 1.42 2000-01-06 19:48:58 praveen Exp $
 
 #ifdef __GNUC__
 #pragma implementation
 #endif
 
+#if defined(macintosh) //MCW can't compile
+#else
 #include <sys/types.h>
+#endif
 #include "DataPool.h"
 #include "IFFByteStream.h"
 #include "GString.h"
@@ -940,7 +943,7 @@ DataPool::stop(bool only_blocked)
 	 // "active_readers"
       while(active_readers)
       {
-#if THREADMODEL==COTHREADS
+#if (THREADMODEL==COTHREADS) || (THREADMODEL==MACTHREADS)
 	 GThread::yield();
 #endif
 	 pool->restart_readers();

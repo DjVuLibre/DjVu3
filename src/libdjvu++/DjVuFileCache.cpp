@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFileCache.cpp,v 1.3 1999-09-28 17:33:51 leonb Exp $
+//C- $Id: DjVuFileCache.cpp,v 1.4 2000-01-06 19:48:58 praveen Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -111,7 +111,7 @@ DjVuFileCache::clear_to_size(int size)
 	    item_arr[i]=item;
 	 }
 
-	 qsort(item_arr, item_arr.size(), sizeof(item_arr[0]), Item::qsort_func);
+	 qsort(&item_arr[0], item_arr.size(), sizeof(item_arr[0]), Item::qsort_func);
 
 	 for(i=0;i<item_arr.size() && cur_size>(int) size;i++)
 	 {
