@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GThreads.h,v 1.20 1999-07-16 18:08:14 leonb Exp $
+//C- $Id: GThreads.h,v 1.21 1999-09-09 22:07:09 eaf Exp $
 
 #ifndef _GTHREADS_H_
 #define _GTHREADS_H_
@@ -73,7 +73,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Praveen Guduru <praveen@sanskrit.lz.att.com> -- mac implementation.
     @version
-    #$Id: GThreads.h,v 1.20 1999-07-16 18:08:14 leonb Exp $# */
+    #$Id: GThreads.h,v 1.21 1999-09-09 22:07:09 eaf Exp $# */
 //@{
 
 #include "DjVuGlobal.h"
@@ -416,6 +416,84 @@ public:
   ~GMonitorLock() 
     { gsec->leave(); };
 };
+
+/** A thread safe class representing a set of flags. The class allows to
+    modify, test the flags and to suspend execution of the thread until
+    some given flags are set. */
+class GSafeFlags : public GMonitor
+{
+private:
+   volatile long flags;
+public:
+      /// Constructs #GSafeFlags# object.
+   GSafeFlags(void);
+
+      /** Clears those bits of the flags, which are zero in the #mask#.
+	  It will also wake up threads waiting for the flags to change. */
+   GSafeFlags &	operator&=(long mask);
+      /** Sets those bits of the flags, which are set in the #mask#.
+	  It will also wake up threads waiting for the flags to change. */
+   GSafeFlags &	operator|=(long mask);
+      /** Returns the value of the flags */
+   operator long(void);
+
+      /// Computes and returns binary AND of the flags and the #mask#
+   long	operator&(long mask);
+
+      /// Waits until at least one bit mentioned in #mask# is set in flags
+   void	wait_for_flags(long mask);
+};
+
+inline
+GSafeFlags::GSafeFlags(void) : flags(0) {}
+
+inline GSafeFlags &
+GSafeFlags::operator&=(long mask)
+{
+   enter();
+   flags&=mask;
+   broadcast();
+   leave();
+   return *this;
+}
+
+inline GSafeFlags &
+GSafeFlags::operator|=(long mask)
+{
+   enter();
+   flags|=mask;
+   broadcast();
+   leave();
+   return *this;
+}
+
+inline long
+GSafeFlags::operator&(long mask)
+{
+   long f;
+   enter();
+   f=flags & mask;
+   leave();
+   return f;
+}
+
+inline
+GSafeFlags::operator long(void)
+{
+   long f;
+   enter();
+   f=flags;
+   leave();
+   return f;
+}
+
+inline void
+GSafeFlags::wait_for_flags(long mask)
+{
+   enter();
+   while((flags & mask)==0) wait();
+   leave();
+}
 
 //@}
 
