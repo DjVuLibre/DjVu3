@@ -32,20 +32,23 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qd_thr_yielder.cpp,v 1.4 2001-10-16 18:01:45 docbill Exp $
+// $Id: qd_thr_yielder.cpp,v 1.3.2.1 2001-10-17 13:05:54 leonb Exp $
 // $Name:  $
 
-
-#ifdef __GNUC__
-#pragma implementation
+#ifdef HAVE_CONFIG_H
+#include "config.h"
 #endif
 
-#include "qd_thr_yielder.h"
+#if defined(HAVE_COTHREAD) || !defined(AUTOCONF)
 #include "GThreads.h"
+#if THREADMODEL == COTHREADS
+
+/* --------------- begin cothread specific code --------------- */
+
+#include "qd_thr_yielder.h"
 #include "GContainer.h"
 #include "debug.h"
 #include "throw_error.h"
-
 #include <qsocketnotifier.h>
 #include <qtimer.h>
 #include <qobject.h>
@@ -225,4 +228,7 @@ QDThrYielder::getTasksNum(void)
    return tasks;
 }
 
-#include "qd_thr_yielder_moc.inc"
+
+/* --------------- end cothread specific code --------------- */
+#endif /* THREADMODEL */
+#endif /* HAVE_COTHREAD || !ASUTOCONF */

@@ -32,16 +32,15 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qd_thr_yielder.h,v 1.4 2001-10-16 18:01:45 docbill Exp $
+// $Id: qd_thr_yielder.h,v 1.3.2.1 2001-10-17 13:05:54 leonb Exp $
 // $Name:  $
-
 
 #ifndef HDR_QD_THR_YIELDER
 #define HDR_QD_THR_YIELDER
-
-#ifdef __GNUC__
-#pragma interface
+#ifdef HAVE_CONFIG_H
+#include "config.h"
 #endif
+#if defined(HAVE_COTHREAD) || !defined(AUTOCONF)
 
 class QDThrYielder
 {
@@ -56,4 +55,5 @@ public:
    static int	getTasksNum(void);
 };
 
-#endif
+#endif /* HAVE_COTHREAD || !AUTOCONF */
+#endif /* HDR_QD_THR_YIELDER */

@@ -32,20 +32,20 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: main.cpp,v 1.10 2001-10-16 18:01:44 docbill Exp $
+// $Id: main.cpp,v 1.9.2.1 2001-10-17 13:05:54 leonb Exp $
 // $Name:  $
 
-
-#ifdef __GNUC__
-#pragma implementation
+#ifdef HAVE_CONFIG_H
+#include "config.h"
 #endif
+
 
 #include <iostream>
 #include <signal.h>
 #include <stdio.h>
 #include <locale.h>
 
-#include "DjVu.h"
+#include "DjVuGlobal.h"
 #include "ZPCodec.h"		// Wants to be before QT
 
 #include "prefs.h"

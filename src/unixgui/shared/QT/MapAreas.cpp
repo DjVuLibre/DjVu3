@@ -32,15 +32,15 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: MapAreas.cpp,v 1.17 2001-10-16 18:01:45 docbill Exp $
+// $Id: MapAreas.cpp,v 1.16.2.1 2001-10-17 13:05:54 leonb Exp $
 // $Name:  $
 
-
-#ifdef __GNUC__
-#pragma implementation
+#ifdef HAVE_CONFIG_H
+#include "config.h"
 #endif
 
-#include "DjVu.h"
+
+#include "DjVuGlobal.h"
 #include "MapAreas.h"
 #include "MapDraw.h"
 #include "debug.h"
