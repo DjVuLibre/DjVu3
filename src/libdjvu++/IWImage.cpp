@@ -9,9 +9,9 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: IWImage.cpp,v 1.11 1999-05-14 19:17:29 leonb Exp $
+//C- $Id: IWImage.cpp,v 1.12 1999-05-22 00:54:05 leonb Exp $
 
-// File "$Id: IWImage.cpp,v 1.11 1999-05-14 19:17:29 leonb Exp $"
+// File "$Id: IWImage.cpp,v 1.12 1999-05-22 00:54:05 leonb Exp $"
 // - Author: Leon Bottou, 08/1998
 
 #ifdef __GNUC__
@@ -405,10 +405,7 @@ forward_mask(short *data16, int w, int h, int rowsize, int begin, int end,
         {
           DJVU_PROGRESS("masking", scale*1000 + rp);
           // Decompose
-          for (i=0; i<h; i+=scale)
-            forward_filter(sdata, i*w, i*w+w, i*w, scale);
-          for (j=0; j<w; j+=scale)
-            forward_filter(sdata, j, j+h*w, j, scale*w);
+          forward(sdata, w, h, w, scale, scale+scale);
           // Zero masked coefficients
           d = sdata;
           m = smask;
@@ -433,10 +430,7 @@ forward_mask(short *data16, int w, int h, int rowsize, int begin, int end,
           if (quickmask && scale==1)
             break;
           // Reconstruct
-          for (j=0; j<w; j+=scale)
-            backward_filter(sdata, j, j+h*w, j, scale*w);
-          for (i=0; i<h; i+=scale)
-            backward_filter(sdata, i*w, i*w+w, i*w, scale);
+          backward(sdata, w, h, w, scale+scale, scale);
           // Evaluate max error
           lasterr = 0;
           p = data16;
