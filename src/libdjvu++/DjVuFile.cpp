@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuFile.cpp,v 1.165 2001-04-20 22:40:33 bcr Exp $
+// $Id: DjVuFile.cpp,v 1.166 2001-04-25 21:30:05 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -1521,7 +1521,7 @@ DjVuFile::get_merged_anno(const GP<DjVuFile> & file,
             {
               if (max_level<level)
                 max_level=level;
-              if (str_out.tell())
+              if (str_out.tell()&&chkid != "ANTz")
               {
                 str_out.write((void *) "", 1);
               }

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.h,v 1.65 2001-04-24 20:59:14 bcr Exp $
+// $Id: GString.h,v 1.66 2001-04-25 21:30:06 bcr Exp $
 // $Name:  $
 
 #ifndef _GSTRING_H_
@@ -57,7 +57,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.65 2001-04-24 20:59:14 bcr Exp $# */
+    #$Id: GString.h,v 1.66 2001-04-25 21:30:06 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -73,7 +73,8 @@
 #ifdef WIN32
 #include <windows.h>
 #endif
-#include <wchar.h>
+
+#include <wchar.h> // needed for mbstate_t
 
 #if defined(__linux__) || defined(WIN32)
 #define HAS_MBSTATE 1
@@ -129,7 +130,13 @@ public:
     GP<GStringRep>& endptr, bool &isDouble) const;
 
   // return next non space position
-  virtual int nextNonSpace( const int from=0 ) const;
+  int nextNonSpace( const int from=0, const int len=(-1) ) const;
+
+  // return next white space position
+  int nextSpace( const int from=0, const int len=(-1) ) const;
+
+  // return the position after the last non-whitespace character.
+  int firstEndSpace( int from=0, const int len=(-1) ) const;
 
     // Create an empty string.
   template <class TYPE> static GP<GStringRep> create(
@@ -223,7 +230,7 @@ public:
   int getUCS4(unsigned long &w, const int from) const;
 
   virtual unsigned char *UCS4toString(
-    const unsigned long w,unsigned char *ptr, mbstate_t *ps=0) const;
+    const unsigned long w, unsigned char *ptr, mbstate_t *ps=0) const;
 
   static unsigned char *UCS4toUTF8(
     const unsigned long w,unsigned char *ptr);
@@ -244,7 +251,26 @@ protected:
   virtual unsigned long getValidUCS4(const char *&source) const;
 
   GP<GStringRep> tocase(
-    int (*xiswcase)(wint_t wc), wint_t (*xtowcase)(wint_t wc)) const;
+    bool (*xiswcase)(const unsigned long wc),
+    unsigned long (*xtowcase)(const unsigned long wc)) const;
+
+  // Tests if the specified character passes the xiswtest.  If so, the
+  // return pointer is incremented to the next character, otherwise the
+  // specified #ptr# is returned.
+  const char * isCharType( bool (*xiswtest)(const unsigned long wc), const char *ptr,
+    const bool reverse=false) const;
+
+  // Find the next character position that passes the isCharType test.
+  int nextCharType(
+    bool (*xiswtest)(const unsigned long wc),const int from,const int len,
+    const bool reverse=false) const;
+
+  static bool iswspace(const unsigned long w);
+  static bool iswupper(const unsigned long w);
+  static bool iswlower(const unsigned long w);
+  static unsigned long towupper(const unsigned long w);
+  static unsigned long towlower(const unsigned long w);
+
 private:
   int  size;
   char *data;
@@ -301,9 +327,6 @@ public:
     GP<GStringRep>& endptr, bool &isULong, const int base) const;
   virtual double toDouble(
     GP<GStringRep>& endptr, bool &isDouble) const;
-
-  // return position of next non space.
-  virtual int nextNonSpace( const int from=0 ) const;
 
     // Create an empty string
   static GP<GStringRep> create(const unsigned int sz = 0)
@@ -415,9 +438,6 @@ public:
 
   static GP<GStringRep> create_format(const char fmt[],...);
   static GP<GStringRep> create(const char fmt[],va_list args);
-
-  // return position of next non space.
-  virtual int nextNonSpace( const int from=0 ) const;
 
   virtual unsigned char *UCS4toString(
     const unsigned long w,unsigned char *ptr, mbstate_t *ps=0) const;
@@ -734,8 +754,16 @@ public:
   friend GStringRep;
 
   /// Returns next non space position.
-  int nextNonSpace( const int from=0 ) const
-  { return ptr?(*this)->nextNonSpace(from):0; }
+  int nextNonSpace( const int from=0, const int len=(-1) ) const
+  { return ptr?(*this)->nextNonSpace(from,len):0; }
+
+  /// Returns next non space position.
+  int nextSpace( const int from=0, const int len=(-1) ) const
+  { return ptr?(*this)->nextSpace(from,len):0; }
+
+  /// return the position after the last non-whitespace character.
+  int firstEndSpace( const int from=0,const int len=(-1) ) const
+  { return ptr?(*this)->firstEndSpace(from,len):0; }
 protected:
   const char *gstr;
   static void throw_illegal_subscript() no_return;
@@ -868,11 +896,6 @@ public:
     const GUTF8String& src, GUTF8String& endptr, bool& isDouble)
   { return src.toDouble(endptr,isDouble); }
 
-
-   /** Returns an integer.  Gives the position of the next non white space */
-   int nextNonSpace( int from=0  ) const
-      { return ptr?(*this)->nextNonSpace( from ):0; }
-
   // -- CONCATENATION
   /// Appends character #ch# to the string.
   GUTF8String& operator+= (char ch)
@@ -997,10 +1020,6 @@ public:
   { 
     return init(GStringRep::Native::create(*this,str));
   }
-
-   /** Return an integer.  Returns position of next non space value */
-   int nextNonSpace( int from=0 )
-      { return ptr?(*this)->nextNonSpace(from):0; }
 
   /** Returns a sub-string.  The sub-string is composed by copying #len#
       characters starting at position #from# in this string.  The length of

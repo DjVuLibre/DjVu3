@@ -30,12 +30,15 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.80 2001-04-24 20:59:14 bcr Exp $
+// $Id: GString.cpp,v 1.81 2001-04-25 21:30:06 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
 #pragma implementation
 #endif
+
+#include "GString.h"
+#include "debug.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -45,9 +48,7 @@
 #include <wctype.h>
 #include <locale.h>
 #endif
-
-#include "GString.h"
-#include "debug.h"
+#include <wchar.h>
 
 
 #ifndef HAS_MBSTATE
@@ -303,60 +304,115 @@ GBaseString::getbuf(int n)
   return r.data;
 }
 
-static inline int
-xiswupper(wint_t w)
+const char *
+GStringRep::isCharType(
+  bool (*xiswtest)(const unsigned long wc), const char *ptr, const bool reverse) const
 {
-  return iswupper(w);
+  char const * xptr=ptr;
+  const unsigned long w=getValidUCS4(xptr);
+  if((ptr != xptr)
+    &&(((sizeof(wchar_t) == 2)&&(w&~0xffff))
+      ||(reverse?(!xiswtest(w)):xiswtest(w))))
+  {
+    ptr=xptr;
+  }
+  return ptr;
 }
 
-static inline wint_t
-xtowupper(wint_t w)
+int
+GStringRep::nextCharType(
+  bool (*xiswtest)(const unsigned long wc), const int from, const int len,
+  const bool reverse) const
 {
-  return towupper(w);
+  // We want to return the position of the next
+  // non white space starting from the #from#
+  // location.  isspace should work in any locale
+  // so we should only need to do this for the non-
+  // native locales (UTF8)
+  int retval;
+  if(from<size)
+  {
+    retval=from;
+    const char * ptr = data+from;
+    for( const char * const eptr=ptr+((len<0)?(size-from):len);
+      (ptr<=eptr) && *ptr;)
+    {
+       // Skip characters that fail the isCharType test
+      char const * const xptr=isCharType(xiswtest,ptr,!reverse);
+      if(xptr == ptr)
+        break;
+      ptr=xptr;
+    }
+    retval=(int)((size_t)ptr-(size_t)data);
+  }else
+  {
+    retval=size;
+  }
+  return retval;
 }
+
+inline bool
+GStringRep::iswspace(const unsigned long w)
+{
+  return ((sizeof(wchar_t) == 2)&&(w&~0xffff))
+    ?(true):(::iswspace(w)?true:false);
+}
+
+inline bool
+GStringRep::iswupper(const unsigned long w)
+{
+  return ((sizeof(wchar_t) == 2)&&(w&~0xffff))
+    ?(true):(::iswupper(w)?true:false);
+}
+
+inline bool
+GStringRep::iswlower(const unsigned long w)
+{
+  return ((sizeof(wchar_t) == 2)&&(w&~0xffff))
+    ?(true):(::iswlower(w)?true:false);
+}
+
+inline unsigned long
+GStringRep::towupper(const unsigned long w)
+{
+  return ((sizeof(wchar_t) == 2)&&(w&~0xffff))
+    ?w:(::towupper(w));
+}
+
+inline unsigned long
+GStringRep::towlower(const unsigned long w)
+{
+  return ((sizeof(wchar_t) == 2)&&(w&~0xffff))
+    ?w:(::towlower(w));
+}
+
 
 GP<GStringRep>
 GStringRep::upcase(void) const
 {
-  return tocase(xiswupper,xtowupper);
-}
-
-static inline int
-xiswlower(wint_t w)
-{
-  return iswlower(w);
-}
-
-static inline wint_t
-xtowlower(wint_t w)
-{
-  return towlower(w);
+  return tocase(iswupper,towupper);
 }
 
 GP<GStringRep>
 GStringRep::downcase(void) const
 {
-  return tocase(xiswlower,xtowlower);
+  return tocase(iswlower,towlower);
 }
 
 GP<GStringRep>
 GStringRep::tocase(
-  int (*xiswcase)(wint_t wc), wint_t (*xtowcase)(wint_t wc)) const
+  bool (*xiswcase)(const unsigned long wc),
+  unsigned long (*xtowcase)(const unsigned long wc)) const
 {
   GP<GStringRep> retval;
   char const * const eptr=data+size;
   char const *ptr=data;
   while(ptr<eptr)
   {
-    char const * const xptr=ptr;
-    const unsigned long w=getValidUCS4(ptr);
+    char const * const xptr=isCharType(xiswcase,ptr,true);
     if(ptr == xptr)
-    {
-      ptr=eptr;
       break;
-    }
-    if(!xiswcase((wchar_t)w))
-      break;
+    ptr=xptr;
   }
   if(ptr<eptr)
   {
@@ -374,7 +430,7 @@ GStringRep::tocase(
       const unsigned long w=getValidUCS4(ptr);
       if(ptr == xptr)
         break;
-      if(((sizeof(wchar_t) == 2)&&(w>=0xffff))||(xiswcase((wchar_t)w)))
+      if(xiswcase(w))
       {
         const int len=(int)((size_t)ptr-(size_t)xptr);
         strncpy((char *)buf_ptr,xptr,len);
@@ -382,7 +438,7 @@ GStringRep::tocase(
       }else
       {
         mbstate_t ps;
-        buf_ptr=UCS4toString((unsigned long)xtowcase((wint_t)w),buf_ptr,&ps);
+        buf_ptr=UCS4toString(xtowcase(w),buf_ptr,&ps);
       }
     }
     buf_ptr[0]=0;
@@ -1853,69 +1909,32 @@ GStringRep::Native::getValidUCS4(const char *&source) const
   return retval;
 }
 
-static int
-Csscanf1(const char src[],const char fmt[], void *arg)
+inline int
+GStringRep::nextNonSpace(const int from,const int len) const
 {
-  GStringRep::ChangeLocale locale(LC_ALL,"C");
-  return sscanf(src,fmt,arg);
+  return nextCharType(iswspace,from,len,true);
 }
 
-int
-GStringRep::nextNonSpace(const int from) const
+inline int
+GStringRep::nextSpace(const int from,const int len) const
 {
-  int retval;
-  if(from<size)
-  {
-    // Store current locale;
-    int n=0;
-    Csscanf1(data+from, " %n", &n);
-    retval=n+from;
-  }else
-  {
-    retval=size;
-  }
-  return retval;
+  return nextCharType(iswspace,from,len,false);
 }
 
-int
-GStringRep::UTF8::nextNonSpace(const int from) const
+int 
+GStringRep::firstEndSpace(int from,const int len) const
 {
-  // We want to return the position of the next
-  // non white space starting from the #from#
-  // location.  isspace should work in any locale
-  // so we should only need to do this for the non-
-  // native locales (UTF8)
-  int retval;
-  if(from<size)
+  const int xsize=(len<0)?size:(from+len);
+  const int ysize=(size<xsize)?size:xsize;
+  int retval=ysize;
+  while(from<ysize)
   {
-    retval=from;
-    const unsigned char * s = (const unsigned char *)(data+from);
-    for( const unsigned char * const eptr=s+size-from; s<=eptr ;
-      retval=((size_t)s-(size_t)data))
+    from=nextNonSpace(from,ysize-from);
+    if(from < size)
     {
-      const wchar_t w=(wchar_t)UTF8toUCS4(s,eptr);
-      if (!iswspace(w))
-        break;
+      retval=nextSpace(from,ysize-from);
+      from=retval;
     }
-  }else
-  {
-    retval=size;
-  }
-  return retval;
-}
-
-int
-GStringRep::Native::nextNonSpace(int from) const
-{
-  int retval;
-  if(from<size)
-  {
-    int n=0;
-    sscanf(data+from, " %n", &n);
-    retval=n+from;
-  }else
-  {
-    retval=size;
   }
   return retval;
 }

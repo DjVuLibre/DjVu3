@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuText.cpp,v 1.16 2001-04-23 23:27:27 praveen Exp $
+// $Id: DjVuText.cpp,v 1.17 2001-04-25 21:30:06 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -42,7 +42,6 @@
 #include "BSByteStream.h"
 #include "debug.h"
 #include <ctype.h>
-#include <wctype.h>
 
 //***************************************************************************
 //******************************** DjVuTXT **********************************
@@ -369,12 +368,8 @@ DjVuTXT::find_zones(int string_start, int string_length) const
   
   {
     // Get rid of the leading and terminating spaces
-    int start=string_start;
-    int end=string_start+string_length;
-    while(start<end && iswspace(textUTF8[start]))
-      start++;
-    while(end>start && iswspace(textUTF8[end-1]))
-      end--;
+    const int start=textUTF8.nextNonSpace(string_start,string_length);
+    const int end=textUTF8.firstEndSpace(start,string_length-start);
     if (start==end)
       return zone_list;
     string_start=start;
@@ -387,10 +382,11 @@ DjVuTXT::find_zones(int string_start, int string_length) const
     int start=string_start;
     int end=string_start+string_length;
     
-    while(true)
+    while(start<end)
     {
-      while(start<end && iswspace(textUTF8[start])) start++;
-      if (start==end) break;
+      start=textUTF8.nextNonSpace(start,string_length);
+      if (start==end)
+        break;
       
       Zone * zone=get_smallest_zone(zone_type, start, end);
       if (zone && zone_type==zone->ztype)
