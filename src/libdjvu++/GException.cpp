@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: GException.cpp,v 1.4 1999-02-08 19:38:36 leonb Exp $
+//C-  $Id: GException.cpp,v 1.5 1999-02-08 19:50:12 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -22,7 +22,7 @@
 #include "debug.h"
 
 
-// File "$Id: GException.cpp,v 1.4 1999-02-08 19:38:36 leonb Exp $"
+// File "$Id: GException.cpp,v 1.5 1999-02-08 19:50:12 leonb Exp $"
 // - Author: Leon Bottou, 05/1997
 
 GException::GException() 
@@ -153,8 +153,8 @@ GExceptionHandler::emthrow(const GException &gex)
 // memory exceptions by themselves.
 #if defined(_MSC_VER)
 // Microsoft is different!
-static int __cdecl throw_memory_error() { THROW(GException::outofmemory); }
-static int (*old_handler)() = _set_new_handler(throw_memory_error);
+static int throw_memory_error(size_t) { THROW(GException::outofmemory); return 0; }
+static int (*old_handler)(size_t) = _set_new_handler(throw_memory_error);
 #else // !_MSC_VER
 // Standard C++
 static void throw_memory_error() { THROW(GException::outofmemory); }
