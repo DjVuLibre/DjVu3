@@ -7,9 +7,9 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: djvutopnm.cpp,v 1.2 1999-01-26 20:22:18 leonb Exp $
+//C-  $Id: djvutopnm.cpp,v 1.3 1999-01-26 22:54:29 leonb Exp $
 
-// File "$Id: djvutopnm.cpp,v 1.2 1999-01-26 20:22:18 leonb Exp $"
+// File "$Id: djvutopnm.cpp,v 1.3 1999-01-26 22:54:29 leonb Exp $"
 // Author: Yann Le Cun 08/1997
 
 #include <stdio.h>
@@ -21,7 +21,7 @@
 #include "JB2Codec.h"
 #include "ByteStream.h"
 #include "IFFByteStream.h"
-#include "DejaVuCodec.h"
+#include "DjVuCodec.h"
 
 
 static int flag_verbose = 0;
@@ -33,17 +33,16 @@ convert(const char *from, const char *to, int subsample=1)
   // Open djvu file
   StdioByteStream in (from,"rb");
   // Decode djvu file
-  DejaVuDecoder   decoder(in);
-  GP<DejaVuImage> dimg = new DejaVuImage;
-  decoder.decode(dimg);
+  DjVuImage dimg;
+  dimg.decode(in);
   // Verbose
   if (flag_verbose > 1)
-    fprintf(stderr,"%s", (const char*)dimg->get_long_description());
+    fprintf(stderr,"%s", (const char*)dimg.get_long_description());
   if (flag_verbose > 0)
-    fprintf(stderr,"Internal DjVuImage is %dkB\n", (dimg->get_memory_usage()+512)/1024);
+    fprintf(stderr,"Internal DjVuImage is %dkB\n", (dimg.get_memory_usage()+512)/1024);
   // Get pixmap or bitmap
-  GRect rect(0,0, dimg->get_width()/subsample, dimg->get_height()/subsample);
-  GP<GPixmap> pm = dimg->get_color_pixmap(rect, subsample);
+  GRect rect(0,0, dimg.get_width()/subsample, dimg.get_height()/subsample);
+  GP<GPixmap> pm = dimg.get_pixmap(rect, subsample);
   // Save image
   StdioByteStream out (to,"wb");
   if (pm) 
@@ -52,7 +51,7 @@ convert(const char *from, const char *to, int subsample=1)
     }
   else 
     {
-      GP<GBitmap> bm = dimg->get_bitmap(rect, subsample);
+      GP<GBitmap> bm = dimg.get_bitmap(rect, subsample);
       if (!bm)
         THROW("Cannot decode this file");
       if (subsample==1)

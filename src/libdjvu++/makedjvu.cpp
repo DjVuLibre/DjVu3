@@ -7,17 +7,17 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: makedjvu.cpp,v 1.2 1999-01-26 20:22:18 leonb Exp $
+//C-  $Id: makedjvu.cpp,v 1.3 1999-01-26 22:54:29 leonb Exp $
 
 // MakeDjVu -- Assemble IFF files
-// $Id: makedjvu.cpp,v 1.2 1999-01-26 20:22:18 leonb Exp $
+// $Id: makedjvu.cpp,v 1.3 1999-01-26 22:54:29 leonb Exp $
 // Author: Leon Bottou 08/1997
 
 #include <stdio.h>
 #include <stdlib.h>
 #include "GString.h"
 #include "GException.h"
-#include "DejaVuCodec.h"
+#include "DjVuCodec.h"
 
 #ifndef TRUE
 #define TRUE 1
@@ -109,19 +109,11 @@ create_info_chunk(IFFByteStream &iff, int argc, char **argv)
   if (w==0 || h==0)
     fprintf(stderr,"makedjvu: cannot determine image size\n");
   // write info chunk
-  DejaVuInfo info;
-  memset((void*)&info, 0, sizeof(info));
-  info.version_lo = (DEJAVUVERSION & 0xff);
-  info.version_hi = ((DEJAVUVERSION >> 8) & 0xff);
-  info.width_hi = (unsigned char)(w>>8);
-  info.width_lo = (unsigned char)(w>>0);
-  info.height_hi = (unsigned char)(h>>8);
-  info.height_lo = (unsigned char)(h>>0);
-  info.dpi_hi = 0;
-  info.dpi_lo = 0;
-  info.gamma10 = 22;
+  DjVuInfo info;
+  info.width = w;
+  info.height = h;
   iff.put_chunk("INFO");
-  iff.writall((void*)&info, sizeof(info));
+  info.encode(iff);
   iff.close_chunk();
 }
 

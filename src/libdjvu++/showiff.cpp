@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: showiff.cpp,v 1.2 1999-01-26 20:22:18 leonb Exp $
+//C-  $Id: showiff.cpp,v 1.3 1999-01-26 22:54:29 leonb Exp $
 
 
 
@@ -51,7 +51,7 @@
     @author
     Leon Bottou <leonb@research.att.com>
     @version
-    #$Id: showiff.cpp,v 1.2 1999-01-26 20:22:18 leonb Exp $# */
+    #$Id: showiff.cpp,v 1.3 1999-01-26 22:54:29 leonb Exp $# */
 //@{
 //@}
 
@@ -60,7 +60,7 @@
 #include "GString.h"
 #include "ByteStream.h"
 #include "IFFByteStream.h"
-#include "DejaVuCodec.h"
+#include "DjVuCodec.h"
 
 
 
@@ -69,25 +69,23 @@
 void
 display_djvu_info(IFFByteStream &iff, const GString &head, size_t size)
 {
-  struct DejaVuInfo info;
-  memset(&info,0,sizeof(info));
-  size = iff.readall((void*)&info, sizeof(info));
+  struct DjVuInfo info;
+  info.decode(iff);
   if (size >= 4)
-    {
-      printf("%dx%d", 
-             (info.height_hi<<8)+info.height_lo,
-             (info.width_hi<<8)+info.width_lo     );
-    }
+    printf("%dx%d", info.width, info.height);
   if (size >= 5)
-    printf(", version %d", (info.version_hi<<8)+info.version_lo);
-  if (size >= 8 && (info.dpi_lo || info.dpi_hi))
-    printf(", %d dpi", (info.dpi_hi<<8)+info.dpi_lo);
+    printf(", version %d", info.version);
   if (size >= 8)
-    printf(", gamma %3.1f", 
-           (info.gamma10>0 && info.gamma10<0xff) 
-           ? (double)info.gamma10/10.0 : 2.2 );
+    printf(", %d dpi", info.dpi);
+  if (size >= 8)
+    printf(", gamma %3.1f", info.gamma);
 }
 
+void
+display_sjbz_info(IFFByteStream &iff, const GString &head, size_t size)
+{
+  printf("JB2 encoded");
+}
 
 void
 display_iw4_info(IFFByteStream &iff, const GString &head, size_t size)
@@ -127,6 +125,7 @@ struct displaysubr
 disproutines[] = 
 {
   { "DJVU.INFO", display_djvu_info },
+  { "DJVU.Sjbz", display_sjbz_info },
   { "DJVU.FG44", display_iw4_info },
   { "DJVU.BG44", display_iw4_info },
   { "BM44.BM44", display_iw4_info },

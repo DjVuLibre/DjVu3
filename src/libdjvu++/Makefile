@@ -16,7 +16,6 @@ OBJS= 	GString.o		\
 	GScaler.o               \
 	IWCodec.o		\
 	DjVuCodec.o             \
-	DejaVuDecoder.o		\
 	GOS.o                   \
 	debug.o	
 
@@ -129,14 +128,10 @@ BSByteStream.o: BSByteStream.cpp BSByteStream.h DjVuGlobal.h \
  GException.h ByteStream.h GContainer.h GSmartPointer.h ZPCodec.h
 ByteStream.o: ByteStream.cpp ByteStream.h DjVuGlobal.h GException.h \
  GContainer.h GSmartPointer.h
-DejaVuDecoder.o: DejaVuDecoder.cpp GException.h DjVuGlobal.h GRect.h \
- GString.h GSmartPointer.h GPixmap.h ByteStream.h GContainer.h \
- GBitmap.h GScaler.h JB2Codec.h ZPCodec.h IFFByteStream.h \
- DejaVuCodec.h IWCodec.h
 DjVuCodec.o: DjVuCodec.cpp DjVuCodec.h GString.h DjVuGlobal.h \
  GException.h GSmartPointer.h GThreads.h ByteStream.h GContainer.h \
  IFFByteStream.h JB2Codec.h ZPCodec.h GRect.h GBitmap.h IWCodec.h \
- GPixmap.h
+ GPixmap.h GScaler.h
 GBitmap.o: GBitmap.cpp GBitmap.h DjVuGlobal.h GRect.h ByteStream.h \
  GException.h GContainer.h GSmartPointer.h GString.h
 GContainer.o: GContainer.cpp GContainer.h DjVuGlobal.h GException.h
@@ -178,14 +173,13 @@ debug.o: debug.cpp debug.h GThreads.h DjVuGlobal.h GException.h \
  GContainer.h
 djvutopnm.o: djvutopnm.cpp GException.h DjVuGlobal.h GSmartPointer.h \
  GRect.h GPixmap.h ByteStream.h GContainer.h GBitmap.h JB2Codec.h \
- GString.h ZPCodec.h IFFByteStream.h DejaVuCodec.h IWCodec.h
+ GString.h ZPCodec.h IFFByteStream.h DjVuCodec.h GThreads.h IWCodec.h
 makedjvu.o: makedjvu.cpp GString.h DjVuGlobal.h GException.h \
- GSmartPointer.h DejaVuCodec.h ByteStream.h GContainer.h \
+ GSmartPointer.h DjVuCodec.h GThreads.h ByteStream.h GContainer.h \
  IFFByteStream.h JB2Codec.h ZPCodec.h GRect.h GBitmap.h IWCodec.h \
  GPixmap.h
 ppmcoco.o: ppmcoco.cpp ByteStream.h DjVuGlobal.h GException.h \
  GContainer.h GSmartPointer.h GPixmap.h GRect.h GBitmap.h GString.h
 showiff.o: showiff.cpp GException.h DjVuGlobal.h GString.h \
- GSmartPointer.h ByteStream.h GContainer.h IFFByteStream.h \
- DejaVuCodec.h JB2Codec.h ZPCodec.h GRect.h GBitmap.h IWCodec.h \
- GPixmap.h
+ GSmartPointer.h ByteStream.h GContainer.h IFFByteStream.h DjVuCodec.h \
+ GThreads.h JB2Codec.h ZPCodec.h GRect.h GBitmap.h IWCodec.h GPixmap.h
