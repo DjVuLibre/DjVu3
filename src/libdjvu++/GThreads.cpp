@@ -9,10 +9,10 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GThreads.cpp,v 1.42 2000-02-03 19:22:05 eaf Exp $
+//C- $Id: GThreads.cpp,v 1.43 2000-02-03 22:18:04 leonb Exp $
 
 
-// **** File "$Id: GThreads.cpp,v 1.42 2000-02-03 19:22:05 eaf Exp $"
+// **** File "$Id: GThreads.cpp,v 1.43 2000-02-03 22:18:04 leonb Exp $"
 // This file defines machine independent classes
 // for running and synchronizing threads.
 // - Author: Leon Bottou, 01/1998
@@ -40,6 +40,13 @@
 #endif // (__GNUC__<2 ...
 #endif // defined(__GNUC__)
 #endif // THREADMODEL!=NOTHREADS
+
+#ifndef _DEBUG
+#if defined(DEBUG) || defined(DEBUGLVL)
+#define _DEBUG
+#endif
+#endif
+
 
 
 // ----------------------------------------
@@ -77,14 +84,18 @@ start(void *arg)
         {
           ex.perror();
           fprintf(stderr, "GThreads: uncaught exception.");
-          //abort();
+#ifdef _DEBUG
+          abort();
+#endif
         }
       ENDCATCH;
     }
   catch(...)
     {
       fprintf(stderr, "GThreads: unrecognized uncaught exception.");
-      //abort();
+#ifdef _DEBUG
+      abort();
+#endif
     }
   return 0;
 }
@@ -95,7 +106,7 @@ GThread::wait_for_finish(void)
   if ((xentry || xarg) && hthr)
     {
       if (thrid == GetCurrentThreadId())
-        THROW("Can't wait on calling thread.");
+        THROW("Cannot wait for termination of calling thread.");
       WaitForSingleObject(hthr, INFINITE);
     }
 }
@@ -378,14 +389,18 @@ GThread::start(void *arg)
         {
           ex.perror();
           fprintf(stderr, "GThreads: uncaught exception.");
+#ifdef _DEBUG
           abort();
+#endif
         }
       ENDCATCH;
     }
   catch(...)
     {
       fprintf(stderr, "GThreads: unrecognized uncaught exception.");
+#ifdef _DEBUG
       abort();
+#endif
     }
   gt->finished = 1;
   macthread_wakeup((void*)gt, 0);
@@ -409,11 +424,10 @@ GThread::create(void (*entry)(void*), void *arg)
 void
 GThread::wait_for_finish()
 {
-  // TODO: test this code [LYB]
   if ((xentry || xarg) && (thid != kNoThreadID))
     {
       if (thid == current())
-        THROW("Can't wait on calling thread.");
+        THROW("Cannot wait for termination of calling thread.");
       if (! finished)
         macthread_wait(thid, (void*)this);
     }
@@ -604,7 +618,9 @@ GThread::start(void *arg)
         {
           ex.perror();
           fprintf(stderr, "GThreads: uncaught exception.");
+#ifdef _DEBUG
           abort();
+#endif
         }
       ENDCATCH;
 #ifdef __EXCEPTIONS
@@ -612,7 +628,9 @@ GThread::start(void *arg)
   catch(...)
     {
       fprintf(stderr, "GThreads: unrecognized uncaught exception.");
+#ifdef _DEBUG
       abort();
+#endif
     }
 #endif
      // Signal thread termination
@@ -622,7 +640,6 @@ GThread::start(void *arg)
   finish_mon.leave();
      // Do not add anything below this line!
      // The GThread object may already be destroyed by now.
-  
   return 0;
 }
 
@@ -634,7 +651,7 @@ GThread::wait_for_finish(void)
     {
       pthread_t caller=pthread_self();
       if (pthread_equal(hthr, caller))
-        THROW("Can't wait on calling thread.");
+        THROW("Cannot wait for termination of calling thread.");
       // This is not very efficient
       // but has low memory overhead.
       finish_mon.enter();
@@ -1406,8 +1423,8 @@ GThread::~GThread()
 {
   if (task==0 || task==maintask)
     return;
-  if (task->next && task->prev)
-    terminate();
+  wait_for_finish();
+  // Now we know that execution has terminated.
   if (task->stack) 
     delete [] task->stack;
   task->stack = 0;
@@ -1454,7 +1471,9 @@ starttwo(GThread *thr)
         {
           ex.perror();
           fprintf(stderr, "GThreads: uncaught exception.");
+#ifdef _DEBUG
           abort();
+#endif
         }
       ENDCATCH;
 #ifdef __EXCEPTIONS
@@ -1462,11 +1481,15 @@ starttwo(GThread *thr)
   catch(...)
     {
       fprintf(stderr, "GThreads: unrecognized uncaught exception.");
+#ifdef _DEBUG
       abort();
+#endif
     }
 #endif 
   thr->terminate();
   GThread::yield();
+  // Do not add anything below this line!
+  // Nothing should reach it anyway.
   abort();
 }
 
@@ -1477,7 +1500,7 @@ GThread::wait_for_finish(void)
   if (maintask && curtask && (xentry || xarg))
     {
       if (task == curtask)
-        THROW("Can't wait on calling thread.");
+        THROW("Cannot wait for termination of calling thread.");
       if (task->next && task->prev)
         curtask->wchan = (void*)this;
       cotask_yield();
