@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: parseoptions.cpp,v 1.46 2000-02-18 20:35:19 bcr Exp $
+//C- $Id: parseoptions.cpp,v 1.47 2000-03-10 04:11:49 bcr Exp $
 #ifdef __GNUC__
 #pragma implementation
 #endif
@@ -1146,14 +1146,19 @@ DjVuParseOptions::ErrorList::GetError()
   retvalue=value;
   if(next)
   {
+    // Move the next value into the current element
     ErrorList *next_save=next;
     value=next->value;
     next->value=0;
     if((next=next->next))
     {
       next->prev=this;
+    }else
+    {
+      prev=this;
     }
     next_save->prev=next_save->next=0;
+    // delete the next element
     delete next_save;
   }else
   {
