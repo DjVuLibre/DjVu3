@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessage.cpp,v 1.20 2001-03-13 01:43:11 bcr Exp $
+// $Id: DjVuMessage.cpp,v 1.21 2001-03-13 01:49:21 bcr Exp $
 // $Name:  $
 
 
@@ -60,6 +60,9 @@
 
 #ifndef NO_DEBUG
 static const char DebugModuleDjVuDir[] ="../TOPDIR/SRCDIR/profiles"; // appended to the home directory.
+#ifdef UNIX
+static const char ModuleDjVuDir[] ="profiles"; // appended to the home directory.
+#endif
 #endif
 
 #ifdef WIN32
@@ -67,9 +70,6 @@ static const char ModuleDjVuDir[] ="Profiles"; // appended to the home directory
 static const char RootDjVuDir[] ="C:/Program Files/LizardTech/Profiles";
 static const TCHAR registrypath[]= TEXT("Software\\LizardTech\\DjVu\\Profile Path");
 #else
-#ifdef UNIX
-static const char ModuleDjVuDir[] ="profiles"; // appended to the home directory.
-#endif
 static const char LocalDjVuDir[] =".DjVu"; // appended to the home directory.
 static const char RootDjVuDir[] ="/etc/DjVu/";
 #endif
@@ -159,7 +159,7 @@ GetProfilePaths(void)
     const char *envp=getenv(DjVuEnv);
     if(envp && strlen(envp))
       paths.append((path=envp));
-#if defined(WIN32) || defined(UNIX)
+#if defined(WIN32) || (defined(UNIX) && !defined(NO_DEBUG))
     GString mpath(GetModulePath());
     if(mpath.length() && GOS::is_dir(mpath))
     {
