@@ -1,253 +1,509 @@
-# C- Copyright (c) 1999 AT&T Corp.  All rights reserved.
-# C-
-# C- This software may only be used by you under license from AT&T
-# C- Corp. ("AT&T"). A copy of AT&T's Source Code Agreement is available at
-# C- AT&T's Internet website having the URL <http://www.djvu.att.com/open>.
-# C- If you received this software without first entering into a license with
-# C- AT&T, you have an infringing copy of this software and cannot use it
-# C- without violating AT&T's intellectual property rights.
-# C-
-# C- $Id: Makefile.in,v 1.96 2000-06-19 17:40:43 bcr Exp $
+# Makefile.in generated automatically by automake 1.4 from Makefile.am
 
-%%%include <paths>
+# Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
+# This Makefile.in is free software; the Free Software Foundation
+# gives unlimited permission to copy and/or distribute it,
+# with or without modifications, as long as this notice is preserved.
 
-SHELL=/bin/sh
-prefix=@%prefix%@
-bindir=@%PROJECT_PREFIX%@/bin
-libdir=@%PROJECT_PREFIX%@/lib
-incdir=@%PROJECT_PREFIX%@/include
-DEFS=@%DEFS%@
-INCS=@%INCS%@
-LDFLAGS=
-LIBS=@%LIBS%@ @%LIBJPEG%@ @%libmath%@
-MAKESTLIB=@%make_stlib%@
-LIBJPEG=@%LIBJPEG%@
-
-CXX=@%CXX%@
-CXXOPT=@%CXXOPT%@ @%CXXUNROLL%@
-CXXWARN=@%CXXWARN%@
-CXXPIC=@%CXXPIC%@
-CXXFLAGS=@%CXXFLAGS%@ $(CXXOPT) $(CXXWARN) $(CXXPIC) $(DEFS) $(INCS)
-
-%%%include <commands>
-
-LIB= $(LIBDJVUXX)
-
-PROG= $(BINPATH)/djvudump $(BINPATH)/c44 $(BINPATH)/d44 $(BINPATH)/ddjvu\
-	$(BINPATH)/djvumake $(BINPATH)/djvuextract $(BINPATH)/ppmcoco\
-	$(BINPATH)/bzz $(BINPATH)/djthumb $(BINPATH)/djvmcvt\
-	$(BINPATH)/djvutxt $(BINPATH)/djvm $(BINPATH)/cjb2\
-	$(BINPATH)/cpaldjvu $(BINPATH)/cdjvu
-
-# Makefile for libdjvu++.a
-
-LIBOBJS= DjVuGlobal.o DjVuGlobalMemory.o GOS.o GException.o GContainer.o \
-         GString.o GThreads.o GRect.o GSmartPointer.o  MMX.o Arrays.o debug.o \
-	 GBitmap.o GPixmap.o GScaler.o DjVuPalette.o \
-	 ByteStream.o IFFByteStream.o BSByteStream.o ZPCodec.o \
-	 JB2Image.o IWTransform.o IWImage.o MMRDecoder.o JPEGDecoder.o \
-	 DataPool.o GURL.o DjVuFileCache.o DjVuPort.o GMapAreas.o \
-	 DjVuAnno.o DjVuInfo.o DjVuFile.o DjVuImage.o DjVuDocument.o\
-	 DjVmDir.o DjVmDoc.o DjVmDir0.o DjVuNavDir.o DjVuErrorList.o \
-	 parseoptions.o DjVuDocEditor.o DjVuToPS.o DjVuDumpHelper.o
-
-# Make all
-
-all: lib prog
-
-lib: $(LIB)
-
-prog: $(PROG)
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY, to the extent permitted by law; without
+# even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+# PARTICULAR PURPOSE.
 
 
+SHELL = @SHELL@
 
-# Rule for building the library
+srcdir = @srcdir@
+top_srcdir = @top_srcdir@
+VPATH = @srcdir@
+prefix = @prefix@
+exec_prefix = @exec_prefix@
 
-$(LIB): $(LIBOBJS) 
-	if [ -r $(LIB) ] ; then rm $(LIB) ; fi
-	if [ -n "$(RPO)" ] ; then $(RPO) $(LIBOBJS) ; fi
-	$(MAKESTLIB) $(LIB) $(LIBOBJS)
-	$(RANLIB) $(LIB)
+bindir = @bindir@
+sbindir = @sbindir@
+libexecdir = @libexecdir@
+datadir = @datadir@
+sysconfdir = @sysconfdir@
+sharedstatedir = @sharedstatedir@
+localstatedir = @localstatedir@
+libdir = @libdir@
+infodir = @infodir@
+mandir = @mandir@
+includedir = @includedir@
+oldincludedir = /usr/include
 
-# Rules for building support programs
+DESTDIR =
 
-DJVMOBJS = djvm.o
-DJVMCVTOBJS = djvmcvt.o
-C44OBJS = c44.o
-D44OBJS = d44.o
-DJVUDUMPOBJS = djvudump.o
-DDJVUOBJS = ddjvu.o
-MAKEDEJAVUOBJS = djvumake.o
-BREAKDEJAVUOBJS = djvuextract.o
-PPMCOCOOBJS = ppmcoco.o
-BZZOBJS = bzz.o
-DJTHUMBOBJS = djthumb.o
-DJVUTXTOBJS = djvutxt.o
-CJB2OBJS = cjb2.o
-CPALDJVUOBJS = cpaldjvu.o
-CDJVUSCRIPT = SRCDIR/cdjvu
+pkgdatadir = $(datadir)/@PACKAGE@
+pkglibdir = $(libdir)/@PACKAGE@
+pkgincludedir = $(includedir)/@PACKAGE@
+
+top_builddir = ../../../..
+
+ACLOCAL = @ACLOCAL@
+AUTOCONF = @AUTOCONF@
+AUTOMAKE = @AUTOMAKE@
+AUTOHEADER = @AUTOHEADER@
+
+INSTALL = @INSTALL@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@ $(AM_INSTALL_PROGRAM_FLAGS)
+INSTALL_DATA = @INSTALL_DATA@
+INSTALL_SCRIPT = @INSTALL_SCRIPT@
+transform = @program_transform_name@
+
+NORMAL_INSTALL = :
+PRE_INSTALL = :
+POST_INSTALL = :
+NORMAL_UNINSTALL = :
+PRE_UNINSTALL = :
+POST_UNINSTALL = :
+host_alias = @host_alias@
+host_triplet = @host@
+AR = @AR@
+AS = @AS@
+AV_DIR = @AV_DIR@
+AV_INC_DIR = @AV_INC_DIR@
+CC = @CC@
+CFLAGS = @CFLAGS@
+CHOKE = @CHOKE@
+COMMON_DIR = @COMMON_DIR@
+COMMON_INC_DIR = @COMMON_INC_DIR@
+COMMON_TOP_DIR = @COMMON_TOP_DIR@
+COMPILE = @COMPILE@
+COMPILER_EXTRAS = @COMPILER_EXTRAS@
+CPLUSPLUS = @CPLUSPLUS@
+CWD_INCLUDES = @CWD_INCLUDES@
+CXX = @CXX@
+CXXCOMPILE = @CXXCOMPILE@
+CXXFLAGS = @CXXFLAGS@
+CXXLINK = @CXXLINK@
+CXXNOTOOL = @CXXNOTOOL@
+DEBUG = @DEBUG@
+DEFS = @DEFS@
+DIP_DIR = @DIP_DIR@
+DIP_INC_DIR = @DIP_INC_DIR@
+ECHO = @ECHO@
+ENCRYPT_DIR = @ENCRYPT_DIR@
+ENCRYPT_INC_DIR = @ENCRYPT_INC_DIR@
+EXCEPT_DIR = @EXCEPT_DIR@
+EXCEPT_INC_DIR = @EXCEPT_INC_DIR@
+EXTRACT_DIR = @EXTRACT_DIR@
+EXTRACT_INC_DIR = @EXTRACT_INC_DIR@
+FPIC = @FPIC@
+GTIFF_DIR = @GTIFF_DIR@
+GTIFF_INC_DIR = @GTIFF_INC_DIR@
+IMAGEBUF_DIR = @IMAGEBUF_DIR@
+IMAGEBUF_INC_DIR = @IMAGEBUF_INC_DIR@
+IMAGEDST_DIR = @IMAGEDST_DIR@
+IMAGEDST_INC_DIR = @IMAGEDST_INC_DIR@
+IMAGESRC_DIR = @IMAGESRC_DIR@
+IMAGESRC_INC_DIR = @IMAGESRC_INC_DIR@
+IMAGE_DIR = @IMAGE_DIR@
+IMAGE_INC_DIR = @IMAGE_INC_DIR@
+IMAGE_SUPPORT_DIR = @IMAGE_SUPPORT_DIR@
+INFO_DIR = @INFO_DIR@
+IOUTILS_DIR = @IOUTILS_DIR@
+JPEG_DIR = @JPEG_DIR@
+JPEG_INC_DIR = @JPEG_INC_DIR@
+KENCODER_DIR = @KENCODER_DIR@
+KEXTRACT_DIR = @KEXTRACT_DIR@
+LD = @LD@
+LDFLAGS = @LDFLAGS@
+LIBTOOL = @LIBTOOL@
+LIBTOOL_DEPS = @LIBTOOL_DEPS@
+LIB_DIR = @LIB_DIR@
+LINKER_EXTRAS = @LINKER_EXTRAS@
+LITTLE_ENDIAN = @LITTLE_ENDIAN@
+LN_S = @LN_S@
+LOCK = @LOCK@
+LT_ENFORCE_ALIGNED_DATA = @LT_ENFORCE_ALIGNED_DATA@
+LT_INCLUDE = @LT_INCLUDE@
+MAKE = @MAKE@
+MAKEINFO = @MAKEINFO@
+MESSAGE_DIR = @MESSAGE_DIR@
+MESSAGE_INC_DIR = @MESSAGE_INC_DIR@
+MG3BACLIB_DIR = @MG3BACLIB_DIR@
+MG3COMMONLIB_DIR = @MG3COMMONLIB_DIR@
+MG3DECODELIB_DIR = @MG3DECODELIB_DIR@
+MG3DECODER_DIR = @MG3DECODER_DIR@
+MG3ENCODER_DIR = @MG3ENCODER_DIR@
+MG3MQLIB_DIR = @MG3MQLIB_DIR@
+MG3OPTIMIZER_DIR = @MG3OPTIMIZER_DIR@
+MG3OPTLIB_DIR = @MG3OPTLIB_DIR@
+MG3PIFLIB_DIR = @MG3PIFLIB_DIR@
+MG3Q15LIB_DIR = @MG3Q15LIB_DIR@
+MG3ZPLIB_DIR = @MG3ZPLIB_DIR@
+MG3_DIR = @MG3_DIR@
+MG3_INCLUDE = @MG3_INCLUDE@
+MKDIR = @MKDIR@
+MRSIDCEXE_DIR = @MRSIDCEXE_DIR@
+MRSIDC_DIR = @MRSIDC_DIR@
+MRSIDC_INC_DIR = @MRSIDC_INC_DIR@
+MRSIDDEXE_DIR = @MRSIDDEXE_DIR@
+MRSIDD_DIR = @MRSIDD_DIR@
+MRSIDD_INC_DIR = @MRSIDD_INC_DIR@
+MRSID_INC_DIR = @MRSID_INC_DIR@
+MV = @MV@
+MrSID_DIR = @MrSID_DIR@
+NAMESPACE = @NAMESPACE@
+OPTIMIZE = @OPTIMIZE@
+PACKAGE = @PACKAGE@
+PWD = @PWD@
+RAINB_DIR = @RAINB_DIR@
+RAINB_INC_DIR = @RAINB_INC_DIR@
+RANLIB = @RANLIB@
+RETRIEVE_DIR = @RETRIEVE_DIR@
+RETRIEVE_INC_DIR = @RETRIEVE_INC_DIR@
+RM = @RM@
+SH = @SH@
+SHARED = @SHARED@
+SOLARIS_SO = @SOLARIS_SO@
+STATIC = @STATIC@
+THREADSAFE = @THREADSAFE@
+TIFF_DIR = @TIFF_DIR@
+TIFF_INC_DIR = @TIFF_INC_DIR@
+TRANS_DIR = @TRANS_DIR@
+TRANS_INC_DIR = @TRANS_INC_DIR@
+VENCRYPT_DIR = @VENCRYPT_DIR@
+VENCRYPT_INC_DIR = @VENCRYPT_INC_DIR@
+VERSION = @VERSION@
+VSHA_DIR = @VSHA_DIR@
+VSHA_INC_DIR = @VSHA_INC_DIR@
+WARNINGS = @WARNINGS@
+WORDS_BIGENDIAN = @WORDS_BIGENDIAN@
+
+lib_LIBRARIES = mg3_zp_lib.a
+
+# --------------- Public I files (directory location of required .h files)
+
+INCLUDES = $(LT_INCLUDE) $(MG3_INCLUDE) 
+
+mg3_zp_lib_a_SOURCES =  Arrays.cpp DjVuGlobalMemory.cpp GScaler.cpp BSByteStream.cpp DjVuImage.cpp GSmartPointer.cpp ByteStream.cpp DjVuInfo.cpp GString.cpp DataPool.cpp DjVuNavDir.cpp GThreads.cpp DjVmDir.cpp DjVuPalette.cpp GURL.cpp DjVmDir0.cpp DjVuPort.cpp IFFByteStream.cpp DjVmDoc.cpp IWImage.cpp DjVuAnno.cpp GBitmap.cpp IWTransform.cpp DjVuDocEditor.cpp GContainer.cpp JB2Image.cpp DjVuDocument.cpp GException.cpp JPEGDecoder.cpp DjVuDumpHelper.cpp GIFFManager.cpp MMRDecoder.cpp DjVuErrorList.cpp GMapAreas.cpp DjVuFile.cpp GOS.cpp	ZPCodec.cpp DjVuFileCache.cpp GPixmap.cpp DjVuGlobal.cpp GRect.cpp		
+
+mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
+CONFIG_CLEAN_FILES = 
+LIBRARIES =  $(lib_LIBRARIES)
+
+CPPFLAGS = @CPPFLAGS@
+LIBS = @LIBS@
+mg3_zp_lib_a_LIBADD = 
+mg3_zp_lib_a_OBJECTS =  Arrays.o DjVuGlobalMemory.o GScaler.o \
+BSByteStream.o DjVuImage.o GSmartPointer.o ByteStream.o DjVuInfo.o \
+GString.o DataPool.o DjVuNavDir.o GThreads.o DjVmDir.o DjVuPalette.o \
+GURL.o DjVmDir0.o DjVuPort.o IFFByteStream.o DjVmDoc.o IWImage.o \
+DjVuAnno.o GBitmap.o IWTransform.o DjVuDocEditor.o GContainer.o \
+JB2Image.o DjVuDocument.o GException.o JPEGDecoder.o DjVuDumpHelper.o \
+GIFFManager.o MMRDecoder.o DjVuErrorList.o GMapAreas.o DjVuFile.o GOS.o \
+ZPCodec.o DjVuFileCache.o GPixmap.o DjVuGlobal.o GRect.o
+LTCXXCOMPILE = $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
+CXXLD = $(CXX)
+DATA =  $(LT_ENFORCE_ALIGNED_DATA)
+
+DIST_COMMON =  Makefile.am Makefile.in
 
 
-$(BINPATH)/djvmcvt: $(DJVMCVTOBJS) $(LIB)
-	if [ -n "$(RPO)" ] ; then $(RPO) $(DJVMCVTOBJS) $(LIB) ; fi
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(DJVMCVTOBJS) $(LIB) $(LIBS)
+DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
-$(BINPATH)/djvm: $(DJVMOBJS) $(LIB)
-	if [ -n "$(RPO)" ] ; then $(RPO) $(DJVMOBJS) $(LIB) ; fi
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(DJVMOBJS) $(LIB) $(LIBS)
+TAR = gtar
+GZIP_ENV = --best
+DEP_FILES =  .deps/Arrays.P .deps/BSByteStream.P .deps/ByteStream.P \
+.deps/DataPool.P .deps/DjVmDir.P .deps/DjVmDir0.P .deps/DjVmDoc.P \
+.deps/DjVuAnno.P .deps/DjVuDocEditor.P .deps/DjVuDocument.P \
+.deps/DjVuDumpHelper.P .deps/DjVuErrorList.P .deps/DjVuFile.P \
+.deps/DjVuFileCache.P .deps/DjVuGlobal.P .deps/DjVuGlobalMemory.P \
+.deps/DjVuImage.P .deps/DjVuInfo.P .deps/DjVuNavDir.P \
+.deps/DjVuPalette.P .deps/DjVuPort.P .deps/GBitmap.P .deps/GContainer.P \
+.deps/GException.P .deps/GIFFManager.P .deps/GMapAreas.P .deps/GOS.P \
+.deps/GPixmap.P .deps/GRect.P .deps/GScaler.P .deps/GSmartPointer.P \
+.deps/GString.P .deps/GThreads.P .deps/GURL.P .deps/IFFByteStream.P \
+.deps/IWImage.P .deps/IWTransform.P .deps/JB2Image.P \
+.deps/JPEGDecoder.P .deps/MMRDecoder.P .deps/ZPCodec.P
+SOURCES = $(mg3_zp_lib_a_SOURCES)
+OBJECTS = $(mg3_zp_lib_a_OBJECTS)
 
-$(BINPATH)/c44: $(C44OBJS) $(LIB)
-	if [ -n "$(RPO)" ] ; then $(RPO) $(C44OBJS) $(LIB) ; fi
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(C44OBJS) $(LIB) $(LIBS)
+all: all-redirect
+.SUFFIXES:
+.SUFFIXES: .S .c .cpp .lo .o .s
+$(srcdir)/Makefile.in: Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
+	cd $(top_srcdir) && $(AUTOMAKE) --gnu mrsid/sid2k/bac_lib/libdjvu++/Makefile
 
-$(BINPATH)/d44: $(D44OBJS) $(LIB)
-	if [ -n "$(RPO)" ] ; then $(RPO) $(D44OBJS) $(LIB) ; fi
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(D44OBJS) $(LIB) $(LIBS)
+Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status $(BUILT_SOURCES)
+	cd $(top_builddir) \
+	  && CONFIG_FILES=$(subdir)/$@ CONFIG_HEADERS= $(SHELL) ./config.status
 
-$(BINPATH)/djvudump: $(DJVUDUMPOBJS) $(LIB) 
-	if [ -n "$(RPO)" ] ; then $(RPO) $(DJVUDUMPOBJS) $(LIB)  ; fi
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(DJVUDUMPOBJS) $(LIB) $(LIBS)
 
-$(BINPATH)/ddjvu: $(DDJVUOBJS) $(LIB)
-	if [ -n "$(RPO)" ] ; then $(RPO) $(DDJVUOBJS) $(LIB) ; fi
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(DDJVUOBJS) $(LIB) $(LIBS)
+mostlyclean-libLIBRARIES:
 
-$(BINPATH)/djvumake: $(MAKEDEJAVUOBJS) $(LIB)
-	if [ -n "$(RPO)" ] ; then $(RPO) $(MAKEDEJAVUOBJS) $(LIB) ; fi
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(MAKEDEJAVUOBJS) $(LIB) $(LIBS)
+clean-libLIBRARIES:
+	-test -z "$(lib_LIBRARIES)" || rm -f $(lib_LIBRARIES)
 
-$(BINPATH)/djvuextract: $(BREAKDEJAVUOBJS) $(LIB)
-	if [ -n "$(RPO)" ] ; then $(RPO) $(BREAKDEJAVUOBJS) $(LIB) ; fi
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(BREAKDEJAVUOBJS) $(LIB) $(LIBS)
+distclean-libLIBRARIES:
 
-$(BINPATH)/ppmcoco: $(PPMCOCOOBJS) $(LIB)
-	if [ -n "$(RPO)" ] ; then $(RPO) $(PPMCOCOOBJS) $(LIB) ; fi
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(PPMCOCOOBJS) $(LIB) $(LIBS)
+maintainer-clean-libLIBRARIES:
 
-$(BINPATH)/cjb2: $(CJB2OBJS) $(LIB)
-	if [ -n "$(RPO)" ] ; then $(RPO) $(CJB2OBJS) $(LIB) ; fi
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(CJB2OBJS) $(LIB) $(LIBS)
+install-libLIBRARIES: $(lib_LIBRARIES)
+	@$(NORMAL_INSTALL)
+	$(mkinstalldirs) $(DESTDIR)$(libdir)
+	@list='$(lib_LIBRARIES)'; for p in $$list; do \
+	  if test -f $$p; then \
+	    echo " $(INSTALL_DATA) $$p $(DESTDIR)$(libdir)/$$p"; \
+	    $(INSTALL_DATA) $$p $(DESTDIR)$(libdir)/$$p; \
+	  else :; fi; \
+	done
+	@$(POST_INSTALL)
+	@list='$(lib_LIBRARIES)'; for p in $$list; do \
+	  if test -f $$p; then \
+	    echo " $(RANLIB) $(DESTDIR)$(libdir)/$$p"; \
+	    $(RANLIB) $(DESTDIR)$(libdir)/$$p; \
+	  else :; fi; \
+	done
 
-$(BINPATH)/cpaldjvu: $(CPALDJVUOBJS) $(LIB)
-	if [ -n "$(RPO)" ] ; then $(RPO) $(CPALDJVUOBJS) $(LIB) ; fi
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(CPALDJVUOBJS) $(LIB) $(LIBS)
+uninstall-libLIBRARIES:
+	@$(NORMAL_UNINSTALL)
+	list='$(lib_LIBRARIES)'; for p in $$list; do \
+	  rm -f $(DESTDIR)$(libdir)/$$p; \
+	done
 
-$(BINPATH)/bzz: $(BZZOBJS) $(LIB)
-	if [ -n "$(RPO)" ] ; then $(RPO) $(BZZOBJS) $(LIB) ; fi
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(BZZOBJS) $(LIB) $(LIBS)
+.s.o:
+	$(COMPILE) -c $<
 
-$(BINPATH)/djthumb: $(DJTHUMBOBJS) $(LIB)
-	if [ -n "$(RPO)" ] ; then $(RPO) $(DJTHUMBOBJS) $(LIB) ; fi
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(DJTHUMBOBJS) $(LIB) $(LIBS)
+.S.o:
+	$(COMPILE) -c $<
 
-$(BINPATH)/djvutxt: $(DJVUTXTOBJS) $(LIB)
-	if [ -n "$(RPO)" ] ; then $(RPO) $(DJVUTXTOBJS) $(LIB) ; fi
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(DJVUTXTOBJS) $(LIB) $(LIBS)
+mostlyclean-compile:
+	-rm -f *.o core *.core
 
-$(BINPATH)/cdjvu: $(CDJVUSCRIPT)
-	cp $(CDJVUSCRIPT) $@
-	chmod 755 $@
+clean-compile:
 
-# Documentation
+distclean-compile:
+	-rm -f *.tab.c
 
-html: libdjvu++.dxx libdjvu++.footer
-	-$(MKDIRP) "$(HTMLREFLIBPATH)" 2>>/dev/null ; $(TRUE)
-	-$(RM) -rf 2>>/dev/null `find "$(HTMLREFLIBPATH)" -name CVS -prune -o -type f -print` ; $(TRUE)
-	${DOCXX} -d "$(HTMLREFLIBPATH)" -B SRCDIR/libdjvu++.footer SRCDIR/libdjvu++.dxx
-	$(DOCXXCLEAN) "$(HTMLREFLIBPATH)"/*.html
+maintainer-clean-compile:
 
-tex: libdjvu++.ps.gz
+.s.lo:
+	$(LIBTOOL) --mode=compile $(COMPILE) -c $<
 
-libdjvu++.ps.gz: libdjvu++.dxx libdjvu++.footer
-	$(RM) -f libdjvu++.ps.gz
-	docxx=`which ${DOCXX} ; \
-	if [ ! -x "$$docxx" ] ; then exit 0 ; fi ; \
-	latex=`which latex` ; \
-	if [ ! -x "$$latex" ] ; then exit 0 ; fi ; \
-	dvips=`which dvips` ; \
-	if [ ! -x "$$dvips" ] ; then exit 0 ; fi ; \
-	gzip=`which gzip` ; \
-	if [ ! -x "$$gzip" ] ; then exit 0 ; fi ; \
-	$(MKDIRP) tex 2>>/dev/null ; \
-	"$$docxx" -t -o tex/libdjvu++.tex -ep fullpage SRCDIR/libdjvu++.dxx ; \
-	( cd tex ; \
-	"$$latex" libdjvu++.tex ; \
-	"$$latex" libdjvu++.tex ) ; \
-	"$$dvips" tex/libdjvu++.dvi -o ; \
-	exec "$$gzip" -f libdjvu++.ps.gz
+.S.lo:
+	$(LIBTOOL) --mode=compile $(COMPILE) -c $<
 
-update-html: html
-	for i in html/* ; do ( \
-	  if  [ -r "SRCDIR/$$i" ] then \
-	    if ( cmp "$$i" "SRCDIR/$$i" ) ; then $(TRUE) ; else \
-	      $(RM) -f "SRCDIR/$$i" ; \
-	      $(CP) "$$i" "SRCDIR/$$i" ; \
-	    fi ; \
+mostlyclean-libtool:
+	-rm -f *.lo
+
+clean-libtool:
+	-rm -rf .libs _libs
+
+distclean-libtool:
+
+maintainer-clean-libtool:
+
+mg3_zp_lib.a: $(mg3_zp_lib_a_OBJECTS) $(mg3_zp_lib_a_DEPENDENCIES)
+	-rm -f mg3_zp_lib.a
+	$(AR) cru mg3_zp_lib.a $(mg3_zp_lib_a_OBJECTS) $(mg3_zp_lib_a_LIBADD)
+	$(RANLIB) mg3_zp_lib.a
+.cpp.o:
+	$(CXXCOMPILE) -c $<
+.cpp.lo:
+	$(LTCXXCOMPILE) -c $<
+
+install-LT_ENFORCE_ALIGNEDDATA: $(LT_ENFORCE_ALIGNED_DATA)
+	@$(NORMAL_INSTALL)
+	$(mkinstalldirs) $(DESTDIR)$(LT_ENFORCE_ALIGNEDdir)
+	@list='$(LT_ENFORCE_ALIGNED_DATA)'; for p in $$list; do \
+	  if test -f $(srcdir)/$$p; then \
+	    echo " $(INSTALL_DATA) $(srcdir)/$$p $(DESTDIR)$(LT_ENFORCE_ALIGNEDdir)/$$p"; \
+	    $(INSTALL_DATA) $(srcdir)/$$p $(DESTDIR)$(LT_ENFORCE_ALIGNEDdir)/$$p; \
+	  else if test -f $$p; then \
+	    echo " $(INSTALL_DATA) $$p $(DESTDIR)$(LT_ENFORCE_ALIGNEDdir)/$$p"; \
+	    $(INSTALL_DATA) $$p $(DESTDIR)$(LT_ENFORCE_ALIGNEDdir)/$$p; \
+	  fi; fi; \
+	done
+
+uninstall-LT_ENFORCE_ALIGNEDDATA:
+	@$(NORMAL_UNINSTALL)
+	list='$(LT_ENFORCE_ALIGNED_DATA)'; for p in $$list; do \
+	  rm -f $(DESTDIR)$(LT_ENFORCE_ALIGNEDdir)/$$p; \
+	done
+
+tags: TAGS
+
+ID: $(HEADERS) $(SOURCES) $(LISP)
+	list='$(SOURCES) $(HEADERS)'; \
+	unique=`for i in $$list; do echo $$i; done | \
+	  awk '    { files[$$0] = 1; } \
+	       END { for (i in files) print i; }'`; \
+	here=`pwd` && cd $(srcdir) \
+	  && mkid -f$$here/ID $$unique $(LISP)
+
+TAGS:  $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) $(LISP)
+	tags=; \
+	here=`pwd`; \
+	list='$(SOURCES) $(HEADERS)'; \
+	unique=`for i in $$list; do echo $$i; done | \
+	  awk '    { files[$$0] = 1; } \
+	       END { for (i in files) print i; }'`; \
+	test -z "$(ETAGS_ARGS)$$unique$(LISP)$$tags" \
+	  || (cd $(srcdir) && etags $(ETAGS_ARGS) $$tags  $$unique $(LISP) -o $$here/TAGS)
+
+mostlyclean-tags:
+
+clean-tags:
+
+distclean-tags:
+	-rm -f TAGS ID
+
+maintainer-clean-tags:
+
+distdir = $(top_builddir)/$(PACKAGE)-$(VERSION)/$(subdir)
+
+subdir = mrsid/sid2k/bac_lib/libdjvu++
+
+distdir: $(DISTFILES)
+	here=`cd $(top_builddir) && pwd`; \
+	top_distdir=`cd $(top_distdir) && pwd`; \
+	distdir=`cd $(distdir) && pwd`; \
+	cd $(top_srcdir) \
+	  && $(AUTOMAKE) --include-deps --build-dir=$$here --srcdir-name=$(top_srcdir) --output-dir=$$top_distdir --gnu mrsid/sid2k/bac_lib/libdjvu++/Makefile
+	@for file in $(DISTFILES); do \
+	  d=$(srcdir); \
+	  if test -d $$d/$$file; then \
+	    cp -pr $$/$$file $(distdir)/$$file; \
 	  else \
-	    $(CP) "$$i" "SRCDIR/$$i" ; \
-	  fi ) ; \
-        done
-
-# Cleaning
-
-clean:
-	-$(RM) 2>>/dev/null -rf $(PROG) ; true
-	-$(RM) 2>>/dev/null $(LIB) *.o *.a *.out *.rpo *.dep ii_files ; true
-	if [ -d Test ] ; then $(MAKE) -C Test clean ; fi
-
-realclean: clean
-	-$(RM) 2>>/dev/null -rf html tex libdjvu++.ps.gz ; true
-	-$(RM) 2>>/dev/null -rf Makefile.depend++ ; true
-
-
-# Installing
-
-install: install-prog install-lib
-
-install-prog: $(PROG)
-	-@$(MKDIRP) $(bindir) 2>>/dev/null
-	for n in $(PROG); do        \
-	  $(CP) $$n $(bindir)        ; \
-	  $(CHMOD) 755 $(bindir)/$$n ; \
+	    test -f $(distdir)/$$file \
+	    || ln $$d/$$file $(distdir)/$$file 2> /dev/null \
+	    || cp -p $$d/$$file $(distdir)/$$file || :; \
+	  fi; \
 	done
 
-install-lib: $(LIB)
-	-@$(MKDIRP) $(libdir) 2>>/dev/null
-	for n in $(LIB); do        \
-	  $(CP) $$n $(libdir)        ; \
-	  $(CHMOD) 644 $(libdir)/$$n ; \
-	  $(RANLIB) $(libdir)/$$n ; \
-	done
+DEPS_MAGIC := $(shell mkdir .deps > /dev/null 2>&1 || :)
+
+-include $(DEP_FILES)
+
+mostlyclean-depend:
+
+clean-depend:
+
+distclean-depend:
+	-rm -rf .deps
+
+maintainer-clean-depend:
+
+%.o: %.c
+	@echo '$(COMPILE) -c $<'; \
+	$(COMPILE) -Wp,-MD,.deps/$(*F).pp -c $<
+	@-cp .deps/$(*F).pp .deps/$(*F).P; \
+	tr ' ' '\012' < .deps/$(*F).pp \
+	  | sed -e 's/^\\$$//' -e '/^$$/ d' -e '/:$$/ d' -e 's/$$/ :/' \
+	    >> .deps/$(*F).P; \
+	rm .deps/$(*F).pp
+
+%.lo: %.c
+	@echo '$(LTCOMPILE) -c $<'; \
+	$(LTCOMPILE) -Wp,-MD,.deps/$(*F).pp -c $<
+	@-sed -e 's/^\([^:]*\)\.o[ 	]*:/\1.lo \1.o :/' \
+	  < .deps/$(*F).pp > .deps/$(*F).P; \
+	tr ' ' '\012' < .deps/$(*F).pp \
+	  | sed -e 's/^\\$$//' -e '/^$$/ d' -e '/:$$/ d' -e 's/$$/ :/' \
+	    >> .deps/$(*F).P; \
+	rm -f .deps/$(*F).pp
+
+%.o: %.cpp
+	@echo '$(CXXCOMPILE) -c $<'; \
+	$(CXXCOMPILE) -Wp,-MD,.deps/$(*F).pp -c $<
+	@-cp .deps/$(*F).pp .deps/$(*F).P; \
+	tr ' ' '\012' < .deps/$(*F).pp \
+	  | sed -e 's/^\\$$//' -e '/^$$/ d' -e '/:$$/ d' -e 's/$$/ :/' \
+	    >> .deps/$(*F).P; \
+	rm .deps/$(*F).pp
+
+%.lo: %.cpp
+	@echo '$(LTCXXCOMPILE) -c $<'; \
+	$(LTCXXCOMPILE) -Wp,-MD,.deps/$(*F).pp -c $<
+	@-sed -e 's/^\([^:]*\)\.o[ 	]*:/\1.lo \1.o :/' \
+	  < .deps/$(*F).pp > .deps/$(*F).P; \
+	tr ' ' '\012' < .deps/$(*F).pp \
+	  | sed -e 's/^\\$$//' -e '/^$$/ d' -e '/:$$/ d' -e 's/$$/ :/' \
+	    >> .deps/$(*F).P; \
+	rm -f .deps/$(*F).pp
+info-am:
+info: info-am
+dvi-am:
+dvi: dvi-am
+check-am: all-am
+check: check-am
+installcheck-am:
+installcheck: installcheck-am
+install-exec-am: install-libLIBRARIES
+install-exec: install-exec-am
+
+install-data-am: install-LT_ENFORCE_ALIGNEDDATA
+install-data: install-data-am
+
+install-am: all-am
+	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
+install: install-am
+uninstall-am: uninstall-libLIBRARIES uninstall-LT_ENFORCE_ALIGNEDDATA
+uninstall: uninstall-am
+all-am: Makefile $(LIBRARIES) $(DATA)
+all-redirect: all-am
+install-strip:
+	$(MAKE) $(AM_MAKEFLAGS) AM_INSTALL_PROGRAM_FLAGS=-s install
+installdirs:
+	$(mkinstalldirs)  $(DESTDIR)$(libdir) \
+		$(DESTDIR)$(LT_ENFORCE_ALIGNEDdir)
 
 
-# Dependencies
+mostlyclean-generic:
 
-%%%include <depend>
+clean-generic:
 
-# Misc
+distclean-generic:
+	-rm -f Makefile $(CONFIG_CLEAN_FILES)
+	-rm -f config.cache config.log stamp-h stamp-h[0-9]*
 
-release:
-	$(MAKE) realclean
-	$(MAKE) depend
-	$(MAKE) libdjvu++.dxx
-	$(MAKE) tex
-	$(MAKE) html
-	$(MAKE) capsule
+maintainer-clean-generic:
+mostlyclean-am:  mostlyclean-libLIBRARIES mostlyclean-compile \
+		mostlyclean-libtool mostlyclean-tags mostlyclean-depend \
+		mostlyclean-generic
 
-capsule:
-	$(MAKE) distclean
-	@attcapsule ATTLICENSE ../$(NAM)-$(VER).tar.gz
-	@echo Distribution is in ../$(NAM)-$(VER).tar.gz
+mostlyclean: mostlyclean-am
+
+clean-am:  clean-libLIBRARIES clean-compile clean-libtool clean-tags \
+		clean-depend clean-generic mostlyclean-am
+
+clean: clean-am
+
+distclean-am:  distclean-libLIBRARIES distclean-compile \
+		distclean-libtool distclean-tags distclean-depend \
+		distclean-generic clean-am
+	-rm -f libtool
+
+distclean: distclean-am
+
+maintainer-clean-am:  maintainer-clean-libLIBRARIES \
+		maintainer-clean-compile maintainer-clean-libtool \
+		maintainer-clean-tags maintainer-clean-depend \
+		maintainer-clean-generic distclean-am
+	@echo "This command is intended for maintainers to use;"
+	@echo "it deletes files that may require special tools to rebuild."
+
+maintainer-clean: maintainer-clean-am
+
+.PHONY: mostlyclean-libLIBRARIES distclean-libLIBRARIES \
+clean-libLIBRARIES maintainer-clean-libLIBRARIES uninstall-libLIBRARIES \
+install-libLIBRARIES mostlyclean-compile distclean-compile \
+clean-compile maintainer-clean-compile mostlyclean-libtool \
+distclean-libtool clean-libtool maintainer-clean-libtool \
+uninstall-LT_ENFORCE_ALIGNEDDATA install-LT_ENFORCE_ALIGNEDDATA tags \
+mostlyclean-tags distclean-tags clean-tags maintainer-clean-tags \
+distdir mostlyclean-depend distclean-depend clean-depend \
+maintainer-clean-depend info-am info dvi-am dvi check check-am \
+installcheck-am installcheck install-exec-am install-exec \
+install-data-am install-data install-am install uninstall-am uninstall \
+all-redirect all-am all installdirs mostlyclean-generic \
+distclean-generic clean-generic maintainer-clean-generic clean \
+mostlyclean distclean maintainer-clean
 
 
-.PHONY: all lib prog \
-       install install-lib install-prog \
-       clean realclean html tex depend update-depend \
-       release capsule
-
-# Handle cpp files as C++
-
-%%%include <compile>
-
-%%%include "Makefile.depend++"
-
+# Tell versions [3.59,3.63) of GNU make to not export all variables.
+# Otherwise a system limit (for SysV at least) may be exceeded.
+.NOEXPORT:
