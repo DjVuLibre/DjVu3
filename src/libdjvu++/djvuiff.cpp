@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: djvuinfo.cpp,v 1.10 1999-05-28 21:09:52 eaf Exp $
+//C- $Id: djvuiff.cpp,v 1.1 1999-06-22 13:54:42 leonb Exp $
 
 
 
@@ -57,7 +57,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: djvuinfo.cpp,v 1.10 1999-05-28 21:09:52 eaf Exp $# */
+    #$Id: djvuiff.cpp,v 1.1 1999-06-22 13:54:42 leonb Exp $# */
 //@{
 //@}
 
