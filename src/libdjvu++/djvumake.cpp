@@ -7,11 +7,78 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: djvumake.cpp,v 1.1 1999-02-03 22:55:30 leonb Exp $
+//C-  $Id: djvumake.cpp,v 1.2 1999-02-15 23:23:37 leonb Exp $
 
-// Djvumake -- Assemble IFF files
-// $Id: djvumake.cpp,v 1.1 1999-02-03 22:55:30 leonb Exp $
-// Author: Leon Bottou 08/1997
+
+
+/** @name djvumake
+
+    {\bf Synopsis}
+    \begin{verbatim}
+       djvumake <djvufile> <chunk-specification>
+    \end{verbatim}
+    
+    {\bf Recipe for Creating a Bilevel DjVu File}\\
+    The first step consists in creating a \Ref{JB2Image} object according to
+    the guidelines specified in section \Ref{JB2Image.h}.  Then use function
+    #JB2Image::encode# to save the JB2 data into a file named #"myjb2.q"# for
+    instance.  You can then assemble file #"my.djvu"# using #djvumake#
+    with the following arguments:
+    \begin{verbatim}
+       djvumake my.djvu Sjbz=myjb2.q
+    \end{verbatim}
+    
+    {\bf Recipe for Creating a Color DjVu File}\\
+    Let's assume that you already have decided what is going into the
+    background layer and what is going into the foreground layer.  Remember
+    that the size of the background image is computed by rounding up the ratio
+    between the size of the mask and an integer background sub-sampling ratio
+    in range 1 to 12.  Choosing a sub-sampling ratio of 3 is usually a good
+    starting point.  Save this background image into a PPM file named
+    #"mybg.ppm"# and encode it using \Ref{c44}:
+    \begin{verbatim} 
+       c44 -slice 74+10+9+4 mybg.ppm  mybg.iw4 
+    \end{verbatim}
+    You must also create a JB2 file containing the foreground mask as
+    explained in the {\em Recipe for Creating a Bilevel DjVu File}. Each zero
+    pixel in the mask means that the corresponding pixel in the raw image
+    belongs to the background. Each non zero pixel means that the
+    corresponding pixel in the raw image belongs to the foreground. Let us
+    call this file #"myjb2.q"#.
+
+    You must then prepare the foreground color image.  Remember that the size
+    of the foreground color image is computed by rounding up the ratio between
+    the size of the mask and an integer background sub-sampling ratio in range
+    1 to 12.  Choosing a sub-sampling ratio of 12 is usually adequate.  First
+    create a PPM image #"myfg.ppm"# and a PBM image mask #"myfgmask.pbm"#.
+    Both the PPM image and the PBM image mask have the same size as the
+    foreground color image.  For each pixel in the PPM image and the PBM image
+    mask, locate the corresponding foreground pixels in the raw image.  If
+    there are at least two such pixels, store their average into the PPM image
+    and store a zero into the PBM image mask.  Otherwise, store an arbitrary
+    color into the PPM image and store a one into the PBM image mask.  Then
+    encode the foreground color image using \Ref{c44} as a single chunk and
+    using the masking option:
+    \begin{verbatim} 
+       c44 -slice 100 -crcbfull -mask myfgmask.pbm myfg.ppm  myfg.iw4
+    \end{verbatim}
+    Finally assemble the DjVu file using the following command:
+    \begin{verbatim}
+       djvumake my.djvu Sjbz=myjb2.q FG44=myfg.iw4 BG44=mybg.iw4
+    \end{verbatim}
+
+    {\bf Creating an IW44 File}\\
+    You do not need program #djvumake# to create an IW44 File.  
+    Program \Ref{c44} already produces compliant IW44 files.
+
+    @memo
+    Create Bilevel DjVu files or Color DjVu files.
+    @version
+    #$Id: djvumake.cpp,v 1.2 1999-02-15 23:23:37 leonb Exp $#
+    @author
+    Leon Bottou <leonb@research.att.com> */
+//@{
+//@}
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -42,7 +109,6 @@ void
 usage()
 {
   printf("djvumake -- Create a DjVu file\n"
-         "              [djvumake (c) AT&T Labs 1997 (Leon Bottou, HA6156)]\n\n"
          "Usage: djvumake djvufile ...arguments...\n"
          "\n"
          "The arguments describe the successive chunks of the DJVU file.\n"

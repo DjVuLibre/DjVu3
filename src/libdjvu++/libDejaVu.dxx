@@ -346,6 +346,7 @@
 //@Include: c44.cpp
 //@Include: d44.cpp
 //@Include: djvutopnm.cpp
+//@Include: djvumake.cpp
 //@}
 
 
