@@ -9,10 +9,10 @@ OBJS= 	GString.o		\
 	ByteStream.o		\
 	ZPCodec.o		\
 	GBitmap.o		\
+	GPixmap.o		\
 	JB2Codec.o		\
 	IFFByteStream.o		\
 	BSByteStream.o		\
-	GIFFManager.o		\
 	GScaler.o               \
 	IWCodec.o		\
 	DejaVuDecoder.o		\
