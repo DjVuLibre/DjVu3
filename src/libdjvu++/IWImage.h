@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: IWImage.h,v 1.2 1999-02-03 22:55:30 leonb Exp $
+//C-  $Id: IWImage.h,v 1.3 1999-02-11 14:33:11 leonb Exp $
 
 #ifndef _IWIMAGE_H_
 #define _IWIMAGE_H_
@@ -97,7 +97,7 @@
     @author
     Leon Bottou <leonb@research.att.com>
     @version
-    #$Id: IWImage.h,v 1.2 1999-02-03 22:55:30 leonb Exp $# */
+    #$Id: IWImage.h,v 1.3 1999-02-11 14:33:11 leonb Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -376,8 +376,8 @@ private:
   int   crcb_half;
   float db_frac;
   // Data
-  _IWMap *ymap, *rmap, *bmap;
-  _IWCodec *ycodec, *rcodec, *bcodec;
+  _IWMap *ymap, *cbmap, *crmap;
+  _IWCodec *ycodec, *cbcodec, *crcodec;
   int cslice;
   int cserial;
   int cbytes;

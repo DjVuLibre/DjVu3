@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: DjVuImage.h,v 1.3 1999-02-03 22:55:29 leonb Exp $
+//C-  $Id: DjVuImage.h,v 1.4 1999-02-11 14:33:11 leonb Exp $
 
 #ifndef _DJVUIMAGE_H
 #define _DJVUIMAGE_H
@@ -58,7 +58,7 @@
     @author
     Leon Bottou <leonb@research.att.com>
     @version
-    #$Id: DjVuImage.h,v 1.3 1999-02-03 22:55:29 leonb Exp $# */
+    #$Id: DjVuImage.h,v 1.4 1999-02-11 14:33:11 leonb Exp $# */
 //@{
 
 
@@ -83,7 +83,7 @@
 /** Current DjVu format version.  The value of this macro represents the
     version of the DjVu file format implemented by this release of the DjVu
     Reference Library. */
-#define DJVUVERSION          18
+#define DJVUVERSION          20
 /** Oldest DjVu format version supported by this library.  This release of the
     library cannot completely decode DjVu files whose version field is less
     than or equal to this number. */
@@ -92,7 +92,7 @@
     the library will attempt to decode files whose version field is smaller
     than this macro.  If the version field is greater than or equal to this
     number, the decoder will just throw a \Ref{GException}.  */
-#define DJVUVERSION_TOO_NEW  20
+#define DJVUVERSION_TOO_NEW  22
 //@}
 
 
@@ -269,6 +269,14 @@ public:
       this information from the DjVu information component. It returns zero if
       such a component is not yet available. */
   int get_version() const;
+  /** Returns the resolution of the DjVu image (in pixels per 2.54 cm).
+      Display programs ca use this information to determine the natural
+      magnification to use for rendering a DjVu image. */
+  int get_dpi() const;
+  /** Returns the gamma coefficient of the display for which the image was
+      designed.  The rendering functions can use this information in order to
+      perform color correction for the intended display device. */
+  double get_gamma() const;
   /** Returns a MIME type string describing the DjVu data.  This information
       is auto-sensed by the decoder.  The MIME type can be #"image/djvu"# or
       #"image/iw44"# depending on the data stream. */
@@ -401,7 +409,20 @@ DjVuImage::get_height() const
 inline int
 DjVuImage::get_version() const
 {
-  return ( info ? info->version : 0 );
+  return ( info ? info->version : DJVUVERSION );
+}
+
+inline int
+DjVuImage::get_dpi() const
+{
+  return ( info ? info->dpi : 300 );
+}
+
+
+inline double
+DjVuImage::get_gamma() const
+{
+  return ( info ? info->gamma : 2.2 );
 }
 
 inline GString

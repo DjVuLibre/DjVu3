@@ -6,7 +6,7 @@ TARG= 	TestString TestException TestArray TestList TestMap\
 NTARG=  TestParser TestIFF TestDir TestHLO
 
 
-LIB= 	  ../libDejaVu.a
+LIB= 	  ../libdjvu++.a
 SHELL=    /bin/sh
 CC=       egcs
 CXX=      eg++
@@ -25,7 +25,7 @@ $(TARG): $(LIB)
 
 $(LIB): PHONY
 	@echo ----- Making library
-	( cd .. ; ${MAKE} libDejaVu.a )
+	( cd .. ; ${MAKE} libdjvu++.a )
 	@echo ----- Done library
 
 

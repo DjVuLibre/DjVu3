@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: GContainer.h,v 1.2 1999-02-01 18:32:32 leonb Exp $
+//C-  $Id: GContainer.h,v 1.3 1999-02-11 14:33:11 leonb Exp $
 
 
 #ifndef _GCONTAINER_H_
@@ -46,7 +46,7 @@
     Leon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@geocities.com> -- bug fixes.
     @version 
-    #$Id: GContainer.h,v 1.2 1999-02-01 18:32:32 leonb Exp $# */
+    #$Id: GContainer.h,v 1.3 1999-02-11 14:33:11 leonb Exp $# */
 //@{
 
 class GContainerBase;
@@ -169,60 +169,6 @@ public:
   const TYPE* prev(GPosition &pos) const;
   TYPE* next(GPosition &pos);
   TYPE* prev(GPosition &pos);
-};
-
-
-
-// *** Class GPool  (implementation stuff)
-// This class represent a storage area for 
-// structures of fixed size. This is particularly
-// convenient for overloading operators new and delete.
-//
-//  class Whathever {
-//   private:
-//    static GPool pool;
-//   public:
-//    void *operator new(size_t sz) { return pool.xnew(sz); };
-//    void operator delete(void *addr) { pool.xdelete(addr); };
-//   .... };
-//
-//  GPool Whathever::pool (sizeof Whatever);
-//
-// There is a variant which is useful because certain compilers
-// (eg g++-2.7.2) do not yet support template static data members.
-//
-// template <class T> class Whatever {
-//   public:
-//    sttaic GPool& pool();
-//   public:
-//    void *operator new(size_t sz) { return pool().xnew(sz); };
-//    void operator delete(void *addr) { pool().xdelete(addr); };
-//   .... };
-//
-// template <class T> GPool &
-// Whatever<T>::pool() 
-// {  static GPool thepool(sizeof(Whatever<T>));
-//    return thepool; }
-//
-// Yes it works!
-
-class GPool {
-public:
-  GPool(size_t elemsize, size_t chunksize=63);
-  void *xnew(size_t sz);
-  void xdelete(void *addr);
-  ~GPool();
-private:
-  // Disable copy (dummy functions)
-  GPool(const GPool&);
-  GPool& operator= (const GPool&);
-private:
-  // Implementation
-  const size_t elemsize;
-  const size_t chunksize;
-  void *freelist;
-  void *chunklist;
-  void newchunk();
 };
 
 
@@ -549,15 +495,10 @@ public:
   GList<TYPE>& operator= (const GList<TYPE>& gl);
 protected:
   // Node implementation
-  static GPool & pool();
   class GListNode {
   public:
     GListNode() {};
     GListNode(const TYPE& val) : data(val) {};
-    // pool management
-    void *operator new(size_t sz) { return GList::pool().xnew(sz); };
-    void operator delete(void *addr) { GList::pool().xdelete(addr); };
-    // contents
     GListNode *next;
     GListNode *prev;
     TYPE data;
@@ -567,14 +508,6 @@ protected:
   int nelem;
   GListNode head;
 };
-
-template<class T>
-GPool& GList<T>::pool()
-{
-   static GPool thepool(sizeof(GListNode));
-   return thepool;
-}
-
 
 
 /** Hashed associative map.
@@ -626,7 +559,6 @@ public:
   virtual void prevpos(GPosition &pos) const;
   virtual const VTYPE *get(const GPosition &pos) const;
   virtual VTYPE* get(const GPosition &pos);
-
   // -- TESTS
   /** Tests whether the associative map is empty.  Returns a non zero value if
       and only if the map contains zero entries. */
@@ -679,14 +611,9 @@ public:
   GMap<KTYPE,VTYPE>& operator=(const GMap<KTYPE,VTYPE>&ref);
 protected:
   // implementation
-  static GPool& pool();
   class GMapNode {
   public:
     GMapNode(const KTYPE& key) : key(key) {};
-    // pool management
-    void *operator new(size_t sz) {return GMap::pool().xnew(sz);};
-    void operator delete(void *addr) {GMap::pool().xdelete(addr);};
-    // contents
     GMapNode *next;
     GMapNode **pprev;
     unsigned int hash;
@@ -703,13 +630,6 @@ protected:
   int nelems;
   GMapNode **table;
 };
-
-template<class T, class V>
-GPool& GMap<T, V>::pool()
-{
-   static GPool thepool(sizeof(GMapNode));
-   return thepool;
-}
 
 
 /** @name Hash functions
@@ -847,37 +767,6 @@ GContainer<TYPE>::prev(GPosition &pos) const
 {
   return ((GContainer<TYPE>*)this)->prev(pos);
 }
-
-
-// ------------- GPOOL INLINES
-
-
-inline 
-GPool::GPool(size_t elemsize, size_t chunksize)
-  : elemsize(elemsize), chunksize(chunksize), freelist(0), chunklist(0)
-{
-}
-
-inline void *
-GPool::xnew(size_t sz)
-{
-  if (sz != elemsize)
-    THROW("Attempt to allocate object in wrong GPool");
-  if (!freelist)
-    newchunk();
-  void *addr = freelist;
-  freelist = *(void**)(addr);
-  return addr;
-}
-
-inline void
-GPool::xdelete(void *addr)
-{
-  *(void**)(addr) = freelist;
-  freelist = addr;
-}
-
-
 
 
 // ----- GARRAY IMPLEMENTATION

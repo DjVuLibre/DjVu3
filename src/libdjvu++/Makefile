@@ -21,7 +21,7 @@ OBJS= 	GString.o		\
 	debug.o	
 
 SHELL=/bin/sh
-TARG= libDejaVu.a
+LIB= libdjvu++.a
 PROG= djvuinfo c44 d44 djvutopnm djvumake djvuextract ppmcoco bzz
 
 #CC=gcc
@@ -40,15 +40,15 @@ DOCXX= doc++
 
 # Make all
 
-all: $(TARG) $(PROG) 
+all: $(LIB) $(PROG) 
 	echo Done.
 
 # Rule for building the library
 
-$(TARG): $(OBJS) Makefile
-	if [ -r $(TARG) ] ; then rm $(TARG) ; fi
-	ar cq $(TARG) $(OBJS)
-	$(RANLIB) $(TARG)
+$(LIB): $(OBJS) Makefile
+	if [ -r $(LIB) ] ; then rm $(LIB) ; fi
+	ar cq $(LIB) $(OBJS)
+	$(RANLIB) $(LIB)
 
 # Rules for building support programs
 
@@ -63,32 +63,32 @@ ANNOTATEOBJS = annotate.o
 BZZOBJS = bzz.o
 LIBDJVUOBJS = libdjvu.o 
 
-c44: $(C44OBJS) $(TARG) Makefile
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(C44OBJS) -L. -lDejaVu $(LDLIBS)
+c44: $(C44OBJS) $(LIB) Makefile
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(C44OBJS) $(LIB) $(LDLIBS)
 
-d44: $(D44OBJS) $(TARG) Makefile
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(D44OBJS) -L. -lDejaVu $(LDLIBS)
+d44: $(D44OBJS) $(LIB) Makefile
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(D44OBJS) $(LIB) $(LDLIBS)
 
-djvuinfo: $(DJVUINFOOBJS) $(TARG) Makefile
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(DJVUINFOOBJS) -L. -lDejaVu $(LDLIBS)
+djvuinfo: $(DJVUINFOOBJS) $(LIB) Makefile
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(DJVUINFOOBJS) $(LIB) $(LDLIBS)
 
-djvutopnm: $(DEJAVUTOPNMOBJS) $(TARG) Makefile
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(DEJAVUTOPNMOBJS) -L. -lDejaVu $(LDLIBS)
+djvutopnm: $(DEJAVUTOPNMOBJS) $(LIB) Makefile
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(DEJAVUTOPNMOBJS) $(LIB) $(LDLIBS)
 
-djvumake: $(MAKEDEJAVUOBJS) $(TARG) Makefile	
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(MAKEDEJAVUOBJS) -L. -lDejaVu $(LDLIBS)
+djvumake: $(MAKEDEJAVUOBJS) $(LIB) Makefile	
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(MAKEDEJAVUOBJS) $(LIB) $(LDLIBS)
 
-djvuextract: $(BREAKDEJAVUOBJS) $(TARG) Makefile	
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(BREAKDEJAVUOBJS) -L. -lDejaVu $(LDLIBS)
+djvuextract: $(BREAKDEJAVUOBJS) $(LIB) Makefile	
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(BREAKDEJAVUOBJS) $(LIB) $(LDLIBS)
 
-ppmcoco: $(PPMCOCOOBJS) $(TARG) Makefile	
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(PPMCOCOOBJS) -L. -lDejaVu $(LDLIBS)
+ppmcoco: $(PPMCOCOOBJS) $(LIB) Makefile	
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(PPMCOCOOBJS) $(LIB) $(LDLIBS)
 
-annotate: $(ANNOTATEOBJS) $(TARG) Makefile	
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(ANNOTATEOBJS) -L. -lDejaVu $(LDLIBS)
+annotate: $(ANNOTATEOBJS) $(LIB) Makefile	
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(ANNOTATEOBJS) $(LIB) $(LDLIBS)
 
-bzz: $(BZZOBJS) $(TARG) Makefile
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(BZZOBJS) -L. -lDejaVu $(LDLIBS)
+bzz: $(BZZOBJS) $(LIB) Makefile
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(BZZOBJS) $(LIB) $(LDLIBS)
 
 # Documentation
 
