@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: GString.cpp,v 1.33.4.1 2001-04-25 21:06:25 jhayes Exp $
+// $Id: GString.cpp,v 1.33.4.2 2001-05-02 20:15:27 jhayes Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -288,7 +288,7 @@ GString::fromEscaped( const GMap<GString,GString> ConvMap ) const
     int semi_locn = search( ';', amp_locn );
     if( semi_locn < 0 ) // No closing semicolon, exit and copy
     {
-//      start_locn = amp_locn;  // this make it so the & is unchanged
+      start_locn = amp_locn;   // this make it so the & is unchanged
       break;
     }
                                 //  the rest of the string.
