@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DataPool.cpp,v 1.83 2001-07-23 19:59:34 bcr Exp $
+// $Id: DataPool.cpp,v 1.84 2001-07-23 20:59:43 bcr Exp $
 // $Name:  $
 
 
@@ -323,8 +323,8 @@ FCPools::add_pool(const GURL &url, GP<DataPool> pool)
    if (url.is_local_file_url())
    {
       GPList<DataPool> list;
-      GPosition pos;
-      if (!map.contains(url, pos))
+      GPosition pos(map.contains(url));
+      if (! pos)
       {
         map[url]=list;
         pos=map.contains(url);
@@ -716,7 +716,7 @@ DataPool::create(const GURL &furl, int start, int length)
 }
 
 void
-DataPool::clear_stream(const bool release)
+DataPool::clear_stream(const bool /* release */)
 {
   DEBUG_MSG("DataPool::clear_stream()\n");
   DEBUG_MAKE_INDENT(3);
@@ -728,7 +728,7 @@ DataPool::clear_stream(const bool release)
     {
       GCriticalSectionLock lock2(&(f->stream_lock));
       fstream=0;
-      if(release)
+//      if(release)
         OpenFiles::get()->stream_released(f->stream, this);
     }
   }
