@@ -616,50 +616,55 @@
     \item[(maparea <url> <comment> <area> <...options...>]
        Defines an hyperlink for the URL specified by argument #url#.
 
-       Argument #url# may have one of the following two forms:\\
-       #    "<href>"#\\
-       #    (url "<href>" "<target>")#\\
+       Argument #url# may have one of the following two forms:
+       \begin{verbatim}
+            "<href>"
+            (url "<href>" "<target>")
+       \end{verbatim}
        where #href# is a string representing the URL and #target# is a string
        representing the target frame for the hyperlink (cf. Documentation for
        the HTML tag #<A>#).  Both strings are surrounded with double quotes.
-
        Argument #comment# is a string surrounded by double quotes.
        This string may be displayed as a tooltip when the user
        moves the mouse over the hyperlink.
-
        Argument #area# defines the shape of the hyperlink.
        The following options are supported for representing
-       rectangle, circle, or polygons.\\  
-       #   (rect <xmin> <ymin> <width> <height>)#\\
-       #   (oval <xmin> <ymin> <width> <height>)#\\
-       #   (polygon <x0> <y0> <x1> <y1> ....)#\\
-       All parameters are numbers representing coordinates measured 
-       in image pixels with the origin set at the bottom left corner
-       of the image.
-       
-       The remaining arguments describe options regarding the hyperlink borders.
-       A first set of option define the type of the borders:\\
-       #   (xor)#\\
-       #   (border <color>#\\
-       #   (shadow_in [<thickness>])#\\
-       #   (shadow_out [<thickness>])#\\
-       #   (shadow_ein [<thickness>])#\\
-       #   (shadow_eout [<thickness>])#\\
+       rectangle, circle, or polygons.
+       \begin{verbatim}
+            (rect <xmin> <ymin> <width> <height>)
+            (oval <xmin> <ymin> <width> <height>)
+            (polygon <x0> <y0> <x1> <y1> ....)
+       \end{verbatim}
+       All parameters are numbers representing coordinates measured in image
+       pixels with the origin set at the bottom left corner of the image.  The
+       remaining arguments describe options regarding the hyperlink borders.
+       A first set of option define the type of the borders:
+       \begin{verbatim}
+            (xor)
+            (border <color>
+            (shadow_in [<thickness>])
+            (shadow_out [<thickness>])
+            (shadow_ein [<thickness>])
+            (shadow_eout [<thickness>])
+       \end{verbatim}
        where parameter #color# has syntax \##RRGGBB# (as above) and parameter
        #thickness# is a number from 1 to 32.  The last four border modes are
        only supported with rectangular areas. The border becomes visible when
        the user moves the mouse over the hyperlink.  The border may be made
-       always visible by using the following option:\\
-       #   (border-avis)#\\
+       always visible by using the following option:
+       \begin{verbatim}
+            (border-avis)
+       \end{verbatim}
        Finally the following option may be used with rectangular areas only.
        The complete area will be hilited using the specified color (specified
-       with syntax \##RRGGBB# as usual).\\
-       #   (hilite <color>)#\\
+       with syntax \##RRGGBB# as usual).
+       \begin{verbatim}
+            (hilite <color>)
+       \end{verbatim}
        This is often used with an empty URL for simply emphasizing a specific
        segment of an image.
 
-    \end{description}
-*/
+    \end{description} */
 
 
 
