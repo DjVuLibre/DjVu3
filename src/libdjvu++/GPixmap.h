@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GPixmap.h,v 1.14 2000-01-21 19:35:27 leonb Exp $
+//C- $Id: GPixmap.h,v 1.15 2000-02-22 17:15:06 leonb Exp $
 
 #ifndef _GPIXMAP_H_
 #define _GPIXMAP_H_
@@ -30,7 +30,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: GPixmap.h,v 1.14 2000-01-21 19:35:27 leonb Exp $# */
+    #$Id: GPixmap.h,v 1.15 2000-02-22 17:15:06 leonb Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -64,6 +64,8 @@ struct GPixel
   friend int operator==(const GPixel & p1, const GPixel & p2);
   /** Returns true iff colors are different. */
   friend int operator!=(const GPixel & p1, const GPixel & p2);
+  /** Returns a hash code for the color. */
+  friend unsigned int hash(const GPixel &p);
   /** @name Predefined colors. */
   //@{ 
   /// GPixel::WHITE is initialized to #rgb:255/255/255#.
@@ -356,6 +358,13 @@ inline int
 operator!=(const GPixel & p1, const GPixel & p2)
 {
   return p1.r!=p2.r || p1.g!=p2.g || p1.b!=p2.b;
+}
+
+inline unsigned int 
+hash(const GPixel &p)
+{
+  unsigned int x = (p.b<<16)|(p.g<<8)|(p.r);
+  return x ^ (p.b<<4) ^ (p.r<<12);
 }
 
 inline unsigned int
