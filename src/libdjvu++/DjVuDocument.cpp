@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocument.cpp,v 1.167 2001-05-01 21:28:33 praveen Exp $
+// $Id: DjVuDocument.cpp,v 1.168 2001-05-02 01:05:59 praveen Exp $
 // $Name:  $
 
 
@@ -706,7 +706,7 @@ DjVuDocument::url_to_page(const GURL & url) const
 	    if (flags & DOC_DIR_KNOWN)
 	    {
 	       GP<DjVmDir::File> file;
-	       if (url.base()==init_url) file=djvm_dir->name_to_file(url.fname());
+	       if (url.base()==init_url) file=djvm_dir->id_to_file(url.fname());
 	       if (file) page_num=file->get_page_num();
 	    }
 	    break;
@@ -716,7 +716,7 @@ DjVuDocument::url_to_page(const GURL & url) const
 	    if (flags & DOC_DIR_KNOWN)
 	    {
 	       GP<DjVmDir::File> file;
-	       if (url.base()==init_url.base()) file=djvm_dir->name_to_file(url.fname());
+	       if (url.base()==init_url.base()) file=djvm_dir->id_to_file(url.fname());
 	       if (file) page_num=file->get_page_num();
 	    }
 	    break;
@@ -1404,7 +1404,7 @@ DjVuDocument::request_data(const DjVuPort * source, const GURL & url)
 	       if (url.base()!=init_url)
 		        G_THROW( ERR_MSG("DjVuDocument.URL_outside") "\t"+url.get_string());
 	 
-	       GP<DjVmDir::File> file=djvm_dir->name_to_file(url.fname());
+	       GP<DjVmDir::File> file=djvm_dir->id_to_file(url.fname());
 	       if (!file) G_THROW( ERR_MSG("DjVuDocument.file_outside") "\t"+url.fname());
 	       data_pool=DataPool::create(init_data_pool, file->offset, file->size);
 	    }
@@ -1416,7 +1416,7 @@ DjVuDocument::request_data(const DjVuPort * source, const GURL & url)
 	 {
 	    DEBUG_MSG("The document is in SINGLE_PAGE or OLD_INDEXED or INDIRECT format\n");
 	    if (flags & DOC_DIR_KNOWN)
-	       if (doc_type==INDIRECT && !djvm_dir->name_to_file(url.fname()))
+	       if (doc_type==INDIRECT && !djvm_dir->id_to_file(url.fname()))
 		        G_THROW( ERR_MSG("DjVuDocument.URL_outside2") "\t"+url.get_string());
 	 
 	    if (url.is_local_file_url())

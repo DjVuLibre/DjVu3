@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.93 2001-05-01 17:35:15 chrisp Exp $
+// $Id: GString.cpp,v 1.94 2001-05-02 01:05:59 praveen Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -813,16 +813,22 @@ GStringRep::rsearch(char const *ptr, int from) const
 }
 
 int
-GBaseString::contains(const char accept[],const int from) const
+GBaseString::contains(const char accept[],int from) const
 {
   int retval=(-1);
+  if(from<0)
+  {
+	from+=length();
+	if(from<0)
+	  G_THROW( ERR_MSG("GString.bad_subscript") );
+  }
   if(accept && strlen(accept) && (from < (int)length()))
   {
     const char *src = (const char*)(*this)+((from<0)?0:from);
     const char *ptr;
     if((ptr=strpbrk(src,accept)))
     {
-      retval=(int)(ptr-src)+from;
+		retval=(int)(ptr-src)+((from<0)?0:from);
     }
   }
   return retval;
@@ -831,6 +837,12 @@ GBaseString::contains(const char accept[],const int from) const
 int
 GBaseString::rcontains(const char accept[],int from) const
 {
+  if(from<0)
+  {
+	from+=length();
+	if(from<0)
+	  G_THROW( ERR_MSG("GString.bad_subscript") );
+  }
   int retval=(-1);
   while((from=contains(accept,from)) >= 0)
   {

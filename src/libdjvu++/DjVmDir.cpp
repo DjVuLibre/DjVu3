@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVmDir.cpp,v 1.41 2001-05-01 17:12:15 bcr Exp $
+// $Id: DjVmDir.cpp,v 1.42 2001-05-02 01:05:59 praveen Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -74,7 +74,7 @@ DjVmDir::File::check_save_name(const bool xis_bundled)
       for(char c=retval[i++];c;)
       {
         static const char hex[]="0123456789ABCDEF";
-        int len=retval.nextChar(i);
+        int len=retval.nextChar(i)-i;
         if(len>1 || ((len == 1)&&(c&0x80)))
         {
           do
