@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: Arrays.h,v 1.1.2.1 1999-03-30 21:28:23 eaf Exp $
+//C- $Id: Arrays.h,v 1.1.2.2 1999-05-07 22:22:11 eaf Exp $
 
 
 #ifndef _ARRAYS_H_
@@ -69,7 +69,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@research.att.com> -- bug fixes.
     @version 
-    #$Id: Arrays.h,v 1.1.2.1 1999-03-30 21:28:23 eaf Exp $# */
+    #$Id: Arrays.h,v 1.1.2.2 1999-05-07 22:22:11 eaf Exp $# */
 //@{
 
 // Internal "Array repository" holding the pointer to the actual data,
@@ -462,7 +462,7 @@ ArrayBaseT<TYPE>::ins(int n, const TYPE &val, unsigned int howmany)
 template <class TYPE> void
 ArrayBaseT<TYPE>::sort()
 {
-   sort(lobound, hibound);
+   sort(lbound(), hbound());
 }
 
 template <class TYPE> void
