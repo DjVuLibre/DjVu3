@@ -6,7 +6,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: parseoptions.h,v 1.1 1999-11-02 21:44:58 bcr Exp $
+//C- $Id: parseoptions.h,v 1.2 1999-11-03 05:17:00 bcr Exp $
 
 #endif /* __cplusplus */
 
@@ -164,7 +164,7 @@
 //
 // \end{verbatim} */
 //** @memo parseoptions header file */
-//** @version $Id: parseoptions.h,v 1.1 1999-11-02 21:44:58 bcr Exp $ */
+//** @version $Id: parseoptions.h,v 1.2 1999-11-03 05:17:00 bcr Exp $ */
 //** @author: $Author: bcr $ */
 
 // First we include some C wrappers for our class.
@@ -219,7 +219,7 @@ extern "C" {
     /* This is a wrapper for the DjVuParseOptions::ParseArguments function */
   void
   djvu_parse_arguments
-  (struct djvu_parse,int,const char *[],const struct djvu_option *);
+  (struct djvu_parse,int,char * const [],const struct djvu_option []);
 
     /* This is a wrapper for the DjVuParseOptions::HasError function */
   int
@@ -315,13 +315,32 @@ public:
 
   //** This is the primary lookup routine.  Input is the token as returned by */
   //** GetToken(), and the return value is the string associated with the     */
-  //** token                                                                  */
+  //** token.  Multiple tokens may be in an array of the specified listsize.  */
   const char * const GetValue(const int token) const;
 
+  //** Multiple tokens may be in an array of the specified listsize.  The   */
+  //** token with a value of the highest presidence will be returned.     */
+  int GetBestToken(const int listsize,const int tokens[]);
+
+  //** Multiple tokens may be in an array of the specified listsize.  The   */
+  //** value with the highest presidence will be returned.                  */
+  inline const char * const GetBestValue(const int listsize,const int tokens[])
+  { return GetValue(GetBestToken(listsize,tokens)); };
+
   //** This is just a short cut, when a token value is only needed for one */
-  //** lookup.                                                             */
+  //** lookup.  A list of tokens may be specified as well.                 */
   inline const char * const GetValue(const char xname[]) const
   { return GetValue(GetVarToken(xname)); }
+
+  //** Multiple names may be in an array of the specified listsize.  The     */
+  //** value with the highest presidence will be returned.                   */
+  int GetBestToken(const int listsize,const char * const[]);
+
+  //** Multiple names may be in an array of the specified listsize.  The     */
+  //** token with a value of the highest presidence will be returned.     */
+  inline const char * const GetBestValue
+  (const int listsize,const char * const xname[])
+  { return GetValue(GetBestToken(listsize,xname)); };
 
   //** This just checks for TRUE, and if not does an atoi() conversion. */
   //** Anything beginning with [Tt] is returned as 1, [Ff\0] is returned */
@@ -350,15 +369,16 @@ public:
   void perror();
 
   //** This is the primary function for reading command  line arguments.  */
-  const int ParseArguments(int,const char *[],const djvu_option *);
+  const int ParseArguments(const int,char * const [],const djvu_option []);
 
 private:
   void Add(const char [],const int,const int,const int,const char []);
   const int ReadConfig(const char prog[]);
   const int ReadNextConfig(const char filename[],int &,const char prog[],FILE *f);
   void ReadFile(const char [],int &,FILE *f,const int profile);
-  void Init(const char[],const int,const char * const [],const djvu_option &);
+  void Init(const char[],const int,const char * const [],const djvu_option []);
   FILE *OpenConfig(const char prog[]);
+  void AmbiguousOptions(const int,const char[],const int,const char[]);
 };
 
 //@}
@@ -433,13 +453,14 @@ private:
   ErrorList &Errors;
   int argc;
   int nextchar;
-  const char **argv,*name;
+  const char * const *argv;
+  const char *name;
   char *optstring;
   const djvu_option *long_opts;
 public:
   const char *optarg;
   int getopt_long();
-  GetOpt(DjVuParseOptions *,const int,const char **,const djvu_option *);
+  GetOpt(DjVuParseOptions *,const int,char * const [],const djvu_option []);
 };
 #endif _PARSEOPTIONS_H_IMPLEMENTATION 
 

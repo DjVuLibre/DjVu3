@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: parseoptions.cpp,v 1.1 1999-11-02 21:44:58 bcr Exp $
+//C- $Id: parseoptions.cpp,v 1.2 1999-11-03 05:17:00 bcr Exp $
 #ifdef __GNUC__
 #pragma implementation
 #endif
@@ -91,7 +91,7 @@ djvu_parse_integer(struct djvu_parse opts,const char name[],const int errval)
   /* This is a wrapper for the DjVuParseOptions::ParseArguments function */
 void
 djvu_parse_arguments
-(struct djvu_parse opts,int argc,const char *argv[],const struct djvu_option *lopts)
+(struct djvu_parse opts,int argc,char * const argv[],const struct djvu_option lopts[])
 {
   ((DjVuParseOptions *)(opts.Private))->ParseArguments(argc,argv,lopts);
 }
@@ -205,6 +205,91 @@ DjVuParseOptions::GetValue
   return retval;
 }
 
+void
+DjVuParseOptions::AmbiguousOptions
+(const int token1,const char value1[],const int token2,const char value2[])
+{
+  if(token1 != token2)
+  {
+    const char *emsg="Ambiguous options: '%s=%s' and '%s=%s' specified.";
+    const char *name1=GetVarName(token1);
+    const char *name2=GetVarName(token2);
+    if(name1 && name2)
+    {
+      char *s=new char [sizeof(emsg)+strlen(name1)+strlen(name2)+strlen(value1)+strlen(value2)];
+      sprintf(s,emsg,name1,value1,name2,value2);
+      Errors->AddError(s);
+      delete [] s;
+    }
+  }
+}
+
+// This function is usefull when the same option has multiple names.
+//
+int
+DjVuParseOptions::GetBestToken
+(const int listsize,const int tokens[])
+{
+  const char *r=0;
+  int retval=(-1);
+  int i;
+  for(i=0;!r&&(i<listsize);
+    r=Arguments->GetValue(tokens[i]));
+  for(retval=i;r&&(i<listsize);i++)
+  {
+    const char *s=Arguments->GetValue(tokens[i]);
+    if(s) AmbiguousOptions(retval,r,i,s);
+  }
+  if(!r)
+  {
+    for(i=0;!r&&(i<listsize);
+      r=Configuration->GetValue(currentProfile,tokens[i]));
+    for(retval=i;r&&(i<listsize);i++)
+    {
+      const char *s=Configuration->GetValue(currentProfile,tokens[i]);
+      if(s) AmbiguousOptions(retval,r,i,s);
+    }
+  }
+  if(!r)
+  {
+    for(i=0;!r&&(i<listsize);
+      r=Configuration->GetValue(defaultProfile,tokens[i++]));
+    for(retval=i;r&&(i<listsize);i++)
+    {
+      const char *s=Configuration->GetValue(defaultProfile,tokens[i]);
+      if(s) AmbiguousOptions(retval,r,i,s);
+    }
+  }
+  return retval;
+}
+
+// This function is usefull when the same option has multiple names.
+//
+int
+DjVuParseOptions::GetBestToken
+(const int listsize,const char * const xname[])
+{
+  int retval=(-1);
+  if(xname && listsize > 0)
+  {
+    int i,j=0;
+    int *tokens=new int[listsize];
+    for(i=0;i<listsize;i++)
+    {
+      if(xname[i])
+      {
+        const int token=GetVarToken(xname[i]);
+        if(token>=0)
+          tokens[i++]=token;
+      } 
+    }
+    if(j>0)
+      retval=GetBestToken(j,tokens);
+    delete [] tokens;
+  }
+  return retval;
+}
+
 // This does a simple strtol() conversion.  Any string beginning with 'T' or
 // 't' is always returned as 1.  Any string starting with 'F', 'f', or '\0'
 // is returned as 0.  Otherwise if strtol() is successfull a value is returned.
@@ -218,7 +303,7 @@ DjVuParseOptions::GetInteger
   int retval;
   if(!str)
   {
-    retval=0;
+    retval=errval;
   }else if((str[0] == 'T')||(str[0] == 't'))
   {
     retval=1;
@@ -239,7 +324,7 @@ DjVuParseOptions::GetInteger
 //
 const int
 DjVuParseOptions::ParseArguments
-(const int argc,const char **argv,const djvu_option *opts)
+(const int argc,char * const argv[],const djvu_option opts[])
 {
   GetOpt args(this,argc,argv,opts);
   int i;
@@ -912,8 +997,8 @@ ReadEscape
 DjVuParseOptions::GetOpt::GetOpt
 (DjVuParseOptions *xopt,
   const int xargc,
-  const char **xargv,
-  const djvu_option *lopts)
+  char * const xargv[],
+  const djvu_option lopts[])
 : optind(1),
   VarTokens(*(xopt->VarTokens)),
   Errors(*(xopt->Errors)),
