@@ -4,7 +4,7 @@
 //C-              Unauthorized use prohibited.
 //C-
 // 
-// $Id: qd_viewer_shell.cpp,v 1.2 2001-05-31 21:25:10 mchen Exp $
+// $Id: qd_viewer_shell.cpp,v 1.3 2001-06-01 18:44:21 mchen Exp $
 // $Name:  $
 
 
@@ -232,7 +232,7 @@ QDViewerShell::slotMenuCB(int cmd)
 	 qeApp->killWidget(this);
       else if (cmd==IDC_OPEN)
       {
-	 static char * filters[]={ "*.djvu", "*.djv", "*.iw44", "*.iw4", "All files (*)", 0 };
+	 static const char * filters[]={ "*.djvu", "*.djv", "*.iw44", "*.iw4", tr("All files (*)"), 0 };
 
 	 QeFileDialog dialog(QeFileDialog::lastLoadDir, filters[0],
 			     this, "file_dialog", TRUE);
