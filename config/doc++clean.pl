@@ -18,40 +18,122 @@ while ( <> )
       print STDERR "Failed to open $filename\n";
       exit 1;
     }
+    unshift @filelist,$filename;
   }
-  if(($last =~ /<IMG ALT="o" BORDER=0 SRC=icon1[.]gif><A NAME=".*"><.A>/i) 
-    &&($line =~ /(<A HREF=)(.*[.]html)(><B>)(.*)(<.B><.A>)(<DD>.*)/i))
+  if($last =~ /^(<IMG ALT="o" BORDER=0 SRC=icon1[.]gif><A NAME=")(.*)("><.A>)/i) 
   {
-    ($current1,$current2,$current3,$current4,$current5,$current6)=($1,$2,$3,$4,$5,$6);
-    $file="$filename/$current2";
-    $file=~s,[^/]*/$current2,$current2,g;
-    if(open(FILE,"<$file"))
+    $anchor=$2;
+    if($line =~ /(<A HREF=)(.*[.]html)(><B>)(.*)(<.B><.A>)(<DD>.*)/i)
     {
-      while( <FILE> )
+      ($current1,$current2,$current3,$current4,$current5,$current6)=($1,$2,$3,$4,$5,$6);
+      $oldlink="$current2";
+      $newlink="$filename#$anchor";
+      $newlink=~s,^.*[/],,g;
+      $file="$filename/$current2";
+      $file=~s,[^/]*/$current2,$current2,g;
+      if(open(FILE,"<$file"))
       {
-        $in=$_;
-        if ($in =~ /(<H2>[ ]*)([^<]*)(<A HREF="[^"]+">)([^<]+)(<\/A>)([^\(]*[^\)]*)(<\/H2>.*)$/i)
+        $block="";
+        $newblock="";
+        @file = <FILE>;
+        $dobreak=0;
+        while ( @file && !$dobreak)
         {
-          $line="<B>$2$current1$current2$current3$current4$current5$6</B>$current6\n";
-          break;
-        }elsif($in =~ /(<H2>[ ]*)([^(]*)(<A HREF="[^"]+">)([^(]+)(<\/A>)(.*)(<\/H2>.*)$/i)
+          $in=shift @file;
+          if ($in =~ /(<H2>[ ]*)([^<]*)(<A HREF="[^"]+">)([^<]+)(<\/A>)([^\(]*[^\)]*)(<\/H2>.*)$/i)
+          {
+            $line="<B>$2</B>$current1$current2$current3$current4$current5<B>$6</B>$current6\n";
+            $altline="<B>$2</B><B><EM><FONT COLOR=#000088>$current4</FONT></EM></B><B>$6</B>$current6\n";
+            $dobreak=1;
+          }elsif($in =~ /(<H2>[ ]*)([^(]*)(<A HREF="[^"]+">)([^(]+)(<\/A>)(.*)(<\/H2>.*)$/i)
+          {
+            $line="<B>$2</B>$current1$current2$current3$current4$current5<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<B>$6</B>$current6\n";
+            $altline="<B>$2</B><B><EM><FONT COLOR=#000088>$current4</FONT></EM></B><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<B>$6</B>$current6\n";
+            $dobreak=1;
+          }elsif ($in =~ /^<H2>/)
+          {
+            $dobreak=1;
+          }
+        }
+        $dobreak=0;
+        while ( @file && ! $dobreak)
         {
-          $line="<B>$2</B>$current1$current2$current3$current4$current5<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<B>$6</B>$current6\n";
-          break;
-        }elsif ($in =~ /^<H2>/)
+          $in=shift @file;
+          if($in =~ /^(<BLOCKQUOTE>)([+][+][ ]+.*)(<\/BLOCKQUOTE>)/)
+          {
+            $block=$2;
+            $dobreak=1;
+          }
+        }
+        if($block ne "")
         {
-          break;
+          $dobreak=0;
+          while ( @file && ! $dobreak)
+          {
+            $in=shift @file;
+            if($in =~ /^(<BLOCKQUOTE>[+][+][ ]+)(.*)(<\/BLOCKQUOTE>)/)
+            {
+              $newblock=$2;
+              $dobreak=1;
+            }elsif($in =~ /^(<BLOCKQUOTE>[+][+][ ]+)(.*)$/)
+            {
+              $newblock=$2."\n";
+              while (@file &&($newblock !~ /<\/BLOCKQUOTE>/))
+              {
+                $newblock.=shift @file;
+              }
+              $newblock =~ s,<\/BLOCKQUOTE>$,,;
+              $dobreak=1;
+            }
+          }
+        }
+        close FILE;
+        if($newblock ne "" )
+        {
+          $altline =~ s,\Q$block\E,$newblock,;
+          $line=$altline;
+          $linklist{$oldlink}=$newlink;
+          unshift @removelist,$file;
         }
       }
-      close FILE;
+    }else
+    {
+      $line =~ s,^<body>,<BODY BGCOLOR=\#fefefe BACKGROUND=back.jpg>,i;
     }
-  }else
-  {
-    $line =~ s,^<body>,<BODY BGCOLOR=\#fefefe BACKGROUND=back.jpg>,i;
   }
   print OUT $line;
   $last=$line;
 }
 close OUT;
 unlink("$filename.save");
+if(@removelist)
+{
+  foreach $file ( @removelist )
+  {
+    unlink $file;
+  }
+  foreach $file ( @filelist )
+  {
+    if(rename("$file","$file.save"))
+    {
+      if(open(OUT,"<$file")&&open(FILE,"<$file.save"))
+      {
+        while(<FILE>)
+        {
+          $line=$_;
+          foreach $oldlink ( keys %linklist )
+          {
+            $line=~s,HREF=(["]*)\Q$oldlink\E(["]*),HREF="$linklist{$oldlink}",g;
+          }
+          print OUT $line;
+        }
+        close FILE;
+        close OUT;
+      }else
+      {
+        rename("$file.save","$file");
+      }
+    }
+  }
+}
 
