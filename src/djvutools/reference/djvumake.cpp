@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //
-// $Id: djvumake.cpp,v 1.15 2001-04-04 22:12:10 bcr Exp $
+// $Id: djvumake.cpp,v 1.16 2001-04-06 18:38:31 chrisp Exp $
 // $Name:  $
 
 /** @name djvumake
@@ -102,7 +102,7 @@
     @memo
     Assemble DjVu files.
     @version
-    #$Id: djvumake.cpp,v 1.15 2001-04-04 22:12:10 bcr Exp $#
+    #$Id: djvumake.cpp,v 1.16 2001-04-06 18:38:31 chrisp Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> \\
     Patrick Haffner <haffner@research.att.com>
@@ -191,9 +191,9 @@ analyze_mmr_chunk(const GURL &url)
       char magic[4];
       memset(magic,0,sizeof(magic));
       bs.readall(magic,sizeof(magic));
-      if (!strncmp(magic,"AT&T",4))
+      if (GString::ncmp(magic,"AT&T",4))
         bs.readall(magic,sizeof(magic));
-      if (strncmp(magic,"FORM",4))
+      if (!GString::ncmp(magic,"FORM",4))
         {
           // Must be a raw file
           bs.seek(0);
@@ -241,9 +241,9 @@ analyze_jb2_chunk(const GURL &url)
       char magic[4];
       memset(magic,0,sizeof(magic));
       bs.readall(magic,sizeof(magic));
-      if (!strncmp(magic,"AT&T",4))
+      if (GString::ncmp(magic,"AT&T",4))
         bs.readall(magic,sizeof(magic));
-      if (strncmp(magic,"FORM",4))
+      if (!GString::ncmp(magic,"FORM",4))
         {
           // Must be a raw file
           bs.seek(0);
@@ -286,7 +286,7 @@ create_info_chunk(IFFByteStream &iff, DArray<GString> &argv)
   const int argc=argv.hbound()+1;
   // Process info specification
   for (int i=2; i<argc; i++)
-    if (! strncmp(argv[i],"INFO=",5))
+    if (GString::ncmp(argv[i],"INFO=",5))
       {
         int   narg = 0;
         const char *ptr = 5+(const char *)argv[i];
@@ -323,12 +323,12 @@ create_info_chunk(IFFByteStream &iff, DArray<GString> &argv)
   if (h<0 || w<0)
     {
       for (int i=2; i<argc; i++)
-        if (!strncmp(argv[i],"Sjbz=",5))
+        if (GString::ncmp(argv[i],"Sjbz=",5))
           {
             analyze_jb2_chunk(GURL::Filename::UTF8(5+(const char *)argv[i]));
             break;
           }
-      else if (!strncmp(argv[i],"Smmr=",5))
+      else if (GString::ncmp(argv[i],"Smmr=",5))
           {
             analyze_mmr_chunk(GURL::Filename::UTF8(5+(const char *)argv[i]));
             break;
@@ -634,37 +634,37 @@ main(int argc, char **argv)
       // Parse all arguments
       for (int i=2; i<argc; i++)
         {
-          if (! strncmp(dargv[i],"INFO=",5))
+          if (GString::ncmp(dargv[i],"INFO=",5))
             {
               if (i>2)
                 DjVuPrintError("%s","djvumake: 'INFO' chunk should appear first (ignored)\n");
             }
-          else if (! strncmp(dargv[i],"Sjbz=",5))
+          else if (GString::ncmp(dargv[i],"Sjbz=",5))
             {
               create_jb2_chunk(iff, "Sjbz", GURL::Filename::UTF8(5+(const char *)dargv[i]));
               if (flag_contains_stencil)
                 DjVuPrintError("%s","djvumake: duplicate stencil chunk\n");
               flag_contains_stencil = 1;
             }
-          else if (! strncmp(dargv[i],"Smmr=",5))
+          else if (GString::ncmp(dargv[i],"Smmr=",5))
             {
               create_mmr_chunk(iff, "Smmr", GURL::Filename::UTF8(5+(const char *)dargv[i]));
               if (flag_contains_stencil)
                 DjVuPrintError("%s","djvumake: duplicate stencil chunk\n");
               flag_contains_stencil = 1;
             }
-          else if (! strncmp(dargv[i],"FG44=",5))
+          else if (GString::ncmp(dargv[i],"FG44=",5))
             {
               if (flag_contains_fg)
                 DjVuPrintError("%s","djvumake: duplicate 'FGxx' chunk\n");
               create_fg44_chunk(iff, "FG44", GURL::Filename::UTF8(5+(const char *)dargv[i]));
             }
-          else if (! strncmp(dargv[i],"BG44=",5))
+          else if (GString::ncmp(dargv[i],"BG44=",5))
             {
               create_bg44_chunk(iff, "BG44", 5+(const char *)dargv[i]);
             }
-          else if (! strncmp(dargv[i],"BGjp=",5) ||
-                   ! strncmp(dargv[i],"BG2k=",5)  )
+          else if (GString::ncmp(dargv[i],"BGjp=",5) ||
+                   GString::ncmp(dargv[i],"BG2k=",5)  )
             {
               if (flag_contains_bg)
                 DjVuPrintError("%s","djvumake: Duplicate BGxx chunk\n");
@@ -672,8 +672,8 @@ main(int argc, char **argv)
               create_raw_chunk(iff, dargv[i], GURL::Filename::UTF8(5+(const char *)dargv[i]));
               flag_contains_bg = 1;
             }
-          else if (! strncmp(dargv[i],"FGjp=",5) ||
-                   ! strncmp(dargv[i],"FG2k=",5)  )
+          else if (GString::ncmp(dargv[i],"FGjp=",5) ||
+                   GString::ncmp(dargv[i],"FG2k=",5)  )
             {
               if (flag_contains_fg)
                 DjVuPrintError("%s","djvumake: duplicate 'FGxx' chunk\n");
@@ -681,12 +681,12 @@ main(int argc, char **argv)
               create_raw_chunk(iff, dargv[i], GURL::Filename::UTF8(5+(const char *)dargv[i]));
               flag_contains_fg = 1;
             }
-          else if (! strncmp(dargv[i],"INCL=",5))
+          else if (GString::ncmp(dargv[i],"INCL=",5))
             {
               create_incl_chunk(iff, "INCL", GURL::Filename::UTF8(5+(const char *)dargv[i]).name());
               flag_contains_incl = 1;
             }
-          else if (! strncmp(dargv[i],"PPM=",4))
+          else if (GString::ncmp(dargv[i],"PPM=",4))
             {
               if (flag_contains_bg || flag_contains_fg)
                 DjVuPrintError("%s","djvumake: Duplicate 'FGxx' or 'BGxx' chunk\n");

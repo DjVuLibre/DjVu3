@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: c44.cpp,v 1.16 2001-04-04 22:12:10 bcr Exp $
+// $Id: c44.cpp,v 1.17 2001-04-06 18:38:31 chrisp Exp $
 // $Name:  $
 
 
@@ -184,7 +184,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: c44.cpp,v 1.16 2001-04-04 22:12:10 bcr Exp $# */
+    #$Id: c44.cpp,v 1.17 2001-04-06 18:38:31 chrisp Exp $# */
 //@{
 //@}
 
@@ -465,7 +465,7 @@ parse(DArray<GString> &argv)
     {
       if (argv[i][0] == '-')
         {
-          if (!strcmp(argv[i],"-bpp"))
+          if (argv[i] == GString("-bpp"))
             {
               if (++i >= argc)
                 G_THROW("c44: no argument for option '-bpp'");
@@ -473,7 +473,7 @@ parse(DArray<GString> &argv)
                 G_THROW("c44: multiple bitrate specification");
               parse_bpp(argv[i]);
             }
-          else if (!strcmp(argv[i],"-size"))
+          else if (argv[i] == GString("-size"))
             {
               if (++i >= argc)
                 G_THROW("c44: no argument for option '-size'");
@@ -481,7 +481,7 @@ parse(DArray<GString> &argv)
                 G_THROW("c44: multiple bitrate specification");
               parse_size(argv[i]);
             }
-          else if (!strcmp(argv[i],"-decibel"))
+          else if (argv[i] == GString("-decibel"))
             {
               if (++i >= argc)
                 G_THROW("c44: no argument for option '-decibel'");
@@ -489,7 +489,7 @@ parse(DArray<GString> &argv)
                 G_THROW("c44: multiple decibel specification");
               parse_decibel(argv[i]);
             }
-          else if (!strcmp(argv[i],"-slice"))
+          else if (argv[i] == GString("-slice"))
             {
               if (++i >= argc)
                 G_THROW("c44: no argument for option '-slice'");
@@ -497,7 +497,7 @@ parse(DArray<GString> &argv)
                 G_THROW("c44: multiple slice specification");
               parse_slice(argv[i]);
             }
-          else if (!strcmp(argv[i],"-mask"))
+          else if (argv[i] == GString("-mask"))
             {
               if (++i >= argc)
                 G_THROW("c44: no argument for option '-mask'");
@@ -505,7 +505,7 @@ parse(DArray<GString> &argv)
                 G_THROW("c44: multiple mask specification");
               mskurl = GURL::Filename::UTF8(argv[i]);
             }
-          else if (!strcmp(argv[i],"-dbfrac"))
+          else if (argv[i] == GString("-dbfrac"))
             {
               if (++i >= argc)
                 G_THROW("c44: no argument for option '-dbfrac'");
@@ -516,35 +516,35 @@ parse(DArray<GString> &argv)
               if (flag_dbfrac<=0 || flag_dbfrac>1 || *ptr)
                 G_THROW("c44: illegal dbfrac specification");
             }
-          else if (!strcmp(argv[i],"-crcbnone"))
+          else if (argv[i] == GString("-crcbnone"))
             {
               if (flag_crcbmode>=0 || flag_crcbdelay>=0)
                 G_THROW("c44: incompatible chrominance options");
               flag_crcbdelay = flag_crcbmode = 0;
               arg_crcbmode = IW44Image::CRCBnone;
             }
-          else if (!strcmp(argv[i],"-crcbhalf"))
+          else if (argv[i] == GString("-crcbhalf"))
             {
               if (flag_crcbmode>=0)
                 G_THROW("c44: incompatible chrominance options");
               flag_crcbmode = 0;
               arg_crcbmode = IW44Image::CRCBhalf;
             }
-          else if (!strcmp(argv[i],"-crcbnormal"))
+          else if (argv[i] == GString("-crcbnormal"))
             {
               if (flag_crcbmode>=0)
                 G_THROW("c44: incompatible chrominance options");
               flag_crcbmode = 0;
               arg_crcbmode = IW44Image::CRCBnormal;
             }
-          else if (!strcmp(argv[i],"-crcbfull"))
+          else if (argv[i] == GString("-crcbfull"))
             {
               if (flag_crcbmode>=0 || flag_crcbdelay>=0)
                 G_THROW("c44: incompatible chrominance options");
               flag_crcbdelay = flag_crcbmode = 0;
               arg_crcbmode = IW44Image::CRCBfull;
             }
-          else if (!strcmp(argv[i],"-crcbdelay"))
+          else if (argv[i] == GString("-crcbdelay"))
             {
               if (++i >= argc)
                 G_THROW("c44: no argument for option '-crcbdelay'");
@@ -555,7 +555,7 @@ parse(DArray<GString> &argv)
               if (*ptr || flag_crcbdelay<0 || flag_crcbdelay>=100)
                 G_THROW("c44: illegal argument for option '-crcbdelay'");
             }
-          else if (!strcmp(argv[i],"-dpi"))
+          else if (argv[i] == GString("-dpi"))
             {
               if (++i >= argc)
                 G_THROW("c44: no argument for option '-dpi'");
@@ -566,7 +566,7 @@ parse(DArray<GString> &argv)
               if (*ptr || flag_dpi<25 || flag_dpi>4800)
                 G_THROW("c44: illegal argument for option '-dpi'");
             }
-          else if (!strcmp(argv[i],"-gamma"))
+          else if (argv[i] == GString("-gamma"))
             {
               if (++i >= argc)
                 G_THROW("c44: no argument for option '-gamma'");
@@ -691,13 +691,13 @@ main(int argc, char **argv)
           h = ibm.rows();
           iw = IW44Image::create_encode(ibm, getmask(w,h));
         }
-      else if (!strncmp(prefix,"AT&TFORM",8) || !strncmp(prefix,"FORM",4))
+      else if (GString::ncmp(prefix,"AT&TFORM",8) || GString::ncmp(prefix,"FORM",4))
         {
           char *s = (prefix[0]=='F' ? prefix+8 : prefix+12);
           GP<IFFByteStream> giff=IFFByteStream::create(gibs);
           IFFByteStream &iff=*giff;
-          const bool color=!strncmp(s,"PM44",4);
-          if (color || !strncmp(s,"BM44",4))
+          const bool color=GString::ncmp(s,"PM44",4);
+          if (color || GString::ncmp(s,"BM44",4))
             {
               iw = IW44Image::create_encode(IW44Image::COLOR);
               iw->decode_iff(iff);

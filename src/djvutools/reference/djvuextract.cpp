@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djvuextract.cpp,v 1.14 2001-04-04 22:12:10 bcr Exp $
+// $Id: djvuextract.cpp,v 1.15 2001-04-06 18:38:31 chrisp Exp $
 // $Name:  $
 
 /** @name djvuextract
@@ -65,7 +65,7 @@
     @memo
     Extract components from DjVu files.
     @version
-    #$Id: djvuextract.cpp,v 1.14 2001-04-04 22:12:10 bcr Exp $#
+    #$Id: djvuextract.cpp,v 1.15 2001-04-06 18:38:31 chrisp Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> - Initial implementation\\
     Andrei Erofeev <eaf@geocities.com> - Multipage support */
@@ -143,7 +143,7 @@ extract_chunk(GP<ByteStream> ibs, const char *id, GP<ByteStream> out)
   
 
   // Special case for FG44 and BG44
-  if (!strcmp(id,"BG44") || !strcmp(id,"FG44"))
+  if (id == GString("BG44") || id == GString("FG44"))
     {
       // Rebuild IW44 file
       GP<IFFByteStream> giffout=IFFByteStream::create(out);
@@ -217,7 +217,7 @@ main(int argc, char **argv)
       // Process page number
       int page_num=0;
       for(i=1;i<argc;i++)
-	 if (!strncmp(dargv[i], "-page=", 6))
+	 if (GString::ncmp(dargv[i], "-page=", 6))
            {
              page_num = atoi(6+(const char *)dargv[i]) - 1;
              for(int j=i;j<argc-1;j++) 

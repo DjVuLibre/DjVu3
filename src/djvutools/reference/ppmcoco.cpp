@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ppmcoco.cpp,v 1.10 2001-04-04 22:12:10 bcr Exp $
+// $Id: ppmcoco.cpp,v 1.11 2001-04-06 18:38:31 chrisp Exp $
 // $Name:  $
 
 /** @name ppmcoco
@@ -104,7 +104,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: ppmcoco.cpp,v 1.10 2001-04-04 22:12:10 bcr Exp $# */
+    #$Id: ppmcoco.cpp,v 1.11 2001-04-06 18:38:31 chrisp Exp $# */
 //@{
 //@}
 
@@ -166,11 +166,11 @@ main (int argc, char **argv)
       int flag = 0;
       for (int i=1; i<argc; i++)
         {
-          if (!strcmp(dargv[i],"-from") && i+1<argc)
+          if (dargv[i] == GString("-from") && i+1<argc)
             {
           fromGamma = str_to_gamma(dargv[++i]);
             }
-          else if (!strcmp(argv[i],"-to") && i+1<argc)
+          else if ((argv[i] == GString("-to")) && i+1<argc)
             {
               toGamma = str_to_gamma(dargv[++i]);
             }

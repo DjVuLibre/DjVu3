@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djvmcvt.cpp,v 1.12 2001-04-04 22:12:10 bcr Exp $
+// $Id: djvmcvt.cpp,v 1.13 2001-04-06 18:38:31 chrisp Exp $
 // $Name:  $
 
 /** @name djvmcvt
@@ -106,7 +106,7 @@
     @author
     Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: djvmcvt.cpp,v 1.12 2001-04-04 22:12:10 bcr Exp $# */
+    #$Id: djvmcvt.cpp,v 1.13 2001-04-06 18:38:31 chrisp Exp $# */
 
 #ifdef __GNUC__
 #pragma implementation
@@ -186,8 +186,8 @@ main(int argc, char ** argv)
 
    bool bundled=true;
    G_TRY {
-      if (!strncmp(dargv[1], "-b", 2)) bundled=true;
-      else if (!strncmp(dargv[1], "-i", 2)) bundled=false;
+      if (GString::ncmp(dargv[1], "-b", 2)) bundled=true;
+      else if (GString::ncmp(dargv[1], "-i", 2)) bundled=false;
       else { Usage(); exit(1); }
 
       if (bundled) do_bundled(dargv);

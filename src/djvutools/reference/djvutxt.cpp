@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djvutxt.cpp,v 1.14 2001-04-04 22:12:10 bcr Exp $
+// $Id: djvutxt.cpp,v 1.15 2001-04-06 18:38:31 chrisp Exp $
 // $Name:  $
 
 // DJVUTXT -- DjVu TXT extractor
@@ -69,7 +69,7 @@
     @author
     Andrei Erofeev <eaf@geocities.com> -- initial implementation
     @version
-    #$Id: djvutxt.cpp,v 1.14 2001-04-04 22:12:10 bcr Exp $# */
+    #$Id: djvutxt.cpp,v 1.15 2001-04-06 18:38:31 chrisp Exp $# */
 //@{
 //@}
 
@@ -158,11 +158,11 @@ main(int argc, char ** argv)
 
       for(int i=1;i<argc;i++)
       {
-	 if (!strcmp(dargv[i], "-") || dargv[i][0]!='-')
+	 if ( (dargv[i] == GString("-")) || dargv[i][0]!='-')
 	 {
 	    if (!name_in.length())
 	    {
-	       if (!strcmp(dargv[i], "-"))
+	       if (dargv[i] == GString( "-"))
 	       {
 		  DjVuPrintError("%s","Can't read from standard input.\n\n");
 		  usage();
@@ -182,7 +182,7 @@ main(int argc, char ** argv)
 	 {
 	    if (dargv[i][0]=='-' && dargv[i][1]=='-')
 	       dargv[i]=1+(const char *)dargv[i];
-	    if (!strcmp(dargv[i], "--page"))
+	    if (dargv[i] == GString("--page"))
 	    {
 	       if (i+1>=argc)
 	       {
@@ -198,7 +198,7 @@ main(int argc, char ** argv)
 		  usage();
 		  exit(1);
 	       }
-	    } else if (!strcmp(dargv[i], "--help"))
+	    } else if (dargv[i] == GString("--help"))
 	    {
 	       usage();
 	       exit(1);

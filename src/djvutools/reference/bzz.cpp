@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: bzz.cpp,v 1.14 2001-04-04 22:12:10 bcr Exp $
+// $Id: bzz.cpp,v 1.15 2001-04-06 18:38:31 chrisp Exp $
 // $Name:  $
 
 
@@ -58,7 +58,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation
     @version
-    $Id: bzz.cpp,v 1.14 2001-04-04 22:12:10 bcr Exp $ */
+    $Id: bzz.cpp,v 1.15 2001-04-06 18:38:31 chrisp Exp $ */
 //@{
 //@}
 
@@ -100,9 +100,9 @@ main(int argc, char **argv)
       program=dargv[0]=GOS::basename(dargv[0]);
       // Obtain default mode from program name
       int blocksize = -1;
-      if (!strcmp(program,"bzz"))
+      if (program == GString("bzz"))
         blocksize = 1100;
-      else if (!strcmp(program,"unbzz"))
+      else if (program == GString("unbzz"))
         blocksize = 0;
       // Parse arguments
       if (argc>=2 && dargv[1][0]=='-')

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djthumb.cpp,v 1.11 2001-04-04 22:12:10 bcr Exp $
+// $Id: djthumb.cpp,v 1.12 2001-04-06 18:38:31 chrisp Exp $
 // $Name:  $
 
 // DJTHUMB -- DjVu thumbnails generator
@@ -68,7 +68,7 @@
     @author
     Andrei Erofeev <eaf@geocities.com> -- initial implementation
     @version
-    #$Id: djthumb.cpp,v 1.11 2001-04-04 22:12:10 bcr Exp $# */
+    #$Id: djthumb.cpp,v 1.12 2001-04-06 18:38:31 chrisp Exp $# */
 //@{
 //@}
 
@@ -157,8 +157,8 @@ main(int argc, char ** argv)
 	    if (!name_in.length()) name_in=dargv[i];
 	    else if (!name_out.length()) name_out=dargv[i];
 	    else DjVuPrintError("Unexpected string '%s' ignored.\n", (const char *)dargv[i]);
-	 } else if (!strncmp(dargv[i], "-v", 2)) verbose=true;
-	 else if (!strncmp(dargv[i], "-s", 2))
+	 } else if (GString::ncmp(dargv[i], "-v", 2)) verbose=true;
+	 else if (GString::ncmp(dargv[i], "-s", 2))
 	 {
 	    if (++i<argc)
 	    {

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ddjvu.cpp,v 1.13 2001-04-04 22:12:10 bcr Exp $
+// $Id: ddjvu.cpp,v 1.14 2001-04-06 18:38:31 chrisp Exp $
 // $Name:  $
 
 /** @name ddjvu
@@ -111,7 +111,7 @@
     Yann Le Cun <yann@research.att.com>\\
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: ddjvu.cpp,v 1.13 2001-04-04 22:12:10 bcr Exp $# */
+    #$Id: ddjvu.cpp,v 1.14 2001-04-06 18:38:31 chrisp Exp $# */
 //@{
 //@}
 
@@ -347,11 +347,11 @@ main(int argc, char **argv)
       while (argc>1 && dargv[1][0]=='-' && dargv[1][1])
         {
           const char *s = dargv[1];
-          if (!strcmp(dargv[1],"-v"))
+          if (dargv[1] == GString("-v"))
             {
               flag_verbose = 1;
             }
-          else if (!strcmp(s,"-scale"))
+          else if (s == GString("-scale"))
             {
               if (argc<=2)
                 G_THROW("No argument for option '-scale'");
@@ -364,7 +364,7 @@ main(int argc, char **argv)
               if (*s)
                 G_THROW("Illegal argument for option '-scale'");
             }
-          else if (! strcmp(s,"-size"))
+          else if ( s == GString("-size"))
             {
               if (argc<=2)
                 G_THROW("No argument for option '-size'");
@@ -376,7 +376,7 @@ main(int argc, char **argv)
               if (fullrect.xmin || fullrect.ymin)
                 G_THROW("Illegal size specification");
             }
-          else if (! strcmp(s,"-segment"))
+          else if (s == GString("-segment"))
             {
               if (argc<=2)
                 G_THROW("No argument for option '-segment'");
@@ -386,25 +386,25 @@ main(int argc, char **argv)
               geometry(s, segmentrect);
               flag_segment = 1;
             }
-          else if (! strcmp(s,"-black"))
+          else if (s == GString("-black"))
             {
               if (flag_mode)
                 G_THROW("Duplicate rendering mode specification");
               flag_mode = 's';
             }
-          else if (! strcmp(s,"-foreground"))
+          else if (s == GString("-foreground"))
             {
               if (flag_mode)
                 G_THROW("Duplicate rendering mode specification");
               flag_mode = 'f';
             }
-          else if (! strcmp(s,"-background"))
+          else if (s == GString("-background"))
             {
               if (flag_mode)
                 G_THROW("Duplicate rendering mode specification");
               flag_mode = 'b';
             }
-	  else if (! strcmp(s,"-page"))
+	  else if (s == GString("-page"))
 	    {
 	      if (argc<=2)
                 G_THROW("No argument for option '-page'");
