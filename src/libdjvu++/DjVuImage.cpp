@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuImage.cpp,v 1.72 2001-04-20 17:53:19 bcr Exp $
+// $Id: DjVuImage.cpp,v 1.73 2001-04-21 23:22:04 mchen Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -393,7 +393,7 @@ DjVuImage::get_long_description() const
 }
 
 void
-DjVuImage::notify_chunk_done(const DjVuPort *, const char * name)
+DjVuImage::notify_chunk_done(const DjVuPort *, const GUTF8String & name)
 {
    if (!relayout_sent &&
      ( GUTF8String::ncmp("INFO",name, 4) ||
@@ -427,7 +427,7 @@ class DjVuImageNotifier : public DjVuPort
 public:
   DjVuImageNotifier(DjVuInterface *notifier);
   GP<DataPool> request_data(const DjVuPort *src, const GURL & url);
-  void notify_chunk_done(const DjVuPort *, const char *);
+  void notify_chunk_done(const DjVuPort *, const GUTF8String &name);
   void notify_redisplay(const class DjVuImage * source);
   void notify_relayout(const class DjVuImage * source);
 };
@@ -460,7 +460,7 @@ DjVuImageNotifier::notify_relayout(const class DjVuImage * source)
 }
 
 void 
-DjVuImageNotifier::notify_chunk_done(const DjVuPort *, const char *name)
+DjVuImageNotifier::notify_chunk_done(const DjVuPort *, const GUTF8String &name)
 {
   if (notifier)
     notifier->notify_chunk(name, "" );

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuErrorList.cpp,v 1.13 2001-04-12 00:24:59 bcr Exp $
+// $Id: DjVuErrorList.cpp,v 1.14 2001-04-21 23:22:04 mchen Exp $
 // $Name:  $
 
 
@@ -61,14 +61,14 @@ DjVuErrorList::set_stream(GP<ByteStream> xibs)
 }
 
 bool
-DjVuErrorList::notify_error(const DjVuPort * source, const char * msg)
+DjVuErrorList::notify_error(const DjVuPort * source, const GUTF8String & msg)
 {
   Errors.append(msg);
   return 1;
 }
 
 bool
-DjVuErrorList::notify_status(const DjVuPort * source, const char * msg)
+DjVuErrorList::notify_status(const DjVuPort * source, const GUTF8String &msg)
 {
   Status.append(msg);
   return 1;

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuErrorList.h,v 1.16 2001-04-12 00:24:59 bcr Exp $
+// $Id: DjVuErrorList.h,v 1.17 2001-04-21 23:22:04 mchen Exp $
 // $Name:  $
 
 #ifndef _DJVUERRORLIST_H
@@ -50,7 +50,7 @@ class ByteStream;
 
     @memo DjVuErrorList class.
     @author Bill C Riemers <bcr@lizardtech.com>
-    @version #$Id: DjVuErrorList.h,v 1.16 2001-04-12 00:24:59 bcr Exp $#
+    @version #$Id: DjVuErrorList.h,v 1.17 2001-04-21 23:22:04 mchen Exp $#
 */
 
 //@{
@@ -71,10 +71,10 @@ public:
   GURL set_stream(GP<ByteStream>);
 
      /// Append all error messages to the list
-  virtual bool notify_error(const DjVuPort * source, const char * msg);
+  virtual bool notify_error(const DjVuPort * source, const GUTF8String & msg);
 
      /// Append all status messages to the list
-  virtual bool notify_status(const DjVuPort * source, const char * msg);
+  virtual bool notify_status(const DjVuPort * source, const GUTF8String & msg);
 
      /// Add a new class to have its messages redirected here.
   inline void connect( const DjVuPort &port);

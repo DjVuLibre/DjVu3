@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuImage.h,v 1.42 2001-04-12 00:24:59 bcr Exp $
+// $Id: DjVuImage.h,v 1.43 2001-04-21 23:22:04 mchen Exp $
 // $Name:  $
 
 #ifndef _DJVUIMAGE_H
@@ -73,7 +73,7 @@
     L\'eon Bottou <leonb@research.att.com> - initial implementation
     Andrei Erofeev <eaf@geocities.com> - multipage support
     @version
-    #$Id: DjVuImage.h,v 1.42 2001-04-12 00:24:59 bcr Exp $# */
+    #$Id: DjVuImage.h,v 1.43 2001-04-21 23:22:04 mchen Exp $# */
 //@{
 
 
@@ -356,7 +356,7 @@ public:
   //@}
 
   // Inherited from DjVuPort.
-  virtual void notify_chunk_done(const DjVuPort *, const char *name);
+  virtual void notify_chunk_done(const DjVuPort *, const GUTF8String &name);
 
   // SUPERSEDED
   GP<GPixmap>  get_pixmap(const GRect &rect, int subs=1, double gamma=0) const;
