@@ -1,7 +1,7 @@
 //C-  -*- C++ -*-
 //C- DjVu® Reference Library (v. 3.0)
 //C- 
-//C- Copyright © 1999-2000 LizardTech, Inc. All Rights Reserved.
+//C- Copyright © 1999-2001 LizardTech, Inc. All Rights Reserved.
 //C- The DjVu Reference Library is protected by U.S. Pat. No.
 //C- 6,058,214 and patents pending.
 //C- 
@@ -29,9 +29,8 @@
 //C- OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
-//C- 
 // 
-// $Id: DjVuDocument.h,v 1.72 2000-12-18 17:13:41 bcr Exp $
+// $Id: DjVuDocument.h,v 1.73 2001-01-04 22:04:54 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUDOCUMENT_H
@@ -59,7 +58,7 @@ class ByteStream;
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocument.h,v 1.72 2000-12-18 17:13:41 bcr Exp $#
+    @version #$Id: DjVuDocument.h,v 1.73 2001-01-04 22:04:54 bcr Exp $#
 */
 
 //@{

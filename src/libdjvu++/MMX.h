@@ -1,7 +1,7 @@
 //C-  -*- C++ -*-
 //C- DjVu® Reference Library (v. 3.0)
 //C- 
-//C- Copyright © 1999-2000 LizardTech, Inc. All Rights Reserved.
+//C- Copyright © 1999-2001 LizardTech, Inc. All Rights Reserved.
 //C- The DjVu Reference Library is protected by U.S. Pat. No.
 //C- 6,058,214 and patents pending.
 //C- 
@@ -29,9 +29,8 @@
 //C- OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
-//C- 
 // 
-// $Id: MMX.h,v 1.13 2000-11-09 20:15:08 jmw Exp $
+// $Id: MMX.h,v 1.14 2001-01-04 22:04:55 bcr Exp $
 // $Name:  $
 
 #ifndef _MMX_H_
@@ -72,7 +71,7 @@
     @memo
     Essential support for MMX.
     @version 
-    #$Id: MMX.h,v 1.13 2000-11-09 20:15:08 jmw Exp $#
+    #$Id: MMX.h,v 1.14 2001-01-04 22:04:55 bcr Exp $#
     @author: 
     L\'eon Bottou <leonb@research.att.com> -- initial implementation */
 //@{

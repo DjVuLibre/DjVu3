@@ -1,7 +1,7 @@
 //C-  -*- C++ -*-
 //C- DjVu® Reference Library (v. 3.0)
 //C- 
-//C- Copyright © 1998-2000 LizardTech, Inc. All Rights Reserved.
+//C- Copyright © 1998-2001 LizardTech, Inc. All Rights Reserved.
 //C- The DjVu Reference Library is protected by U.S. Pat. No.
 //C- 6,058,214 and patents pending.
 //C- 
@@ -29,9 +29,8 @@
 //C- OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
-//C- 
 // 
-// $Id: IFFByteStream.cpp,v 1.21 2001-01-03 20:08:35 bcr Exp $
+// $Id: IFFByteStream.cpp,v 1.22 2001-01-04 22:04:55 bcr Exp $
 // $Name:  $
 
 // -- Implementation of IFFByteStream

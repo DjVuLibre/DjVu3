@@ -1,7 +1,7 @@
 //C-  -*- C++ -*-
 //C- DjVu® Reference Library (v. 3.0)
 //C- 
-//C- Copyright © 1999-2000 LizardTech, Inc. All Rights Reserved.
+//C- Copyright © 1999-2001 LizardTech, Inc. All Rights Reserved.
 //C- The DjVu Reference Library is protected by U.S. Pat. No.
 //C- 6,058,214 and patents pending.
 //C- 
@@ -29,9 +29,8 @@
 //C- OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
-//C- 
 // 
-// $Id: DjVuFile.h,v 1.70 2001-01-03 19:56:08 bcr Exp $
+// $Id: DjVuFile.h,v 1.71 2001-01-04 22:04:55 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUFILE_H
@@ -72,7 +71,7 @@ class DjVuNavDir;
 
     @memo Classes representing DjVu files.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuFile.h,v 1.70 2001-01-03 19:56:08 bcr Exp $#
+    @version #$Id: DjVuFile.h,v 1.71 2001-01-04 22:04:55 bcr Exp $#
 */
 
 //@{

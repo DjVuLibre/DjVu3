@@ -1,7 +1,7 @@
 //C-  -*- C++ -*-
 //C- DjVu® Reference Library (v. 3.0)
 //C- 
-//C- Copyright © 1999-2000 LizardTech, Inc. All Rights Reserved.
+//C- Copyright © 1999-2001 LizardTech, Inc. All Rights Reserved.
 //C- The DjVu Reference Library is protected by U.S. Pat. No.
 //C- 6,058,214 and patents pending.
 //C- 
@@ -29,9 +29,8 @@
 //C- OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
-//C- 
 // 
-// $Id: GURL.h,v 1.31 2000-11-09 20:15:07 jmw Exp $
+// $Id: GURL.h,v 1.32 2001-01-04 22:04:55 bcr Exp $
 // $Name:  $
 
 #ifndef _GURL_H_
@@ -50,7 +49,7 @@
     \Ref{GURL} class used to store URLs in a system independent format.
     @memo System independent URL representation.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: GURL.h,v 1.31 2000-11-09 20:15:07 jmw Exp $#
+    @version #$Id: GURL.h,v 1.32 2001-01-04 22:04:55 bcr Exp $#
 */
 
 //@{

@@ -1,7 +1,7 @@
 //C-  -*- C++ -*-
 //C- DjVu® Reference Library (v. 3.0)
 //C- 
-//C- Copyright © 1999-2000 LizardTech, Inc. All Rights Reserved.
+//C- Copyright © 1999-2001 LizardTech, Inc. All Rights Reserved.
 //C- The DjVu Reference Library is protected by U.S. Pat. No.
 //C- 6,058,214 and patents pending.
 //C- 
@@ -29,9 +29,8 @@
 //C- OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
-//C- 
 // 
-// $Id: JB2Image.h,v 1.28 2000-12-22 01:58:34 bcr Exp $
+// $Id: JB2Image.h,v 1.29 2001-01-04 22:04:55 bcr Exp $
 // $Name:  $
 
 #ifndef _JB2IMAGE_H
@@ -130,7 +129,7 @@
     \end{itemize}
 
     @version
-    #$Id: JB2Image.h,v 1.28 2000-12-22 01:58:34 bcr Exp $#
+    #$Id: JB2Image.h,v 1.29 2001-01-04 22:04:55 bcr Exp $#
     @memo
     Coding bilevel images with JB2.
     @author

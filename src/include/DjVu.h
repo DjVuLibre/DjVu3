@@ -1,7 +1,7 @@
 /*
  *C- DjVu® Reference Library (v. 3.0)
  *C- 
- *C- Copyright © 2000 LizardTech, Inc. All Rights Reserved.
+ *C- Copyright © 2000-2001 LizardTech, Inc. All Rights Reserved.
  *C- The DjVu Reference Library is protected by U.S. Pat. No.
  *C- 6,058,214 and patents pending.
  *C- 
@@ -29,9 +29,8 @@
  *C- OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
  *C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
  *C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- *C- 
  * 
- * $Id: DjVu.h,v 1.19 2000-11-09 20:15:05 jmw Exp $
+ * $Id: DjVu.h,v 1.20 2001-01-04 22:04:54 bcr Exp $
  */
 
 /*C-  -*- C -*-
@@ -53,7 +52,10 @@
 
 /*
  * $Log: DjVu.h,v $
- * Revision 1.19  2000-11-09 20:15:05  jmw
+ * Revision 1.20  2001-01-04 22:04:54  bcr
+ * Update of copyright date.
+ *
+ * Revision 1.19  2000/11/09 20:15:05  jmw
  *
  * Purpose: Update CopyRight notice as per Erik Adams
  *
