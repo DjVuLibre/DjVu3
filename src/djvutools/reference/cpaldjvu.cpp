@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: cpaldjvu.cpp,v 1.25 2001-07-24 17:52:03 bcr Exp $
+// $Id: cpaldjvu.cpp,v 1.26 2001-08-29 18:05:34 docbill Exp $
 // $Name:  $
 
 
@@ -69,7 +69,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: cpaldjvu.cpp,v 1.25 2001-07-24 17:52:03 bcr Exp $# */
+    #$Id: cpaldjvu.cpp,v 1.26 2001-08-29 18:05:34 docbill Exp $# */
 //@{
 //@}
 
@@ -91,11 +91,20 @@
 #include "DjVuMessage.h"
 #include <locale.h>
 #include <stdlib.h>
+#include <math.h>
 
+#ifdef MIN
 #undef MIN
+#endif
+#ifdef MAX
 #undef MAX
+#endif
 inline int MIN(int a, int b) { return ( a<b ?a :b); }
 inline int MAX(int a, int b) { return ( a>b ?a :b); }
+
+static const double cpuspeed=535e6;
+static const double dtimefactor=cpuspeed*(1e-16);
+static const double dsizefactor=2.2;
 
 
 
@@ -751,19 +760,55 @@ cpaldjvu(const GPixmap &input, GURL &urlout, const cpaldjvuopts &opts)
                      bgcolor.r, bgcolor.g, bgcolor.b);
 
   // Fill CCImage with color runs
+  int xruncount=0,yruncount=0;
   CCImage rimg(w, h);
+  int *line;
+  GPBuffer<int> gline(line,w);
+  int *prevline;
+  GPBuffer<int> gprevline(prevline,w);
+  for (int x=0;x<w;x++)
+  {
+    prevline[x]=bgindex;
+  }
   for (int y=0; y<h; y++)
     {
-      int x = 0;
+      int x;
       const GPixel *row = input[y];
-      while (x<w)
+      for(x=0;x<w;x++)
+        {
+          line[x]=pal.color_to_index(row[x]);
+        }
+      for(x=0;x<w;)
         {
           int x1 = x;
-          int index = pal.color_to_index(row[x++]);
-          while (x<w && pal.color_to_index(row[x])==index) { x++; }
+          int index = line[x++];
+          while (x<w && line[x]==index) { x++; }
           if (index != bgindex)
+          {
+            xruncount++;
             rimg.add_single_run(y, x1, x-1, index);
+          }
         }
+      for(x=0;x<w;x++)
+        if(prevline[x] != line[x]) yruncount++;
+      gprevline.swap(gline);
+    }
+    if(xruncount && yruncount)
+    {
+      const double dyruncount=(double)yruncount;
+      const double dxruncount=(double)xruncount;
+      const double dpixsize=(double)(w*h+w);
+      double xd=dpixsize/dxruncount;
+      double xdd=xd/dsizefactor;
+      double xs=dxruncount/(xdd-log(xdd));
+      double yd=dpixsize/dyruncount;
+      double ydd=yd/dsizefactor;
+      double ys=dyruncount/(ydd-log(ydd));
+      unsigned int s=(unsigned int)((xs+ys)*(double)0.5);
+      int t=(int)((dpixsize*dtimefactor*xs+dpixsize*dtimefactor*ys)*(double)0.5);
+      if (opts.verbose)
+        DjVuPrintErrorUTF8("cpaldjvu: predict: Time: %u:%02u.%02u Size: %u\n"
+          ,t/6000,(t/100)%60,t%100,s);
     }
   if (opts.verbose)
     DjVuFormatErrorUTF8( "%s\t%d", ERR_MSG("cpaldjvu.color_runs"), rimg.runs.size());
@@ -956,8 +1001,4 @@ main(int argc, const char **argv)
   G_ENDCATCH;
   return 0;
 }
-
-
-
-
 
