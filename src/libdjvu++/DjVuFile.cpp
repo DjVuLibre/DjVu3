@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.117 2000-02-16 07:38:19 bcr Exp $
+//C- $Id: DjVuFile.cpp,v 1.118 2000-02-18 19:31:52 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -792,7 +792,9 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
       // ---- end hack
       fgjb->decode(iff, static_get_fgjd, (void*)this);
       DjVuFile::fgjb = fgjb;
-      desc.format("JB2 foreground mask (%dx%d)", fgjb->get_width(), fgjb->get_height());
+      desc.format("JB2 foreground mask (%dx%d, %d dpi)",
+		  fgjb->get_width(), fgjb->get_height(),
+		  get_dpi(fgjb->get_width(), fgjb->get_height()));
     }
  
   // Smmr (MMR-G4 encoded mask)
@@ -801,7 +803,9 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
       if (DjVuFile::fgjb)
         THROW("DjVu Decoder: Corrupted data (Duplicate Sxxx chunk)");
       DjVuFile::fgjb = MMRDecoder::decode(iff);
-      desc.format("G4/MMR encoded mask (%dx%d)", fgjb->get_width(), fgjb->get_height());
+      desc.format("G4/MMR encoded mask (%dx%d, %d dpi)",
+		  fgjb->get_width(), fgjb->get_height(),
+		  get_dpi(fgjb->get_width(), fgjb->get_height()));
     }
   
   // BG44 (background wavelets)
@@ -1053,11 +1057,12 @@ DjVuFile::decode(ByteStream & str)
      {
        GString desc;
        if (djvu || djvi)
-         desc.format("DJVU Image (%dx%d) version %d:\n\n", 
-                     info->width, info->height, info->version);
+         desc.format("DJVU Image (%dx%d, %d dpi) version %d:\n\n", 
+                     info->width, info->height,
+		     info->dpi, info->version);
        else if (iw44)
-         desc.format("IW44 Image (%dx%d) :\n\n", 
-                     info->width, info->height);
+         desc.format("IW44 Image (%dx%d, %d dpi) :\n\n", 
+                     info->width, info->height, info->dpi);
        description=desc+description;
        int rawsize=info->width*info->height*3;
        desc.format("\nCompression ratio: %0.f (%0.1f Kb)\n",
