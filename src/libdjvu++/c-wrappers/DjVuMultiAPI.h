@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuMultiAPI.h,v 1.14 2000-01-22 07:10:14 bcr Exp $
+ *C- $Id: DjVuMultiAPI.h,v 1.15 2000-01-24 21:30:44 parag Exp $
  */
 
 
@@ -28,7 +28,10 @@
 
 /* 
  * $Log: DjVuMultiAPI.h,v $
- * Revision 1.14  2000-01-22 07:10:14  bcr
+ * Revision 1.15  2000-01-24 21:30:44  parag
+ * "C" compatibility added
+ *
+ * Revision 1.14  2000/01/22 07:10:14  bcr
  * Fixed serious bug in djvutobitonal, with all output being bogus.  Fixed the
  * page ranges in PhotoToDjVu and DjVuToPhoto.  Updated comments.
  *
@@ -109,7 +112,7 @@ extern "C" {
     Each field somehow corresponds to one of the command line options of the
     corresponding utility program(s).
  */
-struct djvu_combine_options
+typedef struct djvu_combine_options_struct
 {
   /** Size of the option structure.
       This field should be set to the value #sizeof(djvu_combine_options)# */
@@ -168,7 +171,7 @@ struct djvu_combine_options
       Function \Ref{djvu_combine_options_alloc} properly initialises this field.  
       Do not modify it. */
   void *priv;
-};
+} djvu_combine_options;
 
 
 /** Allocates an instance of #djvu_combine_options#.
