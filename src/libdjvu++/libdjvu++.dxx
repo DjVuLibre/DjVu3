@@ -345,7 +345,6 @@
       GP<DjVuImage> dimg = doc->get_page(2);
       if (! dimg->wait_for_complete_decode() )
         THROW("A decoding error has occured");
-
     \end{verbatim}
 
     Note: When the reference library is compiled without threads, both functions
@@ -444,44 +443,34 @@
     skip chunks whose identifier is not recognized.  This mechanism
     provides a backward compatible way to extend the initial format by
     allocating new chunk identifiers. 
-
-    Starting with version 20, DjVu files may include other files by
-    means of #INCL# chunks.  After recognizing such chunks, the
-    decoder should open the specified file and start decoding it
-    possibly in another thread (if threads have been enabled at
-    compilation time). */
+*/
 //@{
 
 /** @name DjVu Image Files
 
-    
     {\bf Photo DjVu Image} --- Photo DjVu Image files are best used for
     encoding photographic images in colors or in shades of gray.  The data
     compression model relies on the IW44 wavelet representation.  This format
     is designed such that the IW44 decoder is able to quickly perform
     progressive rendering of any image segment using only a small amount of
-    memory.
-
-    Photo DjVu files are composed of a single #"FORM:DJVU"# composite chunk.
-    This composite chunk always begins with one #"INFO"# chunk describing the
-    image size and resolution (see \Ref{DjVuInfo}).  One or more additional
-    #"BG44"# chunks contains the image data encoded with the IW44
-    representation (see \Ref{IWPixmap} or \Ref{IWBitmap}).  The image size
-    specified in the #"INFO"# chunk and the image size specified in the IW44
-    data must be equal.
+    memory.  Photo DjVu files are composed of a single #"FORM:DJVU"# composite
+    chunk.  This composite chunk always begins with one #"INFO"# chunk
+    describing the image size and resolution (see \Ref{DjVuInfo.h}).  One or
+    more additional #"BG44"# chunks contains the image data encoded with the
+    IW44 representation (see \Ref{IWImage.h}).  The image size specified in
+    the #"INFO"# chunk and the image size specified in the IW44 data must be
+    equal.
 
     {\bf Bilevel DjVu Image} --- Bilevel DjVu Image files are used to compress
-    black and white images representing text and simple drawings.  Heavily
-    dithered bilevel images are best encoded using Compound DjVu Images.  The
+    black and white images representing text and simple drawings.   The
     JB2 data compression model uses the soft pattern matching technique, which
     essentially consists of encoding each character by describing how it
-    differs from a well chosen already encoded character.
-
-    Bilevel DjVu Files are composed of a single #"FORM:DJVU"# composite chunk.
-    This composite chunk always begins with one #"INFO"# chunk describing the
-    image size and resolution (see \Ref{DjVuInfo}).  An additional #"Sjbz"#
-    chunk contains the bilevel data encoded with the JB2 representation (see
-    \Ref{JB2Image}).  The image size specified in the #"INFO"# chunk and the
+    differs from a well chosen already encoded character.  Bilevel DjVu Files
+    are composed of a single #"FORM:DJVU"# composite chunk.  This composite
+    chunk always begins with one #"INFO"# chunk describing the image size and
+    resolution (see \Ref{DjVuInfo.h}).  An additional #"Sjbz"# chunk contains
+    the bilevel data encoded with the JB2 representation (see
+    \Ref{JB2Image.h}).  The image size specified in the #"INFO"# chunk and the
     image size specified in the JB2 data must be equal.
 
     {\bf Compound DjVu Image} --- Compound DjVu Files are an extremely
@@ -490,41 +479,83 @@
     DjVu Files represent the document images using two layers.  The {\em
     background layer} is used for encoding the pictures and the paper texture.
     The {\em foreground layer} is used for encoding the text and the drawings.
-      
     Compound DjVu Files are composed of a single #"FORM:DJVU"# composite
     chunk.  This composite chunk always begins with one #"INFO"# chunk
     describing the size and the resolution of the image (see \Ref{DjVuInfo}).
+    Additional chunks hold the components of either the foreground or the
+    background layers.
 
     The main component of the foreground layer is a bilevel image named the
     {\em foreground mask}. The pixel size of the foreground mask is equal to
     the size of the DjVu image.  It contains a black-on-white representation
-    of the text and the drawings.  This image is encoded in a single #"Sjbz"#
-    chunk using the JB2 representation.
+    of the text and the drawings.  This image is encoded by a #"Sjbz"# chunk
+    using the JB2 representation.  There may also be a companion chunk
+    #"Djbz"# containing a {\em shape dictionary} that defines bilevel shapes
+    referenced by the #"Sjbz"# chunk.
 
-    The foreground layer also contains a small color image, the {\em
-    foreground color image}, encoded as a single #"FG44"# chunk using the IW44
-    representation (see \Ref{IWPixmap} or \Ref{IWBitmap}).  Compound DjVu
-    images are rendered by painting the foreground color image on top of the
-    background color image using the foreground mask as a stencil.  The pixel
-    size of the foreground color image is computed by rounding up the quotient
-    of the mask size by an integer sub-sampling factor ranging from 1 to 12.
-    Most Compound DjVu Images use a foreground color sub-sampling factor equal
-    to 12.  Smaller sub-sampling factors produce very slightly better images.
+    The {\em foreground colors} can be encoded according to two models:
+    \begin{itemize}
+    \item 
+      The foreground colors may be encoded using a small color image, the {\em
+      foreground color image}, encoded as a single #"FG44"# chunk using the
+      IW44 representation (see \Ref{IWImage.h}).  Such compound DjVu images
+      are rendered by painting the foreground color image on top of the
+      background color image using the foreground mask as a stencil.  The
+      pixel size of the foreground color image is computed by rounding up the
+      quotient of the mask size by an integer sub-sampling factor ranging from
+      1 to 12.  Most Compound DjVu Images use a foreground color sub-sampling
+      factor of 12.  Smaller sub-sampling factors produce very slightly better
+      images.
+    \item 
+      The foreground colors may be encoded by specifying one solid color per
+      object described by the JB2 encoded mask. These {\em JB2 colors} are
+      color-quantized and stored in a single #"FGbz"# chunk (see.
+      \Ref{DjVuPalette.h}).  Such compound DjVu images are rendered by
+      painting each foreground object on top of the background color image
+      using the solid color specified by the #"FGbz"# chunk.
+    \end{itemize}
 
-    The background layer is a color image encoded by an arbitrary number of
-    #"BG44"# chunks containing successive IW44 refinements (see \Ref{IWPixmap}
-    or \Ref{IWBitmap}).  The size of this image is computed by rounding up the
-    quotient of the mask size by an integer sub-sampling factor ranging from 1
-    to 12.  Most Compound DjVu Images use a background sub-sampling factor
-    equal to 3.  Smaller sub-sampling factors are adequate for images with a
-    very rich paper texture.  Larger sub-sampling factors are adequate for
-    images containing no pictures.
+    The background layer is a color image, \Ref{the background color image}
+    ncoded by an arbitrary number of #"BG44"# chunks containing successive
+    IW44 refinements (see \Ref{IWImage.h}).  The size of this image is
+    computed by rounding up the quotient of the mask size by an integer
+    sub-sampling factor ranging from 1 to 12.  Most Compound DjVu Images use a
+    background sub-sampling factor equal to 3.  Smaller sub-sampling factors
+    are adequate for images with a very rich paper texture.  Larger
+    sub-sampling factors are adequate for images containing no pictures.
 
     There are no ordering or interleaving constraints on these chunks except
     that (a) the #"INFO"# chunk must appear first, and (b) the successive
     #"BG44"# refinements must appear with their natural order.  The chunk
     order simply affects the progressive rendering of DjVu images on a web
-    browser.  */
+    browser.  
+
+    {\bf Alternative encodings} --- Besides the JB2 and IW44 encoding schemes,
+    the DjVu format supports alternative encoding methods for its components.  
+    \begin{itemize}
+    \item
+       The foreground mask may be represented by a single #"Smmr"# chunk
+       instead of #"Sjbz"#.  The #"Smmr"# chunk contains a bilevel image
+       encoded with the Fax-G4/MMR method.  Although the resulting files
+       are typically six times larger, this capability can be useful when
+       DjVu is used as a front-end for fax machines and scanners with 
+       embedded Fax-G4/MMR capabilities. 
+    \item
+       The background color image may be represented by a single #"BGjp"#
+       chunk instead of several #"BG44"# chunks.  The #"BGjp"# chunk contains
+       a JPEG encoded color image.  The resulting files are significantly
+       larger and lack the progressivity of the usual DjVu files.  
+       This is useful because some scanners have embedded JPEG capabilities.
+    \item
+       The foreground color image may be represented by a single #"FGjp"#
+       chunk instead of a single #"FG44"# chunk.  This is useful because 
+       some scanners have embedded JPEG capabilities.
+    \end{itemize}
+    In addition, the chunk names #"BG2k"# and #"FG2k"# have been reserved for
+    encoding the background color image and the foreground color image using
+    the forthcoming JPEG-2000 standard.  This capability is not implemented at
+    the moment.  The JPEG-2000 standard may even become the preferred encoding
+    method for color images in DjVu.  */
 
 /** @name IW44 Image Files
     
@@ -543,49 +574,189 @@
     the color image (see \Ref{IWPixmap}).  */
 
 
-/** @name DjVu annotations
+/** @name DjVu Annotations
 
-    [ COMPLETE HERE ]  
+    All types of DjVu images may contain annotation chunks.  Annotation chunks
+    are currently used to describe hyperlinks as well as specifying more
+    closely the behavior of the viewers.  Annotation chunks can be edited with
+    the DjVu editor #djedit#.  Annotation chunks can be inserted or removed
+    using command #djvuiff#.
+
+    Annotations are contained in #"ANTa"# or #"ANTz"# chunks.  The #"ANTa"#
+    chunks contain the annotation in plain ASCII. The #"ANTz"# chunks contain
+    the same information compressed with the BZZ encoder
+    (cf. \Ref{BSByteStream.h}).  The syntax of the uncompressed annotation
+    chunk uses a simple parenthesized notation. Erroneous and unrecognized
+    constructs are silently ignored.  The following constructs are recognized:
+
+    \begin{description}
+
+    \item[(background <color>)]
+       Sets the color of the viewer area surrounding the DjVu image.
+       The color argument #color# are always represented using X11 
+       syntax \##RRGGBB#. For instance \##000000# is black 
+       and \##FFFFFF# is white.
+
+    \item[(zoom <zoom-value>)]
+       Sets the initial zoom factor of the image.  Argument #zoom-value# may
+       be #stretch#, #one2one#, #width#, #page#, or composed of the letter
+       #"d"# followed by a number between #1# and #999# (such as in #d300# for
+       instance.)
+
+    \item[(mode <mode-value>)]
+       Sets the display mode for the image.  Argument #mode-value# may
+       be #color#, #bw#, #fore# or #back#.
+
+    \item[(align <horz-align> <vert-align>)]
+       Specifies how the image should be aligned on the viewer surface.
+       By default the image is located in the center.  Argument #horz-align#
+       may be #left#, #center#, or #right#.  Argument #vert-align# may be
+       #top#, #center#, or #bottom#.
+
+    \item[(maparea <url> <comment> <area> <...options...>]
+       Defines an hyperlink for the URL specified by argument #url#.
+
+       Argument #url# may have one of the following two forms:\\
+       #    "<href>"#\\
+       #    (url "<href>" "<target>")#\\
+       where #href# is a string representing the URL and #target# is a string
+       representing the target frame for the hyperlink (cf. Documentation for
+       the HTML tag #<A>#).  Both strings are surrounded with double quotes.
+
+       Argument #comment# is a string surrounded by double quotes.
+       This string may be displayed as a tooltip when the user
+       moves the mouse over the hyperlink.
+
+       Argument #area# defines the shape of the hyperlink.
+       The following options are supported for representing
+       rectangle, circle, or polygons.\\  
+       #   (rect <xmin> <ymin> <width> <height>)#\\
+       #   (oval <xmin> <ymin> <width> <height>)#\\
+       #   (polygon <x0> <y0> <x1> <y1> ....)#\\
+       All parameters are numbers representing coordinates measured 
+       in image pixels with the origin set at the bottom left corner
+       of the image.
+       
+       The remaining arguments describe options regarding the hyperlink borders.
+       A first set of option define the type of the borders:\\
+       #   (xor)#\\
+       #   (border <color>#\\
+       #   (shadow_in [<thickness>])#\\
+       #   (shadow_out [<thickness>])#\\
+       #   (shadow_ein [<thickness>])#\\
+       #   (shadow_eout [<thickness>])#\\
+       where parameter #color# has syntax \##RRGGBB# (as above) and parameter
+       #thickness# is a number from 1 to 32.  The last four border modes are
+       only supported with rectangular areas. The border becomes visible when
+       the user moves the mouse over the hyperlink.  The border may be made
+       always visible by using the following option:\\
+       #   (border-avis)#\\
+       Finally the following option may be used with rectangular areas only.
+       The complete area will be hilited using the specified color (specified
+       with syntax \##RRGGBB# as usual).\\
+       #   (hilite <color>)#\\
+       This is often used with an empty URL for simply emphasizing a specific
+       segment of an image.
+
+    \end{description}
 */
+
 
 
 /** @name Multipage DjVu documents.
 
-    {\bf Bundled and Indirect Multi-page Documents} --- [COMPLETE HERE]
-
-    {\bf Included Files} --- Multiple DjVu files may share information
-    such as background layer or character shapes.  There are many
-    benefits associated with storing such shared information in
-    separate files.  A well designed browser may keep pre-decoded
-    copies of these files in a cache.  This procedure would reduce the
-    size of the data transferred over the Internet and also increase
-    the display speed.  The currently implemented scheme involves {\em
-    inclusion chunks} (chunk identifiers #"INCL"#) containing the
-    identifier of a file to include.  The included file should be a
-    #"FORM:DJVI"# chunk potentially containing any information
-    otherwise allowed in a DjVu file (except for the #"INFO"# chunk of
-    course).
+    The DjVu3 system supports two models for multi-page documents:
+    {\em bundled} multi-page documents and {\em indirect} multi-page documents.
+    The multi-page API allows you to assemble already compressed pages and to
+    create multipage DjVu documents using either model.
     
-    {\bf Obsolete Formats} --- The decoder supports two other multipage
+    {\bf Bundled multi-page documents} --- A {\em bundled} multi-page DjVu
+    document uses a single file to represent the entire document.  This single
+    file contains all the pages as well as ancillary information (e.g. the
+    page directory, data shared by several pages, thumbnails, etc.).  Using a
+    single file format is very convenient for storing documents or for sending
+    email attachments.
+
+    A bundled multi-page document is composed of a single #"FORM:DJVM"#
+    composite chunk.  This composite chunk always begins with a #"DIRM"# chunk
+    containing the document directory (see. \Ref{DjVmDir.h}) which represents
+    the list of the {\em component files} that compose the document.  The
+    component files themselves are then encoded as IFF85 composite chunks
+    following the #"DIRM"# chunk.
+    \begin{itemize}
+    \item  
+       Component files may be any valid DjVu image (see \Ref{DjVu Image Files})
+       or IW44 image (see \Ref{IW44 Image Files}.)  These component files 
+       always represent a page of a document.  The corresponding IFF85 chunk ids are 
+       #"FORM:DJVU"#, #"FORM:PM44"#, or #"FORM:BM44"#.
+    \item 
+       Component files may contain shared information indirectly referenced by
+       some document pages.  These {\em shared component files} are always composed
+       of a single #"FORM:DJVI"# chunk containing an arbitrary collection of
+       chunks. 
+    \item
+       Thumbnail files contain optional thumbnail images for a few consecutive
+       pages of the document.  Thumbnail files consist of a single
+       #"FORM:THUM"# composite chunk containing several #"TH44"# chunks
+       containing IW44 encoded thumbnail images (see \Ref{IWImage.h}).  These
+       thumbnails always pertain the first few page files following the
+       thumbnail file in the document directory.
+    \end{itemize}
+
+    {\bf Including shared information} --- Any DjVu image file contained in a
+    multipage file may contain an #"INCL"# chunk containing the ID of a shared
+    component file.  The decoder should then process the chunks contained in
+    the shared component file as if they were contained by the DjVu image
+    file.  The shared component file may potentially containing any
+    information otherwise allowed in a DjVu image file (except for the
+    #"INFO"# chunk of course). There are many benefits associated with storing
+    such shared information in separate files.  A well designed browser may
+    keep pre-decoded copies of these files in a cache.  This procedure would
+    reduce the size of the data transferred over the Internet and also
+    increase the display speed.  The multipage DjVu compressor, for instance,
+    identifies similar object shapes occuring in several pages.  These shapes
+    are encoded in a shape dictionary (chunk #"Djbz"#) placed in a shared
+    component file.  All relevant pages include this shared component file.
+    Although they appear in several pages, these shared shapes are encoded
+    only once in the document.
+
+    {\bf Browsing a multi-page document} --- You can view the pages using the
+    DjVu plugin and a web browser.  When you type the URL of a multi-page
+    document, the browser starts downloading the whole file, but displays the
+    first page as soon as it is available.  You can immediately navigate to
+    other pages using the DjVu toolbar.  Suppose however that the document is
+    stored on a remote web server.  You can easily access the first page and
+    see that this is not the document you wanted.  Although you will never
+    display the other pages the browser is transferring data for these pages
+    and is wasting the bandwith of your server (and the bandwith of the
+    Internet too).  You could also see the summary of the document on the
+    first page and jump to page 100.  But page 100 cannot be displayed until
+    data for pages 1 to 99 has been received.  You may have to wait for the
+    transmission of unnecessary page data.  This second problem (the
+    unnecessary wait) can be solved using the ``byte serving'' options of the
+    HTTP/1.1 protocol.  This option has to be supported by the web server, the
+    proxies, the caches and the browser.  We are coming there but not quite
+    yet.  Byte serving however does not solve the first problem (the waste of
+    bandwith).
+
+    {\bf Indirect multi-page documents} --- DjVu solves both problem using a
+    special multi-page format named the {\em indirect} model.  An indirect
+    multi-page DjVu document is composed of several files.  The main file is
+    named the {\em index file}.  You can browse a document using the URL of
+    the index file, just like you do with a bundled multi-page document.  The
+    index file however is very small.  It simply contains the document
+    directory and the URLs of secondary files containing the page data.  When
+    you browse an indirect multi-page document, the browser only accesses data
+    for the pages you are viewing.  This can be done at a reasonable speed
+    because the browser maintains a cache of pages and sometimes pre-fetches a
+    few pages ahead of the current page.  This model uses the web serving
+    bandwith much more effectively.  It also eliminates unnecessary delays
+    when jumping ahead to pages located anywhere in a long document.
+
+    {\bf Obsolete Formats} --- The library also supports two other multipage
     formats which are now obsolete.  These formats are technologically
     inferior and should no longer be used. */
 
-
-/** @name Experimental Features.
-    
-    The DjVu format already delivers extremely high compression ratios.  Yet
-    we keep evaluating new ideas and experimenting with new features.  Here is
-    a brief description of the various enhancements under evaluation.  We
-    intend to update the DjVu Reference Library as soon as we are satisfied
-    with such enhancements.
-
-    {\bf Per-Character Color} --- Compound DjVu files represent the colors of
-    the text and drawings using a low resolution color image named the
-    foreground color image.  We are considering an alternative representation
-    using one color for each character (or more specifically, for each mask
-    component).  This alternative representation would be more appropriate for
-    encoding electronically produced documents.
-*/
 //@}
 
 
