@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.86 1999-12-08 16:18:11 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.87 1999-12-09 00:00:19 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -683,9 +683,7 @@ DjVuDocument::get_djvu_file(const char * id, bool dont_create)
    DEBUG_MAKE_INDENT(3);
 
    if (!id || !strlen(id)) return get_djvu_file(-1);
-   char * ptr;
-   int page_num=strtol(id, &ptr, 10);
-   if (!*ptr) return get_djvu_file(page_num);
+   if (GString(id).is_int()) return get_djvu_file(atoi(id));
 
    GURL url;
    {
