@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GBitmap.cpp,v 1.24 2000-01-17 20:35:27 bcr Exp $
+//C- $Id: GBitmap.cpp,v 1.25 2000-01-31 18:43:33 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -23,7 +23,7 @@
 #include "GString.h"
 #include "GThreads.h"
 
-// File "$Id: GBitmap.cpp,v 1.24 2000-01-17 20:35:27 bcr Exp $"
+// File "$Id: GBitmap.cpp,v 1.25 2000-01-31 18:43:33 leonb Exp $"
 // - Author: Leon Bottou, 05/1997
 
 
@@ -190,6 +190,7 @@ void
 GBitmap::init(ByteStream &ref, int aborder)
 {
   char magic[2];
+  magic[0] = magic[1] = magic[2] = 0;
   ref.readall((void*)magic, sizeof(magic));
   char lookahead = '\n';
   int acolumns = read_integer(lookahead, ref);
