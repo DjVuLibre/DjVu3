@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: ZPCodec.cpp,v 1.11 2000-10-06 21:47:21 fcrary Exp $
+//C- $Id: ZPCodec.cpp,v 1.12 2000-10-11 21:15:03 bcr Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -967,7 +967,7 @@ ZPCodec::eflush()
   else if (subend > 0)
     subend = 0x8000;
   /* zemit many mps bits */
-  while (buffer != 0xffffff)    // || subend ?
+  while (buffer != 0xffffff  || subend )
     {
       zemit(1 - (subend>>15) );
       subend = (unsigned short)(subend<<1);
