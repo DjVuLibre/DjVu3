@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.2 1999-05-25 19:42:28 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.3 1999-05-25 22:33:33 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -49,8 +49,8 @@ DjVuDocument::DjVuDocument(const GURL & url, bool xreadonly,
    GURL decode_url;
    if (is_djvm()) decode_url=djvm_get_first_page_url();
    else decode_url=url;
-   dir=new DjVuNavDir(decode_url.baseURL()+"directory");
-   dir->insert_page(-1, decode_url.fileURL());
+   dir=new DjVuNavDir(decode_url.base()+"directory");
+   dir->insert_page(-1, decode_url.name());
 
    if (!xreadonly)
    {
@@ -252,7 +252,7 @@ unlink_empty_files(const GP<DjVuFile> & f, GMap<GURL, void *> & map,
 	 GP<DjVuFile> file=files[pos];
 	 if (file->get_chunks_number()==0)
 	 {
-	    f->unlink_file(file->get_url().fileURL());
+	    f->unlink_file(file->get_url().name());
 	    cache->del_item(file->get_url());
 	 }
       }
@@ -399,7 +399,7 @@ DjVuDocument::check_nav_structure(void)
 	 for(int i=0;;i++)
 	 {
 	    sprintf(tst_name, "dir%d", i);
-	    if (!cache->get_item(url.baseURL()+tst_name)) break;
+	    if (!cache->get_item(url.base()+tst_name)) break;
 	 };
 	 dir_file->set_name(tst_name);
 	 
@@ -423,11 +423,11 @@ DjVuDocument::insert_page(const GP<DjVuFile> & file, int page_num)
 
    if (readonly) THROW("The document has been created in readonly mode.");
    
-   GString name=file->get_url().fileURL();
+   GString name=file->get_url().name();
    if (dir->name_to_page(name)>=0)
       THROW("Can't insert page '"+name+"': already exists.");
    
-   file->move(dir->page_to_url(0).baseURL());
+   file->move(dir->page_to_url(0).base());
    file->change_cache(cache);
    get_portcaster()->add_route(file, this);
 
@@ -481,7 +481,7 @@ DjVuDocument::request_data(const DjVuPort * source, const GURL & url)
       } else
       {
 	 DEBUG_MSG("The document type is DJVU.\n");
-	 if (url.isLocal())
+	 if (url.is_file_url())
 	 {
 	    GString fname=GOS::url_to_filename(url);
 	    DEBUG_MSG("fname=" << fname << "\n");
@@ -500,10 +500,10 @@ DjVuDocument::request_data(const DjVuPort * source, const GURL & url)
    {
       if (djvm)	// The document has originally been DjVm
       {
-	 GP<DjVmDir0::FileRec> file=djvm_dir.get_file(url.fileURL());
+	 GP<DjVmDir0::FileRec> file=djvm_dir.get_file(url.name());
 	 if (file) return new DataRange(djvm_pool, file->offset, file->size);
       };
-      if (url.isLocal())
+      if (url.is_file_url())
       {
 	 GString fname=GOS::url_to_filename(url);
 	 DEBUG_MSG("fname=" << fname << "\n");

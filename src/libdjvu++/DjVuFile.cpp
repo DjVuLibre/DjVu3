@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.2 1999-05-25 19:42:28 eaf Exp $
+//C- $Id: DjVuFile.cpp,v 1.3 1999-05-25 22:33:33 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -367,7 +367,7 @@ DjVuFile::process_incl_chunk(ByteStream & str)
 
       DEBUG_MSG("incl_str='" << incl_str << "'\n");
       
-      GURL incl_url=url.baseURL()+incl_str;
+      GURL incl_url=url.base()+incl_str;
       GCriticalSectionLock lock(&inc_files_lock);
       GPosition pos;
       for(pos=inc_files_list;pos;++pos)
@@ -934,7 +934,7 @@ DjVuFile::unlink_file(const char * name)
    while(pos)
    {
       GP<DjVuFile> f=inc_files_list[pos];
-      if (f->get_url().fileURL()==name)
+      if (f->get_url().name()==name)
       {
 	 GPosition this_pos=pos;
 	 ++pos;
@@ -950,8 +950,8 @@ DjVuFile::include_file(const GP<DjVuFile> & file, int chunk_pos)
    DEBUG_MAKE_INDENT(3);
 
       // Prepare the new file's url
-   GString file_name=file->get_url().fileURL();
-   GURL file_url=url.baseURL()+file_name;
+   GString file_name=file->get_url().name();
+   GURL file_url=url.base()+file_name;
    
       // See if the file is already included
    process_incl_chunks();
@@ -962,7 +962,7 @@ DjVuFile::include_file(const GP<DjVuFile> & file, int chunk_pos)
 	    THROW("File with name '"+file_name+"' is already included.");
    }
 
-   file->move(url.baseURL());
+   file->move(url.base());
 
       // Set info route
    file->disable_standard_port();
@@ -1334,7 +1334,7 @@ DjVuFile::add_to_djvm(DjVmFile & djvm_file, GMap<GURL, void *> & map)
    map[url]=0;
 
    TArray<char> data=get_djvu_data(0, 0);
-   djvm_file.add_file(url.fileURL(), data, -1);
+   djvm_file.add_file(url.name(), data, -1);
 
    process_incl_chunks();
    
@@ -1357,7 +1357,7 @@ DjVuFile::move(GMap<GURL, void *> & map, const GURL & dir_url)
    {
       map[url]=0;
 
-      url=dir_url+url.fileURL();
+      url=dir_url+url.name();
 
       process_incl_chunks();
 

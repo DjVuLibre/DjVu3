@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.h,v 1.2 1999-05-25 19:42:28 eaf Exp $
+//C- $Id: DjVuFile.h,v 1.3 1999-05-25 22:33:34 eaf Exp $
  
 #ifndef _DJVUFILE_H
 #define _DJVUFILE_H
@@ -47,7 +47,7 @@
 
     @memo Classes representing DjVu files.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuFile.h,v 1.2 1999-05-25 19:42:28 eaf Exp $#
+    @version #$Id: DjVuFile.h,v 1.3 1999-05-25 22:33:34 eaf Exp $#
 */
 
 //@{
@@ -401,7 +401,7 @@ DjVuFile::get_url(void) const
 inline void
 DjVuFile::set_name(const char * name)
 {
-   url=url.baseURL()+name;
+   url=url.base()+name;
 }
 
 inline void
