@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuText.h,v 1.11 2001-04-12 00:25:00 bcr Exp $
+// $Id: DjVuText.h,v 1.12 2001-04-23 23:27:27 praveen Exp $
 // $Name:  $
 
 #ifndef _DJVUTEXT_H
@@ -55,7 +55,7 @@
     @memo Implements support for DjVuImage hidden text.
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: DjVuText.h,v 1.11 2001-04-12 00:25:00 bcr Exp $# */
+    #$Id: DjVuText.h,v 1.12 2001-04-23 23:27:27 praveen Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -180,7 +180,7 @@ public:
       {\bf WARNING:} The returned list contains pointers to Zones.
       {\bf DO NOT DELETE} these Zones.
       */
-  GList<Zone *> search_string(const char * string, int & start_pos,
+  GList<Zone *> search_string(GUTF8String string, int & start_pos,
 			      bool search_fwd, bool match_case,
 			      bool whole_word=false) const;
 

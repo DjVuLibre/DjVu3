@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuText.cpp,v 1.15 2001-04-20 17:53:19 bcr Exp $
+// $Id: DjVuText.cpp,v 1.16 2001-04-23 23:27:27 praveen Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -552,7 +552,7 @@ equal(const char * txt, const char * str, bool match_case, int * length)
 }
 
 GList<DjVuTXT::Zone *>
-DjVuTXT::search_string(const char * string, int & from, bool search_fwd,
+DjVuTXT::search_string(GUTF8String string, int & from, bool search_fwd,
 		       bool match_case, bool whole_word) const
 {
   GUTF8String local_string;
