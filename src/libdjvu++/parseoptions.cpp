@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: parseoptions.cpp,v 1.51 2000-06-01 22:37:04 bcr Exp $
+//C- $Id: parseoptions.cpp,v 1.52 2000-06-19 15:59:25 bcr Exp $
 #ifdef __GNUC__
 #pragma implementation
 #endif
@@ -885,7 +885,8 @@ DjVuParseOptions::ReadFile(int &line,FILE *f,int profile)
   int c;
   char *value=new char[local_bufsize];
   char *value_end=value+local_bufsize;
-  while((profile >= 0)&&((c=getc(f))!=EOF))
+//  while((profile >= 0)&&((c=getc(f))!=EOF))
+  while(((c=getc(f))!=EOF))
   {
     // Skip spaces...
     if(isspace(c)) 
