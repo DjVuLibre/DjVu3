@@ -1,3 +1,4 @@
+#!/bin/sh
 #C-
 #C- DjVu® Reference Library (v. 3.0)
 #C- 
@@ -30,7 +31,7 @@
 #C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #
-# $Id: write_status.sh,v 1.15 2001-01-04 22:04:54 bcr Exp $
+# $Id: write_status.sh,v 1.16 2001-01-09 17:29:22 bcr Exp $
 # $Name:  $
 
 # This script writes the variables currently set to standard output.

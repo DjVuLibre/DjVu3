@@ -1,3 +1,4 @@
+#!/bin/sh
 #C-
 #C- DjVu® Reference Library (v. 3.0)
 #C- 
@@ -30,7 +31,7 @@
 #C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #
-# $Id: mkdirp.sh,v 1.6 2001-01-04 22:04:54 bcr Exp $
+# $Id: mkdirp.sh,v 1.7 2001-01-09 17:29:22 bcr Exp $
 # $Name:  $
 
 #!/bin/sh
