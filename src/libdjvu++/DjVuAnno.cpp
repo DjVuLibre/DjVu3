@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuAnno.cpp,v 1.40 1999-11-02 15:41:14 eaf Exp $
+//C- $Id: DjVuAnno.cpp,v 1.41 1999-11-02 16:41:00 eaf Exp $
 
 
 #ifdef __GNUC__
@@ -1163,40 +1163,76 @@ DjVuTXT::copy(void) const
 
 
 bool
-DjVuTXT::search_zone(const Zone * zone, int start, int & length) const
+DjVuTXT::search_zone(const Zone * zone, int start, int & end) const
       // Will return TRUE if 'zone' contains beginning of the text
-      // at 'start'. In this case it will also modify the 'length'
-      // to show how much of the text in this zone
+      // at 'start'. In this case it will also modify the 'end'
+      // to point to the first character beyond the zone
 {
    if (start>=zone->text_start && start<zone->text_start+zone->text_length)
    {
-      if (start+length>zone->text_start+zone->text_length)
-	 length=zone->text_start+zone->text_length-start;
+      if (end>zone->text_start+zone->text_length)
+	 end=zone->text_start+zone->text_length;
       return true;
    }
    return false;
 }
 
 DjVuTXT::Zone *
-DjVuTXT::get_smallest_zone(int max_type, int start, int & length) const
+DjVuTXT::get_smallest_zone(int max_type, int start, int & end) const
       // Will return the smallest zone with type up to max_type containing
-      // the text starting at start. If anything is found, length will
-      // be modified to indicate how much of the text is inside the zone
+      // the text starting at start. If anything is found, end will
+      // be modified to point to the first character beyond the zone
 {
-   if (!search_zone(&main, start, length)) return 0;
+   if (!search_zone(&main, start, end)) return 0;
    
    const Zone * zone=&main;
    while(zone->ztype<max_type)
    {
       GPosition pos;
       for(pos=zone->children;pos;++pos)
-	 if (search_zone(&zone->children[pos], start, length))
+	 if (search_zone(&zone->children[pos], start, end))
 	    break;
       if (pos) zone=&zone->children[pos];
       else break;
    }
 
    return (Zone *) zone;
+}
+
+GList<DjVuTXT::Zone *>
+DjVuTXT::find_zones(int string_start, int string_length) const
+      // For the string starting at string_start of length string_length
+      // the function will generate a list of smallest zones of the
+      // same type and will return it
+{
+   GList<Zone *> zone_list;
+   int zone_type=CHARACTER;
+   while(zone_type>=PAGE)
+   {
+      int start=string_start;
+      int end=string_start+string_length;
+
+      while(true)
+      {
+	 while(isspace(textUTF8[start]) && start<end) start++;
+	 if (start==end) break;
+
+	 Zone * zone=get_smallest_zone(zone_type, start, end);
+	 if (zone && zone_type==zone->ztype)
+	 {
+	    zone_list.append(zone);
+	    start=end;
+	    end=string_start+string_length;
+	 } else
+	 {
+	    zone_type--;
+	    zone_list.empty();
+	    break;
+	 }
+      }
+      if (zone_list.size()) break;
+   }
+   return zone_list;
 }
 
 static inline bool
@@ -1214,47 +1250,43 @@ chars_equal(char ch1, char ch2, bool match_case)
    return match_case ? (ch1==ch2) : (toupper(ch1)==toupper(ch2));
 }
 
-GList<DjVuTXT::Zone *>
-DjVuTXT::find_zones(int string_start, int string_length) const
-      // For the string starting at string_start of length string_length
-      // the function will generate a list of smallest zones of the
-      // same type and will return it
+static bool
+equal(const char * txt, const char * str, bool match_case, int * length)
+      // Returns TRUE, if there is a portion in the 'txt' which contains
+      // the same words in the same order (but possible with different
+      // number of separating spaces) as the 'str'
+      // If search has been successful, the function will make 'length'
+      // contain the index of the first character in the 'txt' beyond the
+      // found string
+      // NOTE, that it may be different from strlen(str) because of different
+      // number of spaces between words in 'str' and 'txt'
 {
-   GList<Zone *> zone_list;
-   int zone_type=CHARACTER;
-   while(zone_type>=PAGE)
+   const char * str_ptr=str;
+   const char * txt_ptr=txt;
+   while(*str_ptr)
    {
-      int start=string_start;
-      int length=string_length;
-
-      while(true)
-      {
-	 Zone * zone=get_smallest_zone(zone_type, start, length);
-	 if (zone && zone_type==zone->ztype)
+      while(*str_ptr && isspace(*str_ptr)) str_ptr++;
+      while(*str_ptr && *txt_ptr && !isspace(*str_ptr))
+	 if (chars_equal(*txt_ptr, *str_ptr, match_case))
 	 {
-	    zone_list.append(zone);
-	    start+=length;
-	    length=string_start+string_length-start;
-	    if (length==0) break;
-	 } else
-	 {
-	    zone_type--;
-	    zone_list.empty();
-	    break;
-	 }
-      }
-      if (zone_list.size()) break;
+	    txt_ptr++; str_ptr++;
+	 } else break;
+      if (*str_ptr && !isspace(*str_ptr)) return false;
+      else if (!*str_ptr) break;
+      while(*txt_ptr && isspace(*txt_ptr)) txt_ptr++;
    }
-   return zone_list;
+   if (length) *length=txt_ptr-txt;
+   return true;
 }
-   
+
 GList<DjVuTXT::Zone *>
 DjVuTXT::search_string(const char * string, int & from,
 		       bool search_fwd, bool match_case) const
 {
+   while(*string && isspace(*string)) string++;
    int string_length=strlen(string);
    bool found=false;
-	
+
    if (string_length==0 || textUTF8.length()==0 ||
        string_length>(int) textUTF8.length())
    {
@@ -1263,16 +1295,13 @@ DjVuTXT::search_string(const char * string, int & from,
       return GList<Zone *>();
    }
 
+   int real_str_len;
    if (search_fwd)
    {
       if (from<0) from=0;
       while(from<(int) textUTF8.length())
       {
-	 int i;
-	 for(i=0;i<string_length && from+i<(int) textUTF8.length();i++)
-	    if (!chars_equal(textUTF8[from+i], string[i], match_case))
-	       break;
-	 if (i==string_length)
+	 if (equal((const char *) textUTF8+from, string, match_case, &real_str_len))
 	 {
 	    found=true;
 	    break;
@@ -1285,11 +1314,7 @@ DjVuTXT::search_string(const char * string, int & from,
       if (from>(int) textUTF8.length()-1) from=(int) textUTF8.length()-1;
       while(from>=0)
       {
-	 int i;
-	 for(i=0;i<string_length && from+i<(int) textUTF8.length();i++)
-	    if (!chars_equal(textUTF8[from+i], string[i], match_case))
-	       break;
-	 if (i==string_length)
+	 if (equal((const char *) textUTF8+from, string, match_case, &real_str_len))
 	 {
 	    found=true;
 	    break;
@@ -1298,7 +1323,7 @@ DjVuTXT::search_string(const char * string, int & from,
       }
    }
 
-   if (found) return find_zones(from, string_length);
+   if (found) return find_zones(from, real_str_len);
    else return GList<Zone *>();
 }
 
