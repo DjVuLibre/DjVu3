@@ -7,9 +7,9 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: IWImage.cpp,v 1.4 1999-02-08 19:38:36 leonb Exp $
+//C-  $Id: IWImage.cpp,v 1.5 1999-02-10 23:07:51 leonb Exp $
 
-// File "$Id: IWImage.cpp,v 1.4 1999-02-08 19:38:36 leonb Exp $"
+// File "$Id: IWImage.cpp,v 1.5 1999-02-10 23:07:51 leonb Exp $"
 // - Author: Leon Bottou, 08/1998
 
 #ifdef __GNUC__
@@ -1131,14 +1131,14 @@ _IWMap::image(int subsample, const GRect &rect,
 
 
 //-----------------------------------------------
-// This subclass reproduces a bug in the ZPCodec passthru functions.
-// The bug was discovered long after the initial release of DjVu. 
-// Reproducing the bug maintains bitstream compatibility.
+// This subclass reproduces a bug in the ZPCodec passthru functions.  The bug
+// was discovered long after the initial release of DjVu.  After comparing the
+// performances with and without the bug, we renamed it a feature.
 
-class _ZPCodecOops : public ZPCodec // DJVU_CLASS
+class _ZPCodecBias : public ZPCodec // DJVU_CLASS
 {
 public:
-  _ZPCodecOops(ByteStream &bs, int encoding=0) : ZPCodec(bs,encoding) {}
+  _ZPCodecBias(ByteStream &bs, int encoding=0) : ZPCodec(bs,encoding) {}
   void encoder(int bit, BitContext &ctx) { ZPCodec::encoder(bit,ctx); }
   int decoder(BitContext &ctx) { return ZPCodec::decoder(ctx); }
   void encoder(int bit);
@@ -1146,22 +1146,20 @@ public:
 };
 
 inline void 
-_ZPCodecOops::encoder(int bit)
+_ZPCodecBias::encoder(int bit)
 {
-  BitContext junk = 0;
-  unsigned int z = 0x8000 + (a>>1);
+  int z = 0x8000 + ((a+a+a) >> 3);
   if (bit)
-    encode_lps(junk, z);
+    encode_lps_simple(z);
   else
-    encode_mps(junk, z);
+    encode_mps_simple(z);
 }
 
 inline int 
-_ZPCodecOops::decoder()
+_ZPCodecBias::decoder()
 {
-  BitContext junk = 0;
-  unsigned int z = 0x8000 + (a>>1);
-  return decode_sub(junk, z);
+  int z = 0x8000 + ((a+a+a) >> 3);
+  return decode_sub_simple(0, z);
 }
 
 
@@ -1177,7 +1175,7 @@ public:
   _IWCodec(_IWMap &map, int encoding=0);
   ~_IWCodec();
   // Coding
-  int code_slice(_ZPCodecOops &zp);
+  int code_slice(_ZPCodecBias &zp);
   float estimate_decibel(float frac);
   // Data
   _IWMap &map;                  // working map
@@ -1204,10 +1202,10 @@ public:
   // helper
   int  next_quant(void);
   int  is_null_slice(int bit, int band);
-  void encode_buckets(_ZPCodecOops &zp, int bit, int band, 
+  void encode_buckets(_ZPCodecBias &zp, int bit, int band, 
                       _IWBlock &blk, _IWBlock &eblk,
                       int fbucket, int nbucket);
-  void decode_buckets(_ZPCodecOops &zp, int bit, int band,
+  void decode_buckets(_ZPCodecBias &zp, int bit, int band,
                       _IWBlock &blk,
                       int fbucket, int nbucket);
 };
@@ -1339,7 +1337,7 @@ _IWCodec::is_null_slice(int bit, int band)
 // -- read/write a slice of datafile
 
 int
-_IWCodec::code_slice(_ZPCodecOops &zp)
+_IWCodec::code_slice(_ZPCodecBias &zp)
 {
   // Check that code_slice can still run
   if (curbit < 0)
@@ -1384,7 +1382,7 @@ _IWCodec::code_slice(_ZPCodecOops &zp)
 // -- code a sequence of buckets in a given block
 
 void
-_IWCodec::encode_buckets(_ZPCodecOops &zp, int bit, int band, 
+_IWCodec::encode_buckets(_ZPCodecBias &zp, int bit, int band, 
                          _IWBlock &blk, _IWBlock &eblk,
                          int fbucket, int nbucket)
 {
@@ -1583,7 +1581,7 @@ _IWCodec::encode_buckets(_ZPCodecOops &zp, int bit, int band,
 // -- code a sequence of buckets in a given block
 
 void
-_IWCodec::decode_buckets(_ZPCodecOops &zp, int bit, int band, 
+_IWCodec::decode_buckets(_ZPCodecBias &zp, int bit, int band, 
                          _IWBlock &blk,
                          int fbucket, int nbucket)
 {
@@ -1915,8 +1913,6 @@ _IWCodec::estimate_decibel(float frac)
 //////////////////////////////////////////////////////
 
 
-
-
 struct PrimaryHeader {
   unsigned char serial;
   unsigned char slices;
@@ -1938,17 +1934,10 @@ struct TertiaryHeader2 {        // VER 1.2
   unsigned char crcbdelay;
 };
 
-struct TertiaryHeader3 {        // VER 1.3 (not yet)
-  unsigned char xhi, xlo;
-  unsigned char yhi, ylo;
-  unsigned char crcbdelay;
-  unsigned char wavelet;
-};
-
 
 
 //////////////////////////////////////////////////////
-// COLOR CONVERSION STUFF
+// UTILITIES
 //////////////////////////////////////////////////////
 
 
@@ -1963,56 +1952,6 @@ max(T x, T y)
 {
   return (y <= x) ? x : y;
 }
-
-
-static const float 
-rgb_to_yrb[3][3] = 
-{ { 0.304348F,  0.608696F,  0.086956F},      
-  {-0.173913F, -0.347826F,  0.521739F},
-  { 0.463768F, -0.405797F, -0.057971F} };
-
-static inline signed char
-RGB_to_Y(int r, int g, int b)
-{
-  int y = (int) ( rgb_to_yrb[0][0] * r +
-                  rgb_to_yrb[0][1] * g + 
-                  rgb_to_yrb[0][2] * b + 0.5 );
-  assert(y>=0 && y<256);
-  return (signed char) (y - 128);
-}
-
-static inline signed char
-RGB_to_CR(int r, int g, int b)
-{
-  int cr = (int) ( rgb_to_yrb[1][0] * r +
-                   rgb_to_yrb[1][1] * g + 
-                   rgb_to_yrb[1][2] * b + 0.5 );
-  return (signed char) max(-128, min(127, cr));
-}
-
-static inline signed char
-RGB_to_CB(int r, int g, int b)
-{
-  int cb = (int) ( rgb_to_yrb[2][0] * r +
-                   rgb_to_yrb[2][1] * g + 
-                   rgb_to_yrb[2][2] * b + 0.5 );
-  return (signed char) max(-128, min(127, cb));
-}
-
-static inline void
-YRB_to_RGB(int y, int r, int b, GPixel *p)
-{
-  int t1 = r >> 2 ; 
-  int t2 = b + (b >> 1);
-  int t3 = y + 128 - t1;
-  int tr = y + 128 + t2;
-  int tg = t3 - (t2 >> 1);
-  int tb = t3 + (r << 1);
-  p->r = max(0,min(255,tr));
-  p->g = max(0,min(255,tg));
-  p->b = max(0,min(255,tb));
-}
-
 
 
 
@@ -2234,7 +2173,7 @@ IWBitmap::decode_chunk(ByteStream &bs)
   // Read data
   assert(ymap);
   assert(ycodec);
-  _ZPCodecOops zp(bs, 0);
+  _ZPCodecBias zp(bs, 0);
   int flag = 1;
   while (flag && cslice<nslices)
     {
@@ -2273,7 +2212,7 @@ IWBitmap::encode_chunk(ByteStream &bs, const IWEncoderParms &parm)
   MemoryByteStream mbs;
   {
     float estdb = -1.0;
-    _ZPCodecOops zp(mbs,1);
+    _ZPCodecBias zp(mbs,1);
     while (flag)
       {
         if (parm.decibels>0  && estdb>=parm.decibels)
@@ -2386,9 +2325,67 @@ IWBitmap::decode_iff(IFFByteStream &iff, int maxchunks)
 
 
 
+
+
+//////////////////////////////////////////////////////
+// COLOR CONVERSION STUFF
+//////////////////////////////////////////////////////
+
+
+static const float 
+rgb_to_ycc[3][3] = 
+{ { 0.304348F,  0.608696F,  0.086956F},      
+  { 0.463768F, -0.405797F, -0.057971F},
+  {-0.173913F, -0.347826F,  0.521739F} };
+
+static inline signed char
+RGB_to_Y(int r, int g, int b)
+{
+  int y = (int) ( rgb_to_ycc[0][0] * r +
+                  rgb_to_ycc[0][1] * g + 
+                  rgb_to_ycc[0][2] * b + 0.5 );
+  assert(y>=0 && y<256);
+  return (signed char) (y - 128);
+}
+
+static inline signed char
+RGB_to_CR(int r, int g, int b)
+{
+  int cr = (int) ( rgb_to_ycc[1][0] * r +
+                   rgb_to_ycc[1][1] * g + 
+                   rgb_to_ycc[1][2] * b + 0.5 );
+  return (signed char) max(-128, min(127, cr));
+}
+
+static inline signed char
+RGB_to_CB(int r, int g, int b)
+{
+  int cb = (int) ( rgb_to_ycc[2][0] * r +
+                   rgb_to_ycc[2][1] * g + 
+                   rgb_to_ycc[2][2] * b + 0.5 );
+  return (signed char) max(-128, min(127, cb));
+}
+
+static inline void
+YCC_to_RGB(int y, int b, int r, GPixel *p)
+{
+  int t1 = b >> 2 ; 
+  int t2 = r + (r >> 1);
+  int t3 = y + 128 - t1;
+  int tr = y + 128 + t2;
+  int tg = t3 - (t2 >> 1);
+  int tb = t3 + (b << 1);
+  p->r = max(0,min(255,tr));
+  p->g = max(0,min(255,tg));
+  p->b = max(0,min(255,tb));
+}
+
+
+
 //////////////////////////////////////////////////////
 // CLASS IWENCODERPARMS
 //////////////////////////////////////////////////////
+
 
 IWEncoderParms::IWEncoderParms()
 {
@@ -2397,18 +2394,18 @@ IWEncoderParms::IWEncoderParms()
 }
 
 
+
+
+
 //////////////////////////////////////////////////////
 // CLASS IWPIXMAP
 //////////////////////////////////////////////////////
 
 
-
-
-
 IWPixmap::IWPixmap()
   : crcb_delay(10), crcb_half(0), db_frac(1.0),
-    ymap(0), rmap(0), bmap(0),
-    ycodec(0), rcodec(0), bcodec(0),
+    ymap(0), cbmap(0), crmap(0),
+    ycodec(0), cbcodec(0), crcodec(0),
     cslice(0), cserial(0), cbytes(0)
 {
 }
@@ -2416,8 +2413,8 @@ IWPixmap::IWPixmap()
 
 IWPixmap::IWPixmap(const GPixmap *pm, const GBitmap *mask, CRCBMode crcbmode)
   : crcb_delay(10), crcb_half(0), db_frac(1.0),
-    ymap(0), rmap(0), bmap(0),
-    ycodec(0), rcodec(0), bcodec(0),
+    ymap(0), cbmap(0), crmap(0),
+    ycodec(0), cbcodec(0), crcodec(0),
     cslice(0), cserial(0), cbytes(0)
 {
   init(pm, mask, crcbmode);
@@ -2429,9 +2426,9 @@ IWPixmap::init(const GPixmap *pm, const GBitmap *mask, CRCBMode crcbmode)
   /* Free */
   close_codec();
   delete ymap;
-  delete rmap;
-  delete bmap;
-  ymap = rmap = bmap = 0;
+  delete cbmap;
+  delete crmap;
+  ymap = cbmap = crmap = 0;
   /* Create */
   int w = pm->columns();
   int h = pm->rows();
@@ -2474,19 +2471,8 @@ IWPixmap::init(const GPixmap *pm, const GBitmap *mask, CRCBMode crcbmode)
       // Create chrominance maps
       if (crcb_delay >= 0)
         {
-          rmap = new _IWMap(w,h);
-          bmap = new _IWMap(w,h);
-          // Fill buffer with CR information
-          for (i=0; i<h; i++)
-            {
-              signed char *bufrow = buffer + i*w;
-              const GPixel *pixrow = (*pm)[i];
-              for (int j=0; j<w; j++, pixrow++)
-                bufrow[j] = RGB_to_CR(pixrow->r, pixrow->g, pixrow->b);
-            }
-          // Create chrominance map (CR) with half resolution
-          rmap->create(buffer, w, msk8, mskrowsize, crcb_half);
           // Fill buffer with CB information
+          cbmap = new _IWMap(w,h);
           for (i=0; i<h; i++)
             {
               signed char *bufrow = buffer + i*w;
@@ -2495,12 +2481,23 @@ IWPixmap::init(const GPixmap *pm, const GBitmap *mask, CRCBMode crcbmode)
                 bufrow[j] = RGB_to_CB(pixrow->r, pixrow->g, pixrow->b);
             }
           // Create chrominance map (CB) with half resolution
-          bmap->create(buffer, w, msk8, mskrowsize, crcb_half);
+          cbmap->create(buffer, w, msk8, mskrowsize, crcb_half);
+          // Fill buffer with CR information
+          crmap = new _IWMap(w,h);
+          for (i=0; i<h; i++)
+            {
+              signed char *bufrow = buffer + i*w;
+              const GPixel *pixrow = (*pm)[i];
+              for (int j=0; j<w; j++, pixrow++)
+                bufrow[j] = RGB_to_CR(pixrow->r, pixrow->g, pixrow->b);
+            }
+          // Create chrominance map (CR) with half resolution
+          crmap->create(buffer, w, msk8, mskrowsize, crcb_half);
           // Perform chrominance reduction (CRCBhalf)
           if (crcb_half)
             {
-              rmap->slashres(2);
-              bmap->slashres(2);
+              cbmap->slashres(2);
+              crmap->slashres(2);
             }
         }
     }
@@ -2520,9 +2517,9 @@ IWPixmap::~IWPixmap()
 {
   close_codec();
   delete ymap;
-  delete rmap;
-  delete bmap;
-  ymap = rmap = bmap = 0;
+  delete crmap;
+  delete cbmap;
+  ymap = crmap = cbmap = 0;
 }
 
 
@@ -2555,15 +2552,15 @@ IWPixmap::get_percent_memory() const
       buckets += ymap->get_bucket_count();
       maximum += 64*ymap->nb;
     }
-  if (rmap)
+  if (cbmap)
     {
-      buckets += rmap->get_bucket_count();
-      maximum += 64*rmap->nb;
+      buckets += cbmap->get_bucket_count();
+      maximum += 64*cbmap->nb;
     }
-  if (bmap)
+  if (crmap)
     {
-      buckets += bmap->get_bucket_count();
-      maximum += 64*bmap->nb;
+      buckets += crmap->get_bucket_count();
+      maximum += 64*crmap->nb;
     }
   return 100*buckets/ (maximum ? maximum : 1);
 }
@@ -2574,10 +2571,10 @@ IWPixmap::get_memory_usage() const
   unsigned int usage = sizeof(GPixmap);
   if (ymap)
     usage += ymap->get_memory_usage();
-  if (bmap)
-    usage += bmap->get_memory_usage();
-  if (rmap)
-    usage += rmap->get_memory_usage();
+  if (cbmap)
+    usage += cbmap->get_memory_usage();
+  if (crmap)
+    usage += crmap->get_memory_usage();
   return usage;
 }
 
@@ -2597,19 +2594,19 @@ IWPixmap::get_pixmap()
   int rowsep = ppm->rowsize() * sizeof(GPixel);
   int pixsep = sizeof(GPixel);
   ymap->image(ptr, rowsep, pixsep);
-  if (rmap && bmap && crcb_delay >= 0)
+  if (crmap && cbmap && crcb_delay >= 0)
   {
-    rmap->image(ptr+1, rowsep, pixsep, crcb_half);
-    bmap->image(ptr+2, rowsep, pixsep, crcb_half);
+    cbmap->image(ptr+1, rowsep, pixsep, crcb_half);
+    crmap->image(ptr+2, rowsep, pixsep, crcb_half);
   }
   // Convert image data to RGB
   for (int i=0; i<h; i++)
     {
       GPixel *pixrow = (*ppm)[i];
-      if (rmap && bmap && crcb_delay >= 0)
+      if (crmap && cbmap && crcb_delay >= 0)
         {
           for (int j=0; j<w; j++, pixrow++)
-            YRB_to_RGB(((signed char*)pixrow)[0], 
+            YCC_to_RGB(((signed char*)pixrow)[0], 
                        ((signed char*)pixrow)[1], 
                        ((signed char*)pixrow)[2], 
                        pixrow );
@@ -2641,19 +2638,19 @@ IWPixmap::get_pixmap(int subsample, const GRect &rect)
   int rowsep = ppm->rowsize() * sizeof(GPixel);
   int pixsep = sizeof(GPixel);
   ymap->image(subsample, rect, ptr, rowsep, pixsep);
-  if (rmap && bmap && crcb_delay >= 0)
+  if (crmap && cbmap && crcb_delay >= 0)
   {
-    rmap->image(subsample, rect, ptr+1, rowsep, pixsep, crcb_half);
-    bmap->image(subsample, rect, ptr+2, rowsep, pixsep, crcb_half);
+    cbmap->image(subsample, rect, ptr+1, rowsep, pixsep, crcb_half);
+    crmap->image(subsample, rect, ptr+2, rowsep, pixsep, crcb_half);
   }
   // Convert image data to RGB
   for (int i=0; i<h; i++)
     {
       GPixel *pixrow = (*ppm)[i];
-      if (rmap && bmap && crcb_delay >= 0)
+      if (crmap && cbmap && crcb_delay >= 0)
         {
           for (int j=0; j<w; j++, pixrow++)
-            YRB_to_RGB(((signed char*)pixrow)[0], 
+            YCC_to_RGB(((signed char*)pixrow)[0], 
                        ((signed char*)pixrow)[1], 
                        ((signed char*)pixrow)[2], 
                        pixrow );
@@ -2668,7 +2665,6 @@ IWPixmap::get_pixmap(int subsample, const GRect &rect)
   // Return
   return ppm;
 }
-
 
 
 int
@@ -2726,24 +2722,24 @@ IWPixmap::decode_chunk(ByteStream &bs)
       ycodec = new _IWCodec(*ymap, 0);
       if (crcb_delay >= 0)
         {
-          rmap = new _IWMap(w, h);
-          bmap = new _IWMap(w, h);
-          rcodec = new _IWCodec(*rmap, 0);
-          bcodec = new _IWCodec(*bmap, 0);
+          cbmap = new _IWMap(w, h);
+          crmap = new _IWMap(w, h);
+          cbcodec = new _IWCodec(*cbmap, 0);
+          crcodec = new _IWCodec(*crmap, 0);
         }
     }
   // Read data
   assert(ymap);
   assert(ycodec);
-  _ZPCodecOops zp(bs, 0);
+  _ZPCodecBias zp(bs, 0);
   int flag = 1;
   while (flag && cslice<nslices)
     {
       flag = ycodec->code_slice(zp);
-      if (rcodec && bcodec && crcb_delay<=cslice)
+      if (crcodec && cbcodec && crcb_delay<=cslice)
         {
-          flag |= rcodec->code_slice(zp);
-          flag |= bcodec->code_slice(zp);
+          flag |= cbcodec->code_slice(zp);
+          flag |= crcodec->code_slice(zp);
         }
       cslice++;
     }
@@ -2768,10 +2764,10 @@ IWPixmap::encode_chunk(ByteStream &bs, const IWEncoderParms &parm)
     {
       cslice = cserial = cbytes = 0;
       ycodec = new _IWCodec(*ymap, 1);
-      if (rmap && bmap)
+      if (crmap && cbmap)
         {
-          rcodec = new _IWCodec(*rmap, 1);
-          bcodec = new _IWCodec(*bmap, 1);
+          cbcodec = new _IWCodec(*cbmap, 1);
+          crcodec = new _IWCodec(*crmap, 1);
         }
     }
   // Adjust cbytes
@@ -2784,7 +2780,7 @@ IWPixmap::encode_chunk(ByteStream &bs, const IWEncoderParms &parm)
   MemoryByteStream mbs;
   {
     float estdb = -1.0;
-    _ZPCodecOops zp(mbs,1);
+    _ZPCodecBias zp(mbs,1);
     while (flag)
       {
         if (parm.decibels>0  && estdb>=parm.decibels)
@@ -2797,10 +2793,10 @@ IWPixmap::encode_chunk(ByteStream &bs, const IWEncoderParms &parm)
         if (flag && parm.decibels>0)
           if (ycodec->curband==0 || estdb>=parm.decibels-DECIBEL_PRUNE)
             estdb = ycodec->estimate_decibel(db_frac);
-        if (rcodec && bcodec && cslice+nslices>=crcb_delay)
+        if (crcodec && cbcodec && cslice+nslices>=crcb_delay)
           {
-            flag |= rcodec->code_slice(zp);
-            flag |= bcodec->code_slice(zp);
+            flag |= cbcodec->code_slice(zp);
+            flag |= crcodec->code_slice(zp);
           }
         nslices++;
         DJVU_PROGRESS("slice", cslice+nslices);
@@ -2817,7 +2813,7 @@ IWPixmap::encode_chunk(ByteStream &bs, const IWEncoderParms &parm)
       struct SecondaryHeader secondary;
       secondary.major = IWCODEC_MAJOR;
       secondary.minor = IWCODEC_MINOR;
-      if (! (rmap && bmap))
+      if (! (crmap && cbmap))
         secondary.major |= 0x80;
       bs.writall((void*)&secondary, sizeof(secondary));
       struct TertiaryHeader2 tertiary;
@@ -2839,14 +2835,13 @@ IWPixmap::encode_chunk(ByteStream &bs, const IWEncoderParms &parm)
   return flag;
 }
 
-
 void 
 IWPixmap::close_codec()
 {
   delete ycodec;
-  delete rcodec;
-  delete bcodec;
-  ycodec = rcodec = bcodec = 0;
+  delete crcodec;
+  delete cbcodec;
+  ycodec = crcodec = cbcodec = 0;
   cslice = cbytes = cserial = 0;
 }
 
