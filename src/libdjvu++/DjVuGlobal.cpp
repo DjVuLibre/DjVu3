@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuGlobal.cpp,v 1.8 1999-09-21 21:06:19 leonb Exp $
+//C- $Id: DjVuGlobal.cpp,v 1.9 1999-09-21 21:42:19 leonb Exp $
 
 
 
@@ -106,7 +106,7 @@ DjVuProgress::start(const char *logname)
 DjVuProgress::Event::~Event()
 {
   taglen = n;
-  tagbuf[taglen] = 0;
+  if (tagbuf && n<tagmax)  tagbuf[taglen] = 0;
 }
 
 DjVuProgress::Event::Event(const char *tag)
