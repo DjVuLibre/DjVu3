@@ -7,10 +7,10 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: GThreads.cpp,v 1.6 1999-03-03 22:10:44 leonb Exp $
+//C-  $Id: GThreads.cpp,v 1.7 1999-03-03 23:02:15 leonb Exp $
 
 
-// **** File "$Id: GThreads.cpp,v 1.6 1999-03-03 22:10:44 leonb Exp $"
+// **** File "$Id: GThreads.cpp,v 1.7 1999-03-03 23:02:15 leonb Exp $"
 // This file defines machine independent classes
 // for running and synchronizing threads.
 // - Author: Leon Bottou, 01/1998
@@ -825,15 +825,12 @@ GThread::~GThread()
   task = 0;
 }
 
-static GThread *starter;
-
 static void 
-starttwo(void)
+starttwo(GThread *thr)
 {
   // Hopefully this function reacquires 
   // an exception context pointer. Therefore
   // we can register the exception handlers.
-  GThread *thr = starter;
 #ifdef __EXCEPTIONS
   try 
     {
@@ -862,13 +859,17 @@ starttwo(void)
   abort();
 }
 
-void GThread::start(void)
+static GThread * volatile starter;
+
+void
+GThread::start(void)
 {
-  mach_switch(&starter->task->regs, &curtask->regs);
+  GThread *thr = starter;
+  mach_switch(&thr->task->regs, &curtask->regs);
   // Registers may still contain an improper pointer
   // to the exception context.  We should neither 
   // register cleanups nor register handlers.
-  starttwo();
+  starttwo(thr);
   abort();
 }
 
