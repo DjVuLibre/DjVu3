@@ -1,10 +1,38 @@
 //C-  -*- C++ -*-
 //C-
-//C-  Copyright © 1999-2001, LizardTech, Inc. All Rights Reserved.
-//C-              Unauthorized use prohibited.
+//C- DjVu® Unix Viewer (v. 3.5)
+//C- 
+//C- Copyright © 1999-2001 LizardTech, Inc. All Rights Reserved.
+//C- The DjVu Reference Library is protected by U.S. Pat. No.
+//C- 6,058,214 and patents pending.
+//C- 
+//C- This software is subject to, and may be distributed under, the
+//C- GNU General Public License, Version 2. The license should have
+//C- accompanied the software or you may obtain a copy of the license
+//C- from the Free Software Foundation at http://www.fsf.org .
+//C- 
+//C- The computer code originally released by LizardTech under this
+//C- license and unmodified by other parties is deemed the "LizardTech
+//C- Original Code."
+//C- 
+//C- With respect to the LizardTech Original Code ONLY, and subject
+//C- to any third party intellectual property claims, LizardTech
+//C- grants recipient a worldwide, royalty-free, non-exclusive license
+//C- under patent claims now or hereafter owned or controlled by
+//C- LizardTech that are infringed by making, using, or selling
+//C- LizardTech Original Code, but solely to the extent that any such
+//C- patent(s) is/are reasonably necessary to enable you to make, have
+//C- made, practice, sell, or otherwise dispose of LizardTech Original
+//C- Code (or portions thereof) and not to any greater extent that may
+//C- be necessary to utilize further modifications or combinations.
+//C- 
+//C- The LizardTech Original Code is provided "AS IS" WITHOUT WARRANTY
+//C- OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+//C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
+//C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: dispatch.cpp,v 1.1 2001-05-29 22:05:29 bcr Exp $
+// $Id: dispatch.cpp,v 1.2 2001-07-25 17:10:41 mchen Exp $
 // $Name:  $
 
 
@@ -171,7 +199,7 @@ QDispatchObject::slotGetURL(const GURL & url, const GUTF8String &qtarget)
       const QObject * obj=sender();
       if (!obj->inherits("DjVuViewer"))
 	 throw ERROR_MESSAGE("QDispatchObject::slotGetURL",
-			     "Invalid sender: Must be DjVuViewer.");
+			     "QDispatchObject.invalid_sender");
       const DjVuViewer * djvu=(const DjVuViewer *) obj;
       request_data(url, qtarget, djvu);
    } catch(const GException & exc)
@@ -188,7 +216,7 @@ QDispatchObject::slotShowStatus(const QString &qstatus)
       const QObject * obj=sender();
       if (!obj->inherits("DjVuViewer"))
 	 throw ERROR_MESSAGE("QDispatchObject::slotShowStatus",
-			     "Invalid sender: Must be DjVuViewer.");
+			     "QDispatchObject.invalid_sender");
       const DjVuViewer * djvu=(const DjVuViewer *) obj;
 
       const char *status=qstatus;
@@ -388,8 +416,8 @@ AttachWindow(void)
 
 	       displ=XOpenDisplay(displ_name);
 	       if (!displ) throw ERROR_MESSAGE("AttachWindow",
-					       GUTF8String("Failed to open display ")+
-					       XDisplayName(displ_name));
+					       "AttachWindow.open_display_fail" "\t" +
+					       GUTF8String(XDisplayName(displ_name)));
 	       DEBUG_MSG("successfully opened connection to the display\n");
 
 	       XVisualInfo vinfo, * vinfo_list;
@@ -397,7 +425,7 @@ AttachWindow(void)
 	       vinfo.visualid=visual_id;
 	       vinfo_list=XGetVisualInfo(displ, VisualIDMask, &vinfo, &count);
 	       if (!vinfo_list || !count)
-		  throw ERROR_MESSAGE("AttachWindow", "Failed to get Netscape visual.");
+		  throw ERROR_MESSAGE("AttachWindow","AttachWindow.no_netscape_visual");
 	       visual=vinfo_list[0].visual;
 	       depth=vinfo_list[0].depth;
 	       XFree(vinfo_list);
@@ -931,7 +959,7 @@ Dispatch(void)
 	    Handshake();
 	    break;
 	 default:
-	    throw ERROR_MESSAGE("Dispatch", "Unknown request read from the pipe.");
+	    throw ERROR_MESSAGE("Dispatch","Dispatch.unknown_pipe_read_request");
       }
    } catch(PipeError & exc)
    {
