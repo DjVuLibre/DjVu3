@@ -1,5 +1,10 @@
 #!/bin/sh
 name="$1"
+if [ -z "$name" ] 
+then
+  echo "Usage: $0 <packagename>" 1>&2
+  exit 1
+fi
 if [ ! -d ./TOPDIR ]
 then
   echo "TOPDIR does not exist." 1>&2
@@ -11,10 +16,25 @@ then
   echo "./TOPDIR/SRCDIR does not exist." 1>&2
   exit 1
 fi
-if [ ! -d  "./SRCDIR/packages/$name" ] 
+packagedir="packages/$name"
+if [ ! -d  "./SRCDIR/$packagedir" ] 
 then
-  echo "'TOPDIR/SRCDIR/packages/$name' does not exist." 1>&2
+  echo "'TOPDIR/SRCDIR/$packagedir' does not exist." 1>&2
   exit 1
+fi
+issource="$2"
+if [ -n "$issource" ] 
+then
+  if [ ! -d "./SRCDIR/$packagedir/source" ]
+  then
+    echo "'TOPDIR/SRCDIR/$packagedir/source' does not exist." 1>&2
+    exit 1
+  fi
+  srcdir="./SRCDIR/$packagedir/source"
+  srcdir=`cd $srcdir 1>>/dev/null 2>>/dev/null;pwd`
+else
+  srcdir="./SRCDIR/$packagedir"
+  srcdir=`cd $srcdir 1>>/dev/null 2>>/dev/null;pwd`
 fi
 if [ ! -r ./config.cache ]
 then
@@ -26,6 +46,10 @@ if [ -z "$SYS" ]
 then
   echo "System type not found in TOPDIR/config.cache" 1>&2
   exit 1
+fi
+if [ -n "$issource" ]
+then
+  SYS=source
 fi
 for i in $PACKAGES none
 do
@@ -41,8 +65,6 @@ then
   exit 1
 fi 
 
-packagedir="packages/$name"
-filelist="$packagedir/archive.list"
 thisdir=`pwd`
 
 version=`grep 'SDKVERSION=' ./SRCDIR/rules/versions|sed -e 's,.*=,,g' -e 's,[ 	]*$,,g'`
@@ -51,14 +73,11 @@ then
   echo "Version not found in TOPDIR/SRCDIR/rules/versions" 1>&2
   exit 1
 fi
-if [ -z "$name" ] 
+srcfilelist="$srcdir/archive.list"
+filelist="$packagedir/archive.list"
+if [ ! -r "$srcfilelist" ]
 then
-  echo "Usage: $0 <packagename>" 1>&2
-  exit 1
-fi
-if [ ! -r "./SRCDIR/$filelist" ]
-then
-  echo "Archive list $filelist does not exist." 1>&2
+  echo "Archive list $srcfilelist does not exist." 1>&2
   exit 1
 fi
 
@@ -66,52 +85,62 @@ echo "Copying files"
 rm -rf "$packagedir"
 mkdir packages 2>>/dev/null
 mkdir "$packagedir" 2>>/dev/null
-for i in `cd ./SRCDIR;echo $packagedir/*` 
+for i in `cd $srcdir 2>>/dev/null 1>>/dev/null;echo *` 
 do
-  if [ ! -d "./SRCDIR/$i" ]
+  j="$srcdir/$i"
+  if [ ! -d "$j" ]
   then
-    if [ "$i" != "$filelist" ] 
+    if [ "$j" != "$srcfilelist" ] 
     then
-      cp "./SRCDIR/$i" "$i"
-      chmod u+w "$i"
-      sed -e "s,@%VERSION%@,$version,g" -e "s,@%SYS%@,$SYS,g" < "./SRCDIR/$i" > "$i"
-      chmod u-w "$i"
+      k="$packagedir/$i"
+      cp "$j" "$k"
+      chmod u+w "$k"
+      sed -e "s,@%VERSION%@,$version,g" -e "s,@%SYS%@,$SYS,g" < "$j" > "$k"
+      chmod u-w "$k"
     fi
   fi
 done
 rm -f "$filelist" "$packagedir/CVS"
 archive=`cd "$packagedir" 1>>/dev/null 2>>/dev/null;pwd`/archive.tar
-action="cvf"
-for i in `sed "s,@%VERSION%@,$version,g"< "./SRCDIR/$filelist"` 
-do
-  (
-    if [ -r "./examples/$i" ] 
-    then
-      cd examples
-    elif [ -r "./SRCDIR/examples/$i" ] 
-    then
-      cd ./SRCDIR/examples
-    fi
+(
+  if [ -n "$issource" ]
+  then
+    cd ./SRCDIR
+  fi
+  action="cvf"
+  for i in `sed "s,@%VERSION%@,$version,g"< "$srcfilelist"` 
+  do
     if [ -d "./$i" ]
     then
       find "$i" -name CVS -prune -o -type f -exec tar "$action" "$archive" \{\} \;
     elif [ -d "./SRCDIR/$i" ]
     then
       (cd ./SRCDIR;find "$i" -name CVS -prune -o -type f -exec tar "$action" "$archive" \{\} \;)
-    elif [ -r "$i" ] 
-    then
-      tar "$action" "$archive" "$i"
-    elif [ -r "./SRCDIR/$i" ]
-    then
-      (cd ./SRCDIR;tar "$action" "$archive" "$i")
     else
-      echo "$i does not exist." 1>&2
-      rm -rf "$packagedir"
-      exit 1
+      (
+        if [ -r "./examples/$i" ] 
+        then
+          cd examples
+        elif [ -r "./SRCDIR/examples/$i" ] 
+        then
+          cd ./SRCDIR/examples
+        fi
+        if [ -r "$i" ] 
+        then
+          tar "$action" "$archive" "$i"
+        elif [ -r "./SRCDIR/$i" ]
+        then
+          (cd ./SRCDIR;tar "$action" "$archive" "$i")
+        else
+          echo "$i does not exist." 1>&2
+          rm -rf "$packagedir"
+          exit 1
+        fi
+      )
     fi
-  )
-  action="rvf"
-done
+    action="rvf"
+  done
+)
 cd packages
 tar cvvf "$name-$version-$SYS".tar "$name"
 gzip -f "$name-$version-$SYS".tar

@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuAPI.h,v 1.49 2000-03-08 22:59:46 bcr Exp $
+ *C- $Id: DjVuAPI.h,v 1.50 2000-05-18 20:22:34 bcr Exp $
  *
  * The main header file for the DjVu API
  */
@@ -35,7 +35,10 @@
 
 /*
  * $Log: DjVuAPI.h,v $
- * Revision 1.49  2000-03-08 22:59:46  bcr
+ * Revision 1.50  2000-05-18 20:22:34  bcr
+ * Added rules for packaging source files.
+ *
+ * Revision 1.49  2000/03/08 22:59:46  bcr
  * Updated the documentation.  I'm using Leon's libdjvu++ documentation
  * as a template.
  *
@@ -53,9 +56,9 @@
 
 #include "DjVu.h"
 #include "DjVuDecodeAPI.h"
-#include "DjVuBitonalAPI.h"
-#include "DjVuPhotoAPI.h"
-#include "DjVuDocumentAPI.h"
+/* include "DjVuBitonalAPI.h" */
+/* include "DjVuPhotoAPI.h" */
+/* include "DjVuDocumentAPI.h" */
 
 #ifdef __cplusplus
 extern "C"
