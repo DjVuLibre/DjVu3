@@ -9,10 +9,10 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GThreads.cpp,v 1.31 1999-09-12 18:55:27 eaf Exp $
+//C- $Id: GThreads.cpp,v 1.32 1999-10-15 23:32:04 leonb Exp $
 
 
-// **** File "$Id: GThreads.cpp,v 1.31 1999-09-12 18:55:27 eaf Exp $"
+// **** File "$Id: GThreads.cpp,v 1.32 1999-10-15 23:32:04 leonb Exp $"
 // This file defines machine independent classes
 // for running and synchronizing threads.
 // - Author: Leon Bottou, 01/1998
@@ -1377,11 +1377,11 @@ GMonitor::wait()
   // Wait
   if (ok)
     {
-      // Release
+      // Atomically release monitor and wait
       int sav_count = count;
       count = 1;
-      // Wait
       curtask->wchan = (void*)this;
+      cotask_wakeup((void*)count, 1);
       cotask_yield();
       // Re-acquire
       while (ok && count <= 0)
@@ -1404,13 +1404,13 @@ GMonitor::wait(unsigned long timeout)
   // Wait
   if (ok)
     {
-      // Release
+      // Atomically release monitor and wait
       int sav_count = count;
       count = 1;
-      // Wait
       unsigned long maxwait = time_elapsed(0) + timeout;
       curtask->maxwait = &maxwait;
       curtask->wchan = (void*)this;
+      cotask_wakeup((void*)count, 1);
       cotask_yield();
       // Re-acquire
       while (ok && count<=0)
