@@ -31,7 +31,7 @@
 #C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #
-# $Id: functions.sh,v 1.60 2001-03-30 23:31:21 bcr Exp $
+# $Id: functions.sh,v 1.61 2001-05-31 22:19:50 lvincent Exp $
 # $Name:  $
 
 #
@@ -253,7 +253,7 @@ process_general_option()
             ;;
         --with-flag=* )
             C_DEFS=APPEND
-            s=`get option_value "$*"`
+            s=`get_option_value "$*"`
             A_DEFS=`escape "$s"`" $A_DEFS"
             ;;
         *)
