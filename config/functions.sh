@@ -31,7 +31,7 @@
 #C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #
-# $Id: functions.sh,v 1.64 2001-06-13 23:18:42 bcr Exp $
+# $Id: functions.sh,v 1.65 2001-06-19 17:23:31 bcr Exp $
 # $Name:  $
 
 #
@@ -1049,37 +1049,6 @@ generate_makefile()
     shift
   done
 }
-
-generate_messages()
-{
-  TOPSRCDIR=`unescape $TOPSRCDIR`
-  TOPBUILDDIR=`unescape $TOPBUILDDIR`
-  ${mkdirp} "$TOPBUILDDIR/profiles"
-  if [ -r "$TOPSRCDIR/profiles" ]
-  then
-    for i in "$TOPSRCDIR/profiles/"*.conf ; do
-       rm -f "$TOPBUILDDIR/profiles/"`basename "$i"`
-       cp "$i" "$TOPBUILDDIR/profiles/."
-    done
-  fi
-  profilepath="$TOPBUILDDIR/profiles/message.conf"
-  rm -f "$profilepath" "/tmp/$$"
-  echo "Creating: $profilepath"
-  while [ -n "$1" ]
-  do
-    if [ -r "$TOPBUILDDIR/$1/message.conf" ] 
-    then
-      ${cat} "$TOPBUILDDIR/$1/message.conf" >> "/tmp/$$"
-    elif [ -r "$TOPSRCDIR/$1/message.conf" ] 
-    then
-      ${cat} "$TOPSRCDIR/$1/message.conf" >> "/tmp/$$"
-    fi
-    shift
-  done
-  sort -u < "/tmp/$$" > "$profilepath"
-  rm -f "/tmp/$$"
-}
-
 
 ### ------------------------------------------------------------------------
 ### Function to generate main makefiles
