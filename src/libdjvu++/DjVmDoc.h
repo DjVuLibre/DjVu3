@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVmDoc.h,v 1.7 1999-09-23 13:26:06 leonb Exp $
+//C- $Id: DjVmDoc.h,v 1.8 1999-09-28 17:23:12 eaf Exp $
  
 #ifndef _DJVMDOC_H
 #define _DJVMDOC_H
@@ -32,7 +32,7 @@
 
     @memo DjVu multipage documents reader/writer.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: DjVmDoc.h,v 1.7 1999-09-23 13:26:06 leonb Exp $#
+    @version #$Id: DjVmDoc.h,v 1.8 1999-09-28 17:23:12 eaf Exp $#
 */
 
 //@{
@@ -132,6 +132,9 @@ public:
       /** Writes the multipage DjVu document in the {\em bundled} format into
 	  the stream. */
    void		write(ByteStream & str);
+      /** Stored index (top-level) file of the DjVu document in the {\em
+	  indirect} format into the specified stream. */
+   void		write_index(ByteStream & str);
       /** Writes the multipage DjVu document in the {\em indirect} format
 	  into the given directory. Every page and included file will be
           stored as a separate file. Besides, one top-level file with

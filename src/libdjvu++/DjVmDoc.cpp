@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVmDoc.cpp,v 1.9 1999-09-27 21:10:38 leonb Exp $
+//C- $Id: DjVmDoc.cpp,v 1.10 1999-09-28 17:23:12 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -258,6 +258,29 @@ DjVmDoc::read(const char * name)
 }
 
 void
+DjVmDoc::write_index(ByteStream & str)
+{
+   DEBUG_MSG("DjVmDoc::write_index(): Storing DjVm index file\n");
+   DEBUG_MAKE_INDENT(3);
+
+   GPList<DjVmDir::File> files_list=dir->get_files_list();
+   for(GPosition pos=files_list;pos;++pos)
+   {
+      GP<DjVmDir::File> file=files_list[pos];
+      file->offset=0;
+      file->size=0;
+   }
+
+   IFFByteStream iff(str);
+
+   iff.put_chunk("FORM:DJVM", 1);
+   iff.put_chunk("DIRM");
+   dir->encode(iff);
+   iff.close_chunk();
+   iff.close_chunk();
+}
+
+void
 DjVmDoc::expand(const char * dir_name, const char * idx_name)
 {
    DEBUG_MSG("DjVmDoc::expand(): Expanding into '" << dir_name << "'\n");
@@ -288,20 +311,8 @@ DjVmDoc::expand(const char * dir_name, const char * idx_name)
    GString idx_full_name=GOS::expand_name(idx_name, dir_name);
    
    DEBUG_MSG("storing index file '" << idx_full_name << "'\n");
-      // Now save the index
-   for(pos=files_list;pos;++pos)
-   {
-      GP<DjVmDir::File> file=files_list[pos];
-      file->offset=0;
-      file->size=0;
-   }
 
    GOS::deletefile(idx_full_name);
    StdioByteStream str(idx_full_name, "wb");
-   IFFByteStream iff(str);
-
-   iff.put_chunk("FORM:DJVM", 1);
-   iff.put_chunk("DIRM");
-   dir->encode(iff);
-   iff.close_chunk();
+   write_index(str);
 }
