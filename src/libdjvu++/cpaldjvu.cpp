@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: cpaldjvu.cpp,v 1.5 2000-02-24 20:23:07 leonb Exp $
+//C- $Id: cpaldjvu.cpp,v 1.6 2000-03-02 00:05:07 leonb Exp $
 
 
 /** @name cpaldjvu
@@ -43,11 +43,11 @@
     surprisingly well.
 
     @memo
-    Simple lossless encoder for low resolution, low color images.
+    Simple encoder for low resolution, low color images.
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: cpaldjvu.cpp,v 1.5 2000-02-24 20:23:07 leonb Exp $# */
+    #$Id: cpaldjvu.cpp,v 1.6 2000-03-02 00:05:07 leonb Exp $# */
 //@{
 //@}
 
