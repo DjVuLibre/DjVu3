@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: parseoptions.h,v 1.43 2001-04-10 17:34:03 fcrary Exp $
+// $Id: parseoptions.h,v 1.44 2001-05-01 22:40:13 bcr Exp $
 // $Name:  $
 
 #ifndef __DJVUPARSEOPTIONS_H__
@@ -66,7 +66,7 @@
 
    @memo Class used for parsing options and configuration files.
    @author Bill Riemers
-   @version #$Id: parseoptions.h,v 1.43 2001-04-10 17:34:03 fcrary Exp $#
+   @version #$Id: parseoptions.h,v 1.44 2001-05-01 22:40:13 bcr Exp $#
  */
 
 /*@{*/
@@ -77,6 +77,7 @@
  * configuration files.  The operations of ChangeProfile(), and the copy
  * constructor are only thread safe if you define a THREADMODEL. 
  */
+#include "GString.h"
 #include "DjVu.h"
 
 #ifdef __cplusplus
@@ -411,7 +412,7 @@ public:
 
   /** This simple perror() type function prints all errors, with 
       a GetError() loop, so the errors are cleared. */
-  void perror(const char *mesg=0);
+  void perror(const GUTF8String &mesg=GUTF8String());
   /*@}*/
 
 /** @name Parsing profiles or arguments

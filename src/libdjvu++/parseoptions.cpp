@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: parseoptions.cpp,v 1.78 2001-04-21 00:16:58 bcr Exp $
+// $Id: parseoptions.cpp,v 1.79 2001-05-01 22:40:13 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -42,6 +42,7 @@
 #define _PARSEOPTIONS_H_IMPLEMENTATION_ true
 #include "parseoptions.h"
 #include "DjVuOptions.h"
+#include "DjVuMessage.h"
 #include <string.h>
 #ifdef THREADMODEL
 #include "GThreads.h"
@@ -662,17 +663,17 @@ void DjVuParseOptions::ClearError()
   Errors=new ErrorList;
 }
 
-void DjVuParseOptions::perror(const char *mesg)
+void DjVuParseOptions::perror(const GUTF8String &mesg)
 {
   const char *s;
   while((s=Errors->GetError()))
   {
-    if(mesg)
+    if(mesg.length())
     {
-      DjVuPrintError("%s\n%s\n",mesg,s);
+      DjVuPrintError("%s\n",(const char *)DjVuMessage::LookUpUTF8(mesg+"\v"+s));
     }else
     {
-      DjVuPrintError("%s\n",s);
+      DjVuPrintError("%s\n",(const char *)DjVuMessage::LookUpUTF8(s));
     }
   }
 }

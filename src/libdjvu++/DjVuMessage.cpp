@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessage.cpp,v 1.41 2001-05-01 21:28:33 praveen Exp $
+// $Id: DjVuMessage.cpp,v 1.42 2001-05-01 22:40:13 bcr Exp $
 // $Name:  $
 
 
@@ -449,7 +449,8 @@ DjVuMessage::LookUp( const GUTF8String & MessageList ) const
     {
       //  Find the end of the next message and process it
       int next_ending = MessageList.search('\n', start);
-      if( next_ending < 0 ) next_ending = end;
+      if( next_ending < 0 )
+        next_ending = end;
       result += LookUpSingle( MessageList.substr(start, next_ending-start) );
       //  Advance to the next message
       start = next_ending;
@@ -461,13 +462,14 @@ DjVuMessage::LookUp( const GUTF8String & MessageList ) const
 }
 
 
-//  Expands a single message and inserts the arguments. Single_Message contains no
-//  separators (newlines), but includes all the parameters separated by tabs.
+// Expands a single message and inserts the arguments. Single_Message
+// contains no separators (newlines), but includes all the parameters
+// separated by tabs.
 GUTF8String
 DjVuMessage::LookUpSingle( const GUTF8String &Single_Message ) const
 {
   //  Isolate the message ID and get the corresponding message text
-  int ending_posn = Single_Message.search('\t');
+  int ending_posn = Single_Message.contains("\t\v");
   if( ending_posn < 0 )
     ending_posn = Single_Message.length();
   GUTF8String msg_text;
@@ -504,12 +506,20 @@ DjVuMessage::LookUpSingle( const GUTF8String &Single_Message ) const
   unsigned int param_num = 0;
   while( (unsigned int)ending_posn < Single_Message.length() )
   {
+    GUTF8String arg;
     const int start_posn = ending_posn+1;
-    ending_posn = Single_Message.search('\t',start_posn);
-    if( ending_posn < 0 )
-      ending_posn = Single_Message.length();
-    InsertArg( msg_text, ++param_num,
-               Single_Message.substr(start_posn, ending_posn-start_posn) );
+    if(Single_Message[ending_posn] == '\v')
+    {
+      ending_posn=Single_Message.length();
+      arg=LookUpSingle(Single_Message.substr(start_posn,ending_posn));
+    }else
+    {
+      ending_posn = Single_Message.search('\t',start_posn);
+      if( ending_posn < 0 )
+        ending_posn = Single_Message.length();
+      arg=Single_Message.substr(start_posn, ending_posn-start_posn);
+    }
+    InsertArg( msg_text, ++param_num, arg);
   }
   //  Insert the message number
   InsertArg( msg_text, 0, msg_number );
