@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocEditor.cpp,v 1.26 2000-02-01 15:49:23 leonb Exp $
+//C- $Id: DjVuDocEditor.cpp,v 1.27 2000-02-16 07:38:19 bcr Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -600,7 +600,7 @@ DjVuDocEditor::insert_group(const GList<GString> & file_names, int page_num)
 		  GOS::cleardir(dirname);
 		  GOS::deletefile(dirname);
 	       }
-	       RETHROW;
+	       EXTHROW(exc);
 	    } ENDCATCH;
 	 } else insert_file(fname, true, file_pos, name2id);
       } CATCH(exc) {

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.cpp,v 1.42 2000-01-06 19:48:58 praveen Exp $
+//C- $Id: DataPool.cpp,v 1.43 2000-02-16 07:38:19 bcr Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -774,7 +774,7 @@ DataPool::get_data(void * buffer, int offset, int sz, int level)
 	    return pool->get_data(buffer, start+offset, sz, level+1);
 	 } CATCH(exc) {
 	    if (strcmp(exc.get_cause(), "DATA_POOL_REENTER") || level)
-	       RETHROW;
+	       EXTHROW(exc);
 	 } ENDCATCH;
       }
    } 
@@ -835,7 +835,7 @@ DataPool::get_data(void * buffer, int offset, int sz, int level)
 	    GPosition pos;
 	    if (readers_list.search(reader, pos)) readers_list.del(pos);
 	 }
-	 RETHROW;
+	 EXTHROW(exc);
       } ENDCATCH;
    
       {

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuAnno.cpp,v 1.44 1999-12-14 16:56:24 eaf Exp $
+//C- $Id: DjVuAnno.cpp,v 1.45 2000-02-16 07:38:19 bcr Exp $
 
 
 #ifdef __GNUC__
@@ -417,7 +417,7 @@ GLParser::parse(const char * cur_name, GPList<GLObject> & list,
          CATCH(exc)
            {
              if (strcmp(exc.get_cause(), "EOF"))
-               RETHROW;
+               EXTHROW(exc);
            } 
          ENDCATCH;
 	 list.append(new GLObject(object->get_symbol(), new_list));
@@ -440,7 +440,7 @@ GLParser::parse(const char * str)
       parse("toplevel", list, str);
    } CATCH(exc)
    {
-      if (strcmp(exc.get_cause(), "EOF")) RETHROW;
+      if (strcmp(exc.get_cause(), "EOF")) EXTHROW(exc);
    } ENDCATCH;
 }
 

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.112 2000-02-08 19:57:43 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.113 2000-02-16 07:38:19 bcr Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -1335,6 +1335,7 @@ DjVuDocument::get_file_names(void)
       }
       CATCH(ex)
       {
+        // Why is this try/catch block here?
         TRY { 
           get_portcaster()->notify_error(this, ex.get_cause()); 
           static const char emsg[]="Excluding page %d form the file list due to errors.\n";
@@ -1344,7 +1345,7 @@ DjVuDocument::get_file_names(void)
         }
         CATCH(exc)
         {
-          RETHROW;
+          EXTHROW(exc);
         }
         ENDCATCH;
       }

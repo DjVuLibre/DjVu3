@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: parseoptions.cpp,v 1.41 2000-02-16 04:46:16 bcr Exp $
+//C- $Id: parseoptions.cpp,v 1.42 2000-02-16 07:38:20 bcr Exp $
 #ifdef __GNUC__
 #pragma implementation
 #endif
@@ -742,7 +742,6 @@ int
 DjVuParseOptions::ReadNextConfig (
   int &line, const char prog[], FILE *f )
 {
-
   const char *xname=strrchr(prog,'/');
   xname=xname?(xname+1):prog;
   // First check and see if we have already read in this profile.
@@ -785,7 +784,7 @@ DjVuParseOptions::ReadNextConfig (
           const int inherit_profile=ProfileTokens->GetToken(name);
           if(inherit_profile >= 0)
           {
-            const int oldsize=Configuration->profiles[profile].size;
+            int &oldsize=Configuration->profiles[profile].size;
             const int newsize=Configuration->profiles[inherit_profile].size;
             char **inherit_values=Configuration->profiles[inherit_profile].values;
             char **&values=Configuration->profiles[profile].values;
@@ -795,8 +794,10 @@ DjVuParseOptions::ReadNextConfig (
               if(oldsize)
                 memcpy(NewValues,values,oldsize*sizeof(char *));
               memset(NewValues+oldsize,0,(newsize-oldsize)*sizeof(char *));
+              memset(values,0,oldsize*sizeof(char *));
               delete [] values;
               values=NewValues;
+              oldsize=newsize;
             }
             for(int k=0;k<newsize;k++)
             {
@@ -809,18 +810,20 @@ DjVuParseOptions::ReadNextConfig (
             }
           }else
           {
-            static const char emesg[]="%s:Error in line %d of '%1.1024s'\n\t--> can not inherit unknown profile '%1.1024s'";
+            static const char emesg[]="%s:Error in line %d of '%s'\n\t--> can not inherit unknown profile '%s'";
             char *s=new char[sizeof(emesg)+20+strlen(filename)+strlen(name)+strlen(prog)];
             sprintf(s,emesg,filename,line,prog,name);
             Errors->AddError(s);
             delete [] s;
+//            break;
           }
         }
       }
     }
     delete [] buf;
      // Now we can read the new variables.
-    ReadFile(line,f,profile);
+    if(!feof(f))
+      ReadFile(line,f,profile);
   }else if(f)
   {
     delete [] buf;

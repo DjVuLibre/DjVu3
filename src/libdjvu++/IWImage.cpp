@@ -9,9 +9,9 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: IWImage.cpp,v 1.27 2000-01-04 05:31:31 bcr Exp $
+//C- $Id: IWImage.cpp,v 1.28 2000-02-16 07:38:19 bcr Exp $
 
-// File "$Id: IWImage.cpp,v 1.27 2000-01-04 05:31:31 bcr Exp $"
+// File "$Id: IWImage.cpp,v 1.28 2000-02-16 07:38:19 bcr Exp $"
 // - Author: Leon Bottou, 08/1998
 
 #ifdef __GNUC__
@@ -1856,7 +1856,7 @@ IWBitmap::init(const GBitmap *bm, const GBitmap *mask)
   CATCH(ex)
     {
       delete [] buffer;
-      RETHROW;
+      EXTHROW(ex);
     }
   ENDCATCH;
   // Delete buffer
@@ -2279,7 +2279,7 @@ IWPixmap::init(const GPixmap *pm, const GBitmap *mask, CRCBMode crcbmode)
   CATCH(ex)
     {
       delete [] buffer;
-      RETHROW;
+      EXTHROW(ex);
     }
   ENDCATCH;
   // Delete buffer

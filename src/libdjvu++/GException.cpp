@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GException.cpp,v 1.14 1999-08-18 21:44:16 leonb Exp $
+//C- $Id: GException.cpp,v 1.15 2000-02-16 07:38:19 bcr Exp $
 
 
 #ifdef __GNUC__
@@ -23,7 +23,7 @@
 #include "GException.h"
 #include "debug.h"
 
-// File "$Id: GException.cpp,v 1.14 1999-08-18 21:44:16 leonb Exp $"
+// File "$Id: GException.cpp,v 1.15 2000-02-16 07:38:19 bcr Exp $"
 // - Author: Leon Bottou, 05/1997
 
 GException::GException() 
@@ -35,7 +35,7 @@ const char * const
 GException::outofmemory = "Out of memory";
 
 GException::GException(const GException & exc) 
-  : cause(0), file(exc.file), func(exc.func), line(exc.line)
+  : file(exc.file), func(exc.func), line(exc.line)
 {
   if (exc.cause && exc.cause!=outofmemory) 
     {
@@ -50,7 +50,7 @@ GException::GException(const GException & exc)
 }
 
 GException::GException (const char *xcause, const char *file, int line, const char *func)
-  : cause(0), file(file), func(func), line(line)
+  : file(file), func(func), line(line)
 {
   // good place to set a breakpoint and DEBUG message too. 
   // It'd hard to track exceptions which seem to go from nowhere
