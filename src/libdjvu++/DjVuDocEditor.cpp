@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocEditor.cpp,v 1.25 2000-01-26 23:59:31 eaf Exp $
+//C- $Id: DjVuDocEditor.cpp,v 1.26 2000-02-01 15:49:23 leonb Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -1170,7 +1170,6 @@ DjVuDocEditor::save_as(const char * where, bool bundled)
 				orig_doc_type==OLD_BUNDLED ||
 				orig_doc_type==SINGLE_PAGE ||
 				orig_doc_type==OLD_INDEXED && orig_doc_pages==1;
-      bool can_be_saved_indirect=orig_doc_type==INDIRECT;
       if ((bundled ^ can_be_saved_bundled)!=0)
 	 THROW("Can't 'Save' the document in the requested format. Use 'Save As'");
       save_doc_url=doc_url;
