@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: GPContainer.h,v 1.2.2.2 1999-05-14 22:41:14 eaf Exp $
+//C-  $Id: GPContainer.h,v 1.2.2.3 1999-05-25 16:43:04 eaf Exp $
 
 
 #ifndef _GPCONTAINER_H_
@@ -28,8 +28,8 @@
     \Ref{GList}<\Ref{GP}<T>> and \Ref{DArray}<\Ref{GP}<T>>. Internally
     they are \Ref{GList}<\Ref{GPBase}> and \Ref{DArray}<\Ref{GPBase}>
     which results in the fact, that \Ref{GList} and \Ref{DArray} are
-    instantiated only once. This is possible due to the fact, that
-    \Ref{GP} and \Ref{GPBase} have the same size and the same internal
+    instantiated only once. This is possible because \Ref{GP} and
+    \Ref{GPBase} have the same size and the same internal
     structure. \Ref{GP} just adds template interface to \Ref{GPBase}. The
     result is that we reduce the size of the executable by having only
     one instantiation of the list and array.
@@ -38,7 +38,7 @@
     @author 
     Leon Bottou <leonb@research.att.com>, Andrei Erofeev <eaf@geocities.com>.
     @version 
-    #$Id: GPContainer.h,v 1.2.2.2 1999-05-14 22:41:14 eaf Exp $# */
+    #$Id: GPContainer.h,v 1.2.2.3 1999-05-25 16:43:04 eaf Exp $# */
 //@{
 
 /** Dynamic array.
@@ -281,7 +281,7 @@ GPList<TYPE>::operator= (const GPList<TYPE>& gl)
 }
 
 #if 0
-/** Hashed associative map.
+/* Hashed associative map.
   */
 
 template<class KTYPE, class VTYPE>

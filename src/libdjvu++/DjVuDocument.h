@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.h,v 1.1.2.4 1999-05-14 22:41:13 eaf Exp $
+//C- $Id: DjVuDocument.h,v 1.1.2.5 1999-05-25 16:43:04 eaf Exp $
  
 #ifndef _DJVUDOCUMENT_H
 #define _DJVUDOCUMENT_H
@@ -31,7 +31,7 @@
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocument.h,v 1.1.2.4 1999-05-14 22:41:13 eaf Exp $#
+    @version #$Id: DjVuDocument.h,v 1.1.2.5 1999-05-25 16:43:04 eaf Exp $#
 */
 
 //@{
@@ -130,10 +130,12 @@ public:
 	  is negative, the page will be appended. This will change the
 	  file's URL, will update the document's navigation directory,
 	  will insert a link to this directory into the file, and finally
-	  will insert the file into the internal list. */
+	  will insert the file into the internal list. If there was {\em no}
+          navigation directory before, it will be created automatically. */
    void		insert_page(const GP<DjVuFile> & file, int page_num=-1);
       /** Removes page #page_num# from the document. This will update the
-	  navigation directory. */
+	  navigation directory. If there will be only one page left, the
+          navigation directory will be removed from the document automatically. */
    void		delete_page(int page_num);
       //@}
 

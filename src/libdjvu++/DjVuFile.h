@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.h,v 1.1.2.6 1999-05-14 22:41:13 eaf Exp $
+//C- $Id: DjVuFile.h,v 1.1.2.7 1999-05-25 16:43:04 eaf Exp $
  
 #ifndef _DJVUFILE_H
 #define _DJVUFILE_H
@@ -47,7 +47,7 @@
 
     @memo Classes representing DjVu files.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuFile.h,v 1.1.2.6 1999-05-14 22:41:13 eaf Exp $#
+    @version #$Id: DjVuFile.h,v 1.1.2.7 1999-05-25 16:43:04 eaf Exp $#
 */
 
 //@{
@@ -67,7 +67,7 @@
 
     As \Ref{DjVuImage} before, #DjVuFile# now contains public class
     variables corresponding to every component, that can ever be decoded
-    from a DjVu file (such as #INFO# chunk, #BG44# chunk, #INFO# chunk, etc.).
+    from a DjVu file (such as #INFO# chunk, #BG44# chunk, #SJBZ# chunk, etc.).
 
     As before, the decoding is initiated by a single function
     (\Ref{start_decode}() in this case, and \Ref{DjVuImage::decode}() before).
@@ -99,16 +99,15 @@
 
     {\bf Creating.} There is a bunch of functions provided for composing
     the desired \Ref{DjVuDocument} and modifying #DjVuFile# structure. The
-    examples are \Ref{delete_chunk}(), \Ref{insert_chunk}(),
+    examples are \Ref{delete_chunks}(), \Ref{insert_chunk}(),
     \Ref{include_file}() and \Ref{unlink_file}().
 
     {\bf Caching.} In the case of plugin it's important to do the caching
     of decoded images or files. #DjVuFile# appears to be the best candidate
     for caching, and that's why it supports this procedure. Whenever a
-    #DjVuFile# is successfully decoded, it adds itself to the cache
-    provided at the construction time. If there {\bf was} a cache provided,
-    then next time when somebody requests to view this file, it won't be
-    decoded again.
+    #DjVuFile# is successfully decoded, it should be added to the cache.
+    Next time it will be extracted from the cache directly by another
+    #DjVuFile# or \Ref{DjVuDocument} and won't be decoded again.
 
     {\bf URLs.} Historically the biggest strain is put on making the decoder
     available for Netscape and IE plugins where the original files reside
@@ -120,7 +119,7 @@
     problem in this case either. There is a special port \Ref{DjVuMemoryPort},
     which can associate any URL with the corresponding data in the memory.
     All you need to do is to invent your own URL prefix for this case.
-    "#memory:# will do. The usage of absolute URLs has many advantages among
+    "#memory:#" will do. The usage of absolute URLs has many advantages among
     which is the capability to cache files with their URL being the cache key.
 
     Please note, that the #DjVuFile# class has been designed to work closely

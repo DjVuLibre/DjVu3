@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: Arrays.h,v 1.1.2.2 1999-05-07 22:22:11 eaf Exp $
+//C- $Id: Arrays.h,v 1.1.2.3 1999-05-25 16:43:04 eaf Exp $
 
 
 #ifndef _ARRAYS_H_
@@ -59,17 +59,19 @@
     
     {\bf Historical comments} --- Leon chose to implement his own arrays because
     the STL classes were not universally available and the compilers were
-    rarely able to deal with such a template galore.  The following template
-    classes are much simpler and (at some point) were usable with G++ 2.7.2 or
-    CFront based compilers.
+    rarely able to deal with such a template galore. Later it became clear
+    that there is no really good reason why arrays should be derived from
+    containers. It was also suggested to create separate arrays implementation
+    for simple classes and do the copy-on-demand strategy, which would allow
+    to assign array objects without immediate copying of their elements. At
+    this point \Ref{GArray} has been superseded by \Ref{DArray} and \Ref{TArray}.
     
-    @memo 
-    Template class for generic containers.
+    @memo Template array classes.
     @author 
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
-    Andrei Erofeev <eaf@research.att.com> -- bug fixes.
+    Andrei Erofeev <eaf@research.att.com> -- Copy-on-demand implementation.
     @version 
-    #$Id: Arrays.h,v 1.1.2.2 1999-05-07 22:22:11 eaf Exp $# */
+    #$Id: Arrays.h,v 1.1.2.3 1999-05-25 16:43:04 eaf Exp $# */
 //@{
 
 // Internal "Array repository" holding the pointer to the actual data,
@@ -611,7 +613,7 @@ TArray<TYPE>::TArray(int lo, int hi)
 		       init2, init2, insert, lo, hi));
 }
 
-/** Dynamic array.  
+/** Dynamic array for general types.
     Template class #DArray<TYPE># implements an array of
     elements of type #TYPE#.  Each element is identified by an integer
     subscript.  The valid subscripts range is defined by dynamically
