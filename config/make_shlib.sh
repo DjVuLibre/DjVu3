@@ -31,7 +31,7 @@
 #C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #
-# $Id: make_shlib.sh,v 1.16 2001-03-30 23:31:21 bcr Exp $
+# $Id: make_shlib.sh,v 1.17 2001-06-12 16:52:08 bcr Exp $
 # $Name:  $
 
 if [ ! -r ./TOPDIR/config.cache ] ; then
@@ -111,14 +111,17 @@ rm -f "dummy$$.o" "dummy$$.c"
 
 if [ -f "$outputname" ] 
 then
-  `unescape "$mv"` "$outputname" "$linkname"
-  LN=`unescape "$ln"`
-  outputdir=`dirname $outputname`
-  if [ ! -f "$outputdir/$name" ]
+  if [ "$outputname" != "$linkname" ]
   then
-    (cd $outputdir;"$LN" -s `basename "$linkname"` "$name")
-  fi 
-  exec `unescape "$LN"` -s `basename "$linkname"` "$outputname"
+    `unescape "$mv"` "$outputname" "$linkname"
+    LN=`unescape "$ln"`
+    outputdir=`dirname $outputname`
+    if [ ! -f "$outputdir/$name" ]
+    then
+      (cd $outputdir;"$LN" -s `basename "$linkname"` "$name")
+    fi 
+    exec `unescape "$LN"` -s `basename "$linkname"` "$outputname"
+  fi
 else
   exit 1
 fi
