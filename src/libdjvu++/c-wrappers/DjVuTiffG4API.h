@@ -8,7 +8,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C- "$Id: DjVuTiffG4API.h,v 1.2 2000-01-07 22:05:17 bcr Exp $"
+//C- "$Id: DjVuTiffG4API.h,v 1.3 2000-01-11 16:31:11 praveen Exp $"
 //C- -- Tiff G4 To DjVu
 //C- Author: Parag Deshmukh (Dec 99)
 #endif  /* __cplusplus */
@@ -16,10 +16,40 @@
 #ifndef _DJVUTIFFG4_H_
 #define _DJVUTIFFG4_H_
 
+
+#ifndef DJVUAPI
+
+#ifndef DJVU_STATIC_LIBRARY
+#ifdef WIN32 
+#define DLLIMPORT __declspec(dllimport)
+#define DLLEXPORT __declspec(dllexport)
+#else
+#define DLLIMPORT /**/
+#define DLLEXPORT /**/
+#endif
+#else /* DJVU_STATIC_LIBRARY */
+#define DLLIMPORT /**/
+#define DLLEXPORT /**/
+#endif /* DJVU_STATIC_LIBRARY */
+
+#ifdef BUILD_LIB
+#define DJVUAPI DLLEXPORT
+#else
+#define DJVUAPI DLLIMPORT
+#endif  /*BUILD_LIB*/
+
+#endif /*DJVUAPI*/
+
+
+
 /** @name TiffG4ToDjVu.h
       functions used to convert multiple Tiff G4 images to DjVu multipage 
       documents.
 */
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #ifdef DOCXX_CODE
 //@{
@@ -95,12 +125,11 @@ struct tiffg4todjvu_options_struct
 };
 typedef struct tiffg4todjvu_options_struct tiffg4todjvu_options;
 
-struct djvu_parse;
-
 /** @name tiffg4todjvu_options_alloc function 
     This is the primary allocation routine for tiffg4todjvu_options.
     Even if the values specified are illegal, an options structure
     will be returned. */
+DJVUAPI 
 tiffg4todjvu_options *
 tiffg4todjvu_options_alloc(struct djvu_parse *,int,const char * const argv[]);
 
@@ -108,6 +137,7 @@ tiffg4todjvu_options_alloc(struct djvu_parse *,int,const char * const argv[]);
     Deallocates the fields of the tiffg4todjvu_options structure.
     You should always use the free option, even if you did not use alloc
     so the data pointed to by priv is freed. */
+DJVUAPI
 void tiffg4todjvu_options_free(tiffg4todjvu_options *);
 
 /** @name tiffg4todjvu function 
@@ -117,21 +147,26 @@ void tiffg4todjvu_options_free(tiffg4todjvu_options *);
     \Ref{DjVu_PixImage.h} for transformations and \Ref{DjVmDoc.h}, 
     \Ref{JB2Matcher.h} for encoding.  A non-zero return value indicates a
     fatal error. */
+DJVUAPI
 int tiffg4todjvu(tiffg4todjvu_options[]);
 
 /** A non-zero value indicates there are error messages.  Error
     messages are generated for both fatal errors, and errors
     that are recovered from.  */
+DJVUAPI
 int tiffg4todjvu_haserror(const tiffg4todjvu_options []);
 
 /** Returns a string of the first error message on the stack.  Each
     call erases the previous return value. */
+DJVUAPI
 const char * tiffg4todjvu_error(tiffg4todjvu_options []);
 
 /** Prints all the errors to stderr */
+DJVUAPI
 void tiffg4todjvu_perror(tiffg4todjvu_options [],const char *);
 
 /** This will print usage instructions to the specified output. */
+DJVUAPI
 void tiffg4todjvu_usage(int fd,const char *prog);
 
 #ifdef DOCXX_CODE
@@ -186,6 +221,7 @@ struct djvu_parse;
     This is the primary allocation routine for djvutotiffg4_options.
     Even if the values specified are illegal, an options structure
     will be returned. */
+DJVUAPI
 djvutotiffg4_options *
 djvutotiffg4_options_alloc(struct djvu_parse *,int,const char * const argv[]);
 
@@ -193,6 +229,7 @@ djvutotiffg4_options_alloc(struct djvu_parse *,int,const char * const argv[]);
     Deallocates the fields of the djvutotiffg4_options structure.
     You should always use the free option, even if you did not use alloc
     so the data pointed to by priv is freed. */
+DJVUAPI
 void djvutotiffg4_options_free(djvutotiffg4_options *);
 
 /** @name djvutotiffg4 function 
@@ -202,26 +239,35 @@ void djvutotiffg4_options_free(djvutotiffg4_options *);
     \Ref{DjVu_PixImage.h} for transformations and \Ref{DjVmDoc.h}, 
     \Ref{JB2Matcher.h} for encoding.  A non-zero return value indicates a
     fatal error. */
+DJVUAPI
 int djvutotiffg4(djvutotiffg4_options[]);
 
 /** A non-zero value indicates there are error messages.  Error
     messages are generated for both fatal errors, and errors
     that are recovered from.  */
+DJVUAPI
 int djvutotiffg4_haserror(const djvutotiffg4_options []);
 
 /** Returns a string of the first error message on the stack.  Each
     call erases the previous return value. */
+DJVUAPI
 const char * djvutotiffg4_error(djvutotiffg4_options []);
 
 /** Prints all the errors to stderr */
+DJVUAPI
 void djvutotiffg4_perror(djvutotiffg4_options [],const char *);
 
 /** This will print usage instructions to the specified output. */
+DJVUAPI
 void djvutotiffg4_usage(int fd,const char *prog);
 
 #ifdef DOCXX_CODE
 //@}
 #endif /*DOCXX_CODE*/
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _DJVUTIFFG4_H_ */
 
