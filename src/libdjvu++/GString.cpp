@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: GString.cpp,v 1.32 2000-12-06 23:14:09 fcrary Exp $
+// $Id: GString.cpp,v 1.33 2001-01-03 20:03:56 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -399,14 +399,15 @@ void
 GString::format(const char *fmt, va_list args)
 {
   int buflen=32768;
-  char *buffer=new char [buflen];
+  char *buffer;
+  GPBuffer<char> gbuffer(buffer,buflen);
 
   // Format string
 #ifdef USE_VSNPRINTF
   while(USE_VSNPRINTF(buffer, buflen, fmt, args)<0)
   {
-    delete [] buffer;
-    buffer=new char [buflen+=32768];
+    gbuffer.resize(0);
+    gbuffer.resize(buflen+32768);
   }
   va_end(args);
 #else
@@ -422,7 +423,6 @@ GString::format(const char *fmt, va_list args)
 #endif
   // Go altering the string
   (*this) = (const char *)buffer;
-  delete [] buffer;
 }
 
 int 

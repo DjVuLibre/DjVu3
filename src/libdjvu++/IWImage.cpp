@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: IWImage.cpp,v 1.38 2000-12-20 17:42:55 bcr Exp $
+// $Id: IWImage.cpp,v 1.39 2001-01-03 20:07:10 bcr Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 08/1998
@@ -1795,6 +1795,7 @@ struct TertiaryHeader2 {        // VER 1.2
 // UTILITIES
 //////////////////////////////////////////////////////
 
+
 #ifdef min
 #undef min
 #endif
@@ -1852,7 +1853,7 @@ IWBitmap::init(const GBitmap *bm, const GBitmap *mask)
   int w = bm->columns();
   int h = bm->rows();
   int g = bm->get_grays()-1;
-  signed char *buffer = new signed char[w*h];
+  signed char *buffer;
   GPBuffer<signed char> gbuffer(buffer,w*h);
   // Prepare gray level conversion table
   signed char  bconv[256];

@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: GPixmap.cpp,v 1.23 2000-12-18 17:13:42 bcr Exp $
+// $Id: GPixmap.cpp,v 1.24 2001-01-03 20:03:56 bcr Exp $
 // $Name:  $
 
 // -- Implements class PIXMAP
@@ -76,18 +76,17 @@ const GPixel GPixel::RED   = {   0,   0, 255 };
 
 
 static const GPixel *
-new_gray_ramp(int grays)
+new_gray_ramp(const int grays,GPixel *ramp)
 {
-  GPixel *ramp = new GPixel[256];
   memset((void*)ramp, 0, 256 * sizeof(GPixel));
   int color = 0xff0000;
   int decrement = color / (grays-1);
-  for (int i=0; i<grays; i++)
+  for (int i=0; i<grays; i++,ramp++)
     {
       int level = color >> 16;
-      ramp[i].b = level;
-      ramp[i].g = level;
-      ramp[i].r = level;
+      ramp->b = level;
+      ramp->g = level;
+      ramp->r = level;
       color -= decrement;
     }
   return ramp;
@@ -136,6 +135,12 @@ static GMonitor pixmap_monitor;
 GPixmap::~GPixmap()
 {
   delete [] pixels_data;
+}
+
+void
+GPixmap::destroy(void)
+{
+  delete [] pixels_data;
   pixels = pixels_data = 0;
 }
 
@@ -147,37 +152,91 @@ GPixmap::GPixmap()
 GPixmap::GPixmap(int nrows, int ncolumns, const GPixel *filler)
 : nrows(0), ncolumns(0), pixels(0), pixels_data(0)
 {
-  init(nrows, ncolumns, filler);
+  G_TRY
+  {
+    init(nrows, ncolumns, filler);
+  }
+  G_CATCH_ALL
+  {
+    destroy();
+    G_RETHROW;
+  }
+  G_ENDCATCH;
 }
 
 GPixmap::GPixmap(ByteStream &bs)
 : nrows(0), ncolumns(0), pixels(0), pixels_data(0)
 {
-  init(bs);
+  G_TRY
+  {
+    init(bs);
+  }
+  G_CATCH_ALL
+  {
+    destroy();
+    G_RETHROW;
+  }
+  G_ENDCATCH;
 }
 
 GPixmap::GPixmap(const GBitmap &ref)
 : nrows(0), ncolumns(0), pixels(0), pixels_data(0)
 {
-  init(ref, 0);
+  G_TRY
+  {
+    init(ref, 0);
+  }
+  G_CATCH_ALL
+  {
+    destroy();
+    G_RETHROW;
+  }
+  G_ENDCATCH;
 }
 
 GPixmap::GPixmap(const GBitmap &ref, const GRect &rect)
 : nrows(0), ncolumns(0), pixels(0), pixels_data(0)
 {
-  init(ref, rect, 0);
+  G_TRY
+  {
+    init(ref, rect, 0);
+  }
+  G_CATCH_ALL
+  {
+    destroy();
+    G_RETHROW;
+  }
+  G_ENDCATCH;
 }
 
 GPixmap::GPixmap(const GPixmap &ref)
 : nrows(0), ncolumns(0), pixels(0), pixels_data(0)
 {
-  init(ref);
+  G_TRY
+  {
+    init(ref);
+  }
+  G_CATCH_ALL
+  {
+    destroy();
+    G_RETHROW;
+  }
+  G_ENDCATCH;
 }
 
 GPixmap::GPixmap(const GPixmap &ref, const GRect &rect)
 : nrows(0), ncolumns(0), pixels(0), pixels_data(0)
 {
-  init(ref, rect);
+  G_TRY
+  {
+    init(ref, rect);
+  }
+  G_CATCH_ALL
+  {
+    destroy();
+    G_RETHROW;
+  }
+  G_ENDCATCH;
 }
 
 
@@ -190,8 +249,7 @@ GPixmap::GPixmap(const GPixmap &ref, const GRect &rect)
 void 
 GPixmap::init(int arows, int acolumns, const GPixel *filler)
 {
-  delete [] pixels_data;
-  pixels = pixels_data = 0;
+  destroy();
   nrows = arows;
   ncolumns = acolumns;
   nrowsize = acolumns;
@@ -215,9 +273,14 @@ GPixmap::init(const GBitmap &ref, const GPixel *userramp)
   if (nrows>0 && ncolumns>0)
   {
     // Create pixel ramp
-    const GPixel *ramp = userramp;
-    if (!userramp)
-      ramp = new_gray_ramp(ref.get_grays());
+    void *loc_ramp;
+    GPBufferBase gloc_ramp(loc_ramp,0,sizeof(GPixel));
+    const GPixel *ramp=userramp;
+    if(! userramp)
+    {
+      gloc_ramp.resize(256,sizeof(GPixel));
+      ramp=new_gray_ramp(ref.get_grays(),(GPixel *)loc_ramp);
+    }
     // Copy pixels
     for (int y=0; y<nrows; y++)
     {
@@ -226,9 +289,6 @@ GPixmap::init(const GBitmap &ref, const GPixel *userramp)
       for (int x=0; x<ncolumns; x++)
         dst[x] = ramp[ src[x] ];
     }
-    // Free ramp
-    if (!userramp)
-      delete [] (GPixel*)ramp;
   }
 }
 
@@ -245,9 +305,14 @@ GPixmap::init(const GBitmap &ref, const GRect &rect, const GPixel *userramp)
   if (! rect2.isempty())
   {
     // allocate ramp
-    const GPixel *ramp = userramp;
-    if (!userramp)
-      ramp = new_gray_ramp(ref.get_grays());
+    void *loc_ramp;
+    GPBufferBase gloc_ramp(loc_ramp,0,sizeof(GPixel));
+    const GPixel *ramp=userramp;
+    if(! userramp)
+    {
+      gloc_ramp.resize(256,sizeof(GPixel));
+      ramp=new_gray_ramp(ref.get_grays(),(GPixel *)loc_ramp);
+    }
     // copy pixels
     for (int y=rect2.ymin; y<rect2.ymax; y++)
     {
@@ -256,9 +321,6 @@ GPixmap::init(const GBitmap &ref, const GRect &rect, const GPixel *userramp)
       for (int x=rect2.xmin; x<rect2.xmax; x++)
         dst[x] = ramp[ src[x] ];
     }
-    // free ramp
-    if (!userramp)
-      delete [] (GPixel*) ramp;
   }
 }
 
@@ -305,7 +367,7 @@ GPixmap::init(const GPixmap &ref, const GRect &rect)
 void 
 GPixmap::donate_data(GPixel *data, int w, int h)
 {
-  delete [] pixels_data;
+  destroy();
   nrows = h;
   ncolumns = w;
   nrowsize = w;

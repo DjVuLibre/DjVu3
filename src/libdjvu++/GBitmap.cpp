@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: GBitmap.cpp,v 1.41 2001-01-03 20:03:56 bcr Exp $
+// $Id: GBitmap.cpp,v 1.42 2001-01-03 20:07:10 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -46,7 +46,7 @@
 #include "GException.h"
 #include <string.h>
 
-// File "$Id: GBitmap.cpp,v 1.41 2001-01-03 20:03:56 bcr Exp $"
+// File "$Id: GBitmap.cpp,v 1.42 2001-01-03 20:07:10 bcr Exp $"
 // - Author: Leon Bottou, 05/1997
 
 
@@ -345,6 +345,15 @@ GBitmap::take_data(size_t &offset)
   if (ret) offset = (size_t)border;
   bytes_data=0;
   return ret;
+}
+
+const unsigned char *
+GBitmap::get_rle(unsigned int &rle_length)
+{
+  if(!rle)
+    compress();
+  rle_length=rlelength;
+  return rle; 
 }
 
 // ----- compression

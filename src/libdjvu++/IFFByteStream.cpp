@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: IFFByteStream.cpp,v 1.20 2000-11-09 20:15:07 jmw Exp $
+// $Id: IFFByteStream.cpp,v 1.21 2001-01-03 20:08:35 bcr Exp $
 // $Name:  $
 
 // -- Implementation of IFFByteStream
@@ -213,21 +213,30 @@ IFFByteStream::get_chunk(GString &chkid, int *rawoffsetptr, int *rawsizeptr)
 
   // Create context record
   IFFContext *nctx = new IFFContext;
-  nctx->next = ctx;
-  nctx->offStart = seekto;
-  nctx->offEnd = seekto + size;
-  if (composite)
+  G_TRY
   {
-    memcpy( (void*)(nctx->idOne), (void*)&buffer[0], 4);
-    memcpy( (void*)(nctx->idTwo), (void*)&buffer[4], 4);
-    nctx->bComposite = 1;
+    nctx->next = ctx;
+    nctx->offStart = seekto;
+    nctx->offEnd = seekto + size;
+    if (composite)
+    {
+      memcpy( (void*)(nctx->idOne), (void*)&buffer[0], 4);
+      memcpy( (void*)(nctx->idTwo), (void*)&buffer[4], 4);
+      nctx->bComposite = 1;
+    }
+    else
+    {
+      memcpy( (void*)(nctx->idOne), (void*)&buffer[0], 4);
+      memset( (void*)(nctx->idTwo), 0, 4);
+      nctx->bComposite = 0;
+    }
   }
-  else
+  G_CATCH_ALL
   {
-    memcpy( (void*)(nctx->idOne), (void*)&buffer[0], 4);
-    memset( (void*)(nctx->idTwo), 0, 4);
-    nctx->bComposite = 0;
+    delete nctx;
+    G_RETHROW;
   }
+  G_ENDCATCH;
   
   // Install context record
   ctx = nctx;
@@ -301,21 +310,30 @@ IFFByteStream::put_chunk(const char *chkid, int insert_magic)
 
   // Create new context record
   IFFContext *nctx = new IFFContext;
-  nctx->next = ctx;
-  nctx->offStart = seekto;
-  nctx->offEnd = 0;
-  if (composite)
+  G_TRY
   {
-    memcpy( (void*)(nctx->idOne), (void*)&buffer[0], 4);
-    memcpy( (void*)(nctx->idTwo), (void*)&buffer[4], 4);
-    nctx->bComposite = 1;
+    nctx->next = ctx;
+    nctx->offStart = seekto;
+    nctx->offEnd = 0;
+    if (composite)
+    {
+      memcpy( (void*)(nctx->idOne), (void*)&buffer[0], 4);
+      memcpy( (void*)(nctx->idTwo), (void*)&buffer[4], 4);
+      nctx->bComposite = 1;
+    }
+    else
+    {
+      memcpy( (void*)(nctx->idOne), (void*)&buffer[0], 4);
+      memset( (void*)(nctx->idTwo), 0, 4);
+      nctx->bComposite = 0;
+    }
   }
-  else
+  G_CATCH_ALL
   {
-    memcpy( (void*)(nctx->idOne), (void*)&buffer[0], 4);
-    memset( (void*)(nctx->idTwo), 0, 4);
-    nctx->bComposite = 0;
+    delete nctx;
+    G_RETHROW;
   }
+  G_ENDCATCH; 
   // Install context record and leave
   ctx = nctx;
 }
@@ -367,8 +385,6 @@ IFFByteStream::seek_close_chunk(void)
     offset = seekto;
   }
 }
-
-
 
 // IFFByteStream::short_id
 // Returns the id of the current chunk
