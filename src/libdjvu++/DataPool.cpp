@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DataPool.cpp,v 1.86 2001-07-24 18:33:44 lchen Exp $
+// $Id: DataPool.cpp,v 1.87 2001-08-23 21:43:20 docbill Exp $
 // $Name:  $
 
 
@@ -311,8 +311,29 @@ public:
       // Looks for the list of DataPools connected to 'furl' and makes
       // each of them load the contents of the file into memory
    void		load_file(const GURL &url);
+   void clean(void);
 };
 
+void
+FCPools::clean(void)
+{
+  GCriticalSectionLock lock(&map_lock);
+  for(GPosition pos=map;pos;++pos)
+  {
+    GPList<DataPool> &p=map[pos];
+    for(GPosition pos2=p;pos;++pos)
+    {
+      if(p[pos2]->get_count() < 2)
+      {
+        p.del(pos2);
+      }
+    }
+    if(p.isempty())
+    {
+      map.del(pos);
+    }
+  }
+}
 void
 FCPools::add_pool(const GURL &url, GP<DataPool> pool)
 {
@@ -333,6 +354,7 @@ FCPools::add_pool(const GURL &url, GP<DataPool> pool)
       if (!plist.contains(pool))
         plist.append(pool);
    }
+  clean();
 }
 
 void
@@ -342,6 +364,7 @@ FCPools::del_pool(const GURL &url, GP<DataPool> pool)
   DEBUG_MAKE_INDENT(3);
    GCriticalSectionLock lock(&map_lock);
 
+  clean();
    if (url.is_local_file_url())
    {
       GPosition pos;
@@ -366,6 +389,7 @@ FCPools::load_file(const GURL &url)
   DEBUG_MAKE_INDENT(3);
    GCriticalSectionLock lock(&map_lock);
 
+  clean();
    if (url.is_local_file_url())
    {
       GPosition pos;
@@ -740,7 +764,6 @@ DataPool::~DataPool(void)
   DEBUG_MAKE_INDENT(3);
 
   clear_stream(true);
-
   if (furl.is_local_file_url())
   {
     FCPools::get()->del_pool(furl, this);

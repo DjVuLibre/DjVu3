@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qd_tbar_mode_piece.cpp,v 1.14 2001-08-21 15:44:34 docbill Exp $
+// $Id: qd_tbar_mode_piece.cpp,v 1.15 2001-08-23 21:43:20 docbill Exp $
 // $Name:  $
 
 

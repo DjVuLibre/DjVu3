@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.cpp,v 1.86 2001-07-27 23:58:34 bcr Exp $
+// $Id: ByteStream.cpp,v 1.87 2001-08-23 21:43:20 docbill Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 04/1997
@@ -44,6 +44,10 @@
 #include "DjVuMessage.h"
 
 #ifdef UNIX
+#define HAS_MEMMAP 1
+#endif
+
+#ifdef UNIX
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -52,6 +56,7 @@
 #else
 #ifdef macintosh
 #include <unistd.h>
+
 
 _MSL_IMP_EXP_C int _dup(int);
 _MSL_IMP_EXP_C int _dup2(int,int);
@@ -219,6 +224,7 @@ public:
   /** Creates a Static object for allocating the memory area of
       length #sz# starting at address #buffer#. */
   Static(const void * const buffer, const size_t sz);
+  ~Static();
   // Virtual functions
   virtual size_t read(void *buffer, size_t sz);
   virtual int    seek(long offset, int whence = SEEK_SET, bool nothrow=false);
@@ -237,6 +243,8 @@ private:
   int where;
 };
 
+ByteStream::Static::~Static() {}
+
 class ByteStream::Static::Allocate : public ByteStream::Static
 {
 public:
@@ -246,7 +254,10 @@ protected:
   GPBuffer<char> gbuf;
 public:
   Allocate(const size_t size) : Static(0,size), gbuf(buf,size) { data=buf; }
+  virtual ~Allocate();
 };
+
+ByteStream::Static::Allocate::~Allocate() {}
 
 inline int
 ByteStream::Static::size(void) const
@@ -281,7 +292,7 @@ ByteStream::Static::duplicate(const size_t xsize) const
   return new ByteStream::Static::Duplicate(*this,xsize);
 }
 
-#ifdef UNIX
+#if HAS_MEMMAP
 /** Read-only ByteStream interface to a memmap area.
     Class #MemoryMapByteStream# implements a read-only ByteStream interface
     for a memory map to a file. */
@@ -387,7 +398,7 @@ size_t
 ByteStream::readall(void *buffer, size_t size)
 {
   size_t total = 0;
-  while (size > 0)
+    while (size > 0)
     {
       int nitems = read(buffer, size);
       // Replaced perror() below with G_THROW(). It still makes little sense
@@ -1057,7 +1068,7 @@ GP<ByteStream>
 ByteStream::create(const GURL &url,char const * const mode)
 {
   GP<ByteStream> retval;
-#ifdef UNIX
+#if HAS_MEMMAP
   if (!mode || (GUTF8String("rb") == mode))
   {
     const int fd=urlopen(url,O_RDONLY,0777);
@@ -1105,7 +1116,7 @@ ByteStream::create(const int fd,char const * const mode,const bool closeme)
 {
   GP<ByteStream> retval;
   const char *default_mode="rb";
-#ifdef UNIX
+#if HAS_MEMMAP
 
   if ((!mode&&(fd!=1)&&(fd!=2)) || (mode&&(GUTF8String("rb") == mode)))
   {
@@ -1185,7 +1196,7 @@ GP<ByteStream>
 ByteStream::create(FILE * const f,char const * const mode,const bool closeme)
 {
   GP<ByteStream> retval;
-#ifdef UNIX
+#if HAS_MEMMAP
   if (!mode || (GUTF8String("rb") == mode))
   {
     MemoryMapByteStream *rb=new MemoryMapByteStream();
@@ -1244,7 +1255,7 @@ ByteStream::duplicate(const size_t xsize) const
 }
 
 
-#ifdef UNIX
+#if HAS_MEMMAP
 MemoryMapByteStream::MemoryMapByteStream(void)
 : ByteStream::Static(0,0)
 {}

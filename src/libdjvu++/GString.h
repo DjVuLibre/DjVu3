@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.h,v 1.88 2001-08-21 15:44:34 docbill Exp $
+// $Id: GString.h,v 1.89 2001-08-23 21:43:20 docbill Exp $
 // $Name:  $
 
 #ifndef _GSTRING_H_
@@ -64,7 +64,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.88 2001-08-21 15:44:34 docbill Exp $# */
+    #$Id: GString.h,v 1.89 2001-08-23 21:43:20 docbill Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -79,16 +79,17 @@
 #include <stdarg.h>
 #ifdef WIN32
 #include <windows.h>
-#endif
-
 #ifndef UNDER_CE
-#include <wchar.h> // needed for mbstate_t
-#ifdef WIN32
+#define HAS_WCHAR 1
 #define HAS_MBSTATE 1
 #endif
 #endif
 
-#ifndef HAS_MBSTATE
+#if HAS_WCHAR
+#include <wchar.h> // needed for mbstate_t
+#endif
+
+#if !HAS_MBSTATE
 typedef int mbstate_t;
 #endif
 
@@ -106,12 +107,12 @@ public:
   class Unicode;
   friend Unicode;
 
-#ifndef UNDER_CE
+#if HAS_WCHAR
   class ChangeLocale;
   class Native;
 
   friend Native;
-#endif
+#endif // HAS_WCHAR
   friend class GBaseString;
   friend class GUTF8String;
   friend class GNativeString;
@@ -382,7 +383,7 @@ protected:
   virtual unsigned long getValidUCS4(const char *&source) const;
 };
 
-#ifndef UNDER_CE
+#if HAS_WCHAR
 class GStringRep::Native : public GStringRep
 {
 public:
@@ -462,7 +463,7 @@ protected:
   virtual unsigned long getValidUCS4(const char *&source) const;
 };
 
-#endif // UNDER_CE
+#endif // HAS_WCHAR
 
 class GUTF8String;
 class GNativeString;
@@ -1045,7 +1046,7 @@ public:
 };
 
 
-#ifdef UNDER_CE
+#if !HAS_WCHAR
 #define GBaseString GUTF8String
 #endif
 
@@ -1091,7 +1092,7 @@ public:
   /// Construct from base class.
   GNativeString(const GP<GStringRep> &str);
   GNativeString(const GBaseString &str); 
-#ifndef UNDER_CE
+#if HAS_WCHAR
   GNativeString(const GUTF8String &str);
 #endif
   GNativeString(const GNativeString &str);
@@ -1120,7 +1121,7 @@ public:
       format #"%f"# in function #printf#.  */
   GNativeString(const double number);
 
-#ifdef UNDER_CE
+#if !HAS_WCHAR
 #undef GBaseString
 #else
   /// Initialize this string class
@@ -1406,11 +1407,11 @@ GStringRep::UTF8ToNative( const char *s, const EscapeMode escape )
 inline GP<GStringRep> 
 GStringRep::NativeToUTF8( const char *s )
 {
-#ifdef UNDER_CE
+#if !HAS_WCHAR
   return GStringRep::UTF8::create(s);
 #else
   return GStringRep::Native::create(s)->toUTF8();
-#endif // UNDER_CE
+#endif // HAS_WCHAR
 }
 
 inline GBaseString::GBaseString(void) { init(); }
@@ -1468,7 +1469,7 @@ inline GUTF8String GBaseString::operator+(const GUTF8String &s2) const
 
 inline GNativeString::GNativeString(void) {}
 
-#ifdef UNDER_CE
+#if !HAS_WCHAR
 // For Windows CE, GNativeString is essentially GUTF8String
 
 inline
@@ -1511,7 +1512,7 @@ inline
 GNativeString::GNativeString(const GNativeString &fmt, va_list &args)
 : GUTF8String(fmt,args) {}
 
-#else // UNDER_CE
+#else // HAS_WCHAR
 
 inline
 GNativeString::GNativeString(const GUTF8String &str)
@@ -1649,7 +1650,7 @@ GNativeString::downcase( void ) const
   return (ptr?(*this)->downcase():(*this));
 }
 
-#endif // UNDER_CE
+#endif // HAS_WCHAR
 
 // ------------------- The end
 

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.123 2001-07-25 23:55:47 bcr Exp $
+// $Id: GString.cpp,v 1.124 2001-08-23 21:43:20 docbill Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -44,7 +44,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
-#ifndef UNDER_CE
+#if HAS_WCHAR
 #include <wctype.h>
 #include <locale.h>
 #include <wchar.h>
@@ -54,7 +54,7 @@ GBaseString::~GBaseString() {}
 GNativeString::~GNativeString() {}
 GUTF8String::~GUTF8String() {}
 
-#if !defined(HAS_MBSTATE) && !defined(UNDER_CE)
+#if !HAS_MBSTATE && HAS_WCHAR
 // Under some systems, wctomb() and mbtowc() are not thread
 // safe.  In those cases, wcrtomb and mbrtowc are preferred.
 // For Solaris, wctomb() and mbtowc() are thread safe, and 
@@ -77,7 +77,7 @@ mbrlen(const char *s, size_t n, mbstate_t *)
 {
   return mblen(s,n);
 }
-#endif // !defined(HAS_MBSTATE) || defined(UNDER_CE)
+#endif // !HAS_MBSTATE || HAS_WCHAR
 
 
 // - Author: Leon Bottou, 04/1997
@@ -116,7 +116,7 @@ GStringRep::UTF8::create(const char fmt[],va_list args)
   return (s?(s->vformat(args)):s);
 }
 
-#ifndef UNDER_CE
+#if HAS_WCHAR
 
 // The declaration and implementation of GStringRep::ChangeLocale
 // Not used in WinCE
@@ -187,7 +187,7 @@ GStringRep::ChangeLocale::~ChangeLocale()
   }
 }
 
-#endif // UNDER_CE
+#endif // HAS_WCHAR
 
 template <class TYPE>
 GP<GStringRep>
@@ -713,7 +713,7 @@ GUTF8String::format(const char fmt[], ... )
   return init(GStringRep::UTF8::create(fmt,args));
 }
 
-#ifndef UNDER_CE
+#if HAS_WCHAR
 GNativeString &
 GNativeString::format(const char fmt[], ... )
 {
@@ -721,7 +721,7 @@ GNativeString::format(const char fmt[], ... )
   va_start(args, fmt);
   return init(GStringRep::Native::create(fmt,args));
 }
-#endif // UNDER_CE
+#endif // HAS_WCHAR
 
 GP<GStringRep>
 GStringRep::UTF8::create_format(const char fmt[],...)
@@ -802,9 +802,9 @@ GStringRep::vformat(va_list &args) const
       char *buffer;
       GPBuffer<char> gbuffer(buffer,buflen);
 
-#ifndef UNDER_CE
+#if HAS_WCHAR
       ChangeLocale(LC_ALL,(isNative()?0:"C"));
-#endif // UNDER_CE
+#endif // HAS_WCHAR
 
       // Format string
 #ifdef USE_VSNPRINTF
@@ -1064,7 +1064,7 @@ GStringRep::UTF8::toNative(const EscapeMode escape) const
       }
     }
     r[0]=0;
-#ifdef UNDER_CE
+#if !HAS_WCHAR
     retval = UTF8::create( (const char *)buf );
   } else
   {
@@ -1455,9 +1455,9 @@ GStringRep::UTF8::toInt() const
 static inline long
 Cstrtol(char *data,char **edata, const int base)
 {
-#ifndef UNDER_CE
+#if HAS_WCHAR
   GStringRep::ChangeLocale locale(LC_ALL,"C");
-#endif // UNDER_CE
+#endif // HAS_WCHAR
   return strtol(data,edata,base);
 }
 
@@ -1501,9 +1501,9 @@ GStringRep::UTF8::toLong(
 static inline unsigned long
 Cstrtoul(char *data,char **edata, const int base)
 {
-#ifndef UNDER_CE
+#if HAS_WCHAR
   GStringRep::ChangeLocale locale(LC_ALL,"C");
-#endif // UNDER_CE
+#endif // HAS_WCHAR
   return strtoul(data,edata,base);
 }
 
@@ -1547,9 +1547,9 @@ GStringRep::UTF8::toULong(
 static inline double
 Cstrtod(char *data,char **edata)
 {
-#ifndef UNDER_CE
+#if HAS_WCHAR
   GStringRep::ChangeLocale locale(LC_ALL,"C");
-#endif // UNDER_CE
+#endif // HAS_WCHAR
   return strtod(data,edata);
 }
 
@@ -1717,7 +1717,7 @@ GStringRep::UTF16toUCS4(
   return retval;
 }
 
-#ifndef UNDER_CE
+#if HAS_WCHAR
 
 // Gather the native implementations here. Not used in WinCE.
 
@@ -2135,6 +2135,6 @@ GStringRep::get_remainder( void ) const
   return 0;
 }
 
-#endif // UNDER_CE
+#endif // HAS_WCHAR
 
 
