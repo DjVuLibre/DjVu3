@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuOptions.h,v 1.3 2000-02-03 19:07:38 bcr Exp $
+ *C- $Id: DjVuOptions.h,v 1.4 2000-02-03 19:10:00 bcr Exp $
  */
 
 #ifndef _DJVU_OPTIONS_H_
@@ -77,7 +77,7 @@ extern const char djvu_normal_string[];
 extern const char djvu_conservative_string[];
 extern const char djvu_lossless_string[];
 extern const char djvu_aggressive_string[];
-extern const char djvu_halftone_off_string[];
+extern const char djvu_disable_halftone_string[];
 extern const char djvu_pages_per_dict_string[];
 extern const char djvu_pseudo_string[];
 extern const char djvu_tolerance_percent_string[];
@@ -85,7 +85,7 @@ extern const char djvu_tolerance_percent_string[];
 #define djvu_conservative_option {djvu_conservative_string+2,0,0,'C'}
 #define djvu_lossless_option {djvu_lossless_string+2,0,0,'l'}
 #define djvu_aggressive_option {djvu_aggressive_string+2,0,0,'a'}
-#define djvu_halftone_off_option {djvu_halftone_off_string+2,2,0,'t'}
+#define djvu_disable_halftone_option {djvu_disable_halftone_string+2,2,0,'t'}
 #define djvu_pages_per_dict_option {djvu_pages_per_dict_string+2,1,0,'D'}
 #define djvu_pseudo_option {djvu_pseudo_string+2,2,0,'g'}
 #define djvu_tolerance_percent_option {djvu_tolerance_percent_string+2,1,0,0xfd}
