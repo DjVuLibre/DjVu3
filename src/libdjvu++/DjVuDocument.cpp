@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.101 2000-01-20 21:00:00 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.102 2000-01-20 21:18:57 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -528,7 +528,7 @@ DjVuDocument::page_to_url(int page_num) const
 	 }
 	 default:
 	    THROW("Unknown document type.");
-      };
+      }
    return url;
 }
 
@@ -605,10 +605,24 @@ DjVuDocument::id_to_url(const char * id) const
 	    }
 	    break;
 	 case OLD_BUNDLED:
-	    return init_url+id;
+	    if (flags & DOC_DIR_KNOWN)
+	    {
+	       GP<DjVmDir0::FileRec> frec=djvm_dir0->get_file(id);
+	       if (frec) return init_url+id;
+	    }
+	    break;
 	 case OLD_INDEXED:
 	 case SINGLE_PAGE:
-	    return init_url.base()+id;
+	    if (flags & DOC_NDIR_KNOWN)
+	    {
+	       if (ndir->name_to_page(id)>=0)
+		  return init_url.base()+id;
+	    } else
+	    {
+		  // This is required to successully load file with NDIR
+	       return init_url.base()+id;
+	    }
+	    break;
       }
    return GURL();
 }
