@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.122 2001-07-24 17:52:04 bcr Exp $
+// $Id: GString.cpp,v 1.123 2001-07-25 23:55:47 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -1342,8 +1342,23 @@ GStringRep::concat(const GP<GStringRep> &s1,const GP<GStringRep> &s2) const
   return retval;
 }
 
+#ifdef WIN32
+static const char *setlocale_win32(void)
+{
+  static const char *locale=setlocale(LC_ALL,0);
+  if(! locale || (locale[0] == 'C' && !locale[1]))
+  {
+    locale=setlocale(LC_ALL,"");
+  }
+  return locale;
+}
+#endif
+
 GStringRep::GStringRep(void)
 {
+#ifdef WIN32
+  static const char *locale=setlocale_win32();
+#endif
   size=0;
   data=0;
 }
