@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.99 2001-05-16 22:57:50 bcr Exp $
+// $Id: GString.cpp,v 1.100 2001-05-16 23:23:43 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -423,7 +423,7 @@ GStringRep::tocase(
 //      '&'  -->  "&amp;"
 //      '\'' -->  "&apos;"
 //      '\"' -->  "&quot;"
-//  Also escapes characters 0x00 through 0x7e and 0x80 through 0xff.
+//  Also escapes characters 0x00 through 0x1f and 0x7e through 0x7f.
 GUTF8String
 GUTF8String::toEscaped( void ) const
 {
@@ -452,7 +452,7 @@ GUTF8String::toEscaped( void ) const
       ss="&quot;";
       break;
     default:
-      if( ( (signed char)(*s) < ' ' ) || ( *s > 126 ) )
+      if( ( (signed char)(*s) < ' ' ) || ( *s >= 0x7e ) && (*s =< 0x7f))
       {
         special.format("&#%d;",(unsigned char)*s);
         ss=special;

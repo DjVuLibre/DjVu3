@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: XMLParser.cpp,v 1.8 2001-05-16 21:27:06 bcr Exp $
+// $Id: XMLParser.cpp,v 1.9 2001-05-16 23:23:43 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -716,8 +716,9 @@ make_child_layer(
       self.rect=default_rect;
       retval=false;
     }
-    const int i=tag.raw.nextNonSpace(0);
-    bs.writestring(tag.raw.substr(i,tag.raw.firstEndSpace()-i));
+    const GUTF8String raw=tag.raw.fromEscaped();
+    const int i=raw.nextNonSpace(0);
+    bs.writestring(raw.substr(i,raw.firstEndSpace(i)-i));
     if(sepchar)
       bs.write8(sepchar);
     self.text_length = bs.tell() - self.text_start;
@@ -736,8 +737,9 @@ make_child_layer(
       }
     }else
     {
-      const int i=tag.raw.nextNonSpace(0);
-      bs.writestring(tag.raw.substr(i,tag.raw.firstEndSpace()-i));
+      const GUTF8String raw=tag.raw.fromEscaped();
+      const int i=raw.nextNonSpace(0);
+      bs.writestring(raw.substr(i,raw.firstEndSpace(i)-i));
       if(sepchar)
         bs.write8(sepchar);
       self.text_length = bs.tell() - self.text_start;
@@ -780,6 +782,14 @@ make_child_layer(
           break;
         }
       }
+    }else
+    {
+      const GUTF8String raw=tag.raw.fromEscaped();
+      const int i=raw.nextNonSpace(0);
+      bs.writestring(raw.substr(i,raw.firstEndSpace(i)-i));
+      if(sepchar)
+        bs.write8(sepchar);
+      self.text_length = bs.tell() - self.text_start;
     }
   }
   parent.rect.xmin=min(xmin,parent.rect.xmin);
