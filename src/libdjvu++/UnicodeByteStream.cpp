@@ -1,7 +1,7 @@
 //C-  Copyright © 2000-2001, LizardTech, Inc. All Rights Reserved.
 //C-              Unauthorized use prohibited.
 //
-// $Id: UnicodeByteStream.cpp,v 1.4 2001-04-23 18:14:22 bcr Exp $
+// $Id: UnicodeByteStream.cpp,v 1.5 2001-05-18 22:04:08 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -201,7 +201,7 @@ XMLByteStream::init(void)
     case 0x4C6F:
     {
       const unsigned int j=(buf[2]<<8)+buf[3];
-      encodetype=(j == 0xA794)?GUnicode::EBCDIC:GUnicode::UTF8;
+      encodetype=(j == 0xA794)?(GUnicode::EBCDIC):(GUnicode::UTF8);
       buffer=GUnicode(buf,sizeof(buf),encodetype);
       break;
     }

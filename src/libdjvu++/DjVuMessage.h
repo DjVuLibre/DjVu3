@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessage.h,v 1.23 2001-05-18 20:25:51 bcr Exp $
+// $Id: DjVuMessage.h,v 1.24 2001-05-18 22:04:08 bcr Exp $
 // $Name:  $
 
 
@@ -40,6 +40,8 @@
 
 
 #include "DjVuMessageLite.h"
+
+class GURL;
 
 class DjVuMessage : public DjVuMessageLite
 {

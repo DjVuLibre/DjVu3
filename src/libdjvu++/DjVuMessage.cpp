@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessage.cpp,v 1.52 2001-05-18 20:25:51 bcr Exp $
+// $Id: DjVuMessage.cpp,v 1.53 2001-05-18 22:04:08 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -349,7 +349,7 @@ parse(GMap<GUTF8String,GP<lt_XMLTags> > &retval)
   GUTF8String errors;
   GPList<lt_XMLTags> body;
   {
-    GList<GURL> paths=GetProfilePaths();
+    GList<GURL> paths=DjVuMessage::GetProfilePaths();
     GMap<GUTF8String, void *> map;
     GUTF8String m(MessageFile);
     errors=getbodies(paths,m,body,map);

@@ -339,7 +339,7 @@ djvuxmlparser.o: djvuxmlparser.cpp \
  ../../../src/libdjvu++/ByteStream.h \
  ../../../src/libdjvu++/DjVuMessage.h \
  ../../../src/libdjvu++/DjVuMessageLite.h
-nativetoutf8.o: nativetoutf8.cpp \
+native2utf8.o: native2utf8.cpp \
  ../../../src/libdjvu++/GException.h \
  ../../../src/libdjvu++/DjVuGlobal.h \
  ../../../src/include/DjVu.h \
@@ -366,4 +366,34 @@ ppmcoco.o: ppmcoco.cpp \
  ../../../src/libdjvu++/GThreads.h \
  ../../../src/libdjvu++/DjVuMessage.h \
  ../../../src/libdjvu++/DjVuMessageLite.h
+ucs2native.o: ucs2native.cpp \
+ ../../../src/libdjvu++/GException.h \
+ ../../../src/libdjvu++/DjVuGlobal.h \
+ ../../../src/include/DjVu.h \
+ ../../../src/libdjvu++/UnicodeByteStream.h \
+ ../../../src/libdjvu++/GUnicode.h \
+ ../../../src/libdjvu++/GString.h \
+ ../../../src/libdjvu++/GContainer.h \
+ ../../../src/libdjvu++/GSmartPointer.h \
+ ../../../src/libdjvu++/ByteStream.h \
+ ../../../src/libdjvu++/Arrays.h \
+ ../../../src/libdjvu++/DjVuMessage.h \
+ ../../../src/libdjvu++/DjVuMessageLite.h \
+ ../../../src/libdjvu++/GURL.h \
+ ../../../src/libdjvu++/GThreads.h
+ucs2utf8.o: ucs2utf8.cpp \
+ ../../../src/libdjvu++/GException.h \
+ ../../../src/libdjvu++/DjVuGlobal.h \
+ ../../../src/include/DjVu.h \
+ ../../../src/libdjvu++/UnicodeByteStream.h \
+ ../../../src/libdjvu++/GUnicode.h \
+ ../../../src/libdjvu++/GString.h \
+ ../../../src/libdjvu++/GContainer.h \
+ ../../../src/libdjvu++/GSmartPointer.h \
+ ../../../src/libdjvu++/ByteStream.h \
+ ../../../src/libdjvu++/Arrays.h \
+ ../../../src/libdjvu++/DjVuMessage.h \
+ ../../../src/libdjvu++/DjVuMessageLite.h \
+ ../../../src/libdjvu++/GURL.h \
+ ../../../src/libdjvu++/GThreads.h
 ### END   C++ DEPENDENCIES

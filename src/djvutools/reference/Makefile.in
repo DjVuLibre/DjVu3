@@ -3,7 +3,7 @@
 #C-              Unauthorized use prohibited.
 #C-
 #
-# $Id: Makefile.in,v 1.12 2001-05-18 18:30:04 bcr Exp $
+# $Id: Makefile.in,v 1.13 2001-05-18 22:04:08 bcr Exp $
 # $Name:  $
 
 %%%include <paths>
@@ -39,7 +39,7 @@ PROG= $(BINPATH)/djvudump $(BINPATH)/c44 $(BINPATH)/d44 $(BINPATH)/ddjvu\
 	$(BINPATH)/djvutxt $(BINPATH)/djvuanno $(BINPATH)/cjb2\
 	$(BINPATH)/cpaldjvu $(BINPATH)/csepdjvu $(BINPATH)/cdjvu\
 	$(BINPATH)/djvm $(BINPATH)/djvuxmlparser $(BINPATH)/djvutoxml\
-	$(BINPATH)/nativetoutf8
+	$(BINPATH)/native2utf8 $(BINPATH)/ucs2native $(BINPATH)/ucs2utf8
 
 # Makefile for libdjvu++.a
 
@@ -64,7 +64,9 @@ DDJVUOBJS = ddjvu.o
 MAKEDEJAVUOBJS = djvumake.o
 BREAKDEJAVUOBJS = djvuextract.o
 PPMCOCOOBJS = ppmcoco.o
-NATIVETOUTF8OBJS = nativetoutf8.o
+NATIVETOUTF8OBJS = native2utf8.o
+UCSTONATIVEOBJS = ucs2native.o
+UCSTOUTF8OBJS = ucs2utf8.o
 BZZOBJS = bzz.o
 DJTHUMBOBJS = djthumb.o
 DJVUTXTOBJS = djvutxt.o
@@ -119,9 +121,17 @@ $(BINPATH)/ppmcoco: $(PPMCOCOOBJS) $(LIB)
 	if [ -n "$(RPO)" ] ; then $(RPO) $(PPMCOCOOBJS) $(LIB) ; fi
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(PPMCOCOOBJS) $(LIB) $(LIBS) $(LIBICONV_LINK)
 
-$(BINPATH)/nativetoutf8: $(NATIVETOUTF8OBJS) $(LIB)
+$(BINPATH)/native2utf8: $(NATIVETOUTF8OBJS) $(LIB)
 	if [ -n "$(RPO)" ] ; then $(RPO) $(NATIVETOUTF8OBJS) $(LIB) ; fi
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(NATIVETOUTF8OBJS) $(LIB) $(LIBS) $(LIBICONV_LINK)
+
+$(BINPATH)/ucs2native: $(UCSTONATIVEOBJS) $(LIB)
+	if [ -n "$(RPO)" ] ; then $(RPO) $(UCSTONATIVEOBJS) $(LIB) ; fi
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(UCSTONATIVEOBJS) $(LIB) $(LIBS) $(LIBICONV_LINK)
+
+$(BINPATH)/ucs2utf8: $(UCSTOUTF8OBJS) $(LIB)
+	if [ -n "$(RPO)" ] ; then $(RPO) $(UCSTOUTF8OBJS) $(LIB) ; fi
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(UCSTOUTF8OBJS) $(LIB) $(LIBS) $(LIBICONV_LINK)
 
 $(BINPATH)/cjb2: $(CJB2OBJS) $(LIB)
 	if [ -n "$(RPO)" ] ; then $(RPO) $(CJB2OBJS) $(LIB) ; fi
