@@ -155,12 +155,15 @@ release:
 	$(MAKE) libdjvu++.dxx
 	$(MAKE) tex
 	$(MAKE) html
+	$(MAKE) capsule
+
+capsule:
 	$(MAKE) distclean
 	@attcapsule ATTLICENSE ../$(NAM)-$(VER).tar.gz
 	@echo Distribution is in ../$(NAM)-$(VER).tar.gz
 
 
-PHONY: html tex clean realclean distclean install depend release
+PHONY: html tex clean realclean distclean install depend release capsule
 
 
 # Handle cpp files as C++
