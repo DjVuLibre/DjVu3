@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: IWTransform.h,v 1.2 1999-05-27 16:26:13 leonb Exp $
+//C- $Id: IWTransform.h,v 1.3 1999-05-27 17:22:09 eaf Exp $
 
 #ifndef _TEMPLATE_H_
 #define _TEMPLATE_H_
@@ -28,7 +28,7 @@
     @memo 
     Fast IW44 transforms.
     @version 
-    #$Id: IWTransform.h,v 1.2 1999-05-27 16:26:13 leonb Exp $# 
+    #$Id: IWTransform.h,v 1.3 1999-05-27 17:22:09 eaf Exp $# 
     @author: 
     L\'eon Bottou <leonb@research.att.com> -- initial implementation */
 //@{
@@ -70,6 +70,8 @@ class IWTransform
   static void RGB_to_Cr(const GPixel *p, int w, int h, int rowsize, 
                         signed char *out, int outrowsize);
 };
+
+//@}
 
 // ------------ THE END
 #endif
