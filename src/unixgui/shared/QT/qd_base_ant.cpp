@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qd_base_ant.cpp,v 1.2 2001-07-25 17:10:42 mchen Exp $
+// $Id: qd_base_ant.cpp,v 1.3 2001-08-08 17:47:53 docbill Exp $
 // $Name:  $
 
 
@@ -77,7 +77,9 @@ QDBase::displaySearchResults(const GList<DjVuTXT::Zone *> & zones_list)
 
    for(GPosition pos=zones_list;pos;++pos)
    {
-      GP<GMapRect> gma=GMapRect::create(zones_list[pos]->rect);
+      GRect irect=zones_list[pos]->rect;
+      dimg->unmap(irect);
+      GP<GMapRect> gma=GMapRect::create(irect);
       gma->comment=search_results_name;
       gma->hilite_color=0xff000000;
       gma->border_type=GMapArea::NO_BORDER;

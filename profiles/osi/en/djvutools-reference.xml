@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" ?>
 <!DOCTYPE DjVuMessages PUBLIC "-//W3C/DTD DjVuMessages 1.0//EN" "../../../pubtext/DjVuMessages.dtd">
 <!-- Error messages from the reference library -->
-<!-- $Id: djvutools-reference.xml,v 1.1 2001/06/11 17:11:12 bcr Exp $ -->
+<!-- $Id: djvutools-reference.xml,v 1.2 2001/06/26 21:36:10 bcr Exp $ -->
 <DjVuMessages>
 <BODY>
 <MESSAGE name="annotate.failed_chunk" number="17000" value="[%0!05d!] Failed to find chunk %1!d! in the source file." />
@@ -9,5 +9,99 @@
 <MESSAGE name="annotate.usage" number="17002" value="[%0!05d!] USAGE:&#10;    annotate -extract|-insert &lt;djvu_in&gt; &lt;ant_file&gt; [&lt;djvu_out&gt;]&#10;or  annotate -remove &lt;djvu_in&gt; [&lt;djvu_out&gt;]." />
 <MESSAGE name="Callback.seek_failed" number="17200" value="[%0!05d!] Failed seek" />
 <MESSAGE name="convert_io.read_failed" number="17400" value="[%0!05d!] Failed to read page." />
+<MESSAGE name="c44.bitrate_not_number"  number="17500"
+  value="[1-%0!05u!] illegal bitrate specification (number expected)" />
+<MESSAGE name="c44.bitrate_out_of_range"  number="17501"
+  value="[1-%0!05u!] illegal bitrate specification (number out of range)" />
+<MESSAGE name="c44.bitrate_comma_expected"  number="17502"
+  value="[1-%0!05u!] illegal bitrate specification (comma or plus expected)" />
+<MESSAGE name="c44.bitrate_too_many"  number="17503"
+  value="[1-%0!05u!] illegal bitrate specification (too many chunks)" />
+<MESSAGE name="c44.bitrate_no_chunks"  number="17504"
+  value="[1-%0!05u!] illegal bitrate specification (no chunks)" />
+<MESSAGE name="c44.no_bpp_arg" number="17505"
+  value="[1-%0!05u!] no argument for option '-bpp'" />
+<MESSAGE name="c44.multiple_bitrate" number="17506"
+  value="[1-%0!05u!] multiple bitrate specification" />
+<MESSAGE name="c44.size_not_number"  number="17510"
+  value="[1-%0!05u!] illegal size specification (number expected)" />
+<MESSAGE name="c44.size_out_of_range"  number="17511"
+  value="[1-%0!05u!] illegal size specification (number out of range)" />
+<MESSAGE name="c44.size_comma_expected"  number="17512"
+  value="[1-%0!05u!] illegal size specification (comma or plus expected)" />
+<MESSAGE name="c44.size_too_many"  number="17513"
+  value="[1-%0!05u!] illegal size specification (too many chunks)" />
+<MESSAGE name="c44.size_no_chunks"  number="17514"
+  value="[1-%0!05u!] illegal size specification (no chunks)" />
+<MESSAGE name="c44.no_size_arg" number="17515"
+  value="[1-%0!05u!] no argument for option '-size'" />
+<MESSAGE name="c44.multiple_size" number="17516"
+  value="[1-%0!05u!] multiple size specification" />
+<MESSAGE name="c44.slice_not_number"  number="17520"
+  value="[1-%0!05u!] illegal slice specification (number expected)" />
+<MESSAGE name="c44.slice_out_of_range"  number="17521"
+  value="[1-%0!05u!] illegal slice specification (number out of range)" />
+<MESSAGE name="c44.slice_comma_expected"  number="17522"
+  value="[1-%0!05u!] illegal slice specification (comma or plus expected)" />
+<MESSAGE name="c44.slice_too_many"  number="17523"
+  value="[1-%0!05u!] illegal slice specification (too many chunks)" />
+<MESSAGE name="c44.slice_no_chunks"  number="17524"
+  value="[1-%0!05u!] illegal slice specification (no chunks)" />
+<MESSAGE name="c44.no_slice_arg" number="17525"
+  value="[1-%0!05u!] no argument for option '-slice'" />
+<MESSAGE name="c44.multiple_slice" number="17526"
+  value="[1-%0!05u!] multiple slice specification" />
+<MESSAGE name="c44.decibel_not_number"  number="17530"
+  value="[1-%0!05u!] illegal decibel specification (number expected)" />
+<MESSAGE name="c44.decibel_out_of_range"  number="17531"
+  value="[1-%0!05u!] illegal decibel specification (number out of range)" />
+<MESSAGE name="c44.decibel_comma_expected"  number="17532"
+  value="[1-%0!05u!] illegal decibel specification (comma or plus expected)" />
+<MESSAGE name="c44.decibel_too_many"  number="17533"
+  value="[1-%0!05u!] illegal decibel specification (too many chunks)" />
+<MESSAGE name="c44.decibel_no_chunks"  number="17534"
+  value="[1-%0!05u!] illegal decibel specification (no chunks)" />
+<MESSAGE name="c44.no_decibel_arg" number="17535"
+  value="[1-%0!05u!] no argument for option '-decibel'" />
+<MESSAGE name="c44.multiple_decibel" number="17537"
+  value="[1-%0!05u!] multiple decibel specification" />
+<MESSAGE name="c44.no_mask_arg" number="17540"
+  value="[1-%0!05u!] no argument for option '-mask'" />
+<MESSAGE name="c44.multiple_mask" number="17541"
+  value="[1-%0!05u!] multiple mask specification" />
+<MESSAGE name="c44.no_dbfrac_arg" number="17542"
+  value="[1-%0!05u!] no argument for option '-dbfrac'" />
+<MESSAGE name="c44.multiple_dbfrac" number="17543"
+  value="[1-%0!05u!] multiple dbfrac specification" />
+<MESSAGE name="c44.illegal_dbfrac" number="17544"
+  value="[1-%0!05u!] illegal dbfrac specification" />
+<MESSAGE name="c44.no_crcbdelay_arg" number="17545"
+  value="[1-%0!05u!] no argument for option '-crcbdelay'" />
+<MESSAGE name="c44.illegal_crcbdelay" number="17546"
+  value="[1-%0!05u!] illegal argument for option '-crcbdelay'" />
+<MESSAGE name="c44.no_dpi_arg" number="17547"
+  value="[1-%0!05u!] no argument for option '-dpi'" />
+<MESSAGE name="c44.illegal_dpi" number="17548"
+  value="[1-%0!05u!] illegal argument for option '-dpi'" />
+<MESSAGE name="c44.duplicate_dpi" number="17549"
+  value="[1-%0!05u!] duplicate argument for option '-dpi'" />
+<MESSAGE name="c44.no_gamma_arg" number="17550"
+  value="[1-%0!05u!] no argument for option '-gamma'" />
+<MESSAGE name="c44.illegal_gamma" number="17551"
+  value="[1-%0!05u!] illegal argument for option '-gamma'" />
+<MESSAGE name="c44.duplicate_gamma" number="17552"
+  value="[1-%0!05u!] duplicate argument for option '-gamma'" />
+<MESSAGE name="c44.incompatable_chrominance" number="17553"
+  value="[1-%0!05u!] incompatible chrominance options" />
+<MESSAGE name="c44.different_size" number="17554"
+  value="[1-%0!05u!] mask and image have different size" />
+<MESSAGE name="c44.exclusive" number="17555"
+  value="[1-%0!05u!] options -bpp and -size are exclusive" />
+<MESSAGE name="c44.failed_pnm_header" number="17556"
+  value="[1-%0!05u!] cannot read pnm file header" />
+<MESSAGE name="c44.unrecognized" number="17556"
+  value="[1-%0!05u!] unrecognized file" />
+<MESSAGE name="c44.failed_mask" number="17556"
+  value="[1-%0!05u!] cannot apply mask on an already compressed image" />
 </BODY>
 </DjVuMessages>

@@ -2,7 +2,7 @@
 <!DOCTYPE DjVuMessages PUBLIC "-//W3C/DTD DjVuMessages 1.0//EN" "pubtext/DjVuMessages.dtd">
 <DjVuMessages>
 <BODY>
-<MESSAGE name="annotate.failed_chunk" value="Failed to find chunk %#1 in the source file." />
+<MESSAGE name="annotate.failed_chunk" value="Failed to find chunk %#1#d in the source file." />
 <MESSAGE name="annotate.failed_stat" value="Failed to stat annotation file." />
 <MESSAGE name="annotate.usage" value="USAGE:&#10;    annotate -extract|-insert &lt;djvu_in&gt; &lt;ant_file&gt; [&lt;djvu_out&gt;]&#10;or  annotate -remove &lt;djvu_in&gt; [&lt;djvu_out&gt;]." />
 <MESSAGE name="c44.already_compressed" value="Cannot apply mask on an already compressed image" />

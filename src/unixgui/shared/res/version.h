@@ -4,7 +4,7 @@
 //C-              Unauthorized use prohibited.
 //C-
 // 
-// $Id: version.h,v 1.1 2001-08-08 17:38:05 docbill Exp $
+// $Id: version.h,v 1.2 2001-08-08 17:44:52 docbill Exp $
 // $Name:  $
 
 
@@ -15,7 +15,7 @@
 #pragma interface
 #endif
 
-#define DJVIEW_VERSION_STR	"3.2"
-#define DJEDIT_VERSION_STR	"3.2"
+#define DJVIEW_VERSION_STR	"3.5"
+#define DJEDIT_VERSION_STR	"3.5"
 
 #endif

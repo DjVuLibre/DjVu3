@@ -390,6 +390,24 @@
 <MESSAGE name="Stat" value="Stat" />
 <MESSAGE name="STOP" value="STOP" />
 <MESSAGE name="TextException.test" value="Test exception" />
+<MESSAGE name="XMLAnno.bad_color" value="Color %#1#s is not supported" />
+<MESSAGE name="XMLAnno.bad_page" value="Failed to get specified page" />
+<MESSAGE name="XMLAnno.bad_rect" value="Too few coordinates for rectangular region" />
+<MESSAGE name="XMLAnno.bad_circle" value="Too few coordinates for circular region" />
+<MESSAGE name="XMLAnno.bad_oval" value="Too few coordinates for oval region" />
+<MESSAGE name="XMLAnno.unknown_shape" value="Unknown shape %#1#s" />
+<MESSAGE name="XMLAnno.unknown_border" value="Unrecongized border type %#1#s" />
+<MESSAGE name="XMLAnno.extra_body" value="Exactly one <BODY></BODY> pair is needed" />
+<MESSAGE name="XMLAnno.no_body" value="No <BODY></BODY> pair found" />
+<MESSAGE name="XMLAnno.map_find" value="Failed to find specified map %#1#s" />
+<MESSAGE name="XMLAnno.fail_init" value="Failed to initialize %#1#s" />
+<MESSAGE name="XMLTags.no_GP" value="Not secured by a GP pointer" />
+<MESSAGE name="XMLTags.raw_string" value="Raw string '%#1#s' found outside document scope." />
+<MESSAGE name="XMLTags.bad_tag" value="Unterminated Tag %#1#s" />
+<MESSAGE name="XMLTags.bad_PI" value="Unterminated Processing Instruction: %#1#s" />
+<MESSAGE name="XMLTags.bad_comment" value="Unterminated Comment: %#1#s" />
+<MESSAGE name="XMLTags.bad_form" value="Well formed error.  Too many end tags." />
+<MESSAGE name="XMLTags.no_body" value="No body" />
 <MESSAGE name="ZPCodec.no_encoding" value="ZPCodec has not been created for encoding" />
 <MESSAGE name="ZPCodec.write_error" value="ZPCodec write error" />
 </BODY>

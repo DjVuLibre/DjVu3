@@ -4,7 +4,7 @@
 //C-              Unauthorized use prohibited.
 //C-
 // 
-// $Id: djvu_base_res.h,v 1.1 2001-08-08 17:38:05 docbill Exp $
+// $Id: djvu_base_res.h,v 1.2 2001-08-08 17:44:52 docbill Exp $
 // $Name:  $
 
 
@@ -56,8 +56,12 @@
 #define IDC_ZOOM_ZOOMIN			(IDC_ZOOM_MAX+1)
 #define IDC_ZOOM_ZOOMOUT		(IDC_ZOOM_MAX+2)
 
-#define IDC_ROTATE_90                   42000
-#define IDC_ROTATE_270                  42010
+#define IDC_PANE                        42000
+#define IDC_ZOOM_SELECT                 42010
+#define IDC_TEXT_SELECT                 42020
+
+#define IDC_ROTATE_90                   42100
+#define IDC_ROTATE_270                  42110
 
 #define IDC_OPEN			41300
 #define IDC_CLOSE			41301

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" ?>
 <!DOCTYPE DjVuMessages PUBLIC "-//W3C/DTD DjVuMessages 1.0//EN" "../../../pubtext/DjVuMessages.dtd">
 <!-- Messages from libdjvu++ -->
-<!-- $Id: libdjvu++.xml,v 1.1 2001/06/11 17:11:12 bcr Exp $ -->
+<!-- $Id: libdjvu++.xml,v 1.2 2001/06/26 21:12:15 fcrary Exp $ -->
 <DjVuMessages>
 <BODY>
 <MESSAGE name="DjVuMessage.Unrecognized" number="10000">
@@ -1234,9 +1234,6 @@ number.
 <MESSAGE name="parseoptions.ambiguous" number="15800">
 [1-%0!05u!] Ambiguous options: &apos;%1!s!=%2!s!&apos; and &apos;%3!s!=%4!s!
 &apos; specified.
-</MESSAGE>
-<MESSAGE name="parseoptions.bad_install" number="15801">
-[1-%0!05u!] SDK not installed properly, please install it again.
 </MESSAGE>
 <MESSAGE name="parseoptions.bad_number" number="15802">
 [1-%0!05u!] &apos;%1!s!&apos; is not a number.
