@@ -31,7 +31,7 @@
 #C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #
-# $Id: sys.sh,v 1.25 2001-01-25 20:19:30 bcr Exp $
+# $Id: sys.sh,v 1.26 2001-02-20 18:30:04 bcr Exp $
 # $Name:  $
 
 # This sets the variable SYS INCS JOBJ and DEFS
@@ -95,6 +95,7 @@ if [ -z "$SYS_SET" ] ; then
         SYS=Solaris-sparc
         SENTINAL=src/3rd-party/sentinal_lm_60/sol2sprc
 	SENTINAL_NEED_LIB="/usr/lib/libsocket.a /usr/lib/libnsl.a"
+	RTKFLAGS="-fpack-struct"
       fi
     fi
   elif [ "$SYS" = "IRIX64" ] ; then
@@ -118,6 +119,6 @@ if [ -z "$SYS_SET" ] ; then
   fi
   SYS_SET=true
   echo "$SYS"
-  CONFIG_VARS=`echo SYS SYS_SET LIBC LIBDL DEFS INCS JOBJ WHOLEARCHIVE WHOLEARCHIVESEP NOWHOLEARCHIVE SENTINAL SENTINAL_NEED_LIB RTK $CONFIG_VARS`
+  CONFIG_VARS=`echo SYS SYS_SET LIBC LIBDL DEFS INCS JOBJ WHOLEARCHIVE WHOLEARCHIVESEP NOWHOLEARCHIVE SENTINAL SENTINAL_NEED_LIB RTK RTKFLAGS $CONFIG_VARS`
 fi
 

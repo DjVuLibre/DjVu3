@@ -31,7 +31,7 @@
 #C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #
-# $Id: functions.sh,v 1.58 2001-02-16 01:12:56 bcr Exp $
+# $Id: functions.sh,v 1.59 2001-02-20 18:30:04 bcr Exp $
 # $Name:  $
 
 #
@@ -974,11 +974,14 @@ generate_messages()
   ${mkdirp} "$TOPBUILDDIR/profiles"
   if [ -r "$TOPSRCDIR/profiles" ]
   then
-    cp "$TOPSRCDIR/profiles/"*.conf "$TOPBUILDDIR/profiles/."
+    for i in "$TOPSRCDIR/profiles/"*.conf ; do
+       rm -f "$TOPBUILDDIR/profiles/"`basename "$i"`
+       cp "$i" "$TOPBUILDDIR/profiles/."
+    done
   fi
   profilepath="$TOPBUILDDIR/profiles/message.conf"
+  rm -f "$profilepath" "/tmp/$$"
   echo "Creating: $profilepath"
-  rm -f "/tmp/$$"
   while [ -n "$1" ]
   do
     if [ -r "$TOPBUILDDIR/$1/message.conf" ] 
