@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.1.2.1 1999-04-12 16:48:21 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.1.2.2 1999-04-26 19:20:46 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -21,10 +21,20 @@
 #include "DjVmFile.h"
 #include "debug.h"
 
-DjVuDocument::DjVuDocument(const GURL & xurl, DjVuPort * xport,
-			   GCache<GURL, DjVuFile> * xcache):
-      init_url(xurl), cache(xcache), simple_port(0), djvm(0)
+DjVuDocument::DjVuDocument(const GURL & url, bool xreadonly,
+			   DjVuPort * xport, GCache<GURL, DjVuFile> * xcache):
+      cache(xcache), simple_port(0), readonly(1), djvm(0)
 {
+   dir_url=url.baseURL();
+
+   if (!xreadonly)
+   {
+	 // We want to keep loaded files in an unlimited private cache
+	 // :(( Drawbacks of the design. It's hard to combine features
+	 // useful for the plugin and the editor in one class
+      cache=new GCache<GURL, DjVuFile>(-1);
+   }
+   
    DjVuPortcaster * pcaster=get_portcaster();
    if (xport) pcaster->add_route(this, xport);
    else
@@ -33,29 +43,47 @@ DjVuDocument::DjVuDocument(const GURL & xurl, DjVuPort * xport,
       pcaster->add_route(this, simple_port);
    };
 
-   detect_doc_type();
+   detect_doc_type(url);
    
       // Create fake directory (with only one URL in it)
    GURL decode_url;
    if (is_djvm()) decode_url=djvm_get_first_page_url();
-   else decode_url=init_url;
+   else decode_url=url;
    dir=new DjVuNavDir(decode_url.baseURL()+"directory");
    dir->insert_page(-1, decode_url.fileURL());
+
+   if (!xreadonly)
+   {
+	 // Get the REAL directory by decoding page #0
+      GP<DjVuImage> dimg=get_page(0);
+      dimg->get_djvu_file()->wait_for_finish();
+
+	 // Now load each and every file into the cache
+      int page;
+      for(page=0;page<dir->get_pages_num();page++)
+	 get_djvu_file(page);
+
+      check_nav_structure();
+   }
+
+   readonly=xreadonly;
 }
 
 DjVuDocument::~DjVuDocument(void)
 {
-   delete simple_port;
+   delete simple_port; simple_port=0;
+   if (!readonly) delete cache; cache=0;
 }
 
 void
-DjVuDocument::detect_doc_type(void)
+DjVuDocument::detect_doc_type(const GURL & doc_url)
 {
    DEBUG_MSG("DjVuDocument::detect_doc_type(): guessing what we're dealing with\n");
    DEBUG_MAKE_INDENT(3);
    
    DjVuPortcaster * pcaster=get_portcaster();
-   GP<DataRange> data_range=pcaster->request_data(this, init_url);
+   GP<DataRange> data_range=pcaster->request_data(this, doc_url);
+   if (!data_range) THROW("Failed to get data for URL '"+doc_url+"'");
 
    ByteStream * stream=0;
 
@@ -75,6 +103,7 @@ DjVuDocument::detect_doc_type(void)
 
 	    djvm=1;
 	    djvm_pool=data_range->get_pool();
+	    djvm_doc_url=doc_url;
 
 	       // Get the DJVM directory and offset to the 1st DJVU page
 	    int first_page_offset=0;
@@ -122,7 +151,6 @@ DjVuDocument::detect_doc_type(void)
 	       // DJVU format
 	    DEBUG_MSG("Got DJVU document here.\n");
 	    djvm=0;
-	    djvu_pool=data_range->get_pool();
 	 };
       } else THROW("Corrupt document file: not in IFF format.");
    } CATCH(exc) {
@@ -139,9 +167,9 @@ DjVuDocument::djvm_url2name(const GURL & url) const
    if (!is_djvm()) THROW("Internal error: the document format is not DJVM.");
    
    GString name;
-   if (!strncmp(url, init_url, strlen(init_url)))
+   if (!strncmp(url, djvm_doc_url, strlen(djvm_doc_url)))
    {
-      name=(const char *) url+strlen(init_url);
+      name=(const char *) url+strlen(djvm_doc_url);
       while(name[0]=='/') { GString tmp=(const char *) name+1; name=tmp; };
    }
    return name;
@@ -152,15 +180,17 @@ DjVuDocument::djvm_name2url(const char * name) const
 {
    if (!is_djvm()) THROW("Internal error: the document format is not DJVM.");
    
-   return init_url+name;
+   return djvm_doc_url+name;
 }
 
 bool
 DjVuDocument::djvm_contains(const GURL & url) const
 {
    if (!is_djvm()) THROW("Internal error: the document format is not DJVM.");
-   
-   return djvm && !strncmp(url, init_url, strlen(init_url));
+
+   DEBUG_MSG("url='" << url << "'\n");
+   DEBUG_MSG("djvm_doc_url='" << djvm_doc_url << "'\n");
+   return djvm && !strncmp(url, djvm_doc_url, strlen(djvm_doc_url));
 }
 
 GURL
@@ -168,7 +198,252 @@ DjVuDocument::djvm_get_first_page_url(void) const
 {
    if (!is_djvm()) THROW("Internal error: the document format is not DJVM.");
    
-   return init_url+djvm_first_page_name;
+   return djvm_doc_url+djvm_first_page_name;
+}
+
+static void
+add_to_cache(const GP<DjVuFile> & f, GMap<GURL, void *> & map,
+	     GCache<GURL, DjVuFile> * cache)
+{
+   GURL url=f->get_url();
+   
+   if (!map.contains(url))
+   {
+      map[url]=0;
+      cache->add_item(url, f);	// Force overwrite even if item exists
+      
+      GPList<DjVuFile> list;
+      for(GPosition pos=list;pos;++pos)
+	 add_to_cache(list[pos], map, cache);
+   }
+}
+
+void
+DjVuDocument::add_to_cache(const GP<DjVuFile> & f)
+{
+   GMap<GURL, void *> map;
+   ::add_to_cache(f, map, cache);
+}
+
+static void
+unlink_empty_files(const GP<DjVuFile> & f, GMap<GURL, void *> & map,
+		   GCache<GURL, DjVuFile> * cache)
+{
+   if (!map.contains(f->get_url()))
+   {
+      map[f->get_url()]=0;
+
+      GPosition pos;
+      GPList<DjVuFile> files=f->get_included_files();
+      for(pos=files;pos;++pos)
+	 unlink_empty_files(files[pos], map, cache);
+
+      for(pos=files;pos;++pos)
+      {
+	 GP<DjVuFile> file=files[pos];
+	 if (file->get_chunks_number()==0)
+	 {
+	    f->unlink_file(file->get_url().fileURL());
+	    cache->del_item(file->get_url());
+	 }
+      }
+   }
+}
+
+void
+DjVuDocument::unlink_empty_files(void)
+{
+   DEBUG_MSG("DjVuDocument::unlink_empty_files(): getting rid of empty files\n");
+   DEBUG_MAKE_INDENT(3);
+   
+   GMap<GURL, void *> map;
+   for(int page=0;page<dir->get_pages_num();page++)
+      ::unlink_empty_files(get_djvu_file(page), map, cache);
+}
+
+static void
+get_shared_files(const GP<DjVuFile> & f, GMap<GURL, void *> & map)
+{
+   GURL url=f->get_url();
+   
+   if (!map.contains(url))
+   {
+      map[url]=0;
+      GPList<DjVuFile> list=f->get_included_files();
+      for(GPosition pos=list;pos;++pos)
+	 get_shared_files(list[pos], map);
+   }
+}
+
+GPList<DjVuFile>
+DjVuDocument::get_shared_files(void)
+      // Will return the list of files included into every page
+{
+   GMap<GURL, void *> total;
+   for(int page=0;page<dir->get_pages_num();page++)
+   {
+      GMap<GURL, void *> map;
+      GP<DjVuFile> file=get_djvu_file(page);
+      ::get_shared_files(file, map);
+
+      for(GPosition pos=map;pos;++pos)
+      {
+	 GURL url=map.key(pos);
+	 GPosition tpos;
+	 if (!total.contains(url, tpos)) total[url]=(void *) 1;
+	 else total[tpos]=(void *) ((int) total[tpos]+1);
+      }
+   }
+   GPList<DjVuFile> list;
+   for(GPosition pos=total;pos;++pos)
+   {
+      GURL url=total.key(pos);
+      if ((int) total[pos]==dir->get_pages_num())
+	 list.append(get_djvu_file(url));
+   }
+   return list;
+}
+
+static void
+delete_chunks(const GP<DjVuFile> & f, const char * chunk_name)
+{
+   GPList<DjVuFile> list=f->get_included_files();
+   for(GPosition pos=list;pos;++pos)
+      delete_chunks(list[pos], chunk_name);
+
+   f->delete_chunks(chunk_name);
+}
+
+void
+DjVuDocument::check_nav_structure(void)
+      // The function will make sure, that there is one and only one file
+      // included into every page containing one and only one NDIR chunk
+{
+   DEBUG_MSG("DjVuDocument::check_nav_structure() called\n");
+   DEBUG_MAKE_INDENT(3);
+   
+   if (dir->get_pages_num()==1)
+   {
+	 // Get rid of all NDIR chunks anywhere
+      DEBUG_MSG("only one page found => kill any NDIR chunks\n");
+      dir_file=0;
+      delete_chunks(get_djvu_file(0), "NDIR");
+      unlink_empty_files();
+   } else
+   {
+      DEBUG_MSG("more than one page exist => update NDIR\n");
+      
+	 // Get list of files included into every page
+      GPList<DjVuFile> shared_files=get_shared_files();
+      DEBUG_MSG("got " << shared_files.size() << " shared files\n");
+   
+	 // One of them may have NDIR chunk in it
+      GPosition pos;
+      for(pos=shared_files;pos;++pos)
+	 if (shared_files[pos]->contains_chunk("NDIR")) break;
+   
+      if (pos)
+      {
+	    // Shared file with directory has been found
+	    // Restore NDIR chunk in the file we found
+	 DEBUG_MSG("found a shared file with NDIR chunk\n");
+
+	 DEBUG_MSG("killing NDIR chunks everywhere\n");
+	 for(int page=0;page<dir->get_pages_num();page++)
+	    delete_chunks(get_djvu_file(page), "NDIR");
+	 
+	 DEBUG_MSG("updating NDIR chunk in the shared file '" << shared_files[pos]->get_url() << "'\n");
+	 MemoryByteStream str;
+	 dir->encode(str);
+	 dir_file=shared_files[pos];
+	 dir_file->insert_chunk(1, "NDIR", str.get_data());
+	 dir_file->dir=dir;
+
+	 unlink_empty_files();
+      } else
+      {
+	    // No shared file with directory
+	 DEBUG_MSG("no shared files with NDIR chunk found.\n");
+	 
+	 DEBUG_MSG("killing NDIR chunks everywhere\n");
+	 for(int page=0;page<dir->get_pages_num();page++)
+	    delete_chunks(get_djvu_file(page), "NDIR");
+
+	 unlink_empty_files();
+	 
+	    // Create new directory file.
+	 DEBUG_MSG("creating new shared file.\n");
+	 GString name=tmpnam(0);
+	 StdioByteStream str(name, "wb");
+	 IFFByteStream iff(str);
+	 iff.put_chunk("FORM:DJVI");
+	 iff.put_chunk("NDIR");
+	 dir->encode(iff);
+	 iff.close_chunk();
+	 iff.close_chunk();
+	 dir_file=new DjVuFile(GOS::filename_to_url(name));
+	 unlink(name);
+
+	    // Now assign it a decent name
+	 GURL url=dir->page_to_url(0);
+	 char tst_name[128];
+	 for(int i=0;;i++)
+	 {
+	    sprintf(tst_name, "dir%d", i);
+	    if (!cache->get_item(url.baseURL()+tst_name)) break;
+	 };
+	 dir_file->set_name(tst_name);
+	 
+	    // Include it into every page
+	 for(int page=0;page<dir->get_pages_num();page++)
+	    get_djvu_file(page)->include_file(dir_file, 1);
+
+	    // We don't want to add the file to the cache anywhere before
+	    // 'cause its URL becomes OK only at this point
+	 dir_file->change_cache(cache);
+	 add_to_cache(dir_file);
+      }
+   }
+}
+
+void
+DjVuDocument::insert_page(const GP<DjVuFile> & file, int page_num)
+{
+   DEBUG_MSG("DjVuDocument::insert_page(): page_num=" << page_num << "\n");
+   DEBUG_MAKE_INDENT(3);
+
+   if (readonly) THROW("The document has been created in readonly mode.");
+   
+   GString name=file->get_url().fileURL();
+   if (dir->name_to_page(name)>=0)
+      THROW("Can't insert page '"+name+"': already exists.");
+   
+   file->move(dir->page_to_url(0).baseURL());
+   file->change_cache(cache);
+   get_portcaster()->add_route(file, this);
+
+   dir->insert_page(page_num, name);
+   add_to_cache(file);
+
+   if (dir_file) file->include_file(dir_file, 1);
+
+   check_nav_structure();
+}
+
+void
+DjVuDocument::delete_page(int page_num)
+{
+   DEBUG_MSG("DjVuDocument::delete_page(): page_num=" << page_num << "\n");
+   DEBUG_MAKE_INDENT(3);
+
+   if (readonly) THROW("The document has been created in readonly mode.");
+
+   if (dir->get_pages_num()==1) THROW("Can't delete the last page.");
+
+   GURL url=dir->page_to_url(page_num);
+   dir->delete_page(page_num);
+   cache->del_item(url);
+   check_nav_structure();
 }
 
 GP<DataRange>
@@ -176,23 +451,50 @@ DjVuDocument::request_data(const DjVuPort * source, const GURL & url)
 {
    DEBUG_MSG("DjVuDocument::request_data(): seeing if we can do it\n");
    DEBUG_MAKE_INDENT(3);
-   
-   if (is_djvm() && djvm_contains(url))
-   {
-      GString name=djvm_url2name(url);
-      
-      DEBUG_MSG("Yep. It's DjVm document and file name='" << name << "'\n");
-      
-      GP<DjVmDir0::FileRec> file=djvm_dir.get_file(name);
-      if (!file) THROW(GString("File '")+name+"' is not in this DjVm document.");
 
-      DEBUG_MSG("found file at offset=" << file->offset << ", size=" << file->size << "\n");
-      return new DataRange(djvm_pool, file->offset, file->size);
+   if (readonly)
+   {
+      if (is_djvm())
+      {
+	 DEBUG_MSG("The document type is DJVM.\n");
+	 if (djvm_contains(url))
+	 {
+	    GString name=djvm_url2name(url);
+      
+	    DEBUG_MSG("Yep. It's DjVm document and file name='" << name << "'\n");
+      
+	    GP<DjVmDir0::FileRec> file=djvm_dir.get_file(name);
+	    if (!file) THROW(GString("File '")+name+"' is not in this DjVm document.");
+
+	    DEBUG_MSG("found file at offset=" << file->offset << ", size=" << file->size << "\n");
+	    return new DataRange(djvm_pool, file->offset, file->size);
+	 }
+      } else
+      {
+	 DEBUG_MSG("The document type is DJVU.\n");
+	 if (url.isLocal())
+	 {
+	    GString fname=GOS::url_to_filename(url);
+	    DEBUG_MSG("fname=" << fname << "\n");
+
+	    GP<DataPool> pool=new DataPool();
+	    StdioByteStream str(fname, "rb");
+	    char buffer[1024];
+	    int length;
+	    while((length=str.read(buffer, 1024)))
+	       pool->add_data(buffer, length);
+	    pool->set_eof();
+	    return new DataRange(pool);
+	 };
+      }
    } else
    {
-      DEBUG_MSG("The document type is DJVU.\n");
-      if (url==init_url) return new DataRange(djvu_pool);
-      else if (url.isLocal())
+      if (djvm)	// The document has originally been DjVm
+      {
+	 GP<DjVmDir0::FileRec> file=djvm_dir.get_file(url.fileURL());
+	 if (file) return new DataRange(djvm_pool, file->offset, file->size);
+      };
+      if (url.isLocal())
       {
 	 GString fname=GOS::url_to_filename(url);
 	 DEBUG_MSG("fname=" << fname << "\n");
@@ -205,8 +507,8 @@ DjVuDocument::request_data(const DjVuPort * source, const GURL & url)
 	    pool->add_data(buffer, length);
 	 pool->set_eof();
 	 return new DataRange(pool);
-      };
-   };
+      }
+   }
    DEBUG_MSG("Oops. Can't return the stream. Ask smb else.\n");
    return 0;
 }
@@ -315,9 +617,17 @@ DjVuDocument::get_djvm_data(void)
    DEBUG_MAKE_INDENT(3);
 
    GP<DjVmFile> djvm_file=get_djvm_file();
-   
+
    TArray<char> data;
-   djvm_file->write(data);
+   GP<DjVmDir0> djvm_dir=djvm_file->get_djvm_dir();
+   if (djvm_dir->get_files_num()==1)
+   {
+      TArray<char> tmp_data=djvm_file->get_file(djvm_dir->get_file(0)->name);
+      data.resize(tmp_data.size()+3);
+      memcpy(data, "AT&T", 4);
+      memcpy((char *) data+4, tmp_data, tmp_data.size());
+   } else djvm_file->write(data);
+   
    return data;
 }
 

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.h,v 1.1.2.1 1999-04-12 16:48:21 eaf Exp $
+//C- $Id: DjVuFile.h,v 1.1.2.2 1999-04-26 19:20:46 eaf Exp $
  
 #ifndef _DJVUFILE_H
 #define _DJVUFILE_H
@@ -49,9 +49,12 @@ public:
    int			file_size;
 
       // Construction/destruction
-   DjVuFile(const GURL & url, DjVuPort * port,
+   DjVuFile(const GURL & url, DjVuPort * port=0,
 	    GCache<GURL, DjVuFile> * cache=0);
    virtual ~DjVuFile(void);
+
+      // Port override
+   void		disable_standard_port(void);
 
       // Status query
    int		get_status(void) const;
@@ -63,6 +66,7 @@ public:
    bool		is_all_data_present(void) const;
 
    GURL		get_url(void) const;
+   void		set_name(const char * name);
 
       // Decoding control
    void		stop_decode(bool sync);
@@ -75,9 +79,25 @@ public:
       // Way to know what is included
    GPList<DjVuFile>	get_included_files(void);
 
+      // Way to control included files
+   void		include_file(const GP<DjVuFile> & file, int chunk_pos=-1);
+   void		unlink_file(const char * name);
+
+      // Operations with chunks
+   int		get_chunks_number(void);
+   GString	get_chunk_name(int chunk_num);
+   bool		contains_chunk(const char * chunk_name);
+   void		delete_chunks(const char * chunk_name);
+   void		insert_chunk(int pos, const char * chunk_name,
+			     const TArray<char> & data);
+
       // All data (included files too) in one array
    TArray<char>		get_djvu_data(bool included_too, bool no_ndir);
    void			add_to_djvm(DjVmFile & djvm_file);
+
+      // Internal. Used by DjVuDocument
+   void			move(const GURL & dir_url);
+   void			change_cache(GCache<GURL, DjVuFile> * cache);
 
       // Functions inherited from DjVuPort
    virtual bool		inherits(const char * class_name) const;
@@ -87,12 +107,6 @@ public:
    virtual void		notify_file_failed(const DjVuPort * source);
    virtual void		notify_all_data_received(const DjVuPort * source);
 private:
-   struct FinishEvent
-   {
-      GEvent	event;
-      const DjVuFile	* file;
-   };
-   
    GURL			url;
    GP<DataRange>	data_range;
    GCache<GURL, DjVuFile> * cache;
@@ -105,9 +119,9 @@ private:
    
    GThread		* decode_thread;
    GP<DjVuFile>		decode_life_saver;
+   GP<DataRange>	decode_data_range;
 
-   GCriticalSection	finish_event_lock;
-   GList<void *>	finish_event_list;
+   DjVuPort		* simple_port;
 
    GMonitor		chunk_mon;
 
@@ -123,7 +137,7 @@ private:
    bool		wait_for_finish(bool self);
 
       // INCL chunk processor
-   GP<DjVuFile>	include_file(ByteStream & str);
+   GP<DjVuFile>	process_incl_chunk(ByteStream & str);
       // Scans file for INCL chunks and creates associated files
    void		process_incl_chunks(void);
 
@@ -138,7 +152,16 @@ private:
 			      bool included_too, bool no_ndir);
    void		add_to_djvm(DjVmFile & djvm_file,
 			    GMap<GURL, void *> & map);
+   void		move(GMap<GURL, void *> & map, const GURL & dir_url);
+   void		change_cache(GMap<GURL, void *> & map,
+			     GCache<GURL, DjVuFile> * cache);
 };
+
+inline void
+DjVuFile::disable_standard_port(void)
+{
+   delete simple_port; simple_port=0;
+}
 
 inline bool
 DjVuFile::inherits(const char * class_name) const
@@ -158,6 +181,12 @@ inline GURL
 DjVuFile::get_url(void) const
 {
    return url;
+}
+
+inline void
+DjVuFile::set_name(const char * name)
+{
+   url=url.baseURL()+name;
 }
 
 #endif
