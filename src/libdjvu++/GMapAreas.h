@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: GMapAreas.h,v 1.19 2000-12-18 17:13:42 bcr Exp $
+// $Id: GMapAreas.h,v 1.20 2000-12-24 23:59:48 praveen Exp $
 // $Name:  $
 
 #ifndef _GMAPAREAS_H
@@ -65,7 +65,7 @@
     @memo Definition of base map area classes
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: GMapAreas.h,v 1.19 2000-12-18 17:13:42 bcr Exp $# */
+    #$Id: GMapAreas.h,v 1.20 2000-12-24 23:59:48 praveen Exp $# */
 //@{
 
 
@@ -401,7 +401,7 @@ public:
       /// Returns a copy of the polygon
    virtual GP<GMapArea>	get_copy(void) const;
       /// Virtual function generating a list of defining coordinates
-   void GMapPoly::get_coords( GList<int> & CoordList );
+   void get_coords( GList<int> & CoordList );
 protected:
    virtual int		gma_get_xmin(void) const;
    virtual int		gma_get_ymin(void) const;

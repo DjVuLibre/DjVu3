@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: DjVuFile.cpp,v 1.138 2000-12-18 17:13:41 bcr Exp $
+// $Id: DjVuFile.cpp,v 1.139 2000-12-24 23:59:48 praveen Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -417,7 +417,8 @@ DjVuFile::decode_func(void)
     decode(*pstr);
     
     // Wait for all child files to finish
-    while(wait_for_finish(0));
+    while(wait_for_finish(0))
+    	continue;
     
     DEBUG_MSG("waiting for children termination\n");
     // Check for termination status

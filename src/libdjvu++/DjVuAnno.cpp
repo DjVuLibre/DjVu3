@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: DjVuAnno.cpp,v 1.63 2000-12-21 01:22:45 bcr Exp $
+// $Id: DjVuAnno.cpp,v 1.64 2000-12-24 23:59:48 praveen Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -314,7 +314,8 @@ GLObject::operator[](int n) const
    if (n>=list.size()) G_THROW("DjVuAnno.too_few\t"+name);
    int i;
    GPosition pos;
-   for(i=0, pos=list;i<n && pos;i++, ++pos);
+   for(i=0, pos=list;i<n && pos;i++, ++pos)
+   		continue;
    return list[pos];
 }
 

@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: GURL.cpp,v 1.43 2000-11-09 20:15:07 jmw Exp $
+// $Id: GURL.cpp,v 1.44 2000-12-24 23:59:48 praveen Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -78,7 +78,8 @@ collapse(char * ptr, const int chars)
 {
    const int length=strlen(ptr);
    const char *srcptr=ptr+((chars>length)?length:chars);
-   while((*(ptr++) = *(srcptr++)));
+   while((*(ptr++) = *(srcptr++)))
+   	continue;
 }
 
 void
@@ -108,11 +109,14 @@ GURL::beautify_path(void)
 	 }
 
 	 // Eat multiple slashes
-      for(;(ptr=strstr(start, "////"));collapse(ptr, 3));
-      for(;(ptr=strstr(start, "//"));collapse(ptr, 1));
+      for(;(ptr=strstr(start, "////"));collapse(ptr, 3))
+      	continue;
+      for(;(ptr=strstr(start, "//"));collapse(ptr, 1))
+      	continue;
       
 	 // Convert /./ stuff into plain /
-      for(;(ptr=strstr(start, "/./"));collapse(ptr, 2));
+      for(;(ptr=strstr(start, "/./"));collapse(ptr, 2))
+      	continue;
 
 	 // Process /../
       while((ptr=strstr(start, "/../")))
@@ -211,7 +215,8 @@ GURL::protocol(const char * url)
    const char * const url_ptr=url;
    const char * ptr;
    for(ptr=url_ptr;*ptr && !(!isalpha(*ptr) && !isdigit(*ptr) &&
-	  *ptr!='+' && *ptr!='-' && *ptr!='.');ptr++);
+	  *ptr!='+' && *ptr!='-' && *ptr!='.');ptr++)
+	  	continue;
    return(*ptr==':')?GString(url_ptr, ptr-url_ptr):GString();
 }
 
@@ -276,7 +281,8 @@ GURL::parse_cgi_args(void)
 
       // Search for the beginning of CGI arguments
    const char * start=url;
-   while(*start &&(*(start++)!='?'));
+   while(*start &&(*(start++)!='?'))
+   		continue;
 
       // Now loop until we see all of them
    while(*start)
@@ -298,7 +304,8 @@ GURL::parse_cgi_args(void)
 	    // Got argument in 'arg'. Split it into 'name' and 'value'
 	 const char * ptr;
          const char * const arg_ptr=arg;
-	 for(ptr=arg_ptr;*ptr&&(*ptr != '=');ptr++);
+	 for(ptr=arg_ptr;*ptr&&(*ptr != '=');ptr++)
+	 	continue;
 
 	 GString name, value;
 	 if (*ptr)
@@ -667,7 +674,8 @@ GURL::operator+(const char * xname) const
    {
       const char * const url_ptr=(const char *)url;
       const char * ptr;
-      for(ptr=url_ptr+protocol().length()+1;*ptr&&!is_argument(ptr);ptr++);
+      for(ptr=url_ptr+protocol().length()+1;*ptr&&!is_argument(ptr);ptr++)
+      	continue;
 
       if (*(ptr-1) != '/')
       {

@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: GBitmap.cpp,v 1.39 2000-12-18 18:00:13 bcr Exp $
+// $Id: GBitmap.cpp,v 1.40 2000-12-24 23:59:48 praveen Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -46,7 +46,7 @@
 #include "GException.h"
 #include <string.h>
 
-// File "$Id: GBitmap.cpp,v 1.39 2000-12-18 18:00:13 bcr Exp $"
+// File "$Id: GBitmap.cpp,v 1.40 2000-12-24 23:59:48 praveen Exp $"
 // - Author: Leon Bottou, 05/1997
 
 
@@ -950,7 +950,8 @@ GBitmap::makerows(int nrows, int ncolumns, unsigned char *runs)
     {
       rlerows[r] = runs;
       int c;
-      for(c=0;c<ncolumns;c+=GBitmap::read_run(runs));
+      for(c=0;c<ncolumns;c+=GBitmap::read_run(runs))
+      	continue;
       if (c > ncolumns)
         G_THROW("GBitmap.lost_sync2");
     }
@@ -1292,11 +1293,13 @@ GBitmap::append_line(unsigned char *&data,const unsigned char *row,
       if ((p=!p)) 
         {
           if(*row)
-            for(++count,++row;(row<rowend)&&*row;++count,++row);
+            for(++count,++row;(row<rowend)&&*row;++count,++row)
+            	continue;
         } 
       else if(!*row)
         {
-          for(++count,++row;(row<rowend)&&!*row;++count,++row);
+          for(++count,++row;(row<rowend)&&!*row;++count,++row)
+          	continue;
         }
       append_run(data,count);
     }

@@ -31,13 +31,15 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: DjVuMessage.cpp,v 1.12 2000-12-22 18:00:10 fcrary Exp $
+// $Id: DjVuMessage.cpp,v 1.13 2000-12-24 23:59:48 praveen Exp $
 // $Name:  $
 
 
 
 #include "DjVuMessage.h"
+#ifndef macintosh
 #include "parseoptions.h"
+#endif
 #include <ctype.h>
 #include <stdio.h>
 
@@ -57,7 +59,9 @@ static const char DjVuMessageFileName[] = "message";
 // Constructor
 DjVuMessage::DjVuMessage( void ) : opts(0)
 {
+#ifndef macintosh
    opts=new DjVuParseOptions(DjVuMessageFileName);
+#endif
 //  const char *ss;
 //  struct djvu_parse opt = djvu_parse_init( "-" );
 //  ss = djvu_parse_configfile( opt, DjVuMessageFileName, -1 );
@@ -119,7 +123,7 @@ DjVuMessage::LookUp( const GString & MessageList ) const
     }
   }
 
-  //  All done
+  //  All done 
   return result;
 }
 
@@ -139,10 +143,17 @@ DjVuMessage::LookUpSingle( const GString &Single_Message ) const
   if( !msg_text )
   {
     //  Didn't find anything, fabricate a message
+#ifndef macintosh
     msg_text = GString("** Unrecognized DjVu Message: [Contact LizardTech for assistance]\n") + 
-               "\tMessage name:  \"" +
-               Single_Message.substr(0,ending_posn)
-               + "\"";
+               "\tMessage name:  " +
+               Single_Message.substr(0,ending_posn);
+#else
+    msg_text = GString("** error messages not implemented for Macintosh: [Contact LizardTech for assistance]\n") + 
+               "\tMessage name:  " +
+               Single_Message.substr(0,ending_posn);
+#endif
+
+
   }
 #ifdef _DEBUG
   else
@@ -173,8 +184,14 @@ DjVuMessage::LookUpSingle( const GString &Single_Message ) const
 GString
 DjVuMessage::LookUpID( const GString &msgID ) const
 {
-  GString result=opts->GetValue(msgID);
+	GString result;
+
+#ifndef macintosh
+  
+  result=opts->GetValue(msgID);
   opts->perror();
+#endif
+
 /*
   //  Find the message file
   const char *ss;

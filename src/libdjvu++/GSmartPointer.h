@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: GSmartPointer.h,v 1.28 2000-12-21 01:22:45 bcr Exp $
+// $Id: GSmartPointer.h,v 1.29 2000-12-24 23:59:48 praveen Exp $
 // $Name:  $
 
 #ifndef _GSMARTPOINTER_H_
@@ -54,7 +54,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation\\
     Andrei Erofeev <eaf@geocities.com> -- bug fix.
     @version 
-    #$Id: GSmartPointer.h,v 1.28 2000-12-21 01:22:45 bcr Exp $# 
+    #$Id: GSmartPointer.h,v 1.29 2000-12-24 23:59:48 praveen Exp $# 
     @args
 */
 //@{
@@ -308,6 +308,7 @@ inline
 GPEnabled::GPEnabled(const GPEnabled & obj) 
   : count(0) 
 {
+#pragma unused(obj)
 }
 
 inline int
@@ -322,6 +323,7 @@ GPEnabled::operator=(const GPEnabled & obj)
   /* The copy operator should do nothing because the count should not be
      changed.  Subclasses of GPEnabled will call this version of the copy
      operator as part of the default 'memberwise copy' strategy. */
+ #pragma unused(obj)
   return *this; 
 }
 

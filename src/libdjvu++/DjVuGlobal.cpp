@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: DjVuGlobal.cpp,v 1.30 2000-11-09 20:15:06 jmw Exp $
+// $Id: DjVuGlobal.cpp,v 1.31 2000-12-24 23:59:48 praveen Exp $
 // $Name:  $
 
 /** This file impliments the DjVuProgressTask elements.  The memory
@@ -214,9 +214,10 @@ int djvu_supports_progress_callback(void) {return 1;}
 extern "C"
 {
   void *djvu_set_progress_callback(void *);
-  int djvu_supports_progress_callback(void) {return 0;}
+  int djvu_supports_progress_callback(void);
 }
 void *djvu_set_progress_callback(void *) { return 0; }
+int djvu_supports_progress_callback(void) {return 0;}
 #else
 int djvu_supports_progress_callback(void) {return 0;}
 djvu_progress_callback *

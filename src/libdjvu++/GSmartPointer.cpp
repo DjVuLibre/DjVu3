@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: GSmartPointer.cpp,v 1.20 2000-12-21 01:22:45 bcr Exp $
+// $Id: GSmartPointer.cpp,v 1.21 2000-12-24 23:59:48 praveen Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 05/1997
@@ -42,6 +42,7 @@
 #endif 
 #endif
 
+#include <string.h>
 #include "GThreads.h"
 #include "GSmartPointer.h"
 #include "GException.h"

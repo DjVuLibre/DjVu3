@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: GOS.cpp,v 1.38 2000-11-30 21:31:07 bcr Exp $
+// $Id: GOS.cpp,v 1.39 2000-12-24 23:59:48 praveen Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -105,7 +105,7 @@ static const char slash='/';
 static const char backslash='\\';
 static const char colon=':';
 static const char dot='.';
-static const char tilde='~';
+static const char _tilde='~';
 static const char percent='%';
 static const char nillchar=0;
 #ifdef UNIX

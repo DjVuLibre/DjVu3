@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: DjVuFileCache.h,v 1.12 2000-12-18 17:13:42 bcr Exp $
+// $Id: DjVuFileCache.h,v 1.13 2000-12-24 23:59:48 praveen Exp $
 // $Name:  $
 
 #ifndef _DJVUFILECACHE_H
@@ -48,6 +48,9 @@
 #include <sys/types.h>
 #include <time.h>
 #endif 
+#else
+
+#include <time.h>
 #endif
 
 /** @name DjVuFileCache.h
@@ -60,7 +63,7 @@
     
     @memo Simple DjVuFile caching class.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: DjVuFileCache.h,v 1.12 2000-12-18 17:13:42 bcr Exp $#
+    @version #$Id: DjVuFileCache.h,v 1.13 2000-12-24 23:59:48 praveen Exp $#
 */
 
 //@{
@@ -124,6 +127,28 @@ public:
    bool		is_enabled(void) const;
 public:
    class Item;
+   
+   class Item : public GPEnabled
+	{
+	public:
+	   virtual ~Item(void);
+	   time_t		get_time(void) const;
+
+	   GP<DjVuFile>	get_file(void) const;
+	   unsigned int	get_size(void) const;
+	   
+	   void		refresh(void);
+
+	public:
+	   GP<DjVuFile>	file;
+	   time_t		time;
+	   GPosition		list_pos;
+	   static int	qsort_func(const void * el1, const void * el2);
+
+	   Item(void);
+	   Item(const GP<DjVuFile> & xfile);
+	};
+
 protected:
    GCriticalSection	class_lock;
    
@@ -148,25 +173,7 @@ private:
    void		clear_to_size(int size);
 };
 
-class DjVuFileCache::Item : public GPEnabled
-{
-public:
-   virtual ~Item(void);
 
-   GP<DjVuFile>	get_file(void) const;
-   unsigned int	get_size(void) const;
-   time_t		get_time(void) const;
-   void		refresh(void);
-
-public:
-   GP<DjVuFile>	file;
-   time_t		time;
-   GPosition		list_pos;
-   static int	qsort_func(const void * el1, const void * el2);
-
-   Item(void);
-   Item(const GP<DjVuFile> & xfile);
-};
 
 //@}
    

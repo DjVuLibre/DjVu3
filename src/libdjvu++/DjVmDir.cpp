@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: DjVmDir.cpp,v 1.31 2000-11-09 20:15:05 jmw Exp $
+// $Id: DjVmDir.cpp,v 1.32 2000-12-24 23:59:48 praveen Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -428,7 +428,8 @@ DjVmDir::get_file_pos(const File * f) const
    GCriticalSectionLock lock((GCriticalSection *) &class_lock);
    int cnt;
    GPosition pos;
-   for(pos=files_list, cnt=0;pos&&(files_list[pos]!=f);++pos, cnt++);
+   for(pos=files_list, cnt=0;pos&&(files_list[pos]!=f);++pos, cnt++)
+   		continue;
    return (pos)?cnt:(-1);
 }
 
@@ -498,7 +499,8 @@ DjVmDir::insert_file(const GP<File> & file, int pos_num)
       // Add the file to the list
    int cnt;
    GPosition pos;
-   for(pos=files_list, cnt=0;pos&&(cnt!=pos_num);++pos, cnt++);
+   for(pos=files_list, cnt=0;pos&&(cnt!=pos_num);++pos, cnt++)
+   		continue;
    if (pos)
      files_list.insert_before(pos, file);
    else
