@@ -31,7 +31,7 @@
 #C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #
-# $Id: functions.sh,v 1.67 2001-06-19 22:03:34 kmckelvey Exp $
+# $Id: functions.sh,v 1.68 2001-06-26 17:30:25 bcr Exp $
 # $Name:  $
 
 #
@@ -200,11 +200,13 @@ testfile()
 # Run command with echo on CONFIG_LOG
 run()
 {
+    ln -f -s `unescape $TOPBUILDDIR` "$tempdir/TOPDIR"
     ( cd "$tempdir" 2>>/dev/null 1>>/dev/null; $* ) > $temp.out 2>&1 
     status=$?
     echo "------- (cmd)"   >> "$CONFIG_LOG"
     echo '%' "$*"          >> "$CONFIG_LOG"
     "${cat}" "$temp.out"        >> "$CONFIG_LOG"
+    rm -f "$tempdir/TOPDIR"
     return $status
 }
 
