@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/ksh
 #C-
 #C- DjVu® Reference Library (v. 3.0)
 #C- 
@@ -31,7 +31,7 @@
 #C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #
-# $Id: package.sh,v 1.19 2001-02-07 01:11:20 bcr Exp $
+# $Id: package.sh,v 1.19.4.1 2001-03-21 22:32:13 bcr Exp $
 # $Name:  $
 
 # EXIT ON ERROR
@@ -143,7 +143,13 @@ abspackagedir=`cd "$packagedir" 1>>/dev/null 2>>/dev/null;pwd`
 for i in `cd $srcdir 2>>/dev/null 1>>/dev/null;ls|sed -e 's,%,@%%@,g' -e 's, ,@%s%@,g'` 
 do
   i=`echo "$i"|sed -e 's,@%s%@, ,g' -e 's,@%%@,%,g'`
-  j="$srcdir/$i"
+  a="$srcdir/$SYS/$i"
+  if [ -r "$a" ]
+  then
+    j=$a
+  else
+    j="$srcdir/$i"
+  fi
   if [ ! -d "$j" ]
   then
     if [ "$j" != "$srcfilelist" ] 
