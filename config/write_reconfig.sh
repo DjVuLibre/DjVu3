@@ -7,7 +7,7 @@ if [ -z "$CONFIG_DIR" ] ; then
 fi
 
 echo '#!/bin/sh' > "$TOPBUILDDIR/reconfigure"
-echo "'$PROGRAM' \\" >> "$TOPBUILDDIR/reconfigure"
+echo "'$TOPSRCDIR/$PROGRAM_NAME' \\" >> "$TOPBUILDDIR/reconfigure"
 while [ $# != 0 ] ; do
   echon "'$1' \\" >> "$TOPBUILDDIR/reconfigure"
   shift
