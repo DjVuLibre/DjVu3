@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djthumb.cpp,v 1.24 2001-07-24 17:52:03 bcr Exp $
+// $Id: djthumb.cpp,v 1.25 2001-07-26 17:52:26 bcr Exp $
 // $Name:  $
 
 // DJTHUMB -- DjVu thumbnails generator
@@ -68,7 +68,7 @@
     @author
     Andrei Erofeev <eaf@geocities.com> -- initial implementation
     @version
-#$Id: djthumb.cpp,v 1.24 2001-07-24 17:52:03 bcr Exp $# */
+#$Id: djthumb.cpp,v 1.25 2001-07-26 17:52:26 bcr Exp $# */
 //@{
 //@}
 
@@ -98,8 +98,8 @@ Usage:\n\
       %s [options] <djvu_file_in> <djvu_file_out>\n\
 \n\
 Options:\n\
-      -v[erbose]      - Verbose operation.\n\
-      -s[ize] <size>  - How big (in pixels) thumbnail images\n\
+      -v[erbose]       - Verbose operation.\n\
+      -s[ize] [32-256] - How big (in pixels) thumbnail images\n\
                         should be (default is 128 pixels).\n\
 \n\
 The program will generate thumbnails for every page of <djvu_file_in> \
