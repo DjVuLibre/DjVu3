@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: JB2Image.cpp,v 1.16 1999-09-13 20:20:44 leonb Exp $
+//C- $Id: JB2Image.cpp,v 1.17 1999-09-13 21:27:41 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -81,7 +81,7 @@ private:
   void code_record_type(int &rectype);
   int code_match_index(int &index, JB2Dict *jim);
   // Library
-  void init_library(JB2Dict *jim, int nshape=-1);
+  void init_library(JB2Dict *jim);
   int add_library(int shapeno, JB2Shape *jshp);
   GTArray<int> shape2lib;
   GTArray<int> lib2shape;
@@ -577,10 +577,9 @@ _JB2Codec::code_comment(GString &comment)
 
 
 void
-_JB2Codec::init_library(JB2Dict *jim, int nshape)
+_JB2Codec::init_library(JB2Dict *jim)
 {
-  if (nshape < 0) 
-    nshape = jim->get_inherited_shape_count();
+  int nshape = jim->get_inherited_shape_count();
   shape2lib.resize(0,nshape-1);
   lib2shape.resize(0,nshape-1);
   libinfo.resize(0,nshape-1);
@@ -1222,7 +1221,7 @@ _JB2Codec::code(JB2Dict *jim)
       int i;
       int firstshape = jim->get_inherited_shape_count();
       int nshape = jim->get_shape_count();
-      init_library(jim, nshape);
+      init_library(jim);
       // Code headers.
       int rectype = REQUIRED_DICT;
       if (jim->get_inherited_shape_count() > 0)
@@ -1243,6 +1242,7 @@ _JB2Codec::code(JB2Dict *jim)
           if (jshp->parent >= 0)
             rectype = MATCHED_REFINE_LIBRARY_ONLY;
           code_record(rectype, jim, jshp);
+          add_library(shapeno, jshp);
         }
       // Code end of data record
       rectype = END_OF_DATA;
