@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDynamic.cpp,v 1.1 2001-07-12 23:33:16 bcr Exp $
+// $Id: DjVuDynamic.cpp,v 1.2 2001-07-13 00:05:04 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -127,7 +127,7 @@ DjVuDynamicLib::lookup(const GUTF8String &name)
   if(handle && !pos)
   {
 #ifdef WIN32
-    map[name]=GetProcessAddress(handle,(const char *)name);
+    map[name]=GetProcAddress(handle,(const char *)name);
 #else
     map[name]=dlsym(handle,(const char *)name);
 #endif
