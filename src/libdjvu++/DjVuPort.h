@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuPort.h,v 1.18 1999-09-20 21:59:43 eaf Exp $
+//C- $Id: DjVuPort.h,v 1.19 1999-10-05 16:00:06 leonb Exp $
  
 #ifndef _DJVUPORT_H
 #define _DJVUPORT_H
@@ -69,9 +69,9 @@
     performed from a single place and are serialized by a global monitor.
     
     @memo DjVu decoder communication mechanism.
-    @author Andrei Erofeev <eaf@geocities.com>\\
+    @author Andrei Erofeev <eaf@research.att.com>\\
             L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuPort.h,v 1.18 1999-09-20 21:59:43 eaf Exp $# */
+    @version #$Id: DjVuPort.h,v 1.19 1999-10-05 16:00:06 leonb Exp $# */
 //@{
 
 class DjVuPort;

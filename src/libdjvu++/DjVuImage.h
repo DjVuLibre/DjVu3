@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuImage.h,v 1.22 1999-09-30 16:21:35 leonb Exp $
+//C- $Id: DjVuImage.h,v 1.23 1999-10-05 16:00:06 leonb Exp $
 
 #ifndef _DJVUIMAGE_H
 #define _DJVUIMAGE_H
@@ -49,9 +49,9 @@
     Decoding DjVu and IW44 images.
     @author
     L\'eon Bottou <leonb@research.att.com> - initial implementation
-    Andrei Erofeev <eaf@geocities.com> - multipage support
+    Andrei Erofeev <eaf@research.att.com> - multipage support
     @version
-    #$Id: DjVuImage.h,v 1.22 1999-09-30 16:21:35 leonb Exp $# */
+    #$Id: DjVuImage.h,v 1.23 1999-10-05 16:00:06 leonb Exp $# */
 //@{
 
 

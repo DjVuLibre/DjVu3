@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFileCache.h,v 1.2 1999-09-22 15:38:23 eaf Exp $
+//C- $Id: DjVuFileCache.h,v 1.3 1999-10-05 16:00:06 leonb Exp $
 
 #ifndef _DJVUFILECACHE_H
 #define _DJVUFILECACHE_H
@@ -34,8 +34,8 @@
     See \Ref{DjVuFileCache} for details.
     
     @memo Simple DjVuFile caching class.
-    @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: DjVuFileCache.h,v 1.2 1999-09-22 15:38:23 eaf Exp $#
+    @author Andrei Erofeev <eaf@research.att.com>
+    @version #$Id: DjVuFileCache.h,v 1.3 1999-10-05 16:00:06 leonb Exp $#
 */
 
 //@{

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.h,v 1.42 1999-09-30 16:21:35 leonb Exp $
+//C- $Id: DjVuFile.h,v 1.43 1999-10-05 16:00:06 leonb Exp $
  
 #ifndef _DJVUFILE_H
 #define _DJVUFILE_H
@@ -44,8 +44,8 @@
     \Ref{DjVuDocument} and work with {\bf it} when decoding the image.
 
     @memo Classes representing DjVu files.
-    @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuFile.h,v 1.42 1999-09-30 16:21:35 leonb Exp $#
+    @author Andrei Erofeev <eaf@research.att.com>, L\'eon Bottou <leonb@research.att.com>
+    @version #$Id: DjVuFile.h,v 1.43 1999-10-05 16:00:06 leonb Exp $#
 */
 
 //@{

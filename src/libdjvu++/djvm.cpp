@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: djvm.cpp,v 1.6 1999-08-30 19:28:31 leonb Exp $
+//C- $Id: djvm.cpp,v 1.7 1999-10-05 16:00:06 leonb Exp $
 
 /** @name djvm
 
@@ -75,9 +75,9 @@
     @memo
     DjVu all-in-one-file multipage documents creator.
     @author
-    Andrei Erofeev <eaf@geocities.com>
+    Andrei Erofeev <eaf@research.att.com>
     @version
-    #$Id: djvm.cpp,v 1.6 1999-08-30 19:28:31 leonb Exp $# */
+    #$Id: djvm.cpp,v 1.7 1999-10-05 16:00:06 leonb Exp $# */
 //@{
 //@}
 

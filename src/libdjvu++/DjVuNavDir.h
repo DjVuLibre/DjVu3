@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuNavDir.h,v 1.4 1999-09-28 19:56:18 leonb Exp $
+//C- $Id: DjVuNavDir.h,v 1.5 1999-10-05 16:00:06 leonb Exp $
 
 #ifndef _DJVUNAVDIR_H
 #define _DJVUNAVDIR_H
@@ -35,8 +35,8 @@
     Refer to the \Ref{DjVuNavDir} class description for greater details.
 
     @memo DjVu Navigation Directory
-    @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: DjVuNavDir.h,v 1.4 1999-09-28 19:56:18 leonb Exp $#
+    @author Andrei Erofeev <eaf@research.att.com>
+    @version #$Id: DjVuNavDir.h,v 1.5 1999-10-05 16:00:06 leonb Exp $#
 */
 
 //@{

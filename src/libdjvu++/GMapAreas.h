@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GMapAreas.h,v 1.4 1999-10-04 22:22:44 eaf Exp $
+//C- $Id: GMapAreas.h,v 1.5 1999-10-05 16:00:06 leonb Exp $
 
 #ifndef _GMAPAREAS_H
 #define _GMAPAREAS_H
@@ -18,9 +18,15 @@
 #pragma interface
 #endif
 
+#include "DjVuGlobal.h"
 #include "GRect.h"
 #include "GContainer.h"
 #include "GString.h"
+
+#ifndef U_INT32
+typedef unsigned int u_int32;
+#endif
+
 
 /** @name GMapAreas.h
 
@@ -39,14 +45,13 @@
     manipulations
 
     @memo Definition of base map area classes
-    @author Andrei Erofeev <eaf@geocities.com>
+    @author Andrei Erofeev <eaf@research.att.com>
     @version
-    #$Id: GMapAreas.h,v 1.4 1999-10-04 22:22:44 eaf Exp $# */
+    #$Id: GMapAreas.h,v 1.5 1999-10-05 16:00:06 leonb Exp $# */
 //@{
 
-/****************************************************************************
-**************************** GMapArea declaration ***************************
-****************************************************************************/
+
+// ---------- GMAPAREA ---------
 
 #define MAPAREA_TAG		"maparea"
 #define RECT_TAG		"rect"
@@ -210,9 +215,8 @@ GMapArea::~GMapArea(void) {}
 inline void
 GMapArea::clear_bounds(void) { bounds_initialized=0; }
 
-/****************************************************************************
-**************************** GMapRect declaration ***************************
-****************************************************************************/
+
+// ---------- GMAPRECT ---------
 
 /** Implements rectangular map areas. This is the only kind of map areas
     supporting #SHADOW_IN_BORDER#, #SHADOW_OUT_BORDER#, #SHADOW_EIN_BORDER#
@@ -297,9 +301,8 @@ GMapRect::get_shape_name(void) const { return "rect"; }
 inline GP<GMapArea>
 GMapRect::get_copy(void) const { return new GMapRect(*this); }
 
-/****************************************************************************
-**************************** GMapPoly declaration ***************************
-****************************************************************************/
+
+// ---------- GMAPPOLY ---------
 
 /** Implements polygonal map areas. The only supported types of border
     are #NO_BORDER#, #XOR_BORDER# and #SOLID_BORDER#. Its contents can not
@@ -393,9 +396,9 @@ GMapPoly::get_shape_name(void) const { return "poly"; }
 inline GP<GMapArea>
 GMapPoly::get_copy(void) const { return new GMapPoly(*this); }
 
-/****************************************************************************
-**************************** GMapOval declaration ***************************
-****************************************************************************/
+
+
+// ---------- GMAPOVAL ---------
 
 /** Implements elliptical map areas. The only supported types of border
     are #NO_BORDER#, #XOR_BORDER# and #SOLID_BORDER#. Its contents can not

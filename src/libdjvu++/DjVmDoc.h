@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVmDoc.h,v 1.8 1999-09-28 17:23:12 eaf Exp $
+//C- $Id: DjVmDoc.h,v 1.9 1999-10-05 16:00:05 leonb Exp $
  
 #ifndef _DJVMDOC_H
 #define _DJVMDOC_H
@@ -31,8 +31,8 @@
     \Ref{DjVmDoc} class used to read and write new DjVu multipage documents.
 
     @memo DjVu multipage documents reader/writer.
-    @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: DjVmDoc.h,v 1.8 1999-09-28 17:23:12 eaf Exp $#
+    @author Andrei Erofeev <eaf@research.att.com>
+    @version #$Id: DjVmDoc.h,v 1.9 1999-10-05 16:00:05 leonb Exp $#
 */
 
 //@{

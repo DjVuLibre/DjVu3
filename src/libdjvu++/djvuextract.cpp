@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: djvuextract.cpp,v 1.18 1999-09-27 21:04:53 leonb Exp $
+//C- $Id: djvuextract.cpp,v 1.19 1999-10-05 16:00:07 leonb Exp $
 
 /** @name djvuextract
 
@@ -54,10 +54,10 @@
     @memo
     Extract components from DjVu files.
     @version
-    #$Id: djvuextract.cpp,v 1.18 1999-09-27 21:04:53 leonb Exp $#
+    #$Id: djvuextract.cpp,v 1.19 1999-10-05 16:00:07 leonb Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> - Initial implementation\\
-    Andrei Erofeev <eaf@geocities.com> - Multipage support */
+    Andrei Erofeev <eaf@research.att.com> - Multipage support */
 //@{
 //@}
 

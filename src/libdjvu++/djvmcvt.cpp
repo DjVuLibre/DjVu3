@@ -1,8 +1,8 @@
 /*****************************************************************************
  *
- *   $Revision: 1.4 $
- *   $Date: 1999-09-28 19:58:08 $
- *   @(#) $Id: djvmcvt.cpp,v 1.4 1999-09-28 19:58:08 leonb Exp $
+ *   $Revision: 1.5 $
+ *   $Date: 1999-10-05 16:00:06 $
+ *   @(#) $Id: djvmcvt.cpp,v 1.5 1999-10-05 16:00:06 leonb Exp $
  *
  *****************************************************************************/
 
@@ -75,9 +75,9 @@
     @memo
     DjVu multipage document converter.
     @author
-    Andrei Erofeev <eaf@geocities.com>
+    Andrei Erofeev <eaf@research.att.com>
     @version
-    #$Id: djvmcvt.cpp,v 1.4 1999-09-28 19:58:08 leonb Exp $# */
+    #$Id: djvmcvt.cpp,v 1.5 1999-10-05 16:00:06 leonb Exp $# */
 
 #ifdef __GNUC__
 #pragma implementation

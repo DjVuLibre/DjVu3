@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GURL.h,v 1.8 1999-08-12 21:35:56 eaf Exp $
+//C- $Id: GURL.h,v 1.9 1999-10-05 16:00:06 leonb Exp $
 
 #ifndef _GURL_H_
 #define _GURL_H_
@@ -24,8 +24,8 @@
     Files #"GURL.h"# and #"GURL.cpp"# contain the implementation of the
     \Ref{GURL} class used to store URLs in a system independent format.
     @memo System independent URL representation.
-    @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: GURL.h,v 1.8 1999-08-12 21:35:56 eaf Exp $#
+    @author Andrei Erofeev <eaf@research.att.com>
+    @version #$Id: GURL.h,v 1.9 1999-10-05 16:00:06 leonb Exp $#
 */
 
 //@{
