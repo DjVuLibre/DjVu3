@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocEditor.cpp,v 1.61 2001-02-15 19:06:56 bcr Exp $
+// $Id: DjVuDocEditor.cpp,v 1.62 2001-02-16 01:12:56 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -368,7 +368,8 @@ DjVuDocEditor::strip_incl_chunks(GP<DataPool> & pool_in)
    GP<IFFByteStream> giff_in=IFFByteStream::create(pool_in->get_stream());
    IFFByteStream &iff_in=*giff_in;
 
-   GP<IFFByteStream> giff_out=IFFByteStream::create(ByteStream::create());
+   GP<IFFByteStream> gbs_out=ByteStream::create();
+   GP<IFFByteStream> giff_out=IFFByteStream::create(gbs_out);
    IFFByteStream &iff_out=*giff_out;
 
    bool have_incl=false;
@@ -393,11 +394,9 @@ DjVuDocEditor::strip_incl_chunks(GP<DataPool> & pool_in)
 
    if (have_incl)
    {
-      iff_out.seek(0,SEEK_SET);
-      return new DataPool(*iff_out.get_bytestream());
-//      ByteStream &str_out=*iff_out.get_bytestream();
-//      str_out.seek(0, SEEK_SET);
-//      return new DataPool(str_out);
+      ByteStream &bs=*gbs_out;
+      bs.seek(0,SEEK_SET);
+      return new DataPool(bs);
    } else return pool_in;
 }
 
@@ -618,11 +617,9 @@ DjVuDocEditor::insert_file(const char * file_name, bool is_page,
 
          // We have just inserted every included file. We may have modified
          // contents of the INCL chunks. So we need to update the DataPool...
-//      ByteStream &str_out=*gstr_out;
-//      str_out.seek(0);
-//      GP<DataPool> new_file_pool=new DataPool(str_out);
-      iff_out.seek(0);
-      GP<DataPool> new_file_pool=new DataPool(*(iff_out.get_bytestream()));
+      ByteStream &str_out=*gstr_out;
+      str_out.seek(0);
+      GP<DataPool> new_file_pool=new DataPool(str_out);
       {
             // It's important that we replace the pool here anyway.
             // By doing this we load the file into memory. And this is
