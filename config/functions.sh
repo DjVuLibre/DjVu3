@@ -919,6 +919,9 @@ generate_makefile()
   TOPBUILDDIR=`unescape $TOPBUILDDIR`
   ${mkdirp} "$TOPBUILDDIR/bin"
   ${mkdirp} "$TOPBUILDDIR/lib"
+  ${mkdirp} "$TOPBUILDDIR/text"
+  ${mkdirp} "$TOPBUILDDIR/html"
+  ${mkdirp} "$TOPBUILDDIR/man"
   while [ -n "$1" ]
   do
     # compute xtopsrcdir
