@@ -32,7 +32,7 @@
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #C- 
 #
-# $Id: pstodjvu.pl,v 1.3 2001-03-23 15:58:31 debs Exp $
+# $Id: pstodjvu.pl,v 1.4 2001-03-27 23:07:28 debs Exp $
 # $Name:  $
 
 # Perl libs to use
@@ -171,7 +171,7 @@ if ( $ARGV[0] )
 	last SWITCH;
         }; #END SW
      /^.*$/  && do {
-        $end_loop=1;
+        $j="";
 	last SWITCH;
      	}; #END SW
     $nothing=1;
@@ -196,6 +196,9 @@ if ( $ARGV[0] )
     print STDERR "Too few arguments.\n";
     $usage=1;
   } # END if ( "$usage" eq "" )
+} else { 
+    print STDERR "Too few arguments.\n";
+    $usage=1;
 } # END if ( $ARGV[0] ne "" )
 if ( $usage ) {
   $e=basename($electroniccommand);
@@ -267,6 +270,7 @@ if ( $free ) {
 } else {
   $args="--dpi=$rdpi $profile $args";
   $rc=system "$documentcommand -help > tmp.txt 2>&1";
+  open(IFILE, "<tmp.txt");
   if ( -f 'tmp.txt' ) { unlink 'tmp.txt'; }
   if ( $rc eq 0 ) {
     $djvucommand="$documentcommand";
