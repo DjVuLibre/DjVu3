@@ -31,7 +31,7 @@
 #C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #
-# $Id: functions.sh,v 1.57 2001-02-07 01:11:20 bcr Exp $
+# $Id: functions.sh,v 1.58 2001-02-16 01:12:56 bcr Exp $
 # $Name:  $
 
 #
@@ -962,11 +962,37 @@ generate_makefile()
     echo "Creating: $TOPBUILDDIR/$1/Makefile"
     echo "	from  $TOPSRCDIR/$1/Makefile.in"
     run "${CONFIG_STATUS}" "$TOPSRCDIR/$1/Makefile.in" "$TOPBUILDDIR/$1/Makefile"
+ 
     shift
   done
 }
 
-
+generate_messages()
+{
+  TOPSRCDIR=`unescape $TOPSRCDIR`
+  TOPBUILDDIR=`unescape $TOPBUILDDIR`
+  ${mkdirp} "$TOPBUILDDIR/profiles"
+  if [ -r "$TOPSRCDIR/profiles" ]
+  then
+    cp "$TOPSRCDIR/profiles/"*.conf "$TOPBUILDDIR/profiles/."
+  fi
+  profilepath="$TOPBUILDDIR/profiles/message.conf"
+  echo "Creating: $profilepath"
+  rm -f "/tmp/$$"
+  while [ -n "$1" ]
+  do
+    if [ -r "$TOPBUILDDIR/$1/message.conf" ] 
+    then
+      ${cat} "$TOPBUILDDIR/$1/message.conf" >> "/tmp/$$"
+    elif [ -r "$TOPSRCDIR/$1/message.conf" ] 
+    then
+      ${cat} "$TOPSRCDIR/$1/message.conf" >> "/tmp/$$"
+    fi
+    shift
+  done
+  sort -u < "/tmp/$$" > "$profilepath"
+  rm -f "/tmp/$$"
+}
 
 
 ### ------------------------------------------------------------------------

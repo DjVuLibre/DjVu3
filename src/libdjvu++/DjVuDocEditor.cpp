@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocEditor.cpp,v 1.62 2001-02-16 01:12:56 bcr Exp $
+// $Id: DjVuDocEditor.cpp,v 1.63 2001-02-16 01:15:30 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -368,7 +368,7 @@ DjVuDocEditor::strip_incl_chunks(GP<DataPool> & pool_in)
    GP<IFFByteStream> giff_in=IFFByteStream::create(pool_in->get_stream());
    IFFByteStream &iff_in=*giff_in;
 
-   GP<IFFByteStream> gbs_out=ByteStream::create();
+   GP<ByteStream> gbs_out=ByteStream::create();
    GP<IFFByteStream> giff_out=IFFByteStream::create(gbs_out);
    IFFByteStream &iff_out=*giff_out;
 

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.h,v 1.42 2001-02-15 21:49:20 fcrary Exp $
+// $Id: ByteStream.h,v 1.43 2001-02-16 01:12:56 bcr Exp $
 // $Name:  $
 
 #ifndef _BYTESTREAM_H
@@ -62,7 +62,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation\\
     Andrei Erofeev <eaf@geocities.com> -- 
     @version
-    #$Id: ByteStream.h,v 1.42 2001-02-15 21:49:20 fcrary Exp $# */
+    #$Id: ByteStream.h,v 1.43 2001-02-16 01:12:56 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -320,7 +320,6 @@ public:
     { return bs->seek(offset,whence,nothrow); }
   virtual void flush(void)
     { bs->flush(); }
-  GP<ByteStream> & get_bytestream(void) { return gbs; }
 };
 
 /*x Obsolete ByteStream interface for stdio files. 
