@@ -144,35 +144,6 @@ then
     CCFLAGS=`echo "${CCMMX}" "${CCFLAGS}"`
   fi
 
-  echon "Checking ${CC} symbolic option ... "
-  CCSYMBOLIC=""
-  s=`( cd "$tempdir" 2>>/dev/null;${CC} ${CCFLAGS} -symbolic -c $temp.c 2>&1)|"${grep}" 'unrecognized option'`
-  if [ -z "$s" ]
-  then
-    CCSYMBOLIC='-symbolic'
-  elif ( run ${CC} ${CCFLAGS} -shared -Wl,-Bsymbolic -o c$$.so $temp.c -lc -lm )
-  then
-    if [ "$SYS" != "linux-libc6" ]
-    then
-      CCSYMBOLIC='-Wl,-Bsymbolic'
-    fi
-  fi
-  if [ -z "$CCSYMBOLIC" ]
-  then
-    echo "none"
-  else
-    echo "$CCSYMBOLIC"
-  fi
-
-  echon "Checking whether ${CC} -fPIC works ... "
-  if ( run $CC ${CCFLAGS} -fPIC -c $temp.c )
-  then
-    CCPIC="-fPIC"
-    echo yes
-  else
-    echo no
-  fi
-
   echon "Checking whether ${CC} is gcc ... "
   echo 'int main(void) { return __GNUC__;}' | testfile $temp.c
   CCOPT=""
@@ -214,6 +185,63 @@ then
       CCOPT=""
     fi
   fi
+
+  echon "Checking ${CC} symbolic option ... "
+  CCSYMBOLIC=""
+  s=`( cd "$tempdir" 2>>/dev/null;${CC} ${CCFLAGS} -symbolic -c $temp.c 2>&1)|"${grep}" 'unrecognized option'`
+  if [ -z "$s" ]
+  then
+    CCSYMBOLIC='-symbolic'
+  else 
+	  SYSTEMGCC=`echo $SYS | tr A-Z a-z `-$cc_is_gcc
+		case $SYSTEMGCC in
+		  linux-*) 
+			  TESTCCSYMBOLIC="-Wl,-Bstatic,-lstdc++ -shared"
+				TESTCCPIC="-fPIC"
+				;;
+		  solaris-yes) 
+			  TESTCCSYMBOLIC="-Wl,-Bstatic,-lstdc++ -G"
+				TESTCCPIC="-fpic"
+				;;
+		  solaris-*) 
+			  TESTCCSYMBOLIC="-Wl,-Bstatic,-lstdc++ -G"
+				TESTCCPIC="-K PIC"
+				;;
+		  irix*-*) 
+			  TESTCCSYMBOLIC="-Wl,-Bstatic,-lstdc++ -shared"
+				TESTCCPIC=""
+				;;
+		  aix*-*) 
+			  TESTCCSYMBOLIC="-Wl,-Bstatic,-lstdc++ -r"
+				TESTCCPIC="-bM\:SRE"
+				;;
+		esac
+
+	check_shared_link_flags CCSYMBOLIC $temp.c "$TESTCCSYMBOLIC"
+#	check_link_flags CCSYMBOLIC $temp.c "-shared -symbolic" "-shared -Wl,-Bsymbolic" "-shared -Wl,-Bsymbolic -lc" "-shared -Wl,-Bsymbolic -lc -lm"
+#  elif ( run ${CC} ${CCFLAGS} -shared -Wl,-Bsymbolic -o c$$.so $temp.c -lc -lm )
+#  then
+#    if [ "$SYS" != "linux-libc6" ]; then
+#      CCSYMBOLIC='-Wl,-Bsymbolic'
+#    fi
+  fi
+  if [ -z "$CCSYMBOLIC" ]
+  then
+    echo "none"
+  else
+    echo "$CCSYMBOLIC"
+  fi
+
+  echon "Checking whether ${CC} -fPIC works ... "
+#  if ( run $CC ${CCFLAGS} -fPIC -c $temp.c )
+  if ( run $CC ${CCFLAGS} $TESTCCPIC -c $temp.c )
+  then
+    CCPIC=$TESTCCPIC
+    echo yes
+  else
+    echo no
+  fi
+
   "${rm}" -rf $temp.c $temp.o $temp.so
   CC_SET=true
   CONFIG_VARS=`echo CC CC_SET CCFLAGS CCOPT CCWARN CCUNROLL CCSYMBOLIC CCPIC cc_is_gcc $CONFIG_VARS`

@@ -119,26 +119,6 @@ if [ -z "$CXX_SET" ] ; then
     fi
   fi
 
-  echon "Checking ${CXX} symbolic option ... "
-  CXXSYMBOLIC=""
-  if [ "$SYS" != "linux-libc6" ] ; then
-    check_link_flags CXXSYMBOLIC $temp.cpp "-shared -symbolic" "-shared -Wl,-Bsymbolic" "-shared -Wl,-Bsymbolic -lc" "-shared -Wl,-Bsymbolic -lc -lm"
-  fi
-  if [ -z "$CXXSYMBOLIC" ] ; then
-    echo "none"
-  else
-    echo "$CXXSYMBOLIC"
-  fi
-
-  echon "Checking whether ${CXX} -fPIC works ... "
-  check_compile_flags CXXPIC $temp.cpp "-fPIC"
-  if [ $? = 0 ]
-  then
-    echo yes
-  else
-    echo no
-  fi
-
   echon "Checking whether ${CXX} is gcc ... "
   echo 'int main(void) { return __GNUG__;}' | testfile $temp.cpp
   CXXOPT=""
@@ -177,6 +157,52 @@ if [ -z "$CXX_SET" ] ; then
       CXXOPT=""
     fi
   fi
+
+  echon "Checking ${CXX} symbolic option ... "
+  CXXSYMBOLIC=""
+    SYSTEMGXX=`echo $SYS | tr A-Z a-z `-$cxx_is_gcc
+    case $SYSTEMGXX in
+      linux-*)
+        TESTCXXSYMBOLIC="-shared -Wl,-Bstatic,-lstdc++"
+        TESTCXXPIC="-fPIC"
+        ;;
+      solaris-yes)
+        TESTCXXSYMBOLIC="-G -Wl,-Bstatic,-lstdc++"
+        TESTCXXPIC="-fpic"
+        ;;
+      solaris-*)
+        TESTCXXSYMBOLIC="-G -Wl,-Bstatic,-lstdc++"
+        TESTCXXPIC="-K PIC"
+        ;;
+      irix*-*)
+        TESTCXXSYMBOLIC="-shared -Wl,-Bstatic,-lstdc++"
+        TESTCXXPIC=""
+        ;;
+      aix*-*)
+        TESTCXXSYMBOLIC="-r -Wl,-Bstatic,-lstdc++"
+        TESTCXXPIC="-bM\:SRE"
+        ;;
+    esac
+
+		check_shared_link_flags CXXSYMBOLIC $temp.cpp "$TESTCXXSYMBOLIC"
+#  if [ "$SYS" != "linux-libc6" ] ; then
+#    check_link_flags CXXSYMBOLIC $temp.cpp "-shared -symbolic" "-shared -Wl,-Bsymbolic" "-shared -Wl,-Bsymbolic -lc" "-shared -Wl,-Bsymbolic -lc -lm"
+#  fi
+  if [ -z "$CXXSYMBOLIC" ] ; then
+    echo "none"
+  else
+    echo "$CXXSYMBOLIC"
+  fi
+	
+  echon "Checking whether ${CXX} $TESTCXXPIC works ... "
+  check_compile_flags CXXPIC $temp.cpp $TESTCXXPIC
+  if [ $? = 0 ]
+  then
+    echo yes
+  else
+    echo no
+  fi
+
   CXX_SET=true
   "${rm}" -rf $temp.cpp $temp.so $temp.o
   CONFIG_VARS=`echo CXX_SET CXX CXXFLAGS CXXOPT CXXUNROLL CXXWARN CXXSYMBOLIC CXXPIC cxx_is_gcc $CONFIG_VARS`

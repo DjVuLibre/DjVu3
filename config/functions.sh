@@ -599,7 +599,7 @@ check_link_flags()
         if ( run "$CC" $CCFLAGS $CCOPT $CCWARN $DEFS $AAflags $AAtmpfile -o $temp ) 
         then
 
-          eval "${AAname}"'="$AAflags"'
+          eval "${AAname}='"`escape "$AAflags"`"'"
           return 0
         fi
       done
@@ -610,7 +610,7 @@ check_link_flags()
         AAflags=`unescape "$AAflags"`
         if ( run "$CXX" $CXXFLAGS $CXXOPT $CXXWARN $DEFS $AAflags $AAtmpfile -o $temp ) 
         then
-          eval "${AAname}"'="$AAflags"'
+          eval "${AAname}='"`escape "$AAflags"`"'"
           return 0
         fi
       done
@@ -618,6 +618,42 @@ check_link_flags()
     esac
     return 1
   fi
+  s='echo $'"${AAname}"
+  if [ -z "`eval $s`" ] 
+  then
+    return 1
+  else
+    return 0
+  fi
+}
+
+check_shared_link_flags()
+{
+  AAname="$1"
+  shift
+  AAtmpfile="$1"
+  shift
+	AAflags="$*"
+	shift
+
+    CONFIG_VARS=`echo ${AAname} $CONFIG_VARS`
+    case $AAtmpfile in 
+    *.c)
+        if ( run "$CC" $CCFLAGS $CCOPT $CCWARN $DEFS $AAflags $AAtmpfile -o $temp ) 
+        then
+
+          eval "${AAname}='$AAflags'"
+          return 0
+        fi
+      ;;
+    *.cpp)
+        if ( run "$CXX" $CXXFLAGS $CXXOPT $CXXWARN $DEFS $AAflags $AAtmpfile -o $temp ) 
+        then
+          eval "${AAname}='$AAflags'"
+          return 0
+        fi
+      ;;
+    esac
   s='echo $'"${AAname}"
   if [ -z "`eval $s`" ] 
   then
@@ -798,6 +834,24 @@ EOF
   fi
 }
 
+# Usage: check_make_shlib
+# Side effect:  make_stlib <-- can a shared library be build
+
+check_make_shlib()
+{
+  if [ -z "$make_shlib_test" ]
+  then
+    make_shlib_test=checked
+    if [ -z "$CXXSYMBOLIC$CCSYMBOLIC" ]
+    then
+     	make_shlib=""
+    else
+      make_shlib="supported"
+    fi
+    CONFIG_VARS=`echo make_shlib make_shlib_test $CONFIG_VARS`
+  fi
+}
+
 require_make_stlib()
 {
   check_make_stlib $*
@@ -810,8 +864,18 @@ require_make_stlib()
   fi
 }
 
-
-
+require_make_shlib()
+{
+  check_make_shlib $*
+  if [ -z "$make_shlib" ]
+  then
+    echo unknown.
+    echo 1>&2 "${PROGRAM_NAME}: Cannot find how to make a shared library."
+    echo 1>&2 "-- Please set environment variable make_shlib or CXXSYMBOLIC."
+    echo 1>&2 "-- or CCSYMBOLIC."
+    exit 1
+  fi
+}
 
 
 
