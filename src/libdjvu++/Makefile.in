@@ -8,7 +8,7 @@
 # C- AT&T, you have an infringing copy of this software and cannot use it
 # C- without violating AT&T's intellectual property rights.
 # C-
-# C- $Id: Makefile.in,v 1.21 1999-03-17 19:24:59 leonb Exp $
+# C- $Id: Makefile.in,v 1.22 1999-05-24 19:31:59 leonb Exp $
 
 SHELL=/bin/sh
 prefix=@prefix@
@@ -40,9 +40,8 @@ PROG= djvuinfo c44 d44 djvutopnm djvumake djvuextract ppmcoco bzz
 
 LIBOBJS= GString.o GException.o GContainer.o GRect.o GSmartPointer.o \
 	 GThreads.o ByteStream.o ZPCodec.o GBitmap.o GPixmap.o \
-	 IFFByteStream.o BSByteStream.o JB2Image.o GScaler.o IWImage.o \
-	 DjVuImage.o GOS.o DjVuGlobal.o ATTLicense.o
-
+	 IFFByteStream.o BSByteStream.o JB2Image.o GScaler.o IWTransform.o IWImage.o \
+	 DjVuImage.o GOS.o DjVuGlobal.o ATTLicense.o 
 # Make all
 
 all: $(LIB) $(PROG) 

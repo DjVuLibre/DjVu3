@@ -9,9 +9,9 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: IWImage.cpp,v 1.12 1999-05-22 00:54:05 leonb Exp $
+//C- $Id: IWImage.cpp,v 1.13 1999-05-24 19:31:59 leonb Exp $
 
-// File "$Id: IWImage.cpp,v 1.12 1999-05-22 00:54:05 leonb Exp $"
+// File "$Id: IWImage.cpp,v 1.13 1999-05-24 19:31:59 leonb Exp $"
 // - Author: Leon Bottou, 08/1998
 
 #ifdef __GNUC__
@@ -26,6 +26,7 @@
 #include "GSmartPointer.h"
 #include "ZPCodec.h"
 #include "IWImage.h"
+#include "IWTransform.h"
 
 #define IWALLOCSIZE    4080
 #define IWCODEC_MAJOR     1
@@ -34,191 +35,9 @@
 
 
 //////////////////////////////////////////////////////
-// WAVELET DECOMPOSITION/RECONSTRUCTION
+// WAVELET DECOMPOSITION CONSTANTS
 //////////////////////////////////////////////////////
 
-
-
-//----------------------------------------------------
-// Function implementing the elementary IW44 transforms
-
-static inline void 
-forward_filter(short *p, int b, int e, int z, int s)
-{
-  int aa,bb,cc,dd,x,n;
-  int s3 = s + s + s;
-  if (z<b || z>e)
-    THROW("(_IWCoeff::forward_filter) Out of bounds [b<=z<=e]");
-  /* Step 1: prediction */
-  n = z + s;
-  aa = 0;
-  bb = p[n-s];
-  cc = (n+s<e ? p[n+s] : 0);
-  dd = (n+s3<e ? p[n+s3] : 0);
-  if (n < e)
-  {
-    x = bb;
-    if (n+s < e)
-      x = (bb+cc+1)>>1;
-    p[n] = p[n] - x;
-    n = n+s+s;
-  }
-  while (n+s3 < e)
-  {
-    aa=bb; bb=cc; cc=dd; dd=p[n+s3];
-    x = (9*(bb+cc)-(aa+dd)+8) >> 4;
-    p[n] = p[n] - x;
-    n = n+s3-s;
-  }
-  if (n+s < e)
-  {
-    aa=bb; bb=cc; cc=dd; dd=0;
-    x = (bb+cc+1)>>1;
-    p[n] = p[n] - x;
-    n = n+s+s;
-  }
-  if (n < e)
-  {
-    aa=bb; bb=cc; cc=dd; dd=0;
-    x = bb;
-    p[n] = p[n] - x;
-  }
-  /* Step2 : update */
-  n = z;
-  aa = bb = cc = 0;
-  dd = ( n+s<e ? p[n+s] : 0);
-  while (n+s3 < e)
-  {
-    aa=bb; bb=cc; cc=dd; dd=p[n+s3];
-#ifdef IW42
-    x = (bb+cc+2) >> 2;
-#else
-    x = (9*(bb+cc)-(aa+dd)+16) >> 5;
-#endif
-    p[n] += x;
-    n = n+s3-s;
-  }
-  while (n < e)
-  {
-    aa=bb; bb=cc; cc=dd; dd=0;
-#ifdef IW42
-    x = (bb+cc+2) >> 2;
-#else
-    x = (9*(bb+cc)-(aa+dd)+16) >> 5;
-#endif
-    p[n] += x;
-    n = n+s+s;
-  }
-}
-
-
-static inline void 
-backward_filter(short *p, int b, int e, int z, int s)
-{
-  int aa,bb,cc,dd,x,n;
-  int s3 = s + s + s;
-  if (z<b || z>e)
-    THROW("(_IWCoeff::backward_filter) Out of bounds [b<=z<=e]");
-  // Step 1: lifting
-  n = z;
-  aa = bb = cc = 0;
-  dd = ( n+s<e ? p[n+s] : 0);
-  while (n+s3 < e)
-  {
-    aa=bb; bb=cc; cc=dd; dd=p[n+s3];
-#ifdef IW42
-    x = (bb+cc+2) >> 2;
-#else
-    x = (9*(bb+cc)-(aa+dd)+16) >> 5;
-#endif
-    p[n] -= x;
-    n = n+s3-s;
-  }
-  while (n < e)
-  {
-    aa=bb; bb=cc; cc=dd; dd=0;
-#ifdef IW42
-    x = (bb+cc+2) >> 2;
-#else
-    x = (9*(bb+cc)-(aa+dd)+16) >> 5;
-#endif
-    p[n] -= x;
-    n = n+s+s;
-  }
-  // Step 2: interpolation
-  n = z + s;
-  aa = 0;
-  bb = p[n-s];
-  cc = (n+s<e ? p[n+s] : 0);
-  dd = (n+s3<e ? p[n+s3] : 0);
-  if (n < e)
-  {
-    x = bb;
-    if (n+s < e)
-      x = (bb+cc+1)>>1;
-    p[n] += x;
-    n = n+s+s;
-  }
-  while (n+s3 < e)
-  {
-    aa=bb; bb=cc; cc=dd; dd=p[n+s3];
-    x = (9*(bb+cc)-(aa+dd)+8) >> 4;
-    p[n] += x;
-    n = n+s3-s;
-  }
-  if (n+s < e)
-  {
-    aa=bb; bb=cc; cc=dd; dd=0;
-    x = (bb+cc+1)>>1;
-    p[n] += x;
-    n = n+s+s;
-  }
-  if (n < e)
-  {
-    aa=bb; bb=cc; cc=dd; dd=0;
-    x = bb;
-    p[n] += x;
-  }
-}
-
-
-
-
-
-
-//----------------------------------------------------
-// Function for applying bidimensional IW44 between 
-// scale intervals begin(inclusive) and end(exclusive)
-
-
-static void
-forward(short *p, int w, int h, int rowsize, int begin, int end)
-{  
-  for (int scale=begin; scale<end; scale<<=1)
-    {
-      for (int i=0; i<h; i+=scale)
-        forward_filter(p, i*rowsize, i*rowsize+w, i*rowsize, scale);
-      for (int j=0; j<w; j+=scale)
-        forward_filter(p, j, j+h*rowsize, j, scale*rowsize);
-      // Progress
-      DJVU_PROGRESS("decomp",scale);
-    }
-}
-
-static void
-backward(short *p, int w, int h, int rowsize, int begin, int end)
-{ 
-  for (int scale=begin>>1; scale>=end; scale>>=1)
-    {
-      for (int j=0; j<w; j+=scale)
-        backward_filter(p, j, j+h*rowsize, j, scale*rowsize);
-      for (int i=0; i<h; i+=scale)
-        backward_filter(p, i*rowsize, i*rowsize+w, i*rowsize, scale);
-    }
-}
-
-
-//----------------------------------------------------
 // Parameters for IW44 wavelet.
 // - iw_quant: quantization for all 16 sub-bands
 // - iw_norm: norm of all wavelets (for db estimation)
@@ -405,7 +224,7 @@ forward_mask(short *data16, int w, int h, int rowsize, int begin, int end,
         {
           DJVU_PROGRESS("masking", scale*1000 + rp);
           // Decompose
-          forward(sdata, w, h, w, scale, scale+scale);
+          IWTransform::forward(sdata, w, h, w, scale, scale+scale);
           // Zero masked coefficients
           d = sdata;
           m = smask;
@@ -430,7 +249,7 @@ forward_mask(short *data16, int w, int h, int rowsize, int begin, int end,
           if (quickmask && scale==1)
             break;
           // Reconstruct
-          backward(sdata, w, h, w, scale+scale, scale);
+          IWTransform::backward(sdata, w, h, w, scale+scale, scale);
           // Evaluate max error
           lasterr = 0;
           p = data16;
@@ -471,7 +290,7 @@ forward_mask(short *data16, int w, int h, int rowsize, int begin, int end,
 #endif
           delete [] sdata;
           delete [] smask;
-          forward(data16, w, h, rowsize, scale, end);
+          IWTransform::forward(data16, w, h, rowsize, scale, end);
           DJVU_PROGRESS("masking", 999999);
           return;
         }
@@ -863,7 +682,7 @@ _IWMap::create(const signed char *img8, int imgrowsize,
   else
     {
       // Perform traditional decomposition
-      forward(data16, iw, ih, bw, 1, 32);
+      IWTransform::forward(data16, iw, ih, bw, 1, 32);
     }
   // Copy coefficient into blocks
   p = data16;
@@ -937,7 +756,7 @@ _IWMap::image(signed char *img8, int rowsize, int pixsep, int fast)
   // Reconstruction
   if (fast)
     {
-      backward(data16, iw, ih, bw, 32, 2);  
+      IWTransform::backward(data16, iw, ih, bw, 32, 2);  
       p = data16;
       for (i=0; i<bh; i+=2,p+=bw)
         for (int jj=0; jj<bw; jj+=2,p+=2)
@@ -945,7 +764,7 @@ _IWMap::image(signed char *img8, int rowsize, int pixsep, int fast)
     }
   else
     {
-      backward(data16, iw, ih, bw, 32, 1);  
+      IWTransform::backward(data16, iw, ih, bw, 32, 1);  
     }
   // Copy result into image
   p = data16;
@@ -1077,7 +896,7 @@ _IWMap::image(int subsample, const GRect &rect,
       else
         {
           short *pp = data + comp.ymin*dataw + comp.xmin;
-          backward(pp, comp.width(), comp.height(), dataw, r, r>>1);
+          IWTransform::backward(pp, comp.width(), comp.height(), dataw, r, r>>1);
         }
       r = r>>1;
     }
