@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: GString.cpp,v 1.29 2000-12-06 00:30:26 fcrary Exp $
+// $Id: GString.cpp,v 1.30 2000-12-06 18:45:24 fcrary Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -68,6 +68,7 @@ GString::GString(const char dat)
 {
   GStringRep *rep = GStringRep::xnew(1);
   rep->data[0] = dat;
+  rep->data[1] = '\0';
   (*this) = rep;
 }
 
@@ -202,7 +203,7 @@ GString::toEscaped() const
   GString ret;
   for( unsigned i = 0 ; i < length() ; i++ )
   {
-    char d = (*this)->data[i];
+    unsigned char d = (*this)->data[i];
     switch( d )
     {
     case '<':
