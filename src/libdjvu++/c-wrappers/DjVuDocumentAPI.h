@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuDocumentAPI.h,v 1.23 2000-02-29 14:03:58 haffner Exp $
+ *C- $Id: DjVuDocumentAPI.h,v 1.24 2000-03-01 18:33:42 haffner Exp $
  */
 
 #ifndef _DJVUDOC_H_
@@ -210,6 +210,7 @@ typedef struct djvu_segmenter_options_struct
       \item[edge_size] can be reduced when both the printing and scanning
       qualities are excellent, and that we want a high quality 300dpi
       background up to the edges of the characters.
+      \item[thickening] can be turned off whne the resolution is very low.
       \end{description}
       
   */
@@ -277,6 +278,8 @@ typedef struct djvu_segmenter_options_struct
   */
   int blurring_size;
 
+  /** Thickening (in pixels) applied to characters */
+  int thickening;
   /*@}*/
   
   /** @name Options for the subsampling process that happens after the
