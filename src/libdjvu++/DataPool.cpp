@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.cpp,v 1.6 1999-08-25 22:05:59 eaf Exp $
+//C- $Id: DataPool.cpp,v 1.7 1999-08-31 22:52:12 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -80,21 +80,7 @@ DataPool::add_data(const void * buffer, int buffer_size)
       };
    }
 
-      // Check if we need to run any trigger callbacks
-   {
-      GCriticalSectionLock tlock(&triggers_lock);
-      for(GPosition pos=triggers_list;pos;)
-      {
-	 GP<Trigger> trigger=triggers_list[pos];
-	 if (trigger->thresh>=0 && trigger->thresh<size())
-	 {
-	    if (trigger->callback) trigger->callback(trigger->cl_data);
-	    GPosition this_pos=pos;
-	    ++pos;
-	    triggers_list.del(this_pos);
-	 } else ++pos;
-      }
-   }
+   call_triggers();
 }
 
 int
@@ -202,21 +188,9 @@ DataPool::set_eof(void)
       for(GPosition pos=readers_list;pos;++pos)
 	 readers_list[pos]->event.set();
    }
+   
       // Activate all trigger callbacks with negative threshold
-   {
-      GCriticalSectionLock lock(&triggers_lock);
-      for(GPosition pos=triggers_list;pos;)
-      {
-	 GP<Trigger> trigger=triggers_list[pos];
-	 if (trigger->thresh<0)
-	 {
-	    if (trigger->callback) trigger->callback(trigger->cl_data);
-	    GPosition this_pos=pos;
-	    ++pos;
-	    triggers_list.del(this_pos);
-	 } else ++pos;
-      }
-   }
+   call_triggers();
 }
 
 void
@@ -257,14 +231,45 @@ DataPool::stop_reader(void * reader_id)
 }
 
 void
+DataPool::call_triggers(void)
+{
+   DEBUG_MSG("DataPool::call_triggers(): calling trigger callbacks.\n");
+   DEBUG_MAKE_INDENT(3);
+
+   while(1)
+   {
+      GP<Trigger> trigger;
+      {
+	 GCriticalSectionLock lock(&triggers_lock);
+	 for(GPosition pos=triggers_list;pos;++pos)
+	 {
+	    GP<Trigger> t=triggers_list[pos];
+	    if (t->thresh>=0 && t->thresh<size() ||
+		t->thresh<0 && eof_flag)
+	    {
+	       trigger=t;
+	       triggers_list.del(pos);
+	       break;
+	    }
+	 }
+      }
+      if (!trigger) break;
+      else if (trigger->callback) trigger->callback(trigger->cl_data);
+   };
+}
+
+void
 DataPool::add_trigger(int thresh, void (* callback)(void *), void * cl_data)
 {
    if (callback)
    {
-      GCriticalSectionLock lock(&triggers_lock);
       if (thresh<0 && is_eof() || thresh>=0 && get_size()>thresh) callback(cl_data);
       else if (is_eof() && thresh>=get_size()) THROW("Threshold is too big.");
-      else triggers_list.append(new Trigger(thresh, callback, cl_data));
+      else
+      {
+	 GCriticalSectionLock lock(&triggers_lock);
+	 triggers_list.append(new Trigger(thresh, callback, cl_data));
+      }
    }
 }
 
@@ -476,13 +481,18 @@ DataRange::trigger_cb(void)
    {
 	 // Since we know the length now, we can pass the list of triggers
 	 // to the DataPool.
-      GCriticalSectionLock lock(&triggers_lock);
-      for(GPosition pos=end_triggers_list;pos;++pos)
+      while(1)
       {
-	 GP<Trigger> trigger=end_triggers_list[pos];
+	 GP<Trigger> trigger;
+	 {
+	    GCriticalSectionLock lock(&triggers_lock);
+	    if (end_triggers_list.size()==0) break;
+	    GPosition pos=end_triggers_list.firstpos();
+	    trigger=end_triggers_list[pos];
+	    end_triggers_list.del(pos);
+	 }
 	 pass_trigger(start+length-1, trigger->callback, trigger->cl_data);
-      }
-      end_triggers_list.empty();
+      };
    }
 }
 
