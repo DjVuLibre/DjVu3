@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: JB2Image.cpp,v 1.28 2000-01-04 04:48:38 bcr Exp $
+//C- $Id: JB2Image.cpp,v 1.29 2000-01-04 05:31:31 bcr Exp $
 
 
 #ifdef __GNUC__
@@ -1257,7 +1257,6 @@ _JB2Codec::code(JB2Dict *jim)
 {
   if (encoding)
     {
-      static const char encode_string[]="JB2 encoding";
 #ifdef NEED_DECODER_ONLY
       THROW("Compiled with NEED_DECODER_ONLY");
 #else
@@ -1279,10 +1278,10 @@ _JB2Codec::code(JB2Dict *jim)
         code_record(rectype, jim, NULL);
       // Encode every shape
       int shapeno;
-      DJVU_PROGRESS_TASK(jb2code,encode_string, nshape-firstshape);
+      DJVU_PROGRESS_TASK(jb2code,"jb2 encode", nshape-firstshape);
       for (shapeno=firstshape; shapeno<nshape; shapeno++)
         {
-          DJVU_PROGRESS_RUN(jb2code,encode_string, (shapeno-firstshape)|0xff);
+          DJVU_PROGRESS_RUN(jb2code, (shapeno-firstshape)|0xff);
           // Code shape
           JB2Shape *jshp = jim->get_shape(shapeno);
           rectype = NEW_MARK_LIBRARY_ONLY;
@@ -1523,7 +1522,6 @@ _JB2Codec::code(JB2Image *jim)
   // Test case
   if (encoding)
     {
-      static const char encode_string[]="JB2 encoding";
 #ifdef NEED_DECODER_ONLY
       THROW("Compiled with NEED_DECODER_ONLY");
 #else
@@ -1570,10 +1568,10 @@ _JB2Codec::code(JB2Image *jim)
         code_record(rectype, jim, NULL, NULL);
       // Encode every blit
       int blitno;
-      DJVU_PROGRESS_TASK(jb2code,encode_string, nblit);
+      DJVU_PROGRESS_TASK(jb2code,"jb2 encode", nblit);
       for (blitno=0; blitno<nblit; blitno++)
         {
-          DJVU_PROGRESS_RUN(jb2code,encode_string, blitno|0xff);
+          DJVU_PROGRESS_RUN(jb2code, blitno|0xff);
           JB2Blit *jblt = jim->get_blit(blitno);
           int shapeno = jblt->shapeno;
           JB2Shape *jshp = jim->get_shape(shapeno);

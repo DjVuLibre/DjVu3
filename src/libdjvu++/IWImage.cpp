@@ -9,9 +9,9 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: IWImage.cpp,v 1.26 2000-01-04 04:48:38 bcr Exp $
+//C- $Id: IWImage.cpp,v 1.27 2000-01-04 05:31:31 bcr Exp $
 
-// File "$Id: IWImage.cpp,v 1.26 2000-01-04 04:48:38 bcr Exp $"
+// File "$Id: IWImage.cpp,v 1.27 2000-01-04 05:31:31 bcr Exp $"
 // - Author: Leon Bottou, 08/1998
 
 #ifdef __GNUC__
@@ -611,8 +611,7 @@ _IWMap::create(const signed char *img8, int imgrowsize,
 {
   int i, j;
   // Progress
-  static const char create_string[]="create iw44 map";
-  DJVU_PROGRESS_TASK(transf,create_string,3);
+  DJVU_PROGRESS_TASK(transf,"create iw44 map",3);
   // Allocate decomposition buffer
   short *data16 = new short[bw*bh];
   // Copy pixels
@@ -633,16 +632,16 @@ _IWMap::create(const signed char *img8, int imgrowsize,
   if (msk8)
     {
       // Interpolate pixels below mask
-      DJVU_PROGRESS_RUN(transf,create_string, 1);
+      DJVU_PROGRESS_RUN(transf, 1);
       interpolate_mask(data16, iw, ih, bw, msk8, mskrowsize);
       // Multiscale iterative masked decomposition
-      DJVU_PROGRESS_RUN(transf,create_string, 3);
+      DJVU_PROGRESS_RUN(transf, 3);
       forward_mask(data16, iw, ih, bw, 1, 32, msk8, mskrowsize);
     }
   else
     {
       // Perform traditional decomposition
-      DJVU_PROGRESS_RUN(transf,create_string, 3);
+      DJVU_PROGRESS_RUN(transf, 3);
       IWTransform::forward(data16, iw, ih, bw, 1, 32);
     }
   // Copy coefficient into blocks
@@ -2049,8 +2048,7 @@ IWBitmap::encode_chunk(ByteStream &bs, const IWEncoderParms &parm)
   int flag = 1;
   int nslices = 0;
   MemoryByteStream mbs;
-  static const char  encode_string[]="encode chunk";
-  DJVU_PROGRESS_TASK(chunk, encode_string,parm.slices-cslice);
+  DJVU_PROGRESS_TASK(chunk,"encode chunk",parm.slices-cslice);
   {
     float estdb = -1.0;
     _ZPCodecBias zp(mbs, true);
@@ -2062,7 +2060,7 @@ IWBitmap::encode_chunk(ByteStream &bs, const IWEncoderParms &parm)
           break;
         if (parm.slices>0 && nslices+cslice>=parm.slices)
           break;
-        DJVU_PROGRESS_RUN(chunk,encode_string, (1+nslices-cslice)|0xf);
+        DJVU_PROGRESS_RUN(chunk, (1+nslices-cslice)|0xf);
         flag = ycodec->code_slice(zp);
         if (flag && parm.decibels>0.0)
           if (ycodec->curband==0 || estdb>=parm.decibels-DECIBEL_PRUNE)
@@ -2134,11 +2132,10 @@ IWBitmap::encode_iff(IFFByteStream &iff, int nchunks, const IWEncoderParms *parm
     THROW("(IWBitmap::encode_iff) Codec has been left open");
   int flag = 1;
   iff.put_chunk("FORM:BM44", 1);
-  static const char encode_string[]="encode iff chunk";
-  DJVU_PROGRESS_TASK(iff,encode_string, nchunks);
+  DJVU_PROGRESS_TASK(iff,"encode iff chunk",nchunks);
   for (int i=0; flag && i<nchunks; i++)
     {
-      DJVU_PROGRESS_RUN(iff,encode_string,i+1);
+      DJVU_PROGRESS_RUN(iff,i+1);
       iff.put_chunk("BM44");
       flag = encode_chunk(iff,parms[i]);
       iff.close_chunk();
@@ -2214,7 +2211,6 @@ IWPixmap::IWPixmap(const GPixmap *pm, const GBitmap *mask, CRCBMode crcbmode)
 void
 IWPixmap::init(const GPixmap *pm, const GBitmap *mask, CRCBMode crcbmode)
 {
-  static const char init_string[]="initialize pixmap";
   /* Free */
   close_codec();
   delete ymap;
@@ -2247,8 +2243,8 @@ IWPixmap::init(const GPixmap *pm, const GBitmap *mask, CRCBMode crcbmode)
           mskrowsize = mask->rowsize();
         }
       // Fill buffer with luminance information
-      DJVU_PROGRESS_TASK(create,init_string,3);
-      DJVU_PROGRESS_RUN(create,init_string,(crcb_delay>=0 ? 1 : 3));
+      DJVU_PROGRESS_TASK(create,"initialize pixmap",3);
+      DJVU_PROGRESS_RUN(create,(crcb_delay>=0 ? 1 : 3));
       IWTransform::RGB_to_Y((*pm)[0], w, h, pm->rowsize(), buffer, w);
       if (crcb_delay < 0)
         {
@@ -2265,11 +2261,11 @@ IWPixmap::init(const GPixmap *pm, const GBitmap *mask, CRCBMode crcbmode)
           cbmap = new _IWMap(w,h);
           crmap = new _IWMap(w,h);
           // Process CB information
-          DJVU_PROGRESS_RUN(create,init_string,2);
+          DJVU_PROGRESS_RUN(create,2);
           IWTransform::RGB_to_Cb((*pm)[0], w, h, pm->rowsize(), buffer, w);
           cbmap->create(buffer, w, msk8, mskrowsize);
           // Process CR information
-          DJVU_PROGRESS_RUN(create,init_string,3);
+          DJVU_PROGRESS_RUN(create,3);
           IWTransform::RGB_to_Cr((*pm)[0], w, h, pm->rowsize(), buffer, w); 
           crmap->create(buffer, w, msk8, mskrowsize);
           // Perform chrominance reduction (CRCBhalf)
@@ -2525,7 +2521,6 @@ IWPixmap::decode_chunk(ByteStream &bs)
 int  
 IWPixmap::encode_chunk(ByteStream &bs, const IWEncoderParms &parm)
 {
-  static const char encode_string[]="encode pixmap chunk";
   // Check
   if (parm.slices==0 && parm.bytes==0 && parm.decibels==0)
     THROW("(IWPixmap::encode_chunk) Must specify a stopping criterion");
@@ -2552,7 +2547,7 @@ IWPixmap::encode_chunk(ByteStream &bs, const IWEncoderParms &parm)
   int flag = 1;
   int nslices = 0;
   MemoryByteStream mbs;
-  DJVU_PROGRESS_TASK(chunk, encode_string, parm.slices-cslice);
+  DJVU_PROGRESS_TASK(chunk, "encode pixmap chunk", parm.slices-cslice);
   {
     float estdb = -1.0;
     _ZPCodecBias zp(mbs, true);
@@ -2564,7 +2559,7 @@ IWPixmap::encode_chunk(ByteStream &bs, const IWEncoderParms &parm)
           break;
         if (parm.slices>0 && nslices+cslice>=parm.slices)
           break;
-        DJVU_PROGRESS_RUN(chunk,encode_string,  (1+nslices-cslice)|0xf);
+        DJVU_PROGRESS_RUN(chunk,(1+nslices-cslice)|0xf);
         flag = ycodec->code_slice(zp);
         if (flag && parm.decibels>0)
           if (ycodec->curband==0 || estdb>=parm.decibels-DECIBEL_PRUNE)
@@ -2648,15 +2643,14 @@ IWPixmap::get_serial()
 void 
 IWPixmap::encode_iff(IFFByteStream &iff, int nchunks, const IWEncoderParms *parms)
 {
-  static const char encode_string[]="encode pixmap chunk";
   if (ycodec)
     THROW("(IWPixmap::encode_iff) Codec has been left open");
   int flag = 1;
   iff.put_chunk("FORM:PM44", 1);
-  DJVU_PROGRESS_TASK(iff,encode_string, nchunks);
+  DJVU_PROGRESS_TASK(iff,"encode pixmap chunk", nchunks);
   for (int i=0; flag && i<nchunks; i++)
     {
-      DJVU_PROGRESS_RUN(iff,encode_string,i+1);
+      DJVU_PROGRESS_RUN(iff,i+1);
       iff.put_chunk("PM44");
       flag = encode_chunk(iff, parms[i]);
       iff.close_chunk();

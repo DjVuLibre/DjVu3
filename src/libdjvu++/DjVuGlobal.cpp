@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuGlobal.cpp,v 1.17 2000-01-04 04:48:37 bcr Exp $
+//C- $Id: DjVuGlobal.cpp,v 1.18 2000-01-04 05:31:31 bcr Exp $
 
 /** This file impliments the DjVuProgressTask elements.  The memory
     functions are implimented in a separate file, because only the memory
@@ -38,14 +38,14 @@ DjVuProgressTask *DjVuProgressTask::head = 0;
 
 djvu_progress_callback *&DjVuProgressTask::callback=_djvu_progress_ptr;
 
-const char *DjVuProgressTask::task=0;
+const char *DjVuProgressTask::gtask=0;
 
 unsigned long DjVuProgressTask::lastsigdate = 0;
 
 DjVuProgressTask::DjVuProgressTask(const char *xtask,int nsteps)
-  : parent(0), nsteps(nsteps), runtostep(0)
+  : task(xtask),parent(0), nsteps(nsteps), runtostep(0)
 {
-  task=xtask;
+  gtask=task;
   if (callback)
     {
       unsigned long curdate = GOS::ticks();
@@ -67,15 +67,15 @@ DjVuProgressTask::~DjVuProgressTask()
       if (!parent)
         {
           unsigned long curdate = GOS::ticks();
-          (*callback)(task?task:"",curdate-startdate, curdate-startdate);
+          (*callback)(gtask?gtask:"",curdate-startdate, curdate-startdate);
         }
     }
 }
 
 void
-DjVuProgressTask::run(const char *xtask,int tostep)
+DjVuProgressTask::run(int tostep)
 {
-  task=xtask;
+  gtask=task;
   if (callback && tostep>runtostep)
     {
       unsigned long curdate = GOS::ticks();
@@ -101,7 +101,7 @@ DjVuProgressTask::signal(unsigned long curdate, unsigned long estdate)
         }
       else if (callback && curdate<enddate)
         {
-          (*callback)(task?task:"",curdate-startdate, enddate-startdate);
+          (*callback)(gtask?gtask:"",curdate-startdate, enddate-startdate);
           lastsigdate = curdate;
         }
     }

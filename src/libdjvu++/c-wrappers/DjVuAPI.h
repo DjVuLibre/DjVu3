@@ -1,4 +1,4 @@
-/* File "$Id: DjVuAPI.h,v 1.13 2000-01-04 04:48:37 bcr Exp $"
+/* File "$Id: DjVuAPI.h,v 1.14 2000-01-04 05:31:30 bcr Exp $"
  *
  * The main header file for the DjVu API
  */
@@ -8,7 +8,10 @@
 
 /* 
  * $Log: DjVuAPI.h,v $
- * Revision 1.13  2000-01-04 04:48:37  bcr
+ * Revision 1.14  2000-01-04 05:31:30  bcr
+ * Refinement of previous patch, so we don't have unused variables.
+ *
+ * Revision 1.13  2000/01/04 04:48:37  bcr
  * Moved memory and progress callbacks exclusively into libdjvu++.
  * Added a text message for the progress callback, to indicate what
  * is currently being done.
@@ -757,7 +760,7 @@ typedef enum {
 typedef void
 djvu_error_callback ( const char cause[], const char file[], const int line);
 typedef void
-djvu_progress_callback ( const char[],const int,void *);
+djvu_progress_callback (const char [],unsigned long,unsigned long);
 typedef void 
 djvu_free_callback(void *);
 typedef void *
