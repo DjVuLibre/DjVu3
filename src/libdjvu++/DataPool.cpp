@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.cpp,v 1.31 1999-09-28 16:49:14 eaf Exp $
+//C- $Id: DataPool.cpp,v 1.32 1999-09-28 19:57:17 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -859,7 +859,8 @@ DataPool::load_file(void)
       data=new MemoryByteStream();
       block_list.clear();
       fname="";
-      
+
+      stream->seek(0, SEEK_SET);
       char buffer[1024];
       int length;
       while((length=stream->read(buffer, 1024)))
