@@ -49,7 +49,8 @@ EOF
       s='escape "$'"${i}"'"'
       ;;
     esac 
-    echo "-e 's!@%${i}%@!`eval $s`!g' \\"
+    s=`eval "$s"`
+    echo "-e 's!@%${i}%@!"${s}"!g' \\"
   done
 # We include the following unescape rule twice because we allow recursive
 # escapes in the variable substitutions.

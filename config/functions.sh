@@ -116,13 +116,18 @@ sortlist()
   done)|${sort} -u
 }
 
+nonl()
+{
+  echo $*
+}
+
 # Escape characters.
 escape()
 {
-  (for i
+  nonl `(for i
   do
     echo "$i"
-  done)|${sed} -e 's,@%%@,@%%@p,g' -e 's,!,@%%@e,g' -e 's, ,@%%@s,g' -e 's,	,@%%@t,g' -e 's,\$,@%%@d,g' -e 's,",@%%@q,g' -e 's,'"'"',@%%@a,g'
+  done)|${sed} -e 's,@%%@,@%%@p,g' -e 's,!,@%%@e,g' -e 's, ,@%%@s,g' -e 's,	,@%%@t,g' -e 's,\\$,@%%@d,g' -e 's,",@%%@q,g' -e 's,'"'"',@%%@a,g'`
 }
 
 unescape()
