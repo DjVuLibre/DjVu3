@@ -99,9 +99,11 @@ echo '#!/bin/sh' > "$TOPBUILDDIR/reconfigure"
 echo "$0 $*" >> "$TOPBUILDDIR/reconfigure"
 chmod 755 "$TOPBUILDDIR/reconfigure"
 
-# --- display cool message
+# --- save configuration variables
 
 . "${CONFIG_DIR}/write_cache.sh"
+
+# --- display cool message
 
 echo
 echo Configuration is complete.
