@@ -25,7 +25,7 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVmDir.cpp,v 1.27 2000-11-02 01:08:34 bcr Exp $
+// $Id: DjVmDir.cpp,v 1.28 2000-11-02 07:15:24 bcr Exp $
 // $Name:  $
 
 
@@ -366,7 +366,7 @@ DjVmDir::page_to_file(int page_num) const
 {
    GCriticalSectionLock lock((GCriticalSection *) &class_lock);
 
-   return (page_num<page2file.size())?page2file[page_num]:0;
+   return (page_num<page2file.size())?page2file[page_num]:(GP<DjVmDir::File>(0));
 }
 
 GP<DjVmDir::File>
@@ -375,7 +375,7 @@ DjVmDir::name_to_file(const GString & name) const
    GCriticalSectionLock lock((GCriticalSection *) &class_lock);
 
    GPosition pos;
-   return (name2file.contains(name, pos))?name2file[pos]:0;
+   return (name2file.contains(name, pos))?name2file[pos]:(GP<DjVmDir::File>(0));
 }
 
 GP<DjVmDir::File>
@@ -384,7 +384,7 @@ DjVmDir::id_to_file(const char * id) const
    GCriticalSectionLock lock((GCriticalSection *) &class_lock);
 
    GPosition pos;
-   return (id2file.contains(id, pos))?id2file[pos]:0;
+   return (id2file.contains(id, pos))?id2file[pos]:(GP<DjVmDir::File>(0));
 }
 
 GP<DjVmDir::File>
@@ -393,7 +393,7 @@ DjVmDir::title_to_file(const char * title) const
    GCriticalSectionLock lock((GCriticalSection *) &class_lock);
 
    GPosition pos;
-   return (title2file.contains(title, pos))?title2file[pos]:0;
+   return (title2file.contains(title, pos))?title2file[pos]:(GP<DjVmDir::File>(0));
 }
 
 GPList<DjVmDir::File>
