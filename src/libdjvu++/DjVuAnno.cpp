@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuAnno.cpp,v 1.27 1999-10-21 16:53:45 eaf Exp $
+//C- $Id: DjVuAnno.cpp,v 1.28 1999-10-26 18:57:31 praveen Exp $
 
 
 #ifdef __GNUC__
@@ -1158,6 +1158,58 @@ DjVuTXT::copy(void) const
 {
   return new DjVuTXT(*this);
 }
+
+
+GList<DjVuTXT::Zone> DjVuTXT::search_string(const char* string, int &from, DjVuTXT::SearchDirection dir)
+{
+	int k,i;
+	GList<Zone> zone_list;
+	int string_length = strlen(string);
+	
+	if( (string_length == 0) || (textUTF8.length() == 0) || (string_length>textUTF8.length()))
+		return zone_list;
+
+	if( dir != DjVuTXT::UP )
+	{
+		for(i=from; i<textUTF8.length(); i++)
+		{
+			k=0;
+			for(int j=i; j<textUTF8.length() && k<string_length; j++,k++)
+			{
+				if( textUTF8[j] != string[k] )
+					break;
+			}
+
+			if( k == string_length )
+				break;
+		}
+	}
+	else
+	{
+		for(i=from; i>0; i--)
+		{
+			k=0;
+			for(int j=i; j<textUTF8.length() && k<string_length; j++,k++)
+			{
+				if( textUTF8[j] != string[k] )
+					break;
+			}
+
+			if( k == string_length )
+				break;
+		}
+	}
+
+	if( k == string_length )   /// string found in text?
+	{
+		from = i; /// update search location for next search
+
+	}
+	return zone_list;
+}
+
+
+
 
 unsigned int 
 DjVuTXT::get_memory_usage() const

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuAnno.h,v 1.11 1999-10-07 19:32:15 eaf Exp $
+//C- $Id: DjVuAnno.h,v 1.12 1999-10-26 18:57:31 praveen Exp $
 
 #ifndef _DJVUANNO_H
 #define _DJVUANNO_H
@@ -36,7 +36,7 @@
     @memo Implements support for DjVuImage annotations
     @author Andrei Erofeev <eaf@research.att.com>
     @version
-    #$Id: DjVuAnno.h,v 1.11 1999-10-07 19:32:15 eaf Exp $# */
+    #$Id: DjVuAnno.h,v 1.12 1999-10-26 18:57:31 praveen Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -231,6 +231,10 @@ public:
   void decode(ByteStream &bs);
   /** Returns a copy of this object. */
   GP<DjVuTXT> copy(void) const;
+  /** Returns the zones of text which matches */
+  enum SearchDirection { UP=1, DOWN=2 };
+
+  GList<Zone> search_string(const char * string, int &from, SearchDirection dir);
   /** Returns the number of bytes needed by this data structure. It's
       used by caching routines to estimate the size of a \Ref{DjVuImage}. */
   unsigned int get_memory_usage() const;
