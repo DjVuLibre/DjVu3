@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GContainer.h,v 1.9.4.1 1999-03-30 21:28:24 eaf Exp $
+//C- $Id: GContainer.h,v 1.9.4.2 1999-04-01 19:22:20 eaf Exp $
 
 
 #ifndef _GCONTAINER_H_
@@ -54,7 +54,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@research.att.com> -- bug fixes.
     @version 
-    #$Id: GContainer.h,v 1.9.4.1 1999-03-30 21:28:24 eaf Exp $# */
+    #$Id: GContainer.h,v 1.9.4.2 1999-04-01 19:22:20 eaf Exp $# */
 //@{
 
 class GContainerBase;
@@ -532,6 +532,13 @@ static inline unsigned int
 hash(const unsigned long & x) 
 { 
   return (unsigned int)x;
+}
+
+/** Hashing function (void *). */
+static inline unsigned int 
+hash(void * const & x) 
+{ 
+  return (unsigned int) x; 
 }
 
 /** Hashing function (float). */
