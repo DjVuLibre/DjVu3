@@ -6,7 +6,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: parseoptions.h,v 1.19 2000-01-19 23:39:10 leonb Exp $
+//C- $Id: parseoptions.h,v 1.20 2000-01-25 04:30:34 bcr Exp $
 
 #endif /* __cplusplus */
 
@@ -67,8 +67,8 @@
    \Ref{DjVuParseOptions Examples}.
 
    @memo Class used for parsing options and configuration files.
-   @author: #$Author: leonb $#
-   @version #$Id: parseoptions.h,v 1.19 2000-01-19 23:39:10 leonb Exp $#
+   @author: #$Author: bcr $#
+   @version #$Id: parseoptions.h,v 1.20 2000-01-25 04:30:34 bcr Exp $#
  */
 
 //@{
@@ -277,8 +277,9 @@ public:
   DjVuParseOptions(DjVuParseOptions &);
 
   /** This is the only method of reading a new profile, and changing it to 
-      the current profile that will be used with the Get*() methods. */
-  void ChangeProfile(const char []);
+      the current profile that will be used with the Get*() methods. 
+      Returns true if the profile exists. */
+  bool ChangeProfile(const char []);
 
   /** If you wish to retrieve the same variable multiple times, or from    
       multiple profiles, we recommend retrieving the token value for that  

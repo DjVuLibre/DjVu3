@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: parseoptions.cpp,v 1.25 2000-01-11 21:09:38 eaf Exp $
+//C- $Id: parseoptions.cpp,v 1.26 2000-01-25 04:30:34 bcr Exp $
 #ifdef __GNUC__
 #pragma implementation
 #endif
@@ -74,10 +74,10 @@ djvu_parse_copy(const struct djvu_parse opts)
 }
 
   /* This is a wrapper for the DjVuParseOptions::ChangeProfile function. */
-void
+int
 djvu_parse_change_profile(struct djvu_parse opts,const char name[])
 {
-  ((DjVuParseOptions *)(opts.Private))->ChangeProfile(name);
+  return (((DjVuParseOptions *)(opts.Private))->ChangeProfile(name))?1:0;
 }
 
   /* This is a wrapper for the DjVuParseOptions destructor */
@@ -324,7 +324,7 @@ DjVuParseOptions::init
 
 // This changes the current profile
 //
-void
+bool
 DjVuParseOptions::ChangeProfile(const char prog[])
 {
   const char *progname=strrchr(prog,'/');
@@ -333,6 +333,8 @@ DjVuParseOptions::ChangeProfile(const char prog[])
   name=new char [strlen(progname)+1];
   strcpy(name,progname);
   currentProfile=ReadConfig(name);
+  const char *s=GetValue("profile:");
+  return (s&&s[0]);
 }
 
 // This should be the most frequently used function of this class.
@@ -701,8 +703,12 @@ DjVuParseOptions::ReadConfig
     (void)(Configuration->Grow(retval+1));
     if(f)
     {
+      Add(profile,"profile:","read");
       ReadFile(line,f,retval);
       fclose(f);
+    }else
+    {
+      Add(profile,"profile:","");
     }
   }else
   {
@@ -721,8 +727,12 @@ DjVuParseOptions::ReadConfig
       if(((ConfigFilename(xname,0)&&(f=fopen(filename,"r"))))
          ||((ConfigFilename(xname,1)&&(f=fopen(filename,"r")))))
       {
+        Add(profile,"profile:","read");
         ReadFile(line,f,retval);
         fclose(f);
+      }else
+      {
+        Add(profile,"profile:","");
       }
     }
   }
