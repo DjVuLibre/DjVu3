@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GContainer.h,v 1.19 1999-08-30 19:46:04 leonb Exp $
+//C- $Id: GContainer.h,v 1.20 1999-09-04 01:36:49 leonb Exp $
 
 
 #ifndef _GCONTAINER_H_
@@ -55,7 +55,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@research.att.com> -- bug fixes.
     @version 
-    #$Id: GContainer.h,v 1.19 1999-08-30 19:46:04 leonb Exp $# */
+    #$Id: GContainer.h,v 1.20 1999-09-04 01:36:49 leonb Exp $# */
 //@{
 
 
@@ -465,6 +465,9 @@ public:
       #touch# and #resize#. */
   GArray(int lo, int hi) 
     : GArrayTemplate<TYPE>(GCont::NormTraits<TYPE>::traits(), lo, hi ) { } ;
+  // Copy operator
+  GArray& operator=(const GArray &r)
+    { GArrayBase::operator=(r); return *this; } ;
 };
 
 
@@ -486,6 +489,9 @@ public:
     : GArrayTemplate<GP<TYPE> >(GCont::NormTraits<GPBase>::traits(), 0, hi ) { } ;
   GPArray(int lo, int hi) 
     : GArrayTemplate<GP<TYPE> >(GCont::NormTraits<GPBase>::traits(), lo, hi ) { } ;
+  // Copy operator
+  GPArray& operator=(const GPArray &r)
+    { GArrayBase::operator=(r); return *this; } ;
 };
 
 /** Dynamic array for simple types.  
@@ -506,6 +512,9 @@ public:
     : GArrayTemplate<TYPE>(GCont::TrivTraits<sizeof(TYPE)>::traits(), 0, hi ) { } ;
   GTArray(int lo, int hi) 
     : GArrayTemplate<TYPE>(GCont::TrivTraits<sizeof(TYPE)>::traits(), lo, hi ) { } ;
+  // Copy operator
+  GTArray& operator=(const GTArray &r)
+    { GArrayBase::operator=(r); return *this; } ;
 };
 
 
@@ -814,7 +823,10 @@ class GList : public GListTemplate<TYPE,TYPE>
 {
 public:
   /** Null Constructor. Constructs a list with zero elements. */
-  GList() : GListTemplate<TYPE,TYPE>() { } ;
+  GList() 
+    : GListTemplate<TYPE,TYPE>() { } ;
+  GList& operator=(const GList &r) 
+    { GListBase::operator=(r); return *this; } ;
 };
 
 
@@ -831,7 +843,10 @@ class GPList : public GListTemplate<GP<TYPE>,GPBase>
 {
 public:
   /** Null Constructor. Constructs a list with zero elements. */
-  GPList() : GListTemplate<GP<TYPE>,GPBase>() { } ;
+  GPList() 
+    : GListTemplate<GP<TYPE>,GPBase>() { } ;
+  GPList& operator=(const GPList &r) 
+    { GListBase::operator=(r); return *this; } ;
 };
 
 
@@ -1109,7 +1124,10 @@ template <class KTYPE, class VTYPE>
 class GMap : public GMapTemplate<KTYPE,VTYPE,VTYPE>
 {
 public:
-  GMap() : GMapTemplate<KTYPE,VTYPE,VTYPE>() { } ;
+  GMap() 
+    : GMapTemplate<KTYPE,VTYPE,VTYPE>() { } ;
+  GMap& operator=(const GMap &r) 
+    { GSetBase::operator=(r); return *this; } ;
 };
 
 /** Associative maps for smart-pointers.  
@@ -1128,7 +1146,10 @@ template <class KTYPE, class VTYPE>
 class GPMap : public GMapTemplate<KTYPE,GP<VTYPE>,GPBase>
 {
 public:
-  GPMap() : GMapTemplate<KTYPE,GP<VTYPE>,GPBase>() { } ;
+  GPMap() 
+    : GMapTemplate<KTYPE,GP<VTYPE>,GPBase>() { } ;
+  GPMap& operator=(const GPMap &r) 
+    { GSetBase::operator=(r); return *this; } ;
 };
 
 

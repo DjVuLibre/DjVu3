@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.36 1999-09-04 01:02:28 leonb Exp $
+//C- $Id: DjVuFile.cpp,v 1.37 1999-09-04 01:36:49 leonb Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -95,7 +95,6 @@ DjVuFile::init(ByteStream & str)
    if (!get_count())
      THROW("DjVuFile is not secured by a GP<DjVuFile>");
 
-   initialized = 1;
    file_size=0;
    decode_thread=0;
 
@@ -115,6 +114,9 @@ DjVuFile::init(ByteStream & str)
 
       // Ask to cache the newly created file
    get_portcaster()->cache_djvu_file(this, this);
+
+      // Ready
+   initialized = true;
 }
 
 void
@@ -127,7 +129,6 @@ DjVuFile::init(const GURL & xurl, GP<DjVuPort> port)
      THROW("DjVuFile is already initialized");
    if (!get_count())
      THROW("DjVuFile is not secured by a GP<DjVuFile>");
-   initialized = 1;
    url = xurl;
    file_size=0;
    decode_thread=0;
@@ -146,6 +147,9 @@ DjVuFile::init(const GURL & xurl, GP<DjVuPort> port)
 
       // Ask to cache newly created file
    get_portcaster()->cache_djvu_file(this, this);
+
+      // Ready
+   initialized = true;
 }
 
 DjVuFile::~DjVuFile(void)
@@ -296,7 +300,6 @@ void
 DjVuFile::wait_for_chunk(void)
       // Will return after a chunk has been decoded
 {
-   check();
    DEBUG_MSG("DjVuFile::wait_for_chunk() called\n");
    DEBUG_MAKE_INDENT(3);
    chunk_mon.enter();
@@ -407,7 +410,6 @@ DjVuFile::static_decode_func(void * cl_data)
 void
 DjVuFile::decode_func(void)
 {
-   check();
    DEBUG_MSG("DjVuFile::decode_func() called, url='" << url << "'\n");
    DEBUG_MAKE_INDENT(3);
    
@@ -832,6 +834,7 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
 void
 DjVuFile::decode(ByteStream & str)
 {
+   check();
    DEBUG_MSG("DjVuFile::decode(), url='" << url << "'\n");
    DEBUG_MAKE_INDENT(3);
    DjVuPortcaster * pcaster=get_portcaster();
@@ -982,7 +985,7 @@ DjVuFile::stop_decode(bool sync)
 void
 DjVuFile::process_incl_chunks(void)
 {
-   check();
+   if (!data_pool) return;
    GP<ByteStream> str=data_pool->get_stream();
    int chksize;
    GString chkid;
@@ -1001,7 +1004,6 @@ DjVuFile::process_incl_chunks(void)
 GP<DjVuNavDir>
 DjVuFile::find_ndir(GMap<GURL, void *> & map)
 {
-   check();
    DEBUG_MSG("DjVuFile::find_ndir(): looking for NDIR in '" << url << "'\n");
    DEBUG_MAKE_INDENT(3);
    
@@ -1031,7 +1033,6 @@ DjVuFile::find_ndir(void)
 GP<DjVuNavDir>
 DjVuFile::decode_ndir(GMap<GURL, void *> & map)
 {
-   check();
    DEBUG_MSG("DjVuFile::decode_ndir(): decoding for NDIR in '" << url << "'\n");
    DEBUG_MAKE_INDENT(3);
    

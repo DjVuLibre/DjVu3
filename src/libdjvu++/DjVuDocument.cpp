@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.27 1999-09-03 23:55:22 leonb Exp $
+//C- $Id: DjVuDocument.cpp,v 1.28 1999-09-04 01:36:49 leonb Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -35,7 +35,6 @@ DjVuDocument::init(const GURL & url, GP<DjVuPort> xport,
      THROW("DjVuDocument is already initialized");
    if (!get_count())
      THROW("DjVuDocument is not secured by a GP<DjVuDocument>");
-   initialized = true;
    DEBUG_MSG("DjVuDocument::init(): initializing class...\n");
    DEBUG_MAKE_INDENT(3);
    // Initialize
@@ -49,6 +48,8 @@ DjVuDocument::init(const GURL & url, GP<DjVuPort> xport,
    pcaster->add_route(this, xport);
    pcaster->add_route(this, this);
    detect_doc_type(url);
+   // Now we say it is ready
+   initialized = true;
 }
 
 DjVuDocument::~DjVuDocument(void)
@@ -67,7 +68,6 @@ DjVuDocument::check() const
 void
 DjVuDocument::detect_doc_type(const GURL & doc_url)
 {
-   check();
    DEBUG_MSG("DjVuDocument::detect_doc_type(): guessing what we're dealing with\n");
    DEBUG_MAKE_INDENT(3);
 
@@ -172,7 +172,6 @@ DjVuDocument::detect_doc_type(const GURL & doc_url)
 void
 DjVuDocument::decode_doc_structure(void)
 {
-   check();
    DEBUG_MSG("DjVuDocument::decode_doc_structure(): learning doc structure.\n");
    DEBUG_MAKE_INDENT(3);
 
@@ -185,7 +184,6 @@ DjVuDocument::decode_doc_structure(void)
 void
 DjVuDocument::decode_ndir(void)
 {
-   check();
    DEBUG_MSG("DjVuDocument::decode_ndir(): decoding the navigation directory...\n");
    DEBUG_MAKE_INDENT(3);
 
@@ -205,7 +203,8 @@ DjVuDocument::decode_ndir(void)
 int
 DjVuDocument::get_pages_num(void)
 {
-   check();
+  if (!initialized)
+    return 0;
    if (doc_type==BUNDLED || doc_type==INDIRECT)
       return djvm_dir->get_pages_num();
    else return ndir->get_pages_num();
@@ -435,7 +434,6 @@ DjVuDocument::cache_djvu_file(const DjVuPort * source, DjVuFile * file)
 GP<DataPool>
 DjVuDocument::request_data(const DjVuPort * source, const GURL & url)
 {
-   check();
    DEBUG_MSG("DjVuDocument::request_data(): seeing if we can do it\n");
    DEBUG_MAKE_INDENT(3);
 

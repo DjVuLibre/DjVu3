@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.cpp,v 1.8 1999-09-03 23:02:40 eaf Exp $
+//C- $Id: DataPool.cpp,v 1.9 1999-09-04 01:36:49 leonb Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -405,7 +405,7 @@ DataPool::wait_for_data(const GP<Reader> & reader)
    while(1)
    {
       if (stop_flag || reader->stop_flag) THROW("STOP");
-      if (eof_flag || block_list.has_data(reader->offset, 1)) return;
+      if (eof_flag || block_list.has_range(reader->offset, 1)) return;
 
       DEBUG_MSG("calling event.wait()...\n");
       reader->event.wait();
