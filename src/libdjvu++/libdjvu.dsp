@@ -49,7 +49,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LIB32=link.exe -lib
 # ADD BASE LIB32 /nologo
-# ADD LIB32 /nologo /out:"..\ReleaseOutput\libdjvu.lib" /nodefaultlib
+# ADD LIB32 /nologo /nodefaultlib
 
 !ELSEIF  "$(CFG)" == "libdjvu - Win32 Debug"
 
@@ -64,7 +64,7 @@ LIB32=link.exe -lib
 # PROP Intermediate_Dir "Debug"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /FD /GZ /c
-# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "..\3rd-party\libjpeg" /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "DJVU_STATIC_LIBRARY" /D "NEED_JPEG_DECODER" /D "GCONTAINER_NO_MEMBER_TEMPLATES" /D "NEED_DJVU_MEMORY" /D "NEED_DJVU_PROGRESS" /YX /FD /GZ /c
+# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "..\3rd-party\libjpeg" /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "DJVU_STATIC_LIBRARY" /D "NEED_JPEG_DECODER" /D "GCONTAINER_NO_MEMBER_TEMPLATES" /D "NEED_DJVU_MEMORY" /D "NEED_DJVU_PROGRESS" /FR /YX /FD /GZ /c
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
 # ADD RSC /l 0x409 /d "_DEBUG"
 BSC32=bscmake.exe
@@ -72,7 +72,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LIB32=link.exe -lib
 # ADD BASE LIB32 /nologo
-# ADD LIB32 /nologo /out:"..\DebugOutput\libdjvu.lib" /nodefaultlib
+# ADD LIB32 /nologo /out:"Debug/ibdjvu.lib" /nodefaultlib
 
 !ENDIF 
 
