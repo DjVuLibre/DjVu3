@@ -4,7 +4,7 @@
 //C-              Unauthorized use prohibited.
 //C-
 // 
-// $Id: qd_viewer.cpp,v 1.2 2001-06-04 15:18:23 mchen Exp $
+// $Id: qd_viewer.cpp,v 1.3 2001-06-12 15:34:31 mchen Exp $
 // $Name:  $
 
 
@@ -706,7 +706,7 @@ QDViewer::setDjVuDocument(GP<DjVuDocument> & doc, const GUTF8String &qkey_in)
       start_page_num=doc->url_to_page(dimg->get_djvu_file()->get_url());
       if (plugin_data.rel_url.length())
       {
-	 plugin_data.url=doc->get_init_url().base()+plugin_data.rel_url;
+	 plugin_data.url=GURL::UTF8(plugin_data.rel_url,doc->get_init_url().base());
 	 setOverrideFlags(plugin_data);
       }
    }
@@ -892,7 +892,7 @@ QDViewer::slotNotifyDocFlagsChanged(const GP<DjVuDocument> & source, long set_ma
 	    // because otherwise QDBase will treat it relative to the
 	    // PAGE location (inside the same document), while it should
 	    // be relative to the DOCUMENT
-	 plugin_data.url=djvu_doc->get_init_url().base()+plugin_data.rel_url;
+	 plugin_data.url=GURL::UTF8(plugin_data.rel_url,djvu_doc->get_init_url().base());
 	 setOverrideFlags(plugin_data);
       }
 
@@ -1020,7 +1020,7 @@ QDViewer::getURL(const GUTF8String &url_in, const GUTF8String &target)
       } catch(...) {}
 
       if (url.is_empty())
-	 url=dimg->get_djvu_file()->get_url().base()+url_in;
+	 url=GURL::UTF8(url_in,dimg->get_djvu_file()->get_url().base());
    }
 
    if (!url.is_empty())

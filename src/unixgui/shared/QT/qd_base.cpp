@@ -4,7 +4,7 @@
 //C-              Unauthorized use prohibited.
 //C-
 // 
-// $Id: qd_base.cpp,v 1.2 2001-06-05 21:56:29 mchen Exp $
+// $Id: qd_base.cpp,v 1.3 2001-06-12 15:34:31 mchen Exp $
 // $Name:  $
 
 
@@ -942,7 +942,7 @@ QDBase::exportToPNM(void)
 	       save_dir=dir;
 	       break;
 	    }
-	    file_url=file_url.base().base()+file_url.name();
+	    file_url=GURL::UTF8(file_url.name(),file_url.base().base());
 	 }
    if (!QFileInfo(save_dir).isDir()) save_dir=QDir::currentDirPath();
 

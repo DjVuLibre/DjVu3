@@ -4,7 +4,7 @@
 //C-              Unauthorized use prohibited.
 //C-
 // 
-// $Id: qd_doc_saver.cpp,v 1.1 2001-05-29 22:05:30 bcr Exp $
+// $Id: qd_doc_saver.cpp,v 1.2 2001-06-12 15:34:31 mchen Exp $
 // $Name:  $
 
 
@@ -218,7 +218,7 @@ QDSavedFilesDialog::QDSavedFilesDialog(const GP<DjVuDocument> & doc,
       GURL dir_url=GURL::Filename::UTF8(dir_name);
       for(int page=0;page<doc->get_pages_num();page++)
       {
-	 GURL url=dir_url+doc->page_to_url(page).name();
+	 GURL url=GURL::UTF8(doc->page_to_url(page).name(),dir_url);
          GUTF8String gfname=url.fname();
 	 new QLabel(QStringFromGString(gfname), rc, "rc_item");
       }

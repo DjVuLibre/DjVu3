@@ -4,7 +4,7 @@
 //C-              Unauthorized use prohibited.
 //C-
 // 
-// $Id: qd_viewer_shell.cpp,v 1.4 2001-06-05 21:56:29 mchen Exp $
+// $Id: qd_viewer_shell.cpp,v 1.5 2001-06-12 15:34:31 mchen Exp $
 // $Name:  $
 
 
@@ -67,7 +67,7 @@ QDViewerShell::openFile(const QString &qfname, const QString &qid)
       url=GURL::Filename::UTF8(GURL::expand_name(fname));
       if (id)
       {
-        url=url+id;
+	 url=GURL::UTF8(url.fname()+id,url.base());
       }
    }
    openURL(url);
@@ -95,7 +95,6 @@ QDViewerShell::openURL(const GURL & url)
    {
       clean_url=url;
       clean_url.clear_all_arguments();
-      //fname=GOS::url_to_filename(clean_url);
       fname=clean_url.UTF8Filename();
    }
 
