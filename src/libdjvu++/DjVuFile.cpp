@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.1.2.3 1999-04-29 18:46:12 eaf Exp $
+//C- $Id: DjVuFile.cpp,v 1.1.2.4 1999-04-30 21:23:13 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -98,49 +98,49 @@ DjVuFile::~DjVuFile(void)
 int
 DjVuFile::get_status(void) const
 {
-   GCriticalSectionLock lock((GCriticalSection *) &status_lock);
+   GMonitorLock lock((GMonitor *) &status_mon);
    return status;
 }
 
 bool
 DjVuFile::is_decoding(void) const
 {
-   GCriticalSectionLock lock((GCriticalSection *) &status_lock);
+   GMonitorLock lock((GMonitor *) &status_mon);
    return (status & DECODING)!=0;
 }
 
 bool
 DjVuFile::is_decode_ok(void) const
 {
-   GCriticalSectionLock lock((GCriticalSection *) &status_lock);
+   GMonitorLock lock((GMonitor *) &status_mon);
    return (status & DECODE_OK)!=0;
 }
 
 bool
 DjVuFile::is_decode_failed(void) const
 {
-   GCriticalSectionLock lock((GCriticalSection *) &status_lock);
+   GMonitorLock lock((GMonitor *) &status_mon);
    return (status & DECODE_FAILED)!=0;
 }
 
 bool
 DjVuFile::is_decode_stopped(void) const
 {
-   GCriticalSectionLock lock((GCriticalSection *) &status_lock);
+   GMonitorLock lock((GMonitor *) &status_mon);
    return (status & DECODE_STOPPED)!=0;
 }
 
 bool
 DjVuFile::is_data_present(void) const
 {
-   GCriticalSectionLock lock((GCriticalSection *) &status_lock);
+   GMonitorLock lock((GMonitor *) &status_mon);
    return (status & DATA_PRESENT)!=0;
 }
 
 bool
 DjVuFile::is_all_data_present(void) const
 {
-   GCriticalSectionLock lock((GCriticalSection *) &status_lock);
+   GMonitorLock lock((GMonitor *) &status_mon);
    return (status & ALL_DATA_PRESENT)!=0;
 }
 
@@ -221,7 +221,7 @@ DjVuFile::wait_for_finish(bool self)
 	 finish_mon.wait();
 	 DEBUG_MSG("got it\n");
 	 return 1;
-      };
+      }
    };
    DEBUG_MSG("nothing to wait for\n");
    return 0;
@@ -302,17 +302,19 @@ DjVuFile::decode_func(void)
 	    THROW("Internal error: an included file has not finished yet.");
       };
    } CATCH(exc) {
-      GCriticalSectionLock lock(&status_lock);
       delete decode_stream; decode_stream=0;
-      status&=~DECODING;
       if (strstr(exc.get_cause(), "STOP"))
       {
-	 status|=DECODE_STOPPED;
+	 status_mon.enter();
+	 status=status & ~DECODING | DECODE_STOPPED;
+	 status_mon.leave();
 	 pcaster->notify_status(this, GString(url)+" STOPPED");
 	 pcaster->notify_file_stopped(this);
       } else
       {
-	 status|=DECODE_FAILED;
+	 status_mon.enter();
+	 status=status & ~DECODING | DECODE_FAILED;
+	 status_mon.leave();
 	 pcaster->notify_status(this, GString(url)+" FAILED");
 	 pcaster->notify_error(this, exc.get_cause());
 	 pcaster->notify_file_failed(this);
@@ -322,13 +324,13 @@ DjVuFile::decode_func(void)
    delete decode_stream; decode_stream=0;
 
    TRY {
-      GCriticalSectionLock lock(&status_lock);
+      status_mon.enter();
       if (is_decoding())
       {
-	 status|=DECODE_OK;
-	 status&=~DECODING;
+	 status=status & ~DECODING | DECODE_OK;
+	 status_mon.leave();
 	 pcaster->notify_file_done(this);
-      };
+      } else status_mon.leave();
    } CATCH(exc) {} ENDCATCH;
 }
 
@@ -415,8 +417,9 @@ DjVuFile::decode(ByteStream & str)
 	 {
 	    if (!anno)
 	    {
-	       anno=new DjVuAnno();
-	       anno->decode(iff);
+	       GP<DjVuAnno> tmp_anno=new DjVuAnno();
+	       tmp_anno->decode(iff);
+	       anno=tmp_anno;
 	    } else anno->merge(iff);
 	    desc.format(" %0.1f Kb\t'%s'\tPage annotation.\n",
 			chksize/1024.0, (const char*)chkid);
@@ -534,8 +537,9 @@ DjVuFile::decode(ByteStream & str)
 	 {
 	    if (!anno)
 	    {
-	       anno=new DjVuAnno();
-	       anno->decode(iff);
+	       GP<DjVuAnno> tmp_anno=new DjVuAnno();
+	       tmp_anno->decode(iff);
+	       anno=tmp_anno;
 	    } else anno->merge(iff);
 	    desc.format(" %0.1f Kb\t'%s'\tPage annotation.\n",
 			chksize/1024.0, (const char*)chkid);
@@ -618,8 +622,8 @@ DjVuFile::start_decode(void)
 {
    DEBUG_MSG("DjVuFile::start_decode(), url='" << url << "'\n");
    DEBUG_MAKE_INDENT(3);
-   
-   GCriticalSectionLock st_lock(&status_lock);
+
+   status_mon.enter();
    TRY {
       if (!is_decoding())
       {
@@ -634,9 +638,11 @@ DjVuFile::start_decode(void)
    } CATCH(exc) {
       status&=~DECODING;
       status|=DECODE_FAILED;
+      status_mon.leave();
       get_portcaster()->notify_file_failed(this);
       RETHROW;
    } ENDCATCH;
+   status_mon.leave();
 }
 
 void
