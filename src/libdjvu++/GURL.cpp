@@ -1,5 +1,5 @@
 // -*- C++ -*-
-// "$Id: GURL.cpp,v 1.2.2.1 1999-04-12 19:02:58 eaf Exp $"
+// "$Id: GURL.cpp,v 1.2.2.2 1999-05-12 14:20:38 eaf Exp $"
 
 #ifdef __GNUC__
 #pragma implementation
@@ -59,6 +59,7 @@ GURL::init(void)
 	 
       if (!strncmp(url.downcase(), "http:", 5) ||
 	  !strncmp(url.downcase(), "https:", 6) ||
+	  !strncmp(url.downcase(), "news:", 5) ||
 	  !strncmp(url.downcase(), "mailbox:", 8))
       {
 	    // Non-file URL: assume that everything is OK with it except for
