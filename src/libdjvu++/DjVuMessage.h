@@ -9,7 +9,6 @@
 #if !defined(__DJVU_MESSAGE_H__)
 #define __DJVU_MESSAGE_H__
 
-#include <stdio.h>
 #include "GString.h"
 
 

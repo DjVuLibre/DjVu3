@@ -7,7 +7,7 @@
 # C- AT&T, you have an infringing copy of this software and cannot use it
 # C- without violating AT&T's intellectual property rights.
 # C-
-# C- $Id: Makefile.in,v 1.101 2000-09-29 23:24:15 bcr Exp $
+# C- $Id: Makefile.in,v 1.102 2000-10-10 20:54:42 bcr Exp $
 
 %%%include <paths>
 
@@ -46,7 +46,8 @@ LIBOBJS= DjVuGlobal.o DjVuGlobalMemory.o GOS.o GException.o GContainer.o \
 	 DataPool.o GURL.o DjVuFileCache.o DjVuPort.o GMapAreas.o \
 	 DjVuAnno.o DjVuInfo.o DjVuFile.o DjVuImage.o DjVuDocument.o\
 	 DjVmDir.o DjVmDoc.o DjVmDir0.o DjVuNavDir.o DjVuErrorList.o \
-	 parseoptions.o DjVuDocEditor.o DjVuToPS.o DjVuDumpHelper.o
+	 parseoptions.o DjVuDocEditor.o DjVuToPS.o DjVuDumpHelper.o \
+	 DjVuMessage.o
 
 # Make all
 

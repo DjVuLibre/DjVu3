@@ -6,7 +6,8 @@
 
 
 #include "DjVuMessage.h"
-
+#include <ctype.h>
+#include <stdio.h>
 
 //  There is only object of class DjVuMessage in a program, and here it is:
 DjVuMessage  DjVuMsg;
@@ -21,13 +22,15 @@ DjVuMessage::DjVuMessage( void )
 {
   FILE *MessageFile;
   MessageFile = fopen(DjVuMessageFileName, "r");
-  if( MessageFile == NULL )
+  if( ! MessageFile )
   {
-    fprintf( stderr, "*** Unable to find message file (%s)\n*** Expect cryptic error messages\n\n",
-                     DjVuMessageFileName );
+//    fprintf( stderr, "*** Unable to find message file (%s)\n*** Expect cryptic error messages\n\n",
+//                   DjVuMessageFileName );
   }
   else
+  {
     fclose( MessageFile );
+  }
 };
 
 // Destructor
@@ -42,7 +45,7 @@ DjVuMessage::~DjVuMessage( )
 //       and SHOULD NOT BE ASSUMED TO BE ASCII.
 GString DjVuMessage::LookUp( GString MessageList )
 {
-  GString result = "";                      // Result string; begins empty
+  GString result;                           // Result string; begins empty
   int start = 0;                            // Beginning of next message
   int end = MessageList.length();           // End of the message string
 
@@ -50,8 +53,10 @@ GString DjVuMessage::LookUp( GString MessageList )
   while( start < end )
   {
     if( MessageList[start] == '\n' )
+    {
       result += MessageList[start++];       // move the newline to the result
                                             // and advance to the next message
+    }
     else
     {
       //  Find the end of the next message and process it
