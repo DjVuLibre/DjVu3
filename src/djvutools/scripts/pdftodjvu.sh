@@ -32,7 +32,7 @@
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #C- 
 #
-# $Id: pdftodjvu.sh,v 1.6 2001-02-06 21:48:09 bcr Exp $
+# $Id: pdftodjvu.sh,v 1.7 2001-02-08 00:37:41 bcr Exp $
 # $Name:  $
 
 # DjVu Enterprise Commands
@@ -53,7 +53,7 @@ splitcommand=djvmcvt
 
 defaultprofile="--profile=clean"
 defaultdpi="300"
-outputdev="pnmraw"
+outputdev="ppmraw"
 
 # Parse arguments
 
