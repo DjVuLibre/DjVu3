@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: Arrays.h,v 1.5 1999-08-08 23:17:19 leonb Exp $
+//C- $Id: Arrays.h,v 1.6 1999-08-18 15:03:56 eaf Exp $
 
 
 #ifndef _ARRAYS_H_
@@ -72,7 +72,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@research.att.com> -- Copy-on-demand implementation.
     @version 
-    #$Id: Arrays.h,v 1.5 1999-08-08 23:17:19 leonb Exp $# */
+    #$Id: Arrays.h,v 1.6 1999-08-18 15:03:56 eaf Exp $# */
 //@{
 
 // Auxiliary classes: Will be used in place of GPBase and GPEnabled objects
@@ -807,14 +807,23 @@ DArray<TYPE>::DArray(int lo, int hi)
 		       init2, copy, insert, lo, hi));
 }
 
+/** Dynamic array for \Ref{GPBase}d classes.
 
-/** Dynamic array.
+    There are many situations when it's necessary to create arrays of
+    \Ref{GP} pointers. For example, #DArray<GP<Dialog> ># or #DArray<GP<Button> >#.
+    This would result in compilation of two instances of \Ref{DArray} because
+    from the viewpoint of the compiler there are two different classes used
+    as array elements: #GP<Dialog># and #GP<Button>#. In reality though,
+    all \Ref{GP} pointers have absolutely the same binary structure because
+    they are derived from \Ref{GPBase} class and do not add any variables
+    or virtual functions. That's why it's possible to instantiate \Ref{DArray}
+    only once for \Ref{GPBase} elements and then just cast types.
 
-    The only thing we have to say here is that #DPArray<TYPE># is the same
-    as #DArray<GP<TYPE>>#. Use #DPArray# if you have many arrays of \Ref{GP}
-    pointers in your program. This will reduce its size.
+    To implement this idea we have created this #DPArray<TYPE># class,
+    which can be used instead of #DArray<GP<TYPE> >#. It behaves absolutely
+    the same way as \Ref{DArray} but has one big advantage: overhead of
+    using #DPArray# with one more type is negligible.
   */
-
 template <class TYPE>
 class DPArray : public DArray<GPBase> {
 public:
@@ -894,8 +903,6 @@ DPArray<TYPE>::operator= (const DPArray &ga)
    DArray<GPBase>::operator=(ga);
    return *this;
 }
-
-
 
 // ------------ THE END
 
