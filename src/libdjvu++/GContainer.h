@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GContainer.h,v 1.24 1999-10-07 16:48:38 leonb Exp $
+//C- $Id: GContainer.h,v 1.25 1999-10-07 19:21:52 leonb Exp $
 
 
 #ifndef _GCONTAINER_H_
@@ -69,7 +69,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@research.att.com> -- bug fixes.
     @version 
-    #$Id: GContainer.h,v 1.24 1999-10-07 16:48:38 leonb Exp $# */
+    #$Id: GContainer.h,v 1.25 1999-10-07 19:21:52 leonb Exp $# */
 //@{
 
 
@@ -415,8 +415,8 @@ GArrayTemplate<TYPE>::sort(int lo, int hi)
   if (hi > hibound || lo<lobound)
     throw_illegal_subscript(); 
   TYPE *data = (TYPE*)(*this);
-  // Test for insertion sort (optimize!)
-  if (hi <= lo + 20)
+  // Test for insertion sort
+  if (hi <= lo + 50)
     {
       for (int i=lo+1; i<=hi; i++)
         {
