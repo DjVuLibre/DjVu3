@@ -7,9 +7,9 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: IFFByteStream.cpp,v 1.2 1999-01-25 19:15:13 leonb Exp $
+//C-  $Id: IFFByteStream.cpp,v 1.3 1999-01-25 20:45:45 leonb Exp $
 
-// File "$Id: IFFByteStream.cpp,v 1.2 1999-01-25 19:15:13 leonb Exp $"
+// File "$Id: IFFByteStream.cpp,v 1.3 1999-01-25 20:45:45 leonb Exp $"
 // -- Implementation of IFFByteStream
 // - Author: Leon Bottou, 06/1998
 
@@ -387,7 +387,7 @@ IFFByteStream::write(const void *buffer, size_t size)
 {
   if (! (ctx && dir > 0))
     THROW("IFFByteStream not ready for writing bytes");
-  if (seekto <= offset)
+  if (seekto > offset)
     THROW("Cannot write until previous chunk is complete");
   size_t bytes = bs->write(buffer, size);
   offset += bytes;
