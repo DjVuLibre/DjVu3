@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: debug.h,v 1.4 1999-05-25 19:42:30 eaf Exp $
+//C-  $Id: debug.h,v 1.5 1999-07-29 19:53:24 eaf Exp $
 
 
 #ifndef _TEMPLATE_H_
@@ -65,7 +65,7 @@
     @memo 
     Macros for printing debug messages.
     @version 
-    #$Id: debug.h,v 1.4 1999-05-25 19:42:30 eaf Exp $#
+    #$Id: debug.h,v 1.5 1999-07-29 19:53:24 eaf Exp $#
     @author
     Andrew Erofeev <eaf@research.att.com> -- initial implementation \\
     Leon Bottou <leonb@research.att.com> -- cleanups */
@@ -148,6 +148,7 @@ public:
 
 #define DEBUG_MSG_LVL(level,x)   { ( Debug::lock(level,0) << x ).unlock(); }
 #define DEBUG_MSGN_LVL(level,x)  { ( Debug::lock(level,1) << x ).unlock(); }
+#define DEBUG_MSGF_LVL(level,x)  { ( Debug::lock(level,1) << x ).unlock(); }
 
 #else /* DEBUGLVL <= 0 */
 
