@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuAnno.cpp,v 1.73 2001-04-06 22:17:21 praveen Exp $
+// $Id: DjVuAnno.cpp,v 1.74 2001-04-09 17:42:13 chrisp Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -671,7 +671,7 @@ DjVuANT::get_zoom(GLParser & parser)
       else if (zoom=="page") return ZOOM_PAGE;
       else if (zoom[0]!='d')
         G_THROW("DjVuAnno.bad_zoom");
-      else return atoi((const char *) zoom+1);
+      else return zoom.substr(1, zoom.length()).toInt(); //atoi((const char *) zoom+1);
       } else { DEBUG_MSG("can't find any.\n"); }
   } G_CATCH_ALL {} G_ENDCATCH;
   DEBUG_MSG("resetting zoom to 0 (UNSPEC)\n");

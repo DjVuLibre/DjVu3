@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: XMLAnno.cpp,v 1.12 2001-04-05 19:19:23 bcr Exp $
+// $Id: XMLAnno.cpp,v 1.13 2001-04-09 17:42:13 chrisp Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -110,7 +110,7 @@ lt_XMLAnno::ChangeAnno(const lt_XMLTags &map,const GURL &url,const GString &id,c
   GString xid;
   if(is_int)
   {
-    const int page=atoi((char const *)id);
+    const int page=id.toInt(); //atoi((char const *)id);
     if(page>0)
     {
       xid=page-1;
@@ -161,7 +161,7 @@ lt_XMLAnno::ChangeAnno(const lt_XMLTags &map,const GURL &url,const GString &id,c
     if(width.is_int())
     {
       const int w=info->width;
-      const int ww=atoi((const char *)width);
+      const int ww=width.toInt(); //atoi((const char *)width);
       if(ww)
       {
         ws=((double)w)/((double)ww); 
@@ -169,7 +169,7 @@ lt_XMLAnno::ChangeAnno(const lt_XMLTags &map,const GURL &url,const GString &id,c
     }
     if(height.is_int())
     {
-      const int hh=atoi((const char *)height);
+      const int hh=height.toInt();//atoi((const char *)height);
       if(hh)
       {
         hs=((double)h)/((double)hh); 
@@ -381,7 +381,7 @@ lt_XMLAnno::ChangeAnno(const lt_XMLTags &map,const GURL &url,const GString &id,c
           }
           if((pos=args.contains("border")))
           {
-            a->border_width=atoi(args[pos]);
+             a->border_width=args[pos].toInt(); //atoi(args[pos]);
           }
           map_areas.append(a);
         }

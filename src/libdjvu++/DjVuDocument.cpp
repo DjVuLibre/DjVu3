@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocument.cpp,v 1.154 2001-04-05 19:57:56 chrisp Exp $
+// $Id: DjVuDocument.cpp,v 1.155 2001-04-09 17:42:13 chrisp Exp $
 // $Name:  $
 
 
@@ -905,7 +905,8 @@ DjVuDocument::get_djvu_file(const char * id, bool dont_create)
    DEBUG_MAKE_INDENT(3);
 
    if (!id || !strlen(id)) return get_djvu_file(-1);
-   if (GString(id).is_int()) return get_djvu_file(atoi(id));
+//   if (GString(id).is_int()) return get_djvu_file(atoi(id));
+   if (GString(id).is_int()) return get_djvu_file(GString::toInt(id));
 
    GURL url;
    {

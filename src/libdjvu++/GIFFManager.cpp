@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GIFFManager.cpp,v 1.18 2001-04-03 21:45:52 bcr Exp $
+// $Id: GIFFManager.cpp,v 1.19 2001-04-09 17:42:13 chrisp Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -186,7 +186,8 @@ GIFFChunk::decode_name(const GString &name, int &number)
       G_THROW("GIFFManager.unmatched");
     if (name.length() > (unsigned int)(cbracket+1))
       G_THROW("GIFFManager.garbage");
-    number=atoi((const char *)name.substr(obracket+1,cbracket-obracket-1));
+//    number =atoi((const char *)name.substr(obracket+1,cbracket-obracket-1));
+    number= name.substr(obracket+1,cbracket-obracket-1).toInt(); 
     short_name=name.substr(0,obracket);
   }else
   {
@@ -358,7 +359,8 @@ GIFFManager::add_chunk(GString parent_name, const GP<GIFFChunk> & chunk,
         const int cbracket=name.search(']',obracket+1);
         if (cbracket < 0)
           G_THROW("GIFFManager.unmatched");
-        number=atoi((const char *)name.substr(obracket+1,cbracket-obracket-1));
+//        number=atoi((const char *)name.substr(obracket+1,cbracket-obracket-1));
+        number = name.substr(obracket+1,cbracket-obracket-1).toInt();
         short_name=name.substr(0,obracket);
       }else
       {
@@ -404,7 +406,8 @@ GIFFManager::add_chunk(GString name, const TArray<char> & data)
       G_THROW("GIFFManager.unmatched");
     if (name.length() > (unsigned int)(cbracket+1))
       G_THROW("GIFFManager.garbage");
-    pos=atoi((const char *)chunk_name.substr(obracket+1,cbracket-obracket-1));
+//    pos=atoi((const char *)chunk_name.substr(obracket+1,cbracket-obracket-1));
+    pos = chunk_name.substr(obracket+1,cbracket-obracket-1).toInt();
     chunk_name=chunk_name.substr(0,obracket);
   }
   DEBUG_MSG("Creating new chunk with name " << chunk_name << "\n");

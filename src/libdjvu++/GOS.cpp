@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GOS.cpp,v 1.51 2001-04-05 19:19:23 bcr Exp $
+// $Id: GOS.cpp,v 1.52 2001-04-09 17:42:13 chrisp Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -460,7 +460,8 @@ int main(int argc, char **argv)
     DjVuPrintMessage("%lu\n", GOS::ticks());
     return 0;
   } else if (op == "sleep" && argc==3) {
-    GOS::sleep(atoi(argv[2]));
+//    GOS::sleep(atoi(argv[2]));
+     GOS::sleep(GString::nativeToInt(argv[2]);
     return 0;
   } else if (op == "filename_to_url" && argc==3) {
     DjVuPrintMessage("%s\n", (const char*)GOS::filename_to_url(argv[2]));

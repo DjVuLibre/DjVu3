@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.h,v 1.33 2001-04-06 16:55:28 chrisp Exp $
+// $Id: GString.h,v 1.34 2001-04-09 17:42:13 chrisp Exp $
 // $Name:  $
 
 #ifndef _GSTRING_H_
@@ -57,7 +57,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.33 2001-04-06 16:55:28 chrisp Exp $# */
+    #$Id: GString.h,v 1.34 2001-04-09 17:42:13 chrisp Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -367,6 +367,18 @@ public:
        with the #len# characters starting from the beginning of the string.*/
    static bool ncmp(const GString &s1,const GString &s2, const int len=1)
       { return ((s1.substr(0,len) == s2.substr(0,len)) == 1); }
+   /** Returns an integer.  Implements a functional i18n atoi. Note that if you pass
+       a GString that is not in Native format the results may be disparaging. */
+   inline int nativeToInt()
+      { return atoi((const char*)(*this)); }
+   static int nativeToInt( const GString& src )
+      { return atoi((const char*)(src)); }
+   /** Returns an integer.  Implements i18n atoi.  Takes a UTF8 string and converts that
+       value into a native format string, which is then used to make the atoi call. */
+   inline int toInt() const
+      { return getUTF82Native().nativeToInt(); }
+   static int toInt( const GString& src )
+      { return src.getUTF82Native().nativeToInt(); }
    /* # END code block added by CHRISP */
 
   // -- HASHING

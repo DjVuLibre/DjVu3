@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuPalette.cpp,v 1.24 2001-04-04 22:12:11 bcr Exp $
+// $Id: DjVuPalette.cpp,v 1.25 2001-04-09 17:42:13 chrisp Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -545,13 +545,22 @@ DjVuPalette::decode(GP<ByteStream> gbs)
 #ifdef TEST
 int main(int argc, char **argv)
 {
+
+   DArray<GString> dargv(0,argc-1);
+   for( int i=0; i < argc; ++i)
+   {
+      GString g(argv[i]);
+      dargv[i]=g.getNative2UTF8();
+   }
+
   G_TRY
     {
+
       if (argc!=4)
         G_THROW("DjVuPalette.test_usage");
-      int maxcolors = atoi(argv[1]);
-      int minboxsize = atoi(argv[2]);
-      GP<ByteStream> ibs=ByteStream::create(argv[3],"rb");
+      int maxcolors = dargv[1].toInt(); //atoi(argv[1]);
+      int minboxsize = dargv[2].toInt(); //atoi(argv[2]);
+      GP<ByteStream> ibs=ByteStream::create(dargv[3],"rb");
       GPixmap pm(*ibs);
       DjVuPalette pal;
       int ncolors = pal.compute_palette_and_quantize(pm, maxcolors, minboxsize);
