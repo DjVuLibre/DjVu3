@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVmDir.cpp,v 1.12 1999-11-20 07:55:32 bcr Exp $
+//C- $Id: DjVmDir.cpp,v 1.13 1999-12-03 23:36:00 eaf Exp $
 
 
 #ifdef __GNUC__
@@ -463,4 +463,58 @@ DjVmDir::delete_file(const char * id)
 	 break;
       }
    }
+}
+
+void
+DjVmDir::set_file_name(const char * id, const char * name)
+{
+   DEBUG_MSG("DjVmDir::set_file_name(): id='" << id << "', name='" << name << "'\n");
+   DEBUG_MAKE_INDENT(3);
+   
+   GCriticalSectionLock lock((GCriticalSection *) &class_lock);
+
+   GPosition pos;
+   
+      // First see, if the name is unique
+   for(pos=files_list;pos;++pos)
+   {
+      GP<File> file=files_list[pos];
+      if (file->id!=id && file->name==name)
+	 THROW("Name '"+GString(name)+"' is already in use");
+   }
+
+      // Check if ID is valid
+   if (!id2file.contains(id, pos))
+      THROW("Nothing is known about file with ID '"+GString(id)+"'");
+   GP<File> file=id2file[pos];
+   name2file.del(file->name);
+   file->name=name;
+   name2file[name]=file;
+}
+
+void
+DjVmDir::set_file_title(const char * id, const char * title)
+{
+   DEBUG_MSG("DjVmDir::set_file_title(): id='" << id << "', title='" << title << "'\n");
+   DEBUG_MAKE_INDENT(3);
+   
+   GCriticalSectionLock lock((GCriticalSection *) &class_lock);
+
+   GPosition pos;
+   
+      // First see, if the title is unique
+   for(pos=files_list;pos;++pos)
+   {
+      GP<File> file=files_list[pos];
+      if (file->id!=id && file->title==title)
+	 THROW("Title '"+GString(title)+"' is already in use");
+   }
+
+      // Check if ID is valid
+   if (!id2file.contains(id, pos))
+      THROW("Nothing is known about file with ID '"+GString(id)+"'");
+   GP<File> file=id2file[pos];
+   title2file.del(file->title);
+   file->title=title;
+   title2file[title]=file;
 }
