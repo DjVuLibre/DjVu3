@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GContainer.cpp,v 1.12 1999-09-07 15:35:01 leonb Exp $
+//C- $Id: GContainer.cpp,v 1.13 1999-09-15 22:28:04 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -31,7 +31,7 @@ GArrayBase::GArrayBase(const GArrayBase &ref)
     lobound(ref.lobound), hibound(ref.hibound)
 {
   if (maxhi >= minlo)
-    data = operator new ( traits.size * (maxhi - minlo) );
+    data = operator new ( traits.size * (maxhi - minlo + 1) );
   if (hibound >= lobound)
     traits.copy(traits.lea(data, lobound-minlo), 
                 traits.lea(ref.data, lobound-minlo),
