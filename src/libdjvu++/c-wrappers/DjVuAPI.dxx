@@ -10,15 +10,15 @@
     this software and cannot use it without violating AT&T's intellectual
     property rights.
 
-    {\bf Acknowledgements} -- The DjVu(tm) API is the results of the
-    work of the whole DjVu(tm) team, which includes researchers,
+    {\bf Acknowledgements} -- The DjVu API is the results of the
+    work of the whole DjVu team, which includes researchers,
     developers, contractors, webmasters, marketing, testers, and 
     even a few lawyers.  The \URL[DjVu Credits]{../djvucredits.html} 
     lists the key contributors to these libraries and utilities.
     @version
     3.0
     @author
-    Bill C Riemers <bcr@att.com>
+    Bill C Riemers <bcr@att.com>,  L\'eon Bottou, Parag Deshmukh
 */
 //@{
 
@@ -27,7 +27,7 @@
 
 
 //----------------------------------------
-/** @name Introduction (Ignore For Now)
+/** @name Introduction
 
     {\bf DjVu Technology} --- Over 90 percent of the information in the world
     is still on paper. Many of those paper documents include color graphics
@@ -77,84 +77,113 @@
    Photo DjVu Images but use a simpler file format.  There are two variants of
    IW44 files for gray level images and color images.
 
-   {\bf DjVu Reference Library} --- The DjVu Reference Library implements the
-   components of the DjVu technology that are essential for the definition of
-   the file formats.  AT&T Labs \URL{http://www.att.com/attlabs}
-   releases the full source code of the DjVu Reference Library under the terms
-   of the \Ref{AT&T Source Code License}.
-   
-   To understand the meaning of this release, it is important to realize that
-   the separation of AT&T, NCR and Lucent Technologies has significantly
-   changed the business equation.  AT&T is not in the business of selling
-   software.  The DjVu technology is interesting for AT&T because it gives
-   the means to propose enhanced services to its customers.  This can only
-   happen if we ensure that the DjVu technology is widely disseminated.
+  {\bf DjVu Reference Library} --- The DjVu Reference Library implements the
+  components of the DjVu technology that are essential for the definition of
+  the file formats.  AT&T Labs \URL{http://www.att.com/attlabs}
+  releases the full source code of the DjVu Reference Library under the terms
+  of the \Ref{AT&T Source Code License}.
 
-   This source code release serves three purposes:
-   \begin{itemize}
-   \item It demonstrates our intention to create a lasting technology.
-      Regardless of AT&T involvement, developers around the world now have a
-      permanent access to critical parts of DjVu technology.
-   \item It allows developers around the world to work with the DjVu
-      technology, to create new advances using our basic building blocks, to
-      create bridges between DjVu and other document representation formats,
-      to create viewers for various platforms, etc.
-   \item It provides an authoritative implementation of the DjVu format
-      for standardization purposes.
-   \end{itemize}
+  {\bf DjVu Software Development Kit (SDK)} --- The DjVu SDK defines
+  a C interface designed to allow manipulations of multi-page DjVu
+  documents, import and export of some of the most common formats into
+  DjVu.
 
-   The DjVu Reference Library is the first component of DjVu released in
-   source code form.  The DjVu Reference Library completely defines the DjVu
-   and IW44 image formats.  It does not implement however the sophisticated
-   encoding strategies which allow for the highest compression ratios.  These
-   strategies however are very application dependent.  We have developed
-   encoders for scanned documents (see \URL{http://www.djvu.att.com/djvu}.  We
-   also know that completely different (and probably much easier) encoding
-   strategies are needed for electronically created documents.
+  Our experience has been there are two different categories of use for
+  DjVu code.  Multi-threaded code for interactive viewing of documents,
+  and single threaded code that needs to compress documents.
+  {\bf DjVu Reference Library} is very well suited for multi-threaded 
+  GUI code.  The DjVu SDK is designed for the later case.  Even with
+  programs like DjVu Shop which do both, it still greatly simplies
+  the source code to keep the compression and rendering tasks separate.
 
-   We intend to keep releasing new versions of this library and additional
-   software such as viewers and encoders.  Using the currently released code,
-   you can {\em easily} do the following:
-   \begin{itemize}
-   \item {\em Decoding} DjVu and IW44 images.
-   \item {\em Rendering} DjVu or IW44 image fragments at any resolution.
-   \item {\em Encode IW44 wavelet images}.
-   \end{itemize}
-   The following tasks can be achieved with an increasing effort level.  
-   The documentation somehow explains the basic ideas, but this is 
-   not currently implemented:
-   \begin{itemize}
-   \item {\em Creating DjVu Photo Images} which are basically embedded IW44
-         images according to the instructions in \Ref{djvumake}.
-   \item {\em Creating Lossless Bilevel DjVu Images} using lossless encoding.
-         Instructions are provided in \Ref{JB2Image.h} and \Ref{djvumake}.
-         Lossless encoding should be very efficient with electronically
-         produced documents (since the character shapes are perfectly
-         defined). A DVI to DJVU program comes to mind ...
-   \item {\em Creating Compound DjVu Images for Electronically Produced Images}.
-         Just combine the above task with the masking technique described in
-         \Ref{djvumake}.  A GIMP to DJVU filter comes to mind ...
-   \item {\em Creating DjVu Images from Scans}.  The most difficult part
-         involves the separation of the foreground and the background.  A
-         simple thresholding works on half the documents and fails miserably
-         on the second half.  Creating a robust solution is not easy at all.
-   \end{itemize}
-   
-   We do not plan to publish soon the source code pertaining to the DjVu
-   compression of scanned images.  We may provide the source code of older
-   versions.  We also provide executables for personal uses.  We license this
-   technology to business partners who commit to support the DjVu format.
-   Releasing this code today would negatively affect the business of our
-   partners and eventually reduce the dissemination of the DjVu technology.
+  For most uses of the DjVu SDK, simple shell scripts would
+  suffice.  The DjVu 0.9 release, which is still our benchmark
+  for quality, was primarily based on shell scripts.  Users had complete
+  control of the DjVu compressions and could easily customize the
+  code to work the way they needed it to.
+  With the DjVu 2.0 release all the shell scripts were replaced with
+  C programs and API calls.  This greatly improved the reliability and
+  speed of DjVu compression.  However, customization of code become
+  very difficult even for professional programmers.
 
-   We think that this is preferable to the Java alternative where the license
-   mandates that you cannot use the software unless your work fully complies
-   with the Java specifications.  We think that we should not prevent people
-   from using our code for completely different purposes.  In other words, we
-   prefer to release less software but make it really {\em free} (in the sense
-   of {\em free speech} not {\em free lunch} as you probably know.) 
+  The DjVu 3.0 release attempts to merge the best features of the
+  previous DjVu releases to allow advanced programers and users
+  to customize nearly everything, while still having a stable C interface
+  to work from.  This is accomplished by first by separating the API
+  into five primary interfaces:
+
+  \begin{description}
+  \item[DjVu Multi-Page API.]
+    As defined in \Ref{DjVuMultiAPI.h}, this provides a C interface for
+    manipulating multi-page documents.  The \Ref{djvubundle utility} and
+    the \Ref{djvujoin utility} are simple command line implimentations of
+  the {\bf DjVu Multi-Page API}.
+  \item[DjVu Decode API.]
+    As defined in \Ref{DjVuDecodeAPI.h}, this provides a C interface for
+    exporting DjVu documents to other graphic formats.
+    The \Ref{djvudecode utility} and other decoding programs are implimentation
+    of the {\bf DjVu Decode API}.  For GUI programs designed to display DjVu
+    documents, we recommend using the {\bf DjVu Reference Library}.  
+  \item[DjVu Bitonal API.]
+    As defined in \Ref{DjVuBitonalAPI.h}, this provides a C interface for
+    converting files to {\bf Bilevel DjVu Image} documents.
+    The \Ref{bitonaltodjvu utility} is a simple command line implimentation of
+    this API.
+  \item[DjVu Photo API.]
+    As defined in \Ref{DjVuPhotoAPI.h}, this provides a C interface for
+    converting files to {\bf Photo DjVu Image} documents.
+    The \Ref{phototodjvu utility} is a simple command line implimentation of
+    this API.
+  \item[DjVu Document API.]
+    As defined in \Ref{DjVuDocumentAPI.h}, this provides a C interface for
+    converting files to {\bf Compound DjVu Image} documents.
+    The \Ref{documenttodjvu utility} is a simple command line implimentation
+    of this API.
+  \end{description}
+
+  Using the five primary API's it is possible to impliment all the SDK utilities
+  except {\bf djvureindex}.  The functionality neccissary for {\bf djvureindex}
+  is not included to discourage usage of the old multi-page format.
+  However, programmers often need to do program things that can not
+  be easily or efficiently done with a script.  For example, maybe they wish
+  to read the image from a database server, instead of from a file on
+  the local disk.  Or perhaps they wish to decode an image directly to
+  an image buffer, instead of having to read the image off of disk in
+  a different format.  To serve for these special needs, we found it
+  neccissary to define two more API's that can be used to enhance the
+  five primary API's:
+
+  \begin{description}
+  \item[DjVuAPI]
+  As defined in \Ref{DjVuAPI.h} this API defines the neccissary functions
+  and structures needed to do memory and callback operations with the
+  \Ref{DjVuDecodeAPI.h}, \Ref{DjVuBitonalAPI.h}, \Ref{DjVuPhotoAPI.h},
+  and \Ref{DjVuDocumentAPI.h}.
+  \item[DjVu Global API]
+  As defined in \Ref{DjVu.h} the global API defines functions for 
+  memory overloads, progress monitoring, and command line/configuration
+  file parsing.
+  \end{description}
+
+  With all seven API's, we have addressed all the major problems facing
+  a DjVu application developer except one.  How do we allow the 
+  developer complete control over processes like image segmentation 
+  which requires approximately 40 separate variable settings to be
+  tuned properly with out requiring the DjVu application developer
+  understanding exactly what each variable does and what settings the
+  the end user of the application will need?  Even members of the DjVu
+  development team do not know the effects of all the configuration
+  options can have when used together, in a previously untried combination.
+
+  The answer to this perplexing problem was to introduce profiles.  Old
+  fortran programs can think of these as datacards, and young C programmers
+  can thing of them as Makefiles.  Regardless of how you prefere to think
+  of them, the idea is simple.  A \URL[profile]{../djvuprofile.html} defines
+  a commonly used set of options.  Instead of specifying all the options
+  in a command line argument, or argv[] vector, it is sufficient just to
+  specify the profile name that contains all the options.  
 */
-   
+  
 
 
 //----------------------------------------
@@ -780,77 +809,77 @@
  */             
 
 //@{
-/** @name The bitonaltodjvu Utility
+/** @name bitonaltodjvu utility
   @memo The \URL[bitonaltodjvu]{../bitonaltodjvu.html} utility uses
   the API defined in \Ref{DjVuBitonalAPI.h} to perform bitonal to 
   DjVu compressions.
 */
-/** @name The djvubundle Utility
+/** @name djvubundle utility
   @memo The \URL[djvubundle]{../djvubundle.html} utility uses
-  the API defined in \Ref{DjVuMultiAPI.h} to bundle DjVu(tm)
+  the API defined in \Ref{DjVuMultiAPI.h} to bundle DjVu
   files together.
 */
-/** @name The djvudecode Utility
+/** @name djvudecode utility
   @memo The \URL[djvudecode]{../djvudecode.html} utility
-  uses API defined in \Ref{DjVuDecodeAPI.h} to decode single
-  and multi-page DjVu(tm) files to image file(s).
+  uses the API defined in \Ref{DjVuDecodeAPI.h} to decode single
+  and multi-page DjVu files to image file(s).
 */
-/** @name The djvujoin Utility
+/** @name djvujoin utility
   @memo The \URL[djvujoin]{../djvujoin.html} utility uses
-  the API defined in \Ref{DjVuMultiAPI.h} to join DjVu(tm)
+  the API defined in \Ref{DjVuMultiAPI.h} to join DjVu
   files with an index file.
 */
-/** @name The djvureindex Utility
+/** @name djvureindex utility
   @memo The \URL[djvureindex]{../djvureindex.html} utility
   uses direct C++ calls to convert old style multi-page
   documents into new style multi-page documents.
 */
-/** @name The djvutobitonal Utility
+/** @name djvutobitonal utility
   @memo The \URL[djvutobitonal]{../djvutobitonal.html} utility
-  uses API defined in \Ref{DjVuDecodeAPI.h} to decode single
-  and multi-page DjVu(tm) files to bitonal formats.
+  uses the API defined in \Ref{DjVuDecodeAPI.h} to decode single
+  and multi-page DjVu files to bitonal formats.
 */
-/** @name The djvutobmp Utility
+/** @name djvutobmp utility
   @memo The \URL[djvutobmp]{../djvutobmp.html} utility
-  uses API defined in \Ref{DjVuDecodeAPI.h} to decode single
-  and multi-page DjVu(tm) files to bmp file(s).
+  uses the API defined in \Ref{DjVuDecodeAPI.h} to decode single
+  and multi-page DjVu files to bmp file(s).
 */
-/** @name The djvutojpeg Utility
+/** @name djvutojpeg utility
   @memo The \URL[djvutojpeg]{../djvutojpeg.html} utility
-  uses API defined in \Ref{DjVuDecodeAPI.h} to decode single
-  and multi-page DjVu(tm) files to jpeg file(s).
+  uses the API defined in \Ref{DjVuDecodeAPI.h} to decode single
+  and multi-page DjVu files to jpeg file(s).
 */
-/** @name The djvutopbm Utility
+/** @name djvutopbm utility
   @memo The \URL[djvutopbm]{../djvutopbm.html} utility
-  uses API defined in \Ref{DjVuDecodeAPI.h} to decode single
-  and multi-page DjVu(tm) files to pbm file(s).
+  uses the API defined in \Ref{DjVuDecodeAPI.h} to decode single
+  and multi-page DjVu files to pbm file(s).
 */
-/** @name The djvutopict Utility
+/** @name djvutopict utility
   @memo The \URL[djvutopict]{../djvutopict.html} utility
-  uses API defined in \Ref{DjVuDecodeAPI.h} to decode single
-  and multi-page DjVu(tm) files to pict file(s).
+  uses the API defined in \Ref{DjVuDecodeAPI.h} to decode single
+  and multi-page DjVu files to pict file(s).
 */
-/** @name The djvutopnm Utility
+/** @name djvutopnm utility
   @memo The \URL[djvutopnm]{../djvutopnm.html} utility
-  uses API defined in \Ref{DjVuDecodeAPI.h} to decode single
-  and multi-page DjVu(tm) files to pnm file(s).
+  uses the API defined in \Ref{DjVuDecodeAPI.h} to decode single
+  and multi-page DjVu files to pnm file(s).
 */
-/** @name The djvutops Utility
+/** @name djvutops utility
   @memo The \URL[djvutops]{../djvutops.html} utility
-  uses API defined in \Ref{DjVuDecodeAPI.h} to decode single
-  and multi-page DjVu(tm) files to ps file(s).
+  uses the API defined in \Ref{DjVuDecodeAPI.h} to decode single
+  and multi-page DjVu files to ps file(s).
 */
-/** @name The djvutotiff Utility
+/** @name djvutotiff utility
   @memo The \URL[djvutotiff]{../djvutotiff.html} utility
-  uses API defined in \Ref{DjVuDecodeAPI.h} to decode single
-  and multi-page DjVu(tm) files to tiff file(s).
+  uses the API defined in \Ref{DjVuDecodeAPI.h} to decode single
+  and multi-page DjVu files to tiff file(s).
 */
-/** @name The documenttodjvu Utility
+/** @name documenttodjvu utility
   @memo The \URL[documenttodjvu]{../documenttodjvu.html} utility uses
-  the API defined in \Ref{DjVuDocumentAPI.h} to perform document to 
+  the the API defined in \Ref{DjVuDocumentAPI.h} to perform document to 
   DjVu compressions.
 */
-/** @name The phototodjvu Utility
+/** @name phototodjvu utility
   @memo The \URL[phototodjvu]{../phototodjvu.html} utility uses
   the API defined in \Ref{DjVuPhotoAPI.h} to perform photo to 
   DjVu compressions.
