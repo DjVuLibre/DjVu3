@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessage.cpp,v 1.61 2001-06-13 18:26:19 bcr Exp $
+// $Id: DjVuMessage.cpp,v 1.62 2001-06-18 20:08:05 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -84,28 +84,25 @@ static const char localestring[]="locale";
 
 
 static const char opensourcedir[]="osi";
-#ifndef NO_DEBUG
-#if defined(UNIX)
-  // appended to the home directory.
-static const char DebugModuleDjVuDir[] ="../TOPDIR/SRCDIR/profiles";
-#elif defined(WIN32)
-  // appended to the home directory.
-static const char DebugModuleDjVuDir[] ="../../profiles";
-#endif
-#endif
+// append to the executable directory, its parent, 
+// and its parent's parent
+static const char ModuleDjVuDir[] ="profiles";
 
 #ifdef WIN32
-  // appended to the home directory.
-static const char ModuleDjVuDir[] ="Profiles";
 static const char RootDjVuDir[] ="C:/Program Files/LizardTech/Profiles";
 static const TCHAR registrypath[]= TEXT("Software\\LizardTech\\DjVu\\Profile Path");
 #else
 // appended to the home directory.
-  // appended to the home directory.
-static const char ModuleDjVuDir[] ="profiles";
 static const char LocalDjVuDir[] =".DjVu";
+// appended to the home directory.
 static const char RootDjVuDir[] ="/etc/DjVu/";
 #endif
+
+#if !defined(NO_DEBUG) && defined(UNIX)
+  // appended to the executable directory directory.
+static const char DebugModuleDjVuDir[] ="../TOPDIR/SRCDIR/profiles";
+#endif
+
 static const char DjVuEnv[]="DJVU_CONFIG_DIR";
 //  The name of the message file
 static const char DjVuMessageFileName[] = "message";
@@ -269,10 +266,12 @@ DjVuMessage::GetProfilePaths(void)
     GURL mpath(GetModulePath());
     if(!mpath.is_empty() && mpath.is_dir())
     {
-#ifndef NO_DEBUG
+#if !defined(NO_DEBUG) && defined(UNIX)
       appendPath(GURL::UTF8(DebugModuleDjVuDir,mpath),pathsmap,paths);
-#endif
+#endif // !defined(NO_DEBUG) && defined(UNIX)
       appendPath(mpath,pathsmap,paths);
+	  mpath=mpath.base();
+      appendPath(GURL::UTF8(ModuleDjVuDir,mpath),pathsmap,paths);
       appendPath(GURL::UTF8(ModuleDjVuDir,mpath.base()),pathsmap,paths);
     }
 #endif

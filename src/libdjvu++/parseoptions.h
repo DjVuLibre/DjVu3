@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: parseoptions.h,v 1.46 2001-05-03 22:06:30 bcr Exp $
+// $Id: parseoptions.h,v 1.47 2001-06-18 20:08:05 bcr Exp $
 // $Name:  $
 
 #ifndef __DJVUPARSEOPTIONS_H__
@@ -66,7 +66,7 @@
 
    @memo Class used for parsing options and configuration files.
    @author Bill Riemers
-   @version #$Id: parseoptions.h,v 1.46 2001-05-03 22:06:30 bcr Exp $#
+   @version #$Id: parseoptions.h,v 1.47 2001-06-18 20:08:05 bcr Exp $#
  */
 
 /*@{*/
@@ -281,8 +281,8 @@ public: // These are just class declarations.
   
 
 private:
-  char *filename; // This is the name of the function.
-  char *name; // This is the name of the function.
+  GUTF8String filename; // This is the name of the function.
+  GUTF8String name; // This is the name of the function.
   int defaultProfile;
   int currentProfile;
   GList<GUTF8String> Errors;
@@ -304,13 +304,13 @@ public:
   ~DjVuParseOptions();
 
   /// This is the normal constructor.  A profile name must be specified.   
-  DjVuParseOptions(const char []);
+  DjVuParseOptions(const GUTF8String &);
 
   /// This constructor is for using an alternate configuration file 
-  DjVuParseOptions(const char [],const char [],DjVuTokenList *VarTokens=0);
+  DjVuParseOptions(const GUTF8String &,const GUTF8String &,DjVuTokenList *VarTokens=0);
 
   /// This reinitallizes with the above constructor 
-  void init(const char [],const char []);
+  void init(const GUTF8String &,const GUTF8String &);
 
   /** This is a copy constructor.  Arguments, and ErrorLists are not       
       copied.   VarTokens, ProfileTokens, and Configuration are copied by  
@@ -325,11 +325,11 @@ public:
       currently tokenized, a new token is created and returned.  If you are 
       Use of this is recommended when the token value is to be stored       
       statically. */
-  inline int SetVarToken(const char xname[]) const;
+  inline int SetVarToken(const GUTF8String &) const;
 
   /** This is similar to GetVarToken(), but it looks up the token for       
       profile name instead. */
-  inline int GetProfileToken(const char xname[]) const;
+  inline int GetProfileToken(const GUTF8String &) const;
 
   /** This is similar to SetVarToken(), but it looks up the token for      
       profile name instead.   Care should be used when using this method.  
@@ -337,7 +337,7 @@ public:
       to have been read.  Consequently, if you use this function, and the  
       profile did not exist.  An empty profile will be created...          
       Perhaps this method should be private instead. */
-  inline int SetProfileToken(const char xname[]) const;
+  inline int SetProfileToken(const GUTF8String &) const;
 
   /** This is the reverse transform of the GetVarToken() routine.   
       Given the token, it returns the var name.  This is handy for  
@@ -366,7 +366,7 @@ public:
 
   /** This is just a short cut, when a token value is only needed for one 
       lookup.  A list of tokens may be specified as well. */
-  inline const char * const GetValue(const char xname[]) const;
+  inline const char * const GetValue(const GUTF8String &xname) const;
 
   /** Multiple names may be in an array of the specified listsize.  The    
       index of the name with a value of the highest precedence will be     
@@ -388,7 +388,7 @@ public:
 
   /** This is just a short cut, when a token value is only needed for one 
       lookup. */
-  inline int GetInteger(const char xname[],const int errval=0,
+  inline int GetInteger(const GUTF8String &xname,const int errval=0,
     const int falseval=0, const int trueval=1) const;
 
   /** This just checks for valid integer numbers only.  If the string
@@ -398,7 +398,7 @@ public:
 
   /** This is just a short cut, when a token value is only needed for one 
       lookup. */
-  inline int GetNumber(const char xname[],const int errval=0) const;
+  inline int GetNumber(const GUTF8String &xname,const int errval=0) const;
 
   /*@}*/
 
@@ -427,7 +427,7 @@ public:
   /** This is the only method of reading a new profile, and changing it to 
       the current profile that will be used with the Get*() methods. 
       Returns true if the profile exists. */
-  bool ChangeProfile(const char []);
+  bool ChangeProfile(const GUTF8String &profile);
 
   /// This is the primary function for reading command line arguments.  
   int ParseArguments(const DArray<GUTF8String>&argv,const djvu_option [],const int=0);
@@ -441,7 +441,7 @@ public:
   inline int get_optind(void) const;
 
   /// Get the name of the last configuration file corresponding to the profile 
-  const char * const ConfigFilename(const char [],int);
+  const char * const ConfigFilename(const GUTF8String &name);
  /*@}*/
 
 
@@ -451,17 +451,17 @@ private:
       multiple profiles, we recommend retrieving the token value for that  
       variable, to avoid repeated lookups of the string.                   
       Negative values are returned for an unregistered variable name. */
-  inline int GetVarToken(const char xname[]) const;
+  inline int GetVarToken(const GUTF8String &xname) const;
 
-  void Add(const int,const int,const int,const char []);
-  int ReadConfig(const char[],const char []);
-  inline int ReadConfig(const char name[]) 
+  void Add(const int,const int,const int,const GUTF8String &);
+  int ReadConfig(const GUTF8String &,const GUTF8String &);
+  inline int ReadConfig(const GUTF8String &) 
   { return ReadConfig(name,""); }
-  int ReadNextConfig(int &,const char prog[],FILE *f);
+  int ReadNextConfig(int &,const GUTF8String &prog,FILE *f);
   void ReadFile(int &,FILE *f,int profile);
-  void Init(const char[],const DArray<GUTF8String> &argv,const djvu_option []);
-  FILE *OpenConfig(const char prog[]);
-  void AmbiguousOptions(const int,const char[],const int,const char[]);
+  void Init(const GUTF8String &,const DArray<GUTF8String> &argv,const djvu_option []);
+  FILE *OpenConfig(const GUTF8String &prog);
+  void AmbiguousOptions(const int,const GUTF8String &,const int,const GUTF8String &);
 };
 
  /** Token list.
@@ -500,13 +500,13 @@ public:
   inline const char * const GetString(const int token) const;
 
   /// Lookup up a token given a string 
-  int GetToken(const char name[]) const;
+  int GetToken(const GUTF8String &name) const;
 
   /// Assign a token if not already assigned and return it given the string 
-  int SetToken(const char name[]);
+  int SetToken(const GUTF8String &name);
 
   /// Everybody needs friends 
-  friend void DjVuParseOptions::init(const char [],const char []);
+  friend void DjVuParseOptions::init(const GUTF8String &,const GUTF8String &);
 };
 
 //@}
@@ -515,22 +515,22 @@ public:
 //
 inline int
 DjVuParseOptions::GetVarToken
-(const char xname[]) const
+(const GUTF8String &xname) const
 {return VarTokens->GetToken(xname);}
 
 inline int
 DjVuParseOptions::SetVarToken
-(const char xname[]) const
+(const GUTF8String &xname) const
 {return VarTokens->SetToken(xname);}
 
 inline int
 DjVuParseOptions::GetProfileToken
-(const char xname[]) const
+(const GUTF8String &xname) const
 {return ProfileTokens->GetToken(xname);}
 
 inline int
 DjVuParseOptions::SetProfileToken
-(const char xname[]) const
+(const GUTF8String &xname) const
 {return ProfileTokens->SetToken(xname);}
 
 inline const char * const
@@ -550,7 +550,7 @@ DjVuParseOptions::GetBest
 
 inline const char * const
 DjVuParseOptions::GetValue
-(const char xname[]) const
+(const GUTF8String &xname) const
 { return GetValue(GetVarToken(xname)); }
 
 inline int
@@ -560,12 +560,12 @@ DjVuParseOptions::GetBest
 
 inline int
 DjVuParseOptions::GetInteger
-(const char xname[],const int errval,const int falseval,const int trueval) const
+(const GUTF8String &xname,const int errval,const int falseval,const int trueval) const
 { return GetInteger(GetVarToken(xname),errval,falseval,trueval); }
 
 inline int
 DjVuParseOptions::GetNumber
-(const char xname[],const int errval) const
+(const GUTF8String &xname,const int errval) const
 { return GetNumber(GetVarToken(xname),errval); }
 
 inline const char * const
@@ -607,7 +607,7 @@ public:
   ~Profiles();
 
   //  Essentially:  values[var] = value;
-  void Add(const int var,const char value[]);
+  void Add(const int var,const GUTF8String &value);
 
   //  Return values[token] if token is in range, NULL otherwise
   inline const char * const GetValue(const int token) const
@@ -627,7 +627,7 @@ public:
   ~ProfileList();
 
   //  profiles[profile][var]var = value;
-  void Add(const int profile,const int var,const char value[]);
+  void Add(const int profile,const int var,const GUTF8String &value);
 
   //  If necessary, increase the number of profiles to at least newsize.
   //  Returns 1 if a new profile is created, otherwise 0.

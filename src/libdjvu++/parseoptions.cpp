@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: parseoptions.cpp,v 1.86 2001-06-13 18:26:19 bcr Exp $
+// $Id: parseoptions.cpp,v 1.87 2001-06-18 20:08:05 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -45,10 +45,11 @@
 #include "DjVuOptions.h"
 #endif
 #include "DjVuMessage.h"
-#include <string.h>
+#include "GURL.h"
 #ifdef THREADMODEL
 #include "GThreads.h"
 #endif THREADMODEL
+#include <string.h>
 #if defined (UNIX) || defined (MAC)
 #include <unistd.h>
 #include <pwd.h>
@@ -89,7 +90,7 @@ struct djvu_parse
 djvu_parse_init(const char name[]) 
 {
   struct djvu_parse retval;    
-  retval.Private=new DjVuParseOptions(name);
+  retval.Private=new DjVuParseOptions(GNativeString(name));
   return retval; // Return by reference.
 }
 
@@ -97,7 +98,7 @@ struct djvu_parse
 djvu_parse_config(const char config[],const char name[]) 
 {
   struct djvu_parse retval;    
-  retval.Private=new DjVuParseOptions(config,name);
+  retval.Private=new DjVuParseOptions(GNativeString(config),GNativeString(name));
   return retval; // Return by reference.
 }
 
@@ -114,7 +115,7 @@ djvu_parse_copy(const struct djvu_parse opts)
 int
 djvu_parse_change_profile(struct djvu_parse opts,const char name[])
 {
-  return (((DjVuParseOptions *)(opts.Private))->ChangeProfile(name))?1:0;
+  return (((DjVuParseOptions *)(opts.Private))->ChangeProfile(GNativeString(name)))?1:0;
 }
 
   /* This is a wrapper for the DjVuParseOptions destructor */
@@ -128,21 +129,21 @@ djvu_parse_free(struct djvu_parse opts)
 const char *
 djvu_parse_value(struct djvu_parse opts,const char name[])
 {
-  return ((DjVuParseOptions *)(opts.Private))->GetValue(name);
+  return ((DjVuParseOptions *)(opts.Private))->GetValue(GNativeString(name));
 }
 
   /* This is a wrapper for the DjVuParseOptions::GetInteger function */
 int
 djvu_parse_integer(struct djvu_parse opts,const char name[],const int errval)
 {
-  return ((DjVuParseOptions *)(opts.Private))->GetInteger(name,errval);
+  return ((DjVuParseOptions *)(opts.Private))->GetInteger(GNativeString(name),errval);
 }
 
   /* This is a wrapper for the DjVuParseOptions::GetNumber function */
 int
 djvu_parse_number(struct djvu_parse opts,const char name[],const int errval)
 {
-  return ((DjVuParseOptions *)(opts.Private))->GetNumber(name,errval);
+  return ((DjVuParseOptions *)(opts.Private))->GetNumber(GNativeString(name),errval);
 }
 
   /* This is a wrapper for the DjVuParseOptions::ParseArguments function */
@@ -177,16 +178,16 @@ djvu_parse_error(struct djvu_parse opts)
 void
 djvu_parse_perror(struct djvu_parse opts,const char *mesg)
 {
-  ((DjVuParseOptions *)(opts.Private))->perror(mesg);
+  ((DjVuParseOptions *)(opts.Private))->perror(GNativeString(mesg));
   return;
   
 }
 
   /* This is a wrapper for the DjVUParseOptions::ConfigFilename funciton */
 const char *
-djvu_parse_configfile(struct djvu_parse opts,const char *name,int which)
+djvu_parse_configfile(struct djvu_parse opts,const char *name)
 {
-  return ((DjVuParseOptions *)(opts.Private))->ConfigFilename(name,which);
+  return ((DjVuParseOptions *)(opts.Private))->ConfigFilename(GNativeString(name));
 }
 
 
@@ -199,26 +200,17 @@ djvu_parse_configfile(struct djvu_parse opts,const char *name,int which)
 // times.
 //
 // Simple constructor
-DjVuParseOptions::DjVuParseOptions(const char prog[])
+DjVuParseOptions::DjVuParseOptions(const GUTF8String &prog)
 : optind(0)
 {
-  filename = 0;
   VarTokens=new DjVuTokenList;
   ProfileTokens=new DjVuTokenList;
   Configuration=new ProfileList;
   Arguments=new Profiles;
-  filename=0;
   profile_token=VarTokens->SetToken(profile_token_string);
   defaultProfile=ReadConfig(default_string);
-  const char *progname=strrchr(prog,'/');
-  progname=progname?(progname+1):prog;
-  int namelen=strlen(progname),i;
-  name=new char [namelen+1];
-  for(i=0;i<namelen;i++)
-  {
-    name[i]=tolower(progname[i]);
-  }
-  name[i]=0;
+  const GURL::Filename::UTF8 xurl(prog);
+  name=xurl.is_valid()?xurl.fname().downcase():prog.downcase();
 #ifdef  WIN32
 //  if(namelen > 4 && (!strcmp(name+namelen-4,".exe") || !strcmp(name+namelen-4,".EXE")))
 //    name[namelen-4]=0;
@@ -227,7 +219,7 @@ DjVuParseOptions::DjVuParseOptions(const char prog[])
 }
 
 DjVuParseOptions::DjVuParseOptions (
-  const char readfilename[],const char readasprofile[],DjVuTokenList *Vars)
+  const GUTF8String &readfilename,const GUTF8String &readasprofile,DjVuTokenList *Vars)
 : optind(0)
 {
   if(Vars)
@@ -240,9 +232,7 @@ DjVuParseOptions::DjVuParseOptions (
   ProfileTokens=new DjVuTokenList;
   Configuration=new ProfileList;
   Arguments=new Profiles;
-  name=new char [strlen(readasprofile)+1];
-  strcpy(name,readasprofile);
-  filename=0;
+  name=readasprofile;
   profile_token=VarTokens->SetToken(profile_token_string);
   defaultProfile=ReadConfig(default_string);
   currentProfile=ReadConfig(readfilename,readasprofile);
@@ -263,16 +253,14 @@ DjVuParseOptions::DjVuParseOptions(
   ProfileTokens->links++;
   Configuration->links++;
   Arguments=new Profiles;
-  name=new char [strlen(Original.name)+1];
-  strcpy(name,Original.name);
+  name=Original.name;
   profile_token=VarTokens->SetToken(profile_token_string);
-  if(Original.filename)
+  if(Original.filename.length())
   {
-    filename=new char [strlen(Original.filename)+1];
-    strcpy(filename,Original.filename);
+    filename=Original.filename;
   }else
   {
-    filename=0;
+    filename=GUTF8String();
   }
 }
 
@@ -284,8 +272,6 @@ DjVuParseOptions::~DjVuParseOptions()
   if(!ProfileTokens->links--) delete ProfileTokens;
   if(!Configuration->links--) delete Configuration;
   delete Arguments;
-  delete [] name;
-  delete [] filename;
 }
 
 // This reiniallizes the object, by creating a new object, copying the
@@ -295,7 +281,7 @@ DjVuParseOptions::~DjVuParseOptions()
 //
 void
 DjVuParseOptions::init(
-  const char readfilename[],const char readasprofile[])
+  const GUTF8String &readfilename,const GUTF8String &readasprofile)
 {
   DjVuParseOptions tmp(readfilename,readasprofile,VarTokens);
 
@@ -322,24 +308,23 @@ DjVuParseOptions::init(
     tmp.Configuration->profiles[k].size=0;
     tmp.Configuration->profiles[k].values=0;
   }
-  delete [] name;
-  delete [] filename;
   name=tmp.name;
   filename=tmp.filename;
-  tmp.name=0;
-  tmp.filename=0;
 }
 
 // This changes the current profile
 //
 bool
-DjVuParseOptions::ChangeProfile(const char prog[])
+DjVuParseOptions::ChangeProfile(const GUTF8String &prog)
 {
-  const char *progname=strrchr(prog,'/');
-  progname=progname?(progname+1):prog;
-  delete [] name;
-  name=new char [strlen(progname)+1];
-  strcpy(name,progname);
+  GURL::Filename::UTF8 url(prog);
+  if(url.is_valid())
+  {
+    name=url.fname();
+  }else
+  {
+    name=prog;
+  }
   currentProfile=ReadConfig(name);
   const char *s=GetValue(profile_token);
   return (s&&s[0]);
@@ -364,7 +349,7 @@ DjVuParseOptions::GetValue(
 
 void
 DjVuParseOptions::AmbiguousOptions(
-  const int token1, const char value1[], const int token2, const char value2[] )
+  const int token1, const GUTF8String &value1, const int token2, const GUTF8String &value2 )
 {
   if(token1 != token2)
   {
@@ -610,7 +595,8 @@ DjVuParseOptions::HasError() const
   return ((GPosition)Errors)?1:0;
 }
 
-const char *DjVuParseOptions::GetError()
+const char *
+DjVuParseOptions::GetError()
 {
   GPosition pos=Errors;
   if(pos)
@@ -649,14 +635,14 @@ void DjVuParseOptions::perror(const GUTF8String &mesg)
 //
 void
 DjVuParseOptions::Add(
-  const int line,const int profile,const int var,const char value[])
+  const int line,const int profile,const int var,const GUTF8String &value)
 {
   if(var<0)
   {
     static const char emesg1[]= ERR_MSG("parseoptions.illegal_profile");
     static const char emesg2[]= ERR_MSG("parseoptions.profile_error");
     const char *emesg;
-    if(value[0] && strchr(value,':'))
+    if(value.search(':')>= 0)
     {
       emesg=emesg1;
     }else
@@ -682,8 +668,8 @@ DjVuParseOptions::Add(
 // while it is still being read.
 //
 int
-DjVuParseOptions::ReadConfig(const char prog[],
-  const char readasprofile[])
+DjVuParseOptions::ReadConfig(const GUTF8String &prog,
+  const GUTF8String &readasprofile)
 {
 #ifdef THREADMODEL
 #if THREADMODEL!=NOTHREADS
@@ -693,12 +679,10 @@ DjVuParseOptions::ReadConfig(const char prog[],
 #endif
   int retval;
   int line=1;
-  if(readasprofile[0])
+  if(readasprofile.length())
   {
-    delete [] filename;
-    filename=new char [strlen(prog)+1];
-    strcpy(filename,prog);
-    FILE *f=fopen(filename,"r");
+    filename=prog;
+    FILE *f=fopen((const char *)GURL::Filename::UTF8(filename).NativeFilename(),"r");
     retval=ProfileTokens->SetToken(readasprofile);
     (void)(Configuration->Grow(retval+1));
     if(f)
@@ -712,13 +696,8 @@ DjVuParseOptions::ReadConfig(const char prog[],
     }
   }else
   {
-#ifndef WIN32
-    const char *xname=strrchr(prog,'/');
-#else
-    const char *xname=_tcsrchr(prog,'\\');//MBCS DBCS
-#endif
-    xname=xname?(xname+1):prog;
-
+	const GURL::Filename::UTF8 xurl(prog);
+    const GUTF8String xname(xurl.is_valid()?xurl.fname():prog);
     retval=ProfileTokens->GetToken(xname);
   // First check and see if we have already read in this profile.
     if(retval < 0)
@@ -726,8 +705,7 @@ DjVuParseOptions::ReadConfig(const char prog[],
       retval=ProfileTokens->SetToken(xname);
       (void)(Configuration->Grow(retval+1));
       FILE *f=0;
-      if(((ConfigFilename(xname,0)&&(f=fopen(filename,"r"))))
-         ||((ConfigFilename(xname,1)&&(f=fopen(filename,"r")))))
+      if(ConfigFilename(xname)&&(f=fopen((const char *)GURL::Filename::UTF8(filename).NativeFilename(),"r")))
       {
         Configuration->Add(retval,profile_token,profile_token_read_string);
         ReadFile(line,f,retval);
@@ -746,10 +724,10 @@ DjVuParseOptions::ReadConfig(const char prog[],
 // 
 int
 DjVuParseOptions::ReadNextConfig (
-  int &line, const char profilename[], FILE *f )
+  int &line, const GUTF8String &profilename, FILE *f )
 {
-  const char *xname=strrchr(profilename,'/');
-  xname=xname?(xname+1):profilename;
+  const GURL::Filename::UTF8 xurl(profilename);
+  const GUTF8String xname(xurl.is_valid()?xurl.fname():profilename);
   // First check and see if we have already read in this profile.
   int profile=ProfileTokens->GetToken(xname);
 //  const char * const s=(profile>0)?Configuration->GetValue(profile,profile_token):0;
@@ -1140,7 +1118,7 @@ DjVuParseOptions::ProfileList::Grow(const int newsize)
 }
 
 void
-DjVuParseOptions::Profiles::Add(const int var,const char value[])
+DjVuParseOptions::Profiles::Add(const int var,const GUTF8String &value)
 {
   if(var >= 0)
   {
@@ -1163,13 +1141,13 @@ DjVuParseOptions::Profiles::Add(const int var,const char value[])
     {
       delete [] values[var];
     }
-    strcpy(values[var]=new char [strlen(value)+1],value);
+    strcpy(values[var]=new char [value.length()+1],value);
   }
 }
 
 void
 DjVuParseOptions::ProfileList::Add(
-  const int profile,const int var,const char value[])
+  const int profile,const int var,const GUTF8String &value)
 {
   if((profile>=0) && (var>=0))
   {
@@ -1231,169 +1209,22 @@ is_dir(TCHAR *filename)
 }
 #endif
 const char * const
-DjVuParseOptions::ConfigFilename(const char config[],int level)
+DjVuParseOptions::ConfigFilename(const GUTF8String &config)
 {
-  delete [] filename;
-  filename=0;
-#ifndef WIN32
-  const char *retval=0;
-  const char *this_config=config[0]?config:default_string;
-  if(level<=0)
+  filename=GUTF8String();
+  GUTF8String this_config(config.length()?(config+ConfigExt):
+    (GUTF8String(default_string)+ConfigExt));
+  GList<GURL> urls(DjVuMessage::GetProfilePaths());
+  for(GPosition pos=urls;pos;++pos)
   {
-    static const char *home=0;
-    if(!home)
-    {
-      if(!((home=getenv("HOME"))&&(home[0]=='/')))
-      {
-        static const char nill[]="";
-        home=nill;
-        struct passwd *pw=getpwuid(getuid());
-        if(pw && pw->pw_dir)
-        {
-          if(pw->pw_dir[0] == '/')
-          {
-            char *s=new char [strlen(pw->pw_dir)+1];
-            strcpy(s,pw->pw_dir);
-            home=s;
-          }
-        }
-      }
-    }
-    if(home[0])
-    {
-      if(level<0)
-      {
-        retval=home;
-      }else 
-      {
-        retval=filename=new char [strlen(home)+sizeof(LocalDjVuDir)+strlen(this_config)+sizeof(ConfigExt)];
-        strcpy(filename,home);
-        strcat(filename,LocalDjVuDir);
-        strcat(filename,this_config);
-        strcat(filename,ConfigExt);
-      }
-    }
-  }else
-  {
-    static int rootlen=sizeof(RootDjVuDir)-1;
-    static const char *root=0;
-    if(!root)
-    {
-      root=getenv("DJVU_CONFIG_DIR");
-      if(!(root&&(root[0]=='/')))
-      {
-        root=RootDjVuDir;
-      }else
-      {
-        rootlen=strlen(root);
-      }
-    }
-    retval=filename=new char [rootlen+strlen(this_config)+sizeof(ConfigExt)];
-    strcpy(filename,root);
-    strcat(filename,this_config);
-    strcat(filename,ConfigExt);
+    GURL::UTF8 url(this_config,urls[pos]);
+    if(url.is_valid() && url.is_file())
+	{
+	  filename=url.UTF8Filename();
+      break;
+	}
   }
-  return retval;
-#else    // WIN32 
-  
-  TCHAR * root;
-  int rootlen;
-  
-  const char *retval=0;
-  const char *this_config=config[0]?config:default_string;
-  
-  static const TCHAR profiles[]=TEXT("\\Profiles");
-  TCHAR modulepath[1024];
-  GetModuleFileName(0, modulepath, sizeof(modulepath)-1);
-  LPCTSTR path=modulepath;
-  /*
-  int i=_tcslen(modulepath);
-  while(i>0)
-  {
-  const TCHAR c=modulepath[--i];
-  if(c == '/' || c == '\\')
-  {
-  modulepath[i]=0;
-  break;
-  }
-  }
-  */
-  LPTSTR backslash = _tcsrchr(modulepath, _T('\\'));//MBCS DBCS
-  LPTSTR forslash = _tcsrchr(modulepath, _T('/'));//MBCS DBCS
-  if (forslash == NULL) {//MBCS DBCS
-    if (backslash != NULL)
-      *backslash=0;
-  }
-  else {
-    if (backslash == NULL || forslash > backslash)
-      *forslash=0;
-    else
-      *backslash=0;
-  }
-  
-  root = new TCHAR [_tcslen(path)+sizeof(profiles)];
-  if(!level)
-  {
-  /*
-    int i=_tcslen(modulepath);
-    while(i>0)
-    {
-      const TCHAR c=modulepath[--i];
-      if(c == '/' || c == '\\')
-      {
-        modulepath[i]=0;
-        break;
-      }
-    }
-    */
-    LPTSTR backslash = _tcsrchr(modulepath, _T('\\'));//MBCS DBCS
-    LPTSTR forslash = _tcsrchr(modulepath, _T('/'));//MBCS DBCS
-    if (forslash == NULL) {//MBCS DBCS
-      if (backslash != NULL)
-        *backslash=0;
-    }
-    else {
-      if (backslash == NULL || forslash > backslash)
-        *forslash=0;
-      else
-        *backslash=0;
-    }
-    
-  }
-  _tcscpy(root, path);
-  _tcscat(root,profiles);
-  if(!is_dir(root))
-  {
-    delete [] root;
-    if (! level) 
-      root = (TCHAR *)RegOpenReadConfig (HKEY_CURRENT_USER);
-    else
-      root = (TCHAR *) RegOpenReadConfig (HKEY_LOCAL_MACHINE);
-    if(!root)
-    {
-      path=TEXT("C:\\Program Files\\LizardTech");
-      root = new TCHAR [_tcslen(path)+sizeof(profiles)];
-      _tcscpy(root,path);
-      _tcscat(root,profiles);
-    }
-  }
-  if (root && root[0])
-  {
-    rootlen = _tcslen(root);
-    retval=filename=new char [rootlen+strlen(this_config)+sizeof(ConfigExt)+1];
-    USES_CONVERSION;
-    strcpy(filename,T2CA(root));
-    strcat(filename, "\\");
-    strcat(filename,this_config);
-    strcat(filename,ConfigExt);
-    delete [] root;
-    return retval;        
-  }else
-  {
-    Errors.append( ERR_MSG("parseoptions.bad_install") );
-    return 0;
-  }
-#endif
+  return filename.length()?((const char *)filename):0;
 }
 
 static int
@@ -1675,7 +1506,7 @@ DjVuTokenList::~DjVuTokenList()
 // it, inserts it into the list with a new token value...
 //
 int
-DjVuTokenList::GetToken( const char name[] ) const
+DjVuTokenList::GetToken( const GUTF8String &name ) const
 {
   int MaxGuess=NextToken;
   int MinGuess=0;
@@ -1700,7 +1531,7 @@ DjVuTokenList::GetToken( const char name[] ) const
 DjVuTokenList::Entries::~Entries() {}
 
 int
-DjVuTokenList::SetToken( const char name[] )
+DjVuTokenList::SetToken( const GUTF8String &name )
 {
   int retval;
   if((retval=GetToken(name))<0)
