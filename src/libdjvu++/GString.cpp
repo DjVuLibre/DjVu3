@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: GString.cpp,v 1.3 1999-02-01 18:32:33 leonb Exp $
+//C-  $Id: GString.cpp,v 1.4 1999-03-01 17:17:22 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -23,7 +23,7 @@
 
 #include "GString.h"
 
-// File "$Id: GString.cpp,v 1.3 1999-02-01 18:32:33 leonb Exp $"
+// File "$Id: GString.cpp,v 1.4 1999-03-01 17:17:22 leonb Exp $"
 // - Author: Leon Bottou, 04/1997
 
 static GStringRep nullstring;
@@ -60,17 +60,19 @@ GString::GString()
 }
 
 GString::GString(const char *str)
-  : GP<GStringRep> ( &nullstring )
 {
   if (str)
     {
       (*this) =  GStringRep::xnew(strlen(str));
       strcpy((*this)->data,str);
     }
+  else
+    {
+      (*this) = &nullstring;
+    }
 }
 
 GString::GString(const char *str, unsigned int len)
-  : GP<GStringRep> ( &nullstring )
 {
   if (str)
     {
@@ -79,6 +81,10 @@ GString::GString(const char *str, unsigned int len)
       (*this) = GStringRep::xnew(nlen);
       memcpy((*this)->data,str,nlen);
       (*this)->data[nlen] = 0;
+    }
+  else
+    {
+      (*this) = &nullstring;
     }
 }
 
