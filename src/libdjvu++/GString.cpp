@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.34 2001-01-04 22:04:55 bcr Exp $
+// $Id: GString.cpp,v 1.35 2001-03-13 01:34:50 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -247,7 +247,7 @@ GString::toEscaped( void ) const
     }
   }
   ret+=start;
-  DEBUG_MSG( "Escaped string is '" << ret << "'\n" );
+//  DEBUG_MSG( "Escaped string is '" << ret << "'\n" );
   return ret;
 }
 

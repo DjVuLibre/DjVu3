@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GContainer.h,v 1.43 2001-01-04 22:04:55 bcr Exp $
+// $Id: GContainer.h,v 1.44 2001-03-13 01:34:50 bcr Exp $
 // $Name:  $
 
 #ifndef _GCONTAINER_H_
@@ -92,7 +92,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@geocities.com> -- bug fixes.
     @version 
-    #$Id: GContainer.h,v 1.43 2001-01-04 22:04:55 bcr Exp $# */
+    #$Id: GContainer.h,v 1.44 2001-03-13 01:34:50 bcr Exp $# */
 //@{
 
 
@@ -989,6 +989,7 @@ protected:
   int nelems;
   int nbuckets;
   HNode **table;
+  GPBuffer<HNode *> gtable;
   HNode *first;
 private:
   void insertnode(HNode *n);

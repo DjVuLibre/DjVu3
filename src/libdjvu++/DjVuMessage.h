@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessage.h,v 1.10 2001-01-04 22:04:55 bcr Exp $
+// $Id: DjVuMessage.h,v 1.11 2001-03-13 01:34:50 bcr Exp $
 // $Name:  $
 
 
@@ -40,15 +40,16 @@
 #define __DJVU_MESSAGE_H__
 
 #include "GString.h"
-class DjVuParseOptions;
+// class DjVuParseOptions;
+class lt_XMLTags;
 
 class DjVuMessage
 {
 private:
   // Constructor:
   DjVuMessage( void );
-
-  DjVuParseOptions *opts;
+  GMap<GString,GP<lt_XMLTags> > Map;
+//  DjVuParseOptions *opts;
 
 public:
 

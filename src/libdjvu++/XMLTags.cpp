@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: XMLTags.cpp,v 1.4 2001-03-06 19:55:42 bcr Exp $
+// $Id: XMLTags.cpp,v 1.5 2001-03-13 01:34:50 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -39,7 +39,7 @@
 
 #include "XMLTags.h"
 #include "UnicodeByteStream.h"
-#include <stdio.h>
+//#include <stdio.h>
 #include <ctype.h>
 
 lt_XMLContents::lt_XMLContents(void) {}
@@ -332,7 +332,7 @@ lt_XMLTags::getMaps(char const tagname[],char const argn[],GPList<lt_XMLTags> li
 {
   for(GPosition pos=list;pos;++pos)
   {
-    lt_XMLTags const * const tag=list[pos];
+    GP<lt_XMLTags> &tag=list[pos];
     if(tag)
     {
       GPosition loc;
@@ -349,6 +349,7 @@ lt_XMLTags::getMaps(char const tagname[],char const argn[],GPList<lt_XMLTags> li
             if((gpos=args.contains(argn)))
             {
               map[args[gpos]]=gtag;
+//              fprintf(stderr,"Inserting %s\n",(const char *)(args[gpos]));
             }
           }
         }

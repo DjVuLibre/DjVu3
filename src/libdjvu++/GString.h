@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.h,v 1.26 2001-03-12 23:50:23 fcrary Exp $
+// $Id: GString.h,v 1.27 2001-03-13 01:34:50 bcr Exp $
 // $Name:  $
 
 #ifndef _GSTRING_H_
@@ -57,7 +57,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.26 2001-03-12 23:50:23 fcrary Exp $# */
+    #$Id: GString.h,v 1.27 2001-03-13 01:34:50 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -85,7 +85,11 @@ public:
   static GStringRep *xnew(unsigned int sz = 0);
 private:
   int  size;
+#ifndef NO_DEBUG
+  char data[256];
+#else
   char data[1];
+#endif
 };
 
 

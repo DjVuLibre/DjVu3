@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GContainer.cpp,v 1.27 2001-01-04 22:04:55 bcr Exp $
+// $Id: GContainer.cpp,v 1.28 2001-03-13 01:34:50 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -80,7 +80,7 @@ GArrayBase::GArrayBase(const GCONT Traits &traits, int lobound, int hibound)
 
 GArrayBase::~GArrayBase()
 {
-  empty();
+  G_TRY { empty(); } G_CATCH_ALL { } G_ENDCATCH;
 }
 
 
@@ -343,10 +343,18 @@ GListBase::GListBase(const GListBase &ref)
   GListBase::operator= (ref);
 }
 
-
+#include <stdio.h>
 GListBase::~GListBase()
 {
-  empty();
+  G_TRY
+  {
+    empty();
+  }
+  G_CATCH_ALL
+  {
+    fprintf(stderr,"Exception\n");
+  }
+  G_ENDCATCH;
 }
 
 
@@ -570,7 +578,7 @@ GListBase::operator= (const GListBase & ref)
 
 GSetBase::GSetBase(const Traits &traits)
   : traits(traits), nelems(0), nbuckets(0), 
-    table(0), first(0)
+    gtable(table), first(0)
 {
   rehash(17);
 }
@@ -578,7 +586,7 @@ GSetBase::GSetBase(const Traits &traits)
 
 GSetBase::GSetBase(const GSetBase &ref)
   : traits(ref.traits), 
-    nelems(0), nbuckets(0), table(0), first(0)
+    nelems(0), nbuckets(0), gtable(table), first(0)
 {
   GSetBase::operator= (ref);
 }
@@ -586,8 +594,8 @@ GSetBase::GSetBase(const GSetBase &ref)
 
 GSetBase::~GSetBase()
 {
-  empty();
-  delete [] table;
+  G_TRY { empty(); } G_CATCH_ALL { } G_ENDCATCH;
+//  delete [] table;
 }
 
 
@@ -670,12 +678,16 @@ GSetBase::rehash(int newbuckets)
   nelems = 0;
   first = 0;
   // Allocate a new empty bucket table
-  delete [] table;
+// delete [] table;
+  gtable.resize(0);
   nbuckets = newbuckets;
   typedef HNode *HNodePtr;
-  table = new HNodePtr[nbuckets];
-  for (int i=0; i<nbuckets; i++)
-    table[i] = 0;
+// table = new HNodePtr[nbuckets];
+  gtable.resize(nbuckets);
+//  fprintf(stderr,"GSetBase::rehash table=%x\n",table);
+  gtable.clear();
+//  for (int i=0; i<nbuckets; i++)
+//    table[i] = 0;
   // Insert saved nodes
   while (n)
     {
@@ -720,7 +732,6 @@ GSetBase::del(GPosition &pos)
     }
 }
 
-
 void 
 GSetBase::empty()
 {
@@ -734,7 +745,8 @@ GSetBase::empty()
     }
   first = 0;
   nelems = 0;
-  for (int i=0; i<nbuckets; i++)
-    table[i] = 0;
+  gtable.clear();
+//  for (int i=0; i<nbuckets; i++)
+//    table[i] = 0;
 }
 

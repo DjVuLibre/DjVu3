@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GUnicode.cpp,v 1.4 2001-03-06 19:55:42 bcr Exp $
+// $Id: GUnicode.cpp,v 1.5 2001-03-13 01:34:50 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -39,33 +39,35 @@
 
 #include "GUnicode.h"
 
-static unsigned long const nill=0;
+unsigned long const UnicodeRep::nill=0;
 
 UnicodeRep::UnicodeRep(void)
-: len(0), remainder(UnicodeRep::Remainder::OTHER), UnicodePtr(const_cast<unsigned long *>(&nill))
+: len(0), remainder(UnicodeRep::Remainder::OTHER), gUnicodePtr(UnicodePtr)
 {
 }
 
 UnicodeRep::UnicodeRep(const UnicodeRep &uni)
-: len(uni.len), gs(uni.gs), remainder(uni.remainder)
+: len(uni.len), gs(uni.gs), remainder(uni.remainder), gUnicodePtr(UnicodePtr)
 {
   if(uni.len)
   {
-    UnicodePtr=new unsigned long[uni.len];
+    gUnicodePtr.resize(uni.len);
     memcpy(UnicodePtr,uni.UnicodePtr,uni.len*sizeof(unsigned long));
   }else
   {
-    UnicodePtr=const_cast<unsigned long *>(&nill);
+    gUnicodePtr.resize(0);
   }
 }
 
 UnicodeRep::UnicodeRep(const UnicodeRep::Remainder &r)
+: gUnicodePtr(UnicodePtr)
 {
 	init(r.data,r.size,(UnicodeRep::EncodeType)r.encodetype);
 }
 
 UnicodeRep::UnicodeRep(
   const UnicodeRep::Remainder &r1,const UnicodeRep::Remainder &r2)
+: gUnicodePtr(UnicodePtr)
 {
   Remainder r(r1,r2);
   init(r.data,r.size,(UnicodeRep::EncodeType)r.encodetype);
@@ -73,10 +75,10 @@ UnicodeRep::UnicodeRep(
 
 UnicodeRep::~UnicodeRep()
 {
-  if(UnicodePtr != &nill)
-  {
-    delete [] UnicodePtr;
-  }
+//  if(UnicodePtr != nill)
+//  {
+//    delete [] UnicodePtr;
+//  }
 }
 
 
@@ -157,7 +159,7 @@ UnicodeRep::concat(const UnicodeRep &uni1,const UnicodeRep &uni2)
       UnicodeRep *ptr=(retval=UnicodeRep::create());
       ptr->remainder.init(uni2.remainder);
       ptr->len=len1+len2;
-      ptr->UnicodePtr=new unsigned long[ptr->len+1];
+      ptr->gUnicodePtr.resize(ptr->len+1);
       memcpy(ptr->UnicodePtr,uni1.UnicodePtr,len1*sizeof(unsigned long));
       memcpy(ptr->UnicodePtr+len1,uni2.UnicodePtr,len2*sizeof(unsigned long));
       ptr->UnicodePtr[ptr->len]=0;
@@ -278,7 +280,7 @@ UnicodeRep::init(
     if (j)
     {
       unsigned char const *ptr=(unsigned char *)buf;
-      UnicodePtr=new unsigned long [j+1];
+      gUnicodePtr.resize(j+1);
       switch(remainder.encodetype)
       {
         case UCS4:
@@ -323,10 +325,12 @@ UnicodeRep::init(
       }
       if(len<j)
       {
-        unsigned long *old_wide=UnicodePtr;
-        UnicodePtr=new unsigned long [len+1];
+        unsigned long *old_wide;
+        GPBuffer<unsigned long> gold_wide(old_wide);
+        gold_wide.swap(gUnicodePtr);
+        gUnicodePtr.resize(len+1);
         for(j=0;j<len&&(UnicodePtr[j]=old_wide[j]);j++);
-        delete [] old_wide;
+//        delete [] old_wide;
         UnicodePtr[len]=0;
       }
     }
@@ -350,11 +354,12 @@ UnicodeRep::init(
     gs=GString();
     remainder.init(0,0);
     len=0;
-    if(UnicodePtr != &nill)
-    {
-      delete [] UnicodePtr;
-    }
-    UnicodePtr=nill;
+    gUnicodePtr.resize(0);
+//    if(UnicodePtr != &nill)
+//    {
+//      delete [] UnicodePtr;
+//    }
+//    UnicodePtr=nill;
   }
 }
 

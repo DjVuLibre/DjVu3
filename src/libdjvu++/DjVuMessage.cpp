@@ -30,18 +30,22 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessage.cpp,v 1.18 2001-03-12 23:50:23 fcrary Exp $
+// $Id: DjVuMessage.cpp,v 1.19 2001-03-13 01:34:50 bcr Exp $
 // $Name:  $
 
 
 
 #include "DjVuMessage.h"
 #include "GOS.h"
+#include "XMLTags.h"
+#include "ByteStream.h"
+#if 0
 #ifndef macintosh
 #include "parseoptions.h"
 #endif
+#endif
 #include <ctype.h>
-#include <stdio.h>
+// #include <stdio.h>
 #ifdef WIN32
 #include <tchar.h>
 #include <atlbase.h>
@@ -54,16 +58,245 @@
 #include <sys/types.h>
 #endif
 
+#ifndef NO_DEBUG
+static const char DebugModuleDjVuDir[] ="../TOPDIR/SRCDIR/profiles"; // appended to the home directory.
+#endif
+
 #ifdef WIN32
-static const char LocalDjVuDir[] ="Profiles"; // appended to the home directory.
+static const char ModuleDjVuDir[] ="Profiles"; // appended to the home directory.
 static const char RootDjVuDir[] ="C:/Program Files/LizardTech/Profiles";
 static const TCHAR registrypath[]= TEXT("Software\\LizardTech\\DjVu\\Profile Path");
 #else
+#ifdef UNIX
+static const char ModuleDjVuDir[] ="profiles"; // appended to the home directory.
+#endif
 static const char LocalDjVuDir[] =".DjVu"; // appended to the home directory.
 static const char RootDjVuDir[] ="/etc/DjVu/";
 #endif
 static const char DjVuEnv[]="DJVU_CONFIG_DIR";
+//  The name of the message file
+static const char DjVuMessageFileName[] = "message";
+static const char MessageFile[]="messages.xml";
+static const char namestring[]="name";
+static const char valuestring[]="value";
+static const char bodystring[]="BODY";
+static const char headstring[]="HEAD";
+static const char includestring[]="INCLUDE";
+static const char messagestring[]="MESSAGE";
 
+#ifdef WIN32
+static GString
+RegOpenReadConfig ( HKEY hParentKey )
+{
+  GString retval;
+   // To do:  This needs to be shared with SetProfile.cpp
+  LPCTSTR path = TEXT(registerypath) ;
+
+  HKEY hKey = 0;
+  // MultiByteToWideChar(CP_ACP,MB_PRECOMPOSED,argv[1],strlen(argv[1])+1,wszSrcFile,sizeof(wszSrcFile));
+  if (RegOpenKeyEx(hParentKey, path, 0,
+              KEY_READ, &hKey) == ERROR_SUCCESS )
+  {
+    TCHAR path[1024];
+    // Success
+    LPSTR szPathValue = path;
+    LPCTSTR lpszEntry = TEXT("");
+    DWORD dwCount = (sizeof(path)/sizeof(TCHAR))-1;
+    DWORD dwType;
+
+    LONG lResult = RegQueryValueEx(hKey, lpszEntry, NULL,
+             &dwType, (LPBYTE) szPathValue, &dwCount);
+
+    RegCloseKey(hKey);
+
+    if ((lResult == ERROR_SUCCESS))
+    {
+      szPathValue[dwCount] = 0;
+      USES_CONVERSION;
+      strcpy(retval.getbuf(_tcslen(path)),T2CA(path));
+    }
+  } 
+//  if (hKey)  RegCloseKey(hKey); 
+  return retval;
+}
+
+static GString
+GetModulePath( void )
+{
+  TCHAR path[1024];
+  DWORD dwCount = (sizeof(path)/sizeof(TCHAR))-1;
+  GetModuleFileName(0, path, dwCount);
+  GString retval;
+  USES_CONVERSION;
+  strcpy(retval.getbuf(_tcslen(path)),T2CA(path));
+  return GOS::dirname(retval);
+}
+#else
+#ifdef UNIX
+static GString 
+GetModulePath( void )
+{
+  extern char **environ;
+  char **argv=environ-1;
+  int argc;
+  for(argc=0;*(int *)&(argv[-1]) != argc;argc++,argv--)
+    EMPTY_LOOP;
+  return GOS::dirname((argc>=1)?argv[0]:"");
+}
+#endif
+#endif
+
+static GList<GString>
+GetProfilePaths(void)
+{
+  static bool first=true;
+  static GList<GString> paths;
+  if(first)
+  {
+    first=false;
+    GString path;
+    const char *envp=getenv(DjVuEnv);
+    if(envp && strlen(envp))
+      paths.append((path=envp));
+#if defined(WIN32) || defined(UNIX)
+    GString mpath(GetModulePath());
+    if(mpath.length() && GOS::is_dir(mpath))
+    {
+#ifndef NO_DEBUG
+      path=GOS::expand_name(DebugModuleDjVuDir,mpath);
+      if(path.length() && GOS::is_dir(path))
+        paths.append(path);
+#endif
+      path=GOS::expand_name(ModuleDjVuDir,mpath);
+      if(path.length() && GOS::is_dir(path))
+        paths.append(path);
+      path=GOS::dirname(mpath);
+      if(path != mpath)
+      {
+        path=GOS::expand_name(ModuleDjVuDir,path);
+        if(path.length() && GOS::is_dir(path))
+          paths.append(path);
+      }
+    }
+#endif
+#ifdef WIN32
+    path=RegOpenReadConfig (HKEY_CURRENT_USER);
+    if(path.length() && GOS::is_dir(path))
+      paths.append(path);
+    path=(RegOpenReadConfig (HKEY_LOCAL_MACHINE));
+    if(path.length() && GOS::is_dir(path))
+      paths.append(path);
+#else
+    const char* home=getenv("HOME");
+    struct passwd *pw=0;
+    if(!home)
+    {
+      pw=getpwuid(getuid());
+      if(pw)
+        home=pw->pw_dir;
+    }
+    if(home)
+    {
+      path=GOS::expand_name(LocalDjVuDir,home);
+      if(path.length() && GOS::is_dir(path))
+        paths.append(path);
+    }
+    if(pw)
+    {
+      free(pw);
+    }
+#endif
+    path=RootDjVuDir;
+    if(GOS::is_dir(path))
+      paths.append(path);
+  }
+  return paths;
+}
+
+static void
+getbodies(
+  GList<GString> &paths,
+  const GString &MessageFileName,
+  GPList<lt_XMLTags> &body, 
+  GMap<GString, void *> & map )
+{
+  bool isdone=false;
+  for(GPosition pos=paths;!isdone && pos;++pos)
+  {
+    const GString FileName=GOS::expand_name(MessageFileName,paths[pos]);
+    if(GOS::is_file(FileName))
+    {
+      map[MessageFileName]=0;
+      GP<lt_XMLTags> gtags=lt_XMLTags::create();
+      lt_XMLTags &tags=*gtags;
+      {
+        GP<ByteStream> bs=ByteStream::create(FileName,"rb");
+        tags.init(bs);
+      }
+      GPList<lt_XMLTags> Bodies=tags.getTags(bodystring);
+      if(! Bodies.isempty())
+      {
+        isdone=true;
+        for(GPosition pos=Bodies;pos;++pos)
+        {
+          body.append(Bodies[pos]);
+        }
+      }
+      GPList<lt_XMLTags> Head=tags.getTags(headstring);
+      if(! Head.isempty())
+      {
+        isdone=true;
+        GMap<GString, GP<lt_XMLTags> > includes;
+        lt_XMLTags::getMaps(includestring,namestring,Head,includes);
+        for(GPosition pos=includes;pos;++pos)
+        {
+          GString file=includes.key(pos);
+          if(! map.contains(file))
+          {
+            getbodies(paths,file,body,map);
+          }
+        }
+      }
+    }
+  }
+}
+
+static void
+parse(GMap<GString,GP<lt_XMLTags> > &retval)
+{
+  GPList<lt_XMLTags> body;
+  {
+    GList<GString> paths=GetProfilePaths();
+    GMap<GString, void *> map;
+    GString m(MessageFile);
+    getbodies(paths,m,body,map);
+  }
+  if(! body.isempty())
+  {
+    lt_XMLTags::getMaps(messagestring,namestring,body,retval);
+  }
+}
+
+
+#if 0
+static void
+parse (GMap<GString,GP<lt_XMLTags> > &retval)
+{
+  GList<GString> &paths=GetProfilePaths();
+  for(GPosition pos=paths;pos;++pos)
+  {
+    GString FileName=GOS::expand_name(MessageFile,paths[pos]);
+    if(GOS::is_file(FileName))
+    {
+      parse(retval,ByteStream::create(FileName,"rb"));
+      if(retval.isempty())
+      {
+        break;
+      }
+    }
+  }
+}
+#endif
 
 //  There is only object of class DjVuMessage in a program, and here it is:
 //DjVuMessage  DjVuMsg;
@@ -74,15 +307,22 @@ DjVuMessage::get_DjVuMessage(void)
   return m;
 }
 
-//  The name of the message file
-static const char DjVuMessageFileName[] = "message";
 
 
 // Constructor
-DjVuMessage::DjVuMessage( void ) : opts(0)
+DjVuMessage::DjVuMessage( void )
+#if 0
+: opts(0)
+#endif
 {
+  parse(Map);
+#if 0
 #ifndef macintosh
-   opts=new DjVuParseOptions(DjVuMessageFileName);
+  if(Map.isempty())
+  {
+    opts=new DjVuParseOptions(DjVuMessageFileName);
+  }
+#endif
 #endif
 }
 
@@ -163,7 +403,7 @@ DjVuMessage::LookUpSingle( const GString &Single_Message ) const
 
 
   }
-#ifdef _DEBUG
+#ifndef NO_DEBUG
   else
   {
     msg_text = "*!* " + msg_text + " *!*";    // temporary debug
@@ -192,15 +432,32 @@ DjVuMessage::LookUpSingle( const GString &Single_Message ) const
 GString
 DjVuMessage::LookUpID( const GString &msgID ) const
 {
-	GString result;
+  GString result;
 
+  if(!Map.isempty())
+  {
+    GPosition pos=Map.contains(msgID);
+    if(pos)
+    {
+      GP<lt_XMLTags> tag=Map[pos];
+      GPosition valuepos=tag->args.contains(valuestring);
+      if(valuepos)
+      {
+        result=tag->args[valuepos];
+      }
+    }
+  }
+#if 0
 #ifndef macintosh
-  
-  result=opts->GetValue(msgID);
-  opts->perror();
+  else if(opts)
+  {  
+    result=opts->GetValue(msgID);
+    opts->perror();
+  }
+#endif
 #endif
 
-/*
+#if 0
   //  Find the message file
   const char *ss;
   struct djvu_parse opt = djvu_parse_init( "-" );
@@ -235,7 +492,7 @@ DjVuMessage::LookUpID( const GString &msgID ) const
   }
   else
     result.empty();  // Message text file not open
-*/
+#endif
   return result;
 }
 
@@ -363,3 +620,4 @@ GetProfilePaths(void)
   }
   return paths;
 }
+
