@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.69 1999-09-30 21:48:36 praveen Exp $
+//C- $Id: DjVuFile.cpp,v 1.70 1999-10-05 20:30:31 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -361,7 +361,6 @@ DjVuFile::decode_func(void)
    DjVuPortcaster * pcaster=get_portcaster();
 
    TRY {
-      decode_data_pool=new DataPool(data_pool);
       GP<ByteStream> decode_stream=decode_data_pool->get_stream();
       GP<ProgressByteStream> pstr=new ProgressByteStream(decode_stream);
       pstr->set_progress_cb(progress_cb, this);
@@ -879,17 +878,14 @@ DjVuFile::start_decode(void)
 	 if (flags & DECODE_STOPPED) reset();
 	 flags&=~(DECODE_OK | DECODE_STOPPED | DECODE_FAILED);
 	 flags|=DECODING;
-      
+
+	    // We want to create it right here to be able to stop the
+	    // decoding thread even before its function is called (it starts)
+	 decode_data_pool=new DataPool(data_pool);
+	 
 	 delete decode_thread; decode_thread=0;
 	 decode_thread=new GThread();
 	 decode_thread->create(static_decode_func, this);
-
-	    // We want to wait until the other thread actually starts.
-	    // One of the reasons is that if somebody tries to terminate the
-	    // decoding before its thread actually starts, it will NOT be
-	    // terminated. The other is that we want it to initialize the
-	    // local life_saver
-	 while(!decode_data_pool) GThread::yield();
       }
    } CATCH(exc) {
       flags&=~DECODING;
