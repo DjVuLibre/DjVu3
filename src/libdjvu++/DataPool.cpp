@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.cpp,v 1.28 1999-09-24 18:50:47 eaf Exp $
+//C- $Id: DataPool.cpp,v 1.29 1999-09-28 15:18:28 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -1002,9 +1002,7 @@ public:
 
    virtual size_t read(void *buffer, size_t size);
    virtual size_t write(const void *buffer, size_t size);
-   virtual void seek(long offset, int whence = SEEK_SET);
    virtual long tell();
-   virtual int  is_seekable(void) const { return 1; };
 private:
       // Don't make data_pool GP<>. The problem is that DataPool creates
       // and soon destroys this ByteStream from the constructor. Since
@@ -1013,6 +1011,10 @@ private:
    DataPool		* data_pool;
    GP<DataPool>		data_pool_lock;
    long			position;
+   
+   char			buffer[512];
+   int			buffer_size;
+   int			buffer_pos;
 
       // Cancel C++ default stuff
    PoolByteStream & operator=(const PoolByteStream &);
@@ -1020,7 +1022,7 @@ private:
 
 inline
 PoolByteStream::PoolByteStream(DataPool * xdata_pool) :
-   data_pool(xdata_pool), position(0)
+   data_pool(xdata_pool), position(0), buffer_size(0), buffer_pos(0)
 {
    if (!data_pool) THROW("Internal error: ZERO DataPool passed as input.");
 
@@ -1030,9 +1032,16 @@ PoolByteStream::PoolByteStream(DataPool * xdata_pool) :
 }
 
 size_t
-PoolByteStream::read(void *buffer, size_t size)
+PoolByteStream::read(void *data, size_t size)
 {
-   size=data_pool->get_data(buffer, position, size);
+   if (buffer_pos==buffer_size)
+   {
+      buffer_size=data_pool->get_data(buffer, position, 512);
+      buffer_pos=0;
+   }
+   if (size>buffer_size-buffer_pos) size=buffer_size-buffer_pos;
+   memcpy(data, buffer+buffer_pos, size);
+   buffer_pos+=size;
    position+=size;
    return size;
 }
@@ -1042,28 +1051,6 @@ PoolByteStream::write(const void *buffer, size_t size)
 {
    THROW("write() is not implemented.");
    return 0;	// For compiler not to bark
-}
-
-void
-PoolByteStream::seek(long offset, int whence)
-{
-   long length=data_pool->get_length();
-   long pos;
-   switch(whence)
-   {
-      case SEEK_CUR:
-	 pos=position+offset; break;
-      case SEEK_END:
-	 if (length<0) THROW("Can't seek from the end of the stream.");
-	 pos=length-offset;
-	 break;
-      default:
-	 pos=offset;
-	 break;
-   };
-   if (pos<0) pos=0;
-   if (length>=0 && pos>length) pos=length;
-   position=pos;
 }
 
 long
