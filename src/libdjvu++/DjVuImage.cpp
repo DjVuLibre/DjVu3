@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuImage.cpp,v 1.61 2001-04-03 22:46:09 praveen Exp $
+// $Id: DjVuImage.cpp,v 1.62 2001-04-04 00:12:28 praveen Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -1266,20 +1266,11 @@ DjVuImage::get_decoded_anno()
             mapper.set_output(output);               
             mapper.rotate((4-rotate_count)%4);
 
-//            GP<GMapArea> *item;
             GPList<GMapArea> &list=djvuanno->ant->map_areas;
-//            GPosition pos;
-//            list.first(pos);
-//            while(item=list.next(pos))
-//            {
-//                GString shape_name = GString((*item)->get_shape_name());
-//                const char *name = shape_name;
-//                (*item)->unmap(mapper);
-//            }
-           for(GPosition pos=list;pos;++pos)
-           {
-             list[pos]->unmap(mapper);
-           }
+            for(GPosition pos=list;pos;++pos)
+            {
+                list[pos]->unmap(mapper);
+            }
         }
         return djvuanno;
     }
