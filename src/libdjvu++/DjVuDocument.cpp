@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.109 2000-02-05 22:22:02 bcr Exp $
+//C- $Id: DjVuDocument.cpp,v 1.110 2000-02-06 21:31:00 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -30,6 +30,7 @@ DjVuDocument::DjVuDocument(void)
     init_started(false),
     cache(0) 
 {
+   GPBase::preserve(0);
 }
 
 void
@@ -124,7 +125,7 @@ DjVuDocument::stop_init(void)
    while((init_thread_flags & STARTED) &&
 	 !(init_thread_flags & FINISHED))
    {
-      if (init_data_pool) init_data_pool->stop(false);	// any operation
+      if (init_data_pool) init_data_pool->stop(true);	// blocking operation
 
       if (ndir_file) ndir_file->stop(false);
 
@@ -165,6 +166,8 @@ DjVuDocument::static_init_thread(void * cl_data)
       } CATCH(exc) {} ENDCATCH;
       th->init_thread_flags|=FINISHED;
    } ENDCATCH;
+
+   TRY { GPBase::preserve(life_saver); } CATCH(exc) {} ENDCATCH;
 }
 
 void

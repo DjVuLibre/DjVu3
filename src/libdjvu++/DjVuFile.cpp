@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.111 2000-02-05 22:22:02 bcr Exp $
+//C- $Id: DjVuFile.cpp,v 1.112 2000-02-06 21:31:00 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -86,6 +86,7 @@ DjVuFile::DjVuFile()
   : file_size(0), recover_errors(ABORT), verbose_eof(false), chunks_number(-1),
     initialized(false)
 {
+   GPBase::preserve(0);
 }
 
 void
@@ -363,6 +364,7 @@ DjVuFile::static_decode_func(void * cl_data)
       th->decode_func();
    } CATCH(exc) {
    } ENDCATCH;
+   TRY { GPBase::preserve(life_saver); } CATCH(exc) {} ENDCATCH;
 }
 
 void
@@ -476,14 +478,12 @@ DjVuFile::process_incl_chunk(ByteStream & str, int file_num)
       
 	 // No. We have to request a new file
       GP<DjVuFile> file;
-      TRY
-      {
-        file=(DjVuFile *)pcaster->id_to_file(this, incl_str).get();
+      TRY {
+	 file=(DjVuFile *)pcaster->id_to_file(this, incl_str).get();
       }
-      CATCH(ex)
-      {
-        unlink_file(incl_str);
-        RETHROW;
+      CATCH(ex) {
+	 unlink_file(incl_str);
+	 RETHROW;
       }
       ENDCATCH;
       if (!file)
@@ -494,16 +494,16 @@ DjVuFile::process_incl_chunk(ByteStream & str, int file_num)
 	 THROW(buf);
       }
       if (recover_errors!=ABORT)
-        file->set_recover_errors(recover_errors);
+	 file->set_recover_errors(recover_errors);
       if (verbose_eof)
-        file->set_verbose_eof(verbose_eof);
+	 file->set_verbose_eof(verbose_eof);
       pcaster->add_route(file, this);
       
 	 // We may have been stopped. Make sure the child will be stopped too.
       if (flags & STOPPED)
-        file->stop(false);
+	 file->stop(false);
       if (flags & BLOCKED_STOPPED)
-        file->stop(true);
+	 file->stop(true);
 
 	 // Lock the list again and check if the file has already been
 	 // added by someone else
@@ -513,19 +513,18 @@ DjVuFile::process_incl_chunk(ByteStream & str, int file_num)
 	 for(pos=inc_files_list;pos;++pos)
          {
 	    if (inc_files_list[pos]->url.fname()==incl_url.fname())
-              break;
+	       break;
          }
 	 if (pos)
          {
-           file=inc_files_list[pos];
-	 }else if (file_num<0 || !(pos=inc_files_list.nth(file_num)))
+	    file=inc_files_list[pos];
+	 } else if (file_num<0 || !(pos=inc_files_list.nth(file_num)))
          {
 	    inc_files_list.append(file);
-	 }else 
+	 } else 
          {
-           inc_files_list.insert_before(pos, file);
+	    inc_files_list.insert_before(pos, file);
          }
-		
       }
       return file;
    }
@@ -1073,12 +1072,13 @@ DjVuFile::start_decode(void)
 	 flags&=~(DECODE_OK | DECODE_STOPPED | DECODE_FAILED);
 	 flags|=DECODING;
 
+	 delete decode_thread; decode_thread=0;
+	 
 	    // We want to create it right here to be able to stop the
 	    // decoding thread even before its function is called (it starts)
 	 decode_data_pool=new DataPool(data_pool);
 	 decode_life_saver=this;
 	 
-	 delete decode_thread; decode_thread=0;
 	 decode_thread=new GThread();
 	 decode_thread->create(static_decode_func, this);
       }
@@ -1127,8 +1127,8 @@ DjVuFile::stop_decode(bool sync)
 		  if (f->is_decoding())
 		  {
 		     file=f; break;
-		  };
-	       };
+		  }
+	       }
 	    }
 	    if (!file) break;
 
@@ -1137,7 +1137,9 @@ DjVuFile::stop_decode(bool sync)
 
 	 wait_for_finish(1);	// Wait for self termination
 
-	 delete decode_thread; decode_thread=0;
+	    // Don't delete the thread here. Until GPBase::preserve() is
+	    // reimplemented somehow at the GThread level.
+	    // delete decode_thread; decode_thread=0;
       }
       flags&=~DONT_START_DECODE;
    } CATCH(exc) {
