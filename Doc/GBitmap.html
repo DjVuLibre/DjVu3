@@ -135,10 +135,13 @@
 <A HREF="#DOC.1.5.17.1.6.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>rle_get_bits</B>(int rowno, unsigned char *bits) const 
 <DD><I>Gets the pixels for line <TT>rowno</TT>.</I>
 <DT>
-<A HREF="#DOC.1.5.17.1.6.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>rle_get_runs</B>(int rowno, int *rlens) const 
+<A HREF="#DOC.1.5.17.1.6.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   void <B>rle_get_bitmap</B>(const int ncolumns, const unsigned char *&amp;runs, unsigned char *bitmap, const bool invert )
+<DD><I>Gets the bitmap line rle data passed.</I>
+<DT>
+<A HREF="#DOC.1.5.17.1.6.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>rle_get_runs</B>(int rowno, int *rlens) const 
 <DD><I>Gets the lengths of all runs in line <TT>rowno</TT>.</I>
 <DT>
-<A HREF="#DOC.1.5.17.1.6.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>rle_get_rect</B>(<!1><A HREF="GRect.html">GRect</A> &amp;rect) const 
+<A HREF="#DOC.1.5.17.1.6.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>rle_get_rect</B>(<!1><A HREF="GRect.html">GRect</A> &amp;rect) const 
 <DD><I>Gets the smallest rectangle enclosing black pixels.</I>
 </DL></P>
 <DT>
@@ -466,8 +469,15 @@ be used to ensure that the bitmap is RLE encoded.
 The array must be large enough to hold the whole line.  The number of
 pixels is returned. 
 <DL><DT><DD></DL><P>
-<A NAME="rle_get_runs">
+<A NAME="rle_get_bitmap">
 <A NAME="DOC.1.5.17.1.6.2">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static   void rle_get_bitmap(const int ncolumns, const unsigned char *&amp;runs, unsigned char *bitmap, const bool invert )</B></TT>
+<DD>Gets the bitmap line rle data passed.  One line of pixel is stored one
+with 8 bits per <TT>unsigned char</TT> in an array.  The array must be large
+enough to hold the whole line.  
+<DL><DT><DD></DL><P>
+<A NAME="rle_get_runs">
+<A NAME="DOC.1.5.17.1.6.3">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int rle_get_runs(int rowno, int *rlens) const </B></TT>
 <DD>Gets the lengths of all runs in line <TT>rowno</TT>.  The array <TT>rlens</TT> must be
 large enough to accomodate <TT>w+2</TT> integers where <TT>w</TT> is the number of
@@ -477,7 +487,7 @@ zero in order to allow for lines starting with black pixels.  This
 function returns the total number of runs in the line. 
 <DL><DT><DD></DL><P>
 <A NAME="rle_get_rect">
-<A NAME="DOC.1.5.17.1.6.3">
+<A NAME="DOC.1.5.17.1.6.4">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int rle_get_rect(<!1><A HREF="GRect.html">GRect</A> &amp;rect) const </B></TT>
 <DD>Gets the smallest rectangle enclosing black pixels.
 Rectangle rect gives the coordinates of the smallest rectangle
@@ -653,7 +663,7 @@ initially point to a large enough data buffer.
 <!-- This is were the DOC++ footer is defined  -->
 
 <font face="arial,helvetica" size="2">
-<a href=http://www.djvu.att.com>DjVu</a> is a trademark of AT&amp;T.  
+<a href=http://www.lizardtech.com>DjVu</a> is a trademark of AT&amp;T.  
 <br>All other products mentioned are registered trademarks or trademarks of
 their respective companies.
 </font>
