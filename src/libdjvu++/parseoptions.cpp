@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: parseoptions.cpp,v 1.76 2001-04-12 17:05:32 fcrary Exp $
+// $Id: parseoptions.cpp,v 1.77 2001-04-13 00:41:16 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -698,7 +698,7 @@ DjVuParseOptions::Add(
     }
     const char *p=GetProfileName(profile);
     Errors->AddError(GUTF8String(emesg) + "\t" + filename +
-                                      "\t" + GString(line) + 
+                                      "\t" + GUTF8String(line) + 
                                       "\t" + p + 
                                       "\t" + value);
   }else if(profile >= 0)
@@ -852,7 +852,7 @@ DjVuParseOptions::ReadNextConfig (
           {
             Errors->AddError(GUTF8String( ERR_MSG("parseoptions.cant_inherit") ) + 
                                                                     "\t" + filename +
-                                                                    "\t" + GString(line) +
+                                                                    "\t" + GUTF8String(line) +
                                                                     "\t" + profilename +
                                                                     "\t" + name);
 //            break;

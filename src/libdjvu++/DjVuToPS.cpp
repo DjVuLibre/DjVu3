@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuToPS.cpp,v 1.24 2001-04-12 17:05:32 fcrary Exp $
+// $Id: DjVuToPS.cpp,v 1.25 2001-04-13 00:41:16 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -90,7 +90,7 @@ void
 DjVuToPS::Options::set_level(int _level)
 {
    if (_level!=1 && _level!=2)
-      G_THROW( ERR_MSG("DjVuToPS.bad_level") "\t"+GString(_level));
+      G_THROW( ERR_MSG("DjVuToPS.bad_level") "\t"+GUTF8String(_level));
    
    level=_level;
 }
@@ -1187,25 +1187,25 @@ DjVuToPS::print(ByteStream & str, const GP<DjVuDocument> & doc,
           const char * ptr;
           int start_page=strtol(start, (char **) &ptr, 10);
           if (ptr<dash || start_page<=0)
-            G_THROW( ERR_MSG("DjVuToPS.bad_page") "\t"+GString(start, dash-start));
+            G_THROW( ERR_MSG("DjVuToPS.bad_page") "\t"+GUTF8String(start, dash-start));
           if (start_page>doc_pages)
-            G_THROW( ERR_MSG("DjVuToPS.big_page") "\t"+GString(start_page));
+            G_THROW( ERR_MSG("DjVuToPS.big_page") "\t"+GUTF8String(start_page));
           
           if (dash<end)
           {
             if (dash==end-1)
-              G_THROW( ERR_MSG("DjVuToPS.no_to") "\t"+GString(start, end-start));
+              G_THROW( ERR_MSG("DjVuToPS.no_to") "\t"+GUTF8String(start, end-start));
             
             for(ptr=dash+1;ptr<end;ptr++)
               if (*ptr=='-')
-                G_THROW( ERR_MSG("DjVuToPS.bad_range") "\t"+GString(start, end-start));
+                G_THROW( ERR_MSG("DjVuToPS.bad_range") "\t"+GUTF8String(start, end-start));
               
               int end_page=strtol(dash+1, (char **) &ptr, 10);
               if (ptr<end || end_page<=0)
-                G_THROW( ERR_MSG("DjVuToPS.bad_page") "\t"+GString(dash+1, end-dash-1));
+                G_THROW( ERR_MSG("DjVuToPS.bad_page") "\t"+GUTF8String(dash+1, end-dash-1));
               
               if (end_page>doc_pages)
-                G_THROW( ERR_MSG("DjVuToPS.big_page") "\t"+GString(end_page));
+                G_THROW( ERR_MSG("DjVuToPS.big_page") "\t"+GUTF8String(end_page));
               
               if (start_page<end_page)
                 for(int page_num=start_page;page_num<=end_page;page_num++)
@@ -1268,7 +1268,7 @@ DjVuToPS::print(ByteStream & str, const GP<DjVuDocument> & doc,
           port->decode_event_received=false;
           if (djvu_file->is_decode_failed() ||
             djvu_file->is_decode_stopped())
-            G_THROW( ERR_MSG("DjVuToPS.cant_decode") "\t"+GString(page_num));
+            G_THROW( ERR_MSG("DjVuToPS.cant_decode") "\t"+GUTF8String(page_num));
           if (dec_progress_cb)
             dec_progress_cb(port->decode_done, dec_progress_cl_data);
         }

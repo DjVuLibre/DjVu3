@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: IFFByteStream.cpp,v 1.25 2001-04-12 17:05:32 fcrary Exp $
+// $Id: IFFByteStream.cpp,v 1.26 2001-04-13 00:41:16 bcr Exp $
 // $Name:  $
 
 // -- Implementation of IFFByteStream
@@ -244,9 +244,9 @@ IFFByteStream::get_chunk(GString &chkid, int *rawoffsetptr, int *rawsizeptr)
   
   // Install context record
   ctx = nctx;
-  chkid = GString(ctx->idOne, 4);
+  chkid = GUTF8String(ctx->idOne, 4);
   if (composite)
-    chkid = chkid + ":" + GString(ctx->idTwo, 4);
+    chkid = chkid + ":" + GUTF8String(ctx->idTwo, 4);
 
   // Return
   if (rawoffsetptr)
@@ -399,9 +399,9 @@ IFFByteStream::short_id(GString &chkid)
   if (!ctx)
     G_THROW( ERR_MSG("IFFByteStream.no_chunk_id") );
   if (ctx->bComposite)
-    chkid = GString(ctx->idOne, 4) + ":" + GString(ctx->idTwo, 4);
+    chkid = GUTF8String(ctx->idOne, 4) + ":" + GUTF8String(ctx->idTwo, 4);
   else
-    chkid = GString(ctx->idOne, 4);
+    chkid = GUTF8String(ctx->idOne, 4);
 }
 
 
@@ -419,7 +419,7 @@ IFFByteStream::full_id(GString &chkid)
     if (memcmp(ct->idOne, "FOR", 3)==0 || 
         memcmp(ct->idOne, "PRO", 3)==0  )
       {
-        chkid = GString(ct->idTwo, 4) + "." + chkid;
+        chkid = GUTF8String(ct->idTwo, 4) + "." + chkid;
         break;
       }
 }

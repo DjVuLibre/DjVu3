@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: BSEncodeByteStream.cpp,v 1.3 2001-04-04 22:12:11 bcr Exp $
+// $Id: BSEncodeByteStream.cpp,v 1.4 2001-04-13 00:41:16 bcr Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 07/1998
@@ -889,7 +889,7 @@ BSByteStream::Encode::init(const int xencoding)
   gzp=ZPCodec::create(gbs,true,true);
   const int encoding=(xencoding<MINBLOCK)?MINBLOCK:xencoding;
   if (encoding > MAXBLOCK)
-    G_THROW("bytestream.blocksize\t"+GString(MAXBLOCK));  //  "Requested block size must be less than MAXBLOCK Kbytes."
+    G_THROW("bytestream.blocksize\t"+GUTF8String(MAXBLOCK));  //  "Requested block size must be less than MAXBLOCK Kbytes."
   // Record block size
   blocksize = encoding * 1024;
   // Initialize context array

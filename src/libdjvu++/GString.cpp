@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.52 2001-04-12 22:32:27 praveen Exp $
+// $Id: GString.cpp,v 1.53 2001-04-13 00:41:16 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -61,21 +61,6 @@
 
 
 // - Author: Leon Bottou, 04/1997
-
-template <class TYPE>
-GP<GStringRep>
-GStringRep::create(const unsigned int sz, TYPE *)
-{
-  GStringRep *addr=0;
-  if (sz > 0)
-  {
-    void *vma = ::operator new(sizeof(TYPE) + sz);
-    addr = new (vma) TYPE;
-    addr->size = sz;
-    addr->data[sz] = 0;
-  }
-  return addr;
-}
 
 GP<GStringRep>
 GStringRep::strdup(const char *s) const
@@ -145,12 +130,27 @@ GStringRep::substr(const char *s,const int start,const int len) const
 }
 
 GP<GStringRep>
+GStringRep::append(const char *s2) const
+{
+  GP<GStringRep> retval;
+  if(s2)
+  {
+    retval=concat(data,s2);
+  }else
+  {
+    retval=const_cast<GStringRep *>(this);
+  }
+  return retval;
+}
+
+GP<GStringRep>
 GStringRep::append(const GP<GStringRep> &s2) const
 {
   return s2
     ?(s2->concat(data,s2->data))
     :(GP<GStringRep>(const_cast<GStringRep *>(this)));
 }
+
 
 GP<GStringRep>
 GStringRep::UTF8::append(const GP<GStringRep> &s2) const
@@ -189,12 +189,6 @@ GStringRep::Native::append(const GP<GStringRep> &s2) const
 }
 
 GP<GStringRep>
-GStringRep::concat(const GP<GStringRep> &s1,const GP<GStringRep> &s2)
-{
-  return (s1?(s2?(s1->append(s2)):s1):s2);
-}
-
-GP<GStringRep>
 GStringRep::concat(const char *s1,const char *s2) const
 {
   const int length1=(s1?strlen(s1):0);
@@ -225,15 +219,6 @@ GString::GString( const GP<GStringRep> &rep) : GP<GStringRep>(rep)
   init();
 }
 
-GString::GString(const char dat)
-{
-  const GP<GStringRep> rep = GStringRep::create(1);
-  GStringRep &r=*rep;
-  r.data[0] = dat;
-  r.data[1] = 0;
-  (*this) = rep;
-}
-
 GString &
 GString::operator= ( const GP<GStringRep> &rep)
 {
@@ -242,11 +227,13 @@ GString::operator= ( const GP<GStringRep> &rep)
   return (*this);
 }
 
+#if 0
 GString& 
 GString::operator= (const char *str)
 {
   return ((*this)=GStringRep::create(str));
 }
+#endif
 
 void
 GString::empty( void )
@@ -1206,4 +1193,159 @@ GStringRep::UCS4toUTF8(const unsigned long w,unsigned char *ptr)
   return ptr;
 }
 
+   // Creates with a concat operation.
+GP<GStringRep> 
+GStringRep::concat( const char *s1, const GP<GStringRep> &s2) const
+{
+  GP<GStringRep> retval;
+  if(s2)
+  {
+    retval=toThis(s2);
+    if(s1 && s1[0])
+    {
+      if(retval)
+      {
+        retval=concat(s1,retval->data);
+      }else
+      {
+        retval=strdup(s1);
+      }
+    }
+  }else if(s1 && s1[0]);
+  {
+    retval=strdup(s1);
+  }
+  return retval;
+}
 
+   // Creates with a concat operation.
+
+GP<GStringRep> 
+GStringRep::concat( const GP<GStringRep> &s1,const char *s2) const
+{
+  GP<GStringRep> retval;
+  if(s1)
+  {
+    retval=toThis(s1);
+    if(s2 && s2[0])
+    {
+      if(retval)
+      {
+        retval=retval->append(s2);
+      }else
+      {
+        retval=strdup(s2);
+      }
+    }
+  }else if(s2 && s2[0])
+  {
+    retval=strdup(s2);
+  }
+  return retval;
+}
+
+GP<GStringRep> 
+GStringRep::concat(const GP<GStringRep> &s1,const GP<GStringRep> &s2) const
+{ 
+  GP<GStringRep> retval; 
+  if(s1)
+  {
+    retval=toThis(s1,s2);
+    if(retval && s2)
+    {
+      retval=retval->append(toThis(s2));
+    }
+  }else if(s2)
+  {
+    retval=toThis(s2);
+  }
+  return retval;
+}
+
+template <class TYPE>
+GP<GStringRep>
+GStringRep::create(const unsigned int sz, TYPE *)
+{
+  GStringRep *addr=0;
+  if (sz > 0)
+  {
+    addr = new TYPE;
+    addr->data=(char *)(::operator new(sz+1));
+//    void *vma = ::operator new(sizeof(TYPE) + sz);
+//    addr = new (vma) TYPE;
+    addr->size = sz;
+    addr->data[sz] = 0;
+  }
+  return addr;
+}
+
+GStringRep::GStringRep(void)
+{
+  size=0;
+  data=0;
+}
+
+GStringRep::~GStringRep()
+{
+  if(data)
+  {
+    data[0]=0;
+    ::operator delete(data);
+  }
+  data=0;
+}
+
+GStringRep::UTF8::UTF8(void) {}
+
+GStringRep::UTF8::~UTF8() {}
+
+GStringRep::Native::Native(void) {}
+
+GStringRep::Native::~Native() {}
+
+int 
+GStringRep::cmp(const GP<GStringRep> &s2) const
+{
+  int retval=1;
+  if(s2)
+  {
+    if(s2->isUTF8() || s2->isNative())
+      retval=-(s2->cmp(const_cast<GStringRep *>(this)));
+    else
+      retval=strcmp(data,s2->data); 
+  }
+  return retval;
+}
+
+int
+GStringRep::UTF8::cmp(const GP<GStringRep> &s2) const
+{
+  int retval=1;
+  if(s2)
+  {
+    GP<GStringRep> r=s2->toUTF8(true);
+    if(r)
+    {
+      retval=strcmp(data,r->data);
+    }
+  }
+  return retval;
+} 
+
+int
+GStringRep::Native::cmp(const GP<GStringRep> &s2) const
+{
+  int retval=1;
+  if(s2)
+  {
+    if(s2->isUTF8())
+    {
+      retval=-(s2->cmp(const_cast<GStringRep::Native *>(this)));
+    }else
+    {
+      retval=strcmp(data,s2->data);
+    }
+  }
+  return retval;
+}
+ 

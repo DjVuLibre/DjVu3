@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuAnno.cpp,v 1.77 2001-04-12 18:50:50 fcrary Exp $
+// $Id: DjVuAnno.cpp,v 1.78 2001-04-13 00:41:16 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -772,111 +772,116 @@ DjVuANT::get_map_areas(GLParser & parser)
   for(GPosition pos=list;pos;++pos)
   {
     GLObject & obj=*list[pos];
-    if (obj.get_type()==GLObject::LIST && obj.get_name()==GMapArea::MAPAREA_TAG)
+    const GUTF8String type=obj.get_type();
+    if (type == GLObject::LIST)
     {
-      G_TRY {
+      const GUTF8String name=obj.get_name();
+      if(name == GMapArea::MAPAREA_TAG)
+      {
+        G_TRY {
 	       // Getting the url
-        GUTF8String url;
-        GUTF8String target=GMapArea::TARGET_SELF;
-        GLObject & url_obj=*(obj[0]);
-        if (url_obj.get_type()==GLObject::LIST)
-        {
-          if (url_obj.get_name()!=GMapArea::URL_TAG)
-            G_THROW( ERR_MSG("DjVuAnno.bad_url") );
-          url=(url_obj[0])->get_string();
-          target=(url_obj[1])->get_string();
-        } else url=url_obj.get_string();
+          GUTF8String url;
+          GUTF8String target=GMapArea::TARGET_SELF;
+          GLObject & url_obj=*(obj[0]);
+          if (url_obj.get_type()==GLObject::LIST)
+          {
+            if (url_obj.get_name()!=GMapArea::URL_TAG)
+              G_THROW( ERR_MSG("DjVuAnno.bad_url") );
+            url=(url_obj[0])->get_string();
+            target=(url_obj[1])->get_string();
+          } else url=url_obj.get_string();
         
 	       // Getting the comment
-        GUTF8String comment=(obj[1])->get_string();
+          GUTF8String comment=(obj[1])->get_string();
         
-        DEBUG_MSG("found maparea '" << comment << "' (" <<
-          url << ":" << target << ")\n");
+          DEBUG_MSG("found maparea '" << comment << "' (" <<
+            url << ":" << target << ")\n");
         
-        GLObject * shape=obj[2];
-        GP<GMapArea> map_area;
-        if (shape->get_type()==GLObject::LIST)
-        {
-          if (shape->get_name()==GMapArea::RECT_TAG)
+          GLObject * shape=obj[2];
+          GP<GMapArea> map_area;
+          if (shape->get_type()==GLObject::LIST)
           {
-            DEBUG_MSG("it's a rectangle.\n");
-            GRect grect((*shape)[0]->get_number(),
-                        (*shape)[1]->get_number(),
-                        (*shape)[2]->get_number(),
-                        (*shape)[3]->get_number());
-            GP<GMapRect> map_rect=GMapRect::create(grect);
-            map_area=(GMapRect *)map_rect;
-          } else if (shape->get_name()==GMapArea::POLY_TAG)
-          {
-            DEBUG_MSG("it's a polygon.\n");
-            int points=shape->get_list().size()/2;
-            GTArray<int> xx(points-1), yy(points-1);
-            for(int i=0;i<points;i++)
+            if (shape->get_name()==GMapArea::RECT_TAG)
             {
-              xx[i]=(*shape)[2*i]->get_number();
-              yy[i]=(*shape)[2*i+1]->get_number();
+              DEBUG_MSG("it's a rectangle.\n");
+              GRect grect((*shape)[0]->get_number(),
+                          (*shape)[1]->get_number(),
+                          (*shape)[2]->get_number(),
+                          (*shape)[3]->get_number());
+              GP<GMapRect> map_rect=GMapRect::create(grect);
+              map_area=(GMapRect *)map_rect;
+            } else if (shape->get_name()==GMapArea::POLY_TAG)
+            {
+              DEBUG_MSG("it's a polygon.\n");
+              int points=shape->get_list().size()/2;
+              GTArray<int> xx(points-1), yy(points-1);
+              for(int i=0;i<points;i++)
+              {
+                xx[i]=(*shape)[2*i]->get_number();
+                yy[i]=(*shape)[2*i+1]->get_number();
+              }
+              GP<GMapPoly> map_poly=GMapPoly::create(xx,yy,points);
+              map_area=(GMapPoly *)map_poly;
+            } else if (shape->get_name()==GMapArea::OVAL_TAG)
+            {
+              DEBUG_MSG("it's an ellipse.\n");
+              GRect grect((*shape)[0]->get_number(),
+                          (*shape)[1]->get_number(),
+                          (*shape)[2]->get_number(),
+                          (*shape)[3]->get_number());
+              GP<GMapOval> map_oval=GMapOval::create(grect);
+              map_area=(GMapOval *)map_oval;
             }
-            GP<GMapPoly> map_poly=GMapPoly::create(xx,yy,points);
-            map_area=(GMapPoly *)map_poly;
-          } else if (shape->get_name()==GMapArea::OVAL_TAG)
-          {
-            DEBUG_MSG("it's an ellipse.\n");
-            GRect grect((*shape)[0]->get_number(),
-                        (*shape)[1]->get_number(),
-                        (*shape)[2]->get_number(),
-                        (*shape)[3]->get_number());
-            GP<GMapOval> map_oval=GMapOval::create(grect);
-            map_area=(GMapOval *)map_oval;
           }
-        }
         
-        if (map_area)
-        {
-          map_area->url=url;
-          map_area->target=target;
-          map_area->comment=comment;
-          for(int obj_num=3;obj_num<obj.get_list().size();obj_num++)
+          if (map_area)
           {
-            GLObject * el=obj[obj_num];
-            if (el->get_type()==GLObject::LIST)
+            map_area->url=url;
+            map_area->target=target;
+            map_area->comment=comment;
+            for(int obj_num=3;obj_num<obj.get_list().size();obj_num++)
             {
-              const GUTF8String & name=el->get_name();
-              if (name==GMapArea::BORDER_AVIS_TAG)
-                map_area->border_always_visible=true;
-              else if (name==GMapArea::HILITE_TAG)
+              GLObject * el=obj[obj_num];
+              if (el->get_type()==GLObject::LIST)
               {
-                GLObject * obj=el->get_list()[el->get_list().firstpos()];
-                if (obj->get_type()==GLObject::SYMBOL)
-                  map_area->hilite_color=cvt_color(obj->get_symbol(), 0xff);
-              } else
-              {
-                int border_type=
-                  name==GMapArea::NO_BORDER_TAG ? GMapArea::NO_BORDER :
-                  name==GMapArea::XOR_BORDER_TAG ? GMapArea::XOR_BORDER :
-                  name==GMapArea::SOLID_BORDER_TAG ? GMapArea::SOLID_BORDER :
-                  name==GMapArea::SHADOW_IN_BORDER_TAG ? GMapArea::SHADOW_IN_BORDER :
-                  name==GMapArea::SHADOW_OUT_BORDER_TAG ? GMapArea::SHADOW_OUT_BORDER :
-                  name==GMapArea::SHADOW_EIN_BORDER_TAG ? GMapArea::SHADOW_EIN_BORDER :
-                  name==GMapArea::SHADOW_EOUT_BORDER_TAG ? GMapArea::SHADOW_EOUT_BORDER : -1;
-                if (border_type>=0)
+                const GUTF8String & name=el->get_name();
+                if (name==GMapArea::BORDER_AVIS_TAG)
+                  map_area->border_always_visible=true;
+                else if (name==GMapArea::HILITE_TAG)
                 {
-                  map_area->border_type=(GMapArea::BorderType) border_type;
-                  for(GPosition pos=el->get_list();pos;++pos)
+                  GLObject * obj=el->get_list()[el->get_list().firstpos()];
+                  if (obj->get_type()==GLObject::SYMBOL)
+                    map_area->hilite_color=cvt_color(obj->get_symbol(), 0xff);
+                } else
+                {
+                  int border_type=
+                    name==GMapArea::NO_BORDER_TAG ? GMapArea::NO_BORDER :
+                    name==GMapArea::XOR_BORDER_TAG ? GMapArea::XOR_BORDER :
+                    name==GMapArea::SOLID_BORDER_TAG ? GMapArea::SOLID_BORDER :
+                    name==GMapArea::SHADOW_IN_BORDER_TAG ? GMapArea::SHADOW_IN_BORDER :
+                    name==GMapArea::SHADOW_OUT_BORDER_TAG ? GMapArea::SHADOW_OUT_BORDER :
+                    name==GMapArea::SHADOW_EIN_BORDER_TAG ? GMapArea::SHADOW_EIN_BORDER :
+                    name==GMapArea::SHADOW_EOUT_BORDER_TAG ? GMapArea::SHADOW_EOUT_BORDER : -1;
+                  if (border_type>=0)
                   {
-                    GLObject * obj=el->get_list()[pos];
-                    if (obj->get_type()==GLObject::SYMBOL)
-                      map_area->border_color=cvt_color(obj->get_symbol(), 0xff);
-                    if (obj->get_type()==GLObject::NUMBER)
-                      map_area->border_width=obj->get_number();
+                    map_area->border_type=(GMapArea::BorderType) border_type;
+                    for(GPosition pos=el->get_list();pos;++pos)
+                    {
+                      GLObject * obj=el->get_list()[pos];
+                      if (obj->get_type()==GLObject::SYMBOL)
+                        map_area->border_color=cvt_color(obj->get_symbol(), 0xff);
+                      if (obj->get_type()==GLObject::NUMBER)
+                        map_area->border_width=obj->get_number();
+                    }
                   }
-                }
-              }	    
-            } // if (el->get_type()==...)
-          } // for(int obj_num=...)
-          map_areas.append(map_area);
-        } // if (map_area) ...
-      } G_CATCH_ALL {} G_ENDCATCH;
-    } // if (...get_name()==GMapArea::MAPAREA_TAG)
+                }	    
+              } // if (el->get_type()==...)
+            } // for(int obj_num=...)
+            map_areas.append(map_area);
+          } // if (map_area) ...
+        } G_CATCH_ALL {} G_ENDCATCH;
+      }
+    }
   } // while(item==...)
    
   DEBUG_MSG("map area list size = " << list.size() << "\n");
