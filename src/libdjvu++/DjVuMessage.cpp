@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessage.cpp,v 1.67 2001-07-20 23:13:51 bcr Exp $
+// $Id: DjVuMessage.cpp,v 1.68 2001-07-20 23:14:16 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -180,7 +180,7 @@ parsePATH(void)
         retval.append(GURL::Filename::Native(p.substr(from,to-from)));
       }
     }
-    if(from<(int)p.length())
+    if((from+1)<(int)p.length())
     {
       retval.append(GURL::Filename::Native(p.substr(from,-1)));
     }
@@ -194,6 +194,7 @@ GetModulePath( void )
 {
  GURL retval;
  GUTF8String &xprogramname=DjVuMessage::programname();
+#if 0
 #ifndef NO_DEBUG
  if(!xprogramname.length())
  {
@@ -205,6 +206,7 @@ GetModulePath( void )
      xprogramname=GNativeString(argv[0]);
  }
 #endif // NO_DEBUG
+#endif
  if(xprogramname.length())
  {
    if(xprogramname[1]=='/'
