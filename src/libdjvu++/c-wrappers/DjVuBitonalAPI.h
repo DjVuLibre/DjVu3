@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuBitonalAPI.h,v 1.11 2000-03-05 18:13:37 bcr Exp $
+ *C- $Id: DjVuBitonalAPI.h,v 1.12 2000-03-08 22:59:46 bcr Exp $
  */
 
 #ifndef _DJVUBITONAL_H_
@@ -15,15 +15,21 @@
 
 /** @name DjVuBitonalAPI.h
 
-    #DjVuBitonalAPI.h# defines the functions used to convert multiple bitonal
-    images to DjVu multipage documents.
+    @memo #DjVuBitonalAPI.h# defines the functions used to convert multiple
+    bitonal images to DjVu multipage documents.
     @author
     Bill C Riemers <bcr@att.com>
 */
 
+/*@{*/
+
 /* 
  * $Log: DjVuBitonalAPI.h,v $
- * Revision 1.11  2000-03-05 18:13:37  bcr
+ * Revision 1.12  2000-03-08 22:59:46  bcr
+ * Updated the documentation.  I'm using Leon's libdjvu++ documentation
+ * as a template.
+ *
+ * Revision 1.11  2000/03/05 18:13:37  bcr
  * More comment changes.
  *
  * Revision 1.10  2000/03/05 06:29:16  bcr
@@ -34,8 +40,6 @@
 #include "DjVuDecodeAPI.h"
 
 /* Predeclarations. */
-
-/*@{*/
 
 /** ++ #bitonaltodjvu_type# is used to define the bitonal
     compression type.  Possible values consist of normal,
@@ -221,13 +225,11 @@ void bitonaltodjvu_usage(int fd,const char *prog);
 
 /*@}*/
 
-/*@}*/
-
 #ifdef __cplusplus
 #ifndef __cplusplus
 {
 #endif
-}
+};
 
 inline djvu_jb2_options_struct::djvu_jb2_options_struct() :
   pages_per_dict(10), compression(djvu_normal), disable_halftone(0),
@@ -237,6 +239,8 @@ inline bitonaltodjvu_options_struct::bitonaltodjvu_options_struct() :
   process(), transform(), jb2() {}
 
 #endif
+
+/*@}*/
 
 #endif /* _DJVUBITONAL_H_ */
 

@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuMultiAPI.h,v 1.20 2000-03-05 18:13:37 bcr Exp $
+ *C- $Id: DjVuMultiAPI.h,v 1.21 2000-03-08 22:59:46 bcr Exp $
  */
 
 
@@ -16,7 +16,7 @@
 
 /** @name DjVuMultiAPI.h
 
-    File #"DjVuMultiAPI.h"# contains the API for assembling multi page
+    @memo #"DjVuMultiAPI.h"# contains the API for assembling multi page
     DjVu documents, from single page, and other multi page documents.
     This API does not contain any functions for encoding, rendering, or
     decoding.
@@ -26,7 +26,11 @@
 
 /* 
  * $Log: DjVuMultiAPI.h,v $
- * Revision 1.20  2000-03-05 18:13:37  bcr
+ * Revision 1.21  2000-03-08 22:59:46  bcr
+ * Updated the documentation.  I'm using Leon's libdjvu++ documentation
+ * as a template.
+ *
+ * Revision 1.20  2000/03/05 18:13:37  bcr
  * More comment changes.
  *
  * Revision 1.19  2000/03/05 06:29:17  bcr

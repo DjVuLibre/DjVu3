@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuPhotoAPI.h,v 1.15 2000-03-07 00:01:17 bcr Exp $
+ *C- $Id: DjVuPhotoAPI.h,v 1.16 2000-03-08 22:59:46 bcr Exp $
  */
 
 #ifndef _DJVUPHOTO_H_
@@ -17,16 +17,22 @@
 
 /** @name DjVuPhotoAPI.h
 
-   #DjVuPhotoAPI.h# defines the API for wavelette encoding multi page photos.
-   Most of the structures defined here are also used for the background
-   when document encoding.
+   @memo #DjVuPhotoAPI.h# defines the API for wavelette encoding multi page
+   photos.  Most of the structures defined here are also used for the
+   background when document encoding.
    @author
    Bill C Riemers <bcr@att.com>
 */
 
+/*@{*/
+
 /*
  * $Log: DjVuPhotoAPI.h,v $
- * Revision 1.15  2000-03-07 00:01:17  bcr
+ * Revision 1.16  2000-03-08 22:59:46  bcr
+ * Updated the documentation.  I'm using Leon's libdjvu++ documentation
+ * as a template.
+ *
+ * Revision 1.15  2000/03/07 00:01:17  bcr
  * Updated the document api documentation to build correctly.
  *
  * Revision 1.14  2000/03/05 18:13:37  bcr
@@ -35,8 +41,6 @@
  */
 
 /* Predeclarations. */
-
-/*@{*/
 
 /** ++ #phototodjvu_type# is used to decide how aggressively to compress
   the chrominance information when wavelette encoding.  Possible values
@@ -235,8 +239,6 @@ void phototodjvu_usage(int fd,const char *prog);
 
 /*@}*/ 
 
-/*@}*/ 
-
 #ifdef __cplusplus
 #ifndef __cplusplus
 {
@@ -252,6 +254,8 @@ inline phototodjvu_options_struct::phototodjvu_options_struct() :
   process(), transform(), iw44() {}
 
 #endif
+
+/*@}*/ 
 
 #endif /* _DJVUPHOTO_H_ */
 

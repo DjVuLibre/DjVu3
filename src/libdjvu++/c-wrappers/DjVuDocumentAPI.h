@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuDocumentAPI.h,v 1.26 2000-03-07 20:46:21 praveen Exp $
+ *C- $Id: DjVuDocumentAPI.h,v 1.27 2000-03-08 22:59:46 bcr Exp $
  */
 
 #ifndef _DJVUDOCUMENT_H_
@@ -18,16 +18,20 @@
 
 /** @name DjVuDocumentAPI.h
 
-    #DjVuDocumentAPI.h# defines the API for encoding document files.  Document
-    files consist of both a foreground layer with text and a background layer
-    with images.
+    @memo #DjVuDocumentAPI.h# defines the API for encoding document files.
+    Document files consist of both a foreground layer with text and a
+    background layer with images.
     @author
     Bill C Riemers <bcr@att.com>
 */
 
 /*
  * $Log: DjVuDocumentAPI.h,v $
- * Revision 1.26  2000-03-07 20:46:21  praveen
+ * Revision 1.27  2000-03-08 22:59:46  bcr
+ * Updated the documentation.  I'm using Leon's libdjvu++ documentation
+ * as a template.
+ *
+ * Revision 1.26  2000/03/07 20:46:21  praveen
  * updated
  *
  * Revision 1.25  2000/03/07 00:01:16  bcr

@@ -7,13 +7,39 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuAPI.h,v 1.48 2000-03-08 15:36:23 bcr Exp $
+ *C- $Id: DjVuAPI.h,v 1.49 2000-03-08 22:59:46 bcr Exp $
  *
  * The main header file for the DjVu API
  */
 
 #ifndef _DJVUAPI_H_
 #define _DJVUAPI_H_
+
+/** @name DjVuAPI.h
+  
+   @memo #DjVuAPI.h# defines the functions needed to do in memory operations
+   with the \Ref{DjVuDecodeAPI.h}, \Ref{DjVuBitonalAPI.h}, \Ref{DjVuPhotoAPI.h},
+   and \Ref{DjVuDocumentAPI.h} API's. 
+  
+   The basic type defined here is called a 'dstream'.  A 'dstream' can be
+   either a \Ref{djvu_import} or \Ref{djvu_export} stream.  Normal usage
+   of the dstreams, is to pass a filename for input or output, and let the
+   stream handle all the relevant IO functions.  However, there are times
+   when direct memory access, or access to a device is required instead of
+   direct disk access is required.  In those cases, the API's should be 
+   initialized with dummy filenames, and then passed one of the 'dstreams'
+   created with the API functions in #DjVuAPI.h#.
+ */
+
+/*@{*/
+
+/*
+ * $Log: DjVuAPI.h,v $
+ * Revision 1.49  2000-03-08 22:59:46  bcr
+ * Updated the documentation.  I'm using Leon's libdjvu++ documentation
+ * as a template.
+ *
+ */
 
 #ifdef WIN32
 #include <stddef.h>
@@ -31,47 +57,9 @@
 #include "DjVuPhotoAPI.h"
 #include "DjVuDocumentAPI.h"
 
-/* @name DjVuAPI.h
- *
- * #DjVuAPI.h# defines the functions needed to do in memory operations with
- * the \Ref{DjVuDecodeAPI.h}, \Ref{DjVuBitonalAPI.h}, \Ref{DjVuPhotoAPI.h},
- * and \Ref{DjVuDocumentAPI.h} API's. 
- *
- * The basic type defined here is called a 'dstream'.  A 'dstream' can be
- * either a \Ref{djvu_import} or \Ref{djvu_export} stream.  Normal usage
- * of the dstreams, is to pass a filename for input or output, and let the
- * stream handle all the relevant IO functions.  However, there are times
- * when direct memory access, or access to a device is required instead of
- * direct disk access is required.  In those cases, the API's should be 
- * initialized with dummy filenames, and then passed one of the 'dstreams'
- * created with the API functions in #DjVuAPI.h#.
- */
-
-/* 
- * $Log: DjVuAPI.h,v $
- * Revision 1.48  2000-03-08 15:36:23  bcr
- * Updated the documentation.
- *
- * Revision 1.47  2000/02/29 07:04:48  bcr
- * Added in an "optimization" that decreases the amount of preprocess time.
- * Fixed a bug in PnmStream rotated output.
- *
- * Revision 1.46  2000/02/29 03:39:07  bcr
- * Added a 'Strict' option to the Native() method.  Then this option is false we
- * don't require color and gray to be bottom-up.
- *
- * Revision 1.45  2000/02/28 04:07:57  bcr
- * Added missing functions.
- *
- * Revision 1.44  2000/02/26 18:53:20  bcr
- * Changes to the DOC++ comments.
- *
- */
-
-/*@{*/
-
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #ifndef __cplusplus
 };
 #endif
@@ -331,7 +319,9 @@ DJVUAPI
    #djvu_dstream_is_eof# function will return non-zero if we have read
    the file.  If we haven't read the EOF, then you can use the 
    \Ref{djvu_dstream_skip_image} function to skip the page that can not
-   be read.
+   be read.  Since skip images does not actually read an image for many
+   import types, do not expect repeated use of the
+   \Ref{djvu_dstream_skip_image} function to set the EOF flag.
  */
 int
 djvu_dstream_is_eof(djvu_import io);

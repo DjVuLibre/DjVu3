@@ -98,8 +98,13 @@ while ( <> )
       }
     }else
     {
+      $line =~ s,<BODY BGCOLOR=".ffffff">,<BODY BGCOLOR=\#fefefe BACKGROUND=back.jpg>,i;
       $line =~ s,^<body>,<BODY BGCOLOR=\#fefefe BACKGROUND=back.jpg>,i;
     }
+  }else
+  {
+    $line =~ s,<BODY BGCOLOR=".ffffff">,<BODY BGCOLOR=\#fefefe BACKGROUND=back.jpg>,i;
+    $line =~ s,^<body>,<BODY BGCOLOR=\#fefefe BACKGROUND=back.jpg>,i;
   }
   print OUT $line;
   $last=$line;

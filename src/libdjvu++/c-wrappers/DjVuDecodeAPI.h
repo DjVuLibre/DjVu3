@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuDecodeAPI.h,v 1.24 2000-03-05 18:13:37 bcr Exp $
+ *C- $Id: DjVuDecodeAPI.h,v 1.25 2000-03-08 22:59:46 bcr Exp $
  */
 
 #ifndef _DJVUDECODE_H_
@@ -16,16 +16,22 @@
 
 /** @name DjVuDecodeAPI.h
     
-    #DjVuDecodeAPI.h# defines the API for decoding multi page documents.
+    @memo #DjVuDecodeAPI.h# defines the API for decoding multi page documents.
     The structures defined here are also used for some of the encoding
     functions.
     @author
     Bill C Riemers <bcr@att.com>
 */
 
+/*@{*/
+
 /*
  * $Log: DjVuDecodeAPI.h,v $
- * Revision 1.24  2000-03-05 18:13:37  bcr
+ * Revision 1.25  2000-03-08 22:59:46  bcr
+ * Updated the documentation.  I'm using Leon's libdjvu++ documentation
+ * as a template.
+ *
+ * Revision 1.24  2000/03/05 18:13:37  bcr
  * More comment changes.
  *
  */
@@ -33,7 +39,6 @@
 
 /* Predeclarations. */
 
-/*@{*/
 
 /** ++ #djvu_layer_type# is used define which layer should be decoded.
   Possible values consist of DJVU_ALL, DJVU_MASK, DJVU_FOREGROUND, and
@@ -228,12 +233,12 @@ class dummy
 #define DLLIMPORT __declspec(dllimport)
 #define DLLEXPORT __declspec(dllexport)
 #else
-#define DLLIMPORT /**/
-#define DLLEXPORT /**/
+#define DLLIMPORT /* */
+#define DLLEXPORT /* */
 #endif
 #else /* DJVU_STATIC_LIBRARY */
-#define DLLIMPORT /**/
-#define DLLEXPORT /**/
+#define DLLIMPORT /* */
+#define DLLEXPORT /* */
 #endif /* DJVU_STATIC_LIBRARY */
 #if 0
 };
@@ -329,8 +334,6 @@ void djvu_decode_usage(int fd,const char *prog);
 
 /*@}*/
 
-/*@}*/
-
 #ifdef __cplusplus
 #ifndef __cplusplus
 {
@@ -351,6 +354,8 @@ inline djvu_decode_options_struct::djvu_decode_options_struct() :
   process(), transform(), output_format(0), layer(DJVU_ALL) {}
 
 #endif /* __cplusplus */
+
+/*@}*/
 
 #endif /* _DJVUDECODE_H_ */
 
