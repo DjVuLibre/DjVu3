@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.h,v 1.6 1999-08-08 23:27:05 leonb Exp $
+//C- $Id: DataPool.h,v 1.7 1999-08-25 19:31:14 eaf Exp $
  
 #ifndef _DATAPOOL_H
 #define _DATAPOOL_H
@@ -22,6 +22,7 @@
 #include "GThreads.h"
 #include "GSmartPointer.h"
 #include "GContainer.h"
+#include "Arrays.h"
 
 /** @name DataPool.h
     Files #"DataPool.h"# and #"DataPool.cpp"# implement classes \Ref{DataPool}
@@ -29,47 +30,73 @@
 
     The main goal of class \Ref{DataPool} is to provide concurrent access
     to the same data from many threads with a possibility to add data
-    from another thread. It is especially important in the case of the
+    from yet another thread. It is especially important in the case of the
     Netscape plugin when data is not immediately available, but decoding
     should be started as soon as possible. In this situation it is vital
     to provide transparent access to the data from many threads possibly
     blocking readers that try to access information that has not been
     received yet.
 
+    When the data is local though, it can be accessed directly using
+    standard IO mechanism. To provide a uniform interface for decoding
+    routines, \Ref{DataPool} supports file mode as well.
+
     @memo Thread safe data storage
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DataPool.h,v 1.6 1999-08-08 23:27:05 leonb Exp $#
+    @version #$Id: DataPool.h,v 1.7 1999-08-25 19:31:14 eaf Exp $#
 */
 
 //@{
 
-/** Thread safe data file.  
-    Each #DataPool# object accepts data from outside (see \Ref{add_data}())
-    and stores it inside for immediate access (see \Ref{get_data}()) from
-    other threads.
+/** Thread safe data storage.
+    The purpose of #DataPool# is to provide a uniform interface for
+    accessing data from decoding routines. It was designed to work in
+    two very different environments:
+    \begin{enumerate}
+       \item {\bf In the plugin}, where data is not available at once
+             and is added gradually by Netscape.
+       \item {\bf In standalone applications}, where data is stored inside
+             a file on the hard disk, and there is no reason to read
+	     it into memory completely.
+    \end{enumerate}
 
-    This class is derived from \Ref{MemoryByteStream}, which allows it to
-    handle underlying data storage efficiently, and it's also
-    thread-protected.  It means, that more than one thread can attempt to
-    request data from it at the same time.
+    Depending on the environment, the #DataPool# can be initialized in two
+    ways
+    \begin{enumerate}
+       \item {\bf Using default constructor}. In this case you should add data
+             manually using \Ref{add_data}(). #DataPool# will allow any thread
+	     to access any portion of the data (even portions, which have not
+	     been loaded yet) blocking readers if necessary (if requested
+	     data is not there yet). To indicate, that no more data is planned
+	     to be appended, use \Ref{set_eof}().
 
-    The interface of \Ref{get_data}() function allows to request data from
-    any portion of the #DataPool#. In case if there is still not enough data
-    in the #DataPool#, the reader will be {\em blocked} until at least some
-    of desired data is available.
-    
-    This class is ideal for decoding multipage DjVu files in Netscape when
-    you want to start decoding as soon as you can not waiting for the arrival
-    of the whole file. In this case you may have many decoding threads running
-    at the same time and reading/waiting for data from different portions of
-    the #DataPool# and the main thread getting data from the Netscape and
-    adding it to the #DataPool#.
+	     This mode is ideal for decoding multipage DjVu files in Netscape
+	     when you want to start decoding as soon as you can, not waiting
+	     for the arrival of the whole file. In this case you may have many
+	     decoding threads running at the same time and reading/waiting for
+	     data from different portions of the #DataPool# and the main
+	     thread getting data from the Netscape and adding it to the
+	     #DataPool#.
+
+	     #DataPool# is derived from \Ref{MemoryByteStream}, which allows
+	     it to handle underlying data storage efficiently.
+	     
+       \item {\bf By passing it a file name}. In this case the #DataPool#
+             will be reading data from the file itself. Its operation becomes
+	     trivial: requests for data are carried out immediately by
+	     accessing the proper portions of the file. Some functions
+	     (such as \Ref{add_data}(), \Ref{set_eof}(), \Ref{is_eof}())
+	     become irrelevant and should not be called. This mode has
+	     been provided to allow decoders access data using the
+	     same programming interface regardless of the data source.
+    \end{enumerate}
 
     The #DataPool# also provides a set of callbacks or {\em triggers} called
     when a given amount of data has been received. It's a useful feature
     when you don't want to block waiting for data in a \Ref{get_data}()
     request, but still want to be informed when a non-block read can be
-    possible.  */
+    made. For file-based operation, the triggers will be called immediately.
+*/
 
 class DataPool : public GPEnabled, protected MemoryByteStream
 {
@@ -81,11 +108,11 @@ private:
       void	* reader_id;
       int	offset;
       int	size;
-      int	stop_flag;
-      Reader(void) : reader_id(0), offset(0), size(-1), stop_flag(0) {};
+      bool	stop_flag;
+      Reader(void) : reader_id(0), offset(0), size(-1), stop_flag(false) {};
       Reader(void * reader_id_in, int offset_in=0, int size_in=-1) :
 	    reader_id(reader_id_in), offset(offset_in),
-	    size(size_in), stop_flag(0) {};
+	    size(size_in), stop_flag(false) {};
       virtual ~Reader(void) {};
    };
    class Trigger : public GPEnabled
@@ -101,13 +128,16 @@ private:
       virtual ~Trigger(void) {};
    };
 
-   int		eof_flag;
-   int		stop_flag;
+   bool		eof_flag;
+   bool		stop_flag;
 
    GPList<Reader>	readers_list;
    GPList<Trigger>	triggers_list;
 
    GCriticalSection	data_lock, readers_lock, triggers_lock;
+
+   StdioByteStream	* stream;
+   GCriticalSection	stream_lock;
    
    void		wait_for_data(const GP<Reader> & reader);
    void		int_add_data(void * buffer, int size);
@@ -120,6 +150,9 @@ public:
 	  {\bf Note:} After all the data has been added, it's necessary
 	  to call \Ref{set_eof}() to tell the #DataPool# that nothing else
 	  is expected.
+
+	  {\bf Note:} This function may not be called if the #DataPool#
+	  has been initialized with a file name.
 
 	  @param buffer data to append
 	  @param size length of the {\em buffer}
@@ -147,19 +180,30 @@ public:
    int		get_data(void * buffer, int offset, int size, void * reader_id);
    
       /** Tells the #DataPool# that no more data will be added by means
-	  of \Ref{add_data}() function */
+	  of \Ref{add_data}() function.
+
+	  {\bf Note:} This function may not be called when the #DataPool#
+	  has been initialized with a file name. */
    void		set_eof(void);
 
-      /// Returns 1 if no more data is planned to be added
+      /* Returns 1 if no more data is planned to be added.
+
+	 {\bf Note:} This function always returns #TRUE# when the #DataPool#
+	  has been initialized with a file name. */
    bool		is_eof(void) const;
 
-      /** Returns the size of stored data. */
+      /** Returns the size of stored data or the size of the file, if the
+	  #DataPool# has been initialized with a file name. */
    long		get_size(void) const;
 
       /** Adds a so-called {\em trigger callback} to be called when
 	  a given amount of data has been added. Since reading unavailable
 	  data may result in a thread block, which may be bad, this
 	  appears to be a convenient way to signal availability of data.
+
+	  {\bf Note:} If the #DataPool# has been initialized with a file
+	  name and the #thresh# is within the file's range, the trigger
+	  callbacl will be called immediately.
 
 	  @param thresh There should be at least {\em thresh}-1 bytes of
 	         data for the callback to be executed. If {\em thresh} is
@@ -188,32 +232,24 @@ public:
       */
    void		stop_reader(void * reader_id);
 
-      /// The default constructor
+      /// The default constructor. Use it for the plugin-oriented mode
    DataPool(void);
+
+      /** By calling this constructor you initialize the #DataPool# in
+	  file-oriented mode, when it's receiving all data from the
+	  given file. The data is never copied to the memory in full.
+	  #DataPool# just passes \Ref{get_data}() requests to the file
+	  system. This feature convenient because the programming interface
+	  remains the same for both WEB and FILE data sources. */
+   DataPool(const char * file_name);
 
    virtual ~DataPool(void);
 };
-
-inline
-DataPool::DataPool(void) : eof_flag(0), stop_flag(0)
-{
-}
-
-inline
-DataPool::~DataPool(void)
-{
-}
 
 inline bool
 DataPool::is_eof(void) const
 {
    return eof_flag;
-}
-
-inline long
-DataPool::get_size(void) const
-{
-   return size();
 }
 
 /** #DataRange# - convenient way for accessing data in \Ref{DataPool}.
@@ -289,6 +325,9 @@ public:
 	  @exception STOP The stream has been stopped
       */
    int			get_data(void * buffer, int offset, int size);
+
+      /// Returns all data inside the #DataRange# in the form of \Ref{TArray}.
+   TArray<char>		get_data(void);
 
       /** When the data that has been requested by a thread is not available
 	  in the \Ref{DataPool}, the thread is blocked. By calling this

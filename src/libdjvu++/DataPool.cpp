@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.cpp,v 1.4 1999-08-18 19:06:31 eaf Exp $
+//C- $Id: DataPool.cpp,v 1.5 1999-08-25 19:31:14 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -24,12 +24,40 @@
 //******************************* DataPool ***********************************
 //****************************************************************************
 
+DataPool::DataPool(void) : eof_flag(false), stop_flag(false), stream(0)
+{
+}
+
+DataPool::DataPool(const char * file_name) :
+      eof_flag(true), stop_flag(false)
+{
+   stream=new StdioByteStream(file_name, "rb");
+}
+
+DataPool::~DataPool(void)
+{
+   delete stream; stream=0;
+}
+
+long
+DataPool::get_size(void) const
+{
+   if (stream)
+   {
+      GCriticalSectionLock lock((GCriticalSection *) &stream_lock);
+      stream->seek(0, SEEK_END);
+      return stream->tell();
+   } else return size();
+}
+
 void
 DataPool::add_data(void * buffer, int buffer_size)
 {
    DEBUG_MSG("DataPool::add_data(): adding " << buffer_size << " bytes of data...\n");
    DEBUG_MAKE_INDENT(3);
 
+   if (stream) THROW("Function DataPool::add_data() may not be called in file-oriented mode.");
+   
       // First - add data to the underlying stream
    {
       GCriticalSectionLock dlock(&data_lock);
@@ -65,7 +93,7 @@ DataPool::add_data(void * buffer, int buffer_size)
 	    ++pos;
 	    triggers_list.del(this_pos);
 	 } else ++pos;
-      };
+      }
    }
 }
 
@@ -73,6 +101,14 @@ int
 DataPool::get_data(void * buffer, int offset, int sz, void * reader_id)
 {
    if (stop_flag) THROW("STOP");
+
+   if (stream)
+      if (offset<get_size())
+      {
+	 GCriticalSectionLock lock(&stream_lock);
+	 stream->seek(offset, SEEK_SET);
+	 return stream->readall(buffer, sz);
+      } else return 0;
 
    {
 	 // Check the cache: may the data is partially there...
@@ -82,7 +118,7 @@ DataPool::get_data(void * buffer, int offset, int sz, void * reader_id)
 	 if (size()-offset<sz) sz=size()-offset;
 	 seek(offset, SEEK_SET);
 	 return readall(buffer, sz);
-      };
+      }
    }
       // No useful data in the underlying byte stream
 
@@ -142,12 +178,12 @@ DataPool::wait_for_data(const GP<Reader> & reader)
       {
 	 GCriticalSectionLock dlock(&data_lock);
 	 if (reader->offset<size()) return;
-      };
+      }
       if (eof_flag) return;
 
       DEBUG_MSG("calling event.wait()...\n");
       reader->event.wait();
-   };
+   }
 #endif
    
    DEBUG_MSG("Got some data to read\n");
@@ -156,8 +192,10 @@ DataPool::wait_for_data(const GP<Reader> & reader)
 void
 DataPool::set_eof(void)
 {
-   eof_flag=1;
+   eof_flag=true;
 
+   if (stream) return;
+   
       // Wake up everybody to let them rescan flags
    {
       GCriticalSectionLock lock(&readers_lock);
@@ -177,7 +215,7 @@ DataPool::set_eof(void)
 	    ++pos;
 	    triggers_list.del(this_pos);
 	 } else ++pos;
-      };
+      }
    }
 }
 
@@ -186,7 +224,9 @@ DataPool::stop_all_readers(void)
 {
    DEBUG_MSG("DataPool::stop_all_readers(): Stopping all readers\n");
    
-   stop_flag=1;
+   stop_flag=true;
+
+   if (stream) return;
 
       // Wake up everybody to let them rescan flags
    GCriticalSectionLock slock(&readers_lock);
@@ -199,6 +239,8 @@ DataPool::stop_reader(void * reader_id)
 {
    DEBUG_MSG("DataPool::stop_reader(): Stopping reader with ID=" << reader_id << "\n");
    DEBUG_MAKE_INDENT(3);
+
+   if (stream) return;
    
       // Find the reader object with given reader_id
    GCriticalSectionLock slock(&readers_lock);
@@ -208,10 +250,10 @@ DataPool::stop_reader(void * reader_id)
       if (str.reader_id==reader_id)
       {
 	 DEBUG_MSG("found one!\n");
-	 str.stop_flag=1;	// Set the flag
+	 str.stop_flag=true;	// Set the flag
 	 str.event.set();	// And wake the reader up
-      };
-   };
+      }
+   }
 }
 
 void
@@ -220,8 +262,8 @@ DataPool::add_trigger(int thresh, void (* callback)(void *), void * cl_data)
    if (callback)
    {
       GCriticalSectionLock lock(&triggers_lock);
-      if (thresh<0 && is_eof() || thresh>=0 && size()>thresh) callback(cl_data);
-      else if (is_eof() && thresh>=size()) THROW("Threshold is too big.");
+      if (thresh<0 && is_eof() || thresh>=0 && get_size()>thresh) callback(cl_data);
+      else if (is_eof() && thresh>=get_size()) THROW("Threshold is too big.");
       else triggers_list.append(new Trigger(thresh, callback, cl_data));
    }
 }
@@ -343,13 +385,13 @@ DataRange::init(void)
 }
 
 DataRange::DataRange(const GP<DataPool> & xpool, long xstart, long xlength) :
-      pool(xpool), start(xstart), length(xlength), stop_flag(0)
+      pool(xpool), start(xstart), length(xlength), stop_flag(false)
 {
    init();
 }
 
 DataRange::DataRange(const DataRange & r) : pool(r.pool),
-   start(r.start), length(r.length), stop_flag(0)
+   start(r.start), length(r.length), stop_flag(false)
 {
    init();
 }
@@ -380,16 +422,34 @@ DataRange::get_data(void * buffer, int offset, int size)
    {
       if (offset>length) THROW("Internal error: attempt to read outside of DataRange.");
       if (offset+size>length) size=length-offset;
-   };
+   }
 
    if (size==0) return 0;
    else return pool->get_data(buffer, start+offset, size, this);
 }
 
+TArray<char>
+DataRange::get_data(void)
+{
+   TArray<char> data;
+   char buffer[1024];
+   int length;
+   int offset=0;
+   while((length=get_data(buffer, offset, 1024)))
+   {
+      offset+=length;
+      int data_size=data.size();
+      data.resize(data_size+length-1);
+      memcpy((char *) data+data_size, buffer, length);
+   }
+
+   return data;
+}
+
 void
 DataRange::stop(void)
 {
-   stop_flag=1;
+   stop_flag=true;
    pool->stop_reader(this);
 }
 
