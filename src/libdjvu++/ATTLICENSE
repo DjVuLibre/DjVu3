@@ -124,7 +124,7 @@ in the AT&T Source Code Release.
   You have the right to obtain from the person or entity who furnished this
   software to you, for free and under license, a copy of the source code for
   the AT&T Software together with any patches and other source code used in
-  the build of this software.
+  this software.
 
   Unless you accept a license to use the AT&T Software, you shall not
   reverse compile, disassemble or otherwise reverse engineer this software to
@@ -154,8 +154,8 @@ fully paid-up license to:
   (c) Prepare and distribute Patches for the AT&T Source Code Release; 
 
   (d) Prepare a Derived Product solely by compiling Other Source Code Files,
-      if any, and the code resulting from operating a Patch on the AT&T Source
-      Code Release; and
+      if any, together with the code resulting from operating a Patch 
+      on the AT&T Source Code Release; and
 
   (e) Execute, use and distribute to others Derived Products.
 
@@ -164,7 +164,7 @@ claims, if any, and the terms and conditions of this Agreement, AT&T grants to
 YOU under AT&T Source Code Patent Rights a non- exclusive, fully paid-up
 license to:
 
-  (a) Make exact reproductions of the AT&T Capsule; 
+  (a) Make reproductions of the AT&T Capsule; 
 
   (b) Make, only from compiling the AT&T Source Code Release, and use the AT&T 
       Binaries;
@@ -199,7 +199,11 @@ otherwise, conferred.  By way of example only, no rights or licenses under any
 of AT&T's patents are granted or, by implication, estoppel or otherwise,
 conferred with respect to any portion of a Derived Product which is not
 Computer Code compiled from some portion, without Change, of the AT&T Source
-Code Release.
+Code Release.  By way of further example, the license granted in Section 3.2
+shall not be construed to include the right to combine the AT&T Source Code
+Release or the AT&T Binaries with any hardware or other software or use any of
+such combinations, except that, the AT&T Binaries may be run by YOU on a
+computer.
 
 
 ARTICLE 4.0 -  YOUR DISTRIBUTION OBLIGATIONS
@@ -220,7 +224,8 @@ opinion, conflict with YOUR obligations under, or the intent of, this
 Agreement.  The written agreement may be in electronic form.
 
 4.3. If YOU prepare a Derived Product that YOU distribute to a third party, or
-use to provide a service or for YOUR own purposes, YOU shall:
+use to provide a service or for YOUR own purposes, or YOU distribute any
+Derived Product Build Materials for a Derived Product, YOU shall:
 
   (a) Contact AT&T as may be provided on the AT&T Website or in a text file
       included with the AT&T Source Code Release and describe for AT&T such
@@ -256,10 +261,10 @@ shall include as a provision, the Proprietary Notice.
 
 4.5. YOU shall publicly release for free over the Internet the source code for
 that portion of any Extension Products which in any way uses or otherwise
-manipulates data from Derived Products.  Such release shall be pursuant to an
-agreement that, in AT&T's opinion, is consistent with this Agreement and the
-attached Appendix A, and YOU shall make all reasonable efforts to publicize
-such release.
+manipulates data to or from Derived Products.  Such release shall be pursuant
+to an agreement that, in AT&T's opinion, is consistent with this Agreement and
+the attached Appendix A, and YOU shall make all reasonable efforts to
+publicize such release.
 
 
 ARTICLE 5.0 -  YOUR GRANT OF RIGHTS TO AT&T IN MODIFICATIONS
@@ -270,7 +275,7 @@ paid-up, unrestricted, irrevocable license, along with the right to sublicense
 others, to (a) make, have made, use, offer to sell, sell and import any
 products, services or any combination of products or services, and (b)
 reproduce, distribute, prepare derivative works based on, perform and display
-YOUR Patches.
+YOUR Patches in any media whether now known or in the future developed.
 
 
 ARTICLE 6.0 -  AS IS CLAUSE / LIMITATION OF LIABILITY
@@ -294,8 +299,14 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGES, (a) ANY CLAIM ATTRIBUTABLE TO
 ERRORS, OMISSIONS, OR OTHER INACCURACIES IN THE AT&T SOURCE CODE RELEASE OR
 AT&T CAPSULE, OR (c) ANY CLAIM BY ANY THIRD PARTY.
 
+6.3.  BECAUSE SOME STATES DO NOT ALLOW THE EXCLUSION OR LIMITATION OF
+LIABILITY FOR CONSEQUENTIAL OR INCIDENTAL DAMAGES, THE ABOVE LIMITATIONS MAY
+NOT APPLY TO YOU.  IN THE EVENT THAT APPLICABLE LAW DOES NOT ALLOW THE
+COMPLETE EXCLUSION OR LIMITATION OF LIABILITY OF CLAIMS AND DAMAGES AS SET
+FORTH IN THIS AGREEMENT, AT&T'S LIABILITY IS LIMITED TO THE GREATEST EXTENT
+PERMITTED BY LAW.  
 
-ARTICLE 7.0 -  GENERAL
+ARTICLE 7.0 - GENERAL
 
 7.1. YOU shall not assert against AT&T or any of its affiliated companies any
 claim for infringement or misappropriation of any IPR or trademark rights in
@@ -315,7 +326,19 @@ such a claim, (c) any of YOUR representations or warranties in Article 1.0 are
 false or inaccurate, (d) YOU exceed the rights and license granted to YOU or
 (e) YOU fail to fully comply with any provision of this Agreement.
 
-7.4. Without limiting any of AT&T’s rights under this Agreement or at law or
+7.4. YOU acknowledge that the AT&T Source Code Release and AT&T Capsule are
+subject to U.S. export laws and regulations and that any use thereof must be
+authorized under those laws and regulations.  YOU hereby assures AT&T that YOU
+will not, directly or indirectly, "export" or "reexport" the AT&T Source Code
+Release or AT&T Capsule to any country, or national of any country, to which,
+or to whom, "export" or "reexport" is prohibited under U.S. export laws and
+regulations.  For purposes of this Section, "export" and "reexport" mean
+transferring or releasing to another country or to a national of another
+country (wherever that person is located) by any means, including physical,
+electronic, or otherwise.  YOU represent and warrant that YOU are not located
+in or a national of any such country.
+
+7.5. Without limiting any of AT&T's rights under this Agreement or at law or
 in equity, or otherwise expanding the scope of the license and rights granted
 hereunder, if YOU fail to perform any of YOUR obligations under this Agreement
 with respect to any of YOUR Patches or Derived Products, or if YOU do any act
@@ -326,7 +349,7 @@ Agreement.  In addition to all other relief available to it for any breach of
 YOUR obligations under this Agreement, AT&T shall be entitled to an injunction
 requiring YOU to perform such obligations.
 
-7.5. This Agreement shall be governed by and construed in accordance with the
+7.6. This Agreement shall be governed by and construed in accordance with the
 laws of the State of New York, USA, without regard to its conflicts of law
 rules. This Agreement shall be fairly interpreted in accordance with its terms
 and without any strict construction in favor of or against either AT&T or YOU.
@@ -471,6 +494,12 @@ OR ANY OF ITS AUTHORIZED REPRESENTATIVES HAS BEEN ADVISED OF THE POSSIBILITY
 OF SUCH DAMAGES, (a) ANY CLAIM ATTRIBUTABLE TO ERRORS, OMISSIONS, OR OTHER
 INACCURACIES IN THE AT&T SOFTWARE, OR (c) ANY CLAIM BY ANY THIRD PARTY.
 
+5.3.  BECAUSE SOME STATES DO NOT ALLOW THE EXCLUSION OR LIMITATION OF
+LIABILITY FOR CONSEQUENTIAL OR INCIDENTAL DAMAGES, THE ABOVE LIMITATIONS MAY
+NOT APPLY TO YOU.  IN THE EVENT THAT APPLICABLE LAW DOES NOT ALLOW THE
+COMPLETE EXCLUSION OR LIMITATION OF LIABILITY OF CLAIMS AND DAMAGES AS SET
+FORTH IN THIS AGREEMENT, AT&T'S LIABILITY IS LIMITED TO THE GREATEST EXTENT
+PERMITTED BY LAW.  
 
 ARTICLE 6.0 -  GENERAL
 
