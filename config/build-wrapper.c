@@ -111,7 +111,7 @@ copyfile(const char prefix[], const char libpath[],char *src,char *dest)
         buf[statbuf.st_size]=0;
         close(fd);
         changepath(prefix,libpath,buf,statbuf.st_size);
-        if((i == statbuf.st_size) && (fd=open(dest,O_WRONLY|O_CREAT,0x600)) >= 0)
+        if((i == statbuf.st_size) && (fd=open(dest,O_WRONLY|O_CREAT,0600)) >= 0)
         {
           for(i=0;i<statbuf.st_size;)
           {
