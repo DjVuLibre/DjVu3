@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.1.2.6 1999-05-03 19:21:23 eaf Exp $
+//C- $Id: DjVuFile.cpp,v 1.1.2.7 1999-05-03 21:38:28 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -695,9 +695,11 @@ DjVuFile::stop_decode(bool sync)
 void
 DjVuFile::process_incl_chunks(void)
 {
-   ByteStream * str=data_range->get_stream();
+   ByteStream * str=0;
 
    TRY {
+      str=data_range->get_stream();
+      
       int chksize;
       GString chkid;
       IFFByteStream iff(*str);
@@ -992,8 +994,9 @@ int
 DjVuFile::get_chunks_number(void)
 {
    int chunks=0;
-   ByteStream * str=data_range->get_stream();
+   ByteStream * str=0;
    TRY {
+      str=data_range->get_stream();
       int chksize;
       GString chkid;
       IFFByteStream iff(*str);
@@ -1016,8 +1019,9 @@ GString
 DjVuFile::get_chunk_name(int chunk_num)
 {
    GString name;
-   ByteStream * str=data_range->get_stream();
+   ByteStream * str=0;
    TRY {
+      str=data_range->get_stream();
       int chksize;
       GString chkid;
       IFFByteStream iff(*str);
@@ -1046,8 +1050,9 @@ DjVuFile::contains_chunk(const char * chunk_name)
    DEBUG_MAKE_INDENT(3);
    
    bool contains=0;
-   ByteStream * str=data_range->get_stream();
+   ByteStream * str=0;
    TRY {
+      str=data_range->get_stream();
       int chksize;
       GString chkid;
       IFFByteStream iff(*str);
@@ -1206,9 +1211,10 @@ DjVuFile::add_djvu_data(IFFByteStream & ostr, GMap<GURL, void *> & map,
    
    map[url]=0;
 
-   ByteStream * str=data_range->get_stream();
+   ByteStream * str=0;
 
    TRY {
+      str=data_range->get_stream();
       int chksize;
       GString chkid;
       IFFByteStream iff(*str);
