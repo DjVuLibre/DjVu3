@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuPort.cpp,v 1.17 1999-09-10 19:24:20 eaf Exp $
+//C- $Id: DjVuPort.cpp,v 1.18 1999-09-10 22:47:53 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -315,33 +315,22 @@ DjVuPortcaster::id_to_url(const DjVuPort * source, const char * id)
    compute_closure(source, list, true);
    GURL url;
    for(GPosition pos=list;pos;++pos)
-     {
-       url = list[pos]->id_to_url(source, id);
-       if (!url.is_empty()) break;
-     }
+   {
+      url=list[pos]->id_to_url(source, id);
+      if (!url.is_empty()) break;
+   }
    return url;
 }
 
 GPBase
-DjVuPortcaster::get_cached_file(const DjVuPort * source, const GURL & url)
+DjVuPortcaster::id_to_file(const DjVuPort * source, const char * id)
 {
-  // NOTE: We traverse the list from the end!
    GPList<DjVuPort> list;
    compute_closure(source, list, true);
    GPBase file;
    for(GPosition pos=list;pos;++pos)
-     if ((file = list[pos]->get_cached_file(source, url)).get())
-       break;
+      if ((file=list[pos]->id_to_file(source, id)).get()) break;
    return file;
-}
-
-void
-DjVuPortcaster::cache_djvu_file(const DjVuPort * source, class DjVuFile * file)
-{
-   GPList<DjVuPort> list;
-   compute_closure(source, list);
-   for(GPosition pos=list; pos; ++pos)
-     list[pos]->cache_djvu_file(source, file);
 }
 
 GP<DataPool>
@@ -442,10 +431,7 @@ GURL
 DjVuPort::id_to_url(const DjVuPort *, const char *) { return GURL(); }
 
 GPBase
-DjVuPort::get_cached_file(const DjVuPort *, const GURL &) { return 0; }
-
-void
-DjVuPort::cache_djvu_file(const DjVuPort *, class DjVuFile *) {}
+DjVuPort::id_to_file(const DjVuPort *, const char *) { return 0; }
 
 GP<DataPool>
 DjVuPort::request_data(const DjVuPort *, const GURL &) { return 0; }

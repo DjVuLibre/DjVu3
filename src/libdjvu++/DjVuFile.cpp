@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.42 1999-09-10 19:24:20 eaf Exp $
+//C- $Id: DjVuFile.cpp,v 1.43 1999-09-10 22:47:53 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -112,9 +112,6 @@ DjVuFile::init(ByteStream & str)
       // Add (basically - call) the trigger
    data_pool->add_trigger(-1, static_trigger_cb, this);
 
-      // Ask to cache the newly created file
-   get_portcaster()->cache_djvu_file(this, this);
-
       // Ready
    initialized = true;
 }
@@ -144,9 +141,6 @@ DjVuFile::init(const GURL & xurl, GP<DjVuPort> port)
    if (!(data_pool=pcaster->request_data(this, url)))
       THROW("Failed get data for URL '"+url+"'");
    data_pool->add_trigger(-1, static_trigger_cb, this);
-
-      // Ask to cache newly created file
-   get_portcaster()->cache_djvu_file(this, this);
 
       // Ready
    initialized = true;
@@ -304,10 +298,7 @@ DjVuFile::notify_file_flags_changed(const DjVuFile * src,
 {
    if (set_mask & (DECODE_OK | DECODE_FAILED | DECODE_STOPPED))
    {
-      if (src==this && is_decode_ok())
-	 get_portcaster()->cache_djvu_file(this, this);
-   
-      // Signal threads waiting for file termination
+	 // Signal threads waiting for file termination
       finish_mon.enter();
       finish_mon.broadcast();
       finish_mon.leave();
@@ -472,20 +463,10 @@ DjVuFile::process_incl_chunk(ByteStream & str)
 	 if (pos) return inc_files_list[pos];
       }
       
-	 // No. We have to create a new file
-      GP<DjVuFile> file;
-      TRY {
-	 GPBase tmpfile=pcaster->get_cached_file(this, incl_url);
-	 file = (DjVuFile *) tmpfile.get();
-	 if (!file) 
-           {
-             file = new DjVuFile;
-             file->init(incl_url, this);
-           }
-	 else pcaster->add_route(file, this);
-      } CATCH(exc) {
-	 THROW("Failed to include file '"+incl_url+"'");
-      } ENDCATCH;
+	 // No. We have to request a new file
+      GP<DjVuFile> file=(DjVuFile *) pcaster->id_to_file(this, incl_str).get();
+      if (!file) THROW("Internal error: id_to_file() didn't create any file.");
+      pcaster->add_route(file, this);
 
       GCriticalSectionLock lock(&inc_files_lock);
       inc_files_list.append(file);

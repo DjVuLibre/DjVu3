@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuPort.h,v 1.14 1999-09-10 19:24:20 eaf Exp $
+//C- $Id: DjVuPort.h,v 1.15 1999-09-10 22:47:53 eaf Exp $
  
 #ifndef _DJVUPORT_H
 #define _DJVUPORT_H
@@ -71,7 +71,7 @@
     @memo DjVu decoder communication mechanism.
     @author Andrei Erofeev <eaf@geocities.com>\\
             L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuPort.h,v 1.14 1999-09-10 19:24:20 eaf Exp $# */
+    @version #$Id: DjVuPort.h,v 1.15 1999-09-10 22:47:53 eaf Exp $# */
 //@{
 
 class DjVuPort;
@@ -132,18 +132,12 @@ public:
 	  worry about the translation */
    virtual GURL		id_to_url(const DjVuPort * source, const char * id);
 
-      /** This request is issued to obtain a cached copy of a \Ref{DjVuFile}.
-	  This request is issued by \Ref{DjVuFile} and \Ref{DjVuDocument}
-	  when they want to create a new instance of \Ref{DjVuFile}. Normally
-	  \Ref{DjVuDocument} handles all these requests itself.
-	  If a port can not fulfil the request, it should return #0#. */
-   virtual GPBase	get_cached_file(const DjVuPort * source, const GURL & url);
+      /** This request is used to get a file corresponding to the
+	  given ID. \Ref{DjVuDocument} is supposed to intercept it
+	  and either create a new instance of \Ref{DjVuFile} or reuse
+	  an existing one from the cache. */
+   virtual GPBase	id_to_file(const DjVuPort * source, const char * id);
 
-      /** This request is issued to add a given file to cache. It is called by
-	  \Ref{DjVuFile} at least in two cases: after the file has just been
-	  constructed and after it has been decoded. */
-   virtual void		cache_djvu_file(const DjVuPort * source, class DjVuFile * file);
-	  
       /** This request is issued when decoder needs additional data
 	  for decoding.  Both \Ref{DjVuFile} and \Ref{DjVuDocument} are
 	  initialized with a URL, not the document data.  As soon as
@@ -356,13 +350,9 @@ public:
    virtual GURL		id_to_url(const DjVuPort * source, const char * id);
       /** Computes destination list for #source# and calls the corresponding
 	  function in each of the ports from the destination list starting from
-	  the closest until one of then returns non #ZERO# pointer
-	  to \Ref{DjVuFile}. */
-   virtual GPBase	get_cached_file(const DjVuPort * source, const GURL & url);
-      /** Computes destination list for #source# and calls the corresponding
-	  function in each of the ports from the destination list starting from
-	  the closest until one. */
-   virtual void		cache_djvu_file(const DjVuPort * source, class DjVuFile * file);
+	  the closest until one of them returns non-zero pointer to
+	  \Ref{DjVuFile}. */
+   virtual GPBase	id_to_file(const DjVuPort * source, const char * id);
       /** Computes destination list for #source# and calls the corresponding
 	  function in each of the ports from the destination list starting from
 	  the closest until one of them returns non-zero \Ref{DataPool}. */
