@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocEditor.h,v 1.15 1999-12-17 16:39:37 eaf Exp $
+//C- $Id: DjVuDocEditor.h,v 1.16 2000-01-13 21:56:27 eaf Exp $
  
 #ifndef _DJVUDOCEDITOR_H
 #define _DJVUDOCEDITOR_H
@@ -21,60 +21,95 @@
 #include "DjVuDocument.h"
 
 /** @name DjVuDocEditor.h
-    Files #"DjVuDocument.h"# and #"DjVuDocument.cpp"# contain implementation
-    of the \Ref{DjVuDocument} class - the ideal tool for opening, decoding
-    and saving DjVu single page and multi page documents.
+    Files #"DjVuDocEditor.h"# and #"DjVuDocEditor.cpp"# contain extension
+    of \Ref{DjVuDocument} class, which can create and modify existing
+    DjVu document, generate thumbnails, etc. It does {\bf not} do
+    compression though.
 
-    @memo DjVu document class.
-    @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocEditor.h,v 1.15 1999-12-17 16:39:37 eaf Exp $#
+    @memo DjVu document editor class.
+    @author Andrei Erofeev <eaf@geocities.com>
+    @version #$Id: DjVuDocEditor.h,v 1.16 2000-01-13 21:56:27 eaf Exp $#
 */
 
 //@{
 
-/** #DjVuDocument# provides convenient interface for opening, decoding
-    and saving back DjVu documents of any format.
+/** #DjVuDocEditor# is an extension of \Ref{DjVuDocument} class with
+    additional capabilities for editing the document contents.
 
-    {\bf Conversion.} Since #DjVuDocument# can open and save DjVu documents
-    in any of two supported formats (all-in-one-file documents and
-    each-page-in-separate-file documents), it can be used to do conversion
-    between these two formats.
-
-    {\bf Decoding.} #DjVuDocument# provides convenient interface for obtaining
-    \Ref{DjVuImage} corresponding to any page of the document. It uses
-    \Ref{GCache} to do caching thus avoiding unnecessary multiple decoding of
-    the same page. The real decoding though is accomplished by \Ref{DjVuFile}.
-
-    {\bf Modifying.} With #DjVuDocument# you can open an existing document
-    for editing. Editing functionality includes insertion and deletion of
-    pages (\Ref{DjVuFile}s). Using capabilities provided by \Ref{DjVuFile}
-    it's possible to create DjVu documents of any desired structure: with
-    deep inclusion, shared dictionaries, annotations, etc.
-
-    {\bf Messenging.} Being derived from \Ref{DjVuPort}, #DjVuDocument#
-    takes active part in exchanging messages (requests and notifications)
-    between different parties involved in decoding. It reports (relays)
-    errors, progress information, handles some requests for data (when
-    these requests deal with local files. */
+    It can be used to:
+    \begin{enumerate}
+       \item Create (compose) new multipage DjVu documents using single
+             page DjVu documents. The class does {\bf not} do compression.
+       \item Insert and remove different pages od multipage DjVu documents.
+       \item Change attributes ({\em names}, {\em IDs} and {\em titles})
+             of files composing the DjVu document.
+       \item Generate thumbnail images and integrate them into the document.
+    \end{enumerate}
+*/
     
 class DjVuDocEditor : public DjVuDocument
 {
 public:
    static int	thumbnails_per_file;
-   
+
+      /// Default constructor
    DjVuDocEditor(void);
 
+      /** Initialization function. Initializes an empty document.
+
+	  {\bf Note}: You must call either of the two
+	  available \Ref{init}() function before you start doing
+	  anything else with the #DjVuDocEditor#. */
    void		init(void);
+
+      /** Initialization function. Opens document with name #fname#.
+
+	  {\bf Note}: You must call either of the two
+	  available \Ref{init}() function before you start doing
+	  anything else with the #DjVuDocEditor#. */
    void		init(const char * fname);
-   
+
+      /// Destructor
    virtual ~DjVuDocEditor(void);
 
+      /** Returns type of open document. #DjVuDocEditor# silently
+	  converts any open DjVu document to #BUNDLED# format (see
+	  \Ref{DjVuDocument}. Thus, \Ref{DjVuDocument::get_doc_type}()
+	  will always be returning #BUNDLED#. Use this function to
+	  learn the original format of the document being edited. */
    int		get_orig_doc_type(void) const;
+
+      /** Returns #TRUE# if the document can be "saved" (sometimes
+	  the only possibility is to do a "save as"). The reason why
+	  we have this function is that #DjVuDocEditor# can save
+	  documents in new formats only (#BUNDLED# and #INDIRECT#).
+	  At the same time it recognizes all DjVu formats (#OLD_BUNDLED#,
+	  #OLD_INDEXED#, #BUNDLED#, and #INDIRECT#).
+
+	  #OLD_BUNDLED# and #BUNDLED# documents occupy only one file,
+	  so in this case "saving" involves the automatic conversion
+	  to #BUNDLED# format and storing data into the same file.
+
+	  #OLD_INDEXED# documents, on the other hand, occupy more
+	  than one file. They could be converted to #INDIRECT# format
+	  if these two formats had the same set of files. Unfortunately,
+	  these formats are too different, and the best thing to do
+	  is to use "save as" capability. */
    bool		can_be_saved(void) const;
+
+      /** Returns type of the document, which can be created by
+	  \Ref{save}() function. Can be #INDIRECT#, #BUNDLED#,
+	  #SINGLE_PAGE#, or #UNKNOWN_TYPE#. The latter indicates,
+	  that \Ref{save}() will fail, and that \Ref{save_as}()
+	  should be used instead */
    int		get_save_doc_type(void) const;
 
+      /** Saves the document. May generate exception if the document
+	  can not be saved, and \Ref{save_as}() should be used.
+	  See \Ref{can_be_saved}() for details. */
    void		save(void);
-   
+
+      /** Saves the document. */
    virtual void	save_as(const char * where, bool bundled);
 
       /** Translates page number #page_num# to ID. If #page_num# is invalid,
