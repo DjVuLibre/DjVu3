@@ -5,7 +5,7 @@
 </HEAD>
 <BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
 
-<H2>class  <A HREF="#DOC.DOCU">DjVuNavDir</A>: public <!1><A HREF="GPEnabled.html#DOC.1.5.4.1.2">GPEnabled</A></H2>
+<H2>class  <A HREF="#DOC.DOCU">DjVuNavDir</A>: public <!1><A HREF="GPEnabled.html#DOC.1.4.4.1.2">GPEnabled</A></H2>
 <BLOCKQUOTE>DjVu Navigation Directory.</BLOCKQUOTE>
 <HR>
 
@@ -22,37 +22,37 @@
 <DL>
 <P><DL>
 <DT><H3>Public Methods</H3><DD><DT>
-<A HREF="#DOC.1.5.36.2.1.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>DjVuNavDir</B>(const char * dir_url)
+<A HREF="#DOC.1.4.36.2.1.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>DjVuNavDir</B>(const char * dir_url)
 <DD><I>Constructs <TT>DjVuNavDir</TT> object.</I>
 <DT>
-<A HREF="#DOC.1.5.36.2.1.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>DjVuNavDir</B>(<!1><A HREF="ByteStream.html">ByteStream</A> &amp; str, const char * dir_url)
+<A HREF="#DOC.1.4.36.2.1.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>DjVuNavDir</B>(<!1><A HREF="ByteStream.html">ByteStream</A> &amp; str, const char * dir_url)
 <DD><I>Constructs <TT>DjVuNavDir</TT> object by decoding its contents from the stream.</I>
 <DT>
-<A HREF="#DOC.1.5.36.2.1.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>decode</B>(<!1><A HREF="ByteStream.html">ByteStream</A> &amp; str)
+<A HREF="#DOC.1.4.36.2.1.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>decode</B>(<!1><A HREF="ByteStream.html">ByteStream</A> &amp; str)
 <DD><I>Decodes the directory contents from the given <!1><A HREF="ByteStream.html">ByteStream</A></I>
 <DT>
-<A HREF="#DOC.1.5.36.2.1.9"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>encode</B>(<!1><A HREF="ByteStream.html">ByteStream</A> &amp; str)
+<A HREF="#DOC.1.4.36.2.1.9"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>encode</B>(<!1><A HREF="ByteStream.html">ByteStream</A> &amp; str)
 <DD><I>Encodes the directory contents into the given <!1><A HREF="ByteStream.html">ByteStream</A></I>
 <DT>
-<A HREF="#DOC.1.5.36.2.1.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>insert_page</B>(int where, const char * name)
+<A HREF="#DOC.1.4.36.2.1.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>insert_page</B>(int where, const char * name)
 <DD><I>Inserts a new page at position <TT>where</TT> pointing to a file with name <TT>name</TT>.</I>
 <DT>
-<A HREF="#DOC.1.5.36.2.1.10"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>delete_page</B>(int page_num)
+<A HREF="#DOC.1.4.36.2.1.10"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>delete_page</B>(int page_num)
 <DD><I>Deletes page with number <TT>page_num</TT> from the directory.</I>
 <DT>
-<A HREF="#DOC.1.5.36.2.1.11"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_pages_num</B>(void) const 
+<A HREF="#DOC.1.4.36.2.1.11"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_pages_num</B>(void) const 
 <DD><I>Returns the number of pages in the directory.</I>
 <DT>
-<A HREF="#DOC.1.5.36.2.1.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>url_to_page</B>(const <!1><A HREF="GURL.html">GURL</A> &amp; url) const 
+<A HREF="#DOC.1.4.36.2.1.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>url_to_page</B>(const <!1><A HREF="GURL.html">GURL</A> &amp; url) const 
 <DD><I>Converts the <TT>url</TT> to page number.</I>
 <DT>
-<A HREF="#DOC.1.5.36.2.1.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>name_to_page</B>(const char * name) const 
+<A HREF="#DOC.1.4.36.2.1.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>name_to_page</B>(const char * name) const 
 <DD><I>Converts file name <TT>name</TT> to page number.</I>
 <DT>
-<A HREF="#DOC.1.5.36.2.1.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GURL.html">GURL</A> <B>page_to_url</B>(int page) const 
+<A HREF="#DOC.1.4.36.2.1.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GURL.html">GURL</A> <B>page_to_url</B>(int page) const 
 <DD><I>Converts given <TT>page</TT> to URL.</I>
 <DT>
-<A HREF="#DOC.1.5.36.2.1.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GString.html">GString</A> <B>page_to_name</B>(int page) const 
+<A HREF="#DOC.1.4.36.2.1.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GString.html">GString</A> <B>page_to_name</B>(int page) const 
 <DD><I>Converts given <TT>page</TT> to URL.</I>
 </DL></P>
 
@@ -61,7 +61,7 @@
 <DL>
 <P><DL>
 <DT><H3>Public Methods</H3><DD><DT>
-<IMG ALT="o" SRC=icon2.gif><!1><A HREF="GPEnabled.html#DOC.1.5.4.1.2">GPEnabled</A>&amp; <B>operator=</B>(const <!1><A HREF="GPEnabled.html#DOC.1.5.4.1.2">GPEnabled</A> &amp; obj)
+<IMG ALT="o" SRC=icon2.gif><!1><A HREF="GPEnabled.html#DOC.1.4.4.1.2">GPEnabled</A>&amp; <B>operator=</B>(const <!1><A HREF="GPEnabled.html#DOC.1.4.4.1.2">GPEnabled</A> &amp; obj)
 <DT>
 <IMG ALT="o" SRC=icon2.gif>int <B>get_count</B>(void) const 
 </DL></P>
@@ -82,7 +82,7 @@ of. We would like to emphasize, that this is the list of namely
 <B>pages</B>, not <B>files</B>. Any page may include any
 number of additional files. When you've got an all-in-one-file multipage
 DjVu document (DjVm archive) you may get the files list from <!1><A HREF="DjVmDir0.html">DjVmDir0</A>
-class.<P>The <!1><A HREF="DjVuNavDir.html#DOC.1.5.36.2.1.1">DjVuNavDir</A> class can decode and encode the navigation directory
+class.<P>The <!1><A HREF="DjVuNavDir.html#DOC.1.4.36.2.1.1">DjVuNavDir</A> class can decode and encode the navigation directory
 from <B>NDIR</B> IFF chunk. It's normally created by the library during
 decoding procedure and can be accessed like any other component of
 the <!1><A HREF="DjVuImage.html">DjVuImage</A> being decoded.<P>In a typical multipage DjVu document the navigation directory is stored
@@ -92,32 +92,32 @@ every page of the document to enable the navigation. </BLOCKQUOTE>
 <DL>
 
 <A NAME="DjVuNavDir">
-<A NAME="DOC.1.5.36.2.1.1">
+<A NAME="DOC.1.4.36.2.1.1">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> DjVuNavDir(const char * dir_url)</B></TT>
 <DD>Constructs <TT>DjVuNavDir</TT> object. <TT>dir_url</TT> is the URL of the file
 containing the directory source data. It will be used later
-in translation by functions like <!1><A HREF="DjVuNavDir.html#DOC.1.5.36.2.1.4">url_to_page</A>() and
-<!1><A HREF="DjVuNavDir.html#DOC.1.5.36.2.1.6">page_to_url</A>() 
+in translation by functions like <!1><A HREF="DjVuNavDir.html#DOC.1.4.36.2.1.4">url_to_page</A>() and
+<!1><A HREF="DjVuNavDir.html#DOC.1.4.36.2.1.6">page_to_url</A>() 
 <DL><DT><DD></DL><P>
 <A NAME="DjVuNavDir">
-<A NAME="DOC.1.5.36.2.1.2">
+<A NAME="DOC.1.4.36.2.1.2">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> DjVuNavDir(<!1><A HREF="ByteStream.html">ByteStream</A> &amp; str, const char * dir_url)</B></TT>
 <DD>Constructs <TT>DjVuNavDir</TT> object by decoding its contents from
 the stream. <TT>dir_url</TT> is the URL of the file containing the
 directory source data. 
 <DL><DT><DD></DL><P>
 <A NAME="decode">
-<A NAME="DOC.1.5.36.2.1.8">
+<A NAME="DOC.1.4.36.2.1.8">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void decode(<!1><A HREF="ByteStream.html">ByteStream</A> &amp; str)</B></TT>
 <DD>Decodes the directory contents from the given <!1><A HREF="ByteStream.html">ByteStream</A>
 <DL><DT><DD></DL><P>
 <A NAME="encode">
-<A NAME="DOC.1.5.36.2.1.9">
+<A NAME="DOC.1.4.36.2.1.9">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void encode(<!1><A HREF="ByteStream.html">ByteStream</A> &amp; str)</B></TT>
 <DD>Encodes the directory contents into the given <!1><A HREF="ByteStream.html">ByteStream</A>
 <DL><DT><DD></DL><P>
 <A NAME="insert_page">
-<A NAME="DOC.1.5.36.2.1.3">
+<A NAME="DOC.1.4.36.2.1.3">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void insert_page(int where, const char * name)</B></TT>
 <DD>Inserts a new page at position <TT>where</TT> pointing to a file
 with name <TT>name</TT>.<P>
@@ -127,35 +127,35 @@ with name <TT>name</TT>.<P>
 The name may not contain slashes. The file may include
 other files. <BR><DD></DL><P>
 <A NAME="delete_page">
-<A NAME="DOC.1.5.36.2.1.10">
+<A NAME="DOC.1.4.36.2.1.10">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void delete_page(int page_num)</B></TT>
 <DD>Deletes page with number <TT>page_num</TT> from the directory.
 <DL><DT><DD></DL><P>
 <A NAME="get_pages_num">
-<A NAME="DOC.1.5.36.2.1.11">
+<A NAME="DOC.1.4.36.2.1.11">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int get_pages_num(void) const </B></TT>
 <DD>Returns the number of pages in the directory.
 <DL><DT><DD></DL><P>
 <A NAME="url_to_page">
-<A NAME="DOC.1.5.36.2.1.4">
+<A NAME="DOC.1.4.36.2.1.4">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int url_to_page(const <!1><A HREF="GURL.html">GURL</A> &amp; url) const </B></TT>
 <DD>Converts the <TT>url</TT> to page number. Returns <TT>-1</TT> if the <TT>url</TT>
 does not correspond to anything in the directory. 
 <DL><DT><DD></DL><P>
 <A NAME="name_to_page">
-<A NAME="DOC.1.5.36.2.1.5">
+<A NAME="DOC.1.4.36.2.1.5">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int name_to_page(const char * name) const </B></TT>
 <DD>Converts file name <TT>name</TT> to page number. Returns <TT>-1</TT> if file
 with given name cannot be found. 
 <DL><DT><DD></DL><P>
 <A NAME="page_to_url">
-<A NAME="DOC.1.5.36.2.1.6">
+<A NAME="DOC.1.4.36.2.1.6">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GURL.html">GURL</A> page_to_url(int page) const </B></TT>
 <DD>Converts given <TT>page</TT> to URL. Throws an exception if page number
 is invalid. 
 <DL><DT><DD></DL><P>
 <A NAME="page_to_name">
-<A NAME="DOC.1.5.36.2.1.7">
+<A NAME="DOC.1.4.36.2.1.7">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GString.html">GString</A> page_to_name(int page) const </B></TT>
 <DD>Converts given <TT>page</TT> to URL. Throws an exception if page number
 is invalid. 
@@ -167,7 +167,7 @@ is invalid.
 <!-- This is were the DOC++ footer is defined  -->
 
 <font face="arial,helvetica" size="2">
-<a href=http://www.djvu.att.com>DjVu</a> is a trademark of AT&amp;T.  
+<a href=http://www.lizardtech.com>DjVu</a> is a trademark of LizardTech, Inc.  
 <br>All other products mentioned are registered trademarks or trademarks of
 their respective companies.
 </font>

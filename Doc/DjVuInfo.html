@@ -37,8 +37,8 @@
 <A HREF="#DOC.1.5.24.2.9"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>double <B>gamma</B>
 <DD><I>Gamma coefficient of the display for which the image was designed.</I>
 <DT>
-<A HREF="#DOC.1.5.24.2.10"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>unsigned char <B>reserved</B>
-<DD><I>Reserved byte.</I>
+<A HREF="#DOC.1.5.24.2.10"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>bool <B>compressable</B>
+<DD><I>The following boolian values are stored in the last character of the info structure.</I>
 </DL></P>
 
 <P><DL>
@@ -143,12 +143,12 @@ natural magnification to use for rendering a DjVu image.
 rendering functions can use this information in order to perform color
 correction for the intended display device. 
 <DL><DT><DD></DL><P>
-<A NAME="reserved">
+<A NAME="compressable">
 <A NAME="DOC.1.5.24.2.10">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>unsigned char reserved</B></TT>
-<DD>Reserved byte. The IFF padding rules give the opportunity to store an
-extra byte in the <TT>&quot;INFO&quot;</TT> chunk.  This is reserved for possible
-extensions and for backward compatibility. 
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>bool compressable</B></TT>
+<DD>The following boolian values are stored in the last character of the
+info structure.  Unused bits are reserved for possible future extensions
+and backwards compatability. 
 <DL><DT><DD></DL><P></DL>
 
 <HR><DL><DT><B>This class has no child classes.</B></DL>
@@ -157,7 +157,7 @@ extensions and for backward compatibility.
 <!-- This is were the DOC++ footer is defined  -->
 
 <font face="arial,helvetica" size="2">
-DjVu is a trademark of LizardTech.   
+<a href=http://www.djvu.att.com>DjVu</a> is a trademark of AT&amp;T.  
 <br>All other products mentioned are registered trademarks or trademarks of
 their respective companies.
 </font>
