@@ -6,7 +6,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: parseoptions.h,v 1.13 1999-12-16 15:21:27 bcr Exp $
+//C- $Id: parseoptions.h,v 1.14 1999-12-17 01:01:04 bcr Exp $
 
 #endif /* __cplusplus */
 
@@ -16,7 +16,7 @@
 #ifdef __cplusplus
 #ifdef __GNUC__
 #pragma interface
-#endif
+#endif /* __GNUC */
 
 #ifndef DJVUPARSEOPTIONS_STANDALONE
 #include "DjVuGlobal.h"
@@ -55,7 +55,7 @@
 
    @memo Class used for parsing options and configuration files.
    @author: #$Author: bcr $#
-   @version #$Id: parseoptions.h,v 1.13 1999-12-16 15:21:27 bcr Exp $#
+   @version #$Id: parseoptions.h,v 1.14 1999-12-17 01:01:04 bcr Exp $#
  */
 
 //@{
@@ -251,7 +251,7 @@ extern "C" {
     @memo Wrapper functions for \Ref{DjVuParseOptions} */
 #ifdef DOCXX_CODE
 //@{
-#endif
+#endif /* DOCXX_CODE */
 
 /** The #djvu_parse# structure is used for exporting and \Ref{DjVuParseOptions}
     methods from C++ into C.
@@ -317,10 +317,10 @@ extern "C" {
 
 #ifdef DOCXX_CODE
 //@}
-#endif
+#endif /* DOCXX_CODE */
 #ifdef __cplusplus
 };
-#endif
+#endif /* __cplusplus */
 
 
 class DjVuTokenList;
@@ -712,8 +712,6 @@ public:
   Entries() : Token(0),Name(0) {};
 };
 #endif /* _PARSEOPTIONS_H_IMPLEMENTATION_  */
-
-#endif /* __cplusplus */
 
 #endif /* __DJVUPARSEOPTIONS_H__ */
 
