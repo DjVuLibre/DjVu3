@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuAPI.h,v 1.39 2000-02-16 00:44:08 bcr Exp $
+ *C- $Id: DjVuAPI.h,v 1.40 2000-02-17 23:49:44 bcr Exp $
  *
  * The main header file for the DjVu API
  */
@@ -17,7 +17,10 @@
 
 /* 
  * $Log: DjVuAPI.h,v $
- * Revision 1.39  2000-02-16 00:44:08  bcr
+ * Revision 1.40  2000-02-17 23:49:44  bcr
+ * Adding the DjVu_CallbackStream class.
+ *
+ * Revision 1.39  2000/02/16 00:44:08  bcr
  * Commented out an unimplimented method.
  *
  * Revision 1.38  2000/02/15 20:59:21  haffner
@@ -855,10 +858,11 @@ djvu_export_image ( djvu_image *[], const int size );
  * from that callback is NULL we assume we are done.  Note, each stream
  * will be closed when done.
  */
-typedef djvu_import djvu_import_sub ( void *arg, int filecount );
+typedef struct djvuio_struct* djvu_io_sub ( void *arg, int filecount );
+typedef djvu_io_sub djvu_import_sub;
 
 DJVUAPI djvu_import
-djvu_import_streams(djvu_import_sub *);
+djvu_import_streams( void *arg, djvu_import_sub * );
 
 /* For decompression, we need to define another type of callback to
  * accept the streams from arbitrary sources.  The idea is quite
@@ -866,10 +870,10 @@ djvu_import_streams(djvu_import_sub *);
  * accept multiple pages, we make this callback to get a new stream 
  * for appending further pages to.
  */
-typedef djvu_import djvu_export_sub ( void *arg, int filecount );
+typedef djvu_io_sub djvu_export_sub;
 
 DJVUAPI djvu_export
-djvu_export_streams(djvu_export_sub *);
+djvu_export_streams( void *arg, djvu_export_sub * );
 
 
 #ifdef __cplusplus
