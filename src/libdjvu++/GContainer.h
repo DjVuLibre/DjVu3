@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GContainer.h,v 1.16 1999-08-17 21:28:39 leonb Exp $
+//C- $Id: GContainer.h,v 1.17 1999-08-17 22:16:46 leonb Exp $
 
 
 #ifndef _GCONTAINER_H_
@@ -46,7 +46,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@research.att.com> -- bug fixes.
     @version 
-    #$Id: GContainer.h,v 1.16 1999-08-17 21:28:39 leonb Exp $# */
+    #$Id: GContainer.h,v 1.17 1999-08-17 22:16:46 leonb Exp $# */
 //@{
 
 
@@ -536,33 +536,42 @@ public:
       for (GPosition i = a; ; i; ++i) 
         printf("%s\n", (const char*) a[i] );
     }
+
     void print_list_backwards(GList<GString> a)
     {
       for (GPosition i = a.lastpos(); ; i; --i) 
         printf("%s\n", (const char*) a[i] );
     }
     \end{verbatim}
-    A #GPosition# object remains meaningful as long as you do not modify the
-    contents of the underlying container.  You should not use a #GPosition#
-    that was initialized before modifying the contents of container object.
-    Undetermined results may happed (as they say...) */
+    GPosition objects should only be used with the list or map for which they
+    have been created (using the member functions #firstpos# or #lastpos# of
+    the container).  Furthermore, you should never use a GPosition object
+    which designates a list element which has been removed from the list
+    (using member function #del# or by other means.)
+*/
 
 class GPosition : protected GCont
 {
 public:
+  /** Creates a null GPosition object. */
   GPosition() 
     : ptr(0), cont(0) { } ;
+  /** Creates a copy of a GPosition object. */
   GPosition(const GPosition &ref) 
     : ptr(ref.ptr), cont(ref.cont) { } ;
+  /** Tests whether this GPosition object is non null. */
   operator int() const 
     { return !!ptr; } ;
+  /** Tests whether this GPosition object is null. */
   int operator !() const 
     { return !ptr; } ;
+  /** Moves this GPosition object to the next object in the container. */
   GPosition& operator ++() 
     { if (ptr) ptr = ptr->next; return *this; } ;
+  /** Moves this GPosition object to the previous object in the container. */
   GPosition& operator --() 
     { if (ptr) ptr = ptr->prev; return *this; } ;
-  // Internal use
+  // Internal. Do not use.
   GPosition(Node *p, void *c) 
     : ptr(p), cont(c) { } ;
 #ifdef GCONTAINER_BOUNDS_CHECK
@@ -595,6 +604,7 @@ protected:
   void prepend(Node *n);
   void insert_after(GPosition pos, Node *n);
   void insert_before(GPosition pos, Node *n);
+  void insert_before(GPosition pos, GListBase &fromlist, GPosition &frompos);
   void del(GPosition &pos);
 protected:
   const Traits &traits;
@@ -745,16 +755,23 @@ public:
       The new element is initialized with a copy of argument #elt#. */
   void prepend(const TYPE &elt)
     { GListImpl<TI>::prepend(newnode((const TI&)elt)); } ;
-  /** Inserts an element after the list element at position #pos#.  An
-      exception \Ref{GException} is thrown if #pos# is not a valid position.
-      The new element is initialized with a copy of #elt#. */
+  /** Inserts a new element after the list element at position #pos#.  When
+      position #pos# is null the element is inserted at the beginning of the
+      list.  The new element is initialized with a copy of #elt#. */
   void insert_after(GPosition pos, const TYPE &elt)
     { GListImpl<TI>::insert_after(pos, newnode((const TI&)elt)); } ;
-  /** Inserts an element before the list element at position #pos#.  An
-      exception \Ref{GException} is thrown if #pos# is not a valid position.
-      The new element is initialized with a copy of #elt#. */
+  /** Inserts a new element before the list element at position #pos#. When
+      position #pos# is null the element is inserted at the end of the
+      list. The new element is initialized with a copy of #elt#. */
   void insert_before(GPosition pos, const TYPE &elt)
     { GListImpl<TI>::insert_before(pos, newnode((const TI&)elt)); } ;
+  /** Inserts an element of another list into this list.  This function
+      removes the element at position #frompos# in list #frompos#, inserts it
+      in the current list before the element at position #pos#, and advances
+      #frompos# to the next element in list #fromlist#. When position #pos# is
+      null the element is inserted at the end of the list. */
+  void insert_before(GPosition pos, GListTemplate<TYPE,TI> &fromlist, GPosition &frompos)
+    { GListImpl<TI>::insert_before(pos, fromlist, frompos); } ;
   /** Destroys the list element at position #pos#.  This function does 
       nothing unless position #pos# is a valid position. */
   void del(GPosition &pos)
