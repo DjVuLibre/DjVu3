@@ -243,6 +243,10 @@ SOURCE=.\BSByteStream.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\BSEncodeByteStream.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\ByteStream.cpp
 # End Source File
 # Begin Source File

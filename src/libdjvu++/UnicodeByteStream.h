@@ -1,7 +1,7 @@
 //C-  Copyright © 2000-2001, LizardTech, Inc. All Rights Reserved.
 //C-              Unauthorized use prohibited.
 //
-// $Id: UnicodeByteStream.h,v 1.3 2001-03-06 19:55:42 bcr Exp $
+// $Id: UnicodeByteStream.h,v 1.4 2001-03-07 00:33:32 bcr Exp $
 // $Name:  $
 
 #ifndef _UNICODEBYTESTREAM_H_
@@ -29,7 +29,7 @@
     @author
     Bill C Riemers <bcr@lizardtech.org>
     @version
-    #$Id: UnicodeByteStream.h,v 1.3 2001-03-06 19:55:42 bcr Exp $# */
+    #$Id: UnicodeByteStream.h,v 1.4 2001-03-07 00:33:32 bcr Exp $# */
 //@{
 
 #include "DjVuGlobal.h"
@@ -169,7 +169,7 @@ public:
   ~XMLByteStream();
 };
 
-GP<XMLByteStream>
+inline GP<XMLByteStream>
 XMLByteStream::create(UnicodeByteStream &bs)
 {
   return new XMLByteStream(bs);

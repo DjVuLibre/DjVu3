@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuFileCache.h,v 1.15 2001-03-06 19:55:42 bcr Exp $
+// $Id: DjVuFileCache.h,v 1.16 2001-03-07 00:33:32 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUFILECACHE_H
@@ -62,7 +62,7 @@
     
     @memo Simple DjVuFile caching class.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: DjVuFileCache.h,v 1.15 2001-03-06 19:55:42 bcr Exp $#
+    @version #$Id: DjVuFileCache.h,v 1.16 2001-03-07 00:33:32 bcr Exp $#
 */
 
 //@{
@@ -246,7 +246,7 @@ DjVuFileCache::get_max_size(void) const
 #endif
 
 inline GP<DjVuFileCache>
-DjVuFileCache::create(const int max_size=5*2*1024*1024)
+DjVuFileCache::create(const int max_size)
 {
   return new DjVuFileCache(max_size);
 }

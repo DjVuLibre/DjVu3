@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: MMRDecoder.cpp,v 1.33 2001-03-06 19:55:42 bcr Exp $
+// $Id: MMRDecoder.cpp,v 1.34 2001-03-07 00:33:32 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -526,8 +526,8 @@ MMRDecoder::init(GP<ByteStream> gbs, const bool striped)
 }
 
 GP<MMRDecoder> 
-MMRDecoder::create( GP<ByteStream> gbs, const int width, const int height,
- const bool striped=false )
+MMRDecoder::create( GP<ByteStream> gbs, const int width,
+  const int height, const bool striped )
 {
   MMRDecoder *mmr=new MMRDecoder(width,height);
   GP<MMRDecoder> retval=mmr;

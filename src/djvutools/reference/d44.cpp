@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: d44.cpp,v 1.11 2001-02-21 00:03:11 bcr Exp $
+// $Id: d44.cpp,v 1.12 2001-03-07 00:33:31 bcr Exp $
 // $Name:  $
 
 /** @name d44
@@ -84,7 +84,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: d44.cpp,v 1.11 2001-02-21 00:03:11 bcr Exp $# 
+    #$Id: d44.cpp,v 1.12 2001-03-07 00:33:31 bcr Exp $# 
 */
 //@{
 //@}
@@ -198,8 +198,8 @@ mymain(int argc, char **argv)
       // Go decoding
       if (chkid == "FORM:DJVM")
 	      G_THROW("This is multipage DJVU file. Please break it into pieces.");
-      const bool color=(chkid == "FORM:PM44");
-      if (!color && !(chkid == "FORM:BM44"))
+      const bool color=("FORM:PM44" == chkid)?true:false;
+      if (!color && !("FORM:BM44" == chkid))
       {
         G_THROW("d44: expected BM44 or PM44 chunk in IW4 file");
       }
