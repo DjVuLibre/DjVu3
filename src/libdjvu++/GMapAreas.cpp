@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GMapAreas.cpp,v 1.10 2000-10-12 01:39:00 bcr Exp $
+//C- $Id: GMapAreas.cpp,v 1.11 2000-10-12 02:23:04 bcr Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -38,6 +38,18 @@ const char GMapArea::SHADOW_EIN_BORDER_TAG[] = 	"shadow_ein";
 const char GMapArea::SHADOW_EOUT_BORDER_TAG[] = "shadow_eout";
 const char GMapArea::BORDER_AVIS_TAG[] = 	"border_avis";
 const char GMapArea::HILITE_TAG[] = 		"hilite";
+static const char TARGET_SELF[]="_self";
+static const char URL_TAG[]="url";
+static const char zero_width[] = "GMapAreas.zero_width";
+static const char zero_height[] = "GMapAreas.zero_height";
+static const char width_1[] = "GMapAreas.width_1";
+static const char width_3_32 [] = "GMapAreas.width_3-32";
+static const char error_poly_border [] = "GMapAreas.poly_border";
+static const char error_poly_hilite [] = "GMapAreas.poly_hilite";
+static const char error_oval_border [] = "GMapAreas.oval_border";
+static const char error_oval_hilite [] = "GMapAreas.oval_hilite";
+static const char error_too_few_points [] = "GMapAreas.too_few_points";
+static const char error_intersect [] = "GMapAreas.intersect";
 
 void
 GMapArea::initialize_bounds(void)
@@ -132,16 +144,16 @@ GMapArea::check_object(void)
    char const *retval;
    if (get_xmax()==get_xmin())
    {
-     retval="GMapAreas.zero_width";
+     retval=zero_width;
    }
    else if (get_ymax()==get_ymin())
    {
-     retval="GMapAreas.zero_height";
+     retval=zero_height;
    }
    else if ((border_type==XOR_BORDER ||
        border_type==SOLID_BORDER) && border_width!=1)
    {
-     retval="GMapAreas.width_1";
+     retval=width_1;
    }
    else if ((border_type==SHADOW_IN_BORDER ||
        border_type==SHADOW_OUT_BORDER ||
@@ -149,7 +161,7 @@ GMapArea::check_object(void)
        border_type==SHADOW_EOUT_BORDER)&&
        (border_width<3 || border_width>32))
    {
-     retval="GMapAreas.width_3-32";
+     retval=width_3_32;
    }else
    {
      retval=gma_check_object();
@@ -184,19 +196,22 @@ GMapArea::print(void)
    for(i=0;i<(int) url_str.length();i++)
    {
       char ch=url_str[i];
-      if (ch=='"') url1+='\\';
+      if (ch=='"')
+        url1+='\\';
       url1+=ch;
    }
    for(i=0;i<(int) target.length();i++)
    {
       char ch=target[i];
-      if (ch=='"') target1+='\\';
+      if (ch=='"')
+        target1+='\\';
       target1+=ch;
    }
    for(i=0;i<(int) comment.length();i++)
    {
       char ch=comment[i];
-      if (ch=='"') comment1+='\\';
+      if (ch=='"')
+        comment1+='\\';
       comment1+=ch;
    }
    
@@ -206,9 +221,10 @@ GMapArea::print(void)
 	   (border_color & 0xff00) >> 8,
 	   (border_color & 0xff));
 
-   static const GString left="(";
-   static const char right[]=")";
-   static const char space[]=" ";
+   static const GString left('(');
+   static const GString right(')');
+   static const GString space(' ');
+   static const GString quote('"');
    GString border_type_str;
    switch(border_type)
    {
@@ -248,20 +264,20 @@ GMapArea::print(void)
    }
    
    GString URL;
-   if (target1=="_self")
+   if (target1==TARGET_SELF)
    {
-      URL="\""+url1+"\"";
+      URL=quote+url1+quote;
    }else
    {
-      URL="(url \""+url1+"\" \""+target1+"\")";
+      URL=left+URL_TAG+space+quote+url1+quote+space+quote+target1+quote+right;
    }
 
-   GString total=left+MAPAREA_TAG+" "+URL+" \""+comment1+"\" "+gma_print()+border_type_str;
+   GString total=left+MAPAREA_TAG+space+URL+space+quote+comment1+quote+space+gma_print()+border_type_str;
    if (border_always_visible)
-     total+=space+left+BORDER_AVIS_TAG+")";
+     total+=space+left+BORDER_AVIS_TAG+right;
    if (hilite_str[0])
      total+=space+hilite_str;
-   total+=")";
+   total+=right;
    return total;
 }
 
@@ -362,13 +378,21 @@ char const * const
 GMapPoly::check_data(void)
 {
   if (open && points<2 || !open && points<3) 
-    return "GMapAreas.no_poly";
+    return error_too_few_points;
   for(int i=0;i<sides;i++)
+  {
     for(int j=i+2;j<sides;j++)
-      if ((j+1)%points!=i)
+    {
+      if (i != (j+1)%points )
+      {
         if (do_segments_intersect(xx[i], yy[i], xx[i+1], yy[i+1],
 				      xx[j], yy[j], xx[(j+1)%points], yy[(j+1)%points]))
-              return "GMapAreas.intersect";
+        {
+          return error_intersect;
+        }
+      }
+    }
+  }
   return "";
 }
 
@@ -529,8 +553,8 @@ GMapPoly::gma_check_object(void) const
    {
      str=(border_type!=NO_BORDER &&
        border_type!=SOLID_BORDER &&
-       border_type!=XOR_BORDER)?"GMapAreas.poly_border":
-         ((hilite_color!=0xffffffff)?"GMapAreas.poly_hilite":"");
+       border_type!=XOR_BORDER)?error_poly_border:
+         ((hilite_color!=0xffffffff)?error_poly_hilite:"");
    }
    return str;
 }
@@ -546,8 +570,9 @@ GMapPoly::GMapPoly(const int * _xx, const int * _yy, int _points, bool _open) :
       xx[i]=_xx[i]; yy[i]=_yy[i];
    }
    optimize_data();
-   GString res=check_data();
-   if (res[0]) G_THROW(res);
+   char const * const res=check_data();
+   if (res[0])
+     G_THROW(res);
 }
 
 int      
@@ -573,15 +598,16 @@ GMapPoly::close_poly()
 GString
 GMapPoly::gma_print(void)
 {
-   GString res=GString("(")+POLY_TAG+" ";
+   static const GString space(' ');
+   GString res=GString('(')+POLY_TAG+space;
    for(int i=0;i<points;i++)
    {
       char buffer[128];
       sprintf(buffer, "%d %d ", xx[i], yy[i]);
       res+=buffer;
    }
-   res.setat(res.length()-1, 0);
-   res+=") ";
+   res.setat(res.length()-1, ')');
+   res+=space;
    return res;
 }
 
@@ -618,8 +644,8 @@ GMapOval::gma_check_object(void) const
 {
    return (border_type!=NO_BORDER &&
        border_type!=SOLID_BORDER &&
-       border_type!=XOR_BORDER)?"GMapAreas.oval_border":
-      ((hilite_color!=0xffffffff)?"":"GMapAreas.oval_hilite");
+       border_type!=XOR_BORDER)?error_oval_border:
+      ((hilite_color!=0xffffffff)?"":error_oval_hilite);
 }
 
 void
