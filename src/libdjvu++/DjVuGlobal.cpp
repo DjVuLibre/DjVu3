@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: DjVuGlobal.cpp,v 1.25 2000-10-06 21:47:21 fcrary Exp $
+//C- $Id: DjVuGlobal.cpp,v 1.26 2000-10-10 19:02:27 bcr Exp $
 
 /** This file impliments the DjVuProgressTask elements.  The memory
     functions are implimented in a separate file, because only the memory
@@ -127,7 +127,10 @@ DjVuProgressTask::~DjVuProgressTask()
     if (!parent)
     {
       unsigned long curdate = GOS::ticks();
-      (*(data->callback))(data->gtask?data->gtask:"",curdate-startdate, curdate-startdate);
+      if((*(data->callback))(data->gtask?data->gtask:"",curdate-startdate, curdate-startdate))
+      {
+        G_THROW("INTERRUPT");
+      }
     }
   }
   delete (GP<Data> *)gdata;
@@ -165,7 +168,10 @@ DjVuProgressTask::signal(unsigned long curdate, unsigned long estdate)
       }
       else if (data && data->callback && curdate<enddate)
       {
-        (*(data->callback))(data->gtask?data->gtask:"",curdate-startdate, enddate-startdate);
+        if((*(data->callback))(data->gtask?data->gtask:"",curdate-startdate, enddate-startdate))
+        {
+          G_THROW("INTERRUPT");
+        }
         data->lastsigdate = curdate;
       }
     }

@@ -2,7 +2,7 @@
  *C-
  *C- Copyright (c) 2000, LizardTech, Inc.  All Rights Reserved.
  *C-
- *C- $Id: DjVu.h,v 1.16 2000-09-18 17:09:44 bcr Exp $
+ *C- $Id: DjVu.h,v 1.17 2000-10-10 19:02:27 bcr Exp $
  */
 
 #ifndef _DJVU_GLOBAL_API_H
@@ -21,7 +21,14 @@
 
 /*
  * $Log: DjVu.h,v $
- * Revision 1.16  2000-09-18 17:09:44  bcr
+ * Revision 1.17  2000-10-10 19:02:27  bcr
+ * Merging in the changes to the progress function.
+ *
+ * Revision 1.16.6.1  2000/10/10 18:51:07  bcr
+ * Added a return value support for the progress callback.  A return value
+ * of TRUE (non-zero) means to abort.
+ *
+ * Revision 1.16  2000/09/18 17:09:44  bcr
  * Adding files.
  *
  * Revision 1.14  2000/07/11 19:28:53  bcr
@@ -179,7 +186,7 @@ DJVUAPI void _djvu_free(void*);
     what part of the compression the encoder is working on.
 */
 /*@{*/
-typedef void
+typedef int
 djvu_progress_callback (const char *task,unsigned long,unsigned long);
 
 DJVUAPI
