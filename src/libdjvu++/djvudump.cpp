@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: djvudump.cpp,v 1.8 1999-11-11 19:28:48 leonb Exp $
+//C- $Id: djvudump.cpp,v 1.9 1999-11-16 00:17:46 leonb Exp $
 
 
 
@@ -57,7 +57,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: djvudump.cpp,v 1.8 1999-11-11 19:28:48 leonb Exp $# */
+    #$Id: djvudump.cpp,v 1.9 1999-11-16 00:17:46 leonb Exp $# */
 //@{
 //@}
 
@@ -104,9 +104,15 @@ display_djbz(IFFByteStream &iff, GString, size_t, DjVmInfo& )
 }
 
 void
+display_fgbz(IFFByteStream &iff, GString, size_t, DjVmInfo& )
+{
+  printf("JB2 colors data");
+}
+
+void
 display_sjbz(IFFByteStream &iff, GString, size_t, DjVmInfo& )
 {
-  printf("JB2 stencil data");
+  printf("JB2 bilevel data");
 }
 
 void
@@ -214,8 +220,10 @@ disproutines[] =
   { "DJVU.Djbz", display_djbz },
   { "DJVU.FG44", display_iw4 },
   { "DJVU.BG44", display_iw4 },
+  { "DJVU.FGbz", display_fgbz },
   { "DJVI.Sjbz", display_sjbz },
   { "DJVI.Djbz", display_djbz },
+  { "DJVI.FGbz", display_fgbz },
   { "DJVI.FG44", display_iw4 },
   { "DJVI.BG44", display_iw4 },
   { "BM44.BM44", display_iw4 },
