@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GURL.cpp,v 1.52 2001-04-02 21:19:19 bcr Exp $
+// $Id: GURL.cpp,v 1.53 2001-04-02 22:53:30 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -1162,14 +1162,14 @@ GURL::UTF8Filename(void) const
 #endif
     
 #ifdef WIN32
-    if (!is_file()) 
+    if (url_ptr[0] && url_ptr[1]=='|' && url_ptr[2]== slash)
     {
-      // Search for a drive letter (encoded a la netscape)
-      if (url_ptr[1]=='|' && url_ptr[2]== slash)
-      {
-        if ((url_ptr[0]>='a' && url_ptr[0]<='z') 
+      if ((url_ptr[0]>='a' && url_ptr[0]<='z') 
           || (url_ptr[0]>='A' && url_ptr[0]<='Z'))
+      {
+//        if (!is_file()) 
         {
+      // Search for a drive letter (encoded a la netscape)
           GString drive;
           drive.format("%c%c%c", url_ptr[0],colon,backslash);
           retval = expand_name(url_ptr+3, drive);

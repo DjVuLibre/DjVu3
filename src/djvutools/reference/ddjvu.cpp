@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ddjvu.cpp,v 1.11 2001-03-30 23:31:25 bcr Exp $
+// $Id: ddjvu.cpp,v 1.12 2001-04-02 22:53:30 bcr Exp $
 // $Name:  $
 
 /** @name ddjvu
@@ -111,7 +111,7 @@
     Yann Le Cun <yann@research.att.com>\\
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: ddjvu.cpp,v 1.11 2001-03-30 23:31:25 bcr Exp $# */
+    #$Id: ddjvu.cpp,v 1.12 2001-04-02 22:53:30 bcr Exp $# */
 //@{
 //@}
 
@@ -329,6 +329,7 @@ oldmain(int argc, char **argv)
 	}
 	fprintf( logfile, "\n\n" );
 #else
+#include <locale.h>
 int
 main(int argc, char **argv)
 {

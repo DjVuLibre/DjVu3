@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.40 2001-04-02 22:04:07 bcr Exp $
+// $Id: GString.cpp,v 1.41 2001-04-02 22:53:30 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -689,52 +689,55 @@ UTF82Native(const char source[],const bool currentlocale=false)
 {
   GString retval;
   GString lc_ctype;
-  if(source[0]) do
+  if(source[0]) 
   {
-    const GUnicode gsource(source);
-    char *r=retval.getbuf(12*gsource.length()+12);
-    mbstate_t ps;
-    for(const unsigned long *s=gsource;s[0];++s)
-    { 
-      const wchar_t w=(wchar_t)(s[0]);
-      if((const unsigned long)w != (s[0]))
-      {
-        r=retval.getbuf(1);
-        break;
-      }
-      char bytes[12];
-      int i=wcrtomb(bytes,w,&ps);
-      if(i<0)
-      {
-        r=retval.getbuf(1);
-        break;
-      }else if(!i)
-      {
-        break;
-      }else
-      {
-        for(int j=0;j<i;++j)
+    GString lc_ctype(setlocale(LC_CTYPE,0));
+    int count=1;
+    if(!currentlocale)
+    {
+      setlocale(LC_CTYPE,"");
+      count=0;
+    }
+    do
+    {
+      const GUnicode gsource(source);
+      char *r=retval.getbuf(12*gsource.length()+12);
+      mbstate_t ps;
+      for(const unsigned long *s=gsource;s[0];++s)
+      { 
+        const wchar_t w=(wchar_t)(s[0]);
+        if((const unsigned long)w != (s[0]))
         {
-          (r++)[0]=bytes[j];
+          r=retval.getbuf(1);
+          break;
+        }
+        char bytes[12];
+        int i=wcrtomb(bytes,w,&ps);
+        if(i<0)
+        {
+          r=retval.getbuf(1);
+          break;
+        }else if(!i)
+        {
+          break;
+        }else
+        {
+          for(int j=0;j<i;++j)
+          {
+            (r++)[0]=bytes[j];
+          }
         }
       }
-    }
-    r[0]=0;
-    if(currentlocale || retval.length())
-    {
-      break;
-    }
-    if(lc_ctype.length())
-    {
-      setlocale(LC_CTYPE,(const char *)lc_ctype);
-      break;
-    }
-    lc_ctype=setlocale(LC_CTYPE,0);
-    if(lc_ctype == setlocale(LC_CTYPE,""))
-    {
-      break;
-    }
-  } while(1);
+      r[0]=0;
+      if(count-- && (lc_ctype != setlocale(LC_CTYPE,0)))
+      {
+        setlocale(LC_CTYPE,(const char *)lc_ctype);
+      }else
+      {
+        break;
+      }
+    } while(!retval.length());
+  }
   return retval;
 }
 
@@ -812,7 +815,9 @@ Native2UTF8(const char *source,const size_t slen)
   GString retval;
   unsigned long *wresult;
   GPBuffer<unsigned long> gwresult(wresult,slen);
-  GString lc_ctype;
+  GString lc_ctype=setlocale(LC_CTYPE,0);
+  setlocale(LC_CTYPE,"");
+  int count=1;
   do
   {
     size_t len=mbstolcs(source,wresult);
@@ -820,21 +825,18 @@ Native2UTF8(const char *source,const size_t slen)
     {
       retval=GUnicode(wresult,len,GUnicode::UCS4);
     }
-    if(UTF82Native(retval,true) == source)
+    if(UTF82Native(retval,true) != source)
     {
-      break;
+      retval="";
     }
-    if(lc_ctype.length())
+    if(count-- && lc_ctype != setlocale(LC_CTYPE,0))
     {
       setlocale(LC_CTYPE,(const char *)lc_ctype);
-      break;
-    }
-    lc_ctype=setlocale(LC_CTYPE,0);
-    if(lc_ctype == setlocale(LC_CTYPE,""))
+    }else
     {
       break;
     }
-  } while(1);
+  } while(!retval.length());
   return retval;
 }
 
