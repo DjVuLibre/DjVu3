@@ -1,4 +1,4 @@
-/* File "$Id: DjVuAPI.h,v 1.12 1999-12-22 18:29:04 bcr Exp $"
+/* File "$Id: DjVuAPI.h,v 1.13 2000-01-04 04:48:37 bcr Exp $"
  *
  * The main header file for the DjVu API
  */
@@ -8,7 +8,12 @@
 
 /* 
  * $Log: DjVuAPI.h,v $
- * Revision 1.12  1999-12-22 18:29:04  bcr
+ * Revision 1.13  2000-01-04 04:48:37  bcr
+ * Moved memory and progress callbacks exclusively into libdjvu++.
+ * Added a text message for the progress callback, to indicate what
+ * is currently being done.
+ *
+ * Revision 1.12  1999/12/22 18:29:04  bcr
  * Changed the libio++ functions to use ByteStream's.
  *
  * Revision 1.11  1999/12/20 20:11:46  bcr
@@ -784,7 +789,7 @@ djvu_calloc_callback(size_t,size_t);
  */
 
         DJVUAPI int 
-        djvu_memory_callbacks(
+        djvu_set_memory_callbacks(
            djvu_free_callback *,
            djvu_realloc_callback *,
            djvu_malloc_callback *,

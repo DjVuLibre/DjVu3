@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuGlobal.h,v 1.20 1999-12-08 16:47:58 bcr Exp $
+//C- $Id: DjVuGlobal.h,v 1.21 2000-01-04 04:48:38 bcr Exp $
 
 
 #ifndef _DJVUGLOBAL_H
@@ -27,7 +27,7 @@
     @memo
     Global definitions.
     @version
-    #$Id: DjVuGlobal.h,v 1.20 1999-12-08 16:47:58 bcr Exp $#
+    #$Id: DjVuGlobal.h,v 1.21 2000-01-04 04:48:38 bcr Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> -- empty file.\\
     Bill Riemers <bcr@sanskrit.lz.att.com> -- real work.  */
@@ -47,6 +47,26 @@
 
 #ifdef NEED_DJVU_MEMORY
 #include <new.h>
+
+// We also define these typedefs in the API header file.
+//
+#ifndef HAS_DJVU_CALLBACKS
+#define HAS_DJVU_BALLBACKS
+extern "C"
+{
+  typedef void djvu_free_callback (void *);
+  typedef void *djvu_realloc_callback (void *, size_t);
+  typedef void *djvu_malloc_callback (size_t);
+  typedef void *djvu_calloc_callback (size_t,size_t);
+  int djvu_set_memory_callbacks(
+           djvu_free_callback *,
+           djvu_realloc_callback *,
+           djvu_malloc_callback *,
+           djvu_calloc_callback *);
+
+};
+#endif
+
 // Normally, this is the only functions we should need.
 typedef void djvu_delete_callback(void *);
 typedef void *djvu_new_callback(size_t);
@@ -88,6 +108,14 @@ void * _djvu_newArray(size_t);
 void _djvu_delete(void *);
 void _djvu_deleteArray(void *);
 
+// We also need classic memory functions, for routines that need realloc.
+//
+void *_djvu_malloc(size_t);
+void *_djvu_calloc(size_t, size_t);
+void *_djvu_realloc(void*, size_t);
+void _djvu_free(void*);
+
+
 #ifdef UNIX
 extern djvu_new_callback *_djvu_new_ptr;
 extern djvu_new_callback *_djvu_newArray_ptr;
@@ -113,7 +141,9 @@ STATIC_INLINE void
 operator delete [] (void *addr) delete_throw_spec
 { return (*_djvu_deleteArray_ptr)(addr); }
 #endif /* NEED_DJVU_MEMORY_IMPLEMENTATION */
-#else
+
+#else /* UNIX */
+
 #ifndef NEED_DJVU_MEMORY_IMPLEMENTATION
 STATIC_INLINE void *
 operator new(size_t sz) new_throw_spec
@@ -128,7 +158,9 @@ STATIC_INLINE void
 operator delete [] (void *addr) delete_throw_spec
 { return _djvu_deleteArray(addr); }
 #endif /* !NEED_DJVU_MEMORY_IMPLEMENTATION */
+
 #endif /* UNIX */
+
 #endif /* NEED_DJVU_MEMORY */
 
 
@@ -147,9 +179,10 @@ operator delete [] (void *addr) delete_throw_spec
     code support.  This is achieved by inserting {\em code tracing macros}
     in strategic regions of the code.  
     \begin{description}
-    \item[DJVU_PROGRESS_TASK(name,nsteps)]  indicates that the current
-         scope performs a task roughly divided in #nsteps# equal steps.
-    \item[DJVU_PROGRESS_RUN(name,tostep)] indicates that we are starting
+    \item[DJVU_PROGRESS_TASK(name,task,nsteps)]  indicates that the current
+         scope performs a task roughly divided in #nsteps# equal steps, with
+	 the specified #task# string used in the callback.
+    \item[DJVU_PROGRESS_RUN(name,task,tostep)] indicates that we are starting
          an operation which will take us to step #tostep#.  The operation
          will be considered finished when #DJVU_PROGRESS_RUN# will be called
          again with an argument greater than #tostep#.  The execution of
@@ -168,17 +201,26 @@ operator delete [] (void *addr) delete_throw_spec
 //@{
 
 #ifdef NEED_DJVU_PROGRESS
+extern "C"
+{
+  typedef void
+  djvu_progress_callback(const char task[],unsigned long,unsigned long);
+  djvu_progress_callback *djvu_set_progress_callback(djvu_progress_callback *);
+};
 
-#define DJVU_PROGRESS_TASK(name,nsteps)  DjVuProgressTask task_##name(nsteps)
-#define DJVU_PROGRESS_RUN(name,tostep)   { task_##name.run(tostep); }
+extern djvu_progress_callback *_djvu_progress_ptr;
+
+#define DJVU_PROGRESS_TASK(name,task,nsteps)  DjVuProgressTask task_##name(task,nsteps)
+#define DJVU_PROGRESS_RUN(name,task,tostep)   { task_##name.run(task,tostep); }
 
 class DjVuProgressTask
 {
 public:
   ~DjVuProgressTask();
-  DjVuProgressTask(int nsteps);
-  void run(int tostep);
-  static void (*callback)(unsigned long elapsed, unsigned long estimated);
+  DjVuProgressTask(const char *task,int nsteps);
+  void run(const char *task,int tostep);
+  static const char *task;
+  static djvu_progress_callback *&callback;
 private:
   DjVuProgressTask *parent;
   int nsteps;
@@ -223,6 +265,6 @@ private:
 #endif // NEED_DJVU_NAMES
 
 //@}
-#endif /* _DJVUGLOBAL_H_ */
 
+#endif /* _DJVUGLOBAL_H_ */
 
