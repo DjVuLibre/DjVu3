@@ -9,10 +9,10 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GThreads.cpp,v 1.26 1999-07-16 15:38:54 leonb Exp $
+//C- $Id: GThreads.cpp,v 1.27 1999-07-19 14:25:27 leonb Exp $
 
 
-// **** File "$Id: GThreads.cpp,v 1.26 1999-07-16 15:38:54 leonb Exp $"
+// **** File "$Id: GThreads.cpp,v 1.27 1999-07-19 14:25:27 leonb Exp $"
 // This file defines machine independent classes
 // for running and synchronizing threads.
 // - Author: Leon Bottou, 01/1998
@@ -1081,28 +1081,6 @@ cotask_wakeup(void *wchan, int onlyone)
     }
 }
 
-static void
-cotask_unblock_wchan(void *wchan)
-{
-  if (maintask && curtask)
-    {
-      cotask *n = curtask->next;
-      cotask *q = n;
-      do 
-        { 
-          if (q->wchan == wchan)
-            {
-              q->wchan=0; 
-              q->maxwait=0; 
-              q->wselect=0; 
-              q->over = 0;
-            }
-          q = q->next;
-        } 
-      while (q!=n);
-      cotask_yield();
-    }
-}
 
 
 // -------------------------------------- libgcc hook
@@ -1322,7 +1300,8 @@ GMonitor::~GMonitor()
 {
   ok = 0;
   cotask_wakeup((void*)this, 0);
-  cotask_unblock_wchan((void*)&count);
+  cotask_wakeup((void*)count, 0);    
+  cotask_yield();
 }
 
 void 
