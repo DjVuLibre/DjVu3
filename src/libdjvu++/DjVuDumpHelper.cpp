@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDumpHelper.cpp,v 1.5 2000-09-18 17:10:09 bcr Exp $
+//C- $Id: DjVuDumpHelper.cpp,v 1.6 2000-09-21 22:37:06 bcr Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -53,7 +53,7 @@ static void
 display_djvu_info(ByteStream & out_str, IFFByteStream &iff,
 		  GString, size_t size, DjVmInfo&, int)
 {
-  struct DjVuInfo info;
+  DjVuInfo info;
   info.decode(iff);
   if (size >= 4)
     printf(out_str, "DjVu %dx%d", info.width, info.height);

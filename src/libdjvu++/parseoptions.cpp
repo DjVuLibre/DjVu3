@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: parseoptions.cpp,v 1.54 2000-09-18 17:10:27 bcr Exp $
+//C- $Id: parseoptions.cpp,v 1.55 2000-09-21 22:37:06 bcr Exp $
 #ifdef __GNUC__
 #pragma implementation
 #endif
@@ -1269,7 +1269,8 @@ DjVuParseOptions::ProfileList::Add(
 }
 
 #ifdef WIN32
-LPSTR RegOpenReadConfig ( HKEY hParentKey )
+static LPSTR 
+RegOpenReadConfig ( HKEY hParentKey )
 {
 
 
@@ -1304,8 +1305,23 @@ LPSTR RegOpenReadConfig ( HKEY hParentKey )
   return 0;
 
 }
-#endif
 
+static bool
+is_dir(TCHAR *filename)
+{
+   USES_CONVERSION ;
+   DWORD           dwAttrib;       ;
+   dwAttrib = GetFileAttributes(A2CT(filename)) ;
+   if (dwAttrib != 0xFFFFFFFF)
+    {
+      if( dwAttrib & FILE_ATTRIBUTE_DIRECTORY )
+      {
+        return TRUE ;
+      }
+    }
+   return FALSE;
+}
+#endif
 const char * const
 DjVuParseOptions::ConfigFilename(const char config[],int level)
 {
@@ -1378,31 +1394,50 @@ DjVuParseOptions::ConfigFilename(const char config[],int level)
   const char *retval=0;
   const char *this_config=config[0]?config:default_string;
 
-  if (level == 0 ) 
-    root = (TCHAR *)RegOpenReadConfig (HKEY_CURRENT_USER);
-  else
-    root = (TCHAR *) RegOpenReadConfig (HKEY_LOCAL_MACHINE);
-
-  if( !root )
+  static const TCHAR profiles[]=TEXT("\\Profiles");
+  TCHAR modulepath[1024];
+  GetModuleFileName(0, modulepath, sizeof(modulepath)-1);
+  LPCTSTR path=modulepath;
+  int i=_tcslen(modulepath);
+  while(i>0)
   {
-    LPCTSTR path=TEXT("C:\\Program Files\\LizardTech");
-    static const TCHAR profiles[]=TEXT("\\Profiles");
-    TCHAR modulepath[1024];
-    GetModuleFileName(0, modulepath, sizeof(modulepath)-1);
+    const TCHAR c=modulepath[--i];
+    if(c == '/' || c == '\\')
+    {
+      modulepath[i]=0;
+      break;
+    }
+  }
+  root = new TCHAR [_tcslen(path)+sizeof(profiles)];
+  if(!level)
+  {
     int i=_tcslen(modulepath);
     while(i>0)
-    {
+	{
       const TCHAR c=modulepath[--i];
       if(c == '/' || c == '\\')
-      {
+	  {
         modulepath[i]=0;
-        path=modulepath;
         break;
-      }
-    }
-    root = new TCHAR [_tcslen(path)+sizeof(profiles)];
-    _tcscpy(root, path);
-    _tcscat(root,profiles);
+	  }
+	}
+  }
+  _tcscpy(root, path);
+  _tcscat(root,profiles);
+  if(!is_dir(root))
+  {
+    delete [] root;
+    if (! level) 
+      root = (TCHAR *)RegOpenReadConfig (HKEY_CURRENT_USER);
+    else
+      root = (TCHAR *) RegOpenReadConfig (HKEY_LOCAL_MACHINE);
+    if(!root)
+	{
+      path=TEXT("C:\\Program Files\\LizardTech");
+      root = new TCHAR [_tcslen(path)+sizeof(profiles)];
+      _tcscpy(root,path);
+      _tcscat(root,profiles);
+	}
   }
   if (root && root[0])
   {
