@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.6 1999-05-26 21:09:12 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.7 1999-05-27 14:58:03 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -22,6 +22,23 @@
 #include "debug.h"
 
 #include <unistd.h>
+
+DjVuDocument::DjVuDocument(DjVuPort * xport) : cache(0), simple_port(0),
+   readonly(0), dummy_dir(0), djvm(0)
+   
+{
+   cache=new GCache<GURL, DjVuFile>(-1);
+
+   DjVuPortcaster * pcaster=get_portcaster();
+   if (xport) pcaster->add_route(this, xport);
+   else
+   {
+      simple_port=new DjVuSimplePort();
+      pcaster->add_route(this, simple_port);
+   }
+
+   dir=new DjVuNavDir("file://localhost/tmp/dir");
+}
 
 DjVuDocument::DjVuDocument(const GURL & url, bool xreadonly,
 			   DjVuPort * xport, GCache<GURL, DjVuFile> * xcache):
@@ -254,7 +271,7 @@ unlink_empty_files(const GP<DjVuFile> & f, GMap<GURL, void *> & map,
 	 if (file->get_chunks_number()==0)
 	 {
 	    f->unlink_file(file->get_url().name());
-	    cache->del_item(file->get_url());
+	    if (cache) cache->del_item(file->get_url());
 	 }
       }
    }
@@ -401,8 +418,11 @@ DjVuDocument::check_nav_structure(void)
 	 {
 	    sprintf(tst_name, "dir%d", i);
 	    if (!cache->get_item(url.base()+tst_name)) break;
-	 };
+	 }
+	 dir_file->move(url.base());
 	 dir_file->set_name(tst_name);
+
+	 dir=dir_file->decode_ndir();
 	 
 	    // Include it into every page
 	 for(int page=0;page<dir->get_pages_num();page++)
@@ -427,8 +447,18 @@ DjVuDocument::insert_page(const GP<DjVuFile> & file, int page_num)
    GString name=file->get_url().name();
    if (dir->name_to_page(name)>=0)
       THROW("Can't insert page '"+name+"': already exists.");
+
+   GMap<GURL, void *> map;
+   delete_chunks(file, "NDIR");
+   ::unlink_empty_files(file, map, 0);
+
+   if (dir->get_pages_num()) file->move(dir->page_to_url(0).base());
+   else
+   {
+      init_url=file->get_url();
+      dir=new DjVuNavDir(file->get_url());
+   }
    
-   file->move(dir->page_to_url(0).base());
    file->change_cache(cache);
    get_portcaster()->add_route(file, this);
 
@@ -436,8 +466,7 @@ DjVuDocument::insert_page(const GP<DjVuFile> & file, int page_num)
    add_to_cache(file);
 
    if (dir_file) file->include_file(dir_file, 1);
-
-   check_nav_structure();
+   else check_nav_structure();
 }
 
 void
@@ -448,12 +477,13 @@ DjVuDocument::delete_page(int page_num)
 
    if (readonly) THROW("The document has been created in readonly mode.");
 
-   if (dir->get_pages_num()==1) THROW("Can't delete the last page.");
+   if (!dir->get_pages_num()) THROW("There is no pages to be deleted.");
 
    GURL url=dir->page_to_url(page_num);
    dir->delete_page(page_num);
    cache->del_item(url);
-   check_nav_structure();
+   
+   if (dir->get_pages_num()<=2) check_nav_structure();
 }
 
 GP<DataRange>

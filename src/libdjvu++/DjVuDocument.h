@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.h,v 1.3 1999-05-26 18:20:53 eaf Exp $
+//C- $Id: DjVuDocument.h,v 1.4 1999-05-27 14:58:03 eaf Exp $
  
 #ifndef _DJVUDOCUMENT_H
 #define _DJVUDOCUMENT_H
@@ -31,7 +31,7 @@
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocument.h,v 1.3 1999-05-26 18:20:53 eaf Exp $#
+    @version #$Id: DjVuDocument.h,v 1.4 1999-05-27 14:58:03 eaf Exp $#
 */
 
 //@{
@@ -64,8 +64,15 @@
 class DjVuDocument : public GPEnabled, public DjVuPort
 {
 public:
-      /** Constructs the #DjVuDocument# object. There is no default constructor
-	  provided. You should have a real file (at least one page) somewhere.
+      /** Default constructor. Constructs empty #DjVuDocument#.
+
+	  @param port If not #ZERO#, all requests and notifications will
+	         be sent to it. Otherwise #DjVuDocument# will create an internal
+		 instance of \Ref{DjVuSimplePort} for these purposes.
+		 It's OK to make it #ZERO# if you're writing a command line
+		 tool, which normally reports errors to #stderr#. */
+   DjVuDocument(DjVuPort * port=0);
+      /** Constructs the #DjVuDocument# object using an existing document.
 	  The #url# should point to the real data, and the creator of the
 	  document should be ready to return this data to the document
 	  if it's not stored locally.
@@ -90,7 +97,7 @@ public:
 	  @param port If not #ZERO#, all requests and notifications will
 	         be sent to it. Otherwise #DjVuDocument# will create an internal
 		 instance of \Ref{DjVuSimplePort} for these purposes.
-		 It's OK to make it #ZERO# if you're writing a command like
+		 It's OK to make it #ZERO# if you're writing a command line
 		 tool, which should work with files on the hard disk only.
 	  @param cache Is meaningful only in readonly mode when it's used
 	         to cache \Ref{DjVuFile}s. */
