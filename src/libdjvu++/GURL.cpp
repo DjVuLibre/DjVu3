@@ -9,11 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GURL.cpp,v 1.8 1999-08-12 21:35:56 eaf Exp $
-
-#ifdef __GNUC__
-#pragma implementation
-#endif
+//C- $Id: GURL.cpp,v 1.9 1999-08-18 18:20:58 leonb Exp $
 
 #ifdef __GNUC__
 #pragma implementation
