@@ -8,7 +8,7 @@
 # C- AT&T, you have an infringing copy of this software and cannot use it
 # C- without violating AT&T's intellectual property rights.
 # C-
-# C- $Id: Makefile.in,v 1.21.4.2 1999-03-30 22:15:41 eaf Exp $
+# C- $Id: Makefile.in,v 1.21.4.3 1999-04-12 16:44:58 eaf Exp $
 
 SHELL=/bin/sh
 prefix=@prefix@
@@ -16,14 +16,14 @@ bindir=@prefix@/bin
 SRCDIR=@srcdir@
 VPATH=@srcdir@
 CXX=@cxx@
-OPT=@opt@
+OPT=-g -DDEBUG #@opt@
 WARN=@warn@
 RANLIB=@ranlib@
 AR=@ar@
 DOCXX= doc++
 LDLIBS=@ldlibs@
 DEFS=@defs@
-CXXFLAGS= $(DEFS) $(OPT) $(WARN) -I$(SRCDIR) -DUNIX
+CXXFLAGS= $(DEFS) $(OPT) $(WARN) -I$(SRCDIR) -DUNIX -DTHREADMODEL=POSIXTHREADS -pthread
 LDFLAGS=
 
 
@@ -41,7 +41,10 @@ PROG= djvuinfo c44 d44 djvutopnm djvumake djvuextract ppmcoco bzz
 LIBOBJS= GString.o GException.o GContainer.o GRect.o GSmartPointer.o \
 	 GThreads.o ByteStream.o ZPCodec.o GBitmap.o GPixmap.o \
 	 IFFByteStream.o BSByteStream.o JB2Image.o GScaler.o IWImage.o \
-	 DjVuImage.o GOS.o DjVuGlobal.o Arrays.o ATTLicense.o
+	 DjVuImage.o GOS.o DjVuGlobal.o Arrays.o DataPool.o debug.o\
+	 GPContainer.o GURL.o DjVuNavDir.o GCache.o DjVuPort.o\
+	 DjVuAnno.o DjVuInfo.o DjVmDir0.o DjVuFile.o DjVuDocument.o\
+	 GIFFManager.o DjVmFile.o ATTLicense.o
 
 # Make all
 
