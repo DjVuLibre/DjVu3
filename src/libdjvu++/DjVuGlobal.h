@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuGlobal.h,v 1.23 2000-01-04 05:31:31 bcr Exp $
+//C- $Id: DjVuGlobal.h,v 1.24 2000-01-04 16:23:44 bcr Exp $
 
 
 #ifndef _DJVUGLOBAL_H
@@ -27,7 +27,7 @@
     @memo
     Global definitions.
     @version
-    #$Id: DjVuGlobal.h,v 1.23 2000-01-04 05:31:31 bcr Exp $#
+    #$Id: DjVuGlobal.h,v 1.24 2000-01-04 16:23:44 bcr Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> -- empty file.\\
     Bill Riemers <bcr@sanskrit.lz.att.com> -- real work.  */
@@ -219,8 +219,9 @@ class DjVuProgressTask
 public:
   ~DjVuProgressTask();
   DjVuProgressTask(const char *task,int nsteps);
-  void run(const char *task,int tostep);
+  void run(int tostep);
   const char *task;
+  static const char *gtask;
   static djvu_progress_callback *&callback;
 private:
   DjVuProgressTask *parent;
