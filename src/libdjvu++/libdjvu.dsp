@@ -335,7 +335,15 @@ SOURCE=.\XMLAnno.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\XMLEdit.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\XMLTags.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\XMLText.cpp
 # End Source File
 # Begin Source File
 
@@ -523,7 +531,15 @@ SOURCE=.\XMLAnno.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\XMLEdit.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\XMLTags.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\XMLText.h
 # End Source File
 # Begin Source File
 

@@ -30,34 +30,81 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: XMLAnno.h,v 1.8 2001-04-24 17:54:09 jhayes Exp $
+// $Id: XMLEdit.cpp,v 1.1 2001-04-24 17:54:09 jhayes Exp $
 // $Name:  $
 
-#ifndef _LT_XMLANNO__
-#define _LT_XMLANNO__
-
 #ifdef __GNUC__
-#pragma interface
+#pragma implementation
 #endif
 
 #include "XMLEdit.h"
+#include "UnicodeByteStream.h"
+#include "GOS.h"
+#include "GURL.h"
+#include "DjVuDocument.h"
+#include "DjVuFile.h"
+#include "debug.h"
+#include <stdio.h>
+#include <ctype.h>
+#include <stdlib.h>
 
-class lt_XMLAnno : public lt_XMLEdit
+void 
+lt_XMLEdit::intList(char const *coords, GList<int> &retval)
 {
-protected:
-  lt_XMLAnno(void) {}
-public:
-  /// Default creator
-  static GP<lt_XMLAnno> create(void) { return new lt_XMLAnno(); }
-  /// Parse the specified tags.
-  void parse(const lt_XMLTags &tags);
-  /// write to disk.
-protected:
-  void ChangeAnno(const lt_XMLTags &map,const GURL &url,const GUTF8String &id,
-    const GUTF8String &width,const GUTF8String &height);
+  char *ptr=0;
+  if(coords && *coords)
+  {
+    for(unsigned long i=strtoul(coords,&ptr,10);ptr&&ptr!=coords;i=strtoul(coords,&ptr,10))
+    {
+      retval.append(i);
+      for(coords=ptr;isspace(*coords);++coords);
+      if(*coords == ',')
+      {
+        ++coords;
+      }
+      if(!*coords)
+        break;
+    }
+  }
+}
 
-};
+void 
+lt_XMLEdit::empty(void)
+{
+  m_files.empty();
+  m_docs.empty();
+}
 
-#endif /* _LT_XMLANNO__ */
+void 
+lt_XMLEdit::save(void)
+{
+  for(GPosition pos=m_docs;pos;++pos)
+  {
+    DjVuDocument &doc=*(m_docs[pos]);
+    GURL url=doc.get_init_url();
+//    GUTF8String name=GOS::url_to_filename(url);
+//    DjVuPrintMessage("Saving file '%s' with new annotations.\n",(const char *)url);
+    const bool bundle=doc.is_bundled()||(doc.get_doc_type()==DjVuDocument::SINGLE_PAGE);
+    doc.save_as(url,bundle);
+  }
+  empty();
+}
 
+void
+lt_XMLEdit::parse(const char fname[],const GURL &codebase)
+{
+  m_codebase=codebase;
+  GP<lt_XMLTags> tags=lt_XMLTags::create();
+  const GURL::UTF8 url(fname,codebase);
+  tags->init(url);
+  parse(*tags);
+}
 
+void
+lt_XMLEdit::parse(GP<ByteStream> &bs)
+{
+  GP<lt_XMLTags> tags=lt_XMLTags::create();
+  tags->init(bs);
+  parse(*tags);
+}
+  

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: XMLTags.h,v 1.6 2001-04-23 18:14:22 bcr Exp $
+// $Id: XMLTags.h,v 1.7 2001-04-24 17:54:09 jhayes Exp $
 // $Name:  $
 
 #ifndef _LT_XMLTAGS__
@@ -113,7 +113,7 @@ lt_XMLTags::addraw (GUTF8String r)
     content[pos].raw+=r;
   }else
   {
-    r+=raw;
+    raw+=r;
   }
 }
 

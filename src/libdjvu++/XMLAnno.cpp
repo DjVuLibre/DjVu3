@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: XMLAnno.cpp,v 1.15 2001-04-12 22:40:14 fcrary Exp $
+// $Id: XMLAnno.cpp,v 1.16 2001-04-24 17:54:09 jhayes Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -50,25 +50,6 @@
 #include <ctype.h>
 #include <stdlib.h>
 
-static void intList
-(char const *coords, GList<int> &retval)
-{
-  char *ptr=0;
-  if(coords && *coords)
-  {
-    for(unsigned long i=strtoul(coords,&ptr,10);ptr&&ptr!=coords;i=strtoul(coords,&ptr,10))
-    {
-      retval.append(i);
-      for(coords=ptr;isspace(*coords);++coords);
-      if(*coords == ',')
-      {
-        ++coords;
-      }
-      if(!*coords)
-        break;
-    }
-  }
-}
 
 static inline const GMap<GUTF8String,GMapArea::BorderType> &
 BorderTypeMap(void)
@@ -105,19 +86,13 @@ void
 lt_XMLAnno::ChangeAnno(const lt_XMLTags &map,const GURL &url,const GUTF8String &id,const GUTF8String &width,const GUTF8String &height)
 {
   const GUTF8String url_string((const char *)url);
-  DjVuDocument &doc=*(docs[url_string]);
+  DjVuDocument &doc=*(m_docs[url_string]);
   bool const is_int=id.is_int();
   GUTF8String xid;
   if(is_int)
   {
     const int page=id.toInt(); //atoi((char const *)id);
-    if(page>0)
-    {
-      xid=page-1;
-    }else
-    {
-      xid="0";
-    }
+    xid = page > 0 ? GUTF8String(page - 1) : GUTF8String("0");
   }else if(!id.length()
     ||( doc.get_doc_type()==DjVuDocument::SINGLE_PAGE ))
   {
@@ -126,6 +101,7 @@ lt_XMLAnno::ChangeAnno(const lt_XMLTags &map,const GURL &url,const GUTF8String &
   {
     xid=id;
   }
+  const char* temp = xid;
   GP<DjVuFile> dfile=doc.get_djvu_file(xid,true);
   if(!dfile)
   {
@@ -392,48 +368,9 @@ lt_XMLAnno::ChangeAnno(const lt_XMLTags &map,const GURL &url,const GUTF8String &
   dfile->reset();
   dfile->anno=ByteStream::create();
   anno.encode(dfile->anno);
-  files.append(dfile);
+  m_files.append(dfile);
 }
 
-void 
-lt_XMLAnno::empty(void)
-{
-  files.empty();
-  docs.empty();
-}
-
-void 
-lt_XMLAnno::save(void)
-{
-  for(GPosition pos=docs;pos;++pos)
-  {
-    DjVuDocument &doc=*(docs[pos]);
-    GURL url=doc.get_init_url();
-//    GUTF8String name=GOS::url_to_filename(url);
-//    DjVuPrintMessage("Saving file '%s' with new annotations.\n",(const char *)url);
-    const bool bundle=doc.is_bundled()||(doc.get_doc_type()==DjVuDocument::SINGLE_PAGE);
-    doc.save_as(url,bundle);
-  }
-  empty();
-}
-
-void
-lt_XMLAnno::parse(const char fname[],const GURL &codebase)
-{
-  m_codebase=codebase;
-  GP<lt_XMLTags> tags=lt_XMLTags::create();
-  const GURL::UTF8 url(fname,codebase);
-  tags->init(url);
-  parse(*tags);
-}
-
-void
-lt_XMLAnno::parse(GP<ByteStream> &bs)
-{
-  GP<lt_XMLTags> tags=lt_XMLTags::create();
-  tags->init(bs);
-  parse(*tags);
-}
   
 void
 lt_XMLAnno::parse(const lt_XMLTags &tags)
@@ -573,7 +510,7 @@ lt_XMLAnno::parse(const lt_XMLTags &tags)
         }
         {
           GUTF8String url_string((char const *)url);
-          GPosition docspos=docs.contains(url_string);
+          GPosition docspos=m_docs.contains(url_string);
           if(! docspos)
           {
             GP<DjVuDocument> doc=DjVuDocument::create_wait(url);
@@ -583,7 +520,7 @@ lt_XMLAnno::parse(const lt_XMLTags &tags)
               mesg+=GUTF8String((const char *)url);
               G_THROW(mesg);
             }
-            docs[url_string]=doc;
+            m_docs[url_string]=doc;
           }
         }
         if(map)

@@ -30,34 +30,56 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: XMLAnno.h,v 1.8 2001-04-24 17:54:09 jhayes Exp $
+// $Id: XMLEdit.h,v 1.1 2001-04-24 17:54:09 jhayes Exp $
 // $Name:  $
 
-#ifndef _LT_XMLANNO__
-#define _LT_XMLANNO__
+#ifndef _LT_XMLEDIT__
+#define _LT_XMLEDIT__
 
 #ifdef __GNUC__
 #pragma interface
 #endif
 
-#include "XMLEdit.h"
+#include "XMLTags.h"
+#include "GContainer.h"
+#include "GString.h"
+#include "GURL.h"
 
-class lt_XMLAnno : public lt_XMLEdit
+class lt_XMLContents;
+class DjVuFile;
+class DjVuDocument;
+
+// this is the base class for using XML to change DjVu Docs.
+
+
+class lt_XMLEdit : public GPEnabled
 {
 protected:
-  lt_XMLAnno(void) {}
+  lt_XMLEdit(void) {}
 public:
-  /// Default creator
-  static GP<lt_XMLAnno> create(void) { return new lt_XMLAnno(); }
-  /// Parse the specified tags.
-  void parse(const lt_XMLTags &tags);
+  /// Parse the specified file.
+  void parse(const char xmlfile[], const GURL &codebase);
+  /// Parse the specified bytestream.
+  void parse(GP<ByteStream> &bs);
+  /// Parse the specified tags - this one does all the work
+  virtual void parse(const lt_XMLTags &tags) = 0;
   /// write to disk.
-protected:
-  void ChangeAnno(const lt_XMLTags &map,const GURL &url,const GUTF8String &id,
-    const GUTF8String &width,const GUTF8String &height);
+  void save(void);
+  /// erase.
+  void empty(void);
 
+  // helper function for args
+  static void intList(char const *coords, GList<int> &retval);
+protected:
+
+  // we may want to make these list of modified file static so
+  // they only needed to be loaded and saved once.
+  GPList<DjVuFile> m_files;
+  GMap<GUTF8String,GP<DjVuDocument> > m_docs;
+  GURL m_codebase;
+private: // dummy stuff
+  static void parse(ByteStream *bs);
 };
 
 #endif /* _LT_XMLANNO__ */
-
 

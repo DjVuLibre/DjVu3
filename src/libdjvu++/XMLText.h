@@ -30,11 +30,11 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: XMLAnno.h,v 1.8 2001-04-24 17:54:09 jhayes Exp $
+// $Id: XMLText.h,v 1.1 2001-04-24 17:54:09 jhayes Exp $
 // $Name:  $
 
-#ifndef _LT_XMLANNO__
-#define _LT_XMLANNO__
+#ifndef _LT_XMLTEXT__
+#define _LT_XMLTEXT__
 
 #ifdef __GNUC__
 #pragma interface
@@ -42,22 +42,27 @@
 
 #include "XMLEdit.h"
 
-class lt_XMLAnno : public lt_XMLEdit
+// this class writes in a new text layer base on the xml input. 
+// 
+//  note: <HIDDENTEXT> object without any text will remove the text
+//  from that page.
+
+class lt_XMLText : public lt_XMLEdit
 {
 protected:
-  lt_XMLAnno(void) {}
+  lt_XMLText(void) {}
 public:
   /// Default creator
-  static GP<lt_XMLAnno> create(void) { return new lt_XMLAnno(); }
+  static GP<lt_XMLText> create(void) { return new lt_XMLText(); }
   /// Parse the specified tags.
   void parse(const lt_XMLTags &tags);
   /// write to disk.
 protected:
-  void ChangeAnno(const lt_XMLTags &map,const GURL &url,const GUTF8String &id,
+  void ChangeText(const lt_XMLTags &text,const GURL &url,const GUTF8String &id,
     const GUTF8String &width,const GUTF8String &height);
 
 };
 
-#endif /* _LT_XMLANNO__ */
+#endif /* _LT_XMLTEXT__ */
 
 
