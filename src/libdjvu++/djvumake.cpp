@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: djvumake.cpp,v 1.14 1999-12-28 15:35:43 bcr Exp $
+//C- $Id: djvumake.cpp,v 1.15 2000-02-14 22:34:30 leonb Exp $
 
 /** @name djvumake
 
@@ -25,30 +25,31 @@
 
     This program assembles the DjVu file #djvufile# using the JB2 data
     contained in file #maskfile# and the IW44 data contained in files #bgfile#
-    and #fgfile#.  Although this is slightly beyond the scope of the DjVu
-    Reference Library, the following description explains how to prepare the
-    input files required for assembling DjVu files.
+    and #fgfile#.  This is useful for creating a DjVu image file from its 
+    individual components.
 
     {\bf Recipe for creating a Photo DjVu File}
 
-    You should first use program \Ref{c44} and produce an IW44 file "my.iw4".
-    Assuming that this image is 640 pixels wide and 480 pixels high, you can
-    assemble file #"my.djvu"# using #djvumake# with the following arguments.
+    You can simply use program \Ref{c44} and specify either option #-dpi# or
+    #-gamma#.  Since these options are not supported by IW44 files, program
+    \Ref{c44} will produce a Photo DjVu File instead of an IW44 file.
+    Program #djvumake# however may be useful to convert an IW44 file into
+    a Photo DjVu File. Assuming that you have an IW44 file with a 640x480 image,
+    you can also generate Photo DjVu File using the following command:
     \begin{verbatim}
-       % djvumake my.djvu  INFO=640,480  BG44=my.iw4
+       % djvumake my.djvu INFO=640,480  BG44=my.iw4
     \end{verbatim}
-
     
+
     {\bf Recipe for creating a Bilevel DjVu File}
 
-    The first step consists in creating a \Ref{JB2Image} object according to
-    the guidelines specified in section \Ref{JB2Image.h}.  Then use function
-    \Ref{JB2Image::encode} in class \Ref{JB2Image} to save the JB2 data into a
-    file named #"myjb2.q"# for instance.  You can then assemble file
-    #"my.djvu"# using #djvumake# with the following arguments:
-
+    You can simply use program \Ref{cjb2} which generates Bilevel DjVu Image
+    files.  Program #djvumake# however can be useful to extract the mask from
+    a Compound DjVu File (using #djvuextract#) and create a Bilevel DjVu Image
+    (using #djvumake#).
     \begin{verbatim}
-       % djvumake my.djvu Sjbz=myjb2.q
+       % djvuextract mycompound.djvu Sjbz=myjb2.q
+       % djvumake mybilevel.djvu Sjbz=myjb2.q
     \end{verbatim}
 
     
@@ -130,7 +131,7 @@
     @memo
     Assemble DjVu files.
     @version
-    #$Id: djvumake.cpp,v 1.14 1999-12-28 15:35:43 bcr Exp $#
+    #$Id: djvumake.cpp,v 1.15 2000-02-14 22:34:30 leonb Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> */
 //@{
