@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: parseoptions.cpp,v 1.72 2001-04-05 19:57:57 chrisp Exp $
+// $Id: parseoptions.cpp,v 1.73 2001-04-05 23:57:31 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -595,7 +595,7 @@ DjVuParseOptions::ParseArguments(
     if(s && (j=strlen(s)) && (v=VarTokens->GetToken(opts[i].name))>=0)
     {
 #ifdef SUPPRESS_VERBOSE
-      if( GSTring("verbose") == s  )
+      if( strcmp( "verbose", s ) != 0 )
 #endif
       Arguments->Add(v,args.optarg?args.optarg:"TRUE");
     }
@@ -1118,9 +1118,10 @@ DjVuParseOptions::ReadFile(int &line,FILE *f,int profile)
           (state == READ_VALUE_DOUBLE_QUOTE))
         {
           const char *v=VarTokens->GetString(var);
-          GString buf;
-          buf.format("%s=%s",v,value);
-          Add(startline,profile,-1,(const char *)buf);
+          char *r=new char [strlen(v)+strlen(value)+2];
+          sprintf(r,"%s=%s",v,value);
+          Add(startline,profile,-1,r);
+          delete [] r;
         }else
         {
           Add(startline,profile,var,value);
@@ -1679,8 +1680,7 @@ DjVuParseOptions::GetOpt::getopt_long()
     }
     for(longindex=0,opts=long_opts;opts->name;++opts,++longindex)
     {
-//      if(!strcmp(opts->name,argv[optind]+nextchar))
-       if (opts->name == GString(argv[optind]+nextchar))
+      if(!strcmp(opts->name,argv[optind]+nextchar))
       {
         if((opts->has_arg)&&(opts->has_arg != 2))
         {
@@ -1792,8 +1792,7 @@ DjVuTokenList::GetToken( const char name[] ) const
   while(MinGuess<MaxGuess)
   {
     const int guess=MinGuess+((MaxGuess-MinGuess)/2);
-//    const int i=strcmp(name,Entry[guess].Name);
-    const int i=(name == GString(Entry[guess].Name));
+    const int i=strcmp(name,Entry[guess].Name);
     if(i<0)
     {
       MaxGuess=guess;
