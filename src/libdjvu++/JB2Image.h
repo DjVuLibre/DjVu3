@@ -25,7 +25,7 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: JB2Image.h,v 1.21 2000-11-02 01:08:35 bcr Exp $
+// $Id: JB2Image.h,v 1.22 2000-11-02 02:17:05 bcr Exp $
 // $Name:  $
 
 
@@ -125,7 +125,7 @@
     \end{itemize}
 
     @version
-    #$Id: JB2Image.h,v 1.21 2000-11-02 01:08:35 bcr Exp $#
+    #$Id: JB2Image.h,v 1.22 2000-11-02 02:17:05 bcr Exp $#
     @memo
     Coding bilevel images with JB2.
     @author
@@ -547,7 +547,7 @@ JB2Image::get_blit(int blitno) const
     {\bf References} ---
     \begin{itemize}
     \item ICFDD Draft Proposed American National Standard, 1999-08-26.
-    \item DjVu Specification, \URL{http://www.djvu.com/djvu/sci/djvuspec}.
+    \item DjVu Specification, \URL{http://www.lizardtech.com/djvu/sci/djvuspec}.
     \end{itemize}
 
     @memo Extensions to the JB2 format introduced in version 21.  */

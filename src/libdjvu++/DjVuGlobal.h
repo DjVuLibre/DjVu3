@@ -25,7 +25,7 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuGlobal.h,v 1.37 2000-11-02 01:08:34 bcr Exp $
+// $Id: DjVuGlobal.h,v 1.38 2000-11-02 02:17:05 bcr Exp $
 // $Name:  $
 
 
@@ -59,10 +59,10 @@
     @memo
     Global definitions.
     @version
-    #$Id: DjVuGlobal.h,v 1.37 2000-11-02 01:08:34 bcr Exp $#
+    #$Id: DjVuGlobal.h,v 1.38 2000-11-02 02:17:05 bcr Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> -- empty file.\\
-    Bill Riemers <bcr@sanskrit.lz.att.com> -- real work.  */
+    Bill Riemers <bcr@lizardtech.com> -- real work.  */
 //@{
 
 

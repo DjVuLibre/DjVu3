@@ -25,7 +25,7 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GURL.h,v 1.28 2000-11-02 01:08:35 bcr Exp $
+// $Id: GURL.h,v 1.29 2000-11-02 02:17:05 bcr Exp $
 // $Name:  $
 
 
@@ -45,7 +45,7 @@
     \Ref{GURL} class used to store URLs in a system independent format.
     @memo System independent URL representation.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: GURL.h,v 1.28 2000-11-02 01:08:35 bcr Exp $#
+    @version #$Id: GURL.h,v 1.29 2000-11-02 02:17:05 bcr Exp $#
 */
 
 //@{
@@ -161,13 +161,13 @@ public:
    GURL		base(void) const;
 
       /** Returns the name part of this URL.
-	  For example, if the URL is #http://www.djvu.com/file%201.djvu# then
+	  For example, if the URL is #http://www.lizardtech.com/file%201.djvu# then
           this function will return #file%201.djvu#. \Ref{fname}() will
           return #file 1.djvu# at the same time. */
    GString	name(void) const;
 
       /** Returns the name part of this URL with escape sequences expanded.
-	  For example, if the URL is #http://www.djvu.com/file%201.djvu# then
+	  For example, if the URL is #http://www.lizardtech.com/file%201.djvu# then
           this function will return #file 1.djvu#. \Ref{name}() will
           return #file%201.djvu# at the same time. */
    GString	fname(void) const;

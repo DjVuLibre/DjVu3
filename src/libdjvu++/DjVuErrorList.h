@@ -25,7 +25,7 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuErrorList.h,v 1.8 2000-11-02 01:08:34 bcr Exp $
+// $Id: DjVuErrorList.h,v 1.9 2000-11-02 02:17:05 bcr Exp $
 // $Name:  $
 
  
@@ -45,8 +45,8 @@
     messages that would normally end up on stderr to a double linked list.
 
     @memo DjVuErrorList class.
-    @author Bill C Riemers <bcr@att.com>
-    @version #$Id: DjVuErrorList.h,v 1.8 2000-11-02 01:08:34 bcr Exp $#
+    @author Bill C Riemers <bcr@lizardtech.com>
+    @version #$Id: DjVuErrorList.h,v 1.9 2000-11-02 02:17:05 bcr Exp $#
 */
 
 //@{
