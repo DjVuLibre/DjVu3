@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.102 2001-05-18 18:30:04 bcr Exp $
+// $Id: GString.cpp,v 1.103 2001-05-21 16:24:36 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -1060,6 +1060,9 @@ GStringRep::UTF8toUCS4(
                                 {
                                   U=(unsigned int)(-1)-s++[0];
                                 }
+                              }else
+                              {
+                                U=0;
                               }
                             }else if((U=((U&0x4000000)?0:(U&0x3ffffff))))
                             {
@@ -1069,6 +1072,9 @@ GStringRep::UTF8toUCS4(
                           {
                             U=(unsigned int)(-1)-s++[0];
                           }
+                        }else
+                        {
+                          U=0;
                         }
                       }else if((U=((U&0x200000)?0:(U&0x1fffff))))
                       {
@@ -1078,6 +1084,9 @@ GStringRep::UTF8toUCS4(
                     {
                       U=(unsigned int)(-1)-s++[0];
                     }
+                  }else
+                  {
+                    U=0;
                   }
                 }else if((U=((U&0x10000)?0:(U&0xffff))))
                 {
@@ -1087,6 +1096,9 @@ GStringRep::UTF8toUCS4(
               {
                 U=(unsigned int)(-1)-s++[0];
               }
+            }else
+            {
+              U=0;
             }
           }else if((U=((U&0x800)?0:(U&0x7ff))))
           {
@@ -1096,6 +1108,9 @@ GStringRep::UTF8toUCS4(
         {
           U=(unsigned int)(-1)-s++[0];
         }
+      }else
+      {
+        U=0;
       }
     }else if((U=C1))
     {
