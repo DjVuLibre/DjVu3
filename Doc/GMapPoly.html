@@ -1,11 +1,11 @@
 <HTML>
 <HEAD>
-   <TITLE>class  GMapPoly</TITLE>
+   <TITLE>class  _GMAPAREAS_H::GMapPoly</TITLE>
    <META NAME="GENERATOR" CONTENT="DOC++ 3.4.1">
 </HEAD>
 <BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
 
-<H2>class  <A HREF="#DOC.DOCU">GMapPoly</A>: public <!1><A HREF="GMapArea.html#DOC.1.4.26.1.16">GMapArea</A></H2>
+<H2>class  <A HREF="#DOC.DOCU">GMapPoly</A>: public <!1><A HREF="GMapArea.html#DOC.1.4.25.1.16">GMapArea</A></H2>
 <BLOCKQUOTE>Implements polygonal map areas.</BLOCKQUOTE>
 <HR>
 
@@ -22,41 +22,47 @@
 <DL>
 <P><DL>
 <DT><H3>Public Methods</H3><DD><DT>
-<A HREF="#DOC.1.4.26.3.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>bool <B>does_side_cross_rect</B>(const <!1><A HREF="GRect.html">GRect</A> &amp; grect, int side)
+<A HREF="#DOC.1.4.25.3.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>bool <B>does_side_cross_rect</B>(const <!1><A HREF="GRect.html">GRect</A> &amp; grect, int side)
 <DD><I>Returns 1 if side <TT>side</TT> crosses the specified rectangle <TT>rect</TT>.</I>
 <DT>
-<A HREF="#DOC.1.4.26.3.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_points_num</B>(void) const 
+<A HREF="#DOC.1.4.25.3.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_points_num</B>(void) const 
 <DD><I>Returns the number of vertices in the polygon</I>
 <DT>
-<A HREF="#DOC.1.4.26.3.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_sides_num</B>(void) const 
+<A HREF="#DOC.1.4.25.3.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_sides_num</B>(void) const 
 <DD><I>Returns the number sides in the polygon</I>
 <DT>
-<A HREF="#DOC.1.4.26.3.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_x</B>(int i) const 
+<A HREF="#DOC.1.4.25.3.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_x</B>(int i) const 
 <DD><I>Returns x coordinate of vertex number</I>
 <DT>
-<A HREF="#DOC.1.4.26.3.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_y</B>(int i) const 
+<A HREF="#DOC.1.4.25.3.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_y</B>(int i) const 
 <DD><I>Returns y coordinate of vertex number</I>
 <DT>
-<A HREF="#DOC.1.4.26.3.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>move_vertex</B>(int i, int x, int y)
+<A HREF="#DOC.1.4.25.3.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>move_vertex</B>(int i, int x, int y)
 <DD><I>Moves vertex</I>
 <DT>
-<A HREF="#DOC.1.4.26.3.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>add_vertex</B>(int x, int y)
+<A HREF="#DOC.1.4.25.3.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>add_vertex</B>(int x, int y)
 <DD><I>Adds a new vertex and returns number of vertices in the polygon</I>
 <DT>
-<A HREF="#DOC.1.4.26.3.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>close_poly</B>()
+<A HREF="#DOC.1.4.25.3.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>close_poly</B>()
 <DD><I>Closes the polygon if it is not closed</I>
 <DT>
-<A HREF="#DOC.1.4.26.3.9"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>optimize_data</B>(void)
+<A HREF="#DOC.1.4.25.3.9"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>optimize_data</B>(void)
 <DD><I>Optimizes the polygon </I>
 <DT>
-<A HREF="#DOC.1.4.26.3.10"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>char const* const <B>check_data</B>(void)
+<A HREF="#DOC.1.4.25.3.10"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>char const* const <B>check_data</B>(void)
 <DD><I>Checks validity of the polygon </I>
 <DT>
-<A HREF="#DOC.1.4.26.3.11"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   char const* const <B>get_shape_name</B>(void) const 
+<A HREF="#DOC.1.4.25.3.11"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   MapAreaType const <B>get_shape_type</B>( void ) const 
+<DD><I>Returns MapPoly</I>
+<DT>
+<A HREF="#DOC.1.4.25.3.12"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   char const* const <B>get_shape_name</B>(void) const 
 <DD><I>Returns <TT>&quot;poly&quot;</TT> all the time</I>
 <DT>
-<A HREF="#DOC.1.4.26.3.12"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GMapArea.html#DOC.1.4.26.1.16">GMapArea</A>&gt;  <B>get_copy</B>(void) const 
+<A HREF="#DOC.1.4.25.3.13"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GMapArea.html#DOC.1.4.25.1.16">GMapArea</A>&gt;  <B>get_copy</B>(void) const 
 <DD><I>Returns a copy of the polygon</I>
+<DT>
+<A HREF="#DOC.1.4.25.3.14"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>get_coords</B>( GList&lt;int&gt; &amp; CoordList )
+<DD><I>Virtual function generating a list of defining coordinates</I>
 </DL></P>
 
 </DL>
@@ -74,11 +80,11 @@
 <DT>
 <IMG ALT="o" SRC=icon2.gif>bool <B>border_always_visible</B>
 <DT>
-<IMG ALT="o" SRC=icon2.gif>u_int32 <B>border_color</B>
+<IMG ALT="o" SRC=icon2.gif>unsigned long int <B>border_color</B>
 <DT>
 <IMG ALT="o" SRC=icon2.gif>int <B>border_width</B>
 <DT>
-<IMG ALT="o" SRC=icon2.gif>u_int32 <B>hilite_color</B>
+<IMG ALT="o" SRC=icon2.gif>unsigned long int <B>hilite_color</B>
 </DL></P>
 
 <P><DL>
@@ -104,6 +110,11 @@
 <IMG ALT="o" SRC=icon2.gif>char const* const <B>check_object</B>(void)
 <DT>
 <IMG ALT="o" SRC=icon2.gif><!1><A HREF="GString.html">GString</A> <B>print</B>(void)
+</DL></P>
+
+<P><DL>
+<DT><H3>Public</H3><DD><DT>
+<IMG ALT="o" SRC=icon2.gif> <B></B>
 </DL></P>
 
 </DL>
@@ -135,64 +146,74 @@ the polygonal hyperlink. </BLOCKQUOTE>
 <DL>
 
 <A NAME="does_side_cross_rect">
-<A NAME="DOC.1.4.26.3.1">
+<A NAME="DOC.1.4.25.3.1">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>bool does_side_cross_rect(const <!1><A HREF="GRect.html">GRect</A> &amp; grect, int side)</B></TT>
 <DD>Returns 1 if side <TT>side</TT> crosses the specified rectangle <TT>rect</TT>.
 <DL><DT><DD></DL><P>
 <A NAME="get_points_num">
-<A NAME="DOC.1.4.26.3.2">
+<A NAME="DOC.1.4.25.3.2">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int get_points_num(void) const </B></TT>
 <DD>Returns the number of vertices in the polygon
 <DL><DT><DD></DL><P>
 <A NAME="get_sides_num">
-<A NAME="DOC.1.4.26.3.3">
+<A NAME="DOC.1.4.25.3.3">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int get_sides_num(void) const </B></TT>
 <DD>Returns the number sides in the polygon
 <DL><DT><DD></DL><P>
 <A NAME="get_x">
-<A NAME="DOC.1.4.26.3.4">
+<A NAME="DOC.1.4.25.3.4">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int get_x(int i) const </B></TT>
 <DD>Returns x coordinate of vertex number
 <DL><DT><DD></DL><P>
 <A NAME="get_y">
-<A NAME="DOC.1.4.26.3.5">
+<A NAME="DOC.1.4.25.3.5">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int get_y(int i) const </B></TT>
 <DD>Returns y coordinate of vertex number
 <DL><DT><DD></DL><P>
 <A NAME="move_vertex">
-<A NAME="DOC.1.4.26.3.6">
+<A NAME="DOC.1.4.25.3.6">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void move_vertex(int i, int x, int y)</B></TT>
 <DD>Moves vertex
 <DL><DT><DD></DL><P>
 <A NAME="add_vertex">
-<A NAME="DOC.1.4.26.3.7">
+<A NAME="DOC.1.4.25.3.7">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int add_vertex(int x, int y)</B></TT>
 <DD>Adds a new vertex and returns number of vertices in the polygon
 <DL><DT><DD></DL><P>
 <A NAME="close_poly">
-<A NAME="DOC.1.4.26.3.8">
+<A NAME="DOC.1.4.25.3.8">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void close_poly()</B></TT>
 <DD>Closes the polygon if it is not closed
 <DL><DT><DD></DL><P>
 <A NAME="optimize_data">
-<A NAME="DOC.1.4.26.3.9">
+<A NAME="DOC.1.4.25.3.9">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void optimize_data(void)</B></TT>
 <DD>Optimizes the polygon 
 <DL><DT><DD></DL><P>
 <A NAME="check_data">
-<A NAME="DOC.1.4.26.3.10">
+<A NAME="DOC.1.4.25.3.10">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>char const* const check_data(void)</B></TT>
 <DD>Checks validity of the polygon 
 <DL><DT><DD></DL><P>
+<A NAME="get_shape_type">
+<A NAME="DOC.1.4.25.3.11">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   MapAreaType const get_shape_type( void ) const </B></TT>
+<DD>Returns MapPoly
+<DL><DT><DD></DL><P>
 <A NAME="get_shape_name">
-<A NAME="DOC.1.4.26.3.11">
+<A NAME="DOC.1.4.25.3.12">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   char const* const get_shape_name(void) const </B></TT>
 <DD>Returns <TT>&quot;poly&quot;</TT> all the time
 <DL><DT><DD></DL><P>
 <A NAME="get_copy">
-<A NAME="DOC.1.4.26.3.12">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GMapArea.html#DOC.1.4.26.1.16">GMapArea</A>&gt;  get_copy(void) const </B></TT>
+<A NAME="DOC.1.4.25.3.13">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GMapArea.html#DOC.1.4.25.1.16">GMapArea</A>&gt;  get_copy(void) const </B></TT>
 <DD>Returns a copy of the polygon
+<DL><DT><DD></DL><P>
+<A NAME="get_coords">
+<A NAME="DOC.1.4.25.3.14">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void get_coords( GList&lt;int&gt; &amp; CoordList )</B></TT>
+<DD>Virtual function generating a list of defining coordinates
 <DL><DT><DD></DL><P></DL>
 
 <HR><DL><DT><B>This class has no child classes.</B></DL>

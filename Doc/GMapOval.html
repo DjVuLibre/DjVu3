@@ -1,11 +1,11 @@
 <HTML>
 <HEAD>
-   <TITLE>class  GMapOval</TITLE>
+   <TITLE>class  _GMAPAREAS_H::GMapOval</TITLE>
    <META NAME="GENERATOR" CONTENT="DOC++ 3.4.1">
 </HEAD>
 <BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
 
-<H2>class  <A HREF="#DOC.DOCU">GMapOval</A>: public <!1><A HREF="GMapArea.html#DOC.1.4.26.1.16">GMapArea</A></H2>
+<H2>class  <A HREF="#DOC.DOCU">GMapOval</A>: public <!1><A HREF="GMapArea.html#DOC.1.4.25.1.16">GMapArea</A></H2>
 <BLOCKQUOTE>Implements elliptical map areas.</BLOCKQUOTE>
 <HR>
 
@@ -22,22 +22,25 @@
 <DL>
 <P><DL>
 <DT><H3>Public Methods</H3><DD><DT>
-<A HREF="#DOC.1.4.26.4.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_a</B>(void) const 
+<A HREF="#DOC.1.4.25.4.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_a</B>(void) const 
 <DD><I>Returns (xmax-xmin)/2</I>
 <DT>
-<A HREF="#DOC.1.4.26.4.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_b</B>(void) const 
+<A HREF="#DOC.1.4.25.4.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_b</B>(void) const 
 <DD><I>Returns (ymax-ymin)/2</I>
 <DT>
-<A HREF="#DOC.1.4.26.4.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_rmin</B>(void) const 
-<DD><I>Returns the lesser of <!1><A HREF="GMapOval.html#DOC.1.4.26.4.1">get_a</A>() and <!1><A HREF="GMapOval.html#DOC.1.4.26.4.2">get_b</A>()</I>
+<A HREF="#DOC.1.4.25.4.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_rmin</B>(void) const 
+<DD><I>Returns the lesser of <!1><A HREF="GMapOval.html#DOC.1.4.25.4.1">get_a</A>() and <!1><A HREF="GMapOval.html#DOC.1.4.25.4.2">get_b</A>()</I>
 <DT>
-<A HREF="#DOC.1.4.26.4.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_rmax</B>(void) const 
-<DD><I>Returns the greater of <!1><A HREF="GMapOval.html#DOC.1.4.26.4.1">get_a</A>() and <!1><A HREF="GMapOval.html#DOC.1.4.26.4.2">get_b</A>()</I>
+<A HREF="#DOC.1.4.25.4.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_rmax</B>(void) const 
+<DD><I>Returns the greater of <!1><A HREF="GMapOval.html#DOC.1.4.25.4.1">get_a</A>() and <!1><A HREF="GMapOval.html#DOC.1.4.25.4.2">get_b</A>()</I>
 <DT>
-<A HREF="#DOC.1.4.26.4.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   char const* const <B>get_shape_name</B>(void) const 
+<A HREF="#DOC.1.4.25.4.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   MapAreaType const <B>get_shape_type</B>( void ) const 
+<DD><I>Returns MapOval</I>
+<DT>
+<A HREF="#DOC.1.4.25.4.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   char const* const <B>get_shape_name</B>(void) const 
 <DD><I>Returns <TT>&quot;oval&quot;</TT></I>
 <DT>
-<A HREF="#DOC.1.4.26.4.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GMapArea.html#DOC.1.4.26.1.16">GMapArea</A>&gt;  <B>get_copy</B>(void) const 
+<A HREF="#DOC.1.4.25.4.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GMapArea.html#DOC.1.4.25.1.16">GMapArea</A>&gt;  <B>get_copy</B>(void) const 
 <DD><I>Returns a copy of the oval</I>
 </DL></P>
 
@@ -56,11 +59,11 @@
 <DT>
 <IMG ALT="o" SRC=icon2.gif>bool <B>border_always_visible</B>
 <DT>
-<IMG ALT="o" SRC=icon2.gif>u_int32 <B>border_color</B>
+<IMG ALT="o" SRC=icon2.gif>unsigned long int <B>border_color</B>
 <DT>
 <IMG ALT="o" SRC=icon2.gif>int <B>border_width</B>
 <DT>
-<IMG ALT="o" SRC=icon2.gif>u_int32 <B>hilite_color</B>
+<IMG ALT="o" SRC=icon2.gif>unsigned long int <B>hilite_color</B>
 </DL></P>
 
 <P><DL>
@@ -86,6 +89,13 @@
 <IMG ALT="o" SRC=icon2.gif>char const* const <B>check_object</B>(void)
 <DT>
 <IMG ALT="o" SRC=icon2.gif><!1><A HREF="GString.html">GString</A> <B>print</B>(void)
+<DT>
+<IMG ALT="o" SRC=icon2.gif>virtual   void <B>get_coords</B>( GList&lt;int&gt; &amp; CoordList )
+</DL></P>
+
+<P><DL>
+<DT><H3>Public</H3><DD><DT>
+<IMG ALT="o" SRC=icon2.gif> <B></B>
 </DL></P>
 
 </DL>
@@ -114,33 +124,38 @@ be highlighted either. </BLOCKQUOTE>
 <DL>
 
 <A NAME="get_a">
-<A NAME="DOC.1.4.26.4.1">
+<A NAME="DOC.1.4.25.4.1">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int get_a(void) const </B></TT>
 <DD>Returns (xmax-xmin)/2
 <DL><DT><DD></DL><P>
 <A NAME="get_b">
-<A NAME="DOC.1.4.26.4.2">
+<A NAME="DOC.1.4.25.4.2">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int get_b(void) const </B></TT>
 <DD>Returns (ymax-ymin)/2
 <DL><DT><DD></DL><P>
 <A NAME="get_rmin">
-<A NAME="DOC.1.4.26.4.3">
+<A NAME="DOC.1.4.25.4.3">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int get_rmin(void) const </B></TT>
-<DD>Returns the lesser of <!1><A HREF="GMapOval.html#DOC.1.4.26.4.1">get_a</A>() and <!1><A HREF="GMapOval.html#DOC.1.4.26.4.2">get_b</A>()
+<DD>Returns the lesser of <!1><A HREF="GMapOval.html#DOC.1.4.25.4.1">get_a</A>() and <!1><A HREF="GMapOval.html#DOC.1.4.25.4.2">get_b</A>()
 <DL><DT><DD></DL><P>
 <A NAME="get_rmax">
-<A NAME="DOC.1.4.26.4.4">
+<A NAME="DOC.1.4.25.4.4">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int get_rmax(void) const </B></TT>
-<DD>Returns the greater of <!1><A HREF="GMapOval.html#DOC.1.4.26.4.1">get_a</A>() and <!1><A HREF="GMapOval.html#DOC.1.4.26.4.2">get_b</A>()
+<DD>Returns the greater of <!1><A HREF="GMapOval.html#DOC.1.4.25.4.1">get_a</A>() and <!1><A HREF="GMapOval.html#DOC.1.4.25.4.2">get_b</A>()
+<DL><DT><DD></DL><P>
+<A NAME="get_shape_type">
+<A NAME="DOC.1.4.25.4.5">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   MapAreaType const get_shape_type( void ) const </B></TT>
+<DD>Returns MapOval
 <DL><DT><DD></DL><P>
 <A NAME="get_shape_name">
-<A NAME="DOC.1.4.26.4.5">
+<A NAME="DOC.1.4.25.4.6">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   char const* const get_shape_name(void) const </B></TT>
 <DD>Returns <TT>&quot;oval&quot;</TT>
 <DL><DT><DD></DL><P>
 <A NAME="get_copy">
-<A NAME="DOC.1.4.26.4.6">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GMapArea.html#DOC.1.4.26.1.16">GMapArea</A>&gt;  get_copy(void) const </B></TT>
+<A NAME="DOC.1.4.25.4.7">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GMapArea.html#DOC.1.4.25.1.16">GMapArea</A>&gt;  get_copy(void) const </B></TT>
 <DD>Returns a copy of the oval
 <DL><DT><DD></DL><P></DL>
 

@@ -1,61 +1,34 @@
 <HTML>
 <HEAD>
-   <TITLE>class  GOS</TITLE>
+   <TITLE>class  GURLclass  GOS</TITLE>
    <META NAME="GENERATOR" CONTENT="DOC++ 3.4.1">
 </HEAD>
 <BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
 
-<H2>class  <A HREF="#DOC.DOCU">GOS</A></H2>
+<H2>class  GURLclass  <A HREF="#DOC.DOCU">GOS</A></H2>
 <BLOCKQUOTE>Operating System dependent functions.</BLOCKQUOTE>
 <HR>
 
 <DL>
 <P><DL>
 <DT><H3>Public Methods</H3><DD><DT>
-<A HREF="#DOC.1.4.10.1.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   bool <B>is_file</B>(const char *filename)
-<DD><I>Returns true if <TT>filename</TT> exists and is a regular file.</I>
-<DT>
-<A HREF="#DOC.1.4.10.1.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   bool <B>is_dir</B>(const char *filename)
-<DD><I>Returns true if <TT>filename</TT> exists and is a directory.</I>
-<DT>
-<A HREF="#DOC.1.4.10.1.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   <!1><A HREF="GString.html">GString</A> <B>dirname</B>(const char *filename)
-<DD><I>Returns the name of the parent directory of <TT>filename</TT>.</I>
-<DT>
-<A HREF="#DOC.1.4.10.1.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   <!1><A HREF="GString.html">GString</A> <B>basename</B>(const char *filename, const char *suffix=0)
+<A HREF="#DOC.1.4.12.1.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   GUTF8String <B>basename</B>(const GUTF8String &amp;filename, const char *suffix=0)
 <DD><I>Returns the last component of file name <TT>filename</TT>.</I>
 <DT>
-<A HREF="#DOC.1.4.10.1.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   <!1><A HREF="GString.html">GString</A> <B>cwd</B>(const char *<!1><A HREF="GOS.html#DOC.1.4.10.1.3">dirname</A>=0)
+<A HREF="#DOC.1.4.12.1.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   GUTF8String <B>cwd</B>(const GUTF8String &amp;dirname=GUTF8String())
 <DD><I>Sets and returns the current working directory.</I>
 <DT>
-<A HREF="#DOC.1.4.10.1.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   <!1><A HREF="GString.html">GString</A> <B>expand_name</B>(const char *filename, const char *fromdirname=0)
-<DD><I>Returns fully qualified file names.</I>
-<DT>
-<A HREF="#DOC.1.4.10.1.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   int <B>deletefile</B>(const char * filename)
-<DD><I>Deletes file or directory <TT>filename</TT>.</I>
-<DT>
-<A HREF="#DOC.1.4.10.1.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   int <B>mkdir</B>(const char * <!1><A HREF="GOS.html#DOC.1.4.10.1.3">dirname</A>)
-<DD><I>Creates the specified directory.</I>
-<DT>
-<A HREF="#DOC.1.4.10.1.9"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   int <B>cleardir</B>(const char * <!1><A HREF="GOS.html#DOC.1.4.10.1.3">dirname</A>)
-<DD><I>Recursively erases contents of directory <TT>dirname</TT>.</I>
-<DT>
-<A HREF="#DOC.1.4.10.1.10"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   unsigned long <B>ticks</B>()
+<A HREF="#DOC.1.4.12.1.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   unsigned long <B>ticks</B>()
 <DD><I>Returns a number of elapsed milliseconds.</I>
 <DT>
-<A HREF="#DOC.1.4.10.1.11"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   void <B>sleep</B>(int milliseconds)
+<A HREF="#DOC.1.4.12.1.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   void <B>sleep</B>(int milliseconds)
 <DD><I>Sleeps during the specified time expressed in milliseconds.</I>
 <DT>
-<A HREF="#DOC.1.4.10.1.12"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   <!1><A HREF="GString.html">GString</A> <B>filename_to_url</B>(const char *filename, const char *useragent=0)
-<DD><I>Returns a URL for accessing the file <TT>filename</TT>.</I>
+<A HREF="#DOC.1.4.12.1.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   GUTF8String <B>getenv</B>(const GUTF8String &amp;name)
+<DD><I>Read the named variable from the environment, and converts it to UTF8.</I>
 <DT>
-<A HREF="#DOC.1.4.10.1.13"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   <!1><A HREF="GString.html">GString</A> <B>url_to_filename</B>(const char *url)
-<DD><I>Returns a filename for a URL.</I>
-<DT>
-<A HREF="#DOC.1.4.10.1.14"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   <!1><A HREF="GString.html">GString</A> <B>encode_reserved</B>(const char * filename)
+<A HREF="#DOC.1.4.12.1.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   <!1><A HREF="GString.html">GString</A> <B>encode_mbcs_reserved</B>(const char * filename)
 <DD><I>Encodes all reserved characters, so that the <TT>filename</TT> can be used inside a URL.</I>
-<DT>
-<A HREF="#DOC.1.4.10.1.15"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   <!1><A HREF="GString.html">GString</A> <B>decode_reserved</B>(const char * url)
-<DD><I>Decodes reserved characters from the URL.</I>
 </DL></P>
 
 </DL>
@@ -66,115 +39,48 @@
 <BLOCKQUOTE>Operating System dependent functions. </BLOCKQUOTE>
 <DL>
 
-<A NAME="is_file">
-<A NAME="DOC.1.4.10.1.1">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static   bool is_file(const char *filename)</B></TT>
-<DD>Returns true if <TT>filename</TT> exists and is a regular file. 
-<DL><DT><DD></DL><P>
-<A NAME="is_dir">
-<A NAME="DOC.1.4.10.1.2">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static   bool is_dir(const char *filename)</B></TT>
-<DD>Returns true if <TT>filename</TT> exists and is a directory. 
-<DL><DT><DD></DL><P>
-<A NAME="dirname">
-<A NAME="DOC.1.4.10.1.3">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static   <!1><A HREF="GString.html">GString</A> dirname(const char *filename)</B></TT>
-<DD>Returns the name of the parent directory of <TT>filename</TT>.
-This function works like the unix command <TT>/bin/dirname</TT>,
-but also supports the naming conventions of other operating systems. 
-<DL><DT><DD></DL><P>
 <A NAME="basename">
-<A NAME="DOC.1.4.10.1.4">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static   <!1><A HREF="GString.html">GString</A> basename(const char *filename, const char *suffix=0)</B></TT>
+<A NAME="DOC.1.4.12.1.1">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static   GUTF8String basename(const GUTF8String &amp;filename, const char *suffix=0)</B></TT>
 <DD>Returns the last component of file name <TT>filename</TT>.  If the filename
 suffix matches argument <TT>suffix</TT>, the filename suffix is removed.  This
 function works like the unix command <TT>/bin/basename</TT>, but also supports
 the naming conventions of other operating systems. 
 <DL><DT><DD></DL><P>
 <A NAME="cwd">
-<A NAME="DOC.1.4.10.1.5">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static   <!1><A HREF="GString.html">GString</A> cwd(const char *<!1><A HREF="GOS.html#DOC.1.4.10.1.3">dirname</A>=0)</B></TT>
+<A NAME="DOC.1.4.12.1.2">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static   GUTF8String cwd(const GUTF8String &amp;dirname=GUTF8String())</B></TT>
 <DD>Sets and returns the current working directory.
 When argument <TT>dirname</TT> is specified, the current directory is changed
 to <TT>dirname</TT>. This function always returns the fully qualified name
 of the current directory. 
 <DL><DT><DD></DL><P>
-<A NAME="expand_name">
-<A NAME="DOC.1.4.10.1.6">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static   <!1><A HREF="GString.html">GString</A> expand_name(const char *filename, const char *fromdirname=0)</B></TT>
-<DD>Returns fully qualified file names.  This functions constructs the fully
-qualified name of file or directory <TT>filename</TT>. When provided, the
-optional argument <TT>fromdirname</TT> is used as the current directory when
-interpreting relative specifications in <TT>filename</TT>.  Function<P>knows which separators should be used for each operating system and it
-knows which syntactical rules apply. 
-<DL><DT><DD></DL><P>
-<A NAME="deletefile">
-<A NAME="DOC.1.4.10.1.7">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static   int deletefile(const char * filename)</B></TT>
-<DD>Deletes file or directory <TT>filename</TT>.
-Directories are not deleted unless the directory is empty.
-Returns a negative number if an error occurs. 
-<DL><DT><DD></DL><P>
-<A NAME="mkdir">
-<A NAME="DOC.1.4.10.1.8">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static   int mkdir(const char * <!1><A HREF="GOS.html#DOC.1.4.10.1.3">dirname</A>)</B></TT>
-<DD>Creates the specified directory. 
-<DL><DT><DD></DL><P>
-<A NAME="cleardir">
-<A NAME="DOC.1.4.10.1.9">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static   int cleardir(const char * <!1><A HREF="GOS.html#DOC.1.4.10.1.3">dirname</A>)</B></TT>
-<DD>Recursively erases contents of directory <TT>dirname</TT>. The directory
-itself will not be removed. 
-<DL><DT><DD></DL><P>
 <A NAME="ticks">
-<A NAME="DOC.1.4.10.1.10">
+<A NAME="DOC.1.4.12.1.3">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static   unsigned long ticks()</B></TT>
 <DD>Returns a number of elapsed milliseconds.  This number counts elapsed
 milliseconds since a operating system dependent date. This function is
 useful for timing code. 
 <DL><DT><DD></DL><P>
 <A NAME="sleep">
-<A NAME="DOC.1.4.10.1.11">
+<A NAME="DOC.1.4.12.1.4">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static   void sleep(int milliseconds)</B></TT>
 <DD>Sleeps during the specified time expressed in milliseconds.
 Other threads can run while the calling thread sleeps. 
 <DL><DT><DD></DL><P>
-<A NAME="filename_to_url">
-<A NAME="DOC.1.4.10.1.12">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static   <!1><A HREF="GString.html">GString</A> filename_to_url(const char *filename, const char *useragent=0)</B></TT>
-<DD>Returns a URL for accessing the file <TT>filename</TT>. This function normally
-constructs a standard file URL as described in RFC 1738.  
-Some versions of MSIE do not support this
-standard syntax.  A brain damaged MSIE compatible syntax is generated
-when the optional argument <TT>useragent</TT> contains string <TT>&quot;MSIE&quot;</TT> or
-<TT>&quot;Microsoft&quot;</TT>. 
+<A NAME="getenv">
+<A NAME="DOC.1.4.12.1.6">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static   GUTF8String getenv(const GUTF8String &amp;name)</B></TT>
+<DD>Read the named variable from the environment, and converts it to UTF8.
 <DL><DT><DD></DL><P>
-<A NAME="url_to_filename">
-<A NAME="DOC.1.4.10.1.13">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static   <!1><A HREF="GString.html">GString</A> url_to_filename(const char *url)</B></TT>
-<DD>Returns a filename for a URL. Argument <TT>url</TT> must be a legal file URL.
-This function applies heuristic rules to convert the URL into a valid
-file name. It is guaranteed that this function can properly parse all
-URLs generated by <TT>filename_to_url</TT>. The heuristics also work better when
-the file actually exists.  The empty string is returned when this
-function cannot parse the URL or when the URL is not a file URL.
-URL formats are as described in RFC 1738 plus the following alternative
-formats for files on the local host:<P>file:                file:                file:/&lt;path&gt;<P>which are accepted because various browsers recognize them.
-<DL><DT><DD></DL><P>
-<A NAME="encode_reserved">
-<A NAME="DOC.1.4.10.1.14">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static   <!1><A HREF="GString.html">GString</A> encode_reserved(const char * filename)</B></TT>
+<A NAME="encode_mbcs_reserved">
+<A NAME="DOC.1.4.12.1.5">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static   <!1><A HREF="GString.html">GString</A> encode_mbcs_reserved(const char * filename)</B></TT>
 <DD>Encodes all reserved characters, so that the <TT>filename</TT> can be
 used inside a URL. Every reserved character is encoded using escape
 sequence in the form of <TT>%XX</TT>. The legal characters are alphanumeric and
 <TT>$-_.+!*'(),:</TT>.
-Use <!1><A HREF="GOS.html#DOC.1.4.10.1.15">decode_reserved</A>() to convert the URL back to the filename. 
-<DL><DT><DD></DL><P>
-<A NAME="decode_reserved">
-<A NAME="DOC.1.4.10.1.15">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static   <!1><A HREF="GString.html">GString</A> decode_reserved(const char * url)</B></TT>
-<DD>Decodes reserved characters from the URL.
-See also: <!1><A HREF="GOS.html#DOC.1.4.10.1.14">encode_reserved</A>(). 
+Use decode_reserved() to convert the URL back to the filename. 
 <DL><DT><DD></DL><P></DL>
 
 <HR><DL><DT><B>This class has no child classes.</B></DL>

@@ -17,7 +17,7 @@
 <DT>
 
 <IMG ALT="o" BORDER=0 SRC=icon1.gif><A NAME="ZPCodec"></A>
-<B>class  </B><A HREF=ZPCodec.html><B>ZPCodec</B></A><B></B><DD><I>Performs ZP-Coder encoding and decoding.</I>
+<B>class  </B><A HREF=ZPCodec.html><B>ZPCodec</B></A><B>: public <!1><A HREF="GPEnabled.html#DOC.1.4.4.2">GPEnabled</A></B><DD><I>Performs ZP-Coder encoding and decoding.</I>
 <DT>
 
 <IMG ALT="o" BORDER=0 SRC=icon1.gif><A NAME="ZPCodec Examples"></A>
@@ -83,13 +83,13 @@ ZP-Coder is straightforward (see <!1><A HREF="ZPCodecExamples.html">ZPCodec Exam
 initializes them to zero. It then constructs a <!1><A HREF="ZPCodec.html">ZPCodec</A> object for
 encoding. For each message bit, the encoder program retrieves the context
 bits, selects a context variable on the basis of the context bits and
-calls member function <!1><A HREF="ZPCodec.html#DOC.1.4.15.2.4">encoder</A> with the message bit and a
+calls member function <!1><A HREF="ZPCodec.html#DOC.1.4.17.2.2">encoder</A> with the message bit and a
 reference to the context variable.
 <LI> The <EM>decoder program</EM> allocates context variables and
 initializes them to zero. It then constructs a <!1><A HREF="ZPCodec.html">ZPCodec</A> object for
 decoding. For each message bit, the decoder program retrieves the context
 bits, selects a context variable on the basis of the context bits and
-calls member function <!1><A HREF="ZPCodec.html#DOC.1.4.15.2.3">decoder</A> with a reference to the
+calls member function <!1><A HREF="ZPCodec.html#DOC.1.4.17.2.5">decoder</A> with a reference to the
 context variable. This function returns the message bit.
 </UL>
 Functions
@@ -114,7 +114,7 @@ The good news however is that we can grant a license to use the ZP-Coder
 in ``free software'' without further complication. See the Copyright
 for more information.<P></BLOCKQUOTE>
 <DL><DT><DT><B>Author:</B><DD>L&eacute;on Bottou &lt;leonb@research.att.com&gt; 
-<DT><B>Version:</B><DD><TT>$Id: ZPCodec.h.html,v 1.11 2001-08-08 18:14:23 docbill Exp $</TT>
+<DT><B>Version:</B><DD><TT>$Id: ZPCodec.h.html,v 1.12 2001-08-08 18:15:45 docbill Exp $</TT>
 
 <DD></DL><P><I><A HREF="index.html">Alphabetic index</A></I> <I><A HREF="HIER.html">Hierarchy of classes</A></I></P><HR>
 <!-- This is were the DOC++ footer is defined  -->

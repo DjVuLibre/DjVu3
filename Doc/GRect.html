@@ -12,16 +12,16 @@
 <DL>
 <P><DL>
 <DT><H3>Public Fields</H3><DD><DT>
-<A HREF="#DOC.1.4.8.2.16"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>xmin</B>
+<A HREF="#DOC.1.4.8.2.18"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>xmin</B>
 <DD><I>Minimal horizontal point coordinate of the rectangle.</I>
 <DT>
-<A HREF="#DOC.1.4.8.2.17"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>ymin</B>
+<A HREF="#DOC.1.4.8.2.19"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>ymin</B>
 <DD><I>Minimal vertical point coordinate of the rectangle.</I>
 <DT>
-<A HREF="#DOC.1.4.8.2.18"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>xmax</B>
+<A HREF="#DOC.1.4.8.2.20"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>xmax</B>
 <DD><I>Maximal horizontal point coordinate of the rectangle.</I>
 <DT>
-<A HREF="#DOC.1.4.8.2.19"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>ymax</B>
+<A HREF="#DOC.1.4.8.2.21"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>ymax</B>
 <DD><I>Maximal vertical point coordinate of the rectangle.</I>
 </DL></P>
 
@@ -30,7 +30,7 @@
 <A HREF="#DOC.1.4.8.2.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GRect</B>()
 <DD><I>Constructs an empty rectangle </I>
 <DT>
-<A HREF="#DOC.1.4.8.2.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GRect</B>(int <!1><A HREF="GRect.html#DOC.1.4.8.2.16">xmin</A>, int <!1><A HREF="GRect.html#DOC.1.4.8.2.17">ymin</A>, unsigned int <!1><A HREF="GRect.html#DOC.1.4.8.2.3">width</A>=0, unsigned int <!1><A HREF="GRect.html#DOC.1.4.8.2.4">height</A>=0)
+<A HREF="#DOC.1.4.8.2.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GRect</B>(int <!1><A HREF="GRect.html#DOC.1.4.8.2.18">xmin</A>, int <!1><A HREF="GRect.html#DOC.1.4.8.2.19">ymin</A>, unsigned int <!1><A HREF="GRect.html#DOC.1.4.8.2.3">width</A>=0, unsigned int <!1><A HREF="GRect.html#DOC.1.4.8.2.4">height</A>=0)
 <DD><I>Constructs a rectangle given its minimal coordinates <TT>xmin</TT> and <TT>ymin</TT>, and its measurements <TT>width</TT> and <TT>height</TT>.</I>
 <DT>
 <A HREF="#DOC.1.4.8.2.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>width</B>() const 
@@ -71,6 +71,12 @@
 <DT>
 <A HREF="#DOC.1.4.8.2.15"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>recthull</B>(const <!1><A HREF="GRect.html#DOC.1.4.8.2.1">GRect</A> &amp;rect1, const <!1><A HREF="GRect.html#DOC.1.4.8.2.1">GRect</A> &amp;rect2)
 <DD><I>Sets the rectangle to the smallest rectangle containing the points of both rectangles <TT>rect1</TT> and <TT>rect2</TT>.</I>
+<DT>
+<A HREF="#DOC.1.4.8.2.16"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>scale</B>(float factor)
+<DD><I>Multiplies xmin, ymin, xmax, ymax by factor and scales the rectangle</I>
+<DT>
+<A HREF="#DOC.1.4.8.2.17"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>scale</B>(float xfactor, float yfactor)
+<DD><I>Multiplies xmin, xmax by xfactor and ymin, ymax by yfactor and scales the rectangle</I>
 </DL></P>
 
 </DL>
@@ -93,7 +99,7 @@ enclosing two rectangles (<!1><A HREF="GRect.html#DOC.1.4.8.2.15">recthull</A>).
 <DL><DT><DD></DL><P>
 <A NAME="GRect">
 <A NAME="DOC.1.4.8.2.2">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> GRect(int <!1><A HREF="GRect.html#DOC.1.4.8.2.16">xmin</A>, int <!1><A HREF="GRect.html#DOC.1.4.8.2.17">ymin</A>, unsigned int <!1><A HREF="GRect.html#DOC.1.4.8.2.3">width</A>=0, unsigned int <!1><A HREF="GRect.html#DOC.1.4.8.2.4">height</A>=0)</B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> GRect(int <!1><A HREF="GRect.html#DOC.1.4.8.2.18">xmin</A>, int <!1><A HREF="GRect.html#DOC.1.4.8.2.19">ymin</A>, unsigned int <!1><A HREF="GRect.html#DOC.1.4.8.2.3">width</A>=0, unsigned int <!1><A HREF="GRect.html#DOC.1.4.8.2.4">height</A>=0)</B></TT>
 <DD>Constructs a rectangle given its minimal coordinates <TT>xmin</TT> and <TT>ymin</TT>,
 and its measurements <TT>width</TT> and <TT>height</TT>. Setting <TT>width</TT> or <TT>height</TT> to zero
 produces an empty rectangle.  
@@ -176,23 +182,33 @@ This function returns true if the intersection rectangle is not empty.
 both rectangles <TT>rect1</TT> and <TT>rect2</TT>. This function returns true if the
 created rectangle is not empty. 
 <DL><DT><DD></DL><P>
-<A NAME="xmin">
+<A NAME="scale">
 <A NAME="DOC.1.4.8.2.16">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void scale(float factor)</B></TT>
+<DD>Multiplies xmin, ymin, xmax, ymax by factor and scales the rectangle
+<DL><DT><DD></DL><P>
+<A NAME="scale">
+<A NAME="DOC.1.4.8.2.17">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void scale(float xfactor, float yfactor)</B></TT>
+<DD>Multiplies xmin, xmax by xfactor and ymin, ymax by yfactor and scales the rectangle
+<DL><DT><DD></DL><P>
+<A NAME="xmin">
+<A NAME="DOC.1.4.8.2.18">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int xmin</B></TT>
 <DD>Minimal horizontal point coordinate of the rectangle. 
 <DL><DT><DD></DL><P>
 <A NAME="ymin">
-<A NAME="DOC.1.4.8.2.17">
+<A NAME="DOC.1.4.8.2.19">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int ymin</B></TT>
 <DD>Minimal vertical point coordinate of the rectangle. 
 <DL><DT><DD></DL><P>
 <A NAME="xmax">
-<A NAME="DOC.1.4.8.2.18">
+<A NAME="DOC.1.4.8.2.20">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int xmax</B></TT>
 <DD>Maximal horizontal point coordinate of the rectangle. 
 <DL><DT><DD></DL><P>
 <A NAME="ymax">
-<A NAME="DOC.1.4.8.2.19">
+<A NAME="DOC.1.4.8.2.21">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int ymax</B></TT>
 <DD>Maximal vertical point coordinate of the rectangle. 
 <DL><DT><DD></DL><P></DL>

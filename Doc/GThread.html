@@ -30,7 +30,7 @@
 <A HREF="#DOC.1.4.9.1.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   void* <B>current</B>()
 <DD><I>Returns a value which uniquely identifies the current thread.</I>
 <DT>
-<A HREF="#DOC.1.4.9.1.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   int <B>select</B>(int nfds, fd_set*, fd_set*, fd_set*, struct timeval*)
+<A HREF="#DOC.1.4.9.1.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>friendclass  GMonitorclass  cotaskclass  cotaskstatic  *task int <B>select</B>(int nfds, fd_set*, fd_set*, fd_set*, struct timeval*)
 <DD><I>Replaces system call <TT>select</TT> (COTHREADS only).</I>
 <DT>
 <A HREF="#DOC.1.4.9.1.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   void <B>get_select</B>(int &amp;nfds, fd_set*, fd_set*, fd_set*, unsigned long &amp;timeout)
@@ -113,7 +113,7 @@ obtain more information.
 <DL><DT><DD></DL><P>
 <A NAME="select">
 <A NAME="DOC.1.4.9.1.7">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static   int select(int nfds, fd_set*, fd_set*, fd_set*, struct timeval*)</B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>friendclass  GMonitorclass  cotaskclass  cotaskstatic  *task int select(int nfds, fd_set*, fd_set*, fd_set*, struct timeval*)</B></TT>
 <DD>Replaces system call <TT>select</TT> (COTHREADS only).  The <TT>COTHREADS</TT> model
 does not redefine system function.  System functions therefore can
 potentially block the whole process (instead of blocking the current

@@ -40,7 +40,7 @@ to implement this strategy in our case. The reason is that there may be
 more than one "client" working with the same document, and the document
 should send the information to each of the clients. This could be done by
 means of callback <EM>lists</EM>, of course, but we want to achieve more
-bulletproof results: we want to be sure that the client, that we're about
+bulletproof results: we want to be sure that the client that we're about
 to contact is still alive, and is not being destroyed by another thread.
 Besides, we are going to call these "callbacks" from many places, from
 many different classes.  Maintaining multi-thread safe callback lists is
@@ -49,7 +49,7 @@ very difficult.<P>Finally, we want to provide some default implementation of the
 themselves if they can, and contact the client only if they're unable to
 do it (like in the case of <!1><A HREF="DjVuPort.html#DOC.1.5.27.1.5.3">request_data</A>() with local URL
 where <!1><A HREF="DjVuDocument.html">DjVuDocument</A> can get the data from the hard drive itself not
-disturbing the document's creator.<P>Two class implement a general communication mechanism: <!1><A HREF="DjVuPort.html">DjVuPort</A> and
+disturbing the document's creator.<P>Two classes implement a general communication mechanism: <!1><A HREF="DjVuPort.html">DjVuPort</A> and
 <!1><A HREF="DjVuPortcaster.html">DjVuPortcaster</A>. Any sender and recipient of requests should be a
 subclass of <!1><A HREF="DjVuPort.html">DjVuPort</A>.  <!1><A HREF="DjVuPortcaster.html">DjVuPortcaster</A> maintains a map of
 routes between <!1><A HREF="DjVuPort.html">DjVuPort</A>s, which should be configured by somebody
@@ -61,7 +61,7 @@ performed from a single place and are serialized by a global monitor.<P></BLOCKQ
 <DL><DT><DT><B>Author:</B><DD>Andrei Erofeev &lt;eaf@geocities.com&gt;<BR>
 L&eacute;on Bottou &lt;leonb@research.att.com&gt;
 
-<DT><B>Version:</B><DD><TT>$Id: DjVuPort.h.html,v 1.4 2001-08-08 17:54:16 docbill Exp $</TT> 
+<DT><B>Version:</B><DD><TT>$Id: DjVuPort.h.html,v 1.5 2001-08-08 17:58:32 docbill Exp $</TT> 
 <DD></DL><P><I><A HREF="index.html">Alphabetic index</A></I> <I><A HREF="HIER.html">Hierarchy of classes</A></I></P><HR>
 <!-- This is were the DOC++ footer is defined  -->
 

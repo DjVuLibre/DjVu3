@@ -22,31 +22,31 @@
 <DL>
 <P><DL>
 <DT><H3>Public Methods</H3><DD><DT>
-<A HREF="#DOC.1.5.9.3.9"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GSafeFlags</B>(long flags=0)
+<A HREF="#DOC.1.4.9.3.9"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GSafeFlags</B>(long flags=0)
 <DD><I>Constructs <TT>GSafeFlags</TT> object.</I>
 <DT>
-<A HREF="#DOC.1.5.9.3.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GSafeFlags.html#DOC.1.5.9.3.9">GSafeFlags</A>&amp; <B>operator=</B>(const <!1><A HREF="GSafeFlags.html#DOC.1.5.9.3.9">GSafeFlags</A> &amp; f)
+<A HREF="#DOC.1.4.9.3.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GSafeFlags.html#DOC.1.4.9.3.9">GSafeFlags</A>&amp; <B>operator=</B>(const <!1><A HREF="GSafeFlags.html#DOC.1.4.9.3.9">GSafeFlags</A> &amp; f)
 <DD><I>Assignment operator.</I>
 <DT>
-<A HREF="#DOC.1.5.9.3.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>operator long</B>(void) const 
+<A HREF="#DOC.1.4.9.3.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>operator long</B>(void) const 
 <DD><I>Returns the value of the flags </I>
 <DT>
-<A HREF="#DOC.1.5.9.3.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GSafeFlags.html#DOC.1.5.9.3.9">GSafeFlags</A>&amp; <B>operator|=</B>(long mask)
+<A HREF="#DOC.1.4.9.3.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GSafeFlags.html#DOC.1.4.9.3.9">GSafeFlags</A>&amp; <B>operator|=</B>(long mask)
 <DD><I>Modifies the flags by ORing them with the provided mask.</I>
 <DT>
-<A HREF="#DOC.1.5.9.3.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GSafeFlags.html#DOC.1.5.9.3.9">GSafeFlags</A>&amp; <B>operator&amp;=</B>(long mask)
+<A HREF="#DOC.1.4.9.3.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GSafeFlags.html#DOC.1.4.9.3.9">GSafeFlags</A>&amp; <B>operator&amp;=</B>(long mask)
 <DD><I>Modifies the flags by ANDing them with the provided mask.</I>
 <DT>
-<A HREF="#DOC.1.5.9.3.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>bool <B>test_and_modify</B>(long set_mask, long clr_mask, long set_mask1, long clr_mask1)
+<A HREF="#DOC.1.4.9.3.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>bool <B>test_and_modify</B>(long set_mask, long clr_mask, long set_mask1, long clr_mask1)
 <DD><I>If all bits mentioned in <TT>set_mask</TT> are set in the flags and all bits mentioned in <TT>clr_mask</TT> are cleared in the flags, it sets all bits from <TT>set_mask1</TT> in the flags, clears all flags from <TT>clr_mask1</TT> in the flags and returns <TT>TRUE</TT>.</I>
 <DT>
-<A HREF="#DOC.1.5.9.3.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>wait_and_modify</B>(long set_mask, long clr_mask, long set_mask1, long clr_mask1)
+<A HREF="#DOC.1.4.9.3.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>wait_and_modify</B>(long set_mask, long clr_mask, long set_mask1, long clr_mask1)
 <DD><I>Waits until all bits mentioned in <TT>set_mask</TT> are set in the flags and all bits mentioned in <TT>clr_flags</TT> are cleared in the flags.</I>
 <DT>
-<A HREF="#DOC.1.5.9.3.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>wait_for_flags</B>(long set_mask, long clr_mask=0) const 
+<A HREF="#DOC.1.4.9.3.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>wait_for_flags</B>(long set_mask, long clr_mask=0) const 
 <DD><I>Waits until all bits set in <TT>set_mask</TT> are set in the flags and all bits mentioned in <TT>clr_mask</TT> are cleared in the flags.</I>
 <DT>
-<A HREF="#DOC.1.5.9.3.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>modify</B>(long set_mask, long clr_mask)
+<A HREF="#DOC.1.4.9.3.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>modify</B>(long set_mask, long clr_mask)
 <DD><I>Modifies the flags by setting all bits mentioned in <TT>set_mask</TT> and clearing all bits mentioned in <TT>clr_mask</TT>.</I>
 </DL></P>
 
@@ -68,7 +68,7 @@
 <BLOCKQUOTE>A thread safe class representing a set of flags. The flags are protected
 by <!1><A HREF="GMonitor.html">GMonitor</A>, which is attempted to be locked whenever somebody
 accesses the flags. One can modify the class contents using one of
-two functions: <!1><A HREF="GSafeFlags.html#DOC.1.5.9.3.5">test_and_modify</A>() and <!1><A HREF="GSafeFlags.html#DOC.1.5.9.3.6">wait_and_modify</A>().
+two functions: <!1><A HREF="GSafeFlags.html#DOC.1.4.9.3.5">test_and_modify</A>() and <!1><A HREF="GSafeFlags.html#DOC.1.4.9.3.6">wait_and_modify</A>().
 Both of them provide atomic operation of testing (first) and modification
 (second). The flags remain locked between the moment of testing and
 modification, which guarantees, that their state cannot be changed in
@@ -76,35 +76,35 @@ between of these operations. </BLOCKQUOTE>
 <DL>
 
 <A NAME="GSafeFlags">
-<A NAME="DOC.1.5.9.3.9">
+<A NAME="DOC.1.4.9.3.9">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> GSafeFlags(long flags=0)</B></TT>
 <DD>Constructs <TT>GSafeFlags</TT> object.
 <DL><DT><DD></DL><P>
 <A NAME="operator=">
-<A NAME="DOC.1.5.9.3.1">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GSafeFlags.html#DOC.1.5.9.3.9">GSafeFlags</A>&amp; operator=(const <!1><A HREF="GSafeFlags.html#DOC.1.5.9.3.9">GSafeFlags</A> &amp; f)</B></TT>
+<A NAME="DOC.1.4.9.3.1">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GSafeFlags.html#DOC.1.4.9.3.9">GSafeFlags</A>&amp; operator=(const <!1><A HREF="GSafeFlags.html#DOC.1.4.9.3.9">GSafeFlags</A> &amp; f)</B></TT>
 <DD>Assignment operator. Will also wake up threads waiting for the
 flags to change. 
 <DL><DT><DD></DL><P>
 <A NAME="operator long">
-<A NAME="DOC.1.5.9.3.2">
+<A NAME="DOC.1.4.9.3.2">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> operator long(void) const </B></TT>
 <DD>Returns the value of the flags 
 <DL><DT><DD></DL><P>
 <A NAME="operator|=">
-<A NAME="DOC.1.5.9.3.3">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GSafeFlags.html#DOC.1.5.9.3.9">GSafeFlags</A>&amp; operator|=(long mask)</B></TT>
+<A NAME="DOC.1.4.9.3.3">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GSafeFlags.html#DOC.1.4.9.3.9">GSafeFlags</A>&amp; operator|=(long mask)</B></TT>
 <DD>Modifies the flags by ORing them with the provided mask. A broadcast
 will be sent after the modification is done. 
 <DL><DT><DD></DL><P>
 <A NAME="operator&=">
-<A NAME="DOC.1.5.9.3.4">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GSafeFlags.html#DOC.1.5.9.3.9">GSafeFlags</A>&amp; operator&amp;=(long mask)</B></TT>
+<A NAME="DOC.1.4.9.3.4">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GSafeFlags.html#DOC.1.4.9.3.9">GSafeFlags</A>&amp; operator&amp;=(long mask)</B></TT>
 <DD>Modifies the flags by ANDing them with the provided mask. A broadcast
 will be sent after the modification is done. 
 <DL><DT><DD></DL><P>
 <A NAME="test_and_modify">
-<A NAME="DOC.1.5.9.3.5">
+<A NAME="DOC.1.4.9.3.5">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>bool test_and_modify(long set_mask, long clr_mask, long set_mask1, long clr_mask1)</B></TT>
 <DD>If all bits mentioned in <TT>set_mask</TT> are set in the flags and all
 bits mentioned in <TT>clr_mask</TT> are cleared in the flags, it sets all
@@ -113,7 +113,7 @@ bits from <TT>set_mask1</TT> in the flags, clears all flags from
 <TT>FALSE</TT>. 
 <DL><DT><DD></DL><P>
 <A NAME="wait_and_modify">
-<A NAME="DOC.1.5.9.3.6">
+<A NAME="DOC.1.4.9.3.6">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void wait_and_modify(long set_mask, long clr_mask, long set_mask1, long clr_mask1)</B></TT>
 <DD>Waits until all bits mentioned in <TT>set_mask</TT> are set in the flags
 and all bits mentioned in <TT>clr_flags</TT> are cleared in the flags.
@@ -121,13 +121,13 @@ After that it sets bits from <TT>set_mask1</TT> and clears bits from
 <TT>clr_mask1</TT> in the flags. 
 <DL><DT><DD></DL><P>
 <A NAME="wait_for_flags">
-<A NAME="DOC.1.5.9.3.7">
+<A NAME="DOC.1.4.9.3.7">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void wait_for_flags(long set_mask, long clr_mask=0) const </B></TT>
 <DD>Waits until all bits set in <TT>set_mask</TT> are set in the flags and
 all bits mentioned in <TT>clr_mask</TT> are cleared in the flags. 
 <DL><DT><DD></DL><P>
 <A NAME="modify">
-<A NAME="DOC.1.5.9.3.8">
+<A NAME="DOC.1.4.9.3.8">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void modify(long set_mask, long clr_mask)</B></TT>
 <DD>Modifies the flags by setting all bits mentioned in <TT>set_mask</TT>
 and clearing all bits mentioned in <TT>clr_mask</TT>. If the flags have
@@ -140,7 +140,7 @@ actually been modified, a broadcast will be sent.
 <!-- This is were the DOC++ footer is defined  -->
 
 <font face="arial,helvetica" size="2">
-<a href=http://www.lizardtech.com>DjVu</a> is a trademark of AT&amp;T.  
+<a href=http://www.lizardtech.com>DjVu</a> is a trademark of LizardTech, Inc.  
 <br>All other products mentioned are registered trademarks or trademarks of
 their respective companies.
 </font>
