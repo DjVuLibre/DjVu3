@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.123 2000-07-03 17:28:14 bcr Exp $
+//C- $Id: DjVuDocument.cpp,v 1.124 2000-07-05 16:50:53 bcr Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -41,6 +41,7 @@ DjVuDocument::init(const GURL & url, GP<DjVuPort> port, DjVuFileCache * cache)
 {
    start_init(url, port, cache);
    wait_for_complete_init();
+   GPBase::preserve(0);
 }
 
 void

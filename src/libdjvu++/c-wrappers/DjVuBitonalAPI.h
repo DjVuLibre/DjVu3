@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuBitonalAPI.h,v 1.14 2000-07-04 00:51:50 mrosen Exp $
+ *C- $Id: DjVuBitonalAPI.h,v 1.15 2000-07-05 16:50:53 bcr Exp $
  */
 
 #ifndef _DJVUBITONAL_H_
@@ -25,7 +25,10 @@
 
 /* 
  * $Log: DjVuBitonalAPI.h,v $
- * Revision 1.14  2000-07-04 00:51:50  mrosen
+ * Revision 1.15  2000-07-05 16:50:53  bcr
+ * Updated the documentation.
+ *
+ * Revision 1.14  2000/07/04 00:51:50  mrosen
  * updated documentation
  *
  * Revision 1.13  2000/03/09 22:27:59  bcr
@@ -119,10 +122,10 @@ typedef struct djvu_jb2_options_struct djvu_jb2_options;
 
 
 /** @memo #bitonaltodjvu_options# lists options corresponding to
-    \URL[bitonaltodjvu]{../bitonaltodjvu.html}.
+    \URL[bitonaltodjvu]{../SDKTools/bitonaltodjvu.html}.
 
     The values of the #bitonaltodjvu_options# correspond to
-    the command line options of the \URL[bitonaltodjvu]{../bitonaltodjvu.html}
+    the command line options of the \URL[bitonaltodjvu]{../SDKTools/bitonaltodjvu.html}
     utility.
 */
 

@@ -14,7 +14,7 @@
     {\bf Acknowledgements} -- The DjVu API is the results of the
     work of the whole DjVu team, which includes researchers,
     developers, contractors, webmasters, marketing, testers, and 
-    even a few lawyers.  The \URL[DjVu Credits]{../djvucredits.html} 
+    even a few lawyers.  The \URL[DjVu Credits]{../SDKTools/djvucredits.html} 
     lists the key contributors to these libraries and utilities.
     @version
     3.0

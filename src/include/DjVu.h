@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVu.h,v 1.12 2000-07-04 00:51:49 mrosen Exp $
+ *C- $Id: DjVu.h,v 1.13 2000-07-05 16:50:53 bcr Exp $
  */
 
 #ifndef _DJVU_GLOBAL_API_H
@@ -26,7 +26,10 @@
 
 /*
  * $Log: DjVu.h,v $
- * Revision 1.12  2000-07-04 00:51:49  mrosen
+ * Revision 1.13  2000-07-05 16:50:53  bcr
+ * Updated the documentation.
+ *
+ * Revision 1.12  2000/07/04 00:51:49  mrosen
  * updated documentation
  *
  * Revision 1.11  2000/03/10 14:57:35  haffner
@@ -211,7 +214,7 @@ djvu_set_progress_callback(djvu_progress_callback *);
     \end{itemize}
     Before using the #DjVu Parse Options# structures and functions, it
     is best to being by reading the manual page
-    \URL[djvuprofile]{../djvuprofile.html}.
+    \URL[djvuprofile]{../SDKTools/djvuprofile.html}.
 */
 /*@{*/
 /** The #djvu_option# structure is very similar to the standard unix
