@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: BSByteStream.cpp,v 1.21 2000-11-09 20:15:05 jmw Exp $
+// $Id: BSByteStream.cpp,v 1.22 2000-12-20 01:41:43 bcr Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 07/1998
@@ -531,8 +531,7 @@ _BSort::radixsort8(void)
 {
   int i;
   // Initialize frequency array
-  int *lo = new int [256];
-  int *hi = new int [256];
+  int lo[256], hi[256];
   for (i=0; i<256; i++)
     hi[i] = lo[i] = 0;
   // Count occurences
@@ -556,9 +555,6 @@ _BSort::radixsort8(void)
   rank[size-1] = 0;
   // Extra element
   rank[size] = -1;
-  // Free
-  delete [] lo;
-  delete [] hi;
 }
 
 
@@ -569,7 +565,8 @@ _BSort::radixsort16(void)
 {
   int i;
   // Initialize frequency array
-  int *ftab = new int [65536];
+  int *ftab;
+  GPBuffer<int> gftab(ftab,65536);
   for (i=0; i<65536; i++)
     ftab[i] = 0;
   // Count occurences
@@ -608,8 +605,6 @@ _BSort::radixsort16(void)
   rank[size-2] = ftab[(c1<<8)];
   // Extra element
   rank[size] = -1;
-  // Free ftab
-  delete [] ftab;
 }
 
 
@@ -1042,7 +1037,8 @@ BSByteStream::decode()
   if (markerpos<1 || markerpos>=size)
     G_THROW("bytestream.corrupt");        //  Corrupted decoder input
   // Allocate pointers
-  unsigned int *posn = new unsigned int[blocksize];
+  unsigned int *posn;
+  GPBuffer<unsigned int> gposn(posn,blocksize);
   memset(posn, 0, sizeof(unsigned int)*size);
   // Prepare count buffer
   int count[256];
@@ -1080,7 +1076,6 @@ BSByteStream::decode()
       i = count[c] + (n & 0xffffff);
     }
   // Free and check
-  delete [] posn;
   if (i != markerpos)
     G_THROW("bytestream.corrupt");        //  Corrupted decoder input
   return size;

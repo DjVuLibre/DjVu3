@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: IWImage.cpp,v 1.36 2000-12-18 17:13:42 bcr Exp $
+// $Id: IWImage.cpp,v 1.37 2000-12-20 01:41:43 bcr Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 08/1998
@@ -114,13 +114,15 @@ interpolate_mask(short *data16, int w, int h, int rowsize,
 {
   int i,j;
   // count masked bits
-  short *count = new short[h*w];
+  short *count;
+  GPBuffer<short> gcount(count,w*h);
   short *cp = count;
   for (i=0; i<h; i++, cp+=w, mask8+=mskrowsize)
     for (j=0; j<w; j++)
       cp[j] = (mask8[j] ? 0 : 0x1000);
   // copy image
-  short *sdata = new short[w*h];
+  short *sdata;
+  GPBuffer<short> gsdata(sdata,w*h);
   short *p = sdata;
   short *q = data16;
   for (i=0; i<h; i++, p+=w, q+=rowsize)
@@ -204,7 +206,6 @@ interpolate_mask(short *data16, int w, int h, int rowsize,
       scale = scale+scale;
     }
   // free memory
-  delete [] count;
   delete [] sdata;
 }
 
@@ -218,8 +219,10 @@ forward_mask(short *data16, int w, int h, int rowsize, int begin, int end,
   short *p;
   short *d;
   // Allocate buffers
-  short *sdata = new short[h*w];
-  signed char *smask = new signed char[h*w];
+  short *sdata;
+  GPBuffer<short> gsdata(sdata,w*h);
+  signed char *smask;
+  GPBuffer<signed char> gsmask(smask,w*h);
   // Copy mask
   m = smask;
   for (i=0; i<h; i+=1, m+=w, mask8+=mskrowsize)
@@ -303,8 +306,6 @@ forward_mask(short *data16, int w, int h, int rowsize, int begin, int end,
         }
     }
   // Free buffers
-  delete [] sdata;
-  delete [] smask;
 }
 
 #endif
@@ -639,7 +640,8 @@ _IWMap::create(const signed char *img8, int imgrowsize,
   // Progress
   DJVU_PROGRESS_TASK(transf,"create iw44 map",3);
   // Allocate decomposition buffer
-  short *data16 = new short[bw*bh];
+  short *data16;
+  GPBuffer<short> gdata16(data16,bw*bh);
   // Copy pixels
   short *p = data16;
   const signed char *row = img8;
@@ -691,8 +693,6 @@ _IWMap::create(const signed char *img8, int imgrowsize,
       // next row of blocks
       p += 32*bw;
     }
-  // Free decomposition buffer
-  delete [] data16;
 }
 #endif // NEED_DECODER_ONLY
 
@@ -718,7 +718,8 @@ void
 _IWMap::image(signed char *img8, int rowsize, int pixsep, int fast)
 {
   // Allocate reconstruction buffer
-  short *data16 = new short[bw*bh];
+  short *data16;
+  GPBuffer<short> gdata16(data16,bw*bh);
   // Copy coefficients
   int i;
   short *p = data16;
@@ -771,8 +772,6 @@ _IWMap::image(signed char *img8, int rowsize, int pixsep, int fast)
       row += rowsize;
       p += bw;
     }
-  // Delete buffer
-  delete [] data16;
 }
 
 void 
@@ -822,7 +821,8 @@ _IWMap::image(int subsample, const GRect &rect,
   // -- allocate work buffer
   int dataw = work.xmax - work.xmin;     // Note: cannot use inline width() or height()
   int datah = work.ymax - work.ymin;     // because Intel C++ compiler optimizes it wrong !
-  short *data = new short[dataw * datah];
+  short *data;
+  GPBuffer<short> gdata(data,dataw*datah);
   // Fill working rectangle
   // -- loop over liftblocks rows
   short *ldata = data;
@@ -908,8 +908,6 @@ _IWMap::image(int subsample, const GRect &rect,
       row += rowsize;
       p += dataw;
     }
-  // Free reconstruction area
-  delete [] data;
 }
 
 
@@ -1682,7 +1680,8 @@ _IWCodec::estimate_decibel(float frac)
   for (j=1; j<10; j++)
     norm_hi[j] = *q++;
   // Initialize mse array
-  float *xmse = new float[map.nb];
+  float *xmse;
+  GPBuffer<float> gxmse(xmse,map.nb);
   // Compute mse in each block
   for (int blockno=0; blockno<map.nb; blockno++)
     {
@@ -1759,7 +1758,6 @@ _IWCodec::estimate_decibel(float frac)
     mse = mse + xmse[i];
   mse = mse / (map.nb - p);
   // Return
-  delete [] xmse;
   float factor = 255 << iw_shift;
   float decibel = (float)(10.0 * log ( factor * factor / mse ) / 2.302585125);
   return decibel;
@@ -1857,42 +1855,31 @@ IWBitmap::init(const GBitmap *bm, const GBitmap *mask)
   int h = bm->rows();
   int g = bm->get_grays()-1;
   signed char *buffer = new signed char[w*h];
+  GPBuffer<signed char> gbuffer(buffer,w*h);
   // Prepare gray level conversion table
   signed char  bconv[256];
   for (i=0; i<256; i++)
     bconv[i] = max(0,min(255,i*255/g)) - 128;
   // Perform decomposition
-  G_TRY
+  // Prepare mask information
+  const signed char *msk8 = 0;
+  int mskrowsize = 0;
+  if (mask)
     {
-      // Prepare mask information
-      const signed char *msk8 = 0;
-      int mskrowsize = 0;
-      if (mask)
-        {
-          msk8 = (const signed char*)((*mask)[0]);
-          mskrowsize = mask->rowsize();
-        }
-      // Prepare a buffer of signed bytes
-      for (i=0; i<h; i++)
-        {
-          signed char *bufrow = buffer + i*w;
-          const unsigned char *bmrow = (*bm)[i];
-          for (j=0; j<w; j++)
-            bufrow[j] = bconv[bmrow[j]];
-        }
-      // Create map
-      ymap = new _IWMap( w, h );
-      ymap->create(buffer, w, msk8, mskrowsize);
+      msk8 = (const signed char*)((*mask)[0]);
+      mskrowsize = mask->rowsize();
     }
-  G_CATCH_ALL
+  // Prepare a buffer of signed bytes
+  for (i=0; i<h; i++)
     {
-      delete [] buffer;
-      G_RETHROW;
+      signed char *bufrow = buffer + i*w;
+      const unsigned char *bmrow = (*bm)[i];
+      for (j=0; j<w; j++)
+        bufrow[j] = bconv[bmrow[j]];
     }
-  G_ENDCATCH;
-  // Delete buffer
-  delete [] buffer;
-  buffer = 0;
+  // Create map
+  ymap = new _IWMap( w, h );
+  ymap->create(buffer, w, msk8, mskrowsize);
 }
 #endif
 
@@ -2254,71 +2241,59 @@ IWPixmap::init(const GPixmap *pm, const GBitmap *mask, CRCBMode crcbmode)
   /* Create */
   int w = pm->columns();
   int h = pm->rows();
-  signed char *buffer = 0;
-  G_TRY
+  signed char *buffer;
+  GPBuffer<signed char> gbuffer(buffer,w*h);
+  // Create maps
+  ymap = new _IWMap(w,h);
+  // Handle CRCB mode
+  switch (crcbmode) 
     {
-      buffer = new signed char[w*h];
-      // Create maps
-      ymap = new _IWMap(w,h);
-      // Handle CRCB mode
-      switch (crcbmode) 
+    case CRCBnone:   crcb_half=1; crcb_delay=-1; break;
+    case CRCBhalf:   crcb_half=1; crcb_delay=10; break;        
+    case CRCBnormal: crcb_half=0; crcb_delay=10; break;
+    case CRCBfull:   crcb_half=0; crcb_delay= 0; break;
+    }
+  // Prepare mask information
+  const signed char *msk8 = 0;
+  int mskrowsize = 0;
+  if (mask)
+    {
+      msk8 = (const signed char*)((*mask)[0]);
+      mskrowsize = mask->rowsize();
+    }
+  // Fill buffer with luminance information
+  DJVU_PROGRESS_TASK(create,"initialize pixmap",3);
+  DJVU_PROGRESS_RUN(create,(crcb_delay>=0 ? 1 : 3));
+  IWTransform::RGB_to_Y((*pm)[0], w, h, pm->rowsize(), buffer, w);
+  if (crcb_delay < 0)
+    {
+      // Stupid inversion for gray images
+      signed char *e = buffer + w*h;
+      for (signed char *b=buffer; b<e; b++)
+        *b = 255 - *b;
+    }
+  // Create YMAP
+  ymap->create(buffer, w, msk8, mskrowsize);
+  // Create chrominance maps
+  if (crcb_delay >= 0)
+    {
+      cbmap = new _IWMap(w,h);
+      crmap = new _IWMap(w,h);
+      // Process CB information
+      DJVU_PROGRESS_RUN(create,2);
+      IWTransform::RGB_to_Cb((*pm)[0], w, h, pm->rowsize(), buffer, w);
+      cbmap->create(buffer, w, msk8, mskrowsize);
+      // Process CR information
+      DJVU_PROGRESS_RUN(create,3);
+      IWTransform::RGB_to_Cr((*pm)[0], w, h, pm->rowsize(), buffer, w); 
+      crmap->create(buffer, w, msk8, mskrowsize);
+      // Perform chrominance reduction (CRCBhalf)
+      if (crcb_half)
         {
-        case CRCBnone:   crcb_half=1; crcb_delay=-1; break;
-        case CRCBhalf:   crcb_half=1; crcb_delay=10; break;        
-        case CRCBnormal: crcb_half=0; crcb_delay=10; break;
-        case CRCBfull:   crcb_half=0; crcb_delay= 0; break;
-        }
-      // Prepare mask information
-      const signed char *msk8 = 0;
-      int mskrowsize = 0;
-      if (mask)
-        {
-          msk8 = (const signed char*)((*mask)[0]);
-          mskrowsize = mask->rowsize();
-        }
-      // Fill buffer with luminance information
-      DJVU_PROGRESS_TASK(create,"initialize pixmap",3);
-      DJVU_PROGRESS_RUN(create,(crcb_delay>=0 ? 1 : 3));
-      IWTransform::RGB_to_Y((*pm)[0], w, h, pm->rowsize(), buffer, w);
-      if (crcb_delay < 0)
-        {
-          // Stupid inversion for gray images
-          signed char *e = buffer + w*h;
-          for (signed char *b=buffer; b<e; b++)
-            *b = 255 - *b;
-        }
-      // Create YMAP
-      ymap->create(buffer, w, msk8, mskrowsize);
-      // Create chrominance maps
-      if (crcb_delay >= 0)
-        {
-          cbmap = new _IWMap(w,h);
-          crmap = new _IWMap(w,h);
-          // Process CB information
-          DJVU_PROGRESS_RUN(create,2);
-          IWTransform::RGB_to_Cb((*pm)[0], w, h, pm->rowsize(), buffer, w);
-          cbmap->create(buffer, w, msk8, mskrowsize);
-          // Process CR information
-          DJVU_PROGRESS_RUN(create,3);
-          IWTransform::RGB_to_Cr((*pm)[0], w, h, pm->rowsize(), buffer, w); 
-          crmap->create(buffer, w, msk8, mskrowsize);
-          // Perform chrominance reduction (CRCBhalf)
-          if (crcb_half)
-            {
-              cbmap->slashres(2);
-              crmap->slashres(2);
-            }
+          cbmap->slashres(2);
+          crmap->slashres(2);
         }
     }
-  G_CATCH_ALL
-    {
-      delete [] buffer;
-      G_RETHROW;
-    }
-  G_ENDCATCH;
-  // Delete buffer
-  delete [] buffer;
-  buffer = 0;
 }
 
 

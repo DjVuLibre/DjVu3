@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: GSmartPointer.h,v 1.26 2000-11-09 20:15:07 jmw Exp $
+// $Id: GSmartPointer.h,v 1.27 2000-12-20 01:41:43 bcr Exp $
 // $Name:  $
 
 #ifndef _GSMARTPOINTER_H_
@@ -54,7 +54,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation\\
     Andrei Erofeev <eaf@geocities.com> -- bug fix.
     @version 
-    #$Id: GSmartPointer.h,v 1.26 2000-11-09 20:15:07 jmw Exp $# 
+    #$Id: GSmartPointer.h,v 1.27 2000-12-20 01:41:43 bcr Exp $# 
     @args
 */
 //@{
@@ -71,6 +71,30 @@
 
 
 #include "DjVuGlobal.h"
+
+
+class GPBufferBase
+{
+protected:
+  GPBufferBase(void *&,size_t n,size_t t);
+  void *&ptr;
+public:
+  ~GPBufferBase();
+};
+
+template<class TYPE>
+class GPBuffer : public GPBufferBase
+{
+public:
+  GPBuffer(TYPE *&xptr,size_t n) : GPBufferBase((void *&)xptr,n,sizeof(TYPE)) {}
+};
+
+inline
+GPBufferBase::GPBufferBase(void *&xptr,size_t n,size_t t) : ptr(xptr)
+{
+  xptr=::operator new(n*t);
+}
+
 
 /** Base class for reference counted objects.  
     This is the base class for all reference counted objects.
