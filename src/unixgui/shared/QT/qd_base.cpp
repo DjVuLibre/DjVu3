@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qd_base.cpp,v 1.6 2001-07-25 17:10:42 mchen Exp $
+// $Id: qd_base.cpp,v 1.7 2001-07-27 17:02:04 mchen Exp $
 // $Name:  $
 
 
@@ -416,7 +416,16 @@ QDBase::layout(bool allow_redraw)
 	    }
 	    DEBUG_MSG("reduction=" << red << ", scale factor=" << (1/red) << "\n");
 
-	       // determine scrollbar visibility and modify rectVisible
+	    // determine scrollbar visibility and modify rectVisible
+	    
+	    // if the viewport is too small to hold toolbar, disable the toolbar
+	    if ( toolbar_height > main_widget->height() )
+	    {
+	       prefs.toolBarOn=0;
+	       toolbar_enabled=FALSE;
+	       toolbar_height=0;
+	    }
+	    
 	    rectVisible=GRect(0, 0, main_widget->width(),
 			      main_widget->height()-toolbar_height);
 	    DEBUG_MSG("before engaging scrolls rectVisible=(" << rectVisible.xmin <<
