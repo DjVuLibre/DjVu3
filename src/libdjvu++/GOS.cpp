@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GOS.cpp,v 1.54 2001-04-12 00:25:00 bcr Exp $
+// $Id: GOS.cpp,v 1.55 2001-04-16 23:59:13 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -124,33 +124,17 @@ static const char nillchar=0;
 // Functions for dealing with filenames
 // -----------------------------------------
 
-static inline const char *
-finddirsep(const char * const fname)
+static inline int
+finddirsep(const GUTF8String &fname)
 {
-#ifdef UNIX
-  return fname?strrchr(fname,slash):0;
-#else
-#if defined(WIN32) || defined(macintosh) 
-  char const * retval=0;
-  if(fname)
-  {
-    for(const char *q=fname;*q;q++)
-    {
-#ifdef WIN32
-	  if (IsDBCSLeadByte((BYTE)*q)) {q++;continue;}//MBCS DBCS
-      if(*q == slash || *q == backslash)
-#else
-      if(*q == slash || *q == colon)
-#endif
-      {
-        retval=q;
-      }
-    }
-  }
-  return retval;
+#if defined(UNIX)
+  return fname.contains("/");
+#elif defined(WIN32)
+  return fname.contains("\\/");
+#elif defined(macintosh)
+  return fname.contains(":/");
 #else
 #error "Define something here for your operating system"
-#endif  
 #endif  
 }
 
@@ -185,13 +169,10 @@ GOS::basename(const GUTF8String &gfname, const char *suffix)
   }
 #endif
 
-  const char *q;
-  if ((q=finddirsep(fname)))
-    fname = q+1;
-
 
   // Allocate buffer
-  GUTF8String retval(fname);
+  GUTF8String retval(gfname,1+finddirsep(gfname),(unsigned int)(-1));
+  fname=retval;
 
   // Process suffix
   if (suffix)

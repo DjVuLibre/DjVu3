@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.60 2001-04-16 22:39:16 praveen Exp $
+// $Id: GString.cpp,v 1.61 2001-04-16 23:59:13 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -929,7 +929,7 @@ GStringRep::toUTF8(const bool noconvert) const
     unsigned char *buf;
     GPBuffer<unsigned char> gbuf(buf,n*6+1);
     unsigned char *ptr=buf;
-	int len = mbrlen(source, n, &ps);
+    (void)mbrlen(source, n, &ps);
     for(wchar_t w;
       (n>0)&&(i=mbrtowc(&w,source,n,&ps));
       n-=i,source+=i)
@@ -1002,7 +1002,7 @@ GString::getUTF82Native(char* tocode) const
       GPBuffer<char> gresult(result);
       size_t length = 0;
       const char *locales[]={0,"ASCII","ISO-8859-1","CP932","EUC-JP",0};
-      GString glocale_charset=locale_charset();
+      GUTF8String glocale_charset=locale_charset();
       locales[0]=glocale_charset;
       const char **pos=locales;
       for(;pos[0];++pos)
@@ -1037,13 +1037,13 @@ GString::NativeToUTF8(void) const
   if(length())
   {
     const char *source=(*this);
-    GString lc_ctype=setlocale(LC_CTYPE,0);
+    GUTF8String lc_ctype=setlocale(LC_CTYPE,0);
     bool repeat;
     for(repeat=true;;repeat=false)
     {
       if( (retval=GStringRep::NativeToUTF8(source)) )
       {
-        if(source != GString(GStringRep::UTF8ToNative(retval->data)))
+        if(*this != GStringRep::UTF8ToNative(retval->data))
         {
           retval=GStringRep::UTF8::create((size_t)0);
         }
@@ -1056,7 +1056,7 @@ GString::NativeToUTF8(void) const
       setlocale(LC_CTYPE,(const char *)lc_ctype);
     }
   }
-  return GString(retval);
+  return GUTF8String(retval);
 }
 
 GUTF8String
@@ -1079,7 +1079,7 @@ GString::getNative2UTF8(const char *fromcode) const
       GPBuffer<char> gresult(result);
       const char *locales[]={0,"ASCII","ISO-8859-1","CP932","EUC-JP",0};
       size_t length = 0;
-      GString glocale_charset;
+      GUTF8String glocale_charset;
       if (!fromcode || !fromcode[0])
       {
         fromcode="UTF-8";
@@ -1421,8 +1421,8 @@ long
 GStringRep::toLong( GP<GStringRep>& eptr, bool &isLong, const int base) const
 {
   char *edata=0;
-  const GString clocale=setlocale(LC_CTYPE,0);
-  const GString nlocale=setlocale(LC_NUMERIC,0);
+  const GUTF8String clocale=setlocale(LC_CTYPE,0);
+  const GUTF8String nlocale=setlocale(LC_NUMERIC,0);
   setlocale(LC_CTYPE,"C");
   setlocale(LC_NUMERIC,"C");
   long retval=strtol(data, &edata, base);
@@ -1434,7 +1434,7 @@ GStringRep::toLong( GP<GStringRep>& eptr, bool &isLong, const int base) const
     isLong=true;
   }else
   {
-    GP<GStringRep> ptr=toNative();
+    GP<GStringRep> ptr=toNative(true);
     if(ptr)
     {
       retval=ptr->toLong(eptr,isLong,base);
@@ -1472,8 +1472,8 @@ unsigned long
 GStringRep::toULong( GP<GStringRep>& eptr, bool &isULong, const int base) const
 {
   char *edata=0;
-  const GString clocale=setlocale(LC_CTYPE,0);
-  const GString nlocale=setlocale(LC_NUMERIC,0);
+  const GUTF8String clocale=setlocale(LC_CTYPE,0);
+  const GUTF8String nlocale=setlocale(LC_NUMERIC,0);
   setlocale(LC_CTYPE,"C");
   setlocale(LC_NUMERIC,"C");
   unsigned long retval=strtoul(data, &edata, base);
@@ -1485,7 +1485,7 @@ GStringRep::toULong( GP<GStringRep>& eptr, bool &isULong, const int base) const
     isULong=true;
   }else
   {
-    GP<GStringRep> ptr=toNative();
+    GP<GStringRep> ptr=toNative(true);
     if(ptr)
     {
       retval=ptr->toULong(eptr,isULong,base);
@@ -1523,8 +1523,8 @@ double
 GStringRep::toDouble( GP<GStringRep>& eptr, bool &isDouble) const
 {
   char *edata=0;
-  const GString clocale=setlocale(LC_CTYPE,0);
-  const GString nlocale=setlocale(LC_NUMERIC,0);
+  const GUTF8String clocale=setlocale(LC_CTYPE,0);
+  const GUTF8String nlocale=setlocale(LC_NUMERIC,0);
   setlocale(LC_CTYPE,"C");
   setlocale(LC_NUMERIC,"C");
   double retval=strtod(data, &edata);
@@ -1536,7 +1536,7 @@ GStringRep::toDouble( GP<GStringRep>& eptr, bool &isDouble) const
     isDouble=true;
   }else
   {
-    GP<GStringRep> ptr=toNative();
+    GP<GStringRep> ptr=toNative(true);
     if(ptr)
     {
       retval=ptr->toDouble(eptr,isDouble);

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GURL.cpp,v 1.62 2001-04-16 17:55:05 bcr Exp $
+// $Id: GURL.cpp,v 1.63 2001-04-16 23:59:13 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -917,28 +917,6 @@ GURL::encode_reserved(const GUTF8String &gs)
       *d = slash; 
       continue;
     }
-#ifdef WIN32
-    if (IsDBCSLeadByte((BYTE)*s)) //MBCS DBCS
-    {
-      unsigned char const ss=(unsigned char const)(*s);
-      // escape sequence
-      d[0] = percent;
-      d[1] = hex[ (ss >> 4) & 0xf ];
-      d[2] = hex[ (ss) & 0xf ];
-      s++;
-      if (*s) // escape sequence
-      {
-        unsigned char const ss=(unsigned char const)(*s);
-        d+=3;
-        d[0] = percent;
-        d[1] = hex[ (ss >> 4) & 0xf ];
-        d[2] = hex[ (ss) & 0xf ];
-        d+=2;
-      }
-      continue;
-    }
-#endif
-
     unsigned char const ss=(unsigned char const)(*s);
     // WARNING: Whenever you modify this conversion code,
     // make sure, that the following functions are in sync:
@@ -1604,7 +1582,6 @@ GURL::expand_name(const GUTF8String &xfname, const char *from)
         }
         while (*fname && *fname!= slash && *fname!=backslash)
         {
-	      if (IsDBCSLeadByte((BYTE)*fname)) {*s = *fname++;}//MBCS DBCS
           *s = *fname++;
           if ((++s)-string_buffer > MAXPATHLEN)
             G_THROW( ERR_MSG("GURL.big_name") );
@@ -1623,9 +1600,6 @@ GURL::expand_name(const GUTF8String &xfname, const char *from)
       }
       while (*fname && (*fname!= slash) && (*fname!=backslash))
       {
-	    if (IsDBCSLeadByte((BYTE)*fname)) {
-			*s++ = *fname++;
-		}//MBCS DBCS
         *s = *fname++;
         if ((++s)-string_buffer > MAXPATHLEN)
           G_THROW( ERR_MSG("GURL.big_name") );

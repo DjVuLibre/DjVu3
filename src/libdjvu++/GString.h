@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.h,v 1.47 2001-04-16 18:11:31 bcr Exp $
+// $Id: GString.h,v 1.48 2001-04-16 23:59:13 bcr Exp $
 // $Name:  $
 
 #ifndef _GSTRING_H_
@@ -57,7 +57,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.47 2001-04-16 18:11:31 bcr Exp $# */
+    #$Id: GString.h,v 1.48 2001-04-16 23:59:13 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -577,14 +577,12 @@ public:
 
   /** Concatenates strings. Returns a string composed by concatenating
       the characters of strings #s1# and #s2#. */
-  friend GUTF8String operator+(const GUTF8String &s1, const GString &s2);
-  friend GUTF8String operator+(const GString &s1, const GUTF8String &s2);
-  friend GNativeString operator+(const GNativeString &s1, const GString &s2);
-  friend GNativeString operator+(const GString &s1, const GNativeString &s2);
-  friend GString operator+(const GString &s1, const GString &s2) 
-    { return GStringRep::create(s1,s2); }
-  friend GString operator+(const GString &s1, const char    *s2) 
-    { return GStringRep::create(s1,s2); }
+  GUTF8String operator+(const GUTF8String &s2) const;
+  GNativeString operator+(const GNativeString &s2) const;
+  GString operator+(const GString &s2) const 
+    { return GStringRep::create(*this,s2); }
+  GString operator+(const char    *s2) const
+    { return GStringRep::create(*this,s2); }
   friend GString operator+(const char    *s1, const GString &s2) 
     { return GStringRep::create(s1,s2); }
 
@@ -619,12 +617,12 @@ public:
   /** String comparison. Returns true if and only if character strings #s1#
       and #s2# are equal (as with #strcmp#.)
     */
-  friend bool operator==(const GString &s1, const GString &s2) 
-    { return !s1.cmp(s2); }
-  friend bool operator==(const GString &s1, const char *s2) 
-    { return !s1.cmp(s2); }
-  friend bool operator==(const GString &s1, const char s2) 
-    { return !s1.cmp(s2); }
+  bool operator==(const GString &s2) const
+    { return !cmp(s2); }
+  bool operator==(const char *s2) const
+    { return !cmp(s2); }
+  bool operator==(const char s2)  const
+    { return !cmp(s2); }
   friend bool operator==(const char    *s1, const GString &s2) 
     { return !s2.cmp(s1); }
   friend bool operator==(const char s1, const GString &s2) 
@@ -633,12 +631,12 @@ public:
   /** String comparison. Returns true if and only if character strings #s1#
       and #s2# are not equal (as with #strcmp#.)
     */
-  friend bool operator!=(const GString &s1, const GString &s2)
-    { return !!s1.cmp(s2); }
-  friend bool operator!=(const GString &s1, const char *s2)
-    { return !!s1.cmp(s2); }
-  friend bool operator!=(const GString &s1, const char s2)
-    { return !!s1.cmp(s2); }
+  bool operator!=(const GString &s2) const
+    { return !!cmp(s2); }
+  bool operator!=(const char *s2) const
+    { return !!cmp(s2); }
+  bool operator!=(const char s2) const
+    { return !!cmp(s2); }
   friend bool operator!=(const char *s1, const GString &s2)
     { return !!s2.cmp(s1); }
   friend bool operator!=(const char s1, const GString &s2)
@@ -647,12 +645,12 @@ public:
   /** String comparison. Returns true if and only if character strings #s1# is
       lexicographically greater than or equal to string #s2# (as with #strcmp#.)
    */
-  friend bool operator>=(const GString &s1, const GString &s2) 
-    { return (s1.cmp(s2)>=0); }
-  friend bool operator>=(const GString &s1, const char *s2) 
-    { return (s1.cmp(s2)>=0); }
-  friend bool operator>=(const GString &s1, const char s2) 
-    { return (s1.cmp(s2)>=0); }
+  bool operator>=(const GString &s2) const
+    { return (cmp(s2)>=0); }
+  bool operator>=(const char *s2) const
+    { return (cmp(s2)>=0); }
+  bool operator>=(const char s2) const
+    { return (cmp(s2)>=0); }
   friend bool operator>=(const char    *s1, const GString &s2)
     { return (s2.cmp(s1)<=0); }
   friend bool operator>=(const char s1, const GString &s2)
@@ -661,12 +659,12 @@ public:
   /** String comparison. Returns true if and only if character strings #s1# is
       lexicographically less than string #s2# (as with #strcmp#.)
    */
-  friend bool operator<(const GString &s1, const GString &s2)
-    { return (s1.cmp(s2)<0); }
-  friend bool operator<(const GString &s1, const char *s2)
-    { return (s1.cmp(s2)<0); }
-  friend bool operator<(const GString &s1, const char s2)
-    { return (s1.cmp(s2)<0); }
+  bool operator<(const GString &s2) const
+    { return (cmp(s2)<0); }
+  bool operator<(const char *s2) const
+    { return (cmp(s2)<0); }
+  bool operator<(const char s2) const
+    { return (cmp(s2)<0); }
   friend bool operator<(const char *s1, const GString &s2)
     { return (s2.cmp(s1)>0); }
   friend bool operator<(const char s1, const GString &s2)
@@ -675,12 +673,12 @@ public:
   /** String comparison. Returns true if and only if character strings #s1# is
       lexicographically greater than string #s2# (as with #strcmp#.)
    */
-  friend bool operator> (const GString &s1, const GString &s2)
-    { return (s1.cmp(s2)>0); }
-  friend bool operator> (const GString &s1, const char *s2)
-    { return (s1.cmp(s2)>0); }
-  friend bool operator> (const GString &s1, const char s2)
-    { return (s1.cmp(s2)>0); }
+  bool operator> (const GString &s2) const
+    { return (cmp(s2)>0); }
+  bool operator> (const char *s2) const
+    { return (cmp(s2)>0); }
+  bool operator> (const char s2) const
+    { return (cmp(s2)>0); }
   friend bool operator> (const char    *s1, const GString &s2)
     { return (s2.cmp(s1)<0); }
   friend bool operator> (const char s1, const GString &s2)
@@ -689,12 +687,12 @@ public:
   /** String comparison. Returns true if and only if character strings #s1# is
       lexicographically less than or equal to string #s2# (as with #strcmp#.)
    */
-  friend bool operator<=(const GString &s1, const GString &s2)
-    { return !(s1>s2); }
-  friend bool operator<=(const GString &s1, const char *s2)
-    { return !(s1>s2); }
-  friend bool operator<=(const GString &s1, const char s2)
-    { return !(s1>s2); }
+  bool operator<=(const GString &s2) const
+    { return (cmp(s2)<=0); }
+  bool operator<=(const char *s2) const
+    { return (cmp(s2)<=0); }
+  bool operator<=(const char s2) const
+    { return (cmp(s2)<=0); }
   friend bool operator<=(const char    *s1, const GString &s2)
     { return !(s1>s2); }
   friend bool operator<=(const char    s1, const GString &s2)
@@ -857,14 +855,13 @@ public:
   /** Concatenates strings. Returns a string composed by concatenating
       the characters of strings #s1# and #s2#.
   */
-  friend GUTF8String operator+(const GUTF8String &s1, const GString &s2) 
-    { return GStringRep::UTF8::create(s1,s2); }
-  friend GUTF8String operator+(const GString &s1, const GUTF8String &s2) 
-    { return GStringRep::UTF8::create(s1,s2); }
-  friend GUTF8String operator+(const GUTF8String &s1, const GUTF8String &s2) 
-    { return GStringRep::UTF8::create(s1,s2); }
-  friend GUTF8String operator+(const GUTF8String &s1, const char    *s2) 
-    { return GStringRep::UTF8::create(s1,s2); }
+  GUTF8String operator+(const GString &s2) const 
+    { return GStringRep::UTF8::create(*this,s2); }
+  GUTF8String operator+(const GUTF8String &s2) const
+    { return GStringRep::UTF8::create(*this,s2); }
+  GUTF8String operator+(const GNativeString &s2) const;
+  GUTF8String operator+(const char    *s2) const
+    { return GStringRep::UTF8::create(*this,s2); }
   friend GUTF8String operator+(const char    *s1, const GUTF8String &s2) 
     { return GStringRep::UTF8::create(s1,s2); }
 
@@ -971,14 +968,13 @@ public:
     const GNativeString& src,  GNativeString& endptr, bool& isDouble)
   { return src.toDouble(endptr,isDouble); }
 
-  friend GNativeString operator+(const GNativeString &s1, const GString &s2) 
-    { return GStringRep::Native::create(s1,s2); }
-  friend GNativeString operator+(const GString &s1, const GNativeString &s2) 
-    { return GStringRep::Native::create(s1,s2); }
-  friend GNativeString operator+(const GNativeString &s1, const GNativeString &s2) 
-    { return GStringRep::Native::create(s1,s2); }
-  friend GNativeString operator+(const GNativeString &s1, const char    *s2) 
-    { return GStringRep::Native::create(s1,s2); }
+  GNativeString operator+(const GString &s2) const
+    { return GStringRep::Native::create(*this,s2); }
+  GNativeString operator+(const GNativeString &s2) const 
+    { return GStringRep::Native::create(*this,s2); }
+  GUTF8String operator+(const GUTF8String &s2) const;
+  GNativeString operator+(const char    *s2) const
+    { return GStringRep::Native::create(*this,s2); }
   friend GNativeString operator+(const char    *s1, const GNativeString &s2) 
     { return GStringRep::Native::create(s1,s2); }
 
@@ -1200,6 +1196,14 @@ inline GNativeString& GNativeString::operator= (const GUTF8String &str)
 inline GNativeString& GNativeString::operator= (const GNativeString &str)
 { return init(str); }
 
+inline GUTF8String GString::operator+(const GUTF8String &s2) const
+  { return GStringRep::UTF8::create(*this,s2); }
+inline GNativeString GString::operator+(const GNativeString &s2) const
+  { return GStringRep::Native::create(*this,s2); }
+inline GUTF8String GNativeString::operator+(const GUTF8String &s2) const
+  { return GStringRep::UTF8::create(ptr?(*this)->toUTF8(true):(*this),s2); }
+inline GUTF8String GUTF8String::operator+(const GNativeString &s2) const
+  { return GStringRep::UTF8::create(*this,s2.ptr?s2->toUTF8(true):s2); }
 
 // ------------------- The end
 
