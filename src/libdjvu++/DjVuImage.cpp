@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuImage.cpp,v 1.19 1999-06-24 17:58:15 leonb Exp $
+//C- $Id: DjVuImage.cpp,v 1.20 1999-08-17 21:27:34 eaf Exp $
 
 
 #ifdef __GNUC__
@@ -337,7 +337,7 @@ DjVuImage::decode(ByteStream & str, DjVuInterface *notifier)
     port.stream_pool->add_data(buffer, length);
   port.stream_pool->set_eof();
 
-  GP<DjVuDocument> doc = new DjVuDocument( port.stream_url, 1, &port );
+  GP<DjVuDocument> doc = new DjVuDocument( port.stream_url, &port );
   GP<DjVuImage> dimg=doc->get_page(-1);
   file=dimg->get_djvu_file();
   file->wait_for_finish();
