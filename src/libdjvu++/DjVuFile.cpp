@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuFile.cpp,v 1.156 2001-04-05 19:57:57 chrisp Exp $
+// $Id: DjVuFile.cpp,v 1.157 2001-04-11 16:59:50 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -346,7 +346,7 @@ DjVuFile::wait_for_finish(bool self)
 }
 
 void
-DjVuFile::notify_chunk_done(const DjVuPort *, const char *)
+DjVuFile::notify_chunk_done(const DjVuPort *, const GString &)
 {
   check();
   chunk_mon.enter();
@@ -512,10 +512,12 @@ DjVuFile::process_incl_chunk(ByteStream & str, int file_num)
   // Eat '\n' in the beginning and at the end
   while(incl_str.length() && incl_str[0]=='\n')
   {
-    GString tmp=((const char *) incl_str)+1; incl_str=tmp;
+    incl_str=incl_str.substr(1,(unsigned int)(-1));
   }
   while(incl_str.length()>0 && incl_str[(int)incl_str.length()-1]=='\n')
+  {
     incl_str.setat(incl_str.length()-1, 0);
+  }
   
   if (incl_str.length()>0)
   {
@@ -617,7 +619,7 @@ DjVuFile::report_error
   }else
   {
     GURL url=get_url();
-    GString url_str=(const char *) url;
+    GString url_str=url.get_string();
 //    if (url.is_local_file_url())
 //      url_str=url.filename();
     
@@ -784,7 +786,7 @@ is_text(GString chkid)
 
 
 GString
-DjVuFile::decode_chunk(const char *id, GP<ByteStream> gbs, bool djvi, bool djvu, bool iw44)
+DjVuFile::decode_chunk(const GString &id, GP<ByteStream> gbs, bool djvi, bool djvu, bool iw44)
 {
   ByteStream &bs=*gbs;
   check();
@@ -1742,7 +1744,7 @@ DjVuFile::move(const GURL & dir_url)
 }
 
 void
-DjVuFile::set_name(const char * name)
+DjVuFile::set_name(const GString &name)
 {
   DEBUG_MSG("DjVuFile::set_name(): name='" << name << "'\n");
   DEBUG_MAKE_INDENT(3);
@@ -1837,7 +1839,7 @@ DjVuFile::get_chunk_name(int chunk_num)
 }
 
 bool
-DjVuFile::contains_chunk(const char * chunk_name)
+DjVuFile::contains_chunk(const GString &chunk_name)
 {
   check();
   DEBUG_MSG("DjVuFile::contains_chunk(): url='" << url << "', chunk_name='" <<
@@ -2211,7 +2213,7 @@ DjVuFile::rebuild_data_pool(void)
 // old-style DjVu documents to BUNDLED format.
 
 GP<DataPool>
-DjVuFile::unlink_file(const GP<DataPool> & data, const char * name)
+DjVuFile::unlink_file(const GP<DataPool> & data, const GString &name)
 // Will process contents of data[] and remove any INCL chunk
 // containing 'name'
 {
@@ -2243,15 +2245,16 @@ DjVuFile::unlink_file(const GP<DataPool> & data, const char * name)
       // Eat '\n' in the beginning and at the end
       while(incl_str.length() && incl_str[0]=='\n')
       {
-        GString tmp=((const char *) incl_str)+1; incl_str=tmp;
+        incl_str=incl_str.substr(1,(unsigned int)(-1));
       }
       while(incl_str.length()>0 && incl_str[(int)incl_str.length()-1]=='\n')
+      {
         incl_str.setat(incl_str.length()-1, 0);
-      
+      }
       if (incl_str!=name)
       {
         iff_out.put_chunk(chkid);
-        iff_out.writall((const char*)incl_str, incl_str.length());
+        iff_out.writestring(incl_str);
         iff_out.close_chunk();
       }
     } else
@@ -2274,7 +2277,7 @@ DjVuFile::unlink_file(const GP<DataPool> & data, const char * name)
 
 #ifndef NEED_DECODER_ONLY
 void
-DjVuFile::insert_file(const char * id, int chunk_num)
+DjVuFile::insert_file(const GString &id, int chunk_num)
 {
   DEBUG_MSG("DjVuFile::insert_file(): id='" << id << "', chunk_num="
     << chunk_num << "\n");
@@ -2302,7 +2305,7 @@ DjVuFile::insert_file(const char * id, int chunk_num)
       if (chunk_cnt++==chunk_num)
       {
         iff_out.put_chunk("INCL");
-        iff_out.writall(id, strlen(id));
+        iff_out.writestring(id);
         iff_out.close_chunk();
         done=true;
       }
@@ -2314,7 +2317,7 @@ DjVuFile::insert_file(const char * id, int chunk_num)
     if (!done)
     {
       iff_out.put_chunk("INCL");
-      iff_out.writall(id, strlen(id));
+      iff_out.writestring(id);
       iff_out.close_chunk();
     }
     iff_out.close_chunk();
@@ -2332,7 +2335,7 @@ DjVuFile::insert_file(const char * id, int chunk_num)
 #endif
 
 void
-DjVuFile::unlink_file(const char * id)
+DjVuFile::unlink_file(const GString &id)
 {
   DEBUG_MSG("DjVuFile::insert_file(): id='" << id << "'\n");
   DEBUG_MAKE_INDENT(3);
@@ -2384,14 +2387,14 @@ DjVuFile::unlink_file(const char * id)
 	       // Eat '\n' in the beginning and at the end
         while(incl_str.length() && incl_str[0]=='\n')
         {
-          GString tmp=((const char *) incl_str)+1; incl_str=tmp;
+          incl_str=incl_str.substr(1,(unsigned int)(-1));
         }
         while(incl_str.length()>0 && incl_str[(int)incl_str.length()-1]=='\n')
           incl_str.setat(incl_str.length()-1, 0);
         if (incl_str!=id)
         {
           iff_out.put_chunk("INCL");
-          iff_out.writall((const char *) incl_str, incl_str.length());
+          iff_out.writestring(incl_str);
           iff_out.close_chunk();
         }
       }

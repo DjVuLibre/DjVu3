@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: debug.cpp,v 1.20 2001-04-05 19:19:23 bcr Exp $
+// $Id: debug.cpp,v 1.21 2001-04-11 16:59:51 bcr Exp $
 // $Name:  $
 
 #ifdef NO_DEBUG
@@ -106,8 +106,7 @@ DjVuDebug::format(const char *fmt, ... )
     {
       va_list ap;
       va_start(ap, fmt);
-      GString buffer;
-      buffer.format(fmt,ap);
+      GString buffer(fmt,ap);
       va_end(ap);
       GCriticalSectionLock glock(&debug_lock);
       if(debug_file)
@@ -188,7 +187,8 @@ DjVuDebug::lock(int lvl, int noindent)
   // Output thread id and indentation
   if (! noindent)
     {
-      if (threads_num>1) dbg.format("[T%d] ", dbg.id);
+      if (threads_num>1)
+        dbg.format("[T%d] ", dbg.id);
       int ind = dbg.indent;
       char buffer[257];
       memset(buffer,' ', sizeof(buffer)-1);

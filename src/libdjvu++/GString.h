@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.h,v 1.35 2001-04-09 18:24:02 chrisp Exp $
+// $Id: GString.h,v 1.36 2001-04-11 16:59:51 bcr Exp $
 // $Name:  $
 
 #ifndef _GSTRING_H_
@@ -57,7 +57,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.35 2001-04-09 18:24:02 chrisp Exp $# */
+    #$Id: GString.h,v 1.36 2001-04-11 16:59:51 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -79,20 +79,103 @@
 
 class GStringRep : public GPEnabled
 {
+public:
+  class UTF8;
+  class Native;
+  friend Native;
+  friend UTF8;
   friend class GString;
   friend unsigned int hash(const GString &ref);
+
 public:
-  static GStringRep *xnew(unsigned int sz = 0);
+   // Creates an uninitialized #GStringRep#.
+  template <class TYPE> static GP<GStringRep> create(
+    const unsigned int sz,TYPE *);
+
+  virtual GP<GStringRep> blank(const unsigned int sz = 0) const
+  { return create(sz,(GStringRep *)0); }
+ 
+  static GP<GStringRep> create(const unsigned int sz = 0)
+  { return create(sz,(GStringRep *)0); }
+
+   // Creates with a strdup.
+  GP<GStringRep> strdup(const char *s) const;
+
+  static GP<GStringRep> create(const char *s)
+  { GStringRep dummy; return dummy.strdup(s); }
+
+   // Creates with a concat operation.
+  GP<GStringRep> concat(const char *s1,const char *s2) const;
+
+  static GP<GStringRep> create(const char *s1,const char *s2)
+  { GStringRep dummy; return dummy.concat(s1,s2); }
+
+   /* Creates with a strdup.  Negative values have strlen(s)+1
+      added to them.
+   */
+  GP<GStringRep> substr(
+    const char *s,const int start,const int length=(-1)) const;
+
+  static GP<GStringRep> create(
+    const char *s,const int start,const int length=(-1))
+  { GStringRep dummy; return dummy.substr(s,start,length); }
+
   ~GStringRep() { data[0]=0; }
+  static GP<GStringRep> UTF8ToNative( const char *s );
+  static GP<GStringRep> NativeToUTF8( const char *s );
+
+  // Creates an uppercase version of the current string.
+  GP<GStringRep> upcase(void) const;
+  // Creates a lowercase version of the current string.
+  GP<GStringRep> downcase(void) const;
+
+  static unsigned long UTF8toUCS4(
+    unsigned char const *&s, void const * const eptr );
+
+  static unsigned char *UCS4toUTF8(
+    const unsigned long w,unsigned char *ptr);
+
 private:
   int  size;
-#ifndef NO_DEBUG
-  char data[256];
-#else
   char data[1];
-#endif
 };
 
+class GStringRep::Native : public GStringRep
+{
+public:
+//  static GP<GStringRep> create(const unsigned int sz = 0);
+  virtual GP<GStringRep> blank(const unsigned int sz = 0) const
+  { return GStringRep::create(sz,(GStringRep::Native *)0); }
+  static GP<GStringRep> create(const unsigned int sz = 0)
+  { return GStringRep::create(sz,(GStringRep::Native *)0); }
+  static GP<GStringRep> create(const char *s)
+  { GStringRep::Native dummy; return dummy.strdup(s); }
+  static GP<GStringRep> create(const char *s1,const char *s2)
+  { GStringRep::Native dummy; return dummy.concat(s1,s2); }
+  static GP<GStringRep> create(
+    const char *s,const int start,const int length=(-1))
+  { GStringRep::Native dummy; return dummy.substr(s,start,length); }
+
+  friend class GString;
+};
+
+class GStringRep::UTF8 : public GStringRep
+{
+public:
+  virtual GP<GStringRep> blank(const unsigned int sz = 0) const
+  { return GStringRep::create(sz,(GStringRep::UTF8 *)0); }
+  static GP<GStringRep> create(const unsigned int sz = 0)
+  { return GStringRep::create(sz,(GStringRep::UTF8 *)0); }
+  static GP<GStringRep> create(const char *s)
+  { GStringRep::UTF8 dummy; return dummy.strdup(s); }
+  static GP<GStringRep> create(const char *s1,const char *s2)
+  { GStringRep::UTF8 dummy; return dummy.concat(s1,s2); }
+  static GP<GStringRep> create(
+    const char *s,const int start,const int length=(-1))
+  { GStringRep::UTF8 dummy; return dummy.substr(s,start,length); }
+
+  friend class GString;
+};
 
 
 /** General purpose character string.
@@ -119,8 +202,9 @@ class GString : protected GP<GStringRep>
 public: 
   // -- CONSTRUCTORS
   /** Null constructor. Constructs an empty string. */
-  GString( void )
-    { } 
+  GString( void ) { } 
+  /// Construct from parent class.
+  GString( const GP<GStringRep> &rep);
   /// Copy constructor. Constructs a string by copying the string #gs#.
   GString(const GString &gs)
     : GP<GStringRep>(gs) { } 
@@ -147,14 +231,24 @@ public:
       point number #number#. The format is similar to format #"%f"# in
       function #printf#.  */
   GString(const double number);
+  /** Constructs a string with a formatted string (as in #vprintf#).  The
+      string is re-initialized with the characters generated according to the
+      specified format #fmt# and using the optional arguments.  See the ANSI-C
+      function #vprintf()# for more information. The current implementation
+      will cause a segmentation violation if the resulting string is longer
+      than 32768 characters. */
+  GString(const char fmt[], va_list args);
+  // -- SEARCHING
   
   // -- COPY OPERATOR
+  GString& operator= (const GP<GStringRep> &rep);
+
   /** Copy operator. Resets this string with the value of the string #gs#.
       This operation is efficient because string memory is allocated using a
       "copy-on-write" strategy. Both strings will share the same segment of
       memory until one of the strings is modified. */
-  GString& operator= (const GString &gs)
-    { GP<GStringRep>::operator= (gs); return *this; }
+  GString& operator= (const GString &gs);
+
   /** Copy a null terminated character array. Resets this string with the
       character string contained in the null terminated character array
       #str#. */
@@ -165,11 +259,9 @@ public:
       conversion operator is very efficient because it simply returns a
       pointer to the internal string data. The returned pointer remains valid
       as long as the string is unmodified. */
-  operator const char* ( void ) const  
-    { return ptr ? (*this)->data : nullstr; }
+  operator const char* ( void ) const  ;
   /// Returns the string length.
-  unsigned int length( void ) const 
-    { return ptr ? (*this)->size : 0; }
+  unsigned int length( void ) const;
   /** Returns true if and only if the string contains zero characters.  This
       operator is useful for conditional expression in control structures.
       \begin{verbatim}
@@ -179,8 +271,7 @@ public:
       Class #GString# does not to support syntax "#if# #(str)# #{}#" because
       the required conversion operator introduces dangerous ambiguities with
       certain compilers. */
-  int operator! ( void ) const 
-    { return !ptr; } ;
+  bool operator! ( void ) const;
 
   // -- INDEXING
   /** Returns the character at position #n#. An exception \Ref{GException} is
@@ -191,7 +282,7 @@ public:
   char operator[] (int n) const
     { if (n<0 && ptr) n += (*this)->size;
       if (n<0 || !ptr || n>=(int)(*this)->size) throw_illegal_subscript();
-      return (*this)->data[n]; }
+      return ((*this)->data)[n]; }
   /** Set the character at position #n# to value #ch#.  An exception
       \Ref{GException} is thrown if number #n# is not in range #-len# to
       #len#, where #len# is the length of the string.  If character #ch# is
@@ -211,12 +302,11 @@ public:
       the resulting string may be smaller than #len# if the specified range is
       too large. */
   GString substr(int from, unsigned int len=1) const
-    { return GString((GString&)(*this), from, len); }
+    { return GString(*this, from, len); }
   /** Returns an upper case copy of this string.  The returned string
       contains a copy of the current string with all letters turned into 
       upper case letters. */
   GString upcase( void ) const;
-
   /** Returns an lower case copy of this string.  The returned string
       contains a copy of the current string with all letters turned into 
       lower case letters. */
@@ -303,73 +393,73 @@ public:
   /** Concatenates strings. Returns a string composed by concatenating
       the characters of strings #s1# and #s2#. */
   friend GString operator+(const GString &s1, const GString &s2) 
-    { return GString::concat(s1,s2);}
+    { return (s1.length()?(s2.length()?GString(s1->concat(s1,s2)):s1):s2);}
   friend GString operator+(const GString &s1, const char    *s2) 
-    { return GString::concat(s1,s2);}
+    { return (s1.length()?GString(s1->concat(s1,s2)):GString(s2));}
   friend GString operator+(const char    *s1, const GString &s2) 
-    { return GString::concat(s1,s2);}
+    { return (s2.length()?GString(s2->concat(s1,s2)):GString(s1));}
 
   // -- COMPARISONS
   /** String comparison. Returns true if and only if character strings #s1# and #s2#
       are equal (as with #strcmp#.) */
-  friend int operator==(const GString &s1, const GString &s2) 
-    { return strcmp(s1,s2)==0; }
-  friend int operator==(const GString &s1, const char    *s2) 
-    { return strcmp(s1,s2)==0; }
-  friend int operator==(const char    *s1, const GString &s2) 
-    { return strcmp(s1,s2)==0; }
+  friend bool operator==(const GString &s1, const GString &s2) 
+    { return !strcmp(s1,s2); }
+  friend bool operator==(const GString &s1, const char    *s2) 
+    { return !strcmp(s1,s2); }
+  friend bool operator==(const char    *s1, const GString &s2) 
+    { return !strcmp(s1,s2); }
   /** String comparison. Returns true if and only if character strings #s1# and #s2#
       are not equal (as with #strcmp#.) */
-  friend int operator!=(const GString &s1, const GString &s2)
-    { return strcmp(s1,s2)!=0; }
-  friend int operator!=(const GString &s1, const char    *s2)
-    { return strcmp(s1,s2)!=0; }
-  friend int operator!=(const char    *s1, const GString &s2) 
-    { return strcmp(s1,s2)!=0; }
+  friend bool operator!=(const GString &s1, const GString &s2)
+    { return !!strcmp(s1,s2); }
+  friend bool operator!=(const GString &s1, const char    *s2)
+    { return !!strcmp(s1,s2); }
+  friend bool operator!=(const char    *s1, const GString &s2) 
+    { return !!strcmp(s1,s2); }
   /** String comparison. Returns true if and only if character strings #s1# is
       lexicographically greater than or equal to string #s2# (as with #strcmp#.) */
-  friend int operator>=(const GString &s1, const GString &s2) 
-    { return strcmp(s1,s2)>=0; }
-  friend int operator>=(const GString &s1, const char    *s2) 
-    { return strcmp(s1,s2)>=0; }
-  friend int operator>=(const char    *s1, const GString &s2)
-    { return strcmp(s1,s2)>=0; }
+  friend bool operator>=(const GString &s1, const GString &s2) 
+    { return (strcmp(s1,s2)>=0); }
+  friend bool operator>=(const GString &s1, const char    *s2) 
+    { return (strcmp(s1,s2)>=0); }
+  friend bool operator>=(const char    *s1, const GString &s2)
+    { return (strcmp(s1,s2)>=0); }
   /** String comparison. Returns true if and only if character strings #s1# is
       lexicographically greater than string #s2# (as with #strcmp#.) */
-  friend int operator> (const GString &s1, const GString &s2)
-    { return strcmp(s1,s2)> 0; }
-  friend int operator> (const GString &s1, const char    *s2) 
-    { return strcmp(s1,s2)> 0; }
-  friend int operator> (const char    *s1, const GString &s2)
-    { return strcmp(s1,s2)> 0; }
+  friend bool operator> (const GString &s1, const GString &s2)
+    { return (strcmp(s1,s2)> 0); }
+  friend bool operator> (const GString &s1, const char    *s2) 
+    { return (strcmp(s1,s2)> 0); }
+  friend bool operator> (const char    *s1, const GString &s2)
+    { return (strcmp(s1,s2)> 0); }
   /** String comparison. Returns true if and only if character strings #s1# is
       lexicographically less than or equal to string #s2# (as with #strcmp#.) */
-  friend int operator<=(const GString &s1, const GString &s2)
-    { return strcmp(s1,s2)<=0; }
-  friend int operator<=(const GString &s1, const char    *s2) 
-    { return strcmp(s1,s2)<=0; }
-  friend int operator<=(const char    *s1, const GString &s2)
-    { return strcmp(s1,s2)<=0; }
+  friend bool operator<=(const GString &s1, const GString &s2)
+    { return (strcmp(s1,s2)<=0); }
+  friend bool operator<=(const GString &s1, const char    *s2) 
+    { return (strcmp(s1,s2)<=0); }
+  friend bool operator<=(const char    *s1, const GString &s2)
+    { return (strcmp(s1,s2)<=0); }
   /** String comparison. Returns true if and only if character strings #s1# is
       lexicographically less than string #s2# (as with #strcmp#.) */
-  friend int operator< (const GString &s1, const GString &s2)
-    { return strcmp(s1,s2)< 0; }
-  friend int operator< (const GString &s1, const char    *s2)
-    { return strcmp(s1,s2)< 0; }
-  friend int operator< (const char    *s1, const GString &s2) 
-    { return strcmp(s1,s2)< 0; }
+  friend bool operator< (const GString &s1, const GString &s2)
+    { return (strcmp(s1,s2)< 0); }
+  friend bool operator< (const GString &s1, const char    *s2)
+    { return (strcmp(s1,s2)< 0); }
+  friend bool operator< (const char    *s1, const GString &s2) 
+    { return (strcmp(s1,s2)< 0); }
    /* # CHRISP added the following block of code # */
    /** Returns a boolean.  Compares string with #s2# and a given length of #len# */
    inline bool ncmp(const GString& s2, const int len=1) const
-      { return ((substr(0,len) == s2.substr(0,len)) == 1); }
+      { return (substr(0,len) == s2.substr(0,len)); }
    /** Returns a boolean. The Standard C strncmp takes two string and compares the 
        first N characters.  static bool GString::ncmp will compare #s1# with #s2# 
        with the #len# characters starting from the beginning of the string.*/
    static bool ncmp(const GString &s1,const GString &s2, const int len=1)
-      { return ((s1.substr(0,len) == s2.substr(0,len)) == 1); }
+      { return (s1.substr(0,len) == s2.substr(0,len)); }
    /** Returns an integer.  Implements a functional i18n atoi. Note that if you pass
        a GString that is not in Native format the results may be disparaging. */
-   inline int nativeToInt()
+   inline int nativeToInt() const
       { return atoi((const char*)(*this)); }
    static int nativeToInt( const GString& src )
       { return atoi((const char*)(src)); }
@@ -388,19 +478,58 @@ public:
       modulo the upper bound of the range. */
   friend unsigned int hash(const GString &ref);
   // -- HELPERS
-
+  friend GStringRep;
 protected:
-  GString(GStringRep* rep)
-    : GP<GStringRep>(rep) { }
-  GString& operator= (GStringRep *rep)
-    {  GP<GStringRep>::operator= (rep); return *this; }
-  static GString concat (const char *str1, const char *str2);
+  const char *gstr;
   static void throw_illegal_subscript() no_return;
   static const char *nullstr;
+  static GString UTF82Native(
+    const char source[],const bool currentlocale=false);
+  static GString Native2UTF8(const char *source,const size_t slen);
+private:  // dummy methods.
+  GString(const GStringRep* rep);
+  GString& operator= (const GStringRep *rep);
 };
 
 //@}
 
+inline
+GString::operator const char* ( void ) const  
+{
+  return (*this)->data;
+}
+
+inline GString&
+GString::operator= (const GString &gs)
+{
+  GP<GStringRep>::operator=(gs);
+  gstr=(*this)->data;
+  return *this;
+}
+
+inline unsigned int
+GString::length( void ) const 
+{
+  return ptr ? (*this)->size : 0;
+}
+
+inline bool
+GString::operator! ( void ) const
+{
+  return !ptr;
+}
+
+inline GString 
+GString::upcase( void ) const
+{ 
+  return (ptr?GString((*this)->upcase()):(*this));
+}
+
+inline GString 
+GString::downcase( void ) const
+{ 
+  return (ptr?GString((*this)->downcase()):(*this));
+}
 
 // ------------------- The end
 

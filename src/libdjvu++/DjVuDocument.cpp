@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocument.cpp,v 1.155 2001-04-09 17:42:13 chrisp Exp $
+// $Id: DjVuDocument.cpp,v 1.156 2001-04-11 16:59:50 bcr Exp $
 // $Name:  $
 
 
@@ -60,7 +60,7 @@ void (* DjVuDocument::djvu_import_codec)(
   bool &needs_rename )=0;
 
 void (* DjVuDocument::djvu_compress_codec)(
-  GP<ByteStream> &doc,const char where[],bool bundled)=0;
+  GP<ByteStream> &doc,const GURL &where,bool bundled)=0;
 
 void
 DjVuDocument::set_import_codec(
@@ -73,7 +73,7 @@ DjVuDocument::set_import_codec(
 void
 DjVuDocument::set_compress_codec(
   void (* codec)(
-    GP<ByteStream> &doc,const char where[],bool bundled))
+    GP<ByteStream> &doc,const GURL &where,bool bundled))
 {
   djvu_compress_codec=codec;
 }
@@ -455,7 +455,7 @@ DjVuDocument::get_int_prefix(void)
       // file's URL. Please note, that output of this function is used only
       // as name for DjVuPortcaster. Not as a URL.
    GString retval;
-   return retval.format("document_%p%d?", this, hash((GString) (const char*)init_url));
+   return retval.format("document_%p%d?", this, hash(init_url.get_string()));
 }
 
 void
@@ -475,20 +475,20 @@ DjVuDocument::set_file_aliases(const DjVuFile * file)
 	 // assign a global alias to this file, so that any other
 	 // DjVuDocument will be able to use it.
       
-      pcaster->add_alias(file, file->get_url());
+      pcaster->add_alias(file, file->get_url().get_string());
       if (flags & (DOC_NDIR_KNOWN | DOC_DIR_KNOWN))
       {
 	 int page_num=url_to_page(file->get_url());
 	 if (page_num>=0)
 	 {
-	    if (page_num==0) pcaster->add_alias(file, (GString)(const char*)init_url+"#-1");
-	    pcaster->add_alias(file, (GString)(const char*)init_url+"#"+GString(page_num));
+	    if (page_num==0) pcaster->add_alias(file, init_url.get_string()+"#-1");
+	    pcaster->add_alias(file, init_url.get_string()+"#"+GString(page_num));
 	 }
       }
 	 // The following line MUST stay here. For OLD_INDEXED documents
 	 // a page may finish decoding before DIR or NDIR becomes known
 	 // (multithreading, remember), so the code above would not execute
-      pcaster->add_alias(file, (GString)(const char*) file->get_url()+"#-1");
+      pcaster->add_alias(file, file->get_url().get_string()+"#-1");
    } else pcaster->add_alias(file, get_int_prefix()+file->get_url());
 }
 
@@ -726,7 +726,7 @@ DjVuDocument::url_to_page(const GURL & url) const
 }
 
 GURL
-DjVuDocument::id_to_url(const char * id) const
+DjVuDocument::id_to_url(const GString & id) const
 {
    check();
    DEBUG_MSG("DjVuDocument::id_to_url(): translating ID='" << id << "' to URL\n");
@@ -769,7 +769,7 @@ DjVuDocument::id_to_url(const char * id) const
 }
 
 GURL
-DjVuDocument::id_to_url(const DjVuPort * source, const char * id)
+DjVuDocument::id_to_url(const DjVuPort * source, const GString &id)
 {
    return id_to_url(id);
 }
@@ -790,7 +790,7 @@ DjVuDocument::url_to_file(const GURL & url, bool dont_create)
    if (cache)
    {
 	 // First - fully decoded files
-      port=pcaster->alias_to_port(url);
+      port=pcaster->alias_to_port(url.get_string());
       if (port && port->inherits("DjVuFile"))
       {
 	 DEBUG_MSG("found fully decoded file using DjVuPortcaster\n");
@@ -845,7 +845,7 @@ DjVuDocument::get_djvu_file(int page_num, bool dont_create)
 	 DEBUG_MSG("Structure is not known => check <doc_url>#<page_num> alias...\n");
 	 GP<DjVuPort> port;
 	 if (cache)
-	    port=pcaster->alias_to_port((GString)(const char*) init_url+"#"+GString(page_num));
+	    port=pcaster->alias_to_port(init_url.get_string()+"#"+GString(page_num));
 	 if (!port || !port->inherits("DjVuFile"))
 	 {
 	    DEBUG_MSG("failed => invent dummy URL and proceed\n");
@@ -890,23 +890,24 @@ DjVuDocument::get_djvu_file(int page_num, bool dont_create)
 }
 
 GURL
-DjVuDocument::invent_url(const char name[]) const
+DjVuDocument::invent_url(const GString &name) const
 {
    GString buffer;
-   buffer.format("djvufileurl://%p/%s", this, name);
+   buffer.format("djvufileurl://%p/%s", this, (const char *)name);
    return GURL::UTF8(buffer);
 }
 
 GP<DjVuFile>
-DjVuDocument::get_djvu_file(const char * id, bool dont_create)
+DjVuDocument::get_djvu_file(const GString& id, bool dont_create)
 {
    check();
    DEBUG_MSG("DjVuDocument::get_djvu_file(): ID='" << id << "'\n");
    DEBUG_MAKE_INDENT(3);
 
-   if (!id || !strlen(id)) return get_djvu_file(-1);
-//   if (GString(id).is_int()) return get_djvu_file(atoi(id));
-   if (GString(id).is_int()) return get_djvu_file(GString::toInt(id));
+   if (!id.length())
+     return get_djvu_file(-1);
+   if (id.is_int())
+     return get_djvu_file(id.toInt());
 
    GURL url;
    {
@@ -984,7 +985,7 @@ DjVuDocument::get_page(int page_num, bool sync, DjVuPort * port)
 }
 
 GP<DjVuImage>
-DjVuDocument::get_page(const char * id, bool sync, DjVuPort * port)
+DjVuDocument::get_page(const GString &id, bool sync, DjVuPort * port)
 {
    check();
    DEBUG_MSG("DjVuDocument::get_page(): ID='" << id << "'\n");
@@ -1313,7 +1314,7 @@ DjVuDocument::notify_file_flags_changed(const DjVuFile * source,
 }
 
 GPBase
-DjVuDocument::id_to_file(const DjVuPort * source, const char * id)
+DjVuDocument::id_to_file(const DjVuPort * source, const GString &id)
 {
    return (DjVuFile *) get_djvu_file(id);
 }
@@ -1523,12 +1524,6 @@ DjVuDocument::get_url_names(void)
         // Why is this try/catch block here?
         G_TRY { 
           get_portcaster()->notify_error(this, ex.get_cause()); 
-/*              Original preserved in case I screw things up
-          static const char emsg[]="Excluding page %d form the file list due to errors.\n";
-          GString buf;
-          buf.format(emsg,i+1);
-          get_portcaster()->notify_error(this,buf);
-*/
           GString emsg = "DjVuDocument.exclude_page\t" + (i+1);
           get_portcaster()->notify_error(this, emsg);
         }
@@ -1609,12 +1604,6 @@ DjVuDocument::get_djvm_doc()
           {
             G_TRY { 
               get_portcaster()->notify_error(this, ex.get_cause());
-              /*    Preserving original in case I screw things up
-              static const char emsg[]="Skipping page %d due to errors.\n";
-              GString buf;
-              buf.format(emsg,page_num+1);
-              get_portcaster()->notify_error(this,buf); 
-              */
               GString emsg = "DjVuDocument.skip_page\t" + (page_num+1);
               get_portcaster()->notify_error(this, emsg);
             }
@@ -1654,7 +1643,7 @@ DjVuDocument::write(GP<ByteStream> gstr, bool force_djvm)
 }
 
 void
-DjVuDocument::expand(const GURL &codebase, const char * idx_name)
+DjVuDocument::expand(const GURL &codebase, const GString &idx_name)
 {
    DEBUG_MSG("DjVuDocument::expand(): codebase='" << codebase << "'\n");
    DEBUG_MAKE_INDENT(3);
@@ -1664,14 +1653,12 @@ DjVuDocument::expand(const GURL &codebase, const char * idx_name)
 }
 
 void
-DjVuDocument::save_as(const char where[], const bool bundled)
+DjVuDocument::save_as(const GURL &where, const bool bundled)
 {
    DEBUG_MSG("DjVuDocument::save_as(): where='" << where <<
 	     "', bundled=" << bundled << "\n");
    DEBUG_MAKE_INDENT(3);
    
-   const GURL::Filename::UTF8 url(where);
-  
    if (needs_compression())
    { 
      if(!djvu_compress_codec)
@@ -1686,11 +1673,11 @@ DjVuDocument::save_as(const char where[], const bool bundled)
      (*djvu_compress_codec)(gmbs,where,bundled);
    }else if (bundled)
    {
-      DataPool::load_file(url);
-      write(ByteStream::create(url, "wb"));
+      DataPool::load_file(where);
+      write(ByteStream::create(where, "wb"));
    } else 
    {
-     expand(url.base(), url.fname());
+     expand(where.base(), where.fname());
    }
 }
 

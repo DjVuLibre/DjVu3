@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GUnicode.h,v 1.5 2001-03-30 23:31:29 bcr Exp $
+// $Id: GUnicode.h,v 1.6 2001-04-11 16:59:51 bcr Exp $
 // $Name:  $
 
 #ifndef __GUNICODE_
@@ -99,16 +99,16 @@ protected:
 public:
   static unsigned long const nill;
 private:
-  unsigned long UTF8toWideChar(unsigned char const *&,void const * const);
+  unsigned long UTF8toUCS4(unsigned char const *&,void const * const);
   void initUTF8(void);
-  unsigned long UTF16toWideChar(unsigned short const *&s,void const * const);
-  unsigned long UTF16BEtoWideChar(unsigned char const *&s,void const * const);
-  unsigned long UTF16LEtoWideChar(unsigned char const *&s,void const * const);
-  unsigned long UTS4BEtoWideChar(unsigned char const *&s,void const * const);
-  inline unsigned long UCS4BEtoWideChar(unsigned char const *&s,void const * const);
-  inline unsigned long UCS4LEtoWideChar(unsigned char const *&s,void const * const);
-  inline unsigned long UCS4_3412toWideChar(unsigned char const *&s,void const * const);
-  inline unsigned long UCS4_2143toWideChar(unsigned char const *&s,void const * const);
+  unsigned long UTF16toUCS4(unsigned short const *&s,void const * const);
+  unsigned long UTF16BEtoUCS4(unsigned char const *&s,void const * const);
+  unsigned long UTF16LEtoUCS4(unsigned char const *&s,void const * const);
+  unsigned long UTS4BEtoUCS4(unsigned char const *&s,void const * const);
+  inline unsigned long UCS4BEtoUCS4(unsigned char const *&s,void const * const);
+  inline unsigned long UCS4LEtoUCS4(unsigned char const *&s,void const * const);
+  inline unsigned long UCS4_3412toUCS4(unsigned char const *&s,void const * const);
+  inline unsigned long UCS4_2143toUCS4(unsigned char const *&s,void const * const);
   static GP<UnicodeRep> concat(const UnicodeRep &,const UnicodeRep &);
 public:
   void init (void const * const,unsigned int const,const EncodeType=EBCDIC);

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVmDir.h,v 1.33 2001-03-06 19:55:42 bcr Exp $
+// $Id: DjVmDir.h,v 1.34 2001-04-11 16:59:50 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVMDIR_H
@@ -84,7 +84,7 @@
     @memo Implements DjVu multipage document directory
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: DjVmDir.h,v 1.33 2001-03-06 19:55:42 bcr Exp $# */
+    #$Id: DjVmDir.h,v 1.34 2001-04-11 16:59:50 bcr Exp $# */
 //@{
 
 
@@ -136,7 +136,7 @@ public:
       /** Decodes the directory from the specified stream. */
    void decode(GP<ByteStream> stream);
       /** Encodes the directory into the specified stream. */
-   void encode(GP<ByteStream> stream) const;
+   void encode(GP<ByteStream> stream, const bool rename=false) const;
       /** Tests if directory defines an {\em indirect} document. */
    bool is_indirect(void) const;
       /** Tests if the directory defines a {\em bundled} document. */
@@ -146,9 +146,9 @@ public:
       /** Translates file names to file records. */
    GP<File> name_to_file(const GString & name) const;
       /** Translates file IDs to file records. */
-   GP<File> id_to_file(const char * id) const;
+   GP<File> id_to_file(const GString &id) const;
       /** Translates file shortcuts to file records. */
-   GP<File> title_to_file(const char * title) const;
+   GP<File> title_to_file(const GString &title) const;
       /** Returns position of the file in the directory. */
    int get_file_pos(const File * f) const;
       /** Returns position of the given page in the directory. */
@@ -181,7 +181,7 @@ private:
    GPMap<GString, File>	title2file;
 private: //dummy stuff
    static void decode(ByteStream *);
-   static void encode(ByteStream *);
+   static void encode(ByteStream *, const bool=false);
 };
 
 class DjVmDir::File : public GPEnabled

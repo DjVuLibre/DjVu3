@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.cpp,v 1.64 2001-04-06 17:50:22 fcrary Exp $
+// $Id: ByteStream.cpp,v 1.65 2001-04-11 16:59:50 bcr Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 04/1997
@@ -367,8 +367,8 @@ ByteStream::format(const char *fmt, ... )
 {
   va_list args;
   va_start(args, fmt); 
-  GString message;
-  return writestring(message.format(fmt, args));
+  const GString message(fmt,args);
+  return writestring(message);
 }
 
 size_t
@@ -1190,8 +1190,8 @@ DjVuPrintError(const char *fmt, ... )
     errout->cp=ByteStream::NATIVE;
     va_list args;
     va_start(args, fmt); 
-    GString message;
-    errout->writestring(message.format(fmt, args));
+    const GString message(fmt,args);
+    errout->writestring(message);
   }
 }
 
@@ -1204,8 +1204,8 @@ DjVuPrintMessage(const char *fmt, ... )
     strout->cp=ByteStream::NATIVE;
     va_list args;
     va_start(args, fmt);
-    GString message;
-    strout->writestring(message.format(fmt,args));
+    const GString message(fmt,args);
+    strout->writestring(message);
   }
 }
 

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GUnicode.cpp,v 1.7 2001-04-04 22:12:11 bcr Exp $
+// $Id: GUnicode.cpp,v 1.8 2001-04-11 16:59:51 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -366,30 +366,30 @@ UnicodeRep::init(
           UnicodePtr[len]=0;
           break;
         case UCS4BE:
-          for(len=0;(UnicodePtr[len]=UCS4BEtoWideChar(ptr,eptr));len++) EMPTY_LOOP;
+          for(len=0;(UnicodePtr[len]=UCS4BEtoUCS4(ptr,eptr));len++) EMPTY_LOOP;
           break;
         case UCS4LE:
-          for(len=0;(UnicodePtr[len]=UCS4LEtoWideChar(ptr,eptr));len++) EMPTY_LOOP;
+          for(len=0;(UnicodePtr[len]=UCS4LEtoUCS4(ptr,eptr));len++) EMPTY_LOOP;
           break;
         case UCS4_2143:
-          for(len=0;(UnicodePtr[len]=UCS4_2143toWideChar(ptr,eptr));len++) EMPTY_LOOP;
+          for(len=0;(UnicodePtr[len]=UCS4_2143toUCS4(ptr,eptr));len++) EMPTY_LOOP;
           break;
         case UCS4_3412:
-          for(len=0;(UnicodePtr[len]=UCS4_3412toWideChar(ptr,eptr));len++) EMPTY_LOOP;
+          for(len=0;(UnicodePtr[len]=UCS4_3412toUCS4(ptr,eptr));len++) EMPTY_LOOP;
           break;
         case UTF16:
           for(len=0;
-            (UnicodePtr[len]=UTF16toWideChar((unsigned short const*&)ptr,eptr)) EMPTY_LOOP;
+            (UnicodePtr[len]=UTF16toUCS4((unsigned short const*&)ptr,eptr)) EMPTY_LOOP;
             len++) EMPTY_LOOP;
           break;
         case UTF16BE:
-          for(len=0;(UnicodePtr[len]=UTF16BEtoWideChar(ptr,eptr));len++) EMPTY_LOOP;
+          for(len=0;(UnicodePtr[len]=UTF16BEtoUCS4(ptr,eptr));len++) EMPTY_LOOP;
           break;
         case UTF16LE:
-          for(len=0;(UnicodePtr[len]=UTF16LEtoWideChar(ptr,eptr));len++) EMPTY_LOOP;
+          for(len=0;(UnicodePtr[len]=UTF16LEtoUCS4(ptr,eptr));len++) EMPTY_LOOP;
           break;
         case UTF8:
-          for(len=0;(UnicodePtr[len]=UTF8toWideChar(ptr,eptr));len++) EMPTY_LOOP;
+          for(len=0;(UnicodePtr[len]=UTF8toUCS4(ptr,eptr));len++) EMPTY_LOOP;
           break;
         case EBCDIC:
           for(len=0;(ptr<eptr)&&(UnicodePtr[len]=*ptr++);len++) EMPTY_LOOP;
@@ -415,7 +415,7 @@ UnicodeRep::init(
       initUTF8();
     }else
     {
-      gs=(char const *)buf;
+      gs=GStringRep::UTF8::create((char const *)buf);
       if((size_t)eptr<(size_t)buf+bufsize)
       {
         gs.setat((size_t)eptr-(size_t)buf,0);
@@ -427,7 +427,7 @@ UnicodeRep::init(
     }
   }else
   {
-    gs=GString();
+    gs=GStringRep::UTF8::create((size_t)0);
     remainder.init(0,0);
     len=0;
     gUnicodePtr.resize(0);
@@ -442,50 +442,14 @@ UnicodeRep::init(
 void
 UnicodeRep::initUTF8(void)
 {
-  GString temp;
-  unsigned char *ptr=(unsigned char *)(temp.getbuf(length()*6)); 
+  unsigned char *buf;
+  GPBuffer<unsigned char> gbuf(buf,length()*6+1);
+  unsigned char *ptr=buf;
   for(unsigned long *wide=UnicodePtr;*wide;wide++)
   {
-    unsigned long const w=*wide;
-    if(w <= 0x7f)
-    {
-      *ptr++ = (unsigned char)w;
-    }else if(w <= 0x7ff)
-    {
-      *ptr++ = (unsigned char)((w>>6)|0xC0);
-      *ptr++ = (unsigned char)((w|0x80)&0xBF);
-    }else if(w <= 0xFFFF)
-    {
-      *ptr++ = (unsigned char)((w>>12)|0xE0);
-      *ptr++ = (unsigned char)(((w>>6)|0x80)&0xBF);
-      *ptr++ = (unsigned char)((w|0x80)&0xBF);
-    }else if(w <= 0x1FFFFF)
-    {
-      *ptr++ = (unsigned char)((w>>18)|0xF0);
-      *ptr++ = (unsigned char)(((w>>12)|0x80)&0xBF);
-      *ptr++ = (unsigned char)(((w>>6)|0x80)&0xBF);
-      *ptr++ = (unsigned char)((w|0x80)&0xBF);
-    }else if(w <= 0x3FFFFFF)
-    {
-      *ptr++ = (unsigned char)((w>>24)|0xF8);
-      *ptr++ = (unsigned char)(((w>>18)|0x80)&0xBF);
-      *ptr++ = (unsigned char)(((w>>12)|0x80)&0xBF);
-      *ptr++ = (unsigned char)(((w>>6)|0x80)&0xBF);
-      *ptr++ = (unsigned char)((w|0x80)&0xBF);
-    }else if(w <= 0x7FFFFFF)
-    {
-      *ptr++ = (unsigned char)((w>>30)|0xFC);
-      *ptr++ = (unsigned char)(((w>>24)|0x80)&0xBF);
-      *ptr++ = (unsigned char)(((w>>18)|0x80)&0xBF);
-      *ptr++ = (unsigned char)(((w>>12)|0x80)&0xBF);
-      *ptr++ = (unsigned char)(((w>>6)|0x80)&0xBF);
-      *ptr++ = (unsigned char)((w|0x80)&0xBF);
-    }else
-    {
-      *ptr++ = 0;
-    }
+    ptr=GStringRep::UCS4toUTF8(wide[0],ptr);
   }
-  gs=(char const *)temp;
+  gs=GStringRep::UTF8::create((char const *)buf);
 }
 
 static inline unsigned long
@@ -496,97 +460,14 @@ add_char(unsigned long const U, unsigned char const * const r)
 }
 
 unsigned long
-UnicodeRep::UTF8toWideChar(
+UnicodeRep::UTF8toUCS4(
   unsigned char const *&s,void const * const eptr)
 {
-  unsigned long U=0;
-  unsigned char const *r=s;
-  if(r < eptr)
-  {
-    unsigned long const C1=r++[0];
-    if(C1&0x80)
-    {
-      if(r < eptr)
-      {
-        U=C1;
-        if((U=((C1&0x40)?add_char(U,r++):0)))
-        {
-          if(C1&0x20)
-          {
-            if(r < eptr)
-            {
-              if((U=add_char(U,r++)))
-              {
-                if(C1&0x10)
-                {
-                  if(r < eptr)
-                  {
-                    if((U=add_char(U,r++)))
-                    {
-                      if(C1&0x8)
-                      {
-                        if(r < eptr)
-                        {
-                          if((U=add_char(U,r++)))
-                          {
-                            if(C1&0x4)
-                            {
-                              if(r < eptr)
-                              {
-                                if((U=((!(C1&0x2))?(add_char(U,r++)&0x7fffffff):0)))
-                                {
-                                  s=r;
-                                }else
-                                {
-                                  U=(unsigned int)(-1)-s++[0];
-                                }
-                              }
-                            }else if((U=((U&0x4000000)?0:(U&0x3ffffff))))
-                            {
-                              s=r;
-                            }
-                          }else
-                          {
-                            U=(unsigned int)(-1)-s++[0];
-                          }
-                        }
-                      }else if((U=((U&0x200000)?0:(U&0x1fffff))))
-                      {
-                        s=r;
-                      }
-                    }else
-                    {
-                      U=(unsigned int)(-1)-s++[0];
-                    }
-                  }
-                }else if((U=((U&0x10000)?0:(U&0xffff))))
-                {
-                  s=r;
-                }
-              }else
-              {
-                U=(unsigned int)(-1)-s++[0];
-              }
-            }
-          }else if((U=((U&0x800)?0:(U&0x7ff))))
-          {
-            s=r;
-          }
-        }else
-        {
-          U=(unsigned int)(-1)-s++[0];
-        }
-      }
-    }else if((U=C1))
-    {
-      s=r;
-    }
-  }
-  return U;
+  return GStringRep::UTF8toUCS4(s,eptr);
 }
 
 unsigned long
-UnicodeRep::UTF16toWideChar(unsigned short const *&s,void const * const eptr)
+UnicodeRep::UTF16toUCS4(unsigned short const *&s,void const * const eptr)
 {
   unsigned long U=0;
   unsigned short const * const r=s+1;
@@ -620,7 +501,7 @@ UnicodeRep::UTF16toWideChar(unsigned short const *&s,void const * const eptr)
 }
 
 unsigned long
-UnicodeRep::UTF16BEtoWideChar(unsigned char const *&s,void const * const eptr)
+UnicodeRep::UTF16BEtoUCS4(unsigned char const *&s,void const * const eptr)
 {
   unsigned long U=0;
   unsigned char const * const r=s+2;
@@ -656,7 +537,7 @@ UnicodeRep::UTF16BEtoWideChar(unsigned char const *&s,void const * const eptr)
 }
 
 unsigned long
-UnicodeRep::UTF16LEtoWideChar(unsigned char const *&s,void const * const eptr)
+UnicodeRep::UTF16LEtoUCS4(unsigned char const *&s,void const * const eptr)
 {
   unsigned long U=0;
   unsigned long const C1MSB=s[1];
@@ -692,7 +573,7 @@ UnicodeRep::UTF16LEtoWideChar(unsigned char const *&s,void const * const eptr)
 }
 
 inline unsigned long
-UnicodeRep::UCS4BEtoWideChar(unsigned char const *&s,void const * const eptr)
+UnicodeRep::UCS4BEtoUCS4(unsigned char const *&s,void const * const eptr)
 {
   unsigned long U=0;
   unsigned char const * const r=s+4;
@@ -708,7 +589,7 @@ UnicodeRep::UCS4BEtoWideChar(unsigned char const *&s,void const * const eptr)
 }
 
 inline unsigned long
-UnicodeRep::UCS4LEtoWideChar(unsigned char const *&s,void const * const eptr)
+UnicodeRep::UCS4LEtoUCS4(unsigned char const *&s,void const * const eptr)
 {
   unsigned long U=0;
   unsigned char const * const r=s+4;
@@ -724,7 +605,7 @@ UnicodeRep::UCS4LEtoWideChar(unsigned char const *&s,void const * const eptr)
 }
 
 inline unsigned long
-UnicodeRep::UCS4_2143toWideChar(unsigned char const *&s,void const * const eptr)
+UnicodeRep::UCS4_2143toUCS4(unsigned char const *&s,void const * const eptr)
 {
   unsigned long U=0;
   unsigned char const * const r=s+4;
@@ -740,7 +621,7 @@ UnicodeRep::UCS4_2143toWideChar(unsigned char const *&s,void const * const eptr)
 }
 
 inline unsigned long
-UnicodeRep::UCS4_3412toWideChar(unsigned char const *&s,void const * const eptr)
+UnicodeRep::UCS4_3412toUCS4(unsigned char const *&s,void const * const eptr)
 {
   unsigned long U=0;
   unsigned char const * const r=s+4;

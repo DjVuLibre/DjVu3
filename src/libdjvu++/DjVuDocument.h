@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocument.h,v 1.81 2001-04-05 19:57:57 chrisp Exp $
+// $Id: DjVuDocument.h,v 1.82 2001-04-11 16:59:50 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUDOCUMENT_H
@@ -58,7 +58,7 @@ class ByteStream;
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocument.h,v 1.81 2001-04-05 19:57:57 chrisp Exp $#
+    @version #$Id: DjVuDocument.h,v 1.82 2001-04-11 16:59:50 bcr Exp $#
 */
 
 //@{
@@ -505,7 +505,7 @@ public:
 	     \item #OLD_BUNDLED# and #OLD_INDEXED# and #SINGLE_PAGE#:
 	           #DOC_TYPE_KNOWN# flag is set.
 	  \end{itemize} */
-   GURL		id_to_url(const char * id) const;
+   GURL		id_to_url(const GString &id) const;
 
       /** Returns \Ref{GP} pointer to \Ref{DjVuImage} corresponding to page
           #page_num#. If caching is enabled, and there is a {\em fully decoded}
@@ -563,7 +563,7 @@ public:
 	  If so, it just calls the #get_page()# function above. If ID is
 	  #ZERO# or just empty, page number #-1# is assumed. Otherwise
 	  the ID is translated to the URL using \Ref{id_to_url}(). */
-   GP<DjVuImage>get_page(const char * id, bool sync=true, DjVuPort * port=0);
+   GP<DjVuImage>get_page(const GString &id, bool sync=true, DjVuPort * port=0);
    
       /** Returns \Ref{DjVuFile} corresponding to the specified page.
 	  Normally it translates the page number to the URL using
@@ -604,7 +604,7 @@ public:
 
 	  If #dont_create# is #FALSE# the function will return the file
 	  only if it already exists. */
-   GP<DjVuFile>	get_djvu_file(const char * id, bool dont_create=false);
+   GP<DjVuFile>	get_djvu_file(const GString &id, bool dont_create=false);
       /** Returns a \Ref{DataPool} containing one chunk #TH44# with
 	  the encoded thumbnail for the specified page. The function
 	  first looks for thumbnails enclosed into the document and if
@@ -682,7 +682,7 @@ public:
 	  @param idx_name - Name of the top-level file containing the document
 	         directory (basically, list of all files composing the document).
       */
-   void			expand(const GURL &codebase, const char * idx_name);
+   void			expand(const GURL &codebase, const GString &idx_name);
       /** This function can be used instead of \Ref{write}() and \Ref{expand}().
 	  It allows to save the document either in the new #BUNDLED# format
 	  or in the new #INDIRECT# format depending on the value of parameter
@@ -694,7 +694,7 @@ public:
 	     \item For #INDIRECT# documents this is the name of top-level
 	           index file. All document files will be saved into the
 		   save directory where the index file will resize. */
-   virtual void		save_as(const char where[],
+   virtual void		save_as(const GURL &where,
                           const bool bundled=0);
       //@}
       /** Returns pointer to the internal directory of the document, if it
@@ -722,10 +722,10 @@ public:
    GP<DjVuNavDir>	get_nav_dir(void) const;
 
       /// Returns TRUE if #class_name# is #"DjVuDocument"# or #"DjVuPort"#
-   virtual bool		inherits(const char * class_name) const;
+   virtual bool		inherits(const GString &class_name) const;
 
-   virtual GURL		id_to_url(const DjVuPort * source, const char * id);
-   virtual GPBase	id_to_file(const DjVuPort * source, const char * id);
+   virtual GURL		id_to_url(const DjVuPort * source, const GString &id);
+   virtual GPBase	id_to_file(const DjVuPort * source, const GString &id);
    virtual GP<DataPool>	request_data(const DjVuPort * source, const GURL & url);
    virtual void		notify_file_flags_changed(const DjVuFile * source,
  			long set_mask, long clr_mask);
@@ -735,7 +735,7 @@ public:
    virtual void 	set_verbose_eof(bool=true);
 
    static void set_compress_codec(
-     void (*codec)(GP<ByteStream> &, const char where[], bool bundled));
+     void (*codec)(GP<ByteStream> &, const GURL &where, bool bundled));
 
    static void set_import_codec(
      void (*codec)(GP<DataPool> &,const GURL &url,bool &, bool &));
@@ -744,7 +744,7 @@ protected:
    static void (*djvu_import_codec) (
      GP<DataPool> &pool, const GURL &url,bool &needs_compression, bool &needs_rename );
    static void (*djvu_compress_codec) (
-     GP<ByteStream> &bs, const char where[], bool bundled);
+     GP<ByteStream> &bs, const GURL &where, bool bundled);
    virtual GP<DjVuFile>	url_to_file(const GURL & url, bool dont_create=false);
    GURL			init_url;
    GP<DataPool>		init_data_pool;
@@ -806,7 +806,7 @@ protected:
    void			check_unnamed_files(void);
    GString		get_int_prefix(void);
    void			set_file_aliases(const DjVuFile * file);
-   GURL			invent_url(const char name[]) const;
+   GURL			invent_url(const GString &name) const;
 private: //dummy stuff
    static void	write(ByteStream *);
    static void	write(ByteStream *, bool);
@@ -823,7 +823,7 @@ public:
    GP<DjVuFile>	file;
    GP<DataPool>	data_pool;
 protected:
-   UnnamedFile(int xid_type, const char * xid, int xpage_num, const GURL & xurl,
+   UnnamedFile(int xid_type, const GString &xid, int xpage_num, const GURL & xurl,
 		  const GP<DjVuFile> & xfile) :
       id_type(xid_type), id(xid), page_num(xpage_num), url(xurl), file(xfile) {}
    friend class DjVuDocument;
@@ -924,7 +924,7 @@ inline GP<DataPool>
 DjVuDocument::get_init_data_pool(void) const { return init_data_pool; }
 
 inline bool
-DjVuDocument::inherits(const char * class_name) const
+DjVuDocument::inherits(const GString &class_name) const
 {
    return
       (GString("DjVuDocument") == class_name) ||

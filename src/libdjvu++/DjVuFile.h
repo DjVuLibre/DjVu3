@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuFile.h,v 1.77 2001-04-05 19:57:57 chrisp Exp $
+// $Id: DjVuFile.h,v 1.78 2001-04-11 16:59:51 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUFILE_H
@@ -71,7 +71,7 @@ class DjVuNavDir;
 
     @memo Classes representing DjVu files.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuFile.h,v 1.77 2001-04-05 19:57:57 chrisp Exp $#
+    @version #$Id: DjVuFile.h,v 1.78 2001-04-11 16:59:51 bcr Exp $#
 */
 
 //@{
@@ -418,19 +418,19 @@ public:
 	  This function will also insert an #INCL# chunk at position
 	  #chunk_num#. The function will request data for the included
 	  file and will create it before returning. */
-   void		insert_file(const char * id, int chunk_num=1);
+   void		insert_file(const GString &id, int chunk_num=1);
       /// Will get rid of included file with the given #id#
-   void		unlink_file(const char * id);
+   void		unlink_file(const GString &id);
       /** Will find an #INCL# chunk containing #name# in input #data# and
 	  will remove it */
-   static GP<DataPool>	unlink_file(const GP<DataPool> & data, const char * name);
+   static GP<DataPool>	unlink_file(const GP<DataPool> & data, const GString &name);
 
       /// Returns the number of chunks in the IFF file data
    int		get_chunks_number(void);
       /// Returns the name of chunk number #chunk_num#
    GString	get_chunk_name(int chunk_num);
       /// Returns 1 if this file contains chunk with name #chunk_name#
-   bool		contains_chunk(const char * chunk_name);
+   bool		contains_chunk(const GString &chunk_name);
 
       /** Processes the included files hierarchy and returns merged
 	  annotations. This function may be used even when the #DjVuFile#
@@ -518,7 +518,7 @@ public:
 
       /** Internal. Used by DjVuDocument. The #name# should {\bf not}
 	  be encoded with \Ref{GOS::encode_reserved}(). */
-   void			set_name(const char * name);
+   void			set_name(const GString &name);
 
       // Internal. Used by DjVuDocument
    GSafeFlags &		get_safe_flags(void);
@@ -533,8 +533,8 @@ public:
    void			rebuild_data_pool(void);
 
       // Functions inherited from DjVuPort
-   virtual bool		inherits(const char * class_name) const;
-   virtual void		notify_chunk_done(const DjVuPort * source, const char * name);
+   virtual bool		inherits(const GString &class_name) const;
+   virtual void		notify_chunk_done(const DjVuPort * source, const GString &name);
    virtual void		notify_file_flags_changed(const DjVuFile * source,
 						  long set_mask, long clr_mask);
    virtual void		set_recover_errors(const ErrorRecoveryAction=ABORT);
@@ -569,7 +569,7 @@ private:
    static void	static_decode_func(void *);
    void	decode_func(void);
    void	decode(GP<ByteStream> str);
-   GString decode_chunk(const char *chkid, GP<ByteStream> str, 
+   GString decode_chunk(const GString &chkid, GP<ByteStream> str, 
                         bool djvi, bool djvu, bool iw44);
    int		get_dpi(int w, int h);
 
@@ -607,7 +607,7 @@ private:
    void		move(GMap<GURL, void *> & map, const GURL & dir_url);
 private: // dummy stuff
    static void decode(ByteStream *);
-   static GString decode_chunk(const char *, ByteStream *,bool,bool,bool);
+   static GString decode_chunk(const GString &, ByteStream *,bool,bool,bool);
    static void	get_merged_anno(const GP<DjVuFile> &,ByteStream *,
      const GList<GURL> &, int, int &, GMap<GURL, void *> &);
    static void	get_text(const GP<DjVuFile> &,ByteStream *);
@@ -723,7 +723,7 @@ DjVuFile::disable_standard_port(void)
 }
 
 inline bool
-DjVuFile::inherits(const char * class_name) const
+DjVuFile::inherits(const GString &class_name) const
 {
    return
       (GString("DjVuFile") == class_name) ||

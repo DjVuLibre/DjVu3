@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuPort.cpp,v 1.46 2001-04-05 21:26:26 chrisp Exp $
+// $Id: DjVuPort.cpp,v 1.47 2001-04-11 16:59:51 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -233,7 +233,7 @@ DjVuPortcaster::is_port_alive(DjVuPort *port)
 }
 
 void
-DjVuPortcaster::add_alias(const DjVuPort * port, const char * alias)
+DjVuPortcaster::add_alias(const DjVuPort * port, const GString &alias)
 {
    GCriticalSectionLock lock(&map_lock);
    a2p_map[alias]=port;
@@ -265,7 +265,7 @@ DjVuPortcaster::clear_aliases(const DjVuPort * port)
 }
 
 GP<DjVuPort>
-DjVuPortcaster::alias_to_port(const char * alias)
+DjVuPortcaster::alias_to_port(const GString &alias)
 {
    GCriticalSectionLock lock(&map_lock);
    GPosition pos;
@@ -280,12 +280,11 @@ DjVuPortcaster::alias_to_port(const char * alias)
 }
 
 GPList<DjVuPort>
-DjVuPortcaster::prefix_to_ports(const char * prefix)
+DjVuPortcaster::prefix_to_ports(const GString &prefix)
 {
   GPList<DjVuPort> list;
-  if (prefix)
   {
-    int length=strlen(prefix);
+    int length=prefix.length();
     if (length)
     {
       GCriticalSectionLock lock(&map_lock);
@@ -457,7 +456,7 @@ DjVuPortcaster::compute_closure(const DjVuPort * src, GPList<DjVuPort> &list, bo
 }
 
 GURL
-DjVuPortcaster::id_to_url(const DjVuPort * source, const char * id)
+DjVuPortcaster::id_to_url(const DjVuPort * source, const GString &id)
 {
    GPList<DjVuPort> list;
    compute_closure(source, list, true);
@@ -471,7 +470,7 @@ DjVuPortcaster::id_to_url(const DjVuPort * source, const char * id)
 }
 
 GPBase
-DjVuPortcaster::id_to_file(const DjVuPort * source, const char * id)
+DjVuPortcaster::id_to_file(const DjVuPort * source, const GString &id)
 {
    GPList<DjVuPort> list;
    compute_closure(source, list, true);
@@ -494,7 +493,7 @@ DjVuPortcaster::request_data(const DjVuPort * source, const GURL & url)
 }
 
 bool
-DjVuPortcaster::notify_error(const DjVuPort * source, const char * msg)
+DjVuPortcaster::notify_error(const DjVuPort * source, const GString &msg)
 {
    GPList<DjVuPort> list;
    compute_closure(source, list, true);
@@ -505,7 +504,7 @@ DjVuPortcaster::notify_error(const DjVuPort * source, const char * msg)
 }
 
 bool
-DjVuPortcaster::notify_status(const DjVuPort * source, const char * msg)
+DjVuPortcaster::notify_status(const DjVuPort * source, const GString &msg)
 {
    GPList<DjVuPort> list;
    compute_closure(source, list, true);
@@ -534,7 +533,7 @@ DjVuPortcaster::notify_relayout(const DjVuImage * source)
 }
 
 void
-DjVuPortcaster::notify_chunk_done(const DjVuPort * source, const char * name)
+DjVuPortcaster::notify_chunk_done(const DjVuPort * source, const GString &name)
 {
    GPList<DjVuPort> list;
    compute_closure(source, list);
@@ -576,19 +575,19 @@ DjVuPortcaster::notify_decode_progress(const DjVuPort * source, float done)
 //****************************************************************************
 
 GURL
-DjVuPort::id_to_url(const DjVuPort *, const char *) { return GURL(); }
+DjVuPort::id_to_url(const DjVuPort *, const GString &) { return GURL(); }
 
 GPBase
-DjVuPort::id_to_file(const DjVuPort *, const char *) { return 0; }
+DjVuPort::id_to_file(const DjVuPort *, const GString &) { return 0; }
 
 GP<DataPool>
 DjVuPort::request_data(const DjVuPort *, const GURL &) { return 0; }
 
 bool
-DjVuPort::notify_error(const DjVuPort *, const char *) { return 0; }
+DjVuPort::notify_error(const DjVuPort *, const GString &) { return 0; }
 
 bool
-DjVuPort::notify_status(const DjVuPort *, const char *) { return 0; }
+DjVuPort::notify_status(const DjVuPort *, const GString &) { return 0; }
 
 void
 DjVuPort::notify_redisplay(const DjVuImage *) {}
@@ -597,7 +596,7 @@ void
 DjVuPort::notify_relayout(const DjVuImage *) {}
 
 void
-DjVuPort::notify_chunk_done(const DjVuPort *, const char *) {}
+DjVuPort::notify_chunk_done(const DjVuPort *, const GString &) {}
 
 void
 DjVuPort::notify_file_flags_changed(const DjVuFile *, long, long) {}
@@ -627,14 +626,14 @@ DjVuSimplePort::request_data(const DjVuPort * source, const GURL & url)
 }
 
 bool
-DjVuSimplePort::notify_error(const DjVuPort * source, const char * msg)
+DjVuSimplePort::notify_error(const DjVuPort * source, const GString &msg)
 {
    DjVuMsg.perror(msg);
    return 1;
 }
 
 bool
-DjVuSimplePort::notify_status(const DjVuPort * source, const char * msg)
+DjVuSimplePort::notify_status(const DjVuPort * source, const GString &msg)
 {
    DjVuMsg.perror(msg);
    return 1;
