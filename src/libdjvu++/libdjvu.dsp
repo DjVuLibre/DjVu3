@@ -398,6 +398,10 @@ SOURCE=.\IWTransform.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\JB2EncodeCodec.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\JB2Image.cpp
 # End Source File
 # Begin Source File
