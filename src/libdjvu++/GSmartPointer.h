@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GSmartPointer.h,v 1.13 2000-01-19 22:51:50 eaf Exp $
+//C- $Id: GSmartPointer.h,v 1.14 2000-01-19 23:50:38 bcr Exp $
 
 #ifndef _GSMARTPOINTER_H_
 #define _GSMARTPOINTER_H_
@@ -31,7 +31,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation\\
     Andrei Erofeev <eaf@research.att.com> -- bug fix.
     @version 
-    #$Id: GSmartPointer.h,v 1.13 2000-01-19 22:51:50 eaf Exp $# 
+    #$Id: GSmartPointer.h,v 1.14 2000-01-19 23:50:38 bcr Exp $# 
     @args
 */
 //@{
@@ -61,9 +61,6 @@ public:
   /** Returns the number of references to this object.  This should be only
       used for debugging purposes. Other uses are not thread-safe. */
   int get_count(void) const;
-  /** This is a thread safe method to find out if unref() will delete the
-      real object... */
-  bool OnlyCopy(void) const;
 protected:
   /// The reference counter
   volatile int count;
