@@ -199,7 +199,7 @@ then
 			  TESTCCSYMBOLIC="-Wl,-Bstatic,-lstdc++ -shared"
 				TESTCCPIC="-fPIC"
 				;;
-      solaris-yes)
+      solaris-*-yes)
         if [ -z "$CROSSCOMPILER" ] ; then 
           TESTCCSYMBOLIC="-shared -L/usr/lib -R/usr/lib -Wl,-Bstatic,-lstdc++"
         else
