@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuPalette.h,v 1.4 1999-11-11 00:08:08 leonb Exp $
+//C- $Id: DjVuPalette.h,v 1.5 1999-11-11 15:29:54 leonb Exp $
 
 
 
@@ -37,7 +37,7 @@
     @memo 
     DjVuPalette header file
     @version 
-    #$Id: DjVuPalette.h,v 1.4 1999-11-11 00:08:08 leonb Exp $#
+    #$Id: DjVuPalette.h,v 1.5 1999-11-11 15:29:54 leonb Exp $#
     @author: 
     L\'eon Bottou <leonb@research.att.com> */
 //@{
@@ -148,13 +148,13 @@ private:
 // ------------ INLINES
 
 
-void 
+inline void 
 DjVuPalette::histogram_clear()
 {
   allocate_hcube();
 }
 
-void 
+inline void 
 DjVuPalette::histogram_add(const GPixel &p, int weight)
 {
   if (!hcube) allocate_hcube();
@@ -165,7 +165,7 @@ DjVuPalette::histogram_add(const GPixel &p, int weight)
   d.w += weight;
 }
 
-void 
+inline void 
 DjVuPalette::histogram_add(const unsigned char *bgr, int weight)
 {
   if (!hcube) allocate_hcube();
@@ -176,13 +176,13 @@ DjVuPalette::histogram_add(const unsigned char *bgr, int weight)
   d.w += weight;
 }
 
-int
+inline int
 DjVuPalette::size() const
 {
   return palette.size();
 }
 
-int 
+inline int 
 DjVuPalette::color_to_index(const unsigned char *bgr)
 {
   if (!pcube) allocate_pcube();
@@ -191,13 +191,13 @@ DjVuPalette::color_to_index(const unsigned char *bgr)
   return d;
 }
 
-int 
+inline int 
 DjVuPalette::color_to_index(const GPixel &p)
 {
   return color_to_index(&p.b);
 }
 
-void 
+inline void 
 DjVuPalette::index_to_color(int index, unsigned char *bgr) const
 {
   const PColor &color = palette[index];
@@ -206,13 +206,13 @@ DjVuPalette::index_to_color(int index, unsigned char *bgr) const
   bgr[2] = color.p[2];
 }
 
-void 
+inline void 
 DjVuPalette::index_to_color(int index, GPixel &p) const
 {
   index_to_color(index, &p.b);
 }
 
-void
+inline void
 DjVuPalette::get_color(int nth, GPixel &p) const
 {
   index_to_color(colordata[nth], p);
