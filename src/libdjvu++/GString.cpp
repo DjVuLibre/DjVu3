@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.132 2001-09-19 15:53:35 leonb Exp $
+// $Id: GString.cpp,v 1.133 2001-09-21 20:09:07 leonb Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -892,7 +892,7 @@ GNativeString::GNativeString(const GNativeString &str)
   init(str);
 }
 
-GNativeString::GNativeString(const GBaseString &gs, int from, unsigned int len)
+GNativeString::GNativeString(const GBaseString &gs, int from, int len)
 {
   init(
     GStringRep::Native::create(gs,from,((int)len<0)?(-1):(int)len));
@@ -2533,7 +2533,7 @@ GUTF8String::operator+= (const GBaseString &str)
 }
 
 GUTF8String
-GUTF8String::substr(int from, unsigned int len) const
+GUTF8String::substr(int from, int len) const
 { return GUTF8String(*this, from, len); }
 
 GUTF8String
@@ -2605,8 +2605,7 @@ GUTF8String::GUTF8String(const unsigned short *dat, unsigned int len)
 GUTF8String::GUTF8String(const unsigned long *dat, unsigned int len)
 { init(GStringRep::UTF8::create(dat,0,((int)len<0)?(-1):(int)len)); }
 
-GUTF8String::GUTF8String(
-  const GBaseString &gs, int from, unsigned int len)
+GUTF8String::GUTF8String(const GBaseString &gs, int from, int len)
 { init(GStringRep::UTF8::create(gs,from,((int)len<0)?(-1):(int)len)); }
 
 GUTF8String::GUTF8String(const int number)

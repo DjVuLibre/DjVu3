@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: parseoptions.cpp,v 1.92 2001-08-24 21:50:10 docbill Exp $
+// $Id: parseoptions.cpp,v 1.93 2001-09-21 20:09:07 leonb Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -48,7 +48,7 @@
 #include "GURL.h"
 #ifdef THREADMODEL
 #include "GThreads.h"
-#endif THREADMODEL
+#endif //THREADMODEL
 #include <string.h>
 #if defined (UNIX) || defined (MAC)
 #include <unistd.h>
@@ -852,9 +852,9 @@ DjVuParseOptions::ReadNextConfig (
 //   7. Double quotes, may be used to bypass white space stripping.
 //   8. You can continue multiple lines within quotes.
 //   9. The standard shell escape characters \n, \r, ... may be used.
-//  10. You can use single quotes to make everything exactly as is.  e.g. \\  
-//      would remain \\, and not be parsed as an escape character for a
-//      single \  
+//  10. You can use single quotes to make everything exactly as is.  e.g. "\\"
+//      would remain "\\", and not be parsed as an escape character for a
+//      single "\"
 //  In otherwords, it is very similar to parsing a typical ~/.profile file
 //  that only sets variable names.
 

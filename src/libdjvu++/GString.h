@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //
-// $Id: GString.h,v 1.97 2001-09-13 23:44:21 docbill Exp $
+// $Id: GString.h,v 1.98 2001-09-21 20:09:07 leonb Exp $
 // $Name:  $
 
 #ifndef _GSTRING_H_
@@ -64,7 +64,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.97 2001-09-13 23:44:21 docbill Exp $# */
+    #$Id: GString.h,v 1.98 2001-09-21 20:09:07 leonb Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -723,7 +723,7 @@ public:
       character array #dat# are added into the string until the
       string length reaches #len# or until encountering a null
       character (whichever comes first). */
-  GUTF8String(const GBaseString &gs, int from, unsigned int len);
+  GUTF8String(const GBaseString &gs, int from, int len);
 
   /** Copy a null terminated character array. Resets this string
       with the character string contained in the null terminated
@@ -808,7 +808,7 @@ public:
       #len# characters starting at position #from# in this string.
       The length of the resulting string may be smaller than #len#
       if the specified range is too large. */
-  GUTF8String substr(int from, unsigned int len=1) const;
+  GUTF8String substr(int from, int len/*=(-1)*/) const;
 
   /** Returns an upper case copy of this string.  The returned string
       contains a copy of the current string with all letters turned
@@ -922,7 +922,7 @@ public:
       character array #dat# are added into the string until the
       string length reaches #len# or until encountering a null
       character (whichever comes first). */
-  GNativeString(const GBaseString &gs, int from, unsigned int len);
+  GNativeString(const GBaseString &gs, int from, int len);
 
   /** Constructs a string with a formatted string (as in #vprintf#).
       The string is re-initialized with the characters generated
@@ -973,7 +973,7 @@ public:
       #len# characters starting at position #from# in this string.
       The length of the resulting string may be smaller than #len#
       if the specified range is too large. */
-  GNativeString substr(int from, unsigned int len=1) const;
+  GNativeString substr(int from, int len/*=(-1)*/) const;
 
   /** Returns an upper case copy of this string.  The returned
       string contains a copy of the current string with all letters
@@ -1478,7 +1478,7 @@ GNativeString::init(const GP<GStringRep> &rep)
 }
 
 inline GNativeString 
-GNativeString::substr(int from, unsigned int len) const
+GNativeString::substr(int from, int len) const
 { return GNativeString(*this, from, len); }
 
 inline GNativeString &

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuNavDir.cpp,v 1.20 2001-07-24 17:52:04 bcr Exp $
+// $Id: DjVuNavDir.cpp,v 1.21 2001-09-21 20:09:07 leonb Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -111,7 +111,7 @@ DjVuNavDir::encode(ByteStream & str)
       str.writall("\n", 1);
    };
 }
-#endif NEED_DECODER_ONLY
+#endif //NEED_DECODER_ONLY
 
 int
 DjVuNavDir::get_pages_num(void) const

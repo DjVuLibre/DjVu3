@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuText.cpp,v 1.29 2001-07-24 17:52:04 bcr Exp $
+// $Id: DjVuText.cpp,v 1.30 2001-09-21 20:09:07 leonb Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -631,7 +631,7 @@ DjVuTXT::find_text_in_rect(GRect target_rect, GUTF8String &text) const
 	    }
 	 }
       }
-      Zone *parag;
+      Zone *parag = 0;
       if ( ar>0 ) parag=zone_list[pos_sel];
       zone_list.empty();
       if ( ar>0 ) 

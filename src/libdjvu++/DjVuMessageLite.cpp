@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessageLite.cpp,v 1.8 2001-07-24 17:52:04 bcr Exp $
+// $Id: DjVuMessageLite.cpp,v 1.9 2001-09-21 20:09:07 leonb Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -66,9 +66,15 @@ static const char *failed_to_parse_XML=ERR_MSG("DjVuMessage.failed_to_parse_XML"
 
 static const char *unrecognized=ERR_MSG("DjVuMessage.Unrecognized");
 static const char *uparameter=ERR_MSG("DjVuMessage.Parameter");
+#ifdef LIZARDTECH_1_800_NUMBER
 static const char unrecognized_default[] =
-  "** Unrecognized DjVu Message: [Contact LizardTech for assistance]\n"
+  "** Unrecognized DjVu Message: [Contact LizardTech at " LIZARDTECH_1_800_NUMBER " \n"
   "\t** Message name:  %1!s!";
+#else
+static const char unrecognized_default[] =
+  "** Unrecognized DjVu Message:\n"
+  "\t** Message name:  %1!s!";
+#endif
 static const char uparameter_default[]="\t   Parameter: %1!s!";
 static const char failed_to_parse_XML_default[]=
   "Failed to parse XML message file:&#10;&#09;&apos;%1!s!&apos;.";

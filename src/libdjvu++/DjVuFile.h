@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuFile.h,v 1.84 2001-07-24 17:52:03 bcr Exp $
+// $Id: DjVuFile.h,v 1.85 2001-09-21 20:09:07 leonb Exp $
 // $Name:  $
 
 #ifndef _DJVUFILE_H
@@ -71,7 +71,7 @@ class DjVuNavDir;
 
     @memo Classes representing DjVu files.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuFile.h,v 1.84 2001-07-24 17:52:03 bcr Exp $#
+    @version #$Id: DjVuFile.h,v 1.85 2001-09-21 20:09:07 leonb Exp $#
 */
 
 //@{
@@ -458,28 +458,38 @@ public:
 	  when the \Ref{is_all_data_present}() returns #TRUE#. */
    GP<ByteStream>	get_merged_anno(int * max_level_ptr=0);
 
-      /** Processes the text chunks.  This function may be used even when
-          the #DjVuFile# has not been decoded yet. If all data has been
-          received for this #DjVuFile#, it will gather hidden text  and
-          return the result.  If no hidden text has been found, #ZERO# will
-          be returned.
+      /** Returns the annotation chunks (#"ANTa"# and #"ANTz"#).  This
+          function may be used even when the #DjVuFile# has not been decoded
+          yet. If all data has been received for this #DjVuFile#, it will
+          gather hidden text and return the result.  If no hidden text has
+          been found, #ZERO# will be returned.
+
+	  {\bf Summary:} This function will return complete annotations
+	  only when the \Ref{is_all_data_present}() returns #TRUE#. */
+   GP<ByteStream>	get_anno(void);
+
+      /** Returns the text chunks (#"TXTa"# and #"TXTz"#).  This function may
+          be used even when the #DjVuFile# has not been decoded yet. If all
+          data has been received for this #DjVuFile#, it will gather hidden
+          text and return the result.  If no hidden text has been found,
+          #ZERO# will be returned.
 
 	  {\bf Summary:} This function will return complete hidden text layers
 	  only when the \Ref{is_all_data_present}() returns #TRUE#. */
    GP<ByteStream>	get_text(void);
 
-      /** Processes the meta chunks.  This function may be used even when
-          the #DjVuFile# has not been decoded yet. If all data has been
-          received for this #DjVuFile#, it will gather metadata and
-          return the result.  If no hidden text has been found, #ZERO# will
-          be returned.
+      /** Returns the meta chunks (#"METa"# and #"METz"#).  This function may
+          be used even when the #DjVuFile# has not been decoded yet. If all
+          data has been received for this #DjVuFile#, it will gather metadata
+          and return the result.  If no hidden text has been found, #ZERO#
+          will be returned.
 
 	  {\bf Summary:} This function will return complete meta data only
 	  when the \Ref{is_all_data_present}() returns #TRUE#. */
    GP<ByteStream>	get_meta(void);
 
       /** Goes down the hierarchy of #DjVuFile#s and merges their annotations.
-
+          (shouldn't this one be private?).
 	  @param max_level_ptr If this pointer is not ZERO, the function
 	         will use it to store the maximum level at which annotations
 		 were found. Top-level page files have ZERO #level#.
@@ -627,6 +637,8 @@ private:
    static void	get_merged_anno(const GP<DjVuFile> & file,
      const GP<ByteStream> &str_out, const GList<GURL> & ignore_list,
      int level, int & max_level, GMap<GURL, void *> & map);
+   static void	get_anno(const GP<DjVuFile> & file,
+     const GP<ByteStream> &str_out);
    static void	get_text(const GP<DjVuFile> & file,
      const GP<ByteStream> &str_out);
    static void	get_meta(const GP<DjVuFile> & file,

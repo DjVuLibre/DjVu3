@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuFile.cpp,v 1.180 2001-09-13 23:44:21 docbill Exp $
+// $Id: DjVuFile.cpp,v 1.181 2001-09-21 20:09:07 leonb Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -1652,6 +1652,60 @@ DjVuFile::get_merged_anno(int * max_level_ptr)
 }
 
 
+// [LB->BCR] The following six functions get_anno, get_text, get_meta 
+// contain the same code in triplicate!!!
+
+void
+DjVuFile::get_anno(
+  const GP<DjVuFile> & file, const GP<ByteStream> &gstr_out)
+{
+  DEBUG_MSG("DjVuFile::get_anno()\n");
+  ByteStream &str_out=*gstr_out;
+  if (!file->is_data_present() ||
+    file->is_modified() && file->anno)
+  {
+    // Process the decoded (?) anno
+    GCriticalSectionLock lock(&file->anno_lock);
+    if (file->anno && file->anno->size())
+    {
+      if (str_out.tell())
+      {
+        str_out.write((void *) "", 1);
+      }
+      file->anno->seek(0);
+      str_out.copy(*file->anno);
+    }
+  } else if (file->is_data_present())
+  {
+	       // Copy all anno chunks, but do NOT modify
+	       // DjVuFile::anno (to avoid correlation with DjVuFile::decode())
+    const GP<ByteStream> str=file->data_pool->get_stream();
+    const GP<IFFByteStream> giff=IFFByteStream::create(str);
+    IFFByteStream &iff=*giff;
+    GUTF8String chkid;
+    if (iff.get_chunk(chkid))
+    {
+      while(iff.get_chunk(chkid))
+      {
+        if (is_annotation(chkid))
+        {
+          if (str_out.tell())
+          {
+            str_out.write((void *) "", 1);
+          }
+          const GP<IFFByteStream> giff_out(IFFByteStream::create(gstr_out));
+          IFFByteStream &iff_out=*giff_out;
+          iff_out.put_chunk(chkid);
+          iff_out.copy(*iff.get_bytestream());
+          iff_out.close_chunk();
+        }
+        iff.close_chunk();
+      }
+    }
+    file->data_pool->clear_stream();
+  }
+}
+
 void
 DjVuFile::get_text(
   const GP<DjVuFile> & file, const GP<ByteStream> &gstr_out)
@@ -1752,6 +1806,23 @@ DjVuFile::get_meta(
     }
     file->data_pool->clear_stream();
   }
+}
+
+GP<ByteStream>
+DjVuFile::get_anno(void)
+{
+  DEBUG_MSG("DjVuFile::get_text(void)\n");
+  GP<ByteStream> gstr(ByteStream::create());
+  get_anno(this, gstr);
+  ByteStream &str=*gstr;
+  if (!str.tell())
+  { 
+    gstr=0;
+  }else
+  {
+    str.seek(0);
+  }
+  return gstr;
 }
 
 GP<ByteStream>

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GUnicode.cpp,v 1.29 2001-07-24 17:52:04 bcr Exp $
+// $Id: GUnicode.cpp,v 1.30 2001-09-21 20:09:07 leonb Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -70,7 +70,8 @@ checkmarks(void const * const xbuf,size_t &bufsize,GStringRep::EncodeType &rep)
         }
         break;
       case 0xfffe:
-        if(((bufsize>=4)||(!bufsize && rep == GStringRep::XUCS4LE)) && !(unsigned char *)buf[2] && !(unsigned char *)buf[3])
+        if(((bufsize>=4)||(!bufsize && rep == GStringRep::XUCS4LE)) 
+           && !((unsigned char *)buf)[2] && !((unsigned char *)buf)[3])
         {
           rep=GStringRep::XUCS4LE;
           buf+=4;
@@ -81,7 +82,8 @@ checkmarks(void const * const xbuf,size_t &bufsize,GStringRep::EncodeType &rep)
         }
         break;
       case 0xfeff:
-        if(((bufsize>=4)||(!bufsize && rep == GStringRep::XUCS4_3412))&&!(unsigned char *)buf[2] && !(unsigned char *)buf[3])
+        if(((bufsize>=4)||(!bufsize && rep == GStringRep::XUCS4_3412)) 
+           && !((unsigned char *)buf)[2] && !((unsigned char *)buf)[3])
         {
           rep=GStringRep::XUCS4_3412;
           buf+=4;

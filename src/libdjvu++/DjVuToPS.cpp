@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuToPS.cpp,v 1.30 2001-07-31 17:37:12 mchen Exp $
+// $Id: DjVuToPS.cpp,v 1.31 2001-09-21 20:09:07 leonb Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -66,9 +66,10 @@ static const size_t ps_string_size=15000;
 // ***************************************************************************
 
 DjVuToPS::Options::Options(void)
-: format(PS), orientation(PORTRAIT), level(2), mode(COLOR), zoom(FIT_PAGE),
-  color(true), calibrate(true), gamma((double)2.2), copies(1), frame(false),
-  text(false) {}
+: format(PS), level(2), orientation(PORTRAIT), mode(COLOR), zoom(FIT_PAGE),
+  color(true), calibrate(true), text(false),
+  gamma((double)2.2), copies(1), frame(false)
+{}
 
 void
 DjVuToPS::Options::set_format(const Format xformat)
@@ -998,7 +999,7 @@ DjVuToPS::print_fg(ByteStream &str, const GP<DjVuImage> &dimg,
       int nbytes = (columns+7)/8*rows+1;
       int nrows = rows;
       int nstrings=0;
-      if (nbytes>ps_string_size)   //max string length
+      if (nbytes>(int)ps_string_size)   //max string length
       {
         nrows=ps_string_size/((columns+7)/8);
         nbytes=(columns+7)/8*nrows+1;
