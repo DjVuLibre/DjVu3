@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GContainer.h,v 1.23 1999-09-23 12:40:24 leonb Exp $
+//C- $Id: GContainer.h,v 1.24 1999-10-07 16:48:38 leonb Exp $
 
 
 #ifndef _GCONTAINER_H_
@@ -69,7 +69,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@research.att.com> -- bug fixes.
     @version 
-    #$Id: GContainer.h,v 1.23 1999-09-23 12:40:24 leonb Exp $# */
+    #$Id: GContainer.h,v 1.24 1999-10-07 16:48:38 leonb Exp $# */
 //@{
 
 
@@ -255,8 +255,6 @@ public:
   void shift(int disp);
   void del(int n, int howmany=1);
   void ins(int n, const void *src, int howmany=1);
-  typedef int (*LEQV)(const void*, const void*);
-  void sort(int lo, int hi, LEQV leqv);
 protected:
   static void throw_illegal_subscript() no_return;
   const Traits &traits;
