@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GURL.h,v 1.4 1999-05-25 22:33:34 eaf Exp $
+//C- $Id: GURL.h,v 1.5 1999-06-04 19:48:05 eaf Exp $
 
 #ifndef _GURL_H_
 #define _GURL_H_
@@ -25,7 +25,7 @@
     \Ref{GURL} class used to store URLs in a system independent format.
     @memo System independent URL representation.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: GURL.h,v 1.4 1999-05-25 22:33:34 eaf Exp $#
+    @version #$Id: GURL.h,v 1.5 1999-06-04 19:48:05 eaf Exp $#
 */
 
 //@{
@@ -33,7 +33,7 @@
 /** System independent URL representation.
 
     This class is used in the library to store URLs in a system independent
-    format. The idea to use a general class to hold URL was arose after we
+    format. The idea to use a general class to hold URL arose after we
     realized, that DjVu had to be able to access files both from the WEB
     and from the local disk. While it is strange to talk about system
     independence of HTTP URLs, file names formats obviously differ from
@@ -43,7 +43,7 @@
     #file://localhost/dir/file.djvu#.
 
     To simplify a developer's life we have created this class, which contains
-    a canonical representation of URLs.
+    inside a canonical representation of URLs.
 
     File URLs are converted to internal format with the help of \Ref{GOS} class.
 
