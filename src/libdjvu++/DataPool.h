@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.h,v 1.26 1999-10-05 16:00:05 leonb Exp $
+//C- $Id: DataPool.h,v 1.27 1999-11-09 23:14:37 praveen Exp $
  
 #ifndef _DATAPOOL_H
 #define _DATAPOOL_H
@@ -44,7 +44,7 @@
 
     @memo Thread safe data storage
     @author Andrei Erofeev <eaf@research.att.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DataPool.h,v 1.26 1999-10-05 16:00:05 leonb Exp $#
+    @version #$Id: DataPool.h,v 1.27 1999-11-09 23:14:37 praveen Exp $#
 */
 
 //@{
@@ -200,7 +200,7 @@ private:
       int	offset;
       int	size;
       Reader(void) : reenter_flag(false), offset(0), size(-1){};
-      Reader(int offset_in=0, int size_in=-1) :
+      Reader(int offset_in, int size_in=-1) :
 	    reenter_flag(false), offset(offset_in), size(size_in) {};
       virtual ~Reader(void) {};
    };
