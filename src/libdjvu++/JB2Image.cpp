@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: JB2Image.cpp,v 1.50 2000-12-22 01:58:34 bcr Exp $
+// $Id: JB2Image.cpp,v 1.51 2000-12-28 02:48:01 praveen Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -1181,7 +1181,8 @@ JB2Dict::JB2Codec::LibRect::compute_bounding_box(const GBitmap &bm)
     {
       unsigned char const *p = bm[0] + right;
       unsigned char const * const pe = p+(s*h);
-      for (;(p<pe)&&(!*p);p+=s);
+      for (;(p<pe)&&(!*p);p+=s)
+      	continue;
       if (p<pe)
         break;
     }
@@ -1190,7 +1191,8 @@ JB2Dict::JB2Codec::LibRect::compute_bounding_box(const GBitmap &bm)
     {
       unsigned char const *p = bm[top];
       unsigned char const * const pe = p+w;
-      for (;(p<pe)&&(!*p); ++p);
+      for (;(p<pe)&&(!*p); ++p)
+      	continue;
       if (p<pe)
         break;
     }
@@ -1199,7 +1201,8 @@ JB2Dict::JB2Codec::LibRect::compute_bounding_box(const GBitmap &bm)
     {
       unsigned char const *p = bm[0] + left;
       unsigned char const * const pe=p+(s*h);
-      for (;(p<pe)&&(!*p);p+=s);
+      for (;(p<pe)&&(!*p);p+=s)
+      	continue;
       if (p<pe)
         break;
     }
@@ -1208,7 +1211,8 @@ JB2Dict::JB2Codec::LibRect::compute_bounding_box(const GBitmap &bm)
     {
       unsigned char const *p = bm[bottom];
       unsigned char const * const pe = p+w;
-      for (;(p<pe)&&(!*p); ++p);
+      for (;(p<pe)&&(!*p); ++p)
+      	continue;
       if (p<pe)
         break;
     }

@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: GRect.cpp,v 1.17 2000-11-09 20:15:07 jmw Exp $
+// $Id: GRect.cpp,v 1.18 2000-12-28 02:48:01 praveen Exp $
 // $Name:  $
 
 // -- Implementation of class GRect and GRectMapper
@@ -160,6 +160,23 @@ GRect::contains(const GRect & rect) const
    return tmp_rect==rect;
 }
 
+void
+GRect::scale(float factor)
+{
+	xmin *= factor;
+	ymin *= factor;
+	xmax *= factor;
+	ymax *= factor;
+}
+
+void
+GRect::scale(float xfactor, float yfactor)
+{
+	xmin *= xfactor;
+	ymin *= yfactor;
+	xmax *= xfactor;
+	ymax *= yfactor;
+}
 // -- Class GRatio
 
 

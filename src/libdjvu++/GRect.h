@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: GRect.h,v 1.21 2000-11-09 20:15:07 jmw Exp $
+// $Id: GRect.h,v 1.22 2000-12-28 02:48:01 praveen Exp $
 // $Name:  $
 
 #ifndef _GRECT_H_
@@ -52,7 +52,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GRect.h,v 1.21 2000-11-09 20:15:07 jmw Exp $# */
+    #$Id: GRect.h,v 1.22 2000-12-28 02:48:01 praveen Exp $# */
 //@{
 
 #include "DjVuGlobal.h"
@@ -146,6 +146,10 @@ public:
       both rectangles #rect1# and #rect2#. This function returns true if the
       created rectangle is not empty. */
   int  recthull(const GRect &rect1, const GRect &rect2);
+  /** Multiplies xmin, ymin, xmax, ymax by factor and scales the rectangle*/
+  void scale(float factor);
+  /** Multiplies xmin, xmax by xfactor and ymin, ymax by yfactor and scales the rectangle*/
+  void scale(float xfactor, float yfactor);
   /** Minimal horizontal point coordinate of the rectangle. */
   int xmin;
   /** Minimal vertical point coordinate of the rectangle. */
