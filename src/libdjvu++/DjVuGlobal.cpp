@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuGlobal.cpp,v 1.18 2000-01-04 05:31:31 bcr Exp $
+//C- $Id: DjVuGlobal.cpp,v 1.19 2000-01-05 17:13:07 haffner Exp $
 
 /** This file impliments the DjVuProgressTask elements.  The memory
     functions are implimented in a separate file, because only the memory
@@ -45,7 +45,7 @@ unsigned long DjVuProgressTask::lastsigdate = 0;
 DjVuProgressTask::DjVuProgressTask(const char *xtask,int nsteps)
   : task(xtask),parent(0), nsteps(nsteps), runtostep(0)
 {
-  gtask=task;
+  //  gtask=task;
   if (callback)
     {
       unsigned long curdate = GOS::ticks();
