@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GString.cpp,v 1.11 1999-11-18 21:19:06 eaf Exp $
+//C- $Id: GString.cpp,v 1.12 2000-01-06 20:40:34 eaf Exp $
 
 
 #ifdef __GNUC__
@@ -25,7 +25,7 @@
 
 #include "GString.h"
 
-// File "$Id: GString.cpp,v 1.11 1999-11-18 21:19:06 eaf Exp $"
+// File "$Id: GString.cpp,v 1.12 2000-01-06 20:40:34 eaf Exp $"
 // - Author: Leon Bottou, 04/1997
 
 GStringRep *
@@ -101,9 +101,13 @@ GString::GString(const double number)
 GString& 
 GString::operator= (const char *str)
 {
-  GStringRep *rep = GStringRep::xnew(strlen(str));
-  if (rep) strcpy(rep->data,str);
-  (*this) = rep;
+  if (!str) empty();
+  else
+  {
+     GStringRep *rep = GStringRep::xnew(strlen(str));
+     if (rep) strcpy(rep->data,str);
+     (*this) = rep;
+  }
   return *this;
 }
 
