@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.h,v 1.47 2001-04-03 21:45:52 bcr Exp $
+// $Id: ByteStream.h,v 1.48 2001-04-04 22:12:11 bcr Exp $
 // $Name:  $
 
 #ifndef _BYTESTREAM_H
@@ -62,7 +62,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation\\
     Andrei Erofeev <eaf@geocities.com> -- 
     @version
-    #$Id: ByteStream.h,v 1.47 2001-04-03 21:45:52 bcr Exp $# */
+    #$Id: ByteStream.h,v 1.48 2001-04-04 22:12:11 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -95,6 +95,8 @@ public:
   class Static;
   class Memory;
   class Wrapper;
+  enum codepage_type {RAW,NATIVE,UTF8} cp;
+
   /** @name Virtual Functions.
       These functions are usually implemented by each subclass of #ByteStream#. */
   //@{
@@ -185,6 +187,8 @@ public:
       until reaching the end-of-file mark on ByteStream #bsfrom#, regardless
       of the number of bytes transferred.  */
   size_t copy(ByteStream &bsfrom, size_t size=0);
+  /// Allows printf() type operations to a bytestream.
+  size_t format(const char *fmt, ... );
   /** Writes the string as is, to the specified stream. */
   size_t writestring(const GString &s);
   /** Converts the string to native and writes it to the specified stream. */
@@ -229,7 +233,7 @@ public:
   virtual size_t readat(void *buffer, size_t sz, int pos);
   //@}
 protected:
-  ByteStream() {};
+  ByteStream(void) : cp(RAW) {};
 private:
   // Cancel C++ default stuff
   ByteStream(const ByteStream &);
@@ -259,14 +263,12 @@ public:
   /** Same as the above, but uses stdio. */
   static GP<ByteStream> create( char const * const mode);
 
-#if !defined(UNDER_CE)
   /** Constructs a ByteStream for accessing the stdio file #f#.
       Argument #mode# indicates the type of the stdio file, as in the
       well known stdio function #fopen#.  Destroying the ByteStream
       object will not close the stdio file #f# unless closeme is true. */
   static GP<ByteStream> create(
     const int fd, char const * const mode, const bool closeme);
-#endif
 
   /** Constructs a ByteStream for accessing the stdio file #f#.
       Argument #mode# indicates the type of the stdio file, as in the

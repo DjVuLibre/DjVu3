@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: cpaldjvu.cpp,v 1.12 2001-03-30 23:31:25 bcr Exp $
+// $Id: cpaldjvu.cpp,v 1.13 2001-04-04 22:12:10 bcr Exp $
 // $Name:  $
 
 
@@ -69,7 +69,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: cpaldjvu.cpp,v 1.12 2001-03-30 23:31:25 bcr Exp $# */
+    #$Id: cpaldjvu.cpp,v 1.13 2001-04-04 22:12:10 bcr Exp $# */
 //@{
 //@}
 
@@ -738,12 +738,12 @@ cpaldjvu(const GPixmap &input, GURL &urlout, const cpaldjvuopts &opts)
   DjVuPalette &pal=*gpal;
   int bgindex = pal.compute_pixmap_palette(input, opts.ncolors);
   if (opts.verbose)
-    fprintf(stderr,"cpaldjvu: image %dx%d quantized to %d colors\n", 
+    DjVuPrintError("cpaldjvu: image %dx%d quantized to %d colors\n", 
             w, h, pal.size());
   GPixel bgcolor;
   pal.index_to_color(bgindex, bgcolor);
   if (opts.verbose)
-    fprintf(stderr,"cpaldjvu: background color is #%02x%02x%02x\n", 
+    DjVuPrintError("cpaldjvu: background color is #%02x%02x%02x\n", 
             bgcolor.r, bgcolor.g, bgcolor.b);
 
   // Fill CCImage with color runs
@@ -762,17 +762,17 @@ cpaldjvu(const GPixmap &input, GURL &urlout, const cpaldjvuopts &opts)
         }
     }
   if (opts.verbose)
-    fprintf(stderr,"cpaldjvu: %d color runs\n", 
+    DjVuPrintError("cpaldjvu: %d color runs\n", 
             rimg.runs.size());
 
   // Perform Color Connected Component Analysis
   rimg.make_ccids_by_analysis();                  // Obtain ccids
   rimg.make_ccs_from_ccids();                     // Compute cc descriptors
   if (opts.verbose)
-    fprintf(stderr,"cpaldjvu: %d ccs\n", rimg.ccs.size());
+    DjVuPrintError("cpaldjvu: %d ccs\n", rimg.ccs.size());
   rimg.merge_and_split_ccs(smallsize,largesize);  // Eliminates gross ccs
   if (opts.verbose)
-    fprintf(stderr,"cpaldjvu: %d ccs after merging/splitting\n", 
+    DjVuPrintError("cpaldjvu: %d ccs after merging/splitting\n", 
             rimg.ccs.size());
   rimg.sort_in_reading_order();                   // Sort cc descriptors
   
@@ -808,7 +808,7 @@ cpaldjvu(const GPixmap &input, GURL &urlout, const cpaldjvuopts &opts)
         if (jimg.get_shape(i).parent >= 0) nrefine++; 
         nshape++; 
       }
-      fprintf(stderr,"cpaldjvu: %d shapes after matching (%d are cross-coded)\n", 
+      DjVuPrintError("cpaldjvu: %d shapes after matching (%d are cross-coded)\n", 
               nshape, nrefine);
     }
   
@@ -883,7 +883,7 @@ cpaldjvu(const GPixmap &input, GURL &urlout, const cpaldjvuopts &opts)
 void
 usage()
 {
-  fprintf(stderr,"Usage: cpaldjvu [options] <inputppmfile> <outputdjvufile>\n"
+  DjVuPrintError("Usage: cpaldjvu [options] <inputppmfile> <outputdjvufile>\n"
           "Options are:\n"
           "   -colors n    Maximum number of colors during quantization (default 256).\n"
           "   -dpi n       Resolution written into the output file (default 100).\n"

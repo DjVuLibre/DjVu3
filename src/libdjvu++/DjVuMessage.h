@@ -31,7 +31,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessage.h,v 1.13 2001-04-02 22:53:24 fcrary Exp $
+// $Id: DjVuMessage.h,v 1.14 2001-04-04 22:12:11 bcr Exp $
 // $Name:  $
 */
 
@@ -58,7 +58,7 @@ private:
 
 public:
 
-  static const DjVuMessage &get_DjVuMessage(void);
+  static const DjVuMessage &create(void);
 
   // Destructor: Does any necessary cleanup. Actions depend on how the message
   //    file is implemented.
@@ -117,6 +117,15 @@ public:
   //       and SHOULD NOT BE ASSUMED TO BE ASCII.
   GString LookUp( const GString & MessageList ) const;
 
+  // Same as LookUp, but this is a static method.
+  static GString LookUpUTF8( const GString & MessageList )
+  { return DjVuMessage::create().LookUp(MessageList); }
+
+  // Same as Lookup, but returns the a multibyte character string in the
+  // current locale.
+  static GString LookUpNative( const GString & MessageList )
+  { return DjVuMessage::create().LookUp(MessageList).getUTF82Native(); }
+
   // This is a simple alias to the above class, but does an fprintf to stderr.
   void perror( const GString & MessageList ) const;
 
@@ -140,7 +149,7 @@ private:
 //  There is only object of class CDjVuMessage in a program, and here it is (the actual
 //  object is in DjVuMessage.cpp).
 // extern DjVuMessage  DjVuMsg;
-#define DjVuMsg DjVuMessage::get_DjVuMessage()
+#define DjVuMsg DjVuMessage::create()
 
 #endif /* __cplusplus */
 

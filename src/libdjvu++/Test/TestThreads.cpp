@@ -37,7 +37,7 @@ readfile()
   char c;
   int fd = open(__FILE__, O_RDONLY, 0666);
   if (fd < 0)
-    { fprintf(stderr,"Cannot open file '" __FILE__ "'."); exit(1); }
+    { DjVuPrintError("Cannot open file '" __FILE__ "'."); exit(1); }
   while (read(fd, &c, 1)==1) 
     { 
       GThread::yield(); 
@@ -69,7 +69,7 @@ alloc()
   char *mem = (char*)malloc(1);
   FILE *f = fopen(__FILE__,"r");
   if (f == 0)
-    { fprintf(stderr,"Cannot open file '" __FILE__ "'."); exit(0); }
+    { DjVuPrintError("%s","Cannot open file '" __FILE__ "'."); exit(0); }
   while (!feof(f))
     {
       mem = (char*)realloc(mem, size+1);

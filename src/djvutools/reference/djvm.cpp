@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djvm.cpp,v 1.9 2001-03-30 23:31:25 bcr Exp $
+// $Id: djvm.cpp,v 1.10 2001-04-04 22:12:10 bcr Exp $
 // $Name:  $
 
 /** @name djvm
@@ -99,7 +99,7 @@
     @author
     Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: djvm.cpp,v 1.9 2001-03-30 23:31:25 bcr Exp $# */
+    #$Id: djvm.cpp,v 1.10 2001-04-04 22:12:10 bcr Exp $# */
 //@{
 //@}
 
@@ -118,7 +118,7 @@ usage(void)
 {
    cerr << "\
 DJVM -- DjVu multipage document manipulation utility\n\
-   Copyright © 1999-2000 LizardTech, Inc. All Rights Reserved.\n\
+   Copyright Â© 1999-2000 LizardTech, Inc. All Rights Reserved.\n\
 \n\
 Usage:\n\
    To compose a multipage document:\n\
@@ -206,7 +206,7 @@ del(DArray<GString> &argv)
 
       // Delete the page
    int page_num=atoi(argv[3])-1;
-   if (page_num<0) { fprintf(stderr, "Page number must be positive.\n"); exit(1); }
+   if (page_num<0) { DjVuPrintError("%s","Page number must be positive.\n"); exit(1); }
    doc->remove_page(page_num);
 
       // Save the document

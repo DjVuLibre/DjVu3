@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djvuextract.cpp,v 1.13 2001-03-30 23:31:25 bcr Exp $
+// $Id: djvuextract.cpp,v 1.14 2001-04-04 22:12:10 bcr Exp $
 // $Name:  $
 
 /** @name djvuextract
@@ -65,7 +65,7 @@
     @memo
     Extract components from DjVu files.
     @version
-    #$Id: djvuextract.cpp,v 1.13 2001-03-30 23:31:25 bcr Exp $#
+    #$Id: djvuextract.cpp,v 1.14 2001-04-04 22:12:10 bcr Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> - Initial implementation\\
     Andrei Erofeev <eaf@geocities.com> - Multipage support */
@@ -118,7 +118,7 @@ display_info_chunk(GP<ByteStream> ibs, const GURL &url)
         {
           if (iff.readall((void*)&djvuinfo,sizeof(djvuinfo)) < sizeof(djvuinfo))
             G_THROW("Cannot read INFO chunk");
-          fprintf(stderr, "%s: (%d x %d) version %d\n", 
+          DjVuPrintError("%s: (%d x %d) version %d\n", 
                   (const char *)url, 
                   (djvuinfo.width_hi<<8)+djvuinfo.width_lo, 
                   (djvuinfo.height_hi<<8)+djvuinfo.height_lo,
@@ -192,9 +192,9 @@ extract_chunk(GP<ByteStream> ibs, const char *id, GP<ByteStream> out)
 void 
 usage()
 {
-  fprintf(stderr, 
+  DjVuPrintError("%s",
           "DJVUEXTRACT -- Extracts components of a DJVU file\n"
-          "  Copyright © 1999-2000 LizardTech, Inc. All Rights Reserved.\n"
+          "  Copyright Â© 1999-2000 LizardTech, Inc. All Rights Reserved.\n"
           "Usage:\n"
 	  "   djvuextract <djvufile> [-page=<num>] {...<chunkid>=<file>...} \n");
   exit(1);
@@ -227,7 +227,7 @@ main(int argc, char **argv)
            } 
       if (page_num<0)
         {
-          fprintf(stderr, "Invalid page number\n");
+          DjVuPrintError("%s", "Invalid page number\n");
           usage();
         }
       
@@ -256,7 +256,7 @@ main(int argc, char **argv)
           ByteStream &mbs=*gmbs;
           if (mbs.size() == 0)
             {
-              fprintf(stderr, "  %s --> not found!\n", (const char *)dargv[i]);
+              DjVuPrintError("  %s --> not found!\n", (const char *)dargv[i]);
             }
           else
             {
@@ -264,7 +264,7 @@ main(int argc, char **argv)
               GP<ByteStream> obs=ByteStream::create(url,"wb");
               mbs.seek(0);
               obs->copy(mbs);
-              fprintf(stderr, "  %s --> \"%s\" (%d bytes)\n", 
+              DjVuPrintError("  %s --> \"%s\" (%d bytes)\n", 
                       (const char *)dargv[i], (const char *)dargv[i]+5, mbs.size());
             }
         }

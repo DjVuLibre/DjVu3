@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djvudump.cpp,v 1.13 2001-03-30 23:31:25 bcr Exp $
+// $Id: djvudump.cpp,v 1.14 2001-04-04 22:12:10 bcr Exp $
 // $Name:  $
 
 /** @name djvuinfo
@@ -78,7 +78,7 @@ xxx
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: djvudump.cpp,v 1.13 2001-03-30 23:31:25 bcr Exp $# */
+    #$Id: djvudump.cpp,v 1.14 2001-04-04 22:12:10 bcr Exp $# */
 //@{
 //@}
 
@@ -109,9 +109,9 @@ display(const GURL &url)
 void
 usage()
 {
-  fprintf(stderr,
+  DjVuPrintError("%s",
           "DJVUDUMP -- Describes IFF85 files\n"
-          "  Copyright © 1999-2000 LizardTech, Inc. All Rights Reserved.\n"
+          "  Copyright Â© 1999-2000 LizardTech, Inc. All Rights Reserved.\n"
           "Usage: djvudump <iff_filenames>\n" );
   exit(1);
 }

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: XMLTags.cpp,v 1.8 2001-03-30 23:31:29 bcr Exp $
+// $Id: XMLTags.cpp,v 1.9 2001-04-04 22:12:11 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -348,7 +348,7 @@ lt_XMLTags::getMaps(char const tagname[],char const argn[],GPList<lt_XMLTags> li
             if((gpos=args.contains(argn)))
             {
               map[args[gpos]]=gtag;
-//              fprintf(stderr,"Inserting %s\n",(const char *)(args[gpos]));
+//              DjVuPrintError("Inserting %s\n",(const char *)(args[gpos]));
             }
           }
         }

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: d44.cpp,v 1.13 2001-03-30 23:31:25 bcr Exp $
+// $Id: d44.cpp,v 1.14 2001-04-04 22:12:10 bcr Exp $
 // $Name:  $
 
 /** @name d44
@@ -84,7 +84,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: d44.cpp,v 1.13 2001-03-30 23:31:25 bcr Exp $# 
+    #$Id: d44.cpp,v 1.14 2001-04-04 22:12:10 bcr Exp $# 
 */
 //@{
 //@}
@@ -118,7 +118,7 @@ void
 usage()
 {
   printf("D44 -- Image decompression utility using Interpolating Wavelets (4,4)\n"
-         "  Copyright © 1999-2000 LizardTech, Inc. All Rights Reserved.\n"
+         "  Copyright Â© 1999-2000 LizardTech, Inc. All Rights Reserved.\n"
          "Usage: d44 [options] iw4file [pnmfile]\n"
          "Options:\n"
          "    -verbose     -- report decoding time and memory use\n"
@@ -228,7 +228,7 @@ mymain(int argc, char **argv)
       }
       const int rtime = GOS::ticks() - stime - dtime;
       if (flag_verbose)
-        fprintf(stderr,
+        DjVuPrintError(
                 "image: %s %d x %d\n"
                 "times: %dms (decoding) + %dms (rendering)\n"
                 "memory: %dkB (%d%% active coefficients)\n",

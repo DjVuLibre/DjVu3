@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ddjvu.cpp,v 1.12 2001-04-02 22:53:30 bcr Exp $
+// $Id: ddjvu.cpp,v 1.13 2001-04-04 22:12:10 bcr Exp $
 // $Name:  $
 
 /** @name ddjvu
@@ -111,7 +111,7 @@
     Yann Le Cun <yann@research.att.com>\\
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: ddjvu.cpp,v 1.12 2001-04-02 22:53:30 bcr Exp $# */
+    #$Id: ddjvu.cpp,v 1.13 2001-04-04 22:12:10 bcr Exp $# */
 //@{
 //@}
 
@@ -167,8 +167,8 @@ convert(const GURL &from, const GURL &to, int page_num)
   // Verbose
   if (flag_verbose)
     {
-      fprintf(stderr,"%s", (const char*)dimg->get_long_description());
-      fprintf(stderr,"Decoding time:    %lu ms\n", stop - start);
+      DjVuPrintError("%s", (const char*)dimg->get_long_description());
+      DjVuPrintError("Decoding time:    %lu ms\n", stop - start);
     }
 
   // Check
@@ -179,18 +179,18 @@ convert(const GURL &from, const GURL &to, int page_num)
   if (flag_verbose)
     {
       if (compoundp)
-        fprintf(stderr, "This is a legal Compound DjVu image\n");
+        DjVuPrintError("%s","This is a legal Compound DjVu image\n");
       else if (colorp)
-        fprintf(stderr, "This is a legal Photo DjVu image\n");
+        DjVuPrintError("%s","This is a legal Photo DjVu image\n");
       else if (blackp)
-        fprintf(stderr, "This is a legal Bilevel DjVu image\n");
+        DjVuPrintError("%s","This is a legal Bilevel DjVu image\n");
       // Without included files
-      fprintf(stderr, "Direct memory usage is %4.1f Kb\n", 
+      DjVuPrintError("Direct memory usage is %4.1f Kb\n", 
               (double)(dimg->get_djvu_file()->get_memory_usage())/1024 );
     }    
   if (!compoundp && !colorp && !blackp)
     { 
-      fprintf(stderr,"Warning: This is not a well formed DjVu image\n");
+      DjVuPrintError("%s","Warning: This is not a well formed DjVu image\n");
       if (!info)
         G_THROW("Cannot find INFO chunk. Aborting."); 
     }
@@ -235,7 +235,7 @@ convert(const GURL &from, const GURL &to, int page_num)
   stop = GOS::ticks();
   if (flag_verbose)
     {
-      fprintf(stderr,"Rendering time:   %lu ms\n", stop - start);
+      DjVuPrintError("Rendering time:   %lu ms\n", stop - start);
     }
 
   // Save image
@@ -262,13 +262,13 @@ convert(const GURL &from, const GURL &to, int page_num)
 void
 usage()
 {
-  fprintf(stderr,
+  DjVuPrintError("%s",
           "DDJVU -- DjVu decompression utility\n"
-          "  Copyright © 1999-2000 LizardTech, Inc. All Rights Reserved.\n"
+          "  Copyright Â© 1999-2000 LizardTech, Inc. All Rights Reserved.\n"
           "Usage: ddjvu [options] [<djvufile> [<pnmfile>]]\n\n"
           "Options:\n"
           "  -v                  Prints various informational messages.\n"
-          "  -scale N            Selects display scale (default: 100%%).\n"
+          "  -scale N            Selects display scale (default: 100%).\n"
           "  -size  WxH          Selects size of rendered image.\n"
           "  -segment WxH+X+Y    Selects which segment of the rendered image\n"
           "  -black              Only renders the stencil(s).\n"

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: cjb2.cpp,v 1.12 2001-03-30 23:31:25 bcr Exp $
+// $Id: cjb2.cpp,v 1.13 2001-04-04 22:12:10 bcr Exp $
 // $Name:  $
 
 
@@ -70,7 +70,7 @@
     Paul Howard <pgh@research.att.com>\\
     Pascal Vincent <vincentp@iro.umontreal.ca>
     @version
-    $Id: cjb2.cpp,v 1.12 2001-03-30 23:31:25 bcr Exp $ */
+    $Id: cjb2.cpp,v 1.13 2001-04-04 22:12:10 bcr Exp $ */
 //@{
 //@}
 
@@ -814,19 +814,19 @@ cjb2(const GURL &urlin, const GURL &urlout, const cjb2opts &opts)
   rimg.add_bitmap_runs(input);       // fill CCImage
   input.init(0,0);                   // save memory
   if (opts.verbose)
-    fprintf(stderr,"cjb2: %d runs\n", rimg.runs.size());
+    DjVuPrintError("cjb2: %d runs\n", rimg.runs.size());
   
   // Component analysis
   rimg.make_ccids_by_analysis();             // obtain ccids
   rimg.make_ccs_from_ccids();                // compute cc descriptors
   if (opts.verbose)
-    fprintf(stderr,"cjb2: %d ccs\n", rimg.ccs.size());
+    DjVuPrintError("cjb2: %d ccs\n", rimg.ccs.size());
   if (opts.clean) 
     rimg.erase_tiny_ccs();                   // clean
   rimg.merge_and_split_ccs();                // reorganize weird ccs
   rimg.sort_in_reading_order();              // sort cc descriptors
   if (opts.verbose)
-    fprintf(stderr,"cjb2: %d ccs after preprocessing\n", rimg.ccs.size());
+    DjVuPrintError("cjb2: %d ccs after preprocessing\n", rimg.ccs.size());
   
   // Pattern matching
   GP<JB2Image> jimg = rimg.get_jb2image();          // get ``raw'' jb2image
@@ -841,7 +841,7 @@ cjb2(const GURL &urlin, const GURL &urlout, const cjb2opts &opts)
         if (jimg->get_shape(i).parent >= 0) nrefine++; 
         nshape++; 
       }
-      fprintf(stderr,"cjb2: %d shapes after matching (%d are cross-coded)\n", 
+      DjVuPrintError("cjb2: %d shapes after matching (%d are cross-coded)\n", 
               nshape, nrefine);
     }
   
@@ -881,7 +881,7 @@ cjb2(const GURL &urlin, const GURL &urlout, const cjb2opts &opts)
 void
 usage()
 {
-  fprintf(stderr,"Usage: cjb2 [options] <inputpbmfile> <outputdjvufile>\n"
+  DjVuPrintError("Usage: cjb2 [options] <inputpbmfile> <outputdjvufile>\n"
           "Options are:\n"
           "   -dpi xxx     Specify image resolution (default 300).\n"
           "   -clean       Remove small flyspecs (lossy).\n"

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: BSEncodeByteStream.cpp,v 1.2 2001-03-28 00:04:06 mchen Exp $
+// $Id: BSEncodeByteStream.cpp,v 1.3 2001-04-04 22:12:11 bcr Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 07/1998
@@ -701,7 +701,7 @@ _BSort::run(int &markerpos)
   ASSERT(markerpos>=0 && markerpos<size);
 #ifdef BSORT_TIMER
   long end = GOS::ticks();
-  fprintf(stderr,"Sorting time: %d bytes in %ld + %ld = %ld ms\n", 
+  DjVuPrintError("Sorting time: %d bytes in %ld + %ld = %ld ms\n", 
           size-1, middle-start, end-middle, end-start);
 #endif  
 }

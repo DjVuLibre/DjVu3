@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: XMLAnno.cpp,v 1.9 2001-03-30 23:31:29 bcr Exp $
+// $Id: XMLAnno.cpp,v 1.10 2001-04-04 22:12:11 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -495,7 +495,7 @@ lt_XMLAnno::parse(const lt_XMLTags &tags)
         {
           if(args[typePos] != "image/x.djvu")
           {
-            fprintf(stderr,"Ignoring image/x.djvu OBJECT tag.\n");
+            DjVuPrintError("%s","Ignoring image/x.djvu OBJECT tag.\n");
             continue;
           }
           isDjVuType=true;

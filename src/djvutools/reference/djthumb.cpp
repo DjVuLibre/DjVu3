@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djthumb.cpp,v 1.10 2001-03-30 23:31:25 bcr Exp $
+// $Id: djthumb.cpp,v 1.11 2001-04-04 22:12:10 bcr Exp $
 // $Name:  $
 
 // DJTHUMB -- DjVu thumbnails generator
@@ -68,7 +68,7 @@
     @author
     Andrei Erofeev <eaf@geocities.com> -- initial implementation
     @version
-    #$Id: djthumb.cpp,v 1.10 2001-03-30 23:31:25 bcr Exp $# */
+    #$Id: djthumb.cpp,v 1.11 2001-04-04 22:12:10 bcr Exp $# */
 //@{
 //@}
 
@@ -87,9 +87,9 @@ static const char * progname;
 static void
 usage(void)
 {
-   fprintf(stderr, "\
+   DjVuPrintError("\
 DJTHUMB -- DjVu thumbnails generating utility\n\
-   Copyright © 1999-2000 LizardTech, Inc. All Rights Reserved.\n\
+   Copyright Â© 1999-2000 LizardTech, Inc. All Rights Reserved.\n\
 \n\
 Usage:\n\
 	%s [options] <djvu_file_in> <djvu_file_out>\n\
@@ -108,7 +108,7 @@ static int pages_num;
 static bool
 progress_cb(int page_num, void *)
 {
-   fprintf(stderr, "Processing page %d of %d (%d%%)...\r",
+   DjVuPrintError("Processing page %d of %d (%d%%)...\r",
 	   page_num, pages_num, 100*page_num/pages_num);
    return false;	// Proceed
 }
@@ -156,22 +156,22 @@ main(int argc, char ** argv)
 	 {
 	    if (!name_in.length()) name_in=dargv[i];
 	    else if (!name_out.length()) name_out=dargv[i];
-	    else fprintf(stderr, "Unexpected string '%s' ignored.\n", (const char *)dargv[i]);
+	    else DjVuPrintError("Unexpected string '%s' ignored.\n", (const char *)dargv[i]);
 	 } else if (!strncmp(dargv[i], "-v", 2)) verbose=true;
 	 else if (!strncmp(dargv[i], "-s", 2))
 	 {
 	    if (++i<argc)
 	    {
 	       int _size=atoi(dargv[i]);
-	       if (_size<32) fprintf(stderr, "Image size (%d) is too small\n", _size);
-	       else if (_size>256) fprintf(stderr, "Image size (%d) is too big\n", _size);
+	       if (_size<32) DjVuPrintError("Image size (%d) is too small\n", _size);
+	       else if (_size>256) DjVuPrintError("Image size (%d) is too big\n", _size);
 	       else size=_size;
-	    } else fprintf(stderr, "Flag '%s' is missing its value.\n", (const char *)dargv[i-1]);
-	 } else fprintf(stderr, "Unknown flag '%s' encountered\n", (const char *)dargv[i]);
+	    } else DjVuPrintError("Flag '%s' is missing its value.\n", (const char *)dargv[i-1]);
+	 } else DjVuPrintError("Unknown flag '%s' encountered\n", (const char *)dargv[i]);
       }
 
       if (verbose)
-	 fprintf(stderr, "Image size=%d pixels.\n", size);
+	 DjVuPrintError("Image size=%d pixels.\n", size);
 
       int size_in=-1, size_out=-1;
       struct stat st;
@@ -194,7 +194,7 @@ main(int argc, char ** argv)
       if (stat(name_out.getUTF82Native(), &st)>=0) size_out=st.st_size;
       
       if (verbose && size_in>0 && size_out>0)
-	 fprintf(stderr, "Document size: was %d, became %d, increase %d%%\n",
+	 DjVuPrintError("Document size: was %d, became %d, increase %d%%\n",
 		 size_in, size_out, 100*(size_out-size_in)/size_in);
    } G_CATCH(exc) {
       exc.perror();

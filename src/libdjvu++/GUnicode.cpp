@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GUnicode.cpp,v 1.6 2001-03-30 23:31:29 bcr Exp $
+// $Id: GUnicode.cpp,v 1.7 2001-04-04 22:12:11 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -311,7 +311,7 @@ UnicodeRep::init(
           if(bufsize)
           {
             unsigned int const  ii=bufsize/sizeof(unsigned long);
-            for(j=0;(j<ii)&&*(unsigned long const *)eptr;j++,eptr+=sizeof(unsigned long));
+            for(j=0;(j<ii)&&*(unsigned long const *)eptr;j++,eptr+=sizeof(unsigned long)) EMPTY_LOOP;
           }else
           {
             while(*(unsigned long const *)eptr)
@@ -327,7 +327,7 @@ UnicodeRep::init(
           if(bufsize)
           {
             unsigned int const  ii=bufsize/sizeof(unsigned short);
-            for(j=0;(j<ii)&&*(unsigned short const *)eptr;j++,eptr+=sizeof(unsigned short));
+            for(j=0;(j<ii)&&*(unsigned short const *)eptr;j++,eptr+=sizeof(unsigned short)) EMPTY_LOOP;
           }else
           {
             while(*(unsigned short const *)eptr)
@@ -341,7 +341,7 @@ UnicodeRep::init(
         {
           if(bufsize)
           {
-            for(j=0;(j<bufsize)&&*eptr;j++,eptr++);
+            for(j=0;(j<bufsize)&&*eptr;j++,eptr++) EMPTY_LOOP;
           }else
           {
             while(*eptr)
@@ -362,37 +362,37 @@ UnicodeRep::init(
         case UCS4:
           for(len=0;
             (ptr<eptr)&&(UnicodePtr[len]=*(unsigned long const *)ptr);
-            len++,ptr+=sizeof(unsigned long const));
+            len++,ptr+=sizeof(unsigned long const)) EMPTY_LOOP;
           UnicodePtr[len]=0;
           break;
         case UCS4BE:
-          for(len=0;(UnicodePtr[len]=UCS4BEtoWideChar(ptr,eptr));len++);
+          for(len=0;(UnicodePtr[len]=UCS4BEtoWideChar(ptr,eptr));len++) EMPTY_LOOP;
           break;
         case UCS4LE:
-          for(len=0;(UnicodePtr[len]=UCS4LEtoWideChar(ptr,eptr));len++);
+          for(len=0;(UnicodePtr[len]=UCS4LEtoWideChar(ptr,eptr));len++) EMPTY_LOOP;
           break;
         case UCS4_2143:
-          for(len=0;(UnicodePtr[len]=UCS4_2143toWideChar(ptr,eptr));len++);
+          for(len=0;(UnicodePtr[len]=UCS4_2143toWideChar(ptr,eptr));len++) EMPTY_LOOP;
           break;
         case UCS4_3412:
-          for(len=0;(UnicodePtr[len]=UCS4_3412toWideChar(ptr,eptr));len++);
+          for(len=0;(UnicodePtr[len]=UCS4_3412toWideChar(ptr,eptr));len++) EMPTY_LOOP;
           break;
         case UTF16:
           for(len=0;
-            (UnicodePtr[len]=UTF16toWideChar((unsigned short const*&)ptr,eptr));
-            len++);
+            (UnicodePtr[len]=UTF16toWideChar((unsigned short const*&)ptr,eptr)) EMPTY_LOOP;
+            len++) EMPTY_LOOP;
           break;
         case UTF16BE:
-          for(len=0;(UnicodePtr[len]=UTF16BEtoWideChar(ptr,eptr));len++);
+          for(len=0;(UnicodePtr[len]=UTF16BEtoWideChar(ptr,eptr));len++) EMPTY_LOOP;
           break;
         case UTF16LE:
-          for(len=0;(UnicodePtr[len]=UTF16LEtoWideChar(ptr,eptr));len++);
+          for(len=0;(UnicodePtr[len]=UTF16LEtoWideChar(ptr,eptr));len++) EMPTY_LOOP;
           break;
         case UTF8:
-          for(len=0;(UnicodePtr[len]=UTF8toWideChar(ptr,eptr));len++);
+          for(len=0;(UnicodePtr[len]=UTF8toWideChar(ptr,eptr));len++) EMPTY_LOOP;
           break;
         case EBCDIC:
-          for(len=0;(ptr<eptr)&&(UnicodePtr[len]=*ptr++);len++);
+          for(len=0;(ptr<eptr)&&(UnicodePtr[len]=*ptr++);len++) EMPTY_LOOP;
           UnicodePtr[len]=0;
           break;
         default:
@@ -405,7 +405,7 @@ UnicodeRep::init(
         GPBuffer<unsigned long> gold_wide(old_wide);
         gold_wide.swap(gUnicodePtr);
         gUnicodePtr.resize(len+1);
-        for(j=0;j<len&&(UnicodePtr[j]=old_wide[j]);j++);
+        for(j=0;j<len&&(UnicodePtr[j]=old_wide[j]);j++) EMPTY_LOOP;
 //        delete [] old_wide;
         UnicodePtr[len]=0;
       }
@@ -508,6 +508,7 @@ UnicodeRep::UTF8toWideChar(
     {
       if(r < eptr)
       {
+        U=C1;
         if((U=((C1&0x40)?add_char(U,r++):0)))
         {
           if(C1&0x20)

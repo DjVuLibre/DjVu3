@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djvutxt.cpp,v 1.13 2001-03-30 23:31:25 bcr Exp $
+// $Id: djvutxt.cpp,v 1.14 2001-04-04 22:12:10 bcr Exp $
 // $Name:  $
 
 // DJVUTXT -- DjVu TXT extractor
@@ -69,7 +69,7 @@
     @author
     Andrei Erofeev <eaf@geocities.com> -- initial implementation
     @version
-    #$Id: djvutxt.cpp,v 1.13 2001-03-30 23:31:25 bcr Exp $# */
+    #$Id: djvutxt.cpp,v 1.14 2001-04-04 22:12:10 bcr Exp $# */
 //@{
 //@}
 
@@ -90,9 +90,9 @@ static const char * progname;
 static void
 usage(void)
 {
-   fprintf(stderr, "\
+   DjVuPrintError("\
 DJVUTXT -- DjVu TXT* chunks extractor\n\
-   Copyright © 1999-2000 LizardTech, Inc. All Rights Reserved.\n\
+   Copyright Â© 1999-2000 LizardTech, Inc. All Rights Reserved.\n\
 \n\
 Usage:\n\
 	%s [--page <page_num>] <djvu_file_in> [<txt_file_out>]\n\
@@ -164,7 +164,7 @@ main(int argc, char ** argv)
 	    {
 	       if (!strcmp(dargv[i], "-"))
 	       {
-		  fprintf(stderr, "Can't read from standard input.\n\n");
+		  DjVuPrintError("%s","Can't read from standard input.\n\n");
 		  usage();
 		  exit(1);
 	       } else name_in=dargv[i];
@@ -186,7 +186,7 @@ main(int argc, char ** argv)
 	    {
 	       if (i+1>=argc)
 	       {
-		  fprintf(stderr, "--page option must be followed by a number.\n\n");
+		  DjVuPrintError("%s","--page option must be followed by a number.\n\n");
 		  usage();
 		  exit(1);
 	       }
@@ -194,7 +194,7 @@ main(int argc, char ** argv)
 	       page_num=atoi(dargv[i])-1;
 	       if (page_num<0)
 	       {
-		  fprintf(stderr, "Page number must be positive.\n\n");
+		  DjVuPrintError("%s","Page number must be positive.\n\n");
 		  usage();
 		  exit(1);
 	       }
@@ -204,14 +204,14 @@ main(int argc, char ** argv)
 	       exit(1);
 	    } else
             {
-               fprintf(stderr, "Unrecognized option '%s' encountered.\n\n", (const char *)dargv[i]);
+               DjVuPrintError("Unrecognized option '%s' encountered.\n\n", (const char *)dargv[i]);
             }
 	 }
       }
 
       if (name_in.length()==0)
       {
-	 fprintf(stderr, "The name of the input file is missing.\n\n");
+	 DjVuPrintError("%s","The name of the input file is missing.\n\n");
 	 usage();
 	 exit(1);
       }

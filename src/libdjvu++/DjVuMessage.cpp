@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessage.cpp,v 1.27 2001-04-03 21:45:52 bcr Exp $
+// $Id: DjVuMessage.cpp,v 1.28 2001-04-04 22:12:11 bcr Exp $
 // $Name:  $
 
 
@@ -306,7 +306,7 @@ parse (GMap<GString,GP<lt_XMLTags> > &retval)
 //  There is only object of class DjVuMessage in a program, and here it is:
 //DjVuMessage  DjVuMsg;
 const DjVuMessage &
-DjVuMessage::get_DjVuMessage(void)
+DjVuMessage::create(void)
 {
   static const DjVuMessage m;
   return m;
@@ -333,7 +333,7 @@ void
 DjVuMessage::perror( const GString & MessageList ) const
 {
   GString mesg=LookUp(MessageList);
-  fputs((const char *)mesg,stderr);
+  DjVuPrintError("%s",mesg);
 }
 
 
@@ -537,7 +537,7 @@ DjVuMessage::InsertArg( GString &message, int ArgId, GString arg ) const
 //  empty (i.e., msg_buffer[0] == '\0').
 void DjVuMessage_LookUp( char *msg_buffer, const unsigned int buffer_size, const char *message )
 {
-  GString converted = DjVuMessage::get_DjVuMessage().LookUp( message );
+  GString converted = DjVuMessage::LookUpUTF8( message );
   if( converted.length() >= buffer_size )
     msg_buffer[0] = '\0';
   else

@@ -33,7 +33,7 @@ main()
     } 
   G_CATCH(ex) 
     {
-      fprintf(stderr,"*** %s\n", DjVuMsg.LookUp( ex.get_cause() ));
+      DjVuPrintError("*** %s\n", DjVuMsg.LookUp( ex.get_cause() ));
     }
   G_ENDCATCH;
   
@@ -47,7 +47,7 @@ main()
     }
   G_CATCH(ex)
     {
-      fprintf(stderr,"*** %s\n", DjVuMsg.LookUp( ex.get_cause() ));
+      DjVuPrintError("*** %s\n", DjVuMsg.LookUp( ex.get_cause() ));
     }
   G_ENDCATCH;
 
@@ -60,7 +60,7 @@ main()
     }
   G_CATCH(ex)
     {
-      fprintf(stderr,"*** %s\n", DjVuMsg.LookUp( ex.get_cause() ));
+      DjVuPrintError("*** %s\n", DjVuMsg.LookUp( ex.get_cause() ));
     }
   G_ENDCATCH;
 
@@ -76,7 +76,7 @@ main()
         }
       G_CATCH(ex)
         {
-          fprintf(stderr,"*** %s\n", DjVuMsg.LookUp( ex.get_cause() ));
+          DjVuPrintError("*** %s\n", DjVuMsg.LookUp( ex.get_cause() ));
           printf("Rethrown\n");
           G_RETHROW;
         }
@@ -85,7 +85,7 @@ main()
   G_CATCH(ex)
     {
       printf("Recatched\n");
-      fprintf(stderr,"*** %s\n", DjVuMsg.LookUp( ex.get_cause() ));
+      DjVuPrintError("*** %s\n", DjVuMsg.LookUp( ex.get_cause() ));
     }
   G_ENDCATCH;
 

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: c44.cpp,v 1.15 2001-03-30 23:31:24 bcr Exp $
+// $Id: c44.cpp,v 1.16 2001-04-04 22:12:10 bcr Exp $
 // $Name:  $
 
 
@@ -184,7 +184,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: c44.cpp,v 1.15 2001-03-30 23:31:24 bcr Exp $# */
+    #$Id: c44.cpp,v 1.16 2001-04-04 22:12:10 bcr Exp $# */
 //@{
 //@}
 
@@ -237,7 +237,7 @@ void
 usage()
 {
   printf("C44 -- Image compression utility using Interpolating Wavelets (4,4)\n"
-         "  Copyright © 1999-2000 LizardTech, Inc. All Rights Reserved.\n"
+         "  Copyright Â© 1999-2000 LizardTech, Inc. All Rights Reserved.\n"
          "Usage: c44 [options] pnmfile [djvufile]\n\n"
          "Options:\n"
          "    -bpp n,..,n      -- select a increasing sequence of bitrates\n"

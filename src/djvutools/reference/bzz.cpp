@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: bzz.cpp,v 1.13 2001-03-30 23:31:24 bcr Exp $
+// $Id: bzz.cpp,v 1.14 2001-04-04 22:12:10 bcr Exp $
 // $Name:  $
 
 
@@ -58,7 +58,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation
     @version
-    $Id: bzz.cpp,v 1.13 2001-03-30 23:31:24 bcr Exp $ */
+    $Id: bzz.cpp,v 1.14 2001-04-04 22:12:10 bcr Exp $ */
 //@{
 //@}
 
@@ -74,9 +74,9 @@ static const char *program = "(unknown)";
 void
 usage(void)
 {
-  fprintf(stderr, 
+  DjVuPrintError(
           "BZZ -- ZPCoded Burrows Wheeler compression\n"
-          "  Copyright © 1999-2000 LizardTech, Inc. All Rights Reserved.\n"
+          "  Copyright Â© 1999-2000 LizardTech, Inc. All Rights Reserved.\n"
           "Usage [encoding]: %s -e[<blocksize>] <infile> <outfile>\n"
           "Usage [decoding]: %s -d <infile> <outfile>\n"
           "  Argument <blocksize> must be in range [900..4096] (default 1100).\n"

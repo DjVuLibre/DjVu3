@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.cpp,v 1.57 2001-04-03 21:45:51 bcr Exp $
+// $Id: ByteStream.cpp,v 1.58 2001-04-04 22:12:11 bcr Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 04/1997
@@ -356,9 +356,19 @@ ByteStream::readall(void *buffer, size_t size)
 }
 
 size_t
+ByteStream::format(const char *fmt, ... )
+{
+  va_list args;
+  va_start(args, fmt); 
+  GString message;
+  return writestring(message.format(fmt, args));
+}
+
+size_t
 ByteStream::writestring(const GString &s)
 {
-  return writall((const char *)s,s.length());
+  const GString msg((cp==NATIVE)?s.getUTF82Native():s);
+  return writall((const char *)msg,msg.length());
 }
 
 size_t 
@@ -597,16 +607,11 @@ ByteStream::Stdio::init(const GURL &url, const char mode[])
     if (!fp)
     {
 #ifndef UNDER_CE
-      char buffer[4096];
-      sprintf(buffer, "ByteStream.open_fail\t%s\t%s",
-        (const char *)url, strerror(errno));
-      G_THROW(buffer);                                   //  Failed to open '%s': %s
+      //  Failed to open '%s': %s
+      G_THROW("ByteStream.open_fail\t"+url.get_string()+"\t"+GString(strerror(errno)).getNative2UTF8());
 #else
       G_THROW("ByteStream.open_fail2");                  //  StdioByteStream::StdioByteStream, failed to open file.
 #endif
-//    } else
-//    { //MBCS cvt
-//      strcpy((char*)filename,(char*)(const char*)nativeFilename);//MBCS cvt add return new name
     }
     /*MBCS*/
     if (!fp)
@@ -989,13 +994,12 @@ ByteStream::create(char const * const mode)
   return retval;
 }
 
-#if !defined(UNDER_CE)
 GP<ByteStream>
 ByteStream::create(const int fd,char const * const mode,const bool closeme)
 {
   GP<ByteStream> retval;
 #ifdef UNIX
-  if(!mode || !strcmp(mode,"rb"))
+  if((!mode&&(fd!=1)&&(fd!=2))||(mode&&!strcmp(mode,"rb")))
   {
     MemoryMapByteStream *rb=new MemoryMapByteStream();
     retval=rb;
@@ -1005,19 +1009,63 @@ ByteStream::create(const int fd,char const * const mode,const bool closeme)
       retval=0;
     }
   }
+  const char *default_mode="rb";
   if(!retval)
 #endif
   {
-    const int fd2=closeme?fd:dup(fd);
-    FILE * const f=fdopen(fd2,(char*)(mode?mode:"rb"));
+    int fd2=fd;
+    FILE *f=0;
+    switch(fd)
+    {
+      case 0:
+        if(!closeme && !mode)
+        {
+          f=stdin;
+          fd2=(-1);
+          break;
+        }
+      case 1:
+        if(!closeme && !mode)
+        {
+          f=stdout;
+          default_mode="wb";
+          fd2=(-1);
+          break;
+        }
+      case 2:
+        if(!closeme && !mode)
+        {
+          default_mode="wb";
+          f=stderr;
+          fd2=(-1);
+          break;
+        }
+      default:
+#ifndef UNDER_CE
+        if(!closeme)
+        {
+          fd2=dup(fd);
+        } 
+        f=fdopen(fd2,(char*)(mode?mode:default_mode));
+#else
+        if(!closeme)
+        {
+          fd2=(-1);
+        }
+#endif
+        break;
+    }
     if(!f)
     {
-      close(fd2);
+#ifndef UNDER_CE
+      if(fd2>= 0)
+        close(fd2);
+#endif
       G_THROW("ByteStream.open_fail2");
     }
     Stdio *sbs=new Stdio();
     retval=sbs;
-    GString errmessage=sbs->init(f,mode?mode:"rb",true);
+    GString errmessage=sbs->init(f,mode?mode:default_mode,(fd2>=0));
     if(errmessage.length())
     {
       G_THROW(errmessage);
@@ -1025,7 +1073,6 @@ ByteStream::create(const int fd,char const * const mode,const bool closeme)
   }
   return retval;
 }
-#endif
 
 GP<ByteStream>
 ByteStream::create(FILE * const f,char const * const mode,const bool closeme)
@@ -1125,5 +1172,17 @@ MemoryMapByteStream::~MemoryMapByteStream()
 
 ByteStream::Wrapper::~Wrapper() {}
 
-
+void
+DjVuPrintError(const char *fmt, ... )
+{
+  static GP<ByteStream> errout=ByteStream::create(2,0,false);
+  if(errout)
+  {
+    errout->cp=ByteStream::NATIVE;
+    va_list args;
+    va_start(args, fmt); 
+    GString message;
+    errout->writestring(message.format(fmt, args));
+  }
+}
 

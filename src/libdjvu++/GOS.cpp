@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GOS.cpp,v 1.48 2001-03-30 23:31:29 bcr Exp $
+// $Id: GOS.cpp,v 1.49 2001-04-04 22:12:11 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -469,7 +469,7 @@ int main(int argc, char **argv)
     printf("%s\n", (const char*)GOS::url_to_filename(argv[2]));
     return 0;
   }
-  fprintf(stderr,"syntax error\n");
+  DjVuPrintError("%s\n","syntax error");
   return 10;
 }
 

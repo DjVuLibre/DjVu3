@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GThreads.cpp,v 1.58 2001-01-25 20:09:04 bcr Exp $
+// $Id: GThreads.cpp,v 1.59 2001-04-04 22:12:11 bcr Exp $
 // $Name:  $
 
 
@@ -1096,7 +1096,7 @@ static void
 cotask_free(GThread::cotask *task)
 {
 #ifdef COTHREAD_TRACE
-  fprintf(stderr,"cothreads: freeing task %p with autodelete=%d\n", 
+  DjVuPrintError("cothreads: freeing task %p with autodelete=%d\n", 
           task,task->autodelete);
 #endif
   if (task!=maintask)
@@ -1119,7 +1119,7 @@ time_elapsed(int reset=1)
     {
 #ifdef COTHREAD_TRACE
 #ifdef COTHREAD_TRACE_VERBOSE
-      fprintf(stderr,"cothreads: %4ld ms in task %p\n", elapsed, curtask);
+      DjVuPrintError("cothreads: %4ld ms in task %p\n", elapsed, curtask);
 #endif
 #endif
       time_base.tv_sec = tm.tv_sec;
@@ -1215,7 +1215,7 @@ cotask_yield()
       if (r != curtask)
         {
 #ifdef COTHREAD_TRACE
-          fprintf(stderr,"cothreads: ----- switch to %p [%ld]\n", r, best);
+          DjVuPrintError("cothreads: ----- switch to %p [%ld]\n", r, best);
 #endif
           GThread::cotask *old = curtask;
           curtask = r;
@@ -1271,7 +1271,7 @@ static void
 cotask_terminate(GThread::cotask *task)
 {
 #ifdef COTHREAD_TRACE
-  fprintf(stderr,"cothreads: terminating task %p\n", task);
+  DjVuPrintError("cothreads: terminating task %p\n", task);
 #endif
   if (task && task!=maintask)
     {

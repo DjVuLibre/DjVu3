@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GException.cpp,v 1.28 2001-01-10 19:45:51 bcr Exp $
+// $Id: GException.cpp,v 1.29 2001-04-04 22:12:11 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -121,20 +121,20 @@ GException::operator=(const GException & exc)
 void
 GException::perror(const char *msg) const
 {
-  fflush(NULL);
-  fputs("*** ",stderr);
+  fflush(0);
+  DjVuPrintError("%s","***");
   DjVuMsg.perror(get_cause());
   if (file && line>0)
-    fprintf(stderr, "\n*** (%s:%d)", file, line);    
+    DjVuPrintError("\n*** (%s:%d)", file, line);    
   else if (file)
-    fprintf(stderr, "\n*** (%s)", file);        
+    DjVuPrintError("\n*** (%s)", file);        
   if (msg) 
   {
     DjVuMsg.perror(msg);
   }
   if (func)
-    fprintf(stderr, "\n*** %s", func);
-  fprintf(stderr,"\n");
+    DjVuPrintError("\n*** %s", func);
+  DjVuPrintError("\n");
 }
 
 const char* 
