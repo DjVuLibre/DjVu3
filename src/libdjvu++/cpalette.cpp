@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: cpalette.cpp,v 1.2 2000-02-17 19:13:56 leonb Exp $
+//C- $Id: cpalette.cpp,v 1.3 2000-02-17 19:38:04 leonb Exp $
 
 
 /** @name cpalette
@@ -39,7 +39,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: cpalette.cpp,v 1.2 2000-02-17 19:13:56 leonb Exp $# */
+    #$Id: cpalette.cpp,v 1.3 2000-02-17 19:38:04 leonb Exp $# */
 //@{
 //@}
 
@@ -100,6 +100,7 @@ public:
   int width;             // Width of the image in pixels
   GTArray<Run> runs;     // Array of runs
   GTArray<CC>  ccs;      // Array of component descriptors
+  int nregularccs;       // Number of regular ccs (set by merge_and_split_ccs)
   CCImage(int width, int height);
   void add_single_run(int y, int x1, int x2, int color, int ccid=0);
   GP<GBitmap> get_bitmap_for_cc(int ccid) const;
@@ -120,7 +121,7 @@ operator <= (const Run &a, const Run &b)
 
 // -- Constructs CCImage and provide defaults
 CCImage::CCImage(int width, int height)
-  :height(height), width(width)
+  : height(height), width(width), nregularccs(0)
 {
 }
 
@@ -213,7 +214,6 @@ CCImage::make_ccs_from_ccids()
 {
   int n;
   Run *pruns = runs;
-
   // Find maximal ccid
   int maxccid = -1;
   for (n=0; n<=runs.hbound(); n++)
@@ -221,7 +221,6 @@ CCImage::make_ccs_from_ccids()
       maxccid = runs[n].ccid;
   GTArray<int> armap(0,maxccid);
   int *rmap = armap;
-  
   // Renumber ccs 
   for (n=0; n<=maxccid; n++)
     armap[n] = -1;
@@ -232,12 +231,15 @@ CCImage::make_ccs_from_ccids()
   for (n=0; n<=maxccid; n++)
     if (rmap[n] > 0)
       rmap[n] = nid++;
-  
+  // Adjust nregularccs (since ccs are renumbered)
+  while (nregularccs>0 && rmap[nregularccs-1]<0)
+    nregularccs -= 1;
+  if (nregularccs>0)
+    nregularccs = 1 + rmap[nregularccs-1];
   // Prepare cc descriptors
   ccs.resize(0,nid-1);
   for (n=0; n<nid; n++)
     ccs[n].nrun = 0;
-  
   // Relabel runs
   for (n=0; n<=runs.hbound(); n++)
     {
@@ -249,7 +251,6 @@ CCImage::make_ccs_from_ccids()
       run.ccid = newccid;
       cc.nrun += 1;
     }
-  
   // Compute positions for runs of cc
   int frun = 0;
   for (n=0; n<nid; n++) 
@@ -257,7 +258,6 @@ CCImage::make_ccs_from_ccids()
       ccs[n].frun = rmap[n] = frun;
       frun += ccs[n].nrun;
     }
-
   // Copy runs
   GTArray<Run> rtmp;
   rtmp.steal(runs);
@@ -271,7 +271,6 @@ CCImage::make_ccs_from_ccids()
       int pos = rmap[id]++;
       pruns[pos] = ptmp[n];
     }
-
   // Finalize ccs
   for (n=0; n<nid; n++)
     {
@@ -346,7 +345,7 @@ CCImage::merge_and_split_ccs(int smallsize, int largesize)
   if (ncc <= 0) return;
   // Associative map for storing merged ccids
   GMap<Grid_x_Color,int> map;
-
+  nregularccs = ncc;
   // Set the correct ccids for the runs
   for (int ccid=0; ccid<ccs.size(); ccid++)
     {
@@ -445,30 +444,28 @@ integer_ascending (const void *pa, const void *pb)
 void 
 CCImage::sort_in_reading_order()
 {
-  int nccs = ccs.size();
-  if (nccs<2) return;
-  CC *ccarray = new CC[nccs];
+  if (nregularccs<2) return;
+  CC *ccarray = new CC[nregularccs];
   // Copy existing ccarray (but segregate special ccs)
   int ccid;
-  for(ccid=0; ccid<nccs; ccid++)
+  for(ccid=0; ccid<nregularccs; ccid++)
     ccarray[ccid] = ccs[ccid];
   // Sort the ccarray list into top-to-bottom order.
-  qsort (ccarray, nccs, sizeof(CC), top_edges_descending);
-  // Subdivide the ccarray list roughly into text lines [LYB]
-  // - Determine maximal top deviation
+  qsort (ccarray, nregularccs, sizeof(CC), top_edges_descending);
+  // Subdivide the ccarray list roughly into text lines
   int maxtopchange = width / 40;
   if (maxtopchange < 32) 
     maxtopchange = 32;
   // - Loop until processing all ccs
   int ccno = 0;
-  int *bottoms = new int[nccs];
-  while (ccno < nccs)
+  int *bottoms = new int[nregularccs];
+  while (ccno < nregularccs)
     {
       // - Gather first line approximation
       int nccno;
       int sublist_top = ccarray[ccno].bb.ymax-1;
       int sublist_bottom = ccarray[ccno].bb.ymin;
-      for (nccno=ccno; nccno < nccs; nccno++)
+      for (nccno=ccno; nccno < nregularccs; nccno++)
         {
           if (ccarray[nccno].bb.ymax-1 < sublist_bottom) break;
           if (ccarray[nccno].bb.ymax-1 < sublist_top - maxtopchange) break;
@@ -484,7 +481,7 @@ CCImage::sort_in_reading_order()
           qsort(bottoms, nccno-ccno, sizeof(int), integer_ascending);
           int bottom = bottoms[ (nccno-ccno-1)/2 ];
           // - Compose final line
-          for (nccno=ccno; nccno < nccs; nccno++)
+          for (nccno=ccno; nccno < nregularccs; nccno++)
             if (ccarray[nccno].bb.ymax-1 < bottom)
               break;
           // - Sort final line
@@ -494,7 +491,7 @@ CCImage::sort_in_reading_order()
       ccno = nccno;
     }
   // Copy ccarray back and renumber the runs
-  for(ccid=0; ccid<nccs; ccid++)
+  for(ccid=0; ccid<nregularccs; ccid++)
     {
       CC& cc = ccarray[ccid];
       ccs[ccid] = cc;
@@ -530,6 +527,14 @@ CCImage::get_bitmap_for_cc(const int ccid) const
 
 
 
+
+// --------------------------------------------------
+// LOSSLESS PATTERN MATCHING
+// --------------------------------------------------
+
+
+
+
 // --------------------------------------------------
 // LOSSLESS PATTERN MATCHING
 // --------------------------------------------------
@@ -556,14 +561,13 @@ tune_jb2image(JB2Image *jimg, int refine_threshold=21)
   int nshapes = jimg->get_shape_count();
   GTArray<MatchData> library(nshapes);
   MatchData *lib = library;    // for faster access  
-  
   // Loop on all shapes
   for (int current=0; current<nshapes; current++)
     {
-      lib[current].bits = 0;
       // Skip ``special shapes''
+      lib[current].bits = 0;
       JB2Shape *jshp = jimg->get_shape(current);
-      if (! jshp->bits) continue; 
+      if (jshp->userdata || !jshp->bits) continue; 
       // Compute matchdata info
       GBitmap *bitmap = jshp->bits;
       int row;
@@ -577,13 +581,11 @@ tune_jb2image(JB2Image *jimg, int refine_threshold=21)
             black_pixels++;
       lib[current].bits = bitmap;
       lib[current].area = black_pixels;
-
       // Prepare for search
       int closest_match = -1;
       int best_score = (refine_threshold * rows * columns + 50) / 100;
       if (best_score < 2) best_score = 2;
       bitmap->minborder(2); // ensure sufficient borders
-      
       // Search closest match
       for (int candidate = 0; candidate < current; candidate++) 
         {
@@ -667,7 +669,6 @@ cpalette(GPixmap &input, const char *fileout, const cpaletteopts &opts)
   int dpi = MAX(200, MIN(900, opts.dpi));
   int largesize = MIN(500, MAX(64, dpi));
   int smallsize = MAX(2, dpi/150);
-
   // Compute optimal palette and quantize input pixmap
   DjVuPalette pal;
   pal.histogram_clear();
@@ -684,7 +685,6 @@ cpalette(GPixmap &input, const char *fileout, const cpaletteopts &opts)
   pal.index_to_color(bgindex, bgcolor);
   if (opts.verbose)
     fprintf(stderr,"Background color is #%02x%02x%02x\n", bgcolor.r, bgcolor.g, bgcolor.b);
-  
   // Fill CCImage with color runs
   CCImage rimg(w, h);
   for (int y=0; y<h; y++)
@@ -700,13 +700,11 @@ cpalette(GPixmap &input, const char *fileout, const cpaletteopts &opts)
             rimg.add_single_run(y, x1, x-1, index);
         }
     }
-  
   // Perform Color Connected Component Analysis
   rimg.make_ccids_by_analysis();                  // Obtain ccids
   rimg.make_ccs_from_ccids();                     // Compute cc descriptors
   rimg.merge_and_split_ccs(smallsize,largesize);  // Eliminates gross ccs
   rimg.sort_in_reading_order();                   // Sort cc descriptors
-  
   // Create JB2Image and fill colordata
   JB2Image jimg;
   jimg.set_dimension(w, h);
@@ -716,6 +714,7 @@ cpalette(GPixmap &input, const char *fileout, const cpaletteopts &opts)
       JB2Shape shape;
       JB2Blit  blit;
       shape.parent = -1;
+      shape.userdata = (ccid >= rimg.nregularccs);
       shape.bits = rimg.get_bitmap_for_cc(ccid);
       shape.bits->compress();
       CC& cc = rimg.ccs[ccid];
@@ -729,12 +728,10 @@ cpalette(GPixmap &input, const char *fileout, const cpaletteopts &opts)
   
   // Organize JB2Image
   tune_jb2image(&jimg);
-  
   // Create background image
   IWPixmap iwimage;
   GPixmap bgimage((h+11)/12, (w+11)/12, &bgcolor);
   iwimage.init(&bgimage, 0);
-
   // Code
   StdioByteStream obs(fileout, "wb");
   IFFByteStream iff(obs);
