@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GBitmap.cpp,v 1.49 2001-03-27 20:15:30 praveen Exp $
+// $Id: GBitmap.cpp,v 1.50 2001-03-31 01:14:31 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -45,7 +45,7 @@
 #include "GException.h"
 #include <string.h>
 
-// File "$Id: GBitmap.cpp,v 1.49 2001-03-27 20:15:30 praveen Exp $"
+// File "$Id: GBitmap.cpp,v 1.50 2001-03-31 01:14:31 bcr Exp $"
 // - Author: Leon Bottou, 05/1997
 
 
@@ -1492,74 +1492,72 @@ GBitmap::append_line(unsigned char *&data,const unsigned char *row,
 GP<GBitmap> 
 GBitmap::rotate(int count)
 {
-    count %= 4;
-    if( count == 0)
-        return this;
-
-    GP<GBitmap> newbitmap;
-    uncompress();
-
+  GP<GBitmap> newbitmap=this;
+  if((count%=4))
+  {
     if( count & 0x01 )
-        newbitmap = new GBitmap(columns(), rows());
-    else
-        newbitmap = new GBitmap(rows(), columns());
-
-    GBitmap &sbitmap = *this;
+    {
+      newbitmap = new GBitmap(ncolumns, nrows);
+    }else
+    {
+      newbitmap = new GBitmap(nrows, ncolumns);
+    }
+    GMonitorLock lock(monitor());
+    if (!bytes_data)
+      uncompress();
     GBitmap &dbitmap = *newbitmap;
-
-    dbitmap.set_grays(sbitmap.get_grays());
-
+    dbitmap.set_grays(grays);
     switch(count)
     {
-    case 1: //// rotate 90 counter clockwise
+    case 1: // rotate 90 counter clockwise
+      {
+        const int lastrow = dbitmap.rows()-1;
+        for(int y=0; y<nrows; y++)
         {
-            int rows = sbitmap.rows();
-            int columns = sbitmap.columns();
-            int lastrow = dbitmap.rows()-1;
-
-            for(int y=0; y<rows; y++)
-            {
-                for(int x=0; x<columns; x++)
-                {
-                    dbitmap[lastrow-x][y] = sbitmap[y][x];
-                }
-            }
+          const unsigned char *r=operator[] (y);
+          for(int x=0,xnew=lastrow;xnew>=0; x++,xnew--)
+          {
+            dbitmap[xnew][y] = r[x];
+          }
         }
-        break;
-    case 2: //// rotate 180 counter clockwise
+      }
+      break;
+    case 2: // rotate 180 counter clockwise
+      {
+        const int lastrow = dbitmap.rows()-1;
+        const int lastcolumn = dbitmap.columns()-1;
+        for(int y=0,ynew=lastrow;ynew>=0; y++,ynew--)
         {
-            int rows = sbitmap.rows();
-            int columns = sbitmap.columns();
-            int lastrow = dbitmap.rows()-1;
-            int lastcolumn = dbitmap.columns()-1;
-
-            for(int y=0; y<rows; y++)
-            {
-                for(int x=0; x<columns; x++)
-                {
-                    dbitmap[lastrow-y][lastcolumn-x] = sbitmap[y][x];
-                }
-            }
+          const unsigned char *r=operator[] (y);
+          unsigned char *d=dbitmap[ynew];
+          for(int xnew=lastcolumn;xnew>=0; r++,--xnew)
+          {
+            d[xnew] = *r;
+          }
         }
-        break;
-    case 3: //// rotate 270 counter clockwise
+      }
+      break;
+    case 3: // rotate 270 counter clockwise
+      {
+        const int lastcolumn = dbitmap.columns()-1;
+        for(int y=0,ynew=lastcolumn;ynew>=0;y++,ynew--)
         {
-            int rows = sbitmap.rows();
-            int columns = sbitmap.columns();
-            int lastcolumn = dbitmap.columns()-1;
-
-            for(int y=0; y<rows; y++)
-            {
-                for(int x=0; x<columns; x++)
-                {
-                    dbitmap[x][lastcolumn-y] = sbitmap[y][x];
-                }
-            }
+          const unsigned char *r=operator[] (y);
+          for(int x=0; x<ncolumns; x++)
+          {
+            dbitmap[x][ynew] = r[x];
+          }
         }
-        break;
+      }
+      break;
     }
-
-    return newbitmap;
+    if(grays == 2)
+    {
+      compress();
+      dbitmap.compress();
+    }
+  }
+  return newbitmap;
 }
 
 

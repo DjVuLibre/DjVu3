@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: GPixmap.cpp,v 1.29 2001-03-27 20:15:30 praveen Exp $
+// $Id: GPixmap.cpp,v 1.30 2001-03-31 01:14:31 bcr Exp $
 // $Name:  $
 
 // -- Implements class PIXMAP
@@ -1555,71 +1555,66 @@ GPixmap::stencil(const GBitmap *bm,
 
 GP<GPixmap> GPixmap::rotate(int count)
 {
-    count %= 4;
-    if( count == 0 )
-        return this;
-
-    GP<GPixmap> newpixmap;
-
+  GP<GPixmap> newpixmap(this);
+  if((count %= 4))
+  {
     if( count&0x01)
-        newpixmap = new GPixmap(columns(), rows());
+      newpixmap = new GPixmap(ncolumns, nrows);
     else
-        newpixmap = new GPixmap(rows(), columns());
+      newpixmap = new GPixmap(nrows, ncolumns);
 
     GPixmap &dpixmap = *newpixmap;
-    GPixmap &spixmap = *this; /// references to make copy faster
 
+    GMonitorLock lock(&pixmap_monitor);
     switch(count)
     {
     case 1: //// rotate 90 counter clockwise
         {
-            int rows = spixmap.rows();
-            int columns = spixmap.columns();
             int lastrow = dpixmap.rows()-1;
 
-            for(int y=0; y<rows; y++)
+            for(int y=0; y<nrows; y++)
             {
-                for(int x=0; x<columns; x++)
+                const GPixel *r=operator [] (y);
+                for(int x=0,xnew=lastrow; xnew>=0; x++,xnew--)
                 {
-                    dpixmap[lastrow-x][y] = spixmap[y][x];
+                    dpixmap[xnew][y] = r[x];
                 }
             }
         }
         break;
     case 2: //// rotate 180 counter clockwise
         {
-            int rows = spixmap.rows();
-            int columns = spixmap.columns();
             int lastrow = dpixmap.rows()-1;
             int lastcolumn = dpixmap.columns()-1;
 
-            for(int y=0; y<rows; y++)
+            for(int y=0,ynew=lastrow; ynew>=0; y++,ynew--)
             {
-                for(int x=0; x<columns; x++)
+                const GPixel *r=operator [] (y);
+                GPixel *d=dpixmap[ynew];
+                for(int xnew=lastcolumn; xnew>=0; r++,xnew--)
                 {
-                    dpixmap[lastrow-y][lastcolumn-x] = spixmap[y][x];
+                    d[xnew] = *r;
                 }
             }
         }
         break;
     case 3: //// rotate 270 counter clockwise
         {
-            int rows = spixmap.rows();
-            int columns = spixmap.columns();
             int lastcolumn = dpixmap.columns()-1;
 
-            for(int y=0; y<rows; y++)
+            for(int y=0,ynew=lastcolumn; ynew>=0; y++,ynew--)
             {
-                for(int x=0; x<columns; x++)
+                const GPixel *r=operator [] (y);
+                for(int x=0; x<ncolumns; x++)
                 {
-                    dpixmap[x][lastcolumn-y] = spixmap[y][x];
+                    dpixmap[x][ynew] = r[x];
                 }
             }
         }
         break;
     }
-
-    return newpixmap;
+  }
+  return newpixmap;
 }
 
 
