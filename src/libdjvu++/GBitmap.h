@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GBitmap.h,v 1.9 1999-05-19 18:24:11 leonb Exp $
+//C- $Id: GBitmap.h,v 1.10 1999-05-19 18:31:37 leonb Exp $
 
 #ifndef _GBITMAP_H_
 #define _GBITMAP_H_
@@ -44,7 +44,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: GBitmap.h,v 1.9 1999-05-19 18:24:11 leonb Exp $#
+    #$Id: GBitmap.h,v 1.10 1999-05-19 18:31:37 leonb Exp $#
 
  */
 //@{
@@ -292,10 +292,11 @@ public:
       columns, and directly addressing the memory buffer #rledata# provided by
       the user.  This buffer contains #rledatalen# bytes representing the
       bitmap in run length encoded form.  The GBitmap object then ``owns'' the
-      buffer (unlike #borrow_data# sigh!) and will deallocate this buffer with
-      #operator delete[]#.  The encoding of buffer #rledata# is similar to the
-      data segment of the RLE file format (without the header) documented in
-      \Ref{PNM and RLE file formats}.  */
+      buffer (unlike #borrow_data# sigh!) and will deallocate this buffer when
+      appropriate: you should not deallocate this buffer yourself.  The
+      encoding of buffer #rledata# is similar to the data segment of the RLE
+      file format (without the header) documented in \Ref{PNM and RLE file
+      formats}.  */
   void borrow_rle(unsigned char *rledata, unsigned int rledatalen, int w, int h);
   //@}
 
