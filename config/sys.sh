@@ -18,6 +18,7 @@ if [ -z "$SYS_SET" ] ; then
   INCS=" "
   JOBJ=" "
   SECURITYMODE="-D_LOCK_ID_"
+  SENTINAL_NEED_LIB=""
   SENTINAL=""
   WHOLEARCHIVESEP=" "
   WHOLEARCHIVE="-Wl,--whole-archive"
@@ -43,6 +44,7 @@ if [ -z "$SYS_SET" ] ; then
       then
         SYS=Solaris-sparc
         SENTINAL=src/3rd-party/sentinal_lm_60/sol2sprc
+	SENTINAL_NEED_LIB="/usr/lib/libsocket.a /usr/lib/libnsl.a"
         DEFS="$DEFS -DNEED_DJVU_MEMORY"
       fi
     fi
@@ -57,10 +59,11 @@ if [ -z "$SYS_SET" ] ; then
     if [ ! -d "${CONFIG_DIR}/../$SENTINAL" ]
     then 
       SENTINAL=""
+      SENTINAL_NEED_LIB=""
     fi
   fi
   SYS_SET=true
   echo "$SYS"
-  CONFIG_VARS=`echo SYS SYS_SET DEFS INCS JOBJ WHOLEARCHIVE WHOLEARCHIVESEP NOWHOLEARCHIVE SENTINAL $CONFIG_VARS`
+  CONFIG_VARS=`echo SYS SYS_SET DEFS INCS JOBJ WHOLEARCHIVE WHOLEARCHIVESEP NOWHOLEARCHIVE SENTINAL SENTINAL_NEED_LIB $CONFIG_VARS`
 fi
 
