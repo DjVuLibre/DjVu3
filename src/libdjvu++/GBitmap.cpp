@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GBitmap.cpp,v 1.15 1999-11-13 18:43:12 leonb Exp $
+//C- $Id: GBitmap.cpp,v 1.16 1999-11-13 18:47:17 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -24,11 +24,14 @@
 #include "GThreads.h"
 
 
-// File "$Id: GBitmap.cpp,v 1.15 1999-11-13 18:43:12 leonb Exp $"
+// File "$Id: GBitmap.cpp,v 1.16 1999-11-13 18:47:17 leonb Exp $"
 // - Author: Leon Bottou, 05/1997
 
 
 
+// ----- global lock used by some rare operations
+
+static GMonitor bitmap_monitor;
 
 
 // ----- constructor and destructor
@@ -277,8 +280,6 @@ GBitmap::take_data(size_t &offset)
 
 // ----- compression
 
-
-static GMonitor bitmap_monitor;
 
 void 
 GBitmap::compress()
@@ -1154,13 +1155,17 @@ GBitmap::zeroes(int required)
 {
   if (zerosize < required)
     {
-      if (zerosize < 256)
-        zerosize = 256;
-      while (zerosize < required)
-        zerosize = 2*zerosize;
-      delete [] zerobuffer;
-      zerobuffer = new unsigned char[zerosize];
-      memset(zerobuffer, 0, zerosize);
+      GMonitorLock lock(&bitmap_monitor);
+      if (zerosize < required)
+        {
+          if (zerosize < 256)
+            zerosize = 256;
+          while (zerosize < required)
+            zerosize = 2*zerosize;
+          delete [] zerobuffer;
+          zerobuffer = new unsigned char[zerosize];
+          memset(zerobuffer, 0, zerosize);
+        }
     }
 }
 
