@@ -26,7 +26,7 @@ readfile()
   char c;
   int fd = open(__FILE__, O_RDONLY, 0666);
   if (fd < 0)
-    { DjVuPrintError("Cannot open file '" __FILE__ "'."); exit(1); }
+    { DjVuPrintErrorUTF8("Cannot open file '" __FILE__ "'."); exit(1); }
   while (read(fd, &c, 1)==1) 
     { 
       GThread::yield(); 
@@ -40,7 +40,7 @@ serial()
 {
   GCriticalSectionLock lock(&sec);
   if (flag)
-    DjVuPrintError("*** critical section test failed\n");
+    DjVuPrintErrorUTF8("*** critical section test failed\n");
   flag = 1;
   readfile();
   { // embedded lock
@@ -58,7 +58,7 @@ alloc()
   char *mem = (char*)malloc(1);
   FILE *f = fopen(__FILE__,"r");
   if (f == 0)
-    { DjVuPrintError("%s","Cannot open file '" __FILE__ "'."); exit(0); }
+    { DjVuPrintErrorUTF8("%s","Cannot open file '" __FILE__ "'."); exit(0); }
   while (!feof(f))
     {
       mem = (char*)realloc(mem, size+1);
@@ -75,20 +75,20 @@ GEvent sleeper;
 void
 second(void *arg)
 {
-  DjVuPrintError("%d enter\n", (int)arg);
+  DjVuPrintErrorUTF8("%d enter\n", (int)arg);
   for (int i=0; i<10; i++)
     serial();
   for (int i=0; i<10; i++)
     alloc();
   if (arg)
     {
-      DjVuPrintError("%d waiting (no timeout)\n",(int)arg);
+      DjVuPrintErrorUTF8("%d waiting (no timeout)\n",(int)arg);
       ev.wait();
-      DjVuPrintError("%d waiting (timeout 3s)\n",(int)arg);
+      DjVuPrintErrorUTF8("%d waiting (timeout 3s)\n",(int)arg);
       ev.wait(3000);
-      DjVuPrintError("%d waiting 10 seconds\n", (int)arg);
+      DjVuPrintErrorUTF8("%d waiting 10 seconds\n", (int)arg);
       sleeper.wait(10000);
-      DjVuPrintError("%d leave\n", (int)arg);
+      DjVuPrintErrorUTF8("%d leave\n", (int)arg);
     }
 }
 
@@ -100,16 +100,16 @@ main()
   GThread th2;
   th.create(second,(void*)1);
   second(0);
-  DjVuPrintError("0 sleeping 3s\n");
+  DjVuPrintErrorUTF8("0 sleeping 3s\n");
   sleeper.wait(3000);
-  DjVuPrintError("0 waking up\n");
+  DjVuPrintErrorUTF8("0 waking up\n");
   ev.set();
-  DjVuPrintError("0 sleeping 6s\n");
+  DjVuPrintErrorUTF8("0 sleeping 6s\n");
   sleeper.wait(6000);
-  DjVuPrintError("0 destroying thread 1 identifier\n");
+  DjVuPrintErrorUTF8("0 destroying thread 1 identifier\n");
   th.GThread::~GThread();
-  DjVuPrintError("0 sleeping 10s\n");
+  DjVuPrintErrorUTF8("0 sleeping 10s\n");
   sleeper.wait(10000);
-  DjVuPrintError("0 leave\n");
+  DjVuPrintErrorUTF8("0 leave\n");
 }
 

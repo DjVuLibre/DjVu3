@@ -35,11 +35,11 @@ main(int,char *argv[],char *[])
     {
       int a = 2;
       int b = 2+a;
-      DjVuPrintMessage("a=%d, b=%d, c=%d\n",a,b,a+b);
+      DjVuPrintMessageUTF8("a=%d, b=%d, c=%d\n",a,b,a+b);
     } 
   G_CATCH(ex) 
     {
-      DjVuPrintError("*** %s\n", (const char *)DjVuMessage::LookUpNative( ex.get_cause() ));
+      DjVuPrintErrorNative("*** %s\n", (const char *)DjVuMessage::LookUpNative( ex.get_cause() ));
     }
   G_ENDCATCH;
   
@@ -48,25 +48,25 @@ main(int,char *argv[],char *[])
     {
       int a = 2;
       int b = 2+a;
-      DjVuPrintMessage("a=%d, b=%d, c=%d\n",a,b,a+b);
+      DjVuPrintMessageUTF8("a=%d, b=%d, c=%d\n",a,b,a+b);
       G_THROW( ERR_MSG("TextException.test") );
     }
   G_CATCH(ex)
     {
-      DjVuPrintError("*** %s\n", (const char *)DjVuMessage::LookUpNative( ex.get_cause() ));
+      DjVuPrintErrorNative("*** %s\n", (const char *)DjVuMessage::LookUpNative( ex.get_cause() ));
     }
   G_ENDCATCH;
 
   G_TRY
     {
       GUTF8String gs = "abcdef";
-      DjVuPrintMessage("gs[0]=%c\n",gs[0]);
-      DjVuPrintMessage("gs[-1]=%c\n",gs[-1]);
-      DjVuPrintMessage("gs[-12]=%c\n",gs[-12]);
+      DjVuPrintMessageUTF8("gs[0]=%c\n",gs[0]);
+      DjVuPrintMessageUTF8("gs[-1]=%c\n",gs[-1]);
+      DjVuPrintMessageUTF8("gs[-12]=%c\n",gs[-12]);
     }
   G_CATCH(ex)
     {
-      DjVuPrintError("*** %s\n", (const char *)DjVuMessage::LookUpNative( ex.get_cause() ));
+      DjVuPrintErrorNative("*** %s\n", (const char *)DjVuMessage::LookUpNative( ex.get_cause() ));
     }
   G_ENDCATCH;
 
@@ -76,22 +76,22 @@ main(int,char *argv[],char *[])
       G_TRY
         {
           GUTF8String gs = "abcdef";
-          DjVuPrintMessage("gs[0]=%c\n",gs[0]);
-          DjVuPrintMessage("gs[-1]=%c\n",gs[-1]);
-          DjVuPrintMessage("gs[-12]=%c\n",gs[-12]);
+          DjVuPrintMessageUTF8("gs[0]=%c\n",gs[0]);
+          DjVuPrintMessageUTF8("gs[-1]=%c\n",gs[-1]);
+          DjVuPrintMessageUTF8("gs[-12]=%c\n",gs[-12]);
         }
       G_CATCH(ex)
         {
-          DjVuPrintError("*** %s\n", (const char *)DjVuMessage::LookUpNative( ex.get_cause() ));
-          DjVuPrintMessage("Rethrown\n");
+          DjVuPrintErrorNative("*** %s\n", (const char *)DjVuMessage::LookUpNative( ex.get_cause() ));
+          DjVuPrintMessageUTF8("Rethrown\n");
           G_RETHROW;
         }
       G_ENDCATCH;
     }
   G_CATCH(ex)
     {
-      DjVuPrintMessage("Recatched\n");
-      DjVuPrintError("*** %s\n", (const char *)DjVuMessage::LookUpNative( ex.get_cause() ));
+      DjVuPrintMessageUTF8("Recatched\n");
+      DjVuPrintErrorNative("*** %s\n", (const char *)DjVuMessage::LookUpNative( ex.get_cause() ));
     }
   G_ENDCATCH;
 

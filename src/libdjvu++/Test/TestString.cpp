@@ -13,19 +13,19 @@
 #include "DjVu.h"
 #include "DjVuMessage.h"
 
-#define PRS(expr)  DjVuPrintMessage("%s :=\"%s\"\n", #expr, (const char*)(expr))
-#define PRI(expr)  DjVuPrintMessage("%s :=%d\n", #expr, (int)(expr))
-#define PRC(expr)  DjVuPrintMessage("%s :=%d '%c'\n", #expr, (char)(expr), (char)(expr))
+#define PRS(expr)  DjVuPrintMessageUTF8("%s :=\"%s\"\n", #expr, (const char*)(expr))
+#define PRI(expr)  DjVuPrintMessageUTF8("%s :=%d\n", #expr, (int)(expr))
+#define PRC(expr)  DjVuPrintMessageUTF8("%s :=%d '%c'\n", #expr, (char)(expr), (char)(expr))
 
 // #define THOROUGH
 #ifdef THOROUGH
 void *operator new(size_t sz) {
   void *x = malloc(sz);
-  DjVuPrintMessage("new %d = %x\n", sz, x);
+  DjVuPrintMessageUTF8("new %d = %x\n", sz, x);
   return x;
 }
 void operator delete(void *x) {
-  DjVuPrintMessage("delete %x\n", x);
+  DjVuPrintMessageUTF8("delete %x\n", x);
   free(x);
 }
 #endif

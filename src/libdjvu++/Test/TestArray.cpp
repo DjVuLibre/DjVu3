@@ -11,19 +11,19 @@
 #include "GContainer.h"
 #include "GString.h"
 
-#define PRS(expr)  DjVuPrintMessage("%s :=\"%s\"\n", #expr, (const char*)(expr))
-#define PRI(expr)  DjVuPrintMessage("%s :=%d\n", #expr, (int)(expr))
-#define PRC(expr)  DjVuPrintMessage("%s :=%d '%c'\n", #expr, (char)(expr), (char)(expr))
+#define PRS(expr)  DjVuPrintMessageUTF8("%s :=\"%s\"\n", #expr, (const char*)(expr))
+#define PRI(expr)  DjVuPrintMessageUTF8("%s :=%d\n", #expr, (int)(expr))
+#define PRC(expr)  DjVuPrintMessageUTF8("%s :=%d '%c'\n", #expr, (char)(expr), (char)(expr))
 
 // #define THOROUGH
 #ifdef THOROUGH
 void * operator new(size_t sz) {
   void *x = malloc(sz);
-  DjVuPrintMessage("new %d = %x\n", sz, x);
+  DjVuPrintMessageUTF8("new %d = %x\n", sz, x);
   return x;
 }
 void operator delete(void *x) {
-  DjVuPrintMessage("delete %x\n", x);
+  DjVuPrintMessageUTF8("delete %x\n", x);
   free(x);
 }
 #endif
@@ -32,8 +32,8 @@ void
 PARR(GArray<int> &ga)
 {
   for(int i=ga.lbound();i<=ga.hbound();i++)
-    DjVuPrintMessage("%d ", ga[i]);
-  DjVuPrintMessage("\n");
+    DjVuPrintMessageUTF8("%d ", ga[i]);
+  DjVuPrintMessageUTF8("\n");
 }
 
 void
@@ -116,7 +116,7 @@ test_string()
   for(i=gb.lbound();i<=gb.hbound();i++) PRS(gb[i]);
 #if 0
   gb.sort();
-  DjVuPrintMessage("sorted\n");
+  DjVuPrintMessageUTF8("sorted\n");
   for(i=gb.lbound();i<=gb.hbound();i++) PRS(gb[i]);
 #endif
 }

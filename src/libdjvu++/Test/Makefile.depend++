@@ -1,27 +1,30 @@
 ### BEGIN C++ DEPENDENCIES
-TestArray.o: TestArray.cpp \
+TestArray.o: TestArray.cpp ../../../src/include/config.h \
  ../../../src/libdjvu++/GContainer.h \
  ../../../src/libdjvu++/GException.h \
  ../../../src/libdjvu++/DjVuGlobal.h \
  ../../../src/include/DjVu.h \
  ../../../src/libdjvu++/GSmartPointer.h \
  ../../../src/libdjvu++/GString.h
-TestBitmap.o: TestBitmap.cpp \
+TestBitmap.o: TestBitmap.cpp ../../../src/include/config.h \
  ../../../src/libdjvu++/GBitmap.h \
  ../../../src/libdjvu++/GSmartPointer.h \
  ../../../src/libdjvu++/DjVuGlobal.h \
  ../../../src/include/DjVu.h \
- ../../../src/libdjvu++/ByteStream.h \
- ../../../src/libdjvu++/Arrays.h \
- ../../../src/libdjvu++/GException.h
-TestException.o: TestException.cpp \
  ../../../src/libdjvu++/GException.h \
+ ../../../src/libdjvu++/ByteStream.h \
+ ../../../src/libdjvu++/Arrays.h
+TestException.o: TestException.cpp \
+ ../../../src/include/config.h ../../../src/libdjvu++/GException.h \
  ../../../src/libdjvu++/DjVuGlobal.h \
  ../../../src/include/DjVu.h \
  ../../../src/libdjvu++/GString.h \
  ../../../src/libdjvu++/GContainer.h \
- ../../../src/libdjvu++/GSmartPointer.h
-TestJB2.o: TestJB2.cpp ../../../src/libdjvu++/JB2Image.h \
+ ../../../src/libdjvu++/GSmartPointer.h \
+ ../../../src/libdjvu++/DjVuMessage.h \
+ ../../../src/libdjvu++/DjVuMessageLite.h
+TestJB2.o: TestJB2.cpp ../../../src/include/config.h \
+ ../../../src/libdjvu++/JB2Image.h \
  ../../../src/libdjvu++/GString.h \
  ../../../src/libdjvu++/DjVuGlobal.h \
  ../../../src/include/DjVu.h \
@@ -31,15 +34,19 @@ TestJB2.o: TestJB2.cpp ../../../src/libdjvu++/JB2Image.h \
  ../../../src/libdjvu++/ZPCodec.h \
  ../../../src/libdjvu++/GBitmap.h \
  ../../../src/libdjvu++/ByteStream.h \
- ../../../src/libdjvu++/Arrays.h
-TestList.o: TestList.cpp \
+ ../../../src/libdjvu++/Arrays.h \
+ ../../../src/libdjvu++/GURL.h \
+ ../../../src/libdjvu++/GThreads.h
+TestList.o: TestList.cpp ../../../src/include/config.h \
  ../../../src/libdjvu++/GContainer.h \
  ../../../src/libdjvu++/GException.h \
  ../../../src/libdjvu++/DjVuGlobal.h \
  ../../../src/include/DjVu.h \
  ../../../src/libdjvu++/GSmartPointer.h \
- ../../../src/libdjvu++/GString.h
-TestMap.o: TestMap.cpp \
+ ../../../src/libdjvu++/GString.h \
+ ../../../src/libdjvu++/DjVuMessage.h \
+ ../../../src/libdjvu++/DjVuMessageLite.h
+TestMap.o: TestMap.cpp ../../../src/include/config.h \
  ../../../src/libdjvu++/GContainer.h \
  ../../../src/libdjvu++/GException.h \
  ../../../src/libdjvu++/DjVuGlobal.h \
@@ -47,10 +54,11 @@ TestMap.o: TestMap.cpp \
  ../../../src/libdjvu++/GSmartPointer.h \
  ../../../src/libdjvu++/GString.h
 TestSmartPointer.o: TestSmartPointer.cpp \
+ ../../../src/include/config.h \
  ../../../src/libdjvu++/GSmartPointer.h \
  ../../../src/libdjvu++/DjVuGlobal.h \
  ../../../src/include/DjVu.h
-TestString.o: TestString.cpp \
+TestString.o: TestString.cpp ../../../src/include/config.h \
  ../../../src/libdjvu++/GString.h \
  ../../../src/libdjvu++/DjVuGlobal.h \
  ../../../src/include/DjVu.h \
@@ -59,7 +67,7 @@ TestString.o: TestString.cpp \
  ../../../src/libdjvu++/GSmartPointer.h \
  ../../../src/libdjvu++/DjVuMessage.h \
  ../../../src/libdjvu++/DjVuMessageLite.h
-TestThreads.o: TestThreads.cpp \
+TestThreads.o: TestThreads.cpp ../../../src/include/config.h \
  ../../../src/libdjvu++/GThreads.h \
  ../../../src/libdjvu++/DjVuGlobal.h \
  ../../../src/include/DjVu.h \

@@ -25,27 +25,27 @@ void operator delete(void *x) {
 #endif
 
 
-#define PRS(expr)  DjVuPrintMessage("%s :=\"%s\"\n", #expr, (const char*)(expr))
-#define PRI(expr)  DjVuPrintMessage("%s :=%d\n", #expr, (int)(expr))
-#define PRC(expr)  DjVuPrintMessage("%s :=%d '%c'\n", #expr, (char)(expr), (char)(expr))
+#define PRS(expr)  DjVuPrintMessageUTF8("%s :=\"%s\"\n", #expr, (const char*)(expr))
+#define PRI(expr)  DjVuPrintMessageUTF8("%s :=%d\n", #expr, (int)(expr))
+#define PRC(expr)  DjVuPrintMessageUTF8("%s :=%d '%c'\n", #expr, (char)(expr), (char)(expr))
 
 void
 PMAPSI(const GMap<GUTF8String,int> &map)
 {
   GUTF8String gs;
-  DjVuPrintMessage("( ");
+  DjVuPrintMessageUTF8("( ");
   for (GPosition pos=map.firstpos(); pos; ++pos)
-    DjVuPrintMessage("%s:%d ", (const char*)map.key(pos), map[pos]);
-  DjVuPrintMessage(")\n");
+    DjVuPrintMessageUTF8("%s:%d ", (const char*)map.key(pos), map[pos]);
+  DjVuPrintMessageUTF8(")\n");
 }
 
 void
 PMAPIS(const GMap<int,GUTF8String> &map)
 {
-  DjVuPrintMessage("( ");
+  DjVuPrintMessageUTF8("( ");
   for (GPosition pos=map.firstpos(); pos; ++pos)
-    DjVuPrintMessage("%d:%s ", map.key(pos), (const char*)map[pos]);
-  DjVuPrintMessage(")\n");
+    DjVuPrintMessageUTF8("%d:%s ", map.key(pos), (const char*)map[pos]);
+  DjVuPrintMessageUTF8(")\n");
 }
 
 int
