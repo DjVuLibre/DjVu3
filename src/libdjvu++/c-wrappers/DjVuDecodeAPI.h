@@ -10,7 +10,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDecodeAPI.h,v 1.5 2000-01-12 14:29:31 bcr Exp $
+//C- $Id: DjVuDecodeAPI.h,v 1.6 2000-01-12 16:15:21 bcr Exp $
 #endif
 
 #ifndef _DJVU_DECODE_API_H
@@ -18,7 +18,10 @@
 
 /* 
  * $Log: DjVuDecodeAPI.h,v $
- * Revision 1.5  2000-01-12 14:29:31  bcr
+ * Revision 1.6  2000-01-12 16:15:21  bcr
+ * Unified the C interface names without _pixel, and updated libddjvu
+ *
+ * Revision 1.5  2000/01/12 14:29:31  bcr
  * Removed djvu_run_image and exposed more of GBitmap to the rest of the libraries.
  *
  * Revision 1.4  2000/01/08 22:44:32  parag
@@ -206,11 +209,6 @@ typedef struct _djvu_image_priv * djvu_image_priv;
 		  DJVUAPI djvu_image *
 		  djvu_image_allocate(int rows,int cols,int pixsize);
 
-/* This structure is for internal use...
- */
-struct djvu_decode_priv_struct;
-typedef struct djvu_decode_priv_struct * djvu_decode_priv;
-
 /* This is a BIG mess that still needs to be cleaned up!!! 
  */
 typedef enum{DECODE_MASK, DECODE_FOREGROUND, DECODE_BACKGROUND, DECODE_ALL} Layer;
@@ -226,12 +224,12 @@ typedef struct
    unsigned int angle, jpeg_quality;
    char *inFile, *outFile;
    int optind;
-   djvu_image* pimg;
+   djvu_image* ximg;
    unsigned int Xsize,Xsubsample,Xupsample;
    unsigned int Ysize,Ysubsample,Yupsample;
    unsigned int xsiz, ysiz;
    int xmin, ymin, seg_w, seg_h;
-   djvu_decode_priv priv;
+   void *priv;
 } djvu_decode_options;
 
 
@@ -318,7 +316,7 @@ djvu_decode_do_transform(djvu_decode_options *d_obj);
 /* Writes the final image to a file in the requested format */
 DJVUAPI void
 djvu_decode_write_image(
-  djvu_decode_options *d_obj, djvu_image *pimg, OUTFORMAT fmt);
+  djvu_decode_options *d_obj, djvu_image *ximg, OUTFORMAT fmt);
 
 /* Frees the decoder object */
 DJVUAPI void
