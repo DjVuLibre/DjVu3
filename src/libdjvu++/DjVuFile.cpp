@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.19 1999-08-20 22:51:50 eaf Exp $
+//C- $Id: DjVuFile.cpp,v 1.20 1999-08-20 22:54:08 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -252,9 +252,12 @@ DjVuFile::wait_for_finish(bool self)
    GMonitorLock lock(&finish_mon);
    if (self)
    {
-      while(is_decoding()) finish_mon.wait();
-      DEBUG_MSG("got it\n");
-      return 1;
+      if (is_decoding())
+      {
+	 while(is_decoding()) finish_mon.wait();
+	 DEBUG_MSG("got it\n");
+	 return 1;
+      }
    } else
    {
       GP<DjVuFile> file;
