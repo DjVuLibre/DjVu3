@@ -30,15 +30,15 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.cpp,v 1.96 2001-10-16 22:27:24 docbill Exp $
+// $Id: ByteStream.cpp,v 1.97 2001-10-16 22:45:44 docbill Exp $
 // $Name:  $
 
-#include "ByteStream.h"
 #ifdef __GNUC__
 #pragma implementation
 #endif
 // - Author: Leon Bottou, 04/1997
 
+#include "ByteStream.h"
 #include "GOS.h"
 #include "GURL.h"
 #include "DjVuMessage.h"
