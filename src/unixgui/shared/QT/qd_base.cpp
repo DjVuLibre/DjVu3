@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qd_base.cpp,v 1.7 2001-07-27 17:02:04 mchen Exp $
+// $Id: qd_base.cpp,v 1.8 2001-08-08 18:04:25 docbill Exp $
 // $Name:  $
 
 
@@ -828,7 +828,8 @@ QDBase::setRotate(int cmd)
 
    dimg->set_rotate(rotate);
    decodeAnno(false);
-   layout();   
+   layout(0);   
+   redraw();
 }
 
 void

@@ -1,5 +1,7 @@
 <?xml version="1.0" ?>
 <!DOCTYPE DjVuMessages PUBLIC "-//W3C/DTD DjVuMessages 1.0//EN" "pubtext/DjVuMessages.dtd">
+<!-- Error messages from libdjvu++ for unit test directories -->
+<!-- $Id: libdjvu++-Test.xml,v 1.2 2001/03/31 01:18:11 fcrary Exp $ -->
 <DjVuMessages>
 <BODY>
 <MESSAGE name="TestJB2.bad_suffix" value="Unrecognized suffix for output file" />

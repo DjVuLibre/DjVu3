@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qd_base_events.cpp,v 1.7 2001-07-30 18:29:55 mchen Exp $
+// $Id: qd_base_events.cpp,v 1.8 2001-08-08 18:04:25 docbill Exp $
 // $Name:  $
 
 
@@ -493,6 +493,9 @@ QDBase::eventFilter(QObject *obj, QEvent *e)
 	 {
 	    case Event_MouseButtonPress:
 	    {
+                if (pane_mode==IDC_TEXT_SELECT)
+                   eraseSearchResults();
+     
 	       DEBUG_MSGN("Event_MousePress\n");
 	       QMouseEvent * ev=(QMouseEvent *) e;
 
@@ -601,7 +604,7 @@ QDBase::eventFilter(QObject *obj, QEvent *e)
 			   GRect rect=rectDocument;
 			   text_rect.intersect(text_rect, rect);
 			   
-			   setMappers();
+                           //setMappers();
 			   ma_mapper.unmap(text_rect);
   			   dimg->map(text_rect);			
 
@@ -614,12 +617,11 @@ QDBase::eventFilter(QObject *obj, QEvent *e)
 			      if( djvutext->txt )
 			      {
 				 GList<GRect> rects=djvutext->txt->find_text_with_rect(text_rect,UTF8selectedtext);
-
-				 eraseSearchResults();
 				 for(GPosition pos=rects;pos;++pos)
 				 {
 				    GRect irect=rects[pos];
-				    GP<GMapRect> gma=GMapRect::create(rects[pos]);
+                                    dimg->unmap(irect);
+				    GP<GMapRect> gma=GMapRect::create(irect);
 				    gma->comment=search_results_name;
 				    gma->hilite_color=0xff000000;
 				    gma->border_type=GMapArea::NO_BORDER;

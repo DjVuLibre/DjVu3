@@ -8,7 +8,7 @@
 [1-%0!05u!] Message d&apos;erreur inconnu :
 	Nom du message : %1!s!.
 </MESSAGE>
-<MESSAGE name="DjVuMessage.Paramètre : " number="10001">
+<MESSAGE name="DjVuMessage.Parameter" number="10001">
 &#09;Parameter: %1!s!.
 </MESSAGE>
 <MESSAGE name="DjVuMessage.failed_to_parse_XML" number="10002">

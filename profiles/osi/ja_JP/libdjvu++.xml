@@ -111,6 +111,13 @@ Error: %1!s!.
 [1-%0!05u!] XML tag &apos;%1!s!&apos; on line %2!u! was terminated with XML
 tag &apos;%3!s!&apos; line %4!u!.
 </MESSAGE>
+<MESSAGE name="DjVuDynamicLib.failed_open2" number="16402">
+[1-%0!05u!] Failed to open dynamic library '%1!s!'.
+	System reported: '%2!s!'.
+</MESSAGE>
+<MESSAGE name="DjVuDynamicLib.failed_open" number="16403">
+[1-%0!05u!] Failed to open dynamic library '%1!s!'.
+</MESSAGE>
 <MESSAGE name="DjVuMessage.Unrecognized" number="10000"
   value="[1-%0!05u!] 認識できないエラーメッセージ：&#10;&#09;メッセージ名：&apos;%1!s!&apos;" />
 <MESSAGE name="DjVuMessage.Parameter" number="10001"

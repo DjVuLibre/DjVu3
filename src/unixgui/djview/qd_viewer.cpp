@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qd_viewer.cpp,v 1.8 2001-08-02 23:56:51 mchen Exp $
+// $Id: qd_viewer.cpp,v 1.9 2001-08-08 18:07:06 docbill Exp $
 // $Name:  $
 
 
@@ -1413,7 +1413,9 @@ QDViewer::slotDisplaySearchResults(int page_num, const GList<DjVuTXT::Zone *> & 
 	 // Create the map areas
       for(GPosition pos=zones_list;pos;++pos)
       {
-	 GP<GMapRect> gma=GMapRect::create(zones_list[pos]->rect);
+         GRect irect=zones_list[pos]->rect;
+         dimg->unmap(irect);
+	 GP<GMapRect> gma=GMapRect::create(irect);
 	 gma->comment=search_results_name;
 	 gma->hilite_color=0xff000000;
 	 gma->border_type=GMapArea::NO_BORDER;
