@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DataPool.cpp,v 1.66 2001-02-15 01:12:22 bcr Exp $
+// $Id: DataPool.cpp,v 1.67 2001-02-17 02:38:41 bcr Exp $
 // $Name:  $
 
 
@@ -52,7 +52,8 @@
 #endif
 
 static void
-call_callback(void (* callback)(void *), void * cl_data)
+// call_callback(void (* callback)(GP<GPEnabled> &), GP<GPEnabled> cl_data)
+call_callback(void (* callback)(void *), void *cl_data)
 {
    G_TRY
    {
@@ -77,29 +78,28 @@ call_callback(void (* callback)(void *), void * cl_data)
     doesn't exceed MAX_OPEN_FILES. When it does, it looks for the oldest
     file, closes it and asks all DataPools working with it to ZERO
     their GP<> pointers. */
-class DataPool::OpenFiles
-{
-public:
-   class File : public GPEnabled
+   class DataPool::OpenFiles_File : public GPEnabled
    {
    public:
       GString			name;
       GP<ByteStream>	        stream;		// Stream connected to 'name'
       GCriticalSection		stream_lock;
-      GList<void *>		pools_list;	// List of pools using this stream
+      GPList<DataPool>		pools_list;	// List of pools using this stream
       GCriticalSection		pools_lock;
       unsigned long		open_time;	// Time when stream was open
 
-      int	add_pool(DataPool * pool);
-      int	del_pool(DataPool * pool);
+      int	add_pool(GP<DataPool> &pool);
+      int	del_pool(GP<DataPool> &pool);
       
-      File(const char * name, DataPool * pool);
-      virtual ~File(void);
+      OpenFiles_File(const char * name, GP<DataPool> &pool);
+      virtual ~OpenFiles_File(void);
    };
+class DataPool::OpenFiles : public GPEnabled
+{
 private:
    static OpenFiles	* global_ptr;
 
-   GPList<File>		files_list;
+   GPList<DataPool::OpenFiles_File>		files_list;
    GCriticalSection	files_lock;
 public:
    static OpenFiles	* get(void);
@@ -109,22 +109,22 @@ public:
       // with the stream. Whenever OpenFiles decides, that this stream
       // had better be closed, it will order every pool from the list to
       // ZERO their references to it
-   GP<File>		request_stream(const char * name, DataPool * pool);
+   GP<DataPool::OpenFiles_File>		request_stream(const char * name, GP<DataPool> pool);
       // If there are more than MAX_STREAM_FILES open, close the oldest.
    void		prune(void);
       // Removes the pool from the list associated with the stream.
       // If there is nobody else using this stream, the stream will
       // be closed too.
-   void		stream_released(ByteStream * stream, DataPool * pool);
+   void		stream_released(GP<ByteStream> &stream, GP<DataPool> pool);
 
    void 	close_all(void);
 };
 
 DataPool::OpenFiles * DataPool::OpenFiles::global_ptr;
 
-DataPool::OpenFiles::File::File(const char * xname, DataPool * pool) : name(xname)
+DataPool::OpenFiles_File::OpenFiles_File(const char * xname, GP<DataPool> &pool) : name(xname)
 {
-   DEBUG_MSG("DataPool::OpenFiles::File::File(): Opening file '" << name << "'\n");
+   DEBUG_MSG("DataPool::OpenFiles_File::OpenFiles_File(): Opening file '" << name << "'\n");
    DEBUG_MAKE_INDENT(3);
    
    open_time=GOS::ticks();
@@ -132,22 +132,22 @@ DataPool::OpenFiles::File::File(const char * xname, DataPool * pool) : name(xnam
    add_pool(pool);
 }
 
-DataPool::OpenFiles::File::~File(void)
+DataPool::OpenFiles_File::~OpenFiles_File(void)
 {
-   DEBUG_MSG("DataPool::OpenFiles::File::~File(): Closing file '" << name << "'\n");
+   DEBUG_MSG("DataPool::OpenFiles_File::~OpenFiles_File(): Closing file '" << name << "'\n");
    DEBUG_MAKE_INDENT(3);
 
       // Make all DataPools using this stream release it (so that
       // the stream can actually be closed)
    GCriticalSectionLock lock(&pools_lock);
    for(GPosition pos=pools_list;pos;++pos)
-      ((DataPool *) pools_list[pos])->clear_stream();
+      pools_list[pos]->clear_stream();
 }
 
 int
-DataPool::OpenFiles::File::add_pool(DataPool * pool)
+DataPool::OpenFiles_File::add_pool(GP<DataPool> &pool)
 {
-   DEBUG_MSG("DataPool::OpenFiles::File::add_pool: pool=" << (void *) pool << "\n");
+   DEBUG_MSG("DataPool::OpenFiles_File::add_pool: pool=" << (void *) pool << "\n");
    DEBUG_MAKE_INDENT(3);
    GCriticalSectionLock lock(&pools_lock);
    if (!pools_list.contains(pool))
@@ -156,9 +156,9 @@ DataPool::OpenFiles::File::add_pool(DataPool * pool)
 }
 
 int
-DataPool::OpenFiles::File::del_pool(DataPool * pool)
+DataPool::OpenFiles_File::del_pool(GP<DataPool> &pool)
 {
-   DEBUG_MSG("DataPool::OpenFiles::File::del_pool: pool=" << (void *) pool << "\n");
+   DEBUG_MSG("DataPool::OpenFiles_File::del_pool: pool=" << (void *) pool << "\n");
    DEBUG_MAKE_INDENT(3);
    GCriticalSectionLock lock(&pools_lock);
    GPosition pos;
@@ -201,13 +201,13 @@ DataPool::OpenFiles::prune(void)
 
 //			  GP<ByteStream> & stream,
 //			  GCriticalSection ** stream_lock)
-GP<DataPool::OpenFiles::File>
-DataPool::OpenFiles::request_stream(const char * name_in, DataPool * pool)
+GP<DataPool::OpenFiles_File>
+DataPool::OpenFiles::request_stream(const char * name_in, GP<DataPool> pool)
 {
    DEBUG_MSG("DataPool::OpenFiles::request_stream(): name='" << name_in << "'\n");
    DEBUG_MAKE_INDENT(3);
 
-   GP<File> file;
+   GP<DataPool::OpenFiles_File> file;
 
    GString name=GOS::expand_name(name_in, GOS::cwd());
    
@@ -228,7 +228,7 @@ DataPool::OpenFiles::request_stream(const char * name_in, DataPool * pool)
       // too many streams open
    if (!file)
    {
-      file=new File(name, pool);
+      file=new DataPool::OpenFiles_File(name, pool);
       files_list.append(file);
       prune();
    }
@@ -238,15 +238,15 @@ DataPool::OpenFiles::request_stream(const char * name_in, DataPool * pool)
 }
 
 void
-DataPool::OpenFiles::stream_released(ByteStream * stream, DataPool * pool)
+DataPool::OpenFiles::stream_released(GP<ByteStream> &stream, GP<DataPool> pool)
 {
    DEBUG_MSG("DataPool::OpenFiles::stream_release: stream=" << (void *)stream << " pool=" << (void *)pool << "\n");
    DEBUG_MAKE_INDENT(3);
    GCriticalSectionLock lock(&files_lock);
    for(GPosition pos=files_list;pos;)
    {
-      GP<File> f=files_list[pos];
-      if (f->stream==stream && f->del_pool(pool)==0)
+      GP<DataPool::OpenFiles_File> f=files_list[pos];
+      if ((ByteStream *)(f->stream)==(ByteStream *)stream && f->del_pool(pool)==0)
       {
 	 GPosition this_pos=pos;
 	 ++pos;
@@ -281,23 +281,23 @@ DataPool::OpenFiles::close_all(void)
 class FCPools
 {
 private:
-   GMap<GString, const void *>	map;	// GMap<GString, GList<DataPool *>> in fact
+   GMap<GString, GPList<DataPool> >	map;	// GMap<GString, GPList<DataPool>> in fact
    GCriticalSection		map_lock;
 
    static FCPools	* global_ptr;
 public:
    static FCPools *	get(void);
       // Adds the <fname, pool> pair into the list
-   void		add_pool(const char * fname, DataPool * pool);
+   void		add_pool(const char * fname, GP<DataPool> pool);
       // Removes the <fname, pool> pair from the list
-   void		del_pool(const char * fname, DataPool * pool);
+   void		del_pool(const char * fname, GP<DataPool> pool);
       // Looks for the list of DataPools connected to 'fname' and makes
       // each of them load the contents of the file into memory
    void		load_file(const char * fname);
 };
 
 void
-FCPools::add_pool(const char * name_in, DataPool * pool)
+FCPools::add_pool(const char * name_in, GP<DataPool> pool)
 {
   DEBUG_MSG("FCPools::add_pool: name_in='" << name_in << "' pool=" << (void *)pool << "\n");
   DEBUG_MAKE_INDENT(3);
@@ -306,19 +306,21 @@ FCPools::add_pool(const char * name_in, DataPool * pool)
    if (name_in && strlen(name_in))
    {
       GString name=GOS::expand_name(name_in, GOS::cwd());
-      GList<void *> * list;
+      GPList<DataPool> list;
       GPosition pos;
-      if (map.contains(name, pos))
-        list=(GList<void *> *) map[pos];
-      else
-        map[name]=list=new GList<void *>();
-      if (!list->contains(pool))
-        list->append(pool);
+      if (!map.contains(name, pos))
+      {
+        map[name]=list;
+        pos=map.contains(name);
+      }
+      GPList<DataPool> &plist=map[pos];
+      if (!plist.contains(pool))
+        plist.append(pool);
    }
 }
 
 void
-FCPools::del_pool(const char * name_in, DataPool * pool)
+FCPools::del_pool(const char * name_in, GP<DataPool> pool)
 {
   DEBUG_MSG("FCPools::del_pool: name_in='" << name_in << "' pool=" << (void *)pool << "\n");
   DEBUG_MAKE_INDENT(3);
@@ -330,13 +332,12 @@ FCPools::del_pool(const char * name_in, DataPool * pool)
       GPosition pos;
       if (map.contains(name, pos))
       {
-	 GList<void *> * list=(GList<void *> *) map[pos];
+	 GPList<DataPool> &list=map[pos];
 	 GPosition list_pos;
-	 while(list->search(pool, list_pos))
-	    list->del(list_pos);
-	 if (list->isempty())
+	 while(list.search(pool, list_pos))
+	    list.del(list_pos);
+	 if (list.isempty())
 	 {
-	    delete list;
 	    map.del(pos);
 	 }
       }
@@ -358,9 +359,9 @@ FCPools::load_file(const char * name_in)
       {
 	    // We make here a copy of the list because DataPool::load_file()
 	    // will call FCPools::del_pool(), which will modify the list
-	 GList<void *> list=*(GList<void *> *) map[pos];
+	 GPList<DataPool> list=map[pos];
 	 for(GPosition list_pos=list;list_pos;++list_pos)
-	    ((DataPool *) list[list_pos])->load_file();
+	    list[list_pos]->load_file();
       }
    }
 }
@@ -577,12 +578,15 @@ class DataPool::Trigger : public GPEnabled
 public:
    GSafeFlags disabled;
    int  start, length;
+//   void (* callback)(GP<GPEnabled> &);
    void (* callback)(void *);
-   void * cl_data;
+//   GP<GPEnabled> cl_data;
+   void *cl_data;
 
    Trigger() : start(0), length(-1), callback(0), cl_data(0) {};
    Trigger(int xstart, int xlength,
-   void (* xcallback)(void *), void * xcl_data) :
+//   void (* xcallback)(GP<GPEnabled> &), GP<GPEnabled> xcl_data) :
+   void (* xcallback)(void *), void *xcl_data) :
       start(xstart), length(xlength), callback(xcallback), cl_data(xcl_data) {};
    virtual ~Trigger() {};
 };
@@ -600,7 +604,7 @@ public:
 };
 
 #define DATAPOOL_INIT eof_flag(false),stop_flag(false), \
-    stop_blocked_flag(false),fstream(0), \
+    stop_blocked_flag(false), \
     add_at(0),start(0),length(-1)
 
 void
@@ -631,49 +635,68 @@ DataPool::init(void)
   G_ENDCATCH;
 }
 
-DataPool::DataPool(void) : DATAPOOL_INIT
+DataPool::DataPool(void) : DATAPOOL_INIT {}
+
+GP<DataPool>
+DataPool::create(void)
 {
   DEBUG_MSG("DataPool::DataPool()\n");
   DEBUG_MAKE_INDENT(3);
-   init();
+  DataPool *pool=new DataPool();
+
+  GP<DataPool> retval=pool;
+  pool->init();
 
       // If we maintain the data ourselves, we want to interpret its
       // IFF structure to predict its length
-   add_trigger(0, 32, static_trigger_cb, this);
+  pool->add_trigger(0, 32, static_trigger_cb, pool);
+  return retval;
 }
 
-DataPool::DataPool(ByteStream & str) : DATAPOOL_INIT
+GP<DataPool> 
+DataPool::create(ByteStream &str)
 {
-  DEBUG_MSG("DataPool::DataPool: str=" << (void *)&str << "\n");
+  DEBUG_MSG("DataPool::create: str=" << (void *)&str << "\n");
   DEBUG_MAKE_INDENT(3);
-   init();
+  DataPool *pool=new DataPool();
+  GP<DataPool> retval=pool;
+  pool->init();
 
       // It's nice to have IFF data analyzed in this case too.
-   add_trigger(0, 32, static_trigger_cb, this);
+  pool->add_trigger(0, 32, static_trigger_cb, pool);
    
-   char buffer[1024];
-   int length;
-   while((length=str.read(buffer, 1024)))
-      add_data(buffer, length);
-   set_eof();
+  char buffer[1024];
+  int length;
+  while((length=str.read(buffer, 1024)))
+     pool->add_data(buffer, length);
+  pool->set_eof();
+  return retval;
 }
 
-DataPool::DataPool(const GP<DataPool> & pool, int start, int length)
-: DATAPOOL_INIT
+GP<DataPool>
+DataPool::create(const GP<DataPool> & pool, int start, int length)
 {
   DEBUG_MSG("DataPool::DataPool: pool=" << (void *)((DataPool *)pool) << " start=" << start << " length= " << length << "\n");
   DEBUG_MAKE_INDENT(3);
-   init();
-   connect(pool, start, length);
+
+  DataPool *xpool=new DataPool();
+  GP<DataPool> retval=xpool;
+  xpool->init();
+  xpool->connect(pool, start, length);
+  return retval;
 }
 
-DataPool::DataPool(const char * fname, int start, int length)
-: DATAPOOL_INIT
+GP<DataPool>
+DataPool::create(const char * fname, int start, int length)
 {
   DEBUG_MSG("DataPool::DataPool: fname='" << fname << "' start=" << start << " length= " << length << "\n");
   DEBUG_MAKE_INDENT(3);
-   init();
-   connect(fname, start, length);
+
+  DataPool *pool=new DataPool();
+  GP<DataPool> retval=pool;
+  pool->init();
+  pool->connect(fname, start, length);
+  return retval;
 }
 
 void
@@ -683,15 +706,14 @@ DataPool::clear_stream(const bool release)
   DEBUG_MAKE_INDENT(3);
   if(fstream)
   {
-    GCriticalSectionLock lock(&class_stream_lock);
-    if(fstream)
+    GCriticalSectionLock lock1(&class_stream_lock);
+    GP<OpenFiles_File> f=fstream;
+    if(f)
     {
-      GP<OpenFiles::File> *ff=(GP<OpenFiles::File> *)fstream;
+      GCriticalSectionLock lock2(&(f->stream_lock));
       fstream=0;
-      GP<OpenFiles::File> &f=*ff;
       if(release)
         OpenFiles::get()->stream_released(f->stream, this);
-      delete (GP<OpenFiles::File> *)ff;
     }
   }
 }
@@ -887,7 +909,7 @@ DataPool::add_data(const void * buffer, int offset, int size)
    DEBUG_MSG("DataPool::add_data(): adding " << size << " bytes at pos=" <<
 	     offset << "...\n");
    DEBUG_MAKE_INDENT(3);
-   
+
    if (fname.length() || pool)
       G_THROW("DataPool.add_data");     //  Function DataPool::add_data() may not be called for connected DataPools.
    
@@ -1026,14 +1048,16 @@ DataPool::get_data(void * buffer, int offset, int sz, int level)
       if (sz<0)
         sz=0;
       
-      GCriticalSectionLock lock1(&class_stream_lock);
-      if (!fstream)
+      GP<OpenFiles_File> f=fstream;
+      if (!f)
       {
-        fstream=new GP<OpenFiles::File>;
-        GP<OpenFiles::File> &f=*(GP<OpenFiles::File> *)fstream;
-        f=OpenFiles::get()->request_stream(fname, this);
+        GCriticalSectionLock lock(&class_stream_lock);
+        f=fstream;
+        if(!f)
+        {
+          fstream=f=OpenFiles::get()->request_stream(fname, this);
+        }
       }
-      GP<OpenFiles::File> &f=*(GP<OpenFiles::File> *)fstream;
       GCriticalSectionLock lock2(&(f->stream_lock));
       f->stream->seek(start+offset, SEEK_SET); 
       return f->stream->readall(buffer, sz);
@@ -1245,12 +1269,11 @@ DataPool::load_file(void)
       DEBUG_MSG("loading the data from \"" << fname << "\".\n");
 
       GCriticalSectionLock lock1(&class_stream_lock);
-      if (!fstream)
+      GP<OpenFiles_File> f=fstream;
+      if (!f)
       {
-        fstream=new GP<OpenFiles::File>;
-        (*(GP<OpenFiles::File> *)fstream)=OpenFiles::get()->request_stream(fname, this);
+        fstream=f=OpenFiles::get()->request_stream(fname, this);
       }
-      GP<OpenFiles::File> &f = *(GP<OpenFiles::File> *)fstream;
       {  // Scope to de-allocate lock2 before stream gets released
          GCriticalSectionLock lock2(&(f->stream_lock));
 
@@ -1267,7 +1290,6 @@ DataPool::load_file(void)
 	      // No need to set EOF. It should already be set.
         OpenFiles::get()->stream_released(f->stream, this);
       }
-      delete (GP<OpenFiles::File> *)fstream;
       fstream=0;
    } else DEBUG_MSG("Not connected\n");
 }
@@ -1333,6 +1355,7 @@ DataPool::check_triggers(void)
 }
 
 void
+// DataPool::add_trigger(int thresh, void (* callback)(GP<GPEnabled> &), GP<GPEnabled> cl_data)
 DataPool::add_trigger(int thresh, void (* callback)(void *), void * cl_data)
 {
   if (thresh>=0)
@@ -1343,6 +1366,7 @@ DataPool::add_trigger(int thresh, void (* callback)(void *), void * cl_data)
 
 void
 DataPool::add_trigger(int tstart, int tlength,
+//		      void (* callback)(GP<GPEnabled> &), GP<GPEnabled> cl_data)
 		      void (* callback)(void *), void * cl_data)
 {
    DEBUG_MSG("DataPool::add_trigger(): start=" << tstart <<
@@ -1379,6 +1403,7 @@ DataPool::add_trigger(int tstart, int tlength,
 }
 
 void
+// DataPool::del_trigger(void (* callback)(GP<GPEnabled> &), GP<GPEnabled> cl_data)
 DataPool::del_trigger(void (* callback)(void *), void * cl_data)
 {
    DEBUG_MSG("DataPool::del_trigger(): func=" << (void *) callback << "\n");
@@ -1421,10 +1446,12 @@ DataPool::del_trigger(void (* callback)(void *), void * cl_data)
 }
 
 void
-DataPool::static_trigger_cb(void * cl_data)
+// DataPool::static_trigger_cb(GP<GPEnabled> &cl_data)
+DataPool::static_trigger_cb(void *cl_data)
 {
-   DataPool * th=(DataPool *) cl_data;
-   th->trigger_cb();
+//  GP<DataPool> d=(DataPool *)(GPEnabled *)cl_data;
+  GP<DataPool> d=(DataPool *)cl_data;
+  d->trigger_cb();
 }
 
 void
@@ -1496,7 +1523,7 @@ DataPool::analyze_iff(void)
 class PoolByteStream : public ByteStream
 {
 public:
-   PoolByteStream(DataPool * data_pool);
+   PoolByteStream(GP<DataPool> data_pool);
    virtual ~PoolByteStream() {};
 
    virtual size_t read(void *buffer, size_t size);
@@ -1521,7 +1548,7 @@ private:
 };
 
 inline
-PoolByteStream::PoolByteStream(DataPool * xdata_pool) :
+PoolByteStream::PoolByteStream(GP<DataPool> xdata_pool) :
    data_pool(xdata_pool), position(0), buffer_size(0), buffer_pos(0)
 {
    if (!data_pool) 
@@ -1625,15 +1652,7 @@ DataPool::get_stream(void)
 void
 DataPool::clear_stream(void)
 {
-  if(fstream)
-  {
-    GCriticalSectionLock lock(&class_stream_lock);
-    if(fstream)
-    {
-      delete *(GP<OpenFiles::File> *)fstream;
-      fstream=0;
-    }
-  }
+  fstream=0;
 }
 #endif
 

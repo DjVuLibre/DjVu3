@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DataPool.h,v 1.40 2001-01-09 00:17:37 bcr Exp $
+// $Id: DataPool.h,v 1.41 2001-02-17 02:38:41 bcr Exp $
 // $Name:  $
 
 #ifndef _DATAPOOL_H
@@ -64,7 +64,7 @@ class ByteStream;
 
     @memo Thread safe data storage
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DataPool.h,v 1.40 2001-01-09 00:17:37 bcr Exp $#
+    @version #$Id: DataPool.h,v 1.41 2001-02-17 02:38:41 bcr Exp $#
 */
 
 //@{
@@ -198,23 +198,27 @@ public: // Classes used internally by DataPool
    class Reader;
    class Trigger;
    class OpenFiles;
+   class OpenFiles_File;
    class BlockList;
    class Counter;
+protected:
+   DataPool(void);
+
 public:
       /** @name Initialization */
       //@{
-      /** Default constructor. Will prepare #DataPool# for accepting data
+      /** Default creator. Will prepare #DataPool# for accepting data
 	  added through functions \Ref{add_data}(). Use \Ref{connect}()
 	  functions if you want to map this #DataPool# to another or
 	  to a file. */
-   DataPool();
+   static GP<DataPool> create(void);
 
       /** Creates and initialized the #DataPool# with data from stream #str#.
 	  The constructor will read the stream's contents and add them
 	  to the pool using the \Ref{add_data}() function. Afterwards it
 	  will call \Ref{set_eof}() function, and no other data will be
 	  allowed to be added to the pool. */
-   DataPool(ByteStream & str);
+   static GP<DataPool> create(ByteStream & str);
 
       /** Initializes the #DataPool# in slave mode and connects it
 	  to the specified offsets range of the specified master #DataPool#.
@@ -227,7 +231,7 @@ public:
           @param length Length of the offsets range. If negative, the range
 	         is assumed to extend up to the end of the master #DataPool#.
       */
-   DataPool(const GP<DataPool> & master_pool, int start=0, int length=-1);
+   static GP<DataPool> create(const GP<DataPool> & master_pool, int start=0, int length=-1);
 
       /** Initializes the #DataPool# in slave mode and connects it
 	  to the specified offsets range of the specified file.
@@ -239,7 +243,7 @@ public:
           @param length Length of the offsets range. If negative, the range
 	         is assumed to extend up to the end of the file.
       */
-   DataPool(const char * file_name, int start=0, int length=-1);
+   static GP<DataPool> create(const char * file_name, int start=0, int length=-1);
 
    virtual ~DataPool();
 
@@ -472,6 +476,7 @@ public:
 	  @param callback Function to call
 	  @param cl_data Argument to pass to the callback when it's called. */
    void		add_trigger(int start, int length,
+//			    void (* callback)(GP<GPEnabled> &), GP<GPEnabled> cl_data);
 			    void (* callback)(void *), void * cl_data);
 
       /** Associates the specified {\em trigger callback} with the
@@ -481,12 +486,14 @@ public:
 	  The callback will be called when there is data available for
 	  every offset from #0# to #thresh#, if #thresh# is positive, or
 	  when #EOF# condition has been set otherwise. */
+//   void		add_trigger(int thresh, void (* callback)(GP<GPEnabled> &), GP<GPEnabled> cl_data);
    void		add_trigger(int thresh, void (* callback)(void *), void * cl_data);
 
       /** Use this function to unregister callbacks, which are no longer
 	  needed. {\bf Note!} It's important to do it when the client
 	  is about to be destroyed. */
-   void		del_trigger(void (* callback)(void *), void * cl_data);
+   void		del_trigger(void (* callback)(void *), void *  cl_data);
+//   void		del_trigger(void (* callback)(GP<GPEnabled> &), GP<GPEnabled>  cl_data);
       //@}
 
       /** Loads data from the file into memory. This function is only useful
@@ -521,7 +528,7 @@ private:
       // Source or storage of data
    GP<DataPool>		pool;
    GString		fname;
-   void *fstream;
+   GP<OpenFiles_File>   fstream;
    GCriticalSection	class_stream_lock;
    GP<ByteStream>	data;
    GCriticalSection	data_lock;
@@ -546,6 +553,7 @@ private:
    int		get_size(int start, int length) const;
    void		restart_readers(void);
 
+//   static void	static_trigger_cb(GP<GPEnabled> &);
    static void	static_trigger_cb(void *);
    void		trigger_cb(void);
    void		analyze_iff(void);

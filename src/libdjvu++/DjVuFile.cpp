@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuFile.cpp,v 1.149 2001-02-15 01:12:22 bcr Exp $
+// $Id: DjVuFile.cpp,v 1.150 2001-02-17 02:38:41 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -141,7 +141,7 @@ DjVuFile::init(ByteStream & str)
   decode_thread=0;
   
   // Read the data from the stream
-  data_pool=new DataPool(str);
+  data_pool=DataPool::create(str);
   
   // Construct some dummy URL
   GString buffer;
@@ -183,7 +183,7 @@ DjVuFile::init(const GURL & xurl, GP<DjVuPort> port)
   // Set it here because trigger will call other DjVuFile's functions
   initialized=true;
   
-  if (!(data_pool=new DataPool(pcaster->request_data(this, url))))
+  if (!(data_pool=DataPool::create(pcaster->request_data(this, url))))
     G_THROW("DjVuFile.no_data\t"+url);
   data_pool->add_trigger(-1, static_trigger_cb, this);
 }
@@ -1226,7 +1226,7 @@ DjVuFile::start_decode(void)
       
       // We want to create it right here to be able to stop the
       // decoding thread even before its function is called (it starts)
-      decode_data_pool=new DataPool(data_pool);
+      decode_data_pool=DataPool::create(data_pool);
       decode_life_saver=this;
       
       decode_thread=new GThread();
@@ -2059,7 +2059,7 @@ GP<DataPool>
 DjVuFile::get_djvu_data(bool included_too, bool no_ndir)
 {
   GP<ByteStream> pbs = get_djvu_bytestream(included_too, no_ndir);
-  return new DataPool(*pbs);
+  return DataPool::create(*pbs);
 }
 
 void
@@ -2136,7 +2136,7 @@ DjVuFile::remove_anno(void)
   iff_out.close_chunk();
   
   str_out.seek(0, SEEK_SET);
-  data_pool=new DataPool(str_out);
+  data_pool=DataPool::create(str_out);
   chunks_number=-1;
   
   anno=0;
@@ -2176,7 +2176,7 @@ DjVuFile::remove_text(void)
   iff_out.close_chunk();
   
   str_out.seek(0, SEEK_SET);
-  data_pool=new DataPool(str_out);
+  data_pool=DataPool::create(str_out);
   chunks_number=-1;
   
   text=0;
@@ -2255,7 +2255,7 @@ DjVuFile::unlink_file(const GP<DataPool> & data, const char * name)
   iff_out.flush();
   str_out.seek(0, SEEK_SET);
   data->clear_stream();
-  return new DataPool(str_out);
+  return DataPool::create(str_out);
 }
 
 #ifndef NEED_DECODER_ONLY
@@ -2306,7 +2306,7 @@ DjVuFile::insert_file(const char * id, int chunk_num)
     iff_out.close_chunk();
   }
   str_out.seek(0, SEEK_SET);
-  data_pool=new DataPool(str_out);
+  data_pool=DataPool::create(str_out);
   chunks_number=-1;
   
   // Second: create missing DjVuFiles
@@ -2387,7 +2387,7 @@ DjVuFile::unlink_file(const char * id)
   }
   
   str_out.seek(0, SEEK_SET);
-  data_pool=new DataPool(str_out);
+  data_pool=DataPool::create(str_out);
   chunks_number=-1;
   
   flags|=MODIFIED;

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuImage.cpp,v 1.51 2001-02-14 19:49:01 bcr Exp $
+// $Id: DjVuImage.cpp,v 1.52 2001-02-17 02:38:41 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -441,7 +441,7 @@ DjVuImage::decode(ByteStream & str, DjVuInterface *notifier)
     G_THROW("DjVuImage.bad_call");
   GP<DjVuImageNotifier> pport = new DjVuImageNotifier(notifier);
   pport->stream_url="internal://fake/fake.djvu";
-  pport->stream_pool=new DataPool();
+  pport->stream_pool=DataPool::create();
   // Get all the data first
   int length;
   char buffer[1024];

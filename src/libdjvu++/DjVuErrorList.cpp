@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuErrorList.cpp,v 1.9 2001-01-04 22:04:54 bcr Exp $
+// $Id: DjVuErrorList.cpp,v 1.10 2001-02-17 02:38:41 bcr Exp $
 // $Name:  $
 
 
@@ -53,7 +53,7 @@ DjVuErrorList::set_stream(GP<ByteStream> xibs)
 {
   GString name;
   static unsigned long serial=0;
-  pool=new DataPool(*xibs);
+  pool=DataPool::create(*xibs);
   name.format("data://%08lx/%08lx.djvu",
     ++serial,(unsigned long)(size_t)((const ByteStream *)xibs));
   pool_url=name;
@@ -105,7 +105,7 @@ DjVuErrorList::GetStatus(void)
 GP<DataPool>
 DjVuErrorList::request_data(const DjVuPort * source, const GURL & url)
 {
-   DataPool *retval=0;
+   GP<DataPool> retval;
    G_TRY
    {
      if (pool && url.protocol().downcase() == "data")
@@ -125,7 +125,7 @@ DjVuErrorList::request_data(const DjVuPort * source, const GURL & url)
      {
        GString fname=GOS::url_to_filename(url);
        if (GOS::basename(fname)=="-") fname="-";
-       retval=new DataPool(fname);
+       retval=DataPool::create(fname);
      }
    }
    G_CATCH_ALL

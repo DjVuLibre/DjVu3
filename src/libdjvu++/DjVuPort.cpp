@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuPort.cpp,v 1.42 2001-01-04 22:04:55 bcr Exp $
+// $Id: DjVuPort.cpp,v 1.43 2001-02-17 02:38:41 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -620,7 +620,7 @@ DjVuSimplePort::request_data(const DjVuPort * source, const GURL & url)
     {
       GString fname=GOS::url_to_filename(url);
       if (GOS::basename(fname)=="-") fname="-";
-      return new DataPool(fname);
+      return DataPool::create(fname);
     }
   } G_CATCH_ALL {} G_ENDCATCH;
   return 0;

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocEditor.cpp,v 1.63 2001-02-16 01:15:30 bcr Exp $
+// $Id: DjVuDocEditor.cpp,v 1.64 2001-02-17 02:38:41 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -125,7 +125,7 @@ DjVuDocEditor::init(void)
    ByteStream &str=*gstr;
    doc.write(gstr);
    str.seek(0, SEEK_SET);
-   doc_pool=new DataPool(str);
+   doc_pool=DataPool::create(str);
 
    orig_doc_type=UNKNOWN_TYPE;
    orig_doc_pages=0;
@@ -146,7 +146,7 @@ DjVuDocEditor::init(const char * fname)
      G_THROW("DjVuDocEditor.init");
 
       // First - create a temporary DjVuDocument and check its type
-   doc_pool=new DataPool(fname);
+   doc_pool=DataPool::create(fname);
    doc_url=GOS::filename_to_url(fname);
    GP<DjVuDocument> tmp_doc=new DjVuDocument();
    tmp_doc->init(doc_url, this);
@@ -170,7 +170,7 @@ DjVuDocEditor::init(const char * fname)
       ByteStream &str=*gstr;
       tmp_doc->write(gstr, true);        // Force DJVM format
       str.flush();
-      doc_pool=new DataPool(tmp_doc_name);
+      doc_pool=DataPool::create(tmp_doc_name);
    }
 
       // OK. Now doc_pool contains data of the document in one of the
@@ -396,7 +396,7 @@ DjVuDocEditor::strip_incl_chunks(GP<DataPool> & pool_in)
    {
       ByteStream &bs=*gbs_out;
       bs.seek(0,SEEK_SET);
-      return new DataPool(bs);
+      return DataPool::create(bs);
    } else return pool_in;
 }
 
@@ -414,7 +414,7 @@ DjVuDocEditor::insert_file(const char * file_name, const char * parent_id,
    GP<DjVmDir> dir=get_djvm_dir();
 
       // Create DataPool and see if the file exists
-   GP<DataPool> file_pool=new DataPool(file_name);
+   GP<DataPool> file_pool=DataPool::create(file_name);
    if(file_pool && file_name && DjVuDocument::djvu_import_codec)
    {
      (*DjVuDocument::djvu_import_codec)(file_pool,(const char *)file_name,needs_compression_flag,can_compress_flag);
@@ -489,7 +489,7 @@ DjVuDocEditor::insert_file(const char * file_name, bool is_page,
    G_TRY {
       GP<DjVmDir> dir=get_djvm_dir();
 
-      GP<DataPool> file_pool=new DataPool(file_name);
+      GP<DataPool> file_pool=DataPool::create(file_name);
          // Create DataPool and see if the file exists
       if(file_pool && file_name && DjVuDocument::djvu_import_codec)
       {
@@ -619,7 +619,7 @@ DjVuDocEditor::insert_file(const char * file_name, bool is_page,
          // contents of the INCL chunks. So we need to update the DataPool...
       ByteStream &str_out=*gstr_out;
       str_out.seek(0);
-      GP<DataPool> new_file_pool=new DataPool(str_out);
+      GP<DataPool> new_file_pool=DataPool::create(str_out);
       {
             // It's important that we replace the pool here anyway.
             // By doing this we load the file into memory. And this is
@@ -671,7 +671,7 @@ DjVuDocEditor::insert_group(const GList<GString> & file_names, int page_num,
          GString fname=file_names[pos];
          G_TRY {
                // Check if it's a multipage document...
-            GP<DataPool> xdata_pool=new DataPool(fname);
+            GP<DataPool> xdata_pool=DataPool::create(fname);
             if(xdata_pool && (const char *)fname && ((const char *)fname)[0] && DjVuDocument::djvu_import_codec)
             {
               (*DjVuDocument::djvu_import_codec)(xdata_pool,(const char *)fname,needs_compression_flag,can_compress_flag);
@@ -1285,7 +1285,7 @@ DjVuDocEditor::create_shared_anno_file(void (* progress_cb)(float progress, void
    ByteStream &str=*gstr;
    str.flush();
    str.seek(0);
-   GP<DataPool> file_pool=new DataPool(str);
+   GP<DataPool> file_pool=DataPool::create(str);
 
       // Get a unique ID for the new file
    GString id=find_unique_id("shared_anno.iff");
@@ -1345,7 +1345,7 @@ DjVuDocEditor::get_thumbnail(int page_num, bool dont_decode)
    {
          // Get the image from the map
       TArray<char> & data=*(TArray<char> *) thumb_map[pos];
-      GP<DataPool> pool=new DataPool;
+      GP<DataPool> pool=DataPool::create();
       pool->add_data((const char *) data, data.size());
       pool->set_eof();
       return pool;
@@ -1512,7 +1512,7 @@ DjVuDocEditor::file_thumbnails(void)
             // the request for data and will provide this DataPool
          iff->close_chunk();
          mbs->seek(0);
-         GP<DataPool> file_pool=new DataPool(*mbs);
+         GP<DataPool> file_pool=DataPool::create(*mbs);
          GP<File> f=new File;
          f->pool=file_pool;
          GCriticalSectionLock lock(&files_lock);
@@ -1842,7 +1842,7 @@ DjVuDocEditor::save_as(const char * where, bool bundled)
         doc->write(gstr);
         ByteStream &str=*gstr;
         str.seek(0, SEEK_SET);
-        GP<DataPool> pool=new DataPool(str);
+        GP<DataPool> pool=DataPool::create(str);
         doc_pool=pool;
         init_data_pool=pool;
 
@@ -1887,7 +1887,7 @@ DjVuDocEditor::save_as(const char * where, bool bundled)
         iff.flush();
 
          // Update the document data pool (not required, but will save memory)
-        doc_pool=new DataPool(save_doc_name);
+        doc_pool=DataPool::create(save_doc_name);
         init_data_pool=doc_pool;
 
          // No reason to update DjVmDir as for this format it doesn't
@@ -1904,7 +1904,7 @@ DjVuDocEditor::save_as(const char * where, bool bundled)
         gstr->flush();
 
          // Update the document data pool (not required, but will save memory)
-        doc_pool=new DataPool(save_doc_name);
+        doc_pool=DataPool::create(save_doc_name);
         init_data_pool=doc_pool;
 
          // Also update DjVmDir (to reflect changes in offsets)

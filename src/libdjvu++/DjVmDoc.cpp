@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVmDoc.cpp,v 1.39 2001-02-17 00:07:35 bcr Exp $
+// $Id: DjVmDoc.cpp,v 1.40 2001-02-17 02:38:41 bcr Exp $
 // $Name:  $
 
 
@@ -71,7 +71,7 @@ DjVmDoc::insert_file(const GP<DjVmDir::File> & f,
    if (data_pool->get_data(buffer, 0, 4)==4 &&
        !memcmp(buffer, octets, 4))
    {
-      data_pool=new DataPool(data_pool, 4, -1);
+      data_pool=DataPool::create(data_pool, 4, -1);
    } 
    data[f->id]=data_pool;
    dir->insert_file(f, pos);
@@ -83,7 +83,7 @@ DjVmDoc::insert_file(ByteStream &data, DjVmDir::File::FILE_TYPE file_type,
                      const char *title, int pos)
 {
    GP<DjVmDir::File> file=new DjVmDir::File(name, id, title, file_type);
-   GP<DataPool> pool = new DataPool;
+   GP<DataPool> pool = DataPool::create();
       // Cannot connect to a bytestream.
       // Must copy data into the datapool.
    int nbytes;
@@ -233,7 +233,7 @@ DjVmDoc::read(const GP<DataPool> & pool)
       DjVmDir::File * f=files_list[pos];
       
       DEBUG_MSG("reading contents of file '" << f->id << "'\n");
-      data[f->id]=new DataPool(pool, f->offset, f->size);
+      data[f->id]=DataPool::create(pool, f->offset, f->size);
    }
 }
 
@@ -243,7 +243,7 @@ DjVmDoc::read(ByteStream & str_in)
    DEBUG_MSG("DjVmDoc::read(): reading the BUNDLED doc contents from the stream\n");
    DEBUG_MAKE_INDENT(3);
 
-   GP<DataPool> pool=new DataPool();
+   GP<DataPool> pool=DataPool::create();
    char buffer[1024];
    int length;
    while((length=str_in.read(buffer, 1024)))
@@ -259,7 +259,7 @@ DjVmDoc::read(const char * name)
    DEBUG_MSG("DjVmDoc::read(): reading the doc contents from the HDD\n");
    DEBUG_MAKE_INDENT(3);
 
-   GP<DataPool> pool=new DataPool(name);
+   GP<DataPool> pool=DataPool::create(name);
    GP<ByteStream> str=pool->get_stream();
    GP<IFFByteStream> giff=IFFByteStream::create(str);
    IFFByteStream &iff=*giff;
@@ -289,7 +289,7 @@ DjVmDoc::read(const char * name)
       
 	 DEBUG_MSG("reading contents of file '" << f->id << "'\n");
 
-	 data[f->id]=new DataPool(GOS::expand_name(f->name, dir_name));
+	 data[f->id]=DataPool::create(GOS::expand_name(f->name, dir_name));
       }
    }
 }
