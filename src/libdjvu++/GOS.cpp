@@ -9,9 +9,9 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GOS.cpp,v 1.17 1999-11-23 15:39:18 eaf Exp $
+//C- $Id: GOS.cpp,v 1.18 1999-11-23 22:52:28 praveen Exp $
 
-// "$Id: GOS.cpp,v 1.17 1999-11-23 15:39:18 eaf Exp $"
+// "$Id: GOS.cpp,v 1.18 1999-11-23 22:52:28 praveen Exp $"
 
 #ifdef __GNUC__
 #pragma implementation
@@ -76,6 +76,7 @@
 #define MAXPATHLEN 1024
 #endif
 #endif
+
 #if ( MAXPATHLEN < 1024 )
 #undef MAXPATHLEN
 #define MAXPATHLEN 1024
@@ -568,7 +569,9 @@ GOS::mkdir(const char * dirname)
 #if defined(sun) || defined(__osf__) || defined(hpux)
 #include <dirent.h>
 #else
+#ifndef WIN32
 #include <sys/dir.h>
+#endif
 #endif
 
 int
