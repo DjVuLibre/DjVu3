@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVmDoc.cpp,v 1.20 2000-01-14 16:15:26 eaf Exp $
+//C- $Id: DjVmDoc.cpp,v 1.21 2000-01-14 16:22:29 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -242,7 +242,7 @@ DjVmDoc::read(const char * name)
    else
    {
       GString full_name=GOS::expand_name(name);
-      GString dir_name=GOS::basename(full_name);
+      GString dir_name=GOS::dirname(full_name);
 
       data.empty();
 
