@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: parseoptions.cpp,v 1.23 2000-01-07 16:58:49 praveen Exp $
+//C- $Id: parseoptions.cpp,v 1.24 2000-01-07 17:13:48 eaf Exp $
 #ifdef __GNUC__
 #pragma implementation
 #endif
@@ -1270,45 +1270,6 @@ DjVuParseOptions::ConfigFilename
     strcat(filename,ConfigExt);
   }
   return retval;
-<<<<<<< parseoptions.cpp
-#else
-
-	char * root;
-	int rootlen;
-
-	const char *retval=0;
-	const char *this_config=config[0]?config:default_string;
-
-	if ( filename ) {
-  	delete [] filename;
-  	filename=0;
-	}
-
-    if (level == 0 ) 
-		root = (char *) RegOpenReadConfig (HKEY_CURRENT_USER);
-	else
-		root = (char *) RegOpenReadConfig (HKEY_LOCAL_MACHINE);
-	if (root[0]) {
-		rootlen = strlen(root);
-		retval=filename=new char [rootlen+strlen(this_config)+sizeof(ConfigExt)+1];
-		strcpy(filename,root);
-		strcat(filename, "\\");
-		strcat(filename,this_config);
-		strcat(filename,ConfigExt);
-		return retval;        
-	} else {
-        const char emsg[]="SDK not installed properly, please install it again.\n";
-        char *s=new char [sizeof(emsg)];
-        sprintf(s,emsg);
-        Errors->AddError(s);
-        delete [] s;
-		char tempfilename[] = "/windows/djvu";
-		filename = new char[sizeof(tempfilename)];
-		strcpy ( filename, tempfilename);
-		return (retval = filename);
-	}
-#endif
-=======
 #else
 
 	char * root;
@@ -1353,7 +1314,6 @@ DjVuParseOptions::ConfigFilename
 		return (retval = filename);
 	}
 #endif
->>>>>>> 1.20
 }
 
 static int
