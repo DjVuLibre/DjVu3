@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GBitmap.cpp,v 1.46 2001-01-10 20:56:03 bcr Exp $
+// $Id: GBitmap.cpp,v 1.47 2001-01-10 21:09:07 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -45,7 +45,7 @@
 #include "GException.h"
 #include <string.h>
 
-// File "$Id: GBitmap.cpp,v 1.46 2001-01-10 20:56:03 bcr Exp $"
+// File "$Id: GBitmap.cpp,v 1.47 2001-01-10 21:09:07 bcr Exp $"
 // - Author: Leon Bottou, 05/1997
 
 
@@ -1277,7 +1277,7 @@ GBitmap::ZeroBuffer::ZeroBuffer(const unsigned int zerosize)
   GBitmap::zerosize=zerosize;
 }
 
-static unsigned char static_zerobuffer[]=
+static const unsigned char static_zerobuffer[]=
 {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, // 32
  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, // 64
  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, // 96 
@@ -1408,7 +1408,7 @@ static unsigned char static_zerobuffer[]=
  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}; // 4096
 
 int GBitmap::zerosize = sizeof(static_zerobuffer);
-unsigned char *GBitmap::zerobuffer = static_zerobuffer;
+unsigned char *GBitmap::zerobuffer=const_cast<unsigned char *>(static_zerobuffer);
 
 GP<GBitmap::ZeroBuffer>
 GBitmap::zeroes(int required)
