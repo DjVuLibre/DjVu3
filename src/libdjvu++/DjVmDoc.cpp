@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVmDoc.cpp,v 1.19 2000-01-14 15:18:09 bcr Exp $
+//C- $Id: DjVmDoc.cpp,v 1.20 2000-01-14 16:15:26 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -230,7 +230,7 @@ DjVmDoc::read(const char * name)
    GString chkid;
    iff.get_chunk(chkid);
    if (chkid!="FORM:DJVM")
-      THROW("Can't find form DJVM in the input stream.");
+      THROW("Can't find form DJVM. The document is not in new multipage format.");
 
    iff.get_chunk(chkid);
    if (chkid!="DIRM")
