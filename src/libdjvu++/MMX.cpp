@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: MMX.cpp,v 1.4 1999-11-09 23:14:37 praveen Exp $
+//C- $Id: MMX.cpp,v 1.5 1999-11-10 01:18:28 praveen Exp $
 
 
 
@@ -20,7 +20,7 @@
 
 #if defined(_MSC_VER) && defined(_M_IX86)
 // Unfathomable bug in MSVC6 requires this
-#pragma optimize("agy",off)
+//#pragma optimize("agy",off)
 #endif
 
 
@@ -133,6 +133,7 @@ MMXControl::enable_mmx()
            _emit   0xa2
          fini:
            mov     cpuflags,edx 
+           xor     ebx,ebx
          }
 #endif
   mmxflag = !!(cpuflags & 0x800000);
