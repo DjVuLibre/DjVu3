@@ -307,8 +307,8 @@ main(int argc,char *argv[],char *[])
         fprintf(stderr,"%s is an unrecognized format\n",oldindex);
         usage(prog,1);
       }
-      doc=0;
-      GList<GString> filenames=doc->get_files_list();
+      GList<GString> filenames=doc->get_file_names();
+      doc=0; // Deallocate the document now.
       TempDir save(oldindex,TempDir::RENAME_ALL);
       for (GPosition i = filenames; i; ++i)
       {

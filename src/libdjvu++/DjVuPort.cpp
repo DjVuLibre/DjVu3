@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuPort.cpp,v 1.25 1999-11-20 07:55:32 bcr Exp $
+//C- $Id: DjVuPort.cpp,v 1.26 1999-11-20 22:45:08 bcr Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -169,6 +169,8 @@ DjVuPortcaster::prefix_to_ports(const char * prefix)
 void
 DjVuPortcaster::del_port(const DjVuPort * port)
 {
+   clear_aliases(port);
+
    GCriticalSectionLock lock(&map_lock);
 
    GPosition pos;
@@ -184,22 +186,17 @@ DjVuPortcaster::del_port(const DjVuPort * port)
    }
    for(pos=route_map;pos;)
    {
-//bcr: Mapping GMap to GList at the binary level.  This is CRAZY.
+//bcr: As near as I can tell this is just creating a reference, but
+//bcr: it is deficult to be certain since all the operators are overloaded.
 
       GList<void *> & list=*(GList<void *> *) route_map[pos];
       GPosition list_pos;
       if (list.search((void *) port, list_pos)) list.del(list_pos);
       if (!list.size())
       {
-
-//bcr: This is probably were the error really occures.  But this
-//bcr: is so cryptic, since all the operators are overloaded both
-//bcr: here and on the declaration line above.  The value is being
-//bcr: deleted, while the list itself still exists.  So later when
-//bcr: we try to access it, BOOM!  
+//bcr: This can't be legal.  We are deleting route_map[pos], and then we are
+//bcr: calling route_map.del(pos);
 	 delete &list;
-//bcr: Assuming that is the problem, something like:	&list=0;
-//bcr: will fix the problem.
 	 GPosition tmp_pos=pos;
 	 ++pos;
 	 route_map.del(tmp_pos);

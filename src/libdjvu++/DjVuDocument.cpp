@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.70 1999-11-20 07:11:24 bcr Exp $
+//C- $Id: DjVuDocument.cpp,v 1.71 1999-11-20 22:45:07 bcr Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -37,7 +37,7 @@ get_int_prefix(void * ptr)
 }
 
 DjVuDocument::DjVuDocument(void)
-  : doc_type(UNKNOWN_TYPE), has_filelist(0), init_called(false), cache(0) 
+  : doc_type(UNKNOWN_TYPE), has_file_names(false), init_called(false), cache(0) 
 {
 }
 
@@ -91,16 +91,16 @@ DjVuDocument::~DjVuDocument(void)
    }
 
 //bcr: This just seems to create a nice segmentation fault.
-//bcr   GPList<DjVuPort> ports=get_portcaster()->prefix_to_ports(get_int_prefix(this));
-//bcr   for(GPosition pos=ports;pos;++pos)
-//bcr   {
-//bcr      GP<DjVuPort> port=ports[pos];
-//bcr      if (port->inherits("DjVuFile"))
-//bcr      {
-//bcr	 DjVuFile * file=(DjVuFile *) (DjVuPort *) port;
-//bcr	 file->stop(false);	// Disable any access to data
-//bcr  }
-//bcr  }
+   GPList<DjVuPort> ports=get_portcaster()->prefix_to_ports(get_int_prefix(this));
+   for(GPosition pos=ports;pos;++pos)
+   {
+      GP<DjVuPort> port=ports[pos];
+      if (port->inherits("DjVuFile"))
+      {
+	 DjVuFile * file=(DjVuFile *) (DjVuPort *) port;
+	 file->stop(false);	// Disable any access to data
+      }
+   }
 }
 
 void
@@ -294,7 +294,7 @@ DjVuDocument::init_thread(void)
             }
             CATCH(ex)
             {
-              // ignore the error
+		// We will ignore this error for now.
             }
             ENDCATCH;
           }
@@ -954,13 +954,13 @@ DjVuDocument::get_thumbnail(int page_num, bool dont_decode)
    if (get_doc_type()==INDIRECT || get_doc_type()==BUNDLED)
    {
 	 // Predecoded thumbnails exist for new formats only
-      GPList<DjVmDir::File> xfiles_list=djvm_dir->get_files_list();
+      GPList<DjVmDir::File> files_list=djvm_dir->get_files_list();
       GP<DjVmDir::File> thumb_file;
       int thumb_start=0;
       int page_cnt=-1;
-      for(GPosition pos=xfiles_list;pos;++pos)
+      for(GPosition pos=files_list;pos;++pos)
       {
-	 GP<DjVmDir::File> f=xfiles_list[pos];
+	 GP<DjVmDir::File> f=files_list[pos];
 	 if (f->is_thumbnails())
 	 {
 	    thumb_file=f;
@@ -1067,14 +1067,6 @@ DjVuDocument::request_data(const DjVuPort * source, const GURL & url)
 {
    DEBUG_MSG("DjVuDocument::request_data(): seeing if we can do it\n");
    DEBUG_MAKE_INDENT(3);
-
-//   if (filelist && url.is_local_file_url())
-//   {
-//     GString fname=GOS::url_to_filename(url);
-//     if (GOS::basename(fname)=="-") fname="-";
-//     (*filelist)[url]=fname;
-//   }
-
 
    if (url==init_url) return init_data_pool;
 
@@ -1235,11 +1227,11 @@ add_file_to_djvm(const GP<DjVuFile> & file, bool page,
 	    // Yes. We're lazy. We don't check if those files contain
 	    // anything else.
 	 GPosition pos;
-	 GPList<DjVuFile> xfiles_list=file->get_included_files(false);
+	 GPList<DjVuFile> files_list=file->get_included_files(false);
 	 GP<DataPool> data=file->get_djvu_data(false, true);
-	 for(pos=xfiles_list;pos;++pos)
+	 for(pos=files_list;pos;++pos)
 	 {
-	    GP<DjVuFile> f=xfiles_list[pos];
+	    GP<DjVuFile> f=files_list[pos];
 	    if (f->contains_chunk("NDIR"))
 	       data=unlink_file(data, f->get_url().name());
 	 }
@@ -1252,49 +1244,53 @@ add_file_to_djvm(const GP<DjVuFile> & file, bool page,
 	 doc.insert_file(file_rec, data, -1);
 
 	    // And repeat for all included files
-	 for(pos=xfiles_list;pos;++pos)
-	    add_file_to_djvm(xfiles_list[pos], false, doc, map);
+	 for(pos=files_list;pos;++pos)
+	    add_file_to_djvm(files_list[pos], false, doc, map);
       }
    }
 }
 
 static void
-local_get_files_list(DjVuFile * f,const GMap<GURL, void *> & map,GMap<GURL,void *> &tmpmap)
+local_get_file_names
+(DjVuFile * f,const GMap<GURL, void *> & map,GMap<GURL,void *> &tmpmap)
 {
    GURL url=f->get_url();
    if (!map.contains(url) && !tmpmap.contains(url))
    {
       tmpmap[url]=0;
       f->process_incl_chunks();
-      GPList<DjVuFile> xfiles_list=f->get_included_files(false);
-      for(GPosition pos=xfiles_list;pos;++pos)
-         local_get_files_list(xfiles_list[pos], map, tmpmap);
+      GPList<DjVuFile> files_list=f->get_included_files(false);
+      for(GPosition pos=files_list;pos;++pos)
+         local_get_file_names(files_list[pos], map, tmpmap);
    }
 }
 
 static void
-local_get_files_list(DjVuFile * f, GMap<GURL, void *> & map)
+local_get_file_names
+(DjVuFile * f, GMap<GURL, void *> & map)
 {
    GMap<GURL,void *> tmpmap;
-   local_get_files_list(f,map,tmpmap);
+   local_get_file_names(f,map,tmpmap);
    for(GPosition pos=tmpmap;pos;++pos)
      map[tmpmap.key(pos)]=0;
 }
 
 GList<GString>
-DjVuDocument::get_files_list(void) 
+DjVuDocument::get_file_names(void) 
 {
-  if(has_filelist) return files_list;
-
   check();
+
+  GCriticalSectionLock lock(&file_names_lock);
+  if(has_file_names) return file_names;
+
   GMap<GURL, void *> map;
   int i;
   if (doc_type==BUNDLED || doc_type==INDIRECT || doc_type==SINGLE_PAGE)
   {
-    GPList<DjVmDir::File> xfiles_list=djvm_dir->get_files_list();
-    for(GPosition pos=xfiles_list;pos;++pos)
+    GPList<DjVmDir::File> files_list=djvm_dir->get_files_list();
+    for(GPosition pos=files_list;pos;++pos)
     {
-      GURL url=id_to_url(xfiles_list[pos]->id);
+      GURL url=id_to_url(files_list[pos]->id);
       map[url]=0;
     }
   }else
@@ -1304,11 +1300,22 @@ DjVuDocument::get_files_list(void)
     {
       TRY
       {
-        local_get_files_list(get_djvu_file(i), map);
+        local_get_file_names(get_djvu_file(i), map);
       }
       CATCH(ex)
       {
-        //bcr: ignore the error for now.
+        TRY { 
+          get_portcaster()->notify_error(this, ex.get_cause()); 
+          static const char emsg[]="Excluding page %d form the file list due to errors.\n";
+          char buf[sizeof(emsg)+20];
+          sprintf(buf,emsg,i+1);
+          get_portcaster()->notify_error(this,buf); 
+        }
+        CATCH(exc)
+        {
+          RETHROW;
+        }
+        ENDCATCH;
       }
       ENDCATCH;
     }
@@ -1317,13 +1324,12 @@ DjVuDocument::get_files_list(void)
   {
     if (map.key(j).is_local_file_url())
     {
-      files_list.append(GOS::url_to_filename(map.key(j)));
+      file_names.append(GOS::url_to_filename(map.key(j)));
     }
   }
-  has_filelist=1;
-  return files_list;
+  has_file_names=true;
+  return file_names;
 }
-
 
 GP<DjVmDoc>
 DjVuDocument::get_djvm_doc(const bool SkipErrors)
@@ -1341,10 +1347,10 @@ DjVuDocument::get_djvm_doc(const bool SkipErrors)
    {
       DEBUG_MSG("Trivial: the document is either INDIRECT or BUNDLED: follow DjVmDir.\n");
 
-      GPList<DjVmDir::File> xfiles_list=djvm_dir->get_files_list();
-      for(GPosition pos=xfiles_list;pos;++pos)
+      GPList<DjVmDir::File> files_list=djvm_dir->get_files_list();
+      for(GPosition pos=files_list;pos;++pos)
       {
-	 GP<DjVmDir::File> f=new DjVmDir::File(*xfiles_list[pos]);
+	 GP<DjVmDir::File> f=new DjVmDir::File(*files_list[pos]);
 	 GP<DjVuFile> file=url_to_file(id_to_url(f->id));
 	 GP<DataPool> data;
 	 if (file->is_modified()) data=file->get_djvu_data(false, true);
@@ -1360,24 +1366,35 @@ DjVuDocument::get_djvm_doc(const bool SkipErrors)
       {
         for(int page_num=0;page_num<ndir->get_pages_num();page_num++)
         {
-  	   GP<DjVuFile> file=url_to_file(ndir->page_to_url(page_num));
-	   add_file_to_djvm(file, true, *doc, map_add);
+          GP<DjVuFile> file=url_to_file(ndir->page_to_url(page_num));
+          add_file_to_djvm(file, true, *doc, map_add);
         }
       }else
       {
         for(int page_num=0;page_num<ndir->get_pages_num();page_num++)
         {
-           TRY
-           {
-  	       GP<DjVuFile> file=url_to_file(ndir->page_to_url(page_num));
-	       add_file_to_djvm(file, true, *doc, map_add);
-           }
-           CATCH(ex)
-           {
-             ex.perror();
-             fprintf(stderr,"Skiping page %d\n",page_num);
-           }
-           ENDCATCH;
+          TRY
+          {
+            GP<DjVuFile> file=url_to_file(ndir->page_to_url(page_num));
+            add_file_to_djvm(file, true, *doc, map_add);
+          }
+          CATCH(ex)
+          {
+            if(!SkipErrors) RETHROW;
+            TRY { 
+              get_portcaster()->notify_error(this, ex.get_cause()); 
+              static const char emsg[]="Skipping page %d due to errors.\n";
+              char buf[sizeof(emsg)+20];
+              sprintf(buf,emsg,page_num+1);
+              get_portcaster()->notify_error(this,buf); 
+            }
+            CATCH(exc)
+            {
+              RETHROW;
+            }
+            ENDCATCH;
+          }
+          ENDCATCH;
         }
       }
    }
@@ -1395,8 +1412,8 @@ DjVuDocument::write(ByteStream & str, bool force_djvm)
    if (force_djvm || dir->get_files_num()>1) doc->write(str);
    else
    {
-      GPList<DjVmDir::File> xfiles_list=dir->get_files_list();
-      GP<DataPool> pool=doc->get_data(xfiles_list[xfiles_list]->id);
+      GPList<DjVmDir::File> files_list=dir->get_files_list();
+      GP<DataPool> pool=doc->get_data(files_list[files_list]->id);
       GP<ByteStream> pool_str=pool->get_stream();
       str.copy(*pool_str);
    }
