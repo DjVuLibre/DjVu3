@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GThreads.h,v 1.23 1999-09-12 18:55:27 eaf Exp $
+//C- $Id: GThreads.h,v 1.24 1999-09-19 19:26:17 eaf Exp $
 
 #ifndef _GTHREADS_H_
 #define _GTHREADS_H_
@@ -73,7 +73,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Praveen Guduru <praveen@sanskrit.lz.att.com> -- mac implementation.
     @version
-    #$Id: GThreads.h,v 1.23 1999-09-12 18:55:27 eaf Exp $# */
+    #$Id: GThreads.h,v 1.24 1999-09-19 19:26:17 eaf Exp $# */
 //@{
 
 #include "DjVuGlobal.h"
@@ -438,6 +438,12 @@ public:
    GSafeFlags & operator=(const GSafeFlags & f);
       /** Returns the value of the flags */
    operator long(void) const;
+      /** Modifies the flags by ORing them with the provided mask. A broadcast
+	  will be sent after the modification is done. */
+   GSafeFlags &	operator|=(long mask);
+      /** Modifies the flags by ANDing them with the provided mask. A broadcast
+	  will be sent after the modification is done. */
+   GSafeFlags &	operator&=(long mask);
 
       /** If all bits mentioned in #set_mask# are set in the flags and all
 	  bits mentioned in #clr_mask# are cleared in the flags, it sets all
@@ -477,6 +483,20 @@ inline void
 GSafeFlags::modify(long set_mask, long clr_mask)
 {
    test_and_modify(0, 0, set_mask, clr_mask);
+}
+
+inline GSafeFlags &
+GSafeFlags::operator|=(long mask)
+{
+   test_and_modify(0, 0, mask, 0);
+   return *this;
+}
+
+inline GSafeFlags &
+GSafeFlags::operator&=(long mask)
+{
+   test_and_modify(0, 0, 0, ~mask);
+   return *this;
 }
 
 //@}
