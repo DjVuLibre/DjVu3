@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.87 1999-11-17 18:36:23 eaf Exp $
+//C- $Id: DjVuFile.cpp,v 1.88 1999-11-19 18:38:51 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -599,7 +599,13 @@ GString
 DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bool iw44)
 {
   check();
-   
+
+     // If this object is referenced by only one GP<> pointer, this
+     // pointer should be the "life_saver" created by the decoding thread.
+     // If it is the only GP<> pointer, then nobody is interested in the
+     // results of the decoding and we can abort now with "STOP"
+  if (get_count()==1) THROW("STOP");
+  
   GString desc = "Unrecognized chunk";
   GString chkid = id;
   DEBUG_MSG("DjVuFile::decode_chunk() : decoding " << id << "\n");
