@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djvmcvt.cpp,v 1.13 2001-04-06 18:38:31 chrisp Exp $
+// $Id: djvmcvt.cpp,v 1.14 2001-04-17 16:41:07 bcr Exp $
 // $Name:  $
 
 /** @name djvmcvt
@@ -106,7 +106,7 @@
     @author
     Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: djvmcvt.cpp,v 1.13 2001-04-06 18:38:31 chrisp Exp $# */
+    #$Id: djvmcvt.cpp,v 1.14 2001-04-17 16:41:07 bcr Exp $# */
 
 #ifdef __GNUC__
 #pragma implementation
@@ -198,4 +198,7 @@ main(int argc, char ** argv)
    } G_ENDCATCH;
 
    exit(0);
+#ifdef WIN32
+   return 0;
+#endif
 }

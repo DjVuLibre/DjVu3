@@ -31,7 +31,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessage.h,v 1.15 2001-04-12 00:24:59 bcr Exp $
+// $Id: DjVuMessage.h,v 1.16 2001-04-17 16:41:07 bcr Exp $
 // $Name:  $
 */
 
@@ -152,18 +152,5 @@ private:
 #define DjVuMsg DjVuMessage::create()
 
 #endif /* __cplusplus */
-
-
-/*
-//  A C function to perform a message lookup. Arguments are a buffer to received the
-//  translated message, a buffer size (bytes), and a message_list. The translated
-//  result is returned in msg_buffer encoded in UTF-8. In case of error, msg_buffer is
-//  empty (i.e., msg_buffer[0] == '\0').
-*/
-#ifdef __cplusplus
-extern "C" 
-#endif
-  void DjVuMessage_LookUp( char *msg_buffer, const unsigned int buffer_size, const char *message ); 
-
 
 #endif /* __DJVU_MESSAGE_H__ */
