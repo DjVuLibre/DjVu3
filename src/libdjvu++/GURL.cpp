@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: GURL.cpp,v 1.38 2000-09-29 21:48:41 bcr Exp $
+//C- $Id: GURL.cpp,v 1.39 2000-10-03 00:12:53 mrosen Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -41,10 +41,10 @@ GURL::convert_slashes(void)
 {
 #ifndef UNIX
    GCriticalSectionLock lock(&class_lock);
-   for(char *ptr=url.getbuf()+protocol().length());*ptr;ptr++)
+   for(char *ptr=(url.getbuf()+protocol().length());*ptr;ptr++)
    {
      if(*ptr == '\\')
-       ptr='/';
+       *ptr='/';
    }
 #endif
 }
