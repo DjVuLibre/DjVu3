@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: ppmcoco.cpp,v 1.4 1999-03-01 17:02:45 leonb Exp $
+//C-  $Id: ppmcoco.cpp,v 1.5 1999-03-01 17:12:11 leonb Exp $
 
 
 
@@ -82,7 +82,7 @@
     @author
     Leon Bottou <leonb@research.att.com>
     @version
-    #$Id: ppmcoco.cpp,v 1.4 1999-03-01 17:02:45 leonb Exp $# */
+    #$Id: ppmcoco.cpp,v 1.5 1999-03-01 17:12:11 leonb Exp $# */
 //@{
 //@}
 
@@ -99,8 +99,6 @@
 
 double fromGamma = 2.2;
 double toGamma = 2.2;
-GString infile("-");
-GString outfile("-");
 
 int 
 usage(void)
@@ -128,6 +126,8 @@ str_to_gamma(const char *str)
 int 
 main (int argc, char **argv)
 {
+  GString infile("-");
+  GString outfile("-");
   TRY
     {
       // parse
