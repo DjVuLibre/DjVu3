@@ -232,7 +232,6 @@ main(int argc,char *argv[],char *[])
       ignore_error=1;
       argc--;
       argv++;
-      break;
     }else if(!strcmp(argv[1],"--"))
     {
       argc--;
@@ -280,10 +279,9 @@ main(int argc,char *argv[],char *[])
   }
   TRY {
     GString file_name=oldindex;
-    GMap<GURL,GString>filenames;
     GP<DjVuDocument> doc=new DjVuDocument;
-    doc->init(GOS::filename_to_url(file_name),0,0,&filenames);
-//    int pages=doc->get_pages_num();
+    doc->init(GOS::filename_to_url(file_name));
+
     if((doc->get_doc_type()==DjVuDocument::BUNDLED)||(doc->get_doc_type()==DjVuDocument::INDIRECT))
     {
       fputs("This document is already in the new format.\n",stderr);
@@ -310,6 +308,7 @@ main(int argc,char *argv[],char *[])
         usage(prog,1);
       }
       doc=0;
+      GList<GString> filenames=doc->get_files_list();
       TempDir save(oldindex,TempDir::RENAME_ALL);
       for (GPosition i = filenames; i; ++i)
       {

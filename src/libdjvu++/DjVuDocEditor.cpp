@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocEditor.cpp,v 1.4 1999-11-19 17:31:28 eaf Exp $
+//C- $Id: DjVuDocEditor.cpp,v 1.5 1999-11-20 07:11:24 bcr Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -375,10 +375,10 @@ DjVuDocEditor::generate_thumbnails(int thumb_size, int images_per_file,
    GP<DjVmDir> djvm_dir=get_djvm_dir();
    
    DEBUG_MSG("removing any existing thumbnails\n");
-   GPList<DjVmDir::File> files_list=djvm_dir->get_files_list();
-   for(GPosition pos=files_list;pos;++pos)
+   GPList<DjVmDir::File> xfiles_list=djvm_dir->get_files_list();
+   for(GPosition pos=xfiles_list;pos;++pos)
    {
-      GP<DjVmDir::File> f=files_list[pos];
+      GP<DjVmDir::File> f=xfiles_list[pos];
       if (f->is_thumbnails()) djvm_dir->delete_file(f->id);
    }
 
@@ -600,10 +600,10 @@ DjVuDocEditor::save_as(const char * where, bool bundled)
 
 	 // Save the top-level index file
       GP<DjVmDir> dir=get_djvm_dir();
-      GPList<DjVmDir::File> files_list=dir->get_files_list();
-      for(GPosition pos=files_list;pos;++pos)
+      GPList<DjVmDir::File> xfiles_list=dir->get_files_list();
+      for(GPosition pos=xfiles_list;pos;++pos)
       {
-	 GP<DjVmDir::File> file=files_list[pos];
+	 GP<DjVmDir::File> file=xfiles_list[pos];
 	 file->offset=0;
 	 file->size=0;
       }

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.h,v 1.43 1999-11-19 23:44:17 bcr Exp $
+//C- $Id: DjVuDocument.h,v 1.44 1999-11-20 07:11:24 bcr Exp $
  
 #ifndef _DJVUDOCUMENT_H
 #define _DJVUDOCUMENT_H
@@ -33,7 +33,7 @@
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@research.att.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocument.h,v 1.43 1999-11-19 23:44:17 bcr Exp $#
+    @version #$Id: DjVuDocument.h,v 1.44 1999-11-20 07:11:24 bcr Exp $#
 */
 
 //@{
@@ -618,6 +618,10 @@ protected:
    int			doc_type;
    
    virtual GP<DjVuFile>	url_to_file(const GURL & url, bool dont_create=false);
+
+   int 			has_filelist;
+   GList<GString>	files_list;
+
 private:
    class UnnamedFile : public GPEnabled
    {
@@ -752,6 +756,8 @@ DjVuDocument::get_cache(void) const
 inline GP<DjVmDir>
 DjVuDocument::get_djvm_dir(void) const
 {
+   if (doc_type==SINGLE_PAGE)
+      THROW("Single page documents don't have a DjVm directory.");
    if (doc_type!=BUNDLED && doc_type!=INDIRECT)
       THROW("The document is in obsolete format => no DjVm directory.");
    return djvm_dir;
