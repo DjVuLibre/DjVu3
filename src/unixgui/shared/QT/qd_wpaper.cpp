@@ -4,7 +4,7 @@
 //C-              Unauthorized use prohibited.
 //C-
 // 
-// $Id: qd_wpaper.cpp,v 1.1 2001-05-29 22:05:31 bcr Exp $
+// $Id: qd_wpaper.cpp,v 1.2 2001-06-06 17:16:57 mchen Exp $
 // $Name:  $
 
 
@@ -33,7 +33,7 @@ void QDWPaper::paintEvent(QPaintEvent * ev)
       p.end();
    } catch(const GException & exc)
    {
-      showError(this, "DjVu Error", exc);
+      showError(this, tr("DjVu Error"), exc);
    }
 }
 

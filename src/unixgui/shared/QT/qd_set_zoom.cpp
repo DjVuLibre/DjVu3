@@ -4,7 +4,7 @@
 //C-              Unauthorized use prohibited.
 //C-
 // 
-// $Id: qd_set_zoom.cpp,v 1.1 2001-05-29 22:05:31 bcr Exp $
+// $Id: qd_set_zoom.cpp,v 1.2 2001-06-06 17:16:57 mchen Exp $
 // $Name:  $
 
 
@@ -76,7 +76,7 @@ const
 QDSetZoom::QDSetZoom(int zoom, QWidget * parent, const char * name) :
       QeDialog(parent, name, TRUE)
 {
-   setCaption("DjVu: Set Zoom");
+   setCaption(tr("DjVu: Set Zoom"));
 
    QWidget * start=startWidget();
 
@@ -84,7 +84,7 @@ QDSetZoom::QDSetZoom(int zoom, QWidget * parent, const char * name) :
    QVBoxLayout * vlay=new QVBoxLayout(start, 10, 10);
    QHBoxLayout * hlay=new QHBoxLayout(10);
    vlay->addLayout(hlay);
-   QeLabel * label=new QeLabel("Custom zoom", start, "zoom_label");
+   QeLabel * label=new QeLabel(tr("Custom zoom"), start, "zoom_label");
    hlay->addWidget(label);
    spin=new QeSpinBox(5, IDC_ZOOM_MAX-IDC_ZOOM_MIN, 10, start, "goto_menu");
    spin->setValidator(new QDSetZoomVal(spin));
@@ -97,10 +97,10 @@ QDSetZoom::QDSetZoom(int zoom, QWidget * parent, const char * name) :
    hlay=new QHBoxLayout(10);
    vlay->addLayout(hlay);
    hlay->addStretch(1);
-   QePushButton * ok_butt=new QePushButton("&OK", start, "ok_butt");
+   QePushButton * ok_butt=new QePushButton(tr("&OK"), start, "ok_butt");
    ok_butt->setDefault(TRUE);
    hlay->addWidget(ok_butt);
-   QePushButton * cancel_butt=new QePushButton("&Cancel", start, "cancel_butt");
+   QePushButton * cancel_butt=new QePushButton(tr("&Cancel"), start, "cancel_butt");
    hlay->addWidget(cancel_butt);
 
       // Connect signals

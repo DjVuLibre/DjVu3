@@ -4,7 +4,7 @@
 //C-              Unauthorized use prohibited.
 //C-
 // 
-// $Id: djvu_viewer.cpp,v 1.1 2001-05-30 17:29:32 mchen Exp $
+// $Id: djvu_viewer.cpp,v 1.2 2001-06-06 17:16:57 mchen Exp $
 // $Name:  $
 
 
@@ -146,7 +146,7 @@ DjVuViewer::slotShowError(const GUTF8String &title, const GUTF8String &msg)
 {
    if (!GException::cmp_cause(msg, ByteStream::EndOfFile))
    {
-      static const QString mesg("Unexpected end of file encountered");
+      static const QString mesg=tr("Unexpected end of file encountered");
       emit sigShowStatus(mesg);
    }else if (GException::cmp_cause(msg, DataPool::Stop))
    {

@@ -4,7 +4,7 @@
 //C-              Unauthorized use prohibited.
 //C-
 // 
-// $Id: qd_prefs.cpp,v 1.1 2001-05-29 22:05:31 bcr Exp $
+// $Id: qd_prefs.cpp,v 1.2 2001-06-06 17:16:57 mchen Exp $
 // $Name:  $
 
 
@@ -276,10 +276,10 @@ QDGammaPrefs::QDGammaPrefs(DjVuPrefs * prefs, QWidget * parent, const char * nam
 //******************************* QDLensPrefs *******************************
 //***************************************************************************
 
-static const char * ctrl_hkey="Control key";
-static const char * shift_hkey="Shift key";
-static const char * alt_hkey="Alt key";
-static const char * mid_hkey="Middle mouse button";
+static const QString ctrl_hkey=QT_TRANSLATE_NOOP("QDLensPrefs","Control key");
+static const QString shift_hkey=QT_TRANSLATE_NOOP("QDLensPrefs","Shift key");
+static const QString alt_hkey=QT_TRANSLATE_NOOP("QDLensPrefs","Alt key");
+static const QString mid_hkey=QT_TRANSLATE_NOOP("QDLensPrefs","Middle mouse button");
 
 int
 QDLensPrefs::size(void) const
@@ -300,14 +300,14 @@ QDLensPrefs::hotKey(void) const
 {
    DjVuPrefs::MagButtType key=DjVuPrefs::MAG_CTRL;
 
-   GUTF8String text=GStringFromQString(hkey_menu->currentText());
-   if (!strcmp(text, ctrl_hkey))
+   QString text=hkey_menu->currentText();
+   if (text==ctrl_hkey)
       key=DjVuPrefs::MAG_CTRL;
-   else if (!strcmp(text, shift_hkey))
+   else if (text==shift_hkey)
       key=DjVuPrefs::MAG_SHIFT;
-   else if (!strcmp(text, alt_hkey))
+   else if (text==alt_hkey)
       key=DjVuPrefs::MAG_ALT;
-   else if (!strcmp(text, mid_hkey))
+   else if (text==mid_hkey)
       key=DjVuPrefs::MAG_MID;
    
    return key;
@@ -323,7 +323,7 @@ void
 QDLensPrefs::slotHlHotKeyChanged(DjVuPrefs::HLButtType key)
 {
       // Make sure that we don't have the same button selected
-   GUTF8String cur_text=GStringFromQString(hkey_menu->currentText());
+   QString cur_text=hkey_menu->currentText();
    
    if (key==DjVuPrefs::HLB_CTRL && cur_text==ctrl_hkey ||
        key==DjVuPrefs::HLB_SHIFT && cur_text==shift_hkey ||
@@ -351,8 +351,8 @@ QDLensPrefs::QDLensPrefs(DjVuPrefs * prefs, QWidget * parent, const char * name)
    {
       int size=DjVuPrefs::legal_mag_size[i];
       {
-        GUTF8String mesg=GUTF8String(size)+" pixels";
-        size_menu->insertItem(QStringFromGString(mesg));
+        QString mesg=QString::number(size)+tr(" pixels");
+        size_menu->insertItem(mesg);
       }
       if (size==prefs->magnifierSize)
 	 size_menu->setCurrentItem(i);
@@ -385,11 +385,11 @@ QDLensPrefs::QDLensPrefs(DjVuPrefs * prefs, QWidget * parent, const char * name)
    hlay->addStretch(1);
 
    hkey_menu=new QeComboBox(FALSE, this, "hkey_menu");
-   hkey_menu->insertItem(ctrl_hkey);
-   hkey_menu->insertItem(shift_hkey);
-   hkey_menu->insertItem(alt_hkey);
-   hkey_menu->insertItem(mid_hkey);
-   GUTF8String cur_hkey=ctrl_hkey;
+   hkey_menu->insertItem(tr(ctrl_hkey));
+   hkey_menu->insertItem(tr(shift_hkey));
+   hkey_menu->insertItem(tr(alt_hkey));
+   hkey_menu->insertItem(tr(mid_hkey));
+   QString cur_hkey=ctrl_hkey;
    if (prefs->magnifierHotKey==DjVuPrefs::MAG_CTRL)
       cur_hkey=ctrl_hkey;
    else if (prefs->magnifierHotKey==DjVuPrefs::MAG_SHIFT)
@@ -398,7 +398,7 @@ QDLensPrefs::QDLensPrefs(DjVuPrefs * prefs, QWidget * parent, const char * name)
       cur_hkey=alt_hkey;
    else if (prefs->magnifierHotKey==DjVuPrefs::MAG_MID)
       cur_hkey=mid_hkey;
-   hkey_menu->setCurrentItem(QStringFromGString(cur_hkey));
+   hkey_menu->setCurrentItem(cur_hkey);
    hlay->addWidget(hkey_menu);
 
    vlay->activate();

@@ -4,7 +4,7 @@
 //C-              Unauthorized use prohibited.
 //C-
 // 
-// $Id: qd_welcome.cpp,v 1.1 2001-05-29 22:05:31 bcr Exp $
+// $Id: qd_welcome.cpp,v 1.2 2001-06-06 17:16:57 mchen Exp $
 // $Name:  $
 
 
@@ -42,7 +42,7 @@ QDWelcome::QDWelcome(QWidget * parent, const char * name, bool modal) :
    DEBUG_MSG("QDWelcome::QDWelcome(): Creating Welcome dialog...\n");
    DEBUG_MAKE_INDENT(3);
 
-   setCaption("Welcome to the DjVu Plug-in");
+   setCaption(tr("Welcome to the DjVu Plug-in"));
 
    QeLabel * label;
 
@@ -50,20 +50,20 @@ QDWelcome::QDWelcome(QWidget * parent, const char * name, bool modal) :
    QVBoxLayout * vlay=new QVBoxLayout(start, 10, 10, "vlay");
    QGridLayout * glay=new QGridLayout(3, 2, 10, "glay");
    vlay->addLayout(glay);
-   QePushButton * prefs_butt=new QePushButton("&Preferences", start, "prefs_butt");
+   QePushButton * prefs_butt=new QePushButton(tr("&Preferences"), start, "prefs_butt");
    prefs_butt->inflateHeight(3);
    glay->addWidget(prefs_butt, 0, 0);
-   label=new QeLabel("Adjust gamma correction, caches, etc.", start, "prefs_label");
+   label=new QeLabel(tr("Adjust gamma correction, caches, etc."), start, "prefs_label");
    glay->addWidget(label, 0, 1);
-   QePushButton * help_butt=new QePushButton("&Help", start, "help_butt");
+   QePushButton * help_butt=new QePushButton(tr("&Help"), start, "help_butt");
    help_butt->inflateHeight(3);
    glay->addWidget(help_butt, 1, 0);
-   label=new QeLabel("Learn how to use DjVu", start, "help_label");
+   label=new QeLabel(tr("Learn how to use DjVu"), start, "help_label");
    glay->addWidget(label, 1, 1);
-   QePushButton * about_butt=new QePushButton("&About", start, "about_butt");
+   QePushButton * about_butt=new QePushButton(tr("&About"), start, "about_butt");
    about_butt->inflateHeight(3);
    glay->addWidget(about_butt, 2, 0);
-   label=new QeLabel("Credit and links", start, "about_label");
+   label=new QeLabel(tr("Credit and links"), start, "about_label");
    glay->addWidget(label, 2, 1);
 
    QHBoxLayout * hlay=new QHBoxLayout(10);
@@ -72,17 +72,15 @@ QDWelcome::QDWelcome(QWidget * parent, const char * name, bool modal) :
    label->setPixmap(QMessageBox::standardIcon(QMessageBox::Information,
 					      QApplication::style()));
    hlay->addWidget(label);
-   label=new QeLabel("These functions and many others can be\n"
-		     "accessed from within a DjVu document\n"
-		     "by clicking the right mouse button.", start, "info");
+   label=new QeLabel(tr("These functions and many others can be\naccessed from within a DjVu document\nby clicking the right mouse button."), start, "info");
    label->setAlignment(AlignCenter);
    hlay->addWidget(label, 1);
 
    hlay=new QHBoxLayout(10);
    vlay->addLayout(hlay);
-   close_butt=new QePushButton("&Close", start, "close_butt");
+   close_butt=new QePushButton(tr("&Close"), start, "close_butt");
    hlay->addWidget(close_butt);
-   never_butt=new QeCheckBox("&Never show this window again", start, "never_butt");
+   never_butt=new QeCheckBox(tr("&Never show this window again"), start, "never_butt");
    never_butt->setChecked(FALSE);
    hlay->addWidget(never_butt);
 

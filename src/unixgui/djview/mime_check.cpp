@@ -4,7 +4,7 @@
 //C-              Unauthorized use prohibited.
 //C-
 // 
-// $Id: mime_check.cpp,v 1.1 2001-05-29 22:05:29 bcr Exp $
+// $Id: mime_check.cpp,v 1.2 2001-06-06 17:16:57 mchen Exp $
 // $Name:  $
 
 
@@ -59,7 +59,7 @@ QMimeChecker::slotCheckMimeTypes(void)
 	       {
 		  do_it=true;
 		  QMessageBox::information(0, "DjVu",
-					   "Please restart Netscape for the changes to take effect");
+					   tr("Please restart Netscape for the changes to take effect"));
 	       }
 	       prefs.mimeDontAsk=d.dontAsk();
 	       prefs.mimeDontCheck=d.dontCheck();

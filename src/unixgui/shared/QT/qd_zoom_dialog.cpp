@@ -4,7 +4,7 @@
 //C-              Unauthorized use prohibited.
 //C-
 // 
-// $Id: qd_zoom_dialog.cpp,v 1.1 2001-05-29 22:05:31 bcr Exp $
+// $Id: qd_zoom_dialog.cpp,v 1.2 2001-06-06 17:16:57 mchen Exp $
 // $Name:  $
 
 
@@ -91,8 +91,8 @@ QDZoomDialog::done(int rc)
    if (rc==Accepted)
       if (getZoom()==-1000)
       {
-	 GUTF8String mesg=GUTF8String("Invalid zoom specified: '")+GStringFromQString(menu->currentText()+"'");
-	 showError(this, "DjVu: Input error",QStringFromGString(mesg));
+	 QString mesg=tr("Invalid zoom specified: '")+menu->currentText()+"'";
+	 showError(this, tr("DjVu: Input error"),mesg);
 	 return;
       }
    QeDialog::done(rc);
@@ -107,8 +107,8 @@ QDZComboBox::keyPressEvent(QKeyEvent * ev)
       while(w && strcmp(w->className(), "QDZoomDialog")) w=w->parentWidget();
       if (w && ((QDZoomDialog *) w)->getZoom()==-1000)
       {
-	 GUTF8String mesg=GUTF8String("Invalid zoom specified: '")+GStringFromQString(currentText()+"'");
-	 showError(this, "DjVu: Input error",QStringFromGString(mesg));
+	 QString mesg=tr("Invalid zoom specified: '")+currentText()+"'";
+	 showError(this, tr("DjVu: Input error"),mesg);
 	 return;
       }
    }
@@ -126,30 +126,29 @@ static const struct MenuItems {
   {"75 %",75},
   {"50 %",50},
   {"25 %",25},
-  {"Fit Width",DjVuANT::ZOOM_WIDTH},
-  {"Fit Page",DjVuANT::ZOOM_PAGE},
-  {"One to one",DjVuANT::ZOOM_ONE2ONE},
-  {"Stretch",DjVuANT::ZOOM_STRETCH},
-  {"Default",DjVuANT::ZOOM_UNSPEC}
+  {QT_TRANSLATE_NOOP("QDZoomDialog","Fit Width",DjVuANT::ZOOM_WIDTH},
+  {QT_TRANSLATE_NOOP("QDZoomDialog","Fit Page",DjVuANT::ZOOM_PAGE},
+  {QT_TRANSLATE_NOOP("QDZoomDialog","One to one",DjVuANT::ZOOM_ONE2ONE},
+  {QT_TRANSLATE_NOOP("QDZoomDialog","Stretch",DjVuANT::ZOOM_STRETCH},
+  {QT_TRANSLATE_NOOP("QDZoomDialog","Default",DjVuANT::ZOOM_UNSPEC}
 };
 
 QDZoomDialog::QDZoomDialog(int zoom, QWidget * parent,
 			   const char * name, bool modal) :
       QeDialog(parent, name, modal)
 {
-   setCaption("DjVu: Recommended Zoom");
+   setCaption(tr("DjVu: Recommended Zoom"));
    
    QWidget * start=startWidget();
    
    QVBoxLayout * vlay=new QVBoxLayout(start, 10, 15);
-   QeLabel * label=new QeLabel("Please specify the recommended resolution in which\n"
-			       "the page should be displayed by the browser.\n", start);
+   QeLabel * label=new QeLabel(tr("Please specify the recommended resolution in which\nthe page should be displayed by the browser.\n"), start);
    label->setAlignment(AlignCenter);
    vlay->addWidget(label);
 
    QHBoxLayout * hlay=new QHBoxLayout(10);
    vlay->addLayout(hlay);
-   label=new QeLabel("Recommended zoom:", start);
+   label=new QeLabel(tr("Recommended zoom:"), start);
    hlay->addWidget(label, 1);
    menu=new QDZComboBox(TRUE, start, "zoom_menu");
    menu->setInsertionPolicy(QComboBox::NoInsertion);
@@ -157,7 +156,7 @@ QDZoomDialog::QDZoomDialog(int zoom, QWidget * parent,
    int i;
    for(i=0;i<menu_items_size;i++)
    {
-     menu->insertItem(menu_items[i].str);
+     menu->insertItem(tr(menu_items[i].str));
    }
    hlay->addWidget(menu);
    for(i=0;i<menu_items_size;i++)
@@ -178,10 +177,10 @@ QDZoomDialog::QDZoomDialog(int zoom, QWidget * parent,
    QHBoxLayout * butt_lay=new QHBoxLayout(10);
    vlay->addLayout(butt_lay);
    butt_lay->addStretch(1);
-   QePushButton * ok_butt=new QePushButton("&OK", start, "ok_butt");
+   QePushButton * ok_butt=new QePushButton(tr("&OK"), start, "ok_butt");
    ok_butt->setDefault(TRUE);
    butt_lay->addWidget(ok_butt);
-   QePushButton * cancel_butt=new QePushButton("&Cancel", start, "cancel_butt");
+   QePushButton * cancel_butt=new QePushButton(tr("&Cancel"), start, "cancel_butt");
    butt_lay->addWidget(cancel_butt);
 
    vlay->activate();

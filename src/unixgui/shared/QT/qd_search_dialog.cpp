@@ -4,7 +4,7 @@
 //C-              Unauthorized use prohibited.
 //C-
 // 
-// $Id: qd_search_dialog.cpp,v 1.1 2001-05-29 22:05:31 bcr Exp $
+// $Id: qd_search_dialog.cpp,v 1.2 2001-06-06 17:16:57 mchen Exp $
 // $Name:  $
 
 
@@ -53,7 +53,7 @@ QDSearchDialog::slotSearch(void)
       bool fwd=!back_butt->isChecked();
       in_search=true;
       stop=false;
-      search_butt->setText("&Stop");
+      search_butt->setText(tr("&Stop"));
       text->setEnabled(FALSE);
       clear_butt->setEnabled(FALSE);
 
@@ -82,8 +82,8 @@ QDSearchDialog::slotSearch(void)
 	       int done=5*(20*pool->get_size()/pool->get_length());
 	       if (done!=last_done)
 	       {
-		  char buffer[128];
-		  sprintf(buffer, "Loading page %d: %d%%...", page_num+1, done);
+		  QString buffer=tr("Loading page ")+QString::number(page_num+1)+": "+
+		     QString::number(done)+"%...";
 		  status_label->setText(buffer);
 		  last_done=done;
 	       }
@@ -134,15 +134,15 @@ QDSearchDialog::slotSearch(void)
 	    } else
 	    {
 	       asked_once=true;
-	       GUTF8String msg=all_pages_butt->isChecked() ? "document" : "page";
+	       QString msg=all_pages_butt->isChecked() ? tr("document") : tr("page");
 	       if (fwd)
                {
-                 msg="End of "+msg+" reached. Continue from the beginning?";
+                 msg=tr("End of ")+msg+tr(" reached. Continue from the beginning?");
                }else
                {
-                 msg="Beginning of "+msg+" reached. Continue from the end?";
+                 msg=tr("Beginning of ")+msg+tr(" reached. Continue from the end?");
                }
-	       if (QMessageBox::information(this, "DjVu", QStringFromGString(msg), "&Yes", "&No")==0)
+	       if (QMessageBox::information(this, "DjVu", msg, tr("&Yes"), tr("&No"))==0)
 	       {
 		  if (all_pages_butt->isChecked())
 		  {
@@ -173,8 +173,8 @@ QDSearchDialog::slotSearch(void)
 	 }
 
          {
-           GUTF8String mesg="Page "+GUTF8String(page_num+1);
-	   status_label->setText(QStringFromGString(mesg));
+           QString mesg=tr("Page ")+QString::number(page_num+1);
+	   status_label->setText(mesg);
          }
 
 	    // Wrapped back and returned
@@ -192,27 +192,25 @@ QDSearchDialog::slotSearch(void)
 	 if (no_txt)
 	 {
 	    if (all_pages_butt->isChecked())
-	       showMessage(this, "DjVu Search Failed",
-			   "After looking through every page of this document\n"
-			   "we have found, that neither of them contain\n"
-			   "textual information. This means, that the document\n"
-			   "creator did not run an OCR engine on this document.\n\n"
-			   "The search is impossible.", true, false, true);
+	       showMessage(this, tr("DjVu Search Failed"),
+			   tr("After looking through every page of this document\n")+
+			   tr("we have found, that neither of them contain\ntextual information.")+
+			   tr("This means, that the document\ncreator did not run an OCR engine on this document.\n\n")+
+			   tr("The search is impossible."), true, false, true);
 	    else
-	       showMessage(this, "DjVu Search Failed",
-			   "This page does not contain textual information,\n"
-			   "which means that either creator of this document "
-			   "did not run an OCR engine on it, or the OCR engine "
-			   "did not recognize any text on this page.\n\n"
-			   "The search is impossible.", true, false, true);
-	 } else showInfo(this, "DjVu", "Search string not found");
+	       showMessage(this, tr("DjVu Search Failed"),
+			   tr("This page does not contain textual information,\n")+
+			   tr("which means that either creator of this document did not run an OCR engine on it, ")+
+			   tr("or the OCR engine did not recognize any text on this page.\n\n")+
+			   tr("The search is impossible."), true, false, true);
+	 } else showInfo(this, "DjVu", tr("Search string not found"));
       }
 
       in_search=false;
-      search_butt->setText("&Find");
+      search_butt->setText(tr("&Find"));
       {
-        GUTF8String mesg="Page "+GUTF8String(page_num+1);
-        status_label->setText(QStringFromGString(mesg));
+        QString mesg=tr("Page ")+QString::number(page_num+1);
+        status_label->setText(mesg);
       }
       text->setEnabled(TRUE);
       clear_butt->setEnabled(TRUE);
@@ -220,10 +218,10 @@ QDSearchDialog::slotSearch(void)
    {
       status_label->hide();
       in_search=false;
-      search_butt->setText("&Find");
+      search_butt->setText(tr("&Find"));
       {
-        GUTF8String mesg="Page "+GUTF8String(page_num+1);
-        status_label->setText(QStringFromGString(mesg));
+        QString mesg=tr("Page ")+QString::number(page_num+1);
+        status_label->setText(mesg);
       }
       text->setEnabled(TRUE);
       clear_butt->setEnabled(TRUE);
@@ -243,8 +241,8 @@ QDSearchDialog::slotSetPageNum(int page_num_)
       page_num=seen_page_num;
    }
    
-   GUTF8String mesg="Page "+GUTF8String(page_num+1);
-   status_label->setText(QStringFromGString(mesg));
+   QString mesg=tr("Page ")+QString::number(page_num+1);
+   status_label->setText(mesg);
 }
 
 void
@@ -273,7 +271,7 @@ QDSearchDialog::QDSearchDialog(int page_num_, const GP<DjVuDocument> & doc_,
    page_pos=search_backwards ? 0xffffff : -1;
    in_search=false;
    
-   setCaption("DjVu: Find");
+   setCaption(tr("DjVu: Find"));
    setResizable(true, false);
    
    QWidget * start=startWidget();
@@ -283,7 +281,7 @@ QDSearchDialog::QDSearchDialog(int page_num_, const GP<DjVuDocument> & doc_,
 
    QHBoxLayout * hlay=new QHBoxLayout(10);
    vlay->addLayout(hlay);
-   label=new QeLabel("Find: ", start);
+   label=new QeLabel(tr("Find: "), start);
    hlay->addWidget(label);
    text=new QeLineEdit(start, "search_text");
    label->setBuddy(text);
@@ -292,7 +290,7 @@ QDSearchDialog::QDSearchDialog(int page_num_, const GP<DjVuDocument> & doc_,
    hlay=new QHBoxLayout(10);
    vlay->addLayout(hlay);
 
-   all_pages_butt=new QeCheckBox("Search &all pages", start, "all_pages_butt");
+   all_pages_butt=new QeCheckBox(tr("Search &all pages"), start, "all_pages_butt");
    if (doc->get_pages_num()>1)
       all_pages_butt->setChecked(all_pages);
    else
@@ -303,36 +301,36 @@ QDSearchDialog::QDSearchDialog(int page_num_, const GP<DjVuDocument> & doc_,
    hlay->addWidget(all_pages_butt);
    hlay->addStretch(1);
    
-   case_butt=new QeCheckBox("&Case sensitive", start, "case_butt");
+   case_butt=new QeCheckBox(tr("&Case sensitive"), start, "case_butt");
    case_butt->setChecked(case_sensitive);
    hlay->addWidget(case_butt);
    hlay->addStretch(1);
 
-   whole_word_butt=new QeCheckBox("&Whole word", start, "whole_word_butt");
+   whole_word_butt=new QeCheckBox(tr("&Whole word"), start, "whole_word_butt");
    whole_word_butt->setChecked(whole_word);
    hlay->addWidget(whole_word_butt);
    hlay->addStretch(1);
 
-   back_butt=new QeCheckBox("Search &backwards", start, "back_butt");
+   back_butt=new QeCheckBox(tr("Search &backwards"), start, "back_butt");
    back_butt->setChecked(search_backwards);
    hlay->addWidget(back_butt);
    
    QHBoxLayout * butt_lay=new QHBoxLayout(10);
    vlay->addLayout(butt_lay);
-   status_label=new QLabel("Loading page WWWWWWW", start);
+   status_label=new QLabel(tr("Loading page WWWWWWW"), start);
    status_label->setMinimumSize(status_label->sizeHint());
    {
-     GUTF8String mesg="Page "+GUTF8String(page_num+1);
-     status_label->setText(QStringFromGString(mesg));
+     QString mesg=tr("Page ")+QString::number(page_num+1);
+     status_label->setText(mesg);
    }
    butt_lay->addWidget(status_label);
    butt_lay->addStretch(1);
-   search_butt=new QePushButton("&Find", start, "search_butt");
+   search_butt=new QePushButton(tr("&Find"), start, "search_butt");
    search_butt->setEnabled(FALSE);
    butt_lay->addWidget(search_butt);
-   clear_butt=new QePushButton("&Clear", start, "clear_butt");
+   clear_butt=new QePushButton(tr("&Clear"), start, "clear_butt");
    butt_lay->addWidget(clear_butt);
-   QePushButton * close_butt=new QePushButton("C&lose", start, "close_butt");
+   QePushButton * close_butt=new QePushButton(tr("C&lose"), start, "close_butt");
    butt_lay->addWidget(close_butt);
    search_butt->setDefault(TRUE);
 
