@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: djvudump.cpp,v 1.11 2000-05-01 16:15:23 bcr Exp $
+//C- $Id: djvudump.cpp,v 1.12 2000-05-05 22:25:45 mrosen Exp $
 
 /** @name djvuinfo
 
@@ -57,7 +57,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: djvudump.cpp,v 1.11 2000-05-01 16:15:23 bcr Exp $# */
+    #$Id: djvudump.cpp,v 1.12 2000-05-05 22:25:45 mrosen Exp $# */
 //@{
 //@}
 
@@ -85,7 +85,7 @@ struct DjVmInfo
 void
 display_djvu_info(IFFByteStream &iff, GString, size_t size, DjVmInfo& )
 {
-  struct DjVuInfo info;
+  DjVuInfo info;
   info.decode(iff);
   if (size >= 4)
     printf("DjVu %dx%d", info.width, info.height);
