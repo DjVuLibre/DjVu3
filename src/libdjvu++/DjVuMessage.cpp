@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: DjVuMessage.cpp,v 1.10 2000-11-09 20:15:06 jmw Exp $
+// $Id: DjVuMessage.cpp,v 1.11 2000-12-08 18:47:41 fcrary Exp $
 // $Name:  $
 
 
@@ -118,22 +118,7 @@ DjVuMessage::LookUp( const GString & MessageList ) const
       start = next_ending;
     }
   }
-/*
-  //  Process any formatting strings
-  int posn;
-  while( ( posn = result.search( "\\n" ) ) > 0 )
-  {
-    result = result.substr(0,posn) + 
-             GString("\n") +
-             result.substr(posn+2, result.length()-posn-1);
-  }
-  while( ( posn = result.search( "\\t" ) ) > 0 )
-  {
-    result = result.substr(0,posn) + 
-             GString("\t") +
-             result.substr(posn+2, result.length()-posn-1);
-  }
-*/
+
   //  All done
   return result;
 }
@@ -175,7 +160,7 @@ DjVuMessage::LookUpSingle( const GString &Single_Message ) const
       ending_posn = Single_Message.length();
     InsertArg( msg_text,
                ++param_num,
-               Single_Message.substr(start_posn, ending_posn-start_posn+1) );
+               Single_Message.substr(start_posn, ending_posn-start_posn) );
   }
 
   return msg_text;

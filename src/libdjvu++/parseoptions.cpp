@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: parseoptions.cpp,v 1.63 2000-11-17 19:34:18 mrosen Exp $
+// $Id: parseoptions.cpp,v 1.64 2000-12-08 18:47:41 fcrary Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -380,11 +380,9 @@ DjVuParseOptions::AmbiguousOptions(
     const char *name2=GetVarName(token2);
     if(name1 && name2)
     {
-      const char emsg[]="Ambiguous options: '%s=%s' and '%s=%s' specified.";
-      char *s=new char [sizeof(emsg)+strlen(name1)+strlen(name2)+strlen(value1)+strlen(value2)];
-      sprintf(s,emsg,name1,value1,name2,value2);
+      GString s;
+      s.format( "parseoptions.ambiguous\t%s\t%s\t%s\t%s", name1,value1,name2,value2 );
       Errors->AddError(s);
-      delete [] s;
     }
   }
 }
