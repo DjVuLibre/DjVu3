@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: ATTLicense.h,v 1.4 1999-03-02 02:12:11 leonb Exp $
+//C-  $Id: ATTLicense.h,v 1.5 1999-03-15 18:22:13 leonb Exp $
 
 #ifndef _ATTLICENSE_H_
 #define _ATTLICENSE_H_
@@ -15,13 +15,13 @@
 /** @name ATTLicense.h
     
     Files #"ATTLicense.h"# and #"ATTLicense.cpp"# implement a few simple
-    functions for obtaining and displaying the text of the 
-    \Ref{AT&T Source Code Agreement}.
+    functions for obtaining and displaying all sort of legal texts related
+    to the \Ref{AT&T Source Code Agreement}.
 
     @memo
     Support for AT&T Source Code Licensing
     @version
-    #$Id: ATTLicense.h,v 1.4 1999-03-02 02:12:11 leonb Exp $#
+    #$Id: ATTLicense.h,v 1.5 1999-03-15 18:22:13 leonb Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com>\\
     Jeffrey S. Dickey <jsdickey@att.com>\\
@@ -33,8 +33,8 @@
 class ATTLicense
 {
 public:
-  /** Returns a constant pointer to the license text. */
-  static const char* get_license_text();
+  /** Returns a constant pointer to the copyright notice text. */
+  static const char* get_notice_text();
   /** Returns a constant pointer to the copyright notice. */
   static const char* get_copyright_text();
   /** Returns a constant pointer to the usage fragment. */
