@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: parseoptions.cpp,v 1.39 2000-02-16 01:32:05 bcr Exp $
+//C- $Id: parseoptions.cpp,v 1.40 2000-02-16 04:40:14 bcr Exp $
 #ifdef __GNUC__
 #pragma implementation
 #endif
@@ -733,21 +733,88 @@ int
 DjVuParseOptions::ReadNextConfig (
   int &line, const char prog[], FILE *f )
 {
+
   const char *xname=strrchr(prog,'/');
   xname=xname?(xname+1):prog;
-
   // First check and see if we have already read in this profile.
   int profile=ProfileTokens->GetToken(xname);
   const char * const s=(profile>0)?Configuration->GetValue(profile,profile_token):0;
 
+    // We parse the rest of the current line so we can "inherit"
+    // values from other profiles.
+  static const int buf_size=1024;
+  char *buf=new char[buf_size];
+  int cur_buf_size=buf_size;
+  fgets(buf,buf_size,f);
+  for(int i=strlen(buf),j=0;(i != j)&&(buf[i-1] != '\n');i=strlen(buf))
+  {
+    char *newbuf=new char[(cur_buf_size+=buf_size)];
+    strcpy(newbuf,buf);
+    delete [] buf;
+    buf=newbuf;
+    fgets(buf+i,buf_size,f);
+    j=i;
+  }
   if(!s||strcmp(s,profile_token_read_string))
   {
     profile=ProfileTokens->SetToken(xname);
     (void)(Configuration->Grow(profile+1));
     Configuration->Add(profile,profile_token,profile_token_read_string);
+      // First we inherit variables from known profiles.
+    char *ptr;
+    for(ptr=buf;ptr[0];)
+    {
+      for(;*ptr&&isspace(*ptr);ptr++);
+      if(*ptr)
+      {
+        const char *name=ptr;
+        for(;*ptr&&!isspace(*ptr);++ptr);
+        if(*ptr)
+          *ptr++=0;
+        if(name[0])
+        {
+          const int inherit_profile=ProfileTokens->GetToken(name);
+          if(inherit_profile >= 0)
+          {
+            const int oldsize=Configuration->profiles[profile].size;
+            const int newsize=Configuration->profiles[inherit_profile].size;
+            char **inherit_values=Configuration->profiles[inherit_profile].values;
+            char **&values=Configuration->profiles[profile].values;
+            if(oldsize < newsize)
+            {
+              char **NewValues=new char *[newsize];
+              if(oldsize)
+                memcpy(NewValues,values,oldsize*sizeof(char *));
+              memset(NewValues+oldsize,0,(newsize-oldsize)*sizeof(char *));
+              delete [] values;
+              values=NewValues;
+            }
+            for(int k=0;k<newsize;k++)
+            {
+              if(!values[k] && inherit_values[k])
+              {
+                char *s=new char [strlen(inherit_values[k])+1];
+                strcpy(s,inherit_values[k]);
+                values[k]=s;
+              }
+            }
+          }else
+          {
+            static const char emesg[]="%s:Error in line %d of '%1.1024s'\n\t--> can not inherit unknown profile '%1.1024s'";
+            char *s=new char[sizeof(emesg)+20+strlen(filename)+strlen(name)+strlen(prog)];
+            sprintf(s,emesg,filename,line,prog,name);
+            Errors->AddError(s);
+            delete [] s;
+          }
+        }
+      }
+    }
+    delete [] buf;
+     // Now we can read the new variables.
     ReadFile(line,f,profile);
   }else if(f)
   {
+    delete [] buf;
     profile=(-1);
   }
   return profile;
