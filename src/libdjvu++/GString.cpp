@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.100 2001-05-16 23:23:43 bcr Exp $
+// $Id: GString.cpp,v 1.101 2001-05-17 15:40:30 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -452,7 +452,7 @@ GUTF8String::toEscaped( void ) const
       ss="&quot;";
       break;
     default:
-      if( ( (signed char)(*s) < ' ' ) || ( *s >= 0x7e ) && (*s =< 0x7f))
+      if(((unsigned char)(*s)<' ')||((signed char)*s>= 0x7e))
       {
         special.format("&#%d;",(unsigned char)*s);
         ss=special;
