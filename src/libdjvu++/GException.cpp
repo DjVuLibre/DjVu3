@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GException.cpp,v 1.13 1999-08-18 21:41:37 leonb Exp $
+//C- $Id: GException.cpp,v 1.14 1999-08-18 21:44:16 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -23,7 +23,7 @@
 #include "GException.h"
 #include "debug.h"
 
-// File "$Id: GException.cpp,v 1.13 1999-08-18 21:41:37 leonb Exp $"
+// File "$Id: GException.cpp,v 1.14 1999-08-18 21:44:16 leonb Exp $"
 // - Author: Leon Bottou, 05/1997
 
 GException::GException() 
@@ -144,24 +144,21 @@ GExceptionHandler::emthrow(const GException &gex)
 
 #else // ! USE_EXCEPTION_EMULATION
 
-void 
-noop(void)
-{
-}
-
-static void (*nop)(void) = noop;
+static int abort_on_exception = 0;
 
 void 
 GExceptionHandler::exthrow(const GException &ex)
 {
-  nop();
+  if (abort_on_exception) 
+    abort();
   throw ex;
 }
 
 void 
 GExceptionHandler::rethrow(void)
 {
-  nop();
+  if (abort_on_exception) 
+    abort();
   throw;
 }
 
