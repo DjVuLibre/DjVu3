@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GBitmap.h,v 1.16 2000-01-12 14:29:31 bcr Exp $
+//C- $Id: GBitmap.h,v 1.17 2000-01-14 07:27:41 bcr Exp $
 
 #ifndef _GBITMAP_H_
 #define _GBITMAP_H_
@@ -45,7 +45,7 @@ class GMonitor;
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: GBitmap.h,v 1.16 2000-01-12 14:29:31 bcr Exp $#
+    #$Id: GBitmap.h,v 1.17 2000-01-14 07:27:41 bcr Exp $#
 
  */
 //@{
@@ -377,7 +377,7 @@ private:
   void read_rle_raw(ByteStream &ref); 
   static void append_run(unsigned char *&data,const int count);
   static void append_line
-  (unsigned char *&data,const unsigned char *row,const int rowlen,bool invert=true);
+  (unsigned char *&data,const unsigned char *row,const int rowlen,bool invert=false);
 
   static inline int read_run(unsigned char *&data);
   static inline int read_run(const unsigned char *&data);

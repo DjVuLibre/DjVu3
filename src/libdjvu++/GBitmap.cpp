@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GBitmap.cpp,v 1.21 2000-01-12 14:29:31 bcr Exp $
+//C- $Id: GBitmap.cpp,v 1.22 2000-01-14 07:27:41 bcr Exp $
 
 
 #ifdef __GNUC__
@@ -23,7 +23,7 @@
 #include "GString.h"
 #include "GThreads.h"
 
-// File "$Id: GBitmap.cpp,v 1.21 2000-01-12 14:29:31 bcr Exp $"
+// File "$Id: GBitmap.cpp,v 1.22 2000-01-14 07:27:41 bcr Exp $"
 // - Author: Leon Bottou, 05/1997
 
 
@@ -1198,7 +1198,7 @@ GBitmap::append_line(
   unsigned char *&data,const unsigned char *row,const int rowlen,bool invert)
 {
   const unsigned char *rowend=row+rowlen;
-  bool p=invert;
+  bool p=!invert;
   while(row<rowend)
     {
       int count=0;
