@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.h,v 1.41 2001-04-13 01:49:20 praveen Exp $
+// $Id: GString.h,v 1.42 2001-04-13 15:53:06 bcr Exp $
 // $Name:  $
 
 #ifndef _GSTRING_H_
@@ -57,7 +57,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.41 2001-04-13 01:49:20 praveen Exp $# */
+    #$Id: GString.h,v 1.42 2001-04-13 15:53:06 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -137,7 +137,7 @@ public:
   { GStringRep dummy; return dummy.concat(s1,s2); }
   static GP<GStringRep> create( const GP<GStringRep> &s1,const char *s2)
   { GStringRep dummy; return dummy.concat(s1,s2); }
-  static GP<GStringRep> create( const char *s1, GP<GStringRep> &s2)
+  static GP<GStringRep> create( const char *s1, const GP<GStringRep> &s2)
   { GStringRep dummy; return dummy.concat(s1,s2); }
   static GP<GStringRep> create(const char *s1,const char *s2)
   { GStringRep dummy; return dummy.concat(s1,s2); }
@@ -230,7 +230,7 @@ public:
   { GStringRep::Native dummy; return dummy.concat(s1,s2); }
   static GP<GStringRep> create( const GP<GStringRep> &s1,const char *s2)
   { GStringRep::Native dummy; return dummy.concat(s1,s2); }
-  static GP<GStringRep> create( const char *s1, GP<GStringRep> &s2)
+  static GP<GStringRep> create( const char *s1, const GP<GStringRep> &s2)
   { GStringRep::Native dummy; return dummy.concat(s1,s2); }
   static GP<GStringRep> create(const char *s1,const char *s2)
   { GStringRep::Native dummy; return dummy.concat(s1,s2); }
@@ -298,7 +298,7 @@ public:
   { GStringRep::UTF8 dummy; return dummy.concat(s1,s2); }
   static GP<GStringRep> create( const GP<GStringRep> &s1,const char *s2)
   { GStringRep::UTF8 dummy; return dummy.concat(s1,s2); }
-  static GP<GStringRep> create( const char *s1, GP<GStringRep> &s2)
+  static GP<GStringRep> create( const char *s1, const GP<GStringRep> &s2)
   { GStringRep::UTF8 dummy; return dummy.concat(s1,s2); }
   static GP<GStringRep> create( const char *s1,const char *s2)
   { GStringRep::UTF8 dummy; return dummy.concat(s1,s2); }
