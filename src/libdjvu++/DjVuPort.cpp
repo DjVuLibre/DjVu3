@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuPort.cpp,v 1.3 1999-05-27 21:43:37 eaf Exp $
+//C- $Id: DjVuPort.cpp,v 1.4 1999-06-03 16:46:45 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -197,9 +197,9 @@ DjVuPortcaster::sort_closure(const GMap<const void *, void *> & set,
 	 for(pos=lists[dist];pos;++pos)
 	    list.append(lists[dist][pos]);
       
-      delete lists; lists=0;
+      delete [] lists; lists=0;
    } CATCH(exc) {
-      delete lists; lists=0;
+      delete [] lists; lists=0;
       RETHROW;
    } ENDCATCH;
 }
