@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuAPI.h,v 1.28 2000-01-26 23:30:21 bcr Exp $
+ *C- $Id: DjVuAPI.h,v 1.29 2000-01-27 00:46:56 bcr Exp $
  *
  * The main header file for the DjVu API
  */
@@ -17,7 +17,10 @@
 
 /* 
  * $Log: DjVuAPI.h,v $
- * Revision 1.28  2000-01-26 23:30:21  bcr
+ * Revision 1.29  2000-01-27 00:46:56  bcr
+ * Added the *arg argument, I forgot.
+ *
+ * Revision 1.28  2000/01/26 23:30:21  bcr
  * Added remaining functions definitions needed for the API.
  *
  * Revision 1.27  2000/01/26 04:40:46  bcr
@@ -804,23 +807,26 @@ djvu_image *djvu_decode_page(djvu_decode_options[1],int page);
  */
 typedef djvu_import djvu_import_sub ( void *arg,  const char filename[]);
 
-/* The output filename will be ignored if you specify an djvu_output_sub
+/* One or both of djvu_import_sub and djvu_output_sub should be specified.
+ * The output filename will be ignored if you specify a djvu_output_sub.
  */
 DJVUAPI int
 djvu_bitonaltodjvu_callback(
-  bitonaltodjvu_options[1], djvu_import_sub *, djvu_output_sub *);
+  bitonaltodjvu_options[1], djvu_import_sub *, djvu_output_sub *, void *arg);
 
-/* The output filename will be ignored if you specify an djvu_output_sub
+/* One or both of djvu_import_sub and djvu_output_sub should be specified.
+ * The output filename will be ignored if you specify a djvu_output_sub.
  */
 DJVUAPI int
 djvu_phototodjvu_callback(
-  phototodjvu_options[1], djvu_import_sub *, djvu_output_sub *);
+  phototodjvu_options[1], djvu_import_sub *, djvu_output_sub *, void *arg);
 
-/* The output filename will be ignored if you specify an djvu_output_sub
+/* One or both of djvu_import_sub and djvu_output_sub should be specified.
+ * The output filename will be ignored if you specify a djvu_output_sub.
  */
 DJVUAPI int
 djvu_documenttodjvu_callback(
-  phototodjvu_options[1], djvu_import_sub *, djvu_output_sub *);
+  phototodjvu_options[1], djvu_import_sub *, djvu_output_sub *, void *arg);
 
 /* This is a special type of djvu_import, intended for cases when you have
  * defined your own decoding, and want to map it to a stream for use with
