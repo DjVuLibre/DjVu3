@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: djvudump.cpp,v 1.7 2000-12-18 17:13:40 bcr Exp $
+// $Id: djvudump.cpp,v 1.8 2000-12-21 17:13:16 fcrary Exp $
 // $Name:  $
 
 /** @name djvuinfo
@@ -79,7 +79,7 @@ xxx
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: djvudump.cpp,v 1.7 2000-12-18 17:13:40 bcr Exp $# */
+    #$Id: djvudump.cpp,v 1.8 2000-12-21 17:13:16 fcrary Exp $# */
 //@{
 //@}
 
@@ -89,6 +89,7 @@ xxx
 
 #include <stdio.h>
 #include <ctype.h>
+#include <stdlib.h>
 
 void
 display(const char *s)
