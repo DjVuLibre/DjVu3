@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuPort.h,v 1.20 1999-11-17 03:29:16 bcr Exp $
+//C- $Id: DjVuPort.h,v 1.21 1999-11-18 23:23:27 eaf Exp $
  
 #ifndef _DJVUPORT_H
 #define _DJVUPORT_H
@@ -71,7 +71,7 @@
     @memo DjVu decoder communication mechanism.
     @author Andrei Erofeev <eaf@research.att.com>\\
             L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuPort.h,v 1.20 1999-11-17 03:29:16 bcr Exp $# */
+    @version #$Id: DjVuPort.h,v 1.21 1999-11-18 23:23:27 eaf Exp $# */
 //@{
 
 class DjVuPort;
@@ -339,26 +339,27 @@ public:
           to an existing #DjVuPort#.  Returns a null pointer otherwise. */
    GP<DjVuPort> is_port_alive(DjVuPort *port);
 
-      /** Assigns the specified name to the given \Ref{DjVuPort}. Each port
-	  may have only one name and each name may correspond to only one
-	  port. Thus, if the specified name is already associated with another
-	  port, this association will be removed. */
-   void		set_name(const DjVuPort * port, const char * name);
+      /** Assigns one more {\em alias} for the specified \Ref{DjVuPort}.
+	  {\em Aliases} are names, which can be used later to retrieve this
+	  \Ref{DjVuPort}, if it still exists. Any \Ref{DjVuPort} may have
+	  more than one {\em alias}. But every {\em alias} must correspond
+	  to only one \Ref{DjVuPort}. Thus, if the specified alias is
+	  already associated with another port, this association will be
+	  removed. */
+   void		add_alias(const DjVuPort * port, const char * alias);
 
-      /** Returns \Ref{DjVuPort} associated with the given #name#. If nothing
-	  is known about name #name#, or the port associated with it has
+      /** Removes all aliases associated with the given \Ref{DjVuPort}. */
+   void		clear_aliases(const DjVuPort * port);
+
+      /** Returns \Ref{DjVuPort} associated with the given #alias#. If nothing
+	  is known about name #alias#, or the port associated with it has
 	  already been destroyed #ZERO# pointer will be returned. */
-   GP<DjVuPort>	name_to_port(const char * name);
+   GP<DjVuPort>	alias_to_port(const char * name);
 
-      /** Returns a list of \Ref{DjVuPort}s with names starting from
-	  #prefix#. If no \Ref{DjVuPort}s have been found, an empty
+      /** Returns a list of \Ref{DjVuPort}s with aliases starting with
+	  #prefix#. If no \Ref{DjVuPort}s have been found, empty
 	  list is returned. */
    GPList<DjVuPort>	prefix_to_ports(const char * prefix);
-
-      /** Returns name associated with the given \Ref{DjVuPort}. If no name
-	  has been assigned to this port before, an empty string will
-	  be returned. */
-   GString	port_to_name(const DjVuPort * port);
 
       /** Computes destination list for #source# and calls the corresponding
 	  function in each of the ports from the destination list starting from
@@ -421,8 +422,7 @@ private:
    GCriticalSection		map_lock;
    GMap<const void *, void *>	route_map;	// GMap<DjVuPort *, GList<DjVuPort *> *>
    GMap<const void *, void *>	cont_map;	// GMap<DjVuPort *, DjVuPort *>
-   GMap<GString, const void *>	n2p_map;	// GMap<GString, DjVuPort *>
-   GMap<const void *, void *>	p2n_map;	// GMap<DjVuPort *, const char *>
+   GMap<GString, const void *>	a2p_map;	// GMap<GString, DjVuPort *>
    void add_to_closure(GMap<const void*, void*> & set,
                        const DjVuPort *dst, int distance);
    void compute_closure(const DjVuPort *src, GPList<DjVuPort> &list,

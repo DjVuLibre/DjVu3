@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuPort.cpp,v 1.22 1999-11-17 03:29:16 bcr Exp $
+//C- $Id: DjVuPort.cpp,v 1.23 1999-11-18 23:23:27 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -112,28 +112,37 @@ DjVuPortcaster::is_port_alive(DjVuPort *port)
 }
 
 void
-DjVuPortcaster::set_name(const DjVuPort * port, const char * name)
+DjVuPortcaster::add_alias(const DjVuPort * port, const char * alias)
 {
    GCriticalSectionLock lock(&map_lock);
-   GPosition pos;
-   if (p2n_map.contains(port, pos))
-   {
-      n2p_map.del((const char *) p2n_map[pos]);
-      delete (char *) p2n_map[pos];
-      p2n_map.del(pos);
-   }
-   p2n_map[port] = strdup(name);
-   n2p_map[name] = port;
+   a2p_map[alias]=port;
+}
+
+void
+DjVuPortcaster::clear_aliases(const DjVuPort * port)
+{
+   GCriticalSectionLock lock(&map_lock);
+   for(GPosition pos=a2p_map;pos;)
+      if (a2p_map[pos]==port)
+      {
+	 GPosition this_pos=pos;
+	 ++pos;
+	 a2p_map.del(this_pos);
+      } else ++pos;
 }
 
 GP<DjVuPort>
-DjVuPortcaster::name_to_port(const char * name)
+DjVuPortcaster::alias_to_port(const char * alias)
 {
    GCriticalSectionLock lock(&map_lock);
    GPosition pos;
-   if (n2p_map.contains(name, pos))
-      return GP<DjVuPort> ( (DjVuPort *)n2p_map[pos] );
-   else return 0;
+   if (a2p_map.contains(alias, pos))
+   {
+      DjVuPort * port=(DjVuPort *) a2p_map[pos];
+      if (is_port_alive(port)) return port;
+      else a2p_map.del(pos);
+   }
+   return 0;
 }
 
 GPList<DjVuPort>
@@ -146,25 +155,15 @@ DjVuPortcaster::prefix_to_ports(const char * prefix)
       if (length)
       {
 	 GCriticalSectionLock lock(&map_lock);
-	 for(GPosition pos=n2p_map;pos;++pos)
-	    if (!strncmp(prefix, n2p_map.key(pos), length))
+	 for(GPosition pos=a2p_map;pos;++pos)
+	    if (!strncmp(prefix, a2p_map.key(pos), length))
 	    {
-	       GP<DjVuPort> port=(DjVuPort *) n2p_map[pos];
+	       GP<DjVuPort> port=(DjVuPort *) a2p_map[pos];
 	       if (port) list.append(port);
 	    }
       }
    }
    return list;
-}
-
-GString
-DjVuPortcaster::port_to_name(const DjVuPort * port)
-{
-   GCriticalSectionLock lock(&map_lock);
-   GPosition pos;
-   if (p2n_map.contains(port, pos))
-      return GString( (const char *) p2n_map[pos] );
-   else return GString();
 }
 
 void
@@ -173,18 +172,6 @@ DjVuPortcaster::del_port(const DjVuPort * port)
    GCriticalSectionLock lock(&map_lock);
 
    GPosition pos;
-   GString name;
-   
-      // Update "port=>name" map
-   if (p2n_map.contains(port, pos))
-   {
-      name=(const char *) p2n_map[pos];
-      delete (char *) p2n_map[pos];
-      p2n_map.del(pos);
-   }
-
-      // Update "name=>port" map
-   if (name.length() && n2p_map.contains(name, pos)) n2p_map.del(pos);
    
       // Update "contents map"
    if (cont_map.contains(port, pos)) cont_map.del(pos);
