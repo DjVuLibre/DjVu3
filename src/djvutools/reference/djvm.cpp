@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djvm.cpp,v 1.8 2001-03-06 19:55:41 bcr Exp $
+// $Id: djvm.cpp,v 1.8.2.1 2001-03-28 01:04:25 bcr Exp $
 // $Name:  $
 
 /** @name djvm
@@ -99,7 +99,7 @@
     @author
     Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: djvm.cpp,v 1.8 2001-03-06 19:55:41 bcr Exp $# */
+    #$Id: djvm.cpp,v 1.8.2.1 2001-03-28 01:04:25 bcr Exp $# */
 //@{
 //@}
 
@@ -111,7 +111,7 @@
 #include <stdio.h>
 #include <iostream.h>
 
-static char * progname;
+static const char * progname;
 
 static void
 usage(void)
@@ -152,51 +152,57 @@ Usage:\n\
 }
 
 static void
-create(int argc, char ** argv)
+create(DArray<GString> &argv)
       // djvm -c[reate] <doc.djvu> <page_1.djvu> ... <page_n.djvu>
       // doc.djvu will be overwritten
 {
+   const int argc=argv.hbound()+1;
    if (argc<4) { usage(); exit(1); }
 
       // Initialize the DjVuDocEditor class
-   GP<DjVuDocEditor> doc=DjVuDocEditor::create_wait(argv[2]);
+   const GURL::Filename::UTF8 url(argv[2]);
+   GP<DjVuDocEditor> doc=DjVuDocEditor::create_wait(url);
 
       // Insert pages
-   GList<GString> list;
+   GList<GURL> list;
    for(int i=3;i<argc;i++)
-      list.append(argv[i]);
+      list.append(GURL::Filename::UTF8(argv[i]));
    doc->insert_group(list);
 
       // Save in BUNDLED format
-   doc->save_as(argv[2], true);
+   doc->save_as(url, true);
 }
 
 static void
-insert(int argc, char ** argv)
+insert(DArray<GString> &argv)
       // djvm -i[nsert] <doc.djvu> <page.djvu> <page_num>
 {
+   const int argc=argv.hbound()+1;
    if (argc!=4 && argc!=5) { usage(); exit(1); }
 
       // Initialize DjVuDocEditor class
-   GP<DjVuDocEditor> doc=DjVuDocEditor::create_wait(argv[2]);
+   const GURL::Filename::UTF8 url(argv[2]);
+   GP<DjVuDocEditor> doc=DjVuDocEditor::create_wait(url);
 
       // Insert page
    int page_num=-1;
    if (argc==5) page_num=atoi(argv[4])-1;
-   doc->insert_page(argv[3], page_num);
+   doc->insert_page(GURL::Filename::UTF8(argv[3]), page_num);
 
       // Save the document
    doc->save();
 }
 
 static void
-del(int argc, char ** argv)
+del(DArray<GString> &argv)
       // djvm -d[elete] <doc.djvu> <page_num>
 {
+   const int argc=argv.hbound()+1;
    if (argc!=4) { usage(); exit(1); }
 
       // Initialize DjVuDocEditor class
-   GP<DjVuDocEditor> doc=DjVuDocEditor::create_wait(argv[2]);
+   const GURL::Filename::UTF8 url(argv[2]);
+   GP<DjVuDocEditor> doc=DjVuDocEditor::create_wait(url);
 
       // Delete the page
    int page_num=atoi(argv[3])-1;
@@ -208,13 +214,15 @@ del(int argc, char ** argv)
 }
 
 static void
-list(int argc, char ** argv)
+list(DArray<GString> &argv)
       // djvm -l[ist] <doc.djvu>
 {
+   const int argc=argv.hbound()+1;
    if (argc!=3) { usage(); exit(1); }
 
+   const GURL::Filename::UTF8 url(argv[2]);
    GP<DjVmDoc> doc=DjVmDoc::create();
-   doc->read(argv[2]);
+   doc->read(url);
    
    GP<DjVmDir> dir=doc->get_djvm_dir();
    if (dir)
@@ -254,16 +262,20 @@ list(int argc, char ** argv)
 int
 main(int argc, char ** argv)
 {
-   char * ptr;
-   for(progname=ptr=argv[0];*ptr;ptr++)
-      if (*ptr=='/') progname=ptr+1;
+  DArray<GString> dargv(0,argc-1);
+  for(int i=0;i<argc;++i)
+  {
+    GString g(argv[i]);
+    dargv[i]=g.getNative2UTF8();
+  }
+  progname=dargv[0]=GOS::basename(dargv[0]);
    
    G_TRY {
       if (argc<2) { usage(); exit(1); }
-      if (!strncmp(argv[1], "-c", 2)) create(argc, argv);
-      else if (!strncmp(argv[1], "-i", 2)) insert(argc, argv);
-      else if (!strncmp(argv[1], "-d", 2)) del(argc, argv);
-      else if (!strncmp(argv[1], "-l", 2)) list(argc, argv);
+      if (!strncmp(dargv[1], "-c", 2)) create(dargv);
+      else if (!strncmp(dargv[1], "-i", 2)) insert(dargv);
+      else if (!strncmp(dargv[1], "-d", 2)) del(dargv);
+      else if (!strncmp(dargv[1], "-l", 2)) list(dargv);
       else { usage(); exit(1); }
    } G_CATCH(exc) {
       exc.perror();

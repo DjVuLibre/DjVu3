@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: XMLAnno.h,v 1.5.2.1 2001-03-22 02:04:16 bcr Exp $
+// $Id: XMLAnno.h,v 1.5.2.2 2001-03-28 01:04:27 bcr Exp $
 // $Name:  $
 
 #ifndef _LT_XMLANNO__
@@ -57,7 +57,7 @@ public:
   /// Default creator
   static GP<lt_XMLAnno> create(void) { return new lt_XMLAnno(); }
   /// Parse the specified file.
-  void parse(const char xmlfile[], GString baseurl);
+  void parse(const char xmlfile[], const GURL &codebase);
   /// Parse the specified bytestream.
   void parse(GP<ByteStream> &bs);
   /// Parse the specified tags.
@@ -71,7 +71,7 @@ protected:
     const GString &width,const GString &height);
   GPList<DjVuFile> files;
   GMap<GString,GP<DjVuDocument> > docs;
-  GString m_basedir;
+  GURL m_codebase;
 private: // dummy stuff
   static void parse(ByteStream *bs);
 };

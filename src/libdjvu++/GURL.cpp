@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GURL.cpp,v 1.50 2001-03-08 23:57:26 bcr Exp $
+// $Id: GURL.cpp,v 1.50.2.1 2001-03-28 01:04:27 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -40,13 +40,119 @@
 #include "GException.h"
 #include "GOS.h"
 #include "GURL.h"
+#include "debug.h"
 
-#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
 #include <ctype.h>
+#include <math.h>
+#include <string.h>
+
+#ifdef WIN32
+#include <atlbase.h>
+#include <windows.h>
+
+#ifndef UNDER_CE
+#include <direct.h>
+#endif
+#endif   // end win32
+
+// -- MAXPATHLEN
+#ifndef MAXPATHLEN
+#ifdef _MAX_PATH
+#define MAXPATHLEN _MAX_PATH
+#else
+#define MAXPATHLEN 1024
+#endif
+#else
+#if ( MAXPATHLEN < 1024 )
+#undef MAXPATHLEN
+#define MAXPATHLEN 1024
+#endif
+#endif
+
+#ifdef UNIX
+#include <sys/types.h>
+// Handle the few systems without dirent.h
+// 1 -- systems with /usr/include/sys/ndir.h
+#if defined(XENIX)
+#define USE_DIRECT
+#include <sys/ndir.h>
+#endif
+// 2 -- systems with /usr/include/sys/dir.h
+#if defined(OLDBSD)
+#define USE_DIRECT
+#include <sys/dir.h>
+#endif
+// The rest should be generic
+#ifdef USE_DIRECT
+#define dirent direct
+#define NAMLEN(dirent) (dirent)->d_namlen
+#else
+#include <dirent.h>
+#define NAMLEN(dirent) strlen((dirent)->d_name)
+#endif 
+#endif
+
+
+
+
+#ifdef UNIX
+# include <errno.h>
+# include <sys/types.h>
+# include <sys/stat.h>
+# include <sys/time.h>
+# include <fcntl.h>
+# include <pwd.h>
+# include <stdio.h>
+# include <unistd.h>
+#endif
+
+#ifdef macintosh
+#include <unix.h>
+#include <errno.h>
+#include <unistd.h>
+#endif
 
 static const char djvuopts[]="DJVUOPTS";
 static const char localhost[]="file://localhost/";
 static const char fileproto[]="file:";
+static const char backslash='\\';
+static const char colon=':';
+static const char dot='.';
+static const char filespecslashes[] = "file://";
+static const char filespec[] = "file:";
+static const char slash='/';
+static const char percent='%';
+static const char localhostspec1[] = "//localhost/";
+static const char localhostspec2[] = "///";
+static const char nillchar=0;
+#if defined(UNIX)
+  static const char tilde='~';
+  static const char root[] = "/";
+#elif defined(WIN32)
+  static const char root[] = "\\";
+#elif defined(macintosh)
+  static char const * const root = &nillchar; 
+#else
+#error "Define something here for your operating system"
+#endif
+
+// hexval --
+// -- Returns the hexvalue of a character.
+//    Returns -1 if illegal;
+
+static int 
+hexval(char c)
+{
+  return ((c>='0' && c<='9')
+    ?(c-'0')
+    :((c>='A' && c<='F')
+      ?(c-'A'+10)
+      :((c>='a' && c<='f')
+        ?(c-'a'+10):(-1))));
+}
+
 
 static bool
 is_argument(const char * start)
@@ -64,8 +170,8 @@ GURL::convert_slashes(void)
    GCriticalSectionLock lock(&class_lock);
    for(char *ptr=(url.getbuf()+protocol().length());*ptr;ptr++)
    {
-     if(*ptr == '\\')
-       *ptr='/';
+     if(*ptr == backslash)
+       *ptr=slash;
    }
 #endif
 }
@@ -95,7 +201,7 @@ GURL::beautify_path(void)
    
   // Find start point
   char * start=buffer+protocol().length()+1;
-  while(*start && *start=='/') start++;
+  while(*start && *start==slash) start++;
 
   // Find end of the url (don't touch arguments)
   char * ptr;
@@ -119,18 +225,40 @@ GURL::beautify_path(void)
   for(;(ptr=strstr(start, "/./"));collapse(ptr, 2))
     EMPTY_LOOP;
 
+
   // Process /../
   while((ptr=strstr(start, "/../")))
   {
     for(char * ptr1=ptr-1;(ptr1>=start);ptr1--)
     {
-      if (*ptr1=='/')
+      if (*ptr1==slash)
       {
         collapse(ptr1, ptr-ptr1+3);
         break;
-       }
+      }
     }
   }
+
+  // Remove trailing /.
+  ptr=start+strlen(start)-2;
+  if((ptr>=start)&&!strcmp(ptr,"/."))
+  {
+    ptr[1]=0;
+  }
+  // Eat trailing /..
+  ptr=start+strlen(start)-3;
+  if((ptr >= start) &&!strcmp(ptr,"/.."))
+  {
+    for(char * ptr1=ptr-1;(ptr1>=start);ptr1--)
+    {
+      if (*ptr1==slash)
+      {
+        ptr1[1]=0;
+        break;
+      }
+    }
+  }
+
   // Done. Copy the buffer back into the URL and add arguments.
   url=buffer;
   url+=args;
@@ -156,8 +284,8 @@ GURL::init(const bool nothrow)
          // Below we have to make this complex test to detect URLs really
          // referring to *local* files. Surprisingly, file://hostname/dir/file
          // is also valid, but shouldn't be treated thru local FS.
-      if (proto=="file" && url[5]=='/' &&
-          (url[6]!='/' || !strncmp((const char *)url,localhost,sizeof(localhost))))
+      if (proto=="file" && url[5]==slash &&
+          (url[6]!=slash || !strncmp((const char *)url,localhost,sizeof(localhost))))
       {
             // Separate the arguments
          GString arg;
@@ -171,7 +299,7 @@ GURL::init(const bool nothrow)
          }
 
             // Do double conversion
-         GString tmp=GOS::url_to_filename(url);
+         GString tmp=filename();
          if (!tmp.length())
          {
            validurl=false;
@@ -179,7 +307,7 @@ GURL::init(const bool nothrow)
              G_THROW("GURL.fail_to_file");
            return;
          }
-         url=GOS::filename_to_url(tmp);
+         url=GURL::Filename::UTF8(tmp);
          if (!url.length())
          {
            validurl=false;
@@ -195,6 +323,8 @@ GURL::init(const bool nothrow)
       parse_cgi_args();
    }
 }
+
+GURL::GURL(void) : validurl(false) {}
 
 GURL::GURL(const char * url_in) : url(url_in ? url_in : ""), validurl(false)
 {
@@ -225,7 +355,7 @@ GURL::protocol(const char * url)
    for(char c=*ptr;
      c && (isalnum(c) || c == '+' || c == '-' || c == '.');
      c=*(++ptr)) EMPTY_LOOP;
-   return(*ptr==':')?GString(url_ptr, ptr-url_ptr):GString();
+   return(*ptr==colon)?GString(url_ptr, ptr-url_ptr):GString();
 }
 
 GString
@@ -248,7 +378,7 @@ GURL::hash_argument(void) const
          found=(*start=='#');
       }
    }
-   return GOS::decode_reserved(arg);
+   return decode_reserved(arg);
 }
 
 void
@@ -275,7 +405,7 @@ GURL::set_hash_argument(const char * arg)
       }
    }
 
-   url=new_url+"#"+GOS::encode_reserved(arg)+ptr;
+   url=new_url+"#"+GURL::encode_reserved(arg)+ptr;
 }
 
 void
@@ -334,8 +464,8 @@ GURL::parse_cgi_args(void)
          int args=cgi_name_arr.size();
          cgi_name_arr.resize(args);
          cgi_value_arr.resize(args);
-         cgi_name_arr[args]=GOS::decode_reserved(name);
-         cgi_value_arr[args]=GOS::decode_reserved(value);
+         cgi_name_arr[args]=decode_reserved(name);
+         cgi_value_arr[args]=decode_reserved(value);
       }
    }
 }
@@ -357,8 +487,8 @@ GURL::store_cgi_args(void)
    
    for(int i=0;i<cgi_name_arr.size();i++)
    {
-      GString name=GOS::encode_reserved(cgi_name_arr[i]);
-      GString value=GOS::encode_reserved(cgi_value_arr[i]);
+      GString name=GURL::encode_reserved(cgi_name_arr[i]);
+      GString value=GURL::encode_reserved(cgi_value_arr[i]);
       new_url+=(i?"&":"?")+name;
       if (value.length())
          new_url+="="+value;
@@ -633,7 +763,15 @@ GURL::is_local_file_url(void) const
 {
    if(!validurl) const_cast<GURL *>(this)->init();
    GCriticalSectionLock lock((GCriticalSection *) &class_lock);
-   return (protocol()=="file" && url[5]=='/');
+   return (protocol()=="file" && url[5]==slash);
+}
+
+GString
+GURL::pathname(void) const
+{
+  return (is_local_file_url())
+    ?GURL::encode_reserved(filename()) 
+    :url.search(slash);
 }
 
 GURL
@@ -643,18 +781,18 @@ GURL::base(void) const
    GCriticalSectionLock lock((GCriticalSection *) &class_lock);
 
    const char * const url_ptr=url;
-   const char * ptr, * slash;
-   for(ptr=slash=url_ptr+protocol().length()+1;*ptr && !is_argument(ptr);ptr++)
+   const char * ptr, * xslash;
+   for(ptr=xslash=url_ptr+protocol().length()+1;*ptr && !is_argument(ptr);ptr++)
    {
-      if (*ptr=='/')
-        slash=ptr;
+      if (*ptr==slash)
+        xslash=ptr;
    }
    return
 #ifdef WIN32
-   (*(slash-1) == ':')?
-     GString(url,(int)(slash-url))+"/"+GString(ptr,url.length()-(int)(ptr-url_ptr)) :
+   (*(xslash-1) == colon)?
+     GString(url,(int)(xslash-url))+"/"+GString(ptr,url.length()-(int)(ptr-url_ptr)) :
 #endif
-     GString(url,(int)(slash-url))+GString(ptr,url.length()-(int)(ptr-url_ptr));
+     GString(url,(int)(xslash-url))+GString(ptr,url.length()-(int)(ptr-url_ptr));
 }
 
 GString
@@ -662,36 +800,36 @@ GURL::name(void) const
 {
    if(!validurl) const_cast<GURL *>(this)->init();
    GCriticalSectionLock lock((GCriticalSection *) &class_lock);
-   const char * ptr, * slash;
-   for(ptr=slash=(const char *)url+protocol().length()+1;
+   const char * ptr, * xslash;
+   for(ptr=xslash=(const char *)url+protocol().length()+1;
      *ptr && !is_argument(ptr);ptr++)
    {
-      if (*ptr=='/')
-        slash=ptr;
+      if (*ptr==slash)
+        xslash=ptr;
    }
    
-   return GString(slash+1, ptr-slash-1);
+   return GString(xslash+1, ptr-xslash-1);
 }
 
 GString
 GURL::fname(void) const
 {
    if(!validurl) const_cast<GURL *>(this)->init();
-   return GOS::decode_reserved(name());
+   return decode_reserved(name());
 }
 
 GString
 GURL::extension(void) const
 {
    if(!validurl) const_cast<GURL *>(this)->init();
-   GString filename=name();
+   GString xfilename=name();
    GString retval;
 
-   for(int i=filename.length()-1;i>=0;i--)
+   for(int i=xfilename.length()-1;i>=0;i--)
    {
-      if (filename[i]=='.')
+      if (xfilename[i]=='.')
       {
-         retval=(const char*)filename+i+1;
+         retval=(const char*)xfilename+i+1;
          break;
       }
    } 
@@ -712,7 +850,7 @@ GURL::operator+(const char * xname) const
       	EMPTY_LOOP;
 
       res=GString(url_ptr,(int)(ptr-url_ptr))
-        +((*(ptr-1) != '/')?"/":"")+xname+ptr;
+        +((*(ptr-1) != slash)?GString(slash):GString())+xname+ptr;
    } else
    {
      res=xname;
@@ -720,4 +858,818 @@ GURL::operator+(const char * xname) const
    res.parse_cgi_args();
    return res;
 }
+
+GString
+GURL::decode_reserved(const char * url)
+{
+  GString res;
+
+  for(const char * ptr=url;*ptr;ptr++)
+  {
+    if (*ptr!=percent)
+    {
+      res+=*ptr;
+    }else
+    {
+      int c1,c2;
+      if ( ((c1=hexval(ptr[1]))>=0)
+        && ((c2=hexval(ptr[2]))>=0) )
+      {
+        res+=(c1<<4)|c2;
+        ptr+=2;
+      } else
+      {
+        res+=*ptr;
+      }
+    }
+  }
+  return res;
+}
+
+GString
+GURL::encode_reserved(unsigned char const *s)
+{
+  // Potentially unsafe characters (cf. RFC1738 and RFC1808)
+  static const char hex[] = "0123456789ABCDEF";
+  
+  unsigned char *retval;
+  GPBuffer<unsigned char> gd(retval,strlen((const char *)s)*3);
+  unsigned char *d=retval;
+  for (; *s; s++,d++)
+  {
+    // Convert directory separator to slashes
+#ifdef WIN32
+    if (*s == backslash || *s== slash)
+#else
+#ifdef macintosh
+    if (*s == colon )
+#else
+#ifdef UNIX
+    if (*s == slash )
+#else
+#error "Define something here for your operating system"
+#endif  
+#endif
+#endif
+    {
+      *d = slash; 
+      continue;
+    }
+#ifdef WIN32
+    if (IsDBCSLeadByte((BYTE)*s)) //MBCS DBCS
+    {
+      // escape sequence
+      d[0] = percent;
+      d[1] = hex[ (*s >> 4) & 0xf ];
+      d[2] = hex[ (*s) & 0xf ];
+      s++;
+      if (*s) // escape sequence
+      {
+        d+=3;
+        d[0] = percent;
+        d[1] = hex[ (*s >> 4) & 0xf ];
+        d[2] = hex[ (*s) & 0xf ];
+        d+=2;
+      }
+      continue;
+    }
+#endif
+
+    // WARNING: Whenever you modify this conversion code,
+    // make sure, that the following functions are in sync:
+    //   encode_reserved()
+    //   decode_reserved()
+    //   url_to_filename()
+    //   filename_to_url()
+    // unreserved characters
+    if ( (*s>='a' && *s<='z') ||
+       (*s>='A' && *s<='Z') ||
+       (*s>='0' && *s<='9') ||
+       (strchr("$-_.+!*'(),:", *s)) )   // Added : because of windows!
+    {
+      *d = *s;
+      continue;
+    }
+    // escape sequence
+    d[0] = percent;
+    d[1] = hex[ (*s >> 4) & 0xf ];
+    d[2] = hex[ (*s) & 0xf ];
+    d+=2;
+  }
+  *d = 0;
+  return retval;
+}
+
+// -------------------------------------------
+// Functions for converting filenames and urls
+// -------------------------------------------
+
+static GString
+url_from_UTF8filename(const GString &gfilename)
+{
+  if(GURL::UTF8(gfilename).is_valid())
+  {
+    DEBUG_MSG("Illegal URL: " << gfilename << "\n");
+    char *s=0;
+    *s=5;
+  } 
+  const char *filename=gfilename;
+  if(filename && (unsigned char)filename[0] == (unsigned char)0xEF
+     && (unsigned char)filename[1] == (unsigned char)0xBB && (unsigned char)filename[2] == (unsigned char)0xBF)
+  {
+    filename+=3;
+  }
+
+  // Special case for blank pages
+  if(!filename || !filename[0])
+  {
+    return "about:blank";
+  } 
+
+  // Normalize file name to url slash-and-escape syntax
+  GString oname=GURL::expand_name(filename);
+  GString nname=GURL::encode_reserved(oname);
+
+  // Preprend "file://" to file name. If file is on the local
+  // machine, include "localhost".
+  GString url=filespecslashes;
+  const char *cnname=nname;
+  if (cnname[0] == slash)
+  {
+    if (cnname[1] == slash)
+    {
+      url += cnname+2;
+    }else
+    {
+      url = localhost + nname;
+    }
+  }else
+  {
+    url += (localhostspec1+2) + nname;
+  }
+#if 0
+  // Special case for stupid MSIE 
+  GString agent(useragent ? useragent : "default");
+  if (agent.search("MSIE")>=0 || agent.search("Microsoft")>=0)
+  {
+    // We now remove all the escaping we just did.  The reason for adding
+    // it to begin with is so at least the slashes are converted.
+    url=GOS::url_to_filename(url);
+    url=filespecslashes + GURL::expand_name(url);
+  }
+#endif
+  return url;
+}
+
+// -- Returns a url for accessing a given file.
+//    If useragent is not provided, standard url will be created,
+//    but will not be understood by some versions if IE.
+GString 
+GURL::get_string(const char *useragent) const
+{
+  GString retval(url);
+  if(is_local_file_url()&&useragent)
+  {
+    const GString agent(useragent);
+    if(agent.search("MSIE") >= 0 || agent.search("Microsoft")>=0)
+    {
+      retval=filespecslashes + expand_name(filename());
+    }
+  }
+  return retval;
+}
+
+GURL::UTF8::UTF8(const GString &xurl,const GURL &codebase)
+{
+  if(GURL::UTF8(xurl).is_valid())
+  {
+    url=xurl;
+  }else
+  {
+    const char *c=xurl;
+    if(c[0] == slash)
+    {
+      GURL base(codebase);
+      for(GURL newbase=base.base();newbase!=base;newbase=base.base())
+      {
+        base=newbase;
+      }
+      url=base.get_string()+GURL::encode_reserved(xurl);
+    }else
+    {
+      url=codebase.get_string()+GString(slash)+GURL::encode_reserved(xurl);
+    }
+  }
+}
+
+GURL::Native::Native(const GString &xurl,const GURL &codebase)
+{
+  GURL::UTF8::UTF8 retval(xurl.getNative2UTF8(),codebase);
+  url=retval.get_string();
+}
+
+GURL::Filename::Native::Native(const GString &gfilename)
+{
+  url=url_from_UTF8filename(gfilename.getNative2UTF8());
+}
+
+
+GURL::Filename::UTF8::UTF8(const GString &gfilename)
+{
+  url=url_from_UTF8filename(gfilename);
+}
+
+// filename --
+// -- Applies heuristic rules to convert a url into a valid file name.  
+//    Returns a simple basename in case of failure.
+GString 
+GURL::filename(void) const
+{
+  GString retval;
+  if(! is_empty())
+  {
+    const char *url_ptr=url;
+  
+    // WARNING: Whenever you modify this conversion code,
+    // make sure, that the following functions are in sync:
+    //   encode_reserved()
+    //   decode_reserved()
+    //   url_to_filename()
+    //   filename_to_url()
+
+    GString urlcopy=decode_reserved(url);
+    url_ptr = urlcopy;
+
+#if 0
+    // Check if we have a simple file name already
+    {
+      GString tmp=expand_name(url_ptr,root);
+      if (GOS::is_file(tmp)) 
+        return tmp;
+    }
+#endif
+
+    // All file urls are expected to start with filespec which is "file:"
+    if (strncmp(url_ptr, filespec, sizeof(filespec)-1))  //if not
+      return GOS::basename(url_ptr);
+    url_ptr += sizeof(filespec)-1;
+  
+#ifdef macintosh
+    //remove all leading slashes
+    for(;*url_ptr==slash;url_ptr++)
+      EMPTY_LOOP;
+    // Remove possible localhost spec
+    if ( !strncmp(url_ptr, localhost, sizeof(localhost)-1) )
+      url_ptr += sizeof(localhost)-1;
+    //remove all leading slashes
+    while(*url_ptr==slash)
+      url_ptr++;
+#else
+    // Remove possible localhost spec
+    if ( !strncmp(url_ptr, localhostspec1, sizeof(localhostspec1)-1) )        // RFC 1738 local host form
+      url_ptr += sizeof(localhostspec1)-1;
+    else if ( !strncmp(url_ptr, localhostspec2, sizeof(localhostspec2)-1) )   // RFC 1738 local host form
+      url_ptr += sizeof(localhostspec2)-1;
+    else if ( (strlen(url_ptr) > 4) // "file://<letter>:/<path>"
+        && (url_ptr[0] == slash)      // "file://<letter>|/<path>"
+        && (url_ptr[1] == slash)
+        && isalpha(url_ptr[2])
+        && ( url_ptr[3] == colon || url_ptr[3] == '|' )
+        && (url_ptr[4] == slash) )
+      url_ptr += 2;
+    else if ( (strlen(url_ptr)) > 2 // "file:/<path>"
+        && (url_ptr[0] == slash)
+        && (url_ptr[1] != slash) )
+      url_ptr++;
+#endif
+
+    // Check if we are finished
+#ifdef macintosh
+    {
+      char *l_url;
+      GPBuffer<char> gl_url(l_url,strlen(url_ptr)+1);
+      const char *s;
+      char *r;
+      for ( s=url_ptr,r=l_url; *s; s++,r++)
+      {
+        *r=(*s == slash)?colon:*s;
+      }
+      *r=0;
+      retval = expand_name(l_url,root);
+    }
+#else  
+    retval = expand_name(url_ptr,root);
+#endif
+    
+#ifdef WIN32
+    if (!is_file(retval)) 
+    {
+      // Search for a drive letter (encoded a la netscape)
+      if (url_ptr[1]=='|' && url_ptr[2]== slash)
+      {
+        if ((url_ptr[0]>='a' && url_ptr[0]<='z') 
+          || (url_ptr[0]>='A' && url_ptr[0]<='Z'))
+        {
+          GString drive;
+          drive.format("%c%c%c", url_ptr[0],colon,backslash);
+          retval = expand_name(url_ptr+3, drive);
+        }
+      }
+    }
+#endif
+  }
+  // Return what we have
+  return retval;
+}
+
+#if defined(UNIX) || defined(macintosh)
+static int
+urlstat(const GURL &url,struct stat &buf)
+{
+  return stat(url.filename().getUTF82Native(),&buf);
+}
+#endif
+
+// is_file(url) --
+// -- returns true if filename denotes a regular file.
+bool
+GURL::is_file(void) const
+{
+  bool retval=false;
+  if(is_local_file_url())
+  {
+#if defined(UNIX) || defined(macintosh)
+    struct stat buf;
+    if (!urlstat(*this,buf))
+    {
+      retval=!(buf.st_mode & S_IFDIR);
+    }
+#elif defined(WIN32)
+    DWORD           dwAttrib;       ;
+    USES_CONVERSION ;
+    dwAttrib = GetFileAttributes(A2CT(filename().getUTF82Native())) ;//MBCS cvt
+    retval=!((dwAttrib == 0xFFFFFFFF)
+     ||( dwAttrib & FILE_ATTRIBUTE_DIRECTORY ));
+#else
+#error "Define something here for your operating system"
+#endif
+  }
+  return retval;
+}
+
+bool
+GURL::is_local_path(void) const
+{
+  bool retval=false;
+  if(is_local_file_url())
+  {
+#if defined(UNIX) || defined(macintosh)
+    struct stat buf;
+    retval=!urlstat(*this,buf);
+#else
+    DWORD           dwAttrib;       ;
+    USES_CONVERSION ;
+    dwAttrib = GetFileAttributes(A2CT(filename().getUTF82Native())) ;//MBCS cvt
+    retval=!(dwAttrib == 0xFFFFFFFF);
+#endif
+  }
+  return retval;
+}
+
+// is_dir(url) --
+// -- returns true if url denotes a directory.
+bool 
+GURL::is_dir(void) const
+{
+  bool retval=false;
+  if(is_local_file_url())
+  {
+    // UNIX implementation
+#if defined(UNIX) || defined(macintosh)
+    struct stat buf;
+    if (!urlstat(*this,buf))
+    {
+      retval=(buf.st_mode & S_IFDIR);
+    }
+#elif defined(WIN32)   // (either Windows or WCE)
+    USES_CONVERSION ;
+    DWORD           dwAttrib;       ;
+    dwAttrib = GetFileAttributes(A2CT(((GString)filename).getUTF82Native())) ;//MBCS cvt
+    retval=((dwAttrib != 0xFFFFFFFF)&&( dwAttrib & FILE_ATTRIBUTE_DIRECTORY ));
+#else
+#error "Define something here for your operating system"
+#endif
+  }
+  return retval;
+}
+
+int
+GURL::mkdir() const
+{
+  int retval;
+  if(!is_local_file_url())
+  {
+    retval=(-1);
+  }else
+  {
+    retval=0;
+    const GURL baseURL=base();
+    if(baseURL.get_string() != url && !baseURL.is_dir())
+    {
+      retval=baseURL.mkdir();
+    }
+    if(!retval)
+    {
+      retval=is_dir();
+#ifdef WIN32
+      USES_CONVERSION;
+      retval =(is_dir()?0:CreateDirectory(A2CT(filename().getUTF82Native()), NULL));//MBCS cvt
+#else
+      retval=(is_dir()?0:(::mkdir(filename().getUTF82Native(), 0755)));//MBCS cvt
+#endif
+    }
+  }
+  return retval;
+}
+
+// deletefile
+// -- deletes a file or directory
+  
+int
+GURL::deletefile(void) const
+{
+  int retval=(-1);
+  if(is_local_file_url())
+  {
+#ifdef WIN32
+    USES_CONVERSION;
+    retval=is_dir()
+      ?RemoveDirectory(A2CT(filename().getUTF82Native()))
+      :DeleteFile(A2CT(ilename().getUTF82Native())); //MBCS cvt
+#else
+    retval=is_dir()
+      ?rmdir(filename().getUTF82Native())
+      :unlink(filename().getUTF82Native());//MBCS cvt
+#endif
+  }
+  return retval;
+}
+
+GList<GURL>
+GURL::listdir(void) const
+{
+  GList<GURL> retval;
+  if(is_dir())
+  {
+#if defined(UNIX)
+    DIR * dir=opendir(filename().getUTF82Native());//MBCS cvt
+    for(dirent *de=readdir(dir);de;de=readdir(dir))
+    {
+      const int len = NAMLEN(de);
+      if (de->d_name[0]== dot  && len==1)
+        continue;
+      if (de->d_name[0]== dot  && de->d_name[1]== dot  && len==2)
+        continue;
+      retval.append(GURL::UTF8(de->d_name[0],*this));
+    }
+    closedir(dir);
+#elif defined (WIN32) && !defined (UNDER_CE)
+    GURL::UTF8 wildcard("*.*",*this);
+    WIN32_FIND_DATA finddata;
+    HANDLE handle = FindFirstFile(wildcard.filename().getUTF82Native(), &finddata);//MBCS cvt
+    const GString gpathname=pathname();
+    const GString gbase=base().pathname();
+    if( handle != INVALID_HANDLE_VALUE)
+    {
+      retval=0;
+      do
+      {
+        GURL::UTF8 Entry(finddata.cFileName,*this);
+        const GString gentry=Entry.pathname();
+        if((gentry != gpathname) && (gentry != gbase))
+          retval.append(Entry);
+      } while( FindNextFile(handle, &finddata) );
+
+      FindClose(handle);
+    }
+#else
+    // WCE and MAC is missing
+    G_THROW("GOS.cleardir");
+#endif
+  }
+  return retval;
+}
+
+int
+GURL::cleardir(const int timeout) const
+{
+  int retval=(-1);
+  if(is_dir())
+  {
+    GList<GURL> dirlist=listdir();
+    retval=0;
+    for(GPosition pos=dirlist;pos&&!retval;++pos)
+    {
+      const GURL &Entry=dirlist[pos];
+      if(Entry.is_dir())
+      {
+        if((retval=Entry.cleardir(timeout)) < 0)
+        {
+          break;
+        }
+      }
+      if(((retval=Entry.deletefile())<0) && (timeout>0))
+      {
+        GOS::sleep(timeout);
+        retval=Entry.deletefile();
+      }
+    }
+  }
+  return retval;
+}
+
+int
+GURL::renameto(const GURL &newurl) const
+{
+  return (is_local_file_url() && newurl.is_local_file_url())
+    ?rename(filename().getUTF82Native(),newurl.filename().getUTF82Native())
+    :(-1);
+}
+
+// expand_name(filename[, fromdirname])
+// -- returns the full path name of filename interpreted
+//    relative to fromdirname.  Use current working dir when
+//    fromdirname is null.
+GString 
+GURL::expand_name(const char *fname, const char *from)
+{
+  GString retval;
+  char * const string_buffer = retval.getbuf(MAXPATHLEN+10);
+  // UNIX implementation
+#ifdef UNIX
+  // Perform tilde expansion
+  if (fname && fname[0]==tilde)
+  {
+    int n;
+    for(n=1;fname[n] && fname[n]!= slash;n++) 
+      EMPTY_LOOP;
+    struct passwd *pw=0;
+    char const *s;
+    if (n!=1)
+    {
+      GString user(fname+1, n-1);
+      pw=getpwnam(user);
+    }else if ((s=getenv("HOME")))
+    {
+      from=(const char *)((GString)s).getNative2UTF8();//MBCS cvt
+      fname = fname + n;
+    }else if ((s=getenv("LOGNAME")))
+    {
+      pw = getpwnam(s);
+    }else
+    {
+      pw=getpwuid(getuid());
+    }
+    if (pw)
+    {
+      from = (const char *)((GString)pw->pw_dir).getNative2UTF8();//MBCS cvt;
+      fname = fname + n;
+    }
+    for(;fname[0] == slash; fname++)
+      EMPTY_LOOP;
+  }
+  // Process absolute vs. relative path
+  if (fname && fname[0]== slash)
+  {
+    string_buffer[0]=slash;
+    string_buffer[1]=0;
+  }else if (from)
+  {
+    strcpy(string_buffer, expand_name(from));
+  }else
+  {
+    strcpy(string_buffer, GOS::cwd());
+  }
+  char *s = string_buffer + strlen(string_buffer);
+  if(fname)
+  {
+    for(;fname[0]== slash;fname++)
+      EMPTY_LOOP;
+    // Process path components
+    while(fname[0])
+    {
+      if (fname[0] == dot )
+      {
+        if (!fname[1] || fname[1]== slash)
+        {
+          fname++;
+          continue;
+        }else if (fname[1]== dot && (fname[2]== slash || !fname[2]))
+        {
+          fname +=2;
+          for(;s>string_buffer+1 && *(s-1)== slash; s--)
+            EMPTY_LOOP;
+          for(;s>string_buffer+1 && *(s-1)!= slash; s--)
+            EMPTY_LOOP;
+          continue;
+        }
+      }
+      if ((s==string_buffer)||(*(s-1)!= slash))
+      {
+        *s = slash;
+        s++;
+      }
+      while (*fname &&(*fname!= slash))
+      {
+        *s = *fname++;
+        if ((++s)-string_buffer > MAXPATHLEN)
+          G_THROW("GOS.big_name");
+      }
+      *s = 0;
+      for(;fname[0]== slash;fname++)
+        EMPTY_LOOP;
+    }
+  }
+  if (!fname || !fname[0])
+  {
+    for(;s>string_buffer+1 && *(s-1) == slash; s--)
+      EMPTY_LOOP;
+    *s = 0;
+  }
+#elif defined (WIN32) && !defined (UNDER_CE) // WIN32 implementation
+  // Handle base
+  strcpy(string_buffer, (char const *)(from?expand_name(from):GOS::cwd()));
+  if (fname)
+  {
+    char *s = string_buffer;
+    char  drv[4];
+    // Handle absolute part of fname
+    if (fname[0]== slash || fname[0]== backslash)
+    {
+      if (fname[1]== slash || fname[1]== backslash)
+      { // Case "//abcd"
+        s[0]=s[1]= backslash; s[2]=0;
+      } else
+      { // Case "/abcd" 
+        if (s[0]==0 || s[1]!=colon)
+        {
+          s[0] = _getdrive() + 'A' - 1;
+        }
+        s[1]=colon;
+        s[2]= 0;
+      }
+    } else if (fname[0] && fname[1]==colon)
+    {
+      if (fname[2]!= slash && fname[2]!= backslash)
+      { // Case "x:abcd"
+        if ( toupper((unsigned char)s[0]) != toupper((unsigned char)fname[0])
+             || s[1]!=colon)
+        {
+          drv[0]=fname[0];
+          drv[1]=colon;
+          drv[2]= dot ;
+          drv[3]=0;
+          GetFullPathName(drv, MAXPATHLEN, string_buffer, &s);
+		  string_buffer = (char*)(const char *)((GString)string_buffer).getNative2UTF8();//MBCS cvt
+          s = string_buffer;
+        }
+        fname += 2;
+      } else if (fname[3]!= slash && fname[3]!= backslash)
+      { // Case "x:/abcd"
+        s[0]=toupper((unsigned char)fname[0]);
+        s[1]=colon;
+        s[2]=backslash;
+        s[3]=0;
+        fname += 3;
+      }else
+      { // Case "x://abcd"
+        s[0]=s[1]=backslash;
+        s[2]=0;
+        fname += 4;
+      }
+    }
+    // Process path components
+    for(;*fname== slash || *fname==backslash;fname++)
+      EMPTY_LOOP;
+    while(*fname)
+    {
+      if (fname[0]== dot )
+      {
+        if (fname[1]== slash || fname[1]==backslash || !fname[1])
+        {
+          fname++;
+          continue;
+        }else if ((fname[1] == dot)
+          && (fname[2]== slash || fname[2]==backslash || !fname[2]))
+        {
+          fname += 2;
+          strcpy(string_buffer, dirname(string_buffer));
+          s = string_buffer;
+          continue;
+        }
+		char* s2=s;//MBCS DBCS
+        for(;*s;s++) 
+          EMPTY_LOOP;
+		char* back = _tcsrchr(s2,backslash);//MBCS DBCS
+        if ((s>string_buffer)&&(*(s-1)!= slash)&&(back == NULL || (back!=NULL && s-1 != back) ))//MBCS DBCS
+        //if ((s>string_buffer)&&(*(s-1)!= slash)&&(*(s-1)!= backslash))
+        {
+          *s = backslash;
+          s++;
+        }
+        while (*fname && *fname!= slash && *fname!=backslash)
+        {
+	      if (IsDBCSLeadByte((BYTE)*fname)) {*s = *fname++;}//MBCS DBCS
+          *s = *fname++;
+          if ((++s)-string_buffer > MAXPATHLEN)
+            G_THROW("GOS.big_name");
+        }
+        *s = 0;
+      }
+	  char* s2=s;//MBCS DBCS
+      for(;*s;s++) 
+        EMPTY_LOOP;
+	  char* back = _tcsrchr(s2,backslash);//MBCS DBCS
+      if ((s>string_buffer)&&(*(s-1)!= slash)&&(back == NULL || (back!=NULL && s-1 != back) ))//MBCS DBCS
+      //if ((s == string_buffer)||((*(s-1)!= slash) && (*(s-1)!=backslash)))
+      {
+        *s = backslash;
+        s++;
+      }
+      while (*fname && (*fname!= slash) && (*fname!=backslash))
+      {
+	    if (IsDBCSLeadByte((BYTE)*fname)) {
+			*s++ = *fname++;
+		}//MBCS DBCS
+        *s = *fname++;
+        if ((++s)-string_buffer > MAXPATHLEN)
+          G_THROW("GOS.big_name");
+      }
+      *s = 0;
+      for(;(*fname== slash)||(*fname==backslash);fname++)
+        EMPTY_LOOP;
+    }
+  }
+#elif defined(macintosh) // MACINTOSH implementation
+  strcpy(string_buffer, (const char *)(from?from:GOS::cwd()));
+
+  if (!strncmp(string_buffer,fname,strlen(string_buffer)) || is_file(fname))
+  {
+    strcpy(string_buffer, "");//please don't expand, the logic of filename is chaos.
+  }
+    
+  // Process path components
+  char *s = string_buffer + strlen(string_buffer);
+  if(fname)
+  {
+    for(;fname[0]==colon;fname++)
+      EMPTY_LOOP;
+    while(fname[0])
+    {
+      if (fname[0]== dot )
+      {
+        if (fname[1]==colon || !fname[1])
+        {
+          fname++;
+          continue;
+        }
+        if ((fname[1]== dot )
+             &&(fname[2]==colon || fname[2]==0))
+        {
+          fname +=2;
+          for(;(s>string_buffer+1)&&(*(s-1)==colon);s--)
+            EMPTY_LOOP;
+          for(;(s>string_buffer+1)&&(*(s-1)!=colon);s--)
+            EMPTY_LOOP;
+          continue;
+        }
+      }
+      if ((s==string_buffer)||(*(s-1)!=colon))
+      {
+        *s = colon;
+        s++;
+      }
+      while (*fname!=0 && *fname!=colon)
+      {
+        *s = *fname++;
+        if ((++s)-string_buffer > MAXPATHLEN)
+          G_THROW("GOS.big_name");
+      }
+      *s = 0;
+      for(;fname[0]==colon;fname++)
+        EMPTY_LOOP;
+    }
+  }
+  for(;(s>string_buffer+1) && (*(s-1)==colon);s--)
+    EMPTY_LOOP;
+  *s = 0;
+  return ((string_buffer[0]==colon)?(string_buffer+1):string_buffer);
+#elif   defined(UNDER_CE) 
+  retval=fname;
+#else
+#error "Define something here for your operating system"
+#endif  
+  return retval;
+}
+
 

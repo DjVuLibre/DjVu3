@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuFile.cpp,v 1.154 2001-03-08 23:57:26 bcr Exp $
+// $Id: DjVuFile.cpp,v 1.154.2.1 2001-03-28 01:04:27 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -159,7 +159,7 @@ DjVuFile::init(ByteStream & str)
   // Construct some dummy URL
   GString buffer;
   buffer.format("djvufile:/%p.djvu", this);
-  url=buffer;
+  url=GURL::UTF8(buffer);
   
   // Set it here because trigger will call other DjVuFile's functions
   initialized=true;
@@ -526,7 +526,7 @@ DjVuFile::process_incl_chunk(ByteStream & str, int file_num)
     
     GURL incl_url=pcaster->id_to_url(this, incl_str);
     if (incl_url.is_empty())	// Fallback. Should never be used.
-      incl_url=url.base()+GOS::encode_reserved(incl_str);
+      incl_url=GURL::UTF8(incl_str,url.base());
     
     // Now see if there is already a file with this *name* created
     {
@@ -619,7 +619,7 @@ DjVuFile::report_error
     GURL url=get_url();
     GString url_str=(const char *) url;
     if (url.is_local_file_url())
-      url_str=GOS::url_to_filename(url);
+      url_str=url.filename();
     
     GString msg = "DjVuFile.EOF\t" + url_str;
     if(throw_errors)
@@ -1746,7 +1746,7 @@ DjVuFile::set_name(const char * name)
 {
   DEBUG_MSG("DjVuFile::set_name(): name='" << name << "'\n");
   DEBUG_MAKE_INDENT(3);
-  url=url.base()+GOS::encode_reserved(name);
+  url=GURL::UTF8(name,url.base());
 }
 
 //*****************************************************************************
@@ -2340,7 +2340,7 @@ DjVuFile::unlink_file(const char * id)
   // Remove the file from the list of included files
   {
     GURL url=DjVuPort::get_portcaster()->id_to_url(this, id);
-    if (url.is_empty()) url=DjVuFile::url.base()+GOS::encode_reserved(id);
+    if (url.is_empty()) url=GURL::UTF8(id,DjVuFile::url.base());
     GCriticalSectionLock lock(&inc_files_lock);
     for(GPosition pos=inc_files_list;pos;)
       if (inc_files_list[pos]->get_url()==url)

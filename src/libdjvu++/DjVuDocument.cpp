@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocument.cpp,v 1.150 2001-03-08 23:57:26 bcr Exp $
+// $Id: DjVuDocument.cpp,v 1.150.2.1 2001-03-28 01:04:27 bcr Exp $
 // $Name:  $
 
 
@@ -56,7 +56,7 @@ static const char octets[4]={0x41,0x54,0x26,0x54};
 const float	DjVuDocument::thumb_gamma=(float)2.20;
 
 void (* DjVuDocument::djvu_import_codec)(
-  GP<DataPool> &pool, const char *filename, bool &needs_compression,
+  GP<DataPool> &pool, const GURL &url, bool &needs_compression,
   bool &needs_rename )=0;
 
 void (* DjVuDocument::djvu_compress_codec)(
@@ -65,7 +65,7 @@ void (* DjVuDocument::djvu_compress_codec)(
 void
 DjVuDocument::set_import_codec(
   void (*codec)(
-    GP<DataPool> &pool, const char filename[], bool &needs_compression, bool &needs_rename ))
+    GP<DataPool> &pool, const GURL &url, bool &needs_compression, bool &needs_rename ))
 {
   djvu_import_codec=codec;
 }
@@ -83,7 +83,7 @@ DjVuDocument::DjVuDocument(void)
     needs_compression_flag(false),
     can_compress_flag(false),
     needs_rename_flag(false),
-    has_file_names(false),
+    has_url_names(false),
     recover_errors(ABORT),
     verbose_eof(false),
     init_started(false),
@@ -98,7 +98,7 @@ DjVuDocument::create(
   DjVuDocument *doc=new DjVuDocument;
   GP<DjVuDocument> retval=doc;
   doc->init_data_pool=pool;
-  doc->start_init(0,xport,xcache);
+  doc->start_init(GURL(),xport,xcache);
   return retval;
 }
 
@@ -111,9 +111,9 @@ DjVuDocument::create(
 
 GP<DjVuDocument>
 DjVuDocument::create_wait(
-  char const filename[], GP<DjVuPort> xport, DjVuFileCache * const xcache)
+  const GURL &url, GP<DjVuPort> xport, DjVuFileCache * const xcache)
 {
-  GP<DjVuDocument> retval=create(GOS::filename_to_url(filename),xport,xcache);
+  GP<DjVuDocument> retval=create(url,xport,xcache);
   retval->wait_for_complete_init();
   return retval;
 }
@@ -156,20 +156,14 @@ DjVuDocument::start_init(
      {
        if(!init_url.is_empty() && init_url.is_local_file_url() && djvu_import_codec)
        {
-         djvu_import_codec(init_data_pool,(const char *)(GOS::url_to_filename(init_url)),needs_compression_flag,needs_rename_flag);
+         djvu_import_codec(init_data_pool,init_url,needs_compression_flag,needs_rename_flag);
        }
        if(needs_rename_flag)
          can_compress_flag=true;
      }
      if (!init_data_pool) 
      {
-       if(url.is_local_file_url())
-       {
-          G_THROW("DjVuDocument.fail_file\t"+GOS::url_to_filename(init_url));
-       }else
-       {
-          G_THROW("DjVuDocument.fail_URL\t"+init_url);
-       }
+       G_THROW("DjVuDocument.fail_URL\t"+init_url);
      }
    }
       // Now we say it is ready
@@ -594,14 +588,7 @@ DjVuDocument::check_unnamed_files(void)
             GP<DataPool> new_pool=pcaster->request_data(ufile->file, new_url);
             if(!new_pool)
             {
-              if(new_url.is_local_file_url())
-              {
-                G_THROW("DjVuDocument.fail_file\t"+GOS::url_to_filename(new_url));
-              }
-              else
-              {
-                G_THROW("DjVuDocument.fail_URL\t"+new_url);
-              }
+              G_THROW("DjVuDocument.fail_URL\t"+new_url);
             }
             ufile->data_pool->connect(new_pool);
 	         }
@@ -662,7 +649,7 @@ DjVuDocument::page_to_url(int page_num) const
 	 {
 	    if (page_num<0) page_num=0;
 	    if (page_num==0 && (flags & DOC_DIR_KNOWN))
-	       url=init_url+GOS::encode_reserved(first_page_name);
+	       url=GURL::UTF8(first_page_name,init_url);
 	    else if (flags & DOC_NDIR_KNOWN)
 	       url=ndir->page_to_url(page_num);
 	    break;
@@ -674,7 +661,7 @@ DjVuDocument::page_to_url(int page_num) const
 	    {
 	       GP<DjVmDir::File> file=djvm_dir->page_to_file(page_num);
 	       if (!file) G_THROW("DjVuDocument.big_num");
-	       url=init_url+GOS::encode_reserved(file->name);
+	       url=GURL::UTF8(file->name,init_url);
 	    }
 	    break;
 	 }
@@ -685,7 +672,7 @@ DjVuDocument::page_to_url(int page_num) const
 	    {
 	       GP<DjVmDir::File> file=djvm_dir->page_to_file(page_num);
 	       if (!file) G_THROW("DjVuDocument.big_num");
-	       url=init_url.base()+GOS::encode_reserved(file->name);
+	       url=GURL::UTF8(file->name,init_url.base());
 	    }
 	    break;
 	 }
@@ -755,7 +742,7 @@ DjVuDocument::id_to_url(const char * id) const
 	       GP<DjVmDir::File> file=djvm_dir->id_to_file(id);
 	       if (!file) file=djvm_dir->name_to_file(id);
 	       if (!file) file=djvm_dir->title_to_file(id);
-	       if (file) return init_url+GOS::encode_reserved(file->name);
+	       if (file) return GURL::UTF8(file->name,init_url);
 	    }
 	    break;
 	 case INDIRECT:
@@ -764,19 +751,19 @@ DjVuDocument::id_to_url(const char * id) const
 	       GP<DjVmDir::File> file=djvm_dir->id_to_file(id);
 	       if (!file) file=djvm_dir->name_to_file(id);
 	       if (!file) file=djvm_dir->title_to_file(id);
-	       if (file) return init_url.base()+GOS::encode_reserved(file->name);
+	       if (file) return GURL::UTF8(file->name,init_url.base());
 	    }
 	    break;
 	 case OLD_BUNDLED:
 	    if (flags & DOC_DIR_KNOWN)
 	    {
 	       GP<DjVmDir0::FileRec> frec=djvm_dir0->get_file(id);
-	       if (frec) return init_url+GOS::encode_reserved(id);
+	       if (frec) return GURL::UTF8(id,init_url);
 	    }
 	    break;
 	 case OLD_INDEXED:
 	 case SINGLE_PAGE:
-	    return init_url.base()+GOS::encode_reserved(id);
+	    return GURL::UTF8(id,init_url.base());
 	    break;
       }
    return GURL();
@@ -906,9 +893,9 @@ DjVuDocument::get_djvu_file(int page_num, bool dont_create)
 GURL
 DjVuDocument::invent_url(const char name[]) const
 {
-   char buffer[128];
-   sprintf(buffer, "djvufileurl://%p/%s", this, name);
-   return buffer;
+   GString buffer;
+   buffer.format("djvufileurl://%p/%s", this, name);
+   return GURL::UTF8(buffer);
 }
 
 GP<DjVuFile>
@@ -1407,11 +1394,11 @@ DjVuDocument::request_data(const DjVuPort * source, const GURL & url)
 	 
 	    if (url.is_local_file_url())
 	    {
-	       GString fname=GOS::url_to_filename(url);
-	       if (GOS::basename(fname)=="-") fname="-";
-	       DEBUG_MSG("fname=" << fname << "\n");
+//	       GString fname=GOS::url_to_filename(url);
+//	       if (GOS::basename(fname)=="-") fname="-";
+	       DEBUG_MSG("url=" << url << "\n");
 
-	       data_pool=DataPool::create(fname);
+	       data_pool=DataPool::create(url);
 	    }
 	 }
       }
@@ -1481,7 +1468,7 @@ add_file_to_djvm(const GP<DjVuFile> & file, bool page,
 }
 
 static void
-local_get_file_names(DjVuFile * f,const GMap<GURL, void *> & map,GMap<GURL,void *> &tmpmap)
+local_get_url_names(DjVuFile * f,const GMap<GURL, void *> & map,GMap<GURL,void *> &tmpmap)
 {
    GURL url=f->get_url();
    if (!map.contains(url) && !tmpmap.contains(url))
@@ -1490,26 +1477,27 @@ local_get_file_names(DjVuFile * f,const GMap<GURL, void *> & map,GMap<GURL,void 
       f->process_incl_chunks();
       GPList<DjVuFile> files_list=f->get_included_files(false);
       for(GPosition pos=files_list;pos;++pos)
-         local_get_file_names(files_list[pos], map, tmpmap);
+         local_get_url_names(files_list[pos], map, tmpmap);
    }
 }
 
 static void
-local_get_file_names(DjVuFile * f, GMap<GURL, void *> & map)
+local_get_url_names(DjVuFile * f, GMap<GURL, void *> & map)
 {
    GMap<GURL,void *> tmpmap;
-   local_get_file_names(f,map,tmpmap);
+   local_get_url_names(f,map,tmpmap);
    for(GPosition pos=tmpmap;pos;++pos)
      map[tmpmap.key(pos)]=0;
 }
 
-GList<GString>
-DjVuDocument::get_file_names(void) 
+GList<GURL>
+DjVuDocument::get_url_names(void)
 {
   check();
 
-  GCriticalSectionLock lock(&file_names_lock);
-  if(has_file_names) return file_names;
+  GCriticalSectionLock lock(&url_names_lock);
+  if(has_url_names)
+    return url_names;
 
   GMap<GURL, void *> map;
   int i;
@@ -1528,7 +1516,7 @@ DjVuDocument::get_file_names(void)
     {
       G_TRY
       {
-        local_get_file_names(get_djvu_file(i), map);
+        local_get_url_names(get_djvu_file(i), map);
       }
       G_CATCH(ex)
       {
@@ -1557,11 +1545,11 @@ DjVuDocument::get_file_names(void)
   {
     if (map.key(j).is_local_file_url())
     {
-      file_names.append(GOS::url_to_filename(map.key(j)));
+      url_names.append(map.key(j));
     }
   }
-  has_file_names=true;
-  return file_names;
+  has_url_names=true;
+  return url_names;
 }
 
 GP<DjVmDoc>
@@ -1666,13 +1654,13 @@ DjVuDocument::write(GP<ByteStream> gstr, bool force_djvm)
 }
 
 void
-DjVuDocument::expand(const char * dir_name, const char * idx_name)
+DjVuDocument::expand(const GURL &codebase, const char * idx_name)
 {
-   DEBUG_MSG("DjVuDocument::expand(): dir_name='" << dir_name << "'\n");
+   DEBUG_MSG("DjVuDocument::expand(): codebase='" << codebase << "'\n");
    DEBUG_MAKE_INDENT(3);
    
    GP<DjVmDoc> doc=get_djvm_doc();
-   doc->expand(dir_name, idx_name);
+   doc->expand(codebase, idx_name);
 }
 
 void
@@ -1682,7 +1670,7 @@ DjVuDocument::save_as(const char where[], const bool bundled)
 	     "', bundled=" << bundled << "\n");
    DEBUG_MAKE_INDENT(3);
    
-   GString full_name=GOS::expand_name(where, GOS::cwd());
+   const GURL::Filename::UTF8 url(where);
   
    if (needs_compression())
    { 
@@ -1698,11 +1686,11 @@ DjVuDocument::save_as(const char where[], const bool bundled)
      (*djvu_compress_codec)(gmbs,where,bundled);
    }else if (bundled)
    {
-      DataPool::load_file(full_name);
-      write(ByteStream::create(full_name, "wb"));
+      DataPool::load_file(url);
+      write(ByteStream::create(url, "wb"));
    } else 
    {
-     expand(GOS::dirname(full_name), GOS::basename(full_name));
+     expand(url.base(), url.fname());
    }
 }
 

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: bzz.cpp,v 1.12.2.1 2001-03-22 02:04:15 bcr Exp $
+// $Id: bzz.cpp,v 1.12.2.2 2001-03-28 01:04:25 bcr Exp $
 // $Name:  $
 
 
@@ -58,7 +58,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation
     @version
-    $Id: bzz.cpp,v 1.12.2.1 2001-03-22 02:04:15 bcr Exp $ */
+    $Id: bzz.cpp,v 1.12.2.2 2001-03-28 01:04:25 bcr Exp $ */
 //@{
 //@}
 
@@ -69,7 +69,7 @@
 #include "GURL.h"
 #include <stdlib.h>
 
-char *program = "(unknown)";
+static const char *program = "(unknown)";
 
 void
 usage(void)
@@ -88,14 +88,16 @@ usage(void)
 int 
 main(int argc, char **argv)
 {
+  DArray<GString> dargv(0,argc-1);
+  for(int i=0;i<argc;++i)
+  {
+    GString g(argv[i]);
+    dargv[i]=g.getNative2UTF8();
+  }
   G_TRY
     {
       // Get program name
-      program = strrchr(argv[0],'/');
-      if (program) 
-        program += 1; 
-      else 
-        program = argv[0];
+      program=dargv[0]=GOS::basename(dargv[0]);
       // Obtain default mode from program name
       int blocksize = -1;
       if (!strcmp(program,"bzz"))
@@ -103,32 +105,28 @@ main(int argc, char **argv)
       else if (!strcmp(program,"unbzz"))
         blocksize = 0;
       // Parse arguments
-      if (argc>=2 && argv[1][0]=='-')
+      if (argc>=2 && dargv[1][0]=='-')
         {
-          if (argv[1][1]=='d' && argv[1][2]==0)
+          if (dargv[1][1]=='d' && dargv[1][2]==0)
             {
               blocksize = 0;
             }
-          else if (argv[1][1]=='e')
+          else if (dargv[1][1]=='e')
             {
               blocksize = 2048;
-              if (argv[1][2])
-                blocksize = atoi(argv[1]+2);
+              if (dargv[1][2])
+                blocksize = atoi(2+(const char *)dargv[1]);
             }
           else 
             usage();
-          argv++;
+          dargv.shift(-1);
           argc--;
         }
       if (blocksize < 0)
         usage();
       // Obtain filenames
-      GURL inurl(GOS::filename_to_url("-"));
-      GURL outurl(GOS::filename_to_url("-"));
-      if (argc >= 2)
-        inurl = GOS::filename_to_url(argv[1]);
-      if (argc >= 3)
-        outurl = GOS::filename_to_url(argv[2]);
+      const GURL::Filename::UTF8 inurl((argc>=2)?dargv[1]:GString("-"));
+      const GURL::Filename::UTF8 outurl((argc>=3)?dargv[2]:GString("-"));
       if (argc >= 4)
         usage();
       // Action

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.37.2.4 2001-03-22 02:04:16 bcr Exp $
+// $Id: GString.cpp,v 1.37.2.5 2001-03-28 01:04:27 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -83,14 +83,30 @@ GString::GString(const char dat)
 
 GString::GString(const char *str)
 {
-  if (!str) 
-    return;
-  int len = strlen(str);
-  if (len <= 0)
-    return;
-  GStringRep *rep = GStringRep::xnew(strlen(str));
-  strcpy(rep->data,str);
-  (*this) = rep;
+  if (str) 
+  {
+    const int len = strlen(str);
+    if (len > 0)
+    {
+      GStringRep * const rep = GStringRep::xnew(len);
+      strcpy(rep->data,str);
+      (*this) = rep;
+    }
+  }
+}
+
+GString::GString(const unsigned char *str)
+{
+  if (str) 
+  {
+    const int len = strlen((const char *)str);
+    if (len > 0)
+    {
+      GStringRep * const rep = GStringRep::xnew(len);
+      strcpy(rep->data,(const char *)str);
+      (*this) = rep;
+    }
+  }
 }
 
 GString::GString(const char *str, unsigned int len)
@@ -346,13 +362,13 @@ GString::fromEscaped( const GMap<GString,GString> ConvMap ) const
       ret += substr( amp_locn, len+2 );
     }
     start_locn = semi_locn + 1;
-    DEBUG_MSG( "ret = '" << ret << "'\n" );
+//    DEBUG_MSG( "ret = '" << ret << "'\n" );
   }
 
                                 // Copy the end of the string to the output
   ret += substr( start_locn, length()-start_locn );
 
-  DEBUG_MSG( "Unescaped string is '" << ret << "'\n" );
+//  DEBUG_MSG( "Unescaped string is '" << ret << "'\n" );
   return ret;
 }
 

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djvudump.cpp,v 1.12.2.1 2001-03-22 02:04:16 bcr Exp $
+// $Id: djvudump.cpp,v 1.12.2.2 2001-03-28 01:04:25 bcr Exp $
 // $Name:  $
 
 /** @name djvuinfo
@@ -78,7 +78,7 @@ xxx
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: djvudump.cpp,v 1.12.2.1 2001-03-22 02:04:16 bcr Exp $# */
+    #$Id: djvudump.cpp,v 1.12.2.2 2001-03-28 01:04:25 bcr Exp $# */
 //@{
 //@}
 
@@ -119,12 +119,21 @@ usage()
 int 
 main(int argc, char **argv)
 {
+  DArray<GString> dargv(0,argc-1);
+  for(int i=0;i<argc;++i)
+  {
+    GString g(argv[i]);
+    dargv[i]=g.getNative2UTF8();
+  }
   G_TRY
     {
       if (argc<=1)
         usage();
       for (int i=1; i<argc; i++)
-        display(GOS::filename_to_url(argv[i]));
+      {
+        const GURL::Filename::UTF8 url(dargv[i]);
+        display(url);
+      }
     }
   G_CATCH(ex)
     {

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ppmcoco.cpp,v 1.8.2.1 2001-03-22 02:04:16 bcr Exp $
+// $Id: ppmcoco.cpp,v 1.8.2.2 2001-03-28 01:04:25 bcr Exp $
 // $Name:  $
 
 /** @name ppmcoco
@@ -104,7 +104,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: ppmcoco.cpp,v 1.8.2.1 2001-03-22 02:04:16 bcr Exp $# */
+    #$Id: ppmcoco.cpp,v 1.8.2.2 2001-03-28 01:04:25 bcr Exp $# */
 //@{
 //@}
 
@@ -149,8 +149,15 @@ str_to_gamma(const char *str)
 int 
 main (int argc, char **argv)
 {
-  GURL inurl(GOS::filename_to_url("-"));
-  GURL outurl(GOS::filename_to_url("-"));
+  DArray<GString> dargv(0,argc-1);
+  for(int i=0;i<argc;++i)
+  {
+    GString g(argv[i]);
+    dargv[i]=g.getNative2UTF8();
+  }
+  const GURL::Filename::UTF8 stdinurl("-");
+  GURL inurl(stdinurl);
+  GURL outurl(stdinurl);
   G_TRY
     {
       // parse
@@ -159,23 +166,23 @@ main (int argc, char **argv)
       int flag = 0;
       for (int i=1; i<argc; i++)
         {
-          if (!strcmp(argv[i],"-from") && i+1<argc)
+          if (!strcmp(dargv[i],"-from") && i+1<argc)
             {
-          fromGamma = str_to_gamma(argv[++i]);
+          fromGamma = str_to_gamma(dargv[++i]);
             }
           else if (!strcmp(argv[i],"-to") && i+1<argc)
             {
-              toGamma = str_to_gamma(argv[++i]);
+              toGamma = str_to_gamma(dargv[++i]);
             }
           else if (flag==0)
             {
               flag = 1;
-              inurl = GOS::filename_to_url(argv[i]);
+              inurl = GURL::Filename::UTF8(dargv[i]);
             }
           else if (flag == 1)
             {
               flag = 2;
-              outurl = GOS::filename_to_url(argv[i]);
+              outurl = GURL::Filename::UTF8(argv[i]);
             }
           else
             usage();

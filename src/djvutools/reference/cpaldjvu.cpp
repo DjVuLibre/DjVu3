@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: cpaldjvu.cpp,v 1.11.2.1 2001-03-22 02:04:15 bcr Exp $
+// $Id: cpaldjvu.cpp,v 1.11.2.2 2001-03-28 01:04:25 bcr Exp $
 // $Name:  $
 
 
@@ -69,7 +69,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: cpaldjvu.cpp,v 1.11.2.1 2001-03-22 02:04:15 bcr Exp $# */
+    #$Id: cpaldjvu.cpp,v 1.11.2.2 2001-03-28 01:04:25 bcr Exp $# */
 //@{
 //@}
 
@@ -895,6 +895,12 @@ usage()
 int 
 main(int argc, const char **argv)
 {
+  DArray<GString> dargv(0,argc-1);
+  for(int i=0;i<argc;++i)
+  {
+    GString g(argv[i]);
+    dargv[i]=g.getNative2UTF8();
+  }
   G_TRY
     {
       GURL inputppmurl;
@@ -907,18 +913,18 @@ main(int argc, const char **argv)
       // Parse options
       for (int i=1; i<argc; i++)
         {
-          GString arg = argv[i];
+          GString arg = dargv[i];
           if (arg == "-colors" && i+1<argc)
             {
               char *end;
-              opts.ncolors = strtol(argv[++i], &end, 10);
+              opts.ncolors = strtol(dargv[++i], &end, 10);
               if (*end || opts.ncolors<2 || opts.ncolors>1024)
                 usage();
             }
           else if (arg == "-dpi" && i+1<argc)
             {
               char *end;
-              opts.dpi = strtol(argv[++i], &end, 10);
+              opts.dpi = strtol(dargv[++i], &end, 10);
               if (*end || opts.dpi<25 || opts.dpi>144000)
                 usage();
             }
@@ -926,14 +932,14 @@ main(int argc, const char **argv)
             opts.verbose = true;
           else if (arg[0] == '-')
             usage();
-          else if (!inputppmurl.is_valid())
-            inputppmurl = GOS::filename_to_url(arg);
-          else if (!outputdjvuurl.is_valid())
-            outputdjvuurl = GOS::filename_to_url(arg);
+          else if (inputppmurl.is_empty())
+            inputppmurl = GURL::Filename::UTF8(arg);
+          else if (outputdjvuurl.is_empty())
+            outputdjvuurl = GURL::Filename::UTF8(arg);
           else
             usage();
         }
-      if (!inputppmurl.is_valid() || !outputdjvuurl.is_valid())
+      if (inputppmurl.is_empty() || outputdjvuurl.is_empty())
         usage();
       // Load and run
       GP<ByteStream> ibs=ByteStream::create(inputppmurl,"rb");

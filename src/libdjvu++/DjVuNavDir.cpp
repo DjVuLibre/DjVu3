@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuNavDir.cpp,v 1.16 2001-01-04 22:04:55 bcr Exp $
+// $Id: DjVuNavDir.cpp,v 1.16.4.1 2001-03-28 01:04:27 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -42,15 +42,16 @@
 #include "GException.h"
 #include "GOS.h"
 #include "ByteStream.h"
+#include "GURL.h"
 #include <ctype.h>
 
-DjVuNavDir::DjVuNavDir(const char * dirURL)
+DjVuNavDir::DjVuNavDir(const GURL &dirURL)
 {
    if (!dirURL) G_THROW("DjVuNavDir.zero_dir");
-   baseURL=GURL(dirURL).base();
+   baseURL=dirURL.base();
 }
 
-DjVuNavDir::DjVuNavDir(ByteStream & str, const char * dirURL)
+DjVuNavDir::DjVuNavDir(ByteStream & str, const GURL &dirURL)
 {
    if (!dirURL) G_THROW("DjVuNavDir.zero_dir");
    
@@ -93,7 +94,7 @@ DjVuNavDir::decode(ByteStream & str)
    for(cnt=0;cnt<pages;cnt++)
    {
       name2page[page2name[cnt]]=cnt;
-      url2page[baseURL+GOS::encode_reserved(page2name[cnt])]=cnt;
+      url2page[GURL::UTF8(page2name[cnt],baseURL)]=cnt;
    }
 }
 
@@ -154,7 +155,7 @@ DjVuNavDir::page_to_url(int page) const
 {
    GCriticalSectionLock lk((GCriticalSection *)&lock);
    
-   return baseURL+GOS::encode_reserved(page_to_name(page));
+   return GURL::UTF8(page_to_name(page),baseURL);
 }
 
 void
@@ -170,7 +171,7 @@ DjVuNavDir::insert_page(int where, const char * name)
       page2name[i]=page2name[i-1];
    page2name[where]=name;
    name2page[name]=where;
-   url2page[baseURL+GOS::encode_reserved(name)]=where;
+   url2page[GURL::UTF8(name,baseURL)]=where;
 }
 
 #ifndef NEED_DECODER_ONLY

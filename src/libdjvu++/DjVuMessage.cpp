@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessage.cpp,v 1.23.2.1 2001-03-22 02:04:16 bcr Exp $
+// $Id: DjVuMessage.cpp,v 1.23.2.2 2001-03-28 01:04:27 bcr Exp $
 // $Name:  $
 
 
@@ -84,10 +84,10 @@ static const char includestring[]="INCLUDE";
 static const char messagestring[]="MESSAGE";
 
 #ifdef WIN32
-static GString
+static GURL
 RegOpenReadConfig ( HKEY hParentKey )
 {
-  GString retval;
+  GURL retval;
    // To do:  This needs to be shared with SetProfile.cpp
   LPCTSTR path = registrypath;
 
@@ -112,83 +112,84 @@ RegOpenReadConfig ( HKEY hParentKey )
     {
       szPathValue[dwCount] = 0;
       USES_CONVERSION;
-      strcpy(retval.getbuf(_tcslen(path)),T2CA(path));
+      retval=GURL::Filename::Native(T2CA(path));
     }
   } 
 //  if (hKey)  RegCloseKey(hKey); 
   return retval;
 }
 
-static GString
+static GURL
 GetModulePath( void )
 {
   TCHAR path[1024];
   DWORD dwCount = (sizeof(path)/sizeof(TCHAR))-1;
   GetModuleFileName(0, path, dwCount);
-  GString retval;
   USES_CONVERSION;
-  strcpy(retval.getbuf(_tcslen(path)),T2CA(path));
-  return GOS::dirname(retval);
+  return GURL::Filename::Native(T2CA(path)).base();
 }
 #else
 #ifdef UNIX
 extern char **environ;
 static char **e=environ-1;
-static GString 
+static GURL
 GetModulePath( void )
 {
+  GURL retval;
   char **argv=e;
   int argc;
   for(argc=0;*(int *)&(argv[-1]) != argc;argc++,argv--)
     EMPTY_LOOP;
-  return GOS::dirname((argc>=1)?argv[0]:"");
+  if(argc>=1)
+    retval=GURL::Filename::Native(argv[0]).base();
+  return retval;
 }
 #endif
 #endif
 
-static GList<GString>
+static GList<GURL>
 GetProfilePaths(void)
 {
   static bool first=true;
-  static GList<GString> paths;
+  static GList<GURL> paths;
   if(first)
   {
     first=false;
-    GString path;
+    GURL path;
 #ifdef WINCE
     const char *envp=0;
 #else
     const char *envp=getenv(DjVuEnv);
 #endif
     if(envp && strlen(envp))
-      paths.append((path=envp));
+      paths.append((path=GURL::Filename::Native(envp)));
 #if defined(WIN32) || (defined(UNIX) && !defined(NO_DEBUG))
-    GString mpath(GetModulePath());
-    if(mpath.length() && GOS::is_dir(mpath))
+    GURL mpath(GetModulePath());
+    if(!mpath.is_empty() && mpath.is_dir())
     {
 #ifndef NO_DEBUG
-      path=GOS::expand_name(DebugModuleDjVuDir,mpath);
-      if(path.length() && GOS::is_dir(path))
+      path=GURL::UTF8(DebugModuleDjVuDir,mpath);
+      if(!path.is_empty() && path.is_dir())
         paths.append(path);
 #endif
-      path=GOS::expand_name(ModuleDjVuDir,mpath);
-      if(path.length() && GOS::is_dir(path))
+      path=GURL::UTF8(ModuleDjVuDir,mpath);
+      if(!path.is_empty() && path.is_dir())
         paths.append(path);
-      path=GOS::dirname(mpath);
-      if(path != mpath)
+      path=mpath.base();
+      if(path.pathname() != mpath.pathname())
       {
-        path=GOS::expand_name(ModuleDjVuDir,path);
-        if(path.length() && GOS::is_dir(path))
+        path=GURL::UTF8(ModuleDjVuDir,path);
+        if(!path.is_empty() && path.is_dir())
           paths.append(path);
       }
     }
 #endif
 #ifdef WIN32
     path=RegOpenReadConfig (HKEY_CURRENT_USER);
-    if(path.length() && GOS::is_dir(path))
+    if(!path.is_empty() && path.is_dir())
       paths.append(path);
     path=(RegOpenReadConfig (HKEY_LOCAL_MACHINE));
-    if(path.length() && GOS::is_dir(path))
+    if(!path.is_empty() && path.is_dir())
       paths.append(path);
 #else
     const char* home=getenv("HOME");
@@ -201,8 +202,8 @@ GetProfilePaths(void)
     }
     if(home)
     {
-      path=GOS::expand_name(LocalDjVuDir,home);
-      if(path.length() && GOS::is_dir(path))
+      path=GURL::UTF8(LocalDjVuDir,GURL::Filename::UTF8(home));
+      if(!path.is_empty() && path.is_dir())
         paths.append(path);
     }
     if(pw)
@@ -210,8 +211,8 @@ GetProfilePaths(void)
       free(pw);
     }
 #endif
-    path=RootDjVuDir;
-    if(GOS::is_dir(path))
+    path=GURL::Filename::UTF8(RootDjVuDir);
+    if(!path.is_empty() && path.is_dir())
       paths.append(path);
   }
   return paths;
@@ -219,7 +220,7 @@ GetProfilePaths(void)
 
 static void
 getbodies(
-  GList<GString> &paths,
+  GList<GURL> &paths,
   const GString &MessageFileName,
   GPList<lt_XMLTags> &body, 
   GMap<GString, void *> & map )
@@ -227,8 +228,8 @@ getbodies(
   bool isdone=false;
   for(GPosition pos=paths;!isdone && pos;++pos)
   {
-    const GURL url=GOS::filename_to_url(GOS::expand_name(MessageFileName,paths[pos]));
-    if(GOS::is_file(GOS::url_to_filename(url)))
+    const GURL::UTF8 url(MessageFileName,paths[pos]);
+    if(url.is_file())
     {
       map[MessageFileName]=0;
       GP<lt_XMLTags> gtags=lt_XMLTags::create();
@@ -270,7 +271,7 @@ parse(GMap<GString,GP<lt_XMLTags> > &retval)
 {
   GPList<lt_XMLTags> body;
   {
-    GList<GString> paths=GetProfilePaths();
+    GList<GURL> paths=GetProfilePaths();
     GMap<GString, void *> map;
     GString m(MessageFile);
     getbodies(paths,m,body,map);

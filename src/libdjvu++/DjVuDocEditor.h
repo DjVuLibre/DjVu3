@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocEditor.h,v 1.35 2001-03-08 21:45:06 fcrary Exp $
+// $Id: DjVuDocEditor.h,v 1.35.2.1 2001-03-28 01:04:27 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUDOCEDITOR_H
@@ -51,7 +51,7 @@
 
     @memo DjVu document editor class.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: DjVuDocEditor.h,v 1.35 2001-03-08 21:45:06 fcrary Exp $#
+    @version #$Id: DjVuDocEditor.h,v 1.35.2.1 2001-03-28 01:04:27 bcr Exp $#
 */
 
 //@{
@@ -91,11 +91,11 @@ protected:
 	  {\bf Note}: You must call either of the two
 	  available \Ref{init}() function before you start doing
 	  anything else with the #DjVuDocEditor#. */
-   void		init(char const filename[]);
+   void		init(const GURL &url);
 
 public:
      /** Creates a DjVuDocEditor class and initializes with #fname#. */
-   static GP<DjVuDocEditor> create_wait(char const filename[]);
+   static GP<DjVuDocEditor> create_wait(const GURL &url);
 
      /** Creates a DjVuDocEditor class and initializes an empty document. */
    static GP<DjVuDocEditor> create_wait(void);
@@ -151,7 +151,7 @@ public:
 	  an exception is thrown. */
    GString	page_to_id(int page_num) const;
    
-   GString	insert_file(const char * fname, const char * parent_id,
+   GString	insert_file(const GURL &url, const char * parent_id,
 			    int chunk_num=1);
       /** Inserts the referenced file into this DjVu document.
 
@@ -168,7 +168,7 @@ public:
 		 to be unique in the DjVu document.
 	  @param page_num Position where the new page should be inserted at.
 	  	 Negative value means "append" */
-   void		insert_page(const char * fname, int page_num=-1);
+   void		insert_page(const GURL &fname, int page_num=-1);
    /** Inserts a new page with data inside the #data_pool# as page
        number #page_num.
 
@@ -183,7 +183,7 @@ public:
 	  @param page_num Describes where the page should be inserted.
 	  	 Negative number means "append". */
    void		insert_page(GP<DataPool> & file_pool,
-			    const char * fname, int page_num=-1);
+			    const GURL &fname, int page_num=-1);
       /** Inserts a group of pages into this DjVu document.
 	  
 	  Like \Ref{insert_page}() it will insert every page into the document.
@@ -207,7 +207,7 @@ public:
 	  @param fname_list List of top-level files for the pages to be inserted
 	  @param page_num Position where the new pages should be inserted at.
 	  	 Negative value means "append" */
-   void		insert_group(const GList<GString> & fname_list, int page_num=-1,
+   void		insert_group(const GList<GURL> & furl_list, int page_num=-1,
 			     void (* refresh_cb)(void *)=0, void * cl_data=0);
       /** Removes the specified page from the document. If #remove_unref#
 	  is #TRUE#, the function will also remove from the document any file,
@@ -350,7 +350,7 @@ private:
    bool		initialized;
    GURL		doc_url;
    GP<DataPool>	doc_pool;
-   GString	tmp_doc_name;
+   GURL		tmp_doc_url;
    int		orig_doc_type;
    int		orig_doc_pages;
 
@@ -367,10 +367,10 @@ private:
    GString	find_unique_id(const char * id);
    GP<DataPool>	strip_incl_chunks(GP<DataPool> & pool);
    void		clean_files_map(void);
-   bool		insert_file_type(const char * file_name,
+   bool		insert_file_type(const GURL &file_url,
                             DjVmDir::File::FILE_TYPE page_type,
 		            int & file_pos, GMap<GString, GString> & name2id);
-   bool		insert_file(const char * file_name, bool is_page,
+   bool		insert_file(const GURL &file_url, bool is_page,
 			    int & file_pos, GMap<GString, GString> & name2id);
    void		remove_file(const char * id, bool remove_unref,
 			    GMap<GString, void *> & ref_map);
@@ -381,16 +381,12 @@ private:
 			  GMap<GString, void *> & map);
    void		unfile_thumbnails(void);
    void		file_thumbnails(void);
-   void		save_file(const char * id, const char * dir,
+   void		save_file(const char * id, const GURL &codebase,
 			  bool only_modified, GMap<GString, void *> & map);
 private: //dummy stuff
    static void save_pages_as(ByteStream *, const GList<int> &);
    static GP<DjVuDocument> create_wait(
-     const GURL &url, GP<DjVuPort> xport=0, DjVuFileCache * const xcache=0);
-   static GP<DjVuDocument> create_wait(
-     char const filename[], GP<DjVuPort> xport, DjVuFileCache * const xcache=0);
-   static GP<DjVuDocument> create(
-     const GURL &url, GP<DjVuPort> xport=0, DjVuFileCache * const xcache=0);
+     const GURL &url, GP<DjVuPort> xport, DjVuFileCache * const xcache=0);
    static GP<DjVuDocument> create(
      GP<DataPool> pool, GP<DjVuPort> xport=0, DjVuFileCache * const xcache=0);
    static GP<DjVuDocument> create(
@@ -434,25 +430,6 @@ DjVuDocEditor::get_doc_url(void) const
 {
    return doc_url.is_empty() ? init_url : doc_url;
 }
-
-inline GP<DjVuDocEditor> 
-DjVuDocEditor::create_wait(void)
-{
-  DjVuDocEditor *doc=new DjVuDocEditor();
-  GP<DjVuDocEditor> retval=doc;
-  doc->init();
-  return retval;
-}
-
-inline GP<DjVuDocEditor> 
-DjVuDocEditor::create_wait(char const filename[])
-{
-  DjVuDocEditor *doc=new DjVuDocEditor();
-  GP<DjVuDocEditor> retval=doc;
-  doc->init(filename);
-  return retval;
-}
-
 
 //@}
 

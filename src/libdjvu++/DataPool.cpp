@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DataPool.cpp,v 1.69.2.1 2001-03-22 02:04:16 bcr Exp $
+// $Id: DataPool.cpp,v 1.69.2.2 2001-03-28 01:04:26 bcr Exp $
 // $Name:  $
 
 
@@ -808,7 +808,7 @@ DataPool::connect(const GURL &furl_in, int start_in, int length_in)
       while((length=str.read(buffer, 1024)))
 	 add_data(buffer, length);
       set_eof();
-   } else if(!furl_in.is_local_file_url())
+   } else if(furl_in.is_local_file_url())
    {
 	 // Open the stream (just in this function) too see if
 	 // the file is accessible. In future we will be using 'OpenFiles'
@@ -1276,7 +1276,7 @@ DataPool::load_file(void)
          data=ByteStream::create();
          block_list->clear();
          FCPools::get()->del_pool(furl, this);
-         furl="about:blank";
+         furl=GURL::UTF8("about:blank");
 
          f->stream->seek(0, SEEK_SET);
          char buffer[1024];

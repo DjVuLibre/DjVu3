@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocument.h,v 1.79 2001-03-08 16:54:30 bcr Exp $
+// $Id: DjVuDocument.h,v 1.79.2.1 2001-03-28 01:04:27 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUDOCUMENT_H
@@ -58,7 +58,7 @@ class ByteStream;
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocument.h,v 1.79 2001-03-08 16:54:30 bcr Exp $#
+    @version #$Id: DjVuDocument.h,v 1.79.2.1 2001-03-28 01:04:27 bcr Exp $#
 */
 
 //@{
@@ -313,11 +313,6 @@ public:
    /** Create a version of DjVuDocument which has finished initializing. */
    static GP<DjVuDocument> create_wait(
      const GURL &url, GP<DjVuPort> xport=0, DjVuFileCache * const xcache=0);
-
-   /** Create a version of DjVuDocument which has finished initializing. */
-   static GP<DjVuDocument> create_wait(
-     char const filename[], GP<DjVuPort> xport=0,
-     DjVuFileCache * const xcache=0);
 
    /** Create a version of DjVuDocument which has begun initializing. */
    static GP<DjVuDocument> create(
@@ -682,13 +677,12 @@ public:
 	  document. Thus, if you call it from the main thread (the thread,
 	  which transfers data from Netscape), the plugin will block.
 	  
-	  @param dir_name - Name of the directory which the document should
+	  @param codebase - Name of the directory which the document should
 	         be expanded into.
 	  @param idx_name - Name of the top-level file containing the document
 	         directory (basically, list of all files composing the document).
       */
-   void			expand(const char * dir_name,
-			       const char * idx_name);
+   void			expand(const GURL &codebase, const char * idx_name);
       /** This function can be used instead of \Ref{write}() and \Ref{expand}().
 	  It allows to save the document either in the new #BUNDLED# format
 	  or in the new #INDIRECT# format depending on the value of parameter
@@ -736,7 +730,7 @@ public:
    virtual void		notify_file_flags_changed(const DjVuFile * source,
  			long set_mask, long clr_mask);
 
-   virtual GList<GString>	get_file_names(void);
+   virtual GList<GURL>	get_url_names(void);
    virtual void 	set_recover_errors(ErrorRecoveryAction=ABORT);
    virtual void 	set_verbose_eof(bool=true);
 
@@ -744,11 +738,11 @@ public:
      void (*codec)(GP<ByteStream> &, const char where[], bool bundled));
 
    static void set_import_codec(
-     void (*codec)(GP<DataPool> &,const char filename[],bool &, bool &));
+     void (*codec)(GP<DataPool> &,const GURL &url,bool &, bool &));
 
 protected:
    static void (*djvu_import_codec) (
-     GP<DataPool> &pool, const char *filename,bool &needs_compression, bool &needs_rename );
+     GP<DataPool> &pool, const GURL &url,bool &needs_compression, bool &needs_rename );
    static void (*djvu_compress_codec) (
      GP<ByteStream> &bs, const char where[], bool bundled);
    virtual GP<DjVuFile>	url_to_file(const GURL & url, bool dont_create=false);
@@ -762,9 +756,9 @@ protected:
 
    
 
-   bool			has_file_names;
-   GCriticalSection	file_names_lock;
-   GList<GString>	file_names;
+   bool			has_url_names;
+   GCriticalSection	url_names_lock;
+   GList<GURL>	url_names;
    ErrorRecoveryAction	recover_errors;
    bool			verbose_eof;
 public:
@@ -857,15 +851,6 @@ DjVuDocument::init(const GURL &url, GP<DjVuPort> port, DjVuFileCache *cache)
 {
   start_init(url,port,cache);
   wait_for_complete_init();
-}
-
-inline GP<DjVuDocument>
-DjVuDocument::create_wait(const GURL &url, GP<DjVuPort> xport, DjVuFileCache *xcache)
-{
-  DjVuDocument *doc=new DjVuDocument;
-  GP<DjVuDocument> retval=doc;
-  doc->init(url,xport,xcache);
-  return retval;
 }
 
 inline GP<DjVuDocument>

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: d44.cpp,v 1.12.2.1 2001-03-22 02:04:16 bcr Exp $
+// $Id: d44.cpp,v 1.12.2.2 2001-03-28 01:04:25 bcr Exp $
 // $Name:  $
 
 /** @name d44
@@ -84,7 +84,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: d44.cpp,v 1.12.2.1 2001-03-22 02:04:16 bcr Exp $# 
+    #$Id: d44.cpp,v 1.12.2.2 2001-03-28 01:04:25 bcr Exp $# 
 */
 //@{
 //@}
@@ -129,8 +129,9 @@ usage()
 
 
 void
-parse(int argc, char **argv)
+parse(DArray<GString> &argv)
 {
+  const int argc=argv.hbound()+1;
   for (int i=1; i<argc; i++)
     {
       if (argv[i][0] == '-' && argv[i][1])
@@ -151,24 +152,23 @@ parse(int argc, char **argv)
           else
             usage();
         }
-      else if (!iw4url.is_valid())
-        iw4url = GOS::filename_to_url(argv[i]);
-      else if (!pnmurl.is_valid())
-        pnmurl = GOS::filename_to_url(argv[i]);
+      else if (iw4url.is_empty())
+        iw4url = GURL::Filename::UTF8(argv[i]);
+      else if (pnmurl.is_empty())
+        pnmurl = GURL::Filename::UTF8(argv[i]);
       else
         usage();
     }
-  if (!iw4url.is_valid())
+  if (iw4url.is_empty())
     usage();
-  if (!pnmurl.is_valid())
+  if (pnmurl.is_empty())
     {
-      GString iw4file=GOS::url_to_filename(iw4url);
-      GString dir = GOS::dirname(iw4file);
-      GString base = GOS::basename(iw4file);
+      const GURL codebase = iw4url.base();
+      GString base = iw4url.fname();
       int dot = base.rsearch('.');
       if (dot >= 1)
         base = base.substr(0,dot);
-      pnmurl = GOS::filename_to_url(GOS::expand_name(base,dir));
+      pnmurl = GURL::UTF8(base,codebase);
       flag_addsuffix = 1;
     }
 }
@@ -181,10 +181,16 @@ main(int argc, char **argv)
 mymain(int argc, char **argv)
 #endif
 {
+  DArray<GString> dargv(0,argc-1);
+  for(int i=0;i<argc;++i)
+  {
+    GString g(argv[i]);
+    dargv[i]=g.getNative2UTF8();
+  }
   G_TRY
     {
       // Parse arguments
-      parse(argc, argv);
+      parse(dargv);
       // Check input file
       GP<ByteStream> gibs=ByteStream::create(iw4url,"rb");
       ByteStream &ibs=*gibs;
@@ -232,7 +238,7 @@ mymain(int argc, char **argv)
       if (flag_addsuffix)
         pnmurl = pnmurl + (color?".ppm":".pgm");
 #ifndef UNDER_CE
-      remove(GOS::url_to_filename(pnmurl));
+      pnmurl.deletefile();
 #else
       WCHAR tszPnmFile[MAX_PATH] ;
       MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED,GOS::url_to_filename(pnmurl),GOS::url_to_filename(pnmurl).length()+1,tszPnmFile,sizeof(tszPnmFile)) ;

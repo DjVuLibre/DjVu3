@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: csepdjvu.cpp,v 1.12.2.1 2001-03-22 02:04:16 bcr Exp $
+// $Id: csepdjvu.cpp,v 1.12.2.2 2001-03-28 01:04:25 bcr Exp $
 // $Name:  $
 
 
@@ -108,7 +108,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: csepdjvu.cpp,v 1.12.2.1 2001-03-22 02:04:16 bcr Exp $# */
+    #$Id: csepdjvu.cpp,v 1.12.2.2 2001-03-28 01:04:25 bcr Exp $# */
 //@{
 //@}
 
@@ -1265,6 +1265,12 @@ parse_slice(const char *q, csepdjvuopts &opts)
 int 
 main(int argc, const char **argv)
 {
+  DArray<GString> dargv(0,argc-1);
+  for(int i=0;i<argc;++i)
+  {
+    GString g(argv[i]);
+    dargv[i]=g.getNative2UTF8();
+  }
   G_TRY
     {
       GP<DjVmDoc> gdoc=DjVmDoc::create();
@@ -1283,11 +1289,11 @@ main(int argc, const char **argv)
       opts.slice[4] =   0;
       // Read outputurl name
       if (argc < 3) usage();
-      outputurl = GOS::filename_to_url(argv[--argc]);
+      outputurl = GURL::Filename::UTF8(dargv[--argc]);
       // Process arguments
       for (int i=1; i<argc; i++)
         {
-          GString arg = argv[i];
+          GString arg = dargv[i];
           if (arg == "-v")
             opts.verbose = 1;
           else if (arg == "-vv")
@@ -1296,19 +1302,19 @@ main(int argc, const char **argv)
             {
               // Specify resolution
               char *end;
-              opts.dpi = strtol(argv[++i], &end, 10);
+              opts.dpi = strtol(dargv[++i], &end, 10);
               if (*end || opts.dpi<25 || opts.dpi>144000)
                 usage();
             }
           else if (arg == "-q" && i+1<argc)
             {
               // Specify background quality
-              parse_slice(argv[++i], opts);
+              parse_slice(dargv[++i], opts);
             }
           else 
             {
               // Process separation file
-              GP<ByteStream> fbs=ByteStream::create(GOS::filename_to_url(arg),"rb");
+              GP<ByteStream> fbs=ByteStream::create(GURL::Filename::UTF8(arg),"rb");
               BufferByteStream ibs(*fbs);
               do {
                 char pagename[16];

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djvmcvt.cpp,v 1.10 2001-03-06 19:55:41 bcr Exp $
+// $Id: djvmcvt.cpp,v 1.10.2.1 2001-03-28 01:04:25 bcr Exp $
 // $Name:  $
 
 /** @name djvmcvt
@@ -106,7 +106,7 @@
     @author
     Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: djvmcvt.cpp,v 1.10 2001-03-06 19:55:41 bcr Exp $# */
+    #$Id: djvmcvt.cpp,v 1.10.2.1 2001-03-28 01:04:25 bcr Exp $# */
 
 #ifdef __GNUC__
 #pragma implementation
@@ -120,7 +120,7 @@
 
 #include <stdio.h>
 
-static char * progname;
+static const char * progname;
 
 static void Usage(void)
 {
@@ -147,41 +147,51 @@ Usage:\n\
 }
 
 static void
-do_bundled(int argc, char ** argv)
+do_bundled(DArray<GString> &argv)
       // <progname> -b[undled] <file_in> <file_out>
 {
+   const int argc=argv.hbound()+1;
    if (argc!=4) { Usage(); exit(1); }
-   GP<DjVuDocument> doc = DjVuDocument::create_wait(argv[2]);
-   GP<ByteStream> str=ByteStream::create(argv[3], "wb");
+   const GURL::Filename::UTF8 url2(argv[2]);
+   const GURL::Filename::UTF8 url3(argv[3]);
+   GP<DjVuDocument> doc = DjVuDocument::create_wait(url2);
+   GP<ByteStream> str=ByteStream::create(url3, "wb");
    doc->write(str);
 }
 
 static void
-do_indirect(int argc, char ** argv)
+do_indirect(DArray<GString> &argv)
       // <progname> -i[ndirect] <file_in> <dir_out> <idx_fname>
 {
+   const int argc=argv.hbound()+1;
    if (argc!=5) { Usage(); exit(1); }
-   GP<DjVuDocument> doc = DjVuDocument::create_wait(argv[2]);
-   doc->expand(argv[3], argv[4]);
+   const GURL::Filename::UTF8 url2(argv[2]);
+   GP<DjVuDocument> doc = DjVuDocument::create_wait(url2);
+   const GURL::Filename::UTF8 url3(argv[3]);
+   doc->expand(url3, argv[4]);
 }
 
 int 
 main(int argc, char ** argv)
 {
-   char * ptr;
-   for(progname=ptr=argv[0];*ptr;ptr++)
-      if (*ptr=='/') progname=ptr+1;
+  DArray<GString> dargv(0,argc-1);
+  for(int i=0;i<argc;++i)
+  {
+    GString g(argv[i]);
+    dargv[i]=g.getNative2UTF8();
+  }
+  progname=dargv[0]=GOS::basename(dargv[0]);
 
-   if (argc<2) { Usage(); exit(1); }
+  if (argc<2) { Usage(); exit(1); }
 
    bool bundled=true;
    G_TRY {
-      if (!strncmp(argv[1], "-b", 2)) bundled=true;
-      else if (!strncmp(argv[1], "-i", 2)) bundled=false;
+      if (!strncmp(dargv[1], "-b", 2)) bundled=true;
+      else if (!strncmp(dargv[1], "-i", 2)) bundled=false;
       else { Usage(); exit(1); }
 
-      if (bundled) do_bundled(argc, argv);
-      else do_indirect(argc, argv);
+      if (bundled) do_bundled(dargv);
+      else do_indirect(dargv);
    } G_CATCH(exc) {
       fprintf(stderr, "%s\n", exc.get_cause());
       exit(1);

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.cpp,v 1.54.2.3 2001-03-22 02:04:16 bcr Exp $
+// $Id: ByteStream.cpp,v 1.54.2.4 2001-03-28 01:04:26 bcr Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 04/1997
@@ -546,19 +546,30 @@ ByteStream::Stdio::init(const char mode[])
   return retval;
 }
 
+static FILE *
+urlfopen(const GURL &url,const char mode[])
+{
+  return fopen((const char *)url.filename().getUTF82Native(),mode);
+}
+
+static int
+urlopen(const GURL &url, const int mode, const int perm)
+{
+  return open((const char *)url.filename().getUTF82Native(),mode,perm);
+}
+
 GString
 ByteStream::Stdio::init(const GURL &url, const char mode[])
 {
   GString retval;
   if (url.fname() != '-')
   {
-    GString filename=GOS::url_to_filename(url);
-    GString nativeFilename=filename.getUTF82Native();
 #ifdef macintosh
-    fp = fopen((const char *)nativeFilename, mode);
+    fp = urlfopen(url,mode);
 #else
     /* MBCS */
-    fp=fopen((const char *)nativeFilename,mode);//MBCS cvt
+    fp=urlfopen(url,mode);
+#if 0
     if (!fp)
     {
       GString utf8Filename(GOS::expand_name(filename));
@@ -574,12 +585,13 @@ ByteStream::Stdio::init(const GURL &url, const char mode[])
       fp = fopen((char*)(const char *)nativeFilename, mode);
     }
 #endif
+#endif
     if (!fp)
     {
 #ifndef UNDER_CE
       char buffer[4096];
       sprintf(buffer, "ByteStream.open_fail\t%s\t%s",
-        (char*)(const char *)nativeFilename, strerror(errno));
+        (const char *)url, strerror(errno));
       G_THROW(buffer);                                   //  Failed to open '%s': %s
 #else
       G_THROW("ByteStream.open_fail2");                  //  StdioByteStream::StdioByteStream, failed to open file.
@@ -592,7 +604,7 @@ ByteStream::Stdio::init(const GURL &url, const char mode[])
     if (!fp)
     {
 #ifndef UNDER_CE
-      retval=GString("ByteStream.open_fail\t")+filename+strerror(errno);
+      retval=GString("ByteStream.open_fail\t")+url+strerror(errno);
          //  Failed to open '%s': %s
 #else
       retval="ByteStream.open_fail2"; //  Stdio, failed to open file.
@@ -929,7 +941,7 @@ ByteStream::create(const GURL &url,char const * const mode)
 #ifdef UNIX
   if(!mode || !strcmp(mode,"rb"))
   {
-    const int fd=open(GOS::url_to_filename(url),O_RDONLY,0777);
+    const int fd=urlopen(url,O_RDONLY,0777);
     if(fd>=0)
     {
       MemoryMapByteStream *rb=new MemoryMapByteStream();

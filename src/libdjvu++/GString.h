@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.h,v 1.27.2.1 2001-03-20 00:29:40 bcr Exp $
+// $Id: GString.h,v 1.27.2.2 2001-03-28 01:04:27 bcr Exp $
 // $Name:  $
 
 #ifndef _GSTRING_H_
@@ -57,7 +57,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.27.2.1 2001-03-20 00:29:40 bcr Exp $# */
+    #$Id: GString.h,v 1.27.2.2 2001-03-28 01:04:27 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -127,6 +127,8 @@ public:
   GString(const char dat);
   /// Constructs a string from a null terminated character array.
   GString(const char *dat);
+  /// Constructs a string from a null terminated character array.
+  GString(const unsigned char *dat);
   /** Constructs a string from a character array.  Elements of the character
       array #dat# are added into the string until the string length reaches
       #len# or until encountering a null character (whichever comes first). */

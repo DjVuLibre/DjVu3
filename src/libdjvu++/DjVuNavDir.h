@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuNavDir.h,v 1.14 2001-03-06 19:55:42 bcr Exp $
+// $Id: DjVuNavDir.h,v 1.14.2.1 2001-03-28 01:04:27 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUNAVDIR_H
@@ -56,7 +56,7 @@ class ByteStream;
 
     @memo DjVu Navigation Directory
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: DjVuNavDir.h,v 1.14 2001-03-06 19:55:42 bcr Exp $#
+    @version #$Id: DjVuNavDir.h,v 1.14.2.1 2001-03-28 01:04:27 bcr Exp $#
 */
 
 //@{
@@ -93,8 +93,8 @@ private:
    GMap<GString, int>		name2page;
    GMap<GURL, int>		url2page;
 protected:
-   DjVuNavDir(const char * dir_url);
-   DjVuNavDir(ByteStream & str, const char * dir_url);
+   DjVuNavDir(const GURL &dir_url);
+   DjVuNavDir(ByteStream & str, const GURL &dir_url);
 
 public:
    int		get_memory_usage(void) const { return 1024; };
@@ -103,13 +103,13 @@ public:
 	  containing the directory source data. It will be used later
 	  in translation by functions like \Ref{url_to_page}() and
 	  \Ref{page_to_url}() */
-   static GP<DjVuNavDir> create(const char * dir_url)
+   static GP<DjVuNavDir> create(const GURL &dir_url)
    {return new DjVuNavDir(dir_url);}
 
       /** Creates #DjVuNavDir# object by decoding its contents from
 	  the stream. #dir_url# is the URL of the file containing the
 	  directory source data. */
-   static GP<DjVuNavDir> create(ByteStream & str, const char * dir_url)
+   static GP<DjVuNavDir> create(ByteStream & str, const GURL &dir_url)
    { return new DjVuNavDir(str,dir_url); }
 
    virtual ~DjVuNavDir(void) {};
