@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.90 1999-12-21 20:53:41 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.91 1999-12-21 22:12:37 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -32,7 +32,7 @@ get_int_prefix(void * ptr)
       // file's URL. Please note, that output of this function is used only
       // as name for DjVuPortcaster. Not as a URL.
    char buffer[128];
-   sprintf(buffer, "document_%p?", ptr);
+   sprintf(buffer, "document_%p%d?", ptr, rand());
    return buffer;
 }
 
@@ -153,7 +153,12 @@ DjVuDocument::static_init_thread(void * cl_data)
       th->init_thread();
    } CATCH(exc) {
       th->flags|=DjVuDocument::DOC_INIT_FAILED;
-      TRY { get_portcaster()->notify_error(th, exc.get_cause()); } CATCH(exc) {} ENDCATCH;
+      TRY {
+	 if (strcmp(exc.get_cause(), "STOP"))
+	    get_portcaster()->notify_error(th, exc.get_cause());
+	 else
+	    get_portcaster()->notify_status(th, "DjVuDocument init thread STOPPed");
+      } CATCH(exc) {} ENDCATCH;
       th->init_thread_flags|=FINISHED;
    } ENDCATCH;
 }
