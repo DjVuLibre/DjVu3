@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.20 1999-08-20 22:54:08 eaf Exp $
+//C- $Id: DjVuFile.cpp,v 1.21 1999-08-26 16:56:58 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -362,7 +362,7 @@ DjVuFile::decode_func(void)
 	 if (f->is_decode_stopped()) THROW("STOP");
 	 if (!f->is_decode_ok())
 	    THROW("Internal error: an included file has not finished yet.");
-      };
+      }
    } CATCH(exc) {
       TRY {
 	 delete decode_stream; decode_stream=0;
@@ -1014,7 +1014,7 @@ DjVuFile::notify_all_data_received(const DjVuPort * src)
    else DEBUG_MSG("and we do NOT have all files included\n");
 #endif
 
-   if ((status & INCL_FILES_CREATED) && src!=this)
+   if (src!=this && are_incl_files_created() && is_data_present())
    {
 	 // Check if all children have data
       bool all=true;
