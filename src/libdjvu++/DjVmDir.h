@@ -9,20 +9,60 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVmDir.h,v 1.16 2000-01-25 00:46:31 leonb Exp $
+//C- $Id: DjVmDir.h,v 1.17 2000-02-04 16:57:30 leonb Exp $
 
 #ifndef _DJVMDIR_H
 #define _DJVMDIR_H
 
 
 /** @name DjVmDir.h
-    Files #"DjVmDir.h"# and #"DjVmDir.cpp"# contain implementation of
-    DjVu multipage document directory represented by class \Ref{DjVmDir}.
+    Files #"DjVmDir.h"# and #"DjVmDir.cpp"# implement class \Ref{DjVmDir} for
+    representing the directory of a DjVu multipage document.
+
+    {\bf Bundled vs. Indirect format} --- There are currently two multipage
+    DjVu formats supported: {\em bundled} and {\em indirect}.  In the first
+    format all component files composing a given document are packaged (or
+    bundled) into one file, in the second one every page and component is
+    stored in a separate file and there is one more file, which contains the
+    list of all others.
+
+    {\bf Multipage DjVu format} --- Multipage DjVu documents follow the EA
+    IFF85 format (cf. \Ref{IFFByteStream.h}.)  A document is composed of a
+    #"FORM:DJVM"# whose first chunk is a #"DIRM"# chunk containing the {\em
+    document directory}.  This directory lists all component files composing
+    the given document, helps to access every component file and identify the
+    pages of the document.
+    \begin{itemize} 
+    \item In a {\em bundled} multipage file, the component files 
+         are stored immediatly after the #"DIRM"# chunk,
+         within the #"FORM:DJVU"# composite chunk.  
+    \item In an {\em indirect} multipage file, the component files are 
+          stored in different files whose URLs are composed using information 
+          stored in the #"DIRM"# chunk.
+    \end{itemize} 
+    Most of the component files represent pages of a document.  Some files
+    however represent data shared by several pages.  The pages refer to these
+    supporting files by means of an inclusion chunk (#"INCL"# chunks)
+    identifying the supporting file.
+
+    {\bf Document Directory} --- Every directory record describes a component
+    file.  Each component file is identified by a small string named the
+    identifier (ID).  Each component file also contains a file name and a
+    title.  The format of the #"DIRM"# chunk is described in section
+    \Ref{Format of the DIRM chunk.}.
+
+    Theoretically, IDs are used to uniquely identify each component file in
+    #"INCL"# chunks, names are used to compose the the URLs of the component
+    files in an indirect multipage DjVu file, and titles are cosmetic names
+    possibly displayed when viewing a page of a document.  There are however
+    many problems with this scheme, and we {\em strongly suggest}, with the
+    current implementation to always make the file ID, the file name and the
+    file title identical.
 
     @memo Implements DjVu multipage document directory
     @author Andrei Erofeev <eaf@research.att.com>
     @version
-    #$Id: DjVmDir.h,v 1.16 2000-01-25 00:46:31 leonb Exp $# */
+    #$Id: DjVmDir.h,v 1.17 2000-02-04 16:57:30 leonb Exp $# */
 //@{
 
 
@@ -37,39 +77,26 @@
 #include "ByteStream.h"
 #include "GThreads.h"
 
-/** Implements DjVu multipage document directory.  There are currently
-    two multipage DjVu formats supported: {\em bundled} and {\em
-    indirect}.  In the first format all files composing a given
-    document are packaged (or bundled) into one file, in the second
-    one every page and component is stored in a separate file and
-    there is one more file, which contains the list of all others.
+/** Implements DjVu multipage document directory.  There are currently two
+    multipage DjVu formats supported: {\em bundled} and {\em indirect}.  In
+    the first format all component files composing a given document are
+    packaged (or bundled) into one file, in the second one every page and
+    component is stored in a separate file and there is one more file, which
+    contains the list of all others.
 
-    In both cases there is somewhere a #DIRM# chunk with the {\em
-    multipage DjVu document directory}. This directory lists all files
-    composing the given document, helps to access every file, identify
-    pages and maintain user-specified shortcuts.
+    The multipage document directory lists all component files composing the
+    given document, helps to access every file, identify pages and maintain
+    user-specified shortcuts.  Every directory record describes a file
+    composing the document.  Each file is identified by a small string named
+    the identifier (ID).  Each file may also contain a file name and a title.
 
-    Every directory record describes a file composing the document.
-    Each file is identified by a small string named the identifier
-    (ID).  Each file may also contain a file name and a title.  Most
-    of the files represent pages of a document.  Some files however
-    represent data shared by several pages.  The pages refer to these
-    supporting files by means of an indirection chunk (#"INCL"#
-    chunks) identifying the supporting file by its identifier.
-
-    The #DjVmDir# class does compression and decompression of the
-    directory data when it's written or read from the #DIRM# chunk.
-    Normally you don't have to create this class yourself. It's done
-    automatically when \Ref{DjVmDoc} class initializes itself. It may
-    be useful though to be able to access records in the directory
-    because some classes (like \Ref{DjVuDocument} and \Ref{DjVmDoc})
-    return a pointer to #DjVmDir# in some cases. 
-
-    {\bf Implementation notes} ---
-    It is strongly suggested with the current implementation to always
-    make the file ID, the file NAME and the file TITLE identical.
-    This limitation will be lifted in a subsequent version of DjVu.
-*/
+    The #DjVmDir# class represents a multipage document directory.  Its main
+    purpose is to encode and decode the document directory when writing or
+    reading the #DIRM# chunk.  Normally you don't have to create this class
+    yourself. It's done automatically when \Ref{DjVmDoc} class initializes
+    itself. It may be useful though to be able to access records in the
+    directory because some classes (like \Ref{DjVuDocument} and \Ref{DjVmDoc})
+    return a pointer to #DjVmDir# in some cases. */
 
 class DjVmDir : public GPEnabled
 {
@@ -200,6 +227,119 @@ private:
    GPMap<GString, File>	title2file;
 };
 
+
+
+/** @name Format of the DIRM chunk.
+
+    {\bf Variants} --- There are two versions of the #"DIRM"# chunk format.
+    The version number is identified by the seven low bits of the first byte
+    of the chunk.  Version {\bf 0} is obsolete and should never be used.  This
+    section describes version {\bf 1}.  There are two major multipage DjVu
+    formats supported: {\em bundled} and {\em indirect}.  The #"DIRM"# chunk
+    indicates which format is used in the most significant bit of the first
+    byte of the chunk.  The document is bundled when this bit is set.
+    Otherwise the document is indirect.
+
+    {\bf Unencoded data} --- The #"DIRM"# chunk is composed some unencoded
+    data followed by \Ref{bzz} encoded data.  The unencoded data starts with
+    the version byte and a 16 bit integer representing the number of component
+    files.  All integers are encoded with the most significant byte first.
+    \begin{verbatim}
+          BYTE:             Flags/Version:  0x<bundled>0000011
+          INT16:            Number of component files.
+    \end{verbatim}
+    When the document is a bundled document (i.e. the flag #bundled# is set),
+    this header is followed by the offsets of each of the component files within
+    the #"FORM:DJVM"#.  These offsets allow for random component file access.
+    \begin{verbatim}
+          INT32:            Offset of first component file.
+          INT32:            Offset of second component file.
+          ...
+          INT32:            Offset of last component file.
+    \end{verbatim}
+
+    {\bf BZZ encoded data} --- The rest of the chunk is entirely compressed
+    with the BZZ general purpose compressor.  We describe now the data fed
+    into (or retrieved from) the BZZ codec (cf. \Ref{BSByteStream}.)  First
+    come the sizes and the flags associated with each component file.
+    \begin{verbatim}
+          INT24:             Size of the first component file.
+          INT24:             Size of the second component file.
+          ...
+          INT24:             Size of the last component file.
+          BYTE:              Flag byte for the first component file.
+          BYTE:              Flag byte for the second component file.
+          ...
+          BYTE:              Flag byte for the last component file.
+    \end{verbatim}
+    The flag bytes have the following format:
+    \begin{verbatim}
+          0b<hasname><hastitle>000000     for a file included by other files.
+          0b<hasname><hastitle>000001     for a file representing a page.
+          0b<hasname><hastitle>000010     for a file containing thumbnails.
+    \end{verbatim}
+    Flag #hasname# is set when the name of the file is different from the file
+    ID.  Flag #hastitle# is set when the title of the file is different from
+    the file ID.  These flags are used to avoid encoding the same string three
+    times.  Then come zero terminated strings representing the IDs of each
+    file.  These strings are followed by zero terminated strings representing
+    the names of only those files for which the flag #hasname# is set (if
+    any).  Finally come zero-terminated strings representing the titles of
+    only those files for which the flag #hastitle# is set (if any).  The
+    \Ref{bzz} encoding system makes sure that all these strings will be
+    encoded efficiently.
+    \begin{verbatim}
+          ZSTR:     ID of the first component file.
+          ... 
+          ZSTR:     ID of the last component file.
+          ZSTR:     Name of the first file for which #hasname# is set.
+          ...  
+          ZSTR:     Name of the last file for which #hasname# is set..
+          ZSTR:     Title of the first file for which #hastitle# is set.
+          ...  
+          ZSTR:     Title of the last file for which #hastitle# is set..
+    \end{verbatim}
+
+    {\bf Ideas for future evolutions} ---
+    Besides the version byte contained in the #"DIRM"# chunk of a multipage
+    document, there is a 16 bit version number in the #"INFO"# chunk of every
+    page (see \Ref{DjVuInfo.h}.)  These version numbers have different values
+    and different formats.  Although one could argue that the capability to
+    parse a multipage file and the capability to view the pages are different
+    in nature, tracking two version numbers is often a useless complexity.
+    Here is a suggested format for the beginning of the unencoded part:
+    \begin{verbatim}
+          BYTE:             Flags:  0x<bundled>0000011
+          INT24:            Number of component files (extended to 32 bits)
+          INT16:            DjVu version number (cf "DjVuInfo.h")
+    \end{verbatim}
+    The concept of IDs, names and titles did not provide all the expected
+    benefits.  A simpler and more effective scheme would consist of only
+    providing a unique ID for each component file.  The URLs of the component
+    file of indirect document could be constructed using a single template
+    stored in the #"DIRM"# chunk.  This arrangement would give much more freedom 
+    for placing the component files on a web server. Here are a few examples
+    of templates:
+    \begin{verbatim}
+         "${ID}"
+         "${DJVUBASE}/${DJVUNAME}.dir/${ID}"
+         "/cgi-bin/onthefly.pl?DOC=${DJVUNAME}.djvu&FILE=${ID}"
+    \end{verbatim}
+    Finally the file titles would be advantageously replaced by an optional
+    chunk #"NAVM"# following the DIRM chunk and describing how the user can
+    navigate the document.  This chunk would define aliases for accessing the
+    pages (such as ``Chapter 1'' and ``Part 2'').  It could also define how
+    these aliases can be presented in a menu representing the structure of the
+    document.  The PDF specification could be a good source of ideas.
+
+    @memo Description of the format of the DIRM chunk.  */
+//@}
+
+
+
+// -------------- IMPLEMENTATION
+
+
 inline bool
 DjVmDir::is_indirect(void) const
 {
@@ -214,7 +354,6 @@ DjVmDir::is_bundled(void) const
   return !is_indirect();
 }
 
-//@}
 
 // ----- THE END
 #endif
