@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocEditor.h,v 1.10 1999-12-01 22:12:01 eaf Exp $
+//C- $Id: DjVuDocEditor.h,v 1.11 1999-12-03 00:44:40 bcr Exp $
  
 #ifndef _DJVUDOCEDITOR_H
 #define _DJVUDOCEDITOR_H
@@ -27,7 +27,7 @@
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocEditor.h,v 1.10 1999-12-01 22:12:01 eaf Exp $#
+    @version #$Id: DjVuDocEditor.h,v 1.11 1999-12-03 00:44:40 bcr Exp $#
 */
 
 //@{
@@ -187,8 +187,8 @@ public:
 	  #"DjVuDocument"# or #"DjVuPort"# */
    virtual bool		inherits(const char * class_name) const;
    virtual GP<DataPool>	request_data(const DjVuPort * source, const GURL & url);
-protected:
    virtual GP<DjVuFile>	url_to_file(const GURL & url, bool dont_create);
+protected:
    virtual GP<DataPool> get_thumbnail(int page_num, bool dont_decode);
 private:
       // This is a structure for active files and DataPools. It may contain

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.h,v 1.47 1999-11-30 19:56:31 eaf Exp $
+//C- $Id: DjVuDocument.h,v 1.48 1999-12-03 00:44:41 bcr Exp $
  
 #ifndef _DJVUDOCUMENT_H
 #define _DJVUDOCUMENT_H
@@ -33,7 +33,7 @@
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@research.att.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocument.h,v 1.47 1999-11-30 19:56:31 eaf Exp $#
+    @version #$Id: DjVuDocument.h,v 1.48 1999-12-03 00:44:41 bcr Exp $#
 */
 
 //@{
@@ -610,13 +610,13 @@ public:
    virtual GList<GString>	get_file_names(void);
    virtual void 	set_recover_errors(ErrorRecoveryAction=ABORT);
    virtual void 	set_verbose_eof(bool=true);
+   virtual GP<DjVuFile>	url_to_file(const GURL & url, bool dont_create=false);
 protected:
    GURL			init_url;
    GP<DataPool>		init_data_pool;
    GP<DjVmDir>		djvm_dir;	// New-style DjVm directory
    int			doc_type;
    
-   virtual GP<DjVuFile>	url_to_file(const GURL & url, bool dont_create=false);
 
    bool			has_file_names;
    GCriticalSection	file_names_lock;
