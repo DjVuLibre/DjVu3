@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GBitmap.cpp,v 1.16 1999-11-13 18:47:17 leonb Exp $
+//C- $Id: GBitmap.cpp,v 1.17 1999-11-15 00:09:06 praveen Exp $
 
 
 #ifdef __GNUC__
@@ -24,7 +24,7 @@
 #include "GThreads.h"
 
 
-// File "$Id: GBitmap.cpp,v 1.16 1999-11-13 18:47:17 leonb Exp $"
+// File "$Id: GBitmap.cpp,v 1.17 1999-11-15 00:09:06 praveen Exp $"
 // - Author: Leon Bottou, 05/1997
 
 
@@ -402,6 +402,8 @@ GBitmap::binarize_grays(int threshold)
 
 // ----- additive blitting
 
+#undef min
+#undef max
 
 static inline int
 min(int x, int y) 
