@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GMapAreas.h,v 1.2 1999-09-30 20:15:54 eaf Exp $
+//C- $Id: GMapAreas.h,v 1.3 1999-10-04 20:34:49 eaf Exp $
 
 #ifndef _GMAPAREAS_H
 #define _GMAPAREAS_H
@@ -41,7 +41,7 @@
     @memo Definition of base map area classes
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: GMapAreas.h,v 1.2 1999-09-30 20:15:54 eaf Exp $# */
+    #$Id: GMapAreas.h,v 1.3 1999-10-04 20:34:49 eaf Exp $# */
 //@{
 
 /****************************************************************************
@@ -149,9 +149,13 @@ public:
    int		get_xmin(void);
       /// Returns ymin of the bounding rectangle
    int		get_ymin(void);
-      /// Returns xmax of the bounding rectangle
+      /** Returns xmax of the bounding rectangle. In other words, if #X# is
+	  a coordinate of the last point in the right direction, the
+	  function will return #X+1# */
    int		get_xmax(void);
-      /// Returns ymax of the bounding rectangle
+      /** Returns xmax of the bounding rectangle. In other words, if #Y# is
+	  a coordinate of the last point in the top direction, the
+	  function will return #Y+1# */
    int		get_ymax(void);
       /// Returns the hyperlink bounding rectangle
    GRect	get_bound_rect(void);
@@ -195,7 +199,7 @@ private:
 
 inline
 GMapArea::GMapArea(void) : target("_self"), border_type(NO_BORDER),
-   border_always_visible(false), border_color(0xff), border_width(3),
+   border_always_visible(false), border_color(0xff), border_width(1),
    hilite_color(0xffffffff), bounds_initialized(0) {}
 
 inline
