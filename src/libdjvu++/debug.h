@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: debug.h,v 1.5 1999-07-29 19:53:24 eaf Exp $
+//C-  $Id: debug.h,v 1.6 2000-02-10 14:31:30 leonb Exp $
 
 
 #ifndef _TEMPLATE_H_
@@ -65,7 +65,7 @@
     @memo 
     Macros for printing debug messages.
     @version 
-    #$Id: debug.h,v 1.5 1999-07-29 19:53:24 eaf Exp $#
+    #$Id: debug.h,v 1.6 2000-02-10 14:31:30 leonb Exp $#
     @author
     Andrew Erofeev <eaf@research.att.com> -- initial implementation \\
     Leon Bottou <leonb@research.att.com> -- cleanups */
@@ -108,9 +108,10 @@ public:
   ~Debug();
   // access
   static void   set_debug_level(int lvl);
+  static void   set_debug_file(const char *fname);
+  void          modify_indent(int rindent);
   static Debug& lock(int lvl, int noindent);
   void          unlock();
-  void          modify_indent(int rindent);
   // printing
   Debug &	operator<<(bool b);
   Debug &	operator<<(char c);

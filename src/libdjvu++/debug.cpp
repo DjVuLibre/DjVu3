@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: debug.cpp,v 1.6 1999-11-04 18:41:39 bcr Exp $
+//C-  $Id: debug.cpp,v 1.7 2000-02-10 14:31:30 leonb Exp $
 
 
 #include "debug.h"
@@ -57,9 +57,7 @@ Debug::Debug()
 #ifdef UNIX
   GCriticalSectionLock glock(&debug_lock);
   if (! debug_file)
-    debug_file = fopen("/dev/tty", "w");
-  if (! debug_file)
-    debug_file = stderr;
+    set_debug_file("/dev/tty");
   debug_file_count++;
 #endif
 }
@@ -101,6 +99,19 @@ void
 Debug::set_debug_level(int lvl)
 {
   debug_level = lvl;
+}
+
+void
+Debug::set_debug_file(const char *fname)
+{
+  GCriticalSectionLock glock(&debug_lock);
+  if (debug_file && (debug_file != stderr))
+    fclose(debug_file);
+  debug_file = 0;
+  if (fname)
+    debug_file = fopen(fname, "w");
+  if (! debug_file)
+    debug_file = stderr;
 }
 
 void
