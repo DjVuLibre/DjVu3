@@ -1,11 +1,9 @@
 # This rule sets the following variables:
 #	CXX, CXXFLAGS, CXXSYMBOLIC, CXXPIC
-#
-# This requires $SYS be set.
-#
-# Note: A value of false should be replaced with "".
 
-. `dirname $0`/sys.sh
+if [ -z "$CONFIG_DIR" ] ; then
+  . `dirname $0`/functions.sh
+fi
 
 ECXX="eg++"
 if [ -z "$CXX" ] ; then

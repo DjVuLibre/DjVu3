@@ -4,6 +4,17 @@
 # and call the relevant functions.
 #
 
+# First we set the CONFIG_DIR and SYS variables.
+#
+
+if [ -a "$CONFIG_DIR" ] ; then
+  CONFIG_DIR=`dirname "$0"`
+  CONFIG_VARS=`echo CONFIG_DIR "${CONFIG_VARS}"`
+fi
+
+if [ -z "$SYS" ] ; then
+  "${CONFIG_DIR}"/sys.sh
+fi
 
 ### ------------------------------------------------------------------------
 ### General stuff

@@ -1,10 +1,10 @@
-# This sets the variable SYS and CONFIG_DIR
+# This sets the variable SYS
 #
 
 if [ -z "$CONFIG_DIR" ] ; then
-  CONFIG_DIR=`dirname $0`
-  CONFIG_VARS=`echo CONFIG_DIR "$CONFIG_VARS"`
+  `dirname $0`/functions.sh
 fi
+
 if [ -z "$SYS" ] ; then
   echo "Detecting system type"
   SYS=`uname -s`

@@ -1,40 +1,22 @@
 # This script writes the variables currently set to standard output.
 
-if [ -z "$SYS" ] ; then
-  . `dirname $0`/sys.sh
+if [ -z "$CONFIG_DIR" ] ; then
+  . `dirname $0`/functions.sh
 fi
 
 if [ -z "$CONFIG_READONLY" ] ; then
 
-  if [ -z "$TOPBUILDDIR" ] ; then
-    if [ -z "$TOPBUILDPREFIX" ] ; then
-      TOPBUILDDIR="`pwd`/build/${SYS}"
-    else
-      TOPBUILDDIR="${TOPBUILDPREFIX}/${SYS}"
-    fi
+  if [ -z "${CONFIG_CACHE}" ] ; then
+    "${CONFIG_DIR}"/dirs.sh
   fi
 
-  while [ ! -d "$TOPBUILDDIR" ] ; do
-    p="$TOPBUILDDIR/x/x"
-    q="$TOPBUILDDIR/x"
-    while [ "$p" != "$q" ] ; do
-      p="$q"
-      q=`dirname "$p"`
-      if [ -d "$q" ] ; then
-        q="$p"
-      fi
-    done
-    if [ ! -d "$p" ] ; then
-      mkdir "$p"
-      if [ ! -d "$p" ] ; then
-        exit 1
-      fi
-    fi
-  done
+  if [ ! -d "$TOPBUILDDIR" ] ; then
+    mkdirp("$TOPBUILDDIR")
+  fi
 
-  echo CONFIG_VARS="'$CONFIG_VARS'" > "${TOPBUILDDIR}/config.cache"
+  echo CONFIG_VARS="'$CONFIG_VARS'" > "${CONFIG_CACHE}"
   for i in $CONFIG_VARS ; do
-    echo "${i}='"`eval echo \"\$"$i"\"`"'" >> "${TOPBUILDDIR}/config.cache"
+    echo "${i}='"`eval echo \"\$"$i"\"`"'" >> "${CONFIG_CACHE}"
   done
 fi
 

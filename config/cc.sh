@@ -1,11 +1,9 @@
 # This rule sets the following variables:
 #	CC, CCFLAGS, CCSYMBOLIC CCPIC
-#
-# This requires $SYS be set.
-#
-# Note: A value of false should be replaced with "".
 
-. `dirname $0`/sys.sh
+if [ -z "$CONFIG_DIR" ] ; then
+  . `dirname $0`/functions.sh
+fi
 
 EGCS="egcs"
 if [ -z "$CC" ] ; then
