@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: IW44Image.cpp,v 1.3 2001-02-16 00:10:58 bcr Exp $
+// $Id: IW44Image.cpp,v 1.4 2001-02-21 00:03:11 bcr Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 08/1998
@@ -862,7 +862,6 @@ bandbuckets[] =
 
 IW44Image::Codec::Codec(IW44Image::Map &xmap)
   : map(xmap), 
-    emap(0),
     curband(0),
     curbit(1)
 {
@@ -891,17 +890,12 @@ IW44Image::Codec::Codec(IW44Image::Map &xmap)
   memset((void*)ctxBucket, 0, sizeof(ctxBucket));
   ctxMant = 0;
   ctxRoot = 0;
-  // The encoder uses emap to track the decoder state
 }
 
 
 // IW44Image::Codec destructor
 
-IW44Image::Codec::~Codec()
-{
-  if (emap)
-    delete emap;
-}
+IW44Image::Codec::~Codec() {}
 
 // is_null_slice
 // -- check if data can be produced for this band/mask
@@ -1282,12 +1276,17 @@ IW44Image::~IW44Image()
 }
 
 GP<IW44Image>
-IW44Image::create_decode(const bool color)
+IW44Image::create_decode(const ImageType itype)
 {
-  if(color)
+  switch(itype)
+  {
+  case COLOR:
     return new IWPixmap();
-  else
+  case GRAY:
     return new IWBitmap();
+  default:
+    return 0;
+  }
 }
 
 int

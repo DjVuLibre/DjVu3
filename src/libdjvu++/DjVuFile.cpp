@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuFile.cpp,v 1.150 2001-02-17 02:38:41 bcr Exp $
+// $Id: DjVuFile.cpp,v 1.151 2001-02-21 00:03:11 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -126,6 +126,19 @@ DjVuFile::check() const
     G_THROW("DjVuFile.not_init");
 }
 
+GP<DjVuFile>
+DjVuFile::create(
+  ByteStream & str, const ErrorRecoveryAction recover_errors,
+  const bool verbose_eof )
+{
+  DjVuFile *file=new DjVuFile();
+  GP<DjVuFile> retval=file;
+  file->set_recover_errors(recover_errors);
+  file->set_verbose_eof(verbose_eof);
+  file->init(str);
+  return retval;
+}
+
 void 
 DjVuFile::init(ByteStream & str)
 {
@@ -153,6 +166,19 @@ DjVuFile::init(ByteStream & str)
   
   // Add (basically - call) the trigger
   data_pool->add_trigger(-1, static_trigger_cb, this);
+}
+
+GP<DjVuFile>
+DjVuFile::create(
+  const GURL & xurl, GP<DjVuPort> port, 
+  const ErrorRecoveryAction recover_errors, const bool verbose_eof ) 
+{
+  DjVuFile *file=new DjVuFile();
+  GP<DjVuFile> retval=file;
+  file->set_recover_errors(recover_errors);
+  file->set_verbose_eof(verbose_eof);
+  file->init(xurl,port);
+  return retval;
 }
 
 void
@@ -875,7 +901,7 @@ DjVuFile::decode_chunk(const char *id, GP<ByteStream> gbs, bool djvi, bool djvu,
       if (bgpm)
         G_THROW("DjVuFile.dupl_backgrnd");
       // First chunk
-      GP<IW44Image> bg44=IW44Image::create_decode(true);
+      GP<IW44Image> bg44=IW44Image::create_decode(IW44Image::COLOR);
       bg44->decode_chunk(iff);
       DjVuFile::bg44=bg44;
       desc.format("IW44 background (%dx%d, %d dpi)",
@@ -896,7 +922,7 @@ DjVuFile::decode_chunk(const char *id, GP<ByteStream> gbs, bool djvi, bool djvu,
   {
     if (fgpm || fgbc)
       G_THROW("DjVuFile.dupl_foregrnd");
-    GP<IW44Image> gfg44=IW44Image::create_decode(true);
+    GP<IW44Image> gfg44=IW44Image::create_decode(IW44Image::COLOR);
     IW44Image &fg44=*gfg44;
     fg44.decode_chunk(iff);
     fgpm=fg44.get_pixmap();
@@ -990,7 +1016,7 @@ DjVuFile::decode_chunk(const char *id, GP<ByteStream> gbs, bool djvi, bool djvu,
     if (!bg44)
     {
       // First chunk
-      GP<IW44Image> gbg44=IW44Image::create_decode(true);
+      GP<IW44Image> gbg44=IW44Image::create_decode(IW44Image::COLOR);
       IW44Image &xbg44=*gbg44;
       xbg44.decode_chunk(iff);
       GP<DjVuInfo> ginfo=new DjVuInfo();

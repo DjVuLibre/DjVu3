@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: c44.cpp,v 1.12 2001-02-15 19:06:55 bcr Exp $
+// $Id: c44.cpp,v 1.13 2001-02-21 00:03:11 bcr Exp $
 // $Name:  $
 
 
@@ -184,7 +184,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: c44.cpp,v 1.12 2001-02-15 19:06:55 bcr Exp $# */
+    #$Id: c44.cpp,v 1.13 2001-02-21 00:03:11 bcr Exp $# */
 //@{
 //@}
 
@@ -690,7 +690,7 @@ main(int argc, char **argv)
           const bool color=!strncmp(s,"PM44",4);
           if (color || !strncmp(s,"BM44",4))
             {
-              iw = IW44Image::create_encode(color);
+              iw = IW44Image::create_encode(IW44Image::COLOR);
               iw->decode_iff(iff);
               w = iw->get_width();
               h = iw->get_height();

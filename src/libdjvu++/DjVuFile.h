@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuFile.h,v 1.74 2001-02-15 20:31:57 bcr Exp $
+// $Id: DjVuFile.h,v 1.75 2001-02-21 00:03:11 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUFILE_H
@@ -71,7 +71,7 @@ class DjVuNavDir;
 
     @memo Classes representing DjVu files.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuFile.h,v 1.74 2001-02-15 20:31:57 bcr Exp $#
+    @version #$Id: DjVuFile.h,v 1.75 2001-02-21 00:03:11 bcr Exp $#
 */
 
 //@{
@@ -206,7 +206,10 @@ public:
    int			file_size;
       //@}
 
+protected:
+      /** Default constructor.  Must follow with an init() */
    DjVuFile(void);
+public:
    virtual ~DjVuFile(void);
 
       /** Initializes a #DjVuFile# object. This is a simplified initializer,
@@ -223,6 +226,11 @@ public:
 
 	  @param str The stream containing data for the file. */
    void init(ByteStream & str);
+
+      /** Creator, does the init(ByteStream &str) */
+   static GP<DjVuFile> create(
+     ByteStream & str, const ErrorRecoveryAction recover_action=ABORT,
+     const bool verbose_eof=true);
    
       /** Initializes a #DjVuFile# object. As you can notice, the data is not
 	  directly passed to this function. The #DjVuFile# will ask for it
@@ -254,6 +262,12 @@ public:
 		 reporting errors. It can later be disabled by means
 		 of \Ref{disable_standard_port}() function. */
    void init(const GURL & url, GP<DjVuPort> port=0);
+
+      /** Creator, does the init(const GURL &url, GP<DjVuPort> port=0) */
+   static GP<DjVuFile> create(
+     const GURL & url, GP<DjVuPort> port=0,
+     const ErrorRecoveryAction recover_action=ABORT,
+     const bool verbose_eof=true);
 
       /** Disables the built-in port for accessing local files, which may
 	  have been created in the case when the #port# argument to
@@ -525,8 +539,8 @@ public:
    virtual void		notify_chunk_done(const DjVuPort * source, const char * name);
    virtual void		notify_file_flags_changed(const DjVuFile * source,
 						  long set_mask, long clr_mask);
-   virtual void		set_recover_errors(ErrorRecoveryAction=ABORT);
-   virtual void		set_verbose_eof(bool=true);
+   virtual void		set_recover_errors(const ErrorRecoveryAction=ABORT);
+   virtual void		set_verbose_eof(const bool verbose_eof=true);
    virtual void		report_error(const GException &ex,const bool=true);
    static void set_decode_codec(GP<GPixmap> (*codec)(ByteStream &bs));
 
@@ -733,14 +747,14 @@ DjVuFile::get_url(void) const
 
 inline void
 DjVuFile::set_verbose_eof
-(bool verbose)
+(const bool verbose)
 {
   verbose_eof=verbose;
 }
 
 inline void
 DjVuFile::set_recover_errors
-(ErrorRecoveryAction action)
+(const ErrorRecoveryAction action)
 {
   recover_errors=action;
 }

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocument.cpp,v 1.147 2001-02-17 02:38:41 bcr Exp $
+// $Id: DjVuDocument.cpp,v 1.148 2001-02-21 00:03:11 bcr Exp $
 // $Name:  $
 
 
@@ -812,10 +812,7 @@ DjVuDocument::url_to_file(const GURL & url, bool dont_create)
    if (!dont_create)
    {
       DEBUG_MSG("creating a new file\n");
-      file=new DjVuFile();
-      file->set_recover_errors(recover_errors);
-      file->set_verbose_eof(verbose_eof);
-      file->init(url, this);
+      file=DjVuFile::create(url,this,recover_errors,verbose_eof);
       set_file_aliases(file);
    }
 
@@ -879,10 +876,8 @@ DjVuDocument::get_djvu_file(int page_num, bool dont_create)
 	       // request_data() is called, the record is still there
 	    ufiles_list.append(ufile);
       
-	    GP<DjVuFile> file=new DjVuFile();
-            file->set_recover_errors(recover_errors);
-            file->set_verbose_eof(verbose_eof);
-	    file->init(url, this);
+	    GP<DjVuFile> file=
+              DjVuFile::create(url,this,recover_errors,verbose_eof);
 	    ufile->file=file;
 	    return file;
 	 } else url=((DjVuFile *) (DjVuPort *) port)->get_url();
@@ -950,10 +945,7 @@ DjVuDocument::get_djvu_file(const char * id, bool dont_create)
 	    // request_data() is called, the record is still there
 	 ufiles_list.append(ufile);
       
-	 GP<DjVuFile> file=new DjVuFile();
-         file->set_recover_errors(recover_errors);
-         file->set_verbose_eof(verbose_eof);
-	 file->init(url, this);
+         GP<DjVuFile> file=DjVuFile::create(url,this,recover_errors,verbose_eof);
 	 ufile->file=file;
 	 return file;
       }

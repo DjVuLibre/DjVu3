@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: IW44Image.h,v 1.1 2001-02-14 19:49:02 bcr Exp $
+// $Id: IW44Image.h,v 1.2 2001-02-21 00:03:11 bcr Exp $
 // $Name:  $
 
 
@@ -129,7 +129,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: IW44Image.h,v 1.1 2001-02-14 19:49:02 bcr Exp $# */
+    #$Id: IW44Image.h,v 1.2 2001-02-21 00:03:11 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -220,6 +220,9 @@ public:
   struct SecondaryHeader;
   struct TertiaryHeader1;
   struct TertiaryHeader2;
+  enum ImageType {
+    GRAY=false,
+    COLOR=true };
 protected:
   IW44Image(void);
 public:
@@ -228,13 +231,13 @@ public:
       \Ref{decode_iff} or \Ref{decode_chunk} to populate the wavelet
       coefficient data structure. You may not use \Ref{encode_iff} or 
       \Ref{encode_chunk}. */
-  static GP<IW44Image> create_decode(const bool color=true);
+  static GP<IW44Image> create_decode(const ImageType itype=COLOR);
   /** Null constructor.  Constructs an empty IW44Image object. This object does
       not contain anything meaningful. You must call function \Ref{init},
       \Ref{decode_iff} or \Ref{decode_chunk} to populate the wavelet
       coefficient data structure.  You may then use \Ref{encode_iff}
       and \Ref{encode_chunk}. */
-  static GP<IW44Image> create_encode(const bool color=true);
+  static GP<IW44Image> create_encode(const ImageType itype=COLOR);
   // virtual destructor
   virtual ~IW44Image();
   /** Initializes an IWBitmap with image #bm#.  This constructor
@@ -614,7 +617,6 @@ public:
   virtual int code_slice(ZPCodec &zp) = 0;
   // Data
   IW44Image::Map &map;                  // working map
-  IW44Image::Map *emap;                 // encoder state
   // status
   int curband;                  // current band
   int curbit;                   // current bitplane

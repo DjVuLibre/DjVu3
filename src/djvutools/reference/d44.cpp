@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: d44.cpp,v 1.10 2001-02-15 01:12:21 bcr Exp $
+// $Id: d44.cpp,v 1.11 2001-02-21 00:03:11 bcr Exp $
 // $Name:  $
 
 /** @name d44
@@ -84,7 +84,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: d44.cpp,v 1.10 2001-02-15 01:12:21 bcr Exp $# 
+    #$Id: d44.cpp,v 1.11 2001-02-21 00:03:11 bcr Exp $# 
 */
 //@{
 //@}
@@ -205,7 +205,7 @@ mymain(int argc, char **argv)
       }
       GP<IFFByteStream> giff=IFFByteStream::create(gibs);
       IFFByteStream &iff=*giff;
-      GP<IW44Image> iw=IW44Image::create_decode(color);
+      GP<IW44Image> iw=IW44Image::create_decode((IW44Image::ImageType)color);
       const int stime = GOS::ticks();
       iw->decode_iff(iff, flag_chunks);
       const int dtime = GOS::ticks() - stime;

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: IW44EncodeCodec.cpp,v 1.7 2001-02-16 00:10:58 bcr Exp $
+// $Id: IW44EncodeCodec.cpp,v 1.8 2001-02-21 00:03:11 bcr Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 08/1998
@@ -214,7 +214,7 @@ public:
 class IW44Image::Codec::Encode : public IW44Image::Codec
 {
 public:
-  Encode(IW44Image::Map &map) : Codec(map) {emap = new IW44Image::Map(map.iw, map.ih);}
+  Encode(IW44Image::Map &map);
   // Coding
   virtual int code_slice(ZPCodec &zp);
   float estimate_decibel(float frac);
@@ -222,7 +222,11 @@ public:
   void encode_buckets(ZPCodec &zp, int bit, int band,
     IW44Image::Block &blk, IW44Image::Block &eblk, int fbucket, int nbucket);
   int encode_prepare(int band, int fbucket, int nbucket, IW44Image::Block &blk, IW44Image::Block &eblk);
+  IW44Image::Map emap;
 };
+
+IW44Image::Codec::Encode::Encode(IW44Image::Map &map)
+: Codec(map), emap(map.iw,map.ih) {}
 
 //////////////////////////////////////////////////////
 /** IW44Image::Transform::Encode
@@ -1008,7 +1012,7 @@ IW44Image::Codec::Encode::encode_prepare(int band, int fbucket, int nbucket, IW4
     {
       // Band zero ( fbucket==0 implies band==zero and nbucket==1 )
       const short *pcoeff = blk.data(0, &map);
-      const short *epcoeff = eblk.data(0, emap);
+      const short *epcoeff = eblk.data(0, &emap);
       char *cstate = coeffstate;
       for (int i=0; i<16; i++)
         {
@@ -1111,7 +1115,7 @@ IW44Image::Codec::Encode::encode_buckets(ZPCodec &zp, int bit, int band,
                 gotcha += 1;
 #endif
             const short *pcoeff = blk.data(fbucket+buckno);
-            short *epcoeff = eblk.data(fbucket+buckno, emap);
+            short *epcoeff = eblk.data(fbucket+buckno, &emap);
             // iterate within bucket
             for (i=0; i<16; i++)
               {
@@ -1164,7 +1168,7 @@ IW44Image::Codec::Encode::encode_buckets(ZPCodec &zp, int bit, int band,
         if (bucketstate[buckno] & ACTIVE)
           {
             const short *pcoeff = blk.data(fbucket+buckno);
-            short *epcoeff = eblk.data(fbucket+buckno, emap);
+            short *epcoeff = eblk.data(fbucket+buckno, &emap);
             for (int i=0; i<16; i++)
               if (cstate[i] & ACTIVE)
                 {
@@ -1199,9 +1203,6 @@ IW44Image::Codec::Encode::estimate_decibel(float frac)
 {
   int i,j;
   const float *q;
-  // Test that we are encoding
-  if (!emap)
-    G_THROW("IW44Image.cant_estimate");
   // Fill norm arrays
   float norm_lo[16];
   float norm_hi[10];
@@ -1235,7 +1236,7 @@ IW44Image::Codec::Encode::estimate_decibel(float frac)
           int fbucket = bandbuckets[bandno].start;
           int nbucket = bandbuckets[bandno].size;
           IW44Image::Block &blk = map.blocks[blockno];
-          IW44Image::Block &eblk = emap->blocks[blockno];
+          IW44Image::Block &eblk = emap.blocks[blockno];
           float norm = norm_hi[bandno];
           for (int buckno=0; buckno<nbucket; buckno++)
             {
@@ -1307,12 +1308,17 @@ IW44Image::Codec::Encode::estimate_decibel(float frac)
 }
 
 GP<IW44Image>
-IW44Image::create_encode(const bool color)
+IW44Image::create_encode(const ImageType itype)
 {
-  if(color)
+  switch(itype)
+  {
+  case COLOR:
     return new IWPixmap::Encode();
-  else
+  case GRAY:
     return new IWBitmap::Encode();
+  default:
+    return 0;
+  }
 }
 
 GP<IW44Image>
@@ -1698,7 +1704,7 @@ IW44Image::Codec::Encode::code_slice(ZPCodec &zp)
           const int fbucket = bandbuckets[curband].start;
           const int nbucket = bandbuckets[curband].size;
           encode_buckets(zp, curbit, curband, 
-                         map.blocks[blockno], emap->blocks[blockno], 
+                         map.blocks[blockno], emap.blocks[blockno], 
                          fbucket, nbucket);
         }
     }

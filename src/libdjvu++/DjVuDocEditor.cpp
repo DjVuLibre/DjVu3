@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocEditor.cpp,v 1.64 2001-02-17 02:38:41 bcr Exp $
+// $Id: DjVuDocEditor.cpp,v 1.65 2001-02-21 00:03:11 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -1386,7 +1386,7 @@ DjVuDocEditor::get_thumbnails_size(void) const
          ByteStream &str=*gstr;
          str.writall((const char *) data, data.size());
          str.seek(0);
-         GP<IW44Image> iwpix=IW44Image::create_decode(true);
+         GP<IW44Image> iwpix=IW44Image::create_decode(IW44Image::COLOR);
          iwpix->decode_chunk(str);
         
          int width=iwpix->get_width();
