@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GMapAreas.cpp,v 1.2 1999-09-30 20:15:54 eaf Exp $
+//C- $Id: GMapAreas.cpp,v 1.3 1999-10-04 20:35:40 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -103,6 +103,16 @@ GMapArea::check_object(void)
 {
    if (get_xmax()==get_xmin()) return "Area width is ZERO";
    if (get_ymax()==get_ymin()) return "Area height is ZERO";
+   if (border_type==XOR_BORDER ||
+       border_type==SOLID_BORDER)
+      if (border_width!=1)
+	 return "Border width must be 1 for XOR and SOLID border types";
+   if (border_type==SHADOW_IN_BORDER ||
+       border_type==SHADOW_OUT_BORDER ||
+       border_type==SHADOW_EIN_BORDER ||
+       border_type==SHADOW_EOUT_BORDER)
+      if (border_width<3 || border_width>32)
+	 return "Border width must be between 3 and 32 for SHADOW border types";
    return gma_check_object();
 }
 
@@ -117,6 +127,11 @@ GMapArea::is_point_inside(int x, int y)
 GString
 GMapArea::print(void)
 {
+      // Make this hard check to make sure, that *no* illegal GMapArea
+      // can be stored into a file.
+   GString errors=check_object();
+   if (errors.length()) THROW(errors);
+   
    int i;
    GString tmp;
    GString url1, target1, comment1;
