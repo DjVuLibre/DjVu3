@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qt_fix.cpp,v 1.4 2001-09-25 20:28:59 leonb Exp $
+// $Id: qt_fix.cpp,v 1.5 2001-09-25 22:38:56 leonb Exp $
 // $Name:  $
 
 
@@ -88,6 +88,7 @@ ActivateLayouts(QWidget * start)
       // a layout. QT tries to do smth like this, but due to the bug it doesn't
       // work every the time.
 {
+#ifdef QT1
    DEBUG2_MSG("ActivateLayouts(): going up and up and reactivating every QLayout...\n");
    DEBUG_MAKE_INDENT(3);
    if (!start) return;
@@ -135,6 +136,7 @@ ActivateLayouts(QWidget * start)
 	 }
       }
    }
+#endif
 }
 
 // QEAPPLICATION ----------------------------------------
@@ -412,13 +414,16 @@ QeFileDialog::QeFileDialog(QWidget * parent, const char * name, bool modal) :
 void
 QeLabel::setMinSize(void)
 {
+#ifdef QT1
   setMinimumSize(sizeHint());
   ActivateLayouts(this);
+#endif
 }
 
 void
 QeLabel::resizeEvent(QResizeEvent * ev)
 {
+#ifdef QT1
    if (isText() && (alignment() & WordBreak))
    {
 	 // Get the minimum height basing on the width
@@ -441,6 +446,7 @@ QeLabel::resizeEvent(QResizeEvent * ev)
       setMinimumHeight(h);
       ActivateLayouts(this);
    }
+#endif
 }
 
 QeLabel::QeLabel(QWidget * parent=0, const char * name=0, WFlags f=0) 
@@ -462,7 +468,9 @@ QeLabel::QeLabel(QWidget * buddy, const QString & text,
 void
 QeLabel::show(void)   
 {
+#ifdef QT1
   if (!isText() || !(alignment() & WordBreak)) setMinSize();
+#endif
   QLabel::show();
 }
 
@@ -473,8 +481,10 @@ QeLabel::show(void)
 void
 QePushButton::setMinSize(void)
 {
+#ifdef QT1
   setMinimumSize(sizeHint());
   ActivateLayouts(this);
+#endif
 }
 
 QSize
@@ -510,8 +520,10 @@ QePushButton::show(void)
 void 
 QeCheckBox::setMinSize(void)
 {
+#ifdef QT1
   setMinimumSize(sizeHint());
   ActivateLayouts(this);
+#endif
 }
 
 QeCheckBox::QeCheckBox(QWidget * parent=0, const char * name=0) 
@@ -537,10 +549,12 @@ QeCheckBox::show(void)
 
 void
 QeRadioButton::setMinSize(void)
-   {
-      setMinimumSize(sizeHint());
-      ActivateLayouts(this);
-   }
+{
+#ifdef QT1
+  setMinimumSize(sizeHint());
+  ActivateLayouts(this);
+#endif
+}
 
 QeRadioButton::QeRadioButton(QWidget * parent=0, const char * name=0) 
   : QRadioButton(parent, name) 
@@ -567,8 +581,10 @@ QeRadioButton::show(void)
 void
 QeSlider::setMinMaxSize(void)
 {
+#ifdef QT1
   setMinimumSize(sizeHint());
   ActivateLayouts(this);
+#endif
 }
 
 QeSlider::QeSlider(QWidget * parent=0, const char * name=0) 
@@ -603,9 +619,11 @@ QeSlider::show(void)
 void	
 QeLineEdit::setMinMaxSize(void)
 {
+#ifdef QT1
   setMinimumSize(sizeHint());
   setMaximumHeight(sizeHint().height());
   ActivateLayouts(this);
+#endif
 }
 
 void
@@ -627,10 +645,12 @@ QeLineEdit::QeLineEdit(QWidget * parent=0, const char * name=0)
 void 
 QeSpinBox::setMinMaxSize(void)
 {
+#ifdef QT1
   setMinimumWidth(sizeHint().width());
   setMinimumHeight(sizeHint().height());
   setMaximumHeight(sizeHint().height());
   ActivateLayouts(this);
+#endif
 }
 
 QeSpinBox::QeSpinBox(QWidget * parent=0, const char * name=0)
@@ -711,8 +731,7 @@ QeProgressBar::QeProgressBar(int totalSteps, QWidget * parent=0, const char * na
 void	
 QeGroupBox::init(void)
 {
-#if 0
-  // Disabled because if also affects the group's children
+#ifdef QT1
   QFont fnt=font();
   fnt.setBold(TRUE);
   setFont(fnt);
@@ -737,8 +756,7 @@ QeGroupBox::QeGroupBox(const QString & title, QWidget * parent=0, const char * n
 void
 QeButtonGroup::init(void)
 {
-#if 0
-  // Disabled because if also affects the group's children
+#ifdef QT1
   QFont fnt=font();
   fnt.setBold(TRUE);
   setFont(fnt);
@@ -774,6 +792,7 @@ bool
 QeDialog::event(QEvent * ev)
   // Useful only when there is an aux_widget
 {
+#ifdef QT1
    if (aux_widget)
    {
       if (ev->type()==Event_Resize)
@@ -790,22 +809,14 @@ QeDialog::event(QEvent * ev)
 	 setMaximumSize(aux_widget->maximumSize());
       }
    }
+#endif
    return QDialog::event(ev);
 }
 
 void
 QeDialog::resize(int w, int h)
 {
-#ifndef QT1
-   const int hinth=aux_widget?aux_widget->sizeHint().height():sizeHint().height();
-   const int xminh=40;
-   const int hintw=aux_widget?aux_widget->sizeHint().width():sizeHint().width();
-   const int xminw=20;
-   if(h<xminh && hinth>1)
-     h=hinth+xminh;
-   if(w<xminw && hintw>1)
-     w=hintw+xminw;
-#endif /* QT1 */
+#ifdef QT1
    if (aux_widget)
    {
 	 // Take into account the aux_widget's min/max dimensions a little
@@ -829,12 +840,14 @@ QeDialog::resize(int w, int h)
       move(wid->x()+(wid->width()-w)/2,
         wid->y()+(wid->height()-h)/2);
    }
+#endif
    QDialog::resize(w, h);
 }
 
 void
 QeDialog::setGeometry(int x, int y, int w, int h)
 {
+#ifdef QT1
    if (aux_widget)
    {
 	 // Take into account the aux_widget's min/max dimensions a little
@@ -848,15 +861,15 @@ QeDialog::setGeometry(int x, int y, int w, int h)
       if (h<minh) h=minh;
       if (h>maxh) h=maxh;
    }
-
    if (!isVisible())
-   {
-	 // After I played with min/max sizes, QT will not center the
-	 // dialog on the screen. Do it ourselves
-      QWidget * wid=parent ? parent->topLevelWidget() : QApplication::desktop();
-      move(wid->x()+(wid->width()-w)/2,
-	   wid->y()+(wid->height()-h)/2);
+     {
+       // After I played with min/max sizes, QT will not center the
+       // dialog on the screen. Do it ourselves
+       QWidget * wid= (parent) ? parent->topLevelWidget() : QApplication::desktop();
+       move(wid->x()+(wid->width()-w)/2,
+            wid->y()+(wid->height()-h)/2);
    }
+#endif
    QDialog::setGeometry(x, y, w, h);
 }
 
@@ -864,18 +877,23 @@ bool
 QeDialog::eventFilter(QObject * obj, QEvent * ev)
 	 // Called when there is a valid parent
 {
+#ifdef QT1
    if (ev->type()==Event_LayoutHint)
    {
       int width, height;
       if (!wresizable && (width=minimumSize().width())) setMaximumWidth(width);
       if (!hresizable && (height=minimumSize().height())) setMaximumHeight(height);
    }
+#endif
    return QDialog::eventFilter(obj, ev);
 }
 
 void
 QeDialog::setResizable(bool wres, bool hres)
 {
+   wresizable = wres;
+   hresizable = hres;
+#ifdef QT1
    static const int qcoord_max=(QCOORD_MAX>32767)?32767:QCOORD_MAX;
    if (wresizable=wres)
    {
@@ -907,12 +925,15 @@ QeDialog::setResizable(bool wres, bool hres)
       if ((height=minimumSize().height()))
 	 setMaximumHeight(height);
    }
+#endif
    setResizeDecorations(wresizable || hresizable);
 }
+
 
 void
 QeDialog::show(void)
 {
+#ifdef QT1
       // The following operation is not that useless as one may think
       // We override resize() to fix the width and height in accordance
       // with the aux_widget's min/max dimensions. I'm more than sure, that
@@ -929,6 +950,15 @@ QeDialog::show(void)
       // aux_widget's min/max size directly, while the dialog learns about it
       // only via a posted (delayed) event.
    resize(width(), height());
+#else
+   if (parent)
+     {
+       QSize sz = sizeHint();
+       QWidget * wid= parent->topLevelWidget();
+       move( wid->x() + (wid->width() - sz.width())/2,
+             wid->y() + (wid->height() - sz.height())/2 );
+     }
+#endif
    QDialog::show();
 }
 
@@ -952,16 +982,19 @@ QeDialog::slotParentDestroyed(void)
 }
 
 QeDialog::QeDialog(QWidget * parent_, const char * name,
-		   bool modal_, WFlags f) :
-      QDialog(modal_ ? parent_ : 0, name, modal_, f)
-      , modal(modal_), parent(parent_), wresizable(false), hresizable(false)
+		   bool modal_, WFlags f) 
+  :  QDialog(modal_ ? parent_ : 0, name, modal_, f),
+     modal(modal_), parent(parent_), aux_widget(0),
+     wresizable(false), hresizable(false)
 {
       // Note: parent here *may* be non-zero even when QDialog ate
       // zero parent. This is why we make this strange check
    if (!parentWidget())
    {
+#ifdef QT1
       aux_widget=new QWidget(this, "aux_dialog_widget");
       aux_widget->setGeometry(0, 0, width(), height());
+#endif
       if (parent) connect(parent, SIGNAL(destroyed(void)),
 			  this, SLOT(slotParentDestroyed(void)));
    } else
@@ -969,16 +1002,14 @@ QeDialog::QeDialog(QWidget * parent_, const char * name,
       aux_widget=0;
       parentWidget()->installEventFilter(this);
    }
-
       // We need to do it both when the dialog is not modal (when
       // QT does nothing) or when the dialog IS modal because in the
       // latter case QT doesn't care to search for the top level widget
-   
    if (parent) makeTransient(this, parent->topLevelWidget());
-
    setResizable(0);
-
+#ifdef QT1
    resize(0, 0);
+#endif
 }
 
 #ifdef UNIX
@@ -1163,10 +1194,12 @@ QeDialog::setResizeDecorations(bool enabled)
 void
 QeComboBox::setMinMaxSize(void)
 {
+#ifdef QT1
   setMinimumWidth(sizeHint().width());
   setMinimumHeight(sizeHint().height());
   setMaximumHeight(sizeHint().height());
   ActivateLayouts(this);
+#endif
 }
 
 void

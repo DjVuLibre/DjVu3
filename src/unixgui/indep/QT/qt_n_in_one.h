@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qt_n_in_one.h,v 1.2 2001-07-25 17:10:42 mchen Exp $
+// $Id: qt_n_in_one.h,v 1.3 2001-09-25 22:38:56 leonb Exp $
 // $Name:  $
 
 
@@ -60,25 +60,18 @@ private:
       // Returns the same (if valid) or the last widget from the children list
       // E.g. If w==0 then the result will ne non-null if there is at least
       // one child available.
-   QWidget	* checkWidget(QWidget * w);
+   QWidget	* checkWidget(QWidget * w) const;
 
       // Recomputes min/max sizes. Used only when resizable is FALSE
-   void		recomputeMinMax(void);
+   void	recomputeMinMax(void);
+   virtual QSize sizeHint(void) const;
+   virtual QSize minimumSizeHint(void) const;
    
       // Checks and maybe changes the activeWidget
-   void		checkActiveWidget(void)
-   {
-      QWidget * w=checkWidget(activeWidget);
-      if (w!=activeWidget) setActiveWidget(w);
-   };
+   void		checkActiveWidget(void);
 protected:
-   virtual void		resizeEvent(QResizeEvent * ev)
-   {
-      checkActiveWidget();
-      if (activeWidget && ev->size().width() && ev->size().height())
-	 activeWidget->resize(ev->size());
-   };
-   virtual bool		event(QEvent * ev);
+   virtual void	resizeEvent(QResizeEvent * ev);
+   virtual bool	event(QEvent * ev);
 public:
    virtual void	hide(void);
    virtual void	show(void);

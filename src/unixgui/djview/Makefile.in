@@ -31,7 +31,7 @@
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #C-
 #
-# $Id: Makefile.in,v 1.5 2001-09-24 22:28:09 leonb Exp $
+# $Id: Makefile.in,v 1.6 2001-09-25 22:38:55 leonb Exp $
 # $Name:  $
 
 %%%include <paths>
@@ -118,7 +118,7 @@ OBJS		+= $(OBJ_INDEP_QX)
 DIR_INDEP_QT	:= $(DIR_UNIXGUI)/indep/QT
 VPATH		:= $(VPATH):$(DIR_INDEP_QT)
 SRC_INDEP_QT 	:= qt_fix.cpp qt_imager.cpp qt_painter.cpp qt_n_in_one.cpp\
-	qlib.cpp qt_iscale.cpp qt_color_menu.cpp qt_color_dialog.cpp
+	qlib.cpp # qt_iscale.cpp qt_color_menu.cpp qt_color_dialog.cpp
 HDR_INDEP_QT	:= $(patsubst %.cpp,%.h,$(SRC_INDEP_QT))
 OBJ_INDEP_QT	:= $(patsubst %.cpp,%.o,$(SRC_INDEP_QT))
 SRCS		+= $(SRC_INDEP_QT)

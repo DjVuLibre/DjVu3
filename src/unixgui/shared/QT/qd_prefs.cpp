@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qd_prefs.cpp,v 1.4 2001-09-25 20:28:59 leonb Exp $
+// $Id: qd_prefs.cpp,v 1.5 2001-09-25 22:38:56 leonb Exp $
 // $Name:  $
 
 
@@ -217,12 +217,11 @@ QDGammaPrefs::QDGammaPrefs(DjVuPrefs * prefs, QWidget * parent, const char * nam
    QVBoxLayout * vlay=new QVBoxLayout(5);
    glay->addLayout(vlay, 1, 0);
    vlay->addStretch(1);
-   label=new QeLabel(tr("Screen color correction."), this);
+   label=new QeLabel(tr("Screen color correction.\n") +
+                     tr("Adjust slider until\ngray shades look similar."), this );
    label->setAlignment(AlignCenter);
    vlay->addWidget(label);
-   label=new QeLabel(tr("Adjust slider until\ngray shades look similar"), this);
-   label->setAlignment(AlignCenter);
-   vlay->addWidget(label);
+   vlay->addSpacing(5);
    displ_slider=new QeSlider(5, 50, 1, (int) (prefs->dScreenGamma*10),
 			     QSlider::Horizontal, this, "displ_slider");
    displ_slider->setTickmarks(QSlider::Below);

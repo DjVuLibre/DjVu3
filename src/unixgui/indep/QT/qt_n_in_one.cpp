@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qt_n_in_one.cpp,v 1.2 2001-07-25 17:10:42 mchen Exp $
+// $Id: qt_n_in_one.cpp,v 1.3 2001-09-25 22:38:56 leonb Exp $
 // $Name:  $
 
 
@@ -53,11 +53,65 @@
 #define QGManager QLayout
 #endif
 
+QSize QeNInOne::sizeHint(void) const
+{
+  int sw = -1;
+  int sh = -1;
+  QWidget *w = checkWidget(activeWidget);
+  if (resizable && w)
+    return w->sizeHint();
+  const QObjectList * objectList=children();
+  if (objectList)
+    {
+      QObjectListIt it(*objectList);
+      QObject * obj;
+      while((obj=it.current()))
+        {
+          ++it;
+          if (obj->isWidgetType())
+            {
+              QWidget * w=(QWidget *) obj;
+              QSize sz = w->sizeHint();
+              if (sw < sz.width()) sw = sz.width();
+              if (sh < sz.height()) sh = sz.height();
+            }
+        }
+    }
+  return QSize(sw, sh);
+}
+
+QSize QeNInOne::minimumSizeHint(void) const
+{
+  int sw = -1;
+  int sh = -1;
+  QWidget *w = checkWidget(activeWidget);
+  if (resizable && w)
+    return w->minimumSizeHint();
+  const QObjectList * objectList=children();
+  if (objectList)
+    {
+      QObjectListIt it(*objectList);
+      QObject * obj;
+      while((obj=it.current()))
+        {
+          ++it;
+          if (obj->isWidgetType())
+            {
+              QWidget * w=(QWidget *) obj;
+              QSize sz = w->minimumSizeHint();
+              if (sw < sz.width()) sw = sz.width();
+              if (sh < sz.height()) sh = sz.height();
+            }
+        }
+    }
+  return QSize(sw, sh);
+}
+
 void QeNInOne::recomputeMinMax(void)
 {
+#ifdef QT1
    int min_w=0, min_h=0;
    int max_w=QGManager::unlimited, max_h=QGManager::unlimited;
-
    const QObjectList * objectList=children();
    if (objectList)
    {
@@ -78,7 +132,6 @@ void QeNInOne::recomputeMinMax(void)
 	 }
       }
    }
-
    QSize min=minimumSize();
    QSize max=maximumSize();
    int done=0;
@@ -87,29 +140,36 @@ void QeNInOne::recomputeMinMax(void)
    if (min_h!=min.height()) { setMinimumHeight(min_h); done=1; }
    if (max_h!=max.height()) { setMaximumHeight(max_h); done=1; }
    if (done) ActivateLayouts(this);
+#endif
 }
 
-QWidget	* QeNInOne::checkWidget(QWidget * w)
-      // Check and return a legal widget, maybe different from w. If w==0 and
-      // there is at least one child - it will be returned
+void QeNInOne::checkActiveWidget(void)
 {
-   QWidget * last_w=0;
-   const QObjectList * objectList=children();
-   if (objectList)
-   {
-      QObjectListIt it(*objectList);
-      QObject * obj;
-      while((obj=it.current()))
-      {
-	 ++it;
-	 if (obj->isWidgetType())
-	 {
-	    last_w=(QWidget *) obj;
-	    if (last_w==w) return w;
-	 }
-      }
-   }
-   return last_w;
+  QWidget * w=checkWidget(activeWidget);
+  if (w!=activeWidget) setActiveWidget(w);
+}
+
+QWidget	* QeNInOne::checkWidget(QWidget * w) const
+  // Check and return a legal widget, maybe different from w. If w==0 and
+  // there is at least one child - it will be returned
+{
+  QWidget * last_w=0;
+  const QObjectList * objectList=children();
+  if (objectList)
+     {
+       QObjectListIt it(*objectList);
+       QObject * obj;
+       while((obj=it.current()))
+         {
+           ++it;
+           if (obj->isWidgetType())
+             {
+               last_w=(QWidget *) obj;
+               if (last_w==w) return w;
+             }
+         }
+     }
+  return last_w;
 }
 
 void QeNInOne::setActiveWidget(QWidget * new_w)
@@ -140,18 +200,35 @@ void QeNInOne::setActiveWidget(QWidget * new_w)
       if (resizable && isVisible())
       {
 	    // Otherwise min/max size is set when a child is added/removed
+#ifdef QT1
 	 setMinimumSize(activeWidget->minimumSize());
 	 setMaximumSize(activeWidget->maximumSize());
 	 ActivateLayouts(this);
+#else
+         updateGeometry();
+#endif
       }
    }
+}
+
+void QeNInOne::resizeEvent(QResizeEvent * ev)
+{
+  checkActiveWidget();
+  if (activeWidget && ev->size().width() && ev->size().height())
+    activeWidget->resize(ev->size());
 }
 
 bool QeNInOne::event(QEvent * ev)
 {
    try
    {
-      if (ev->type()==Event_ChildRemoved) checkActiveWidget();
+      if (ev->type()==Event_ChildRemoved) 
+      {
+         checkActiveWidget();
+#ifndef QT1
+         updateGeometry();
+#endif
+      }
       else if (ev->type()==Event_ChildInserted)
       {
 #ifdef QT1
@@ -160,26 +237,35 @@ bool QeNInOne::event(QEvent * ev)
 	 QWidget * w_ins=(QWidget *)((QChildEvent *) ev)->child();
 #endif
 	 w_ins->move(0, 0);
-
 	 checkActiveWidget();
+#ifndef QT1
+         updateGeometry();
+#endif
       } else if (ev->type()==Event_LayoutHint)
       {
 	    // Looks like min/max dimensions of a child changed...
 	 if (resizable && isVisible())
 	 {
 	    checkActiveWidget();
+#ifdef QT1
 	    setMinimumSize(activeWidget->minimumSize());
 	    setMaximumSize(activeWidget->maximumSize());
+#endif
 	 }
+#ifndef QT1
+         updateGeometry();
+#endif
       }
 		    
       if (!resizable)
       {
+#ifdef QT1
 	    // If not resizable, it's necessary to recompute min/max
 	    // every time when a child is added.
 	    // Otherwise it's done every time a new active widget is chosen
 	    // or when LayoutHint event is received.
 	 recomputeMinMax();
+#endif
       }
    } catch(const GException & exc)
    {
@@ -192,8 +278,10 @@ void QeNInOne::hide(void)
 {
    if (resizable)
    {
+#ifdef QT1
       setFixedSize(QSize(1, 1));
       ActivateLayouts(this);
+#endif
    }
 
    QWidget::hide();
@@ -206,8 +294,10 @@ void QeNInOne::show(void)
       checkActiveWidget();
       if (activeWidget)
       {
+#ifdef QT1
 	 setMinimumSize(activeWidget->minimumSize());
 	 setMaximumSize(activeWidget->maximumSize());
+#endif
       }
    }
 

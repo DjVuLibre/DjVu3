@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qd_print_dialog.cpp,v 1.5 2001-09-25 20:28:59 leonb Exp $
+// $Id: qd_print_dialog.cpp,v 1.6 2001-09-25 22:38:56 leonb Exp $
 // $Name:  $
 
 
@@ -579,6 +579,7 @@ QDPrintDialog::eventFilter(QObject * obj, QEvent * ev)
       // the "what" box become bigger than 2*"scale" box, the dialog
       // will not grow.
 {
+#ifdef QT1
    if (ev->type()==Event_LayoutHint)
    {
 	 // Adjust the sizes of 'Scale' and 'What' boxes first
@@ -609,6 +610,7 @@ QDPrintDialog::eventFilter(QObject * obj, QEvent * ev)
       if (max_width>color_size.width())
 	 color_bg->setMinimumWidth(max_width);
    }
+#endif
    return FALSE;
 }
 
