@@ -32,7 +32,7 @@
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #C- 
 #
-# $Id: configure,v 1.39 2000-11-09 20:15:05 jmw Exp $
+# $Id: configure,v 1.40 2001-08-02 16:49:04 bcr Exp $
 # $Name:  $
 
 # LIBDJVU++ -- Decoding library and utilities
@@ -43,6 +43,13 @@
 PROGRAM="$0"
 CONFIG_FILE=`dirname "$PROGRAM"`"/config/functions.sh"
 conf=`basename "$PROGRAM"`
+if [ -r "$conf" ]
+then
+  mkdir build
+  cd build
+  CONFIG_FILE="../$CONFIG_FILE"
+  PROGRAM="../$conf"
+fi
 if [ ! -r "$CONFIG_FILE" ]
 then
     echo 1>&2 "$conf: Cannot recognize source directory"
@@ -68,8 +75,20 @@ do
     --with-rpo|--frepo )
       use_rpo=yes
       ;;
+    --without-rpo )
+      use_rpo=
+      ;;
+    --with-jpeg )
+      without_jpeg=
+      jpeg_name=
+      ;;
     --without-jpeg )
       without_jpeg=yes
+      jpeg_name=
+      ;;
+    --with-jpeg=* )
+      without_jpeg=
+      jpeg_name=`echo $arg |sed 's/[-A-Za-z]*=//'`
       ;;
     *)
       if process_general_option $arg
@@ -82,26 +101,44 @@ do
         echo 1>&2 "  --with-threads=(no|co|posix|dce)          choose a thread implementation."
         echo 1>&2 "  --with-rpo,--frepo                        use --frepo option in G++."
         echo 1>&2 "  --without-jpeg                            excludes  JPEG decoder (bulky)."
+        echo 1>&2 "  --with-jpeg                               includes JPEG decoder (bulky)."
+        echo 1>&2 "  --with-jpeg=libjpeg.so                    includes JPEG decoder dynamically."
         exit 1 
       fi
       ;;
    esac
 done
 
-if [ ! -d "$TOPSRCDIR/src/3rd-party/libjpeg" ] 
+if [ -z "$jpeg_name" ]
 then
-  without_jpeg=true
+  if [ ! -d "$TOPSRCDIR/src/3rd-party/libjpeg" ] 
+  then
+    without_jpeg=true
+  fi
 fi
 
 if [ -z "$without_jpeg" ] 
 then
-      C_DEFS=APPEND
-      A_DEFS="$A_DEFS -DNEED_JPEG_DECODER"
+  append_defs NEED_JPEG_DECODER 1
+  if [ -z "$jpeg_name" ]
+  then
+    if [ ! -d "$TOPSRCDIR/src/3rd-party/libjpeg" ] 
+    then
       C_INCS=APPEND
       A_INCS="$A_INCS -I./TOPDIR/src/3rd-party/libjpeg -I./TOPDIR/SRCDIR/src/3rd-party/libjpeg"
       LIBJPEG='$(LIBPATH)/libdjpeg.a'
-else
+      C_CXXSYMBOLIC=APPEND
+      A_CXXSYMBOLIC="$A_CXXSYMBOLIC $WLWHOLEARCHIVE,"'$(LIBJPEG)'
+    else
       LIBJPEG=""
+      append_defs LIBJPEGNAME \""libjpeg.so"\"
+    fi
+  else
+    LIBJPEG=""
+    append_defs LIBJPEGNAME \""$jpeg_name"\"
+  fi  
+else
+  LIBJPEG=""
 fi
 CONFIG_VARS=`echo LIBJPEG $CONFIG_VARS`
 
@@ -120,7 +157,7 @@ fi
 ### ---------------------------
 ### Proceed
 
-if [ -z "$without_jpeg" ] 
+if [ -z "$without_jpeg$jpeg_name" ] 
 then
     require_compiler c c++
 else
@@ -132,6 +169,8 @@ check_thread_option $threads
 require_library math log -lm
 check_rpo_option $use_rpo
 require_make_stlib
+check_dlopen
+check_iconv
 
 
 ### ---------------------------
@@ -141,7 +180,7 @@ generate_makefile src/libdjvu++
 generate_makefile src/libdjvu++/Test
 generate_makefile src/djvutools/reference
 
-if [ -z "$without_jpeg" ] 
+if [ -z "$without_jpeg$jpeg_name" ] 
 then
     ## This is the version with JPEG 
     generate_makefile src/3rd-party/libjpeg

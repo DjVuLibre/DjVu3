@@ -31,7 +31,7 @@
 #C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #
-# $Id: functions.sh,v 1.71 2001-07-24 17:52:02 bcr Exp $
+# $Id: functions.sh,v 1.72 2001-08-02 16:49:04 bcr Exp $
 # $Name:  $
 
 #
@@ -1140,7 +1140,7 @@ PROGRAM_NAME=`basename "$PROGRAM"`
 #
 
 if [ -z "$CONFIG_DIR" ] ; then
-  CONFIG_DIR=`dirname "$0"`/config
+  CONFIG_DIR=`dirname "$PROGRAM"`/config
   CONFIG_DIR=`cd "$CONFIG_DIR" 2>>/dev/null 1>>/dev/null;pwd`
   CONFIG_VARS=`echo CONFIG_DIR ${CONFIG_VARS}`
 fi
