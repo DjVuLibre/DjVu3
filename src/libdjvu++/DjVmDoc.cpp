@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVmDoc.cpp,v 1.13 1999-09-29 20:15:59 eaf Exp $
+//C- $Id: DjVmDoc.cpp,v 1.14 1999-10-24 20:26:12 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -52,17 +52,17 @@ DjVmDoc::insert_file(ByteStream &data, bool page,
                      const char *name, const char *id, 
                      const char *title, int pos)
 {
-  DjVmDir::File *file = new DjVmDir::File(name, id, title, page);
-  GP<DataPool> pool = new DataPool;
-  // Cannot connect to a bytestream.
-  // Must copy data into the datapool.
-  int nbytes;
-  char buffer[1024];
-  while ((nbytes = data.read(buffer, sizeof(buffer))))
-    pool->add_data(buffer, nbytes);
-  pool->set_eof();
-  // Call low level insert
-  insert_file(file, pool, pos);
+   DjVmDir::File *file = new DjVmDir::File(name, id, title, page);
+   GP<DataPool> pool = new DataPool;
+      // Cannot connect to a bytestream.
+      // Must copy data into the datapool.
+   int nbytes;
+   char buffer[1024];
+   while ((nbytes = data.read(buffer, sizeof(buffer))))
+      pool->add_data(buffer, nbytes);
+   pool->set_eof();
+      // Call low level insert
+   insert_file(file, pool, pos);
 }
 
 void
@@ -100,10 +100,7 @@ DjVmDoc::write(ByteStream & str)
 
    GPList<DjVmDir::File> files_list=dir->get_files_list();
    for(pos=files_list;pos;++pos)
-   {
-      GP<DjVmDir::File> file=files_list[pos];
-      file->offset=file->size=0xffffffff;
-   }
+      files_list[pos]->offset=0xffffffff;
    
    MemoryByteStream tmp_str;
    IFFByteStream tmp_iff(tmp_str);
@@ -270,7 +267,12 @@ DjVmDoc::write_index(ByteStream & str)
    {
       GP<DjVmDir::File> file=files_list[pos];
       file->offset=0;
-      file->size=0;
+
+      GPosition data_pos;
+      if (!data.contains(file->id, data_pos))
+	 THROW("Strange: there is no data for file '"+file->id+"'\n");
+      file->size=data[data_pos]->get_length();
+      if (!file->size) THROW("Strange: File size is zero.");
    }
 
    IFFByteStream iff(str);
