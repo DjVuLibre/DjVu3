@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.99 2000-01-18 21:10:36 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.100 2000-01-19 23:35:59 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -339,8 +339,12 @@ DjVuDocument::set_file_aliases(const DjVuFile * file)
    
    GMonitorLock lock(&((DjVuFile *) file)->get_safe_flags());
    pcaster->clear_aliases(file);
-   if (file->is_decode_ok())
+   if (file->is_decode_ok() && cache)
    {
+	 // If file is successfully decoded and caching is enabled,
+	 // assign a global alias to this file, so that any other
+	 // DjVuDocument will be able to use it.
+      
       pcaster->add_alias(file, file->get_url());
       if (flags & (DOC_NDIR_KNOWN | DOC_DIR_KNOWN))
       {
