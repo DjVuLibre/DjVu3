@@ -1,4 +1,3 @@
-
                 PDF/PS to DjVu Utility
 
 -------------------------------------------------------------------
@@ -15,106 +14,117 @@
 -------------------------------------------------------------------
     1. README.txt       - This file.
     2. build-gnu-gs.sh  - shell script to build Ghostscript
-    3. pdftodjvu.sh     - shell script to convert PS and PDF files 
-                          to DjVu                      
-    4. pstodjvu.sh      - shell script to convert PS and PDF files
-                          to Djvu
+    3. pdftodjvu.sh     - script to convert PS & PDF files to DjVu
+    4. pstodjvu.sh      - script to convert PS & PDF files to Djvu
+-------------------------------------------------------------------
+   II Installation instructions
+-------------------------------------------------------------------
 
--------------------------------------------------------------------
-   II Installation instructions 
--------------------------------------------------------------------
-Perform the following procedure to install the PDF/PS to DjVu 
-utilities.  
- 
+Perform the following procedure to install the PDF/PS to DjVu utilities.
+
 Step 1:
-        Download the pdftodjvu304.tar.gz
+    Download the pdftodjvu305.tar.gz
+
 Step 2:
-        Untar and unzip the pdftodjvu304.tar.gz file:
-                gunzip -c < pdftodjvu304.tar.gz|tar xvvf -
-              
-Step 3: Verify that if you have Ghostscript version 5.50 installed,
-        with the command:
-                gs --version
-        If you do not have Ghostscript version 5.50 installed, download
-        the following:
+    Untar and unzip the pdftodjvu305.tar.gz file:
+        gunzip -c < pdftodjvu305.tar.gz|tar xvvf -
+
+Step 3:
+    Verify that you have GNU Ghostscript version 5.50 installed,
+    with the command:
+        gs --version
+    If this command returns version "5.50" skip to step 4.
+    If not, you do not have GNU Ghostscript version 5.50 installed.
+    You will need to install GNU Ghostscripts version 5.50 before
+    continuing.  To do so complete steps A - D below.
+
+        Step A:
+            Download GNU Ghostscript version 5.50 to the same
+            directory where ./build-gnu-gs.sh is located.  You
+            can obtain source code for GNU Ghostscript from:
+                http://www.cs.wisc.edu/~ghost
+                http://www.aladdin.com
+            or your favorite GNU mirror site.
+
+            You need the following files:
+
                 gnu-gs-5.50.tar.gz
                 gnu-gs-5.50jpeg.tar.gz
                 gnu-gs-5.50libpng.tar.gz
                 gnu-gs-5.50zlib.tar.gz
                 gnu-gs-fonts-other-5.50.tar.gz
                 gnu-gs-fonts-std-5.50.tar.gz
-        
-        GNU Ghostscript Source can also be obtained from the following
-        location:
-                http://www.cs.wisc.edu/~ghost
+
+        Step B:
+            Under Linux, before running ./build-gnu-gs.sh
+            check that /usr/X11 exists.  If not, create /usr/X11 with
+            the command:
+                ln -s /usr/X11R6 /usr/X11
+
+        Step C:
+            Execute the build-gnu-gs.sh script:
+                ./build-gnu-gs.sh
+            Note:  This script will extract the source and build
+            GNU Ghostscript.  This script will also create an
+            install.sh script.
+
+        Step D:
+            Run the ./install.sh script to install GNU Ghostscript:
+                ./install.sh <prefix>
+            where <prefix> is somewhere in your search path such as:
+                ./install.sh /usr
+            or
+                ./install.sh /usr/local
 
 Step 4:
-        Install either DjVu Enterprise 3.1 for Linux (purchased from
-        LizardTech, Inc.) or build and install the Open Source DjVu Reference
-        Library version 3.0, obtained from:
+    Install either DjVu Enterprise 3.1 for Linux (purchased from
+    LizardTech, Inc.) or build and install the Open Source DjVu
+    Reference Library version 3.0, obtained from:
 
   http://www.lizardtech.com/products/djvu/referencelibrary/DjVuRefLib_3.0.html
 
 Step 5:
-        Execute the build-gnu-gs.sh script:
-                ./build-gnu-gs.sh
-
-        Note: Under Linux, before running ./build-gnu-gs.sh check that 
-        /usr/X11 exists.  If not, create /usr/X11 with the command:
-        	ln -s /usr/X11R6 /usr/X11
-
-        This script will extract the source and build Ghostscript.
-        This script will also create an install.sh script.
+    Verify that the DjVu and Ghostscript commands have been
+    installed in your search path.
 
 Step 6:
-        Run the ./install.sh to install Ghostscript:
-                ./install.sh <prefix>
-        where <prefix> is a somewhere in your search path such as:
-                ./install.sh /usr
-        or
-                ./install.sh /usr/local
+    Execute the shell scripts (pdftodjvu.sh or pstodjvu.sh) to
+    convert PDF/PS files to DjVu by using the following syntax:
 
-Step 7:
-        Verify all the commands installed in step 4 and step 6 have been
-        installed in your search path.
-
-Step 8:
-        Execute the shell scripts (pdftodjvu.sh or pstodjvu.sh) to convert
-        PDF/PS files to DjVu by using the following syntax:
-
-DjVu Open Source
-    Bundled output
+DjVu Open Source:
+    Bundled output:
         ./pdftodjvu.sh --free [cpaldjvu options] <inputfile> <outputfile>
-        
-    Indirect output
+
+    Indirect output:
         ./pdftodjvu.sh --free [cpaldjvu options] <inputfile> <outputdir>
 
-DjVu Enterprise
-    Bundled output
+DjVu Enterprise:
+    Bundled output:
         ./pdftodjvu.sh --profile=[profilename] [documenttodjvu options] \
             [--best] <inputfile> <outputfile>
 
-    Indirect output
+    Indirect output:
         ./pdftodjvu.sh --profile=[profilename] [documenttodjvu options] \
             [--best] <inputfile> <outputdir>
 
-Note: "--profile=clean300" is recommended for most documents with photos or
-other complicated graphics.  "--free" is recommended for documents that are
-mostly simple text.
+Note: "--profile=clean300" is recommended for most documents with photos
+or other complicated graphics.  The "--free" option is recommended for
+documents that are mostly simple text.
 
 -------------------------------------------------------------------
   III Release Notes
 -------------------------------------------------------------------
 
     1. Ghostscript version 5.50 supports PDF versions 1.0, 1.1, and 1.2
-       file formats
+       file formats.
 
-    2. "--profile=clean300" is recommended for most documents with photos
-       or other complicated graphics.
+    2. The "--profile=clean300" option is recommended for most documents
+       with photos or other complicated graphics.
 
-    3. "--free" is recommended for documents that are mostly simple text.
+    3. The "--free" option is recommended for documents that are mostly
+       simple text.
 
-     
+
 -------------------------------------------------------------------
     IV Licenses and Trademarks.
 -------------------------------------------------------------------
@@ -123,7 +133,7 @@ Copyright (c) 2001 LizardTech, Inc.
 All rights reserved. DjVu is a registered trademark of LizardTech.
 Unauthorized use is prohibited by law.
 
-The PDF/PS to DjVu utility is made available by LizardTech 
+The PDF/PS to DjVu utility is made available by LizardTech
 subject to the GNU General Public License, the text of which follows:
 
                     GNU GENERAL PUBLIC LICENSE
@@ -406,3 +416,5 @@ PROGRAMS), EVEN IF SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGES.
 
                      END OF TERMS AND CONDITIONS
+
+
