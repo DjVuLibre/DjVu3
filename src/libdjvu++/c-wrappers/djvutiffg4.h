@@ -8,7 +8,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C- "$Id: djvutiffg4.h,v 1.1 2000-01-06 04:28:09 bcr Exp $"
+//C- "$Id: djvutiffg4.h,v 1.2 2000-01-06 22:00:22 bcr Exp $"
 //C- -- Tiff G4 To DjVu
 //C- Author: Parag Deshmukh (Dec 99)
 #endif  /* __cplusplus */
@@ -118,7 +118,7 @@ int tiffg4todjvu_haserror(const tiffg4todjvu_options []);
 const char * tiffg4todjvu_error(tiffg4todjvu_options []);
 
 /** Prints all the errors to stderr */
-void tiffg4todjvu_perror(tiffg4todjvu_options []);
+void tiffg4todjvu_perror(tiffg4todjvu_options [],const char *);
 
 /** This will print usage instructions to the specified output. */
 void tiffg4todjvu_usage(FILE *out,const char *prog);
@@ -195,7 +195,7 @@ int djvutotiffg4_haserror(const djvutotiffg4_options []);
 const char * djvutotiffg4_error(djvutotiffg4_options []);
 
 /** Prints all the errors to stderr */
-void djvutotiffg4_perror(djvutotiffg4_options []);
+void djvutotiffg4_perror(djvutotiffg4_options [],const char *);
 
 /** This will print usage instructions to the specified output. */
 void djvutotiffg4_usage(FILE *out,const char *prog);
