@@ -1,39 +1,33 @@
-/*
- *C- DjVu® Reference Library (v. 3.5)
+/*C- -*- C -*-
+ *C-
+ *C- DjVu® Reference Library (v. 3.0)
  *C- 
- *C- Copyright © 2000-2001 LizardTech, Inc. All Rights Reserved.
- *C- The DjVu Reference Library is protected by U.S. Pat. No.
- *C- 6,058,214 and patents pending.
+ *C- Copyright © 2000 LizardTech, Inc. All Rights Reserved.
  *C- 
- *C- This software is subject to, and may be distributed under, the
- *C- GNU General Public License, Version 2. The license should have
- *C- accompanied the software or you may obtain a copy of the license
- *C- from the Free Software Foundation at http://www.fsf.org .
+ *C- This software (the "Original Code") is subject to, and may be
+ *C- distributed under, the GNU General Public License, Version 2.
+ *C- The license should have accompanied the Original Code or you
+ *C- may obtain a copy of the license from the Free Software
+ *C- Foundation at http://www.fsf.org .
  *C- 
- *C- The computer code originally released by LizardTech under this
- *C- license and unmodified by other parties is deemed the "LizardTech
- *C- Original Code."
+ *C- With respect to the Original Code, and subject to any third
+ *C- party intellectual property claims, LizardTech grants recipient
+ *C- a worldwide, royalty-free, non-exclusive license under patent
+ *C- claims infringed by making, using, or selling Original Code
+ *C- which are now or hereafter owned or controlled by LizardTech,
+ *C- but solely to the extent that any such patent is reasonably
+ *C- necessary to enable you to make, have made, practice, sell, or 
+ *C- otherwise dispose of Original Code (or portions thereof) and
+ *C- not to any greater extent that may be necessary to utilize
+ *C- further modifications or combinations.
  *C- 
- *C- With respect to the LizardTech Original Code ONLY, and subject
- *C- to any third party intellectual property claims, LizardTech
- *C- grants recipient a worldwide, royalty-free, non-exclusive license
- *C- under patent claims now or hereafter owned or controlled by
- *C- LizardTech that are infringed by making, using, or selling
- *C- LizardTech Original Code, but solely to the extent that any such
- *C- patent(s) is/are reasonably necessary to enable you to make, have
- *C- made, practice, sell, or otherwise dispose of LizardTech Original
- *C- Code (or portions thereof) and not to any greater extent that may
- *C- be necessary to utilize further modifications or combinations.
- *C- 
- *C- The LizardTech Original Code is provided "AS IS" WITHOUT WARRANTY
- *C- OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
- *C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
- *C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ *C- The Original Code is provided "AS IS" WITHOUT WARRANTY OF ANY
+ *C- KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO
+ *C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
+ *C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
  * 
- * $Id: DjVu.h,v 1.21 2001-07-24 17:52:03 bcr Exp $
- */
-
-/*C-  -*- C -*-
+ * $Id: DjVu.h,v 1.22 2001-08-02 21:38:02 bcr Exp $
+ * $Name:  $
  */
 
 #ifndef _DJVU_GLOBAL_API_H
@@ -49,61 +43,6 @@
     Bill C Riemers 
 */
 /*@{*/
-
-/*
- * $Log: DjVu.h,v $
- * Revision 1.21  2001-07-24 17:52:03  bcr
- * *** empty log message ***
- *
- * Revision 1.20  2001/01/04 22:04:54  bcr
- * Update of copyright date.
- *
- * Revision 1.19  2000/11/09 20:15:05  jmw
- *
- * Purpose: Update CopyRight notice as per Erik Adams
- *
- * Project: DjVu3
- *
- * Rationale: OSI
- *
- * BugID:
- *
- * Side_Effects:
- *
- * Testing:
- *
- * Reviewers:
- *
- * Revision 1.18  2000/11/02 01:08:34  bcr
- * Updated the copyrights in the various files.
- *
- * Revision 1.17  2000/10/10 19:02:27  bcr
- * Merging in the changes to the progress function.
- *
- * Revision 1.16.6.1  2000/10/10 18:51:07  bcr
- * Added a return value support for the progress callback.  A return value
- * of TRUE (non-zero) means to abort.
- *
- * Revision 1.16  2000/09/18 17:09:44  bcr
- * Adding files.
- *
- * Revision 1.14  2000/07/11 19:28:53  bcr
- * Various fixes to the copyrights and such.  Applied AT&T's latest patches.
- *
- * Revision 1.13  2000/07/05 16:50:53  bcr
- * Updated the documentation.
- *
- * Revision 1.12  2000/07/04 00:51:49  mrosen
- * updated documentation
- *
- * Revision 1.11  2000/03/10 14:57:35  haffner
- * Typos + cannot use "default" as a variable name!
- *
- * Revision 1.10  2000/03/08 22:59:46  bcr
- * Updated the documentation.  I'm using Leon's libdjvu++ documentation
- * as a template.
- *
- */
 
 /* Predeclarations. (should go here) */
 
@@ -183,10 +122,10 @@ DJVUAPI
   These callbacks are not enabled in ALPHA and BETA builds under Unix.
 */
 int djvu_set_memory_callbacks(
-           djvu_free_callback *,
-           djvu_realloc_callback *,
-           djvu_malloc_callback *,
-           djvu_calloc_callback *);
+           djvu_free_callback    *free_handler,
+           djvu_realloc_callback *realloc_handler,
+           djvu_malloc_callback  *malloc_handler,
+           djvu_calloc_callback  *calloc_handler);
 
 /* Replacement functions. */
 DJVUAPI void * _djvu_new(size_t);
@@ -234,12 +173,14 @@ DJVUAPI void _djvu_free(void*);
 
     The progress callback should be a function of the form:
     \begin{verbatim}
-    typedef void
+    typedef int
     djvu_progress_callback (const char *task,unsigned long,unsigned long);
     \end{verbatim}
     The first unsigned long is how much time has spent compressing, and the
     second is an estimate how much time is required.  The task string indicates
-    what part of the compression the encoder is working on.
+    what part of the compression the encoder is working on. The return value
+    should normally be zero. A non-zero return value causes DjVu to halt
+    encoding (throws an exception).
 */
 /*@{*/
 typedef int
@@ -295,7 +236,7 @@ struct djvu_option
   int has_arg;
   /** #flag# reserved for future use. */
   int *flag;
-  /** #val# contains a single charactor represing the short option value.
+  /** #val# contains a single charactor representing the short option value.
       Use a '-' if there is no short option equivalent.
   */
   int val;
@@ -319,7 +260,7 @@ DJVUAPI
   reported if that profile does not exist.
 */
 struct djvu_parse
-djvu_parse_init(const char []);
+djvu_parse_init(const char name[]);
 
 DJVUAPI
 #if 0
@@ -342,7 +283,7 @@ DJVUAPI
   but you need to parse a different set of arguments. 
 */
 struct djvu_parse
-djvu_parse_copy(const struct djvu_parse);
+djvu_parse_copy(const struct djvu_parse opts);
 
 DJVUAPI
 #if 0
@@ -353,7 +294,7 @@ DJVUAPI
   profile was not found.
 */
 int
-djvu_parse_change_profile(struct djvu_parse,const char []);
+djvu_parse_change_profile(struct djvu_parse opts,const char name[]);
 
 DJVUAPI
 #if 0
@@ -374,7 +315,7 @@ DJVUAPI
   indicates the specified variable has not been defined. 
 */
 const char *
-djvu_parse_value(struct djvu_parse,const char []);
+djvu_parse_value(struct djvu_parse opts,const char name[]);
 
 DJVUAPI
 #if 0
@@ -387,8 +328,9 @@ DJVUAPI
   the value specified as default.
 */
 int
-djvu_parse_integer(struct djvu_parse,const char name[],
-                   const int default_val);
+djvu_parse_integer(struct djvu_parse opts,
+                   const char name[],
+                   const int errval);
 
 DJVUAPI
 #if 0
@@ -400,7 +342,9 @@ DJVUAPI
   to the stack. 
 */
 int
-djvu_parse_number(struct djvu_parse,const char [],const int);
+djvu_parse_number(struct djvu_parse opts,
+                  const char name[],
+                  const int errval);
 
 DJVUAPI
 #if 0
@@ -415,7 +359,10 @@ DJVUAPI
 */
 int
 djvu_parse_arguments(
-  struct djvu_parse,int,const char * const *argv,const struct djvu_option []);
+  struct djvu_parse opts,
+  int argc,
+  const char * const *argv,
+  const struct djvu_option *lopts);
 
 DJVUAPI
 #if 0
@@ -425,7 +372,7 @@ DJVUAPI
   the stack.
 */
 int
-djvu_parse_haserror(struct djvu_parse);
+djvu_parse_haserror(struct djvu_parse opts);
 
 DJVUAPI
 #if 0
@@ -449,13 +396,135 @@ DJVUAPI
 ;
 #endif
 /** ++ #djvu_parse_configfile# is useful for finding what configuration file
-  would be open.  Level should be 0 for the global configuration directory,
-  1 for the user configuration file directory.  -1 has the special meaning
-  of just return the path and don't actually search for a file name. */
+  would be open. */
 const char *
-djvu_parse_configfile(struct djvu_parse,const char[],int level);
+djvu_parse_configfile(struct djvu_parse opts,
+                      const char name[]);
+
+
+DJVUAPI
+#if 0
+;
+#endif
+/** This replaces fprintf(stderr,...), but requires UTF8 encoded strings. */
+void DjVuPrintErrorUTF8(const char *fmt, ...);
+
+DJVUAPI
+#if 0
+;
+#endif
+/** This is identical to fprintf(stderr,...). */
+void DjVuPrintErrorNative(const char *fmt, ...);
+
+DJVUAPI
+#if 0
+;
+#endif
+/** This replaces printf(...), but requires UTF8 encoded strings. */
+void DjVuPrintMessageUTF8(const char *fmt, ...);
+
+DJVUAPI
+#if 0
+;
+#endif
+/** This is identical to printf(...). */
+void DjVuPrintMessageNative(const char *fmt, ...);
+
+DJVUAPI
+#if 0
+;
+#endif
+/** This writes untranslated messages to a log file.  Intended for 
+    logging errors from non-I18N third party libraries.   The strings
+    are assumed to be in Native MBS format. */
+void DjVuPrintLogMessage(const char *fmt, ...);
+
+DJVUAPI
+#if 0
+;
+#endif
+/** ++ Set the file name for DjVu to place 3rd party library error
+    messages. Messages are discarded if no filename is set.
+ */
+void
+djvu_set_logfilename( const char *filename );
+
+DJVUAPI
+#if 0
+;
+#endif
+/** The format (fmt) and arguments define a MessageList to be looked
+    up in the external messages and printed to stderr.  Requires UTF8
+    encoded strings. */
+void DjVuFormatErrorUTF8(const char *fmt, ...);
+
+DJVUAPI
+#if 0
+;
+#endif
+/** The format (fmt) and arguments define a MessageList to be looked
+    up in the external messages and printed to stderr.  Requires Native
+    encoded strings. */
+void DjVuFormatErrorNative(const char *fmt, ...);
+
+DJVUAPI
+#if 0
+;
+#endif
+/** Prints the translation of message to stdout. (Must be in UTF8)*/
+void DjVuWriteMessage( const char *message );
+
+/**
+ A C function to perform a message lookup. Arguments are a buffer to
+ receive the translated message, a buffer size (bytes), and a
+ message_list. The translated result is returned in msg_buffer encoded
+ in UTF8 MBS encoding. In case of error, msg_buffer is empty
+ (i.e., msg_buffer[0] == '\0').
+ */
+DJVUAPI
+#if 0
+;
+#endif
+void DjVuMessageLookUpUTF8( char *msg_buffer,
+                         const unsigned int buffer_size, 
+                         const char *message ); 
+
+/**
+ A C function to perform a message lookup. Arguments are a buffer to
+ receive the translated message, a buffer size (bytes), and a
+ message_list. The translated result is returned in msg_buffer encoded
+ in Native MBS encoding. In case of error, msg_buffer is empty
+ (i.e., msg_buffer[0] == '\0').
+ */
+DJVUAPI
+#if 0
+;
+#endif
+void DjVuMessageLookUpNative( char *msg_buffer,
+                         const unsigned int buffer_size, 
+                         const char *message ); 
+
+/**
+ A C function to set the program name used when looking for language files.
+ The argument is expected to be argv[0] from main().  The UTF8 translation of
+ the program name is returned.
+ */
+DJVUAPI
+#if 0
+;
+#endif
+const char *
+djvu_programname( const char *programname );
 
 /*@}*/
+
+/**
+ Macro ERR_MSG is used by LizardTech to maintain the message files.
+ It is used by an external auditing script and has no effect on the program. 
+ */
+#ifndef ERR_MSG
+#define ERR_MSG(x) x
+#endif
 
 #ifdef __cplusplus
 #ifndef __cplusplus
