@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.13 1999-06-09 21:24:20 leonb Exp $
+//C- $Id: DjVuDocument.cpp,v 1.14 1999-06-25 21:50:37 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -196,11 +196,7 @@ DjVuDocument::djvm_url2name(const GURL & url) const
    if (!is_djvm()) 
      THROW("Internal error: the document format is not DJVM.");
    GString name;
-   if (!strncmp(url, djvm_doc_url, strlen(djvm_doc_url)))
-   {
-      name=(const char *) url+strlen(djvm_doc_url);
-      while(name[0]=='/') { GString tmp=(const char *) name+1; name=tmp; };
-   }
+   if (url.base()==djvm_doc_url) name=url.name();
    return name;
 }
 
@@ -219,7 +215,7 @@ DjVuDocument::djvm_contains(const GURL & url) const
 
    DEBUG_MSG("url='" << url << "'\n");
    DEBUG_MSG("djvm_doc_url='" << djvm_doc_url << "'\n");
-   return djvm && !strncmp(url, djvm_doc_url, strlen(djvm_doc_url));
+   return djvm && url.base()==djvm_doc_url;
 }
 
 GURL
