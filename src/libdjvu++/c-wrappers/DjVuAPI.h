@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuAPI.h,v 1.32 2000-01-30 02:41:04 praveen Exp $
+ *C- $Id: DjVuAPI.h,v 1.33 2000-01-31 06:52:20 bcr Exp $
  *
  * The main header file for the DjVu API
  */
@@ -17,7 +17,10 @@
 
 /* 
  * $Log: DjVuAPI.h,v $
- * Revision 1.32  2000-01-30 02:41:04  praveen
+ * Revision 1.33  2000-01-31 06:52:20  bcr
+ * Added an djvu_export_image() function, to allow decoding images to memory.
+ *
+ * Revision 1.32  2000/01/30 02:41:04  praveen
  * updated and fixed bugs
  *
  * Revision 1.31  2000/01/30 01:18:42  bcr
@@ -132,6 +135,7 @@ typedef enum djvuio_type_enum
   DjVuIO_JPEG,
   DjVuIO_GIF,
   DjVuIO_DJVU,
+  DjVuIO_RAW,
   DjVuIO_UNKNOWN
 } djvuio_type;
 
@@ -818,34 +822,21 @@ djvu_image *djvu_decode_page(djvu_decode_options[1],int page);
  */
 typedef djvu_import djvu_import_sub ( void *arg,  const char filename[]);
 
-/* One or both of djvu_import_sub and djvu_output_sub should be specified.
- * The output filename will be ignored if you specify a djvu_output_sub.
- */
-DJVUAPI int
-djvu_bitonaltodjvu_callback(
-  bitonaltodjvu_options[1], djvu_import_sub *, djvu_output_sub *, void *arg);
-
-/* One or both of djvu_import_sub and djvu_output_sub should be specified.
- * The output filename will be ignored if you specify a djvu_output_sub.
- */
-DJVUAPI int
-djvu_phototodjvu_callback(
-  phototodjvu_options[1], djvu_import_sub *, djvu_output_sub *, void *arg);
-
-/* One or both of djvu_import_sub and djvu_output_sub should be specified.
- * The output filename will be ignored if you specify a djvu_output_sub.
- */
-DJVUAPI int
-djvu_documenttodjvu_callback(
-  phototodjvu_options[1], djvu_import_sub *, djvu_output_sub *, void *arg);
-
 /* This is a special type of djvu_import, intended for cases when you have
  * defined your own decoding, and want to map it to a stream for use with
  * one of the above functions.  The image will be passed directly and
  * may be modified by the encoder.
  */
 DJVUAPI djvu_import
-djvu_import_image( djvu_image * );
+djvu_import_image ( djvu_image * );
+
+/* This is a special type of djvu_export, intended for obtaining the
+ * pixel image in memory...  An apon successfull decoding, the image
+ * will be stored in the pointed passed.  The returned image should
+ * be freed with djvu_image_free.
+ */
+DJVUAPI djvu_export
+djvu_export_image ( djvu_image *[1] );
 
 #ifdef __cplusplus
 }
