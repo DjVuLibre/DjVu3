@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: ZPCodec.h,v 1.3 1999-02-01 18:57:34 leonb Exp $
+//C-  $Id: ZPCodec.h,v 1.4 1999-02-15 23:34:51 leonb Exp $
 
 
 #ifndef _ZPCODEC_H
@@ -125,13 +125,13 @@
     
     Needless to say, AT&T has patents pending for both the Z-Coder and the
     ZP-Coder. The good news however is that we can grant a license to use the
-    ZP-Coder in Open Source code without further complication. See the AT&T
-    Public License for more information.
+    ZP-Coder in Open Source code without further complication. See the 
+    \Ref{AT&T Source Code License} for more information.
 
     @memo
     Binary adaptive quasi-arithmetic coder.
     @version
-    #$Id: ZPCodec.h,v 1.3 1999-02-01 18:57:34 leonb Exp $#
+    #$Id: ZPCodec.h,v 1.4 1999-02-15 23:34:51 leonb Exp $#
     @author
     Leon Bottou <leonb@research.att.com> */
 //@{
