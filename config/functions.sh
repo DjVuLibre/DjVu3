@@ -31,7 +31,7 @@
 #C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #
-# $Id: functions.sh,v 1.77 2001-08-20 16:02:02 docbill Exp $
+# $Id: functions.sh,v 1.78 2001-08-20 16:54:23 docbill Exp $
 # $Name:  $
 
 #
@@ -571,11 +571,24 @@ check_dlopen()
   fi
 }
 
+check_mbstate()
+{
+  if [ -z "$MBSTATE_TEST" ]  ; then
+    . "${CONFIG_DIR}/mbstate.sh"
+  fi
+}
+
 check_iconv()
 {
   if [ -z "$ICONV_TEST" ]  ; then
     . "${CONFIG_DIR}/iconv.sh"
   fi
+}
+
+check_i18n()
+{
+  check_mbstate
+  check_iconv
 }
 
 ### ------------------------------------------------------------------------

@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: MapAreas.cpp,v 1.7 2001-08-20 16:02:03 docbill Exp $
+// $Id: MapAreas.cpp,v 1.8 2001-08-20 16:54:24 docbill Exp $
 // $Name:  $
 
 

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.h,v 1.86 2001-07-27 23:58:34 bcr Exp $
+// $Id: GString.h,v 1.87 2001-08-20 16:54:24 docbill Exp $
 // $Name:  $
 
 #ifndef _GSTRING_H_
@@ -64,7 +64,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.86 2001-07-27 23:58:34 bcr Exp $# */
+    #$Id: GString.h,v 1.87 2001-08-20 16:54:24 docbill Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -83,10 +83,11 @@
 
 #ifndef UNDER_CE
 #include <wchar.h> // needed for mbstate_t
-#if defined(__linux__) || defined(WIN32)
+#ifdef WIN32
 #define HAS_MBSTATE 1
 #endif
 #endif
+
 #ifndef HAS_MBSTATE
 typedef int mbstate_t;
 #endif

@@ -31,12 +31,12 @@
 #C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #
-# $Id: cxx.sh,v 1.30 2001-07-24 17:52:02 bcr Exp $
+# $Id: cxx.sh,v 1.31 2001-08-20 16:54:23 docbill Exp $
 # $Name:  $
 
 # This rule sets the following variables:
 #	CXX, CXXFLAGS, CXXSYMBOLIC, CXXPIC, CXXUNROLL, CXXWARN
-# $Id: cxx.sh,v 1.30 2001-07-24 17:52:02 bcr Exp $
+# $Id: cxx.sh,v 1.31 2001-08-20 16:54:23 docbill Exp $
 
 if [ -z "$CONFIG_DIR" ]
 then
@@ -149,5 +149,7 @@ then
   CXX_SET=true
   "${rm}" -rf $temp.cpp $temp.so $temp.o
   CONFIG_VARS=`echo CXX_SET CXX CXXFLAGS CXXOPT CXXUNROLL CXXWARN CXXSYMBOLIC cxx_is_gcc $CONFIG_VARS`
+
+  check_i18n
 fi
 
