@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuGlobal.h,v 1.56 2001-07-06 17:19:36 fcrary Exp $
+// $Id: DjVuGlobal.h,v 1.57 2001-07-16 22:16:04 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUGLOBAL_H
@@ -86,7 +86,7 @@
     @memo
     Global definitions.
     @version
-    #$Id: DjVuGlobal.h,v 1.56 2001-07-06 17:19:36 fcrary Exp $#
+    #$Id: DjVuGlobal.h,v 1.57 2001-07-16 22:16:04 bcr Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> -- empty file.\\
     Bill Riemers <bcr@lizardtech.com> -- real work.  */
@@ -359,6 +359,8 @@ DJVUEXTERNCAPI(void DjVuMessageLookUpNative(
   files.
 */
 DJVUEXTERNCAPI(const char *djvu_programname(const char *programname));
+
+DJVUEXTERNCAPI(void static_destruct(void));
 
 /** @name DjVu Names  
 
