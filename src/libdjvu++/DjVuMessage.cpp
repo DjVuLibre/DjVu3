@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessage.cpp,v 1.47 2001-05-04 22:20:32 bcr Exp $
+// $Id: DjVuMessage.cpp,v 1.48 2001-05-04 22:55:13 fcrary Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -677,7 +677,7 @@ DjVuMessage::AddByteStream(const GP<ByteStream> &bs)
 
 
 static const char *
-lookup_id(const char *xlanguage, const int start=0)
+lookup_id(const char *xlanguage, const int start)
 {
   struct iso639
   {
