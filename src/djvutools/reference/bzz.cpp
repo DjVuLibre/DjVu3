@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: bzz.cpp,v 1.22 2001-06-13 18:26:19 bcr Exp $
+// $Id: bzz.cpp,v 1.23 2001-07-23 23:01:14 bcr Exp $
 // $Name:  $
 
 
@@ -58,7 +58,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation
     @version
-    $Id: bzz.cpp,v 1.22 2001-06-13 18:26:19 bcr Exp $ */
+    $Id: bzz.cpp,v 1.23 2001-07-23 23:01:14 bcr Exp $ */
 //@{
 //@}
 
@@ -97,6 +97,8 @@ main(int argc, char **argv)
     dargv[i]=GNativeString(argv[i]);
   G_TRY
     {
+      if(argc < 2)
+        usage();
       // Get program name
       program=dargv[0]=GOS::basename(dargv[0]);
       // Obtain default mode from program name
