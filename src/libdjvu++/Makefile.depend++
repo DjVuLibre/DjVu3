@@ -53,7 +53,9 @@ ddjvu.o: ddjvu.cpp GException.h DjVuGlobal.h \
  DjVuNavDir.h DjVuDocument.h DjVuFileCache.h \
  debug.h DjVmDir0.h DjVmDoc.h DjVmDir.h \
  GOS.h
-debug.o: debug.cpp debug.h
+debug.o: debug.cpp debug.h GThreads.h \
+ DjVuGlobal.h c-wrappers/DjVu.h GException.h \
+ GContainer.h GSmartPointer.h
 djthumb.o: djthumb.cpp GString.h DjVuGlobal.h \
  c-wrappers/DjVu.h GException.h GSmartPointer.h \
  DjVuDocEditor.h DjVuDocument.h DjVuFileCache.h \
