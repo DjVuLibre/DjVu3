@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: bzz.cpp,v 1.18 2001-04-25 22:28:47 bcr Exp $
+// $Id: bzz.cpp,v 1.19 2001-05-03 22:06:25 bcr Exp $
 // $Name:  $
 
 
@@ -58,7 +58,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation
     @version
-    $Id: bzz.cpp,v 1.18 2001-04-25 22:28:47 bcr Exp $ */
+    $Id: bzz.cpp,v 1.19 2001-05-03 22:06:25 bcr Exp $ */
 //@{
 //@}
 
@@ -89,13 +89,10 @@ usage(void)
 int 
 main(int argc, char **argv)
 {
-  setlocale(LC_CTYPE,"");
+  setlocale(LC_ALL,"");
   DArray<GUTF8String> dargv(0,argc-1);
   for(int i=0;i<argc;++i)
-  {
-    GUTF8String g(argv[i]);
-    dargv[i]=g.getNative2UTF8();
-  }
+    dargv[i]=GNativeString(argv[i]);
   G_TRY
     {
       // Get program name

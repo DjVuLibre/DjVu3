@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: d44.cpp,v 1.16 2001-04-25 22:28:47 bcr Exp $
+// $Id: d44.cpp,v 1.17 2001-05-03 22:06:25 bcr Exp $
 // $Name:  $
 
 /** @name d44
@@ -84,7 +84,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: d44.cpp,v 1.16 2001-04-25 22:28:47 bcr Exp $# 
+    #$Id: d44.cpp,v 1.17 2001-05-03 22:06:25 bcr Exp $# 
 */
 //@{
 //@}
@@ -182,13 +182,10 @@ main(int argc, char **argv)
 mymain(int argc, char **argv)
 #endif
 {
-  setlocale(LC_CTYPE,"");
+  setlocale(LC_ALL,"");
   DArray<GUTF8String> dargv(0,argc-1);
   for(int i=0;i<argc;++i)
-  {
-    GUTF8String g(argv[i]);
-    dargv[i]=g.getNative2UTF8();
-  }
+    dargv[i]=GNativeString(argv[i]);
   G_TRY
     {
       // Parse arguments

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: Arrays.h,v 1.26 2001-04-18 17:54:24 praveen Exp $
+// $Id: Arrays.h,v 1.27 2001-05-03 22:06:30 bcr Exp $
 // $Name:  $
 
 #ifndef _ARRAYS_H_
@@ -91,7 +91,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@geocities.com> -- Copy-on-demand implementation.
     @version 
-    #$Id: Arrays.h,v 1.26 2001-04-18 17:54:24 praveen Exp $# */
+    #$Id: Arrays.h,v 1.27 2001-05-03 22:06:30 bcr Exp $# */
 //@{
 
 // Auxiliary classes: Will be used in place of GPBase and GPEnabled objects
@@ -728,18 +728,18 @@ public:
    /** Constructs an empty array. The valid subscript range is initially
        empty. Member function #touch# and #resize# provide convenient ways
        to enlarge the subscript range. */
-   DArray();
+   DArray(void);
    /** Constructs an array with subscripts in range 0 to #hibound#. 
        The subscript range can be subsequently modified with member functions
        #touch# and #resize#.
        @param hibound upper bound of the initial subscript range. */
-   DArray(int hibound);
+   DArray(const int hibound);
    /** Constructs an array with subscripts in range #lobound# to #hibound#.  
        The subscript range can be subsequently modified with member functions
        #touch# and #resize#.
        @param lobound lower bound of the initial subscript range.
        @param hibound upper bound of the initial subscript range. */
-   DArray(int lobound, int hibound);
+   DArray(const int lobound, const int hibound);
    
    virtual ~DArray() {};
 private:
@@ -827,14 +827,14 @@ DArray<TYPE>::DArray ()
 }
 
 template <class TYPE> inline 
-DArray<TYPE>::DArray(int hi)
+DArray<TYPE>::DArray(const int hi)
 {
    assign(new ArrayRep(sizeof(TYPE), destroy, init1,
 		       init2, copy, insert, hi));
 }
 
 template <class TYPE> inline 
-DArray<TYPE>::DArray(int lo, int hi)
+DArray<TYPE>::DArray(const int lo, const int hi)
 {
    assign(new ArrayRep(sizeof(TYPE), destroy, init1,
 		       init2, copy, insert, lo, hi));

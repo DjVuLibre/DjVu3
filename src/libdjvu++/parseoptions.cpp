@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: parseoptions.cpp,v 1.80 2001-05-02 22:32:43 bcr Exp $
+// $Id: parseoptions.cpp,v 1.81 2001-05-03 22:06:30 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -147,11 +147,14 @@ djvu_parse_number(struct djvu_parse opts,const char name[],const int errval)
 int
 djvu_parse_arguments(
   struct djvu_parse opts,
-  int argc, 
-  const char * const argv[],
+  const int argc,
+  char const * const *argv,
   const struct djvu_option lopts[] )
 {
-  return ((DjVuParseOptions *)(opts.Private))->ParseArguments(argc,argv,lopts);
+  DArray<GUTF8String> dargv(argc+1);
+  for(int i=0;i<argc;++i)
+    dargv[i]=argv[i];
+  return ((DjVuParseOptions *)(opts.Private))->ParseArguments(dargv,lopts);
 }
 
   /* This is a wrapper for the DjVuParseOptions::HasError function */
@@ -195,7 +198,7 @@ djvu_parse_configfile(struct djvu_parse opts,const char *name,int which)
 //
 // Simple constructor
 DjVuParseOptions::DjVuParseOptions(const char prog[])
-: argc(0),argv(0),optind(0)
+: optind(0)
 {
   filename = 0;
   VarTokens=new DjVuTokenList;
@@ -223,7 +226,7 @@ DjVuParseOptions::DjVuParseOptions(const char prog[])
 
 DjVuParseOptions::DjVuParseOptions (
   const char readfilename[],const char readasprofile[],DjVuTokenList *Vars)
-: argc(0),argv(0),optind(0)
+: optind(0)
 {
   if(Vars)
   {
@@ -252,8 +255,6 @@ DjVuParseOptions::DjVuParseOptions(
   VarTokens(Original.VarTokens),
   ProfileTokens(Original.ProfileTokens),
   Configuration(Original.Configuration),
-  argc(0),
-  argv(0),
   optind(0)
 {
   VarTokens->links++;
@@ -277,16 +278,6 @@ DjVuParseOptions::DjVuParseOptions(
 //
 DjVuParseOptions::~DjVuParseOptions()
 {
-  if(argv)
-  {
-    int i;
-    for(i=0;i<argc;i++)
-    {
-      delete argv[i];
-      argv[i]=0;
-    }
-    delete [] argv;
-  }
   if(!VarTokens->links--) delete VarTokens;
   if(!ProfileTokens->links--) delete ProfileTokens;
   if(!Configuration->links--) delete Configuration;
@@ -577,13 +568,13 @@ DjVuParseOptions::GetNumber(
 //
 int
 DjVuParseOptions::ParseArguments(
-  const int xargc,
-  const char * const xargv[],
+  const DArray<GUTF8String> &xargv,
   const djvu_option opts[],
   const int long_only
 )
 {
-  GetOpt args(this,xargc,xargv,opts,long_only);
+  const int xargc=xargv.hbound()+1;
+  GetOpt args(this,xargv,opts,long_only);
   int i;
   while((i=args.getopt_long())>=0)
   {
@@ -597,45 +588,14 @@ DjVuParseOptions::ParseArguments(
       Arguments->Add(v,args.optarg?args.optarg:"TRUE");
     }
   }
-  if(argv)
-  {
-    for(i=0;i<argc;i++)
-    {
-      delete argv[i];
-      argv[i]=0;
-    }
-    delete [] argv;
-  }
+  argv.empty();
   if(xargc)
   {
-    int j;
-    if(argc)
+    argv.resize(0,xargc-1);
+    optind=args.optind; 
+    for(int argc=0,i=0;argc<xargc;)
     {
-      char **oldargv=argv;
-      argv=new char *[optind+xargc-1];
-      for(i=0;i<optind;i++)
-      {
-        argv[i]=oldargv[i];
-        oldargv[i]=0;
-      }
-      for(j=i;j<argc;j++)
-      {
-        delete [] oldargv[j];
-        oldargv[j]=0;
-      }
-      delete [] oldargv;
-      argc=optind+xargc-(j=1);
-      optind+=args.optind-1;
-    }else
-    {
-      i=j=0;
-      argv=new char *[(argc=xargc)];
-      optind=args.optind; 
-    }
-    while(i<argc)
-    {
-      argv[i]=new char[strlen(xargv[j])+1];
-      strcpy(argv[i++],xargv[j++]);
+      argv[argc++]=xargv[i++];
     }
   }
   return args.optind;
@@ -1226,7 +1186,6 @@ RegOpenReadConfig ( HKEY hParentKey )
   LPCTSTR path = TEXT("Software\\LizardTech\\DjVu\\Profile Path") ;
 
   HKEY hKey = NULL;
-  // MultiByteToWideChar(CP_ACP,MB_PRECOMPOSED,argv[1],strlen(argv[1])+1,wszSrcFile,sizeof(wszSrcFile));
   if (RegOpenKeyEx(hParentKey, path, 0,
               KEY_READ, &hKey) == ERROR_SUCCESS )
   {
@@ -1524,14 +1483,12 @@ DjVuParseOptions::GetOpt::~GetOpt()
 // difficult to compute longindex.
 //
 DjVuParseOptions::GetOpt::GetOpt(DjVuParseOptions *xopt,
-                                 const int xargc,
-                                 const char * const xargv[],
+                                 const DArray<GUTF8String> &xargv,
                                  const djvu_option lopts[],
                                  const int only)
 : optind(1),
   VarTokens(*(xopt->VarTokens)),
   Errors(xopt->Errors),
-  argc(xargc),
   nextchar(1),
   argv(xargv),
   name(xopt->name),
@@ -1573,12 +1530,13 @@ DjVuParseOptions::GetOpt::GetOpt(DjVuParseOptions *xopt,
 int
 DjVuParseOptions::GetOpt::getopt_long()
 {
+  const int argc=argv.hbound()+1;
   int longindex=1+(strlen(optstring)/2);
   char *optptr;
   optarg=0;
   do 
   {
-    if((argc <= optind)||(!argv[optind])||(argv[optind][0] != '-'))
+    if((argc <= optind)||(!argv[optind].length())||(argv[optind][0] != '-'))
     {
       return -1;
     }
@@ -1609,7 +1567,7 @@ DjVuParseOptions::GetOpt::getopt_long()
     }
     for(longindex=0,opts=long_opts;opts->name;++opts,++longindex)
     {
-      if(!strcmp(opts->name,argv[optind]+nextchar))
+      if(!strcmp(opts->name,((const char *)argv[optind])+nextchar))
       {
         if((opts->has_arg)&&(opts->has_arg != 2))
         {
@@ -1630,11 +1588,11 @@ DjVuParseOptions::GetOpt::getopt_long()
     {
       const char *ss=opts->name;
       s=strlen(opts->name);
-      if(!strncmp(ss,argv[optind]+nextchar,s)
+      if(!strncmp(ss,((const char *)argv[optind])+nextchar,s)
         &&(argv[optind][nextchar+s] == '='))
       {
         if(opts->has_arg)
-          optarg=argv[optind]+nextchar+1+s;
+          optarg=((const char *)argv[optind])+nextchar+1+s;
         optind++;
         nextchar=1;
         return longindex;
@@ -1642,7 +1600,7 @@ DjVuParseOptions::GetOpt::getopt_long()
     }
     if(has_dash)
     {
-      Errors.append(GUTF8String( ERR_MSG("parseoptions.unrecog_option") "\t") + argv[optind]);
+      Errors.append(( ERR_MSG("parseoptions.unrecog_option") "\t")+argv[optind]);
       return -1;
     }
   }
@@ -1657,7 +1615,7 @@ DjVuParseOptions::GetOpt::getopt_long()
       return -1;
     }
     nextchar=1;
-    optarg=&(argv[optind][nextchar]);
+    optarg=((const char *)argv[optind])+nextchar;
     return -1;
   }else
   {
@@ -1672,7 +1630,7 @@ DjVuParseOptions::GetOpt::getopt_long()
     }
     if(argv[optind][nextchar])
     {
-      optarg=&(argv[optind][nextchar]);
+      optarg=((const char *)argv[optind])+nextchar;
     }else if(++optind<argc)
     {
       optarg=argv[optind];

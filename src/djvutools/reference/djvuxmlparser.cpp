@@ -1,7 +1,7 @@
 //C-  Copyright © 2000-2001, LizardTech, Inc. All Rights Reserved.
 //C-              Unauthorized use prohibited.
 //
-// $Id: djvuxmlparser.cpp,v 1.4 2001-04-26 18:38:44 bcr Exp $
+// $Id: djvuxmlparser.cpp,v 1.5 2001-05-03 22:06:26 bcr Exp $
 // $Name:  $
 
 #include "XMLParser.h"
@@ -18,7 +18,10 @@
 int 
 main(int argc,char *argv[],char *[])
 {
-  setlocale(LC_CTYPE,"");
+  setlocale(LC_ALL,"");
+  DArray<GUTF8String> dargv(0,argc-1);
+  for(int i=0;i<argc;++i)
+    dargv[i]=GNativeString(argv[i]);
   G_TRY
   {
     bool is_valid=(argc >= 2);

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: cpaldjvu.cpp,v 1.17 2001-04-25 23:04:15 bcr Exp $
+// $Id: cpaldjvu.cpp,v 1.18 2001-05-03 22:06:25 bcr Exp $
 // $Name:  $
 
 
@@ -69,7 +69,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: cpaldjvu.cpp,v 1.17 2001-04-25 23:04:15 bcr Exp $# */
+    #$Id: cpaldjvu.cpp,v 1.18 2001-05-03 22:06:25 bcr Exp $# */
 //@{
 //@}
 
@@ -896,13 +896,10 @@ usage()
 int 
 main(int argc, const char **argv)
 {
-  setlocale(LC_CTYPE,"");
+  setlocale(LC_ALL,"");
   DArray<GUTF8String> dargv(0,argc-1);
   for(int i=0;i<argc;++i)
-  {
-    GUTF8String g(argv[i]);
-    dargv[i]=g.getNative2UTF8();
-  }
+    dargv[i]=GNativeString(argv[i]);
   G_TRY
     {
       GURL inputppmurl;

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djvutxt.cpp,v 1.18 2001-04-25 22:28:48 bcr Exp $
+// $Id: djvutxt.cpp,v 1.19 2001-05-03 22:06:26 bcr Exp $
 // $Name:  $
 
 // DJVUTXT -- DjVu TXT extractor
@@ -69,7 +69,7 @@
     @author
     Andrei Erofeev <eaf@geocities.com> -- initial implementation
     @version
-    #$Id: djvutxt.cpp,v 1.18 2001-04-25 22:28:48 bcr Exp $# */
+    #$Id: djvutxt.cpp,v 1.19 2001-05-03 22:06:26 bcr Exp $# */
 //@{
 //@}
 
@@ -132,13 +132,10 @@ doPage(const GP<DjVuDocument> & doc, int page_num,
 int
 main(int argc, char ** argv)
 {
-  setlocale(LC_CTYPE,"");
+  setlocale(LC_ALL,"");
   DArray<GUTF8String> dargv(0,argc-1);
   for(int i=0;i<argc;++i)
-  {
-    GUTF8String g(argv[i]);
-    dargv[i]=g.getNative2UTF8();
-  }
+    dargv[i]=GNativeString(argv[i]);
   progname=dargv[0]=GOS::basename(dargv[0]);
    
 #ifdef DEBUG

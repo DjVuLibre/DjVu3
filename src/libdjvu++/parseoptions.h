@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: parseoptions.h,v 1.45 2001-05-02 22:32:43 bcr Exp $
+// $Id: parseoptions.h,v 1.46 2001-05-03 22:06:30 bcr Exp $
 // $Name:  $
 
 #ifndef __DJVUPARSEOPTIONS_H__
@@ -66,7 +66,7 @@
 
    @memo Class used for parsing options and configuration files.
    @author Bill Riemers
-   @version #$Id: parseoptions.h,v 1.45 2001-05-02 22:32:43 bcr Exp $#
+   @version #$Id: parseoptions.h,v 1.46 2001-05-03 22:06:30 bcr Exp $#
  */
 
 /*@{*/
@@ -78,6 +78,7 @@
  * constructor are only thread safe if you define a THREADMODEL. 
  */
 #include "GString.h"
+#include "Arrays.h"
 #include "DjVu.h"
 
 #ifdef __cplusplus
@@ -119,7 +120,13 @@
    	int
     	main(int argc,const char **argv,char **env)
       {
+                  // Set the locale.
+        setlocale(LC_ALL,"");
+        DArray<GUTF8String> dargv(argc-1);
+        for(int i=0;i<argc;++i)
+          dargv[i]=GNativeString(argv[i]);
    	    char *profile,*topping,*color;
+
         int redo,bignumber;
 
    		  // This will read in the default configuration file
@@ -130,7 +137,7 @@
         DjVuParseOptions MyOptions("MyConfigFile");
 
    		  // This parses the command line arguments.
-        MyOptions.ParseArguments(argc,argv,long_options);
+        MyOptions.ParseArguments(dargv,long_options);
 
    		  // We could for example, check the value of a profile
    		  // option, and switch which profile we are using.
@@ -187,7 +194,7 @@
 \begin{verbatim}                                        
    	  int foo(DjVuParseOptions);
    	  DjVuParseOptions Opts("Config");
-   	  Opts.ParseArguments(argc,argv,long_opts,long_only);
+   	  Opts.ParseArguments(argv,long_opts,long_only);
    	  foo(Opts);
 \end{verbatim}
 
@@ -284,8 +291,7 @@ private:
   DjVuTokenList *ProfileTokens;
   ProfileList *Configuration;
   Profiles *Arguments;
-  int argc;
-  char **argv;
+  DArray<GUTF8String> argv;
   int optind;
 
 public:
@@ -424,9 +430,9 @@ public:
   bool ChangeProfile(const char []);
 
   /// This is the primary function for reading command line arguments.  
-  int ParseArguments(const int,const char * const [],const djvu_option [],const int=0);
+  int ParseArguments(const DArray<GUTF8String>&argv,const djvu_option [],const int=0);
   /// These are the arguments sent to ParseArguments
-  inline const char * const * get_argv(void) const;
+  inline const DArray<GUTF8String> &get_argv(void) const;
 
   /// These are the arguments sent to ParseArguments
   inline int get_argc(void) const;
@@ -453,7 +459,7 @@ private:
   { return ReadConfig(name,""); }
   int ReadNextConfig(int &,const char prog[],FILE *f);
   void ReadFile(int &,FILE *f,int profile);
-  void Init(const char[],const int,const char * const [],const djvu_option []);
+  void Init(const char[],const DArray<GUTF8String> &argv,const djvu_option []);
   FILE *OpenConfig(const char prog[]);
   void AmbiguousOptions(const int,const char[],const int,const char[]);
 };
@@ -567,13 +573,13 @@ DjVuTokenList::GetString
 (const int token) const
 { return (token<NextToken)?Strings[token]:0; }
 
-inline const char * const *
+inline const DArray<GUTF8String> &
 DjVuParseOptions::get_argv(void) const
 { return argv; }
 
 inline int
 DjVuParseOptions::get_argc(void) const
-{ return argc; }
+{ return argv.hbound()+1; }
 
 inline int
 DjVuParseOptions::get_optind(void) const
@@ -643,9 +649,8 @@ public:
 private:
   DjVuTokenList &VarTokens;
   GList<GUTF8String> Errors;
-  int argc;
   int nextchar;
-  const char * const *argv;
+  const DArray<GUTF8String> argv;
   const char *name;
   char *optstring;
   const djvu_option *long_opts;
@@ -654,8 +659,7 @@ public:
   const char *optarg;
   int getopt_long();
   GetOpt(DjVuParseOptions *xopt, 
-         const int xargc, 
-         const char * const xargv[], 
+         const DArray<GUTF8String> &argv,
          const djvu_option lopts[],
          const int only=0);
   ~GetOpt();

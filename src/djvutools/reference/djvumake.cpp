@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //
-// $Id: djvumake.cpp,v 1.19 2001-04-25 22:28:47 bcr Exp $
+// $Id: djvumake.cpp,v 1.20 2001-05-03 22:06:26 bcr Exp $
 // $Name:  $
 
 /** @name djvumake
@@ -102,7 +102,7 @@
     @memo
     Assemble DjVu files.
     @version
-    #$Id: djvumake.cpp,v 1.19 2001-04-25 22:28:47 bcr Exp $#
+    #$Id: djvumake.cpp,v 1.20 2001-05-03 22:06:26 bcr Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> \\
     Patrick Haffner <haffner@research.att.com>
@@ -613,13 +613,10 @@ create_masksub_chunks(IFFByteStream &iff, const GURL &url)
 int
 main(int argc, char **argv)
 {
-  setlocale(LC_CTYPE,"");
+  setlocale(LC_ALL,"");
   DArray<GUTF8String> dargv(0,argc-1);
   for(int i=0;i<argc;++i)
-  {
-    GUTF8String g(argv[i]);
-    dargv[i]=g.getNative2UTF8();
-  }
+    dargv[i]=GNativeString(argv[i]);
   G_TRY
     {
       // Print usage when called without enough arguments

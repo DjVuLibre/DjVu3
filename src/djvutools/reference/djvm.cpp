@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djvm.cpp,v 1.17 2001-04-30 23:30:45 bcr Exp $
+// $Id: djvm.cpp,v 1.18 2001-05-03 22:06:26 bcr Exp $
 // $Name:  $
 
 /** @name djvm
@@ -99,7 +99,7 @@
     @author
     Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: djvm.cpp,v 1.17 2001-04-30 23:30:45 bcr Exp $# */
+    #$Id: djvm.cpp,v 1.18 2001-05-03 22:06:26 bcr Exp $# */
 //@{
 //@}
 
@@ -264,13 +264,10 @@ list(DArray<GUTF8String> &argv)
 int
 main(int argc, char ** argv)
 {
-  setlocale(LC_CTYPE,"");
+  setlocale(LC_ALL,"");
   DArray<GUTF8String> dargv(0,argc-1);
   for(int i=0;i<argc;++i)
-  {
-    GUTF8String g(argv[i]);
-    dargv[i]=g.getNative2UTF8();
-  }
+    dargv[i]=GNativeString(argv[i]);
   progname=dargv[0]=GOS::basename(dargv[0]);
    
    G_TRY {

@@ -4,7 +4,7 @@
 //C-              Unauthorized use prohibited.
 //C-
 // 
-// $Id: djvutoxml.cpp,v 1.1 2001-04-25 22:28:48 bcr Exp $
+// $Id: djvutoxml.cpp,v 1.2 2001-05-03 22:06:26 bcr Exp $
 // $Name:  $
 
 #include "DjVuDocument.h"
@@ -92,13 +92,10 @@ EndingTag( ByteStream & str_out,
 int
 main(int argc, char * argv[], char *env[])
 {
-  setlocale(LC_CTYPE,"");
-   DArray<GUTF8String> dargv(0,argc-1);
-   for(int i=0; i<argc; ++i)
-   {
-      GNativeString g(argv[i]);
-      dargv[i]=g.getNative2UTF8();
-   }
+  setlocale(LC_ALL,"");
+  DArray<GUTF8String> dargv(0,argc-1);
+  for(int i=0;i<argc;++i)
+    dargv[i]=GNativeString(argv[i]);
 
   GUTF8String name;
   if(argc>0)

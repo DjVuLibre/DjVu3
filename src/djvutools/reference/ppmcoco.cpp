@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ppmcoco.cpp,v 1.14 2001-04-25 23:04:15 bcr Exp $
+// $Id: ppmcoco.cpp,v 1.15 2001-05-03 22:06:26 bcr Exp $
 // $Name:  $
 
 /** @name ppmcoco
@@ -104,7 +104,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: ppmcoco.cpp,v 1.14 2001-04-25 23:04:15 bcr Exp $# */
+    #$Id: ppmcoco.cpp,v 1.15 2001-05-03 22:06:26 bcr Exp $# */
 //@{
 //@}
 
@@ -149,14 +149,12 @@ str_to_gamma(const char *str)
 
 
 int 
-main (int argc, char **argv)
+main(int argc, char **argv)
 {
+  setlocale(LC_ALL,"");
   DArray<GUTF8String> dargv(0,argc-1);
   for(int i=0;i<argc;++i)
-  {
-    GUTF8String g(argv[i]);
-    dargv[i]=g.getNative2UTF8();
-  }
+    dargv[i]=GNativeString(argv[i]);
   const GURL::Filename::UTF8 stdinurl("-");
   GURL inurl(stdinurl);
   GURL outurl(stdinurl);

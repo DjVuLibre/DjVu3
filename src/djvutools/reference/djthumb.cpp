@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djthumb.cpp,v 1.17 2001-04-25 23:04:15 bcr Exp $
+// $Id: djthumb.cpp,v 1.18 2001-05-03 22:06:25 bcr Exp $
 // $Name:  $
 
 // DJTHUMB -- DjVu thumbnails generator
@@ -68,7 +68,7 @@
     @author
     Andrei Erofeev <eaf@geocities.com> -- initial implementation
     @version
-    #$Id: djthumb.cpp,v 1.17 2001-04-25 23:04:15 bcr Exp $# */
+    #$Id: djthumb.cpp,v 1.18 2001-05-03 22:06:25 bcr Exp $# */
 //@{
 //@}
 
@@ -118,13 +118,10 @@ progress_cb(int page_num, void *)
 int
 main(int argc, char ** argv)
 {
-  setlocale(LC_CTYPE,"");
+  setlocale(LC_ALL,"");
   DArray<GUTF8String> dargv(0,argc-1);
   for(int i=0;i<argc;++i)
-  {
-    GUTF8String g(argv[i]);
-    dargv[i]=g.getNative2UTF8();
-  }
+    dargv[i]=GNativeString(argv[i]);
       // Get the program name
    progname=dargv[0]=GOS::basename(dargv[0]);
    

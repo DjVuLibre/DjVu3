@@ -30,18 +30,18 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: annotate.cpp,v 1.13 2001-04-25 23:04:15 bcr Exp $
+// $Id: annotate.cpp,v 1.14 2001-05-03 22:06:25 bcr Exp $
 // $Name:  $
 
 /*****************************************************************************
  *
- *   $Revision: 1.13 $
- *   $Date: 2001-04-25 23:04:15 $
- *   @(#) $Id: annotate.cpp,v 1.13 2001-04-25 23:04:15 bcr Exp $
+ *   $Revision: 1.14 $
+ *   $Date: 2001-05-03 22:06:25 $
+ *   @(#) $Id: annotate.cpp,v 1.14 2001-05-03 22:06:25 bcr Exp $
  *
  *****************************************************************************/
 
-static const char RCSVersion[]="@(#) $Id: annotate.cpp,v 1.13 2001-04-25 23:04:15 bcr Exp $";
+static const char RCSVersion[]="@(#) $Id: annotate.cpp,v 1.14 2001-05-03 22:06:25 bcr Exp $";
 
 #include "GIFFManager.h"
 #include "GOS.h"
@@ -184,13 +184,11 @@ static void insert_djvu(DArray<GUTF8String> & argv)
 
 int main(int argc, char ** argv)
 {
-  setlocale(LC_CTYPE,"");
-   DArray<GUTF8String> dargv(0,argc-1);
-   for(int i=0;i<argc;++i)
-   {
-     GUTF8String g(argv[i]);
-     dargv[i]=g.getNative2UTF8();
-   }
+  setlocale(LC_ALL,"");
+  DArray<GUTF8String> dargv(0,argc-1);
+  for(int i=0;i<argc;++i)
+    dargv[i]=GNativeString(argv[i]);
+
    G_TRY
    {
       if (argc<2) WrongParams();
