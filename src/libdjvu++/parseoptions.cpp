@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: parseoptions.cpp,v 1.47 2000-03-10 04:11:49 bcr Exp $
+//C- $Id: parseoptions.cpp,v 1.48 2000-03-15 21:16:41 bcr Exp $
 #ifdef __GNUC__
 #pragma implementation
 #endif
@@ -740,10 +740,10 @@ DjVuParseOptions::ReadConfig(const char prog[],
 // 
 int
 DjVuParseOptions::ReadNextConfig (
-  int &line, const char prog[], FILE *f )
+  int &line, const char profilename[], FILE *f )
 {
-  const char *xname=strrchr(prog,'/');
-  xname=xname?(xname+1):prog;
+  const char *xname=strrchr(profilename,'/');
+  xname=xname?(xname+1):profilename;
   // First check and see if we have already read in this profile.
   int profile=ProfileTokens->GetToken(xname);
   const char * const s=(profile>0)?Configuration->GetValue(profile,profile_token):0;
@@ -812,8 +812,8 @@ DjVuParseOptions::ReadNextConfig (
           }else
           {
             static const char emesg[]="%s:Error in line %d of '%s'\n\t--> can not inherit unknown profile '%s'";
-            char *s=new char[sizeof(emesg)+20+strlen(filename)+strlen(name)+strlen(prog)];
-            sprintf(s,emesg,filename,line,prog,name);
+            char *s=new char[sizeof(emesg)+20+strlen(filename)+strlen(name)+strlen(profilename)];
+            sprintf(s,emesg,filename,line,profilename,name);
             Errors->AddError(s);
             delete [] s;
 //            break;
@@ -823,8 +823,10 @@ DjVuParseOptions::ReadNextConfig (
     }
     delete [] buf;
      // Now we can read the new variables.
-    if(!feof(f))
-      ReadFile(line,f,profile);
+//  if(!feof(f))
+//    ReadFile(line,f,profile);
+    if(feof(f))
+      profile=(-1);
   }else if(f)
   {
     delete [] buf;
@@ -862,12 +864,12 @@ DjVuParseOptions::ReadNextConfig (
 //  that only sets variable names.
 
 void
-DjVuParseOptions::ReadFile(int &line,FILE *f,const int profile)
+DjVuParseOptions::ReadFile(int &line,FILE *f,int profile)
 {
   int c;
   char *value=new char[local_bufsize];
   char *value_end=value+local_bufsize;
-  while((c=getc(f))!=EOF)
+  while((profile >= 0)&&((c=getc(f))!=EOF))
   {
     // Skip spaces...
     if(isspace(c)) 
@@ -942,7 +944,8 @@ DjVuParseOptions::ReadFile(int &line,FILE *f,const int profile)
                 case ':': // This indicates the start of a new profile...
                   if(value[0] &&(c!=EOF))
                   {
-                    ReadNextConfig(line,value,f);
+//                    ReadNextConfig(line,value,f);
+                    profile=ReadNextConfig(line,value,f);
                     value[0]=0;
                     s=value;
                     state=READ_EOL;
@@ -1719,11 +1722,13 @@ DjVuTokenList::SetToken( const char name[] )
       {
         memcpy(&(NewEntry[MinGuess+1]),&(Entry[MinGuess]),sizeof(Entries)*(NextToken-MinGuess));
       }
+      memset(NewEntry,0,NextToken*sizeof(char *));
       delete [] Entry;
       Entry=NewEntry;
       char **NewStrings=new char *[ListSize];
-      memset(NewStrings,0,ListSize);
-      memcpy(NewStrings,Strings,sizeof(char *)*NextToken);
+      memset(NewStrings,0,ListSize*sizeof(char *));
+      memcpy(NewStrings,Strings,NextToken*sizeof(char *));
+      memset(Strings,0,NextToken*sizeof(char *));
       delete [] Strings;
       Strings=NewStrings;
     }else

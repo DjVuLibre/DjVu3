@@ -6,7 +6,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: parseoptions.h,v 1.31 2000-02-29 19:44:44 praveen Exp $
+//C- $Id: parseoptions.h,v 1.32 2000-03-15 21:16:41 bcr Exp $
 */
 
 #ifndef __DJVUPARSEOPTIONS_H__
@@ -42,7 +42,7 @@
 
    @memo Class used for parsing options and configuration files.
    @author Bill Riemers
-   @version #$Id: parseoptions.h,v 1.31 2000-02-29 19:44:44 praveen Exp $#
+   @version #$Id: parseoptions.h,v 1.32 2000-03-15 21:16:41 bcr Exp $#
  */
 
 /*@{*/
@@ -411,7 +411,7 @@ private:
   inline int ReadConfig(const char name[]) 
   { return ReadConfig(name,""); }
   int ReadNextConfig(int &,const char prog[],FILE *f);
-  void ReadFile(int &,FILE *f,const int profile);
+  void ReadFile(int &,FILE *f,int profile);
   void Init(const char[],const int,const char * const [],const djvu_option []);
   FILE *OpenConfig(const char prog[]);
   void AmbiguousOptions(const int,const char[],const int,const char[]);
