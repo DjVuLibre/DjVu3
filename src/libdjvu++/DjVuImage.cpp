@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: DjVuImage.cpp,v 1.5 1999-02-08 23:07:53 leonb Exp $
+//C-  $Id: DjVuImage.cpp,v 1.6 1999-02-12 16:57:48 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -29,7 +29,7 @@
 DjVuInfo::DjVuInfo()
   : width(0), height(0), 
     version(DJVUVERSION),
-    dpi(300), gamma(2.2)
+    dpi(300), gamma(2.2), reserved(0)
 {
 }
 
@@ -40,10 +40,11 @@ DjVuInfo::decode(ByteStream &bs)
   width = 0;
   height = 0;
   version = DJVUVERSION;
-  dpi=300;
+  dpi = 300;
   gamma = 2.2;
+  reserved = 0;
   // Read data
-  unsigned char buffer[16];
+  unsigned char buffer[10];
   int  size = bs.readall((void*)buffer, sizeof(buffer));
   if (size < 5)
     THROW("DjVu Decoder: Corrupted file (truncated INFO chunk)");
@@ -52,7 +53,7 @@ DjVuInfo::decode(ByteStream &bs)
     width = (buffer[0]<<8) + buffer[1];
   if (size>=4)
     height = (buffer[2]<<8) + buffer[3];
-  if (size==5)
+  if (size>=5)
     version = buffer[4];
   if (size>=6 && buffer[5]!=0xff)
     version = (buffer[5]<<8) + buffer[4];
@@ -60,6 +61,8 @@ DjVuInfo::decode(ByteStream &bs)
     dpi = (buffer[7]<<8) + buffer[6];
   if (size>=9)
     gamma = 22.0 * buffer[8];
+  if (size>=10)
+    reserved = buffer[9];
   // Consistency checks
   if (width<0 || height<0)
     THROW("DjVu Decoder: Corrupted file (image size is zero)");
@@ -78,11 +81,12 @@ DjVuInfo::encode(ByteStream &bs)
 {
   bs.write16(width);
   bs.write16(height);
-  bs.write8( version & 0xff );
-  bs.write8( version >> 8);
-  bs.write8( dpi & 0xff );
-  bs.write8( dpi >> 8);
-  bs.write8( (int)(10.0*gamma+0.5) );
+  bs.write8(version & 0xff);
+  bs.write8(version >> 8);
+  bs.write8(dpi & 0xff);
+  bs.write8(dpi >> 8);
+  bs.write8((int)(10.0*gamma+0.5) );
+  bs.write8(reserved);
 }
 
 unsigned int 

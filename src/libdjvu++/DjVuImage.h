@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: DjVuImage.h,v 1.4 1999-02-11 14:33:11 leonb Exp $
+//C-  $Id: DjVuImage.h,v 1.5 1999-02-12 16:57:48 leonb Exp $
 
 #ifndef _DJVUIMAGE_H
 #define _DJVUIMAGE_H
@@ -58,7 +58,7 @@
     @author
     Leon Bottou <leonb@research.att.com>
     @version
-    #$Id: DjVuImage.h,v 1.4 1999-02-11 14:33:11 leonb Exp $# */
+    #$Id: DjVuImage.h,v 1.5 1999-02-12 16:57:48 leonb Exp $# */
 //@{
 
 
@@ -140,6 +140,10 @@ public:
       rendering functions can use this information in order to perform color
       correction for the intended display device. */
   double gamma;
+  /** Reserved byte. The IFF padding rules give the opportunity to store an
+      extra byte in the #"INFO"# chunk.  This is reserved for possible
+      extensions, backward compatibility hacks and other dirty businesses. */
+  unsigned char reserved;
 };
 
 
@@ -379,8 +383,8 @@ private:
   GP<DjVuInfo>  info;    // INFO component
   GP<DjVuAnno>  anno;    // ANNOTATION component
   GP<IWPixmap>  bg44;    // BACKGROUND component
-  GP<JB2Image>  fgjb;    // FOREGROUND component
-  GP<GPixmap>   fgpm;    // FOREGROUND component
+  GP<JB2Image>  fgjb;    // FOREGROUND MASK component
+  GP<GPixmap>   fgpm;    // FOREGROUND COLOR component
   // DECODER INFO
   GString mimetype;
   GString description;
