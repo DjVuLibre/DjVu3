@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: cpalette.cpp,v 1.5 2000-02-17 21:54:52 leonb Exp $
+//C- $Id: cpaldjvu.cpp,v 1.1 2000-02-17 22:09:08 leonb Exp $
 
 
 /** @name cpaldjvu
@@ -46,7 +46,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: cpalette.cpp,v 1.5 2000-02-17 21:54:52 leonb Exp $# */
+    #$Id: cpaldjvu.cpp,v 1.1 2000-02-17 22:09:08 leonb Exp $# */
 //@{
 //@}
 
