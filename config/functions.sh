@@ -82,6 +82,14 @@ temp="${tempdir}"/c$$
 # --- Make sure that all temp files are removed
 trap "rm -rf 2>>/dev/null $temp $temp.*" 0
 
+if [ -z "" -a -z "broken"  ]
+then
+  echo 2>&1 "Your /bin/sh is broken.  Please upgrade."
+  echo 2>&1 "Old versions of bash also contain bug which"
+  echo 2>&1 "may allow hackers to crack your system."
+  exit 1
+fi
+
 ### ------------------------------------------------------------------------
 ### Support functions
 
