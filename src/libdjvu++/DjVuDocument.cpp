@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.98 2000-01-14 23:38:55 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.99 2000-01-18 21:10:36 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -21,20 +21,6 @@
 #include "debug.h"
 
 const float	DjVuDocument::thumb_gamma=2.20;
-
-static GString
-get_int_prefix(void * ptr)
-{
-      // These NAMEs are used to enable DjVuFile sharing inside the same
-      // DjVuDocument using DjVuPortcaster. Since URLs are unique to the
-      // document, other DjVuDocuments cannot retrieve files until they're
-      // assigned some permanent name. After '?' there should be the real
-      // file's URL. Please note, that output of this function is used only
-      // as name for DjVuPortcaster. Not as a URL.
-   char buffer[128];
-   sprintf(buffer, "document_%p%d?", ptr, rand());
-   return buffer;
-}
 
 DjVuDocument::DjVuDocument(void)
   : doc_type(UNKNOWN_TYPE),
@@ -113,7 +99,7 @@ DjVuDocument::~DjVuDocument(void)
       ufiles_list.empty();
    }
 
-   GPList<DjVuPort> ports=get_portcaster()->prefix_to_ports(get_int_prefix(this));
+   GPList<DjVuPort> ports=get_portcaster()->prefix_to_ports(get_int_prefix());
    for(GPosition pos=ports;pos;++pos)
    {
       GP<DjVuPort> port=ports[pos];
@@ -328,6 +314,20 @@ DjVuDocument::init_thread(void)
 	      "UNKNOWN") << "'\n");
 }
 
+GString
+DjVuDocument::get_int_prefix(void)
+{
+      // These NAMEs are used to enable DjVuFile sharing inside the same
+      // DjVuDocument using DjVuPortcaster. Since URLs are unique to the
+      // document, other DjVuDocuments cannot retrieve files until they're
+      // assigned some permanent name. After '?' there should be the real
+      // file's URL. Please note, that output of this function is used only
+      // as name for DjVuPortcaster. Not as a URL.
+   char buffer[128];
+   sprintf(buffer, "document_%p%d?", this, hash((GString) init_url));
+   return buffer;
+}
+
 void
 DjVuDocument::set_file_aliases(const DjVuFile * file)
 {
@@ -355,7 +355,7 @@ DjVuDocument::set_file_aliases(const DjVuFile * file)
 	 // a page may finish decoding before DIR or NDIR becomes known
 	 // (multithreading, remember), so the code above would not execute
       pcaster->add_alias(file, (GString)(const char*) file->get_url()+"#-1");
-   } else pcaster->add_alias(file, get_int_prefix(this)+file->get_url());
+   } else pcaster->add_alias(file, get_int_prefix()+file->get_url());
 }
 
 void
@@ -637,7 +637,7 @@ DjVuDocument::url_to_file(const GURL & url, bool dont_create)
    }
 
       // Second - internal files
-   port=pcaster->alias_to_port(get_int_prefix(this)+url);
+   port=pcaster->alias_to_port(get_int_prefix()+url);
    if (port && port->inherits("DjVuFile"))
    {
       DEBUG_MSG("found internal file using DjVuPortcaster\n");
