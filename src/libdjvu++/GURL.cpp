@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: GURL.cpp,v 1.45 2001-01-03 20:41:12 bcr Exp $
+// $Id: GURL.cpp,v 1.46 2001-01-03 21:46:34 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -210,8 +210,8 @@ GURL::protocol(const char * url)
    const char * const url_ptr=url;
    const char * ptr=url_ptr;
    for(char c=*ptr;
-     c && !(!isalnum(c) && c != '+' && c != '-' && c != '.');
-     c=*ptr++) EMPTY_LOOP;
+     c && (isalnum(c) || c == '+' || c == '-' || c == '.');
+     c=*(++ptr)) EMPTY_LOOP;
    return(*ptr==':')?GString(url_ptr, ptr-url_ptr):GString();
 }
 
