@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.cpp,v 1.30 1999-09-28 16:24:49 leonb Exp $
+//C- $Id: DataPool.cpp,v 1.31 1999-09-28 16:49:14 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -74,7 +74,7 @@ public:
    void		request_stream(const char * name, DataPool * pool,
 			       GP<StdioByteStream> & stream,
 			       GCriticalSection ** stream_lock);
-   void		pool_dies(DataPool * pool);
+   void		stream_released(StdioByteStream * stream, DataPool * pool);
 };
 
 OpenFiles * OpenFiles::global_ptr;
@@ -171,13 +171,13 @@ OpenFiles::request_stream(const char * name, DataPool * pool,
 }
 
 void
-OpenFiles::pool_dies(DataPool * pool)
+OpenFiles::stream_released(StdioByteStream * stream, DataPool * pool)
 {
    GCriticalSectionLock lock(&files_lock);
    for(GPosition pos=files_list;pos;)
    {
       GP<File> f=files_list[pos];
-      if (f->del_pool(pool)==0)
+      if (f->stream==stream && f->del_pool(pool)==0)
       {
 	 GPosition this_pos=pos;
 	 ++pos;
@@ -196,6 +196,13 @@ OpenFiles::pool_dies(DataPool * pool)
 // The class is basically a list of integers. Abs(integer)=size of the
 // block. If the integer is positive, data for the block is known.
 // Otherwise it's unkown.
+
+void
+DataPool::BlockList::clear(void)
+{
+   GCriticalSectionLock lk(&lock);
+   list.empty();
+}
 
 void
 DataPool::BlockList::add_range(int start, int length)
@@ -385,7 +392,11 @@ DataPool::DataPool(const char * fname, int start, int length)
 
 DataPool::~DataPool(void)
 {
-   OpenFiles::get()->pool_dies(this);
+   {
+      GCriticalSectionLock lock(&class_stream_lock);
+      OpenFiles::get()->stream_released(stream, this);
+      stream=0;
+   }
    
    {
 	 // Wait until the static_trigger_cb() exits
@@ -824,6 +835,39 @@ DataPool::restart_readers(void)
    }
       
    if (pool) pool->restart_readers();
+}
+
+void
+DataPool::load_file(void)
+{
+   DEBUG_MSG("DataPool::load_file() called\n");
+   DEBUG_MAKE_INDENT(3);
+
+   if (pool)
+   {
+      DEBUG_MSG("passing the request down.\n");
+      pool->load_file();
+   } else if (fname.length())
+   {
+      DEBUG_MSG("loading the data.\n");
+      
+      GCriticalSectionLock lock1(&class_stream_lock);
+      if (!stream || !stream_lock)
+	 OpenFiles::get()->request_stream(fname, this, stream, &stream_lock);
+      GCriticalSectionLock lock2(stream_lock);
+
+      data=new MemoryByteStream();
+      block_list.clear();
+      fname="";
+      
+      char buffer[1024];
+      int length;
+      while((length=stream->read(buffer, 1024)))
+	 add_data(buffer, length);
+
+      OpenFiles::get()->stream_released(stream, this);
+      stream=0;
+   }
 }
 
 void

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.h,v 1.22 1999-09-24 18:50:47 eaf Exp $
+//C- $Id: DataPool.h,v 1.23 1999-09-28 16:49:14 eaf Exp $
  
 #ifndef _DATAPOOL_H
 #define _DATAPOOL_H
@@ -44,7 +44,7 @@
 
     @memo Thread safe data storage
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DataPool.h,v 1.22 1999-09-24 18:50:47 eaf Exp $#
+    @version #$Id: DataPool.h,v 1.23 1999-09-28 16:49:14 eaf Exp $#
 */
 
 //@{
@@ -224,6 +224,7 @@ private:
       GCriticalSection	lock;
       GList<int>	list;
    public:
+      void		clear(void);
       void		add_range(int start, int length);
       int		get_bytes(int start, int length) const;
       int		get_range(int start, int length) const;
@@ -516,6 +517,17 @@ public:
 	  is about to be destroyed. */
    void		del_trigger(void (* callback)(void *), void * cl_data);
       //@}
+
+      /** Loads data from the file into memory. This function is only useful
+	  for #DataPool#s getting data from a file. It decends the #DataPool#s
+	  hierarchy until it either reaches a file-connected #DataPool#
+	  or #DataPool# containing the real data. In the latter case it
+	  does nothing, in the first case it makes the #DataPool# read all
+	  data from the file into memory and stop using the file.
+
+	  This may be useful when you want to overwrite the file and leave
+	  existing #DataPool#s with valid data. */
+   void		load_file(void);
 
       // Internal. Used by 'OpenFiles'
    void		clear_stream(void);
