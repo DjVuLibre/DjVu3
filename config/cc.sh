@@ -10,35 +10,39 @@ fi
 EGCS="egcs"
 if [ -z "$CC_SET" ]
 then
-  CCFLAGS=""
-  CCSYMBOLIC=""
-  CCPIC=""
-  cc_is_gcc=""
   (echo '#include <stdio.h>';echo 'int main(void) {puts("Hello World\n");return 0;}')|testfile $temp.c
-  echon "Searching for C compiler ... "
-  if [ -n "$CC" ] ; then
-    if ( run "$CC" -c $temp.c ) ; then
+  # I added CC_OVERRIDE to be able to select compiler myself and let
+  # you do the rest (flags and options) -eaf
+  if [ -z "$CC_OVERRIDE" ]; then
+    CCFLAGS=""
+    CCSYMBOLIC=""
+    CCPIC=""
+    cc_is_gcc=""
+    echon "Searching for C compiler ... "
+    if [ -n "$CC" ] ; then
+      if ( run "$CC" -c $temp.c ) ; then
+        echo "$CC"
+      else
+        CC=""
+      fi
+    fi
+    if [ -z "$CC" ]
+    then
+      if ( run "$EGCS" -c $temp.c ) ; then
+        CC="$EGCS"
+      elif ( run gcc -c $temp.c ) ; then
+        CC=gcc
+      elif ( run cc -c $temp.c ) ; then
+        CC=cc
+      elif ( run CC -c $temp.c ) ; then
+        CC=CC
+      else
+        echo "none available"
+        echo "Error: Can't find a C compiler" 1>&2
+        exit 1
+      fi
       echo "$CC"
-    else
-      CC=""
     fi
-  fi
-  if [ -z "$CC" ]
-  then
-    if ( run "$EGCS" -c $temp.c ) ; then
-      CC="$EGCS"
-    elif ( run gcc -c $temp.c ) ; then
-      CC=gcc
-    elif ( run cc -c $temp.c ) ; then
-      CC=cc
-    elif ( run CC -c $temp.c ) ; then
-      CC=CC
-    else
-      echo "none available"
-      echo "Error: Can't find a C compiler" 1>&2
-      exit 1
-    fi
-    echo "$CC"
   fi
   if [ -z "$CXX" ] 
   then
