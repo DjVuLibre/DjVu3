@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qd_base_events.cpp,v 1.5 2001-07-25 17:10:42 mchen Exp $
+// $Id: qd_base_events.cpp,v 1.6 2001-07-26 23:47:51 mchen Exp $
 // $Name:  $
 
 
@@ -362,8 +362,8 @@ QDBase::processMouseMoveEvent(QMouseEvent * ev)
 	    hand_scroll_x=ev->x();
 	    hand_scroll_y=ev->y();
 	 }
-      } else
-      { //IDC_ZOOM_SELECT || IDC_TEXT_SELECT
+      } else if ( pane_mode == IDC_ZOOM_SELECT ) 
+      { //IDC_ZOOM_SELECT
 	 if ( pane )
 	 {
 	    if ( lastrect )
@@ -385,6 +385,7 @@ QDBase::processMouseMoveEvent(QMouseEvent * ev)
 	    if (lastrect) delete lastrect;
 	    lastrect=currect;
 	 }
+      } else { // IDC_TEXT_SELECT
       }
    } else if (!(ev->state() & (LeftButton | MidButton | RightButton |
 			       getLensHotKey())))

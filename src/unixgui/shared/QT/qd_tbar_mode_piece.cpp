@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qd_tbar_mode_piece.cpp,v 1.4 2001-07-25 17:10:43 mchen Exp $
+// $Id: qd_tbar_mode_piece.cpp,v 1.5 2001-07-26 23:47:51 mchen Exp $
 // $Name:  $
 
 
@@ -132,7 +132,8 @@ QDTBarModePiece::setEnabled(bool en)
    zoom_out_butt->setEnabled(en);
 #if 1
    zoom_select_butt->setEnabled(en);
-   text_select_butt->setEnabled(en);
+   //text_select_butt->setEnabled(en);
+   text_select_butt->setEnabled(false);
    pane_butt->setEnabled(en);
 #endif
    if ( pin_butt )
