@@ -236,7 +236,7 @@ BSC32=bscmake.exe
 # PROP Target_Dir ""
 CPP=shcl.exe
 # ADD BASE CPP /nologo /W3 /D _WIN32_WCE=$(CEVersion) /D "$(CePlatform)" /D "SHx" /D "SH3" /D "_SH3_" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_UNICODE" /D "NDEBUG" /D "WIN32" /YX /Oxs /M$(CECrtMT) /c
-# ADD CPP /nologo /W3 /I "../include" /D "SHx" /D "SH3" /D "_SH3_" /D "NDEBUG" /D _WIN32_WCE=$(CEVersion) /D "$(CePlatform)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_UNICODE" /D "WIN32" /D "USE_EXCEPTION_EMULATION" /YX /Oxs /M$(CECrtMT) /c
+# ADD CPP /nologo /W3 /I "../include" /D "SHx" /D "SH3" /D "_SH3_" /D "NDEBUG" /D _WIN32_WCE=$(CEVersion) /D "$(CePlatform)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_UNICODE" /D "WIN32" /D "USE_EXCEPTION_EMULATION" /FR /YX /Oxs /M$(CECrtMT) /c
 LIB32=link.exe -lib
 # ADD BASE LIB32 /nologo
 # ADD LIB32 /nologo
@@ -352,14 +352,12 @@ NODEP_CPP_ARRAY=\
 !ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
 
 DEP_CPP_ARRAY=\
+	"..\include\DjVu.h"\
 	".\Arrays.h"\
 	".\ByteStream.h"\
 	".\DjVuGlobal.h"\
 	".\GException.h"\
 	".\GSmartPointer.h"\
-	
-NODEP_CPP_ARRAY=\
-	".\DjVu.h"\
 	
 
 !ENDIF 
@@ -492,6 +490,7 @@ NODEP_CPP_BSBYT=\
 !ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
 
 DEP_CPP_BSBYT=\
+	"..\include\DjVu.h"\
 	".\Arrays.h"\
 	".\BSByteStream.h"\
 	".\ByteStream.h"\
@@ -502,9 +501,6 @@ DEP_CPP_BSBYT=\
 	".\GSmartPointer.h"\
 	".\GString.h"\
 	".\ZPCodec.h"\
-	
-NODEP_CPP_BSBYT=\
-	".\DjVu.h"\
 	
 
 !ENDIF 
@@ -621,6 +617,7 @@ NODEP_CPP_BYTES=\
 !ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
 
 DEP_CPP_BYTES=\
+	"..\include\DjVu.h"\
 	".\Arrays.h"\
 	".\ByteStream.h"\
 	".\DjVuGlobal.h"\
@@ -629,9 +626,6 @@ DEP_CPP_BYTES=\
 	".\GOS.h"\
 	".\GSmartPointer.h"\
 	".\GString.h"\
-	
-NODEP_CPP_BYTES=\
-	".\DjVu.h"\
 	
 
 !ENDIF 
@@ -791,6 +785,7 @@ NODEP_CPP_DATAP=\
 !ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
 
 DEP_CPP_DATAP=\
+	"..\include\DjVu.h"\
 	".\Arrays.h"\
 	".\ByteStream.h"\
 	".\DataPool.h"\
@@ -805,7 +800,6 @@ DEP_CPP_DATAP=\
 	".\IFFByteStream.h"\
 	
 NODEP_CPP_DATAP=\
-	".\DjVu.h"\
 	".\jri.h"\
 	
 
@@ -931,6 +925,7 @@ NODEP_CPP_DEBUG=\
 !ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
 
 DEP_CPP_DEBUG=\
+	"..\include\DjVu.h"\
 	".\debug.h"\
 	".\DjVuGlobal.h"\
 	".\GContainer.h"\
@@ -940,7 +935,6 @@ DEP_CPP_DEBUG=\
 	".\GThreads.h"\
 	
 NODEP_CPP_DEBUG=\
-	".\DjVu.h"\
 	".\jri.h"\
 	
 
@@ -1101,6 +1095,7 @@ NODEP_CPP_DJVMD=\
 !ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
 
 DEP_CPP_DJVMD=\
+	"..\include\DjVu.h"\
 	".\Arrays.h"\
 	".\BSByteStream.h"\
 	".\ByteStream.h"\
@@ -1115,7 +1110,6 @@ DEP_CPP_DJVMD=\
 	".\ZPCodec.h"\
 	
 NODEP_CPP_DJVMD=\
-	".\DjVu.h"\
 	".\jri.h"\
 	
 
@@ -1242,6 +1236,7 @@ NODEP_CPP_DJVMDI=\
 !ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
 
 DEP_CPP_DJVMDI=\
+	"..\include\DjVu.h"\
 	".\Arrays.h"\
 	".\ByteStream.h"\
 	".\debug.h"\
@@ -1251,9 +1246,6 @@ DEP_CPP_DJVMDI=\
 	".\GException.h"\
 	".\GSmartPointer.h"\
 	".\GString.h"\
-	
-NODEP_CPP_DJVMDI=\
-	".\DjVu.h"\
 	
 
 !ENDIF 
@@ -1427,6 +1419,7 @@ NODEP_CPP_DJVMDO=\
 !ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
 
 DEP_CPP_DJVMDO=\
+	"..\include\DjVu.h"\
 	".\Arrays.h"\
 	".\ByteStream.h"\
 	".\DataPool.h"\
@@ -1443,7 +1436,6 @@ DEP_CPP_DJVMDO=\
 	".\IFFByteStream.h"\
 	
 NODEP_CPP_DJVMDO=\
-	".\DjVu.h"\
 	".\jri.h"\
 	
 
@@ -1609,6 +1601,7 @@ NODEP_CPP_DJVUA=\
 !ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
 
 DEP_CPP_DJVUA=\
+	"..\include\DjVu.h"\
 	".\Arrays.h"\
 	".\BSByteStream.h"\
 	".\ByteStream.h"\
@@ -1623,9 +1616,6 @@ DEP_CPP_DJVUA=\
 	".\GString.h"\
 	".\IFFByteStream.h"\
 	".\ZPCodec.h"\
-	
-NODEP_CPP_DJVUA=\
-	".\DjVu.h"\
 	
 
 !ENDIF 
@@ -1896,6 +1886,7 @@ NODEP_CPP_DJVUD=\
 !ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
 
 DEP_CPP_DJVUD=\
+	"..\include\DjVu.h"\
 	".\Arrays.h"\
 	".\ByteStream.h"\
 	".\DataPool.h"\
@@ -1925,7 +1916,6 @@ DEP_CPP_DJVUD=\
 	".\ZPCodec.h"\
 	
 NODEP_CPP_DJVUD=\
-	".\DjVu.h"\
 	".\jri.h"\
 	
 
@@ -2202,6 +2192,7 @@ NODEP_CPP_DJVUDO=\
 !ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
 
 DEP_CPP_DJVUDO=\
+	"..\include\DjVu.h"\
 	".\Arrays.h"\
 	".\ByteStream.h"\
 	".\DataPool.h"\
@@ -2232,7 +2223,6 @@ DEP_CPP_DJVUDO=\
 	".\ZPCodec.h"\
 	
 NODEP_CPP_DJVUDO=\
-	".\DjVu.h"\
 	".\jri.h"\
 	
 
@@ -2408,6 +2398,7 @@ NODEP_CPP_DJVUE=\
 !ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
 
 DEP_CPP_DJVUE=\
+	"..\include\DjVu.h"\
 	".\Arrays.h"\
 	".\DataPool.h"\
 	".\DjVmDir.h"\
@@ -2424,7 +2415,6 @@ DEP_CPP_DJVUE=\
 	".\GURL.h"\
 	
 NODEP_CPP_DJVUE=\
-	".\DjVu.h"\
 	".\jri.h"\
 	
 
@@ -2698,6 +2688,7 @@ NODEP_CPP_DJVUF=\
 !ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
 
 DEP_CPP_DJVUF=\
+	"..\include\DjVu.h"\
 	".\Arrays.h"\
 	".\ByteStream.h"\
 	".\DataPool.h"\
@@ -2728,7 +2719,6 @@ DEP_CPP_DJVUF=\
 	".\ZPCodec.h"\
 	
 NODEP_CPP_DJVUF=\
-	".\DjVu.h"\
 	".\jri.h"\
 	
 
@@ -2919,6 +2909,7 @@ NODEP_CPP_DJVUFI=\
 !ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
 
 DEP_CPP_DJVUFI=\
+	"..\include\DjVu.h"\
 	".\Arrays.h"\
 	".\debug.h"\
 	".\DjVuFile.h"\
@@ -2936,7 +2927,6 @@ DEP_CPP_DJVUFI=\
 	".\GURL.h"\
 	
 NODEP_CPP_DJVUFI=\
-	".\DjVu.h"\
 	".\jri.h"\
 	
 
@@ -3062,6 +3052,7 @@ NODEP_CPP_DJVUG=\
 !ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
 
 DEP_CPP_DJVUG=\
+	"..\include\DjVu.h"\
 	".\DjVuGlobal.h"\
 	".\GContainer.h"\
 	".\GException.h"\
@@ -3071,7 +3062,6 @@ DEP_CPP_DJVUG=\
 	".\GThreads.h"\
 	
 NODEP_CPP_DJVUG=\
-	".\DjVu.h"\
 	".\jri.h"\
 	
 
@@ -3155,12 +3145,10 @@ NODEP_CPP_DJVUGL=\
 !ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
 
 DEP_CPP_DJVUGL=\
+	"..\include\DjVu.h"\
 	".\debug.h"\
 	".\DjVuGlobal.h"\
 	".\GException.h"\
-	
-NODEP_CPP_DJVUGL=\
-	".\DjVu.h"\
 	
 
 !ENDIF 
@@ -3412,6 +3400,7 @@ NODEP_CPP_DJVUI=\
 !ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
 
 DEP_CPP_DJVUI=\
+	"..\include\DjVu.h"\
 	".\Arrays.h"\
 	".\ByteStream.h"\
 	".\DataPool.h"\
@@ -3438,7 +3427,6 @@ DEP_CPP_DJVUI=\
 	".\ZPCodec.h"\
 	
 NODEP_CPP_DJVUI=\
-	".\DjVu.h"\
 	".\jri.h"\
 	
 
@@ -3550,15 +3538,13 @@ NODEP_CPP_DJVUIN=\
 !ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
 
 DEP_CPP_DJVUIN=\
+	"..\include\DjVu.h"\
 	".\Arrays.h"\
 	".\ByteStream.h"\
 	".\DjVuGlobal.h"\
 	".\DjVuInfo.h"\
 	".\GException.h"\
 	".\GSmartPointer.h"\
-	
-NODEP_CPP_DJVUIN=\
-	".\DjVu.h"\
 	
 
 !ENDIF 
@@ -3669,16 +3655,15 @@ NODEP_CPP_DJVUM=\
 !ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
 
 DEP_CPP_DJVUM=\
+	"..\include\DjVu.h"\
 	".\DjVuGlobal.h"\
 	".\DjVuMessage.h"\
 	".\GContainer.h"\
 	".\GException.h"\
+	".\GOS.h"\
 	".\GSmartPointer.h"\
 	".\GString.h"\
 	".\parseoptions.h"\
-	
-NODEP_CPP_DJVUM=\
-	".\DjVu.h"\
 	
 
 !ENDIF 
@@ -3838,6 +3823,7 @@ NODEP_CPP_DJVUN=\
 !ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
 
 DEP_CPP_DJVUN=\
+	"..\include\DjVu.h"\
 	".\Arrays.h"\
 	".\ByteStream.h"\
 	".\debug.h"\
@@ -3852,7 +3838,6 @@ DEP_CPP_DJVUN=\
 	".\GURL.h"\
 	
 NODEP_CPP_DJVUN=\
-	".\DjVu.h"\
 	".\jri.h"\
 	
 
@@ -3988,6 +3973,7 @@ NODEP_CPP_DJVUP=\
 !ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
 
 DEP_CPP_DJVUP=\
+	"..\include\DjVu.h"\
 	".\Arrays.h"\
 	".\BSByteStream.h"\
 	".\ByteStream.h"\
@@ -3998,9 +3984,6 @@ DEP_CPP_DJVUP=\
 	".\GPixmap.h"\
 	".\GSmartPointer.h"\
 	".\ZPCodec.h"\
-	
-NODEP_CPP_DJVUP=\
-	".\DjVu.h"\
 	
 
 !ENDIF 
@@ -4217,6 +4200,7 @@ NODEP_CPP_DJVUPO=\
 !ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
 
 DEP_CPP_DJVUPO=\
+	"..\include\DjVu.h"\
 	".\Arrays.h"\
 	".\DataPool.h"\
 	".\DjVuDocument.h"\
@@ -4237,7 +4221,6 @@ DEP_CPP_DJVUPO=\
 	".\GURL.h"\
 	
 NODEP_CPP_DJVUPO=\
-	".\DjVu.h"\
 	".\jri.h"\
 	
 
@@ -4384,6 +4367,7 @@ NODEP_CPP_GBITM=\
 !ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
 
 DEP_CPP_GBITM=\
+	"..\include\DjVu.h"\
 	".\Arrays.h"\
 	".\ByteStream.h"\
 	".\DjVuGlobal.h"\
@@ -4396,7 +4380,6 @@ DEP_CPP_GBITM=\
 	".\GThreads.h"\
 	
 NODEP_CPP_GBITM=\
-	".\DjVu.h"\
 	".\jri.h"\
 	
 
@@ -4488,13 +4471,11 @@ NODEP_CPP_GCONT=\
 !ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
 
 DEP_CPP_GCONT=\
+	"..\include\DjVu.h"\
 	".\DjVuGlobal.h"\
 	".\GContainer.h"\
 	".\GException.h"\
 	".\GSmartPointer.h"\
-	
-NODEP_CPP_GCONT=\
-	".\DjVu.h"\
 	
 
 !ENDIF 
@@ -4605,6 +4586,7 @@ NODEP_CPP_GEXCE=\
 !ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
 
 DEP_CPP_GEXCE=\
+	"..\include\DjVu.h"\
 	".\debug.h"\
 	".\DjVuGlobal.h"\
 	".\DjVuMessage.h"\
@@ -4612,9 +4594,6 @@ DEP_CPP_GEXCE=\
 	".\GException.h"\
 	".\GSmartPointer.h"\
 	".\GString.h"\
-	
-NODEP_CPP_GEXCE=\
-	".\DjVu.h"\
 	
 
 !ENDIF 
@@ -4747,6 +4726,7 @@ NODEP_CPP_GIFFM=\
 !ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
 
 DEP_CPP_GIFFM=\
+	"..\include\DjVu.h"\
 	".\Arrays.h"\
 	".\ByteStream.h"\
 	".\debug.h"\
@@ -4757,9 +4737,6 @@ DEP_CPP_GIFFM=\
 	".\GSmartPointer.h"\
 	".\GString.h"\
 	".\IFFByteStream.h"\
-	
-NODEP_CPP_GIFFM=\
-	".\DjVu.h"\
 	
 
 !ENDIF 
@@ -4877,6 +4854,7 @@ NODEP_CPP_GMAPA=\
 !ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
 
 DEP_CPP_GMAPA=\
+	"..\include\DjVu.h"\
 	".\debug.h"\
 	".\DjVuGlobal.h"\
 	".\GContainer.h"\
@@ -4885,9 +4863,6 @@ DEP_CPP_GMAPA=\
 	".\GRect.h"\
 	".\GSmartPointer.h"\
 	".\GString.h"\
-	
-NODEP_CPP_GMAPA=\
-	".\DjVu.h"\
 	
 
 !ENDIF 
@@ -5011,6 +4986,7 @@ NODEP_CPP_GOS_C=\
 !ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
 
 DEP_CPP_GOS_C=\
+	"..\include\DjVu.h"\
 	".\DjVuGlobal.h"\
 	".\GContainer.h"\
 	".\GException.h"\
@@ -5020,7 +4996,6 @@ DEP_CPP_GOS_C=\
 	".\GThreads.h"\
 	
 NODEP_CPP_GOS_C=\
-	".\DjVu.h"\
 	".\jri.h"\
 	
 
@@ -5174,6 +5149,7 @@ NODEP_CPP_GPIXM=\
 !ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
 
 DEP_CPP_GPIXM=\
+	"..\include\DjVu.h"\
 	".\Arrays.h"\
 	".\ByteStream.h"\
 	".\DjVuGlobal.h"\
@@ -5187,7 +5163,6 @@ DEP_CPP_GPIXM=\
 	".\GThreads.h"\
 	
 NODEP_CPP_GPIXM=\
-	".\DjVu.h"\
 	".\jri.h"\
 	
 
@@ -5272,12 +5247,10 @@ NODEP_CPP_GRECT=\
 !ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
 
 DEP_CPP_GRECT=\
+	"..\include\DjVu.h"\
 	".\DjVuGlobal.h"\
 	".\GException.h"\
 	".\GRect.h"\
-	
-NODEP_CPP_GRECT=\
-	".\DjVu.h"\
 	
 
 !ENDIF 
@@ -5392,6 +5365,7 @@ NODEP_CPP_GSCAL=\
 !ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
 
 DEP_CPP_GSCAL=\
+	"..\include\DjVu.h"\
 	".\DjVuGlobal.h"\
 	".\GBitmap.h"\
 	".\GException.h"\
@@ -5399,9 +5373,6 @@ DEP_CPP_GSCAL=\
 	".\GRect.h"\
 	".\GScaler.h"\
 	".\GSmartPointer.h"\
-	
-NODEP_CPP_GSCAL=\
-	".\DjVu.h"\
 	
 
 !ENDIF 
@@ -5505,13 +5476,13 @@ NODEP_CPP_GSMAR=\
 !ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
 
 DEP_CPP_GSMAR=\
+	"..\include\DjVu.h"\
 	".\DjVuGlobal.h"\
 	".\GException.h"\
 	".\GSmartPointer.h"\
 	".\GThreads.h"\
 	
 NODEP_CPP_GSMAR=\
-	".\DjVu.h"\
 	".\jri.h"\
 	
 
@@ -5615,15 +5586,13 @@ NODEP_CPP_GSTRI=\
 !ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
 
 DEP_CPP_GSTRI=\
+	"..\include\DjVu.h"\
 	".\debug.h"\
 	".\DjVuGlobal.h"\
 	".\GContainer.h"\
 	".\GException.h"\
 	".\GSmartPointer.h"\
 	".\GString.h"\
-	
-NODEP_CPP_GSTRI=\
-	".\DjVu.h"\
 	
 
 !ENDIF 
@@ -5747,6 +5716,7 @@ NODEP_CPP_GTHRE=\
 !ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
 
 DEP_CPP_GTHRE=\
+	"..\include\DjVu.h"\
 	".\DjVuGlobal.h"\
 	".\DjVuMessage.h"\
 	".\GContainer.h"\
@@ -5756,7 +5726,6 @@ DEP_CPP_GTHRE=\
 	".\GThreads.h"\
 	
 NODEP_CPP_GTHRE=\
-	".\DjVu.h"\
 	".\jri.h"\
 	
 
@@ -5895,6 +5864,7 @@ NODEP_CPP_GURL_=\
 !ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
 
 DEP_CPP_GURL_=\
+	"..\include\DjVu.h"\
 	".\Arrays.h"\
 	".\DjVuGlobal.h"\
 	".\GContainer.h"\
@@ -5906,7 +5876,6 @@ DEP_CPP_GURL_=\
 	".\GURL.h"\
 	
 NODEP_CPP_GURL_=\
-	".\DjVu.h"\
 	".\jri.h"\
 	
 
@@ -6026,6 +5995,7 @@ NODEP_CPP_IFFBY=\
 !ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
 
 DEP_CPP_IFFBY=\
+	"..\include\DjVu.h"\
 	".\Arrays.h"\
 	".\ByteStream.h"\
 	".\DjVuGlobal.h"\
@@ -6034,9 +6004,6 @@ DEP_CPP_IFFBY=\
 	".\GSmartPointer.h"\
 	".\GString.h"\
 	".\IFFByteStream.h"\
-	
-NODEP_CPP_IFFBY=\
-	".\DjVu.h"\
 	
 
 !ENDIF 
@@ -6202,6 +6169,7 @@ NODEP_CPP_IW44I=\
 !ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
 
 DEP_CPP_IW44I=\
+	"..\include\DjVu.h"\
 	".\Arrays.h"\
 	".\ByteStream.h"\
 	".\DjVuGlobal.h"\
@@ -6217,9 +6185,6 @@ DEP_CPP_IW44I=\
 	".\IW44Image.h"\
 	".\MMX.h"\
 	".\ZPCodec.h"\
-	
-NODEP_CPP_IW44I=\
-	".\DjVu.h"\
 	
 
 !ENDIF 
@@ -6367,6 +6332,7 @@ NODEP_CPP_JB2IM=\
 !ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
 
 DEP_CPP_JB2IM=\
+	"..\include\DjVu.h"\
 	".\DjVuGlobal.h"\
 	".\GBitmap.h"\
 	".\GContainer.h"\
@@ -6379,7 +6345,6 @@ DEP_CPP_JB2IM=\
 	".\ZPCodec.h"\
 	
 NODEP_CPP_JB2IM=\
-	".\DjVu.h"\
 	".\jri.h"\
 	
 
@@ -6495,6 +6460,7 @@ NODEP_CPP_JPEGD=\
 !ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
 
 DEP_CPP_JPEGD=\
+	"..\include\DjVu.h"\
 	".\Arrays.h"\
 	".\ByteStream.h"\
 	".\DjVuGlobal.h"\
@@ -6502,9 +6468,6 @@ DEP_CPP_JPEGD=\
 	".\GPixmap.h"\
 	".\GSmartPointer.h"\
 	".\JPEGDecoder.h"\
-	
-NODEP_CPP_JPEGD=\
-	".\DjVu.h"\
 	
 
 !ENDIF 
@@ -6645,6 +6608,7 @@ NODEP_CPP_MMRDE=\
 !ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
 
 DEP_CPP_MMRDE=\
+	"..\include\DjVu.h"\
 	".\Arrays.h"\
 	".\ByteStream.h"\
 	".\DjVuGlobal.h"\
@@ -6656,9 +6620,6 @@ DEP_CPP_MMRDE=\
 	".\JB2Image.h"\
 	".\MMRDecoder.h"\
 	".\ZPCodec.h"\
-	
-NODEP_CPP_MMRDE=\
-	".\DjVu.h"\
 	
 
 !ENDIF 
@@ -6735,11 +6696,9 @@ NODEP_CPP_MMX_C=\
 !ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
 
 DEP_CPP_MMX_C=\
+	"..\include\DjVu.h"\
 	".\DjVuGlobal.h"\
 	".\MMX.h"\
-	
-NODEP_CPP_MMX_C=\
-	".\DjVu.h"\
 	
 
 !ENDIF 
@@ -6863,6 +6822,7 @@ NODEP_CPP_PARSE=\
 !ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
 
 DEP_CPP_PARSE=\
+	"..\include\DjVu.h"\
 	".\DjVuGlobal.h"\
 	".\GContainer.h"\
 	".\GException.h"\
@@ -6872,7 +6832,6 @@ DEP_CPP_PARSE=\
 	".\parseoptions.h"\
 	
 NODEP_CPP_PARSE=\
-	".\DjVu.h"\
 	".\jri.h"\
 	
 
@@ -6985,6 +6944,7 @@ NODEP_CPP_ZPCOD=\
 !ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
 
 DEP_CPP_ZPCOD=\
+	"..\include\DjVu.h"\
 	".\Arrays.h"\
 	".\ByteStream.h"\
 	".\DjVuGlobal.h"\
@@ -6992,9 +6952,6 @@ DEP_CPP_ZPCOD=\
 	".\GException.h"\
 	".\GSmartPointer.h"\
 	".\ZPCodec.h"\
-	
-NODEP_CPP_ZPCOD=\
-	".\DjVu.h"\
 	
 
 !ENDIF 

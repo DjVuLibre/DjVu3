@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.h,v 1.44 2001-03-06 19:55:41 bcr Exp $
+// $Id: ByteStream.h,v 1.45 2001-03-12 23:50:23 fcrary Exp $
 // $Name:  $
 
 #ifndef _BYTESTREAM_H
@@ -62,7 +62,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation\\
     Andrei Erofeev <eaf@geocities.com> -- 
     @version
-    #$Id: ByteStream.h,v 1.44 2001-03-06 19:55:41 bcr Exp $# */
+    #$Id: ByteStream.h,v 1.45 2001-03-12 23:50:23 fcrary Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -249,12 +249,16 @@ public:
       file cannot be opened. */
   static GP<ByteStream> create(
     const char filename[], char const * const mode);
+
+#if !defined(UNDER_CE)
   /** Constructs a ByteStream for accessing the stdio file #f#.
       Argument #mode# indicates the type of the stdio file, as in the
       well known stdio function #fopen#.  Destroying the ByteStream
       object will not close the stdio file #f# unless closeme is true. */
   static GP<ByteStream> create(
     const int fd, char const * const mode, const bool closeme);
+#endif
+
   /** Constructs a ByteStream for accessing the stdio file #f#.
       Argument #mode# indicates the type of the stdio file, as in the
       well known stdio function #fopen#.  Destroying the ByteStream

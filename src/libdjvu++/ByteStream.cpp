@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.cpp,v 1.53 2001-03-06 19:55:41 bcr Exp $
+// $Id: ByteStream.cpp,v 1.54 2001-03-12 23:50:23 fcrary Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 04/1997
@@ -60,7 +60,9 @@ __inline int dup(int _a ) 			{ return _dup(_a);}
 __inline int dup2(int _a, int _b ) 	{ return _dup2(_a, _b);}
 
 #else
+#ifndef UNDER_CE
 #include <io.h>
+#endif
 #endif
 #endif
 #ifndef UNDER_CE
@@ -939,6 +941,7 @@ ByteStream::create(const char filename[],char const * const mode)
   return retval;
 }
 
+#if !defined(UNDER_CE)
 GP<ByteStream>
 ByteStream::create(const int fd,char const * const mode,const bool closeme)
 {
@@ -974,6 +977,7 @@ ByteStream::create(const int fd,char const * const mode,const bool closeme)
   }
   return retval;
 }
+#endif
 
 GP<ByteStream>
 ByteStream::create(FILE * const f,char const * const mode,const bool closeme)

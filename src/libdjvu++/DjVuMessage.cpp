@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessage.cpp,v 1.17 2001-03-09 00:27:58 bcr Exp $
+// $Id: DjVuMessage.cpp,v 1.18 2001-03-12 23:50:23 fcrary Exp $
 // $Name:  $
 
 
@@ -57,7 +57,7 @@
 #ifdef WIN32
 static const char LocalDjVuDir[] ="Profiles"; // appended to the home directory.
 static const char RootDjVuDir[] ="C:/Program Files/LizardTech/Profiles";
-static const char registerypath[]="Software\\LizardTech\\DjVu\\Profile Path";
+static const TCHAR registrypath[]= TEXT("Software\\LizardTech\\DjVu\\Profile Path");
 #else
 static const char LocalDjVuDir[] =".DjVu"; // appended to the home directory.
 static const char RootDjVuDir[] ="/etc/DjVu/";
@@ -271,7 +271,7 @@ RegOpenReadConfig ( HKEY hParentKey )
 {
   GString retval;
    // To do:  This needs to be shared with SetProfile.cpp
-  LPCTSTR path = TEXT(registerypath) ;
+  LPCTSTR path = registrypath ;
 
   HKEY hKey = 0;
   // MultiByteToWideChar(CP_ACP,MB_PRECOMPOSED,argv[1],strlen(argv[1])+1,wszSrcFile,sizeof(wszSrcFile));
@@ -280,7 +280,7 @@ RegOpenReadConfig ( HKEY hParentKey )
   {
     TCHAR path[1024];
     // Success
-    LPSTR szPathValue = path;
+    PTCHAR szPathValue = path;
     LPCTSTR lpszEntry = TEXT("");
     DWORD dwCount = (sizeof(path)/sizeof(TCHAR))-1;
     DWORD dwType;
@@ -322,9 +322,11 @@ GetProfilePaths(void)
   if(first)
   {
     first=false;
+#if !defined(UNDER_CE)
     const char *envp=getenv(DjVuEnv);
     if(envp)
       paths.append(envp);
+#endif
 #ifdef WIN32
     GString path(GetModulePath());
     if(path.length() && GOS::is_dir(path))

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.h,v 1.25 2001-01-04 22:04:55 bcr Exp $
+// $Id: GString.h,v 1.26 2001-03-12 23:50:23 fcrary Exp $
 // $Name:  $
 
 #ifndef _GSTRING_H_
@@ -57,7 +57,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.25 2001-01-04 22:04:55 bcr Exp $# */
+    #$Id: GString.h,v 1.26 2001-03-12 23:50:23 fcrary Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -210,6 +210,7 @@ public:
       contains a copy of the current string with all letters turned into 
       upper case letters. */
   GString upcase( void ) const;
+
   /** Returns an lower case copy of this string.  The returned string
       contains a copy of the current string with all letters turned into 
       lower case letters. */
@@ -221,21 +222,17 @@ public:
       escaped. */
   GString toEscaped(void ) const;
 
-  /** Converts strings containing HTML/XML escaped characters (e.g.,
-      "&lt;" for "<") into their unescaped forms. The conversion is partially
-      defined by the ConvMap argument which specifies the conversion strings
-      to be recognized. The default BasicMap inverts the actions of toEscaped().
-      Numeric representation of characters (e.g., "&#38;" or "&#x26;" for "*")
-      are always converted. */
+  /** Converts strings containing HTML/XML escaped characters into their
+      unescaped forms. Numeric representations of characters (e.g., "&#38;"
+      or "&#x26;" for "*") are the only forms converted by this function. */
   GString fromEscaped( void ) const;
 
   /** Converts strings containing HTML/XML escaped characters (e.g.,
       "&lt;" for "<") into their unescaped forms. The conversion is partially
       defined by the ConvMap argument which specifies the conversion strings
-      to be recognized. The default BasicMap inverts the actions of toEscaped().
-      Numeric representation of characters (e.g., "&#38;" or "&#x26;" for "*")
-      are always converted. */
-
+      to be recognized. [The function BasicMap() is available to produce a list
+      which inverts the actions of toEscaped().] Numeric representations of
+      characters (e.g., "&#38;" or "&#x26;" for "*") are always converted. */
   GString fromEscaped( const GMap<GString,GString> ConvMap ) const;
 
   // -- ALTERING
