@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuGlobal.h,v 1.47 2001-04-06 17:50:22 fcrary Exp $
+// $Id: DjVuGlobal.h,v 1.48 2001-04-06 18:59:35 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUGLOBAL_H
@@ -79,7 +79,7 @@
     @memo
     Global definitions.
     @version
-    #$Id: DjVuGlobal.h,v 1.47 2001-04-06 17:50:22 fcrary Exp $#
+    #$Id: DjVuGlobal.h,v 1.48 2001-04-06 18:59:35 bcr Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> -- empty file.\\
     Bill Riemers <bcr@lizardtech.com> -- real work.  */
@@ -275,10 +275,45 @@ private:
     system calls without any other header file dependancies.
  */
 
-#include "DjVu.h"
+#ifndef DJVUAPI
+#if 0
+class dummy /* This makes doc++ ignore this block */
+{
+  private:
+#endif
+#ifndef DJVU_STATIC_LIBRARY
+#ifdef WIN32
+#define DLLIMPORT __declspec(dllimport)
+#define DLLEXPORT __declspec(dllexport)
+#else
+#define DLLIMPORT /* */
+#define DLLEXPORT /* */
+#endif
+#else /* DJVU_STATIC_LIBRARY */
+#define DLLIMPORT /* */
+#define DLLEXPORT /* */
+#endif /* DJVU_STATIC_LIBRARY */
+#ifdef BUILD_LIB
+#define DJVUAPI DLLEXPORT
+#else
+#define DJVUAPI DLLIMPORT
+#endif  /*BUILD_LIB*/
+#if 0
+};
+#endif
+#endif /*DJVUAPI*/ 
+
+#ifdef __cplusplus
+#define DJVUEXTERNCAPI(x) extern "C" DJVUAPI x
+#else
+#define DJVUEXTERNCAPI(x) DJVUAPI x
+#endif
+
+/** This replaces fprintf(stderr,...), but with UTF8 encoded strings. */
+DJVUEXTERNCAPI(void DjVuPrintError(const char *fmt, ...));
 
 /** This replaces printf(...), but requires UTF8 encoded strings. */
-void DjVuPrintMessage(const char *fmt, ...);
+DJVUEXTERNCAPI(void DjVuPrintMessage(const char *fmt, ...));
 
 /** @name DjVu Names  
 
