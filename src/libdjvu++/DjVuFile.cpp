@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuFile.cpp,v 1.151 2001-02-21 00:03:11 bcr Exp $
+// $Id: DjVuFile.cpp,v 1.152 2001-02-22 21:07:45 fcrary Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -1149,7 +1149,7 @@ DjVuFile::decode(GP<ByteStream> gbs)
     REPORT_EOF(true)
     
     // Check file format
-    bool djvi = (chkid=="FORM:DJVI")?true:false;
+  bool djvi = (chkid=="FORM:DJVI")?true:false;
   bool djvu = (chkid=="FORM:DJVU")?true:false;
   bool iw44 = ((chkid=="FORM:PM44") || (chkid=="FORM:BM44"));
   if (djvi || djvu)

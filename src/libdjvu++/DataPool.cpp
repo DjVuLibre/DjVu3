@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DataPool.cpp,v 1.68 2001-02-20 19:36:50 fcrary Exp $
+// $Id: DataPool.cpp,v 1.69 2001-02-22 21:07:45 fcrary Exp $
 // $Name:  $
 
 
@@ -1494,7 +1494,7 @@ DataPool::analyze_iff(void)
       // DjVuFiles have IFF structure, which makes it possible to do it.
       // If due to some reason we fail, the length will remain -1.
 {
-   DEBUG_MSG("DataPool::analyze_iff(): Trying to decode IFF structure.\n");
+   DEBUG_MSG("DataPool::analyze_iff(): Trying to decode IFF structure of " << fname << ".\n");
    DEBUG_MSG("in order to predict the DataPool's size\n");
    DEBUG_MAKE_INDENT(3);
 
