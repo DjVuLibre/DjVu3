@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuDocumentAPI.h,v 1.22 2000-02-26 18:53:20 bcr Exp $
+ *C- $Id: DjVuDocumentAPI.h,v 1.23 2000-02-29 14:03:58 haffner Exp $
  */
 
 #ifndef _DJVUDOC_H_
@@ -223,6 +223,7 @@ typedef struct djvu_segmenter_options_struct
       \item bad color registration in the printer or the scanner
       \item ink blurring around in old documents
       \end{itemize}
+      {\em Its most direct influence is a band of width #edge_size# around each character is not used to sample the background color}
 
       \begin{description}
       \item[Option type] Pixel size.
@@ -237,15 +238,14 @@ typedef struct djvu_segmenter_options_struct
   /** Render Size: size of the "ideal" pixel, viewed at the standard rendering
       resolution.
 
-      Parameter type: resolution.
+      {\em Its most direct influence is that any character with #render_size# or less pixels will be removed }
 
       If is assumed that at this render size, characters have a reasonable
       size (typically more than 10 pixels and less than 100 pixels).
-      
 
       \begin{description}
       \item[Option type] Pixel size.
-      \item[Range] 1..4
+      \item[Range] 1..6
       \item[0] Very clean or 100dpi images
       \item[4] High resolution images
       \item[Default] 3
@@ -375,20 +375,6 @@ typedef struct djvu_segmenter_options_struct
    */
   int masksub_refine;
 
-  /** Segmenter uses subsampled chrominance only.
-      
-      This option designed to save memory. It should be avoided 
-      when maximum color saturation is desired for 
-      the foreground image. Automatically turned off when
-      \Ref{background_floss} is on.
-
-      Using sub-chrominance implies that a faithful restitution of the
-      foreground color is not critical: the
-      \Ref{djvu_foreground_options_struct::color_jb2} option is automatically
-      turned on for improved compression.
-      
-  */
-  int masksub_sub_chrom;
 
   /** Sample background color in small intervals between character.
 
@@ -526,7 +512,7 @@ inline djvu_segmenter_options_struct::djvu_segmenter_options_struct() :
   inhibit_foreback_level(40), inversion_level(25), edge_size(3),
   render_size(3), blurring_size(3), fg_subsample(12), bg_subsample(3),
   mask_upsample(3),
-  resolution_multiplier(1), high_variation_foreground(false), masksub_refine(true), masksub_sub_chrom(false) {}
+  resolution_multiplier(1), high_variation_foreground(false), masksub_refine(true) {}
 
 #endif
   /*@}*/
