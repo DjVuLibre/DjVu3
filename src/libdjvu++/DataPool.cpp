@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.cpp,v 1.26 1999-09-23 19:07:59 eaf Exp $
+//C- $Id: DataPool.cpp,v 1.27 1999-09-23 21:09:43 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -1015,6 +1015,7 @@ private:
       // there are no other pointers to the DataPool created yet, it becomes
       // destroyed immediately :(
    DataPool		* data_pool;
+   GP<DataPool>		data_pool_lock;
    long			position;
 
       // Cancel C++ default stuff
@@ -1026,6 +1027,10 @@ PoolByteStream::PoolByteStream(DataPool * xdata_pool) :
    data_pool(xdata_pool), position(0)
 {
    if (!data_pool) THROW("Internal error: ZERO DataPool passed as input.");
+
+      // Secure the DataPool if possible. If we're called from DataPool
+      // constructor (get_count()==0) there is no need to secure at all.
+   if (data_pool->get_count()) data_pool_lock=data_pool;
 }
 
 size_t
