@@ -35,6 +35,7 @@ sed +
   -e 's,\$,@%%@d,g' +
   -e 's,",@%%@q,g' +
   -e 's,'"'"',@%%@a,g' +
+  -e 's,\\,@%%@z,g' +
   -e "s!@%TOPDIR%@!$TOPDIR!g" +
   -e "s!@%srcdir%@!$SRCDIR!g" +
   -e "s!@%builddir%@!$BUILDDIR!g" +
@@ -78,6 +79,7 @@ EOF
   -e 's,@%%@s, ,g' +
   -e 's,@%%@e,!,g' +
   -e 's,@%%@p,@%%@,g' +
+  -e 's,@%%@z,\\,g' +
 EOF
   "${sed}" -e 's,+$,\\,g' <<EOF
   -e 's!^%%%[ 	]*include[ 	]*<\(.*\)>!%%%include "${RULES_DIR}/\1"!g' +

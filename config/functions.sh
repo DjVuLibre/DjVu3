@@ -142,7 +142,7 @@ escape()
   nonl `(for i
   do
     echo "$i"
-  done)|${sed} -e 's,@%%@,@%%@p,g' -e 's,!,@%%@e,g' -e 's, ,@%%@s,g' -e 's,	,@%%@t,g' -e 's,\\$,@%%@d,g' -e 's,",@%%@q,g' -e 's,'"'"',@%%@a,g'`
+  done)|${sed} -e 's,@%%@,@%%@p,g' -e 's,!,@%%@e,g' -e 's, ,@%%@s,g' -e 's,	,@%%@t,g' -e 's,\\$,@%%@d,g' -e 's,",@%%@q,g' -e 's,'"'"',@%%@a,g' -e 's,\\\\,@%%@z,g'`
 }
 
 unescape()
@@ -150,7 +150,7 @@ unescape()
   (for i
    do
     echo "$i"
-  done)|sed  -e 's,@%%@a,'"'"',g' -e 's,@%%@q,",g' -e 's,@%%@d,\$,g' -e 's,@%%@t,	,g' -e 's,@%%@s, ,g' -e 's,@%%@e,!,g' -e 's,@%%@p,@%%@,g'
+  done)|sed  -e 's,@%%@a,'"'"',g' -e 's,@%%@q,",g' -e 's,@%%@d,\$,g' -e 's,@%%@t,	,g' -e 's,@%%@s, ,g' -e 's,@%%@e,!,g' -e 's,@%%@p,@%%@,g' -e 's,@%%@z,\\,g'
 }
 
 # Make a test file with echo on CONFIG_LOG
