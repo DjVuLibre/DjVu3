@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocument.cpp,v 1.177 2001-06-18 18:50:37 lchen Exp $
+// $Id: DjVuDocument.cpp,v 1.178 2001-06-18 22:48:36 lchen Exp $
 // $Name:  $
 
 
@@ -132,7 +132,7 @@ DjVuDocument::start_init(
    {
      if (!init_data_pool)
        G_THROW( ERR_MSG("DjVuDocument.empty_url") );
-     if(!init_url)
+     if(init_url.is_empty())
      {
        init_url=invent_url("document.djvu");
      }
