@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: Arrays.h,v 1.3 1999-06-08 20:36:24 leonb Exp $
+//C- $Id: Arrays.h,v 1.4 1999-06-15 21:25:27 eaf Exp $
 
 
 #ifndef _ARRAYS_H_
@@ -19,7 +19,6 @@
 #include <string.h>
 #include <new.h>
 #include "GException.h"
-#include "GSmartPointer.h"
 
 #if defined(EXTERNAL_TEMPLATES) && defined(__GNUC__)
 #pragma interface
@@ -71,14 +70,66 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@research.att.com> -- Copy-on-demand implementation.
     @version 
-    #$Id: Arrays.h,v 1.3 1999-06-08 20:36:24 leonb Exp $# */
+    #$Id: Arrays.h,v 1.4 1999-06-15 21:25:27 eaf Exp $# */
 //@{
+
+// Auxiliary classes: Will be used in place of GPBase and GPEnabled objects
+class _ArrayRep
+{
+   friend class	_ArrayBase;
+public:
+   _ArrayRep(void) : count(0) {}
+   _ArrayRep(const _ArrayRep &) {}
+   virtual ~_ArrayRep(void) {}
+
+   _ArrayRep & operator=(const _ArrayRep &) { return *this; }
+
+   int		get_count(void) const { return count; }
+private:
+   int		count;
+
+   void		ref(void) { count++; }
+   void		unref(void) { if (--count==0) delete this; }
+};
+
+class _ArrayBase
+{
+public:
+   _ArrayBase(void) : rep(0) {}
+   _ArrayBase(const _ArrayBase & ab) : rep(0)
+   {
+      if (ab.rep) ab.rep->ref();
+      rep=ab.rep;
+   }
+   _ArrayBase(_ArrayRep * ar) : rep(0)
+   {
+      if (ar) ar->ref();
+      rep=ar;
+   }
+   virtual ~_ArrayBase(void)
+   {
+      if (rep) { rep->unref(); rep=0; }
+   }
+
+   _ArrayRep *	get(void) const { return rep; }
+   _ArrayBase & assign(_ArrayRep * ar)
+   {
+      if (ar) ar->ref();
+      if (rep) rep->unref();
+      rep=ar;
+      return *this;
+   }
+   _ArrayBase &	operator=(const _ArrayBase & ab) { return assign(ab.rep); }
+   bool		operator==(const _ArrayBase & ab) { return rep==ab.rep; }
+private:
+   _ArrayRep	* rep;
+};
 
 // Internal "Array repository" holding the pointer to the actual data,
 // data bounds, etc. It copes with data elements with the help of five
 // static functions which pointers are supposed to be passed to the
 // constructor.
-class ArrayRep : public GPEnabled
+class ArrayRep : public _ArrayRep
 {
 public:
    ArrayRep(int elsize,
@@ -198,7 +249,7 @@ ArrayRep::touch(int n)
     and \Ref{TArray} instead.
     */
     
-class ArrayBase : protected GP<ArrayRep>
+class ArrayBase : protected _ArrayBase
 {
 protected:
    void		check(void);
