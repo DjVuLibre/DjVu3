@@ -9,9 +9,9 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: ByteStream.cpp,v 1.13 1999-08-30 19:28:31 leonb Exp $
+//C- $Id: ByteStream.cpp,v 1.14 1999-09-28 15:05:19 leonb Exp $
 
-// File "$Id: ByteStream.cpp,v 1.13 1999-08-30 19:28:31 leonb Exp $"
+// File "$Id: ByteStream.cpp,v 1.14 1999-09-28 15:05:19 leonb Exp $"
 // - Author: Leon Bottou, 04/1997
 
 #ifdef __GNUC__
@@ -224,6 +224,7 @@ StdioByteStream::StdioByteStream(FILE *f, const char *mode)
       case 'b': break;
       default: THROW("Illegal mode in StdioByteStream");
       }
+  tell();
 }
 
 StdioByteStream::StdioByteStream(const char *filename, const char *mode)
@@ -262,6 +263,7 @@ StdioByteStream::StdioByteStream(const char *filename, const char *mode)
       if (!fp)
         THROW("Illegal mode for stdin/stdout file descriptor");
     }
+  tell();
 }
 
 StdioByteStream::~StdioByteStream()
@@ -337,8 +339,11 @@ StdioByteStream::seek(long offset, int whence)
 {
   if (!can_seek)
     ByteStream::seek(offset, whence);
+  else if (whence==SEEK_SET && offset>=0 && offset==ftell(fp))
+    return;
   else if (fseek(fp, offset, whence))
     THROW(strerror(errno));
+  tell();
 }
 
 
