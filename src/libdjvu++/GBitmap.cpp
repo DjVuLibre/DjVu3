@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GBitmap.cpp,v 1.43 2001-01-04 22:04:55 bcr Exp $
+// $Id: GBitmap.cpp,v 1.44 2001-01-06 00:54:56 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -45,7 +45,7 @@
 #include "GException.h"
 #include <string.h>
 
-// File "$Id: GBitmap.cpp,v 1.43 2001-01-04 22:04:55 bcr Exp $"
+// File "$Id: GBitmap.cpp,v 1.44 2001-01-06 00:54:56 bcr Exp $"
 // - Author: Leon Bottou, 05/1997
 
 
@@ -878,12 +878,12 @@ GBitmap::save_pbm(ByteStream &bs, int raw)
     const unsigned char * const runs_end=rle+rlelength;
     const int count=(ncolumns+7)>>3;
     unsigned char *buf=new unsigned char[count];
+    GPBuffer<unsigned char> gbuf(buf,count);
     while(runs<runs_end)
     {
       rle_get_bitmap(ncolumns,runs,buf,false);
       bs.writall(buf,count);
     }
-    delete [] buf;
   }else
   {
     if (!bytes)
