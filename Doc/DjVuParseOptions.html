@@ -69,10 +69,10 @@
 <A HREF="#DOC.1.5.35.2.2.15"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>inline   int <B>GetBest</B>(const char * const names[], bool=false)
 <DD><I>Same as above, but NULL terminated </I>
 <DT>
-<A HREF="#DOC.1.5.35.2.2.10"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>GetInteger</B>(const int token, const int errval=0) const 
+<A HREF="#DOC.1.5.35.2.2.10"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>GetInteger</B>( const int token, const int errval=0, const int falseval=0, const int trueval=1) const 
 <DD><I>This just checks for TRUE, and if not does an atoi() conversion.</I>
 <DT>
-<A HREF="#DOC.1.5.35.2.2.11"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>inline   int <B>GetInteger</B>(const char xname[], const int errval=0) const 
+<A HREF="#DOC.1.5.35.2.2.11"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>inline   int <B>GetInteger</B>(const char xname[], const int errval=0, const int falseval=0, const int trueval=1) const 
 <DD><I>This is just a short cut, when a token value is only needed for one  lookup.</I>
 <DT>
 <A HREF="#DOC.1.5.35.2.2.12"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>GetNumber</B>(const int token, const int errval=0) const 
@@ -254,15 +254,15 @@ to have two values f the same precedence.
 <DL><DT><DD></DL><P>
 <A NAME="GetInteger">
 <A NAME="DOC.1.5.35.2.2.10">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int GetInteger(const int token, const int errval=0) const </B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int GetInteger( const int token, const int errval=0, const int falseval=0, const int trueval=1) const </B></TT>
 <DD>This just checks for TRUE, and if not does an atoi() conversion. 
-Anything beginning with [Tt] is returned as 1, [Ff] is returned 
-as 0, and anything else that is not a legal integer is returned 
+Anything beginning with [Tt] is returned as trueval, [Ff] is returned 
+as falseval, and anything else that is not a legal integer is returned 
 as errval. 
 <DL><DT><DD></DL><P>
 <A NAME="GetInteger">
 <A NAME="DOC.1.5.35.2.2.11">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>inline   int GetInteger(const char xname[], const int errval=0) const </B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>inline   int GetInteger(const char xname[], const int errval=0, const int falseval=0, const int trueval=1) const </B></TT>
 <DD>This is just a short cut, when a token value is only needed for one 
 lookup. 
 <DL><DT><DD></DL><P>
