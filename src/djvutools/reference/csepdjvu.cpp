@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: csepdjvu.cpp,v 1.4 2000-11-09 20:15:05 jmw Exp $
+// $Id: csepdjvu.cpp,v 1.5 2000-12-15 01:18:52 bcr Exp $
 // $Name:  $
 
 
@@ -109,7 +109,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: csepdjvu.cpp,v 1.4 2000-11-09 20:15:05 jmw Exp $# */
+    #$Id: csepdjvu.cpp,v 1.5 2000-12-15 01:18:52 bcr Exp $# */
 //@{
 //@}
 
@@ -392,8 +392,10 @@ CRLEImage::CRLEImage(BufferByteStream &bs)
           x = bs.get();
           if (x >= 0xc0)
             x = (bs.get()) + ((x - 0xc0) << 8);
-          if (c+x > width || bs.eof())
+          if (c+x > width)
             G_THROW("csepdjvu: corrupted input file (lost RLE synchronization)");
+          else if (c+x < width && bs.eof())
+            G_THROW("csepdjvu: corrupted input file (premature EOF)");
           if (p)
             {
               px[0] = c;
@@ -436,6 +438,9 @@ CRLEImage::CRLEImage(BufferByteStream &bs)
           x = (x & 0xfffff);
           if (c+x > width)
             G_THROW("csepdjvu: corrupted input file (lost RLE synchronization)");
+          else if(c+x < width && bs.eof())
+            G_THROW("csepdjvu: corrupted input file (premature EOF)");
+
           if (p >= 0 && p < ncolors)
             {
               px[0] = c;
