@@ -84,23 +84,32 @@ archive=`cd "$packagedir" 1>>/dev/null 2>>/dev/null;pwd`/archive.tar
 action="cvf"
 for i in `sed "s,@%VERSION%@,$version,g"< "./SRCDIR/$filelist"` 
 do
-  if [ -d "./$i" ]
-  then
-    find "$i" -name CVS -prune -o -type f -exec tar "$action" "$archive" \{\} \;
-  elif [ -d "./SRCDIR/$i" ]
-  then
-    (cd ./SRCDIR;find "$i" -name CVS -prune -o -type f -exec tar "$action" "$archive" \{\} \;)
-  elif [ -r "$i" ] 
-  then
-    tar "$action" "$archive" "$i"
-  elif [ -r "./SRCDIR/$i" ]
-  then
-    (cd ./SRCDIR;tar "$action" "$archive" "$i")
-  else
-    echo "$i does not exist." 1>&2
-    rm -rf "$packagedir"
-    exit 1
-  fi
+  (
+    if [ -r "./examples/$i" ] 
+    then
+      cd examples
+    elif [ -r "./SRCDIR/examples/$i" ] 
+    then
+      cd ./SRCDIR/examples
+    fi
+    if [ -d "./$i" ]
+    then
+      find "$i" -name CVS -prune -o -type f -exec tar "$action" "$archive" \{\} \;
+    elif [ -d "./SRCDIR/$i" ]
+    then
+      (cd ./SRCDIR;find "$i" -name CVS -prune -o -type f -exec tar "$action" "$archive" \{\} \;)
+    elif [ -r "$i" ] 
+    then
+      tar "$action" "$archive" "$i"
+    elif [ -r "./SRCDIR/$i" ]
+    then
+      (cd ./SRCDIR;tar "$action" "$archive" "$i")
+    else
+      echo "$i does not exist." 1>&2
+      rm -rf "$packagedir"
+      exit 1
+    fi
+  )
   action="rvf"
 done
 cd packages
