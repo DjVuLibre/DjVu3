@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DataPool.cpp,v 1.92 2001-08-24 21:50:09 docbill Exp $
+// $Id: DataPool.cpp,v 1.93 2001-08-31 23:08:44 docbill Exp $
 // $Name:  $
 
 
@@ -320,21 +320,38 @@ void
 FCPools::clean(void)
 {
   GCriticalSectionLock lock(&map_lock);
-  for(GPosition pos=map;pos;++pos)
+  static int count=0;
+  if(! count++)
   {
-    GPList<DataPool> &p=map[pos];
-    for(GPosition pos2=p;pos2;++pos2)
+    GPosition pos=map;
+    while(pos)
     {
-      if(p[pos2]->get_count() < 2)
+      GPList<DataPool> &p=map[pos];
+      if(p.isempty())
       {
-        p.del(pos2);
+        map.del(pos);
+        pos=map;
+      }else
+      {
+        GPosition pos2=p;
+        ++pos;
+        while(pos2)
+        {
+          GP<DataPool> &pp=p[pos2];      
+          if(pp->get_count() < 2)
+          {
+            p.del(pos2);
+            pos2=p;
+            pos=map;
+          }else
+          {
+            ++pos2;
+          }
+        }
       }
     }
-    if(p.isempty())
-    {
-      map.del(pos);
-    }
   }
+  --count;
 }
 void
 FCPools::add_pool(const GURL &url, GP<DataPool> pool)
