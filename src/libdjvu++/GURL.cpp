@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GURL.cpp,v 1.50.2.2 2001-03-29 00:49:59 bcr Exp $
+// $Id: GURL.cpp,v 1.50.2.3 2001-03-29 19:09:12 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -1064,7 +1064,7 @@ GURL::UTF8::UTF8(const GString &xurl,const GURL &codebase)
 
 GURL::Native::Native(const GString &xurl,const GURL &codebase)
 {
-  GURL::UTF8::UTF8 retval(xurl.getNative2UTF8(),codebase);
+  GURL::UTF8 retval(xurl.getNative2UTF8(),codebase);
   url=retval.get_string();
 }
 
@@ -1162,7 +1162,7 @@ GURL::UTF8Filename(void) const
 #endif
     
 #ifdef WIN32
-    if (!is_file(retval)) 
+    if (!is_file()) 
     {
       // Search for a drive letter (encoded a la netscape)
       if (url_ptr[1]=='|' && url_ptr[2]== slash)
@@ -1311,7 +1311,7 @@ GURL::deletefile(void) const
     USES_CONVERSION;
     retval=is_dir()
       ?RemoveDirectory(A2CT(NativeFilename()))
-      :DeleteFile(A2CT(ilename().getUTF82Native())); //MBCS cvt
+      :DeleteFile(A2CT(NativeFilename())); //MBCS cvt
 #else
     retval=is_dir()
       ?rmdir(NativeFilename())
@@ -1347,7 +1347,6 @@ GURL::listdir(void) const
     const GString gbase=base().pathname();
     if( handle != INVALID_HANDLE_VALUE)
     {
-      retval=0;
       do
       {
         GURL::UTF8 Entry(finddata.cFileName,*this);
@@ -1506,6 +1505,7 @@ GURL::expand_name(const char *fname, const char *from)
 #elif defined (WIN32) && !defined (UNDER_CE) // WIN32 implementation
   // Handle base
   strcpy(string_buffer, (char const *)(from?expand_name(from):GOS::cwd()));
+  GString native;
   if (fname)
   {
     char *s = string_buffer;
@@ -1537,7 +1537,7 @@ GURL::expand_name(const char *fname, const char *from)
           drv[2]= dot ;
           drv[3]=0;
           GetFullPathName(drv, MAXPATHLEN, string_buffer, &s);
-		  string_buffer = (char*)(const char *)((GString)string_buffer).getNative2UTF8();//MBCS cvt
+		  strcpy(string_buffer,(const char *)GString(string_buffer).getNative2UTF8());
           s = string_buffer;
         }
         fname += 2;
@@ -1570,7 +1570,15 @@ GURL::expand_name(const char *fname, const char *from)
           && (fname[2]== slash || fname[2]==backslash || !fname[2]))
         {
           fname += 2;
-          strcpy(string_buffer, dirname(string_buffer));
+		  char *back=_tcsrchr(string_buffer,backslash);
+		  char *forward=_tcsrchr(string_buffer,slash);
+		  if(back>forward)
+		  {
+			*back=0;
+		  }else if(forward)
+		  {
+            *forward=0;
+		  }
           s = string_buffer;
           continue;
         }
