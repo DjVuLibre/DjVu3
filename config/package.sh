@@ -1,3 +1,4 @@
+#!/bin/sh
 #C-
 #C- DjVu® Reference Library (v. 3.0)
 #C- 
@@ -31,10 +32,12 @@
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #C- 
 #
-# $Id: package.sh,v 1.13 2000-11-09 20:15:05 jmw Exp $
+# $Id: package.sh,v 1.14 2000-12-06 17:31:51 bcr Exp $
 # $Name:  $
 
-#!/bin/sh
+# EXIT ON ERROR
+set -e
+
 name="$1"
 if [ -z "$name" ] 
 then
@@ -114,7 +117,7 @@ then
   echo "Version not found in TOPDIR/SRCDIR/src/include/DjVuVersion.h" 1>&2
   exit 1
 fi
-version=`echo $version|tr ' ' '_'`
+version=`echo $version|tr ' ' '-'`
 srcfilelist="$srcdir/archive.list"
 filelist="$packagedir/archive.list"
 if [ ! -r "$srcfilelist" ]
@@ -125,8 +128,11 @@ fi
 
 echo "Copying files"
 rm -rf "$packagedir"
-mkdir packages 2>>/dev/null
-mkdir "$packagedir" 2>>/dev/null
+if [ ! -d "packages" ] 
+then
+  mkdir packages
+fi
+mkdir "$packagedir"
 abspackagedir=`cd "$packagedir" 1>>/dev/null 2>>/dev/null;pwd`
 for i in `cd $srcdir 2>>/dev/null 1>>/dev/null;ls|sed -e 's,%,@%%@,g' -e 's, ,@%s%@,g'` 
 do

@@ -31,7 +31,7 @@
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #C- 
 #
-# $Id: sys.sh,v 1.21 2000-11-09 20:15:05 jmw Exp $
+# $Id: sys.sh,v 1.22 2000-12-06 17:31:51 bcr Exp $
 # $Name:  $
 
 # This sets the variable SYS INCS JOBJ and DEFS
@@ -81,7 +81,6 @@ if [ -z "$SYS_SET" ] ; then
       SYS=linux-libc5
     fi
     SENTINAL=src/3rd-party/sentinal_lm_60/linux
-    RTK="src/3rd-party/rtk3/$SYS"
   elif [ "$SYS" = "SunOS" ] ; then
     s=`"${uname}" -r|"${sed}" 's,\(5.[4-9]\)[.0-9]*,SOLARIS,'`
     WHOLEARCHIVESEP=","
@@ -102,6 +101,11 @@ if [ -z "$SYS_SET" ] ; then
     NOWHOLEARCHIVE="-Wl,-notall"
     SENTINAL=src/3rd-party/sentinal_lm_60/irixn32
     strip=""
+  fi
+  RTK="src/3rd-party/rtk3/$SYS"
+  if [ ! -d "${CONFIG_DIR}/../$RTK" ]
+  then 
+    RTK=""
   fi
   if [ -n "$SENTINAL" ]
   then
