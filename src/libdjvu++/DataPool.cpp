@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.cpp,v 1.2 1999-05-25 19:42:27 eaf Exp $
+//C- $Id: DataPool.cpp,v 1.3 1999-08-06 21:09:22 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -337,7 +337,6 @@ DataRange::init(void)
    if (length<0 && pool->is_eof()) length=pool->get_size()-start;
    if (length<0)
    {
-      GPosition pos=triggers_list;
       pool->add_trigger(-1, static_trigger_cb, this);
       pool->add_trigger(start+32, static_trigger_cb, this);
    }
@@ -360,8 +359,12 @@ DataRange::~DataRange(void)
    DEBUG_MSG("DataRange::~DataRange(): destroying, this=" << this << "\n");
    DEBUG_MAKE_INDENT(3);
 
-   GCriticalSectionLock lock(&trigger_lock);
+   GCriticalSectionLock lock1(&trigger_lock);
    pool->del_trigger(static_trigger_cb, this);
+
+   GCriticalSectionLock lock2(&triggers_lock);
+   for(GPosition pos=passed_triggers_list;pos;++pos)
+      pool->del_trigger(static_trigger_relay_cb, passed_triggers_list[pos]);
 
    DEBUG_MSG("done destroying DataRange\n");
 }
@@ -422,13 +425,32 @@ DataRange::trigger_cb(void)
 	 // Since we know the length now, we can pass the list of triggers
 	 // to the DataPool.
       GCriticalSectionLock lock(&triggers_lock);
-      for(GPosition pos=triggers_list;pos;++pos)
+      for(GPosition pos=end_triggers_list;pos;++pos)
       {
-	 GP<Trigger> trigger=triggers_list[pos];
-	 pool->add_trigger(start+length-1, trigger->callback, trigger->cl_data);
+	 GP<Trigger> trigger=end_triggers_list[pos];
+	 pass_trigger(start+length-1, trigger->callback, trigger->cl_data);
       }
-      triggers_list.empty();
+      end_triggers_list.empty();
    }
+}
+
+void
+DataRange::static_trigger_relay_cb(void * cl_data)
+{
+   DEBUG_MSG("DataRange::static_trigger_relay_cb(): relaying trigger request\n");
+   DEBUG_MAKE_INDENT(3);
+   
+   Trigger * trigger=(Trigger *) cl_data;
+   if (trigger->callback) trigger->callback(trigger->cl_data);
+}
+
+void
+DataRange::pass_trigger(int thresh, void (* callback)(void *), void * cl_data)
+{
+   GP<Trigger> trigger=new Trigger(callback, cl_data);
+   pool->add_trigger(thresh, static_trigger_relay_cb, trigger);
+   GCriticalSectionLock lock(&triggers_lock);
+   passed_triggers_list.append(trigger);
 }
 
 void
@@ -436,12 +458,12 @@ DataRange::add_trigger(int thresh, void (* callback)(void *), void * cl_data)
 {
    if (length>=0 && thresh>=length)
       THROW("Trigger threshold is beyond DataRange.");
-   if (thresh>=0) pool->add_trigger(start+thresh, callback, cl_data);
-   else if (length>=0) pool->add_trigger(start+length-1, callback, cl_data);
+   if (thresh>=0) pass_trigger(start+thresh, callback, cl_data);
+   else if (length>=0) pass_trigger(start+length-1, callback, cl_data);
    else
    {
       GCriticalSectionLock lock(&triggers_lock);
-      triggers_list.append(new Trigger(callback, cl_data));
+      end_triggers_list.append(new Trigger(callback, cl_data));
    }
 }
 
@@ -449,17 +471,28 @@ void
 DataRange::del_trigger(void (* callback)(void *), void * cl_data)
 {
    GCriticalSectionLock lock(&triggers_lock);
-   for(GPosition pos=triggers_list;pos;)
+   GPosition pos;
+   for(pos=end_triggers_list;pos;)
    {
-      GP<Trigger> t=triggers_list[pos];
+      GP<Trigger> t=end_triggers_list[pos];
       if (t->callback==callback && t->cl_data==cl_data)
       {
 	 GPosition this_pos=pos;
 	 ++pos;
-	 triggers_list.del(this_pos);
+	 end_triggers_list.del(this_pos);
       } else ++pos;
    }
-   pool->del_trigger(callback, cl_data);
+   for(pos=passed_triggers_list;pos;)
+   {
+      GP<Trigger> t=passed_triggers_list[pos];
+      if (t->callback==callback && t->cl_data==cl_data)
+      {
+	 GPosition this_pos=pos;
+	 ++pos;
+	 passed_triggers_list.del(this_pos);
+	 pool->del_trigger(static_trigger_relay_cb, t);
+      } else ++pos;
+   }
 }
 
 void
