@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocEditor.cpp,v 1.10 1999-11-23 18:16:59 eaf Exp $
+//C- $Id: DjVuDocEditor.cpp,v 1.11 1999-11-30 19:01:43 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -35,6 +35,14 @@ DjVuDocEditor::DjVuDocEditor(void)
 DjVuDocEditor::~DjVuDocEditor(void)
 {
    if (tmp_doc_name.length()) GOS::deletefile(tmp_doc_name);
+
+   GPosition pos;
+   GCriticalSectionLock lock(&thumb_lock);
+   while((pos=thumb_map))
+   {
+      delete (TArray<char> *) thumb_map[pos];
+      thumb_map.del(pos);
+   }
 }
 
 void
@@ -42,6 +50,9 @@ DjVuDocEditor::init(void)
 {
    DEBUG_MSG("DjVuDocEditor::init() called\n");
    DEBUG_MAKE_INDENT(3);
+
+      // If you remove this check be sure to delete thumb_map
+   if (initialized) THROW("DjVuDocEditor has already been initialized.");
    
    doc_url=GOS::filename_to_url(GOS::expand_name("noname.djvu", GOS::cwd()));
    
@@ -65,6 +76,9 @@ DjVuDocEditor::init(const char * fname)
 {
    DEBUG_MSG("DjVuDocEditor::init() called: fname='" << fname << "'\n");
    DEBUG_MAKE_INDENT(3);
+
+      // If you remove this check be sure to delete thumb_map
+   if (initialized) THROW("DjVuDocEditor has already been initialized.");
    
       // First - create a temporary DjVuDocument and check its type
    doc_pool=new DataPool(fname);
@@ -98,6 +112,20 @@ DjVuDocEditor::init(const char * fname)
    initialized=true;
    DjVuDocument::init(doc_url, this);
    wait_for_complete_init();
+
+      // Cool. Now extract the thumbnails...
+   GCriticalSectionLock lock(&thumb_lock);
+   int pages_num=get_pages_num();
+   for(int page_num=0;page_num<pages_num;page_num++)
+   {
+      GP<DataPool> pool=get_thumbnail(page_num, true);
+      if (pool)
+      {
+	 TArray<char> * data=new TArray<char>(pool->get_size()-1);
+	 pool->get_data(*data, 0, data->size());
+	 thumb_map[page_to_url(page_num)]=data;
+      }
+   }
 }
 
 GP<DataPool>
@@ -468,10 +496,6 @@ DjVuDocEditor::insert_file(const char * file_name, bool is_page,
 	 GCriticalSectionLock lock(&files_lock);
 	 files_map[file_url]->pool=new_file_pool;
       }
-
-      StdioByteStream str("/tmp/tmp.djvu", "wb");
-      str_out.seek(0);
-      str.copy(str_out);
    } CATCH(exc) {
       if (errors.length()) errors+="\n\n";
       errors+=exc.get_cause();
@@ -705,9 +729,72 @@ DjVuDocEditor::remove_page(int page_num, bool remove_unref)
    remove_file(djvm_dir->page_to_file(page_num)->id, remove_unref);
 }
 
+int
+DjVuDocEditor::get_thumbnails_num(void) const
+{
+   GCriticalSectionLock lock((GCriticalSection *) &thumb_lock);
+
+   int cnt=0;
+   int pages_num=get_pages_num();
+   for(int page_num=0;page_num<pages_num;page_num++)
+      if (thumb_map.contains(page_to_url(page_num))) cnt++;
+   return cnt;
+}
+
+int
+DjVuDocEditor::get_thumbnails_size(void) const
+{
+   DEBUG_MSG("DjVuDocEditor::remove_thumbnails(): doing it\n");
+   DEBUG_MAKE_INDENT(3);
+
+   GCriticalSectionLock lock((GCriticalSection *) &thumb_lock);
+   
+   GPosition pos;
+   int pages_num=get_pages_num();
+   for(int page_num=0;page_num<pages_num;page_num++)
+      if (thumb_map.contains(page_to_url(page_num), pos))
+      {
+	 TArray<char> & data=*(TArray<char> *) thumb_map[pos];
+	 MemoryByteStream str;
+	 str.writall((const char *) data, data.size());
+	 str.seek(0);
+	 GP<IWPixmap> iwpix=new IWPixmap;
+	 iwpix->decode_chunk(str);
+	 
+	 int width=iwpix->get_width();
+	 int height=iwpix->get_height();
+	 return width<height ? width : height;
+      }
+   return -1;
+}
+
+void
+DjVuDocEditor::remove_thumbnails(void)
+{
+   DEBUG_MSG("DjVuDocEditor::remove_thumbnails(): doing it\n");
+   DEBUG_MAKE_INDENT(3);
+
+   DEBUG_MSG("removing from DjVmDir\n");
+   GPList<DjVmDir::File> xfiles_list=djvm_dir->get_files_list();
+   for(GPosition pos=xfiles_list;pos;++pos)
+   {
+      GP<DjVmDir::File> f=xfiles_list[pos];
+      if (f->is_thumbnails()) djvm_dir->delete_file(f->id);
+   }
+
+   DEBUG_MSG("clearing thumb_map\n");
+   GPosition pos;
+   GCriticalSectionLock lock(&thumb_lock);
+   while((pos=thumb_map))
+   {
+      delete (TArray<char> *) thumb_map[pos];
+      thumb_map.del(pos);
+   }
+}
+
 void
 DjVuDocEditor::generate_thumbnails(int thumb_size, int images_per_file,
-				   void (* cb)(int page_num, void *),
+				   bool (* cb)(int page_num, void *),
 				   void * cl_data)
 {
    DEBUG_MSG("DjVuDocEditor::generate_thumbnails(): doing it\n");
@@ -728,30 +815,49 @@ DjVuDocEditor::generate_thumbnails(int thumb_size, int images_per_file,
    GPArray<MemoryByteStream> thumb_str(pages_num-1);
    for(page_num=0;page_num<pages_num;page_num++)
    {
-      if (cb) cb(page_num, cl_data);
-      
-      GP<DjVuImage> dimg=get_page(page_num);
-      dimg->wait_for_complete_decode();
-      
-      GRect rect(0, 0, thumb_size, dimg->get_height()*thumb_size/dimg->get_width());
-      GP<GPixmap> pm=dimg->get_pixmap(rect, rect, get_thumbnails_gamma());
-      if (!pm)
+      if (cb) if (cb(page_num, cl_data)) return;
+
+      GPosition pos;
+      GCriticalSectionLock lock(&thumb_lock);
+      if (thumb_map.contains(page_to_url(page_num), pos))
       {
-	 GP<GBitmap> bm=dimg->get_bitmap(rect, rect, sizeof(int));
-	 pm=new GPixmap(*bm);
-      }
-      if (!pm) THROW("Unable to render image of page "+GString(page_num));
+	 GP<MemoryByteStream> str=new MemoryByteStream;
+	 TArray<char> & data=*(TArray<char> *) thumb_map[pos];
+	 str->writall((const char *) data, data.size());
+	 str->seek(0);
+	 thumb_str[page_num]=str;
+      } else
+      {
+	 GP<DjVuImage> dimg=get_page(page_num);
+	 dimg->wait_for_complete_decode();
       
-	 // Store and compress the pixmap
-      GP<IWPixmap> iwpix=new IWPixmap(pm);
-      GP<MemoryByteStream> str=new MemoryByteStream;
-      IWEncoderParms parms;
-      parms.slices=97;
-      parms.bytes=0;
-      parms.decibels=0;
-      iwpix->encode_chunk(*str, parms);
-      str->seek(0);
-      thumb_str[page_num]=str;
+	 GRect rect(0, 0, thumb_size, dimg->get_height()*thumb_size/dimg->get_width());
+	 GP<GPixmap> pm=dimg->get_pixmap(rect, rect, get_thumbnails_gamma());
+	 if (!pm)
+	 {
+	    GP<GBitmap> bm=dimg->get_bitmap(rect, rect, sizeof(int));
+	    pm=new GPixmap(*bm);
+	 }
+	 if (!pm) THROW("Unable to render image of page "+GString(page_num));
+      
+	    // Store and compress the pixmap
+	 GP<IWPixmap> iwpix=new IWPixmap(pm);
+	 GP<MemoryByteStream> str=new MemoryByteStream;
+	 IWEncoderParms parms;
+	 parms.slices=97;
+	 parms.bytes=0;
+	 parms.decibels=0;
+	 iwpix->encode_chunk(*str, parms);
+	 str->seek(0);
+	 thumb_str[page_num]=str;
+      }
+   }
+
+   for(page_num=0;page_num<pages_num;page_num++)
+   {
+      GURL url=page_to_url(page_num);
+      if (!thumb_map.contains(url))
+	 thumb_map[url]=new TArray<char>(thumb_str[page_num]->get_data());
    }
 
    DEBUG_MSG("creating DjVuFiles to contain new thumbnails...\n");
