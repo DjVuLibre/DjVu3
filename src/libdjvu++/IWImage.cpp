@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: IWImage.cpp,v 1.44 2001-01-20 01:55:40 bcr Exp $
+// $Id: IWImage.cpp,v 1.45 2001-01-20 02:03:56 bcr Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 08/1998
@@ -501,7 +501,7 @@ static int zigzagloc[1024] = {
 
 struct IW44Image::Alloc // DJVU_CLASS
 {
-  struct Alloc *next;
+  Alloc *next;
   short data[IWALLOCSIZE];
 };
 
@@ -877,7 +877,7 @@ IW44Image::Map::image(int subsample, const GRect &rect,
 
 // Constant
 
-static const struct { const int start; const int size; }  
+static const struct { int start; int size; }  
 bandbuckets[] = 
 {
   // Code first bucket and number of buckets in each band

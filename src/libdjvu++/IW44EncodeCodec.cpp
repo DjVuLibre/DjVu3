@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: IW44EncodeCodec.cpp,v 1.1 2001-01-20 01:55:40 bcr Exp $
+// $Id: IW44EncodeCodec.cpp,v 1.2 2001-01-20 02:03:56 bcr Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 08/1998
@@ -90,7 +90,7 @@ static const float iw_norm[16] = {
 static const int iw_shift  = 6;
 static const int iw_round  = (1<<(iw_shift-1));
 
-static const struct { const int start; const int size; }  
+static const struct { int start; int size; }  
 bandbuckets[] = 
 {
   // Code first bucket and number of buckets in each band
@@ -485,7 +485,13 @@ IW44Image::Transform::Encode::RGB_to_Y(const GPixel *p, int w, int h, int rowsiz
     }
 }
 
+#ifdef min
+#undef min
+#endif
 static inline int min(const int x,const int y) {return (x<y)?x:y;}
+#ifdef max
+#undef max
+#endif
 static inline int max(const int x,const int y) {return (x>y)?x:y;}
 
 /* Extracts Cb */
@@ -1053,7 +1059,7 @@ IW44Image::Codec::encode_buckets(ZPCodec &zp, int bit, int band,
                   if (ecoeff <= 3*thres)
                     zp.encoder(pix, ctxMant);                      
                   else
-                    zp.IWencoder(pix);
+					  zp.IWencoder(!!pix);
                   // adjust epcoeff
                   epcoeff[i] = ecoeff - (pix ? 0 : thres) + (thres>>1);
                 }

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: IWImage.h,v 1.20 2001-01-20 01:55:40 bcr Exp $
+// $Id: IWImage.h,v 1.21 2001-01-20 02:03:56 bcr Exp $
 // $Name:  $
 
 
@@ -129,7 +129,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: IWImage.h,v 1.20 2001-01-20 01:55:40 bcr Exp $# */
+    #$Id: IWImage.h,v 1.21 2001-01-20 02:03:56 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -194,7 +194,7 @@ public:
   class Map;
   class Block;
   class Codec;
-  class Alloc;
+  struct Alloc;
   struct PrimaryHeader;
   struct SecondaryHeader;
   struct TertiaryHeader1;
