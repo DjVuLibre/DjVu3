@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.cpp,v 1.33 1999-09-29 18:50:46 eaf Exp $
+//C- $Id: DataPool.cpp,v 1.34 1999-09-29 20:12:41 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -70,10 +70,18 @@ private:
    GCriticalSection	files_lock;
 public:
    static OpenFiles	* get(void);
-   
+
+      // Opend the specified file if necessary (or finds an already open one)
+      // and returns it. The caller (pool) is stored in the list associated
+      // with the stream. Whenever OpenFiles decides, that this stream
+      // had better be closed, it will order every pool from the list to
+      // ZERO their references to it
    void		request_stream(const char * name, DataPool * pool,
 			       GP<StdioByteStream> & stream,
 			       GCriticalSection ** stream_lock);
+      // Removes the pool from the list associated with the stream.
+      // If there is nobody else using this stream, the stream will
+      // be closed too.
    void		stream_released(StdioByteStream * stream, DataPool * pool);
 };
 
@@ -124,15 +132,17 @@ OpenFiles::get(void)
 }
 
 void
-OpenFiles::request_stream(const char * name, DataPool * pool,
+OpenFiles::request_stream(const char * name_in, DataPool * pool,
 			  GP<StdioByteStream> & stream,
 			  GCriticalSection ** stream_lock)
 {
-   DEBUG_MSG("OpenFiles::request_stream(): name='" << name << "'\n");
+   DEBUG_MSG("OpenFiles::request_stream(): name='" << name_in << "'\n");
    DEBUG_MAKE_INDENT(3);
 
    GP<File> file;
 
+   GString name=GOS::expand_name(name_in, GOS::cwd());
+   
       // Check: maybe the stream has already been open by request of
       // another DataPool
    GCriticalSectionLock lock(&files_lock);
@@ -184,6 +194,103 @@ OpenFiles::stream_released(StdioByteStream * stream, DataPool * pool)
 	 files_list.del(this_pos);
       } else ++pos;
    }
+}
+
+//****************************************************************************
+//******************************** FCPools ***********************************
+//****************************************************************************
+
+/** This class is used to maintain a list of DataPools connected to a file.
+    It's important to have this list if we want to do smth with this file
+    like to modify it or just erase. Since any modifications of the file
+    will break DataPools directly connected to it, it would be nice to have
+    a mechanism for signaling all the related DataPools to read data into
+    memory. This is precisely the purpose of this class. */
+class FCPools
+{
+private:
+   GMap<GString, const void *>	map;	// GMap<GString, GList<DataPool *>> in fact
+   GCriticalSection		map_lock;
+
+   static FCPools	* global_ptr;
+public:
+   static FCPools *	get(void);
+      // Adds the <fname, pool> pair into the list
+   void		add_pool(const char * fname, DataPool * pool);
+      // Removes the <fname, pool> pair from the list
+   void		del_pool(const char * fname, DataPool * pool);
+      // Looks for the list of DataPools connected to 'fname' and makes
+      // each of them load the contents of the file into memory
+   void		load_file(const char * fname);
+};
+
+void
+FCPools::add_pool(const char * name_in, DataPool * pool)
+{
+   GCriticalSectionLock lock(&map_lock);
+
+   if (name_in && strlen(name_in))
+   {
+      GString name=GOS::expand_name(name_in, GOS::cwd());
+      GList<void *> * list;
+      GPosition pos;
+      if (map.contains(name, pos)) list=(GList<void *> *) map[pos];
+      else map[name]=list=new GList<void *>();
+      if (!list->contains(pool)) list->append(pool);
+   }
+}
+
+void
+FCPools::del_pool(const char * name_in, DataPool * pool)
+{
+   GCriticalSectionLock lock(&map_lock);
+
+   if (name_in && strlen(name_in))
+   {
+      GString name=GOS::expand_name(name_in, GOS::cwd());
+      GPosition pos;
+      if (map.contains(name, pos))
+      {
+	 GList<void *> * list=(GList<void *> *) map[pos];
+	 GPosition list_pos;
+	 while(list->search(pool, list_pos))
+	    list->del(list_pos);
+	 if (list->isempty())
+	 {
+	    delete list;
+	    map.del(pos);
+	 }
+      }
+   }
+}
+
+void
+FCPools::load_file(const char * name_in)
+{
+   GCriticalSectionLock lock(&map_lock);
+
+   if (name_in && strlen(name_in))
+   {
+      GString name=GOS::expand_name(name_in, GOS::cwd());
+      GPosition pos;
+      if (map.contains(name, pos))
+      {
+	    // We make here a copy of the list because DataPool::load_file()
+	    // will call FCPools::del_pool(), which will modify the list
+	 GList<void *> list=*(GList<void *> *) map[pos];
+	 for(GPosition list_pos=list;list_pos;++list_pos)
+	    ((DataPool *) list[list_pos])->load_file();
+      }
+   }
+}
+
+FCPools	* FCPools::global_ptr;
+
+inline FCPools *
+FCPools::get(void)
+{
+   if (!global_ptr) global_ptr=new FCPools();
+   return global_ptr;
 }
 
 //****************************************************************************
@@ -397,6 +504,9 @@ DataPool::~DataPool(void)
       OpenFiles::get()->stream_released(stream, this);
       stream=0;
    }
+
+   if (fname.length())
+      FCPools::get()->del_pool(fname, this);
    
    {
 	 // Wait until the static_trigger_cb() exits
@@ -486,6 +596,8 @@ DataPool::connect(const char * fname_in, int start_in, int length_in)
       eof_flag=true;
 
       data=0;
+
+      FCPools::get()->add_pool(fname, this);
 
       wake_up_all_readers();
    
@@ -850,7 +962,7 @@ DataPool::load_file(void)
    } else if (fname.length())
    {
       DEBUG_MSG("loading the data.\n");
-      
+
       GCriticalSectionLock lock1(&class_stream_lock);
       if (!stream || !stream_lock)
 	 OpenFiles::get()->request_stream(fname, this, stream, &stream_lock);
@@ -858,6 +970,7 @@ DataPool::load_file(void)
 
       data=new MemoryByteStream();
       block_list.clear();
+      FCPools::get()->del_pool(fname, this);
       fname="";
 
       stream->seek(0, SEEK_SET);
@@ -865,10 +978,17 @@ DataPool::load_file(void)
       int length;
       while((length=stream->read(buffer, 1024)))
 	 add_data(buffer, length);
+	 // No need to set EOF. It should already be set.
 
       OpenFiles::get()->stream_released(stream, this);
       stream=0;
-   }
+   } else DEBUG_MSG("Not connected\n");
+}
+
+void
+DataPool::load_file(const char * name)
+{
+   FCPools::get()->load_file(name);
 }
 
 void

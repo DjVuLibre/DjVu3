@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.h,v 1.23 1999-09-28 16:49:14 eaf Exp $
+//C- $Id: DataPool.h,v 1.24 1999-09-29 20:12:41 eaf Exp $
  
 #ifndef _DATAPOOL_H
 #define _DATAPOOL_H
@@ -44,7 +44,7 @@
 
     @memo Thread safe data storage
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DataPool.h,v 1.23 1999-09-28 16:49:14 eaf Exp $#
+    @version #$Id: DataPool.h,v 1.24 1999-09-29 20:12:41 eaf Exp $#
 */
 
 //@{
@@ -528,6 +528,12 @@ public:
 	  This may be useful when you want to overwrite the file and leave
 	  existing #DataPool#s with valid data. */
    void		load_file(void);
+      /** This function will make every #DataPool# in the program, which
+	  is connected to a file, to load the file contents to the main
+	  memory and close the file. This feature is important when you
+	  want to do something with the file like remove or overwrite it
+	  not affecting the rest of the program. */
+   static void	load_file(const char * name);
 
       // Internal. Used by 'OpenFiles'
    void		clear_stream(void);
