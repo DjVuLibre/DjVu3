@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GCache.h,v 1.3 1999-06-08 15:50:34 leonb Exp $
+//C- $Id: GCache.h,v 1.4 1999-06-08 15:58:58 eaf Exp $
 
 #ifndef _GCACHE_H
 #define _GCACHE_H
@@ -26,6 +26,20 @@
 
 #include <sys/types.h>
 #include <time.h>
+
+/** @name GCache.h
+    Files #"GCache.h"# and #"GCache.cpp"# implement a simple caching class,
+    which is based on \Ref{GMap} and is used by DjVu plugin to cache
+    pages, which have already been decoded.
+
+    See \Ref{GCache} for details.
+    
+    @memo Simple template data caching class.
+    @author Andrei Erofeev <eaf@geocities.com>
+    @version #$Id: GCache.h,v 1.4 1999-06-08 15:58:58 eaf Exp $#
+*/
+
+//@{
 
 // We employ this GCacheItemBase to be able to qsort cache items basing
 // on their sizes.
@@ -94,19 +108,55 @@ GCacheItem<Value>::get_size(void) const
    return value->get_memory_usage();
 }
 
+/** #GCache# is a simple template class for caching data of any type.
+    It is based on \Ref{GMap} class and like \Ref{GMap} it stores inside
+    pairs #<key, value>#. In addition to \Ref{GMap} it keeps track of
+    the age of components and is able to delete them when the total size
+    of the map exceeds some predefined limit.
+
+    Whenever a new item is added, #GCache# recomputes the total size
+    of the cached items, and if it is too big, #GCache# will try to get
+    rid of the oldest items until the size is less than predefined
+    #max_size#. */
 template<class Key, class Value>
 class GCache
 {
 public:
+      /** Constructs the #GCache#
+	  @param max_size Maximum allowed size of the cache in bytes. */
    GCache(int max_size=5*2*1024*1024);
    virtual ~GCache(void);
-   
+
+      /** Attempts to find the value corresponding to #key# and return it.
+	  #ZERO# will be returned if #GCache# does not know anything about the
+	  #key#. If the cache is disabled, #ZERO# will be returned as well. */
    GP<Value> 	get_item(const Key & key);
+      /** Deletes the item corresponding to the key #key#. Does nothing
+	  if the cache is disabled. */
    void		del_item(const Key & key);
+      /** Adds (possibly replaces) pair #<key, value># to the cache.
+	  If the total size of all elements in the cache is greater than
+	  the maximum size, the function will be deleting the oldest items
+	  until the size is OK. Does nothing if the cache is disabled. */
    void		add_item(const Key & key, const GP<Value> & value);
+      /** Clears the cache. All items are deleted. */
    void		clear(void);
+      /** Sets new maximum size. If the total size of all items in the cache
+	  is greater than #max_size#, the cache will be deleting the oldest
+	  items until the size is OK */
    void		set_max_size(int max_size);
+      /** Enables or disables the cache. See \Ref{is_enabled}() for details
+	  @param en - If {\em en} is TRUE, the cache will be enabled.
+	         Otherwise it will be disabled.
+	*/
    void		enable(bool en);
+      /** Returns #TRUE# if the cache is enabled, #FALSE# otherwise.
+	  When a cache is disabled, \Ref{add_item}(), \Ref{get_item}() and
+	  \Ref{del_item}() do nothing. But the {\em maximum size} is preserved
+	  inside the class so that next time the cache is enabled, it will
+	  be configured the same way. Clearly this "enable/disable" thing is
+	  for convenience only. One could easily simulate this behaviour by
+	  setting the {\em maximum size} of the cache to #ZERO#. */
    bool		is_enabled(void) const;
 private:
    GCriticalSection		cache_lock;
@@ -282,6 +332,7 @@ template<class Key, class Value> void
 GCache<Key, Value>::enable(bool en)
 {
    enabled=en;
+   set_max_size(max_size);
 }
 
 template<class Key, class Value> bool
