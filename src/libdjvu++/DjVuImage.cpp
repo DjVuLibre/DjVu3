@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuImage.cpp,v 1.13 1999-05-25 19:42:28 eaf Exp $
+//C- $Id: DjVuImage.cpp,v 1.14 1999-05-26 21:08:25 eaf Exp $
 
 
 #ifdef __GNUC__
@@ -275,7 +275,7 @@ GP<DataRange>
 DjVuImage::request_data(const DjVuPort * src, const GURL & url)
 {
    if (url!=stream_url)
-      THROW("This stream cannot be decoded old way.");
+      THROW("This stream cannot be decoded the old way.");
 
    return new DataRange(stream_pool);
 }
@@ -312,7 +312,7 @@ DjVuImage::decode(ByteStream & str)
    stream_pool->set_eof();
    
    GP<DjVuDocument> doc=new DjVuDocument(stream_url, this);
-   GP<DjVuImage> dimg=doc->get_page(0);
+   GP<DjVuImage> dimg=doc->get_page(-1);
    file=dimg->get_djvu_file();
    file->wait_for_finish();
 
