@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: DjVuAnno.cpp,v 1.60 2000-12-05 21:41:21 fcrary Exp $
+// $Id: DjVuAnno.cpp,v 1.61 2000-12-09 00:32:10 mchen Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -833,6 +833,7 @@ DjVuANT::get_map_areas(GLParser & parser)
   GPList<GMapArea> map_areas;
   
   GPList<GLObject> list=parser.get_list();
+
   for(GPosition pos=list;pos;++pos)
   {
     GLObject & obj=*list[pos];
@@ -938,9 +939,11 @@ DjVuANT::get_map_areas(GLParser & parser)
         } // if (map_area) ...
       } G_CATCH_ALL {} G_ENDCATCH;
     } // if (...get_name()==GMapArea::MAPAREA_TAG)
-   } // while(item==...)
+  } // while(item==...)
    
-   return map_areas;
+  DEBUG_MSG("map area list size = " << list.size() << "\n");
+  
+  return map_areas;
 }
 
 void
