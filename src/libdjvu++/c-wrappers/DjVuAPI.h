@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuAPI.h,v 1.24 2000-01-23 03:16:39 bcr Exp $
+ *C- $Id: DjVuAPI.h,v 1.25 2000-01-23 22:01:34 bcr Exp $
  *
  * The main header file for the DjVu API
  */
@@ -17,7 +17,10 @@
 
 /* 
  * $Log: DjVuAPI.h,v $
- * Revision 1.24  2000-01-23 03:16:39  bcr
+ * Revision 1.25  2000-01-23 22:01:34  bcr
+ * Add djvu_import_buffer().
+ *
+ * Revision 1.24  2000/01/23 03:16:39  bcr
  * Cleaned up the header files a bit more.  Eventually we'll reach something
  * that is understandable.
  *
@@ -131,6 +134,15 @@ djvu_import_fileno( int fileno);
  */
 DJVUAPI djvu_export
 djvu_export_fileno( int fileno);
+
+
+/* Open a user allocated buffer as a stream for reading.  The buffer should
+ * not be free'd until after the djvu_import stream is closed.  This type of
+ * stream is most useful for memmap files,  or files read in whole from a 
+ * database.
+ */
+DJVUAPI djvu_import
+djvu_import_buffer ( const void *buf, const size_t bufsize );
 
 
 /* Open a stream for reading from user defined callbacks functions.
