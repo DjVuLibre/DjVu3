@@ -7,10 +7,10 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: GThreads.cpp,v 1.4 1999-03-02 02:12:12 leonb Exp $
+//C-  $Id: GThreads.cpp,v 1.5 1999-03-02 23:52:43 leonb Exp $
 
 
-// **** File "$Id: GThreads.cpp,v 1.4 1999-03-02 02:12:12 leonb Exp $"
+// **** File "$Id: GThreads.cpp,v 1.5 1999-03-02 23:52:43 leonb Exp $"
 // This file defines machine independent classes
 // for running and synchronizing threads.
 // - Author: Leon Bottou, 01/1998
@@ -312,7 +312,7 @@ GThread::~GThread()
 int  
 GThread::create(void (*entry)(void*), void *arg)
 {
-  if (hthr)
+  if (xentry || xarg)
     return -1;
   xentry = entry;
   xarg = arg;
