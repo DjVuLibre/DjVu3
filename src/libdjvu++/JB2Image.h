@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: JB2Image.h,v 1.25 2000-12-18 17:13:42 bcr Exp $
+// $Id: JB2Image.h,v 1.26 2000-12-22 01:06:12 bcr Exp $
 // $Name:  $
 
 #ifndef _JB2IMAGE_H
@@ -130,7 +130,7 @@
     \end{itemize}
 
     @version
-    #$Id: JB2Image.h,v 1.25 2000-12-18 17:13:42 bcr Exp $#
+    #$Id: JB2Image.h,v 1.26 2000-12-22 01:06:12 bcr Exp $#
     @memo
     Coding bilevel images with JB2.
     @author
@@ -143,6 +143,7 @@
 #endif
 
 #include "GString.h"
+#include "ZPCodec.h"
 
 class JB2Dict;
 class JB2Image;
@@ -174,7 +175,8 @@ public:
     image representing the shape pixels.  Member #parent# is the subscript of
     the parent shape.  */
 
-class JB2Shape { 
+class JB2Shape
+{ 
 public: 
   /** Subscript of the parent shape.  The parent shape must always be located
       before the current shape in the shape array.  A negative value indicates
@@ -211,6 +213,10 @@ typedef GP<JB2Dict> JB2DecoderCallback ( void* );
 class JB2Dict : public GPEnabled
 {
 public:
+  class JB2Codec;
+  class JB2DecodeCodec;
+  class JB2EncodeCodec;
+
   // CONSTRUCTION
   /** Null Constructor.  Constructs an empty #JB2Dict# object.  You can then
       call the decoding function #decode#.  You can also manually set the
@@ -283,8 +289,6 @@ private:
   GArray<JB2Shape> shapes;
   
 };
-
-
 
 /** Main JB2 data structure.  Each #JB2Image# consists of an array of shapes
     and an array of blits.  These arrays can be populated by hand using
@@ -432,7 +436,6 @@ JB2Dict::get_shape(int shapeno) const
   return 0;
 }
 
-
 // JB2IMAGE INLINE FUNCTIONS
 
 inline int
@@ -468,9 +471,6 @@ JB2Image::get_blit(int blitno) const
 }
 
 
-
-// ---------- THE END
-#endif
 
 
 
@@ -557,4 +557,222 @@ JB2Image::get_blit(int blitno) const
 
 //@}
 
+////////////////////////////////////////
+//// CLASS JB2CODEC:  DECLARATION
+////////////////////////////////////////
+
+// This class is accessed via the encode and decode
+// functions of class JB2Image
+
+
+//**** Class JB2Codec
+// This class implements the base class for both the JB2 coder and decoder.
+// The JB2Codec's Contains all contextual information for encoding/decoding
+// a JB2Image.
+
+class JB2Image::JB2Codec
+{
+public:
+  typedef unsigned int NumContext;
+  struct LibRect
+  {
+    short top,left,right,bottom;
+    void compute_bounding_box(const GBitmap &cbm);
+  };
+  virtual ~JB2Codec();
+protected:
+  // Constructors
+  JB2Codec(ByteStream &bs, const bool xencoding=false);
+  // Forbidden assignment
+  JB2Codec(const JB2Codec &ref);
+  JB2Codec& operator=(const JB2Codec &ref);
+
+  int CodeNum(int lo, int hi, NumContext *pctx,int v);
+  void reset_numcoder(void);
+  inline void code_eventual_lossless_refinement();
+  void init_library(JB2Dict *jim);
+  int add_library(int shapeno, JB2Shape *jshp);
+  void code_relative_location(JB2Blit *jblt, int rows, int columns);
+  void code_bitmap_directly (GBitmap &bm);
+  void code_bitmap_by_cross_coding (GBitmap &bm, GBitmap *cbm, const int libno);
+  void code_record(int &rectype, JB2Dict *jim, JB2Shape *jshp);
+  void code_record(int &rectype, JB2Image *jim, JB2Shape *jshp, JB2Blit *jblt);
+  static void compute_bounding_box(GBitmap &cbm, LibRect &lrect);
+  static int get_direct_context( unsigned char const * const up2,
+    unsigned char const * const up1, unsigned char const * const up0,
+    const int column);
+  static int shift_direct_context ( const int context,
+    const int next, unsigned char const * const up2,
+    unsigned char const * const up1, unsigned char const * const up0,
+    const int column);
+  static int get_cross_context( unsigned char const * const up1,
+    unsigned char const * const up0, unsigned char const * const xup1,
+    unsigned char const * const xup0, unsigned char const * const xdn1,
+    const int column );
+  static int shift_cross_context( const int context,
+    const int n, unsigned char const * const up1,
+    unsigned char const * const up0, unsigned char const * const xup1,
+    unsigned char const * const xup0, unsigned char const * const xdn1,
+    const int column );
+
+  virtual bool CodeBit(const bool bit, BitContext &ctx) = 0;
+  virtual void code_comment(GString &comment) = 0;
+  virtual void code_record_type(int &rectype) = 0;
+  virtual int code_match_index(int &index, JB2Dict *jim)=0;
+  virtual void code_inherited_shape_count(JB2Dict *jim)=0;
+  virtual void code_image_size(JB2Dict *jim);
+  virtual void code_image_size(JB2Image *jim);
+  virtual void code_absolute_location(JB2Blit *jblt,  int rows, int columns)=0;
+  virtual void code_absolute_mark_size(GBitmap *bm, int border=0) = 0;
+  virtual void code_relative_mark_size(GBitmap *bm, int cw, int ch, int border=0) = 0;
+  virtual void code_bitmap_directly(GBitmap &bm,const int dw, int dy,
+    unsigned char *up2, unsigned char *up1, unsigned char *up0 )=0;
+  virtual void code_bitmap_by_cross_coding (GBitmap &bm, GBitmap &cbm,
+    const int xd2c, const int dw, int dy, int cy,
+    unsigned char *up1, unsigned char *up0, unsigned char *xup1, 
+    unsigned char *xup0, unsigned char *xdn1 )=0;
+  // Code records
+  virtual int get_diff(const int x_diff,NumContext &rel_loc) = 0;
+
+private:
+  bool encoding;
+
+protected:
+  // NumCoder
+  int cur_ncell;
+  int max_ncell;
+  BitContext *bitcells;
+  GPBuffer<BitContext> gbitcells;
+  NumContext *leftcell;
+  GPBuffer<NumContext> gleftcell;
+  NumContext *rightcell;
+  GPBuffer<NumContext> grightcell;
+  // Info
+  bool refinementp;
+  char gotstartrecordp;
+  // Code comment
+  NumContext dist_comment_byte;
+  NumContext dist_comment_length;
+  // Code values
+  NumContext dist_record_type;
+  NumContext dist_match_index;
+  BitContext dist_refinement_flag;
+  // Library
+  GTArray<int> shape2lib;
+  GTArray<int> lib2shape;
+  GTArray<LibRect> libinfo;
+  // Code pairs
+  NumContext abs_loc_x;
+  NumContext abs_loc_y;
+  NumContext abs_size_x;
+  NumContext abs_size_y;
+  NumContext image_size_dist;
+  NumContext inherited_shape_count_dist;
+  BitContext offset_type_dist;
+  NumContext rel_loc_x_current;
+  NumContext rel_loc_x_last;
+  NumContext rel_loc_y_current;
+  NumContext rel_loc_y_last;
+  NumContext rel_size_x;
+  NumContext rel_size_y;
+  int last_bottom;
+  int last_left;
+  int last_right;
+  int last_row_bottom;
+  int last_row_left;
+  int image_columns;
+  int image_rows;
+  int short_list[3];
+  int short_list_pos;
+  inline void fill_short_list(const int v);
+  int update_short_list(const int v);
+  // Code bitmaps
+  BitContext bitdist[1024];
+  BitContext cbitdist[2048];
+};
+
+inline void
+JB2Image::JB2Codec::code_eventual_lossless_refinement()
+{
+  refinementp=CodeBit(refinementp, dist_refinement_flag);
+}
+
+inline void
+JB2Image::JB2Codec::fill_short_list(const int v)
+{
+  short_list[0] = short_list[1] = short_list[2] = v;
+  short_list_pos = 0;
+}
+
+inline int
+JB2Image::JB2Codec::get_direct_context( unsigned char const * const up2,
+                    unsigned char const * const up1,
+                    unsigned char const * const up0,
+                    const int column)
+{
+  return ( (up2[column - 1] << 9) |
+              (up2[column    ] << 8) |
+              (up2[column + 1] << 7) |
+              (up1[column - 2] << 6) |
+              (up1[column - 1] << 5) |
+              (up1[column    ] << 4) |
+              (up1[column + 1] << 3) |
+              (up1[column + 2] << 2) |
+              (up0[column - 2] << 1) |
+              (up0[column - 1] << 0) );
+}
+
+inline int
+JB2Image::JB2Codec::shift_direct_context(const int context, const int next,
+                     unsigned char const * const up2,
+                     unsigned char const * const up1,
+                     unsigned char const * const up0,
+                     const int column)
+{
+  return ( ((context << 1) & 0x37a) |
+              (up1[column + 2] << 2)   |
+              (up2[column + 1] << 7)   |
+              (next << 0)              );
+}
+
+inline int
+JB2Image::JB2Codec::get_cross_context( unsigned char const * const up1,
+                   unsigned char const * const up0,
+                   unsigned char const * const xup1,
+                   unsigned char const * const xup0,
+                   unsigned char const * const xdn1,
+                   const int column )
+{
+  return ( ( up1[column - 1] << 10) |
+              ( up1[column    ] <<  9) |
+              ( up1[column + 1] <<  8) |
+              ( up0[column - 1] <<  7) |
+              (xup1[column    ] <<  6) |
+              (xup0[column - 1] <<  5) |
+              (xup0[column    ] <<  4) |
+              (xup0[column + 1] <<  3) |
+              (xdn1[column - 1] <<  2) |
+              (xdn1[column    ] <<  1) |
+              (xdn1[column + 1] <<  0) );
+}
+
+inline int
+JB2Image::JB2Codec::shift_cross_context( const int context, const int n,
+                     unsigned char const * const up1,
+                     unsigned char const * const up0,
+                     unsigned char const * const xup1,
+                     unsigned char const * const xup0,
+                     unsigned char const * const xdn1,
+                     const int column )
+{
+  return ( ((context<<1) & 0x636)  |
+              ( up1[column + 1] << 8) |
+              (xup1[column    ] << 6) |
+              (xup0[column + 1] << 3) |
+              (xdn1[column + 1] << 0) |
+              (n << 7)             );
+}
+
+// ---------- THE END
+#endif
 

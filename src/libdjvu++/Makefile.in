@@ -31,7 +31,7 @@
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #C- 
 #
-# $Id: Makefile.in,v 1.106 2000-12-18 17:13:43 bcr Exp $
+# $Id: Makefile.in,v 1.107 2000-12-22 01:06:12 bcr Exp $
 # $Name:  $
 
 %%%include <paths>
@@ -65,11 +65,11 @@ LIB= $(LIBDJVUXX)
 
 LIBOBJS= DjVuGlobal.o DjVuGlobalMemory.o GOS.o GException.o GContainer.o \
          GString.o GThreads.o GRect.o GSmartPointer.o  MMX.o Arrays.o debug.o \
-	 GBitmap.o GPixmap.o GScaler.o DjVuPalette.o \
-	 ByteStream.o IFFByteStream.o BSByteStream.o ZPCodec.o \
-	 JB2Image.o IWTransform.o IWImage.o MMRDecoder.o JPEGDecoder.o \
-	 DataPool.o GURL.o DjVuFileCache.o DjVuPort.o GMapAreas.o \
-	 DjVuAnno.o DjVuText.o DjVuInfo.o DjVuFile.o DjVuImage.o DjVuDocument.o\
+	 GBitmap.o GPixmap.o GScaler.o DjVuPalette.o ByteStream.o \
+	 IFFByteStream.o BSByteStream.o ZPCodec.o JB2Image.o JB2EncodeCodec.o \
+	 IWTransform.o IWImage.o MMRDecoder.o JPEGDecoder.o DataPool.o GURL.o \
+	 DjVuFileCache.o DjVuPort.o GMapAreas.o DjVuAnno.o DjVuText.o \
+	 DjVuInfo.o DjVuFile.o DjVuImage.o DjVuDocument.o \
 	 DjVmDir.o DjVmDoc.o DjVmDir0.o DjVuNavDir.o DjVuErrorList.o \
 	 parseoptions.o DjVuDocEditor.o DjVuToPS.o DjVuDumpHelper.o \
 	 DjVuMessage.o
