@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: djvuextract.cpp,v 1.3 1999-03-01 17:02:45 leonb Exp $
+//C-  $Id: djvuextract.cpp,v 1.4 1999-03-02 02:12:13 leonb Exp $
 
 /** @name djvuextract
 
@@ -17,7 +17,7 @@
     \end{verbatim}
     
     {\bf Description}\\
-    Program #djvuextract# analyzes the Bilevel DjVu or Color DjVu file
+    Program #djvuextract# analyzes the DjVu file
     #<djvufile># and saves the various layers into the specified files.
     The reverse operation can be achieved using program \Ref{djvumake}.
     \begin{itemize}
@@ -33,11 +33,11 @@
     \end{itemize}
 
     @memo
-    Extract layers from Bilevel DjVu files or Color DjVu files.
+    Extract components from DjVu files.
     @version
-    #$Id: djvuextract.cpp,v 1.3 1999-03-01 17:02:45 leonb Exp $#
+    #$Id: djvuextract.cpp,v 1.4 1999-03-02 02:12:13 leonb Exp $#
     @author
-    Leon Bottou <leonb@research.att.com> */
+    L\'eon Bottou <leonb@research.att.com> */
 //@{
 //@}
 

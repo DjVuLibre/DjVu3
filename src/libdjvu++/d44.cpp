@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: d44.cpp,v 1.6 1999-03-01 17:02:45 leonb Exp $
+//C-  $Id: d44.cpp,v 1.7 1999-03-02 02:12:13 leonb Exp $
 
 
 
@@ -60,9 +60,9 @@
     @memo
     DjVu IW44 wavelet decoder.
     @author
-    Leon Bottou <leonb@research.att.com>
+    L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: d44.cpp,v 1.6 1999-03-01 17:02:45 leonb Exp $# */
+    #$Id: d44.cpp,v 1.7 1999-03-02 02:12:13 leonb Exp $# */
 //#{
 //#}
 

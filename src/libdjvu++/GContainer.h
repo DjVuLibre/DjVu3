@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: GContainer.h,v 1.4 1999-02-19 19:03:43 leonb Exp $
+//C-  $Id: GContainer.h,v 1.5 1999-03-02 02:12:12 leonb Exp $
 
 
 #ifndef _GCONTAINER_H_
@@ -43,10 +43,10 @@
     @memo 
     Template class for generic containers.
     @author 
-    Leon Bottou <leonb@research.att.com> -- initial implementation.\\
+    L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@research.att.com> -- bug fixes.
     @version 
-    #$Id: GContainer.h,v 1.4 1999-02-19 19:03:43 leonb Exp $# */
+    #$Id: GContainer.h,v 1.5 1999-03-02 02:12:12 leonb Exp $# */
 //@{
 
 class GContainerBase;
@@ -68,7 +68,7 @@ class GPosition;
     A #GPosition# object remains meaningful as long as you do not modify the
     contents of the underlying container.  You should not use a #GPosition#
     that was initialized before modifying the contents of container object.
-    Undetermined results may happed (as they say...) */
+    Undetermined results may occur (as they say...) */
 
 class GPosition {
 public:
@@ -260,7 +260,7 @@ public:
       subscripts and the usual bracket syntax.  This pointer remains valid as
       long as the valid subscript range is unchanged. If you change the
       subscript range, you must stop using the pointers returned by prior
-      invokation of this conversion operator. */
+      invocation of this conversion operator. */
   operator TYPE* ();
   /** Returns a pointer for reading (but not modifying) the array elements.
       This pointer can be used to access the array elements with the same
@@ -276,7 +276,7 @@ public:
   /** Extends the subscript range so that is contains #n#.
       This function does nothing if #n# is already int the valid subscript range.
       If the valid range was empty, both the lower bound and the upper bound
-      are set to #n#.  Otherwise the valid subscript ranhe is extented
+      are set to #n#.  Otherwise the valid subscript range is extended
       to encompass #n#. This function is very handy when called before setting
       an array element:
       \begin{verbatim}
@@ -287,7 +287,6 @@ public:
           a[lineno++] = read_a_line(); 
         }
       \end{verbatim} 
-      @param n 
   */
   void touch(int n);
   /** Resets the valid subscript range to #0#---#hibound#. 
@@ -383,10 +382,11 @@ public:
   void sort();
   /** Sort array elements in subscript range #lo# to #hi#.  Sort all array
       elements whose subscripts are in range #lo#..#hi# in ascending order.
-      The other elements of the array are left untouched. Both arguments #lo#
-      and #hi# must be in the valid subscript range.  Array elements are
-      compared using the less-or-equal comparison operator for type #TYPE#.
-      @param lo low bound for the subscripts of the elements to sort.
+      The other elements of the array are left untouched.  An exception is
+      thrown if arguments #lo# and #hi# are not in the valid subscript range.
+      Array elements are compared using the less-or-equal comparison operator
+      for type #TYPE#.  
+      @param lo low bound for the subscripts of the elements to sort.  
       @param hi high bound for the subscripts of the elements to sort. */
   void sort(int lo, int hi);
 };
@@ -429,18 +429,20 @@ public:
   virtual TYPE* get(const GPosition &pos);
   // -- ACCESS
   /** Tests whether a list is empty.  Returns a non zero value if the list
-      contains zero elements. */
+      contains no elements. */
   int isempty() const;
   /** Returns a reference to the list element at position #pos#.  This
       reference can be used for both reading (as "#a[n]#") and modifying (as
-      "#a[n]=v#") a list element. An exception \Ref{GException} is thrown if
-      #pos# is not a valid position for this list. */
+      "#a[n]=v#") a list element.  An exception \Ref{GException} is thrown if
+      #pos# is not a valid position for this list. See \Ref{GPosition} for
+      efficient operations on positions. */
   TYPE& operator[](GPosition pos);
   /** Returns a constant reference to the list element at position #pos#.
       This reference only be used for reading a list element.  An exception
       \Ref{GException} is thrown if #pos# is not a valid position. This
-      variant of #operator[]# is necessary when dealing with a 
-      #const GList<TYPE>#. */
+      variant of #operator[]# is necessary when dealing with a #const
+      GList<TYPE>#.  See \Ref{GPosition} for efficient operations on
+      positions. */
   const TYPE& operator[](GPosition pos) const;
   // -- TEST
   /** Compares two lists. Returns a non zero value if and only if both lists
@@ -448,11 +450,13 @@ public:
       in the same order. */
   int operator==(const GList<TYPE> &l2) const;
   // -- SEARCHING
-  /** Initializes position #pos# for accessing the #n#-th list element.
-      If the list contains less than #n# elements, function #nth# returns 
-      zero and the position #pos# is left unchanged. Otherwise function #nth# 
-      returns a non zero value.  Position #pos# can be subsequently used to access
-      the list element with #operator[](const GPosition&)#. */
+  /** Initializes position #pos# for accessing the #n#-th list element.  If
+      the list contains less than #n# elements, function #nth# returns zero
+      and the position #pos# is left unchanged. Otherwise function #nth#
+      returns a non zero value.  Position #pos# can be subsequently used to
+      access the list element with #operator[](const GPosition&)#.  The
+      operation works by sequentially scanning the list until reaching the
+      #n#-th element. */
   int nth(unsigned int n, GPosition &pos) const;
   /** Tests whether the list contains a given element.  Returns a non zero
       value if and only if the list contains an element equal to #elt# as
@@ -487,7 +491,7 @@ public:
       for this list.  The new element is initialized with a copy of #elt#. */
   void insert_before(GPosition pos, const TYPE& elt);
   /** Destroys the list element at position #pos#. This function does 
-      nothing unless position #pos# is a valiud position for this list */
+      nothing unless position #pos# is a valid position for this list */
   void del(GPosition &pos);
   // -- ASSIGMENT
   /** Copy operator.  
@@ -570,7 +574,7 @@ public:
   /** Searches a map entry for key #key#. Returns a non zero value if and only
       if the map contains an entry whose key is equal to #key# according to
       #KTYPE::operator==(const KTYPE&)#.  Position #pos# is then set to the 
-      position of the map entry matching ket #key#. */
+      position of the map entry matching the key #key#. */
   int contains(const KTYPE &key, GPosition &pos) const;
   // -- ACCESS
   /** Erases the associative map contents.  All entries are destroyed and
@@ -602,7 +606,7 @@ public:
   /** Destroys the map entry for key #key#.  Nothing is done if there is no
       entry for key #key#. */
   void del(const KTYPE &key);
-  /** Destroys the map entry for key #key#.  Nothing is done if position
+  /** Destroys the map entry for position #pos#.  Nothing is done if position
       #pos# is not a valid position for this container. */
   void del(GPosition &pos);
   // -- ASSIGMENT
@@ -633,8 +637,10 @@ protected:
 
 
 /** @name Hash functions
-    These functions let you use template class \Ref{GMap}
-    with the corresponding elementary types. 
+    These functions let you use template class \Ref{GMap} with the
+    corresponding elementary types. The returned hash code may be reduced to
+    an arbitrary range by computing its remainder modulo the upper bound of
+    the range.
     @memo Hash functions for elementary types. */
 //@{
 

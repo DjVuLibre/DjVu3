@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: GRect.h,v 1.4 1999-02-01 18:32:32 leonb Exp $
+//C-  $Id: GRect.h,v 1.5 1999-03-02 02:12:12 leonb Exp $
 
 
 #ifndef _GRECT_H_
@@ -26,9 +26,9 @@
     @memo
     Rectangle manipulation class.
     @author
-    Leon Bottou <leonb@research.att.com> -- initial implementation.
+    L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GRect.h,v 1.4 1999-02-01 18:32:32 leonb Exp $# */
+    #$Id: GRect.h,v 1.5 1999-03-02 02:12:12 leonb Exp $# */
 //@{
 
 #include "DjVuGlobal.h"
@@ -96,7 +96,7 @@ public:
     an affine transform which maps the corners of the first rectangle onto the
     matching corners of the second rectangle. The scaling operation is
     performed using integer fraction arithmetic in order to maximize
-    acurracy. */
+    accuracy. */
 class GRectMapper 
 {
 public:

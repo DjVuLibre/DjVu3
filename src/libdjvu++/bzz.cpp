@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: bzz.cpp,v 1.5 1999-03-01 17:02:45 leonb Exp $
+//C-  $Id: bzz.cpp,v 1.6 1999-03-02 02:12:13 leonb Exp $
 
 // BZZ -- a frontend for BSByteStream
 
@@ -29,9 +29,9 @@
     @memo
     General purpose compression/decompression program
     @author
-    Leon Bottou <leonb@research.att.com> -- initial implementation
+    L\'eon Bottou <leonb@research.att.com> -- initial implementation
     @version
-    #$Id: bzz.cpp,v 1.5 1999-03-01 17:02:45 leonb Exp $# */
+    #$Id: bzz.cpp,v 1.6 1999-03-02 02:12:13 leonb Exp $# */
 //@{
 //@}
 

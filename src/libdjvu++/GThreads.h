@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: GThreads.h,v 1.6 1999-02-18 16:11:15 leonb Exp $
+//C-  $Id: GThreads.h,v 1.7 1999-03-02 02:12:12 leonb Exp $
 
 #ifndef _GTHREADS_H_
 #define _GTHREADS_H_
@@ -16,9 +16,9 @@
 /** @name GThreads.h
 
     Files #"GThreads.h"# and #"GThreads.cpp"# implement common entry points
-    for multithreading on the DjVu supported platforms.  Each execution thread
-    is represented by an instance of class \Ref{GThread}.  Portions of code
-    can be protected using class \Ref{GCriticalSection} or class
+    for multithreading on multiple platforms.  Each execution thread is
+    represented by an instance of class \Ref{GThread}.  Portions of code can
+    be protected using class \Ref{GCriticalSection} or class
     \Ref{GCriticalSectionLock}. Synchronization is provided by class
     \Ref{GEvent}.
 
@@ -33,8 +33,8 @@
     \item[-DTHREADMODEL=WINTHREADS] Windows implementation.
           This is the default when compiling under Windows.
     \item[-DTHREADMODEL=MACTHREADS] Macintosh implementation,
-          which is based on the MacOS cooperative model. The current code
-          does not fully support synchronization (ooops).
+          which is based on the MacOS cooperative model. The current 
+          implementation does not yet fully support synchronization.
           This is the default when compiling under MacOS.
     \item[-DTHREADMODEL=POSIXTHREADS] Posix implementation.
           This implementation also supports DCE threads. The behavior of
@@ -73,10 +73,10 @@
     @memo
     Portable threads
     @author
-    Leon Bottou <leonb@research.att.com> -- initial implementation.\\
+    L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Praveen Guduru <praveen@sanskrit.lz.att.com> -- mac implementation.
     @version
-    #$Id: GThreads.h,v 1.6 1999-02-18 16:11:15 leonb Exp $# */
+    #$Id: GThreads.h,v 1.7 1999-03-02 02:12:12 leonb Exp $# */
 //@{
 
 #include "DjVuGlobal.h"
@@ -161,7 +161,7 @@
     represented by a #GThread# object.  The amount of memory required for the
     stack of a secondary thread is defined when the #GThread# object is
     constructed.  The executaion thread is started when function
-    \Ref{GThread::create} is called.  The execution can be brutally terminated
+    \Ref{GThread::create} is called.  The execution can be terminated
     at all times by destroying the #GThread# object or calling
     \Ref{GThread::terminate}.
 
@@ -180,7 +180,7 @@ public:
       Argument #stacksize# is used by the #COTHREADS# model only for
       specifying the amount of memory needed for the processor stack. A
       negative value will be replaced by a suitable default value (128Kb as of
-      12/98). A minimum value of 32Kb is silently enforced. */
+      12/1998). A minimum value of 32Kb is silently enforced. */
   GThread(int stacksize = -1);
   /** Destructor. */
   ~GThread();
@@ -189,10 +189,11 @@ public:
       thread cannot be restarted after its termination. You must create a new
       #GThread# object. */
   int  create(void (*entry)(void*), void *arg);
-  /** Terminates a thread. The thread is removed from the scheduling list.
-      Execution terminates regardless of the execution status of the thread
-      function. Automatic variables may or may not be destroyed. This function
-      must be considered as a last resort since memory may be lost. */
+  /** Terminates a thread with extreme prejudice. The thread is removed from
+      the scheduling list.  Execution terminates regardless of the execution
+      status of the thread function. Automatic variables may or may not be
+      destroyed. This function must be considered as a last resort since
+      memory may be lost. */
   void terminate();
   /** Causes the current thread to relinquish the processor.  The scheduler
       selects a thread ready to run and transfers control to that thread. The
@@ -267,7 +268,7 @@ private:
 
 
 /** Mutual exclusion class.  Class #GCriticalSection# provides an efficient
-    way to protect segment of codes (dubbed "critical sections") which should
+    way to protect segment of codes ({\em critical sections}) which should
     not be simultaneously executed by two threads. Only one thread can own a
     critical section object at a given time.  Function \Ref{lock} causes the
     current thread to own the critical section object (or wait as long as

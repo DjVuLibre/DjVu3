@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: ATTLicense.h,v 1.3 1999-03-01 17:02:44 leonb Exp $
+//C-  $Id: ATTLicense.h,v 1.4 1999-03-02 02:12:11 leonb Exp $
 
 #ifndef _ATTLICENSE_H_
 #define _ATTLICENSE_H_
@@ -21,9 +21,9 @@
     @memo
     Support for AT&T Source Code Licensing
     @version
-    #$Id: ATTLicense.h,v 1.3 1999-03-01 17:02:44 leonb Exp $#
+    #$Id: ATTLicense.h,v 1.4 1999-03-02 02:12:11 leonb Exp $#
     @author
-    Leon Bottou <leonb@research.att.com>\\
+    L\'eon Bottou <leonb@research.att.com>\\
     Jeffrey S. Dickey <jsdickey@att.com>\\
     James Tramontana <jtramontana@att.com>\\
     Marya Yee <myee@yeellp.com> */

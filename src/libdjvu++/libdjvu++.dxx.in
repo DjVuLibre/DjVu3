@@ -9,9 +9,9 @@
     YOUR acceptance of all the provisions specified in this agreement.
 
     @version
-    990221
+    1.1
     @author
-    Leon Bottou, 02/1999
+    L\'eon Bottou, 02/1999
 */
 //@{
 
@@ -43,17 +43,17 @@
 
     There are in fact three kinds of DjVu image files:
     \begin{description}
-    \item[Color DjVu Image] ---
-       Color DjVu Image files are best used for encoding photographic images
+    \item[Photo DjVu Image.]
+       Photo DjVu Image files are best used for encoding photographic images
        in colors or in shades of gray.  The images are coded using the IW44
        wavelet representation optimized for fast progressive rendering.
-    \item[Bilevel DjVu Image] ---
+    \item[Bilevel DjVu Image.]
        Bilevel DjVu Image files are best used to compress black and white
        images representing text and simple drawings.  The JB2 data compression
        model uses a the "soft pattern matching" technique which essentially
        consists of encoding each character by describing how it differs from a
        well chosen already encoded character.
-    \item[Compound DjVu Image] ---
+    \item[Compound DjVu Image.]
        Compound DjVu Image files are an extremely efficient way to compress
        high resolution color document images containing both pictures and
        text, such as a page of a magazine.  Compound DjVu Images represent the
@@ -63,19 +63,19 @@
    \end{description}
    In addition we often use {\bf IW44 Image} files. This is the native format
    for the IW44 wavelet representation. These files have the same uses then
-   Color DjVu Images but use a simpler file format.  There are two variants of
+   Photo DjVu Images but use a simpler file format.  There are two variants of
    IW44 files for gray level images and color images.
 
    {\bf DjVu Reference Library} --- The DjVu Reference Library implements the
    components of the DjVu technology that are essential for the definition of
-   the file formats.  AT&T Laboratories \URL{http://www.att.com/attlabs}
+   the file formats.  AT&T Labs \URL{http://www.att.com/attlabs}
    releases the full source code of the DjVu Reference Library under the terms
    of the \Ref{AT&T Source Code License}.
    
    To understand the meaning of this release, it is important to realize that
    the separation of AT&T, NCR and Lucent Technologies has significantly
    changed the business equation.  AT&T is not in the business of selling
-   software.  The DjVu technology is interesting for AT&T because it may give
+   software.  The DjVu technology is interesting for AT&T because it gives
    the means to propose enhanced services to its customers.  This can only
    happen if we ensure that the DjVu technology is widely disseminated.
 
@@ -92,22 +92,14 @@
       for standardization purposes.
    \end{itemize}
 
-   In the spirit of open source development, the text of the AT&T Source Code
-   License makes sure that any work containing or derived from the DjVu
-   Reference Library will be available to anyone in source code form.  This is
-   to ensure the greatest dissemination of AT&T's technology.  We know however
-   that these terms will not fit everyone's needs.  You may contact our
-   intellectual property department to setup other agreements on the basis of
-   fair revenue sharing.
-
    The DjVu Reference Library is the first component of DjVu released in
    source code form.  The DjVu Reference Library completely defines the DjVu
    and IW44 image formats.  It does not implement however the sophisticated
    encoding strategies which allow for the highest compression ratios.  These
    strategies however are very application dependent.  We have developped
    encoders for scanned documents (see \URL{http://www.djvu.att.com/djvu}.  We
-   also know that we need completely different (and probably much easier)
-   encoding strategies for electronically created documents.
+   also know that completely different (and probably much easier) encoding
+   strategies are needed for electronically created documents.
 
    We intend to keep releasing new versions of this library and additional
    software such as viewers and encoders.  Using the currently released code,
@@ -139,7 +131,7 @@
    
    We do not plan to publish soon the source code pertaining to the DjVu
    compression of scanned images.  We may provide the source code of older
-   versions.  We will provide executables for personal uses. We license this
+   versions.  We also provide executables for personal uses.  We license this
    technology to business partners who commit to support the DjVu format.
    Releasing this code today would negatively affect the business of our
    partners and eventually reduce the dissemination of the DjVu technology.
@@ -188,8 +180,9 @@
     #"@Samples"# contains sample DjVu files for testing purposes.  Directory
     #"@Test"# contains a few test programs for the library basic features.
     Directory #"@Tools"# contains tools that may be useful for building the
-    library or its documentation.
-
+    library or its documentation.  The character #"@"# in the directory names
+    is a probably misguided attempt to emphazise the directory names when you
+    type #ls#.
 
     {\bf Prerequisites} --- The DjVu Reference Library should compile and run
     on any well behaved Unix system, {\em provided that you use a good C++
@@ -248,8 +241,8 @@
       % gnu-make
       % gnu-make install
     \end{verbatim}
-    You are reading correctly: I am pretending that my workstation has
-    Irix-5.3 because I want to create backward compatible binaries.  Welcome
+    You are reading correctly: We are pretending that the workstation has
+    Irix-5.3 because we want to create backward compatible binaries.  Welcome
     to the wonderful world of compilers.
 
     {\bf Compiling the DjVu Reference Library} --- Compiling the DjVu
@@ -268,7 +261,7 @@
     \item[--with-debug] enables the debugging options of the compiler.
     \item[--with-cxxflag=FLAG] passes a particular option to the compiler.
     \item[--without-threads] disables multi-threading (the default).
-    \item[--with-threads=(cothreads|posix|dce)] enables multithreading and
+    \item[--with-threads=(cothreads,posix,dce)] enables multithreading and
          selects a multithreading implementation (see \Ref{GThreads.h}). You
          must make sure that your C++ compiler is compatible with the chosen
          thread implementation.  The safest option consists of using the
@@ -373,7 +366,7 @@
 //----------------------------------------
 /** @name DjVu File Structure
 
-    DjVu files are organized according to the EA IFF85 layout.  Pointers to
+    DjVu files are organized according to the ``EA IFF 85'' layout.  Pointers to
     the appropriate reference document are provided in section
     \Ref{IFFByteStream.h}.  IFF files are logically composed of a sequence of
     data {\em chunks}.  Each chunk comes with a four character {\em chunk
@@ -401,13 +394,14 @@
 /** @name DjVu Image Files
 
     
-    {\bf Color DjVu Image} --- Color DjVu Image files are best used for
-    encoding photographic images in colors or in shades of gray.  The images
-    The data compression model relies on the IW44 wavelet representation.  The
-    IW44 decoder is able to quickly perform progressive rendering of any image
-    segment using only a small amount of memory.
+    {\bf Photo DjVu Image} --- Photo DjVu Image files are best used for
+    encoding photographic images in colors or in shades of gray.  The data
+    compression model relies on the IW44 wavelet representation.  This format
+    is designed such that the IW44 decoder is able to quickly perform
+    progressive rendering of any image segment using only a small amount of
+    memory.
 
-    Color DjVu files are composed of a single #"FORM:DJVU"# composite chunk.
+    Photo DjVu files are composed of a single #"FORM:DJVU"# composite chunk.
     This composite chunk always begins with one #"INFO"# chunk describing the
     image size and resolution (see \Ref{DjVuInfo}).  One or more additional
     #"BG44"# chunks contains the image data encoded with the IW44
@@ -416,18 +410,18 @@
     data must be equal.
 
     {\bf Bilevel DjVu Image} --- Bilevel DjVu Image files are used to compress
-    black and white images representing text and simple drawings.  These files
-    should not be used for encoding heavily dithered bilevel images.  The JB2
-    data compression model uses the "soft pattern matching" technique. This
-    technique essentially consists of encoding each character by describing
-    how it differs from a well chosen already encoded character.
+    black and white images representing text and simple drawings.  Heavily
+    dithered bilevel images are best encoded using Compound DjVu Images.  The
+    JB2 data compression model uses the soft pattern matching technique, which
+    essentially consists of encoding each character by describing how it
+    differs from a well chosen already encoded character.
 
     Bilevel DjVu Files are composed of a single #"FORM:DJVU"# composite chunk.
     This composite chunk always begins with one #"INFO"# chunk describing the
     image size and resolution (see \Ref{DjVuInfo}).  An additional #"Sjbz"#
     chunk contains the bilevel data encoded with the JB2 representation (see
     \Ref{JB2Image}).  The image size specified in the #"INFO"# chunk and the
-    image size specified in the IW44 data must be equal.
+    image size specified in the JB2 data must be equal.
 
     {\bf Compound DjVu Image} --- Compound DjVu Files are an extremely
     efficient way to compress high resolution Compound document images
@@ -441,20 +435,20 @@
     describing the size and the resolution of the image (see \Ref{DjVuInfo}).
 
     The main component of the foreground layer is a bilevel image named the
-    {\em foreground mask}. The size of the foreground mask is equal to the
-    size of the DjVu image.  It contains a black-on-white representation of
-    the text and the drawings.  This image is encoded in a single #"Sjbz# 
+    {\em foreground mask}. The pixel size of the foreground mask is equal to
+    the size of the DjVu image.  It contains a black-on-white representation
+    of the text and the drawings.  This image is encoded in a single #"Sjbz"#
     chunk using the JB2 representation.
 
     The foreground layer also contains a small color image, the {\em
     foreground color image}, encoded as a single #"FG44"# chunk using the IW44
     representation (see \Ref{IWPixmap} or \Ref{IWBitmap}).  Compound DjVu
     images are rendered by painting the foreground color image on top of the
-    background color image using the foreground mask as a stencil.  The size
-    of the foreground color image is computed by rounding up the quotient of
-    the mask size by an integer sub-sampling factor ranging from 1 to 12.
+    background color image using the foreground mask as a stencil.  The pixel
+    size of the foreground color image is computed by rounding up the quotient
+    of the mask size by an integer sub-sampling factor ranging from 1 to 12.
     Most Compound DjVu Images use a foreground color sub-sampling factor equal
-    to 12.  Smaller sub-sampling factors hardly produce better images.
+    to 12.  Smaller sub-sampling factors produce very slightly better images.
 
     The background layer is a color image encoded by an arbitrary number of
     #"BG44"# chunks containing successive IW44 refinements (see \Ref{IWPixmap}
@@ -496,11 +490,11 @@
     intend to update the DjVu Reference Library as soon as we are satisfied
     with such enhancements.
 
-    {\bf Hyper-links} --- We are experimenting with an {\em annotation chunk}
+    {\bf Hyper-links} --- We are considering an {\em annotation chunk}
     containing directives for the DjVu image browser, such as hyper-links,
     image placement, border color or default zoom factor.  Such directives
-    will most likely be described using an extensible text syntax and stored
-    into an #"ANTa"# or #"ANTz"# chunk.
+    will be described using an extensible text syntax and stored into an
+    #"ANTa"# or #"ANTz"# chunk.
 
     {\bf Included Files} --- Multiple DjVu files may share information such as
     background layer or character shapes.  There are many benefits associated
@@ -534,19 +528,19 @@
     directory (chunk identifier #"DIR0"#) and all the archived files with
     their natural IFF structure.
 
-    {\bf Per-Character Color} --- Color DjVu files represent the colors of the
-    text and drawings using a low resolution color image named the foreground
-    color image.  We are considering an alternative representation using one
-    color for each character (or more specifically, for each mask component).
-    This alternative representation would be more appropriate for encoding
-    electronically produced documents.
+    {\bf Per-Character Color} --- Compound DjVu files represent the colors of
+    the text and drawings using a low resolution color image named the
+    foreground color image.  We are considering an alternative representation
+    using one color for each character (or more specifically, for each mask
+    component).  This alternative representation would be more appropriate for
+    encoding electronically produced documents.
 
     {\bf Semantic Markups} --- DjVu files already contain a lot of information
     about the structure of the page.  We could create a real {\em multi-valued
     document} by adding a #"DXML"# chunk containing the textual information in
     the page with adequate semantic markups.  The association between the
     textual information and the image would be described by a #"DX2I"# chunk.
-    That would finally allow us to do Copy/Paste with DjVu documents.  */
+    That would allow us to do Copy/Paste with DjVu documents.  */
 //@}
 
 

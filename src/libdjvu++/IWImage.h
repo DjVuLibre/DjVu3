@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: IWImage.h,v 1.4 1999-02-18 22:46:06 leonb Exp $
+//C-  $Id: IWImage.h,v 1.5 1999-03-02 02:12:13 leonb Exp $
 
 #ifndef _IWIMAGE_H_
 #define _IWIMAGE_H_
@@ -96,9 +96,9 @@
     @memo
     Wavelet encoded images.
     @author
-    Leon Bottou <leonb@research.att.com>
+    L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: IWImage.h,v 1.4 1999-02-18 22:46:06 leonb Exp $# */
+    #$Id: IWImage.h,v 1.5 1999-03-02 02:12:13 leonb Exp $# */
 //@{
 
 #ifdef __GNUC__

@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: GOS.h,v 1.2 1999-02-01 18:32:32 leonb Exp $
+//C-  $Id: GOS.h,v 1.3 1999-03-02 02:12:12 leonb Exp $
 
 #ifndef _GOS_H_
 #define _GOS_H_
@@ -27,9 +27,9 @@
     @memo
     Operating System dependent functions.
     @author
-    Leon Bottou <leonb@research.att.com> -- Initial implementation
+    L\'eon Bottou <leonb@research.att.com> -- Initial implementation
     @version
-    #$Id: GOS.h,v 1.2 1999-02-01 18:32:32 leonb Exp $#
+    #$Id: GOS.h,v 1.3 1999-03-02 02:12:12 leonb Exp $#
 */
 //@{
 

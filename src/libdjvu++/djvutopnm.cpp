@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: djvutopnm.cpp,v 1.13 1999-03-01 17:02:45 leonb Exp $
+//C-  $Id: djvutopnm.cpp,v 1.14 1999-03-02 02:12:13 leonb Exp $
 
 
 /** @name djvutopnm
@@ -47,21 +47,21 @@
     
     {\bf Rendering Mode Selection} --- The default rendering mode merges all
     the layers of the DjVu image and outputs an adequate PNM file. IW44 files
-    and Color DjVu files are always rendered as PPM files. Black and White
-    DjVu files are rendered as PBM files if the subsampling factor is 1.
-    Otherwise, they are rendered as PGM files because the resolution change
-    gives better results with anti-aliasing.  Three options alter this
-    default behavior.
+    Compound djVu files and Photo DjVu files are always rendered as PPM
+    files. Bilevel DjVu files are rendered as PBM files if the
+    subsampling factor is 1.  Otherwise, they are rendered as PGM files
+    because the resolution change gives better results with anti-aliasing.
+    Three options alter this default behavior.
     \begin{description}
     \item[-black] Renders only the foreground layer mask.  This mode does not
        work with IW44 files because these files have no foreground layer mask.
        The output file will be a PBM file if the subsampling factor is 1.
        Otherwise the output file will be an anti-aliased PGM file.
     \item[-foreground] Renders only the foreground layer on a white
-       background.  This mode works only with Color DjVu files. The output
+       background.  This mode works only with Compound DjVu files. The output
        file always is a PPM file.
     \item[-background] Renders only the background layer. This mode works only
-       with Color DjVu files and IW44 files. The output file always is a PPM
+       with Compound DjVu files and IW44 files. The output file always is a PPM
        file.
     \end{description}
 
@@ -83,9 +83,9 @@
     Decodes and renders a DjVu file.
     @author
     Yann Le Cun <yann@research.att.com>\\
-    Leon Bottou <leonb@research.att.com>
+    L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: djvutopnm.cpp,v 1.13 1999-03-01 17:02:45 leonb Exp $# */
+    #$Id: djvutopnm.cpp,v 1.14 1999-03-02 02:12:13 leonb Exp $# */
 //@{
 //@}
 
@@ -131,7 +131,7 @@ convert(const char *from, const char *to)
     }
   // Check
   DjVuInfo *info = dimg.get_info();
-  int colorp = dimg.is_legal_color();
+  int colorp = dimg.is_legal_photo();
   int blackp = dimg.is_legal_bilevel();
   int compoundp = dimg.is_legal_compound();
   if (flag_verbose)
@@ -139,7 +139,7 @@ convert(const char *from, const char *to)
       if (compoundp)
         fprintf(stderr, "This is a legal Compound DjVu image\n");
       else if (colorp)
-        fprintf(stderr, "This is a legal Color DjVu image\n");
+        fprintf(stderr, "This is a legal Photo DjVu image\n");
       else if (blackp)
         fprintf(stderr, "This is a legal Bilevel DjVu image\n");
     }    

@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: ppmcoco.cpp,v 1.5 1999-03-01 17:12:11 leonb Exp $
+//C-  $Id: ppmcoco.cpp,v 1.6 1999-03-02 02:12:14 leonb Exp $
 
 
 
@@ -80,9 +80,9 @@
     @memo
     Perform color correction on PPM files.
     @author
-    Leon Bottou <leonb@research.att.com>
+    L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: ppmcoco.cpp,v 1.5 1999-03-01 17:12:11 leonb Exp $# */
+    #$Id: ppmcoco.cpp,v 1.6 1999-03-02 02:12:14 leonb Exp $# */
 //@{
 //@}
 

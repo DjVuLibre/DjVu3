@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: IFFByteStream.h,v 1.6 1999-02-18 16:11:15 leonb Exp $
+//C-  $Id: IFFByteStream.h,v 1.7 1999-03-02 02:12:13 leonb Exp $
 
 
 #ifndef _IFFBYTESTREAM_H_
@@ -17,20 +17,21 @@
 /** @name IFFByteStream.h
 
     Files #"IFFByteStream.h"# and #"IFFByteStream.cpp"# implement a parser for
-    files structured accoding the the EA IFF 85 Interchange File Format.  IFF
-    files are composed of a sequence of data {\em chunks}.  Each chunk is
-    identified by a four character {\em chunk identifier} describing the type
-    of the data stored in the chunk.  A few special chunk identifiers, for
-    instance #"FORM"#, are reserved for {\em composite chunks} which
-    themselves contain a sequence of data chunks.  This conventions
-    effectively provides IFF files with a convenient hierarchical structure.
-    Composite chunks are further identified by a secondary chunk identifier.
+    files structured accoding the Electronic Arts {\em EA IFF 85 Interchange
+    File Format}.  IFF files are composed of a sequence of data {\em chunks}.
+    Each chunk is identified by a four character {\em chunk identifier}
+    describing the type of the data stored in the chunk.  A few special chunk
+    identifiers, for instance #"FORM"#, are reserved for {\em composite
+    chunks} which themselves contain a sequence of data chunks.  This
+    conventions effectively provides IFF files with a convenient hierarchical
+    structure.  Composite chunks are further identified by a secondary chunk
+    identifier.
     
     We found convenient to define a {\em extended chunk identifier}.  In the
     case of a regular chunk, the extended chunk identifier is simply the
     chunk identifier, as in #"PM44"#. In the case of a composite chunk, the
     extended chunk identifier is composed by concatenating the main chunk
-    identifier, a semicolon, and the secondary chunk identifier, as in
+    identifier, a colon, and the secondary chunk identifier, as in
     #"FORM:DJVU"#.
 
     Class \Ref{IFFByteStream} provides a way to read or write IFF structured
@@ -45,27 +46,27 @@
     without worrying about the final file position. See class \Ref{ZPCodec}
     for more details.
     
-    {\bf AT&T IFF Files} --- We had initially planned to exactly follow the EA
-    IFF 85 specifications.  Then we realized that certain versions of MSIE
+    {\bf AT&T IFF Files} --- We had initially planned to exactly follow the
+    IFF specifications.  Then we realized that certain versions of MSIE
     recognize any IFF file as a Microsoft AIFF sound file and pop a message
     box "Cannot play that sound".  It appears that the structure of AIFF files
     is entirely modeled after the IFF standard, with small variations
-    regarding the endianness of numbers and the padding rules.  We fix the
-    problem by casting the AT&T protection spell.  Our IFF files always start
-    with the four octets #"AT&T"# followed by the fully conformant EA IFF 85
-    byte stream.  Class #IFFByteStream# silently skips these four octets when
-    it encounters them.
+    regarding the endianness of numbers and the padding rules.  We eliminate
+    this problem by casting the AT&T protection spell.  Our IFF files always
+    start with the four octets #"AT&T"# followed by the fully conformant IFF
+    byte stream.  Class #IFFByteStream# silently skips these four
+    octets when it encounters them.
 
-    {\bf References} --- EA IFF 85 file format specification:\\
-    \URL{http://www.cica.indiana.edu/graphics/image_specs/ilbm.format.txt} or\\
+    {\bf References} --- EA IFF 85 Interchange File Format specification:\\
+    \URL{http://www.cica.indiana.edu/graphics/image_specs/ilbm.format.txt} or
     \URL{http://www.tnt.uni-hannover.de/soft/compgraph/fileformats/docs/iff.pre}
 
     @memo 
     IFF file parser.
     @author
-    Leon Bottou <leonb@research.att.com>
+    L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: IFFByteStream.h,v 1.6 1999-02-18 16:11:15 leonb Exp $# */
+    #$Id: IFFByteStream.h,v 1.7 1999-03-02 02:12:13 leonb Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -82,41 +83,40 @@
 
 
 
-/** ByteStream interface for a IFF file. 
+/** ByteStream interface for an IFF file. 
 
     Class #IFFByteStream# augments the #ByteStream# interface with
     functions for navigating from chunk to chunk.  It works in relation
     with a ByteStream specified at construction time. 
 
-    {\bf Reading an IFF file}:
-    You can read an IFF file by constructing an #IFFByteStream# object
-    attached to the ByteStream containing the IFF file.  Calling function
-    \Ref{get_chunk} positions the file pointer at the beginning of the first
-    chunk.  You can then use \Ref{ByteStream::read} to access the chunk data.
-    Function #read# will return #0# if you attempt to read past the end of the
-    chunk, just as if you were trying to read past the end of a file. You can
-    at any time call function \Ref{close_chunk} to terminate reading data in
-    this chunk.  The following chunks can be accessed by calling again
-    #get_chunk# and #close_chunk# until you reach the end of the file.
-    Function #read# is not very useful when accessing a composite chunk.  You
-    can instead make nested calls to functions #get_chunk# and #close_chunk#
-    in order to access the chunks located inside the composite chunk.
+    {\bf Reading an IFF file} --- You can read an IFF file by constructing an
+    #IFFByteStream# object attached to the ByteStream containing the IFF file.
+    Calling function \Ref{get_chunk} positions the file pointer at the
+    beginning of the first chunk.  You can then use \Ref{ByteStream::read} to
+    access the chunk data.  Function #read# will return #0# if you attempt to
+    read past the end of the chunk, just as if you were trying to read past
+    the end of a file. You can at any time call function \Ref{close_chunk} to
+    terminate reading data in this chunk.  The following chunks can be
+    accessed by calling #get_chunk# and #close_chunk# repeatedly until you
+    reach the end of the file.  Function #read# is not very useful when
+    accessing a composite chunk.  You can instead make nested calls to
+    functions #get_chunk# and #close_chunk# in order to access the chunks
+    located inside the composite chunk.
     
-    {\bf Writing an IFF file}:
-    You can write an IFF file by constructing an #IFFByteStream# object
-    attached to the seekable ByteStream object that will contain the IFF file.
-    Calling function \Ref{put_chunk} creates a first chunk header and
-    positions the file pointer at the beginning of the chunk.  You can then
-    use \Ref{ByteStream::write} to store the chunk data.  Calling function
-    \Ref{close_chunk} terminates the current chunk.  You can append more
-    chunks by calling again #put_chunk# and #close_chunk#.  Function #write#
-    is not very useful for writing a composite chunk.  You can instead make
-    nested calls to function #put_chunk# and #close_chunk# in order to create
-    chunks located inside the composite chunk.
+    {\bf Writing an IFF file} --- You can write an IFF file by constructing an
+    #IFFByteStream# object attached to the seekable ByteStream object that
+    will contain the IFF file.  Calling function \Ref{put_chunk} creates a
+    first chunk header and positions the file pointer at the beginning of the
+    chunk.  You can then use \Ref{ByteStream::write} to store the chunk data.
+    Calling function \Ref{close_chunk} terminates the current chunk.  You can
+    append more chunks by calling #put_chunk# and #close_chunk# repeatedly.
+    Function #write# is not very useful for writing a composite chunk.  You
+    can instead make nested calls to function #put_chunk# and #close_chunk# in
+    order to create chunks located inside the composite chunk.
 
     Writing an IFF file requires a seekable ByteStream (see
-    \Ref{ByteStream::is_seekable}).  This is hardly a problem because you can
-    always create the IFF file into a \Ref{MemoryByteStream} and then use
+    \Ref{ByteStream::is_seekable}).  This is not much of a problem because you
+    can always create the IFF file into a \Ref{MemoryByteStream} and then use
     \Ref{ByteStream::copy} to transfer the IFF file into a non seekable
     ByteStream.  */
 
@@ -141,8 +141,10 @@ public:
       the non zero chunk size.  The file offset of the chunk data may be
       retrieved using function #tell#.  The chunk data can then be read using
       function #read# until reaching the end of the chunk.  Advanced users may
-      use the optional arguments #rawoffsetptr# and #rawsizeptr# to locate the
-      file segment containing the chunk header and the chunk data. */
+      supply two pointers to integer variables using arguments #rawoffsetptr#
+      and #rawsizeptr#. These variables will be overwritten with the offset
+      and the length of the file segment containing both the chunk header and
+      the chunk data. */
   int get_chunk(GString &chkid, int *rawoffsetptr=0, int *rawsizeptr=0);
   /** Enters a chunk for writing.  Function #put_chunk# prepares a chunk
       header and positions the IFFByteStream at the beginning of the chunk

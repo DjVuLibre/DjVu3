@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: ByteStream.h,v 1.5 1999-03-01 14:48:02 leonb Exp $
+//C-  $Id: ByteStream.h,v 1.6 1999-03-02 02:12:11 leonb Exp $
 
 
 #ifndef _BYTESTREAM_H
@@ -18,7 +18,7 @@
     Files #"ByteStream.h"# and #"ByteStream.cpp"# define input/output classes
     similar in spirit to the well known C++ #iostream# classes.  Class
     \Ref{ByteStream} is an abstract base class for all byte streams.  It
-    defines a virtual interface and also provides utseful functions.  These
+    defines a virtual interface and also provides useful functions.  These
     files provide two subclasses. Class \Ref{StdioByteStream} provides a
     simple interface to the Ansi C buffered input/output functions. Class
     \Ref{MemoryByteStream} provides stream-like access to a dynamical array
@@ -36,10 +36,10 @@
     @memo 
     Input/output classes
     @author
-    Leon Bottou <leonb@research.att.com> -- initial implementation\\
+    L\'eon Bottou <leonb@research.att.com> -- initial implementation\\
     Andrei Erofeev <eaf@research.att.com> -- 
     @version
-    #$Id: ByteStream.h,v 1.5 1999-03-01 14:48:02 leonb Exp $# */
+    #$Id: ByteStream.h,v 1.6 1999-03-02 02:12:11 leonb Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -251,7 +251,7 @@ public:
       memory area pointed to by #buffer#. */
   MemoryByteStream(const void *buffer, size_t size);
   /** Constructs a MemoryByteStream by copying an initial string.  The
-      MemoryByteStream buffer is initialized with the zero terminated string
+      MemoryByteStream buffer is initialized with the null terminated string
       #buffer#. */
   MemoryByteStream(const char *buffer);
   // Virtual functions
@@ -315,7 +315,7 @@ public:
   /** Creates a StaticByteStream object for allocating the memory area of
       length #sz# starting at address #buffer#. */
   StaticByteStream(const char *buffer, size_t sz);
-  /** Creates a StaticByteStream object for allocating the zero terminated
+  /** Creates a StaticByteStream object for allocating the null terminated
       memory area starting at address #buffer#. */
   StaticByteStream(const char *buffer);  
   // Virtual functions

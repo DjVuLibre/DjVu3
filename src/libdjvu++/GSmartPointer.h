@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: GSmartPointer.h,v 1.3 1999-02-22 21:25:40 leonb Exp $
+//C-  $Id: GSmartPointer.h,v 1.4 1999-03-02 02:12:12 leonb Exp $
 
 #ifndef _GSMARTPOINTER_H_
 #define _GSMARTPOINTER_H_
@@ -26,10 +26,10 @@
     @memo 
     Thread-Safe reference counting smart-pointers.
     @author 
-    Leon Bottou <leonb@research.att.com> -- initial implementation\\
+    L\'eon Bottou <leonb@research.att.com> -- initial implementation\\
     Andrei Erofeev <eaf@research.att.com> -- bug fix.
     @version 
-    #$Id: GSmartPointer.h,v 1.3 1999-02-22 21:25:40 leonb Exp $# 
+    #$Id: GSmartPointer.h,v 1.4 1999-03-02 02:12:12 leonb Exp $# 
     @args
 */
 //@{
@@ -162,10 +162,10 @@ protected:
     function returns.  The bad news is that the fact that a function assigns a
     pointer argument to a smart-pointer does not necessarily appear in the
     function prototype.  Such a behavior must be {\em documented} with the
-    function public interface.  As a convention, I usually write such
+    function public interface.  As a convention, we usually write such
     functions with smart-pointer arguments instead of a regular pointer
     arguments.  This is not enough to catch the error at compile time, but
-    this is a simple way to document such a behavior.  I still believe that
+    this is a simple way to document such a behavior.  We still believe that
     this is a small problem in regard to the benefits of the smart-pointer.
     But one has to be aware of its existence.  */
 

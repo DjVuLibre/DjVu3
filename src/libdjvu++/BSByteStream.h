@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: BSByteStream.h,v 1.4 1999-02-19 19:03:43 leonb Exp $
+//C-  $Id: BSByteStream.h,v 1.5 1999-03-02 02:12:11 leonb Exp $
 
 
 #ifndef _BSBYTESTREAM_H
@@ -17,7 +17,8 @@
     
     Files #"BSByteStream.h"# and #"BSByteStream.cpp"# implement a very compact
     general purpose compressor based on the Burrows-Wheeler transform.  The
-    utility program \Ref{bzz} provides a front-end for this class.
+    utility program \Ref{bzz} provides a front-end for this class. This is not
+    currently used in DjVu files.
 
     {\bf Algorithms} --- The Burrows-Wheeler transform (also named Block-Sorting)
     is performed using a combination of the Karp-Miller-Rosenberg and the
@@ -36,7 +37,7 @@
     files like spreadsheet files.  Compression and decompression speed is
     about twice slower than #bzip2# but the sorting algorithms is more
     robust. Unlike #bzip2# (as of August 1998), this code can compress half a
-    megabyte of "abababab....".
+    megabyte of "abababab...." in bounded time.
     
     Here are some comparative results (in bits per character) obtained on the
     Canterbury Corpus (\URL{http://corpus.canterbury.ac.nz}) as of August
@@ -85,12 +86,12 @@
     below your eyes.
 
     @author
-    Leon Bottou <leonb@research.att.com> -- Initial implementation\\
+    L\'eon Bottou <leonb@research.att.com> -- Initial implementation\\
     Andrei Erofeev <eaf@research.att.com> -- Improved Block Sorting algorithm.
     @memo
     Simple Burrows-Wheeler general purpose compressor.
     @version
-    #$Id: BSByteStream.h,v 1.4 1999-02-19 19:03:43 leonb Exp $# */
+    #$Id: BSByteStream.h,v 1.5 1999-03-02 02:12:11 leonb Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -144,7 +145,7 @@ public:
       buffer. Function #read# can be used to access the decompressed data.
       \item[Compression]
       Setting #blocksize# to a positive number between 100 and 4096
-      initialized the compressor.  Data written to the BSByteStream will be
+      initializes the compressor.  Data written to the BSByteStream will be
       accumulated into an internal buffer.  The buffered data will be
       compressed and written to ByteStream #bs# whenever the buffer sizes
       reaches the maximum value specified by argument #blocksize# (in

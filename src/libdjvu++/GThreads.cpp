@@ -7,10 +7,10 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: GThreads.cpp,v 1.3 1999-02-01 22:50:40 leonb Exp $
+//C-  $Id: GThreads.cpp,v 1.4 1999-03-02 02:12:12 leonb Exp $
 
 
-// **** File "$Id: GThreads.cpp,v 1.3 1999-02-01 22:50:40 leonb Exp $"
+// **** File "$Id: GThreads.cpp,v 1.4 1999-03-02 02:12:12 leonb Exp $"
 // This file defines machine independent classes
 // for running and synchronizing threads.
 // - Author: Leon Bottou, 01/1998
@@ -540,9 +540,9 @@ mach_start(mach_state *st1, void *pc, char *stacklo, char *stackhi)
       char *sp = (char*)(((unsigned long)stacklo+127+256) & ~0xff);
       asm volatile("copy %0,%%sp\n\t"       // set stack pointer
                    "copy %1,%%r22\n\t"      // set call address
-                   ".CALL\n\t"              // call 
+                   ".CALL\n\t"              // call pseudo instr (why?)
                    "bl $$dyncall,%%r31\n\t" // call 
-                   "nop"                    // delay slot ???
+                   "copy %%r31,%%r2"        // delay slot ???
                    : : "r" (sp), "r" (pc) );
 #elif #cpu(alpha)
       char *sp = (char*)(((unsigned long)stackhi-16) & ~0xff);

@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: DjVuImage.h,v 1.6 1999-02-18 22:46:06 leonb Exp $
+//C-  $Id: DjVuImage.h,v 1.7 1999-03-02 02:12:12 leonb Exp $
 
 #ifndef _DJVUIMAGE_H
 #define _DJVUIMAGE_H
@@ -56,9 +56,9 @@
     @memo
     Decoding DjVu and IW44 images.
     @author
-    Leon Bottou <leonb@research.att.com>
+    L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: DjVuImage.h,v 1.6 1999-02-18 22:46:06 leonb Exp $# */
+    #$Id: DjVuImage.h,v 1.7 1999-03-02 02:12:12 leonb Exp $# */
 //@{
 
 
@@ -300,8 +300,8 @@ public:
   //@{
   /** Decodes DjVu data. This function reads binary data from the ByteStream
       #bs# and populates this DjVu image.  The decoder can process both IW44
-      Image files and DjVu Image files. IW44 Image files are in fact processed
-      as Color DjVu Images.  The member functions of the optional argument
+      Image files and DjVu Image files.  IW44 Image files are in fact handled
+      like Photo DjVu Images.  The member functions of the optional argument
       #notifier# are called at appropriate times during the decoding process.
       See class \Ref{DjVuInterface} for more details. */
   void decode(ByteStream &bs, DjVuInterface *notifier=0);
@@ -310,12 +310,12 @@ public:
   // CHECKING
   /** @name Checking for legal DjVu files. */
   //@{
-  /** This function returns true if this object contains a well formed Color
+  /** This function returns true if this object contains a well formed Photo
       DjVu image. Calling function #get_pixmap# on a well formed color image
       should always return a non zero value.  Note that function #get_pixmap#
       works as soon as sufficient information is present, regardless of the
       fact that the image follows the rules or not. */
-  int is_legal_color() const;
+  int is_legal_photo() const;
   /** This function returns true if this object contains a well formed Bilevel
       DjVu image.  Calling function #get_bitmap# on a well formed bilevel
       image should always return a non zero value.  Note that function

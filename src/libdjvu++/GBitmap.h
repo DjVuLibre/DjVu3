@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: GBitmap.h,v 1.2 1999-02-01 18:32:32 leonb Exp $
+//C-  $Id: GBitmap.h,v 1.3 1999-03-02 02:12:12 leonb Exp $
 
 #ifndef _GBITMAP_H_
 #define _GBITMAP_H_
@@ -40,9 +40,9 @@
     @memo
     Generic support for bilevel and gray-level images.
     @author
-    Leon Bottou <leonb@research.att.com>
+    L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: GBitmap.h,v 1.2 1999-02-01 18:32:32 leonb Exp $#
+    #$Id: GBitmap.h,v 1.3 1999-03-02 02:12:12 leonb Exp $#
 
  */
 //@{

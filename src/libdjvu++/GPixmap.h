@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: GPixmap.h,v 1.2 1999-02-01 18:32:32 leonb Exp $
+//C-  $Id: GPixmap.h,v 1.3 1999-03-02 02:12:12 leonb Exp $
 
 #ifndef _GPIXMAP_H_
 #define _GPIXMAP_H_
@@ -30,9 +30,9 @@
     @memo
     Generic support for color images.
     @author
-    Leon Bottou <leonb@research.att.com>
+    L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: GPixmap.h,v 1.2 1999-02-01 18:32:32 leonb Exp $# */
+    #$Id: GPixmap.h,v 1.3 1999-03-02 02:12:12 leonb Exp $# */
 //@{
 
 #ifdef __GNUC__

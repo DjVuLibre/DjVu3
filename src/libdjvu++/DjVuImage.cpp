@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: DjVuImage.cpp,v 1.7 1999-02-18 22:46:06 leonb Exp $
+//C-  $Id: DjVuImage.cpp,v 1.8 1999-03-02 02:12:12 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -305,7 +305,7 @@ DjVuImage::is_legal_bilevel() const
 }
 
 int 
-DjVuImage::is_legal_color() const
+DjVuImage::is_legal_photo() const
 {
   // Components
   GP<DjVuInfo> info = get_info();

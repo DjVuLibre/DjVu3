@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: djvuinfo.cpp,v 1.2 1999-03-01 17:02:45 leonb Exp $
+//C-  $Id: djvuinfo.cpp,v 1.3 1999-03-02 02:12:13 leonb Exp $
 
 
 
@@ -49,9 +49,9 @@
     @memo
     Prints the structure of an IFF file.
     @author
-    Leon Bottou <leonb@research.att.com>
+    L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: djvuinfo.cpp,v 1.2 1999-03-01 17:02:45 leonb Exp $# */
+    #$Id: djvuinfo.cpp,v 1.3 1999-03-02 02:12:13 leonb Exp $# */
 //@{
 //@}
 

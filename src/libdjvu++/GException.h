@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: GException.h,v 1.6 1999-02-22 21:12:28 leonb Exp $
+//C-  $Id: GException.h,v 1.7 1999-03-02 02:12:12 leonb Exp $
 
 
 #ifndef _GEXCEPTION_H_
@@ -27,7 +27,7 @@
     the proper destructors when an exception occurs, and (b) it is not thread
     safe.  Although all modern C++ compiler handle exception decently, the
     exception handling intrinsics are not always thread safe.  Therefore we
-    urge programmers to {\em only} use exception to signal error conditions
+    urge programmers to {\em only} use exceptions to signal error conditions
     that force the library to discontinue execution.
     
     There are four macros for handling exceptions.  Macros #TRY#, #CATCH# and
@@ -55,10 +55,10 @@
     @memo 
     Portable exceptions.
     @author 
-    Leon Bottou <leonb@research.att.com> -- initial implementation.\\
+    L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@research.att.com> -- fixed message memory allocation.
     @version 
-    #$Id: GException.h,v 1.6 1999-02-22 21:12:28 leonb Exp $# */
+    #$Id: GException.h,v 1.7 1999-03-02 02:12:12 leonb Exp $# */
 //@{
 
 #include "DjVuGlobal.h"

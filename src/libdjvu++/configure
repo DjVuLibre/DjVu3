@@ -126,12 +126,21 @@ then
        if ( ( $CXX -pthread /tmp/$$.c -o /tmp/$$ >/tmp/$$.log 2>&1 ) \
             && [ -z "`grep -i unrecognized /tmp/$$.log`" ] )
        then
-         OPT="$OPT -pthread"
          echo yes.
+         OPT="$OPT -pthread"
        else
-         LDLIBS="-lpthread $LDLIBS"
-         DEFS="$DEFS -D_REENTRANT"
          echo no.
+         echo -n "Check option -threads ..."
+         if ( ( $CXX -threads /tmp/$$.c -o /tmp/$$ >/tmp/$$.log 2>&1 ) \
+              && [ -z "`grep -i unrecognized /tmp/$$.log`" ] )
+         then
+           echo yes.
+           OPT="$OPT -threads"
+         else
+           echo no.
+           LDLIBS="-lpthread $LDLIBS"
+           DEFS="$DEFS -D_REENTRANT"
+         fi
        fi
        ;;
     *)

@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: Template.h,v 1.2 1999-02-01 18:32:33 leonb Exp $
+//C-  $Id: Template.h,v 1.3 1999-03-02 02:12:13 leonb Exp $
 
 
 //T// This is a template for the header files in the
@@ -74,9 +74,9 @@
     @memo 
     Template header file
     @version 
-    #$Id: Template.h,v 1.2 1999-02-01 18:32:33 leonb Exp $# 
+    #$Id: Template.h,v 1.3 1999-03-02 02:12:13 leonb Exp $# 
     @author: 
-    Leon Bottou <leonb@research.att.com> -- initial implementation \\
+    L\'eon Bottou <leonb@research.att.com> -- initial implementation \\
     Andrew Erofeev <eaf@research.att.com> -- implemented EXTERNAL_TEMPLATES */
 //@{
 //T// The magic doc++ comment above opens a doc++ context.

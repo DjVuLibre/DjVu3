@@ -101,10 +101,10 @@ html: libdjvu++.dxx libdjvu++.footer
 
 tex:  libdjvu++.dxx
 	-@mkdir @Doc 2>/dev/null
-	${DOCXX} -t -o @Doc/libdjvu++.tex libdjvu++.dxx
+	${DOCXX} -t -o @Doc/libdjvu++.tex -ep fullpage libdjvu++.dxx
 	( cd @Doc ; latex libdjvu++.tex ; latex libdjvu++.tex )
 	dvips @Doc/libdjvu++.dvi -o
-	gzip libdjvu++.ps
+	gzip -f libdjvu++.ps
 
 
 # Generic rules

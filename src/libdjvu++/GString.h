@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: GString.h,v 1.4 1999-02-22 22:47:18 leonb Exp $
+//C-  $Id: GString.h,v 1.5 1999-03-02 02:12:12 leonb Exp $
 
 
 #ifndef _GSTRING_H_
@@ -32,9 +32,9 @@
     @memo
     General purpose string class.
     @author
-    Leon Bottou <leonb@research.att.com> -- initial implementation.
+    L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.4 1999-02-22 22:47:18 leonb Exp $# */
+    #$Id: GString.h,v 1.5 1999-03-02 02:12:12 leonb Exp $# */
 //@{
 
 #include "DjVuGlobal.h"
@@ -78,10 +78,10 @@ private:
     objects because the class will automatically manage the necessary memory.
     
     Characters in the string can be identified by their position.  The first
-    character of a string is numbered zero. Negative values for argument
-    #from# represent characters relative to the end of the string
-    (i.e. position #-1# accesses the last character of the string, position
-    #-2# represents the second last character, etc.)  */
+    character of a string is numbered zero. Negative positions represent
+    characters relative to the end of the string (i.e. position #-1# accesses
+    the last character of the string, position #-2# represents the second last
+    character, etc.)  */
 
     
 class GString : protected GP<GStringRep> 
@@ -92,7 +92,7 @@ public:
   GString();
   /** Copy constructor. Constructs a string by copying the string #gs#. */
   GString(const GString &gs);
-  /** Constructs a string from a zero terminated character array. */ 
+  /** Constructs a string from a null terminated character array. */ 
   GString(const char *dat);
   /** Constructs a string from a character array.  Elements of the character
       array #dat# are added into the string until the string length reaches
@@ -104,10 +104,12 @@ public:
       than #len# if the specified range is too large. */
   GString(const GString &gs, int from, unsigned int len);
   /** Constructs a string with a human-readable representation of integer
-      #number#. */
+      #number#.  The format is similar to format #"%d"# in function
+      #printf#. */
   GString(const int number);
   /** Constructs a string with a human-readable representation of floating
-      point number #number#. */
+      point number #number#. The format is similar to format #"%f"# in
+      function #printf#.  */
   GString(const double number);
   // -- COPY OPERATOR
   /** Copy operator. Resets this string with the value of the string #gs#.
@@ -115,12 +117,12 @@ public:
       "copy-on-write" strategy. Both strings will share the same segment of
       memory until one of the strings is modified. */
   GString& operator= (const GString &gs);
-  /** Copy a zero terminated character array. Resets this string with the
-      character string contained in the zero terminated character array
+  /** Copy a null terminated character array. Resets this string with the
+      character string contained in the null terminated character array
       #str#. */
   GString& operator= (const char *str);
   // -- ACCESS
-  /** Converts a string into a constant zero terminated character array.  This
+  /** Converts a string into a constant null terminated character array.  This
       conversion operator is very efficient because it simply returns a
       pointer to the internal string data. The returned pointer remains valid
       as long as the string is unmodified. */
@@ -138,16 +140,20 @@ public:
       certain compilers. */
   int operator! () const { return ((*this)->data[0] == 0); }
   // -- INDEXING
-  /** Returns the character at position #n#. An exception
-      \Ref{GException} is thrown if number #n# is not in range #-len# to
-      #len-1#, where #len# is the length of the string. */
+  /** Returns the character at position #n#. An exception \Ref{GException} is
+      thrown if number #n# is not in range #-len# to #len-1#, where #len# is
+      the length of the string.  The first character of a string is numbered
+      zero.  Negative positions represent characters relative to the end of
+      the string. */
   char operator[] (int n) const;
   /** Set the character at position #n# to value #ch#.  An exception
       \Ref{GException} is thrown if number #n# is not in range #-len# to
       #len#, where #len# is the length of the string.  If character #ch# is
-      zero, the string is truncated at position #n#.  If position #n# is equal
-      to the length of the string, the character #ch# is appended to the end
-      of the string. */
+      zero, the string is truncated at position #n#.  The first character of a
+      string is numbered zero. Negative positions represent characters
+      relative to the end of the string. If position #n# is equal to the
+      length of the string, this function appends character #ch# to the end of
+      the string. */
   void setat(int n, char ch);
   // -- DERIVED STRINGS
   /** Returns a sub-string.  The sub-string is composed by copying #len#
@@ -171,14 +177,15 @@ public:
       as long as the string is not modified by other means.  Positive values
       for argument #n# represent the length of the returned buffer.  The
       returned string buffer will be large enough to hold at least #n#
-      characters plus a zero termination.  If #n# is positive but smaller than
+      characters plus a null character.  If #n# is positive but smaller than
       the string length, the string will be truncated to #n# characters. */
   char *getbuf(int n = -1);
   /** Initializes a string with a formatted string (as in #printf#).  The
       string is re-initialized with the characters generated according to the
       specified format #fmt# and using the optional arguments.  See the Ansi-C
       function #printf()# for more information.  The current implementation
-      will not work with strings longer than 4096 characters. */
+      will cause a segmentation violation if the resulting string is longer
+      than 4096 characters. */
   void format(const char *fmt, ... );
   // -- SEARCHING
   /** Searches character #c# in the string, starting at position #from# and
@@ -204,7 +211,7 @@ public:
   // -- CONCATENATION
   /** Appends character #ch# to the string. */
   GString& operator+= (char ch);
-  /** Appends the zero terminated character array #str# to the string. */
+  /** Appends the null terminated character array #str# to the string. */
   GString& operator+= (const char *str);
   /** Concatenates strings. Returns a string composed by concatenating
       the characters of strings #s1# and #s2#. */
@@ -248,7 +255,7 @@ public:
   friend int operator> (const char    *s1, const GString &s2)
     { return strcmp(s1,s2)> 0; }
   /** String comparison. Returns true if and only if character strings #s1# is
-      lexicographically lesser than or equal to string #s2# (as with #strcmp#.) */
+      lexicographically less than or equal to string #s2# (as with #strcmp#.) */
   friend int operator<=(const GString &s1, const GString &s2)
     { return strcmp(s1,s2)<=0; }
   friend int operator<=(const GString &s1, const char    *s2) 
@@ -256,7 +263,7 @@ public:
   friend int operator<=(const char    *s1, const GString &s2)
     { return strcmp(s1,s2)<=0; }
   /** String comparison. Returns true if and only if character strings #s1# is
-      lexicographically lesser than string #s2# (as with #strcmp#.) */
+      lexicographically less than string #s2# (as with #strcmp#.) */
   friend int operator< (const GString &s1, const GString &s2)
     { return strcmp(s1,s2)< 0; }
   friend int operator< (const GString &s1, const char    *s2)
@@ -264,8 +271,10 @@ public:
   friend int operator< (const char    *s1, const GString &s2) 
     { return strcmp(s1,s2)< 0; }
   // -- HASHING
-  /** Returns a hash code for the string.  This hashing function
-      helps when creating associative maps with string keys (see \Ref{GMap}). */
+  /** Returns a hash code for the string.  This hashing function helps when
+      creating associative maps with string keys (see \Ref{GMap}).  This hash
+      code may be reduced to an arbitrary range by computing its remainder
+      modulo the upper bound of the range. */
   friend unsigned int hash(const GString &ref);
   // -- HELPERS
 protected:

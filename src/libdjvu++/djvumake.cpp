@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: djvumake.cpp,v 1.5 1999-03-01 17:02:45 leonb Exp $
+//C-  $Id: djvumake.cpp,v 1.6 1999-03-02 02:12:13 leonb Exp $
 
 /** @name djvumake
 
@@ -16,7 +16,7 @@
        % djvumake <djvufile> [Sjbz=<jb2file>] [FG44=<iw4file>] [BG44=<iw4file>]
     \end{verbatim}
 
-    {\bf Recipe for creating a Color DjVu File}\\
+    {\bf Recipe for creating a Photo DjVu File}\\
     You should first use program \Ref{c44} and produce an IW44 file "my.iw4".
     Assuming that this image is 640 pixels wide and 480 pixels high, you can
     assemble file #"my.djvu"# using #djvumake# with the following arguments.
@@ -109,11 +109,11 @@
     \end{verbatim}
 
     @memo
-    Create DjVu files.
+    Assemble DjVu files.
     @version
-    #$Id: djvumake.cpp,v 1.5 1999-03-01 17:02:45 leonb Exp $#
+    #$Id: djvumake.cpp,v 1.6 1999-03-02 02:12:13 leonb Exp $#
     @author
-    Leon Bottou <leonb@research.att.com> */
+    L\'eon Bottou <leonb@research.att.com> */
 //@{
 //@}
 
@@ -432,6 +432,7 @@ main(int argc, char **argv)
       // Sanity checks
       if (flag_contains_stencil)
         {
+          // Compound or Bilevel
           if (flag_contains_bg && ! flag_contains_fg)
             fprintf(stderr,"djvumake: djvu file contains a BG44 chunk but no FG44 chunk\n");
           if (flag_contains_fg && ! flag_contains_bg)
@@ -439,14 +440,14 @@ main(int argc, char **argv)
         }
       else if (flag_contains_bg)
         {
-          // Color DjVu Image
+          // Photo DjVu Image
           if (flag_contains_bg!=1)
-            fprintf(stderr,"djvumake: color djvu image has subsampled BG44 chunk\n"); 
+            fprintf(stderr,"djvumake: photo djvu image has subsampled BG44 chunk\n"); 
           if (flag_contains_fg)
-            fprintf(stderr,"djvumake: color djvu file contains FG44 chunk\n");            
+            fprintf(stderr,"djvumake: photo djvu file contains FG44 chunk\n");            
         }
       else
-        fprintf(stderr,"djvumake: djvu file contains no Sjbz or BG44 chunk\n");
+        fprintf(stderr,"djvumake: djvu file contains chunk Sjbz or BG44\n");
     }
   CATCH(ex)
     {

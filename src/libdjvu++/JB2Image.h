@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: JB2Image.h,v 1.2 1999-02-12 20:38:12 leonb Exp $
+//C-  $Id: JB2Image.h,v 1.3 1999-03-02 02:12:13 leonb Exp $
 
 #ifndef _JB2IMAGE_H
 #define _JB2IMAGE_H
@@ -96,12 +96,12 @@
     \end{itemize}
 
     @version
-    #$Id: JB2Image.h,v 1.2 1999-02-12 20:38:12 leonb Exp $#
+    #$Id: JB2Image.h,v 1.3 1999-03-02 02:12:13 leonb Exp $#
     @memo
     Coding bilevel images with JB2.
     @author
     Paul Howard <pgh@research.att.com> -- JB2 design\\
-    Leon Bottou <leonb@research.att.com> -- this implementation */
+    L\'eon Bottou <leonb@research.att.com> -- this implementation */
 //@{
 
 #ifdef __GNUC__
