@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.51 2001-04-12 18:50:50 fcrary Exp $
+// $Id: GString.cpp,v 1.52 2001-04-12 22:32:27 praveen Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -283,7 +283,7 @@ GStringRep::upcase( void ) const
   {
     if(islower(*d))
     {
-      const GP<GStringRep> newval=(*(GP<GStringRep> *)(this))->blank(size);
+      const GP<GStringRep> newval=blank(size);
       unsigned char *s=(unsigned char *)(newval->data);
       for(const unsigned char *e=(const unsigned char *)data;e!=d;e++,s++)
       {
@@ -315,7 +315,7 @@ GStringRep::downcase( void ) const
   {
     if(isupper(*d))
     {
-      const GP<GStringRep> newval=(*(GP<GStringRep> *)(this))->blank(size);
+      const GP<GStringRep> newval=blank(size);
       unsigned char *s=(unsigned char *)(newval->data);
       for(const unsigned char *e=(const unsigned char *)data;e!=d;e++,s++)
       {
