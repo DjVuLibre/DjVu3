@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //
-// $Id: djvused.cpp,v 1.6 2001-09-24 20:02:45 leonb Exp $
+// $Id: djvused.cpp,v 1.7 2001-09-24 20:23:52 leonb Exp $
 // $Name:  $
 
 #include <stdio.h>
@@ -739,12 +739,12 @@ modify_meta(const GP<DjVuFile> &f,
   GP<ByteStream> newant = ByteStream::create();
   if (newmeta && !newmeta->isempty())
     {
-      newant->writestring(GUTF8String("(metadata ("));
+      newant->writestring(GUTF8String("(metadata"));
       for (GPosition pos=newmeta->firstpos(); pos; ++pos)
         {
           GUTF8String key = newmeta->key(pos); 
           GUTF8String val = (*newmeta)[pos];
-          newant->write("\n\t(",2);
+          newant->write("\n\t(",3);
           newant->writestring(key);
           newant->write(" ",1);
           print_c_string((const char*)val, val.length(), *newant);
@@ -801,22 +801,39 @@ command_remove_meta(ParsingByteStream &)
 }
 
 void
-set_meta(IFFByteStream &iff, ByteStream *newmeta)
-{
-}
-
-void
 command_set_meta(ParsingByteStream &pbs)
 {
   if (!file)
     verror("you must first select a page");
-  GP<ByteStream> bs(file->get_anno());
-  GP<IFFByteStream> iff = IFFByteStream::create(bs); 
+  // get metadata
   GP<ByteStream> metastream = ByteStream::create();
   get_data_from_file("set-meta", pbs, *metastream);
   metastream->seek(0);
-  set_meta(*iff, metastream);
-  vprint("set-ant: modified \"%s\"", (const char*)(GNativeString)fileid);
+  // parse metadata
+  GMap<GUTF8String,GUTF8String> metadata;
+  GP<ParsingByteStream> inp = ParsingByteStream::create(metastream);
+  int c;
+  while ( (c = inp->get_spaces(true)) != EOF )
+    {
+      GUTF8String key, val;
+      inp->unget(c);
+      key = inp->get_token();
+      c = inp->get_spaces(false);
+      if (c == '\"') {
+        inp->unget(c);
+        val = inp->get_token();
+      } else {
+        while (c!='\n' && c!='\r' && c!=EOF) {
+          val += c;
+          c = inp->get();
+        }
+      }
+      if (key.length()>0 && val.length()>0)
+        metadata[key] = val;
+    }
+  // set metadata
+  if (modify_meta(file, &metadata))
+    vprint("set-meta: modified \"%s\"", (const char*)(GNativeString)fileid);
 }
 
 static struct 
