@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GURL.h,v 1.6 1999-06-09 19:35:03 eaf Exp $
+//C- $Id: GURL.h,v 1.7 1999-08-04 19:10:02 eaf Exp $
 
 #ifndef _GURL_H_
 #define _GURL_H_
@@ -25,7 +25,7 @@
     \Ref{GURL} class used to store URLs in a system independent format.
     @memo System independent URL representation.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: GURL.h,v 1.6 1999-06-09 19:35:03 eaf Exp $#
+    @version #$Id: GURL.h,v 1.7 1999-08-04 19:10:02 eaf Exp $#
 */
 
 //@{
@@ -92,6 +92,9 @@ public:
       /// Returns TRUE if #gurl1# and #gurl2# are the same
    friend int	operator==(const GURL & gurl1, const GURL & gurl2);
 
+      /// Returns TRUE if #gurl1# and #gurl2# are different
+   friend int	operator!=(const GURL & gurl1, const GURL & gurl2);
+
       /// Returns Internal URL representation
    operator	const char*(void) const { return url; };
 
@@ -124,11 +127,16 @@ GURL::operator+(const GString & name) const
    return (*this)+(const char *) name;
 }
 
-
 inline int
 operator==(const GURL & gurl1, const GURL & gurl2)
 {
    return gurl1.url==gurl2.url;
+}
+
+inline int
+operator!=(const GURL & gurl1, const GURL & gurl2)
+{
+   return gurl1.url!=gurl2.url;
 }
 
 inline unsigned int
