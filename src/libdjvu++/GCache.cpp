@@ -9,13 +9,15 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GCache.cpp,v 1.2 1999-05-25 19:42:28 eaf Exp $
+//C- $Id: GCache.cpp,v 1.3 1999-06-04 19:57:08 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
 #endif
 
 #include "GCache.h"
+
+/*
 #include "DjVuFile.h"
 
 int
@@ -37,4 +39,4 @@ void f(void)
    cache.del_item("haha");
    cache.get_item("geg");
    cache.set_max_size(0);
-}
+}*/
