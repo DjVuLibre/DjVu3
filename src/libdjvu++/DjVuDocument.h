@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocument.h,v 1.89 2001-06-25 18:24:46 bcr Exp $
+// $Id: DjVuDocument.h,v 1.90 2001-06-26 16:14:51 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUDOCUMENT_H
@@ -58,7 +58,7 @@ class ByteStream;
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocument.h,v 1.89 2001-06-25 18:24:46 bcr Exp $#
+    @version #$Id: DjVuDocument.h,v 1.90 2001-06-26 16:14:51 bcr Exp $#
 */
 
 //@{
@@ -436,6 +436,7 @@ public:
 	  has not finished yet), #1# will be returned. Please refer to
           \Ref{init}() for details. */
    int		get_pages_num(void) const;
+
       /** Translates the page number to the full URL of the page. This URL
 	  is "artificial" for the {\em bundled} formats and is obtained
 	  by appending the page name to the document's URL honoring possible
@@ -567,6 +568,8 @@ public:
 	  @param port A pointer to \Ref{DjVuPort}, that the created image
 	  	      will be connected to. */
    GP<DjVuImage> get_page(int page_num, bool sync=true, DjVuPort * port=0) const;
+   GP<DjVuImage> get_page(int page_num, bool sync=true, DjVuPort * port=0)
+   { return const_cast<const DjVuDocument *>(this)->get_page(page_num,sync,port); }
 
       /** Returns \Ref{GP} pointer to \Ref{DjVuImage} corresponding to the
 	  specified ID. This function behaves exactly as the #get_page()#
@@ -606,6 +609,10 @@ public:
 	  the initialization completes before the \Ref{init}() function
 	  returns. */
    GP<DjVuFile>	get_djvu_file(int page_num, bool dont_create=false) const;
+   GP<DjVuFile> get_djvu_file(int page_num, bool dont_create=false)
+   { return const_cast<const DjVuDocument *>(this)->get_djvu_file(page_num,dont_create); }
+
+
       /** Returns \Ref{DjVuFile} corresponding to the specified ID.
           This function behaves exactly as the #get_djvu_file()# function
 	  above. The only thing worth mentioning here is how the #ID#
