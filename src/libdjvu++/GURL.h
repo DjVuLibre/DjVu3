@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GURL.h,v 1.12 1999-12-22 17:14:07 eaf Exp $
+//C- $Id: GURL.h,v 1.13 2000-01-14 23:34:51 eaf Exp $
 
 #ifndef _GURL_H_
 #define _GURL_H_
@@ -27,7 +27,7 @@
     \Ref{GURL} class used to store URLs in a system independent format.
     @memo System independent URL representation.
     @author Andrei Erofeev <eaf@research.att.com>
-    @version #$Id: GURL.h,v 1.12 1999-12-22 17:14:07 eaf Exp $#
+    @version #$Id: GURL.h,v 1.13 2000-01-14 23:34:51 eaf Exp $#
 */
 
 //@{
@@ -55,7 +55,8 @@
 class GURL
 {
 private:
-   GString	url;
+   GCriticalSection	url_lock;
+   GString		url;
 
    GCriticalSection	cgi_lock;
    DArray<GString>	cgi_name_arr, cgi_value_arr;
@@ -95,6 +96,9 @@ public:
 
       /// Erases everything after the first '#' ('%23') or '?' ('%3f')
    void		clear_all_arguments(void);
+
+      /// Erases everything after the first '#' ('#23')
+   void		clear_hash_argument(void);
    
       /** Returns the URL corresponding to the directory containing the document
 	  with this URL. */
