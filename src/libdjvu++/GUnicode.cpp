@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GUnicode.cpp,v 1.19 2001-05-25 20:23:14 bcr Exp $
+// $Id: GUnicode.cpp,v 1.20 2001-05-31 20:36:15 lchen Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -51,7 +51,7 @@ static void const *
 checkmarks(void const * const xbuf,size_t &bufsize,GStringRep::EncodeType &rep)
 {
   unsigned char const *buf=(unsigned char const *)xbuf;
-  if(bufsize >= 2 || (!bufsize && rep != GStringRep::XOTHER))
+  if(bufsize >= 2 || (xbuf && !bufsize && rep != GStringRep::XOTHER))
   {
     const unsigned int s=(((unsigned int)buf[0])<<8)+(unsigned int)buf[1];
     switch(s)
@@ -203,9 +203,9 @@ GStringRep::Unicode::create(
   GP<GStringRep> retval;
   if(r)
   {
+    const int s=r->gremainder;
     if(xbuf && bufsize)
     {
-      const int s=r->gremainder;
       if(s)
       {
         void *buf;
@@ -221,9 +221,19 @@ GStringRep::Unicode::create(
           ?create(xbuf,bufsize,r->encoding)
           :create(xbuf,bufsize,r->encodetype));
       }
-    }else
+    }else if(s)
+	{
+      void *buf;
+      GPBufferBase gbuf(buf,s,1);
+      memcpy(buf,r->remainder,s);
+      retval=((r->encoding)
+        ?create(buf,s,r->encoding)
+        :create(buf,s,r->encodetype));
+	}else
     {
-      retval=xremainder;
+      retval=((r->encoding)
+        ?create(0,0,r->encoding)
+        :create(0,0,r->encodetype));
     }
   }else
   {

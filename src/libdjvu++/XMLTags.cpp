@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: XMLTags.cpp,v 1.20 2001-05-25 19:17:16 bcr Exp $
+// $Id: XMLTags.cpp,v 1.21 2001-05-31 20:36:15 lchen Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -161,17 +161,13 @@ lt_XMLTags::init(XMLByteStream &xmlbs)
   int linesread=xmlbs.get_lines_read();
   if(!isspaces(raw))
   {
-    GUTF8String mesg;
-    mesg.format( ERR_MSG("XMLTags.raw_string") "\t%s",(const char *)raw);
-    G_THROW(mesg);
+    G_THROW( (ERR_MSG("XMLTags.raw_string") "\t")+raw);
   }
   for(int len;(len=(tag=xmlbs.gets(0,'>',true)).length());)
   {
-    while(tag[len-1] != '>')
+    if(tag[len-1] != '>')
     {
-      GUTF8String mesg;
-      mesg.format( ERR_MSG("XMLTags.bad_tag") "\t%s",(const char *)tag);
-      G_THROW(mesg);
+      G_THROW((ERR_MSG("XMLTags.bad_tag") "\t")+tag);
     }
     switch(tag[1])
     {
