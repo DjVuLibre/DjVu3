@@ -8,15 +8,17 @@ fi
 
 if [ -z "$SYS_SET" ] ; then
   echon "Checking system type ... "
-	if [ -z "$SYS" ] ; then 
+  if [ -z "$SYS" ] ; then 
     SYS=`"${uname}" -s`
-	fi
-	if [ -z "$PROC" ] ; then 
+  fi
+  if [ -z "$PROC" ] ; then 
     PROC=`"${uname}" -p`
-	fi
+  fi
   DEFS="-DUNIX"
   INCS=" "
   JOBJ=" "
+  SECURITYMODE="-D_LOCK_ID_"
+  SENTINAL=""
   WHOLEARCHIVESEP=" "
   WHOLEARCHIVE="-Wl,--whole-archive"
   NOWHOLEARCHIVE="-Wl,--no-whole-archive"
@@ -28,6 +30,7 @@ if [ -z "$SYS_SET" ] ; then
     else
       SYS=linux-libc5
     fi
+    SENTINAL=src/3rd-party/sentinal_lm_60/linux
   elif [ "$SYS" = "SunOS" ] ; then
     s=`"${uname}" -r|"${sed}" 's,\(5.[4-9]\)[.0-9]*,SOLARIS,'`
     WHOLEARCHIVESEP=","
@@ -39,16 +42,25 @@ if [ -z "$SYS_SET" ] ; then
       elif [ x$PROC = xsparc ]
       then
         SYS=Solaris-sparc
+        SENTINAL=src/3rd-party/sentinal_lm_60/sol2sprc
         DEFS="$DEFS -DNEED_DJVU_MEMORY"
       fi
     fi
   elif [ "$SYS" = "IRIX64" ] ; then
     WHOLEARCHIVE="-Wl,-all"
     NOWHOLEARCHIVE="-Wl,-notall"
+    SENTINAL=src/3rd-party/sentinal_lm_60/irixn32
     strip=""
+  fi
+  if [ -n "$SENTINAL" ]
+  then
+    if [ ! -d "${CONFIG_DIR}/../$SENTINAL" ]
+    then 
+      SENTINAL=""
+    fi
   fi
   SYS_SET=true
   echo "$SYS"
-  CONFIG_VARS=`echo SYS SYS_SET DEFS INCS JOBJ WHOLEARCHIVE WHOLEARCHIVESEP NOWHOLEARCHIVE $CONFIG_VARS`
+  CONFIG_VARS=`echo SYS SYS_SET DEFS INCS JOBJ WHOLEARCHIVE WHOLEARCHIVESEP NOWHOLEARCHIVE SENTINAL $CONFIG_VARS`
 fi
 

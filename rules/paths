@@ -44,3 +44,5 @@ LIBTIFF_INC=-I./TOPDIR/src/3rd-party/tiff-v3.5.4/libtiff -I./TOPDIR/SRCDIR/src/3
 LIBUNGIF=@%LIBUNGIF%@
 LIBUNGIF_INC=-I./TOPDIR/src/3rd-party/libungif-4.1.0 -I./TOPDIR/SRCDIR/src/3rd-party/libungif-4.1.0
 
+SECURITY=$(LIBPATH)/authorized.o
+
