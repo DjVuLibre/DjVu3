@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.89 2001-04-28 22:41:00 mchen Exp $
+// $Id: GString.cpp,v 1.90 2001-04-29 14:57:04 mchen Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -400,8 +400,8 @@ GStringRep::tocase(
     {
       strncpy((char *)buf,data,n);
     }
-    unsigned char *buf_ptr=buf;
-    for(char const *ptr=data;ptr<eptr;)
+    unsigned char *buf_ptr=buf+n;
+    for(char const *ptr=data+n;ptr<eptr;)
     {
       char const * const xptr=ptr;
       const unsigned long w=getValidUCS4(ptr);
