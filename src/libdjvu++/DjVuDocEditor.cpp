@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocEditor.cpp,v 1.11 1999-11-30 19:01:43 eaf Exp $
+//C- $Id: DjVuDocEditor.cpp,v 1.12 1999-11-30 19:56:08 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -729,6 +729,44 @@ DjVuDocEditor::remove_page(int page_num, bool remove_unref)
    remove_file(djvm_dir->page_to_file(page_num)->id, remove_unref);
 }
 
+GP<DataPool>
+DjVuDocEditor::get_thumbnail(int page_num, bool dont_decode)
+      // We override DjVuDocument::get_thumbnail() here because
+      // pages may have been shuffled and those "thumbnail file records"
+      // from the DjVmDir do not describe things correctly.
+      //
+      // So, first we will check the thumb_map[] if we have a predecoded
+      // thumbnail for the given page. If this is the case, we will
+      // return it. Otherwise, if dont_decode is false, we will
+      // ask DjVuDocument to generate this thumbnail for us.
+{
+   GURL url=page_to_url(page_num);
+
+   GPosition pos;
+   GCriticalSectionLock lock(&thumb_lock);
+   if (thumb_map.contains(url))
+   {
+	 // Get the image from the map
+      TArray<char> & data=*(TArray<char> *) thumb_map[pos];
+      GP<DataPool> pool=new DataPool;
+      pool->add_data((const char *) data, data.size());
+      pool->set_eof();
+      return pool;
+   } else if (!dont_decode)
+   {
+	 // Ask DjVuDocument to generate the thumbnail
+      GP<DataPool> pool=DjVuDocument::get_thumbnail(page_num, dont_decode);
+      if (pool)
+      {
+	    // And add the image to the map for future references
+	 TArray<char> * data=new TArray<char>(pool->get_size()-1);
+	 pool->get_data(*data, 0, data->size());
+	 thumb_map[url]=data;
+      }
+      return pool;
+   } else return 0;
+}
+
 int
 DjVuDocEditor::get_thumbnails_num(void) const
 {
@@ -934,6 +972,17 @@ DjVuDocEditor::save_as(const char * where, bool bundled)
    DEBUG_MSG("DjVuDocEditor::save_as(): where='" << where << "'\n");
    DEBUG_MAKE_INDENT(3);
 
+      // First see if we need to generate (or just reshuffle) thumbnails...
+      // If we have an icon for every page, we will just call
+      // generate_thumbnails(), which will update DjVmDir and will create
+      // the actual bundles with thumbnails (very fast)
+      // Otherwise we will remove the thumbnails completely because
+      // we really don't want to deal with documents, which have only
+      // some of their pages thumbnailed.
+   if (get_thumbnails_num()==get_pages_num())
+      generate_thumbnails(get_thumbnails_size(), 10);
+   else remove_thumbnails();
+   
    GURL save_doc_url;
    GString save_doc_name;
    

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocEditor.h,v 1.6 1999-11-30 19:01:43 eaf Exp $
+//C- $Id: DjVuDocEditor.h,v 1.7 1999-11-30 19:56:08 eaf Exp $
  
 #ifndef _DJVUDOCEDITOR_H
 #define _DJVUDOCEDITOR_H
@@ -27,7 +27,7 @@
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocEditor.h,v 1.6 1999-11-30 19:01:43 eaf Exp $#
+    @version #$Id: DjVuDocEditor.h,v 1.7 1999-11-30 19:56:08 eaf Exp $#
 */
 
 //@{
@@ -157,6 +157,8 @@ public:
    void		remove_thumbnails(void);
 
       /** Generates thumbnails for those pages, which do not have them yet.
+	  If you want to regenerate thumbnails for all pages, call
+	  \Ref{remove_thumbnails}() prior to calling this function.
 
 	  @param thumb_size The size of the thumbnails in pixels. DjVu viewer
 	         is able to rescale the thumbnail images if necessary, so this
@@ -182,6 +184,7 @@ public:
    virtual GP<DataPool>	request_data(const DjVuPort * source, const GURL & url);
 protected:
    virtual GP<DjVuFile>	url_to_file(const GURL & url, bool dont_create);
+   virtual GP<DataPool> get_thumbnail(int page_num, bool dont_decode);
 private:
       // This is a structure for active files and DataPools. It may contain
       // a DjVuFile, which is currently being used by someone (I check the list
