@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: IFFByteStream.h,v 1.5 1999-02-12 20:38:12 leonb Exp $
+//C-  $Id: IFFByteStream.h,v 1.6 1999-02-18 16:11:15 leonb Exp $
 
 
 #ifndef _IFFBYTESTREAM_H_
@@ -56,8 +56,8 @@
     byte stream.  Class #IFFByteStream# silently skips these four octets when
     it encounters them.
 
-    {\bf References} --- EA IFF 85 file format specification:
-    \URL{http://www.cica.indiana.edu/graphics/image_specs/ilbm.format.txt} or
+    {\bf References} --- EA IFF 85 file format specification:\\
+    \URL{http://www.cica.indiana.edu/graphics/image_specs/ilbm.format.txt} or\\
     \URL{http://www.tnt.uni-hannover.de/soft/compgraph/fileformats/docs/iff.pre}
 
     @memo 
@@ -65,7 +65,7 @@
     @author
     Leon Bottou <leonb@research.att.com>
     @version
-    #$Id: IFFByteStream.h,v 1.5 1999-02-12 20:38:12 leonb Exp $# */
+    #$Id: IFFByteStream.h,v 1.6 1999-02-18 16:11:15 leonb Exp $# */
 //@{
 
 #ifdef __GNUC__

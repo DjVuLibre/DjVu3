@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: GThreads.h,v 1.5 1999-02-15 23:44:28 leonb Exp $
+//C-  $Id: GThreads.h,v 1.6 1999-02-18 16:11:15 leonb Exp $
 
 #ifndef _GTHREADS_H_
 #define _GTHREADS_H_
@@ -57,7 +57,7 @@
           JRIGlobalRef.  This is not a real implementation since everything
           (Java code, native functions, stubs, exception thread safety) must
           be addressed by the plugin source code. Performance may be an issue.
-    \end{itemize}
+    \end{description}
     
     {\bf Portability}: The simultaneous use of threads and exceptions caused a
     lot of portability headaches under Unix.  We eventually decided to
@@ -76,7 +76,7 @@
     Leon Bottou <leonb@research.att.com> -- initial implementation.\\
     Praveen Guduru <praveen@sanskrit.lz.att.com> -- mac implementation.
     @version
-    #$Id: GThreads.h,v 1.5 1999-02-15 23:44:28 leonb Exp $# */
+    #$Id: GThreads.h,v 1.6 1999-02-18 16:11:15 leonb Exp $# */
 //@{
 
 #include "DjVuGlobal.h"

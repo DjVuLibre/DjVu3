@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: djvutopnm.cpp,v 1.10 1999-02-11 22:37:05 leonb Exp $
+//C-  $Id: djvutopnm.cpp,v 1.11 1999-02-18 16:11:15 leonb Exp $
 
 
 /** @name djvutopnm
@@ -17,7 +17,7 @@
         djvutopnm [options] djvufilename [pnmfilename]
     \end{verbatim}
 
-    {\bf Description} --- File #"djvutopnm.cpp" illustrates how to decode and
+    {\bf Description} --- File #"djvutopnm.cpp"# illustrates how to decode and
     render a DjVu file using class #DjVuImage#.  This program decodes all
     variants of DjVu files, including the wavelet files produced by \Ref{c44},
     and produces PNM files (see \Ref{PNM and RLE file formats}).
@@ -85,7 +85,7 @@
     Yann Le Cun <yann@research.att.com>\\
     Leon Bottou <leonb@research.att.com>
     @version
-    #$Id: djvutopnm.cpp,v 1.10 1999-02-11 22:37:05 leonb Exp $# */
+    #$Id: djvutopnm.cpp,v 1.11 1999-02-18 16:11:15 leonb Exp $# */
 //@{
 //@}
 

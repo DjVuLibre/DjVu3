@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: DjVuGlobal.h,v 1.4 1999-02-05 22:48:32 leonb Exp $
+//C-  $Id: DjVuGlobal.h,v 1.5 1999-02-18 16:11:15 leonb Exp $
 
 
 #ifndef _DJVUGLOBAL_H
@@ -24,7 +24,7 @@
     @memo
     Global definitions.
     @version
-    #$Id: DjVuGlobal.h,v 1.4 1999-02-05 22:48:32 leonb Exp $#
+    #$Id: DjVuGlobal.h,v 1.5 1999-02-18 16:11:15 leonb Exp $#
     @author
     Leon Bottou <leonb@research.att.com> -- empty file.\\
     Bill Riemers <bcr@sanskrit.lz.att.com> -- real work.  */
@@ -34,7 +34,7 @@
 
 
 
-/** @name DjVu Memory.
+/** @name DjVu Memory
     This section is enabled when compilation symbol #NEED_DJVU_MEMORY# is defined.
     It redefines the C++ memory allocation operators.  Some operating systems
     (e.g. Macintoshes) require very peculiar memory allocation in shared
@@ -100,7 +100,7 @@ operator delete [] (void *addr) delete_throw_spec
 
 
 
-/** @name DjVu Progress.  
+/** @name DjVu Progress  
     This section is enabled when compilation symbol #NEED_DJVU_PROGRESS# is
     defined.  This section allows for defining a callback function called at
     predefined points in the encoding routines.  There is not such facility
@@ -137,12 +137,13 @@ void _djvu_progress(const char*, const char*, int);
 
 
 
-/** @name DjVu Names.  
+/** @name DjVu Names  
     This section is enabled when compilation symbol #NEED_DJVU_NAMES# is defined.
     This section redefines class names in order to unclutter the name space of
     shared objects.  This is useful on systems which automatically export all
     global symbols when building a shared object.
-    {\bf Note} --- This is {\em unfinished}. Do not enable.  */
+    {\bf Note} --- This is {\em unfinished}. Do not enable. 
+    @args */
 //@{
 //@}
 
