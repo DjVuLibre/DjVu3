@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: ATTLicense.h,v 1.8 1999-03-17 19:24:56 leonb Exp $
+//C- $Id: ATTLicense.h,v 1.9 1999-03-17 20:05:43 leonb Exp $
 
 #ifndef _ATTLICENSE_H_
 #define _ATTLICENSE_H_
@@ -23,7 +23,7 @@
     @memo
     Support for AT&T Source Code Licensing
     @version
-    #$Id: ATTLicense.h,v 1.8 1999-03-17 19:24:56 leonb Exp $#
+    #$Id: ATTLicense.h,v 1.9 1999-03-17 20:05:43 leonb Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com>\\
     Jeffrey S. Dickey <jsdickey@att.com>\\
@@ -35,9 +35,9 @@
 class ATTLicense
 {
 public:
-  /** Returns a constant pointer to the copyright notice text. */
+  /** Returns a constant pointer to the long copyright notice. */
   static const char* get_notice_text();
-  /** Returns a constant pointer to the copyright notice. */
+  /** Returns a constant pointer to the short copyright notice. */
   static const char* get_copyright_text();
   /** Returns a constant pointer to the usage fragment. */
   static const char* get_usage_text();

@@ -1,14 +1,14 @@
 // -*- C++ -*-
 /** @name DjVu Reference Library
 
-    
-    The DjVu Reference Library is Copyright (c) AT&T 1999.  
+    Copyright (c) AT&T 1999.  All Rights Reserved.  
 
-    YOU may use this software pursuant to the terms and conditions specified
-    in the \Ref{AT&T Source Code Agreement}.  Unless you have other agreements
-    with AT&T regarding this software, YOUR use of this software shall imply
-    YOUR acceptance of all the provisions specified in this agreement.
-
+    This software may only be used by you under license from AT&T
+    Corp. ("AT&T"). A copy of the \Ref{AT&T Source Code Agreement} is available at
+    AT&T's Internet website having the URL \URL{http://www.djvu.att.com/open}.
+    If you received this software without first entering into a license with
+    AT&T, you have an infringing copy of this software and cannot use it
+    without violating AT&T's intellectual property rights.
 
     {\bf Acknowledgements} --- The ideas discussed in this library are the
     result of endless discussions with Yoshua Bengio, Patrick Haffner, Paul
