@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: XMLAnno.cpp,v 1.2 2001-02-02 16:41:42 bcr Exp $
+// $Id: XMLAnno.cpp,v 1.3 2001-02-06 19:14:38 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -47,6 +47,7 @@
 #include "DjVuFile.h"
 #include <stdio.h>
 #include <ctype.h>
+#include <stdlib.h>
 
 static void intList
 (char const *coords, GList<int> &retval)
