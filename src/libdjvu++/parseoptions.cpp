@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: parseoptions.cpp,v 1.42 2000-02-16 07:38:20 bcr Exp $
+//C- $Id: parseoptions.cpp,v 1.43 2000-02-16 17:13:15 bcr Exp $
 #ifdef __GNUC__
 #pragma implementation
 #endif
@@ -801,8 +801,9 @@ DjVuParseOptions::ReadNextConfig (
             }
             for(int k=0;k<newsize;k++)
             {
-              if(!values[k] && inherit_values[k])
+              if(inherit_values[k])
               {
+		delete [] values[k];
                 char *s=new char [strlen(inherit_values[k])+1];
                 strcpy(s,inherit_values[k]);
                 values[k]=s;
