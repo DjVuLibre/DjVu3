@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: JB2Image.cpp,v 1.40 2000-12-18 17:13:42 bcr Exp $
+// $Id: JB2Image.cpp,v 1.41 2000-12-19 19:04:31 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -60,21 +60,21 @@
 // Contains all contextual information for encoding/decoding a JB2Image.
 
 
-class _JB2Codec {
-
+class _JB2Codec
+{
 public:
   // Constructor Destructor
   _JB2Codec(ByteStream &bs, int encoding=0);
-  ~_JB2Codec();
+  virtual ~_JB2Codec();
   // Functions
   void set_dict_callback(JB2DecoderCallback *cb, void *arg);
-  void code(JB2Image *jim);
-  void code(JB2Dict *jim);
+  virtual void code(JB2Image *jim) = 0;
+  virtual void code(JB2Dict *jim) = 0;
 protected:
   // Forbidden assignment
   _JB2Codec(const _JB2Codec &ref);
   _JB2Codec& operator=(const _JB2Codec &ref);
-private:
+//private:
   // Coder
   ZPCodec zp;
   int encoding;
@@ -89,8 +89,8 @@ private:
   BitContext *bitcells;
   NumContext *leftcell;
   NumContext *rightcell;
-  void CodeBit(int &bit, BitContext &ctx);
-  void CodeNum(int &num, int lo, int hi, NumContext &ctx);
+  virtual void CodeBit(int &bit, BitContext &ctx) = 0;
+  int CodeNum(int lo, int hi, NumContext &ctx,int v);
   void reset_numcoder();
   // Info
   char refinementp;
@@ -100,14 +100,14 @@ private:
   // Code comment
   NumContext dist_comment_byte;
   NumContext dist_comment_length;
-  void code_comment(GString &comment);
+  virtual void code_comment(GString &comment) = 0;
   // Code values
   NumContext dist_record_type;
   NumContext dist_match_index;
   BitContext dist_refinement_flag;
   void code_eventual_lossless_refinement();
-  void code_record_type(int &rectype);
-  int code_match_index(int &index, JB2Dict *jim);
+  virtual void code_record_type(int &rectype) = 0;
+  virtual int code_match_index(int &index, JB2Dict *jim)=0;
   // Library
   void init_library(JB2Dict *jim);
   int add_library(int shapeno, JB2Shape *jshp);
@@ -136,13 +136,13 @@ private:
   int last_row_left;
   int image_columns;
   int image_rows;
-  void code_inherited_shape_count(JB2Dict *jim);
-  void code_image_size(JB2Dict *jim);
-  void code_image_size(JB2Image *jim);
+  virtual void code_inherited_shape_count(JB2Dict *jim)=0;
+  virtual void code_image_size(JB2Dict *jim);
+  virtual void code_image_size(JB2Image *jim);
   void code_relative_location(JB2Blit *jblt, int rows, int columns);
-  void code_absolute_location(JB2Blit *jblt,  int rows, int columns);
-  void code_absolute_mark_size(GBitmap *bm, int border=0);
-  void code_relative_mark_size(GBitmap *bm, int cw, int ch, int border=0);
+  virtual void code_absolute_location(JB2Blit *jblt,  int rows, int columns)=0;
+  virtual void code_absolute_mark_size(GBitmap *bm, int border=0) = 0;
+  virtual void code_relative_mark_size(GBitmap *bm, int cw, int ch, int border=0) = 0;
   int short_list[3];
   int short_list_pos;
   void fill_short_list(int v);
@@ -158,10 +158,54 @@ private:
   // Helpers
   void encode_libonly_shape(JB2Image *jim, int shapeno);
   void compute_bounding_box(GBitmap *cbm, LibRect *lrect);
+  virtual int get_diff(int x_diff,NumContext &rel_loc_last_x) = 0;
 };
 
+class _JB2DecodeCodec : public _JB2Codec
+{
+public:
+  _JB2DecodeCodec(ByteStream &bs);
+  virtual ~_JB2DecodeCodec();
+  virtual void code(JB2Image *jim);
+  virtual void code(JB2Dict *jim);
+protected:
+  int CodeNum(int lo, int hi, NumContext &ctx);
+  virtual void CodeBit(int &bit, BitContext &ctx);
+  virtual void code_comment(GString &comment);
+  virtual void code_record_type(int &rectype);
+  virtual int code_match_index(int &index, JB2Dict *jim);
+  virtual void code_inherited_shape_count(JB2Dict *jim);
+  virtual void code_image_size(JB2Dict *jim);
+  virtual void code_image_size(JB2Image *jim);
+  virtual void code_absolute_location(JB2Blit *jblt,  int rows, int columns);
+  virtual void code_absolute_mark_size(GBitmap *bm, int border=0);
+  virtual void code_relative_mark_size(GBitmap *bm, int cw, int ch, int border=0);
+  virtual int get_diff(int x_diff,NumContext &rel_loc_last_x);
+};
 
-
+#ifndef NEED_DECODER_ONLY
+class _JB2EncodeCodec : public _JB2Codec
+{
+public:
+  _JB2EncodeCodec(ByteStream &bs);
+  virtual ~_JB2EncodeCodec();
+  virtual void code(JB2Image *jim);
+  virtual void code(JB2Dict *jim);
+protected:
+  void CodeNum(int num, int lo, int hi, NumContext &ctx);
+  virtual void CodeBit(int &bit, BitContext &ctx);
+  virtual void code_comment(GString &comment);
+  virtual void code_record_type(int &rectype);
+  virtual int code_match_index(int &index, JB2Dict *jim);
+  virtual void code_inherited_shape_count(JB2Dict *jim);
+  virtual void code_image_size(JB2Dict *jim);
+  virtual void code_image_size(JB2Image *jim);
+  virtual void code_absolute_location(JB2Blit *jblt,  int rows, int columns);
+  virtual void code_absolute_mark_size(GBitmap *bm, int border=0);
+  virtual void code_relative_mark_size(GBitmap *bm, int cw, int ch, int border=0);
+  virtual int get_diff(int x_diff,NumContext &rel_loc_last_x);
+};
+#endif
 
 ////////////////////////////////////////
 //// CLASS JB2DICT: IMPLEMENTATION
@@ -231,7 +275,7 @@ JB2Dict::add_shape(const JB2Shape &shape)
 void 
 JB2Dict::encode(ByteStream &bs) const
 {
-  _JB2Codec codec(bs, 1);
+  _JB2EncodeCodec codec(bs);
   codec.code((JB2Dict*)this);
 }
 #endif
@@ -240,7 +284,7 @@ void
 JB2Dict::decode(ByteStream &bs, JB2DecoderCallback *cb, void *arg)
 {
   init();
-  _JB2Codec codec(bs);
+  _JB2DecodeCodec codec(bs);
   codec.set_dict_callback(cb,arg);
   codec.code((JB2Dict*)this);
 }
@@ -339,7 +383,7 @@ JB2Image::get_bitmap(const GRect &rect, int subsample, int align, int dispy) con
 void 
 JB2Image::encode(ByteStream &bs) const
 {
-  _JB2Codec codec(bs, 1);
+  _JB2EncodeCodec codec(bs);
   codec.code((JB2Image*)this);
 }
 #endif
@@ -348,7 +392,7 @@ void
 JB2Image::decode(ByteStream &bs, JB2DecoderCallback *cb, void *arg)
 {
   init();
-  _JB2Codec codec(bs);
+  _JB2DecodeCodec codec(bs);
   codec.set_dict_callback(cb,arg);
   codec.code((JB2Image*)this);
 }
@@ -385,6 +429,12 @@ const int _JB2Codec::CELLEXTRA =   500;
 
 
 // CONSTRUCTOR
+
+_JB2DecodeCodec::_JB2DecodeCodec(ByteStream &bs) : _JB2Codec(bs,0) {}
+
+#ifndef NEED_DECODER_ONLY
+_JB2EncodeCodec::_JB2EncodeCodec(ByteStream &bs) : _JB2Codec(bs,1) {}
+#endif
 
 _JB2Codec::_JB2Codec(ByteStream &bs, int encoding)
   : zp(bs, encoding!=0, true),
@@ -436,6 +486,11 @@ _JB2Codec::~_JB2Codec()
   delete [] leftcell;
 }
 
+_JB2DecodeCodec::~_JB2DecodeCodec() {}
+
+#ifndef NEED_DECODER_ONLY
+_JB2EncodeCodec::~_JB2EncodeCodec() {}
+#endif
 
 void 
 _JB2Codec::reset_numcoder()
@@ -473,30 +528,44 @@ _JB2Codec::set_dict_callback(JB2DecoderCallback *cb, void *arg)
 
 // CODE NUMBERS
 
+#ifndef NEED_DECODER_ONLY
 inline void 
-_JB2Codec::CodeBit(int &bit, BitContext &ctx)
+_JB2EncodeCodec::CodeBit(int &bit, BitContext &ctx)
 {
-  if (encoding)
     zp.encoder(bit, ctx);
-  else
-    bit = zp.decoder(ctx);
+}
+#endif
+
+inline void 
+_JB2DecodeCodec::CodeBit(int &bit, BitContext &ctx)
+{
+  bit = zp.decoder(ctx);
 }
 
-void 
-_JB2Codec::CodeNum(int &num, int low, int high, NumContext &ctx)
+int
+_JB2DecodeCodec::CodeNum(int low, int high, NumContext &ctx)
 {
+  return _JB2Codec::CodeNum(low,high,ctx,0);
+}
 
-  int cutoff, decision, negative=0, phase, range, temp, v=0;
+#ifndef NEED_DECODER_ONLY
+void
+_JB2EncodeCodec::CodeNum(int num, int low, int high, NumContext &ctx)
+{
+  if (num < low || num > high)
+    G_THROW("JB2Image.bad_number");
+  _JB2Codec::CodeNum(low,high,ctx,num);
+}
+#endif
+
+int
+_JB2Codec::CodeNum(int low, int high, NumContext &ctx, int v)
+{
+  int cutoff, decision, negative=0, phase, range, temp;
   NumContext *pctx = &ctx;
   // Check
   if ((int)ctx >= cur_ncell)
     G_THROW("JB2Image.bad_numcontext");
-  if (encoding)
-    if (num < low || num > high)
-      G_THROW("JB2Image.bad_number");
-  // Initialize
-  if (encoding) 
-    v = num;
   // Start all phases
   phase = 1;
   cutoff = 0;
@@ -593,47 +662,38 @@ _JB2Codec::CodeNum(int &num, int low, int high, NumContext &ctx)
           break;
 	}
     }
-  // Terminate
-  if (! encoding)
-    {
-      if (negative)
-        num = - cutoff - 1;
-      else
-        num = cutoff;
-    }
+    return (negative)?(- cutoff - 1):cutoff;
 }
 
 
 
 // CODE COMMENTS
 
+#ifndef NEED_DECODER_ONLY
 void 
-_JB2Codec::code_comment(GString &comment)
+_JB2EncodeCodec::code_comment(GString &comment)
 {
   // Encode size
-  if (encoding)
-    {
-      int size = comment.length();
+      int size=comment.length();
       CodeNum(size, 0, BIGPOSITIVE, dist_comment_length);
       for (int i=0; i<size; i++) 
         {
-          int ch = comment[i];
-          CodeNum(ch, 0, 255, dist_comment_byte);
+          CodeNum(comment[i], 0, 255, dist_comment_byte);
         }
-    }
-  else
-    {
-      int size, ch;
-      CodeNum(size, 0, BIGPOSITIVE, dist_comment_length);
+}
+#endif
+
+void 
+_JB2DecodeCodec::code_comment(GString &comment)
+{
+      int size=CodeNum(0, BIGPOSITIVE, dist_comment_length);
       comment.empty();
       char *combuf = comment.getbuf(size);
       for (int i=0; i<size; i++) 
         {
-          CodeNum(ch, 0, 255, dist_comment_byte);
-          combuf[i] = ch;
+          combuf[i]=CodeNum(0, 255, dist_comment_byte);
         }
       comment.getbuf();
-    }
 }
 
 
@@ -672,10 +732,20 @@ _JB2Codec::add_library(int shapeno, JB2Shape *jshp)
 
 // CODE SIMPLE VALUES
 
-void 
-_JB2Codec::code_record_type(int &rectype)
+#ifndef NEED_DECODER_ONLY
+inline void 
+_JB2EncodeCodec::code_record_type(int &rectype)
 {
   CodeNum(rectype, 
+             START_OF_DATA, END_OF_DATA, 
+             dist_record_type);
+}
+#endif
+
+inline void 
+_JB2DecodeCodec::code_record_type(int &rectype)
+{
+  rectype=CodeNum(
              START_OF_DATA, END_OF_DATA, 
              dist_record_type);
 }
@@ -683,7 +753,7 @@ _JB2Codec::code_record_type(int &rectype)
 void
 _JB2Codec::code_eventual_lossless_refinement()
 {
-  int bit;
+  int bit=refinementp;
   if (encoding)
     bit = refinementp;
   CodeBit(bit, dist_refinement_flag);
@@ -691,16 +761,22 @@ _JB2Codec::code_eventual_lossless_refinement()
     refinementp = bit;
 }
 
+#ifndef NEED_DECODER_ONLY
 int 
-_JB2Codec::code_match_index(int &index, JB2Dict *jim)
+_JB2EncodeCodec::code_match_index(int &index, JB2Dict *jim)
 {
-  int match = 0;
-  if (encoding)
-    match = shape2lib[index];
-  CodeNum(match, 0, lib2shape.hbound(), dist_match_index);
-  if (! encoding)
+    int match=shape2lib[index];
+    CodeNum(match, 0, lib2shape.hbound(), dist_match_index);
+    return match;
+}
+#endif
+
+int 
+_JB2DecodeCodec::code_match_index(int &index, JB2Dict *jim)
+{
+    int match=CodeNum(0, lib2shape.hbound(), dist_match_index);
     index = lib2shape[match];
-  return match;
+    return match;
 }
 
 
@@ -744,14 +820,19 @@ _JB2Codec::update_short_list(int v)
 // CODE PAIRS
 
 
+#ifndef NEED_DECODER_ONLY
 void
-_JB2Codec::code_inherited_shape_count(JB2Dict *jim)
+_JB2EncodeCodec::code_inherited_shape_count(JB2Dict *jim)
 {
-  int size;
-  if (encoding)
-    size = jim->get_inherited_shape_count();
-  CodeNum(size, 0, BIGPOSITIVE, inherited_shape_count_dist);
-  if (!encoding)
+  CodeNum(jim->get_inherited_shape_count(),
+    0, BIGPOSITIVE, inherited_shape_count_dist);
+}
+#endif
+
+void
+_JB2DecodeCodec::code_inherited_shape_count(JB2Dict *jim)
+{
+  int size=CodeNum(0, BIGPOSITIVE, inherited_shape_count_dist);
     {
       GP<JB2Dict> dict = jim->get_inherited_dict();
       if (!dict && size>0)
@@ -769,15 +850,29 @@ _JB2Codec::code_inherited_shape_count(JB2Dict *jim)
     }
 }
 
+#ifndef NEED_DECODER_ONLY
+void 
+_JB2EncodeCodec::code_image_size(JB2Dict *jim)
+{
+  CodeNum(0, 0, BIGPOSITIVE, image_size_dist);
+  CodeNum(0, 0, BIGPOSITIVE, image_size_dist);
+  _JB2Codec::code_image_size(jim);
+}
+#endif
+
+void 
+_JB2DecodeCodec::code_image_size(JB2Dict *jim)
+{
+  int w=CodeNum(0, BIGPOSITIVE, image_size_dist);
+  int h=CodeNum(0, BIGPOSITIVE, image_size_dist);
+  if (w || h)
+    G_THROW("JB2Image.bad_dict2");
+  _JB2Codec::code_image_size(jim);
+}
+
 void 
 _JB2Codec::code_image_size(JB2Dict *jim)
 {
-  int w = 0;
-  int h = 0;
-  CodeNum(w, 0, BIGPOSITIVE, image_size_dist);
-  CodeNum(h, 0, BIGPOSITIVE, image_size_dist);
-  if (!encoding && (w || h))
-    G_THROW("JB2Image.bad_dict2");
   last_left = 1;
   last_row_left = 0;
   last_row_bottom = 0;
@@ -786,28 +881,53 @@ _JB2Codec::code_image_size(JB2Dict *jim)
   gotstartrecordp = 1;
 }
 
+#ifndef NEED_DECODER_ONLY
+void 
+_JB2EncodeCodec::code_image_size(JB2Image *jim)
+{
+  image_columns = jim->get_width();
+  CodeNum(image_columns, 0, BIGPOSITIVE, image_size_dist);
+  image_rows = jim->get_height();
+  CodeNum(image_rows, 0, BIGPOSITIVE, image_size_dist);
+  _JB2Codec::code_image_size(jim);
+}
+#endif
+
+void 
+_JB2DecodeCodec::code_image_size(JB2Image *jim)
+{
+  image_columns=CodeNum(0, BIGPOSITIVE, image_size_dist);
+  image_rows=CodeNum(0, BIGPOSITIVE, image_size_dist);
+  if (!image_columns || !image_rows)
+    G_THROW("JB2Image.zero_dim");
+  jim->set_dimension(image_columns, image_rows);
+  _JB2Codec::code_image_size(jim);
+}
+
 void 
 _JB2Codec::code_image_size(JB2Image *jim)
 {
-  if (encoding)
-    {
-      image_columns = jim->get_width();
-      image_rows = jim->get_height();
-    }
-  CodeNum(image_columns, 0, BIGPOSITIVE, image_size_dist);
-  CodeNum(image_rows, 0, BIGPOSITIVE, image_size_dist);
-  if (!encoding)
-    {
-      if (!image_columns || !image_rows)
-        G_THROW("JB2Image.zero_dim");
-      jim->set_dimension(image_columns, image_rows);
-    }
   last_left = 1 + image_columns;
   last_row_left = 0;
   last_row_bottom = image_rows;
   last_right = 0;
   fill_short_list(last_row_bottom);
   gotstartrecordp = 1;
+}
+
+#ifndef NEED_DECODER_ONLY
+int
+_JB2EncodeCodec::get_diff(int x_diff,NumContext &rel_loc_last_x)
+{
+   CodeNum(x_diff, BIGNEGATIVE, BIGPOSITIVE, rel_loc_x_last);
+   return x_diff;
+}
+#endif
+
+int
+_JB2DecodeCodec::get_diff(int,NumContext &rel_loc_last_x)
+{
+   return CodeNum(BIGNEGATIVE, BIGPOSITIVE, rel_loc_y_last);
 }
 
 void 
@@ -835,13 +955,8 @@ _JB2Codec::code_relative_location(JB2Blit *jblt, int rows, int columns)
   if (new_row)
     {
       // Begin a new row
-      if (encoding)
-        {
-          x_diff = left - last_row_left;
-          y_diff = top - last_row_bottom;
-        }
-      CodeNum(x_diff, BIGNEGATIVE, BIGPOSITIVE, rel_loc_x_last);
-      CodeNum(y_diff, BIGNEGATIVE, BIGPOSITIVE, rel_loc_y_last);
+      x_diff=get_diff(left-last_row_left,rel_loc_x_last);
+      y_diff=get_diff(top-last_row_bottom,rel_loc_y_last);
       if (!encoding)
         {
           left = last_row_left + x_diff;
@@ -857,13 +972,8 @@ _JB2Codec::code_relative_location(JB2Blit *jblt, int rows, int columns)
   else
     {
       // Same row
-      if (encoding)
-        {
-          x_diff = left - last_right;
-          y_diff = bottom - last_bottom;
-        }
-      CodeNum(x_diff, BIGNEGATIVE, BIGPOSITIVE, rel_loc_x_current);
-      CodeNum(y_diff, BIGNEGATIVE, BIGPOSITIVE, rel_loc_y_current);
+      x_diff=get_diff(left-last_right,rel_loc_x_current);
+      y_diff=get_diff(bottom-last_bottom,rel_loc_y_current);
       if (!encoding)
         {
           left = last_right + x_diff;
@@ -883,60 +993,63 @@ _JB2Codec::code_relative_location(JB2Blit *jblt, int rows, int columns)
     }
 }
 
+#ifndef NEED_DECODER_ONLY
 void 
-_JB2Codec::code_absolute_location(JB2Blit *jblt, int rows, int columns)
+_JB2EncodeCodec::code_absolute_location(JB2Blit *jblt, int rows, int columns)
 {
   // Check start record
   if (!gotstartrecordp)
     G_THROW("JB2Image.no_start");
   // Code TOP and LEFT
-  int top, left;
-  if (encoding)
-    {
-      top = jblt->bottom + rows - 1 + 1;
-      left = jblt->left + 1;
-    }
-  CodeNum(left, 1, image_columns, abs_loc_x);
-  CodeNum(top, 1, image_rows, abs_loc_y);
-  if (!encoding)
-    {
-      jblt->bottom = top - rows + 1 - 1;
-      jblt->left = left - 1;
-    }
+  CodeNum(jblt->left+1, 1, image_columns, abs_loc_x);
+  CodeNum(jblt->bottom+rows-1+1, 1, image_rows, abs_loc_y);
 }
+#endif
 
 void 
-_JB2Codec::code_absolute_mark_size(GBitmap *bm, int border)
+_JB2DecodeCodec::code_absolute_location(JB2Blit *jblt, int rows, int columns)
 {
-  int xsize, ysize;
-  if (encoding) 
-    {
-      xsize = bm->columns();
-      ysize = bm->rows();
-    }
-  CodeNum(xsize, 0, BIGPOSITIVE, abs_size_x);
-  CodeNum(ysize, 0, BIGPOSITIVE, abs_size_y);
-  if (!encoding)
-    {
-      bm->init(ysize, xsize, border);
-    }
+  // Check start record
+  if (!gotstartrecordp)
+    G_THROW("JB2Image.no_start");
+  int left=CodeNum(1, image_columns, abs_loc_x);
+  int top=CodeNum(1, image_rows, abs_loc_y);
+  jblt->bottom = top - rows + 1 - 1;
+  jblt->left = left - 1;
 }
 
+#ifndef NEED_DECODER_ONLY
 void 
-_JB2Codec::code_relative_mark_size(GBitmap *bm, int cw, int ch, int border)
+_JB2EncodeCodec::code_absolute_mark_size(GBitmap *bm, int border)
 {
-  int xdiff, ydiff;
-  if (encoding) 
-    {
-      xdiff = bm->columns() - cw;
-      ydiff = bm->rows() - ch;
-    }
-  CodeNum(xdiff, BIGNEGATIVE, BIGPOSITIVE, rel_size_x);
-  CodeNum(ydiff, BIGNEGATIVE, BIGPOSITIVE, rel_size_y);
-  if (!encoding)
-    {
-      bm->init(ch + ydiff, cw + xdiff, border);
-    }
+  CodeNum(bm->columns(), 0, BIGPOSITIVE, abs_size_x);
+  CodeNum(bm->rows(), 0, BIGPOSITIVE, abs_size_y);
+}
+#endif
+
+void 
+_JB2DecodeCodec::code_absolute_mark_size(GBitmap *bm, int border)
+{
+  int xsize=CodeNum(0, BIGPOSITIVE, abs_size_x);
+  int ysize=CodeNum(0, BIGPOSITIVE, abs_size_y);
+  bm->init(ysize, xsize, border);
+}
+
+#ifndef NEED_DECODER_ONLY
+void 
+_JB2EncodeCodec::code_relative_mark_size(GBitmap *bm, int cw, int ch, int border)
+{
+  CodeNum(bm->columns()-cw, BIGNEGATIVE, BIGPOSITIVE, rel_size_x);
+  CodeNum(bm->rows()-ch, BIGNEGATIVE, BIGPOSITIVE, rel_size_y);
+}
+#endif
+
+void 
+_JB2DecodeCodec::code_relative_mark_size(GBitmap *bm, int cw, int ch, int border)
+{
+  int xdiff=CodeNum(BIGNEGATIVE, BIGPOSITIVE, rel_size_x);
+  int ydiff=CodeNum(BIGNEGATIVE, BIGPOSITIVE, rel_size_y);
+  bm->init(ch + ydiff, cw + xdiff, border);
 }
 
 
@@ -1284,14 +1397,10 @@ _JB2Codec::code_record(int &rectype, JB2Dict *jim, JB2Shape *jshp)
 
 // CODE JB2DICT
 
+#ifndef NEED_DECODER_ONLY
 void 
-_JB2Codec::code(JB2Dict *jim)
+_JB2EncodeCodec::code(JB2Dict *jim)
 {
-  if (encoding)
-    {
-#ifdef NEED_DECODER_ONLY
-      G_THROW("JB2Image.decoder_only");
-#else
       // -------------------------
       // THIS IS THE ENCODING PART
       // -------------------------
@@ -1332,10 +1441,12 @@ _JB2Codec::code(JB2Dict *jim)
       rectype = END_OF_DATA;
       code_record(rectype, jim, NULL); 
       zp.ZPCodec::~ZPCodec();
+}
 #endif
-    }
-  else
-    {
+
+void 
+_JB2DecodeCodec::code(JB2Dict *jim)
+{
       // -------------------------
       // THIS IS THE DECODING PART
       // -------------------------
@@ -1350,7 +1461,6 @@ _JB2Codec::code(JB2Dict *jim)
       if (!gotstartrecordp)
         G_THROW("JB2Image.no_start");
       jim->compress();
-    }
 }
 
 
@@ -1548,15 +1658,10 @@ _JB2Codec::code_record(int &rectype, JB2Image *jim, JB2Shape *jshp, JB2Blit *jbl
 
 // CODE JB2IMAGE
 
+#ifndef NEED_DECODER_ONLY
 void 
-_JB2Codec::code(JB2Image *jim)
+_JB2EncodeCodec::code(JB2Image *jim)
 {
-  // Test case
-  if (encoding)
-    {
-#ifdef NEED_DECODER_ONLY
-      G_THROW("JB2Image.decoder_only");
-#else
       // -------------------------
       // THIS IS THE ENCODING PART
       // -------------------------
@@ -1664,10 +1769,12 @@ _JB2Codec::code(JB2Image *jim)
       rectype = END_OF_DATA;
       code_record(rectype, jim, NULL, NULL); 
       zp.ZPCodec::~ZPCodec();
+}
 #endif
-    }
-  else
-    {
+
+void 
+_JB2DecodeCodec::code(JB2Image *jim)
+{
       // -------------------------
       // THIS IS THE DECODING PART
       // -------------------------
@@ -1683,7 +1790,6 @@ _JB2Codec::code(JB2Image *jim)
       if (!gotstartrecordp)
         G_THROW("JB2Image.no_start");
       jim->compress();
-    }
 }
 
 
