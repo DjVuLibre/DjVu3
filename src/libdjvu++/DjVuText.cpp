@@ -9,11 +9,11 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuText.cpp,v 1.1 1999-09-02 03:12:22 leonb Exp $
+//C- $Id: DjVuText.cpp,v 1.2 1999-09-02 19:05:24 leonb Exp $
 
 
 #ifdef __GNUC__
-#pragma interface
+#pragma implementation
 #endif
 
 #include "DjVuText.h"

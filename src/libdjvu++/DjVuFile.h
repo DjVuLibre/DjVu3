@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.h,v 1.19 1999-09-01 18:41:29 eaf Exp $
+//C- $Id: DjVuFile.h,v 1.20 1999-09-02 19:05:24 leonb Exp $
  
 #ifndef _DJVUFILE_H
 #define _DJVUFILE_H
@@ -25,6 +25,7 @@
 #include "JB2Image.h"
 #include "IWImage.h"
 #include "GPixmap.h"
+#include "DjVuText.h"
 #include "DjVuPort.h"
 #include "GContainer.h"
 #include "DjVuNavDir.h"
@@ -45,7 +46,7 @@
 
     @memo Classes representing DjVu files.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuFile.h,v 1.19 1999-09-01 18:41:29 eaf Exp $#
+    @version #$Id: DjVuFile.h,v 1.20 1999-09-02 19:05:24 leonb Exp $#
 */
 
 //@{
@@ -162,6 +163,8 @@ public:
    GP<JB2Dict>		fgjd;
       /// Pointer to the colors of foreground component of DjVu image.
    GP<GPixmap>		fgpm;
+      /// Pointer to the textual information
+   GP<DjVuText>         txtz;
       /// Pointer to the navigation directory contained in this file
    GP<DjVuNavDir>	dir;
       /// Description of the file formed during decoding
@@ -333,7 +336,7 @@ public:
       /** Returns the list of included DjVuFiles.
 	  
 	  {\bf Warning.} Included files are normally created during decoding.
-	  Before that they do not exist. So, if you call this function at
+	  Before that they do not exist.   If you call this function at
 	  that time and set #only_created# to #FALSE# then it will have to
 	  read all the data from this file in order to find #INCL# chunks,
 	  which may block your application, if not all data is available.
@@ -409,8 +412,10 @@ private:
 
       // Functions called when the decoding thread starts
    static void	static_decode_func(void *);
-   void		decode_func(void);
-   void		decode(ByteStream & str);
+   void	decode_func(void);
+   void	decode(ByteStream & str);
+   GString decode_chunk(const char *chkid, ByteStream & str, 
+                        bool djvi, bool djvu, bool iw44);
 
       // Functions dealing with the shape directory (fgjd)
    static GP<JB2Dict> static_get_fgjd(void *);
@@ -462,12 +467,7 @@ DjVuFile::get_url(void) const
    return url;
 }
 
-inline void
-DjVuFile::reset(void)
-{
-   info=0; anno=0; bg44=0; fgjb=0; fgpm=0;
-   dir=0; description=""; mimetype="";
-}
+
 
 //@}
 

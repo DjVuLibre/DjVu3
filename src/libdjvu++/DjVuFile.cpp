@@ -9,14 +9,17 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.28 1999-09-01 18:41:29 eaf Exp $
+//C- $Id: DjVuFile.cpp,v 1.29 1999-09-02 19:05:24 leonb Exp $
 
 #ifdef __GNUC__
 #pragma implementation
 #endif
 
 #include "DjVuFile.h"
+#include "BSByteStream.h"
 #include "debug.h"
+
+
 
 class ProgressByteStream : public ByteStream
 {
@@ -138,6 +141,24 @@ DjVuFile::~DjVuFile(void)
 
    if (simple_port) { delete simple_port; simple_port=0; }
 }
+
+
+
+void
+DjVuFile::reset(void)
+{
+   info = 0; 
+   anno = 0; 
+   bg44 = 0; 
+   fgjb = 0; 
+   fgjd = 0;
+   fgpm = 0;
+   txtz = 0;
+   dir  = 0; 
+   description = ""; 
+   mimetype = "";
+}
+
 
 void
 DjVuFile::destroy(void)
@@ -545,299 +566,333 @@ DjVuFile::get_fgjd(int block)
 }
 
 
+GString
+DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bool iw44)
+{
+  GString chkid = id;
+  GString desc = "Unrecognized chunk";
+  DjVuPortcaster * pcaster=get_portcaster();
+  DEBUG_MSG("DjVuFile::decode_chunk() : decoding " << id << "\n");
+  
+  // INFO  (information chunk for djvu page)
+  
+  if (chkid == "INFO" && (djvu || djvi))
+    {
+      if (DjVuFile::info)
+        THROW("DjVu Decoder: Corrupted file (Duplicate INFO chunk)");
+      if (djvi)
+        THROW("DjVu Decoder: Corrupted file (Found INFO chunk in FORM:DJVI)");
+      GP<DjVuInfo> info=new DjVuInfo();
+      info->decode(iff);
+      DjVuFile::info = info;
+      pcaster->notify_relayout(this);
+      desc.format("Page information (DjVu version %d)", info->version);
+    }
+
+  // ANTa (annotation)
+
+  else if (chkid == "ANTa")
+    {
+      if (DjVuFile::anno)
+        {
+          anno->merge(iff);
+        }
+      else 
+        {
+          GP<DjVuAnno> anno=new DjVuAnno();
+          anno->decode(iff);
+          DjVuFile::anno = anno;
+        }
+      desc.format("Page annotation");
+    }
+
+  // ANTz (compressed annotation)
+
+  else if (chkid == "ANTz")
+    {
+      BSByteStream bsiff(iff);
+      if (DjVuFile::anno)
+        {
+          anno->merge(bsiff);
+        }
+      else 
+        {
+          GP<DjVuAnno> anno=new DjVuAnno();
+          anno->decode(bsiff);
+          DjVuFile::anno = anno;
+        }
+      desc.format("Page annotation (compressed)");
+    }
+  
+  // NDIR (obsolete navigation chunk)
+
+  else if (chkid == "NDIR")
+    {
+      GP<DjVuNavDir> dir=new DjVuNavDir(url);
+      dir->decode(iff);
+      DjVuFile::dir=dir;
+      desc.format("Navigation directory (obsolete)");
+    }
+
+  // TXTz (text information)
+
+  else if (chkid == "TXTz")
+    {
+      if (DjVuFile::txtz)
+        THROW("DjVu Decoder: Corrupted file (Duplicate TXTz chunk)");
+      GP<DjVuText> txtz = new DjVuText;
+      txtz->decode_text(iff);
+      DjVuFile::txtz = txtz;
+    }
+  
+  // TZNz (text zone hierarchy)
+  
+  else if (chkid == "TZNz")
+    {
+      if (! DjVuFile::txtz)
+        THROW("DjVu Decoder: Corrupted file (Found TZNz without preceding TXTz chunk)");
+      if (txtz->has_valid_zones())
+        THROW("DjVu Decoder: Corrupted file (Duplicate TZNz chunk)");
+      txtz->decode_zones(iff);
+    }
+
+  // INCL (inclusion chunk)
+
+  else if (chkid == "INCL" && (djvi || djvu))
+    {
+      GP<DjVuFile> file=process_incl_chunk(iff);
+      if (file && !file->is_decoding())
+        {
+          if (file->is_decode_ok() || !file->is_decode_failed()) 
+            {
+              // Send chunk notifications
+              int chksize;
+              GString chkid;
+              ByteStream *str=0;
+              TRY 
+                {
+                  str=file->data_range->get_stream();
+                  IFFByteStream iff(*str);
+                  if (!iff.get_chunk(chkid)) 
+                    THROW("EOF");
+                  while((chksize=iff.get_chunk(chkid)))
+                    {
+                      get_portcaster()->notify_chunk_done(file, chkid);
+                      iff.close_chunk();
+                    }
+                } 
+              CATCH(exc) 
+                {
+                  delete str; 
+                  str=0;
+                  RETHROW;
+                } 
+              ENDCATCH;
+              delete str; 
+              str=0;
+            }
+          else
+            {
+              // Start decoding
+              file->start_decode();
+            }
+        }
+      desc.format("Indirection chunk");
+    }
+
+  // Djbz (JB2 Dictionary)
+
+  else if (chkid == "Djbz" && (djvu || djvi))
+    {
+      if (DjVuFile::fgjd)
+        THROW("DjVu Decoder: Corrupted data (Duplicate Dxxx chunk)");
+      if (DjVuFile::fgjd)
+        THROW("DjVu Decoder: Corrupted data (Dxxx chunk found after Sxxx chunk)");
+      GP<JB2Dict> fgjd = new JB2Dict();
+      fgjd->decode(iff);
+      DjVuFile::fgjd = fgjd;
+      desc.format("JB2 shape dictionary (%d shapes)", fgjd->get_shape_count());
+    } 
+
+  // Sjbz (JB2 encoded mask)
+
+  else if (chkid=="Sjbz" && (djvu || djvi))
+    {
+      if (DjVuFile::fgjb)
+        THROW("DjVu Decoder: Corrupted data (Duplicate Sxxx chunk)");
+      GP<JB2Image> fgjb=new JB2Image();
+      fgjb->decode(iff, static_get_fgjd, (void*)this);
+      DjVuFile::fgjb = fgjb;
+      pcaster->notify_redisplay(this);
+      desc.format("JB2 foreground mask (%dx%d)", fgjb->get_width(), fgjb->get_height());
+    }
+ 
+  // Smmr (MMR-G4 encoded mask)
+
+  else if (chkid=="Smmr" && (djvu || djvi))
+    {
+      if (DjVuFile::fgjb)
+        THROW("DjVu Decoder: Corrupted data (Duplicate Sxxx chunk)");
+      desc.format("MMR-G4 encoded mask (Unimplemented)");
+    }
+  
+  // BG44 (background wavelets)
+  
+  else if (chkid == "BG44" && (djvu || djvi))
+    {
+      if (!bg44)
+        {
+          // First chunk
+          GP<IWPixmap> bg44=new IWPixmap();
+          bg44->decode_chunk(iff);
+          DjVuFile::bg44=bg44;
+          pcaster->notify_redisplay(this);
+          desc.format("IW44 background (%dx%d)", bg44->get_width(), bg44->get_height());
+        } 
+      else
+        {
+          // Refinement chunks
+          bg44->decode_chunk(iff);
+          pcaster->notify_redisplay(this);
+          desc.format("IW44 background (part %d)", bg44->get_serial());
+        }
+    }
+
+  // FG44 (foreground wavelets)
+
+  else if (chkid == "FG44" && (djvu || djvu))
+    {
+      if (fgpm)
+        THROW("DjVu Decoder: Corrupted data (Duplicate foreground layer)");
+      IWPixmap fg44;
+      fg44.decode_chunk(iff);
+      fgpm=fg44.get_pixmap();
+      pcaster->notify_redisplay(this);
+      desc.format("IW44 foreground colors (%dx%d)", fg44.get_width(), fg44.get_height());
+    } 
+
+
+  // BGjp (background JPEG)
+
+  else if (chkid == "BGjp" && (djvu || djvi))
+    {
+      if (bg44)
+        THROW("DjVu Decoder: Corrupted data (Duplicate background layer)");
+      desc.format("JPEG background (Unimplemented)");
+    } 
+
+  // FGjp (foreground JPEG)
+  
+  else if (chkid == "FGjp" && (djvu || djvi))
+    {
+      if (fgpm)
+        THROW("DjVu Decoder: Corrupted data (Duplicate foreground layer)");
+      desc.format("JPEG foreground colors (Unimplemented)");
+    } 
+  
+  // BM44/PM44 (IW44 data)
+
+  else if ((chkid == "PM44" || chkid=="BM44") && iw44)
+    {
+      if (!bg44)
+        {
+          // First chunk
+          GP<IWPixmap> bg44=new IWPixmap();
+          bg44->decode_chunk(iff);
+          GP<DjVuInfo> info=new DjVuInfo();
+          info->width=bg44->get_width();
+          info->height=bg44->get_height();
+          info->dpi=100;
+          DjVuFile::bg44=bg44;
+          DjVuFile::info=info;
+          pcaster->notify_relayout(this);
+          desc.format("IW44 data (%dx%d)", bg44->get_width(), bg44->get_height());
+        } 
+      else
+        {
+          // Refinement chunks
+          bg44->decode_chunk(iff);
+          pcaster->notify_redisplay(this);
+          desc.format("IW44 data (part %d)", bg44->get_serial());
+        }
+    }
+
+  // Return description
+  return desc;
+}
+
+
+
 void
 DjVuFile::decode(ByteStream & str)
 {
    DEBUG_MSG("DjVuFile::decode(), url='" << url << "'\n");
    DEBUG_MAKE_INDENT(3);
-   
    DjVuPortcaster * pcaster=get_portcaster();
 
+   // Get form chunk
    int chksize;
    GString chkid;
-   
    IFFByteStream iff(str);
    if (!iff.get_chunk(chkid)) 
-      THROW("EOF");
+     THROW("EOF");
 
-   bool djvi=(chkid=="FORM:DJVI");
+   // Check file format
+   bool djvi = (chkid=="FORM:DJVI");
+   bool djvu = (chkid=="FORM:DJVU");
+   bool iw44 = ((chkid=="FORM:PM44") || (chkid=="FORM:BM44"));
+   if (djvi || djvu)
+     mimetype = "image/djvu";
+   else if (iw44)
+     mimetype = "image/iw44";
+   else
+     THROW("DejaVu decoder: a DJVU or IW44 image was expected");
+   
+   // Process chunks
+   while((chksize = iff.get_chunk(chkid)))
+     {
+       // Decode
+       GString str = decode_chunk(chkid, iff, djvi, djvu, iw44);
+       // Update description and notify
+       GString desc;
+       desc.format(" %0.1f Kb\t'%s'\t%s.\n", chksize/1024.0, 
+                   (const char*)chkid, (const char*)str );
+       description=description+desc;
+       pcaster->notify_chunk_done(this, chkid);
+       // Close chunk
+       iff.close_chunk();
+     }
+   // Record file size
+   file_size=iff.tell();
+   // Close form chunk
+   iff.close_chunk();
+   // Close BG44 codec
+   if (bg44) 
+     bg44->close_codec();
 
-   if (chkid=="FORM:DJVU" || djvi)
-   {
-      GString desc;
-      mimetype="image/djvu";
-      while((chksize=iff.get_chunk(chkid)))
-      {
-	 DEBUG_MSG("decoding chunk '" << chkid << "'\n");
-	 
-	 if (chkid=="INFO")
-	 {
-	    if (DjVuFile::info)
-	       THROW("DjVu Decoder: Corrupted file (Duplicate INFO chunk)");
-	    GP<DjVuInfo> info=new DjVuInfo();
-	    info->decode(iff);
-	    DjVuFile::info=info;
-	    pcaster->notify_relayout(this);
-	    desc.format(" %0.1f Kb\t'%s'\tPage information.\n", 
-			chksize/1024.0, (const char*)chkid );
-	 } else if (chkid=="ANTa")
-	 {
-	    if (!anno)
-	    {
-	       GP<DjVuAnno> tmp_anno=new DjVuAnno();
-	       tmp_anno->decode(iff);
-	       anno=tmp_anno;
-	    } else anno->merge(iff);
-	    desc.format(" %0.1f Kb\t'%s'\tPage annotation.\n",
-			chksize/1024.0, (const char*)chkid);
-	 } else if (chkid=="INCL")
-	 {
-	    GP<DjVuFile> file=process_incl_chunk(iff);
-	    if (file)
-	       if (!file->is_decoding())
-		  if (!file->is_decode_ok() &&
-		      !file->is_decode_failed()) file->start_decode();
-		  else
-		  {
-		     ByteStream * str=0;
-		     TRY {
-			str=file->data_range->get_stream();
-			int chksize;
-			GString chkid;
-			IFFByteStream iff(*str);
-			if (!iff.get_chunk(chkid)) 
-			   THROW("EOF");
-
-			while((chksize=iff.get_chunk(chkid)))
-			{
-			   get_portcaster()->notify_chunk_done(file, chkid);
-			   iff.close_chunk();
-			}
-		     } CATCH(exc) {
-			delete str; str=0;
-			RETHROW;
-		     } ENDCATCH;
-		     delete str; str=0;
-		  }
-	    desc.format(" %0.1f Kb\t'%s'\tIndirection chunk.\n",
-			chksize/1024.0, (const char*)chkid);
-	 } else if (chkid=="NDIR")
-	 {
-	    GP<DjVuNavDir> dir=new DjVuNavDir(url);
-	    dir->decode(iff);
-	    DjVuFile::dir=dir;
-	    desc.format(" %0.1f Kb\t'%s'\tNavigation chunk.\n",
-			chksize/1024.0, (const char*)chkid);
-	 } else if (chkid=="BG44")
-	 {
-	    if (!bg44)
-	    {
-		  // First chunk
-	       GP<IWPixmap> bg44=new IWPixmap();
-	       bg44->decode_chunk(iff);
-	       DjVuFile::bg44=bg44;
-	       pcaster->notify_redisplay(this);
-	       desc.format(" %0.1f Kb\t'%s'\tIW44 background (%dx%d)\n",
-			   chksize/1024.0, (const char*)chkid,
-			   bg44->get_width(), bg44->get_height());
-	    } else
-	    {
-		  // Refinement chunks
-	       bg44->decode_chunk(iff);
-	       pcaster->notify_redisplay(this);
-	       desc.format(" %0.1f Kb\t'%s'\tIW44 background (part %d).\n",
-			   chksize/1024.0, (const char*)chkid,
-			   bg44->get_serial());
-                  
-	    }
-	 } 
-	 else if (chkid=="Djbz")
-	 {
-	    if (DjVuFile::fgjd)
-	       THROW("DjVu Decoder: Corrupted data (Duplicate Dxxx chunk)");
-	    if (DjVuFile::fgjd)
-	       THROW("DjVu Decoder: Corrupted data (Dxxx chunk found after Sxxx chunk)");
-	    GP<JB2Dict> fgjd = new JB2Dict();
-	    fgjd->decode(iff);
-	    DjVuFile::fgjd = fgjd;
-	    desc.format(" %0.1f Kb\t'%s'\tJB2 shape dictionary\n",
-			chksize/1024.0, (const char*)chkid );
-	 } 
-	 else if (chkid=="Sjbz")
-	 {
-	    if (DjVuFile::fgjb)
-	       THROW("DjVu Decoder: Corrupted data (Duplicate Sxxx chunk)");
-	    GP<JB2Image> fgjb=new JB2Image();
-	    fgjb->decode(iff, static_get_fgjd, (void*)this);
-	    DjVuFile::fgjb = fgjb;
-	    pcaster->notify_redisplay(this);
-	    desc.format(" %0.1f Kb\t'%s'\tJB2 foreground mask (%dx%d)\n",
-			chksize/1024.0, (const char*)chkid,
-			fgjb->get_width(), fgjb->get_height());
-	 }
-	 else if (chkid=="FG44")
-	 {
-	    if (fgpm)
-	       THROW("DjVu Decoder: Corrupted data (Duplicate foreground layer)");
-	    IWPixmap fg44;
-	    fg44.decode_chunk(iff);
-	    fgpm=fg44.get_pixmap();
-	    pcaster->notify_redisplay(this);
-	    desc.format(" %0.1f Kb\t'%s'\tIW44 foreground colors (%dx%d)\n",
-			chksize/1024.0, (const char*)chkid,
-			fg44.get_width(), fg44.get_height());
-	 } else if (chkid=="BGjp")
-	 {
-	    if (bg44)
-	       THROW("DjVu Decoder: Corrupted data (Duplicate background layer)");
-	    desc.format(" %0.1f Kb\t'%s'\tObsolete JPEG background (Ignored).\n", 
-			chksize/1024.0, (const char*)chkid);
-	 } else if (chkid=="FGjp")
-	 {
-	    if (fgpm)
-	       THROW("DjVu Decoder: Corrupted data (Duplicate foreground layer)");
-	    desc.format(" %0.1f Kb\t'%s'\tObsolete JPEG foreground colors (Ignored).\n", 
-			chksize/1024.0, (const char*)chkid);
-	 } else 
-	 {
-	    desc.format(" %0.1f Kb\t'%s'\tUnknown chunk (Ignored).\n",
-			chksize/1024.0, (const char*)chkid);
-	 }
-	    // Update description and notify
-	 description=description+desc;
-	 pcaster->notify_chunk_done(this, chkid);
-	 
-	    // Close chunk
-	 iff.close_chunk();
-      }
-
-	 // Record file size
-      file_size=iff.tell();
-	 // Close BG44 codec
-      if (bg44) bg44->close_codec();
-	 // Complete description
-      if (info)
-      {
-	 desc.format("DJVU Image (%dx%d) version %d:\n\n", 
-		     info->width, info->height, info->version);
-	 description=desc+description;
-	 int rawsize=info->width*info->height*3;
-	 desc.format("\nCompression ratio: %0.f (%0.1f Kb)\n",
-		     (double)rawsize/file_size, file_size/1024.0 );
-	 description=description+desc;
-      } else if (!djvi)
-	 THROW("DjVu Decoder: Corrupted data (Missing INFO chunk)");
-   } else if (chkid=="FORM:PM44" || chkid=="FORM:BM44")
-   {
-      GString desc;
-      mimetype="image/iw44";
-      while((chksize=iff.get_chunk(chkid)))
-      {
-	 DEBUG_MSG("decoding chunk '" << chkid << "'\n");
-	 
-	 if (chkid=="ANTa")
-	 {
-	    if (!anno)
-	    {
-	       GP<DjVuAnno> tmp_anno=new DjVuAnno();
-	       tmp_anno->decode(iff);
-	       anno=tmp_anno;
-	    } else anno->merge(iff);
-	    desc.format(" %0.1f Kb\t'%s'\tPage annotation.\n",
-			chksize/1024.0, (const char*)chkid);
-	 } else if (chkid=="INCL")
-	 {
-	    GP<DjVuFile> file=process_incl_chunk(iff);
-	    if (file)
-	       if (!file->is_decoding())
-		  if (!file->is_decode_ok() &&
-		      !file->is_decode_failed()) file->start_decode();
-		  else
-		  {
-		     ByteStream * str=0;
-		     TRY {
-			str=file->data_range->get_stream();
-			int chksize;
-			GString chkid;
-			IFFByteStream iff(*str);
-			if (!iff.get_chunk(chkid)) 
-			   THROW("EOF");
-			while((chksize=iff.get_chunk(chkid)))
-			{
-			   get_portcaster()->notify_chunk_done(file, chkid);
-			   iff.close_chunk();
-			}
-		     } CATCH(exc) {
-			delete str; str=0;
-			RETHROW;
-		     } ENDCATCH;
-		     delete str; str=0;
-		  }
-	    desc.format(" %0.1f Kb\t'%s'\tIndirection chunk (Unsupported).\n",
-			chksize/1024.0, (const char*)chkid);
-	 } else if (chkid=="NDIR")
-	 {
-	    GP<DjVuNavDir> dir=new DjVuNavDir(url);
-	    dir->decode(iff);
-	    DjVuFile::dir=dir;
-	    desc.format(" %0.1f Kb\t'%s'\tNavigation chunk (Unsupported).\n",
-			chksize/1024.0, (const char*)chkid);
-	 } else if (chkid=="PM44" || chkid=="BM44")
-	 {
-	    if (!bg44)
-	    {
-		  // First chunk
-	       GP<IWPixmap> bg44=new IWPixmap();
-	       bg44->decode_chunk(iff);
-	       GP<DjVuInfo> info=new DjVuInfo();
-	       info->width=bg44->get_width();
-	       info->height=bg44->get_height();
-	       info->dpi=100;
-	       DjVuFile::bg44=bg44;
-	       DjVuFile::info=info;
-	       pcaster->notify_relayout(this);
-	    } else
-	    {
-		  // Refinement chunks
-	       bg44->decode_chunk(iff);
-	       pcaster->notify_redisplay(this);
-	    }
-	    desc.format(" %0.1f Kb\t'%s'\tIW44 wavelet data (part %d)\n", 
-			chksize/1024.0, (const char*)chkid, 
-			bg44->get_serial());
-	 } else
-	 {
-	    desc.format(" %0.1f Kb\t'%s'\tUnknown chunk (Ignored).\n",
-			chksize/1024.0, (const char*)chkid);
-	 }
-	    // Update description and notify
-	 description=description+desc;
-	 pcaster->notify_chunk_done(this, chkid);
-	 
-	    // Close chunk
-	 iff.close_chunk();
-      }
-	 // Record file size
-      file_size=iff.tell();
-	 // Close BG44
-      if (bg44) bg44->close_codec();
-	 // Complete description
-      if (info)
-      {
-	 desc.format("IW44 Image (%dx%d) :\n\n", 
-		     info->width, info->height);
-	 description=desc+description;
-	 int rawsize=info->width*info->height*3;
-	 desc.format("\nCompression ratio: %0.f (%0.1f Kb)\n",
-		     (double)rawsize/file_size, file_size/1024.0);
-	 description=description+desc;
-      } else
-	 THROW("DjVu Decoder: Corrupted data (Missing IW44 data chunks)");
-   } else
-   {
-      THROW("DejaVu decoder: a DJVU or IW44 image was expected");
-   }
+   // Complete description
+   if (djvu && !info)
+     THROW("DjVu Decoder: Corrupted data (Missing INFO chunk)");
+   if (iw44 && !info)
+     THROW("DjVu Decoder: Corrupted data (Missing IW44 data chunks)");
+   if (info)
+     {
+       GString desc;
+       if (djvu || djvi)
+         desc.format("DJVU Image (%dx%d) version %d:\n\n", 
+                     info->width, info->height, info->version);
+       else if (iw44)
+         desc.format("IW44 Image (%dx%d) :\n\n", 
+                     info->width, info->height);
+       description=desc+description;
+       int rawsize=info->width*info->height*3;
+       desc.format("\nCompression ratio: %0.f (%0.1f Kb)\n",
+                   (double)rawsize/file_size, file_size/1024.0 );
+       description=description+desc;
+     }
 }
+
+
 
 void
 DjVuFile::start_decode(void)
@@ -876,8 +931,8 @@ DjVuFile::start_decode(void)
 void
 DjVuFile::stop_decode(bool sync)
 {
-   DEBUG_MSG("DjVuFile::stop_decode(), url='" << url <<
-	     "', sync=" << (int) sync << "\n");
+  DEBUG_MSG("DjVuFile::stop_decode(), url='" << url <<
+            "', sync=" << (int) sync << "\n");
    DEBUG_MAKE_INDENT(3);
    
       // Don't stop SYNCHRONOUSLY from the thread where the decoding is going!!!
