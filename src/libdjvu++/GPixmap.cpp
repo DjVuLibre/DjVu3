@@ -9,9 +9,9 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GPixmap.cpp,v 1.5 1999-03-17 19:24:57 leonb Exp $
+//C- $Id: GPixmap.cpp,v 1.6 1999-05-19 19:09:52 leonb Exp $
 
-// File "$Id: GPixmap.cpp,v 1.5 1999-03-17 19:24:57 leonb Exp $"
+// File "$Id: GPixmap.cpp,v 1.6 1999-05-19 19:09:52 leonb Exp $"
 // -- Implements class PIXMAP
 // Author: Leon Bottou 07/1997
 
@@ -425,7 +425,7 @@ GPixmap::save_ppm(ByteStream &bs, int raw) const
         head.format("%d %d %d  ", p[x].r, p[x].g, p[x].b);
         bs.writall((void*)(const char *)head, head.length());
         x += 1;
-        if (x==ncolumns || x&0x7==0) 
+        if (x==ncolumns || (x&0x7)==0) 
           bs.write((void*)&eol, 1);          
       }
     }

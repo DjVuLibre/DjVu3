@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GBitmap.cpp,v 1.6 1999-05-19 18:24:11 leonb Exp $
+//C- $Id: GBitmap.cpp,v 1.7 1999-05-19 19:09:51 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -23,7 +23,7 @@
 #include "GString.h"
 
 
-// File "$Id: GBitmap.cpp,v 1.6 1999-05-19 18:24:11 leonb Exp $"
+// File "$Id: GBitmap.cpp,v 1.7 1999-05-19 19:09:51 leonb Exp $"
 // - Author: Leon Bottou, 05/1997
 
 // ----- constructor and destructor
@@ -749,7 +749,7 @@ GBitmap::save_pbm(ByteStream &bs, int raw)
               unsigned char bit= (row[c] ? '1' : '0');
               bs.write((void*)&bit, 1);
               c += 1;
-              if (c==ncolumns || c&0x1f==0) 
+              if (c==ncolumns || (c&0x1f)==0) 
                 bs.write((void*)&eol, 1);          
             }
         }
@@ -791,7 +791,7 @@ GBitmap::save_pgm(ByteStream &bs, int raw)
               head.format("%d ", grays - 1 - row[c]);
               bs.writall((void*)(const char *)head, head.length());
               c += 1;
-              if (c==ncolumns || c&0xf==0) 
+              if (c==ncolumns || (c&0xf)==0) 
                 bs.write((void*)&eol, 1);          
             }
         }
