@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: JB2Image.h,v 1.8 1999-03-17 19:24:58 leonb Exp $
+//C- $Id: JB2Image.h,v 1.9 1999-05-25 19:24:55 leonb Exp $
 
 #ifndef _JB2IMAGE_H
 #define _JB2IMAGE_H
@@ -99,7 +99,7 @@
     \end{itemize}
 
     @version
-    #$Id: JB2Image.h,v 1.8 1999-03-17 19:24:58 leonb Exp $#
+    #$Id: JB2Image.h,v 1.9 1999-05-25 19:24:55 leonb Exp $#
     @memo
     Coding bilevel images with JB2.
     @author
@@ -159,6 +159,10 @@ public:
       silently discard all blits referring to a shape containing a null
       bitmap. */
   GP<GBitmap> bits;
+  /** Private user data. This long word is provided as a convenience for users
+      of the JB2Image data structures.  Neither the rendering functions nor
+      the coding functions ever access this value. */
+  long userdata;
 };
 
 
