@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: d44.cpp,v 1.17 2001-05-03 22:06:25 bcr Exp $
+// $Id: d44.cpp,v 1.18 2001-05-09 00:38:26 bcr Exp $
 // $Name:  $
 
 /** @name d44
@@ -84,7 +84,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: d44.cpp,v 1.17 2001-05-03 22:06:25 bcr Exp $# 
+    #$Id: d44.cpp,v 1.18 2001-05-09 00:38:26 bcr Exp $# 
 */
 //@{
 //@}
@@ -97,6 +97,7 @@
 #include "IFFByteStream.h"
 #include "GPixmap.h"
 #include "GBitmap.h"
+#include "DjVuMessage.h"
 #include <locale.h>
 #include <stdlib.h>
 #ifdef UNDER_CE
@@ -183,6 +184,7 @@ mymain(int argc, char **argv)
 #endif
 {
   setlocale(LC_ALL,"");
+  DjVuMessage::use_locale();
   DArray<GUTF8String> dargv(0,argc-1);
   for(int i=0;i<argc;++i)
     dargv[i]=GNativeString(argv[i]);

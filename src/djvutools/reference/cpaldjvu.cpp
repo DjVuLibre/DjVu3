@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: cpaldjvu.cpp,v 1.18 2001-05-03 22:06:25 bcr Exp $
+// $Id: cpaldjvu.cpp,v 1.19 2001-05-09 00:38:26 bcr Exp $
 // $Name:  $
 
 
@@ -69,7 +69,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: cpaldjvu.cpp,v 1.18 2001-05-03 22:06:25 bcr Exp $# */
+    #$Id: cpaldjvu.cpp,v 1.19 2001-05-09 00:38:26 bcr Exp $# */
 //@{
 //@}
 
@@ -88,6 +88,7 @@
 #include "DjVuInfo.h"
 #include "GOS.h"
 #include "GURL.h"
+#include "DjVuMessage.h"
 #include <locale.h>
 #include <stdlib.h>
 
@@ -897,6 +898,7 @@ int
 main(int argc, const char **argv)
 {
   setlocale(LC_ALL,"");
+  DjVuMessage::use_locale();
   DArray<GUTF8String> dargv(0,argc-1);
   for(int i=0;i<argc;++i)
     dargv[i]=GNativeString(argv[i]);

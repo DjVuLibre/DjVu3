@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djvmcvt.cpp,v 1.19 2001-05-03 22:06:26 bcr Exp $
+// $Id: djvmcvt.cpp,v 1.20 2001-05-09 00:38:26 bcr Exp $
 // $Name:  $
 
 /** @name djvmcvt
@@ -106,7 +106,7 @@
     @author
     Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: djvmcvt.cpp,v 1.19 2001-05-03 22:06:26 bcr Exp $# */
+    #$Id: djvmcvt.cpp,v 1.20 2001-05-09 00:38:26 bcr Exp $# */
 
 #ifdef __GNUC__
 #pragma implementation
@@ -116,6 +116,7 @@
 #include "DjVmDoc.h"
 #include "ByteStream.h"
 #include "GOS.h"
+#include "DjVuMessage.h"
 #include "debug.h"
 
 #include <locale.h>
@@ -177,6 +178,7 @@ int
 main(int argc, char ** argv)
 {
   setlocale(LC_ALL,"");
+  DjVuMessage::use_locale();
   DArray<GUTF8String> dargv(0,argc-1);
   for(int i=0;i<argc;++i)
     dargv[i]=GNativeString(argv[i]);

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessage.h,v 1.21 2001-05-01 18:44:17 bcr Exp $
+// $Id: DjVuMessage.h,v 1.22 2001-05-09 00:38:26 bcr Exp $
 // $Name:  $
 
 
@@ -39,141 +39,48 @@
 #define __DJVU_MESSAGE_H__
 
 
-#include "GString.h"
-class lt_XMLTags;
-class ByteStream;
+#include "DjVuMessageLite.h"
 
-/** Exception causes and external messages are passed as message lists which
-    have the following syntax:
-  
-    message_list ::= single_message |
-                     single_message separator message_list
-    
-    separator ::= newline |
-                  newline | separator
-    
-    single_message ::= message_ID |
-                       message_ID parameters
-    
-    parameters ::= tab string |
-                   tab string parameters
-    
-    Message_IDs are looked up an external file and replaced by the message
-    text strings they are mapped to. The message text may contain the
-    following:
-    
-    Parameter specifications: These are modelled after printf format
-    specifications and have one of the following forms:
-  
-      %n!s! %n!d! %n!i! %n!u! %n!x! %n!X!
-  
-    where n is the parameter number. The parameter number is indicated
-    explicitly to allow for the possibility that the parameter order may
-    change when the message text is translated into another language.
-    The final letter ('s', 'd', 'i', 'u', 'x', or 'X') indicates the form
-    of the parameter (string, integer, integer, unsigned integer, lowercase
-    hexadecimal, or uppercase hexadecimal, respectively).  In addition
-    formating options such as precision available in sprintf, may be used.
-    So, to print the third argument as 5 digit unsigned number, with leading
-    zero's one could use:
-      %3!05u!
-
-    All of the arguments are actually strings.  For forms that don't take
-    string input ('d', 'i', 'u', 'x', or 'X'), and atoi() conversion is done
-    on the string before formatting.  In addition the form indicates to the
-    translater whether to expect a word or a number.
-
-    The strings are read in from XML.  To to format the strings, use the
-    relavent XML escape sequences, such as follows:
-
-            &#10;        [line feed]
-            &#09;        [horizontal tab]
-            &apos;       [single quote]
-            &#34;        [double quote]
-            &lt;         [less than sign]
-            &gt;         [greater than sign]
-  
-    After parameters have been inserted in the message text, the formatting 
-    strings are replaced by their usual equivalents (newline and tab
-    respectively).
-
-    If a message_id cannot be found in the external file, a message text
-    is fabricated giving the message_id and the parameters (if any).
-
-    Separators (newlines) are preserved in the translated message list.
-
-    Expands message lists by looking up the message IDs and inserting
-    arguments into the retrieved messages.
-
-    N.B. The resulting string may be encoded in UTF-8 format (ISO 10646-1
-    Annex R) and SHOULD NOT BE ASSUMED TO BE ASCII.
-  */
-
-class DjVuMessage : public GPEnabled
+class DjVuMessage : public DjVuMessageLite
 {
-private:
-  // Constructor:
-  DjVuMessage( void );
-  GMap<GUTF8String,GP<lt_XMLTags> > Map;
-  GUTF8String errors;
+protected:
+  void init(void);
+  DjVuMessage(void);
 
 public:
-  /// Creates a DjVuMessage class.
-  static const DjVuMessage &create(void);
+  /// Use the locale info and find the XML files on disk.
+  static void use_locale(void);
+
+  /// creates this class specifically.
+  static const DjVuMessageLite &create_full(void);
 
   /** Adds a byte stream to be parsed whenever the next DjVuMessage::create()
       call is made. */
-  static void AddByteStreamLater(const GP<ByteStream> &bs);
+  static void AddByteStreamLater(const GP<ByteStream> &bs)
+  { use_locale(); DjVuMessageLite::AddByteStreamLater(bs); }
 
   /** Destructor: Does any necessary cleanup. Actions depend on how the message
       file is implemented. */
   ~DjVuMessage();
 
-  /// Lookup the relavent string and parse the message.
-  GUTF8String LookUp( const GUTF8String & MessageList ) const;
-
   //// Same as LookUp, but this is a static method.
   static GUTF8String LookUpUTF8( const GUTF8String & MessageList )
-  { return DjVuMessage::create().LookUp(MessageList); }
+  { use_locale();return DjVuMessageLite::LookUpUTF8(MessageList); }
 
   /** Same as Lookup, but returns the a multibyte character string in the
       current locale. */
   static GNativeString LookUpNative( const GUTF8String & MessageList )
-  { return DjVuMessage::create().LookUp(MessageList).getUTF82Native(); }
+  { use_locale();return DjVuMessageLite::LookUpNative(MessageList); }
 
   /// This is a simple alias to the above class, but does an fprintf to stderr.
-  void perror( const GUTF8String & MessageList ) const;
-
-private:
-
-  /** Looks up the msgID in the file of messages. The strings message_text
-      and message_number are returned if found. If not found, these strings
-      are empty. */
-  void LookUpID( const GUTF8String & msgID,
-    GUTF8String &message_text, GUTF8String &message_number ) const;
-
-  /** Expands a single message and inserts the arguments. Single_Message
-      contains no separators (newlines), but includes all the parameters
-      separated by tabs. */
-  GUTF8String LookUpSingle( const GUTF8String & Single_Message ) const;
-
-  /** Insert a string into the message text. Will insert into any field
-      description.  Except for an ArgId of zero (message number), if the
-      #ArgId# is not found, the routine adds a line with the parameter
-      so information will not be lost. */
-  void InsertArg(
-    GUTF8String &message, const int ArgId, const GUTF8String &arg ) const;
-
-  void AddByteStream(const GP<ByteStream> &bs);
+  static void perror( const GUTF8String & MessageList )
+  { use_locale();DjVuMessageLite::perror(MessageList); }
 };
-
 
 // There is only object of class DjVuMessage in a program, and here it
 // is (the actual object is in DjVuMessage.cpp).
 //
-// extern DjVuMessage  DjVuMsg;
-
-#define DjVuMsg DjVuMessage::create()
+// #define DjVuMsg DjVuMessage::create()
 
 #endif /* __DJVU_MESSAGE_H__ */
 

@@ -1,7 +1,7 @@
 //C-  Copyright © 2000-2001, LizardTech, Inc. All Rights Reserved.
 //C-              Unauthorized use prohibited.
 //
-// $Id: djvuxmlparser.cpp,v 1.5 2001-05-03 22:06:26 bcr Exp $
+// $Id: djvuxmlparser.cpp,v 1.6 2001-05-09 00:38:26 bcr Exp $
 // $Name:  $
 
 #include "XMLParser.h"
@@ -10,6 +10,7 @@
 #include "GURL.h"
 #include "DjVuDocument.h"
 #include "ByteStream.h"
+#include "DjVuMessage.h"
 #include <stdio.h>
 #include <ctype.h>
 #include <locale.h>
@@ -19,6 +20,7 @@ int
 main(int argc,char *argv[],char *[])
 {
   setlocale(LC_ALL,"");
+  DjVuMessage::use_locale();
   DArray<GUTF8String> dargv(0,argc-1);
   for(int i=0;i<argc;++i)
     dargv[i]=GNativeString(argv[i]);

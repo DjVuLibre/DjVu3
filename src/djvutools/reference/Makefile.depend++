@@ -255,6 +255,7 @@ djvutoxml.o: djvutoxml.cpp \
  ../../../src/libdjvu++/Arrays.h \
  ../../../src/libdjvu++/GOS.h \
  ../../../src/libdjvu++/DjVuMessage.h \
+ ../../../src/libdjvu++/DjVuMessageLite.h \
  ../../../src/libdjvu++/ByteStream.h \
  ../../../src/libdjvu++/GMapAreas.h \
  ../../../src/libdjvu++/GRect.h \

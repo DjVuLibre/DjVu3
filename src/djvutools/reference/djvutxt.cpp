@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djvutxt.cpp,v 1.19 2001-05-03 22:06:26 bcr Exp $
+// $Id: djvutxt.cpp,v 1.20 2001-05-09 00:38:26 bcr Exp $
 // $Name:  $
 
 // DJVUTXT -- DjVu TXT extractor
@@ -69,7 +69,7 @@
     @author
     Andrei Erofeev <eaf@geocities.com> -- initial implementation
     @version
-    #$Id: djvutxt.cpp,v 1.19 2001-05-03 22:06:26 bcr Exp $# */
+    #$Id: djvutxt.cpp,v 1.20 2001-05-09 00:38:26 bcr Exp $# */
 //@{
 //@}
 
@@ -80,6 +80,7 @@
 #include "DjVuImage.h"
 #include "GString.h"
 #include "GOS.h"
+#include "DjVuMessage.h"
 
 #include <locale.h>
 #include <stdio.h>
@@ -133,6 +134,7 @@ int
 main(int argc, char ** argv)
 {
   setlocale(LC_ALL,"");
+  DjVuMessage::use_locale();
   DArray<GUTF8String> dargv(0,argc-1);
   for(int i=0;i<argc;++i)
     dargv[i]=GNativeString(argv[i]);

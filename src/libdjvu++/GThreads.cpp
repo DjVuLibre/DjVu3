@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GThreads.cpp,v 1.60 2001-04-12 18:50:51 fcrary Exp $
+// $Id: GThreads.cpp,v 1.61 2001-05-09 00:38:26 bcr Exp $
 // $Name:  $
 
 
@@ -44,7 +44,7 @@
 
 #include "GThreads.h"
 #include "GException.h"
-#include "DjVuMessage.h"
+#include "DjVuMessageLite.h"
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -107,7 +107,7 @@ start(void *arg)
       G_CATCH(ex)
         {
           ex.perror();
-          DjVuMsg.perror( ERR_MSG("GThreads.uncaught") );
+          DjVuMessageLite::perror( ERR_MSG("GThreads.uncaught") );
 #ifdef _DEBUG
           abort();
 #endif
@@ -116,7 +116,7 @@ start(void *arg)
     }
   catch(...)
     {
-      DjVuMsg.perror( ERR_MSG("GThreads.unrecognized") );
+      DjVuMessageLite::perror( ERR_MSG("GThreads.unrecognized") );
 #ifdef _DEBUG
       abort();
 #endif
@@ -419,7 +419,7 @@ GThread::start(void *arg)
       G_CATCH(ex)
         {
           ex.perror();
-          DjVuMsg.perror( ERR_MSG("GThreads.uncaught") );
+          DjVuMessageLite::perror( ERR_MSG("GThreads.uncaught") );
 #ifdef _DEBUG
           abort();
 #endif
@@ -428,7 +428,7 @@ GThread::start(void *arg)
     }
   catch(...)
     {
-      DjVuMsg.perror( ERR_MSG("GThreads.unrecognized") );
+      DjVuMessageLite::perror( ERR_MSG("GThreads.unrecognized") );
 #ifdef _DEBUG
       abort();
 #endif
@@ -629,7 +629,7 @@ GThread::start(void *arg)
       G_CATCH(ex)
         {
           ex.perror();
-          DjVuMsg.perror( ERR_MSG("GThreads.uncaught") );
+          DjVuMessageLite::perror( ERR_MSG("GThreads.uncaught") );
 #ifdef _DEBUG
           abort();
 #endif
@@ -639,7 +639,7 @@ GThread::start(void *arg)
     }
   catch(...)
     {
-          DjVuMsg.perror( ERR_MSG("GThreads.unrecognized") );
+          DjVuMessageLite::perror( ERR_MSG("GThreads.unrecognized") );
 #ifdef _DEBUG
       abort();
 #endif
@@ -1252,7 +1252,7 @@ cotask_yield()
   while (q != n);
   // abort on deadlock
   if (count == 0) {
-    DjVuMsg.perror( ERR_MSG("GThreads.panic") );
+    DjVuMessageLite::perror( ERR_MSG("GThreads.panic") );
     abort();
   }
   // select
@@ -1425,7 +1425,7 @@ cotask_get_eh_context()
     return curtask->ehctx;
   else if (maintask)
     return maintask->ehctx;
-  DjVuMsg.perror( ERR_MSG("GThreads.co_panic") );
+  DjVuMessageLite::perror( ERR_MSG("GThreads.co_panic") );
   abort();
 }
 #endif
@@ -1523,7 +1523,7 @@ starttwo(GThread *thr)
       G_CATCH(ex)
         {
           ex.perror();
-          DjVuMsg.perror( ERR_MSG("GThreads.uncaught") );
+          DjVuMessageLite::perror( ERR_MSG("GThreads.uncaught") );
 #ifdef _DEBUG
           abort();
 #endif
@@ -1533,7 +1533,7 @@ starttwo(GThread *thr)
     }
   catch(...)
     {
-          DjVuMsg.perror( ERR_MSG("GThreads.unrecognized") );
+          DjVuMessageLite::perror( ERR_MSG("GThreads.unrecognized") );
 #ifdef _DEBUG
       abort();
 #endif

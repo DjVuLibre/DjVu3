@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuImage.cpp,v 1.76 2001-05-03 22:06:30 bcr Exp $
+// $Id: DjVuImage.cpp,v 1.77 2001-05-09 00:38:26 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -48,7 +48,6 @@
 #include "DataPool.h"
 #include "ByteStream.h"
 #include "GMapAreas.h"
-#include "DjVuMessage.h"
 #include "debug.h"
 #include <stdarg.h>
 
@@ -342,14 +341,13 @@ DjVuImage::get_short_description() const
     else
       //msg.format("%dx%d", width, height);
       msg.format( ERR_MSG("DjVuImage.short2") "\t%d\t%d", width, height );
-  return DjVuMessage::LookUpUTF8(msg);
+  return msg;
 }
 
 GUTF8String 
 DjVuImage::get_long_description() const
 {
-  GUTF8String result = file ? DjVuMessage::LookUpUTF8(file->description) : GUTF8String();
-  return result;
+  return file?(file->description):GUTF8String();
 }
 
 

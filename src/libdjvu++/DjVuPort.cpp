@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuPort.cpp,v 1.50 2001-04-24 00:25:50 bcr Exp $
+// $Id: DjVuPort.cpp,v 1.51 2001-05-09 00:38:26 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -42,7 +42,7 @@
 #include "DjVuImage.h"
 #include "DjVuDocument.h"
 #include "DjVuFile.h"
-#include "DjVuMessage.h"
+#include "DjVuMessageLite.h"
 #include "DataPool.h"
 
 //****************************************************************************
@@ -628,14 +628,14 @@ DjVuSimplePort::request_data(const DjVuPort * source, const GURL & url)
 bool
 DjVuSimplePort::notify_error(const DjVuPort * source, const GUTF8String &msg)
 {
-   DjVuMsg.perror(msg);
+   DjVuMessageLite::perror(msg);
    return 1;
 }
 
 bool
 DjVuSimplePort::notify_status(const DjVuPort * source, const GUTF8String &msg)
 {
-   DjVuMsg.perror(msg);
+   DjVuMessageLite::perror(msg);
    return 1;
 }
 

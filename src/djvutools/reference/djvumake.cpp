@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //
-// $Id: djvumake.cpp,v 1.20 2001-05-03 22:06:26 bcr Exp $
+// $Id: djvumake.cpp,v 1.21 2001-05-09 00:38:26 bcr Exp $
 // $Name:  $
 
 /** @name djvumake
@@ -102,7 +102,7 @@
     @memo
     Assemble DjVu files.
     @version
-    #$Id: djvumake.cpp,v 1.20 2001-05-03 22:06:26 bcr Exp $#
+    #$Id: djvumake.cpp,v 1.21 2001-05-09 00:38:26 bcr Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> \\
     Patrick Haffner <haffner@research.att.com>
@@ -120,6 +120,7 @@
 
 #include "GPixmap.h"
 #include "GBitmap.h"
+#include "DjVuMessage.h"
 
 #include <locale.h>
 #include <stdio.h>
@@ -614,6 +615,7 @@ int
 main(int argc, char **argv)
 {
   setlocale(LC_ALL,"");
+  DjVuMessage::use_locale();
   DArray<GUTF8String> dargv(0,argc-1);
   for(int i=0;i<argc;++i)
     dargv[i]=GNativeString(argv[i]);

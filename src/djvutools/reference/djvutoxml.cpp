@@ -4,7 +4,7 @@
 //C-              Unauthorized use prohibited.
 //C-
 // 
-// $Id: djvutoxml.cpp,v 1.2 2001-05-03 22:06:26 bcr Exp $
+// $Id: djvutoxml.cpp,v 1.3 2001-05-09 00:38:26 bcr Exp $
 // $Name:  $
 
 #include "DjVuDocument.h"
@@ -93,6 +93,7 @@ int
 main(int argc, char * argv[], char *env[])
 {
   setlocale(LC_ALL,"");
+  DjVuMessage::use_locale();
   DArray<GUTF8String> dargv(0,argc-1);
   for(int i=0;i<argc;++i)
     dargv[i]=GNativeString(argv[i]);
@@ -182,7 +183,7 @@ main(int argc, char * argv[], char *env[])
           {
             if (arg == "-")
             {
-              DjVuMsg.perror( ERR_MSG("DjVuToXML.std_read") );
+              DjVuMessage::perror( ERR_MSG("DjVuToXML.std_read") );
               usage();
               exit(1);
             }
@@ -199,7 +200,7 @@ main(int argc, char * argv[], char *env[])
         {
           if (i+1>=argc)
           {
-            DjVuMsg.perror( ERR_MSG("DjVuToXML.no_num") );
+            DjVuMessage::perror( ERR_MSG("DjVuToXML.no_num") );
             usage();
             exit(1);
           }
@@ -207,7 +208,7 @@ main(int argc, char * argv[], char *env[])
           page_num=dargv[i].toInt() - 1;
           if (page_num<0)
           {
-            DjVuMsg.perror( ERR_MSG("DjVuToXML.negative_num") );
+            DjVuMessage::perror( ERR_MSG("DjVuToXML.negative_num") );
             usage();
             exit(1);
           }
@@ -217,13 +218,13 @@ main(int argc, char * argv[], char *env[])
           exit(1);
         } else
         {
-          DjVuMsg.perror( ERR_MSG("DjVuToXML.unrecog_opt") "\t"+arg);
+          DjVuMessage::perror( ERR_MSG("DjVuToXML.unrecog_opt") "\t"+arg);
         }
       }
       
       if (!name_in.length())
       {
-        DjVuMsg.perror( ERR_MSG("DjVuToXML.no_name") );
+        DjVuMessage::perror( ERR_MSG("DjVuToXML.no_name") );
         usage();
         exit(1);
       }
