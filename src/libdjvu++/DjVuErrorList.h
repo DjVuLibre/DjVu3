@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuErrorList.h,v 1.1 1999-12-05 21:46:17 bcr Exp $
+//C- $Id: DjVuErrorList.h,v 1.2 2000-01-14 06:43:44 bcr Exp $
  
 #ifndef _DJVUERRORLIST_H
 #define _DJVUERRORLIST_H
@@ -28,7 +28,7 @@
 
     @memo DjVuErrorList class.
     @author Bill C Riemers <bcr@att.com>
-    @version #$Id: DjVuErrorList.h,v 1.1 1999-12-05 21:46:17 bcr Exp $#
+    @version #$Id: DjVuErrorList.h,v 1.2 2000-01-14 06:43:44 bcr Exp $#
 */
 
 //@{
@@ -37,7 +37,7 @@
     from classes dirived from DjVuPort to a list that can be accessed at
     any time. */
 
-class DjVuErrorList : public DjVuPort
+class DjVuErrorList : public DjVuSimplePort
 {
 public:
   /// The normal port caster constructor. 
