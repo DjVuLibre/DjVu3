@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GUnicode.cpp,v 1.17 2001-05-25 19:17:16 bcr Exp $
+// $Id: GUnicode.cpp,v 1.18 2001-05-25 19:44:00 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -135,6 +135,7 @@ public:
   /// virtual destructor.
   virtual ~Unicode();
 
+  static GP<GStringRep> create(const unsigned int sz);
   static GP<GStringRep> create(void const * const buf,const size_t,const EncodeType,
     const GP<GStringRep> &encoding);
   static GP<GStringRep> create( void const * const buf,
@@ -159,6 +160,22 @@ static unsigned long UCS4BEtoUCS4(unsigned char const *&s,void const * const);
 static unsigned long UCS4LEtoUCS4(unsigned char const *&s,void const * const);
 static unsigned long UCS4_3412toUCS4(unsigned char const *&s,void const * const);
 static unsigned long UCS4_2143toUCS4(unsigned char const *&s,void const * const);
+template <class TYPE>
+
+GP<GStringRep>
+GStringRep::Unicode::create(const unsigned int sz)
+{
+  GP<GStringRep> gaddr;
+  if (sz > 0)
+  {
+    GStringRep *addr;
+    gaddr=(addr=new GStringRep::Unicode);
+    addr->data=(char *)(::operator new(sz+1));
+    addr->size = sz;
+    addr->data[sz] = 0;
+  }
+  return gaddr;
+}
 
 GStringRep::Unicode::Unicode(void)
 : encodetype(XUTF8), gremainder(remainder,0,1) {}
@@ -360,6 +377,7 @@ GStringRep::Unicode::create(
       case XUCS4LE:
       case XUCS4_2143:
       case XUCS4_3412:
+      {
         for(unsigned long w;
           (eptr<xeptr)&&(w=*(unsigned long const *)eptr);
           eptr+=sizeof(unsigned long))
@@ -367,9 +385,11 @@ GStringRep::Unicode::create(
           maxutf8size+=(w>0x7f)?6:1;
         }
         break;
+      }
       case XUTF16:
       case XUTF16BE:
       case XUTF16LE:
+      {
         for(unsigned short w;
           (eptr<xeptr)&&(w=*(unsigned short const *)eptr);
           eptr+=sizeof(unsigned short))
@@ -377,6 +397,7 @@ GStringRep::Unicode::create(
           maxutf8size+=(w>0x7f)?3:1;
         }
         break;
+      }
       case XUTF8:
         for(;(eptr<xeptr)&&*eptr;maxutf8size++,eptr++)
           EMPTY_LOOP;
@@ -471,11 +492,11 @@ GStringRep::Unicode::create(
       const unsigned int size=(size_t)optr-(size_t)utf8buf;
       if(size)
       {
-        retval=(gretval=GStringRep::create(size,(GStringRep::Unicode *)0));
+		  retval=(gretval=GStringRep::Unicode::create(size));
         memcpy(retval->data,utf8buf,size);
       }else
       {
-        retval=(gretval=GStringRep::create(1,(GStringRep::Unicode *)0));
+		  retval=(gretval=GStringRep::Unicode::create(1));
         retval->size=size;
       }
       retval->data[size]=0;
@@ -486,7 +507,7 @@ GStringRep::Unicode::create(
   }
   if(!retval)
   {
-    retval=(gretval=GStringRep::create(1,(GStringRep::Unicode *)0));
+    retval=(gretval=GStringRep::Unicode::create(1));
     retval->data[0]=0;
     retval->size=0;
     retval->set_remainder(0,0,t);

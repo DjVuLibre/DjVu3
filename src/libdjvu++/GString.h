@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.h,v 1.77 2001-05-25 19:17:16 bcr Exp $
+// $Id: GString.h,v 1.78 2001-05-25 19:44:00 bcr Exp $
 // $Name:  $
 
 #ifndef _GSTRING_H_
@@ -57,7 +57,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.77 2001-05-25 19:17:16 bcr Exp $# */
+    #$Id: GString.h,v 1.78 2001-05-25 19:44:00 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -1414,23 +1414,6 @@ GNativeString::downcase( void ) const
 { 
   return (ptr?(*this)->downcase():(*this));
 }
-
-template <class TYPE>
-GP<GStringRep>
-GStringRep::create(const unsigned int sz, TYPE *)
-{
-  GP<GStringRep> gaddr;
-  if (sz > 0)
-  {
-    GStringRep *addr;
-    gaddr=(addr=new TYPE);
-    addr->data=(char *)(::operator new(sz+1));
-    addr->size = sz;
-    addr->data[sz] = 0;
-  }
-  return gaddr;
-}
-
 
 #endif // UNDER_CE
 

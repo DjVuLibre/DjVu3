@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.106 2001-05-25 19:17:16 bcr Exp $
+// $Id: GString.cpp,v 1.107 2001-05-25 19:44:00 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -126,6 +126,22 @@ GStringRep::ChangeLocale::~ChangeLocale()
 }
 
 #endif // UNDER_CE
+
+template <class TYPE>
+GP<GStringRep>
+GStringRep::create(const unsigned int sz, TYPE *)
+{
+  GP<GStringRep> gaddr;
+  if (sz > 0)
+  {
+    GStringRep *addr;
+    gaddr=(addr=new TYPE);
+    addr->data=(char *)(::operator new(sz+1));
+    addr->size = sz;
+    addr->data[sz] = 0;
+  }
+  return gaddr;
+}
 
 GP<GStringRep>
 GStringRep::strdup(const char *s) const
