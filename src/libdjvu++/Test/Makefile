@@ -25,7 +25,7 @@ $(TARG): $(LIB)
 
 $(LIB): PHONY
 	@echo ----- Making library
-	( cd .. ; make libDejaVu.a )
+	( cd .. ; ${MAKE} ${MAKEFLAGS} libDejaVu.a )
 	@echo ----- Done library
 
 

@@ -7,9 +7,10 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: debug.cpp,v 1.1 1999-01-22 00:40:19 leonb Exp $
+//C-  $Id: debug.cpp,v 1.2 1999-01-27 20:03:33 leonb Exp $
 
-// $Id: debug.cpp,v 1.1 1999-01-22 00:40:19 leonb Exp $
+
+#if ( DEBUGLVL > 0 )
 
 #include "debug.h"
 #include "GThreads.h"
@@ -29,9 +30,6 @@
 #endif
 #endif
 #endif
-
-
-#if ( DEBUGLVL > 0 )
 
 static GCriticalSection debug_lock;
 #ifdef RUNTIME_DEBUG_ONLY

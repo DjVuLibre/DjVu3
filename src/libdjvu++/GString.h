@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: GString.h,v 1.1 1999-01-22 00:40:19 leonb Exp $
+//C-  $Id: GString.h,v 1.2 1999-01-27 20:03:33 leonb Exp $
 
 
 #ifndef _GSTRING_H_
@@ -35,7 +35,7 @@
     @author
     Leon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.1 1999-01-22 00:40:19 leonb Exp $# */
+    #$Id: GString.h,v 1.2 1999-01-27 20:03:33 leonb Exp $# */
 //@{
 
 #include "DjVuGlobal.h"
@@ -54,7 +54,6 @@ class GStringRep : public GPEnabled
 {
   friend class GString;
   friend unsigned int hash(const GString &ref);
-  friend GString concat(const char *str1, const char *str2);
 public:
   virtual ~GStringRep();
   static GStringRep *xnew(unsigned int sz = 0);
@@ -113,8 +112,6 @@ public:
   /** Constructs a string with a human-readable representation of floating
       point number #number#. */
   GString(const double number);
-  // Secret constructor -- do not use.
-  GString(GStringRep* rep);
   // -- COPY OPERATOR
   /** Copy operator. Resets the string with the value of string #gs#.  This
       operation is efficient : both strings will share the same segment of
@@ -124,8 +121,6 @@ public:
       character string contained in the zero terminated character array
       #str#. */
   GString& operator= (const char *str);
-  // Secret copy operator -- do not use.
-  GString& operator= (GStringRep *rep);
   // -- ACCESS
   /** Converts a string into a constant zero terminated character array.  This
       conversion operator is very efficient. The returned pointer remains
@@ -213,48 +208,72 @@ public:
   GString& operator+= (char ch);
   /** Appends the zero terminated character array #str# to the string. */
   GString& operator+= (const char *str);
-  // secret function -- do not use.
-  friend GString concat (const char *str1, const char *str2);
   /** Concatenates strings. Returns a string composed by concatenating
       the characters of strings #s1# and #s2#. */
-  friend GString operator+(const GString &s1, const GString &s2) { return concat(s1,s2);}
-  friend GString operator+(const GString &s1, const char    *s2) { return concat(s1,s2);}
-  friend GString operator+(const char    *s1, const GString &s2) { return concat(s1,s2);}
+  friend GString operator+(const GString &s1, const GString &s2) 
+    { return GString::concat(s1,s2);}
+  friend GString operator+(const GString &s1, const char    *s2) 
+    { return GString::concat(s1,s2);}
+  friend GString operator+(const char    *s1, const GString &s2) 
+    { return GString::concat(s1,s2);}
   // -- COMPARISONS
   /** String comparison. Returns true if and only if character strings #s1# and #s2#
       are equal (in the sense of #strcmp#.) */
-  friend int operator==(const GString &s1, const GString &s2) { return strcmp(s1,s2)==0; }
-  friend int operator==(const GString &s1, const char    *s2) { return strcmp(s1,s2)==0; }
-  friend int operator==(const char    *s1, const GString &s2) { return strcmp(s1,s2)==0; }
+  friend int operator==(const GString &s1, const GString &s2) 
+    { return strcmp(s1,s2)==0; }
+  friend int operator==(const GString &s1, const char    *s2) 
+    { return strcmp(s1,s2)==0; }
+  friend int operator==(const char    *s1, const GString &s2) 
+    { return strcmp(s1,s2)==0; }
   /** String comparison. Returns true if and only if character strings #s1# and #s2#
       are not equal (in the sense of #strcmp#.) */
-  friend int operator!=(const GString &s1, const GString &s2) { return strcmp(s1,s2)!=0; }
-  friend int operator!=(const GString &s1, const char    *s2) { return strcmp(s1,s2)!=0; }
-  friend int operator!=(const char    *s1, const GString &s2) { return strcmp(s1,s2)!=0; }
+  friend int operator!=(const GString &s1, const GString &s2)
+    { return strcmp(s1,s2)!=0; }
+  friend int operator!=(const GString &s1, const char    *s2)
+    { return strcmp(s1,s2)!=0; }
+  friend int operator!=(const char    *s1, const GString &s2) 
+    { return strcmp(s1,s2)!=0; }
   /** String comparison. Returns true if and only if character strings #s1# is
       lexicographically greater than or equal to string #s2# (as with #strcmp#.) */
-  friend int operator>=(const GString &s1, const GString &s2) { return strcmp(s1,s2)>=0; }
-  friend int operator>=(const GString &s1, const char    *s2) { return strcmp(s1,s2)>=0; }
-  friend int operator>=(const char    *s1, const GString &s2) { return strcmp(s1,s2)>=0; }
+  friend int operator>=(const GString &s1, const GString &s2) 
+    { return strcmp(s1,s2)>=0; }
+  friend int operator>=(const GString &s1, const char    *s2) 
+    { return strcmp(s1,s2)>=0; }
+  friend int operator>=(const char    *s1, const GString &s2)
+    { return strcmp(s1,s2)>=0; }
   /** String comparison. Returns true if and only if character strings #s1# is
       lexicographically greater than string #s2# (as with #strcmp#.) */
-  friend int operator> (const GString &s1, const GString &s2) { return strcmp(s1,s2)> 0; }
-  friend int operator> (const GString &s1, const char    *s2) { return strcmp(s1,s2)> 0; }
-  friend int operator> (const char    *s1, const GString &s2) { return strcmp(s1,s2)> 0; }
+  friend int operator> (const GString &s1, const GString &s2)
+    { return strcmp(s1,s2)> 0; }
+  friend int operator> (const GString &s1, const char    *s2) 
+    { return strcmp(s1,s2)> 0; }
+  friend int operator> (const char    *s1, const GString &s2)
+    { return strcmp(s1,s2)> 0; }
   /** String comparison. Returns true if and only if character strings #s1# is
       lexicographically lesser than or equal to string #s2# (as with #strcmp#.) */
-  friend int operator<=(const GString &s1, const GString &s2) { return strcmp(s1,s2)<=0; }
-  friend int operator<=(const GString &s1, const char    *s2) { return strcmp(s1,s2)<=0; }
-  friend int operator<=(const char    *s1, const GString &s2) { return strcmp(s1,s2)<=0; }
+  friend int operator<=(const GString &s1, const GString &s2)
+    { return strcmp(s1,s2)<=0; }
+  friend int operator<=(const GString &s1, const char    *s2) 
+    { return strcmp(s1,s2)<=0; }
+  friend int operator<=(const char    *s1, const GString &s2)
+    { return strcmp(s1,s2)<=0; }
   /** String comparison. Returns true if and only if character strings #s1# is
       lexicographically lesser than string #s2# (as with #strcmp#.) */
-  friend int operator< (const GString &s1, const GString &s2) { return strcmp(s1,s2)< 0; }
-  friend int operator< (const GString &s1, const char    *s2) { return strcmp(s1,s2)< 0; }
-  friend int operator< (const char    *s1, const GString &s2) { return strcmp(s1,s2)< 0; }
+  friend int operator< (const GString &s1, const GString &s2)
+    { return strcmp(s1,s2)< 0; }
+  friend int operator< (const GString &s1, const char    *s2)
+    { return strcmp(s1,s2)< 0; }
+  friend int operator< (const char    *s1, const GString &s2) 
+    { return strcmp(s1,s2)< 0; }
   // -- HASHING
   /** Returns a hash code for the string.  This is useful for creating
       associative maps with string keys (see \Ref{GMap}). */
   friend unsigned int hash(const GString &ref);
+  // -- HELPERS
+protected:
+  GString(GStringRep* rep);
+  GString& operator= (GStringRep *rep);
+  static GString concat (const char *str1, const char *str2);
 };
 
 //@}

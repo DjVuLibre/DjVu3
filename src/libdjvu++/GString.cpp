@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: GString.cpp,v 1.1 1999-01-22 00:40:19 leonb Exp $
+//C-  $Id: GString.cpp,v 1.2 1999-01-27 20:03:33 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -23,7 +23,7 @@
 
 #include "GString.h"
 
-// File "$Id: GString.cpp,v 1.1 1999-01-22 00:40:19 leonb Exp $"
+// File "$Id: GString.cpp,v 1.2 1999-01-27 20:03:33 leonb Exp $"
 // - Author: Leon Bottou, 04/1997
 
 static GStringRep nullstring;
@@ -60,18 +60,26 @@ GString::GString()
 }
 
 GString::GString(const char *str)
-  : GP<GStringRep> ( GStringRep::xnew(strlen(str)) )
+  : GP<GStringRep> ( &nullstring )
 {
-  strcpy((*this)->data,str);
+  if (str)
+    {
+      (*this) =  GStringRep::xnew(strlen(str));
+      strcpy((*this)->data,str);
+    }
 }
 
 GString::GString(const char *str, unsigned int len)
+  : GP<GStringRep> ( &nullstring )
 {
-  unsigned int nlen = 0;
-  for (nlen=0; nlen<len && str[nlen]; nlen++) /**/;
-  (*this) = GStringRep::xnew(nlen);
-  memcpy((*this)->data,str,nlen);
-  (*this)->data[nlen] = 0;
+  if (str)
+    {
+      unsigned int nlen = 0;
+      for (nlen=0; nlen<len && str[nlen]; nlen++) /**/;
+      (*this) = GStringRep::xnew(nlen);
+      memcpy((*this)->data,str,nlen);
+      (*this)->data[nlen] = 0;
+    }
 }
 
 GString::GString(const GString& gs, int from, unsigned int len)
@@ -274,11 +282,12 @@ GString::operator+= (const char *str)
 }
 
 GString
-concat(const char *str1, const char *str2)
+GString::concat(const char *str1, const char *str2)
 {
-  GString res = GStringRep::xnew(strlen(str1) + strlen(str2));
-  strcpy(res->data, str1);
-  strcat(res->data, str2);
+  GStringRep *resrep = GStringRep::xnew(strlen(str1) + strlen(str2));
+  strcpy(resrep->data, str1);
+  strcat(resrep->data, str2);
+  GString res(resrep);
   return res;
 }
 
