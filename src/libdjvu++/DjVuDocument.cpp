@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.74 1999-11-21 21:19:16 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.75 1999-11-22 03:38:43 bcr Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -95,6 +95,7 @@ DjVuDocument::~DjVuDocument(void)
       ufiles_list.empty();
    }
 
+//bcr: This just seems to create a nice segmentation fault.
    GPList<DjVuPort> ports=get_portcaster()->prefix_to_ports(get_int_prefix(this));
    for(GPosition pos=ports;pos;++pos)
    {
@@ -119,6 +120,7 @@ DjVuDocument::stop(void)
    {
       if (init_data_pool) init_data_pool->stop(false);	// any operation
 
+//bcr: I don't understand this.  Isn't ndir_file stopped above?
       if (ndir_file) ndir_file->stop(false);
 
       GCriticalSectionLock lock(&ufiles_lock);
@@ -276,6 +278,36 @@ DjVuDocument::init_thread(void)
 	    ndir=new DjVuNavDir(init_url.base()+"directory");
 	    ndir->insert_page(-1, init_url.name());
 	 }
+      }
+      else
+      {
+//bcr: I don't really understand why ndir_file must point to a 
+//bcr: document.  But if it doesn't, then a segmentation fault
+//bcr: will be generated with the destructor is called from a THROW().
+//bcr: So we map ndir_file to the first page if init_url was the 
+//bcr: index file.
+        int page=ndir->url_to_page(init_url);
+        if(page<0)
+        {
+          int pages=ndir->get_pages_num(),i;
+          for(i=0;i<pages;i++)
+          {
+            TRY
+            {
+              ndir_file=get_djvu_file(i);
+              break;
+            }
+            CATCH(ex)
+            {
+		// We will ignore this error for now.
+            }
+            ENDCATCH;
+          }
+          if(i==pages)
+          {
+            THROW("No valid pages found in this document.");
+          }
+        }
       }
       flags|=DOC_NDIR_KNOWN;
       pcaster->notify_doc_flags_changed(this, DOC_NDIR_KNOWN, 0);
@@ -590,11 +622,11 @@ DjVuDocument::url_to_file(const GURL & url, bool dont_create)
    {
       DEBUG_MSG("creating a new file\n");
       file=new DjVuFile();
+      file->set_recover_errors(recover_errors);
+      file->set_verbose_eof(verbose_eof);
       file->init(url, this);
       set_file_aliases(file);
    }
-   file->set_recover_errors(recover_errors);
-   file->set_verbose_eof(verbose_eof);
 
    return file;
 }
@@ -649,9 +681,9 @@ DjVuDocument::get_djvu_file(int page_num, bool dont_create)
 	    ufiles_list.append(ufile);
       
 	    GP<DjVuFile> file=new DjVuFile();
-	    file->init(url, this);
             file->set_recover_errors(recover_errors);
             file->set_verbose_eof(verbose_eof);
+	    file->init(url, this);
 	    ufile->file=file;
 	    return file;
 	 } else url=((DjVuFile *) (DjVuPort *) port)->get_url();
@@ -711,9 +743,9 @@ DjVuDocument::get_djvu_file(const char * id, bool dont_create)
 	 ufiles_list.append(ufile);
       
 	 GP<DjVuFile> file=new DjVuFile();
-	 file->init(url, this);
          file->set_recover_errors(recover_errors);
          file->set_verbose_eof(verbose_eof);
+	 file->init(url, this);
 	 ufile->file=file;
 	 return file;
       }
@@ -1230,8 +1262,8 @@ add_file_to_djvm(const GP<DjVuFile> & file, bool page,
 }
 
 static void
-local_get_file_names(DjVuFile * f,const GMap<GURL, void *> & map,
-		     GMap<GURL,void *> &tmpmap)
+local_get_file_names
+(DjVuFile * f,const GMap<GURL, void *> & map,GMap<GURL,void *> &tmpmap)
 {
    GURL url=f->get_url();
    if (!map.contains(url) && !tmpmap.contains(url))
@@ -1245,7 +1277,8 @@ local_get_file_names(DjVuFile * f,const GMap<GURL, void *> & map,
 }
 
 static void
-local_get_file_names(DjVuFile * f, GMap<GURL, void *> & map)
+local_get_file_names
+(DjVuFile * f, GMap<GURL, void *> & map)
 {
    GMap<GURL,void *> tmpmap;
    local_get_file_names(f,map,tmpmap);
@@ -1407,7 +1440,8 @@ DjVuDocument::expand(const char * dir_name, const char * idx_name)
 }
 
 void
-DjVuDocument::save_as(const char where[], const bool bundled)
+DjVuDocument::save_as
+(const char where[], const bool bundled)
 {
    DEBUG_MSG("DjVuDocument::save_as(): where='" << where <<
 	     "', bundled=" << bundled << "\n");

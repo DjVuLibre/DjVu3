@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.91 1999-11-21 21:19:16 eaf Exp $
+//C- $Id: DjVuFile.cpp,v 1.92 1999-11-22 03:38:43 bcr Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -426,42 +426,6 @@ DjVuFile::decode_func(void)
    DEBUG_MSG("decoding thread for url='" << url << "' ended\n");
 }
 
-void
-DjVuFile::set_recover_errors(ErrorRecoveryAction recover)
-{
-  if(recover != recover_errors)
-  {
-     // We need to set this class's recover_error flag first, to avoid 
-     // possable inifinite recursion.
-    recover_errors=recover;
-    if (are_incl_files_created())
-    {
-      // make sure all children have the same setting.
-      GCriticalSectionLock lock(&inc_files_lock);
-      for(GPosition pos=inc_files_list;pos;++pos)
-	inc_files_list[pos]->set_recover_errors(recover);
-    }
-  }
-}
-
-void
-DjVuFile::set_verbose_eof(bool verbose)
-{
-  if(verbose != verbose_eof)
-  {
-     // We need to set this class's recover_error flag first, to avoid 
-     // possable inifinite recursion.
-    verbose_eof=verbose;
-    if (are_incl_files_created())
-    {
-      // make sure all children have the same setting.
-      GCriticalSectionLock lock(&inc_files_lock);
-      for(GPosition pos=inc_files_list;pos;++pos)
-	inc_files_list[pos]->set_verbose_eof(verbose);
-    }
-  }
-}
-
 GP<DjVuFile>
 DjVuFile::process_incl_chunk(ByteStream & str, int file_num)
 {
@@ -536,10 +500,11 @@ DjVuFile::process_incl_chunk(ByteStream & str, int file_num)
 
 
 void
-DjVuFile::report_error(const GException &ex,bool throw_errors)
+DjVuFile::report_error
+(const GException &ex,bool throw_errors)
 {
   const char eof_msg[]="Unexpected End Of File Encountered Reading:\n\t%0.1024s";
-  if((verbose_eof)||strcmp(ex.get_cause(),"EOF"))
+  if((!verbose_eof)||strcmp(ex.get_cause(),"EOF"))
   {
     if(throw_errors)
     {
@@ -590,7 +555,7 @@ DjVuFile::process_incl_chunks(void)
          {
             chunks++;
 	    if (chkid=="INCL") process_incl_chunk(iff, incl_cnt++);
-	    iff.close_chunk();
+	    iff.seek_close_chunk();
          }
          if (chunks_number < 0) chunks_number=last_chunk;
       }
@@ -995,7 +960,7 @@ DjVuFile::decode(ByteStream & str)
           description=description+desc;
           pcaster->notify_chunk_done(this, chkid);
           // Close chunk
-          iff.close_chunk();
+          iff.seek_close_chunk();
           // Record file size
           size_so_far=iff.tell();
         }
@@ -1216,7 +1181,7 @@ DjVuFile::decode_ndir(GMap<GURL, void *> & map)
 	       dir=d;
 	       break;
 	    }
-	    iff.close_chunk();
+	    iff.seek_close_chunk();
          }
          if ((!dir)&&(chunks_number < 0)) chunks_number=last_chunk;
       }
@@ -1465,7 +1430,7 @@ DjVuFile::get_chunks_number(void)
        for(;(chksize=iff.get_chunk(chkid));last_chunk=chunks)
        {
           chunks++;
-          iff.close_chunk();
+          iff.seek_close_chunk();
        }
        chunks_number=last_chunk;
      }
@@ -1508,7 +1473,7 @@ DjVuFile::get_chunk_name(int chunk_num)
      for(;(chunks_left--)&&(chksize=iff.get_chunk(chkid));last_chunk=chunks)
      {
         if (chunks++==chunk_num) { name=chkid; break; }
-        iff.close_chunk();
+        iff.seek_close_chunk();
      }
    }
    CATCH(ex)
@@ -1551,7 +1516,7 @@ DjVuFile::contains_chunk(const char * chunk_name)
      {
        chunks++;
        if (chkid==chunk_name) { contains=1; break; }
-       iff.close_chunk();
+       iff.seek_close_chunk();
      }
      if (!contains &&(chunks_number < 0)) chunks_number=last_chunk;
    }
@@ -1652,13 +1617,13 @@ DjVuFile::add_djvu_data(IFFByteStream & ostr, GMap<GURL, void *> & map,
           ostr.close_chunk();
           if(ochksize != chksize)
           {
-            iff.close_chunk();
+            iff.seek_close_chunk();
             if (chunks_number < 0)
               chunks_number=(recover_errors>SKIP_CHUNKS)?chunks:last_chunk;
             THROW("EOF");
           }
         }
-      iff.close_chunk();
+      iff.seek_close_chunk();
      }
      if (chunks_number < 0) chunks_number=last_chunk;
    }
