@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GBitmap.cpp,v 1.25 2000-01-31 18:43:33 leonb Exp $
+//C- $Id: GBitmap.cpp,v 1.26 2000-02-01 16:07:50 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -23,7 +23,7 @@
 #include "GString.h"
 #include "GThreads.h"
 
-// File "$Id: GBitmap.cpp,v 1.25 2000-01-31 18:43:33 leonb Exp $"
+// File "$Id: GBitmap.cpp,v 1.26 2000-02-01 16:07:50 leonb Exp $"
 // - Author: Leon Bottou, 05/1997
 
 
@@ -1176,28 +1176,34 @@ GBitmap::fill(unsigned char value)
     }
 }
 
-void
-GBitmap::append_run(unsigned char *&data,const int count)
+
+void 
+GBitmap::append_long_run(unsigned char *&data, int count)
 {
-  if(count<GBitmap::RUNOVERFLOWVALUE)
-  {
-    data++[0]=count;
-  }else if(count<=GBitmap::MAXRUNSIZE)
-  {
-    data++[0]=((count>>8)&RUNMSBMASK)|RUNOVERFLOWVALUE;
-    data++[0]=(count&GBitmap::RUNLSBMASK);
-  }else
-  {
-    data++[0]=0xff;
-    data++[0]=0xff;
-    data++[0]=0;
-    append_run(data,count-MAXRUNSIZE);
-  }
+  while (count > MAXRUNSIZE)
+    {
+      data[0] = data[1] = 0xff;
+      data[2] = 0;
+      data += 3;
+      count -= MAXRUNSIZE;
+    }
+  if (count < RUNOVERFLOWVALUE)
+    {
+      data[0] = count;
+      data += 1;
+    }
+  else
+    {
+      data[0] = (count>>8) + GBitmap::RUNOVERFLOWVALUE;
+      data[1] = (count & 0xff);
+      data += 2;
+    }
 }
 
+
 void
-GBitmap::append_line(
-  unsigned char *&data,const unsigned char *row,const int rowlen,bool invert)
+GBitmap::append_line(unsigned char *&data,const unsigned char *row,
+                     const int rowlen,bool invert)
 {
   const unsigned char *rowend=row+rowlen;
   bool p=!invert;
@@ -1211,7 +1217,7 @@ GBitmap::append_line(
         } 
       else if(!*row)
         {
-            for(++count,++row;(row<rowend)&&!*row;++count,++row);
+          for(++count,++row;(row<rowend)&&!*row;++count,++row);
         }
       append_run(data,count);
     }
