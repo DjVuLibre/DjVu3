@@ -1,13 +1,15 @@
 //C-  -*- C++ -*-
 //C-
-//C-  Copyright (c) 1988 AT&T	
-//C-  All Rights Reserved 
+//C- Copyright (c) 1999 AT&T Corp.  All rights reserved.
 //C-
-//C-  THIS IS UNPUBLISHED PROPRIETARY SOURCE CODE OF AT&T
-//C-  The copyright notice above does not evidence any
-//C-  actual or intended publication of such source code.
+//C- This software may only be used by you under license from AT&T
+//C- Corp. ("AT&T"). A copy of AT&T's Source Code Agreement is available at
+//C- AT&T's Internet website having the URL <http://www.djvu.att.com/open>.
+//C- If you received this software without first entering into a license with
+//C- AT&T, you have an infringing copy of this software and cannot use it
+//C- without violating AT&T's intellectual property rights.
 //C-
-//C-  $Id: GException.cpp,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $
+//C- $Id: GException.cpp,v 1.1.1.2 1999-10-22 19:29:24 praveen Exp $
 
 
 #ifdef __GNUC__
@@ -21,17 +23,16 @@
 #include "GException.h"
 #include "debug.h"
 
-
-// File "$Id: GException.cpp,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $"
+// File "$Id: GException.cpp,v 1.1.1.2 1999-10-22 19:29:24 praveen Exp $"
 // - Author: Leon Bottou, 05/1997
-
-static const char *outofmemory = "Out of memory";
 
 GException::GException() 
   : cause(0), file(0), func(0), line(0)
 {
 }
 
+const char * const
+GException::outofmemory = "Out of memory";
 
 GException::GException(const GException & exc) 
   : cause(0), file(exc.file), func(exc.func), line(exc.line)
@@ -53,8 +54,9 @@ GException::GException (const char *xcause, const char *file, int line, const ch
 {
   // good place to set a breakpoint and DEBUG message too. 
   // It'd hard to track exceptions which seem to go from nowhere
-  DEBUG_MSG("GException::GException(): cause=" << (cause ? cause : "unknown") << "\n");
-
+#ifdef DEBUG_MSG
+  DEBUG_MSG("GException::GException(): cause=" << (xcause ? xcause : "unknown") << "\n");
+#endif
   if (xcause && xcause!=outofmemory) 
     {
       char *s = new char[strlen(xcause)+1];
@@ -140,57 +142,43 @@ GExceptionHandler::emthrow(const GException &gex)
     }
 }
 
+#else // ! USE_EXCEPTION_EMULATION
+
+static int abort_on_exception = 0;
+
+void 
+GExceptionHandler::exthrow(const GException &ex)
+{
+  if (abort_on_exception) 
+    abort();
+  throw ex;
+}
+
+void 
+GExceptionHandler::rethrow(void)
+{
+  if (abort_on_exception) 
+    abort();
+  throw;
+}
 
 #endif
 
 
 
-// ------ HACK TO SET NEW HANDLER
+// ------ MEMORY MANAGEMENT HANDLER
 
-
+#ifndef NEED_DJVU_MEMORY
+// This is not activated when C++ memory management
+// is overidden.  The overriding functions handle
+// memory exceptions by themselves.
 #if defined(_MSC_VER)
-
-
-static int __cdecl  
-throw_memory_error(size_t) 
-{
-  THROW(outofmemory);
-  return 0;
-}
-
-class SetNewHandler { 
-  int (*old_handler)(size_t);
-public:
-  SetNewHandler() {
-    old_handler = _set_new_handler(throw_memory_error);
-  }
-  ~SetNewHandler() {
-    _set_new_handler(old_handler);
-  }
-};
-
-
-
-#else // ! MICROSOFT
-
-
-static void 
-throw_memory_error() 
-{
-  THROW(outofmemory);
-}
-
-class SetNewHandler { 
-  void (*old_handler)();
-public:
-  SetNewHandler() {
-    old_handler = set_new_handler(throw_memory_error);
-  }
-  ~SetNewHandler() {
-    set_new_handler(old_handler);
-  }
-};
-
-#endif
-
-static SetNewHandler junk;
+// Microsoft is different!
+static int throw_memory_error(size_t) { THROW(GException::outofmemory); return 0; }
+static int (*old_handler)(size_t) = _set_new_handler(throw_memory_error);
+#else // !_MSC_VER
+// Standard C++
+static void throw_memory_error() { THROW(GException::outofmemory); }
+static void (*old_handler)() = set_new_handler(throw_memory_error);
+#endif // !_MSC_VER
+#endif // !NEED_DJVU_MEMORY

@@ -1,15 +1,17 @@
 //C-  -*- C++ -*-
 //C-
-//C-  Copyright (c) 1988 AT&T	
-//C-  All Rights Reserved 
+//C- Copyright (c) 1999 AT&T Corp.  All rights reserved.
 //C-
-//C-  THIS IS UNPUBLISHED PROPRIETARY SOURCE CODE OF AT&T
-//C-  The copyright notice above does not evidence any
-//C-  actual or intended publication of such source code.
+//C- This software may only be used by you under license from AT&T
+//C- Corp. ("AT&T"). A copy of AT&T's Source Code Agreement is available at
+//C- AT&T's Internet website having the URL <http://www.djvu.att.com/open>.
+//C- If you received this software without first entering into a license with
+//C- AT&T, you have an infringing copy of this software and cannot use it
+//C- without violating AT&T's intellectual property rights.
 //C-
-//C-  $Id: GPixmap.cpp,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $
+//C- $Id: GPixmap.cpp,v 1.1.1.2 1999-10-22 19:29:24 praveen Exp $
 
-// File "$Id: GPixmap.cpp,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $"
+// File "$Id: GPixmap.cpp,v 1.1.1.2 1999-10-22 19:29:24 praveen Exp $"
 // -- Implements class PIXMAP
 // Author: Leon Bottou 07/1997
 
@@ -25,6 +27,7 @@
 #include "GBitmap.h"
 #include "GPixmap.h"
 #include "GThreads.h"
+#include "Arrays.h"
 #include <stdlib.h>
 #include <math.h>
 #include <assert.h>
@@ -35,11 +38,11 @@
 //////////////////////////////////////////////////
 
 
-GPixel GPixel::WHITE = { 255, 255, 255 };
-GPixel GPixel::BLACK = {   0,   0,   0 };
-GPixel GPixel::BLUE  = { 255,   0,   0 };
-GPixel GPixel::GREEN = {   0, 255,   0 };
-GPixel GPixel::RED   = {   0,   0, 255 };
+const GPixel GPixel::WHITE = { 255, 255, 255 };
+const GPixel GPixel::BLACK = {   0,   0,   0 };
+const GPixel GPixel::BLUE  = { 255,   0,   0 };
+const GPixel GPixel::GREEN = {   0, 255,   0 };
+const GPixel GPixel::RED   = {   0,   0, 255 };
 
 
 //////////////////////////////////////////////////
@@ -47,7 +50,7 @@ GPixel GPixel::RED   = {   0,   0, 255 };
 //////////////////////////////////////////////////
 
 
-static GPixel *
+static const GPixel *
 new_gray_ramp(int grays)
 {
   GPixel *ramp = new GPixel[256];
@@ -109,7 +112,7 @@ GPixmap::GPixmap()
 {
 }
 
-GPixmap::GPixmap(int nrows, int ncolumns, GPixel *filler)
+GPixmap::GPixmap(int nrows, int ncolumns, const GPixel *filler)
 : nrows(0), ncolumns(0), pixels(0), pixels_data(0)
 {
   init(nrows, ncolumns, filler);
@@ -153,7 +156,7 @@ GPixmap::GPixmap(const GPixmap &ref, const GRect &rect)
 
 
 void 
-GPixmap::init(int arows, int acolumns, GPixel *filler)
+GPixmap::init(int arows, int acolumns, const GPixel *filler)
 {
   delete [] pixels_data;
   pixels = pixels_data = 0;
@@ -174,13 +177,13 @@ GPixmap::init(int arows, int acolumns, GPixel *filler)
 
 
 void 
-GPixmap::init(const GBitmap &ref, GPixel *userramp)
+GPixmap::init(const GBitmap &ref, const GPixel *userramp)
 {
   init(ref.rows(), ref.columns(), 0);
   if (nrows>0 && ncolumns>0)
   {
     // Create pixel ramp
-    GPixel *ramp = userramp;
+    const GPixel *ramp = userramp;
     if (!userramp)
       ramp = new_gray_ramp(ref.get_grays());
     // Copy pixels
@@ -193,13 +196,13 @@ GPixmap::init(const GBitmap &ref, GPixel *userramp)
     }
     // Free ramp
     if (!userramp)
-      delete [] ramp;
+      delete [] (GPixel*)ramp;
   }
 }
 
 
 void 
-GPixmap::init(const GBitmap &ref, const GRect &rect, GPixel *userramp)
+GPixmap::init(const GBitmap &ref, const GRect &rect, const GPixel *userramp)
 {
   init(rect.height(), rect.width(), 0);
   // compute destination rectangle
@@ -210,7 +213,7 @@ GPixmap::init(const GBitmap &ref, const GRect &rect, GPixel *userramp)
   if (! rect2.isempty())
   {
     // allocate ramp
-    GPixel *ramp = userramp;
+    const GPixel *ramp = userramp;
     if (!userramp)
       ramp = new_gray_ramp(ref.get_grays());
     // copy pixels
@@ -223,7 +226,7 @@ GPixmap::init(const GBitmap &ref, const GRect &rect, GPixel *userramp)
     }
     // free ramp
     if (!userramp)
-      delete [] ramp;
+      delete [] (GPixel*) ramp;
   }
 }
 
@@ -343,7 +346,7 @@ GPixmap::init(ByteStream &bs)
   // Read image data
   if (raw)
   {
-    GArray<unsigned char> line(ncolumns*3);
+    GTArray<unsigned char> line(ncolumns*3);
     for (int y=nrows-1; y>=0; y--) 
       {
         GPixel *p = (*this)[y];
@@ -423,7 +426,7 @@ GPixmap::save_ppm(ByteStream &bs, int raw) const
         head.format("%d %d %d  ", p[x].r, p[x].g, p[x].b);
         bs.writall((void*)(const char *)head, head.length());
         x += 1;
-        if (x==ncolumns || x&0x7==0) 
+        if (x==ncolumns || (x&0x7)==0) 
           bs.write((void*)&eol, 1);          
       }
     }
@@ -476,6 +479,9 @@ color_correction_table(double gamma, unsigned char gtable[256] )
 #endif
           gtable[i] = (int) floor(255.0 * x + 0.5);
         }
+      // Make sure that min and max values are exactly black or white
+      gtable[0] = 0;
+      gtable[255] = 255;
     }
 }
 

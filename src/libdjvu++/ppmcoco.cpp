@@ -1,13 +1,15 @@
 //C-  -*- C++ -*-
 //C-
-//C-  Copyright (c) 1988 AT&T	
-//C-  All Rights Reserved 
+//C- Copyright (c) 1999 AT&T Corp.  All rights reserved.
 //C-
-//C-  THIS IS UNPUBLISHED PROPRIETARY SOURCE CODE OF AT&T
-//C-  The copyright notice above does not evidence any
-//C-  actual or intended publication of such source code.
+//C- This software may only be used by you under license from AT&T
+//C- Corp. ("AT&T"). A copy of AT&T's Source Code Agreement is available at
+//C- AT&T's Internet website having the URL <http://www.djvu.att.com/open>.
+//C- If you received this software without first entering into a license with
+//C- AT&T, you have an infringing copy of this software and cannot use it
+//C- without violating AT&T's intellectual property rights.
 //C-
-//C-  $Id: ppmcoco.cpp,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $
+//C- $Id: ppmcoco.cpp,v 1.1.1.2 1999-10-22 19:29:25 praveen Exp $
 
 
 
@@ -28,11 +30,11 @@
     The default value 2.2 is assumed when this argument is omitted.
     \item[<ppmin>]
     Name of the PPM file to read. A single dash (#"-"#) means that the PPM
-    file is to be read on the standard input.  See \Ref{PNM and RLE file
-    formats} for more information about PPM files.
+    file is to be read on the standard input.  See 
+    \Ref{PNM and RLE file formats} for more information about PPM files.
     \item[<ppmout>]
     Name of the PPM file into which the color corrected image will be written.
-    Ommitting this argument or providing a single dash (#"-"#) means that the
+    Omitting this argument or providing a single dash (#"-"#) means that the
     PPM data will be written to the standard output.
     \end{description}
     
@@ -49,7 +51,7 @@
 
     The current release of the DjVu Reference Library only implements gamma
     correction.  Cathodic displays are reasonably well characterized by a
-    single floating point number called "gamma".  Typical gamma values 
+    single floating point number called ``gamma''.  Typical gamma values 
     are given in the table below:
     \begin{center}\begin{tabular}{ll}
     {\bf computer} & {\bf gamma}\\
@@ -65,10 +67,10 @@
     gamma coefficients are close, partly because the color values have a
     limited dynamical range, and partly because we do not exactly perform a
     regular gamma correction: regular gamma correction tends to reveal ugly
-    data compression artefacts in the dark areas of the image.  We suggest
+    data compression artifacts in the dark areas of the image.  We suggest
     therefore to design images with a intermediate gamma coefficient.  Value
     2.2 gives decent results on all computers.  This value is suggested by
-    several photo edition programs (such as Adobe Photoshop (tm)), and is
+    several photo editing programs (such as Photoshop), and is
     supported by virtually all scanner drivers.
 
     Program #ppmcoco# reads a PPM file #ppmin# containing an image designed
@@ -80,9 +82,9 @@
     @memo
     Perform color correction on PPM files.
     @author
-    Leon Bottou <leonb@research.att.com>
+    L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: ppmcoco.cpp,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $# */
+    #$Id: ppmcoco.cpp,v 1.1.1.2 1999-10-22 19:29:25 praveen Exp $# */
 //@{
 //@}
 
@@ -91,21 +93,22 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include "GException.h"
 #include "ByteStream.h"
 #include "GPixmap.h"
 #include "GString.h"
 
 double fromGamma = 2.2;
 double toGamma = 2.2;
-GString infile("-");
-GString outfile("-");
 
 int 
 usage(void)
 {
   fprintf(stderr,
-          "usage: ppmcoco [-from gamma] [-to gamma] [<ppmin>] [<ppmout>]\n");
-  exit(10);
+          "PPMCOCO -- Color correction program\n"
+          "  Copyright (c) AT&T 1999.  All rights reserved\n"
+          "usage: ppmcoco [-from gamma] [-to gamma] [<ppmin>] [<ppmout>]\n" );
+  exit(1);
 }
 
 double
@@ -124,47 +127,59 @@ str_to_gamma(const char *str)
 int 
 main (int argc, char **argv)
 {
-  // parse
-  if (argc==1)
-    usage();
-  int flag = 0;
-  for (int i=1; i<argc; i++)
+  GString infile("-");
+  GString outfile("-");
+  TRY
     {
-      if (!strcmp(argv[i],"-from") && i+1<argc)
-        {
-          fromGamma = str_to_gamma(argv[++i]);
-        }
-      else if (!strcmp(argv[i],"-to") && i+1<argc)
-        {
-          toGamma = str_to_gamma(argv[++i]);
-        }
-      else if (flag==0)
-        {
-          flag = 1;
-          infile = argv[i];
-        }
-      else if (flag == 1)
-        {
-          flag = 2;
-          outfile = argv[i];
-        }
-      else
+      // parse
+      if (argc==1)
         usage();
+      int flag = 0;
+      for (int i=1; i<argc; i++)
+        {
+          if (!strcmp(argv[i],"-from") && i+1<argc)
+            {
+          fromGamma = str_to_gamma(argv[++i]);
+            }
+          else if (!strcmp(argv[i],"-to") && i+1<argc)
+            {
+              toGamma = str_to_gamma(argv[++i]);
+            }
+          else if (flag==0)
+            {
+              flag = 1;
+              infile = argv[i];
+            }
+          else if (flag == 1)
+            {
+              flag = 2;
+              outfile = argv[i];
+            }
+          else
+            usage();
+        }
+      // compute
+      double gamma_correction = toGamma / fromGamma;
+      if (gamma_correction<0.1)
+        gamma_correction = 0.1;
+      else if (gamma_correction>10)
+        gamma_correction = 10;
+      if (gamma_correction<0.2 || gamma_correction>5)
+        fprintf(stderr,"warning: strong correction reduces image quality\n");
+      // perform
+      GPixmap pm;
+      StdioByteStream ibs(infile,"rb"); 
+      pm.init(ibs); 
+      pm.color_correct(gamma_correction);
+      StdioByteStream obs(outfile,"wb"); 
+      pm.save_ppm(obs); 
     }
-  // compute
-  double gamma_correction = toGamma / fromGamma;
-  if (gamma_correction<0.1)
-    gamma_correction = 0.1;
-  else if (gamma_correction>10)
-    gamma_correction = 10;
-  if (gamma_correction<0.2 || gamma_correction>5)
-    fprintf(stderr,"warning: strong correction reduces image quality\n");
-  // perform
-  GPixmap pm;
-  { StdioByteStream ibs(infile,"rb"); pm.init(ibs); }
-  pm.color_correct(gamma_correction);
-  { StdioByteStream obs(outfile,"wb"); pm.save_ppm(obs); }
-  // finish
+  CATCH(ex)
+    {
+      ex.perror();
+      exit(1);
+    }
+  ENDCATCH;
   return 0;
 }
 

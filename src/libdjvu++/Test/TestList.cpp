@@ -1,13 +1,15 @@
 //C-  -*- C++ -*-
 //C-
-//C-  Copyright (c) 1988 AT&T	
-//C-  All Rights Reserved 
+//C- Copyright (c) 1999 AT&T Corp.  All rights reserved.
 //C-
-//C-  THIS IS UNPUBLISHED PROPRIETARY SOURCE CODE OF AT&T
-//C-  The copyright notice above does not evidence any
-//C-  actual or intended publication of such source code.
+//C- This software may only be used by you under license from AT&T
+//C- Corp. ("AT&T"). A copy of AT&T's Source Code Agreement is available at
+//C- AT&T's Internet website having the URL <http://www.djvu.att.com/open>.
+//C- If you received this software without first entering into a license with
+//C- AT&T, you have an infringing copy of this software and cannot use it
+//C- without violating AT&T's intellectual property rights.
 //C-
-//C-  $Id: TestList.cpp,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $
+//C- $Id: TestList.cpp,v 1.1.1.2 1999-10-22 19:29:25 praveen Exp $
 
 
 
@@ -36,24 +38,20 @@ void operator delete(void *x) {
 #define PRC(expr)  printf("%s :=%d '%c'\n", #expr, (char)(expr), (char)(expr))
 
 void
-PCONTI(GContainer<int> &ga)
+PCONTI(GList<int> &ga)
 {
-  int *np;
   printf("( ");
-  GPosition pos(ga);
-  while (np = ga.next(pos))
-    printf("%d ", *np);
+  for (GPosition pos=ga; pos; ++pos)
+    printf("%d ", ga[pos]);
   printf(")\n");
 }
 
 void
-PCONTS(GContainer<GString> &ga)
+PCONTS(GList<GString> &ga)
 {
-  GString *np;
   printf("( ");
-  GPosition pos(ga);
-  while (np = ga.next(pos))
-    printf("\"%s\" ", (const char*)(*np));
+  for (GPosition pos=ga; pos; ++pos)
+    printf("\"%s\" ", (const char*)(ga[pos]));
   printf(")\n");
 }
 
@@ -77,9 +75,9 @@ main()
   gl1.append("three");
   PRI(gl1.size());
   PCONTS(gl1);
-  GPosition pos(gl1);
+  GPosition pos = gl1;
   PRS(gl1[pos]);
-  gl1.next(pos);
+  ++pos;
   PRS(gl1[pos]);
 
   GList<GString> gl2 = gl1;
@@ -88,8 +86,7 @@ main()
   gl2 = gl1;
   PCONTS(gl2);
   PFIRST(&gl2);
-  GContainer<GString>& gc1 = gl1;
-  gl2 = gc1;
+  gl2 = gl1;
   gl2.prepend("zero");
   PCONTS(gl2);
   
@@ -112,15 +109,12 @@ main()
   GList<GString> gl3 = gl1;
   PRI(gl1.size());
   PCONTS(gl1);
-  gl1.first(pos);
+  pos = gl1.firstpos();
   n = gl1.search("two",pos);
   PRI(n);
-  gl2.last(pos);
-  const GString *ps;
   printf("( ");
-  while ((ps = gl2.prev(pos)))
-    printf("'%s' ",(const char*)*ps);
+  for (pos=gl2.lastpos(); pos; --pos)
+    printf("'%s' ", (const char*)gl2[pos]);
   printf(")\n");
-
   return 0;
 }

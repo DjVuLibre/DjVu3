@@ -1,13 +1,15 @@
 //C-  -*- C++ -*-
 //C-
-//C-  Copyright (c) 1988 AT&T	
-//C-  All Rights Reserved 
+//C- Copyright (c) 1999 AT&T Corp.  All rights reserved.
 //C-
-//C-  THIS IS UNPUBLISHED PROPRIETARY SOURCE CODE OF AT&T
-//C-  The copyright notice above does not evidence any
-//C-  actual or intended publication of such source code.
+//C- This software may only be used by you under license from AT&T
+//C- Corp. ("AT&T"). A copy of AT&T's Source Code Agreement is available at
+//C- AT&T's Internet website having the URL <http://www.djvu.att.com/open>.
+//C- If you received this software without first entering into a license with
+//C- AT&T, you have an infringing copy of this software and cannot use it
+//C- without violating AT&T's intellectual property rights.
 //C-
-//C-  $Id: GScaler.h,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $
+//C- $Id: GScaler.h,v 1.1.1.2 1999-10-22 19:29:24 praveen Exp $
 
 #ifndef _GSCALER_H_
 #define _GSCALER_H_
@@ -28,16 +30,16 @@
     image is implemented by class \Ref{GPixmapScaler}.
 
     {\bf Remark} --- The bilinear interpolation code relies on fixed precision
-    tables.  It becomes suboptimal when supersampling (i.e. zooming into) an
-    image by a factor greater than eight.  Very contracted images displayed at
+    tables.  It becomes suboptimal when upsampling (i.e. zooming into) an
+    image by a factor greater than eight.  High contrast images displayed at
     high magnification may contain visible jaggies.
 
     @memo
     Rescaling images with bilinear interpolation.
     @author
-    Leon Bottou <leonb@research.att.com>
+    L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: GScaler.h,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $# */
+    #$Id: GScaler.h,v 1.1.1.2 1999-10-22 19:29:24 praveen Exp $# */
 //@{
 
 
@@ -132,15 +134,16 @@ public:
       \Ref{GScaler::set_input_size} and \Ref{GScaler::set_output_size}. The
       size of the output image is given by #outw# and #outh#.  . */
   GBitmapScaler(int inw, int inh, int outw, int outh);
-  /** Computes a segment of the rescaled output image.  The bitmap #output# is
-      overwritten with the segment of the output image specified by the
-      rectangle #desired_output#.  The rectangle #provided_input# specifies
-      which segment of the input image is provided in the bitmap #input#.  An
-      exception \Ref{GException} is thrown if the rectangle #provided_input#
-      is smaller then the rectangle #required_input# rectangle returned by
-      function \Ref{GScaler::get_input_rect}.  Note that the output bitmap
-      always contain 256 gray levels. You may want to use function
-      \Ref{GBitmap::change_grays} to reduce the numebr of gray levels. */
+  /** Computes a segment of the rescaled output image.  The GBitmap object
+      #output# is overwritten with the segment of the output image specified
+      by the rectangle #desired_output#.  The rectangle #provided_input#
+      specifies which segment of the input image is provided by the GBitmap
+      object #input#.  An exception \Ref{GException} is thrown if the
+      rectangle #provided_input# is smaller then the rectangle
+      #required_input# returned by function \Ref{GScaler::get_input_rect}.
+      Note that the output image always contain 256 gray levels. You may want
+      to use function \Ref{GBitmap::change_grays} to reduce the number of gray
+      levels. */
   void scale( const GRect &provided_input, const GBitmap &input,
               const GRect &desired_output, GBitmap &output );
 protected:
@@ -157,7 +160,7 @@ protected:
 
 
 /** Fast rescaling code for color images.  This class augments the base class
-    \Ref{GScaler} with a function for rescaling gray level images.  Function
+    \Ref{GScaler} with a function for rescaling color images.  Function
     \Ref{GPixmapScaler::scale} computes an arbitrary segment of the output
     image given the corresponding pixels in the input image.
 
@@ -197,8 +200,8 @@ public:
       rectangle #desired_output#.  The rectangle #provided_input# specifies
       which segment of the input image is provided in the pixmap #input#.  An
       exception \Ref{GException} is thrown if the rectangle #provided_input#
-      is smaller then the rectangle #required_input# rectangle returned by
-      function \Ref{GScaler::get_input_rect}. */
+      is smaller then the rectangle #required_input# returned by function
+      \Ref{GScaler::get_input_rect}. */
   void scale( const GRect &provided_input, const GPixmap &input,
               const GRect &desired_output, GPixmap &output );
 protected:

@@ -1,0 +1,77 @@
+%%%include <commands>
+
+SHELL=/bin/sh
+prefix=@%prefix%@
+bindir=@%PROJECT_PREFIX%@/bin
+SRCDIR=@%srcdir%@
+TOPSRCDIR=@%TOPSRCDIR%@
+TOPBUILDDIR=@%TOPBUILDDIR%@
+VPATH=@%srcdir%@
+CXX=@%CXX%@
+CXXOPT=@%CXXOPT%@ @%CXXUNROLL%@
+CXXWARN=@%CXXWARN%@
+DEFS=@%DEFS%@
+INCS=-I.. -I$(SRCDIR)/..
+CXXFLAGS=@%CXXFLAGS%@ $(CXXOPT) $(CXXWARN) $(DEFS) $(INCS)
+LDFLAGS=
+DOCXX=@%docxx%@
+LIBS=@%libmath%@ @%LIBS%@
+MAKESTLIB=@%make_stlib%@
+MAKESHLIB=@%make_shlib%@
+
+%%%include <commands>
+
+# Defs
+
+LIB= ../libdjvu++.a
+TARG= TestString TestException TestArray TestList TestMap\
+      TestBitmap TestSmartPointer TestJB2 TestThreads
+
+
+# Make all
+
+all: $(TARG)
+	echo Done.
+
+# Generic rules
+
+clean:
+	-$(RM) 2>>/dev/null -rf $(TARG) *.o *.out ii_files *.rpo ; true
+
+distclean:
+	-$(RM) 2>>/dev/null -rf $(TARG) *.o *.out ii_files *.rpo Makefile Makefile.depend ; true
+
+
+%%%include <depend>
+
+PHONY: clean distclean
+
+
+# Handle cpp files as C++
+
+%%%include <compile>
+
+.o: $(LIB)
+	if [ -n "$(RPO)" ] ; then $(RPO) $*.o $(LIB) ; fi
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $*.o $(LIB) $(LIBS)
+	@if test -f $(SRCDIR)/$@.exp ; then\
+	   if $@ > $@.out 2>&1  &&  cmp -s $@.out $(SRCDIR)/$@.exp  ;\
+	     then echo -- $@ passed ;\
+	     else echo -- $@ begin ; cat $@.out ; echo -- $@ end ;\
+           fi ;\
+	   else echo -- $@ compiled ;\
+	 fi
+
+TestThreads: TestThreads.o $(LIB)
+	if [ -n "$(RPO)" ] ; then $(RPO) TestThreads.o $(LIB) ; fi
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o TestThreads TestThreads.o $(LIB) $(LIBS)
+	@if test -f $(SRCDIR)/$@.exp ; then\
+	   if $@ 2>&1 | sort > $@.out 2>&1  &&  cmp -s $@.out $(SRCDIR)/$@.exp  ;\
+	     then echo -- $@ passed ;\
+	     else echo -- $@ begin ; cat $@.out ; echo -- $@ end ;\
+           fi ;\
+	   else echo -- $@ compiled ;\
+	 fi
+
+%%%include "Makefile.depend+++"
+

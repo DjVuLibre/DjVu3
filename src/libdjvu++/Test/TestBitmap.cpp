@@ -1,13 +1,15 @@
 //C-  -*- C++ -*-
 //C-
-//C-  Copyright (c) 1988 AT&T	
-//C-  All Rights Reserved 
+//C- Copyright (c) 1999 AT&T Corp.  All rights reserved.
 //C-
-//C-  THIS IS UNPUBLISHED PROPRIETARY SOURCE CODE OF AT&T
-//C-  The copyright notice above does not evidence any
-//C-  actual or intended publication of such source code.
+//C- This software may only be used by you under license from AT&T
+//C- Corp. ("AT&T"). A copy of AT&T's Source Code Agreement is available at
+//C- AT&T's Internet website having the URL <http://www.djvu.att.com/open>.
+//C- If you received this software without first entering into a license with
+//C- AT&T, you have an infringing copy of this software and cannot use it
+//C- without violating AT&T's intellectual property rights.
 //C-
-//C-  $Id: TestBitmap.cpp,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $
+//C- $Id: TestBitmap.cpp,v 1.1.1.2 1999-10-22 19:29:25 praveen Exp $
 
 
 #include <stdlib.h>
@@ -16,7 +18,7 @@
 #include "ByteStream.h"
 
 
-MemoryByteStream bs1 ( 
+StaticByteStream bs1 ( 
 "P1  16 16\n"
 "0000000111000000\n"
 "0000001101100000\n"
@@ -35,7 +37,7 @@ MemoryByteStream bs1 (
 "0000000000000000\n"
 "0000000000000000\n" );
 
-MemoryByteStream bs2 ( 
+StaticByteStream bs2 ( 
 "P1  16 16\n"
 "0000000000000000\n"
 "0000000000000000\n"
@@ -83,7 +85,7 @@ compare_GBitmap(const GBitmap  &bm1, const GBitmap &bm2)
 #define PRI(i) \
  printf("%s --> %d\n", #i, i)
 
-void 
+int 
 main(void)
 {
 

@@ -1,20 +1,12 @@
-a=2, b=4, c=6
-a=2, b=4, c=6
 *** Test exception
-*** (TestException.cpp:40)
-*** int main()
+*** Illegal subscript in GString::operator[]
+*** Illegal subscript in GString::operator[]
+*** Illegal subscript in GString::operator[]
+a=2, b=4, c=6
+a=2, b=4, c=6
 gs[0]=a
 gs[-1]=f
-*** Illegal bound in GString subscript
-*** (GString.h:293)
-*** char GString::operator [](int) const
 gs[0]=a
 gs[-1]=f
-*** Illegal bound in GString subscript
-*** (GString.h:293)
-*** char GString::operator [](int) const
 Rethrown
 Recatched
-*** Illegal bound in GString subscript
-*** (GString.h:293)
-*** char GString::operator [](int) const

@@ -1,13 +1,15 @@
 //C-  -*- C++ -*-
 //C-
-//C-  Copyright (c) 1988 AT&T	
-//C-  All Rights Reserved 
+//C- Copyright (c) 1999 AT&T Corp.  All rights reserved.
 //C-
-//C-  THIS IS UNPUBLISHED PROPRIETARY SOURCE CODE OF AT&T
-//C-  The copyright notice above does not evidence any
-//C-  actual or intended publication of such source code.
+//C- This software may only be used by you under license from AT&T
+//C- Corp. ("AT&T"). A copy of AT&T's Source Code Agreement is available at
+//C- AT&T's Internet website having the URL <http://www.djvu.att.com/open>.
+//C- If you received this software without first entering into a license with
+//C- AT&T, you have an infringing copy of this software and cannot use it
+//C- without violating AT&T's intellectual property rights.
 //C-
-//C-  $Id: ZPCodec.h,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $
+//C- $Id: ZPCodec.h,v 1.1.1.2 1999-10-22 19:29:25 praveen Exp $
 
 
 #ifndef _ZPCODEC_H
@@ -26,7 +28,7 @@
     Files #"ZPCodec.h"# and #"ZPCodec.cpp"# implement a fast binary adaptive
     quasi-arithmetic coder named ZP-Coder.  Because of its speed and
     convenience, the ZP-Coder is used in several parts of the DjVu reference
-    library (See \Ref{BSByteStream.h}, \Ref{JB2Codec.h}, \Ref{IWCodec.h}).
+    library (See \Ref{BSByteStream.h}, \Ref{JB2Image.h}, \Ref{IWImage.h}).
     The following comments avoid the theory (see the historical remarks for
     useful pointers) and concentrate on the user perspective on the ZP-Coder.
 
@@ -84,7 +86,7 @@
     on which the each prediction is based, must be composed of message bits which
     have already been coded. }
 
-    {\bf Practice} ---
+    {\bf Usage} ---
     Once you know how to organize the predictions (i.e. which coding context
     to use, how many context variables to initialize, etc.), using the
     ZP-Coder is straightforward (see \Ref{ZPCodec Examples}):
@@ -108,32 +110,31 @@
     operations only.  To make your program fast, you just need to feed message
     bits and context variables fast enough.
 
-    {\bf History} ---
-    The ZP-Coder is similar in function and performance to the Q-Coder
-    (Pennebaker, Mitchell, Langdon, Arps, IBM J. Res Dev. 32, 1988). An
-    improved version of the Q-Coder, named QM-Coder, has been described in
-    certain parts of the JPEG standard.  Unfortunate patent policies have made
-    these coders very difficult to use in general purpose applications.  The
-    Z-Coder was the result of re-interpreting quasi-arithmetic coding as an
-    extension of Golomb codes (Bottou, Howard, Bengio, IEEE DCC 98, 1998
+    {\bf History} --- The ZP-Coder is similar in function and performance to
+    the seminal Q-Coder (Pennebaker, Mitchell, Langdon, Arps, IBM J. Res Dev. 32,
+    1988). An improved version of the Q-Coder, named QM-Coder, has been
+    described in certain parts of the JPEG standard.  Unfortunate patent
+    policies have made these coders very difficult to use in general purpose
+    applications.  The Z-Coder is constructed using a new approach based on an
+    extension of the Golomb codes (Bottou, Howard, Bengio, IEEE DCC 98, 1998
     \URL[DjVu]{http://www.research.att.com/~leonb/DJVU/bottou-howard-bengio}
     \URL[PostScript]{http://www.research.att.com/~leonb/PS/bottou-howard-bengio.ps.gz})
-    This new interpretation provides a way to escape the QM-Coder patents.
-    Unfortunately the initial Z-Coder is sailing dangerously close to another
-    patent (The "Arithmetic MEL Coder").  Therefore we wrote the ZP-Coder
-    (pronounce Zee-Prime Coder) which we believe is clear of legal problems.
+    This new approach does not infringe the QM-Coder patents.  Unfortunately
+    the Z-Coder is dangerously close to the patented Arithmetic MEL Coder.
+    Therefore we wrote the ZP-Coder (pronounce Zee-Prime Coder) which we
+    believe is clear of legal problems.
     
     Needless to say, AT&T has patents pending for both the Z-Coder and the
     ZP-Coder. The good news however is that we can grant a license to use the
-    ZP-Coder in Open Source code without further complication. See the AT&T
-    Public License for more information.
+    ZP-Coder in ``free software'' without further complication. See the
+    \Ref{AT&T Source Code Agreement} for more information.
 
     @memo
     Binary adaptive quasi-arithmetic coder.
     @version
-    #$Id: ZPCodec.h,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $#
+    #$Id: ZPCodec.h,v 1.1.1.2 1999-10-22 19:29:25 praveen Exp $#
     @author
-    Leon Bottou <leonb@research.att.com> */
+    L\'eon Bottou <leonb@research.att.com> */
 //@{
 
 
@@ -166,7 +167,7 @@ typedef unsigned char  BitContext;
     function \Ref{encoder} and writes the corresponding code bits to
     ByteStream #bs#.
 
-    You should never access directly a ByteStream object connected to a valid
+    You should never directly access a ByteStream object connected to a valid
     ZPCodec object. The most direct way to access the ByteStream object
     consists of using the "pass-thru" versions of functions \Ref{encoder} and
     \Ref{decoder}.
@@ -183,7 +184,7 @@ typedef unsigned char  BitContext;
     of the message bit sequence.  The content of the message must be designed
     in a way which indicates when to stop decoding.  Simple ways to achieve
     this consists of announcing the message length at the beginning (like a
-    pascal style string), or of defining a termination code (like a zero
+    pascal style string), or of defining a termination code (like a null
     terminated string).  */
 
 class ZPCodec {
@@ -418,7 +419,7 @@ ZPCodec::decoder()
     void encode_8_bits(ZPCodec &zp, int x, BitContext *ctx )
     {
       int n = 1;
-      REPEAT8( { int b=(x&0x80) ? 1 : 0;  x=(x<<1);
+      REPEAT8( { int b=((x&0x80)?1:0);  x=(x<<1);
                  zp.encoder(b,ctx[n-1]);  n=(n<<1)|(b); } );
     }
     \end{verbatim}
@@ -477,25 +478,24 @@ ZPCodec::decoder()
     successive points.
 
 
-    {\bf Huffman Coding Tricks} ---
-    Programmer with an experience of Huffman codes should rejoice because this
-    experience will prove very useful when working with the ZP-Coder.  Huffman
-    codes also organize the symbol values as a decision tree. The tree is
-    balanced in such a way that each decision is as unpredictable as possible
-    (i.e. both branches must be equally probable).  This is very close to the
-    ZP-Coder technique described above.  Since we allocate one context
-    variable for each decision, our tree need not be balanced: the context
-    variable will track the decision statistics and the ZP-Coder will
-    compensate optimally.
+    {\bf Huffman Coding Tricks} --- 
+    Programmers with experience in Huffman codes can see the similarity in the
+    ZP-Coder.  Huffman codes also organize the symbol values as a decision
+    tree. The tree is balanced in such a way that each decision is as
+    unpredictable as possible (i.e. both branches must be equally probable).
+    This is very close to the ZP-Coder technique described above.  Since we
+    allocate one context variable for each decision, our tree need not be
+    balanced: the context variable will track the decision statistics and the
+    ZP-Coder will compensate optimally.
 
-    There are good reasons however to avoid unbalanced tree with the ZP-Coder.
+    There are good reasons however to avoid unbalanced trees with the ZP-Coder.
     Frequent symbol values may be located quite deep in a poorly balanced
     tree.  This increases the average number of message bits (the number of
     decisions) required to code a symbol.  The ZP-Coder will be called more
-    often, making the coding program quite slower.  Furthermore, each message
+    often, making the coding program slower.  Furthermore, each message
     bit is encoded using an estimated distribution.  All these useless message
-    bits mean that the ZP-Coder has more distributions to adapt.  All this
-    extra adaptation work can increase the file size.
+    bits mean that the ZP-Coder has more distributions to adapt.  This
+    extra adaptation work will probably increase the file size.
 
     Huffman codes are very fast when the tree structure is fixed beforehand.
     Such {\em static Huffman codes} are unfortunately not very efficient
@@ -510,19 +510,19 @@ ZPCodec::decoder()
 
 
     {\bf Encoding Numbers} ---
-    This technique is illustrated with the following number encoding problem.
+    This technique is illustrated with the following number encoding example.
     The multivalued technique described above is not practical with large
     numbers because the decision tree has too many nodes and requires too many
     context variables.  This problem can be solved by using a priori knowledge
     about the probability distribution of our numbers.
 
-    Assume for instance that the distribution is symetrical and that small
+    Assume for instance that the distribution is symmetrical and that small
     numbers are much more probable than large numbers.  We will first group
     our numbers into several sets.  Each number is coded by first coding which
     set contains the number and then coding a position within the set.  Each
     set contains #2^n# numbers that we consider roughly equiprobable.  Since
     the most probable values occur much more often, we want to model their
-    probabily more precisely. Therefore we use small sets for the most
+    probability more precisely. Therefore we use small sets for the most
     probable values and large sets for the least probable values, as
     demonstrated below.
     \begin{verbatim} 
@@ -578,11 +578,11 @@ ZPCodec::decoder()
    regular decoder.
 
    The ZP-Coder will not learn the probabilities of the numbers within a set
-   since no context variables have been allocated for that.  This could be
-   improved by allocating additional context variables for encoding the
-   position within the smaller sets and using the regular decoding functions
-   instead of the pass-thru variants.  Only experimentation can tell what
-   works best for your problem.
+   since no context variables have been allocated for that purpose.  This
+   could be improved by allocating additional context variables for encoding
+   the position within the smaller sets and using the regular decoding
+   functions instead of the pass-thru variants.  Only experimentation can tell
+   what works best for your particular encoding problem.
 
 
    {\bf Understanding Adaptation} ---
@@ -591,32 +591,33 @@ ZPCodec::decoder()
    using a particular context variable.  It is also able to track slow
    variations when the actual probabilities change while coding.
    
-   Let us consider the "cloud of points" application presented above.  Suppose
-   that we first code points located towards the left side and then slowly
-   move towards points located on the right side.  The ZP-Coder will first
-   estimate that the X coordinates are rather on the left side. This
-   estimation will be progressively revised after seing more points on the
+   Let us consider the ``cloud of points'' application presented above.
+   Suppose that we first code points located towards the left side and then
+   slowly move towards points located on the right side.  The ZP-Coder will
+   first estimate that the X coordinates are rather on the left side. This
+   estimation will be progressively revised after seeing more points on the
    right side.  Such an ordering of the points obviously violates the point
    independence assumption on which our code is based.  Despite our inexact
    assumptions, the tracking mechanism allows for better prediction of the X
    coordinates and therefore better compression.
 
-   This is not however a perfect solution. The ZP-Coder tracks the changes
+   However, this is not a perfect solution. The ZP-Coder tracks the changes
    because every point seems to be a little bit more on the right side than
-   suggested by the previous points.  The ZP-Coder coding algorithm is always a
-   little bit misadjusted and we always lose a little bit on file size.  This
-   is hardly a problem when the probabilities drift slowly. This can be very
-   significant if the probabilities change drastically.
+   suggested by the previous points.  The ZP-Coder coding algorithm is always
+   slightly misadjusted and we always lose a little on possible compression
+   ratio.  This is not much of a problem when the probabilities drift slowly.
+   On the other hand, this can be very significant if the probabilities change
+   drastically.
 
    Adaptation is always associated with a small loss of efficiency.  The
    ZP-Coder updates the probability model whenever it suspects, {\em after
    coding}, that the current settings were not optimal.  The model will be
-   better next time, but a little bit of harm has been done.  The design of
-   ZP-Coder of course minimizes this effect as much as possible.  Yet you will
-   pay a price if you ask too much to the adaptation algorithm.  If you have
-   millions of context variables, it will be difficult to learn them all.  If
-   the probability distributions change drastically while coding, it will be
-   difficult to track the changes fast enough.
+   better next time, but a slight loss in compression has occurred.  The
+   design of ZP-Coder of course minimizes this effect as much as possible.
+   Yet you will pay a price if you ask too much to the adaptation algorithm.
+   If you have millions of context variables, it will be difficult to train
+   them all.  If the probability distributions change drastically while
+   coding, it will be difficult to track the changes fast enough.
 
    Adaptation on the other hand is a great simplification.  A good data
    compression program must (a) represent the data in order to make its
@@ -625,7 +626,7 @@ ZPCodec::decoder()
    implementing task (b).
 
 
-   {\bf Practical Tricks} ---
+   {\bf Practical Debugging Tricks} ---
    Sometimes you write an encoding program and a decoding program.
    Unfortunately there is a bug: the decoding program decodes half the file
    and then just outputs garbage.  There is a simple way to locate the

@@ -1,13 +1,15 @@
 //C-  -*- C++ -*-
 //C-
-//C-  Copyright (c) 1988 AT&T	
-//C-  All Rights Reserved 
+//C- Copyright (c) 1999 AT&T Corp.  All rights reserved.
 //C-
-//C-  THIS IS UNPUBLISHED PROPRIETARY SOURCE CODE OF AT&T
-//C-  The copyright notice above does not evidence any
-//C-  actual or intended publication of such source code.
+//C- This software may only be used by you under license from AT&T
+//C- Corp. ("AT&T"). A copy of AT&T's Source Code Agreement is available at
+//C- AT&T's Internet website having the URL <http://www.djvu.att.com/open>.
+//C- If you received this software without first entering into a license with
+//C- AT&T, you have an infringing copy of this software and cannot use it
+//C- without violating AT&T's intellectual property rights.
 //C-
-//C-  $Id: BSByteStream.h,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $
+//C- $Id: BSByteStream.h,v 1.1.1.2 1999-10-22 19:29:22 praveen Exp $
 
 
 #ifndef _BSBYTESTREAM_H
@@ -17,13 +19,15 @@
     
     Files #"BSByteStream.h"# and #"BSByteStream.cpp"# implement a very compact
     general purpose compressor based on the Burrows-Wheeler transform.  The
-    utility program \Ref{bzz} provides a front-end for this class.
+    utility program \Ref{bzz} provides a front-end for this class. Although
+    this compression model is not currently used in DjVu files, it may be used
+    in the future for encoding textual data chunks.
 
     {\bf Algorithms} --- The Burrows-Wheeler transform (also named Block-Sorting)
     is performed using a combination of the Karp-Miller-Rosenberg and the
     Bentley-Sedgewick algorithms. This is comparable to (Sadakane, DCC 98)
     with a slightly more flexible ranking scheme. Symbols are then ordered
-    according to a running estimate of their occurence frequencies.  The
+    according to a running estimate of their occurrence frequencies.  The
     symbol ranks are then coded using a simple fixed tree and the
     \Ref{ZPCodec} binary adaptive coder.
 
@@ -36,7 +40,7 @@
     files like spreadsheet files.  Compression and decompression speed is
     about twice slower than #bzip2# but the sorting algorithms is more
     robust. Unlike #bzip2# (as of August 1998), this code can compress half a
-    megabyte of "abababab....".
+    megabyte of "abababab...." in bounded time.
     
     Here are some comparative results (in bits per character) obtained on the
     Canterbury Corpus (\URL{http://corpus.canterbury.ac.nz}) as of August
@@ -85,12 +89,12 @@
     below your eyes.
 
     @author
-    Leon Bottou <leonb@research.att.com> -- Initial implementation\\
-    Andrei Erofeev <eaf@geocities.com> -- Improved Block Sorting algorithm.
+    L\'eon Bottou <leonb@research.att.com> -- Initial implementation\\
+    Andrei Erofeev <eaf@research.att.com> -- Improved Block Sorting algorithm.
     @memo
     Simple Burrows-Wheeler general purpose compressor.
     @version
-    #$Id: BSByteStream.h,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $# */
+    #$Id: BSByteStream.h,v 1.1.1.2 1999-10-22 19:29:22 praveen Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -128,8 +132,17 @@
     Due to the block oriented nature of the Burrows-Wheeler transform, there
     is a very significant latency between the data input and the data output.
     You can use function #flush# to force data output at the expense of
-    compression efficiency.  Destroying the BSByteStream performs an implicit
-    #flush#.  
+    compression efficiency.
+
+    You should never directly access a ByteStream object connected to a valid
+    BSByteStream object. The ByteStream object can be accessed again after the
+    destruction of the BSByteStream object.  Note that the encoder always
+    flushes its internal buffers and writes a few final code bytes when the
+    BSByteStream object is destroyed.  Note also that the decoder often reads
+    a few bytes beyond the last code byte written by the encoder.  This lag
+    means that you must reposition the ByteStream after the destruction of the
+    BSByteStream object and before re-using the ByteStream object (see
+    \Ref{IFFByteStream}.)
 */
 class BSByteStream : public ByteStream
 {
@@ -143,17 +156,18 @@ public:
       data will be read from ByteStream #bs# and decompressed into an internal
       buffer. Function #read# can be used to access the decompressed data.
       \item[Compression]
-      Setting #blocksize# to a positive number between 100 and 4096
-      initialized the compressor.  Data written to the BSByteStream will be
+      Setting #blocksize# to a positive number smaller than 4096
+      initializes the compressor.  Data written to the BSByteStream will be
       accumulated into an internal buffer.  The buffered data will be
       compressed and written to ByteStream #bs# whenever the buffer sizes
       reaches the maximum value specified by argument #blocksize# (in
       kilobytes).  Using a larger block size usually increases the compression
       ratio at the expense of computation time.  There is no need however to
       specify a block size larger than the total number of bytes to compress.
-      Setting #blocksize# to #1024# is a good starting point.
+      Setting #blocksize# to #1024# is a good starting point.  A minimal block
+      size of 10 is silently enforced.
       \end{description} */
-  BSByteStream(ByteStream *bs, int blocksize=0);
+  BSByteStream(ByteStream &bs, int blocksize=0);
   // ByteStream Interface
   ~BSByteStream();
   size_t read(void *buffer, size_t size);

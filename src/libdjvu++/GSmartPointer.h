@@ -1,13 +1,15 @@
 //C-  -*- C++ -*-
 //C-
-//C-  Copyright (c) 1988 AT&T	
-//C-  All Rights Reserved 
+//C- Copyright (c) 1999 AT&T Corp.  All rights reserved.
 //C-
-//C-  THIS IS UNPUBLISHED PROPRIETARY SOURCE CODE OF AT&T
-//C-  The copyright notice above does not evidence any
-//C-  actual or intended publication of such source code.
+//C- This software may only be used by you under license from AT&T
+//C- Corp. ("AT&T"). A copy of AT&T's Source Code Agreement is available at
+//C- AT&T's Internet website having the URL <http://www.djvu.att.com/open>.
+//C- If you received this software without first entering into a license with
+//C- AT&T, you have an infringing copy of this software and cannot use it
+//C- without violating AT&T's intellectual property rights.
 //C-
-//C-  $Id: GSmartPointer.h,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $
+//C- $Id: GSmartPointer.h,v 1.1.1.2 1999-10-22 19:29:24 praveen Exp $
 
 #ifndef _GSMARTPOINTER_H_
 #define _GSMARTPOINTER_H_
@@ -20,16 +22,16 @@
     assignment and dereferencing operators. The overloaded operators maintain
     the reference counters and destroy the pointed objects as soon as their
     reference counter reaches zero.  Transparent type conversions are provided
-    between smart-pointers and regular pointers.  Objects references by
+    between smart-pointers and regular pointers.  Objects referenced by
     smart-pointers must be derived from class \Ref{GPEnabled}.
 
     @memo 
     Thread-Safe reference counting smart-pointers.
     @author 
-    Leon Bottou <leonb@research.att.com> -- initial implementation\\
+    L\'eon Bottou <leonb@research.att.com> -- initial implementation\\
     Andrei Erofeev <eaf@research.att.com> -- bug fix.
     @version 
-    #$Id: GSmartPointer.h,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $# 
+    #$Id: GSmartPointer.h,v 1.1.1.2 1999-10-22 19:29:24 praveen Exp $# 
     @args
 */
 //@{
@@ -39,8 +41,6 @@
 #endif
 
 #include "DjVuGlobal.h"
-
-
 
 /** Base class for reference counted objects.  
     This is the base class for all reference counted objects.
@@ -52,24 +52,23 @@ class GPEnabled
 public:
   /// Null constructor.
   GPEnabled();
+  /// Copy construcotr
+  GPEnabled(const GPEnabled & obj);
   /// Virtual destructor.
   virtual ~GPEnabled();
   /// Copy operator
   GPEnabled & operator=(const GPEnabled & obj);
+  /** Returns the number of references to this object.  This should be only
+      used for debugging purposes. Other uses are not thread-safe. */
+  int get_count(void) const;
 protected:
   /// The reference counter
   volatile int count;
-  /** Called when object must be destroyed.  
-      Virtual function #destroy# is called when the reference counter is
-      decreased from one to zero. The default implementation just calls
-      #delete#. This default implementation should be enough for most
-      purposes.  See the implementation of \Ref{GString} for an example of
-      overriding #destroy#. */
-  virtual void destroy();
 private:
   friend class GPBase;
   void unref();
   void ref();
+  void destroy();
 };
 
 
@@ -94,15 +93,18 @@ public:
       Increments the reference count.
       @param nptr pointer to a #GPEnabled# object. */
   GPBase(GPEnabled *nptr);
-  /** Destructor.
-      Decrements the reference count. */
+  /** Destructor. Decrements the reference count. */
   ~GPBase();
   /** Accesses the actual pointer. */
   GPEnabled* get() const;
-  /** Assignment. 
+  /** Assignment from smartpointer. 
       Increments the counter of the new value of the pointer.
-      Decrements the counter of the previous value of the pointer.
-      @param nptr new #GPEnabled# pointer assigned to this object. */
+      Decrements the counter of the previous value of the pointer. */
+  GPBase& assign(const GPBase &sptr);
+  /** Assignment from pointer. 
+      Checks that the object is not being destroyed.
+      Increments the counter of the new value of the pointer.
+      Decrements the counter of the previous value of the pointer. */
   GPBase& assign(GPEnabled *nptr);
   /** Assignment operator. */
   GPBase & operator=(const GPBase & obj);
@@ -115,27 +117,26 @@ protected:
 
 
 /** Reference counting pointer.
-
     Class #GP<TYPE># represents a smart-pointer to an object of type #TYPE#.
     Type #TYPE# must be a subclass of #GPEnabled#.  This class overloads the
     usual pointer assignment and dereferencing operators. The overloaded
-    operators maintain the reference counters and destroy the pointed objects
+    operators maintain the reference counters and destroy the pointed object
     as soon as their reference counter reaches zero.  Transparent type
     conversions are provided between smart-pointers and regular pointers.
 
-    Using a smart-pointer is a convenience and not an obligation.
-    There is no need to use a smart-pointer to access a #GPEnabled# object.
-    As long as you never use a smart-pointer to access a #GPEnabled# object,
-    the object's reference counter stays null.  Since there is no reference
-    counter transition from one to zero, the object remains allocated.  You can
-    therefore choose to only use regular pointers to access objects allocated
-    on the stack (automatic variables) or objects allocated dynamically.  In
-    the latter case you must destroy the dynamically allocated object with
-    operator #delete#.
+    Using a smart-pointer is a convenience and not an obligation.  There is no
+    need to use a smart-pointer to access a #GPEnabled# object.  As long as
+    you never use a smart-pointer to access a #GPEnabled# object, its
+    reference counter remains zero.  Since the reference counter is never
+    decremented from one to zero, the object is never destroyed by the
+    reference counting code.  You can therefore choose to only use regular
+    pointers to access objects allocated on the stack (automatic variables) or
+    objects allocated dynamically.  In the latter case you must explicitly
+    destroy the dynamically allocated object with operator #delete#.
 
     The first time you use a smart-pointer to access #GPEnabled# object, the
-    reference counter is incremented to one  Object destruction will then
-    happen automatically when the reference counters is decremented back to
+    reference counter is incremented to one. Object destruction will then
+    happen automatically when the reference counter is decremented back to
     zero (i.e. when the last smart-pointer referencing this object stops doing so).
     This will happen regardless of how many regular pointers reference this object.
     In other words, if you start using smart-pointers with a #GPEnabled#
@@ -144,12 +145,12 @@ protected:
     never destroy the object yourself, but let the smart-pointers control the
     life of the object.
     
-    {\bf Performance considerations} --- Thread safe reference counting incurs a
-    significant overhead. smart-pointer are best used with sizeable objects
+    {\bf Performance considerations} --- Thread safe reference counting incurs
+    a significant overhead. Smart-pointer are best used with sizeable objects
     for which the cost of maintaining the counters represent a small fraction
     of the processing time.  It is always possible to cache a smart-pointer
     into a regular pointer.  The cached pointer will remain valid until the
-    smart-pointer is destroyed or the smart-pointer value is changed.
+    smart-pointer object is destroyed or the smart-pointer value is changed.
 
     {\bf Safety considerations} --- As explained above, a #GPEnabled# object
     switches to automatic mode as soon as it becomes referenced by a
@@ -159,17 +160,16 @@ protected:
     explicitly when you no longer need it.  When you pass a regular pointer to
     this object as argument to a function, you really need to be certain that
     the function implementation will not assign this pointer to a
-    smart-pointer. Doing so would indeed destroy the object as soon as the
+    smart-pointer.  Doing so would indeed destroy the object as soon as the
     function returns.  The bad news is that the fact that a function assigns a
     pointer argument to a smart-pointer does not necessarily appear in the
     function prototype.  Such a behavior must be {\em documented} with the
-    function public interface.  As a convention, I usually write such
+    function public interface.  As a convention, we usually write such
     functions with smart-pointer arguments instead of a regular pointer
     arguments.  This is not enough to catch the error at compile time, but
-    this is a simple way to document such a behavior.  I still believe that
+    this is a simple way to document such a behavior.  We still believe that
     this is a small problem in regard to the benefits of the smart-pointer.
-    But one has to be aware of its existence.  
-*/
+    But one has to be aware of its existence.  */
 
 template <class TYPE>
 class GP : protected GPBase
@@ -210,21 +210,21 @@ public:
       Operator #*# works with smart-pointers exactly as with regular pointers. */
   TYPE& operator*() const;
   /** Comparison operator. 
-      Returns true if the smart-pointer points to the object referenced 
-      by #nptr#.  The automatic conversion from smart-pointers
-      to regular pointers allows you to compare two smart-pointers as well.
+      Returns true if both this smart-pointer and pointer #nptr# point to the
+      same object.  The automatic conversion from smart-pointers to regular
+      pointers allows you to compare two smart-pointers as well.  
       @param nptr pointer to compare with. */
   int operator== (TYPE *nptr) const;
-  /** Comparison operator. 
-      Returns true if the smart-pointer does not point to the object referenced 
-      by #nptr#.  The automatic conversion from smart-pointers
-      to regular pointers allows you to compare two smart-pointers as well.
+  /** Comparison operator.  
+      Returns true if this smart-pointer and pointer #nptr# point to different
+      objects. The automatic conversion from smart-pointers to regular
+      pointers allows you to compare two smart-pointers as well.  
       @param nptr pointer to compare with. */
   int operator!= (TYPE *nptr) const;
   /** Test operator.
       Returns true if the smart-pointer is null.  The automatic conversion 
-      from smart-pointers to regular pointers allows you to perform
-      the opposite test as well. You can use both following constructs:
+      from smart-pointers to regular pointers allows you to test whether 
+      a smart-pointer is non-null.  You can use both following constructs:
       \begin{verbatim}
       if (gp) { ... }
       while (! gp) { ... }
@@ -242,17 +242,26 @@ GPEnabled::GPEnabled()
 {
 }
 
+inline
+GPEnabled::GPEnabled(const GPEnabled & obj) 
+  : count(0) 
+{
+}
+
+inline int
+GPEnabled::get_count(void) const
+{
+   return count;
+}
+
 inline GPEnabled & 
 GPEnabled::operator=(const GPEnabled & obj)
 { 
-  /* The copy operator should do nothing
-     because the count should not be changed.
-     Subclasses of GPEnabled will call this version of the
-     copy operator as part of the default 'memberwise copy'
-     strategy. Thank you Andrei! */
+  /* The copy operator should do nothing because the count should not be
+     changed.  Subclasses of GPEnabled will call this version of the copy
+     operator as part of the default 'memberwise copy' strategy. */
   return *this; 
 }
-
 
 // INLINE FOR GPBASE
 
@@ -266,9 +275,7 @@ inline
 GPBase::GPBase(GPEnabled *nptr)
   : ptr(0)
 {
-  if (nptr)
-    nptr->ref();
-  ptr = nptr;
+  assign(nptr);
 }
 
 inline
@@ -288,7 +295,6 @@ GPBase::~GPBase()
     old->unref();
 }
 
-
 inline GPEnabled* 
 GPBase::get() const
 {
@@ -298,13 +304,13 @@ GPBase::get() const
 inline GPBase &
 GPBase::operator=(const GPBase & obj)
 {
-   return assign(obj.get());
+  return assign(obj);
 }
 
 inline int 
 GPBase::operator==(const GPBase & g2) const
 {
-   return get() == g2.get();
+  return ptr == g2.ptr;
 }
 
 
@@ -323,42 +329,40 @@ GP<TYPE>::GP(TYPE *nptr)
 {
 }
 
-
 template <class TYPE> inline
 GP<TYPE>::GP(const GP<TYPE> &sptr)
-: GPBase((GPEnabled*) sptr)
+: GPBase((const GPBase&) sptr)
 {
 }
-
 
 template <class TYPE> inline
 GP<TYPE>::operator TYPE* () const
 {
-  return (TYPE*)(this->get());
+  return (TYPE*) ptr;
 }
 
 template <class TYPE> inline TYPE*
 GP<TYPE>::operator->() const
 {
-  return (TYPE*)(this->get());
+  return (TYPE*) ptr;
 }
 
 template <class TYPE> inline TYPE&
 GP<TYPE>::operator*() const
 {
-  return *(TYPE*)(this->get());
+  return *(TYPE*) ptr;
 }
 
 template <class TYPE> inline GP<TYPE>& 
 GP<TYPE>::operator= (TYPE *nptr)
 {
-  return (GP<TYPE>&)( this->assign(nptr) );
+  return (GP<TYPE>&)( assign(nptr) );
 }
 
 template <class TYPE> inline GP<TYPE>& 
 GP<TYPE>::operator= (const GP<TYPE> &sptr)
 {
-  return (GP<TYPE>&)( this->assign(sptr.get()) );
+  return (GP<TYPE>&)( assign((const GPBase&)sptr) );
 }
 
 template <class TYPE> inline int

@@ -1,15 +1,17 @@
 //C-  -*- C++ -*-
 //C-
-//C-  Copyright (c) 1988 AT&T	
-//C-  All Rights Reserved 
+//C- Copyright (c) 1999 AT&T Corp.  All rights reserved.
 //C-
-//C-  THIS IS UNPUBLISHED PROPRIETARY SOURCE CODE OF AT&T
-//C-  The copyright notice above does not evidence any
-//C-  actual or intended publication of such source code.
+//C- This software may only be used by you under license from AT&T
+//C- Corp. ("AT&T"). A copy of AT&T's Source Code Agreement is available at
+//C- AT&T's Internet website having the URL <http://www.djvu.att.com/open>.
+//C- If you received this software without first entering into a license with
+//C- AT&T, you have an infringing copy of this software and cannot use it
+//C- without violating AT&T's intellectual property rights.
 //C-
-//C-  $Id: BSByteStream.cpp,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $
+//C- $Id: BSByteStream.cpp,v 1.1.1.2 1999-10-22 19:29:22 praveen Exp $
 
-// "$Id: BSByteStream.cpp,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $"
+// "$Id: BSByteStream.cpp,v 1.1.1.2 1999-10-22 19:29:22 praveen Exp $"
 // - Author: Leon Bottou, 07/1998
 
 
@@ -21,6 +23,11 @@
 #include <stdio.h>
 #include <string.h>
 #include "BSByteStream.h"
+#undef BSORT_TIMER
+#ifdef BSORT_TIMER
+#include "GOS.h"
+#endif
+
 
 // ========================================
 // --- Assertion
@@ -36,17 +43,17 @@
             
 
 // Limits on block sizes
-#define MINBLOCK           100
+#define MINBLOCK           10
 #define MAXBLOCK           4096
 
 // Overflow required when encoding
 #define OVERFLOW           32
 
 // Sorting tresholds
-#define RANKSORT_THRESH    20
+#define RANKSORT_THRESH    10
 #define QUICKSORT_STACK    512
 #define PRESORT_THRESH     10
-#define PRESORT_DEPTH      6
+#define PRESORT_DEPTH      8
 #define RADIX_THRESH       32768
 
 
@@ -54,12 +61,13 @@
 // -- Sorting Routines
 
   
+#ifndef NEED_DECODER_ONLY
 
-class BSort
+class _BSort  // DJVU_CLASS
 {
 public:
-  ~BSort();
-  BSort(unsigned char *data, int size);
+  ~_BSort();
+  _BSort(unsigned char *data, int size);
   void run(int &markerpos);
 private:
   // Members
@@ -89,14 +97,14 @@ private:
 static void 
 blocksort(unsigned char *data, int size, int &markerpos)
 {
-  BSort bsort(data, size);
+  _BSort bsort(data, size);
   bsort.run(markerpos);
 }
 
 
-// BSort construction
+// _BSort construction
 
-BSort::BSort(unsigned char *data, int size)
+_BSort::_BSort(unsigned char *data, int size)
   : size(size), data(data), posn(0), rank(0)
 {
   ASSERT(size>0 && size<0x1000000);
@@ -105,7 +113,7 @@ BSort::BSort(unsigned char *data, int size)
   rank[size] = -1;
 }
 
-BSort::~BSort()
+_BSort::~_BSort()
 {
   delete [] posn;
   delete [] rank;
@@ -116,7 +124,7 @@ BSort::~BSort()
 // GT -- compare suffixes using rank information
 
 inline int 
-BSort::GT(int p1, int p2, int depth)
+_BSort::GT(int p1, int p2, int depth)
 {
   int r1, r2;
   int twod = depth + depth;
@@ -154,11 +162,11 @@ BSort::GT(int p1, int p2, int depth)
 }
 
 
-// BSort::ranksort -- 
+// _BSort::ranksort -- 
 // -- a simple insertion sort based on GT
 
 void 
-BSort::ranksort(int lo, int hi, int depth)
+_BSort::ranksort(int lo, int hi, int depth)
 {
   int i,j;
   for (i=lo+1; i<=hi; i++)
@@ -175,7 +183,7 @@ BSort::ranksort(int lo, int hi, int depth)
 // pivot -- return suitable pivot
 
 inline int
-BSort::pivot3r(int *rr, int lo, int hi)
+_BSort::pivot3r(int *rr, int lo, int hi)
 {
   int c1, c2, c3;
   if (hi-lo > 256)
@@ -202,7 +210,7 @@ BSort::pivot3r(int *rr, int lo, int hi)
 }
 
 
-// BSort::quicksort3r -- Three way quicksort algorithm 
+// _BSort::quicksort3r -- Three way quicksort algorithm 
 //    Sort suffixes based on rank at pos+depth
 //    The algorithm breaks into ranksort when size is 
 //    smaller than RANKSORT_THRESH
@@ -221,7 +229,7 @@ vswap(int i, int j, int n, unsigned int *x)
 }
 
 void 
-BSort::quicksort3r(int lo, int hi, int depth)
+_BSort::quicksort3r(int lo, int hi, int depth)
 {
   /* Initialize stack */
   int slo[QUICKSORT_STACK];
@@ -318,7 +326,7 @@ BSort::quicksort3r(int lo, int hi, int depth)
 //  (up to depth PRESORT_DEPTH)
 
 inline int 
-BSort::GTD(int p1, int p2, int depth)
+_BSort::GTD(int p1, int p2, int depth)
 {
   unsigned char c1, c2;
   p1+=depth; p2+=depth;
@@ -341,7 +349,7 @@ BSort::GTD(int p1, int p2, int depth)
 // pivot3d -- return suitable pivot
 
 inline unsigned char
-BSort::pivot3d(unsigned char *rr, int lo, int hi)
+_BSort::pivot3d(unsigned char *rr, int lo, int hi)
 {
   unsigned char c1, c2, c3;
   if (hi-lo > 256)
@@ -368,14 +376,14 @@ BSort::pivot3d(unsigned char *rr, int lo, int hi)
 }
 
 
-// BSort::quicksort3d -- Three way quicksort algorithm 
+// _BSort::quicksort3d -- Three way quicksort algorithm 
 //    Sort suffixes based on strings until reaching
 //    depth rank at pos+depth
 //    The algorithm breaks into ranksort when size is 
 //    smaller than PRESORT_THRESH
 
 void 
-BSort::quicksort3d(int lo, int hi, int depth)
+_BSort::quicksort3d(int lo, int hi, int depth)
 {
   /* Initialize stack */
   int slo[QUICKSORT_STACK];
@@ -494,10 +502,10 @@ BSort::quicksort3d(int lo, int hi, int depth)
 
 
 
-// BSort::radixsort8 -- 8 bit radix sort
+// _BSort::radixsort8 -- 8 bit radix sort
 
 void 
-BSort::radixsort8(void)
+_BSort::radixsort8(void)
 {
   int i;
   // Initialize frequency array
@@ -532,10 +540,10 @@ BSort::radixsort8(void)
 }
 
 
-// BSort::radixsort16 -- 16 bit radix sort
+// _BSort::radixsort16 -- 16 bit radix sort
 
 void 
-BSort::radixsort16(void)
+_BSort::radixsort16(void)
 {
   int i;
   // Initialize frequency array
@@ -578,21 +586,23 @@ BSort::radixsort16(void)
   rank[size-2] = ftab[(c1<<8)];
   // Extra element
   rank[size] = -1;
-  // Free
+  // Free ftab
   delete [] ftab;
 }
 
 
 
-// BSort::run -- main sort loop
+// _BSort::run -- main sort loop
 
 void
-BSort::run(int &markerpos)
+_BSort::run(int &markerpos)
 {
   int lo, hi;
   ASSERT(size>0);
   ASSERT(data[size-1]==0);
-  
+#ifdef BSORT_TIMER
+  long start = GOS::ticks();
+#endif  
   // Step 1: Radix sort 
   int depth = 0;
   if (size > RADIX_THRESH)
@@ -614,6 +624,9 @@ BSort::run(int &markerpos)
       lo = hi;
     }
   depth = PRESORT_DEPTH;
+#ifdef BSORT_TIMER
+  long middle = GOS::ticks();
+#endif  
   // Step 3: Perform rank doubling
   int again = 1;
   while (again)
@@ -677,20 +690,26 @@ BSort::run(int &markerpos)
         }
     }
   ASSERT(markerpos>=0 && markerpos<size);
+#ifdef BSORT_TIMER
+  long end = GOS::ticks();
+  fprintf(stderr,"Sorting time: %d bytes in %ld + %ld = %ld ms\n", 
+          size-1, middle-start, end-middle, end-start);
+#endif  
 }
 
 
+#endif // NEED_DECODER_ONLY
 
 
 // ========================================
 // -- Encoding
-
 
 #define FREQMAX   4
 #define FREQS0    100000
 #define FREQS1    1000000
 #define CTXIDS    3
 
+#ifndef NEED_DECODER_ONLY
 static void
 encode_raw(ZPCodec &zp, int bits, int x)
 {
@@ -704,7 +723,9 @@ encode_raw(ZPCodec &zp, int bits, int x)
       n = (n<<1) | b;
     }
 }
+#endif
 
+#ifndef NEED_DECODER_ONLY
 static inline void
 encode_binary(ZPCodec &zp, BitContext *ctx, int bits, int x)
 {
@@ -720,8 +741,9 @@ encode_binary(ZPCodec &zp, BitContext *ctx, int bits, int x)
       n = (n<<1) | b;
     }
 }
+#endif
 
-
+#ifndef NEED_DECODER_ONLY
 unsigned int
 BSByteStream::encode()
 { 
@@ -736,6 +758,14 @@ BSByteStream::encode()
 
   // Header
   encode_raw(zp, 24, size);
+  // Determine and Encode Estimation Speed
+  int fshift = 0;
+  if (size < FREQS0)
+    { fshift=0; zp.encoder(0); }
+  else if (size < FREQS1)
+    { fshift = 1; zp.encoder(1); zp.encoder(0); }
+  else
+    { fshift = 2; zp.encoder(1); zp.encoder(1); }
   // MTF
   unsigned char mtf[256];
   unsigned char rmtf[256];
@@ -748,11 +778,6 @@ BSByteStream::encode()
   int fadd = 4;
   for (m=0; m<FREQMAX; m++)
     freq[m] = 0;
-  int fshift = 0;
-  if (size > FREQS0)
-    fshift += 1;
-  if (size > FREQS1)
-    fshift += 1;
   // Encode
   int i;
   int mtfno = 3;
@@ -842,6 +867,8 @@ BSByteStream::encode()
   return 0;
 }
 
+#endif // NEED_DECODER_ONLY
+
 
 // ========================================
 // -- Decoding
@@ -899,7 +926,15 @@ BSByteStream::decode()
     }
   if (! data) 
     data = new unsigned char[blocksize];
-  // MTF
+  // Decode Estimation Speed
+  int fshift = 0;
+  if (zp.decoder())
+    {
+      fshift += 1;
+      if (zp.decoder())
+        fshift += 1;
+    }
+  // Prepare Quasi MTF
   unsigned char mtf[256];
   unsigned int freq[FREQMAX];
   int m = 0;
@@ -908,11 +943,6 @@ BSByteStream::decode()
   int fadd = 4;
   for (m=0; m<FREQMAX; m++)
     freq[m]= 0;
-  int fshift = 0;
-  if (size > FREQS0)
-    fshift += 1;
-  if (size > FREQS1)
-    fshift += 1;
   // Decode
   int mtfno = 3;
   int markerpos = -1;
@@ -1041,18 +1071,23 @@ BSByteStream::decode()
 
 
 
-BSByteStream::BSByteStream(ByteStream *bs_in, int encoding)
+BSByteStream::BSByteStream(ByteStream &xbs, int encoding)
   : encoding(encoding), offset(0), bptr(0), blocksize(0), 
-    data(0), size(0), eof(0), bs(bs_in),
-    zp(*bs_in, encoding)
+    data(0), size(0), eof(0), bs(&xbs),
+    zp(*bs, encoding)
 {
   if (encoding)
     {
-      if (encoding<MINBLOCK || encoding>MAXBLOCK)
-        THROW("Requested block size must be in ["
-              STR(MINBLOCK) "Kb.." STR(MAXBLOCK) "Kb] range");
+#ifdef NEED_DECODER_ONLY
+      THROW("Compiled with NEED_DECODER_ONLY");
+#else
+      if (encoding < MINBLOCK)
+        encoding = MINBLOCK;
+      if (encoding > MAXBLOCK)
+        THROW("Requested block size must be less than " STR(MAXBLOCK) "Kbytes.");
       // Record block size
       blocksize = encoding * 1024;
+#endif
     }
   // Initialize context array
   memset(ctx, 0, sizeof(ctx));
@@ -1062,12 +1097,14 @@ BSByteStream::BSByteStream(ByteStream *bs_in, int encoding)
 
 BSByteStream::~BSByteStream()
 {
+#ifndef NEED_DECODER_ONLY
   // Flush
   if (encoding) 
     flush();
   // Encode EOF marker
   if (encoding)
     encode_raw(zp, 24, 0);
+#endif
   // Free allocated memory
   if (data)
     delete [] data; 
@@ -1091,6 +1128,7 @@ BSByteStream::tell()
 void 
 BSByteStream::flush()
 {
+#ifndef NEED_DECODER_ONLY
   if (encoding && bptr>0)
     {
       ASSERT(bptr<(int)blocksize);
@@ -1098,6 +1136,7 @@ BSByteStream::flush()
       size = bptr+1;
       encode();
     }
+#endif
   size = bptr = 0;
 }
 
@@ -1143,6 +1182,9 @@ BSByteStream::read(void *buffer, size_t sz)
 size_t 
 BSByteStream::write(const void *buffer, size_t sz)
 {
+#ifdef NEED_ENCODER_ONLY
+  THROW("Cannot write to BSByteStream created for decoding");
+#else
   // Trivial checks
   if (! encoding)
     THROW("Cannot write to BSByteStream created for decoding");
@@ -1175,5 +1217,6 @@ BSByteStream::write(const void *buffer, size_t sz)
     }
   // return
   return copied;
+#endif // NEED_DECODER_ONLY
 }
 

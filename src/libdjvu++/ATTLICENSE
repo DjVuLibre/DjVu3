@@ -1,0 +1,534 @@
+                     AT&T SOURCE CODE AGREEMENT
+                             Version 1.0
+
+This Source Code Agreement (the "Agreement") provides the terms and conditions
+pursuant to which AT&T Corp. ("AT&T") is willing to grant you ("YOU" or
+"YOUR") a non-exclusive right to use the AT&T Source Code Release.  PLEASE
+READ THIS AGREEMENT CAREFULLY.  If YOU agree to only use the AT&T Source Code
+Release in accordance with the following terms and conditions and are willing
+to be bound by this Agreement in its entirety, acknowledge YOUR acceptance by
+providing an affirmative response and downloading, or opening the AT&T Capsule
+containing, the AT&T Source Code Release.
+
+
+ARTICLE 1.0 -  YOUR REPRESENTATIONS
+
+1.1. If YOU are an entity, or person other than the individual accepting this
+Agreement, YOU warrant and represent that the individual accepting this
+Agreement on YOUR behalf is YOUR legally authorized representative and is duly
+authorized to accept agreements of this type on YOUR behalf and obligate YOU
+to comply with its provisions.
+
+1.2. YOU represent that YOU have read this Agreement in its entirety and fully
+understand it.
+
+1.3. YOU represent that all of YOUR Derived Product Build Materials are either
+original or do not include any code obtained under license from a third party,
+which license conflicts with YOUR obligations under this Agreement.  If any of
+YOUR Derived Product Build Materials do include permitted third party code,
+YOU represent that such Derived Product Build Materials also include complete
+details concerning the license or other restrictions associated with such
+code.
+
+1.4. To the best of YOUR knowledge, YOU represent that the use of YOUR Derived
+Product Build Materials does not infringe or misappropriate the rights of any
+person or entity.
+
+1.5. YOU represent that YOU will regularly monitor the AT&T Website for any
+notices.
+
+
+ARTICLE 2.0 -  DEFINITIONS
+
+2.1. "AT&T Binaries" means the Files in object code form only which result
+from compiling the AT&T Source Code Release.
+
+2.2. "AT&T Capsule" means the File having the name ``libdjvu++-2.1.tar.gz'',
+which will be downloaded after accepting, or was opened to access, this
+Agreement.  By way of clarification only, when the term "AT&T Capsule" is used
+in this Agreement, it only means the file identified above as furnished by
+AT&T without change, enhancement, amendment, addition, deletion, alteration or
+other modification (collectively, "Change" or variations thereof, including
+"Changed" or "Changing").
+
+2.3. "AT&T Source Code Patent Rights" means those claims of any patents owned
+by AT&T and licensable without restriction or obligation which, absent a
+license, are necessarily and unavoidably infringed by the use of the
+functionality of the AT&T Source Code Release.
+
+2.4. "AT&T Source Code Release" means the Files provided by AT&T to YOU
+pursuant to this Agreement, which are all contained in compressed form in the
+AT&T Capsule.  By way of clarification only, when the term "AT&T Source Code
+Release" is used in this Agreement, it only means such Files without any
+Change.
+
+2.5. "AT&T Website" means the Internet website having the URL
+``http://www.djvu.att.com/open''.  AT&T may Change the content or URL of the
+AT&T Website, or remove it from the Internet altogether.
+
+2.6. "Compilation Scripts" means the instructions for compiling code to
+prepare a Derived Work.
+
+2.7. "Derived Product" means a Software Product which is a derivative work (as
+used in this Agreement, the term "derivative work" having the same meaning as
+under U.S. Copyright Law) of the AT&T Source Code Release.
+
+2.8. "Derived Product Build Materials" means, with reference to a Derived
+Product, the Compilation Script, Other Source Code Files, if any, and Patch
+used to prepare such Derived Product.
+
+2.9. "Extension Product" means any Software Product with which YOU have
+prepared a Derived Product to work, but only if: 
+
+  (a) YOU, or the entity or person on whose behalf YOU created the 
+      Derived Product, own, control or can otherwise license the source code
+      used to prepare such Software Product; and,
+
+  (b) Such Software Product is publicly distributed.  By way of example
+      only, if a Derived Product is prepared by YOU to serve as a plug-in
+      to another Software Product owned by YOU, such other Software Product
+      is an "Extension Product."
+
+2.10. "File" means a computer file containing, as the context may require,
+source or object code ("Computer Code") instructions for controlling the
+operation of a central processing unit or computer, or containing data or
+textual information.
+
+2.11. "IPR" means all rights protectable under intellectual property law
+anywhere throughout the world, including rights protectable under patent,
+copyright and trade secret laws, but not trademark rights.
+
+2.12. "Other Source Code Files" means Files in source code form which do not
+contain any
+
+  (a) of the AT&T Source Code Release, or 
+
+  (b) derivative work prepared from the AT&T Source Code Release. 
+
+2.13. "Patch" means an instruction set for Changing any of the Files contained
+in the AT&T Source Code Release.
+
+2.14. "Proprietary Notice" means the following statement without Change:
+
+``This software contains certain software code or other information ("AT&T
+  Software") proprietary to AT&T Corp. ("AT&T").  The AT&T Software is
+  provided to you "AS IS".  YOU ASSUME TOTAL RESPONSIBILITY AND RISK FOR USE
+  OF THE AT&T SOFTWARE.  AT&T DOES NOT MAKE, AND EXPRESSLY DISCLAIMS, ANY
+  EXPRESS OR IMPLIED WARRANTIES OF ANY KIND WHATSOEVER, INCLUDING, WITHOUT
+  LIMITATION, THE IMPLIED WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A
+  PARTICULAR PURPOSE, WARRANTIES OF TITLE OR NON-INFRINGEMENT OF ANY
+  INTELLECTUAL PROPERTY RIGHTS, ANY WARRANTIES ARISING BY USAGE OF TRADE,
+  COURSE OF DEALING OR COURSE OF PERFORMANCE, OR ANY WARRANTY THAT THE AT&T
+  SOFTWARE IS "ERROR FREE" OR WILL MEET YOUR REQUIREMENTS.
+
+  You have the right to obtain from the person or entity who furnished this
+  software to you, for free and under license, a copy of the source code for
+  the AT&T Software together with any patches and other source code used in
+  this software.
+
+  Unless you accept a license to use the AT&T Software, you shall not
+  reverse compile, disassemble or otherwise reverse engineer this software to
+  ascertain the source code for any AT&T Software.
+
+  (C) AT&T Corp. All rights reserved.  
+  AT&T is a registered trademark of AT&T Corp.''
+
+2.15. "Software Product" means a collection of Files in object code form only
+which, taken together, reasonably comprise a product, regardless of whether
+such product is intended for internal use or commercial exploitation.  A
+single File can comprise a Software Product.
+
+
+ARTICLE 3.0 -  GRANT OF RIGHTS TO YOU
+
+3.1. Copyright Grant.  Subject to third party intellectual property claims, if
+any, and the terms and conditions of this Agreement, AT&T grants to YOU under
+AT&T's copyright rights in the AT&T Source Code Release, a non-exclusive,
+fully paid-up license to:
+
+  (a) Reproduce and distribute to others the AT&T Capsule;
+
+  (b) Prepare from the AT&T Source Code Release, and execute and use, the AT&T 
+      Binaries;
+
+  (c) Prepare and distribute Patches for the AT&T Source Code Release; 
+
+  (d) Prepare a Derived Product solely by compiling Other Source Code Files,
+      if any, together with the code resulting from operating a Patch 
+      on the AT&T Source Code Release; and
+
+  (e) Execute, use and distribute to others Derived Products.
+
+3.2. Patent Rights Grant.  Subject to third party intellectual property
+claims, if any, and the terms and conditions of this Agreement, AT&T grants to
+YOU under AT&T Source Code Patent Rights a non- exclusive, fully paid-up
+license to:
+
+  (a) Make reproductions of the AT&T Capsule; 
+
+  (b) Make, only from compiling the AT&T Source Code Release, and use the AT&T 
+      Binaries;
+
+  (c) Distribute to others the AT&T Capsule; and,
+
+  (d) Make, execute, use and distribute to others Derived Products but, in the
+      case of these rights, the license granted in this Section 3.2(d) shall
+      only extend to that portion of a Derived Product which is Computer Code
+      compiled from some portion, without Change, of the AT&T Source Code Release.
+
+The license granted in this Section 3.2 does not include the right to combine
+the AT&T Source Code Release or the AT&T Binaries with any hardware other
+than YOUR general purpose computer.
+
+3.3. Subject to the terms and conditions of this Agreement, YOU may create a
+hyperlink between an Internet website owned and controlled by YOU and the AT&T
+Website, which hyperlink describes in a fair and good faith manner where the
+AT&T Capsule and AT&T Source Code Release may be found, provided that, YOU do
+not frame the AT&T Website or otherwise give the false impression that AT&T is
+somehow associated with, or otherwise endorses or sponsors YOUR website.  Any
+goodwill associated with such hyperlink shall inure to the sole benefit of
+AT&T.  Other than the creation of such hyperlink, nothing in this Agreement
+shall be construed as conferring upon YOU any right to use any reference to
+AT&T, its trade names, trademarks, service marks or any other indicia of
+origin owned by AT&T, or to indicate that YOUR products or services are in any
+way sponsored, approved or endorsed by AT&T.
+
+3.4. Except as expressly set forth in this Article 3.0, no other rights or
+licenses under any of AT&T's IPR are granted or, by implication, estoppel or
+otherwise, conferred.  By way of example only, no rights or licenses under any
+of AT&T's patents are granted or, by implication, estoppel or otherwise,
+conferred with respect to any portion of a Derived Product which is not
+Computer Code compiled from some portion, without Change, of the AT&T Source
+Code Release.  By way of further example, the license granted in Section 3.2
+shall not be construed to include the right to combine the AT&T Source Code
+Release or the AT&T Binaries with any hardware or other software or use any of
+such combinations, except that, the AT&T Binaries may be run by YOU on a
+computer.
+
+
+ARTICLE 4.0 -  YOUR DISTRIBUTION OBLIGATIONS
+
+4.1. YOU shall only distribute the AT&T Capsule and Derived Product Build
+Materials free of charge, without any form of compensation.  However, if YOU
+furnish the AT&T Capsule or Derived Product Build Materials on any physical
+media, YOU may charge for YOUR out-of-pocket expense for both the media and
+shipping.  YOU may distribute Derived Products for a fee that it is fair and
+reasonable compared to other similar products.
+
+4.2. If YOU distribute Derived Product Build Materials (including if YOU are
+required to do so pursuant to this Agreement), YOU shall ensure that the
+recipient enters into and duly accepts a written agreement with YOU which
+includes the minimum terms set forth in Appendix A (completed to indicate YOU
+as the LICENSOR where provided) and no other provisions which, in AT&T's
+opinion, conflict with YOUR obligations under, or the intent of, this
+Agreement.  The written agreement may be in electronic form.
+
+4.3. If YOU prepare a Derived Product that YOU distribute to a third party, or
+use to provide a service or for YOUR own purposes, or YOU distribute any
+Derived Product Build Materials for a Derived Product, YOU shall:
+
+  (a) Contact AT&T as may be provided on the AT&T Website or in a text file
+      included with the AT&T Source Code Release and describe for AT&T such
+      Derived Product and its Derived Product Build Materials;
+
+  (b) Provide AT&T with a copy of such Derived Product Build Materials as
+      directed by AT&T, unless YOU make them generally available on YOUR
+      Internet website, in which case, YOU shall provide AT&T with the URL of
+      YOUR website and hereby grant to AT&T a non-exclusive, fully-paid up
+      right to create a hyperlink between YOUR website and a page associated
+      with the AT&T Website;
+
+  (c) Inform any third parties to whom you distribute, or provide services
+      using, such Derived Product that the AT&T Capsule and source code for
+      YOUR Derived Product Build Materials are available from YOU without
+      charge;
+
+  (d) Make such Derived Product generally available to anyone requesting a
+      copy;
+
+  (e) If requested by anyone, furnish to them any Derived Product Build
+      Materials used to prepare such Derived Product (such Derived Product Build
+      Materials being furnished in such a manner as to reasonable identify and
+      facilitate the preparation of such Derived Product); and,
+
+  (f) If requested by anyone interested in obtaining the AT&T Source Code
+      Release, either furnish to them the AT&T Capsule or provide them with
+      the URL for the AT&T Website.
+
+4.4.  If YOU prepare a Derived Product, such product shall conspicuously
+display to users, and any corresponding documentation and license agreement
+shall include as a provision, the Proprietary Notice.
+
+4.5. YOU shall publicly release for free over the Internet the source code for
+that portion of any Extension Products which in any way uses or otherwise
+manipulates data to or from Derived Products.  Such release shall be pursuant
+to an agreement that, in AT&T's opinion, is consistent with this Agreement and
+the attached Appendix A, and YOU shall make all reasonable efforts to
+publicize such release.
+
+
+ARTICLE 5.0 -  YOUR GRANT OF RIGHTS TO AT&T IN MODIFICATIONS
+
+5.1. YOU grant to AT&T under any IPR owned or licensable by YOU which in any
+way relates to YOUR Patches, a non-exclusive, perpetual, worldwide, fully
+paid-up, unrestricted, irrevocable license, along with the right to sublicense
+others, to (a) make, have made, use, offer to sell, sell and import any
+products, services or any combination of products or services, and (b)
+reproduce, distribute, prepare derivative works based on, perform and display
+YOUR Patches in any media whether now known or in the future developed.
+
+
+ARTICLE 6.0 -  AS IS CLAUSE / LIMITATION OF LIABILITY
+
+6.1. The AT&T Source Code Release and AT&T Capsule are provided to YOU "AS
+IS".  YOU ASSUME TOTAL RESPONSIBILITY AND RISK FOR YOUR USE OF THEM INCLUDING
+THE RISK OF ANY DEFECTS OR INACCURACIES THEREIN.  AT&T DOES NOT MAKE, AND
+EXPRESSLY DISCLAIMS, ANY EXPRESS OR IMPLIED WARRANTIES OF ANY KIND WHATSOEVER,
+INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF MERCHANTABILITY OR
+FITNESS FOR A PARTICULAR PURPOSE, WARRANTIES OF TITLE OR NON-INFRINGEMENT OF
+ANY IPR OR TRADEMARK RIGHTS, ANY WARRANTIES ARISING BY USAGE OF TRADE, COURSE
+OF DEALING OR COURSE OF PERFORMANCE, OR ANY WARRANTY THAT THE AT&T SOURCE CODE
+RELEASE OR AT&T CAPSULE ARE "ERROR FREE" WILL MEET YOUR REQUIREMENTS.
+
+6.2. IN NO EVENT SHALL AT&T BE LIABLE FOR (a) ANY INCIDENTAL, CONSEQUENTIAL,
+OR INDIRECT DAMAGES (INCLUDING, WITHOUT LIMITATION, DAMAGES FOR LOSS OF
+PROFITS, BUSINESS INTERRUPTION, LOSS OF PROGRAMS OR INFORMATION, AND THE LIKE)
+ARISING OUT OF THE USE OF OR INABILITY TO USE THE AT&T SOURCE CODE RELEASE OR
+AT&T CAPSULE, EVEN IF AT&T OR ANY OF ITS AUTHORIZED REPRESENTATIVES HAS BEEN
+ADVISED OF THE POSSIBILITY OF SUCH DAMAGES, (a) ANY CLAIM ATTRIBUTABLE TO
+ERRORS, OMISSIONS, OR OTHER INACCURACIES IN THE AT&T SOURCE CODE RELEASE OR
+AT&T CAPSULE, OR (c) ANY CLAIM BY ANY THIRD PARTY.
+
+6.3.  BECAUSE SOME STATES DO NOT ALLOW THE EXCLUSION OR LIMITATION OF
+LIABILITY FOR CONSEQUENTIAL OR INCIDENTAL DAMAGES, THE ABOVE LIMITATIONS MAY
+NOT APPLY TO YOU.  IN THE EVENT THAT APPLICABLE LAW DOES NOT ALLOW THE
+COMPLETE EXCLUSION OR LIMITATION OF LIABILITY OF CLAIMS AND DAMAGES AS SET
+FORTH IN THIS AGREEMENT, AT&T'S LIABILITY IS LIMITED TO THE GREATEST EXTENT
+PERMITTED BY LAW.  
+
+ARTICLE 7.0 - GENERAL
+
+7.1. YOU shall not assert against AT&T or any of its affiliated companies any
+claim for infringement or misappropriation of any IPR or trademark rights in
+any way relating to the AT&T Source Code Release, including any such claims
+relating to any Patches.
+
+7.2. In the event that any provision of this Agreement is deemed illegal or
+unenforceable, this Agreement shall automatically terminate.  AT&T may, but is
+not obligated to, post on the AT&T Website a new version of this Agreement
+which, in AT&T's opinion, reasonably preserves the intent of this Agreement.
+
+7.3. YOUR rights and license (but not any of YOUR obligations) under this
+Agreement shall terminate automatically in the event that (a) notice of a
+non-frivolous claim by a third party relating to the AT&T Source Code Release
+or AT&T Capsule is posted on the AT&T Website, (b) YOU have knowledge of any
+such a claim, (c) any of YOUR representations or warranties in Article 1.0 are
+false or inaccurate, (d) YOU exceed the rights and license granted to YOU or
+(e) YOU fail to fully comply with any provision of this Agreement.
+
+7.4. YOU acknowledge that the AT&T Source Code Release and AT&T Capsule are
+subject to U.S. export laws and regulations and that any use thereof must be
+authorized under those laws and regulations.  YOU hereby assures AT&T that YOU
+will not, directly or indirectly, "export" or "reexport" the AT&T Source Code
+Release or AT&T Capsule to any country, or national of any country, to which,
+or to whom, "export" or "reexport" is prohibited under U.S. export laws and
+regulations.  For purposes of this Section, "export" and "reexport" mean
+transferring or releasing to another country or to a national of another
+country (wherever that person is located) by any means, including physical,
+electronic, or otherwise.  YOU represent and warrant that YOU are not located
+in or a national of any such country.
+
+7.5. Without limiting any of AT&T's rights under this Agreement or at law or
+in equity, or otherwise expanding the scope of the license and rights granted
+hereunder, if YOU fail to perform any of YOUR obligations under this Agreement
+with respect to any of YOUR Patches or Derived Products, or if YOU do any act
+which exceeds the scope of the license and rights granted herein, then such
+Patches, Derived Products and acts are not licensed or otherwise authorized
+under this Agreement and such failure shall also be deemed a breach of this
+Agreement.  In addition to all other relief available to it for any breach of
+YOUR obligations under this Agreement, AT&T shall be entitled to an injunction
+requiring YOU to perform such obligations.
+
+7.6. This Agreement shall be governed by and construed in accordance with the
+laws of the State of New York, USA, without regard to its conflicts of law
+rules. This Agreement shall be fairly interpreted in accordance with its terms
+and without any strict construction in favor of or against either AT&T or YOU.
+Any suit or proceeding YOU bring relating to this Agreement shall be brought
+and prosecuted only in New York, New York, USA.
+
+
+
+--------------------------------------------------------------------------------
+
+
+APPENDIX A - MINIMUM TERMS
+LICENSOR: ______________
+
+LICENSE AGREEMENT
+
+This License Agreement (the "Agreement") provides the terms and conditions
+pursuant to which you ("LICENSEE") are granted by LICENSOR a non-exclusive
+license to exploit the Build Materials (as defined below).  PLEASE READ THIS
+AGREEMENT CAREFULLY.
+
+
+ARTICLE 1.0 -  REPRESENTATIONS
+
+1.1. If LICENSEE is an entity, or person other than the individual accepting
+this Agreement, LICENSEE warrants and represents that the individual accepting
+this Agreement on LICENSEE'S behalf is LICENSEE'S legally authorized
+representative and is duly authorized to accept agreements of this type on
+LICENSEE'S behalf and obligate LICENSEE to comply with its provisions.
+
+1.2. LICENSEE represents that LICENSEE has read this Agreement in its entirety
+and fully understand it.
+
+1.3. LICENSEE represents that LICENSEE understands that no rights or licenses
+of any kind under any IPR owned or controlled by AT&T. Corp. ("AT&T") are
+granted or, by implication, estoppel or otherwise, conferred by this
+Agreement.
+
+
+ARTICLE 2.0 -  DEFINITIONS
+
+2.1. "AT&T Source Code Agreement" means the agreement available at the
+Internet website having the URL ``http://www.djvu.att.com/open'', or accessed
+by opening the computer file having the name ``ATTLICENSE'', if such file is
+furnished to LICENSEE.
+
+2.2. "AT&T Source Code Release" means the computer files owned by AT&T which
+can be obtained under license at the Internet website having the URL
+``http://www.djvu.att.com/open'', or by opening the computer file having the
+name ``libdjvu++-2.1.tar.gz'', if such file is furnished to LICENSEE.
+
+2.3. "Build Materials" means the compilation script, Patch files and other
+source code files, if any, furnished by LICENSOR to LICENSEE free of charge
+pursuant to this Agreement.  THE BUILD MATERIALS INCLUDE SOFTWARE OR OTHER
+INFORMATION PROPRIETARY TO AT&T.  LICENSEE'S EXERCISE OF ONE OR MORE OF THE
+RIGHTS GRANTED IN SECTION 3.1 OF THIS AGREEMENT WITHOUT
+
+  (a) FIRST ENTERING INTO THE AT&T SOURCE CODE AGREEMENT, AND
+
+  (b) ABIDING BY THE TERMS AND CONDITIONS OF SUCH AGREEMENT 
+
+MAY (AND IF LICENSEE HAS USED ANY PATCH, LICENSEE WILL) INFRINGE OR
+MISAPPROPRIATE IPR OWNED OR CONTROLLED BY AT&T.
+
+2.4. "IPR" means all rights protectable under intellectual property law
+anywhere throughout the world, including rights protectable under patent,
+copyright and trade secret laws, but not trademark rights.
+
+2.5. "Patch" means an instruction set for changing, enhancing, amending,
+adding to, deleting from, altering or otherwise modifying any Software
+contained in the AT&T Source Code Release.
+
+2.6. "Software" means any source or object code instructions for controlling
+the operation of a central processing unit or computer, or computer files
+containing data or textual information.
+
+
+ARTICLE 3.0 -  GRANT OF RIGHTS TO LICENSEE
+
+3.1. Subject to the terms and conditions of this Agreement, LICENSOR grants to
+LICENSEE under any IPR owned or licensable by LICENSOR which relates to the
+Build Materials, a non-exclusive, fully paid-up license, with the right to
+sublicense others, to
+
+  (a) make, have made, use, sell free of charge and import, any products or
+      services; and
+
+  (b) reproduce, distribute, perform and display all or any portion of the
+      Build Materials, and prepare derivative works based on the Build
+      Materials and reproduce, distribute, perform and display such derivative
+      works.
+
+
+ARTICLE 4.0 -  LICENSEE'S DISTRIBUTION OBLIGATIONS
+
+4.1. Unless otherwise permitted by the AT&T Source Code Agreement, LICENSEE
+shall only distribute any products licensed pursuant to this Agreement free of
+charge, without any form of compensation.  However, if LICENSEE furnishes a
+product on any physical media, LICENSEE may charge for LICENSEE'S
+out-of-pocket expense for both the media and shipping.
+
+4.2. If LICENSEE distributes any products licensed pursuant to this Agreement
+or source code required pursuant to Section 4.3(b), LICENSEE shall ensure that
+the recipient enters into and duly accepts a written agreement with LICENSEE
+which includes the minimum terms set forth in Appendix A of the AT&T Source
+Code Agreement (completed to indicate YOU as the LICENSOR where provided) and
+no other provisions which conflict with the obligations under, or the intent
+of, this Agreement.
+
+4.3. If LICENSEE shall prepare, or have prepared for it, a product licensed
+pursuant to this Agreement, LICENSEE shall:
+
+  (a) Inform any third parties (including AT&T) to whom LICENSEE distributes,
+      or provides services using, such product that the source code for any
+      Software which is part of such product is available from LICENSEE
+      without charge;
+
+  (b) Distribute, without charge, such source code to any third parties
+      requesting a copy; and,
+
+  (c) Make such product generally available to anyone requesting a copy.
+
+
+ARTICLE 5.0 -  AS IS CLAUSE / LIMITATION OF LIABILITY
+
+5.1. The Build Materials contain certain software or other information ("AT&T
+Software") proprietary to AT&T.  The AT&T Software is provided to LICENSEE "AS
+IS".  LICENSEE ASSUMES TOTAL RESPONSIBILITY AND RISK FOR USE OF THE AT&T
+SOFTWARE.  AT&T DOES NOT MAKE, AND EXPRESSLY DISCLAIMS, ANY EXPRESS OR IMPLIED
+WARRANTIES OF ANY KIND WHATSOEVER, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE, WARRANTIES
+OF TITLE OR NON-INFRINGEMENT OF ANY IPR or TRADEMARK RIGHTS, ANY WARRANTIES
+ARISING BY USAGE OF TRADE, COURSE OF DEALING OR COURSE OF PERFORMANCE, OR ANY
+WARRANTY THAT THE AT&T SOFTWARE IS "ERROR FREE" OR WILL MEET LICENSEE'S
+REQUIREMENTS.
+
+5.2. IN NO EVENT SHALL AT&T BE LIABLE FOR (a) ANY INCIDENTAL, CONSEQUENTIAL,
+OR INDIRECT DAMAGES (INCLUDING, WITHOUT LIMITATION, DAMAGES FOR LOSS OF
+PROFITS, BUSINESS INTERRUPTION, LOSS OF PROGRAMS OR INFORMATION, AND THE LIKE)
+ARISING OUT OF THE USE OF OR INABILITY TO USE THE AT&T SOFTWARE, EVEN IF AT&T
+OR ANY OF ITS AUTHORIZED REPRESENTATIVES HAS BEEN ADVISED OF THE POSSIBILITY
+OF SUCH DAMAGES, (a) ANY CLAIM ATTRIBUTABLE TO ERRORS, OMISSIONS, OR OTHER
+INACCURACIES IN THE AT&T SOFTWARE, OR (c) ANY CLAIM BY ANY THIRD PARTY.
+
+5.3.  BECAUSE SOME STATES DO NOT ALLOW THE EXCLUSION OR LIMITATION OF
+LIABILITY FOR CONSEQUENTIAL OR INCIDENTAL DAMAGES, THE ABOVE LIMITATIONS MAY
+NOT APPLY TO YOU.  IN THE EVENT THAT APPLICABLE LAW DOES NOT ALLOW THE
+COMPLETE EXCLUSION OR LIMITATION OF LIABILITY OF CLAIMS AND DAMAGES AS SET
+FORTH IN THIS AGREEMENT, AT&T'S LIABILITY IS LIMITED TO THE GREATEST EXTENT
+PERMITTED BY LAW.  
+
+ARTICLE 6.0 -  GENERAL
+
+6.1. LICENSEE shall not assert against AT&T or any of its affiliated companies
+any claim for infringement or misappropriation of any IPR or trademark rights
+in any way relating to the AT&T Source Code Release.
+
+6.2. LICENSEE'S rights and license (but not any of LICENSEE'S obligations)
+under this Agreement shall terminate automatically in the event that (a) any
+of LICENSEE'S representations or warranties in Article 1.0 are false or
+inaccurate, (b) LICENSEE exceed the rights and license granted to LICENSEE or
+(c) LICENSEE fails to fully comply with any provision of this Agreement.
+
+6.3. AT&T shall be entitled, in its own name and without joining LICENSOR as a
+party, to enforce against LICENSEE in an action for breach of contract, any
+provision of this Agreement which protects, limits the liability of, or
+otherwise benefits AT&T.  In addition to all other relief available to AT&T in
+any such action, AT&T shall be entitled to an injunction requiring LICENSEE to
+comply with any such provision.
+
+6.4. This Agreement shall be governed by and construed in accordance with the
+laws of the State of New York, USA, without regard to its conflicts of law
+rules. This Agreement shall be fairly interpreted in accordance with its terms
+and without any strict construction in favor of or against either party.  Any
+suit or proceeding relating to this Agreement shall be brought and prosecuted
+only in New York, New York, USA.  
+
+END OF MINIMUM TERMS
+
+
+
+ 

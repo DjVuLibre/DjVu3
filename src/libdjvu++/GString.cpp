@@ -1,13 +1,15 @@
 //C-  -*- C++ -*-
 //C-
-//C-  Copyright (c) 1988 AT&T	
-//C-  All Rights Reserved 
+//C- Copyright (c) 1999 AT&T Corp.  All rights reserved.
 //C-
-//C-  THIS IS UNPUBLISHED PROPRIETARY SOURCE CODE OF AT&T
-//C-  The copyright notice above does not evidence any
-//C-  actual or intended publication of such source code.
+//C- This software may only be used by you under license from AT&T
+//C- Corp. ("AT&T"). A copy of AT&T's Source Code Agreement is available at
+//C- AT&T's Internet website having the URL <http://www.djvu.att.com/open>.
+//C- If you received this software without first entering into a license with
+//C- AT&T, you have an infringing copy of this software and cannot use it
+//C- without violating AT&T's intellectual property rights.
 //C-
-//C-  $Id: GString.cpp,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $
+//C- $Id: GString.cpp,v 1.1.1.2 1999-10-22 19:29:24 praveen Exp $
 
 
 #ifdef __GNUC__
@@ -23,10 +25,8 @@
 
 #include "GString.h"
 
-// File "$Id: GString.cpp,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $"
+// File "$Id: GString.cpp,v 1.1.1.2 1999-10-22 19:29:24 praveen Exp $"
 // - Author: Leon Bottou, 04/1997
-
-static GStringRep nullstring;
 
 GStringRep *
 GStringRep::xnew(unsigned int sz)
@@ -36,55 +36,56 @@ GStringRep::xnew(unsigned int sz)
       void *vma = ::operator new(sizeof(GStringRep) + sz);
       GStringRep *addr = new (vma) GStringRep;
       addr->size = sz;
+      addr->data[sz] = 0;
       return addr;
     }
-  return &nullstring;
+  return 0;
 }
 
-void
-GStringRep::destroy()
-{
-  if ( (void*)this != (void*)&nullstring )
-    GPEnabled::destroy();
-}
-
-GStringRep::~GStringRep()
-{
-  count = 0;
-}
-
-
-GString::GString()
-  : GP<GStringRep> ( &nullstring )
-{
-}
+const char *GString::nullstr = "";
 
 GString::GString(const char *str)
-  : GP<GStringRep> ( GStringRep::xnew(strlen(str)) )
 {
-  strcpy((*this)->data,str);
+  if (!str) 
+    return;
+  int len = strlen(str);
+  if (len <= 0)
+    return;
+  GStringRep *rep = GStringRep::xnew(strlen(str));
+  strcpy(rep->data,str);
+  (*this) = rep;
 }
 
 GString::GString(const char *str, unsigned int len)
 {
+  if (!str) return;
   unsigned int nlen = 0;
-  for (nlen=0; nlen<len && str[nlen]; nlen++) /**/;
-  (*this) = GStringRep::xnew(nlen);
-  memcpy((*this)->data,str,nlen);
-  (*this)->data[nlen] = 0;
+  while (nlen<len && str[nlen]) 
+    nlen++;
+  if (nlen <= 0) 
+    return;
+  GStringRep *rep = GStringRep::xnew(nlen);
+  memcpy(rep->data,str,nlen);
+  rep->data[nlen] = 0;
+  (*this) = rep;
 }
 
 GString::GString(const GString& gs, int from, unsigned int len)
 {
+  GString ngs = gs;
+  int gsl = ngs.length();
   if (from < 0)
-    from += gs->size;
-  if (from<0 || from>=(int)gs->size)
-    from = gs->size;
-  if (len > gs->size - from)
-    len = gs->size - from;
-  (*this) = GStringRep::xnew(len);
-  memcpy((*this)->data, &gs->data[from],len);
-  (*this)->data[len] = 0;
+    from += gsl;
+  if (from<0 || from>=gsl)
+    from = gsl;
+  if ((int)len > gsl - from)
+    len = gsl - from;
+  if (len <= 0)
+    return;
+  GStringRep *rep = GStringRep::xnew(len);
+  memcpy(rep->data, &ngs->data[from], len);
+  rep->data[len] = 0;
+  (*this) = rep;
 }
 
 GString::GString(const int number) 
@@ -100,93 +101,84 @@ GString::GString(const double number)
 GString& 
 GString::operator= (const char *str)
 {
-  *this = GStringRep::xnew(strlen(str));
-  strcpy((*this)->data,str);
+  GStringRep *rep = GStringRep::xnew(strlen(str));
+  if (rep) strcpy(rep->data,str);
+  (*this) = rep;
   return *this;
-}
-
-GString 
-GString::upcase() const
-{
-  GString ret;
-  ret = GStringRep::xnew((*this)->size);
-  unsigned char *src = (unsigned char*)((*this)->data);
-  unsigned char *dst = (unsigned char*)(ret->data);
-  for (int i = 0; i<(int)(*this)->size; i++)
-    if (islower(src[i]))
-      dst[i] = toupper(src[i]);
-    else
-      dst[i] = src[i];
-  dst[(*this)->size] = 0;
-  return ret;
-}
-
-GString
-GString::downcase() const
-{
-  GString ret;
-  ret = GStringRep::xnew((*this)->size);
-  unsigned char *src = (unsigned char*)((*this)->data);
-  unsigned char *dst = (unsigned char*)(ret->data);
-  for (int i = 0; i<(int)(*this)->size; i++)
-    if (isupper(src[i]))
-      dst[i] = tolower(src[i]);
-    else
-      dst[i] = src[i];
-  dst[(*this)->size] = 0;
-  return ret;
-}
-
-char *
-GString::getbuf(int n)
-{
-  // Compute buffer length
-  (*this)->data[(*this)->size] = 0;
-  if (n < 0) n = strlen((*this)->data);
-  // Save string
-  GString old = *this;
-  (*this) = GStringRep::xnew(n);
-  // Copy string
-  char *s = old->data;
-  char *d = (*this)->data;
-  while (d < (*this)->data + n)
-    if ((*d++ = *s)) 
-      s += 1;
-  (*this)->data[(*this)->size] = 0;
-  return (*this)->data;
 }
 
 void
 GString::empty()
 {
-  (*this) = &nullstring;
+  (*this) = (GStringRep*)0;
 }
+
+char *
+GString::getbuf(int n)
+{
+  const char *s = (const char*)(*this);
+  if (n < 0)  
+    n = strlen(s);
+  if (n <= 0) 
+    { empty(); return 0; }
+  // Copy string
+  GStringRep *rep = GStringRep::xnew(n);
+  char *d = rep->data;
+  while (d < rep->data + n)
+    if ((*d++ = *s)) 
+      s += 1;
+  rep->data[n] = 0;
+  (*this) = rep;
+  return rep->data;
+}
+
+
+GString 
+GString::upcase() const
+{
+  GString ret = (*this);
+  unsigned char *d = (unsigned char *)ret.getbuf(-1);
+  for (; d && *d; d++)
+    if (islower(*d))
+      *d = toupper(*d);
+  return ret;
+}
+
+
+GString
+GString::downcase() const
+{
+  GString ret = (*this);
+  unsigned char *d = (unsigned char *)ret.getbuf(-1);
+  for (; d && *d; d++)
+    if (isupper(*d))
+      *d = tolower(*d);
+  return ret;
+}
+
 
 void
 GString::setat(int n, char ch)
 {
+  int len = length();
   if (n < 0) 
+    n += len;
+  if (n < 0 || n>len) 
+    throw_illegal_subscript();
+  if (ch == 0)
     {
-      n += (*this)->size;
-      if (n < 0)
-        THROW("Subscript too small in GString::setat");
+      getbuf(n);
     }
-  if (n >= (int)(*this)->size)
+  else if (n == len)
     {
-      if (n > (int)(*this)->size)
-        THROW("Subscript too large in GString::setat");      
-      if (ch == 0)
-        return;
-      getbuf((*this)->size + 1);
-      (*this)->data[n] = ch;
+      char *data = getbuf(len + 1);
+      data[n] = ch;
     }
-  else
+  else 
     {
       if ((*this)->count > 1)
-        getbuf((*this)->size);
+        getbuf(length());
       (*this)->data[n] = ch;
-      if (ch == 0)
-        (*this)->size = n;
     }
 }
 
@@ -209,38 +201,45 @@ GString::format(const char *fmt, ... )
 int 
 GString::search(char c, int from) const
 {
+  const char *src = (const char*)(*this);
+  int len = strlen(src);
   if (from<0)
-    from += (*this)->size;
-  if (from<0 || from>=(int)(*this)->size)
+    from += len;
+  if (from<0 || from>=len)
     return -1;
-  char *s = strchr(&(*this)->data[from], c);
-  return (s ? s - (*this)->data : -1);
+  const char *str = (const char*)(*this);
+  char *s = strchr(&str[from], c);
+  return (s ? s - str : -1);
 }
   
 int 
 GString::search(const char *str, int from) const
 {
+  const char *src = (const char*)(*this);
+  int len = strlen(src);
   if (from<0)
-    from += (*this)->size;
-  if (from<0 || from>=(int)(*this)->size)
+    from += len;
+  if (from<0 || from>=len)
     return -1;
-  char *s = strstr(&(*this)->data[from], str);
-  return (s ? s - (*this)->data : -1);
+  char *s = strstr(&src[from], str);
+  return (s ? s - src : -1);
 }
 
 
 int 
 GString::rsearch(char c, int from) const
 {
+  const char *src = (const char*)(*this);
+  int len = strlen(src);
   if (from<0)
-    from += (*this)->size;
-  if (from<0 || from>=(int)(*this)->size)
+    from += len;
+  if (from<0 || from>=len)
     return -1;
   int ans = -1;
-  char *s = (*this)->data;
-  while ((s=strchr(s,c)) && (s<=(*this)->data + from))
+  const char *s = src;
+  while ((s=strchr(s,c)) && (s<=src+from))
     {
-      ans = s - (*this)->data;
+      ans = s - src;
       s += 1;
     }
   return ans;
@@ -249,48 +248,71 @@ GString::rsearch(char c, int from) const
 int 
 GString::rsearch(const char *str, int from) const
 {
+  const char *src = (const char*)(*this);
+  int len = strlen(src);
   if (from<0)
-    from += (*this)->size;
-  if (from<0 || from>=(int)(*this)->size)
+    from += len;
+  if (from<0 || from>=len)
     return -1;
   int ans = -1;
-  char *s = (*this)->data;
-  while ((s=strstr(s,str)) && (s<=(*this)->data + from))
+  const char *s = src;
+  while ((s=strstr(s,str)) && (s<=src+from))
     {
-      ans = s - (*this)->data;
+      ans = s - src;
       s += 1;
     }
   return ans;
 }
 
+
 GString& 
-GString::operator+= (const char *str)
+GString::operator+= (char ch)
 {
-  GString old = *this;
-  (*this) = GStringRep::xnew(strlen(old->data) + strlen(str));
-  strcpy((*this)->data, old->data);
-  strcat((*this)->data, str);
+  const char *str1 = (const char*)(*this);
+  GStringRep *rep = GStringRep::xnew(strlen(str1) + 1);
+  strcpy(rep->data, str1);
+  int len = strlen(rep->data);
+  rep->data[len] = ch;
+  rep->data[len+1] = 0;
+  (*this) = rep;
+  return *this;
+}
+
+
+GString& 
+GString::operator+= (const char *str2)
+{
+  const char *str1 = (const char*)(*this);
+  GStringRep *rep = GStringRep::xnew(strlen(str1) + strlen(str2));
+  if (rep && str1) strcpy(rep->data, str1);
+  if (rep && str2) strcat(rep->data, str2);
+  (*this) = rep;
   return *this;
 }
 
 GString
-concat(const char *str1, const char *str2)
+GString::concat(const char *str1, const char *str2)
 {
-  GString res = GStringRep::xnew(strlen(str1) + strlen(str2));
-  strcpy(res->data, str1);
-  strcat(res->data, str2);
-  return res;
+  GStringRep *rep = GStringRep::xnew(strlen(str1) + strlen(str2));
+  if (rep && str1) strcpy(rep->data, str1);
+  if (rep && str2) strcat(rep->data, str2);
+  return GString(rep);
 }
 
 unsigned int 
 hash(const GString &str)
 {
   unsigned int x = 0;
-  const char *s = str->data;
+  const char *s = (const char*)str;
   while (*s) 
-    x = (x<<6) ^ (unsigned char)(*s++);
+    x = x ^ (x<<6) ^ (unsigned char)(*s++);
   return x;
 }
 
+void 
+GString::throw_illegal_subscript()
+{
+  THROW("Illegal subscript in GString::operator[]");
+}
 
 

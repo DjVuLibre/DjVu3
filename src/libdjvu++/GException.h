@@ -1,13 +1,15 @@
 //C-  -*- C++ -*-
 //C-
-//C-  Copyright (c) 1988 AT&T	
-//C-  All Rights Reserved 
+//C- Copyright (c) 1999 AT&T Corp.  All rights reserved.
 //C-
-//C-  THIS IS UNPUBLISHED PROPRIETARY SOURCE CODE OF AT&T
-//C-  The copyright notice above does not evidence any
-//C-  actual or intended publication of such source code.
+//C- This software may only be used by you under license from AT&T
+//C- Corp. ("AT&T"). A copy of AT&T's Source Code Agreement is available at
+//C- AT&T's Internet website having the URL <http://www.djvu.att.com/open>.
+//C- If you received this software without first entering into a license with
+//C- AT&T, you have an infringing copy of this software and cannot use it
+//C- without violating AT&T's intellectual property rights.
 //C-
-//C-  $Id: GException.h,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $
+//C- $Id: GException.h,v 1.1.1.2 1999-10-22 19:29:24 praveen Exp $
 
 
 #ifndef _GEXCEPTION_H_
@@ -16,39 +18,37 @@
 /** @name GException.h
 
     Files #"GException.h"# and #"GException.cpp"# define a portable exception
-    scheme used through the library. This scheme can use native C++ exception
-    or an exception emulation based on #longjmp#/#setjmp#. A particular model
-    can be forced a compile time by defining option #CPP_SUPPORTS_EXCEPTIONS#
-    or #USE_EXCEPTION_EMULATION#.
+    scheme used through the DjVu Reference Library. This scheme can use native
+    C++ exceptions or an exception emulation based on #longjmp#/#setjmp#. A
+    particular model can be forced a compile time by defining option
+    #CPP_SUPPORTS_EXCEPTIONS# or #USE_EXCEPTION_EMULATION#.
     
-    The exception emulation unfortunately is not able to call the proper
-    destructors when an exception occurs. This is acceptable for simple
-    command line program, but will cause memory leaks in any continuously
-    running application (such as a browser). In addition, the exception
-    emulation is not thread safe.  These are the two main reasons for using a
-    compliant C++ compiler.  These are also compelling reasons to {\em only}
-    use exception to signal an error condition which forces the library to
-    discontinue execution.
+    This emulation code was motivated because many compilers did not properly
+    support exceptions as mandated by the C++ standard documents. This
+    emulation is now considered obsolete because (a) it is not able to call
+    the proper destructors when an exception occurs, and (b) it is not thread
+    safe.  Although all modern C++ compiler handle exception decently, the
+    exception handling intrinsics are not always thread safe.  Therefore we
+    urge programmers to {\em only} use exceptions to signal error conditions
+    that force the library to discontinue execution.
     
-    There are four macros for handling exceptions.  Macros #TRY#, #CATCH(ex)#
-    and #ENDCATCH# must be used to define an exception catching
-    block. Exceptions can be thrown at all times using macro
-    #THROW(cause)#. An exception can be re-thrown from a catch block using
-    macro #RETHROW#.
+    There are four macros for handling exceptions.  Macros #TRY#, #CATCH# and
+    #ENDCATCH# are used to define an exception catching block.  Exceptions can
+    be thrown at all times using macro #THROW(cause)#. An exception can be
+    re-thrown from a catch block using macro #RETHROW#.
     
     Example:
     \begin{verbatim}
     TRY
       {
-        // program lines including a possible THROW  
-        // or calls to functions that perform a THROW
+        // program lines which may result in a call to THROW()
         THROW("message");
       }
     CATCH(ex) 
       {
-        // ex is a \Ref{GException} object that you can print ...
+        // Variable ex refers to a GException object.
         ex.perror();  
-        // or rethrow to an outer exception handler
+        // You can rethrow the exception to an outer exception handler.
         RETHROW;
       }
     ENDCATCH;
@@ -57,10 +57,10 @@
     @memo 
     Portable exceptions.
     @author 
-    Leon Bottou <leonb@research.att.com> -- initial implementation.\\
-    Andrei Erofeev <eaf@geocities.com> -- fixed message memory allocation.
+    L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
+    Andrei Erofeev <eaf@research.att.com> -- fixed message memory allocation.
     @version 
-    #$Id: GException.h,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $# */
+    #$Id: GException.h,v 1.1.1.2 1999-10-22 19:29:24 praveen Exp $# */
 //@{
 
 #include "DjVuGlobal.h"
@@ -68,28 +68,28 @@
 #ifdef __GNUC__
 #pragma interface
 #endif
+#ifndef no_return
+#ifdef __GNUC__
+#define no_return __attribute__ ((noreturn))
+#else
+#define no_return
+#endif
+#endif
 
-/** Base exception class.
-    The library can use native C++ exception or an exception
-    emulation based on #longjmp#/#setjmp#.  This model uses
-    exception handling macros (see \Ref{GException.h}). 
-    These macros represent all exceptions wich class GException.  
-*/
+/** Exception class.  
+    The library always uses macros #TRY#, #THROW#, #CATCH# and #ENDCATCH# for
+    throwing and catching exceptions (see \Ref{GException.h}). These macros
+    only deal with exceptions of type #GException#. */
 
 class GException {
 public:
-  /** Constructs a GException.  Usually called by macro #THROW#.  Argument
-      #cause# usually is a plain text error message which should not be relied
-      upon by exception handlers.  As a convention however, string #"EOF"# is
-      used when reaching an unexpected end-of-file condition and string
-      #"STOP"# is used when the user interrupts the execution.  These strings
-      can be tested by the exception handlers. Similar conventional strings may
-      be defined in the future. They all will be small strings with only
-      uppercase characters.  
-      @param cause error message.  
-      @param file file name, usually provided by macro #__FILE__#.  
-      @param line line number, usually provided by macro #__LINE__#.  
-      @param func function name, provided (in GCC) by macro #__PRETTY_FUNCTION__#. */
+  /** Constructs a GException.  This constructor is usually called by macro
+      #THROW#.  Argument #cause# is a plain text error message. As a
+      convention, string #"EOF"# is used when reaching an unexpected
+      end-of-file condition and string #"STOP"# is used when the user
+      interrupts the execution. The remaining arguments are usually provided
+      by the predefined macros #__FILE__#, #__LINE__#, and (G++ and EGCS only)
+      #__PRETTY_FUNCTION__#.  */
   GException (const char *cause, const char *file=0, int line=0, const char *func=0);
   /** Copy Constructor. */
   GException (const GException & exc);
@@ -103,11 +103,13 @@ public:
       @param msg: string incorporated into the error message. */
   void perror(const char *msg = 0) const;
   /** Returns the string describing the cause of the exception.  The returned
-      pointer is never null. The string usually is a plain text error message
-      and should not be relied upon by exception handlers. As a convention
-      however, string #"EOF"# is used when reaching an unexpected end-of-file
-      condition and string #"STOP"# is used when the user interrupts the
-      execution. */
+      pointer is never null.  Exception handlers should not rely on the value
+      of the string #cause#.  As a convention however, string #"EOF"# is used
+      when reaching an unexpected end-of-file condition and string #"STOP"# is
+      used when the user interrupts the execution. These strings can be tested
+      by the exception handlers. Similar conventional strings may be defined
+      in the future. They all will be small strings with only uppercase
+      characters. */
   const char* get_cause(void) const;
   /** Returns the function name from which the exception was thrown.
       A null pointer is returned if no function name is available. */
@@ -118,6 +120,8 @@ public:
   /** Returns the line number from which the exception was thrown.
       A zero is returned if no line number is available. */
   int get_line(void) const { return line; };
+  //  Magic cause string
+  static const char * const outofmemory;
 private:
   const char *cause;
   const char *file;
@@ -156,16 +160,22 @@ private:
 // Compiler supports ANSI C++ exceptions.
 // Defined exception macros accordingly.
 
+class GExceptionHandler {
+public:
+  static void exthrow(const GException &) no_return;
+  static void rethrow(void) no_return;
+};
+
 #define G_TRY        try
 #define G_CATCH(n)   catch(GException &n) { 
 #define G_ENDCATCH   }
-#define G_RETHROW    throw
+#define G_RETHROW    GExceptionHandler::rethrow()
 #ifdef __GNUG__
-#define G_THROW(msg) throw \
-  GException(msg, __FILE__, __LINE__, __PRETTY_FUNCTION__)
+#define G_THROW(msg) GExceptionHandler::exthrow \
+  (GException(msg, __FILE__, __LINE__, __PRETTY_FUNCTION__))
 #else
-#define G_THROW(msg) throw \
-  GException(msg, __FILE__, __LINE__)
+#define G_THROW(msg) GExceptionHandler::exthrow \
+  (GException(msg, __FILE__, __LINE__))
 #endif
 
 #else // USE_EXCEPTION_EMULATION
@@ -182,7 +192,7 @@ public:
   GException current;
 public:
   static GExceptionHandler *head;
-  static void emthrow(const GException &);
+  static void emthrow(const GException &) no_return;
 public:
   GExceptionHandler() { next = head; };
   ~GExceptionHandler() { head = next; };
@@ -193,18 +203,18 @@ public:
                       { GExceptionHandler::head = &__exh;
 
 #define G_CATCH(n) } else { GExceptionHandler::head = __exh.next; \
-                          GException& n = __exh.current;
+                            GException& n = __exh.current;
 
 #define G_ENDCATCH } } while(0)
 
-#define G_RETHROW  GExceptionHandler::emthrow(__exh.current)
+#define G_RETHROW    GExceptionHandler::emthrow(__exh.current)
 
 #ifdef __GNUG__
 #define G_THROW(msg) GExceptionHandler::emthrow \
-  (GException(msg, __FILE__, __LINE__, __PRETTY_FUNCTION__))
+  (GException(msg, __FILE__, __LINE__, __PRETTY_FUNCTION__)) 
 #else
 #define G_THROW(m) GExceptionHandler::emthrow \
-  (GException(m, __FILE__, __LINE__))
+  (GException(m, __FILE__, __LINE__)) no_return
 #endif
 
 #endif // !CPP_SUPPORTS_EXCEPTIONS

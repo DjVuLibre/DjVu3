@@ -1,15 +1,17 @@
 //C-  -*- C++ -*-
 //C-
-//C-  Copyright (c) 1988 AT&T	
-//C-  All Rights Reserved 
+//C- Copyright (c) 1999 AT&T Corp.  All rights reserved.
 //C-
-//C-  THIS IS UNPUBLISHED PROPRIETARY SOURCE CODE OF AT&T
-//C-  The copyright notice above does not evidence any
-//C-  actual or intended publication of such source code.
+//C- This software may only be used by you under license from AT&T
+//C- Corp. ("AT&T"). A copy of AT&T's Source Code Agreement is available at
+//C- AT&T's Internet website having the URL <http://www.djvu.att.com/open>.
+//C- If you received this software without first entering into a license with
+//C- AT&T, you have an infringing copy of this software and cannot use it
+//C- without violating AT&T's intellectual property rights.
 //C-
-//C-  $Id: GSmartPointer.cpp,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $
+//C- $Id: GSmartPointer.cpp,v 1.1.1.2 1999-10-22 19:29:24 praveen Exp $
 
-// File "$Id: GSmartPointer.cpp,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $"
+// File "$Id: GSmartPointer.cpp,v 1.1.1.2 1999-10-22 19:29:24 praveen Exp $"
 // - Author: Leon Bottou, 05/1997
 
 /* Put this into *one* file, which instantiates all the required containers
@@ -33,14 +35,14 @@ static GCriticalSection gcsCounter;
 
 GPEnabled::~GPEnabled()
 {
-  if (count)
+  if (count > 0)
     THROW("Suspicious destruction of referenced GPEnabled object");
 }
 
 void
 GPEnabled::destroy()
 {
-  if (count)
+  if (count >= 0)
     THROW("Suspicious destruction of referenced GPEnabled object");
   delete this;
 }
@@ -57,9 +59,10 @@ void
 GPEnabled::unref()
 {
   gcsCounter.lock();
-  int newcount = --count;
+  if (! --count) 
+    count = -1;
   gcsCounter.unlock();
-  if (newcount==0)
+  if (count < 0)
     destroy();
 }
 
@@ -71,22 +74,53 @@ GPBase&
 GPBase::assign (GPEnabled *nptr)
 {
   gcsCounter.lock();
-  if (nptr) 
+  if (nptr)
     {
-      nptr->count++;
+      if (nptr->count >= 0)  
+        nptr->count++;
+      else
+        nptr = 0;
     }
   if (ptr)
     {
       GPEnabled *old = ptr;
       ptr = nptr;
-      int newcount = --old->count;
+      if (! --old->count) 
+        old->count = -1;
       gcsCounter.unlock();      
-      if (newcount == 0)
+      if (old->count < 0)
         old->destroy();
     }
   else
     {
       ptr = nptr;
+      gcsCounter.unlock();
+    }
+  return *this;
+}
+
+
+GPBase&
+GPBase::assign (const GPBase &sptr)
+{
+  gcsCounter.lock();
+  if (sptr.ptr) 
+    {
+      sptr.ptr->count++;
+    }
+  if (ptr)
+    {
+      GPEnabled *old = ptr;
+      ptr = sptr.ptr;
+      if (! --old->count) 
+        old->count = -1;
+      gcsCounter.unlock();      
+      if (old->count < 0)
+        old->destroy();
+    }
+  else
+    {
+      ptr = sptr.ptr;
       gcsCounter.unlock();
     }
   return *this;

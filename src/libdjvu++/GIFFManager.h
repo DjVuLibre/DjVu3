@@ -1,26 +1,18 @@
 //C-  -*- C++ -*-
 //C-
-//C-  Copyright (c) 1988 AT&T	
-//C-  All Rights Reserved 
+//C- Copyright (c) 1999 AT&T Corp.  All rights reserved.
 //C-
-//C-  THIS IS UNPUBLISHED PROPRIETARY SOURCE CODE OF AT&T
-//C-  The copyright notice above does not evidence any
-//C-  actual or intended publication of such source code.
+//C- This software may only be used by you under license from AT&T
+//C- Corp. ("AT&T"). A copy of AT&T's Source Code Agreement is available at
+//C- AT&T's Internet website having the URL <http://www.djvu.att.com/open>.
+//C- If you received this software without first entering into a license with
+//C- AT&T, you have an infringing copy of this software and cannot use it
+//C- without violating AT&T's intellectual property rights.
 //C-
-//C-  $Id: GIFFManager.h,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $
+//C- $Id: GIFFManager.h,v 1.1.1.2 1999-10-22 19:29:24 praveen Exp $
 
-/*****************************************************************************
- *
- *   $Revision: 1.1.1.1 $
- *   $Date: 1999-01-22 00:40:19 $
- *   @(#) $Id: GIFFManager.h,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $
- *
- *****************************************************************************/
-
-// - Author: Andrei Erofeev, 7/1998
-
-#ifndef HDR_GIFFMANAGER
-#define HDR_GIFFMANAGER
+#ifndef _GIFFMANAGER_H
+#define _GIFFMANAGER_H
 
 #ifdef __GNUC__
 #pragma interface
@@ -28,6 +20,7 @@
 
 #include "IFFByteStream.h"
 #include "GContainer.h"
+#include "Arrays.h"
 #include "GSmartPointer.h"
 #include "GString.h"
 
@@ -45,9 +38,9 @@
     
     Interface to IFF files.
     @author 
-    Andrei Erofeev <eaf@geocities.com> -- Initial implementation.
+    Andrei Erofeev <eaf@research.att.com> -- Initial implementation.
     @version 
-    #$Id: GIFFManager.h,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $# */
+    #$Id: GIFFManager.h,v 1.1.1.2 1999-10-22 19:29:24 praveen Exp $# */
 
 /** #GIFFChunk# is the base class for other IFF chunks understood by
     {\Ref GIFFManager}. It provides some basic interface, and is not supposed
@@ -56,47 +49,48 @@
 class GIFFChunk : public GPEnabled
 {
 private:
-   char				name[5];
-   GString			type;
-   GList<GP<GIFFChunk> >	chunks;
-   GArray<char>			data;
+   char			name[5];
+   GString		type;
+   GPList<GIFFChunk>	chunks;
+   TArray<char>		data;
 
-   static void	decodeName(const char * name, GString * short_name, int * number);
+   static void	decode_name(const char * name, GString * short_name, int * number);
 public:
       /// Returns the name of the chunk (without possible #FORM:# or similar prefixes)
-   GString	getName(void) const;
+   GString	get_name(void) const;
       /// Returns full chunk name, with possible container specification
-   GString	getFullName(void) const;
+   GString	get_full_name(void) const;
       /// Returns the chunk type, like #CAT# for chunk #CAT:DJVU#
-   GString	getType(void) const;
+   GString	get_type(void) const;
       /// Returns TRUE if the chunk may contain other chunks or FALSE otherwise
-   bool		isContainer(void) const;
+   bool		is_container(void) const;
       /** Sets the chunk name. The {\em name} may not contain dots or brackets,
 	  but {\bf may} contain colons. */
-   void		setName(const char * name);
+   void		set_name(const char * name);
       /** Parses the {\em name} probably containing colon and compares it
 	  with its own name returning TRUE if they are the same */
-   bool		checkName(const char * name);
+   bool		check_name(const char * name);
 
       /** Adds the {\em chunk} to the chunks list at position {\em order}.
 	  Set {\em order} to #-1# to append the chunk to the list.
           {\bf Note!} By adding chunk #PROP# you will convert this chunk
           to type #LIST# {\em automatically}. */
-   void		addChunk(const GP<GIFFChunk> & chunk, int order=-1);
+   void		add_chunk(const GP<GIFFChunk> & chunk, int order=-1);
       /** Removes the chunk with given {\em name}. The {\em name} may not
 	  contain dots, but MAY contain colons and brackets (the latter -
 	  for specifying the chunk number) */
-   void		delChunk(const char * name);
+   void		del_chunk(const char * name);
       /** Returns the chunk with given {\em name}. The {\em name} may not
 	  contain dots, but MAY contain colons and brackets (the latter -
 	  for specifying the chunk number). If {\em position} is not zero
 	  then the chunk position in its parent will be put into #*position# */
-   GP<GIFFChunk>getChunk(const char * name, int * position=0);
+   GP<GIFFChunk>get_chunk(const char * name, int * position=0);
       /** Returns the number of chunks with given {\em name}. The {\em name}
-	  may not contain dots and brackets. */
-   int		getChunksNumber(const char * name);
+	  may not contain dots and brackets. If {\em name} is ZERO, the
+	  total number of chunks will be returned. */
+   int		get_chunks_number(const char * name=0);
       /** Returns the data array for plain chunks */
-   GArray<char>	getData(void) const;
+   TArray<char>	get_data(void) const;
    
       /** Saves the chunk into the {\Ref IFFByteStream}.
 	  Set {\em use_trick} to #1# if this is a top-level chunk */
@@ -108,38 +102,37 @@ public:
 	  contain dots colons or brackets */
    GIFFChunk(const char * name);
       /** Constructs the {\em plain chunk} containing raw data */
-   GIFFChunk(const char * name, const char * buffer, int length);
+   GIFFChunk(const char * name, const TArray<char> & data);
       /// Destructor
    virtual ~GIFFChunk(void);
 };
 
 inline GString
-GIFFChunk::getName(void) const { return GString(name, 4); }
+GIFFChunk::get_name(void) const { return GString(name, 4); }
 
 inline GString
-GIFFChunk::getFullName(void) const { return getType()+":"+getName(); };
+GIFFChunk::get_type(void) const { return type; };
 
 inline GString
-GIFFChunk::getType(void) const { return type; };
+GIFFChunk::get_full_name(void) const { return get_type()+":"+get_name(); };
 
 inline bool
-GIFFChunk::isContainer(void) const { return type.length()!=0; };
+GIFFChunk::is_container(void) const { return type.length()!=0; };
 
-inline GArray<char>
-GIFFChunk::getData(void) const { return data; };
+inline TArray<char>
+GIFFChunk::get_data(void) const { return data; };
 
 inline
 GIFFChunk::GIFFChunk(void) { name[0]=0; }
 
 inline
-GIFFChunk::GIFFChunk(const char * name) { setName(name); }
+GIFFChunk::GIFFChunk(const char * name) { set_name(name); }
 
 inline
-GIFFChunk::GIFFChunk(const char * name, const char * buffer, int length)
+GIFFChunk::GIFFChunk(const char * name, const TArray<char> & data_in) :
+      data(data_in)
 {
-   setName(name);
-   data.resize(length-1);
-   memcpy(data, buffer, length);
+   set_name(name);
 }
 
 inline
@@ -156,8 +149,8 @@ GIFFChunk::~GIFFChunk(void) {};
     Some of the examples are below:
     \begin{verbatim}
        GP<GIFFChunk> chunk;
-       chunk=manager1.getChunk("BG44[2]");
-       manager2.addChunk(".FORM:DJVU.BG44[-1]", chunk);
+       chunk=manager1.get_chunk("BG44[2]");
+       manager2.add_chunk(".FORM:DJVU.BG44[-1]", chunk);
     \end{verbatim}
 
     {\bf Chunk name}
@@ -197,10 +190,10 @@ class GIFFManager
 private:
    GP<GIFFChunk>	top_level;
 
-   static const char *	checkLeadingDot(const char * name);
+   static const char *	check_leading_dot(const char * name);
 public:
       /// Sets the name of the top level chunk to {\em name}
-   void		setName(const char * name);
+   void		set_name(const char * name);
       /** Adds the chunk {\em chunk} to chunk with name {\em parent_name} at
 	  position {\em pos}. {\em parent_name} may contain dots, brackets
 	  and colons. All missing chunks in the chain will be created.
@@ -218,7 +211,7 @@ public:
 	     ;; Same thing regardless of the top-level chunk name
 	     m.addChunk("FORM:DJVU[1]", ch);
 	  \end{verbatim} */
-   void		addChunk(const char * parent_name, const GP<GIFFChunk> & chunk, int pos=-1);
+   void		add_chunk(const char * parent_name, const GP<GIFFChunk> & chunk, int pos=-1);
       /** If {\em name}={\em name1}.{\em name2} where {\em name2} doesn't
 	  contain dots, then #addChunk()# will create plain chunk with
 	  name {\em name2} with data {\em buffer} of size {\em length} and
@@ -234,7 +227,7 @@ public:
              ;; To append chunk BG44 to 2nd DjVu file inside DjVm archive:
              m.addChunk(".DJVM.DJVU[1].BG44", data, length);
           \end{verbatim} */
-   void		addChunk(const char * name, const char * buffer, int length);
+   void		add_chunk(const char * name, const TArray<char> & data);
       /** Will remove chunk with name {\em name}. You may use dots, colons
 	  and brackets to specify the chunk uniquely.
 
@@ -248,10 +241,11 @@ public:
 	     m.delChunk("DJVU");
 	  \end{verbatim}
       */
-   void		delChunk(const char * name);
+   void		del_chunk(const char * name);
       /** Will return the number of chunks with given name. The {\em name} may
 	  not end with brackets, but may contain them inside. It may also
-	  contain dots and colons.
+	  contain dots and colons. If {\em name} is ZERO, the total number
+	  of chunks will be returned.
 
 	  {\bf Examples:}
 	  \begin{verbatim}
@@ -261,7 +255,7 @@ public:
 	     m.getChunksNumber("DJVU");
 	  \end{verbatim}
       */
-   int		getChunksNumber(const char * name);
+   int		get_chunks_number(const char * name=0);
 
       /** Returns the chunk with name {\em name}. The {\em name} may contain dots
 	  colons and slashes. If {\em position} is not zero, #*position# will
@@ -274,14 +268,18 @@ public:
 	     ;; To get chunk corresponding to 2nd DJVU form
 	     m.getChunk(".DJVU[1]");
 	  \end{verbatim} */
-   GP<GIFFChunk>getChunk(const char * name, int * position=0);
+   GP<GIFFChunk>get_chunk(const char * name, int * position=0);
 
       /** Loads the composite {\em chunk}'s contents from stream {\em istr}. */
-   void		loadChunk(IFFByteStream & istr, GP<GIFFChunk> chunk);
+   void		load_chunk(IFFByteStream & istr, GP<GIFFChunk> chunk);
       /** Loads the file contents from stream {\em str} */
-   void		loadFile(ByteStream & str);
+   void		load_file(ByteStream & str);
+      /** Loads the file contents from the data array {\em data} */
+   void		load_file(const TArray<char> & data);
       /** Saves all the chunks into stream {\em str} */
-   void		saveFile(ByteStream & str);
+   void		save_file(ByteStream & str);
+      /** Saves all the chunks into the data array {\em data} */
+   void		save_file(TArray<char> & data);
 
       /// Default constructor
    GIFFManager(void);
@@ -294,9 +292,9 @@ public:
 };
 
 inline void
-GIFFManager::setName(const char * name)
+GIFFManager::set_name(const char * name)
 {
-   top_level->setName(name);
+   top_level->set_name(name);
 }
 
 inline

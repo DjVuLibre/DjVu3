@@ -1,16 +1,18 @@
 //C-  -*- C++ -*-
 //C-
-//C-  Copyright (c) 1988 AT&T	
-//C-  All Rights Reserved 
+//C- Copyright (c) 1999 AT&T Corp.  All rights reserved.
 //C-
-//C-  THIS IS UNPUBLISHED PROPRIETARY SOURCE CODE OF AT&T
-//C-  The copyright notice above does not evidence any
-//C-  actual or intended publication of such source code.
+//C- This software may only be used by you under license from AT&T
+//C- Corp. ("AT&T"). A copy of AT&T's Source Code Agreement is available at
+//C- AT&T's Internet website having the URL <http://www.djvu.att.com/open>.
+//C- If you received this software without first entering into a license with
+//C- AT&T, you have an infringing copy of this software and cannot use it
+//C- without violating AT&T's intellectual property rights.
 //C-
-//C-  $Id: GThreads.cpp,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $
+//C- $Id: GThreads.cpp,v 1.1.1.2 1999-10-22 19:29:24 praveen Exp $
 
 
-// **** File "$Id: GThreads.cpp,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $"
+// **** File "$Id: GThreads.cpp,v 1.1.1.2 1999-10-22 19:29:24 praveen Exp $"
 // This file defines machine independent classes
 // for running and synchronizing threads.
 // - Author: Leon Bottou, 01/1998
@@ -75,14 +77,22 @@ start(void *arg)
         {
           ex.perror();
           fprintf(stderr, "GThreads: uncaught exception.");
+#ifdef _DEBUG
           abort();
+#else
+		  ExitThread(1);
+#endif
         }
       ENDCATCH;
     }
   catch(...)
     {
       fprintf(stderr, "GThreads: unrecognized uncaught exception.");
-      abort();
+#ifdef _DEBUG
+          abort();
+#else
+		  ExitThread(1);
+#endif
     }
   return 0;
 }
@@ -129,10 +139,131 @@ GThread::yield()
   return 0;
 }
 
-void*
+void *
 GThread::current()
 {
   return (void*) GetCurrentThreadId();
+}
+
+GMonitor::GMonitor()
+  : ok(0), count(1)
+{
+  InitializeCriticalSection(&cs);
+  hev[0] = CreateEvent(NULL,FALSE,FALSE,NULL);
+  hev[1] = CreateEvent(NULL,TRUE,FALSE,NULL);
+  locker = GetCurrentThreadId();
+  ok = 1;
+}
+
+GMonitor::~GMonitor()
+{
+  ok = 0;
+  DeleteCriticalSection(&cs); 
+  CloseHandle(hev[0]);
+  CloseHandle(hev[1]);
+}
+
+void 
+GMonitor::enter()
+{
+  DWORD self = GetCurrentThreadId();
+  if (count>0 || self!=locker)
+    {
+      if (ok)
+        EnterCriticalSection(&cs);
+      locker = self;
+      count = 1;
+    }
+  count -= 1;
+}
+
+void 
+GMonitor::leave()
+{
+  DWORD self = GetCurrentThreadId();
+  if (ok && (count>0 || self!=locker))
+    THROW("Monitor was not acquired by this thread (GMonitor::broadcast)");
+  count += 1;
+  if (count > 0)
+    {
+      count = 1;
+      if (ok)
+        LeaveCriticalSection(&cs);
+    }
+}
+
+void
+GMonitor::signal()
+{
+  if (ok)
+    {
+      DWORD self = GetCurrentThreadId();
+      if (count>0 || self!=locker)
+        THROW("Monitor was not acquired by this thread (GMonitor::signal)");
+      SetEvent(hev[0]);
+    }
+}
+
+void
+GMonitor::broadcast()
+{
+  if (ok)
+    {
+      DWORD self = GetCurrentThreadId();
+      if (count>0 || self!=locker)
+        THROW("Monitor was not acquired by this thread (GMonitor::broadcast)");
+      SetEvent(hev[1]);
+    }
+}
+
+void
+GMonitor::wait()
+{
+  // Check state
+  DWORD self = GetCurrentThreadId();
+  if (count>0 || self!=locker)
+    THROW("Monitor was not acquired by this thread (GMonitor::wait)");
+  // Wait
+  if (ok)
+    {
+      // Release
+      int sav_count = count;
+      count = 1;
+      ResetEvent(hev[0]);
+      ResetEvent(hev[1]);
+      // Wait
+      LeaveCriticalSection(&cs);
+      WaitForMultipleObjects(2,hev,FALSE,INFINITE);
+      // Re-acquire
+      EnterCriticalSection(&cs);
+      count = sav_count;
+      locker = self;
+    }
+}
+
+void
+GMonitor::wait(unsigned long timeout) 
+{
+  // Check state
+  DWORD self = GetCurrentThreadId();
+  if (count>0 || self!=locker)
+    THROW("Monitor was not acquired by this thread (GMonitor::wait)");
+  // Wait
+  if (ok)
+    {
+      // Release
+      int sav_count = count;
+      count = 1;
+      ResetEvent(hev[0]);
+      ResetEvent(hev[1]);
+      // Wait
+      LeaveCriticalSection(&cs);
+      WaitForMultipleObjects(2,hev,FALSE,timeout);
+      // Re-acquire
+      EnterCriticalSection(&cs);
+      count = sav_count;
+      locker = self;
+    }
 }
 
 #endif
@@ -218,19 +349,15 @@ GThread::current()
   return (void*) thid;
 }
 
-
-// GCriticalSection: unimportant since mac threads are cooperative
-GCriticalSection::GCriticalSection() {}
-GCriticalSection::~GCriticalSection() {}
-void GCriticalSection::lock() {}
-void GCriticalSection::unlock() {}
-
-// GEvent: this is highly suspicious (LYB!)
-GEvent::GEvent() {}
-GEvent::~GEvent() {}
-void GEvent::set() {}
-void GEvent::wait() {}
-void GEvent::wait(int timeout) {}
+// GMonitor is not implemented (highly suspicious)
+inline GMonitor::GMonitor() {}
+inline GMonitor::~GMonitor() {}
+inline void GMonitor::enter() {}
+inline void GMonitor::leave() {}
+inline void GMonitor::wait() {}
+inline void GMonitor::wait(unsigned long timeout) {}
+inline void GMonitor::signal() {}
+inline void GMonitor::broadcast() {}
 
 #endif
 
@@ -245,11 +372,9 @@ void GEvent::wait(int timeout) {}
 #if defined(CMA_INCLUDE) || defined(pthread_attr_default)
 #define DCETHREADS
 #define pthread_key_create pthread_keycreate
-static pthread_t nullthread;
 #else
 #define pthread_mutexattr_default  NULL
 #define pthread_condattr_default   NULL
-static const pthread_t nullthread = 0;
 #endif
 
 static void *
@@ -282,7 +407,11 @@ start(void *arg)
         {
           ex.perror();
           fprintf(stderr, "GThreads: uncaught exception.");
+#ifdef _DEBUG
           abort();
+#else
+		  ExitThread(-1);
+#endif
         }
       ENDCATCH;
 #ifdef __EXCEPTIONS
@@ -290,7 +419,11 @@ start(void *arg)
   catch(...)
     {
       fprintf(stderr, "GThreads: unrecognized uncaught exception.");
-      abort();
+#ifdef _DEBUG
+          abort();
+#else
+		  ExitThread(-1);
+#endif
     }
 #endif 
   return 0;
@@ -299,9 +432,8 @@ start(void *arg)
 // GThread
 
 GThread::GThread(int stacksize) : 
-    hthr(nullthread),
-    xentry(0), 
-    xarg(0)
+  xentry(0), 
+  xarg(0)
 {
 }
 
@@ -312,7 +444,7 @@ GThread::~GThread()
 int  
 GThread::create(void (*entry)(void*), void *arg)
 {
-  if (hthr)
+  if (xentry || xarg)
     return -1;
   xentry = entry;
   xarg = arg;
@@ -362,94 +494,113 @@ GThread::current()
 #endif
 }
 
+// -- GMonitor
 
-
-// -- GCriticalSection
-
-GCriticalSection::GCriticalSection() 
-  : count(0), locker(nullthread) 
-{	
+GMonitor::GMonitor()
+  : ok(0), count(1), locker(0)
+{
   pthread_mutex_init(&mutex, pthread_mutexattr_default);
+  pthread_cond_init(&cond, pthread_condattr_default); 
+  locker = pthread_self();
   ok = 1;
 }
 
-GCriticalSection::~GCriticalSection()
-{	
+GMonitor::~GMonitor()
+{
   ok = 0;
+  pthread_cond_destroy(&cond);
   pthread_mutex_destroy(&mutex); 
 }
 
+
 void 
-GCriticalSection::lock() 
+GMonitor::enter()
 {
   pthread_t self = pthread_self();
-  if (count<=0 || !pthread_equal(locker, self))
+  if (count>0 || !pthread_equal(locker, self))
     {
       if (ok)
         pthread_mutex_lock(&mutex);
       locker = self;
+      count = 1;
     }
-  count += 1;
+  count -= 1;
 }
 
 void 
-GCriticalSection::unlock() 
+GMonitor::leave()
 {
   pthread_t self = pthread_self();
-  if (! pthread_equal(locker, self))
-    THROW("GCriticalSection has been misused");
-  count -= 1;
-  if (count == 0) 
+  if (ok && (count>0 || !pthread_equal(locker, self)))
+    THROW("Monitor was not acquired by this thread (GMonitor::broadcast)");
+  count += 1;
+  if (count > 0)
     {
-      count  = 0;
-      locker = nullthread;
+      count = 1;
       if (ok)
         pthread_mutex_unlock(&mutex);
     }
 }
 
-// -- GEvent
-
-GEvent::GEvent() 
-  : status(0) 
+void
+GMonitor::signal()
 {
-  pthread_cond_init(&cond, pthread_condattr_default); 
-  pthread_mutex_init(&mutex, pthread_mutexattr_default);
-}
-
-GEvent::~GEvent() 
-{
-  pthread_mutex_destroy(&mutex);
-  pthread_cond_destroy(&cond);
+  if (ok)
+    {
+      pthread_t self = pthread_self();
+      if (count>0 || !pthread_equal(locker, self))
+        THROW("Monitor was not acquired by this thread (GMonitor::signal)");
+      pthread_cond_signal(&cond);
+    }
 }
 
 void
-GEvent::set() 
+GMonitor::broadcast()
 {
-  if (status) 
-    return;
-  pthread_mutex_lock(&mutex);
-  status = 1;
-  pthread_cond_signal(&cond);
-  pthread_mutex_unlock(&mutex);
+  if (ok)
+    {
+      pthread_t self = pthread_self();
+      if (count>0 || !pthread_equal(locker, self))
+        THROW("Monitor was not acquired by this thread (GMonitor::broadcast)");
+      pthread_cond_broadcast(&cond);
+    }
 }
 
 void
-GEvent::wait()
+GMonitor::wait()
 {
-  pthread_mutex_lock(&mutex);
-  if (! status)
-    pthread_cond_wait(&cond, &mutex);
-  status = 0;
-  pthread_mutex_unlock(&mutex);
+  // Check
+  pthread_t self = pthread_self();
+  if (count>0 || !pthread_equal(locker, self))
+    THROW("Monitor was not acquired by this thread (GMonitor::wait)");
+  // Wait
+  if (ok)
+    {
+      // Release
+      int sav_count = count;
+      count = 1;
+      // Wait
+      pthread_cond_wait(&cond, &mutex);
+      // Re-acquire
+      count = sav_count;
+      locker = self;
+    }      
 }
 
 void
-GEvent::wait(int timeout) 
+GMonitor::wait(unsigned long timeout) 
 {
-  pthread_mutex_lock(&mutex);
-  if (! status)
-    {	
+  // Check
+  pthread_t self = pthread_self();
+  if (count>0 || !pthread_equal(locker, self))
+    THROW("Monitor was not acquired by this thread (GMonitor::wait)");
+  // Wait
+  if (ok)
+    {
+      // Release
+      int sav_count = count;
+      count = 1;
+      // Wait
       struct timeval  abstv;
       struct timespec absts;
       gettimeofday(&abstv, NULL); // grrr
@@ -460,12 +611,14 @@ GEvent::wait(int timeout)
         absts.tv_sec += 1;
       }
       pthread_cond_timedwait(&cond, &mutex, &absts);
-    }
-  status = 0;
-  pthread_mutex_unlock(&mutex);
+      // Re-acquire
+      count = sav_count;
+      locker = self;
+    }      
 }
 
 #endif
+
 
 
 // ----------------------------------------
@@ -490,7 +643,22 @@ GEvent::wait(int timeout)
 #include <sys/time.h>
 
 
-// -- context switch
+// -------------------------------------- constants
+
+// Minimal stack size
+#define MINSTACK   (32*1024)
+// Default stack size
+#define DEFSTACK   (127*1024)
+// Maxtime between checking fdesc (ms)
+#define MAXFDWAIT    (200)
+// Maximum time to wait in any case
+#define MAXWAIT (60*60*1000)
+// Maximum penalty for hog task (ms)
+#define MAXPENALTY (1000)
+// Trace task switches
+#undef COTHREAD_TRACE
+
+// -------------------------------------- context switch code
 
 struct mach_state { 
   jmp_buf buf; 
@@ -532,17 +700,18 @@ mach_start(mach_state *st1, void *pc, char *stacklo, char *stackhi)
                     : : "r" (sp), "r" (pc) );
 #elif #cpu(sparc)
       char *sp = (char*)(((unsigned long)stackhi-16) & ~0xff);
-      asm volatile ("mov %0,%%sp\n\t"   // set new stack pointer
+      asm volatile ("ta 3\n\t"          // saving the register windows will not hurt.
+                    "mov %0,%%sp\n\t"   // set new stack pointer
                     "call %1,0\n\t"     // call function
                     "nop"               // delay slot
                     : : "r" (sp), "r" (pc) );
 #elif #cpu(hppa)
-      char *sp = (char*)(((unsigned long)stacklo+127+256) & ~0xff);
+      char *sp = (char*)(((unsigned long)stacklo+128+255) & ~0xff);
       asm volatile("copy %0,%%sp\n\t"       // set stack pointer
                    "copy %1,%%r22\n\t"      // set call address
-                   ".CALL\n\t"              // call 
+                   ".CALL\n\t"              // call pseudo instr (why?)
                    "bl $$dyncall,%%r31\n\t" // call 
-                   "nop"                    // delay slot ???
+                   "copy %%r31,%%r2"        // delay slot ???
                    : : "r" (sp), "r" (pc) );
 #elif #cpu(alpha)
       char *sp = (char*)(((unsigned long)stackhi-16) & ~0xff);
@@ -551,7 +720,7 @@ mach_start(mach_state *st1, void *pc, char *stacklo, char *stackhi)
                     "jsr $26,($27),0"     // call function
                     : : "r" (sp), "r" (pc) );
 #elif #cpu(powerpc)
-      char *sp = (char*)(((unsigned long)stackhi-64) & ~0xff);
+      char *sp = (char*)(((unsigned long)stackhi-16) & ~0xff);
       asm volatile ("mr 1,%0\n\t"         // set new stack pointer
                     "mr 0,%1\n\t"         // load func pointer into r0
                     "mtlr 0\n\t"          // load link register with r0
@@ -563,7 +732,7 @@ mach_start(mach_state *st1, void *pc, char *stacklo, char *stackhi)
                     "jmp %a1"             // branch to address %1
                     : : "r" (sp), "a" (pc) );
 #elif #cpu(arm) && defined(COTHREAD_UNTESTED)
-      char *sp = (char*)(((unsigned long)stackhi-64) & ~0xff);
+      char *sp = (char*)(((unsigned long)stackhi-16) & ~0xff);
       asm volatile ("mov%?\t%|sp, %0\n\t" // set new stack pointer
                     "mov%?\t%|pc, %1"     // branch to address %1
                     : : "r" (sp), "r" (pc) );
@@ -604,7 +773,40 @@ int main() {
 #endif
 
 
-// -- data structures
+
+// -------------------------------------- select
+
+struct coselect {
+  int nfds;
+  fd_set rset;
+  fd_set wset;
+  fd_set eset;
+};
+
+static void 
+coselect_merge(coselect *dest, coselect *from)
+{
+  int i;
+  int nfds = from->nfds;
+  if (nfds > dest->nfds)
+    dest->nfds = nfds;
+  for (i=0; i<nfds; i++) if (FD_ISSET(i, &from->rset)) FD_SET(i, &dest->rset);
+  for (i=0; i<nfds; i++) if (FD_ISSET(i, &from->wset)) FD_SET(i, &dest->wset);
+  for (i=0; i<nfds; i++) if (FD_ISSET(i, &from->eset)) FD_SET(i, &dest->eset);
+}
+
+static int
+coselect_test(coselect *c)
+{
+  static timeval tmzero = {0,0};
+  fd_set copyr = c->rset;
+  fd_set copyw = c->wset;
+  fd_set copye = c->eset;
+  return select(c->nfds, &copyr, &copyw, &copye, &tmzero);
+}
+
+
+// -------------------------------------- cotask
 
 struct cotask {
   struct cotask *next;
@@ -616,77 +818,299 @@ struct cotask {
   int stacksize;
   // egcs exception support
   void *ehctx;
-  // waiting on event
-  int *wchan;
-  // waiting on select
-  int nfds;
-  fd_set *rdfds;
-  fd_set *wrfds;
-  fd_set *exfds;
-  // waiting timeout
-  struct timeval wakup;
+  // timing information
+  unsigned long over;
+  // waiting information
+  void *wchan;
+  coselect *wselect;
+  unsigned long *maxwait;
 };
 
 static cotask *maintask = 0;
-static cotask *curtask = 0;
+static cotask *curtask  = 0;
+static unsigned long globalmaxwait = 0;
 
-// Minimum and default stack size
-#define MINSTACK (32*1024)
-#define DEFSTACK (127*1024)
+// Hmmm. Waiting tasks should really be in a separate list
+
+
+// -------------------------------------- time
+
+static timeval time_base;
+
+static unsigned long
+time_elapsed(int reset=1)
+{
+  timeval tm;
+  gettimeofday(&tm, NULL);
+  long msec = (tm.tv_usec-time_base.tv_usec)/1000;
+  unsigned long elapsed = (long)(tm.tv_sec-time_base.tv_sec)*1000 + msec;
+  if (reset && elapsed>0)
+    {
+#ifdef COTHREAD_TRACE
+      fprintf(stderr,"cothreads: %4ld ms in task %p\n", elapsed, curtask);
+#endif
+      time_base.tv_sec = tm.tv_sec;
+      time_base.tv_usec += msec*1000;
+    }
+  return elapsed;
+}
+
+// -------------------------------------- scheduler
+
+static int
+cotask_yield()
+{
+  // ok
+  if (! maintask)
+    return 0;
+  // get elapsed time and return immediately when it is too small
+  unsigned long elapsed = time_elapsed();
+  if (elapsed==0 && curtask->wchan==0 && curtask->prev && curtask->next)
+    return 0;
+  // adjust task running time
+  curtask->over += elapsed;
+  if (curtask->over > MAXPENALTY)
+    curtask->over = MAXPENALTY;
+  // start scheduling
+ reschedule:
+  // try unblocking tasks
+  cotask *n = curtask->next;
+  cotask *q = n;
+  do 
+    { 
+      if (q->wchan)
+        {
+	  if (q->maxwait && *q->maxwait<=elapsed) 
+            {
+              *q->maxwait = 0;
+              q->wchan=0; 
+              q->maxwait=0; 
+              q->wselect=0; 
+            }
+          else if (q->wselect && globalmaxwait<=elapsed && coselect_test(q->wselect))
+            {
+              q->wchan=0;
+              if (q->maxwait)
+                *q->maxwait -= elapsed;
+              q->maxwait = 0; 
+              q->wselect=0; 
+            }
+          if (q->maxwait)
+            *q->maxwait -= elapsed;
+        }
+      q = q->next;
+    } 
+  while (q!=n);
+  // adjust globalmaxwait
+  if (globalmaxwait < elapsed)
+    globalmaxwait = MAXFDWAIT;
+  else
+    globalmaxwait -= elapsed;
+  // find best candidate
+  static int count;
+  unsigned long best = MAXPENALTY + 1;
+  cotask *r = 0;
+  count = 0;
+  q = n;
+  do 
+    { 
+      if (! q->wchan)
+        {
+          count += 1;
+          if (best > q->over)
+            {
+              r = q;
+              best = r->over;
+            } 
+        }
+      q = q->next;
+    } 
+  while (q != n);
+  // found
+  if (count > 0)
+    {
+      // adjust over 
+      q = n;
+      do 
+        { 
+          q->over = (q->over>best ? q->over-best : 0);
+          q = q->next;
+        } 
+      while (q != n);
+      // Switch
+      if (r != curtask)
+        {
+#ifdef COTHREAD_TRACE
+          fprintf(stderr,"cothreads: ----- switch to %p [%ld]\n", r, best);
+#endif
+          cotask *old = curtask;
+          curtask = r;
+          mach_switch(&old->regs, &curtask->regs);
+        }
+      // return 
+      if (count == 1)
+        return 1;
+      return 0;
+    }
+  // No task ready
+  count = 0;
+  unsigned long minwait = MAXWAIT;
+  coselect allfds;
+  allfds.nfds = 1;
+  FD_ZERO(&allfds.rset);
+  FD_ZERO(&allfds.wset);
+  FD_ZERO(&allfds.eset);
+  q = n;
+  do 
+    {
+      if (q->maxwait || q->wselect)
+        count += 1;
+      if (q->maxwait && *q->maxwait<minwait)
+        minwait = *q->maxwait;
+      if (q->wselect)
+        coselect_merge(&allfds, q->wselect);
+      q = q->next;
+    } 
+  while (q != n);
+  // abort on deadlock
+  if (count == 0) {
+    fprintf(stderr,"PANIC: Cothreads deadlock\n");
+    abort();
+  }
+  // select
+  timeval tm;
+  tm.tv_sec = minwait/1000;
+  tm.tv_usec = 1000*(minwait-1000*tm.tv_sec);
+  select(allfds.nfds,&allfds.rset, &allfds.wset, &allfds.eset, &tm);
+  // reschedule
+  globalmaxwait = 0;
+  elapsed = time_elapsed();
+  goto reschedule;
+}
+
+
+
+// -------------------------------------- select / get_select
+
+static int
+cotask_select(int nfds, 
+              fd_set *rfds, fd_set *wfds, fd_set *efds,
+              struct timeval *tm)
+{
+  // bypass
+  if (maintask==0 || (tm && tm->tv_sec==0 && tm->tv_usec<1000))
+    return select(nfds, rfds, wfds, efds, tm);
+  // copy parameters
+  unsigned long maxwait = 0;
+  coselect parm;
+  // set waiting info
+  curtask->wchan = (void*)&parm;
+  if (rfds || wfds || efds)
+    {
+      parm.nfds = nfds;
+      if (rfds) { parm.rset=*rfds; } else { FD_ZERO(&parm.rset); }
+      if (wfds) { parm.wset=*wfds; } else { FD_ZERO(&parm.wset); }
+      if (efds) { parm.eset=*efds; } else { FD_ZERO(&parm.eset); }
+      curtask->wselect = &parm;
+    }
+  if (tm) 
+    {
+      maxwait = time_elapsed(0) + tm->tv_sec*1000 + tm->tv_usec/1000;
+      curtask->maxwait = &maxwait;
+    }
+  // reschedule
+  cotask_yield();
+  // call select to update masks
+  if (tm)
+    {
+      tm->tv_sec = maxwait/1000;
+      tm->tv_usec = 1000*(maxwait-1000*tm->tv_sec);
+    }
+  static timeval tmzero = {0,0};
+  return select(nfds, rfds, wfds, efds, &tmzero);
+}
+
+
+static void 
+cotask_get_select(int &nfds, fd_set *rfds, fd_set *wfds, fd_set *efds, 
+                  unsigned long &timeout)
+{
+  int ready = 1;
+  unsigned long minwait = MAXWAIT;
+  unsigned long elapsed = time_elapsed(0);
+  coselect allfds;
+  allfds.nfds=0;
+  FD_ZERO(&allfds.rset);
+  FD_ZERO(&allfds.wset);
+  FD_ZERO(&allfds.eset);
+  if (curtask)
+    {
+      cotask *q=curtask->next;
+      while (q != curtask)
+        {
+          ready++;
+          if (q->wchan)
+            {
+              if (q->wselect) 
+                coselect_merge(&allfds, q->wselect);
+              if (q->maxwait && *q->maxwait<minwait)
+                minwait = *q->maxwait;
+              ready--;
+            }
+          q = q->next;
+        }
+    }
+  timeout = 0;
+  nfds=allfds.nfds;
+  *rfds=allfds.rset;
+  *wfds=allfds.wset;
+  *efds=allfds.eset;
+  if (ready==1 && minwait>elapsed)
+    timeout = minwait-elapsed;
+}
+
+
+
+// -------------------------------------- utilities
+
+static void
+cotask_wakeup(void *wchan, int onlyone)
+{
+  if (maintask && curtask)
+    {
+      cotask *n = curtask->next;
+      cotask *q = n;
+      do 
+        { 
+          if (q->wchan == wchan)
+            {
+              q->wchan=0; 
+              q->maxwait=0; 
+              q->wselect=0; 
+              q->over = 0;
+	      if (onlyone)
+		return;
+            }
+          q = q->next;
+        } 
+      while (q!=n);
+    }
+}
+
+
+
+// -------------------------------------- libgcc hook
 
 #ifndef NO_LIBGCC_HOOKS
-  // These are exported by Leon's patched version of libgcc.a
-  // Let's hope that the egcs people will include the patch in
-  // the distributions.
+// These are exported by Leon's patched version of libgcc.a
+// Let's hope that the egcs people will include the patch in
+// the distributions.
 extern "C" 
 {
   extern void* (*__get_eh_context_ptr)(void);
   extern void* __new_eh_context(void);
 }
-#endif
 
-
-
-
-// -- cotask support
-
-static int
-cotask_switch(cotask *thr)
-{
-  if (thr != curtask)
-    {
-      cotask *old = curtask;
-      curtask = thr;
-      curtask->wchan = 0;
-      mach_switch(&old->regs, &curtask->regs);
-      return 0;
-    }
-  return 1;
-}
-
-static void
-cotask_release_all(int *wchan)
-{
-  int again = 0;
-  if (maintask && curtask)
-    again = 1;
-  while (again)
-    {
-      again = 0;
-      cotask *p = curtask;
-      do {
-        if (p->wchan == wchan)
-          {
-            cotask_switch(p);
-            again = 1;
-            break;
-          }
-        p = p->next;
-      } while (p != curtask);
-    }
-}
-
-#ifndef NO_LIBGCC_HOOKS
 // This function is called via the pointer __get_eh_context_ptr
 // by the internal mechanisms of egcs.  It must return the 
 // per-thread event handler context.  This is necessary to
@@ -704,67 +1128,9 @@ cotask_get_eh_context()
 }
 #endif
 
-static int
-tmcmp(const struct timeval *tp1, const struct timeval *tp2)
-{
-  if (tp1->tv_sec < tp2->tv_sec)
-    return -1;
-  if (tp1->tv_sec > tp2->tv_sec)
-    return  1;
-  if (tp1->tv_usec < tp2->tv_usec)
-    return -1;
-  if (tp1->tv_usec > tp2->tv_usec)
-    return  1;
-  return 0;
-}
-
-static void
-tmadd(struct timeval *tp1, const struct timeval *tp2)
-{
-  tp1->tv_sec += tp2->tv_sec;
-  tp1->tv_usec += tp2->tv_usec;
-  if (tp1->tv_usec > 1000000)
-    {
-      tp1->tv_usec -= 1000000;
-      tp1->tv_sec += 1;
-    }
-}
-
-static void
-tmsub(struct timeval *tp1, const struct timeval *tp2)
-{
-  if (tp1->tv_usec < tp2->tv_usec)
-    {
-      tp1->tv_usec += 1000000;
-      tp1->tv_sec -= 1;
-    }
-  tp1->tv_usec -= tp2->tv_usec;
-  tp1->tv_sec -= tp2->tv_sec;
-}
-
-static struct timeval tmzero = {0,0};
-
-static void
-fdadd(fd_set *set1, fd_set *set2, int nfds)
-{
-  if (set2)
-    for (int i=0; i<nfds; i++)
-      if (FD_ISSET(i, set2))
-        FD_SET(i, set1);
-}
-
-static int 
-pollselect(int nfds, fd_set *rfds, fd_set *wfds, fd_set *efds)
-{
-  fd_set copyr; FD_ZERO(&copyr); if (rfds) copyr = *rfds;
-  fd_set copyw; FD_ZERO(&copyw); if (wfds) copyw = *wfds;
-  fd_set copye; FD_ZERO(&copye); if (efds) copye = *efds;
-  return ::select(nfds, &copyr, &copyw, &copye, &tmzero);
-}
 
 
-
-// -- GThread
+// -------------------------------------- GThread
 
 static void (*scheduling_callback)(int) = 0;
 
@@ -793,6 +1159,7 @@ GThread::GThread(int stacksize)
       memset(maintask, 0, sizeof(cotask));
       maintask->next = maintask;
       maintask->prev = maintask;
+      gettimeofday(&time_base,NULL);
 #ifndef NO_LIBGCC_HOOKS
       maintask->ehctx =  (*__get_eh_context_ptr)();
       __get_eh_context_ptr = cotask_get_eh_context;
@@ -825,11 +1192,30 @@ GThread::~GThread()
   task = 0;
 }
 
-static GThread *starter;
-void GThread::start(void)
+
+static void startone(void);
+static void starttwo(GThread *thr);
+static GThread * volatile starter;
+
+static void
+startone(void)
 {
   GThread *thr = starter;
-  mach_switch(&starter->task->regs, &curtask->regs);
+  mach_switch(&thr->task->regs, &curtask->regs);
+  // Registers may still contain an improper pointer
+  // to the exception context.  We should neither 
+  // register cleanups nor register handlers.
+  starttwo(thr);
+  abort();
+}
+
+static void 
+starttwo(GThread *thr)
+{
+  // Hopefully this function reacquires 
+  // an exception context pointer. Therefore
+  // we can register the exception handlers.
+  // It is placed after ``startone'' to avoid inlining.
 #ifdef __EXCEPTIONS
   try 
     {
@@ -861,7 +1247,7 @@ void GThread::start(void)
 int 
 GThread::create(void (*entry)(void*), void *arg)
 {
-  if (task->prev)
+  if (task->next || task->prev)
     return -1;
   xentry = entry;
   xarg = arg;
@@ -872,11 +1258,10 @@ GThread::create(void (*entry)(void*), void *arg)
   task->prev->next = task;
   cotask *old = curtask;
   starter = this;
-  mach_start(&old->regs, 
-             (void*)GThread::start, 
+  mach_start(&old->regs, (void*)startone, 
              task->stack, task->stack+task->stacksize);
   if (scheduling_callback)
-    (*scheduling_callback)(0);
+    (*scheduling_callback)(CallbackCreate);
   return 0;
 }
 
@@ -887,113 +1272,22 @@ GThread::terminate()
     return;
   if (task==maintask)
     abort();
-  if (task->next)
+  if (task->prev && task->next)
     {
+      if (scheduling_callback)
+        (*scheduling_callback)(CallbackTerminate);
       task->prev->next = task->next;
       task->next->prev = task->prev;
-      task->next = 0;
+      task->prev = 0; // mark task as terminated...
       if (task == curtask)
-        yield();
+        cotask_yield();
     }
 }
 
 int
 GThread::yield()
 {
-  // Before initializing
-  if (! maintask)
-    return -1;
-  // Initialize variables
-  cotask *next = curtask->next;
-  if (! next)
-    // This is happening when a cotask calls terminate() itself
-    next = curtask->prev->next;
-  // Scheduling loop
- reschedule:
-  struct timeval cur;
-  cur.tv_sec = 0;
-  cur.tv_usec = 0;
-  cotask *p = next;
-  do 
-    {
-      if (p->wchan == 0)
-        return cotask_switch(p);
-      // check if waiting event set
-      if (*p->wchan > 0)
-        return cotask_switch(p);
-      // check if waiting timeout elapsed
-      if (p->wakup.tv_sec > 0)
-        {
-          if (cur.tv_sec==0)
-            gettimeofday(&cur, NULL);
-          if (tmcmp(&cur, &p->wakup) >= 0)
-            return cotask_switch(p);
-        }
-      // check if waiting file descriptors ready
-      if (p->nfds > 0)
-        if (pollselect(p->nfds, p->rdfds, p->wrfds, p->exfds))
-          return cotask_switch(p);            
-      p = p->next;
-    }
-  while (p != next);
-  // all tasks are waiting
-  struct timeval wakup;
-  cotask *waiter = 0 ;
-  fd_set rdfds, wrfds, exfds;
-  int nfds = 0;
-  FD_ZERO(&rdfds);
-  FD_ZERO(&wrfds);
-  FD_ZERO(&exfds);
-  // loop over task
-  p = next;
-  do 
-    {
-      // compute union of waiting file descriptors
-      if (p->wchan && p->nfds>0)
-        {
-          if (p->nfds > nfds)
-            nfds = p->nfds;
-          fdadd(&rdfds, p->rdfds, nfds);
-          fdadd(&wrfds, p->wrfds, nfds);
-          fdadd(&exfds, p->exfds, nfds);
-        }
-      // compute earliest wakup time
-      if (p->wchan && p->wakup.tv_sec>0)
-        if (waiter==0 || tmcmp(&p->wakup, &wakup) <= 0) 
-          {
-            waiter = p;
-            wakup = p->wakup;
-          }
-      // next task
-      p = p->next;
-    } 
-  while (p!=next);
-  // check for deadlock
-  if (waiter==0 && nfds==0)
-    {
-      fprintf(stderr,"panic: COTHREADS deadlock\n");
-      abort();
-    }
-  // check if timeout has expired
-  if (waiter)
-    {
-      gettimeofday(&cur, NULL);
-      if (tmcmp(&wakup, &cur) <= 0)
-        goto reschedule;
-      tmsub(&wakup, &cur);
-    }
-  // whole process waits.
-  ::select(nfds, &rdfds, &wrfds, &exfds, (waiter ? &wakup : 0));
-  goto reschedule;
-}
-
-
-void*
-GThread::current()
-{
-  if (curtask && curtask!=maintask)
-    return (void*)curtask;
-  return (void*)0;
+  return cotask_yield();
 }
 
 int 
@@ -1001,144 +1295,211 @@ GThread::select(int nfds,
                 fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
                 struct timeval *timeout)
 {
-  if (! maintask)
-    return ::select(nfds, readfds, writefds, exceptfds, timeout);
-  // Compute wakup date
-  struct timeval wakup = tmzero; 
-  if (timeout)
-    {
-      gettimeofday(&wakup, NULL);
-      tmadd(&wakup, timeout);
-    }
-  // Check if data is ready now
-  if (pollselect(nfds, readfds, writefds, exceptfds) == 0)
-    {
-      // Wait
-      int event = 0;
-      curtask->nfds = nfds;
-      curtask->rdfds = readfds;
-      curtask->wrfds = writefds;
-      curtask->exfds = exceptfds;
-      curtask->wakup = wakup;
-      curtask->wchan = &event;
-      yield();
-    }
-  // Compute remaining waiting time (as select does)
-  if (timeout)
-    {
-      *timeout = wakup;
-      gettimeofday(&wakup, 0);
-      if (tmcmp(timeout, &wakup) > 0)
-        tmsub(timeout, &wakup);
-      else
-        *timeout = tmzero;
-    }
-  // Run the real select in order to modify the masks.
-  return ::select(nfds, readfds, writefds, exceptfds, &tmzero);
-}
-
-// -- GCriticalSection
-
-GCriticalSection::GCriticalSection() 
-  : count(1), locker(0) 
-{	
-  ok = 1;
-}
-
-GCriticalSection::~GCriticalSection()
-{	
-  ok = 0;
-  cotask_release_all(&count);
-}
-
-void 
-GCriticalSection::lock() 
-{
-  if (count>0) {
-    count = 0;
-    locker = curtask;
-  } else if (locker==curtask) {
-    count -= 1;
-  } else if (ok) {
-    curtask->nfds = 0;
-    curtask->wakup.tv_sec = 0;
-    curtask->wchan = &count;
-    GThread::yield();
-    count = 0;
-    locker = curtask;
-  }
-}
-
-void 
-GCriticalSection::unlock() 
-{
-  if (locker == curtask)
-    {
-      count += 1;
-      if (count>0)
-        {
-          locker = 0;
-          if (scheduling_callback)
-            (*scheduling_callback)(1);
-        }
-    }
-}
-
-
-// -- GEvent
-
-GEvent::GEvent() 
-  : status(0) 
-{
-  ok = 1;
-}
-
-GEvent::~GEvent() 
-{
-  ok = 0;
-  cotask_release_all(&status);
+  return cotask_select(nfds, readfds, writefds, exceptfds, timeout);
 }
 
 void
-GEvent::set() 
+GThread::get_select(int &nfds, fd_set *rfds, fd_set *wfds, fd_set *efds, 
+                    unsigned long &timeout)
 {
-  status = 1;
+  cotask_get_select(nfds, rfds, wfds, efds, timeout);
+}
+
+inline void *
+GThread::current()
+{
+  if (curtask && curtask!=maintask)
+    return (void*)curtask;
+  return (void*)0;
+}
+
+
+// -------------------------------------- GMonitor
+
+GMonitor::GMonitor()
+  : count(1), locker(0)
+{
+  locker = 0;
+  ok = 1;
+}
+
+GMonitor::~GMonitor()
+{
+  ok = 0;
+  cotask_wakeup((void*)this, 0);
+  cotask_wakeup((void*)count, 0);    
+  cotask_yield();
+  // Because we know how the scheduler works, we know that this single call to
+  // yield will run all unblocked tasks and given them the chance to leave the
+  // scope of the monitor object.
+}
+
+void 
+GMonitor::enter()
+{
+  void *self = GThread::current();
+  if (count>0 || self!=locker)
+    {
+      while (ok && count<=0)
+        {
+          curtask->wchan = (void*)&count;
+          cotask_yield();
+        }
+      count = 1;
+      locker = self;
+    }
+  count -= 1;
+}
+
+void 
+GMonitor::leave()
+{
+  void *self = GThread::current();
+  if (ok && (count>0 || self!=locker))
+    THROW("Monitor was not acquired by this thread (GMonitor::leave)");
+  if (++count > 0)
+    cotask_wakeup((void*)&count, 1);
+}
+
+void
+GMonitor::signal()
+{
+  void *self = GThread::current();
+  if (count>0 || self!=locker)
+    THROW("Monitor was not acquired by this thread (GMonitor::signal)");
+  cotask_wakeup((void*)this, 1);
   if (scheduling_callback)
-    (*scheduling_callback)(2);
+    (*scheduling_callback)(GThread::CallbackUnblock);
 }
 
 void
-GEvent::wait()
+GMonitor::broadcast()
 {
-  if (ok && status<=0)
-    {
-      curtask->nfds = 0;
-      curtask->wakup.tv_sec = 0;
-      curtask->wchan = &status;
-      GThread::yield();
-    }
-  status = 0;
+  void *self = GThread::current();
+  if (count>0 || self!=locker)
+    THROW("Monitor was not acquired by this thread (GMonitor::broadcast)");
+  cotask_wakeup((void*)this, 0);
+  if (scheduling_callback)
+    (*scheduling_callback)(GThread::CallbackUnblock);
 }
 
 void
-GEvent::wait(int timeout) 
+GMonitor::wait()
 {
-  if (ok && status<=0) 
+  // Check state
+  void *self = GThread::current();
+  if (count>0 || locker!=self)
+    THROW("Monitor was not acquired by this thread (GMonitor::wait)");
+  // Wait
+  if (ok)
     {
-      gettimeofday(&curtask->wakup, NULL);
-      curtask->wakup.tv_sec += timeout/1000;
-      curtask->wakup.tv_usec += (timeout%1000)*1000;
-      if (curtask->wakup.tv_usec > 1000000) 
+      // Release
+      int sav_count = count;
+      count = 1;
+      // Wait
+      curtask->wchan = (void*)this;
+      cotask_yield();
+      // Re-acquire
+      while (ok && count <= 0)
         {
-          curtask->wakup.tv_usec -= 1000000;
-          curtask->wakup.tv_sec += 1;
+          curtask->wchan = &count;
+          cotask_yield();
         }
-      curtask->nfds = 0;
-      curtask->wchan = &status;
-      GThread::yield();
+      count = sav_count;
+      locker = self;
     }
-  status = 0;
+}
+
+void
+GMonitor::wait(unsigned long timeout) 
+{
+  // Check state
+  void *self = GThread::current();
+  if (count>0 || locker!=self)
+    THROW("Monitor was not acquired by this thread (GMonitor::wait)");
+  // Wait
+  if (ok)
+    {
+      // Release
+      int sav_count = count;
+      count = 1;
+      // Wait
+      unsigned long maxwait = time_elapsed(0) + timeout;
+      curtask->maxwait = &maxwait;
+      curtask->wchan = (void*)this;
+      cotask_yield();
+      // Re-acquire
+      while (ok && count<=0)
+        {
+          curtask->wchan = &count;
+          cotask_yield();
+        }
+      count = sav_count;
+      locker = self;
+    }
 }
 
 #endif
 
+GSafeFlags &
+GSafeFlags::operator=(const GSafeFlags & f)
+{
+   enter();
+   if (flags!=f.flags)
+   {
+      flags=f.flags;
+      broadcast();
+   }
+   leave();
+   return *this;
+}
+
+GSafeFlags::operator long(void) const
+{
+   long f;
+   ((GSafeFlags *) this)->enter();
+   f=flags;
+   ((GSafeFlags *) this)->leave();
+   return f;
+}
+
+bool
+GSafeFlags::test_and_modify(long set_mask, long clr_mask,
+			    long set_mask1, long clr_mask1)
+{
+   enter();
+   if ((flags & set_mask)==set_mask &&
+       (~flags & clr_mask)==clr_mask)
+   {
+      long new_flags=flags;
+      new_flags|=set_mask1;
+      new_flags&=~clr_mask1;
+      if (new_flags!=flags)
+      {
+	 flags=new_flags;
+	 broadcast();
+      }
+      leave();
+      return true;
+   }
+   leave();
+   return false;
+}
+
+void
+GSafeFlags::wait_and_modify(long set_mask, long clr_mask,
+			    long set_mask1, long clr_mask1)
+{
+   enter();
+   while((flags & set_mask)!=set_mask ||
+	 (~flags & clr_mask)!=clr_mask) wait();
+   long new_flags=flags;
+   new_flags|=set_mask1;
+   new_flags&=~clr_mask1;
+   if (flags!=new_flags)
+   {
+      flags=new_flags;
+      broadcast();
+   }
+   leave();
+}

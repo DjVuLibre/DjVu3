@@ -1,13 +1,15 @@
 //C-  -*- C++ -*-
 //C-
-//C-  Copyright (c) 1988 AT&T	
-//C-  All Rights Reserved 
+//C- Copyright (c) 1999 AT&T Corp.  All rights reserved.
 //C-
-//C-  THIS IS UNPUBLISHED PROPRIETARY SOURCE CODE OF AT&T
-//C-  The copyright notice above does not evidence any
-//C-  actual or intended publication of such source code.
+//C- This software may only be used by you under license from AT&T
+//C- Corp. ("AT&T"). A copy of AT&T's Source Code Agreement is available at
+//C- AT&T's Internet website having the URL <http://www.djvu.att.com/open>.
+//C- If you received this software without first entering into a license with
+//C- AT&T, you have an infringing copy of this software and cannot use it
+//C- without violating AT&T's intellectual property rights.
 //C-
-//C-  $Id: GURL.h,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $
+//C- $Id: GURL.h,v 1.1.1.2 1999-10-22 19:29:24 praveen Exp $
 
 #ifndef _GURL_H_
 #define _GURL_H_
@@ -19,31 +21,33 @@
 #include "GString.h"
 
 /** @name GURL.h
-    File #"GURL.h"# contains the implementation of the \Ref{GURL}
-    class used to store URLs in a system independent format.
+    Files #"GURL.h"# and #"GURL.cpp"# contain the implementation of the
+    \Ref{GURL} class used to store URLs in a system independent format.
     @memo System independent URL representation.
-    @author Andrei Erofeev
-    @version #$Id: GURL.h,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $#
+    @author Andrei Erofeev <eaf@research.att.com>
+    @version #$Id: GURL.h,v 1.1.1.2 1999-10-22 19:29:24 praveen Exp $#
 */
 
 //@{
 
-/** Accepts a URL starting from either #http:/# or #file:/# and
-    transforms it to a system independent format.
+/** System independent URL representation.
 
-    This class is nothing without \Ref{GOS} which does smart normalization
-    of local URLs. Basically it works as follows:
+    This class is used in the library to store URLs in a system independent
+    format. The idea to use a general class to hold URL arose after we
+    realized, that DjVu had to be able to access files both from the WEB
+    and from the local disk. While it is strange to talk about system
+    independence of HTTP URLs, file names formats obviously differ from
+    platform to platform. They may contain forward slashes, backward slashes,
+    colons as separators, etc. There maybe more than one URL corresponding
+    to the same file name. Compare #file:/dir/file.djvu# and
+    #file://localhost/dir/file.djvu#.
 
-    \begin{itemize}
-       \item If the URL starts from #http://# then #GURL# makes sure, that
-       every back slash is replaced by a forward one
-       \item If the URL starts from #file://# then it's passed to \Ref{GOS}
-       for normilizing (double convertion to file name and back to URL) to
-       a form similar to #file://localhost/dir/file#
-    \end{itemize}
+    To simplify a developer's life we have created this class, which contains
+    inside a canonical representation of URLs.
 
-    The class guarantees, that only forward slashes are used in the URL
-    name, and the URL is absolute.
+    File URLs are converted to internal format with the help of \Ref{GOS} class.
+
+    All other URLs are modified to contain only forward slashes.
 */
 
 class GURL
@@ -52,29 +56,38 @@ private:
    GString	url;
 
    void		init(void);
-   void		convertSlashes(void);
-   void		eatDots(void);
+   void		convert_slashes(void);
+   void		eat_dots(void);
+
+   static GString	protocol(const char * url);
 public:
-      /// Returns everything from the beginning and up to the last slash)
-   GURL		baseURL(void) const;
+      /// Extracts the {\em protocol} part from the URL and returns it
+   GString	protocol(void) const;
 
-      /// Returns part of the URL after the last slash
-   GString	fileURL(void) const;
+      /// Returns string after the first '#' or '%23'
+   GString	hash_argument(void) const;
 
-      /// Checks if the object contains NULL URL
-   int		isEmpty(void) const { return !url.length(); };
+      /// Erases everything after the first '#' or '%23'
+   void		clear_hash_argument(void);
+   
+      /** Returns the URL corresponding to the directory containing the document
+	  with this URL. */
+   GURL		base(void) const;
+
+      /// Returns the name part of this URL.
+   GString	name(void) const;
+
+      /// Checks if this is an empty URL
+   bool		is_empty(void) const;
 
       /// Checks if the URL is local (starts from #file:/#) or not
-   int		isLocal(void) const;
-
-      /** Checks that {\em url} is absolute, that is starts from
-	  #http:/# or #file:/# */
-   static bool	isAbsolute(const char * url_string);
+   bool		is_local_file_url(void) const;
 
       /** @name Concatenation operators
 	  Concatenate the GURL with the passed {\em name}. If the {\em name}
-	  is absolute, we just return #GURL(name)#. Otherwise it's appended to
-	  the GURL after a separating slash */
+	  is absolute (has non empty protocol prefix), we just return
+	  #GURL(name)#. Otherwise the name is appended to the GURL after a
+	  separating slash preserving possible URL suffixes following #;# or #?#. */
       //@{
       ///
    GURL		operator+(const char * name) const;
@@ -82,10 +95,13 @@ public:
    GURL		operator+(const GString & name) const;
       //@}
 
-      /// @return TRUE if {\em gurl1} and {\em gurl2} are the same
+      /// Returns TRUE if #gurl1# and #gurl2# are the same
    friend int	operator==(const GURL & gurl1, const GURL & gurl2);
 
-      /// @return Internal URL representation
+      /// Returns TRUE if #gurl1# and #gurl2# are different
+   friend int	operator!=(const GURL & gurl1, const GURL & gurl2);
+
+      /// Returns Internal URL representation
    operator	const char*(void) const { return url; };
 
       /** @name Constructors
@@ -117,17 +133,34 @@ GURL::operator+(const GString & name) const
    return (*this)+(const char *) name;
 }
 
-
 inline int
 operator==(const GURL & gurl1, const GURL & gurl2)
 {
    return gurl1.url==gurl2.url;
 }
 
+inline int
+operator!=(const GURL & gurl1, const GURL & gurl2)
+{
+   return gurl1.url!=gurl2.url;
+}
+
 inline unsigned int
 hash(const GURL & gurl)
 {
    return hash(gurl.url);
+}
+
+inline GString
+GURL::protocol(void) const
+{
+   return protocol(url);
+}
+
+inline bool
+GURL::is_empty(void) const
+{
+   return !url.length();
 }
 
 //@}

@@ -1,13 +1,13 @@
 //C-  -*- C++ -*-
 //C-
-//C-  Copyright (c) 1988 AT&T	
+//C-  Copyright (c) 1998 AT&T	
 //C-  All Rights Reserved 
 //C-
 //C-  THIS IS UNPUBLISHED PROPRIETARY SOURCE CODE OF AT&T
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: debug.h,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $
+//C-  $Id: debug.h,v 1.1.1.2 1999-10-22 19:29:23 praveen Exp $
 
 
 #ifndef _TEMPLATE_H_
@@ -52,16 +52,20 @@
     user specifies option #-debug# in the command line. Usage of
     #RUNTIME_DEBUG_ONLY# implies #DEBUGLVL=1# if not specified otherwise.
 
+    Finally, #-DDEBUG# can be used instead of #-DDEBUGLVL=1#.
+
     {\bf Historical Comment} --- Debug macros are rarely used in the reference
     DjVu library because Leon thinks that debugging messages unnecessarily
     clutter the code.  Debug macros are used everywhere in the plugin code
     because Andrew thinks that code without debugging messages is close to
-    useless.  No agreement could be reached.
+    useless.  No agreement could be reached. Neither could they agree on
+    if cluttering header files with huge documentation chunks helps to
+    improve code readability.
 
     @memo 
     Macros for printing debug messages.
     @version 
-    #$Id: debug.h,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $#
+    #$Id: debug.h,v 1.1.1.2 1999-10-22 19:29:23 praveen Exp $#
     @author
     Andrew Erofeev <eaf@research.att.com> -- initial implementation \\
     Leon Bottou <leonb@research.att.com> -- cleanups */
@@ -91,7 +95,7 @@
 
 // ------------ SUPPORT
 
-class Debug
+class Debug // DJVU_CLASS
 {
 private:
   int    id;
@@ -108,6 +112,7 @@ public:
   void          unlock();
   void          modify_indent(int rindent);
   // printing
+  Debug &	operator<<(bool b);
   Debug &	operator<<(char c);
   Debug &	operator<<(unsigned char c);
   Debug &	operator<<(int i);
@@ -123,7 +128,7 @@ public:
   Debug &	operator<<(const void * const p);
 };
 
-class DebugIndent
+class DebugIndent // DJVU_CLASS
 {
 private:
   int inc;
@@ -143,6 +148,7 @@ public:
 
 #define DEBUG_MSG_LVL(level,x)   { ( Debug::lock(level,0) << x ).unlock(); }
 #define DEBUG_MSGN_LVL(level,x)  { ( Debug::lock(level,1) << x ).unlock(); }
+#define DEBUG_MSGF_LVL(level,x)  { ( Debug::lock(level,1) << x ).unlock(); }
 
 #else /* DEBUGLVL <= 0 */
 

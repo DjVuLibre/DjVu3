@@ -1,13 +1,15 @@
 //C-  -*- C++ -*-
 //C-
-//C-  Copyright (c) 1988 AT&T	
-//C-  All Rights Reserved 
+//C- Copyright (c) 1999 AT&T Corp.  All rights reserved.
 //C-
-//C-  THIS IS UNPUBLISHED PROPRIETARY SOURCE CODE OF AT&T
-//C-  The copyright notice above does not evidence any
-//C-  actual or intended publication of such source code.
+//C- This software may only be used by you under license from AT&T
+//C- Corp. ("AT&T"). A copy of AT&T's Source Code Agreement is available at
+//C- AT&T's Internet website having the URL <http://www.djvu.att.com/open>.
+//C- If you received this software without first entering into a license with
+//C- AT&T, you have an infringing copy of this software and cannot use it
+//C- without violating AT&T's intellectual property rights.
 //C-
-//C-  $Id: GBitmap.h,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $
+//C- $Id: GBitmap.h,v 1.1.1.2 1999-10-22 19:29:24 praveen Exp $
 
 #ifndef _GBITMAP_H_
 #define _GBITMAP_H_
@@ -25,8 +27,8 @@
 /** @name GBitmap.h
 
     Files #"GBitmap.h"# and #"GBitmap.cpp"# implement class \Ref{GBitmap}.
-    Instances of these class represent bilevel or gray-level images. The
-    "bottom left" coordinate system is used consistently in the DjVu library.
+    Instances of this class represent bilevel or gray-level images. The
+    ``bottom left'' coordinate system is used consistently in the DjVu library.
     Line zero of a bitmap is the bottom line in the bitmap.  Pixels are
     organized from left to right within each line.  As suggested by its name,
     class #GBitmap# was initially a class for bilevel images only.  It was
@@ -40,9 +42,9 @@
     @memo
     Generic support for bilevel and gray-level images.
     @author
-    Leon Bottou <leonb@research.att.com>
+    L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: GBitmap.h,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $#
+    #$Id: GBitmap.h,v 1.1.1.2 1999-10-22 19:29:24 praveen Exp $#
 
  */
 //@{
@@ -57,15 +59,14 @@
 
     The bracket operator returns a pointer to the bytes composing one line of
     the image.  This pointer can be used to read or write the image pixels.
-    Following the general convention of the DjVu Reference Library, line zero
-    is always the bottom line of the image.
+    Line zero represents the bottom line of the image.
 
     The memory organization is setup in such a way that you can safely read a
     few pixels located in a small border surrounding all four sides of the
     image.  The width of this border can be modified using the function
-    \Ref{minborder}.  The border pixels are initialized to zero (e.g. white).
-    You should never write anything into border pixels because they are shared
-    between images and between lines.  */
+    \Ref{minborder}.  The border pixels are initialized to zero and therefore
+    represent white pixels.  You should never write anything into border
+    pixels because they are shared between images and between lines.  */
 
 class GBitmap : public GPEnabled
 {
@@ -139,9 +140,9 @@ public:
   /** Returns a pointer to the first byte of row #row#.
       This pointer can be used as an array to read or write the row elements. */
   unsigned char *operator[] (int row);
-  /** Returns the size of a row in memory.  This number is equal to the
-      difference between pointers to pixels located in the same column in
-      consecutive rows.  This difference can be larger than the number of
+  /** Returns the size of a row in memory (in pixels).  This number is equal
+      to the difference between pointers to pixels located in the same column
+      in consecutive rows.  This difference can be larger than the number of
       columns in the image. */
   unsigned int rowsize() const;
   /** Makes sure that the border is at least #minimum# pixels large.  This
@@ -154,12 +155,12 @@ public:
   /** @name Managing gray levels. */
   //@{
   /** Returns the number of gray levels. 
-      Value #2# denotes a gray level image. */
+      Value #2# denotes a bilevel image. */
   int  get_grays() const;
   /** Sets the number of gray levels without changing the pixels.
       Argument #grays# must be in range #2# to #256#. */
   void set_grays(int grays);
-  /** Changes the number of gray levels.  The argument #grays# must be in
+  /** Changes the number of gray levels.  The argument #grays# must be in the
       range #2# to #256#.  All the pixel values are then rescaled and clipped
       in range #0# to #grays-1#. */
   void change_grays(int grays);
@@ -185,12 +186,36 @@ public:
   unsigned int get_memory_usage() const;
   //@}
 
+  /** @name Accessing RLE data.
+      The next functions are useful for processing bilevel images
+      encoded using the run length encoding scheme.  These functions always return
+      zero if the bitmap is not RLE encoded.  Function \Ref{compress} must
+      be used to ensure that the bitmap is RLE encoded.  */
+  //@{
+  /** Gets the pixels for line #rowno#.  One line of pixel is stored as
+      #unsigned char# values into array #bits#.  Each pixel is either 1 or 0.
+      The array must be large enough to hold the whole line.  The number of
+      pixels is returned. */
+  int rle_get_bits(int rowno, unsigned char *bits) const;
+  /** Gets the lengths of all runs in line #rowno#.  The array #rlens# must be
+      large enough to accomodate #w+2# integers where #w# is the number of
+      columns in the image.  These integers represent the lengths of
+      consecutive runs of alternatively white or black pixels.  Lengths can be
+      zero in order to allow for lines starting with black pixels.  This
+      function returns the total number of runs in the line. */
+  int rle_get_runs(int rowno, int *rlens) const;
+  /** Gets the smallest rectangle enclosing black pixels.
+      Rectangle rect gives the coordinates of the smallest rectangle
+      containing all black pixels. Returns the number of black pixels. */
+  int rle_get_rect(GRect &rect) const;
+  //@}
+
   /** @name Additive Blit.  
       The blit functions are designed to efficiently construct an anti-aliased
       image by copying smaller images at predefined locations.  The image of a
       page, for instance, is composed by copying the images of characters at
       predefined locations.  These functions are fairly optimized.  They can
-      direclty use compressed GBitmaps (see \Ref{compress}).  We consider in
+      directly use compressed GBitmaps (see \Ref{compress}).  We consider in
       this section that each GBitmap comes with a coordinate system defined as
       follows.  Position (#0#,#0#) corresponds to the bottom left corner of
       the bottom left pixel.  Position (#1#,#1#) corresponds to the top right
@@ -201,7 +226,7 @@ public:
 
   //@{
   /** Performs an additive blit of the GBitmap #bm#.  The GBitmap #bm# is
-      first positionned above the current GBitmap in such a way that position
+      first positioned above the current GBitmap in such a way that position
       (#u#,#v#) in GBitmap #bm# corresponds to position (#u#+#x#,#v#+#y#) in
       the current GBitmap.  The value of each pixel in GBitmap #bm# is then
       added to the value of the corresponding pixel in the current GBitmap.
@@ -214,7 +239,7 @@ public:
       how the pixel values should be interpreted. */
   void blit(const GBitmap *bm, int x, int y);
   /** Performs an additive blit of the GBitmap #bm# with anti-aliasing.  The
-      GBitmap #bm# is first positionned above the current GBitmap in such a
+      GBitmap #bm# is first positioned above the current GBitmap in such a
       way that position (#u#,#v#) in GBitmap #bm# corresponds to position
       (#u#+#x#/#subsample#,#v#+#y#/#subsample#) in the current GBitmap.  This
       mapping results in a contraction of GBitmap #bm# by a factor
@@ -230,7 +255,7 @@ public:
       for instance GBitmap #bm# is a bilevel image (pixels can be #0# or #1#),
       the pixels of the current GBitmap can take values in range #0# to
       #subsample*subsample#.  Note that function #blit# does not change the
-      number of gray levels in the current GBitmap.  You may must call
+      number of gray levels in the current GBitmap.  You must call
       \Ref{set_grays} to indicate that there are #subsample^2+1# gray
       levels.  Since there is at most 256 gray levels, this also means that
       #subsample# should never be greater than #15#.
@@ -250,18 +275,19 @@ public:
       read using the ByteStream based constructor or initialization function.
       See \Ref{PNM and RLE file formats} for more information. */
   //@{
-  /** Saves the image into ByteStream #bs# using the PBM format.
-      Argument #raw# selects the "Raw PBM" or the "Ascii PBM" format.
-      The image is saved as a bilevel image. All non zero pixels are
-      considered black pixels. */
+  /** Saves the image into ByteStream #bs# using the PBM format.  Argument
+      #raw# selects the ``Raw PBM'' (1) or the ``Ascii PBM'' (0) format.  The
+      image is saved as a bilevel image.  All non zero pixels are considered
+      black pixels. See section \Ref{PNM and RLE file formats}. */
   void save_pbm(ByteStream &bs, int raw=1);
-  /** Saves the image into ByteStream #bs# using the PGM format.
-      Argument #raw# selects the "Raw PGM" or the "Ascii PGM" format. 
-      The image is saved as a gray level image. */
+  /** Saves the image into ByteStream #bs# using the PGM format.  Argument
+      #raw# selects the ``Raw PGM'' (1) or the ``Ascii PGM'' (0) format.  The
+      image is saved as a gray level image.  See section
+      \Ref{PNM and RLE file formats}. */
   void save_pgm(ByteStream &bs, int raw=1);
   /** Saves the image into ByteStream #bs# using the RLE file format.
       The image is saved as a bilevel image. All non zero pixels are
-      considered black pixels. */
+      considered black pixels. See section \Ref{PNM and RLE file formats}. */
   void save_rle(ByteStream &bs);
   //@}
 
@@ -271,20 +297,31 @@ public:
       address of the memory buffer allocated by this GBitmap object.  The
       offset of the first pixel in the bottom line is written into variable
       #offset#.  Other lines can be accessed using pointer arithmetic (see
-      \Ref{rowsize}).  The GBitmap object no longer "owns" the buffer: you
+      \Ref{rowsize}).  The GBitmap object no longer ``owns'' the buffer: you
       must explicitly de-allocate the buffer using #operator delete []#.  This
       de-allocation should take place after the destruction or the
       re-initialization of the GBitmap object.  This function will return a
-      null pointer if the GBitmap object does not "own" the buffer in the
+      null pointer if the GBitmap object does not ``own'' the buffer in the
       first place.  */
   unsigned char *take_data(size_t &offset);
   /** Initializes this GBitmap by borrowing a memory segment.  The GBitmap
       then directly addresses the memory buffer #data# provided by the user.
-      This buffer must be large enough to hold #w*h# bytes.  The GBitmap
-      object does not "own" the buffer: you must explicitly de-allocate the
-      buffer using #operator delete []#.  This de-allocation should take place
-      after the destruction or the re-initialization of the GBitmap object.  */
+      This buffer must be large enough to hold #w*h# bytes representing each
+      one pixel.  The GBitmap object does not ``own'' the buffer: you must
+      explicitly de-allocate the buffer using #operator delete []#.  This
+      de-allocation should take place after the destruction or the
+      re-initialization of the GBitmap object.  */
   void borrow_data(unsigned char *data, int w, int h);
+  /** Initializes this GBitmap by setting the size to #h# rows and #w#
+      columns, and directly addressing the memory buffer #rledata# provided by
+      the user.  This buffer contains #rledatalen# bytes representing the
+      bitmap in run length encoded form.  The GBitmap object then ``owns'' the
+      buffer (unlike #borrow_data# sigh!) and will deallocate this buffer when
+      appropriate: you should not deallocate this buffer yourself.  The
+      encoding of buffer #rledata# is similar to the data segment of the RLE
+      file format (without the header) documented in \Ref{PNM and RLE file
+      formats}.  */
+  void borrow_rle(unsigned char *rledata, unsigned int rledatalen, int w, int h);
   //@}
 
 
@@ -295,9 +332,10 @@ protected:
   unsigned short border;
   unsigned short bytes_per_row;
   unsigned short grays;
-  unsigned char *bytes;
-  unsigned char *bytes_data;
-  unsigned char *rle;
+  unsigned char  *bytes;
+  unsigned char  *bytes_data;
+  unsigned char  *rle;
+  unsigned char  **rlerows;
   unsigned int   rlelength;
 private:
   // helpers
@@ -328,11 +366,11 @@ public:
     NetPBM \URL{http://www.arc.umn.edu/GVL/Software/netpbm.html} or
     ImageMagick \URL{http://www.wizards.dupont.com/cristy/}.
     
-    {\bf RLE} --- The RLE file format is a simple run-length encoding scheme
-    for storing bilevel images.  Encoding or decoding a RLE encoded file is
-    extremely simple. Yet RLE encoded files are usually much smaller than the
-    corresponding PBM encoded files.  RLE files always begin with a header
-    line composed of:\\
+    {\bf RLE} --- The binary RLE file format is a simple run-length encoding
+    scheme for storing bilevel images.  Encoding or decoding a RLE encoded
+    file is extremely simple. Yet RLE encoded files are usually much smaller
+    than the corresponding PBM encoded files.  RLE files always begin with a
+    header line composed of:\\
     - the two characters #"R4"#,\\
     - one or more blank characters,\\
     - the number of columns, encoded using characters #"0"# to #"9"#,\\
@@ -432,7 +470,6 @@ GBitmap::minborder(int minimum)
         {
           GBitmap tmp(*this, minimum);
           delete [] bytes_data;
-          delete [] rle;
           bytes_per_row = tmp.bytes_per_row;
           bytes = bytes_data = tmp.bytes_data;
           tmp.bytes = tmp.bytes_data = 0;

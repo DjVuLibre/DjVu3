@@ -1,15 +1,17 @@
 //C-  -*- C++ -*-
 //C-
-//C-  Copyright (c) 1988 AT&T	
-//C-  All Rights Reserved 
+//C- Copyright (c) 1999 AT&T Corp.  All rights reserved.
 //C-
-//C-  THIS IS UNPUBLISHED PROPRIETARY SOURCE CODE OF AT&T
-//C-  The copyright notice above does not evidence any
-//C-  actual or intended publication of such source code.
+//C- This software may only be used by you under license from AT&T
+//C- Corp. ("AT&T"). A copy of AT&T's Source Code Agreement is available at
+//C- AT&T's Internet website having the URL <http://www.djvu.att.com/open>.
+//C- If you received this software without first entering into a license with
+//C- AT&T, you have an infringing copy of this software and cannot use it
+//C- without violating AT&T's intellectual property rights.
 //C-
-//C-  $Id: GOS.cpp,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $
+//C- $Id: GOS.cpp,v 1.1.1.2 1999-10-22 19:29:24 praveen Exp $
 
-// "$Id: GOS.cpp,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $"
+// "$Id: GOS.cpp,v 1.1.1.2 1999-10-22 19:29:24 praveen Exp $"
 
 #ifdef __GNUC__
 #pragma implementation
@@ -86,7 +88,7 @@
 
 
 // This code is derived from TL3 file fileio.c that I wrote a while ago.
-// I, Leon Bottou, thereby give AT&T a royalty-free non-exclusive
+// I, Leon Bottou, hereby give AT&T a royalty-free non-exclusive
 // license to do whatever they want with this code.
 
 
@@ -597,7 +599,6 @@ GOS::filename_to_url(const char *filename, const char *useragent)
     return "file:/" "/" + expand_name(filename);
 
   // Potentially unsafe characters (cf. RFC1738 and RFC1808)
-  const char *safe = "\\\"/@?#;%<>{}[]";
   const char *hex = "0123456789ABCDEF";
   
   // Normalize file name to url slash-and-escape syntax
@@ -728,6 +729,26 @@ GOS::url_to_filename(const char *url)
   // Return what we have
   return tmp;
 }
+
+
+// -----------------------------------------
+// Testing
+// -----------------------------------------
+
+#if defined(sun) && ! defined(svr4)
+// strerror() is not defined under SunOS.
+char *
+strerror(int errno)
+{
+  extern int sys_nerr;
+  extern char *sys_errlist[];
+  if (errno>0 && errno<sys_nerr) 
+    return sys_errlist[errno];
+  return "unknown stdio error";
+}
+#endif
+
+
 
 // -----------------------------------------
 // Testing

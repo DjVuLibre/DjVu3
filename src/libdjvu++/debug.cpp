@@ -1,17 +1,19 @@
 //C-  -*- C++ -*-
 //C-
-//C-  Copyright (c) 1988 AT&T	
+//C-  Copyright (c) 1998 AT&T	
 //C-  All Rights Reserved 
 //C-
 //C-  THIS IS UNPUBLISHED PROPRIETARY SOURCE CODE OF AT&T
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: debug.cpp,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $
+//C-  $Id: debug.cpp,v 1.1.1.2 1999-10-22 19:29:23 praveen Exp $
 
-// $Id: debug.cpp,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $
 
 #include "debug.h"
+
+#if ( DEBUGLVL > 0 )
+
 #include "GThreads.h"
 #include "GContainer.h"
 #include <stdarg.h>
@@ -29,9 +31,6 @@
 #endif
 #endif
 #endif
-
-
-#if ( DEBUGLVL > 0 )
 
 static GCriticalSection debug_lock;
 #ifdef RUNTIME_DEBUG_ONLY
@@ -159,6 +158,11 @@ Debug::unlock()
 #define OP(type, fmt) \
 Debug& Debug::operator<<(type arg)\
 { format(fmt, arg); return *this; }
+
+Debug& Debug::operator<<(bool arg)
+{
+   format("%s", arg ? "TRUE" : "FALSE"); return *this;
+}
 
 OP(char, "%c")
 OP(unsigned char, "%c")

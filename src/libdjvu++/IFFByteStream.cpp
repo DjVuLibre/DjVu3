@@ -1,15 +1,17 @@
 //C-  -*- C++ -*-
 //C-
-//C-  Copyright (c) 1988 AT&T	
-//C-  All Rights Reserved 
+//C- Copyright (c) 1999 AT&T Corp.  All rights reserved.
 //C-
-//C-  THIS IS UNPUBLISHED PROPRIETARY SOURCE CODE OF AT&T
-//C-  The copyright notice above does not evidence any
-//C-  actual or intended publication of such source code.
+//C- This software may only be used by you under license from AT&T
+//C- Corp. ("AT&T"). A copy of AT&T's Source Code Agreement is available at
+//C- AT&T's Internet website having the URL <http://www.djvu.att.com/open>.
+//C- If you received this software without first entering into a license with
+//C- AT&T, you have an infringing copy of this software and cannot use it
+//C- without violating AT&T's intellectual property rights.
 //C-
-//C-  $Id: IFFByteStream.cpp,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $
+//C- $Id: IFFByteStream.cpp,v 1.1.1.2 1999-10-22 19:29:24 praveen Exp $
 
-// File "$Id: IFFByteStream.cpp,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $"
+// File "$Id: IFFByteStream.cpp,v 1.1.1.2 1999-10-22 19:29:24 praveen Exp $"
 // -- Implementation of IFFByteStream
 // - Author: Leon Bottou, 06/1998
 
@@ -23,10 +25,9 @@
 
 
 // Constructor
-IFFByteStream::IFFByteStream(ByteStream *bs)
-: ctx(0), bs(bs), dir(0)
+IFFByteStream::IFFByteStream(ByteStream &xbs)
+  : ctx(0), bs(&xbs), dir(0)
 {
-  assert(bs);
   offset = seekto = bs->tell();
 }
 
@@ -148,7 +149,8 @@ IFFByteStream::get_chunk(GString &chkid, int *rawoffsetptr, int *rawsizeptr)
       return 0;
     if (bytes != 4)
       THROW("EOF");
-  } while (! memcmp((void*)buffer, (void*)"AT&T", 4));
+  } while (buffer[0]==0x41 && buffer[1]==0x54 && 
+           buffer[2]==0x26 && buffer[3]==0x54  );
   
   // Read chunk size
   if (ctx && offset+4 > ctx->offEnd)
@@ -296,17 +298,18 @@ IFFByteStream::close_chunk()
     THROW("Cannot close chunk when no chunk is open");
   // Patch size field in new chunk
   if (dir > 0)
-  {
-    char buffer[4];
-    long size = offset - ctx->offStart;
-    buffer[0] = (unsigned char)(size>>24);
-    buffer[1] = (unsigned char)(size>>16);
-    buffer[2] = (unsigned char)(size>>8);
-    buffer[3] = (unsigned char)(size);
-    bs->seek(ctx->offStart - 4);
-    bs->writall((void*)buffer, 4);
-    bs->seek(offset);
-  }
+    {
+      ctx->offEnd = offset;
+      long size = ctx->offEnd - ctx->offStart;
+      char buffer[4];
+      buffer[0] = (unsigned char)(size>>24);
+      buffer[1] = (unsigned char)(size>>16);
+      buffer[2] = (unsigned char)(size>>8);
+      buffer[3] = (unsigned char)(size);
+      bs->seek(ctx->offStart - 4);
+      bs->writall((void*)buffer, 4);
+      bs->seek(offset);
+    }
   // Arrange for reader to seek at next chunk
   seekto = ctx->offEnd;
   // Remove ctx record
@@ -361,7 +364,11 @@ IFFByteStream::read(void *buffer, size_t size)
 {
   if (! (ctx && dir < 0))
     THROW("IFFByteStream not ready for reading bytes");
-  assert(seekto <= offset);
+  // Seek if necessary
+  if (seekto > offset) {
+    bs->seek(seekto);
+    offset = seekto;
+  }
   // Ensure that read does not extend beyond chunk
   if (offset > ctx->offEnd)
     THROW("IFFByteStream (internal error) offset beyond chunk boundary");
@@ -382,7 +389,8 @@ IFFByteStream::write(const void *buffer, size_t size)
 {
   if (! (ctx && dir > 0))
     THROW("IFFByteStream not ready for writing bytes");
-  assert(seekto <= offset);
+  if (seekto > offset)
+    THROW("Cannot write until previous chunk is complete");
   size_t bytes = bs->write(buffer, size);
   offset += bytes;
   return bytes;

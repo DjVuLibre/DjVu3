@@ -1,13 +1,15 @@
 //C-  -*- C++ -*-
 //C-
-//C-  Copyright (c) 1988 AT&T	
-//C-  All Rights Reserved 
+//C- Copyright (c) 1999 AT&T Corp.  All rights reserved.
 //C-
-//C-  THIS IS UNPUBLISHED PROPRIETARY SOURCE CODE OF AT&T
-//C-  The copyright notice above does not evidence any
-//C-  actual or intended publication of such source code.
+//C- This software may only be used by you under license from AT&T
+//C- Corp. ("AT&T"). A copy of AT&T's Source Code Agreement is available at
+//C- AT&T's Internet website having the URL <http://www.djvu.att.com/open>.
+//C- If you received this software without first entering into a license with
+//C- AT&T, you have an infringing copy of this software and cannot use it
+//C- without violating AT&T's intellectual property rights.
 //C-
-//C-  $Id: TestThreads.cpp,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $
+//C- $Id: TestThreads.cpp,v 1.1.1.2 1999-10-22 19:29:25 praveen Exp $
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -41,6 +43,8 @@ readfile()
 {
   char c;
   int fd = open(__FILE__, O_RDONLY, 0666);
+  if (fd < 0)
+    { fprintf(stderr,"Cannot open file '" __FILE__ "'."); exit(1); }
   while (read(fd, &c, 1)==1) 
     { 
       GThread::yield(); 
@@ -71,6 +75,8 @@ alloc()
   int size = 1;
   char *mem = (char*)malloc(1);
   FILE *f = fopen(__FILE__,"r");
+  if (f == 0)
+    { fprintf(stderr,"Cannot open file '" __FILE__ "'."); exit(0); }
   while (!feof(f))
     {
       mem = (char*)realloc(mem, size+1);
@@ -103,7 +109,7 @@ second(void *arg)
 
 GEvent sleeper;
 
-void
+int
 main()
 {
   th.create(second,(void*)1);
