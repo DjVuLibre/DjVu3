@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: DataPool.cpp,v 1.48 2000-06-06 18:59:38 bcr Exp $
+//C- $Id: DataPool.cpp,v 1.49 2000-06-28 19:25:34 mrosen Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -991,25 +991,28 @@ DataPool::load_file(void)
       DEBUG_MSG("loading the data.\n");
 
       GCriticalSectionLock lock1(&class_stream_lock);
+      
       if (!stream || !stream_lock)
-	 OpenFiles::get()->request_stream(fname, this, stream, &stream_lock);
-      GCriticalSectionLock lock2(stream_lock);
+	      OpenFiles::get()->request_stream(fname, this, stream, &stream_lock);
+      {     // Extra scoping to work-around problem with stream being released 
+            // before the locks destructor is called.
+         GCriticalSectionLock lock2(stream_lock);
 
-      data=new MemoryByteStream();
-      block_list.clear();
-      FCPools::get()->del_pool(fname, this);
-      fname="";
+         data=new MemoryByteStream();
+         block_list.clear();
+         FCPools::get()->del_pool(fname, this);
+         fname="";
 
-      stream->seek(0, SEEK_SET);
-      char buffer[1024];
-      int length;
-      while((length=stream->read(buffer, 1024)))
-	 add_data(buffer, length);
-	 // No need to set EOF. It should already be set.
-
+         stream->seek(0, SEEK_SET);
+         char buffer[1024];
+         int length;
+         while((length=stream->read(buffer, 1024)))
+	         add_data(buffer, length);
+	    // No need to set EOF. It should already be set.
+      }
       OpenFiles::get()->stream_released(stream, this);
       stream=0;
-   } else DEBUG_MSG("Not connected\n");
+      } else DEBUG_MSG("Not connected\n");
 }
 
 void
