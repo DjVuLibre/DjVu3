@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: GOS.cpp,v 1.41 2001-01-03 01:24:07 fcrary Exp $
+// $Id: GOS.cpp,v 1.42 2001-01-03 15:49:36 fcrary Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -1053,16 +1053,18 @@ GOS::url_to_filename(const char *url)
   //remove all leading slashes
   while(*url=='/')
     url++;
-#endif
+  // Remove possible localhost spec
+  if ( !strncmp(url, localhost, strlen(localhost)) )
+    url += strlen(localhost);
+  //remove all leading slashes
+  while(*url=='/')
+    url++;
+#else
   
   // Remove possible localhost spec
   if ( !strncmp(url, localhostspec, strlen(localhostspec)) )
     url += strlen(localhostspec);
-  
-#ifdef macintosh
-  //remove all leading slashes
-  while(*url=='/')
-    url++;
+
 #endif
   
   // Check if we are finished
