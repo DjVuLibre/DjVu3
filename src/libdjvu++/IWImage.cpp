@@ -9,9 +9,9 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: IWImage.cpp,v 1.10.2.1 1999-03-23 21:14:09 leonb Exp $
+//C- $Id: IWImage.cpp,v 1.10.2.2 1999-03-24 15:40:31 leonb Exp $
 
-// File "$Id: IWImage.cpp,v 1.10.2.1 1999-03-23 21:14:09 leonb Exp $"
+// File "$Id: IWImage.cpp,v 1.10.2.2 1999-03-24 15:40:31 leonb Exp $"
 // - Author: Leon Bottou, 08/1998
 
 #ifdef __GNUC__
@@ -2123,7 +2123,7 @@ IWBitmap::get_bitmap(int subsample, const GRect &rect)
 
 
 int
-IWBitmap::decode_chunk(ByteStream &bs)
+IWBitmap::decode_chunk(ByteStream &bs, int maxslice)
 {
   // Check
   if (ycodec && ycodec->encoding)
@@ -2181,6 +2181,8 @@ IWBitmap::decode_chunk(ByteStream &bs)
   assert(ycodec);
   _ZPCodecBias zp(bs, 0);
   int flag = 1;
+  if (nslices > maxslice)
+    nslices = maxslice;
   while (flag && cslice<nslices)
     {
       flag = ycodec->code_slice(zp);
@@ -2687,7 +2689,7 @@ IWPixmap::get_pixmap(int subsample, const GRect &rect)
 
 
 int
-IWPixmap::decode_chunk(ByteStream &bs)
+IWPixmap::decode_chunk(ByteStream &bs, int maxslice)
 {
   // Check
   if (ycodec && ycodec->encoding)
@@ -2759,6 +2761,8 @@ IWPixmap::decode_chunk(ByteStream &bs)
   assert(ycodec);
   _ZPCodecBias zp(bs, 0);
   int flag = 1;
+  if (nslices > maxslice)
+    nslices = maxslice;
   while (flag && cslice<nslices)
     {
       flag = ycodec->code_slice(zp);
