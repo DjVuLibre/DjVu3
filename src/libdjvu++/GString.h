@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.h,v 1.74 2001-05-18 18:30:04 bcr Exp $
+// $Id: GString.h,v 1.75 2001-05-23 20:20:59 fcrary Exp $
 // $Name:  $
 
 #ifndef _GSTRING_H_
@@ -57,7 +57,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.74 2001-05-18 18:30:04 bcr Exp $# */
+    #$Id: GString.h,v 1.75 2001-05-23 20:20:59 fcrary Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -975,6 +975,7 @@ public:
 #ifdef UNDER_CE
 #define GBaseString GUTF8String
 #endif
+
 class GNativeString : public GBaseString
 {
 public:
@@ -995,7 +996,9 @@ public:
   /// Construct from base class.
   GNativeString(const GP<GStringRep> &str);
   GNativeString(const GBaseString &str); 
+#ifndef UNDER_CE
   GNativeString(const GUTF8String &str);
+#endif
   GNativeString(const GNativeString &str);
   /** Constructs a string from a character array.  Elements of the character
       array #dat# are added into the string until the string length reaches
@@ -1223,7 +1226,11 @@ GStringRep::UTF8ToNative( const char *s )
 inline GP<GStringRep> 
 GStringRep::NativeToUTF8( const char *s )
 {
+#ifdef UNDER_CE
+  return GStringRep::UTF8::create(s);
+#else
   return GStringRep::Native::create(s)->toUTF8();
+#endif // UNDER_CE
 }
 
 inline GBaseString::GBaseString(void) { init(); }
@@ -1289,7 +1296,7 @@ inline
 GNativeString::GNativeString(const double number) : GUTF8String(number) {}
 inline
 GNativeString::GNativeString(const GNativeString &fmt, va_list &args)
-: GUTF8String(fmt,va_list) {}
+: GUTF8String(fmt,args) {}
 
 #else // UNDER_CE
 

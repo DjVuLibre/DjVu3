@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.103 2001-05-21 16:24:36 bcr Exp $
+// $Id: GString.cpp,v 1.104 2001-05-23 20:20:59 fcrary Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -131,6 +131,8 @@ GStringRep::ChangeLocale::~ChangeLocale()
   }
 }
 
+#endif // UNDER_CE
+
 GP<GStringRep>
 GStringRep::strdup(const char *s) const
 {
@@ -149,8 +151,6 @@ GStringRep::strdup(const char *s) const
   }
   return retval;
 }
-
-#endif // UNDER_CE
 
 GP<GStringRep>
 GStringRep::substr(const char *s,const int start,const int len) const
@@ -992,11 +992,19 @@ GStringRep::UTF8::toNative(const bool) const
       }
     }
     r[0]=0;
+#ifdef UNDER_CE
+    retval = UTF8::create( (const char *)buf );
+  } else
+  {
+    retval = UTF8::create( (size_t)0 );
+  }
+#else
     retval=Native::create((const char *)buf);
   }else
   {
     retval=Native::create((size_t)0);
   }
+#endif
   return retval;
 }
 
