@@ -215,6 +215,7 @@ int
 main(int argc,char *argv[],char *[])
 {
   FILE *log=0;
+  int ignore_error=0;
   int bundled_only=0;
   int status=1;
   struct stat statbuf;
@@ -226,6 +227,12 @@ main(int argc,char *argv[],char *[])
       log=stdout;
       argc--;
       argv++;
+    }else if(!strcmp(argv[1],"-force")||!strcmp(argv[1],"--force"))
+    {
+      ignore_error=1;
+      argc--;
+      argv++;
+      break;
     }else if(!strcmp(argv[1],"--"))
     {
       argc--;
@@ -287,21 +294,21 @@ main(int argc,char *argv[],char *[])
       if(!basename++)
         basename=newindex;
 
-      char *where=new char [strlen(tmp)+strlen(basename)+2];
-      sprintf(where,"%s/%s",(const char *)tmp,basename);
-      if(log) fprintf(log,"Saving new document as: %s\n",where);
+      if(log) fprintf(log,"Saving new document as: %s/%s\n",(const char *)tmp,basename);
       if(doc->get_doc_type() == DjVuDocument::OLD_BUNDLED)
       {
-        doc->save_as(where,1);
+        char *where=new char [strlen(tmp)+strlen(basename)+2];
+        sprintf(where,"%s/%s",(const char *)tmp,basename);
+        doc->save_as(where,0,ignore_error);
+        delete [] where;
       }else if(doc->get_doc_type() == DjVuDocument::OLD_INDEXED)
       {
-        doc->save_as(where,0);
+        doc->expand((const char *)tmp,basename,ignore_error);
       }else
       {
         fprintf(stderr,"%s is an unrecognized format\n",oldindex);
         usage(prog,1);
       }
-      delete [] where;
       doc=0;
       TempDir save(oldindex,TempDir::RENAME_ALL);
       for (GPosition i = filenames; i; ++i)
@@ -317,7 +324,7 @@ main(int argc,char *argv[],char *[])
   } 
   CATCH(ex)
   {
-    ex.perror("Test");
+    ex.perror("Exception Caught");
   }
   ENDCATCH;
   exit(status);

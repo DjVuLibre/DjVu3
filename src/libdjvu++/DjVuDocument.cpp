@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.65 1999-11-18 23:24:20 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.66 1999-11-19 15:56:59 bcr Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -1221,7 +1221,7 @@ add_file_to_djvm(const GP<DjVuFile> & file, bool page,
 }
 
 GP<DjVmDoc>
-DjVuDocument::get_djvm_doc(void)
+DjVuDocument::get_djvm_doc(const bool SkipErrors)
       // This function may block for data
 {
    check();
@@ -1250,11 +1250,30 @@ DjVuDocument::get_djvm_doc(void)
       DEBUG_MSG("Converting: the document is in an old format.\n");
 
       GMap<GURL, void *> map_add;
-      for(int page_num=0;page_num<ndir->get_pages_num();page_num++)
+      if(!SkipErrors)
       {
-	 GP<DjVuFile> file=url_to_file(ndir->page_to_url(page_num));
-	 GMap<GURL, void *> map_del;
-	 add_file_to_djvm(file, true, *doc, map_add);
+        for(int page_num=0;page_num<ndir->get_pages_num();page_num++)
+        {
+  	   GP<DjVuFile> file=url_to_file(ndir->page_to_url(page_num));
+	   GMap<GURL, void *> map_del;
+	   add_file_to_djvm(file, true, *doc, map_add);
+        }
+      }else
+      {
+        for(int page_num=0;page_num<ndir->get_pages_num();page_num++)
+        {
+           TRY {
+  	     GP<DjVuFile> file=url_to_file(ndir->page_to_url(page_num));
+	     GMap<GURL, void *> map_del;
+	     add_file_to_djvm(file, true, *doc, map_add);
+           }
+           CATCH(ex)
+           {
+             ex.perror();
+             fprintf(stderr,"Skiping page %d\n",page_num);
+           }
+           ENDCATCH;
+        }
       }
    }
    return doc;
@@ -1279,17 +1298,18 @@ DjVuDocument::write(ByteStream & str, bool force_djvm)
 }
 
 void
-DjVuDocument::expand(const char * dir_name, const char * idx_name)
+DjVuDocument::expand(const char * dir_name, const char * idx_name, const bool SkipErrors)
 {
    DEBUG_MSG("DjVuDocument::expand(): dir_name='" << dir_name << "'\n");
    DEBUG_MAKE_INDENT(3);
    
-   GP<DjVmDoc> doc=get_djvm_doc();
+   GP<DjVmDoc> doc=get_djvm_doc(SkipErrors);
    doc->expand(dir_name, idx_name);
 }
 
 void
-DjVuDocument::save_as(const char * where, bool bundled)
+DjVuDocument::save_as
+(const char where[], const bool bundled,const bool SkipErrors)
 {
    DEBUG_MSG("DjVuDocument::save_as(): where='" << where <<
 	     "', bundled=" << bundled << "\n");
@@ -1302,5 +1322,5 @@ DjVuDocument::save_as(const char * where, bool bundled)
       DataPool::load_file(full_name);
       StdioByteStream str(full_name, "wb");
       write(str);
-   } else expand(GOS::dirname(full_name), GOS::basename(full_name));
+   } else expand(GOS::dirname(full_name), GOS::basename(full_name),SkipErrors);
 }

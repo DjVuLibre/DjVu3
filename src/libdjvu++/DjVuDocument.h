@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.h,v 1.40 1999-11-18 23:24:19 eaf Exp $
+//C- $Id: DjVuDocument.h,v 1.41 1999-11-19 15:57:00 bcr Exp $
  
 #ifndef _DJVUDOCUMENT_H
 #define _DJVUDOCUMENT_H
@@ -33,7 +33,7 @@
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@research.att.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocument.h,v 1.40 1999-11-18 23:24:19 eaf Exp $#
+    @version #$Id: DjVuDocument.h,v 1.41 1999-11-19 15:57:00 bcr Exp $#
 */
 
 //@{
@@ -544,7 +544,7 @@ public:
 	  {\bf Plugin Warning}. This function will read contents of the whole
 	  document. Thus, if you call it from the main thread (the thread,
 	  which transfers data from Netscape), the plugin will block. */
-   GP<DjVmDoc>		get_djvm_doc(void);
+   GP<DjVmDoc>		get_djvm_doc(const bool SkipErrors=0);
       /** Saves the document in the {\em new bundled} format. All the data
 	  is "bundled" into one file and this file is written into the
 	  passed stream.
@@ -574,7 +574,8 @@ public:
 	         directory (basically, list of all files composing the document).
       */
    void			expand(const char * dir_name,
-			       const char * idx_name);
+			       const char * idx_name,
+                               const bool SkipErrors=0);
       /** This function can be used instead of \Ref{write}() and \Ref{expand}().
 	  It allows to save the document either in the new #BUNDLED# format
 	  or in the new #INDIRECT# format depending on the value of parameter
@@ -586,7 +587,9 @@ public:
 	     \item For #INDIRECT# documents this is the name of top-level
 	           index file. All document files will be saved into the
 		   save directory where the index file will resize. */
-   virtual void		save_as(const char * where, bool bundled);
+   virtual void		save_as(const char where[],
+                          const bool bundled=0,
+                          const bool SkipErrors=0);
       //@}
       /** Returns pointer to the internal directory of the document, if it
 	  is in one of the new formats: #BUNDLED# or #INDIRECT#.
@@ -597,7 +600,7 @@ public:
 	  learnt enough information about the document (#DOC_DIR_KNOWN# has
 	  not been set yet). Check \Ref{is_init_complete}() and \Ref{init}()
           for details. */
-   GP<DjVmDir>		get_djvm_dir(void) const;
+   inline GP<DjVmDir>		get_djvm_dir(void) const;
 
       /// Returns TRUE if #class_name# is #"DjVuDocument"# or #"DjVuPort"#
    virtual bool		inherits(const char * class_name) const;
