@@ -84,10 +84,10 @@ generate_makefile src/libdjvu++/Test
 generate_main_makefile src/libdjvu++ <<\EOF
 
 all: 
-    	( cd src/libdjvu++; $(MAKE) lib prog )
+	( cd src/libdjvu++; $(MAKE) lib prog )
 
 install:
-    	( cd src/libdjvu++; $(MAKE) install-lib install-prog )
+	( cd src/libdjvu++; $(MAKE) install-lib install-prog )
 
 EOF
 
