@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessage.cpp,v 1.44 2001-05-03 16:35:31 fcrary Exp $
+// $Id: DjVuMessage.cpp,v 1.45 2001-05-04 19:00:14 fcrary Exp $
 // $Name:  $
 
 
@@ -62,7 +62,7 @@ static const char *uparameter=ERR_MSG("DjVuMessage.Parameter");
 static const char unrecognized_default[] =
   "** Unrecognized DjVu Message: [Contact LizardTech for assistance]\n"
   "\t** Message name:  %1!s!";
-static const char uparameter_default[]="Parameter: %1!s!";
+static const char uparameter_default[]="\t   Parameter: %1!s!";
 static const char *failed_to_parse_XML=ERR_MSG("DjVuMessage.failed_to_parse_XML");
 static const char failed_to_parse_XML_default[]=
   "Failed to parse XML message file:&#10;&#09;&apos;%1!s!&apos;.";
@@ -243,9 +243,11 @@ GetProfilePaths(void)
         paths.append(path);
     }
 #endif
+
     path=GURL::Filename::UTF8(RootDjVuDir);
     if(!path.is_empty() && path.is_dir())
       paths.append(path);
+
     GUTF8String oldlocale(setlocale(LC_CTYPE,0));
     GUTF8String defaultlocale((oldlocale.search('_') < 0)
       ?setlocale(LC_CTYPE,"")
