@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuPalette.cpp,v 1.28 2001-07-24 17:52:04 bcr Exp $
+// $Id: DjVuPalette.cpp,v 1.29 2001-09-24 20:19:12 leonb Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -546,7 +546,7 @@ DjVuPalette::decode(GP<ByteStream> gbs)
 int main(int argc, char **argv)
 {
 
-   DArray<GString> dargv(0,argc-1);
+   GArray<GString> dargv(0,argc-1);
    for( int i=0; i < argc; ++i)
    {
       GString g(argv[i]);

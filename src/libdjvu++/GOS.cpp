@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GOS.cpp,v 1.62 2001-07-24 17:52:04 bcr Exp $
+// $Id: GOS.cpp,v 1.63 2001-09-24 20:19:12 leonb Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -407,7 +407,7 @@ GOS::getenv(const GUTF8String &name)
 int main(int argc, char **argv)
 {
 
-   DArray<GString> dargv(0, argc-1);
+   GArray<GString> dargv(0, argc-1);
    for ( int i=0; i<argc; ++i)
    {
       GString g(argv[i]);
