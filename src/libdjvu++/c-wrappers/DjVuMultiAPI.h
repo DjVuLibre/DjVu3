@@ -1,3 +1,18 @@
+#ifdef __cplusplus
+//C-  -*- C++ -*-
+//C-
+//C- Copyright (c) 1999 AT&T Corp.  All rights reserved.
+//C-
+//C- This software may only be used by you under license from AT&T
+//C- Corp. ("AT&T"). A copy of AT&T's Source Code Agreement is available at
+//C- AT&T's Internet website having the URL <http://www.djvu.att.com/open>.
+//C- If you received this software without first entering into a license with
+//C- AT&T, you have an infringing copy of this software and cannot use it
+//C- without violating AT&T's intellectual property rights.
+//C-
+//C- $Id: DjVuMultiAPI.h,v 1.3 2000-01-06 20:10:44 praveen Exp $
+#endif
+
 #ifndef __DJVUMULTIAPI_H__
 #define __DJVUMULTIAPI_H__
 /** @name DjVuMultiAPI.h
@@ -7,6 +22,13 @@
     @version
     
 */
+
+/* 
+ * $Log: DjVuMultiAPI.h,v $
+ * Revision 1.3  2000-01-06 20:10:44  praveen
+ * added DjVu decode interface file
+ *
+ */
 
 /*
  *  ------------------------------------------------------------------------
