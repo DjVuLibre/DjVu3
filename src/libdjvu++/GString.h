@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.h,v 1.32 2001-04-05 19:34:52 chrisp Exp $
+// $Id: GString.h,v 1.33 2001-04-06 16:55:28 chrisp Exp $
 // $Name:  $
 
 #ifndef _GSTRING_H_
@@ -57,7 +57,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.32 2001-04-05 19:34:52 chrisp Exp $# */
+    #$Id: GString.h,v 1.33 2001-04-06 16:55:28 chrisp Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -360,13 +360,13 @@ public:
     { return strcmp(s1,s2)< 0; }
    /* # CHRISP added the following block of code # */
    /** Returns a boolean.  Compares string with #s2# and a given length of #len# */
-   inline int ncmp(const GString& s2, const int len=1) const
-      { return substr(0,len) == s2.substr(0,len); }
+   inline bool ncmp(const GString& s2, const int len=1) const
+      { return ((substr(0,len) == s2.substr(0,len)) == 1); }
    /** Returns a boolean. The Standard C strncmp takes two string and compares the 
        first N characters.  static bool GString::ncmp will compare #s1# with #s2# 
        with the #len# characters starting from the beginning of the string.*/
    static bool ncmp(const GString &s1,const GString &s2, const int len=1)
-      { return s1.substr(0,len) == s2.substr(0,len); }
+      { return ((s1.substr(0,len) == s2.substr(0,len)) == 1); }
    /* # END code block added by CHRISP */
 
   // -- HASHING

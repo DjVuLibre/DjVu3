@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuPort.h,v 1.36 2001-04-05 19:57:57 chrisp Exp $
+// $Id: DjVuPort.h,v 1.37 2001-04-06 16:55:28 chrisp Exp $
 // $Name:  $
 
 #ifndef _DJVUPORT_H
@@ -90,7 +90,7 @@ class DataPool;
     @memo DjVu decoder communication mechanism.
     @author Andrei Erofeev <eaf@geocities.com>\\
             L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuPort.h,v 1.36 2001-04-05 19:57:57 chrisp Exp $# */
+    @version #$Id: DjVuPort.h,v 1.37 2001-04-06 16:55:28 chrisp Exp $# */
 //@{
 
 class DjVuPort;
@@ -459,7 +459,7 @@ private:
 inline bool
 DjVuPort::inherits(const char * class_name) const
 {
-   return (GString("DjVuPort") == class_name);
+   return ((GString("DjVuPort") == class_name) == 1);
 }
 
 inline bool
