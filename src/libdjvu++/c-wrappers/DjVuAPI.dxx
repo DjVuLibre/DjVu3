@@ -1,13 +1,14 @@
 // -*- C++ -*-
 /** @name DjVu C API Libraries
 
-    Copyright (c) AT&T 2000.  All Rights Reserved.  
+    Copyright (c) LizardTech 2000.
+    All Rights Reserved.  
 
-    This software may only be used by you under license from AT&T
-    Corp. ("AT&T"). A copy of the license should have been packaged
+    This software may only be used by you under license from LizardTech
+    Inc. ("LizardTech"). A copy of the license should have been packaged
     with this software.  If you received this software without first
-    entering into a license with AT&T, you have an infringing copy of
-    this software and cannot use it without violating AT&T's intellectual
+    entering into a license with LizardTech, you have an infringing copy of
+    this software and cannot use it without violating LizardTech's intellectual
     property rights.
 
     {\bf Acknowledgements} -- The DjVu API is the results of the
@@ -18,7 +19,7 @@
     @version
     3.0
     @author
-    Bill C Riemers <bcr@att.com>,  L\'eon Bottou, Parag Deshmukh
+    Bill C Riemers <bcr@lizardtech.com>,  L\'eon Bottou, Parag Deshmukh
 */
 //@{
 
@@ -79,9 +80,9 @@
 
   {\bf DjVu Reference Library} --- The #DjVu Reference Library# implements the
   components of the DjVu technology that are essential for the definition of
-  the file formats.  AT&T Labs \URL{http://www.att.com/attlabs}
+  the file formats.  LizardTech \URL{http://www.lizardtech.com}
   releases the full source code of the #DjVu Reference Library# under the terms
-  of the \Ref{AT&T Source Code License}.
+  of the \Ref{LizardTech Source Code License}.
 
   {\bf DjVu Software Development Kit (SDK)} --- The DjVu SDK defines
   a C interface designed to allow manipulations of multi-page DjVu
@@ -335,77 +336,77 @@
 
 //@{
 /** @name bitonaltodjvu utility
-  @memo The \URL[bitonaltodjvu]{../bitonaltodjvu.html} utility uses
+  @memo The \URL[bitonaltodjvu]{../SDKTools/bitonaltodjvu.html} utility uses
   the API defined in \Ref{DjVuBitonalAPI.h} to perform bitonal to 
   DjVu compressions.
 */
 /** @name djvubundle utility
-  @memo The \URL[djvubundle]{../djvubundle.html} utility uses
+  @memo The \URL[djvubundle]{../SDKTools/djvubundle.html} utility uses
   the API defined in \Ref{DjVuMultiAPI.h} to bundle DjVu
   files together.
 */
 /** @name djvudecode utility
-  @memo The \URL[djvudecode]{../djvudecode.html} utility
+  @memo The \URL[djvudecode]{../SDKTools/djvudecode.html} utility
   uses the API defined in \Ref{DjVuDecodeAPI.h} to decode single
   and multi-page DjVu files to image file(s).
 */
 /** @name djvujoin utility
-  @memo The \URL[djvujoin]{../djvujoin.html} utility uses
+  @memo The \URL[djvujoin]{../SDKTools/djvujoin.html} utility uses
   the API defined in \Ref{DjVuMultiAPI.h} to join DjVu
   files with an index file.
 */
 /** @name djvureindex utility
-  @memo The \URL[djvureindex]{../djvureindex.html} utility
+  @memo The \URL[djvureindex]{../SDKTools/djvureindex.html} utility
   uses direct C++ calls to convert old style multi-page
   documents into new style multi-page documents.
 */
 /** @name djvutobitonal utility
-  @memo The \URL[djvutobitonal]{../djvutobitonal.html} utility
+  @memo The \URL[djvutobitonal]{../SDKTools/djvutobitonal.html} utility
   uses the API defined in \Ref{DjVuDecodeAPI.h} to decode single
   and multi-page DjVu files to bitonal formats.
 */
 /** @name djvutobmp utility
-  @memo The \URL[djvutobmp]{../djvutobmp.html} utility
+  @memo The \URL[djvutobmp]{../SDKTools/djvutobmp.html} utility
   uses the API defined in \Ref{DjVuDecodeAPI.h} to decode single
   and multi-page DjVu files to bmp file(s).
 */
 /** @name djvutojpeg utility
-  @memo The \URL[djvutojpeg]{../djvutojpeg.html} utility
+  @memo The \URL[djvutojpeg]{../SDKTools/djvutojpeg.html} utility
   uses the API defined in \Ref{DjVuDecodeAPI.h} to decode single
   and multi-page DjVu files to jpeg file(s).
 */
 /** @name djvutopbm utility
-  @memo The \URL[djvutopbm]{../djvutopbm.html} utility
+  @memo The \URL[djvutopbm]{../SDKTools/djvutopbm.html} utility
   uses the API defined in \Ref{DjVuDecodeAPI.h} to decode single
   and multi-page DjVu files to pbm file(s).
 */
 /** @name djvutopict utility
-  @memo The \URL[djvutopict]{../djvutopict.html} utility
+  @memo The \URL[djvutopict]{../SDKTools/djvutopict.html} utility
   uses the API defined in \Ref{DjVuDecodeAPI.h} to decode single
   and multi-page DjVu files to pict file(s).
 */
 /** @name djvutopnm utility
-  @memo The \URL[djvutopnm]{../djvutopnm.html} utility
+  @memo The \URL[djvutopnm]{../SDKTools/djvutopnm.html} utility
   uses the API defined in \Ref{DjVuDecodeAPI.h} to decode single
   and multi-page DjVu files to pnm file(s).
 */
 /** @name djvutops utility
-  @memo The \URL[djvutops]{../djvutops.html} utility
+  @memo The \URL[djvutops]{../SDKTools/djvutops.html} utility
   uses the API defined in \Ref{DjVuDecodeAPI.h} to decode single
   and multi-page DjVu files to ps file(s).
 */
 /** @name djvutotiff utility
-  @memo The \URL[djvutotiff]{../djvutotiff.html} utility
+  @memo The \URL[djvutotiff]{../SDKTools/djvutotiff.html} utility
   uses the API defined in \Ref{DjVuDecodeAPI.h} to decode single
   and multi-page DjVu files to tiff file(s).
 */
 /** @name documenttodjvu utility
-  @memo The \URL[documenttodjvu]{../documenttodjvu.html} utility uses
+  @memo The \URL[documenttodjvu]{../SDKTools/documenttodjvu.html} utility uses
   the the API defined in \Ref{DjVuDocumentAPI.h} to perform document to 
   DjVu compressions.
 */
 /** @name phototodjvu utility
-  @memo The \URL[phototodjvu]{../phototodjvu.html} utility uses
+  @memo The \URL[phototodjvu]{../SDKTools/phototodjvu.html} utility uses
   the API defined in \Ref{DjVuPhotoAPI.h} to perform photo to 
   DjVu compressions.
 */
