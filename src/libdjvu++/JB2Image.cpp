@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: JB2Image.cpp,v 1.24 1999-10-18 21:45:52 leonb Exp $
+//C- $Id: JB2Image.cpp,v 1.25 1999-11-13 18:21:15 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -171,8 +171,6 @@ JB2Dict::compress()
 {
   for (int i=shapes.lbound(); i<=shapes.hbound(); i++)
     shapes[i].bits->compress();
-  if (inherited_dict)
-    inherited_dict->compress();
 }
 
 unsigned int
