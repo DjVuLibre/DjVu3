@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuAnno.h,v 1.44 2001-07-24 17:52:03 bcr Exp $
+// $Id: DjVuAnno.h,v 1.45 2001-09-04 19:47:24 leonb Exp $
 // $Name:  $
 
 #ifndef _DJVUANNO_H
@@ -58,7 +58,7 @@
     @memo Implements support for DjVuImage annotations
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: DjVuAnno.h,v 1.44 2001-07-24 17:52:03 bcr Exp $# */
+    #$Id: DjVuAnno.h,v 1.45 2001-09-04 19:47:24 leonb Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -132,6 +132,10 @@ public:
 	  \Ref{GMapPoly} and \Ref{GMapOval} for details. */
    GPList<GMapArea>	map_areas;
 
+      /** Metainformations like title, author ...
+       **/
+   GMap<GUTF8String,GUTF8String> metadata;
+
       /** Returns TRUE if no features are specified or specified features
 	  are not different from default ones */
    bool		is_empty(void) const;
@@ -184,6 +188,7 @@ private:
    static alignment    get_hor_align(class GLParser & parser);
    static alignment    get_ver_align(class GLParser & parser);
    static GPList<GMapArea>get_map_areas(class GLParser & parser);
+   static GMap<GUTF8String, GUTF8String>get_metadata(GLParser & parser);
    static void		del_all_items(const char * name, class GLParser & parser);
 };
 
