@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuImage.h,v 1.12 1999-05-25 19:42:28 eaf Exp $
+//C- $Id: DjVuImage.h,v 1.13 1999-06-04 15:55:17 leonb Exp $
 
 #ifndef _DJVUIMAGE_H
 #define _DJVUIMAGE_H
@@ -51,7 +51,7 @@
     L\'eon Bottou <leonb@research.att.com> - initial implementation
     Andrei Erofeev <eaf@geocities.com> - multipage support
     @version
-    #$Id: DjVuImage.h,v 1.12 1999-05-25 19:42:28 eaf Exp $# */
+    #$Id: DjVuImage.h,v 1.13 1999-06-04 15:55:17 leonb Exp $# */
 //@{
 
 
@@ -123,13 +123,23 @@ public:
   GP<GPixmap>    get_fgpm() const;
   //@}
 
-  // OLD STYLE DECODING
-  /** @name Old style decoding routing */
+  // NEW STYLE DECODING
+  /** @name New style decoding. */
   //@{
-      /** This function is here for backward compatibility. Now, with
-	  introduction of multipage DjVu documents, the decoding is handled
-	  by \Ref{DjVuFile} and \Ref{DjVuDocument} classes. For single page
-	  documents though, we still have this wrapper. */
+  /** The decoder is now started when the image is created
+      by function \Ref{DjVuDocument::get_page} in \Ref{DjVuDocument}. 
+      This function waits until the decoding thread terminates
+      and returns TRUE if the image has been successfully decoded. */
+  bool wait_for_decoder(void);
+  //@}
+  
+  // OLD STYLE DECODING
+  /** @name Old style decoding (backward compatibility). */
+  //@{
+  /** This function is here for backward compatibility. Now, with
+      introduction of multipage DjVu documents, the decoding is handled
+      by \Ref{DjVuFile} and \Ref{DjVuDocument} classes. For single page
+      documents though, we still have this wrapper. */
   void decode(ByteStream & str);
   //@}
   
@@ -297,6 +307,17 @@ inline GP<DjVuFile>
 DjVuImage::get_djvu_file(void) const
 {
    return file;
+}
+
+inline bool
+DjVuImage::wait_for_decoder(void)
+{
+  if (file) 
+    {
+      file->wait_for_finish();
+      return file->is_decode_ok();
+    }
+  return 0;
 }
 
 //@}

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.h,v 1.4 1999-05-27 14:58:03 eaf Exp $
+//C- $Id: DjVuDocument.h,v 1.5 1999-06-04 15:55:17 leonb Exp $
  
 #ifndef _DJVUDOCUMENT_H
 #define _DJVUDOCUMENT_H
@@ -31,7 +31,7 @@
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocument.h,v 1.4 1999-05-27 14:58:03 eaf Exp $#
+    @version #$Id: DjVuDocument.h,v 1.5 1999-06-04 15:55:17 leonb Exp $#
 */
 
 //@{
@@ -107,10 +107,13 @@ public:
 
       /** @name Accessing pages */
       //@{
-      /** Returns \Ref{GP} pointer to \Ref{DjVuImage} corresponding to
-	  page #page_num#. The image doesn't have to be decoded in full.
-	  If multithreaded behaviour is allowed, the decoding will be started
-	  in a separate thread, which enables to do progressive display */
+      /** Returns \Ref{GP} pointer to \Ref{DjVuImage} corresponding to page
+          #page_num#. The image doesn't have to be decoded in full.  If
+          multithreaded behaviour is allowed, the decoding will be started in
+          a separate thread, which enables to do progressive display.
+          Negative #page_num# has a special meaning for the multipage
+          documents with each page in separate files: the #DjVuDocument# will
+          start decoding of the URL with which it has been initialized. */
    GP<DjVuImage>get_page(int page_num);
       /** Creates and returns \Ref{DjVuFile} corresponding to the given #url#.
 	  For DjVm document (all-in-one-file multipage DjVu documents) the
@@ -118,13 +121,12 @@ public:
 	  If there is a \Ref{DjVuFile} corresponding to this URL in the
 	  cache already, it will be returned. */
    GP<DjVuFile>	get_djvu_file(const GURL & url);
-      /** Creates and returns \Ref{DjVuFile} corresponding to the fiven
+      /** Creates and returns \Ref{DjVuFile} corresponding to the given
 	  page. Cache will be used to take advantage of files created and
-	  decoded before.
-
-	  Negative #page_num# has a special meaning for the multipage documents
-	  with each page in separate files: the #DjVuDocument# will start
-	  decoding of the URL with which it has been initialized. */
+	  decoded before. Negative #page_num# has a special meaning for the
+	  multipage documents with each page in separate files: the
+	  #DjVuDocument# will return the file corresponding to the URL with
+	  which it has been initialized. */
    GP<DjVuFile>	get_djvu_file(int page_num);
       /** Returns navigation directory of the document. This is the only
 	  way to figure out the number of pages in the document and URLs

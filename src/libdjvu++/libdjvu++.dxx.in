@@ -311,16 +311,10 @@
 
 /** @name Decoding DjVu Content
 
-    Classes \Ref{DjVuImage} and \Ref{DjVuFile} provide two ways to decode
-    a DjVu file contents. The mechanism supported by \Ref{DjVuImage::decode}()
-    is simple but obsolete and is supported for compatibility reasons only.
-    It will not allow you to decode multipage DjVu documents or DjVu pages,
-    which include other files. At the same time, \Ref{DjVuFile} together with
-    \Ref{DjVuDocument} can be used in general case to decode DjVu documents of
-    any format. This is the preffered way of decompressing DjVu files.
-    
-    The complete documentation is found in section \Ref{DjVuImage.h} and
-    \Ref{DjVuFile}. You may also consult the source code of programs
+    Classes \Ref{DjVuImage} and \Ref{DjVuDocument} provide the preferred way
+    to decode the contents of a DjVu file.  The complete documentation is
+    found in section \Ref{DjVuDocument.h}, \Ref{DjVuImage.h} and
+    \Ref{DjVuFile}.  You may also consult the source code of programs
     \Ref{djvutopnm} and \Ref{djvm}.
 
     The DjVu Reference Library uses a two stage decoding model. 
@@ -337,42 +331,29 @@
           both the memory and the computational requirements.
     \end{itemize}
 
-    An example of decoding code for one page documents is shown below.
-    Please note, that this mechanism provided by \Ref{DjVuImage::decode}()
-    is obsolete and is being replaced by \Ref{DjVuFile} and \Ref{DjVuDocument}:
+    An example of decoding multipage DjVu document is shown below. First you
+    create \Ref{DjVuDocument}. Then you start decoding of desired page by
+    calling \Ref{DjVuDocument::get_page}(). Page numbers start from #0#.  If
+    threads have been enabled at compilation time, the decoding will start in
+    another thread. Otherwise you'll get a fully decoded image after this
+    function returns. If threads are enabled though, you'll need to wait for
+    the decoding to finish. This can be done the best with
+    \Ref{DjVuImage::wait_for_decoder}.
     \begin{verbatim}
-       DjVuImage img;
-       ByteStream &bs = my_incoming_data_stream();
-       img.decode(bs);
+      GOS furl=GOS::filename_to_url("file.djvu");
+      DjVuDocument doc(furl, 1);
+      GP<DjVuImage> dimg=doc.get_page(2); // Page numbers start from 0
+      if (! dimg->wait_for_decoder() )
+         THROW("A decoding error has occured");
     \end{verbatim}
 
-    With the introduction of multipage DjVu documents and #INCL# chunks,
-    the decoding procedure became more complex as the decoder has to handle
-    more than one stream of incoming data and should be able to keep track
-    of relationships between different files in the same document. An example
-    of decoding multipage DjVu document is shown below. First you should
-    create \Ref{DjVuDocument}. Then you start decoding of desired page by
-    calling \Ref{DjVuDocument::get_page}(). Page numbers start from #0#.
-    If threads have been enabled at compilation time, the decoding will
-    start in another thread. Otherwise you'll get a fully decoded image
-    after this function returns. If threads are enabled though, you'll
-    need to wait for the decoding to finish. This can be done
-    the best with \Ref{DjVuFile::wait_for_finish}().
-    \begin{verbatim}
-       GString fname="/tmp/file.djvu";
-       GOS furl=GOS::filename_to_url(fname);
-       DjVuDocument doc(furl, 1);
-       GP<DjVuImage> dimg=doc.get_page(2);   // Page numbers start from 0
-       GP<DjVuFile> file=dimg->get_djvu_file();
-       file->wait_for_finish();
-    \end{verbatim}
     This is the easiest way to load a DjVu document when it's stored on hard
     drive. \Ref{DjVuDocument} accesses all the files itself and prints all
     status and error messages directly to #stderr#. In a more complex
-    environment you may want to have more control on where the data is
-    coming from and where status and error messages are directed. Then you'll
-    need to derive one of your classes from \Ref{DjVuPort} and take part in
-    requests and notifications exchange supported by \Ref{DjVuPort} and
+    environment you may want to have more control on where the data is coming
+    from and where status and error messages are directed. Then you'll need to
+    derive one of your classes from \Ref{DjVuPort} and take part in requests
+    and notifications exchange supported by \Ref{DjVuPort} and
     \Ref{DjVuPortcaster}.
     
     The sample rendering code below may be called whenever you need to
@@ -410,7 +391,15 @@
 
     Section \Ref{GThreads.h} discusses the multi-threading capabilities of the
     DjVu Reference Library.  These features must be enabled at compile-time
-    using the adequate option of the configuration script.  */
+    using the adequate option of the configuration script.  
+
+    {\bf Note:} In previous versions of the library, decoding was achieved by
+    calling function \Ref{DjVuImage::decode} in class \Ref{DjVuImage}.  This
+    method has been made obsolete by the introduction of multipage DjVu
+    documents and #INCL# chunks.  The decoder has to handle more than one
+    stream of incoming data and should be able to keep track of relationships
+    between different files in the same document.  All this activity is now
+    orchestrated by class \Ref{DjVuDocument}.  */
 
 //@}
 

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: djvutopnm.cpp,v 1.19 1999-05-26 18:21:30 eaf Exp $
+//C- $Id: djvutopnm.cpp,v 1.20 1999-06-04 15:55:17 leonb Exp $
 
 
 /** @name djvutopnm
@@ -90,7 +90,7 @@
     Yann Le Cun <yann@research.att.com>\\
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: djvutopnm.cpp,v 1.19 1999-05-26 18:21:30 eaf Exp $# */
+    #$Id: djvutopnm.cpp,v 1.20 1999-06-04 15:55:17 leonb Exp $# */
 //@{
 //@}
 
@@ -121,19 +121,16 @@ convert(const char *from, const char *to, int page_num)
 {
   unsigned long start, stop;
 
-     // Create DjVuDocument
+  // Create DjVuDocument
   GURL from_url=GOS::filename_to_url(from);
   GP<DjVuDocument> doc=new DjVuDocument(from_url, 1);
 
+  // Create DjVuImage
   start=GOS::ticks();
   GP<DjVuImage> dimg=doc->get_page(page_num);
-  GP<DjVuFile> file=dimg->get_djvu_file();
-  file->wait_for_finish();
+  if (! dimg->wait_for_decoder())
+    THROW("Decoding failed. Nothing can be done.");    
   stop=GOS::ticks();
-
-     // Check for success
-  if (!file->is_decode_ok())
-     THROW("Decoding failed. Nothing can be done.");
 
   // Verbose
   if (flag_verbose)
@@ -141,6 +138,7 @@ convert(const char *from, const char *to, int page_num)
       fprintf(stderr,"%s", (const char*)dimg->get_long_description());
       fprintf(stderr,"Decoding time:    %lu ms\n", stop - start);
     }
+
   // Check
   DjVuInfo *info = dimg->get_info();
   int colorp = dimg->is_legal_photo();
@@ -161,6 +159,7 @@ convert(const char *from, const char *to, int page_num)
       if (!info)
         THROW("Cannot find INFO chunk. Aborting."); 
     }
+
   // Setup rectangles
   if (flag_size<0 && flag_scale<0 && flag_subsample<0)
     flag_scale = 100;
@@ -176,6 +175,7 @@ convert(const char *from, const char *to, int page_num)
     }
   if (flag_segment < 0)
     segmentrect = fullrect;
+
   // Render
   GP<GPixmap> pm;
   GP<GBitmap> bm;
@@ -202,6 +202,7 @@ convert(const char *from, const char *to, int page_num)
     {
       fprintf(stderr,"Rendering time:   %lu ms\n", stop - start);
     }
+
   // Save image
   if (pm) 
     {
