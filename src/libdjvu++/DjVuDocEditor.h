@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocEditor.h,v 1.8 1999-11-30 20:29:19 eaf Exp $
+//C- $Id: DjVuDocEditor.h,v 1.9 1999-12-01 20:56:00 eaf Exp $
  
 #ifndef _DJVUDOCEDITOR_H
 #define _DJVUDOCEDITOR_H
@@ -27,7 +27,7 @@
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocEditor.h,v 1.8 1999-11-30 20:29:19 eaf Exp $#
+    @version #$Id: DjVuDocEditor.h,v 1.9 1999-12-01 20:56:00 eaf Exp $#
 */
 
 //@{
@@ -74,6 +74,10 @@ public:
    void		save(void);
    
    virtual void	save_as(const char * where, bool bundled);
+
+      /** Translates page number #page_num# to ID. If #page_num# is invalid,
+	  an exception is thrown. */
+   GString	page_to_id(int page_num) const;
    
    GString	insert_file(const char * fname, const char * parent_id,
 			    int chunk_num=1);
@@ -129,6 +133,8 @@ public:
 	  If #remove_unref# is #TRUE#, the function will also remove every
 	  file, which will become unreferenced after the removal of this file. */
    void		remove_file(const char * id, bool remove_unref=true);
+      /** Makes page number #page_num# to be #new_page_num#. */
+   void		move_page(int page_num, int new_page_num);
 
       /** @name Thumbnails */
       //@{
@@ -227,7 +233,6 @@ private:
 
    void		check(void);
    GString	find_unique_id(const char * id);
-   GString	page_to_id(int page_num) const;
    GP<DataPool>	strip_incl_chunks(const GP<DataPool> & pool);
    void		clean_files_map(void);
    void		insert_file(const char * file_name, bool is_page,

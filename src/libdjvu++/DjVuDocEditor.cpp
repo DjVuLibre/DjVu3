@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocEditor.cpp,v 1.14 1999-11-30 20:38:08 eaf Exp $
+//C- $Id: DjVuDocEditor.cpp,v 1.15 1999-12-01 20:56:00 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -125,6 +125,14 @@ DjVuDocEditor::init(const char * fname)
 	 pool->get_data(*data, 0, data->size());
 	 thumb_map[page_to_id(page_num)]=data;
       }
+   }
+      // And remove then from DjVmDir so that DjVuDocument
+      // does not try to use them
+   GPList<DjVmDir::File> xfiles_list=djvm_dir->get_files_list();
+   for(GPosition pos=xfiles_list;pos;++pos)
+   {
+      GP<DjVmDir::File> f=xfiles_list[pos];
+      if (f->is_thumbnails()) djvm_dir->delete_file(f->id);
    }
 }
 
@@ -749,6 +757,14 @@ DjVuDocEditor::remove_page(int page_num, bool remove_unref)
    remove_file(djvm_dir->page_to_file(page_num)->id, remove_unref);
 }
 
+void
+DjVuDocEditor::move_page(int page_num, int new_page_num)
+{
+   DEBUG_MSG("DjVuDocEditor::move_page(): page_num=" << page_num <<
+	     ", new_page_num=" << new_page_num << "\n");
+   DEBUG_MAKE_INDENT(3);
+}
+
 GP<DataPool>
 DjVuDocEditor::get_thumbnail(int page_num, bool dont_decode)
       // We override DjVuDocument::get_thumbnail() here because
@@ -764,7 +780,7 @@ DjVuDocEditor::get_thumbnail(int page_num, bool dont_decode)
 
    GPosition pos;
    GCriticalSectionLock lock(&thumb_lock);
-   if (thumb_map.contains(id))
+   if (thumb_map.contains(id, pos))
    {
 	 // Get the image from the map
       TArray<char> & data=*(TArray<char> *) thumb_map[pos];
@@ -772,19 +788,7 @@ DjVuDocEditor::get_thumbnail(int page_num, bool dont_decode)
       pool->add_data((const char *) data, data.size());
       pool->set_eof();
       return pool;
-   } else
-   {
-	 // Ask DjVuDocument to generate the thumbnail
-      GP<DataPool> pool=DjVuDocument::get_thumbnail(page_num, dont_decode);
-      if (pool)
-      {
-	    // And add the image to the map for future references
-	 TArray<char> * data=new TArray<char>(pool->get_size()-1);
-	 pool->get_data(*data, 0, data->size());
-	 thumb_map[id]=data;
-      }
-      return pool;
-   }
+   } else return DjVuDocument::get_thumbnail(page_num, dont_decode);
 }
 
 int
