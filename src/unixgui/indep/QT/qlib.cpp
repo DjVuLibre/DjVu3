@@ -4,7 +4,7 @@
 //C-              Unauthorized use prohibited.
 //C-
 // 
-// $Id: qlib.cpp,v 1.1 2001-05-29 22:05:29 bcr Exp $
+// $Id: qlib.cpp,v 1.2 2001-06-07 14:28:43 mchen Exp $
 // $Name:  $
 
 
@@ -60,11 +60,11 @@ QeExcMessage::switchDetails(void)
    {
       if (details->isVisible())
       {
-	 details_butt->setText("&Details");
+	 details_butt->setText(tr("&Details"));
 	 details->hide();
       } else
       {
-	 details_butt->setText("Hide &Details");
+	 details_butt->setText(tr("Hide &Details"));
 	 details->show();
       }
       details_butt->setMinimumWidth(details_butt->sizeHint().width());
@@ -107,7 +107,7 @@ QeExcMessage::QeExcMessage(const GException & exc, const char * title,
    glay->addMultiCellWidget(sep, 0, 0, 0, 1);
    QeLabel * name, * value;
    QFont font;
-   name=new QeLabel("Function name", w, "func_name");
+   name=new QeLabel(tr("Function name"), w, "func_name");
    glay->addWidget(name, 1, 0);
    QString func_name=exc.get_function();
    if (!func_name) func_name="unknown";
@@ -115,7 +115,7 @@ QeExcMessage::QeExcMessage(const GException & exc, const char * title,
    value->setFont(QFont("courier", value->font().pointSize()));
    value->setFrameStyle(QFrame::WinPanel | QFrame::Sunken);
    glay->addWidget(value, 1, 1);
-   name=new QeLabel("File name", w, "file_name");
+   name=new QeLabel(tr("File name"), w, "file_name");
    glay->addWidget(name, 2, 0);
    QString file_name=exc.get_file();
    if (!file_name) file_name="unknown";
@@ -123,7 +123,7 @@ QeExcMessage::QeExcMessage(const GException & exc, const char * title,
    value->setFont(QFont("courier", value->font().pointSize()));
    value->setFrameStyle(QFrame::WinPanel | QFrame::Sunken);
    glay->addWidget(value, 2, 1);
-   name=new QeLabel("Line number", w, "line_name");
+   name=new QeLabel(tr("Line number"), w, "line_name");
    glay->addWidget(name, 3, 0);
    char buffer[128];
    sprintf(buffer, "%d", exc.get_line());
@@ -138,10 +138,10 @@ QeExcMessage::QeExcMessage(const GException & exc, const char * title,
    hlay=new QHBoxLayout(5);
    vlay->addLayout(hlay);
    hlay->addStretch(1);
-   QePushButton * ok_butt=new QePushButton("&OK", this, "ok_butt");
+   QePushButton * ok_butt=new QePushButton(tr("&OK"), this, "ok_butt");
    ok_butt->setDefault(TRUE);
    hlay->addWidget(ok_butt);
-   details_butt=new QePushButton("&Details", this, "details_butt");
+   details_butt=new QePushButton(tr("&Details"), this, "details_butt");
    hlay->addWidget(details_butt);
 
    vlay->activate();
@@ -354,7 +354,7 @@ QeRowColumn::event(QEvent * ev)
       }
    } catch(const GException & exc)
    {
-      showError(this, "Error", exc);
+      showError(this, tr("Error"), exc);
    }
    return QTableView::event(ev);
 }
@@ -410,7 +410,7 @@ showError(QWidget * parent, const GException & exc)
 #ifdef NO_DEBUG
    if (!exc.cmp_cause(DataPool::Stop)) return;
 #endif
-   QeExcMessage * msg=new QeExcMessage(exc, "Error", parent, "exc_message");
+   QeExcMessage * msg=new QeExcMessage(exc, QeExcMessage::tr("Error"), parent, "exc_message");
    msg->exec();
    delete msg;
 }
@@ -422,7 +422,7 @@ showError(QWidget * parent, const QString &qtitle, const GException & exc)
 #ifdef NO_DEBUG
    if (!exc.cmp_cause(DataPool::Stop)) return;
 #endif
-   if (!title) title="Error";
+   if (!title) title=QeExcMessage::tr("Error");
    QeExcMessage * msg=new QeExcMessage(exc, title, parent, "exc_message");
    msg->exec();
    delete msg;
@@ -500,7 +500,7 @@ showMessage(QWidget * parent, const QString &qtitle, const QString &qmessage,
    QHBoxLayout * hlay=new QHBoxLayout(5, "hlay");
    vlay->addLayout(hlay);
    hlay->addStretch(1);
-   QePushButton * butt=new QePushButton("&Close", start, "close_butt");
+   QePushButton * butt=new QePushButton(QePushButton::tr("&Close"), start, "close_butt");
    butt->setDefault(TRUE);
    hlay->addWidget(butt);
 
@@ -698,7 +698,7 @@ QeGrid::resizeEvent(QResizeEvent * ev)
 	 }
    } catch(const GException & exc)
    {
-      showError(this, "Error", exc);
+      showError(this, tr("Error"), exc);
    }
 }
 
@@ -714,7 +714,7 @@ QeGrid::event(QEvent * ev)
       }
    } catch(const GException & exc)
    {
-      showError(this, "Error", exc);
+      showError(this, tr("Error"), exc);
    }
    return QWidget::event(ev);
 }

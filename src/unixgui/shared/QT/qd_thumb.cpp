@@ -4,7 +4,7 @@
 //C-              Unauthorized use prohibited.
 //C-
 // 
-// $Id: qd_thumb.cpp,v 1.1 2001-05-29 22:05:31 bcr Exp $
+// $Id: qd_thumb.cpp,v 1.2 2001-06-07 14:28:43 mchen Exp $
 // $Name:  $
 
 
@@ -156,7 +156,6 @@ QDThumbItem::paint(QPainter * p)
    QRect r (HMARGIN/2, VMARGIN/2, width()-HMARGIN, height()-VMARGIN-VMARGIN_FIX);
    if ( cur_page ) 
      listBox()->style().drawFocusRect( p, r, listBox()->colorGroup(), NULL, TRUE );
-   //listBox()->style().drawFocusRect( p, r, listBox()->colorGroup(), &p->backgroundColor(), TRUE );
    
    p->translate(HMARGIN, VMARGIN);
 
@@ -164,8 +163,7 @@ QDThumbItem::paint(QPainter * p)
    int text_height=p->fontMetrics().height()*10/9;
    int w=width()-2*HMARGIN;
    int h=height()-2*VMARGIN-VMARGIN_FIX;
-   char buffer[64];
-   sprintf(buffer, "Page %d", page_num+1);
+   QString buffer=QDThumbnails::tr("Page ")+QString::number(page_num+1);
    p->drawText(0, h-text_height, w, text_height,
 	       QTNAMESPACE_QT::AlignHCenter | QTNAMESPACE_QT::AlignVCenter, buffer);
 
