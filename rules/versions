@@ -1,6 +1,6 @@
 %%%include <paths>
 
-SDKVERSION=3.0b12.1
+SDKVERSION=3.0b13
 
 %%%BEGIN_REQUIRE(@%CXXPIC_SET%@)
 LIBDJVUMULTISO=$(LIBPATH)/libdjvumulti.so
