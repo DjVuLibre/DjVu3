@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuAnno.h,v 1.46 2001-09-04 23:01:51 docbill Exp $
+// $Id: DjVuAnno.h,v 1.47 2001-09-18 23:12:21 leonb Exp $
 // $Name:  $
 
 #ifndef _DJVUANNO_H
@@ -58,7 +58,7 @@
     @memo Implements support for DjVuImage annotations
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: DjVuAnno.h,v 1.46 2001-09-04 23:01:51 docbill Exp $# */
+    #$Id: DjVuAnno.h,v 1.47 2001-09-18 23:12:21 leonb Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -131,7 +131,10 @@ public:
 	  or hyperlink. Please refer to \Ref{GMapArea}, \Ref{GMapRect},
 	  \Ref{GMapPoly} and \Ref{GMapOval} for details. */
    GPList<GMapArea>	map_areas;
-
+#ifndef NO_METADATA_IN_ANT_CHUNK
+      /** Metainformations like title, author ... */
+   GMap<GUTF8String,GUTF8String> metadata;
+#endif
       /** Returns TRUE if no features are specified or specified features
 	  are not different from default ones */
    bool		is_empty(void) const;
@@ -173,18 +176,19 @@ public:
       /// Write the XML flags for the default specifications.
    void writeParam(ByteStream &out_str) const;
 private:
-   void			decode(class GLParser & parser);
-   
-   static GUTF8String	read_raw(ByteStream & str);
-   
+   void	decode(class GLParser & parser);
+   static GUTF8String read_raw(ByteStream & str);
    static unsigned char	decode_comp(char ch1, char ch2);
-   static unsigned long int	get_bg_color(class GLParser & parser);
-   static int		get_zoom(class GLParser & parser);
-   static int		get_mode(class GLParser & parser);
-   static alignment    get_hor_align(class GLParser & parser);
-   static alignment    get_ver_align(class GLParser & parser);
-   static GPList<GMapArea>get_map_areas(class GLParser & parser);
-   static void		del_all_items(const char * name, class GLParser & parser);
+   static unsigned long int get_bg_color(class GLParser & parser);
+   static int get_zoom(class GLParser & parser);
+   static int get_mode(class GLParser & parser);
+   static alignment get_hor_align(class GLParser & parser);
+   static alignment get_ver_align(class GLParser & parser);
+   static GPList<GMapArea> get_map_areas(class GLParser & parser);
+#ifndef NO_METADATA_IN_ANT_CHUNK
+   static GMap<GUTF8String, GUTF8String>get_metadata(GLParser & parser);
+#endif
+   static void del_all_items(const char * name, class GLParser & parser);
 };
 
 // -------- DJVUANNO --------
