@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GURL.h,v 1.13 2000-01-14 23:34:51 eaf Exp $
+//C- $Id: GURL.h,v 1.14 2000-01-19 18:19:33 praveen Exp $
 
 #ifndef _GURL_H_
 #define _GURL_H_
@@ -27,7 +27,7 @@
     \Ref{GURL} class used to store URLs in a system independent format.
     @memo System independent URL representation.
     @author Andrei Erofeev <eaf@research.att.com>
-    @version #$Id: GURL.h,v 1.13 2000-01-14 23:34:51 eaf Exp $#
+    @version #$Id: GURL.h,v 1.14 2000-01-19 18:19:33 praveen Exp $#
 */
 
 //@{
@@ -106,6 +106,9 @@ public:
 
       /// Returns the name part of this URL.
    GString	name(void) const;
+
+      /// Returns the extention part of name of document in this URL.
+   GString	extension(void) const;
 
       /// Checks if this is an empty URL
    bool		is_empty(void) const;
