@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: IFFByteStream.cpp,v 1.28 2001-04-21 00:16:58 bcr Exp $
+// $Id: IFFByteStream.cpp,v 1.29 2001-05-01 23:38:24 bcr Exp $
 // $Name:  $
 
 // -- Implementation of IFFByteStream
@@ -165,7 +165,7 @@ IFFByteStream::get_chunk(GUTF8String &chkid, int *rawoffsetptr, int *rawsizeptr)
   
   // Read chunk id (skipping magic sequences inserted here to make
   // DjVu files recognizable.)
-  while (1)
+  for(;;)
   {
     if (ctx && offset == ctx->offEnd)
       return 0;
