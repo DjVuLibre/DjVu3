@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ddjvu.cpp,v 1.27 2001-07-26 17:23:15 bcr Exp $
+// $Id: ddjvu.cpp,v 1.28 2001-09-21 20:09:40 leonb Exp $
 // $Name:  $
 
 /** @name ddjvu
@@ -111,7 +111,7 @@
     Yann Le Cun <yann@research.att.com>\\
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: ddjvu.cpp,v 1.27 2001-07-26 17:23:15 bcr Exp $# */
+    #$Id: ddjvu.cpp,v 1.28 2001-09-21 20:09:40 leonb Exp $# */
 //@{
 //@}
 
@@ -279,7 +279,7 @@ usage()
           "  -N                  Subsampling factor from full resolution.\n"
 	  "  -page <page>        Decode page <page> (for multipage documents).\n"
           "\n"
-          "The output will be a PBM, PGM or PPM file depending of its content."
+          "The output will be a PBM, PGM or PPM file depending of its content.\n"
           "If <pnmfile> is a single dash or omitted, the decompressed image\n"
           "is sent to the standard output.  If <djvufile> is a single dash or\n"
           "omitted, the djvu file is read from the standard input.\n\n");
@@ -351,7 +351,7 @@ main(int argc, char **argv)
 #endif
   setlocale(LC_ALL,"");
   djvu_programname(argv[0]);
-  DArray<GUTF8String> dargv(0,argc-1);
+  GArray<GUTF8String> dargv(0,argc-1);
   for(int i=0;i<argc;++i)
     dargv[i]=GNativeString(argv[i]);
    G_TRY
@@ -456,6 +456,10 @@ main(int argc, char **argv)
       // Process remaining arguments
       if (argc == 3) 
         convert(GURL::Filename::UTF8(dargv[1]),GURL::Filename::UTF8(dargv[2]), page_num);
+      else if (argc == 2)
+        convert(GURL::Filename::UTF8(dargv[1]),GURL::Filename::UTF8("-"), page_num);
+      else if (argc == 1)
+        convert(GURL::Filename::UTF8("-"),GURL::Filename::UTF8("-"), page_num);
       else
         usage();
     }
