@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GURL.cpp,v 1.15 1999-12-22 17:14:07 eaf Exp $
+//C- $Id: GURL.cpp,v 1.16 2000-01-14 23:03:23 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -21,6 +21,20 @@
 
 #include <string.h>
 #include <ctype.h>
+
+static bool
+is_argument(const char * start)
+{
+   return
+      start[0]=='#' || start[0]=='%' &&
+      start[1]=='2' && start[2]=='3' ||
+      
+      start[0]=='?' || start[0]=='%' &&
+      start[1]=='3' && toupper(start[2])=='F' ||
+      
+      start[0]==';' || start[0]=='%' &&
+      start[1]=='3' && toupper(start[2])=='B';
+}
 
 void
 GURL::convert_slashes(void)
@@ -76,10 +90,22 @@ GURL::init(void)
       if (proto=="file" && url[5]=='/' &&
 	  (url[6]!='/' || !strncmp(url, "file://localhost/", strlen("file://localhost/"))))
       {
+	    // Separate the arguments
+	 const char * ptr;
+	 for(ptr=url;*ptr;ptr++)
+	    if (is_argument(ptr))
+	       break;
+	 GString arg=ptr;
+	 url.setat(ptr-url, 0);
+
+	    // Do double conversion
 	 url=GOS::url_to_filename(url);
 	 if (!url.length()) THROW("Failed to convert URL to filename.");
 	 url=GOS::filename_to_url(url);
 	 if (!url.length()) THROW("Failed to convert filename back to URL.");
+
+	    // Return the argument back
+	 url=url+arg;
       }
 
       convert_slashes();
@@ -224,20 +250,6 @@ GURL::cgi_values(void) const
 {
    GCriticalSectionLock lock((GCriticalSection *) &cgi_lock);
    return cgi_value_arr;
-}
-
-static bool
-is_argument(const char * start)
-{
-   return
-      start[0]=='#' || start[0]=='%' &&
-      start[1]=='2' && start[2]=='3' ||
-      
-      start[0]=='?' || start[0]=='%' &&
-      start[1]=='3' && toupper(start[2])=='F' ||
-      
-      start[0]==';' || start[0]=='%' &&
-      start[1]=='3' && toupper(start[2])=='B';
 }
 
 void
