@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: GException.h,v 1.4 1999-02-19 19:03:43 leonb Exp $
+//C-  $Id: GException.h,v 1.5 1999-02-22 20:54:07 leonb Exp $
 
 
 #ifndef _GEXCEPTION_H_
@@ -16,39 +16,37 @@
 /** @name GException.h
 
     Files #"GException.h"# and #"GException.cpp"# define a portable exception
-    scheme used through the library. This scheme can use native C++ exception
+    scheme used through the library. This scheme can use native C++ exceptions
     or an exception emulation based on #longjmp#/#setjmp#. A particular model
     can be forced a compile time by defining option #CPP_SUPPORTS_EXCEPTIONS#
     or #USE_EXCEPTION_EMULATION#.
     
-    The exception emulation unfortunately is not able to call the proper
+    The exception emulation is unfortunately not able to call the proper
     destructors when an exception occurs. This is acceptable for simple
     command line program, but will cause memory leaks in any continuously
     running application (such as a browser). In addition, the exception
     emulation is not thread safe.  These are the two main reasons for using a
-    compliant C++ compiler.  These are also compelling reasons to {\em only}
-    use exception to signal an error condition which forces the library to
-    discontinue execution.
+    C++ compiler which supports exceptions.  These are also compelling reasons
+    to {\em only} use exception to signal error conditions that force the
+    library to discontinue execution.
     
     There are four macros for handling exceptions.  Macros #TRY#, #CATCH(ex)#
-    and #ENDCATCH# must be used to define an exception catching
-    block. Exceptions can be thrown at all times using macro
-    #THROW(cause)#. An exception can be re-thrown from a catch block using
-    macro #RETHROW#.
+    and #ENDCATCH# are used to define an exception catching block.  Exceptions
+    can be thrown at all times using macro #THROW(cause)#. An exception can be
+    re-thrown from a catch block using macro #RETHROW#.
     
     Example:
     \begin{verbatim}
     TRY
       {
-        // program lines including a possible THROW  
-        // or calls to functions that perform a THROW
+        // program lines which may result in a call to THROW()
         THROW("message");
       }
     CATCH(ex) 
       {
-        // ex is a \Ref{GException} object that you can print ...
+        // Variable ex refres to a GException object.
         ex.perror();  
-        // or rethrow to an outer exception handler
+        // You can rethrow the exception to an outer exception handler.
         RETHROW;
       }
     ENDCATCH;
@@ -60,7 +58,7 @@
     Leon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@research.att.com> -- fixed message memory allocation.
     @version 
-    #$Id: GException.h,v 1.4 1999-02-19 19:03:43 leonb Exp $# */
+    #$Id: GException.h,v 1.5 1999-02-22 20:54:07 leonb Exp $# */
 //@{
 
 #include "DjVuGlobal.h"
@@ -199,7 +197,7 @@ public:
 
 #define G_ENDCATCH } } while(0)
 
-#define G_RETHROW  GExceptionHandler::emthrow(__exh.current)
+#define G_RETHROW    GExceptionHandler::emthrow(__exh.current)
 
 #ifdef __GNUG__
 #define G_THROW(msg) GExceptionHandler::emthrow \
