@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: GOS.cpp,v 1.28 2000-09-18 17:10:16 bcr Exp $
+//C- $Id: GOS.cpp,v 1.29 2000-10-02 22:33:33 mrosen Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -1030,24 +1030,22 @@ GOS::url_to_filename(const char *url)
   if (is_file(tmp)) 
     return tmp;
   // All file urls are expected to start with "file:"
+  // If the url doens't start with "file:", then fail and send back the base filename.
   static char filespec[] = "file:";
   if (strncmp(url, filespec, strlen(filespec)) != 0)
     return basename(url);
   url += strlen(filespec);
-  /*================================================================================
+
   // Remove all leading slashes
   while (*url=='/')
     url ++;
-  ================================================================================*/
   // Remove possible localhost spec
-  static char localhostspec[] = "//localhost/";
+  static char localhostspec[] = "localhost/";
   if (strncmp(url, localhostspec, strlen(localhostspec)) == 0)
     url += strlen(localhostspec);
-  /*================================================================================
   // Remove all leading slashes
   while (*url=='/')
     url ++;
-  ================================================================================*/
   // Check if we are finished
 #ifdef macintosh
   char l_url[1024];
