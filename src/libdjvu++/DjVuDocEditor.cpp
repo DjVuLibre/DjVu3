@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocEditor.cpp,v 1.12 1999-11-30 19:56:08 eaf Exp $
+//C- $Id: DjVuDocEditor.cpp,v 1.13 1999-11-30 20:29:19 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -123,7 +123,7 @@ DjVuDocEditor::init(const char * fname)
       {
 	 TArray<char> * data=new TArray<char>(pool->get_size()-1);
 	 pool->get_data(*data, 0, data->size());
-	 thumb_map[page_to_url(page_num)]=data;
+	 thumb_map[page_to_id(page_num)]=data;
       }
    }
 }
@@ -235,6 +235,17 @@ DjVuDocEditor::url_to_file(const GURL & url, bool dont_create)
    }
    
    return file;
+}
+
+GString
+DjVuDocEditor::page_to_id(int page_num) const
+{
+   GP<DjVmDir::File> f;
+   if (page_num<0 || page_num>=get_pages_num() ||
+       (f=djvm_dir->page_to_file(page_num))==0)
+      THROW("Invalid page number "+GString(page_num));
+
+   return f->id;
 }
 
 GString
@@ -737,14 +748,14 @@ DjVuDocEditor::get_thumbnail(int page_num, bool dont_decode)
       //
       // So, first we will check the thumb_map[] if we have a predecoded
       // thumbnail for the given page. If this is the case, we will
-      // return it. Otherwise, if dont_decode is false, we will
-      // ask DjVuDocument to generate this thumbnail for us.
+      // return it. Otherwise we will ask DjVuDocument to generate
+      // this thumbnail for us.
 {
-   GURL url=page_to_url(page_num);
+   GString id=page_to_id(page_num);
 
    GPosition pos;
    GCriticalSectionLock lock(&thumb_lock);
-   if (thumb_map.contains(url))
+   if (thumb_map.contains(id))
    {
 	 // Get the image from the map
       TArray<char> & data=*(TArray<char> *) thumb_map[pos];
@@ -752,7 +763,7 @@ DjVuDocEditor::get_thumbnail(int page_num, bool dont_decode)
       pool->add_data((const char *) data, data.size());
       pool->set_eof();
       return pool;
-   } else if (!dont_decode)
+   } else
    {
 	 // Ask DjVuDocument to generate the thumbnail
       GP<DataPool> pool=DjVuDocument::get_thumbnail(page_num, dont_decode);
@@ -761,10 +772,10 @@ DjVuDocEditor::get_thumbnail(int page_num, bool dont_decode)
 	    // And add the image to the map for future references
 	 TArray<char> * data=new TArray<char>(pool->get_size()-1);
 	 pool->get_data(*data, 0, data->size());
-	 thumb_map[url]=data;
+	 thumb_map[id]=data;
       }
       return pool;
-   } else return 0;
+   }
 }
 
 int
@@ -775,7 +786,7 @@ DjVuDocEditor::get_thumbnails_num(void) const
    int cnt=0;
    int pages_num=get_pages_num();
    for(int page_num=0;page_num<pages_num;page_num++)
-      if (thumb_map.contains(page_to_url(page_num))) cnt++;
+      if (thumb_map.contains(page_to_id(page_num))) cnt++;
    return cnt;
 }
 
@@ -790,7 +801,7 @@ DjVuDocEditor::get_thumbnails_size(void) const
    GPosition pos;
    int pages_num=get_pages_num();
    for(int page_num=0;page_num<pages_num;page_num++)
-      if (thumb_map.contains(page_to_url(page_num), pos))
+      if (thumb_map.contains(page_to_id(page_num), pos))
       {
 	 TArray<char> & data=*(TArray<char> *) thumb_map[pos];
 	 MemoryByteStream str;
@@ -857,7 +868,7 @@ DjVuDocEditor::generate_thumbnails(int thumb_size, int images_per_file,
 
       GPosition pos;
       GCriticalSectionLock lock(&thumb_lock);
-      if (thumb_map.contains(page_to_url(page_num), pos))
+      if (thumb_map.contains(page_to_id(page_num), pos))
       {
 	 GP<MemoryByteStream> str=new MemoryByteStream;
 	 TArray<char> & data=*(TArray<char> *) thumb_map[pos];
@@ -893,9 +904,9 @@ DjVuDocEditor::generate_thumbnails(int thumb_size, int images_per_file,
 
    for(page_num=0;page_num<pages_num;page_num++)
    {
-      GURL url=page_to_url(page_num);
-      if (!thumb_map.contains(url))
-	 thumb_map[url]=new TArray<char>(thumb_str[page_num]->get_data());
+      GString id=page_to_id(page_num);
+      if (!thumb_map.contains(id))
+	 thumb_map[id]=new TArray<char>(thumb_str[page_num]->get_data());
    }
 
    DEBUG_MSG("creating DjVuFiles to contain new thumbnails...\n");
