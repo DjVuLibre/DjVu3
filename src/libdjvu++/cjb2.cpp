@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: cjb2.cpp,v 1.1 2000-02-14 22:32:36 leonb Exp $
+//C- $Id: cjb2.cpp,v 1.2 2000-02-14 22:41:44 leonb Exp $
 
 
 /** @name cjb2
@@ -38,7 +38,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: cjb2.cpp,v 1.1 2000-02-14 22:32:36 leonb Exp $# */
+    #$Id: cjb2.cpp,v 1.2 2000-02-14 22:41:44 leonb Exp $# */
 //@{
 //@}
 
@@ -971,7 +971,7 @@ main(int argc, const char **argv)
           else if (arg == "-smooth")
             opts.smooth = true;
           else if (arg == "-loose")
-            opts.substitute_threshold = 7;
+            opts.substitute_threshold = 5;
           else if (arg[0] == '-')
             usage();
           else if (!inputpbmfile)
@@ -981,6 +981,8 @@ main(int argc, const char **argv)
           else
             usage();
         }
+      if (!inputpbmfile || !outputdjvufile)
+        usage();
       // Execute
       cjb2(inputpbmfile, outputdjvufile, opts);
     }
