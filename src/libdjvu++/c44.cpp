@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: c44.cpp,v 1.17 1999-10-22 14:58:53 leonb Exp $
+//C- $Id: c44.cpp,v 1.18 1999-10-22 15:02:12 leonb Exp $
 
 
 /** @name c44
@@ -132,7 +132,9 @@
     {\bf Generating Photo DjVu instead of IW44} ---
     Photo DjVu images have thje additional capability to store the resolution
     and gamma correction information.  Using any of the following options will
-    generate a Photo DjVu Image instead of a IW44 file.
+    generate a Photo DjVu Image instead of a IW44 file.  Program \Ref{d44}
+    does not work on these files.  Program \Ref{djvutopnm} handles both IW44 and
+    DjVu files.
     \begin{description}
     \item[-dpi n]  Sets the resolution information for a Photo DjVu image.
     \item[-gamma n] Sets the gamma correction information for a Photo DjVu image.
@@ -160,7 +162,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: c44.cpp,v 1.17 1999-10-22 14:58:53 leonb Exp $# */
+    #$Id: c44.cpp,v 1.18 1999-10-22 15:02:12 leonb Exp $# */
 //@{
 //@}
 
@@ -245,7 +247,8 @@ usage()
          "                     for -crcbnormal and -crcbhalf modes\n"
          "\n"
          "You can generating a Photo DjVu image instead of a IW44 image\n"
-         "by using any of the following options:\n"
+         "by using any of the following options.  These files can be decoded\n"
+         "using program DJVUTOPNM\n"
          "    -dpi n        -- sets the image resolution\n"
          "    -gamma n      -- sets the image gamma correction\n"
          "\n");
