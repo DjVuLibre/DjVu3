@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: JB2Image.cpp,v 1.29 2000-01-04 05:31:31 bcr Exp $
+//C- $Id: JB2Image.cpp,v 1.30 2000-02-08 00:00:02 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -1691,6 +1691,9 @@ _JB2Codec::encode_libonly_shape(JB2Image *jim, int shapeno )
 void 
 _JB2Codec::compute_bounding_box(GBitmap *bm, LibRect *lib)
 {
+  // First lock the stuff.
+  GMonitorLock lock(bm->monitor());
+  // Get size
   int w = bm->columns();
   int h = bm->rows();
   int s = bm->rowsize();
