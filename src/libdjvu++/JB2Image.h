@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: JB2Image.h,v 1.12 1999-06-08 20:36:25 leonb Exp $
+//C- $Id: JB2Image.h,v 1.13 1999-07-20 15:52:50 leonb Exp $
 
 #ifndef _JB2IMAGE_H
 #define _JB2IMAGE_H
@@ -44,6 +44,14 @@
     when both shapes are similar because each shape is encoded using the
     parent shape as a model.  A #"O"# shape for instance could be a parent for
     both a #"C"# shape and a #"Q"# shape.
+
+    {\bf JB2 Dictionary} --- Class \Ref{JB2Dict} is a peculiar kind of
+    JB2Image which only contains an array of shapes.  These shapes can be
+    referenced from another JB2Dict/JB2Image.  This is arranged by setting the
+    ``inherited dictionary'' of a JB2Dict/JB2Image using function
+    \Ref{JB2Dict::set_inherited_dict}. Several JB2Images can use shapes from a
+    same JB2Dict encoded separately.  This is how several pages of a same
+    document can share information.
     
     {\bf Decoding JB2 data} --- The first step for decoding JB2 data consists of 
     creating an empty #JB2Image# object.  Function \Ref{JB2Image::decode} then
@@ -99,7 +107,7 @@
     \end{itemize}
 
     @version
-    #$Id: JB2Image.h,v 1.12 1999-06-08 20:36:25 leonb Exp $#
+    #$Id: JB2Image.h,v 1.13 1999-07-20 15:52:50 leonb Exp $#
     @memo
     Coding bilevel images with JB2.
     @author
@@ -119,6 +127,8 @@
 #include "GRect.h"
 #include "GBitmap.h"
 
+class JB2Dict;
+class JB2Image;
 
 /** Blit data structure.  A #JB2Image# contains an array of #JB2Blit# data
     structures.  Each array entry instructs the decoder to render a particular
@@ -167,6 +177,96 @@ public:
 
 
 
+/** JB2 Dictionary callback.
+    The decoding function call this callback function when they discover that
+    the current JB2Image or JB2Dict needs a pre-existing shape dictionary. 
+    The callback function must return a pointer to the dictionary or NULL
+    if none is found. */
+
+typedef GP<JB2Dict> JB2DecoderCallback ( void* );
+
+
+/** Dictionary of JB2 shapes. */
+
+class JB2Dict : public GPEnabled
+{
+public:
+  // CONSTRUCTION
+  /** Null Constructor.  Constructs an empty #JB2Dict# object.  You can then
+      call the decoding function #decode#.  You can also manually set the
+      image size using #add_shape#. */
+  JB2Dict();
+  // INITIALIZATION
+  /** Resets the #JB2Image# object.  This function reinitializes both the shape
+     and the blit arrays.  All allocated memory is freed. */
+  void init();
+
+  // INHERITED
+  /** Returns the inherited dictionary. */
+  GP<JB2Dict> get_inherited_dict() const;
+  /** Returns the number of inherited shapes. */
+  int get_inherited_shape_count() const;
+  /** Sets the inherited dictionary. */
+  void set_inherited_dict(GP<JB2Dict> dict);
+
+  // ACCESSING THE SHAPE LIBRARY
+  /** Returns the total number of shapes.
+      Shape indices range from #0# to #get_shape_count()-1#. */
+  int get_shape_count() const;
+  /** Returns a pointer to shape #shapeno#.
+      The returned pointer directly points into the shape array.
+      This pointer can be used for reading or writing the shape data. */
+  JB2Shape *get_shape(int shapeno);
+  /** Returns a constant pointer to shape #shapeno#.
+      The returned pointer directly points into the shape array.
+      This pointer can only be used for reading the shape data. */
+  const JB2Shape *get_shape(int shapeno) const;
+  /** Appends a shape to the shape array.  This function appends a copy of
+      shape #shape# to the shape array and returns the subscript of the new
+      shape.  The subscript of the parent shape #shape.parent# must 
+      actually designate an already existing shape. */
+  int  add_shape(const JB2Shape &shape);
+
+  // MEMORY OPTIMIZATION
+  /** Compresses all shape bitmaps.  This function reduces the memory required
+      by the #JB2Image# by calling \Ref{GBitmap::compress} on all shapes
+      bitmaps.  This function is best called after decoding a #JB2Image#,
+      because function \Ref{get_bitmap} can directly use the compressed
+      bitmaps.  */
+  void compress();
+  /** Returns the total memory used by the JB2Image.
+      The returned value is expressed in bytes. */
+  unsigned int get_memory_usage() const;
+
+  // CODING
+  /** Encodes the JB2Dict into ByteStream #bs#.  
+      This function generates the JB2 data stream without any header.   */
+  void encode(ByteStream &bs) const;
+  /** Decodes JB2 data from ByteStream #bs#. This function decodes the image
+      size and populates the shape and blit arrays.  The callback function
+      #cb# is called when the decoder determines that the ByteStream data
+      requires a shape dictionary which has not been set with
+      \Ref{JB2Dict::set_inherited_dict}. The callback receives argument #arg#
+      and must return a suitable dictionary which will be installed as the
+      inherited dictionary.  The callback should return null if no such
+      dictionary is found. */
+  void decode(ByteStream &bs, JB2DecoderCallback *cb=0, void *arg=0);
+
+  
+public:
+  /** Comment string.  
+      This variable holds an optional comment included in JB2 files. */
+  GString comment;
+
+private:
+  int inherited_shapes;
+  GP<JB2Dict> inherited_dict;
+  DArray<JB2Shape> shapes;
+  
+};
+
+
+
 /** Main JB2 data structure.  Each #JB2Image# consists of an array of shapes
     and an array of blits.  These arrays can be populated by hand using
     functions \Ref{add_shape} and \Ref{add_blit}, or by decoding JB2 data
@@ -174,7 +274,7 @@ public:
     to render anti-aliased images, or use function \Ref{encode} to generate
     JB2 data. */
 
-class JB2Image : public GPEnabled
+class JB2Image : public JB2Dict
 {
 public:
 
@@ -186,17 +286,22 @@ public:
   JB2Image();
 
   // INITIALIZATION
-  /* Resets the #JB2Image# object.  This function reinitializes both the shape
+  /** Resets the #JB2Image# object.  This function reinitializes both the shape
      and the blit arrays.  All allocated memory is freed. */
   void init();
 
-  // ACCESS
+  // DIMENSION
   /** Returns the width of the image.  
       This is the width value previously set with #set_dimension#. */
   int get_width() const;
   /** Returns the height of the image.  
       This is the height value previously set with #set_dimension#. */
   int get_height() const;
+  /** Sets the size of the JB2Image.
+      This function can be called at any time. 
+      The corresponding #width# and the #height# are stored
+      in the JB2 file. */
+  void set_dimension(int width, int height);
 
   // RENDERING
   /** Renders an anti-aliased gray level image.  This function renders the
@@ -217,19 +322,6 @@ public:
       images, as explained above.  Argument #dispy# should remain null. */
   GP<GBitmap> get_bitmap(const GRect &rect, int subsample=1, int align=1, int dispy=0) const;
 
-  // ACCESSING THE SHAPE LIBRARY
-  /** Returns the total number of shapes.
-      Shape indices range from #0# to #get_shape_count()-1#. */
-  int get_shape_count() const;
-  /** Returns a pointer to shape #shapeno#.
-      The returned pointer directly points into the shape array.
-      This pointer can be used for reading or writing the shape data. */
-  JB2Shape *get_shape(int shapeno);
-  /** Returns a constant pointer to shape #shapeno#.
-      The returned pointer directly points into the shape array.
-      This pointer can only be used for reading the shape data. */
-  const JB2Shape *get_shape(int shapeno) const;
-
   // ACCESSING THE BLIT LIBRARY
   /** Returns the total number of blits.
       Blit indices range from #0# to #get_blit_count()-1#. */
@@ -242,57 +334,35 @@ public:
       The returned pointer directly points into the shape array.
       This pointer can only be used for reading the shape data. */
   const JB2Blit *get_blit(int blitno) const;
-
-  // MEMORY OPTIMIZATION
-  /** Compresses all shape bitmaps.  This function reduces the memory required
-      by the #JB2Image# by calling \Ref{GBitmap::compress} on all shapes
-      bitmaps.  This function is best called after decoding a #JB2Image#,
-      because function \Ref{get_bitmap} can directly use the compressed
-      bitmaps.  */
-  void compress();
-  /** Returns the total memory used by the JB2Image.
-      The returned value is expressed in bytes. */
-  unsigned int get_memory_usage() const;
-
-  // BUILDING JB2IMAGE
-  /** Sets the size of the JB2Image.
-      This function can be called at any time. 
-      The corresponding #width# and the #height# are stored
-      in the JB2 file. */
-  void set_dimension(int width, int height);
-  /** Appends a shape to the shape array.  This function appends a copy of
-      shape #shape# to the shape array and returns the subscript of the new
-      shape.  The subscript of the parent shape #shape.parent# must 
-      actually designate an already existing shape. */
-  int  add_shape(const JB2Shape &shape);
   /** Appends a blit to the blit array.  This function appends a copy of blit
       #blit# to the blit array and returns the subscript of the new blit.  The
       shape subscript #blit.shapeno# must actually designate an already
       existing shape. */
   int  add_blit(const JB2Blit &blit);
 
-  // CODING
-  /** Encodes the JB2Image into ByteStream #bs#.  This function generates the
-      JB2 data stream without any header.  Argument #mode# is reserved for
-      future extensions (such as specifying JBIG2 encoding versus JB2
-      encoding) and should be left to the default value. */
-  void encode(ByteStream &bs, int mode=0) const;
-  /** Decodes JB2 data from ByteStream #bs#. This function decodes the image
-      size and populates the shape and blit arrays. Argument #mode# is
-      reserved for future extensions (such as specifying JBIG2 encoding versus
-      JB2 encoding) and should be left to the default value. */
-  void decode(ByteStream &bs, int mode=0);
+  // MEMORY OPTIMIZATION
+  /** Returns the total memory used by the JB2Image.
+      The returned value is expressed in bytes. */
+  unsigned int get_memory_usage() const;
 
-public:
-  /** Comment string. 
-      This variable holds the optional comment included in JB2 files. */
-  GString comment;
+  // CODING
+  /** Encodes the JB2Image into ByteStream #bs#.  
+      This function generates the JB2 data stream without any header. */
+  void encode(ByteStream &bs) const;
+  /** Decodes JB2 data from ByteStream #bs#. This function decodes the image
+      size and populates the shape and blit arrays.  The callback function
+      #cb# is called when the decoder determines that the ByteStream data
+      requires a shape dictionary which has not been set with
+      \Ref{JB2Dict::set_inherited_dict}. The callback receives argument #arg#
+      and must return a suitable dictionary which will be installed as the
+      inherited dictionary.  The callback should return null if no such
+      dictionary is found. */
+  void decode(ByteStream &bs, JB2DecoderCallback *cb=0, void *arg=0);
   
 private:
   // Implementation
   int width;
   int height;
-  DArray<JB2Shape> shapes;
   TArray<JB2Blit> blits;
 };
 
@@ -300,7 +370,51 @@ private:
 //@}
 
 
-// INLINE FUNCTIONS
+// JB2DICT INLINE FUNCTIONS
+
+
+
+
+inline int
+JB2Dict::get_shape_count() const
+{
+  return inherited_shapes + shapes.size();
+}
+
+inline int
+JB2Dict::get_inherited_shape_count() const
+{
+  return inherited_shapes;
+}
+
+inline GP<JB2Dict>
+JB2Dict::get_inherited_dict() const
+{
+  return inherited_dict;
+}
+
+inline JB2Shape *
+JB2Dict::get_shape(int shapeno)
+{
+  if (shapeno >= inherited_shapes)
+    return & shapes[shapeno - inherited_shapes];
+  else if (inherited_dict)
+    return inherited_dict->get_shape(shapeno);
+  return 0;
+}
+
+inline const JB2Shape *
+JB2Dict::get_shape(int shapeno) const
+{
+  if (shapeno >= inherited_shapes)
+    return & shapes[shapeno - inherited_shapes];
+  else if (inherited_dict)
+    return inherited_dict->get_shape(shapeno);
+  return 0;
+}
+
+
+// JB2IMAGE INLINE FUNCTIONS
 
 inline int
 JB2Image::get_width() const
@@ -314,11 +428,6 @@ JB2Image::get_height() const
   return height;
 }
 
-inline int
-JB2Image::get_shape_count() const
-{
-  return shapes.size();
-}
 
 inline int
 JB2Image::get_blit_count() const
@@ -326,11 +435,6 @@ JB2Image::get_blit_count() const
   return blits.size();
 }
 
-inline JB2Shape *
-JB2Image::get_shape(int shapeno)
-{
-  return & shapes[shapeno];
-}
 
 inline JB2Blit *
 JB2Image::get_blit(int blitno)
@@ -338,18 +442,11 @@ JB2Image::get_blit(int blitno)
   return & blits[blitno];
 }
 
-inline const JB2Shape *
-JB2Image::get_shape(int shapeno) const
-{
-  return & shapes[shapeno];
-}
-
 inline const JB2Blit *
 JB2Image::get_blit(int blitno) const
 {
   return & blits[blitno];
 }
-
 
 
 #endif

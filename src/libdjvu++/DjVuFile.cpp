@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.11 1999-06-30 20:49:25 eaf Exp $
+//C- $Id: DjVuFile.cpp,v 1.12 1999-07-20 15:52:50 leonb Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -190,9 +190,9 @@ DjVuFile::wait_for_chunk(void)
 {
    DEBUG_MSG("DjVuFile::wait_for_chunk() called\n");
    DEBUG_MAKE_INDENT(3);
-   
    chunk_mon.enter();
    chunk_mon.wait();
+   chunk_mon.leave();
 }
 
 bool
@@ -248,23 +248,30 @@ DjVuFile::wait_for_finish(bool self)
 void
 DjVuFile::notify_chunk_done(const DjVuPort *, const char *)
 {
-   GMonitorLock lock(&chunk_mon);
+   chunk_mon.enter();
    chunk_mon.broadcast();
+   chunk_mon.leave();
 }
 
 void
 DjVuFile::notify_file_done(const DjVuPort * src)
 {
-   if (src!=this)
-   {
+  if (src!=this)
+    {
       GCriticalSectionLock inc_lock(&inc_files_lock);
       GPosition pos;
       for(pos=inc_files_list;pos;++pos)
-	 if (inc_files_list[pos]==src) break;
+        if (inc_files_list[pos]==src) break;
       if (!pos) return;
-   }
-   GMonitorLock lock(&finish_mon);
-   finish_mon.broadcast();
+    }
+  // Signal threads waiting for file termination
+  finish_mon.enter();
+  finish_mon.broadcast();
+  finish_mon.leave();
+  // In case a thread is still waiting for a chunk
+  chunk_mon.enter();
+  chunk_mon.broadcast();
+  chunk_mon.leave();
 }
 
 void
@@ -422,6 +429,46 @@ DjVuFile::process_incl_chunk(ByteStream & str, bool incl)
    return 0;
 }
 
+
+GP<JB2Dict>
+DjVuFile::static_get_fgjd(void *arg)
+{
+  DjVuFile *file = (DjVuFile*)arg;
+  return file->get_fgjd(1);
+}
+
+
+GP<JB2Dict>
+DjVuFile::get_fgjd(int block)
+{
+  // Simplest case
+  if (DjVuFile::fgjd)
+    return DjVuFile::fgjd;
+  // Check wether included files
+  for(;;)
+    {
+      int active = 0;
+      GPList<DjVuFile> incs = get_included_files();
+      for (GPosition pos=incs.firstpos(); pos; ++pos)
+        {
+          GP<DjVuFile> file = incs[pos];
+          if (file->is_decoding()) 
+            active = 1;
+          GP<JB2Dict> fgjd = file->get_fgjd();
+          if (fgjd) 
+            return fgjd;
+        }
+      // Exit if non-blocking mode
+      if (! block) break;
+      // Exit if there is no decoding activity
+      if (! active) break;
+      // Wait until a new chunk gets decoded
+      wait_for_chunk();
+    }
+  return 0;
+}
+
+
 void
 DjVuFile::decode(ByteStream & str)
 {
@@ -529,28 +576,42 @@ DjVuFile::decode(ByteStream & str)
 			      bg44->get_serial());
                   
 	       }
-	    } else if (chkid=="Sjbz")
-	    {
-	       if (DjVuFile::fgjb)
-		  THROW("DjVu Decoder: Corrupted data (Duplicate FGxx chunk)");
-	       GP<JB2Image> fgjb=new JB2Image();
-	       fgjb->decode(iff);
-	       DjVuFile::fgjb=fgjb;
-	       pcaster->notify_redisplay(this);
-	       desc.format(" %0.1f Kb\t'%s'\tJB2 foreground mask (%dx%d)\n",
-			   chksize/1024.0, (const char*)chkid,
-			   fgjb->get_width(), fgjb->get_height());
-	    } else if (chkid=="FG44")
-	    {
-	       if (fgpm)
+            } 
+            else if (chkid=="Djbz")
+              {
+                if (DjVuFile::fgjd)
+		  THROW("DjVu Decoder: Corrupted data (Duplicate Dxxx chunk)");
+                if (DjVuFile::fgjd)
+		  THROW("DjVu Decoder: Corrupted data (Dxxx chunk found after Sxxx chunk)");
+                GP<JB2Dict> fgjd = new JB2Dict();
+                fgjd->decode(iff);
+                DjVuFile::fgjd = fgjd;
+                desc.format(" %0.1f Kb\t'%s'\tJB2 shape dictionary\n",
+                            chksize/1024.0, (const char*)chkid );
+              } 
+            else if (chkid=="Sjbz")
+              {
+                if (DjVuFile::fgjb)
+		  THROW("DjVu Decoder: Corrupted data (Duplicate Sxxx chunk)");
+                GP<JB2Image> fgjb=new JB2Image();
+                fgjb->decode(iff, static_get_fgjd, (void*)this);
+                DjVuFile::fgjb = fgjb;
+                pcaster->notify_redisplay(this);
+                desc.format(" %0.1f Kb\t'%s'\tJB2 foreground mask (%dx%d)\n",
+                            chksize/1024.0, (const char*)chkid,
+                            fgjb->get_width(), fgjb->get_height());
+              }
+	    else if (chkid=="FG44")
+              {
+                if (fgpm)
 		  THROW("DjVu Decoder: Corrupted data (Duplicate foreground layer)");
-	       IWPixmap fg44;
-	       fg44.decode_chunk(iff);
-	       fgpm=fg44.get_pixmap();
-	       pcaster->notify_redisplay(this);
-	       desc.format(" %0.1f Kb\t'%s'\tIW44 foreground colors (%dx%d)\n",
-			   chksize/1024.0, (const char*)chkid,
-			   fg44.get_width(), fg44.get_height());
+                IWPixmap fg44;
+                fg44.decode_chunk(iff);
+                fgpm=fg44.get_pixmap();
+                pcaster->notify_redisplay(this);
+                desc.format(" %0.1f Kb\t'%s'\tIW44 foreground colors (%dx%d)\n",
+                            chksize/1024.0, (const char*)chkid,
+                            fg44.get_width(), fg44.get_height());
 	    } else if (chkid=="BGjp")
 	    {
 	       if (bg44)

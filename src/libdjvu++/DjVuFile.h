@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.h,v 1.7 1999-06-10 23:30:49 eaf Exp $
+//C- $Id: DjVuFile.h,v 1.8 1999-07-20 15:52:50 leonb Exp $
  
 #ifndef _DJVUFILE_H
 #define _DJVUFILE_H
@@ -47,7 +47,7 @@
 
     @memo Classes representing DjVu files.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuFile.h,v 1.7 1999-06-10 23:30:49 eaf Exp $#
+    @version #$Id: DjVuFile.h,v 1.8 1999-07-20 15:52:50 leonb Exp $#
 */
 
 //@{
@@ -147,6 +147,8 @@ public:
    GP<IWPixmap>		bg44;
       /// Pointer to the mask of foreground component of DjVu image.
    GP<JB2Image>		fgjb;
+      /// Pointer to the optional shape dictionary for the mask.
+   GP<JB2Dict>		fgjd;
       /// Pointer to the colors of foreground component of DjVu image.
    GP<GPixmap>		fgpm;
       /// Pointer to the navigation directory contained in this file
@@ -401,6 +403,9 @@ private:
    static void	static_decode_func(void *);
    void		decode_func(void);
    void		decode(ByteStream & str);
+      // Functions dealing with the shape directory (fgjd)
+   static GP<JB2Dict> static_get_fgjd(void *);
+   GP<JB2Dict> get_fgjd(int block=0);
 
       // Functions used to wait for smth
    void		wait_for_chunk(void);
