@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GThreads.h,v 1.25 1999-10-16 15:26:13 leonb Exp $
+//C- $Id: GThreads.h,v 1.26 1999-11-17 19:05:18 leonb Exp $
 
 #ifndef _GTHREADS_H_
 #define _GTHREADS_H_
@@ -73,7 +73,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Praveen Guduru <praveen@sanskrit.lz.att.com> -- mac implementation.
     @version
-    #$Id: GThreads.h,v 1.25 1999-10-16 15:26:13 leonb Exp $# */
+    #$Id: GThreads.h,v 1.26 1999-11-17 19:05:18 leonb Exp $# */
 //@{
 
 #include "DjVuGlobal.h"
@@ -407,6 +407,7 @@ inline void GMonitor::broadcast() {}
          ... -- protected code
       }
     \end{verbatim} 
+    This construct will do nothing when passed a null pointer.
 */
 class GMonitorLock 
 {
@@ -415,10 +416,10 @@ private:
 public:
   /** Constructor. Enters the monitor #gsec#. */
   GMonitorLock(GMonitor *gsec) : gsec(gsec) 
-    { gsec->enter(); };
+    { if (gsec) gsec->enter(); };
   /** Destructor. Leaves the associated monitor. */
   ~GMonitorLock() 
-    { gsec->leave(); };
+    { if (gsec) gsec->leave(); };
 };
 
 /** A thread safe class representing a set of flags. The flags are protected
@@ -544,9 +545,9 @@ private:
   GCriticalSection *gsec;
 public:
   GCriticalSectionLock(GCriticalSection *gsec) : gsec(gsec) 
-    { gsec->lock(); };
+    { if (gsec) gsec->lock(); };
   ~GCriticalSectionLock() 
-    { gsec->unlock(); };
+    { if (gsec) gsec->unlock(); };
 };
 
 
