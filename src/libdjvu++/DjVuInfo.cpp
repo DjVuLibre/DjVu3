@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuInfo.cpp,v 1.4 1999-10-21 15:02:17 leonb Exp $
+//C- $Id: DjVuInfo.cpp,v 1.5 1999-10-22 14:58:36 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -62,7 +62,7 @@ DjVuInfo::decode(ByteStream &bs)
   if (size>=8 && buffer[7]!=0xff)
     dpi = (buffer[7]<<8) + buffer[6];
   if (size>=9)
-    gamma = 22.0 * buffer[8];
+    gamma = 0.1 * buffer[8];
   if (size>=10)
     reserved = buffer[9];
   // Fixup
