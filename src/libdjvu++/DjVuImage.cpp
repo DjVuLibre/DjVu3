@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: DjVuImage.cpp,v 1.2 1999-02-01 22:50:39 leonb Exp $
+//C-  $Id: DjVuImage.cpp,v 1.3 1999-02-08 19:56:50 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -652,25 +652,25 @@ do_pixmap(const DjVuImage &dimg, PImager get,
 }
 
 GP<GPixmap>  
-DjVuImage::get_pixmap(const GRect &rect, const GRect &all, double gamma=0) const
+DjVuImage::get_pixmap(const GRect &rect, const GRect &all, double gamma) const
 {
   return do_pixmap(*this, & DjVuImage::get_pixmap, rect, all, gamma);
 }
 
 GP<GBitmap>  
-DjVuImage::get_bitmap(const GRect &rect, const GRect &all, int align = 1) const
+DjVuImage::get_bitmap(const GRect &rect, const GRect &all, int align) const
 {
   return do_bitmap(*this, & DjVuImage::get_bitmap, rect, all, align);
 }
 
 GP<GPixmap>  
-DjVuImage::get_bg_pixmap(const GRect &rect, const GRect &all, double gamma=0) const
+DjVuImage::get_bg_pixmap(const GRect &rect, const GRect &all, double gamma) const
 {
   return do_pixmap(*this, & DjVuImage::get_bg_pixmap, rect, all, gamma);
 }
 
 GP<GPixmap>  
-DjVuImage::get_fg_pixmap(const GRect &rect, const GRect &all, double gamma=0) const
+DjVuImage::get_fg_pixmap(const GRect &rect, const GRect &all, double gamma) const
 {
   return do_pixmap(*this, & DjVuImage::get_fg_pixmap, rect, all, gamma);
 }
