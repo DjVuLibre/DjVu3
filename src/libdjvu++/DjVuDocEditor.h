@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocEditor.h,v 1.4 1999-11-22 21:10:51 eaf Exp $
+//C- $Id: DjVuDocEditor.h,v 1.5 1999-11-23 18:16:59 eaf Exp $
  
 #ifndef _DJVUDOCEDITOR_H
 #define _DJVUDOCEDITOR_H
@@ -27,7 +27,7 @@
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocEditor.h,v 1.4 1999-11-22 21:10:51 eaf Exp $#
+    @version #$Id: DjVuDocEditor.h,v 1.5 1999-11-23 18:16:59 eaf Exp $#
 */
 
 //@{
@@ -117,6 +117,19 @@ public:
 	  @param page_num Position where the new pages should be inserted at.
 	  	 Negative value means "append" */
    void		insert_group(const GList<GString> & fname_list, int page_num=-1);
+      /** Removes the specified page from the document. If #remove_unref#
+	  is #TRUE#, the function will also remove from the document any file,
+	  which became unreferenced due to the page's removal */
+   void		remove_page(int page_num, bool remove_unref=true);
+      /** Removes a DjVu file with the specified #id#.
+
+	  If some other files include this file, the corresponding #INCL#
+	  chunks will be removed to avoid dead links.
+
+	  If #remove_unref# is #TRUE#, the function will also remove every
+	  file, which will become unreferenced after the removal of this file. */
+   void		remove_file(const char * id, bool remove_unref=true);
+   
    void		generate_thumbnails(int thumb_size, int images_per_file,
 				    void (* cb)(int page_num, void *)=0,
 				    void * cl_data=0);
@@ -170,6 +183,11 @@ private:
    void		clean_files_map(void);
    void		insert_file(const char * file_name, bool is_page,
 			    int & file_pos, GMap<GString, GString> & name2id);
+   void		remove_file(const char * id, bool remove_unref,
+			    GMap<GString, void *> & ref_map);
+   void		generate_ref_map(const GP<DjVuFile> & file,
+				 GMap<GString, void *> & ref_map,
+				 GMap<GURL, void *> & visit_map);
 };
 
 inline bool

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocEditor.cpp,v 1.9 1999-11-23 15:40:40 eaf Exp $
+//C- $Id: DjVuDocEditor.cpp,v 1.10 1999-11-23 18:16:59 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -561,6 +561,148 @@ DjVuDocEditor::insert_page(const char * file_name, int page_num)
    list.append(file_name);
 
    insert_group(list, page_num);
+}
+
+void
+DjVuDocEditor::generate_ref_map(const GP<DjVuFile> & file,
+				GMap<GString, void *> & ref_map,
+				GMap<GURL, void *> & visit_map)
+      // This private function is used to generate a list (implemented as map)
+      // of files referencing the given file. To get list of all parents
+      // for file with ID 'id' iterate map obtained as
+      // *((GMap<GString, void *> *) ref_map[id])
+{
+   GURL url=file->get_url();
+   GString id=djvm_dir->name_to_file(url.name())->id;
+   if (!visit_map.contains(url))
+   {
+      visit_map[url]=0;
+
+      GPList<DjVuFile> files_list=file->get_included_files(false);
+      for(GPosition pos=files_list;pos;++pos)
+      {
+	 GP<DjVuFile> child_file=files_list[pos];
+	    // First: add the current file to the list of parents for
+	    // the child being processed
+	 GURL child_url=child_file->get_url();
+	 GString child_id=djvm_dir->name_to_file(child_url.name())->id;
+	 GMap<GString, void *> * parents=0;
+	 if (ref_map.contains(child_id))
+	    parents=(GMap<GString, void *> *) ref_map[child_id];
+	 else
+	    ref_map[child_id]=parents=new GMap<GString, void *>();
+	 (*parents)[id]=0;
+	    // Second: go recursively
+	 generate_ref_map(child_file, ref_map, visit_map);
+      }
+   }
+}
+
+void
+DjVuDocEditor::remove_file(const char * id, bool remove_unref,
+			   GMap<GString, void *> & ref_map)
+      // Private function, which will remove file with ID id.
+      //
+      // If will also remove all INCL chunks in parent files pointing
+      // to this one
+      //
+      // Finally, if remove_unref is TRUE, we will go down the files
+      // hierarchy removing every file, which becomes unreferenced.
+      //
+      // ref_map will be used to find out list of parents referencing
+      // this file (required when removing INCL chunks)
+{
+      // First get rid of INCL chunks in parents
+   GMap<GString, void *> * parents=(GMap<GString, void *> *) ref_map[id];
+   if (parents)
+   {
+      for(GPosition pos=*parents;pos;++pos)
+      {
+	 GString parent_id=(*parents).key(pos);
+	 GP<DjVuFile> parent=get_djvu_file(parent_id);
+	 if (parent) parent->unlink_file(id);
+      }
+      delete parents; parents=0;
+      ref_map.del(id);
+   }
+
+      // We will accumulate errors here.
+   GString errors;
+   
+      // Now modify the ref_map and process children if necessary
+   GP<DjVuFile> file=get_djvu_file(id);
+   if (file)
+   {
+      TRY {
+	 GPList<DjVuFile> files_list=file->get_included_files(false);
+	 for(GPosition pos=files_list;pos;++pos)
+	 {
+	    GP<DjVuFile> child_file=files_list[pos];
+	    GURL child_url=child_file->get_url();
+	    GString child_id=djvm_dir->name_to_file(child_url.name())->id;
+	    GMap<GString, void *> * parents=(GMap<GString, void *> *) ref_map[child_id];
+	    if (parents) parents->del(id);
+
+	    if (remove_unref && (!parents || !parents->size()))
+	       remove_file(child_id, remove_unref, ref_map);
+	 }
+      } CATCH(exc) {
+	 if (errors.length()) errors+="\n\n";
+	 errors+=exc.get_cause();
+      } ENDCATCH;
+   }
+
+      // Finally remove this file from the directory.
+   djvm_dir->delete_file(id);
+
+   if (errors.length()) THROW(errors);
+}
+
+void
+DjVuDocEditor::remove_file(const char * id, bool remove_unref)
+{
+   DEBUG_MSG("DjVuDocEditor::remove_file(): id='" << id << "'\n");
+   DEBUG_MAKE_INDENT(3);
+
+   if (!djvm_dir->id_to_file(id))
+      THROW("There is no such file with ID '"+GString(id)+"' in this document.");
+   
+      // First generate a map of references (containing the list of parents
+      // including this particular file. This will speed things up
+      // significatly.
+   GMap<GString, void *> ref_map;	// GMap<GString, GMap<GString, void *> *> in fact
+   GMap<GURL, void *> visit_map;	// To avoid loops
+
+   int pages_num=djvm_dir->get_pages_num();
+   for(int page_num=0;page_num<pages_num;page_num++)
+      generate_ref_map(get_djvu_file(page_num), ref_map, visit_map);
+
+      // Now call the function, which will do the removal recursively
+   remove_file(id, remove_unref, ref_map);
+
+      // And clear the ref_map
+   GPosition pos;
+   while((pos=ref_map))
+   {
+      GMap<GString, void *> * parents=(GMap<GString, void *> *) ref_map[pos];
+      delete parents;
+      ref_map.del(pos);
+   }
+}
+
+void
+DjVuDocEditor::remove_page(int page_num, bool remove_unref)
+{
+   DEBUG_MSG("DjVuDocEditor::remove_page(): page_num=" << page_num << "\n");
+   DEBUG_MAKE_INDENT(3);
+
+      // Translate the page_num to ID
+   GP<DjVmDir> djvm_dir=get_djvm_dir();
+   if (page_num<0 || page_num>=djvm_dir->get_pages_num())
+      THROW("Page number "+GString(page_num)+" is invalid");
+
+      // And call general remove_file()
+   remove_file(djvm_dir->page_to_file(page_num)->id, remove_unref);
 }
 
 void
