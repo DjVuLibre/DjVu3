@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuDocumentAPI.h,v 1.19 2000-02-18 08:02:06 bcr Exp $
+ *C- $Id: DjVuDocumentAPI.h,v 1.20 2000-02-18 17:28:40 haffner Exp $
  */
 
 #ifndef _DJVUDOC_H_
@@ -387,6 +387,16 @@ typedef struct djvu_segmenter_options_struct
      Necessary when characters are thick (typically when upsampling).
   */
   int background_floss;
+
+  /** Set some limits to the memory usage, especially in the filter .
+
+      This mostly applies to the filter, whose memory usage can become very
+      important when CCs are large.  The price to pay is that large CCs will
+      be rejected in the background, without even attempting to break them.  
+
+  */
+
+  int limit_mem_usage;
   /*@}*/
 
 #ifdef __cplusplus 
