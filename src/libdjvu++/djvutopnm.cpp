@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: djvutopnm.cpp,v 1.17.4.1 1999-04-12 16:45:50 eaf Exp $
+//C- $Id: djvutopnm.cpp,v 1.17.4.2 1999-04-29 20:11:30 eaf Exp $
 
 
 /** @name djvutopnm
@@ -87,7 +87,7 @@
     Yann Le Cun <yann@research.att.com>\\
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: djvutopnm.cpp,v 1.17.4.1 1999-04-12 16:45:50 eaf Exp $# */
+    #$Id: djvutopnm.cpp,v 1.17.4.2 1999-04-29 20:11:30 eaf Exp $# */
 //@{
 //@}
 
@@ -122,18 +122,6 @@ convert(const char *from, const char *to, int page_num)
   GURL from_url=GOS::filename_to_url(from);
   GP<DjVuDocument> doc=new DjVuDocument(from_url);
 
-  GP<DjVuFile> f=doc->get_djvu_file(0);
-  TArray<char> data=f->get_djvu_data(0, 0);
-  StdioByteStream ostr("/tmp/file.djvu", "wb");
-  ostr.writall(data, data.size());
-  ostr.flush();
-  data=doc->get_djvm_data();
-  StdioByteStream ostr1("/tmp/doc.djvm", "wb");
-  ostr1.writall(data, data.size());
-  ostr1.flush();
-  doc->save_as_djvu("/tmp/djvu");
-  exit(0);
-  
   if (page_num>0)
   {
 	// Unfortunately, before we can access any page from the document,
