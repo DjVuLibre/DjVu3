@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GMapAreas.cpp,v 1.4 1999-10-18 16:50:39 eaf Exp $
+//C- $Id: GMapAreas.cpp,v 1.5 1999-10-27 21:41:49 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -244,15 +244,16 @@ GMapPoly::does_side_cross_rect(const GRect & grect, int side)
    int ymin=y1<y2 ? y1 : y2;
    int xmax=x1+x2-xmin;
    int ymax=y1+y2-ymin;
+
    if (xmax<grect.xmin || xmin>grect.xmax ||
        ymax<grect.ymin || ymin>grect.ymax) return false;
-   
+
    return
-      x1>=grect.xmin && x1<grect.xmax && y1>=grect.ymin && y1<grect.ymax ||
-      x2>=grect.xmin && x2<grect.xmax && y2>=grect.ymin && y2<grect.ymax ||
-      do_segments_intersect(grect.xmin, grect.ymin, grect.xmax-1, grect.ymax-1,
+      x1>=grect.xmin && x1<=grect.xmax && y1>=grect.ymin && y1<=grect.ymax ||
+      x2>=grect.xmin && x2<=grect.xmax && y2>=grect.ymin && y2<=grect.ymax ||
+      do_segments_intersect(grect.xmin, grect.ymin, grect.xmax, grect.ymax,
 			    x1, y1, x2, y2) ||
-      do_segments_intersect(grect.xmax-1, grect.ymin, grect.xmin, grect.ymax-1,
+      do_segments_intersect(grect.xmax, grect.ymin, grect.xmin, grect.ymax,
 			    x1, y1, x2, y2);
 }
 
