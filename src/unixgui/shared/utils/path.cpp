@@ -32,12 +32,11 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: path.cpp,v 1.18 2001-10-16 22:27:24 docbill Exp $
+// $Id: path.cpp,v 1.16.2.1 2001-10-19 00:39:26 leonb Exp $
 // $Name:  $
 
-
-#ifdef __GNUC__
-#pragma implementation
+#ifdef HAVE_CONFIG_H
+#include "config.h"
 #endif
 
 #include "debug.h"
@@ -51,148 +50,356 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
-#ifdef AUTOCONF
-#  ifdef HAVE_DIRENT_H
-#   include <dirent.h>
-#   define NAMLEN(dirent) strlen((dirent)->d_name)
-#  else
-#   define dirent direct
-#   define NAMLEN(dirent) (dirent)->d_namlen
-#   ifdef HAVE_SYS_NDIR_H
-#    include <sys/ndir.h>
-#   endif
-#   ifdef HAVE_SYS_DIR_H
-#    include <sys/dir.h>
-#   endif
-#   ifdef HAVE_NDIR_H
-#    include <ndir.h>
-#   endif
-#  endif
-#else
-# if defined(sun) || defined(__osf__) || defined(hpux)
-#  include <dirent.h>
-# else
-#  include <sys/dir.h>
-#  define dirent direct
-# endif
-#endif /* AUTOCONF */
+#include <errno.h>
+#include <sys/stat.h>
+#include <pwd.h>
+#include <stdarg.h>
 
-static int CheckLibraryPath(const char * path)
+#ifndef MAXPATHLEN
+#ifdef _MAX_PATH
+#define MAXPATHLEN _MAX_PATH
+#else
+#define MAXPATHLEN 1024
+#endif
+#endif
+#if ( MAXPATHLEN < 1024 )
+#undef MAXPATHLEN
+#define MAXPATHLEN 1024
+#endif
+
+/* Logging */
+#define DBG(x) /**/
+
+/* Stuff for easily dealing with string allocation */
+
+struct strpool_data {
+  struct strpool_data *next;
+  char data[1];
+};
+
+typedef struct strpool {
+  struct strpool_data *first;
+} strpool;
+
+static void
+strpool_init(strpool *pool)
 {
-   DEBUG_MSG("CheckLibraryPath(): Checking path '" << path << "'\n");
-   if (!path || !strlen(path)) return 0;
-   
-   DIR * dir=opendir(path);
-   if (dir)
-   {
-      dirent * de;
-      while((de=readdir(dir)))
-      {
-         if (!strcmp(de->d_name, LIBRARY_NAME))
-	 {
-	    char buffer[MAXPATHLEN+1];
-	    sprintf(buffer, "%s/%s", path, de->d_name);
-	    int fd=open(buffer, O_RDONLY);
-	    closedir(dir);
-	    if (fd<0) return 0;
-	    close(fd);
-	    return 1;
-	 }
-      }
-      closedir(dir);
-   }
-   return 0;
+  pool->first = 0;
 }
 
-GUTF8String GetLibraryPath(void)
-   // Returns directory, which is one level above the directory
-   // containing the shared library.
-   // Typically it's either ~/.netscape, or /usr/local/lib/netscape
-   // or anyother specified by NPX_PLUGIN_PATH
-   //
-   // NB The returned path should end with a slash
+static char *
+strpool_alloc(strpool *pool, int n)
 {
-   static char *library_path=NULL;
-   if (library_path) return library_path;
-   
-   char * ptr;
-   if ((ptr=getenv("NPX_PLUGIN_PATH")))
-   {
-      char * buffer=new char[strlen(ptr)+1];
-      if (!buffer) G_THROW("Not enough memory to get the path to the plugin.");
-      strcpy(buffer, ptr);
-      char *start = buffer;
-      while (*start)
-        {
-          char *end = start;
-          while (*end && *end!=':')
-            end += 1;
-          char *nstart = end;
-          if (*nstart)
-            *nstart++ = 0;
-          if (CheckLibraryPath(start))
-            {
-              if (start[strlen(start)-1]=='/') start[strlen(start)-1]=0;
-              char * slash;
-              for(ptr=slash=start;*ptr;ptr++)
-                if (*ptr=='/') slash=ptr;
-              slash[1]=0;
-              library_path=strdup(start); delete buffer;
-              if (!library_path) G_THROW("Not enough memory to get path to the plugin.");
-              DEBUG_MSG("GetLibraryPath(): Returning '" << library_path << "'\n");
-              return library_path;
-            }
-          start = nstart;
+  char *b = new char[sizeof(struct strpool_data)+n];
+  struct strpool_data *d = (struct strpool_data *)b;
+  d->next = pool->first;
+  d->data[n] = 0;
+  pool->first = d;
+  return d->data;
+}
+
+static void
+strpool_fini(strpool *pool)
+{
+  struct strpool_data *d;
+  while ((d = pool->first))
+    {
+      pool->first = d->next;
+      delete (char*) d;
+    }
+}
+
+const char *
+strconcat(strpool *pool, ...)
+{
+  va_list ap;
+  int n = 0;
+  char *d, *r;
+  const char *s;
+  va_start(ap, pool);
+  while ((s = va_arg(ap, const char *)))
+    n += strlen(s);
+  va_end(ap);
+  r = d = strpool_alloc(pool, n);
+  va_start(ap, pool);
+  while ((s = va_arg(ap, const char *)))
+    while (*s)
+      *d++ = *s++;
+  *d = 0;
+  return r;
+}
+
+/* Stuff to test and manipulate filenames */
+
+static bool
+is_file(const char *filename)
+{
+  DBG(("is_file(%s)\n",filename));
+  struct stat buf;
+  if (stat(filename,&buf) >= 0)
+    if (! (buf.st_mode & S_IFDIR)) {
+      DBG(("yes\n"));
+      return true;
+    }
+  return false;
+}
+
+static bool
+is_executable(const char *filename)
+{
+  if (!is_file(filename))
+    return false;
+  DBG(("is_executable(%s)\n", filename));
+  if (access(filename, X_OK)<0)
+    return false;
+  DBG(("yes\n"));
+  return true;
+}
+
+static const char *
+dirname(strpool *pool, const char *fname)
+{
+  const char *s = fname + strlen(fname);
+  while (s>fname && s[-1]=='/') s--;
+  while (s>fname && s[-1]!='/') s--;
+  while (s>fname && s[-1]=='/') s--;
+  if (s == fname)
+    return ( (s[0] == '/') ? "/" : "." );
+  int n = s - fname;
+  char *ret = strpool_alloc(pool, n);
+  strncpy(ret, fname, n);
+  return ret;
+}
+
+static const char *
+pathclean(strpool *pool, const char *n)
+{
+  DBG(("Cleaning '%s'\n",n));
+  char *ret = strpool_alloc(pool, strlen(n));
+  char *d = ret;
+  bool slash = false;
+  if (n[0] == '/')
+    *d++ = '/';
+  while (*n)
+    {
+      if (n[0] == '/') {
+        while (n[0] == '/')
+          n += 1;
+        continue;
+      }
+      if (n[0]=='.' && (n[1]=='/' || !n[1])) {
+        n += 1;
+        continue;
+      }
+      if (n[0]=='.' && n[1]=='.' 
+          && (n[2]=='/' || !n[2])
+          && d>ret && d[-1]!='/') {
+        *d = 0;
+        while (d>ret && d[-1] != '/')
+          d -= 1;
+        if (d[0]=='.' && d[1]=='.' && !d[2]) {
+          d += 2;
+        } else {
+          n += 2;
+          slash = false;
+          continue;
         }
-      delete buffer;
-   }
-   if ((ptr=getenv("HOME")))
-   {
-      const char ext[]=".netscape/plugins";
-      char * buffer=new char[strlen(ptr)+sizeof(ext)+1];
-      if (!buffer) G_THROW("Not enough memory to get the path to the plugin.");
-      strcpy(buffer,ptr);
-      if (buffer[strlen(buffer)-1]!='/') strcat(buffer, "/");
-      strcat(buffer,ext);
-      // Be sure that the Lib exists below this dir.
-      if (CheckLibraryPath(buffer)) 
-      {
-         //Since the aux file can't be in the plugins dir, move 1 up
-	 char * slash;
-	 for(ptr=slash=buffer;*ptr;ptr++)
-	    if (*ptr=='/') slash=ptr;
-	 slash[1]=0;
-	 library_path=strdup(buffer); delete buffer;
-	 if (!library_path) G_THROW("Not enough memory to get path to the plugin.");
-	 DEBUG_MSG("GetLibraryPath(): Returning '" << library_path << "'\n");
-	 return library_path;
       }
-      delete buffer;
-   }
-   static char *check_paths[]={NULL CHECK_PATHS,NULL};
-   check_paths[0]=getenv("MOZILLA_HOME");
-   for(int i=(check_paths[0])?0:1;(ptr=check_paths[i]);i++)
-      if (*ptr)
-      {
-	 const char ext[]="/plugins";
-	 char * buffer=new char[strlen(ptr)+sizeof(ext)];
-	 if (!buffer) G_THROW("Not enough memory to get the path to the plugin.");
-	 strcpy(buffer,ptr);
-	 strcat(buffer,ext);
-	 if (CheckLibraryPath(buffer))
-	 {
-	    library_path=new char[strlen(ptr)+2];
-	    if (!library_path) G_THROW("Not enough memory to get path to the plugin.");
-	    strcpy(library_path, ptr);
-	    if (library_path[strlen(library_path)-1]!='/')
-	       strcat(library_path, "/");
-	    delete buffer;
-	    DEBUG_MSG("GetLibraryPath(): Returning '" << library_path << "'\n");
-	    return library_path;
-	 }
-	 delete buffer;
-      }
-   library_path=strdup("");
-   DEBUG_MSG("GetLibraryPath(): Returning ''\n");
-   return GUTF8String(library_path);
+      if (slash)
+        *d++ = '/';
+      while (n[0] && n[0] != '/')
+        *d++ = *n++;
+      slash = (n[0] == '/');
+    }
+  if (d == ret)
+    *d++ = '.';
+  *d = 0;
+  DBG(("Got '%s'\n",ret));
+  return ret;
+}
+
+static const char *
+follow_symlinks(strpool *pool, const char *fname)
+{
+  const char *ret = fname;
+#ifdef S_IFLNK
+  int lnklen;
+  char lnkbuf[MAXPATHLEN+1];
+  while ((lnklen = readlink(ret, lnkbuf, sizeof(lnkbuf))) > 0) 
+    {
+      lnkbuf[lnklen] = 0;
+      DBG(("Symlink %s -> %s\n", ret, lnkbuf));
+      if (lnkbuf[0] != '/')
+        ret = strconcat(pool, dirname(pool, ret), "/", lnkbuf, 0);
+      else
+        ret = lnkbuf;
+      ret = pathclean(pool,ret);
+      DBG(("Resolving as %s\n", ret));
+    }
+#endif
+  return ret;
+}
+
+static const char *
+pathelem(strpool *pool, const char **pathptr)
+{
+  if (*pathptr) {
+    const char *s = strchr(*pathptr,':');
+    if (s) {
+      int n = s - *pathptr;
+      char *ret = strpool_alloc(pool, n);
+      strncpy(ret, *pathptr, n);
+      *pathptr += n+1;
+      return ret;
+    }
+    s = *pathptr;
+    *pathptr = 0;
+    return s;
+  }
+  return 0;
+}
+
+static const char *stdpath = 
+"/usr/local/lib/netscape/plugins:"
+"/usr/local/netscape/plugins:"
+"/usr/lib/netscape/plugins:"
+"/opt/netscape/plugins";
+
+static const char *
+get_plugin_path(strpool *pool)
+{
+  const char *env;
+  const char *dir;
+  // NPX_PLUGIN_PATH
+  if ((env = getenv("NPX_PLUGIN_PATH"))) {
+    while ((dir = pathelem(pool, &env))) {
+      const char *lib = strconcat(pool, dir, "/", LIBRARY_NAME, 0);
+      if (is_file(lib))
+        return lib;
+    }
+  }
+  // HOME
+  if ((env = getenv("HOME"))) {
+    const char *lib = strconcat(pool, env, "/.netscape/plugins/", LIBRARY_NAME, 0);
+    if (is_file(lib))
+      return lib;
+  }
+  // MOZILLA_HOME
+  if ((env = getenv("MOZILLA_HOME"))) {
+    const char *lib = strconcat(pool, env, "/plugins/", LIBRARY_NAME, 0);
+    if (is_file(lib))
+      return lib;
+  }
+  // OTHER
+  env = stdpath;
+  while ((dir = pathelem(pool, &env))) {
+    const char *lib = strconcat(pool, dir, "/", LIBRARY_NAME, 0);
+    if (is_file(lib))
+      return lib;
+  }
+  return 0;
+}
+
+GUTF8String 
+GetPluginPath(void)
+{
+  static GUTF8String path;
+  if (! path) 
+    {
+      strpool apool;
+      strpool_init(&apool);
+      const char *p = get_plugin_path(&apool);
+      path = GUTF8String(p);
+      strpool_fini(&apool);
+    }
+  return path;
+}
+
+static const char *
+get_viewer_path(strpool *pool)
+{
+  const char *env;
+  const char *dir;
+  const char *test;
+  /* Try relative to plugin path */
+  if ((env = (const char*)GetPluginPath())) {
+    const char *envs = follow_symlinks(pool, env);
+#ifdef AUTOCONF
+    dir = dirname(pool, envs);
+    test = strconcat(pool, dir, "/../../../bin/", DJVIEW_NAME, 0);
+    if (is_executable(test))
+      return test;
+    test = strconcat(pool, dir, "/../../bin/", DJVIEW_NAME, 0);
+    if (is_executable(test))
+      return test;
+#else /* ! AUTOCONF */
+    dir = dirname(pool, env);
+    test = strconcat(pool, dir, "/../", DEJAVU_DIR, "/", DJVIEW_NAME,0);
+    if (is_executable(test))
+      return test;
+    dir = dirname(pool, envs);
+    test = strconcat(pool, dir, "/../", DEJAVU_DIR, "/", DJVIEW_NAME,0);
+    if (is_executable(test))
+      return test;
+#endif
+  }
+  /* Try ${bindir} */
+#ifdef AUTOCONF
+#ifdef DIR_BINDIR
+  test = strconcat(pool,DIR_BINDIR,"/",DJVIEW_NAME,0);
+  if (is_executable(test))
+    return test;
+#endif
+#endif
+  /* Try in the shell path */
+  if ((env = getenv("PATH")))
+    while ((dir = pathelem(pool, &env))) {
+      test = strconcat(pool, dir, "/", DJVIEW_NAME, 0);
+      if (is_executable(test))
+        return test;
+    }
+  /* Deep trouble */
+  return 0;
+}
+
+GUTF8String 
+GetViewerPath(void)
+{
+  static GUTF8String path;
+  if (! path) 
+    {
+      strpool apool;
+      strpool_init(&apool);
+      path = GUTF8String( get_viewer_path(&apool) );
+      strpool_fini(&apool);
+    }
+  return path;
+}
+
+static const char *
+get_library_path(strpool *pool)
+{
+  const char *env = 0;
+  if ((env = (const char*)GetPluginPath())) {
+    env = dirname(pool, env);
+    env = strconcat(pool, env, "/../", DEJAVU_DIR, 0);
+    env = pathclean(pool, env);
+    DBG(("Library dir is %s\n", env));
+    return env;
+  }
+  return 0;
+}
+
+GUTF8String 
+GetLibraryPath(void)
+{
+  static GUTF8String path;
+  if (! path) 
+    {
+      strpool apool;
+      strpool_init(&apool);
+      path = GUTF8String( get_library_path(&apool) );
+      strpool_fini(&apool);
+    }
+  return path;
 }

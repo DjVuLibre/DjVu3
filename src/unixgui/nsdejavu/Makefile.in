@@ -7,7 +7,7 @@
 # C- AT&T, you have an infringing copy of this software and cannot use it
 # C- without violating AT&T's intellectual property rights.
 # C-
-# C- $Id: Makefile.in,v 1.1 2001-05-29 22:05:30 bcr Exp $
+# C- $Id: Makefile.in,v 1.1.8.1 2001-10-19 00:39:25 leonb Exp $
 
 %%%include <paths>
 
@@ -72,8 +72,7 @@ DIR_UNIXGUI	:= ./TOPDIR/SRCDIR/src/unixgui
 DIR_LIB_DJVU	:= ./TOPDIR/SRCDIR/src/libdjvu++
 VPATH		:= $(VPATH):$(DIR_LIB_DJVU)
 SRC_LIB_DJVU 	:= GString.cpp GException.cpp GContainer.cpp \
-	GSmartPointer.cpp GThreads.cpp debug.cpp Arrays.cpp \
-	ByteStream.cpp DjVuMessageLite.cpp
+	GSmartPointer.cpp GThreads.cpp debug.cpp Arrays.cpp 
 HDR_LIB_DJVU	:= $(patsubst %.cpp,%.h,$(SRC_LIB_DJVU))
 OBJ_LIB_DJVU	:= $(patsubst %.cpp,%.o,$(SRC_LIB_DJVU))
 LIB_DJVU	:= libdjvu++.a
@@ -84,7 +83,7 @@ SRCS		+= $(SRC_LIB_DJVU)
 #############################################################################
 DIR_SHARED_UTILS:= $(DIR_UNIXGUI)/shared/utils
 VPATH		:= $(VPATH):$(DIR_SHARED_UTILS)
-SRC_SHARED_UTILS:= io.cpp path.cpp
+SRC_SHARED_UTILS:= io.cpp path.cpp stubs.cpp
 HDR_SHARED_UTILS:= $(patsubst %.cpp,%.h,$(SRC_SHARED_UTILS))
 OBJ_SHARED_UTILS:= $(patsubst %.cpp,%.o,$(SRC_SHARED_UTILS))
 SRCS		+= $(SRC_SHARED_UTILS)

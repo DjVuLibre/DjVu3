@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: plugin.cpp,v 1.7.2.1 2001-10-17 17:38:29 leonb Exp $
+// $Id: plugin.cpp,v 1.7.2.2 2001-10-19 00:39:25 leonb Exp $
 // $Name:  $
 
 #ifdef HAVE_CONFIG_H
@@ -1057,7 +1057,7 @@ StartProgram(void)
    
    if (IsConnectionOK(true)) return;
    
-   GUTF8String path=GetLibraryPath();
+   GUTF8String path=GetViewerPath();
    if(!path.length())
       G_THROW("Failed to find '" DJVIEW_NAME "' executable.");
    
@@ -1128,7 +1128,6 @@ StartProgram(void)
 	 sprintf(buffer, "%s=%s", mzh, (const char *) path);
 	 putenv(buffer);
       }
-      path=path+DEJAVU_DIR+DJVIEW_NAME;
       DEBUG_MSG("trying to exec program '" << (const char *) path << "\n");
 
 	// This is needed for RedHat's version of Netscape.
@@ -1284,9 +1283,8 @@ NPP_New(NPMIMEType, NPP np_inst, uint16 np_mode, int16 argc,
    void * id=0;
    G_TRY
    {
-      GUTF8String path=GetLibraryPath();
-      if (path.length()) path+=DEJAVU_DIR;
-      
+      GUTF8String path = GetLibraryPath();
+
       WriteInteger(pipe_write, CMD_NEW);
       WriteInteger(pipe_write, np_mode==NP_FULL);
       WriteString(pipe_write, (const char *)path);

@@ -32,20 +32,64 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: path.h,v 1.16.2.1 2001-10-19 00:39:26 leonb Exp $
+// $Id: stubs.cpp,v 1.1.2.1 2001-10-19 00:39:25 leonb Exp $
 // $Name:  $
 
-#ifndef HDR_PATH
-#define HDR_PATH
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
+#include "DjVuGlobal.h"
+#include "DjVuMessageLite.h"
 
-#include "GString.h"
+// These stubs ensure that nsdejavu does not 
+// depend on the internationalization stuff.
+// Experience shows that the smallest the plugin
+// the better the reliability.
 
-GUTF8String GetPluginPath(void);
-GUTF8String GetViewerPath(void);
-GUTF8String GetLibraryPath(void);
 
-#endif
+
+void
+DjVuPrintErrorUTF8(const char *, ...)
+{
+}
+
+void
+DjVuPrintErrorNative(const char *, ...)
+{
+}
+
+void
+DjVuPrintMessageUTF8(const char *, ...)
+{
+}
+
+void
+DjVuPrintMessageNative(const char *, ...)
+{
+}
+
+void
+DjVuFormatErrorUTF8(const char *, ...)
+{
+}
+
+void
+DjVuFormatErrorNative(const char *, ...)
+{
+}
+
+void
+DjVuWriteError( const char * )
+{
+}
+
+void
+DjVuWriteMessage( const char * )
+{
+}
+
+void
+DjVuMessageLite::perror( const GUTF8String & )
+{
+}
