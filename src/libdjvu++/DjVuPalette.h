@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuPalette.h,v 1.7 1999-11-12 14:32:14 leonb Exp $
+//C- $Id: DjVuPalette.h,v 1.8 1999-11-12 20:42:24 haffner Exp $
 
 
 
@@ -37,7 +37,7 @@
     @memo 
     DjVuPalette header file
     @version 
-    #$Id: DjVuPalette.h,v 1.7 1999-11-12 14:32:14 leonb Exp $#
+    #$Id: DjVuPalette.h,v 1.8 1999-11-12 20:42:24 haffner Exp $#
     @author: 
     L\'eon Bottou <leonb@research.att.com> */
 //@{
@@ -81,9 +81,9 @@ public:
   /** Adds the color specified by #p# to the histogram.
       Argument #weight# represent the number of pixels with this color. */
   void histogram_add(const GPixel &p, int weight);
-  /** Adds the color specified by the triple #bgr# to the histogram.
+  /** Adds the color specified by the WEIGHTED triple #bgr# to the histogram.
       Argument #weight# represent the number of pixels with this color. */
-  void histogram_add(const unsigned char *bgr, int weight);
+  void histogram_add(const int *bgr, int weight);
   /** Computes an optimal palette for representing an image where colors
       appear according to the histogram.  Argument #maxcolors# is the maximum
       number of colors allowed in the palette (up to 1024).  Argument
@@ -126,7 +126,9 @@ public:
       populate the palette, and optionally populate the \Ref{colordata}
       array. Note that the color histogram is never saved. */
   void decode(ByteStream &bs);
+
 private:
+  int color_to_index_slow(const unsigned char *bgr);
   // Histogram
   struct PHist { int p[3]; int w; };
   PHist *hcube;
@@ -138,7 +140,6 @@ private:
   GTArray<PColor> palette;
   void allocate_pcube();
   short *pcube;
-  int color_to_index_slow(const unsigned char *bgr);
   static int bcomp (const void*, const void*);
   static int gcomp (const void*, const void*);
   static int rcomp (const void*, const void*);
@@ -162,22 +163,28 @@ DjVuPalette::histogram_add(const GPixel &p, int weight)
 {
   if (!hcube) allocate_hcube();
   PHist &d = hcube[hind[0][p.b]+hind[1][p.g]+hind[2][p.r]];
-  d.p[0] += p.b;
-  d.p[1] += p.g;
-  d.p[2] += p.r;
+  d.p[0] += weight*p.b;
+  d.p[1] += weight*p.g;
+  d.p[2] += weight*p.r;
   d.w += weight;
 }
 
+#define TEST256(x) ((x)>=256 ? 255 : ((x)<0 ? 0: (x)))
+
 inline void 
-DjVuPalette::histogram_add(const unsigned char *bgr, int weight)
+DjVuPalette::histogram_add(const int *bgr, int weight)
 {
   if (!hcube) allocate_hcube();
-  PHist &d = hcube[hind[0][bgr[0]]+hind[1][bgr[1]]+hind[2][bgr[2]]];
-  d.p[0] += bgr[0];
-  d.p[1] += bgr[1];
-  d.p[2] += bgr[2];
-  if (weight>65536) weight=65536;
-  d.w += weight;
+  if (weight>0) {
+    int p0=TEST256(bgr[0]/weight);
+    int p1=TEST256(bgr[1]/weight);
+    int p2=TEST256(bgr[2]/weight);
+    PHist &d = hcube[hind[0][p0]+hind[1][p1]+hind[2][p2]];
+    d.p[0] +=  bgr[0];
+    d.p[1] +=  bgr[1];
+    d.p[2] +=  bgr[2];
+    d.w += weight;
+  }
 }
 
 inline int
