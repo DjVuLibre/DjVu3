@@ -9,9 +9,9 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: BSByteStream.cpp,v 1.9 1999-07-30 18:55:02 leonb Exp $
+//C- $Id: BSByteStream.cpp,v 1.10 1999-08-18 17:53:46 leonb Exp $
 
-// "$Id: BSByteStream.cpp,v 1.9 1999-07-30 18:55:02 leonb Exp $"
+// "$Id: BSByteStream.cpp,v 1.10 1999-08-18 17:53:46 leonb Exp $"
 // - Author: Leon Bottou, 07/1998
 
 
@@ -43,7 +43,7 @@
             
 
 // Limits on block sizes
-#define MINBLOCK           100
+#define MINBLOCK           10
 #define MAXBLOCK           4096
 
 // Overflow required when encoding
