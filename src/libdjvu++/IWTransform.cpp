@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: IWTransform.cpp,v 1.4 1999-05-24 21:58:15 leonb Exp $
+//C- $Id: IWTransform.cpp,v 1.5 1999-05-24 22:33:42 leonb Exp $
 
 
 
@@ -197,6 +197,7 @@ IWTransform::enable_mmx()
 // Speedup is basically related to faster memory transfer
 // The IW44 transform is not CPU bound, it is memory bound.
 
+#ifdef MMX
 
 static short w9[]  = {9,9,9,9};
 static short w1[]  = {1,1,1,1};
@@ -378,6 +379,7 @@ mmx_bv_2 ( short* &q, short* e, int s, int s3 )
     }
 }
 
+#endif
 
 //////////////////////////////////////////////////////
 // NEW FILTERS
