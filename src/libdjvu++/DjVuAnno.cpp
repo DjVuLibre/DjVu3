@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuAnno.cpp,v 1.1.2.2 1999-04-26 19:19:21 eaf Exp $
+//C- $Id: DjVuAnno.cpp,v 1.1.2.3 1999-05-14 22:42:02 eaf Exp $
 
 
 #ifdef __GNUC__
@@ -561,14 +561,14 @@ DjVuAnno::get_memory_usage() const
 unsigned char
 DjVuAnno::decode_comp(char ch1, char ch2)
 {
-   u_char dig1=0;
+   unsigned char dig1=0;
    if (ch1)
    {
       ch1=toupper(ch1);
       if (ch1>='0' && ch1<='9') dig1=ch1-'0';
       if (ch1>='A' && ch1<='F') dig1=10+ch1-'A';
       
-      u_char dig2=0;
+      unsigned char dig2=0;
       if (ch2)
       {
 	 ch2=toupper(ch2);
