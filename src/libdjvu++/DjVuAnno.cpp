@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuAnno.cpp,v 1.72 2001-04-05 19:57:56 chrisp Exp $
+// $Id: DjVuAnno.cpp,v 1.73 2001-04-06 22:17:21 praveen Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -331,7 +331,8 @@ void
 GLParser::skip_white_space(const char * & start)
 {
    while(*start && isspace(*start)) start++;
-   if (!*start) G_THROW("EOF");
+   if (!*start) 
+       G_THROW("EOF");
 }
 
 GLToken
@@ -442,7 +443,7 @@ GLParser::parse(const char * cur_name, GPList<GLObject> & list,
       G_CATCH(exc)
       {
 //        if (strcmp(exc.get_cause(), "EOF"))
-         if (GString("EOF") == exc.get_cause())
+         if (GString("EOF") != exc.get_cause())
           G_RETHROW;
       } 
       G_ENDCATCH;
@@ -467,7 +468,7 @@ GLParser::parse(const char * str)
    } G_CATCH(exc)
    {
 //      if (strcmp(exc.get_cause(), "EOF"))
-      if (GString("EOF") == exc.get_cause())
+      if (GString("EOF") != exc.get_cause())
         G_RETHROW;
    } G_ENDCATCH;
 }
