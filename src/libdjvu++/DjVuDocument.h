@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.h,v 1.12 1999-09-01 18:39:56 eaf Exp $
+//C- $Id: DjVuDocument.h,v 1.13 1999-09-01 23:47:55 leonb Exp $
  
 #ifndef _DJVUDOCUMENT_H
 #define _DJVUDOCUMENT_H
@@ -18,6 +18,7 @@
 #pragma interface
 #endif
 
+#include "DjVuGlobal.h"
 #include "GSmartPointer.h"
 #include "GCache.h"
 #include "DjVuFile.h"
@@ -32,7 +33,7 @@
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocument.h,v 1.12 1999-09-01 18:39:56 eaf Exp $#
+    @version #$Id: DjVuDocument.h,v 1.13 1999-09-01 23:47:55 leonb Exp $#
 */
 
 //@{

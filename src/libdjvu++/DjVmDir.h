@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVmDir.h,v 1.5 1999-08-31 16:16:45 leonb Exp $
+//C- $Id: DjVmDir.h,v 1.6 1999-09-01 23:47:54 leonb Exp $
 
 #ifndef _DJVMDIR_H
 #define _DJVMDIR_H
@@ -22,7 +22,7 @@
     @memo Implements DjVu multipage document directory
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: DjVmDir.h,v 1.5 1999-08-31 16:16:45 leonb Exp $# */
+    #$Id: DjVmDir.h,v 1.6 1999-09-01 23:47:54 leonb Exp $# */
 //@{
 
 
@@ -30,6 +30,7 @@
 #pragma interface
 #endif
 
+#include "DjVuGlobal.h"
 #include "GString.h"
 #include "Arrays.h"
 #include "GContainer.h"

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVmDoc.h,v 1.3 1999-08-25 22:29:37 eaf Exp $
+//C- $Id: DjVmDoc.h,v 1.4 1999-09-01 23:47:55 leonb Exp $
  
 #ifndef _DJVMDOC_H
 #define _DJVMDOC_H
@@ -18,6 +18,7 @@
 #pragma interface
 #endif
 
+#include "DjVuGlobal.h"
 #include "ByteStream.h"
 #include "GSmartPointer.h"
 #include "GContainer.h"
@@ -32,7 +33,7 @@
 
     @memo DjVu multipage documents reader/writer.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: DjVmDoc.h,v 1.3 1999-08-25 22:29:37 eaf Exp $#
+    @version #$Id: DjVmDoc.h,v 1.4 1999-09-01 23:47:55 leonb Exp $#
 */
 
 //@{
