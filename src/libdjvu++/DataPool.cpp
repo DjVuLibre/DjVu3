@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.cpp,v 1.39 1999-12-22 21:21:43 eaf Exp $
+//C- $Id: DataPool.cpp,v 1.40 1999-12-28 21:52:24 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -22,7 +22,7 @@
 #include "GOS.h"
 #include "debug.h"
 
-static inline void
+static void
 call_callback(void (* callback)(void *), void * cl_data)
 {
    TRY {
