@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVmDir.h,v 1.17 2000-02-04 16:57:30 leonb Exp $
+//C- $Id: DjVmDir.h,v 1.18 2000-02-21 19:55:26 leonb Exp $
 
 #ifndef _DJVMDIR_H
 #define _DJVMDIR_H
@@ -62,7 +62,7 @@
     @memo Implements DjVu multipage document directory
     @author Andrei Erofeev <eaf@research.att.com>
     @version
-    #$Id: DjVmDir.h,v 1.17 2000-02-04 16:57:30 leonb Exp $# */
+    #$Id: DjVmDir.h,v 1.18 2000-02-21 19:55:26 leonb Exp $# */
 //@{
 
 
@@ -103,11 +103,10 @@ class DjVmDir : public GPEnabled
 public:
       
    static const int version;
-      /** This class represents the directory records managed by 
-	  class \Ref{DjVmDir}. */
+      /** Class \Ref{DjVmDir::File} represents the directory records
+          managed by class \Ref{DjVmDir}. */
    class File : public GPEnabled
    {
-      friend class DjVmDir;
    public:
 	 // Out of the record: INCLUDE below must be zero and PAGE must be one.
 	 // This is to avoid problems with the File constructor, which now takes
@@ -124,7 +123,6 @@ public:
 	     pages.
 	     \end{description} */
       enum FILE_TYPE { INCLUDE=0, PAGE=1, THUMBNAILS=2 };
-     
 	 /** File name.  The optional file name must be unique and is assigned
 	     either by encoder or by user when the document is composed.  In the
 	     case of an {\em indirect} document, this is the relative URL of the
@@ -143,7 +141,7 @@ public:
 	 /** Offset of the file data in a bundled DJVM file.  This number is
 	     relevant in the {\em bundled} case only when everything is packed into
 	     one single file. */
-      int	offset;
+      int offset;
 	 /** Size of the file data in a bundled DJVM file.  This number is
 	     relevant in the {\em bundled} case only when everything is
 	     packed into one single file. */
@@ -159,13 +157,13 @@ public:
 	     this document */
       bool is_include(void) const
 	 { return (flags & TYPE_MASK)==INCLUDE; }
-	 /** Returns #TRUE# if this file contains thumbnails for the document pages */
+	 /** Returns #TRUE# if this file contains thumbnails for the document pages. */
       bool is_thumbnails(void) const
 	 { return (flags & TYPE_MASK)==THUMBNAILS; }
 	 /** Returns the page number of this file. This function returns
 	     #-1# if this file does not represent a page of the document. */
-      int	get_page_num(void) const 
-	 { return page_num; } ;
+      int get_page_num(void) const 
+	 { return page_num; } 
 	 /** Default constructor. */
       File(void);
 	 /** Full constructor. */
@@ -173,23 +171,21 @@ public:
 	 // Obsolete
       File(const char *name, const char *id, const char *title, bool page);
    private:
+      friend class DjVmDir;
       enum FLAGS_0 { IS_PAGE_0=1, HAS_NAME_0=2, HAS_TITLE_0=4 };
       enum FLAGS_1 { HAS_NAME=0x80, HAS_TITLE=0x40, TYPE_MASK=0x3f };
       unsigned char flags;
-      int	page_num;
+      int page_num;
    };
 
-   DjVmDir(void) {};
-   virtual ~DjVmDir() {};
+   DjVmDir(void) { } ;
       /** Decodes the directory from the specified stream. */
    void decode(ByteStream & stream);
       /** Encodes the directory into the specified stream. */
    void encode(ByteStream & stream) const;
-      /** Tests if directory is from an {\em indirect} document
-	  (where every page is stored in a separate file.) */
+      /** Tests if directory defines an {\em indirect} document. */
    bool is_indirect(void) const;
-      /** Tests if the directory is from a {\em bundled} document
-	  (where everything is bundled into one file.) */
+      /** Tests if the directory defines a {\em bundled} document. */
    bool is_bundled(void) const;
       /** Translates page numbers to file records. */
    GP<File> page_to_file(int page_num) const;
@@ -207,17 +203,17 @@ public:
    GPList<File> get_files_list(void) const;
       /** Returns the number of file records. */
    int get_files_num(void) const;
-      /** Returns the number of file records which represent pages. */
+      /** Returns the number of file records representing pages. */
    int get_pages_num(void) const;
-      /** Inserts the specified file record at the specified position.
-	  #pos=-1# means to append */
-   void insert_file(File * file, int pos=-1);
-      /** Removes a file record with the given #id# from the directory */
-   void delete_file(const char * id);
-      /** Changes title of the file with ID #id# */
+      /** Changes the title of the file with ID #id#. */
    void set_file_title(const char * id, const char * title);
-      /** Changes name of the file with ID #id# */
+      /** Changes the name of the file with ID #id#. */
    void set_file_name(const char * id, const char * name);
+      /** Inserts the specified file record at the specified position.
+	  Specifying #pos# equal to #-1# means to append. */
+   void insert_file(File * file, int pos=-1);
+      /** Removes a file record with ID #id#. */
+   void delete_file(const char * id);
 private:
    GCriticalSection 	class_lock;
    GPList<File>		files_list;
@@ -226,7 +222,6 @@ private:
    GPMap<GString, File>	id2file;
    GPMap<GString, File>	title2file;
 };
-
 
 
 /** @name Format of the DIRM chunk.
