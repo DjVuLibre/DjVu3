@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuAnno.cpp,v 1.22 1999-10-10 21:08:19 eaf Exp $
+//C- $Id: DjVuAnno.cpp,v 1.23 1999-10-10 21:12:23 eaf Exp $
 
 
 #ifdef __GNUC__
@@ -1231,8 +1231,8 @@ DjVuAnno::copy(void) const
       // Copy any primitives (if any)
    *anno=*this;
       // Copy each substructure
-   anno->ant = ant->copy();
-   anno->txt = txt->copy();
+   if (ant) anno->ant = ant->copy();
+   if (txt) anno->txt = txt->copy();
    return anno;
 }
 
@@ -1240,9 +1240,7 @@ unsigned int
 DjVuAnno::get_memory_usage() const
 {
   int memuse = 0;
-  if (ant)
-    memuse += ant->get_memory_usage();
-  if (txt)
-    memuse += txt->get_memory_usage();
+  if (ant) memuse += ant->get_memory_usage();
+  if (txt) memuse += txt->get_memory_usage();
   return memuse;
 }
