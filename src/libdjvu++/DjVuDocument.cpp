@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.56 1999-09-30 21:48:36 praveen Exp $
+//C- $Id: DjVuDocument.cpp,v 1.57 1999-10-19 19:59:11 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -1003,7 +1003,15 @@ DjVuDocument::write(ByteStream & str)
    DEBUG_MAKE_INDENT(3);
    
    GP<DjVmDoc> doc=get_djvm_doc();
-   doc->write(str);
+   GP<DjVmDir> dir=doc->get_djvm_dir();
+   if (dir->get_files_num()>1) doc->write(str);
+   else
+   {
+      GPList<DjVmDir::File> files_list=dir->get_files_list();
+      GP<DataPool> pool=doc->get_data(files_list[files_list]->id);
+      GP<ByteStream> pool_str=pool->get_stream();
+      str.copy(*pool_str);
+   }
 }
 
 void
