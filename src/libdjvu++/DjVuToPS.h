@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuToPS.h,v 1.2 2000-03-19 22:31:51 eaf Exp $
+//C- $Id: DjVuToPS.h,v 1.3 2000-03-20 22:58:22 eaf Exp $
 
 #ifndef _DJVU_TO_PS_H_
 #define _DJVU_TO_PS_H_
@@ -22,7 +22,7 @@
     @memo PostScript file generator
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: DjVuToPS.h,v 1.2 2000-03-19 22:31:51 eaf Exp $#
+    #$Id: DjVuToPS.h,v 1.3 2000-03-20 22:58:22 eaf Exp $#
 */
 //@{
 
@@ -347,10 +347,12 @@ public:
 	  @param str \Ref{ByteStream} where PostScript output will be sent
 	  @param dimg \Ref{DjVuImage} to print
 	  @param img_rect Rectangle to which the \Ref{DjVuImage} will be scaled
-	  @param prn_rect Part of img_rect to send to printer. */
+	  @param prn_rect Part of img_rect to send to printer.
+	  @param override_dpi Optional parameter allowing you to override
+	         dpi setting that would otherwise be extracted from #dimg# */
    void		print(ByteStream & str, const GP<DjVuImage> & dimg,
-		      const GRect & prn_rect,
-		      const GRect & img_rect);
+		      const GRect & prn_rect, const GRect & img_rect,
+		      int override_dpi=-1);
 
       /** Will output the specifies pages from the \Ref{DjVuDocument}
 	  into the \Ref{ByteStream} in PostScript format.

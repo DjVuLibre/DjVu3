@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuToPS.cpp,v 1.5 2000-03-20 22:45:30 eaf Exp $
+//C- $Id: DjVuToPS.cpp,v 1.6 2000-03-20 22:58:22 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -1035,7 +1035,8 @@ image\n",
 
 void
 DjVuToPS::print(ByteStream & str, const GP<DjVuImage> & dimg,
-		const GRect & prn_rect_in, const GRect & img_rect)
+		const GRect & prn_rect_in, const GRect & img_rect,
+		int override_dpi)
 {
    DEBUG_MSG("DjVuToPS::print(): Printing DjVu page to a stream\n");
    DEBUG_MAKE_INDENT(3);
@@ -1060,7 +1061,9 @@ DjVuToPS::print(ByteStream & str, const GP<DjVuImage> & dimg,
    store_doc_setup(str);
 
       // Setup the page
-   int image_dpi=dimg->get_dpi();
+   int image_dpi;
+   if (override_dpi>0) image_dpi=override_dpi;
+   else image_dpi=dimg->get_dpi();
    if (image_dpi<=0) image_dpi=300;
    float scale=(float) img_rect.width()/dimg->get_width();
    store_page_setup(str, 0, (int) (image_dpi*scale), prn_rect);
