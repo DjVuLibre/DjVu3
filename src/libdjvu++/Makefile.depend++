@@ -82,12 +82,11 @@ DjVuFile.o: DjVuFile.cpp DjVuFile.h DjVuInfo.h \
  ../../src/include/DjVu.h DjVuPalette.h \
  GContainer.h GException.h GPixmap.h \
  DjVuPort.h GThreads.h GURL.h GString.h \
- Arrays.h BSByteStream.h ByteStream.h \
- ZPCodec.h IFFByteStream.h GOS.h \
- MMRDecoder.h JPEGDecoder.h DjVuAnno.h \
- DjVuText.h GMapAreas.h GRect.h DataPool.h \
- JB2Image.h IW44Image.h DjVuNavDir.h \
- debug.h
+ Arrays.h IFFByteStream.h ByteStream.h \
+ GOS.h MMRDecoder.h JPEGDecoder.h \
+ DjVuAnno.h DjVuText.h GMapAreas.h GRect.h \
+ DataPool.h JB2Image.h ZPCodec.h \
+ IW44Image.h DjVuNavDir.h debug.h
 DjVuGlobal.o: DjVuGlobal.cpp DjVuGlobal.h \
  ../../src/include/DjVu.h GOS.h GString.h \
  GContainer.h GException.h GSmartPointer.h \
@@ -203,12 +202,6 @@ IW44EncodeCodec.o: IW44EncodeCodec.cpp IW44Image.h \
  GString.h GContainer.h ByteStream.h \
  Arrays.h GRect.h MMX.h
 IW44Image.o: IW44Image.cpp IW44Image.h \
- GSmartPointer.h DjVuGlobal.h \
- ../../src/include/DjVu.h ZPCodec.h GBitmap.h \
- GException.h GPixmap.h IFFByteStream.h \
- GString.h GContainer.h ByteStream.h \
- Arrays.h GRect.h MMX.h
-IW44ImageImpl.o: IW44ImageImpl.cpp IW44Image.h \
  GSmartPointer.h DjVuGlobal.h \
  ../../src/include/DjVu.h ZPCodec.h GBitmap.h \
  GException.h GPixmap.h IFFByteStream.h \

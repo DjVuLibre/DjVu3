@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: IFFByteStream.h,v 1.26 2001-02-15 19:06:56 bcr Exp $
+// $Id: IFFByteStream.h,v 1.27 2001-02-15 20:31:57 bcr Exp $
 // $Name:  $
 
 #ifndef _IFFBYTESTREAM_H_
@@ -89,7 +89,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: IFFByteStream.h,v 1.26 2001-02-15 19:06:56 bcr Exp $# */
+    #$Id: IFFByteStream.h,v 1.27 2001-02-15 20:31:57 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -143,10 +143,10 @@
     \Ref{ByteStream::copy} to transfer the IFF file into a non seekable
     ByteStream.  */
 
-class IFFByteStream : public ByteStream
+class IFFByteStream : public ByteStream::Wrapper
 {
 protected: 
-  IFFByteStream(GP<ByteStream> &bs);
+  IFFByteStream(GP<ByteStream> &bs, const int pos);
 public:
   /** Constructs an IFFByteStream object attached to ByteStream #bs#.
       Any ByteStream can be used when reading an IFF file.  Writing
@@ -154,11 +154,9 @@ public:
   static GP<IFFByteStream> IFFByteStream::create(GP<ByteStream> bs);
   // --- BYTESTREAM INTERFACE
   ~IFFByteStream();
-  GP<ByteStream> & get_bytestream(void);
   virtual size_t read(void *buffer, size_t size);
   virtual size_t write(const void *buffer, size_t size);
   virtual long tell(void) const;
-  virtual void flush(void);
   // -- NAVIGATING CHUNKS
   /** Enters a chunk for reading.  Function #get_chunk# returns zero when the
       last chunk has already been accessed.  Otherwise it parses a chunk
@@ -235,8 +233,6 @@ private:
   };
   // Implementation
   IFFContext *ctx;
-  GP<ByteStream> gbs;
-  ByteStream *bs;
   long offset;
   long seekto;
   int dir;
@@ -245,14 +241,6 @@ private:
   IFFByteStream & operator=(const IFFByteStream &);
   static GP<IFFByteStream> IFFByteStream::create(ByteStream *bs);
 };
-
-inline GP<IFFByteStream>
-IFFByteStream::create(GP<ByteStream> bs)
-{ return new IFFByteStream(bs); }
-
-inline GP<ByteStream> & 
-IFFByteStream::get_bytestream(void)
-{ return gbs; }
 
 //@}
 

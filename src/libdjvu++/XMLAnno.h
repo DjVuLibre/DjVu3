@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: XMLAnno.h,v 1.2 2001-02-02 16:41:42 bcr Exp $
+// $Id: XMLAnno.h,v 1.3 2001-02-15 20:31:57 bcr Exp $
 // $Name:  $
 
 #ifndef _LT_XMLANNO__
@@ -63,6 +63,8 @@ protected:
     const GString width,const GString height);
   GPList<DjVuFile> files;
   GMap<GString,GP<DjVuDocument> > docs;
+private: // dummy stuff
+  static void parse(ByteStream *bs);
 };
 
 #endif /* _LT_XMLANNO__ */

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocEditor.h,v 1.31 2001-02-15 01:12:22 bcr Exp $
+// $Id: DjVuDocEditor.h,v 1.32 2001-02-15 20:31:57 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUDOCEDITOR_H
@@ -51,7 +51,7 @@
 
     @memo DjVu document editor class.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: DjVuDocEditor.h,v 1.31 2001-02-15 01:12:22 bcr Exp $#
+    @version #$Id: DjVuDocEditor.h,v 1.32 2001-02-15 20:31:57 bcr Exp $#
 */
 
 //@{
@@ -374,6 +374,8 @@ private:
    void		file_thumbnails(void);
    void		save_file(const char * id, const char * dir,
 			  bool only_modified, GMap<GString, void *> & map);
+private: //dummy stuff
+   static void save_pages_as(ByteStream *, const GList<int> &);
 };
 
 inline bool

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuAnno.h,v 1.37 2001-02-15 01:12:22 bcr Exp $
+// $Id: DjVuAnno.h,v 1.38 2001-02-15 20:31:57 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUANNO_H
@@ -58,7 +58,7 @@
     @memo Implements support for DjVuImage annotations
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: DjVuAnno.h,v 1.37 2001-02-15 01:12:22 bcr Exp $# */
+    #$Id: DjVuAnno.h,v 1.38 2001-02-15 20:31:57 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -209,6 +209,9 @@ public:
       /** Returns the number of bytes needed by this data structure. It's
 	  used by caching routines to estimate the size of a \Ref{DjVuImage}. */
    inline unsigned int get_memory_usage() const;
+private: // dummy stuff
+   static void decode(ByteStream *);
+   static void encode(ByteStream *);
 };
 
 //@}

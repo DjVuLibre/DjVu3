@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocument.h,v 1.76 2001-02-15 01:12:22 bcr Exp $
+// $Id: DjVuDocument.h,v 1.77 2001-02-15 20:31:57 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUDOCUMENT_H
@@ -58,7 +58,7 @@ class ByteStream;
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocument.h,v 1.76 2001-02-15 01:12:22 bcr Exp $#
+    @version #$Id: DjVuDocument.h,v 1.77 2001-02-15 20:31:57 bcr Exp $#
 */
 
 //@{
@@ -797,6 +797,9 @@ protected:
    GString		get_int_prefix(void);
    void			set_file_aliases(const DjVuFile * file);
    GURL			invent_url(const char name[]) const;
+private: //dummy stuff
+   static void	write(ByteStream *);
+   static void	write(ByteStream *, bool);
 };
 
 class DjVuDocument::UnnamedFile : public GPEnabled

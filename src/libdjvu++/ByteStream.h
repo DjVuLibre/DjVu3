@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.h,v 1.40 2001-02-15 18:22:34 bcr Exp $
+// $Id: ByteStream.h,v 1.41 2001-02-15 20:31:57 bcr Exp $
 // $Name:  $
 
 #ifndef _BYTESTREAM_H
@@ -62,7 +62,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation\\
     Andrei Erofeev <eaf@geocities.com> -- 
     @version
-    #$Id: ByteStream.h,v 1.40 2001-02-15 18:22:34 bcr Exp $# */
+    #$Id: ByteStream.h,v 1.41 2001-02-15 20:31:57 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -91,7 +91,7 @@ public:
   class Stdio;
   class Static;
   class Memory;
-  class Obsolete;
+  class Wrapper;
   /** @name Virtual Functions.
       These functions are usually implemented by each subclass of #ByteStream#. */
   //@{
@@ -296,16 +296,19 @@ ByteStream::size(void) const
   return bsize;
 }
 
-/*x ByteStream::Obsolete impliments backwards compatable ByteStreams
-    to support old code.  Since an exception in a constructor will leak
-    memory in your program, we recommend to use the #ByteStream::create# 
-    methods instead.  */
-class ByteStream::Obsolete : public ByteStream
+/** ByteStream::Wrapper impliments wrapping bytestream.  This is usefull
+    for dirived classes that take a GP<ByteStream> as a creation argument,
+    and the backwards compatable bytestreams.  */
+class ByteStream::Wrapper : public ByteStream
 {
 protected:
   GP<ByteStream> gbs;
   ByteStream *bs;
+  void init(GP<ByteStream> xbs) { bs=gbs=xbs; }
+  Wrapper(void) : bs(0) {}
+  Wrapper(GP<ByteStream> &xbs) : gbs(xbs), bs(xbs) {}
 public:
+  ~Wrapper();
   ByteStream * operator & () const {return bs;}
   ByteStream * operator & () {return bs;}
   virtual size_t read(void *buffer, size_t size)
@@ -318,16 +321,20 @@ public:
   { return bs->seek(offset,whence,nothrow); }
   virtual void flush(void)
   { bs->flush(); }
+  GP<ByteStream> & get_bytestream(void) { return gbs; }
+private:
+  static void init(ByteStream *);
 };
 
-/*x ByteStream interface for stdio files. 
+/*x Obsolete ByteStream interface for stdio files. 
     The virtual member functions #read#, #write#, #tell# and #seek# are mapped
     to the well known stdio functions #fread#, #fwrite#, #ftell# and #fseek#.
     @see Unix man page fopen(3), fread(3), fwrite(3), ftell(3), fseek(3) */
 
-class StdioByteStream : public ByteStream::Obsolete
+class StdioByteStream : public ByteStream::Wrapper
 {
 public:
+  ~StdioByteStream();
   /*x Constructs a ByteStream for accessing the file named #filename#.
       Arguments #filename# and #mode# are similar to the arguments of the well
       known stdio function #fopen#. In addition a filename of #-# will be
@@ -338,7 +345,7 @@ public:
       \Ref{GException} is thrown with a plain text error message if the stdio
       file cannot be opened. */
   StdioByteStream(const char filename[], const char * const mode="rb")
-  { gbs=ByteStream::create(filename,mode); bs=gbs;}
+  { init(ByteStream::create(filename,mode)); }
 
   /*x Constructs a ByteStream for accessing the stdio file #f#.
       Argument #mode# indicates the type of the stdio file, as in the
@@ -346,57 +353,58 @@ public:
       object will not close the stdio file #f# unless closeme is true. */
   StdioByteStream(
     FILE * const f, const char * const mode="rb", const bool closeme=false)
-  { gbs=ByteStream::create(f,mode,closeme);bs=gbs;}
-
+  { init(ByteStream::create(f,mode,closeme));;}
 };
 
-/*x ByteStream interface managing a memory buffer.  
+/*x Obsolete ByteStream interface managing a memory buffer.  
     Class #ByteStream::Memory# manages a dynamically resizable buffer from
     which data can be read or written.  The buffer itself is organized as an
     array of blocks of 4096 bytes.  */
 
-class MemoryByteStream : public ByteStream::Obsolete
+class MemoryByteStream : public ByteStream::Wrapper
 {
 public:
+  ~MemoryByteStream();
   /*x Constructs an empty ByteStream::Memory.
       The buffer is initially empty. You must first use function #write#
       to store data into the buffer, use function #seek# to rewind the
       current position, and function #read# to read the data back. */
   MemoryByteStream()
-  { gbs=create(); bs=gbs; }
+  { init(create()); }
   /*x Constructs a Memory by copying initial data.  The
       Memory buffer is initialized with #size# bytes copied from the
       memory area pointed to by #buffer#. */
   MemoryByteStream(const void *buffer, size_t size)
-  { gbs=create(buffer,size); bs=gbs; }
+  { init(create(buffer,size)); }
   /*x Constructs a Memory by copying an initial string.  The
       Memory buffer is initialized with the null terminated string
       #buffer#. */
   MemoryByteStream(const char *buffer)
-  { gbs=create(buffer,strlen(buffer)); bs=gbs; }
+  { init(create(buffer,strlen(buffer))); }
   /*x Erases everything in the Memory.
       The current location is reset to zero. */
   void empty(void)
-  { gbs=create();bs=gbs; }
+  { init(create()); }
 };
 
-/*x Read-only ByteStream interface to a memory area.  
+/*x Obsolete Read-only ByteStream interface to a memory area.  
     Class #ByteStream::Static# implements a read-only ByteStream interface for a
     memory area specified by the user at construction time. Calls to function
     #read# directly access this memory area.  The user must therefore make
     sure that its content remain valid long enough.  */
 
-class StaticByteStream : public ByteStream::Obsolete
+class StaticByteStream : public ByteStream::Wrapper
 {
 public:
+  ~StaticByteStream();
   /*x Creates a ByteStream object for allocating the memory area of
       length #sz# starting at address #buffer#. */
   StaticByteStream(const char *buffer, size_t sz)
-  { gbs=create_static(buffer,sz);bs=gbs; }
+  { init(create_static(buffer,sz)); }
   /*x Creates a ByteStream object for allocating the null terminated
       memory area starting at address #buffer#. */
   StaticByteStream(const char *buffer)
-  { gbs=create_static(buffer,strlen(buffer));bs=gbs; }
+  { init(create_static(buffer,strlen(buffer))); }
 };
 
 //@}

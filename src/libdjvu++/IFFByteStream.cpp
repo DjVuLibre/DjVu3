@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: IFFByteStream.cpp,v 1.23 2001-02-15 01:12:22 bcr Exp $
+// $Id: IFFByteStream.cpp,v 1.24 2001-02-15 20:31:57 bcr Exp $
 // $Name:  $
 
 // -- Implementation of IFFByteStream
@@ -47,10 +47,10 @@
 
 
 // Constructor
-IFFByteStream::IFFByteStream(GP<ByteStream> &xbs)
-: has_magic(false), ctx(0), gbs(xbs), bs(xbs), dir(0)
+IFFByteStream::IFFByteStream(GP<ByteStream> &xbs,const int xpos)
+: ByteStream::Wrapper(xbs), has_magic(false), ctx(0), dir(0)
 {
-  offset = seekto = bs->tell();
+  offset = seekto = xpos;
 }
 
 // Destructor
@@ -59,6 +59,14 @@ IFFByteStream::~IFFByteStream()
   while (ctx)
     close_chunk();
 }
+
+GP<IFFByteStream>
+IFFByteStream::create(GP<ByteStream> bs)
+{
+  const int pos=bs->tell();
+  return new IFFByteStream(bs,pos);
+}
+
 
 // IFFByteStream::ready
 // -- indicates if bytestream is ready for reading
@@ -457,18 +465,6 @@ IFFByteStream::write(const void *buffer, size_t size)
   offset += bytes;
   return bytes;
 }
-
-
-
-// IFFByteStream::flush
-// -- flushes all buffers
-
-void 
-IFFByteStream::flush()
-{
-  bs->flush();
-}
-
 
 // IFFByteStream::tell
 // -- tell position

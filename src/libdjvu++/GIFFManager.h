@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GIFFManager.h,v 1.14 2001-02-15 01:12:22 bcr Exp $
+// $Id: GIFFManager.h,v 1.15 2001-02-15 20:31:57 bcr Exp $
 // $Name:  $
 
 #ifndef _GIFFMANAGER_H
@@ -62,7 +62,7 @@
     @author 
     Andrei Erofeev <eaf@geocities.com> -- Initial implementation.
     @version 
-    #$Id: GIFFManager.h,v 1.14 2001-02-15 01:12:22 bcr Exp $# */
+    #$Id: GIFFManager.h,v 1.15 2001-02-15 20:31:57 bcr Exp $# */
 
 /** #GIFFChunk# is the base class for other IFF chunks understood by
     {\Ref GIFFManager}. It provides some basic interface, and is not supposed
@@ -311,6 +311,9 @@ public:
    GIFFManager(const char * name);
       /// Destructor
    virtual ~GIFFManager(void);
+private:
+   static void save_file(ByteStream *);
+   static void load_file(ByteStream *);
 };
 
 inline void

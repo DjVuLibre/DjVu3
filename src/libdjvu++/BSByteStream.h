@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: BSByteStream.h,v 1.24 2001-02-15 01:12:22 bcr Exp $
+// $Id: BSByteStream.h,v 1.25 2001-02-15 20:31:57 bcr Exp $
 // $Name:  $
 
 #ifndef _BSBYTESTREAM_H
@@ -115,7 +115,7 @@
     @memo
     Simple Burrows-Wheeler general purpose compressor.
     @version
-    #$Id: BSByteStream.h,v 1.24 2001-02-15 01:12:22 bcr Exp $# */
+    #$Id: BSByteStream.h,v 1.25 2001-02-15 20:31:57 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -213,6 +213,8 @@ private:
   // Cancel C++ default stuff
   BSByteStream(const BSByteStream &);
   BSByteStream & operator=(const BSByteStream &);
+  BSByteStream(ByteStream *);
+  BSByteStream(ByteStream *, int);
   // Helpers
   unsigned int encode(void);
   unsigned int decode(void);

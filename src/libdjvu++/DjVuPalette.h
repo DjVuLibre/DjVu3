@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuPalette.h,v 1.25 2001-02-15 01:12:22 bcr Exp $
+// $Id: DjVuPalette.h,v 1.26 2001-02-15 20:31:57 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUPALETTE_H_
@@ -52,7 +52,7 @@
     @memo 
     DjVuPalette header file
     @version 
-    #$Id: DjVuPalette.h,v 1.25 2001-02-15 01:12:22 bcr Exp $#
+    #$Id: DjVuPalette.h,v 1.26 2001-02-15 20:31:57 bcr Exp $#
     @author: 
     L\'eon Bottou <leonb@research.att.com> */
 //@{
@@ -188,6 +188,9 @@ private:
   static int CALLINGCONVENTION gcomp (const void*, const void*);
   static int CALLINGCONVENTION rcomp (const void*, const void*);
   static int CALLINGCONVENTION lcomp (const void*, const void*);
+private: // dummy functions
+  static void encode(ByteStream *);
+  static void decode(ByteStream *);
 };
 
 

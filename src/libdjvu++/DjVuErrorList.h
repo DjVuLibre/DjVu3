@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuErrorList.h,v 1.13 2001-01-04 22:04:54 bcr Exp $
+// $Id: DjVuErrorList.h,v 1.14 2001-02-15 20:31:57 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUERRORLIST_H
@@ -50,7 +50,7 @@ class ByteStream;
 
     @memo DjVuErrorList class.
     @author Bill C Riemers <bcr@lizardtech.com>
-    @version #$Id: DjVuErrorList.h,v 1.13 2001-01-04 22:04:54 bcr Exp $#
+    @version #$Id: DjVuErrorList.h,v 1.14 2001-02-15 20:31:57 bcr Exp $#
 */
 
 //@{
@@ -113,6 +113,8 @@ private:
   GString PrevError;
   GList<GString> Status;
   GString PrevStatus;
+private: //dummy stuff
+  static GURL set_stream(ByteStream *);
 };
 
 inline void

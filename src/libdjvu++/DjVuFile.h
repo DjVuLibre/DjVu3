@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuFile.h,v 1.73 2001-02-15 01:12:22 bcr Exp $
+// $Id: DjVuFile.h,v 1.74 2001-02-15 20:31:57 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUFILE_H
@@ -71,7 +71,7 @@ class DjVuNavDir;
 
     @memo Classes representing DjVu files.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuFile.h,v 1.73 2001-02-15 01:12:22 bcr Exp $#
+    @version #$Id: DjVuFile.h,v 1.74 2001-02-15 20:31:57 bcr Exp $#
 */
 
 //@{
@@ -593,6 +593,13 @@ private:
 			      GMap<GURL, void *> & map,
 			      bool included_too, bool no_ndir);
    void		move(GMap<GURL, void *> & map, const GURL & dir_url);
+private: // dummy stuff
+   static void decode(ByteStream *);
+   static GString decode_chunk(const char *, ByteStream *,bool,bool,bool);
+   static void	get_merged_anno(const GP<DjVuFile> &,ByteStream *,
+     const GList<GURL> &, int, int &, GMap<GURL, void *> &);
+   static void	get_text(const GP<DjVuFile> &,ByteStream *);
+
 };
 
 inline long

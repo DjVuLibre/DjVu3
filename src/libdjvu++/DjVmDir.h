@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVmDir.h,v 1.31 2001-02-15 01:12:22 bcr Exp $
+// $Id: DjVmDir.h,v 1.32 2001-02-15 20:31:57 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVMDIR_H
@@ -84,7 +84,7 @@
     @memo Implements DjVu multipage document directory
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: DjVmDir.h,v 1.31 2001-02-15 01:12:22 bcr Exp $# */
+    #$Id: DjVmDir.h,v 1.32 2001-02-15 20:31:57 bcr Exp $# */
 //@{
 
 
@@ -173,6 +173,9 @@ private:
    GPMap<GString, File>	name2file;
    GPMap<GString, File>	id2file;
    GPMap<GString, File>	title2file;
+private: //dummy stuff
+   static void decode(ByteStream *);
+   static void encode(ByteStream *);
 };
 
 class DjVmDir::File : public GPEnabled
