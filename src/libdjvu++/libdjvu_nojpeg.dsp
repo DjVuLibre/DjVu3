@@ -193,6 +193,10 @@ SOURCE=.\DjVuText.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\DjVuToPS.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\GBitmap.cpp
 # End Source File
 # Begin Source File
@@ -398,6 +402,10 @@ SOURCE=.\DjVuPort.h
 # Begin Source File
 
 SOURCE=.\DjVuText.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\DjVuToPS.h
 # End Source File
 # Begin Source File
 
