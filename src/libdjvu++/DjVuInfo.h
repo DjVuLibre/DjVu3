@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuInfo.h,v 1.3 1999-06-04 15:19:05 leonb Exp $
+//C- $Id: DjVuInfo.h,v 1.4 1999-09-17 12:46:05 leonb Exp $
 
 #ifndef _DJVUINFO_H
 #define _DJVUINFO_H
@@ -24,7 +24,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: DjVuInfo.h,v 1.3 1999-06-04 15:19:05 leonb Exp $# */
+    #$Id: DjVuInfo.h,v 1.4 1999-09-17 12:46:05 leonb Exp $# */
 //@{
 
 
@@ -43,7 +43,7 @@
 /** Current DjVu format version.  The value of this macro represents the
     version of the DjVu file format implemented by this release of the DjVu
     Reference Library. */
-#define DJVUVERSION          20
+#define DJVUVERSION          21
 /** Oldest DjVu format version supported by this library.  This release of the
     library cannot completely decode DjVu files whose version field is less
     than or equal to this number. */
