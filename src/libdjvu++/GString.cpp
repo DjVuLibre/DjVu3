@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.55 2001-04-13 17:36:01 bcr Exp $
+// $Id: GString.cpp,v 1.56 2001-04-13 19:02:46 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -237,11 +237,6 @@ GStringRep::concat(const char *s1,const char *s2) const
 }
 
 const char *GString::nullstr = "";
-
-GString::GString( const GP<GStringRep> &rep) : GP<GStringRep>(rep)
-{
-  init();
-}
 
 #if 0
 GString &
