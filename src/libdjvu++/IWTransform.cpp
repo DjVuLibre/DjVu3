@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: IWTransform.cpp,v 1.3 1999-05-24 21:31:22 leonb Exp $
+//C- $Id: IWTransform.cpp,v 1.4 1999-05-24 21:58:15 leonb Exp $
 
 
 
@@ -66,8 +66,8 @@
 #define MMXra(op,src,addr) \
   { register __int64 var; __asm { op [var],src };  *(__int64*)addr = var; } 
 // Probably not as efficient as GCC macros
-// Disabled now: Not thoroughly tested.
-// #define MMX 1
+// Not thoroughly tested.
+#define MMX 1
 #endif
 
 
@@ -240,6 +240,9 @@ mmx_fv_1 ( short* &q, short* e, int s, int s3 )
       MMXrr( packssdw,   mm1,mm0);  // MM0=[ x3,x2,x1,x0 ]
       MMXrr( psubw,      mm0,mm7);  // MM7=[ p3-x3, p2-x2, ... ]
       MMXra( movq,       mm7,q);
+#if defined(_MSC_VER) && defined(_DEBUG)
+      MMXemms;
+#endif
       q += 4;
     }
 }
@@ -280,6 +283,9 @@ mmx_fv_2 ( short* &q, short* e, int s, int s3 )
       MMXrr( packssdw,   mm1,mm0);  // MM0=[ x3,x2,x1,x0 ]
       MMXrr( paddw,      mm0,mm7);  // MM7=[ p3+x3, p2+x2, ... ]
       MMXra( movq,       mm7,q);
+#if defined(_MSC_VER) && defined(_DEBUG)
+      MMXemms;
+#endif
       q += 4;
     }
 }
@@ -321,6 +327,9 @@ mmx_bv_1 ( short* &q, short* e, int s, int s3 )
       MMXrr( packssdw,   mm1,mm0);  // MM0=[ x3,x2,x1,x0 ]
       MMXrr( psubw,      mm0,mm7);  // MM7=[ p3-x3, p2-x2, ... ]
       MMXra( movq,       mm7,q);
+#if defined(_MSC_VER) && defined(_DEBUG)
+      MMXemms;
+#endif
       q += 4;
     }
 }
@@ -362,6 +371,9 @@ mmx_bv_2 ( short* &q, short* e, int s, int s3 )
       MMXrr( packssdw,   mm1,mm0);  // MM0=[ x3,x2,x1,x0 ]
       MMXrr( paddw,      mm0,mm7);  // MM7=[ p3+x3, p2+x2, ... ]
       MMXra( movq,       mm7,q);
+#if defined(_MSC_VER) && defined(_DEBUG)
+      MMXemms;
+#endif
       q += 4;
     }
 }
@@ -390,7 +402,8 @@ static void
 filter_end()
 {
 #ifdef MMX
-  MMXemms;
+  if (mmxflag>0)
+    MMXemms;
 #endif
   if (zeroes)
     delete [] zeroes;
