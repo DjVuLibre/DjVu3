@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GURL.cpp,v 1.32 2000-02-02 21:08:31 eaf Exp $
+//C- $Id: GURL.cpp,v 1.33 2000-02-08 20:47:29 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -79,6 +79,7 @@ GURL::beautify_path(void)
 	 {
 	    args=ptr;
 	    *ptr=0;
+	    break;
 	 }
 
 	 // Eat multiple slashes
