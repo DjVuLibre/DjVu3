@@ -1,4 +1,6 @@
 SHELL=/bin/sh
+prefix=@prefix@
+bindir=@prefix@/bin
 SRCDIR=@srcdir@
 TOP=@topdir@
 VPATH=@srcdir@
@@ -33,7 +35,7 @@ all: $(LIB) $(PROG)
 
 # Rule for building the library
 
-$(LIB): $(LIBOBJS) Makefile
+$(LIB): $(LIBOBJS) 
 	if [ -r $(LIB) ] ; then rm $(LIB) ; fi
 	$(AR) cq $(LIB) $(LIBOBJS)
 	$(RANLIB) $(LIB)
@@ -51,31 +53,31 @@ ANNOTATEOBJS = annotate.o
 BZZOBJS = bzz.o
 LIBDJVUOBJS = libdjvu.o 
 
-c44: $(C44OBJS) $(LIB) Makefile
+c44: $(C44OBJS) $(LIB)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(C44OBJS) $(LIB) $(LDLIBS)
 
-d44: $(D44OBJS) $(LIB) Makefile
+d44: $(D44OBJS) $(LIB)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(D44OBJS) $(LIB) $(LDLIBS)
 
-djvuinfo: $(DJVUINFOOBJS) $(LIB) Makefile
+djvuinfo: $(DJVUINFOOBJS) $(LIB) 
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(DJVUINFOOBJS) $(LIB) $(LDLIBS)
 
-djvutopnm: $(DEJAVUTOPNMOBJS) $(LIB) Makefile
+djvutopnm: $(DEJAVUTOPNMOBJS) $(LIB)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(DEJAVUTOPNMOBJS) $(LIB) $(LDLIBS)
 
-djvumake: $(MAKEDEJAVUOBJS) $(LIB) Makefile	
+djvumake: $(MAKEDEJAVUOBJS) $(LIB)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(MAKEDEJAVUOBJS) $(LIB) $(LDLIBS)
 
-djvuextract: $(BREAKDEJAVUOBJS) $(LIB) Makefile	
+djvuextract: $(BREAKDEJAVUOBJS) $(LIB)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(BREAKDEJAVUOBJS) $(LIB) $(LDLIBS)
 
-ppmcoco: $(PPMCOCOOBJS) $(LIB) Makefile	
+ppmcoco: $(PPMCOCOOBJS) $(LIB)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(PPMCOCOOBJS) $(LIB) $(LDLIBS)
 
-annotate: $(ANNOTATEOBJS) $(LIB) Makefile	
+annotate: $(ANNOTATEOBJS) $(LIB)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(ANNOTATEOBJS) $(LIB) $(LDLIBS)
 
-bzz: $(BZZOBJS) $(LIB) Makefile
+bzz: $(BZZOBJS) $(LIB)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(BZZOBJS) $(LIB) $(LDLIBS)
 
 # Documentation
@@ -110,14 +112,21 @@ distclean:
 	( cd @Test ; $(MAKE) distclean )
 	-@echo Cleaned.
 
+install: $(PROG)
+	for n in $(PROG); do        \
+	  cp $$n $(bindir)        ; \
+	  chmod 755 $(bindir)/$$n ; \
+	done
+	-@echo Installed.
+
 depend:
 	sed -e '/^### DEPENDENCIES$$/,$$d' Makefile > Makefile.new
 	echo "### DEPENDENCIES" >> Makefile.new
-	for n in $(TOP)/*.cpp ; do ${CXX} -MM $(CXXFLAGS) $$n >> Makefile.new ; done
+	( cd $(TOP) ; for n in *.cpp ; do ${CXX} -MM $(CXXFLAGS) $$n ; done ) >> Makefile.new
 	sed -e '1,$$s/^\(Test[A-Za-z0-9]*\)\.o:/\1:/g' < Makefile.new > Makefile
 	rm Makefile.new
 
-PHONY: html dvi clean distclean depend disk
+PHONY: html dvi clean realclean distclean install depend
 
 
 # Handle cpp files as C++
@@ -132,8 +141,7 @@ BSByteStream.o: BSByteStream.cpp BSByteStream.h DjVuGlobal.h \
  GException.h ByteStream.h GContainer.h GSmartPointer.h ZPCodec.h
 ByteStream.o: ByteStream.cpp ByteStream.h DjVuGlobal.h GException.h \
  GContainer.h GSmartPointer.h
-DjVuGlobal.o: DjVuGlobal.cpp DjVuGlobal.h GOS.h GString.h GException.h \
- GSmartPointer.h
+DjVuGlobal.o: DjVuGlobal.cpp DjVuGlobal.h
 DjVuImage.o: DjVuImage.cpp DjVuImage.h GString.h DjVuGlobal.h \
  GException.h GSmartPointer.h GThreads.h ByteStream.h GContainer.h \
  IFFByteStream.h JB2Image.h ZPCodec.h GRect.h GBitmap.h IWImage.h \

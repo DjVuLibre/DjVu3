@@ -1,6 +1,7 @@
 #!/bin/sh
 
 ### The substitutions
+prefix=/usr/local
 SRCDIR=.
 TOPDIR=.
 CXX=${CXX-eg++}
@@ -24,31 +25,34 @@ fi
 
 ### Process arguments
 
-while [ -n "$1" ]
+for arg 
 do
-   case "$1" in 
-
+   case "$arg" in 
         --prefix=* )     
-           prefix=`echo $1 | sed 's/[-A-Za-z_]*=//'` ;; 
-        --prefix )
-           prefix=$2; shift ;;
+           prefix=`echo $arg | sed 's/[-A-Za-z_]*=//'` 
+           ;; 
         --with-debug )
-           OPT=-g ;;
+           OPT=-g 
+           ;;
         --with-threads=* )
-           threads=`echo $1 | sed 's/[-A-Za-z_]*=//'` ;; 
-        --with-threads )
-           threads=$2; shift ;;
+           threads=`echo $arg | sed 's/[-A-Za-z_]*=//'` 
+           ;; 
         --without-threads )
-           threads=no ;;
-
+           threads=no 
+           ;;
+        --with-cxxflag=* )
+           flag=`echo $arg | sed 's/[-A-Za-z_]*=//'`
+           DEFS="$DEFS $flag"
+           ;;
         *)
-           echo 1>&2 "$conf: Unrecognized argument $1"
+           echo 1>&2 "$conf: Unrecognized argument '$arg'"
            cat 1>&2 <<\EOF
 Recognized options:
-  --prefix=PREFIXDIR                    set install directory
-  --with-debug                          compile with debug enabled
-  --without-threads                     do not use threads
-  --with-threads=(no|co|posix|dce|jri)  choose thread implementation
+  --prefix=PREFIXDIR                    set install directory.
+  --with-debug                          compile with debug enabled.
+  --without-threads                     do not use threads.
+  --with-threads=(no|co|posix|dce|jri)  choose thread implementation.
+  --with-cxxflag=FLAG                   gives flag FLAG to C++ compiler.
 EOF
            exit 1 ;;
    esac
@@ -61,14 +65,14 @@ echo 'int main(void) {return 0;}' > /tmp/$$.c
 trap "rm 2>/dev/null /tmp/$$ /tmp/$$.*" 0
 
 echo -n Testing C++ compiler ...
-if ( $CXX -c /tmp/$$.c -o /tmp/$$.o >/dev/null 1>&2 ) 
+if ( $CXX -c /tmp/$$.c -o /tmp/$$.o >/dev/null 2>&1 ) 
 then
   echo $CXX.
-elif ( g++ -c /tmp/$$.c -o /tmp/$$.o >/dev/null 1>&2 ) 
+elif ( g++ -c /tmp/$$.c -o /tmp/$$.o >/dev/null 2>&1 ) 
 then
   CXX=g++
   echo $CXX.
-elif ( CC -c /tmp/$$.c -o /tmp/$$.o >/dev/null 1>&2 ) 
+elif ( CC -c /tmp/$$.c -o /tmp/$$.o >/dev/null 2>&1 ) 
 then
   CXX=CC
   OPT=
@@ -84,7 +88,7 @@ fi
 if [ -z "$OPT" ] 
 then
   echo -n Testing optimization option ... 
-  if ( $CXX -O -c /tmp/$$.c -o /tmp/$$ >/dev/null 2>/dev/null ) 
+  if ( $CXX -O -c /tmp/$$.c -o /tmp/$$ >/dev/null 2>&1 ) 
   then
      echo $OPT
      OPT=-O
@@ -94,7 +98,7 @@ then
 fi
 
 echo -n Testing pipe option ...
-if ( $CXX -pipe -c /tmp/$$.c -o /tmp/$$ >/dev/null 2>/dev/null ) 
+if ( $CXX -pipe -c /tmp/$$.c -o /tmp/$$ >/dev/null 2>&1 ) 
 then
   echo yes.
   CXX="$CXX -pipe"
@@ -127,6 +131,7 @@ then
          echo yes.
        else
          LDLIBS="-lpthread $LDLIBS"
+         DEFS="$DEFS -D_REENTRANT"
          echo no.
        fi
        ;;
@@ -166,6 +171,7 @@ fi
 # Generate makefiles
 
 sed < $SRCDIR/Makefile.in > Makefile \
+  -e 's!@prefix@!'"$prefix"'!g' \
   -e 's!@topdir@!'"$TOPDIR"'!g' \
   -e 's!@srcdir@!'"$TOPDIR"'!g' \
   -e 's!@cc@!'"$CC"'!g' \
@@ -175,7 +181,7 @@ sed < $SRCDIR/Makefile.in > Makefile \
   -e 's!@warn@!'"$WARN"'!g' \
   -e 's!@ldlibs@!'"$LDLIBS"'!g' \
   -e 's!@ranlib@!'"$RANLIB"'!g' \
-  -e 's!@ar@!'"$AR"'!g' \
+  -e 's!@ar@!'"$AR"'!g'
 
 
 case "$TOPDIR" in
@@ -194,7 +200,7 @@ sed < $SRCDIR/@Tools/Makefile.in > @Tools/Makefile \
   -e 's!@warn@!'"$WARN"'!g' \
   -e 's!@ldlibs@!'"$LDLIBS"'!g' \
   -e 's!@ranlib@!'"$RANLIB"'!g' \
-  -e 's!@ar@!'"$AR"'!g' \
+  -e 's!@ar@!'"$AR"'!g'
 
 if [ ! -d @Test ] ; then mkdir @Test ; fi
 sed < $SRCDIR/@Test/Makefile.in > @Test/Makefile \
@@ -207,4 +213,5 @@ sed < $SRCDIR/@Test/Makefile.in > @Test/Makefile \
   -e 's!@warn@!'"$WARN"'!g' \
   -e 's!@ldlibs@!'"$LDLIBS"'!g' \
   -e 's!@ranlib@!'"$RANLIB"'!g' \
-  -e 's!@ar@!'"$AR"'!g' \
+  -e 's!@ar@!'"$AR"'!g'
+
