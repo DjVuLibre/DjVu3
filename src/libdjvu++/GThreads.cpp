@@ -9,10 +9,10 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GThreads.cpp,v 1.41 2000-01-24 21:26:59 praveen Exp $
+//C- $Id: GThreads.cpp,v 1.42 2000-02-03 19:22:05 eaf Exp $
 
 
-// **** File "$Id: GThreads.cpp,v 1.41 2000-01-24 21:26:59 praveen Exp $"
+// **** File "$Id: GThreads.cpp,v 1.42 2000-02-03 19:22:05 eaf Exp $"
 // This file defines machine independent classes
 // for running and synchronizing threads.
 // - Author: Leon Bottou, 01/1998
@@ -107,6 +107,7 @@ GThread::GThread(int stacksize)
 
 GThread::~GThread()
 {
+  wait_for_finish();
   if (hthr)
     CloseHandle(hthr);
   hthr = 0;
@@ -358,6 +359,7 @@ GThread::GThread(int stacksize)
 
 GThread::~GThread(void)
 {
+   wait_for_finish();
 }
 
 
@@ -612,12 +614,15 @@ GThread::start(void *arg)
       fprintf(stderr, "GThreads: unrecognized uncaught exception.");
       abort();
     }
-#endif 
-  // Signal thread termination
+#endif
+     // Signal thread termination
   finish_mon.enter();
   gt->finished = 1;
   finish_mon.broadcast();
   finish_mon.leave();
+     // Do not add anything below this line!
+     // The GThread object may already be destroyed by now.
+  
   return 0;
 }
 
@@ -648,6 +653,9 @@ GThread::GThread(int stacksize) :
 
 GThread::~GThread()
 {
+      // Need to wait because the start() function will want
+      // to set the 'finished' flag
+   wait_for_finish();
 }
 
 int  
