@@ -9,9 +9,9 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: IWImage.cpp,v 1.23 1999-10-19 20:58:19 haffner Exp $
+//C- $Id: IWImage.cpp,v 1.24 1999-10-19 22:00:35 haffner Exp $
 
-// File "$Id: IWImage.cpp,v 1.23 1999-10-19 20:58:19 haffner Exp $"
+// File "$Id: IWImage.cpp,v 1.24 1999-10-19 22:00:35 haffner Exp $"
 // - Author: Leon Bottou, 08/1998
 
 #ifdef __GNUC__
@@ -611,7 +611,7 @@ _IWMap::create(const signed char *img8, int imgrowsize,
 {
   int i, j;
   // Progress
-  DJVU_PROGRESS_TASK(transf,4);
+  DJVU_PROGRESS_TASK(transf,3);
   // Allocate decomposition buffer
   short *data16 = new short[bw*bh];
   // Copy pixels
@@ -641,7 +641,7 @@ _IWMap::create(const signed char *img8, int imgrowsize,
   else
     {
       // Perform traditional decomposition
-      DJVU_PROGRESS_RUN(transf, 4);
+      DJVU_PROGRESS_RUN(transf, 3);
       IWTransform::forward(data16, iw, ih, bw, 1, 32);
     }
   // Copy coefficient into blocks
@@ -2243,8 +2243,8 @@ IWPixmap::init(const GPixmap *pm, const GBitmap *mask, CRCBMode crcbmode)
           mskrowsize = mask->rowsize();
         }
       // Fill buffer with luminance information
-      DJVU_PROGRESS_TASK(create,4);
-      DJVU_PROGRESS_RUN(create, (crcb_delay>=0 ? 2 : 4));
+      DJVU_PROGRESS_TASK(create,3);
+      DJVU_PROGRESS_RUN(create, (crcb_delay>=0 ? 1 : 3));
       IWTransform::RGB_to_Y((*pm)[0], w, h, pm->rowsize(), buffer, w);
       if (crcb_delay < 0)
         {
@@ -2261,11 +2261,11 @@ IWPixmap::init(const GPixmap *pm, const GBitmap *mask, CRCBMode crcbmode)
           cbmap = new _IWMap(w,h);
           crmap = new _IWMap(w,h);
           // Process CB information
-          DJVU_PROGRESS_RUN(create,3);
+          DJVU_PROGRESS_RUN(create,2);
           IWTransform::RGB_to_Cb((*pm)[0], w, h, pm->rowsize(), buffer, w);
           cbmap->create(buffer, w, msk8, mskrowsize);
           // Process CR information
-          DJVU_PROGRESS_RUN(create,4);
+          DJVU_PROGRESS_RUN(create,3);
           IWTransform::RGB_to_Cr((*pm)[0], w, h, pm->rowsize(), buffer, w); 
           crmap->create(buffer, w, msk8, mskrowsize);
           // Perform chrominance reduction (CRCBhalf)
