@@ -9,10 +9,10 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GThreads.cpp,v 1.20.4.1 1999-04-12 16:45:50 eaf Exp $
+//C- $Id: GThreads.cpp,v 1.20.4.2 1999-05-11 21:16:42 eaf Exp $
 
 
-// **** File "$Id: GThreads.cpp,v 1.20.4.1 1999-04-12 16:45:50 eaf Exp $"
+// **** File "$Id: GThreads.cpp,v 1.20.4.2 1999-05-11 21:16:42 eaf Exp $"
 // This file defines machine independent classes
 // for running and synchronizing threads.
 // - Author: Leon Bottou, 01/1998
@@ -1294,6 +1294,8 @@ GMonitor::signal()
   if (count>0 || self!=locker)
     THROW("Monitor was not acquired by this thread (GMonitor::signal)");
   wchan = 1;
+  if (scheduling_callback)
+    (*scheduling_callback)(GThread::CallbackUnblock);
 }
 
 void
@@ -1304,6 +1306,8 @@ GMonitor::broadcast()
     THROW("Monitor was not acquired by this thread (GMonitor::broadcast)");
   seqno += 1;
   wchan = 1;
+  if (scheduling_callback)
+    (*scheduling_callback)(GThread::CallbackUnblock);
 }
 
 void
