@@ -31,7 +31,7 @@
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #C-
 #
-# $Id: Makefile.in,v 1.4 2001-07-25 17:10:41 mchen Exp $
+# $Id: Makefile.in,v 1.5 2001-09-24 22:28:09 leonb Exp $
 # $Name:  $
 
 %%%include <paths>
@@ -262,8 +262,8 @@ $(PROGRAM):	$(OBJS) $(LIBDJVUXX) $(MAKEFILE) $(RPO) $(LIBJPEG)
 #############################################################################
 $(SRC_CIN_DATA): %.cpp: %.cin
 	NAME=$(basename $(notdir $<));\
-	$(BIN2CPP) $$NAME < $< > /tmp/$$$$.cpp;\
-	echo "Generating $@ from $(notdir $<)...";\
+	$(BIN2CPP) $$NAME < $< > /tmp/$$$$.cpp || exit 1 ;\
+	echo "Generating $@ from $(notdir $<)..." ;\
 	rm -f $@; mv /tmp/$$$$.cpp $@
 
 $(CPP_MOC): %_moc.cpp: %.h
@@ -298,12 +298,12 @@ $(patsubst %.cpp,%.dep,$(filter %.cpp,$(FROM_MOC))): %.dep : %.cpp %_moc.inc
 	$(RM) -f $@; ($(ECHO) $(EHEAD) "$@ " $(ETAIL); cat /tmp/$$$$.dep) > $@;\
 	$(RM) -f /tmp/$$$$.dep
 
-# Dependencies generator for files not including *_moc.inc
-$(patsubst %.cpp,%.dep,$(filter-out $(filter %,cpp,$(FROM_MOC)),$(SRCS))): %.dep : %.cpp
+# Dependencies generator for regular files
+$(patsubst %.cpp,%.dep,$(filter-out $(filter %,cpp,$(FROM_MOC) $(SRC_CIN_DATA)),$(SRCS))): %.dep : %.cpp
 	$(ECHO) "Generating dependencies for $(notdir $<)...";\
-	$(CXX) -MM $(CXXFLAGS) $< > /tmp/$$$$.dep || exit 1;\
+	$(CXX) -MM $(CXXFLAGS) $< > /tmp/$$$$.dep || exit 1 ;\
 	$(RM) -f $@; ($(ECHO) $(EHEAD) "$@ " $(ETAIL); cat /tmp/$$$$.dep) > $@;\
-	$(RM) -f /tmp/$$$$.dep
+	$(RM) -f /tmp/$$$$.dep ;\
 
 #############################################################################
 ### Basic rules
@@ -312,12 +312,12 @@ all: $(PROGRAM)
 
 clean:
 	-$(RM) -f $(PROGRAM) 2>>/dev/null
-	-$(RM) -f *.o *.a *.out *.rpo *.dep ii_files 2>>/dev/null
+	-$(RM) -f *.o *.a *.out *.rpo ii_files 2>>/dev/null
 	-$(RM) -f $(SRC_CIN_DATA) $(OBJ_CIN_DATA) 2>>/dev/null
-	-$(RM) -f $(SRC_MOC) $(OBJ_MOC) 2>>/dev/null
+	-$(RM) -f $(INC_MOC) $(OBJ_MOC) 2>>/dev/null
 
 distclean: clean
-	-$(RM) -f $(MAKEFILE) 2>>/dev/null
+	-$(RM) -f $(MAKEFILE) *.dep 2>>/dev/null
 
 .PHONY: all depend clean distclean
 
