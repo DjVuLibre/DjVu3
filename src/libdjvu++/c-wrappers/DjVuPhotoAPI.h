@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuPhotoAPI.h,v 1.9 2000-01-26 04:40:46 bcr Exp $
+ *C- $Id: DjVuPhotoAPI.h,v 1.10 2000-01-26 19:27:06 bcr Exp $
  */
 
 #ifndef _DJVUPHOTO_H_
@@ -31,7 +31,7 @@ enum phototodjvu_type_enum
   djvu_crcbhalf,
   djvu_crcbnormal,
   djvu_crcbfull,
-  djvu_pseudobg
+  djvu_jpeg
 };
 typedef enum phototodjvu_type_enum phototodjvu_type;
 
