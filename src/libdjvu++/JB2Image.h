@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: JB2Image.h,v 1.27 2000-12-22 01:49:35 bcr Exp $
+// $Id: JB2Image.h,v 1.28 2000-12-22 01:58:34 bcr Exp $
 // $Name:  $
 
 #ifndef _JB2IMAGE_H
@@ -130,7 +130,7 @@
     \end{itemize}
 
     @version
-    #$Id: JB2Image.h,v 1.27 2000-12-22 01:49:35 bcr Exp $#
+    #$Id: JB2Image.h,v 1.28 2000-12-22 01:58:34 bcr Exp $#
     @memo
     Coding bilevel images with JB2.
     @author
@@ -580,9 +580,6 @@ public:
     void compute_bounding_box(const GBitmap &cbm);
   };
   virtual ~JB2Codec();
-  virtual void code_image_size(JB2Dict *jim);
-  virtual void code_image_size(JB2Image *jim);
-
 protected:
   // Constructors
   JB2Codec(ByteStream &bs, const bool xencoding=false);
@@ -623,6 +620,8 @@ protected:
   virtual void code_record_type(int &rectype) = 0;
   virtual int code_match_index(int &index, JB2Dict *jim)=0;
   virtual void code_inherited_shape_count(JB2Dict *jim)=0;
+  virtual void code_image_size(JB2Dict *jim);
+  virtual void code_image_size(JB2Image *jim);
   virtual void code_absolute_location(JB2Blit *jblt,  int rows, int columns)=0;
   virtual void code_absolute_mark_size(GBitmap *bm, int border=0) = 0;
   virtual void code_relative_mark_size(GBitmap *bm, int cw, int ch, int border=0) = 0;

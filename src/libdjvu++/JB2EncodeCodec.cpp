@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: JB2EncodeCodec.cpp,v 1.2 2000-12-22 01:49:35 bcr Exp $
+// $Id: JB2EncodeCodec.cpp,v 1.3 2000-12-22 01:58:34 bcr Exp $
 // $Name:  $
 
 #ifndef NEED_DECODER_ONLY
@@ -59,8 +59,6 @@ public:
 //virtual
   void code(JB2Image *jim);
   void code(JB2Dict *jim);
-  void code_image_size(JB2Dict *jim);
-  void code_image_size(JB2Image *jim);
 
 protected:
   void CodeNum(const int num, const int lo, const int hi, NumContext &ctx);
@@ -71,6 +69,8 @@ protected:
   void code_record_type(int &rectype);
   int code_match_index(int &index, JB2Dict *jim);
   void code_inherited_shape_count(JB2Dict *jim);
+  void code_image_size(JB2Dict *jim);
+  void code_image_size(JB2Image *jim);
   void code_absolute_location(JB2Blit *jblt,  int rows, int columns);
   void code_absolute_mark_size(GBitmap *bm, int border=0);
   void code_relative_mark_size(GBitmap *bm, int cw, int ch, int border=0);
