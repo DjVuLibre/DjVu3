@@ -7,9 +7,9 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: ByteStream.cpp,v 1.5 1999-03-01 14:48:02 leonb Exp $
+//C-  $Id: ByteStream.cpp,v 1.6 1999-03-04 19:00:30 leonb Exp $
 
-// File "$Id: ByteStream.cpp,v 1.5 1999-03-01 14:48:02 leonb Exp $"
+// File "$Id: ByteStream.cpp,v 1.6 1999-03-04 19:00:30 leonb Exp $"
 // - Author: Leon Bottou, 04/1997
 
 #ifdef __GNUC__
@@ -353,7 +353,7 @@ MemoryByteStream::write(const void *buffer, size_t sz)
       if ( (where+nsz) > (nblocks<<12) )
         {
           int new_nblocks = (((where+nsz)+0xffff)&~0xffff) >> 12;
-          char **new_blocks = new (char*) [new_nblocks];
+          char **new_blocks = new char* [new_nblocks];
           for (b=0; b<nblocks; b++) 
             new_blocks[b] = blocks[b];
           for (; b<new_nblocks; b++) 
@@ -473,6 +473,7 @@ size_t
 StaticByteStream::write(const void *buffer, size_t sz)
 {
   THROW("Attempt to write into a StaticByteStream");
+  return 0;
 }
 
 int 
@@ -482,7 +483,7 @@ StaticByteStream::is_seekable(void) const
 }
 
 void 
-StaticByteStream::seek(long offset, int whence = SEEK_SET)
+StaticByteStream::seek(long offset, int whence)
 {
   int nwhere = 0;
   switch (whence)
