@@ -30,12 +30,14 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: parseoptions.cpp,v 1.68 2001-03-30 23:31:29 bcr Exp $
+// $Id: parseoptions.cpp,v 1.69 2001-04-03 21:47:08 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
 #pragma implementation
 #endif
+
+#ifndef UNDER_CE
 
 #define _PARSEOPTIONS_H_IMPLEMENTATION_ true
 #include "parseoptions.h"
@@ -1868,4 +1870,5 @@ DjVuParseOptions::Profiles::~Profiles()
   delete [] values;
 }
 
+#endif /* UNDER_CE */
 
