@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.35 1999-09-14 13:07:14 leonb Exp $
+//C- $Id: DjVuDocument.cpp,v 1.36 1999-09-14 22:36:47 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -22,63 +22,81 @@
 
 
 DjVuDocument::DjVuDocument(void)
-  : initialized(false), cache(0), doc_type(BUNDLED), dummy_ndir(false)
+  : init_called(false), cache(0), doc_type(UNKNOWN_TYPE)
 {
 }
-
 
 void
 DjVuDocument::init(const GURL & url, GP<DjVuPort> xport,
                    DjVuFileCache * xcache)
 {
-   if (initialized)
-     THROW("DjVuDocument is already initialized");
+   if (init_called)
+      THROW("DjVuDocument is already initialized");
    if (!get_count())
-     THROW("DjVuDocument is not secured by a GP<DjVuDocument>");
+      THROW("DjVuDocument is not secured by a GP<DjVuDocument>");
    DEBUG_MSG("DjVuDocument::init(): initializing class...\n");
    DEBUG_MAKE_INDENT(3);
-   // Initialize
-   cache = xcache;
-   doc_type = BUNDLED;
-   dummy_ndir = true;
-   init_url = url;
+   
+      // Initialize
+   cache=xcache;
+   doc_type=UNKNOWN_TYPE;
+   init_url=url;
    DjVuPortcaster * pcaster=get_portcaster();
-   if (!xport) 
-     xport = simple_port = new DjVuSimplePort();
+   if (!xport) xport=simple_port=new DjVuSimplePort();
    pcaster->add_route(this, xport);
    pcaster->add_route(this, this);
-   detect_doc_type(url);
-   // Now we say it is ready
-   initialized = true;
+
+   init_data_pool=pcaster->request_data(this, init_url);
+   if (!init_data_pool) 
+      THROW("Failed to get data for URL '"+init_url+"'");
+
+      // Now we say it is ready
+   init_called=true;
+   
+   init_life_saver=this;
+   init_thr.create(static_init_thread, this);
 }
 
 DjVuDocument::~DjVuDocument(void)
 {
+   wait_for_complete_init();
 }
-
 
 void
 DjVuDocument::check() const
 {
-  if (!initialized)
+  if (!init_called)
     THROW("DjVuDocument is not initialized");
 }
 
+void
+DjVuDocument::static_init_thread(void * cl_data)
+{
+   DjVuDocument * th=(DjVuDocument *) cl_data;
+   TRY {
+      th->init_thread();
+   } CATCH(exc) {
+      TRY {
+	 get_portcaster()->notify_error(th, exc.get_cause());
+      } CATCH(exc) {} ENDCATCH;
+   } ENDCATCH;
+}
 
 void
-DjVuDocument::detect_doc_type(const GURL & doc_url)
+DjVuDocument::init_thread(void)
+      // This function is run in a separate thread.
+      // The goal is to detect the document type (BUNDLED, OLD_INDEXED, etc.)
+      // and decode navigation directory.
 {
-   DEBUG_MSG("DjVuDocument::detect_doc_type(): guessing what we're dealing with\n");
+   DEBUG_MSG("DjVuDocument::init_thread(): guessing what we're dealing with\n");
    DEBUG_MAKE_INDENT(3);
 
-   DjVuPortcaster * pcaster=get_portcaster();
-   GP<DataPool> data_pool=pcaster->request_data(this, doc_url);
-   if (!data_pool) 
-      THROW("Failed to get data for URL '"+doc_url+"'");
-
-   init_data_pool=data_pool;
+   GP<DjVuDocument> life_saver=init_life_saver;
+   init_life_saver=0;
    
-   GP<ByteStream> stream=data_pool->get_stream();
+   DjVuPortcaster * pcaster=get_portcaster();
+      
+   GP<ByteStream> stream=init_data_pool->get_stream();
    IFFByteStream iff(*stream);
    GString chkid;
    int size=iff.get_chunk(chkid);
@@ -106,10 +124,16 @@ DjVuDocument::detect_doc_type(const GURL & doc_url)
 	    DEBUG_MSG("Got INDIRECT file.\n");
 	    doc_type=INDIRECT;
 	 }
+	 flags=flags | DOC_TYPE_KNOWN | DOC_DIR_KNOWN;
+	 pcaster->notify_doc_flags_changed(this, DOC_TYPE_KNOWN | DOC_DIR_KNOWN, 0);
+	 check_unnamed_files();
       } else if (chkid=="DIR0")
       {
 	 DEBUG_MSG("Got OLD_BUNDLED file.\n");
 	 doc_type=OLD_BUNDLED;
+	 flags=flags | DOC_TYPE_KNOWN;
+	 pcaster->notify_doc_flags_changed(this, DOC_TYPE_KNOWN, 0);
+	 check_unnamed_files();
       } else THROW("Unknown document format. Can't decode.");
 
       if (doc_type==OLD_BUNDLED)
@@ -140,7 +164,6 @@ DjVuDocument::detect_doc_type(const GURL & doc_url)
 
 	    // Now get the name of this file
 	 int file_num;
-	 GString first_page_name;
 	 for(file_num=0;file_num<djvm_dir0->get_files_num();file_num++)
 	 {
 	    DjVmDir0::FileRec & file=*djvm_dir0->get_file(file_num);
@@ -153,9 +176,9 @@ DjVuDocument::detect_doc_type(const GURL & doc_url)
 	 if (!first_page_name.length())
 	    THROW("Failed to find any page in this document.");
 
-	    // Create dummy DjVuNavDir and insert the first page into it
-	 ndir=new DjVuNavDir(init_url+"directory");
-	 ndir->insert_page(-1, first_page_name);
+	 flags=flags | DOC_DIR_KNOWN;
+	 pcaster->notify_doc_flags_changed(this, DOC_DIR_KNOWN, 0);
+	 check_unnamed_files();
       }
    } else // chkid!="FORM:DJVM"
    {
@@ -163,115 +186,176 @@ DjVuDocument::detect_doc_type(const GURL & doc_url)
       DEBUG_MSG("Got DJVU OLD_INDEXED document here.\n");
       doc_type=OLD_INDEXED;
 
-	 // Create dummy DjVuNavDir and insert this page into it
-      ndir=new DjVuNavDir(init_url.base()+"directory");
-      ndir->insert_page(-1, init_url.name());
+      flags=flags | DOC_TYPE_KNOWN;
+      pcaster->notify_doc_flags_changed(this, DOC_TYPE_KNOWN, 0);
+      check_unnamed_files();
    }
-}
 
-void
-DjVuDocument::decode_doc_structure(void)
-{
-   DEBUG_MSG("DjVuDocument::decode_doc_structure(): learning doc structure.\n");
-   DEBUG_MAKE_INDENT(3);
-
-   if (get_doc_type()==OLD_BUNDLED ||
-       get_doc_type()==OLD_INDEXED)
-      if (!ndir || dummy_ndir)
-	 decode_ndir();
-}
-
-void
-DjVuDocument::decode_ndir(void)
-{
-   DEBUG_MSG("DjVuDocument::decode_ndir(): decoding the navigation directory...\n");
-   DEBUG_MAKE_INDENT(3);
-
-   if (doc_type==BUNDLED || doc_type==INDIRECT)
-      THROW("The document is in the new format, which doesn't use NDIR chunks.");
-
-   if (!ndir || dummy_ndir)
+   if (doc_type==OLD_BUNDLED || doc_type==OLD_INDEXED)
    {
-      GP<DjVuNavDir> dir=get_djvu_file(-1)->decode_ndir();
-      if (dir)
+      DEBUG_MSG("Searching for NDIR chunks...\n");
+      ndir=get_djvu_file(-1)->decode_ndir();
+      if (!ndir)
       {
-	 ndir=dir; dummy_ndir=false;
+	    // Seems to be 1-page old-style document. Create dummy NDIR
+	 if (doc_type==OLD_BUNDLED)
+	 {
+	    ndir=new DjVuNavDir(init_url+"directory");
+	    ndir->insert_page(-1, first_page_name);
+	 } else
+	 {
+	    ndir=new DjVuNavDir(init_url.base()+"directory");
+	    ndir->insert_page(-1, init_url.name());
+	 }
       }
+      flags=flags | DOC_NDIR_KNOWN;
+      pcaster->notify_doc_flags_changed(this, DOC_NDIR_KNOWN, 0);
+      check_unnamed_files();
    }
+
+   flags=flags | DOC_INIT_COMPLETE;
+   pcaster->notify_doc_flags_changed(this, DOC_INIT_COMPLETE, 0);
+   check_unnamed_files();
+   
+   DEBUG_MSG("DOCUMENT IS FULLY INITIALIZED now: doc_type='" <<
+	     (doc_type==BUNDLED ? "BUNDLED" :
+	      doc_type==OLD_BUNDLED ? "OLD_BUNDLED" :
+	      doc_type==INDIRECT ? "INDIRECT" :
+	      doc_type==OLD_INDEXED ? "OLD_INDEXED" :
+	      "UNKNOWN") << "'\n");
+}
+
+void
+DjVuDocument::check_unnamed_files(void)
+{
+   DEBUG_MSG("DjVuDocument::check_unnamed_files(): Seeing if we can fix some...\n");
+   DEBUG_MAKE_INDENT(3);
+
+   if ((flags & DOC_TYPE_KNOWN)==0) return;
+   
+      // See the list of unnamed files (created when there was insufficient
+      // information about DjVuDocument structure) and try to fix those,
+      // which can be fixed at this time
+   while(1)
+   {
+      DjVuPortcaster * pcaster=get_portcaster();
+
+      GP<UnnamedFile> ufile;
+      GURL new_url;
+      
+      TRY {
+	 {
+	    GCriticalSectionLock lock(&ufiles_lock);
+	    for(GPosition pos=ufiles_list;pos;)
+	    {
+	       TRY {
+		  GP<UnnamedFile> f=ufiles_list[pos];
+		  if (f->id_type==UnnamedFile::ID) new_url=id_to_url(f->id);
+		  else new_url=page_to_url(f->page_num);
+		  if (!new_url.is_empty())
+		  {
+		     ufile=f;
+		     ufiles_list.del(pos);
+		     break;
+		  }
+		  ++pos;
+	       } CATCH(exc) {
+		  pcaster->notify_error(this, exc.get_cause());
+		  GPosition this_pos=pos;
+		  ++pos;
+		  ufiles_list.del(this_pos);
+	       } ENDCATCH;
+	    }
+	 }
+
+	 if (ufile && !new_url.is_empty())
+	 {
+	    DEBUG_MSG("Fixing file: '" << ufile->url << "'=>'" << new_url << "'\n");
+	    
+	       // Now, once we know its real URL we can request a real DataPool and
+	       // can connect the DataPool owned by DjVuFile to that real one
+	       // Note, that now request_data() will not play fool because
+	       // we have enough information
+	    if (ufile->data_pool)
+	    {
+	       GP<DataPool> new_pool=pcaster->request_data(ufile->file, new_url);
+	       if (!new_pool) THROW("Failed to get data for URL '"+new_url+"'");
+	       ufile->data_pool->connect(new_pool);
+	    }
+	    
+	    ufile->file->set_name(new_url.name());
+	    ufile->file->move(new_url.base());
+	    pcaster->set_name(ufile->file, new_url);
+	 } else break;
+      } CATCH(exc) {
+	 pcaster->notify_error(this, exc.get_cause());
+      } ENDCATCH;
+   } // while(1)
 }
 
 int
 DjVuDocument::get_pages_num(void)
 {
-  if (!initialized)
-    return 0;
-   if (doc_type==BUNDLED || doc_type==INDIRECT)
-      return djvm_dir->get_pages_num();
-   else return ndir->get_pages_num();
-}
-
-GString
-DjVuDocument::page_to_id(int page_num)
-{
    check();
-   if (page_num<0) THROW("Page number may not be negative.");
-   if (page_num>=get_pages_num()) THROW("Page number is too big.");
-   if (doc_type==BUNDLED || doc_type==INDIRECT)
-      return djvm_dir->page_to_file(page_num)->id;
-   else return ndir->page_to_name(page_num);
-}
-
-GString
-DjVuDocument::page_to_name(int page_num)
-{
-   check();
-   if (page_num<0) THROW("Page number may not be negative.");
-   if (page_num>=get_pages_num()) THROW("Page number is too big.");
-   if (doc_type==BUNDLED || doc_type==INDIRECT)
-      return djvm_dir->page_to_file(page_num)->name;
-   else return ndir->page_to_name(page_num);
-}
-
-GString
-DjVuDocument::page_to_title(int page_num)
-{
-   check();
-   if (page_num<0) THROW("Page number may not be negative.");
-   if (page_num>=get_pages_num()) THROW("Page number is too big.");
-   if (doc_type==BUNDLED || doc_type==INDIRECT)
-      return djvm_dir->page_to_file(page_num)->title;
-   else return ndir->page_to_name(page_num);
+   if (flags & DOC_TYPE_KNOWN)
+      if (doc_type==BUNDLED || doc_type==INDIRECT)
+	 return djvm_dir->get_pages_num();
+      else if (flags & DOC_NDIR_KNOWN)
+	 return ndir->get_pages_num();
+   return 1;
 }
 
 GURL
 DjVuDocument::page_to_url(int page_num)
 {
    check();
-   if (page_num<0) THROW("Page number may not be negative.");
-   if (page_num>=get_pages_num()) THROW("Page number is too big.");
-
+   DEBUG_MSG("DjVuDocument::page_to_url(): page_num=" << page_num << "\n");
+   DEBUG_MAKE_INDENT(3);
+   
    GURL url;
-   switch(doc_type)
-   {
-      case OLD_BUNDLED:
-      case OLD_INDEXED:
+   if (flags & DOC_TYPE_KNOWN)
+      switch(doc_type)
       {
-	 url=ndir->page_to_url(page_num);
-	 break;
-      }
-      case BUNDLED:
-      {
-	 url=init_url+djvm_dir->page_to_file(page_num)->name;
-	 break;
-      }
-      case INDIRECT:
-      {
-	 url=init_url.base()+djvm_dir->page_to_file(page_num)->name;
-	 break;
-      }
-      default:
-	 THROW("Unknown document type.");
-   };
+	 case OLD_INDEXED:
+	 {
+	    if (page_num<0) url=init_url;
+	    else if (flags & DOC_NDIR_KNOWN) url=ndir->page_to_url(page_num);
+	    break;
+	 }
+	 case OLD_BUNDLED:
+	 {
+	    if (page_num<0) page_num=0;
+	    if (page_num==0 && (flags & DOC_DIR_KNOWN))
+	       url=init_url+first_page_name;
+	    else if (flags & DOC_NDIR_KNOWN)
+	       url=ndir->page_to_url(page_num);
+	    break;
+	 }
+	 case BUNDLED:
+	 {
+	    if (page_num<0) page_num=0;
+	    if (flags & DOC_DIR_KNOWN)
+	    {
+	       GP<DjVmDir::File> file=djvm_dir->page_to_file(page_num);
+	       if (!file) THROW("Page number is too big.");
+	       url=init_url+file->name;
+	    }
+	    break;
+	 }
+	 case INDIRECT:
+	 {
+	    if (page_num<0) page_num=0;
+	    if (flags & DOC_DIR_KNOWN)
+	    {
+	       GP<DjVmDir::File> file=djvm_dir->page_to_file(page_num);
+	       if (!file) THROW("Page number is too big.");
+	       url=init_url.base()+file->name;
+	    }
+	    break;
+	 }
+	 default:
+	    THROW("Unknown document type.");
+      };
    return url;
 }
 
@@ -279,33 +363,267 @@ int
 DjVuDocument::url_to_page(const GURL & url)
 {
    check();
-   int page_num=-1;
-   switch(doc_type)
-   {
-      case OLD_BUNDLED:
-      case OLD_INDEXED:
+   DEBUG_MSG("DjVuDocument::url_to_page(): url='" << url << "'\n");
+   DEBUG_MAKE_INDENT(3);
+
+   int page_num=0;
+   if (flags & DOC_TYPE_KNOWN)
+      switch(doc_type)
       {
-	 page_num=ndir->url_to_page(url);
-	 break;
-      }
-      case BUNDLED:
-      {
-	 GP<DjVmDir::File> file;
-	 if (url.base()==init_url) file=djvm_dir->name_to_file(url.name());
-	 if (file) page_num=file->get_page_num();
-	 break;
-      }
-      case INDIRECT:
-      {
-	 GP<DjVmDir::File> file;
-	 if (url.base()==init_url.base()) file=djvm_dir->name_to_file(url.name());
-	 if (file) page_num=file->get_page_num();
-	 break;
-      }
-      default:
-	 THROW("Unknown document type.");
-   };
+	 case OLD_BUNDLED:
+	 case OLD_INDEXED:
+	 {
+	    if (flags & DOC_NDIR_KNOWN) page_num=ndir->url_to_page(url);
+	    break;
+	 }
+	 case BUNDLED:
+	 {
+	    if (flags & DOC_DIR_KNOWN)
+	    {
+	       GP<DjVmDir::File> file;
+	       if (url.base()==init_url) file=djvm_dir->name_to_file(url.name());
+	       if (file) page_num=file->get_page_num();
+	    }
+	    break;
+	 }
+	 case INDIRECT:
+	 {
+	    if (flags & DOC_DIR_KNOWN)
+	    {
+	       GP<DjVmDir::File> file;
+	       if (url.base()==init_url.base()) file=djvm_dir->name_to_file(url.name());
+	       if (file) page_num=file->get_page_num();
+	    }
+	    break;
+	 }
+	 default:
+	    THROW("Unknown document type.");
+      };
    return page_num;
+}
+
+GURL
+DjVuDocument::id_to_url(const char * id)
+{
+   check();
+   DEBUG_MSG("DjVuDocument::id_to_url(): translating ID='" << id << "' to URL\n");
+   DEBUG_MAKE_INDENT(3);
+
+   if (flags & DOC_TYPE_KNOWN)
+      switch(doc_type)
+      {
+	 case BUNDLED:
+	    if (flags & DOC_DIR_KNOWN)
+	    {
+	       GP<DjVmDir::File> file=djvm_dir->id_to_file(id);
+	       if (!file) file=djvm_dir->name_to_file(id);
+	       if (!file) file=djvm_dir->title_to_file(id);
+	       if (file) return init_url+file->name;
+	    }
+	    break;
+	 case INDIRECT:
+	    if (flags & DOC_DIR_KNOWN)
+	    {
+	       GP<DjVmDir::File> file=djvm_dir->id_to_file(id);
+	       if (!file) file=djvm_dir->name_to_file(id);
+	       if (!file) file=djvm_dir->title_to_file(id);
+	       if (file) return init_url.base()+file->name;
+	    }
+	    break;
+	 case OLD_BUNDLED:
+	    return init_url+id;
+	 case OLD_INDEXED:
+	    return init_url.base()+id;
+      }
+   return GURL();
+}
+
+GURL
+DjVuDocument::id_to_url(const DjVuPort * source, const char * id)
+{
+   return id_to_url(id);
+}
+
+GP<DjVuFile>
+DjVuDocument::url_to_file(const GURL & url)
+      // This function is private and is called from two places:
+      // id_to_file() and get_djvu_file() ONLY when the structure is known
+{
+   check();
+   DEBUG_MSG("DjVuDocument::url_to_file(): url='" << url << "'\n");
+   DEBUG_MAKE_INDENT(3);
+
+      // Check files registered with DjVuPortcaster
+   GP<DjVuPort> port=get_portcaster()->name_to_port(url);
+   if (port && port->inherits("DjVuFile"))
+   {
+      DEBUG_MSG("found file using DjVuPortcaster\n");
+      GP<DjVuFile> file=(DjVuFile *) (DjVuPort *) port;
+      if (file->is_decode_ok()) return (DjVuFile *) file;
+      DEBUG_MSG("but it's not fully decoded.\n");
+   }
+
+   DEBUG_MSG("creating a new file\n");
+   GP<DjVuFile> file=new DjVuFile();
+   file->init(url, this);
+   get_portcaster()->set_name(file, url);
+
+   return file;
+}
+
+GP<DjVuFile>
+DjVuDocument::get_djvu_file(int page_num)
+{
+   check();
+   DEBUG_MSG("DjVuDocument::get_djvu_file(): request for page " << page_num << "\n");
+   DEBUG_MAKE_INDENT(3);
+
+   GURL url;
+   {
+	 // I'm locking the flags because depending on what page_to_url()
+	 // returns me, I'll be creating DjVuFile in different ways.
+	 // And I don't want the situation to change between the moment I call
+	 // id_to_url() and I actually create DjVuFile
+      GMonitorLock lock(&flags);
+      url=page_to_url(page_num);
+      if (url.is_empty())
+      {
+	 DEBUG_MSG("Structure is not known => inventing dummy URL.\n");
+	 
+	    // Invent some dummy temporary URL. I don't care what it will
+	    // be. I'll remember the page_num and will generate the correct URL
+	    // after I learn what the document is
+	 char buffer[128];
+	 sprintf(buffer, "djvufileurl://%p/page%d.djvu", this, page_num);
+	 url=buffer;
+
+	 GCriticalSectionLock lock(&ufiles_lock);
+	 for(GPosition pos=ufiles_list;pos;++pos)
+	 {
+	    GP<UnnamedFile> f=ufiles_list[pos];
+	    if (f->url==url) return f->file;
+	 }
+	 GP<UnnamedFile> ufile=new UnnamedFile(UnnamedFile::PAGE_NUM, 0,
+					       page_num, url, 0);
+
+	    // We're adding the record to the list before creating the DjVuFile
+	    // because DjVuFile::init() will call request_data(), and the
+	    // latter should be able to find the record.
+	    //
+	    // We also want to keep ufiles_lock to make sure that when
+	    // request_data() is called, the record is still there
+	 ufiles_list.append(ufile);
+      
+	 GP<DjVuFile> file=new DjVuFile();
+	 file->init(url, this);
+	 ufile->file=file;
+	 return file;
+      }
+   }
+   
+   GP<DjVuFile> file=url_to_file(url);
+   get_portcaster()->add_route(file, this);
+   
+   return file;
+}
+
+GP<DjVuFile>
+DjVuDocument::get_djvu_file(const char * id)
+{
+   check();
+   DEBUG_MSG("DjVuDocument::get_djvu_file(): ID='" << id << "'\n");
+   DEBUG_MAKE_INDENT(3);
+
+   if (!id || !strlen(id)) return get_djvu_file(-1);
+   char * ptr;
+   int page_num=strtol(id, &ptr, 10);
+   if (!*ptr) return get_djvu_file(page_num);
+
+   GURL url;
+   {
+	 // I'm locking the flags because depending on what id_to_url()
+	 // returns me, I'll be creating DjVuFile in different ways.
+	 // And I don't want the situation to change between the moment I call
+	 // id_to_url() and I actually create DjVuFile
+      GMonitorLock lock(&flags);
+      url=id_to_url(id);
+      if (url.is_empty())
+      {
+	    // Invent some dummy temporary URL. I don't care what it will
+	    // be. I'll remember the ID and will generate the correct URL
+	    // after I learn what the document is
+	 char buffer[128];
+	 sprintf(buffer, "djvufileurl://%p/%s", this, id);
+	 url=buffer;
+	 DEBUG_MSG("Invented url='" << url << "'\n");
+	 
+	 GCriticalSectionLock lock(&ufiles_lock);
+	 for(GPosition pos=ufiles_list;pos;++pos)
+	 {
+	    GP<UnnamedFile> f=ufiles_list[pos];
+	    if (f->url==url) return f->file;
+	 }
+	 GP<UnnamedFile> ufile=new UnnamedFile(UnnamedFile::ID, id, 0, url, 0);
+
+	    // We're adding the record to the list before creating the DjVuFile
+	    // because DjVuFile::init() will call request_data(), and the
+	    // latter should be able to find the record.
+	    //
+	    // We also want to keep ufiles_lock to make sure that when
+	    // request_data() is called, the record is still there
+	 ufiles_list.append(ufile);
+      
+	 GP<DjVuFile> file=new DjVuFile();
+	 file->init(url, this);
+	 ufile->file=file;
+	 return file;
+      }
+   }
+
+   GP<DjVuFile> file=url_to_file(url);
+   get_portcaster()->add_route(file, this);
+   
+   return file;
+}
+
+GP<DjVuImage>
+DjVuDocument::get_page(int page_num, DjVuPort * port)
+{
+   check();
+   DEBUG_MSG("DjVuDocument::get_page(): request for page " << page_num << "\n");
+   DEBUG_MAKE_INDENT(3);
+   
+   GP<DjVuFile> file=get_djvu_file(page_num);
+   GP<DjVuImage> dimg=new DjVuImage();
+   dimg->connect(file);
+   if (port) DjVuPort::get_portcaster()->add_route(dimg, port);
+   
+   if (!file->is_decoding() &&
+       !file->is_decode_ok() &&
+       !file->is_decode_failed())
+      file->start_decode();
+
+   return dimg;
+}
+
+GP<DjVuImage>
+DjVuDocument::get_page(const char * id, DjVuPort * port)
+{
+   check();
+   DEBUG_MSG("DjVuDocument::get_page(): ID=" << id << "\n");
+   DEBUG_MAKE_INDENT(3);
+
+   GP<DjVuFile> file=get_djvu_file(id);
+   GP<DjVuImage> dimg=new DjVuImage();
+   dimg->connect(file);
+   if (port) DjVuPort::get_portcaster()->add_route(dimg, port);
+   
+   if (!file->is_decoding() &&
+       !file->is_decode_ok() &&
+       !file->is_decode_failed())
+      file->start_decode();
+
+   return dimg;
 }
 
 static void
@@ -313,11 +631,13 @@ add_to_cache(const GP<DjVuFile> & f, GMap<GURL, void *> & map,
 	     DjVuFileCache * cache)
 {
    GURL url=f->get_url();
+   DEBUG_MSG("DjVuDocument::add_to_cache(): url='" << url << "'\n");
+   DEBUG_MAKE_INDENT(3);
    
    if (!map.contains(url))
    {
       map[url]=0;
-      cache->add_file(f);	// Force overwrite even if item exists
+      cache->add_file(f);
       
       GPList<DjVuFile> list;
       for(GPosition pos=list;pos;++pos)
@@ -335,81 +655,19 @@ DjVuDocument::add_to_cache(const GP<DjVuFile> & f)
    }
 }
 
-GURL
-DjVuDocument::id_to_url(const char * id)
+void
+DjVuDocument::notify_file_flags_changed(const DjVuFile * source,
+					long set_mask, long clr_mask)
 {
    check();
-   DEBUG_MSG("DjVuDocument::id_to_url(): translating ID='" << id << "' to URL\n");
-   DEBUG_MAKE_INDENT(3);
-
-   switch(doc_type)
-   {
-      case BUNDLED:
-	 if (djvm_dir)
-	 {
-	    GP<DjVmDir::File> file=djvm_dir->id_to_file(id);
-	    if (file) return init_url+file->name;
-	 }
-	 break;
-      case INDIRECT:
-	 if (djvm_dir)
-	 {
-	    GP<DjVmDir::File> file=djvm_dir->id_to_file(id);
-	    if (file) return init_url.base()+file->name;
-	 }
-	 break;
-      case OLD_BUNDLED:
-	 return init_url+id;
-      case OLD_INDEXED:
-	 return init_url.base()+id;
-   }
-   return GURL();
-}
-
-GURL
-DjVuDocument::id_to_url(const DjVuPort * source, const char * id)
-{
-   return id_to_url(id);
-}
-
-GPBase
-DjVuDocument::url_to_file(const GURL & url)
-{
-   DEBUG_MSG("DjVuDocument::url_to_file(): url='" << url << "'\n");
-   DEBUG_MAKE_INDENT(3);
-
-   GP<DjVuPort> port=get_portcaster()->name_to_port(url);
-   if (port && port->inherits("DjVuFile"))
-   {
-      DEBUG_MSG("found file using DjVuPortcaster\n");
-      GP<DjVuFile> file=(DjVuFile *) (DjVuPort *) port;
-      if (file->is_decode_ok()) return (DjVuFile *) file;
-      DEBUG_MSG("but it's not fully decoded.\n");
-   }
-
-   DEBUG_MSG("creating a new file\n");
-   GP<DjVuFile> file=new DjVuFile();
-   file->init(url, this);
-   get_portcaster()->set_name(file, url);
-
-   return (DjVuFile *) file;
+   if (set_mask & DjVuFile::DECODE_OK)
+      if (cache) add_to_cache((DjVuFile *) source);
 }
 
 GPBase
 DjVuDocument::id_to_file(const DjVuPort * source, const char * id)
 {
-   DEBUG_MSG("DjVuDocument::id_to_file(): id='" << id << "'\n");
-   DEBUG_MAKE_INDENT(3);
-
-   GURL url=id_to_url(id);
-
-      // TODO
-      // Actually, if URL is empty it means, that structure has not been
-      // decoded yet. One should invent a URL and continue with the file
-      // creation
-   if (url.is_empty()) THROW("Failed to convert ID '"+GString(id)+"'to URL. ");
-
-   return url_to_file(url);
+   return (DjVuFile *) get_djvu_file(id);
 }
 
 GP<DataPool>
@@ -419,159 +677,92 @@ DjVuDocument::request_data(const DjVuPort * source, const GURL & url)
    DEBUG_MAKE_INDENT(3);
 
    if (source==this) return 0;
-   
-   switch(doc_type)
-   {
-      case OLD_BUNDLED:
-      {
-	 DEBUG_MSG("The document is in OLD_BUNDLED format\n");
-	 if (url.base()!=init_url)
-	    THROW("URL '"+url+"' points outside of the bundled document.");
-	 
-	 GP<DjVmDir0::FileRec> file=djvm_dir0->get_file(url.name());
-	 if (!file) THROW("File '"+url.name()+"' is not in this bundle.");
-	 return new DataPool(init_data_pool, file->offset, file->size);
-      }
-      case BUNDLED:
-      {
-	 DEBUG_MSG("The document is in new BUNDLED format\n");
-	 if (url.base()!=init_url)
-	    THROW("URL '"+url+"' points outside of the bundled document.");
-	 
-	 GP<DjVmDir::File> file=djvm_dir->name_to_file(url.name());
-	 if (!file) THROW("File '"+url.name()+"' is not in this bundle.");
-	 return new DataPool(init_data_pool, file->offset, file->size);
-      }
-      case OLD_INDEXED:
-      case INDIRECT:
-      {
-	 DEBUG_MSG("The document is in OLD_INDEXED or INDIRECT format\n");
-	 if (url.base()!=init_url.base())
-	    THROW("URL '"+url+"' points outside of the document's directory.");
-	 if (doc_type==INDIRECT && !djvm_dir->name_to_file(url.name()))
-	    THROW("URL '"+url+"' points outside of the INDIRECT document.");
-	 
-	 if (url.is_local_file_url())
-	 {
-	    GString fname=GOS::url_to_filename(url);
-	    if (GOS::basename(fname)=="-") fname="-";
-	    DEBUG_MSG("fname=" << fname << "\n");
 
-	    GP<DataPool> pool=new DataPool();
-	    StdioByteStream str(fname, "rb");
-	    char buffer[1024];
-	    int length;
-	    while((length=str.read(buffer, 1024)))
-	       pool->add_data(buffer, length);
-	    pool->set_eof();
-	    return pool;
+   check();
+
+   if (url==init_url) return init_data_pool;
+
+   {
+	 // See if there is a file in the "UnnamedFiles" list.
+	 // If it's there, then create an empty DataPool and store its
+	 // pointer in the list. The "init thread" will eventually
+	 // do smth with it.
+      GCriticalSectionLock lock(&ufiles_lock);
+      for(GPosition pos=ufiles_list;pos;++pos)
+      {
+	 GP<UnnamedFile> f=ufiles_list[pos];
+	 if (f->url==url)
+	 {
+	    DEBUG_MSG("Found tmp unnamed DjVuFile. Return empty DataPool\n");
+	       // Remember the DataPool. We will connect it to the
+	       // actual data after the document structure becomes known
+	    f->data_pool=new DataPool();
+	    return f->data_pool;
 	 }
       }
    }
-   DEBUG_MSG("Oops. Can't return the stream. Ask smb else.\n");
-   return 0;
-}
 
-void
-DjVuDocument::notify_chunk_done(const DjVuPort * source, const char * name)
-{
-   if (doc_type==OLD_BUNDLED || doc_type==OLD_INDEXED)
-      if (!strcmp(name, "NDIR") && (!ndir || dummy_ndir))
-	 if (source->inherits("DjVuFile"))
-	 {
-	    GP<DjVuNavDir> dir=((DjVuFile *) source)->find_ndir();
-	    if (dir)
-	    {
-	       DEBUG_MSG("DjVuDocument::notify_chunk_done(): updating nav. dir.\n");
-	       ndir=dir;
-	       dummy_ndir=false;
-	    }
-	 }
-}
-
-void
-DjVuDocument::notify_file_flags_changed(const DjVuFile * source,
-					long set_mask, long clr_mask)
-{
-   if (set_mask & DjVuFile::ALL_DATA_PRESENT)
-      if (doc_type==OLD_BUNDLED || doc_type==OLD_INDEXED)
-	 if (!ndir || dummy_ndir)
-	 {
-	    DEBUG_MSG("DjVuDocument::notify_file_flags_changed(): ALL_DATA_PRESENT: updating nav. dir.\n");
-	    GP<DjVuNavDir> dir=((DjVuFile *) source)->find_ndir();
-	    if (dir)
-	    {
-	       ndir=dir;
-	       dummy_ndir=false;
-	    }
-	 }
-
-   if (set_mask & DjVuFile::DECODE_OK)
-      if (cache) add_to_cache((DjVuFile *) source);
-}
-
-GP<DjVuFile>
-DjVuDocument::get_djvu_file(const GURL & url)
-{
-   check();
-   DEBUG_MSG("DjVuDocument::get_djvu_file(): request for '" << url << "'\n");
-   DEBUG_MAKE_INDENT(3);
-
-   GPBase tmpfile=url_to_file(url);
-   GP<DjVuFile> file=(DjVuFile *) tmpfile.get();
-
-   get_portcaster()->add_route(file, this);
-   if (!ndir || dummy_ndir)
-      if (file->is_all_data_present())	// Check to avoid deadlocks
+      // Well, the url is not in the "UnnamedFiles" list, but it doesn't
+      // mean, that it's not "artificial". Stay alert!
+   GP<DataPool> data_pool;
+   if (flags & DOC_TYPE_KNOWN)
+      switch(doc_type)
       {
-	 GP<DjVuNavDir> dir=file->find_ndir();
-	 if (dir)
+	 case OLD_BUNDLED:
 	 {
-	    DEBUG_MSG("updating nav. directory from the cached file.\n");
-	    ndir=dir;
-	    dummy_ndir=false;
+	    if (flags & DOC_DIR_KNOWN)
+	    {
+	       DEBUG_MSG("The document is in OLD_BUNDLED format\n");
+	       if (url.base()!=init_url)
+		  THROW("URL '"+url+"' points outside of the bundled document.");
+	 
+	       GP<DjVmDir0::FileRec> file=djvm_dir0->get_file(url.name());
+	       if (!file) THROW("File '"+url.name()+"' is not in this bundle.");
+	       data_pool=new DataPool(init_data_pool, file->offset, file->size);
+	    }
+	    break;
+	 }
+	 case BUNDLED:
+	 {
+	    if (flags & DOC_DIR_KNOWN)
+	    {
+	       DEBUG_MSG("The document is in new BUNDLED format\n");
+	       if (url.base()!=init_url)
+		  THROW("URL '"+url+"' points outside of the bundled document.");
+	 
+	       GP<DjVmDir::File> file=djvm_dir->name_to_file(url.name());
+	       if (!file) THROW("File '"+url.name()+"' is not in this bundle.");
+	       data_pool=new DataPool(init_data_pool, file->offset, file->size);
+	    }
+	    break;
+	 }
+	 case OLD_INDEXED:
+	 case INDIRECT:
+	 {
+	    DEBUG_MSG("The document is in OLD_INDEXED or INDIRECT format\n");
+	    if (url.base()!=init_url.base())
+	       THROW("URL '"+url+"' points outside of the document's directory.");
+	    if (flags & DOC_DIR_KNOWN)
+	       if (doc_type==INDIRECT && !djvm_dir->name_to_file(url.name()))
+		  THROW("URL '"+url+"' points outside of the INDIRECT document.");
+	 
+	    if (url.is_local_file_url())
+	    {
+	       GString fname=GOS::url_to_filename(url);
+	       if (GOS::basename(fname)=="-") fname="-";
+	       DEBUG_MSG("fname=" << fname << "\n");
+
+	       data_pool=new DataPool();
+	       StdioByteStream str(fname, "rb");
+	       char buffer[1024];
+	       int length;
+	       while((length=str.read(buffer, 1024)))
+		  data_pool->add_data(buffer, length);
+	       data_pool->set_eof();
+	    }
 	 }
       }
-   
-   return file;
-}
-
-GP<DjVuFile>
-DjVuDocument::get_djvu_file(int page_num)
-{
-   DEBUG_MSG("DjVuDocument::get_djvu_file(): request for page " << page_num << "\n");
-   DEBUG_MAKE_INDENT(3);
-
-   GURL url;
-   if (page_num>=0) url=page_to_url(page_num);
-   else
-   {
-      if (doc_type==BUNDLED || doc_type==INDIRECT) url=page_to_url(0);
-      else if (doc_type==OLD_BUNDLED) url=ndir->page_to_url(0);
-      else url=init_url;
-   }
-   return get_djvu_file(url);
-}
-
-GP<DjVuImage>
-DjVuDocument::get_page(int page_num, DjVuPort * port)
-{
-   check();
-   DEBUG_MSG("DjVuDocument::get_page(): request for page " << page_num << "\n");
-   DEBUG_MAKE_INDENT(3);
-   
-   GP<DjVuFile> file=get_djvu_file(page_num);
-   GP<DjVuImage> dimg=new DjVuImage();
-   dimg->connect(file);
-   if (port) DjVuPort::get_portcaster()->add_route(dimg, port);
-   else DjVuPort::get_portcaster()->add_route(dimg, this);
-   
-   if (!file->is_decoding() &&
-       !file->is_decode_ok() &&
-       !file->is_decode_failed())
-      file->start_decode();
-
-   return dimg;
+   return data_pool;
 }
 
 static TArray<char>
@@ -673,10 +864,13 @@ add_file_to_djvm(const GP<DjVuFile> & file, bool page,
 
 GP<DjVmDoc>
 DjVuDocument::get_djvm_doc(void)
+      // This function may block for data
 {
    check();
    DEBUG_MSG("DjVuDocument::get_djvm_doc(): creating the DjVmDoc\n");
    DEBUG_MAKE_INDENT(3);
+
+   if (!is_init_complete()) THROW("Document has not been initialized complete yet.");
 
    GP<DjVmDoc> doc=new DjVmDoc();
    if (doc_type==BUNDLED)
@@ -691,7 +885,7 @@ DjVuDocument::get_djvm_doc(void)
       for(GPosition pos=files_list;pos;++pos)
       {
 	 GP<DjVmDir::File> f=new DjVmDir::File(*files_list[pos]);
-	 GP<DjVuFile> file=get_djvu_file(id_to_url(f->id));
+	 GP<DjVuFile> file=url_to_file(id_to_url(f->id));
 	 doc->insert_file(f, file->get_data_pool());
       }
    } else
@@ -699,10 +893,9 @@ DjVuDocument::get_djvm_doc(void)
       DEBUG_MSG("Converting: the document is in an old format.\n");
 
       GMap<GURL, void *> map_add;
-      if (dummy_ndir) decode_ndir();
       for(int page_num=0;page_num<ndir->get_pages_num();page_num++)
       {
-	 GP<DjVuFile> file=get_djvu_file(ndir->page_to_url(page_num));
+	 GP<DjVuFile> file=url_to_file(ndir->page_to_url(page_num));
 	 GMap<GURL, void *> map_del;
 	 add_file_to_djvm(file, true, *doc, map_add);
       }
@@ -713,6 +906,9 @@ DjVuDocument::get_djvm_doc(void)
 void
 DjVuDocument::write(ByteStream & str)
 {
+   DEBUG_MSG("DjVuDocument::write(): storing DjVmDoc into ByteStream\n");
+   DEBUG_MAKE_INDENT(3);
+   
    GP<DjVmDoc> doc=get_djvm_doc();
    doc->write(str);
 }
@@ -720,6 +916,9 @@ DjVuDocument::write(ByteStream & str)
 void
 DjVuDocument::expand(const char * dir_name, const char * idx_name)
 {
+   DEBUG_MSG("DjVuDocument::expand(): dir_name='" << dir_name << "'\n");
+   DEBUG_MAKE_INDENT(3);
+   
    GP<DjVmDoc> doc=get_djvm_doc();
    doc->expand(dir_name, idx_name);
 }
