@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.42 1999-09-16 23:21:33 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.43 1999-09-17 19:02:28 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -259,6 +259,28 @@ DjVuDocument::init_thread(void)
 	      "UNKNOWN") << "'\n");
 }
 
+static GString
+get_int_prefix(void * ptr)
+{
+   char buffer[128];
+   sprintf(buffer, "intfileurl://%p?", ptr);
+   return buffer;
+}
+
+void
+DjVuDocument::set_file_name(const DjVuFile * file)
+{
+   DEBUG_MSG("DjVuDocument::set_file_name(): setting global name for file '"
+	     << file->get_url() << "'\n");
+   DEBUG_MAKE_INDENT(3);
+
+   DjVuPortcaster * pcaster=DjVuPort::get_portcaster();
+   
+   GMonitorLock lock(&((DjVuFile *) file)->get_safe_flags());
+   if (file->is_decode_ok()) pcaster->set_name(file, file->get_url());
+   else pcaster->set_name(file, get_int_prefix(this)+file->get_url());
+}
+
 void
 DjVuDocument::check_unnamed_files(void)
 {
@@ -319,8 +341,8 @@ DjVuDocument::check_unnamed_files(void)
 	       if (!new_pool) THROW("Failed to get data for URL '"+new_url+"'");
 	       ufile->data_pool->connect(new_pool);
 	    }
-	    
-	    ufile->file->set_name(new_url.name());
+
+	    set_file_name(ufile->file);
 	    ufile->file->move(new_url.base());
 	    pcaster->set_name(ufile->file, new_url);
 	 } else break;
@@ -499,20 +521,30 @@ DjVuDocument::url_to_file(const GURL & url)
    DEBUG_MSG("DjVuDocument::url_to_file(): url='" << url << "'\n");
    DEBUG_MAKE_INDENT(3);
 
-      // Check files registered with DjVuPortcaster
-   GP<DjVuPort> port=get_portcaster()->name_to_port(url);
+      // Try DjVuPortcaster to find existing files.
+   DjVuPortcaster * pcaster=DjVuPort::get_portcaster();
+   GP<DjVuPort> port;
+   
+      // First - fully decoded files
+   port=pcaster->name_to_port(url);
    if (port && port->inherits("DjVuFile"))
    {
-      DEBUG_MSG("found file using DjVuPortcaster\n");
-      GP<DjVuFile> file=(DjVuFile *) (DjVuPort *) port;
-      if (file->is_decode_ok()) return (DjVuFile *) file;
-      DEBUG_MSG("but it's not fully decoded.\n");
+      DEBUG_MSG("found fully decoded file using DjVuPortcaster\n");
+      return (DjVuFile *) (DjVuPort *) port;
+   }
+
+      // Second - internal files
+   port=pcaster->name_to_port(get_int_prefix(this)+url);
+   if (port && port->inherits("DjVuFile"))
+   {
+      DEBUG_MSG("found internal file using DjVuPortcaster\n");
+      return (DjVuFile *) (DjVuPort *) port;
    }
 
    DEBUG_MSG("creating a new file\n");
    GP<DjVuFile> file=new DjVuFile();
    file->init(url, this);
-   get_portcaster()->set_name(file, url);
+   set_file_name(file);
 
    return file;
 }
@@ -707,7 +739,10 @@ DjVuDocument::notify_file_flags_changed(const DjVuFile * source,
 {
    check();
    if (set_mask & DjVuFile::DECODE_OK)
+   {
+      set_file_name(source);
       if (cache) add_to_cache((DjVuFile *) source);
+   }
 }
 
 GPBase
