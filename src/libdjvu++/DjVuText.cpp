@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuText.cpp,v 1.22 2001-07-03 00:21:13 mchen Exp $
+// $Id: DjVuText.cpp,v 1.23 2001-07-03 14:39:19 mchen Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -42,6 +42,12 @@
 #include "BSByteStream.h"
 #include "debug.h"
 #include <ctype.h>
+
+#ifdef min
+#undef min
+#endif
+template<class TYPE>
+static inline TYPE min(TYPE a,TYPE b) { return (a<b)?a:b; }
 
 //***************************************************************************
 //******************************** DjVuTXT **********************************
@@ -345,8 +351,7 @@ DjVuTXT::get_zones(int zone_type, const Zone *parent, GList<Zone *> & zone_list)
 {
    // search all branches under parent
    const Zone *zone=parent;
-   int ztype_tmp=zone->ztype;
-   while( ztype_tmp<zone_type )
+   for( int ztype_tmp=zone->ztype; ztype_tmp<zone_type; ++ztype_tmp )
    {
       GPosition pos;
       for(pos=zone->children; pos; ++pos)
@@ -359,12 +364,8 @@ DjVuTXT::get_zones(int zone_type, const Zone *parent, GList<Zone *> & zone_list)
 	       zone_list.append(zcur);
 	 }
 	 else if ( zone->children[pos].ztype < zone_type )
-	 {
-	    const Zone *zone_next=&zone->children[pos];
-	    get_zones(zone_type, zone_next, zone_list);
-	 }
+	    get_zones(zone_type, &zone->children[pos], zone_list);
       }
-      ++ztype_tmp;
    }
 }
 
@@ -448,35 +449,50 @@ DjVuTXT::find_text_in_rect(GRect target_rect, GUTF8String &text) const
    GList<Zone *> zone_list;
 
    get_zones((int)PARAGRAPH, &page_zone, zone_list);
-   // it's possible that no paragraph structure was generated 
-   // by a ocr engine. In this case, we can do very little ...
+   // it's possible that no paragraph structure exists for reasons that  
+   // 1) ocr engine is not capable 2) file was modified by user. In such case, 
+   // we can only make a rough guess, i.e., select all the lines contained in
+   // target_rect
    if (zone_list.isempty())
-      get_zones((int)LINE, &page_zone, zone_list);
-   GPosition pos, pos_sel=zone_list;
-   int t_xmin=target_rect.xmin;
-//  int t_xmax=target_rect.xmax;
-   int t_ymin=target_rect.ymin;
-//  int t_ymax=target_rect.ymax;
-   int dist=-1;
-   for(pos=zone_list; pos; ++pos)
    {
-      GRect rect=zone_list[pos]->rect;
-      if ( rect.xmin>t_xmin && rect.ymin>t_ymin )
+      get_zones((int)LINE, &page_zone, zone_list);
+      GPosition pos;
+      GList<Zone *> lines;
+      for(pos=zone_list; pos; ++pos)
       {
-	 int d=(rect.xmin-t_xmin)*(rect.xmin-t_xmin) +
-	    (rect.ymin-t_ymin)*(rect.ymin-t_ymin);
-	 if ( dist<0 || dist>d) 
+	 if(target_rect.contains(zone_list[pos]->rect))
+	    lines.append(zone_list[pos]);
+      }
+      if(!lines.isempty())
+      {
+	 zone_list.empty();
+	 for(pos=lines; pos; ++pos)
+	    get_zones((int)WORD, lines[pos], zone_list);
+      }
+   } else 
+   {
+      GPosition pos, pos_sel=zone_list;
+      int t_xmin=min(target_rect.xmin,target_rect.xmax);
+      int t_ymin=min(target_rect.ymin,target_rect.ymax);
+      int dist=-1;
+      for(pos=zone_list; pos; ++pos)
+      {
+	 GRect rect=zone_list[pos]->rect;
+	 if ( rect.xmin>t_xmin && rect.ymin>t_ymin )
 	 {
-	    dist=d;
-	    pos_sel=pos;
+	    int d=(rect.xmin-t_xmin)*(rect.xmin-t_xmin) +
+	       (rect.ymin-t_ymin)*(rect.ymin-t_ymin);
+	    if ( dist<0 || dist>d) 
+	    {
+	       dist=d;
+	       pos_sel=pos;
+	    }
 	 }
       }
+      Zone *pzone=zone_list[pos_sel];
+      zone_list.empty();
+      get_zones((int)WORD, pzone, zone_list);
    }
-
-   Zone *pzone=zone_list[pos_sel];
-   zone_list.empty();
-   get_zones((int)WORD,pzone, zone_list);
-
    return zone_list;
 }
 
