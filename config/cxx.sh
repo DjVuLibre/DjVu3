@@ -8,18 +8,17 @@ fi
 
 ECXX="eg++"
 if [ -z "$CXX" ] ; then
+  echo 'extern "C" {void exit(int);};void foo(void) {exit(0);}' |testfile $temp.cpp
   CXXFLAGS=""
   CXXSYMBOLIC=""
   CXXPIC=""
+  cxx_is_gcc=
   echo Searching for C++ compiler
-  echo 'int foo(void) {return 0;}' > /tmp/cpp$$.cpp
-  if ( cd /tmp 2>>/dev/null;$EGXX -c cpp$$.cpp 1>>/dev/null 2>>/dev/null ) ; then
+  if ( run $EGXX -c $temp.cpp ) ; then
     CXX="$EGXX"
-  elif ( cd /tmp 2>>/dev/null;g++ -c cpp$$.cpp 1>>/dev/null 2>>/dev/null ) ; then
-    CXX=g++
-  elif ( cd /tmp 2>>/dev/null;c++ -c cpp$$.cpp 1>>/dev/null 2>>/dev/null ) ; then
+  elif ( run g++ -c $temp.cpp ) ; then
     CXX=c++
-  elif ( cd /tmp 2>>/dev/null;CC -c cpp$$.cpp 1>>/dev/null 2>>/dev/null ) ; then
+  elif ( run CC -c $temp.cpp ) ; then
     CXX=CC
   else 
     echo "Error: Can't find a C++ compiler" 1>&2
@@ -34,10 +33,9 @@ if [ -z "$CXX" ] ; then
       echo "$CXX is egcs"
     else
       EGCSTEST=`($CXX -v 2>&1)|sed -n -e 's,.*/egcs-.*,Is EGCS,p' -e 's,.*/pgcc-.*,Is PGCC,p'`
-      echo 'int foo(void) {return 0;}' > /tmp/cpp$$.cpp
       if [ ! -z "$EGCSTEST" ] ; then
         echo "$CXX is egcs"
-      elif ( cd /tmp 2>>/dev/null;$CXX -V2.8.1 -c cpp$$.cpp  1>>/dev/null 2>>/dev/null ) ; then
+      elif ( run $CXX -V2.8.1 -c $temp.cpp ) ; then
         CXXVERSION="-V2.8.1"
       else
         echo WARNING: DjVu is designed to compile with egcs or g++ version 2.8.1 1>&2
@@ -46,23 +44,21 @@ if [ -z "$CXX" ] ; then
   fi
   CXXFLAGS="$CXXVERSION"
 
-  echo 'int foo(void) {return 0;}' > /tmp/cpp$$.cpp
   CXXPIPE=""
-  if ( cd /tmp 2>>/dev/null;$CXX ${CXXFLAGS} -pipe -c cpp$$.cpp  1>>/dev/null 2>>/dev/null ) ; then
+  if ( run $CXX ${CXXFLAGS} -pipe -c $temp.cpp ) ; then
     echo "Testing ${CXX} pipe option"
     CXXPIPE="-pipe"
   fi
   CXXFLAGS=`echo "${CXXPIPE}" "${CXXFLAGS}"`
 
-  echo 'int foo(void) {return 0;}' > /tmp/cpp$$.cpp
   CXXMMX=""
   echo "Testing ${CXX} MMX option"
   if [ `uname -m` = i686 ]
   then
-    if (cd /tmp 2>>/dev/null;$CXX ${CXXFLAGS} -mpentiumpro -c cpp$$.cpp) 
+    if ( run $CXX ${CXXFLAGS} -mpentiumpro -c $temp.cpp ) 
     then
       CXXMMX="-mpentiumpro"
-      if ( cd /tmp 2>>/dev/null;$CXX ${CXXFLAGS} ${CXXMMX} -mmx -c cpp$$.cpp  1>>/dev/null 2>>/dev/null ) ; then
+      if ( run $CXX ${CXXFLAGS} ${CXXMMX} -mmx -c $temp.cpp ) ; then
         CXXMMX="$CXXMMX -mmx"
       fi
     fi
@@ -71,11 +67,10 @@ if [ -z "$CXX" ] ; then
 
   echo "Testing ${CXX} Symbolic Option"
   CXXSYMBOLIC=""
-  echo 'extern "C" {void exit(int);};void foo(void) {exit(0);}' > /tmp/cpp$$.cpp
-  if [ -z "`(cd /tmp 2>>/dev/null;${CXX} ${CXXFLAGS} -symbolic -c cpp$$.cpp 2>&1)|grep 'unrecognized option'`" ] ; then
+  if [ -z "`(cd $tempdir 2>>/dev/null;${CXX} ${CXXFLAGS} -symbolic -c $temp.cpp 2>&1)|grep 'unrecognized option'`" ] ; then
     CXXSYMBOLIC='-symbolic'
     echo "Using CXXSYMBOLIC=$CXXSYMBOLIC"
-  elif (cd /tmp 2>>/dev/null;${CXX} ${CXXFLAGS} -shared -Wl,-Bsymbolic -o cpp$$.so cpp$$.cpp -lc -lm 2>>/dev/null 1>>/dev/null) ; then
+  elif ( run ${CXX} ${CXXFLAGS} -shared -Wl,-Bsymbolic -o $temp.so $temp.cpp -lc -lm ) ; then
     if [ "$SYS" != "linux-libc6" ] ; then
       CXXSYMBOLIC='-Wl,-Bsymbolic'
       echo "Using CXXSYMBOLIC=$CXXSYMBOLIC"
@@ -83,13 +78,21 @@ if [ -z "$CXX" ] ; then
   fi
 
   echo "Testing ${CXX} PIC option"
-  echo 'int foo(void) {return 0;}' > /tmp/cpp$$.cpp
-  if ( cd /tmp 2>>/dev/null;$CXX ${CXXFLAGS} -fPIC -c cpp$$.cpp 1>>/dev/null 2>>/dev/null ) ; then
+  if ( run $CXX ${CXXFLAGS} -fPIC -c $temp.cpp ) ; then
     CXXPIC="-fPIC"
   else
     CXXPIC=""
   fi
-  rm -rf /tmp/cpp$$.cpp /tmp/cpp$$.o
-  CONFIG_VARS=`echo CXX CXXFLAGS CXXSYMBOLIC CXXPIC "$CONFIG_VARS"`
+  echon "Checking whether ${CXX} is gcc ... "
+  echo 'int main(void) { return __GNUG__;}' | testfile $temp.cpp
+  if ( run $CXX $CXXFLAGS -c $temp.cpp ) 
+  then
+      cxx_is_gcc=yes
+      echo yes
+  else
+      echo no
+  fi
+  rm -rf $temp.cpp $temp.so $temp.o
+  CONFIG_VARS=`echo CXX CXXFLAGS CXXSYMBOLIC CXXPIC cxx_is_gcc "$CONFIG_VARS"`
 fi
 

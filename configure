@@ -6,9 +6,7 @@
 ### Determine directories
 
 conf=`basename $0`
-topsrcdir=`dirname $0`
-topbuilddir=.
-if [ ! -r $topsrcdir/config/functions.sh ]
+if [ ! -r `dirname $0`/config/functions.sh ]
 then
     echo 1>&2 "$conf: Cannot recognize source directory"
     echo 1>&2 "--  Check that your source directory is complete."
@@ -19,8 +17,7 @@ fi
 ### ---------------------------
 ### Get functions
 
-. $topsrcdir/config/functions.sh
-
+. `dirname $0`/config/functions.sh
 
 ### ---------------------------
 ### Process arguments
@@ -54,7 +51,7 @@ done
 ### ---------------------------
 ### Want a distinct compilation directory
 
-if [ $topsrcdir = $topbuilddir ]
+if [ $TOPSRCDIR = $TOPBUILDDIR ]
 then
     echo 1>&2 "$conf: Cannot compile in the source directory"
     echo 1>&2 "--  You must mkdir a compilation directory and"
@@ -103,6 +100,8 @@ echo "$0 $*" >> reconfigure
 chmod 755 reconfigure
 
 # --- display cool message
+
+. "${CONFIG_DIR}/write_cache.sh"
 
 echo
 echo Configuration is complete.

@@ -4,37 +4,6 @@
 # and call the relevant functions.
 #
 
-# First we set the CONFIG_DIR and SYS variables.
-#
-
-if [ -z "$CONFIG_DIR" ] ; then
-  CONFIG_DIR=`dirname "$0"`/config
-  CONFIG_DIR=`cd "$CONFIG_DIR" 2>>/dev/null 1>>/dev/null;pwd`
-  CONFIG_VARS=`echo CONFIG_DIR "${CONFIG_VARS}"`
-fi
-
-if [ -z "$SYS" ] ; then
-  . "${CONFIG_DIR}"/sys.sh
-fi
-
-### ------------------------------------------------------------------------
-### General stuff
-
-# --- Prefix for temporary files
-temp=/tmp/c$$
-
-# --- Log file
-logfile=configure.log
-date > $logfile
-
-# --- Make sure that all temp files are removed
-trap "rm 2>/dev/null $temp $temp.*" 0
-
-# --- Default prefix directory
-prefix=/usr/local
-
-
-
 ### ------------------------------------------------------------------------
 ### Support functions
 
@@ -72,23 +41,23 @@ mkdirp()
 }
 
 
-# Make a test file with echo on logfile
+# Make a test file with echo on CONFIG_LOG
 testfile()
 {
     cat > $1
-    echo "------- ($1)" >> $logfile
-    cat $1              >> $logfile
+    echo "------- ($1)" >> $CONFIG_LOG
+    cat $1              >> $CONFIG_LOG
 }
 
 
-# Run command with echo on logfile
+# Run command with echo on CONFIG_LOG
 run()
 {
-    ( $* ) > $temp.out 2>&1 
+    ( cd "$tempdir" 2>>/dev/null 1>>/dev/null; $* ) > $temp.out 2>&1 
     status=$?
-    echo "------- (cmd)"   >> $logfile
-    echo '%' $*            >> $logfile
-    cat $temp.out          >> $logfile
+    echo "------- (cmd)"   >> $CONFIG_LOG
+    echo '%' $*            >> $CONFIG_LOG
+    cat $temp.out          >> $CONFIG_LOG
     return $status
 }
 
@@ -176,27 +145,12 @@ check_compiler()
 
     # -----
 
-    cxx_is_gcc=
-    cc_is_gcc=
-    echon "Checking whether both compilers are gcc ... "
-    echo 'int main(void) { return __GNUG__;}' | testfile $temp.cpp
-    if ( cd `dirname $temp` 2>>/dev/null 1>>/dev/null;run $CXX $CXXFLAGS -O -c $temp.cpp ) 
-    then
-        cxx_is_gcc=yes
-    fi
-    echo 'int main(void) { return __GNUC__;}' | testfile $temp.c
-    if ( cd `dirname $temp` 2>>/dev/null 1>>/dev/null;run $CC $CCFLAGS -c $temp.c ) 
-    then
-        cc_is_gcc=yes
-    fi
     if [ -n "$cc_is_gcc" ] && [ -n "$cxx_is_gcc" ]
     then
-      echo yes.
       compiler_is_gcc=yes
       test -z "$OPT" && OPT="-O3 -funroll-loops"
       test -z "$WARN" && WARN="-Wall -Wno-unused"
     else
-      echo no.
       compiler_is_gcc=
     fi
 
@@ -409,7 +363,7 @@ check_make_stlib()
     testfile $temp.c <<EOF
 int main(void) { return 1; }
 EOF
-    $CC $CCFLAGS $OPT $DEFS $WARN -c $temp.c
+    run $CC $CCFLAGS $OPT $DEFS $WARN -c $temp.c
     AR=${AR-ar}
     MAKE_STLIB=${MAKE_STLIB-$AR cq}
     if ( run $MAKE_STLIB $temp.a $temp.o ) 
@@ -450,40 +404,17 @@ EOF
 generate_makefile()
 {
   # compute xtopsrcdir
-  xtopsrcdir=$topsrcdir
-  case $xtopsrcdir in
-      /*) # absolute path
-        ;;
-      *)  # relative path
-        temp=$1
-        while [ "$temp" != "." ] 
-        do
-          xtopsrcdir=../$xtopsrcdir
-          temp=`dirname $temp`
-        done
-        ;;
-  esac 
-
-  #compute topbuilddir
-  temp=$1
-  xtopbuilddir=.
-  while [ "$temp" != "." ] 
-  do
-    xtopbuilddir=../$xtopbuilddir
-    temp=`dirname $temp`
-  done
-
   # compute xsrcdir
-  xsrcdir=$xtopsrcdir/$1
+  xsrcdir=$TOPSRCDIR/$1
 
   # make nice pathnames
   xsrcdir=`pathclean $xsrcdir`
-  xtopsrcdir=`pathclean $xtopsrcdir`
-  xtopbuilddir=`pathclean $xtopbuilddir`
+  xtopsrcdir=`pathclean $TOPSRCDIR`
+  xtopbuilddir=`pathclean $TOPBUILDDIR`
 
   # substitute
   mkdirp $1
-  sed < $topsrcdir/$1/Makefile.in > $1/Makefile \
+  sed < $TOPSRCDIR/$1/Makefile.in > $1/Makefile \
     -e 's!@prefix@!'"$prefix"'!g' \
     -e 's!@topsrcdir@!'"$xtopsrcdir"'!g' \
     -e 's!@topbuilddir@!'"$xtopbuilddir"'!g' \
@@ -501,9 +432,9 @@ generate_makefile()
     -e 's!@make_shlib@!'"$MAKE_SHLIB"'!g'
 
   # dependencies
-  if [ -r $topsrcdir/$1/Makefile.depend ]
+  if [ -r $TOPSRCDIR/$1/Makefile.depend ]
   then
-    cat $topsrcdir/$1/Makefile.depend >> $1/Makefile
+    cat $TOPSRCDIR/$1/Makefile.depend >> $1/Makefile
   fi
 }
 
@@ -525,8 +456,8 @@ generate_main_makefile()
     # Generate Makefile header
     cat > Makefile <<EOF
 SHELL=/bin/sh
-TOPSRCDIR= $topsrcdir
-TOPBUILDDIR= $topbuilddir
+TOPSRCDIR= $TOPSRCDIR
+TOPBUILDDIR= $TOPBUILDDIR
 CC= $CC $CCFLAGS
 CXX= $CXX $CXXFLAGS
 OPT= $OPT
@@ -553,3 +484,36 @@ depend:
 PHONY: all install clean html depend
 EOF
 }
+
+# First we set the CONFIG_DIR and SYS variables.
+#
+
+if [ -z "$CONFIG_DIR" ] ; then
+  CONFIG_DIR=`dirname "$0"`/config
+  CONFIG_DIR=`cd "$CONFIG_DIR" 2>>/dev/null 1>>/dev/null;pwd`
+  CONFIG_VARS=`echo CONFIG_DIR "${CONFIG_VARS}"`
+fi
+if [ -z "$SYS" ] ; then
+  . "${CONFIG_DIR}"/sys.sh
+fi
+
+# Now we read the cache file.
+#
+. ${CONFIG_DIR}/read_cache.sh
+
+### ------------------------------------------------------------------------
+### General stuff
+
+# --- Prefix for temporary files
+tempdir=/tmp
+temp="${tempdir}"/c$$
+
+# --- Log file
+date > $CONFIG_LOG
+
+# --- Make sure that all temp files are removed
+trap "rm 2>/dev/null $temp $temp.*" 0
+
+# --- Default prefix directory
+prefix=/usr/local
+

@@ -11,16 +11,16 @@ if [ -z "$CC" ] ; then
   CCFLAGS=""
   CCSYMBOLIC=""
   CCPIC=""
-  echo '#include <stdio.h>' > /tmp/c$$.c
-  echo 'int main(void) {puts("Hello World\n");return 0;}' > /tmp/c$$.c
+  cc_is_gcc=""
+  (echo '#include <stdio.h>';echo 'int main(void) {puts("Hello World\n");return 0;}')|testfile $temp.c
   echo Searching for C compiler
-  if ( cd /tmp 2>>/dev/null;$EGCS -c c$$.c 1>>/dev/null 2>>/dev/null ) ; then
+  if ( run $EGCS -c $temp.c ) ; then
     CC="$EGCS"
-  elif ( cd /tmp 2>>/dev/null;gcc -c c$$.c 1>>/dev/null 2>>/dev/null ) ; then
+  elif ( run gcc -c $temp.c ) ; then
     CC=gcc
-  elif ( cd /tmp 2>>/dev/null;cc -c c$$.c 1>>/dev/null 2>>/dev/null ) ; then
+  elif ( run cc -c $temp.c ) ; then
     CC=cc
-  elif ( cd /tmp 2>>/dev/null;CC -c c$$.c 1>>/dev/null 2>>/dev/null ) ; then
+  elif ( run CC -c $temp.c ) ; then
     CC=CC
   else
     echo "Error: Can't find a C compiler" 1>&2
@@ -34,14 +34,13 @@ if [ -z "$CC" ] ; then
       echo "$CC is egcs"
     else
       EGCSTEST=`($CC -v 2>&1)|sed -n -e 's,.*/egcs-.*,Is EGCS,p' -e 's,.*/pgcc-.*,Is PGCC,p'`
-      echo 'int foo(void) {return 0;}' > /tmp/c$$.c
       if [ ! -z "$EGCSTEST" ] ; then
         echo "$CC is egcs"
-      elif ( cd /tmp 2>>/dev/null;$CC -V2.7.2.3 -c c$$.c  1>>/dev/null 2>>/dev/null ) ; then
+      elif ( run $CC -V2.7.2.3 -c $temp.c ) ; then
         CCVERSION="-V2.7.2.3"
-      elif ( cd /tmp 2>>/dev/null;$CC -V2.7.2 -c c$$.c  1>>/dev/null 2>>/dev/null ) ; then
+      elif ( run $CC -V2.7.2 -c $temp.c ) ; then
         CCVERSION="-V2.7.2"
-      elif ( cd /tmp 2>>/dev/null;$CC -V2.8.1 -c c$$.c  1>>/dev/null 2>>/dev/null ) ; then
+      elif ( run $CC -V2.8.1 -c $temp.c ) ; then
         CCVERSION="-V2.8.1"
         echo WARNING: version 2.7.2.3 of gcc is recommended. 1>&2
       else
@@ -53,7 +52,7 @@ if [ -z "$CC" ] ; then
   
   echo "Testing ${CC} pipe option"
   CCPIPE=""
-  if ( cd /tmp 2>>/dev/null;$CC ${CCFLAGS} -pipe -c c$$.c 1>>/dev/null 2>>/dev/null ) ; then
+  if ( run $CC ${CCFLAGS} -pipe -c $temp.c ) ; then
     CCPIPE="-pipe"
   fi
   CCFLAGS=`echo "${CCPIPE}" "${CCFLAGS}"`
@@ -62,10 +61,10 @@ if [ -z "$CC" ] ; then
   CCMMX=""
   if [ `uname -m` = i686 ]
   then
-    if (cd /tmp 2>>/dev/null;$CC ${CCFLAGS} -mpentiumpro -c c$$.c) 
+    if ( run $CC ${CCFLAGS} -mpentiumpro -c $temp.c) 
     then
       CCMMX="-mpentiumpro"
-      if ( cd /tmp 2>>/dev/null;$CC ${CCFLAGS} ${CCMMX} -mmx -c c$$.c 1>>/dev/null 2>>/dev/null ) ; then
+      if ( run $CC ${CCFLAGS} ${CCMMX} -mmx -c $temp.c ) ; then
         CCMMX="$CCMMX -mmx"
       fi
     fi
@@ -74,11 +73,10 @@ if [ -z "$CC" ] ; then
 
   echo "Testing ${CC} Symbolic Option"
   CCSYMBOLIC=""
-  echo 'void foo(void) {exit(0);}' > /tmp/c$$.c
-  if [ -z "`(cd /tmp 2>>/dev/null;${CC} ${CCFLAGS} -symbolic -c c$$.c 2>&1)|grep 'unrecognized option'`" ] ; then
+  if [ -z "`( cd $tempdir 2>>/dev/null;${CC} ${CCFLAGS} -symbolic -c $temp.c 2>&1)|grep 'unrecognized option'`" ] ; then
     CCSYMBOLIC='-symbolic'
     echo "Using CCSYMBOLIC=$CCSYMBOLIC"
-  elif (cd /tmp 2>>/dev/null;${CC} ${CCFLAGS} -shared -Wl,-Bsymbolic -o c$$.so c$$.c -lc -lm 2>>/dev/null 1>>/dev/null) ; then
+  elif ( run ${CC} ${CCFLAGS} -shared -Wl,-Bsymbolic -o c$$.so $temp.c -lc -lm ) ; then
     if [ "$SYS" != "linux-libc6" ] ; then
       CCSYMBOLIC='-Wl,-Bsymbolic'
       echo "Using CCSYMBOLIC=$CCSYMBOLIC"
@@ -86,10 +84,19 @@ if [ -z "$CC" ] ; then
   fi
 
   echo "Testing ${CC} PIC option"
-  if ( cd /tmp 2>>/dev/null;$CC ${CCFLAGS} -fPIC -c c$$.c 1>>/dev/null 2>>/dev/null ) ; then
+  if ( run $CC ${CCFLAGS} -fPIC -c $temp.c ) ; then
     CCPIC="-fPIC"
   fi
-  rm -rf /tmp/c$$.c /tmp/c$$.o /tmp/c$$.so
-  CONFIG_VARS=`echo CC CCFLAGS CCSYMBOLIC CCPIC $CONFIG_VARS`
+  echon "Checking whether ${CC} is gcc ... "
+  echo 'int main(void) { return __GNUC__;}' | testfile $temp.c
+  if ( run $CC $CCFLAGS -c $temp.c ) 
+  then
+      echo yes
+      cc_is_gcc=yes
+  else
+      echo no
+  fi
+  rm -rf $temp.c $temp.o $temp.so
+  CONFIG_VARS=`echo CC CCFLAGS CCSYMBOLIC CCPIC cc_is_gcc $CONFIG_VARS`
 fi
 
