@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.h,v 1.11 1999-08-17 23:48:04 leonb Exp $
+//C- $Id: DjVuFile.h,v 1.12 1999-08-19 22:23:02 eaf Exp $
  
 #ifndef _DJVUFILE_H
 #define _DJVUFILE_H
@@ -46,7 +46,7 @@
 
     @memo Classes representing DjVu files.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuFile.h,v 1.11 1999-08-17 23:48:04 leonb Exp $#
+    @version #$Id: DjVuFile.h,v 1.12 1999-08-19 22:23:02 eaf Exp $#
 */
 
 //@{
@@ -282,14 +282,8 @@ public:
    bool		are_incl_files_created(void) const;
       //@}
 
-      /** @name File name */
-      //@{
       /// Returns the URL assigned to this file
    GURL		get_url(void) const;
-      /** Changes the {\bf name} of the file (last component of the URL).
-	  This doesn't change the file's location. */
-   void		set_name(const char * name);
-      //@}
 
       /** @name Decode control routines */
       //@{
@@ -335,8 +329,6 @@ public:
       // Function needed by the cache
    unsigned int	get_memory_usage(void) const;
 
-      /** @name Operations with included files */
-      //@{
       /** Returns the list of included DjVuFiles.
 	  
 	  {\bf Warning.} Included files are normally created during decoding.
@@ -345,43 +337,13 @@ public:
 	  in order to find #INCL# chunks, which may block your application,
 	  if not all data is available. */
    GPList<DjVuFile>	get_included_files(void);
-      /** Includes the given #file# into this one. Since the procedure
-	  of inclusion also implies inserting the #INCL# chunk somewhere
-	  (you want to save the results after all, don't you), it's
-	  necessary to specify chunk position #chunk_pos#.
 
-	  @param file The file to be included
-	  @param chunk_pos Position of the #INCL# chunk, which has to
-	         be inserted into {\bf this} file. #-1# means append. */
-   void		include_file(const GP<DjVuFile> & file, int chunk_pos=-1);
-      /** Removes included file with given #name#. This will remove
-	  the #INCL# chunk too. */
-   void		unlink_file(const char * name);
-      //@}
-   
-
-      /** @name Operations with chunks (underlying IFF data) */
-      //@{
       /// Returns the number of chunks in the IFF file data
    int		get_chunks_number(void);
       /// Returns the name of chunk number #chunk_num#
    GString	get_chunk_name(int chunk_num);
       /// Returns 1 if this file contains chunk with name #chunk_name#
    bool		contains_chunk(const char * chunk_name);
-      /** Removes all chunks with name #chunk_name# from the underlying
-	  IFF file structure. You can't use this function to delete #INCL#
-	  chunks. Use \Ref{unlink_file}() instead. */
-   void		delete_chunks(const char * chunk_name);
-      /** Inserts any chunk into the underlying IFF file data. Please beware,
-	  that the insertion will not decode the chunk contents.
-
-	  @param pos Position at which the chunk should be inserted.
-	         #-1# means to append.
-	  @param chunk_name Name of the chunk to be inserted
-	  @param data The actual data that will be inserted. */
-   void		insert_chunk(int pos, const char * chunk_name,
-			     const TArray<char> & data);
-      //@}
 
       /** @name Encoding routines */
       //@{
@@ -395,10 +357,6 @@ public:
    TArray<char>		get_djvu_data(bool included_too, bool no_ndir);
       //@}
 
-      // Internal. Used by DjVuDocument
-   void			move(const GURL & dir_url);
-   void			change_cache(GCache<GURL, DjVuFile> * cache);
-
       // Functions inherited from DjVuPort
    virtual bool		inherits(const char * class_name) const;
    virtual void		notify_chunk_done(const DjVuPort * source, const char * name);
@@ -406,6 +364,9 @@ public:
    virtual void		notify_file_stopped(const DjVuPort * source);
    virtual void		notify_file_failed(const DjVuPort * source);
    virtual void		notify_all_data_received(const DjVuPort * source);
+protected:
+   virtual GP<DjVuFile>	create_djvu_file(const GURL & url, DjVuPort * port,
+					 GCache<GURL, DjVuFile> * cache);
 private:
    GURL			url;
    GP<DataRange>	data_range;
@@ -434,6 +395,7 @@ private:
    static void	static_decode_func(void *);
    void		decode_func(void);
    void		decode(ByteStream & str);
+
       // Functions dealing with the shape directory (fgjd)
    static GP<JB2Dict> static_get_fgjd(void *);
    GP<JB2Dict> get_fgjd(int block=0);
@@ -456,9 +418,6 @@ private:
    void		add_djvu_data(IFFByteStream & str,
 			      GMap<GURL, void *> & map,
 			      bool included_too, bool no_ndir);
-   void		move(GMap<GURL, void *> & map, const GURL & dir_url);
-   void		change_cache(GMap<GURL, void *> & map,
-			     GCache<GURL, DjVuFile> * cache);
 };
 
 inline void
@@ -485,12 +444,6 @@ inline GURL
 DjVuFile::get_url(void) const
 {
    return url;
-}
-
-inline void
-DjVuFile::set_name(const char * name)
-{
-   url=url.base()+name;
 }
 
 inline void

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.16 1999-08-19 20:40:46 eaf Exp $
+//C- $Id: DjVuFile.cpp,v 1.17 1999-08-19 22:23:02 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -130,6 +130,13 @@ DjVuFile::~DjVuFile(void)
    stop_decode(1);
 
    if (simple_port) { delete simple_port; simple_port=0; }
+}
+
+GP<DjVuFile>
+DjVuFile::create_djvu_file(const GURL & url, DjVuPort * port,
+			   GCache<GURL, DjVuFile> * cache)
+{
+   return new DjVuFile(url, port, cache);
 }
 
 int
@@ -1094,196 +1101,6 @@ DjVuFile::progress_cb(int pos, void * cl_data)
    };
 }
 
-void
-DjVuFile::unlink_file(const char * name)
-{
-   DEBUG_MSG("DjVuFile::unlink_file(): name='" << name << "'\n");
-   DEBUG_MAKE_INDENT(3);
-
-   if (!are_incl_files_created()) process_incl_chunks();
-
-   bool done=0;
-   MemoryByteStream str_out;
-   IFFByteStream iff_out(str_out);
-   
-   ByteStream * str_in=0;
-   TRY {
-      str_in=data_range->get_stream();
-
-      int chksize;
-      GString chkid;
-      IFFByteStream iff_in(*str_in);
-      if (!iff_in.get_chunk(chkid)) 
-        THROW("EOF");
-
-      iff_out.put_chunk(chkid);
-
-      while((chksize=iff_in.get_chunk(chkid)))
-      {
-	 if (chkid=="INCL")
-	 {
-	    GString incl_str;
-	    char buffer[1024];
-	    int length;
-	    while((length=iff_in.read(buffer, 1024)))
-	       incl_str+=GString(buffer, length);
-
-	       // Eat '\n' in the beginning and at the end
-	    while(incl_str.length() && incl_str[0]=='\n')
-	    {
-	       GString tmp=((const char *) incl_str)+1; incl_str=tmp;
-	    }
-	    while(incl_str.length()>0 && incl_str[incl_str.length()-1]=='\n')
-	       incl_str.setat(incl_str.length()-1, 0);
-	    
-	    if (incl_str==name) done=1;
-	    else
-	    {
-	       iff_out.put_chunk(chkid);
-	       iff_out.writall((const char*)incl_str, incl_str.length());
-	       iff_out.close_chunk();
-	    }
-	 } else
-	 {
-	    iff_out.put_chunk(chkid);
-	    char buffer[1024];
-	    int length;
-	    while((length=iff_in.read(buffer, 1024)))
-	       iff_out.writall(buffer, length);
-	    iff_out.close_chunk();
-	 }
-	 iff_in.close_chunk();
-      }
-      iff_out.close_chunk();
-   } CATCH(exc) {
-      delete str_in; str_in=0;
-      RETHROW;
-   } ENDCATCH;
-   delete str_in; str_in=0;
-
-   if (done)
-   {
-	 // Replace data_range with the new one
-      GP<DataPool> data_pool=new DataPool();
-      str_out.seek(0, SEEK_SET);
-      char buffer[1024];
-      int length;
-      while((length=str_out.read(buffer, 1024)))
-	 data_pool->add_data(buffer, length);
-      data_pool->set_eof();
-      data_range=new DataRange(data_pool);
-   }
-
-   GCriticalSectionLock lock(&inc_files_lock);
-   GPosition pos=inc_files_list;
-   while(pos)
-   {
-      GP<DjVuFile> f=inc_files_list[pos];
-      if (f->get_url().name()==name)
-      {
-	 GPosition this_pos=pos;
-	 ++pos;
-	 inc_files_list.del(this_pos);
-      } else ++pos;
-   }
-}
-
-void
-DjVuFile::include_file(const GP<DjVuFile> & file, int chunk_pos)
-{
-   DEBUG_MSG("DjVuFile::include_file(): incl_url='" << file->get_url() << "'\n");
-   DEBUG_MAKE_INDENT(3);
-
-      // Prepare the new file's url
-   GString file_name=file->get_url().name();
-   GURL file_url=url.base()+file_name;
-   
-      // See if the file is already included
-   if (!are_incl_files_created()) process_incl_chunks();
-   {
-      GCriticalSectionLock lock(&inc_files_lock);
-      for(GPosition pos=inc_files_list;pos;++pos)
-	 if (inc_files_list[pos]->get_url()==file_url)
-	    THROW("File with name '"+file_name+"' is already included.");
-   }
-
-   file->move(url.base());
-
-      // Set info route
-   file->disable_standard_port();
-   get_portcaster()->add_route(file, this);
-
-      // Insert INCL chunk
-   MemoryByteStream str_out;
-   IFFByteStream iff_out(str_out);
-   
-   ByteStream * str_in=0;
-   TRY {
-      str_in=data_range->get_stream();
-
-      int chksize;
-      GString chkid;
-      IFFByteStream iff_in(*str_in);
-      if (!iff_in.get_chunk(chkid)) 
-        THROW("EOF");
-
-      iff_out.put_chunk(chkid);
-
-      int chunk_num=0, inc_chunk_num=0;
-      bool stored=0;
-      while((chksize=iff_in.get_chunk(chkid)))
-      {
-	 if (chunk_num==chunk_pos)
-	 {
-	    iff_out.put_chunk("INCL");
-	    iff_out.write((const void*)(const char*)file_name, file_name.length());
-	    iff_out.close_chunk();
-	    stored=1;
-
-	    GCriticalSectionLock lock(&inc_files_lock);
-	    GPosition pos;
-	    if (inc_files_list.nth(inc_chunk_num, pos))
-	       inc_files_list.insert_before(pos, file);
-	    else inc_files_list.append(file);
-	 }
-	 iff_out.put_chunk(chkid);
-	 char buffer[1024];
-	 int length;
-	 while((length=iff_in.read(buffer, 1024)))
-	    iff_out.writall(buffer, length);
-	 iff_in.close_chunk();
-	 iff_out.close_chunk();
-	 chunk_num++;
-	 if (chkid=="INCL") inc_chunk_num++;
-      }
-
-      if (!stored)
-      {
-	 iff_out.put_chunk("INCL");
-	 iff_out.write((const void*)(const char*)file_name, file_name.length());
-	 iff_out.close_chunk();
-
-	 GCriticalSectionLock lock(&inc_files_lock);
-	 inc_files_list.append(file);
-      }
-      iff_out.close_chunk();
-   } CATCH(exc) {
-      delete str_in; str_in=0;
-      RETHROW;
-   } ENDCATCH;
-   delete str_in; str_in=0;
-
-      // Replace data_range with the new one
-   GP<DataPool> data_pool=new DataPool();
-   str_out.seek(0, SEEK_SET);
-   char buffer[1024];
-   int length;
-   while((length=str_out.read(buffer, 1024)))
-      data_pool->add_data(buffer, length);
-   data_pool->set_eof();
-   data_range=new DataRange(data_pool);
-}
-
 //*****************************************************************************
 //****************************** Data routines ********************************
 //*****************************************************************************
@@ -1367,134 +1184,6 @@ DjVuFile::contains_chunk(const char * chunk_name)
    } ENDCATCH;
    delete str; str=0;
    return contains;
-}
-
-void
-DjVuFile::delete_chunks(const char * chunk_name)
-{
-   DEBUG_MSG("DjVuFile::delete_chunks(): chunk_name='" << chunk_name << "'\n");
-   DEBUG_MAKE_INDENT(3);
-
-   if (chunk_name=="INCL")
-      THROW("Can't delete INCL chunks. Use unlink_file() instead.");
-   
-   bool done=0;
-   MemoryByteStream str_out;
-   IFFByteStream iff_out(str_out);
-   
-   ByteStream * str_in=0;
-   TRY {
-      str_in=data_range->get_stream();
-
-      int chksize;
-      GString chkid;
-      IFFByteStream iff_in(*str_in);
-      if (!iff_in.get_chunk(chkid)) 
-        THROW("EOF");
-      iff_out.put_chunk(chkid);
-
-      while((chksize=iff_in.get_chunk(chkid)))
-      {
-	 if (chkid!=chunk_name)
-	 {
-	    iff_out.put_chunk(chkid);
-	    char buffer[1024];
-	    int length;
-	    while((length=iff_in.read(buffer, 1024)))
-	       iff_out.writall(buffer, length);
-	    iff_out.close_chunk();
-	 } else done=1;
-	 iff_in.close_chunk();
-      }
-
-      iff_out.close_chunk();
-   } CATCH(exc) {
-      delete str_in; str_in=0;
-      RETHROW;
-   } ENDCATCH;
-   delete str_in; str_in=0;
-
-   if (done)
-   {
-	 // Replace data_range with the new one
-      GP<DataPool> data_pool=new DataPool();
-      str_out.seek(0, SEEK_SET);
-      char buffer[1024];
-      int length;
-      while((length=str_out.read(buffer, 1024)))
-	 data_pool->add_data(buffer, length);
-      data_pool->set_eof();
-      data_range=new DataRange(data_pool);
-   }
-}
-
-void
-DjVuFile::insert_chunk(int pos, const char * chunk_name,
-		       const TArray<char> & data)
-{
-   DEBUG_MSG("DjVuFile::insert_chunk(): chunk_name='" << chunk_name << "'\n");
-   DEBUG_MAKE_INDENT(3);
-
-   if (chunk_name=="INCL")
-      THROW("Can't insert INCL chunks. Use include_file() instead.");
-   
-   MemoryByteStream str_out;
-   IFFByteStream iff_out(str_out);
-   
-   ByteStream * str_in=0;
-   TRY {
-      str_in=data_range->get_stream();
-
-      int chksize;
-      GString chkid;
-      IFFByteStream iff_in(*str_in);
-      if (!iff_in.get_chunk(chkid)) 
-        THROW("EOF");
-      iff_out.put_chunk(chkid);
-
-      bool done=0;
-      int chunk=0;
-      while((chksize=iff_in.get_chunk(chkid)))
-      {
-	 if (pos>=0 && chunk==pos)
-	 {
-	    iff_out.put_chunk(chunk_name);
-	    iff_out.writall(data, data.size());
-	    iff_out.close_chunk();
-	    done=1;
-	 }
-	 iff_out.put_chunk(chkid);
-	 char buffer[1024];
-	 int length;
-	 while((length=iff_in.read(buffer, 1024)))
-	    iff_out.writall(buffer, length);
-	 iff_out.close_chunk();
-	 iff_in.close_chunk();
-	 chunk++;
-      }
-      if (!done)
-      {
-	 iff_out.put_chunk(chunk_name);
-	 iff_out.writall(data, data.size());
-	 iff_out.close_chunk();
-      }
-
-      iff_out.close_chunk();
-   } CATCH(exc) {
-      delete str_in; str_in=0;
-      RETHROW;
-   } ENDCATCH;
-   delete str_in; str_in=0;
-
-      // Replace data_range with the new one
-   GP<DataPool> data_pool=new DataPool();
-   str_out.seek(0, SEEK_SET);
-   char buffer[1024];
-   int length;
-   while((length=str_out.read(buffer, 1024)))
-      data_pool->add_data(buffer, length);
-   data_pool->set_eof();
-   data_range=new DataRange(data_pool);
 }
 
 //*****************************************************************************
@@ -1585,54 +1274,4 @@ DjVuFile::get_djvu_data(bool included_too, bool no_ndir)
    add_djvu_data(iff, map, included_too, no_ndir);
 
    return str.get_data();
-}
-
-void
-DjVuFile::move(GMap<GURL, void *> & map, const GURL & dir_url)
-{
-   if (!map.contains(url))
-   {
-      map[url]=0;
-
-      url=dir_url+url.name();
-
-      if (!are_incl_files_created()) process_incl_chunks();
-
-      GPList<DjVuFile> list=get_included_files();
-      for(GPosition pos=list;pos;++pos)
-	 list[pos]->move(map, dir_url);
-   }
-}
-
-void
-DjVuFile::move(const GURL & dir_url)
-{
-   GMap<GURL, void *> map;
-   move(map, dir_url);
-}
-
-void
-DjVuFile::change_cache(GMap<GURL, void *> & map,
-		       GCache<GURL, DjVuFile> * xcache)
-{
-      // TODO: We no longer update cache from DjVuFile: FIX IT!
-   if (map.contains(url)) return;
-
-   map[url]=0;
-
-   cache=xcache;
-   if (xcache) xcache->add_item(url, this);
-
-   if (!are_incl_files_created()) process_incl_chunks();
-
-   GPList<DjVuFile> list=get_included_files();
-   for(GPosition pos=list;pos;++pos)
-      list[pos]->change_cache(map, xcache);
-}
-
-void
-DjVuFile::change_cache(GCache<GURL, DjVuFile> * cache)
-{
-   GMap<GURL, void *> map;
-   change_cache(map, cache);
 }
