@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.h,v 1.31 2001-04-03 21:45:52 bcr Exp $
+// $Id: GString.h,v 1.32 2001-04-05 19:34:52 chrisp Exp $
 // $Name:  $
 
 #ifndef _GSTRING_H_
@@ -57,7 +57,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.31 2001-04-03 21:45:52 bcr Exp $# */
+    #$Id: GString.h,v 1.32 2001-04-05 19:34:52 chrisp Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -212,7 +212,6 @@ public:
       too large. */
   GString substr(int from, unsigned int len=1) const
     { return GString((GString&)(*this), from, len); }
-
   /** Returns an upper case copy of this string.  The returned string
       contains a copy of the current string with all letters turned into 
       upper case letters. */
@@ -359,6 +358,16 @@ public:
     { return strcmp(s1,s2)< 0; }
   friend int operator< (const char    *s1, const GString &s2) 
     { return strcmp(s1,s2)< 0; }
+   /* # CHRISP added the following block of code # */
+   /** Returns a boolean.  Compares string with #s2# and a given length of #len# */
+   inline int ncmp(const GString& s2, const int len=1) const
+      { return substr(0,len) == s2.substr(0,len); }
+   /** Returns a boolean. The Standard C strncmp takes two string and compares the 
+       first N characters.  static bool GString::ncmp will compare #s1# with #s2# 
+       with the #len# characters starting from the beginning of the string.*/
+   static bool ncmp(const GString &s1,const GString &s2, const int len=1)
+      { return s1.substr(0,len) == s2.substr(0,len); }
+   /* # END code block added by CHRISP */
 
   // -- HASHING
   /** Returns a hash code for the string.  This hashing function helps when
