@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocEditor.cpp,v 1.68 2001-03-08 23:57:26 bcr Exp $
+// $Id: DjVuDocEditor.cpp,v 1.64.2.1 2001-05-21 23:10:25 mchen Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -120,10 +120,10 @@ DjVuDocEditor::init(void)
 
    doc_url=GOS::filename_to_url(GOS::expand_name("noname.djvu", GOS::cwd()));
 
-   GP<DjVmDoc> doc=DjVmDoc::create();
+   DjVmDoc doc;
    GP<ByteStream> gstr=ByteStream::create();
    ByteStream &str=*gstr;
-   doc->write(gstr);
+   doc.write(gstr);
    str.seek(0, SEEK_SET);
    doc_pool=DataPool::create(str);
 
@@ -136,7 +136,7 @@ DjVuDocEditor::init(void)
 }
 
 void
-DjVuDocEditor::init(char const fname[])
+DjVuDocEditor::init(const char * fname)
 {
    DEBUG_MSG("DjVuDocEditor::init() called: fname='" << fname << "'\n");
    DEBUG_MAKE_INDENT(3);
@@ -148,7 +148,8 @@ DjVuDocEditor::init(char const fname[])
       // First - create a temporary DjVuDocument and check its type
    doc_pool=DataPool::create(fname);
    doc_url=GOS::filename_to_url(fname);
-   GP<DjVuDocument> tmp_doc=DjVuDocument::create_wait(doc_url,this);
+   GP<DjVuDocument> tmp_doc=new DjVuDocument();
+   tmp_doc->init(doc_url, this);
    if (!tmp_doc->is_init_ok())
       G_THROW(GString("DjVuDocEditor.open_fail\t")+fname);
 
@@ -261,7 +262,7 @@ DjVuDocEditor::clean_files_map(void)
       {
          DEBUG_MSG("ZEROing file '" << f->file->get_url() << "'\n");
          if (f->file->is_modified())
-            f->pool=f->file->get_djvu_data(false);
+            f->pool=f->file->get_djvu_data(false, true);
          f->file=0;
       }
       if (!f->file && !f->pool)
@@ -668,7 +669,6 @@ DjVuDocEditor::insert_group(const GList<GString> & file_names, int page_num,
       for(GPosition pos=file_names;pos;++pos)
       {
          GString fname=file_names[pos];
-         DEBUG_MSG( "Inserting file '" << fname << "'\n" );
          G_TRY {
                // Check if it's a multipage document...
             GP<DataPool> xdata_pool=DataPool::create(fname);
@@ -683,7 +683,8 @@ DjVuDocEditor::insert_group(const GList<GString> & file_names, int page_num,
                   // Hey, it really IS a multipage document.
                   // Open it, expand to a tmp directory and add pages
                   // one after another
-               GP<DjVuDocument> doc=DjVuDocument::create_wait((const char *)fname);
+               GP<DjVuDocument> doc=new DjVuDocument();
+               doc->init(GOS::filename_to_url(fname));
 #ifndef UNDER_CE
 	             GString dirname=tmpnam(0);
 #else
@@ -1224,7 +1225,7 @@ DjVuDocEditor::simplify_anno(void (* progress_cb)(float progress, void *),
             file_flags.wait();
         
             // Merge all chunks in one by decoding and encoding DjVuAnno
-         GP<DjVuAnno> dec_anno=DjVuAnno::create();
+         GP<DjVuAnno> dec_anno=new DjVuAnno;
          dec_anno->decode(anno);
          GP<ByteStream> new_anno=ByteStream::create();
          dec_anno->encode(new_anno);
@@ -1382,10 +1383,11 @@ DjVuDocEditor::get_thumbnails_size(void) const
       {
          TArray<char> & data=*(TArray<char> *) thumb_map[pos];
          GP<ByteStream> gstr=ByteStream::create();
-         gstr->writall((const char *) data, data.size());
-         gstr->seek(0);
-         GP<IW44Image> iwpix=IW44Image::create_decode(IW44Image::COLOR);
-         iwpix->decode_chunk(gstr);
+         ByteStream &str=*gstr;
+         str.writall((const char *) data, data.size());
+         str.seek(0);
+         GP<IW44Image> iwpix=IW44Image::create_decode(true);
+         iwpix->decode_chunk(str);
         
          int width=iwpix->get_width();
          int height=iwpix->get_height();
@@ -1548,19 +1550,20 @@ DjVuDocEditor::generate_thumbnails(int thumb_size, int page_num)
          if (!pm)
          {
             GP<GBitmap> bm=dimg->get_bitmap(rect, rect, sizeof(int));
-            pm=GPixmap::create(*bm);
+            pm=new GPixmap(*bm);
          }
          if (!pm) G_THROW("DjVuDocEditor.render\t"+GString(page_num));
 
             // Store and compress the pixmap
-         GP<IW44Image> iwpix=IW44Image::create_encode(*pm);
-         GP<ByteStream> gstr=ByteStream::create();
+         GP<IW44Image> iwpix=IW44Image::create(*pm);
+         GP<ByteStream> str=ByteStream::create();
+         ByteStream &mbs=*str;
          IWEncoderParms parms;
          parms.slices=97;
          parms.bytes=0;
          parms.decibels=0;
-         iwpix->encode_chunk(gstr, parms);
-         thumb_map[id]=new TArray<char>(gstr->get_data());
+         iwpix->encode_chunk(mbs, parms);
+         thumb_map[id]=new TArray<char>(mbs.get_data());
       }
       ++page_num;
    }else
@@ -1598,7 +1601,7 @@ store_file(const GP<DjVmDir> & src_djvm_dir, const GP<DjVmDoc> & djvm_doc,
          store_file(src_djvm_dir, djvm_doc, djvu_files_list[pos], map);
 
          // Now store contents of this file
-      GP<DataPool> file_data=djvu_file->get_djvu_data(false);
+      GP<DataPool> file_data=djvu_file->get_djvu_data(false, true);
       GP<DjVmDir::File> frec=src_djvm_dir->name_to_file(url.name());
       if (frec)
       {
@@ -1613,7 +1616,7 @@ DjVuDocEditor::save_pages_as(GP<ByteStream> str, const GList<int> & _page_list)
 {
    GList<int> page_list=sortList(_page_list);
 
-   GP<DjVmDoc> djvm_doc=DjVmDoc::create();
+   GP<DjVmDoc> djvm_doc=new DjVmDoc;
    GMap<GURL, void *> map;
    for(GPosition pos=page_list;pos;++pos)
    {
@@ -1648,7 +1651,7 @@ DjVuDocEditor::save_file(const char * file_id, const char * save_dir,
          bool file_modified=file_rec->pool || file_rec->file &&
                             file_rec->file->is_modified();
          if (file_rec->file)
-            file_pool=file_rec->file->get_djvu_data(false);
+            file_pool=file_rec->file->get_djvu_data(false, true);
          else
             file_pool=file_rec->pool;
          if (!file_modified && only_modified)
@@ -1817,7 +1820,7 @@ DjVuDocEditor::save_as(const char * where, bool bundled)
          if (file_rec->pool && (!file_rec->file ||
                                 !file_rec->file->is_modified()))
             file_pool=file_rec->pool;
-         else if (file_rec->file) file_pool=file_rec->file->get_djvu_data(false);
+         else if (file_rec->file) file_pool=file_rec->file->get_djvu_data(false, true);
         }
          // Even if file has not been modified (pool==0) we still want
          // to save it.
@@ -1878,7 +1881,7 @@ DjVuDocEditor::save_as(const char * where, bool bundled)
 
         iff.put_chunk("FORM:DJVM", 1);
         iff.put_chunk("DIRM");
-        djvm_dir->encode(gstr);
+        djvm_dir->encode(iff.get_bytestream());
         iff.close_chunk();
         iff.close_chunk();
         iff.flush();
