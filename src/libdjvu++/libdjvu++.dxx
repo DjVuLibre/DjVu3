@@ -159,23 +159,17 @@
 //----------------------------------------
 /** @name AT&T Source Code Agreement
 
-    Here is the {\em verbatim} text of the AT&T Source Code Agreement.
+    The {\em verbatim} text of the AT&T Source Code Agreement.
     Additional explanation (as well as updated versions) can be found under
-    \URL{http://www.djvu.att.com/open}.
-
-    \begin{verbatim}
-    @ATTLICENSE@
-    \end{verbatim}
-  
+    \URL{http://www.djvu.att.com/open} or in file #"ATTLICENSE"#.
+    They say you must read it and accept it.
+    
     @author
     Jeffrey S. Dickey <jsdickey@att.com>\\
     James Tramontana <jtramontana@att.com>\\
     Marya Lenn Yee <myee@yeellp.com> */
-  */
 //@{
 //@}
-
-
 
 
 //----------------------------------------
