@@ -1,5 +1,5 @@
 //C-  -*- C++ -*-
-// $Id: npmac.cpp,v 1.18 2001-08-24 22:27:31 docbill Exp $
+// $Id: npmac.cpp,v 1.19 2001-08-24 22:34:33 docbill Exp $
 // $Name:  $
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -457,7 +457,7 @@ void SetUpQD(void)
 		//
 		// Now that we know the app name and FSSpec, we can call GetDiskFragment
 		// to get a connID to use in a subsequent call to FindSymbol (it will also
-		// return the address of “main” in app, which we ignore).  If GetDiskFragment 
+		// return the address of `main' in app, which we ignore).  If GetDiskFragment 
 		// returns an error, we assume the app must be 68K.
 		//
 		Ptr mainAddr; 	
@@ -469,7 +469,7 @@ void SetUpQD(void)
 	{
 		//
 		// The app is a PPC code fragment, so call FindSymbol
-		// to get the exported “qd” symbol so we can access its
+		// to get the exported `qd' symbol so we can access its
 		// QuickDraw globals.
 		//
 		SymClass symClass;
@@ -511,7 +511,7 @@ NPError main(NPNetscapeFuncs* nsTable, NPPluginFuncs* pluginFuncs, NPP_ShutdownU
 		err = NPERR_INVALID_FUNCTABLE_ERROR;
 	
 	//
-	// Check the “major” version passed in Netscape's function table.
+	// Check the `major' version passed in Netscape's function table.
 	// We won't load if the major version is newer than what we expect.
 	// Also check that the function tables passed in are big enough for
 	// all the functions we need (they could be bigger, if Netscape added
