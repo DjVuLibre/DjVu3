@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: JB2Image.cpp,v 1.30 2000-02-08 00:00:02 leonb Exp $
+//C- $Id: JB2Image.cpp,v 1.31 2000-02-14 16:52:38 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -1067,13 +1067,20 @@ shift_cross_context( int &context, int next,
 void 
 _JB2Codec::code_bitmap_by_cross_coding (GBitmap *bm, GBitmap *cbm, int libno)
 {
+  // Make sure bitmaps will not be disturbed
+  GBitmap copycbm;
+  if (cbm->monitor())
+    {
+      // Perform a copy when the bitmap is explicitely shared
+      GMonitorLock lock2(cbm->monitor());
+      copycbm.init(*cbm);
+      cbm = &copycbm;
+    }
+  GMonitorLock lock1(bm->monitor());
+  // Center bitmaps
   int cw = cbm->columns();
   int dw = bm->columns();
   int dh = bm->rows();
-  // Make sure bitmaps will not be disturbed
-  GMonitorLock lock1(bm->monitor());
-  GMonitorLock lock2(cbm->monitor());
-  // Center bitmaps
   LibRect &l = libinfo[libno];
   int xd2c = (dw/2 - dw + 1) - ((l.right - l.left + 1)/2 - l.right);
   int yd2c = (dh/2 - dh + 1) - ((l.top - l.bottom + 1)/2 - l.top);
