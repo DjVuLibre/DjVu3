@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GURL.cpp,v 1.23 2000-01-21 20:28:09 eaf Exp $
+//C- $Id: GURL.cpp,v 1.24 2000-01-21 20:41:36 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -272,6 +272,22 @@ GURL::cgi_arguments(void) const
    return cgi_name_arr.size();
 }
 
+int
+GURL::djvu_cgi_arguments(void) const
+{
+   GCriticalSectionLock lock((GCriticalSection *) &cgi_lock);
+
+   int args=0;
+   for(int i=0;i<cgi_name_arr.size();i++)
+      if (cgi_name_arr[i].upcase()==DJVUOPTS)
+      {
+	 args=cgi_name_arr.size()-(i+1);
+	 break;
+      }
+   
+   return args;
+}
+
 GString
 GURL::cgi_name(int num) const
 {
@@ -281,11 +297,51 @@ GURL::cgi_name(int num) const
 }
 
 GString
+GURL::djvu_cgi_name(int num) const
+{
+   GCriticalSectionLock lock((GCriticalSection *) &cgi_lock);
+
+   GString arg;
+   for(int i=0;i<cgi_name_arr.size();i++)
+      if (cgi_name_arr[i].upcase()==DJVUOPTS)
+      {
+	 for(i++;i<cgi_name_arr.size();i++)
+	    if (num--==0)
+	    {
+	       arg=cgi_name_arr[i];
+	       break;
+	    }
+	 break;
+      }
+   return arg;
+}
+
+GString
 GURL::cgi_value(int num) const
 {
    GCriticalSectionLock lock((GCriticalSection *) &cgi_lock);
    if (num<cgi_value_arr.size()) return cgi_value_arr[num];
    else return GString();
+}
+
+GString
+GURL::djvu_cgi_value(int num) const
+{
+   GCriticalSectionLock lock((GCriticalSection *) &cgi_lock);
+
+   GString arg;
+   for(int i=0;i<cgi_name_arr.size();i++)
+      if (cgi_name_arr[i].upcase()==DJVUOPTS)
+      {
+	 for(i++;i<cgi_name_arr.size();i++)
+	    if (num--==0)
+	    {
+	       arg=cgi_value_arr[i];
+	       break;
+	    }
+	 break;
+      }
+   return arg;
 }
 
 DArray<GString>

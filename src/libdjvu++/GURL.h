@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GURL.h,v 1.17 2000-01-21 18:24:45 eaf Exp $
+//C- $Id: GURL.h,v 1.18 2000-01-21 20:41:36 eaf Exp $
 
 #ifndef _GURL_H_
 #define _GURL_H_
@@ -27,7 +27,7 @@
     \Ref{GURL} class used to store URLs in a system independent format.
     @memo System independent URL representation.
     @author Andrei Erofeev <eaf@research.att.com>
-    @version #$Id: GURL.h,v 1.17 2000-01-21 18:24:45 eaf Exp $#
+    @version #$Id: GURL.h,v 1.18 2000-01-21 20:41:36 eaf Exp $#
 */
 
 //@{
@@ -79,9 +79,25 @@ public:
 	  CGI arguments follow '#?#' sign and are separated by '#&#' signs */
    int		cgi_arguments(void) const;
 
+      /** Returns the total number of DjVu-related CGI arguments (arguments
+	  following #DJVUOPTS# in the URL). */
+   int		djvu_cgi_arguments(void) const;
+
       /** Returns that part of CGI argument number #num#, which is
 	  before the equal sign. */
    GString	cgi_name(int num) const;
+
+      /** Returns that part of DjVu-related CGI argument number #num#,
+	  which is before the equal sign. */
+   GString	djvu_cgi_name(int num) const;
+
+      /** Returns that part of CGI argument number #num#, which is
+	  after the equal sign. */
+   GString	cgi_value(int num) const;
+   
+      /** Returns that part of DjVu-related CGI argument number #num#,
+	  which is after the equal sign. */
+   GString	djvu_cgi_value(int num) const;
    
       /** Returns array of all known CGI names (part of CGI argument before
 	  the equal sign) */
@@ -91,10 +107,6 @@ public:
 	  following #DJVUOPTS# option. */
    DArray<GString>djvu_cgi_names(void) const;
    
-      /** Returns that part of CGI argument number #num#, which is
-	  after the equal sign. */
-   GString	cgi_value(int num) const;
-
       /** Returns array of all known CGI names (part of CGI argument before
 	  the equal sign) */
    DArray<GString>cgi_values(void) const;
