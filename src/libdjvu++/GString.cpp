@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.37.2.2 2001-03-20 18:51:48 bcr Exp $
+// $Id: GString.cpp,v 1.37.2.3 2001-03-20 23:43:52 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -46,7 +46,10 @@
 #include "debug.h"
 
 
+#ifndef WIN32
 #define LIBICONV_PLUG true
+#endif
+
 
 #include "iconv.h"//MBCS cvt
 #ifdef WIN32
