@@ -5,7 +5,7 @@
 </HEAD>
 <BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
 
-<H2>class  <A HREF="#DOC.DOCU">DjVuAnno</A>: public <!1><A HREF="GPEnabled.html#DOC.1.4.4.2">GPEnabled</A></H2>
+<H2>class  <A HREF="#DOC.DOCU">DjVuAnno</A>: public <!1><A HREF="GPEnabled.html#DOC.1.5.4.1.2">GPEnabled</A></H2>
 <BLOCKQUOTE>This is a top-level class containing annotations of a DjVu document (or just a page).</BLOCKQUOTE>
 <HR>
 
@@ -22,22 +22,19 @@
 <DL>
 <P><DL>
 <DT><H3>Public Methods</H3><DD><DT>
-<A HREF="#DOC.1.4.26.2.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVuAnno.html">DjVuAnno</A>&gt;  <B>create</B>(void)
-<DD><I>Creation method.</I>
-<DT>
-<A HREF="#DOC.1.4.26.2.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>decode</B>(<!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="ByteStream.html">ByteStream</A>&gt; bs)
+<A HREF="#DOC.1.5.25.3.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>decode</B>(<!1><A HREF="ByteStream.html">ByteStream</A> &amp; bs)
 <DD><I>Decodes a sequence of annotation chunks and merges contents of every chunk with previously decoded information.</I>
 <DT>
-<A HREF="#DOC.1.4.26.2.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>encode</B>(<!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="ByteStream.html">ByteStream</A>&gt; bs)
+<A HREF="#DOC.1.5.25.3.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>encode</B>(<!1><A HREF="ByteStream.html">ByteStream</A> &amp; bs)
 <DD><I>Encodes all annotations back into a sequence of chunks to be put inside a <TT>FORM:ANNO</TT>.</I>
 <DT>
-<A HREF="#DOC.1.4.26.2.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVuAnno.html">DjVuAnno</A>&gt;  <B>copy</B>(void) const 
+<A HREF="#DOC.1.5.25.3.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVuAnno.html">DjVuAnno</A>&gt;  <B>copy</B>(void) const 
 <DD><I>Returns a copy of this object</I>
 <DT>
-<A HREF="#DOC.1.4.26.2.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>merge</B>(const <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVuAnno.html">DjVuAnno</A>&gt; &amp; anno)
+<A HREF="#DOC.1.5.25.3.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>merge</B>(const <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVuAnno.html">DjVuAnno</A>&gt; &amp; anno)
 <DD><I>Merged the contents of this class and of annotations pointed by <TT>anno</TT> pointer </I>
 <DT>
-<A HREF="#DOC.1.4.26.2.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>inline   unsigned int <B>get_memory_usage</B>() const 
+<A HREF="#DOC.1.5.25.3.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>unsigned int <B>get_memory_usage</B>() const 
 <DD><I>Returns the number of bytes needed by this data structure.</I>
 </DL></P>
 
@@ -46,7 +43,7 @@
 <DL>
 <P><DL>
 <DT><H3>Public Methods</H3><DD><DT>
-<IMG ALT="o" SRC=icon2.gif><!1><A HREF="GPEnabled.html#DOC.1.4.4.2">GPEnabled</A>&amp; <B>operator=</B>(const <!1><A HREF="GPEnabled.html#DOC.1.4.4.2">GPEnabled</A> &amp; obj)
+<IMG ALT="o" SRC=icon2.gif><!1><A HREF="GPEnabled.html#DOC.1.5.4.1.2">GPEnabled</A>&amp; <B>operator=</B>(const <!1><A HREF="GPEnabled.html#DOC.1.5.4.1.2">GPEnabled</A> &amp; obj)
 <DT>
 <IMG ALT="o" SRC=icon2.gif>int <B>get_count</B>(void) const 
 </DL></P>
@@ -62,45 +59,40 @@
 <HR>
 <H2>Documentation</H2>
 <BLOCKQUOTE>This is a top-level class containing annotations of a DjVu document (or
-just a page). It has only two functions: <!1><A HREF="DjVuAnno.html#DOC.1.4.26.2.2">encode</A>() and
-<!1><A HREF="DjVuAnno.html#DOC.1.4.26.2.1">decode</A>().  Both of them work with a sequence of annotation chunks
+just a page). It has only two functions: <!1><A HREF="DjVuAnno.html#DOC.1.5.25.3.2">encode</A>() and
+<!1><A HREF="DjVuAnno.html#DOC.1.5.25.3.1">decode</A>().  Both of them work with a sequence of annotation chunks
 from <TT>FORM:ANNO</TT> form. Basing on the name of the chunks they call<P>(like ANT). The real work of encoding and decoding is done by
 lower-level classes. </BLOCKQUOTE>
 <DL>
 
-<A NAME="create">
-<A NAME="DOC.1.4.26.2.5">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVuAnno.html">DjVuAnno</A>&gt;  create(void)</B></TT>
-<DD>Creation method.
-<DL><DT><DD></DL><P>
 <A NAME="decode">
-<A NAME="DOC.1.4.26.2.1">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void decode(<!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="ByteStream.html">ByteStream</A>&gt; bs)</B></TT>
+<A NAME="DOC.1.5.25.3.1">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void decode(<!1><A HREF="ByteStream.html">ByteStream</A> &amp; bs)</B></TT>
 <DD>Decodes a sequence of annotation chunks and merges contents of every
 chunk with previously decoded information. This function
-should be called right after applying <!1><A HREF="IFFByteStream.html#DOC.1.4.15.1.2">get_chunk</A>()
+should be called right after applying <!1><A HREF="IFFByteStream.html#DOC.1.5.13.1.2">get_chunk</A>()
 to data from <TT>FORM:ANNO</TT>. 
 <DL><DT><DD></DL><P>
 <A NAME="encode">
-<A NAME="DOC.1.4.26.2.2">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void encode(<!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="ByteStream.html">ByteStream</A>&gt; bs)</B></TT>
+<A NAME="DOC.1.5.25.3.2">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void encode(<!1><A HREF="ByteStream.html">ByteStream</A> &amp; bs)</B></TT>
 <DD>Encodes all annotations back into a sequence of chunks to be put
 inside a <TT>FORM:ANNO</TT>. 
 <DL><DT><DD></DL><P>
 <A NAME="copy">
-<A NAME="DOC.1.4.26.2.6">
+<A NAME="DOC.1.5.25.3.5">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVuAnno.html">DjVuAnno</A>&gt;  copy(void) const </B></TT>
 <DD>Returns a copy of this object
 <DL><DT><DD></DL><P>
 <A NAME="merge">
-<A NAME="DOC.1.4.26.2.3">
+<A NAME="DOC.1.5.25.3.3">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void merge(const <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVuAnno.html">DjVuAnno</A>&gt; &amp; anno)</B></TT>
 <DD>Merged the contents of this class and of annotations
 pointed by <TT>anno</TT> pointer 
 <DL><DT><DD></DL><P>
 <A NAME="get_memory_usage">
-<A NAME="DOC.1.4.26.2.4">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>inline   unsigned int get_memory_usage() const </B></TT>
+<A NAME="DOC.1.5.25.3.4">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>unsigned int get_memory_usage() const </B></TT>
 <DD>Returns the number of bytes needed by this data structure. It's
 used by caching routines to estimate the size of a <!1><A HREF="DjVuImage.html">DjVuImage</A>. 
 <DL><DT><DD></DL><P></DL>
@@ -111,7 +103,7 @@ used by caching routines to estimate the size of a <!1><A HREF="DjVuImage.html">
 <!-- This is were the DOC++ footer is defined  -->
 
 <font face="arial,helvetica" size="2">
-<a href=http://www.lizardtech.com>DjVu</a> is a trademark of LizardTech, Inc.  
+<a href=http://www.lizardtech.com>DjVu</a> is a trademark of AT&amp;T.  
 <br>All other products mentioned are registered trademarks or trademarks of
 their respective companies.
 </font>
