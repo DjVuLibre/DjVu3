@@ -1,12 +1,5 @@
 // -*- C++ -*-
 /** @name DjVu Reference Library
-    @version
-    990221
-    @author
-    Leon Bottou, 02/1999
-
-
-
 
     The DjVu Reference Library is Copyright (c) AT&T 1999.  
 
@@ -15,7 +8,10 @@
     with AT&T regarding this software, YOUR use of this software shall imply
     YOUR acceptance of all the provisions specified in this agreement.
 
-
+    @version
+    990221
+    @author
+    Leon Bottou, 02/1999
 */
 //@{
 
