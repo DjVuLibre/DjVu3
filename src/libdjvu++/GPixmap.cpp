@@ -9,9 +9,9 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GPixmap.cpp,v 1.8 1999-08-13 15:31:38 leonb Exp $
+//C- $Id: GPixmap.cpp,v 1.9 1999-09-15 18:24:34 leonb Exp $
 
-// File "$Id: GPixmap.cpp,v 1.8 1999-08-13 15:31:38 leonb Exp $"
+// File "$Id: GPixmap.cpp,v 1.9 1999-09-15 18:24:34 leonb Exp $"
 // -- Implements class PIXMAP
 // Author: Leon Bottou 07/1997
 
@@ -479,6 +479,9 @@ color_correction_table(double gamma, unsigned char gtable[256] )
 #endif
           gtable[i] = (int) floor(255.0 * x + 0.5);
         }
+      // Make sure that min and max values are exactly black or white
+      gtable[0] = 0;
+      gtable[255] = 255;
     }
 }
 
