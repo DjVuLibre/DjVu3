@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.cpp,v 1.32 1999-09-28 19:57:17 eaf Exp $
+//C- $Id: DataPool.cpp,v 1.33 1999-09-29 18:50:46 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -431,7 +431,7 @@ DataPool::connect(const GP<DataPool> & pool_in, int start_in, int length_in)
    length=length_in;
 
       // The following will work for length<0 too
-   if (pool->has_data(start, length)) set_eof();
+   if (pool->has_data(start, length)) eof_flag=true;
    else pool->add_trigger(start, length, static_trigger_cb, this);
 
    data=0;
@@ -990,7 +990,7 @@ DataPool::trigger_cb(void)
 	 // Connected to a pool
 	 // We may be here when either EOF is set on the master DataPool
 	 // Or when it may have learnt its length (from IFF or whatever)
-      if (pool->is_eof() || pool->has_data(start, length)) set_eof();
+      if (pool->is_eof() || pool->has_data(start, length)) eof_flag=true;
    } else if (!fname.length())
    {
 	 // Not connected to anything => Try to guess the length
