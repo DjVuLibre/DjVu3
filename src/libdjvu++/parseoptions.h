@@ -6,7 +6,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: parseoptions.h,v 1.17 2000-01-05 20:05:43 bcr Exp $
+//C- $Id: parseoptions.h,v 1.18 2000-01-06 06:11:30 bcr Exp $
 
 #endif /* __cplusplus */
 
@@ -68,7 +68,7 @@
 
    @memo Class used for parsing options and configuration files.
    @author: #$Author: bcr $#
-   @version #$Id: parseoptions.h,v 1.17 2000-01-05 20:05:43 bcr Exp $#
+   @version #$Id: parseoptions.h,v 1.18 2000-01-06 06:11:30 bcr Exp $#
  */
 
 //@{
@@ -323,10 +323,10 @@ public:
       is returned.  Command line arguments have the highest presidence.    
       Default profile values have the lowest presidence.  It is an error   
       to have two values f the same presedence. */
-  int GetBest(const int listsize,const int tokens[]);
+  int GetBest(const int listsize,const int tokens[],bool=false);
 
   /// Same as above, but -1 terminated 
-  inline int GetBest(const int tokens[]);
+  inline int GetBest(const int tokens[],bool=false);
 
   /** This is just a short cut, when a token value is only needed for one 
       lookup.  A list of tokens may be specified as well. */
@@ -337,10 +337,10 @@ public:
       is returned.  Command line arguments have the highest presidence.    
       Default profile values have the lowest presidence.  It is an error   
       to have two values f the same presedence. */
-  int GetBest(const int listsize,const char * const[]);
+  int GetBest(const int listsize,const char * const[],bool=false);
 
   /// Same as above, but NULL terminated 
-  inline int GetBest(const char * const names[]);
+  inline int GetBest(const char * const names[],bool=false);
 
   /** This just checks for TRUE, and if not does an atoi() conversion. 
       Anything beginning with [Tt] is returned as 1, [Ff\0] is returned 
@@ -483,8 +483,8 @@ DjVuParseOptions::GetProfileName
 
 inline int
 DjVuParseOptions::GetBest
-(const int tokens[])
-{int i;for(i=0;tokens[i]>=0;i++);return GetBest(i,tokens);}
+(const int tokens[],bool requiretrue)
+{int i;for(i=0;tokens[i]>=0;i++);return GetBest(i,tokens,requiretrue);}
 
 inline const char * const
 DjVuParseOptions::GetValue
@@ -493,8 +493,8 @@ DjVuParseOptions::GetValue
 
 inline int
 DjVuParseOptions::GetBest
-(const char * const names[])
-{int i;for(i=0;names[i];i++);return GetBest(i,names);}
+(const char * const names[],bool requiretrue)
+{int i;for(i=0;names[i];i++);return GetBest(i,names,requiretrue);}
 
 inline int
 DjVuParseOptions::GetInteger

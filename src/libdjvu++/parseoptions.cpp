@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: parseoptions.cpp,v 1.20 2000-01-05 21:54:56 praveen Exp $
+//C- $Id: parseoptions.cpp,v 1.21 2000-01-06 06:11:30 bcr Exp $
 #ifdef __GNUC__
 #pragma implementation
 #endif
@@ -377,50 +377,79 @@ DjVuParseOptions::AmbiguousOptions
 // which are higher priority than default profile values.
 int
 DjVuParseOptions::GetBest
-(const int listsize,const int tokens[])
+(const int listsize,const int tokens[],bool requiretrue)
 {
   const char *r=0;
   int retval=(-1);
   int besttoken=(-1);
   int i;
-  for(i=0;!r&&(i<listsize);r=Arguments->GetValue(tokens[i++])) /* NOP */;
-  if(r)
+  for(i=0;(i<listsize);r=Arguments->GetValue(tokens[i++])) if(r)
   {
-    for(besttoken=tokens[(retval=i-1)];i<listsize;i++)
-    {
-      const char *s=Arguments->GetValue(tokens[i]);
-      if(s)
-      {
-        AmbiguousOptions(besttoken,r,tokens[i],s);
-      }
-    }
-  }else
-  {
-    for(i=0;!r&&(i<listsize);
-      r=Configuration->GetValue(currentProfile,tokens[i++])) /* NOP */;
-    if(r)
+    if((!requiretrue)||(r[0]=='T')||(r[0]=='t')||(atoi(r)))
     {
       for(besttoken=tokens[(retval=i-1)];i<listsize;i++)
       {
-        const char *s=Configuration->GetValue(currentProfile,tokens[i]);
+        const char *s=Arguments->GetValue(tokens[i]);
         if(s)
         {
-          AmbiguousOptions(besttoken,r,tokens[i],s);
-        }
-      }
-    }else
-    {
-      for(i=0;!r&&(i<listsize);
-        r=Configuration->GetValue(defaultProfile,tokens[i++])) /* NOP */;
-      if(r)
-      {
-        for(besttoken=tokens[(retval=i-1)];i<listsize;i++)
-        {
-          const char *s=Configuration->GetValue(defaultProfile,tokens[i]);
-          if(s)
+          if((!requiretrue)||(s[0]=='T')||(s[0]=='t')||(atoi(s)))
           {
             AmbiguousOptions(besttoken,r,tokens[i],s);
           }
+        }
+      }
+      break;
+    }else
+    {
+      r=0;
+    }
+  }
+  if(!r)
+  {
+    for(i=0;!r&&(i<listsize);
+      r=Configuration->GetValue(currentProfile,tokens[i++])) if(r)
+    {
+      if((!requiretrue)||(r[0]=='T')||(r[0]=='t')||(atoi(r)))
+      {
+        for(besttoken=tokens[(retval=i-1)];i<listsize;i++)
+        {
+          const char *s=Configuration->GetValue(currentProfile,tokens[i]);
+          if(s)
+          {
+            if((!requiretrue)||(s[0]=='T')||(s[0]=='t')||(atoi(s)))
+            {
+              AmbiguousOptions(besttoken,r,tokens[i],s);
+            }
+          }
+        }
+        break;
+      }else
+      {
+        r=0;
+      }
+    }
+    if(!r)
+    {
+      for(i=0;!r&&(i<listsize);
+        r=Configuration->GetValue(defaultProfile,tokens[i++])) if(r)
+      {
+        if((!requiretrue)||(r[0]=='T')||(r[0]=='t')||(atoi(r)))
+        {
+          for(besttoken=tokens[(retval=i-1)];i<listsize;i++)
+          {
+            const char *s=Configuration->GetValue(defaultProfile,tokens[i]);
+            if(s)
+            {
+              if((!requiretrue)||(s[0]=='T')||(s[0]=='t')||(atoi(s)))
+              {
+                AmbiguousOptions(besttoken,r,tokens[i],s);
+              }
+            }
+          }
+          break;
+        }else
+        {
+          r=0;
         }
       }
     }
@@ -434,7 +463,7 @@ DjVuParseOptions::GetBest
 // which are higher priority than default profile values.
 int
 DjVuParseOptions::GetBest
-(const int listsize,const char * const xname[])
+(const int listsize,const char * const xname[],bool requiretrue)
 {
   int retval=(-1);
   if(xname && listsize > 0)
@@ -445,7 +474,7 @@ DjVuParseOptions::GetBest
     {
       tokens[j++]=xname[i]?GetVarToken(xname[i]):(-1);
     }
-    retval=GetBest(j,tokens);
+    retval=GetBest(j,tokens,requiretrue);
     delete [] tokens;
   }
   return retval;
