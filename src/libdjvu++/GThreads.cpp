@@ -9,10 +9,10 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GThreads.cpp,v 1.21 1999-04-03 00:13:36 leonb Exp $
+//C- $Id: GThreads.cpp,v 1.22 1999-04-03 16:48:52 leonb Exp $
 
 
-// **** File "$Id: GThreads.cpp,v 1.21 1999-04-03 00:13:36 leonb Exp $"
+// **** File "$Id: GThreads.cpp,v 1.22 1999-04-03 16:48:52 leonb Exp $"
 // This file defines machine independent classes
 // for running and synchronizing threads.
 // - Author: Leon Bottou, 01/1998
@@ -221,10 +221,10 @@ GMonitor::wait()
       // Release
       int sav_count = count;
       count = 1;
-      LeaveCriticalSection(&cs);
-      // Wait
       ResetEvent(hev[0]);
       ResetEvent(hev[1]);
+      // Wait
+      LeaveCriticalSection(&cs);
       WaitForMultipleObjects(2,hev,FALSE,INFINITE);
       // Re-acquire
       EnterCriticalSection(&cs);
