@@ -31,7 +31,7 @@
 #C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #
-# $Id: functions.sh,v 1.85 2001-08-24 21:50:09 docbill Exp $
+# $Id: functions.sh,v 1.86 2001-09-05 23:23:21 docbill Exp $
 # $Name:  $
 
 #
@@ -340,7 +340,13 @@ append_defs()
   done
 }
 
-
+wrap_compiler()
+{
+  if [ -z "$WRAPPER_SET" ]
+  then
+    . ${CONFIG_DIR}/cc-wrapper.sh
+  fi
+}
 
 ### ------------------------------------------------------------------------
 ### Check compiler

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessage.cpp,v 1.69 2001-07-24 17:52:03 bcr Exp $
+// $Id: DjVuMessage.cpp,v 1.70 2001-09-05 23:23:21 docbill Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -97,6 +97,10 @@ static const TCHAR registrypath[]= TEXT("Software\\LizardTech\\DjVu\\Profile Pat
 static const char LocalDjVuDir[] =".DjVu";
 // appended to the home directory.
 static const char RootDjVuDir[] ="/etc/DjVu/";
+#endif
+
+#ifdef LT_DEFAULT_PREFIX
+static const char DjVuPrefixDir[]=LT_DEFAULT_PREFIX "/../profiles";
 #endif
 
 #if !defined(NO_DEBUG) && defined(UNIX)
@@ -301,6 +305,9 @@ DjVuMessage::GetProfilePaths(void)
     {
       appendPath(GURL::UTF8(LocalDjVuDir,GURL::Filename::UTF8(home)),pathsmap,paths);
     }
+#endif
+#ifdef LT_DEFAULT_PREFIX
+    appendPath(GURL::Filename::UTF8(DjVuPrefixDir),pathsmap,paths);
 #endif
     appendPath(GURL::Filename::UTF8(RootDjVuDir),pathsmap,paths);
     pathsmap.empty();
