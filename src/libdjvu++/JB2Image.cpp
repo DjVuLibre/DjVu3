@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: JB2Image.cpp,v 1.10.2.3 1999-06-25 20:05:08 leonb Exp $
+//C- $Id: JB2Image.cpp,v 1.10.2.4 1999-06-25 22:44:41 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -1335,7 +1335,7 @@ _JB2Codec::code(JB2Image *jim)
       int nshape = jim->get_shape_count();
       int nblit = jim->get_blit_count();
       // Initialize shape2lib 
-      shape2lib.touch(nshape-1);
+      shape2lib.resize(0,nshape-1);
       for (i=firstshape; i<nshape; i++)
         shape2lib[i] = -1;
       // Determine shapes that go into library (shapeno>=firstshape)
