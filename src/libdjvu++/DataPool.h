@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.h,v 1.17 1999-09-19 21:20:32 eaf Exp $
+//C- $Id: DataPool.h,v 1.18 1999-09-20 16:06:30 eaf Exp $
  
 #ifndef _DATAPOOL_H
 #define _DATAPOOL_H
@@ -43,7 +43,7 @@
 
     @memo Thread safe data storage
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DataPool.h,v 1.17 1999-09-19 21:20:32 eaf Exp $#
+    @version #$Id: DataPool.h,v 1.18 1999-09-20 16:06:30 eaf Exp $#
 */
 
 //@{
@@ -341,10 +341,11 @@ public:
 	  @param size length of the {\em buffer} */
    void		add_data(const void * buffer, int offset, int size);
 
-      /** Tells the #DataPool# that no more data will be added by means
-	  of \Ref{add_data}() function. When #EOF# is true, any reader
-	  attempting to read non existing data will read #0# bytes instead
-	  of being blocked. This will also call all registered trigger
+      /** Tells the #DataPool# that all data has been added and nothing else
+	  is anticipated. When #EOF# is true, any reader attempting to read
+	  non existing data will not be blocked. It will either read #ZERO#
+	  bytes or will get an #"EOF"# exception (see \Ref{get_data}()).
+	  Calling this function will also activate all registered trigger
 	  callbacks.
 
 	  {\bf Note:} This function is meaningless and does nothing
@@ -377,7 +378,22 @@ public:
 		   the reader is blocked, it should run in a separate thread
 		   so that other threads have a chance to call \Ref{add_data}().
 		   If there is no data available, but \Ref{is_eof}() is #TRUE#
-		   then this function will return #ZERO#.
+		   the behaviour is different and depends on the #DataPool#'s
+		   estimate of the file size:
+		   \begin{itemize}
+		      \item If #DataPool# learns from the IFF structure of the
+		            data, that its size should be greater than it
+			    really is, then any attempt to read nonexisting
+			    data in the range of {\em valid} offsets will
+			    result in an #"EOF"# exception. This is done to
+			    indicate, that there was an error in adding data,
+			    and the data requested is {\bf supposed} to be
+			    there, but has actually not been added.
+		      \item If #DataPool#'s expectations about the data size
+		            coinside with the reality then any attempt to
+			    read data beyond the legal range of offsets will
+			    result in #ZERO# bytes returned.
+		   \end{itemize}.
           \end{enumerate}.
 
 	  @param buffer Buffer to be filled with data
@@ -385,6 +401,8 @@ public:
 	  @param size Size of the {\em buffer}
 	  @return The number of bytes actually read
 	  @exception STOP The stream has been stopped
+	  @exception EOF The requested data is not there and will not be added,
+	             although it should have been.
       */
    int		get_data(void * buffer, int offset, int size);
 
