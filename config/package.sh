@@ -179,6 +179,11 @@ archive=`cd "$packagedir" 1>>/dev/null 2>>/dev/null;pwd`/archive.tar
   done
 )
 cd packages
+(
+  cd "$name"
+  tar xvf "$archive"
+  rm -f "$archive"
+)
 tar cvvf "$name-$version-$SYS".tar "$name"
 gzip -f "$name-$version-$SYS".tar
 rm -rf "$name"
