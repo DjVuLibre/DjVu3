@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.118 2001-07-19 21:56:48 bcr Exp $
+// $Id: GString.cpp,v 1.119 2001-07-20 23:14:16 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -1933,7 +1933,7 @@ GBaseString::getNative2UTF8(void) const
     retval=NativeToUTF8();
     if(!retval.length())
     {
-      retval=*this;
+      retval=(const char *)(*this);
     }
   }
   return retval;
