@@ -1,5 +1,5 @@
 /*C-  -*- C -*-
- * $Id: jri_md.h,v 1.5 2001-08-17 17:02:02 docbill Exp $
+ * $Id: jri_md.h,v 1.6 2001-08-20 16:02:03 docbill Exp $
  * $Name:  $
  */
 

@@ -31,7 +31,7 @@
 #C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #
-# $Id: functions.sh,v 1.76 2001-08-17 17:02:01 docbill Exp $
+# $Id: functions.sh,v 1.77 2001-08-20 16:02:02 docbill Exp $
 # $Name:  $
 
 #

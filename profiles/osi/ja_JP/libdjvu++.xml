@@ -10,9 +10,6 @@
   value="パラメーター &apos;%1!s!&apos;" />
 <MESSAGE name="DjVuMessage.failed_to_parse_XML" number="10002"
   value="[%0!05u!] XMLメッセージを解析することができません。ファイル：;&#09;&apos;%1!s!&apos;" />
-<MESSAGE name="DjVuText.corrupt_text" number="10100">
-[1-%0!05u!] Text layer hierarchy is corrupt"
-</MESSAGE>
 <MESSAGE name="DjVuText.no_text" number="10101">
 [1-%0!05u!] テキストが必要です。テキストが見つかりませんでした。
 </MESSAGE>
@@ -20,7 +17,7 @@
 [1-%0!05u!] ファイルチャンクが不正です。ファイルチャンクが短すぎます。
 </MESSAGE>
 <MESSAGE name="DjVuText.bad_version" number="10103">
-[1-%0!05u!] テキストバージョン '%1!c!' はサポートしていません。
+[1-%0!05u!] テキストバージョン &apos;%1!c!&apos; はサポートしていません。
 </MESSAGE>
 <MESSAGE name="DjVuText.one_word" number="10104">
 [1-%0!05u!] 単語中にセパレータが見つかりました。
@@ -40,16 +37,12 @@
   value="[%0!05u!] この ByteStream では後方に捜索することができません。" />
 <MESSAGE name="ByteStream.bad_arg" number="11701"
   value="[%0!05u!] ByteStream::seek に不正な引数があります。" />
-<MESSAGE name="ByteStream.bad_mode2" number="11702"
-  value="[%0!05u!] stdin/stdoutファイル記述子が不正なモードです。" />
 <MESSAGE name="ByteStream.bad_mode" number="11703"
   value="[%0!05u!] StdioByteStream に不正なモードがあります。" />
 <MESSAGE name="ByteStream.cant_write" number="11704"
   value="[%0!05u!] デコード時に作成される BSByteStream に書き込めません。" />
 <MESSAGE name="ByteStream.corrupt" number="11705"
   value="[%0!05u!] デコーダーからの入力情報が破損しています。" />
-<MESSAGE name="ByteStream.decoder_only" number="11706"
-  value="[%0!05u!] NEED_DECODER_ONLY でコンパイルされます。" />
 <MESSAGE name="ByteStream.flush_error" number="11707"
   value="[%0!05u!] StdioByteStream::flush、フラッシュエラー" />
 <MESSAGE name="ByteStream.no_read" number="11708"
@@ -74,8 +67,6 @@
   value="[%0!05u!] ByteStream::write%1!s!、書き込みエラー" />
 <MESSAGE name="ByteStream.write_error2" number="11718"
   value="[%0!05u!] StdioByteStream::write、書き込みエラー" />
-<MESSAGE name="ByteStream.write_error3" number="11719"
-  value="[%0!05u!] StaticByteStream に書き込めません。" />
 <MESSAGE name="ByteStream.write_error" number="11720"
   value="[%0!05u!] ByteStream::write に未知のエラーがあります。" />
 <MESSAGE name="ByteStream.not_implemented" number="11721"
@@ -94,8 +85,6 @@
   value="[%0!05u!] 範囲の起点は負の値ではいけません。" />
 <MESSAGE name="DataPool.no_threadless" number="11806"
   value="[%0!05u!] 内部エラーです：このファンクションはスレッドレスモードで使用することは出来ません。" />
-<MESSAGE name="DataPool.reenter" number="11807"
-  value="[%0!05u!] DATA_POOL_REENTER" />
 <MESSAGE name="DataPool.seek_backward" number="11808"
   value="[%0!05u!] この ByteStream では EOF から後方に走査することができません。" />
 <MESSAGE name="DataPool.zero_DataPool" number="11809"
@@ -162,16 +151,8 @@
   value="[%0!05u!] GLObject()：誤ったオブジェクト型が渡されました。STRING または SYMBOL を指定してください。" />
 <MESSAGE name="DjVuAnno.bad_url" number="12201"
   value="[%0!05u!] URL仕様が無効です。" />
-<MESSAGE name="DjVuAnno.bad_version" number="12202"
-  value="[%0!05u!] バージョン &apos;%1!s!&apos; はテキストゾーン情報をサポートしていません。" />
 <MESSAGE name="DjVuAnno.bad_zoom" number="12203"
   value="[%0!05u!] ズーム仕様が正しくありません。" />
-<MESSAGE name="DjVuAnno.corrupt_chunk" number="12204"
-  value="[%0!05u!] TXT チャンクが破損しています。" />
-<MESSAGE name="DjVuAnno.corrupt_text" number="12205"
-  value="[%0!05u!] テキストゾーン階層が破損しています。" />
-<MESSAGE name="DjVuAnno.dupl_text" number="12206"
-  value="[%0!05u!] TXT 注釈が重複しています。" />
 <MESSAGE name="DjVuAnno.invalid2list" number="12207"
   value="[%0!05u!] オブジェクトタイプが無効です　リストに変換することができません。" />
 <MESSAGE name="DjVuAnno.invalid2number" number="12208"
@@ -192,16 +173,12 @@
   value="[%0!05u!] オブジェクト &apos;%1!s!&apos;の内容を走査中にエラーが発生しました：;&apos;(&apos; のあとにはパーレンでなくオブジェクト名を記述します。" />
 <MESSAGE name="DjVuAnno.no_string" number="12216"
   value="[%0!05u!] オブジェクト &apos;%1!s!&apos; の内容を走査中にエラーが発生しました：;&apos;(&apos; のあとには文字列でなくオブジェクト名を記述します。" />
-<MESSAGE name="DjVuAnno.no_text" number="12217"
-  value="[%0!05u!] エンコードできるテキスト情報ではありません。" />
 <MESSAGE name="DjVuAnno.number2list" number="12218"
   value="[%0!05u!] オブジェクトタイプが無効です　数値 &apos;%1!d!&apos; を複合オブジェクトに変換することができません。" />
 <MESSAGE name="DjVuAnno.number2string" number="12219"
   value="[%0!05u!] オブジェクトタイプが無効です　数値 &apos;%1!d!&apos; を文字列に変換することができません。" />
 <MESSAGE name="DjVuAnno.number2symbol" number="12220"
   value="[%0!05u!] オブジェクトタイプが無効です　数値 &apos;%1!d!&apos; をシンボルに変換することができません。" />
-<MESSAGE name="DjVuAnno.one_word" number="12221"
-  value="[%0!05u!] すべての語にマッチする検索モードでは検索文字列が1つでなくてはなりません。" />
 <MESSAGE name="DjVuAnno.paren" number="12222"
   value="[%0!05u!] オブジェクト &apos;%1!s!&apos; の内容を走査中にエラーが発生しました：;&apos;(&apos; の直後にはオブジェクト名を記述します。" />
 <MESSAGE name="DjVuAnno.string2list" number="12223"
@@ -258,8 +235,6 @@
   value="[%0!05u!] サムネイルが破損しています。" />
 <MESSAGE name="DjVuDocument.big_num" number="12403"
   value="[%0!05u!] ページ番号が大きすぎます。" />
-<MESSAGE name="DjVuDocument.cant_extract2" number="12404"
-  value="[%0!05u!] サムネイルが作成できません:" />
 <MESSAGE name="DjVuDocument.cant_extract" number="12405"
   value="[%0!05u!] プレデコードされたサムネイルが作成できません:" />
 <MESSAGE name="DjVuDocument.cant_render" number="12406"
@@ -270,8 +245,6 @@
   value="[%0!05u!] 無効なURL が DjVuDocument に存在します。" />
 <MESSAGE name="DjVuDocument.exclude_page" number="12409"
   value="[%0!05u!] エラーのため %1!d! ページをファイルリストから削除されます。" />
-<MESSAGE name="DjVuDocument.fail_file" number="12410"
-  value="[%0!05u!] &apos;%1!s!&apos; を読み込めません。" />
 <MESSAGE name="DjVuDocument.fail_URL" number="12411"
   value="[%0!05u!] URL &apos;%1!s!&apos; のデータの取得に失敗しました。" />
 <MESSAGE name="DjVuDocument.file_outside" number="12412"
@@ -338,8 +311,6 @@
   value="[%0!05u!] デコーダ：データが破損しています。(Sxxx チャンクの後に Dxxx チャンクがあります。)" />
 <MESSAGE name="DjVuFile.empty_URL" number="12513"
   value="[%0!05u!] DjVuFile が空の URL を参照しています。" />
-<MESSAGE name="DjVuFile.EOF" number="12514"
-  value="[%0!05u!] 読み込み中に予期しない EOF が見つかりました。" />
 <MESSAGE name="DjVuFile.failed" number="12515"
   value="[%0!05u!] &apos;%1!s!&apos; 失敗しました。" />
 <MESSAGE name="DjVuFile.illegal_chunk" number="12516"
@@ -490,8 +461,6 @@
   value="[%0!05u!] 不正なズーム要因が印刷コードに渡されました。" />
 <MESSAGE name="DjVuToPS.big_page" number="13311"
   value="[%0!05u!] ページ番号 %1!d! が大きすぎます。" />
-<MESSAGE name="DjVuToPS.cant_decode" number="13312"
-  value="[%0!05u!] ページ &apos;%1!s!&apos; のデコードに失敗しました。" />
 <MESSAGE name="DjVuToPS.empty_image" number="13313"
   value="[%0!05u!] 空のページの印刷を試みました。" />
 <MESSAGE name="DjVuToPS.empty_rect" number="13314"
@@ -500,18 +469,12 @@
   value="[%0!05u!] ページ %1!d! の画像を取得できませんでした。" />
 <MESSAGE name="DjVuToPS.no_landscape" number="13316"
   value="[%0!05u!] LANDSCAPE モードは EPS 形式でサポートされていません。" />
-<MESSAGE name="DjVuToPS.no_memory" number="13317"
-  value="[%0!05u!] 画像を印刷するために必要なメモリがありません。" />
 <MESSAGE name="DjVuToPS.no_to" number="13318"
   value="[%0!05u!] &apos;To&apos; で指定されているページが見つかりません &apos;%1!s!&apos;" />
 <MESSAGE name="DjVuToPS.only_one_page" number="13319"
   value="[%0!05u!] EPSフォーマットでは複数のページを印刷することができません。" />
 <MESSAGE name="EOF" number="13400"
   value="予想外の位置でファイルが終了しています。" />
-<MESSAGE name="Error" number="13500"
-  value="エラー" />
-<MESSAGE name="error" number="13600"
-  value="エラー" />
 <MESSAGE name="Failed" number="13700"
   value="失敗しました。" />
 <MESSAGE name="GBitmap.bad_format" number="13800"
@@ -577,7 +540,7 @@
 <MESSAGE name="GIFFManager.no_brackets" number="14107"
   value="[%0!05u!] チャンク名には括弧を含んではいけません。" />
 <MESSAGE name="GIFFManager.no_chunk" number="14108"
-  value="[%0!05u!] チャンク &apos;%3!s!d!&apos; にサブチャンク &apos;%1!s!&apos; #%2! がありません。" />
+  value="[%0!05u!] チャンク &apos;%3!s!&apos; にサブチャンク &apos;%1!s!&apos; #%2!d! がありません。" />
 <MESSAGE name="GIFFManager.no_dots" number="14109"
   value="[%0!05u!] チャンク名にはドットを含んではいけません。" />
 <MESSAGE name="GIFFManager.no_top_cont" number="14110"
@@ -586,10 +549,8 @@
   value="[%0!05u!] トップレベルチャンク名がわかりません。" />
 <MESSAGE name="GIFFManager.one_colon" number="14112"
   value="[%0!05u!] チャンク名には１つのコロンだけを含むことが出来ます。" />
-<MESSAGE name="GIFFManager.unbalanced" number="14113"
-  value="[%0!05u!] チャンク名で括弧がアンバランスです。" />
 <MESSAGE name="GIFFManager.unknown" number="14114"
-  value="[%0!05u!] 内部エラー：チャンク &apos;%1！s！&apos; が不明です。" />
+  value="[%0!05u!] 内部エラー：チャンク &apos;%1!s!&apos; が不明です。" />
 <MESSAGE name="GIFFManager.unmatched" number="14115"
   value="[%0!05u!] チャンクにマッチしない括弧があります。" />
 <MESSAGE name="GIFFManager.wrong_name2" number="14116"
@@ -616,16 +577,6 @@
   value="[%0!05u!] 領域の高さがゼロです。" />
 <MESSAGE name="GMapAreas.zero_width" number="14209"
   value="[%0!05u!] 領域の幅がゼロです。" />
-<MESSAGE name="GOS.big_name" number="14300"
-  value="[%0!05u!] ファイル名の長さがシステムの限度を上回っています。" />
-<MESSAGE name="GOS.cleardir" number="14301"
-  value="[%0!05u!] このプラットフォームでは GOS::cleardir() を正しく実装してください。" />
-<MESSAGE name="GOS.unknown1" number="14302"
-  value="[%0!05u!] 未知の libc エラー (エラー番号 = %1!d!)" />
-<MESSAGE name="GOS.unknown2" number="14303"
-  value="[%0!05u!] Windows CE 下の GOS.cpp で未知のエラーが発生しました。 (エラー番号 = %1!d!)" />
-<MESSAGE name="GOS.unknown3" number="14304"
-  value="[%0!05u!] &apos;%1!s!&apos; (エラー番号 = %2!d!)" />
 <MESSAGE name="GPixmap.bad_param" number="14400"
   value="[%0!05u!] (GPixmap::color_correct) 不正なパラメータ" />
 <MESSAGE name="GPixmap.diff_size" number="14401"
@@ -753,8 +704,6 @@
   value="[%0!05u!] 内部エラー" />
 <MESSAGE name="IW44Image.bad_rect" number="15300"
   value="[%0!05u!] (IWMap::image) 矩形が範囲外です。" />
-<MESSAGE name="IW44Image.cant_estimate" number="15301"
-  value="[%0!05u!] デコード中にエラーを評価できませんでした。" />
 <MESSAGE name="IW44Image.cant_read_primary2" number="15302"
   value="[%0!05u!] (IWPixmap::decode_chunk) プライマリヘッダを読むことができません。" />
 <MESSAGE name="IW44Image.cant_read_primary" number="15303"
@@ -769,18 +718,10 @@
   value="[%0!05u!] (IWBitmap::decode_chunk) 3番目のヘッダを読むことができません。" />
 <MESSAGE name="IW44Image.codec_open2" number="15308"
   value="[%0!05u!] (IWBitmap::decode_chunk) デコードの Codec が開いたままです。" />
-<MESSAGE name="IW44Image.codec_open3" number="15309"
-  value="[%0!05u!] (IWPixmap::decode_chunk) エンコードの Codec が開いたままです。" />
-<MESSAGE name="IW44Image.codec_open4" number="15310"
-  value="[%0!05u!] (IWPixmap::decode_chunk) デコードの Codec が開いたままです。" />
-<MESSAGE name="IW44Image.codec_open" number="15311"
-  value="[%0!05u!] (IWBitmap::decode_chunk) エンコードの Codec が開いたままです。" />
 <MESSAGE name="IW44Image.corrupt_BM44_2" number="15312"
   value="[%0!05u!] (IWPixmap::decode_iff) ファイルが壊れています。(FORM.BM44 が読み込めません。)" />
 <MESSAGE name="IW44Image.corrupt_BM44" number="15313"
   value="[%0!05u!] (IWBitmap::decode_iff) ファイルが壊れています。(FORM.BM44 が読み込めません。)" />
-<MESSAGE name="IW44Image.decoder_only" number="15314"
-  value="[%0!05u!] NEED_DECODER_ONLY でコンパイルされました。" />
 <MESSAGE name="IW44Image.empty_object2" number="15315"
   value="[%0!05u!] (IWPixmap::encode_chunk) IWBitmap オブジェクトが空です。" />
 <MESSAGE name="IW44Image.empty_object" number="15316"
@@ -863,26 +804,22 @@
   value="[%0!05u!] 実装されていません" />
 <MESSAGE name="parseoptions.ambiguous" number="15800"
   value="[%0!05u!] オプションがあいまいです：&apos;%1!s!=%2!s!&apos; と &apos;%3!s!=%4!s!&apos; が指定されています。" />
-<MESSAGE name="parseoptions.bad_install" number="15801"
-  value="[%0!05u!] SDK が正しくインストールされていません。再インストールしてください。" />
 <MESSAGE name="parseoptions.bad_number" number="15802"
   value="[%0!05u!] &apos;%1!s!&apos; は数値ではありません。" />
 <MESSAGE name="parseoptions.bad_value" number="15803"
   value="[%0!05u!] &apos;%1!s!&apos; は数値またはブーリアン値ではありません。" />
 <MESSAGE name="parseoptions.cant_inherit" number="15804"
-  value="[%0!05u!] &apos;%1!s!&apos;：&apos;%3!s!&apos;の行 %2! でエラーが発生しました。&#09;--&gt; 未知のプロファイル &apos;%4!s!d!&apos; を継承できません。" />
+  value="[%0!05u!] &apos;%1!s!&apos;：&apos;%3!s!&apos;の行 %2!d! でエラーが発生しました。&#09;--&gt; 未知のプロファイル &apos;%4!s!&apos; を継承できません。" />
 <MESSAGE name="parseoptions.illegal_profile" number="15805"
-  value="[%0!05u!] &apos;%1!s!&apos;：プロファイル &apos;%3!s!&apos; の行 %2! でエラーが発生しました。&#09;--&gt; 無効なプロファイル名 &apos;%4!s!d!&apos;。" />
+  value="[%0!05u!] &apos;%1!s!&apos;：プロファイル &apos;%3!s!&apos; の行 %2!d! でエラーが発生しました。&#09;--&gt; 無効なプロファイル名 &apos;%4!s!&apos;。" />
 <MESSAGE name="parseoptions.missing_arg_option" number="15806"
   value="[%0!05u!] 引数が必要です： --&apos;%1!s!&apos;" />
 <MESSAGE name="parseoptions.profile_error" number="15807"
-  value="[%0!05u!] &apos;%1!s!&apos;：プロファイル &apos;%3!s!&apos; の行 %2! でエラーが発生しました。&#09;--&gt; %4!s!d!" />
+  value="[%0!05u!] &apos;%1!s!&apos;：プロファイル &apos;%3!s!&apos; の行 %2!d! でエラーが発生しました。&#09;--&gt; %4!s!" />
 <MESSAGE name="parseoptions.unrecog_option_c" number="15808"
   value="[%0!05u!] 認識できないオプション -&apos;%1!s!&apos;" />
 <MESSAGE name="parseoptions.unrecog_option" number="15809"
   value="[%0!05u!] 認識できないオプション &apos;%1!s!&apos;" />
-<MESSAGE name="Stat" number="15900"
-  value="[%0!05u!] Stat" />
 <MESSAGE name="STOP" number="16000"
   value="[%0!05u!] トラップできないストップメッセージ。" />
 <MESSAGE name="TextException.test" number="16100"
@@ -923,11 +860,35 @@
   value="[%0!05u!] 整形式XML文書エラー。終了タグが多すぎます。" />
 <MESSAGE name="XMLTags.no_body" number="16306"
   value="[%0!05u!] ボディがありません。" />
-<MESSAGE name="XMLTags.unmatched_end" number="16307"
-  value="[%0!05u!] 行 %2u のXMLタグ &apos;%1!s!&apos; は行 %2u のXMLタグ &apos;%2!s!&apos; で終了しています。" />
 <MESSAGE name="ZPCodec.no_encoding" number="16400"
   value="[%0!05u!] エンコードの ZPCodec が作成されていません。" />
 <MESSAGE name="ZPCodec.write_error" number="16401"
   value="[%0!05u!] ZPCodec 書込みエラー" />
+<MESSAGE name="DjVuText.corrupt_text" number="10100">
+[1-%0!05u!] Text layer hierarchy is corrupt"
+</MESSAGE>
+<MESSAGE name="DataPool.reenter" number="11807"
+  value="[%0!05u!] DATA_POOL_REENTER" />
+<MESSAGE name="DjVuFile.EOF" number="12514">
+[1-%0!05u!] Unexpected End Of File Encountered Reading:
+	%1!s!.
+</MESSAGE>
+<MESSAGE name="Error" number="13500">
+Error: %1!s!.
+</MESSAGE>
+<MESSAGE name="error" number="13600">
+Error: %1!s!.
+</MESSAGE>
+<MESSAGE name="XMLTags.unmatched_end" number="16307">
+[1-%0!05u!] XML tag &apos;%1!s!&apos; on line %2!u! was terminated with XML
+tag &apos;%3!s!&apos; line %4!u!.
+</MESSAGE>
+<MESSAGE name="DjVuDynamicLib.failed_open2" number="16402">
+[1-%0!05u!] Failed to open dynamic library '%1!s!'.
+	System reported: '%2!s!'.
+</MESSAGE>
+<MESSAGE name="DjVuDynamicLib.failed_open" number="16403">
+[1-%0!05u!] Failed to open dynamic library '%1!s!'.
+</MESSAGE>
 </BODY>
 </DjVuMessages>
