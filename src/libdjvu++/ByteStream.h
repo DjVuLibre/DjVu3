@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: ByteStream.h,v 1.23 2000-11-01 18:52:51 bcr Exp $
+//C- $Id: ByteStream.h,v 1.24 2000-11-02 00:08:51 menders Exp $
 
 
 #ifndef _BYTESTREAM_H
@@ -41,7 +41,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation\\
     Andrei Erofeev <eaf@geocities.com> -- 
     @version
-    #$Id: ByteStream.h,v 1.23 2000-11-01 18:52:51 bcr Exp $# */
+    #$Id: ByteStream.h,v 1.24 2000-11-02 00:08:51 menders Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -246,7 +246,7 @@ public:
   virtual void flush(void);
   virtual int seek(long offset, int whence = SEEK_SET, bool nothrow=false);
   virtual long tell() const;
-  virtual ungetc(char x);
+  virtual int ungetc(int x);
 private:
   // Cancel C++ default stuff
   StdioByteStream(const StdioByteStream &);
@@ -372,8 +372,8 @@ StaticByteStream::size(void) const
   return bsize;
 }
 
-inline int 
-StaticByteStream::ungetc(int x)
+inline int
+StdioByteStream::ungetc(int x)
 {
   int retval;
   if((retval=ungetc(x))!=EOF)
