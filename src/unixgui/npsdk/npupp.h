@@ -1,11 +1,11 @@
 /*C-  -*- C -*-
- * $Id: npupp.h,v 1.11 2001-08-24 00:05:47 docbill Exp $
+ * $Id: npupp.h,v 1.12 2001-08-24 15:40:31 docbill Exp $
  * $Name:  $
  */
 
 /* -*- Mode: C; tab-width: 4; -*- */
 /*
- *  npupp.h $Revision: 1.11 $
+ *  npupp.h $Revision: 1.12 $
  *  function call mecahnics needed by platform specific glue code.
  */
 

@@ -31,12 +31,12 @@
 #C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #
-# $Id: cxx.sh,v 1.35 2001-08-24 00:05:47 docbill Exp $
+# $Id: cxx.sh,v 1.36 2001-08-24 15:40:30 docbill Exp $
 # $Name:  $
 
 # This rule sets the following variables:
 #	CXX, CXXFLAGS, CXXSYMBOLIC, CXXPIC, CXXUNROLL, CXXWARN
-# $Id: cxx.sh,v 1.35 2001-08-24 00:05:47 docbill Exp $
+# $Id: cxx.sh,v 1.36 2001-08-24 15:40:30 docbill Exp $
 
 if [ -z "$CONFIG_DIR" ]
 then
@@ -48,6 +48,7 @@ ECXX="eg++"
 if [ -z "$CXX_SET" ]
 then
   (echo '#include <unistd.h>'
+   echo '#include <stdlib.h>'
    echo 'extern "C" {void exit(int);};void foo(void) {exit(0);}') |testfile $temp.cpp
   
   CXXFLAGS=""

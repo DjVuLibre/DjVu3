@@ -31,12 +31,12 @@
 #C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #
-# $Id: cxxpic.sh,v 1.12 2001-08-24 00:05:47 docbill Exp $
+# $Id: cxxpic.sh,v 1.13 2001-08-24 15:40:30 docbill Exp $
 # $Name:  $
 
 # This rule sets the following variables:
 #	CXXSYMBOLIC, CXXPIC
-# $Id: cxxpic.sh,v 1.12 2001-08-24 00:05:47 docbill Exp $
+# $Id: cxxpic.sh,v 1.13 2001-08-24 15:40:30 docbill Exp $
 
 if [ -z "$CXX_SET" ] ; then
   echo "You must source cxx.sh" 1>&2
@@ -47,6 +47,7 @@ if [ -z "$CXXPIC_SET" ] ; then
   CXXSYMBOLIC=""
   CXXPIC=""
   (echo '#include <unistd.h>'
+   echo '#include <stdlib.h>'
    echo 'extern "C" {void exit(int);};void foo(void) {exit(0);}') |testfile $temp.cpp
   
   echon "Checking ${CXX} symbolic option ... "

@@ -31,7 +31,7 @@
 #C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #
-# $Id: iconv.sh,v 1.3 2001-08-24 00:05:47 docbill Exp $
+# $Id: iconv.sh,v 1.4 2001-08-24 15:40:30 docbill Exp $
 # $Name:  $
 
 # This script sets the variables:
@@ -47,6 +47,7 @@ then
   ICONV_TEST=true
   (echo '#include <iconv.h>'
   echo '#include <unistd.h>'
+  echo '#include <stdlib.h>'
   echo 'int main(int argc,char *[],char *[])'
   echo '{iconv_t cv=iconv_open("UTF-8","UTF-8");exit(0);}'
   )|testfile $temp.cpp
