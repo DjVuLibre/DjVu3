@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: djvuextract.cpp,v 1.19 1999-10-05 16:00:07 leonb Exp $
+//C- $Id: djvuextract.cpp,v 1.20 2000-02-14 21:44:32 leonb Exp $
 
 /** @name djvuextract
 
@@ -34,27 +34,16 @@
       using programs \Ref{d44}.
     \item Optionally one can provide a #-page# option to select a given
       page from the document, if it's a multipage document. The page numbers
-      start from #1#. The exact behaviour of the program depends on the document
-      type:
-      \begin{itemize}
-         \item {\bf Multipage all-in-one-file DjVu documents.}
-
-	 If the option is specified, the desired page will be open. Otherwise
-	 the first page.
-
-	 \item {\bf Multipage each-page-in-separate-file DjVu documents.}
-
-	 Here, if no #-page# option is given, the page corresponding to the
-	 specified file will be considered. Otherwise the program will process
-	 the given file in search of navigation directory, will learn the name
-	 of the file containing the desired page, will open and interpret it.
-      \end{itemize}
+      start from #1#.
     \end{itemize}
+    This commands also supports #"Smmr"# chunks for G4/MMR encoded masks,
+    #"FGjp"# and #"BGjp"# for JPEG encoded color layers, and finally #"FG2k"#
+    and #"BG2k"# for JPEG-2000 encoded color layers.
 
     @memo
     Extract components from DjVu files.
     @version
-    #$Id: djvuextract.cpp,v 1.19 1999-10-05 16:00:07 leonb Exp $#
+    #$Id: djvuextract.cpp,v 1.20 2000-02-14 21:44:32 leonb Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> - Initial implementation\\
     Andrei Erofeev <eaf@research.att.com> - Multipage support */
