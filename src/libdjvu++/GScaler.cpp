@@ -7,10 +7,10 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: GScaler.cpp,v 1.1 1999-01-22 00:40:19 leonb Exp $
+//C-  $Id: GScaler.cpp,v 1.2 1999-01-28 16:33:25 leonb Exp $
 
 // Rescale images with fast bilinear interpolation
-// $Id: GScaler.cpp,v 1.1 1999-01-22 00:40:19 leonb Exp $
+// $Id: GScaler.cpp,v 1.2 1999-01-28 16:33:25 leonb Exp $
 
 #include "GScaler.h"
 
@@ -232,7 +232,7 @@ GScaler::get_input_rect( const GRect &desired_output, GRect &required_input )
 
 
 GBitmapScaler::GBitmapScaler()
-  : lbuffer(0), p1(0), p2(0)
+  : lbuffer(0), conv(0), p1(0), p2(0)
 {
 }
 

@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: DjVuCodec.cpp,v 1.2 1999-01-27 22:08:06 leonb Exp $
+//C-  $Id: DjVuCodec.cpp,v 1.3 1999-01-28 16:33:25 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -293,7 +293,7 @@ DjVuImage::is_legal_color() const
     return 0;
   // Check stencil
   if (stencil)
-    if (stencil->get_width()!=width || stencil->get_height()==height)
+    if (stencil->get_width()!=width || stencil->get_height()!=height)
       return 0;
   // Check background
   int bgred = 0;
@@ -334,7 +334,7 @@ DjVuImage::is_legal_bilevel() const
     return 0;
   // Check stencil
   if (stencil)
-    if (stencil->get_width()!=width || stencil->get_height()==height)
+    if (stencil->get_width()!=width || stencil->get_height()!=height)
       return 0;
   // Check that color information is not present.
   if (get_bg44() || get_bgpm() || get_fgpm())
@@ -636,7 +636,7 @@ do_bitmap(const DjVuImage &dimg, BImager get,
   GRect zrect = rect; 
   zrect.translate(-all.xmin, -all.ymin);
   for (red=1; red<=15; red++)
-    if (((w+red-1)/red==rw) && ((h+red-1)/red==rh))
+    if (rw*red>w-red && rw*red<w+red && rh*red>h-red && rh*red<h+red)
       return (dimg.*get)(zrect, red, align);
   // Find best reduction
   for (red=15; red>1; red--)
@@ -677,7 +677,7 @@ do_pixmap(const DjVuImage &dimg, PImager get,
   GRect zrect = rect; 
   zrect.translate(-all.xmin, -all.ymin);
   for (red=1; red<=15; red++)
-    if (((w+red-1)/red==rw) && ((h+red-1)/red==rh))
+    if (rw*red>w-red && rw*red<w+red && rh*red>h-red && rh*red<h+red)
       return (dimg.*get)(zrect, red, gamma);
   // These reductions usually go faster (improve!)
   static int fastred[] = { 12,6,4,3,2,1 };
