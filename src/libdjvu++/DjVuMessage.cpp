@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessage.cpp,v 1.30 2001-04-12 00:24:59 bcr Exp $
+// $Id: DjVuMessage.cpp,v 1.31 2001-04-16 18:58:15 bcr Exp $
 // $Name:  $
 
 
@@ -54,6 +54,7 @@
 #include <pwd.h>
 #include <sys/types.h>
 #endif
+#include <locale.h>
 
 #ifndef NO_DEBUG
 #if defined(UNIX)
@@ -152,10 +153,11 @@ static GList<GURL>
 GetProfilePaths(void)
 {
   static bool first=true;
-  static GList<GURL> paths;
+  static GList<GURL> realpaths;
   if(first)
   {
     first=false;
+    GList<GURL> paths;
     GURL path;
 #ifndef WINCE
     const GUTF8String envp(GOS::getenv(DjVuEnv));
@@ -205,16 +207,46 @@ GetProfilePaths(void)
       if(!path.is_empty() && path.is_dir())
         paths.append(path);
     }
-//    if(pw)
-//    {
-//      free(pw);
-//    }
 #endif
     path=GURL::Filename::UTF8(RootDjVuDir);
     if(!path.is_empty() && path.is_dir())
       paths.append(path);
+    GString oldlocale(setlocale(LC_CTYPE,0));
+    GString defaultlocale((oldlocale.search('_') < 0)
+      ?setlocale(LC_CTYPE,"")
+      :(const char *)oldlocale);
+    if(oldlocale != defaultlocale)
+    {
+      setlocale(LC_CTYPE,(const char *)oldlocale);
+    }
+    GPosition pos;
+    for(pos=paths;pos;++pos)
+    {
+      path=GURL::UTF8(defaultlocale,paths[pos]);
+      if(path.is_dir())
+      {
+        realpaths.append(path);
+      }
+    }
+    const int underscore=defaultlocale.search('_');
+    if(underscore > 0)
+    {
+      defaultlocale=defaultlocale.substr(0,underscore);
+      for(pos=paths;pos;++pos)
+      {
+        path=GURL::UTF8(defaultlocale,paths[pos]);
+        if(path.is_dir())
+        {
+          realpaths.append(path);
+        }
+      }
+    }
+    for(pos=paths;pos;++pos)
+    {
+      realpaths.append(paths[pos]);
+    }
   }
-  return paths;
+  return realpaths;
 }
 
 static void
