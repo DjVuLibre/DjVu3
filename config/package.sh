@@ -31,7 +31,7 @@
 #C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #
-# $Id: package.sh,v 1.17 2001-02-02 23:05:53 bcr Exp $
+# $Id: package.sh,v 1.18 2001-02-07 01:05:36 bcr Exp $
 # $Name:  $
 
 # EXIT ON ERROR
@@ -171,7 +171,9 @@ archive=`cd "$packagedir" 1>>/dev/null 2>>/dev/null;pwd`/archive.tar
         sed -e "s,@%VERSION%@,$version,g" -e "s,@%SYS%@,$SYS,g" -e "/@%RTK%@/d" -e 's,%,@%%@,g' -e 's, ,@%s%@,g' < "$srcfilelist" ;
       fi`
   do
-    i=`echo "$i"|sed -e 's,@%s%@, ,g' -e 's,@%%@,%,g'`
+    i=`echo "$i"|sed -e 's,@%s%@, ,g' -e 's,@%%@,%,g' -e 's, *$,,g'`
+    if [ -n "$i" ] 
+    then
     if [ -d "./$i" ]
     then
       for j in `find "$i" -name CVS -prune -o -type f -print|sed -e 's,%,@%%@,g' -e 's, ,@%s%@,g'` ; do
@@ -216,6 +218,7 @@ archive=`cd "$packagedir" 1>>/dev/null 2>>/dev/null;pwd`/archive.tar
           fi
         fi
       )
+    fi
     fi
     if [ ! -d "$abspackagedir" ]
     then
