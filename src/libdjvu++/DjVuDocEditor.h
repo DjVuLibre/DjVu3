@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocEditor.h,v 1.42 2001-06-25 18:24:46 bcr Exp $
+// $Id: DjVuDocEditor.h,v 1.43 2001-06-26 22:45:23 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUDOCEDITOR_H
@@ -51,7 +51,7 @@
 
     @memo DjVu document editor class.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: DjVuDocEditor.h,v 1.42 2001-06-25 18:24:46 bcr Exp $#
+    @version #$Id: DjVuDocEditor.h,v 1.43 2001-06-26 22:45:23 bcr Exp $#
 */
 
 //@{
@@ -358,7 +358,7 @@ private:
    GPMap<GUTF8String, File>	files_map; 	// files_map[id]=GP<File>
    GCriticalSection	files_lock;
 
-   GMap<GUTF8String, void *>thumb_map;
+   GPMap<GUTF8String,DataPool> thumb_map;
    GCriticalSection	thumb_lock;
 
    void		(* refresh_cb)(void *);

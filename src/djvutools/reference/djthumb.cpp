@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djthumb.cpp,v 1.22 2001-06-13 18:26:19 bcr Exp $
+// $Id: djthumb.cpp,v 1.23 2001-06-26 22:45:23 bcr Exp $
 // $Name:  $
 
 // DJTHUMB -- DjVu thumbnails generator
@@ -68,7 +68,7 @@
     @author
     Andrei Erofeev <eaf@geocities.com> -- initial implementation
     @version
-#$Id: djthumb.cpp,v 1.22 2001-06-13 18:26:19 bcr Exp $# */
+#$Id: djthumb.cpp,v 1.23 2001-06-26 22:45:23 bcr Exp $# */
 //@{
 //@}
 
@@ -207,12 +207,12 @@ main(int argc, char ** argv)
     GP<DjVuDocEditor> edoc=DjVuDocEditor::create_wait(GURL::Filename::UTF8(name_in));
     pages_num=edoc->get_pages_num();
     if (pages_num==1)
-      G_THROW("Thumbnails cannot be generated for one-page documents.");
+      G_THROW( ERR_MSG("djthumb.one_page") );
     
     int page_num=0;
     do 
     { 
-      edoc->generate_thumbnails(size, page_num);
+      page_num=edoc->generate_thumbnails(size, page_num);
       progress_cb(page_num,0);
     }while (page_num>=0);
     
@@ -221,11 +221,12 @@ main(int argc, char ** argv)
     if (stat(name_out.getUTF82Native(), &st)>=0) size_out=st.st_size;
     
     if (verbose && size_in>0 && size_out>0)
-      DjVuFormatErrorUTF8( "%s\t%d\t%d\t%d",
-                       ERR_MSG("djthumb.new_size"),
+    {
+      DjVuFormatErrorUTF8( ERR_MSG("djthumb.new_size") "\t%d\t%d\t%d",
                        size_in, size_out, 100*(size_out-size_in)/size_in);
+    }
   } G_CATCH(exc) {
-    exc.perror();
+    exc.perror( ERR_MSG("Error") );
     exit(1);
   } G_ENDCATCH;
   return 0;

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocEditor.cpp,v 1.80 2001-06-25 18:24:46 bcr Exp $
+// $Id: DjVuDocEditor.cpp,v 1.81 2001-06-26 22:45:23 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -103,13 +103,8 @@ DjVuDocEditor::~DjVuDocEditor(void)
      tmp_doc_url.deletefile();
    }
 
-   GPosition pos;
    GCriticalSectionLock lock(&thumb_lock);
-   while((pos=thumb_map))
-   {
-      delete (TArray<char> *) thumb_map[pos];
-      thumb_map.del(pos);
-   }
+   thumb_map.empty();
    DataPool::close_all();
 }
 
@@ -193,9 +188,7 @@ DjVuDocEditor::init(const GURL &url)
       const GP<DataPool> pool(DjVuDocument::get_thumbnail(page_num, true));
       if (pool)
       {
-	 TArray<char> * data=new TArray<char>(pool->get_size()-1);
-	 pool->get_data(*data, 0, data->size());
-	 thumb_map[page_to_id(page_num)]=data;
+        thumb_map[page_to_id(page_num)]=pool;
       }
    }
       // And remove then from DjVmDir so that DjVuDocument
@@ -895,14 +888,13 @@ DjVuDocEditor::remove_file(const GUTF8String &id, bool remove_unref,
 
       // And get rid of its thumbnail, if any
    GCriticalSectionLock lock(&thumb_lock);
-   GPosition pos;
-   if (thumb_map.contains(id, pos))
+   GPosition pos(thumb_map.contains(id));
+   if (pos)
    {
-      delete (TArray<char> *) thumb_map[pos];
-      thumb_map.del(pos);
+     thumb_map.del(pos);
    }
-
-   if (errors.length()) G_THROW(errors);
+   if (errors.length())
+     G_THROW(errors);
 }
 
 void
@@ -1367,16 +1359,12 @@ DjVuDocEditor::get_thumbnail(int page_num, bool dont_decode)
 {
    const GUTF8String id(page_to_id(page_num));
 
-   GPosition pos;
    GCriticalSectionLock lock(&thumb_lock);
-   if (thumb_map.contains(id, pos))
+   const GPosition pos(thumb_map.contains(id));
+   if (pos)
    {
          // Get the image from the map
-      TArray<char> & data=*(TArray<char> *) thumb_map[pos];
-      const GP<DataPool> pool(DataPool::create());
-      pool->add_data((const char *)data, data.size());
-      pool->set_eof();
-      return pool;
+      return thumb_map[pos];
    } else
    {
       unfile_thumbnails();
@@ -1392,7 +1380,10 @@ DjVuDocEditor::get_thumbnails_num(void) const
    int cnt=0;
    int pages_num=get_pages_num();
    for(int page_num=0;page_num<pages_num;page_num++)
-      if (thumb_map.contains(page_to_id(page_num))) cnt++;
+   {
+     if (thumb_map.contains(page_to_id(page_num)))
+       cnt++;
+   }
    return cnt;
 }
 
@@ -1404,23 +1395,22 @@ DjVuDocEditor::get_thumbnails_size(void) const
 
    GCriticalSectionLock lock((GCriticalSection *) &thumb_lock);
 
-   GPosition pos;
    int pages_num=get_pages_num();
    for(int page_num=0;page_num<pages_num;page_num++)
-      if (thumb_map.contains(page_to_id(page_num), pos))
-      {
-         TArray<char> & data=*(TArray<char> *) thumb_map[pos];
-         const GP<ByteStream> gstr(ByteStream::create());
-         gstr->writall((const char *)data, data.size());
-         gstr->seek(0);
-         GP<IW44Image> iwpix=IW44Image::create_decode(IW44Image::COLOR);
-         iwpix->decode_chunk(gstr);
-        
-         int width=iwpix->get_width();
-         int height=iwpix->get_height();
-         return width<height ? width : height;
-      }
-   return -1;
+   {
+     const GPosition pos(thumb_map.contains(page_to_id(page_num)));
+     if (pos)
+     {
+       const GP<ByteStream> gstr(thumb_map[pos]->get_stream());
+       GP<IW44Image> iwpix=IW44Image::create_decode(IW44Image::COLOR);
+       iwpix->decode_chunk(gstr);
+      
+       int width=iwpix->get_width();
+       int height=iwpix->get_height();
+       return width<height ? width : height;
+    }
+  }
+  return -1;
 }
 
 void
@@ -1432,13 +1422,8 @@ DjVuDocEditor::remove_thumbnails(void)
    unfile_thumbnails();
 
    DEBUG_MSG("clearing thumb_map\n");
-   GPosition pos;
    GCriticalSectionLock lock(&thumb_lock);
-   while((pos=thumb_map))
-   {
-      delete (TArray<char> *) thumb_map[pos];
-      thumb_map.del(pos);
-   }
+   thumb_map.empty();
 }
 
 void
@@ -1498,18 +1483,16 @@ DjVuDocEditor::file_thumbnails(void)
    GP<ByteStream> str(ByteStream::create());
    GP<IFFByteStream> iff(IFFByteStream::create(str));
    iff->put_chunk("FORM:THUM");
-   while(true)
+   for(;;)
    {
-      GPosition pos;
       GUTF8String id(page_to_id(page_num));
-
-      if (!thumb_map.contains(id, pos))
+      const GPosition pos(thumb_map.contains(id));
+      if (! pos)
       {
-         G_THROW( ERR_MSG("DjVuDocEditor.no_thumb") "\t"+GUTF8String(page_num));
+        G_THROW( ERR_MSG("DjVuDocEditor.no_thumb") "\t"+GUTF8String(page_num));
       }
-      TArray<char> & data=*(TArray<char> *) thumb_map[pos];
       iff->put_chunk("TH44");
-      iff->write((const char *)data, data.size());
+      iff->copy(*(thumb_map[pos]->get_stream()));
       iff->close_chunk();
       image_num++;
       page_num++;
@@ -1590,7 +1573,8 @@ DjVuDocEditor::generate_thumbnails(int thumb_size, int page_num)
          parms.bytes=0;
          parms.decibels=0;
          iwpix->encode_chunk(gstr, parms);
-         thumb_map[id]=new TArray<char>(gstr->get_data());
+         gstr->seek(0L);
+         thumb_map[id]=DataPool::create(gstr);
       }
       ++page_num;
    }else
