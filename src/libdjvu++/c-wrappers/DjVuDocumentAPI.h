@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuDocumentAPI.h,v 1.11 2000-01-27 20:36:18 haffner Exp $
+ *C- $Id: DjVuDocumentAPI.h,v 1.12 2000-01-28 23:44:38 haffner Exp $
  */
 
 #ifndef _DJVUDOC_H_
@@ -24,9 +24,6 @@
 #ifdef __cplusplus
 extern "C"
 {
-#ifndef __cplusplus
-}
-#endif
 #endif
 
   /*@{*/
@@ -40,7 +37,6 @@ extern "C"
     When encoded as wavelet, options such as the number of chunks or the
     crcbdelay would be an overkill.
     
-    The #gamma_correction# is set to the same value as the background image.
 */
 
 typedef struct djvu_foreground_options_struct
@@ -64,8 +60,11 @@ typedef struct djvu_foreground_options_struct
       \end{description}
   */
   int quality;
+#ifdef __cplusplus 
+  inline djvu_foreground_options_struct();
+#endif
+  
 } djvu_foreground_options;
-
 
 
 /** List of djvu_segmenter options. */
@@ -293,7 +292,7 @@ typedef struct djvu_segmenter_options_struct
       \item[Command line] yes
       \end{description}
   */
-  int fg_pixel_size;
+  int fg_subsampling;
 
   /** Subsampling for the background image.      
 
@@ -306,7 +305,7 @@ typedef struct djvu_segmenter_options_struct
       \item[Command line] yes
       \end{description}
    */
-  int bg_pixel_size;
+  int bg_subsampling;
 
   /*@}*/
 
@@ -463,10 +462,14 @@ DJVUAPI
 void documenttodjvu_usage(int fd,const char *prog);
 
 #ifdef __cplusplus
-#ifndef __cplusplus
-{
-#endif
 }
+#endif
+
+#ifdef __cplusplus 
+inline
+djvu_foreground_options_struct::djvu_foreground_options_struct() :
+  high_saturation(false), color_jb2(false), quality(75)
+{};
 
 inline documenttodjvu_options_struct::documenttodjvu_options_struct() :
   process(), transform(), segment(), foreground(), jb2(), iw44() {}
@@ -474,11 +477,12 @@ inline documenttodjvu_options_struct::documenttodjvu_options_struct() :
 inline djvu_segmenter_options_struct::djvu_segmenter_options_struct() :
   pix_filter_level(25), threshold_level(75), mark_filter_level(50),
   inhibit_foreback_level(40), inversion_level(25), edge_size(3),
-  render_size(3), smoothing_size(3), fg_pixel_size(12), bg_pixel_size(3),
+  render_size(3), smoothing_size(3), fg_subsampling(12), bg_subsampling(3),
   upsample_size(1), high_variation_foreground(false), masksub_refine(true) {}
 
 // These examples will be modified to show configuration file examples,
 // instead of inline functions at a future date.
+
 
   /** @name Profiles examples */
   /*@{*/
@@ -501,8 +505,8 @@ inline djvu_segmenter_options_struct::djvu_segmenter_options_struct() :
       edge_size= 3;
       render_size= 3;
       smoothing_size= 3;
-      fg_pixel_size= 12; 
-      bg_pixel_size= 3; 
+      fg_subsampling= 12; 
+      bg_subsampling= 3; 
       upsample_size=1;
 
       
@@ -522,8 +526,8 @@ inline djvu_segmenter_options_struct::djvu_segmenter_options_struct() :
       edge_size= 3;
       render_size= 3;
       smoothing_size= 3;
-      fg_pixel_size= 12; 
-      bg_pixel_size= 4; 
+      fg_subsampling= 12; 
+      bg_subsampling= 4; 
       upsample_size=2;
 
       
@@ -544,8 +548,8 @@ inline djvu_segmenter_options_struct::djvu_segmenter_options_struct() :
       edge_size= 2;
       render_size= 3;
       smoothing_size= 3;
-      fg_pixel_size= 8; 
-      bg_pixel_size= 2; 
+      fg_subsampling= 8; 
+      bg_subsampling= 2; 
       upsample_size=1;
 
       
@@ -564,8 +568,8 @@ inline djvu_segmenter_options_struct::djvu_segmenter_options_struct() :
       edge_size= 1;
       render_size= 1;
       smoothing_size= 2;
-      fg_pixel_size= 6; 
-      bg_pixel_size= 1; 
+      fg_subsampling= 6; 
+      bg_subsampling= 1; 
       upsample_size=1;
       inhibit_foreback_level=40;
 
@@ -583,7 +587,7 @@ inline djvu_segmenter_options_struct::djvu_segmenter_options_struct() :
       \begin{verbatim}
       pix_filter_level= 50
       inversion_level=25
-      bg_pixel_size=1
+      bg_subsampling=1
       high_variation_foreground= true
       \end{verbatim}
   */
@@ -598,8 +602,8 @@ inline djvu_segmenter_options_struct::djvu_segmenter_options_struct() :
       edge_size= 3;
       render_size= 3;
       smoothing_size= 3;
-      fg_pixel_size= 12; 
-      bg_pixel_size= 3; 
+      fg_subsampling= 12; 
+      bg_subsampling= 3; 
       upsample_size=1;
       
       
@@ -631,8 +635,8 @@ inline djvu_segmenter_options_struct::djvu_segmenter_options_struct() :
       edge_size= 3;
       render_size= 3;
       smoothing_size= 3;
-      fg_pixel_size= 12; 
-      bg_pixel_size= 3; 
+      fg_subsampling= 12; 
+      bg_subsampling= 3; 
       upsample_size=1;
       
       
@@ -662,8 +666,8 @@ inline djvu_segmenter_options_struct::djvu_segmenter_options_struct() :
       edge_size= 1;
       render_size= 1;
       smoothing_size= 1;
-      fg_pixel_size= 12; 
-      bg_pixel_size= 3; 
+      fg_subsampling= 12; 
+      bg_subsampling= 3; 
       upsample_size=1;
       
       
