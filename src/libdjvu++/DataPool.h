@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.h,v 1.10 1999-09-03 23:02:40 eaf Exp $
+//C- $Id: DataPool.h,v 1.11 1999-09-07 18:47:23 eaf Exp $
  
 #ifndef _DATAPOOL_H
 #define _DATAPOOL_H
@@ -43,7 +43,7 @@
 
     @memo Thread safe data storage
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DataPool.h,v 1.10 1999-09-03 23:02:40 eaf Exp $#
+    @version #$Id: DataPool.h,v 1.11 1999-09-07 18:47:23 eaf Exp $#
 */
 
 //@{
@@ -206,8 +206,8 @@ private:
       GList<int>	list;
    public:
       void		add_range(int start, int length);
-      int		get_range(int start, int length);
-      bool		has_range(int start, int length);
+      int		get_bytes(int start, int length) const;
+      int		get_range(int start, int length) const;
    };
 public:
       /** @name Initialization */
@@ -413,6 +413,13 @@ public:
 		   passed to the \Ref{connect}() function.
 	  \end{itemize}. */
    int		get_length(void) const;
+      /** Returns the number of bytes of data available in this #DataPool#.
+	  Contrary to the \Ref{get_length}() function, this one doesn't try
+	  to interpret the IFF structure and predict the file length.
+	  It just returns the number of bytes of data really available inside
+	  the #DataPool#, if it contains data, or inside its range, if it's
+	  connected to another #DataPool# or a file. */
+   int		get_size(void) const;
       //@}
 
       /** @name Trigger callbacks.
@@ -491,6 +498,7 @@ private:
    void		call_triggers(void);
    void		stop_reader(void * reader_id);
    int		get_data(void * buffer, int offset, int size, void * reader_id);
+   int		get_size(int start, int length) const;
 
    static void	static_trigger_cb(void *);
    void		trigger_cb(void);
@@ -513,6 +521,12 @@ inline void
 DataPool::add_trigger(int thresh, void (* callback)(void *), void * cl_data)
 {
    add_trigger(0, thresh+1, callback, cl_data);
+}
+
+inline int
+DataPool::get_size(void) const
+{
+   return get_size(0, -1);
 }
 
 //@}

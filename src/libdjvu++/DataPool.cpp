@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.cpp,v 1.11 1999-09-07 17:41:14 eaf Exp $
+//C- $Id: DataPool.cpp,v 1.12 1999-09-07 18:47:23 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -108,35 +108,59 @@ DataPool::BlockList::add_range(int start, int length)
 }
 
 int
-DataPool::BlockList::get_range(int start, int length)
-      // Returns -1 if there is no data starting from offset=start
-      // Returns the size of the available block starting from start
-      // and limited by length
+DataPool::BlockList::get_bytes(int start, int length) const
+      // Returns the number of bytes of data available in the range
+      // [start, start+length[. There may be holes between data chunks
 {
    if (length<0) THROW("Length must be positive.");
-   
-   GCriticalSectionLock lk(&lock);
+
+   GCriticalSectionLock lk((GCriticalSection *) &lock);
+   int bytes=0;
    int block_start=0, block_end=0;
    for(GPosition pos=list;pos && block_start<start+length;++pos)
    {
       int size=list[pos];
       block_end=block_start+abs(size);
-      if (start>=block_start)
+      if (size>0)
+	 if (block_start<start)
+	 {
+	    if (block_end>=start && block_end<start+length)
+	       bytes+=block_end-start;
+            else if (block_end>=start+length)
+	       bytes+=length;
+	 } else
+	 {
+	    if (block_end<=start+length)
+	       bytes+=block_end-block_start;
+	    else bytes+=start+length-block_start;
+	 }
+      block_start=block_end;
+   }
+   return bytes;
+}
+
+int
+DataPool::BlockList::get_range(int start, int length) const
+      // Finds a range covering offset=start and returns the length
+      // of intersection of this range with [start, start+length[
+      // 0 is returned if nothing can be found
+{
+   if (length<0) THROW("Length must be positive.");
+
+   GCriticalSectionLock lk((GCriticalSection *) &lock);
+   int block_start=0, block_end=0;
+   for(GPosition pos=list;pos && block_start<start+length;++pos)
+   {
+      int size=list[pos];
+      block_end=block_start+abs(size);
+      if (block_start<=start && block_end>start)
 	 if (size<0) return -1;
          else
 	    if (block_end>start+length) return length;
-	    else return block_end-start;
+            else return block_end-start;
       block_start=block_end;
    }
-   return -1;
-}
-
-bool
-DataPool::BlockList::has_range(int start, int length)
-      // Checks that there is data available for every offset from
-      // start to start+length-1
-{
-   return get_range(start, length)==length;
+   return 0;
 }
 
 //****************************************************************************
@@ -247,6 +271,32 @@ DataPool::get_length(void) const
    return -1;	// Still unknown
 }
 
+int
+DataPool::get_size(int dstart, int dlength) const
+{
+   if (dlength<0 && length>0)
+   {
+      dlength=length-dstart;
+      if (dlength<0) return 0;
+   }
+   
+   if (pool) return pool->get_size(start+dstart, dlength);
+   else if (stream)
+   {
+      if (start+dstart+dlength>length) return length-(start+dstart);
+      else return dlength;
+   } else
+   {
+      if (dlength<0)
+      {
+	 GCriticalSectionLock lock((GCriticalSection *) &data_lock);
+	 dlength=data->size()-dstart;
+      }
+      if (dlength<0) return 0;
+      else return block_list.get_bytes(dstart, dlength);
+   }
+}
+
 void
 DataPool::add_data(const void * buffer, int size)
       // This function adds data sequentially at 'add_at' position
@@ -293,7 +343,7 @@ DataPool::add_data(const void * buffer, int offset, int size)
       for(GPosition pos=readers_list;pos;++pos)
       {
 	 GP<Reader> reader=readers_list[pos];
-	 if (block_list.has_range(reader->offset, 1))
+	 if (block_list.get_bytes(reader->offset, 1))
 	 {
 	    DEBUG_MSG("waking up reader: offset=" << reader->offset <<
 		      ", size=" << reader->size << "\n");
@@ -314,7 +364,7 @@ DataPool::has_data(int dstart, int dlength)
    if (pool) return pool->has_data(start+dstart, dlength);
    else if (stream) return start+dstart+dlength<=length;
    else if (dlength<0) return is_eof();
-   else return block_list.has_range(dstart, dlength);
+   else return block_list.get_bytes(dstart, dlength)==dlength;
 }
 
 int
@@ -405,7 +455,7 @@ DataPool::wait_for_data(const GP<Reader> & reader)
    while(1)
    {
       if (stop_flag || reader->stop_flag) THROW("STOP");
-      if (eof_flag || block_list.has_range(reader->offset, 1)) return;
+      if (eof_flag || block_list.get_bytes(reader->offset, 1)) return;
       if (pool || stream) return;
 
       DEBUG_MSG("calling event.wait()...\n");
@@ -502,7 +552,7 @@ DataPool::call_triggers(void)
 	    {
 	       GP<Trigger> t=triggers_list[pos];
 	       if (is_eof() || t->length>=0 &&
-		   block_list.has_range(t->start, t->length))
+		   block_list.get_bytes(t->start, t->length)==t->length)
 	       {
 		  trigger=t;
 		  triggers_list.del(pos);
@@ -535,7 +585,7 @@ DataPool::add_trigger(int tstart, int tlength,
       } else if (!stream)
       {
 	    // We're not connected to anything and maintain our own data
-	 if (tlength>=0 && block_list.has_range(tstart, tlength))
+	 if (tlength>=0 && block_list.get_bytes(tstart, tlength)==tlength)
 	    callback(cl_data);
 	 else
 	 {
