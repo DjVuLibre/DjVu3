@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.24 1999-08-27 22:30:43 eaf Exp $
+//C- $Id: DjVuFile.cpp,v 1.25 1999-08-31 18:31:21 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -202,6 +202,20 @@ DjVuFile::are_incl_files_created(void) const
 {
    GMonitorLock lock((GMonitor *) &status_mon);
    return (status & INCL_FILES_CREATED)!=0;
+}
+
+bool
+DjVuFile::is_modified(void) const
+{
+   GMonitorLock lock((GMonitor *) &status_mon);
+   return (status & MODIFIED)!=0;
+}
+
+void
+DjVuFile::set_modified(bool m)
+{
+   if (m) status_mon|=MODIFIED;
+   else status_mon&=~MODIFIED;
 }
 
 unsigned int

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.h,v 1.16 1999-08-27 22:30:43 eaf Exp $
+//C- $Id: DjVuFile.h,v 1.17 1999-08-31 18:31:21 eaf Exp $
  
 #ifndef _DJVUFILE_H
 #define _DJVUFILE_H
@@ -45,7 +45,7 @@
 
     @memo Classes representing DjVu files.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuFile.h,v 1.16 1999-08-27 22:30:43 eaf Exp $#
+    @version #$Id: DjVuFile.h,v 1.17 1999-08-31 18:31:21 eaf Exp $#
 */
 
 //@{
@@ -145,7 +145,8 @@ class DjVuFile : public GPEnabled, public DjVuPort
 {
 public:
    enum { DECODING=1, DECODE_OK=2, DECODE_FAILED=4, DECODE_STOPPED=8,
-	  DATA_PRESENT=16, ALL_DATA_PRESENT=32, INCL_FILES_CREATED=64 };
+	  DATA_PRESENT=16, ALL_DATA_PRESENT=32, INCL_FILES_CREATED=64,
+          MODIFIED=128 };
 
       /** @name Decoded file contents */
       //@{
@@ -278,6 +279,8 @@ public:
 	  this function returns 1, the \Ref{get_included_files}() returns
 	  the correct information. */
    bool		are_incl_files_created(void) const;
+   bool		is_modified(void) const;
+   void		set_modified(bool m);
       //@}
 
       /// Returns the URL assigned to this file
