@@ -9,9 +9,9 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GOS.cpp,v 1.23 2000-01-26 17:25:56 eaf Exp $
+//C- $Id: GOS.cpp,v 1.24 2000-02-04 21:18:01 parag Exp $
 
-// "$Id: GOS.cpp,v 1.23 2000-01-26 17:25:56 eaf Exp $"
+// "$Id: GOS.cpp,v 1.24 2000-02-04 21:18:01 parag Exp $"
 
 #ifdef __GNUC__
 #pragma implementation
@@ -714,7 +714,7 @@ GOS::cleardir(const char * dirname)
    DIR * dir=opendir(dirname);
    if (dir)
    {
-#if defined(sun) || defined(__osf__) || defined(hpux)
+#if defined(sun) || defined(__osf__) || defined(hpux) || defined(_AIX)
       dirent * de;
 #else
       direct * de;
