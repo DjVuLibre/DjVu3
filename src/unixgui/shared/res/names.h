@@ -32,16 +32,15 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: names.h,v 1.18 2001-10-16 18:01:45 docbill Exp $
+// $Id: names.h,v 1.17.2.1 2001-10-19 00:42:27 leonb Exp $
 // $Name:  $
-
 
 #ifndef HDR_NAMES
 #define HDR_NAMES
-
-#ifdef __GNUC__
-#pragma interface
+#ifdef HAVE_CONFIG_H
+#include "config.h"
 #endif
+
 
 #define REV_PIPE_NAME	".pipe"
 #ifdef hpux
@@ -52,6 +51,6 @@
 #define DJVIEW_NAME	"djview"
 #define DJEDIT_NAME	"djedit"
 #define DEJAVU_DIR	"DjVu/"
-#define DJVU_URL	"http://www.lizardtech.com/pluginfiles/unix/3.0/"
-
+#define DJVU_URL	"http://www.lizardtech.com/pluginfiles/unix/3.5/"
+#define DOWNLOAD_URL    "http://www.lizardtech.com/download.html"
 #endif
