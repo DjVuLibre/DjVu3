@@ -25,7 +25,7 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: parseoptions.cpp,v 1.59 2000-11-02 01:08:35 bcr Exp $
+// $Id: parseoptions.cpp,v 1.60 2000-11-04 01:26:02 fcrary Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -1568,10 +1568,10 @@ DjVuParseOptions::GetOpt::~GetOpt()
 // difficult to compute longindex.
 //
 DjVuParseOptions::GetOpt::GetOpt(DjVuParseOptions *xopt,
-  const int xargc,
-  const char * const xargv[],
-  const djvu_option lopts[],
-  const int only)
+                                 const int xargc,
+                                 const char * const xargv[],
+                                 const djvu_option lopts[],
+                                 const int only)
 : optind(1),
   VarTokens(*(xopt->VarTokens)),
   Errors(*(xopt->Errors)),
@@ -1634,11 +1634,12 @@ DjVuParseOptions::GetOpt::getopt_long()
       }else
       {
         nextchar=1;
-  if((++optind >= argc)||(argv[optind][0] != '-'))
-    return -1;
+        if((++optind >= argc)||(argv[optind][0] != '-'))
+          return -1;
       }
     }
   }while(! argv[optind][nextchar]);
+
   const int has_dash=(argv[optind][nextchar] == '-');
   if((nextchar == 1)&&(has_dash || long_only))
   {

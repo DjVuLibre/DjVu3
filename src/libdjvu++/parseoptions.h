@@ -25,7 +25,7 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: parseoptions.h,v 1.38 2000-11-03 02:08:37 bcr Exp $
+// $Id: parseoptions.h,v 1.39 2000-11-04 01:26:02 fcrary Exp $
 // $Name:  $
 
 #ifndef __DJVUPARSEOPTIONS_H__
@@ -41,7 +41,7 @@
    listing all the command line options.  The last element of the array must
    be
 \begin{verbatim}
- {0,0,0,0}
+     {0,0,0,0}
 \end{verbatim}
    Typically the djvu_option array is declared statically.
 
@@ -61,7 +61,7 @@
 
    @memo Class used for parsing options and configuration files.
    @author Bill Riemers
-   @version #$Id: parseoptions.h,v 1.38 2000-11-03 02:08:37 bcr Exp $#
+   @version #$Id: parseoptions.h,v 1.39 2000-11-04 01:26:02 fcrary Exp $#
  */
 
 /*@{*/
@@ -112,44 +112,52 @@
   
    	int
     	main(int argc,const char **argv,char **env)
-        {
-   	  char *profile,*topping,*color;
-          int redo,bignumber;
-   		// This will read in the default configuration file
-   		// which is either ~/.DjVu/global.conf if it exists,
-   		// otherwise /etc/DjVu/global.conf.
-   		// Next the file MyConfigFile.conf will be read from
-   		// either ~/.DjVu or /etc/DjVu
-          DjVuParseOptions MyOptions("MyConfigFile");
-   		// This parses the command line arguments.
-          MyOptions.ParseArguments(argc,argv,long_options);
-   		// We could for example, check the value of a profile
-   		// option, and switch which profile we are using.
-   	  profile=MyOptions.GetValue(profile_string);
-          if(profile) MyOptions.ChangeProfile(profile);
-   		// Now we can read in the variables.
-   		// I find it is a good idea to only list the variable
-   		// strings once, so I use constant strings.  But this
-                // isn't required.
-   	  topping=MyOptions.GetValue(pizza_topping_string);
-   	  color=MyOptions.GetValue(favorite_color_string);
-   		// We can also read in integers, and specify a default value
-   		// to return in case the value is not an integer.  In this
-   		// case I specified -1.
-   	  bignumber=MyOptions.GetNumber(bignumber_string,-1);
-   		// We can also check true/false type values.
-   	  redo=MyOptions.GetInteger(redo_string,0);
-   		// Now before we do anything with these values we might
-   		// want to check for errors.
-   	  if(MyOptions.HasError())
-   	  {
-   	     MyOptions.perror();
-   	     usage();
+      {
+   	    char *profile,*topping,*color;
+        int redo,bignumber;
+
+   		  // This will read in the default configuration file
+   		  // which is either ~/.DjVu/global.conf if it exists,
+   		  // otherwise /etc/DjVu/global.conf.
+   		  // Next the file MyConfigFile.conf will be read from
+   		  // either ~/.DjVu or /etc/DjVu
+        DjVuParseOptions MyOptions("MyConfigFile");
+
+   		  // This parses the command line arguments.
+        MyOptions.ParseArguments(argc,argv,long_options);
+
+   		  // We could for example, check the value of a profile
+   		  // option, and switch which profile we are using.
+   	    profile=MyOptions.GetValue(profile_string);
+        if(profile) MyOptions.ChangeProfile(profile);
+
+   		  // Now we can read in the variables.
+   		  // I find it is a good idea to only list the variable
+   		  // strings once, so I use constant strings.  But this
+        // isn't required.
+   	    topping=MyOptions.GetValue(pizza_topping_string);
+   	    color=MyOptions.GetValue(favorite_color_string);
+
+   		  // We can also read in integers, and specify a default value
+   		  // to return in case the value is not an integer.  In this
+   		  // case I specified -1.
+   	    bignumber=MyOptions.GetNumber(bignumber_string,-1);
+
+   		  // We can also check true/false type values.
+   	    redo=MyOptions.GetInteger(redo_string,0);
+
+   		  // Now before we do anything with these values, we might
+   		  // want to check for errors.
+   	    if(MyOptions.HasError())
+   	    {
+   	       MyOptions.perror();
+   	       usage();
+   	    }
+
+   	    ... Now we can do the real work of this program...
+
+   	    exit(0);
    	  }
-  
-   	  ... Now we can do the real work of this program...
-   	  exit(0);
-   	}
 \end{verbatim}
   
    Now the more complicated issue is using the same object for libraries
@@ -166,18 +174,20 @@
    references we run into problems that multiple functions can not parse
    argv[] arrays.
   
-   The compromise I reached is the profiles, are stored in the class as
-   references.  So when you pass by "value", the profile information is
+   The compromise I reached is the profiles are stored in the class as
+   references.  So when you pass by "value," the profile information is
    still passed by reference.  Consequently if you do something like:
+
 \begin{verbatim}                                        
-   	int foo(DjVuParseOptions);
-   	DjVuParseOptions Opts("Config");
-   	Opts.ParseArguments(argc,argv,long_opts,long_only);
-   	foo(Opts);
+   	  int foo(DjVuParseOptions);
+   	  DjVuParseOptions Opts("Config");
+   	  Opts.ParseArguments(argc,argv,long_opts,long_only);
+   	  foo(Opts);
 \end{verbatim}
+
    the copy of Opts passed to foo will not contain any information from
    the argv[] array.  But it will contain the profile information.
-   If you do a ChangeProfile() it will only effect the original to
+   If you do a ChangeProfile() it will only affect the original to
    the extent if it does the same ChangeProfile() the configuration
    file will have already been parsed.
   
@@ -197,8 +207,8 @@
    	test=TRUE
 \end{verbatim}
   
-   The one unique implementation detail, is alternate profiles may be
-   specified  within a configuration file.  The rules is simple.  The
+   The one unique implementation detail is alternate profiles may be
+   specified  within a configuration file.  The rules are simple.  The
    default profile name is the file name.  To end the current profile
    and begin a new one, simply list the new profile name followed by
    a ':'.  e.g.
@@ -243,7 +253,7 @@ class DjVuTokenList;
 
 /** Main class for parsing options.
     #DjVuParseOptions# is the only class you really need to declare.  This
-    will handle all fo the details of parsing options from the command line
+    will handle all of the details of parsing options from the command line
     and configuration files on disk. */
 
 class DjVuParseOptions
@@ -347,13 +357,13 @@ public:
       index of the name with a value of the highest precedence will be     
       is returned.  Command line arguments have the highest precedence.    
       Default profile values have the lowest precedence.  It is an error   
-      to have two values f the same precedence. */
+      to have two values with the same precedence. */
   int GetBest(const int listsize,const char * const[],bool=false);
 
   /// Same as above, but NULL terminated 
   inline int GetBest(const char * const names[],bool=false);
 
-  /** This just checks for TRUE, and if not does an atoi() conversion. 
+  /** This just checks for TRUE, and it not does an atoi() conversion. 
       Anything beginning with [Tt] is returned as trueval, [Ff] is returned 
       as falseval, and anything else that is not a legal integer is returned 
       as errval. */
@@ -404,7 +414,7 @@ public:
       Returns true if the profile exists. */
   bool ChangeProfile(const char []);
 
-  /// This is the primary function for reading command  line arguments.  
+  /// This is the primary function for reading command line arguments.  
   int ParseArguments(const int,const char * const [],const djvu_option [],const int=0);
   /// These are the arguments sent to ParseArguments
   inline const char * const * get_argv(void) const;
@@ -597,34 +607,45 @@ public:
 };
 
 // This is just a simple array of strings.  We could just use a structure,
-// but some compilers incorrectly treat classes differently from all public
+// but some compilers incorrectly treat structures differently from all public
 // classes...
 //
 class DjVuParseOptions::Profiles
 {
 public:
-  int size;
+  int size;         // Size of the array of strings
   char **values;
   Profiles();
   ~Profiles();
-  void Add(const int,const char []);
+
+  //  Essentially:  values[var] = value;
+  void Add(const int var,const char value[]);
+
+  //  Return values[token] if token is in range, NULL otherwise
   inline const char * const GetValue(const int token) const
-  {return ((token<size)&&(token>=0))?values[token]:0;};
+    {return ((token<size)&&(token>=0))?values[token]:0;};
 };
 
-// And this is a an array of array of strings...
+// And this is an array of array of strings...
 //
 class DjVuParseOptions::ProfileList
 {
 private:
-  int size;
+  int size;         // Number of profiles currently allocated
 public:
-  int links;
+  int links;        // Reference count (managed externally)
   Profiles *profiles;
   ProfileList();
   ~ProfileList();
-  void Add(const int,const int,const char []);
-  int Grow(const int);
+
+  //  profiles[profile][var]var = value;
+  void Add(const int profile,const int var,const char value[]);
+
+  //  If necessary, increase the number of profiles to at least newsize.
+  //  Returns 1 if a new profile is created, otherwise 0.
+  int Grow(const int newsize);
+
+  //  Return profiles[profile][var] if both profile and var are in range, NULL otherwise.
   inline const char *GetValue(const int profile ,const int var) const
   { 
       return ((profile<size) && (profile>=0))?(profiles[profile].GetValue(var)):0; 
@@ -650,7 +671,11 @@ private:
 public:
   const char *optarg;
   int getopt_long();
-  GetOpt(DjVuParseOptions *,const int,const char * const [],const djvu_option[],const int=0);
+  GetOpt(DjVuParseOptions *xopt, 
+         const int xargc, 
+         const char * const xargv[], 
+         const djvu_option lopts[],
+         const int only=0);
   ~GetOpt();
 };
 
