@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GURL.cpp,v 1.14 1999-12-22 00:11:41 praveen Exp $
+//C- $Id: GURL.cpp,v 1.15 1999-12-22 17:14:07 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -98,6 +98,19 @@ GURL::GURL(const GString & url_in) : url(url_in)
    init();
 }
 
+GURL::GURL(const GURL & url_in) : url(url_in.url)
+{
+   init();
+}
+
+GURL &
+GURL::operator=(const GURL & url_in)
+{
+   url=url_in.url;
+   init();
+   return *this;
+}
+
 GString
 GURL::protocol(const char * url)
 {
@@ -125,6 +138,7 @@ GURL::hash_argument(void) const
 void
 GURL::parse_cgi_args(void)
 {
+   GCriticalSectionLock lock(&cgi_lock);
    cgi_name_arr.empty();
    cgi_value_arr.empty();
 
@@ -145,18 +159,13 @@ GURL::parse_cgi_args(void)
       GString arg;	// Storage for another argument
       while(*start)	// Seek for the end of it
       {
-	     if (start[0]=='&' || start[0]=='%' &&
-	         start[1]=='2' && start[2]=='6')
-	     {
-	        if (start[0]=='&') start++;
-	        else start+=3;
-	        break;
-	     } 
-         else 
-         {
-             arg+=start[0];
-             start++;
-         }
+	 if (start[0]=='&' || start[0]=='%' &&
+	     start[1]=='2' && start[2]=='6')
+	 {
+	    if (start[0]=='&') start++;
+	    else start+=3;
+	    break;
+	 } else arg+=*start++;
       }
       if (arg.length())
       {
@@ -183,12 +192,14 @@ GURL::parse_cgi_args(void)
 int
 GURL::cgi_arguments(void) const
 {
+   GCriticalSectionLock lock((GCriticalSection *) &cgi_lock);
    return cgi_name_arr.size();
 }
 
 GString
 GURL::cgi_name(int num) const
 {
+   GCriticalSectionLock lock((GCriticalSection *) &cgi_lock);
    if (num<cgi_name_arr.size()) return cgi_name_arr[num];
    else return GString();
 }
@@ -196,8 +207,23 @@ GURL::cgi_name(int num) const
 GString
 GURL::cgi_value(int num) const
 {
+   GCriticalSectionLock lock((GCriticalSection *) &cgi_lock);
    if (num<cgi_value_arr.size()) return cgi_value_arr[num];
    else return GString();
+}
+
+DArray<GString>
+GURL::cgi_names(void) const
+{
+   GCriticalSectionLock lock((GCriticalSection *) &cgi_lock);
+   return cgi_name_arr;
+}
+
+DArray<GString>
+GURL::cgi_values(void) const
+{
+   GCriticalSectionLock lock((GCriticalSection *) &cgi_lock);
+   return cgi_value_arr;
 }
 
 static bool

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GURL.h,v 1.11 1999-12-21 00:09:28 eaf Exp $
+//C- $Id: GURL.h,v 1.12 1999-12-22 17:14:07 eaf Exp $
 
 #ifndef _GURL_H_
 #define _GURL_H_
@@ -20,13 +20,14 @@
 
 #include "GString.h"
 #include "Arrays.h"
+#include "GThreads.h"
 
 /** @name GURL.h
     Files #"GURL.h"# and #"GURL.cpp"# contain the implementation of the
     \Ref{GURL} class used to store URLs in a system independent format.
     @memo System independent URL representation.
     @author Andrei Erofeev <eaf@research.att.com>
-    @version #$Id: GURL.h,v 1.11 1999-12-21 00:09:28 eaf Exp $#
+    @version #$Id: GURL.h,v 1.12 1999-12-22 17:14:07 eaf Exp $#
 */
 
 //@{
@@ -56,7 +57,8 @@ class GURL
 private:
    GString	url;
 
-   DArray<GString>cgi_name_arr, cgi_value_arr;
+   GCriticalSection	cgi_lock;
+   DArray<GString>	cgi_name_arr, cgi_value_arr;
 
    void		init(void);
    void		convert_slashes(void);
@@ -78,9 +80,18 @@ public:
       /** Returns that part of CGI argument number #num#, which is
 	  before the equal sign. */
    GString	cgi_name(int num) const;
+   
+      /** Returns array of all known CGI names (part of CGI argument before
+	  the equal sign) */
+   DArray<GString>cgi_names(void) const;
+   
       /** Returns that part of CGI argument number #num#, which is
 	  after the equal sign. */
    GString	cgi_value(int num) const;
+
+      /** Returns array of all known CGI names (part of CGI argument before
+	  the equal sign) */
+   DArray<GString>cgi_values(void) const;
 
       /// Erases everything after the first '#' ('%23') or '?' ('%3f')
    void		clear_all_arguments(void);
@@ -116,6 +127,9 @@ public:
       /// Returns TRUE if #gurl1# and #gurl2# are different
    friend int	operator!=(const GURL & gurl1, const GURL & gurl2);
 
+      /// Assignment operator
+   GURL &	operator=(const GURL & url);
+
       /// Returns Internal URL representation
    operator	const char*(void) const { return url; };
 
@@ -132,10 +146,10 @@ public:
       //@}
 
       /// Copy constructor
-   GURL(const GURL & gurl) : url(gurl.url) {};
+   GURL(const GURL & gurl);
 
       /// The descructor
-   virtual ~GURL(void) {};
+   virtual ~GURL(void) {}
 
       /** Hashing function.
 	  @return hash suitable for usage in \Ref{GMap} */
