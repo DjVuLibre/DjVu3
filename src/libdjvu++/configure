@@ -74,9 +74,11 @@ done
 
 ### License stuff
 
-accept=show
-while [ "$accept" != yes -a "$accept" != no ]
-do
+if false
+then
+  accept=show
+  while [ "$accept" != yes -a "$accept" != no ]
+  do
     if [ "$accept" = show ] ; then
        ${PAGER-more} $SRCDIR/ATTLICENSE
     fi
@@ -87,8 +89,9 @@ do
        echo Bye
        exit 0
     fi
-done
-echo
+  done
+  echo
+fi
 
 
 ### Check compiler
