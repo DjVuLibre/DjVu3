@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: DjVuAnno.cpp,v 1.53 2000-10-06 21:47:21 fcrary Exp $
+//C- $Id: DjVuAnno.cpp,v 1.54 2000-10-12 01:39:00 bcr Exp $
 
 
 #ifdef __GNUC__
@@ -790,7 +790,7 @@ DjVuANT::get_map_areas(GLParser & parser)
   for(GPosition pos=list;pos;++pos)
   {
     GLObject & obj=*list[pos];
-    if (obj.get_type()==GLObject::LIST && obj.get_name()==MAPAREA_TAG)
+    if (obj.get_type()==GLObject::LIST && obj.get_name()==GMapArea::MAPAREA_TAG)
     {
       G_TRY {
 	       // Getting the url
@@ -814,7 +814,7 @@ DjVuANT::get_map_areas(GLParser & parser)
         GP<GMapArea> map_area;
         if (shape->get_type()==GLObject::LIST)
         {
-          if (shape->get_name()==RECT_TAG)
+          if (shape->get_name()==GMapArea::RECT_TAG)
           {
             DEBUG_MSG("it's a rectangle.\n");
             GRect grect((*shape)[0]->get_number(),
@@ -822,7 +822,7 @@ DjVuANT::get_map_areas(GLParser & parser)
                         (*shape)[2]->get_number(),
                         (*shape)[3]->get_number());
             map_area=new GMapRect(grect);
-          } else if (shape->get_name()==POLY_TAG)
+          } else if (shape->get_name()==GMapArea::POLY_TAG)
           {
             DEBUG_MSG("it's a polygon.\n");
             int points=shape->get_list().size()/2;
@@ -833,7 +833,7 @@ DjVuANT::get_map_areas(GLParser & parser)
               yy[i]=(*shape)[2*i+1]->get_number();
             }
             map_area=new GMapPoly(xx, yy, points);
-          } else if (shape->get_name()==OVAL_TAG)
+          } else if (shape->get_name()==GMapArea::OVAL_TAG)
           {
             DEBUG_MSG("it's an ellipse.\n");
             GRect grect((*shape)[0]->get_number(),
@@ -855,9 +855,9 @@ DjVuANT::get_map_areas(GLParser & parser)
             if (el->get_type()==GLObject::LIST)
             {
               const GString & name=el->get_name();
-              if (name==BORDER_AVIS_TAG)
+              if (name==GMapArea::BORDER_AVIS_TAG)
                 map_area->border_always_visible=true;
-              else if (name==HILITE_TAG)
+              else if (name==GMapArea::HILITE_TAG)
               {
                 GLObject * obj=el->get_list()[el->get_list().firstpos()];
                 if (obj->get_type()==GLObject::SYMBOL)
@@ -865,13 +865,13 @@ DjVuANT::get_map_areas(GLParser & parser)
               } else
               {
                 int border_type=
-                  name==NO_BORDER_TAG ? GMapArea::NO_BORDER :
-                  name==XOR_BORDER_TAG ? GMapArea::XOR_BORDER :
-                  name==SOLID_BORDER_TAG ? GMapArea::SOLID_BORDER :
-                  name==SHADOW_IN_BORDER_TAG ? GMapArea::SHADOW_IN_BORDER :
-                  name==SHADOW_OUT_BORDER_TAG ? GMapArea::SHADOW_OUT_BORDER :
-                  name==SHADOW_EIN_BORDER_TAG ? GMapArea::SHADOW_EIN_BORDER :
-                  name==SHADOW_EOUT_BORDER_TAG ? GMapArea::SHADOW_EOUT_BORDER : -1;
+                  name==GMapArea::NO_BORDER_TAG ? GMapArea::NO_BORDER :
+                  name==GMapArea::XOR_BORDER_TAG ? GMapArea::XOR_BORDER :
+                  name==GMapArea::SOLID_BORDER_TAG ? GMapArea::SOLID_BORDER :
+                  name==GMapArea::SHADOW_IN_BORDER_TAG ? GMapArea::SHADOW_IN_BORDER :
+                  name==GMapArea::SHADOW_OUT_BORDER_TAG ? GMapArea::SHADOW_OUT_BORDER :
+                  name==GMapArea::SHADOW_EIN_BORDER_TAG ? GMapArea::SHADOW_EIN_BORDER :
+                  name==GMapArea::SHADOW_EOUT_BORDER_TAG ? GMapArea::SHADOW_EOUT_BORDER : -1;
                 if (border_type>=0)
                 {
                   map_area->border_type=(GMapArea::BorderType) border_type;
@@ -890,7 +890,7 @@ DjVuANT::get_map_areas(GLParser & parser)
           map_areas.append(map_area);
         } // if (map_area) ...
       } G_CATCH_ALL {} G_ENDCATCH;
-    } // if (...get_name()==MAPAREA_TAG)
+    } // if (...get_name()==GMapArea::MAPAREA_TAG)
    } // while(item==...)
    
    return map_areas;
@@ -971,7 +971,7 @@ DjVuANT::encode_raw(void) const
    }
    
       //*** Mapareas
-   del_all_items(MAPAREA_TAG, parser);
+   del_all_items(GMapArea::MAPAREA_TAG, parser);
    for(GPosition pos=map_areas;pos;++pos)
       parser.parse(map_areas[pos]->print());
 

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GMapAreas.h,v 1.11 2000-09-18 17:10:16 bcr Exp $
+//C- $Id: GMapAreas.h,v 1.12 2000-10-12 01:39:00 bcr Exp $
 
 #ifndef _GMAPAREAS_H
 #define _GMAPAREAS_H
@@ -47,25 +47,11 @@ typedef unsigned int u_int32;
     @memo Definition of base map area classes
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: GMapAreas.h,v 1.11 2000-09-18 17:10:16 bcr Exp $# */
+    #$Id: GMapAreas.h,v 1.12 2000-10-12 01:39:00 bcr Exp $# */
 //@{
 
 
 // ---------- GMAPAREA ---------
-
-#define MAPAREA_TAG		"maparea"
-#define RECT_TAG		"rect"
-#define POLY_TAG		"poly"
-#define OVAL_TAG		"oval"
-#define NO_BORDER_TAG		"none"
-#define XOR_BORDER_TAG		"xor"
-#define SOLID_BORDER_TAG	"border"
-#define SHADOW_IN_BORDER_TAG	"shadow_in"
-#define SHADOW_OUT_BORDER_TAG	"shadow_out"
-#define SHADOW_EIN_BORDER_TAG	"shadow_ein"
-#define SHADOW_EOUT_BORDER_TAG	"shadow_eout"
-#define BORDER_AVIS_TAG		"border_avis"
-#define HILITE_TAG		"hilite"
 
 /** This is the base object for all map areas. It defines some standard
     interface to access the geometrical properties of the areas and
@@ -98,6 +84,20 @@ typedef unsigned int u_int32;
 class GMapArea : public GPEnabled
 {
 public:
+   static const char MAPAREA_TAG [];
+   static const char RECT_TAG [];
+   static const char POLY_TAG [];
+   static const char OVAL_TAG [];
+   static const char NO_BORDER_TAG [];
+   static const char XOR_BORDER_TAG [];
+   static const char SOLID_BORDER_TAG [];
+   static const char SHADOW_IN_BORDER_TAG [];
+   static const char SHADOW_OUT_BORDER_TAG [];
+   static const char SHADOW_EIN_BORDER_TAG [];
+   static const char SHADOW_EOUT_BORDER_TAG [];
+   static const char BORDER_AVIS_TAG [];
+   static const char HILITE_TAG [];
+
    enum BorderType { NO_BORDER=0, XOR_BORDER=1, SOLID_BORDER=2,
 		     SHADOW_IN_BORDER=3, SHADOW_OUT_BORDER=4,
 		     SHADOW_EIN_BORDER=5, SHADOW_EOUT_BORDER=6 };
@@ -177,25 +177,25 @@ public:
       /** Checks if the object is OK. Especially useful with \Ref{GMapPoly}
 	  where edges may intersect. If there is a problem it returns a
 	  string describing it. */
-   GString	check_object(void);
+   char const *	const check_object(void);
       /** Stores the contents of the hyperlink object in a lisp-like format
 	  for sving into #ANTa# chunk (see \Ref{DjVuAnno}) */
    GString	print(void);
 
       /// Virtual function returning the shape name.
-   virtual GString	get_shape_name(void) const=0;
+   virtual char const * const	get_shape_name(void) const=0;
       /// Virtual function generating a copy of this object
    virtual GP<GMapArea>	get_copy(void) const=0;
 protected:
-   virtual int		gma_get_xmin(void)=0;
-   virtual int		gma_get_ymin(void)=0;
-   virtual int		gma_get_xmax(void)=0;
-   virtual int		gma_get_ymax(void)=0;
+   virtual int		gma_get_xmin(void) const=0;
+   virtual int		gma_get_ymin(void) const=0;
+   virtual int		gma_get_xmax(void) const=0;
+   virtual int		gma_get_ymax(void) const=0;
    virtual void		gma_move(int dx, int dy)=0;
    virtual void		gma_resize(int new_width, int new_height)=0;
    virtual void		gma_transform(const GRect & grect)=0;
-   virtual bool		gma_is_point_inside(int x, int y)=0;
-   virtual GString	gma_check_object(void)=0;
+   virtual bool		gma_is_point_inside(const int x, const int y)=0;
+   virtual char const * const	gma_check_object(void) const=0;
    virtual GString	gma_print(void)=0;
    
    void		clear_bounds(void);
@@ -243,20 +243,20 @@ public:
    virtual ~GMapRect(void);
 
       /// Returns #"rect"#
-   virtual GString	get_shape_name(void) const;
+   virtual char const * const	get_shape_name(void) const;
       /// Returns a copy of the rectangle
    virtual GP<GMapArea>	get_copy(void) const;
 protected:
    int			xmin, ymin, xmax, ymax;
-   virtual int		gma_get_xmin(void);
-   virtual int		gma_get_ymin(void);
-   virtual int		gma_get_xmax(void);
-   virtual int		gma_get_ymax(void);
+   virtual int		gma_get_xmin(void) const;
+   virtual int		gma_get_ymin(void) const;
+   virtual int		gma_get_xmax(void) const;
+   virtual int		gma_get_ymax(void) const;
    virtual void		gma_move(int dx, int dy);
    virtual void		gma_resize(int new_width, int new_height);
    virtual void		gma_transform(const GRect & grect);
-   virtual bool		gma_is_point_inside(int x, int y);
-   virtual GString	gma_check_object(void);
+   virtual bool		gma_is_point_inside(const int x, const int y);
+   virtual char const * const gma_check_object(void) const;
    virtual GString	gma_print(void);
 };
 
@@ -292,34 +292,37 @@ inline int
 GMapRect::get_height(void) const { return ymax-ymin; }
 
 inline int
-GMapRect::gma_get_xmin(void) { return xmin; }
+GMapRect::gma_get_xmin(void) const { return xmin; }
 
 inline int
-GMapRect::gma_get_ymin(void) { return ymin; }
+GMapRect::gma_get_ymin(void) const { return ymin; }
 
 inline int
-GMapRect::gma_get_xmax(void) { return xmax; }
+GMapRect::gma_get_xmax(void) const { return xmax; }
 
 inline int
-GMapRect::gma_get_ymax(void) { return ymax; }
+GMapRect::gma_get_ymax(void) const { return ymax; }
 
-inline GString
-GMapRect::gma_check_object(void) { return ""; }
+inline char const * const
+GMapRect::gma_check_object(void)  const{ return ""; }
 
 inline void
 GMapRect::gma_move(int dx, int dy)
 {
-   xmin+=dx; xmax+=dx; ymin+=dy; ymax+=dy;
+   xmin+=dx;
+   xmax+=dx;
+   ymin+=dy;
+   ymax+=dy;
 }
 
 inline bool
-GMapRect::gma_is_point_inside(int x, int y)
+GMapRect::gma_is_point_inside(const int x, const int y)
 {
-   return x>=xmin && x<xmax && y>=ymin && y<ymax;
+   return (x>=xmin)&&(x<xmax)&&(y>=ymin)&&(y<ymax);
 }
 
-inline GString
-GMapRect::get_shape_name(void) const { return "rect"; }
+inline char const * const 
+GMapRect::get_shape_name(void) const { return RECT_TAG; }
 
 inline GP<GMapArea>
 GMapRect::get_copy(void) const { return new GMapRect(*this); }
@@ -367,22 +370,22 @@ public:
       /// Optimizes the polygon 
    void		optimize_data(void);
       /// Checks validity of the polygon 
-   GString	check_data(void);
+   char const * const	check_data(void);
 
       /// Returns #"poly"# all the time
-   virtual GString	get_shape_name(void) const;
+   virtual char const * const 	get_shape_name(void) const;
       /// Returns a copy of the polygon
    virtual GP<GMapArea>	get_copy(void) const;
 protected:
-   virtual int		gma_get_xmin(void);
-   virtual int		gma_get_ymin(void);
-   virtual int		gma_get_xmax(void);
-   virtual int		gma_get_ymax(void);
+   virtual int		gma_get_xmin(void) const;
+   virtual int		gma_get_ymin(void) const;
+   virtual int		gma_get_xmax(void) const;
+   virtual int		gma_get_ymax(void) const;
    virtual void		gma_move(int dx, int dy);
    virtual void		gma_resize(int new_width, int new_height);
    virtual void		gma_transform(const GRect & grect);
-   virtual bool		gma_is_point_inside(int x, int y);
-   virtual GString	gma_check_object(void);
+   virtual bool		gma_is_point_inside(const int x, const int y);
+   virtual char const * const gma_check_object(void) const;
    virtual GString	gma_print(void);
 private:
    bool		open;
@@ -421,8 +424,8 @@ GMapPoly::move_vertex(int i, int x, int y)
    clear_bounds();
 }
 
-inline GString
-GMapPoly::get_shape_name(void) const { return "poly"; }
+inline char const * const
+GMapPoly::get_shape_name(void) const { return POLY_TAG; }
 
 inline GP<GMapArea>
 GMapPoly::get_copy(void) const { return new GMapPoly(*this); }
@@ -452,19 +455,19 @@ public:
    int		get_rmax(void) const;
 
       /// Returns #"oval"#
-   virtual GString	get_shape_name(void) const;
+   virtual char const * const get_shape_name(void) const;
       /// Returns a copy of the oval
    virtual GP<GMapArea>	get_copy(void) const;
 protected:
-   virtual int		gma_get_xmin(void);
-   virtual int		gma_get_ymin(void);
-   virtual int		gma_get_xmax(void);
-   virtual int		gma_get_ymax(void);
+   virtual int		gma_get_xmin(void) const;
+   virtual int		gma_get_ymin(void) const;
+   virtual int		gma_get_xmax(void) const;
+   virtual int		gma_get_ymax(void) const;
    virtual void		gma_move(int dx, int dy);
    virtual void		gma_resize(int new_width, int new_height);
    virtual void		gma_transform(const GRect & grect);
-   virtual bool		gma_is_point_inside(int x, int y);
-   virtual GString	gma_check_object(void);
+   virtual bool		gma_is_point_inside(const int x, const int y);
+   virtual char const * const	gma_check_object(void) const;
    virtual GString	gma_print(void);
 private:
    int		rmax, rmin;
@@ -494,16 +497,16 @@ inline int
 GMapOval::get_rmax(void) const { return rmax; }
 
 inline int
-GMapOval::gma_get_xmin(void) { return xmin; }
+GMapOval::gma_get_xmin(void) const { return xmin; }
 
 inline int
-GMapOval::gma_get_ymin(void) { return ymin; }
+GMapOval::gma_get_ymin(void) const { return ymin; }
 
 inline int
-GMapOval::gma_get_xmax(void) { return xmax; }
+GMapOval::gma_get_xmax(void) const { return xmax; }
 
 inline int
-GMapOval::gma_get_ymax(void) { return ymax; }
+GMapOval::gma_get_ymax(void) const { return ymax; }
 
 inline void
 GMapOval::gma_move(int dx, int dy)
@@ -512,8 +515,8 @@ GMapOval::gma_move(int dx, int dy)
    xf1+=dx; yf1+=dy; xf2+=dx; yf2+=dy;
 }
 
-inline GString
-GMapOval::get_shape_name(void) const { return "oval"; }
+inline char const * const
+GMapOval::get_shape_name(void) const { return OVAL_TAG; }
 
 inline GP<GMapArea>
 GMapOval::get_copy(void) const { return new GMapOval(*this); }

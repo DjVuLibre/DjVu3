@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GMapAreas.cpp,v 1.9 2000-10-06 21:47:21 fcrary Exp $
+//C- $Id: GMapAreas.cpp,v 1.10 2000-10-12 01:39:00 bcr Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -25,39 +25,59 @@
 ***************************** GMapArea definition ***************************
 ****************************************************************************/
 
+const char GMapArea::MAPAREA_TAG[] = 		"maparea";
+const char GMapArea::RECT_TAG[] = 		"rect";
+const char GMapArea::POLY_TAG[] = 		"poly";
+const char GMapArea::OVAL_TAG[] = 		"oval";
+const char GMapArea::NO_BORDER_TAG[] = 		"none";
+const char GMapArea::XOR_BORDER_TAG[] = 	"xor";
+const char GMapArea::SOLID_BORDER_TAG[] = 	"border";
+const char GMapArea::SHADOW_IN_BORDER_TAG[] = 	"shadow_in";
+const char GMapArea::SHADOW_OUT_BORDER_TAG[] = 	"shadow_out";
+const char GMapArea::SHADOW_EIN_BORDER_TAG[] = 	"shadow_ein";
+const char GMapArea::SHADOW_EOUT_BORDER_TAG[] = "shadow_eout";
+const char GMapArea::BORDER_AVIS_TAG[] = 	"border_avis";
+const char GMapArea::HILITE_TAG[] = 		"hilite";
+
 void
 GMapArea::initialize_bounds(void)
 {
-   xmin=gma_get_xmin(); xmax=gma_get_xmax();
-   ymin=gma_get_ymin(); ymax=gma_get_ymax();
-   bounds_initialized=1;
+   xmin=gma_get_xmin();
+   xmax=gma_get_xmax();
+   ymin=gma_get_ymin();
+   ymax=gma_get_ymax();
+   bounds_initialized=true;
 }
 
 int
 GMapArea::get_xmin(void)
 {
-   if (!bounds_initialized) initialize_bounds();
+   if (!bounds_initialized)
+     initialize_bounds();
    return xmin;
 }
 
 int
 GMapArea::get_ymin(void)
 {
-   if (!bounds_initialized) initialize_bounds();
+   if (!bounds_initialized)
+     initialize_bounds();
    return ymin;
 }
 
 int
 GMapArea::get_xmax(void)
 {
-   if (!bounds_initialized) initialize_bounds();
+   if (!bounds_initialized)
+     initialize_bounds();
    return xmax;
 }
 
 int
 GMapArea::get_ymax(void)
 {
-   if (!bounds_initialized) initialize_bounds();
+   if (!bounds_initialized)
+     initialize_bounds();
    return ymax;
 }
 
@@ -71,55 +91,77 @@ GMapArea::get_bound_rect(void)
 void
 GMapArea::move(int dx, int dy)
 {
-   if (!dx && !dy) return;
-   if (bounds_initialized)
+   if (dx || dy)
    {
-      xmin+=dx; ymin+=dy; xmax+=dx; ymax+=dy;
+     if (bounds_initialized)
+     {
+        xmin+=dx;
+        ymin+=dy;
+        xmax+=dx;
+        ymax+=dy;
+     }
+     gma_move(dx, dy);
    }
-   gma_move(dx, dy);
 }
 
 void
 GMapArea::resize(int new_width, int new_height)
 {
-   if (get_xmax()-get_xmin()==new_width &&
-       get_ymax()-get_ymin()==new_height) return;
-   gma_resize(new_width, new_height);
-   bounds_initialized=0;
+   if (get_xmax()-get_xmin()!=new_width ||
+       get_ymax()-get_ymin()!=new_height)
+   {
+     gma_resize(new_width, new_height);
+     bounds_initialized=false;
+   }
 }
 
 void
 GMapArea::transform(const GRect & grect)
 {
-   if (grect.xmin==get_xmin() && grect.ymin==get_ymin() &&
-       grect.xmax==get_xmax() && grect.ymax==get_ymax())
-      return;
-   gma_transform(grect);
-   bounds_initialized=0;
+   if (grect.xmin!=get_xmin() || grect.ymin!=get_ymin() ||
+       grect.xmax!=get_xmax() || grect.ymax!=get_ymax())
+   {
+     gma_transform(grect);
+     bounds_initialized=false;
+   }
 }
 
-GString
+char const * const
 GMapArea::check_object(void)
 {
-   if (get_xmax()==get_xmin()) return "GMapAreas.zero_width";
-   if (get_ymax()==get_ymin()) return "GMapAreas.zero_height";
-   if (border_type==XOR_BORDER ||
-       border_type==SOLID_BORDER)
-      if (border_width!=1)
-	       return "GMapAreas.width_1";
-   if (border_type==SHADOW_IN_BORDER ||
+   char const *retval;
+   if (get_xmax()==get_xmin())
+   {
+     retval="GMapAreas.zero_width";
+   }
+   else if (get_ymax()==get_ymin())
+   {
+     retval="GMapAreas.zero_height";
+   }
+   else if ((border_type==XOR_BORDER ||
+       border_type==SOLID_BORDER) && border_width!=1)
+   {
+     retval="GMapAreas.width_1";
+   }
+   else if ((border_type==SHADOW_IN_BORDER ||
        border_type==SHADOW_OUT_BORDER ||
        border_type==SHADOW_EIN_BORDER ||
-       border_type==SHADOW_EOUT_BORDER)
-      if (border_width<3 || border_width>32)
-	       return "GMapAreas.width_3-32";
-   return gma_check_object();
+       border_type==SHADOW_EOUT_BORDER)&&
+       (border_width<3 || border_width>32))
+   {
+     retval="GMapAreas.width_3-32";
+   }else
+   {
+     retval=gma_check_object();
+   }
+   return retval;
 }
 
 bool
 GMapArea::is_point_inside(int x, int y)
 {
-   if (!bounds_initialized) initialize_bounds();
+   if (!bounds_initialized)
+      initialize_bounds();
    return (x>=xmin && x<xmax && y>=ymin && y<ymax) ?
 	      gma_is_point_inside(x, y) : false;
 }
@@ -129,8 +171,11 @@ GMapArea::print(void)
 {
       // Make this hard check to make sure, that *no* illegal GMapArea
       // can be stored into a file.
-   GString errors=check_object();
-   if (errors.length()) G_THROW(errors);
+   const char * const errors=check_object();
+   if (errors[0])
+   {
+     G_THROW(errors);
+   }
    
    int i;
    GString tmp;
@@ -155,48 +200,67 @@ GMapArea::print(void)
       comment1+=ch;
    }
    
-   char border_width_str[128];
-   sprintf(border_width_str, "%d", border_width);
-   
    GString border_color_str;
-   char buffer[128];
-   sprintf(buffer, "#%02X%02X%02X",
+   border_color_str.format("#%02X%02X%02X",
 	   (border_color & 0xff0000) >> 16,
 	   (border_color & 0xff00) >> 8,
 	   (border_color & 0xff));
-   border_color_str=buffer;
-   
+
+   static const GString left="(";
+   static const char right[]=")";
+   static const char space[]=" ";
    GString border_type_str;
    switch(border_type)
    {
-      case NO_BORDER: border_type_str="(" NO_BORDER_TAG ")"; break;
-      case XOR_BORDER: border_type_str="(" XOR_BORDER_TAG ")"; break;
-      case SOLID_BORDER: border_type_str="(" SOLID_BORDER_TAG " "+border_color_str+")"; break;
-      case SHADOW_IN_BORDER: border_type_str=GString("(" SHADOW_IN_BORDER_TAG " ")+border_width_str+")"; break;
-      case SHADOW_OUT_BORDER: border_type_str=GString("(" SHADOW_OUT_BORDER_TAG " ")+border_width_str+")"; break;
-      case SHADOW_EIN_BORDER: border_type_str=GString("(" SHADOW_EIN_BORDER_TAG " ")+border_width_str+")"; break;
-      case SHADOW_EOUT_BORDER: border_type_str=GString("(" SHADOW_EOUT_BORDER_TAG " ")+border_width_str+")"; break;
-      default: border_type_str="(" XOR_BORDER_TAG ")"; break;
+      case NO_BORDER:
+        border_type_str=left+NO_BORDER_TAG+right;
+        break;
+      case XOR_BORDER:
+        border_type_str=left+XOR_BORDER_TAG+right;
+        break;
+      case SOLID_BORDER:
+        border_type_str=left+SOLID_BORDER_TAG+space+border_color_str+right;
+        break;
+      case SHADOW_IN_BORDER:
+        border_type_str=left+SHADOW_IN_BORDER_TAG+space+GString(border_width)+right;
+        break;
+      case SHADOW_OUT_BORDER:
+        border_type_str=left+SHADOW_OUT_BORDER_TAG+space+GString(border_width)+right;
+        break;
+      case SHADOW_EIN_BORDER:
+        border_type_str=left+SHADOW_EIN_BORDER_TAG+space+GString(border_width)+right;
+        break;
+      case SHADOW_EOUT_BORDER:
+        border_type_str=left+SHADOW_EOUT_BORDER_TAG+space+GString(border_width)+right;
+        break;
+      default:
+        border_type_str=left+XOR_BORDER_TAG+right;
+        break;
    }
 
    GString hilite_str;
    if (hilite_color!=0xffffffff)
    {
-      char buffer[128];
-      sprintf(buffer, "(" HILITE_TAG " #%02X%02X%02X)",
-	      (hilite_color & 0xff0000) >> 16,
+      hilite_str.format("(%s #%02X%02X%02X)",
+	      HILITE_TAG, (hilite_color & 0xff0000) >> 16,
 	      (hilite_color & 0xff00) >> 8,
 	      (hilite_color & 0xff));
-      hilite_str=buffer;
    }
    
    GString URL;
-   if (target1=="_self") URL="\""+url1+"\"";
-   else URL="(url \""+url1+"\" \""+target1+"\")";
+   if (target1=="_self")
+   {
+      URL="\""+url1+"\"";
+   }else
+   {
+      URL="(url \""+url1+"\" \""+target1+"\")";
+   }
 
-   GString total="(" MAPAREA_TAG " "+URL+" \""+comment1+"\" "+gma_print()+border_type_str;
-   if (border_always_visible) total+=" (" BORDER_AVIS_TAG ")";
-   if (hilite_str.length()) total+=" "+hilite_str;
+   GString total=left+MAPAREA_TAG+" "+URL+" \""+comment1+"\" "+gma_print()+border_type_str;
+   if (border_always_visible)
+     total+=space+left+BORDER_AVIS_TAG+")";
+   if (hilite_str[0])
+     total+=space+hilite_str;
    total+=")";
    return total;
 }
@@ -223,8 +287,8 @@ GString
 GMapRect::gma_print(void)
 {
    char buffer[128];
-   sprintf(buffer, "(" RECT_TAG " %d %d %d %d) ",
-	   xmin, ymin, xmax-xmin, ymax-ymin);
+   sprintf(buffer, "(%s %d %d %d %d) ",
+	   RECT_TAG, xmin, ymin, xmax-xmin, ymax-ymin);
    return buffer;
 }
 
@@ -294,7 +358,7 @@ GMapPoly::are_segments_parallel(int x11, int y11, int x12, int y12,
    return (x12-x11)*(y22-y21)-(y12-y11)*(x22-x21)==0;
 }
 
-GString
+char const * const
 GMapPoly::check_data(void)
 {
   if (open && points<2 || !open && points<3) 
@@ -345,9 +409,10 @@ GMapPoly::optimize_data(void)
 }
 
 bool
-GMapPoly::gma_is_point_inside(int xin, int yin)
+GMapPoly::gma_is_point_inside(const int xin, const int yin)
 {
-   if (open) return false;
+   if (open)
+     return false;
    
    int xfar=get_xmax()+(get_xmax()-get_xmin());
    
@@ -386,7 +451,7 @@ GMapPoly::gma_is_point_inside(int xin, int yin)
 }
 
 int
-GMapPoly::gma_get_xmin(void)
+GMapPoly::gma_get_xmin(void) const
 {
    int x=xx[0];
    for(int i=1;i<points;i++)
@@ -395,7 +460,7 @@ GMapPoly::gma_get_xmin(void)
 }
 
 int
-GMapPoly::gma_get_xmax(void)
+GMapPoly::gma_get_xmax(void) const
 {
    int x=xx[0];
    for(int i=1;i<points;i++)
@@ -404,7 +469,7 @@ GMapPoly::gma_get_xmax(void)
 }
 
 int
-GMapPoly::gma_get_ymin(void)
+GMapPoly::gma_get_ymin(void) const
 {
    int y=yy[0];
    for(int i=1;i<points;i++)
@@ -413,7 +478,7 @@ GMapPoly::gma_get_ymin(void)
 }
 
 int
-GMapPoly::gma_get_ymax(void)
+GMapPoly::gma_get_ymax(void) const
 {
    int y=yy[0];
    for(int i=1;i<points;i++)
@@ -456,18 +521,18 @@ GMapPoly::gma_transform(const GRect & grect)
    }
 }
 
-GString
-GMapPoly::gma_check_object(void)
+char const * const
+GMapPoly::gma_check_object(void) const
 {
-   GString str=check_data();
-   if (str.length()) return str;
-   if (border_type!=NO_BORDER &&
+   const char * str=(const_cast<GMapPoly *>(this))->check_object();
+   if (!str[0])
+   {
+     str=(border_type!=NO_BORDER &&
        border_type!=SOLID_BORDER &&
-       border_type!=XOR_BORDER)
-      return "GMapAreas.poly_border";
-   if (hilite_color!=0xffffffff)
-      return "GMapAreas.poly_hilite";
-   return "";
+       border_type!=XOR_BORDER)?"GMapAreas.poly_border":
+         ((hilite_color!=0xffffffff)?"GMapAreas.poly_hilite":"");
+   }
+   return str;
 }
 
 GMapPoly::GMapPoly(const int * _xx, const int * _yy, int _points, bool _open) :
@@ -482,7 +547,7 @@ GMapPoly::GMapPoly(const int * _xx, const int * _yy, int _points, bool _open) :
    }
    optimize_data();
    GString res=check_data();
-   if (res.length()) G_THROW(res);
+   if (res[0]) G_THROW(res);
 }
 
 int      
@@ -508,7 +573,7 @@ GMapPoly::close_poly()
 GString
 GMapPoly::gma_print(void)
 {
-   GString res="(" POLY_TAG " ";
+   GString res=GString("(")+POLY_TAG+" ";
    for(int i=0;i<points;i++)
    {
       char buffer[128];
@@ -541,23 +606,20 @@ GMapOval::gma_transform(const GRect & grect)
 }
 
 bool
-GMapOval::gma_is_point_inside(int x, int y)
+GMapOval::gma_is_point_inside(const int x, const int y)
 {
    return
       sqrt((x-xf1)*(x-xf1)+(y-yf1)*(y-yf1))+
       sqrt((x-xf2)*(x-xf2)+(y-yf2)*(y-yf2))<=2*rmax;
 }
 
-GString
-GMapOval::gma_check_object(void)
+char const * const
+GMapOval::gma_check_object(void) const
 {
-   if (border_type!=NO_BORDER &&
+   return (border_type!=NO_BORDER &&
        border_type!=SOLID_BORDER &&
-       border_type!=XOR_BORDER)
-      return "GMapAreas.oval_border";
-   if (hilite_color!=0xffffffff)
-      return "";
-   return "GMapAreas.oval_hilite";
+       border_type!=XOR_BORDER)?"GMapAreas.oval_border":
+      ((hilite_color!=0xffffffff)?"":"GMapAreas.oval_hilite");
 }
 
 void
@@ -592,7 +654,7 @@ GString
 GMapOval::gma_print(void)
 {
    char buffer[128];
-   sprintf(buffer, "(" OVAL_TAG " %d %d %d %d) ",
-	   xmin, ymin, xmax-xmin, ymax-ymin);
+   sprintf(buffer, "(%s %d %d %d %d) ",
+	   OVAL_TAG, xmin, ymin, xmax-xmin, ymax-ymin);
    return buffer;
 }
