@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.9 1999-06-10 23:30:49 eaf Exp $
+//C- $Id: DjVuFile.cpp,v 1.10 1999-06-15 19:07:10 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -26,13 +26,20 @@ public:
 
    virtual size_t read(void *buffer, size_t size)
    {
-      int cur_pos=str->tell();
-      if (progress_cb && (last_call_pos/256!=cur_pos/256))
-      {
-	 progress_cb(cur_pos, progress_cl_data);
-	 last_call_pos=cur_pos;
-      }
-      return str->read(buffer, size);
+      int rc=0;
+	 // TRY {} CATCH; block here is merely to avoid egcs internal error
+      TRY {
+	 int cur_pos=str->tell();
+	 if (progress_cb && (last_call_pos/256!=cur_pos/256))
+	 {
+	    progress_cb(cur_pos, progress_cl_data);
+	    last_call_pos=cur_pos;
+	 }
+	 rc=str->read(buffer, size);
+      } CATCH(exc) {
+	 RETHROW;
+      } ENDCATCH;
+      return rc;
    }
    virtual size_t write(const void *buffer, size_t size)
    {
@@ -316,28 +323,32 @@ DjVuFile::decode_func(void)
 	    THROW("Internal error: an included file has not finished yet.");
       };
    } CATCH(exc) {
-      delete decode_stream; decode_stream=0;
-      if (strcmp(exc.get_cause(), "STOP") == 0)
-      {
-	 status_mon.enter();
-	 status=status & ~DECODING | DECODE_STOPPED;
-	 status_mon.leave();
-	 pcaster->notify_status(this, GString(url)+" STOPPED");
-	 pcaster->notify_file_stopped(this);
-      } else
-      {
-	 status_mon.enter();
-	 status=status & ~DECODING | DECODE_FAILED;
-	 status_mon.leave();
-	 pcaster->notify_status(this, GString(url)+" FAILED");
-	 pcaster->notify_error(this, exc.get_cause());
-	 pcaster->notify_file_failed(this);
-      };
+      TRY {
+	 delete decode_stream; decode_stream=0;
+	 if (strcmp(exc.get_cause(), "STOP") == 0)
+	 {
+	    status_mon.enter();
+	    status=status & ~DECODING | DECODE_STOPPED;
+	    status_mon.leave();
+	    pcaster->notify_status(this, GString(url)+" STOPPED");
+	    pcaster->notify_file_stopped(this);
+	 } else
+	 {
+	    status_mon.enter();
+	    status=status & ~DECODING | DECODE_FAILED;
+	    status_mon.leave();
+	    pcaster->notify_status(this, GString(url)+" FAILED");
+	    pcaster->notify_error(this, exc.get_cause());
+	    pcaster->notify_file_failed(this);
+	 };
+      } CATCH(exc) {
+	 DEBUG_MSG("******* Oops. Almost missed an exception\n");
+      } ENDCATCH;
    } ENDCATCH;
 
-   delete decode_stream; decode_stream=0;
-
    TRY {
+      delete decode_stream; decode_stream=0;
+      
       status_mon.enter();
       if (is_decoding())
       {
@@ -424,7 +435,7 @@ DjVuFile::decode(ByteStream & str)
    
    IFFByteStream iff(str);
    if (!iff.get_chunk(chkid)) 
-     THROW("EOF");
+      THROW("EOF");
 
    bool djvi=(chkid=="FORM:DJVI");
 
@@ -436,132 +447,136 @@ DjVuFile::decode(ByteStream & str)
       {
 	 DEBUG_MSG("decoding chunk '" << chkid << "'\n");
 	 
-	 if (chkid=="INFO")
-	 {
-	    if (DjVuFile::info)
-	       THROW("DjVu Decoder: Corrupted file (Duplicate INFO chunk)");
-	    GP<DjVuInfo> info=new DjVuInfo();
-	    info->decode(iff);
-	    DjVuFile::info=info;
-	    pcaster->notify_relayout(this);
-	    desc.format(" %0.1f Kb\t'%s'\tPage information.\n", 
-			chksize/1024.0, (const char*)chkid );
-              
-	 } else if (chkid=="ANTa")
-	 {
-	    if (!anno)
+	    // TRY {} CATCH; block here is merely to avoid egcs internal error
+	 TRY {
+	    if (chkid=="INFO")
 	    {
-	       GP<DjVuAnno> tmp_anno=new DjVuAnno();
-	       tmp_anno->decode(iff);
-	       anno=tmp_anno;
-	    } else anno->merge(iff);
-	    desc.format(" %0.1f Kb\t'%s'\tPage annotation.\n",
-			chksize/1024.0, (const char*)chkid);
-	 } else if (chkid=="INCL" || chkid=="INCF")
-	 {
-	    GP<DjVuFile> file=process_incl_chunk(iff, chkid=="INCL");
-	    if (file)
-	       if (!file->is_decoding() &&
-		   !file->is_decode_ok() &&
-		   !file->is_decode_failed()) file->start_decode();
-	       else
+	       if (DjVuFile::info)
+		  THROW("DjVu Decoder: Corrupted file (Duplicate INFO chunk)");
+	       GP<DjVuInfo> info=new DjVuInfo();
+	       info->decode(iff);
+	       DjVuFile::info=info;
+	       pcaster->notify_relayout(this);
+	       desc.format(" %0.1f Kb\t'%s'\tPage information.\n", 
+			   chksize/1024.0, (const char*)chkid );
+	    } else if (chkid=="ANTa")
+	    {
+	       if (!anno)
 	       {
-		  ByteStream * str=0;
-		  TRY {
-		     str=file->data_range->get_stream();
-		     int chksize;
-		     GString chkid;
-		     IFFByteStream iff(*str);
-		     if (!iff.get_chunk(chkid)) 
-                       THROW("EOF");
+		  GP<DjVuAnno> tmp_anno=new DjVuAnno();
+		  tmp_anno->decode(iff);
+		  anno=tmp_anno;
+	       } else anno->merge(iff);
+	       desc.format(" %0.1f Kb\t'%s'\tPage annotation.\n",
+			   chksize/1024.0, (const char*)chkid);
+	    } else if (chkid=="INCL" || chkid=="INCF")
+	    {
+	       GP<DjVuFile> file=process_incl_chunk(iff, chkid=="INCL");
+	       if (file)
+		  if (!file->is_decoding() &&
+		      !file->is_decode_ok() &&
+		      !file->is_decode_failed()) file->start_decode();
+		  else
+		  {
+		     ByteStream * str=0;
+		     TRY {
+			str=file->data_range->get_stream();
+			int chksize;
+			GString chkid;
+			IFFByteStream iff(*str);
+			if (!iff.get_chunk(chkid)) 
+			   THROW("EOF");
 
-		     while((chksize=iff.get_chunk(chkid)))
-		     {
-			get_portcaster()->notify_chunk_done(file, chkid);
-			iff.close_chunk();
-		     }
-		  } CATCH(exc) {
+			while((chksize=iff.get_chunk(chkid)))
+			{
+			   get_portcaster()->notify_chunk_done(file, chkid);
+			   iff.close_chunk();
+			}
+		     } CATCH(exc) {
+			delete str; str=0;
+			RETHROW;
+		     } ENDCATCH;
 		     delete str; str=0;
-		     RETHROW;
-		  } ENDCATCH;
-		  delete str; str=0;
-	       }
-	    desc.format(" %0.1f Kb\t'%s'\tIndirection chunk.\n",
-			chksize/1024.0, (const char*)chkid);
-	 } else if (chkid=="NDIR")
-	 {
-	    GP<DjVuNavDir> dir=new DjVuNavDir(url);
-	    dir->decode(iff);
-	    DjVuFile::dir=dir;
-	    desc.format(" %0.1f Kb\t'%s'\tNavigation chunk.\n",
-			chksize/1024.0, (const char*)chkid);
-	 } else if (chkid=="BG44")
-	 {
-	    if (!bg44)
+		  }
+	       desc.format(" %0.1f Kb\t'%s'\tIndirection chunk.\n",
+			   chksize/1024.0, (const char*)chkid);
+	    } else if (chkid=="NDIR")
 	    {
-		  // First chunk
-	       GP<IWPixmap> bg44=new IWPixmap();
-	       bg44->decode_chunk(iff);
-	       DjVuFile::bg44=bg44;
-	       pcaster->notify_redisplay(this);
-	       desc.format(" %0.1f Kb\t'%s'\tIW44 background (%dx%d)\n",
-			   chksize/1024.0, (const char*)chkid,
-			   bg44->get_width(), bg44->get_height());
-	    } else
+	       GP<DjVuNavDir> dir=new DjVuNavDir(url);
+	       dir->decode(iff);
+	       DjVuFile::dir=dir;
+	       desc.format(" %0.1f Kb\t'%s'\tNavigation chunk.\n",
+			   chksize/1024.0, (const char*)chkid);
+	    } else if (chkid=="BG44")
 	    {
-		  // Refinement chunks
-	       bg44->decode_chunk(iff);
-	       pcaster->notify_redisplay(this);
-	       desc.format(" %0.1f Kb\t'%s'\tIW44 background (part %d).\n",
-			   chksize/1024.0, (const char*)chkid,
-			   bg44->get_serial());
+	       if (!bg44)
+	       {
+		     // First chunk
+		  GP<IWPixmap> bg44=new IWPixmap();
+		  bg44->decode_chunk(iff);
+		  DjVuFile::bg44=bg44;
+		  pcaster->notify_redisplay(this);
+		  desc.format(" %0.1f Kb\t'%s'\tIW44 background (%dx%d)\n",
+			      chksize/1024.0, (const char*)chkid,
+			      bg44->get_width(), bg44->get_height());
+	       } else
+	       {
+		     // Refinement chunks
+		  bg44->decode_chunk(iff);
+		  pcaster->notify_redisplay(this);
+		  desc.format(" %0.1f Kb\t'%s'\tIW44 background (part %d).\n",
+			      chksize/1024.0, (const char*)chkid,
+			      bg44->get_serial());
                   
-	    }
-	 } else if (chkid=="Sjbz")
-	 {
-	    if (DjVuFile::fgjb)
-	       THROW("DjVu Decoder: Corrupted data (Duplicate FGxx chunk)");
-	    GP<JB2Image> fgjb=new JB2Image();
-	    fgjb->decode(iff);
-	    DjVuFile::fgjb=fgjb;
-	    pcaster->notify_redisplay(this);
-	    desc.format(" %0.1f Kb\t'%s'\tJB2 foreground mask (%dx%d)\n",
-			chksize/1024.0, (const char*)chkid,
-			fgjb->get_width(), fgjb->get_height());
-	 } else if (chkid=="FG44")
-	 {
-	    if (fgpm)
-	       THROW("DjVu Decoder: Corrupted data (Duplicate foreground layer)");
-	    IWPixmap fg44;
-	    fg44.decode_chunk(iff);
-	    fgpm=fg44.get_pixmap();
-	    pcaster->notify_redisplay(this);
-	    desc.format(" %0.1f Kb\t'%s'\tIW44 foreground colors (%dx%d)\n",
-			chksize/1024.0, (const char*)chkid,
-			fg44.get_width(), fg44.get_height());
-	 } else if (chkid=="BGjp")
-	 {
-	    if (bg44)
-	       THROW("DjVu Decoder: Corrupted data (Duplicate background layer)");
-	    desc.format(" %0.1f Kb\t'%s'\tObsolete JPEG background (Ignored).\n", 
-			chksize/1024.0, (const char*)chkid);
-	 } else if (chkid=="FGjp")
-	 {
-	    if (fgpm)
-	       THROW("DjVu Decoder: Corrupted data (Duplicate foreground layer)");
-	    desc.format(" %0.1f Kb\t'%s'\tObsolete JPEG foreground colors (Ignored).\n", 
-			chksize/1024.0, (const char*)chkid);
-	 } else 
-	 {
-	    desc.format(" %0.1f Kb\t'%s'\tUnknown chunk (Ignored).\n",
-			chksize/1024.0, (const char*)chkid);
-	 };
-	    // Update description and notify
-	 description=description+desc;
-	 pcaster->notify_chunk_done(this, chkid);
+	       }
+	    } else if (chkid=="Sjbz")
+	    {
+	       if (DjVuFile::fgjb)
+		  THROW("DjVu Decoder: Corrupted data (Duplicate FGxx chunk)");
+	       GP<JB2Image> fgjb=new JB2Image();
+	       fgjb->decode(iff);
+	       DjVuFile::fgjb=fgjb;
+	       pcaster->notify_redisplay(this);
+	       desc.format(" %0.1f Kb\t'%s'\tJB2 foreground mask (%dx%d)\n",
+			   chksize/1024.0, (const char*)chkid,
+			   fgjb->get_width(), fgjb->get_height());
+	    } else if (chkid=="FG44")
+	    {
+	       if (fgpm)
+		  THROW("DjVu Decoder: Corrupted data (Duplicate foreground layer)");
+	       IWPixmap fg44;
+	       fg44.decode_chunk(iff);
+	       fgpm=fg44.get_pixmap();
+	       pcaster->notify_redisplay(this);
+	       desc.format(" %0.1f Kb\t'%s'\tIW44 foreground colors (%dx%d)\n",
+			   chksize/1024.0, (const char*)chkid,
+			   fg44.get_width(), fg44.get_height());
+	    } else if (chkid=="BGjp")
+	    {
+	       if (bg44)
+		  THROW("DjVu Decoder: Corrupted data (Duplicate background layer)");
+	       desc.format(" %0.1f Kb\t'%s'\tObsolete JPEG background (Ignored).\n", 
+			   chksize/1024.0, (const char*)chkid);
+	    } else if (chkid=="FGjp")
+	    {
+	       if (fgpm)
+		  THROW("DjVu Decoder: Corrupted data (Duplicate foreground layer)");
+	       desc.format(" %0.1f Kb\t'%s'\tObsolete JPEG foreground colors (Ignored).\n", 
+			   chksize/1024.0, (const char*)chkid);
+	    } else 
+	    {
+	       desc.format(" %0.1f Kb\t'%s'\tUnknown chunk (Ignored).\n",
+			   chksize/1024.0, (const char*)chkid);
+	    };
+	       // Update description and notify
+	    description=description+desc;
+	    pcaster->notify_chunk_done(this, chkid);
 	 
-	    // Close chunk
-	 iff.close_chunk();
+	       // Close chunk
+	    iff.close_chunk();
+	 } CATCH(exc) {
+	    RETHROW;
+	 } ENDCATCH;
       }
 
 	 // Record file size
@@ -588,87 +603,92 @@ DjVuFile::decode(ByteStream & str)
       {
 	 DEBUG_MSG("decoding chunk '" << chkid << "'\n");
 	 
-	 if (chkid=="ANTa")
-	 {
-	    if (!anno)
+	    // TRY {} CATCH; block here is merely to avoid egcs internal error
+	 TRY {
+	    if (chkid=="ANTa")
 	    {
-	       GP<DjVuAnno> tmp_anno=new DjVuAnno();
-	       tmp_anno->decode(iff);
-	       anno=tmp_anno;
-	    } else anno->merge(iff);
-	    desc.format(" %0.1f Kb\t'%s'\tPage annotation.\n",
-			chksize/1024.0, (const char*)chkid);
-	 } else if (chkid=="INCL" || chkid=="INCF")
-	 {
-	    GP<DjVuFile> file=process_incl_chunk(iff, chkid=="INCL");
-	    if (file)
-	       if (!file->is_decoding() &&
-		   !file->is_decode_ok() &&
-		   !file->is_decode_failed()) file->start_decode();
-	       else
+	       if (!anno)
 	       {
-		  ByteStream * str=0;
-		  TRY {
-		     str=file->data_range->get_stream();
-		     int chksize;
-		     GString chkid;
-		     IFFByteStream iff(*str);
-		     if (!iff.get_chunk(chkid)) 
-                       THROW("EOF");
-		     while((chksize=iff.get_chunk(chkid)))
-		     {
-			get_portcaster()->notify_chunk_done(file, chkid);
-			iff.close_chunk();
-		     }
-		  } CATCH(exc) {
-		     delete str; str=0;
-		     RETHROW;
-		  } ENDCATCH;
-		  delete str; str=0;
-	       }
-	    desc.format(" %0.1f Kb\t'%s'\tIndirection chunk (Unsupported).\n",
-			chksize/1024.0, (const char*)chkid);
-	 } else if (chkid=="NDIR")
-	 {
-	    GP<DjVuNavDir> dir=new DjVuNavDir(url);
-	    dir->decode(iff);
-	    DjVuFile::dir=dir;
-	    desc.format(" %0.1f Kb\t'%s'\tNavigation chunk (Unsupported).\n",
-			chksize/1024.0, (const char*)chkid);
-	 } else if (chkid=="PM44" || chkid=="BM44")
-	 {
-	    if (!bg44)
+		  GP<DjVuAnno> tmp_anno=new DjVuAnno();
+		  tmp_anno->decode(iff);
+		  anno=tmp_anno;
+	       } else anno->merge(iff);
+	       desc.format(" %0.1f Kb\t'%s'\tPage annotation.\n",
+			   chksize/1024.0, (const char*)chkid);
+	    } else if (chkid=="INCL" || chkid=="INCF")
 	    {
-                  // First chunk
-	       GP<IWPixmap> bg44=new IWPixmap();
-	       bg44->decode_chunk(iff);
-	       GP<DjVuInfo> info=new DjVuInfo();
-	       info->width=bg44->get_width();
-	       info->height=bg44->get_height();
-	       info->dpi=100;
-	       DjVuFile::bg44=bg44;
-	       DjVuFile::info=info;
-	       pcaster->notify_relayout(this);
+	       GP<DjVuFile> file=process_incl_chunk(iff, chkid=="INCL");
+	       if (file)
+		  if (!file->is_decoding() &&
+		      !file->is_decode_ok() &&
+		      !file->is_decode_failed()) file->start_decode();
+		  else
+		  {
+		     ByteStream * str=0;
+		     TRY {
+			str=file->data_range->get_stream();
+			int chksize;
+			GString chkid;
+			IFFByteStream iff(*str);
+			if (!iff.get_chunk(chkid)) 
+			   THROW("EOF");
+			while((chksize=iff.get_chunk(chkid)))
+			{
+			   get_portcaster()->notify_chunk_done(file, chkid);
+			   iff.close_chunk();
+			}
+		     } CATCH(exc) {
+			delete str; str=0;
+			RETHROW;
+		     } ENDCATCH;
+		     delete str; str=0;
+		  }
+	       desc.format(" %0.1f Kb\t'%s'\tIndirection chunk (Unsupported).\n",
+			   chksize/1024.0, (const char*)chkid);
+	    } else if (chkid=="NDIR")
+	    {
+	       GP<DjVuNavDir> dir=new DjVuNavDir(url);
+	       dir->decode(iff);
+	       DjVuFile::dir=dir;
+	       desc.format(" %0.1f Kb\t'%s'\tNavigation chunk (Unsupported).\n",
+			   chksize/1024.0, (const char*)chkid);
+	    } else if (chkid=="PM44" || chkid=="BM44")
+	    {
+	       if (!bg44)
+	       {
+		     // First chunk
+		  GP<IWPixmap> bg44=new IWPixmap();
+		  bg44->decode_chunk(iff);
+		  GP<DjVuInfo> info=new DjVuInfo();
+		  info->width=bg44->get_width();
+		  info->height=bg44->get_height();
+		  info->dpi=100;
+		  DjVuFile::bg44=bg44;
+		  DjVuFile::info=info;
+		  pcaster->notify_relayout(this);
+	       } else
+	       {
+		     // Refinement chunks
+		  bg44->decode_chunk(iff);
+		  pcaster->notify_redisplay(this);
+	       }
+	       desc.format(" %0.1f Kb\t'%s'\tIW44 wavelet data (part %d)\n", 
+			   chksize/1024.0, (const char*)chkid, 
+			   bg44->get_serial());
 	    } else
 	    {
-                  // Refinement chunks
-	       bg44->decode_chunk(iff);
-	       pcaster->notify_redisplay(this);
+	       desc.format(" %0.1f Kb\t'%s'\tUnknown chunk (Ignored).\n",
+			   chksize/1024.0, (const char*)chkid);
 	    }
-	    desc.format(" %0.1f Kb\t'%s'\tIW44 wavelet data (part %d)\n", 
-			chksize/1024.0, (const char*)chkid, 
-			bg44->get_serial());
-	 } else
-	 {
-	    desc.format(" %0.1f Kb\t'%s'\tUnknown chunk (Ignored).\n",
-			chksize/1024.0, (const char*)chkid);
-	 }
-	    // Update description and notify
-	 description=description+desc;
-	 pcaster->notify_chunk_done(this, chkid);
+	       // Update description and notify
+	    description=description+desc;
+	    pcaster->notify_chunk_done(this, chkid);
 	 
-	    // Close chunk
-	 iff.close_chunk();
+	       // Close chunk
+	    iff.close_chunk();
+	 } CATCH(exc) {
+	    RETHROW;
+	 } ENDCATCH;
       }
 	 // Record file size
       file_size=iff.tell();
