@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.h,v 1.31 1999-09-28 16:19:57 eaf Exp $
+//C- $Id: DjVuDocument.h,v 1.32 1999-09-28 20:23:39 eaf Exp $
  
 #ifndef _DJVUDOCUMENT_H
 #define _DJVUDOCUMENT_H
@@ -33,7 +33,7 @@
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocument.h,v 1.31 1999-09-28 16:19:57 eaf Exp $#
+    @version #$Id: DjVuDocument.h,v 1.32 1999-09-28 20:23:39 eaf Exp $#
 */
 
 //@{
@@ -334,7 +334,7 @@ public:
 	  insufficient information about the document structure (initialization
 	  has not finished yet), #1# will be returned. Plese refer to
           \Ref{init}() for details. */
-   int		get_pages_num(void);
+   int		get_pages_num(void) const;
       /** Translates the page number to the full URL of the page. This URL
 	  is "artificial" for the {\em bundled} formats and is obtained
 	  by appending the page name to the document's URL honoring possible
@@ -358,7 +358,7 @@ public:
 		   be set. Otherwise #DOC_NDIR_KNOWN# flag must be set.
 	     \item #INDIRECT# and #BUNDLED#: #DOC_DIR_KNOWN# flag must be set.
 	  \end{itemize} */
-   GURL		page_to_url(int page_num);
+   GURL		page_to_url(int page_num) const;
       /** Translates the page URL back to page number. Returns #-1# if the
 	  page is not in the document. If the document's structure has
           not been learnt yet #0# will be returned.
@@ -369,7 +369,7 @@ public:
 	     \item #OLD_INDEXED# and #OLD_BUNDLED#: #DOC_NDIR_KNOWN# is set
 	     \item #INDIRECT# and #BUNDLED#: #DOC_DIR_KNOWN# is set.
 	  \end{itemize} */
-   int		url_to_page(const GURL & url);
+   int		url_to_page(const GURL & url) const;
       /** Translates the textual ID to the complete URL if possible.
 	  
 	  Depending on the document format the translation is done in the
@@ -406,7 +406,7 @@ public:
 	     \item #BUNDLED# and #INDIRECT#: #DOC_DIR_KNOWN# flag is set.
 	     \item #OLD_BUNDLED# and #OLD_INDEXED#: #DOC_TYPE_KNOWN# flag is set.
 	  \end{itemize} */
-   GURL		id_to_url(const char * id);
+   GURL		id_to_url(const char * id) const;
 
       /** Returns \Ref{GP} pointer to \Ref{DjVuImage} corresponding to page
           #page_num#. If caching is enabled and there is a {\em fully decoded}
@@ -563,6 +563,10 @@ public:
    virtual void		notify_file_flags_changed(const DjVuFile * source,
 						  long set_mask, long clr_mask);
 protected:
+   GURL			init_url;
+   GP<DataPool>		init_data_pool;
+   GP<DjVmDir>		djvm_dir;	// New-style DjVm directory
+   
    virtual GP<DjVuFile>	url_to_file(const GURL & url);
 private:
    class UnnamedFile : public GPEnabled
@@ -586,16 +590,12 @@ private:
    GP<DjVuSimplePort>	simple_port;
    int			doc_type;
 
-   GP<DjVmDir>		djvm_dir;	// New-style DjVm directory
    GP<DjVmDir0>		djvm_dir0;	// Old-style DjVm directory
    GP<DjVuNavDir>	ndir;		// Old-style navigation directory
    GString		first_page_name;// For OLD_BUNDLED docs only
 
    GP<DjVuFile>		ndir_file;	// Used to query NDIR.
    
-   GURL			init_url;
-   GP<DataPool>		init_data_pool;
-
    GPList<UnnamedFile>	ufiles_list;
    GCriticalSection	ufiles_lock;
 

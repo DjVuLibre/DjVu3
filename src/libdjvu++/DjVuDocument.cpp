@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.50 1999-09-27 22:22:18 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.51 1999-09-28 20:23:39 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -382,7 +382,7 @@ DjVuDocument::check_unnamed_files(void)
 }
 
 int
-DjVuDocument::get_pages_num(void)
+DjVuDocument::get_pages_num(void) const
 {
    check();
    if (flags & DOC_TYPE_KNOWN)
@@ -394,7 +394,7 @@ DjVuDocument::get_pages_num(void)
 }
 
 GURL
-DjVuDocument::page_to_url(int page_num)
+DjVuDocument::page_to_url(int page_num) const
 {
    check();
    DEBUG_MSG("DjVuDocument::page_to_url(): page_num=" << page_num << "\n");
@@ -448,7 +448,7 @@ DjVuDocument::page_to_url(int page_num)
 }
 
 int
-DjVuDocument::url_to_page(const GURL & url)
+DjVuDocument::url_to_page(const GURL & url) const
 {
    check();
    DEBUG_MSG("DjVuDocument::url_to_page(): url='" << url << "'\n");
@@ -491,7 +491,7 @@ DjVuDocument::url_to_page(const GURL & url)
 }
 
 GURL
-DjVuDocument::id_to_url(const char * id)
+DjVuDocument::id_to_url(const char * id) const
 {
    check();
    DEBUG_MSG("DjVuDocument::id_to_url(): translating ID='" << id << "' to URL\n");
