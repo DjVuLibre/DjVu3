@@ -7,7 +7,7 @@
 # C- AT&T, you have an infringing copy of this software and cannot use it
 # C- without violating AT&T's intellectual property rights.
 # C-
-# C- $Id: Makefile.in,v 1.75 2000-01-04 04:48:38 bcr Exp $
+# C- $Id: Makefile.in,v 1.76 2000-01-13 00:06:39 leonb Exp $
 
 %%%include <paths>
 
@@ -24,7 +24,7 @@ INCS=@%INCS%@
 CXXFLAGS=@%CXXFLAGS%@ $(CXXOPT) $(CXXWARN) $(DEFS) $(INCS)
 LDFLAGS=
 DOCXX=@%docxx%@
-LIBS=@%LIBS%@ @%libmath%@
+LIBS=@%LIBS%@ @%LIBJPEG%@ @%libmath%@
 MAKESTLIB=@%make_stlib%@
 MAKESHLIB=@%make_shlib%@
 
@@ -82,9 +82,9 @@ PPMCOCOOBJS = ppmcoco.o
 ANNOTATEOBJS = annotate.o
 BZZOBJS = bzz.o
 
-$(BINPATH)/djvmcvt: $(DJVMCVTOBJS) $(LIB) @%LIBJPEG%@
-	if [ -n "$(RPO)" ] ; then $(RPO) $(DJVMCVTOBJS) $(LIB) @%LIBJPEG%@ ; fi
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(DJVMCVTOBJS) $(LIB) @%LIBJPEG%@ $(LIBS)
+$(BINPATH)/djvmcvt: $(DJVMCVTOBJS) $(LIB)
+	if [ -n "$(RPO)" ] ; then $(RPO) $(DJVMCVTOBJS) $(LIB) ; fi
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(DJVMCVTOBJS) $(LIB) $(LIBS)
 
 $(BINPATH)/djvm: $(DJVMOBJS) $(LIB)
 	if [ -n "$(RPO)" ] ; then $(RPO) $(DJVMOBJS) $(LIB) ; fi
@@ -102,17 +102,17 @@ $(BINPATH)/djvudump: $(DJVUDUMPOBJS) $(LIB)
 	if [ -n "$(RPO)" ] ; then $(RPO) $(DJVUDUMPOBJS) $(LIB)  ; fi
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(DJVUDUMPOBJS) $(LIB) $(LIBS)
 
-$(BINPATH)/djvutopnm: $(DJVUTOPNMOBJS) $(LIB) @%LIBJPEG%@
-	if [ -n "$(RPO)" ] ; then $(RPO) $(DJVUTOPNMOBJS) $(LIB) @%LIBJPEG%@ ; fi
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(DJVUTOPNMOBJS) $(LIB) @%LIBJPEG%@ $(LIBS)
+$(BINPATH)/djvutopnm: $(DJVUTOPNMOBJS) $(LIB)
+	if [ -n "$(RPO)" ] ; then $(RPO) $(DJVUTOPNMOBJS) $(LIB) ; fi
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(DJVUTOPNMOBJS) $(LIB) $(LIBS)
 
 $(BINPATH)/djvumake: $(MAKEDEJAVUOBJS) $(LIB)
 	if [ -n "$(RPO)" ] ; then $(RPO) $(MAKEDEJAVUOBJS) $(LIB) ; fi
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(MAKEDEJAVUOBJS) $(LIB) $(LIBS)
 
-$(BINPATH)/djvuextract: $(BREAKDEJAVUOBJS) $(LIB) @%LIBJPEG%@
-	if [ -n "$(RPO)" ] ; then $(RPO) $(BREAKDEJAVUOBJS) $(LIB) @%LIBJPEG%@ ; fi
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(BREAKDEJAVUOBJS) $(LIB) @%LIBJPEG%@ $(LIBS)
+$(BINPATH)/djvuextract: $(BREAKDEJAVUOBJS) $(LIB)
+	if [ -n "$(RPO)" ] ; then $(RPO) $(BREAKDEJAVUOBJS) $(LIB) ; fi
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(BREAKDEJAVUOBJS) $(LIB) $(LIBS)
 
 $(BINPATH)/ppmcoco: $(PPMCOCOOBJS) $(LIB)
 	if [ -n "$(RPO)" ] ; then $(RPO) $(PPMCOCOOBJS) $(LIB) ; fi
