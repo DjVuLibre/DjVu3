@@ -24,7 +24,7 @@
 .pod.1:
 	@echo "pod2man --section=1 $*.pod > $*.1"
 	@if [ -r "$*.pod" ] ; then d="."; else d=SRCDIR; fi ; \
-	if ( ( cd "$$d";pod2man --section=1 --release=" " --center=" " "$*.pod" ) > "$*.1" ) ; \
+	if ( ( cd "$$d";pod2man --section=1 --release=" " --center=" " --date=" " "$*.pod" ) > "$*.1" ) ; \
 	then $(TRUE) ; else \
 		$(RM) -f "$*.1" ; \
 		exit 1 ; \
@@ -33,7 +33,7 @@
 .pod.5:
 	@echo "pod2man --section=5 $*.pod > $*.5"
 	@if [ -r "$*.pod" ] ; then d="."; else d=SRCDIR; fi ; \
-	if ( ( cd "$$d";pod2man --section=5 --release=" " --center=" " "$*.pod" ) > "$*.5" ) ; \
+	if ( ( cd "$$d";pod2man --section=5 --release=" " --center=" " --date=" " "$*.pod" ) > "$*.5" ) ; \
 	then $(TRUE) ; else \
 		$(RM) -f "$*.5" ; \
 		exit 1 ; \
