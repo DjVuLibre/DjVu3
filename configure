@@ -37,9 +37,9 @@ do
       C_DEFS=APPEND
       A_DEFS="$A_DEFS -DNEED_JPEG_DECODER"
       C_INCS=APPEND
-      A_INCS="$A_INCS -I\$(TOPSRCDIR)/src/libdjpeg"
+      A_INCS="$A_INCS -I\$(TOPSRCDIR)/src/libjpeg"
       C_LIBS=APPEND
-      A_LIBS="$A_LIBS \$(TOPBUILDDIR)/src/libdjpeg/libdjpeg.a"
+      A_LIBS="$A_LIBS \$(TOPBUILDDIR)/src/libjpeg/libjpeg.a"
       ;;
     *)
       if process_general_option $arg
@@ -97,14 +97,14 @@ generate_makefile src/libdjvu++/Test
 if [ "$with_jpeg" = yes ] 
 then
     ## This is the version with JPEG 
-    generate_makefile src/libdjpeg
-    generate_main_makefile src/libdjpeg src/libdjvu++ <<\EOF
+    generate_makefile src/libjpeg
+    generate_main_makefile src/libjpeg src/libdjvu++ <<\EOF
 all: 
-	( cd src/libdjpeg; $(MAKE) lib )
+	( cd src/libjpeg; $(MAKE) lib prog)
 	( cd src/libdjvu++; $(MAKE) lib prog )
 
 install:
-	( cd src/libdjpeg; $(MAKE) install-lib )
+	( cd src/libjpeg; $(MAKE) install-lib )
 	( cd src/libdjvu++; $(MAKE) install-lib install-prog )
 EOF
 
