@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: parseoptions.cpp,v 1.49 2000-05-01 16:15:25 bcr Exp $
+//C- $Id: parseoptions.cpp,v 1.50 2000-05-11 19:36:09 mrosen Exp $
 #ifdef __GNUC__
 #pragma implementation
 #endif
@@ -1253,8 +1253,9 @@ DjVuParseOptions::ProfileList::Add(
 LPSTR RegOpenReadConfig ( HKEY hParentKey )
 {
 
-  LPCSTR path = "Software\\AT&T\\DjVu\\Profile Path";
-
+//  LPCSTR path = "Software\\AT&T\\DjVu\\Profile Path";
+   // To do:  This needs to be shared with SetProfile.cpp
+   LPCSTR path = "Software\\LizardTech\\DjVu\\Profile Path" ;
   HKEY hKey = NULL;
 
   if (RegOpenKeyEx(hParentKey, path, 0,
