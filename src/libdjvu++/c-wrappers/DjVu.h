@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVu.h,v 1.6 2000-01-22 07:10:14 bcr Exp $
+ *C- $Id: DjVu.h,v 1.7 2000-01-25 04:30:16 bcr Exp $
  */
 
 #include <stdlib.h>
@@ -142,7 +142,7 @@ struct djvu_parse
 djvu_parse_copy(const struct djvu_parse);
 
 /** This is a wrapper for the DjVuParseOptions::ChangeProfile function. */
-void
+int
 djvu_parse_change_profile(struct djvu_parse,const char []);
 
   /** This is a wrapper for the DjVuParseOptions destructor */
