@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GOS.cpp,v 1.45 2001-01-04 22:04:55 bcr Exp $
+// $Id: GOS.cpp,v 1.46 2001-01-15 23:49:06 fcrary Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -97,7 +97,8 @@
 #endif
 
 static const char localhost[] = "localhost";
-static const char localhostspec[] = "//localhost/";
+static const char localhostspec1[] = "//localhost/";
+static const char localhostspec2[] = "///";
 static const char filespec[] = "file:";
 static const char filespecslashes[] = "file://";
 static const char slash='/';
@@ -998,6 +999,7 @@ GOS::filename_to_url(const char *filename, const char *useragent)
       d+=2;
   }
   *d = 0;
+
   // Preprend "file://" to file name. If file is on the local
   // machine, include "localhost".
   GString retval(filespecslashes);
@@ -1006,14 +1008,14 @@ GOS::filename_to_url(const char *filename, const char *useragent)
   {
     if (cnname[1] == slash)
     {
-      retval+=cnname+2;
+      retval += cnname+2;
     }else
     {
-      retval+=localhost+nname;
+      retval += localhost + nname;
     }
   }else
   {
-    retval+=(localhostspec+2)+nname;
+    retval += (localhostspec1+2) + nname;
   }
   return retval;
 }
@@ -1042,7 +1044,7 @@ hexval(char c)
 GString 
 GOS::url_to_filename(const char *url)
 {
-  if(!url||!strcmp(url,"about:blank"))
+  if( !url || !strcmp(url,"about:blank") )
   {
     return "";
   }
@@ -1060,9 +1062,9 @@ GOS::url_to_filename(const char *url)
   for(;*url;d++)
   {
     int c1, c2;
-    if ((*url == percent)
-      && ((c1=hexval(url[1]))>=0)
-      && ((c2=hexval(url[2]))>=0))
+    if ( (*url == percent)
+         && ( (c1 = hexval(url[1])) >= 0 )
+         && ( (c2 = hexval(url[2])) >= 0 ) )
     {
       *d = (c1<<4)|c2;
       url += 3;
@@ -1073,12 +1075,14 @@ GOS::url_to_filename(const char *url)
   }
   *d = 0;
   url = (char const *)urlcopy;
+
   // Check if we have a simple file name already
   {
     GString tmp=expand_name(url,root);
     if (is_file(tmp)) 
       return tmp;
   }
+
   // All file urls are expected to start with filespec which is "file:"
   if (strncmp(url, filespec, strlen(filespec)))  //if not
     return basename(url);
@@ -1095,10 +1099,22 @@ GOS::url_to_filename(const char *url)
   while(*url=='/')
     url++;
 #else
-  
   // Remove possible localhost spec
-  if ( !strncmp(url, localhostspec, strlen(localhostspec)) )
-    url += strlen(localhostspec);
+  if ( !strncmp(url, localhostspec1, strlen(localhostspec1)) )        // RFC 1738 local host form
+    url += strlen(localhostspec1);
+  else if ( !strncmp(url, localhostspec2, strlen(localhostspec2)) )   // RFC 1738 local host form
+    url += strlen(localhostspec2);
+  else if ( strlen(url) > 4 &&                          // "file://<letter>:/<path>"
+            url[0] == '/' &&                            // "file://<letter>|/<path>"
+            url[1] == '/' && 
+            isalpha(url[2]) && 
+            ( url[3] == ':' || url[3] == '|' ) && 
+            url[4] == '/' )
+    url += 2;
+  else if ( strlen(url) > 2 &&                          // "file:/<path>"
+            url[0] == '/' &&
+            url[1] != '/' )
+    url++;
 #endif
 
   // Check if we are finished
