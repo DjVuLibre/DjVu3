@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuImage.cpp,v 1.11 1999-03-17 19:24:56 leonb Exp $
+//C- $Id: DjVuImage.cpp,v 1.12 1999-04-03 00:20:04 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -932,6 +932,8 @@ DjVuImage::decode(ByteStream &bs, DjVuInterface *notifier)
         }
       // Record file size
       filesize = iff.tell();
+      if (img44)
+        img44->close_codec();
       // Complete description
       if (info)
         {
