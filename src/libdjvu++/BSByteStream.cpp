@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: BSByteStream.cpp,v 1.28 2001-04-25 21:30:05 bcr Exp $
+// $Id: BSByteStream.cpp,v 1.29 2001-05-18 00:06:56 fcrary Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 07/1998
@@ -194,7 +194,7 @@ BSByteStream::Decode::decode(void)
   if (!size)
     return 0;
   if (size>MAXBLOCK*1024)
-    G_THROW("bytestream.corrupt");        //  Corrupted decoder input
+    G_THROW( ERR_MSG("ByteStream.corrupt") );
   // Allocate
   if ((int)blocksize < size)
     {
@@ -326,7 +326,7 @@ BSByteStream::Decode::decode(void)
   ////////// Reconstruct the string
   
   if (markerpos<1 || markerpos>=size)
-    G_THROW("bytestream.corrupt");        //  Corrupted decoder input
+    G_THROW( ERR_MSG("ByteStream.corrupt") );
   // Allocate pointers
   unsigned int *posn;
   GPBuffer<unsigned int> gposn(posn,blocksize);
@@ -368,7 +368,7 @@ BSByteStream::Decode::decode(void)
     }
   // Free and check
   if (i != markerpos)
-    G_THROW("bytestream.corrupt");        //  Corrupted decoder input
+    G_THROW( ERR_MSG("ByteStream.corrupt") );
   return size;
 }
 

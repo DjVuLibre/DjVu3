@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.cpp,v 1.78 2001-05-10 23:09:36 fcrary Exp $
+// $Id: ByteStream.cpp,v 1.79 2001-05-18 00:06:56 fcrary Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 04/1997
@@ -930,7 +930,7 @@ ByteStream::Memory::seek(long offset, int whence, bool nothrow)
     case SEEK_SET: nwhere = 0; break;
     case SEEK_CUR: nwhere = where; break;
     case SEEK_END: nwhere = bsize; break;
-    default: G_THROW("bad_arg\tByteStream::Memory::seek()");      // Illegal argument in ByteStream::Memory::seek()
+    default: G_THROW( ERR_MSG("bad_arg") "\tByteStream::Memory::seek()");      // Illegal argument in ByteStream::Memory::seek()
     }
   nwhere += offset;
   if (nwhere<0)

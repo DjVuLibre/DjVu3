@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuText.cpp,v 1.19 2001-04-27 18:53:47 praveen Exp $
+// $Id: DjVuText.cpp,v 1.20 2001-05-18 00:06:56 fcrary Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -207,7 +207,7 @@ DjVuTXT::Zone::decode(const GP<ByteStream> &gbs, int maxtext,
   // Decode type
   ztype = (ZoneType) bs.read8();
   if ( ztype<PAGE || ztype>CHARACTER )
-    G_THROW("DjVuText.corrupt_text");
+    G_THROW( ERR_MSG("DjVuText.corrupt_text") );
 
   // Decode coordinates
   int x=(int) bs.read16()-0x8000;
@@ -243,7 +243,7 @@ DjVuTXT::Zone::decode(const GP<ByteStream> &gbs, int maxtext,
 
   // Checks
   if (rect.isempty() || text_start<0 || text_start+text_length>maxtext )
-    G_THROW("DjVuText.corrupt_text");
+    G_THROW( ERR_MSG("DjVuText.corrupt_text") );
 
   // Process children
   const Zone * prev_child=0;
@@ -281,7 +281,7 @@ DjVuTXT::encode(const GP<ByteStream> &gbs) const
 {
   ByteStream &bs=*gbs;
   if (! textUTF8 )
-    G_THROW("DjVuText.no_text");
+    G_THROW( ERR_MSG("DjVuText.no_text") );
   // Encode text
   int textsize = textUTF8.length();
   bs.write24( textsize );
@@ -306,13 +306,13 @@ DjVuTXT::decode(const GP<ByteStream> &gbs)
   int readsize = bs.read(buffer,textsize);
   buffer[readsize] = 0;
   if (readsize < textsize)
-    G_THROW("DjVuText.corrupt_chunk");
+    G_THROW( ERR_MSG("DjVuText.corrupt_chunk") );
   // Try reading zones
   unsigned char version;
   if ( bs.read( (void*) &version, 1 ) == 1) 
   {
     if (version != Zone::version)
-      G_THROW("DjVuText.bad_version\t"+GUTF8String(version));
+      G_THROW( ERR_MSG("DjVuText.bad_version") "\t" + GUTF8String(version) );
     page_zone.decode(gbs, textsize);
   }
 }
@@ -579,7 +579,7 @@ DjVuTXT::search_string(GUTF8String string, int & from, bool search_fwd,
     // separators in the middle
     for(const char * ptr=string;*ptr;ptr++)
       if (is_separator(*ptr, true))
-        G_THROW("DjVuText.one_word");
+        G_THROW( ERR_MSG("DjVuText.one_word") );
   }
   
   int string_length=strlen(string);
@@ -660,14 +660,14 @@ DjVuText::decode(const GP<ByteStream> &gbs)
     if (chkid == "TXTa")
     {
       if (txt)
-        G_THROW("DjVuText.dupl_text");
+        G_THROW( ERR_MSG("DjVuText.dupl_text") );
       txt = DjVuTXT::create();
       txt->decode(iff.get_bytestream());
     }
     else if (chkid == "TXTz")
     {
       if (txt)
-        G_THROW("DjVuText.dupl_text");
+        G_THROW( ERR_MSG("DjVuText.dupl_text") );
       txt = DjVuTXT::create();
       const GP<ByteStream> gbsiff=BSByteStream::create(iff.get_bytestream());
       txt->decode(gbsiff);
