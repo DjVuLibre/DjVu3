@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: parseoptions.cpp,v 1.44 2000-02-18 16:44:46 bcr Exp $
+//C- $Id: parseoptions.cpp,v 1.45 2000-02-18 19:58:43 praveen Exp $
 #ifdef __GNUC__
 #pragma implementation
 #endif
@@ -1243,54 +1243,33 @@ DjVuParseOptions::ProfileList::Add(
 LPSTR RegOpenReadConfig ( HKEY hParentKey )
 {
 
-  LPCSTR szSoftware = "Software";
-  LPCSTR szCompany =  "AT&T";
-  LPCSTR szProduct =  "DjVu";
-  LPCSTR szProfilePath = "Profile Path";
+  LPCSTR path = "Software\\AT&T\\DjVu\\Profile Path";
 
-  HKEY hSoftwareKey = NULL;
-  HKEY hCompanyKey = NULL;
-  HKEY hProductKey = NULL;
-  HKEY hProfilePathKey = NULL;
+  HKEY hKey = NULL;
 
-  if (RegOpenKeyEx(hParentKey, szSoftware, 0,
-              KEY_READ, &hSoftwareKey) == ERROR_SUCCESS )
+  if (RegOpenKeyEx(hParentKey, path, 0,
+              KEY_READ, &hKey) == ERROR_SUCCESS )
   {
-    if (RegOpenKeyEx(hSoftwareKey, szCompany, 0,
-                KEY_READ, &hCompanyKey) == ERROR_SUCCESS )
-    {
-      if (RegOpenKeyEx(hCompanyKey, szProduct, 0,
-                  KEY_READ, &hProductKey) == ERROR_SUCCESS )
-      {
-        if (RegOpenKeyEx(hProductKey, szProfilePath, 0,
-                    KEY_READ, &hProfilePathKey) == ERROR_SUCCESS )
-        {
-          // Success
-          LPSTR szPathValue = new char[100];
-          LPCSTR lpszEntry = "";
-          DWORD dwCount = 100;
-          DWORD dwType;
-          LONG lResult = RegQueryValueEx(hProfilePathKey, lpszEntry, NULL,
-                     &dwType, (LPBYTE) szPathValue, &dwCount);
-          RegCloseKey(hSoftwareKey);
-          RegCloseKey(hCompanyKey) ;
-          RegCloseKey(hProductKey);
-          RegCloseKey(hProfilePathKey);
-      
-          if ( (lResult == ERROR_SUCCESS) && (dwType == REG_SZ))
-          {
-            return szPathValue ;
-          }
-          return 0;
-        }
-      }
-    }
-  }
+    // Success
+    LPSTR szPathValue = new char[1024];
+    LPCSTR lpszEntry = "";
+    DWORD dwCount = 100;
+    DWORD dwType;
 
-  if (hSoftwareKey) RegCloseKey(hSoftwareKey);
-  if (hCompanyKey)  RegCloseKey(hCompanyKey); 
-  if (hProductKey)  RegCloseKey(hProductKey); 
-  if (hProfilePathKey)  RegCloseKey(hProfilePathKey); 
+    LONG lResult = RegQueryValueEx(hKey, lpszEntry, NULL,
+             &dwType, (LPBYTE) szPathValue, &dwCount);
+
+    RegCloseKey(hKey);
+
+    if ((lResult == ERROR_SUCCESS))
+    {
+        szPathValue[dwCount] = 0;
+        return szPathValue ;
+    }
+    delete [] szPathValue;
+    return 0;
+  } 
+  if (hKey)  RegCloseKey(hKey); 
   return 0;
 
 }
@@ -1388,6 +1367,7 @@ DjVuParseOptions::ConfigFilename(const char config[],int level)
     strcat(filename, "\\");
     strcat(filename,this_config);
     strcat(filename,ConfigExt);
+    delete [] root;
     return retval;        
   }else
   {
@@ -1396,10 +1376,8 @@ DjVuParseOptions::ConfigFilename(const char config[],int level)
     sprintf(s,emsg);
     Errors->AddError(s);
     delete [] s;
-    char tempfilename[] = "/windows/djvu";
-    filename = new char[sizeof(tempfilename)];
-    strcpy ( filename, tempfilename);
-    return (retval = filename);
+    
+    return 0;
   }
 #endif
 }
