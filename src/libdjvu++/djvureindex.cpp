@@ -50,9 +50,9 @@ TempDir::TempDir(const char path[],ExitAction a)
   {
     unsigned long id=(unsigned long)getpid();
     int i=0;
-    for(sprintf(p,"%s.%8lx",ext,id);
+    for(sprintf(p,"%s.%08lx",ext,id);
       stat(dirpath,&statbuf)>=0;
-      sprintf(p,"%s.%8lx.%d",ext,id,++i));
+      sprintf(p,"%s.%08lx.%d",ext,id,++i));
   }
   if(mkdir(dirpath,0755)<0)
   {
@@ -204,7 +204,7 @@ usage(const char prog[],int status)
     "All files in the old multipage format refered to by the <oldindex> file\n"
     "Are replaced by the new multipage format with the <newindex> file.\n\n",
     status?stderr:stdout);
-  fprintf(status?stderr:stdout,"-or-\n\t%s <oldbundledfile> <newbundledfile>\n\n",prog);
+  fprintf(status?stderr:stdout,"-or-\n\t%s <oldbundledfile> [<newbundledfile>]\n\n",prog);
   fputs(
     "The <oldbundledfile> is replaced with the <newbundledfile> in the new format.\n",
     status?stderr:stdout);
@@ -215,6 +215,7 @@ int
 main(int argc,char *argv[],char *[])
 {
   FILE *log=0;
+  int bundled_only=0;
   int status=1;
   struct stat statbuf;
   const char *prog=argv[0];
@@ -237,32 +238,41 @@ main(int argc,char *argv[],char *[])
   }
   if(argc < 3) 
   {
-    fprintf(stderr,"Insufficient arguments.\n");
-    usage(prog,1);
+    if(argc < 2)
+    {
+      fputs("Too few arguments\n",stderr);
+      usage(prog,1);
+    }
+    bundled_only=1;
   }
   if(argc > 3) 
   {
-    fprintf(stderr,"To many arguments.\n");
+    fputs("To many arguments.\n",stderr);
     usage(prog,1);
   }
-  if(stat(argv[1],&statbuf)<0)
+  const char *oldindex=argv[1];
+  if(stat(oldindex,&statbuf)<0)
   {
     perror("stat");
-    fprintf(stderr,"Can not query %s\n",argv[1]);
+    fprintf(stderr,"Can not query %s\n",oldindex);
     usage(prog,1);
   }
-  if(stat(argv[2],&statbuf)>=0)
+  const char *newindex=argv[2];
+  if(bundled_only)
   {
-    fprintf(stderr,"%s already exists\n",argv[2]);
+    newindex=argv[1];
+  }else if(stat(newindex,&statbuf)>=0)
+  {
+    fprintf(stderr,"%s already exists\n",newindex);
     usage(prog,1);
-  }
-  char *ext=strrchr(argv[2],'.');
-  if(!ext ||(!strcmp(ext,".djvu")&&!strcmp(ext,".djv")))
-  {
-    fprintf(stderr,"WARNING: The new index name %s does not have a .djvu extension.\n",argv[2]);
+    char *ext=strrchr(newindex,'.');
+    if(!ext ||(!strcmp(ext,".djvu")&&!strcmp(ext,".djv")))
+    {
+      fprintf(stderr,"WARNING: The new index name %s does not have a .djvu extension.\n",newindex);
+    }
   }
   TRY {
-    GString file_name=argv[1];
+    GString file_name=oldindex;
     GMap<GURL,GString>filenames;
     GP<DjVuDocument> doc=new DjVuDocument;
     doc->init(GOS::filename_to_url(file_name),0,0,&filenames);
@@ -270,12 +280,12 @@ main(int argc,char *argv[],char *[])
     if((doc->get_doc_type()==DjVuDocument::BUNDLED)||(doc->get_doc_type()==DjVuDocument::INDIRECT))
     {
       fputs("This document is already in the new format.\n",stderr);
-    }else
+    }else if((!bundled_only)||(doc->get_doc_type() == DjVuDocument::OLD_BUNDLED))
     {
-      TempDir tmp(argv[2],TempDir::REMOVE_ALL);
-      const char *basename=strrchr(argv[2],'/');
+      TempDir tmp(newindex,TempDir::REMOVE_ALL);
+      const char *basename=strrchr(newindex,'/');
       if(!basename++)
-        basename=argv[2];
+        basename=newindex;
 
       char *where=new char [strlen(tmp)+strlen(basename)+2];
       sprintf(where,"%s/%s",(const char *)tmp,basename);
@@ -288,17 +298,21 @@ main(int argc,char *argv[],char *[])
         doc->save_as(where,0);
       }else
       {
-        fprintf(stderr,"%s is an unrecognized format\n",argv[1]);
-        usage(argv[0],1);
+        fprintf(stderr,"%s is an unrecognized format\n",oldindex);
+        usage(prog,1);
       }
       delete [] where;
       doc=0;
-      TempDir save(argv[1],TempDir::RENAME_ALL);
+      TempDir save(oldindex,TempDir::RENAME_ALL);
       for (GPosition i = filenames; i; ++i)
       {
         save.addtotmp(filenames[i],log);
       }
       status=((tmp.RenameAll(log)>=0)&&(save.RemoveAll(log)>=0))?0:1;
+    }else
+    {
+      fputs("Too few arguments\n",stderr);
+      usage(prog,1);
     }
   } 
   CATCH(ex)
