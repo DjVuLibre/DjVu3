@@ -2,23 +2,31 @@
 # Copyright (c) 2000 AT&T -- All Rights Reserved
 # Written 01/00 by Patrick Haffner
 
-# Setup root name of temporary files
-temp=${TMPDIR:-/tmp}/cdjvu$$
+ppmfile=$1
+djvufile=$2
+if [ -z "$1" -o -z "$2" -o -n "$3" ]
+then
+    echo 1>&2 "Usage: cdjvu <ppmfile> <djvufile>"
+fi
 
-# Ensure temporary files are deleted 
-trap 'rm -f "$temp"*; exit 1' 0 2 3
+# Setup root name of tmporary files
+tmp=${TMPDIR:-/tmp}/cdjvu$$
+trap 'rm -f "$tmp"*' 0 2 3
 
 # Display command while executing
 run() {
- echo 1>&2 $1 
+ echo 1>&2 "  $1"
  eval $1 
 } 
 
-# Compute the binary mask from the color image
-run "ppmtopgm $1 | pgmtopbm -threshold > $temp.pbm"
+echo 1>&2 "-- Compute a binary mask"
+run "ppmtopgm $ppmfile > $tmp.pgm"
+run "pgmtopbm -threshold $tmp.pgm > $tmp.pbm"
 
-# JB2 compression
-run "cjb2 -loose -clean $temp.pbm $temp-m.djvu"
+echo 1>&2 "-- Perform jb2 compression"
+run "cjb2 -loose -clean $tmp.pbm $tmp.djvu"
 
-# Subsample, mask, and assemble
-run "djvumake $2 Sjbz=$temp-m.djvu PPM=$1"
+echo 1>&2 "-- Subsample, mask and assemble DjVu file."
+run "djvumake $djvufile Sjbz=$tmp.djvu PPM=$ppmfile"
+
+echo 1>&2 "-- Finished."
