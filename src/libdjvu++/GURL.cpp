@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GURL.cpp,v 1.51 2001-03-30 23:31:29 bcr Exp $
+// $Id: GURL.cpp,v 1.52 2001-04-02 21:19:19 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -273,7 +273,7 @@ GURL::init(const bool nothrow)
    if (url.length())
    {
       GString proto=protocol();
-      if (!proto.length())
+      if (proto.length()<2)
       {
         validurl=false;
         if(!nothrow)
