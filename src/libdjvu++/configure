@@ -11,6 +11,19 @@ AR=${AR-ar}
 LDLIBS=-lm
 DEFS=
 
+### Echo without newline
+
+if [ "`echo -n`" = "-n" ]
+then
+  echon() { 
+    echo $* "\c" 
+  }
+else
+  echon() { 
+    echo -n $* 
+  }
+fi
+
 ### Check top dir
 
 conf=`basename $0`
@@ -63,15 +76,15 @@ done
 echo 'int main(void) {return 0;}' > /tmp/$$.c
 trap "rm 2>/dev/null /tmp/$$ /tmp/$$.*" 0
 
-echo -n Testing C++ compiler ...
-if ( $CXX -c /tmp/$$.c -o /tmp/$$.o >/dev/null 2>&1 ) 
+echon Testing C++ compiler ...
+if ( ( $CXX -c /tmp/$$.c -o /tmp/$$.o ) >/dev/null 2>&1 ) 
 then
   echo $CXX.
-elif ( g++ -c /tmp/$$.c -o /tmp/$$.o >/dev/null 2>&1 ) 
+elif ( ( g++ -c /tmp/$$.c -o /tmp/$$.o ) >/dev/null 2>&1 ) 
 then
   CXX=g++
   echo $CXX.
-elif ( CC -c /tmp/$$.c -o /tmp/$$.o >/dev/null 2>&1 ) 
+elif ( ( CC -c /tmp/$$.c -o /tmp/$$.o ) >/dev/null 2>&1 ) 
 then
   CXX=CC
   OPT=
@@ -86,7 +99,7 @@ fi
 
 if [ -z "$OPT" ] 
 then
-  echo -n Testing optimization option ... 
+  echon Testing optimization option ... 
   if ( $CXX -O -c /tmp/$$.c -o /tmp/$$ >/dev/null 2>&1 ) 
   then
      echo $OPT
@@ -96,7 +109,7 @@ then
   fi
 fi
 
-echo -n Testing pipe option ...
+echon Testing pipe option ...
 if ( $CXX -pipe -c /tmp/$$.c -o /tmp/$$ >/dev/null 2>&1 ) 
 then
   echo yes.
@@ -122,7 +135,7 @@ then
        ;;       
     posix* | dce* )
        DEFS="$DEFS -DTHREADMODEL=POSIXTHREADS" 
-       echo -n "Check option -pthread ..."
+       echon "Check option -pthread ..."
        if ( ( $CXX -pthread /tmp/$$.c -o /tmp/$$ >/tmp/$$.log 2>&1 ) \
             && [ -z "`grep -i unrecognized /tmp/$$.log`" ] )
        then
@@ -130,7 +143,7 @@ then
          OPT="$OPT -pthread"
        else
          echo no.
-         echo -n "Check option -threads ..."
+         echon "Check option -threads ..."
          if ( ( $CXX -threads /tmp/$$.c -o /tmp/$$ >/tmp/$$.log 2>&1 ) \
               && [ -z "`grep -i unrecognized /tmp/$$.log`" ] )
          then
@@ -151,7 +164,7 @@ fi
 
 ### Check programs
 
-echo -n Searching AR program ...
+echon Searching AR program ...
 if ( $AR cq /tmp/$$.a /tmp/$$.o ) 
 then
   echo $AR
@@ -166,7 +179,7 @@ else
   exit 1
 fi
 
-echo -n Searching RANLIB program ...
+echon Searching RANLIB program ...
 if ( $RANLIB /tmp/$$.a )
 then
   echo $RANLIB
