@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.62 1999-11-17 03:29:15 bcr Exp $
+//C- $Id: DjVuDocument.cpp,v 1.63 1999-11-17 03:36:01 bcr Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -77,6 +77,8 @@ DjVuDocument::init(const GURL & url, GP<DjVuPort> xport,
 
 DjVuDocument::~DjVuDocument(void)
 {
+      // Stop listing files.
+   simple_port->set_filelist(0);
       // No more messages, please. We're being destroyed.
    get_portcaster()->del_port(this);
 
