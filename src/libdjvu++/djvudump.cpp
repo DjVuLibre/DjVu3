@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: djvudump.cpp,v 1.2 1999-08-30 19:28:31 leonb Exp $
+//C- $Id: djvudump.cpp,v 1.3 1999-09-14 14:19:50 leonb Exp $
 
 
 
@@ -57,7 +57,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: djvudump.cpp,v 1.2 1999-08-30 19:28:31 leonb Exp $# */
+    #$Id: djvudump.cpp,v 1.3 1999-09-14 14:19:50 leonb Exp $# */
 //@{
 //@}
 
@@ -99,9 +99,15 @@ display_djvu_info(IFFByteStream &iff, GString, size_t size, DjVmInfo& )
 }
 
 void
+display_djbz(IFFByteStream &iff, GString, size_t, DjVmInfo& )
+{
+  printf("JB2 shared dictionary");
+}
+
+void
 display_sjbz(IFFByteStream &iff, GString, size_t, DjVmInfo& )
 {
-  printf("JB2 data");
+  printf("JB2 page data");
 }
 
 void
@@ -183,8 +189,13 @@ disproutines[] =
 {
   { "DJVU.INFO", display_djvu_info },
   { "DJVU.Sjbz", display_sjbz },
+  { "DJVU.Djbz", display_djbz },
   { "DJVU.FG44", display_iw4 },
   { "DJVU.BG44", display_iw4 },
+  { "DJVI.Sjbz", display_sjbz },
+  { "DJVI.Djbz", display_djbz },
+  { "DJVI.FG44", display_iw4 },
+  { "DJVI.BG44", display_iw4 },
   { "BM44.BM44", display_iw4 },
   { "PM44.PM44", display_iw4 },
   { "DJVM.DIRM", display_djvm_dirm },
