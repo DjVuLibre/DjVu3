@@ -12,7 +12,8 @@
 temp=/tmp/c$$
 
 # --- Log file
-log=$temp.log
+logfile=configure.log
+date > $logfile
 
 # --- Make sure that all temp files are removed
 trap "rm 2>/dev/null $temp $temp.*" 0
@@ -56,6 +57,27 @@ mkdirp()
       mkdirp `dirname $1`
       mkdir $1
     fi
+}
+
+
+# Make a test file with echo on logfile
+testfile()
+{
+    cat > $1
+    echo "------- ($1)" >> $logfile
+    cat $1              >> $logfile
+}
+
+
+# Run command with echo on logfile
+run()
+{
+    ( $* ) > $temp.out 2>&1 
+    status=$?
+    echo "------- (cmd)"   >> $logfile
+    echo '%' $*            >> $logfile
+    cat $temp.out          >> $logfile
+    return $status
 }
 
 
@@ -142,16 +164,16 @@ check_compiler()
 
     # -----
 
-    echo 'int main(void) {return 0;}' > $temp.c
+    echo 'int main(void) {return 0;}' | testfile $temp.c
     echon "Testing C compiler ... "
-    if ( ( $CC -c $temp.c -o $temp.o ) >$log 2>&1 ) 
+    if ( run $CC -c $temp.c -o $temp.o ) 
     then
         echo $CC.
-    elif ( ( gcc -c $temp.c -o $temp.o ) >$log 2>&1 ) 
+    elif ( run gcc -c $temp.c -o $temp.o ) 
     then
         CC=gcc
         echo $CC.
-    elif ( ( cc -c $temp.c -o $temp.o ) >$log 2>&1 ) 
+    elif ( run cc -c $temp.c -o $temp.o  ) 
     then
         CC=cc
         echo $CC.
@@ -164,16 +186,16 @@ check_compiler()
 
     # -----
 
-    echo 'int main(void) {return 0;}' > $temp.cpp
+    echo 'int main(void) {return 0;}' | testfile $temp.cpp
     echon "Testing C++ compiler ... "
-    if ( ( $CXX -c $temp.cpp -o $temp.o ) >$log 2>&1 ) 
+    if ( run $CXX -c $temp.cpp -o $temp.o ) 
     then
         echo $CXX.
-    elif ( ( g++ -c $temp.cpp -o $temp.o ) >$log 2>&1 ) 
+    elif ( run g++ -c $temp.cpp -o $temp.o ) 
     then
         CXX=g++
         echo $CXX.
-    elif ( ( CC -c $temp.cpp -o $temp.o ) >$log 2>&1 ) 
+    elif ( run CC -c $temp.cpp -o $temp.o ) 
     then
         CXX=CC
         echo $CXX.
@@ -189,13 +211,13 @@ check_compiler()
     cxx_is_gcc=
     cc_is_gcc=
     echon "Checking whether both compilers are gcc ... "
-    echo 'int main(void) { return __GNUG__;}' > $temp.cpp
-    if ( $CXX -O -c $temp.cpp -o $temp >$log 2>&1 ) 
+    echo 'int main(void) { return __GNUG__;}' | testfile $temp.cpp
+    if ( run $CXX -O -c $temp.cpp -o $temp  ) 
     then
         cxx_is_gcc=yes
     fi
-    echo 'int main(void) { return __GNUC__;}' > $temp.c
-    if ( $CC -c $temp.c -o $temp >$log 2>&1 ) 
+    echo 'int main(void) { return __GNUC__;}' | testfile $temp.c
+    if ( run $CC -c $temp.c -o $temp ) 
     then
         cc_is_gcc=yes
     fi
@@ -215,8 +237,8 @@ check_compiler()
     if [ -n "$compiler_is_gcc" ]
     then
         echon "Testing pipe option ... "
-        echo 'int main(void) {return 0;}' > $temp.cpp
-        if ( $CXX -pipe -c $temp.cpp -o $temp >$log 2>&1 ) 
+        echo 'int main(void) {return 0;}' | testfile $temp.cpp
+        if ( run $CXX -pipe -c $temp.cpp -o $temp ) 
         then
             echo yes.
             CC="$CC -pipe"
@@ -231,8 +253,8 @@ check_compiler()
     if [ -z "$OPT" ]
     then
         echon "Testing optimization option ... "
-        echo 'int main(void) {return 0;}' > $temp.cpp
-        if ( $CXX -O -c $temp.cpp -o $temp >$log 2>&1 ) 
+        echo 'int main(void) {return 0;}' | testfile $temp.cpp
+        if ( run $CXX -O -c $temp.cpp -o $temp ) 
         then
             OPT=-O
             echo $OPT
@@ -292,11 +314,12 @@ check_thread_option()
           exit 1
        fi
        echon "Testing exception handler patch for gcc ... "
-       cat > $temp.cpp <<\EOF
-extern "C" { extern void *(*__get_eh_context_ptr)(void), *__new_eh_context(void); }
+       testfile $temp.cpp <<\EOF
+extern "C" void *(*__get_eh_context_ptr)(void);
+extern "C" void *__new_eh_context(void);
 void main() { __get_eh_context_ptr = &__new_eh_context; }
 EOF
-       if ( $CXX $temp.cpp -o $temp 1>$log 2>&1 ) 
+       if ( run $CXX $temp.cpp -o $temp ) 
        then
           echo yes.
        else
@@ -308,10 +331,10 @@ EOF
        ;;       
     posix* | dce* )
        DEFS="$DEFS -DTHREADMODEL=POSIXTHREADS" 
-       echo 'int main(void) {return 0;}' > $temp.cpp
+       echo 'int main(void) {return 0;}' | testfile $temp.cpp
        echon "Check option -pthread ... "
-       if ( ( $CXX -pthread $temp.cpp -o $temp >$log 2>&1 ) \
-            && [ -z "`grep -i unrecognized $log`" ] )
+       if ( ( run $CXX -pthread $temp.cpp -o $temp ) \
+            && [ -z "`grep -i unrecognized $temp.out`" ] )
        then
          echo yes.
          CC="$CC -pthread"
@@ -319,8 +342,8 @@ EOF
        else
          echo no.
          echon "Check option -threads ... "
-         if ( ( $CXX -threads $temp.cpp -o $temp >$log 2>&1 ) \
-              && [ -z "`grep -i unrecognized $log`" ] )
+         if ( ( run $CXX -threads $temp.cpp -o $temp ) \
+              && [ -z "`grep -i unrecognized $temp.out`" ] )
          then
            echo yes.
            CC="$CC -threads"
@@ -360,9 +383,9 @@ check_rpo_option()
      echo 2>&1 "$conf: Option '-frepo' only work with gcc."
      exit 1
   fi
-  echo 'int main(void) {return 0;}' > $temp.cpp
-  if ( ( $CXX -frepo $temp.cpp -o $temp >$log 2>&1 ) \
-         && [ -z "`grep -i unrecognized $log`" ] )
+  echo 'int main(void) {return 0;}' | testfile $temp.cpp
+  if ( ( run $CXX -frepo $temp.cpp -o $temp ) \
+         && [ -z "`grep -i unrecognized $temp.out`" ] )
   then
     echo yes.
     OPT="$OPT -frepo"
@@ -373,7 +396,7 @@ check_rpo_option()
   fi
   echon "Searching rpo program ... "
   test -z "$RPO" && RPO=rpo
-  if ( $RPO 1>$log 2>&1 ) 
+  if ( run $RPO ) 
   then
     echo $RPO
   else
@@ -401,13 +424,13 @@ check_library()
   func=$1
   shift
   echon "Searching library containing $func() ... "
-  cat > $temp.cpp <<EOF
+  testfile $temp.cpp <<EOF
 extern "C" int $func(void);
 int main(void) { return $func(); }
 EOF
   for lib
   do
-    if ( $CXX $OPT $DEFS $WARN $temp.cpp $lib -o $temp 1>$log 2>&1 ) 
+    if ( run $CXX $OPT $DEFS $WARN $temp.cpp $lib -o $temp ) 
     then
       echo $lib
       LIBS="$LIBS $lib"
@@ -430,11 +453,10 @@ EOF
 
 check_make_stlib()
 {
+    echon Searching how to build a static library ...
     AR=${AR-ar}
     MAKE_STLIB=${MAKE_STLIB-$AR cq}
-    
-    echon Searching how to build a static library ...
-    if ( $MAKE_STLIB /tmp/$$.a /tmp/$$.o >$log 2>&1 ) 
+    if ( run $MAKE_STLIB $temp.a $temp.o ) 
     then
         echo $MAKE_STLIB
     else
@@ -443,9 +465,9 @@ check_make_stlib()
         echo 1>&2 "-- Please set environment variable MAKE_STLIB or AR."
         exit 1
     fi
-
     echon Searching RANLIB program ...
-    if ( $RANLIB /tmp/$$.a >$log 2>&1 )
+    RANLIB=${RANLIB-ranlib}
+    if ( run $RANLIB $temp.a )
     then
         echo $RANLIB
     else
