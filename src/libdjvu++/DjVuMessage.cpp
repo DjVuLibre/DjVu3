@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessage.cpp,v 1.74 2001-10-12 17:58:30 leonb Exp $
+// $Id: DjVuMessage.cpp,v 1.75 2001-10-12 20:12:13 leonb Exp $
 // $Name:  $
 
 #ifdef HAVE_CONFIG_H
@@ -253,10 +253,6 @@ DjVuMessage::GetProfilePaths(void)
     if(envp.length())
       appendPath(GURL::Filename::UTF8(envp),pathsmap,paths);
 #endif
-#if defined(AUTOCONF)
-    GURL dpath = GURL::Filename::UTF8(DjVuDataDir);
-    appendPath(dpath,pathsmap,paths);
-#endif
 #if defined(WIN32) || defined(UNIX)
     GURL mpath(GetModulePath());
     if(!mpath.is_empty() && mpath.is_dir())
@@ -270,6 +266,10 @@ DjVuMessage::GetProfilePaths(void)
       mpath=mpath.base();
       appendPath(GURL::UTF8(ModuleDjVuDir,mpath),pathsmap,paths);
     }
+#endif
+#if defined(AUTOCONF)
+    GURL dpath = GURL::Filename::UTF8(DjVuDataDir);
+    appendPath(dpath,pathsmap,paths);
 #endif
 #ifdef WIN32
     appendPath(RegOpenReadConfig(HKEY_CURRENT_USER),pathsmap,paths);
