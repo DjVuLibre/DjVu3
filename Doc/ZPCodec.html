@@ -1,6 +1,6 @@
 <HTML>
 <HEAD>
-   <TITLE>class  ZPCodec</TITLE>
+   <TITLE>class  ByteStream::ZPCodec</TITLE>
    <META NAME="GENERATOR" CONTENT="DOC++ 3.4.1">
 </HEAD>
 <BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
@@ -30,7 +30,7 @@
 <A HREF="#DOC.1.4.15.2.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>encoder</B>(int bit)
 <DD><I>Encodes bit <TT>bit</TT> without compression (pass-thru encoder).</I>
 <DT>
-<A HREF="#DOC.1.4.15.2.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>decoder</B>()
+<A HREF="#DOC.1.4.15.2.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>decoder</B>(void)
 <DD><I>Decodes a bit without compression (pass-thru decoder).</I>
 </DL></P>
 
@@ -99,7 +99,7 @@ bit.
 <DL><DT><DD></DL><P>
 <A NAME="decoder">
 <A NAME="DOC.1.4.15.2.5">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int decoder()</B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int decoder(void)</B></TT>
 <DD>Decodes a bit without compression (pass-thru decoder).  This function
 retrieves bits encoded with the pass-thru encoder. 
 <DL><DT><DD></DL><P>

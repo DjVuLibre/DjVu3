@@ -5,7 +5,7 @@
 </HEAD>
 <BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
 
-<H2>class  <A HREF="#DOC.DOCU">GPixmap</A>: public <!1><A HREF="GPEnabled.html#DOC.1.5.4.1.2">GPEnabled</A></H2>
+<H2>class  <A HREF="#DOC.DOCU">GPixmap</A>: public <!1><A HREF="GPEnabled.html#DOC.1.4.4.1.2">GPEnabled</A></H2>
 <BLOCKQUOTE>RGB Color images.</BLOCKQUOTE>
 <HR>
 
@@ -22,157 +22,157 @@
 <DL>
 <P><DL>
 <DT><H3>Public</H3><DD><DT>
-<A HREF="#DOC.1.5.18.2.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Construction. </B>
+<A HREF="#DOC.1.4.18.2.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Construction. </B>
 <DD><I></I>
 <P><DL>
 <DT>
-<A HREF="#DOC.1.5.18.2.1.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GPixmap</B>()
+<A HREF="#DOC.1.4.18.2.1.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GPixmap</B>()
 <DD><I>Constructs an empty GBitmap object.</I>
 <DT>
-<A HREF="#DOC.1.5.18.2.1.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GPixmap</B>(int nrows, int ncolumns, const <!1><A HREF="GPixel.html">GPixel</A> *filler=0)
+<A HREF="#DOC.1.4.18.2.1.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GPixmap</B>(int nrows, int ncolumns, const <!1><A HREF="GPixel.html">GPixel</A> *filler=0)
 <DD><I>Constructs a GPixmap with <TT>nrows</TT> rows and <TT>ncolumns</TT> columns.</I>
 <DT>
-<A HREF="#DOC.1.5.18.2.1.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GPixmap</B>(const <!1><A HREF="GBitmap.html">GBitmap</A> &amp;ref)
+<A HREF="#DOC.1.4.18.2.1.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GPixmap</B>(const <!1><A HREF="GBitmap.html">GBitmap</A> &amp;ref)
 <DD><I>Constructs a GPixmap by copying the gray level image <TT>ref</TT>.</I>
 <DT>
-<A HREF="#DOC.1.5.18.2.1.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GPixmap</B>(const <!1><A HREF="GBitmap.html">GBitmap</A> &amp;ref, const <!1><A HREF="GRect.html">GRect</A> &amp;rect)
+<A HREF="#DOC.1.4.18.2.1.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GPixmap</B>(const <!1><A HREF="GBitmap.html">GBitmap</A> &amp;ref, const <!1><A HREF="GRect.html">GRect</A> &amp;rect)
 <DD><I>Constructs a GPixmap by copying the rectangle <TT>rect</TT> of the gray level image <TT>ref</TT>.</I>
 <DT>
-<A HREF="#DOC.1.5.18.2.1.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GPixmap</B>(const <!1><A HREF="GPixmap.html#DOC.1.5.18.2.1.1">GPixmap</A> &amp;ref)
+<A HREF="#DOC.1.4.18.2.1.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GPixmap</B>(const <!1><A HREF="GPixmap.html#DOC.1.4.18.2.1.1">GPixmap</A> &amp;ref)
 <DD><I>Copy constructors.</I>
 <DT>
-<A HREF="#DOC.1.5.18.2.1.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GPixmap</B>(const <!1><A HREF="GPixmap.html#DOC.1.5.18.2.1.1">GPixmap</A> &amp;ref, const <!1><A HREF="GRect.html">GRect</A> &amp;rect)
+<A HREF="#DOC.1.4.18.2.1.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GPixmap</B>(const <!1><A HREF="GPixmap.html#DOC.1.4.18.2.1.1">GPixmap</A> &amp;ref, const <!1><A HREF="GRect.html">GRect</A> &amp;rect)
 <DD><I>Constructs a GPixmap by copying the rectangle <TT>rect</TT> of the color image <TT>ref</TT>.</I>
 <DT>
-<A HREF="#DOC.1.5.18.2.1.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GPixmap</B>(<!1><A HREF="ByteStream.html">ByteStream</A> &amp;ref)
+<A HREF="#DOC.1.4.18.2.1.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GPixmap</B>(<!1><A HREF="ByteStream.html">ByteStream</A> &amp;ref)
 <DD><I>Constructs a GPixmap by reading PPM data from ByteStream <TT>ref</TT>.</I>
 </DL></P>
 <DT>
-<A HREF="#DOC.1.5.18.2.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Initialization. </B>
+<A HREF="#DOC.1.4.18.2.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Initialization. </B>
 <DD><I></I>
 <P><DL>
 <DT>
-<A HREF="#DOC.1.5.18.2.2.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>init</B>(int nrows, int ncolumns, const <!1><A HREF="GPixel.html">GPixel</A> *filler=0)
+<A HREF="#DOC.1.4.18.2.2.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>init</B>(int nrows, int ncolumns, const <!1><A HREF="GPixel.html">GPixel</A> *filler=0)
 <DD><I>Resets the GPixmap to <TT>nrows</TT> rows and <TT>ncolumns</TT> columns.</I>
 <DT>
-<A HREF="#DOC.1.5.18.2.2.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>init</B>(const <!1><A HREF="GPixmap.html#DOC.1.5.18.2.1.1">GPixmap</A> &amp;ref)
+<A HREF="#DOC.1.4.18.2.2.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>init</B>(const <!1><A HREF="GPixmap.html#DOC.1.4.18.2.1.1">GPixmap</A> &amp;ref)
 <DD><I>Resets the GPixmap by copying the size and the contents of the color image <TT>ref</TT>.</I>
 <DT>
-<A HREF="#DOC.1.5.18.2.2.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>init</B>(const <!1><A HREF="GPixmap.html#DOC.1.5.18.2.1.1">GPixmap</A> &amp;ref, const <!1><A HREF="GRect.html">GRect</A> &amp;rect)
+<A HREF="#DOC.1.4.18.2.2.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>init</B>(const <!1><A HREF="GPixmap.html#DOC.1.4.18.2.1.1">GPixmap</A> &amp;ref, const <!1><A HREF="GRect.html">GRect</A> &amp;rect)
 <DD><I>Resets the GPixmap by copying the rectangle <TT>rect</TT> of the color image <TT>ref</TT>.</I>
 <DT>
-<A HREF="#DOC.1.5.18.2.2.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>init</B>(const <!1><A HREF="GBitmap.html">GBitmap</A> &amp;ref, const <!1><A HREF="GPixel.html">GPixel</A> *ramp=0)
+<A HREF="#DOC.1.4.18.2.2.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>init</B>(const <!1><A HREF="GBitmap.html">GBitmap</A> &amp;ref, const <!1><A HREF="GPixel.html">GPixel</A> *ramp=0)
 <DD><I>Resets the GPixmap by copying the size and the contents of the gray  level image <TT>ref</TT>.</I>
 <DT>
-<A HREF="#DOC.1.5.18.2.2.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>init</B>(const <!1><A HREF="GBitmap.html">GBitmap</A> &amp;ref, const <!1><A HREF="GRect.html">GRect</A> &amp;rect, const <!1><A HREF="GPixel.html">GPixel</A> *ramp=0)
+<A HREF="#DOC.1.4.18.2.2.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>init</B>(const <!1><A HREF="GBitmap.html">GBitmap</A> &amp;ref, const <!1><A HREF="GRect.html">GRect</A> &amp;rect, const <!1><A HREF="GPixel.html">GPixel</A> *ramp=0)
 <DD><I>Resets the GPixmap by copying the rectangle <TT>rect</TT> of the gray level image <TT>ref</TT>.</I>
 <DT>
-<A HREF="#DOC.1.5.18.2.2.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>init</B>(<!1><A HREF="ByteStream.html">ByteStream</A> &amp;ref)
+<A HREF="#DOC.1.4.18.2.2.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>init</B>(<!1><A HREF="ByteStream.html">ByteStream</A> &amp;ref)
 <DD><I>Resets the GPixmap by reading PPM data from ByteStream <TT>ref</TT>.</I>
 <DT>
-<A HREF="#DOC.1.5.18.2.2.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GPixmap.html#DOC.1.5.18.2.1.1">GPixmap</A>&amp; <B>operator=</B>(const <!1><A HREF="GBitmap.html">GBitmap</A> &amp;ref)
+<A HREF="#DOC.1.4.18.2.2.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GPixmap.html#DOC.1.4.18.2.1.1">GPixmap</A>&amp; <B>operator=</B>(const <!1><A HREF="GBitmap.html">GBitmap</A> &amp;ref)
 <DD><I>Resets the GPixmap by copying the gray level image <TT>ref</TT>.</I>
 <DT>
-<A HREF="#DOC.1.5.18.2.2.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GPixmap.html#DOC.1.5.18.2.1.1">GPixmap</A>&amp; <B>operator=</B>(const <!1><A HREF="GPixmap.html#DOC.1.5.18.2.1.1">GPixmap</A> &amp;ref)
+<A HREF="#DOC.1.4.18.2.2.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GPixmap.html#DOC.1.4.18.2.1.1">GPixmap</A>&amp; <B>operator=</B>(const <!1><A HREF="GPixmap.html#DOC.1.4.18.2.1.1">GPixmap</A> &amp;ref)
 <DD><I>Copy operator.</I>
 </DL></P>
 <DT>
-<A HREF="#DOC.1.5.18.2.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Accessing pixels. </B>
+<A HREF="#DOC.1.4.18.2.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Accessing pixels. </B>
 <DD><I></I>
 <P><DL>
 <DT>
-<A HREF="#DOC.1.5.18.2.3.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>unsigned int <B>rows</B>() const 
+<A HREF="#DOC.1.4.18.2.3.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>unsigned int <B>rows</B>() const 
 <DD><I>Returns the number of rows (the image height).</I>
 <DT>
-<A HREF="#DOC.1.5.18.2.3.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>unsigned int <B>columns</B>() const 
+<A HREF="#DOC.1.4.18.2.3.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>unsigned int <B>columns</B>() const 
 <DD><I>Returns the number of columns (the image width).</I>
 <DT>
-<A HREF="#DOC.1.5.18.2.3.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>const <!1><A HREF="GPixel.html">GPixel</A>* <B>operator[] </B>(int row) const 
+<A HREF="#DOC.1.4.18.2.3.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>const <!1><A HREF="GPixel.html">GPixel</A>* <B>operator[] </B>(int row) const 
 <DD><I>Returns a constant pointer to the first GPixel in row <TT>row</TT>.</I>
 <DT>
-<A HREF="#DOC.1.5.18.2.3.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GPixel.html">GPixel</A>* <B>operator[] </B>(int row)
+<A HREF="#DOC.1.4.18.2.3.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GPixel.html">GPixel</A>* <B>operator[] </B>(int row)
 <DD><I>Returns a pointer to the first GPixel in row <TT>row</TT>.</I>
 <DT>
-<A HREF="#DOC.1.5.18.2.3.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>unsigned int <B>rowsize</B>() const 
+<A HREF="#DOC.1.4.18.2.3.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>unsigned int <B>rowsize</B>() const 
 <DD><I>Returns the length (in pixels) of a row in memory.</I>
 </DL></P>
 <DT>
-<A HREF="#DOC.1.5.18.2.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Resampling images. </B>
+<A HREF="#DOC.1.4.18.2.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Resampling images. </B>
 <DD><I></I>
 <P><DL>
 <DT>
-<A HREF="#DOC.1.5.18.2.4.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>downsample</B>(const <!1><A HREF="GPixmap.html#DOC.1.5.18.2.1.1">GPixmap</A> *src, int factor, const <!1><A HREF="GRect.html">GRect</A> *rect=0)
+<A HREF="#DOC.1.4.18.2.4.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>downsample</B>(const <!1><A HREF="GPixmap.html#DOC.1.4.18.2.1.1">GPixmap</A> *src, int factor, const <!1><A HREF="GRect.html">GRect</A> *rect=0)
 <DD><I>Resets this GPixmap with a subsampled segment of color image <TT>src</TT>.</I>
 <DT>
-<A HREF="#DOC.1.5.18.2.4.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>upsample</B>(const <!1><A HREF="GPixmap.html#DOC.1.5.18.2.1.1">GPixmap</A> *src, int factor, const <!1><A HREF="GRect.html">GRect</A> *rect=0)
+<A HREF="#DOC.1.4.18.2.4.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>upsample</B>(const <!1><A HREF="GPixmap.html#DOC.1.4.18.2.1.1">GPixmap</A> *src, int factor, const <!1><A HREF="GRect.html">GRect</A> *rect=0)
 <DD><I>Resets this GPixmap with a oversampled segment of color image <TT>src</TT>.</I>
 <DT>
-<A HREF="#DOC.1.5.18.2.4.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>downsample43</B>(const <!1><A HREF="GPixmap.html#DOC.1.5.18.2.1.1">GPixmap</A> *src, const <!1><A HREF="GRect.html">GRect</A> *rect=0)
+<A HREF="#DOC.1.4.18.2.4.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>downsample43</B>(const <!1><A HREF="GPixmap.html#DOC.1.4.18.2.1.1">GPixmap</A> *src, const <!1><A HREF="GRect.html">GRect</A> *rect=0)
 <DD><I>Resets this GPixmap with a rescaled segment of <TT>src</TT> (zoom 75%).</I>
 <DT>
-<A HREF="#DOC.1.5.18.2.4.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>upsample23</B>(const <!1><A HREF="GPixmap.html#DOC.1.5.18.2.1.1">GPixmap</A> *src, const <!1><A HREF="GRect.html">GRect</A> *rect=0)
+<A HREF="#DOC.1.4.18.2.4.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>upsample23</B>(const <!1><A HREF="GPixmap.html#DOC.1.4.18.2.1.1">GPixmap</A> *src, const <!1><A HREF="GRect.html">GRect</A> *rect=0)
 <DD><I>Resets this GPixmap with a rescaled segment of <TT>src</TT> (zoom 150%).</I>
 </DL></P>
 <DT>
-<A HREF="#DOC.1.5.18.2.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Blitting and applying stencils.  </B>
+<A HREF="#DOC.1.4.18.2.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Blitting and applying stencils.  </B>
 <DD><I></I>
 <P><DL>
 <DT>
-<A HREF="#DOC.1.5.18.2.5.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>attenuate</B>(const <!1><A HREF="GBitmap.html">GBitmap</A> *bm, int x, int y)
+<A HREF="#DOC.1.4.18.2.5.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>attenuate</B>(const <!1><A HREF="GBitmap.html">GBitmap</A> *bm, int x, int y)
 <DD><I>Attenuates the color image in preparation for a blit.</I>
 <DT>
-<A HREF="#DOC.1.5.18.2.5.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>blit</B>(const <!1><A HREF="GBitmap.html">GBitmap</A> *bm, int x, int y, const <!1><A HREF="GPixel.html">GPixel</A> *color)
+<A HREF="#DOC.1.4.18.2.5.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>blit</B>(const <!1><A HREF="GBitmap.html">GBitmap</A> *bm, int x, int y, const <!1><A HREF="GPixel.html">GPixel</A> *color)
 <DD><I>Blits solid color <TT>color</TT> through transparency mask <TT>bm</TT>.</I>
 <DT>
-<A HREF="#DOC.1.5.18.2.5.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>blit</B>(const <!1><A HREF="GBitmap.html">GBitmap</A> *bm, int x, int y, const <!1><A HREF="GPixmap.html#DOC.1.5.18.2.1.1">GPixmap</A> *color)
+<A HREF="#DOC.1.4.18.2.5.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>blit</B>(const <!1><A HREF="GBitmap.html">GBitmap</A> *bm, int x, int y, const <!1><A HREF="GPixmap.html#DOC.1.4.18.2.1.1">GPixmap</A> *color)
 <DD><I>Blits pixmap <TT>color</TT> through transparency mask <TT>bm</TT>.</I>
 <DT>
-<A HREF="#DOC.1.5.18.2.5.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>blend</B>(const <!1><A HREF="GBitmap.html">GBitmap</A> *bm, int x, int y, const <!1><A HREF="GPixmap.html#DOC.1.5.18.2.1.1">GPixmap</A> *color)
+<A HREF="#DOC.1.4.18.2.5.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>blend</B>(const <!1><A HREF="GBitmap.html">GBitmap</A> *bm, int x, int y, const <!1><A HREF="GPixmap.html#DOC.1.4.18.2.1.1">GPixmap</A> *color)
 <DD><I>Performs alpha blending.</I>
 <DT>
-<A HREF="#DOC.1.5.18.2.5.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>stencil</B>(const <!1><A HREF="GBitmap.html">GBitmap</A> *bm, const <!1><A HREF="GPixmap.html#DOC.1.5.18.2.1.1">GPixmap</A> *pm, int pms, const <!1><A HREF="GRect.html">GRect</A> *pmr, double corr=1.0)
+<A HREF="#DOC.1.4.18.2.5.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>stencil</B>(const <!1><A HREF="GBitmap.html">GBitmap</A> *bm, const <!1><A HREF="GPixmap.html#DOC.1.4.18.2.1.1">GPixmap</A> *pm, int pms, const <!1><A HREF="GRect.html">GRect</A> *pmr, double corr=1.0)
 <DD><I>Resample color pixmap and performs color corrected alpha blending.</I>
 </DL></P>
 <DT>
-<A HREF="#DOC.1.5.18.2.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Manipulating colors. </B>
+<A HREF="#DOC.1.4.18.2.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Manipulating colors. </B>
 <DD><I></I>
 <P><DL>
 <DT>
-<A HREF="#DOC.1.5.18.2.6.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>ordered_666_dither</B>(int xmin=0, int ymin=0)
+<A HREF="#DOC.1.4.18.2.6.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>ordered_666_dither</B>(int xmin=0, int ymin=0)
 <DD><I>Dithers the image to 216 colors.</I>
 <DT>
-<A HREF="#DOC.1.5.18.2.6.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>ordered_32k_dither</B>(int xmin=0, int ymin=0)
+<A HREF="#DOC.1.4.18.2.6.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>ordered_32k_dither</B>(int xmin=0, int ymin=0)
 <DD><I>Dithers the image to 32768 colors.</I>
 <DT>
-<A HREF="#DOC.1.5.18.2.6.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>color_correct</B>(double corr)
+<A HREF="#DOC.1.4.18.2.6.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>color_correct</B>(double corr)
 <DD><I>Applies a luminance gamma correction factor of <TT>corr</TT>.</I>
 <DT>
-<A HREF="#DOC.1.5.18.2.6.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   void <B>color_correct</B>(double corr, <!1><A HREF="GPixel.html">GPixel</A> *pixels, int npixels)
+<A HREF="#DOC.1.4.18.2.6.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   void <B>color_correct</B>(double corr, <!1><A HREF="GPixel.html">GPixel</A> *pixels, int npixels)
 <DD><I>Applies a luminance gamma correction to an array of pixels.</I>
 </DL></P>
 <DT>
-<A HREF="#DOC.1.5.18.2.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Miscellaneous. </B>
+<A HREF="#DOC.1.4.18.2.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Miscellaneous. </B>
 <DD><I></I>
 <P><DL>
 <DT>
-<A HREF="#DOC.1.5.18.2.7.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>unsigned int <B>get_memory_usage</B>() const 
+<A HREF="#DOC.1.4.18.2.7.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>unsigned int <B>get_memory_usage</B>() const 
 <DD><I>Returns the number of bytes allocated for this image.</I>
 <DT>
-<A HREF="#DOC.1.5.18.2.7.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>save_ppm</B>(<!1><A HREF="ByteStream.html">ByteStream</A> &amp;bs, int raw=1) const 
+<A HREF="#DOC.1.4.18.2.7.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>save_ppm</B>(<!1><A HREF="ByteStream.html">ByteStream</A> &amp;bs, int raw=1) const 
 <DD><I>Saves the image into ByteStream <TT>bs</TT> using the PPM format.</I>
 </DL></P>
 <DT>
-<A HREF="#DOC.1.5.18.2.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Stealing or borrowing the memory buffer (advanced). </B>
+<A HREF="#DOC.1.4.18.2.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Stealing or borrowing the memory buffer (advanced). </B>
 <DD><I></I>
 <P><DL>
 <DT>
-<A HREF="#DOC.1.5.18.2.8.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GPixel.html">GPixel</A>* <B>take_data</B>(size_t &amp;offset)
+<A HREF="#DOC.1.4.18.2.8.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GPixel.html">GPixel</A>* <B>take_data</B>(size_t &amp;offset)
 <DD><I>Steals the memory buffer of a GPixmap.</I>
 <DT>
-<A HREF="#DOC.1.5.18.2.8.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>inline   void <B>borrow_data</B>(<!1><A HREF="GPixel.html">GPixel</A> &amp;data, int w, int h)
+<A HREF="#DOC.1.4.18.2.8.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>inline   void <B>borrow_data</B>(<!1><A HREF="GPixel.html">GPixel</A> &amp;data, int w, int h)
 <DD><I>Initializes this GPixmap by borrowing a memory segment.</I>
 <DT>
-<A HREF="#DOC.1.5.18.2.8.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>donate_data</B>(<!1><A HREF="GPixel.html">GPixel</A> *data, int w, int h)
+<A HREF="#DOC.1.4.18.2.8.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>donate_data</B>(<!1><A HREF="GPixel.html">GPixel</A> *data, int w, int h)
 <DD><I>Identical to the above, but GPixmap will do the delete []. </I>
 </DL></P>
 </DL></P>
@@ -182,7 +182,7 @@
 <DL>
 <P><DL>
 <DT><H3>Public Methods</H3><DD><DT>
-<IMG ALT="o" SRC=icon2.gif><!1><A HREF="GPEnabled.html#DOC.1.5.4.1.2">GPEnabled</A>&amp; <B>operator=</B>(const <!1><A HREF="GPEnabled.html#DOC.1.5.4.1.2">GPEnabled</A> &amp; obj)
+<IMG ALT="o" SRC=icon2.gif><!1><A HREF="GPEnabled.html#DOC.1.4.4.1.2">GPEnabled</A>&amp; <B>operator=</B>(const <!1><A HREF="GPEnabled.html#DOC.1.4.4.1.2">GPEnabled</A> &amp; obj)
 <DT>
 <IMG ALT="o" SRC=icon2.gif>int <B>get_count</B>(void) const 
 </DL></P>
@@ -207,33 +207,33 @@ the bottom line of the image.</BLOCKQUOTE>
 <DL>
 
 <A NAME="Construction. ">
-<A NAME="DOC.1.5.18.2.1">
+<A NAME="DOC.1.4.18.2.1">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> Construction. </B></TT>
 <DL><DT><DD></DL><P><DL>
 
 <A NAME="GPixmap">
-<A NAME="DOC.1.5.18.2.1.1">
+<A NAME="DOC.1.4.18.2.1.1">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> GPixmap()</B></TT>
 <DD>Constructs an empty GBitmap object.  The returned GPixmap has zero rows
-and zero columns.  Use function <!1><A HREF="GPixmap.html#DOC.1.5.18.2.2.1">init</A> to change the size of the
+and zero columns.  Use function <!1><A HREF="GPixmap.html#DOC.1.4.18.2.2.1">init</A> to change the size of the
 image. 
 <DL><DT><DD></DL><P>
 <A NAME="GPixmap">
-<A NAME="DOC.1.5.18.2.1.2">
+<A NAME="DOC.1.4.18.2.1.2">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> GPixmap(int nrows, int ncolumns, const <!1><A HREF="GPixel.html">GPixel</A> *filler=0)</B></TT>
 <DD>Constructs a GPixmap with <TT>nrows</TT> rows and <TT>ncolumns</TT> columns.  When the
 optional argument <TT>filler</TT> is specified, all pixels are initialized 
 with the corresponding color. 
 <DL><DT><DD></DL><P>
 <A NAME="GPixmap">
-<A NAME="DOC.1.5.18.2.1.3">
+<A NAME="DOC.1.4.18.2.1.3">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> GPixmap(const <!1><A HREF="GBitmap.html">GBitmap</A> &amp;ref)</B></TT>
 <DD>Constructs a GPixmap by copying the gray level image <TT>ref</TT>.
 The constructed GPixmap has the same size as <TT>ref</TT>.  The pixels
 are initialized with shades of grays copied from <TT>ref</TT>. 
 <DL><DT><DD></DL><P>
 <A NAME="GPixmap">
-<A NAME="DOC.1.5.18.2.1.4">
+<A NAME="DOC.1.4.18.2.1.4">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> GPixmap(const <!1><A HREF="GBitmap.html">GBitmap</A> &amp;ref, const <!1><A HREF="GRect.html">GRect</A> &amp;rect)</B></TT>
 <DD>Constructs a GPixmap by copying the rectangle <TT>rect</TT> of the gray level
 image <TT>ref</TT>.  The constructed GPixmap has the same size as rectangle
@@ -242,51 +242,51 @@ the ink levels represented in <TT>ref</TT>.  This conversion depends on the
 number of gray levels in <TT>ref</TT>. 
 <DL><DT><DD></DL><P>
 <A NAME="GPixmap">
-<A NAME="DOC.1.5.18.2.1.5">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> GPixmap(const <!1><A HREF="GPixmap.html#DOC.1.5.18.2.1.1">GPixmap</A> &amp;ref)</B></TT>
+<A NAME="DOC.1.4.18.2.1.5">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> GPixmap(const <!1><A HREF="GPixmap.html#DOC.1.4.18.2.1.1">GPixmap</A> &amp;ref)</B></TT>
 <DD>Copy constructors. Constructs a GPixmap by replicating the size and the
 contents of GPixmap <TT>ref</TT>. 
 <DL><DT><DD></DL><P>
 <A NAME="GPixmap">
-<A NAME="DOC.1.5.18.2.1.6">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> GPixmap(const <!1><A HREF="GPixmap.html#DOC.1.5.18.2.1.1">GPixmap</A> &amp;ref, const <!1><A HREF="GRect.html">GRect</A> &amp;rect)</B></TT>
+<A NAME="DOC.1.4.18.2.1.6">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> GPixmap(const <!1><A HREF="GPixmap.html#DOC.1.4.18.2.1.1">GPixmap</A> &amp;ref, const <!1><A HREF="GRect.html">GRect</A> &amp;rect)</B></TT>
 <DD>Constructs a GPixmap by copying the rectangle <TT>rect</TT> of the color image <TT>ref</TT>.
 The constructed GPixmap has the same size as rectangle <TT>rect</TT>.
 The pixels are initialized with colors copied from <TT>ref</TT>. 
 <DL><DT><DD></DL><P>
 <A NAME="GPixmap">
-<A NAME="DOC.1.5.18.2.1.7">
+<A NAME="DOC.1.4.18.2.1.7">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> GPixmap(<!1><A HREF="ByteStream.html">ByteStream</A> &amp;ref)</B></TT>
 <DD>Constructs a GPixmap by reading PPM data from ByteStream <TT>ref</TT>.
 See <!1><A HREF="PNMandRLEfileformats.html">PNM and RLE file formats</A> for more information. 
 <DL><DT><DD></DL><P></DL>
 
 <A NAME="Initialization. ">
-<A NAME="DOC.1.5.18.2.2">
+<A NAME="DOC.1.4.18.2.2">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> Initialization. </B></TT>
 <DL><DT><DD></DL><P><DL>
 
 <A NAME="init">
-<A NAME="DOC.1.5.18.2.2.1">
+<A NAME="DOC.1.4.18.2.2.1">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void init(int nrows, int ncolumns, const <!1><A HREF="GPixel.html">GPixel</A> *filler=0)</B></TT>
 <DD>Resets the GPixmap to <TT>nrows</TT> rows and <TT>ncolumns</TT> columns.  When the
 optional argument <TT>filler</TT> is specified, all pixels are initialized with
 the corresponding color.  The previous content of the GPixmap is discarded. 
 <DL><DT><DD></DL><P>
 <A NAME="init">
-<A NAME="DOC.1.5.18.2.2.2">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void init(const <!1><A HREF="GPixmap.html#DOC.1.5.18.2.1.1">GPixmap</A> &amp;ref)</B></TT>
+<A NAME="DOC.1.4.18.2.2.2">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void init(const <!1><A HREF="GPixmap.html#DOC.1.4.18.2.1.1">GPixmap</A> &amp;ref)</B></TT>
 <DD>Resets the GPixmap by copying the size and the contents of the color
 image <TT>ref</TT>.  The previous content of the GPixmap is discarded. 
 <DL><DT><DD></DL><P>
 <A NAME="init">
-<A NAME="DOC.1.5.18.2.2.3">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void init(const <!1><A HREF="GPixmap.html#DOC.1.5.18.2.1.1">GPixmap</A> &amp;ref, const <!1><A HREF="GRect.html">GRect</A> &amp;rect)</B></TT>
+<A NAME="DOC.1.4.18.2.2.3">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void init(const <!1><A HREF="GPixmap.html#DOC.1.4.18.2.1.1">GPixmap</A> &amp;ref, const <!1><A HREF="GRect.html">GRect</A> &amp;rect)</B></TT>
 <DD>Resets the GPixmap by copying the rectangle <TT>rect</TT> of the color image <TT>ref</TT>.
 The previous content of the GPixmap is discarded. 
 <DL><DT><DD></DL><P>
 <A NAME="init">
-<A NAME="DOC.1.5.18.2.2.4">
+<A NAME="DOC.1.4.18.2.2.4">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void init(const <!1><A HREF="GBitmap.html">GBitmap</A> &amp;ref, const <!1><A HREF="GPixel.html">GPixel</A> *ramp=0)</B></TT>
 <DD>Resets the GPixmap by copying the size and the contents of the gray 
 level image <TT>ref</TT>.  The optional argument <TT>ramp</TT> is an array of 256 
@@ -294,7 +294,7 @@ pixel values used for mapping the gray levels to color values.
 Setting <TT>ramp</TT> to zero selects a linear ramp of shades of gray. 
 <DL><DT><DD></DL><P>
 <A NAME="init">
-<A NAME="DOC.1.5.18.2.2.5">
+<A NAME="DOC.1.4.18.2.2.5">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void init(const <!1><A HREF="GBitmap.html">GBitmap</A> &amp;ref, const <!1><A HREF="GRect.html">GRect</A> &amp;rect, const <!1><A HREF="GPixel.html">GPixel</A> *ramp=0)</B></TT>
 <DD>Resets the GPixmap by copying the rectangle <TT>rect</TT> of the gray level
 image <TT>ref</TT>.  The optional argument <TT>ramp</TT> is an array of 256 pixel
@@ -303,54 +303,54 @@ to zero selects a linear ramp computed according to the maximal number
 of gray levels in <TT>ref</TT>. 
 <DL><DT><DD></DL><P>
 <A NAME="init">
-<A NAME="DOC.1.5.18.2.2.6">
+<A NAME="DOC.1.4.18.2.2.6">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void init(<!1><A HREF="ByteStream.html">ByteStream</A> &amp;ref)</B></TT>
 <DD>Resets the GPixmap by reading PPM data from ByteStream <TT>ref</TT>.  See
 <!1><A HREF="PNMandRLEfileformats.html">PNM and RLE file formats</A> for more information. 
 <DL><DT><DD></DL><P>
 <A NAME="operator=">
-<A NAME="DOC.1.5.18.2.2.7">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GPixmap.html#DOC.1.5.18.2.1.1">GPixmap</A>&amp; operator=(const <!1><A HREF="GBitmap.html">GBitmap</A> &amp;ref)</B></TT>
+<A NAME="DOC.1.4.18.2.2.7">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GPixmap.html#DOC.1.4.18.2.1.1">GPixmap</A>&amp; operator=(const <!1><A HREF="GBitmap.html">GBitmap</A> &amp;ref)</B></TT>
 <DD>Resets the GPixmap by copying the gray level image <TT>ref</TT>.  The pixels
 are initialized with shades of grays copied from <TT>ref</TT>. 
 <DL><DT><DD></DL><P>
 <A NAME="operator=">
-<A NAME="DOC.1.5.18.2.2.8">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GPixmap.html#DOC.1.5.18.2.1.1">GPixmap</A>&amp; operator=(const <!1><A HREF="GPixmap.html#DOC.1.5.18.2.1.1">GPixmap</A> &amp;ref)</B></TT>
+<A NAME="DOC.1.4.18.2.2.8">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GPixmap.html#DOC.1.4.18.2.1.1">GPixmap</A>&amp; operator=(const <!1><A HREF="GPixmap.html#DOC.1.4.18.2.1.1">GPixmap</A> &amp;ref)</B></TT>
 <DD>Copy operator. Resets the GPixmap by copying the size and the contents
 of the color image <TT>ref</TT>.  The previous content of the GPixmap is
 discarded. 
 <DL><DT><DD></DL><P></DL>
 
 <A NAME="Accessing pixels. ">
-<A NAME="DOC.1.5.18.2.3">
+<A NAME="DOC.1.4.18.2.3">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> Accessing pixels. </B></TT>
 <DL><DT><DD></DL><P><DL>
 
 <A NAME="rows">
-<A NAME="DOC.1.5.18.2.3.1">
+<A NAME="DOC.1.4.18.2.3.1">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>unsigned int rows() const </B></TT>
 <DD>Returns the number of rows (the image height). 
 <DL><DT><DD></DL><P>
 <A NAME="columns">
-<A NAME="DOC.1.5.18.2.3.2">
+<A NAME="DOC.1.4.18.2.3.2">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>unsigned int columns() const </B></TT>
 <DD>Returns the number of columns (the image width). 
 <DL><DT><DD></DL><P>
 <A NAME="operator[] ">
-<A NAME="DOC.1.5.18.2.3.3">
+<A NAME="DOC.1.4.18.2.3.3">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>const <!1><A HREF="GPixel.html">GPixel</A>* operator[] (int row) const </B></TT>
 <DD>Returns a constant pointer to the first GPixel in row <TT>row</TT>.  This
 pointer can be used as an array to read the row elements. 
 <DL><DT><DD></DL><P>
 <A NAME="operator[] ">
-<A NAME="DOC.1.5.18.2.3.4">
+<A NAME="DOC.1.4.18.2.3.4">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GPixel.html">GPixel</A>* operator[] (int row)</B></TT>
 <DD>Returns a pointer to the first GPixel in row <TT>row</TT>.  This pointer can be
 used as an array to read or write the row elements. 
 <DL><DT><DD></DL><P>
 <A NAME="rowsize">
-<A NAME="DOC.1.5.18.2.3.5">
+<A NAME="DOC.1.4.18.2.3.5">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>unsigned int rowsize() const </B></TT>
 <DD>Returns the length (in pixels) of a row in memory.  This number is equal
 to the difference between pointers to pixels located in the same column
@@ -359,13 +359,13 @@ columns in the image.
 <DL><DT><DD></DL><P></DL>
 
 <A NAME="Resampling images. ">
-<A NAME="DOC.1.5.18.2.4">
+<A NAME="DOC.1.4.18.2.4">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> Resampling images. </B></TT>
 <DL><DT><DD></DL><P><DL>
 
 <A NAME="downsample">
-<A NAME="DOC.1.5.18.2.4.1">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void downsample(const <!1><A HREF="GPixmap.html#DOC.1.5.18.2.1.1">GPixmap</A> *src, int factor, const <!1><A HREF="GRect.html">GRect</A> *rect=0)</B></TT>
+<A NAME="DOC.1.4.18.2.4.1">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void downsample(const <!1><A HREF="GPixmap.html#DOC.1.4.18.2.1.1">GPixmap</A> *src, int factor, const <!1><A HREF="GRect.html">GRect</A> *rect=0)</B></TT>
 <DD>Resets this GPixmap with a subsampled segment of color image <TT>src</TT>.
 This function conceptually rescales image <TT>src</TT> by a factor <TT>1:factor</TT>,
 and copies rectangle <TT>rect</TT> of the subsampled image into the current GPixmap.
@@ -375,8 +375,8 @@ Subsampling works by averaging the colors of the source pixels located
 in small squares of size <TT>factor</TT> times <TT>factor</TT>. 
 <DL><DT><DD></DL><P>
 <A NAME="upsample">
-<A NAME="DOC.1.5.18.2.4.2">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void upsample(const <!1><A HREF="GPixmap.html#DOC.1.5.18.2.1.1">GPixmap</A> *src, int factor, const <!1><A HREF="GRect.html">GRect</A> *rect=0)</B></TT>
+<A NAME="DOC.1.4.18.2.4.2">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void upsample(const <!1><A HREF="GPixmap.html#DOC.1.4.18.2.1.1">GPixmap</A> *src, int factor, const <!1><A HREF="GRect.html">GRect</A> *rect=0)</B></TT>
 <DD>Resets this GPixmap with a oversampled segment of color image <TT>src</TT>.
 This function conceptually rescales image <TT>src</TT> by a factor <TT>factor:1</TT>,
 and copies rectangle <TT>rect</TT> of the oversampled image into the current
@@ -386,8 +386,8 @@ reasons.  Oversampling works by replicating the color of the source
 pixels into squares of size <TT>factor</TT> times <TT>factor</TT>. 
 <DL><DT><DD></DL><P>
 <A NAME="downsample43">
-<A NAME="DOC.1.5.18.2.4.3">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void downsample43(const <!1><A HREF="GPixmap.html#DOC.1.5.18.2.1.1">GPixmap</A> *src, const <!1><A HREF="GRect.html">GRect</A> *rect=0)</B></TT>
+<A NAME="DOC.1.4.18.2.4.3">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void downsample43(const <!1><A HREF="GPixmap.html#DOC.1.4.18.2.1.1">GPixmap</A> *src, const <!1><A HREF="GRect.html">GRect</A> *rect=0)</B></TT>
 <DD>Resets this GPixmap with a rescaled segment of <TT>src</TT> (zoom 75%).  This
 function conceptually rescales image <TT>src</TT> by a factor <TT>3:4</TT>, and copies
 rectangle <TT>rect</TT> of the rescaled image into the current GPixmap.  The
@@ -396,8 +396,8 @@ operations are however performed together for efficiency reasons.  This
 function has been superseded by class <!1><A HREF="GPixmapScaler.html">GPixmapScaler</A>. 
 <DL><DT><DD></DL><P>
 <A NAME="upsample23">
-<A NAME="DOC.1.5.18.2.4.4">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void upsample23(const <!1><A HREF="GPixmap.html#DOC.1.5.18.2.1.1">GPixmap</A> *src, const <!1><A HREF="GRect.html">GRect</A> *rect=0)</B></TT>
+<A NAME="DOC.1.4.18.2.4.4">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void upsample23(const <!1><A HREF="GPixmap.html#DOC.1.4.18.2.1.1">GPixmap</A> *src, const <!1><A HREF="GRect.html">GRect</A> *rect=0)</B></TT>
 <DD>Resets this GPixmap with a rescaled segment of <TT>src</TT> (zoom 150%).  This
 function conceptually rescales image <TT>src</TT> by a factor <TT>3:2</TT> and copies
 rectangle <TT>rect</TT> of the rescaled image into the current GPixmap.  The
@@ -407,15 +407,15 @@ function has been superseded by class <!1><A HREF="GPixmapScaler.html">GPixmapSc
 <DL><DT><DD></DL><P></DL>
 
 <A NAME="Blitting and applying stencils.  ">
-<A NAME="DOC.1.5.18.2.5">
+<A NAME="DOC.1.4.18.2.5">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> Blitting and applying stencils.  </B></TT>
 <DD>These function is essential for rendering DjVu images.  The elementary
-functions are <!1><A HREF="GPixmap.html#DOC.1.5.18.2.5.1">attenuate</A> and <!1><A HREF="GPixmap.html#DOC.1.5.18.2.5.2">blit</A>.  The combined functions
-<!1><A HREF="GPixmap.html#DOC.1.5.18.2.5.4">blend</A> and <!1><A HREF="GPixmap.html#DOC.1.5.18.2.5.5">stencil</A> should be viewed as optimizations.  
+functions are <!1><A HREF="GPixmap.html#DOC.1.4.18.2.5.1">attenuate</A> and <!1><A HREF="GPixmap.html#DOC.1.4.18.2.5.2">blit</A>.  The combined functions
+<!1><A HREF="GPixmap.html#DOC.1.4.18.2.5.4">blend</A> and <!1><A HREF="GPixmap.html#DOC.1.4.18.2.5.5">stencil</A> should be viewed as optimizations.  
 <DL><DT><DD></DL><P><DL>
 
 <A NAME="attenuate">
-<A NAME="DOC.1.5.18.2.5.1">
+<A NAME="DOC.1.4.18.2.5.1">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void attenuate(const <!1><A HREF="GBitmap.html">GBitmap</A> *bm, int x, int y)</B></TT>
 <DD>Attenuates the color image in preparation for a blit.  
 Bitmap <TT>bm</TT> is positionned at location <TT>x</TT>,<TT>y</TT> over this color image.
@@ -424,7 +424,7 @@ The matching color image pixels are then multiplied by <TT>1.0-Alpha</TT> where
 corresponding pixel of bitmap <TT>bm</TT>. 
 <DL><DT><DD></DL><P>
 <A NAME="blit">
-<A NAME="DOC.1.5.18.2.5.2">
+<A NAME="DOC.1.4.18.2.5.2">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void blit(const <!1><A HREF="GBitmap.html">GBitmap</A> *bm, int x, int y, const <!1><A HREF="GPixel.html">GPixel</A> *color)</B></TT>
 <DD>Blits solid color <TT>color</TT> through transparency mask <TT>bm</TT>.  
 Bitmap <TT>bm</TT> is positionned at location <TT>x</TT>,<TT>y</TT> over this color image.
@@ -433,8 +433,8 @@ The matching color image pixels are then modified by adding color
 range <TT>[0,1]</TT>, represented by the corresponding pixel of bitmap <TT>bm</TT>. 
 <DL><DT><DD></DL><P>
 <A NAME="blit">
-<A NAME="DOC.1.5.18.2.5.3">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void blit(const <!1><A HREF="GBitmap.html">GBitmap</A> *bm, int x, int y, const <!1><A HREF="GPixmap.html#DOC.1.5.18.2.1.1">GPixmap</A> *color)</B></TT>
+<A NAME="DOC.1.4.18.2.5.3">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void blit(const <!1><A HREF="GBitmap.html">GBitmap</A> *bm, int x, int y, const <!1><A HREF="GPixmap.html#DOC.1.4.18.2.1.1">GPixmap</A> *color)</B></TT>
 <DD>Blits pixmap <TT>color</TT> through transparency mask <TT>bm</TT>.
 Bitmap <TT>bm</TT> is positionned at location <TT>x</TT>,<TT>y</TT> over this color image.
 The matching color image pixels are then modified by adding the
@@ -443,32 +443,32 @@ where <TT>Alpha</TT> denotes the gray value, in range <TT>[0,1]</TT>, represente
 the corresponding pixel of bitmap <TT>bm</TT>. 
 <DL><DT><DD></DL><P>
 <A NAME="blend">
-<A NAME="DOC.1.5.18.2.5.4">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void blend(const <!1><A HREF="GBitmap.html">GBitmap</A> *bm, int x, int y, const <!1><A HREF="GPixmap.html#DOC.1.5.18.2.1.1">GPixmap</A> *color)</B></TT>
+<A NAME="DOC.1.4.18.2.5.4">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void blend(const <!1><A HREF="GBitmap.html">GBitmap</A> *bm, int x, int y, const <!1><A HREF="GPixmap.html#DOC.1.4.18.2.1.1">GPixmap</A> *color)</B></TT>
 <DD>Performs alpha blending. This function is similar to first calling
-<!1><A HREF="GPixmap.html#DOC.1.5.18.2.5.1">attenuate</A> with alpha map <TT>bm</TT> and then calling <!1><A HREF="GPixmap.html#DOC.1.5.18.2.5.2">blit</A> with
+<!1><A HREF="GPixmap.html#DOC.1.4.18.2.5.1">attenuate</A> with alpha map <TT>bm</TT> and then calling <!1><A HREF="GPixmap.html#DOC.1.4.18.2.5.2">blit</A> with
 alpha map <TT>bm</TT> and color map <TT>color</TT>. Both operations are performed
 together for efficiency reasons. 
 <DL><DT><DD></DL><P>
 <A NAME="stencil">
-<A NAME="DOC.1.5.18.2.5.5">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void stencil(const <!1><A HREF="GBitmap.html">GBitmap</A> *bm, const <!1><A HREF="GPixmap.html#DOC.1.5.18.2.1.1">GPixmap</A> *pm, int pms, const <!1><A HREF="GRect.html">GRect</A> *pmr, double corr=1.0)</B></TT>
+<A NAME="DOC.1.4.18.2.5.5">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void stencil(const <!1><A HREF="GBitmap.html">GBitmap</A> *bm, const <!1><A HREF="GPixmap.html#DOC.1.4.18.2.1.1">GPixmap</A> *pm, int pms, const <!1><A HREF="GRect.html">GRect</A> *pmr, double corr=1.0)</B></TT>
 <DD>Resample color pixmap and performs color corrected alpha blending.  This
 function conceptually computes an intermediate color image by first
-upsampling the GPixmap <TT>pm</TT> by a factor <TT>pms:1</TT> (see <!1><A HREF="GPixmap.html#DOC.1.5.18.2.4.2">upsample</A>),
+upsampling the GPixmap <TT>pm</TT> by a factor <TT>pms:1</TT> (see <!1><A HREF="GPixmap.html#DOC.1.4.18.2.4.2">upsample</A>),
 extracting the sub-image designated by rectangle <TT>pmr</TT> and applying
-color correction <TT>corr</TT> (see <!1><A HREF="GPixmap.html#DOC.1.5.18.2.6.3">color_correct</A>).  This intermediate
+color correction <TT>corr</TT> (see <!1><A HREF="GPixmap.html#DOC.1.4.18.2.6.3">color_correct</A>).  This intermediate
 color image is then blended into this pixel map according to the alpha
-map <TT>bm</TT> (see <!1><A HREF="GPixmap.html#DOC.1.5.18.2.5.4">blend</A>). 
+map <TT>bm</TT> (see <!1><A HREF="GPixmap.html#DOC.1.4.18.2.5.4">blend</A>). 
 <DL><DT><DD></DL><P></DL>
 
 <A NAME="Manipulating colors. ">
-<A NAME="DOC.1.5.18.2.6">
+<A NAME="DOC.1.4.18.2.6">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> Manipulating colors. </B></TT>
 <DL><DT><DD></DL><P><DL>
 
 <A NAME="ordered_666_dither">
-<A NAME="DOC.1.5.18.2.6.1">
+<A NAME="DOC.1.4.18.2.6.1">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void ordered_666_dither(int xmin=0, int ymin=0)</B></TT>
 <DD>Dithers the image to 216 colors.  This function applies an ordered
 dithering algorithm to reduce the image to 216 predefined colors.  These
@@ -483,7 +483,7 @@ these arguments eliminates dithering artifacts on the tile
 boundaries. 
 <DL><DT><DD></DL><P>
 <A NAME="ordered_32k_dither">
-<A NAME="DOC.1.5.18.2.6.2">
+<A NAME="DOC.1.4.18.2.6.2">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void ordered_32k_dither(int xmin=0, int ymin=0)</B></TT>
 <DD>Dithers the image to 32768 colors.  This function applies an ordered
 dithering algorithm to reduce the image to 32768 predefined colors.
@@ -498,7 +498,7 @@ these arguments eliminates dithering artifacts on the tile
 boundaries. 
 <DL><DT><DD></DL><P>
 <A NAME="color_correct">
-<A NAME="DOC.1.5.18.2.6.3">
+<A NAME="DOC.1.4.18.2.6.3">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void color_correct(double corr)</B></TT>
 <DD>Applies a luminance gamma correction factor of <TT>corr</TT>.  Values greater than
 <TT>1.0</TT> make the image brighter.  Values smaller than <TT>1.0</TT> make the image
@@ -506,24 +506,24 @@ darker.  The documentation of program <!1><A HREF="ppmcoco.html">ppmcoco</A> exp
 properly use this function. 
 <DL><DT><DD></DL><P>
 <A NAME="color_correct">
-<A NAME="DOC.1.5.18.2.6.4">
+<A NAME="DOC.1.4.18.2.6.4">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static   void color_correct(double corr, <!1><A HREF="GPixel.html">GPixel</A> *pixels, int npixels)</B></TT>
 <DD>Applies a luminance gamma correction to an array of pixels. 
 This function is <EM>static</EM> and does not modify this pixmap. 
 <DL><DT><DD></DL><P></DL>
 
 <A NAME="Miscellaneous. ">
-<A NAME="DOC.1.5.18.2.7">
+<A NAME="DOC.1.4.18.2.7">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> Miscellaneous. </B></TT>
 <DL><DT><DD></DL><P><DL>
 
 <A NAME="get_memory_usage">
-<A NAME="DOC.1.5.18.2.7.1">
+<A NAME="DOC.1.4.18.2.7.1">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>unsigned int get_memory_usage() const </B></TT>
 <DD>Returns the number of bytes allocated for this image. 
 <DL><DT><DD></DL><P>
 <A NAME="save_ppm">
-<A NAME="DOC.1.5.18.2.7.2">
+<A NAME="DOC.1.4.18.2.7.2">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void save_ppm(<!1><A HREF="ByteStream.html">ByteStream</A> &amp;bs, int raw=1) const </B></TT>
 <DD>Saves the image into ByteStream <TT>bs</TT> using the PPM format.
 Argument <TT>raw</TT> selects the ``Raw PPM'' (1) or the ``Ascii PPM'' (0) format.
@@ -531,18 +531,18 @@ See <!1><A HREF="PNMandRLEfileformats.html">PNM and RLE file formats</A> for mor
 <DL><DT><DD></DL><P></DL>
 
 <A NAME="Stealing or borrowing the memory buffer (advanced). ">
-<A NAME="DOC.1.5.18.2.8">
+<A NAME="DOC.1.4.18.2.8">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> Stealing or borrowing the memory buffer (advanced). </B></TT>
 <DL><DT><DD></DL><P><DL>
 
 <A NAME="take_data">
-<A NAME="DOC.1.5.18.2.8.1">
+<A NAME="DOC.1.4.18.2.8.1">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GPixel.html">GPixel</A>* take_data(size_t &amp;offset)</B></TT>
 <DD>Steals the memory buffer of a GPixmap.  This function returns the
 address of the memory buffer allocated by this GPixmap object.  The
 offset of the first pixel in the bottom line is written into variable
 <TT>offset</TT>.  Other lines can be accessed using pointer arithmetic (see
-<!1><A HREF="GPixmap.html#DOC.1.5.18.2.3.5">rowsize</A>).  The GPixmap object no longer ``owns'' the buffer: you
+<!1><A HREF="GPixmap.html#DOC.1.4.18.2.3.5">rowsize</A>).  The GPixmap object no longer ``owns'' the buffer: you
 must explicitly de-allocate the buffer using <TT>operator delete []</TT>.  This
 de-allocation should take place after the destruction or the
 re-initialization of the GPixmap object.  This function will return a
@@ -550,7 +550,7 @@ null pointer if the GPixmap object does not ``own'' the buffer in the
 first place.  
 <DL><DT><DD></DL><P>
 <A NAME="borrow_data">
-<A NAME="DOC.1.5.18.2.8.2">
+<A NAME="DOC.1.4.18.2.8.2">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>inline   void borrow_data(<!1><A HREF="GPixel.html">GPixel</A> &amp;data, int w, int h)</B></TT>
 <DD>Initializes this GPixmap by borrowing a memory segment.  The GPixmap
 then directly addresses the memory buffer <TT>data</TT> provided by the user.
@@ -560,7 +560,7 @@ buffer using <TT>operator delete []</TT>.  This de-allocation should take place
 after the destruction or the re-initialization of the GPixmap object.  
 <DL><DT><DD></DL><P>
 <A NAME="donate_data">
-<A NAME="DOC.1.5.18.2.8.3">
+<A NAME="DOC.1.4.18.2.8.3">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void donate_data(<!1><A HREF="GPixel.html">GPixel</A> *data, int w, int h)</B></TT>
 <DD>Identical to the above, but GPixmap will do the delete []. 
 <DL><DT><DD></DL><P></DL>
@@ -572,7 +572,7 @@ after the destruction or the re-initialization of the GPixmap object.
 <!-- This is were the DOC++ footer is defined  -->
 
 <font face="arial,helvetica" size="2">
-<a href=http://www.lizardtech.com>DjVu</a> is a trademark of AT&amp;T.  
+<a href=http://www.lizardtech.com>DjVu</a> is a trademark of LizardTech, Inc.  
 <br>All other products mentioned are registered trademarks or trademarks of
 their respective companies.
 </font>

@@ -12,13 +12,13 @@
 <DL>
 <P><DL>
 <DT><H3>Public Fields</H3><DD><DT>
-<A HREF="#DOC.1.5.23.2.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>parent</B>
+<A HREF="#DOC.1.4.23.2.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>parent</B>
 <DD><I>Subscript of the parent shape.</I>
 <DT>
-<A HREF="#DOC.1.5.23.2.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GBitmap.html">GBitmap</A>&gt;  <B>bits</B>
+<A HREF="#DOC.1.4.23.2.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GBitmap.html">GBitmap</A>&gt;  <B>bits</B>
 <DD><I>Bilevel image of the shape pixels.</I>
 <DT>
-<A HREF="#DOC.1.5.23.2.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>long <B>userdata</B>
+<A HREF="#DOC.1.4.23.2.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>long <B>userdata</B>
 <DD><I>Private user data.</I>
 </DL></P>
 
@@ -35,7 +35,7 @@ the parent shape.  </BLOCKQUOTE>
 <DL>
 
 <A NAME="parent">
-<A NAME="DOC.1.5.23.2.1">
+<A NAME="DOC.1.4.23.2.1">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int parent</B></TT>
 <DD>Subscript of the parent shape.  The parent shape must always be located
 before the current shape in the shape array.  A negative value indicates
@@ -46,7 +46,7 @@ saved into the JB2 file, but the actual value of the <TT>parent</TT> variable
 is not. 
 <DL><DT><DD></DL><P>
 <A NAME="bits">
-<A NAME="DOC.1.5.23.2.2">
+<A NAME="DOC.1.4.23.2.2">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GBitmap.html">GBitmap</A>&gt;  bits</B></TT>
 <DD>Bilevel image of the shape pixels.  This must be a pointer to a bilevel
 <TT>GBitmap</TT> image.  This pointer can also be null. The encoder will just
@@ -54,7 +54,7 @@ silently discard all blits referring to a shape containing a null
 bitmap. 
 <DL><DT><DD></DL><P>
 <A NAME="userdata">
-<A NAME="DOC.1.5.23.2.3">
+<A NAME="DOC.1.4.23.2.3">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>long userdata</B></TT>
 <DD>Private user data. This long word is provided as a convenience for users
 of the JB2Image data structures.  Neither the rendering functions nor
@@ -67,7 +67,7 @@ the coding functions ever access this value.
 <!-- This is were the DOC++ footer is defined  -->
 
 <font face="arial,helvetica" size="2">
-<a href=http://www.lizardtech.com>DjVu</a> is a trademark of AT&amp;T.  
+<a href=http://www.lizardtech.com>DjVu</a> is a trademark of LizardTech, Inc.  
 <br>All other products mentioned are registered trademarks or trademarks of
 their respective companies.
 </font>

@@ -5,7 +5,7 @@
 </HEAD>
 <BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
 
-<H2>class  <A HREF="#DOC.DOCU">GString</A>: protected <!1><A HREF="GP.html#DOC.1.5.4.3.1">GP</A>&lt;GStringRep&gt;</H2>
+<H2>class  <A HREF="#DOC.DOCU">GString</A>: protected <!1><A HREF="GP.html#DOC.1.4.4.3.1">GP</A>&lt;GStringRep&gt;</H2>
 <BLOCKQUOTE>General purpose character string.</BLOCKQUOTE>
 <HR>
 
@@ -22,115 +22,115 @@
 <DL>
 <P><DL>
 <DT><H3>Public Methods</H3><DD><DT>
-<A HREF="#DOC.1.5.5.1.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GString</B>()
+<A HREF="#DOC.1.4.5.1.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GString</B>()
 <DD><I>Null constructor.</I>
 <DT>
-<A HREF="#DOC.1.5.5.1.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GString</B>(const <!1><A HREF="GString.html#DOC.1.5.5.1.1">GString</A> &amp;gs)
+<A HREF="#DOC.1.4.5.1.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GString</B>(const <!1><A HREF="GString.html#DOC.1.4.5.1.1">GString</A> &amp;gs)
 <DD><I>Copy constructor.</I>
 <DT>
-<A HREF="#DOC.1.5.5.1.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GString</B>(const char *dat)
+<A HREF="#DOC.1.4.5.1.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GString</B>(const char *dat)
 <DD><I>Constructs a string from a null terminated character array.</I>
 <DT>
-<A HREF="#DOC.1.5.5.1.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GString</B>(const char *dat, unsigned int len)
+<A HREF="#DOC.1.4.5.1.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GString</B>(const char *dat, unsigned int len)
 <DD><I>Constructs a string from a character array.</I>
 <DT>
-<A HREF="#DOC.1.5.5.1.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GString</B>(const <!1><A HREF="GString.html#DOC.1.5.5.1.1">GString</A> &amp;gs, int from, unsigned int len)
+<A HREF="#DOC.1.4.5.1.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GString</B>(const <!1><A HREF="GString.html#DOC.1.4.5.1.1">GString</A> &amp;gs, int from, unsigned int len)
 <DD><I>Construct a string by copying a sub-string.</I>
 <DT>
-<A HREF="#DOC.1.5.5.1.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GString</B>(const int number)
+<A HREF="#DOC.1.4.5.1.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GString</B>(const int number)
 <DD><I>Constructs a string with a human-readable representation of integer <TT>number</TT>.</I>
 <DT>
-<A HREF="#DOC.1.5.5.1.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GString</B>(const double number)
+<A HREF="#DOC.1.4.5.1.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GString</B>(const double number)
 <DD><I>Constructs a string with a human-readable representation of floating point number <TT>number</TT>.</I>
 <DT>
-<A HREF="#DOC.1.5.5.1.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GString.html#DOC.1.5.5.1.1">GString</A>&amp; <B>operator= </B>(const <!1><A HREF="GString.html#DOC.1.5.5.1.1">GString</A> &amp;gs)
+<A HREF="#DOC.1.4.5.1.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GString.html#DOC.1.4.5.1.1">GString</A>&amp; <B>operator= </B>(const <!1><A HREF="GString.html#DOC.1.4.5.1.1">GString</A> &amp;gs)
 <DD><I>Copy operator.</I>
 <DT>
-<A HREF="#DOC.1.5.5.1.9"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GString.html#DOC.1.5.5.1.1">GString</A>&amp; <B>operator= </B>(const char *str)
+<A HREF="#DOC.1.4.5.1.9"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GString.html#DOC.1.4.5.1.1">GString</A>&amp; <B>operator= </B>(const char *str)
 <DD><I>Copy a null terminated character array.</I>
 <DT>
-<A HREF="#DOC.1.5.5.1.10"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>operator const char* </B>() const 
+<A HREF="#DOC.1.4.5.1.10"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>operator const char* </B>() const 
 <DD><I>Converts a string into a constant null terminated character array.</I>
 <DT>
-<A HREF="#DOC.1.5.5.1.11"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>unsigned int <B>length</B>() const 
+<A HREF="#DOC.1.4.5.1.11"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>unsigned int <B>length</B>() const 
 <DD><I>Returns the string length.</I>
 <DT>
-<A HREF="#DOC.1.5.5.1.12"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>operator! </B>() const 
+<A HREF="#DOC.1.4.5.1.12"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>operator! </B>() const 
 <DD><I>Returns true if and only if the string contains zero characters.</I>
 <DT>
-<A HREF="#DOC.1.5.5.1.13"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>char <B>operator[] </B>(int n) const 
+<A HREF="#DOC.1.4.5.1.13"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>char <B>operator[] </B>(int n) const 
 <DD><I>Returns the character at position <TT>n</TT>.</I>
 <DT>
-<A HREF="#DOC.1.5.5.1.14"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>setat</B>(int n, char ch)
+<A HREF="#DOC.1.4.5.1.14"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>setat</B>(int n, char ch)
 <DD><I>Set the character at position <TT>n</TT> to value <TT>ch</TT>.</I>
 <DT>
-<A HREF="#DOC.1.5.5.1.15"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>bool <B>is_int</B>(void) const 
+<A HREF="#DOC.1.4.5.1.15"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>bool <B>is_int</B>(void) const 
 <DD><I>Returns <TT>TRUE</TT> if the string contains an integer number.</I>
 <DT>
-<A HREF="#DOC.1.5.5.1.16"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>bool <B>is_float</B>(void) const 
+<A HREF="#DOC.1.4.5.1.16"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>bool <B>is_float</B>(void) const 
 <DD><I>Returns <TT>TRUE</TT> if the string contains a float number.</I>
 <DT>
-<A HREF="#DOC.1.5.5.1.17"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GString.html#DOC.1.5.5.1.1">GString</A> <B>substr</B>(int from, unsigned int len=1) const 
+<A HREF="#DOC.1.4.5.1.17"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GString.html#DOC.1.4.5.1.1">GString</A> <B>substr</B>(int from, unsigned int len=1) const 
 <DD><I>Returns a sub-string.</I>
 <DT>
-<A HREF="#DOC.1.5.5.1.18"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GString.html#DOC.1.5.5.1.1">GString</A> <B>upcase</B>() const 
+<A HREF="#DOC.1.4.5.1.18"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GString.html#DOC.1.4.5.1.1">GString</A> <B>upcase</B>() const 
 <DD><I>Returns an upper case copy of this string.</I>
 <DT>
-<A HREF="#DOC.1.5.5.1.19"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GString.html#DOC.1.5.5.1.1">GString</A> <B>downcase</B>() const 
+<A HREF="#DOC.1.4.5.1.19"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GString.html#DOC.1.4.5.1.1">GString</A> <B>downcase</B>() const 
 <DD><I>Returns an lower case copy of this string.</I>
 <DT>
-<A HREF="#DOC.1.5.5.1.20"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>empty</B>()
+<A HREF="#DOC.1.4.5.1.20"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>empty</B>()
 <DD><I>Reinitializes a string with the null string.</I>
 <DT>
-<A HREF="#DOC.1.5.5.1.21"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>char* <B>getbuf</B>(int n = -1)
+<A HREF="#DOC.1.4.5.1.21"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>char* <B>getbuf</B>(int n = -1)
 <DD><I>Provides a direct access to the string buffer.</I>
 <DT>
-<A HREF="#DOC.1.5.5.1.22"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>format</B>(const char *fmt, ... )
+<A HREF="#DOC.1.4.5.1.22"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>format</B>(const char *fmt, ... )
 <DD><I>Initializes a string with a formatted string (as in <TT>printf</TT>).</I>
 <DT>
-<A HREF="#DOC.1.5.5.1.23"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>format</B>(const char *fmt, va_list args)
+<A HREF="#DOC.1.4.5.1.23"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>format</B>(const char *fmt, va_list args)
 <DD><I>Initializes a string with a formatted string (as in <TT>vprintf</TT>).</I>
 <DT>
-<A HREF="#DOC.1.5.5.1.24"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>search</B>(char c, int from=0) const 
+<A HREF="#DOC.1.4.5.1.24"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>search</B>(char c, int from=0) const 
 <DD><I>Searches character <TT>c</TT> in the string, starting at position <TT>from</TT> and scanning forward until reaching the end of the string.</I>
 <DT>
-<A HREF="#DOC.1.5.5.1.25"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>search</B>(const char *str, int from=0) const 
+<A HREF="#DOC.1.4.5.1.25"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>search</B>(const char *str, int from=0) const 
 <DD><I>Searches sub-string <TT>str</TT> in the string, starting at position <TT>from</TT> and scanning forward until reaching the end of the string.</I>
 <DT>
-<A HREF="#DOC.1.5.5.1.26"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>rsearch</B>(char c, int from=-1) const 
+<A HREF="#DOC.1.4.5.1.26"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>rsearch</B>(char c, int from=-1) const 
 <DD><I>Searches character <TT>c</TT> in the string, starting at position <TT>from</TT> and scanning backwards until reaching the beginning of the string.</I>
 <DT>
-<A HREF="#DOC.1.5.5.1.27"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>rsearch</B>(const char *str, int from=-1) const 
+<A HREF="#DOC.1.4.5.1.27"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>rsearch</B>(const char *str, int from=-1) const 
 <DD><I>Searches sub-string <TT>str</TT> in the string, starting at position <TT>from</TT> and scanning backwards until reaching the beginning of the string.</I>
 <DT>
-<A HREF="#DOC.1.5.5.1.28"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GString.html#DOC.1.5.5.1.1">GString</A>&amp; <B>operator+= </B>(char ch)
+<A HREF="#DOC.1.4.5.1.28"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GString.html#DOC.1.4.5.1.1">GString</A>&amp; <B>operator+= </B>(char ch)
 <DD><I>Appends character <TT>ch</TT> to the string.</I>
 <DT>
-<A HREF="#DOC.1.5.5.1.29"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GString.html#DOC.1.5.5.1.1">GString</A>&amp; <B>operator+= </B>(const char *str)
+<A HREF="#DOC.1.4.5.1.29"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GString.html#DOC.1.4.5.1.1">GString</A>&amp; <B>operator+= </B>(const char *str)
 <DD><I>Appends the null terminated character array <TT>str</TT> to the string.</I>
 <DT>
-<A HREF="#DOC.1.5.5.1.30"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>friend <!1><A HREF="GString.html#DOC.1.5.5.1.1">GString</A> <B>operator+</B>(const <!1><A HREF="GString.html#DOC.1.5.5.1.1">GString</A> &amp;s1, const <!1><A HREF="GString.html#DOC.1.5.5.1.1">GString</A> &amp;s2)
+<A HREF="#DOC.1.4.5.1.30"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>friend <!1><A HREF="GString.html#DOC.1.4.5.1.1">GString</A> <B>operator+</B>(const <!1><A HREF="GString.html#DOC.1.4.5.1.1">GString</A> &amp;s1, const <!1><A HREF="GString.html#DOC.1.4.5.1.1">GString</A> &amp;s2)
 <DD><I>Concatenates strings.</I>
 <DT>
-<A HREF="#DOC.1.5.5.1.31"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>friend int <B>operator==</B>(const <!1><A HREF="GString.html#DOC.1.5.5.1.1">GString</A> &amp;s1, const <!1><A HREF="GString.html#DOC.1.5.5.1.1">GString</A> &amp;s2)
+<A HREF="#DOC.1.4.5.1.31"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>friend int <B>operator==</B>(const <!1><A HREF="GString.html#DOC.1.4.5.1.1">GString</A> &amp;s1, const <!1><A HREF="GString.html#DOC.1.4.5.1.1">GString</A> &amp;s2)
 <DD><I>String comparison.</I>
 <DT>
-<A HREF="#DOC.1.5.5.1.32"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>friend int <B>operator!=</B>(const <!1><A HREF="GString.html#DOC.1.5.5.1.1">GString</A> &amp;s1, const <!1><A HREF="GString.html#DOC.1.5.5.1.1">GString</A> &amp;s2)
+<A HREF="#DOC.1.4.5.1.32"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>friend int <B>operator!=</B>(const <!1><A HREF="GString.html#DOC.1.4.5.1.1">GString</A> &amp;s1, const <!1><A HREF="GString.html#DOC.1.4.5.1.1">GString</A> &amp;s2)
 <DD><I>String comparison.</I>
 <DT>
-<A HREF="#DOC.1.5.5.1.33"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>friend int <B>operator&gt;=</B>(const <!1><A HREF="GString.html#DOC.1.5.5.1.1">GString</A> &amp;s1, const <!1><A HREF="GString.html#DOC.1.5.5.1.1">GString</A> &amp;s2)
+<A HREF="#DOC.1.4.5.1.33"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>friend int <B>operator&gt;=</B>(const <!1><A HREF="GString.html#DOC.1.4.5.1.1">GString</A> &amp;s1, const <!1><A HREF="GString.html#DOC.1.4.5.1.1">GString</A> &amp;s2)
 <DD><I>String comparison.</I>
 <DT>
-<A HREF="#DOC.1.5.5.1.34"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>friend int <B>operator&gt; </B>(const <!1><A HREF="GString.html#DOC.1.5.5.1.1">GString</A> &amp;s1, const <!1><A HREF="GString.html#DOC.1.5.5.1.1">GString</A> &amp;s2)
+<A HREF="#DOC.1.4.5.1.34"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>friend int <B>operator&gt; </B>(const <!1><A HREF="GString.html#DOC.1.4.5.1.1">GString</A> &amp;s1, const <!1><A HREF="GString.html#DOC.1.4.5.1.1">GString</A> &amp;s2)
 <DD><I>String comparison.</I>
 <DT>
-<A HREF="#DOC.1.5.5.1.35"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>friend int <B>operator&lt;=</B>(const <!1><A HREF="GString.html#DOC.1.5.5.1.1">GString</A> &amp;s1, const <!1><A HREF="GString.html#DOC.1.5.5.1.1">GString</A> &amp;s2)
+<A HREF="#DOC.1.4.5.1.35"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>friend int <B>operator&lt;=</B>(const <!1><A HREF="GString.html#DOC.1.4.5.1.1">GString</A> &amp;s1, const <!1><A HREF="GString.html#DOC.1.4.5.1.1">GString</A> &amp;s2)
 <DD><I>String comparison.</I>
 <DT>
-<A HREF="#DOC.1.5.5.1.36"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>friend int <B>operator&lt; </B>(const <!1><A HREF="GString.html#DOC.1.5.5.1.1">GString</A> &amp;s1, const <!1><A HREF="GString.html#DOC.1.5.5.1.1">GString</A> &amp;s2)
+<A HREF="#DOC.1.4.5.1.36"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>friend int <B>operator&lt; </B>(const <!1><A HREF="GString.html#DOC.1.4.5.1.1">GString</A> &amp;s1, const <!1><A HREF="GString.html#DOC.1.4.5.1.1">GString</A> &amp;s2)
 <DD><I>String comparison.</I>
 <DT>
-<A HREF="#DOC.1.5.5.1.37"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>friend unsigned int <B>hash</B>(const <!1><A HREF="GString.html#DOC.1.5.5.1.1">GString</A> &amp;ref)
+<A HREF="#DOC.1.4.5.1.37"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>friend unsigned int <B>hash</B>(const <!1><A HREF="GString.html#DOC.1.4.5.1.1">GString</A> &amp;ref)
 <DD><I>Returns a hash code for the string.</I>
 </DL></P>
 
@@ -157,11 +157,11 @@
 <DT><H3>Public Methods</H3><DD><DT>
 <IMG ALT="o" SRC=icon2.gif><!1><A HREF="GPEnabled.html">GPEnabled</A>* <B>get</B>() const 
 <DT>
-<IMG ALT="o" SRC=icon2.gif><!1><A HREF="GPBase.html#DOC.1.5.4.2.1">GPBase</A>&amp; <B>assign</B>(const <!1><A HREF="GPBase.html#DOC.1.5.4.2.1">GPBase</A> &amp;sptr)
+<IMG ALT="o" SRC=icon2.gif><!1><A HREF="GPBase.html#DOC.1.4.4.2.1">GPBase</A>&amp; <B>assign</B>(const <!1><A HREF="GPBase.html#DOC.1.4.4.2.1">GPBase</A> &amp;sptr)
 <DT>
-<IMG ALT="o" SRC=icon2.gif><!1><A HREF="GPBase.html#DOC.1.5.4.2.1">GPBase</A>&amp; <B>assign</B>(<!1><A HREF="GPEnabled.html">GPEnabled</A> *nptr)
+<IMG ALT="o" SRC=icon2.gif><!1><A HREF="GPBase.html#DOC.1.4.4.2.1">GPBase</A>&amp; <B>assign</B>(<!1><A HREF="GPEnabled.html">GPEnabled</A> *nptr)
 <DT>
-<IMG ALT="o" SRC=icon2.gif><!1><A HREF="GPBase.html#DOC.1.5.4.2.1">GPBase</A>&amp; <B>operator=</B>(const <!1><A HREF="GPBase.html#DOC.1.5.4.2.1">GPBase</A> &amp; obj)
+<IMG ALT="o" SRC=icon2.gif><!1><A HREF="GPBase.html#DOC.1.4.4.2.1">GPBase</A>&amp; <B>operator=</B>(const <!1><A HREF="GPBase.html#DOC.1.4.4.2.1">GPBase</A> &amp; obj)
 </DL></P>
 
 <P><DL>
@@ -190,66 +190,66 @@ character, etc.)  </BLOCKQUOTE>
 <DL>
 
 <A NAME="GString">
-<A NAME="DOC.1.5.5.1.1">
+<A NAME="DOC.1.4.5.1.1">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> GString()</B></TT>
 <DD>Null constructor. Constructs an empty string. 
 <DL><DT><DD></DL><P>
 <A NAME="GString">
-<A NAME="DOC.1.5.5.1.2">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> GString(const <!1><A HREF="GString.html#DOC.1.5.5.1.1">GString</A> &amp;gs)</B></TT>
+<A NAME="DOC.1.4.5.1.2">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> GString(const <!1><A HREF="GString.html#DOC.1.4.5.1.1">GString</A> &amp;gs)</B></TT>
 <DD>Copy constructor. Constructs a string by copying the string <TT>gs</TT>. 
 <DL><DT><DD></DL><P>
 <A NAME="GString">
-<A NAME="DOC.1.5.5.1.3">
+<A NAME="DOC.1.4.5.1.3">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> GString(const char *dat)</B></TT>
 <DD>Constructs a string from a null terminated character array. 
 <DL><DT><DD></DL><P>
 <A NAME="GString">
-<A NAME="DOC.1.5.5.1.4">
+<A NAME="DOC.1.4.5.1.4">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> GString(const char *dat, unsigned int len)</B></TT>
 <DD>Constructs a string from a character array.  Elements of the character
 array <TT>dat</TT> are added into the string until the string length reaches
 <TT>len</TT> or until encountering a null character (whichever comes first). 
 <DL><DT><DD></DL><P>
 <A NAME="GString">
-<A NAME="DOC.1.5.5.1.5">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> GString(const <!1><A HREF="GString.html#DOC.1.5.5.1.1">GString</A> &amp;gs, int from, unsigned int len)</B></TT>
+<A NAME="DOC.1.4.5.1.5">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> GString(const <!1><A HREF="GString.html#DOC.1.4.5.1.1">GString</A> &amp;gs, int from, unsigned int len)</B></TT>
 <DD>Construct a string by copying a sub-string. The string will be
 initialized with at most <TT>len</TT> characters from string <TT>gs</TT> starting at
 position <TT>from</TT>.  The length of the constructed string may be smaller
 than <TT>len</TT> if the specified range is too large. 
 <DL><DT><DD></DL><P>
 <A NAME="GString">
-<A NAME="DOC.1.5.5.1.6">
+<A NAME="DOC.1.4.5.1.6">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> GString(const int number)</B></TT>
 <DD>Constructs a string with a human-readable representation of integer
 <TT>number</TT>.  The format is similar to format <TT>&quot;%d&quot;</TT> in function
 <TT>printf</TT>. 
 <DL><DT><DD></DL><P>
 <A NAME="GString">
-<A NAME="DOC.1.5.5.1.7">
+<A NAME="DOC.1.4.5.1.7">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> GString(const double number)</B></TT>
 <DD>Constructs a string with a human-readable representation of floating
 point number <TT>number</TT>. The format is similar to format <TT>&quot;%f&quot;</TT> in
 function <TT>printf</TT>.  
 <DL><DT><DD></DL><P>
 <A NAME="operator= ">
-<A NAME="DOC.1.5.5.1.8">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GString.html#DOC.1.5.5.1.1">GString</A>&amp; operator= (const <!1><A HREF="GString.html#DOC.1.5.5.1.1">GString</A> &amp;gs)</B></TT>
+<A NAME="DOC.1.4.5.1.8">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GString.html#DOC.1.4.5.1.1">GString</A>&amp; operator= (const <!1><A HREF="GString.html#DOC.1.4.5.1.1">GString</A> &amp;gs)</B></TT>
 <DD>Copy operator. Resets this string with the value of the string <TT>gs</TT>.
 This operation is efficient because string memory is allocated using a
 "copy-on-write" strategy. Both strings will share the same segment of
 memory until one of the strings is modified. 
 <DL><DT><DD></DL><P>
 <A NAME="operator= ">
-<A NAME="DOC.1.5.5.1.9">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GString.html#DOC.1.5.5.1.1">GString</A>&amp; operator= (const char *str)</B></TT>
+<A NAME="DOC.1.4.5.1.9">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GString.html#DOC.1.4.5.1.1">GString</A>&amp; operator= (const char *str)</B></TT>
 <DD>Copy a null terminated character array. Resets this string with the
 character string contained in the null terminated character array
 <TT>str</TT>. 
 <DL><DT><DD></DL><P>
 <A NAME="operator const char* ">
-<A NAME="DOC.1.5.5.1.10">
+<A NAME="DOC.1.4.5.1.10">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> operator const char* () const </B></TT>
 <DD>Converts a string into a constant null terminated character array.  This
 conversion operator is very efficient because it simply returns a
@@ -257,12 +257,12 @@ pointer to the internal string data. The returned pointer remains valid
 as long as the string is unmodified. 
 <DL><DT><DD></DL><P>
 <A NAME="length">
-<A NAME="DOC.1.5.5.1.11">
+<A NAME="DOC.1.4.5.1.11">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>unsigned int length() const </B></TT>
 <DD>Returns the string length. 
 <DL><DT><DD></DL><P>
 <A NAME="operator! ">
-<A NAME="DOC.1.5.5.1.12">
+<A NAME="DOC.1.4.5.1.12">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int operator! () const </B></TT>
 <DD>Returns true if and only if the string contains zero characters.  This
 operator is useful for conditional expression in control structures.
@@ -275,7 +275,7 @@ the required conversion operator introduces dangerous ambiguities with
 certain compilers. 
 <DL><DT><DD></DL><P>
 <A NAME="operator[] ">
-<A NAME="DOC.1.5.5.1.13">
+<A NAME="DOC.1.4.5.1.13">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>char operator[] (int n) const </B></TT>
 <DD>Returns the character at position <TT>n</TT>. An exception <!1><A HREF="GException.html">GException</A> is
 thrown if number <TT>n</TT> is not in range <TT>-len</TT> to <TT>len-1</TT>, where <TT>len</TT> is
@@ -284,7 +284,7 @@ zero.  Negative positions represent characters relative to the end of
 the string. 
 <DL><DT><DD></DL><P>
 <A NAME="setat">
-<A NAME="DOC.1.5.5.1.14">
+<A NAME="DOC.1.4.5.1.14">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void setat(int n, char ch)</B></TT>
 <DD>Set the character at position <TT>n</TT> to value <TT>ch</TT>.  An exception
 <!1><A HREF="GException.html">GException</A> is thrown if number <TT>n</TT> is not in range <TT>-len</TT> to
@@ -296,44 +296,44 @@ length of the string, this function appends character <TT>ch</TT> to the end of
 the string. 
 <DL><DT><DD></DL><P>
 <A NAME="is_int">
-<A NAME="DOC.1.5.5.1.15">
+<A NAME="DOC.1.4.5.1.15">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>bool is_int(void) const </B></TT>
 <DD>Returns <TT>TRUE</TT> if the string contains an integer number. 
 <DL><DT><DD></DL><P>
 <A NAME="is_float">
-<A NAME="DOC.1.5.5.1.16">
+<A NAME="DOC.1.4.5.1.16">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>bool is_float(void) const </B></TT>
 <DD>Returns <TT>TRUE</TT> if the string contains a float number. 
 <DL><DT><DD></DL><P>
 <A NAME="substr">
-<A NAME="DOC.1.5.5.1.17">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GString.html#DOC.1.5.5.1.1">GString</A> substr(int from, unsigned int len=1) const </B></TT>
+<A NAME="DOC.1.4.5.1.17">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GString.html#DOC.1.4.5.1.1">GString</A> substr(int from, unsigned int len=1) const </B></TT>
 <DD>Returns a sub-string.  The sub-string is composed by copying <TT>len</TT>
 characters starting at position <TT>from</TT> in this string.  The length of
 the resulting string may be smaller than <TT>len</TT> if the specified range is
 too large. 
 <DL><DT><DD></DL><P>
 <A NAME="upcase">
-<A NAME="DOC.1.5.5.1.18">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GString.html#DOC.1.5.5.1.1">GString</A> upcase() const </B></TT>
+<A NAME="DOC.1.4.5.1.18">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GString.html#DOC.1.4.5.1.1">GString</A> upcase() const </B></TT>
 <DD>Returns an upper case copy of this string.  The returned string
 contains a copy of the current string with all letters turned into 
 upper case letters. 
 <DL><DT><DD></DL><P>
 <A NAME="downcase">
-<A NAME="DOC.1.5.5.1.19">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GString.html#DOC.1.5.5.1.1">GString</A> downcase() const </B></TT>
+<A NAME="DOC.1.4.5.1.19">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GString.html#DOC.1.4.5.1.1">GString</A> downcase() const </B></TT>
 <DD>Returns an lower case copy of this string.  The returned string
 contains a copy of the current string with all letters turned into 
 lower case letters. 
 <DL><DT><DD></DL><P>
 <A NAME="empty">
-<A NAME="DOC.1.5.5.1.20">
+<A NAME="DOC.1.4.5.1.20">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void empty()</B></TT>
 <DD>Reinitializes a string with the null string. 
 <DL><DT><DD></DL><P>
 <A NAME="getbuf">
-<A NAME="DOC.1.5.5.1.21">
+<A NAME="DOC.1.4.5.1.21">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>char* getbuf(int n = -1)</B></TT>
 <DD>Provides a direct access to the string buffer.  Returns a pointer for
 directly accessing the string buffer.  This pointer valid remains valid
@@ -344,7 +344,7 @@ characters plus a null character.  If <TT>n</TT> is positive but smaller than
 the string length, the string will be truncated to <TT>n</TT> characters. 
 <DL><DT><DD></DL><P>
 <A NAME="format">
-<A NAME="DOC.1.5.5.1.22">
+<A NAME="DOC.1.4.5.1.22">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void format(const char *fmt, ... )</B></TT>
 <DD>Initializes a string with a formatted string (as in <TT>printf</TT>).  The
 string is re-initialized with the characters generated according to the
@@ -354,7 +354,7 @@ will cause a segmentation violation if the resulting string is longer
 than 32768 characters. 
 <DL><DT><DD></DL><P>
 <A NAME="format">
-<A NAME="DOC.1.5.5.1.23">
+<A NAME="DOC.1.4.5.1.23">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void format(const char *fmt, va_list args)</B></TT>
 <DD>Initializes a string with a formatted string (as in <TT>vprintf</TT>).  The
 string is re-initialized with the characters generated according to the
@@ -364,7 +364,7 @@ will cause a segmentation violation if the resulting string is longer
 than 32768 characters. 
 <DL><DT><DD></DL><P>
 <A NAME="search">
-<A NAME="DOC.1.5.5.1.24">
+<A NAME="DOC.1.4.5.1.24">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int search(char c, int from=0) const </B></TT>
 <DD>Searches character <TT>c</TT> in the string, starting at position <TT>from</TT> and
 scanning forward until reaching the end of the string.  This function
@@ -372,7 +372,7 @@ returns the position of the matching character.  It returns <TT>-1</TT> if
 character <TT>c</TT> cannot be found. 
 <DL><DT><DD></DL><P>
 <A NAME="search">
-<A NAME="DOC.1.5.5.1.25">
+<A NAME="DOC.1.4.5.1.25">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int search(const char *str, int from=0) const </B></TT>
 <DD>Searches sub-string <TT>str</TT> in the string, starting at position <TT>from</TT> and
 scanning forward until reaching the end of the string.  This function
@@ -380,7 +380,7 @@ returns the position of the first matching character of the sub-string.
 It returns <TT>-1</TT> if string <TT>str</TT> cannot be found. 
 <DL><DT><DD></DL><P>
 <A NAME="rsearch">
-<A NAME="DOC.1.5.5.1.26">
+<A NAME="DOC.1.4.5.1.26">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int rsearch(char c, int from=-1) const </B></TT>
 <DD>Searches character <TT>c</TT> in the string, starting at position <TT>from</TT> and
 scanning backwards until reaching the beginning of the string.  This
@@ -388,7 +388,7 @@ function returns the position of the matching character.  It returns
 <TT>-1</TT> if character <TT>c</TT> cannot be found. 
 <DL><DT><DD></DL><P>
 <A NAME="rsearch">
-<A NAME="DOC.1.5.5.1.27">
+<A NAME="DOC.1.4.5.1.27">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int rsearch(const char *str, int from=-1) const </B></TT>
 <DD>Searches sub-string <TT>str</TT> in the string, starting at position <TT>from</TT> and
 scanning backwards until reaching the beginning of the string.  This
@@ -396,60 +396,60 @@ function returns the position of the first matching character of the
 sub-string. It returns <TT>-1</TT> if string <TT>str</TT> cannot be found. 
 <DL><DT><DD></DL><P>
 <A NAME="operator+= ">
-<A NAME="DOC.1.5.5.1.28">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GString.html#DOC.1.5.5.1.1">GString</A>&amp; operator+= (char ch)</B></TT>
+<A NAME="DOC.1.4.5.1.28">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GString.html#DOC.1.4.5.1.1">GString</A>&amp; operator+= (char ch)</B></TT>
 <DD>Appends character <TT>ch</TT> to the string. 
 <DL><DT><DD></DL><P>
 <A NAME="operator+= ">
-<A NAME="DOC.1.5.5.1.29">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GString.html#DOC.1.5.5.1.1">GString</A>&amp; operator+= (const char *str)</B></TT>
+<A NAME="DOC.1.4.5.1.29">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GString.html#DOC.1.4.5.1.1">GString</A>&amp; operator+= (const char *str)</B></TT>
 <DD>Appends the null terminated character array <TT>str</TT> to the string. 
 <DL><DT><DD></DL><P>
 <A NAME="operator+">
-<A NAME="DOC.1.5.5.1.30">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>friend <!1><A HREF="GString.html#DOC.1.5.5.1.1">GString</A> operator+(const <!1><A HREF="GString.html#DOC.1.5.5.1.1">GString</A> &amp;s1, const <!1><A HREF="GString.html#DOC.1.5.5.1.1">GString</A> &amp;s2)</B></TT>
+<A NAME="DOC.1.4.5.1.30">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>friend <!1><A HREF="GString.html#DOC.1.4.5.1.1">GString</A> operator+(const <!1><A HREF="GString.html#DOC.1.4.5.1.1">GString</A> &amp;s1, const <!1><A HREF="GString.html#DOC.1.4.5.1.1">GString</A> &amp;s2)</B></TT>
 <DD>Concatenates strings. Returns a string composed by concatenating
 the characters of strings <TT>s1</TT> and <TT>s2</TT>. 
 <DL><DT><DD></DL><P>
 <A NAME="operator==">
-<A NAME="DOC.1.5.5.1.31">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>friend int operator==(const <!1><A HREF="GString.html#DOC.1.5.5.1.1">GString</A> &amp;s1, const <!1><A HREF="GString.html#DOC.1.5.5.1.1">GString</A> &amp;s2)</B></TT>
+<A NAME="DOC.1.4.5.1.31">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>friend int operator==(const <!1><A HREF="GString.html#DOC.1.4.5.1.1">GString</A> &amp;s1, const <!1><A HREF="GString.html#DOC.1.4.5.1.1">GString</A> &amp;s2)</B></TT>
 <DD>String comparison. Returns true if and only if character strings <TT>s1</TT> and <TT>s2</TT>
 are equal (as with <TT>strcmp</TT>.) 
 <DL><DT><DD></DL><P>
 <A NAME="operator!=">
-<A NAME="DOC.1.5.5.1.32">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>friend int operator!=(const <!1><A HREF="GString.html#DOC.1.5.5.1.1">GString</A> &amp;s1, const <!1><A HREF="GString.html#DOC.1.5.5.1.1">GString</A> &amp;s2)</B></TT>
+<A NAME="DOC.1.4.5.1.32">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>friend int operator!=(const <!1><A HREF="GString.html#DOC.1.4.5.1.1">GString</A> &amp;s1, const <!1><A HREF="GString.html#DOC.1.4.5.1.1">GString</A> &amp;s2)</B></TT>
 <DD>String comparison. Returns true if and only if character strings <TT>s1</TT> and <TT>s2</TT>
 are not equal (as with <TT>strcmp</TT>.) 
 <DL><DT><DD></DL><P>
 <A NAME="operator>=">
-<A NAME="DOC.1.5.5.1.33">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>friend int operator&gt;=(const <!1><A HREF="GString.html#DOC.1.5.5.1.1">GString</A> &amp;s1, const <!1><A HREF="GString.html#DOC.1.5.5.1.1">GString</A> &amp;s2)</B></TT>
+<A NAME="DOC.1.4.5.1.33">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>friend int operator&gt;=(const <!1><A HREF="GString.html#DOC.1.4.5.1.1">GString</A> &amp;s1, const <!1><A HREF="GString.html#DOC.1.4.5.1.1">GString</A> &amp;s2)</B></TT>
 <DD>String comparison. Returns true if and only if character strings <TT>s1</TT> is
 lexicographically greater than or equal to string <TT>s2</TT> (as with <TT>strcmp</TT>.) 
 <DL><DT><DD></DL><P>
 <A NAME="operator> ">
-<A NAME="DOC.1.5.5.1.34">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>friend int operator&gt; (const <!1><A HREF="GString.html#DOC.1.5.5.1.1">GString</A> &amp;s1, const <!1><A HREF="GString.html#DOC.1.5.5.1.1">GString</A> &amp;s2)</B></TT>
+<A NAME="DOC.1.4.5.1.34">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>friend int operator&gt; (const <!1><A HREF="GString.html#DOC.1.4.5.1.1">GString</A> &amp;s1, const <!1><A HREF="GString.html#DOC.1.4.5.1.1">GString</A> &amp;s2)</B></TT>
 <DD>String comparison. Returns true if and only if character strings <TT>s1</TT> is
 lexicographically greater than string <TT>s2</TT> (as with <TT>strcmp</TT>.) 
 <DL><DT><DD></DL><P>
 <A NAME="operator<=">
-<A NAME="DOC.1.5.5.1.35">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>friend int operator&lt;=(const <!1><A HREF="GString.html#DOC.1.5.5.1.1">GString</A> &amp;s1, const <!1><A HREF="GString.html#DOC.1.5.5.1.1">GString</A> &amp;s2)</B></TT>
+<A NAME="DOC.1.4.5.1.35">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>friend int operator&lt;=(const <!1><A HREF="GString.html#DOC.1.4.5.1.1">GString</A> &amp;s1, const <!1><A HREF="GString.html#DOC.1.4.5.1.1">GString</A> &amp;s2)</B></TT>
 <DD>String comparison. Returns true if and only if character strings <TT>s1</TT> is
 lexicographically less than or equal to string <TT>s2</TT> (as with <TT>strcmp</TT>.) 
 <DL><DT><DD></DL><P>
 <A NAME="operator< ">
-<A NAME="DOC.1.5.5.1.36">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>friend int operator&lt; (const <!1><A HREF="GString.html#DOC.1.5.5.1.1">GString</A> &amp;s1, const <!1><A HREF="GString.html#DOC.1.5.5.1.1">GString</A> &amp;s2)</B></TT>
+<A NAME="DOC.1.4.5.1.36">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>friend int operator&lt; (const <!1><A HREF="GString.html#DOC.1.4.5.1.1">GString</A> &amp;s1, const <!1><A HREF="GString.html#DOC.1.4.5.1.1">GString</A> &amp;s2)</B></TT>
 <DD>String comparison. Returns true if and only if character strings <TT>s1</TT> is
 lexicographically less than string <TT>s2</TT> (as with <TT>strcmp</TT>.) 
 <DL><DT><DD></DL><P>
 <A NAME="hash">
-<A NAME="DOC.1.5.5.1.37">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>friend unsigned int hash(const <!1><A HREF="GString.html#DOC.1.5.5.1.1">GString</A> &amp;ref)</B></TT>
+<A NAME="DOC.1.4.5.1.37">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>friend unsigned int hash(const <!1><A HREF="GString.html#DOC.1.4.5.1.1">GString</A> &amp;ref)</B></TT>
 <DD>Returns a hash code for the string.  This hashing function helps when
 creating associative maps with string keys (see <!1><A HREF="GMap.html">GMap</A>).  This hash
 code may be reduced to an arbitrary range by computing its remainder
@@ -462,7 +462,7 @@ modulo the upper bound of the range.
 <!-- This is were the DOC++ footer is defined  -->
 
 <font face="arial,helvetica" size="2">
-<a href=http://www.lizardtech.com>DjVu</a> is a trademark of AT&amp;T.  
+<a href=http://www.lizardtech.com>DjVu</a> is a trademark of LizardTech, Inc.  
 <br>All other products mentioned are registered trademarks or trademarks of
 their respective companies.
 </font>
