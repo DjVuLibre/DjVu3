@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVmDoc.h,v 1.6 1999-09-22 19:36:38 eaf Exp $
+//C- $Id: DjVmDoc.h,v 1.7 1999-09-23 13:26:06 leonb Exp $
  
 #ifndef _DJVMDOC_H
 #define _DJVMDOC_H
@@ -32,7 +32,7 @@
 
     @memo DjVu multipage documents reader/writer.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: DjVmDoc.h,v 1.6 1999-09-22 19:36:38 eaf Exp $#
+    @version #$Id: DjVmDoc.h,v 1.7 1999-09-23 13:26:06 leonb Exp $#
 */
 
 //@{
@@ -58,8 +58,7 @@
 
     This class can also be used to create and modify multipage documents at
     the low level without decoding every page or component (See
-    \Ref{insert_file}() and \Ref{delete_file}()). For a more convenient
-    editing tool please refer to \Ref{DjVuDocEditor} and \Ref{DjVuFile}. 
+    \Ref{insert_file}() and \Ref{delete_file}()). 
 */
 
 class DjVmDoc : public GPEnabled
@@ -71,12 +70,24 @@ private:
       // Internal function.
    
 public:
+      /** Inserts a file into the document.
+          @param data  ByteStream containing the file data.
+          @param page  Indicates whether this file is a page of the document.
+          @param name  Name of the file in the document (e.g. an URL).
+          @param id    Identifier of the file (as used in INCL chunks).
+          @param title Optional title of the file (shown in browsers).
+          @param pos   Position of the file in the document (default is append).
+      */
+   void		insert_file(ByteStream &data, bool page,
+                            const char *name, const char *id, 
+                            const char *title=0, int pos=-1);
+
       /** Inserts a file described by \Ref{DjVmDir::File} structure with
 	  data #data# at position #pos#. If #pos# is negative, the file
           will be appended to the document. Otherwise it will be inserted
           at position #pos#. */
    void		insert_file(DjVmDir::File * f, GP<DataPool> data, int pos=-1);
-   
+
       /** Removes file with the specified #id# from the document. Every
 	  file inside a new DjVu multipage document has its unique ID
 	  (refer to \Ref{DjVmDir} for details), which is passed to this

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVmDoc.cpp,v 1.6 1999-09-22 19:35:27 eaf Exp $
+//C- $Id: DjVmDoc.cpp,v 1.7 1999-09-23 13:26:06 leonb Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -45,6 +45,24 @@ DjVmDoc::insert_file(DjVmDir::File * f, GP<DataPool> data_pool, int pos)
    
    data[f->id]=data_pool;
    dir->insert_file(f, pos);
+}
+
+void		
+DjVmDoc::insert_file(ByteStream &data, bool page,
+                     const char *name, const char *id, 
+                     const char *title=0, int pos=-1)
+{
+  DjVmDir::File *file = new DjVmDir::File(name, id, title, page);
+  GP<DataPool> pool = new DataPool;
+  // Cannot connect to a bytestream.
+  // Must copy data into the datapool.
+  int nbytes;
+  char buffer[1024];
+  while ((nbytes = data.read(buffer, sizeof(buffer))))
+    pool->add_data(buffer, nbytes);
+  pool->set_eof();
+  // Call low level insert
+  insert_file(file, pool, pos);
 }
 
 void
@@ -106,6 +124,8 @@ DjVmDoc::write(ByteStream & str)
 	 THROW("Strange: there is no data for file '"+file->id+"'\n");
       file->offset=offset;
       file->size=data[data_pos]->get_length();
+      if (!file->size)
+        THROW("Strange: File size is zero.");
       offset+=file->size;
    }
 

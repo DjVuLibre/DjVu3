@@ -9,12 +9,14 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.cpp,v 1.24 1999-09-22 19:34:19 eaf Exp $
+//C- $Id: DataPool.cpp,v 1.25 1999-09-23 13:26:06 leonb Exp $
 
 #ifdef __GNUC__
 #pragma implementation
 #endif
 
+#include <sys/types.h>
+#include <time.h>
 #include "DataPool.h"
 #include "IFFByteStream.h"
 #include "GString.h"
