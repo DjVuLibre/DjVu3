@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.h,v 1.1.2.3 1999-04-28 20:22:53 eaf Exp $
+//C- $Id: DjVuDocument.h,v 1.1.2.4 1999-05-14 22:41:13 eaf Exp $
  
 #ifndef _DJVUDOCUMENT_H
 #define _DJVUDOCUMENT_H
@@ -24,45 +24,155 @@
 #include "DjVmDir0.h"
 #include "DjVmFile.h"
 
+/** @name DjVuDocument.h
+    Files #"DjVuDocument.h"# and #"DjVuDocument.cpp"# contain implementation
+    of the \Ref{DjVuDocument} class - the ideal tool for opening, decoding
+    and saving DjVu single page and multi page documents.
+
+    @memo DjVu document class.
+    @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
+    @version #$Id: DjVuDocument.h,v 1.1.2.4 1999-05-14 22:41:13 eaf Exp $#
+*/
+
+//@{
+
+/** #DjVuDocument# provides convenient interface for opening, decoding
+    and saving back DjVu documents of any format.
+
+    {\bf Conversion.} Since #DjVuDocument# can open and save DjVu documents
+    in any of two supported formats (all-in-one-file documents and
+    each-page-in-separate-file documents), it can be used to do conversion
+    between these two formats.
+
+    {\bf Decoding.} #DjVuDocument# provides convenient interface for obtaining
+    \Ref{DjVuImage} corresponding to any page of the document. It uses
+    \Ref{GCache} to do caching thus avoiding unnecessary multiple decoding of
+    the same page. The real decoding though is accomplished by \Ref{DjVuFile}.
+
+    {\bf Modifying.} With #DjVuDocument# you can open an existing document
+    for editing. Editing functionality includes insertion and deletion of
+    pages (\Ref{DjVuFile}s). Using capabilities provided by \Ref{DjVuFile}
+    it's possible to create DjVu documents of any desired structure: with
+    deep inclusion, shared dictionaries, annotations, etc.
+
+    {\bf Messenging.} Being derived from \Ref{DjVuPort}, #DjVuDocument#
+    takes active part in exchanging messages (requests and notifications)
+    between different parties involved in decoding. It reports (relays)
+    errors, progress information, handles some requests for data (when
+    these requests deal with local files. */
+    
 class DjVuDocument : public GPEnabled, public DjVuPort
 {
 public:
-      // Construction/destruction
+      /** Constructs the #DjVuDocument# object. There is no default constructor
+	  provided. You should have a real file (at least one page) somewhere.
+	  The #url# should point to the real data, and the creator of the
+	  document should be ready to return this data to the document
+	  if it's not stored locally.
+
+	  Before the constructor terminates, it will query for data using
+	  the communication mechanism provided by \Ref{DjVuPort} and
+	  \Ref{DjVuPortcaster}. If #port# is not #ZERO#, then the request will
+	  be forwarded to it. If it {\bf is} #ZERO# then #DjVuDocument# will
+	  create an internal instance of \Ref{DjVuSimplePort} and will use
+	  it to access local files and report errors to #stderr#.
+
+	  The #url# passed may point to DjVm (all-in-one-file multipage)
+	  document or to any page of DjVu document.
+
+	  @param url The URL pointing to the document. If it's a all-in-one-file
+	         multipage DjVu document (also called DjVm) then it should
+		 point to it. It can also be a URL of any page of the document
+		 with every page in a separate file.
+	  @param readonly If FALSE the document will be opened for editing.
+	         This means, f.i. that all pages will be created in the
+		 \Ref{DjVuDocument::DjVuDocument}() constructor.
+	  @param port If not #ZERO#, all requests and notifications will
+	         be sent to it. Otherwise #DjVuDocument# will create an internal
+		 instance of \Ref{DjVuSimplePort} for these purposes.
+		 It's OK to make it #ZERO# if you're writing a command like
+		 tool, which should work with files on the hard disk only.
+	  @param cache Is meaningful only in readonly mode when it's used
+	         to cache \Ref{DjVuFile}s. */
    DjVuDocument(const GURL & url, bool readonly,
 		DjVuPort * port=0, GCache<GURL, DjVuFile> * cache=0);
    virtual ~DjVuDocument(void);
 
-      // Requesting specific page or even file
-   GP<DjVuFile>	get_djvu_file(const GURL & url);
-   GP<DjVuFile>	get_djvu_file(int page_num);
-
-      // Requesting image corresponding to given page
+      /** @name Accessing pages */
+      //@{
+      /** Returns \Ref{GP} pointer to \Ref{DjVuImage} corresponding to
+	  page #page_num#. The image doesn't have to be decoded in full.
+	  If multithreaded behaviour is allowed, the decoding will be started
+	  in a separate thread, which enables to do progressive display */
    GP<DjVuImage>get_page(int page_num);
+      /** Creates and returns \Ref{DjVuFile} corresponding to the given #url#.
+	  For DjVm document (all-in-one-file multipage DjVu documents) the
+	  #url# is faked by appending file name to the document's URL.
+	  If there is a \Ref{DjVuFile} corresponding to this URL in the
+	  cache already, it will be returned. */
+   GP<DjVuFile>	get_djvu_file(const GURL & url);
+      /** Creates and returns \Ref{DjVuFile} corresponding to the fiven
+	  page. Cache will be used to take advantage of files created and
+	  decoded before. */
+   GP<DjVuFile>	get_djvu_file(int page_num);
+      /** Returns navigation directory of the document. This is the only
+	  way to figure out the number of pages in the document and URLs
+	  of files corresponding to every page. */
+   GP<DjVuNavDir>	get_dir(void) const;
+      //@}
 
-      // Cache in use
+      /// Returns cache being used.
    GCache<GURL, DjVuFile> * get_cache(void) const;
 
-      // Navigation directory
-   GP<DjVuNavDir>	get_dir(void) const;
-
-      // Way to customize existing document
+      /** @name Editing tools */
+      //@{
+      /** Inserts the given \Ref{DjVuFile} as page #page_num#. If #page_num#
+	  is negative, the page will be appended. This will change the
+	  file's URL, will update the document's navigation directory,
+	  will insert a link to this directory into the file, and finally
+	  will insert the file into the internal list. */
    void		insert_page(const GP<DjVuFile> & file, int page_num=-1);
+      /** Removes page #page_num# from the document. This will update the
+	  navigation directory. */
    void		delete_page(int page_num);
+      //@}
 
-      // DjVm format related stuff
+      /** @name DjVm related stuff */
+      //@{
+      /** Returns TRUE if the open document was in DjVm (all-in-one-file)
+	  format. */
    bool		is_djvm(void) const;
+      /** Returns TRUE if DjVm document contains a file with given URL.
+	  File URLs in the case of DjVm documents are basically fake URLs
+	  composed by appending the file name to the document's URL. */
    bool		djvm_contains(const GURL & url) const;
+      /// Returns the document's URL
    GURL		djvm_get_url(void) const;
+      /** Returns URL corresponding to the first page. It's a valuable
+	  information used internally to get a pointer to the first page
+	  in the document before the navigation directory is decoded. */
    GURL		djvm_get_first_page_url(void) const;
+      /** Returns the \Ref{DataPool} that the document has been initialized
+	  with. It contains all the document's data. */
    GP<DataPool>	djvm_get_init_data_pool(void) const;
+      //@}
 
-      // Routines for saving
+      /** @name Saving routines */
+      //@{
+      /** Stores all files in the document into binary array in DjVm format
+	  and returns it. Please beware, that if not all files have already
+	  been loaded, this will generate a bunch of requests for data. */
    TArray<char>	get_djvm_data(void);
+      /// Will save the document in DjVm format in a file with name #file_name#
    void		save_as_djvm(const char * file_name);
+      /** Will save the document in DjVu format (every page in a separate file)
+	  into directory with name #dir_name#. */
    void		save_as_djvu(const char * dir_name);
+      //@}
 
-      // Functions inherited from DjVuPort
+      /// Returns TRUE if #class_name# is #"DjVuDocument"# or #"DjVuPort"#
    virtual bool		inherits(const char * class_name) const;
+   
    virtual GP<DataRange>request_data(const DjVuPort * source, const GURL & url);
    virtual void		notify_chunk_done(const DjVuPort * source, const char * name);
 private:
@@ -135,5 +245,7 @@ DjVuDocument::get_cache(void) const
 {
    return cache;
 }
+
+//@}
 
 #endif

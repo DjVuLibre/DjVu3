@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: GPContainer.h,v 1.2.2.1 1999-04-12 16:48:22 eaf Exp $
+//C-  $Id: GPContainer.h,v 1.2.2.2 1999-05-14 22:41:14 eaf Exp $
 
 
 #ifndef _GPCONTAINER_H_
@@ -22,18 +22,30 @@
 #endif
 
 
-/** @name GContainer.h
-
-    @memo 
-    Template class for generic containers.
+/** @name GPContainer.h
+    Files #"GPContainer.h"# and #"GPContainer.cpp"# contain implementation
+    of \Ref{GPList}<T> and \Ref{DPArray}<T> classes, which are basically
+    \Ref{GList}<\Ref{GP}<T>> and \Ref{DArray}<\Ref{GP}<T>>. Internally
+    they are \Ref{GList}<\Ref{GPBase}> and \Ref{DArray}<\Ref{GPBase}>
+    which results in the fact, that \Ref{GList} and \Ref{DArray} are
+    instantiated only once. This is possible due to the fact, that
+    \Ref{GP} and \Ref{GPBase} have the same size and the same internal
+    structure. \Ref{GP} just adds template interface to \Ref{GPBase}. The
+    result is that we reduce the size of the executable by having only
+    one instantiation of the list and array.
+    
+    @memo List and array for \Ref{GP}<> pointers.
     @author 
-    Leon Bottou <leonb@research.att.com> -- initial implementation.\\
-    Andrei Erofeev <eaf@geocities.com> -- bug fixes.
+    Leon Bottou <leonb@research.att.com>, Andrei Erofeev <eaf@geocities.com>.
     @version 
-    #$Id: GPContainer.h,v 1.2.2.1 1999-04-12 16:48:22 eaf Exp $# */
+    #$Id: GPContainer.h,v 1.2.2.2 1999-05-14 22:41:14 eaf Exp $# */
 //@{
 
 /** Dynamic array.
+
+    The only thing we have to say here is that #DPArray<TYPE># is the same
+    as #DArray<GP<TYPE>>#. Use #DPArray# if you have many arrays of \Ref{GP}
+    pointers in your program. This will reduce its size.
   */
 
 template <class TYPE>
@@ -117,6 +129,10 @@ DPArray<TYPE>::operator= (const DPArray &ga)
 }
 
 /** Doubly linked list.
+
+    The only thing we have to say here is that #GPList<TYPE># is the same
+    as #GPList<GP<TYPE>>#. Use #GPList# if you have many lists of \Ref{GP}
+    pointers in your program. This will reduce its size.
   */
 
 template <class TYPE>
@@ -351,6 +367,8 @@ GPMap<KTYPE, VTYPE>::prev(GPosition & pos)
 }
 
 #endif
+
+//@}
 
 #endif
 

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.h,v 1.1.2.5 1999-05-03 22:09:13 eaf Exp $
+//C- $Id: DataPool.h,v 1.1.2.6 1999-05-14 22:41:13 eaf Exp $
  
 #ifndef _DATAPOOL_H
 #define _DATAPOOL_H
@@ -24,21 +24,28 @@
 #include "GPContainer.h"
 
 /** @name DataPool.h
-    File #"DataPool.h"# contains the implementation of the \Ref{DataPool}
-    and \Ref{PoolSubByteStream} classes, which are used by \Ref{GBSTranslator}
-    and \Ref{DjVuDecManager} to share file contents between many threads
-    and to feed the data into \Ref{DejaVuDecoder}s.
+    Files #"DataPool.h"# and #"DataPool.cpp"# implement classes \Ref{DataPool}
+    and \Ref{DataRange} used by DjVu decoder to access data.
 
-    @memo Data storage with compatible byte streams.
-    @author Andrei Erofeev
-    @version #$Id: DataPool.h,v 1.1.2.5 1999-05-03 22:09:13 eaf Exp $#
+    The main goal of class \Ref{DataPool} is to provide concurrent access
+    to the same data from many threads with a possibility to add data
+    from another thread. It is especially important in the case of the
+    Netscape plugin when data is not immediately available, but decoding
+    should be started as soon as possible. In this situation it is vital
+    to provide transparent access to the data from many threads possibly
+    blocking readers that try to access information that has not been
+    received yet.
+
+    @memo Thread safe data storage
+    @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
+    @version #$Id: DataPool.h,v 1.1.2.6 1999-05-14 22:41:13 eaf Exp $#
 */
 
 //@{
 
 /** #DataPool# is an object, which accepts data from outside (see
-    \Ref{add_data}()) and stores it inside for later access through
-    \Ref{get_data}() function.
+    \Ref{add_data}()) and stores it inside for immediate access through
+    \Ref{get_data}() function from other threads
 
     It is derived from \Ref{MemoryByteStream}, which allows it to handle
     underlying data storage efficiently, and it's also thread-protected.
@@ -50,12 +57,18 @@
     in the #DataPool#, the reader will be {\em blocked} until at least some
     of desired data is available.
     
-    This class is ideal for decoding DJVM files in Netscape when you want
-    to start decoding as fast as you can not waiting for the arrival of the
-    whole file. In this case you may have many decoding threads running
+    This class is ideal for decoding multipage DjVu files in Netscape when
+    you want to start decoding as soon as you can not waiting for the arrival
+    of the whole file. In this case you may have many decoding threads running
     at the same time and reading/waiting for data from different portions of
     the #DataPool# and the main thread getting data from the Netscape and
     adding it to the #DataPool#.
+
+    The #DataPool# also provides a set of callbacks or {\em triggers} called
+    when a given amount of data has been received. It's a useful feature
+    when you don't want to block waiting for data in a \Ref{get_data}()
+    request, but still want to be informed when a non-block read can be
+    possible.
 */
 
 class DataPool : public GPEnabled, protected MemoryByteStream
@@ -113,8 +126,8 @@ public:
       */
    void		add_data(void * buffer, int size);
    
-      /** Attempts to return a block of data at the given {\em offset}
-	  of the given {\em size}. If some of the data requested is in the
+      /** Attempts to return a block of data at the given #offset#
+	  of the given #size#. If some of the data requested is in the
 	  internal array, it is returns immediately. Otherwise the reader
 	  (and the thread) is {\bf blocked} until the data actually arrives.
 	  Please note, that since the reader is blocked, it should run in a
@@ -122,7 +135,7 @@ public:
 	  \Ref{add_data}()
 
 	  @param buffer Buffer to be filled with data
-	  @param offset Offset in the \Ref{DataPool} to read data at
+	  @param offset Offset in the #DataPool# to read data at
 	  @param size Size of the {\em buffer}
 	  @param reader_id ID uniquely identifying the reader.
 	  	 Basically this is important for stopping a given reader
@@ -133,7 +146,8 @@ public:
       */
    int		get_data(void * buffer, int offset, int size, void * reader_id);
    
-      /// Tells the #DataPool# that no more data will arrive
+      /** Tells the #DataPool# that no more data will be added by means
+	  of \Ref{add_data}() function */
    void		set_eof(void);
 
       /// Returns 1 if no more data is planned to be added
@@ -142,12 +156,12 @@ public:
       /** Returns the size of stored data. */
    long		get_size(void) const;
 
-      /** {\em Trigger callbacks} are functions called when a given amount
-	  of data has been added. Since writing and reading can be done
-	  from separate threads, this appears to be a convenient way to
-	  signal availability of data.
+      /** Adds a so-called {\em trigger callback} to be called when
+	  a given amount of data has been added. Since reading unavailable
+	  data may result in a thread block, which may be bad, this
+	  appears to be a convenient way to signal availability of data.
 
-	  @param thresh There should be at least {\em thresh} bytes of
+	  @param thresh There should be at least {\em thresh}-1 bytes of
 	         data for the callback to be executed. If {\em thresh} is
 		 negative, the callback is called after all data has been
 		 added and \Ref{set_eof}() has been called.
@@ -165,7 +179,7 @@ public:
 	  in each of them with text #STOP#. */
    void		stop_all_readers(void);
 
-      /** Tells the #DataPool# to stop the reader with given {\em reader_id}.
+      /** Tells the #DataPool# to stop the reader with given #reader_id#.
 	  Since every reading thread has to pass this ID to the \Ref{get_data}()
 	  function (the place where it may be blocked), #DataPool# knows exactly
 	  what reader (thread) to stop.
@@ -174,10 +188,9 @@ public:
       */
    void		stop_reader(void * reader_id);
 
-      /// The constructor
+      /// The default constructor
    DataPool(void);
 
-      /// The destructor
    virtual ~DataPool(void);
 };
 
@@ -203,8 +216,18 @@ DataPool::get_size(void) const
    return size();
 }
 
-/** #DataRange# - range of data in \Ref{DataPool}.
-    
+/** #DataRange# - convenient way for accessing data in \Ref{DataPool}.
+
+    Normally, the program should not use \Ref{DataPool} directly for
+    {\em reading} data from it. It is supposed to create the #DataRange#,
+    which is mapped to a given portion of the \Ref{DataPool} and which can
+    provide either random or sequential access to the data within the valid
+    range.
+
+    The #DataRange# can return data either through its \Ref{get_data}()
+    function or using a special stream created and returned by
+    \Ref{get_stream}() function in which case the access is obviously
+    sequential.
     */
 
 class DataRange : public GPEnabled
@@ -223,22 +246,74 @@ private:
    };
    void		init(void);
 public:
+      /** The construtor.
+
+	  @param pool The \Ref{DataPool} which contains the data
+	  @param start Beginning of the data range in the {\em pool}
+	  @param length Length of the data range. If negative, the
+	  	#DataRange# is assumed to extend up to the end of
+		the {\em pool}. */
+   
    DataRange(const GP<DataPool> & pool, long start=0, long length=-1);
+
+      /// Copy constructor
    DataRange(const DataRange & r);
+
+      /// The destructor
    virtual ~DataRange(void);
 
+      /** Returns the \Ref{ByteStream} for sequential access to the underlying
+	  data. */
    ByteStream *		get_stream(void);
+
+      /** Returns the \Ref{DataPool} containing the real data */
    GP<DataPool>		get_pool(void) const;
+
+      /** Returns the start offset of the data range in the \Ref{DataPool} */
    long			get_start(void) const;
+
+      /** Returns the length of the data range in the \Ref{DataPool}. The
+	  length may now always be known because the #DataRange# may have
+	  been created with #length=-1# and EOF condition has not been
+	  set yet in the \Ref{DataPool}. In this case the #DataRange#
+	  tries its best to guess the length by parsing the data with hope that
+	  it's IFF data. If this attempt does not succeed, -1 is returned */
    long			get_length(void) const;
+
+      /** Provides random access to the data range from the pool
+
+	  @param buffer Where to put data
+	  @param offset Offset from the data range's start to get data from
+	  @param size How much data to copy
+	  @exception EOF End of file encountered
+	  @exception STOP The stream has been stopped
+      */
    int			get_data(void * buffer, int offset, int size);
 
+      /** When the data that has been requested by a thread is not available
+	  in the \Ref{DataPool}, the thread is blocked. By calling this
+	  function any blocked thread is unblocked by an exception thrown in
+	  it with text #STOP#. All following \Ref{get_data}() calls and
+	  attempts to access data by the stream returned by \Ref{get_stream}()
+	  function will result in #STOP# exception. */
    void			stop(void);
 
-      // Make thresh<0 to be called when all data for THIS DataRange
-      // has been received. DataPool may still miss some megs.
+      /** Like in \Ref{DataPool}, you may add your callbacks to #DataRange#
+	  as well. In this case the #thresh# is relative to the
+	  #DataRange#, of course.
+
+	  @param thresh There should be at least {\em thresh}-1 bytes
+	         of data available for reading from the beginning of the
+		 #DataRange# for the callback to be called. If {\em thresh}
+		 is negative, the callback will be called when data for the
+		 whole #DataRange# is available.
+	  @param callback The callback to call
+	  @param cl_data Data to be passed to the callback */
    void			add_trigger(int thresh, void (* callback)(void *),
 				    void * cl_data);
+
+      /** Removes the given callback from the list. {\bf Note!} It's important
+	  to call this function before the client is destroyed */
    void			del_trigger(void (* callback)(void *), void * cl_data);
 private:
    GP<DataPool>	pool;
