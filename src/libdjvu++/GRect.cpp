@@ -9,11 +9,11 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GRect.cpp,v 1.8 1999-10-11 19:42:10 eaf Exp $
+//C- $Id: GRect.cpp,v 1.9 1999-10-22 15:52:39 eaf Exp $
 
 
 // -- Implementation of class GRect and GRectMapper
-// - File "$Id: GRect.cpp,v 1.8 1999-10-11 19:42:10 eaf Exp $"
+// - File "$Id: GRect.cpp,v 1.9 1999-10-22 15:52:39 eaf Exp $"
 // - Author: Leon Bottou, 05/1997
 
 #ifdef __GNUC__
@@ -280,9 +280,9 @@ GRectMapper::map(int &x, int &y)
   if (code & SWAPXY)
     iswap(mx,my);
   if (code & MIRRORX)
-    mx = rectFrom.xmin + ((rectFrom.xmax - 1) - mx);
+    mx = rectFrom.xmin + rectFrom.xmax - mx;
   if (code & MIRRORY)
-    my = rectFrom.ymin + ((rectFrom.ymax - 1) - my);
+    my = rectFrom.ymin + rectFrom.ymax - my;
   // scale and translate
   x = rectTo.xmin + (mx - rectFrom.xmin) * rw;
   y = rectTo.ymin + (my - rectFrom.ymin) * rh;
@@ -299,55 +299,33 @@ GRectMapper::unmap(int &x, int &y)
   int my = rectFrom.ymin + (y - rectTo.ymin) / rh;
   //  mirror and swap
   if (code & MIRRORX)
-    mx = rectFrom.xmin + ((rectFrom.xmax - 1) - mx);
+    mx = rectFrom.xmin + rectFrom.xmax - mx;
   if (code & MIRRORY)
-    my = rectFrom.ymin + ((rectFrom.ymax - 1) - my);
+    my = rectFrom.ymin + rectFrom.ymax - my;
   if (code & SWAPXY)
     iswap(mx,my);
   x = mx;
   y = my;
 }
 
-void
+void 
 GRectMapper::map(GRect &rect)
 {
-  int no_width=(rect.xmax==rect.xmin);
-  int no_height=(rect.ymax==rect.ymin);
-  if (code & SWAPXY) iswap(no_width, no_height);
-  if (rect.xmax>rect.xmin) rect.xmax--;
-  if (rect.ymax>rect.ymin) rect.ymax--;
-  
   map(rect.xmin, rect.ymin);
   map(rect.xmax, rect.ymax);
   if (rect.xmin >= rect.xmax)
     iswap(rect.xmin, rect.xmax);
   if (rect.ymin >= rect.ymax)
     iswap(rect.ymin, rect.ymax);
-
-  if (no_width) rect.xmax=rect.xmin;
-  else rect.xmax++;
-  if (no_height) rect.ymax=rect.ymin;
-  else rect.ymax++;
 }
 
-void
+void 
 GRectMapper::unmap(GRect &rect)
 {
-  int no_width=(rect.xmax==rect.xmin);
-  int no_height=(rect.ymax==rect.ymin);
-  if (code & SWAPXY) iswap(no_width, no_height);
-  if (rect.xmax>rect.xmin) rect.xmax--;
-  if (rect.ymax>rect.ymin) rect.ymax--;
-  
   unmap(rect.xmin, rect.ymin);
   unmap(rect.xmax, rect.ymax);
   if (rect.xmin >= rect.xmax)
     iswap(rect.xmin, rect.xmax);
   if (rect.ymin >= rect.ymax)
     iswap(rect.ymin, rect.ymax);
-  
-  if (no_width) rect.xmax=rect.xmin;
-  else rect.xmax++;
-  if (no_height) rect.ymax=rect.ymin;
-  else rect.ymax++;
 }
