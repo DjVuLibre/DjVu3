@@ -7,7 +7,7 @@
 # C- AT&T, you have an infringing copy of this software and cannot use it
 # C- without violating AT&T's intellectual property rights.
 # C-
-# C- $Id: Makefile.in,v 1.92 2000-05-24 00:23:17 bcr Exp $
+# C- $Id: Makefile.in,v 1.93 2000-05-27 01:51:31 bcr Exp $
 
 %%%include <paths>
 
@@ -151,10 +151,10 @@ $(BINPATH)/cdjvu: $(CDJVUSCRIPT)
 # Documentation
 
 html: libdjvu++.dxx libdjvu++.footer
-	-$(RM) -rf html 
-	-$(MKDIRP) html 2>>/dev/null
-	${DOCXX} -d html -B SRCDIR/libdjvu++.footer SRCDIR/libdjvu++.dxx
-	$(DOCXXCLEAN) html/*.html
+	-$(MKDIRP) "$(HTMLREFLIBPATH)" 2>>/dev/null ; $(TRUE)
+	-$(RM) -rf 2>>/dev/null `find "$(HTMLREFLIBPATH)" -name CVS -prune -o -type f -print` ; $(TRUE)
+	${DOCXX} -d "$(HTMLREFLIBPATH)" -B SRCDIR/libdjvu++.footer SRCDIR/libdjvu++.dxx
+	$(DOCXXCLEAN) "$(HTMLREFLIBPATH)"/*.html
 
 tex: libdjvu++.ps.gz
 
