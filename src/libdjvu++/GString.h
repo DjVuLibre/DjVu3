@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GString.h,v 1.9 1999-08-02 20:23:37 leonb Exp $
+//C- $Id: GString.h,v 1.10 1999-08-18 18:05:43 leonb Exp $
 
 
 #ifndef _GSTRING_H_
@@ -36,8 +36,12 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.9 1999-08-02 20:23:37 leonb Exp $# */
+    #$Id: GString.h,v 1.10 1999-08-18 18:05:43 leonb Exp $# */
 //@{
+
+#ifdef __GNUC__
+#pragma interface
+#endif
 
 #include "DjVuGlobal.h"
 #include <string.h>
