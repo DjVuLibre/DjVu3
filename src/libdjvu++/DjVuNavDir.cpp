@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuNavDir.cpp,v 1.3 1999-05-25 22:33:34 eaf Exp $
+//C- $Id: DjVuNavDir.cpp,v 1.4 1999-05-26 18:05:22 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -22,12 +22,15 @@
 
 DjVuNavDir::DjVuNavDir(const char * dirURL)
 {
-   if (dirURL) baseURL=GURL(dirURL).base();
+   if (!dirURL) THROW("ZERO directory URL passed to the DjVuNavDir constructor.");
+   baseURL=GURL(dirURL).base();
 }
 
 DjVuNavDir::DjVuNavDir(ByteStream & str, const char * dirURL)
 {
-   if (dirURL) baseURL=GURL(dirURL).base();
+   if (!dirURL) THROW("ZERO directory URL passed to the DjVuNavDir constructor.");
+   
+   baseURL=GURL(dirURL).base();
    
    decode(str);
 }

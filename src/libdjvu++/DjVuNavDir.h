@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuNavDir.h,v 1.2 1999-05-25 19:42:28 eaf Exp $
+//C- $Id: DjVuNavDir.h,v 1.3 1999-05-26 18:05:23 eaf Exp $
 
 #ifndef _DJVUNAVDIR_H
 #define _DJVUNAVDIR_H
@@ -36,7 +36,7 @@
 
     @memo DjVu Navigation Directory
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: DjVuNavDir.h,v 1.2 1999-05-25 19:42:28 eaf Exp $#
+    @version #$Id: DjVuNavDir.h,v 1.3 1999-05-26 18:05:23 eaf Exp $#
 */
 
 //@{
@@ -79,11 +79,11 @@ public:
 	  containing the directory source data. It will be used later
 	  in translation by functions like \Ref{url_to_page}() and
 	  \Ref{page_to_url}() */
-   DjVuNavDir(const char * dir_url=0);
+   DjVuNavDir(const char * dir_url);
       /** Constructs #DjVuNavDir# object by decoding its contents from
 	  the stream. #dir_url# is the URL of the file containing the
 	  directory source data. */
-   DjVuNavDir(ByteStream & str, const char * dir_url=0);
+   DjVuNavDir(ByteStream & str, const char * dir_url);
    virtual ~DjVuNavDir(void) {};
 
       /// Decodes the directory contents from the given \Ref{ByteStream}
