@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GUnicode.cpp,v 1.15 2001-05-18 23:02:33 bcr Exp $
+// $Id: GUnicode.cpp,v 1.16 2001-05-23 21:48:01 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -38,6 +38,12 @@
 #endif
 
 #include "GUnicode.h"
+#ifdef UNIX
+#define HAS_ICONV
+#endif
+#ifdef HAS_ICONV
+#include <iconv.h>
+#endif
 
 unsigned long const UnicodeRep::nill=0;
 
@@ -140,7 +146,7 @@ UnicodeRep::UnicodeRep(const UnicodeRep &uni)
 UnicodeRep::UnicodeRep(const UnicodeRep::Remainder &r)
 : gUnicodePtr(UnicodePtr)
 {
-  init(r.data,r.size,(UnicodeRep::EncodeType)r.encodetype);
+  init(r.data,r.size,(UnicodeRep::EncodeType)r.encodetype,r.encoding);
 }
 
 UnicodeRep::UnicodeRep(
@@ -148,7 +154,7 @@ UnicodeRep::UnicodeRep(
 : gUnicodePtr(UnicodePtr)
 {
   Remainder r(r1,r2);
-  init(r.data,r.size,(UnicodeRep::EncodeType)r.encodetype);
+  init(r.data,r.size,(UnicodeRep::EncodeType)r.encodetype,r.encoding);
 }
 
 UnicodeRep::~UnicodeRep()
@@ -203,6 +209,20 @@ GUnicode::GUnicode(
 {
   GP<UnicodeRep>::operator=(UnicodeRep::create());
   (*this)->init(i?str:0,i,(UnicodeRep::EncodeType &)t);
+}
+
+GUnicode::GUnicode(
+  unsigned char const * const str,unsigned int const i,const EncodeType t,
+  const GUTF8String &encoding)
+{
+  GP<UnicodeRep>::operator=(UnicodeRep::create());
+  if(encoding.length())
+  {
+    (*this)->init(i?str:0,i,encoding);
+  }else
+  {
+    (*this)->init(i?str:0,i,(UnicodeRep::EncodeType &)t);
+  }
 }
 
 GUnicode::GUnicode(
@@ -287,7 +307,142 @@ UnicodeRep::concat(const GP<UnicodeRep> &guni1,const GP<UnicodeRep> &guni2)
 
 void
 UnicodeRep::init(
-  void const * const xbuf,unsigned int bufsize,EncodeType t)
+  void const * const xbuf,
+  const unsigned int bufsize,
+  const EncodeType t,
+  const GUTF8String &encoding)
+{
+  if(encoding.length())
+  {
+    init(xbuf,bufsize,encoding);
+  }else
+  {
+    init(xbuf,bufsize,t);
+  }
+}
+
+void
+UnicodeRep::init(
+  void const * const xbuf,
+  unsigned int bufsize,
+  const GUTF8String &encoding)
+{
+  GUTF8String e=encoding.upcase();
+  if(!e.length())
+  {
+    init(xbuf,bufsize);
+  }else if(e == "UTF8" || e == "UTF-8")
+  {
+    init(xbuf,bufsize,UTF8);
+  }else if(e == "UTF16" || e == "UTF-16"
+    || e == "UCS2" || e == "UCS2")
+  {
+    init(xbuf,bufsize,UTF16);
+  }else if(e == "UCS4" || e == "UCS-4")
+  {
+    init(xbuf,bufsize,UCS4);
+  }else
+  {
+#ifdef HAS_ICONV
+    remainder.encoding=e;
+    EncodeType t=OTHER;
+    void const * const buf=checkmarks(xbuf,bufsize,t); 
+    if(t != OTHER)
+    {
+      init(xbuf,bufsize,t);
+    }
+    if(buf)
+    {
+      unsigned char const *eptr=(unsigned char *)buf;
+      unsigned int j=0;
+      if(bufsize)
+      {
+        for(j=0;(j<bufsize)&&*eptr;j++,eptr++)
+          EMPTY_LOOP;
+      }else
+      {
+        while(*eptr)
+          eptr++;
+        j=(size_t)eptr-(size_t)buf;
+      }
+      if (j)
+      {
+        unsigned char const *ptr=(unsigned char *)buf;
+        gUnicodePtr.resize(j+1);
+        UnicodePtr[j]=0;
+        if(remainder.encoding.length())
+        {
+          iconv_t cv=iconv_open("UTF-8",(const char *)remainder.encoding);
+          if(cv == (iconv_t)(-1))
+          { 
+            const int i=remainder.encoding.search('-');
+            if(i>=0)
+            {
+              cv=iconv_open("UTF-8",(const char *)remainder.encoding.substr(i+1));
+            }
+          }
+          if(cv == (iconv_t)(-1))
+          { 
+            remainder.encoding=GUTF8String();
+            if(remainder.encodetype == Remainder::EBCDIC)
+            {
+              for(len=0;(ptr<eptr)&&(UnicodePtr[len]=*ptr++);len++)
+                EMPTY_LOOP;
+            }else
+            {
+              UnicodePtr[(len=0)]=0;
+            }
+          }else
+          {
+            size_t ptrleft=(eptr-ptr); 
+            char utf8char[7];
+            char *p=utf8char;
+            size_t pleft=sizeof(utf8char);
+            for(len=0;iconv(cv,(const char **)&ptr,&ptrleft,&p,&pleft);
+              len++,pleft=sizeof(utf8char))
+            {
+              unsigned char const * const pend=(unsigned char *)(p=utf8char)+sizeof(utf8char);
+              UnicodePtr[len]=UTF8toUCS4((const unsigned char *&)p,pend);
+              p=utf8char;
+            }
+            iconv_close(cv);
+          }
+        }
+        if(len<j)
+        {
+          unsigned long *old_wide;
+          GPBuffer<unsigned long> gold_wide(old_wide);
+          gold_wide.swap(gUnicodePtr);
+          gUnicodePtr.resize(len+1);
+          for(j=0;j<len&&(UnicodePtr[j]=old_wide[j]);j++)
+            EMPTY_LOOP;
+          UnicodePtr[len]=0;
+        }
+        UnicodePtr[len]=0;
+      }
+      initUTF8();
+      if((size_t)eptr<(size_t)buf+bufsize)
+      {
+        remainder.init(eptr,bufsize+(size_t)buf-(size_t)eptr);
+      }
+    }else
+    {
+      gs=GStringRep::UTF8::create((size_t)0);
+      remainder.init(0,0);
+      len=0;
+      gUnicodePtr.resize(0);
+    }
+#else
+    init(xbuf,bufsize);
+#endif
+  }
+}
+
+void
+UnicodeRep::init(
+  void const * const xbuf,
+  unsigned int bufsize,
+  EncodeType t)
 { 
   void const * const buf=checkmarks(xbuf,bufsize,t); 
   if(t != OTHER)
@@ -404,11 +559,15 @@ UnicodeRep::init(
             EMPTY_LOOP;
           break;
         case EBCDIC:
-          for(len=0;(ptr<eptr)&&(UnicodePtr[len]=*ptr++);len++)
-            EMPTY_LOOP;
-          break;
         default:
-          UnicodePtr[(len=0)]=0;
+          if(remainder.encodetype == Remainder::EBCDIC)
+          {
+            for(len=0;(ptr<eptr)&&(UnicodePtr[len]=*ptr++);len++)
+              EMPTY_LOOP;
+          }else
+          {
+            UnicodePtr[(len=0)]=0;
+          }
           break;
       }
       if(len<j)
@@ -726,7 +885,7 @@ UnicodeRep::Remainder::~Remainder()
 inline void
 UnicodeRep::Remainder::init(const Remainder &r)
 {
-  init(r.data,r.size,r.encodetype);
+  init(r.data,r.size,r.encodetype,r.encoding);
 }
 
 void 
@@ -735,9 +894,11 @@ UnicodeRep::Remainder::init(
 {
   EncodeType t=
 	  encodetype=(r2.encodetype == OTHER)?r1.encodetype:r2.encodetype;
+  GUTF8String e=
+          encoding=(r2.encoding.length())?r2.encoding:r1.encoding;
   if(!r2.size)
   {
-    init(r1.data,r1.size,t);
+    init(r1.data,r1.size,t,e);
   }else if(r1.size
     &&((r1.encodetype == OTHER)||(r1.encodetype == t)))
   {
@@ -746,19 +907,16 @@ UnicodeRep::Remainder::init(
     size=r1.size+r2.size;
     memcpy(data,r1.data,r1.size);
     memcpy((unsigned char *)data+r2.size,r2.data,r2.size);
-    if(t != OTHER)
-    {
-      encodetype=t;
-    }
   }else
   {
-    init(r2.data,r2.size,t);
+    init(r2.data,r2.size,t,e);
   }
 }
 
 void
 UnicodeRep::Remainder::init(
-  void const * const d,size_t const s,UnicodeRep::Remainder::EncodeType t)
+  void const * const d,size_t const s,UnicodeRep::Remainder::EncodeType t,
+  const GUTF8String &e)
 {
   gdata.resize(0,1);
   if(d && s)
@@ -774,6 +932,10 @@ UnicodeRep::Remainder::init(
   if(t != OTHER)
   {
     encodetype=t;
+  }
+  if(e.length())
+  {
+    encoding=e;
   }
 }
 

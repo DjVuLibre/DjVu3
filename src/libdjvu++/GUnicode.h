@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GUnicode.h,v 1.7 2001-04-21 00:16:58 bcr Exp $
+// $Id: GUnicode.h,v 1.8 2001-05-23 21:48:01 bcr Exp $
 // $Name:  $
 
 #ifndef __GUNICODE_
@@ -56,7 +56,9 @@ public:
     ~Remainder();
     inline void init(const Remainder &r1);
     void init(const Remainder &r1,const Remainder &r2);
-    void init(void const * const ,size_t,EncodeType=OTHER);
+    void init(void const * const ,const size_t,const EncodeType=OTHER,
+      const GUTF8String &encoding=GUTF8String());
+    GUTF8String encoding;
     EncodeType encodetype;
     void *data;
     GPBufferBase gdata;
@@ -111,12 +113,15 @@ private:
   inline unsigned long UCS4_2143toUCS4(unsigned char const *&s,void const * const);
   static GP<UnicodeRep> concat(const UnicodeRep &,const UnicodeRep &);
 public:
-  void init (void const * const,unsigned int const,const EncodeType=EBCDIC);
+  void init(void const * const ,const size_t,const EncodeType,
+    const GUTF8String &encoding);
+  void init (void const * const,unsigned int,const EncodeType=EBCDIC);
+  void init(void const * const ,const size_t,const GUTF8String &encoding);
   inline void init (GUTF8String &,unsigned int const=0);
   inline void init (const GUTF8String &,unsigned int const=0);
   inline operator unsigned long const * () const;
   inline operator char const * () const;
-  inline GUTF8String get_GUTF8String() const;
+  inline GUTF8String get_string() const;
   inline void const * get_remainder (void) const;
   inline size_t get_remainder_size (void) const;
   inline EncodeType get_remainderType (void) const;
@@ -157,7 +162,7 @@ UnicodeRep::operator char const * () const
 {return gs;}
 
 inline GUTF8String
-UnicodeRep::get_GUTF8String (void) const
+UnicodeRep::get_string (void) const
 {return gs;}
 
 inline const void *
@@ -223,14 +228,16 @@ public:
   GUnicode( unsigned long const * const wide );
   GUnicode( unsigned long const * const wide, unsigned int const );
   GUnicode( unsigned char const * const,
-    unsigned int const, const EncodeType );
+    unsigned int const, const EncodeType);
+  GUnicode( unsigned char const * const,
+    unsigned int const, const EncodeType, const GUTF8String &encoding );
   GUnicode( unsigned short const * const,
     unsigned int const, const EncodeType );
   GUnicode( unsigned long const * const,
     unsigned int const, const EncodeType );
   inline operator unsigned long const * () const;
   inline operator char const * () const;
-  inline GUTF8String get_GUTF8String (void) const;
+  inline GUTF8String get_string (void) const;
   inline void const *get_remainder (void) const;
   inline size_t get_remainder_size (void) const;
   inline EncodeType get_remainderType (void) const;
@@ -338,8 +345,8 @@ GUnicode::operator char const * () const
 {return (char const *)(**this);}
 
 inline GUTF8String
-GUnicode::get_GUTF8String (void) const
-{return GUTF8String((*this)->get_GUTF8String());}
+GUnicode::get_string (void) const
+{return GUTF8String((*this)->get_string());}
 
 inline const void *
 GUnicode::get_remainder (void) const

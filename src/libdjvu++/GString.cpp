@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.104 2001-05-23 20:20:59 fcrary Exp $
+// $Id: GString.cpp,v 1.105 2001-05-23 21:48:01 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -79,12 +79,6 @@ mbrlen(const char *s, size_t n, mbstate_t *)
 }
 #endif // !defined(HAS_MBSTATE) || defined(UNDER_CE)
 
-
-#ifdef HAS_ICONV
-#define LIBICONV_PLUG true
-#include <iconv.h>//MBCS cvt
-#include "libcharset.h"//MBCS cvt
-#endif
 
 // - Author: Leon Bottou, 04/1997
 
@@ -421,16 +415,16 @@ GStringRep::tocase(
 //      '\"' -->  "&quot;"
 //  Also escapes characters 0x00 through 0x1f and 0x7e through 0x7f.
 GUTF8String
-GUTF8String::toEscaped( void ) const
+GUTF8String::toEscaped( const bool tosevenbit ) const
 {
   GUTF8String ret, special;
   char const * const head=(*this);
   char const *start=head;
   char const *s=start;
-  while(*s)
+  for(unsigned long w;(w=(*this)->getValidUCS4(s));)
   {
     char const *ss=0;
-    switch(*s)
+    switch(w)
     {
     case '<':
       ss="&lt;";
@@ -448,14 +442,13 @@ GUTF8String::toEscaped( void ) const
       ss="&quot;";
       break;
     default:
-      if(((unsigned char)(*s)<' ')||((signed char)*s>= 0x7e))
+      if((w<' ')||(w>=0x7e && (tosevenbit || (w < 0x80))))
       {
-        special.format("&#%d;",(unsigned char)*s);
+        special.format("&#%lu;",w);
         ss=special;
       }
       break;
     }
-
     if(ss)
     {
       if(s!=start)
@@ -534,7 +527,9 @@ GUTF8String::fromEscaped( const GMap<GUTF8String,GUTF8String> ConvMap ) const
         }
         if(ptr)
         {
-          ret+=GUTF8String((char const)(value));
+          unsigned char utf8char[7];
+          unsigned char const * const end=GStringRep::UCS4toUTF8(value,utf8char);
+          ret+=GUTF8String((char const *)utf8char,(size_t)end-(size_t)utf8char);
         }else
         {
           ret += substr( amp_locn, semi_locn - amp_locn + 1 );
@@ -887,79 +882,6 @@ GBaseString::throw_illegal_subscript()
 {
   G_THROW( ERR_MSG("GString.bad_subscript") );
 }
-
-#ifdef HAS_ICONV
-class DjVuIconv {
-private:
-  char *buf;
-  GPBuffer<char> gbuf;
-  GMap<GBaseString,iconv_t> iconv_map;
-  GList<GBaseString> codes;
-  DjVuIconv() : gbuf(buf) {}
-public:
-  static size_t iconv_string(const GBaseString &fromcode,const GBaseString &tocode,
-    const char *fromstr, const size_t fromstr_len, char *&retval,
-    size_t &retval_len,GPBuffer<char> &);
-  iconv_t getmap(const GBaseString &fromcode, const GBaseString &tocode);
-  ~DjVuIconv();
-};
-
-DjVuIconv::~DjVuIconv()
-{
-  GPosition pos;
-  while((pos=iconv_map))
-  {
-    iconv_t cd=iconv_map[pos];
-    iconv_map.del(pos);
-    if(cd != (iconv_t)(-1))
-      iconv_close(cd);
-  }
-}
-
-iconv_t
-DjVuIconv::getmap(const GBaseString &tocode, const GBaseString &fromcode)
-{
-  GBaseString code(tocode+fromcode);
-  GPosition pos;
-  iconv_t retval;
-  if(!(pos=iconv_map.contains(code)))
-  {
-    codes.append(tocode);
-    const char *tc=codes[codes.lastpos()];
-    codes.append(fromcode);
-    const char *fc=codes[codes.lastpos()];
-    iconv_map[code]=retval=iconv_open(tc,fc);
-  }else
-  {
-    retval=iconv_map[pos];
-  }
-  return retval;
-}
-
-size_t
-DjVuIconv::iconv_string(const GBaseString &tocode,const GBaseString &fromcode,
-  const char *fromstr, const size_t fromstr_len, char *&outbuf, size_t &outbuf_len,GPBuffer<char> &gbufout)
-{
-  static DjVuIconv conv;
-  iconv_t cd=conv.getmap(tocode,fromcode);
-  const char *inbuf=fromstr;
-  size_t insize=fromstr_len;
-  size_t outsize=fromstr_len*6;
-  gbufout.resize(fromstr_len*6+1);
-  char *retbuf=outbuf;
-  outbuf[0]=0;
-  const size_t retval=(cd!=(iconv_t)-1)?iconv(cd,&inbuf,&insize,&retbuf,&outsize):(size_t)(-1);
-  if(retval != (size_t)(-1))
-  {
-    gbufout.resize(fromstr_len*6-outsize);
-  }else
-  {
-    gbufout.resize(0);
-  }
-  return retval;
-}
-
-#endif /* HAS_ICONV */
 
 unsigned char *
 GStringRep::UTF8::UCS4toString(
@@ -1753,34 +1675,7 @@ GBaseString::getUTF82Native(char* tocode) const
     retval=UTF8ToNative();
     if(!retval.length())
     {
-#ifdef HAS_ICONV 
-      char *result;
-      GPBuffer<char> gresult(result);
-      size_t length = 0;
-      const char *locales[]={0,"ASCII","ISO-8859-1","CP932","EUC-JP",0};
-      GUTF8String glocale_charset=locale_charset();
-      locales[0]=glocale_charset;
-      const char **pos=locales;
-      for(;pos[0];++pos)
-      {
-        if (pos[0][0]&&!DjVuIconv::iconv_string(pos[0], "UTF-8",
-          s, slen, result, length, gresult))
-        {
-          if (tocode)
-            strcpy((char*)tocode,pos[0]);
-          retval=result;
-          break;
-        }
-      }
-      if(!pos[0])
-      {
-        if (tocode)
-          strcpy(tocode,locales[0]);
-        retval=*this; //invalid codeset
-      }
-#else /* HAS_ICONV */
       retval=(const char*)*this;
-#endif /* HAS_ICONV */
     }
   }
   return retval;
@@ -1830,34 +1725,7 @@ GBaseString::getNative2UTF8(const char *fromcode) const
     retval=NativeToUTF8();
     if(!retval.length())
     {
-#ifdef HAS_ICONV
-      char *result;
-      GPBuffer<char> gresult(result);
-      const char *locales[]={0,"ASCII","ISO-8859-1","CP932","EUC-JP",0};
-      size_t length = 0;
-      GUTF8String glocale_charset;
-      if (!fromcode || !fromcode[0])
-      {
-        fromcode="UTF-8";
-        locales[0]=glocale_charset=locale_charset();
-      }
-      const char **pos=locales;
-      for(;pos[0];++pos)
-      {
-        if (!DjVuIconv::iconv_string(fromcode, pos[0],
-          s, slen, result, length, gresult))
-        {
-          retval=result;
-          break;
-        }
-      }
-      if(!pos[0])
-      {
-        retval=*this;
-      }
-#else /* HAS_ICONV */
       retval=*this;
-#endif /* HAS_ICONV */
     }
   }
   return retval;

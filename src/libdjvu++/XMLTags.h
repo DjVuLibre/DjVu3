@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: XMLTags.h,v 1.8 2001-05-01 18:44:17 bcr Exp $
+// $Id: XMLTags.h,v 1.9 2001-05-23 21:48:01 bcr Exp $
 // $Name:  $
 
 #ifndef _LT_XMLTAGS__
@@ -85,6 +85,7 @@ public:
   GList<lt_XMLContents> content;
   GMap<GUTF8String,GPList<lt_XMLTags> > allTags;
   int startline;
+  GUTF8String encoding;
 };
 
 class lt_XMLContents

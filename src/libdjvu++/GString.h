@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.h,v 1.75 2001-05-23 20:20:59 fcrary Exp $
+// $Id: GString.h,v 1.76 2001-05-23 21:48:01 bcr Exp $
 // $Name:  $
 
 #ifndef _GSTRING_H_
@@ -57,7 +57,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.75 2001-05-23 20:20:59 fcrary Exp $# */
+    #$Id: GString.h,v 1.76 2001-05-23 21:48:01 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -845,7 +845,7 @@ public:
       '<'  to "&lt;", '>'  to "&gt;",  '&' to "&amp;" '\'' to "&apos;",
       and  '\"' to  "&quot;".   Characters 0x01 through 0x1f are also
       escaped. */
-  GUTF8String toEscaped(void ) const;
+  GUTF8String toEscaped( const bool tosevenbit=false ) const;
 
   /** Converts strings containing HTML/XML escaped characters into their
       unescaped forms. Numeric representations of characters (e.g., "&#38;"

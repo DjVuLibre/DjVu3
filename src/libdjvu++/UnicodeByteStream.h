@@ -1,7 +1,7 @@
 //C-  Copyright © 2000-2001, LizardTech, Inc. All Rights Reserved.
 //C-              Unauthorized use prohibited.
 //
-// $Id: UnicodeByteStream.h,v 1.5 2001-04-23 18:14:22 bcr Exp $
+// $Id: UnicodeByteStream.h,v 1.6 2001-05-23 21:48:01 bcr Exp $
 // $Name:  $
 
 #ifndef _UNICODEBYTESTREAM_H_
@@ -29,7 +29,7 @@
     @author
     Bill C Riemers <bcr@lizardtech.org>
     @version
-    #$Id: UnicodeByteStream.h,v 1.5 2001-04-23 18:14:22 bcr Exp $# */
+    #$Id: UnicodeByteStream.h,v 1.6 2001-05-23 21:48:01 bcr Exp $# */
 //@{
 
 #include "DjVuGlobal.h"
@@ -76,6 +76,7 @@ public:
   ~UnicodeByteStream();
   /// Sets the encoding type and seek's to position 0.
   void set_encodetype(const GUnicode::EncodeType et=GUnicode::UTF8);
+  void set_encoding(const GUTF8String &encoding);
   /// Simmular to fgets(), except read aheads effect the tell() position.
   virtual GUnicode gets(size_t const t=0,unsigned long const stopat='\n',bool const inclusive=true); 
   /// Resets the gets buffering as well as physically seeking.
@@ -95,9 +96,11 @@ public:
 protected:
   /// The real byte stream.
   GUnicode::EncodeType encodetype;
+  GUTF8String encoding;
   GUnicode buffer;
   GP<ByteStream> bs;
   int linesread;
+  long startpos;
 private:
   // Cancel C++ default stuff
   UnicodeByteStream & operator=(UnicodeByteStream &);
@@ -107,7 +110,16 @@ inline void
 UnicodeByteStream::set_encodetype(const GUnicode::EncodeType et)
 {
   encodetype=et;
-  seek(0,SEEK_SET);
+  seek(startpos,SEEK_SET);
+  buffer=GUnicode();
+}
+
+inline void
+UnicodeByteStream::set_encoding(const GUTF8String &xencoding)
+{
+  encoding=xencoding;
+  seek(startpos,SEEK_SET);
+  buffer=GUnicode();
 }
 
 inline size_t
@@ -116,7 +128,7 @@ UnicodeByteStream::read(void *buf, size_t size)
   int retval=bs->read(buf,size);
   if(retval)
   {
-    buffer+=GUnicode((unsigned char const *)buf,retval,encodetype);
+    buffer+=GUnicode((unsigned char const *)buf,retval,encodetype,encoding);
   }
   return retval;
 }
@@ -140,6 +152,7 @@ UnicodeByteStream::operator=(UnicodeByteStream &uni)
   bs=uni.bs;
   buffer=uni.buffer;
   encodetype=uni.encodetype;
+  encoding=uni.encoding;
   return *this;
 }
 

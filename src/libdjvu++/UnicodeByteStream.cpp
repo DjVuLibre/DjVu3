@@ -1,7 +1,7 @@
 //C-  Copyright © 2000-2001, LizardTech, Inc. All Rights Reserved.
 //C-              Unauthorized use prohibited.
 //
-// $Id: UnicodeByteStream.cpp,v 1.5 2001-05-18 22:04:08 bcr Exp $
+// $Id: UnicodeByteStream.cpp,v 1.6 2001-05-23 21:48:01 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -12,10 +12,11 @@
 #include "ByteStream.h"
 
 UnicodeByteStream::UnicodeByteStream(const UnicodeByteStream &uni)
-: encodetype(uni.encodetype), linesread(0)
+: encodetype(uni.encodetype), encoding(uni.encoding), linesread(0)
 {
   bs=uni.bs;
   buffer=uni.buffer;
+  startpos=bs->tell();
 }
 
 UnicodeByteStream::UnicodeByteStream(
@@ -23,6 +24,7 @@ UnicodeByteStream::UnicodeByteStream(
 : encodetype(et), linesread(0)
 {
   bs=ibs;
+  startpos=bs->tell();
 }
 
 UnicodeByteStream::~UnicodeByteStream()
@@ -132,30 +134,37 @@ XMLByteStream::init(void)
       {
         case 0x003C:
         {
+          encoding=GUTF8String();
           encodetype=GUnicode::UCS4BE;
           buffer=GUnicode(buf,sizeof(buf),encodetype);
           break;
         }
         case 0x3C00:
         {
+          encoding=GUTF8String();
           encodetype=GUnicode::UCS4_2143;
           buffer=GUnicode(buf,sizeof(buf),encodetype);
           break;
         }
         case 0xFEFF:
         {
+          encoding=GUTF8String();
           encodetype=GUnicode::UCS4BE;
           buffer=GUnicode();
+          startpos+=sizeof(buf);
           break;
         }
         case 0xFFFE:
         {
+          encoding=GUTF8String();
           encodetype=GUnicode::UCS4_2143;
           buffer=GUnicode();
+          startpos+=sizeof(buf);
           break;
         }
         default:
         {
+          encoding=GUTF8String();
           encodetype=GUnicode::UTF8;
           buffer=GUnicode(buf,sizeof(buf),encodetype);
           break;
@@ -168,16 +177,18 @@ XMLByteStream::init(void)
       switch(j)
       {
         case 0x0000:
+          encoding=GUTF8String();
           encodetype=GUnicode::UCS4_3412;
           break;
         case 0x003F:
+          encoding=GUTF8String();
           encodetype=GUnicode::UTF16BE;
           break;
         default:
           encodetype=GUnicode::UTF8;
           break;
       }
-      buffer=GUnicode(buf,sizeof(buf),encodetype);
+      buffer=GUnicode(buf,sizeof(buf),encodetype,encoding);
       break;
     }
     case 0x3C00:
@@ -186,50 +197,63 @@ XMLByteStream::init(void)
       switch(j)
       {
         case 0x0000:
+          encoding=GUTF8String();
           encodetype=GUnicode::UCS4LE;
           break;
         case 0x3F00:
+          encoding=GUTF8String();
           encodetype=GUnicode::UTF16LE;
           break;
         default:
           encodetype=GUnicode::UTF8;
           break;
       }
-      buffer=GUnicode(buf,sizeof(buf),encodetype);
+      buffer=GUnicode(buf,sizeof(buf),encodetype,encoding);
       break;
     }
     case 0x4C6F:
     {
       const unsigned int j=(buf[2]<<8)+buf[3];
       encodetype=(j == 0xA794)?(GUnicode::EBCDIC):(GUnicode::UTF8);
-      buffer=GUnicode(buf,sizeof(buf),encodetype);
+      buffer=GUnicode(buf,sizeof(buf),encodetype,encoding);
       break;
     }
     case 0xFFFE:
     {
+      encoding=GUTF8String();
       encodetype=GUnicode::UTF16LE;
       buffer=GUnicode(buf+2,sizeof(buf)-2,encodetype);
+      startpos+=2;
       break;
     }
     case 0xFEFF:
     {
+      encoding=GUTF8String();
       encodetype=GUnicode::UTF16BE;
       buffer=GUnicode(buf+2,sizeof(buf)-2,encodetype);
+      startpos+=2;
       break;
     }
     case 0xEFBB:
     {
       encodetype=GUnicode::UTF8;
-      buffer=((buf[2] == 0xBF)
-        ?GUnicode(buf+3,sizeof(buf)-3,encodetype)
-        :GUnicode(buf,sizeof(buf),encodetype));
+      if(buf[2] == 0xBF)
+      {
+        encoding=GUTF8String();
+        buffer=GUnicode(buf+3,sizeof(buf)-3,encodetype);
+        startpos+=3;
+      }else
+      {
+        buffer=GUnicode(buf,sizeof(buf),encodetype,encoding);
+      }
       break;
     }
     case 0x3C3F:
     default:
     {
+      encoding=GUTF8String();
       encodetype=GUnicode::UTF8;
-      buffer=GUnicode(buf,sizeof(buf),GUnicode::UTF8);
+      buffer=GUnicode(buf,sizeof(buf),encodetype,encoding);
     }
   }
   bs=ibs;
@@ -237,6 +261,5 @@ XMLByteStream::init(void)
 
 XMLByteStream::~XMLByteStream()
 {}
-
 
 

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: xml2native.cpp,v 1.1 2001-05-18 23:02:33 bcr Exp $
+// $Id: xml2native.cpp,v 1.2 2001-05-23 21:48:01 bcr Exp $
 // $Name:  $
 
 /** @name nativetoutf8
@@ -43,7 +43,7 @@
     @author
     Dr Bill C Riemers <bcr@lizardtech.com>
     @version
-    #$Id: xml2native.cpp,v 1.1 2001-05-18 23:02:33 bcr Exp $# */
+    #$Id: xml2native.cpp,v 1.2 2001-05-23 21:48:01 bcr Exp $# */
 //@{
 //@}
 
@@ -79,7 +79,7 @@ main(int argc, char **argv)
       GUnicode ustr;
       while((ustr=uni->gets()).length())
       {
-        bs->writestring(ustr->get_GUTF8String().getUTF82Native());
+        bs->writestring(ustr->get_string().getUTF82Native());
       }
     }
     bs->seek(0L);

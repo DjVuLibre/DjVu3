@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: XMLTags.cpp,v 1.18 2001-05-01 18:44:17 bcr Exp $
+// $Id: XMLTags.cpp,v 1.19 2001-05-23 21:48:01 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -189,26 +189,46 @@ lt_XMLTags::init(XMLByteStream &xmlbs)
     {
       case '?':
       {
-        while(len < 4 || tag.substr_nr(len-2,len).get_GUTF8String() != "?>")
+        while(len < 4 || tag.substr_nr(len-2,len).get_string() != "?>")
         {
           GUnicode cont(xmlbs.gets(0,'>',true));
           if(!cont[0])
           { 
-            GUTF8String mesg;
-            mesg.format( ERR_MSG("XMLTags.bad_PI") "\t%s",(const char *)tag);
-            G_THROW(mesg);
+            G_THROW( (ERR_MSG("XMLTags.bad_PI") "\t")+tag.get_string());
           }
           len=((tag+=cont).length());
         }
-        GUTF8String xname=tagtoname(((const char *)tag)+2);
-//        if(xname.downcase() == "xml")
-//        {
-//          DjVuPrintMessage("Got XMLDecl: %s",(const char *)tag);
-//          
-//        }else
-//        {
-//          DjVuPrintMessage("Got PI: %s",(const char *)tag);
-//        }
+        char const *n;
+        GUTF8String xname=tagtoname(((const char *)tag)+2,n);
+        if(xname.downcase() == "xml")
+        {
+          ParseValues(n,args);
+          for(GPosition pos=args;pos;++pos)
+          {
+            if(args.key(pos) == "encoding")
+            {
+              const GUTF8String e=args[pos].upcase();
+              if(e != encoding)
+              {
+                xmlbs.set_encoding((encoding=e));
+//                if(e != "UTF-8" && e != "UTF-16"
+//                  && e != "ISO-10645-UCS-2" && e != "ISO-10646-UCS-4")
+//                {
+//                  G_THROW( (ERR_MSG("XMLTags.bad_PI") "\t")+tag.get_string());
+//                }
+//                DjVuPrintMessage("Got XMLDecl: %s",(const char *)tag);
+//            }else if(encoding.length())
+//            {
+//                G_THROW( (ERR_MSG("XMLTags.bad_PI") "\t")+tag.get_string());
+              }
+            }
+          }
+//        DjVuPrintMessage("Got XMLDecl: %s",(const char *)tag);
+//      }else
+//      {
+//
+//        DjVuPrintMessage("Got PI: %s",(const char *)tag);
+        }
         break;
       }
       case '!':
@@ -216,7 +236,7 @@ lt_XMLTags::init(XMLByteStream &xmlbs)
         if(tag[2] == '-' && tag[3] == '-')
         {
           while((len < 7) ||
-            (tag.substr_nr(len-3,len).get_GUTF8String() != "-->"))
+            (tag.substr_nr(len-3,len).get_string() != "-->"))
           {
             GUnicode cont(xmlbs.gets(0,'>',true));
             if(!cont[0])
@@ -294,7 +314,7 @@ lt_XMLTags::init(XMLByteStream &xmlbs)
       GPosition last=level.lastpos();
       if(last)
       {
-        level[last]->addraw(raw.get_GUTF8String());
+        level[last]->addraw(raw.get_string());
 //        DjVuPrintMessage("Got raw %s: %s\n",(const char *)(level[last]->name),(const char *)raw);
       }else if(!isspaces((unsigned long const *)raw))
       {
