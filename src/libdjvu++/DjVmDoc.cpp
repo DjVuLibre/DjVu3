@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVmDoc.cpp,v 1.45 2001-04-12 17:05:31 fcrary Exp $
+// $Id: DjVmDoc.cpp,v 1.46 2001-04-30 23:30:45 bcr Exp $
 // $Name:  $
 
 
@@ -45,6 +45,71 @@
 #include "debug.h"
 
 static const char octets[4]={0x41,0x54,0x26,0x54};
+
+// Save the file to disk, remapping INCL chunks while saving.
+static void
+save_file(
+  IFFByteStream &iff_in, IFFByteStream &iff_out, const DjVmDir &dir,
+  GMap<GUTF8String,GUTF8String> &incl)
+{
+  GUTF8String chkid;
+  if (iff_in.get_chunk(chkid))
+  {
+    iff_out.put_chunk(chkid,true);
+    if(!chkid.cmp("FORM:",5))
+    {
+      for(;iff_in.get_chunk(chkid);iff_in.close_chunk())
+      {
+        iff_out.put_chunk(chkid);
+        if(chkid == "INCL")
+        {
+          GUTF8String incl_str;
+          char buffer[1024];
+          int length;
+          while((length=iff_in.read(buffer, 1024)))
+            incl_str+=GUTF8String(buffer, length);
+          // Eat '\n' in the beginning and at the end
+          while(incl_str.length() && incl_str[0]=='\n')
+          {
+            incl_str=incl_str.substr(1,(unsigned int)(-1));
+          }
+          while(incl_str.length()>0 && incl_str[(int)incl_str.length()-1]=='\n')
+          {
+            incl_str.setat(incl_str.length()-1, 0);
+          }
+          GPosition pos=incl.contains(incl_str);
+          if(pos)
+          { 
+            iff_out.writestring(incl[pos]);
+          }else
+          {
+            GP<DjVmDir::File> incl_file=dir.id_to_file(incl_str); 
+            if(incl_file)
+            {
+              DEBUG_MSG("INCL '"<<(const char *)incl_file->get_save_name()<<"'\n");
+              const GUTF8String incl_name=incl_file->get_save_name();
+              incl[incl_str]=incl_name;
+              iff_out.writestring(incl_name);
+            }else
+            {
+              DEBUG_MSG("BOGUS INCL '"<<(const char *)incl_str<<"'\n");
+              iff_out.copy(iff_in);
+            }
+          }
+        }else
+        {
+          iff_out.copy(iff_in);
+        }
+        iff_out.close_chunk();
+      }
+    }else
+    {
+      iff_out.copy(iff_in);
+    }
+    iff_out.close_chunk();
+    iff_in.close_chunk();
+  }
+}
 
 DjVmDoc::DjVmDoc(void)
 {
@@ -71,31 +136,31 @@ void
 DjVmDoc::insert_file(const GP<DjVmDir::File> & f,
 		     GP<DataPool> data_pool, int pos)
 {
-   DEBUG_MSG("DjVmDoc::insert_file(): inserting file '" << f->id <<
+   DEBUG_MSG("DjVmDoc::insert_file(): inserting file '" << f->get_load_name() <<
 	     "' at pos " << pos << "\n");
    DEBUG_MAKE_INDENT(3);
 
    if (!f)
      G_THROW( ERR_MSG("DjVmDoc.no_zero_file") );
-   if (data.contains(f->id))
+   if (data.contains(f->get_load_name()))
      G_THROW( ERR_MSG("DjVmDoc.no_duplicate") );
 
    char buffer[4];
-   if (data_pool->get_data(buffer, 0, 4)==4 &&
-       !memcmp(buffer, octets, 4))
+   if (data_pool->get_data(buffer, 0, 4)==4 && !memcmp(buffer, octets, 4))
    {
       data_pool=DataPool::create(data_pool, 4, -1);
    } 
-   data[f->id]=data_pool;
+   data[f->get_load_name()]=data_pool;
    dir->insert_file(f, pos);
 }
 
 void		
-DjVmDoc::insert_file(ByteStream &data, DjVmDir::File::FILE_TYPE file_type,
-                     const char *name, const char *id, 
-                     const char *title, int pos)
+DjVmDoc::insert_file(
+  ByteStream &data, DjVmDir::File::FILE_TYPE file_type,
+  const GUTF8String &name, const GUTF8String &id, const GUTF8String &title,
+  int pos)
 {
-   GP<DjVmDir::File> file=new DjVmDir::File(name, id, title, file_type);
+   GP<DjVmDir::File> file=DjVmDir::File::create(name, id, title, file_type);
    GP<DataPool> pool = DataPool::create();
       // Cannot connect to a bytestream.
       // Must copy data into the datapool.
@@ -109,7 +174,7 @@ DjVmDoc::insert_file(ByteStream &data, DjVmDir::File::FILE_TYPE file_type,
 }
 
 void
-DjVmDoc::delete_file(const char * id)
+DjVmDoc::delete_file(const GUTF8String &id)
 {
    DEBUG_MSG("DjVmDoc::delete_file(): deleting file '" << id << "'\n");
    DEBUG_MAKE_INDENT(3);
@@ -122,96 +187,101 @@ DjVmDoc::delete_file(const char * id)
 }
 
 GP<DataPool>
-DjVmDoc::get_data(const char * id)
+DjVmDoc::get_data(const GUTF8String &id) const
 {
-   GPosition pos;
-   if (!data.contains(id, pos))
-      G_THROW(GUTF8String( ERR_MSG("DjVmDoc.cant_find") "\t") + id);
-   return data[pos];
+  GPosition pos;
+  if (!data.contains(id, pos))
+    G_THROW(GUTF8String( ERR_MSG("DjVmDoc.cant_find") "\t") + id);
+  const GP<DataPool> pool(data[pos]);
+   // First check that the file is in IFF format
+  G_TRY
+  {
+    const GP<ByteStream> str_in(pool->get_stream());
+    const GP<IFFByteStream> giff_in=IFFByteStream::create(str_in);
+    IFFByteStream &iff_in=*giff_in;
+    GUTF8String chkid;
+    int size=iff_in.get_chunk(chkid);
+    if (size<0 || size>0x7fffffff)
+      G_THROW( ERR_MSG("DjVmDoc.not_IFF") "\t" + id);
+  }
+  G_CATCH_ALL 
+  {
+    G_THROW( ERR_MSG("DjVmDoc.not_IFF") "\t" + id);
+  }
+  G_ENDCATCH;
+  return pool;
 }
 
 void
-DjVmDoc::write(GP<ByteStream> gstr)
+DjVmDoc::write(const GP<ByteStream> &gstr)
 {
-   DEBUG_MSG("DjVmDoc::write(): Storing document into the byte stream.\n");
-   DEBUG_MAKE_INDENT(3);
+  DEBUG_MSG("DjVmDoc::write(): Storing document into the byte stream.\n");
+  DEBUG_MAKE_INDENT(3);
 
 
-   DEBUG_MSG("pass 1: create dummy DIRM chunk and calculate offsets...\n");
+  DEBUG_MSG("pass 1: create dummy DIRM chunk and calculate offsets...\n");
 
-   GPosition pos;
+  GPosition pos;
 
-   GPList<DjVmDir::File> files_list=dir->get_files_list();
-   for(pos=files_list;pos;++pos)
-   {
-      GP<DjVmDir::File> file=files_list[pos];
-      file->offset=0xffffffff;
-      GPosition data_pos;
-      if (!data.contains(file->id, data_pos))
-	       G_THROW( ERR_MSG("DjVmDoc.no_data") "\t" + file->id);
-      file->size=data[data_pos]->get_length();
-      if (!file->size)
-         G_THROW( ERR_MSG("DjVmDoc.zero_file") );
-   }
+  GPList<DjVmDir::File> files_list=dir->get_files_list();
+  for(pos=files_list;pos;++pos)
+  {
+    GP<DjVmDir::File> file=files_list[pos];
+    file->offset=0xffffffff;
+    GPosition data_pos=data.contains(file->get_load_name());
+    if (!data_pos)
+      G_THROW( ERR_MSG("DjVmDoc.no_data") "\t" + file->get_load_name());
+    file->size=data[data_pos]->get_length();
+    if (!file->size)
+      G_THROW( ERR_MSG("DjVmDoc.zero_file") );
+  }
    
-   GP<ByteStream> tmp_str=ByteStream::create();
-   GP<IFFByteStream> gtmp_iff=IFFByteStream::create(tmp_str);
-   IFFByteStream &tmp_iff=*gtmp_iff;
-   tmp_iff.put_chunk("FORM:DJVM", 1);
-   tmp_iff.put_chunk("DIRM");
-   dir->encode(tmp_iff.get_bytestream());
-   tmp_iff.close_chunk();
-   tmp_iff.close_chunk();
-   int offset=tmp_iff.tell();
+  const GP<ByteStream> tmp_str(ByteStream::create());
+  const GP<IFFByteStream> gtmp_iff(IFFByteStream::create(tmp_str));
+  IFFByteStream &tmp_iff=*gtmp_iff;
+  tmp_iff.put_chunk("FORM:DJVM", 1);
+  tmp_iff.put_chunk("DIRM");
+  dir->encode(tmp_iff.get_bytestream());
+  tmp_iff.close_chunk();
+  tmp_iff.close_chunk();
+  int offset=tmp_iff.tell();
 
-   for(pos=files_list;pos;++pos)
-   {
-      if ((offset & 1)!=0) offset++;
+  for(pos=files_list;pos;++pos)
+  {
+    if ((offset & 1)!=0)
+      offset++;
       
-      GP<DjVmDir::File> & file=files_list[pos];
-      file->offset=offset;
-      offset+=file->size;	// file->size has been set in the first pass
-   }
+    GP<DjVmDir::File> & file=files_list[pos];
+    file->offset=offset;
+    offset+=file->size;	// file->size has been set in the first pass
+  }
 
-   DEBUG_MSG("pass 2: store the file contents.\n");
+  DEBUG_MSG("pass 2: store the file contents.\n");
 
-   GP<IFFByteStream> giff=IFFByteStream::create(gstr);
-   IFFByteStream &iff=*giff;
-   iff.put_chunk("FORM:DJVM", 1);
-   iff.put_chunk("DIRM");
-   dir->encode(iff.get_bytestream());
-   iff.close_chunk();
+  GP<IFFByteStream> giff=IFFByteStream::create(gstr);
+  IFFByteStream &iff=*giff;
+  iff.put_chunk("FORM:DJVM", 1);
+  iff.put_chunk("DIRM");
+  dir->encode(iff.get_bytestream());
+  iff.close_chunk();
 
-   for(pos=files_list;pos;++pos)
-   {
-      GP<DjVmDir::File> & file=files_list[pos];
+  for(pos=files_list;pos;++pos)
+  {
+    GP<DjVmDir::File> & file=files_list[pos];
 
-      GP<DataPool> pool=data[file->id];
-      GP<ByteStream> str_in=pool->get_stream();
+    const GP<DataPool> pool=get_data(file->get_load_name());
+    const GP<ByteStream> str_in(pool->get_stream());
+    if ((iff.tell() & 1)!=0)
+    {
+      iff.write8(0);
+    }
+    iff.copy(*str_in);
+  }
 
-	 // First check that the file is in IFF format
-      G_TRY {
-               GP<IFFByteStream> giff_in=IFFByteStream::create(str_in);
-               IFFByteStream &iff_in=*giff_in;
-	       int size;
-	       GUTF8String chkid;
-	       size=iff_in.get_chunk(chkid);
-	       if (size<0 || size>0x7fffffff)
-	          G_THROW( ERR_MSG("DjVmDoc.not_IFF") "\t" + file->id);
-      } G_CATCH_ALL {
-	       G_THROW( ERR_MSG("DjVmDoc.not_IFF") "\t" + file->id);
-      } G_ENDCATCH;
+  iff.close_chunk();
+  iff.flush();
 
-	 // Now copy the file contents
-      str_in=pool->get_stream();	// Rewind doesn't work
-      if ((iff.tell() & 1)!=0) { char ch=0; iff.write(&ch, 1); }
-      iff.copy(*str_in);
-   }
-
-   iff.close_chunk();
-   iff.flush();
-
-   DEBUG_MSG("done storing DjVm file.\n");
+  DEBUG_MSG("done storing DjVm file.\n");
 }
 
 void
@@ -220,7 +290,7 @@ DjVmDoc::read(const GP<DataPool> & pool)
    DEBUG_MSG("DjVmDoc::read(): reading the BUNDLED doc contents from the pool\n");
    DEBUG_MAKE_INDENT(3);
    
-   GP<ByteStream> str=pool->get_stream();
+   const GP<ByteStream> str(pool->get_stream());
    
    GP<IFFByteStream> giff=IFFByteStream::create(str);
    IFFByteStream &iff=*giff;
@@ -245,8 +315,8 @@ DjVmDoc::read(const GP<DataPool> & pool)
    {
       DjVmDir::File * f=files_list[pos];
       
-      DEBUG_MSG("reading contents of file '" << f->id << "'\n");
-      data[f->id]=DataPool::create(pool, f->offset, f->size);
+      DEBUG_MSG("reading contents of file '" << f->get_load_name() << "'\n");
+      data[f->get_load_name()]=DataPool::create(pool, f->offset, f->size);
    }
 }
 
@@ -273,7 +343,7 @@ DjVmDoc::read(const GURL &url)
    DEBUG_MAKE_INDENT(3);
 
    GP<DataPool> pool=DataPool::create(url);
-   GP<ByteStream> str=pool->get_stream();
+   const GP<ByteStream> str(pool->get_stream());
    GP<IFFByteStream> giff=IFFByteStream::create(str);
    IFFByteStream &iff=*giff;
    GUTF8String chkid;
@@ -302,17 +372,16 @@ DjVmDoc::read(const GURL &url)
       {
 	 DjVmDir::File * f=files_list[pos];
       
-	 DEBUG_MSG("reading contents of file '" << f->id << "'\n");
+	 DEBUG_MSG("reading contents of file '" << f->get_load_name() << "'\n");
 
-//         const GURL::Filename::UTF8 url(GOS::expand_name(f->name,dir_name));
-         const GURL::UTF8 url(f->name,dirbase);
-	 data[f->id]=DataPool::create(url);
+         const GURL::UTF8 url(f->get_load_name(),dirbase);
+	 data[f->get_load_name()]=DataPool::create(url);
       }
    }
 }
 
 void
-DjVmDoc::write_index(GP<ByteStream> str)
+DjVmDoc::write_index(const GP<ByteStream> &str)
 {
    DEBUG_MSG("DjVmDoc::write_index(): Storing DjVm index file\n");
    DEBUG_MAKE_INDENT(3);
@@ -323,11 +392,12 @@ DjVmDoc::write_index(GP<ByteStream> str)
       GP<DjVmDir::File> file=files_list[pos];
       file->offset=0;
 
-      GPosition data_pos;
-      if (!data.contains(file->id, data_pos))
-	       G_THROW( ERR_MSG("DjVmDoc.no_data") "\t" + file->id);
+      GPosition data_pos=data.contains(file->get_load_name());
+      if (!data_pos)
+	G_THROW( ERR_MSG("DjVmDoc.no_data") "\t" + file->get_load_name());
       file->size=data[data_pos]->get_length();
-      if (!file->size) G_THROW( ERR_MSG("DjVmDoc.zero_file") );
+      if (!file->size)
+        G_THROW( ERR_MSG("DjVmDoc.zero_file") );
    }
 
    GP<IFFByteStream> giff=IFFByteStream::create(str);
@@ -341,7 +411,68 @@ DjVmDoc::write_index(GP<ByteStream> str)
 }
 
 void
-DjVmDoc::expand(const GURL &codebase, const char * idx_name)
+DjVmDoc::save_page(
+  const GURL &codebase, const DjVmDir::File &file) const
+{
+  GMap<GUTF8String,GUTF8String> incl;
+  save_file(codebase,file,&incl);
+}
+
+void
+DjVmDoc::save_page(
+  const GURL &codebase, const DjVmDir::File &file,
+  GMap<GUTF8String,GUTF8String> &incl ) const
+{
+  save_file(codebase,file,&incl);
+}
+
+void
+DjVmDoc::save_file(
+  const GURL &codebase, const DjVmDir::File &file) const
+{
+  save_file(codebase,file,0);
+}
+
+GUTF8String 
+DjVmDoc::save_file(const GURL &codebase, const DjVmDir::File &file,
+  GMap<GUTF8String,GUTF8String> &incl, const GP<DataPool> &pool) const
+{
+  const GUTF8String save_name(file.get_save_name());
+  const GURL::UTF8 new_url(save_name,codebase);
+  DEBUG_MSG("storing file '"<<new_url<<"'\n");
+  DataPool::load_file(new_url);
+  const GP<ByteStream> str_in(pool->get_stream());
+  const GP<ByteStream> str_out(ByteStream::create(new_url, "wb"));
+  ::save_file( *IFFByteStream::create(str_in),
+      *IFFByteStream::create(str_out), *dir, incl);
+  return save_name;
+}
+
+void
+DjVmDoc::save_file(
+  const GURL &codebase, const DjVmDir::File &file,
+  GMap<GUTF8String,GUTF8String> *incl) const
+{
+  const GUTF8String load_name=file.get_load_name();
+  if(!incl || !incl->contains(load_name))
+  {
+    GMap<GUTF8String,GUTF8String> new_incl;
+    const GUTF8String save_name(
+      save_file(codebase,file,new_incl,get_data(load_name)));
+
+    if(incl)
+    {
+      (*incl)[load_name]=save_name;
+      for(GPosition pos=new_incl;pos;++pos)
+      {
+        save_file(codebase,file,incl);
+      }
+    }
+  }
+}
+
+void
+DjVmDoc::expand(const GURL &codebase, const GUTF8String &idx_name)
 {
    DEBUG_MSG("DjVmDoc::expand(): Expanding into '" << codebase << "'\n");
    DEBUG_MAKE_INDENT(3);
@@ -352,26 +483,11 @@ DjVmDoc::expand(const GURL &codebase, const char * idx_name)
    GPList<DjVmDir::File> files_list=dir->get_files_list();
    for(pos=files_list;pos;++pos)
    {
-      GP<DjVmDir::File> & file=files_list[pos];
-      
-      GPosition data_pos;
-      if (!data.contains(file->id, data_pos))
-	       G_THROW( ERR_MSG("DjVmDoc.no_data") "\t" + file->id);
-
-//      const GURL::Filename::UTF8 url(GOS::expand_name(file->name, GOS::url_to_filename(codebase)));
-      const GURL::UTF8 url(file->name,codebase);
-      DEBUG_MSG("storing file '" << url << "'\n");
-
-      GP<ByteStream> str_in=data[data_pos]->get_stream();
-      DataPool::load_file(url);
-      GP<ByteStream> str_out=ByteStream::create(url, "wb");
-      str_out->writall(octets, 4);
-      str_out->copy(*str_in);
+     save_file(codebase,*files_list[pos]);
    }
 
-   if (idx_name && strlen(idx_name))
+   if (idx_name.length())
    {
-//      const GURL::Filename::UTF8 idx_url(GOS::expand_name(idx_name, GOS::url_to_filename(codebase)));
       const GURL::UTF8 idx_url(idx_name, codebase);
    
       DEBUG_MSG("storing index file '" << idx_url << "'\n");
@@ -381,3 +497,4 @@ DjVmDoc::expand(const GURL &codebase, const char * idx_name)
       write_index(str);
    }
 }
+

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDumpHelper.cpp,v 1.20 2001-04-12 00:24:59 bcr Exp $
+// $Id: DjVuDumpHelper.cpp,v 1.21 2001-04-30 23:30:45 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -149,7 +149,7 @@ display_djvm_dirm(ByteStream & out_str, IFFByteStream & iff,
 	                  dir->get_files_num(), dir->get_pages_num());
     for (GPosition p=list; p; ++p)
       out_str.format( "\n%s%s -> %s", (const char*)head, 
-                      (const char*)list[p]->id, (const char*)list[p]->name );
+                      (const char*)list[p]->get_load_name(), (const char*)list[p]->get_save_name() );
   }
   else
   {
@@ -280,7 +280,7 @@ display_chunks(ByteStream & out_str, IFFByteStream &iff,
     {
       GP<DjVmDir::File> rec = djvminfo.map[rawoffset];
       if (rec)
-        out_str.format( "{%s}", (const char*) rec->id);
+        out_str.format( "{%s}", (const char*) rec->get_load_name());
     }
     // Test chunk type
     iff.full_id(fullid);

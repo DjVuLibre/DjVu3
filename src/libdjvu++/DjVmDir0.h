@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVmDir0.h,v 1.17 2001-04-12 00:24:59 bcr Exp $
+// $Id: DjVmDir0.h,v 1.18 2001-04-30 23:30:45 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVMDIR0_H
@@ -58,7 +58,7 @@ class ByteStream;
 
     @memo Directory of DjVu all-in-one-file DjVu documents.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: DjVmDir0.h,v 1.17 2001-04-12 00:24:59 bcr Exp $# */
+    @version #$Id: DjVmDir0.h,v 1.18 2001-04-30 23:30:45 bcr Exp $# */
 
 //@{
 
@@ -98,7 +98,7 @@ public:
    int		get_files_num(void) const;
    
       /// Returns the file record with name #name#
-   GP<FileRec>	get_file(const char * name);
+   GP<FileRec>	get_file(const GUTF8String &name);
 
       /// Returns the file record number #file_num#
    GP<FileRec>	get_file(int file_num);
@@ -106,7 +106,7 @@ public:
       /** Creates a new file record with name #name# at offset
 	  #offset# and size #size#, which is in IFF format if
 	  #iff_file# is #TRUE#. */
-   void		add_file(const char * name, bool iff_file,
+   void		add_file(const GUTF8String &name, bool iff_file,
 			 int offset=-1, int size=-1);
 
       /// Returns the size of the directory if it were encoded in #DIR0# chunk
@@ -138,7 +138,7 @@ public:
   friend int	operator==(const FileRec & f1, const FileRec & f2);
 
   /// Constructs the #FileRec# object
-  FileRec(const char * name, bool iff_file,
+  FileRec(const GUTF8String &name, bool iff_file,
 	      int offset=-1, int size=-1);
   /// Default constructor
   FileRec(void);
@@ -146,10 +146,9 @@ public:
 };
 
 inline
-DjVmDir0::FileRec::FileRec(const char * name_in, bool iff_file_in,
-			   int offset_in, int size_in) :
-      name(name_in), iff_file(iff_file_in),
-      offset(offset_in), size(size_in)
+DjVmDir0::FileRec::FileRec(
+  const GUTF8String &name_in, bool iff_file_in, int offset_in, int size_in)
+: name(name_in), iff_file(iff_file_in), offset(offset_in), size(size_in)
 {
 }
 

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVmDir.cpp,v 1.39 2001-04-12 17:05:31 fcrary Exp $
+// $Id: DjVmDir.cpp,v 1.40 2001-04-30 23:30:45 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -39,47 +39,107 @@
 
 #include "DjVmDir.h"
 #include "BSByteStream.h"
+#include "GURL.h"
 #include "debug.h"
 
 #include <ctype.h>
 
-
-/* Test that a file id is legal (static). */
-
-bool
-DjVmDir::File::is_legal_id(const char *id)
+GP<DjVmDir::File>
+DjVmDir::File::create(const GUTF8String &load_name,
+  const GUTF8String &save_name, const GUTF8String &title,
+  const FILE_TYPE file_type)
 {
-  // This is a minimal check.
-  if (id==0 || id[0]==0 || id[0]=='#')
-    return false;
-  return true;
+  File *file_ptr=new File();
+  GP<File> file=file_ptr;
+  file_ptr->set_load_name(load_name);
+  file_ptr->set_save_name(save_name);
+  file_ptr->set_title(title);
+  file_ptr->flags=(file_type & TYPE_MASK);
+  return file;
+}
+
+const GUTF8String &
+DjVmDir::File::get_save_name(void) const
+{
+  GUTF8String retval=name.length()?name:id;
+  if(!valid_name)
+  {
+    if(GUTF8String(GNativeString(retval)) != retval)
+    {
+      const_cast<bool &>(valid_name)=true;
+      char *buf;
+      GPBuffer<char> gbuf(buf,2*retval.length()+1);
+      char *s=buf;
+      int i=0;
+      for(char c=retval[i++];c;)
+      {
+        static const char hex[]="0123456789ABCDEF";
+        int len=retval.nextChar(i);
+        if(len>1 || ((len == 1)&&(c&0x80)))
+        {
+          do
+          {
+            s++[0]=hex[(c>>4)&0xf];
+            s++[0]=hex[(c&0xf)];
+            c=retval[i++];
+          } while(c && ((--len) > 0));
+        }else
+        {
+          s++[0]=c;
+          c=retval[i++];
+        }
+      }
+      s++[0]=0;
+      const_cast<GUTF8String &>(oldname)=retval;
+      const_cast<GUTF8String &>(name)=buf;
+    }
+    const_cast<bool &>(valid_name)=true;
+  }
+  return *(name.length()?&name:&id);
+}
+
+void
+DjVmDir::File::set_load_name(const GUTF8String &xid)
+{
+  GURL url=GURL::UTF8(xid);
+  if(!url.is_valid())
+  {
+    url=GURL::Filename::UTF8(xid);
+  }
+  id=url.fname();
+}
+
+void
+DjVmDir::File::set_save_name(const GUTF8String &xname)
+{
+  GURL url;
+  if(!xname.length())
+  {
+    GURL url=GURL::UTF8(id);
+    if(!url.is_valid())
+    {
+      name=id;
+    }else
+    {
+      name=url.fname();
+    }
+  }else
+  {
+    GURL url=GURL::UTF8(xname);
+    if(!url.is_valid())
+    {
+      url=GURL::Filename::UTF8(xname);
+    }
+    name=url.fname();
+  }
+  oldname="";
 }
 
 /* DjVmDir::File */
 
-DjVmDir::File::File(void) 
-  : offset(0), size(0), flags(0), page_num(-1)
-{ 
-}
+DjVmDir::File::File(void) : offset(0), size(0), valid_name(false),
+   flags(0), page_num(-1) { }
 
-DjVmDir::File::File(const char *name, const char *id,
-                    const char *title, FILE_TYPE file_type)
-  : name(name), id(id), title(title), offset(0), size(0), page_num(-1)
-{ 
-  if (! File::is_legal_id(id) )
-    G_THROW( ERR_MSG("DjVmDir.bad_file") "\t" + GUTF8String(id));
-  flags=(file_type & TYPE_MASK);
-}
-
-DjVmDir::File::File(const char *name, const char *id,
-                    const char *title, bool page)
-  : name(name), id(id), title(title), offset(0), size(0), page_num(-1)
-{ 
-  if (! File::is_legal_id(id) )
-    G_THROW( ERR_MSG("DjVmDir.bad_file") "\t" + GUTF8String(id));
-  flags=page ? PAGE : INCLUDE;
-}
-   
 GUTF8String
 DjVmDir::File::get_str_type(void) const
 {
@@ -110,7 +170,7 @@ DjVmDir::File::get_str_type(void) const
 const int DjVmDir::version=1;
 
 void 
-DjVmDir::decode(GP<ByteStream> gstr)
+DjVmDir::decode(const GP<ByteStream> &gstr)
 {
    ByteStream &str=*gstr;
    DEBUG_MSG("DjVmDir::decode(): decoding contents of 'DIRM' chunk...\n");
@@ -292,7 +352,7 @@ DjVmDir::decode(GP<ByteStream> gstr)
 }
 
 void
-DjVmDir::encode(GP<ByteStream> gstr, const bool rename) const
+DjVmDir::encode(const GP<ByteStream> &gstr) const
 {
    ByteStream &str=*gstr;
    DEBUG_MSG("DjVmDir::encode(): encoding contents of the 'DIRM' chunk\n");
@@ -357,14 +417,37 @@ DjVmDir::encode(GP<ByteStream> gstr, const bool rename) const
       for(pos=files_list;pos;++pos)
       {
         GP<File> file=files_list[pos];
-        if (!rename && (file->name!=file->id))
+        if(bundled)
         {
-          file->flags|=File::HAS_NAME;
+          if(!file->name.length() || file->name == file->id)
+          {
+            file->flags&=~File::HAS_NAME;
+          }else
+          {
+            file->flags|=File::HAS_NAME;
+          }
         }else
         {
-          file->flags&=~File::HAS_NAME;
+          const GUTF8String new_id=
+            (!bundled && file->name.length() && file->name != file->id)
+              ?file->name:file->id;
+          if(!file->oldname.length() || file->oldname == new_id)
+          {
+            file->flags&=~File::HAS_NAME;
+          }else
+          {
+            file->flags|=File::HAS_NAME;
+          }
         }
-        if (file->title!=file->id)
+        if((!file->name.length() || file->name == file->id)
+          ||(!bundled&&(!file->oldname.length()||(file->oldname == file->name))))
+        {
+          file->flags&=~File::HAS_NAME;
+        }else
+        {
+          file->flags|=File::HAS_NAME;
+        }
+        if (file->title.length() && (file->title!=file->id))
         {
           file->flags|=File::HAS_TITLE;
         }else
@@ -378,18 +461,29 @@ DjVmDir::encode(GP<ByteStream> gstr, const bool rename) const
       for(pos=files_list;pos;++pos)
       {
          GP<File> file=files_list[pos];
-         if(rename)
+         if(!bundled)
          {
-           bs_str.writall((const char*)file->name, file->name.length()+1);
+           bs_str.writestring((file->name.length())?(file->name):(file->id));
+           bs_str.write8(0);
+           if ((file->flags) & File::HAS_NAME)
+           {
+             bs_str.writestring(file->oldname);
+             bs_str.write8(0);
+           }
          }else
          {
-           bs_str.writall((const char*)file->id, file->id.length()+1);
-           if (file->flags & File::HAS_NAME)
-             bs_str.writall((const void*)(const char*)file->name, file->name.length()+1);
+           bs_str.writestring(file->id);
+           bs_str.write8(0);
+           if ((file->flags) & File::HAS_NAME)
+           {
+             bs_str.writestring(file->name);
+             bs_str.write8(0);
+           }
          }
-         if (file->flags & File::HAS_TITLE)
+         if ((file->flags)&File::HAS_TITLE)
          {
-           bs_str.writall((const char*)file->title, file->title.length()+1);
+           bs_str.writestring(file->title);
+           bs_str.write8(0);
          }
       }
    }
@@ -503,8 +597,8 @@ DjVmDir::insert_file(const GP<File> & file, int pos_num)
      pos_num=files_list.size();
 
       // Modify maps
-   if (! File::is_legal_id(file->id))
-     G_THROW( ERR_MSG("DjVmDir.bad_file") "\t" + file->id);
+//   if (! File::is_legal_id(file->id))
+//     G_THROW( ERR_MSG("DjVmDir.bad_file") "\t" + file->id);
    if (id2file.contains(file->id))
      G_THROW( ERR_MSG("DjVmDir.dupl_id2") "\t" + file->id);
    if (name2file.contains(file->name))
@@ -561,9 +655,9 @@ DjVmDir::insert_file(const GP<File> & file, int pos_num)
 }
 
 void
-DjVmDir::delete_file(const char * id)
+DjVmDir::delete_file(const GUTF8String &id)
 {
-   DEBUG_MSG("Deleting file with id='" << id << "'\n");
+   DEBUG_MSG("Deleting file with id='" << (const char *)id << "'\n");
    DEBUG_MAKE_INDENT(3);
 
    GCriticalSectionLock lock((GCriticalSection *) &class_lock);
@@ -571,8 +665,7 @@ DjVmDir::delete_file(const char * id)
    for(GPosition pos=files_list;pos;++pos)
    {
       GP<File> & f=files_list[pos];
-//      if (!strcmp(f->id, id))
-      if (GUTF8String(id) == f->id)
+      if (id == f->id)
       {
          name2file.del(f->name);
          id2file.del(f->id);
@@ -600,7 +693,7 @@ DjVmDir::delete_file(const char * id)
 }
 
 void
-DjVmDir::set_file_name(const char * id, const char * name)
+DjVmDir::set_file_name(const GUTF8String &id, const GUTF8String &name)
 {
    DEBUG_MSG("DjVmDir::set_file_name(): id='" << id << "', name='" << name << "'\n");
    DEBUG_MAKE_INDENT(3);
@@ -627,7 +720,7 @@ DjVmDir::set_file_name(const char * id, const char * name)
 }
 
 void
-DjVmDir::set_file_title(const char * id, const char * title)
+DjVmDir::set_file_title(const GUTF8String &id, const GUTF8String &title)
 {
    DEBUG_MSG("DjVmDir::set_file_title(): id='" << id << "', title='" << title << "'\n");
    DEBUG_MAKE_INDENT(3);
@@ -652,3 +745,4 @@ DjVmDir::set_file_title(const char * id, const char * title)
    file->title=title;
    title2file[title]=file;
 }
+

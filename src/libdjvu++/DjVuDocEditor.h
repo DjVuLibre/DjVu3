@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocEditor.h,v 1.39 2001-04-12 00:24:59 bcr Exp $
+// $Id: DjVuDocEditor.h,v 1.40 2001-04-30 23:30:45 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUDOCEDITOR_H
@@ -51,7 +51,7 @@
 
     @memo DjVu document editor class.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: DjVuDocEditor.h,v 1.39 2001-04-12 00:24:59 bcr Exp $#
+    @version #$Id: DjVuDocEditor.h,v 1.40 2001-04-30 23:30:45 bcr Exp $#
 */
 
 //@{
@@ -145,7 +145,8 @@ public:
    virtual void	save_as(const GURL &where, bool bundled);
 
       /** Saves the specified pages in DjVu #BUNDLED# multipage document. */
-   void		save_pages_as(GP<ByteStream> str, const GList<int> & page_list);
+   void		save_pages_as(
+     const GP<ByteStream> &str, const GList<int> & page_list);
 
       /** Translates page number #page_num# to ID. If #page_num# is invalid,
 	  an exception is thrown. */
@@ -365,7 +366,7 @@ private:
 
    void		check(void);
    GUTF8String	find_unique_id(GUTF8String id);
-   GP<DataPool>	strip_incl_chunks(GP<DataPool> & pool);
+   GP<DataPool>	strip_incl_chunks(const GP<DataPool> & pool);
    void		clean_files_map(void);
    bool		insert_file_type(const GURL &file_url,
                             DjVmDir::File::FILE_TYPE page_type,
@@ -381,8 +382,10 @@ private:
 			  GMap<GUTF8String, void *> & map);
    void		unfile_thumbnails(void);
    void		file_thumbnails(void);
-   void		save_file(const GUTF8String &id, const GURL &codebase,
-			  bool only_modified, GMap<GUTF8String, void *> & map);
+   void	save_file(const GUTF8String &id, const GURL &codebase,
+     const bool only_modified, GMap<GUTF8String, GUTF8String> & map);
+   void	save_file(const GUTF8String &id, const GURL &codebase,
+     GMap<GUTF8String, GUTF8String> & map);
 private: //dummy stuff
    static void save_pages_as(ByteStream *, const GList<int> &);
    static GP<DjVuDocument> create_wait(

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.90 2001-04-29 14:57:04 mchen Exp $
+// $Id: GString.cpp,v 1.91 2001-04-30 23:30:46 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -1854,6 +1854,14 @@ int
 GStringRep::nextSpace(const int from,const int len) const
 {
   return nextCharType(giswspace,from,len,false);
+}
+
+int
+GStringRep::nextChar(const int from) const
+{
+  char const * xptr=data+from;
+  (void)getValidUCS4(xptr);
+  return (int)((size_t)xptr-(size_t)data);
 }
 
 int 

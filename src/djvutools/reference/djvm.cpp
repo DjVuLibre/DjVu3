@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djvm.cpp,v 1.16 2001-04-25 23:04:15 bcr Exp $
+// $Id: djvm.cpp,v 1.17 2001-04-30 23:30:45 bcr Exp $
 // $Name:  $
 
 /** @name djvm
@@ -99,7 +99,7 @@
     @author
     Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: djvm.cpp,v 1.16 2001-04-25 23:04:15 bcr Exp $# */
+    #$Id: djvm.cpp,v 1.17 2001-04-30 23:30:45 bcr Exp $# */
 //@{
 //@}
 
@@ -256,7 +256,7 @@ list(DArray<GUTF8String> &argv)
          {
            printf("%s", "UNKNOWN  ");
          }
-	 printf("   %s\n", (const char *) file->name);
+	 printf("   %s\n", (const char *) file->get_save_name());
       }
    }
 }

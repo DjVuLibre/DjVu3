@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.cpp,v 1.72 2001-04-30 22:31:19 praveen Exp $
+// $Id: ByteStream.cpp,v 1.73 2001-04-30 23:30:45 bcr Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 04/1997
@@ -456,7 +456,7 @@ ByteStream::copy(ByteStream &bsfrom, size_t size)
   for(;;)
     {
       size_t bytes = sizeof(buffer);
-      if (size>0 && bytes>size-total)
+      if (size>0 && bytes+total>size)
         bytes = size - total;
       if (bytes == 0)
         break;
@@ -777,6 +777,7 @@ ByteStream::Stdio::seek(long offset, int whence, bool nothrow)
 {
   if (whence==SEEK_SET && offset>=0 && offset==ftell(fp))
     return 0;
+  clearerr(fp);
   if (fseek(fp, offset, whence)) 
     {
       if (nothrow) return -1;

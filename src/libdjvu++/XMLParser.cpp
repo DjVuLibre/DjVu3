@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: XMLParser.cpp,v 1.3 2001-04-26 23:58:12 bcr Exp $
+// $Id: XMLParser.cpp,v 1.4 2001-04-30 23:30:46 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -615,81 +615,110 @@ lt_XMLParser::Anno::parse(const lt_XMLTags &tags)
   }
 }
 
+#ifdef max
+#undef max
+#endif
+template<class TYPE>
+static inline TYPE max(TYPE a,TYPE b) { return (a>b)?a:b; }
+#ifdef min
+#undef min
+#endif
+template<class TYPE>
+static inline TYPE min(TYPE a,TYPE b) { return (a<b)?a:b; }
+
 // used to build the zone tree
 GRect make_next_layer(
-  DjVuTXT::Zone *parent, const lt_XMLTags &tag, ByteStream *bs, int height)
+  DjVuTXT::Zone &parent, const lt_XMLTags &tag, ByteStream &bs, int height)
 {
   // the plugin thinks there are only Pages, Lines and Words
   // so we don't make Paragraphs, Regions and Columns zones
   // if we did the plugin is not able to search the text but 
   // DjVuToText writes out all the text anyway
-  DjVuTXT::Zone *child = parent;
-  if(tag.name == "WORD" || tag.name == "LINE")
-  {
-    child = parent->append_child();
-    child->ztype = (tag.name == "WORD") ? DjVuTXT::WORD: DjVuTXT::LINE;
-    child->text_start = bs->tell();
-  }
-  
+  char sepchar;
+  DjVuTXT::Zone *child_ptr;
   if(tag.name == "WORD")
+  {
+    child_ptr = parent.append_child();
+    child_ptr->ztype = DjVuTXT::WORD;
+    sepchar=' ';
+  }else if(tag.name == "LINE")
+  {
+    child_ptr = parent.append_child();
+    child_ptr->ztype = DjVuTXT::LINE;
+    sepchar=DjVuTXT::end_of_line;
+  }else if(tag.name == "PARAGRAPH")
+  {
+    child_ptr = parent.append_child();
+    child_ptr->ztype = DjVuTXT::PARAGRAPH;
+    sepchar=DjVuTXT::end_of_paragraph;
+  }else if(tag.name == "REGION")
+  {
+    child_ptr = parent.append_child();
+    child_ptr->ztype = DjVuTXT::REGION;
+    sepchar=DjVuTXT::end_of_region;
+  }else if(tag.name == "PAGECOLUMN")
+  {
+    child_ptr = parent.append_child();
+    child_ptr->ztype = DjVuTXT::COLUMN;
+    sepchar=DjVuTXT::end_of_column;
+  }else
+  {
+    child_ptr = &parent;
+    child_ptr->ztype = DjVuTXT::PAGE;
+    sepchar=0;
+  }
+  DjVuTXT::Zone &child = *child_ptr;
+  child.text_start = bs.tell();
+  GRect ret(child.rect);
+  if(child.ztype == DjVuTXT::WORD)
   {
     GList<int> rectArgs;
     lt_XMLParser::intList(tag.args["coords"], rectArgs);
     GPosition i = rectArgs;
     
-    child->rect.xmin = rectArgs[i];
-    child->rect.ymin = height - 1 - rectArgs[++i];
-    child->rect.xmax = rectArgs[++i];
-    child->rect.ymax = height - 1 - rectArgs[++i];
-    child->text_length = tag.raw.length();
-    bs->write((const char*)tag.raw, child->text_length);
-    return child->rect;
-  }
-  else
+    child.rect.xmin = rectArgs[i];
+    child.rect.ymin = height - 1 - rectArgs[++i];
+    child.rect.xmax = rectArgs[++i];
+    child.rect.ymax = height - 1 - rectArgs[++i];
+    bs.writestring(tag.raw.substr(0,tag.raw.firstEndSpace()));
+    bs.write8(sepchar);
+    child.text_length = bs.tell() - child.text_start;
+  }else
   {
-    GRect ret;
-    int set = 0;
-    for(GPosition i = tag.content; i; ++i)
+    ret.xmin = 65535;
+    ret.ymin = height;
+    ret.xmax = 0;
+    ret.ymax = 0;
+    for(GPosition pos = tag.content; pos; ++pos)
     {
-      GP<lt_XMLTags> t = tag.content[i].tag;
-      child->rect = make_next_layer(child, *t, bs, height);
+      GP<lt_XMLTags> t = tag.content[pos].tag;
+      child.rect = make_next_layer(child, *t, bs, height);
       
-      if(t->name == "LINE")
-      {
-        bs->write("\n", 1);
-      }
-      child->text_length = bs->tell() - child->text_start;
+      if(sepchar)
+        bs.write8(sepchar);
+      child.text_length = bs.tell() - child.text_start;
       
       // find the size of the rect that holds the zone
-      if(!set)
-      {  // on first pass
-        ret.xmin = child->rect.xmin;
-        ret.ymin = child->rect.ymin;
-        ret.xmax = child->rect.xmax;
-        ret.ymax = child->rect.ymax;
-        set = 1;
-      }
-      else
-      {  // grow the rect if needed
-        if(ret.xmin > child->rect.xmin) ret.xmin = child->rect.xmin;
-        if(ret.ymin > child->rect.ymin) ret.ymin = child->rect.ymin;
-        if(ret.xmax < child->rect.xmax) ret.xmax = child->rect.xmax;
-        if(ret.ymax < child->rect.ymax) ret.ymax = child->rect.ymax;
-      }
+      ret.xmin=min(child.rect.xmin,ret.xmin);
+      ret.ymin=min(child.rect.ymin,ret.ymin);
+      ret.xmax=max(child.rect.xmax,ret.xmax);
+      ret.ymax=max(child.rect.ymax,ret.ymax);
     }
-    return ret; // returns the rect that holds the zone
   }
+  return ret; // returns the rect that holds the zone
 }
 
+#if 0
 // used in debugging to see if the zone tree is built right       
-void step_down(DjVuTXT::Zone *parent)
+void step_down(DjVuTXT::Zone &parent)
 {
   if(parent)
   {
-    for(GPosition i = parent->children; i; ++i)
-      step_down(&parent->children[i]);
+    for(GPosition i = parent.children; i; ++i)
+      step_down(*parent.children[i]);
   }
 }
+#endif
 
 void 
 lt_XMLParser::Text::ChangeText(const lt_XMLTags &tags, const GURL &url,const GUTF8String &id, const GUTF8String &width,const GUTF8String &height)
@@ -726,8 +755,8 @@ lt_XMLParser::Text::ChangeText(const lt_XMLTags &tags, const GURL &url,const GUT
   GP<ByteStream> textbs = ByteStream::create(); 
   
   txt->page_zone.text_start = 0;
-  txt->page_zone.rect = make_next_layer(&txt->page_zone, tags, textbs, atoi(height));
-  textbs->write("\0", 1);
+  txt->page_zone.rect = make_next_layer(txt->page_zone, tags, *textbs, atoi(height));
+  textbs->write8(0);
   long len = textbs->tell();
   txt->page_zone.text_length = len;
   textbs->seek(0,SEEK_SET);

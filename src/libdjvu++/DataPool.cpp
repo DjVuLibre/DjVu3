@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DataPool.cpp,v 1.79 2001-04-26 23:58:11 bcr Exp $
+// $Id: DataPool.cpp,v 1.80 2001-04-30 23:30:45 bcr Exp $
 // $Name:  $
 
 
@@ -1310,8 +1310,9 @@ DataPool::load_file(void)
          FCPools::get()->del_pool(furl, this);
          furl=GURL();
 
-         f->stream->seek(0, SEEK_SET);
-         data=f->stream->duplicate();
+         const GP<ByteStream> gbs=f->stream;
+         gbs->seek(0, SEEK_SET);
+         data=gbs->duplicate();
          added_data(0,data->size());   
          set_eof();
 //         char buffer[1024];

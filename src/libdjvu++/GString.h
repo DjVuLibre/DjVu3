@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.h,v 1.68 2001-04-27 15:38:34 bcr Exp $
+// $Id: GString.h,v 1.69 2001-04-30 23:30:46 bcr Exp $
 // $Name:  $
 
 #ifndef _GSTRING_H_
@@ -57,7 +57,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.68 2001-04-27 15:38:34 bcr Exp $# */
+    #$Id: GString.h,v 1.69 2001-04-30 23:30:46 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -135,6 +135,9 @@ public:
   virtual double toDouble(
     GP<GStringRep>& endptr, bool &isDouble) const = 0;
 
+  // return the position of the next character
+  int nextChar( const int from=0 ) const;
+  
   // return next non space position
   int nextNonSpace( const int from=0, const int len=(-1) ) const;
 
@@ -712,6 +715,10 @@ public:
   int nextNonSpace( const int from=0, const int len=(-1) ) const
   { return ptr?(*this)->nextNonSpace(from,len):0; }
 
+  /// Returns next character position.
+  int nextChar( const int from=0 ) const
+  { return ptr?(*this)->nextChar(from):0; }
+
   /// Returns next non space position.
   int nextSpace( const int from=0, const int len=(-1) ) const
   { return ptr?(*this)->nextSpace(from,len):0; }
@@ -723,8 +730,10 @@ protected:
   const char *gstr;
   static void throw_illegal_subscript() no_return;
   static const char *nullstr;
+public:
   GNativeString UTF8ToNative(const bool currentlocale=false) const;
   GUTF8String NativeToUTF8(void) const;
+protected:
   int CheckSubscript(int n) const
   {
     if(n)

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuFile.h,v 1.80 2001-04-26 23:58:12 bcr Exp $
+// $Id: DjVuFile.h,v 1.81 2001-04-30 23:30:45 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUFILE_H
@@ -71,7 +71,7 @@ class DjVuNavDir;
 
     @memo Classes representing DjVu files.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuFile.h,v 1.80 2001-04-26 23:58:12 bcr Exp $#
+    @version #$Id: DjVuFile.h,v 1.81 2001-04-30 23:30:45 bcr Exp $#
 */
 
 //@{
@@ -228,8 +228,8 @@ public:
    void init(const GP<ByteStream> & str);
 
       /** Creator, does the init(ByteStream &str) */
-   static GP<DjVuFile> create(
-     const GP<ByteStream> & str, const ErrorRecoveryAction recover_action=ABORT,
+   static GP<DjVuFile> create( const GP<ByteStream> & str,
+     const ErrorRecoveryAction recover_action=ABORT,
      const bool verbose_eof=true);
    
       /** Initializes a #DjVuFile# object. As you can notice, the data is not
@@ -568,9 +568,9 @@ private:
       // Functions called when the decoding thread starts
    static void	static_decode_func(void *);
    void	decode_func(void);
-   void	decode(GP<ByteStream> str);
-   GUTF8String decode_chunk(const GUTF8String &chkid, GP<ByteStream> str, 
-                        bool djvi, bool djvu, bool iw44);
+   void	decode(const GP<ByteStream> &str);
+   GUTF8String decode_chunk(const GUTF8String &chkid,
+     const GP<ByteStream> &str, bool djvi, bool djvu, bool iw44);
    int		get_dpi(int w, int h);
 
       // Functions dealing with the shape directory (fgjd)
@@ -591,12 +591,10 @@ private:
       // Progress callback: called from time to time
    static void	progress_cb(int pos, void *);
    static void	get_merged_anno(const GP<DjVuFile> & file,
-				GP<ByteStream> str_out,
-				const GList<GURL> & ignore_list,
-				int level, int & max_level,
-				GMap<GURL, void *> & map);
+     const GP<ByteStream> &str_out, const GList<GURL> & ignore_list,
+     int level, int & max_level, GMap<GURL, void *> & map);
    static void	get_text(const GP<DjVuFile> & file,
-				GP<ByteStream> str_out);
+     const GP<ByteStream> &str_out);
 
    void          check() const;
    GP<DjVuNavDir>find_ndir(GMap<GURL, void *> & map);

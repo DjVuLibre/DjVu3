@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVmDir0.cpp,v 1.16 2001-04-12 17:05:31 fcrary Exp $
+// $Id: DjVmDir0.cpp,v 1.17 2001-04-30 23:30:45 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -69,7 +69,8 @@ DjVmDir0::encode(ByteStream & bs)
    for(int i=0;i<num2file.size();i++)
    {
       FileRec & file=*num2file[i];
-      bs.write((const char*)file.name, file.name.length()+1);
+      bs.writestring(file.name);
+      bs.write8(0);
       bs.write8(file.iff_file);
       bs.write32(file.offset);
       bs.write32(file.size);
@@ -97,9 +98,10 @@ DjVmDir0::decode(ByteStream & bs)
 }
 
 GP<DjVmDir0::FileRec>
-DjVmDir0::get_file(const char * name)
+DjVmDir0::get_file(const GUTF8String &name)
 {
-   if (name2file.contains(name)) return name2file[name];
+   if (name2file.contains(name))
+     return name2file[name];
    return 0;
 }
 
@@ -111,12 +113,14 @@ DjVmDir0::get_file(int file_num)
 }
 
 void
-DjVmDir0::add_file(const char * name, bool iff_file, int offset, int size)
+DjVmDir0::add_file(
+  const GUTF8String &name, bool iff_file, int offset, int size)
 {
    DEBUG_MSG("DjVmDir0::add_file(): name='" << name << "', iff=" << iff_file <<
 	     ", offset=" << offset << "\n");
    
-   if (strchr(name, '/')) G_THROW( ERR_MSG("DjVmDir0.no_slash") );
+   if (name.search('/') >= 0)
+     G_THROW( ERR_MSG("DjVmDir0.no_slash") );
    
    GP<FileRec> file=new FileRec(name, iff_file, offset, size);
    name2file[name]=file;

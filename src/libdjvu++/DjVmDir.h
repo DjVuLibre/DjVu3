@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVmDir.h,v 1.35 2001-04-12 00:24:58 bcr Exp $
+// $Id: DjVmDir.h,v 1.36 2001-04-30 23:30:45 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVMDIR_H
@@ -84,7 +84,7 @@
     @memo Implements DjVu multipage document directory
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: DjVmDir.h,v 1.35 2001-04-12 00:24:58 bcr Exp $# */
+    #$Id: DjVmDir.h,v 1.36 2001-04-30 23:30:45 bcr Exp $# */
 //@{
 
 
@@ -134,9 +134,9 @@ public:
    static GP<DjVmDir> create(void) {return new DjVmDir; } ;
 
       /** Decodes the directory from the specified stream. */
-   void decode(GP<ByteStream> stream);
+   void decode(const GP<ByteStream> &stream);
       /** Encodes the directory into the specified stream. */
-   void encode(GP<ByteStream> stream, const bool rename=false) const;
+   void encode(const GP<ByteStream> &stream) const;
       /** Tests if directory defines an {\em indirect} document. */
    bool is_indirect(void) const;
       /** Tests if the directory defines a {\em bundled} document. */
@@ -160,102 +160,133 @@ public:
       /** Returns the number of file records representing pages. */
    int get_pages_num(void) const;
       /** Returns back pointer to the file with #SHARED_ANNO# flag.
-	  Note that there may be only one file with shared annotations
-	  in any multipage DjVu document. */
+        Note that there may be only one file with shared annotations
+        in any multipage DjVu document. */
    GP<File> get_shared_anno_file(void) const;
       /** Changes the title of the file with ID #id#. */
-   void set_file_title(const char * id, const char * title);
+   void set_file_title(const GUTF8String &id, const GUTF8String &title);
       /** Changes the name of the file with ID #id#. */
-   void set_file_name(const char * id, const char * name);
+   void set_file_name(const GUTF8String &id, const GUTF8String &name);
       /** Inserts the specified file record at the specified position.
-	  Specifying #pos# equal to #-1# means to append. */
+        Specifying #pos# equal to #-1# means to append. */
    void insert_file(const GP<File> & file, int pos=-1);
       /** Removes a file record with ID #id#. */
-   void delete_file(const char * id);
+   void delete_file(const GUTF8String &id);
 private:
-   GCriticalSection 	class_lock;
-   GPList<File>		files_list;
-   GPArray<File>	page2file;
-   GPMap<GUTF8String, File>	name2file;
-   GPMap<GUTF8String, File>	id2file;
-   GPMap<GUTF8String, File>	title2file;
+   GCriticalSection class_lock;
+   GPList<File>	files_list;
+   GPArray<File> page2file;
+   GPMap<GUTF8String, File> name2file;
+   GPMap<GUTF8String, File> id2file;
+   GPMap<GUTF8String, File> title2file;
 private: //dummy stuff
    static void decode(ByteStream *);
-   static void encode(ByteStream *, const bool=false);
+   static void encode(ByteStream *);
 };
 
 class DjVmDir::File : public GPEnabled
 {
 public:
-	 // Out of the record: INCLUDE below must be zero and PAGE must be one.
-	 // This is to avoid problems with the File constructor, which now takes
-	 // 'int file_type' as the last argument instead of 'bool is_page'
-   
-	 /** File type. Possible file types are:
-	     \begin{description}
-	     \item[PAGE] This is a top level page file. It may include other
-	     #INCLUDE#d files, which may in turn be shared between
-	     different pages.
-	     \item[INCLUDE] This file is included into some other file inside
-	     this document.
-	     \item[THUMBNAILS] This file contains thumbnails for the document
-	     pages.
-	     \item[SHARED_ANNO] This file contains annotations shared by
-	     all the pages. It's supposed to be included into every page
-	     for the annotations to take effect. There may be only one
-	     file with shared annotations in a document.
-	     \end{description} */
-      enum FILE_TYPE { INCLUDE=0, PAGE=1, THUMBNAILS=2, SHARED_ANNO=3 };
-	 /** File name.  The optional file name must be unique and is assigned
-	     either by encoder or by user when the document is composed.  In the
-	     case of an {\em indirect} document, this is the relative URL of the
-	     file.  By keeping the name in {\em bundled} document we guarantee,
-	     that it can be expanded later into {\em indirect} document and files
-	     will still have the same names. */
-      GUTF8String name;
-	 /** File identifier.  The encoder assigns a unique identifier to each file
-	     in a multipage document. Indirection chunks in other files (#"INCL"#
-	     chunks) may refer to another file using its identifier. */
-      GUTF8String id;
-	 /** File title.  The file title is assigned by the user and may be used as
-	     a shortcut for viewing a particular page.  Names like #"chapter1"# or
-	     #"appendix"# are appropriate. */
-      GUTF8String title;
-	 /** Offset of the file data in a bundled DJVM file.  This number is
-	     relevant in the {\em bundled} case only when everything is packed into
-	     one single file. */
-      int offset;
-	 /** Size of the file data in a bundled DJVM file.  This number is
-	     relevant in the {\em bundled} case only when everything is
-	     packed into one single file. */
-      int size;
-         /** Tests whether a file ID is legal.
-             This function only checks that #id# is syntactically legal.
-             It does not check for duplicate file IDs in a directory. */  
-      static bool is_legal_id(const char *id);
-      GUTF8String get_str_type(void) const;
-	 /** Tests if this file represents a page of the document. */
-      bool is_page(void) const 
-	 { return (flags & TYPE_MASK)==PAGE; }
-	 /** Returns #TRUE# if this file is included into some other files of
-	     this document */
-      bool is_include(void) const
-	 { return (flags & TYPE_MASK)==INCLUDE; }
-	 /** Returns #TRUE# if this file contains thumbnails for the document pages. */
-      bool is_thumbnails(void) const
-	 { return (flags & TYPE_MASK)==THUMBNAILS; }
-	 /** Returns the page number of this file. This function returns
-	     #-1# if this file does not represent a page of the document. */
-      bool is_shared_anno(void) const
-	 { return (flags & TYPE_MASK)==SHARED_ANNO; }
-      int get_page_num(void) const 
-	 { return page_num; } 
-	 /** Default constructor. */
-      File(void);
-	 /** Full constructor. */
-      File(const char *name, const char *id, const char *title, FILE_TYPE file_type);
-	 // Obsolete
-      File(const char *name, const char *id, const char *title, bool page);
+  // Out of the record: INCLUDE below must be zero and PAGE must be one.
+  // This is to avoid problems with the File constructor, which now takes
+  // 'int file_type' as the last argument instead of 'bool is_page'
+  
+  /** File type. Possible file types are:
+     \begin{description}
+       \item[PAGE] This is a top level page file. It may include other
+         #INCLUDE#d files, which may in turn be shared between
+         different pages.
+       \item[INCLUDE] This file is included into some other file inside
+         this document.
+       \item[THUMBNAILS] This file contains thumbnails for the document
+         pages.
+       \item[SHARED_ANNO] This file contains annotations shared by
+         all the pages. It's supposed to be included into every page
+         for the annotations to take effect. There may be only one
+         file with shared annotations in a document.
+     \end{description} */
+  enum FILE_TYPE { INCLUDE=0, PAGE=1, THUMBNAILS=2, SHARED_ANNO=3 };
+protected:
+  /** Default constructor. */
+  File(void);
+
+public:
+  static GP<File> create(void) { return new File(); }
+  static GP<File> create(const GUTF8String &load_name,
+     const GUTF8String &save_name, const GUTF8String &title,
+     const FILE_TYPE file_type);
+
+  /** File name.  The optional file name must be unique and is the name
+      that will be used when the document is saved to an indirect file.
+      If not assigned, the value of #id# will be used for this purpose.
+      By keeping the name in {\em bundled} document we guarantee, that it
+      can be expanded later into {\em indirect} document and files will
+      still have the same names, if the name is legal on a given filesystem.
+    */
+  const GUTF8String &get_save_name(void) const;
+  void set_save_name(const GUTF8String &name);
+
+  /** File identifier.  The encoder assigns a unique identifier to each file
+      in a multipage document. This is the name used when loading files.
+      Indirection chunks in other files (#"INCL"# chunks) may refer to another
+      file using its identifier. */
+  const GUTF8String &get_load_name(void) const;
+  void set_load_name(const GUTF8String &id);
+
+  /** File title.  The file title is assigned by the user and may be used as
+      a shortcut for viewing a particular page.  Names like #"chapter1"# or
+      #"appendix"# are appropriate. */
+  const GUTF8String &get_title() const;
+  void set_title(const GUTF8String &id);
+
+  /** Reports an ascii string indicating file type. */
+  GUTF8String get_str_type(void) const;
+
+  /** Offset of the file data in a bundled DJVM file.  This number is
+      relevant in the {\em bundled} case only when everything is packed into
+      one single file. */
+  int offset;
+
+  /** Size of the file data in a bundled DJVM file.  This number is
+      relevant in the {\em bundled} case only when everything is
+      packed into one single file. */
+  int size;
+
+  /** Have we checked the saved file name, to see if it is valid on the
+      local disk? */
+  bool valid_name;
+
+  /** Tests if this file represents a page of the document. */
+  bool is_page(void) const 
+  {
+    return (flags & TYPE_MASK)==PAGE;
+  }
+
+  /** Returns #TRUE# if this file is included into some other files of
+      this document. */
+  bool is_include(void) const
+  {
+    return (flags & TYPE_MASK)==INCLUDE;
+  }
+
+  /** Returns #TRUE# if this file contains thumbnails for the document pages. */
+  bool is_thumbnails(void) const
+  {
+    return (flags & TYPE_MASK)==THUMBNAILS;
+  }
+
+  /** Returns the page number of this file. This function returns
+      #-1# if this file does not represent a page of the document. */
+  bool is_shared_anno(void) const
+  { return (flags & TYPE_MASK)==SHARED_ANNO; }
+
+  int get_page_num(void) const 
+  { return page_num; } 
+protected:
+  GUTF8String name;
+  GUTF8String oldname;
+  GUTF8String id;
+  GUTF8String title; 
 private:
       friend class DjVmDir;
       enum FLAGS_0 { IS_PAGE_0=1, HAS_NAME_0=2, HAS_TITLE_0=4 };
@@ -263,6 +294,17 @@ private:
       unsigned char flags;
       int page_num;
 };
+
+inline const GUTF8String &
+DjVmDir::File::get_load_name(void) const
+{ return id; }
+
+inline const GUTF8String &
+DjVmDir::File::get_title() const
+{ return *(title.length()?&title:&id); }
+
+inline void
+DjVmDir::File::set_title(const GUTF8String &xtitle) { title=xtitle; }
 
 /** @name Format of the DIRM chunk.
 

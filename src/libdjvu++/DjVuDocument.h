@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocument.h,v 1.85 2001-04-26 23:58:12 bcr Exp $
+// $Id: DjVuDocument.h,v 1.86 2001-04-30 23:30:45 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUDOCUMENT_H
@@ -58,7 +58,7 @@ class ByteStream;
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocument.h,v 1.85 2001-04-26 23:58:12 bcr Exp $#
+    @version #$Id: DjVuDocument.h,v 1.86 2001-04-30 23:30:45 bcr Exp $#
 */
 
 //@{
@@ -606,6 +606,7 @@ public:
 	  If #dont_create# is #FALSE# the function will return the file
 	  only if it already exists. */
    GP<DjVuFile>	get_djvu_file(const GUTF8String &id, bool dont_create=false);
+   GP<DjVuFile>	get_djvu_file(const GURL &url, bool dont_create=false);
       /** Returns a \Ref{DataPool} containing one chunk #TH44# with
 	  the encoded thumbnail for the specified page. The function
 	  first looks for thumbnails enclosed into the document and if
@@ -695,8 +696,7 @@ public:
 	     \item For #INDIRECT# documents this is the name of top-level
 	           index file. All document files will be saved into the
 		   save directory where the index file will resize. */
-   virtual void		save_as(const GURL &where,
-                          const bool bundled=0);
+   virtual void		save_as(const GURL &where, const bool bundled=0);
       //@}
       /** Returns pointer to the internal directory of the document, if it
 	  is in one of the new formats: #BUNDLED# or #INDIRECT#.

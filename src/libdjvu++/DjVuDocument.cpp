@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocument.cpp,v 1.164 2001-04-26 23:58:12 bcr Exp $
+// $Id: DjVuDocument.cpp,v 1.165 2001-04-30 23:30:45 bcr Exp $
 // $Name:  $
 
 
@@ -655,12 +655,13 @@ DjVuDocument::page_to_url(int page_num) const
 	 }
 	 case BUNDLED:
 	 {
-	    if (page_num<0) page_num=0;
+	    if (page_num<0)
+              page_num=0;
 	    if (flags & DOC_DIR_KNOWN)
 	    {
-	       GP<DjVmDir::File> file=djvm_dir->page_to_file(page_num);
-	       if (!file) G_THROW( ERR_MSG("DjVuDocument.big_num") );
-	       url=GURL::UTF8(file->name,init_url);
+	      GP<DjVmDir::File> file=djvm_dir->page_to_file(page_num);
+	      if (!file) G_THROW( ERR_MSG("DjVuDocument.big_num") );
+	      url=GURL::UTF8(file->get_load_name(),init_url);
 	    }
 	    break;
 	 }
@@ -670,8 +671,9 @@ DjVuDocument::page_to_url(int page_num) const
 	    if (flags & DOC_DIR_KNOWN)
 	    {
 	       GP<DjVmDir::File> file=djvm_dir->page_to_file(page_num);
-	       if (!file) G_THROW( ERR_MSG("DjVuDocument.big_num") );
-	       url=GURL::UTF8(file->name,init_url.base());
+	       if (!file)
+                 G_THROW( ERR_MSG("DjVuDocument.big_num") );
+	       url=GURL::UTF8(file->get_load_name(),init_url.base());
 	    }
 	    break;
 	 }
@@ -739,25 +741,36 @@ DjVuDocument::id_to_url(const GUTF8String & id) const
 	    if (flags & DOC_DIR_KNOWN)
 	    {
 	       GP<DjVmDir::File> file=djvm_dir->id_to_file(id);
-	       if (!file) file=djvm_dir->name_to_file(id);
-	       if (!file) file=djvm_dir->title_to_file(id);
-	       if (file) return GURL::UTF8(file->name,init_url);
+	       if (!file)
+               {
+                 file=djvm_dir->name_to_file(id);
+	         if (!file)
+                   file=djvm_dir->title_to_file(id);
+               }
+	       if (file)
+	         return GURL::UTF8(file->get_load_name(),init_url);
 	    }
 	    break;
 	 case INDIRECT:
 	    if (flags & DOC_DIR_KNOWN)
 	    {
 	       GP<DjVmDir::File> file=djvm_dir->id_to_file(id);
-	       if (!file) file=djvm_dir->name_to_file(id);
-	       if (!file) file=djvm_dir->title_to_file(id);
-	       if (file) return GURL::UTF8(file->name,init_url.base());
+	       if (!file)
+               {
+                 file=djvm_dir->name_to_file(id);
+	         if (!file)
+                   file=djvm_dir->title_to_file(id);
+               }
+	       if (file)
+	         return GURL::UTF8(file->get_load_name(),init_url.base());
 	    }
 	    break;
 	 case OLD_BUNDLED:
 	    if (flags & DOC_DIR_KNOWN)
 	    {
 	       GP<DjVmDir0::FileRec> frec=djvm_dir0->get_file(id);
-	       if (frec) return GURL::UTF8(id,init_url);
+	       if (frec)
+                 return GURL::UTF8(id,init_url);
 	    }
 	    break;
 	 case OLD_INDEXED:
@@ -900,61 +913,71 @@ DjVuDocument::invent_url(const GUTF8String &name) const
 GP<DjVuFile>
 DjVuDocument::get_djvu_file(const GUTF8String& id, bool dont_create)
 {
+  check();
+  DEBUG_MSG("DjVuDocument::get_djvu_file(): ID='" << id << "'\n");
+  DEBUG_MAKE_INDENT(3);
+  if (!id.length())
+    return get_djvu_file(-1);
+  if (id.is_int())
+    return get_djvu_file(id.toInt());
+  // I'm locking the flags because depending on what id_to_url()
+  // returns me, I'll be creating DjVuFile in different ways.
+  // And I don't want the situation to change between the moment I call
+  // id_to_url() and I actually create DjVuFile
+  GMonitorLock lock(&flags);
+  GURL url=id_to_url(id);
+  if(url.is_empty())
+  {
+    // If init is complete, we know for sure, that there is no such
+    // file with ID 'id' in the document. Otherwise we have to
+    // create a temporary file and wait for the init to finish
+    if (is_init_complete())
+      return 0;
+    // Invent some dummy temporary URL. I don't care what it will
+    // be. I'll remember the ID and will generate the correct URL
+    // after I learn what the document is
+    url=invent_url(id);
+    DEBUG_MSG("Invented url='" << url << "'\n");
+
+    GCriticalSectionLock lock(&ufiles_lock);
+    for(GPosition pos=ufiles_list;pos;++pos)
+    {
+      GP<UnnamedFile> f=ufiles_list[pos];
+      if (f->url==url)
+        return f->file;
+    }
+    GP<UnnamedFile> ufile=new UnnamedFile(UnnamedFile::ID, id, 0, url, 0);
+
+    // We're adding the record to the list before creating the DjVuFile
+    // because DjVuFile::init() will call request_data(), and the
+    // latter should be able to find the record.
+    //
+    // We also want to keep ufiles_lock to make sure that when
+    // request_data() is called, the record is still there
+    ufiles_list.append(ufile);
+      
+    GP<DjVuFile> file=DjVuFile::create(url,this,recover_errors,verbose_eof);
+    ufile->file=file;
+    return file;
+  }
+  return get_djvu_file(url,dont_create);
+}
+
+GP<DjVuFile>
+DjVuDocument::get_djvu_file(const GURL& url, bool dont_create)
+{
    check();
-   DEBUG_MSG("DjVuDocument::get_djvu_file(): ID='" << id << "'\n");
+   DEBUG_MSG("DjVuDocument::get_djvu_file(): URL='" << url << "'\n");
    DEBUG_MAKE_INDENT(3);
 
-   if (!id.length())
-     return get_djvu_file(-1);
-   if (id.is_int())
-     return get_djvu_file(id.toInt());
-
-   GURL url;
-   {
-	 // I'm locking the flags because depending on what id_to_url()
-	 // returns me, I'll be creating DjVuFile in different ways.
-	 // And I don't want the situation to change between the moment I call
-	 // id_to_url() and I actually create DjVuFile
-      GMonitorLock lock(&flags);
-      url=id_to_url(id);
-      if (url.is_empty())
-      {
-	    // If init is complete, we know for sure, that there is no such
-	    // file with ID 'id' in the document. Otherwise we have to
-	    // create a temporary file and wait for the init to finish
-	 if (is_init_complete()) return 0;
-	 
-	    // Invent some dummy temporary URL. I don't care what it will
-	    // be. I'll remember the ID and will generate the correct URL
-	    // after I learn what the document is
-	 url=invent_url(id);
-	 DEBUG_MSG("Invented url='" << url << "'\n");
-	 
-	 GCriticalSectionLock lock(&ufiles_lock);
-	 for(GPosition pos=ufiles_list;pos;++pos)
-	 {
-	    GP<UnnamedFile> f=ufiles_list[pos];
-	    if (f->url==url) return f->file;
-	 }
-	 GP<UnnamedFile> ufile=new UnnamedFile(UnnamedFile::ID, id, 0, url, 0);
-
-	    // We're adding the record to the list before creating the DjVuFile
-	    // because DjVuFile::init() will call request_data(), and the
-	    // latter should be able to find the record.
-	    //
-	    // We also want to keep ufiles_lock to make sure that when
-	    // request_data() is called, the record is still there
-	 ufiles_list.append(ufile);
-      
-         GP<DjVuFile> file=DjVuFile::create(url,this,recover_errors,verbose_eof);
-	 ufile->file=file;
-	 return file;
-      }
-   }
+   if (url.is_empty())
+     return 0;
 
    GP<DjVuFile> file=url_to_file(url, dont_create);
+
    if (file)
      get_portcaster()->add_route(file, this);
+
    return file;
 }
 
@@ -1215,7 +1238,7 @@ DjVuDocument::get_thumbnail(int page_num, bool dont_decode)
       if (thumb_file)
       {
 	    // That's the file with the desired thumbnail image
-	 thumb_req->thumb_file=get_djvu_file(thumb_file->id);
+	 thumb_req->thumb_file=get_djvu_file(thumb_file->get_load_name());
 	 thumb_req->thumb_chunk=page_num-thumb_start;
 	 thumb_req=add_thumb_req(thumb_req);
 	 process_threqs();
@@ -1437,9 +1460,9 @@ add_file_to_djvm(const GP<DjVuFile> & file, bool page,
 	 
 	    // Finally add it to the document
 	 GUTF8String name=file->get_url().fname();
-	 GP<DjVmDir::File> file_rec=new DjVmDir::File(name, name, name,
-						      page ? DjVmDir::File::PAGE :
-						      DjVmDir::File::INCLUDE);
+	 GP<DjVmDir::File> file_rec=DjVmDir::File::create(
+           name, name, name,
+           page ? DjVmDir::File::PAGE : DjVmDir::File::INCLUDE );
 	 doc.insert_file(file_rec, data, -1);
 
 	    // And repeat for all included files
@@ -1507,7 +1530,7 @@ DjVuDocument::get_url_names(void)
     GPList<DjVmDir::File> files_list=djvm_dir->get_files_list();
     for(GPosition pos=files_list;pos;++pos)
     {
-      GURL url=id_to_url(files_list[pos]->id);
+      GURL url=id_to_url(files_list[pos]->get_load_name());
       map[url]=0;
     }
   }else
@@ -1555,7 +1578,8 @@ DjVuDocument::get_djvm_doc()
    DEBUG_MSG("DjVuDocument::get_djvm_doc(): creating the DjVmDoc\n");
    DEBUG_MAKE_INDENT(3);
 
-   if (!is_init_complete()) G_THROW( ERR_MSG("DjVuDocument.init_not_done") );
+   if (!is_init_complete())
+     G_THROW( ERR_MSG("DjVuDocument.init_not_done") );
 
    GP<DjVmDoc> doc=DjVmDoc::create();
 
@@ -1567,7 +1591,7 @@ DjVuDocument::get_djvm_doc()
       for(GPosition pos=files_list;pos;++pos)
       {
 	 GP<DjVmDir::File> f=new DjVmDir::File(*files_list[pos]);
-	 GP<DjVuFile> file=url_to_file(id_to_url(f->id));
+	 GP<DjVuFile> file=url_to_file(id_to_url(f->get_load_name()));
 	 GP<DataPool> data;
 	 if (file->is_modified()) data=file->get_djvu_data(false);
 	 else data=file->get_init_data_pool();
@@ -1623,23 +1647,23 @@ DjVuDocument::get_djvm_doc()
 void
 DjVuDocument::write(GP<ByteStream> gstr, bool force_djvm)
 {
-   DEBUG_MSG("DjVuDocument::write(): storing DjVmDoc into ByteStream\n");
-   DEBUG_MAKE_INDENT(3);
+  DEBUG_MSG("DjVuDocument::write(): storing DjVmDoc into ByteStream\n");
+  DEBUG_MAKE_INDENT(3);
    
-   GP<DjVmDoc> doc=get_djvm_doc();
-   GP<DjVmDir> dir=doc->get_djvm_dir();
-   if (force_djvm || dir->get_files_num()>1)
-   {
-     doc->write(gstr);
-   }else
-   {
-      GPList<DjVmDir::File> files_list=dir->get_files_list();
-      GP<DataPool> pool=doc->get_data(files_list[files_list]->id);
-      GP<ByteStream> pool_str=pool->get_stream();
-      ByteStream &str=*gstr;
-      str.writall(octets,4);
-      str.copy(*pool_str);
-   }
+  GP<DjVmDoc> doc=get_djvm_doc();
+  GP<DjVmDir> dir=doc->get_djvm_dir();
+  if (force_djvm || dir->get_files_num()>1)
+  {
+    doc->write(gstr);
+  }else
+  {
+    GPList<DjVmDir::File> files_list=dir->get_files_list();
+    GP<DataPool> pool=doc->get_data(files_list[files_list]->get_load_name());
+    GP<ByteStream> pool_str=pool->get_stream();
+    ByteStream &str=*gstr;
+    str.writall(octets,4);
+    str.copy(*pool_str);
+  }
 }
 
 void
