@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVmDoc.cpp,v 1.50 2001-07-03 17:02:32 bcr Exp $
+// $Id: DjVmDoc.cpp,v 1.51 2001-07-06 21:48:53 bcr Exp $
 // $Name:  $
 
 
@@ -245,8 +245,8 @@ DjVmDoc::write(const GP<ByteStream> &gstr,
     for(pos=files_list;pos;++pos)
     {
       GP<DjVmDir::File> file=files_list[pos];
-      if((do_rename=reserved.contains(file->get_load_name()))
-        ||(do_rename=reserved.contains(file->get_save_name())))
+      if((do_rename=(reserved.contains(file->get_load_name())?true:false))
+		  ||(do_rename=(reserved.contains(file->get_save_name())?true:false)))
       {
         break;
       }
