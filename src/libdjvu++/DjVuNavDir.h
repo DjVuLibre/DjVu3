@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuNavDir.h,v 1.1.2.1 1999-04-12 16:48:21 eaf Exp $
+//C- $Id: DjVuNavDir.h,v 1.1.2.2 1999-04-23 21:22:47 eaf Exp $
 
 #ifndef _DJVUNAVDIR_H
 #define _DJVUNAVDIR_H
@@ -45,6 +45,7 @@ public:
    void		encode(ByteStream & str);
 
    void		insert_page(int where, const char * name);
+   void		delete_page(int page_num);
    
    int		get_pages_num(void) const;
    int		url_to_page(const GURL & url) const;

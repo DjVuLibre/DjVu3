@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuNavDir.cpp,v 1.1.2.1 1999-04-12 16:48:22 eaf Exp $
+//C- $Id: DjVuNavDir.cpp,v 1.1.2.2 1999-04-23 21:22:47 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -142,4 +142,19 @@ DjVuNavDir::insert_page(int where, const char * name)
    page2name[where]=name;
    name2page[name]=where;
    url2page[baseURL+name]=where;
+}
+
+void
+DjVuNavDir::delete_page(int page_num)
+{
+   GCriticalSectionLock lk((GCriticalSection *)&lock);
+
+   int pages=page2name.size();
+   
+   if (page_num<0 || page_num>=pages)
+      THROW("Invalid page number passed as input.");
+
+   for(int i=page_num;i<pages-1;i++)
+      page2name[i]=page2name[i+1];
+   page2name.resize(--pages-1);
 }
