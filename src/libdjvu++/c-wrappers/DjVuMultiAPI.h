@@ -10,7 +10,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuMultiAPI.h,v 1.5 2000-01-07 16:58:50 praveen Exp $
+//C- $Id: DjVuMultiAPI.h,v 1.6 2000-01-07 19:40:33 bcr Exp $
 #endif
 
 #ifndef __DJVUMULTIAPI_H__
@@ -25,7 +25,10 @@
 
 /* 
  * $Log: DjVuMultiAPI.h,v $
- * Revision 1.5  2000-01-07 16:58:50  praveen
+ * Revision 1.6  2000-01-07 19:40:33  bcr
+ * We can't pass FILE handles in Windows.
+ *
+ * Revision 1.5  2000/01/07 16:58:50  praveen
  * updated
  *
  * Revision 1.4  2000/01/07 00:28:07  bcr
@@ -140,7 +143,7 @@ void djvu_bundle_perror(djvu_bundle_options [],const char *mesg);
 
 /** This will print usage instructions to the specified output. */
 DJVUAPI
-void djvu_bundle_usage(FILE *out,const char *prog);
+void djvu_bundle_usage(int fd,const char *prog);
 
 /** This is the primary allocation routine for djvu_join_options.
     Even if the values specified are illegal, an options structure
@@ -178,7 +181,7 @@ void djvu_join_perror(djvu_join_options [],const char *mesg);
 
 /** This will print usage instructions to the specified output. */
 DJVUAPI
-void djvu_join_usage(FILE *out,const char *prog);
+void djvu_join_usage(int fd,const char *prog);
 
 #ifdef __cplusplus
 }
