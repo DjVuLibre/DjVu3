@@ -862,7 +862,7 @@ generate_main_makefile()
 SHELL=/bin/sh
 TOPSRCDIR=`unescape $TOPSRCDIR`
 TOPBUILDDIR=`unescape $TOPBUILDDIR`
-SUBDIRS=`unescape $subdirs`
+SUBDIRS=`unescape $1` `unescape $2` `unescape $3`
 EOF
 
     # Insert Makefile fragment
