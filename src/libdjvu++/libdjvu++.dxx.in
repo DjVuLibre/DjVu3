@@ -665,6 +665,7 @@
 //@Include: djvutopnm.cpp
 //@Include: djvumake.cpp
 //@Include: djvuextract.cpp
+//@Include: djvmcvt.cpp
 //@Include: djvm.cpp
 //@}
 
