@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuOptions.h,v 1.12 2000-03-03 22:17:12 bcr Exp $
+ *C- $Id: DjVuOptions.h,v 1.13 2000-03-26 16:16:41 haffner Exp $
  */
 
 #ifndef _DJVU_OPTIONS_H_
@@ -131,6 +131,8 @@ extern const char djvu_shape_filter_level_string[];
 extern const char djvu_pix_filter_level_string[];
 extern const char djvu_inversion_level_string[];
 extern const char djvu_inhibit_foreback_level_string[];
+extern const char djvu_block_size_string[];
+extern const char djvu_block_overlap_string[];
 extern const char djvu_edge_size_string[];
 extern const char djvu_thickening_string[];
 extern const char djvu_render_size_string[];
@@ -145,8 +147,10 @@ extern const char djvu_refine_string[];
 extern const char djvu_background_floss_string[];
 extern const char djvu_limit_mem_usage_string[];
 
+#define djvu_block_size_option {djvu_block_size_string+2,1,0,0xfd}
+#define djvu_block_overlap_option {djvu_block_overlap_string+2,1,0,0xf9}
 #define djvu_background_floss_option {djvu_background_floss_string+2,0,0,0xf8}
-#define djvu_thickening_option {djvu_edge_size_string+2,1,0,0xf6}
+#define djvu_thickening_option {djvu_thickening_string+2,1,0,0xfb}
 #define djvu_threshold_level_option {djvu_threshold_level_string+2,1,0,0xf5}
 #define djvu_shape_filter_level_option {djvu_shape_filter_level_string+2,1,0,0xf4}
 #define djvu_pix_filter_level_option {djvu_pix_filter_level_string+2,1,0,0xf3}

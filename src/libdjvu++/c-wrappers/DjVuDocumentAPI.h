@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuDocumentAPI.h,v 1.28 2000-03-09 22:27:59 bcr Exp $
+ *C- $Id: DjVuDocumentAPI.h,v 1.29 2000-03-26 16:16:41 haffner Exp $
  */
 
 #ifndef _DJVUDOCUMENT_H_
@@ -27,7 +27,10 @@
 
 /*
  * $Log: DjVuDocumentAPI.h,v $
- * Revision 1.28  2000-03-09 22:27:59  bcr
+ * Revision 1.29  2000-03-26 16:16:41  haffner
+ * Added options
+ *
+ * Revision 1.28  2000/03/09 22:27:59  bcr
  * Updated the documentation, again.
  *
  * Revision 1.27  2000/03/08 22:59:46  bcr
@@ -308,6 +311,24 @@ struct djvu_segmenter_options_struct
 
   /** Thickening (in pixels) applied to characters */
   int thickening;
+  /** Size, in pixels , of the block used for local thresholding.
+
+  */
+  int block_size;
+
+  /** Number of small block (used to compute the histograms) by which each large block (used to estimate the thresholding parameters) overlaps the next block.
+
+      Overlapping gives more choice for block boundaries, avoiding to cut characters.
+      \begin{itemize}
+      \item A 0 value corresponds to no overlap. It results of blocking artifacts, as there is no choice on where to place the boundary.
+
+      \item A 1 overlap is usually enough.
+      \item A 2 overlap, making segmentation slower, is more robust when segmenting drawings.
+      \end{itemize}
+
+  */
+  int block_overlap;
+
   /*@}*/
   
   /** @name Options for subsampling
@@ -593,7 +614,9 @@ inline documenttodjvu_options_struct::documenttodjvu_options_struct() :
 inline djvu_segmenter_options_struct::djvu_segmenter_options_struct() :
   pix_filter_level(25), threshold_level(75), shape_filter_level(50),
   inhibit_foreback_level(40), inversion_level(25), edge_size(3),
-  render_size(3), blurring_size(3), fg_subsample(12), bg_subsample(3),
+  render_size(3), blurring_size(3), 
+  block_size(16), block_overlap(1),
+  fg_subsample(12), bg_subsample(3),
   mask_upsample(3),
   resolution_multiplier(1), high_variation_foreground(false), masksub_refine(true) {}
 
