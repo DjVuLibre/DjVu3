@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DataPool.h,v 1.39 2001-01-04 22:04:54 bcr Exp $
+// $Id: DataPool.h,v 1.40 2001-01-09 00:17:37 bcr Exp $
 // $Name:  $
 
 #ifndef _DATAPOOL_H
@@ -64,7 +64,7 @@ class ByteStream;
 
     @memo Thread safe data storage
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DataPool.h,v 1.39 2001-01-04 22:04:54 bcr Exp $#
+    @version #$Id: DataPool.h,v 1.40 2001-01-09 00:17:37 bcr Exp $#
 */
 
 //@{
@@ -510,7 +510,7 @@ public:
    static void	close_all(void);
 
       // Internal. Used by 'OpenFiles'
-   void		clear_stream(void);
+   void		clear_stream(const bool release=false);
 private:
    bool		eof_flag;
    bool		stop_flag;

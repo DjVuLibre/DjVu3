@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocument.cpp,v 1.135 2001-01-04 22:04:54 bcr Exp $
+// $Id: DjVuDocument.cpp,v 1.136 2001-01-09 00:17:37 bcr Exp $
 // $Name:  $
 
 
@@ -1294,7 +1294,8 @@ DjVuDocument::request_data(const DjVuPort * source, const GURL & url)
    DEBUG_MSG("DjVuDocument::request_data(): seeing if we can do it\n");
    DEBUG_MAKE_INDENT(3);
 
-   if (url==init_url) return init_data_pool;
+   if (url==init_url)
+     return init_data_pool;
 
    check();	// Don't put it before 'init_data_pool'
 

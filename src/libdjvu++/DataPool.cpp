@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DataPool.cpp,v 1.59 2001-01-04 22:04:54 bcr Exp $
+// $Id: DataPool.cpp,v 1.60 2001-01-09 00:17:37 bcr Exp $
 // $Name:  $
 
 
@@ -109,6 +109,8 @@ public:
       // had better be closed, it will order every pool from the list to
       // ZERO their references to it
    GP<File>		request_stream(const char * name, DataPool * pool);
+      // If there are more than MAX_STREAM_FILES open, close the oldest.
+   void		prune(void);
       // Removes the pool from the list associated with the stream.
       // If there is nobody else using this stream, the stream will
       // be closed too.
@@ -122,6 +124,7 @@ DataPool::OpenFiles * DataPool::OpenFiles::global_ptr;
 DataPool::OpenFiles::File::File(const char * xname, DataPool * pool) : name(xname)
 {
    DEBUG_MSG("DataPool::OpenFiles::File::File(): Opening file '" << name << "'\n");
+   DEBUG_MAKE_INDENT(3);
    
    open_time=GOS::ticks();
    stream=new StdioByteStream(name, "rb");
@@ -131,6 +134,7 @@ DataPool::OpenFiles::File::File(const char * xname, DataPool * pool) : name(xnam
 DataPool::OpenFiles::File::~File(void)
 {
    DEBUG_MSG("DataPool::OpenFiles::File::~File(): Closing file '" << name << "'\n");
+   DEBUG_MAKE_INDENT(3);
 
       // Make all DataPools using this stream release it (so that
       // the stream can actually be closed)
@@ -142,6 +146,8 @@ DataPool::OpenFiles::File::~File(void)
 int
 DataPool::OpenFiles::File::add_pool(DataPool * pool)
 {
+   DEBUG_MSG("DataPool::OpenFiles::File::add_pool: pool=" << (void *) pool << "\n");
+   DEBUG_MAKE_INDENT(3);
    GCriticalSectionLock lock(&pools_lock);
    if (!pools_list.contains(pool))
      pools_list.append(pool);
@@ -151,17 +157,45 @@ DataPool::OpenFiles::File::add_pool(DataPool * pool)
 int
 DataPool::OpenFiles::File::del_pool(DataPool * pool)
 {
+   DEBUG_MSG("DataPool::OpenFiles::File::del_pool: pool=" << (void *) pool << "\n");
+   DEBUG_MAKE_INDENT(3);
    GCriticalSectionLock lock(&pools_lock);
    GPosition pos;
-   if (pools_list.search(pool, pos)) pools_list.del(pos);
+   if (pools_list.search(pool, pos))
+     pools_list.del(pos);
    return pools_list.size();
 }
 
 inline DataPool::OpenFiles *
 DataPool::OpenFiles::get(void)
 {
-   if (!global_ptr) global_ptr=new OpenFiles();
+   DEBUG_MSG("DataPool::OpenFiles::get()\n");
+   DEBUG_MAKE_INDENT(3);
+   if (!global_ptr)
+     global_ptr=new OpenFiles();
    return global_ptr;
+}
+
+void
+DataPool::OpenFiles::prune(void)
+{
+  DEBUG_MSG("DataPool::OpenFiles::prune(void): " << files_list.size() << "\n");
+  DEBUG_MAKE_INDENT(3);
+  while(files_list.size()>MAX_OPEN_FILES)
+  {
+    // Too many open files (streams). Get rid of the oldest one.
+    unsigned long oldest_time=GOS::ticks();
+    GPosition oldest_pos=files_list;
+    for(GPosition pos=files_list;pos;++pos)
+    {
+      if (files_list[pos]->open_time<oldest_time)
+      {
+        oldest_time=files_list[pos]->open_time;
+        oldest_pos=pos;
+      }
+    }
+    files_list.del(oldest_pos);
+  }
 }
 
 //			  GP<ByteStream> & stream,
@@ -180,12 +214,14 @@ DataPool::OpenFiles::request_stream(const char * name_in, DataPool * pool)
       // another DataPool
    GCriticalSectionLock lock(&files_lock);
    for(GPosition pos=files_list;pos;++pos)
+   {
       if (files_list[pos]->name==name)
       {
 	 DEBUG_MSG("found existing stream\n");
 	 file=files_list[pos];
 	 break;
       }
+   }
 
       // No? Open the stream, but check, that there are not
       // too many streams open
@@ -193,30 +229,18 @@ DataPool::OpenFiles::request_stream(const char * name_in, DataPool * pool)
    {
       file=new File(name, pool);
       files_list.append(file);
-      if (files_list.size()>MAX_OPEN_FILES)
-      {
-	    // Too many open files (streams). Get rid of the oldest one.
-	 unsigned long oldest_time=GOS::ticks();
-	 GPosition oldest_pos=files_list;
-	 for(GPosition pos=files_list;pos;++pos)
-	    if (files_list[pos]->open_time<oldest_time)
-	    {
-	       oldest_time=files_list[pos]->open_time;
-	       oldest_pos=pos;
-	    }
-	 files_list.del(oldest_pos);
-      }
+      prune();
    }
    
    file->add_pool(pool);
    return file;
-//   stream=file->stream;
-//   *stream_lock=&file->stream_lock;
 }
 
 void
 DataPool::OpenFiles::stream_released(ByteStream * stream, DataPool * pool)
 {
+   DEBUG_MSG("DataPool::OpenFiles::stream_release: stream=" << (void *)stream << " pool=" << (void *)pool << "\n");
+   DEBUG_MAKE_INDENT(3);
    GCriticalSectionLock lock(&files_lock);
    for(GPosition pos=files_list;pos;)
    {
@@ -237,6 +261,8 @@ DataPool::OpenFiles::stream_released(ByteStream * stream, DataPool * pool)
 void
 DataPool::OpenFiles::close_all(void)
 {
+  DEBUG_MSG("DataPool::OpenFiles::close_all\n");
+  DEBUG_MAKE_INDENT(3);
   GCriticalSectionLock lock(&files_lock);
   files_list.empty();
 }
@@ -246,7 +272,7 @@ DataPool::OpenFiles::close_all(void)
 //****************************************************************************
 
 /** This class is used to maintain a list of DataPools connected to a file.
-    It's important to have this list if we want to do smth with this file
+    It's important to have this list if we want to do something with this file
     like to modify it or just erase. Since any modifications of the file
     will break DataPools directly connected to it, it would be nice to have
     a mechanism for signaling all the related DataPools to read data into
@@ -272,6 +298,8 @@ public:
 void
 FCPools::add_pool(const char * name_in, DataPool * pool)
 {
+  DEBUG_MSG("FCPools::add_pool: name_in='" << name_in << "' pool=" << (void *)pool << "\n");
+  DEBUG_MAKE_INDENT(3);
    GCriticalSectionLock lock(&map_lock);
 
    if (name_in && strlen(name_in))
@@ -283,13 +311,16 @@ FCPools::add_pool(const char * name_in, DataPool * pool)
         list=(GList<void *> *) map[pos];
       else
         map[name]=list=new GList<void *>();
-      if (!list->contains(pool)) list->append(pool);
+      if (!list->contains(pool))
+        list->append(pool);
    }
 }
 
 void
 FCPools::del_pool(const char * name_in, DataPool * pool)
 {
+  DEBUG_MSG("FCPools::del_pool: name_in='" << name_in << "' pool=" << (void *)pool << "\n");
+  DEBUG_MAKE_INDENT(3);
    GCriticalSectionLock lock(&map_lock);
 
    if (name_in && strlen(name_in))
@@ -314,6 +345,8 @@ FCPools::del_pool(const char * name_in, DataPool * pool)
 void
 FCPools::load_file(const char * name_in)
 {
+  DEBUG_MSG("FCPools::load_file: name_in='" << name_in << "'\n");
+  DEBUG_MAKE_INDENT(3);
    GCriticalSectionLock lock(&map_lock);
 
    if (name_in && strlen(name_in))
@@ -370,6 +403,8 @@ friend class DataPool;
 void
 DataPool::BlockList::clear(void)
 {
+  DEBUG_MSG("DataPool::BlockList::clear()\n");
+  DEBUG_MAKE_INDENT(3);
    GCriticalSectionLock lk(&lock);
    list.empty();
 }
@@ -378,8 +413,12 @@ void
 DataPool::BlockList::add_range(int start, int length)
       // Adds range of known data.
 {
-   if (start<0) G_THROW("DataPool.neg_start");        //  The start offset of the range may not be negative.
-   if (length<=0) G_THROW("DataPool.bad_length");     //  The length must be positive.
+  DEBUG_MSG("DataPool::BlockList::add_range: start=" << start << " length=" << length << "\n");
+  DEBUG_MAKE_INDENT(3);
+   if (start<0)
+     G_THROW("DataPool.neg_start");        //  The start offset of the range may not be negative.
+   if (length<=0)
+     G_THROW("DataPool.bad_length");     //  The length must be positive.
    if (length>0)
    {
       GCriticalSectionLock lk(&lock);
@@ -455,7 +494,11 @@ DataPool::BlockList::get_bytes(int start, int length) const
       // Returns the number of bytes of data available in the range
       // [start, start+length[. There may be holes between data chunks
 {
-   if (length<0) G_THROW("DataPool.bad_length");        //  The length must be positive.
+  DEBUG_MSG("DataPool::BlockList::get_bytes: start=" << start << " length=" << length << "\n");
+  DEBUG_MAKE_INDENT(3);
+
+   if (length<0)
+     G_THROW("DataPool.bad_length");        //  The length must be positive.
 
    GCriticalSectionLock lk((GCriticalSection *) &lock);
    int bytes=0;
@@ -488,8 +531,12 @@ DataPool::BlockList::get_range(int start, int length) const
       // of intersection of this range with [start, start+length[
       // 0 is returned if nothing can be found
 {
-   if (start<0) G_THROW("DataPool.neg_start");    //  The start offset of the range may not be negative.
-   if (length<=0) G_THROW("DataPool.bad_length"); //  The length must be positive.
+  DEBUG_MSG("DataPool::BlockList::get_range: start=" << start << " length=" << length << "\n");
+  DEBUG_MAKE_INDENT(3);
+   if (start<0)
+     G_THROW("DataPool.neg_start");    //  The start offset of the range may not be negative.
+   if (length<=0)
+      G_THROW("DataPool.bad_length"); //  The length must be positive.
 
    GCriticalSectionLock lk((GCriticalSection *) &lock);
    int block_start=0, block_end=0;
@@ -586,6 +633,8 @@ DataPool::init(void)
 
 DataPool::DataPool(void) : DATAPOOL_INIT
 {
+  DEBUG_MSG("DataPool::DataPool()\n");
+  DEBUG_MAKE_INDENT(3);
    init();
 
       // If we maintain the data ourselves, we want to interpret its
@@ -595,6 +644,8 @@ DataPool::DataPool(void) : DATAPOOL_INIT
 
 DataPool::DataPool(ByteStream & str) : DATAPOOL_INIT
 {
+  DEBUG_MSG("DataPool::DataPool: str=" << (void *)&str << "\n");
+  DEBUG_MAKE_INDENT(3);
    init();
 
       // It's nice to have IFF data analyzed in this case too.
@@ -610,6 +661,8 @@ DataPool::DataPool(ByteStream & str) : DATAPOOL_INIT
 DataPool::DataPool(const GP<DataPool> & pool, int start, int length)
 : DATAPOOL_INIT
 {
+  DEBUG_MSG("DataPool::DataPool: pool=" << (void *)((DataPool *)pool) << " start=" << start << " length= " << length << "\n");
+  DEBUG_MAKE_INDENT(3);
    init();
    connect(pool, start, length);
 }
@@ -617,45 +670,63 @@ DataPool::DataPool(const GP<DataPool> & pool, int start, int length)
 DataPool::DataPool(const char * fname, int start, int length)
 : DATAPOOL_INIT
 {
+  DEBUG_MSG("DataPool::DataPool: fname='" << fname << "' start=" << start << " length= " << length << "\n");
+  DEBUG_MAKE_INDENT(3);
    init();
    connect(fname, start, length);
 }
 
+void
+DataPool::clear_stream(const bool release)
+{
+  DEBUG_MSG("DataPool::clear_stream()\n");
+  DEBUG_MAKE_INDENT(3);
+  if(fstream)
+  {
+    GCriticalSectionLock lock(&class_stream_lock);
+    if(fstream)
+    {
+      GP<OpenFiles::File> *ff=(GP<OpenFiles::File> *)fstream;
+      fstream=0;
+      GP<OpenFiles::File> &f=*ff;
+      if(release)
+        OpenFiles::get()->stream_released(f->stream, this);
+      delete (GP<OpenFiles::File> *)ff;
+    }
+  }
+}
+
 DataPool::~DataPool(void)
 {
-   if(fstream)
-   {
-      GCriticalSectionLock lock(&class_stream_lock);
-      if(fstream)
-      {
-        GP<OpenFiles::File> &f=*(GP<OpenFiles::File> *)fstream;
-        OpenFiles::get()->stream_released(f->stream, this);
-        delete (GP<OpenFiles::File> *)fstream;
-        fstream=0;
-      }
-   }
+  DEBUG_MSG("DataPool::~DataPool()\n");
+  DEBUG_MAKE_INDENT(3);
 
-   if (fname.length())
-      FCPools::get()->del_pool(fname, this);
+  clear_stream(true);
+
+  if (fname.length()) 
+  {
+    FCPools::get()->del_pool(fname, this);
+  }
    
-   {
+  {
 	 // Wait until the static_trigger_cb() exits
       GCriticalSectionLock lock(&trigger_lock);
-      if (pool) pool->del_trigger(static_trigger_cb, this);
+      if (pool)
+        pool->del_trigger(static_trigger_cb, this);
       del_trigger(static_trigger_cb, this);
-   }
+  }
 
-   if (pool)
-   {
+  if (pool)
+  {
       GCriticalSectionLock lock(&triggers_lock);
       for(GPosition pos=triggers_list;pos;++pos)
       {
 	 GP<Trigger> trigger=triggers_list[pos];
 	 pool->del_trigger(trigger->callback, trigger->cl_data);
       }
-   }
-   delete block_list;
-   delete active_readers;
+  }
+  delete block_list;
+  delete active_readers;
 }
 
 void
@@ -673,8 +744,10 @@ DataPool::connect(const GP<DataPool> & pool_in, int start_in, int length_in)
    length=length_in;
 
       // The following will work for length<0 too
-   if (pool->has_data(start, length)) eof_flag=true;
-   else pool->add_trigger(start, length, static_trigger_cb, this);
+   if (pool->has_data(start, length))
+     eof_flag=true;
+   else
+     pool->add_trigger(start, length, static_trigger_cb, this);
 
    data=0;
 
@@ -686,7 +759,8 @@ DataPool::connect(const GP<DataPool> & pool_in, int start_in, int length_in)
    {
       GP<Trigger> t=triggers_list[pos];
       int tlength=t->length;
-      if (tlength<0 && length>0) tlength=length-t->start;
+      if (tlength<0 && length>0)
+        tlength=length-t->start;
       pool->add_trigger(start+t->start, tlength, t->callback, t->cl_data);
    }
 }
@@ -697,14 +771,18 @@ DataPool::connect(const char * fname_in, int start_in, int length_in)
    DEBUG_MSG("DataPool::connect(): connecting to a file\n");
    DEBUG_MAKE_INDENT(3);
    
-   if (pool) G_THROW("DataPool.connected1");              //  Already connected to another DataPool.
-   if (fname.length()) G_THROW("DataPool.connected2");    //  Already connected to a file.
-   if (start_in<0) G_THROW("DataPool.neg_start");         //  The start offset of the range may not be negative.
+   if (pool)
+     G_THROW("DataPool.connected1");              //  Already connected to another DataPool.
+   if (fname.length())
+     G_THROW("DataPool.connected2");    //  Already connected to a file.
+   if (start_in<0)
+     G_THROW("DataPool.neg_start");         //  The start offset of the range may not be negative.
 
 
    if (!strcmp(fname_in, "-"))
    {
       DEBUG_MSG("This is stdin => just read the data...\n");
+      DEBUG_MAKE_INDENT(3);
       char buffer[1024];
       int length;
       StdioByteStream str("-", "rb");
@@ -723,8 +801,10 @@ DataPool::connect(const char * fname_in, int start_in, int length_in)
       fname=fname_in;
       start=start_in;
       length=length_in;
-      if (start>=file_size) length=0;
-      else if (length<0 || start+length>=file_size) length=file_size-start;
+      if (start>=file_size)
+        length=0;
+      else if (length<0 || start+length>=file_size)
+        length=file_size-start;
 
       eof_flag=true;
 
@@ -839,6 +919,7 @@ DataPool::add_data(const void * buffer, int offset, int size)
 	 {
 	    DEBUG_MSG("waking up reader: offset=" << reader->offset <<
 		      ", size=" << reader->size << "\n");
+            DEBUG_MAKE_INDENT(3);
 	    reader->event.set();
 	 }
       }
@@ -854,7 +935,8 @@ DataPool::add_data(const void * buffer, int offset, int size)
       // is set, the master and slave DataPools disagree regarding if
       // all data is there or not. These two lines solve the problem
    GCriticalSectionLock lock(&data_lock);
-   if (length>=0 && data->size()>=length) set_eof();
+   if (length>=0 && data->size()>=length)
+     set_eof();
 }
 
 bool
@@ -886,6 +968,8 @@ public:
 int
 DataPool::get_data(void * buffer, int offset, int sz, int level)
 {
+   DEBUG_MSG("DataPool::get_data()\n");
+   DEBUG_MAKE_INDENT(3);
    Incrementor inc(*active_readers);
    
    if (stop_flag)
@@ -894,14 +978,22 @@ DataPool::get_data(void * buffer, int offset, int sz, int level)
        !has_data(offset, sz))
      G_THROW("STOP");
    
-   if (sz < 0) G_THROW("DataPool.bad_size");        //  Size must be non negative
-   if (sz == 0) return 0;
+   if (sz < 0)
+     G_THROW("DataPool.bad_size");        //  Size must be non negative
+
+   if (! sz)
+     return 0;
 
    if (pool)
    {
-      if (length>0 && offset+sz>length) sz=length-offset;
-      if (sz<0) sz=0;
-      while(1)
+      DEBUG_MSG("DataPool::get_data(): from pool\n");
+      DEBUG_MAKE_INDENT(3);
+      int retval=0;
+      if (length>0 && offset+sz>length)
+        sz=length-offset;
+      if (sz<0)
+        sz=0;
+      for(;;)
       {
 	    // Ask the underlying (master) DataPool for data. Note, that
 	    // master DataPool may throw the "DATA_POOL_REENTER" exception
@@ -910,20 +1002,28 @@ DataPool::get_data(void * buffer, int offset, int sz, int level)
 	    // should return to the most upper level and then reenter the
 	    // DataPools hierarchy. Some of them will be stopped by "STOP"
 	    // exception.
-	 G_TRY {
-	    if (stop_flag || stop_blocked_flag && !is_eof() &&
-        !has_data(offset, sz)) G_THROW("STOP");
-	    return pool->get_data(buffer, start+offset, sz, level+1);
+	 G_TRY
+         {
+	    if(stop_flag||stop_blocked_flag&&!is_eof()&&!has_data(offset, sz))
+              G_THROW("STOP");
+	    retval=pool->get_data(buffer, start+offset, sz, level+1);
 	 } G_CATCH(exc) {
+            pool->clear_stream();
 	    if (strcmp(exc.get_cause(), "DataPool.reenter") || level)
 	      G_RETHROW;
 	 } G_ENDCATCH;
+         pool->clear_stream();
+         return retval;
       }
    } 
    else if (fname.length())
    {
-      if (length>0 && offset+sz>length) sz=length-offset;
-      if (sz<0) sz=0;
+      DEBUG_MSG("DataPool::get_data(): from file\n");
+      DEBUG_MAKE_INDENT(3);
+      if (length>0 && offset+sz>length)
+        sz=length-offset;
+      if (sz<0)
+        sz=0;
       
       GCriticalSectionLock lock1(&class_stream_lock);
       if (!fstream)
@@ -934,11 +1034,13 @@ DataPool::get_data(void * buffer, int offset, int sz, int level)
       }
       GP<OpenFiles::File> &f=*(GP<OpenFiles::File> *)fstream;
       GCriticalSectionLock lock2(&(f->stream_lock));
-      f->stream->seek(start+offset, SEEK_SET);
+      f->stream->seek(start+offset, SEEK_SET); 
       return f->stream->readall(buffer, sz);
    } 
    else
    {
+      DEBUG_MSG("DataPool::get_data(): direct\n");
+      DEBUG_MAKE_INDENT(3);
 	 // We're not connected to anybody => handle the data
       int size=block_list->get_range(offset, sz);
       if (size>0)
@@ -1017,14 +1119,19 @@ DataPool::wait_for_data(const GP<Reader> & reader)
 #if THREADMODEL==NOTHREADS
    G_THROW("DataPool.no_threadless");  // Internal error. This function can't be used in threadless mode.
 #else
-   while(1)
+   for(;;)
    {
-      if (stop_flag) G_THROW("STOP");
-      if (reader->reenter_flag) G_THROW("DataPool.reenter");    //  DATA_POOL_REENTER
-      if (eof_flag || block_list->get_bytes(reader->offset, 1)) return;
-      if (pool || fname.length()) return;
+      if (stop_flag)
+        G_THROW("STOP");
+      if (reader->reenter_flag)
+        G_THROW("DataPool.reenter");    //  DATA_POOL_REENTER
+      if (eof_flag || block_list->get_bytes(reader->offset, 1))
+        return;
+      if (pool || fname.length())
+        return;
 
-      if (stop_blocked_flag) G_THROW("STOP");
+      if (stop_blocked_flag)
+        G_THROW("STOP");
 
       DEBUG_MSG("calling event.wait()...\n");
       reader->event.wait();
@@ -1118,7 +1225,8 @@ DataPool::restart_readers(void)
       reader->event.set();
    }
       
-   if (pool) pool->restart_readers();
+   if (pool)
+     pool->restart_readers();
 }
 
 void
@@ -1276,7 +1384,7 @@ DataPool::del_trigger(void (* callback)(void *), void * cl_data)
    DEBUG_MSG("DataPool::del_trigger(): func=" << (void *) callback << "\n");
    DEBUG_MAKE_INDENT(3);
 
-   while(true)
+   for(;;)
    {
       GP<Trigger> trigger;
       {
@@ -1291,7 +1399,8 @@ DataPool::del_trigger(void (* callback)(void *), void * cl_data)
 	       ++pos;
 	       triggers_list.del(this_pos);
 	       break;
-	    } else ++pos;
+	    } else
+              ++pos;
 	 }
       }
 
@@ -1301,11 +1410,14 @@ DataPool::del_trigger(void (* callback)(void *), void * cl_data)
 	 // check_triggers() locks the trigger for the duration of the
 	 // trigger callback. Thus we will wait for the trigger callback
 	 // to finish and avoid client's destruction.
-      if (trigger) trigger->disabled=1;
-      else break;
+      if (trigger)
+        trigger->disabled=1;
+      else
+        break;
    }
 
-   if (pool) pool->del_trigger(callback, cl_data);
+   if (pool)
+     pool->del_trigger(callback, cl_data);
 }
 
 void
@@ -1508,6 +1620,7 @@ DataPool::get_stream(void)
    return new PoolByteStream(this);
 }
 
+#if 0
 void
 DataPool::clear_stream(void)
 {
@@ -1521,6 +1634,7 @@ DataPool::clear_stream(void)
     }
   }
 }
+#endif
 
 inline
 DataPool::Counter::operator int(void) const

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuFile.cpp,v 1.142 2001-01-04 22:04:54 bcr Exp $
+// $Id: DjVuFile.cpp,v 1.143 2001-01-09 00:17:37 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -200,7 +200,8 @@ DjVuFile::~DjVuFile(void)
   
   // Unregister the trigger (we don't want it to be called and attempt
   // to access the destroyed object)
-  if (data_pool) data_pool->del_trigger(static_trigger_cb, this);
+  if (data_pool)
+    data_pool->del_trigger(static_trigger_cb, this);
   
   // We don't have to wait for decoding to finish here. It's already
   // finished (we know it because there is a "life saver" in the
@@ -459,6 +460,7 @@ DjVuFile::decode_func(void)
     } G_ENDCATCH;
   } G_ENDCATCH;
   
+  decode_data_pool->clear_stream();
   G_TRY {
     if (flags.test_and_modify(DECODING, 0, DECODE_OK | INCL_FILES_CREATED, DECODING))
       pcaster->notify_file_flags_changed(this, DECODE_OK | INCL_FILES_CREATED, DECODING);
@@ -576,35 +578,7 @@ void
 DjVuFile::report_error
 (const GException &ex,bool throw_errors)
 {
-/*      Original preserved in case I screw things up
-const char eof_msg[]="Unexpected End Of File Encountered Reading:\n\t%1.1024s";
-if((!verbose_eof)||strcmp(ex.get_cause(),"EOF"))
-{
-if(throw_errors)
-{
-G_EXTHROW(ex);
-}else
-{
-get_portcaster()->notify_error(this,ex.get_cause());
-}
-}else
-{
-GURL url=get_url();
-GString url_str=(const char *) url;
-if (url.is_local_file_url())
-url_str=GOS::url_to_filename(url);
-
-  GString msg;
-  msg.format(eof_msg, (const char *) url_str);
-  if(throw_errors)
-  {
-  G_EXTHROW(ex, msg);
-  }else
-  {
-  get_portcaster()->notify_error(this,msg);
-  }
-  }
-  */
+  data_pool->clear_stream();
   if((!verbose_eof)||strcmp(ex.get_cause(),"EOF"))
   {
     if(throw_errors)
@@ -639,6 +613,8 @@ DjVuFile::process_incl_chunks(void)
 // It happens in insert_file() when it has modified the data
 // and wants to create the actual file
 {
+  DEBUG_MSG("DjVuFile::process_incl_chunks(void)\n");
+  DEBUG_MAKE_INDENT(3);
   check();
   
   int incl_cnt=0;
@@ -692,6 +668,7 @@ DjVuFile::process_incl_chunks(void)
     G_ENDCATCH;
   }
   flags|=INCL_FILES_CREATED;
+  data_pool->clear_stream();
 }
 
 GP<JB2Dict>
@@ -1386,7 +1363,7 @@ DjVuFile::decode_ndir(GMap<GURL, void *> & map)
     if (!iff.get_chunk(chkid)) 
       REPORT_EOF(true)
       
-      int chunks=0;
+    int chunks=0;
     int last_chunk=0;
     G_TRY
     {
@@ -1420,6 +1397,7 @@ DjVuFile::decode_ndir(GMap<GURL, void *> & map)
     }
     G_ENDCATCH;
     
+    data_pool->clear_stream();
     if (dir) return dir;
     
     GPList<DjVuFile> list=get_included_files(false);
@@ -1428,6 +1406,7 @@ DjVuFile::decode_ndir(GMap<GURL, void *> & map)
       GP<DjVuNavDir> d=list[pos]->decode_ndir(map);
       if (d) return d;
     }
+    data_pool->clear_stream();
   }
   return 0;
 }
@@ -1512,6 +1491,7 @@ DjVuFile::get_merged_anno(const GP<DjVuFile> & file,
             }
             iff.close_chunk();
           }
+        file->data_pool->clear_stream();
       }
     }
   }
@@ -1599,6 +1579,7 @@ DjVuFile::get_text(const GP<DjVuFile> & file,
         iff.close_chunk();
       }
     }
+    file->data_pool->clear_stream();
   }
 }
 
@@ -1652,17 +1633,14 @@ DjVuFile::trigger_cb(void)
   inc_files_lock.lock();
   GPList<DjVuFile> files_list=inc_files_list;
   inc_files_lock.unlock();
-  for(GPosition pos=files_list;pos;++pos)
-    if (!files_list[pos]->is_all_data_present())
-    {
-      all=false; break;
-    }
-    if (all)
-    {
-      DEBUG_MSG("It appears, that we have ALL data for '" << url << "'\n");
-      flags|=ALL_DATA_PRESENT;
-      get_portcaster()->notify_file_flags_changed(this, ALL_DATA_PRESENT, 0);
-    }
+  for(GPosition pos=files_list;pos&&!(all=!files_list[pos]->is_all_data_present());++pos)
+    EMPTY_LOOP;
+  if (all)
+  {
+    DEBUG_MSG("DjVuFile::trigger_cb(): We have ALL data for '" << url << "'\n");
+    flags|=ALL_DATA_PRESENT;
+    get_portcaster()->notify_file_flags_changed(this, ALL_DATA_PRESENT, 0);
+  }
 }
 
 void
@@ -1760,6 +1738,7 @@ DjVuFile::get_chunks_number(void)
       report_error(ex,(recover_errors<=SKIP_PAGES));
     }
     G_ENDCATCH;
+    data_pool->clear_stream();
   }
   return chunks_number;
 }
@@ -1847,6 +1826,7 @@ DjVuFile::contains_chunk(const char * chunk_name)
     report_error(ex,(recover_errors <= SKIP_PAGES));
   }
   G_ENDCATCH;
+  data_pool->clear_stream();
   return contains;
 }
 
@@ -1867,6 +1847,7 @@ DjVuFile::contains_anno(void)
     iff.close_chunk();
   }
   
+  data_pool->clear_stream();
   return false;
 }
 
@@ -1887,6 +1868,7 @@ DjVuFile::contains_text(void)
     iff.close_chunk();
   }
   
+  data_pool->clear_stream();
   return false;
 }
 
@@ -2027,6 +2009,8 @@ DjVuFile::add_djvu_data(IFFByteStream & ostr, GMap<GURL, void *> & map,
     // Close iff
     if (top_level) 
       ostr.close_chunk();
+
+  data_pool->clear_stream();
 }
 
 
@@ -2130,6 +2114,7 @@ DjVuFile::remove_anno(void)
   anno=0;
   
   flags|=MODIFIED;
+  data_pool->clear_stream();
 }
 
 void
@@ -2166,6 +2151,7 @@ DjVuFile::remove_text(void)
   text=0;
   
   flags|=MODIFIED;
+  data_pool->clear_stream();
 }
 
 void
@@ -2234,6 +2220,7 @@ DjVuFile::unlink_file(const GP<DataPool> & data, const char * name)
   iff_out.close_chunk();
   iff_out.flush();
   str_out.seek(0, SEEK_SET);
+  data->clear_stream();
   return new DataPool(str_out);
 }
 
@@ -2289,6 +2276,7 @@ DjVuFile::insert_file(const char * id, int chunk_num)
   process_incl_chunks();
   
   flags|=MODIFIED;
+  data_pool->clear_stream();
 }
 #endif
 
