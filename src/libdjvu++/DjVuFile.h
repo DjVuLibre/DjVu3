@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.h,v 1.24 1999-09-07 15:21:49 leonb Exp $
+//C- $Id: DjVuFile.h,v 1.25 1999-09-09 22:26:04 eaf Exp $
  
 #ifndef _DJVUFILE_H
 #define _DJVUFILE_H
@@ -46,7 +46,7 @@
 
     @memo Classes representing DjVu files.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuFile.h,v 1.24 1999-09-07 15:21:49 leonb Exp $#
+    @version #$Id: DjVuFile.h,v 1.25 1999-09-09 22:26:04 eaf Exp $#
 */
 
 //@{
@@ -244,9 +244,9 @@ public:
 	  of #NDIR# chunks and decodes them. */
    GP<DjVuNavDir>	find_ndir(void);
 
-      /** @name Status query functions */
+      /** @name #DjVuFile# flags query functions */
       //@{
-      /** Returns the #DjVuFile# status. The value returned is the
+      /** Returns the #DjVuFile# flags. The value returned is the
 	  result of ORing one or more of the following constants:
 	  \begin{itemize}
 	     \item #DECODING# The decoding is in progress
@@ -265,7 +265,7 @@ public:
 		   is important to know to be sure that the list returned by
 		   \Ref{get_included_files}() is OK.
 	  \end{itemize} */
-   int		get_status(void) const;
+   long		get_flags(void) const;
       /// Returns #TRUE# if the file is being decoded.
    bool		is_decoding(void) const;
       /// Returns #TRUE# if decoding of the file has finished successfully.
@@ -396,8 +396,7 @@ private:
 	    cb(cb), cl_data(cl_data) {};
    };
    bool                 initialized;
-   GMonitor		status_mon;
-   int			status;
+   GSafeFlags		flags;
 
    GCriticalSection	trigger_lock;
    
@@ -444,6 +443,67 @@ private:
 			      GMap<GURL, void *> & map,
 			      bool included_too, bool no_ndir);
 };
+
+inline long
+DjVuFile::get_flags(void) const
+{
+   return flags;
+}
+
+inline bool
+DjVuFile::is_decoding(void) const
+{
+   return (flags & DECODING)!=0;
+}
+
+inline bool
+DjVuFile::is_decode_ok(void) const
+{
+   return (flags & DECODE_OK)!=0;
+}
+
+inline bool
+DjVuFile::is_decode_failed(void) const
+{
+   return (flags & DECODE_FAILED)!=0;
+}
+
+inline bool
+DjVuFile::is_decode_stopped(void) const
+{
+   return (flags & DECODE_STOPPED)!=0;
+}
+
+inline bool
+DjVuFile::is_data_present(void) const
+{
+   return (flags & DATA_PRESENT)!=0;
+}
+
+inline bool
+DjVuFile::is_all_data_present(void) const
+{
+   return (flags & ALL_DATA_PRESENT)!=0;
+}
+
+inline bool
+DjVuFile::are_incl_files_created(void) const
+{
+   return (flags & INCL_FILES_CREATED)!=0;
+}
+
+inline bool
+DjVuFile::is_modified(void) const
+{
+   return (flags & MODIFIED)!=0;
+}
+
+inline void
+DjVuFile::set_modified(bool m)
+{
+   if (m) flags|=MODIFIED;
+   else flags&=~MODIFIED;
+}
 
 inline void
 DjVuFile::disable_standard_port(void)

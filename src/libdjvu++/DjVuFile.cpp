@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.40 1999-09-09 20:48:33 eaf Exp $
+//C- $Id: DjVuFile.cpp,v 1.41 1999-09-09 22:26:04 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -72,7 +72,7 @@ private:
 
 
 DjVuFile::DjVuFile()
-  : file_size(0), initialized(false), status(0)
+  : file_size(0), initialized(false)
 {
 }
 
@@ -200,76 +200,6 @@ DjVuFile::add_destroy_cb(void (* cb)(const DjVuFile *, void *), void * cl_data)
 {
    GCriticalSectionLock lock(&destroy_lock);
    destroy_list.append(new DestroyCB(cb, cl_data));
-}
-
-int
-DjVuFile::get_status(void) const
-{
-   GMonitorLock lock((GMonitor *) &status_mon);
-   return status;
-}
-
-bool
-DjVuFile::is_decoding(void) const
-{
-   GMonitorLock lock((GMonitor *) &status_mon);
-   return (status & DECODING)!=0;
-}
-
-bool
-DjVuFile::is_decode_ok(void) const
-{
-   GMonitorLock lock((GMonitor *) &status_mon);
-   return (status & DECODE_OK)!=0;
-}
-
-bool
-DjVuFile::is_decode_failed(void) const
-{
-   GMonitorLock lock((GMonitor *) &status_mon);
-   return (status & DECODE_FAILED)!=0;
-}
-
-bool
-DjVuFile::is_decode_stopped(void) const
-{
-   GMonitorLock lock((GMonitor *) &status_mon);
-   return (status & DECODE_STOPPED)!=0;
-}
-
-bool
-DjVuFile::is_data_present(void) const
-{
-   GMonitorLock lock((GMonitor *) &status_mon);
-   return (status & DATA_PRESENT)!=0;
-}
-
-bool
-DjVuFile::is_all_data_present(void) const
-{
-   GMonitorLock lock((GMonitor *) &status_mon);
-   return (status & ALL_DATA_PRESENT)!=0;
-}
-
-bool
-DjVuFile::are_incl_files_created(void) const
-{
-   GMonitorLock lock((GMonitor *) &status_mon);
-   return (status & INCL_FILES_CREATED)!=0;
-}
-
-bool
-DjVuFile::is_modified(void) const
-{
-   GMonitorLock lock((GMonitor *) &status_mon);
-   return (status & MODIFIED)!=0;
-}
-
-void
-DjVuFile::set_modified(bool m)
-{
-   if (m) status|=MODIFIED;
-   else status&=~MODIFIED;
 }
 
 unsigned int
@@ -444,7 +374,7 @@ DjVuFile::decode_func(void)
 	    DEBUG_MSG("this_url='" << url << "'\n");
 	    DEBUG_MSG("incl_url='" << f->get_url() << "'\n");
 	    DEBUG_MSG("decoding=" << f->is_decoding() << "\n");
-	    DEBUG_MSG("status='" << f->get_status() << "\n");
+	    DEBUG_MSG("status='" << f->get_flags() << "\n");
 	    THROW("Internal error: an included file has not finished yet.");
 	 }
       }
@@ -452,16 +382,16 @@ DjVuFile::decode_func(void)
       TRY {
 	 if (strcmp(exc.get_cause(), "STOP") == 0)
 	 {
-	    status_mon.enter();
-	    status=status & ~DECODING | DECODE_STOPPED;
-	    status_mon.leave();
+	    flags.enter();
+	    flags=flags & ~DECODING | DECODE_STOPPED;
+	    flags.leave();
 	    pcaster->notify_status(this, GString(url)+" STOPPED");
 	    pcaster->notify_file_stopped(this);
 	 } else
 	 {
-	    status_mon.enter();
-	    status=status & ~DECODING | DECODE_FAILED;
-	    status_mon.leave();
+	    flags.enter();
+	    flags=flags & ~DECODING | DECODE_FAILED;
+	    flags.leave();
 	    pcaster->notify_status(this, GString(url)+" FAILED");
 	    pcaster->notify_error(this, exc.get_cause());
 	    pcaster->notify_file_failed(this);
@@ -472,13 +402,13 @@ DjVuFile::decode_func(void)
    } ENDCATCH;
 
    TRY {
-      status_mon.enter();
+      flags.enter();
       if (is_decoding())
       {
-	 status=status & ~DECODING | DECODE_OK;
-	 status_mon.leave();
+	 flags=flags & ~DECODING | DECODE_OK;
+	 flags.leave();
 	 pcaster->notify_file_done(this);
-      } else status_mon.leave();
+      } else flags.leave();
    } CATCH(exc) {} ENDCATCH;
    DEBUG_MSG("decoding thread for url='" << url << "' ended\n");
 }
@@ -685,7 +615,7 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
         {
           int decode_was_already_started = 1;
           {
-            GMonitorLock( &file->status_mon );
+            GMonitorLock(&file->flags);
             if (!file->is_decoding() &&
                 !file->is_decode_ok() &&
                 !file->is_decode_failed() )
@@ -922,13 +852,13 @@ DjVuFile::start_decode(void)
    DEBUG_MSG("DjVuFile::start_decode(), url='" << url << "'\n");
    DEBUG_MAKE_INDENT(3);
 
-   status_mon.enter();
+   flags.enter();
    TRY {
       if (!is_decoding())
       {
-	 if (status & DECODE_STOPPED) reset();
-	 status&=~(DECODE_OK | DECODE_STOPPED | DECODE_FAILED);
-	 status|=DECODING;
+	 if (flags & DECODE_STOPPED) reset();
+	 flags&=~(DECODE_OK | DECODE_STOPPED | DECODE_FAILED);
+	 flags|=DECODING;
       
 	 delete decode_thread; decode_thread=0;
 	 decode_thread=new GThread();
@@ -941,13 +871,13 @@ DjVuFile::start_decode(void)
 	 decode_thread_started_ev.wait();
       }
    } CATCH(exc) {
-      status&=~DECODING;
-      status|=DECODE_FAILED;
-      status_mon.leave();
+      flags&=~DECODING;
+      flags|=DECODE_FAILED;
+      flags.leave();
       get_portcaster()->notify_file_failed(this);
       RETHROW;
    } ENDCATCH;
-   status_mon.leave();
+   flags.leave();
 }
 
 void
@@ -1010,7 +940,7 @@ DjVuFile::process_incl_chunks(void)
 	 iff.close_chunk();
       }
    }
-   status|=INCL_FILES_CREATED;
+   flags|=INCL_FILES_CREATED;
 }
 
 GP<DjVuNavDir>
@@ -1101,7 +1031,7 @@ DjVuFile::notify_all_data_received(const DjVuPort * src)
    DEBUG_MAKE_INDENT(3);
    if (src!=this) { DEBUG_MSG("it comes from an included file\n"); }
    else DEBUG_MSG("and it comes from us\n");
-   if (status & INCL_FILES_CREATED) { DEBUG_MSG("and we HAVE all files included\n"); }
+   if (flags & INCL_FILES_CREATED) { DEBUG_MSG("and we HAVE all files included\n"); }
    else DEBUG_MSG("and we do NOT have all files included\n");
 #endif
 
@@ -1121,7 +1051,7 @@ DjVuFile::notify_all_data_received(const DjVuPort * src)
       if (all)
       {
 	 DEBUG_MSG("Just got ALL data for '" << url << "'\n");
-	 status|=ALL_DATA_PRESENT;
+	 flags|=ALL_DATA_PRESENT;
 	 get_portcaster()->notify_all_data_received(this);
       }
    }
@@ -1145,7 +1075,7 @@ DjVuFile::trigger_cb(void)
    DEBUG_MAKE_INDENT(3);
 
    file_size=data_pool->get_length();
-   status|=DATA_PRESENT;
+   flags|=DATA_PRESENT;
    get_portcaster()->notify_file_data_received(this);
 
    if (!are_incl_files_created()) process_incl_chunks();
@@ -1162,7 +1092,7 @@ DjVuFile::trigger_cb(void)
    if (all)
    {
       DEBUG_MSG("It appears, that we have ALL data for '" << url << "'\n");
-      status|=ALL_DATA_PRESENT;
+      flags|=ALL_DATA_PRESENT;
       get_portcaster()->notify_all_data_received(this);
    }
 }
