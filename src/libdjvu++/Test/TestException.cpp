@@ -1,17 +1,9 @@
 //C-  -*- C++ -*-
 //C-
-//C- Copyright (c) 1999 AT&T Corp.
-//C- Copyright (c) 2000 LizardTech Inc.
-//C- All rights reserved.
+//C-  Copyright © 2000-2001, LizardTech, Inc. All Rights Reserved.
+//C-              Unauthorized use prohibited.
 //C-
-//C- This software may only be used by you under license from LizardTech
-//C- Inc. A copy of LizardTech's Source Code Agreement is available at
-//C- LizardTech's Internet website having the URL <http://www.lizardtech.com/open>.
-//C- If you received this software without first entering into a license with
-//C- LizardTech, you have an infringing copy of this software and cannot use it
-//C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: TestException.cpp,v 1.11 2000-11-02 02:17:06 bcr Exp $
 
 
 #include <stdio.h>
