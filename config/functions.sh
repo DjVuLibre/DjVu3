@@ -31,7 +31,7 @@
 #C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #
-# $Id: functions.sh,v 1.56 2001-02-02 23:05:53 bcr Exp $
+# $Id: functions.sh,v 1.57 2001-02-07 01:11:20 bcr Exp $
 # $Name:  $
 
 #
@@ -1108,7 +1108,7 @@ then
   echo "Version not found in TOPDIR/SRCDIR/src/include/DjVuVersion.h" 1>&2
   exit 1
 fi
-version=`echo $version|sed -e 's, ,-,g'`
+version=`echo $version|sed -e 's, ,-,g' -e 's,-*$,,g'`
 v=`echo "$version"|sed -n -e 's,^\([0-9]\).*,\1,p'`
 if [ -z "$v" ]
 then
