@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.95 2000-01-10 20:49:35 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.96 2000-01-10 20:51:09 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -535,7 +535,7 @@ DjVuDocument::url_to_page(const GURL & url) const
    DEBUG_MSG("DjVuDocument::url_to_page(): url='" << url << "'\n");
    DEBUG_MAKE_INDENT(3);
 
-   int page_num=0;
+   int page_num=-1;
    if (flags & DOC_TYPE_KNOWN)
       switch(doc_type)
       {
@@ -568,7 +568,7 @@ DjVuDocument::url_to_page(const GURL & url) const
 	 }
 	 default:
 	    THROW("Unknown document type.");
-      };
+      }
    return page_num;
 }
 
