@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuDocumentAPI.h,v 1.4 2000-01-24 21:35:56 haffner Exp $
+ *C- $Id: DjVuDocumentAPI.h,v 1.5 2000-01-24 21:48:03 haffner Exp $
  */
 
 #ifndef _DJVUDOC_H_
@@ -276,28 +276,15 @@ struct djvu_segmenter_options_struct
 
   /*@}*/
 
-  /** The original luminance image and, as a consequence, the mask, have
-      a resolution approximately #upsample_size# times 300dpi.
-      
-      The default value is 1.
+  /** Special indicator for images which are more than 400dpi.
 
-      When it is set to two, shall all the other sizes be multiplied by 2?
-
-      In theory, yes except for \Ref{smoothing_size}.
-
-      In practice, no, as this imply that we process as 600dpi image as if it
-      had the same quality as a 300dpi.  This is not true: 600dpi edges are
-      much sharper.  Moreover, if one uses a 600dpi image input, he/she should
-      also expect a higher quality Djvu output.
-
-      More experiments are necessary, but I recommend leaving the other sizes
-      to their 300dpi values.
+      In theory, upsample_size=(image_dpi/400)+1.
       
       \begin{description}
       \item[Option type] Pixel size.
-      \item[Range] 1..2
-      \item[1] less than 300dpi
-      \item[2] more than 300dpi
+      \item[Range] 1,2
+      \item[1] less than 400dpi
+      \item[2] more than 400dpi
       \item[Default] 1
       \item[Command line] yes
       \end{description}
@@ -350,6 +337,9 @@ struct djvu_segmenter_options_struct
       /* must be conservative here, other characters are lost on 200dpi images, or documents with small low-contrast fonts. */
       pix_filter_level= 25;
       inversion_level= 25;
+
+      /* this parameters has very little influence on most images,
+         but may be very dramatic on few */
       inhibit_foreback_level=40;
 
       edge_size= 3;
