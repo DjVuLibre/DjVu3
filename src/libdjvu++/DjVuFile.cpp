@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.17 1999-08-19 22:23:02 eaf Exp $
+//C- $Id: DjVuFile.cpp,v 1.18 1999-08-19 23:03:52 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -453,7 +453,7 @@ DjVuFile::process_incl_chunk(ByteStream & str)
       {
 	 DEBUG_MSG("creating new file\n");
 	 TRY {
-	    file=new DjVuFile(incl_url, this, cache);
+	    file=create_djvu_file(incl_url, this, cache);
 	 } CATCH(exc) {
 	    THROW("Failed to include file '"+incl_url+"'");
 	 } ENDCATCH;

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.h,v 1.12 1999-08-19 22:23:02 eaf Exp $
+//C- $Id: DjVuFile.h,v 1.13 1999-08-19 23:03:52 eaf Exp $
  
 #ifndef _DJVUFILE_H
 #define _DJVUFILE_H
@@ -46,7 +46,7 @@
 
     @memo Classes representing DjVu files.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuFile.h,v 1.12 1999-08-19 22:23:02 eaf Exp $#
+    @version #$Id: DjVuFile.h,v 1.13 1999-08-19 23:03:52 eaf Exp $#
 */
 
 //@{
@@ -365,18 +365,19 @@ public:
    virtual void		notify_file_failed(const DjVuPort * source);
    virtual void		notify_all_data_received(const DjVuPort * source);
 protected:
-   virtual GP<DjVuFile>	create_djvu_file(const GURL & url, DjVuPort * port,
-					 GCache<GURL, DjVuFile> * cache);
-private:
    GURL			url;
    GP<DataRange>	data_range;
    GCache<GURL, DjVuFile> * cache;
 
-   GMonitor		status_mon;
-   int			status;
-
    GPList<DjVuFile>	inc_files_list;
    GCriticalSection	inc_files_lock;
+
+      // This function will be overriden in DjVuFileEditor
+   virtual GP<DjVuFile>	create_djvu_file(const GURL & url, DjVuPort * port,
+					 GCache<GURL, DjVuFile> * cache);
+private:
+   GMonitor		status_mon;
+   int			status;
 
    GCriticalSection	trigger_lock;
    

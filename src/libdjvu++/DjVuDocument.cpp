@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.17 1999-08-19 22:21:43 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.18 1999-08-19 23:03:52 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -42,6 +42,13 @@ DjVuDocument::DjVuDocument(const GURL & url, DjVuPort * xport,
 DjVuDocument::~DjVuDocument(void)
 {
    delete simple_port; simple_port=0;
+}
+
+GP<DjVuFile>
+DjVuDocument::create_djvu_file(const GURL & url, DjVuPort * port,
+			       GCache<GURL, DjVuFile> * cache)
+{
+   return new DjVuFile(url, port, cache);
 }
 
 void
@@ -452,7 +459,7 @@ DjVuDocument::get_djvu_file(const GURL & url)
    if (cache) file=cache->get_item(url);
    if (!file)
    {
-      file=new DjVuFile(url, this, cache);
+      file=create_djvu_file(url, this, cache);
    } else if (dummy_ndir)
    {
       GP<DjVuNavDir> dir=file->find_ndir();
