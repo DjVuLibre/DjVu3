@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuText.h,v 1.12 2001-04-23 23:27:27 praveen Exp $
+// $Id: DjVuText.h,v 1.13 2001-04-26 23:58:12 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUTEXT_H
@@ -55,7 +55,7 @@
     @memo Implements support for DjVuImage hidden text.
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: DjVuText.h,v 1.12 2001-04-23 23:27:27 praveen Exp $# */
+    #$Id: DjVuText.h,v 1.13 2001-04-26 23:58:12 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -111,8 +111,9 @@ public:
     void normtext(const char *instr, GUTF8String &outstr);
     unsigned int memuse() const;
     static const int version;
-    void encode(ByteStream &bs, const Zone * parent=0, const Zone * prev=0) const;
-    void decode(ByteStream &bs, int maxtext,
+    void encode(
+      const GP<ByteStream> &bs, const Zone * parent=0, const Zone * prev=0) const;
+    void decode(const GP<ByteStream> &bs, int maxtext,
 	            	const Zone * parent=0, const Zone * prev=0);
   };
   /** Textual data for this page.  
@@ -144,9 +145,9 @@ public:
       zones in the hierarchy. Separators are inserted where appropriate. */
   void normalize_text();
   /** Encode data for a TXT chunk. */
-  void encode(ByteStream &bs) const;
+  void encode(const GP<ByteStream> &bs) const;
   /** Decode data from a TXT chunk. */
-  void decode(ByteStream &bs);
+  void decode(const GP<ByteStream> &bs);
   /** Returns a copy of this object. */
   GP<DjVuTXT> copy(void) const;
   /** Searches the TXT chunk for the given string and returns a list of
@@ -208,11 +209,11 @@ public:
 	  chunk with previously decoded information. This function
 	  should be called right after applying \Ref{IFFByteStream::get_chunk}()
 	  to data from #FORM:TEXT#. */
-   void decode(GP<ByteStream> bs);
+   void decode(const GP<ByteStream> &bs);
 
       /** Encodes all annotations back into a sequence of chunks to be put
 	  inside a #FORM:TEXT#. */
-   void	encode(GP<ByteStream> bs);
+   void	encode(const GP<ByteStream> &bs);
 
       /// Returns a copy of this object
    GP<DjVuText>	copy(void) const;

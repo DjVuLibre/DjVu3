@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuText.cpp,v 1.17 2001-04-25 21:30:06 bcr Exp $
+// $Id: DjVuText.cpp,v 1.18 2001-04-26 23:58:12 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -140,8 +140,10 @@ DjVuTXT::Zone::memuse() const
 
 #ifndef NEED_DECODER_ONLY
 void 
-DjVuTXT::Zone::encode(ByteStream &bs, const Zone * parent, const Zone * prev) const
+DjVuTXT::Zone::encode(
+  const GP<ByteStream> &gbs, const Zone * parent, const Zone * prev) const
 {
+  ByteStream &bs=*gbs;
   // Encode type
   bs.write8(ztype);
   
@@ -191,16 +193,17 @@ DjVuTXT::Zone::encode(ByteStream &bs, const Zone * parent, const Zone * prev) co
   // Encode all children
   for (GPosition i=children; i; ++i)
   {
-    children[i].encode(bs, this, prev_child);
+    children[i].encode(gbs, this, prev_child);
     prev_child=&children[i];
   }
 }
 #endif
 
 void 
-DjVuTXT::Zone::decode(ByteStream &bs, int maxtext,
+DjVuTXT::Zone::decode(const GP<ByteStream> &gbs, int maxtext,
 		      const Zone * parent, const Zone * prev)
 {
+  ByteStream &bs=*gbs;
   // Decode type
   ztype = (ZoneType) bs.read8();
   if ( ztype<PAGE || ztype>CHARACTER )
@@ -248,7 +251,7 @@ DjVuTXT::Zone::decode(ByteStream &bs, int maxtext,
   while (size-- > 0) 
   {
     Zone *z = append_child();
-    z->decode(bs, maxtext, this, prev_child);
+    z->decode(gbs, maxtext, this, prev_child);
     prev_child=z;
   }
 }
@@ -274,8 +277,9 @@ DjVuTXT::has_valid_zones() const
 
 #ifndef NEED_DECODER_ONLY
 void 
-DjVuTXT::encode(ByteStream &bs) const
+DjVuTXT::encode(const GP<ByteStream> &gbs) const
 {
+  ByteStream &bs=*gbs;
   if (! textUTF8 )
     G_THROW("DjVuText.no_text");
   // Encode text
@@ -286,14 +290,15 @@ DjVuTXT::encode(ByteStream &bs) const
   if (has_valid_zones())
   {
     bs.write8(Zone::version);
-    page_zone.encode(bs);
+    page_zone.encode(gbs);
   }
 }
 #endif
 
 void 
-DjVuTXT::decode(ByteStream &bs)
+DjVuTXT::decode(const GP<ByteStream> &gbs)
 {
+  ByteStream &bs=*gbs;
   // Read text
   textUTF8.empty();
   int textsize = bs.read24();
@@ -308,7 +313,7 @@ DjVuTXT::decode(ByteStream &bs)
   {
     if (version != Zone::version)
       G_THROW("DjVuText.bad_version\t"+GUTF8String(version));
-    page_zone.decode(bs, textsize);
+    page_zone.decode(gbs, textsize);
   }
 }
 
@@ -645,7 +650,7 @@ DjVuTXT::get_memory_usage() const
 //***************************************************************************
 
 void
-DjVuText::decode(GP<ByteStream> gbs)
+DjVuText::decode(const GP<ByteStream> &gbs)
 {
   GUTF8String chkid;
   GP<IFFByteStream> giff=IFFByteStream::create(gbs);
@@ -657,15 +662,15 @@ DjVuText::decode(GP<ByteStream> gbs)
       if (txt)
         G_THROW("DjVuText.dupl_text");
       txt = DjVuTXT::create();
-      txt->decode(iff);
+      txt->decode(iff.get_bytestream());
     }
     else if (chkid == "TXTz")
     {
       if (txt)
         G_THROW("DjVuText.dupl_text");
       txt = DjVuTXT::create();
-      GP<ByteStream> gbsiff=BSByteStream::create(gbs);
-      txt->decode(*gbsiff);
+      const GP<ByteStream> gbsiff=BSByteStream::create(iff.get_bytestream());
+      txt->decode(gbsiff);
     }
     // Add decoding of other chunks here
     iff.close_chunk();
@@ -673,16 +678,16 @@ DjVuText::decode(GP<ByteStream> gbs)
 }
 
 void
-DjVuText::encode(GP<ByteStream> gbs)
+DjVuText::encode(const GP<ByteStream> &gbs)
 {
   if (txt)
   {
-    GP<IFFByteStream> giff=IFFByteStream::create(gbs);
+    const GP<IFFByteStream> giff=IFFByteStream::create(gbs);
     IFFByteStream &iff=*giff;
     iff.put_chunk("TXTz");
     {
-      GP<ByteStream> gbsiff=BSByteStream::create(gbs,50);
-      txt->encode(*gbsiff);
+      GP<ByteStream> gbsiff=BSByteStream::create(iff.get_bytestream(),50);
+      txt->encode(gbsiff);
     }
     iff.close_chunk();
   }

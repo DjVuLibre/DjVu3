@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuFile.cpp,v 1.167 2001-04-26 16:03:21 mchen Exp $
+// $Id: DjVuFile.cpp,v 1.168 2001-04-26 23:58:12 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -128,7 +128,7 @@ DjVuFile::check() const
 
 GP<DjVuFile>
 DjVuFile::create(
-  ByteStream & str, const ErrorRecoveryAction recover_errors,
+  const GP<ByteStream> & str, const ErrorRecoveryAction recover_errors,
   const bool verbose_eof )
 {
   DjVuFile *file=new DjVuFile();
@@ -140,7 +140,7 @@ DjVuFile::create(
 }
 
 void 
-DjVuFile::init(ByteStream & str)
+DjVuFile::init(const GP<ByteStream> & str)
 {
   DEBUG_MSG("DjVuFile::DjVuFile(): ByteStream constructor\n");
   DEBUG_MAKE_INDENT(3);
@@ -159,6 +159,7 @@ DjVuFile::init(ByteStream & str)
   // Construct some dummy URL
   GUTF8String buffer;
   buffer.format("djvufile:/%p.djvu", this);
+  DEBUG_MSG("DjVuFile::DjVuFile(): url is "<<(const char *)buffer<<"\n");
   url=GURL::UTF8(buffer);
   
   // Set it here because trigger will call other DjVuFile's functions
@@ -195,6 +196,7 @@ DjVuFile::init(const GURL & xurl, GP<DjVuPort> port)
     G_THROW( ERR_MSG("DjVuFile.empty_URL") );
   
   url = xurl;
+  DEBUG_MSG("DjVuFile::DjVuFile(): url is "<<(const char *)url<<"\n");
   file_size=0;
   decode_thread=0;
   
@@ -2081,8 +2083,8 @@ DjVuFile::get_djvu_bytestream(const bool included_too, const bool no_ndir)
 GP<DataPool>
 DjVuFile::get_djvu_data(const bool included_too, const bool no_ndir)
 {
-  GP<ByteStream> pbs = get_djvu_bytestream(included_too, no_ndir);
-  return DataPool::create(*pbs);
+  const GP<ByteStream> pbs = get_djvu_bytestream(included_too, no_ndir);
+  return DataPool::create(pbs);
 }
 
 void
@@ -2134,7 +2136,6 @@ DjVuFile::remove_anno(void)
   DEBUG_MSG("DjVuFile::remove_anno()\n");
   GP<ByteStream> str_in=data_pool->get_stream();
   GP<ByteStream> gstr_out=ByteStream::create();
-  ByteStream &str_out=*gstr_out;
   
   GUTF8String chkid;
   GP<IFFByteStream> giff_in=IFFByteStream::create(str_in);
@@ -2159,8 +2160,8 @@ DjVuFile::remove_anno(void)
   
   iff_out.close_chunk();
   
-  str_out.seek(0, SEEK_SET);
-  data_pool=DataPool::create(str_out);
+  gstr_out->seek(0, SEEK_SET);
+  data_pool=DataPool::create(gstr_out);
   chunks_number=-1;
   
   anno=0;
@@ -2173,9 +2174,8 @@ void
 DjVuFile::remove_text(void)
 {
   DEBUG_MSG("DjVuFile::remove_text()\n");
-  GP<ByteStream> str_in=data_pool->get_stream();
-  GP<ByteStream> gstr_out=ByteStream::create();
-  ByteStream &str_out=*gstr_out;
+  const GP<ByteStream> str_in=data_pool->get_stream();
+  const GP<ByteStream> gstr_out=ByteStream::create();
   
   GUTF8String chkid;
   GP<IFFByteStream> giff_in=IFFByteStream::create(str_in);
@@ -2200,8 +2200,8 @@ DjVuFile::remove_text(void)
   
   iff_out.close_chunk();
   
-  str_out.seek(0, SEEK_SET);
-  data_pool=DataPool::create(str_out);
+  gstr_out->seek(0, SEEK_SET);
+  data_pool=DataPool::create(gstr_out);
   chunks_number=-1;
   
   text=0;
@@ -2227,8 +2227,7 @@ DjVuFile::unlink_file(const GP<DataPool> & data, const GUTF8String &name)
 // containing 'name'
 {
   DEBUG_MSG("DjVuFile::unlink_file()\n");
-  GP<ByteStream> gstr_out=ByteStream::create();
-  ByteStream &str_out=*gstr_out;
+  const GP<ByteStream> gstr_out=ByteStream::create();
   GP<IFFByteStream> giff_out=IFFByteStream::create(gstr_out);
   IFFByteStream &iff_out=*giff_out;
   
@@ -2280,9 +2279,9 @@ DjVuFile::unlink_file(const GP<DataPool> & data, const GUTF8String &name)
   }
   iff_out.close_chunk();
   iff_out.flush();
-  str_out.seek(0, SEEK_SET);
+  gstr_out->seek(0, SEEK_SET);
   data->clear_stream();
-  return DataPool::create(str_out);
+  return DataPool::create(gstr_out);
 }
 
 #ifndef NEED_DECODER_ONLY
@@ -2298,8 +2297,7 @@ DjVuFile::insert_file(const GUTF8String &id, int chunk_num)
   GP<IFFByteStream> giff_in=IFFByteStream::create(str_in);
   IFFByteStream &iff_in=*giff_in;
   
-  GP<ByteStream> gstr_out=ByteStream::create();
-  ByteStream &str_out=*gstr_out;
+  const GP<ByteStream> gstr_out=ByteStream::create();
   GP<IFFByteStream> giff_out=IFFByteStream::create(gstr_out);
   IFFByteStream &iff_out=*giff_out;
   
@@ -2332,8 +2330,8 @@ DjVuFile::insert_file(const GUTF8String &id, int chunk_num)
     }
     iff_out.close_chunk();
   }
-  str_out.seek(0, SEEK_SET);
-  data_pool=DataPool::create(str_out);
+  gstr_out->seek(0, SEEK_SET);
+  data_pool=DataPool::create(gstr_out);
   chunks_number=-1;
   
   // Second: create missing DjVuFiles
@@ -2369,8 +2367,7 @@ DjVuFile::unlink_file(const GUTF8String &id)
   GP<IFFByteStream> giff_in=IFFByteStream::create(str_in);
   IFFByteStream &iff_in=*giff_in;
   
-  GP<ByteStream> gstr_out=ByteStream::create();
-  ByteStream &str_out=*gstr_out;
+  const GP<ByteStream> gstr_out=ByteStream::create();
   GP<IFFByteStream> giff_out=IFFByteStream::create(gstr_out);
   IFFByteStream &iff_out=*giff_out;
   
@@ -2413,8 +2410,8 @@ DjVuFile::unlink_file(const GUTF8String &id)
     iff_out.close_chunk();
   }
   
-  str_out.seek(0, SEEK_SET);
-  data_pool=DataPool::create(str_out);
+  gstr_out->seek(0, SEEK_SET);
+  data_pool=DataPool::create(gstr_out);
   chunks_number=-1;
   
   flags|=MODIFIED;

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocument.cpp,v 1.163 2001-04-24 00:25:50 bcr Exp $
+// $Id: DjVuDocument.cpp,v 1.164 2001-04-26 23:58:12 bcr Exp $
 // $Name:  $
 
 
@@ -104,7 +104,7 @@ DjVuDocument::create(
 
 GP<DjVuDocument>
 DjVuDocument::create(
-  ByteStream &bs, GP<DjVuPort> xport, DjVuFileCache * const xcache)
+  const GP<ByteStream> &bs, GP<DjVuPort> xport, DjVuFileCache * const xcache)
 {
   return create(DataPool::create(bs),xport,xcache);
 }

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DataPool.h,v 1.44 2001-04-20 17:53:18 bcr Exp $
+// $Id: DataPool.h,v 1.45 2001-04-26 23:58:11 bcr Exp $
 // $Name:  $
 
 #ifndef _DATAPOOL_H
@@ -65,7 +65,7 @@ class ByteStream;
 
     @memo Thread safe data storage
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DataPool.h,v 1.44 2001-04-20 17:53:18 bcr Exp $#
+    @version #$Id: DataPool.h,v 1.45 2001-04-26 23:58:11 bcr Exp $#
 */
 
 //@{
@@ -219,7 +219,7 @@ public:
 	  to the pool using the \Ref{add_data}() function. Afterwards it
 	  will call \Ref{set_eof}() function, and no other data will be
 	  allowed to be added to the pool. */
-   static GP<DataPool> create(ByteStream & str);
+   static GP<DataPool> create(const GP<ByteStream> & str);
 
       /** Initializes the #DataPool# in slave mode and connects it
 	  to the specified offsets range of the specified master #DataPool#.
@@ -558,6 +558,7 @@ private:
    static void	static_trigger_cb(void *);
    void		trigger_cb(void);
    void		analyze_iff(void);
+   void		added_data(const int offset, const int size);
 public:
   static const char *Stop;
 };

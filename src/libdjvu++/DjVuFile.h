@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuFile.h,v 1.79 2001-04-12 00:24:59 bcr Exp $
+// $Id: DjVuFile.h,v 1.80 2001-04-26 23:58:12 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUFILE_H
@@ -71,7 +71,7 @@ class DjVuNavDir;
 
     @memo Classes representing DjVu files.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuFile.h,v 1.79 2001-04-12 00:24:59 bcr Exp $#
+    @version #$Id: DjVuFile.h,v 1.80 2001-04-26 23:58:12 bcr Exp $#
 */
 
 //@{
@@ -225,11 +225,11 @@ public:
 	  it has been constructed.
 
 	  @param str The stream containing data for the file. */
-   void init(ByteStream & str);
+   void init(const GP<ByteStream> & str);
 
       /** Creator, does the init(ByteStream &str) */
    static GP<DjVuFile> create(
-     ByteStream & str, const ErrorRecoveryAction recover_action=ABORT,
+     const GP<ByteStream> & str, const ErrorRecoveryAction recover_action=ABORT,
      const bool verbose_eof=true);
    
       /** Initializes a #DjVuFile# object. As you can notice, the data is not
@@ -677,8 +677,7 @@ DjVuFile::is_modified(void) const
 inline void
 DjVuFile::set_modified(bool m)
 {
-   if (m) flags=flags | MODIFIED;
-   else flags=flags & ~MODIFIED;
+  flags=m ? (flags | MODIFIED) : (flags & ~MODIFIED);
 }
 
 inline bool

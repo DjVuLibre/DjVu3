@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuErrorList.cpp,v 1.14 2001-04-21 23:22:04 mchen Exp $
+// $Id: DjVuErrorList.cpp,v 1.15 2001-04-26 23:58:12 bcr Exp $
 // $Name:  $
 
 
@@ -53,7 +53,7 @@ DjVuErrorList::set_stream(GP<ByteStream> xibs)
 {
   GUTF8String name;
   static unsigned long serial=0;
-  pool=DataPool::create(*xibs);
+  pool=DataPool::create(xibs);
   name.format("data://%08lx/%08lx.djvu",
     ++serial,(unsigned long)(size_t)((const ByteStream *)xibs));
   pool_url=GURL::UTF8(name);

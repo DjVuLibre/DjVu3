@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: XMLParser.cpp,v 1.2 2001-04-26 18:38:44 bcr Exp $
+// $Id: XMLParser.cpp,v 1.3 2001-04-26 23:58:12 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -132,7 +132,7 @@ lt_XMLParser::save(void)
     DjVuDocument &doc=*(m_docs[pos]);
     GURL url=doc.get_init_url();
 //    GUTF8String name=GOS::url_to_filename(url);
-//    DjVuPrintMessage("Saving file '%s' with new annotations.\n",(const char *)url);
+    DEBUG_MSG("Saving "<<(const char *)url<<" with new annotations.\n");
     const bool bundle=doc.is_bundled()||(doc.get_doc_type()==DjVuDocument::SINGLE_PAGE);
     doc.save_as(url,bundle);
   }
@@ -718,8 +718,6 @@ lt_XMLParser::Text::ChangeText(const lt_XMLTags &tags, const GURL &url,const GUT
     G_THROW("Failed to get specified page");
   }
   
-  dfile->start_decode();
-  dfile->wait_for_finish();
   
   GP<DjVuText> text = DjVuText::create();
   GP<DjVuTXT> txt = text->txt = DjVuTXT::create();
@@ -735,11 +733,9 @@ lt_XMLParser::Text::ChangeText(const lt_XMLTags &tags, const GURL &url,const GUT
   textbs->seek(0,SEEK_SET);
   textbs->read(txt->textUTF8.getbuf(len), len);
   
-  dfile->set_modified(true);
-  dfile->reset();
-  GP<ByteStream> mbs = ByteStream::create();
-  dfile->text = mbs;
-  text->encode(dfile->text);
+  dfile->start_decode();
+  dfile->wait_for_finish();
+  dfile->change_text(txt,true);
   m_files.append(dfile);
 }
 

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DataPool.cpp,v 1.78 2001-04-21 00:16:58 bcr Exp $
+// $Id: DataPool.cpp,v 1.79 2001-04-26 23:58:11 bcr Exp $
 // $Name:  $
 
 
@@ -112,7 +112,7 @@ public:
       // with the stream. Whenever OpenFiles decides, that this stream
       // had better be closed, it will order every pool from the list to
       // ZERO their references to it
-   GP<DataPool::OpenFiles_File>		request_stream(const GURL &url, GP<DataPool> pool);
+   GP<DataPool::OpenFiles_File> request_stream(const GURL &url, GP<DataPool> pool);
       // If there are more than MAX_STREAM_FILES open, close the oldest.
    void		prune(void);
       // Removes the pool from the list associated with the stream.
@@ -183,7 +183,7 @@ DataPool::OpenFiles::get(void)
 void
 DataPool::OpenFiles::prune(void)
 {
-  DEBUG_MSG("DataPool::OpenFiles::prune(void): " << files_list.size() << "\n");
+  DEBUG_MSG("DataPool::OpenFiles::prune(void): "<<files_list.size()<< "\n");
   DEBUG_MAKE_INDENT(3);
   while(files_list.size()>MAX_OPEN_FILES)
   {
@@ -652,8 +652,9 @@ DataPool::create(void)
 }
 
 GP<DataPool> 
-DataPool::create(ByteStream &str)
+DataPool::create(const GP<ByteStream> &gstr)
 {
+  ByteStream &str=*gstr;
   DEBUG_MSG("DataPool::create: str=" << (void *)&str << "\n");
   DEBUG_MAKE_INDENT(3);
   DataPool *pool=new DataPool();
@@ -662,11 +663,13 @@ DataPool::create(ByteStream &str)
 
       // It's nice to have IFF data analyzed in this case too.
   pool->add_trigger(0, 32, static_trigger_cb, pool);
-   
-  char buffer[1024];
-  int length;
-  while((length=str.read(buffer, 1024)))
-     pool->add_data(buffer, length);
+
+  pool->data=gstr->duplicate();
+  pool->added_data(0,pool->data->size());   
+//  char buffer[1024];
+//  int length;
+//  while((length=str.read(buffer, 1024)))
+//     pool->add_data(buffer, length);
   pool->set_eof();
   return retval;
 }
@@ -829,7 +832,14 @@ DataPool::connect(const GURL &furl_in, int start_in, int length_in)
 
       eof_flag=true;
 
-      data=0;
+      if(str->is_static())
+      {
+        data=str;
+        added_data(0,length);
+      }else 
+      {
+        data=0;
+      }
 
       FCPools::get()->add_pool(furl, this);
 
@@ -927,27 +937,33 @@ DataPool::add_data(const void * buffer, int offset, int size)
       }
    }
 
-      // Modify map of blocks
-   block_list->add_range(offset, size);
-   
-      // Wake up all threads, which may be waiting for this data
-   {
-      GCriticalSectionLock lock(&readers_lock);
-      for(GPosition pos=readers_list;pos;++pos)
-      {
-	 GP<Reader> reader=readers_list[pos];
-	 if (block_list->get_bytes(reader->offset, 1))
-	 {
-	    DEBUG_MSG("waking up reader: offset=" << reader->offset <<
-		      ", size=" << reader->size << "\n");
-            DEBUG_MAKE_INDENT(3);
-	    reader->event.set();
-	 }
-      }
-   }
+   added_data(offset, size);
+}
 
-      // And call triggers
-   check_triggers();
+void
+DataPool::added_data(const int offset, const int size)
+{
+     // Modify map of blocks
+  block_list->add_range(offset, size);
+   
+     // Wake up all threads, which may be waiting for this data
+  {
+    GCriticalSectionLock lock(&readers_lock);
+    for(GPosition pos=readers_list;pos;++pos)
+    {
+      GP<Reader> reader=readers_list[pos];
+      if (block_list->get_bytes(reader->offset, 1))
+      {
+        DEBUG_MSG("waking up reader: offset=" << reader->offset <<
+          ", size=" << reader->size << "\n");
+        DEBUG_MAKE_INDENT(3);
+        reader->event.set();
+      }
+    }
+  }
+
+    // And call triggers
+  check_triggers();
 
       // Do not undo the following two lines. The reason why we need them
       // here is the connected DataPools, which use 'length' (more exactly
@@ -955,9 +971,9 @@ DataPool::add_data(const void * buffer, int offset, int size)
       // all data has been added to the master DataPool, but before EOF
       // is set, the master and slave DataPools disagree regarding if
       // all data is there or not. These two lines solve the problem
-   GCriticalSectionLock lock(&data_lock);
-   if (length>=0 && data->size()>=length)
-     set_eof();
+  GCriticalSectionLock lock(&data_lock);
+  if (length>=0 && data->size()>=length)
+    set_eof();
 }
 
 bool
@@ -1037,8 +1053,21 @@ DataPool::get_data(void * buffer, int offset, int sz, int level)
          pool->clear_stream();
          return retval;
       }
-   } 
-   else if (furl.is_local_file_url())
+   }else if(data && data->is_static() && eof_flag)
+   { 
+      DEBUG_MSG("DataPool::get_data(): static\n");
+      DEBUG_MAKE_INDENT(3);
+	 // We're not connected to anybody => handle the data
+      int size=block_list->get_range(offset, sz);
+      if (size>0)
+      {
+	    // Hooray! Some data is there
+	 GCriticalSectionLock lock(&data_lock);
+	 data->seek(offset, SEEK_SET);
+	 return data->readall(buffer, size);
+      }
+      return 0;
+   } else if (furl.is_local_file_url())
    {
       DEBUG_MSG("DataPool::get_data(): from file\n");
       DEBUG_MAKE_INDENT(3);
@@ -1265,7 +1294,7 @@ DataPool::load_file(void)
       pool->load_file();
    } else if (furl.is_local_file_url())
    {
-      DEBUG_MSG("loading the data from \"" << furl.is_local_file_url() << "\".\n");
+      DEBUG_MSG("loading the data from \""<<(const char *)furl<<"\".\n");
 
       GCriticalSectionLock lock1(&class_stream_lock);
       GP<OpenFiles_File> f=fstream;
@@ -1279,13 +1308,16 @@ DataPool::load_file(void)
          data=ByteStream::create();
          block_list->clear();
          FCPools::get()->del_pool(furl, this);
-         furl=GURL::UTF8("about:blank");
+         furl=GURL();
 
          f->stream->seek(0, SEEK_SET);
-         char buffer[1024];
-         int length;
-         while((length=f->stream->read(buffer, 1024)))
-	         add_data(buffer, length);
+         data=f->stream->duplicate();
+         added_data(0,data->size());   
+         set_eof();
+//         char buffer[1024];
+//         int length;
+//         while((length=f->stream->read(buffer, 1024)))
+//	         add_data(buffer, length);
 	      // No need to set EOF. It should already be set.
         OpenFiles::get()->stream_released(f->stream, this);
       }
@@ -1641,10 +1673,18 @@ DataPool::close_all(void)
 }
 
 
-inline GP<ByteStream>
+GP<ByteStream>
 DataPool::get_stream(void)
 {
-   return new PoolByteStream(this);
+  if(data && data->is_static())
+  {
+    GCriticalSectionLock lock(&data_lock);
+    data->seek(0, SEEK_SET);
+    return data->duplicate(length);
+  }else
+  {
+    return new PoolByteStream(this);
+  }
 }
 
 #if 0

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocument.h,v 1.84 2001-04-12 18:50:50 fcrary Exp $
+// $Id: DjVuDocument.h,v 1.85 2001-04-26 23:58:12 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUDOCUMENT_H
@@ -58,7 +58,7 @@ class ByteStream;
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocument.h,v 1.84 2001-04-12 18:50:50 fcrary Exp $#
+    @version #$Id: DjVuDocument.h,v 1.85 2001-04-26 23:58:12 bcr Exp $#
 */
 
 //@{
@@ -324,7 +324,8 @@ public:
 
    /** Create a version of DjVuDocument which has begun initializing. */
    static GP<DjVuDocument> create(
-     ByteStream &bs, GP<DjVuPort> xport=0, DjVuFileCache * const xcache=0);
+     const GP<ByteStream> &bs, GP<DjVuPort> xport=0,
+     DjVuFileCache * const xcache=0);
 
       /** Call this function when you don't need the #DjVuDocument# any more.
 	  In a multi-threaded environment it will stop initialization

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.h,v 1.51 2001-04-19 00:05:27 bcr Exp $
+// $Id: ByteStream.h,v 1.52 2001-04-26 23:58:11 bcr Exp $
 // $Name:  $
 
 #ifndef _BYTESTREAM_H
@@ -62,7 +62,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation\\
     Andrei Erofeev <eaf@geocities.com> -- 
     @version
-    #$Id: ByteStream.h,v 1.51 2001-04-19 00:05:27 bcr Exp $# */
+    #$Id: ByteStream.h,v 1.52 2001-04-26 23:58:11 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -188,6 +188,10 @@ public:
       until reaching the end-of-file mark on ByteStream #bsfrom#, regardless
       of the number of bytes transferred.  */
   size_t copy(ByteStream &bsfrom, size_t size=0);
+  /** Create a new #ByteStream# that copies the data from this #ByteStream#
+      starting from the current position, upto #size# bytes.  Setting the
+      #size# to zero means copy to the end-of-file mark. */
+  GP<ByteStream> duplicate(const size_t size=0) const;
   /// Allows printf() type operations to a bytestream.
   size_t format(const char *fmt, ... );
   /// Allows scanf() type operations on a bytestream.
@@ -232,6 +236,8 @@ public:
       bytes at position #pos# into #buffer# and returns the actual number of
       bytes read.  The current position is unchanged. */
   virtual size_t readat(void *buffer, size_t sz, int pos);
+  /// Returns false, unless a subclass of ByteStream::Static
+  virtual bool is_static(void) const { return false; }
   //@}
 protected:
   ByteStream(void) : cp(RAW) {};
