@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocEditor.cpp,v 1.23 2000-01-14 19:03:28 eaf Exp $
+//C- $Id: DjVuDocEditor.cpp,v 1.24 2000-01-25 22:17:31 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -917,7 +917,7 @@ DjVuDocEditor::get_thumbnail(int page_num, bool dont_decode)
       // this thumbnail for us.
 {
    GString id=page_to_id(page_num);
-
+   
    GPosition pos;
    GCriticalSectionLock lock(&thumb_lock);
    if (thumb_map.contains(id, pos))
@@ -1104,8 +1104,6 @@ DjVuDocEditor::generate_thumbnails(int thumb_size,
    int pages_num=djvm_dir->get_pages_num();
    for(int page_num=0;page_num<pages_num;page_num++)
    {
-      if (cb) if (cb(page_num, cl_data)) return;
-
       GString id=page_to_id(page_num);
       if (!thumb_map.contains(id))
       {
@@ -1131,6 +1129,7 @@ DjVuDocEditor::generate_thumbnails(int thumb_size,
 	 iwpix->encode_chunk(*str, parms);
 	 thumb_map[id]=new TArray<char>(str->get_data());
       }
+      if (cb) if (cb(page_num, cl_data)) return;
    }
 }
 
