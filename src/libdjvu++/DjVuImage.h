@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuImage.h,v 1.16 1999-09-07 22:36:12 eaf Exp $
+//C- $Id: DjVuImage.h,v 1.17 1999-09-09 17:32:41 eaf Exp $
 
 #ifndef _DJVUIMAGE_H
 #define _DJVUIMAGE_H
@@ -51,7 +51,7 @@
     L\'eon Bottou <leonb@research.att.com> - initial implementation
     Andrei Erofeev <eaf@geocities.com> - multipage support
     @version
-    #$Id: DjVuImage.h,v 1.16 1999-09-07 22:36:12 eaf Exp $# */
+    #$Id: DjVuImage.h,v 1.17 1999-09-09 17:32:41 eaf Exp $# */
 //@{
 
 
@@ -101,10 +101,24 @@ public:
   // CONSTRUCTION
   /** @name Construction. */
   //@{
-  /** Constructs a DjVu image. */
+  /** Constructs an empty DjVu image. After the image has been constructed,
+      it may be connected to an existing \Ref{DjVuFile} or left as is.
+
+      In the former case #DjVuImage# will look for its decoded components
+      (like #Sjbz# or #BG44#) by decending the hierarchy of \Ref{DjVuFile}s
+      starting from the one passed to \Ref{connect}().
+
+      In the latter case you can use \Ref{decode}() function to decode
+      {\bf single-page} DjVu documents in the old-style way. */
   DjVuImage(void);
-  /** Constructs a DjVu image. */
-  DjVuImage(const GP<DjVuFile> & file);
+  /** Connects this #DjVuImage# to the passed \Ref{DjVuFile}. The #DjVuImage#
+      will use this \Ref{DjVuFile} to retrieve components necessary for
+      decoding. It will also connect itself to \Ref{DjVuFile} using the
+      communication mechanism provided by \Ref{DjVuPort} and \Ref{DjVuPortcaster}.
+      This will allow it to receive and relay messages and requests generated
+      by the passed \Ref{DjVuFile} and any file included into it. */
+  void		connect(const GP<DjVuFile> & file);
+      
   //@}
 
   // COMPONENTS

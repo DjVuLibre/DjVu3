@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuImage.cpp,v 1.23 1999-09-07 22:36:12 eaf Exp $
+//C- $Id: DjVuImage.cpp,v 1.24 1999-09-09 17:32:41 eaf Exp $
 
 
 #ifdef __GNUC__
@@ -26,8 +26,11 @@
 
 DjVuImage::DjVuImage(void) {};
 
-DjVuImage::DjVuImage(const GP<DjVuFile> & xfile) : file(xfile)
+void
+DjVuImage::connect(const GP<DjVuFile> & xfile)
 {
+   file=xfile;
+   DjVuPort::get_portcaster()->add_route(file, this);
 }
 
 //// DJVUIMAGE: data collectors
@@ -328,7 +331,7 @@ DjVuImage::decode(ByteStream & str, DjVuInterface *notifier)
   DEBUG_MSG("DjVuImage::decode(): decoding old way...\n");
   DEBUG_MAKE_INDENT(3);
   if (file) 
-    THROW("To decode old way you should have been used default constructor.");
+    THROW("To decode old way you should not have been used the connect() function.");
   
   GP<DjVuImageNotifier> pport = new DjVuImageNotifier(notifier);
   pport->stream_url="internal://fake_url_for_old_style_decoder";

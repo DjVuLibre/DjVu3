@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.28 1999-09-04 01:36:49 leonb Exp $
+//C- $Id: DjVuDocument.cpp,v 1.29 1999-09-09 17:32:41 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -589,8 +589,10 @@ DjVuDocument::get_page(int page_num)
        !file->is_decode_ok() &&
        !file->is_decode_failed())
       file->start_decode();
-   
-   return new DjVuImage(file);
+
+   GP<DjVuImage> dimg=new DjVuImage();
+   dimg->connect(file);
+   return dimg;
 }
 
 void
