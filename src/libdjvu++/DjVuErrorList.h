@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuErrorList.h,v 1.2 2000-01-14 06:43:44 bcr Exp $
+//C- $Id: DjVuErrorList.h,v 1.3 2000-01-30 23:19:25 bcr Exp $
  
 #ifndef _DJVUERRORLIST_H
 #define _DJVUERRORLIST_H
@@ -28,7 +28,7 @@
 
     @memo DjVuErrorList class.
     @author Bill C Riemers <bcr@att.com>
-    @version #$Id: DjVuErrorList.h,v 1.2 2000-01-14 06:43:44 bcr Exp $#
+    @version #$Id: DjVuErrorList.h,v 1.3 2000-01-30 23:19:25 bcr Exp $#
 */
 
 //@{
@@ -40,8 +40,10 @@
 class DjVuErrorList : public DjVuSimplePort
 {
 public:
-  /// The normal port caster constructor. 
+     /// The normal port caster constructor. 
   DjVuErrorList();
+     /// This constructor allows the user to specify the ByteStream.
+  void set_stream(GP<ByteStream>);
      /// Append all error messages to the list
   virtual bool notify_error(const DjVuPort * source, const char * msg);
      /// Append all status messages to the list
@@ -64,7 +66,13 @@ public:
   const char *GetStatus(void);
      /// Check if there are anymore status messages.
   inline bool HasStatus(void) const;
+     /** This gets the data.  We can't use the simple port's request
+       data since we want to allow the user to specify the ByteStream. */
+  virtual GP<DataPool> request_data (
+    const DjVuPort * source, const GURL & url );
+
 private:
+  GP<ByteStream> ibs;
   GList<GString> Errors;
   GString PrevError;
   GList<GString> Status;

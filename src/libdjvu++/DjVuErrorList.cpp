@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuErrorList.cpp,v 1.1 1999-12-05 21:46:17 bcr Exp $
+//C- $Id: DjVuErrorList.cpp,v 1.2 2000-01-30 23:19:25 bcr Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -18,9 +18,14 @@
 #include "DjVuErrorList.h"
 #include "GException.h"
 #include "GContainer.h"
+#include "GOS.h"
 #include <string.h>
 
 DjVuErrorList::DjVuErrorList() {}
+
+void
+DjVuErrorList::set_stream(GP<ByteStream> xibs)
+{ ibs=xibs; }
 
 bool
 DjVuErrorList::notify_error(const DjVuPort * source, const char * msg)
@@ -64,3 +69,27 @@ DjVuErrorList::GetStatus(void)
   return retval;
 }
 
+GP<DataPool>
+DjVuErrorList::request_data(const DjVuPort * source, const GURL & url)
+{
+   DataPool *retval=0;
+   TRY
+   {
+     if (url.is_empty() )
+     {
+       if(ibs)
+         retval=new DataPool(*ibs);
+     }else if (url.is_local_file_url())
+     {
+       GString fname=GOS::url_to_filename(url);
+       if (GOS::basename(fname)=="-") fname="-";
+       retval=new DataPool(fname);
+     }
+   }
+   CATCH(exc)
+   {
+     retval=0;
+   } ENDCATCH;
+   return retval;
+}
+ 
