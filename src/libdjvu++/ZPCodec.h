@@ -21,7 +21,7 @@
 //C-     (C) AT&T Corp. All rights reserved.
 //C-     AT&T is a registered trademark of AT&T Corp.
 //C-
-//C- $Id: ZPCodec.h,v 1.8 1999-03-15 18:28:53 leonb Exp $
+//C- $Id: ZPCodec.h,v 1.9 1999-03-16 00:09:23 leonb Exp $
 
 
 #ifndef _ZPCODEC_H
@@ -138,13 +138,13 @@
     
     Needless to say, AT&T has patents pending for both the Z-Coder and the
     ZP-Coder. The good news however is that we can grant a license to use the
-    ZP-Coder in Open Source code without further complication. See the
-    \Ref{AT&T Source Code License} for more information.
+    ZP-Coder in ``free software'' without further complication. See the
+    \Ref{AT&T Source Code Agreement} for more information.
 
     @memo
     Binary adaptive quasi-arithmetic coder.
     @version
-    #$Id: ZPCodec.h,v 1.8 1999-03-15 18:28:53 leonb Exp $#
+    #$Id: ZPCodec.h,v 1.9 1999-03-16 00:09:23 leonb Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> */
 //@{
