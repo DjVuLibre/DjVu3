@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuPalette.h,v 1.9 1999-11-12 21:18:39 leonb Exp $
+//C- $Id: DjVuPalette.h,v 1.10 2000-01-21 19:48:42 leonb Exp $
 
 
 
@@ -37,7 +37,7 @@
     @memo 
     DjVuPalette header file
     @version 
-    #$Id: DjVuPalette.h,v 1.9 1999-11-12 21:18:39 leonb Exp $#
+    #$Id: DjVuPalette.h,v 1.10 2000-01-21 19:48:42 leonb Exp $#
     @author: 
     L\'eon Bottou <leonb@research.att.com> */
 //@{
@@ -116,6 +116,12 @@ public:
       builds the histogram for pixmap #pm#, computes the optimal palette using
       \Ref{compute_palette} and quantize the pixmap using \Ref{quantize}. */
   int compute_palette_and_quantize(GPixmap &pm, int ncolors, int minboxsize=0);
+  // COLOR CORRECTION
+  /** Applies a luminance gamma correction factor of #corr# to the palette
+      entries.  Values greater than #1.0# make the image brighter.  Values
+      smaller than #1.0# make the image darker.  The documentation of program
+      \Ref{ppmcoco} explains how to properly use this function. */
+  void color_correct(double corr);
   // COLOR INDEX DATA
   /** Contains an optional sequence of color indices. 
       Function \Ref{encode} and \Ref{decode} also encode and decode this

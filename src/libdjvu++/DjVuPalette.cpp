@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuPalette.cpp,v 1.4 1999-11-11 15:41:41 leonb Exp $
+//C- $Id: DjVuPalette.cpp,v 1.5 2000-01-21 19:48:42 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -352,6 +352,35 @@ DjVuPalette::compute_palette_and_quantize(GPixmap &pm, int maxcolors, int minbox
   int ncolors = compute_palette(maxcolors, minboxsize);
   quantize(pm);
   return ncolors;
+}
+
+void 
+DjVuPalette::color_correct(double corr)
+{
+  int palettesize = palette.size();
+  if (palettesize > 0)
+    {
+      // Copy colors
+      int i;
+      GTArray<GPixel> pix(0,palettesize-1);
+      GPixel *r = pix;
+      PColor *q = palette;
+      for (i=0; i<palettesize; i++) 
+        {
+          r[i].b = q[i].p[0];
+          r[i].g = q[i].p[1];
+          r[i].r = q[i].p[2];
+        }
+      // Apply color correction
+      GPixmap::color_correct(corr, r, palettesize);
+      // Restore colors
+      for (i=0; i<palettesize; i++) 
+        {
+          q[i].p[0] = r[i].b;
+          q[i].p[1] = r[i].g;
+          q[i].p[2] = r[i].r;
+        }
+    }
 }
 
 #endif
