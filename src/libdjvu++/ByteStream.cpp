@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: ByteStream.cpp,v 1.35 2000-11-09 20:15:05 jmw Exp $
+// $Id: ByteStream.cpp,v 1.36 2000-11-13 19:22:05 mrosen Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 04/1997
@@ -178,7 +178,7 @@ ByteStream::write16(unsigned int card)
 #ifndef UNDER_CE
         G_THROW(strerror(errno));                     //  (No error in the DjVuMessageFile)
 #else
-  G_THROW("ByteStream.write\t16"):                    //  ByteStream::write16, write error.
+  G_THROW("ByteStream.write\t16");                    //  ByteStream::write16, write error.
 #endif
 }
 
@@ -193,7 +193,7 @@ ByteStream::write24(unsigned int card)
 #ifndef UNDER_CE
         G_THROW(strerror(errno));                     //  (No error in the DjVuMessageFile)
 #else
-        G_THROW("ByteStream.write\t24"):              //  ByteStream::write24, write error.
+        G_THROW("ByteStream.write\t24");              //  ByteStream::write24, write error.
 #endif
 }
 
@@ -209,7 +209,7 @@ ByteStream::write32(unsigned int card)
 #ifndef UNDER_CE
         G_THROW(strerror(errno));                     //  (No error in the DjVuMessageFile)
 #else
-        G_THROW("ByteStream.write\t32"):              //  ByteStream::write32, write error.
+        G_THROW("ByteStream.write\t32");              //  ByteStream::write32, write error.
 #endif
 }
 
