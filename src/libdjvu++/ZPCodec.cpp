@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: ZPCodec.cpp,v 1.6 1999-11-22 21:38:48 leonb Exp $
+//C- $Id: ZPCodec.cpp,v 1.7 2000-02-29 19:44:44 praveen Exp $
 
 
 #ifdef __GNUC__
@@ -1141,7 +1141,7 @@ p_to_plps(unsigned short p)
 {
   float fplps;
   float fp = (float)(p) / (float)(0x10000);
-  const float log2 = 0.69314718055994530942;
+  const float log2 = (float)0.69314718055994530942;
 #ifdef ZCODER
   fplps = fp - (fp+0.5) * log(fp+0.5) + (fp-0.5)*log2;
 #endif
@@ -1149,7 +1149,7 @@ p_to_plps(unsigned short p)
   if (fp <= (1.0/6.0) )
     fplps = fp * 2 * log2;
   else
-    fplps = (1.5*fp-0.25) - (1.5*fp+0.25)*log(1.5*fp+0.25) + (0.5*fp-0.25)*log2;
+    fplps = (float)((1.5*fp-0.25) - (1.5*fp+0.25)*log(1.5*fp+0.25) + (0.5*fp-0.25)*log2);
 #endif
   return fplps;
 }
@@ -1161,7 +1161,7 @@ ZPCodec::state(float prob1)
   // Return a state representing 'prob1' in the steady chain
   // FixMe: This is quite slow! 
   int mps = (prob1 <= 0.5 ? 0 : 1);
-  float plps = (mps ? 1.0 - prob1 : prob1);
+  float plps = (float)(mps ? 1.0 - prob1 : prob1);
   // Locate steady chain (ordered, decreasing)
   int sz = 0;
   int lo = (mps ? 1 : 2);

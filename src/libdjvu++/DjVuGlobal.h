@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuGlobal.h,v 1.31 2000-01-13 16:04:01 bcr Exp $
+//C- $Id: DjVuGlobal.h,v 1.32 2000-02-29 19:44:44 praveen Exp $
 
 
 #ifndef _DJVUGLOBAL_H
@@ -40,7 +40,7 @@
     @memo
     Global definitions.
     @version
-    #$Id: DjVuGlobal.h,v 1.31 2000-01-13 16:04:01 bcr Exp $#
+    #$Id: DjVuGlobal.h,v 1.32 2000-02-29 19:44:44 praveen Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> -- empty file.\\
     Bill Riemers <bcr@sanskrit.lz.att.com> -- real work.  */
@@ -134,13 +134,13 @@ operator new(size_t sz) new_throw_spec
 { return _djvu_new(sz); }
 STATIC_INLINE void
 operator delete(void *addr) delete_throw_spec
-{ return _djvu_delete(addr); }
+{ _djvu_delete(addr); }
 STATIC_INLINE void *
 operator new [] (size_t sz) new_throw_spec
 { return _djvu_newArray(sz); }
 STATIC_INLINE void
 operator delete [] (void *addr) delete_throw_spec
-{ return _djvu_deleteArray(addr); }
+{ _djvu_deleteArray(addr); }
 #endif /* !NEED_DJVU_MEMORY_IMPLEMENTATION */
 
 #endif /* UNIX */

@@ -6,7 +6,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: parseoptions.h,v 1.30 2000-02-21 20:01:48 leonb Exp $
+//C- $Id: parseoptions.h,v 1.31 2000-02-29 19:44:44 praveen Exp $
 */
 
 #ifndef __DJVUPARSEOPTIONS_H__
@@ -42,7 +42,7 @@
 
    @memo Class used for parsing options and configuration files.
    @author Bill Riemers
-   @version #$Id: parseoptions.h,v 1.30 2000-02-21 20:01:48 leonb Exp $#
+   @version #$Id: parseoptions.h,v 1.31 2000-02-29 19:44:44 praveen Exp $#
  */
 
 /*@{*/
@@ -559,7 +559,13 @@ private:
   char *value,*retvalue;
   ErrorList(class ErrorList *,const char[]);
 public:
-  ErrorList() : next(0),prev(this),value(0),retvalue(0) {};
+  ErrorList()
+  {
+      next = 0;
+      prev = this;
+      value = 0;
+      retvalue = 0;
+  };
   ErrorList(const char[]);
   ~ErrorList();
   const char *AddError(const char value[]);

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuGlobalMemory.cpp,v 1.2 2000-01-04 04:48:38 bcr Exp $
+//C- $Id: DjVuGlobalMemory.cpp,v 1.3 2000-02-29 19:44:44 praveen Exp $
 
 
 #ifdef NEED_DJVU_MEMORY
@@ -21,6 +21,7 @@
 #include "GException.h"
 #include <stdlib.h>
 #include <string.h>
+#include <new.h>
 
 #ifdef UNIX
 djvu_delete_callback *
@@ -168,7 +169,7 @@ _djvu_newArray(size_t siz)
 #ifndef UNIX
   }else
   {
-    ptr=operator new [] (siz?siz:1);
+    ptr=operator new unsigned char[siz?siz:1];
   }
 #endif
   return ptr;
