@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.h,v 1.4 1999-05-26 18:19:32 eaf Exp $
+//C- $Id: DjVuFile.h,v 1.5 1999-05-27 17:34:34 eaf Exp $
  
 #ifndef _DJVUFILE_H
 #define _DJVUFILE_H
@@ -47,7 +47,7 @@
 
     @memo Classes representing DjVu files.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuFile.h,v 1.4 1999-05-26 18:19:32 eaf Exp $#
+    @version #$Id: DjVuFile.h,v 1.5 1999-05-27 17:34:34 eaf Exp $#
 */
 
 //@{
@@ -81,9 +81,14 @@
     of things shared between its pages. Examples can be the navigation
     directory (\Ref{DjVuNavDir}), the document annotation (\Ref{DjVuAnno})
     and other things like shared shapes and dictionary (to be implemented).
-    To avoid putting these chunks into every page, we have invented a new
-    chunk called #INCL# which purpose is to make the decoder open the
-    specified file and decode it.
+    To avoid putting these chunks into every page, we have invented new
+    chunks called #INCL# and #INCD# which purpose is to make the decoder open the
+    specified file and decode it. If a missing file is included via #INCL#
+    chunk, an error will be issued and decoding will be stopped. With #INCD#
+    chunk though the decoding will proceed. This special case is important
+    in the case when a file with navigation directory is included: its absence
+    is not fatal, but should be reported.
+    
 
     {\bf Source of data.} The #DjVuFile# does not work with hard drive only.
     Generally it asks for data through the communication mechanism provided
@@ -208,9 +213,9 @@ public:
 		   decoding is done.
 	     \item #ALL_DATA_PRESENT# Not only data for this file, but also
 	           for all included file has been received.
-	     \item #INCL_FILES_CREATED# All #INCL# chunks have been processed
-	           and the corresponding #DjVuFile#s created. This is important
-		   to know to be sure that the list returned by
+	     \item #INCL_FILES_CREATED# All #INCL# and #INCD# chunks have been
+	           processed and the corresponding #DjVuFile#s created. This
+		   is important to know to be sure that the list returned by
 		   \Ref{get_included_files}() is OK.
 	  \end{itemize} */
    int		get_status(void) const;
@@ -272,10 +277,10 @@ public:
    GP<DjVuNavDir>	decode_ndir(void);
       /// Clears all decoded components.
    void		reset(void);
-      /** Processes #INCL# chunks and creates included files. Normally you
-	  won't need to call this function because included files are
-	  created automatically when the file is being decoded. But if
-	  due to some reason you'd like to obtain the list of included
+      /** Processes #INCL# and #INCD# chunks and creates included files.
+	  Normally you won't need to call this function because included
+	  files are created automatically when the file is being decoded.
+	  But if due to some reason you'd like to obtain the list of included
 	  files without decoding this file, this is an ideal function to call.
 
 	  {\bf Warning.} This function does not return before it reads the
@@ -299,16 +304,21 @@ public:
 	  application if there is not enough data available. */
    GPList<DjVuFile>	get_included_files(void);
       /** Includes the given #file# into this one. Since the procedure
-	  of inclusion also implies inserting #INCL# chunks somewhere
+	  of inclusion also implies inserting #INCL# or #INCD# chunks somewhere
 	  (you want to save the results after all, don't you), it's
 	  necessary to specify chunk position #chunk_pos#.
 
 	  @param file The file to be included
 	  @param chunk_pos Position of the #INCL# chunk, which has to
-	         be inserted into {\bf this} file. #-1# means append. */
-   void		include_file(const GP<DjVuFile> & file, int chunk_pos=-1);
+	         be inserted into {\bf this} file. #-1# means append.
+	  @param incd If #TRUE#, #INCD# chunk will be inserted. Otherwise
+	         #INCL#. The difference is that if a missing file is included
+		 with #INCL# chunk, decoding will fail. Otherwise only an
+		 error message will be printed. */
+   void		include_file(const GP<DjVuFile> & file, int chunk_pos=-1,
+			     bool incd=0);
       /** Removes included file with given #name#. This will remove
-	  the #INCL# chunk too. */
+	  the #INCL# or #INCD# chunk too. */
    void		unlink_file(const char * name);
       //@}
    
@@ -323,7 +333,7 @@ public:
    bool		contains_chunk(const char * chunk_name);
       /** Removes all chunks with name #chunk_name# from the underlying
 	  IFF file structure. You can't use this function to delete #INCL#
-	  chunks. Use \Ref{unlink_file}() instead. */
+	  or #INCD# chunks. Use \Ref{unlink_file}() instead. */
    void		delete_chunks(const char * chunk_name);
       /** Inserts any chunk into the underlying IFF file data. Please beware,
 	  that the insertion will not decode the chunk contents.
@@ -395,8 +405,8 @@ private:
    void		wait_for_chunk(void);
    bool		wait_for_finish(bool self);
 
-      // INCL chunk processor
-   GP<DjVuFile>	process_incl_chunk(ByteStream & str);
+      // INCL and INCD chunk processor
+   GP<DjVuFile>	process_incl_chunk(ByteStream & str, bool incd);
 
       // Trigger: called when DataRange has all data
    static void	static_trigger_cb(void *);

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.4 1999-05-26 18:19:32 eaf Exp $
+//C- $Id: DjVuFile.cpp,v 1.5 1999-05-27 17:34:34 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -348,10 +348,12 @@ DjVuFile::decode_func(void)
 }
 
 GP<DjVuFile>
-DjVuFile::process_incl_chunk(ByteStream & str)
+DjVuFile::process_incl_chunk(ByteStream & str, bool incd)
 {
-   DEBUG_MSG("DjVuFile::process_incl_chunk(): processing INCL chunk...\n");
+   DEBUG_MSG("DjVuFile::process_incl_chunk(): processing INCL or INCD chunk...\n");
    DEBUG_MAKE_INDENT(3);
+
+   GString chunk_name=incd ? "INCD" : "INCL";
    
    GString incl_str;
    char buffer[1024];
@@ -370,7 +372,7 @@ DjVuFile::process_incl_chunk(ByteStream & str)
    if (incl_str.length()>0)
    {
       if (strchr(incl_str, '/'))
-	 THROW("Malformed INCL chunk. No directories allowed.");
+	 THROW("Malformed "+chunk_name+" chunk. No directories allowed.");
 
       DEBUG_MSG("incl_str='" << incl_str << "'\n");
       
@@ -386,7 +388,17 @@ DjVuFile::process_incl_chunk(ByteStream & str)
 	 if (!file)
 	 {
 	    DEBUG_MSG("creating new file\n");
-	    file=new DjVuFile(incl_url, this, cache);
+	    TRY {
+	       file=new DjVuFile(incl_url, this, cache);
+	    } CATCH(exc) {
+	       if (incd)
+	       {
+		  get_portcaster()->notify_error(this,
+						 "Failed to include file '"+
+						 incl_url+"'");
+		  return 0;
+	       } else RETHROW;
+	    } ENDCATCH;
 	    if (cache) cache->add_item(incl_url, file);
 	 } else { DEBUG_MSG("reusing file from cache\n"); }
 	 get_portcaster()->add_route(file, this);
@@ -442,9 +454,9 @@ DjVuFile::decode(ByteStream & str)
 	    } else anno->merge(iff);
 	    desc.format(" %0.1f Kb\t'%s'\tPage annotation.\n",
 			chksize/1024.0, (const char*)chkid);
-	 } else if (chkid=="INCL")
+	 } else if (chkid=="INCL" || chkid=="INCD")
 	 {
-	    GP<DjVuFile> file=process_incl_chunk(iff);
+	    GP<DjVuFile> file=process_incl_chunk(iff, chkid=="INCD");
 	    if (file)
 	       if (!file->is_decoding() &&
 		   !file->is_decode_ok() &&
@@ -582,9 +594,9 @@ DjVuFile::decode(ByteStream & str)
 	    } else anno->merge(iff);
 	    desc.format(" %0.1f Kb\t'%s'\tPage annotation.\n",
 			chksize/1024.0, (const char*)chkid);
-	 } else if (chkid=="INCL")
+	 } else if (chkid=="INCL" || chkid=="INCD")
 	 {
-	    GP<DjVuFile> file=process_incl_chunk(iff);
+	    GP<DjVuFile> file=process_incl_chunk(iff, chkid=="INCD");
 	    if (file)
 	       if (!file->is_decoding() &&
 		   !file->is_decode_ok() &&
@@ -762,7 +774,8 @@ DjVuFile::process_incl_chunks(void)
 
       while((chksize=iff.get_chunk(chkid)))
       {
-	 if (chkid=="INCL") process_incl_chunk(iff);
+	 if (chkid=="INCL" || chkid=="INCD")
+	    process_incl_chunk(iff, chkid=="INCD");
 	 iff.close_chunk();
       }
    } CATCH(exc) {
@@ -974,7 +987,7 @@ DjVuFile::unlink_file(const char * name)
 
       while((chksize=iff_in.get_chunk(chkid)))
       {
-	 if (chkid=="INCL")
+	 if (chkid=="INCL" || chkid=="INCD")
 	 {
 	    GString incl_str;
 	    char buffer[1024];
@@ -993,7 +1006,7 @@ DjVuFile::unlink_file(const char * name)
 	    if (incl_str==name) done=1;
 	    else
 	    {
-	       iff_out.put_chunk("INCL");
+	       iff_out.put_chunk(chkid);
 	       iff_out.writall(incl_str, incl_str.length());
 	       iff_out.close_chunk();
 	    }
@@ -1043,7 +1056,7 @@ DjVuFile::unlink_file(const char * name)
 }
 
 void
-DjVuFile::include_file(const GP<DjVuFile> & file, int chunk_pos)
+DjVuFile::include_file(const GP<DjVuFile> & file, int chunk_pos, bool incd)
 {
    DEBUG_MSG("DjVuFile::include_file(): incl_url='" << file->get_url() << "'\n");
    DEBUG_MAKE_INDENT(3);
@@ -1067,7 +1080,7 @@ DjVuFile::include_file(const GP<DjVuFile> & file, int chunk_pos)
    file->disable_standard_port();
    get_portcaster()->add_route(file, this);
 
-      // Insert INCL chunk
+      // Insert INCL/INCD chunk
    MemoryByteStream str_out;
    IFFByteStream iff_out(str_out);
    
@@ -1088,7 +1101,7 @@ DjVuFile::include_file(const GP<DjVuFile> & file, int chunk_pos)
       {
 	 if (chunk_num==chunk_pos)
 	 {
-	    iff_out.put_chunk("INCL");
+	    iff_out.put_chunk(incd ? "INCD" : "INCL");
 	    iff_out.write(file_name, file_name.length());
 	    iff_out.close_chunk();
 	    stored=1;
@@ -1107,12 +1120,12 @@ DjVuFile::include_file(const GP<DjVuFile> & file, int chunk_pos)
 	 iff_in.close_chunk();
 	 iff_out.close_chunk();
 	 chunk_num++;
-	 if (chkid=="INCL") inc_chunk_num++;
+	 if (chkid=="INCL" || chkid=="INCD") inc_chunk_num++;
       }
 
       if (!stored)
       {
-	 iff_out.put_chunk("INCL");
+	 iff_out.put_chunk(incd ? "INCD" : "INCL");
 	 iff_out.write(file_name, file_name.length());
 	 iff_out.close_chunk();
 
@@ -1228,7 +1241,8 @@ DjVuFile::delete_chunks(const char * chunk_name)
    DEBUG_MSG("DjVuFile::delete_chunks(): chunk_name='" << chunk_name << "'\n");
    DEBUG_MAKE_INDENT(3);
 
-   if (chunk_name=="INCL") THROW("Can't delete INCL chunks. Use unlink_file() instead.");
+   if (chunk_name=="INCL" || chunk_name=="INCD")
+      THROW("Can't delete INCL or INCD chunks. Use unlink_file() instead.");
    
    bool done=0;
    MemoryByteStream str_out;
@@ -1287,7 +1301,8 @@ DjVuFile::insert_chunk(int pos, const char * chunk_name,
    DEBUG_MSG("DjVuFile::insert_chunk(): chunk_name='" << chunk_name << "'\n");
    DEBUG_MAKE_INDENT(3);
 
-   if (chunk_name=="INCL") THROW("Can't insert INCL chunk. Use include_file() instead.");
+   if (chunk_name=="INCL" || chunk_name=="INCD")
+      THROW("Can't insert INCL or INCD chunks. Use include_file() instead.");
    
    MemoryByteStream str_out;
    IFFByteStream iff_out(str_out);
@@ -1375,10 +1390,10 @@ DjVuFile::add_djvu_data(IFFByteStream & ostr, GMap<GURL, void *> & map,
       
       while((chksize=iff.get_chunk(chkid)))
       {
-	 if (chkid=="INCL" && included_too)
+	 if ((chkid=="INCL" || chkid=="INCD") && included_too)
 	 {
-	    GP<DjVuFile> file=process_incl_chunk(iff);
-	    file->add_djvu_data(ostr, map, included_too, no_ndir);
+	    GP<DjVuFile> file=process_incl_chunk(iff, chkid=="INCD");
+	    if (file) file->add_djvu_data(ostr, map, included_too, no_ndir);
 	 } else if (chkid=="ANTa" && anno)
 	 {
 	    ostr.put_chunk(chkid);

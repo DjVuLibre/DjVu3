@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.7 1999-05-27 14:58:03 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.8 1999-05-27 17:34:34 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -426,7 +426,7 @@ DjVuDocument::check_nav_structure(void)
 	 
 	    // Include it into every page
 	 for(int page=0;page<dir->get_pages_num();page++)
-	    get_djvu_file(page)->include_file(dir_file, 1);
+	    get_djvu_file(page)->include_file(dir_file, 1, 1);
 
 	    // We don't want to add the file to the cache anywhere before
 	    // 'cause its URL becomes OK only at this point
@@ -465,7 +465,7 @@ DjVuDocument::insert_page(const GP<DjVuFile> & file, int page_num)
    dir->insert_page(page_num, name);
    add_to_cache(file);
 
-   if (dir_file) file->include_file(dir_file, 1);
+   if (dir_file) file->include_file(dir_file, 1, 1);
    else check_nav_structure();
 }
 
