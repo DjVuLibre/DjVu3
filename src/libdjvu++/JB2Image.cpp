@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: JB2Image.cpp,v 1.10 1999-06-08 20:36:25 leonb Exp $
+//C- $Id: JB2Image.cpp,v 1.11 1999-06-24 22:07:57 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -61,8 +61,9 @@ private:
   typedef unsigned int NumContext;
   static const int BIGPOSITIVE;
   static const int BIGNEGATIVE;
-  static const int MAX_NCELLS;
+  static const int CELLCHUNK;
   int cur_ncell;
+  int max_ncell;
   BitContext *bitcells;
   NumContext *leftcell;
   NumContext *rightcell;
@@ -120,7 +121,7 @@ private:
   void code_bitmap_by_cross_coding (GBitmap *bm, GBitmap *cbm, int libno);
   // Code records
   void code_record(int &rectype, JB2Image *jim, JB2Shape *jshp, JB2Blit *jblt);
-  // Private helpers
+  // Helpers
   void encode_libonly_shape(JB2Image *jim, int shapeno);
 #ifdef STRICT_PGH
   struct LibRect { short top,left,right,bottom; };
@@ -278,7 +279,7 @@ JB2Image::decode(ByteStream &bs, int)
 
 const int _JB2Codec::BIGPOSITIVE = 262142;
 const int _JB2Codec::BIGNEGATIVE = -262143;
-const int _JB2Codec::MAX_NCELLS = 20000;
+const int _JB2Codec::CELLCHUNK = 20000;
 
 
 // CONSTRUCTOR
@@ -313,14 +314,13 @@ _JB2Codec::_JB2Codec(ByteStream &bs, int encoding)
   memset(bitdist, 0, sizeof(bitdist));
   memset(cbitdist, 0, sizeof(cbitdist));
   // Initialize numcoder
-  bitcells  = new BitContext[MAX_NCELLS+2];
-  leftcell  = new NumContext[MAX_NCELLS+2];
-  rightcell = new NumContext[MAX_NCELLS+2];
+  max_ncell = CELLCHUNK;
+  bitcells  = new BitContext[max_ncell];
+  leftcell  = new NumContext[max_ncell];
+  rightcell = new NumContext[max_ncell];
   bitcells[0] = 0; // dummy cell
   leftcell[0] = rightcell[0] = 0;
-  bitcells[1] = 0; // overflow cell
-  leftcell[1] = rightcell[1] = 1;
-  cur_ncell = 2;
+  cur_ncell = 1;
 }
 
 
@@ -365,16 +365,23 @@ _JB2Codec::CodeNum(int &num, int low, int high, NumContext &ctx)
     {
       if (! *pctx)
         {
-          if (cur_ncell < MAX_NCELLS+2)
+          if (cur_ncell >= max_ncell)
             {
-              *pctx = cur_ncell ++;
-              bitcells[*pctx] = 0;
-              leftcell[*pctx] = rightcell[*pctx] = 0;
+              int nmax_ncell = max_ncell + CELLCHUNK;
+              BitContext *nbitcells = new BitContext[nmax_ncell];
+              NumContext *nleftcell = new NumContext[nmax_ncell];
+              NumContext *nrightcell = new NumContext[nmax_ncell];
+              memcpy(nbitcells, bitcells, max_ncell*sizeof(BitContext));
+              memcpy(nleftcell, leftcell, max_ncell*sizeof(NumContext));
+              memcpy(nrightcell, rightcell, max_ncell*sizeof(NumContext));
+              delete bitcells; bitcells=nbitcells;
+              delete leftcell; leftcell=nleftcell;
+              delete rightcell; rightcell=nrightcell;
+              max_ncell = nmax_ncell;
             }
-          else 
-            {
-              *pctx = 1;
-            }
+          *pctx = cur_ncell ++;
+          bitcells[*pctx] = 0;
+          leftcell[*pctx] = rightcell[*pctx] = 0;
         }
       // encode
       if (encoding)
