@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.115 2000-02-08 19:57:43 eaf Exp $
+//C- $Id: DjVuFile.cpp,v 1.116 2000-02-08 21:19:28 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -635,31 +635,36 @@ DjVuFile::get_fgjd(int block)
       return DjVuFile::fgjd;
       // Check wether included files
    chunk_mon.enter();
-   for(;;)
-   {
-      int active = 0;
-      GPList<DjVuFile> incs = get_included_files();
-      for (GPosition pos=incs.firstpos(); pos; ++pos)
+   TRY {
+      for(;;)
       {
-	 GP<DjVuFile> file = incs[pos];
-	 if (file->is_decoding())
-            active = 1;
-	 GP<JB2Dict> fgjd = file->get_fgjd();
-	 if (fgjd)
+	 int active = 0;
+	 GPList<DjVuFile> incs = get_included_files();
+	 for (GPosition pos=incs.firstpos(); pos; ++pos)
 	 {
-	    chunk_mon.leave();
-	    return fgjd;
+	    GP<DjVuFile> file = incs[pos];
+	    if (file->is_decoding())
+	       active = 1;
+	    GP<JB2Dict> fgjd = file->get_fgjd();
+	    if (fgjd)
+	    {
+	       chunk_mon.leave();
+	       return fgjd;
+	    }
 	 }
+	    // Exit if non-blocking mode
+	 if (! block)
+	    break;
+	    // Exit if there is no decoding activity
+	 if (! active)
+	    break;
+	    // Wait until a new chunk gets decoded
+	 wait_for_chunk();
       }
-	 // Exit if non-blocking mode
-      if (! block)
-        break;
-	 // Exit if there is no decoding activity
-      if (! active)
-        break;
-	 // Wait until a new chunk gets decoded
-      wait_for_chunk();
-   }
+   } CATCH(exc) {
+      chunk_mon.leave();
+      RETHROW;
+   } ENDCATCH;
    chunk_mon.leave();
    if (is_decode_stopped()) THROW("STOP");
    return 0;
