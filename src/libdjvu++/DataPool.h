@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.h,v 1.7 1999-08-25 19:31:14 eaf Exp $
+//C- $Id: DataPool.h,v 1.8 1999-08-25 22:05:59 eaf Exp $
  
 #ifndef _DATAPOOL_H
 #define _DATAPOOL_H
@@ -43,7 +43,7 @@
 
     @memo Thread safe data storage
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DataPool.h,v 1.7 1999-08-25 19:31:14 eaf Exp $#
+    @version #$Id: DataPool.h,v 1.8 1999-08-25 22:05:59 eaf Exp $#
 */
 
 //@{
@@ -140,7 +140,6 @@ private:
    GCriticalSection	stream_lock;
    
    void		wait_for_data(const GP<Reader> & reader);
-   void		int_add_data(void * buffer, int size);
 public:
       /** Appends the new block of data to the #DataPool#. Will unblock
 	  readers waiting for data if this data arrives with this block.
@@ -157,7 +156,7 @@ public:
 	  @param buffer data to append
 	  @param size length of the {\em buffer}
       */
-   void		add_data(void * buffer, int size);
+   void		add_data(const void * buffer, int size);
    
       /** Attempts to return a block of data at the given #offset#
 	  of the given #size#. If some of the data requested is in the

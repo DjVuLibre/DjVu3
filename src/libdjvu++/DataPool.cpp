@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.cpp,v 1.5 1999-08-25 19:31:14 eaf Exp $
+//C- $Id: DataPool.cpp,v 1.6 1999-08-25 22:05:59 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -51,7 +51,7 @@ DataPool::get_size(void) const
 }
 
 void
-DataPool::add_data(void * buffer, int buffer_size)
+DataPool::add_data(const void * buffer, int buffer_size)
 {
    DEBUG_MSG("DataPool::add_data(): adding " << buffer_size << " bytes of data...\n");
    DEBUG_MAKE_INDENT(3);
@@ -372,9 +372,6 @@ PoolByteStream::tell(void)
 void
 DataRange::init(void)
 {
-   DEBUG_MSG("DataRange::init(): initializing\n");
-   DEBUG_MAKE_INDENT(3);
-
    if (!pool) THROW("ZERO data pool passed as input.");
    if (length<0 && pool->is_eof()) length=pool->get_size()-start;
    if (length<0)
@@ -398,17 +395,12 @@ DataRange::DataRange(const DataRange & r) : pool(r.pool),
 
 DataRange::~DataRange(void)
 {
-   DEBUG_MSG("DataRange::~DataRange(): destroying, this=" << this << "\n");
-   DEBUG_MAKE_INDENT(3);
-
    GCriticalSectionLock lock1(&trigger_lock);
    pool->del_trigger(static_trigger_cb, this);
 
    GCriticalSectionLock lock2(&triggers_lock);
    for(GPosition pos=passed_triggers_list;pos;++pos)
       pool->del_trigger(static_trigger_relay_cb, (Trigger *) passed_triggers_list[pos]);
-
-   DEBUG_MSG("done destroying DataRange\n");
 }
 
 int
