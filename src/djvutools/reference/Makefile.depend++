@@ -33,6 +33,7 @@ cjb2.o: cjb2.cpp ../../../src/libdjvu++/DjVuGlobal.h \
  ../../../src/libdjvu++/GRect.h \
  ../../../src/libdjvu++/GBitmap.h \
  ../../../src/libdjvu++/JB2Image.h \
+ ../../../src/libdjvu++/ZPCodec.h \
  ../../../src/libdjvu++/DjVuInfo.h
 cpaldjvu.o: cpaldjvu.cpp \
  ../../../src/libdjvu++/DjVuGlobal.h \
@@ -47,6 +48,7 @@ cpaldjvu.o: cpaldjvu.cpp \
  ../../../src/libdjvu++/GRect.h \
  ../../../src/libdjvu++/GBitmap.h \
  ../../../src/libdjvu++/JB2Image.h \
+ ../../../src/libdjvu++/ZPCodec.h \
  ../../../src/libdjvu++/DjVuPalette.h \
  ../../../src/libdjvu++/GPixmap.h \
  ../../../src/libdjvu++/IWImage.h \
@@ -64,6 +66,7 @@ csepdjvu.o: csepdjvu.cpp \
  ../../../src/libdjvu++/GRect.h \
  ../../../src/libdjvu++/GBitmap.h \
  ../../../src/libdjvu++/JB2Image.h \
+ ../../../src/libdjvu++/ZPCodec.h \
  ../../../src/libdjvu++/DjVuPalette.h \
  ../../../src/libdjvu++/GPixmap.h \
  ../../../src/libdjvu++/IWImage.h \
@@ -197,6 +200,7 @@ djvumake.o: djvumake.cpp \
  ../../../src/libdjvu++/IFFByteStream.h \
  ../../../src/libdjvu++/ByteStream.h \
  ../../../src/libdjvu++/JB2Image.h \
+ ../../../src/libdjvu++/ZPCodec.h \
  ../../../src/libdjvu++/IWImage.h \
  ../../../src/libdjvu++/GBitmap.h
 djvutxt.o: djvutxt.cpp \
