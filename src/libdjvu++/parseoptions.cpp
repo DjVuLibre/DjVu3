@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: parseoptions.cpp,v 1.9 1999-11-14 05:55:21 bcr Exp $
+//C- $Id: parseoptions.cpp,v 1.10 1999-11-14 21:45:54 bcr Exp $
 #ifdef __GNUC__
 #pragma implementation
 #endif
@@ -918,10 +918,11 @@ const char * const
 DjVuParseOptions::ConfigFilename
 (const char config[],int level)
 {
+  const char *retval=0;
   const char *this_config=config[0]?config:default_string;
   delete [] filename;
   filename=0;
-  if(!level)
+  if(level<=0)
   {
     static const char *home=0;
     if(!home)
@@ -944,11 +945,17 @@ DjVuParseOptions::ConfigFilename
     }
     if(home[0])
     {
-      filename=new char [strlen(home)+sizeof(LocalDjVuDir)+strlen(this_config)+sizeof(ConfigExt)];
-      strcpy(filename,home);
-      strcat(filename,LocalDjVuDir);
-      strcat(filename,this_config);
-      strcat(filename,ConfigExt);
+      if(level<0)
+      {
+        retval=home;
+      }else 
+      {
+        retval=filename=new char [strlen(home)+sizeof(LocalDjVuDir)+strlen(this_config)+sizeof(ConfigExt)];
+        strcpy(filename,home);
+        strcat(filename,LocalDjVuDir);
+        strcat(filename,this_config);
+        strcat(filename,ConfigExt);
+      }
     }
   }else
   {
@@ -965,12 +972,12 @@ DjVuParseOptions::ConfigFilename
         rootlen=strlen(root);
       }
     }
-    filename=new char [rootlen+strlen(this_config)+sizeof(ConfigExt)];
+    retval=filename=new char [rootlen+strlen(this_config)+sizeof(ConfigExt)];
     strcpy(filename,root);
     strcat(filename,this_config);
     strcat(filename,ConfigExt);
   }
-  return filename;
+  return retval;
 }
 
 static int
