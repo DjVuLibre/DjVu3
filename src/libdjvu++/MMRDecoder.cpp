@@ -8,7 +8,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: MMRDecoder.cpp,v 1.1 1999-09-27 21:04:53 leonb Exp $
+//C- $Id: MMRDecoder.cpp,v 1.2 1999-09-27 21:39:55 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -387,7 +387,7 @@ _VLTable::_VLTable(VLCode *codes, int nbits)
   for (i=0; i<size; i++)
     index[i] = ncodes;
   // process codes
-  for (int i=0; i<ncodes; i++) {
+  for (i=0; i<ncodes; i++) {
     int c = codes[i].code;
     int b = codes[i].codelen;
     ASSERT(b>0 && b<=nbits);
