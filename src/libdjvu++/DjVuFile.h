@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.h,v 1.43 1999-10-05 16:00:06 leonb Exp $
+//C- $Id: DjVuFile.h,v 1.44 1999-10-24 21:34:36 eaf Exp $
  
 #ifndef _DJVUFILE_H
 #define _DJVUFILE_H
@@ -45,7 +45,7 @@
 
     @memo Classes representing DjVu files.
     @author Andrei Erofeev <eaf@research.att.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuFile.h,v 1.43 1999-10-05 16:00:06 leonb Exp $#
+    @version #$Id: DjVuFile.h,v 1.44 1999-10-24 21:34:36 eaf Exp $#
 */
 
 //@{
@@ -381,6 +381,17 @@ public:
       /// Returns 1 if this file contains chunk with name #chunk_name#
    bool		contains_chunk(const char * chunk_name);
 
+      /** Processes the included files hierarchy and returns merged
+	  annotations. This function may be used even when the #DjVuFile#
+	  has not been decoded yet. If all data has been received for
+	  this #DjVuFile# and all included #DjVuFile#s, it will will
+	  gather annotations from them and will return it. If no annotations
+	  have been found, or either this or any of the included files
+	  do not have all data, #ZERO# will be returned. To distinguish
+	  between the cases of insufficient data and missing annotations
+	  you may use \Ref{is_all_data_present}() function. */
+   GP<MemoryByteStream>	get_all_anno(void);
+   
       /** @name Encoding routines */
       //@{
       /** The main function that encodes data back into binary stream.
@@ -389,13 +400,12 @@ public:
 	  chunk #NDIR#.
 	  @param included_too Process included files too
 	  @param no_ndir Get rid of #NDIR# chunks. */
-  GP<MemoryByteStream>  get_djvu_bytestream(bool included_too, bool no_ndir);
+   GP<MemoryByteStream>	get_djvu_bytestream(bool included_too, bool no_ndir);
 
-      /** Same, returning a DataPool.
+      /** Same as \Ref{get_djvu_bytestream}(), returning a DataPool.
 	  @param included_too Process included files too
 	  @param no_ndir Get rid of #NDIR# chunks. */
    GP<DataPool>		get_djvu_data(bool included_too, bool no_ndir);
-
       //@}
 
       // Internal. Used by DjVuDocument
@@ -420,7 +430,7 @@ public:
 						  long set_mask, long clr_mask);
 protected:
    GURL			url;
-   GP<DataPool	>	data_pool;
+   GP<DataPool>		data_pool;
 
    GPList<DjVuFile>	inc_files_list;
    GCriticalSection	inc_files_lock;
@@ -456,8 +466,12 @@ private:
       // Trigger: called when DataPool has all data
    static void	static_trigger_cb(void *);
    void		trigger_cb(void);
+   
       // Progress callback: called from time to time
    static void	progress_cb(int pos, void *);
+   static void	get_all_anno(const GP<DjVuFile> & file,
+			     ByteStream & str_out,
+			     GMap<GURL, void *> & map);
 
    void          check() const;
    GP<DjVuNavDir>find_ndir(GMap<GURL, void *> & map);

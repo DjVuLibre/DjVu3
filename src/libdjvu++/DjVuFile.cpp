@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.76 1999-10-21 15:02:17 leonb Exp $
+//C- $Id: DjVuFile.cpp,v 1.77 1999-10-24 21:34:36 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -1067,6 +1067,57 @@ DjVuFile::decode_ndir(void)
 {
    GMap<GURL, void *> map;
    return decode_ndir(map);
+}
+
+void
+DjVuFile::get_all_anno(const GP<DjVuFile> & file, ByteStream & str_out,
+		       GMap<GURL, void *> & map)
+{
+   GURL url=file->get_url();
+   if (!map.contains(url))
+   {
+      map[url]=0;
+
+      GP<ByteStream> str=file->data_pool->get_stream();
+      IFFByteStream iff(*str);
+      GString chkid;
+      if (iff.get_chunk(chkid))
+	 while(iff.get_chunk(chkid))
+	 {
+	    if (chkid=="INCL")
+	    {
+	       GP<DjVuFile> inc_file=file->process_incl_chunk(iff);
+	       if (inc_file) get_all_anno(inc_file, str_out, map);
+	    } else if (chkid == "FORM:ANNO")
+	    {
+	       if (str_out.tell() & 1) str_out.write((void *) "", 1);
+	       str_out.copy(iff);
+	    } else if (chkid == "ANTa")
+	    {
+	       if (str_out.tell() & 1) str_out.write((void *) "", 1);
+	       
+	       IFFByteStream iff_out(str_out);
+	       iff_out.put_chunk(chkid);
+	       iff_out.copy(iff);
+	       iff_out.close_chunk();
+	    }
+	    iff.close_chunk();
+	 }
+   }
+}
+   
+GP<MemoryByteStream>
+DjVuFile::get_all_anno(void)
+{
+   GP<MemoryByteStream> str;
+   if (is_all_data_present())
+   {
+      str=new MemoryByteStream;
+      GMap<GURL, void *> map;
+      get_all_anno(this, *str, map);
+      if (str->tell()==0) str=0;
+   }
+   return str;
 }
 
 void
