@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: cjb2.cpp,v 1.6 2000-02-16 22:06:46 leonb Exp $
+//C- $Id: cjb2.cpp,v 1.7 2000-02-17 16:09:28 leonb Exp $
 
 
 /** @name cjb2
@@ -43,7 +43,7 @@
     L\'eon Bottou <leonb@research.att.com>\\
     Paul Howard <pgh@research.att.com>
     @version
-    #$Id: cjb2.cpp,v 1.6 2000-02-16 22:06:46 leonb Exp $# */
+    #$Id: cjb2.cpp,v 1.7 2000-02-17 16:09:28 leonb Exp $# */
 //@{
 //@}
 
@@ -58,15 +58,6 @@
 #include "GBitmap.h"
 #include "JB2Image.h"
 #include "DjVuInfo.h"
-
-
-
-
-#ifndef IMPLEMENT_MAIN
-// Define IMPLEMENT_MAIN to zero before including this file
-#define IMPLEMENT_MAIN 1
-#endif
-
 
 
 
@@ -932,7 +923,6 @@ cjb2(const char *filein, const char *fileout, const cjb2opts &opts)
 // --------------------------------------------------
 
 
-#if IMPLEMENT_MAIN
 
 void
 usage()
@@ -1001,5 +991,3 @@ main(int argc, const char **argv)
   return 0;
 }
 
-
-#endif
