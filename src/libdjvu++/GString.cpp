@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.91 2001-04-30 23:30:46 bcr Exp $
+// $Id: GString.cpp,v 1.92 2001-05-01 15:42:02 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -61,7 +61,7 @@ GUTF8String::~GUTF8String() {}
 // wcrtomb() and mbrtowc() don't exist.
 
 static inline  int
-wcrtomb(char *bytes,wchar_t w,mbstate_t *);
+wcrtomb(char *bytes,wchar_t w,mbstate_t *)
 {
   return wctomb(bytes,w);
 }

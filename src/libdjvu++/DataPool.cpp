@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DataPool.cpp,v 1.80 2001-04-30 23:30:45 bcr Exp $
+// $Id: DataPool.cpp,v 1.81 2001-05-01 15:43:50 bcr Exp $
 // $Name:  $
 
 
@@ -654,8 +654,7 @@ DataPool::create(void)
 GP<DataPool> 
 DataPool::create(const GP<ByteStream> &gstr)
 {
-  ByteStream &str=*gstr;
-  DEBUG_MSG("DataPool::create: str=" << (void *)&str << "\n");
+  DEBUG_MSG("DataPool::create: str="<<(ByteStream *)gstr<<"\n");
   DEBUG_MAKE_INDENT(3);
   DataPool *pool=new DataPool();
   GP<DataPool> retval=pool;
