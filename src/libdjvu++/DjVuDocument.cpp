@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.79 1999-11-22 23:59:49 bcr Exp $
+//C- $Id: DjVuDocument.cpp,v 1.80 1999-11-23 18:20:11 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -649,6 +649,11 @@ DjVuDocument::get_djvu_file(int page_num, bool dont_create)
       url=page_to_url(page_num);
       if (url.is_empty())
       {
+	    // If init is complete and url is empty, we know for sure, that
+	    // smth is wrong with the page_num. So we can return ZERO.
+	    // Otherwise we create a temporary file and wait for init to finish
+	 if (is_init_complete()) return 0;
+	 
 	 DEBUG_MSG("Structure is not known => check <doc_url>#<page_num> alias...\n");
 	 GP<DjVuPort> port=pcaster->alias_to_port(init_url+"#"+GString(page_num));
 	 if (!port || !port->inherits("DjVuFile"))
@@ -717,6 +722,11 @@ DjVuDocument::get_djvu_file(const char * id, bool dont_create)
       url=id_to_url(id);
       if (url.is_empty())
       {
+	    // If init is complete, we know for sure, that there is no such
+	    // file with ID 'id' in the document. Otherwise we have to
+	    // create a temporary file and wait for the init to finish
+	 if (is_init_complete()) return 0;
+	 
 	    // Invent some dummy temporary URL. I don't care what it will
 	    // be. I'll remember the ID and will generate the correct URL
 	    // after I learn what the document is
