@@ -6,7 +6,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: parseoptions.h,v 1.2 1999-11-03 05:17:00 bcr Exp $
+//C- $Id: parseoptions.h,v 1.3 1999-11-03 19:59:19 bcr Exp $
 
 #endif /* __cplusplus */
 
@@ -41,7 +41,18 @@
 // 	  {"pizza-topping",1,0,'P'},
 // 	  {"bignumber",1,0,'n'},
 // 	  {"redo",0,0,'r'},
-// 	  {"profile",0,0,'p'}
+// 	  {"profile",0,0,'p'},
+// 	  {"count",3,0,'0'},  // This is a special definition for a numerical
+// 	  {"count",3,0,'1'},  // operator.   Like -69 treated as an option.
+// 	  {"count",3,0,'2'},  // When -69 is used, the value of "count" will 
+// 	  {"count",3,0,'3'},  // will be 69.  Simularly, -3 would result in
+// 	  {"count",3,0,'4'},  // count having a value of 3.
+// 	  {"count",3,0,'5'},
+// 	  {"count",3,0,'6'},  // Litterally, the 3 argument means to assign
+// 	  {"count",3,0,'7'},  // the option letter used as the first character
+// 	  {"count",3,0,'8'},  // of the value.
+// 	  {"count",3,0,'9'},
+// 	  {0,0,0,0}
 // 	};
 //
 // 	int
@@ -164,7 +175,7 @@
 //
 // \end{verbatim} */
 //** @memo parseoptions header file */
-//** @version $Id: parseoptions.h,v 1.2 1999-11-03 05:17:00 bcr Exp $ */
+//** @version $Id: parseoptions.h,v 1.3 1999-11-03 19:59:19 bcr Exp $ */
 //** @author: $Author: bcr $ */
 
 // First we include some C wrappers for our class.

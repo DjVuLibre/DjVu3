@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: parseoptions.cpp,v 1.4 1999-11-03 15:20:19 bcr Exp $
+//C- $Id: parseoptions.cpp,v 1.5 1999-11-03 19:59:19 bcr Exp $
 #ifdef __GNUC__
 #pragma implementation
 #endif
@@ -215,7 +215,7 @@ DjVuParseOptions::AmbiguousOptions
     const char *name2=GetVarName(token2);
     if(name1 && name2)
     {
-      const char *emsg="Ambiguous options: '%s=%s' and '%s=%s' specified.";
+      const char emsg[]="Ambiguous options: '%s=%s' and '%s=%s' specified.";
       char *s=new char [sizeof(emsg)+strlen(name1)+strlen(name2)+strlen(value1)+strlen(value2)];
       sprintf(s,emsg,name1,value1,name2,value2);
       Errors->AddError(s);
@@ -345,8 +345,9 @@ DjVuParseOptions::ParseArguments
   int i;
   while((i=args.getopt_long())>=0)
   {
-    int v;
-    if((opts[i].name)&&((v=VarTokens->GetToken(opts[i].name))>=0))
+    int v,j;
+    const char *s=opts[i].name;
+    if(s && (j=strlen(s)) && (v=VarTokens->GetToken(opts[i].name))>=0)
     {
       Arguments->Add(v,args.optarg?args.optarg:"TRUE");
     }
@@ -1026,20 +1027,21 @@ DjVuParseOptions::GetOpt::GetOpt
   optarg(0)
 {
   int i;
-  for(i=0;long_opts[i].name;i++)
+  const char *ss;
+  const djvu_option *opts;
+  for(i=0;(ss=long_opts[i].name);i++)
   {
-    VarTokens.SetToken(long_opts[i].name);
+    int j=strlen(ss);
+    if(j)
+    {
+      VarTokens.SetToken(ss);
+    }
   }
   char *s=(optstring=new char[2*i+1]);
-  int j;
-  for(j=0;j<i;j++)
+  for(opts=long_opts;opts->name;opts++)
   {
-    const int val=long_opts[j].val;
-    if((val>0)&&(val<0xff))
-    {
-      (s++)[0]=(char)(val&0xff);
-      (s++)[0]=(long_opts[j].has_arg)?':':'?';
-    }
+    const int val=opts->val;
+    (s++)[0]=((val>0)&&(val<256))?((char)(val&0xff)):'-';
   }
   (s++)[0]=0;
 }
@@ -1102,8 +1104,9 @@ DjVuParseOptions::GetOpt::getopt_long()
     }
     for(longindex=0,opts=long_opts;opts->name;++opts,++longindex)
     {
+      const char *ss=opts->name;
       s=strlen(opts->name);
-      if(!strncmp(opts->name,argv[optind]+2,s)
+      if(!strncmp(ss,argv[optind]+2,s)
         &&(argv[optind][2+s] == '=')
       ) {
         if(!opts->has_arg)
@@ -1139,23 +1142,28 @@ DjVuParseOptions::GetOpt::getopt_long()
     return -1;
   }else
   {
-    longindex=((int)(optptr-optstring))/2;
+    longindex=(int)(optptr-optstring);
   }
-  if(optptr[1] == ':')
+  const djvu_option &opts=long_opts[longindex];
+  if(opts.has_arg)
   {
-    if(argv[optind][++nextchar])
+    if(opts.has_arg != 3)
+    {
+      nextchar++;
+    }
+    if(argv[optind][nextchar])
     {
       optarg=&(argv[optind][nextchar]);
     }else if(++optind<argc)
     {
       optarg=argv[optind];
-    }else if(optptr[2] == ':')
+    }else if(opts.has_arg == 2)
     {
       optarg=NULL;
     }else
     {
       static const char emesg[]="Argument required for --%s option";
-      const char * const xname=long_opts[longindex].name;
+      const char * const xname=opts.name;
       char *s=new char[sizeof(emesg)+strlen(xname)];
       sprintf(s,emesg,xname);
       Errors.AddError(s);

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: djvutopnm2.cpp,v 1.1 1999-11-03 05:17:00 bcr Exp $
+//C- $Id: djvutopnm2.cpp,v 1.2 1999-11-03 19:59:19 bcr Exp $
 
 
 /** @name djvutopnm
@@ -94,7 +94,7 @@
     Yann Le Cun <yann@research.att.com>\\
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: djvutopnm2.cpp,v 1.1 1999-11-03 05:17:00 bcr Exp $# */
+    #$Id: djvutopnm2.cpp,v 1.2 1999-11-03 19:59:19 bcr Exp $# */
 //@{
 //@}
 
@@ -241,7 +241,7 @@ usage()
           "  Copyright (c) AT&T 1999.  All rights reserved\n"
           "Usage: djvutopnm [options] [<djvufile> [<pnmfile>]]\n\n"
           "Options:\n"
-          "  -v                  Prints various informational messages.\n"
+          "  --verbose           Prints various informational messages.\n"
           "  --scale N           Selects display scale (default: 100%%).\n"
           "  --size  WxH         Selects size of rendered image.\n"
           "  --segment WxH+X+Y   Selects which segment of the rendered image\n"
@@ -249,7 +249,7 @@ usage()
           "  --foreground        Only renders the foreground layer.\n"
           "  --background        Only renders the background layer.\n"
           "  --layer <layer>     Same as the above three options.\n"
-          "  -N                  Subsampling factor from full resolution.\n"
+          "  -#                  Subsampling factor from full resolution.\n"
           "  --subsample N       Same as above.\n"
 	  "  --page <page>       Decode page <page> (for multipage documents).\n"
           "\n"
@@ -290,24 +290,23 @@ geometry(const char *r, GRect &rect)
 static const djvu_option long_options[] = {
 {"verbose",0,0,'v'},
 {"help",0,0,'h'},
-{"scale",1,0,'-'},
-{"size",1,0,'-'},
-{"segment",1,0,'-'},
-{"layer",0,0,'-'},
+{"scale",1,0,0},
+{"size",1,0,0},
+{"segment",1,0,0},
+{"layer",0,0,0},
 {"black",0,0,'s'},
 {"foreground",0,0,'f'},
 {"background",0,0,'b'},
-{"page",1,0,'-'},
-{"@1",1,0,'1'},
-{"@2",1,0,'2'},
-{"@3",1,0,'3'},
-{"@4",1,0,'4'},
-{"@5",1,0,'5'},
-{"@6",1,0,'6'},
-{"@7",1,0,'7'},
-{"@8",1,0,'8'},
-{"@9",1,0,'9'},
-{"subsample",0,0,'-'},
+{"page",1,0,0},
+{"subsample",3,0,'1'},
+{"subsample",3,0,'2'},
+{"subsample",3,0,'3'},
+{"subsample",3,0,'4'},
+{"subsample",3,0,'5'},
+{"subsample",3,0,'6'},
+{"subsample",3,0,'7'},
+{"subsample",3,0,'8'},
+{"subsample",3,0,'9'},
 {0,0,0,0}
 };
 
@@ -329,17 +328,16 @@ main(int argc, char *argv[], char *[])
         usage();
       }
       flag_verbose=Opts.GetInteger("verbose",0);
-      const static char *duplicates[12] = {
-        "@1","@2","@3","@4","@5","@6","@7","@8","@9",
-        "scale", "size", "subsample"
+      const static char *duplicates[3] = {
+        "scale","size","subsample"
       };
           // We can't use the value directly, because we don't know which
           // one we got.  But if more than one was specified, the GetValue
           // command will generate an error message.
       int token;
-      if((token=Opts.GetBestToken(12,duplicates)) >= 0)
+      if((token=Opts.GetBestToken(4,duplicates)) >= 0)
       {
-        if(token == Opts.GetVarToken(duplicates[9]))
+        if(token == Opts.GetVarToken(duplicates[0]))
         {
           const char *s=Opts.GetValue(token);
           char *r;
@@ -348,14 +346,14 @@ main(int argc, char *argv[], char *[])
             r++;
           if (*r)
             THROW("Illegal argument for option '--scale'");
-        }else if(token == Opts.GetVarToken(duplicates[10]))
+        }else if(token == Opts.GetVarToken(duplicates[1]))
         {
           const char *s=Opts.GetValue(token);
           geometry(s, fullrect);
           flag_size = 1;
           if (fullrect.xmin || fullrect.ymin)
             THROW("Illegal --size specification");
-        }else if(token == Opts.GetVarToken(duplicates[11]))
+        }else
         {
           int i=Opts.GetInteger(token,0);
           if (i<0)
@@ -364,28 +362,6 @@ main(int argc, char *argv[], char *[])
             usage();
           }
           flag_subsample = i;
-        }else
-        {
-          int i;
-          for(i=0;i<9;i++)
-          {
-            if(token == Opts.GetVarToken(duplicates[i]))
-            {
-              const char *r=Opts.GetValue(token);
-              char *s,*ss=new char [strlen(s)+2];
-              strcpy(ss+1,r);
-              ss[0]=duplicates[i][1];
-              int arg = strtol(ss,&s,10);
-              delete [] ss;
-              if (arg<0 || *s)
-              {
-                Opts.perror();
-                usage();
-              }
-              flag_subsample=arg;
-              break;
-            }
-          }
         }
       }
       const char *segment=Opts.GetValue("segment");
