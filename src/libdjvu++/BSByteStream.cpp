@@ -9,9 +9,9 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: BSByteStream.cpp,v 1.12 1999-09-28 19:56:18 leonb Exp $
+//C- $Id: BSByteStream.cpp,v 1.13 1999-11-22 21:38:48 leonb Exp $
 
-// "$Id: BSByteStream.cpp,v 1.12 1999-09-28 19:56:18 leonb Exp $"
+// "$Id: BSByteStream.cpp,v 1.13 1999-11-22 21:38:48 leonb Exp $"
 // - Author: Leon Bottou, 07/1998
 
 
@@ -1074,7 +1074,7 @@ BSByteStream::decode()
 BSByteStream::BSByteStream(ByteStream &xbs, int encoding)
   : encoding(encoding), offset(0), bptr(0), blocksize(0), 
     data(0), size(0), eof(0), bs(&xbs),
-    zp(*bs, encoding)
+    zp(*bs, encoding, true)
 {
   if (encoding)
     {

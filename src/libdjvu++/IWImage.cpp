@@ -9,9 +9,9 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: IWImage.cpp,v 1.24 1999-10-19 22:00:35 haffner Exp $
+//C- $Id: IWImage.cpp,v 1.25 1999-11-22 21:38:48 leonb Exp $
 
-// File "$Id: IWImage.cpp,v 1.24 1999-10-19 22:00:35 haffner Exp $"
+// File "$Id: IWImage.cpp,v 1.25 1999-11-22 21:38:48 leonb Exp $"
 // - Author: Leon Bottou, 08/1998
 
 #ifdef __GNUC__
@@ -903,7 +903,7 @@ _IWMap::image(int subsample, const GRect &rect,
 class _ZPCodecBias : public ZPCodec // DJVU_CLASS
 {
 public:
-  _ZPCodecBias(ByteStream &bs, int encoding=0) : ZPCodec(bs,encoding) {}
+  _ZPCodecBias(ByteStream &bs, bool encoding) : ZPCodec(bs, encoding, true) {}
   void encoder(int bit, BitContext &ctx) { ZPCodec::encoder(bit,ctx); }
   int decoder(BitContext &ctx) { return ZPCodec::decoder(ctx); }
   void encoder(int bit);
@@ -2010,7 +2010,7 @@ IWBitmap::decode_chunk(ByteStream &bs)
   // Read data
   assert(ymap);
   assert(ycodec);
-  _ZPCodecBias zp(bs, 0);
+  _ZPCodecBias zp(bs, false);
   int flag = 1;
   while (flag && cslice<nslices)
     {
@@ -2051,7 +2051,7 @@ IWBitmap::encode_chunk(ByteStream &bs, const IWEncoderParms &parm)
   DJVU_PROGRESS_TASK(chunk, parm.slices-cslice);
   {
     float estdb = -1.0;
-    _ZPCodecBias zp(mbs,1);
+    _ZPCodecBias zp(mbs, true);
     while (flag)
       {
         if (parm.decibels>0  && estdb>=parm.decibels)
@@ -2499,7 +2499,7 @@ IWPixmap::decode_chunk(ByteStream &bs)
   // Read data
   assert(ymap);
   assert(ycodec);
-  _ZPCodecBias zp(bs, 0);
+  _ZPCodecBias zp(bs, false);
   int flag = 1;
   while (flag && cslice<nslices)
     {
@@ -2550,7 +2550,7 @@ IWPixmap::encode_chunk(ByteStream &bs, const IWEncoderParms &parm)
   DJVU_PROGRESS_TASK(chunk, parm.slices-cslice);
   {
     float estdb = -1.0;
-    _ZPCodecBias zp(mbs,1);
+    _ZPCodecBias zp(mbs, true);
     while (flag)
       {
         if (parm.decibels>0  && estdb>=parm.decibels)

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: ZPCodec.cpp,v 1.5 1999-03-17 19:24:59 leonb Exp $
+//C- $Id: ZPCodec.cpp,v 1.6 1999-11-22 21:38:48 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -37,49 +37,21 @@
 #ifdef ZCODER
 
 // The ZCODER option is provided for documentation purposes only. The ZCODER
-// is dangerously close to U.S. patent 5059976 (Mitsubishi).  This is why we
-// always use the ZPCODER, although it usually produces 1% larger files.
+// might come dangerously close to U.S. patent 5059976 (Mitsubishi).  This is
+// why we always use the ZPCODER, although it usually produces 1% larger files.
 #warning "The ZCODER may infringe non-AT&T patent(s)."
 #warning "You should use the ZPCODER instead."
 #endif
-
-////////////////////////////////////////////////////////////////
-// INTERFACE STUFF
-////////////////////////////////////////////////////////////////
-
-ZPCodec::ZPCodec(ByteStream &bs, int encoding)
-  : bs(&bs), 
-    encoding(!! encoding)
-{
-  // Create machine independent ffz table
-  for (int i=0; i<256; i++)
-    {
-      ffzt[i]=0;
-      for (int j=i; j&0x80; j<<=1)
-        ffzt[i] += 1;
-    }
-  // Initialize encoder or decoder
-  if (encoding) 
-    einit();
-  else
-    dinit();
-  // Codebit counter
-#ifdef ZPCODEC_BITCOUNT
-  bitcount = 0;
-#endif
-}
-
-ZPCodec::~ZPCodec()
-{
-  if (encoding)
-    eflush();
-}
-
 
 
 ////////////////////////////////////////////////////////////////
 // ZP CODER DEFAULT ADAPTATION TABLE
 ////////////////////////////////////////////////////////////////
+
+
+// See ZPCodec::ZPCodec to see how this
+// default table is modified when not
+// using the DjVu compatibility mode.
 
 
 static ZPCodec::Table default_ztable[256] = 
@@ -603,6 +575,55 @@ static ZPCodec::Table default_ztable[256] =
 
 
 ////////////////////////////////////////////////////////////////
+// CONSTRUCTOR/DESTRUCTOR
+////////////////////////////////////////////////////////////////
+
+ZPCodec::ZPCodec(ByteStream &bs, bool encoding, bool djvucompat)
+  : bs(&bs), encoding(encoding)
+{
+  // Create machine independent ffz table
+  for (int i=0; i<256; i++)
+    {
+      ffzt[i]=0;
+      for (int j=i; j&0x80; j<<=1)
+        ffzt[i] += 1;
+    }
+  // Initialize table
+  newtable(default_ztable);
+  // Patch table table (and lose DjVu compatibility).
+  if (!djvucompat)
+    {
+      for (int j=0; j<256; j++)
+        {
+          unsigned short a = 0x10000-p[j];
+          while (a>=0x8000)  a=(unsigned short)(a<<1);
+          if (m[j]>0 && a+p[j]>=0x8000 && a>=m[j])
+            {
+              BitContext x = default_ztable[j].dn;
+              BitContext y = default_ztable[x].dn;
+              dn[j] = y;
+            }
+        }
+    }
+  // Initialize encoder or decoder
+  if (encoding) 
+    einit();
+  else
+    dinit();
+  // Codebit counter
+#ifdef ZPCODEC_BITCOUNT
+  bitcount = 0;
+#endif
+}
+
+ZPCodec::~ZPCodec()
+{
+  if (encoding)
+    eflush();
+}
+
+
+////////////////////////////////////////////////////////////////
 // Z CODER DECODE ALGORITHM
 ////////////////////////////////////////////////////////////////
 
@@ -614,7 +635,6 @@ ZPCodec::dinit(void)
   assert(sizeof(unsigned int)==4);
   assert(sizeof(unsigned short)==2);
   a = 0;
-  newtable(default_ztable);
   /* Read first 16 bits of code */
   if (! bs->read((void*)&byte, 1))
     byte = 0xff;
@@ -709,6 +729,9 @@ ZPCodec::decode_sub(BitContext &ctx, unsigned int z)
       scount -= shift;
       a = (unsigned short)(a<<shift);
       code = (unsigned short)(code<<shift) | ((buffer>>scount) & ((1<<shift)-1));
+#ifdef ZPCODEC_BITCOUNT
+      bitcount += shift;
+#endif
       if (scount<16) preload();
       /* Adjust fence */
       fence = code;
@@ -725,6 +748,9 @@ ZPCodec::decode_sub(BitContext &ctx, unsigned int z)
       scount -= 1;
       a = (unsigned short)(z<<1);
       code = (unsigned short)(code<<1) | ((buffer>>scount) & 1);
+#ifdef ZPCODEC_BITCOUNT
+      bitcount += 1;
+#endif
       if (scount<16) preload();
       /* Adjust fence */
       fence = code;
@@ -750,6 +776,9 @@ ZPCodec::decode_sub_simple(int mps, unsigned int z)
       scount -= shift;
       a = (unsigned short)(a<<shift);
       code = (unsigned short)(code<<shift) | ((buffer>>scount) & ((1<<shift)-1));
+#ifdef ZPCODEC_BITCOUNT
+      bitcount += shift;
+#endif
       if (scount<16) preload();
       /* Adjust fence */
       fence = code;
@@ -763,6 +792,9 @@ ZPCodec::decode_sub_simple(int mps, unsigned int z)
       scount -= 1;
       a = (unsigned short)(z<<1);
       code = (unsigned short)(code<<1) | ((buffer>>scount) & 1);
+#ifdef ZPCODEC_BITCOUNT
+      bitcount += 1;
+#endif
       if (scount<16) preload();
       /* Adjust fence */
       fence = code;
@@ -797,6 +829,9 @@ ZPCodec::decode_sub_nolearn(int mps, unsigned int z)
       scount -= shift;
       a = (unsigned short)(a<<shift);
       code = (unsigned short)(code<<shift) | ((buffer>>scount) & ((1<<shift)-1));
+#ifdef ZPCODEC_BITCOUNT
+      bitcount += shift;
+#endif
       if (scount<16) preload();
       /* Adjust fence */
       fence = code;
@@ -810,6 +845,9 @@ ZPCodec::decode_sub_nolearn(int mps, unsigned int z)
       scount -= 1;
       a = (unsigned short)(z<<1);
       code = (unsigned short)(code<<1) | ((buffer>>scount) & 1);
+#ifdef ZPCODEC_BITCOUNT
+      bitcount += 1;
+#endif
       if (scount<16) preload();
       /* Adjust fence */
       fence = code;
@@ -842,7 +880,6 @@ ZPCodec::einit(void)
   subend = 0;
   buffer = 0xffffff;
   nrun = 0;
-  newtable(default_ztable);
 }
 
 void
