@@ -196,31 +196,31 @@ then
 	  SYSTEMGCC=`echo $SYS | tr A-Z a-z `-$cc_is_gcc
 		case $SYSTEMGCC in
 		  linux-*) 
-			  TESTCCSYMBOLIC="-Wl,-Bstatic,-lstdc++ -shared"
+			  TESTCCSYMBOLIC="-shared"
 				TESTCCPIC="-fPIC"
 				;;
       solaris-*-yes)
         if [ -z "$CROSSCOMPILER" ] ; then 
-          TESTCCSYMBOLIC="-shared -L/usr/lib -R/usr/lib -Wl,-Bstatic,-lstdc++"
+          TESTCCSYMBOLIC="-shared -L/usr/lib -R/usr/lib "
         else
-          TESTCCSYMBOLIC="-shared -Wl,-rpath,/usr/lib:/usr/ccs/lib:/usr/openwin/lib -Wl,-Bstatic,-lstdc++"
+          TESTCCSYMBOLIC="-shared -Wl,-rpath,/usr/lib:/usr/ccs/lib:/usr/openwin/lib "
         fi
         TESTCCPIC="-fPIC"
         ;;
       solaris-*)
         if [ -z "$CROSSCOMPILER" ] ; then 
-          TESTCCSYMBOLIC="-G -L/usr/lib -R/usr/lib -Wl,-Bstatic,-lstdc++"
+          TESTCCSYMBOLIC="-G -L/usr/lib -R/usr/lib "
         else
-          TESTCCSYMBOLIC="-shared -Wl,-rpath,/usr/lib:/usr/ccs/lib:/usr/openwin/lib -Wl,-Bstatic,-lstdc++"
+          TESTCCSYMBOLIC="-shared -Wl,-rpath,/usr/lib:/usr/ccs/lib:/usr/openwin/lib "
         fi
         TESTCCPIC="-K PIC"
         ;;
 		  irix*-*) 
-			  TESTCCSYMBOLIC="-Wl,-Bstatic,-lstdc++ -shared"
+			  TESTCCSYMBOLIC="-shared"
 				TESTCCPIC=""
 				;;
 		  aix*-*) 
-			  TESTCCSYMBOLIC="-Wl,-Bstatic,-lstdc++ -r"
+			  TESTCCSYMBOLIC="-r"
 				TESTCCPIC="-bM\:SRE"
 				;;
 		esac

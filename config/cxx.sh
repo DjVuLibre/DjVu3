@@ -163,31 +163,31 @@ if [ -z "$CXX_SET" ] ; then
     SYSTEMGXX=`echo $SYS | tr A-Z a-z `-$cxx_is_gcc
     case $SYSTEMGXX in
       linux-*)
-        TESTCXXSYMBOLIC="-shared -Wl,-Bstatic,-lstdc++"
+        TESTCXXSYMBOLIC="-shared "
         TESTCXXPIC="-fPIC"
         ;;
       solaris-yes)
         if [ -z "$CROSSCOMPILER" ] ; then 
-          TESTCXXSYMBOLIC="-shared -L/usr/lib -R/usr/lib -Wl,-Bstatic,-lstdc++"
+          TESTCXXSYMBOLIC="-shared -L/usr/lib -R/usr/lib "
         else
-          TESTCXXSYMBOLIC="-shared -Wl,-rpath,/usr/lib:/usr/ccs/lib:/usr/openwin/lib -Wl,-Bstatic,-lstdc++"
+          TESTCXXSYMBOLIC="-shared -Wl,-rpath,/usr/lib:/usr/ccs/lib:/usr/openwin/lib "
         fi
         TESTCXXPIC="-fPIC"
         ;;
       solaris-*)
         if [ -z "$CROSSCOMPILER" ] ; then 
-          TESTCXXSYMBOLIC="-G -L/usr/lib -R/usr/lib -Wl,-Bstatic,-lstdc++"
+          TESTCXXSYMBOLIC="-G -L/usr/lib -R/usr/lib "
         else
-          TESTCXXSYMBOLIC="-shared -Wl,-rpath,/usr/lib:/usr/ccs/lib:/usr/openwin/lib -Wl,-Bstatic,-lstdc++"
+          TESTCXXSYMBOLIC="-shared -Wl,-rpath,/usr/lib:/usr/ccs/lib:/usr/openwin/lib "
         fi
         TESTCXXPIC="-K PIC"
         ;;
       irix*-*)
-        TESTCXXSYMBOLIC="-shared -Wl,-Bstatic,-lstdc++"
+        TESTCXXSYMBOLIC="-shared "
         TESTCXXPIC=""
         ;;
       aix*-*)
-        TESTCXXSYMBOLIC="-r -Wl,-Bstatic,-lstdc++"
+        TESTCXXSYMBOLIC="-r "
         TESTCXXPIC="-bM\:SRE"
         ;;
     esac
