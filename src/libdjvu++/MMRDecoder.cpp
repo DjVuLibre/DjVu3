@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: MMRDecoder.cpp,v 1.28 2001-01-04 00:45:56 bcr Exp $
+// $Id: MMRDecoder.cpp,v 1.29 2001-01-04 00:48:06 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -481,9 +481,20 @@ MMRDecoder::MMRDecoder(ByteStream &bs, int width, int height, int striped)
   prevruns[0] = width;
   rowsperstrip = (striped ? bs.read16() : height);
   src = new VLSource(bs, striped);
-  mrtable = new VLTable(mrcodes, 7);
-  btable = new VLTable(bcodes, 13);
-  wtable = new VLTable(wcodes, 13);
+  G_TRY
+  {
+    mrtable = new VLTable(mrcodes, 7);
+    btable = new VLTable(bcodes, 13);
+    wtable = new VLTable(wcodes, 13);
+  }
+  G_CATCH_ALL
+  {
+    delete src; src=0;
+    delete mrtable; mrtable=0;
+    delete btable; btable=0;
+    delete wtable; wtable=0;
+  }
+  G_ENDCATCH;
 }
 
 
