@@ -295,6 +295,7 @@ require_compiler()
     fi
     LIBS=
     CONFIG_VARS=`echo LIBS $CONFIG_VARS`
+    compiler_is_gcc=yes
     for i in $compilers
     do
       case $i in 
@@ -302,6 +303,7 @@ require_compiler()
         if [ -z "$CC_SET" ]
         then
           . ${CONFIG_DIR}/cc.sh
+          if [ -z "$cc_is_gcc" ] ; then compiler_is_gcc= ; fi
           if [ -z "$CC" ]
           then
             echo 1>&2 "${PROGRAM_NAME}: C compiler not found."
@@ -313,6 +315,7 @@ require_compiler()
         if [ -z "$CXX_SET" ]
         then
           . ${CONFIG_DIR}/cxx.sh
+          if [ -z "$cxx_is_gcc" ] ; then compiler_is_gcc= ; fi
           if [ -z "$CXX" ]
           then
             echo 1>&2 "${PROGRAM_NAME}: C++ compiler not found."
