@@ -39,7 +39,7 @@ do
       C_INCS=APPEND
       A_INCS="$A_INCS -I\$(TOPSRCDIR)/src/libjpeg"
       C_LIBS=APPEND
-      A_LIBS="$A_LIBS \$(TOPBUILDDIR)/src/libjpeg/libjpeg.a"
+      A_LIBS="$A_LIBS \$(TOPBUILDDIR)/src/libjpeg/libdjpeg.a"
       ;;
     *)
       if process_general_option $arg
