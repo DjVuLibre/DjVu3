@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuAnno.cpp,v 1.26 1999-10-19 22:06:08 leonb Exp $
+//C- $Id: DjVuAnno.cpp,v 1.27 1999-10-21 16:53:45 eaf Exp $
 
 
 #ifdef __GNUC__
@@ -573,23 +573,30 @@ DjVuANT::cvt_color(const char * color, u_int32 def)
    color++;
    const char * start, * end;
    
-   // Do blue
+      // Do blue
    end=color+strlen(color); start=end-2;
    if (start<color) start=color;
    if (end>start)
       color_rgb|=decode_comp(start[0], start+1<end ? start[1] : 0);
    
-   // Do green
+      // Do green
    end=color+strlen(color)-2; start=end-2;
    if (start<color) start=color;
    if (end>start)
       color_rgb|=decode_comp(start[0], start+1<end ? start[1] : 0) << 8;
    
-   // Do red
+      // Do red
    end=color+strlen(color)-4; start=end-2;
    if (start<color) start=color;
    if (end>start)
       color_rgb|=decode_comp(start[0], start+1<end ? start[1] : 0) << 16;
+
+      // Do the fourth byte
+   end=color+strlen(color)-6; start=end-2;
+   if (start<color) start=color;
+   if (end>start)
+      color_rgb|=decode_comp(start[0], start+1<end ? start[1] : 0) << 24;
+   
    return color_rgb;
 }
 
@@ -1215,12 +1222,15 @@ DjVuAnno::encode(ByteStream &bs)
   IFFByteStream iff(bs);
   if (ant)
     {
+      iff.put_chunk("ANTa");
+      ant->encode(iff);
+      iff.close_chunk();/*
       iff.put_chunk("ANTz");
       {
 	BSByteStream bsiff(iff, 50);
 	ant->encode(bsiff);
       }
-      iff.close_chunk();
+      iff.close_chunk();*/
     }
   if (txt)
     {
