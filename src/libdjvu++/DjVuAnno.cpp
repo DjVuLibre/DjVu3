@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuAnno.cpp,v 1.88 2001-07-24 17:52:03 bcr Exp $
+// $Id: DjVuAnno.cpp,v 1.89 2001-08-06 17:25:56 mchen Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -772,7 +772,7 @@ DjVuANT::get_zoom(GLParser & parser)
       {
         if(zoom == zoom_strings[i])
         {
-          retval=((-1)-i);
+          retval=(-i);
           break;
         }
       }
