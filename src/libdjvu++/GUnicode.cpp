@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GUnicode.cpp,v 1.25 2001-06-21 21:38:15 bcr Exp $
+// $Id: GUnicode.cpp,v 1.26 2001-07-11 19:08:39 lvincent Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -307,7 +307,7 @@ GStringRep::Unicode::create(
             GPBuffer<char> gutf8buf(utf8buf,pleft);
             char *p=utf8buf;
             unsigned char const *last=ptr;
-            for(;iconv(cv,(const char **)&ptr,&ptrleft,&p,&pleft);last=ptr)
+            for(;iconv(cv,(char **)&ptr,&ptrleft,&p,&pleft);last=ptr)
               EMPTY_LOOP;
             iconv_close(cv);
             retval=create(utf8buf,(size_t)last-(size_t)buf,t);
