@@ -6,6 +6,7 @@ CXX=@cxx@
 OPT=@opt@
 WARN=@warn@
 RANLIB=@ranlib@
+RPO=@rpo@
 AR=@ar@
 DEFS=@defs@
 CXXFLAGS= $(DEFS) $(OPT) $(WARN) -I$(TOPSRCDIR) -DUNIX
@@ -40,7 +41,9 @@ PHONY: clean distclean
 	$(CXX) $(CXXFLAGS) -c $(SRCDIR)/$*.cpp
 
 .cpp: $(LIB)
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $(SRCDIR)/$*.cpp $(LIB) $(LDLIBS)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -c $(SRCDIR)/$*.cpp
+	if [ -n "$(RPO)" ] ; then $(RPO) $*.o $(LIB) ; fi
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $*.o $(LIB) $(LDLIBS)
 	@if test -f $(SRCDIR)/$@.exp ; then\
 	   if $@ > $@.out 2>&1  &&  cmp -s $@.out $(SRCDIR)/$@.exp  ;\
 	     then echo -- $@ passed ;\
@@ -50,7 +53,9 @@ PHONY: clean distclean
 	 fi
 
 TestThreads: $(LIB)
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o TestThreads $(SRCDIR)/TestThreads.cpp $(LIB) $(LDLIBS)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -c $(SRCDIR)/TestThreads.cpp
+	if [ -n "$(RPO)" ] ; then $(RPO) TestThreads.o $(LIB) ; fi
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o TestThreads TestThreads.o $(LIB) $(LDLIBS)
 	@if test -f $(SRCDIR)/$@.exp ; then\
 	   if $@ 2>&1 | sort > $@.out 2>&1  &&  cmp -s $@.out $(SRCDIR)/$@.exp  ;\
 	     then echo -- $@ passed ;\

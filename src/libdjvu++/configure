@@ -9,20 +9,25 @@
 # C- AT&T, you have an infringing copy of this software and cannot use it
 # C- without violating AT&T's intellectual property rights.
 # C-
-# C- $Id: configure,v 1.16 1999-06-08 15:31:48 leonb Exp $
+# C- $Id: configure,v 1.17 1999-07-23 16:10:27 leonb Exp $
 
 
+### ------------------------------------------------------------------------
 ### The substitutions
+
 prefix=/usr/local
 SRCDIR=.
 CXX=${CXX-eg++}
-OPT=${OPT-"-O3 -fomit-frame-pointer -funroll-all-loops"}
-WARN=${WARN-"-Wall -Wno-unused"}
+OPT=${OPT}
+WARN=${WARN}
 RANLIB=${RANLIB-ranlib}
 AR=${AR-ar}
 LDLIBS=-lm
+RPO=${RPO}
 DEFS=
 
+
+### ------------------------------------------------------------------------
 ### Echo without newline
 
 if [ "`echo -n`" = "-n" ]
@@ -36,6 +41,8 @@ else
   }
 fi
 
+
+### ------------------------------------------------------------------------
 ### Check top dir
 
 conf=`basename $0`
@@ -47,6 +54,7 @@ then
 fi
 
 
+### ------------------------------------------------------------------------
 ### Process arguments
 
 for arg 
@@ -69,6 +77,9 @@ do
            flag=`echo $arg | sed 's/[-A-Za-z_]*=//'`
            DEFS="$DEFS $flag"
            ;;
+        --with-frepo )
+           rpo=yes
+           ;;
         *)
            test $arg = --help || echo 1>&2 "$conf: Unrecognized option '$arg'"
            cat 1>&2 <<EOF
@@ -76,16 +87,19 @@ Usage: $conf <options>
 Recognized options:
   --prefix=PREFIXDIR                    set install directory.
   --with-debug                          compile with debug enabled.
-  --with-cxxflag=FLAG                   gives flag FLAG to C++ compiler.
+  --with-cxxflag=FLAG                   pass specific flag to C++ compiler.
   --without-threads                     do not use threads.
   --with-threads=(cothreads|posix|dce)  choose a thread implementation.
+  --with-frepo                          use -frepo option in G++.
 EOF
            exit 1 ;;
    esac
    shift
 done
 
-### License stuff
+
+### ------------------------------------------------------------------------
+### License stuff (currently disabled)
 
 if false
 then
@@ -106,47 +120,76 @@ then
   echo
 fi
 
-
+### ------------------------------------------------------------------------
 ### Check compiler
 
-echo 'int main(void) {return 0;}' > /tmp/$$.c
+echo 'int main(void) {return 0;}' > /tmp/$$.cpp
 trap "rm 2>/dev/null /tmp/$$ /tmp/$$.*" 0
 
 echon Testing C++ compiler ...
-if ( ( $CXX -c /tmp/$$.c -o /tmp/$$.o ) >/dev/null 2>&1 ) 
+if ( ( $CXX -c /tmp/$$.cpp -o /tmp/$$.o ) >/dev/null 2>&1 ) 
 then
   echo $CXX.
-elif ( ( g++ -c /tmp/$$.c -o /tmp/$$.o ) >/dev/null 2>&1 ) 
+elif ( ( g++ -c /tmp/$$.cpp -o /tmp/$$.o ) >/dev/null 2>&1 ) 
 then
   CXX=g++
   echo $CXX.
-elif ( ( CC -c /tmp/$$.c -o /tmp/$$.o ) >/dev/null 2>&1 ) 
+elif ( ( CC -c /tmp/$$.cpp -o /tmp/$$.o ) >/dev/null 2>&1 ) 
 then
   CXX=CC
-  OPT=
-  WARN=
   echo $CXX.
 else
   echo
+  echo 1>&2 "$conf: ---------------------------------------------------------------   "
+  echo 1>&2 "$conf: ------ Use environment variable CXX to specify which C++ compiler "
+  echo 1>&2 "$conf: ------ should be used.  Environment variable OPT and WARN may     "
+  echo 1>&2 "$conf: ------ be used in order should be used.  Use environment variables"
+  echo 1>&2 "$conf: ------ OPT and WARN to specify compiler options.                  "
+  echo 1>&2 "$conf: ---------------------------------------------------------------   "
   echo 1>&2 "$conf: Cannot find C++ compiler."
-  echo 1>&2 "$conf: Please set environment variable CXX."
   exit 1
 fi
+
+
+### ------------------------------------------------------------------------
+### Check if compiler is gcc/g++
+
+echon Checking whether C++ compiler is gcc ...
+echo 'int main(void) { return __GNUG__;}' > /tmp/$$.cpp
+if ( $CXX -O -c /tmp/$$.cpp -o /tmp/$$ >/dev/null 2>&1 ) 
+then
+  compiler_is_gcc=yes
+  test -z "$OPT" && OPT="-O3 -fomit-frame-pointer -funroll-all-loops"
+  test -z "$WARN" && WARN="-Wall -Wno-unused"
+  echo yes.
+else
+  echo no.
+fi
+
+
+### ------------------------------------------------------------------------
+### Select optimization option (non gcc)
 
 if [ -z "$OPT" ] 
 then
   echon Testing optimization option ... 
-  if ( $CXX -O -c /tmp/$$.c -o /tmp/$$ >/dev/null 2>&1 ) 
+  echo 'int main(void) {return 0;}' > /tmp/$$.cpp
+  if ( $CXX -O -c /tmp/$$.cpp -o /tmp/$$ 1>/dev/null 2>&1 ) 
   then
-     echo $OPT
      OPT=-O
+     echo $OPT
   else
      echo broken.
   fi
 fi
 
+
+### ------------------------------------------------------------------------
+### Select pipe option 
+
 echon Testing pipe option ...
-if ( $CXX -pipe -c /tmp/$$.c -o /tmp/$$ >/dev/null 2>&1 ) 
+echo 'int main(void) {return 0;}' > /tmp/$$.cpp
+if ( $CXX -pipe -c /tmp/$$.cpp -o /tmp/$$ >/dev/null 2>&1 ) 
 then
   echo yes.
   CXX="$CXX -pipe"
@@ -155,7 +198,8 @@ else
 fi
 
 
-### Set defines
+### ------------------------------------------------------------------------
+### Process thread options
 
 if [ -n "$threads" ] 
 then
@@ -168,11 +212,33 @@ then
        ;;       
     co* )
        DEFS="$DEFS -DTHREADMODEL=COTHREADS" 
+       if [ -z "$compiler_is_gcc" ] 
+       then
+          echo 1>&2 "$conf: Cothreads only work with gcc."
+          exit 1
+       fi
+       echon "Testing exception handler patch for gcc ..."
+       cat > /tmp/$$.cpp <<\EOF
+extern "C" { extern void *(*__get_eh_context_ptr)(void), *__new_eh_context(void); }
+void main() { __get_eh_context_ptr = &__new_eh_context; }
+EOF
+       if ( $CXX /tmp/$$.cpp -o /tmp/$$ 1>/dev/null 2>&1 ) 
+       then
+          echo yes.
+       else
+          echo no.
+          echo 1>&2 "$conf: --------------------------------------------------------"
+          echo 1>&2 "$conf: ------ Using COTHREADS without the patch is unsafe."
+          echo 1>&2 "$conf: ------ See documentation and file $SRCDIR/@Tools/README."
+          echo 1>&2 "$conf: --------------------------------------------------------"
+          DEFS="$DEFS -DNO_LIBGCC_HOOKS"
+       fi
        ;;       
     posix* | dce* )
        DEFS="$DEFS -DTHREADMODEL=POSIXTHREADS" 
+       echo 'int main(void) {return 0;}' > /tmp/$$.cpp
        echon "Check option -pthread ..."
-       if ( ( $CXX -pthread /tmp/$$.c -o /tmp/$$ >/tmp/$$.log 2>&1 ) \
+       if ( ( $CXX -pthread /tmp/$$.cpp -o /tmp/$$ >/tmp/$$.log 2>&1 ) \
             && [ -z "`grep -i unrecognized /tmp/$$.log`" ] )
        then
          echo yes.
@@ -180,7 +246,7 @@ then
        else
          echo no.
          echon "Check option -threads ..."
-         if ( ( $CXX -threads /tmp/$$.c -o /tmp/$$ >/tmp/$$.log 2>&1 ) \
+         if ( ( $CXX -threads /tmp/$$.cpp -o /tmp/$$ >/tmp/$$.log 2>&1 ) \
               && [ -z "`grep -i unrecognized /tmp/$$.log`" ] )
          then
            echo yes.
@@ -193,11 +259,54 @@ then
        fi
        ;;
     *)
-       echo 1>&2 "$conf: unrecognized argument for --with-threads"
+       echo 1>&2 "$conf: unrecognized argument for option '--with-threads'."
   esac
 fi
 
 
+### ------------------------------------------------------------------------
+### Process rpo option
+
+if [ -n "$rpo" ]
+then
+  echon Test if compiler supports option '-frepo' ...
+  if [ -z "$compiler_is_gcc" ] 
+  then
+     echo no.
+     echo "$conf: Option '-frepo' only work with gcc."
+     exit 1
+  fi
+  echo 'int main(void) {return 0;}' > /tmp/$$.cpp
+  if ( ( $CXX -frepo /tmp/$$.cpp -o /tmp/$$ >/tmp/$$.log 2>&1 ) \
+         && [ -z "`grep -i unrecognized /tmp/$$.log`" ] )
+  then
+    echo yes.
+    OPT="$OPT -frepo"
+  else
+    echo no.
+    echo 1>&2 "$conf: Compiler does not support option '-frepo'."
+    exit 1
+  fi
+  echon Searching program RPO ...
+  test -z "$RPO" && RPO=rpo
+  if ( $RPO 1>/dev/null 2>&1 ) 
+  then
+    echo $RPO
+  else
+    echo not found.
+    echo 1>&2 "$conf: ---------------------------------------------------------------"
+    echo 1>&2 "$conf: ------ Program RPO is required for using option '-frepo'.      "
+    echo 1>&2 "$conf: ------ You may first configure without option '--with-frepo'   "
+    echo 1>&2 "$conf: ------ and compile program RPO from directory '@Tools'.        "
+    echo 1>&2 "$conf: ------ The full path of program rpo (as well as rpo options).  "
+    echo 1>&2 "$conf: ------ can be specifed by setting the RPO environment variable."
+    echo 1>&2 "$conf: ---------------------------------------------------------------"
+    echo "$conf: Cannot execute program '$RPO'."
+    exit 1
+  fi
+fi
+
+### ------------------------------------------------------------------------
 ### Check programs
 
 echon Searching AR program ...
@@ -224,7 +333,10 @@ else
   echo "none."
 fi
 
-# Function to generate makefiles
+
+
+### ------------------------------------------------------------------------
+### Function to generate makefiles
 
 generate_makefile()
 {
@@ -255,6 +367,7 @@ generate_makefile()
     -e 's!@warn@!'"$WARN"'!g' \
     -e 's!@ldlibs@!'"$LDLIBS"'!g' \
     -e 's!@ranlib@!'"$RANLIB"'!g' \
+    -e 's!@rpo@!'"$RPO"'!g' \
     -e 's!@ar@!'"$AR"'!g'
 
   # dependencies
@@ -265,7 +378,8 @@ generate_makefile()
 }
 
 
-# Generate makefiles
+### ------------------------------------------------------------------------
+### Generate makefiles
 
 if [ ! -d @Tools ] ; then mkdir @Tools ; fi
 if [ ! -d @Test ] ; then mkdir @Test ; fi
@@ -275,8 +389,13 @@ generate_makefile @Tools
 generate_makefile @Test
 
 
-# Further instructions
+### ------------------------------------------------------------------------
+### Success
 
 echo
-echo "Type 'make' to proceed with the compilation".
+echo Configuration is complete.
+echo You can proceed with the compilation by typing:
+                              echo "    make clean"
+test -n "$compiler_is_gcc" && echo "    make depend"
+                              echo "    make all"
 echo
