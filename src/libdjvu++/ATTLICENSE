@@ -110,26 +110,28 @@ in the AT&T Source Code Release.
 2.14. "Proprietary Notice" means the following statement without Change:
 
 ``This software contains certain software code or other information ("AT&T
-Software") proprietary to AT&T Corp. ("AT&T").  The AT&T Software is provided
-to you "AS IS".  YOU ASSUME TOTAL RESPONSIBILITY AND RISK FOR USE OF THE AT&T
-SOFTWARE.  AT&T DOES NOT MAKE, AND EXPRESSLY DISCLAIMS, ANY EXPRESS OR IMPLIED
-WARRANTIES OF ANY KIND WHATSOEVER, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
-WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE, WARRANTIES
-OF TITLE OR NON-INFRINGEMENT OF ANY INTELLECTUAL PROPERTY RIGHTS, ANY
-WARRANTIES ARISING BY USAGE OF TRADE, COURSE OF DEALING OR COURSE OF
-PERFORMANCE, OR ANY WARRANTY THAT THE AT&T SOFTWARE IS “ERROR FREE OR WILL
-MEET YOUR REQUIREMENTS.
+  Software") proprietary to AT&T Corp. ("AT&T").  The AT&T Software is
+  provided to you "AS IS".  YOU ASSUME TOTAL RESPONSIBILITY AND RISK FOR USE
+  OF THE AT&T SOFTWARE.  AT&T DOES NOT MAKE, AND EXPRESSLY DISCLAIMS, ANY
+  EXPRESS OR IMPLIED WARRANTIES OF ANY KIND WHATSOEVER, INCLUDING, WITHOUT
+  LIMITATION, THE IMPLIED WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A
+  PARTICULAR PURPOSE, WARRANTIES OF TITLE OR NON-INFRINGEMENT OF ANY
+  INTELLECTUAL PROPERTY RIGHTS, ANY WARRANTIES ARISING BY USAGE OF TRADE,
+  COURSE OF DEALING OR COURSE OF PERFORMANCE, OR ANY WARRANTY THAT THE AT&T
+  SOFTWARE IS "ERROR FREE" OR WILL MEET YOUR REQUIREMENTS.
 
-You have the right to obtain from the person or entity who furnished this
-software to you, for free and under license, a copy of the source code for the
-AT&T Software together with any patches and other source code used in the
-build of this software.
+  You have the right to obtain from the person or entity who furnished this
+  software to you, for free and under license, a copy of the source code for
+  the AT&T Software together with any patches and other source code used in
+  the build of this software.
 
-Unless you accept a license to use the AT&T Software, you shall may not
-reverse compile, disassemble or otherwise reverse engineer this software to
-ascertain the source code for any AT&T Software.
+  Unless you accept a license to use the AT&T Software, you shall not
+  reverse compile, disassemble or otherwise reverse engineer this software to
+  ascertain the source code for any AT&T Software.
 
-(C) AT&T Corp. All rights reserved.  AT&T is a registered trademark of AT&T Corp.''
+  (C) AT&T Corp. All rights reserved.  
+  AT&T is a registered trademark of AT&T Corp.''
+
 
 2.15. "Software Product" means a collection of Files in object code form only
 which, taken together, reasonably comprise a product, regardless of whether
@@ -278,7 +280,7 @@ INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF MERCHANTABILITY OR
 FITNESS FOR A PARTICULAR PURPOSE, WARRANTIES OF TITLE OR NON-INFRINGEMENT OF
 ANY IPR OR TRADEMARK RIGHTS, ANY WARRANTIES ARISING BY USAGE OF TRADE, COURSE
 OF DEALING OR COURSE OF PERFORMANCE, OR ANY WARRANTY THAT THE AT&T SOURCE CODE
-RELEASE OR AT&T CAPSULE ARE “ERROR FREE” OR WILL MEET YOUR REQUIREMENTS.
+RELEASE OR AT&T CAPSULE ARE "ERROR FREE" WILL MEET YOUR REQUIREMENTS.
 
 6.2. IN NO EVENT SHALL AT&T BE LIABLE FOR (a) ANY INCIDENTAL, CONSEQUENTIAL,
 OR INDIRECT DAMAGES (INCLUDING, WITHOUT LIMITATION, DAMAGES FOR LOSS OF
@@ -378,9 +380,10 @@ RIGHTS GRANTED IN SECTION 3.1 OF THIS AGREEMENT WITHOUT
 
   (a) FIRST ENTERING INTO THE AT&T SOURCE CODE AGREEMENT, AND
 
-  (b) ABIDING BY THE TERMS AND CONDITIONS OF SUCH AGREEMENT MAY (AND IF
-      LICENSEE HAS USED ANY PATCH, LICENSEE WILL) INFRINGE OR MISAPPROPRIATE
-      IPR OWNED OR CONTROLLED BY AT&T.
+  (b) ABIDING BY THE TERMS AND CONDITIONS OF SUCH AGREEMENT 
+
+MAY (AND IF LICENSEE HAS USED ANY PATCH, LICENSEE WILL) INFRINGE OR
+MISAPPROPRIATE IPR OWNED OR CONTROLLED BY AT&T.
 
 2.4. "IPR" means all rights protectable under intellectual property law
 anywhere throughout the world, including rights protectable under patent,
@@ -447,7 +450,7 @@ WARRANTIES OF ANY KIND WHATSOEVER, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
 WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE, WARRANTIES
 OF TITLE OR NON-INFRINGEMENT OF ANY IPR or TRADEMARK RIGHTS, ANY WARRANTIES
 ARISING BY USAGE OF TRADE, COURSE OF DEALING OR COURSE OF PERFORMANCE, OR ANY
-WARRANTY THAT THE AT&T SOFTWARE IS “ERROR FREE" OR WILL MEET LICENSEE'S
+WARRANTY THAT THE AT&T SOFTWARE IS "ERROR FREE" OR WILL MEET LICENSEE'S
 REQUIREMENTS.
 
 5.2. IN NO EVENT SHALL AT&T BE LIABLE FOR (a) ANY INCIDENTAL, CONSEQUENTIAL,
