@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.h,v 1.59 2001-04-21 00:16:58 bcr Exp $
+// $Id: GString.h,v 1.60 2001-04-23 16:46:43 chrisp Exp $
 // $Name:  $
 
 #ifndef _GSTRING_H_
@@ -57,7 +57,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.59 2001-04-21 00:16:58 bcr Exp $# */
+    #$Id: GString.h,v 1.60 2001-04-23 16:46:43 chrisp Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -122,7 +122,7 @@ public:
     GP<GStringRep>& endptr, bool &isDouble) const;
 
   // return next non space position
-  virtual int nextNonSpace( const int from ) const;
+  virtual int nextNonSpace( const int from=0 ) const;
 
     // Create an empty string.
   template <class TYPE> static GP<GStringRep> create(
@@ -283,7 +283,7 @@ public:
     GP<GStringRep>& endptr, bool &isDouble) const;
 
   // return position of next non space.
-  virtual int nextNonSpace( const int from ) const;
+  virtual int nextNonSpace( const int from=0 ) const;
 
     // Create an empty string
   static GP<GStringRep> create(const unsigned int sz = 0)
@@ -393,7 +393,7 @@ public:
   static GP<GStringRep> create(const char fmt[],va_list args);
 
   // return position of next non space.
-  virtual int nextNonSpace( const int from ) const;
+  virtual int nextNonSpace( const int from=0 ) const;
 
   friend class GString;
 protected:
@@ -930,7 +930,7 @@ public:
 
 
    /** Returns an integer.  Gives the position of the next non white space */
-   int nextNonSpace( int from  ) const
+   int nextNonSpace( int from=0  ) const
       { return ptr?(*this)->nextNonSpace( from ):0; }
 
   // -- CONCATENATION
@@ -1045,7 +1045,7 @@ public:
   }
 
    /** Return an integer.  Returns position of next non space value */
-   int nextNonSpace( int from )
+   int nextNonSpace( int from=0 )
       { return ptr?(*this)->nextNonSpace(from):0; }
 
   /** Returns a sub-string.  The sub-string is composed by copying #len#
