@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuAnno.cpp,v 1.24 1999-10-11 20:54:21 eaf Exp $
+//C- $Id: DjVuAnno.cpp,v 1.25 1999-10-11 21:31:00 eaf Exp $
 
 
 #ifdef __GNUC__
@@ -1183,7 +1183,16 @@ DjVuAnno::decode(ByteStream &bs)
            ant->decode(iff);
          }
        }
-     else if (chkid == "TXTa")
+     else if (chkid == "ANTz")
+       {
+	 BSByteStream bsiff(iff);
+	 if (ant) {
+           ant->merge(bsiff);
+         } else {
+           ant=new DjVuANT;
+           ant->decode(bsiff);
+         }
+       } else if (chkid == "TXTa")
        {
          if (txt)
            THROW("Duplicate TXT annotation");
@@ -1209,15 +1218,20 @@ DjVuAnno::encode(ByteStream &bs)
   IFFByteStream iff(bs);
   if (ant)
     {
-      iff.put_chunk("ANTa");
-      ant->encode(iff);
+      iff.put_chunk("ANTz");
+      {
+	BSByteStream bsiff(iff, 50);
+	ant->encode(bsiff);
+      }
       iff.close_chunk();
     }
   if (txt)
     {
       iff.put_chunk("TXTz");
-      BSByteStream bsiff(iff,50);
-      txt->encode(bsiff);
+      {
+	BSByteStream bsiff(iff,50);
+	txt->encode(bsiff);
+      }
       iff.close_chunk();
     }
   // Add encoding of other chunks here
