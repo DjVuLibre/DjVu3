@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.56 2001-04-13 19:02:46 bcr Exp $
+// $Id: GString.cpp,v 1.57 2001-04-16 15:15:29 chrisp Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -71,7 +71,6 @@ mbrtowc(wchar_t *w,const char *s, size_t n, mbstate_t &)
   return mbtowc(&w,source,n);
 }
 #endif
-
 
 
 #ifdef HAS_ICONV
@@ -463,6 +462,7 @@ GUTF8String::fromEscaped( const GMap<GUTF8String,GUTF8String> ConvMap ) const
         {
           value=strtoul((char const *)(s+1),&ptr,10);
         }
+
         if(!ptr)
         {
           ret+=GUTF8String((char const)(value));
@@ -584,7 +584,7 @@ GString::GString(const char fmt[], va_list args)
   }
 #endif
   // Go altering the string
-  (*this) = GStringRep::create((const char *)buffer);
+  (*this) = GStringRep::create((const char *)buffer); 
 }
 
 int 
@@ -710,23 +710,55 @@ GString::operator+= (const GString &str2)
 bool
 GString::is_int(void) const
 {
-  const char * buf=*this;
-  char * ptr;
-  strtol(buf, &ptr, 10);
-  while(*ptr && isspace(*ptr))
-    ptr++;
-  return (*ptr==0);
+//     const char * buf=*this;
+//     char * ptr;
+//     strtol(buf, &ptr, 10);
+
+//     while(*ptr && isspace(*ptr)) ptr++;
+//     return *ptr==0;
+
+   bool err;
+   GString endptr;
+   toLong(endptr, 10, err);
+
+   // if an error occurred we cannot be sure that the value
+   // was indeed a number...
+   if (err) return false;  
+
+   // count blanks;
+   int i=0;
+   for (i=0; i < (int)endptr.length() && isspace(endptr[i]); ++i);
+
+   // if the length of the endptr is 0 the whole string
+   // was a number so return true.
+   return  (i == (int)endptr.length());
+
 }
 
 bool
 GString::is_float(void) const
 {
-  const char * buf=*this;
-  char * ptr;
-  strtod(buf, &ptr);
-  while(*ptr && isspace(*ptr))
-    ptr++;
-  return (*ptr==0);
+//     const char * buf=*this;
+//     char * ptr;
+//     strtod(buf, &ptr);
+//     while(*ptr && isspace(*ptr)) ptr++;
+//     return *ptr==0;
+
+   bool err;
+   GString endptr;
+   toDouble(endptr, err);
+
+   // if an error occured we cannot be sure that the 
+   // value was indeed a number...
+   if (err) return false;
+
+   // count blanks;
+   int i=0;
+   for (i=0; i < (int)endptr.length() && isspace(endptr[i]); ++i);
+   
+   // if i equals the length of the endptr the string is
+   // a number;
+   return (i == (int)endptr.length());
 }
 
 unsigned int 
@@ -834,6 +866,7 @@ static GString locale_charset(void)
 }
 #endif
 #endif /* HAS_ICONV */
+
 
 GP<GStringRep> 
 GStringRep::toNative(const bool noconvert) const
@@ -963,6 +996,11 @@ GNativeString
 GString::getUTF82Native(char* tocode) const
 { //MBCS cvt
   GNativeString retval;
+
+  // We don't want to convert this if it 
+  // already is known to be native...
+//  if (isNative()) return *this;
+
   const size_t slen=length()+1;
   if(slen>1)
   {
@@ -1034,6 +1072,11 @@ GString::NativeToUTF8(void) const
 GUTF8String
 GString::getNative2UTF8(const char *fromcode) const
 { //MBCS cvt
+
+   // We don't want to do a transform this
+   // if we already are in the given type.
+//   if (isUTF8()) return *this;
+   
   const size_t slen=length()+1;
   GUTF8String retval;
   if(slen > 1)
@@ -1073,6 +1116,96 @@ GString::getNative2UTF8(const char *fromcode) const
   }
   return retval;
 } /*MBCS*/
+
+/* The following block of code was added by CHRISP */
+long int
+GNativeString::toLong(GNativeString& endptr, int base, bool& ptrnull) const
+{
+
+   long int retval=0;
+   if(ptr)
+      retval = (*this)->toLong(endptr, base);
+   return retval;
+}
+
+long int
+GUTF8String::toLong(GUTF8String& endptr, int base, bool& ptrnull) const
+{
+   GNativeString err( endptr.getUTF82Native() );
+   const GNativeString tmp( getUTF82Native() );
+   long int retval = tmp.toLong( err, base, ptrnull );
+   endptr = err.getNative2UTF8();
+   return retval;
+}
+
+long int
+GString::toLong(GString& endptr, int base, bool& ptrnull) const
+{
+   GNativeString err( endptr.getUTF82Native() );
+   const GNativeString tmp( getUTF82Native() );
+   long int retval = tmp.toLong( err, base, ptrnull );
+   endptr = err.getNative2UTF8();
+   return retval;
+}
+
+unsigned long int
+GNativeString::toULong( GNativeString& endptr, int base, bool& nullptr) const
+{
+   long int retval = 0;
+   if(ptr)
+      retval = (*this)->toULong(endptr, base);
+   return retval; 
+}
+
+unsigned long int
+GUTF8String::toULong( GUTF8String& endptr, int base, bool& nullptr) const
+{
+   GNativeString err( endptr.getUTF82Native() );
+   const GNativeString tmp( getUTF82Native() );
+   unsigned long int retval = tmp.toULong( err, base, nullptr );
+   endptr = err.getNative2UTF8();
+   return retval;
+}
+
+unsigned long int
+GString::toULong( GString& endptr, int base, bool& nullptr) const
+{
+   GNativeString err( endptr.getUTF82Native() );
+   const GNativeString tmp(getUTF82Native());
+   unsigned long int retval = tmp.toULong( err, base, nullptr );
+   endptr = err.getNative2UTF8();
+   return retval;
+}
+
+double
+GNativeString::toDouble( GNativeString& endptr, bool& ptrnull) const
+{
+   double retval = 0;
+   if (ptr)
+      retval = (*this)->toDouble(endptr);
+   return retval;
+}
+
+double
+GUTF8String::toDouble( GUTF8String& endptr, bool& ptrnull ) const
+{
+   GNativeString err(endptr.getUTF82Native());
+   const GNativeString tmp(getUTF82Native());
+   double retval = tmp.toDouble(err, ptrnull);
+   endptr = err.getNative2UTF8();
+   return retval;
+}
+
+double
+GString::toDouble( GString& endptr, bool& ptrnull ) const
+{
+   GNativeString err(endptr.getUTF82Native());
+   const GNativeString tmp(getUTF82Native());
+   double retval = tmp.toDouble(err, ptrnull);
+   endptr = err.getNative2UTF8();
+   return retval;
+}
+/* end code block by CHRISP */
 
 static inline unsigned long
 add_char(unsigned long const U, unsigned char const * const r)
@@ -1370,3 +1503,80 @@ GStringRep::Native::cmp(const GP<GStringRep> &s2) const
   return retval;
 }
  
+int
+GStringRep::Native::toInt() const
+{
+   if (this)
+   {
+      if (isNative())
+         return atoi(data);
+      else
+      {
+         GP<GStringRep> r= this->toNative();
+         if (r)
+         {
+            return atoi(r->data);
+         }
+      } 
+   }
+
+   return 0;
+}
+
+long int
+GStringRep::Native::toLong( GP<GStringRep>& eptr, int base ) const
+{
+   long int retval=0;
+   if (this)
+   {
+      if (isNative())
+      {
+         retval = strtol(data, &(eptr->data), base);
+      }
+      else
+      {
+         GP<GStringRep> r = this->toNative();
+         retval = strtol(r->data,  &(eptr->data), base);
+      }
+   }
+   return retval;
+}
+
+unsigned long int
+GStringRep::Native::toULong( GP<GStringRep>& eptr, int base ) const
+{
+   unsigned long int retval=0;
+   if (this)
+   {
+      if (isNative())
+      {
+         retval = strtoul(data, &(eptr->data), base);
+      }
+      else
+      {
+         GP<GStringRep> r = this->toNative();
+         retval = strtoul(r->data,  &(eptr->data), base);
+      }
+   }
+   return retval;
+}
+
+double
+GStringRep::Native::toDouble( GP<GStringRep>& eptr ) const
+{
+   double retval=0;
+   if (this)
+   {
+      if (isNative())
+      {
+         retval = strtod(data, &(eptr->data));
+      }
+      else
+      {
+         GP<GStringRep> r = this->toNative();
+         retval = strtod(r->data,  &(eptr->data));
+      }
+   }
+   return retval;
+}
+

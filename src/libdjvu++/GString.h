@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.h,v 1.44 2001-04-13 19:02:47 bcr Exp $
+// $Id: GString.h,v 1.45 2001-04-16 15:15:29 chrisp Exp $
 // $Name:  $
 
 #ifndef _GSTRING_H_
@@ -57,7 +57,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.44 2001-04-13 19:02:47 bcr Exp $# */
+    #$Id: GString.h,v 1.45 2001-04-16 15:15:29 chrisp Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -110,6 +110,12 @@ public:
     const GP<GStringRep> &rep,const GP<GStringRep> &locale=0) const;
       // Compare with #s2#.
   virtual int cmp(const GP<GStringRep> &s2) const;
+
+   // implements atoi
+   virtual int toInt() const { return 0; }
+   virtual long int toLong(GP<GStringRep>& eptr, int base) const { return 0; }
+   virtual unsigned long int toULong( GP<GStringRep>& eptr, int base) const { return 0; }
+   virtual double toDouble(GP<GStringRep>& eptr) const { return 0; }
 
     // Create an empty string.
   template <class TYPE> static GP<GStringRep> create(
@@ -213,6 +219,11 @@ public:
       // Compare with #s2#.
   virtual int cmp(const GP<GStringRep> &s2) const;
 
+   // implements atoi
+   virtual int toInt() const;
+   virtual long int toLong(GP<GStringRep>& eptr, int base) const;
+   virtual unsigned long int toULong( GP<GStringRep>& eptr, int base) const;
+   virtual double toDouble(GP<GStringRep>& eptr) const;
 
     // Create an empty string
   static GP<GStringRep> create(const unsigned int sz = 0)
@@ -419,6 +430,18 @@ public:
   GString& operator= (const GUTF8String &str);
   GString& operator= (const GNativeString &str);
 
+  /** Copy a null terminated character array, in the native mbs format.
+      Resets this string with the character string contained in the null
+      terminated character array #str#. */
+  GString& assignNative(const char *str)
+  { return ((*this)=GStringRep::Native::create(str)); }
+
+  /** Copy a null terminated character array, in the native mbs format.
+      Resets this string with the character string contained in the null
+      terminated character array #str#. */
+  GString& assignUTF8(const char *str)
+  { return ((*this)=GStringRep::UTF8::create(str)); }
+
   // -- ACCESS
   /** Converts a string into a constant null terminated character array.  This
       conversion operator is very efficient because it simply returns a
@@ -480,6 +503,13 @@ public:
   /** Converts strings between native & UTF8 **/
   GNativeString getUTF82Native( char* tocode=NULL ) const;/*MBCS*/
   GUTF8String getNative2UTF8( const char* fromcode="" ) const;/*MBCS*/
+
+  /** Converts strings containing HTML/XML escaped characters (e.g.,
+      "&lt;" for "<") into their unescaped forms. The conversion is partially
+      defined by the ConvMap argument which specifies the conversion strings
+      to be recognized. Numeric representations of
+      characters (e.g., "&#38;" or "&#x26;" for "*") are always converted. */
+  GString fromEscaped( const GMap<GString,GString> ConvMap ) const;
 
   // -- ALTERING
   /// Reinitializes a string with the null string.
@@ -655,16 +685,43 @@ public:
        with the #len# characters starting from the beginning of the string.*/
    static bool ncmp(const GString &s1,const GString &s2, const int len=1)
       { return (s1.substr(0,len) == s2.substr(0,len)); }
+
    /** Returns an integer.  Implements a functional i18n atoi. Note that if you pass
        a GString that is not in Native format the results may be disparaging. */
-   inline int nativeToInt() const
-     { return atoi((const char*)(*this)); }
-   static int nativeToInt( const GString& src )
-     { return atoi((const char*)(src)); }
+//     inline int nativeToInt() const
+//        { return atoi((const char*)(*this)); }
+//     static int nativeToInt( const GString& src )
+//        { return atoi((const char*)(src)); }
+
    /** Returns an integer.  Implements i18n atoi.  Takes a UTF8 string and converts that
        value into a native format string, which is then used to make the atoi call. */
    int toInt(void) const;
    static int toInt( const GString& src );
+
+   /** Returns a long intenger.  Implments i18n strtol.  Use toLong if you have a
+       UTF8 string, and nativeToLong if you already have the native string. */
+//   long int nativeToLong( GString& endptr, int base, bool& ptrnull) const;
+//   static long int nativeToLong(const GString& src, GString& endptr, int base, bool& err);
+//   long int toLong( GString& endptr, int base) const;
+   long int toLong( GString& endptr, int base, bool& ptrnull) const;
+   static long int toLong( const GString& src, GString& endptr, int base, bool& err);
+
+   /** Returns a unsigned long integer.  Implements i18n strtoul. Use toULong if you have
+       a UTF8 string, and nativeToULong if you already have the native string. */
+//   unsigned long int nativeToULong( GString& endptr, int base, bool& ptrnull) const;
+//   static unsigned long int nativeToULong(const GString& src, GString& endptr, int base, bool& err);
+//   unsigned long int toULong( GString& endptr, int base) const;
+   unsigned long int toULong( GString& endptr, int base, bool& ptrnull) const;
+   static unsigned long int toULong( const GString& src,  GString& endptr, int base, bool& err);
+   
+   /** Returns a double.  Implements the i18n strtod.  Use toDouble if you have a UTF8
+       string, and nativeToDouble if you already have the native string. */
+//   double nativeToDouble( GString& endptr, bool& ptrnull ) const;
+//   static double nativeToDouble(const GString& src, GString& endptr, bool& err);
+//   double toDouble( GString& endptr ) const;
+   double toDouble( GString& endptr, bool& ptrnull ) const;
+   static double toDouble( const GString& src,  GString& endptr, bool& err);
+
    /* # END code block added by CHRISP */
 
   // -- HASHING
@@ -750,6 +807,12 @@ public:
    static bool ncmp(const GUTF8String &s1,const GUTF8String &s2, const int len=1)
       { return (s1.substr(0,len) == s2.substr(0,len)); }
 
+
+   int toInt( void ) const;
+   long int toLong( GUTF8String& endptr, int base, bool& ptrnull) const;
+   unsigned long int toULong(GUTF8String& endptr, int base, bool& ptrnull) const;
+   double toDouble(GUTF8String& endptr, bool& ptrnull) const;
+
   // -- CONCATENATION
   /// Appends character #ch# to the string.
   GUTF8String& operator+= (char ch)
@@ -791,6 +854,7 @@ public:
     { return GStringRep::UTF8::create(s1,s2); }
   friend GUTF8String operator+(const char    *s1, const GUTF8String &s2) 
     { return GStringRep::UTF8::create(s1,s2); }
+
 };
 
 class GNativeString : public GString
@@ -833,12 +897,20 @@ public:
   GNativeString& operator= (const GUTF8String &str);
   GNativeString& operator= (const GNativeString &str);
 
+  template <class TYPE>
+  GNativeString& operator= (const TYPE &str)
+  { return (*this=GNativeString(str)); }
+
    /** Returns a boolean. The Standard C strncmp takes two string and compares the 
        first N characters.  static bool GString::ncmp will compare #s1# with #s2# 
        with the #len# characters starting from the beginning of the string.*/
-   static bool ncmp(
-     const GNativeString &s1,const GNativeString &s2, const int len=1)
+   static bool ncmp(const GNativeString &s1,const GNativeString &s2, const int len=1)
      { return (s1.substr(0,len) == s2.substr(0,len)); }
+
+   int toInt( void ) const;
+   long int toLong( GNativeString& endptr, int base, bool& ptrnull) const;
+   unsigned long int toULong(GNativeString& endptr, int base, bool& ptrnull) const;
+   double toDouble(GNativeString& endptr, bool& ptrnull) const;
 
   // -- CONCATENATION
   /// Appends character #ch# to the string.
@@ -877,6 +949,7 @@ public:
     { return GStringRep::Native::create(s1,s2); }
   friend GNativeString operator+(const char    *s1, const GNativeString &s2) 
     { return GStringRep::Native::create(s1,s2); }
+
 };
 
 //@}
@@ -913,12 +986,49 @@ GString::downcase( void ) const
 
 inline int 
 GString::toInt(void) const
-{ return getUTF82Native().nativeToInt(); }
+{ return getUTF82Native().toInt(); }
 
 inline int
 GString::toInt( const GString& src )
-{ return src.getUTF82Native().nativeToInt(); }
-   /* # END code block added by CHRISP */
+{ return src.getUTF82Native().toInt(); }
+
+inline int
+GNativeString::toInt(void) const
+{ return (ptr?(*this)->toInt():0); }
+
+inline int
+GUTF8String::toInt(void) const
+{ return getUTF82Native().toInt(); }
+
+inline
+GUTF8String::GUTF8String(const GNativeString &str)
+: GString((str.length()?(str->toNative(true)):(GP<GStringRep>)str))
+{ init(); }
+
+inline
+GNativeString::GNativeString(const GUTF8String &str)
+: GString((str.length()?(str->toUTF8(true)):(GP<GStringRep>)str))
+{ init(); }
+
+inline
+GUTF8String::GUTF8String(const GP<GStringRep> &str)
+: GString(str?(str->toNative(true)):str)
+{ init(); }
+
+inline
+GNativeString::GNativeString(const GP<GStringRep> &str)
+: GString(str?(str->toNative(true)):str)
+{ init(); }
+
+inline
+GUTF8String::GUTF8String(const GString &str)
+: GString((str.length()?(str->toNative(true)):(GP<GStringRep>)str))
+{ init(); }
+
+inline
+GNativeString::GNativeString(const GString &str)
+: GString((str.length()?(str->toUTF8(true)):(GP<GStringRep>)str))
+{ init(); }
 
 inline void
 GString::init(void)
@@ -1009,14 +1119,14 @@ inline GUTF8String::GUTF8String(const unsigned char *str)
 { init(GStringRep::UTF8::create((const char *)str)); }
 inline GUTF8String::GUTF8String(const char *dat, unsigned int len)
 { init(GStringRep::UTF8::create(dat,0,((int)len<0)?(-1):(int)len)); }
-inline GUTF8String::GUTF8String(const GP<GStringRep> &str)
-{ init(str); }
-inline GUTF8String::GUTF8String(const GString &str)
-{ init(str); }
+//inline GUTF8String::GUTF8String(const GP<GStringRep> &str)
+//{ init(str); }
+//inline GUTF8String::GUTF8String(const GString &str)
+//{ init(str); }
 inline GUTF8String::GUTF8String(const GUTF8String &str)
 { init(str); }
-inline GUTF8String::GUTF8String(const GNativeString &str)
-{ init(str); }
+//inline GUTF8String::GUTF8String(const GNativeString &str)
+//{ init(str); }
 inline GUTF8String::GUTF8String(const GString &gs, int from, unsigned int len)
 { init(GStringRep::UTF8::create(gs,from,((int)len<0)?(-1):(int)len)); }
 inline GUTF8String::GUTF8String(const int number)
@@ -1046,12 +1156,12 @@ inline GNativeString::GNativeString(const unsigned char *str)
 { init(GStringRep::Native::create((const char *)str)); }
 inline GNativeString::GNativeString(const char *dat, unsigned int len)
 { init(GStringRep::Native::create(dat,0,((int)len<0)?(-1):(int)len)); }
-inline GNativeString::GNativeString(const GP<GStringRep> &str)
-{ init(str); }
-inline GNativeString::GNativeString(const GString &str)
-{ init(str); }
-inline GNativeString::GNativeString(const GUTF8String &str)
-{ init(str); }
+//inline GNativeString::GNativeString(const GP<GStringRep> &str)
+//{ init(str); }
+//inline GNativeString::GNativeString(const GString &str)
+//{ init(str); }
+//inline GNativeString::GNativeString(const GUTF8String &str)
+//{ init(str); }
 inline GNativeString::GNativeString(const GNativeString &str)
 { init(str); }
 inline GNativeString::GNativeString(const GString &gs, int from, unsigned int len)
@@ -1078,6 +1188,3 @@ inline GNativeString& GNativeString::operator= (const GNativeString &str)
 // ------------------- The end
 
 #endif
-
-
-
