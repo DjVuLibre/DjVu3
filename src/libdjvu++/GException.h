@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: GException.h,v 1.5 1999-02-22 20:54:07 leonb Exp $
+//C-  $Id: GException.h,v 1.6 1999-02-22 21:12:28 leonb Exp $
 
 
 #ifndef _GEXCEPTION_H_
@@ -16,23 +16,23 @@
 /** @name GException.h
 
     Files #"GException.h"# and #"GException.cpp"# define a portable exception
-    scheme used through the library. This scheme can use native C++ exceptions
-    or an exception emulation based on #longjmp#/#setjmp#. A particular model
-    can be forced a compile time by defining option #CPP_SUPPORTS_EXCEPTIONS#
-    or #USE_EXCEPTION_EMULATION#.
+    scheme used through the DjVu Reference Library. This scheme can use native
+    C++ exceptions or an exception emulation based on #longjmp#/#setjmp#. A
+    particular model can be forced a compile time by defining option
+    #CPP_SUPPORTS_EXCEPTIONS# or #USE_EXCEPTION_EMULATION#.
     
-    The exception emulation is unfortunately not able to call the proper
-    destructors when an exception occurs. This is acceptable for simple
-    command line program, but will cause memory leaks in any continuously
-    running application (such as a browser). In addition, the exception
-    emulation is not thread safe.  These are the two main reasons for using a
-    C++ compiler which supports exceptions.  These are also compelling reasons
-    to {\em only} use exception to signal error conditions that force the
-    library to discontinue execution.
+    This emulation code was motivated because many compilers did not properly
+    support exceptions as mandated by the C++ standard documents. This
+    emulation is now considered obsolete because (a) it is not able to call
+    the proper destructors when an exception occurs, and (b) it is not thread
+    safe.  Although all modern C++ compiler handle exception decently, the
+    exception handling intrinsics are not always thread safe.  Therefore we
+    urge programmers to {\em only} use exception to signal error conditions
+    that force the library to discontinue execution.
     
-    There are four macros for handling exceptions.  Macros #TRY#, #CATCH(ex)#
-    and #ENDCATCH# are used to define an exception catching block.  Exceptions
-    can be thrown at all times using macro #THROW(cause)#. An exception can be
+    There are four macros for handling exceptions.  Macros #TRY#, #CATCH# and
+    #ENDCATCH# are used to define an exception catching block.  Exceptions can
+    be thrown at all times using macro #THROW(cause)#. An exception can be
     re-thrown from a catch block using macro #RETHROW#.
     
     Example:
@@ -58,7 +58,7 @@
     Leon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@research.att.com> -- fixed message memory allocation.
     @version 
-    #$Id: GException.h,v 1.5 1999-02-22 20:54:07 leonb Exp $# */
+    #$Id: GException.h,v 1.6 1999-02-22 21:12:28 leonb Exp $# */
 //@{
 
 #include "DjVuGlobal.h"
@@ -67,27 +67,20 @@
 #pragma interface
 #endif
 
-/** Base exception class.
-    The library can use native C++ exception or an exception
-    emulation based on #longjmp#/#setjmp#.  This model uses
-    exception handling macros (see \Ref{GException.h}). 
-    These macros represent all exceptions wich class GException.  
-*/
+/** Exception class.  
+    The library always uses macros #TRY#, #THROW#, #CATCH# and #ENDCATCH# for
+    throwing and catching exceptions (see \Ref{GException.h}). These macros
+    only deal with exceptions of type #GException#. */
 
 class GException {
 public:
-  /** Constructs a GException.  Usually called by macro #THROW#.  Argument
-      #cause# usually is a plain text error message which should not be relied
-      upon by exception handlers.  As a convention however, string #"EOF"# is
-      used when reaching an unexpected end-of-file condition and string
-      #"STOP"# is used when the user interrupts the execution.  These strings
-      can be tested by the exception handlers. Similar conventional strings may
-      be defined in the future. They all will be small strings with only
-      uppercase characters.  
-      @param cause error message.  
-      @param file file name, usually provided by macro #__FILE__#.  
-      @param line line number, usually provided by macro #__LINE__#.  
-      @param func function name, provided (in GCC) by macro #__PRETTY_FUNCTION__#. */
+  /** Constructs a GException.  This constructor is usually called by macro
+      #THROW#.  Argument #cause# is a plain text error message. As a
+      convention, string #"EOF"# is used when reaching an unexpected
+      end-of-file condition and string #"STOP"# is used when the user
+      interrupts the execution. The remaining arguments are usually provided
+      by the predefined macros #__FILE__#, #__LINE__#, and (G++ and EGCS only)
+      #__PRETTY_FUNCTION__#.  */
   GException (const char *cause, const char *file=0, int line=0, const char *func=0);
   /** Copy Constructor. */
   GException (const GException & exc);
@@ -101,11 +94,13 @@ public:
       @param msg: string incorporated into the error message. */
   void perror(const char *msg = 0) const;
   /** Returns the string describing the cause of the exception.  The returned
-      pointer is never null. The string usually is a plain text error message
-      and should not be relied upon by exception handlers. As a convention
-      however, string #"EOF"# is used when reaching an unexpected end-of-file
-      condition and string #"STOP"# is used when the user interrupts the
-      execution. */
+      pointer is never null.  Exception handlers should not rely on the value
+      of the string #cause#.  As a convention however, string #"EOF"# is used
+      when reaching an unexpected end-of-file condition and string #"STOP"# is
+      used when the user interrupts the execution. These strings can be tested
+      by the exception handlers. Similar conventional strings may be defined
+      in the future. They all will be small strings with only uppercase
+      characters. */
   const char* get_cause(void) const;
   /** Returns the function name from which the exception was thrown.
       A null pointer is returned if no function name is available. */
