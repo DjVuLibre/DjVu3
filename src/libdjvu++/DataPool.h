@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.h,v 1.12 1999-09-07 19:16:52 leonb Exp $
+//C- $Id: DataPool.h,v 1.13 1999-09-07 20:41:46 leonb Exp $
  
 #ifndef _DATAPOOL_H
 #define _DATAPOOL_H
@@ -43,7 +43,7 @@
 
     @memo Thread safe data storage
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DataPool.h,v 1.12 1999-09-07 19:16:52 leonb Exp $#
+    @version #$Id: DataPool.h,v 1.13 1999-09-07 20:41:46 leonb Exp $#
 */
 
 //@{
@@ -79,7 +79,8 @@
 
     \begin{enumerate}
        \item {\bf Not connected #DataPool#}. In this mode the #DataPool#
-             contains some real data. As mentioned above, it may be added  by means of two functions \Ref{add_data}() operating independent
+             contains some real data. As mentioned above, it may be added  
+             by means of two functions \Ref{add_data}() operating independent
 	     of each other and allowing to add data sequentially and
 	     directly to any place of data storage. It's important to call
 	     function \Ref{set_eof}() after all data has been added.
@@ -235,7 +236,6 @@ public:
 	  to the specified offsets range of the specified file.
 	  It is equivalent to calling default constructor and function
 	  \Ref{connect}().
-	  
 	  @param file_name Name of the file to connect to.
 	  @param start Beginning of the offsets range which the #DataPool# is
 	         mapped into
@@ -246,9 +246,8 @@ public:
 
    virtual ~DataPool(void);
 
-      /** Switched the #DataPool# to slave mode and connects it to the
+      /** Switches the #DataPool# to slave mode and connects it to the
 	  specified offsets range of the master #DataPool#.
-
 	  @param master_pool Master #DataPool# providing data for this slave
 	  @param start Beginning of the offsets range which the slave is
 	         mapped into
@@ -257,8 +256,7 @@ public:
       */
    void		connect(const GP<DataPool> & master_pool, int start=0, int length=-1);
       /** Connects the #DataPool# to the specified offsets range of
-	  a file with the given name.
-
+	  the named #file_name#.
 	  @param file_name Name of the file to connect to.
 	  @param start Beginning of the offsets range which the #DataPool# is
 	         mapped into
@@ -437,7 +435,7 @@ public:
 		   last for {\em threshold}+1 bytes.
 	  \end{enumerate}
 	*/
-      //{@
+      //@{
       /** Associates the specified {\em trigger callback} with the
 	  given data range.
 

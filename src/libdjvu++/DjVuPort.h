@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuPort.h,v 1.8 1999-09-07 15:59:53 leonb Exp $
+//C- $Id: DjVuPort.h,v 1.9 1999-09-07 20:41:46 leonb Exp $
  
 #ifndef _DJVUPORT_H
 #define _DJVUPORT_H
@@ -72,14 +72,12 @@
     
     @memo DjVu decoder communication mechanism.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuPort.h,v 1.8 1999-09-07 15:59:53 leonb Exp $#
+    @version #$Id: DjVuPort.h,v 1.9 1999-09-07 20:41:46 leonb Exp $#
 */
-
+//@{
 
 class DjVuPort;
 class DjVuPortcaster;
-
-//@{
 
 /** #DjVuPort# provides base functionality for classes willing to take
     part in sending and receiving messages generated during decoding process.
