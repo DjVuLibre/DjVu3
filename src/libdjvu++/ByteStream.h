@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: ByteStream.h,v 1.15 1999-09-30 15:06:26 leonb Exp $
+//C- $Id: ByteStream.h,v 1.16 2000-02-15 19:08:39 eaf Exp $
 
 
 #ifndef _BYTESTREAM_H
@@ -41,7 +41,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation\\
     Andrei Erofeev <eaf@research.att.com> -- 
     @version
-    #$Id: ByteStream.h,v 1.15 1999-09-30 15:06:26 leonb Exp $# */
+    #$Id: ByteStream.h,v 1.16 2000-02-15 19:08:39 eaf Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -118,10 +118,12 @@ public:
       of the file. It is then advisable to provide a negative value for #offset#.
       \end{description}
       Results are undefined whenever the new position is greater than the
-      total size of the ByteStream.  An exception \Ref{GException} is thrown
-      whwnever an error occurs.  However, if argument #nothrow# is set, this
-      function will return #-1# if the bytestream is not able to perform the
-      required seek operation. */
+      total size of the ByteStream.
+
+      {\bf Error reporting}:
+      If #seek()# succeeds, #0# is returned. Otherwise it either returns
+      #-1# (if #nothrow# is set to #FALSE#) or throws the \Ref{GException}
+      exception. */
   virtual int seek(long offset, int whence = SEEK_SET, bool nothrow=false);
   /** Flushes all buffers in the ByteStream.  Calling this function
       guarantees that pending data have been actually written (i.e. passed to
