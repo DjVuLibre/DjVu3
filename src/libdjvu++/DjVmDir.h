@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVmDir.h,v 1.10 1999-10-05 16:00:05 leonb Exp $
+//C- $Id: DjVmDir.h,v 1.11 1999-10-18 14:07:33 leonb Exp $
 
 #ifndef _DJVMDIR_H
 #define _DJVMDIR_H
@@ -22,7 +22,7 @@
     @memo Implements DjVu multipage document directory
     @author Andrei Erofeev <eaf@research.att.com>
     @version
-    #$Id: DjVmDir.h,v 1.10 1999-10-05 16:00:05 leonb Exp $# */
+    #$Id: DjVmDir.h,v 1.11 1999-10-18 14:07:33 leonb Exp $# */
 //@{
 
 
@@ -107,12 +107,9 @@ public:
     int	get_page_num(void) const 
       { return page_num; } ;
     /** Default constructor. */
-    File(void) : flags(0) 
-      { } ;
+    File(void);
     /** Full constructor. */
-    File(const char *name, const char *id, const char *title, bool page)
-      : name(name), id(id), title(title), flags(0), page_num(-1)
-      { if (page) flags|=IS_PAGE; } ;
+    File(const char *name, const char *id, const char *title, bool page);
   private:
     enum FLAGS { IS_PAGE=1, HAS_NAME=2, HAS_TITLE=4 };
     char flags;

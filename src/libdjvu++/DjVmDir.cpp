@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVmDir.cpp,v 1.7 1999-09-30 21:48:35 praveen Exp $
+//C- $Id: DjVmDir.cpp,v 1.8 1999-10-18 14:07:33 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -23,7 +23,28 @@
 #include <ctype.h>
 
 
-const int DjVmDir::version=0;
+
+
+
+/* DjVmDir::File */
+
+DjVmDir::File::File(void) 
+  : offset(0), size(0), flags(0), page_num(-1)
+{ 
+}
+
+DjVmDir::File::File(const char *name, const char *id, const char *title, bool page)
+  : name(name), id(id), title(title), offset(0), size(0), flags(0), page_num(-1)
+{ 
+  // Ask Leon if you get this one!
+  if (id && id[0]=='#')
+    THROW("DjVm File IDs should not start with character '#'");
+  // Set page flag
+  if (page) 
+    flags |= IS_PAGE; 
+}
+
+
 
 /* Directory file format
 
@@ -40,6 +61,8 @@ const int DjVmDir::version=0;
          ASCIIZ name, if it's different from id (see flags)
          ASCIIZ title, if it's different from id (see flags)
 */
+
+const int DjVmDir::version=0;
 
 void 
 DjVmDir::decode(ByteStream & str)
