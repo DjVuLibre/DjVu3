@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.4 1999-05-26 18:20:54 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.5 1999-05-26 18:26:48 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -580,20 +580,19 @@ DjVuDocument::get_djvu_file(int page_num)
    else
    {
       DEBUG_MSG("dummy_dir=" << dummy_dir << "\n");
+      GP<DjVuFile> f;
       if (dummy_dir)
       {
 	    // Navigation directory has not been decoded yet.
 	 GP<DjVuNavDir> d;
 	 if (djvm)
 	 {
-	    GP<DjVuFile> f=get_djvu_file(djvm_doc_url+djvm_first_page_name);
+	    f=get_djvu_file(djvm_doc_url+djvm_first_page_name);
 	    d=f->find_ndir();
-	    DEBUG_MSG("*** d=" << d << "\n");
-	    if (!d) { d=f->decode_ndir();
-	    DEBUG_MSG("**** d=" << d << "\n"); }
+	    if (!d) d=f->decode_ndir();
 	 } else
 	 {
-	    GP<DjVuFile> f=get_djvu_file(init_url);
+	    f=get_djvu_file(init_url);
 	    d=f->find_ndir();
 	    if (!d) d=f->decode_ndir();
 	 }
@@ -604,6 +603,7 @@ DjVuDocument::get_djvu_file(int page_num)
 	 }
       }
       url=dir->page_to_url(page_num);
+      if (f && f->get_url()==url) return f;
    }
    return get_djvu_file(url);
 }
