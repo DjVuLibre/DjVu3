@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.h,v 1.55 2001-05-18 18:30:04 bcr Exp $
+// $Id: ByteStream.h,v 1.56 2001-06-05 03:19:57 bcr Exp $
 // $Name:  $
 
 #ifndef _BYTESTREAM_H
@@ -62,7 +62,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation\\
     Andrei Erofeev <eaf@geocities.com> -- 
     @version
-    #$Id: ByteStream.h,v 1.55 2001-05-18 18:30:04 bcr Exp $# */
+    #$Id: ByteStream.h,v 1.56 2001-06-05 03:19:57 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -99,7 +99,8 @@ public:
   enum codepage_type {RAW,AUTO,NATIVE,UTF8} cp;
 
   /** @name Virtual Functions.
-      These functions are usually implemented by each subclass of #ByteStream#. */
+      These functions are usually implemented by each subclass of #ByteStream#.
+  */
   //@{
 public:
   /** Virtual destructor. */

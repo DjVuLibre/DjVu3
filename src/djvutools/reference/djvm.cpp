@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djvm.cpp,v 1.19 2001-05-09 00:38:26 bcr Exp $
+// $Id: djvm.cpp,v 1.20 2001-06-05 03:19:57 bcr Exp $
 // $Name:  $
 
 /** @name djvm
@@ -99,7 +99,7 @@
     @author
     Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: djvm.cpp,v 1.19 2001-05-09 00:38:26 bcr Exp $# */
+    #$Id: djvm.cpp,v 1.20 2001-06-05 03:19:57 bcr Exp $# */
 //@{
 //@}
 
@@ -266,7 +266,7 @@ int
 main(int argc, char ** argv)
 {
   setlocale(LC_ALL,"");
-  DjVuMessage::use_locale();
+  djvu_programname(argv[0]);
   DArray<GUTF8String> dargv(0,argc-1);
   for(int i=0;i<argc;++i)
     dargv[i]=GNativeString(argv[i]);

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: XMLTags.h,v 1.9 2001-05-23 21:48:01 bcr Exp $
+// $Id: XMLTags.h,v 1.10 2001-06-05 03:19:58 bcr Exp $
 // $Name:  $
 
 #ifndef _LT_XMLTAGS__
@@ -55,37 +55,54 @@ class lt_XMLTags : public GPEnabled
 protected:
   lt_XMLTags();
   lt_XMLTags(const char n[]);
+
 public:
-  /// Default creator.
-  static GP<lt_XMLTags> create(void) { return new lt_XMLTags(); }
+  /// Empty creator.
+  static GP<lt_XMLTags> create(void) { return new lt_XMLTags; }
   /// Default the specified tag.
   static GP<lt_XMLTags> create(const char n[]) { return new lt_XMLTags(n); }
+  /// Initialize from the specified URL.
+  void init(const GURL & url);
+  /// Create from the specified URL.
+  static GP<lt_XMLTags> create(const GURL &url);
+  /// Initialize from the specified bytestream.
+  void init(const GP<ByteStream> &bs);
+  /// Create from the specified bytestream.
+  static GP<lt_XMLTags> create(const GP<ByteStream> &bs);
+  /// Initialize from an XMLByteStream.
+  void init(XMLByteStream &xmlbs);
+  /// Create from an XML bytestream.
+  static GP<lt_XMLTags> create(XMLByteStream &xmlbs);
   /// Non-virtual destructor.
   ~lt_XMLTags();
 
-  inline void setLine(const int xstartline) { startline=xstartline; }
-  inline int getLine(void) { return startline; }
+  inline int get_Line(void) const;
+  inline const GUTF8String& get_raw(void) const;
+  inline const GUTF8String& get_name(void) const;
+  inline const GList<lt_XMLContents>& get_content(void) const;
+  inline const GMap<GUTF8String,GUTF8String>& get_args(void) const;
+  inline const GMap<GUTF8String,GPList<lt_XMLTags> >& get_allTags(void) const;
+
+  GPList<lt_XMLTags> get_Tags(char const tagname[]) const;
+  inline void set_Line(const int xstartline) { startline=xstartline; }
+
   inline void addtag(GP<lt_XMLTags> x);
   inline void addraw(GUTF8String raw);
   inline GPosition contains(GUTF8String name) const;
   inline const GPList<lt_XMLTags> & operator [] (const GUTF8String name) const;
   inline const GPList<lt_XMLTags> & operator [] (const GPosition &pos) const;
-  void init(XMLByteStream &xmlbs);
-  void init(const GP<ByteStream> &bs);
-  void init(const GURL & url);
-  GPList<lt_XMLTags> getTags(char const tagname[]) const;
   static void ParseValues(char const *t, GMap<GUTF8String,GUTF8String> &args,bool downcase=true);
-  static void getMaps(char const tagname[],char const argn[],
+  static void get_Maps(char const tagname[],char const argn[],
     GPList<lt_XMLTags> list, GMap<GUTF8String, GP<lt_XMLTags> > &map);
   void write(ByteStream &bs,bool const top=true) const;
 
+protected:
   GUTF8String name;
   GMap<GUTF8String,GUTF8String> args;
-  GUTF8String raw;
   GList<lt_XMLContents> content;
+  GUTF8String raw;
   GMap<GUTF8String,GPList<lt_XMLTags> > allTags;
   int startline;
-  GUTF8String encoding;
 };
 
 class lt_XMLContents
@@ -98,6 +115,31 @@ public:
   void write(ByteStream &bs) const;
 };
 
+inline GP<lt_XMLTags>
+lt_XMLTags::create(const GURL &url)
+{
+  const GP<lt_XMLTags> retval(new lt_XMLTags);
+  retval->init(url);
+  return retval;
+}
+
+inline GP<lt_XMLTags>
+lt_XMLTags::create(const GP<ByteStream> &bs)
+{
+  const GP<lt_XMLTags> retval(new lt_XMLTags);
+  retval->init(bs);
+  return retval;
+}
+
+inline GP<lt_XMLTags>
+lt_XMLTags::create(XMLByteStream &xmlbs)
+{
+  const GP<lt_XMLTags> retval(new lt_XMLTags);
+  retval->init(xmlbs);
+  return retval;
+}
+
+/// Non-virtual destructor.
 inline void
 lt_XMLTags::addtag (GP<lt_XMLTags> x)
 {
@@ -117,6 +159,25 @@ lt_XMLTags::addraw (GUTF8String r)
     raw+=r;
   }
 }
+
+inline int
+lt_XMLTags::get_Line(void) const
+{ return startline; }
+
+inline const GUTF8String &
+lt_XMLTags::get_name(void) const { return name; }
+
+inline const GUTF8String &
+lt_XMLTags::get_raw(void) const { return raw; }
+
+inline const GList<lt_XMLContents> &
+lt_XMLTags::get_content(void) const { return content; }
+
+inline const GMap<GUTF8String,GUTF8String> &
+lt_XMLTags::get_args(void) const { return args; }
+
+inline const GMap<GUTF8String,GPList<lt_XMLTags> > &
+lt_XMLTags::get_allTags(void) const { return allTags; }
 
 inline GPosition
 lt_XMLTags::contains(GUTF8String name) const

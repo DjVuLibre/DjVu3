@@ -59,10 +59,10 @@ PFIRST(const GList<GUTF8String> * const gl)
 
 
 int
-main()
+main(int,char *argv[],char *[])
 {
    setlocale(LC_ALL,"");
-   DjVuMessage::use_locale();
+   DjVuMessage::set_programname(GNativeString(argv[0]));
    
   GList<GUTF8String> gl1;
 

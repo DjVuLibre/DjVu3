@@ -19,10 +19,10 @@
 #endif
 
 int
-main()
+main(int,char *argv[],char *[])
 {
    setlocale(LC_ALL,"");
-   DjVuMessage::use_locale();
+   DjVuMessage::set_programname(GNativeString(argv[0]));
 
 #ifdef _MSC_VER
   // Redirect STDERR on STDOUT

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocument.cpp,v 1.173 2001-05-03 20:43:11 mchen Exp $
+// $Id: DjVuDocument.cpp,v 1.174 2001-06-05 03:19:57 bcr Exp $
 // $Name:  $
 
 
@@ -706,8 +706,10 @@ DjVuDocument::url_to_page(const GURL & url) const
 	    if (flags & DOC_DIR_KNOWN)
 	    {
 	       GP<DjVmDir::File> file;
-	       if (url.base()==init_url) file=djvm_dir->id_to_file(url.fname());
-	       if (file) page_num=file->get_page_num();
+	       if (url.base()==init_url)
+                 file=djvm_dir->id_to_file(url.fname());
+	       if (file)
+                 page_num=file->get_page_num();
 	    }
 	    break;
 	 }
@@ -716,8 +718,10 @@ DjVuDocument::url_to_page(const GURL & url) const
 	    if (flags & DOC_DIR_KNOWN)
 	    {
 	       GP<DjVmDir::File> file;
-	       if (url.base()==init_url.base()) file=djvm_dir->id_to_file(url.fname());
-	       if (file) page_num=file->get_page_num();
+	       if (url.base()==init_url.base())
+                 file=djvm_dir->id_to_file(url.fname());
+	       if (file)
+                 page_num=file->get_page_num();
 	    }
 	    break;
 	 }
@@ -740,15 +744,15 @@ DjVuDocument::id_to_url(const GUTF8String & id) const
 	 case BUNDLED:
 	    if (flags & DOC_DIR_KNOWN)
 	    {
-	       GP<DjVmDir::File> file=djvm_dir->id_to_file(id);
-	       if (!file)
-               {
-                 file=djvm_dir->name_to_file(id);
-	         if (!file)
-                   file=djvm_dir->title_to_file(id);
-               }
-	       if (file)
-	         return GURL::UTF8(file->get_load_name(),init_url);
+	      GP<DjVmDir::File> file=djvm_dir->id_to_file(id);
+	      if (!file)
+              {
+                file=djvm_dir->name_to_file(id);
+	        if (!file)
+                  file=djvm_dir->title_to_file(id);
+              }
+	      if (file)
+	        return GURL::UTF8(file->get_load_name(),init_url);
 	    }
 	    break;
 	 case INDIRECT:
@@ -996,21 +1000,17 @@ DjVuDocument::get_page(int page_num, bool sync, DjVuPort * port)
    DEBUG_MAKE_INDENT(3);
 
    GP<DjVuImage> dimg;
-   
-   GP<DjVuFile> file=get_djvu_file(page_num);
+   const GP<DjVuFile> file(get_djvu_file(page_num));
    if (file)
    {
-      dimg=DjVuImage::create();
-      dimg->connect(file);
-      if (port) DjVuPort::get_portcaster()->add_route(dimg, port);
+     dimg=DjVuImage::create(file);
+     if (port)
+       DjVuPort::get_portcaster()->add_route(dimg, port);
    
-      if (!file->is_decoding() &&
-	  !file->is_decode_ok() &&
-	  !file->is_decode_failed())
-	 file->start_decode();
+     file->resume_decode();
+     if (dimg && sync)
+       dimg->wait_for_complete_decode();
    }
-   if (dimg && sync)
-      dimg->wait_for_complete_decode();
    return dimg;
 }
 
@@ -1022,21 +1022,17 @@ DjVuDocument::get_page(const GUTF8String &id, bool sync, DjVuPort * port)
    DEBUG_MAKE_INDENT(3);
 
    GP<DjVuImage> dimg;
-   
-   GP<DjVuFile> file=get_djvu_file(id);
-   if (file)
+   const GP<DjVuFile> file(get_djvu_file(id));
+   if(file)
    {
-      dimg=DjVuImage::create();
-      dimg->connect(file);
-      if (port) DjVuPort::get_portcaster()->add_route(dimg, port);
+     dimg=DjVuImage::create(file);
+     if (port)
+       DjVuPort::get_portcaster()->add_route(dimg, port);
    
-      if (!file->is_decoding() &&
-	  !file->is_decode_ok() &&
-	  !file->is_decode_failed())
-	 file->start_decode();
+     file->resume_decode();
+     if (dimg && sync)
+       dimg->wait_for_complete_decode();
    }
-   if (dimg && sync)
-      dimg->wait_for_complete_decode();
    return dimg;
 }
 
@@ -1110,8 +1106,7 @@ DjVuDocument::process_threqs(void)
             if (req->image_file->is_decode_ok())
             {
               // We can generate it now
-              GP<DjVuImage> dimg=DjVuImage::create();
-              dimg->connect(req->image_file);
+              const GP<DjVuImage> dimg(DjVuImage::create(req->image_file));
               
               dimg->wait_for_complete_decode();
               
@@ -1157,7 +1152,10 @@ DjVuDocument::process_threqs(void)
               req->image_file=0;
               req->data_pool->set_eof();
               remove=true;
-            } else req->image_file->start_decode();
+            } else
+            {
+              req->image_file->start_decode();
+            }
           }
         }
       } G_CATCH(exc) {
@@ -1368,7 +1366,7 @@ DjVuDocument::notify_file_flags_changed(const DjVuFile * source,
       process_threqs();		// May be we can extract thumbnails now
 }
 
-GPBase
+GP<DjVuFile>
 DjVuDocument::id_to_file(const DjVuPort * source, const GUTF8String &id)
 {
    return (DjVuFile *) get_djvu_file(id);

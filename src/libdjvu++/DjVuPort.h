@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuPort.h,v 1.39 2001-04-12 00:24:59 bcr Exp $
+// $Id: DjVuPort.h,v 1.40 2001-06-05 03:19:58 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUPORT_H
@@ -90,11 +90,12 @@ class DataPool;
     @memo DjVu decoder communication mechanism.
     @author Andrei Erofeev <eaf@geocities.com>\\
             L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuPort.h,v 1.39 2001-04-12 00:24:59 bcr Exp $# */
+    @version #$Id: DjVuPort.h,v 1.40 2001-06-05 03:19:58 bcr Exp $# */
 //@{
 
 class DjVuPort;
 class DjVuPortcaster;
+class DjVuFile;
 
 /** Base class for notification targets.
     #DjVuPort# provides base functionality for classes willing to take part in
@@ -155,7 +156,7 @@ public:
 	  given ID. \Ref{DjVuDocument} is supposed to intercept it
 	  and either create a new instance of \Ref{DjVuFile} or reuse
 	  an existing one from the cache. */
-   virtual GPBase	id_to_file(const DjVuPort * source, const GUTF8String &id);
+   virtual GP<DjVuFile>	id_to_file(const DjVuPort * source, const GUTF8String &id);
 
       /** This request is issued when decoder needs additional data
 	  for decoding.  Both \Ref{DjVuFile} and \Ref{DjVuDocument} are
@@ -393,7 +394,7 @@ public:
 	  function in each of the ports from the destination list starting from
 	  the closest until one of them returns non-zero pointer to
 	  \Ref{DjVuFile}. */
-   virtual GPBase	id_to_file(const DjVuPort * source, const GUTF8String &id);
+   virtual GP<DjVuFile>	id_to_file(const DjVuPort * source, const GUTF8String &id);
 
       /** Computes destination list for #source# and calls the corresponding
 	  function in each of the ports from the destination list starting from

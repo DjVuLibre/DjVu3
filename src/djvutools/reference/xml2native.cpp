@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: xml2native.cpp,v 1.3 2001-05-25 19:17:15 bcr Exp $
+// $Id: xml2native.cpp,v 1.4 2001-06-05 03:19:57 bcr Exp $
 // $Name:  $
 
 /** @name nativetoutf8
@@ -43,7 +43,7 @@
     @author
     Dr Bill C Riemers <bcr@lizardtech.com>
     @version
-    #$Id: xml2native.cpp,v 1.3 2001-05-25 19:17:15 bcr Exp $# */
+    #$Id: xml2native.cpp,v 1.4 2001-06-05 03:19:57 bcr Exp $# */
 //@{
 //@}
 
@@ -63,7 +63,7 @@ int
 main(int argc, char **argv)
 {
   setlocale(LC_ALL,"");
-  DjVuMessage::use_locale();
+  djvu_programname(argv[0]);
   DArray<GUTF8String> dargv(0,argc-1);
   for(int i=0;i<argc;++i)
     dargv[i]=GNativeString(argv[i]);

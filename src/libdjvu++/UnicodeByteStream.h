@@ -1,7 +1,7 @@
 //C-  Copyright © 2000-2001, LizardTech, Inc. All Rights Reserved.
 //C-              Unauthorized use prohibited.
 //
-// $Id: UnicodeByteStream.h,v 1.7 2001-05-25 19:17:16 bcr Exp $
+// $Id: UnicodeByteStream.h,v 1.8 2001-06-05 03:19:58 bcr Exp $
 // $Name:  $
 
 #ifndef _UNICODEBYTESTREAM_H_
@@ -29,7 +29,7 @@
     @author
     Bill C Riemers <bcr@lizardtech.org>
     @version
-    #$Id: UnicodeByteStream.h,v 1.7 2001-05-25 19:17:16 bcr Exp $# */
+    #$Id: UnicodeByteStream.h,v 1.8 2001-06-05 03:19:58 bcr Exp $# */
 //@{
 
 #include "DjVuGlobal.h"
@@ -104,79 +104,6 @@ private:
   // Cancel C++ default stuff
   UnicodeByteStream & operator=(UnicodeByteStream &);
 };
-
-inline void
-UnicodeByteStream::set_encodetype(const GStringRep::EncodeType et)
-{
-  seek(startpos,SEEK_SET);
-  bufferpos=0;
-  buffer=GUTF8String::create(0,0,et);
-}
-
-inline void
-UnicodeByteStream::set_encoding(const GUTF8String &xencoding)
-{
-  seek(startpos,SEEK_SET);
-  bufferpos=0;
-  buffer=GUTF8String::create(0,0,xencoding);
-}
-
-inline size_t
-UnicodeByteStream::read(void *buf, size_t size)
-{
-  bufferpos=0;
-  const int retval=bs->read(buf,size);
-  if(retval)
-  {
-    buffer=GUTF8String::create(
-      (unsigned char const *)buf,retval,buffer.get_remainder());
-  }else
-  {
-    buffer=GUTF8String::create(0,0,buffer.get_remainder());
-  }
-  return retval;
-}
-
-inline size_t
-UnicodeByteStream::write(const void *buf, size_t size)
-{
-  bufferpos=0;
-  buffer=GUTF8String::create(0,0,buffer.get_remainder());
-  return bs->write(buf,size);
-}
-
-inline long 
-UnicodeByteStream::tell(void) const
-{
-  return bs->tell();
-}
-
-inline UnicodeByteStream & 
-UnicodeByteStream::operator=(UnicodeByteStream &uni)
-{
-  bs=uni.bs;
-  bufferpos=uni.bufferpos;
-  buffer=uni.buffer;
-  return *this;
-}
-
-inline int 
-UnicodeByteStream::seek
-(long offset, int whence, bool nothrow)
-{
-  int retval=bs->seek(offset,whence,nothrow);
-  bufferpos=0;
-  buffer=GUTF8String::create(0,0,buffer.get_remainder());
-  return retval;
-}
-
-inline void 
-UnicodeByteStream::flush(void)
-{
-  bs->flush();
-  bufferpos=0;
-  buffer=GUTF8String::create(0,0,buffer.get_remainder());
-}
 
 
 class XMLByteStream : public UnicodeByteStream

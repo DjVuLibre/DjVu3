@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.cpp,v 1.80 2001-05-18 18:30:04 bcr Exp $
+// $Id: ByteStream.cpp,v 1.81 2001-06-05 03:19:57 bcr Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 04/1997
@@ -1350,7 +1350,7 @@ void ByteStream::writemessage( const char *message )
 }
 
 static void 
-read_file(ByteStream &bs,char buffer[],GPBuffer<char> &gbuffer)
+read_file(ByteStream &bs,char *&buffer,GPBuffer<char> &gbuffer)
 {
   const int size=bs.size();
   int pos=0;

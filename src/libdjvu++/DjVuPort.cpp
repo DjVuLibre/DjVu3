@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuPort.cpp,v 1.51 2001-05-09 00:38:26 bcr Exp $
+// $Id: DjVuPort.cpp,v 1.52 2001-06-05 03:19:58 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -469,14 +469,14 @@ DjVuPortcaster::id_to_url(const DjVuPort * source, const GUTF8String &id)
    return url;
 }
 
-GPBase
+GP<DjVuFile>
 DjVuPortcaster::id_to_file(const DjVuPort * source, const GUTF8String &id)
 {
    GPList<DjVuPort> list;
    compute_closure(source, list, true);
-   GPBase file;
+   GP<DjVuFile> file;
    for(GPosition pos=list;pos;++pos)
-      if ((file=list[pos]->id_to_file(source, id)).get()) break;
+      if ((file=list[pos]->id_to_file(source, id))) break;
    return file;
 }
 
@@ -577,7 +577,7 @@ DjVuPortcaster::notify_decode_progress(const DjVuPort * source, float done)
 GURL
 DjVuPort::id_to_url(const DjVuPort *, const GUTF8String &) { return GURL(); }
 
-GPBase
+GP<DjVuFile>
 DjVuPort::id_to_file(const DjVuPort *, const GUTF8String &) { return 0; }
 
 GP<DataPool>

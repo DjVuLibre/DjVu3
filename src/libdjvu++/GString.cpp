@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.107 2001-05-25 19:44:00 bcr Exp $
+// $Id: GString.cpp,v 1.108 2001-06-05 03:19:58 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -437,7 +437,8 @@ GUTF8String::toEscaped( const bool tosevenbit ) const
   char const * const head=(*this);
   char const *start=head;
   char const *s=start;
-  for(unsigned long w;(w=(*this)->getValidUCS4(s));)
+  char const *last=s;
+  for(unsigned long w;(w=(*this)->getValidUCS4(s));last=s)
   {
     char const *ss=0;
     switch(w)
@@ -469,15 +470,12 @@ GUTF8String::toEscaped( const bool tosevenbit ) const
     {
       if(s!=start)
       {
-        ret+=substr((size_t)start-(size_t)head,(size_t)s-(size_t)start)+ss;
+        ret+=substr((size_t)start-(size_t)head,(size_t)last-(size_t)start)+ss;
       }else
       {
         ret+=ss;
       }
-      start=(++s);
-    }else
-    {
-      ++s;
+      start=s;
     }
   }
   ret+=start;
@@ -857,11 +855,11 @@ GBaseString::is_int(void) const
   bool isLong=!!ptr;
   if(isLong)
   {
-    GP<GStringRep> eptr;
-    (*this)->toLong(eptr,isLong);
-    if(isLong && eptr)
+    int endpos;
+    (*this)->toLong(0,endpos);
+    if(endpos>=0)
     {
-      isLong=(eptr->nextNonSpace(0) == eptr->size);
+      isLong=((*this)->nextNonSpace(endpos) == (int)length());
     }
   }
   return isLong;
@@ -873,11 +871,11 @@ GBaseString::is_float(void) const
   bool isDouble=!!ptr;
   if(isDouble)
   {
-    GP<GStringRep> eptr;
-    (*this)->toDouble(eptr,isDouble);
-    if(isDouble && eptr)
+    int endpos;
+    (*this)->toDouble(0,endpos);
+    if(endpos>=0)
     {
-      isDouble=(eptr->nextNonSpace(0) == eptr->size);
+      isDouble=((*this)->nextNonSpace(endpos) == (int)length());
     }
   }
   return isDouble;
@@ -1103,8 +1101,16 @@ GStringRep::UCS4toUTF8(const unsigned long w,unsigned char *ptr)
     *ptr++ = (unsigned char)(((w>>6)|0x80)&0xBF);
     *ptr++ = (unsigned char)((w|0x80)&0xBF);
   }else
-  {
-    *ptr++ = 0;
+  {  // We code the illegal character into the string anyway...
+    const unsigned char winv=(unsigned int)(-1)-w;
+    if(winv<=0xff)
+    {
+      *ptr++ = winv;
+    }else
+    {
+      UCS4toUTF8(winv,ptr);
+    }
+//    *ptr++ = 0;
   }
   return ptr;
 }
@@ -1269,9 +1275,8 @@ GStringRep::UTF8::cmp(const GP<GStringRep> &s2,const int len) const
 int
 GStringRep::UTF8::toInt() const
 {
-  bool isLong;
-  GP<GStringRep> eptr;
-  return (int)toLong(eptr,isLong);
+  int endpos;
+  return (int)toLong(0,endpos);
 }
 
 static inline long
@@ -1284,27 +1289,37 @@ Cstrtol(char *data,char **edata, const int base)
 }
 
 long 
-GStringRep::UTF8::toLong( GP<GStringRep>& eptr, bool &isLong, const int base) const
+GStringRep::UTF8::toLong(
+  const int pos, int &endpos, const int base) const
 {
   char *edata=0;
-  long retval=Cstrtol(data,&edata, base);
+  long retval=Cstrtol(data+pos,&edata, base);
   if(edata)
   {
-    eptr=strdup(edata);
-    isLong=true;
+    endpos=edata-data;
   }else
   {
-    GP<GStringRep> ptr=toNative(true);
+    endpos=(-1);
+    GP<GStringRep> ptr=ptr->strdup(data+pos);
+    if(ptr)
+      ptr=ptr->toNative(true);
     if(ptr)
     {
-      retval=ptr->toLong(eptr,isLong,base);
-      if(isLong)
+      int xendpos;
+      retval=ptr->toLong(0,xendpos,base);
+      if(xendpos> 0)
       {
-        eptr=eptr->toUTF8();
+        endpos=(int)size;
+        ptr=ptr->strdup(data+xendpos);
+        if(ptr)
+        {
+          ptr=ptr->toUTF8(true);
+          if(ptr)
+          {
+            endpos-=(int)(ptr->size);
+          }
+        }
       }
-    }else
-    {
-      eptr=0;
     }
   }
   return retval;
@@ -1320,27 +1335,37 @@ Cstrtoul(char *data,char **edata, const int base)
 }
 
 unsigned long 
-GStringRep::UTF8::toULong( GP<GStringRep>& eptr, bool &isULong, const int base) const
+GStringRep::UTF8::toULong(
+  const int pos, int &endpos, const int base) const
 {
   char *edata=0;
-  unsigned long retval=Cstrtoul(data,&edata,base);
+  unsigned long retval=Cstrtoul(data+pos,&edata, base);
   if(edata)
   {
-    eptr=strdup(edata);
-    isULong=true;
+    endpos=edata-data;
   }else
   {
-    GP<GStringRep> ptr=toNative(true);
+    endpos=(-1);
+    GP<GStringRep> ptr=ptr->strdup(data+pos);
+    if(ptr)
+      ptr=ptr->toNative(true);
     if(ptr)
     {
-      retval=ptr->toULong(eptr,isULong,base);
-      if(isULong)
+      int xendpos;
+      retval=ptr->toULong(0,xendpos,base);
+      if(xendpos> 0)
       {
-        eptr=eptr->toUTF8();
+        endpos=(int)size;
+        ptr=ptr->strdup(data+xendpos);
+        if(ptr)
+        {
+          ptr=ptr->toUTF8(true);
+          if(ptr)
+          {
+            endpos-=(int)(ptr->size);
+          }
+        }
       }
-    }else
-    {
-      eptr=0;
     }
   }
   return retval;
@@ -1356,27 +1381,36 @@ Cstrtod(char *data,char **edata)
 }
 
 double
-GStringRep::UTF8::toDouble( GP<GStringRep>& eptr, bool &isDouble) const
+GStringRep::UTF8::toDouble(const int pos, int &endpos) const
 {
   char *edata=0;
-  double retval=Cstrtod(data, &edata);
+  double retval=Cstrtod(data+pos,&edata);
   if(edata)
   {
-    eptr=strdup(edata);
-    isDouble=true;
+    endpos=edata-data;
   }else
   {
-    GP<GStringRep> ptr=toNative(true);
+    endpos=(-1);
+    GP<GStringRep> ptr=ptr->strdup(data+pos);
+    if(ptr)
+      ptr=ptr->toNative(true);
     if(ptr)
     {
-      retval=ptr->toDouble(eptr,isDouble);
-      if(isDouble)
+      int xendpos;
+      retval=ptr->toDouble(0,xendpos);
+      if(xendpos >= 0)
       {
-        eptr=eptr->toUTF8();
+        endpos=(int)size;
+        ptr=ptr->strdup(data+xendpos);
+        if(ptr)
+        {
+          ptr=ptr->toUTF8(true);
+          if(ptr)
+          {
+            endpos-=(int)(ptr->size);
+          }
+        }
       }
-    }else
-    {
-      eptr=0;
     }
   }
   return retval;
@@ -1588,8 +1622,8 @@ GStringRep::Native::toUTF8(const bool) const
   int i=0;
   if(sizeof(wchar_t) == sizeof(unsigned long))
   {
-    for(wchar_t w;
-      (n>0)&&((i=mbrtowc(&w,source,n,&ps))>=0);
+    for(wchar_t w;(n>0)
+      &&((i=mbrtowc(&w,source,n,&ps))>=0);
       n-=i,source+=i)
     {
       ptr=UCS4toUTF8(w,ptr);
@@ -1766,56 +1800,50 @@ GStringRep::Native::toInt() const
 
 long
 GStringRep::Native::toLong(
-  GP<GStringRep>& eptr, bool &isLong, const int base ) const
+  const int pos, int &endpos, const int base) const
 {
    char *edata=0;
-   const long retval=strtol(data, &edata, base);
+   const long retval=strtol(data+pos, &edata, base);
    if(edata)
    {
-     eptr=GStringRep::Native::create(edata);
-     isLong=true;
+     endpos=(int)((size_t)edata-(size_t)data);
    }else
    {
-     eptr=0;
-     isLong=false;
+     endpos=(-1);
    }
    return retval;
 }
 
 unsigned long
 GStringRep::Native::toULong(
-  GP<GStringRep>& eptr, bool &isULong, const int base ) const
+  const int pos, int &endpos, const int base) const
 {
-  char *edata=0;
-  const unsigned long retval=strtoul(data, &edata, base);
-  if(edata)
-  {
-    eptr=GStringRep::Native::create(edata);
-    isULong=true;
-  }else
-  {
-    eptr=0;
-    isULong=false;
-  }
-  return retval;
+   char *edata=0;
+   const unsigned long retval=strtoul(data+pos, &edata, base);
+   if(edata)
+   {
+     endpos=(int)((size_t)edata-(size_t)data);
+   }else
+   {
+     endpos=(-1);
+   }
+   return retval;
 }
 
 double
 GStringRep::Native::toDouble(
-  GP<GStringRep>& eptr, bool &isDouble) const
+  const int pos, int &endpos) const
 {
-  char *edata=0;
-  const double retval=strtod(data, &edata);
-  if(edata)
-  {
-    eptr=GStringRep::Native::create(edata);
-    isDouble=true;
-  }else
-  {
-    eptr=0;
-    isDouble=false;
-  }
-  return retval;
+   char *edata=0;
+   const double retval=strtod(data+pos, &edata);
+   if(edata)
+   {
+     endpos=(int)((size_t)edata-(size_t)data);
+   }else
+   {
+     endpos=(-1);
+   }
+   return retval;
 }
 
 unsigned long
@@ -1867,6 +1895,9 @@ GStringRep::Native::getValidUCS4(const char *&source) const
 void 
 GStringRep::set_remainder(void const * const, const unsigned int,
   const EncodeType) {}
+void 
+GStringRep::set_remainder(void const * const, const unsigned int,
+  const GP<GStringRep> &encoding) {}
 void
 GStringRep::set_remainder( const GP<GStringRep::Unicode> &) {}
 

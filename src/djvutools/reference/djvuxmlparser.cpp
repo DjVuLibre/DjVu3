@@ -1,7 +1,7 @@
 //C-  Copyright © 2000-2001, LizardTech, Inc. All Rights Reserved.
 //C-              Unauthorized use prohibited.
 //
-// $Id: djvuxmlparser.cpp,v 1.6 2001-05-09 00:38:26 bcr Exp $
+// $Id: djvuxmlparser.cpp,v 1.7 2001-06-05 03:19:57 bcr Exp $
 // $Name:  $
 
 #include "XMLParser.h"
@@ -20,7 +20,7 @@ int
 main(int argc,char *argv[],char *[])
 {
   setlocale(LC_ALL,"");
-  DjVuMessage::use_locale();
+  djvu_programname(argv[0]);
   DArray<GUTF8String> dargv(0,argc-1);
   for(int i=0;i<argc;++i)
     dargv[i]=GNativeString(argv[i]);
@@ -45,23 +45,15 @@ main(int argc,char *argv[],char *[])
       exit(1);
     }
 
-// this is a poor way of doing this
-// if we had a global list of the mod files we would 
-// only have to decode them once and save them once
-
-    for(int i=1;i<argc;i++)
+    for(int i=0;i<argc;++i)
     {
-      GP<lt_XMLTags> tag = lt_XMLTags::create();
-      tag->init(GURL::Filename::Native(argv[i]));
-      GP<lt_XMLParser> anno = lt_XMLParser::create_anno();
-      anno->parse(*tag);
-      // if we try to change the text here we will 
-      // lose the anno changes when we save
-      anno->save();
-      anno=0;
-      GP<lt_XMLParser> text = lt_XMLParser::create_text();
-      text->parse(*tag);
-      text->save();
+      const GP<lt_XMLParser> parser(lt_XMLParser::create());
+      {
+        const GP<lt_XMLTags> tag(
+          lt_XMLTags::create(GURL::Filename::Native(dargv[i])));
+        parser->parse(*tag);
+      }
+      parser->save();
     }
   }
   G_CATCH(ex)

@@ -1,7 +1,7 @@
 //C-  Copyright © 2000-2001, LizardTech, Inc. All Rights Reserved.
 //C-              Unauthorized use prohibited.
 //
-// $Id: UnicodeByteStream.cpp,v 1.8 2001-05-31 22:43:11 bcr Exp $
+// $Id: UnicodeByteStream.cpp,v 1.9 2001-06-05 03:19:58 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -37,6 +37,105 @@ CountLines(const GUTF8String &str)
     EMPTY_LOOP;
   return retval;
 }
+
+void
+UnicodeByteStream::set_encodetype(const GStringRep::EncodeType et)
+{
+  seek(startpos,SEEK_SET);
+  bufferpos=0;
+  buffer=GUTF8String::create(0,0,et);
+}
+
+void
+UnicodeByteStream::set_encoding(const GUTF8String &xencoding)
+{
+  seek(startpos,SEEK_SET);
+  bufferpos=0;
+  buffer=GUTF8String::create(0,0,xencoding);
+}
+
+size_t
+UnicodeByteStream::read(void *buf, size_t size)
+{
+  bufferpos=0;
+  const int retval=bs->read(buf,size);
+  if(retval)
+  {
+    void *bufend=memchr(buf,0,retval);
+    if(! bufend)
+    {
+      buffer=GUTF8String::create(
+        (unsigned char const *)buf,retval,buffer.get_remainder());
+    }else
+    {
+      int len=(size_t)bufend-(size_t)buf; 
+      GUTF8String e(GUTF8String::create(buf,len,buffer.get_remainder())+"&#0;");
+      void *bufstart=(char *)bufend+1;
+      int left=retval-len-1;
+      for(;left>0;left-=len+1,bufstart=(char *)bufend+1)
+      {
+        bufend=memchr((bufstart=(char *)bufend+1),0,left);
+        if(!bufend)
+          break; 
+        len=(size_t)bufend-(size_t)buf; 
+        e+=GUTF8String::create(bufstart,len,buffer.get_remainder())+"&#0;";
+      }
+      if(left)
+      {
+        e+=GUTF8String::create(bufstart,left,buffer.get_remainder());
+      }
+      buffer=GUTF8String::create(
+        (unsigned char const *)(const char *)e,e.length(),buffer.get_remainder());
+    }
+  }else
+  {
+    buffer=GUTF8String::create(0,0,buffer.get_remainder());
+  }
+  return retval;
+}
+
+size_t
+UnicodeByteStream::write(const void *buf, size_t size)
+{
+  bufferpos=0;
+  buffer=GUTF8String::create(0,0,buffer.get_remainder());
+  return bs->write(buf,size);
+}
+
+long 
+UnicodeByteStream::tell(void) const
+{
+  return bs->tell();
+}
+
+UnicodeByteStream & 
+UnicodeByteStream::operator=(UnicodeByteStream &uni)
+{
+  bs=uni.bs;
+  bufferpos=uni.bufferpos;
+  buffer=uni.buffer;
+  return *this;
+}
+
+int 
+UnicodeByteStream::seek
+(long offset, int whence, bool nothrow)
+{
+  int retval=bs->seek(offset,whence,nothrow);
+  bufferpos=0;
+  buffer=GUTF8String::create(0,0,buffer.get_remainder());
+  return retval;
+}
+
+void 
+UnicodeByteStream::flush(void)
+{
+  bs->flush();
+  bufferpos=0;
+  buffer=GUTF8String::create(0,0,buffer.get_remainder());
+}
+
+
 
 GUTF8String
 UnicodeByteStream::gets(
@@ -222,5 +321,4 @@ XMLByteStream::init(void)
 
 XMLByteStream::~XMLByteStream()
 {}
-
 

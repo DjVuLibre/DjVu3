@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: cjb2.cpp,v 1.19 2001-05-10 23:09:35 fcrary Exp $
+// $Id: cjb2.cpp,v 1.20 2001-06-05 03:19:57 bcr Exp $
 // $Name:  $
 
 
@@ -70,7 +70,7 @@
     Paul Howard <pgh@research.att.com>\\
     Pascal Vincent <vincentp@iro.umontreal.ca>
     @version
-    $Id: cjb2.cpp,v 1.19 2001-05-10 23:09:35 fcrary Exp $ */
+    $Id: cjb2.cpp,v 1.20 2001-06-05 03:19:57 bcr Exp $ */
 //@{
 //@}
 
@@ -894,7 +894,7 @@ int
 main(int argc, const char **argv)
 {
   setlocale(LC_ALL,"");
-  DjVuMessage::use_locale();
+  djvu_programname(argv[0]);
   DArray<GUTF8String> dargv(0,argc-1);
   for(int i=0;i<argc;++i)
     dargv[i]=GNativeString(argv[i]);

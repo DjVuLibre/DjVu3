@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuFile.cpp,v 1.171 2001-05-04 00:12:17 fcrary Exp $
+// $Id: DjVuFile.cpp,v 1.172 2001-06-05 03:19:58 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -545,7 +545,7 @@ DjVuFile::process_incl_chunk(ByteStream & str, int file_num)
     // No. We have to request a new file
     GP<DjVuFile> file;
     G_TRY {
-      file=(DjVuFile *)pcaster->id_to_file(this, incl_str).get();
+      file=pcaster->id_to_file(this, incl_str);
     }
     G_CATCH(ex) {
       unlink_file(incl_str);
@@ -837,13 +837,10 @@ DjVuFile::decode_chunk( const GUTF8String &id, const GP<ByteStream> &gbs,
       int decode_was_already_started = 1;
       {
         GMonitorLock lock(&file->flags);
-        if (!file->is_decoding() &&
-          !file->is_decode_ok() &&
-          !file->is_decode_failed() )
-        {
           // Start decoding
+        if(file->resume_decode())
+        {
           decode_was_already_started = 0;
-          file->start_decode();
         }
       }
       // Send file notifications if previously started
@@ -856,7 +853,8 @@ DjVuFile::decode_chunk( const GUTF8String &id, const GP<ByteStream> &gbs,
           get_portcaster()->notify_file_flags_changed(file, DECODE_FAILED, 0);
       }
       desc.format( ERR_MSG("DjVuFile.indir_chunk1") "\t" + file->get_url().fname() );
-    } else desc.format( ERR_MSG("DjVuFile.indir_chunk2") );
+    } else
+      desc.format( ERR_MSG("DjVuFile.indir_chunk2") );
   }
   
   // Djbz (JB2 Dictionary)
@@ -1279,6 +1277,25 @@ DjVuFile::start_decode(void)
   G_ENDCATCH;
   flags.leave();
   delete thread_to_delete;
+}
+
+bool
+DjVuFile::resume_decode(const bool sync)
+{
+  bool retval=false;
+  {
+    GMonitorLock lock(&flags);
+    if( !is_decoding() && !is_decode_ok() && !is_decode_failed() )
+    {
+      start_decode();
+      retval=true;
+    }
+  }
+  if(sync)
+  {
+    wait_for_finish();
+  }
+  return retval;
 }
 
 void

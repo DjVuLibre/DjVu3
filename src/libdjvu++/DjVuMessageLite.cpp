@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessageLite.cpp,v 1.1 2001-05-09 00:38:26 bcr Exp $
+// $Id: DjVuMessageLite.cpp,v 1.2 2001-06-05 03:19:58 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -256,29 +256,30 @@ DjVuMessageLite::LookUpID( const GUTF8String &msgID,
     GPosition pos=Map.contains(msgID);
     if(pos)
     {
-      GP<lt_XMLTags> tag=Map[pos];
-      GPosition valuepos=tag->args.contains(valuestring);
+      const GP<lt_XMLTags> tag=Map[pos];
+      GPosition valuepos=tag->get_args().contains(valuestring);
       if(valuepos)
       {
-        message_text=tag->args[valuepos];
+        message_text=tag->get_args()[valuepos];
       }else
       {
-        const int start_line=tag->raw.search((unsigned long)'\n',0);
+        const GUTF8String raw(tag->get_raw());
+        const int start_line=raw.search((unsigned long)'\n',0);
       
-        const int start_text=tag->raw.nextNonSpace(0);
-        const int end_text=tag->raw.firstEndSpace(0);
+        const int start_text=raw.nextNonSpace(0);
+        const int end_text=raw.firstEndSpace(0);
         if(start_line<0 || start_text<0 || start_text < start_line)
         {
-          message_text=tag->raw.substr(0,end_text).fromEscaped();
+          message_text=raw.substr(0,end_text).fromEscaped();
         }else
         {
-          message_text=tag->raw.substr(start_line+1,end_text-start_line-1).fromEscaped();
+          message_text=raw.substr(start_line+1,end_text-start_line-1).fromEscaped();
         }
       }
-      GPosition numberpos=tag->args.contains(numberstring);
+      GPosition numberpos=tag->get_args().contains(numberstring);
       if(numberpos)
       {
-        message_number=tag->args[numberpos];
+        message_number=tag->get_args()[numberpos];
       }
     }
   }
@@ -324,10 +325,10 @@ DjVuMessageLite::InsertArg( GUTF8String &message,
               break;
             case 'f':
               {
-                GUTF8String end;
-                bool success;
-                narg.format((const char *)format, arg.toDouble(end,success));
-                if( !success ) narg = arg;
+                int endpos;
+                narg.format((const char *)format, arg.toDouble(0,endpos));
+                if( endpos < 0 )
+                  narg = arg;
               }
               break;
             default:
@@ -372,13 +373,12 @@ void DjVuMessageLite_LookUp( char *msg_buffer, const unsigned int buffer_size, c
 void
 DjVuMessageLite::AddByteStream(const GP<ByteStream> &bs)
 {
-  GP<lt_XMLTags> gtags=lt_XMLTags::create();
+  const GP<lt_XMLTags> gtags(lt_XMLTags::create(bs));
   lt_XMLTags &tags=*gtags;
-  tags.init(bs);
-  GPList<lt_XMLTags> Bodies=tags.getTags(bodystring);
+  GPList<lt_XMLTags> Bodies=tags.get_Tags(bodystring);
   if(! Bodies.isempty())
   {
-    lt_XMLTags::getMaps(messagestring,namestring,Bodies,Map);
+    lt_XMLTags::get_Maps(messagestring,namestring,Bodies,Map);
   }
 }
 

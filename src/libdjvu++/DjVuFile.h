@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuFile.h,v 1.81 2001-04-30 23:30:45 bcr Exp $
+// $Id: DjVuFile.h,v 1.82 2001-06-05 03:19:58 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUFILE_H
@@ -71,7 +71,7 @@ class DjVuNavDir;
 
     @memo Classes representing DjVu files.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuFile.h,v 1.81 2001-04-30 23:30:45 bcr Exp $#
+    @version #$Id: DjVuFile.h,v 1.82 2001-06-05 03:19:58 bcr Exp $#
 */
 
 //@{
@@ -343,6 +343,10 @@ public:
 	  or listen for notifications sent through the \Ref{DjVuPortcaster}
 	  to remain in sync. */
    void		start_decode(void);
+      /** Start the decode iff not already decoded.  If sync is true, wait
+          wait for decode to complete.  Returns true of start_decode is called.
+          */
+   bool   resume_decode(const bool sync=false);
       /** Stops decode. If #sync# is 1 then the function will not return
 	  until the decoding thread actually dies. Otherwise it will
 	  just signal the thread to stop and will return immediately.

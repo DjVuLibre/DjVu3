@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuImage.h,v 1.43 2001-04-21 23:22:04 mchen Exp $
+// $Id: DjVuImage.h,v 1.44 2001-06-05 03:19:58 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUIMAGE_H
@@ -73,7 +73,7 @@
     L\'eon Bottou <leonb@research.att.com> - initial implementation
     Andrei Erofeev <eaf@geocities.com> - multipage support
     @version
-    #$Id: DjVuImage.h,v 1.43 2001-04-21 23:22:04 mchen Exp $# */
+    #$Id: DjVuImage.h,v 1.44 2001-06-05 03:19:58 bcr Exp $# */
 //@{
 
 
@@ -129,6 +129,10 @@ public:
       This will allow it to receive and relay messages and requests generated
       by the passed \Ref{DjVuFile} and any file included into it. */
   void		connect(const GP<DjVuFile> & file);
+
+  /** This combines the above two steps for simplier code operations. */
+  static GP<DjVuImage> create(const GP<DjVuFile> &file)
+  { const GP<DjVuImage> retval=create(); retval->connect(file); return retval; }
       
   //@}
 

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: native2utf8.cpp,v 1.1 2001-05-18 22:04:08 bcr Exp $
+// $Id: native2utf8.cpp,v 1.2 2001-06-05 03:19:57 bcr Exp $
 // $Name:  $
 
 /** @name nativetoutf8
@@ -43,7 +43,7 @@
     @author
     Dr Bill C Riemers <bcr@lizardtech.com>
     @version
-    #$Id: native2utf8.cpp,v 1.1 2001-05-18 22:04:08 bcr Exp $# */
+    #$Id: native2utf8.cpp,v 1.2 2001-06-05 03:19:57 bcr Exp $# */
 //@{
 //@}
 
@@ -63,7 +63,7 @@ int
 main(int argc, char **argv)
 {
   setlocale(LC_ALL,"");
-  DjVuMessage::use_locale();
+  djvu_programname(argv[0]);
   DArray<GUTF8String> dargv(0,argc-1);
   for(int i=0;i<argc;++i)
     dargv[i]=GNativeString(argv[i]);

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: XMLParser.h,v 1.1 2001-04-24 19:50:38 bcr Exp $
+// $Id: XMLParser.h,v 1.2 2001-06-05 03:19:58 bcr Exp $
 // $Name:  $
 
 #ifndef _LT_XMLPARSER__
@@ -48,39 +48,34 @@ class lt_XMLTags;
 class lt_XMLContents;
 class DjVuFile;
 class DjVuDocument;
-// this is the base class for using XML to change DjVu Docs.
+class DjVuImage;
+class GBitmap;
 
+// this is the base class for using XML to change DjVu Docs.
 
 class lt_XMLParser : public GPEnabled
 {
 public:
-  class Text;
-  class Anno;
+  class Impl;
+  typedef GP<ByteStream> mapOCRcallback(
+    void *,const GUTF8String &value,const GP<DjVuImage> &);
 protected:
   lt_XMLParser(void);
+  virtual ~lt_XMLParser();
 public:
-  static GP<lt_XMLParser> create_anno(void);
-  static GP<lt_XMLParser> create_text(void);
+  static GP<lt_XMLParser> create(void);
   /// Parse the specified bytestream.
-  void parse(GP<ByteStream> &bs);
+  virtual void parse(const GP<ByteStream> &bs) = 0;
   /// Parse the specified tags - this one does all the work
   virtual void parse(const lt_XMLTags &tags) = 0;
   /// write to disk.
-  void save(void);
+  virtual void save(void) = 0;
   /// erase.
-  void empty(void);
+  virtual void empty(void) = 0;
 
   // helper function for args
-  static void intList(char const *coords, GList<int> &retval);
-protected:
-
-  // we may want to make these list of modified file static so
-  // they only needed to be loaded and saved once.
-  GPList<DjVuFile> m_files;
-  GMap<GUTF8String,GP<DjVuDocument> > m_docs;
-  GURL m_codebase;
-private: // dummy stuff
-  static void parse(ByteStream *bs);
+  static void setOCRcallback(
+    void * const arg,mapOCRcallback * const );
 };
 
 #endif /* _LT_XMLPARSER__ */

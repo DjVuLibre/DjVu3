@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessage.h,v 1.24 2001-05-18 22:04:08 bcr Exp $
+// $Id: DjVuMessage.h,v 1.25 2001-06-05 03:19:58 bcr Exp $
 // $Name:  $
 
 
@@ -51,7 +51,10 @@ protected:
 
 public:
   /// Use the locale info and find the XML files on disk.
-  static void use_locale(void);
+  static void use_language(void);
+
+  /// Set the program name used when searching for XML files on disk.
+  static void set_programname(const GUTF8String &programname);
 
   /// creates this class specifically.
   static const DjVuMessageLite &create_full(void);
@@ -59,7 +62,7 @@ public:
   /** Adds a byte stream to be parsed whenever the next DjVuMessage::create()
       call is made. */
   static void AddByteStreamLater(const GP<ByteStream> &bs)
-  { use_locale(); DjVuMessageLite::AddByteStreamLater(bs); }
+  { use_language(); DjVuMessageLite::AddByteStreamLater(bs); }
 
   /** Destructor: Does any necessary cleanup. Actions depend on how the message
       file is implemented. */
@@ -67,16 +70,16 @@ public:
 
   //// Same as LookUp, but this is a static method.
   static GUTF8String LookUpUTF8( const GUTF8String & MessageList )
-  { use_locale();return DjVuMessageLite::LookUpUTF8(MessageList); }
+  { use_language();return DjVuMessageLite::LookUpUTF8(MessageList); }
 
   /** Same as Lookup, but returns the a multibyte character string in the
       current locale. */
   static GNativeString LookUpNative( const GUTF8String & MessageList )
-  { use_locale();return DjVuMessageLite::LookUpNative(MessageList); }
+  { use_language();return DjVuMessageLite::LookUpNative(MessageList); }
 
   /// This is a simple alias to the above class, but does an fprintf to stderr.
   static void perror( const GUTF8String & MessageList )
-  { use_locale();DjVuMessageLite::perror(MessageList); }
+  { use_language();DjVuMessageLite::perror(MessageList); }
 
   static GList<GURL> GetProfilePaths(void);
 };

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: XMLTags.cpp,v 1.21 2001-05-31 20:36:15 lchen Exp $
+// $Id: XMLTags.cpp,v 1.22 2001-06-05 03:19:58 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -143,7 +143,7 @@ lt_XMLTags::init(const GP<ByteStream> &bs)
 void
 lt_XMLTags::init(const GURL &url)
 {
-  const GP<ByteStream> bs=ByteStream::create(url,"r");
+  const GP<ByteStream> bs=ByteStream::create(url,"rb");
   init(bs);
 }
 
@@ -163,6 +163,7 @@ lt_XMLTags::init(XMLByteStream &xmlbs)
   {
     G_THROW( (ERR_MSG("XMLTags.raw_string") "\t")+raw);
   }
+  GUTF8String encoding;
   for(int len;(len=(tag=xmlbs.gets(0,'>',true)).length());)
   {
     if(tag[len-1] != '>')
@@ -247,7 +248,7 @@ lt_XMLTags::init(XMLByteStream &xmlbs)
           if(level[last]->name != xname)
           {
             G_THROW( (ERR_MSG("XMLTags.unmatched_end") "\t")
-              +level[last]->name+("\t"+GUTF8String(level[last]->getLine()))
+              +level[last]->name+("\t"+GUTF8String(level[last]->get_Line()))
               +("\t"+xname)+("\t"+GUTF8String(linesread+1)));
           }
 //          DjVuPrintMessage("Got end tag: %s\n",(const char *)name);
@@ -283,7 +284,7 @@ lt_XMLTags::init(XMLByteStream &xmlbs)
         {
           G_THROW( ERR_MSG("XMLTags.no_body") );
         }
-        t->setLine(linesread+1);
+        t->set_Line(linesread+1);
         allTags[t->name].append(t);
         for(GPosition pos=t->args;pos;++pos)
         {
@@ -309,7 +310,7 @@ lt_XMLTags::init(XMLByteStream &xmlbs)
 }
 
 GPList<lt_XMLTags>
-lt_XMLTags::getTags(char const tagname[]) const
+lt_XMLTags::get_Tags(char const tagname[]) const
 {
   GPosition pos=allTags.contains(tagname);
   GPList<lt_XMLTags> retval;
@@ -317,7 +318,7 @@ lt_XMLTags::getTags(char const tagname[]) const
 }
 
 void
-lt_XMLTags::getMaps(char const tagname[],char const argn[],GPList<lt_XMLTags> list, GMap<GUTF8String, GP<lt_XMLTags> > &map)
+lt_XMLTags::get_Maps(char const tagname[],char const argn[],GPList<lt_XMLTags> list, GMap<GUTF8String, GP<lt_XMLTags> > &map)
 {
   for(GPosition pos=list;pos;++pos)
   {

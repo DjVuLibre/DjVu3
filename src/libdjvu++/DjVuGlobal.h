@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuGlobal.h,v 1.53 2001-05-10 23:09:36 fcrary Exp $
+// $Id: DjVuGlobal.h,v 1.54 2001-06-05 03:19:58 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUGLOBAL_H
@@ -86,7 +86,7 @@
     @memo
     Global definitions.
     @version
-    #$Id: DjVuGlobal.h,v 1.53 2001-05-10 23:09:36 fcrary Exp $#
+    #$Id: DjVuGlobal.h,v 1.54 2001-06-05 03:19:58 bcr Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> -- empty file.\\
     Bill Riemers <bcr@lizardtech.com> -- real work.  */
@@ -332,15 +332,20 @@ DJVUEXTERNCAPI(void DjVuWriteError( const char *message ));
 /** Prints the translation of message to stdout. */
 DJVUEXTERNCAPI(void DjVuWriteMessage( const char *message ));
 
-/**
-    A C function to perform a message lookup. Arguments are a buffer to received the
-    translated message, a buffer size (bytes), and a message_list. The translated
-    result is returned in msg_buffer encoded in UTF-8. In case of error, msg_buffer is
-    empty (i.e., msg_buffer[0] == '\0').
+/** A C function to perform a message lookup. Arguments are a buffer to
+  received the translated message, a buffer size (bytes), and a
+  message_list. The translated result is returned in msg_buffer encoded
+  in UTF-8. In case of error, msg_buffer is empty
+  (i.e., msg_buffer[0] == '\0').
 */
 DJVUEXTERNCAPI(void DjVuMessage_LookUp(
   char *msg_buffer, const unsigned int buffer_size, 
   const char *message ));
+
+/** This function sets the program name used when searching for language
+  files.
+*/
+DJVUEXTERNCAPI(const char *djvu_programname(const char *programname));
 
 /** @name DjVu Names  
 

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: d44.cpp,v 1.19 2001-05-10 23:09:35 fcrary Exp $
+// $Id: d44.cpp,v 1.20 2001-06-05 03:19:57 bcr Exp $
 // $Name:  $
 
 /** @name d44
@@ -84,7 +84,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: d44.cpp,v 1.19 2001-05-10 23:09:35 fcrary Exp $# 
+    #$Id: d44.cpp,v 1.20 2001-06-05 03:19:57 bcr Exp $# 
 */
 //@{
 //@}
@@ -185,7 +185,7 @@ mymain(int argc, char **argv)
 #endif
 {
   setlocale(LC_ALL,"");
-  DjVuMessage::use_locale();
+  djvu_programname(argv[0]);
   DArray<GUTF8String> dargv(0,argc-1);
   for(int i=0;i<argc;++i)
     dargv[i]=GNativeString(argv[i]);

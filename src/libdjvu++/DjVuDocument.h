@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocument.h,v 1.87 2001-05-02 22:32:43 bcr Exp $
+// $Id: DjVuDocument.h,v 1.88 2001-06-05 03:19:57 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUDOCUMENT_H
@@ -58,7 +58,7 @@ class ByteStream;
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocument.h,v 1.87 2001-05-02 22:32:43 bcr Exp $#
+    @version #$Id: DjVuDocument.h,v 1.88 2001-06-05 03:19:57 bcr Exp $#
 */
 
 //@{
@@ -460,6 +460,9 @@ public:
 	     \item #INDIRECT# and #BUNDLED#: #DOC_DIR_KNOWN# flag must be set.
 	  \end{itemize} */
    GURL		page_to_url(int page_num) const;
+   /// Tranlate the page number to id...
+   GUTF8String page_to_id(int page_num) const
+   { return url_to_id(page_to_url(page_num)); }
       /** Translates the page URL back to page number. Returns #-1# if the
 	  page is not in the document or the document's structure
           has not been learnt yet.
@@ -472,6 +475,10 @@ public:
 	     \item #INDIRECT# and #BUNDLED#: #DOC_DIR_KNOWN# is set.
 	  \end{itemize} */
    int		url_to_page(const GURL & url) const;
+   /// Map the specified url to it's id.
+   GUTF8String  url_to_id(const GURL &url) const
+   { return url.fname(); }
+
       /** Translates the textual ID to the complete URL if possible.
 	  
 	  Depending on the document format the translation is done in the
@@ -510,6 +517,9 @@ public:
 	           #DOC_TYPE_KNOWN# flag is set.
 	  \end{itemize} */
    GURL		id_to_url(const GUTF8String &id) const;
+   /// Find out which page this id is...
+   int		id_to_page(const GUTF8String &id) const
+   {  return url_to_page(id_to_url(id)); }
 
       /** Returns \Ref{GP} pointer to \Ref{DjVuImage} corresponding to page
           #page_num#. If caching is enabled, and there is a {\em fully decoded}
@@ -556,7 +566,7 @@ public:
 		      \Ref{DjVuFile::is_decode_ok}().
 	  @param port A pointer to \Ref{DjVuPort}, that the created image
 	  	      will be connected to. */
-   GP<DjVuImage>get_page(int page_num, bool sync=true, DjVuPort * port=0);
+   GP<DjVuImage> get_page(int page_num, bool sync=true, DjVuPort * port=0);
 
       /** Returns \Ref{GP} pointer to \Ref{DjVuImage} corresponding to the
 	  specified ID. This function behaves exactly as the #get_page()#
@@ -567,7 +577,7 @@ public:
 	  If so, it just calls the #get_page()# function above. If ID is
 	  #ZERO# or just empty, page number #-1# is assumed. Otherwise
 	  the ID is translated to the URL using \Ref{id_to_url}(). */
-   GP<DjVuImage>get_page(const GUTF8String &id, bool sync=true, DjVuPort * port=0);
+   GP<DjVuImage> get_page(const GUTF8String &id, bool sync=true, DjVuPort * port=0);
    
       /** Returns \Ref{DjVuFile} corresponding to the specified page.
 	  Normally it translates the page number to the URL using
@@ -728,8 +738,9 @@ public:
       /// Returns TRUE if #class_name# is #"DjVuDocument"# or #"DjVuPort"#
    virtual bool		inherits(const GUTF8String &class_name) const;
 
+      /// Converts the specified id to a URL.
    virtual GURL		id_to_url(const DjVuPort * source, const GUTF8String &id);
-   virtual GPBase	id_to_file(const DjVuPort * source, const GUTF8String &id);
+   virtual GP<DjVuFile>	id_to_file(const DjVuPort * source, const GUTF8String &id);
    virtual GP<DataPool>	request_data(const DjVuPort * source, const GURL & url);
    virtual void		notify_file_flags_changed(const DjVuFile * source,
  			long set_mask, long clr_mask);

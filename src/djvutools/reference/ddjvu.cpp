@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ddjvu.cpp,v 1.21 2001-05-10 23:09:35 fcrary Exp $
+// $Id: ddjvu.cpp,v 1.22 2001-06-05 03:19:57 bcr Exp $
 // $Name:  $
 
 /** @name ddjvu
@@ -111,7 +111,7 @@
     Yann Le Cun <yann@research.att.com>\\
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: ddjvu.cpp,v 1.21 2001-05-10 23:09:35 fcrary Exp $# */
+    #$Id: ddjvu.cpp,v 1.22 2001-06-05 03:19:57 bcr Exp $# */
 //@{
 //@}
 
@@ -157,13 +157,13 @@ convert(const GURL &from, const GURL &to, int page_num)
   // Create DjVuDocument
   GP<DjVuDocument> doc=DjVuDocument::create_wait(from);
   if (! doc->wait_for_complete_init())
-    G_THROW("Decoding failed. Nothing can be done.");        
+    G_THROW( ERR_MSG("Decoding failed. Nothing can be done."));
   
   // Create DjVuImage
   start=GOS::ticks();
   GP<DjVuImage> dimg=doc->get_page(page_num);
   if (!dimg || ! dimg->wait_for_complete_decode() )
-    G_THROW("Decoding failed. Nothing can be done.");    
+    G_THROW( ERR_MSG("Decoding failed. Nothing can be done."));
   stop=GOS::ticks();
 
   // Verbose
@@ -194,7 +194,7 @@ convert(const GURL &from, const GURL &to, int page_num)
     { 
       DjVuPrintError("%s","Warning: This is not a well formed DjVu image\n");
       if (!info)
-        G_THROW("Cannot find INFO chunk. Aborting."); 
+        G_THROW( ERR_MSG("Cannot find INFO chunk. Aborting.")); 
     }
 
   // Setup rectangles
@@ -256,7 +256,7 @@ convert(const GURL &from, const GURL &to, int page_num)
     }
   else 
     {
-      G_THROW("Cannot render the requested image");
+      G_THROW(ERR_MSG("Cannot render the requested image"));
     }
 }
 
@@ -286,29 +286,35 @@ usage()
   exit(1);
 }
 
+static inline void
+syntax_error(void)
+{
+  G_THROW( ERR_MSG("Syntax error in geometry specification"));
+}
 
 void
 geometry(const GUTF8String &s, GRect &rect)
 {
   int w,h;
   rect.xmin = rect.ymin = 0;
-  GUTF8String ss;
-  bool isLong;
-  w = s.toLong(ss,isLong);
-  if (w<=0 || ss[0] !='x')
-    goto error;
-  ss=ss.substr(1,(unsigned int)(-1));
-  h = ss.toLong(ss,isLong);
-  if (h<=0 || (ss.length() && ss[0] != '+' && ss[0] !='-'))
-    goto error;
-  if (ss.length()) 
-    rect.xmin = ss.toLong(ss,isLong);
-  if (ss.length()) 
-    rect.ymin = ss.toLong(ss,isLong);
-  if (ss.length()) 
+  int pos;
+  w = s.toLong(0,pos);
+  if (pos < 0 || w<=0 || s[pos] !='x')
+    syntax_error();
+  h = s.toLong(pos,pos);
+  if((pos<0)||(h<=0))
+    syntax_error();
+  if (pos<(int)s.length())
   {
-    error:
-      G_THROW("Syntax error in geometry specification");
+    if ((s[pos]!='+')&&(s[pos] !='-'))
+      syntax_error();
+    rect.xmin = s.toLong(pos,pos);
+    if ((pos >= 0)&&(pos<(int)s.length())) 
+    {
+      rect.ymin = s.toLong(pos,pos);
+      if ((pos >= 0)&&(pos<(int)s.length())) 
+        syntax_error();
+    }
   }
   rect.xmax = rect.xmin + w;
   rect.ymax = rect.ymin + h;
@@ -342,7 +348,7 @@ main(int argc, char **argv)
 {
 #endif
   setlocale(LC_ALL,"");
-  DjVuMessage::use_locale();
+  djvu_programname(argv[0]);
   DArray<GUTF8String> dargv(0,argc-1);
   for(int i=0;i<argc;++i)
     dargv[i]=GNativeString(argv[i]);
@@ -360,40 +366,41 @@ main(int argc, char **argv)
           else if (s == "-scale")
             {
               if (argc<=2)
-                G_THROW("No argument for option '-scale'");
+                G_THROW( ERR_MSG("No argument for option '-scale'"));
               if (flag_subsample>=0 || flag_scale>=0 || flag_size>=0)
-                G_THROW("Duplicate scaling specification");
+                G_THROW( ERR_MSG("Duplicate scaling specification"));
               argc -=1;
               dargv.shift(-1);
               s = dargv[1];
-              GUTF8String ss;
-              bool isDouble;
-              flag_scale = s.toDouble(ss,isDouble);
-              if (ss[0] == '%') 
+              int pos;
+              flag_scale = s.toDouble(0,pos);
+              if((pos<0)||(pos == (int)s.length()))
+                G_THROW( ERR_MSG("Illegal argument for option '-scale'"));
+              if (s[pos] == '%') 
               {
-                s=ss.substr(1,(unsigned int)(-1));
+                pos++;
               }
-              if (ss.length())
-                G_THROW("Illegal argument for option '-scale'");
+              if (pos < (int)s.length())
+                G_THROW( ERR_MSG("Illegal argument for option '-scale'"));
             }
           else if ( s == "-size")
             {
               if (argc<=2)
-                G_THROW("No argument for option '-size'");
+                G_THROW( ERR_MSG("No argument for option '-size'"));
               if (flag_subsample>=0 || flag_scale>=0 || flag_size>=0)
-                G_THROW("Duplicate scaling specification");
+                G_THROW( ERR_MSG("Duplicate scaling specification"));
               argc -=1; dargv.shift(-1); s = dargv[1];
               geometry(s, fullrect);
               flag_size = 1;
               if (fullrect.xmin || fullrect.ymin)
-                G_THROW("Illegal size specification");
+                G_THROW( ERR_MSG("Illegal size specification"));
             }
           else if (s == "-segment")
             {
               if (argc<=2)
-                G_THROW("No argument for option '-segment'");
+                G_THROW( ERR_MSG("No argument for option '-segment'"));
               if (flag_segment>=0)
-                G_THROW("Duplicate segment specification");
+                G_THROW( ERR_MSG("Duplicate segment specification"));
               argc -=1; dargv.shift(-1); s = dargv[1];
               geometry(s, segmentrect);
               flag_segment = 1;
@@ -401,44 +408,43 @@ main(int argc, char **argv)
           else if (s == "-black")
             {
               if (flag_mode)
-                G_THROW("Duplicate rendering mode specification");
+                G_THROW( ERR_MSG("Duplicate rendering mode specification"));
               flag_mode = 's';
             }
           else if (s == "-foreground")
             {
               if (flag_mode)
-                G_THROW("Duplicate rendering mode specification");
+                G_THROW( ERR_MSG("Duplicate rendering mode specification"));
               flag_mode = 'f';
             }
           else if (s == "-background")
             {
               if (flag_mode)
-                G_THROW("Duplicate rendering mode specification");
+                G_THROW( ERR_MSG("Duplicate rendering mode specification"));
               flag_mode = 'b';
             }
 	  else if (s == "-page")
 	    {
 	      if (argc<=2)
-                G_THROW("No argument for option '-page'");
+                G_THROW( ERR_MSG("No argument for option '-page'"));
               if (page_num>=0)
-                G_THROW("Duplicate page specification");
+                G_THROW( ERR_MSG("Duplicate page specification"));
               argc -=1;
               dargv.shift(-1);
               s = dargv[1];
               page_num=s.toInt(); // atoi(s);
 	      if (page_num<=0)
-                G_THROW("Page number must be positive.");
+                G_THROW( ERR_MSG("Page number must be positive."));
 	      page_num--;
 	    }
           else if (s[1]>='1' && s[1]<='9')
             {
-              GUTF8String ss;
-              bool isULong;
-              int arg = s.substr(1,(unsigned int)(-1)).toULong(ss,isULong);
-              if (arg<0 || !isULong || ss.length())
+              int pos;
+              const int arg = s.substr(1,(unsigned int)(-1)).toULong(0,pos);
+              if ((arg<0)||(pos<0)||(pos<(int)s.length()))
                 usage();
               if (flag_subsample>=0 || flag_scale>=0 || flag_size>=0)
-                G_THROW("Duplicate scaling specification");
+                G_THROW( ERR_MSG("Duplicate scaling specification"));
               flag_subsample = arg;
             }
           else
