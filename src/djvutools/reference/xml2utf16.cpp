@@ -30,20 +30,20 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: xml2utf8.cpp,v 1.6 2001-07-24 00:16:20 bcr Exp $
+// $Id: xml2utf16.cpp,v 1.1 2001-07-24 00:15:12 bcr Exp $
 // $Name:  $
 
-/** @name xml2utf8
+/** @name xml2utf16
 
     {\bf Synopsis}
     \begin{verbatim}
-        xml2utf8 [<inputfile>] [<outputfile>]
+        xml2utf16 [<inputfile>] [<outputfile>]
     \end{verbatim}
 
     @author
     Dr Bill C Riemers <bcr@lizardtech.com>
     @version
-    #$Id: xml2utf8.cpp,v 1.6 2001-07-24 00:16:20 bcr Exp $# */
+    #$Id: xml2utf16.cpp,v 1.1 2001-07-24 00:15:12 bcr Exp $# */
 //@{
 //@}
 
@@ -64,7 +64,7 @@ void
 usage(const GUTF8String &name)
 {
   DjVuPrintErrorUTF8(
-          "%s -- xml to UTF8 MBS encoding conversion\n"
+          "%s -- xml to utf16 encoding conversion\n"
           "  Copyright © 2001 LizardTech, Inc. All Rights Reserved.\n"
           "Usage: %s <infile> <outfile>\n",(const char *)name,(const char *)name);
 }
@@ -93,12 +93,36 @@ main(int argc, char **argv)
       GUTF8String ustr;
       while((ustr=uni->gets()).length())
       {
-        bs->writestring(ustr);
+        wchar_t *wbuf;
+        GPBuffer<wchar_t> gbuf(wbuf,ustr.length()+1);
+        ustr.ncopy(wbuf,ustr.length()+1);
+        if(sizeof(wchar_t) == sizeof(unsigned short))
+        {
+          bs->writall(wbuf,wcslen(wbuf));
+        }else
+        {
+          for(wchar_t *ptr=wbuf;*ptr;++ptr)
+          {
+            unsigned long w=*ptr;
+            unsigned short w1, w2;
+            int count=GStringRep::UCS4toUTF16(w,w1,w2);
+            if(count > 0)
+            {
+              bs->writall(&w1,sizeof(w1));
+              if(count > 1)
+              {
+                bs->writall(&w2,sizeof(w2));
+                ++ptr;
+              }
+            }
+          }
+        }
       }
     }
     bs->seek(0L);
     GP<ByteStream> outbs=ByteStream::create(outurl,"w");
-    outbs->write24(0xEFBBBF);
+    static const unsigned short tag=0xFEFF;
+    outbs->writall(&tag,sizeof(tag));
     outbs->copy(*bs);
   }
   G_CATCH(ex)

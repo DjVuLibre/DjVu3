@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: xml2native.cpp,v 1.6 2001-07-24 00:15:12 bcr Exp $
+// $Id: xml2native.cpp,v 1.7 2001-07-24 00:16:20 bcr Exp $
 // $Name:  $
 
 /** @name xml2native
@@ -43,7 +43,7 @@
     @author
     Dr Bill C Riemers <bcr@lizardtech.com>
     @version
-    #$Id: xml2native.cpp,v 1.6 2001-07-24 00:15:12 bcr Exp $# */
+    #$Id: xml2native.cpp,v 1.7 2001-07-24 00:16:20 bcr Exp $# */
 //@{
 //@}
 
@@ -65,7 +65,7 @@ usage(const GUTF8String &name)
   DjVuPrintErrorUTF8(
           "%s -- xml to native MBS encoding conversion\n"
           "  Copyright © 2001 LizardTech, Inc. All Rights Reserved.\n"
-          "Usage: %s <infile> <outfile>\n",name,name);
+          "Usage: %s <infile> <outfile>\n",(const char *)name,(const char *)name);
 }
 
 int 
