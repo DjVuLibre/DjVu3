@@ -10,7 +10,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuMultiAPI.h,v 1.6 2000-01-07 19:40:33 bcr Exp $
+//C- $Id: DjVuMultiAPI.h,v 1.7 2000-01-07 21:46:47 bcr Exp $
 #endif
 
 #ifndef __DJVUMULTIAPI_H__
@@ -25,7 +25,10 @@
 
 /* 
  * $Log: DjVuMultiAPI.h,v $
- * Revision 1.6  2000-01-07 19:40:33  bcr
+ * Revision 1.7  2000-01-07 21:46:47  bcr
+ * Switched to fileno instead of FILE * in the C structures.
+ *
+ * Revision 1.6  2000/01/07 19:40:33  bcr
  * We can't pass FILE handles in Windows.
  *
  * Revision 1.5  2000/01/07 16:58:50  praveen
@@ -65,7 +68,6 @@
 #endif  /*BUILD_LIB*/
 #endif  /*DJVUAPI*/
 
-#include <stdio.h>
 #include "DjVu.h"
 
 #ifdef __cplusplus
@@ -86,9 +88,9 @@ struct djvu_combine_options
   /** This should tell us the number of elements in the filelist */
   int filecount;
   /** If set, the save() command will write usage instructions to this stream */
-  FILE *helpfile;
+  int helpfileno;
   /** If set, messages will be logged to this stream */
-  FILE *logfile;
+  int logfileno;
   /** This is the name of the calling program */
   const char *prog;
   /** This is the name of the output index or bundled file */
