@@ -55,6 +55,11 @@ DjVuDocument.o: DjVuDocument.cpp DjVuDocument.h \
  DjVuNavDir.h debug.h DjVuImage.h \
  DjVuAnno.h GMapAreas.h DjVmDir0.h \
  DjVmDoc.h DjVmDir.h GOS.h
+DjVuErrorList.o: DjVuErrorList.cpp DjVuErrorList.h \
+ DjVuPort.h DjVuGlobal.h GException.h \
+ GSmartPointer.h GURL.h GString.h \
+ GThreads.h GContainer.h DataPool.h \
+ ByteStream.h Arrays.h
 DjVuFile.o: DjVuFile.cpp debug.h DjVuFile.h \
  GSmartPointer.h DjVuGlobal.h ByteStream.h \
  GException.h GContainer.h Arrays.h \

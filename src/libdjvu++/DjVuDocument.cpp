@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.83 1999-12-02 22:37:31 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.84 1999-12-05 21:46:17 bcr Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -278,36 +278,6 @@ DjVuDocument::init_thread(void)
 	    ndir->insert_page(-1, init_url.name());
 	 }
       }
-#if 0
-//bcr: The following code is a nice idea.  But it is commented out
-//bcr: because the bug it works around has been fixed, and we don't
-//bcr: want to add non-essiential code right now.
-      else
-      {
-        int page=ndir->url_to_page(init_url);
-        if(page<0)
-        {
-          int pages=ndir->get_pages_num(),i;
-          for(i=0;i<pages;i++)
-          {
-            TRY
-            {
-              ndir_file=get_djvu_file(i);
-              break;
-            }
-            CATCH(ex)
-            {
-		// We will ignore this error for now.
-            }
-            ENDCATCH;
-          }
-          if(i==pages)
-          {
-            THROW("No valid pages found in this document.");
-          }
-        }
-      }
-#endif
       flags|=DOC_NDIR_KNOWN;
       pcaster->notify_doc_flags_changed(this, DOC_NDIR_KNOWN, 0);
       check_unnamed_files();
