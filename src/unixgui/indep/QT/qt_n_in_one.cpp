@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qt_n_in_one.cpp,v 1.3 2001-09-25 22:38:56 leonb Exp $
+// $Id: qt_n_in_one.cpp,v 1.4 2001-09-25 22:47:02 leonb Exp $
 // $Name:  $
 
 
@@ -50,66 +50,11 @@
 #include "qlib.h"
 #ifndef QT1
 #include <q1xcompatibility.h>
-#define QGManager QLayout
 #endif
 
-QSize QeNInOne::sizeHint(void) const
-{
-  int sw = -1;
-  int sh = -1;
-  QWidget *w = checkWidget(activeWidget);
-  if (resizable && w)
-    return w->sizeHint();
-  const QObjectList * objectList=children();
-  if (objectList)
-    {
-      QObjectListIt it(*objectList);
-      QObject * obj;
-      while((obj=it.current()))
-        {
-          ++it;
-          if (obj->isWidgetType())
-            {
-              QWidget * w=(QWidget *) obj;
-              QSize sz = w->sizeHint();
-              if (sw < sz.width()) sw = sz.width();
-              if (sh < sz.height()) sh = sz.height();
-            }
-        }
-    }
-  return QSize(sw, sh);
-}
-
-QSize QeNInOne::minimumSizeHint(void) const
-{
-  int sw = -1;
-  int sh = -1;
-  QWidget *w = checkWidget(activeWidget);
-  if (resizable && w)
-    return w->minimumSizeHint();
-  const QObjectList * objectList=children();
-  if (objectList)
-    {
-      QObjectListIt it(*objectList);
-      QObject * obj;
-      while((obj=it.current()))
-        {
-          ++it;
-          if (obj->isWidgetType())
-            {
-              QWidget * w=(QWidget *) obj;
-              QSize sz = w->minimumSizeHint();
-              if (sw < sz.width()) sw = sz.width();
-              if (sh < sz.height()) sh = sz.height();
-            }
-        }
-    }
-  return QSize(sw, sh);
-}
-
+#ifdef QT1
 void QeNInOne::recomputeMinMax(void)
 {
-#ifdef QT1
    int min_w=0, min_h=0;
    int max_w=QGManager::unlimited, max_h=QGManager::unlimited;
    const QObjectList * objectList=children();
@@ -140,8 +85,62 @@ void QeNInOne::recomputeMinMax(void)
    if (min_h!=min.height()) { setMinimumHeight(min_h); done=1; }
    if (max_h!=max.height()) { setMaximumHeight(max_h); done=1; }
    if (done) ActivateLayouts(this);
-#endif
 }
+#else
+QSize QeNInOne::sizeHint(void) const
+{
+  int sw = -1;
+  int sh = -1;
+  QWidget *w = checkWidget(activeWidget);
+  if (resizable && w)
+    return w->sizeHint();
+  const QObjectList * objectList=children();
+  if (objectList)
+    {
+      QObjectListIt it(*objectList);
+      QObject * obj;
+      while((obj=it.current()))
+        {
+          ++it;
+          if (obj->isWidgetType())
+            {
+              QWidget * w=(QWidget *) obj;
+              QSize sz = w->sizeHint();
+              if (sw < sz.width()) sw = sz.width();
+              if (sh < sz.height()) sh = sz.height();
+            }
+        }
+    }
+  return QSize(sw, sh);
+}
+QSize QeNInOne::minimumSizeHint(void) const
+{
+  int sw = -1;
+  int sh = -1;
+  QWidget *w = checkWidget(activeWidget);
+  if (resizable && w)
+    return w->minimumSizeHint();
+  const QObjectList * objectList=children();
+  if (objectList)
+    {
+      QObjectListIt it(*objectList);
+      QObject * obj;
+      while((obj=it.current()))
+        {
+          ++it;
+          if (obj->isWidgetType())
+            {
+              QWidget * w=(QWidget *) obj;
+              QSize sz = w->minimumSizeHint();
+              if (sw < sz.width()) sw = sz.width();
+              if (sh < sz.height()) sh = sz.height();
+            }
+        }
+    }
+  return QSize(sw, sh);
+}
+#endif
+
 
 void QeNInOne::checkActiveWidget(void)
 {

@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qt_n_in_one.h,v 1.3 2001-09-25 22:38:56 leonb Exp $
+// $Id: qt_n_in_one.h,v 1.4 2001-09-25 22:47:02 leonb Exp $
 // $Name:  $
 
 
@@ -63,10 +63,12 @@ private:
    QWidget	* checkWidget(QWidget * w) const;
 
       // Recomputes min/max sizes. Used only when resizable is FALSE
+#ifdef QT1
    void	recomputeMinMax(void);
+#else
    virtual QSize sizeHint(void) const;
    virtual QSize minimumSizeHint(void) const;
-   
+#endif
       // Checks and maybe changes the activeWidget
    void		checkActiveWidget(void);
 protected:
