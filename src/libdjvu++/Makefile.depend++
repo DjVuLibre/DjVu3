@@ -107,7 +107,7 @@ DjVuFile.o: DjVuFile.cpp ../../src/include/config.h \
  JPEGDecoder.h DjVuAnno.h DjVuText.h \
  GMapAreas.h DataPool.h JB2Image.h \
  ZPCodec.h IW44Image.h DjVuNavDir.h \
- debug.h
+ BSByteStream.h debug.h
 DjVuGlobal.o: DjVuGlobal.cpp ../../src/include/config.h \
  DjVuGlobal.h ../../src/include/DjVu.h GOS.h \
  GString.h GContainer.h GException.h \
@@ -123,7 +123,8 @@ DjVuImage.o: DjVuImage.cpp ../../src/include/config.h \
  Arrays.h DjVuAnno.h GScaler.h GBitmap.h \
  DjVuDocument.h JB2Image.h ZPCodec.h \
  IW44Image.h DataPool.h ByteStream.h \
- GMapAreas.h DjVuText.h debug.h
+ GMapAreas.h DjVuText.h IFFByteStream.h \
+ BSByteStream.h debug.h
 DjVuInfo.o: DjVuInfo.cpp ../../src/include/config.h \
  DjVuInfo.h GSmartPointer.h DjVuGlobal.h \
  ../../src/include/DjVu.h GRect.h GException.h \
@@ -304,4 +305,9 @@ ZPCodec.o: ZPCodec.cpp ../../src/include/config.h \
  ZPCodec.h GContainer.h GException.h \
  DjVuGlobal.h ../../src/include/DjVu.h \
  GSmartPointer.h ByteStream.h Arrays.h
+test.o: test.cpp DjVuDocEditor.h DjVuDocument.h \
+ DjVuPort.h GThreads.h DjVuGlobal.h \
+ GException.h GURL.h GString.h \
+ GContainer.h GSmartPointer.h Arrays.h \
+ DjVmDoc.h DjVmDir.h ByteStream.h
 ### END   C++ DEPENDENCIES
