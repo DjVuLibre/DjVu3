@@ -7,9 +7,9 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: IFFByteStream.cpp,v 1.1 1999-01-22 00:40:19 leonb Exp $
+//C-  $Id: IFFByteStream.cpp,v 1.2 1999-01-25 19:15:13 leonb Exp $
 
-// File "$Id: IFFByteStream.cpp,v 1.1 1999-01-22 00:40:19 leonb Exp $"
+// File "$Id: IFFByteStream.cpp,v 1.2 1999-01-25 19:15:13 leonb Exp $"
 // -- Implementation of IFFByteStream
 // - Author: Leon Bottou, 06/1998
 
@@ -296,17 +296,18 @@ IFFByteStream::close_chunk()
     THROW("Cannot close chunk when no chunk is open");
   // Patch size field in new chunk
   if (dir > 0)
-  {
-    char buffer[4];
-    long size = offset - ctx->offStart;
-    buffer[0] = (unsigned char)(size>>24);
-    buffer[1] = (unsigned char)(size>>16);
-    buffer[2] = (unsigned char)(size>>8);
-    buffer[3] = (unsigned char)(size);
-    bs->seek(ctx->offStart - 4);
-    bs->writall((void*)buffer, 4);
-    bs->seek(offset);
-  }
+    {
+      ctx->offEnd = offset;
+      long size = ctx->offEnd - ctx->offStart;
+      char buffer[4];
+      buffer[0] = (unsigned char)(size>>24);
+      buffer[1] = (unsigned char)(size>>16);
+      buffer[2] = (unsigned char)(size>>8);
+      buffer[3] = (unsigned char)(size);
+      bs->seek(ctx->offStart - 4);
+      bs->writall((void*)buffer, 4);
+      bs->seek(offset);
+    }
   // Arrange for reader to seek at next chunk
   seekto = ctx->offEnd;
   // Remove ctx record
@@ -361,7 +362,11 @@ IFFByteStream::read(void *buffer, size_t size)
 {
   if (! (ctx && dir < 0))
     THROW("IFFByteStream not ready for reading bytes");
-  assert(seekto <= offset);
+  // Seek if necessary
+  if (seekto > offset) {
+    bs->seek(seekto);
+    offset = seekto;
+  }
   // Ensure that read does not extend beyond chunk
   if (offset > ctx->offEnd)
     THROW("IFFByteStream (internal error) offset beyond chunk boundary");
@@ -382,7 +387,8 @@ IFFByteStream::write(const void *buffer, size_t size)
 {
   if (! (ctx && dir > 0))
     THROW("IFFByteStream not ready for writing bytes");
-  assert(seekto <= offset);
+  if (seekto <= offset)
+    THROW("Cannot write until previous chunk is complete");
   size_t bytes = bs->write(buffer, size);
   offset += bytes;
   return bytes;
