@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GPixmap.h,v 1.8 1999-08-13 15:31:39 leonb Exp $
+//C- $Id: GPixmap.h,v 1.9 1999-11-16 00:00:21 leonb Exp $
 
 #ifndef _GPIXMAP_H_
 #define _GPIXMAP_H_
@@ -23,18 +23,14 @@
     bottom line in the color image.  Pixels are organized from left to right
     within each line.
     
-    {\bf ToDo} --- Support should be included for more sophisticated color
-    correction schemes.  Support should also be added for blitting individual
-    bitmaps with a predefined color.  This operation should support
-    subsampling, anti-aliasing, and sub-pixel positionment, just like
-    #GBitmap::blit#.
+    {\bf ToDo} --- More sophisticated color correction schemes. 
     
     @memo
     Generic support for color images.
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: GPixmap.h,v 1.8 1999-08-13 15:31:39 leonb Exp $# */
+    #$Id: GPixmap.h,v 1.9 1999-11-16 00:00:21 leonb Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -68,6 +64,8 @@ struct GPixel
   friend int operator==(const GPixel & p1, const GPixel & p2);
   /** Returns true iff colors are different. */
   friend int operator!=(const GPixel & p1, const GPixel & p2);
+  /** Color correction (see \Ref{GPixmap::color_correct}). */
+  void color_correct(double gamma_correction);
   /** @name Predefined colors. */
   //@{ 
   /// GPixel::WHITE is initialized to #rgb:255/255/255#.
@@ -218,8 +216,7 @@ public:
   //@}
 
   /** @name Blitting and applying stencils. 
-      This function is essential for rendering DjVu images
-      composed of multiple layers. */
+      These function is essential for rendering DjVu images. */
   //@{
   /** Paints the color image #pm# through the stencil #bm# into this image.
       This function conceptually computes an intermediate color image by first
@@ -242,6 +239,19 @@ public:
       DjVu image. */
   void stencil(const GBitmap *bm, const GPixmap *pm, int pms=1, 
                const GRect *pmr=0, double corr=1.0);
+
+
+
+  void attenuate(const GBitmap *bm, int x, int y);
+  void blit(const GBitmap *bm, int x, int y, const GPixel *color);
+  void blit(const GBitmap *bm, int x, int y, const GPixmap *color);
+  void blend(const GBitmap *bm, int x, int y, const GPixmap *color);
+  
+
+
+
+
+
   //@}
   
   /** @name Manipulating colors. */

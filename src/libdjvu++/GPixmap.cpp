@@ -9,9 +9,9 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GPixmap.cpp,v 1.11 1999-09-30 21:48:36 praveen Exp $
+//C- $Id: GPixmap.cpp,v 1.12 1999-11-16 00:00:21 leonb Exp $
 
-// File "$Id: GPixmap.cpp,v 1.11 1999-09-30 21:48:36 praveen Exp $"
+// File "$Id: GPixmap.cpp,v 1.12 1999-11-16 00:00:21 leonb Exp $"
 // -- Implements class PIXMAP
 // Author: Leon Bottou 07/1997
 
@@ -94,6 +94,13 @@ euclidian_ratio(int a, int b, int &q, int &r)
     r += b;
   }
 }
+
+
+//////////////////////////////////////////////////
+// global lock used by some rare operations
+//////////////////////////////////////////////////
+
+static GMonitor pixmap_monitor;
 
 
 //////////////////////////////////////////////////
@@ -485,8 +492,6 @@ color_correction_table(double gamma, unsigned char gtable[256] )
     }
 }
 
-static GCriticalSection gcsCache;
-
 static void
 color_correction_table_cache(double gamma, unsigned char gtable[256] )
 {
@@ -499,7 +504,7 @@ color_correction_table_cache(double gamma, unsigned char gtable[256] )
     {
       static double lgamma = -1.0;
       static unsigned char ctable[256];
-      GCriticalSectionLock lock(&gcsCache);
+      GMonitorLock lock(&pixmap_monitor);
       if (gamma != lgamma)
         {
           color_correction_table(gamma, ctable);
@@ -532,116 +537,25 @@ GPixmap::color_correct(double gamma_correction)
 }
 
 
-//////////////////////////////////////////////////
-// Blitting function (with a bitmap mask)
-//////////////////////////////////////////////////
-
-
-#ifdef DO_NOT_DEFINE_THIS_SYMBOL
-
 void 
-GPixmap::blit(const GBitmap *bm, const GPixel &pixTarget, int xpos, int ypos)
+GPixel::color_correct(double gamma_correction)
 {
-  // Compute number of rows and columns
-  int xrows = mini(ypos + (int)bm->rows(), nrows) - maxi(0, ypos),
-      xcolumns = mini(xpos + (int) bm->columns(), ncolumns) - maxi(0, xpos);
-  if(xrows <= 0 || xcolumns <= 0)
-      return;
-  // Precompute multiplier map
-  unsigned int multiplier[256];
-  unsigned int maxgray = bm->get_grays() - 1;
-  for (unsigned int i=1; i<maxgray ; i++)
-    multiplier[i] = 0x10000 * i / maxgray;
-  // Prepare color correction table
-  unsigned char gr = pixTarget.r, gg = pixTarget.g, gb = pixTarget.b;
-  // Compute starting point in blown up foreground pixmap
-  const unsigned char *src = (*bm)[0] - mini(0,ypos)*bm->rowsize()-mini(0,xpos);
-  GPixel *dst = (*this)[0] + maxi(0, ypos)*rowsize()+maxi(0, xpos);
-  // Loop over rows
-  for (int y=0; y<xrows; y++)
-  {
-    // Loop over columns
-    for (int x=0; x<xcolumns; x++)
-    {
-      unsigned char srcpix = src[x];
-      // Perform pixel operation
-      if (srcpix > 0)
-      {
-        if (srcpix >= maxgray)
-        {
-          dst[x].b = gb;
-          dst[x].g = gg;
-          dst[x].r = gr;
-        }
-        else
-        {
-          unsigned int level = multiplier[srcpix];
-          dst[x].b -= (((int)dst[x].b - (int)gb) * level) >> 16;
-          dst[x].g -= (((int)dst[x].g - (int)gg) * level) >> 16;
-          dst[x].r -= (((int)dst[x].r - (int)gr) * level) >> 16;
-        }
-      }
-    }
-    // Next line
-    dst += rowsize();
-    src += bm->rowsize();
-  }
+  // Trivial corrections
+  if (gamma_correction>0.999 && gamma_correction<1.001)
+    return;
+  // Compute correction table
+  unsigned char gtable[256];
+  color_correction_table_cache(gamma_correction, gtable);
+  // Perform correction
+  r = gtable[r];
+  g = gtable[g];
+  b = gtable[b];
 }
 
-void 
-GPixmap::blit(const GBitmap *bm, const GPixmap *pmTarget, int xpos, int ypos)
-{
-  // Compute number of rows and columns
-  int xrows = mini(ypos + (int)bm->rows(), nrows) - maxi(0, ypos),
-      xcolumns = mini(xpos + (int) bm->columns(), ncolumns) - maxi(0, xpos);
-  if(xrows <= 0 || xcolumns <= 0)
-      return;
-  // Precompute multiplier map
-  unsigned int multiplier[256];
-  unsigned int maxgray = bm->get_grays() - 1;
-  for (unsigned int i=1; i<maxgray ; i++)
-    multiplier[i] = 0x10000 * i / maxgray;
-  // Compute starting point in blown up foreground pixmap
-  const GPixel *fg = (*pmTarget)[0];
-  const unsigned char *src = (*bm)[0] - mini(0,ypos)*bm->rowsize()-mini(0,xpos);
-  GPixel *dst = (*this)[0] + maxi(0, ypos)*rowsize()+maxi(0, xpos);
-  // Loop over rows
-  for (int y=0; y<xrows; y++)
-  {
-    // Loop over columns
-    for (int x=0; x<xcolumns; x++)
-    {
-      unsigned char srcpix = src[x];
-      // Perform pixel operation
-      if (srcpix > 0)
-      {
-        if (srcpix >= maxgray)
-        {
-          dst[x].b = fg[x].b;
-          dst[x].g = fg[x].g;
-          dst[x].r = fg[x].r;
-        }
-        else
-        {
-          unsigned int level = multiplier[srcpix];
-          dst[x].b -= (((int)dst[x].b - (int)fg[x].b) * level) >> 16;
-          dst[x].g -= (((int)dst[x].g - (int)fg[x].g) * level) >> 16;
-          dst[x].r -= (((int)dst[x].r - (int)fg[x].r) * level) >> 16;
-        }
-      }
-      // Next column
-    }
-    // Next line
-    dst += rowsize();
-    src += bm->rowsize();
-    fg  += pmTarget->rowsize();
-  }
-}
 
-#endif
 
 //////////////////////////////////////////////////
-// dithering
+// Dithering
 //////////////////////////////////////////////////
 
 
@@ -1225,8 +1139,243 @@ GPixmap::upsample23(const GPixmap *src, const GRect *pdr)
 
 
 //////////////////////////////////////////////////
-// Combined stencil operation
+// Blitting and attenuating
 //////////////////////////////////////////////////
+
+
+static unsigned char clip[512];
+static bool clipok = false;
+
+static void
+compute_clip()
+{
+  clipok = true;
+  for (unsigned int i=0; i<sizeof(clip); i++)
+    clip[i] = (i<256 ? i : 255);
+}
+
+
+void 
+GPixmap::attenuate(const GBitmap *bm, int xpos, int ypos)
+{
+  // Check
+  if (!bm) THROW("Null alpha bitmap pointer");
+  // Compute number of rows and columns
+  int xrows = mini(ypos + (int)bm->rows(), nrows) - maxi(0, ypos),
+    xcolumns = mini(xpos + (int) bm->columns(), ncolumns) - maxi(0, xpos);
+  if(xrows <= 0 || xcolumns <= 0)
+    return;
+  // Precompute multiplier map
+  unsigned int multiplier[256];
+  unsigned int maxgray = bm->get_grays() - 1;
+  for (unsigned int i=0; i<maxgray ; i++)
+    multiplier[i] = 0x10000 * i / maxgray;
+  // Compute starting point
+  const unsigned char *src = (*bm)[0] - mini(0,ypos)*bm->rowsize()-mini(0,xpos);
+  GPixel *dst = (*this)[0] + maxi(0, ypos)*rowsize()+maxi(0, xpos);
+  // Loop over rows
+  for (int y=0; y<xrows; y++)
+    {
+      // Loop over columns
+      for (int x=0; x<xcolumns; x++)
+        {
+          unsigned char srcpix = src[x];
+          // Perform pixel operation
+          if (srcpix > 0)
+            {
+              if (srcpix >= maxgray)
+                {
+                  dst[x].b = 0;
+                  dst[x].g = 0;
+                  dst[x].r = 0;
+                }
+              else
+                {
+                  unsigned int level = multiplier[srcpix];
+                  dst[x].b -=  (dst[x].b * level) >> 16;
+                  dst[x].g -=  (dst[x].g * level) >> 16;
+                  dst[x].r -=  (dst[x].r * level) >> 16;
+                }
+            }
+        }
+      // Next line
+      dst += rowsize();
+      src += bm->rowsize();
+    }
+}
+
+
+void 
+GPixmap::blit(const GBitmap *bm, int xpos, int ypos, const GPixel *color)
+{
+  // Check
+  if (!bm) THROW("Null alpha bitmap pointer");
+  if (!clipok) compute_clip();
+  if (!color) return;
+  // Compute number of rows and columns
+  int xrows = mini(ypos + (int)bm->rows(), nrows) - maxi(0, ypos),
+    xcolumns = mini(xpos + (int) bm->columns(), ncolumns) - maxi(0, xpos);
+  if(xrows <= 0 || xcolumns <= 0)
+    return;
+  // Precompute multiplier map
+  unsigned int multiplier[256];
+  unsigned int maxgray = bm->get_grays() - 1;
+  for (unsigned int i=1; i<maxgray ; i++)
+    multiplier[i] = 0x10000 * i / maxgray;
+  // Cache target color
+  unsigned char gr = color->r;
+  unsigned char gg = color->g;
+  unsigned char gb = color->b;
+  // Compute starting point
+  const unsigned char *src = (*bm)[0] - mini(0,ypos)*bm->rowsize()-mini(0,xpos);
+  GPixel *dst = (*this)[0] + maxi(0, ypos)*rowsize()+maxi(0, xpos);
+  // Loop over rows
+  for (int y=0; y<xrows; y++)
+    {
+      // Loop over columns
+      for (int x=0; x<xcolumns; x++)
+        {
+          unsigned char srcpix = src[x];
+          // Perform pixel operation
+          if (srcpix > 0)
+            {
+              if (srcpix >= maxgray)
+                {
+                  dst[x].b = clip[dst[x].b + gb];
+                  dst[x].g = clip[dst[x].g + gg];
+                  dst[x].r = clip[dst[x].r + gr];
+                }
+              else
+                {
+                  unsigned int level = multiplier[srcpix];
+                  dst[x].b = clip[dst[x].b + ((gb * level) >> 16)];
+                  dst[x].g = clip[dst[x].g + ((gg * level) >> 16)];
+                  dst[x].r = clip[dst[x].r + ((gr * level) >> 16)];
+                }
+            }
+        }
+      // Next line
+      dst += rowsize();
+      src += bm->rowsize();
+    }
+}
+
+
+void 
+GPixmap::blit(const GBitmap *bm, int xpos, int ypos, const GPixmap *color)
+{
+  // Check
+  if (!bm) THROW("Null alpha bitmap pointer");
+  if (!color) THROW("Null color pixmap pointer");
+  if (!clipok) compute_clip();
+  if (bm->rows()!=color->rows() || bm->columns()!=color->columns())
+    THROW("Color pixmap and alpha bitmap have different sizes");
+  // Compute number of rows and columns
+  int xrows = mini(ypos + (int)bm->rows(), nrows) - maxi(0, ypos),
+      xcolumns = mini(xpos + (int) bm->columns(), ncolumns) - maxi(0, xpos);
+  if(xrows <= 0 || xcolumns <= 0)
+    return;
+  // Precompute multiplier map
+  unsigned int multiplier[256];
+  unsigned int maxgray = bm->get_grays() - 1;
+  for (unsigned int i=1; i<maxgray ; i++)
+    multiplier[i] = 0x10000 * i / maxgray;
+  // Cache target color
+  // Compute starting point
+  const unsigned char *src = (*bm)[0] - mini(0,ypos)*bm->rowsize()-mini(0,xpos);
+  const GPixel *src2 = (*color)[0] + maxi(0, ypos)*color->rowsize()+maxi(0, xpos);
+  GPixel *dst = (*this)[0] + maxi(0, ypos)*rowsize()+maxi(0, xpos);
+  // Loop over rows
+  for (int y=0; y<xrows; y++)
+    {
+      // Loop over columns
+      for (int x=0; x<xcolumns; x++)
+        {
+          unsigned char srcpix = src[x];
+          // Perform pixel operation
+          if (srcpix > 0)
+            {
+              if (srcpix >= maxgray)
+                {
+                  dst[x].b = clip[dst[x].b + src2[x].b];
+                  dst[x].g = clip[dst[x].g + src2[x].g];
+                  dst[x].r = clip[dst[x].r + src2[x].r];
+                }
+              else
+                {
+                  unsigned int level = multiplier[srcpix];
+                  dst[x].b = clip[dst[x].b + ((src2[x].b * level) >> 16)];
+                  dst[x].g = clip[dst[x].g + ((src2[x].g * level) >> 16)];
+                  dst[x].r = clip[dst[x].r + ((src2[x].r * level) >> 16)];
+                }
+            }
+        }
+      // Next line
+      dst += rowsize();
+      src += bm->rowsize();
+      src2 += color->rowsize();
+    }
+}
+
+
+
+void 
+GPixmap::blend(const GBitmap *bm, int xpos, int ypos, const GPixmap *color)
+{
+  // Check
+  if (!bm) THROW("Null alpha bitmap pointer");
+  if (!color) THROW("Null color pixmap pointer");
+  if (!clipok) compute_clip();
+  if (bm->rows()!=color->rows() || bm->columns()!=color->columns())
+    THROW("Color pixmap and alpha bitmap have different sizes");
+  // Compute number of rows and columns
+  int xrows = mini(ypos + (int)bm->rows(), nrows) - maxi(0, ypos),
+      xcolumns = mini(xpos + (int) bm->columns(), ncolumns) - maxi(0, xpos);
+  if(xrows <= 0 || xcolumns <= 0)
+    return;
+  // Precompute multiplier map
+  unsigned int multiplier[256];
+  unsigned int maxgray = bm->get_grays() - 1;
+  for (unsigned int i=1; i<maxgray ; i++)
+    multiplier[i] = 0x10000 * i / maxgray;
+  // Cache target color
+  // Compute starting point
+  const unsigned char *src = (*bm)[0] - mini(0,ypos)*bm->rowsize()-mini(0,xpos);
+  const GPixel *src2 = (*color)[0] + maxi(0, ypos)*color->rowsize()+maxi(0, xpos);
+  GPixel *dst = (*this)[0] + maxi(0, ypos)*rowsize()+maxi(0, xpos);
+  // Loop over rows
+  for (int y=0; y<xrows; y++)
+    {
+      // Loop over columns
+      for (int x=0; x<xcolumns; x++)
+        {
+          unsigned char srcpix = src[x];
+          // Perform pixel operation
+          if (srcpix > 0)
+            {
+              if (srcpix >= maxgray)
+                {
+                  dst[x].b = src2[x].b;
+                  dst[x].g = src2[x].g;
+                  dst[x].r = src2[x].r;
+                }
+              else
+                {
+                  unsigned int level = multiplier[srcpix];
+                  dst[x].b -= (((int)dst[x].b - (int)src2[x].b) * level) >> 16;
+                  dst[x].g -= (((int)dst[x].g - (int)src2[x].g) * level) >> 16;
+                  dst[x].r -= (((int)dst[x].r - (int)src2[x].r) * level) >> 16;
+                }
+            }
+        }
+      // Next line
+      dst += rowsize();
+      src += bm->rowsize();
+      src2 += color->rowsize();
+    }
+}
+
+
 
 
 void 

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuImage.h,v 1.24 1999-11-11 19:50:34 leonb Exp $
+//C- $Id: DjVuImage.h,v 1.25 1999-11-16 00:00:21 leonb Exp $
 
 #ifndef _DJVUIMAGE_H
 #define _DJVUIMAGE_H
@@ -51,7 +51,7 @@
     L\'eon Bottou <leonb@research.att.com> - initial implementation
     Andrei Erofeev <eaf@research.att.com> - multipage support
     @version
-    #$Id: DjVuImage.h,v 1.24 1999-11-11 19:50:34 leonb Exp $# */
+    #$Id: DjVuImage.h,v 1.25 1999-11-16 00:00:21 leonb Exp $# */
 //@{
 
 
@@ -315,19 +315,19 @@ public:
   GP<GPixmap>  get_bg_pixmap(const GRect &rect, int subs=1, double gamma=0) const;
   GP<GPixmap>  get_fg_pixmap(const GRect &rect, int subs=1, double gamma=0) const;
 private:
-   GP<DjVuFile>		file;
-   bool			relayout_sent;
-   
-   // HELPERS
-   int	stencil(GPixmap *pm, const GRect &rect, int subs, double gcorr) const;
-   GP<DjVuInfo>		get_info(const GP<DjVuFile> & file) const;
-   GP<IWPixmap>		get_bg44(const GP<DjVuFile> & file) const;
-   GP<GPixmap>		get_bgpm(const GP<DjVuFile> & file) const;
-   GP<JB2Image>		get_fgjb(const GP<DjVuFile> & file) const;
-   GP<GPixmap>		get_fgpm(const GP<DjVuFile> & file) const;
-   GP<DjVuPalette>      get_fgbc(const GP<DjVuFile> & file) const;
-
+  GP<DjVuFile>		file;
+  bool			relayout_sent;
+  
+  // HELPERS
+  int stencil(GPixmap *pm, const GRect &rect, int subs, double gcorr) const;
+  GP<DjVuInfo>		get_info(const GP<DjVuFile> & file) const;
+  GP<IWPixmap>		get_bg44(const GP<DjVuFile> & file) const;
+  GP<GPixmap>		get_bgpm(const GP<DjVuFile> & file) const;
+  GP<JB2Image>		get_fgjb(const GP<DjVuFile> & file) const;
+  GP<GPixmap>		get_fgpm(const GP<DjVuFile> & file) const;
+  GP<DjVuPalette>      get_fgbc(const GP<DjVuFile> & file) const;
 };
+
 
 inline GP<DjVuFile>
 DjVuImage::get_djvu_file(void) const

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuImage.cpp,v 1.32 1999-11-11 19:50:34 leonb Exp $
+//C- $Id: DjVuImage.cpp,v 1.33 1999-11-16 00:00:21 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -19,6 +19,8 @@
 #include "DjVuImage.h"
 #include "GScaler.h"
 #include "DjVuDocument.h"
+#include "DjVuPalette.h"
+#include "GContainer.h"
 #include "GSmartPointer.h"
 #include <stdarg.h>
 
@@ -480,11 +482,12 @@ int
 DjVuImage::is_legal_compound() const
 {
   // Components
-  GP<DjVuInfo> info = get_info();
-  GP<JB2Image> fgjb = get_fgjb();
-  GP<IWPixmap> bg44 = get_bg44();
-  GP<GPixmap>  bgpm = get_bgpm();
-  GP<GPixmap>  fgpm = get_fgpm();
+  GP<DjVuInfo>     info = get_info();
+  GP<JB2Image>     fgjb = get_fgjb();
+  GP<IWPixmap>     bg44 = get_bg44();
+  GP<GPixmap>      bgpm = get_bgpm();
+  GP<GPixmap>      fgpm = get_fgpm();
+  GP<DjVuPalette>  fgbc = get_fgbc();
   // Check size
   if (! info)
     return 0;
@@ -507,7 +510,9 @@ DjVuImage::is_legal_compound() const
     return 0;
   // Check foreground colors
   int fgred = 0;
-  if (fgpm)
+  if (fgbc)
+    fgred = 1;
+  else if (fgpm)
     fgred = compute_red(width, height, fgpm->columns(), fgpm->rows());
   if (fgred<1 || fgred>12)
     return 0;
@@ -676,11 +681,16 @@ int
 DjVuImage::stencil(GPixmap *pm, const GRect &rect,
 		   int subsample, double gamma) const
 {
+  // Warping and blending. 
   // Access components
   int width = get_width();
   int height = get_height();
   GP<DjVuInfo> info = get_info();
   if (width<=0 || height<=0 || !info) return 0;
+  GP<JB2Image> fgjb = get_fgjb();
+  GP<GPixmap> fgpm = get_fgpm();
+  GP<DjVuPalette> fgbc = get_fgbc();
+  
   // Compute gamma_correction
   double gamma_correction = 1.0;
   if (gamma > 0)
@@ -690,67 +700,182 @@ DjVuImage::stencil(GPixmap *pm, const GRect &rect,
   else if (gamma_correction > 10)
     gamma_correction = 10;
 
-  // CASE1: JB2 stencil and FG pixmap
-  GP<JB2Image> fgjb = get_fgjb();
-  GP<GPixmap> fgpm = get_fgpm();
-  if (fgjb && fgpm)
+  // Compute alphaq map and relevant JB2Image components
+  GList<int> components;
+  GP<GBitmap> bm;
+  if (fgjb)
     {
-      GP<GBitmap> bm = get_bitmap(rect, subsample);
-      if (bm && pm)
+      JB2Image *jimg = fgjb;
+      bm = new GBitmap(rect.height(), rect.width());
+      bm->set_grays(1+subsample*subsample);
+      int rxmin = rect.xmin * subsample;
+      int rymin = rect.ymin * subsample;
+      for (int blitno = 0; blitno < jimg->get_blit_count(); blitno++)
         {
-          int w = fgpm->columns();
-          int h = fgpm->rows();
-          // Determine foreground reduction
-          int red = compute_red(width,height,w,h);
-          if (red<1 || red>12)
-            return 0;
-          // Try supersampling foreground pixmap by an integer factor
-          int supersample = ( red>subsample ? red/subsample : 1);
-          int wantedred = supersample*subsample;
-          // Try simple foreground upsampling
-          if (red == wantedred)
+          const JB2Blit *pblit = jimg->get_blit(blitno);
+          const JB2Shape  *pshape = jimg->get_shape(pblit->shapeno);
+          if (pshape->bits &&
+              pblit->left <= rect.xmax * subsample &&
+              pblit->bottom <= rect.ymax * subsample &&
+              pblit->left + (int)pshape->bits->columns() >= rect.xmin * subsample &&
+              pblit->bottom + (int)pshape->bits->rows() >= rect.ymin * subsample )
             {
-              // Simple foreground upsampling is enough.
-              pm->stencil(bm, fgpm, supersample, &rect, gamma_correction);
-              return 1;
-            }
-          else 
-            {
-              // Must rescale foreground pixmap first
-              GP<GPixmap> nfg;
-              int desw = (w*red+wantedred-1)/wantedred;
-              int desh = (h*red+wantedred-1)/wantedred;
-              // Cache rescaled fgpm for speed
-              static const DjVuImage *tagimage  = 0;
-              static const GPixmap *tagfgpm   = 0;
-              static GP<GPixmap> cachednfg = 0;
-              // Check whether cached fgpm applies.
-              if ( cachednfg && this==tagimage && fgpm==tagfgpm
-                   && desw==(int)cachednfg->columns()
-                   && desh==(int)cachednfg->rows() )
-                {
-                  nfg = cachednfg;
-                }
-              else
-                {
-                  GPixmapScaler ps(w,h,desw,desh);
-                  ps.set_horz_ratio(red, wantedred);
-                  ps.set_vert_ratio(red, wantedred);
-                  nfg = new GPixmap;
-                  GRect provided(0,0,w,h);
-                  GRect desired(0,0,desw,desh);
-                  ps.scale(provided, *fgpm, desired, *nfg);
-                }
-              // Compute
-              pm->stencil(bm, nfg, supersample, &rect, gamma_correction);
-              // Cache
-              tagimage = this;
-              tagfgpm = fgpm;
-              cachednfg = nfg;
-              return 1;
+              // Record component list
+              if (fgbc) components.append(blitno);
+              // Blit
+              bm->blit(pshape->bits, 
+                       pblit->left - rxmin, pblit->bottom - rymin, 
+                       subsample);
             }
         }
     }
+
+
+  // TWO LAYER MODEL
+  if (bm && fgbc)
+    {
+      // Perform attenuation from scratch
+      pm->attenuate(bm, 0, 0);
+      // Check that fgbc has the correct size
+      JB2Image *jimg = fgjb;
+      DjVuPalette *fg = fgbc;
+      if (jimg->get_blit_count() != fg->colordata.size())
+        return 0;
+      // Blit all components (one color at a time)
+      while (components.size() > 0)
+        {
+          GPosition nullpos;
+          GPosition pos = components;
+          int colorindex = fg->colordata[components[pos]];
+          // Gather relevant components and relevant rectangle
+          GList<int> compset;
+          GRect comprect;
+          while (pos)
+            {
+              int blitno = components[pos];
+              if (fg->colordata[blitno] == colorindex)
+                {
+                  const JB2Blit *pblit = jimg->get_blit(blitno);
+                  const JB2Shape  *pshape = jimg->get_shape(pblit->shapeno);
+                  GRect rect(pblit->left, pblit->bottom, 
+                             pshape->bits->columns(), pshape->bits->rows());
+                  comprect.recthull(comprect, rect);
+                  compset.insert_before(nullpos, components, pos);
+                  continue;
+                }
+              ++pos;
+            }
+          // Round alpha map rectangle
+          comprect.xmin = comprect.xmin / subsample;
+          comprect.ymin = comprect.ymin / subsample;
+          comprect.xmax = (comprect.xmax+subsample-1) / subsample;
+          comprect.ymax = (comprect.ymax+subsample-1) / subsample;
+          comprect.intersect(comprect, rect);
+          // Compute alpha map for that color
+          bm = 0;
+          bm = new GBitmap(comprect.height(), comprect.width());
+          bm->set_grays(1+subsample*subsample);
+          int rxmin = comprect.xmin * subsample;
+          int rymin = comprect.ymin * subsample;
+          for (pos=compset; pos; ++pos)
+            {
+              int blitno = compset[pos];
+              const JB2Blit *pblit = jimg->get_blit(blitno);
+              const JB2Shape  *pshape = jimg->get_shape(pblit->shapeno);
+              bm->blit(pshape->bits, 
+                       pblit->left - rxmin, pblit->bottom - rymin, 
+                       subsample);
+            }
+          // Blit
+          GPixel color;
+          fg->index_to_color(colorindex, color);
+          color.color_correct(gamma_correction);
+          pm->blit(bm, comprect.xmin-rect.xmin, comprect.ymin-rect.ymin, &color);
+        }
+      return 1;
+    }
+
+
+  // THREE LAYER MODEL
+  if (bm && fgpm)
+    {
+#ifndef OLD_THREE_LAYER_RENDERING
+      // This follows fig. 4 in Adelson "Layered representations for image
+      // coding" (1991) http://www-bcs.mit.edu/people/adelson/papers.html.
+      // The properly warped background is already in PM.  The properly warped
+      // alpha map is already in BM.  We just have to warp the foreground and
+      // perform alpha blending.
+      int w = fgpm->columns();
+      int h = fgpm->rows();
+      // Determine foreground reduction
+      int red = compute_red(width,height, w, h);
+      if (red<1 || red>12)
+        return 0;
+      // Warp foreground pixmap
+      GPixmapScaler ps(w,h,width/subsample+1,height/subsample+1);
+      ps.set_horz_ratio(red,subsample);
+      ps.set_vert_ratio(red,subsample);
+      GP<GPixmap> nfg = new GPixmap;
+      GRect provided(0,0,w,h);
+      ps.scale(provided, *fgpm, rect, *nfg);
+      // Attenuate background and blit
+      nfg->color_correct(gamma_correction);
+      pm->blend(bm, 0, 0, nfg); // blend == attenuate + blit
+      return 1;
+#else // OLD_THREE_LAYER_RENDERING
+      int w = fgpm->columns();
+      int h = fgpm->rows();
+      // Determine foreground reduction
+      int red = compute_red(width,height,w,h);
+      if (red<1 || red>12)
+        return 0;
+      // Try supersampling foreground pixmap by an integer factor
+      int supersample = ( red>subsample ? red/subsample : 1);
+      int wantedred = supersample*subsample;
+      // Try simple foreground upsampling
+      if (red == wantedred)
+        {
+          // Simple foreground upsampling is enough.
+          pm->stencil(bm, fgpm, supersample, &rect, gamma_correction);
+          return 1;
+        }
+      else 
+        {
+          // Must rescale foreground pixmap first
+          GP<GPixmap> nfg;
+          int desw = (w*red+wantedred-1)/wantedred;
+          int desh = (h*red+wantedred-1)/wantedred;
+          // Cache rescaled fgpm for speed
+          static const DjVuImage *tagimage  = 0;
+          static const GPixmap *tagfgpm   = 0;
+          static GP<GPixmap> cachednfg = 0;
+          // Check whether cached fgpm applies.
+          if ( cachednfg && this==tagimage && fgpm==tagfgpm
+               && desw==(int)cachednfg->columns()
+               && desh==(int)cachednfg->rows() )
+            {
+              nfg = cachednfg;
+            }
+          else
+            {
+              GPixmapScaler ps(w,h,desw,desh);
+              ps.set_horz_ratio(red, wantedred);
+              ps.set_vert_ratio(red, wantedred);
+              nfg = new GPixmap;
+              GRect provided(0,0,w,h);
+              GRect desired(0,0,desw,desh);
+              ps.scale(provided, *fgpm, desired, *nfg);
+            }
+          // Compute
+          pm->stencil(bm, nfg, supersample, &rect, gamma_correction);
+          // Cache
+          tagimage = this;
+          tagfgpm = fgpm;
+          cachednfg = nfg;
+          return 1;
+#endif // OLD_THREE_LAYER_RENDERING
+    }
+  
   // FAILURE
   return 0;
 }
