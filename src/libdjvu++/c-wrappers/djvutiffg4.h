@@ -8,7 +8,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C- "$Id: djvutiffg4.h,v 1.2 2000-01-06 22:00:22 bcr Exp $"
+//C- "$Id: djvutiffg4.h,v 1.3 2000-01-07 04:54:04 bcr Exp $"
 //C- -- Tiff G4 To DjVu
 //C- Author: Parag Deshmukh (Dec 99)
 #endif  /* __cplusplus */
@@ -46,39 +46,52 @@ struct tiffg4todjvu_options_struct
 {
 /** This keeps a string delimited by hypens(-) and commas(,) */
   const char *page_range;
+
 /** These are tuning parameters which affect the compression
   and the quality of the output image */
   int tolerance_percent, tolerance4_size;
+
 /** These decides which predefined set of options to use. They are
   boolean values either 0 or 1. Quality  value is greatest in 
   lossless. (lossless > normal > conservative > aggressive).
   pseudo wil create the djvu output with data stored in G4 format,
   that is same as input. */
   tiffg4todjvu_type compression;
+
 /** Halftone detection is used for dithered images. */
   int halftone_off;
+
 /** pages_per_dict allows n number of pages to be matched together.
   This value should never be too high or too low. Best value  can
   be between 10 to 20*/
   int pages_per_dict;
+
 /** They allow transformations to be done on the given input images. 
   vflip is verticle flip, hflip is horizontal flip, invert gives the
   negative of the image and rotateAngle will rotate image clockwise */
   int vflip, hflip, invert, rotateAngle;
+
 /** logfile should be non-NULL to print verbose processing details */
   FILE *logfile;
+
 /** helpfile should be non-NULL to print usage instructions */
   FILE *helpfile;
+
 /** dpi should the resolution in dots per inch of input images. */
   int dpi;
+
 /** list of input filenames being the last. */
   const char * const * filelist;
+
 /** Number of files in filelist. */
   int filecount;
+
 /** The output filename (or directory) */
   const char *output;
+
 /** The program name */
   const char *prog;
+
 /** This is where all memory is allocated and errors are listed. */
   void *priv;
 };
@@ -141,21 +154,29 @@ struct djvutotiffg4_options_struct
 {
 /** This keeps a string delimited by hypens(-) and commas(,) */
   const char *page_range;
+
 /** This option should be non-zero, if we want to force the application
     to avoid color images */
   int disable_mask;
+
 /** logfile should be non-NULL to print verbose processing details */
   FILE *logfile;
+
 /** helpfile should be non-NULL to print usage instructions */
   FILE *helpfile;
+
 /** list of input filenames being the last. */
   const char * const * filelist;
+
 /** Number of files in filelist. */
   int filecount;
+
 /** The output filename (or directory) */
   const char *output;
+
 /** The program name */
   const char *prog;
+
 /** This is where all memory is allocated and errors are listed. */
   void *priv;
 };
