@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuPort.cpp,v 1.18 1999-09-10 22:47:53 eaf Exp $
+//C- $Id: DjVuPort.cpp,v 1.19 1999-09-20 21:59:43 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -135,6 +135,27 @@ DjVuPortcaster::name_to_port(const char * name)
    if (n2p_map.contains(name, pos))
       return GP<DjVuPort> ( (DjVuPort *)n2p_map[pos] );
    else return 0;
+}
+
+GPList<DjVuPort>
+DjVuPortcaster::prefix_to_ports(const char * prefix)
+{
+   GPList<DjVuPort> list;
+   if (prefix)
+   {
+      int length=strlen(prefix);
+      if (length)
+      {
+	 GCriticalSectionLock lock(&map_lock);
+	 for(GPosition pos=n2p_map;pos;++pos)
+	    if (!strncmp(prefix, n2p_map.key(pos), length))
+	    {
+	       GP<DjVuPort> port=(DjVuPort *) n2p_map[pos];
+	       if (port) list.append(port);
+	    }
+      }
+   }
+   return list;
 }
 
 GString

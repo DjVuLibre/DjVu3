@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuPort.h,v 1.17 1999-09-16 22:04:13 eaf Exp $
+//C- $Id: DjVuPort.h,v 1.18 1999-09-20 21:59:43 eaf Exp $
  
 #ifndef _DJVUPORT_H
 #define _DJVUPORT_H
@@ -71,7 +71,7 @@
     @memo DjVu decoder communication mechanism.
     @author Andrei Erofeev <eaf@geocities.com>\\
             L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuPort.h,v 1.17 1999-09-16 22:04:13 eaf Exp $# */
+    @version #$Id: DjVuPort.h,v 1.18 1999-09-20 21:59:43 eaf Exp $# */
 //@{
 
 class DjVuPort;
@@ -343,6 +343,11 @@ public:
 	  is known about name #name#, or the port associated with it has
 	  already been destroyed #ZERO# pointer will be returned. */
    GP<DjVuPort>	name_to_port(const char * name);
+
+      /** Returns a list of \Ref{DjVuPort}s with names starting from
+	  #prefix#. If no \Ref{DjVuPort}s have been found, an empty
+	  list is returned. */
+   GPList<DjVuPort>	prefix_to_ports(const char * prefix);
 
       /** Returns name associated with the given \Ref{DjVuPort}. If no name
 	  has been assigned to this port before, an empty string will
