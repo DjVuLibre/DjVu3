@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.12 1999-07-20 15:52:50 leonb Exp $
+//C- $Id: DjVuFile.cpp,v 1.13 1999-08-04 21:43:02 leonb Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -1103,7 +1103,7 @@ DjVuFile::unlink_file(const char * name)
 	    else
 	    {
 	       iff_out.put_chunk(chkid);
-	       iff_out.writall(incl_str, incl_str.length());
+	       iff_out.writall((const char*)incl_str, incl_str.length());
 	       iff_out.close_chunk();
 	    }
 	 } else
@@ -1199,7 +1199,7 @@ DjVuFile::include_file(const GP<DjVuFile> & file, int chunk_pos, bool incl)
 	 if (chunk_num==chunk_pos)
 	 {
 	    iff_out.put_chunk(incl ? "INCL" : "INCF");
-	    iff_out.write(file_name, file_name.length());
+	    iff_out.write((const char*)file_name, file_name.length());
 	    iff_out.close_chunk();
 	    stored=1;
 
@@ -1223,7 +1223,7 @@ DjVuFile::include_file(const GP<DjVuFile> & file, int chunk_pos, bool incl)
       if (!stored)
       {
 	 iff_out.put_chunk(incl ? "INCL" : "INCF");
-	 iff_out.write(file_name, file_name.length());
+	 iff_out.write((const char*)file_name, file_name.length());
 	 iff_out.close_chunk();
 
 	 GCriticalSectionLock lock(&inc_files_lock);
