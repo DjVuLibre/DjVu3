@@ -10,6 +10,7 @@ to be bound by this Agreement in its entirety, acknowledge YOUR acceptance by
 providing an affirmative response and downloading, or opening the AT&T Capsule
 containing, the AT&T Source Code Release.
 
+
 ARTICLE 1.0 -  YOUR REPRESENTATIONS
 
 1.1. If YOU are an entity, or person other than the individual accepting this
@@ -132,11 +133,11 @@ in the AT&T Source Code Release.
   (C) AT&T Corp. All rights reserved.  
   AT&T is a registered trademark of AT&T Corp.''
 
-
 2.15. "Software Product" means a collection of Files in object code form only
 which, taken together, reasonably comprise a product, regardless of whether
 such product is intended for internal use or commercial exploitation.  A
 single File can comprise a Software Product.
+
 
 ARTICLE 3.0 -  GRANT OF RIGHTS TO YOU
 
@@ -200,6 +201,7 @@ conferred with respect to any portion of a Derived Product which is not
 Computer Code compiled from some portion, without Change, of the AT&T Source
 Code Release.
 
+
 ARTICLE 4.0 -  YOUR DISTRIBUTION OBLIGATIONS
 
 4.1. YOU shall only distribute the AT&T Capsule and Derived Product Build
@@ -259,6 +261,7 @@ agreement that, in AT&T's opinion, is consistent with this Agreement and the
 attached Appendix A, and YOU shall make all reasonable efforts to publicize
 such release.
 
+
 ARTICLE 5.0 -  YOUR GRANT OF RIGHTS TO AT&T IN MODIFICATIONS
 
 5.1. YOU grant to AT&T under any IPR owned or licensable by YOU which in any
@@ -268,6 +271,7 @@ others, to (a) make, have made, use, offer to sell, sell and import any
 products, services or any combination of products or services, and (b)
 reproduce, distribute, prepare derivative works based on, perform and display
 YOUR Patches.
+
 
 ARTICLE 6.0 -  AS IS CLAUSE / LIMITATION OF LIABILITY
 
@@ -289,6 +293,7 @@ AT&T CAPSULE, EVEN IF AT&T OR ANY OF ITS AUTHORIZED REPRESENTATIVES HAS BEEN
 ADVISED OF THE POSSIBILITY OF SUCH DAMAGES, (a) ANY CLAIM ATTRIBUTABLE TO
 ERRORS, OMISSIONS, OR OTHER INACCURACIES IN THE AT&T SOURCE CODE RELEASE OR
 AT&T CAPSULE, OR (c) ANY CLAIM BY ANY THIRD PARTY.
+
 
 ARTICLE 7.0 -  GENERAL
 
@@ -343,6 +348,7 @@ pursuant to which you ("LICENSEE") are granted by LICENSOR a non-exclusive
 license to exploit the Build Materials (as defined below).  PLEASE READ THIS
 AGREEMENT CAREFULLY.
 
+
 ARTICLE 1.0 -  REPRESENTATIONS
 
 1.1. If LICENSEE is an entity, or person other than the individual accepting
@@ -358,6 +364,7 @@ and fully understand it.
 of any kind under any IPR owned or controlled by AT&T. Corp. ("AT&T") are
 granted or, by implication, estoppel or otherwise, conferred by this
 Agreement.
+
 
 ARTICLE 2.0 -  DEFINITIONS
 
@@ -396,6 +403,7 @@ contained in the AT&T Source Code Release.
 the operation of a central processing unit or computer, or computer files
 containing data or textual information.
 
+
 ARTICLE 3.0 -  GRANT OF RIGHTS TO LICENSEE
 
 3.1. Subject to the terms and conditions of this Agreement, LICENSOR grants to
@@ -410,6 +418,7 @@ sublicense others, to
       Build Materials, and prepare derivative works based on the Build
       Materials and reproduce, distribute, perform and display such derivative
       works.
+
 
 ARTICLE 4.0 -  LICENSEE'S DISTRIBUTION OBLIGATIONS
 
@@ -439,6 +448,7 @@ pursuant to this Agreement, LICENSEE shall:
 
   (c) Make such product generally available to anyone requesting a copy.
 
+
 ARTICLE 5.0 -  AS IS CLAUSE / LIMITATION OF LIABILITY
 
 5.1. The Build Materials contain certain software or other information ("AT&T
@@ -459,6 +469,7 @@ ARISING OUT OF THE USE OF OR INABILITY TO USE THE AT&T SOFTWARE, EVEN IF AT&T
 OR ANY OF ITS AUTHORIZED REPRESENTATIVES HAS BEEN ADVISED OF THE POSSIBILITY
 OF SUCH DAMAGES, (a) ANY CLAIM ATTRIBUTABLE TO ERRORS, OMISSIONS, OR OTHER
 INACCURACIES IN THE AT&T SOFTWARE, OR (c) ANY CLAIM BY ANY THIRD PARTY.
+
 
 ARTICLE 6.0 -  GENERAL
 
