@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuPalette.cpp,v 1.8 2000-02-24 16:38:48 leonb Exp $
+//C- $Id: DjVuPalette.cpp,v 1.9 2000-02-29 18:23:48 praveen Exp $
 
 
 #ifdef __GNUC__
@@ -276,7 +276,7 @@ DjVuPalette::compute_palette(int maxcolors, int minboxsize)
       float rsum = 0;
       for (int j=0; j<box.colors; j++)
         {
-          float w = box.data[j].w;
+          float w = (float)box.data[j].w;
           bsum += box.data[j].p[0] * w;
           gsum += box.data[j].p[1] * w;
           rsum += box.data[j].p[2] * w;
@@ -302,7 +302,7 @@ DjVuPalette::compute_palette(int maxcolors, int minboxsize)
 
 
 int 
-DjVuPalette::compute_pixmap_palette(const GPixmap &pm, int ncolors, int minboxsize=0)
+DjVuPalette::compute_pixmap_palette(const GPixmap &pm, int ncolors, int minboxsize)
 {
   // Prepare histogram
   histogram_clear();
