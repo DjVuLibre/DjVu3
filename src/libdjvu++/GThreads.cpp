@@ -9,10 +9,10 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GThreads.cpp,v 1.25 1999-06-22 23:48:38 leonb Exp $
+//C- $Id: GThreads.cpp,v 1.26 1999-07-16 15:38:54 leonb Exp $
 
 
-// **** File "$Id: GThreads.cpp,v 1.25 1999-06-22 23:48:38 leonb Exp $"
+// **** File "$Id: GThreads.cpp,v 1.26 1999-07-16 15:38:54 leonb Exp $"
 // This file defines machine independent classes
 // for running and synchronizing threads.
 // - Author: Leon Bottou, 01/1998
@@ -634,7 +634,9 @@ GMonitor::wait(unsigned long timeout)
 // Default stack size
 #define DEFSTACK   (127*1024)
 // Maxtime between checking fdesc (ms)
-#define MAXWAIT    (200)
+#define MAXFDWAIT    (200)
+// Maximum time to wait in any case
+#define MAXWAIT (60*60*1000)
 // Maximum penalty for hog task (ms)
 #define MAXPENALTY (1000)
 // Trace task switches
@@ -802,7 +804,7 @@ struct cotask {
   // timing information
   unsigned long over;
   // waiting information
-  int *wchan;
+  void *wchan;
   coselect *wselect;
   unsigned long *maxwait;
 };
@@ -810,6 +812,8 @@ struct cotask {
 static cotask *maintask = 0;
 static cotask *curtask  = 0;
 static unsigned long globalmaxwait = 0;
+
+// Hmmm. Waiting tasks should really be in a separate list
 
 
 // -------------------------------------- time
@@ -841,7 +845,7 @@ cotask_yield()
 {
   // ok
   if (! maintask)
-    return -1;
+    return 0;
   // get elapsed time and return immediately when it is too small
   unsigned long elapsed = time_elapsed();
   if (elapsed==0 && curtask->wchan==0 && curtask->prev && curtask->next)
@@ -859,13 +863,7 @@ cotask_yield()
     { 
       if (q->wchan)
         {
-          if (*q->wchan>0)
-            {
-              q->wchan=0; 
-              q->maxwait=0; 
-              q->wselect=0; 
-            } 
-          else if (q->maxwait && *q->maxwait<=elapsed) 
+	  if (q->maxwait && *q->maxwait<=elapsed) 
             {
               *q->maxwait = 0;
               q->wchan=0; 
@@ -888,7 +886,7 @@ cotask_yield()
   while (q!=n);
   // adjust globalmaxwait
   if (globalmaxwait < elapsed)
-    globalmaxwait = MAXWAIT;
+    globalmaxwait = MAXFDWAIT;
   else
     globalmaxwait -= elapsed;
   // find best candidate
@@ -922,11 +920,11 @@ cotask_yield()
           q = q->next;
         } 
       while (q != n);
-      // switch
+      // Switch
       if (r != curtask)
         {
 #ifdef COTHREAD_TRACE
-          fprintf(stderr,"cothreads: ----- switch to %p [%ld] ----- \n", r, best);
+          fprintf(stderr,"cothreads: ----- switch to %p [%ld]\n", r, best);
 #endif
           cotask *old = curtask;
           curtask = r;
@@ -937,9 +935,9 @@ cotask_yield()
         return 1;
       return 0;
     }
-  // no task ready
+  // No task ready
   count = 0;
-  unsigned long minwait = 1000000;
+  unsigned long minwait = MAXWAIT;
   coselect allfds;
   allfds.nfds = 1;
   FD_ZERO(&allfds.rset);
@@ -973,68 +971,9 @@ cotask_yield()
   goto reschedule;
 }
 
-unsigned long
-GThread::get_minwait(void)
-{
-   if (!curtask) return 0;
-   
-   bool found=false;
-   unsigned long minwait=1000000;
 
-   cotask * next=curtask->next;
-   cotask * q=next;
-   do 
-   {
-      if (q->maxwait) found=true;
-      if (q->maxwait && *q->maxwait<minwait) minwait=*q->maxwait;
-      q=q->next;
-   } while(q!=next);
-   
-   return found ? minwait : 0;
-}
 
-void
-GThread::get_select(int & nfds, fd_set & read_fds, fd_set & write_fds, fd_set & except_fds)
-{
-   if (!curtask)
-   {
-      nfds=0;
-      return;
-   }
-   
-   coselect allfds;
-   allfds.nfds=0;
-   FD_ZERO(&allfds.rset);
-   FD_ZERO(&allfds.wset);
-   FD_ZERO(&allfds.eset);
-
-   cotask * next=curtask->next;
-   cotask * q=next;
-   do 
-   {
-      if (q->wselect) coselect_merge(&allfds, q->wselect);
-      q=q->next;
-   } while(q!=next);
-
-   nfds=allfds.nfds;
-   read_fds=allfds.rset;
-   write_fds=allfds.wset;
-   except_fds=allfds.eset;
-}
-
-int
-GThread::get_cothreads_num(void)
-{
-   if (!curtask) return 1;
-
-   int tasks=1;
-   cotask * task;
-   for(task=curtask->next;task!=curtask;task=task->next) tasks++;
-
-   return tasks;
-}
-
-// -------------------------------------- select
+// -------------------------------------- select / get_select
 
 static int
 cotask_select(int nfds, 
@@ -1045,11 +984,10 @@ cotask_select(int nfds,
   if (maintask==0 || (tm && tm->tv_sec==0 && tm->tv_usec<1000))
     return select(nfds, rfds, wfds, efds, tm);
   // copy parameters
-  int chan = 0;
   unsigned long maxwait = 0;
   coselect parm;
   // set waiting info
-  curtask->wchan = &chan;
+  curtask->wchan = (void*)&parm;
   if (rfds || wfds || efds)
     {
       parm.nfds = nfds;
@@ -1076,10 +1014,75 @@ cotask_select(int nfds,
 }
 
 
+void 
+GThread::get_select(int &nfds,
+                    fd_set *rfds, fd_set *wfds, fd_set *efds, 
+                    unsigned long &timeout)
+{
+  int ready = 1;
+  unsigned long minwait = MAXWAIT;
+  unsigned long elapsed = time_elapsed(0);
+  coselect allfds;
+  allfds.nfds=0;
+  FD_ZERO(&allfds.rset);
+  FD_ZERO(&allfds.wset);
+  FD_ZERO(&allfds.eset);
+  if (curtask)
+    {
+      cotask *q=curtask->next;
+      while (q != curtask)
+        {
+          ready++;
+          if (q->wchan)
+            {
+              if (q->wselect) 
+                coselect_merge(&allfds, q->wselect);
+              if (q->maxwait && *q->maxwait<minwait)
+                minwait = *q->maxwait;
+              ready--;
+            }
+          q = q->next;
+        }
+    }
+  timeout = 0;
+  nfds=allfds.nfds;
+  *rfds=allfds.rset;
+  *wfds=allfds.wset;
+  *efds=allfds.eset;
+  if (ready==1 && minwait>elapsed)
+    timeout = minwait-elapsed;
+}
+
+
+
 // -------------------------------------- utilities
 
 static void
-cotask_unblock_wchan(int *wchan)
+cotask_wakeup(void *wchan, int onlyone)
+{
+  if (maintask && curtask)
+    {
+      cotask *n = curtask->next;
+      cotask *q = n;
+      do 
+        { 
+          if (q->wchan == wchan)
+            {
+              q->wchan=0; 
+              q->maxwait=0; 
+              q->wselect=0; 
+              q->over = 0;
+	      if (onlyone)
+		return;
+            }
+          q = q->next;
+        } 
+      while (q!=n);
+    }
+}
+
+static void
+cotask_unblock_wchan(void *wchan)
 {
   if (maintask && curtask)
     {
@@ -1309,7 +1312,7 @@ GThread::current()
 // -------------------------------------- GMonitor
 
 GMonitor::GMonitor()
-  : count(1), locker(0), seqno(0)
+  : count(1), locker(0)
 {
   locker = 0;
   ok = 1;
@@ -1318,7 +1321,8 @@ GMonitor::GMonitor()
 GMonitor::~GMonitor()
 {
   ok = 0;
-  cotask_unblock_wchan(&count);
+  cotask_wakeup((void*)this, 0);
+  cotask_unblock_wchan((void*)&count);
 }
 
 void 
@@ -1329,7 +1333,7 @@ GMonitor::enter()
     {
       while (ok && count<=0)
         {
-          curtask->wchan = &count;
+          curtask->wchan = (void*)&count;
           cotask_yield();
         }
       count = 1;
@@ -1344,7 +1348,8 @@ GMonitor::leave()
   void *self = GThread::current();
   if (ok && (count>0 || self!=locker))
     THROW("Monitor was not acquired by this thread (GMonitor::leave)");
-  count += 1;
+  if (++count > 0)
+    cotask_wakeup((void*)&count, 1);
 }
 
 void
@@ -1353,7 +1358,7 @@ GMonitor::signal()
   void *self = GThread::current();
   if (count>0 || self!=locker)
     THROW("Monitor was not acquired by this thread (GMonitor::signal)");
-  wchan = 1;
+  cotask_wakeup((void*)this, 1);
   if (scheduling_callback)
     (*scheduling_callback)(GThread::CallbackUnblock);
 }
@@ -1364,8 +1369,7 @@ GMonitor::broadcast()
   void *self = GThread::current();
   if (count>0 || self!=locker)
     THROW("Monitor was not acquired by this thread (GMonitor::broadcast)");
-  seqno += 1;
-  wchan = 1;
+  cotask_wakeup((void*)this, 0);
   if (scheduling_callback)
     (*scheduling_callback)(GThread::CallbackUnblock);
 }
@@ -1382,16 +1386,10 @@ GMonitor::wait()
     {
       // Release
       int sav_count = count;
-      int sav_seqno = seqno;
       count = 1;
       // Wait
-      wchan = 0;
-      while (wchan<=0 && seqno==sav_seqno)
-        {
-          curtask->wchan = &wchan;
-          cotask_yield();
-        }
-      wchan = 0;
+      curtask->wchan = (void*)this;
+      cotask_yield();
       // Re-acquire
       while (ok && count <= 0)
         {
@@ -1415,18 +1413,12 @@ GMonitor::wait(unsigned long timeout)
     {
       // Release
       int sav_count = count;
-      int sav_seqno = seqno;
       count = 1;
       // Wait
-      wchan = 0;
       unsigned long maxwait = time_elapsed(0) + timeout;
-      while (wchan<=0 && maxwait>0 && seqno==sav_seqno)
-        {
-          curtask->maxwait = &maxwait;
-          curtask->wchan = &wchan;
-          cotask_yield();
-        }
-      wchan = 0;
+      curtask->maxwait = &maxwait;
+      curtask->wchan = (void*)this;
+      cotask_yield();
       // Re-acquire
       while (ok && count<=0)
         {

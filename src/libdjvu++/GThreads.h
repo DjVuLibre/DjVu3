@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GThreads.h,v 1.18 1999-06-15 19:16:23 eaf Exp $
+//C- $Id: GThreads.h,v 1.19 1999-07-16 15:38:54 leonb Exp $
 
 #ifndef _GTHREADS_H_
 #define _GTHREADS_H_
@@ -65,8 +65,7 @@
     lot of portability headaches under Unix.  We eventually decided to
     implement the COTHREADS cooperative threads (because preemptive threads
     have more problems) and to patch EGCS in order to make exception handling
-    COTHREAD-safe.  We expect to make COTHREADs the default in future
-    releases.
+    COTHREAD-safe. 
 
     @memo
     Portable threads
@@ -74,7 +73,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Praveen Guduru <praveen@sanskrit.lz.att.com> -- mac implementation.
     @version
-    #$Id: GThreads.h,v 1.18 1999-06-15 19:16:23 eaf Exp $# */
+    #$Id: GThreads.h,v 1.19 1999-07-16 15:38:54 leonb Exp $# */
 //@{
 
 #include "DjVuGlobal.h"
@@ -196,14 +195,13 @@ public:
       memory may be lost. */
   void terminate();
   /** Causes the current thread to relinquish the processor.  The scheduler
-      selects a thread ready to run and transfers control to that thread. The
-      effect of #yield# heavily depends on the selected implementation.
-      Function #yield# returns #-1# when the selected implementation does not
-      provide an explicit way to relinquish the processor. This is often the
-      case with preemptive multithreading models like #POSIXTHREADS# or
-      #WINTHREADS#.  The scheduling code does not need such a feature.
-      Function #yield# returns #+1# when only the current thread is ready to
-      run.  Otherwise function #yield# returns #0#. */
+      selects a thread ready to run and transfers control to that thread.  The
+      actual effect of #yield# heavily depends on the selected implementation.
+      Function #yield# usually returns zero when the execution of the current
+      thread is resumed.  It may return a positive number when it can
+      determine that the current thread will remain the only runnable thread
+      for some time.  You may then call function \Ref{get_select} to
+      obtain more information. */
   static int yield();
   /** Returns a value which uniquely identifies the current thread. */
   static void *current();
@@ -243,21 +241,17 @@ public:
         return read(fd, buffer, len);
       }
       \end{verbatim} */
-  static int select(int, fd_set*, fd_set*, fd_set*, struct timeval*);
-  /** Return period of time after which a thread should wake up after waiting on
-      timer. If there are no such threads, #ZERO# will be returned. This function
-      is only relevant in #COTHREAD# model.*/
-  static unsigned long get_minwait(void);
-  /** Return union of all file descriptors which threads are waiting for. This
-      function is only relevant in #COTHREAD# model when the internal scheduler keeps
-      track of what thread is waiting for what. Function \Ref{GThread::select}()
-      should be used to wait for data or wait for some given period of time.
-      #get_select()# will set #*nfds# to #ZERO# if there are no thread waiting in
-      \Ref{GThread::select}(). */
-  static void get_select(int & nfds, fd_set & read_fd, fd_set & write_fd, fd_set & except_fd);
-  /** Return the number of running cothreads. Is relevant in #COTHREAD# model only. */
-  static int get_cothreads_num(void);
-      
+  static int select(int nfds, fd_set*, fd_set*, fd_set*, struct timeval*);
+  /** Provide arguments for system call #select# (COTHREADS only). It may be
+      appropriate to call the real system call #select# if the current thread
+      is the only thread ready to run.  Other threads however may wake up when
+      certain file descriptors are ready or when a certain delay expires.
+      Function #get_select# returns this information by filling the three
+      usual file descriptor sets (similar to the arguments of system call
+      #select#).  It also returns a timeout #timeout# expressed in
+      milliseconds.  Note that this timeout is zero is the current thread is
+      not the sole thread ready to run. */
+  static void get_select(int &nfds, fd_set*, fd_set*, fd_set*, unsigned long &timeout);
   /** Install hooks in the scheduler (COTHREADS only).  The hook function
       #call# is called when a new thread is created (argument is
       #GThread::CallbackCreate#), when a thread terminates (argument is
@@ -267,6 +261,7 @@ public:
       consists in setting a timer event that calls \Ref{GThread::yield}.  */
   static void set_scheduling_callback(void (*call)(int));
   enum { CallbackCreate, CallbackTerminate, CallbackUnblock };
+
 #endif
 public:
   // Should be considered as private
@@ -356,8 +351,6 @@ private:
   int ok;
   int count;
   void *locker;
-  int wchan;
-  int seqno;  
 #elif THREADMODEL==JRITHREADS
   JRIGlobalRef obj;
 #endif  
@@ -377,7 +370,7 @@ private:
 inline GThread::GThread(int stacksize) {}
 inline GThread::~GThread(void) {}
 inline void GThread::terminate() {}
-inline int GThread::yield() { return -1; }
+inline unsigned long GThread::yield() { return 0; }
 inline void* GThread::current() { return 0; }
 inline GMonitor::GMonitor() {}
 inline GMonitor::~GMonitor() {}
