@@ -9,9 +9,9 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: IWImage.cpp,v 1.15 1999-05-27 16:26:12 leonb Exp $
+//C- $Id: IWImage.cpp,v 1.16 1999-06-02 16:08:42 leonb Exp $
 
-// File "$Id: IWImage.cpp,v 1.15 1999-05-27 16:26:12 leonb Exp $"
+// File "$Id: IWImage.cpp,v 1.16 1999-06-02 16:08:42 leonb Exp $"
 // - Author: Leon Bottou, 08/1998
 
 #ifdef __GNUC__
@@ -961,13 +961,13 @@ public:
   BitContext ctxMant;
   BitContext ctxRoot;
   // helper
-  int  is_null_slice(int bit, int band);
-  void encode_buckets(_ZPCodecBias &zp, int bit, int band, 
-                      _IWBlock &blk, _IWBlock &eblk,
-                      int fbucket, int nbucket);
+  int is_null_slice(int bit, int band);
+  int encode_prepare(int band, int fbucket, int nbucket, _IWBlock &blk, _IWBlock &eblk);
+  int decode_prepare(int fbucket, int nbucket, _IWBlock &blk);
+  void encode_buckets(_ZPCodecBias &zp, int bit, int band,
+                      _IWBlock &blk, _IWBlock &eblk, int fbucket, int nbucket);
   void decode_buckets(_ZPCodecBias &zp, int bit, int band,
-                      _IWBlock &blk,
-                      int fbucket, int nbucket);
+                      _IWBlock &blk, int fbucket, int nbucket);
 };
 
 
@@ -1047,18 +1047,17 @@ _IWCodec::is_null_slice(int bit, int band)
           int threshold = quant_lo[i];
           coeffstate[i] = ZERO;
           if (threshold>0 && threshold<0x8000)
-            is_null = coeffstate[i] = 0;
+            {
+              coeffstate[i] = UNK;
+              is_null = 0;
+            }
         }
       return is_null;
     }
   else
     {
       int threshold = quant_hi[band];
-      if (! (threshold>0 && threshold<0x8000))
-        return 1;
-      for (int i=0; i<bandbuckets[band].size<<4; i++)
-        coeffstate[i] = 0;
-      return 0;
+      return (! (threshold>0 && threshold<0x8000));
     }
 }
 
@@ -1110,6 +1109,85 @@ _IWCodec::code_slice(_ZPCodecBias &zp)
 }
 
 
+
+// encode_prepare
+// -- compute the states prior to encoding the buckets
+
+int
+_IWCodec::encode_prepare(int band, int fbucket, int nbucket, _IWBlock &blk, _IWBlock &eblk)
+{
+  int bbstate = 0;
+  // compute state of all coefficients in all buckets
+  if (band) 
+    {
+      // Band other than zero
+      int thres = quant_hi[band];
+      char *cstate = coeffstate;
+      for (int buckno=0; buckno<nbucket; buckno++, cstate+=16)
+        {
+          const short *pcoeff = blk.data(fbucket+buckno);
+          const short *epcoeff = eblk.data(fbucket+buckno);
+          int bstatetmp = 0;
+          if (! pcoeff)
+            {
+              bstatetmp = UNK;
+              // cstate[i] is not used and does not need initialization
+            }
+          else if (! epcoeff)
+            {
+              for (int i=0; i<16; i++)
+                {
+                  int cstatetmp = UNK;
+                  if  ((int)(pcoeff[i])>=thres || (int)(pcoeff[i])<=-thres)
+                    cstatetmp = NEW|UNK;
+                  cstate[i] = cstatetmp;
+                  bstatetmp |= cstatetmp;
+                }
+            }
+          else
+            {
+              for (int i=0; i<16; i++)
+                {
+                  int cstatetmp = UNK;
+                  if (epcoeff[i])
+                    cstatetmp = ACTIVE;
+                  else if  ((int)(pcoeff[i])>=thres || (int)(pcoeff[i])<=-thres)
+                    cstatetmp = NEW|UNK;
+                  cstate[i] = cstatetmp;
+                  bstatetmp |= cstatetmp;
+                }
+            }
+          bucketstate[buckno] = bstatetmp;
+          bbstate |= bstatetmp;
+        }
+    }
+  else
+    {
+      // Band zero ( fbucket==0 implies band==zero and nbucket==1 )
+      const short *pcoeff = blk.data(0, &map);
+      const short *epcoeff = eblk.data(0, emap);
+      char *cstate = coeffstate;
+      for (int i=0; i<16; i++)
+        {
+          int thres = quant_lo[i];
+          int cstatetmp = cstate[i];
+          if (cstatetmp != ZERO)
+            {
+              cstatetmp = UNK;
+              if (epcoeff[i])
+                cstatetmp = ACTIVE;
+              else if ((int)(pcoeff[i])>=thres || (int)(pcoeff[i])<=-thres)
+                cstatetmp = NEW|UNK;
+            }
+          cstate[i] = cstatetmp;
+          bbstate |= cstatetmp;
+        }
+      bucketstate[0] = bbstate;
+    }
+  return bbstate;
+}
+
+
 // encode_buckets
 // -- code a sequence of buckets in a given block
 
@@ -1118,39 +1196,9 @@ _IWCodec::encode_buckets(_ZPCodecBias &zp, int bit, int band,
                          _IWBlock &blk, _IWBlock &eblk,
                          int fbucket, int nbucket)
 {
-  int thres = quant_hi[band];
-  int bbstate = 0;
-  
   // compute state of all coefficients in all buckets
-  char *cstate = coeffstate;
-  for (int buckno=0; buckno<nbucket; buckno++, cstate+=16)
-    {
-      int bstatetmp = 0;
-      const short *pcoeff = blk.data(fbucket+buckno);
-      const short *epcoeff = eblk.data(fbucket+buckno);
-      for (int i=0; i<16; i++)
-        {
-          if (band == 0)
-            thres = quant_lo[i];
-          int cstatetmp = cstate[i] & ZERO;
-          if (!cstatetmp)
-            {
-              if (!pcoeff)
-                cstatetmp |= UNK;
-              else if (epcoeff && epcoeff[i])
-                cstatetmp |= ACTIVE;
-              else if ((int)(pcoeff[i])>=thres || (int)(pcoeff[i])<=-thres)
-                cstatetmp |= NEW|UNK;
-              else
-                cstatetmp |= UNK;
-            }
-          cstate[i] = cstatetmp;
-          bstatetmp |= cstatetmp;
-          bbstate |= cstatetmp;
-        }
-      bucketstate[buckno] = bstatetmp;
-    }
-  
+  int bbstate = encode_prepare(band, fbucket, nbucket, blk, eblk);
+
   // code root bit
   if ((nbucket<16) || (bbstate&ACTIVE))
     {
@@ -1208,7 +1256,8 @@ _IWCodec::encode_buckets(_ZPCodecBias &zp, int bit, int band,
   // code new active coefficient (with their sign)
   if (bbstate & NEW)
     {
-      cstate = coeffstate;
+      int thres = quant_hi[band];
+      char *cstate = coeffstate;
       for (int buckno=0; buckno<nbucket; buckno++, cstate+=16)
         if (bucketstate[buckno] & NEW)
           {
@@ -1268,7 +1317,8 @@ _IWCodec::encode_buckets(_ZPCodecBias &zp, int bit, int band,
   // code mantissa bits
   if (bbstate & ACTIVE)
     {
-      cstate = coeffstate;
+      int thres = quant_hi[band];
+      char *cstate = coeffstate;
       for (int buckno=0; buckno<nbucket; buckno++, cstate+=16)
         if (bucketstate[buckno] & ACTIVE)
           {
@@ -1305,6 +1355,70 @@ _IWCodec::encode_buckets(_ZPCodecBias &zp, int bit, int band,
 
 
 
+// decode_prepare
+// -- prepare the states before decoding buckets
+
+int
+_IWCodec::decode_prepare(int fbucket, int nbucket, _IWBlock &blk)
+{  
+  int bbstate = 0;
+  char *cstate = coeffstate;
+  if (fbucket)
+    {
+      // Band other than zero
+      for (int buckno=0; buckno<nbucket; buckno++, cstate+=16)
+        {
+          int bstatetmp = 0;
+          const short *pcoeff = blk.data(fbucket+buckno);
+          if (! pcoeff)
+            {
+              // cstate[0..15] will be filled later
+              bstatetmp = UNK;
+            }
+          else
+            {
+              for (int i=0; i<16; i++)
+                {
+                  int cstatetmp = UNK;
+                  if (pcoeff[i])
+                    cstatetmp = ACTIVE;
+                  cstate[i] = cstatetmp;
+                  bstatetmp |= cstatetmp;
+                }
+            }
+          bucketstate[buckno] = bstatetmp;
+          bbstate |= bstatetmp;
+        }
+    }
+  else
+    {
+      // Band zero ( fbucket==0 implies band==zero and nbucket==1 )
+      const short *pcoeff = blk.data(0);
+      if (! pcoeff)
+        {
+          // cstate[0..15] will be filled later
+          bbstate = UNK;      
+        }
+      else
+        {
+          for (int i=0; i<16; i++)
+            {
+              int cstatetmp = cstate[i];
+              if (cstatetmp != ZERO)
+                {
+                  cstatetmp = UNK;
+                  if (pcoeff[i])
+                    cstatetmp = ACTIVE;
+                }
+              cstate[i] = cstatetmp;
+              bbstate |= cstatetmp;
+            }
+        }
+      bucketstate[0] = bbstate;
+    }
+  return bbstate;
+}
+
 
 // decode_buckets
 // -- code a sequence of buckets in a given block
@@ -1314,40 +1428,8 @@ _IWCodec::decode_buckets(_ZPCodecBias &zp, int bit, int band,
                          _IWBlock &blk,
                          int fbucket, int nbucket)
 {
-  int thres = quant_hi[band];
-  int bbstate = 0;
-  
   // compute state of all coefficients in all buckets
-  char *cstate = coeffstate;
-  for (int buckno=0; buckno<nbucket; buckno++, cstate+=16)
-    {
-      int bstatetmp = 0;
-      const short *pcoeff = blk.data(fbucket+buckno);
-      if (!pcoeff)
-        {
-          // cstate[0..15] will be filled later
-          bstatetmp = UNK;
-        }
-      else
-        {
-          for (int i=0; i<16; i++)
-            {
-              int cstatetmp = cstate[i] & ZERO;
-              if (!cstatetmp)
-                {
-                  if (pcoeff[i])
-                    cstatetmp |= ACTIVE;
-                  else
-                    cstatetmp |= UNK;
-                }
-              cstate[i] = cstatetmp;
-              bstatetmp |= cstatetmp;
-            }
-        }
-      bucketstate[buckno] = bstatetmp;
-      bbstate |= bstatetmp;
-    }
-  
+  int bbstate = decode_prepare(fbucket, nbucket, blk);
   // code root bit
   if ((nbucket<16) || (bbstate&ACTIVE))
     {
@@ -1361,7 +1443,7 @@ _IWCodec::decode_buckets(_ZPCodecBias &zp, int bit, int band,
       printf("bbstate[bit=%d,band=%d] = %d\n", bit, band, bbstate);
 #endif
     }
-
+  
   // code bucket bits
   if (bbstate & NEW)
     for (int buckno=0; buckno<nbucket; buckno++)
@@ -1407,7 +1489,8 @@ _IWCodec::decode_buckets(_ZPCodecBias &zp, int bit, int band,
   // code new active coefficient (with their sign)
   if (bbstate & NEW)
     {
-      cstate = coeffstate;
+      int thres = quant_hi[band];
+      char *cstate = coeffstate;
       for (int buckno=0; buckno<nbucket; buckno++, cstate+=16)
         if (bucketstate[buckno] & NEW)
           {
@@ -1417,9 +1500,17 @@ _IWCodec::decode_buckets(_ZPCodecBias &zp, int bit, int band,
               {
                 pcoeff = blk.data(fbucket+buckno, &map);
                 // time to fill cstate[0..15]
-                for (i=0; i<16; i++)
-                  if (! (cstate[i] & ZERO))
-                    cstate[i] = UNK;
+                if (fbucket == 0) // band zero
+                  {
+                    for (i=0; i<16; i++)
+                      if (cstate[i] != ZERO)
+                        cstate[i] = UNK;
+                  }
+                else
+                  {
+                    for (i=0; i<16; i++)
+                      cstate[i] = UNK;
+                  }
               }
 #ifndef NOCTX_EXPECT
             int gotcha = 0;
@@ -1476,7 +1567,8 @@ _IWCodec::decode_buckets(_ZPCodecBias &zp, int bit, int band,
   // code mantissa bits
   if (bbstate & ACTIVE)
     {
-      cstate = coeffstate;
+      int thres = quant_hi[band];
+      char *cstate = coeffstate;
       for (int buckno=0; buckno<nbucket; buckno++, cstate+=16)
         if (bucketstate[buckno] & ACTIVE)
           {
