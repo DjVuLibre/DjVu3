@@ -21,7 +21,7 @@
 //C-     (C) AT&T Corp. All rights reserved.
 //C-     AT&T is a registered trademark of AT&T Corp.
 //C-
-//C- $Id: IWImage.h,v 1.8 1999-03-15 18:28:52 leonb Exp $
+//C- $Id: IWImage.h,v 1.9 1999-03-16 19:04:36 leonb Exp $
 
 #ifndef _IWIMAGE_H_
 #define _IWIMAGE_H_
@@ -83,8 +83,15 @@
     important role in the DjVu system.  We have investigated various
     state-of-the-art wavelet compression schemes: although these schemes may
     achieve slightly smaller file sizes, the decoding functions did not even
-    approach our requirements.  The IW44 wavelets satisfy these requirements
-    today.  Little care however has been taken to make the IW44 encoder memory
+    approach our requirements.  
+
+    The IW44 wavelets satisfy these requirements today. It performs very well
+    for quality settings resulting in high compression ratios.  It should not
+    be used for quasi-lossless compression because certain design choices
+    deliberately sacrifice the IW44 quasi-lossless performance in order to
+    improve the image quality at high compression ratios.
+
+    Little care however has been taken to make the IW44 encoder memory
     efficient.  This code uses two copies of the wavelet coefficient data
     structure (one for the raw coefficients, one for the quantized
     coefficients).  A more sophisticated implementation should considerably
@@ -111,7 +118,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: IWImage.h,v 1.8 1999-03-15 18:28:52 leonb Exp $# */
+    #$Id: IWImage.h,v 1.9 1999-03-16 19:04:36 leonb Exp $# */
 //@{
 
 #ifdef __GNUC__
