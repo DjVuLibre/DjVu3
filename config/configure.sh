@@ -157,8 +157,8 @@ check_compiler()
         echo $CC.
     else
         echo 1>&2 "$conf: Cannot find C compiler"
-        echo 1>&2 "  -- Use environment variable CC to specify a C compiler."
-        echo 1>&2 "  -- Use environment variable OPT and WARN to specify compiler options."
+        echo 1>&2 "-- Use environment variable CC to specify a C compiler."
+        echo 1>&2 "-- Use environment variable OPT and WARN to specify compiler options."
         exit 1
     fi
 
@@ -179,8 +179,8 @@ check_compiler()
         echo $CXX.
     else
         echo 1>&2 "$conf: Cannot find C++ compiler"
-        echo 1>&2 "  -- Use environment variable CXX to specify a C++ compiler."
-        echo 1>&2 "  -- Use environment variable OPT and WARN to specify compiler options."
+        echo 1>&2 "-- Use environment variable CXX to specify a C++ compiler."
+        echo 1>&2 "-- Use environment variable OPT and WARN to specify compiler options."
         exit 1
     fi
 
@@ -275,7 +275,7 @@ check_thread_option()
   case "$1" in
     yes )
        echo 2>&1 "$conf: Autodetermination of thread model is not yet implemented."
-       echo 2>&1 " -- Please specify one of nothreads, cothreads, posixthreads."
+       echo 2>&1 "-- Please specify one of nothreads, cothreads, posixthreads."
        exit 1
        ;;
     no* )
@@ -302,7 +302,7 @@ EOF
        else
           echo no.
           echo 1>&2 "$conf: Using COTHREADS without the patch is unsafe."
-          echo 1>&2 "  -- See documentation for libdjvu++."
+          echo 1>&2 "-- See documentation for libdjvu++."
           DEFS="$DEFS -DNO_LIBGCC_HOOKS"
        fi
        ;;       
@@ -383,7 +383,7 @@ check_rpo_option()
     # We could build it instead of complaining
     #
     echo 1>&2 "$conf: Cannot find program RPO."
-    echo 1>&2 "  -- You cannot use option -frepo without this program."
+    echo 1>&2 "-- You cannot use option -frepo without this program."
     exit 1
   fi
 }
@@ -440,7 +440,7 @@ check_make_stlib()
     else
         echo unknown.
         echo 1>&2 "$conf: Cannot find how to make a static library."
-        echo 1>&2 "  -- Please set environment variable MAKE_STLIB or AR."
+        echo 1>&2 "-- Please set environment variable MAKE_STLIB or AR."
         exit 1
     fi
 
