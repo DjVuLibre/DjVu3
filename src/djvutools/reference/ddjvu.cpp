@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: ddjvu.cpp,v 1.5 2000-11-09 20:15:05 jmw Exp $
+// $Id: ddjvu.cpp,v 1.6 2000-12-14 22:42:25 ndire Exp $
 // $Name:  $
 
 /** @name ddjvu
@@ -112,7 +112,7 @@
     Yann Le Cun <yann@research.att.com>\\
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: ddjvu.cpp,v 1.5 2000-11-09 20:15:05 jmw Exp $# */
+    #$Id: ddjvu.cpp,v 1.6 2000-12-14 22:42:25 ndire Exp $# */
 //@{
 //@}
 
@@ -128,8 +128,9 @@
 
 #ifdef UNDER_CE
 #include <windows.h>
+// This captures stderr to a file for this compilation unit.
+FILE * logfile = _wfreopen( TEXT("\\temp\\ddjvu_log.txt"), TEXT("a"), stderr );
 #endif
-
 
 static double flag_scale = -1;
 static int    flag_size = -1;
@@ -140,6 +141,9 @@ static int    flag_mode = 0;
 
 GRect fullrect;
 GRect segmentrect;
+
+
+
 
 static void
 convert(const char *from, const char *to, int page_num)
@@ -310,13 +314,20 @@ geometry(char *s, GRect &rect)
 int
 oldmain(int argc, char **argv)
 {
+	flag_scale = -1;
+	flag_size = -1;
+	flag_subsample = -1;
+	flag_segment = -1;
+	flag_verbose = 0;
+	flag_mode = 0;
 
-flag_scale = -1;
-flag_size = -1;
-flag_subsample = -1;
-flag_segment = -1;
-flag_verbose = 0;
-flag_mode = 0;
+	// Output command arguments that oldmain receives to logfile.
+	fprintf( logfile, "Command arguments: " );
+	for ( int i = 0; i < argc; i++ )
+	{
+		fprintf( logfile, "%s ", argv[i] );
+	}
+	fprintf( logfile, "\n\n" );
 #else
 int
 main(int argc, char **argv)
@@ -429,24 +440,64 @@ main(int argc, char **argv)
       exit(1);
     }
   G_ENDCATCH;
+
   return 0;
 }
 
 
 #ifdef UNDER_CE
+#define SEPCHARS TEXT( " " )
+#define TIME_BUFSIZE 20
+#define ARG_BUFSIZE 20
 int WINAPI WinMain (HINSTANCE hInstance,
 		             HINSTANCE hPrevInstance,
                      LPTSTR lpCmdLine,
                      int nCmdShow)
 {
-   char *argv[4] ;
-   argv[0]="-" ;
+	int argc = 1, i = 0;
+	char *argv[20];
+	TCHAR *arg;
+	TCHAR timestamp[TIME_BUFSIZE];
+
+	GetTimeFormat( LOCALE_SYSTEM_DEFAULT, 0, NULL, NULL, 
+		timestamp, TIME_BUFSIZE );
+	
+	// Ouput header to ddjvuce log file with timestamp
+	fwprintf( logfile, TEXT("\n--------------------------------\n") );
+	fwprintf( logfile, TEXT("ddjvuce log file:  ") );
+	fwprintf( logfile, timestamp );
+	fwprintf( logfile, TEXT("\n--------------------------------\n") );
+	fwprintf( logfile, TEXT("\n") );
+
+	// Use wcstok to get arguments from lpCmdLine, then convert them
+	// to chars for oldmain().
+	argv[0]="ddjvu";
+	arg = wcstok( lpCmdLine, SEPCHARS );
+	while( arg != NULL )
+	{
+		argv[argc] = (char*) malloc( wcslen( arg ) + 1 );
+		for ( i = 0; i < wcslen( arg); i++ )
+		{
+			argv[argc][i] = arg[i];
+		}
+		argv[argc][i] = '\0';
+		arg = wcstok( NULL, SEPCHARS );
+		argc++;
+	}
+	
+	oldmain( argc, argv );
+	
+	for( i = 0; i < argc; i++ )
+		free( argv[argc] );
+	
+	fclose( logfile );
+	/*
    argv[1]="-v" ;
    // Vanilla flavored conversion
-   argv[2]="\\\\My Documents\\input.djvu" ;
-   argv[3]="\\\\My Documents\\output_default.pnm" ;
-   oldmain (4, argv) ;
- 
+   argv[2]="\\\\temp\\input.djvu" ;
+   argv[3]="\\\\temp\\output_default.pnm" ;
+   oldmain(4, argv);
+
    // Scale at 50%
    argv[2]="-scale";
    argv[3]="50" ;
@@ -512,8 +563,7 @@ int WINAPI WinMain (HINSTANCE hInstance,
    argv[4]="-black" ;
    argv[5]="\\\\My Documents\\input.djvu" ;
    argv[6]="\\\\My Documents\\output_page2_mask.pnm" ;
-   oldmain (7, argv) ;
-
+   oldmain (7, argv) ; */
 
 /* 
 
