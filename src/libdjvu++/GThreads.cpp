@@ -7,10 +7,10 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: GThreads.cpp,v 1.11 1999-03-06 00:07:05 leonb Exp $
+//C-  $Id: GThreads.cpp,v 1.12 1999-03-06 00:39:28 leonb Exp $
 
 
-// **** File "$Id: GThreads.cpp,v 1.11 1999-03-06 00:07:05 leonb Exp $"
+// **** File "$Id: GThreads.cpp,v 1.12 1999-03-06 00:39:28 leonb Exp $"
 // This file defines machine independent classes
 // for running and synchronizing threads.
 // - Author: Leon Bottou, 01/1998
@@ -677,16 +677,20 @@ static unsigned long globalmaxwait = 0;
 
 // -------------------------------------- time
 
+static timeval time_base;
+
 static unsigned long
 time_elapsed(int reset=1)
 {
-  static timeval base;
   timeval tm;
-  unsigned long  elapsed;
   gettimeofday(&tm, NULL);
-  elapsed = (tm.tv_sec-base.tv_sec)*1000 + (tm.tv_usec-base.tv_usec)/1000;
+  long msec = (tm.tv_usec-time_base.tv_usec)/1000;
+  unsigned long elapsed = (long)(tm.tv_sec-time_base.tv_sec)*1000 + msec;
   if (reset && elapsed>0)
-    base = tm;
+    {
+      time_base.tv_sec = tm.tv_sec;
+      time_base.tv_usec += msec*1000;
+    }
   return elapsed;
 }
 
@@ -938,7 +942,7 @@ GThread::GThread(int stacksize)
       memset(maintask, 0, sizeof(cotask));
       maintask->next = maintask;
       maintask->prev = maintask;
-      time_elapsed();
+      gettimeofday(&time_base,NULL);
 #ifndef NO_LIBGCC_HOOKS
       maintask->ehctx =  (*__get_eh_context_ptr)();
       __get_eh_context_ptr = cotask_get_eh_context;
