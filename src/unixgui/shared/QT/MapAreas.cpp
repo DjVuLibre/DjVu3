@@ -4,7 +4,7 @@
 //C-              Unauthorized use prohibited.
 //C-
 // 
-// $Id: MapAreas.cpp,v 1.2 2001-06-18 19:26:28 mchen Exp $
+// $Id: MapAreas.cpp,v 1.3 2001-06-19 17:14:49 mchen Exp $
 // $Name:  $
 
 
@@ -167,7 +167,6 @@ MapArea::MapArea(const GP<GMapArea> & area) : gmap_area(area)
    pane=0;
    mapper=0;
    in_motion=false;
-   //first_move=true;
    enable_edit_controls=false;
    active_outline_mode=inactive_outline_mode=false;
    active=gmap_area->border_always_visible;
@@ -637,7 +636,7 @@ MapArea::move(const GRect & doc_rect, int x, int y,
       ma_move(doc_rect, x, y, vic_code, vic_data);
       return;
    }
-
+   
    ma_copySaved();
    GMapArea * copy=ma_getCopiedData();
    int xmin=copy->get_xmin(), ymin=copy->get_ymin();
@@ -1250,7 +1249,7 @@ MapPoly::ma_move(const GRect & doc_rect, int x, int y,
    // doc_rect, (x, y) are in screen coord system
 {
    if (!mapper) return;
-   
+
    if (vic_data<0) vic_data=gmap_poly->get_points_num()-1;
    if (vic_code==VERTEX && vic_data>=0 && vic_data<gmap_poly->get_points_num())
    {
@@ -1258,12 +1257,7 @@ MapPoly::ma_move(const GRect & doc_rect, int x, int y,
       int vx=saved_poly->get_x(vic_data);
       int vy=saved_poly->get_y(vic_data);
       mapper->map(vx, vy);
-      if ( saved_poly->get_points_num() >=3 )
-      {
-	 vx+=dx; vy+=dy;
-      } else {
-	 vx=x; vy=y;
-      }
+      vx+=dx; vy+=dy;
       if (vx<doc_rect.xmin) vx=doc_rect.xmin;
       if (vx>doc_rect.xmax) vx=doc_rect.xmax;
       if (vy<doc_rect.ymin) vy=doc_rect.ymin;
@@ -1356,6 +1350,8 @@ MapPoly::MapPoly(const GP<GMapPoly> & poly) :
       MapArea((GMapPoly *) poly), gmap_poly(poly)
 {
    DEBUG_MSG("MapPoly::MapPoly(): Initializing rectangular hyperlink\n");
+   copy_poly=GMapPoly::create();
+   saved_poly=GMapPoly::create();
    createCursors();
 }
 
@@ -1439,71 +1435,7 @@ MapOval::ma_drawOutline(QPainter * p, const GRect & grect)
 MapOval::MapOval(const GP<GMapOval> & oval) :
       MapArea((GMapOval *) oval), gmap_oval(oval)
 {
+   DEBUG_MSG("MapOval::MapOval(): Initializing rectangular hyperlink\n");
    copy_oval=GMapOval::create();
    saved_oval=GMapOval::create();
-   DEBUG_MSG("MapOval::MapOval(): Initializing rectangular hyperlink\n");
 }
-
-void 
-MapPoly::ma_restoreSavedData(void)
-{
-   // map back to the saved rect ...
-   gmap_poly->transform(saved_poly->get_bound_rect());
-}
-
-void 
-MapPoly::ma_loadCopy(void)
-{
-   // map to the new rect 
-   gmap_poly->transform(copy_poly->get_bound_rect());
-}
-
-void 
-MapPoly::ma_saveData(void)
-{
-   // this seems to be the only way I could save the poly
-   // but all we need is the bound rect ...
-   GList<int> coords;
-   gmap_poly->get_coords(coords);
-   int points=coords.size()/2;
-   if ( points >= 3 )
-   {
-      int x[points], y[points];
-      int i=0;
-      for (GPosition pos=coords; pos; ++pos, ++i) {
-	 x[i]=coords[pos];
-	 y[i]=coords[++pos];
-      }
-      saved_poly=GMapPoly::create(x,y,points);
-   } else {
-      // if there are less than 3 points, then it's an 'invalid' poly,
-      // use x, y points directly (see MapPoly::ma_move)
-      saved_poly=gmap_poly;
-   }
-}
-
-void 
-MapPoly::ma_copySaved(void)
-{
-   // this seems to be the only way I could save the poly
-   // but all we need is the bound rect ...
-   GList<int> coords;
-   saved_poly->get_coords(coords);
-   int points=coords.size()/2;
-   if ( points >= 3 )
-   {
-      int x[points], y[points];
-      int i=0;
-      for (GPosition pos=coords; pos; ++pos, ++i) {
-	 x[i]=coords[pos];
-	 y[i]=coords[++pos];
-      }
-      copy_poly=GMapPoly::create(x,y,points);
-   } else {
-      // if there are less than 3 points, then it's an 'invalid' poly,
-      // use x, y points directly (see MapPoly::ma_move)
-      copy_poly=saved_poly;
-   }
-}
-
-
