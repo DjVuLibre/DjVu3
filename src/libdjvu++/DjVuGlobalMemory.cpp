@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuGlobalMemory.cpp,v 1.13 2001-01-04 22:04:55 bcr Exp $
+// $Id: DjVuGlobalMemory.cpp,v 1.14 2001-01-11 20:56:19 bcr Exp $
 // $Name:  $
 
 #ifdef NEED_DJVU_MEMORY
@@ -42,6 +42,7 @@
 #include "GException.h"
 #include <stdlib.h>
 #include <string.h>
+#include "debug.h"
 
 #ifdef UNIX
 djvu_delete_callback *
@@ -217,12 +218,14 @@ _djvu_deleteArray(void *addr)
 void *
 _djvu_malloc(size_t siz)
 {
+  DEBUG_MSG("_djvu_malloc: siz="<<siz<<"\n");
   return _djvu_malloc_handler?(*_djvu_malloc_handler)(siz?siz:1):malloc(siz?siz:1);
 }
 
 void *
 _djvu_calloc(size_t siz, size_t items)
 {
+  DEBUG_MSG("_djvu_calloc: siz="<<siz<<" items="<<items<<"\n");
   void *ptr;
   if( _djvu_calloc_handler )
   {
@@ -243,6 +246,7 @@ _djvu_calloc(size_t siz, size_t items)
 void *
 _djvu_realloc(void* ptr, size_t siz)
 {
+  DEBUG_MSG("_djvu_realloc: ptr="<<ptr<<" siz="<<siz<<"\n");
   void *newptr;
   if( _djvu_realloc_handler )
   {
@@ -257,6 +261,7 @@ _djvu_realloc(void* ptr, size_t siz)
 void
 _djvu_free(void *ptr)
 {
+  DEBUG_MSG("_djvu_free: ptr="<<ptr<<"\n");
   if(ptr)
   {
     if( _djvu_free_handler )
