@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: d44.cpp,v 1.20 2001-06-05 03:19:57 bcr Exp $
+// $Id: d44.cpp,v 1.21 2001-06-11 22:53:30 bcr Exp $
 // $Name:  $
 
 /** @name d44
@@ -84,7 +84,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: d44.cpp,v 1.20 2001-06-05 03:19:57 bcr Exp $# 
+    #$Id: d44.cpp,v 1.21 2001-06-11 22:53:30 bcr Exp $# 
 */
 //@{
 //@}
@@ -239,7 +239,7 @@ mymain(int argc, char **argv)
                          (iw->get_memory_usage()+512)/1024, iw->get_percent_memory());
       }
       if (flag_addsuffix)
-        pnmurl = pnmurl + (color?".ppm":".pgm");
+        pnmurl=GURL::UTF8(pnmurl.name()+(color?".ppm":".pgm"),pnmurl.base());
 #ifndef UNDER_CE
       pnmurl.deletefile();
 #else
