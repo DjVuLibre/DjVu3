@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.cpp,v 1.9 1999-09-04 01:36:49 leonb Exp $
+//C- $Id: DataPool.cpp,v 1.10 1999-09-07 16:34:55 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -88,22 +88,22 @@ DataPool::BlockList::add_range(int start, int length)
       } else if (block_end<start+length) list.append(start+length-block_end);
 
 	 // Now merge adjacent areas with the same sign
-      GList<int> new_list;
-      int sum=0;
-      for(pos=list;pos;++pos)
+      pos=list;
+      while(pos)
       {
-	 int size=list[pos];
-	 if (size!=0)
+	 GPosition pos1;
+	 for(pos1=++pos;pos1;)
 	 {
-	    if (sum<0 && size>0 || sum>0 && size<0)
-	    {
-	       new_list.append(sum);
-	       sum=size;
-	    } else sum+=size;
+	    if (list[pos]<0 && list[pos1]>0 ||
+		list[pos]>0 && list[pos1]<0)
+	       break;
+	    list[pos]+=list[pos1];
+	    GPosition this_pos=pos1;
+	    ++pos1;
+	    list.del(this_pos);
 	 }
+	 pos=pos1;
       }
-      new_list.append(sum);
-      list=new_list;
    } // if (length>0)
 }
 
@@ -311,8 +311,8 @@ DataPool::has_data(int dstart, int dlength)
 {
    if (dlength<0 && length>0) dlength=length-dstart;
 
-   if (pool) return pool->has_data(dstart, dlength);
-   else if (stream) return dstart+dlength<=length;
+   if (pool) return pool->has_data(start+dstart, dlength);
+   else if (stream) return start+dstart+dlength<=length;
    else if (dlength<0) return is_eof();
    else return block_list.has_range(dstart, dlength);
 }
@@ -406,6 +406,7 @@ DataPool::wait_for_data(const GP<Reader> & reader)
    {
       if (stop_flag || reader->stop_flag) THROW("STOP");
       if (eof_flag || block_list.has_range(reader->offset, 1)) return;
+      if (pool || stream) return;
 
       DEBUG_MSG("calling event.wait()...\n");
       reader->event.wait();
