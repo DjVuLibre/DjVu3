@@ -64,33 +64,20 @@ if [ -z "$CXX" ] ; then
   CXXMMX=""
   if [ `uname -m` = i686 ]
   then
-    echon "Checking whether ${CXX} -mpentiumpro and -mmx work ... "
-    if ( run $CXX ${CXXFLAGS} -mpentiumpro -c $temp.cpp ) 
-    then
-      CXXMMX="-mpentiumpro"
-      if ( run $CXX ${CXXFLAGS} ${CXXMMX} -mmx -c $temp.cpp ) ; then
-        CXXMMX="$CXXMMX -mmx"
-        echo "yes, both work"
-      else
-        echo "just $CXXMMX works"
-      fi
+    echon "Checking ${CXX} supports pentium optimizations ... "
+    check_compile_flags CXXMMX $temp.cpp "-mpentiumpro -mmx" "-mpentiumpro"
+    if [ -z "$CXXMMX" ] ; then
+      echo "none"
     else
-      echo "no"
+      echo "$CXXMMX"
+      CXXFLAGS="${CXXMMX} ${CXXFLAGS}"
     fi
-    CXXFLAGS=`echo "${CXXMMX}" "${CXXFLAGS}"`
   fi
 
   echon "Checking ${CXX} symbolic option ... "
   CXXSYMBOLIC=""
-  s=`(cd $tempdir 2>>/dev/null;${CXX} ${CXXFLAGS} -symbolic -c $temp.cpp 2>&1)|"${grep}" 'unrecognized option'`
-  if [ -z "$s" ]
-  then
-    echo " -symbolic"
-    CXXSYMBOLIC='-symbolic'
-  elif ( run ${CXX} ${CXXFLAGS} -shared -Wl,-Bsymbolic -o $temp.so $temp.cpp -lc -lm ) ; then
-    if [ "$SYS" != "linux-libc6" ] ; then
-      CXXSYMBOLIC='-Wl,-Bsymbolic'
-    fi
+  if [ "$SYS" != "linux-libc6" ] ; then
+    check_link_flags CXXSYMBOLIC $temp.cpp "-shared -symbolic" "-shared -Wl,-Bsymbolic" "-shared -Wl,-Bsymbolic -lc" "-shared -Wl,-Bsymbolic -lc -lm"
   fi
   if [ -z "$CXXSYMBOLIC" ] ; then
     echo "none"
@@ -99,12 +86,12 @@ if [ -z "$CXX" ] ; then
   fi
 
   echon "Checking whether ${CXX} -fPIC works ... "
-  if ( run $CXX ${CXXFLAGS} -fPIC -c $temp.cpp ) ; then
+  check_compile_flags CXXPIC $temp.cpp "-fPIC"
+  if [ $? = 0 ]
+  then
     echo yes
-    CXXPIC="-fPIC"
   else
     echo no
-    CXXPIC=""
   fi
 
   echon "Checking whether ${CXX} is gcc ... "

@@ -68,9 +68,9 @@ fi
 require_compiler c++
 check_debug_option $debug
 check_thread_option $threads
-check_library math log -lm
+require_library math log -lm
 check_rpo_option $use_rpo
-check_make_stlib
+require_make_stlib
 
 
 ### ---------------------------

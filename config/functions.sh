@@ -56,7 +56,13 @@
 # check_library
 #   (to be documented)
 #
+# require_library
+#   (to be documented)
+#
 # check_make_stlib
+#   (to be documented)
+#
+# require_make_stlib
 #   (to be documented)
 #
 # generate_makefile
@@ -104,23 +110,26 @@ pathclean()
 # Sort a list and make sure the elements are unique
 sortlist()
 {
-  (while [ $# != 0 ] ; do
-    echo "$1"
-    shift
+  (for i 
+  do
+    echo "$i"
   done)|${sort} -u
 }
 
 # Escape characters.
 escape()
 {
-  echo "$*"|${sed} -e 's,@%%@,@%%@p,g' -e 's,!,@%%@e,g' -e 's, ,@%%@s,g' -e 's,	,@%%@t,g' -e 's,\$,@%%@d,g' -e 's,",@%%@q,g' -e 's,'"'"',@%%@a,g'
+  (for i
+  do
+    echo "$i"
+  done)|${sed} -e 's,@%%@,@%%@p,g' -e 's,!,@%%@e,g' -e 's, ,@%%@s,g' -e 's,	,@%%@t,g' -e 's,\$,@%%@d,g' -e 's,",@%%@q,g' -e 's,'"'"',@%%@a,g'
 }
 
 unescape()
 {
-  (while [ $# != 0 ] ; do
-    echo "$1"
-    shift
+  (for i
+   do
+    echo "$i"
   done)|sed  -e 's,@%%@a,'"'"',g' -e 's,@%%@q,",g' -e 's,@%%@d,\$,g' -e 's,@%%@t,	,g' -e 's,@%%@s, ,g' -e 's,@%%@e,!,g' -e 's,@%%@p,@%%@,g'
 }
 
@@ -476,6 +485,137 @@ check_rpo_option()
 
 
 ### ------------------------------------------------------------------------
+### Check compile and link flags
+
+# Usage: check_compile_flags NAME tmpfile.c|.cpp ALTERNATIVE_COMPILE_FLAGS
+# Side effect: Update variable <NAME> and <NAME>_paths
+
+check_compile_flags()
+{
+  BBname="$1"
+  shift
+  BBtmpfile="$1"
+  shift
+  if [ "x$1" = "x@%%@" ]
+  then
+    shift
+    BBargs="$*"
+  else
+    BBargs=""
+    for s
+    do
+      s=`unescape "$s"`
+      if [ -z "$BBargs" ]
+      then
+        BBargs="`escape $s`"
+      else
+        BBargs="$ACargs `escape $s`"
+      fi
+    done
+  fi
+  s='echo $'"${BBname}_paths"
+  s=`eval $s`
+  if [ "x$s" != "x$BBargs" ] ; then
+    eval "${BBname}_paths='$BBargs'"
+    CONFIG_VARS=`echo ${BBname}_paths ${BBname} $CONFIG_VARS`
+    case $BBtmpfile in 
+    *.c)
+      for BBflags in $BBargs
+      do
+        flags=`unescape "$BBflags"`
+        run "$CC" $CCFLAGS $CCOPT $CCWARN $DEFS $BBflags -c $BBtmpfile
+        if [ $? = 0 -a -z "`grep -i unrecognized $temp.out`" ]
+        then
+          eval "${BBname}='"`escape "$BBflags"`"'"
+          return 0
+        fi
+      done
+      ;;
+    *.cpp)
+      for BBflags in $BBargs
+      do
+        run "$CXX" $CXXFLAGS $CXXOPT $CXXWARN $DEFS $BBflags -c $BBtmpfile
+        if [ $? = 0 -a -z "`grep -i unrecognized $temp.out`" ]
+        then
+          eval "${BBname}='"`escape "$BBflags"`"'"
+          return 0
+        fi
+      done
+      ;;
+    esac
+    return 1;
+  fi
+  return 0;
+}
+
+# Usage: check_link_flags NAME tmpfile.c|.cpp ALTERNATIVE_COMPILE_FLAGS
+# Side effect: Update variable <NAME> and <NAME>_paths
+
+check_link_flags()
+{
+  AAname="$1"
+  shift
+  AAtmpfile="$1"
+  shift
+  if [ "x$1" = "x@%%@" ]
+  then
+    shift
+    AAargs="$*"
+  else
+    AAargs=""
+    for s
+    do
+      s=`unescape "$s"`
+      if [ -z "$AAargs" ]
+      then
+        AAargs="`escape $s`"
+      else
+        AAargs="$AAargs `escape $s`"
+      fi
+    done
+  fi
+  s='echo $'"${AAname}_paths"
+  s=`eval $s`
+  if [ "x$s" != "x$AAargs" ] ; then
+    eval "${AAname}_paths"'="$AAargs"'
+    CONFIG_VARS=`echo ${AAname}_paths ${AAname} $CONFIG_VARS`
+    case $AAtmpfile in 
+    *.c)
+      for AAflags in $AAargs
+      do
+        AAflags=`unescape "$AAflags"`
+        if ( run "$CC" $CCFLAGS $CCOPT $CCWARN $DEFS $AAflags $AAtmpfile -o $temp ) 
+        then
+
+          eval "${AAname}"'="$AAflags"'
+          return 0
+        fi
+      done
+      ;;
+    *.cpp)
+      for AAflags in $AAargs
+      do
+        AAflags=`unescape "$AAflags"`
+        if ( run "$CXX" $CXXFLAGS $CXXOPT $CXXWARN $DEFS $AAflags $AAtmpfile -o $temp ) 
+        then
+          eval "${AAname}"'="$AAflags"'
+          return 0
+        fi
+      done
+      ;;
+    esac
+    return 1
+  fi
+  s='echo $'"${AAname}"
+  if [ -z "`eval $s`" ] 
+  then
+    return 1
+  else
+    return 0
+  fi
+}
+
+### ------------------------------------------------------------------------
 ### Check library
 
 # Usage: check_library NAME FUNCTION ...ALTERNATIVE_LINKSPEC...
@@ -484,53 +624,124 @@ check_rpo_option()
 
 check_library()
 {
-  name="$1"
+  ABname="$1"
   shift
-  func="$1"
+  ABfunc="$1"
   shift
-  s='echo $'"lib${name}_paths"
+  if [ "x$1" = "x@%%@" ]
+  then
+    shift
+    ABargs="$*"
+  else
+    ABargs=""
+    for s
+    do
+      s=`unescape "$s"`
+      if [ -z "$ABargs" ]
+      then
+        ABargs="`escape $s`"
+      else
+        ABargs="$ABargs `escape $s`"
+      fi
+    done
+  fi
+  s='echo $'"lib${ABname}_paths"
   s=`eval $s`
-  t=`escape "$*"`
-  if [ "x$s" != "x$t" ] ; then
-    eval "lib${name}_paths='$t'"
-    CONFIG_VARS=`echo lib${name}_paths lib${name} $CONFIG_VARS`
-    echon "Searching library containing ${func}() ... "
+  if [ "x$s" != "x$ABargs" ] ; then
+    echon "Searching library containing ${ABfunc}() ... "
     if [ -z "$CXX" ] 
     then
       testfile $temp.c <<EOF
-int ${func}(void);
-int main(void) { return ${func}(); }
+int ${ABfunc}(void);
+int main(void) { return ${ABfunc}(); }
 EOF
-      for lib
-      do
-        if ( run "$CC" $CCFLAGS $OPT $DEFS $WARN $temp.c $lib -o $temp ) 
-        then
-          echo $lib
-          eval "lib${name}='"`escape "$lib"`"'"
-          return 0
-        fi
-      done
+      check_link_flags "lib${ABname}" $temp.c @%%@ $ABargs
     else
       testfile $temp.cpp <<EOF
-extern "C" int ${func}(void);
-int main(void) { return ${func}(); }
+extern "C" int ${ABfunc}(void);
+int main(void) { return ${ABfunc}(); }
 EOF
-      for lib
-      do
-        if ( run "$CXX" $CXXFLAGS $OPT $DEFS $WARN $temp.cpp $lib -o $temp ) 
-        then
-          echo $lib
-          eval "lib${name}='"`escape "$lib"`"'"
-          return 0
-        fi
-      done
+      check_link_flags "lib${ABname}" $temp.cpp @%%@ $ABargs
+    fi
+    if [ $? = 0 ] ; then
+      s='echo $lib'"${ABname}"
+      eval $s
+      return 0
     fi
     echo "not found."
-    echo 2>&1 "${PROGRAM_NAME}: Function ${func}() not found."
-    exit 1
+    return 1;
+  fi
+  s='echo $lib'"${ABname}"
+  if [ -z "`eval $s`" ] 
+  then
+    return 1
+  else
+    return 0
   fi
 }
 
+# Usage: require_library NAME FUNCTION ...ALTERNATIVE_LINKSPEC...
+# Side effect: Update variable lib<NAME>
+
+require_library()
+{
+  ACname="$1"
+  shift
+  ACfunc="$1"
+  shift
+  if [ "x$1" = "x@%%@" ]
+  then
+    shift
+    ACargs="$*"
+  else
+    ACargs=""
+    for s
+    do
+      s=`unescape "$s"`
+      if [ -z "$ACargs" ]
+      then
+        ACargs="`escape $s`"
+      else
+        ACargs="$ACargs `escape $s`"
+      fi
+    done
+  fi
+  check_library "$ACname" "$ACfunc" @%%@ $ACargs
+  if [ $? = 0 ] 
+  then
+    return 0
+  fi
+  echo 2>&1 "${PROGRAM_NAME}: Function ${ACfunc}() not found."
+  exit 1
+}
+
+# Usage: search_for_library NAME FUNCTION ...ALTERNATIVE_LIBRARY_FILENAMES...
+# Side effect: Update variable lib<NAME>
+
+search_for_library()
+{
+  ADname="$1"
+  shift
+  ADfunc="$1"
+  shift
+  for i
+  do
+    if [ `"${basename}" "x$i" .a` = `"${basename}" "x$i"` ] 
+    then
+      if ( check_library "$ADname" "$ADfunc" @%%@ `echo $SOPATHS" "|sed -e "s, ,/$i ,g"` )
+      then
+        return 0
+      fi
+    else
+      s=`"${basename}" "$i" ".a"|sed 's,^lib,-l,'`
+      if ( check_library "$ADname" "$ADfunc" @%%@ "-Wl,-Bstatic $s -Wl,-Bdynamic" `echo "${LIBPATHS} "|sed -e "s, ,/$i ,g" -e 's, $,,'` )
+      then
+        return 0
+      fi
+    fi
+  done
+  return 1
+}
 
 ### ------------------------------------------------------------------------
 ### Searching how to make archives
@@ -542,39 +753,50 @@ EOF
 
 check_make_stlib()
 {
-  if [ ! -z "$CC$CXX" ]
+  if [ -z "$make_stlib_test" ]
   then
-    echon Searching how to build a static library ...
-    if [ -z "$CC" ]
-    then
-      testfile $temp.cpp <<EOF
-int main(void) { return 1; }
-EOF
-      run "$CXX" $CCFLAGS $OPT $DEFS $WARN -c $temp.cpp
-    else
-      testfile $temp.c <<EOF
-int main(void) { return 1; }
-EOF
-      run "$CC" $CCFLAGS $OPT $DEFS $WARN -c $temp.c
-    fi
+    make_stlib_test=checked
     if [ -z "$MAKE_STDLIB" ]
     then
       make_stlib="${ar} cq"
     fi
-    if ( run "${make_stlib}" $temp.a $temp.o ) 
+    if [ ! -z "$CC$CXX" ]
     then
+      echon Searching how to build a static library ...
+      if [ -z "$CC" ]
+      then
+        testfile $temp.cpp <<EOF
+int main(void) { return 1; }
+EOF
+        run "$CXX" $CCFLAGS $OPT $DEFS $WARN -c $temp.cpp
+      else
+        testfile $temp.c <<EOF
+int main(void) { return 1; }
+EOF
+        run "$CC" $CCFLAGS $OPT $DEFS $WARN -c $temp.c
+      fi
+      if ( run "${make_stlib}" $temp.a $temp.o ) 
+      then
         echo "${make_stlib}"
-    else
-        echo unknown.
-        echo 1>&2 "${PROGRAM_NAME}: Cannot find how to make a static library."
-        echo 1>&2 "-- Please set environment variable make_stlib or AR."
-        exit 1
+      else
+        make_stlib=""
+      fi
+      CONFIG_VARS=`echo make_stlib make_stlib_test $CONFIG_VARS`
     fi
-    CONFIG_VARS=`echo make_stlib $CONFIG_VARS`
   fi
 }
 
-
+require_make_stlib()
+{
+  check_make_stlib $*
+  if [ -z "$make_stlib" ]
+  then
+    echo unknown.
+    echo 1>&2 "${PROGRAM_NAME}: Cannot find how to make a static library."
+    echo 1>&2 "-- Please set environment variable make_stlib or AR."
+    exit 1
+  fi
+}
 
 
 
