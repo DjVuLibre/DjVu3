@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuAnno.cpp,v 1.38 1999-10-28 21:26:09 eaf Exp $
+//C- $Id: DjVuAnno.cpp,v 1.39 1999-10-29 22:09:00 praveen Exp $
 
 
 #ifdef __GNUC__
@@ -934,10 +934,7 @@ DjVuANT::is_empty(void) const
 GP<DjVuANT>
 DjVuANT::copy(void) const
 {
-   GP<DjVuANT> ant=new DjVuANT;
-
-      // First: copy all primitives
-   *ant=*this;
+   GP<DjVuANT> ant=new DjVuANT(*this);
 
       // Now process the list of hyperlinks.
    ant->map_areas.empty();

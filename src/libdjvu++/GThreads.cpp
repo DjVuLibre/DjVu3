@@ -9,10 +9,10 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GThreads.cpp,v 1.34 1999-10-19 13:52:24 leonb Exp $
+//C- $Id: GThreads.cpp,v 1.35 1999-10-29 22:09:00 praveen Exp $
 
 
-// **** File "$Id: GThreads.cpp,v 1.34 1999-10-19 13:52:24 leonb Exp $"
+// **** File "$Id: GThreads.cpp,v 1.35 1999-10-29 22:09:00 praveen Exp $"
 // This file defines machine independent classes
 // for running and synchronizing threads.
 // - Author: Leon Bottou, 01/1998
@@ -77,14 +77,14 @@ start(void *arg)
         {
           ex.perror();
           fprintf(stderr, "GThreads: uncaught exception.");
-          abort();
+          //abort();
         }
       ENDCATCH;
     }
   catch(...)
     {
       fprintf(stderr, "GThreads: unrecognized uncaught exception.");
-      abort();
+      //abort();
     }
   return 0;
 }
