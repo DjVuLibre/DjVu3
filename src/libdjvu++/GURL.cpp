@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GURL.cpp,v 1.82 2001-07-19 21:56:48 bcr Exp $
+// $Id: GURL.cpp,v 1.83 2001-07-21 04:04:40 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -163,7 +163,8 @@ is_argument(const char * start)
       // Returns TRUE if 'start' points to the beginning of an argument
       // (either hash or CGI)
 {
-   return (*start=='#' || *start=='?' || *start=='&' || *start==';');
+   // return (*start=='#' || *start=='?' || *start=='&' || *start==';');
+   return (*start=='#' || *start=='?' );
 }
 
 void
@@ -949,11 +950,11 @@ GURL::base(void) const
      }
    }
    return GURL::UTF8(
-#ifdef WIN32
-   (*(xslash-1) == colon)?
-     (GUTF8String(xurl,(int)(xslash-url_ptr))+"/"+GUTF8String(ptr,xurl_length-(int)(ptr-url_ptr))+"/" ):
-#endif
-     (GUTF8String(xurl,(int)(xslash-url_ptr))+GUTF8String(ptr,xurl_length-(int)(ptr-url_ptr))+"/"));
+// ifdef WIN32
+// (*(xslash-1) == colon)?
+//   (GUTF8String(xurl,(int)(xslash-url_ptr))+"/" ):
+// endif
+     (GUTF8String(xurl,(int)(xslash-url_ptr))+"/"));
 }
 
 bool
