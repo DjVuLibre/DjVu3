@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.68 2001-04-19 19:18:49 praveen Exp $
+// $Id: GString.cpp,v 1.69 2001-04-19 19:20:04 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -1153,9 +1153,9 @@ GString::NativeToUTF8(void) const
         {
           retval=GStringRep::UTF8::create((size_t)0);
         }
-        if(!repeat || retval || (lc_ctype == setlocale(LC_CTYPE,"")))
-          break;
       }
+      if(!repeat || retval || (lc_ctype == setlocale(LC_CTYPE,"")))
+        break;
     }
     if(!repeat)
     {
@@ -1733,6 +1733,93 @@ GStringRep::Native::toDouble(
   return retval;
 }
 
+#if 0
+int 
+GStringRep::nextUCS4(const int from,const unsigned long &w) const
+{
+  int retval;
+  if(from>=size)
+  {
+    w=0;
+    retval=size;
+  }else if(from<0)
+  {
+    w=(unsigned int)(-1);
+    retval=(-1);
+  }else
+  {
+    retval=(from<0)?0:from;
+    w=data[retval++];
+  } 
+  return retval;
+}
+
+int
+GStringRep::UTF8::nextUCS4(const int from,const unsigned long &w) const
+{
+  int retval;
+  if(from>=size)
+  {
+    w=0;
+    retval=size;
+  }else if(from<0)
+  {
+    w=(unsigned int)(-1);
+    retval=(-1);
+  }else
+  {
+    const char *s=data+from;
+    w=UTF8toUCS4(s,s+size);
+    retval=(int)((size_t)s-(size_t)data);
+  }
+  return retval;
+}
+
+int
+GStringRep::Native::nextUCS4(const int from,const unsigned long &w) const
+{
+  int retval;
+  if(from>=size)
+  {
+    w=0;
+    retval=size;
+  }else if(from<0)
+  {
+    w=(unsigned int)(-1);
+    retval=(-1);
+  }else
+  {
+    const char *source=s+from;
+    int n=size-from;
+    if((n>0)&&((i=mbrtowc(&w,source,n,&ps))>=0))
+    {
+      unsigned short s[2];
+      s[0]=w;
+      unsigned long w0;
+      if(UTF16toUCS4(w0,s,s+1)<=0)
+      {
+        source+=i;
+        n-=i;
+        if((n>0)&&((i=mbrtowc(&w,source,n,&ps))>=0))
+        {
+          s[1]=w;
+          if(UTF16toUCS4(w0,s,s+2)<=0)
+          {
+            i=(-1);
+            break;
+          }
+        }else
+        {
+          i=(-1);
+          break;
+        }
+      }
+    }
+  }
+}
+
+#endif
+
 static int
 Csscanf1(const char src[],const char fmt[], void *arg)
 {
@@ -1741,7 +1828,7 @@ Csscanf1(const char src[],const char fmt[], void *arg)
 }
 
 int
-GStringRep::nextNonSpace(int from) const
+GStringRep::nextNonSpace(const int from) const
 {
   int retval;
   if(from<size)
@@ -1829,7 +1916,7 @@ GStringRep::UTF16toUCS4(
   if(r <= eptr)
   {
     unsigned long const W1=s[0];
-    if((W1<0xD800)&&(W1>0xDFFF))
+    if((W1<0xD800)||(W1>0xDFFF))
     {
       if((U=W1))
       {
