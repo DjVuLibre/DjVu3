@@ -240,15 +240,16 @@
       Hunk #2 succeeded at 3118.
       done
     \end{verbatim}
-    This patch has been tested with #egcs-1.1# and #egcs-1.1.1#.  We hope that
-    the EGCS people will either include the patch in their future releases, or
-    provide a similar capability.  If anything suspicious happens during the
-    patching process, we suggest that you restore the original version of
-    #"libgcc2.c"# which is automatically saved as #"libgcc2.c.orig"#.
+    This patch has been tested with #egcs-1.1#, #egcs-1.1.1# and #gcc-2.95#.
+    We hope that the EGCS people will either include the patch in their future
+    releases, or provide a similar capability.  If anything suspicious happens
+    during the patching process, we suggest that you restore the original
+    version of #"libgcc2.c"# which is automatically saved as
+    #"libgcc2.c.orig"#.
 
     You must then configure and compile #egcs#.  Everything is pretty well
     described at \URL{http://egcs.cygnus.com}.  I could use for instance the
-    following commands on my SGI workstation running Irix-6.4:
+    following commands on my SGI workstation running Irix-6.5:
     \begin{verbatim}
       % cd egcs
       % configure --prefix=$HOME/egcs  mips-sgi-irix-5.3
@@ -340,7 +341,7 @@
     the decoding to finish. This can be done the best with
     \Ref{DjVuImage::wait_for_decoder}.
     \begin{verbatim}
-      DjVuDocument doc( GOS::filename_to_url("file.djvu"), 1 );
+      DjVuDocument doc( GOS::filename_to_url("file.djvu") );
       GP<DjVuImage> dimg = doc.get_page(2);
       if (! dimg->wait_for_decoder() )
         THROW("A decoding error has occured");
@@ -563,30 +564,16 @@
     #"FORM:DJVI"# chunk potentially containing any information otherwise
     allowed in a DjVu file (except for the #"INFO"# chunk of course).
     
-    {\bf Document Navigation} --- Documents can be represented using one DjVu
-    file per page. Each DjVu file may contain (or better: may include a file
-    containing) a {\em navigation directory chunk} (chunk identifier
-    #"NDIR"#). This navigation directory simply lists the URLs of all DjVu
-    files composing a document.  Once the DjVu browser knows the document
-    structure, it can use smart caching, pre-fetching and pre-decoding
-    strategies.
+    {\bf Document Navigation} --- [COMPLETE HERE] Once the DjVu browser knows the
+    document structure, it can use smart caching, pre-fetching and
+    pre-decoding strategies.
 
-    {\bf Multi-page Files} --- The next step consists in packaging all files in
-    a document (i.e. all the pages and all the included files) as a single
-    archive file.  Although this is good for archiving or emailing, using a
-    single file is not very good for web applications because it does not
-    provide a random access to each page.  Web designers would have the choice
-    of either (a) unpacking the archive, or (b) use an appropriate Apache
-    module or CGI script for unpacking the requested file on the fly.  The
-    archive format is a single #"FORM:DJVM"# chunk containing a directory
-    (chunk identifier #"DIR0"#) and all the archived files with their natural
-    IFF structure. We will refer sometimes to these all-in-one-file multipage
-    DjVu documents as to DjVm documents for briefness. \Ref{DjVmFile} can be
-    used to create such documents. Another type of multipage DjVu documents,
-    which we have already covered above, is ideal for web publishing: when
-    every page is stored in one or more files. Convertion between these
-    two formats can be done by \Ref{DjVuDocument} class or \Ref{djvm} program.
-*/
+    {\bf Bundled and Indirect Multi-page Documents} --- [COMPLETE HERE]
+
+    {\bf Obsolete Formats} --- The decoder supports two other multipage
+    formats which are now obsolete.  These formats are technologically
+    inferior and should no longer be used. */
+
 
 /** @name Experimental Features.
     
@@ -644,15 +631,25 @@
 //@Include: JB2Image.h
 //@Include: DjVuInfo.h
 //@Include: DjVuAnno.h
-//@Include: DjVuImage.h
-//@Include: DjVuNavDir.h
 //@Include: GHLObjects.h
 //@Include: DjVuPort.h
 //@Include: DjVuFile.h
+//@Include: DjVmDir.h
 //@Include: DjVuDocument.h
-//@Include: DjVmDir0.h
-//@Include: DjVmFile.h
+//@Include: DjVuImage.h
+//@Include: DjVmDoc.h
 //@Include: ATTLicense.h
+
+
+/** @name Quasi obsolete files.
+    This section groups things which have been left
+    for supporting obsolete variants of the DjVu format.
+ */
+//@{
+//@Include: DjVmDir0.h
+//@Include: DjVuNavDir.h
+//@}
+
 //@}
 
 

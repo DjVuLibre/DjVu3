@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.15 1999-08-17 21:30:05 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.16 1999-08-17 23:48:04 leonb Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -18,7 +18,6 @@
 #include "DjVuDocument.h"
 #include "IFFByteStream.h"
 #include "GOS.h"
-#include "DjVmFile.h"
 #include "debug.h"
 
 DjVuDocument::DjVuDocument(const GURL & url, DjVuPort * xport,
@@ -316,8 +315,11 @@ add_to_cache(const GP<DjVuFile> & f, GMap<GURL, void *> & map,
 void
 DjVuDocument::add_to_cache(const GP<DjVuFile> & f)
 {
-   GMap<GURL, void *> map;
-   ::add_to_cache(f, map, cache);
+   if (cache)
+     {
+       GMap<GURL, void *> map;
+       ::add_to_cache(f, map, cache);
+     }
 }
 
 void

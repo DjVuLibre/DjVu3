@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVmDoc.h,v 1.1 1999-08-17 21:28:44 eaf Exp $
+//C- $Id: DjVmDoc.h,v 1.2 1999-08-17 23:48:04 leonb Exp $
  
 #ifndef _DJVMDOC_H
 #define _DJVMDOC_H
@@ -20,7 +20,7 @@
 
 #include "ByteStream.h"
 #include "GSmartPointer.h"
-#include "GPContainer.h"
+#include "GContainer.h"
 #include "Arrays.h"
 #include "GString.h"
 #include "DjVmDir.h"
@@ -29,18 +29,14 @@
     Files #"DjVmDoc.h"# and #"DjVmDoc.cpp"# contain implementation of the
     \Ref{DjVmDoc} class used to read and write new DjVu multipage documents.
 
-    Since the class can read and write documents in any of the two formats,
-    it's ideal for performing the convertion between the formats.
-
     @memo DjVu multipage documents reader/writer.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: DjVmDoc.h,v 1.1 1999-08-17 21:28:44 eaf Exp $#
+    @version #$Id: DjVmDoc.h,v 1.2 1999-08-17 23:48:04 leonb Exp $#
 */
 
 //@{
 
-/** #DjVmDoc# - class for reading and writing DjVu multipage documents in
-    one of the new formats. 
+/** Read/Write DjVu multipage documents.
 
     The "new" DjVu multipage documents can be of two types: {\em bundled} and
     {\em indirect}. In the first case all pages are packed into one file,
@@ -52,17 +48,19 @@
     \Ref{DjVmDir}), which is basically an index file containing the
     list of all files composing the document.
 
-    Since the class can read documents of both formats and can save them
-    in any format, it's ideal for performing conversion between {\em bundled}
-    and {\em indirect} formats. If it's necessary to convert a document
-    in an obsolete format though, the best way to do it is to use
-    \Ref{DjVuDocument} class, which still supports both obsolete and new formats.
+    This class can read documents of both formats and can save them under any
+    format.  It is therefore ideal for converting between {\em bundled} and
+    {\em indirect} formats.  It cannot be used however for reading obsolete
+    formats.  The best way to convert obsolete formats consists in reading
+    them with class \Ref{DjVuDocument} class and saving them using
+    \Ref{DjVuDocument::write} or \Ref{DjVuDocument::expand}.
 
-    This class can also be used to create and modify multipage documents
-    at the low level without decoding every page or component (See
+    This class can also be used to create and modify multipage documents at
+    the low level without decoding every page or component (See
     \Ref{insert_file}() and \Ref{delete_file}()). For a more convenient
-    editing tool please refer to \Ref{DjVuDocEditor} and \Ref{DjVuFile}.
+    editing tool please refer to \Ref{DjVuDocEditor} and \Ref{DjVuFile}. 
 */
+
 class DjVmDoc : public GPEnabled
 {
 private:
@@ -126,7 +124,6 @@ public:
 
       /// Constructor
    DjVmDoc(void);
-   virtual ~DjVmDoc(void);
 };
 
 inline GP<DjVmDir>
@@ -135,8 +132,6 @@ DjVmDoc::get_djvm_dir(void)
    return dir;
 }
 
-inline
-DjVmDoc::~DjVmDoc(void) {}
 
 //@}
 

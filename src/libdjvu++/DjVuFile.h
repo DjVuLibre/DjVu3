@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.h,v 1.10 1999-08-17 21:30:05 eaf Exp $
+//C- $Id: DjVuFile.h,v 1.11 1999-08-17 23:48:04 leonb Exp $
  
 #ifndef _DJVUFILE_H
 #define _DJVUFILE_H
@@ -29,7 +29,6 @@
 #include "GContainer.h"
 #include "DjVuNavDir.h"
 #include "GCache.h"
-#include "DjVmFile.h"
 
 /** @name DjVuFile.h
     Files #"DjVuFile.h"# and #"DjVuFile.cpp"# contain implementation of the
@@ -47,7 +46,7 @@
 
     @memo Classes representing DjVu files.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuFile.h,v 1.10 1999-08-17 21:30:05 eaf Exp $#
+    @version #$Id: DjVuFile.h,v 1.11 1999-08-17 23:48:04 leonb Exp $#
 */
 
 //@{
@@ -394,10 +393,6 @@ public:
 	  @param included_too Process included files too
 	  @param no_ndir Get rid of #NDIR# chunks. */
    TArray<char>		get_djvu_data(bool included_too, bool no_ndir);
-      /** Will add the contents of this and all included files to
-	  the given \Ref{DjVmFile}. It's normally used by
-	  \Ref{DjVuDocument::get_djvm_data}(). */
-      //void			add_to_djvm(DjVmFile & djvm_file);
       //@}
 
       // Internal. Used by DjVuDocument
@@ -461,8 +456,6 @@ private:
    void		add_djvu_data(IFFByteStream & str,
 			      GMap<GURL, void *> & map,
 			      bool included_too, bool no_ndir);
-   void		add_to_djvm(DjVmFile & djvm_file,
-			    GMap<GURL, void *> & map);
    void		move(GMap<GURL, void *> & map, const GURL & dir_url);
    void		change_cache(GMap<GURL, void *> & map,
 			     GCache<GURL, DjVuFile> * cache);

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVmDir.cpp,v 1.1 1999-08-17 21:28:44 eaf Exp $
+//C- $Id: DjVmDir.cpp,v 1.2 1999-08-17 23:48:04 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -67,7 +67,7 @@ DjVmDir::decode(ByteStream & str)
       str.readall(data, data.size());
       DEBUG_MSG("flags: " << data.size() << "=>" << files << "\n");
       
-      MemoryByteStream mem_str(data, data.size());
+      MemoryByteStream mem_str((const void*)(const char*)data, data.size());
       BSByteStream bs_str(mem_str);
       for(int file_num=0;file_num<files;file_num++)
       {
@@ -99,7 +99,7 @@ DjVmDir::decode(ByteStream & str)
    {
       int strings_size=strings.size();
       strings.resize(strings_size+length-1);
-      memcpy(strings+strings_size, buffer, length);
+      memcpy( (char*)strings + strings_size, buffer, length);
    }
    DEBUG_MSG("size of decompressed names block=" << strings.size() << "\n");
    
@@ -206,7 +206,7 @@ DjVmDir::encode(ByteStream & str) const
       TArray<char> data=mem_str.get_data();
       DEBUG_MSG("flags: " << files_list.size() << "=>" << data.size() << "\n");
       str.write16(data.size());
-      str.writall(data, data.size());
+      str.writall((const void*)(const char*)data, data.size());
    }
 
    if (bundled)
@@ -227,12 +227,12 @@ DjVmDir::encode(ByteStream & str) const
    BSByteStream bs_str(str, 1024);
    for(pos=files_list;pos;++pos)
    {
-      GP<File> file=files_list[pos];
-      bs_str.writall(file->id, file->id.length()+1);
-      if (file->flags & File::HAS_NAME)
-	 bs_str.writall(file->name, file->name.length()+1);
-      if (file->flags & File::HAS_TITLE)
-	 bs_str.writall(file->title, file->title.length()+1);
+     GP<File> file=files_list[pos];
+     bs_str.writall((const void*)(const char*)file->id, file->id.length()+1);
+     if (file->flags & File::HAS_NAME)
+       bs_str.writall((const void*)(const char*)file->name, file->name.length()+1);
+     if (file->flags & File::HAS_TITLE)
+       bs_str.writall((const void*)(const char*)file->title, file->title.length()+1);
    }
    DEBUG_MSG("done\n");
 }

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVmDoc.cpp,v 1.1 1999-08-17 21:28:44 eaf Exp $
+//C- $Id: DjVmDoc.cpp,v 1.2 1999-08-17 23:48:04 leonb Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -124,7 +124,7 @@ DjVmDoc::write(ByteStream & str)
       
 	 // First check that the file is in IFF format
       TRY {
-	 MemoryByteStream str_in(d, d.size()<32 ? d.size() : 32);
+	 MemoryByteStream str_in((const void*)(const char*)d, d.size()<32 ? d.size() : 32);
 	 IFFByteStream iff_in(str_in);
 	 int size;
 	 GString chkid;
@@ -137,7 +137,7 @@ DjVmDoc::write(ByteStream & str)
 
 	 // Now store file contents into the stream
       if ((iff.tell() & 1)!=0) { char ch=0; iff.write(&ch, 1); }
-      iff.writall(d, d.size());
+      iff.writall((const void*)(const char*)d, d.size());
    }
 
    DEBUG_MSG("done storing DjVm file.\n");
@@ -269,7 +269,7 @@ DjVmDoc::expand(const char * dir_name, const char * idx_name)
       StdioByteStream str(file_name, "wb");
       TArray<char> & d=data[data_pos];
       str.writall("AT&T", 4);
-      str.writall(d, d.size());
+      str.writall((const void*)(const char*)d, d.size());
    }
 
    GString idx_full_name=GOS::expand_name(idx_name, dir_name);
