@@ -845,6 +845,7 @@
 //@Include: djvmcvt.cpp
 //@Include: djvm.cpp
 //@Include: djthumb.cpp
+//@Include: djvutxt.cpp
 
 
 /** @name cdjvu
