@@ -219,6 +219,10 @@ SOURCE=.\DjVuMessage.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\DjVuMessageLite.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\DjVuNavDir.cpp
 # End Source File
 # Begin Source File
@@ -416,6 +420,10 @@ SOURCE=.\DjVuInfo.h
 # Begin Source File
 
 SOURCE=.\DjVuMessage.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\DjVuMessageLite.h
 # End Source File
 # Begin Source File
 
