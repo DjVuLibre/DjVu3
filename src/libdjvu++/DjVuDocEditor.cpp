@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocEditor.cpp,v 1.7 1999-11-22 21:15:53 eaf Exp $
+//C- $Id: DjVuDocEditor.cpp,v 1.8 1999-11-22 21:35:32 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -366,8 +366,11 @@ DjVuDocEditor::insert_file(const char * file_name, bool is_page,
 	 GString chkid;
 	 int length;
 	 length=iff.get_chunk(chkid);
-	 if (length>1024*1024)
+	 if (length>100*1024*1024)
 	    THROW("File '"+GString(file_name)+"' is not a DjVu file");
+	 if (chkid!="FORM:DJVI" && chkid!="FORM:DJVU" &&
+	     chkid!="FORM:BM44" && chkid!="FORM:PM44")
+	    THROW("File '"+GString(file_name)+"' is not a single page DjVu file");
       }
       
 	 // Now get a unique name for this file.
@@ -445,7 +448,7 @@ DjVuDocEditor::insert_file(const char * file_name, bool is_page,
 	    } CATCH(exc) {
 		  // Should an error occur, we move on. INCL chunk will
 		  // not be copied.
-	       if (errors.length()) errors+="\n";
+	       if (errors.length()) errors+="\n\n";
 	       errors+=exc.get_cause();
 	    } ENDCATCH;
 	 }
@@ -467,7 +470,7 @@ DjVuDocEditor::insert_file(const char * file_name, bool is_page,
       str_out.seek(0);
       str.copy(str_out);
    } CATCH(exc) {
-      if (errors.length()) errors+="\n";
+      if (errors.length()) errors+="\n\n";
       errors+=exc.get_cause();
       THROW(errors);
    } ENDCATCH;
@@ -501,7 +504,7 @@ DjVuDocEditor::insert_group(const GList<GString> & file_names, int page_num)
       TRY {
 	 insert_file(file_names[pos], true, file_pos, name2id);
       } CATCH(exc) {
-	 if (errors.length()) errors+="\n";
+	 if (errors.length()) errors+="\n\n";
 	 errors+=exc.get_cause();
       } ENDCATCH;
    }
