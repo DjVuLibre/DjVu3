@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.11 1999-06-08 20:43:27 leonb Exp $
+//C- $Id: DjVuDocument.cpp,v 1.12 1999-06-09 19:35:03 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -513,7 +513,7 @@ DjVuDocument::request_data(const DjVuPort * source, const GURL & url)
       } else
       {
 	 DEBUG_MSG("The document type is DJVU.\n");
-	 if (url.is_file_url())
+	 if (url.is_local_file_url())
 	 {
 	    GString fname=GOS::url_to_filename(url);
 	    if (GOS::basename(fname)=="-") fname="-";
@@ -536,7 +536,7 @@ DjVuDocument::request_data(const DjVuPort * source, const GURL & url)
 	 GP<DjVmDir0::FileRec> file=djvm_dir.get_file(url.name());
 	 if (file) return new DataRange(djvm_pool, file->offset, file->size);
       }
-      if (url.is_file_url())
+      if (url.is_local_file_url())
       {
 	 GString fname=GOS::url_to_filename(url);
 	 DEBUG_MSG("fname=" << fname << "\n");

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GURL.cpp,v 1.5 1999-05-25 22:33:34 eaf Exp $
+//C- $Id: GURL.cpp,v 1.6 1999-06-09 19:35:03 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -106,6 +106,12 @@ GURL::protocol(const char * url)
 	  *ptr!='+' && *ptr!='-' && *ptr!='.') break;
    if (*ptr==':') return GString(url, ptr-url);
    else return "";
+}
+
+bool
+GURL::is_local_file_url(void) const
+{
+   return protocol()=="file" && GOS::url_to_filename(url).length()>0;
 }
 
 GURL

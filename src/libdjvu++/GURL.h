@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GURL.h,v 1.5 1999-06-04 19:48:05 eaf Exp $
+//C- $Id: GURL.h,v 1.6 1999-06-09 19:35:03 eaf Exp $
 
 #ifndef _GURL_H_
 #define _GURL_H_
@@ -25,7 +25,7 @@
     \Ref{GURL} class used to store URLs in a system independent format.
     @memo System independent URL representation.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: GURL.h,v 1.5 1999-06-04 19:48:05 eaf Exp $#
+    @version #$Id: GURL.h,v 1.6 1999-06-09 19:35:03 eaf Exp $#
 */
 
 //@{
@@ -75,7 +75,7 @@ public:
    bool		is_empty(void) const;
 
       /// Checks if the URL is local (starts from #file:/#) or not
-   bool		is_file_url(void) const;
+   bool		is_local_file_url(void) const;
 
       /** @name Concatenation operators
 	  Concatenate the GURL with the passed {\em name}. If the {\em name}
@@ -147,12 +147,6 @@ inline bool
 GURL::is_empty(void) const
 {
    return !url.length();
-}
-
-inline bool
-GURL::is_file_url(void) const
-{
-   return protocol()=="file";
 }
 
 //@}
