@@ -29,19 +29,19 @@
 <A HREF="#DOC.1.5.12.1.1.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   <B>~ByteStream</B>()
 <DD><I>Virtual destructor.</I>
 <DT>
-<A HREF="#DOC.1.5.12.1.1.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   size_t <B>read</B>(void *buffer, size_t size)
+<A HREF="#DOC.1.5.12.1.1.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   size_t <B>read</B>(void *buffer, size_t <!1><A HREF="ByteStream.html#DOC.1.5.12.1.2.12">size</A>)
 <DD><I>Reads data from a ByteStream.</I>
 <DT>
-<A HREF="#DOC.1.5.12.1.1.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   size_t <B>write</B>(const void *buffer, size_t size)
+<A HREF="#DOC.1.5.12.1.1.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   size_t <B>write</B>(const void *buffer, size_t <!1><A HREF="ByteStream.html#DOC.1.5.12.1.2.12">size</A>)
 <DD><I>Writes data to a ByteStream.</I>
 <DT>
-<A HREF="#DOC.1.5.12.1.1.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   long <B>tell</B>(void)
+<A HREF="#DOC.1.5.12.1.1.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   long <B>tell</B>(void) const 
 <DD><I>Returns the offset of the current position in the ByteStream.</I>
 <DT>
 <A HREF="#DOC.1.5.12.1.1.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   int <B>seek</B>(long offset, int whence = SEEK_SET, bool nothrow=false)
 <DD><I>Sets the current position for reading or writing the ByteStream.</I>
 <DT>
-<A HREF="#DOC.1.5.12.1.1.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>flush</B>()
+<A HREF="#DOC.1.5.12.1.1.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>flush</B>(void)
 <DD><I>Flushes all buffers in the ByteStream.</I>
 </DL></P>
 <DT>
@@ -49,13 +49,13 @@
 <DD><I></I>
 <P><DL>
 <DT>
-<A HREF="#DOC.1.5.12.1.2.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>size_t <B>readall</B>(void *buffer, size_t size)
+<A HREF="#DOC.1.5.12.1.2.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>size_t <B>readall</B>(void *buffer, size_t <!1><A HREF="ByteStream.html#DOC.1.5.12.1.2.12">size</A>)
 <DD><I>Reads data and blocks until everything has been read.</I>
 <DT>
-<A HREF="#DOC.1.5.12.1.2.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>size_t <B>writall</B>(const void *buffer, size_t size)
+<A HREF="#DOC.1.5.12.1.2.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>size_t <B>writall</B>(const void *buffer, size_t <!1><A HREF="ByteStream.html#DOC.1.5.12.1.2.12">size</A>)
 <DD><I>Writes data and blocks until everything has been written.</I>
 <DT>
-<A HREF="#DOC.1.5.12.1.2.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>size_t <B>copy</B>(<!1><A HREF="ByteStream.html">ByteStream</A> &amp;bsfrom, size_t size=0)
+<A HREF="#DOC.1.5.12.1.2.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>size_t <B>copy</B>(<!1><A HREF="ByteStream.html">ByteStream</A> &amp;bsfrom, size_t <!1><A HREF="ByteStream.html#DOC.1.5.12.1.2.12">size</A>=0)
 <DD><I>Copy data from another ByteStream.</I>
 <DT>
 <A HREF="#DOC.1.5.12.1.2.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>write8</B>(unsigned int card8)
@@ -81,6 +81,9 @@
 <DT>
 <A HREF="#DOC.1.5.12.1.2.11"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>unsigned int <B>read32</B>()
 <DD><I>Reads a four-bytes integer from a ByteStream.</I>
+<DT>
+<A HREF="#DOC.1.5.12.1.2.12"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   int <B>size</B>(void) const 
+<DD><I>Returns the total number of bytes contained in the buffer, file, etc.</I>
 </DL></P>
 </DL></P>
 
@@ -127,7 +130,7 @@ of instances of this class, as implied by the class semantic.  </BLOCKQUOTE>
 <DL><DT><DD></DL><P>
 <A NAME="read">
 <A NAME="DOC.1.5.12.1.1.2">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   size_t read(void *buffer, size_t size)</B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   size_t read(void *buffer, size_t <!1><A HREF="ByteStream.html#DOC.1.5.12.1.2.12">size</A>)</B></TT>
 <DD>Reads data from a ByteStream.  This function <EM>must</EM> be implemented
 by each subclass of <TT>ByteStream</TT>.  At most <TT>size</TT> bytes are read from
 the ByteStream and stored in the memory area pointed to by <TT>buffer</TT>.
@@ -142,7 +145,7 @@ thrown with a plain text error message whenever an error occurs.
 <DL><DT><DD></DL><P>
 <A NAME="write">
 <A NAME="DOC.1.5.12.1.1.3">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   size_t write(const void *buffer, size_t size)</B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   size_t write(const void *buffer, size_t <!1><A HREF="ByteStream.html#DOC.1.5.12.1.2.12">size</A>)</B></TT>
 <DD>Writes data to a ByteStream.  This function <EM>must</EM> be implemented by
 each subclass of <TT>ByteStream</TT>.  At most <TT>size</TT> bytes from buffer
 <TT>buffer</TT> are written to the ByteStream.  Function <TT>write</TT> returns
@@ -155,7 +158,7 @@ error occurs.
 <DL><DT><DD></DL><P>
 <A NAME="tell">
 <A NAME="DOC.1.5.12.1.1.4">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   long tell(void)</B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   long tell(void) const </B></TT>
 <DD>Returns the offset of the current position in the ByteStream.  This
 function <EM>must</EM> be implemented by each subclass of <TT>ByteStream</TT>. 
 <DL><DT><DD></DL><P>
@@ -185,7 +188,7 @@ exception.
 <DL><DT><DD></DL><P>
 <A NAME="flush">
 <A NAME="DOC.1.5.12.1.1.6">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   void flush()</B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   void flush(void)</B></TT>
 <DD>Flushes all buffers in the ByteStream.  Calling this function
 guarantees that pending data have been actually written (i.e. passed to
 the operating system). Class <TT>ByteStream</TT> provides a default
@@ -202,7 +205,7 @@ functions.
 
 <A NAME="readall">
 <A NAME="DOC.1.5.12.1.2.1">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>size_t readall(void *buffer, size_t size)</B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>size_t readall(void *buffer, size_t <!1><A HREF="ByteStream.html#DOC.1.5.12.1.2.12">size</A>)</B></TT>
 <DD>Reads data and blocks until everything has been read.  This function is
 essentially similar to function <TT>read</TT>.  Unlike function <TT>read</TT> however,
 function <TT>readall</TT> will never return a value smaller than <TT>size</TT> unless
@@ -213,7 +216,7 @@ end-of-file mark.  Note that <TT>read</TT> and <TT>readall</TT> are equivalent w
 <DL><DT><DD></DL><P>
 <A NAME="writall">
 <A NAME="DOC.1.5.12.1.2.2">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>size_t writall(const void *buffer, size_t size)</B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>size_t writall(const void *buffer, size_t <!1><A HREF="ByteStream.html#DOC.1.5.12.1.2.12">size</A>)</B></TT>
 <DD>Writes data and blocks until everything has been written.  This function
 is essentially similar to function <TT>write</TT>.  Unlike function <TT>write</TT>
 however, function <TT>writall</TT> will only return after all <TT>size</TT> bytes have
@@ -223,7 +226,7 @@ are equivalent when <TT>size</TT> is one.
 <DL><DT><DD></DL><P>
 <A NAME="copy">
 <A NAME="DOC.1.5.12.1.2.3">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>size_t copy(<!1><A HREF="ByteStream.html">ByteStream</A> &amp;bsfrom, size_t size=0)</B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>size_t copy(<!1><A HREF="ByteStream.html">ByteStream</A> &amp;bsfrom, size_t <!1><A HREF="ByteStream.html#DOC.1.5.12.1.2.12">size</A>=0)</B></TT>
 <DD>Copy data from another ByteStream.  A maximum of <TT>size</TT> bytes are read
 from the ByteStream <TT>bsfrom</TT> and are written to the ByteStream <TT>*this</TT>
 at the current position.  Less than <TT>size</TT> bytes may be written if an
@@ -284,6 +287,13 @@ regardless of the processor endianness.
 <DD>Reads a four-bytes integer from a ByteStream.
 The integer most significant bytes are read first,
 regardless of the processor endianness. 
+<DL><DT><DD></DL><P>
+<A NAME="size">
+<A NAME="DOC.1.5.12.1.2.12">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   int size(void) const </B></TT>
+<DD>Returns the total number of bytes contained in the buffer, file, etc.
+Valid offsets for function <TT>seek</TT> range from 0 to the value returned
+by this function. 
 <DL><DT><DD></DL><P></DL>
 </DL>
 <HR>
@@ -299,7 +309,7 @@ regardless of the processor endianness.
 <!-- This is were the DOC++ footer is defined  -->
 
 <font face="arial,helvetica" size="2">
-<a href=http://www.djvu.att.com>DjVu</a> is a trademark of AT&amp;T.  
+<a href=http://www.lizardtech.com>DjVu</a> is a trademark of AT&amp;T.  
 <br>All other products mentioned are registered trademarks or trademarks of
 their respective companies.
 </font>
