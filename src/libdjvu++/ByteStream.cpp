@@ -25,7 +25,7 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.cpp,v 1.33 2000-11-03 00:04:36 mchen Exp $
+// $Id: ByteStream.cpp,v 1.34 2000-11-03 00:19:07 mchen Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 04/1997
@@ -320,10 +320,11 @@ StdioByteStream::read(void *buffer, size_t size)
 {
   if (!can_read)
     G_THROW("ByteStream.no_read");                    //  StdioByteStream not opened for reading
+  size_t nitems;
   do
   {
     clearerr(fp);
-    size_t nitems = fread(buffer, 1, size, fp); 
+    nitems = fread(buffer, 1, size, fp); 
     if (nitems<=0 && ferror(fp))
     {
 #ifdef EINTR
@@ -348,10 +349,11 @@ StdioByteStream::write(const void *buffer, size_t size)
 {
   if (!can_write)
     G_THROW("ByteStream.no_write");                   //  StdioByteStream not opened for writing
+  size_t nitems;
   do
   {
     clearerr(fp);
-    size_t nitems = fwrite(buffer, 1, size, fp);
+    nitems = fwrite(buffer, 1, size, fp);
     if (nitems<=0 && ferror(fp))
     {
 #ifdef EINTR
