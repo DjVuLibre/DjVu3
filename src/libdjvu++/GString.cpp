@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.66 2001-04-19 00:05:28 bcr Exp $
+// $Id: GString.cpp,v 1.67 2001-04-19 16:42:49 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -631,12 +631,6 @@ GStringRep::format(va_list &args) const
   GPBuffer<char> gbuffer(buffer,buflen);
 
   ChangeLocale(LC_ALL,(isNative()?0:"C"));
-  const GUTF8String clocale=setlocale(LC_CTYPE,0);
-  const GUTF8String nlocale=setlocale(LC_NUMERIC,0);
-  if(clocale != "C")
-    setlocale(LC_CTYPE,"C");
-  if(nlocale != "C")
-    setlocale(LC_NUMERIC,"C");
   // Format string
 #ifdef USE_VSNPRINTF
   while(USE_VSNPRINTF(buffer, buflen, data, args)<0)
@@ -649,12 +643,6 @@ GStringRep::format(va_list &args) const
   buffer[buflen-1] = 0;
   vsprintf(buffer, data, args);
   va_end(args);
-  const GUTF8String clocale=setlocale(LC_CTYPE,0);
-  const GUTF8String nlocale=setlocale(LC_NUMERIC,0);
-  if(clocale != "C")
-    setlocale(LC_CTYPE,"C");
-  if(nlocale != "C")
-    setlocale(LC_NUMERIC,"C");
   if (buffer[buflen-1])
   {
     // This isn't as fatal since it is on the stack, but we
@@ -1817,14 +1805,14 @@ GStringRep::UCS4toUTF16(
   const unsigned long w,unsigned short &w1, unsigned short &w2)
 {
   int retval;
-  if(w<=0xFFFF && (w<0xD800||w>0xDFFF))
+  if(w<0x10000)
   {
     w1=w;
     w2=0;
     retval=1;
   }else
   {
-    w1=((w>>10)&0x3ff)+0xD800;
+    w1=(((w-0x10000)>>10)&0x3ff)+0xD800;
     w2=(w&0x3ff)+0xDC00;
     retval=2;
   }
@@ -1853,7 +1841,7 @@ GStringRep::UTF16toUCS4(
       if(rr <= eptr)
       {
         unsigned long const W2=s[1];
-        if(((W2>=0xDC00)||(W2<=0xDFFF))&&((U=((W1&0x3ff)<<10)|(W2&0x3ff))))
+        if(((W2>=0xDC00)||(W2<=0xDFFF))&&((U=(0x10000+((W1&0x3ff)<<10))|(W2&0x3ff))))
         {
           retval=2;
         }else

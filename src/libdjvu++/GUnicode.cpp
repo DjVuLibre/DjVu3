@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GUnicode.cpp,v 1.9 2001-04-17 22:41:56 chrisp Exp $
+// $Id: GUnicode.cpp,v 1.10 2001-04-19 16:42:49 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -487,7 +487,7 @@ UnicodeRep::UTF16toUCS4(unsigned short const *&s,void const * const eptr)
       if(rr <= eptr)
       {
         unsigned long const W2=s[1];
-        if(((W2>=0xDC00)||(W2<=0xDFFF))&&((U=((W1&0x3ff)<<10)|(W2&0x3ff))))
+        if(((W2>=0xDC00)||(W2<=0xDFFF))&&((U=(0x1000+((W1&0x3ff)<<10))|(W2&0x3ff))))
         {
           s=rr;
         }else
