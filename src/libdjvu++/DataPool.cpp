@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.cpp,v 1.15 1999-09-14 22:28:34 eaf Exp $
+//C- $Id: DataPool.cpp,v 1.16 1999-09-15 17:54:12 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -19,6 +19,14 @@
 #include "IFFByteStream.h"
 #include "GString.h"
 #include "debug.h"
+
+static inline void
+call_callback(void (* callback)(void *), void * cl_data)
+{
+   TRY {
+      if (callback) callback(cl_data);
+   } CATCH(exc) {} ENDCATCH;
+}
 
 //****************************************************************************
 //****************************** BlockList ***********************************
@@ -288,7 +296,7 @@ DataPool::connect(const char * fname, int start_in, int length_in)
    for(GPosition pos=triggers_list;pos;++pos)
    {
       GP<Trigger> t=triggers_list[pos];
-      t->callback(t->cl_data);
+      call_callback(t->callback, t->cl_data);
    }
    triggers_list.empty();
 }
@@ -606,7 +614,7 @@ DataPool::check_triggers(void)
 	    }
 	 }
 	 if (!trigger) break;
-	 else if (trigger->callback) trigger->callback(trigger->cl_data);
+	 else call_callback(trigger->callback, trigger->cl_data);
       }
 }
 
@@ -629,7 +637,7 @@ DataPool::add_trigger(int tstart, int tlength,
    
    if (callback)
    {
-      if (is_eof()) callback(cl_data);
+      if (is_eof()) call_callback(callback, cl_data);
       
       if (pool)
       {
@@ -645,7 +653,7 @@ DataPool::add_trigger(int tstart, int tlength,
       {
 	    // We're not connected to anything and maintain our own data
 	 if (tlength>=0 && block_list.get_bytes(tstart, tlength)==tlength)
-	    callback(cl_data);
+	    call_callback(callback, cl_data);
 	 else
 	 {
 	    GCriticalSectionLock lock(&triggers_lock);
