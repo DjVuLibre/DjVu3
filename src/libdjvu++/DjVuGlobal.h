@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuGlobal.h,v 1.21 2000-01-04 04:48:38 bcr Exp $
+//C- $Id: DjVuGlobal.h,v 1.22 2000-01-04 04:51:49 bcr Exp $
 
 
 #ifndef _DJVUGLOBAL_H
@@ -27,7 +27,7 @@
     @memo
     Global definitions.
     @version
-    #$Id: DjVuGlobal.h,v 1.21 2000-01-04 04:48:38 bcr Exp $#
+    #$Id: DjVuGlobal.h,v 1.22 2000-01-04 04:51:49 bcr Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> -- empty file.\\
     Bill Riemers <bcr@sanskrit.lz.att.com> -- real work.  */
@@ -200,13 +200,14 @@ operator delete [] (void *addr) delete_throw_spec
     multithreaded programs.  */
 //@{
 
-#ifdef NEED_DJVU_PROGRESS
 extern "C"
 {
   typedef void
   djvu_progress_callback(const char task[],unsigned long,unsigned long);
   djvu_progress_callback *djvu_set_progress_callback(djvu_progress_callback *);
 };
+
+#ifdef NEED_DJVU_PROGRESS
 
 extern djvu_progress_callback *_djvu_progress_ptr;
 
