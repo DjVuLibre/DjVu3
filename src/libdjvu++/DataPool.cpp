@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DataPool.cpp,v 1.61 2001-01-26 19:33:46 fcrary Exp $
+// $Id: DataPool.cpp,v 1.62 2001-02-02 17:11:42 bcr Exp $
 // $Name:  $
 
 
@@ -79,7 +79,7 @@ call_callback(void (* callback)(void *), void * cl_data)
     their GP<> pointers. */
 class DataPool::OpenFiles
 {
-private:
+public:
    class File : public GPEnabled
    {
    public:
@@ -96,6 +96,7 @@ private:
       File(const char * name, DataPool * pool);
       virtual ~File(void);
    };
+private:
    static OpenFiles	* global_ptr;
 
    GPList<File>		files_list;
