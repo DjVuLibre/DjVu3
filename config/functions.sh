@@ -1014,7 +1014,7 @@ fi
 # Next we need to set the SYS variable.
 #
 
-if [ -z "$SYS" ] ; then
+if [ -z "$SYS_SET" ] ; then
   . "${CONFIG_DIR}"/sys.sh
 fi
 
