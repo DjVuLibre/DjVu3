@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.3 1999-05-25 22:33:33 eaf Exp $
+//C- $Id: DjVuFile.cpp,v 1.4 1999-05-26 18:19:32 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -146,6 +146,13 @@ DjVuFile::is_all_data_present(void) const
 {
    GMonitorLock lock((GMonitor *) &status_mon);
    return (status & ALL_DATA_PRESENT)!=0;
+}
+
+bool
+DjVuFile::are_incl_files_created(void) const
+{
+   GMonitorLock lock((GMonitor *) &status_mon);
+   return (status & INCL_FILES_CREATED)!=0;
 }
 
 unsigned int
@@ -767,6 +774,98 @@ DjVuFile::process_incl_chunks(void)
    status|=INCL_FILES_CREATED;
 }
 
+GP<DjVuNavDir>
+DjVuFile::find_ndir(GMap<GURL, void *> & map)
+{
+   DEBUG_MSG("DjVuFile::find_ndir(): looking for NDIR in '" << url << "'\n");
+   DEBUG_MAKE_INDENT(3);
+   
+   if (dir) return dir;
+
+   if (!map.contains(url))
+   {
+      map[url]=0;
+
+      if (!are_incl_files_created()) process_incl_chunks();
+
+      GCriticalSectionLock lock(&inc_files_lock);
+      for(GPosition pos=inc_files_list;pos;++pos)
+      {
+	 GP<DjVuNavDir> d=inc_files_list[pos]->find_ndir(map);
+	 if (d) return d;
+      }
+   }
+   return 0;
+}
+
+GP<DjVuNavDir>
+DjVuFile::find_ndir(void)
+{
+   GMap<GURL, void *> map;
+   return find_ndir(map);
+}
+
+GP<DjVuNavDir>
+DjVuFile::decode_ndir(GMap<GURL, void *> & map)
+{
+   DEBUG_MSG("DjVuFile::decode_ndir(): decoding for NDIR in '" << url << "'\n");
+   DEBUG_MAKE_INDENT(3);
+   
+   if (dir) return dir;
+   
+   if (!map.contains(url))
+   {
+      map[url]=0;
+      
+      ByteStream * str=0;
+
+      TRY {
+	 str=data_range->get_stream();
+      
+	 int chksize;
+	 GString chkid;
+	 IFFByteStream iff(*str);
+	 if (!iff.get_chunk(chkid)) THROW("File does not appear to be in IFF format.");
+
+	 while((chksize=iff.get_chunk(chkid)))
+	 {
+	    if (chkid=="NDIR")
+	    {
+	       GP<DjVuNavDir> d=new DjVuNavDir(url);
+	       d->decode(iff);
+	       dir=d;
+	       break;
+	    }
+	    iff.close_chunk();
+	 }
+      } CATCH(exc) {
+	 delete str; str=0;
+	 RETHROW;
+      } ENDCATCH;
+   
+      delete str; str=0;
+
+      if (dir) return dir;
+
+      if (!are_incl_files_created()) process_incl_chunks();
+
+      GCriticalSectionLock lock(&inc_files_lock);
+      for(GPosition pos=inc_files_list;pos;++pos)
+      {
+	 GP<DjVuNavDir> d=inc_files_list[pos]->decode_ndir(map);
+	 if (d) return d;
+      }
+   }
+   return 0;
+}
+
+GP<DjVuNavDir>
+DjVuFile::decode_ndir(void)
+{
+   GMap<GURL, void *> map;
+   return decode_ndir(map);
+}
+
 void
 DjVuFile::notify_all_data_received(const DjVuPort * src)
 {
@@ -816,7 +915,7 @@ DjVuFile::trigger_cb(void)
    status|=DATA_PRESENT;
    get_portcaster()->notify_file_data_received(this);
 
-   process_incl_chunks();
+   if (!are_incl_files_created()) process_incl_chunks();
 
    GCriticalSectionLock flock(&inc_files_lock);
    GPosition pos;
@@ -856,7 +955,7 @@ DjVuFile::unlink_file(const char * name)
    DEBUG_MSG("DjVuFile::unlink_file(): name='" << name << "'\n");
    DEBUG_MAKE_INDENT(3);
 
-   process_incl_chunks();
+   if (!are_incl_files_created()) process_incl_chunks();
 
    bool done=0;
    MemoryByteStream str_out;
@@ -954,7 +1053,7 @@ DjVuFile::include_file(const GP<DjVuFile> & file, int chunk_pos)
    GURL file_url=url.base()+file_name;
    
       // See if the file is already included
-   process_incl_chunks();
+   if (!are_incl_files_created()) process_incl_chunks();
    {
       GCriticalSectionLock lock(&inc_files_lock);
       for(GPosition pos=inc_files_list;pos;++pos)
@@ -1336,7 +1435,7 @@ DjVuFile::add_to_djvm(DjVmFile & djvm_file, GMap<GURL, void *> & map)
    TArray<char> data=get_djvu_data(0, 0);
    djvm_file.add_file(url.name(), data, -1);
 
-   process_incl_chunks();
+   if (!are_incl_files_created()) process_incl_chunks();
    
    GCriticalSectionLock lock(&inc_files_lock);
    for(GPosition pos=inc_files_list;pos;++pos)
@@ -1359,7 +1458,7 @@ DjVuFile::move(GMap<GURL, void *> & map, const GURL & dir_url)
 
       url=dir_url+url.name();
 
-      process_incl_chunks();
+      if (!are_incl_files_created()) process_incl_chunks();
 
       GCriticalSectionLock lock(&inc_files_lock);
       for(GPosition pos=inc_files_list;pos;++pos)
@@ -1385,7 +1484,7 @@ DjVuFile::change_cache(GMap<GURL, void *> & map,
    cache=xcache;
    if (xcache) xcache->add_item(url, this);
 
-   process_incl_chunks();
+   if (!are_incl_files_created()) process_incl_chunks();
 
    GCriticalSectionLock lock(&inc_files_lock);
    for(GPosition pos=inc_files_list;pos;++pos)

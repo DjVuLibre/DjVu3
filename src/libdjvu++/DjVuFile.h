@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.h,v 1.3 1999-05-25 22:33:34 eaf Exp $
+//C- $Id: DjVuFile.h,v 1.4 1999-05-26 18:19:32 eaf Exp $
  
 #ifndef _DJVUFILE_H
 #define _DJVUFILE_H
@@ -47,7 +47,7 @@
 
     @memo Classes representing DjVu files.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuFile.h,v 1.3 1999-05-25 22:33:34 eaf Exp $#
+    @version #$Id: DjVuFile.h,v 1.4 1999-05-26 18:19:32 eaf Exp $#
 */
 
 //@{
@@ -181,6 +181,17 @@ public:
 	  the \Ref{DjVuFile::DjVuFile}() constructor is #ZERO# */
    void		disable_standard_port(void);
 
+      /** Looks for #decoded# navigation directory (\Ref{DjVuNavDir}) in this
+	  or included files. Returns #ZERO# if nothing could be found.
+
+	  {\bf Note.} This function does {\bf not} attempt to decode #NDIR#
+	  chunks. It is looking for predecoded components. #NDIR# can be
+	  decoded either during regular decoding (initiated by
+	  \Ref{start_decode}() function) or by \Ref{decode_ndir}() function,
+	  which processes this and included files recursively in search
+	  of #NDIR# chunks and decodes them. */
+   GP<DjVuNavDir>	find_ndir(void);
+
       /** @name Status query functions */
       //@{
       /** Returns the #DjVuFile# status. The value returned is the
@@ -203,20 +214,24 @@ public:
 		   \Ref{get_included_files}() is OK.
 	  \end{itemize} */
    int		get_status(void) const;
-      /// Returns 1 if the file is being decoded.
+      /// Returns #TRUE# if the file is being decoded.
    bool		is_decoding(void) const;
-      /// Returns 1 if decoding of the file has finished successfully.
+      /// Returns #TRUE# if decoding of the file has finished successfully.
    bool		is_decode_ok(void) const;
-      /// Returns 1 if decoding of the file has failed.
+      /// Returns #TRUE# if decoding of the file has failed.
    bool		is_decode_failed(void) const;
-      /** Returns 1 if decoding of the file has been stopped by
+      /** Returns #TRUE# if decoding of the file has been stopped by
 	  \Ref{stop_decode}() function. */
    bool		is_decode_stopped(void) const;
-      /// Returns 1 if this file has received all data.
+      /// Returns #TRUE# if this file has received all data.
    bool		is_data_present(void) const;
-      /** Returns 1 if this file {\bf and} all included files have received
-	  all data. */
+      /** Returns #TRUE# if this file {\bf and} all included files have
+	  received all data. */
    bool		is_all_data_present(void) const;
+      /** Returns #TRUE# if all included files have been created. Only when
+	  this function returns 1, the \Ref{get_included_files}() returns
+	  the correct information. */
+   bool		are_incl_files_created(void) const;
       //@}
 
       /** @name File name */
@@ -243,8 +258,30 @@ public:
       /** Wait for the decoding to finish. This will wait for the
 	  termination of included files too. */
    void		wait_for_finish(void);
+      /** Looks for #NDIR# chunk (navigation directory), and decodes its
+	  contents. If the #NDIR# chunk has not been found in {\em this} file,
+	  but this file includes others, the procedure will continue
+	  recursively. This function is useful to obtain the document
+	  navigation directory before any page has been decoded. After it
+	  returns the directory can be obtained by calling \Ref{find_ndir}()
+	  function.
+
+	  {\bf Warning.} Contrary to \Ref{start_decode}(), this function
+	  does not return before it completely decodes the directory.
+	  Make sure, that this file and all included files have enough data. */
+   GP<DjVuNavDir>	decode_ndir(void);
       /// Clears all decoded components.
    void		reset(void);
+      /** Processes #INCL# chunks and creates included files. Normally you
+	  won't need to call this function because included files are
+	  created automatically when the file is being decoded. But if
+	  due to some reason you'd like to obtain the list of included
+	  files without decoding this file, this is an ideal function to call.
+
+	  {\bf Warning.} This function does not return before it reads the
+	  whole file, which may block your application under some circumstances
+	  if not all data is available. */
+   void		process_incl_chunks(void);
       //@}
    
       // Function needed by the cache
@@ -252,7 +289,14 @@ public:
 
       /** @name Operations with included files */
       //@{
-      /// Returns the list of included DjVuFiles
+      /** Returns the list of included DjVuFiles.
+	  
+	  {\bf Warning.} The list of included files may not be available
+	  at any time. The best way to check if it's valid is to call
+	  the \Ref{are_incl_files_created}(). If it returns #FALSE#,
+	  you may want to call \Ref{process_incl_chunks}(), but beware, that
+	  this function will read the whole file, which may block your
+	  application if there is not enough data available. */
    GPList<DjVuFile>	get_included_files(void);
       /** Includes the given #file# into this one. Since the procedure
 	  of inclusion also implies inserting #INCL# chunks somewhere
@@ -353,8 +397,6 @@ private:
 
       // INCL chunk processor
    GP<DjVuFile>	process_incl_chunk(ByteStream & str);
-      // Scans file for INCL chunks and creates associated files
-   void		process_incl_chunks(void);
 
       // Trigger: called when DataRange has all data
    static void	static_trigger_cb(void *);
@@ -362,6 +404,8 @@ private:
       // Progress callback: called from time to time
    static void	progress_cb(int pos, void *);
 
+   GP<DjVuNavDir>find_ndir(GMap<GURL, void *> & map);
+   GP<DjVuNavDir>decode_ndir(GMap<GURL, void *> & map);
    void		add_djvu_data(IFFByteStream & str,
 			      GMap<GURL, void *> & map,
 			      bool included_too, bool no_ndir);
