@@ -40,7 +40,7 @@ depend: $(SRC)
 %%%BEGIN_REQUIRE(@%cc_is_gcc%@)
 	@%rm%@ -f Makefile.depend
 	echo '### BEGIN C DEPENDENCIES' > Makefile.depend
-	@for n in `(echo *.c;cd ./SRCDIR>>/dev/null 2>>/dev/null;echo *.c)|@%sort%@ -u`; do echo "@%CC%@ -MM -I. @%CCFLAGS%@ @%DEFS%@ $$n";(if [ -r "$$n" ] ; then @%CC%@ -MM -I. -I./SRCDIR @%CCFLAGS%@ $$n ; elif [ -r "./SRCDIR/$$n" ] ; then @%CC%@ -MM -I. -I./SRCDIR @%CCFLAGS%@ @%DEFS%@ $(INCS) ./SRCDIR/$$n ; fi)| @%sed%@ -e 's,\([ 	]\)SRCDIR/,\1,g' -e s,\([ 	]\)TOPDIR/,\1@%TOPDIR%@/,g' -e 's,/SRCDIR/,/,' -e 's,/TOPDIR/,/@%TOPDIR%@/,g' -e 's,//*,/,g' -e 's,\([ 	]\)[.]/,\1,g' -e 's,^[.]/,,g' >> Makefile.depend;done
+	@for n in `(echo *.c;cd ./SRCDIR>>/dev/null 2>>/dev/null;echo *.c)|@%sort%@ -u`; do echo "@%CC%@ -MM -I. @%CCFLAGS%@ @%DEFS%@ $$n";(if [ -r "$$n" ] ; then @%CC%@ -MM -I. -I./SRCDIR @%CCFLAGS%@ $$n ; elif [ -r "./SRCDIR/$$n" ] ; then @%CC%@ -MM -I. -I./SRCDIR @%CCFLAGS%@ @%DEFS%@ $(INCS) ./SRCDIR/$$n ; fi)| @%sed%@ -e 's,\([ 	]\)SRCDIR/,\1,g' -e 's,\([ 	]\)TOPDIR/,\1@%TOPDIR%@/,g' -e 's,/SRCDIR/,/,g' -e 's,/TOPDIR/,/@%TOPDIR%@/,g' -e 's,//*,/,g' -e 's,\([ 	]\)[.]/,\1,g' -e 's,^[.]/,,g' >> Makefile.depend++;done
 	echo '### END   C DEPENDENCIES' >> Makefile.depend
 	@%rm%@ -f Makefile.new
 	@%sed%@ -n -e '/^### BEGIN [ ]*C [ ]*DEPENDENCIES/,/^### END [ ]*C [ ]*DEPENDENCIES/d' -e '/.*/p' Makefile > Makefile.new
