@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuAnno.cpp,v 1.31 1999-10-26 20:53:50 eaf Exp $
+//C- $Id: DjVuAnno.cpp,v 1.32 1999-10-26 21:12:54 eaf Exp $
 
 
 #ifdef __GNUC__
@@ -1200,6 +1200,15 @@ DjVuTXT::get_smallest_zone(int max_type, int start, int & length)
 static inline bool
 chars_equal(char ch1, char ch2, bool match_case)
 {
+   if (ch1==DjVuTXT::end_of_column ||
+       ch1==DjVuTXT::end_of_region ||
+       ch1==DjVuTXT::end_of_paragraph ||
+       ch1==DjVuTXT::end_of_line) ch1=' ';
+   if (ch2==DjVuTXT::end_of_column ||
+       ch2==DjVuTXT::end_of_region ||
+       ch2==DjVuTXT::end_of_paragraph ||
+       ch2==DjVuTXT::end_of_line) ch2=' ';
+   
    return match_case ? (ch1==ch2) : (toupper(ch1)==toupper(ch2));
 }
 
@@ -1287,6 +1296,7 @@ DjVuTXT::search_string(const char* string, int &from,
 	    } else
 	    {
 	       zone_type--;
+	       zone_list.empty();
 	       break;
 	    }
 	 }
