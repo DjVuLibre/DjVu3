@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.cpp,v 1.10 1999-09-07 16:34:55 eaf Exp $
+//C- $Id: DataPool.cpp,v 1.11 1999-09-07 17:41:14 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -91,8 +91,8 @@ DataPool::BlockList::add_range(int start, int length)
       pos=list;
       while(pos)
       {
-	 GPosition pos1;
-	 for(pos1=++pos;pos1;)
+	 GPosition pos1=pos; ++pos1;
+	 while(pos1)
 	 {
 	    if (list[pos]<0 && list[pos1]>0 ||
 		list[pos]>0 && list[pos1]<0)
