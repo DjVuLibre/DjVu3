@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVmDoc.cpp,v 1.49 2001-06-29 23:24:47 bcr Exp $
+// $Id: DjVmDoc.cpp,v 1.50 2001-07-03 17:02:32 bcr Exp $
 // $Name:  $
 
 
@@ -80,7 +80,7 @@ save_file(
           GPosition pos=incl.contains(incl_str);
           if(pos)
           { 
-            iff_out.writestring(incl[pos]);
+            iff_out.get_bytestream()->writestring(incl[pos]);
           }else
           {
             GP<DjVmDir::File> incl_file=dir.id_to_file(incl_str); 
@@ -89,22 +89,22 @@ save_file(
               DEBUG_MSG("INCL '"<<(const char *)incl_file->get_save_name()<<"'\n");
               const GUTF8String incl_name=incl_file->get_save_name();
               incl[incl_str]=incl_name;
-              iff_out.writestring(incl_name);
+              iff_out.get_bytestream()->writestring(incl_name);
             }else
             {
               DEBUG_MSG("BOGUS INCL '"<<(const char *)incl_str<<"'\n");
-              iff_out.copy(iff_in);
+              iff_out.copy(*iff_in.get_bytestream());
             }
           }
         }else
         {
-          iff_out.copy(iff_in);
+          iff_out.copy(*iff_in.get_bytestream());
         }
         iff_out.close_chunk();
       }
     }else
     {
-      iff_out.copy(iff_in);
+      iff_out.copy(*iff_in.get_bytestream());
     }
     iff_out.close_chunk();
     iff_in.close_chunk();
@@ -357,7 +357,7 @@ DjVmDoc::write(const GP<ByteStream> &gstr,
     const GP<ByteStream> str_in(pool->get_stream());
     if ((iff.tell() & 1)!=0)
     {
-      iff.write8(0);
+      iff.get_bytestream()->write8(0);
     }
     iff.copy(*str_in);
   }

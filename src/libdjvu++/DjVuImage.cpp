@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuImage.cpp,v 1.81 2001-06-25 23:33:38 bcr Exp $
+// $Id: DjVuImage.cpp,v 1.82 2001-07-03 17:02:32 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -49,6 +49,8 @@
 #include "ByteStream.h"
 #include "GMapAreas.h"
 #include "DjVuText.h"
+#include "IFFByteStream.h"
+#include "BSByteStream.h"
 #include "debug.h"
 #include <stdarg.h>
 
@@ -211,6 +213,23 @@ DjVuImage::get_text() const
    if (file) 
    {
      file->get_text(mbs);
+   }
+   mbs.seek(0);
+   if(!mbs.size())
+   {
+     out=0;
+   }
+   return out;
+}
+
+GP<ByteStream>
+DjVuImage::get_meta() const
+{
+   GP<ByteStream> out = ByteStream::create();
+   ByteStream &mbs = *out;
+   if (file) 
+   {
+     file->get_meta(mbs);
    }
    mbs.seek(0);
    if(!mbs.size())
@@ -1390,6 +1409,29 @@ DjVuImage::writeXML(ByteStream &str_out,const GURL &doc_url,const int flags) con
         text->decode(text_str);
       }
       text->writeText(str_out,height);
+    }
+  }
+  if(!(flags & NOMETA))
+  {
+    const GP<ByteStream> meta_str(get_meta());
+    if(meta_str)
+    {
+      GP<IFFByteStream> giff=IFFByteStream::create(meta_str);
+      IFFByteStream &iff=*giff;
+      GUTF8String chkid;
+      while( iff.get_chunk(chkid))
+      {
+        GP<ByteStream> gbs(iff.get_bytestream());
+        if(chkid == "METa")
+        {
+          str_out.writestring(gbs->getAsUTF8());
+        }else if(chkid == "METz")
+        {
+          gbs=BSByteStream::create(gbs);
+          str_out.writestring(gbs->getAsUTF8());
+        }
+        iff.close_chunk();
+      }
     }
   }
   str_out.writestring(GUTF8String("</OBJECT>\n"));

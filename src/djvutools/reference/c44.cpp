@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: c44.cpp,v 1.26 2001-06-26 21:36:10 bcr Exp $
+// $Id: c44.cpp,v 1.27 2001-07-03 17:02:31 bcr Exp $
 // $Name:  $
 
 
@@ -184,7 +184,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: c44.cpp,v 1.26 2001-06-26 21:36:10 bcr Exp $# */
+    #$Id: c44.cpp,v 1.27 2001-07-03 17:02:31 bcr Exp $# */
 //@{
 //@}
 
@@ -636,7 +636,7 @@ create_photo_djvu_file(IW44Image &iw, int w, int h,
   // Write djvu header and info chunk
   iff.put_chunk("FORM:DJVU", 1);
   iff.put_chunk("INFO");
-  info.encode(iff);
+  info.encode(*iff.get_bytestream());
   iff.close_chunk();
   // Write all chunks
   int flag = 1;

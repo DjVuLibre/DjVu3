@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: IFFByteStream.cpp,v 1.29 2001-05-01 23:38:24 bcr Exp $
+// $Id: IFFByteStream.cpp,v 1.30 2001-07-03 17:02:32 bcr Exp $
 // $Name:  $
 
 // -- Implementation of IFFByteStream
@@ -47,7 +47,7 @@
 
 
 // Constructor
-IFFByteStream::IFFByteStream(GP<ByteStream> &xbs,const int xpos)
+IFFByteStream::IFFByteStream(const GP<ByteStream> &xbs,const int xpos)
 : ByteStream::Wrapper(xbs), has_magic(false), ctx(0), dir(0)
 {
   offset = seekto = xpos;
@@ -61,7 +61,7 @@ IFFByteStream::~IFFByteStream()
 }
 
 GP<IFFByteStream>
-IFFByteStream::create(GP<ByteStream> bs)
+IFFByteStream::create(const GP<ByteStream> &bs)
 {
   const int pos=bs->tell();
   return new IFFByteStream(bs,pos);

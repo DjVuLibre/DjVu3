@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocEditor.cpp,v 1.83 2001-06-29 23:24:47 bcr Exp $
+// $Id: DjVuDocEditor.cpp,v 1.84 2001-07-03 17:02:32 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -384,7 +384,7 @@ DjVuDocEditor::strip_incl_chunks(const GP<DataPool> & pool_in)
          if (chkid!="INCL")
          {
             iff_out.put_chunk(chkid);
-            iff_out.copy(iff_in);
+            iff_out.copy(*iff_in.get_bytestream());
             iff_out.close_chunk();
          } else
          {
@@ -618,13 +618,13 @@ DjVuDocEditor::insert_file(const GURL &file_url, bool is_page,
          if (chkid!="INCL")
          {
             iff_out.put_chunk(chkid);
-            iff_out.copy(iff_in);
+            iff_out.copy(*iff_in.get_bytestream());
             iff_in.close_chunk();
             iff_out.close_chunk();
             if (shared_frec && chkid=="INFO")
             {
                iff_out.put_chunk("INCL");
-               iff_out.writestring(shared_frec->get_load_name());
+               iff_out.get_bytestream()->writestring(shared_frec->get_load_name());
                iff_out.close_chunk();
             }
          } else
@@ -652,7 +652,7 @@ DjVuDocEditor::insert_file(const GURL &file_url, bool is_page,
                      // contain NDIR chunk), add INCL chunk.
                   GUTF8String id=name2id[name];
                   iff_out.put_chunk("INCL");
-                  iff_out.writestring(id);
+                  iff_out.get_bytestream()->writestring(id);
                   iff_out.close_chunk();
                }
             } G_CATCH(exc) {

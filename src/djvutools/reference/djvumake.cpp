@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //
-// $Id: djvumake.cpp,v 1.23 2001-06-13 18:26:19 bcr Exp $
+// $Id: djvumake.cpp,v 1.24 2001-07-03 17:02:31 bcr Exp $
 // $Name:  $
 
 /** @name djvumake
@@ -102,7 +102,7 @@
     @memo
     Assemble DjVu files.
     @version
-    #$Id: djvumake.cpp,v 1.23 2001-06-13 18:26:19 bcr Exp $#
+    #$Id: djvumake.cpp,v 1.24 2001-07-03 17:02:31 bcr Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> \\
     Patrick Haffner <haffner@research.att.com>
@@ -347,7 +347,7 @@ create_info_chunk(IFFByteStream &iff, DArray<GUTF8String> &argv)
   info.height = h;
   info.dpi = dpi;
   iff.put_chunk("INFO");
-  info.encode(iff);
+  info.encode(*iff.get_bytestream());
   iff.close_chunk();
 }
 
@@ -433,7 +433,7 @@ create_fg44_chunk(IFFByteStream &iff, char *ckid, const GURL &url)
     G_THROW("djvumake: FG44 file has incorrect format (wring IFF header)");
   GP<ByteStream> gmbs=ByteStream::create();
   ByteStream &mbs=*gmbs;
-  mbs.copy(bsi);
+  mbs.copy(*bsi.get_bytestream());
   bsi.close_chunk();  
   if (bsi.get_chunk(chkid))
     DjVuPrintErrorUTF8("%s","djvumake: FG44 file contains more than one chunk\n");
@@ -511,7 +511,7 @@ create_bg44_chunk(IFFByteStream &iff, char *ckid, GUTF8String filespec)
         }
       GP<ByteStream> gmbs=ByteStream::create();
       ByteStream &mbs=*gmbs;
-      mbs.copy(*bg44iff);
+      mbs.copy(*(bg44iff->get_bytestream()));
       bg44iff->close_chunk();  
       mbs.seek(0);
       if (mbs.readall((void*)&primary, sizeof(primary)) != sizeof(primary))

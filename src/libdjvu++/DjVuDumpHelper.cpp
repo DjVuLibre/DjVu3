@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDumpHelper.cpp,v 1.21 2001-04-30 23:30:45 bcr Exp $
+// $Id: DjVuDumpHelper.cpp,v 1.22 2001-07-03 17:02:32 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -67,7 +67,7 @@ display_djvu_info(ByteStream & out_str, IFFByteStream &iff,
 {
   GP<DjVuInfo> ginfo=DjVuInfo::create();
   DjVuInfo &info=*ginfo;
-  info.decode(iff);
+  info.decode(*iff.get_bytestream());
   if (size >= 4)
     out_str.format( "DjVu %dx%d", info.width, info.height);
   if (size >= 5)
@@ -122,11 +122,11 @@ display_iw4(ByteStream & out_str, IFFByteStream &iff,
     unsigned char yhi, ylo;
   } secondary;
   
-  if (iff.readall((void*)&primary, sizeof(primary)) == sizeof(primary))
+  if (iff.get_bytestream()->readall((void*)&primary, sizeof(primary)) == sizeof(primary))
     {
       out_str.format( "IW4 data #%d, %d slices", primary.serial+1, primary.slices);
       if (primary.serial==0)
-        if (iff.readall((void*)&secondary, sizeof(secondary)) == sizeof(secondary))
+        if (iff.get_bytestream()->readall((void*)&secondary, sizeof(secondary)) == sizeof(secondary))
           {
             out_str.format( ", v%d.%d (%s), %dx%d", secondary.major&0x7f, secondary.minor,
                    (secondary.major & 0x80 ? "b&w" : "color"),

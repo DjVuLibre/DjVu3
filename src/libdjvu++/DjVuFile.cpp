@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuFile.cpp,v 1.174 2001-06-28 19:42:58 bcr Exp $
+// $Id: DjVuFile.cpp,v 1.175 2001-07-03 17:02:32 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -50,6 +50,9 @@
 #include "JB2Image.h"
 #include "IW44Image.h"
 #include "DjVuNavDir.h"
+#ifndef NEED_DECODER_ONLY
+#include "BSByteStream.h"
+#endif // NEED_DECODER_ONLY
 
 #include "debug.h"
 
@@ -242,6 +245,7 @@ DjVuFile::reset(void)
    info = 0; 
    anno = 0; 
    text = 0; 
+   meta = 0; 
    bg44 = 0; 
    fgbc = 0;
    fgjb = 0; 
@@ -262,7 +266,7 @@ DjVuFile::get_memory_usage(void) const
    if (fgpm) size+=fgpm->get_memory_usage();
    if (fgbc) size+=fgbc->size()*sizeof(int);
    if (anno) size+=anno->size();
-   if (text) size+=text->size();
+   if (meta) size+=meta->size();
    if (dir) size+=dir->get_memory_usage();
    return size;
 }
@@ -675,7 +679,7 @@ DjVuFile::process_incl_chunks(void)
         {
           G_TRY
           {
-            process_incl_chunk(iff, incl_cnt++);
+            process_incl_chunk(*iff.get_bytestream(), incl_cnt++);
           }
           G_CATCH(ex);
           {
@@ -778,9 +782,14 @@ DjVuFile::get_dpi(int w, int h)
   return (dpi ? dpi : 300)/red;
 }
 
+static inline bool
+is_info(const GUTF8String &chkid)
+{
+  return (chkid=="INFO");
+}
 
 static inline bool
-is_annotation(GUTF8String chkid)
+is_annotation(const GUTF8String &chkid)
 {
   return (chkid=="ANTa" ||
     chkid=="ANTz" ||
@@ -788,9 +797,15 @@ is_annotation(GUTF8String chkid)
 }
 
 static inline bool
-is_text(GUTF8String chkid)
+is_text(const GUTF8String &chkid)
 {
   return (chkid=="TXTa" || chkid=="TXTz");
+}
+
+static inline bool
+is_meta(const GUTF8String &chkid)
+{
+  return (chkid=="METa" || chkid=="METz");
 }
 
 
@@ -814,7 +829,7 @@ DjVuFile::decode_chunk( const GUTF8String &id, const GP<ByteStream> &gbs,
   DEBUG_MSG("DjVuFile::decode_chunk() : decoding " << id << "\n");
   
   // INFO  (information chunk for djvu page)
-  if (chkid == "INFO" && (djvu || djvi))
+  if (is_info(chkid) && (djvu || djvi))
   {
     if (DjVuFile::info)
       G_THROW( ERR_MSG("DjVuFile.corrupt_dupl") );
@@ -1132,6 +1147,30 @@ DjVuFile::decode_chunk( const GUTF8String &id, const GP<ByteStream> &gbs,
       iffout.close_chunk();
       desc.format( ERR_MSG("DjVuFile.text") );
     }
+  else if (is_meta(chkid))
+    {
+      const GP<ByteStream> gachunk(ByteStream::create());
+      ByteStream &achunk=*gachunk;
+      achunk.copy(bs);
+      achunk.seek(0);
+      GCriticalSectionLock lock(&text_lock);
+      if (! meta)
+      {
+        meta = ByteStream::create();
+      }
+      meta->seek(0,SEEK_END);
+      if (meta->tell())
+      {
+        meta->write((const void*)"", 1);
+      }
+      // Recreate chunk header
+      const GP<IFFByteStream> giffout(IFFByteStream::create(meta));
+      IFFByteStream &iffout=*giffout;
+      iffout.put_chunk(id);
+      iffout.copy(achunk);
+      iffout.close_chunk();
+//      desc.format( ERR_MSG("DjVuFile.text") );
+    }
 
   // Return description
   return desc;
@@ -1441,7 +1480,7 @@ DjVuFile::decode_ndir(GMap<GURL, void *> & map)
         if (chkid=="NDIR")
         {
           GP<DjVuNavDir> d=DjVuNavDir::create(url);
-          d->decode(iff);
+          d->decode(*iff.get_bytestream());
           dir=d;
           break;
         }
@@ -1541,7 +1580,7 @@ DjVuFile::get_merged_anno(const GP<DjVuFile> & file,
               {
                 str_out.write((void *) "", 1);
               }
-              str_out.copy(iff);
+              str_out.copy(*iff.get_bytestream());
             } 
             else if (is_annotation(chkid)) // but not FORM:ANNO
             {
@@ -1554,7 +1593,7 @@ DjVuFile::get_merged_anno(const GP<DjVuFile> & file,
               const GP<IFFByteStream> giff_out(IFFByteStream::create(gstr_out));
               IFFByteStream &iff_out=*giff_out;
               iff_out.put_chunk(chkid);
-              iff_out.copy(iff);
+              iff_out.copy(*iff.get_bytestream());
               iff_out.close_chunk();
             }
             iff.close_chunk();
@@ -1649,7 +1688,58 @@ DjVuFile::get_text(
           const GP<IFFByteStream> giff_out(IFFByteStream::create(gstr_out));
           IFFByteStream &iff_out=*giff_out;
           iff_out.put_chunk(chkid);
-          iff_out.copy(iff);
+          iff_out.copy(*iff.get_bytestream());
+          iff_out.close_chunk();
+        }
+        iff.close_chunk();
+      }
+    }
+    file->data_pool->clear_stream();
+  }
+}
+
+void
+DjVuFile::get_meta(
+  const GP<DjVuFile> & file, const GP<ByteStream> &gstr_out)
+{
+  DEBUG_MSG("DjVuFile::get_meta()\n");
+  ByteStream &str_out=*gstr_out;
+  if (!file->is_data_present() ||
+    file->is_modified() && file->meta)
+  {
+    // Process the decoded (?) meta
+    GCriticalSectionLock lock(&file->meta_lock);
+    if (file->meta && file->meta->size())
+    {
+      if (str_out.tell())
+      {
+        str_out.write((void *) "", 1);
+      }
+      file->meta->seek(0);
+      str_out.copy(*file->meta);
+    }
+  } else if (file->is_data_present())
+  {
+	       // Copy all meta chunks, but do NOT modify
+	       // DjVuFile::meta (to avoid correlation with DjVuFile::decode())
+    const GP<ByteStream> str=file->data_pool->get_stream();
+    const GP<IFFByteStream> giff=IFFByteStream::create(str);
+    IFFByteStream &iff=*giff;
+    GUTF8String chkid;
+    if (iff.get_chunk(chkid))
+    {
+      while(iff.get_chunk(chkid))
+      {
+        if (is_meta(chkid))
+        {
+          if (str_out.tell())
+          {
+            str_out.write((void *) "", 1);
+          }
+          const GP<IFFByteStream> giff_out(IFFByteStream::create(gstr_out));
+          IFFByteStream &iff_out=*giff_out;
+          iff_out.put_chunk(chkid);
+          iff_out.copy(*iff.get_bytestream());
           iff_out.close_chunk();
         }
         iff.close_chunk();
@@ -1665,6 +1755,23 @@ DjVuFile::get_text(void)
   DEBUG_MSG("DjVuFile::get_text(void)\n");
   GP<ByteStream> gstr(ByteStream::create());
   get_text(this, gstr);
+  ByteStream &str=*gstr;
+  if (!str.tell())
+  { 
+    gstr=0;
+  }else
+  {
+    str.seek(0);
+  }
+  return gstr;
+}
+
+GP<ByteStream>
+DjVuFile::get_meta(void)
+{
+  DEBUG_MSG("DjVuFile::get_meta(void)\n");
+  GP<ByteStream> gstr(ByteStream::create());
+  get_meta(this, gstr);
   ByteStream &str=*gstr;
   if (!str.tell())
   { 
@@ -1954,6 +2061,28 @@ DjVuFile::contains_text(void)
   return false;
 }
 
+bool
+DjVuFile::contains_meta(void)
+{
+  const GP<ByteStream> str(data_pool->get_stream());
+  
+  GUTF8String chkid;
+  const GP<IFFByteStream> giff(IFFByteStream::create(str));
+  IFFByteStream &iff=*giff;
+  if (!iff.get_chunk(chkid))
+    G_THROW( ByteStream::EndOfFile );
+  
+  while(iff.get_chunk(chkid))
+  {
+    if (is_meta(chkid))
+      return true;
+    iff.close_chunk();
+  }
+  
+  data_pool->clear_stream();
+  return false;
+}
+
 //*****************************************************************************
 //****************************** Save routines ********************************
 //*****************************************************************************
@@ -1969,7 +2098,7 @@ copy_chunks(const GP<ByteStream> &from, IFFByteStream &ostr)
   while ((chksize=iff.get_chunk(chkid)))
   {
     ostr.put_chunk(chkid);
-    int ochksize=ostr.copy(iff);
+    int ochksize=ostr.copy(*iff.get_bytestream());
     ostr.close_chunk();
     iff.seek_close_chunk();
     if(ochksize != chksize)
@@ -1990,6 +2119,7 @@ DjVuFile::add_djvu_data(IFFByteStream & ostr, GMap<GURL, void *> & map,
   map[url]=0;
   bool processed_annotation = false;
   bool processed_text = false;
+  bool processed_meta = false;
   
   const GP<ByteStream> str(data_pool->get_stream());
   GUTF8String chkid;
@@ -2011,9 +2141,15 @@ DjVuFile::add_djvu_data(IFFByteStream & ostr, GMap<GURL, void *> & map,
       for(;(chunks_left--)&&(chksize = iff.get_chunk(chkid));last_chunk=chunks)
       {
         chunks++;
-        if (chkid=="INCL" && included_too)
+        if (is_info(chkid) && info)
         {
-          GP<DjVuFile> file = process_incl_chunk(iff);
+          ostr.put_chunk(chkid);
+          info->encode(*ostr.get_bytestream());
+          ostr.close_chunk();
+        }
+        else if (chkid=="INCL" && included_too)
+        {
+          GP<DjVuFile> file = process_incl_chunk(*iff.get_bytestream());
           if (file)
           {
             if(recover_errors!=ABORT)
@@ -2041,10 +2177,19 @@ DjVuFile::add_djvu_data(IFFByteStream & ostr, GMap<GURL, void *> & map,
             copy_chunks(text, ostr);
           }
         }
+        else if (is_meta(chkid) && meta && meta->size())
+        {
+          if (!processed_meta)
+          {
+            processed_meta = true;
+            GCriticalSectionLock lock(&meta_lock);
+            copy_chunks(meta, ostr);
+          }
+        }
         else if (chkid!="NDIR"||!(no_ndir || dir))
         {  // Copy NDIR chunks, but never generate new ones.
           ostr.put_chunk(chkid);
-          ostr.copy(iff);
+          ostr.copy(*iff.get_bytestream());
           ostr.close_chunk();
         }
         iff.seek_close_chunk();
@@ -2077,6 +2222,12 @@ DjVuFile::add_djvu_data(IFFByteStream & ostr, GMap<GURL, void *> & map,
       processed_text = true;
       GCriticalSectionLock lock(&text_lock);
       copy_chunks(text, ostr);
+    }
+    if (!processed_meta && meta && meta->size())
+    {
+      processed_meta = true;
+      GCriticalSectionLock lock(&meta_lock);
+      copy_chunks(meta, ostr);
     }
     // Close iff
     if (top_level) 
@@ -2146,6 +2297,21 @@ DjVuFile::get_text(ByteStream &out)
   }
 }
 
+void
+DjVuFile::get_meta(ByteStream &out)
+{
+  const GP<ByteStream> str(get_meta());
+  if (str)
+  {
+    str->seek(0);
+    if (out.tell())
+    {
+      out.write((void *) "", 1);
+    }
+    out.copy(*str);
+  }
+}
+
 
 
 //****************************************************************************
@@ -2174,7 +2340,7 @@ DjVuFile::remove_anno(void)
     if (!is_annotation(chkid))
     {
       iff_out.put_chunk(chkid);
-      iff_out.copy(iff_in);
+      iff_out.copy(*iff_in.get_bytestream());
       iff_out.close_chunk();
     }
     iff_in.close_chunk();
@@ -2214,7 +2380,7 @@ DjVuFile::remove_text(void)
     if (!is_text(chkid))
     {
       iff_out.put_chunk(chkid);
-      iff_out.copy(iff_in);
+      iff_out.copy(*iff_in.get_bytestream());
       iff_out.close_chunk();
     }
     iff_in.close_chunk();
@@ -2227,6 +2393,46 @@ DjVuFile::remove_text(void)
   chunks_number=-1;
   
   text=0;
+  
+  flags|=MODIFIED;
+  data_pool->clear_stream();
+}
+
+void
+DjVuFile::remove_meta(void)
+{
+  DEBUG_MSG("DjVuFile::remove_meta()\n");
+  const GP<ByteStream> str_in(data_pool->get_stream());
+  const GP<ByteStream> gstr_out(ByteStream::create());
+  
+  GUTF8String chkid;
+  const GP<IFFByteStream> giff_in(IFFByteStream::create(str_in));
+  IFFByteStream &iff_in=*giff_in;
+  if (!iff_in.get_chunk(chkid))
+    G_THROW( ByteStream::EndOfFile );
+  
+  const GP<IFFByteStream> giff_out(IFFByteStream::create(gstr_out));
+  IFFByteStream &iff_out=*giff_out;
+  iff_out.put_chunk(chkid);
+  
+  while(iff_in.get_chunk(chkid))
+  {
+    if (!is_meta(chkid))
+    {
+      iff_out.put_chunk(chkid);
+      iff_out.copy(*iff_in.get_bytestream());
+      iff_out.close_chunk();
+    }
+    iff_in.close_chunk();
+  }
+  
+  iff_out.close_chunk();
+  
+  gstr_out->seek(0, SEEK_SET);
+  data_pool=DataPool::create(gstr_out);
+  chunks_number=-1;
+  
+  meta=0;
   
   flags|=MODIFIED;
   data_pool->clear_stream();
@@ -2285,7 +2491,7 @@ DjVuFile::unlink_file(const GP<DataPool> & data, const GUTF8String &name)
       if (incl_str!=name)
       {
         iff_out.put_chunk(chkid);
-        iff_out.writestring(incl_str);
+        iff_out.get_bytestream()->writestring(incl_str);
         iff_out.close_chunk();
       }
     } else
@@ -2293,8 +2499,11 @@ DjVuFile::unlink_file(const GP<DataPool> & data, const GUTF8String &name)
       iff_out.put_chunk(chkid);
       char buffer[1024];
       int length;
-      while((length=iff_in.read(buffer, 1024)))
-        iff_out.writall(buffer, length);
+      for(const GP<ByteStream> gbs(iff_out.get_bytestream());
+        (length=iff_in.read(buffer, 1024));)
+      {
+        gbs->writall(buffer, length);
+      }
       iff_out.close_chunk();
     }
     iff_in.close_chunk();
@@ -2335,19 +2544,19 @@ DjVuFile::insert_file(const GUTF8String &id, int chunk_num)
       if (chunk_cnt++==chunk_num)
       {
         iff_out.put_chunk("INCL");
-        iff_out.writestring(id);
+        iff_out.get_bytestream()->writestring(id);
         iff_out.close_chunk();
         done=true;
       }
       iff_out.put_chunk(chkid);
-      iff_out.copy(iff_in);
+      iff_out.copy(*iff_in.get_bytestream());
       iff_out.close_chunk();
       iff_in.close_chunk();
     }
     if (!done)
     {
       iff_out.put_chunk("INCL");
-      iff_out.writestring(id);
+      iff_out.get_bytestream()->writestring(id);
       iff_out.close_chunk();
     }
     iff_out.close_chunk();
@@ -2403,7 +2612,7 @@ DjVuFile::unlink_file(const GUTF8String &id)
       if (chkid!="INCL")
       {
         iff_out.put_chunk(chkid);
-        iff_out.copy(iff_in);
+        iff_out.copy(*iff_in.get_bytestream());
         iff_out.close_chunk();
       } else
       {
@@ -2423,7 +2632,7 @@ DjVuFile::unlink_file(const GUTF8String &id)
         if (incl_str!=id)
         {
           iff_out.put_chunk("INCL");
-          iff_out.writestring(incl_str);
+          iff_out.get_bytestream()->writestring(incl_str);
           iff_out.close_chunk();
         }
       }
@@ -2439,6 +2648,16 @@ DjVuFile::unlink_file(const GUTF8String &id)
   flags|=MODIFIED;
 }
 
+void
+DjVuFile::change_info(GP<DjVuInfo> xinfo,const bool do_reset)
+{
+  DEBUG_MSG("DjVuFile::change_text()\n");
+  // Mark this as modified
+  set_modified(true);
+  if(do_reset)
+    reset();
+  info=xinfo;
+}
 
 #ifndef NEED_DECODER_ONLY
 void
@@ -2455,6 +2674,7 @@ DjVuFile::change_text(GP<DjVuTXT> txt,const bool do_reset)
       text_c.decode(file_text);
     }
   }
+  GCriticalSectionLock lock(&text_lock);
   // Mark this as modified
   set_modified(true);
   if(do_reset)
@@ -2462,6 +2682,33 @@ DjVuFile::change_text(GP<DjVuTXT> txt,const bool do_reset)
   text_c.txt = txt;
   text=ByteStream::create();
   text_c.encode(text);
+}
+
+void
+DjVuFile::change_meta(const GUTF8String &xmeta,const bool do_reset)
+{
+  DEBUG_MSG("DjVuFile::change_meta()\n");
+  // Mark this as modified
+  set_modified(true);
+  if(contains_meta())
+  {
+    (void)get_meta();
+  }
+  if(do_reset)
+    reset();
+  GCriticalSectionLock lock(&meta_lock);
+  meta=ByteStream::create();
+  if(xmeta.length())
+  {
+    const GP<IFFByteStream> giff=IFFByteStream::create(meta);
+    IFFByteStream &iff=*giff;
+    iff.put_chunk("METz");
+    {
+      GP<ByteStream> gbsiff=BSByteStream::create(iff.get_bytestream(),50);
+      gbsiff->writestring(xmeta);
+    }
+    iff.close_chunk();
+  }
 }
 #endif
 

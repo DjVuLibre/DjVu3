@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: cjb2.cpp,v 1.21 2001-06-13 18:26:19 bcr Exp $
+// $Id: cjb2.cpp,v 1.22 2001-07-03 17:02:31 bcr Exp $
 // $Name:  $
 
 
@@ -70,7 +70,7 @@
     Paul Howard <pgh@research.att.com>\\
     Pascal Vincent <vincentp@iro.umontreal.ca>
     @version
-    $Id: cjb2.cpp,v 1.21 2001-06-13 18:26:19 bcr Exp $ */
+    $Id: cjb2.cpp,v 1.22 2001-07-03 17:02:31 bcr Exp $ */
 //@{
 //@}
 
@@ -856,7 +856,7 @@ cjb2(const GURL &urlin, const GURL &urlout, const cjb2opts &opts)
   info.width = rimg.width;
   info.dpi = opts.dpi;
   iff.put_chunk("INFO");
-  info.encode(iff);
+  info.encode(*iff.get_bytestream());
   iff.close_chunk();
   // -- ``Sjbz'' chunk
   iff.put_chunk("Sjbz");

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djvuextract.cpp,v 1.24 2001-06-13 18:26:19 bcr Exp $
+// $Id: djvuextract.cpp,v 1.25 2001-07-03 17:02:31 bcr Exp $
 // $Name:  $
 
 /** @name djvuextract
@@ -65,7 +65,7 @@
     @memo
     Extract components from DjVu files.
     @version
-    #$Id: djvuextract.cpp,v 1.24 2001-06-13 18:26:19 bcr Exp $#
+    #$Id: djvuextract.cpp,v 1.25 2001-07-03 17:02:31 bcr Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> - Initial implementation\\
     Andrei Erofeev <eaf@geocities.com> - Multipage support */
@@ -119,7 +119,7 @@ display_info_chunk(GP<ByteStream> ibs, const GURL &url)
     {
       if (chkid=="INFO")
         {
-          if (iff.readall((void*)&djvuinfo,sizeof(djvuinfo)) < sizeof(djvuinfo))
+          if (iff.get_bytestream()->readall((void*)&djvuinfo,sizeof(djvuinfo)) < sizeof(djvuinfo))
             G_THROW("Cannot read INFO chunk");
           DjVuPrintErrorUTF8("%s: (%d x %d) version %d\n", 
                   (const char *)url, 
@@ -158,7 +158,7 @@ extract_chunk(GP<ByteStream> ibs, const GUTF8String &id, GP<ByteStream> out)
             {
               GP<ByteStream> gtemp=ByteStream::create();
               ByteStream &temp=*gtemp;
-              temp.copy(iff);
+              temp.copy(*iff.get_bytestream());
               temp.seek(0);
               if (temp.readall((void*)&primary, sizeof(primary))<sizeof(primary))
                 G_THROW("Cannot read primary header in BG44 chunk");
@@ -185,7 +185,7 @@ extract_chunk(GP<ByteStream> ibs, const GUTF8String &id, GP<ByteStream> out)
       while (iff.get_chunk(chkid))
         {
           if (chkid == id)
-            out->copy(iff);
+            out->copy(*iff.get_bytestream());
           iff.close_chunk();
         }
     }

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocument.cpp,v 1.180 2001-06-28 19:42:58 bcr Exp $
+// $Id: DjVuDocument.cpp,v 1.181 2001-07-03 17:02:32 bcr Exp $
 // $Name:  $
 
 
@@ -329,7 +329,7 @@ DjVuDocument::init_thread(void)
 	    // form *is* the first page. The rest will become known
 	    // after we decode DjVuNavDir
 	 djvm_dir0=DjVmDir0::create();
-	 djvm_dir0->decode(iff);
+	 djvm_dir0->decode(*iff.get_bytestream());
 	 iff.close_chunk();
 
 	    // Get offset to the first DJVU, PM44 or BM44 chunk

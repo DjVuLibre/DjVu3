@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: XMLParser.cpp,v 1.15 2001-06-25 23:33:38 bcr Exp $
+// $Id: XMLParser.cpp,v 1.16 2001-07-03 17:02:32 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -63,6 +63,7 @@ static const char paragraphtag[]="PARAGRAPH";
 static const char regiontag[]="REGION";
 static const char pagecolumntag[]="PAGECOLUMN";
 static const char hiddentexttag[]="HIDDENTEXT";
+static const char metadatatag[]="METADATA";
 
 class lt_XMLParser::Impl : public lt_XMLParser
 {
@@ -87,11 +88,17 @@ protected:
   void parse_text(const int width, const int height,
     const lt_XMLTags &GObject, DjVuFile &dfile);
 
+  void parse_meta(const lt_XMLTags &GObject, DjVuFile &dfile);
+
   void ChangeAnno( const int width, const int height,
     DjVuFile &dfile, const lt_XMLTags &map);
 
+  void ChangeInfo(DjVuFile &dfile,const int dpi,const double gamma);
+
   void ChangeText( const int width, const int height,
     DjVuFile &dfile, const lt_XMLTags &map);
+
+  void ChangeMeta( DjVuFile &dfile, const lt_XMLTags &map);
 
   void ChangeTextOCR( const GUTF8String &value, 
     const int width, const int height,
@@ -217,12 +224,41 @@ convertToColor(const GUTF8String &s)
 }
 
 void
+lt_XMLParser::Impl::ChangeInfo(DjVuFile &dfile,const int dpi,const double gamma)
+{
+  GP<DjVuInfo> info;
+  if(dpi >= 5 && dpi <= 4800)
+  {
+    dfile.resume_decode(true);
+    if(dfile.info && (dpi != dfile.info->dpi) )
+    {
+      info=new DjVuInfo(*dfile.info);
+      info->dpi=dpi;
+    }
+  }
+  if(gamma >= 0.1 && gamma <= 5.0)
+  {
+    dfile.resume_decode(true);
+    if(dfile.info && (gamma != dfile.info->gamma) )
+    {
+      if(!info)
+        info=new DjVuInfo(*dfile.info);
+      info->gamma=gamma;
+    }
+  }
+  if(info)
+  {
+    dfile.change_info(info);
+  }
+}
+
+void
 lt_XMLParser::Impl::ChangeAnno(
   const int width, const int height,
   DjVuFile &dfile, 
   const lt_XMLTags &map )
 {
-  dfile.resume_decode();
+  dfile.resume_decode(true);
   const GP<DjVuInfo> info(dfile.info);
   const GP<DjVuAnno> ganno(DjVuAnno::create());
   DjVuAnno &anno=*ganno;
@@ -594,6 +630,8 @@ lt_XMLParser::Impl::parse(const lt_XMLTags &tags)
         GPosition heightPos=args.contains("height");
         height=(heightPos)?args[heightPos].toInt():0;
       }
+      GUTF8String gamma;
+      GUTF8String dpi;
       GUTF8String page;
       GUTF8String do_ocr;
       {
@@ -620,6 +658,14 @@ lt_XMLParser::Impl::parse(const lt_XMLTags &tags)
                   {
                     page=args["page"];
                   }
+                  if(args.contains("dpi"))
+                  {
+                    dpi=args["dpi"];
+                  }
+                  if(args.contains("gamma"))
+                  {
+                    gamma=args["gamma"];
+                  }
                   if(args.contains("ocr"))
                   {
                     do_ocr=args["ocr"];
@@ -627,6 +673,12 @@ lt_XMLParser::Impl::parse(const lt_XMLTags &tags)
                 }else if(name == "page")
                 {
                   page=value;
+                }else if(name == "dpi")
+                {
+                  dpi=value;
+                }else if(name == "gamma")
+                {
+                  gamma=value;
                 }else if(name == "ocr")
                 {
                   do_ocr=value;
@@ -637,7 +689,13 @@ lt_XMLParser::Impl::parse(const lt_XMLTags &tags)
         }
       }
       const GP<DjVuFile> dfile(get_file(url,page));
+      if(dpi.is_int() || gamma.is_float())
+      {
+        int pos=0;
+        ChangeInfo(*dfile,dpi.toInt(),gamma.toDouble(pos,pos));
+      }
       parse_anno(width,height,GObject,Maps,*dfile);
+      parse_meta(GObject,*dfile);
       parse_text(width,height,GObject,*dfile);
       ChangeTextOCR(do_ocr,width,height,dfile);
     }
@@ -900,6 +958,24 @@ lt_XMLParser::Impl::ChangeTextOCR(
 }
 
 void 
+lt_XMLParser::Impl::ChangeMeta(
+  DjVuFile &dfile, const lt_XMLTags &tags )
+{
+  dfile.resume_decode(true);
+  GP<ByteStream> gbs(ByteStream::create());
+  tags.write(*gbs,false);
+  gbs->seek(0L);
+  GUTF8String raw(gbs->getAsUTF8());
+  if(raw.length())
+  {
+    dfile.change_meta("<"+(metadatatag+(">"+raw))+"</"+metadatatag+">\n");
+  }else
+  {
+    dfile.change_meta(GUTF8String());
+  }
+}
+
+void 
 lt_XMLParser::Impl::ChangeText(
   const int width, const int height,
   DjVuFile &dfile, const lt_XMLTags &tags )
@@ -912,7 +988,7 @@ lt_XMLParser::Impl::ChangeText(
   // to store the new text
   GP<ByteStream> textbs = ByteStream::create(); 
   
-  const GP<DjVuInfo> info=(dfile.info);
+  GP<DjVuInfo> info=(dfile.info);
   if(info)
   {
     const int h=info->height;
@@ -959,6 +1035,22 @@ lt_XMLParser::Impl::parse_text(
     GPList<lt_XMLTags> textTags = GObject[textPos];
     GPosition pos = textTags;
     ChangeText(width,height,dfile,*textTags[pos]);
+  }
+}
+
+void
+lt_XMLParser::Impl::parse_meta(
+  const lt_XMLTags &GObject,
+  DjVuFile &dfile )
+{
+  GPosition metaPos = GObject.contains(metadatatag);
+  if(metaPos)
+  {
+    // loop through the hidden text - there should only be one 
+    // if there are more ??only the last one will be saved??
+    GPList<lt_XMLTags> metaTags = GObject[metaPos];
+    GPosition pos = metaTags;
+    ChangeMeta(dfile,*metaTags[pos]);
   }
 }
 

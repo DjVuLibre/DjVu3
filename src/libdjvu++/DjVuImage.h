@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuImage.h,v 1.46 2001-06-25 18:24:46 bcr Exp $
+// $Id: DjVuImage.h,v 1.47 2001-07-03 17:02:32 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUIMAGE_H
@@ -73,7 +73,7 @@
     L\'eon Bottou <leonb@research.att.com> - initial implementation
     Andrei Erofeev <eaf@geocities.com> - multipage support
     @version
-    #$Id: DjVuImage.h,v 1.46 2001-06-25 18:24:46 bcr Exp $# */
+    #$Id: DjVuImage.h,v 1.47 2001-07-03 17:02:32 bcr Exp $# */
 //@{
 
 
@@ -108,7 +108,7 @@ class DjVuImage : public DjVuPort
 protected:
   DjVuImage(void);
 public:
-  enum { NOINFO, NOTEXT=1, NOMAP=4 };
+  enum { NOINFO, NOTEXT=1, NOMAP=4, NOMETA=8 };
   // CONSTRUCTION
   /** @name Construction. */
   //@{
@@ -175,6 +175,9 @@ public:
   /** Returns a pointer to a ByteStream containing all the hidden text.
       Returns NULL if no chunks have been collected yet. */
   GP<ByteStream> get_text() const;
+  /** Returns a pointer to a ByteStream containing all the metadata.
+      Returns NULL if no chunks have been collected yet. */
+  GP<ByteStream> get_meta() const;
   //@}
 
   // NEW STYLE DECODING

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuAnno.cpp,v 1.86 2001-06-25 18:24:46 bcr Exp $
+// $Id: DjVuAnno.cpp,v 1.87 2001-07-03 17:02:32 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -1249,10 +1249,10 @@ DjVuAnno::decode(const GP<ByteStream> &gbs)
     if (chkid == "ANTa")
     {
       if (ant) {
-        ant->merge(iff);
+        ant->merge(*iff.get_bytestream());
       } else {
         ant=DjVuANT::create();
-        ant->decode(iff);
+        ant->decode(*iff.get_bytestream());
       }
     }
     else if (chkid == "ANTz")
@@ -1284,8 +1284,8 @@ DjVuAnno::encode(const GP<ByteStream> &gbs)
 #else
       iff.put_chunk("ANTz");
       {
-	 GP<ByteStream> bsbinput = GP<ByteStream>(giff); // yek yek yek!
-	 GP<ByteStream> bsb = BSByteStream::create(bsbinput, 50);
+//	 GP<ByteStream> bsbinput = giff.get_bytestream();
+	 GP<ByteStream> bsb = BSByteStream::create(giff->get_bytestream(), 50);
 	 ant->encode(*bsb);
       }
       iff.close_chunk();

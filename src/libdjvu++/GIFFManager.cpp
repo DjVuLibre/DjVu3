@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GIFFManager.cpp,v 1.21 2001-04-12 17:05:32 fcrary Exp $
+// $Id: GIFFManager.cpp,v 1.22 2001-07-03 17:02:32 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -133,7 +133,7 @@ GIFFChunk::save(IFFByteStream & istr, bool use_trick)
   } else
   {
     istr.put_chunk(get_name(), use_trick);
-    istr.writall((const char *) data, data.size());
+    istr.get_bytestream()->writall((const char *) data, data.size());
     istr.close_chunk();
   }
 }
@@ -571,7 +571,7 @@ GIFFManager::load_chunk(IFFByteStream & istr, GP<GIFFChunk> chunk)
     } else
     {
       TArray<char> data(chunk_size-1);
-      istr.readall( (char*)data, data.size());
+      istr.get_bytestream()->readall( (char*)data, data.size());
       GP<GIFFChunk> ch=GIFFChunk::create(chunk_id, data);
       chunk->add_chunk(ch);
     }

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.h,v 1.56 2001-06-05 03:19:57 bcr Exp $
+// $Id: ByteStream.h,v 1.57 2001-07-03 17:02:32 bcr Exp $
 // $Name:  $
 
 #ifndef _BYTESTREAM_H
@@ -62,7 +62,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation\\
     Andrei Erofeev <eaf@geocities.com> -- 
     @version
-    #$Id: ByteStream.h,v 1.56 2001-06-05 03:19:57 bcr Exp $# */
+    #$Id: ByteStream.h,v 1.57 2001-07-03 17:02:32 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -340,7 +340,7 @@ protected:
   GP<ByteStream> gbs;
   ByteStream *bs;
   Wrapper(void) : bs(0) {}
-  Wrapper(GP<ByteStream> &xbs) : gbs(xbs), bs(xbs) {}
+  Wrapper(const GP<ByteStream> &xbs) : gbs(xbs), bs(xbs) {}
 public:
   ~Wrapper();
   ByteStream * operator & () const {return bs;}

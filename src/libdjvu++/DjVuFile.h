@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuFile.h,v 1.82 2001-06-05 03:19:58 bcr Exp $
+// $Id: DjVuFile.h,v 1.83 2001-07-03 17:02:32 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUFILE_H
@@ -71,7 +71,7 @@ class DjVuNavDir;
 
     @memo Classes representing DjVu files.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuFile.h,v 1.82 2001-06-05 03:19:58 bcr Exp $#
+    @version #$Id: DjVuFile.h,v 1.83 2001-07-03 17:02:32 bcr Exp $#
 */
 
 //@{
@@ -194,8 +194,10 @@ public:
    GP<DjVuPalette>	fgbc;
       /// Pointer to collected annotation chunks.
    GP<ByteStream>	anno;
-      /// Pointer to collected hidden text chunks.
+      /// Pointer to collected hiddentext chunks.
    GP<ByteStream>	text;
+      /// Pointer to meta data chunks.
+   GP<ByteStream>	meta;
       /// Pointer to the *old* navigation directory contained in this file
    GP<DjVuNavDir>	dir;
       /// Description of the file formed during decoding
@@ -466,6 +468,16 @@ public:
 	  only when the \Ref{is_all_data_present}() returns #TRUE#. */
    GP<ByteStream>	get_text(void);
 
+      /** Processes the meta chunks.  This function may be used even when
+          the #DjVuFile# has not been decoded yet. If all data has been
+          received for this #DjVuFile#, it will gather metadata and
+          return the result.  If no hidden text has been found, #ZERO# will
+          be returned.
+
+	  {\bf Summary:} This function will return complete meta data only
+	  when the \Ref{is_all_data_present}() returns #TRUE#. */
+   GP<ByteStream>	get_meta(void);
+
       /** Goes down the hierarchy of #DjVuFile#s and merges their annotations.
 
 	  @param max_level_ptr If this pointer is not ZERO, the function
@@ -477,23 +489,37 @@ public:
 					int * max_level_ptr);
 
       /** Clears this file of all annotations. */
-   void		remove_anno(void);
+   void	remove_anno(void);
 
       /** Clears the hidden text. */
-   void		remove_text(void);
+   void	remove_text(void);
+
+      /// Clears the meta data.
+   void remove_meta(void);
 
       /** Returns #TRUE# if the file contains annotation chunks.
 	  Known annotation chunks at the time of writing this help are:
 	  {\bf ANTa}, {\bf ANTz}, {\bf FORM:ANNO}. */
    bool		contains_anno(void);
 
-      /** Returns #TRUE# if the file contains annotation chunks.
-	  Known annotation chunks at the time of writing this help are:
+      /** Returns #TRUE# if the file contains hiddentext chunks.
+	  Known hiddentext chunks at the time of writing this help are:
 	  {\bf TXTa}, and {\bf TXTz}. */
    bool		contains_text(void);
 
-     /** Changes the value of the text annotation. */
-   void change_text(GP<DjVuTXT> txt, const bool do_reset);
+      /** Returns #TRUE# if the file contains metadata chunks.
+	  Known metadata chunks at the time of writing this help are:
+	  {\bf METa}, and {\bf METz}. */
+   bool		contains_meta(void);
+
+     /** Changes the value of the hiddentext. */
+   void change_info(GP<DjVuInfo> info, const bool do_reset=false);
+   
+     /** Changes the value of the hiddentext. */
+   void change_text(GP<DjVuTXT> txt, const bool do_reset=false);
+   
+     /** Changes the value of the metadata. */
+   void change_meta(const GUTF8String &meta, const bool do_reset=false);
    
       /** @name Encoding routines */
       //@{
@@ -533,6 +559,9 @@ public:
       // Internal. Used by DjVuImage
    void                 get_text(ByteStream &out);
 
+      // Internal. Used by DjVuImage
+   void                 get_meta(ByteStream &out);
+
       // Internal. Used by DjVuDocEditor
    void			rebuild_data_pool(void);
 
@@ -554,6 +583,7 @@ protected:
    GCriticalSection	inc_files_lock;
    GCriticalSection	anno_lock;
    GCriticalSection	text_lock;
+   GCriticalSection	meta_lock;
    ErrorRecoveryAction	recover_errors;
    bool			verbose_eof;
    int			chunks_number;
@@ -599,6 +629,8 @@ private:
      int level, int & max_level, GMap<GURL, void *> & map);
    static void	get_text(const GP<DjVuFile> & file,
      const GP<ByteStream> &str_out);
+   static void	get_meta(const GP<DjVuFile> & file,
+     const GP<ByteStream> &str_out);
 
    void          check() const;
    GP<DjVuNavDir>find_ndir(GMap<GURL, void *> & map);
@@ -613,6 +645,7 @@ private: // dummy stuff
    static void	get_merged_anno(const GP<DjVuFile> &,ByteStream *,
      const GList<GURL> &, int, int &, GMap<GURL, void *> &);
    static void	get_text(const GP<DjVuFile> &,ByteStream *);
+   static void	get_meta(const GP<DjVuFile> &,ByteStream *);
 
 };
 

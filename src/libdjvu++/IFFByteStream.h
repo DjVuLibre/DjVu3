@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: IFFByteStream.h,v 1.30 2001-04-21 00:16:58 bcr Exp $
+// $Id: IFFByteStream.h,v 1.31 2001-07-03 17:02:32 bcr Exp $
 // $Name:  $
 
 #ifndef _IFFBYTESTREAM_H_
@@ -89,7 +89,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: IFFByteStream.h,v 1.30 2001-04-21 00:16:58 bcr Exp $# */
+    #$Id: IFFByteStream.h,v 1.31 2001-07-03 17:02:32 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -143,15 +143,16 @@
     \Ref{ByteStream::copy} to transfer the IFF file into a non seekable
     ByteStream.  */
 
-class IFFByteStream : public ByteStream::Wrapper
+class IFFByteStream : protected ByteStream::Wrapper
 {
 protected: 
-  IFFByteStream(GP<ByteStream> &bs, const int pos);
+  IFFByteStream(const GP<ByteStream> &bs, const int pos);
 public:
+  friend GP<IFFByteStream>;
   /** Constructs an IFFByteStream object attached to ByteStream #bs#.
       Any ByteStream can be used when reading an IFF file.  Writing
       an IFF file however requires a seekable ByteStream. */
-  static GP<IFFByteStream> create(GP<ByteStream> bs);
+  static GP<IFFByteStream> create(const GP<ByteStream> &bs);
   // --- BYTESTREAM INTERFACE
   ~IFFByteStream();
   virtual size_t read(void *buffer, size_t size);
@@ -218,6 +219,22 @@ public:
       which should not be used.  */
   static int check_id(const char *id);
   GP<ByteStream> get_bytestream(void) {return this;}
+  /** Copy data from another ByteStream.  A maximum of #size# bytes are read
+      from the ByteStream #bsfrom# and are written to the ByteStream #*this#
+      at the current position.  Less than #size# bytes may be written if an
+      end-of-file mark is reached on #bsfrom#.  This function returns the
+      total number of bytes copied.  Setting argument #size# to zero (the
+      default value) has a special meaning: the copying process will continue
+      until reaching the end-of-file mark on ByteStream #bsfrom#, regardless
+      of the number of bytes transferred.  */
+  size_t copy(ByteStream &bsfrom, size_t size=0)
+  { return get_bytestream()->copy(bsfrom,size); }
+  /** Flushes all buffers in the ByteStream.  Calling this function
+      guarantees that pending data have been actually written (i.e. passed to
+      the operating system). Class #ByteStream# provides a default
+      implementation which does nothing. */
+  virtual void flush(void)
+  { ByteStream::Wrapper::flush(); }
   /** #has_magic# is true if the stream has the DjVu file magic.
    */
   bool has_magic;

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: csepdjvu.cpp,v 1.29 2001-06-13 18:26:19 bcr Exp $
+// $Id: csepdjvu.cpp,v 1.30 2001-07-03 17:02:31 bcr Exp $
 // $Name:  $
 
 
@@ -108,7 +108,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: csepdjvu.cpp,v 1.29 2001-06-13 18:26:19 bcr Exp $# */
+    #$Id: csepdjvu.cpp,v 1.30 2001-07-03 17:02:31 bcr Exp $# */
 //@{
 //@}
 
@@ -1144,7 +1144,7 @@ csepdjvu_page(BufferByteStream &bs, GP<ByteStream> obs, const csepdjvuopts &opts
   info.height = h;
   info.width = w;
   info.dpi = opts.dpi;
-  info.encode(iff);
+  info.encode(*iff.get_bytestream());
   iff.close_chunk();
   // -- ``Sjbz'' chunk
   iff.put_chunk("Sjbz");
