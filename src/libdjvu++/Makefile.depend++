@@ -92,12 +92,7 @@ DjVuFile.o: DjVuFile.cpp debug.h DjVuFile.h \
  GBitmap.h IWImage.h GPixmap.h \
  IFFByteStream.h DjVuPalette.h DjVuPort.h \
  GURL.h DjVuNavDir.h BSByteStream.h GOS.h \
- MMRDecoder.h JPEGDecoder.h \
- ../../src/3rd-party/libjpeg/jinclude.h \
- ../../src/3rd-party/libjpeg/jconfig.h \
- ../../src/3rd-party/libjpeg/jpeglib.h \
- ../../src/3rd-party/libjpeg/jmorecfg.h \
- ../../src/3rd-party/libjpeg/jerror.h DjVuAnno.h \
+ MMRDecoder.h JPEGDecoder.h DjVuAnno.h \
  GMapAreas.h
 DjVuGlobal.o: DjVuGlobal.cpp DjVuGlobal.h \
  ../../src/include/DjVu.h GOS.h GString.h \
@@ -229,12 +224,7 @@ JPEGDecoder.o: JPEGDecoder.cpp JPEGDecoder.h \
  DjVuGlobal.h ../../src/include/DjVu.h \
  ByteStream.h GException.h GContainer.h \
  GSmartPointer.h Arrays.h GPixmap.h \
- GRect.h GBitmap.h \
- ../../src/3rd-party/libjpeg/jinclude.h \
- ../../src/3rd-party/libjpeg/jconfig.h \
- ../../src/3rd-party/libjpeg/jpeglib.h \
- ../../src/3rd-party/libjpeg/jmorecfg.h \
- ../../src/3rd-party/libjpeg/jerror.h
+ GRect.h GBitmap.h
 MMRDecoder.o: MMRDecoder.cpp MMRDecoder.h \
  DjVuGlobal.h ../../src/include/DjVu.h \
  GSmartPointer.h ByteStream.h GException.h \
