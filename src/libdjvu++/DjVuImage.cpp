@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuImage.cpp,v 1.25 1999-09-09 20:48:33 eaf Exp $
+//C- $Id: DjVuImage.cpp,v 1.26 1999-09-14 13:06:42 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -278,17 +278,19 @@ void
 DjVuImage::notify_chunk_done(const DjVuPort *, const char * name)
 {
    if (!relayout_sent &&
-       (!strcmp(name, "INFO") ||
-	!strcmp(name, "PM44") ||
-	!strcmp(name, "BM44")))
+       (!strncmp(name, "INFO", 4) ||
+	!strncmp(name, "PMxx", 2) ||
+	!strncmp(name, "BMxx", 2)  ) )
    {
       DjVuPort::get_portcaster()->notify_relayout(this);
       relayout_sent=true;
-   } else
-      if (!strcmp(name, "Sjbz") ||
-	  !strcmp(name, "BG44") ||
-	  !strcmp(name, "BM44"))
-	 DjVuPort::get_portcaster()->notify_redisplay(this);
+   } 
+   else if (!strncmp(name, "Sxxx", 1) ||
+            !strncmp(name, "BGxx", 2) ||
+            !strncmp(name, "FGxx", 2) ||
+            !strncmp(name, "BMxx", 2) ||
+            !strncmp(name, "PMxx", 2)  )
+     DjVuPort::get_portcaster()->notify_redisplay(this);
 }
 
 //// DJVUIMAGE: OLD-STYLE DECODING
