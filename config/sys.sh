@@ -9,6 +9,7 @@ fi
 if [ -z "$SYS" ] ; then
   echon "Checking system type ... "
   SYS=`"${uname}" -s`
+  PROC=`"${uname}" -p`
   DEFS="-DUNIX"
   INCS=" "
   JOBJ=" "
@@ -24,6 +25,12 @@ if [ -z "$SYS" ] ; then
     s=`"${uname}" -r|"${sed}" 's,\(5.[4-9]\)[.0-9]*,SOLARIS,'`
     if [ "x$s" = xSOLARIS ] ; then
       SYS=Solaris
+      if [ x$PROC = xi386 ]
+      then
+	SYS=Solaris-i386
+      elif [ x$PROC = xsparc ]
+	SYS=Solaris-sparc
+      fi
     fi
     DEFS="$DEFS -DNEED_DJVU_MEMORY"
   fi
