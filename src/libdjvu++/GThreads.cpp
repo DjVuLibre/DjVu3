@@ -9,10 +9,10 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GThreads.cpp,v 1.33 1999-10-16 15:26:13 leonb Exp $
+//C- $Id: GThreads.cpp,v 1.34 1999-10-19 13:52:24 leonb Exp $
 
 
-// **** File "$Id: GThreads.cpp,v 1.33 1999-10-16 15:26:13 leonb Exp $"
+// **** File "$Id: GThreads.cpp,v 1.34 1999-10-19 13:52:24 leonb Exp $"
 // This file defines machine independent classes
 // for running and synchronizing threads.
 // - Author: Leon Bottou, 01/1998
@@ -277,7 +277,7 @@ GThread::~GThread(void)
 {
 }
 
-pascal void
+pascal void *
 start(void *arg)
 {
   GThread *gt = (GThread*)arg;
