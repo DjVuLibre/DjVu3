@@ -8,7 +8,7 @@
 # C- AT&T, you have an infringing copy of this software and cannot use it
 # C- without violating AT&T's intellectual property rights.
 # C-
-# C- $Id: Makefile.in,v 1.64 1999-11-12 16:45:55 bcr Exp $
+# C- $Id: Makefile.in,v 1.65 1999-11-18 01:41:14 bcr Exp $
 
 SHELL=/bin/sh
 prefix=@%prefix%@
@@ -40,7 +40,7 @@ VER= 2.3
 
 # This 
 LIB= libdjvu++.a
-PROG= djvudump c44 d44 djvutopnm djvumake djvuextract ppmcoco bzz djvmcvt # djvm
+PROG= djvudump c44 d44 djvutopnm djvumake djvuextract ppmcoco bzz djvmcvt djvureindex # djvm
 
 # Makefile for libdjvu++.a
 
@@ -83,6 +83,7 @@ BREAKDEJAVUOBJS = djvuextract.o
 PPMCOCOOBJS = ppmcoco.o
 ANNOTATEOBJS = annotate.o
 BZZOBJS = bzz.o
+DJVUREINDEXOBJS = djvureindex.o
 
 djvmcvt: $(DJVMCVTOBJS) $(LIB)
 	if [ -n "$(RPO)" ] ; then $(RPO) $(DJVMCVTOBJS) $(LIB) ; fi
@@ -103,6 +104,10 @@ d44: $(D44OBJS) $(LIB)
 djvudump: $(DJVUDUMPOBJS) $(LIB) 
 	if [ -n "$(RPO)" ] ; then $(RPO) $(DJVUDUMPOBJS) $(LIB)  ; fi
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(DJVUDUMPOBJS) $(LIB) $(LIBS)
+
+djvureindex: $(DJVUREINDEXOBJS) $(LIB) 
+	if [ -n "$(RPO)" ] ; then $(RPO) $(DJVUREINDEXOBJS) $(LIB)  ; fi
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(DJVUREINDEXOBJS) $(LIB) $(LIBS)
 
 djvutopnm: $(DJVUTOPNMOBJS) $(LIB)
 	if [ -n "$(RPO)" ] ; then $(RPO) $(DJVUTOPNMOBJS) $(LIB) ; fi
