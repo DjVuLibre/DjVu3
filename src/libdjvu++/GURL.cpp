@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GURL.cpp,v 1.31 2000-01-28 17:18:34 eaf Exp $
+//C- $Id: GURL.cpp,v 1.32 2000-02-02 21:08:31 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -43,32 +43,66 @@ GURL::convert_slashes(void)
       if (url[i]=='\\') url.setat(i, '/');
 }
 
+static void
+collapse(char * string, int chars)
+      // Will remove the first 'chars' chars from the string and
+      // move the rest toward the beginning. Will take into account
+      // string length
+{
+   int length=strlen(string);
+   if (chars>length) chars=length;
+   for(int i=0;;i++)
+      if (!(string[i]=string[i+chars])) break;
+}
+
 void
-GURL::eat_dots(void)
+GURL::beautify_path(void)
 {
    GCriticalSectionLock lock(&class_lock);
-      // Eats parts like ./ or ../
+   
+      // Eats parts like ./ or ../ or ///
    char * buffer=new char[url.length()+1];
    strcpy(buffer, url);
+   
    TRY {
       GString proto=protocol();
-      char * ptr, * last_slash=(char *) ((const char *) url+proto.length()+1);
-      for(ptr=last_slash;*ptr && *ptr!='/';ptr++);
-      while(*ptr)
-      {
-	 while(*ptr && *ptr=='/') { last_slash=ptr; ptr++; };
-	 if (*ptr)
+      
+	 // Find start point
+      char * start=buffer+proto.length()+1;
+      while(*start && *start=='/') start++;
+
+	 // Find end of the url (don't touch arguments)
+      char * ptr;
+      GString args;
+      for(ptr=start;*ptr;ptr++)
+	 if (is_argument(ptr))
 	 {
-	       // ptr[-1]=='/' here
-	    if (ptr[0]=='.' && ptr[1]=='/') strcpy(ptr, ptr+2);
-	    else if (ptr[0]=='.' && ptr[1]=='.' && ptr[2]=='/')
-	    {
-	       strcpy(last_slash+1, ptr+3);
-	       ptr=last_slash+1;
-	    } else while(*ptr && *ptr!='/') ptr++;
+	    args=ptr;
+	    *ptr=0;
 	 }
-      }
+
+	 // Eat multiple slashes
+      while((ptr=strstr(start, "////")))
+	 collapse(ptr, 3);
+      while((ptr=strstr(start, "//")))
+	 collapse(ptr, 1);
+      
+	 // Convert /./ stuff into plain /
+      while((ptr=strstr(start, "/./")))
+	 collapse(ptr, 2);
+
+	 // Process /../
+      while((ptr=strstr(start, "/../")))
+	 for(char * ptr1=ptr-1;ptr1>=start;ptr1--)
+	    if (*ptr1=='/')
+	    {
+	       collapse(ptr1, ptr-ptr1+3);
+	       break;
+	    }
+
+	 // Done. Copy the buffer back into the URL and add arguments.
       url=buffer;
+      url+=args;
       delete buffer; buffer=0;
    } CATCH(exc) {
       delete buffer;
@@ -79,6 +113,8 @@ GURL::eat_dots(void)
 void
 GURL::init(void)
 {
+   GCriticalSectionLock lock(&class_lock);
+   
    if (url.length())
    {
       GString proto=protocol();
@@ -99,9 +135,9 @@ GURL::init(void)
 	 url.setat(ptr-url, 0);
 
 	    // Do double conversion
-	 url=GOS::url_to_filename(url);
-	 if (!url.length()) THROW("Failed to convert URL to filename.");
-	 url=GOS::filename_to_url(url);
+	 GString tmp=GOS::url_to_filename(url);
+	 if (!tmp.length()) THROW("Failed to convert URL to filename.");
+	 url=GOS::filename_to_url(tmp);
 	 if (!url.length()) THROW("Failed to convert filename back to URL.");
 
 	    // Return the argument back
@@ -109,7 +145,7 @@ GURL::init(void)
       }
 
       convert_slashes();
-      eat_dots();
+      beautify_path();
       parse_cgi_args();
    }
 }
@@ -405,14 +441,8 @@ GURL::djvu_cgi_values(void) const
 void
 GURL::clear_all_arguments(void)
 {
-   GCriticalSectionLock lock(&class_lock);
-   for(const char * start=url;*start;start++)
-      if (is_argument(start))
-      {
-	 url.setat(start-url, 0);
-	 break;
-      }
-   parse_cgi_args();
+   clear_hash_argument();
+   clear_cgi_arguments();
 }
 
 void
@@ -438,7 +468,6 @@ GURL::clear_hash_argument(void)
       if (!found) new_url+=*start;
    }
    url=new_url;
-   parse_cgi_args();
 }
 
 void
