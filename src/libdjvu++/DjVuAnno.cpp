@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuAnno.cpp,v 1.36 1999-10-28 14:43:51 eaf Exp $
+//C- $Id: DjVuAnno.cpp,v 1.37 1999-10-28 17:20:22 eaf Exp $
 
 
 #ifdef __GNUC__
@@ -1213,11 +1213,44 @@ chars_equal(char ch1, char ch2, bool match_case)
 }
 
 GList<DjVuTXT::Zone *>
+DjVuTXT::find_zones(int string_start, int string_length) const
+      // For the string starting at string_start of length string_length
+      // the function will generate a list of smallest zones of the
+      // same type and will return it
+{
+   GList<Zone *> zone_list;
+   int zone_type=CHARACTER;
+   while(zone_type>=PAGE)
+   {
+      int start=string_start;
+      int length=string_length;
+
+      while(true)
+      {
+	 Zone * zone=get_smallest_zone(zone_type, start, length);
+	 if (zone && zone_type==zone->ztype)
+	 {
+	    zone_list.append(zone);
+	    start+=length;
+	    length=string_start+string_length-start;
+	    if (length==0) break;
+	 } else
+	 {
+	    zone_type--;
+	    zone_list.empty();
+	    break;
+	 }
+      }
+      if (zone_list.size()) break;
+   }
+   return zone_list;
+}
+   
+GList<DjVuTXT::Zone *>
 DjVuTXT::search_string(const char * string, int & from,
 		       bool search_fwd, bool match_case) const
 {
-   GList<Zone *> zone_list;
-   int string_length = strlen(string);
+   int string_length=strlen(string);
    bool found=false;
 	
    if (string_length==0 || textUTF8.length()==0 ||
@@ -1225,7 +1258,7 @@ DjVuTXT::search_string(const char * string, int & from,
    {
       if (search_fwd) from=textUTF8.length();
       else from=-1;
-      return zone_list;
+      return GList<Zone *>();
    }
 
    if (search_fwd)
@@ -1263,36 +1296,8 @@ DjVuTXT::search_string(const char * string, int & from,
       }
    }
 
-   if (found)
-   {
-      int string_start=from;
-
-      int zone_type=CHARACTER;
-      while(zone_type>=PAGE)
-      {
-	 int start=string_start;
-	 int length=string_length;
-
-	 zone_list.empty();
-	 while(1)
-	 {
-	    Zone * zone=get_smallest_zone(zone_type, start, length);
-	    if (zone && zone_type==zone->ztype)
-	    {
-	       zone_list.append(zone);
-	       start+=length;
-	       length=string_start+string_length-start;
-	       if (length==0) return zone_list;
-	    } else
-	    {
-	       zone_type--;
-	       zone_list.empty();
-	       break;
-	    }
-	 }
-      }
-   }
-   return zone_list;
+   if (found) return find_zones(from, string_length);
+   else return GList<Zone *>();
 }
 
 unsigned int 
