@@ -86,8 +86,9 @@ rm -rf "$packagedir"
 mkdir packages 2>>/dev/null
 mkdir "$packagedir" 2>>/dev/null
 abspackagedir=`cd "$packagedir" 1>>/dev/null 2>>/dev/null;pwd`
-for i in `cd $srcdir 2>>/dev/null 1>>/dev/null;echo *` 
+for i in `cd $srcdir 2>>/dev/null 1>>/dev/null;ls|sed -e 's,%,@%%@,g' -e 's, ,@%s%@,g'` 
 do
+  i=`echo "$i"|sed -e 's,@%s%@, ,g' -e 's,@%%@,%,g'`
   j="$srcdir/$i"
   if [ ! -d "$j" ]
   then
@@ -109,11 +110,13 @@ archive=`cd "$packagedir" 1>>/dev/null 2>>/dev/null;pwd`/archive.tar
     cd ./SRCDIR
   fi
   action="cvf"
-  for i in `sed "s,@%VERSION%@,$version,g"< "$srcfilelist"` 
+  for i in `sed -e "s,@%VERSION%@,$version,g" -e 's,%,@%%@,g' -e 's, ,@%s%@,g' < "$srcfilelist"` 
   do
+    i=`echo "$i"|sed -e 's,@%s%@, ,g' -e 's,@%%@,%,g'`
     if [ -d "./$i" ]
     then
-      for j in `find "$i" -name CVS -prune -o -type f -print` ; do
+      for j in `find "$i" -name CVS -prune -o -type f -print|sed -e 's,%,@%%@,g' -e 's, ,@%s%@,g'` ; do
+        j=`echo "$j"|sed -e 's,@%s%@, ,g' -e 's,@%%@,%,g'`
         tar "$action" "$archive" "$j"
         action=rvf
       done
@@ -121,7 +124,8 @@ archive=`cd "$packagedir" 1>>/dev/null 2>>/dev/null;pwd`/archive.tar
     then
       (
         cd ./SRCDIR;
-        for j in `find "$i" -name CVS -prune -o -type f -print` ; do
+        for j in `find "$i" -name CVS -prune -o -type f -print|sed -e 's,%,@%%@,g' -e 's, ,@%s%@,g'` ; do
+          j=`echo "$j"|sed -e 's,@%s%@, ,g' -e 's,@%%@,%,g'`
           tar "$action" "$archive" "$j"
           action=rvf
         done
