@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djvm.cpp,v 1.11 2001-04-06 18:38:31 chrisp Exp $
+// $Id: djvm.cpp,v 1.12 2001-04-09 20:22:33 bcr Exp $
 // $Name:  $
 
 /** @name djvm
@@ -99,7 +99,7 @@
     @author
     Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: djvm.cpp,v 1.11 2001-04-06 18:38:31 chrisp Exp $# */
+    #$Id: djvm.cpp,v 1.12 2001-04-09 20:22:33 bcr Exp $# */
 //@{
 //@}
 
@@ -160,8 +160,7 @@ create(DArray<GString> &argv)
    if (argc<4) { usage(); exit(1); }
 
       // Initialize the DjVuDocEditor class
-   const GURL::Filename::UTF8 url(argv[2]);
-   GP<DjVuDocEditor> doc=DjVuDocEditor::create_wait(url);
+   GP<DjVuDocEditor> doc=DjVuDocEditor::create_wait();
 
       // Insert pages
    GList<GURL> list;
@@ -169,6 +168,7 @@ create(DArray<GString> &argv)
       list.append(GURL::Filename::UTF8(argv[i]));
    doc->insert_group(list);
 
+   const GURL::Filename::UTF8 url(argv[2]);
       // Save in BUNDLED format
    doc->save_as(url, true);
 }
