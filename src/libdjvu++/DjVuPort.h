@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuPort.h,v 1.15 1999-09-10 22:47:53 eaf Exp $
+//C- $Id: DjVuPort.h,v 1.16 1999-09-12 19:11:52 eaf Exp $
  
 #ifndef _DJVUPORT_H
 #define _DJVUPORT_H
@@ -71,7 +71,7 @@
     @memo DjVu decoder communication mechanism.
     @author Andrei Erofeev <eaf@geocities.com>\\
             L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuPort.h,v 1.15 1999-09-10 22:47:53 eaf Exp $# */
+    @version #$Id: DjVuPort.h,v 1.16 1999-09-12 19:11:52 eaf Exp $# */
 //@{
 
 class DjVuPort;
@@ -188,7 +188,7 @@ public:
 
       /** This notification is sent after the \Ref{DjVuDocument} flags have
 	  been changed. This happens, for example, after it receives enough
-	  data and can determine its structure (#BUNDLED#, #INDEXED#, etc.).
+	  data and can determine its structure (#BUNDLED#, #OLD_INDEXED#, etc.).
 
 	  @param source \Ref{DjVuDocument}, which flags have been changed
 	  @param set_mask bits, which have been set

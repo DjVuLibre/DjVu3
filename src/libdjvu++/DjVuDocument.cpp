@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.33 1999-09-10 22:47:53 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.34 1999-09-12 19:11:52 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -160,8 +160,8 @@ DjVuDocument::detect_doc_type(const GURL & doc_url)
    } else // chkid!="FORM:DJVM"
    {
 	 // DJVU format
-      DEBUG_MSG("Got DJVU INDEXED document here.\n");
-      doc_type=INDEXED;
+      DEBUG_MSG("Got DJVU OLD_INDEXED document here.\n");
+      doc_type=OLD_INDEXED;
 
 	 // Create dummy DjVuNavDir and insert this page into it
       ndir=new DjVuNavDir(init_url.base()+"directory");
@@ -176,7 +176,7 @@ DjVuDocument::decode_doc_structure(void)
    DEBUG_MAKE_INDENT(3);
 
    if (get_doc_type()==OLD_BUNDLED ||
-       get_doc_type()==INDEXED)
+       get_doc_type()==OLD_INDEXED)
       if (!ndir || dummy_ndir)
 	 decode_ndir();
 }
@@ -254,7 +254,7 @@ DjVuDocument::page_to_url(int page_num)
    switch(doc_type)
    {
       case OLD_BUNDLED:
-      case INDEXED:
+      case OLD_INDEXED:
       {
 	 url=ndir->page_to_url(page_num);
 	 break;
@@ -283,7 +283,7 @@ DjVuDocument::url_to_page(const GURL & url)
    switch(doc_type)
    {
       case OLD_BUNDLED:
-      case INDEXED:
+      case OLD_INDEXED:
       {
 	 page_num=ndir->url_to_page(url);
 	 break;
@@ -360,7 +360,7 @@ DjVuDocument::id_to_url(const char * id)
 	 break;
       case OLD_BUNDLED:
 	 return init_url+id;
-      case INDEXED:
+      case OLD_INDEXED:
 	 return init_url.base()+id;
    }
    return GURL();
@@ -442,10 +442,10 @@ DjVuDocument::request_data(const DjVuPort * source, const GURL & url)
 	 if (!file) THROW("File '"+url.name()+"' is not in this bundle.");
 	 return new DataPool(init_data_pool, file->offset, file->size);
       }
-      case INDEXED:
+      case OLD_INDEXED:
       case INDIRECT:
       {
-	 DEBUG_MSG("The document is in INDEXED or INDIRECT format\n");
+	 DEBUG_MSG("The document is in OLD_INDEXED or INDIRECT format\n");
 	 if (url.base()!=init_url.base())
 	    THROW("URL '"+url+"' points outside of the document's directory.");
 	 if (doc_type==INDIRECT && !djvm_dir->name_to_file(url.name()))
@@ -475,7 +475,7 @@ DjVuDocument::request_data(const DjVuPort * source, const GURL & url)
 void
 DjVuDocument::notify_chunk_done(const DjVuPort * source, const char * name)
 {
-   if (doc_type==OLD_BUNDLED || doc_type==INDEXED)
+   if (doc_type==OLD_BUNDLED || doc_type==OLD_INDEXED)
       if (!strcmp(name, "NDIR") && (!ndir || dummy_ndir))
 	 if (source->inherits("DjVuFile"))
 	 {
@@ -494,7 +494,7 @@ DjVuDocument::notify_file_flags_changed(const DjVuFile * source,
 					long set_mask, long clr_mask)
 {
    if (set_mask & DjVuFile::ALL_DATA_PRESENT)
-      if (doc_type==OLD_BUNDLED || doc_type==INDEXED)
+      if (doc_type==OLD_BUNDLED || doc_type==OLD_INDEXED)
 	 if (!ndir || dummy_ndir)
 	 {
 	    DEBUG_MSG("DjVuDocument::notify_file_flags_changed(): ALL_DATA_PRESENT: updating nav. dir.\n");

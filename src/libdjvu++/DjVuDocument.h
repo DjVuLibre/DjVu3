@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.h,v 1.20 1999-09-10 22:47:53 eaf Exp $
+//C- $Id: DjVuDocument.h,v 1.21 1999-09-12 19:11:52 eaf Exp $
  
 #ifndef _DJVUDOCUMENT_H
 #define _DJVUDOCUMENT_H
@@ -33,7 +33,7 @@
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocument.h,v 1.20 1999-09-10 22:47:53 eaf Exp $#
+    @version #$Id: DjVuDocument.h,v 1.21 1999-09-12 19:11:52 eaf Exp $#
 */
 
 //@{
@@ -104,20 +104,21 @@
 class DjVuDocument : public DjVuPort
 {
 public:
+   enum DOC_FLAGS { STRUCTURE_KNOWN=1 };
       /** There are 4 DjVu multipage formats, which are currently recognized
 	  by the plugin and other decoding programs. These constants are
 	  returned by \Ref{get_doc_type}() and should help to identify format
 	  of a given document.
 	  \begin{enumerate}
 	     \item #OLD_BUNDLED# - Obsolete bundled format
-	     \item #INDEXED# - Obsolete multipage format where every page
+	     \item #OLD_INDEXED# - Obsolete multipage format where every page
 	           is stored in a separate file and "includes" (by means
 		   of an #INCL# chunk) the file with the document directory.
 	     \item #BUNDLED# - Currently supported bundled format
 	     \item #INDIRECT# - Currently supported "expanded" format, where
 	           every page and component is stored in a separate file.
           \end{enumerate} */
-   enum DOC_TYPE { OLD_BUNDLED=1, INDEXED, BUNDLED, INDIRECT };
+   enum DOC_TYPE { OLD_BUNDLED=1, OLD_INDEXED, BUNDLED, INDIRECT };
    
    DjVuDocument(void);
    virtual ~DjVuDocument(void);
@@ -169,7 +170,7 @@ public:
                      DjVuFileCache * cache=0);
 
       /** Returns type of the document: #DjVuDocument::OLD_BUNDLED# or
-	  #DjVuDocument::INDEXED# or #DjVuDocument:BUNDLED# or
+	  #DjVuDocument::OLD_INDEXED# or #DjVuDocument:BUNDLED# or
 	  #DjVuDocument::INDIRECT#. The first two formats are obsolete. */
    int		get_doc_type(void) const;
 
