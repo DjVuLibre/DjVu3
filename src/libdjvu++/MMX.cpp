@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: MMX.cpp,v 1.6 1999-11-10 18:35:17 leonb Exp $
+//C- $Id: MMX.cpp,v 1.7 2000-02-09 22:22:58 leonb Exp $
 
 
 
@@ -79,7 +79,8 @@ MMXControl::enable_mmx()
   int cpuflags = 0;
 #if defined(MMX) && defined(__GNUC__) && defined(__i386__)
   // Detection of MMX for GCC
-  __asm__ volatile ("pushfl\n\t"    
+  __asm__ volatile ("pushl %%ebx\n\t"
+                    "pushfl\n\t"    
                     "popl %%ecx\n\t"
                     "xorl %%edx,%%edx\n\t"
                     // Check that CPUID exists
@@ -100,7 +101,9 @@ MMXControl::enable_mmx()
                     // Execute CPUID
                     "movl $1,%%eax\n\t"
                     "cpuid\n"
-                    "1:\tmovl %%edx, %0"
+                    "1:\tmovl %%edx, %0\n\t"
+                    // EBX contains magic when -fPIC is on.
+                    "popl %%ebx"
                     : "=m" (cpuflags) :
                     : "eax","ebx","ecx","edx");
 #endif
