@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GURL.cpp,v 1.87 2001-07-25 23:42:20 fcrary Exp $
+// $Id: GURL.cpp,v 1.88 2001-07-31 21:16:47 lchen Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -240,7 +240,13 @@ GURL::beautify_path(GUTF8String xurl)
 #ifdef WIN32
   if(!xurl.cmp(filespec,sizeof(filespec)-1))
   {
-    for(ptr=start+1;(ptr=strchr(ptr, '/'));)
+	int offset=1;
+	if(start&&(start[0] == '/')&& !xurl.cmp("file:////",sizeof("file:////")-1))
+	{
+	  collapse(start, 1);
+	  offset=0;
+	}
+    for(ptr=start+offset;(ptr=strchr(ptr, '/'));)
 	{
 	  if(isalpha((++ptr)[0]))
 	  {
