@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: Arrays.h,v 1.6 1999-08-18 15:03:56 eaf Exp $
+//C- $Id: Arrays.h,v 1.7 1999-08-18 20:47:40 leonb Exp $
 
 
 #ifndef _ARRAYS_H_
@@ -22,7 +22,7 @@
 #include "GSmartPointer.h"
 
 
-#if defined(EXTERNAL_TEMPLATES) && defined(__GNUC__)
+#ifdef __GNUC__
 #pragma interface
 #endif
 
@@ -72,7 +72,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@research.att.com> -- Copy-on-demand implementation.
     @version 
-    #$Id: Arrays.h,v 1.6 1999-08-18 15:03:56 eaf Exp $# */
+    #$Id: Arrays.h,v 1.7 1999-08-18 20:47:40 leonb Exp $# */
 //@{
 
 // Auxiliary classes: Will be used in place of GPBase and GPEnabled objects

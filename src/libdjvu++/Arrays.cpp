@@ -9,14 +9,12 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: Arrays.cpp,v 1.4 1999-06-08 20:36:24 leonb Exp $
+//C- $Id: Arrays.cpp,v 1.5 1999-08-18 20:47:40 leonb Exp $
 
 
-/* Put this into *one* file, which instantiates all the required containers
 #ifdef __GNUC__
 #pragma implementation
 #endif
-*/
 
 #include "Arrays.h"
 
