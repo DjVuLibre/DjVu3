@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: GRect.h,v 1.2 1999-01-22 21:18:06 leonb Exp $
+//C-  $Id: GRect.h,v 1.3 1999-01-22 22:09:35 leonb Exp $
 
 
 #ifndef _GRECT_H_
@@ -28,7 +28,7 @@
     @author
     Leon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GRect.h,v 1.2 1999-01-22 21:18:06 leonb Exp $# */
+    #$Id: GRect.h,v 1.3 1999-01-22 22:09:35 leonb Exp $# */
 //@{
 
 #include "DjVuGlobal.h"
@@ -161,6 +161,8 @@ private:
   int   code;
   // Helper
   void  precalc();
+  friend int operator*(int, GRatio);
+  friend int operator/(int, GRatio);
   GRatio rw;
   GRatio rh;
 };
