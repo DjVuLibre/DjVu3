@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVmDir.h,v 1.13 1999-12-03 23:36:00 eaf Exp $
+//C- $Id: DjVmDir.h,v 1.14 2000-01-19 23:34:28 leonb Exp $
 
 #ifndef _DJVMDIR_H
 #define _DJVMDIR_H
@@ -22,7 +22,7 @@
     @memo Implements DjVu multipage document directory
     @author Andrei Erofeev <eaf@research.att.com>
     @version
-    #$Id: DjVmDir.h,v 1.13 1999-12-03 23:36:00 eaf Exp $# */
+    #$Id: DjVmDir.h,v 1.14 2000-01-19 23:34:28 leonb Exp $# */
 //@{
 
 
@@ -81,7 +81,7 @@ public:
 	 // This is to avoid problems with the File constructor, which now takes
 	 // 'int file_type' as the last argument instead of 'bool is_page'
    
-	 /** Describes the type of the file, which may be:
+	 /** File type. Possible file types are:
 	     \begin{description}
 	     \item[PAGE] This is a top level page file. It may include other
 	     #INCLUDE#d files, which may in turn be shared between
