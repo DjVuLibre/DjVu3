@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuPalette.cpp,v 1.2 1999-11-10 22:21:34 leonb Exp $
+//C- $Id: DjVuPalette.cpp,v 1.3 1999-11-10 22:40:15 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -340,15 +340,18 @@ DjVuPalette::compute_palette_and_quantize(GPixmap &pm, int maxcolors, int minbox
 
 // -------- ENCODE AND DECODE
 
+#define DJVUPALETTEVERSION 0
 
 void 
 DjVuPalette::encode(ByteStream &bs) const
 {
+  int palettesize = palette.size();
+  int datasize = colordata.size();
   // Code version number
-  const int version = 0;
+  int version = DJVUPALETTEVERSION;
+  if (datasize>0) version |= 0x80;
   bs.write8(version);
   // Code palette
-  int palettesize = palette.size();
   bs.write16(palette.size());
   for (int c=0; c<palettesize; c++)
     {
@@ -359,11 +362,13 @@ DjVuPalette::encode(ByteStream &bs) const
       bs.writall((const void*)p, 3);
     }
   // Code colordata
-  int datasize = colordata.size();
-  bs.write24(datasize);
-  BSByteStream bsb(bs,20);
-  for (int d=0; d<datasize; d++)
-    bsb.write16(colordata[d]);
+  if (datasize > 0)
+    {
+      bs.write24(datasize);
+      BSByteStream bsb(bs, 50);
+      for (int d=0; d<datasize; d++)
+        bsb.write16(colordata[d]);
+    }
 }
 
 void 
@@ -376,11 +381,11 @@ DjVuPalette::decode(ByteStream &bs)
     delete [] pcube;
   hcube = 0;
   pcube = 0;
-  // Get version
+  // Code version
   int version = bs.read8();
-  if (version != 0)
-    THROW("Unrecognized version in color data chunk");
-  // Get palette
+  if ( (version & 0x7f) != DJVUPALETTEVERSION)
+    THROW("Unrecognized version tag in palette data");
+  // Code palette
   int palettesize = bs.read16();
   if (palettesize<0 || palettesize>MAXPALETTESIZE)
     THROW("Corrupted foreground color palette");
@@ -394,18 +399,21 @@ DjVuPalette::decode(ByteStream &bs)
       palette[c].p[2] = p[2];
       palette[c].p[3] = (p[0]*BMUL+p[1]*GMUL+p[2]*RMUL)/SMUL;
     }
-  // Get data
-  int datasize = bs.read24();
-  if (datasize<0)
-    THROW("Corrupted foreground color data");
-  colordata.resize(0,datasize-1);
-  BSByteStream bsb(bs);
-  for (int d=0; d<datasize; d++)
+  // Code data
+  if (version & 0x80)
     {
-      short s = bsb.read16();
-      if (s<0 || s>=palettesize)
-        THROW("Corrupted foreground color data");        
-      colordata[d] = s;
+      int datasize = bs.read24();
+      if (datasize<0)
+        THROW("Corrupted foreground color data");
+      colordata.resize(0,datasize-1);
+      BSByteStream bsb(bs);
+      for (int d=0; d<datasize; d++)
+        {
+          short s = bsb.read16();
+          if (s<0 || s>=palettesize)
+            THROW("Corrupted foreground color data");        
+          colordata[d] = s;
+        }
     }
 }
 
