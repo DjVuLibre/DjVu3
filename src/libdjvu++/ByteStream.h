@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.h,v 1.37 2001-02-12 21:23:35 bcr Exp $
+// $Id: ByteStream.h,v 1.38 2001-02-12 22:31:52 bcr Exp $
 // $Name:  $
 
 #ifndef _BYTESTREAM_H
@@ -62,7 +62,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation\\
     Andrei Erofeev <eaf@geocities.com> -- 
     @version
-    #$Id: ByteStream.h,v 1.37 2001-02-12 21:23:35 bcr Exp $# */
+    #$Id: ByteStream.h,v 1.38 2001-02-12 22:31:52 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -85,7 +85,8 @@
     as private members. It is therefore not possible to make multiple copies
     of instances of this class, as implied by the class semantic.  
 */
-class ByteStream : public GPEnabled {
+class ByteStream : public GPEnabled
+{
 public:
   class Stdio;
   class Static;

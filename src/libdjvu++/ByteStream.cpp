@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.cpp,v 1.47 2001-02-12 21:23:35 bcr Exp $
+// $Id: ByteStream.cpp,v 1.48 2001-02-12 22:31:52 bcr Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 04/1997
@@ -71,24 +71,24 @@ public:
       will flush and close the associated stdio file.  Exception
       \Ref{GException} is thrown with a plain text error message if the stdio
       file cannot be opened. */
-  void init(const char filename[], const char * const mode);
+  GString init(const char filename[], const char * const mode);
   /** Constructs a ByteStream for accessing the stdio file #f#.
       Argument #mode# indicates the type of the stdio file, as in the
       well known stdio function #fopen#.  Destroying the ByteStream
       object will not close the stdio file #f# unless closeme is true. */
-  void init(FILE * const f, const char * const mode="rb", const bool closeme=false);
+  GString init(FILE * const f, const char * const mode="rb", const bool closeme=false);
   // Virtual functions
   ~Stdio();
   virtual size_t read(void *buffer, size_t size);
   virtual size_t write(const void *buffer, size_t size);
   virtual void flush(void);
   virtual int seek(long offset, int whence = SEEK_SET, bool nothrow=false);
-  virtual long tell() const;
+  virtual long tell(void) const;
 private:
   // Cancel C++ default stuff
   Stdio(const Stdio &);
   Stdio & operator=(const Stdio &);
-  void init(const char mode[]);
+  GString init(const char mode[]);
 private:
   // Implementation
   bool can_read;
@@ -99,12 +99,12 @@ protected:
   long pos;
 };
 
-inline void
+inline GString
 ByteStream::Stdio::init(FILE * const f,const char mode[],const bool closeme)
 {
   fp=f;
   must_close=closeme;
-  init(mode);
+  return init(mode);
 }
 
 
@@ -124,7 +124,7 @@ public:
   /** Constructs a Memory by copying initial data.  The
       Memory buffer is initialized with #size# bytes copied from the
       memory area pointed to by #buffer#. */
-  void init(const void * const buffer, const size_t size);
+  GString init(const void * const buffer, const size_t size);
   // Virtual functions
   ~Memory();
   virtual size_t read(void *buffer, size_t size);
@@ -226,8 +226,8 @@ public:
   MemoryMapByteStream(void);
   virtual ~MemoryMapByteStream();  
 private:
-  void init(const int fd, const bool closeme);
-  void init(FILE *const f,const bool closeme);
+  GString init(const int fd, const bool closeme);
+  GString init(FILE *const f,const bool closeme);
   friend ByteStream;
 };
 #endif
@@ -468,58 +468,60 @@ ByteStream::Stdio::~Stdio()
     fclose(fp);
 }
 
-void
+GString
 ByteStream::Stdio::init(const char mode[])
-{ 
-  G_TRY
+{
+  char const *mesg=0; 
+  for (const char *s=mode; s && *s; s++)
   {
-    for (const char *s=mode; s && *s; s++)
+    switch(*s) 
     {
-      switch(*s) 
-      {
-        case 'r':
-          can_read=true;
-        case 'w': 
-        case 'a':
-          can_write=true;
-          break;
-        case '+':
-          can_read=can_write=true;
-          break;
-        case 'b':
-          break;
-        default:
-          G_THROW("ByteStream.bad_mode"); //  Illegal mode in Stdio
-      }
+      case 'r':
+        can_read=true;
+      case 'w': 
+      case 'a':
+        can_write=true;
+        break;
+      case '+':
+        can_read=can_write=true;
+        break;
+      case 'b':
+        break;
+      default:
+        mesg="ByteStream.bad_mode"; //  Illegal mode in Stdio
     }
+  }
+  GString retval;
+  if(!mesg)
+  {
     tell();
-  }
-  G_CATCH_ALL
+  }else
   {
-    if(fp && must_close)
-    {
-      fclose(fp);
-      fp=0;
-      must_close=false;
-    }
-    G_RETHROW;
+    retval=mesg;
   }
-  G_ENDCATCH;
+  if(mesg &&(fp && must_close))
+  {
+    fclose(fp);
+    fp=0;
+    must_close=false;
+  }
+  return retval;
 }
 
-void
+GString
 ByteStream::Stdio::init(const char filename[], const char mode[])
 {
+  GString retval;
   if (filename[0] != '-' || filename[1])
   {
     fp = fopen(GOS::expand_name(filename), mode);
     if (!fp)
     {
 #ifndef UNDER_CE
-      G_THROW(GString("ByteStream.open_fail\t")+filename+strerror(errno));
+      retval=GString("ByteStream.open_fail\t")+filename+strerror(errno);
          //  Failed to open '%s': %s
 #else
-      G_THROW("ByteStream.open_fail2");                  //  Stdio, failed to open file.
+      retval="ByteStream.open_fail2"; //  Stdio, failed to open file.
 #endif
     }
   }else 
@@ -544,9 +546,11 @@ ByteStream::Stdio::init(const char filename[], const char mode[])
     }
     must_close=false;
     if (!fp)
-      G_THROW("ByteStream.bad_mode2"); //  Illegal mode for stdin/stdout file descriptor
+    {
+      retval="ByteStream.bad_mode2"; // Illegal mode for stdin/stdout file descriptor
+    }
   }
-  init(mode);
+  return retval.length()?retval:init(mode);
 }
 
 size_t 
@@ -619,7 +623,7 @@ ByteStream::Stdio::flush()
 }
 
 long 
-ByteStream::Stdio::tell() const
+ByteStream::Stdio::tell(void) const
 {
   long x = ftell(fp);
   if (x >= 0)
@@ -661,11 +665,21 @@ ByteStream::Memory::Memory()
 {
 }
 
-void
+GString
 ByteStream::Memory::init(void const * const buffer, const size_t sz)
 {
-  write(buffer, sz);
-  where = 0;
+  GString retval;
+  G_TRY
+  {
+    writall(buffer, sz);
+    where = 0;
+  }
+  G_CATCH(ex) // The only error that should be thrown is out of memory...
+  {
+    retval=ex.get_cause();
+  }
+  G_ENDCATCH;
+  return retval;
 }
 
 void 
@@ -761,7 +775,7 @@ ByteStream::Memory::read(void *buffer, size_t sz)
 }
 
 long 
-ByteStream::Memory::tell() const
+ByteStream::Memory::tell(void) const
 {
   return where;
 }
@@ -846,7 +860,7 @@ ByteStream::Static::seek(long offset, int whence, bool nothrow)
 }
 
 long 
-ByteStream::Static::tell() const
+ByteStream::Static::tell(void) const
 {
   return where;
 }
@@ -878,15 +892,11 @@ ByteStream::create(const char filename[],char const * const mode)
     {
       MemoryMapByteStream *rb=new MemoryMapByteStream();
       retval=rb;
-      G_TRY
-      {
-        rb->init(fd,true);
-      }
-      G_CATCH_ALL
+      GString errmessage=rb->init(fd,true);
+      if(errmessage.length())
       {
         retval=0;
       }
-      G_ENDCATCH;
     }
   }
   if(!retval)
@@ -894,7 +904,11 @@ ByteStream::create(const char filename[],char const * const mode)
   {
     Stdio *sbs=new Stdio();
     retval=sbs;
-    sbs->init(filename,mode?mode:"rb");
+    GString errmessage=sbs->init(filename,mode?mode:"rb");
+    if(errmessage.length())
+    {
+      G_THROW(errmessage);
+    }
   }
   return retval;
 }
@@ -908,15 +922,11 @@ ByteStream::create(const int fd,char const * const mode,const bool closeme)
   {
     MemoryMapByteStream *rb=new MemoryMapByteStream();
     retval=rb;
-    G_TRY
-    {
-      rb->init(fd,closeme);
-    }
-    G_CATCH_ALL
+    GString errmessage=rb->init(fd,closeme);
+    if(errmessage.length())
     {
       retval=0;
     }
-    G_ENDCATCH;
   }
   if(!retval)
 #endif
@@ -930,7 +940,11 @@ ByteStream::create(const int fd,char const * const mode,const bool closeme)
     }
     Stdio *sbs=new Stdio();
     retval=sbs;
-    sbs->init(f,mode?mode:"rb",true);
+    GString errmessage=sbs->init(f,mode?mode:"rb",true);
+    if(errmessage.length())
+    {
+      G_THROW(errmessage);
+    }
   }
   return retval;
 }
@@ -944,23 +958,25 @@ ByteStream::create(FILE * const f,char const * const mode,const bool closeme)
   {
     MemoryMapByteStream *rb=new MemoryMapByteStream();
     retval=rb;
-    G_TRY
-    {
-      rb->init(fileno(f),false);
-      fclose(f);
-    }
-    G_CATCH_ALL
+    GString errmessage=rb->init(fileno(f),false);
+    if(errmessage.length())
     {
       retval=0;
+    }else
+    {
+      fclose(f);
     }
-    G_ENDCATCH;
   }
   if(!retval)
 #endif
   {
     Stdio *sbs=new Stdio();
     retval=sbs;
-    sbs->init(f,mode?mode:"rb",closeme);
+    GString errmessage=sbs->init(f,mode?mode:"rb",closeme);
+    if(errmessage.length())
+    {
+      G_THROW(errmessage);
+    }
   }
   return retval;
 }
@@ -976,31 +992,22 @@ MemoryMapByteStream::MemoryMapByteStream(void)
 : ByteStream::Static(0,0)
 {}
 
-void
+GString
 MemoryMapByteStream::init(FILE *const f,const bool closeme)
 {
-  if(!closeme)
+  GString retval;
+  retval=init(fileno(f),false);
+  if(closeme)
   {
-    init(fileno(f),false);
-  }else
-  {
-    G_TRY
-    {
-      init(fileno(f),false);
-      fclose(f);
-    }
-    G_CATCH_ALL
-    {
-      fclose(f);
-      G_RETHROW;
-    }
-    G_ENDCATCH;
+    fclose(f);
   }
+  return retval;
 }
 
-void
+GString
 MemoryMapByteStream::init(const int fd,const bool closeme)
 {
+  GString retval;
 #if defined(PROT_READ) && defined(MAP_SHARED)
   struct stat statbuf;
   if(!fstat(fd,&statbuf))
@@ -1016,19 +1023,16 @@ MemoryMapByteStream::init(const int fd,const bool closeme)
     {
       close(fd);
     }
-    G_THROW("ByteStream.open_fail2");
-  }
-  if(closeme)
-  {
-    close(fd);
+    retval="ByteStream.open_fail2";
   }
 #else
+  retval="ByteStream.open_fail2";
+#endif
   if(closeme)
   {
     close(fd);
   }
-  G_THROW("ByteStream.open_fail2");
-#endif
+  return retval;
 }
 
 MemoryMapByteStream::~MemoryMapByteStream()
