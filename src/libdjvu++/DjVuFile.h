@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuFile.h,v 1.75 2001-02-21 00:03:11 bcr Exp $
+// $Id: DjVuFile.h,v 1.76 2001-03-08 19:08:03 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUFILE_H
@@ -71,7 +71,7 @@ class DjVuNavDir;
 
     @memo Classes representing DjVu files.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuFile.h,v 1.75 2001-02-21 00:03:11 bcr Exp $#
+    @version #$Id: DjVuFile.h,v 1.76 2001-03-08 19:08:03 bcr Exp $#
 */
 
 //@{
@@ -502,14 +502,12 @@ public:
           #0x41,0x54,0x26,0x54#
 	  at the beginning.
 	  
-	  @param included_too Process included files too
-	  @param no_ndir Get rid of #NDIR# chunks. */
-   GP<ByteStream>	get_djvu_bytestream(bool included_too, bool no_ndir);
+	  @param included_too Process included files too. */
+   GP<ByteStream>	get_djvu_bytestream(const bool included_too, const bool no_ndir=true);
 
       /** Same as \Ref{get_djvu_bytestream}(), returning a DataPool.
-	  @param included_too Process included files too
-	  @param no_ndir Get rid of #NDIR# chunks. */
-   GP<DataPool>		get_djvu_data(bool included_too, bool no_ndir);
+	  @param included_too Process included files too. */
+   GP<DataPool>		get_djvu_data(const bool included_too, const bool no_ndir=true );
       //@}
 
       // Internal. Used by DjVuDocument
@@ -605,7 +603,7 @@ private:
    GP<DjVuNavDir>decode_ndir(GMap<GURL, void *> & map);
    void		add_djvu_data(IFFByteStream & str,
 			      GMap<GURL, void *> & map,
-			      bool included_too, bool no_ndir);
+			      const bool included_too, const bool no_ndir=true);
    void		move(GMap<GURL, void *> & map, const GURL & dir_url);
 private: // dummy stuff
    static void decode(ByteStream *);
