@@ -8,7 +8,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: MMRDecoder.cpp,v 1.7 1999-12-21 21:43:30 parag Exp $
+//C- $Id: MMRDecoder.cpp,v 1.8 1999-12-23 05:15:03 bcr Exp $
 
 
 #ifdef __GNUC__
@@ -317,7 +317,6 @@ MMRDecoder::VLSource::VLSource(ByteStream &inp)
 unsigned int
 MMRDecoder::VLSource::reset(unsigned int offset){
 	unsigned int stripsize, loc;
-	unsigned int word;
 	loc = inp.tell();
 	
 	preload();
