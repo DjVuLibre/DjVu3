@@ -42,8 +42,8 @@ do
       A_LIBS="$A_LIBS \$(TOPBUILDDIR)/src/libdjpeg/libdjpeg.a"
       ;;
     *)
-      if ( process_general_option $arg )
-      then true  
+      if process_general_option $arg
+      then true
       else
         if [ "x$arg" != "x--help" ] ; then echo 1>&2 "$conf: Unrecognized option '$arg'" ; fi
         echo 1>&2 "Usage: $conf <options>"
