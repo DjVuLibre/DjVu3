@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: GOS.cpp,v 1.37 2000-11-29 22:44:10 lchen Exp $
+// $Id: GOS.cpp,v 1.38 2000-11-30 21:31:07 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -126,12 +126,6 @@ static const char nillchar=0;
 // -----------------------------------------
 // Functions for dealing with filenames
 // -----------------------------------------
-
-
-// This code is derived from TL3 file fileio.c that I wrote a while ago.
-// I, Leon Bottou, hereby give AT&T a royalty-free non-exclusive
-// license to do whatever they want with this code.
-
 
 // is_file(filename) --
 // -- returns true if filename denotes a regular file.
