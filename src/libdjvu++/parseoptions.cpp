@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: parseoptions.cpp,v 1.12 1999-11-29 21:19:06 parag Exp $
+//C- $Id: parseoptions.cpp,v 1.13 1999-12-05 08:08:26 bcr Exp $
 #ifdef __GNUC__
 #pragma implementation
 #endif
@@ -99,7 +99,7 @@ djvu_parse_integer(struct djvu_parse opts,const char name[],const int errval)
   /* This is a wrapper for the DjVuParseOptions::ParseArguments function */
 int
 djvu_parse_arguments
-(struct djvu_parse opts,int argc,char * const argv[],const struct djvu_option lopts[])
+(struct djvu_parse opts,int argc,const char * const argv[],const struct djvu_option lopts[])
 {
   return ((DjVuParseOptions *)(opts.Private))->ParseArguments(argc,argv,lopts);
 }
@@ -451,7 +451,7 @@ DjVuParseOptions::GetInteger
 //
 int
 DjVuParseOptions::ParseArguments
-(const int argc,char * const argv[],const djvu_option opts[],const int long_only)
+(const int argc,const char * const argv[],const djvu_option opts[],const int long_only)
 {
   GetOpt args(this,argc,argv,opts,long_only);
   int i;
@@ -486,13 +486,19 @@ void DjVuParseOptions::ClearError()
   Errors=new ErrorList;
 }
 
-void DjVuParseOptions::perror()
+void DjVuParseOptions::perror(const char *mesg)
 {
   const char *s;
   while((s=Errors->GetError()))
   {
-    fputs(s,stderr);
-    putc('\n',stderr);
+    if(mesg)
+    {
+      fprintf(stderr,"%s: %s\n",mesg,s);
+    }else
+    {
+      fputs(s,stderr);
+      putc('\n',stderr);
+    }
   }
 }
 
@@ -1148,7 +1154,7 @@ ReadEscape
 DjVuParseOptions::GetOpt::GetOpt
 (DjVuParseOptions *xopt,
   const int xargc,
-  char * const xargv[],
+  const char * const xargv[],
   const djvu_option lopts[],
   const int only)
 : optind(1),

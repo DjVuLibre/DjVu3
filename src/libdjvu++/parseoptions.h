@@ -6,7 +6,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: parseoptions.h,v 1.9 1999-11-29 21:19:02 parag Exp $
+//C- $Id: parseoptions.h,v 1.10 1999-12-05 08:08:26 bcr Exp $
 
 #endif /* __cplusplus */
 
@@ -58,7 +58,7 @@
    	};
   
    	int
-    	main(int argc,char **argv,char **env)
+    	main(int argc,const char **argv,char **env)
         {
    	  char *profile,*topping,*color;
           int redo,bignumber;
@@ -181,8 +181,8 @@
    Be very careful of missing quotes...  */  
 
 /**  @memo parseoptions header file
-     @version $Id: parseoptions.h,v 1.9 1999-11-29 21:19:02 parag Exp $
-     @author: $Author: parag $ */
+     @version $Id: parseoptions.h,v 1.10 1999-12-05 08:08:26 bcr Exp $
+     @author: $Author: bcr $ */
 
 // First we include some C wrappers for our class.
 // The purpose of the DjVuParseOptions class, is to give a standard
@@ -240,7 +240,7 @@ extern "C" {
     /* This is a wrapper for the DjVuParseOptions::ParseArguments function */
   int
   djvu_parse_arguments
-  (struct djvu_parse,int,char * const [],const struct djvu_option []);
+  (struct djvu_parse,int,const char **,const struct djvu_option []);
 
     /* This is a wrapper for the DjVuParseOptions::HasError function */
   int
@@ -392,10 +392,10 @@ public:
 
   //** This simple perror() type function prints all errors to stderr, with */
   //** a GetError() loop, so the errors are cleared.                        */
-  void perror();
+  void perror(const char *mesg=0);
 
   //** This is the primary function for reading command  line arguments.  */
-  int ParseArguments(const int,char * const [],const djvu_option [],const int=0);
+  int ParseArguments(const int,const char * const [],const djvu_option [],const int=0);
 
   //** Get the name of the last configuration file corresponding to the profile */
   const char * const ConfigFilename(const char [],int);
@@ -603,7 +603,7 @@ private:
 public:
   const char *optarg;
   int getopt_long();
-  GetOpt(DjVuParseOptions *,const int,char * const[],const djvu_option[],const int=0);
+  GetOpt(DjVuParseOptions *,const int,const char * const [],const djvu_option[],const int=0);
 };
 
 class DjVuTokenList::Entries
