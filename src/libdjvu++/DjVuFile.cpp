@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.27 1999-08-31 20:04:30 eaf Exp $
+//C- $Id: DjVuFile.cpp,v 1.28 1999-09-01 18:41:29 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -244,9 +244,10 @@ DjVuFile::get_memory_usage(void) const
 }
 
 GPList<DjVuFile>
-DjVuFile::get_included_files(void)
+DjVuFile::get_included_files(bool only_created)
 {
-   if (!are_incl_files_created()) process_incl_chunks();
+   if (!only_created && !are_incl_files_created())
+      process_incl_chunks();
 
    GCriticalSectionLock lock(&inc_files_lock);
    GPList<DjVuFile> list=inc_files_list;	// Get a copy when locked
@@ -953,9 +954,7 @@ DjVuFile::find_ndir(GMap<GURL, void *> & map)
    {
       map[url]=0;
 
-      if (!are_incl_files_created()) process_incl_chunks();
-
-      GPList<DjVuFile> list=get_included_files();
+      GPList<DjVuFile> list=get_included_files(false);
       for(GPosition pos=list;pos;++pos)
       {
 	 GP<DjVuNavDir> d=list[pos]->find_ndir(map);
@@ -1015,7 +1014,7 @@ DjVuFile::decode_ndir(GMap<GURL, void *> & map)
 
       if (dir) return dir;
 
-      GPList<DjVuFile> list=get_included_files();
+      GPList<DjVuFile> list=get_included_files(false);
       for(GPosition pos=list;pos;++pos)
       {
 	 GP<DjVuNavDir> d=list[pos]->decode_ndir(map);

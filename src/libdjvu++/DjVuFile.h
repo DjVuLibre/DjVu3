@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.h,v 1.18 1999-08-31 18:56:36 eaf Exp $
+//C- $Id: DjVuFile.h,v 1.19 1999-09-01 18:41:29 eaf Exp $
  
 #ifndef _DJVUFILE_H
 #define _DJVUFILE_H
@@ -45,7 +45,7 @@
 
     @memo Classes representing DjVu files.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuFile.h,v 1.18 1999-08-31 18:56:36 eaf Exp $#
+    @version #$Id: DjVuFile.h,v 1.19 1999-09-01 18:41:29 eaf Exp $#
 */
 
 //@{
@@ -334,10 +334,15 @@ public:
 	  
 	  {\bf Warning.} Included files are normally created during decoding.
 	  Before that they do not exist. So, if you call this function at
-	  that time it will have to read all the data from this file
-	  in order to find #INCL# chunks, which may block your application,
-	  if not all data is available. */
-   GPList<DjVuFile>	get_included_files(void);
+	  that time and set #only_created# to #FALSE# then it will have to
+	  read all the data from this file in order to find #INCL# chunks,
+	  which may block your application, if not all data is available.
+
+	  @param only_created If #TRUE#, the file will not try to process
+	         #INCL# chunks and load referenced files. It will return
+		 just those files, which have already been created during
+		 the decoding procedure. */
+   GPList<DjVuFile>	get_included_files(bool only_created=true);
 
       /// Returns the number of chunks in the IFF file data
    int		get_chunks_number(void);
