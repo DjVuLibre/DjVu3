@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: DjVuDocEditor.cpp,v 1.29 2000-05-02 16:00:58 bcr Exp $
+//C- $Id: DjVuDocEditor.cpp,v 1.30 2000-05-09 18:17:26 mrosen Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -496,8 +496,15 @@ DjVuDocEditor::insert_file(const char * file_name, bool is_page,
 	    int length;
 	    while((length=iff_in.read(buffer, 1024)))
 	       name+=GString(buffer, length);
-	    while(isspace(name[0])) { GString tmp=(const char *) name+1; name=tmp; }
-	    while(isspace(name[name.length()-1])) name.setat(name.length()-1, 0);
+	    while(isspace(name[0]))
+       {
+          GString tmp=(const char *) name+1;
+          name=tmp;
+       }
+	    while(isspace(name[(int)(name.length())-1]))
+       {
+          name.setat(name.length()-1, 0);
+       }
 	    GString full_name=GOS::expand_name(name, GOS::dirname(file_name));
 	    iff_in.close_chunk();
 
