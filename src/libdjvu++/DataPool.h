@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.h,v 1.21 1999-09-24 18:43:43 eaf Exp $
+//C- $Id: DataPool.h,v 1.22 1999-09-24 18:50:47 eaf Exp $
  
 #ifndef _DATAPOOL_H
 #define _DATAPOOL_H
@@ -44,7 +44,7 @@
 
     @memo Thread safe data storage
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DataPool.h,v 1.21 1999-09-24 18:43:43 eaf Exp $#
+    @version #$Id: DataPool.h,v 1.22 1999-09-24 18:50:47 eaf Exp $#
 */
 
 //@{
@@ -530,7 +530,7 @@ private:
    GP<DataPool>		pool;
    GString		fname;
    GP<StdioByteStream>	stream;
-   GCriticalSection	* stream_lock;
+   GCriticalSection	* stream_lock, class_stream_lock;
    GP<MemoryByteStream>	data;
    GCriticalSection	data_lock;
    BlockList		block_list;
@@ -547,7 +547,6 @@ private:
    GCriticalSection	trigger_lock;		// Lock for static_trigger_cb()
 
    void		init(void);
-   void		check_stream(void);
    void		wait_for_data(const GP<Reader> & reader);
    void		wake_up_all_readers(void);
    void		check_triggers(void);
@@ -581,9 +580,9 @@ DataPool::get_size(void) const
 inline void
 DataPool::clear_stream(void)
 {
-   if (stream_lock) stream_lock->lock();
+   GCriticalSectionLock lock(&class_stream_lock);
    stream=0;
-   if (stream_lock) stream_lock->unlock();
+   stream_lock=0;
 }
 
 inline

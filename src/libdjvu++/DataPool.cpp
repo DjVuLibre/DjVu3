@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.cpp,v 1.27 1999-09-23 21:09:43 eaf Exp $
+//C- $Id: DataPool.cpp,v 1.28 1999-09-24 18:50:47 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -489,13 +489,6 @@ DataPool::connect(const char * fname_in, int start_in, int length_in)
    }
 }
 
-inline void
-DataPool::check_stream(void)
-{
-   if (!stream)
-      OpenFiles::get()->request_stream(fname, this, stream, &stream_lock);
-}
-
 int
 DataPool::get_length(void) const
 {
@@ -652,8 +645,11 @@ DataPool::get_data(void * buffer, int offset, int sz, int level)
    {
       if (length>0 && offset+sz>length) sz=length-offset;
       if (sz<0) sz=0;
-      check_stream();	// Will open the stream if necessary
-      GCriticalSectionLock lock(stream_lock);
+      
+      GCriticalSectionLock lock1(&class_stream_lock);
+      if (!stream || !stream_lock)
+	 OpenFiles::get()->request_stream(fname, this, stream, &stream_lock);
+      GCriticalSectionLock lock2(stream_lock);
       stream->seek(start+offset, SEEK_SET);
       return stream->readall(buffer, sz);
    } 
