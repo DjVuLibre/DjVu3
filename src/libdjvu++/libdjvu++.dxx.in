@@ -637,6 +637,7 @@
 //@Include: BSByteStream.h
 //@Include: GBitmap.h
 //@Include: GPixmap.h
+//@Include: MMX.h
 //@Include: GScaler.h
 //@Include: IWTransform.h
 //@Include: IWImage.h

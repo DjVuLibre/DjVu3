@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: MMX.cpp,v 1.1 1999-06-08 15:50:34 leonb Exp $
+//C- $Id: MMX.cpp,v 1.2 1999-06-08 16:02:46 leonb Exp $
 
 
 
@@ -24,7 +24,7 @@
 
 
 #if defined(MMX) && defined(DEBUG)
-static void
+extern "C" void
 mmx_show()
 {
   /* This function can be called from a debugger

@@ -9,14 +9,10 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: MMX.h,v 1.1 1999-06-08 15:50:34 leonb Exp $
+//C- $Id: MMX.h,v 1.2 1999-06-08 16:02:46 leonb Exp $
 
 #ifndef _MMX_H_
 #define _MMX_H_
-
-#ifdef __GNUC__
-#pragma interface
-#endif
 
 #include "DjVuGlobal.h"
 #include "GPixmap.h"
@@ -32,23 +28,31 @@
     can be executed.  MMX instructions are entered in the middle of C++ code
     using the following macros.
     \begin{description}
-    \item[MMXrr(insn,srcreg,dstreg)] 
+    \item[MMXrr( insn, srcreg, dstreg)] 
        Encode a register to register MMX instruction 
-       (e.g. "paddw", "punpcklwd", etc.).
-    \item[MMXar(insn,addr,dstreg)]
+       (e.g. #paddw# or #"punpcklwd#).
+    \item[MMXar( insn, addr, dstreg )]
        Encode a memory to register MMX instruction 
        (e.g. #moveq# from memory).
-    \item[MMXra(insn,srcreg,addr)]
+    \item[MMXra( insn, srcreg, addr )]
        Encode a register to memory MMX instruction 
        (e.g. #moveq# to memory).
-    \item[MMXra(insn,imm,dstreg)]
+    \item[MMXir( insn, imm, dstreg )]
        Encode a immediate to register MMX instruction 
        (e.g #psraw#).
     \item[MMXemms]
        Execute the #EMMS# instruction to reset the FPU state.
     \end{description}
 
-    Examples can be found in #"IWTransform.h"#.  */
+    Examples can be found in #"IWTransform.h"#.  
+
+    @memo
+    Essential support for MMX.
+    @version 
+    #$Id: MMX.h,v 1.2 1999-06-08 16:02:46 leonb Exp $#
+    @author: 
+    L\'eon Bottou <leonb@research.att.com> -- initial implementation 
+*/    
 //@{
 
 
@@ -69,16 +73,16 @@ class MMXControl
   /** Disables MMX or similar technologies.  The transforms will then be
       performed using the baseline code. */
   static int disable_mmx();
-  /** Returns true if MMX code can be executed.
-      This fast function can be used to transfer the instruction flow
-      to the MMX branch of the code. */
-  static int ok() { return mmxflag; };
- private:
+  /** Contains a value greater than zero if MMX code can be executed.  A
+      negative value means that you must call \Ref{enable_mmx} and test the
+      value again. Direct access to this member should only be used to
+      transfer the instruction flow to the MMX branch of the code. Do not
+      write into this variable. */
   static int mmxflag;
 };
 
-
 //@}
+
 
 
 

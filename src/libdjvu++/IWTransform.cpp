@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: IWTransform.cpp,v 1.7 1999-06-08 15:50:34 leonb Exp $
+//C- $Id: IWTransform.cpp,v 1.8 1999-06-08 16:02:46 leonb Exp $
 
 
 
@@ -232,7 +232,7 @@ static short *zeroes = 0;
 static void
 filter_begin(int w, int h)
 {
-  if (MMXControl::ok() < 0)  
+  if (MMXControl::mmxflag < 0)  
     MMXControl::enable_mmx();
   if (zeroes)
     delete [] zeroes;
@@ -245,7 +245,7 @@ static void
 filter_end()
 {
 #ifdef MMX
-  if (MMXControl::ok() > 0)
+  if (MMXControl::mmxflag > 0)
     MMXemms;
 #endif
   if (zeroes)
@@ -273,7 +273,7 @@ filter_fv(short *p, int w, int h, int rowsize, int scale)
           {
             // Generic case
 #ifdef MMX
-            if (scale==1 && MMXControl::ok()>0)
+            if (scale==1 && MMXControl::mmxflag>0)
               mmx_fv_1(q, e, s, s3);
 #endif
             while (q<e)
@@ -305,7 +305,7 @@ filter_fv(short *p, int w, int h, int rowsize, int scale)
           {
             // Generic case
 #ifdef MMX
-            if (scale==1 && MMXControl::ok()>0)
+            if (scale==1 && MMXControl::mmxflag>0)
               mmx_fv_2(q, e, s, s3);
 #endif
             while (q<e)
@@ -382,7 +382,7 @@ filter_bv(short *p, int w, int h, int rowsize, int scale)
           {
             // Generic case
 #ifdef MMX
-            if (scale==1 && MMXControl::ok()>0)
+            if (scale==1 && MMXControl::mmxflag>0)
               mmx_bv_1(q, e, s, s3);
 #endif
             while (q<e)
@@ -444,7 +444,7 @@ filter_bv(short *p, int w, int h, int rowsize, int scale)
           {
             // Generic case
 #ifdef MMX
-            if (scale==1 && MMXControl::ok()>0)
+            if (scale==1 && MMXControl::mmxflag>0)
               mmx_bv_2(q, e, s, s3);
 #endif
             while (q<e)
