@@ -11,7 +11,7 @@ CXX=@%CXX%@
 OPT=@%OPT%@
 WARN=@%WARN%@
 DEFS=@%DEFS%@
-INCS=-I$(SRCDIR) -I$(SRCDIR)/..
+INCS=-I.. -I$(SRCDIR)/..
 CXXFLAGS=@%CXXFLAGS%@ @%CXXOPT%@ $(DEFS) $(OPT) $(WARN) $(INCS) -DUNIX
 LDFLAGS=
 DOCXX=@%docxx%@
@@ -47,11 +47,10 @@ PHONY: clean distclean
 
 # Handle cpp files as C++
 .SUFFIXES: .cpp
-.cpp.o:
-	$(CXX) $(CXXFLAGS) -c $(SRCDIR)/$*.cpp
+%%%include <compile>
 
 .cpp: $(LIB)
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -c $(SRCDIR)/$*.cpp
+	@echo "$(CXX) -I. $(CXXFLAGS) -c $*.cpp";if [ -r "$*.cpp" ] ; then $(CXX) -I. -I"@%SRCDIR%@" $(CXXFLAGS) -c "$*.cpp"; else $(CXX) -I. -I"@%SRCDIR%@" $(CXXFLAGS) -c "$(SRCDIR)/$*.cpp" ; fi
 	if [ -n "$(RPO)" ] ; then $(RPO) $*.o $(LIB) ; fi
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $*.o $(LIB) $(LIBS)
 	@if test -f $(SRCDIR)/$@.exp ; then\
@@ -63,7 +62,7 @@ PHONY: clean distclean
 	 fi
 
 TestThreads: $(LIB)
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -c $(SRCDIR)/TestThreads.cpp
+	if [ -r TestThreads.cpp ] ; then $(CXX) $(CXXFLAGS) $(LDFLAGS) -c TestThreads.cpp ; else $(CXX) $(CXXFLAGS) $(LDFLAGS) -c $(SRCDIR)/TestThreads.cpp ; fi
 	if [ -n "$(RPO)" ] ; then $(RPO) TestThreads.o $(LIB) ; fi
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o TestThreads TestThreads.o $(LIB) $(LIBS)
 	@if test -f $(SRCDIR)/$@.exp ; then\

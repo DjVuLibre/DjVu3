@@ -1,0 +1,8 @@
+.SUFFIXES: .c
+.c.o:
+	@echo "$(CC) -I. $(CCFLAGS) -c $*.c";if [ -r "$*.c" ] ; then $(CC) -I. -I"@%srcdir%@" $(CCFLAGS) -c "$*.c"; else $(CC) -I -I"@%srcdir%@" $(CCFLAGS) -c "@%srcdir%@/$*.c" ; fi
+
+.SUFFIXES: .cpp
+.cpp.o:
+	@echo "$(CXX) -I. $(CXXFLAGS) -c $*.cpp";if [ -r "$*.cpp" ] ; then $(CXX) -I. -I"@%srcdir%@" $(CXXFLAGS) -c "$*.cpp"; else $(CXX) -I. -I"@%srcdir%@" $(CXXFLAGS) -c "@%srcdir%@/$*.cpp" ; fi
+
