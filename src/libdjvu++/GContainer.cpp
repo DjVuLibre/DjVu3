@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GContainer.cpp,v 1.11 1999-08-30 19:46:04 leonb Exp $
+//C- $Id: GContainer.cpp,v 1.12 1999-09-07 15:35:01 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -39,7 +39,7 @@ GArrayBase::GArrayBase(const GArrayBase &ref)
 }
 
 
-GArrayBase::GArrayBase(const GCont::Traits &traits)
+GArrayBase::GArrayBase(const GCONT Traits &traits)
   : traits(traits),
     data(0),
     minlo(0), maxhi(-1),
@@ -48,7 +48,7 @@ GArrayBase::GArrayBase(const GCont::Traits &traits)
 }
 
 
-GArrayBase::GArrayBase(const GCont::Traits &traits, int lobound, int hibound)
+GArrayBase::GArrayBase(const GCONT Traits &traits, int lobound, int hibound)
   : traits(traits),
     data(0),
     minlo(0), maxhi(-1),
@@ -571,14 +571,14 @@ GSetBase::~GSetBase()
 }
 
 
-GCont::HNode *
+GCONT HNode *
 GSetBase::hashnode(unsigned int hashcode) const
 {
   int bucket = hashcode % nbuckets;
   return table[bucket];
 }
 
-GCont::HNode *
+GCONT HNode *
 GSetBase::installnode(HNode *n)
 {
   // Rehash if table is more than 60% full
@@ -617,7 +617,7 @@ GSetBase::insertnode(HNode *n)
 
 
 void   
-GSetBase::deletenode(GCont::HNode *n)
+GSetBase::deletenode(GCONT HNode *n)
 {
   if (n == 0) 
     return;

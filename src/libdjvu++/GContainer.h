@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GContainer.h,v 1.20 1999-09-04 01:36:49 leonb Exp $
+//C- $Id: GContainer.h,v 1.21 1999-09-07 15:35:01 leonb Exp $
 
 
 #ifndef _GCONTAINER_H_
@@ -38,6 +38,18 @@
 #define GCONTAINER_ZERO_FILL 1
 #endif
 
+// Avoid member templates (needed by old compilers)
+#ifndef GCONTAINER_NO_MEMBER_TEMPLATES
+#if defined(__GNUC__) && (__GNUC__==2) && (__GNUC_MINOR__<91)
+#define GCONTAINER_NO_MEMBER_TEMPLATES 1
+#else
+#define GCONTAINER_NO_MEMBER_TEMPLATES 0
+#endif
+#endif
+
+
+
+
 /** @name GContainer.h
 
     Files #"GContainer.h"# and #"GContainer.cpp"# implement three main
@@ -55,7 +67,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@research.att.com> -- bug fixes.
     @version 
-    #$Id: GContainer.h,v 1.20 1999-09-04 01:36:49 leonb Exp $# */
+    #$Id: GContainer.h,v 1.21 1999-09-07 15:35:01 leonb Exp $# */
 //@{
 
 
@@ -66,13 +78,19 @@
 
 
 
-/* Namespace for containers.  
-   This class is used as a namespace for global identifiers related to the
-   implementation of containers.  It is inherited by all container objects.  */
+/* Namespace for containers support classes.  This class is used as a
+   namespace for global identifiers related to the implementation of
+   containers.  It is inherited by all container objects.  This is disabled by
+   defining compilation symbol #GCONTAINER_NO_MEMBER_TEMPATES# to 1. */
 
 class GCont
+#if GCONTAINER_NO_MEMBER_TEMPLATES
+{
+};
+#else
 {
 protected:
+#endif
   // --- Pointers to type management functions
   struct Traits
   {
@@ -146,11 +164,19 @@ protected:
   {
     T val;
   };
+#if !GCONTAINER_NO_MEMBER_TEMPLATES
 };
+#endif
 
 
-template <int SZ> const GCont::Traits & 
-GCont::TrivTraits<SZ>::traits()
+#if !GCONTAINER_NO_MEMBER_TEMPLATES
+#define GCONT GCont::
+#else
+#define GCONT
+#endif
+
+template <int SZ> const GCONT Traits & 
+GCONT TrivTraits<SZ>::traits()
 {
   static const Traits theTraits = {
     SZ,
@@ -162,8 +188,8 @@ GCont::TrivTraits<SZ>::traits()
   return theTraits;
 }
 
-template <class T> const GCont::Traits & 
-GCont::NormTraits<T>::traits()
+template <class T> const GCONT Traits & 
+GCONT NormTraits<T>::traits()
 {
   static const Traits theTraits = {
     sizeof(T),
@@ -454,17 +480,17 @@ public:
       empty. Member function #touch# and #resize# provide convenient ways
       to enlarge the subscript range. */
   GArray() 
-    : GArrayTemplate<TYPE>(GCont::NormTraits<TYPE>::traits() ) { } ;
+    : GArrayTemplate<TYPE>(GCONT NormTraits<TYPE>::traits() ) { } ;
   /** Constructs an array with subscripts in range 0 to #hibound#. 
       The subscript range can be subsequently modified with member functions
       #touch# and #resize#. */
   GArray(int hi) 
-    : GArrayTemplate<TYPE>(GCont::NormTraits<TYPE>::traits(), 0, hi ) { } ;
+    : GArrayTemplate<TYPE>(GCONT NormTraits<TYPE>::traits(), 0, hi ) { } ;
   /** Constructs an array with subscripts in range #lobound# to #hibound#.  
       The subscript range can be subsequently modified with member functions
       #touch# and #resize#. */
   GArray(int lo, int hi) 
-    : GArrayTemplate<TYPE>(GCont::NormTraits<TYPE>::traits(), lo, hi ) { } ;
+    : GArrayTemplate<TYPE>(GCONT NormTraits<TYPE>::traits(), lo, hi ) { } ;
   // Copy operator
   GArray& operator=(const GArray &r)
     { GArrayBase::operator=(r); return *this; } ;
@@ -484,11 +510,11 @@ class GPArray : public GArrayTemplate<GP<TYPE> >
 {
 public:
   GPArray() 
-    : GArrayTemplate<GP<TYPE> >(GCont::NormTraits<GPBase>::traits() ) { } ;
+    : GArrayTemplate<GP<TYPE> >(GCONT NormTraits<GPBase>::traits() ) { } ;
   GPArray(int hi) 
-    : GArrayTemplate<GP<TYPE> >(GCont::NormTraits<GPBase>::traits(), 0, hi ) { } ;
+    : GArrayTemplate<GP<TYPE> >(GCONT NormTraits<GPBase>::traits(), 0, hi ) { } ;
   GPArray(int lo, int hi) 
-    : GArrayTemplate<GP<TYPE> >(GCont::NormTraits<GPBase>::traits(), lo, hi ) { } ;
+    : GArrayTemplate<GP<TYPE> >(GCONT NormTraits<GPBase>::traits(), lo, hi ) { } ;
   // Copy operator
   GPArray& operator=(const GPArray &r)
     { GArrayBase::operator=(r); return *this; } ;
@@ -507,11 +533,11 @@ class GTArray : public GArrayTemplate<TYPE>
 {
 public:
   GTArray() 
-    : GArrayTemplate<TYPE>(GCont::TrivTraits<sizeof(TYPE)>::traits() ) { } ;
+    : GArrayTemplate<TYPE>(GCONT TrivTraits<sizeof(TYPE)>::traits() ) { } ;
   GTArray(int hi) 
-    : GArrayTemplate<TYPE>(GCont::TrivTraits<sizeof(TYPE)>::traits(), 0, hi ) { } ;
+    : GArrayTemplate<TYPE>(GCONT TrivTraits<sizeof(TYPE)>::traits(), 0, hi ) { } ;
   GTArray(int lo, int hi) 
-    : GArrayTemplate<TYPE>(GCont::TrivTraits<sizeof(TYPE)>::traits(), lo, hi ) { } ;
+    : GArrayTemplate<TYPE>(GCONT TrivTraits<sizeof(TYPE)>::traits(), lo, hi ) { } ;
   // Copy operator
   GTArray& operator=(const GTArray &r)
     { GArrayBase::operator=(r); return *this; } ;
@@ -644,7 +670,7 @@ class GListImpl : public GListBase
 {
 protected:
   GListImpl();
-  typedef GCont::ListNode<TI> LNode;
+  typedef GCONT ListNode<TI> LNode;
   static Node * newnode(const TI &elt);
   int operator==(const GListImpl<TI> &l2) const;
   int search(const TI &elt, GPosition &pos) const;
@@ -652,11 +678,11 @@ protected:
 
 template<class TI> 
 GListImpl<TI>::GListImpl() 
-  : GListBase( GCont::NormTraits<LNode>::traits() ) 
+  : GListBase( GCONT NormTraits<LNode>::traits() ) 
 { 
 }
 
-template<class TI> GCont::Node *
+template<class TI> GCONT Node *
 GListImpl<TI>::newnode(const TI &elt)
 {
   LNode *n = (LNode*) operator new (sizeof(LNode));
@@ -889,7 +915,7 @@ class GSetBase : public GCont
 protected:
   GSetBase(const Traits &traits);
   GSetBase(const GSetBase &ref);
-  static GCont::HNode *newnode(const void *key);
+  static GCONT HNode *newnode(const void *key);
   HNode *hashnode(unsigned int hashcode) const;
   HNode *installnode(HNode *n);
   void   deletenode(HNode *n);
@@ -918,7 +944,7 @@ class GSetImpl : public GSetBase
 protected:
   GSetImpl();
   GSetImpl(const Traits &traits);
-  typedef GCont::SetNode<K> SNode;
+  typedef GCONT SetNode<K> SNode;
   HNode *get(const K &key) const;
   HNode *get_or_throw(const K &key) const;
   HNode *get_or_create(const K &key);
@@ -931,7 +957,7 @@ public:
 
 template<class K>
 GSetImpl<K>::GSetImpl()
-  : GSetBase( GCont::NormTraits<GCont::SetNode<K> >::traits() )
+  : GSetBase( GCONT NormTraits<GCONT SetNode<K> >::traits() )
 { 
 }
 
@@ -941,7 +967,7 @@ GSetImpl<K>::GSetImpl(const Traits &traits)
 { 
 }
 
-template<class K> GCont::HNode *
+template<class K> GCONT HNode *
 GSetImpl<K>::get(const K &key) const
 { 
   unsigned int hashcode = hash(key);
@@ -951,7 +977,7 @@ GSetImpl<K>::get(const K &key) const
 }
 
 #if GCONTAINER_BOUNDS_CHECK
-template<class K> GCont::HNode *
+template<class K> GCONT HNode *
 GSetImpl<K>::get_or_throw(const K &key) const
 { 
   HNode *m = get(key);
@@ -959,14 +985,14 @@ GSetImpl<K>::get_or_throw(const K &key) const
   return m;
 }
 #else
-template<class K> inline GCont::HNode *
+template<class K> inline GCONT HNode *
 GSetImpl<K>::get_or_throw(const K &key) const
 { 
   return get(key);
 }
 #endif
 
-template<class K> GCont::HNode *
+template<class K> GCONT HNode *
 GSetImpl<K>::get_or_create(const K &key)
 {
   HNode *m = get(key);
@@ -987,13 +1013,13 @@ class GMapImpl : public GSetImpl<K>
 protected:
   GMapImpl();
   GMapImpl(const Traits &traits);
-  typedef GCont::MapNode<K,TI> MNode;
-  GCont::HNode* get_or_create(const K &key);
+  typedef GCONT MapNode<K,TI> MNode;
+  GCONT HNode* get_or_create(const K &key);
 };
 
 template<class K, class TI>
 GMapImpl<K,TI>::GMapImpl()
-  : GSetImpl<K> ( GCont::NormTraits<GCont::MapNode<K,TI> >::traits() ) 
+  : GSetImpl<K> ( GCONT NormTraits<GCONT MapNode<K,TI> >::traits() ) 
 { 
 }
 
@@ -1003,7 +1029,7 @@ GMapImpl<K,TI>::GMapImpl(const Traits &traits)
 { 
 }
 
-template<class K, class TI> GCont::HNode *
+template<class K, class TI> GCONT HNode *
 GMapImpl<K,TI>::get_or_create(const K &key)
 {
   HNode *m = get(key);
