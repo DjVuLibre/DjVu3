@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: TestMap.cpp,v 1.6 1999-03-17 19:25:01 leonb Exp $
+//C- $Id: TestMap.cpp,v 1.7 1999-09-30 16:52:46 leonb Exp $
 
 
 
@@ -40,7 +40,6 @@ void operator delete(void *x) {
 void
 PMAPSI(const GMap<GString,int> &map)
 {
-  int i;
   GString gs;
   printf("( ");
   for (GPosition pos=map.firstpos(); pos; ++pos)
@@ -51,8 +50,6 @@ PMAPSI(const GMap<GString,int> &map)
 void
 PMAPIS(const GMap<int,GString> &map)
 {
-  int i;
-  GString gs;
   printf("( ");
   for (GPosition pos=map.firstpos(); pos; ++pos)
     printf("%d:%s ", map.key(pos), (const char*)map[pos]);
@@ -85,7 +82,6 @@ main()
   PMAPSI(copy);
   
   GMap<int,GString> rev;
-  int i;
   GString gs;
   for (pf=copy.firstpos(); pf; ++pf)
     rev[ copy[pf] ] = copy.key(pf);

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: TestList.cpp,v 1.7 1999-08-06 15:28:50 leonb Exp $
+//C- $Id: TestList.cpp,v 1.8 1999-09-30 16:52:46 leonb Exp $
 
 
 
@@ -40,7 +40,6 @@ void operator delete(void *x) {
 void
 PCONTI(GList<int> &ga)
 {
-  int *np;
   printf("( ");
   for (GPosition pos=ga; pos; ++pos)
     printf("%d ", ga[pos]);
@@ -50,9 +49,7 @@ PCONTI(GList<int> &ga)
 void
 PCONTS(GList<GString> &ga)
 {
-  GString *np;
   printf("( ");
-  GPosition pos(ga);
   for (GPosition pos=ga; pos; ++pos)
     printf("\"%s\" ", (const char*)(ga[pos]));
   printf(")\n");

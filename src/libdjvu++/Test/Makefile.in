@@ -18,7 +18,8 @@ DOCXX=@%docxx%@
 LIBS=@%libmath%@ @%LIBS%@
 MAKESTLIB=@%make_stlib%@
 MAKESHLIB=@%make_shlib%@
-RANLIB=@%ranlib%@
+
+%%%include <commands>
 
 # Defs
 
@@ -45,12 +46,12 @@ distclean:
 
 PHONY: clean distclean
 
+
 # Handle cpp files as C++
-.SUFFIXES: .cpp
+
 %%%include <compile>
 
-.cpp: $(LIB)
-	@echo "$(CXX) -I. $(CXXFLAGS) -c $*.cpp";if [ -r "$*.cpp" ] ; then $(CXX) -I. -I"@%SRCDIR%@" $(CXXFLAGS) -c "$*.cpp"; else $(CXX) -I. -I"@%SRCDIR%@" $(CXXFLAGS) -c "$(SRCDIR)/$*.cpp" ; fi
+.o: $(LIB)
 	if [ -n "$(RPO)" ] ; then $(RPO) $*.o $(LIB) ; fi
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $*.o $(LIB) $(LIBS)
 	@if test -f $(SRCDIR)/$@.exp ; then\
@@ -61,8 +62,7 @@ PHONY: clean distclean
 	   else echo -- $@ compiled ;\
 	 fi
 
-TestThreads: $(LIB)
-	if [ -r TestThreads.cpp ] ; then $(CXX) $(CXXFLAGS) $(LDFLAGS) -c TestThreads.cpp ; else $(CXX) $(CXXFLAGS) $(LDFLAGS) -c $(SRCDIR)/TestThreads.cpp ; fi
+TestThreads: TestThreads.o $(LIB)
 	if [ -n "$(RPO)" ] ; then $(RPO) TestThreads.o $(LIB) ; fi
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o TestThreads TestThreads.o $(LIB) $(LIBS)
 	@if test -f $(SRCDIR)/$@.exp ; then\
