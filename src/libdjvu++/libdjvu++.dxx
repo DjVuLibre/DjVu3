@@ -857,18 +857,19 @@
     {\bf Description}
 
     Shell script #cdjvu# illustrates a very simple encoder for creating a
-    Compound DjVu File.  You may also investigate \Ref{cpaldjvu} for a
-    completely different way to do this.  The script first segments the image
-    using a fixed threshold.  It calls then program \Ref{cjb2} to create the
-    encoded mask and program \Ref{djvumake} to create the color layers and
-    assemble the DjVu file.
+    Compound DjVu File.  The script first segments the image using a fixed
+    threshold.  It calls then program \Ref{cjb2} to create the encoded mask
+    and program \Ref{djvumake} to create the color layers and assemble the
+    DjVu file.
 
     The segmentation performed by this script depends on the NetPBM tools
     #ppmtopgm# and #pgmtopbm#
     (\URL{http://www.arc.umn.edu/GVL/Software/netpbm.html}).  You may also
     investigate option #-segment# in the ImageMagick program #convert#
     (\URL{http://www.wizards.dupont.com/cristy/}) or consider creating the
-    mask image using The Gimp (\URL{http://www.gimp.org}).
+    mask image using The Gimp (\URL{http://www.gimp.org}).  You may also
+    investigate \Ref{cpaldjvu} for a completely different way to create
+    Compound DjVu Files.
 
     @memo
     Simple shell script for encoding Compound DjVu Files.
