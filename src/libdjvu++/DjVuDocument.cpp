@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.38 1999-09-15 17:36:49 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.39 1999-09-16 15:43:18 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -59,6 +59,11 @@ DjVuDocument::init(const GURL & url, GP<DjVuPort> xport,
 
 DjVuDocument::~DjVuDocument(void)
 {
+      // Before we proceed with destroy we must stop the initializing
+      // thread (involves stopping the init_data_pool and the file
+      // used to decode NDIR chunks (if any))
+   init_data_pool->stop();
+   if (ndir_file) ndir_file->stop_decode(true);
    wait_for_complete_init();
 }
 
@@ -92,7 +97,11 @@ DjVuDocument::init_thread(void)
    DEBUG_MSG("DjVuDocument::init_thread(): guessing what we're dealing with\n");
    DEBUG_MAKE_INDENT(3);
 
-   GP<DjVuDocument> life_saver=init_life_saver;
+      // No *local* life savers, please. Otherwise this object is very
+      // likely to be never destroyed (data stops flowing into a DataPool,
+      // the thread is waiting for it, the last external reference to
+      // DjVuDocument is lost, but this local would stay => we will hang
+      // forever)
    init_life_saver=0;
    
    DjVuPortcaster * pcaster=get_portcaster();
@@ -195,7 +204,8 @@ DjVuDocument::init_thread(void)
    if (doc_type==OLD_BUNDLED || doc_type==OLD_INDEXED)
    {
       DEBUG_MSG("Searching for NDIR chunks...\n");
-      ndir=get_djvu_file(-1)->decode_ndir();
+      ndir_file=get_djvu_file(-1);
+      ndir=ndir_file->decode_ndir();
       if (!ndir)
       {
 	    // Seems to be 1-page old-style document. Create dummy NDIR

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.h,v 1.26 1999-09-16 01:23:04 snwiz Exp $
+//C- $Id: DjVuDocument.h,v 1.27 1999-09-16 15:43:18 eaf Exp $
  
 #ifndef _DJVUDOCUMENT_H
 #define _DJVUDOCUMENT_H
@@ -33,7 +33,7 @@
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocument.h,v 1.26 1999-09-16 01:23:04 snwiz Exp $#
+    @version #$Id: DjVuDocument.h,v 1.27 1999-09-16 15:43:18 eaf Exp $#
 */
 
 //@{
@@ -584,6 +584,8 @@ private:
    GP<DjVuNavDir>	ndir;		// Old-style navigation directory
    GString		first_page_name;// For OLD_BUNDLED docs only
 
+   GP<DjVuFile>		ndir_file;	// Used to query NDIR.
+   
    GURL			init_url;
    GP<DataPool>		init_data_pool;
 
