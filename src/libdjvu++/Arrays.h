@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: Arrays.h,v 1.14 2000-09-18 17:10:02 bcr Exp $
+//C- $Id: Arrays.h,v 1.15 2000-09-19 19:06:50 mrosen Exp $
 
 
 #ifndef _ARRAYS_H_
@@ -17,7 +17,11 @@
 
 #include "DjVuGlobal.h"
 #include <string.h>
-#include <new.h>     // You may need to add one of these with a placement new operator under Windows CE 3.0
+#ifdef UNDER_CE
+#include <afx.h>
+#else
+#include <new.h>
+#endif
 #include "GException.h"
 #include "GSmartPointer.h"
 
@@ -72,7 +76,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@geocities.com> -- Copy-on-demand implementation.
     @version 
-    #$Id: Arrays.h,v 1.14 2000-09-18 17:10:02 bcr Exp $# */
+    #$Id: Arrays.h,v 1.15 2000-09-19 19:06:50 mrosen Exp $# */
 //@{
 
 // Auxiliary classes: Will be used in place of GPBase and GPEnabled objects

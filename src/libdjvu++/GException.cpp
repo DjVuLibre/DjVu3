@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: GException.cpp,v 1.18 2000-09-18 17:10:15 bcr Exp $
+//C- $Id: GException.cpp,v 1.19 2000-09-19 19:06:51 mrosen Exp $
 
 
 #ifdef __GNUC__
@@ -21,11 +21,15 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#ifdef UNDER_CE
+#include <afx.h>
+#else
 #include <new.h>
+#endif
 #include "GException.h"
 #include "debug.h"
 
-// File "$Id: GException.cpp,v 1.18 2000-09-18 17:10:15 bcr Exp $"
+// File "$Id: GException.cpp,v 1.19 2000-09-19 19:06:51 mrosen Exp $"
 // - Author: Leon Bottou, 05/1997
 
 GException::GException() 

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuPalette.h,v 1.15 2000-09-18 17:10:14 bcr Exp $
+//C- $Id: DjVuPalette.h,v 1.16 2000-09-19 19:06:51 mrosen Exp $
 
 
 
@@ -22,7 +22,11 @@
 
 #include "DjVuGlobal.h"
 #include <string.h>
+#ifdef UNDER_CE
+#include <afx.h>
+#else
 #include <new.h>
+#endif
 #include "GException.h"
 #include "GSmartPointer.h"
 #include "GContainer.h"
@@ -37,7 +41,7 @@
     @memo 
     DjVuPalette header file
     @version 
-    #$Id: DjVuPalette.h,v 1.15 2000-09-18 17:10:14 bcr Exp $#
+    #$Id: DjVuPalette.h,v 1.16 2000-09-19 19:06:51 mrosen Exp $#
     @author: 
     L\'eon Bottou <leonb@research.att.com> */
 //@{

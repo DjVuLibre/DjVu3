@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GContainer.h,v 1.33 2000-09-18 17:10:15 bcr Exp $
+//C- $Id: GContainer.h,v 1.34 2000-09-19 19:06:51 mrosen Exp $
 
 
 #ifndef _GCONTAINER_H_
@@ -23,7 +23,11 @@
 #include "DjVuGlobal.h"
 #include "GException.h"
 #include "GSmartPointer.h"
+#ifdef UNDER_CE
+#include <afx.h>
+#else
 #include <new.h>
+#endif
 #include <string.h>
 
 // Supports old iterators (first/last/next/prev) on lists and maps?
@@ -74,7 +78,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@geocities.com> -- bug fixes.
     @version 
-    #$Id: GContainer.h,v 1.33 2000-09-18 17:10:15 bcr Exp $# */
+    #$Id: GContainer.h,v 1.34 2000-09-19 19:06:51 mrosen Exp $# */
 //@{
 
 

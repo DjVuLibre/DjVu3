@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: GString.cpp,v 1.20 2000-09-18 17:10:20 bcr Exp $
+//C- $Id: GString.cpp,v 1.21 2000-09-19 19:06:51 mrosen Exp $
 
 
 #ifdef __GNUC__
@@ -22,11 +22,15 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+#ifdef UNDER_CE
+#include <afx.h>
+#else
 #include <new.h>
+#endif
 
 #include "GString.h"
 
-// File "$Id: GString.cpp,v 1.20 2000-09-18 17:10:20 bcr Exp $"
+// File "$Id: GString.cpp,v 1.21 2000-09-19 19:06:51 mrosen Exp $"
 // - Author: Leon Bottou, 04/1997
 
 GStringRep *
