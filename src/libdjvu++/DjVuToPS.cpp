@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: DjVuToPS.cpp,v 1.15 2000-10-06 21:47:21 fcrary Exp $
+//C- $Id: DjVuToPS.cpp,v 1.16 2000-10-09 22:04:27 mrosen Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -41,7 +41,7 @@ DjVuToPS::Options::Options(void)
    mode=COLOR;
    zoom=FIT_PAGE;
    color=true;
-   gamma=2.60;
+   gamma=2.60f;
    copies=1;
    frame=false;
 }
@@ -910,7 +910,7 @@ DjVuToPS::print_image(ByteStream & str, const GP<DjVuImage> & dimg,
           int decrement=color/(grays-1);
           for(int i=0;i<grays;i++)
           {
-            gray[i]=color>>16;
+            gray[i]=static_cast<unsigned char>(color>>16);
             color-=decrement;
           }
           
@@ -979,7 +979,7 @@ DjVuToPS::print_image(ByteStream & str, const GP<DjVuImage> & dimg,
          int decrement=color/(grays-1);
          for(int i=0;i<grays;i++)
          {
-           gray[i]=color>>16;
+           gray[i]=static_cast<unsigned char>(color>>16);
            color-=decrement;
          }
          
@@ -1003,7 +1003,8 @@ DjVuToPS::print_image(ByteStream & str, const GP<DjVuImage> & dimg,
    
    if (prn_progress_cb)
    {
-	    float done=(double) (prn_rect.ymax-grectBand.ymin)/prn_rect.height();
+	   // float done=(double) (prn_rect.ymax-grectBand.ymin)/prn_rect.height();
+      float done=(float)(prn_rect.ymax-grectBand.ymin)/prn_rect.height();
       if ((int) (20*print_done)!=(int) (20*done))
       {
 	       print_done=done;
