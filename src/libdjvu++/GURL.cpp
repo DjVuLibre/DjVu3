@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GURL.cpp,v 1.65 2001-04-25 21:30:06 bcr Exp $
+// $Id: GURL.cpp,v 1.66 2001-05-16 22:57:50 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -1382,6 +1382,7 @@ GURL::renameto(const GURL &newurl) const
     :(-1);
 #else
   G_THROW(ERR_MSG("GURL.no_rename"));
+  return 0;   // logically unnecessary, but the MS compiler needs it
 #endif
 }
 

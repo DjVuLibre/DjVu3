@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.h,v 1.72 2001-05-02 22:32:43 bcr Exp $
+// $Id: GString.h,v 1.73 2001-05-16 22:57:50 bcr Exp $
 // $Name:  $
 
 #ifndef _GSTRING_H_
@@ -57,7 +57,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.72 2001-05-02 22:32:43 bcr Exp $# */
+    #$Id: GString.h,v 1.73 2001-05-16 22:57:50 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -90,7 +90,10 @@ class GStringRep : public GPEnabled
 public:
   class Native;
   class UTF8;
+#ifndef UNDER_CE
   class ChangeLocale;
+#endif // UNDER_CE
+
   friend Native;
   friend UTF8;
   friend class GBaseString;
@@ -273,6 +276,105 @@ inline GP<GStringRep> GStringRep::upcase(void) const
 inline GP<GStringRep> GStringRep::downcase(void) const
 { return tocase(giswlower,gtowlower); }
 
+class GStringRep::UTF8 : public GStringRep
+{
+public:
+  // default constructor
+  UTF8(void);
+  // virtual destructor
+  virtual ~UTF8();
+
+    // Other virtual methods.
+  virtual GP<GStringRep> blank(const unsigned int sz = 0) const;
+  virtual GP<GStringRep> append(const GP<GStringRep> &s2) const;
+      // Test if Native.
+  virtual bool isUTF8(void) const;
+      // Convert to Native.
+  virtual GP<GStringRep> toNative(const bool nothrow=false) const;
+      // Convert to UTF8.
+  virtual GP<GStringRep> toUTF8(const bool nothrow=false) const;
+      // Convert to same as current class.
+  virtual GP<GStringRep> toThis(
+    const GP<GStringRep> &rep,const GP<GStringRep> &) const;
+      // Compare with #s2#.
+  virtual int cmp(const GP<GStringRep> &s2,const int len=(-1)) const;
+
+  static GP<GStringRep> create(const unsigned int sz = 0)
+  { return GStringRep::create(sz,(GStringRep::UTF8 *)0); }
+
+  // Convert strings to numbers.
+  virtual int toInt() const;
+  virtual long int toLong(
+    GP<GStringRep>& endptr, bool &isLong, const int base=10) const;
+  virtual unsigned long int toULong(
+    GP<GStringRep>& endptr, bool &isULong, const int base=10) const;
+  virtual double toDouble(
+    GP<GStringRep>& endptr, bool &isDouble) const;
+
+    // Create a strdup string.
+  static GP<GStringRep> create(const char *s)
+  { GStringRep::UTF8 dummy; return dummy.strdup(s); }
+
+   // Creates with a concat operation.
+  static GP<GStringRep> create(
+    const GP<GStringRep> &s1,const GP<GStringRep> &s2)
+  { GStringRep::UTF8 dummy; return dummy.concat(s1,s2); }
+  static GP<GStringRep> create( const GP<GStringRep> &s1,const char *s2)
+  { GStringRep::UTF8 dummy; return dummy.concat(s1,s2); }
+  static GP<GStringRep> create( const char *s1, const GP<GStringRep> &s2)
+  { GStringRep::UTF8 dummy; return dummy.concat(s1,s2); }
+  static GP<GStringRep> create( const char *s1,const char *s2)
+  { GStringRep::UTF8 dummy; return dummy.concat(s1,s2); }
+
+  static GP<GStringRep> create(
+    const char *s,const int start,const int length=(-1))
+  { GStringRep::UTF8 dummy; return dummy.substr(s,start,length); }
+
+  static GP<GStringRep> create_format(const char fmt[],...);
+  static GP<GStringRep> create(const char fmt[],va_list args);
+
+  virtual unsigned char *UCS4toString(
+    const unsigned long w,unsigned char *ptr, mbstate_t *ps=0) const;
+
+  friend class GBaseString;
+protected:
+  // Return the next character and increment the source pointer.
+  virtual unsigned long getValidUCS4(const char *&source) const;
+};
+
+inline GP<GStringRep> 
+GStringRep::UTF8::blank(const unsigned int sz) const
+{
+   return GStringRep::create(sz,(GStringRep::UTF8 *)0);
+}
+
+inline bool
+GStringRep::UTF8::isUTF8(void) const
+{
+  return true;
+}
+
+inline GP<GStringRep> 
+GStringRep::UTF8::toThis(
+    const GP<GStringRep> &rep,const GP<GStringRep> &) const
+{
+  return rep?(rep->toUTF8(true)):rep;
+}
+
+inline GP<GStringRep> 
+GStringRep::UTF8::create(const char fmt[],va_list args)
+{ 
+  GP<GStringRep> s=create(fmt);
+  return (s?(s->vformat(args)):s);
+}
+
+#ifdef UNDER_CE
+
+class GStringRep::Native : public GStringRep::UTF8
+{};
+
+#else
+
 class GStringRep::Native : public GStringRep
 {
 public:
@@ -372,97 +474,7 @@ GStringRep::Native::create(const char fmt[],va_list &args)
   return (s?(s->vformat(args)):s);
 }
 
-class GStringRep::UTF8 : public GStringRep
-{
-public:
-  // default constructor
-  UTF8(void);
-  // virtual destructor
-  virtual ~UTF8();
-
-    // Other virtual methods.
-  virtual GP<GStringRep> blank(const unsigned int sz = 0) const;
-  virtual GP<GStringRep> append(const GP<GStringRep> &s2) const;
-      // Test if Native.
-  virtual bool isUTF8(void) const;
-      // Convert to Native.
-  virtual GP<GStringRep> toNative(const bool nothrow=false) const;
-      // Convert to UTF8.
-  virtual GP<GStringRep> toUTF8(const bool nothrow=false) const;
-      // Convert to same as current class.
-  virtual GP<GStringRep> toThis(
-    const GP<GStringRep> &rep,const GP<GStringRep> &) const;
-      // Compare with #s2#.
-  virtual int cmp(const GP<GStringRep> &s2,const int len=(-1)) const;
-
-  static GP<GStringRep> create(const unsigned int sz = 0)
-  { return GStringRep::create(sz,(GStringRep::UTF8 *)0); }
-
-  // Convert strings to numbers.
-  virtual int toInt() const;
-  virtual long int toLong(
-    GP<GStringRep>& endptr, bool &isLong, const int base=10) const;
-  virtual unsigned long int toULong(
-    GP<GStringRep>& endptr, bool &isULong, const int base=10) const;
-  virtual double toDouble(
-    GP<GStringRep>& endptr, bool &isDouble) const;
-
-    // Create a strdup string.
-  static GP<GStringRep> create(const char *s)
-  { GStringRep::UTF8 dummy; return dummy.strdup(s); }
-
-   // Creates with a concat operation.
-  static GP<GStringRep> create(
-    const GP<GStringRep> &s1,const GP<GStringRep> &s2)
-  { GStringRep::UTF8 dummy; return dummy.concat(s1,s2); }
-  static GP<GStringRep> create( const GP<GStringRep> &s1,const char *s2)
-  { GStringRep::UTF8 dummy; return dummy.concat(s1,s2); }
-  static GP<GStringRep> create( const char *s1, const GP<GStringRep> &s2)
-  { GStringRep::UTF8 dummy; return dummy.concat(s1,s2); }
-  static GP<GStringRep> create( const char *s1,const char *s2)
-  { GStringRep::UTF8 dummy; return dummy.concat(s1,s2); }
-
-  static GP<GStringRep> create(
-    const char *s,const int start,const int length=(-1))
-  { GStringRep::UTF8 dummy; return dummy.substr(s,start,length); }
-
-  static GP<GStringRep> create_format(const char fmt[],...);
-  static GP<GStringRep> create(const char fmt[],va_list args);
-
-  virtual unsigned char *UCS4toString(
-    const unsigned long w,unsigned char *ptr, mbstate_t *ps=0) const;
-
-  friend class GBaseString;
-protected:
-  // Return the next character and increment the source pointer.
-  virtual unsigned long getValidUCS4(const char *&source) const;
-};
-
-inline GP<GStringRep> 
-GStringRep::UTF8::blank(const unsigned int sz) const
-{
-   return GStringRep::create(sz,(GStringRep::UTF8 *)0);
-}
-
-inline bool
-GStringRep::UTF8::isUTF8(void) const
-{
-  return true;
-}
-
-inline GP<GStringRep> 
-GStringRep::UTF8::toThis(
-    const GP<GStringRep> &rep,const GP<GStringRep> &) const
-{
-  return rep?(rep->toUTF8(true)):rep;
-}
-
-inline GP<GStringRep> 
-GStringRep::UTF8::create(const char fmt[],va_list args)
-{ 
-  GP<GStringRep> s=create(fmt);
-  return (s?(s->vformat(args)):s);
-}
+#endif // UNDER_CE
 
 /** General purpose character string.
     Each instance of class #GString# represents a character string.
@@ -963,6 +975,24 @@ public:
   }
 };
 
+#ifdef UNDER_CE
+
+// In Windows CE there is no concept of a native string, so we make the class
+// the same as GUTF8String.
+class GNativeString : public GUTF8String
+{
+public:
+  ~GNativeString();
+  /** Null constructor. Constructs an empty string. */
+  GNativeString(void);
+  /// Construct from base class.
+  GNativeString(const GUTF8String &str);
+  /// Constructs a string from a null terminated character array.
+  GNativeString(const char *str);
+};
+
+#else
+
 class GNativeString : public GBaseString
 {
 public:
@@ -1146,6 +1176,8 @@ public:
   }
 };
 
+#endif // UNDER_CE
+
 //@}
 
 inline
@@ -1178,41 +1210,17 @@ GUTF8String::downcase( void ) const
   return (ptr?(*this)->downcase():(*this));
 }
 
-inline GNativeString 
-GNativeString::upcase( void ) const
-{ 
-  return (ptr?(*this)->upcase():(*this));
-}
-
-inline GNativeString 
-GNativeString::downcase( void ) const
-{ 
-  return (ptr?(*this)->downcase():(*this));
-}
-
 inline
 GUTF8String::GUTF8String(const GNativeString &str)
 { init(str.length()?(str->toUTF8(true)):(GP<GStringRep>)str); }
-
-inline
-GNativeString::GNativeString(const GUTF8String &str)
-{ init(str.length()?(str->toNative(true)):(GP<GStringRep>)str); }
 
 inline
 GUTF8String::GUTF8String(const GP<GStringRep> &str)
 { init(str?(str->toUTF8(true)):str); }
 
 inline
-GNativeString::GNativeString(const GP<GStringRep> &str)
-{ init(str?(str->toNative(true)):str); }
-
-inline
 GUTF8String::GUTF8String(const GBaseString &str)
 { init(str.length()?(str->toUTF8(true)):(GP<GStringRep>)str); }
-
-inline
-GNativeString::GNativeString(const GBaseString &str)
-{ init(str.length()?(str->toNative(true)):(GP<GStringRep>)str); }
 
 inline void
 GBaseString::init(void)
@@ -1267,6 +1275,36 @@ inline GUTF8String& GUTF8String::operator= (const GUTF8String &str)
 inline GUTF8String& GUTF8String::operator= (const GNativeString &str)
 { return init(str); }
 
+inline GUTF8String GBaseString::operator+(const GUTF8String &s2) const
+  { return GStringRep::UTF8::create(*this,s2); }
+
+#ifndef UNDER_CE
+// For Windows CE, GNativeString is essentially GUTF8String
+
+inline GNativeString 
+GNativeString::upcase( void ) const
+{ 
+  return (ptr?(*this)->upcase():(*this));
+}
+
+inline GNativeString 
+GNativeString::downcase( void ) const
+{ 
+  return (ptr?(*this)->downcase():(*this));
+}
+
+inline
+GNativeString::GNativeString(const GUTF8String &str)
+{ init(str.length()?(str->toNative(true)):(GP<GStringRep>)str); }
+
+inline
+GNativeString::GNativeString(const GP<GStringRep> &str)
+{ init(str?(str->toNative(true)):str); }
+
+inline
+GNativeString::GNativeString(const GBaseString &str)
+{ init(str.length()?(str->toNative(true)):(GP<GStringRep>)str); }
+
 inline GNativeString::GNativeString(void) { }
 inline GNativeString::GNativeString(const char dat)
 { init(GStringRep::Native::create(&dat,0,1)); }
@@ -1306,14 +1344,14 @@ inline GNativeString& GNativeString::operator= (const GUTF8String &str)
 inline GNativeString& GNativeString::operator= (const GNativeString &str)
 { return init(str); }
 
-inline GUTF8String GBaseString::operator+(const GUTF8String &s2) const
-  { return GStringRep::UTF8::create(*this,s2); }
 inline GNativeString GBaseString::operator+(const GNativeString &s2) const
   { return GStringRep::Native::create(*this,s2); }
 inline GUTF8String GNativeString::operator+(const GUTF8String &s2) const
   { return GStringRep::UTF8::create(ptr?(*this)->toUTF8(true):(*this),s2); }
 inline GUTF8String GUTF8String::operator+(const GNativeString &s2) const
   { return GStringRep::UTF8::create(*this,s2.ptr?s2->toUTF8(true):s2); }
+
+#endif // UNDER_CE
 
 // ------------------- The end
 

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessage.cpp,v 1.50 2001-05-10 23:09:36 fcrary Exp $
+// $Id: DjVuMessage.cpp,v 1.51 2001-05-16 22:57:50 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -58,7 +58,9 @@
 #include <pwd.h>
 #include <sys/types.h>
 #endif
+#ifndef UNDER_CE
 #include <locale.h>
+#endif
 
 static const char namestring[]="name";
 static const char valuestring[]="value";
@@ -113,7 +115,7 @@ RegOpenReadConfig ( HKEY hParentKey )
   {
     TCHAR path[1024];
     // Success
-    LPSTR szPathValue = path;
+    TCHAR *szPathValue = path;
     LPCTSTR lpszEntry = (LPCTSTR &)TEXT("");
     DWORD dwCount = (sizeof(path)/sizeof(TCHAR))-1;
     DWORD dwType;
@@ -224,6 +226,8 @@ GetProfilePaths(void)
     if(!path.is_empty() && path.is_dir())
       paths.append(path);
 
+    GPosition pos;
+#ifndef UNDER_CE
     const GUTF8String oldlocale(setlocale(LC_CTYPE,0));
     const GUTF8String defaultlocale((oldlocale.search((unsigned long)'_') < 0)
       ?setlocale(LC_CTYPE,""):(const char *)oldlocale);
@@ -231,7 +235,6 @@ GetProfilePaths(void)
     {
       setlocale(LC_CTYPE,(const char *)oldlocale);
     }
-    GPosition pos;
     for(pos=paths;pos;++pos)
     {
       path=GURL::UTF8(defaultlocale,paths[pos]);
@@ -255,6 +258,7 @@ GetProfilePaths(void)
         }
       }
     }
+#endif
     for(pos=paths;pos;++pos)
     {
       realpaths.append(paths[pos]);

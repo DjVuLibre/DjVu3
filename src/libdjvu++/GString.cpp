@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.98 2001-05-16 22:49:11 mchen Exp $
+// $Id: GString.cpp,v 1.99 2001-05-16 22:57:50 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -54,9 +54,10 @@ GBaseString::~GBaseString() {}
 GNativeString::~GNativeString() {}
 GUTF8String::~GUTF8String() {}
 
-#ifndef HAS_MBSTATE
+//#ifndef HAS_MBSTATE
+#if !defined(HAS_MBSTATE) && !defined(UNDER_CE)
 // Under some systems, wctomb() and mbtowc() are not thread
-// safe.  In those cases, wcrtomb and mbrtowc are prefered.
+// safe.  In those cases, wcrtomb and mbrtowc are preferred.
 // For Solaris, wctomb() and mbtowc() are thread safe, and 
 // wcrtomb() and mbrtowc() don't exist.
 
@@ -77,7 +78,7 @@ mbrlen(const char *s, size_t n, mbstate_t *)
 {
   return mblen(s,n);
 }
-#endif // HAS_MBSTATE
+#endif // !defined(HAS_MBSTATE) || defined(UNDER_CE)
 
 
 #ifdef HAS_ICONV
@@ -88,6 +89,13 @@ mbrlen(const char *s, size_t n, mbstate_t *)
 #include "libcharset.h"//MBCS cvt
 #endif
 // #include <locale.h>
+
+// - Author: Leon Bottou, 04/1997
+
+#ifndef UNDER_CE
+
+// The declaration and implementation of GStringRep::ChangeLocale
+// Not used in WinCE
 
 class GStringRep::ChangeLocale
 {
@@ -116,7 +124,7 @@ GStringRep::ChangeLocale::ChangeLocale(
     {
       locale.empty();
     }
-  } 
+  }
 }
 
 GStringRep::ChangeLocale::~ChangeLocale()
@@ -126,8 +134,6 @@ GStringRep::ChangeLocale::~ChangeLocale()
     setlocale(category,(const char *)locale);
   }
 }
-
-// - Author: Leon Bottou, 04/1997
 
 GP<GStringRep>
 GStringRep::strdup(const char *s) const
@@ -147,6 +153,8 @@ GStringRep::strdup(const char *s) const
   }
   return retval;
 }
+
+#endif // UNDER_CE
 
 GP<GStringRep>
 GStringRep::substr(const char *s,const int start,const int len) const
@@ -224,24 +232,6 @@ GStringRep::UTF8::append(const GP<GStringRep> &s2) const
   }else
   {
     retval=const_cast<GStringRep::UTF8 *>(this); 
-  }
-  return retval;
-}
-
-GP<GStringRep>
-GStringRep::Native::append(const GP<GStringRep> &s2) const
-{
-  GP<GStringRep> retval;
-  if(s2)
-  {
-    if(s2->isUTF8())
-    {
-      G_THROW( ERR_MSG("GStringRep.appendUTF8toNative") );
-    }
-    retval=concat(data,s2->data);
-  }else
-  {
-    retval=const_cast<GStringRep::Native *>(this); 
   }
   return retval;
 }
@@ -634,6 +624,7 @@ GUTF8String::format(const char fmt[], ... )
   return init(GStringRep::UTF8::create(fmt,args));
 }
 
+#ifndef UNDER_CE
 GNativeString &
 GNativeString::format(const char fmt[], ... )
 {
@@ -641,17 +632,10 @@ GNativeString::format(const char fmt[], ... )
   va_start(args, fmt);
   return init(GStringRep::Native::create(fmt,args));
 }
+#endif // UNDER_CE
 
 GP<GStringRep>
 GStringRep::UTF8::create_format(const char fmt[],...)
-{
-  va_list args;
-  va_start(args, fmt);
-  return create(fmt,args);
-}
-
-GP<GStringRep>
-GStringRep::Native::create_format(const char fmt[],...)
 {
   va_list args;
   va_start(args, fmt);
@@ -680,7 +664,7 @@ GStringRep::vformat(va_list &args) const
         if(n)
         {
 #ifdef WIN32
-          LPCTSTR lpszFormat=data;
+          char *lpszFormat=data;
           LPTSTR lpszTemp;
           if((!::FormatMessage(
             FORMAT_MESSAGE_FROM_STRING|FORMAT_MESSAGE_ALLOCATE_BUFFER,
@@ -729,7 +713,10 @@ GStringRep::vformat(va_list &args) const
       char *buffer;
       GPBuffer<char> gbuffer(buffer,buflen);
 
+#ifndef UNDER_CE
       ChangeLocale(LC_ALL,(isNative()?0:"C"));
+#endif // UNDER_CE
+
       // Format string
 #ifdef USE_VSNPRINTF
       while(USE_VSNPRINTF(buffer, buflen, fmt, args)<0)
@@ -985,38 +972,6 @@ GStringRep::UTF8::UCS4toString(
   return UCS4toUTF8(w0,ptr);
 }
 
-unsigned char *
-GStringRep::Native::UCS4toString(
-  const unsigned long w0,unsigned char *ptr, mbstate_t *ps) const
-{
-  return UCS4toNative(w0,ptr,ps);
-}
-
-// Convert a UCS4 to a multibyte string in the value bytes.  
-// The data pointed to by ptr should be long enough to contain
-// the results with a nill termination.  (Normally 7 characters
-// is enough.)
-unsigned char *
-GStringRep::UCS4toNative(
-  const unsigned long w0,unsigned char *ptr, mbstate_t *ps)
-{
-  unsigned short w1, w2;
-  for(int count=(sizeof(wchar_t) == sizeof(w1))?UCS4toUTF16(w0,w1,w2):1;
-    count;--count,w1=w2)
-  {
-    // wchar_t can be either UCS4 or UCS2
-    const wchar_t w=(sizeof(wchar_t) == sizeof(w1))?(wchar_t)w1:(wchar_t)w0;
-    int i=wcrtomb((char *)ptr,w,ps);
-    if(i<0)
-    {
-      break;
-    }
-    ptr+=i;
-  }
-  ptr[0]=0;
-  return ptr;
-}
-
 GP<GStringRep> 
 GStringRep::UTF8::toNative(const bool) const
 {
@@ -1050,230 +1005,12 @@ GStringRep::UTF8::toNative(const bool) const
 }
 
 GP<GStringRep>
-GStringRep::Native::toNative(const bool nothrow) const
-{
-  if(!nothrow)
-    G_THROW( ERR_MSG("GStringRep.NativeToNative") );
-  return const_cast<GStringRep::Native *>(this);
-}
-
-GP<GStringRep>
-GStringRep::Native::toUTF8(const bool) const
-{
-  size_t n=size;
-  const char *source=data;
-  mbstate_t ps;
-  unsigned char *buf;
-  GPBuffer<unsigned char> gbuf(buf,n*6+1);
-  unsigned char *ptr=buf;
-  (void)mbrlen(source, n, &ps);
-  int i=0;
-  if(sizeof(wchar_t) == sizeof(unsigned long))
-  {
-    for(wchar_t w;
-      (n>0)&&((i=mbrtowc(&w,source,n,&ps))>=0);
-      n-=i,source+=i)
-    {
-      ptr=UCS4toUTF8(w,ptr);
-    }
-  }else
-  { 
-    for(wchar_t w;
-      (n>0)&&((i=mbrtowc(&w,source,n,&ps))>=0);
-      n-=i,source+=i)
-    {
-      unsigned short s[2];
-      s[0]=w;
-      unsigned long w0;
-      if(UTF16toUCS4(w0,s,s+1)<=0)
-      {
-        source+=i;
-        n-=i;
-        if((n>0)&&((i=mbrtowc(&w,source,n,&ps))>=0))
-        {
-          s[1]=w;
-          if(UTF16toUCS4(w0,s,s+2)<=0)
-          {
-            i=(-1);
-            break;
-          }
-        }else
-        {
-          i=(-1);
-          break;
-        }
-      }
-      ptr=UCS4toUTF8(w0,ptr);
-    }
-  }
-  if(i<0)
-  {
-    gbuf.resize(0);
-  }else
-  {
-    ptr[0]=0;
-  }
-  return GStringRep::UTF8::create((const char *)buf);
-}
-
-GP<GStringRep>
 GStringRep::UTF8::toUTF8(const bool nothrow) const
 {
   if(!nothrow)
     G_THROW( ERR_MSG("GStringRep.UTF8ToUTF8") );
   return const_cast<GStringRep::UTF8 *>(this);
 }
-
-GNativeString
-GBaseString::UTF8ToNative(const bool currentlocale) const
-{
-  const char *source=(*this);
-  GP<GStringRep> retval;
-  if(source && source[0]) 
-  {
-    GUTF8String lc_ctype(setlocale(LC_CTYPE,0));
-    bool repeat;
-    for(repeat=!currentlocale;;repeat=false)
-    {
-      retval=(*this)->toNative();
-      if(!repeat
-        || retval
-        || (lc_ctype == setlocale(LC_CTYPE,""))
-      ) break;
-    }
-    if(!repeat)
-    {
-      setlocale(LC_CTYPE,(const char *)lc_ctype);
-    }
-  }
-  return GNativeString(retval);
-}
-
-/*MBCS*/
-GNativeString
-GBaseString::getUTF82Native(char* tocode) const
-{ //MBCS cvt
-  GNativeString retval;
-
-  // We don't want to convert this if it 
-  // already is known to be native...
-//  if (isNative()) return *this;
-
-  const size_t slen=length()+1;
-  if(slen>1)
-  {
-    retval=UTF8ToNative();
-    if(!retval.length())
-    {
-#ifdef HAS_ICONV 
-      char *result;
-      GPBuffer<char> gresult(result);
-      size_t length = 0;
-      const char *locales[]={0,"ASCII","ISO-8859-1","CP932","EUC-JP",0};
-      GUTF8String glocale_charset=locale_charset();
-      locales[0]=glocale_charset;
-      const char **pos=locales;
-      for(;pos[0];++pos)
-      {
-        if (pos[0][0]&&!DjVuIconv::iconv_string(pos[0], "UTF-8",
-          s, slen, result, length, gresult))
-        {
-          if (tocode)
-            strcpy((char*)tocode,pos[0]);
-          retval=result;
-          break;
-        }
-      }
-      if(!pos[0])
-      {
-        if (tocode)
-          strcpy(tocode,locales[0]);
-        retval=*this; //invalid codeset
-      }
-#else /* HAS_ICONV */
-      retval=(const char*)*this;
-#endif /* HAS_ICONV */
-    }
-  }
-  return retval;
-}
-
-GUTF8String
-GBaseString::NativeToUTF8(void) const
-{
-  GP<GStringRep> retval;
-  if(length())
-  {
-    const char *source=(*this);
-    GUTF8String lc_ctype=setlocale(LC_CTYPE,0);
-    bool repeat;
-    for(repeat=true;;repeat=false)
-    {
-      if( (retval=GStringRep::NativeToUTF8(source)) )
-      {
-        if(*this != GStringRep::UTF8ToNative(retval->data))
-        {
-          retval=GStringRep::UTF8::create((size_t)0);
-        }
-      }
-      if(!repeat || retval || (lc_ctype == setlocale(LC_CTYPE,"")))
-        break;
-    }
-    if(!repeat)
-    {
-      setlocale(LC_CTYPE,(const char *)lc_ctype);
-    }
-  }
-  return GUTF8String(retval);
-}
-
-GUTF8String
-GBaseString::getNative2UTF8(const char *fromcode) const
-{ //MBCS cvt
-
-   // We don't want to do a transform this
-   // if we already are in the given type.
-//   if (isUTF8()) return *this;
-   
-  const size_t slen=length()+1;
-  GUTF8String retval;
-  if(slen > 1)
-  {
-    retval=NativeToUTF8();
-    if(!retval.length())
-    {
-#ifdef HAS_ICONV
-      char *result;
-      GPBuffer<char> gresult(result);
-      const char *locales[]={0,"ASCII","ISO-8859-1","CP932","EUC-JP",0};
-      size_t length = 0;
-      GUTF8String glocale_charset;
-      if (!fromcode || !fromcode[0])
-      {
-        fromcode="UTF-8";
-        locales[0]=glocale_charset=locale_charset();
-      }
-      const char **pos=locales;
-      for(;pos[0];++pos)
-      {
-        if (!DjVuIconv::iconv_string(fromcode, pos[0],
-          s, slen, result, length, gresult))
-        {
-          retval=result;
-          break;
-        }
-      }
-      if(!pos[0])
-      {
-        retval=*this;
-      }
-#else /* HAS_ICONV */
-      retval=*this;
-#endif /* HAS_ICONV */
-    }
-  }
-  return retval;
-} /*MBCS*/
 
 static inline unsigned long
 add_char(unsigned long const U, unsigned char const * const r)
@@ -1520,10 +1257,6 @@ GStringRep::UTF8::UTF8(void) {}
 
 GStringRep::UTF8::~UTF8() {}
 
-GStringRep::Native::Native(void) {}
-
-GStringRep::Native::~Native() {}
-
 int
 GStringRep::cmp(const char *s1,const int len) const
 {
@@ -1593,33 +1326,6 @@ GStringRep::UTF8::cmp(const GP<GStringRep> &s2,const int len) const
 } 
 
 int
-GStringRep::Native::cmp(const GP<GStringRep> &s2,const int len) const
-{
-  int retval;
-  if(s2)
-  {
-    if(s2->isUTF8())
-    {
-      GP<GStringRep> r(toUTF8(true));
-      if(r)
-      {
-        retval=GStringRep::cmp(r->data,s2->data,len);
-      }else
-      {
-        retval=cmp(s2->toNative(true),len);
-      }
-    }else
-    {
-      retval=GStringRep::cmp(data,s2->data,len);
-    }
-  }else
-  {
-    retval=GStringRep::cmp(data,0,len);
-  }
-  return retval;
-}
-
-int
 GStringRep::UTF8::toInt() const
 {
   bool isLong;
@@ -1627,16 +1333,12 @@ GStringRep::UTF8::toInt() const
   return (int)toLong(eptr,isLong);
 }
 
-int
-GStringRep::Native::toInt() const
-{
-  return atoi(data);
-}
-
 static inline long
 Cstrtol(char *data,char **edata, const int base)
 {
+#ifndef UNDER_CE
   GStringRep::ChangeLocale locale(LC_ALL,"C");
+#endif // UNDER_CE
   return strtol(data,edata,base);
 }
 
@@ -1667,28 +1369,12 @@ GStringRep::UTF8::toLong( GP<GStringRep>& eptr, bool &isLong, const int base) co
   return retval;
 }
 
-long
-GStringRep::Native::toLong(
-  GP<GStringRep>& eptr, bool &isLong, const int base ) const
-{
-   char *edata=0;
-   const long retval=strtol(data, &edata, base);
-   if(edata)
-   {
-     eptr=GStringRep::Native::create(edata);
-     isLong=true;
-   }else
-   {
-     eptr=0;
-     isLong=false;
-   }
-   return retval;
-}
-
 static inline unsigned long
 Cstrtoul(char *data,char **edata, const int base)
 {
+#ifndef UNDER_CE
   GStringRep::ChangeLocale locale(LC_ALL,"C");
+#endif // UNDER_CE
   return strtoul(data,edata,base);
 }
 
@@ -1719,28 +1405,12 @@ GStringRep::UTF8::toULong( GP<GStringRep>& eptr, bool &isULong, const int base) 
   return retval;
 }
 
-unsigned long
-GStringRep::Native::toULong(
-  GP<GStringRep>& eptr, bool &isULong, const int base ) const
-{
-  char *edata=0;
-  const unsigned long retval=strtoul(data, &edata, base);
-  if(edata)
-  {
-    eptr=GStringRep::Native::create(edata);
-    isULong=true;
-  }else
-  {
-    eptr=0;
-    isULong=false;
-  }
-  return retval;
-}
-
 static inline double
 Cstrtod(char *data,char **edata)
 {
+#ifndef UNDER_CE
   GStringRep::ChangeLocale locale(LC_ALL,"C");
+#endif // UNDER_CE
   return strtod(data,edata);
 }
 
@@ -1771,24 +1441,6 @@ GStringRep::UTF8::toDouble( GP<GStringRep>& eptr, bool &isDouble) const
   return retval;
 }
 
-double
-GStringRep::Native::toDouble(
-  GP<GStringRep>& eptr, bool &isDouble) const
-{
-  char *edata=0;
-  const double retval=strtod(data, &edata);
-  if(edata)
-  {
-    eptr=GStringRep::Native::create(edata);
-    isDouble=true;
-  }else
-  {
-    eptr=0;
-    isDouble=false;
-  }
-  return retval;
-}
-
 int 
 GStringRep::getUCS4(unsigned long &w, const int from) const
 {
@@ -1815,51 +1467,6 @@ unsigned long
 GStringRep::UTF8::getValidUCS4(const char *&source) const
 {
   return GStringRep::UTF8toUCS4((const unsigned char *&)source,data+size);
-}
-
-unsigned long
-GStringRep::Native::getValidUCS4(const char *&source) const
-{
-  int n=(int)((size_t)size+(size_t)data-(size_t)source);
-  mbstate_t ps;
-  (void)mbrlen(source, n, &ps);
-  wchar_t wt;
-  const int len=mbrtowc(&wt,source,n,&ps); 
-  unsigned long retval=0;
-  if(len>=0)
-  {
-    if(sizeof(wchar_t) == sizeof(unsigned short))
-    {
-      source+=len;
-      unsigned short s[2];
-      s[0]=(unsigned short)wt;
-      if(UTF16toUCS4(retval,s,s+1)<=0)
-      {
-        if((n-=len)>0)
-        {
-          const int len=mbrtowc(&wt,source,n,&ps);
-          if(len>=0)
-          {
-            s[1]=(unsigned short)wt;
-            unsigned long w;
-            if(UTF16toUCS4(w,s,s+2)>0)
-            {
-              source+=len;
-              retval=w;
-            }
-          }
-        }
-      }
-    }else
-    {
-      retval=(unsigned long)wt;
-      source++;
-    } 
-  }else
-  {
-    source++;
-  }
-  return retval;
 }
 
 int
@@ -1953,4 +1560,423 @@ GStringRep::UTF16toUCS4(
   }
   return retval;
 }
+
+#ifndef UNDER_CE
+
+// Gather the native implementations here. Not used in WinCE.
+
+GStringRep::Native::Native(void) {}
+
+GStringRep::Native::~Native() {}
+
+GP<GStringRep>
+GStringRep::Native::append(const GP<GStringRep> &s2) const
+{
+  GP<GStringRep> retval;
+  if(s2)
+  {
+    if(s2->isUTF8())
+    {
+      G_THROW( ERR_MSG("GStringRep.appendUTF8toNative") );
+    }
+    retval=concat(data,s2->data);
+  }else
+  {
+    retval=const_cast<GStringRep::Native *>(this); 
+  }
+  return retval;
+}
+
+GP<GStringRep>
+GStringRep::Native::create_format(const char fmt[],...)
+{
+  va_list args;
+  va_start(args, fmt);
+  return create(fmt,args);
+}
+
+unsigned char *
+GStringRep::Native::UCS4toString(
+  const unsigned long w0,unsigned char *ptr, mbstate_t *ps) const
+{
+  return UCS4toNative(w0,ptr,ps);
+}
+
+// Convert a UCS4 to a multibyte string in the value bytes.  
+// The data pointed to by ptr should be long enough to contain
+// the results with a nill termination.  (Normally 7 characters
+// is enough.)
+unsigned char *
+GStringRep::UCS4toNative(
+  const unsigned long w0,unsigned char *ptr, mbstate_t *ps)
+{
+  unsigned short w1, w2;
+  for(int count=(sizeof(wchar_t) == sizeof(w1))?UCS4toUTF16(w0,w1,w2):1;
+    count;--count,w1=w2)
+  {
+    // wchar_t can be either UCS4 or UCS2
+    const wchar_t w=(sizeof(wchar_t) == sizeof(w1))?(wchar_t)w1:(wchar_t)w0;
+    int i=wcrtomb((char *)ptr,w,ps);
+    if(i<0)
+    {
+      break;
+    }
+    ptr+=i;
+  }
+  ptr[0]=0;
+  return ptr;
+}
+
+GP<GStringRep>
+GStringRep::Native::toNative(const bool nothrow) const
+{
+  if(!nothrow)
+    G_THROW( ERR_MSG("GStringRep.NativeToNative") );
+  return const_cast<GStringRep::Native *>(this);
+}
+
+GP<GStringRep>
+GStringRep::Native::toUTF8(const bool) const
+{
+  size_t n=size;
+  const char *source=data;
+  mbstate_t ps;
+  unsigned char *buf;
+  GPBuffer<unsigned char> gbuf(buf,n*6+1);
+  unsigned char *ptr=buf;
+  (void)mbrlen(source, n, &ps);
+  int i=0;
+  if(sizeof(wchar_t) == sizeof(unsigned long))
+  {
+    for(wchar_t w;
+      (n>0)&&((i=mbrtowc(&w,source,n,&ps))>=0);
+      n-=i,source+=i)
+    {
+      ptr=UCS4toUTF8(w,ptr);
+    }
+  }else
+  { 
+    for(wchar_t w;
+      (n>0)&&((i=mbrtowc(&w,source,n,&ps))>=0);
+      n-=i,source+=i)
+    {
+      unsigned short s[2];
+      s[0]=w;
+      unsigned long w0;
+      if(UTF16toUCS4(w0,s,s+1)<=0)
+      {
+        source+=i;
+        n-=i;
+        if((n>0)&&((i=mbrtowc(&w,source,n,&ps))>=0))
+        {
+          s[1]=w;
+          if(UTF16toUCS4(w0,s,s+2)<=0)
+          {
+            i=(-1);
+            break;
+          }
+        }else
+        {
+          i=(-1);
+          break;
+        }
+      }
+      ptr=UCS4toUTF8(w0,ptr);
+    }
+  }
+  if(i<0)
+  {
+    gbuf.resize(0);
+  }else
+  {
+    ptr[0]=0;
+  }
+  return GStringRep::UTF8::create((const char *)buf);
+}
+
+GNativeString
+GBaseString::UTF8ToNative(const bool currentlocale) const
+{
+  const char *source=(*this);
+  GP<GStringRep> retval;
+  if(source && source[0]) 
+  {
+    GUTF8String lc_ctype(setlocale(LC_CTYPE,0));
+    bool repeat;
+    for(repeat=!currentlocale;;repeat=false)
+    {
+      retval=(*this)->toNative();
+      if(!repeat
+        || retval
+        || (lc_ctype == setlocale(LC_CTYPE,""))
+      ) break;
+    }
+    if(!repeat)
+    {
+      setlocale(LC_CTYPE,(const char *)lc_ctype);
+    }
+  }
+  return GNativeString(retval);
+}
+
+/*MBCS*/
+GNativeString
+GBaseString::getUTF82Native(char* tocode) const
+{ //MBCS cvt
+  GNativeString retval;
+
+  // We don't want to convert this if it 
+  // already is known to be native...
+//  if (isNative()) return *this;
+
+  const size_t slen=length()+1;
+  if(slen>1)
+  {
+    retval=UTF8ToNative();
+    if(!retval.length())
+    {
+#ifdef HAS_ICONV 
+      char *result;
+      GPBuffer<char> gresult(result);
+      size_t length = 0;
+      const char *locales[]={0,"ASCII","ISO-8859-1","CP932","EUC-JP",0};
+      GUTF8String glocale_charset=locale_charset();
+      locales[0]=glocale_charset;
+      const char **pos=locales;
+      for(;pos[0];++pos)
+      {
+        if (pos[0][0]&&!DjVuIconv::iconv_string(pos[0], "UTF-8",
+          s, slen, result, length, gresult))
+        {
+          if (tocode)
+            strcpy((char*)tocode,pos[0]);
+          retval=result;
+          break;
+        }
+      }
+      if(!pos[0])
+      {
+        if (tocode)
+          strcpy(tocode,locales[0]);
+        retval=*this; //invalid codeset
+      }
+#else /* HAS_ICONV */
+      retval=(const char*)*this;
+#endif /* HAS_ICONV */
+    }
+  }
+  return retval;
+}
+
+GUTF8String
+GBaseString::NativeToUTF8(void) const
+{
+  GP<GStringRep> retval;
+  if(length())
+  {
+    const char *source=(*this);
+    GUTF8String lc_ctype=setlocale(LC_CTYPE,0);
+    bool repeat;
+    for(repeat=true;;repeat=false)
+    {
+      if( (retval=GStringRep::NativeToUTF8(source)) )
+      {
+        if(*this != GStringRep::UTF8ToNative(retval->data))
+        {
+          retval=GStringRep::UTF8::create((size_t)0);
+        }
+      }
+      if(!repeat || retval || (lc_ctype == setlocale(LC_CTYPE,"")))
+        break;
+    }
+    if(!repeat)
+    {
+      setlocale(LC_CTYPE,(const char *)lc_ctype);
+    }
+  }
+  return GUTF8String(retval);
+}
+
+GUTF8String
+GBaseString::getNative2UTF8(const char *fromcode) const
+{ //MBCS cvt
+
+   // We don't want to do a transform this
+   // if we already are in the given type.
+//   if (isUTF8()) return *this;
+   
+  const size_t slen=length()+1;
+  GUTF8String retval;
+  if(slen > 1)
+  {
+    retval=NativeToUTF8();
+    if(!retval.length())
+    {
+#ifdef HAS_ICONV
+      char *result;
+      GPBuffer<char> gresult(result);
+      const char *locales[]={0,"ASCII","ISO-8859-1","CP932","EUC-JP",0};
+      size_t length = 0;
+      GUTF8String glocale_charset;
+      if (!fromcode || !fromcode[0])
+      {
+        fromcode="UTF-8";
+        locales[0]=glocale_charset=locale_charset();
+      }
+      const char **pos=locales;
+      for(;pos[0];++pos)
+      {
+        if (!DjVuIconv::iconv_string(fromcode, pos[0],
+          s, slen, result, length, gresult))
+        {
+          retval=result;
+          break;
+        }
+      }
+      if(!pos[0])
+      {
+        retval=*this;
+      }
+#else /* HAS_ICONV */
+      retval=*this;
+#endif /* HAS_ICONV */
+    }
+  }
+  return retval;
+} /*MBCS*/
+
+int
+GStringRep::Native::cmp(const GP<GStringRep> &s2,const int len) const
+{
+  int retval;
+  if(s2)
+  {
+    if(s2->isUTF8())
+    {
+      GP<GStringRep> r(toUTF8(true));
+      if(r)
+      {
+        retval=GStringRep::cmp(r->data,s2->data,len);
+      }else
+      {
+        retval=cmp(s2->toNative(true),len);
+      }
+    }else
+    {
+      retval=GStringRep::cmp(data,s2->data,len);
+    }
+  }else
+  {
+    retval=GStringRep::cmp(data,0,len);
+  }
+  return retval;
+}
+
+int
+GStringRep::Native::toInt() const
+{
+  return atoi(data);
+}
+
+long
+GStringRep::Native::toLong(
+  GP<GStringRep>& eptr, bool &isLong, const int base ) const
+{
+   char *edata=0;
+   const long retval=strtol(data, &edata, base);
+   if(edata)
+   {
+     eptr=GStringRep::Native::create(edata);
+     isLong=true;
+   }else
+   {
+     eptr=0;
+     isLong=false;
+   }
+   return retval;
+}
+
+unsigned long
+GStringRep::Native::toULong(
+  GP<GStringRep>& eptr, bool &isULong, const int base ) const
+{
+  char *edata=0;
+  const unsigned long retval=strtoul(data, &edata, base);
+  if(edata)
+  {
+    eptr=GStringRep::Native::create(edata);
+    isULong=true;
+  }else
+  {
+    eptr=0;
+    isULong=false;
+  }
+  return retval;
+}
+
+double
+GStringRep::Native::toDouble(
+  GP<GStringRep>& eptr, bool &isDouble) const
+{
+  char *edata=0;
+  const double retval=strtod(data, &edata);
+  if(edata)
+  {
+    eptr=GStringRep::Native::create(edata);
+    isDouble=true;
+  }else
+  {
+    eptr=0;
+    isDouble=false;
+  }
+  return retval;
+}
+
+unsigned long
+GStringRep::Native::getValidUCS4(const char *&source) const
+{
+  int n=(int)((size_t)size+(size_t)data-(size_t)source);
+  mbstate_t ps;
+  (void)mbrlen(source, n, &ps);
+  wchar_t wt;
+  const int len=mbrtowc(&wt,source,n,&ps); 
+  unsigned long retval=0;
+  if(len>=0)
+  {
+    if(sizeof(wchar_t) == sizeof(unsigned short))
+    {
+      source+=len;
+      unsigned short s[2];
+      s[0]=(unsigned short)wt;
+      if(UTF16toUCS4(retval,s,s+1)<=0)
+      {
+        if((n-=len)>0)
+        {
+          const int len=mbrtowc(&wt,source,n,&ps);
+          if(len>=0)
+          {
+            s[1]=(unsigned short)wt;
+            unsigned long w;
+            if(UTF16toUCS4(w,s,s+2)>0)
+            {
+              source+=len;
+              retval=w;
+            }
+          }
+        }
+      }
+    }else
+    {
+      retval=(unsigned long)wt;
+      source++;
+    } 
+  }else
+  {
+    source++;
+  }
+  return retval;
+}
+
+#endif // UNDER_CE
+
 
