@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GCache.h,v 1.5 1999-06-08 20:36:24 leonb Exp $
+//C- $Id: GCache.h,v 1.6 1999-06-11 22:07:29 leonb Exp $
 
 #ifndef _GCACHE_H
 #define _GCACHE_H
@@ -36,7 +36,7 @@
     
     @memo Simple template data caching class.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: GCache.h,v 1.5 1999-06-08 20:36:24 leonb Exp $#
+    @version #$Id: GCache.h,v 1.6 1999-06-11 22:07:29 leonb Exp $#
 */
 
 //@{
@@ -168,6 +168,8 @@ private:
    int		calculate_size(void);
    void		clear_to_size(int size);
 };
+
+//@}
 
 template<class Key, class Value> inline
 GCache<Key, Value>::GCache(int xmax_size) :
