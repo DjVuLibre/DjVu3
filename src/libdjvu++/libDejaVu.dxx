@@ -1,6 +1,11 @@
 // -*- C++ -*-
 /** @name DjVu Reference Library
- */
+
+    Disclaimer: Spelling has not been checked yet!
+    
+    @author
+    Leon Bottou, 02/1999
+*/
 //@{
 
 //----------------------------------------
