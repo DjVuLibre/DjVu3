@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: parseoptions.cpp,v 1.40 2000-02-16 04:40:14 bcr Exp $
+//C- $Id: parseoptions.cpp,v 1.41 2000-02-16 04:46:16 bcr Exp $
 #ifdef __GNUC__
 #pragma implementation
 #endif
@@ -647,9 +647,18 @@ DjVuParseOptions::Add(
 {
   if(var<0)
   {
-    static const char emesg[]="%s:Error in line %d of profile '%s'\n\t--> %s";
+    static const char emesg1[]="%s:Error in line %d of profile '%s'\n\t--> Illegal profile name '%s'";
+    static const char emesg2[]="%s:Error in line %d of profile '%s'\n\t--> %s";
+    const char *emesg;
+    if(value[0] && strchr(value,':'))
+    {
+      emesg=emesg1;
+    }else
+    {
+      emesg=emesg2;
+    }
     const char *p=GetProfileName(profile);
-    char *s=new char[22+sizeof(emesg)+strlen(p)+strlen(value)+strlen(filename)];
+    char *s=new char[22+strlen(emesg)+strlen(p)+strlen(value)+strlen(filename)];
     sprintf(s,emesg,filename,line,p,value);
     Errors->AddError(s);
     delete [] s;
