@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuOptions.h,v 1.2 2000-02-03 19:01:33 bcr Exp $
+ *C- $Id: DjVuOptions.h,v 1.3 2000-02-03 19:07:38 bcr Exp $
  */
 
 #ifndef _DJVU_OPTIONS_H_
@@ -63,13 +63,13 @@ extern const char djvu_tobitonal_string[];
 extern const char djvu_resize_string[];
 extern const char djvu_upsample_string[];
 extern const char djvu_subsample_string[];
-extern const char djvu_segment_string[];
+extern const char djvu_crop_string[];
 #define djvu_togray_option {djvu_togray_string+2,2,0,'G'}
 #define djvu_tobitonal_option {djvu_tobitonal_string+2,2,0,'B'}
 #define djvu_resize_option {djvu_resize_string+2,1,0,'R'}
 #define djvu_upsample_option {djvu_upsample_string+2,1,0,'u'}
 #define djvu_subsample_option {djvu_subsample_string+2,1,0,'s'}
-#define djvu_segment_option {djvu_segment_string+2,1,0,'S'}
+#define djvu_crop_option {djvu_crop_string+2,1,0,'S'}
 
 /** These are defined in DjVuJB2Parse.cpp as part of libdjvuphoto.a */
 
