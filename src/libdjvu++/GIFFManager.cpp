@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GIFFManager.cpp,v 1.12 2001-01-04 22:04:55 bcr Exp $
+// $Id: GIFFManager.cpp,v 1.13 2001-01-10 19:45:51 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -192,13 +192,6 @@ GIFFChunk::del_chunk(const char * name)
 	 chunks.del(pos);
 	 return;
       };
- 
-/*    Original preserved in case I screw things up      
-   char * buffer=new char[256];
-   sprintf(buffer, "There is no subchunk '%s' #%d in chunk '%s'.",
-	   (const char *) short_name, number, (const char *) get_name());
-   G_THROW(buffer);
-*/
    G_THROW(GString("GIFFManager.no_chunk\t")+short_name+"\t"+GString(number)+"\t"+get_name());
 }
 
@@ -397,11 +390,6 @@ GIFFManager::del_chunk(const char * name)
    
    if (!strlen(start))
    {
-     /*     Original preserved in case I screw things up
-      char * buffer=new char[128];
-      sprintf(buffer, "Malformed chunk name '%s': ends with a dot.", name);
-      G_THROW(buffer);
-     */
      G_THROW(GString("GIFFManager.malformed\t")+name);
    };
    

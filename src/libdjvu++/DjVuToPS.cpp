@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuToPS.cpp,v 1.21 2001-01-04 22:04:55 bcr Exp $
+// $Id: DjVuToPS.cpp,v 1.22 2001-01-10 19:45:51 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -808,23 +808,19 @@ DjVuToPS::print_image(ByteStream & str, const GP<DjVuImage> & dimg,
       prn_rect.width(), prn_rect.height());
   }
   
-  unsigned char * buffer=0;
-  unsigned char * rle_in=0;
-  unsigned char * rle_out=0;
-  G_TRY {
+  {
+    unsigned char *buffer, *rle_in, *rle_out;
+    GPBuffer<unsigned char> gbuffer(buffer,buffer_size);
+    GPBuffer<unsigned char> grle_in(rle_in,ps_chunk_height*prn_rect.width());
+    GPBuffer<unsigned char> grle_out(rle_out,2*ps_chunk_height*prn_rect.width());
     // Start storing image in bands
-    if (!(buffer=new unsigned char[buffer_size]) ||
-      !(rle_in=new unsigned char[ps_chunk_height*prn_rect.width()]) ||
-      !(rle_out=new unsigned char[2*ps_chunk_height*prn_rect.width()]))
-        G_THROW("DjVuToPS.no_memory");
-    
     unsigned char * rle_out_end=rle_out;
     GRect grectBand=prn_rect;
     grectBand.ymin=grectBand.ymax;
     while(grectBand.ymin>prn_rect.ymin)
     {
-      GP<GPixmap> pm=0;
-      GP<GBitmap> bm=0;
+      GP<GPixmap> pm;
+      GP<GBitmap> bm;
       
       // Compute next band
       grectBand.ymax=grectBand.ymin;
@@ -1053,15 +1049,7 @@ DjVuToPS::print_image(ByteStream & str, const GP<DjVuImage> & dimg,
           str.writall(buffer, buf_ptr-buffer);
         }
         
-        delete buffer; buffer=0;
-        delete rle_in; rle_in=0;
-        delete rle_out; rle_out=0;
-   } G_CATCH_ALL {
-     delete buffer; buffer=0;
-     delete rle_in; rle_in=0;
-     delete rle_out; rle_out=0;
-     G_RETHROW;
-   } G_ENDCATCH;
+   }
    char frc=options.get_frame() ? ' ' : '%';
    write(str, 
      "\n"

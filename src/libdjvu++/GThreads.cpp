@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GThreads.cpp,v 1.56 2001-01-04 22:04:55 bcr Exp $
+// $Id: GThreads.cpp,v 1.57 2001-01-10 19:45:51 bcr Exp $
 // $Name:  $
 
 
@@ -1028,16 +1028,22 @@ coselect_test(coselect *c)
 
 // -------------------------------------- cotask
 
-struct cotask {
-  struct cotask *next;
-  struct cotask *prev;
+class GThread::cotask {
+public:
+#ifndef NO_LIBGCC_HOOKS
+  cotask(const int xstacksize,void *);
+#else
+  cotask(const int xstacksize);
+#endif
+  ~cotask();
+  class GThread::cotask *next;
+  class GThread::cotask *prev;
   // context
   mach_state regs;
   // stack information
   char *stack;
+  GPBuffer<char> gstack;
   int stacksize;
-  // egcs exception support
-  void *ehctx;
   // timing information
   unsigned long over;
   // waiting information
@@ -1046,33 +1052,55 @@ struct cotask {
   unsigned long *maxwait;
   // delete after termination
   bool autodelete;
+  // egcs exception support
+#ifndef NO_LIBGCC_HOOKS
+  void *ehctx;
+#endif
 };
 
-static cotask *maintask = 0;
-static cotask *curtask  = 0;
-static cotask *autodeletetask = 0;
+#ifndef NO_LIBGCC_HOOKS
+GThread::cotask::cotask(const int xstacksize, void *xehctx)
+#else
+GThread::cotask::cotask(const int xstacksize)
+#endif
+: next(0), prev(0), gstack(stack,xstacksize), stacksize(xstacksize),
+  over(0), wchan(0), wselect(0), maxwait(0), autodelete(false)
+#ifndef NO_LIBGCC_HOOKS
+  ,ehctx(xehctx)
+#endif
+{
+  memset(regs,0,sizeof(regs));
+}
+
+static GThread::cotask *maintask = 0;
+static GThread::cotask *curtask  = 0;
+static GThread::cotask *autodeletetask = 0;
 static unsigned long globalmaxwait = 0;
 static void (*scheduling_callback)(int) = 0;
 static timeval time_base;
 
 
+GThread::cotask::~cotask()
+{
+  gstack.resize(0);
+#ifndef NO_LIBGCC_HOOKS
+  if (task->ehctx)
+    free(task->ehctx);
+#endif
+  task->ehctx = 0;
+}
+
 static void 
-cotask_free(cotask *task)
+cotask_free(GThread::cotask *task)
 {
 #ifdef COTHREAD_TRACE
   fprintf(stderr,"cothreads: freeing task %p with autodelete=%d\n", 
           task,task->autodelete);
 #endif
-  if (task && task!=maintask)
-    {
-      if (task->stack) 
-        delete [] task->stack;
-      task->stack = 0;
-      if (task->ehctx) 
-        free(task->ehctx);
-      task->ehctx = 0;
-      delete task;
-    }
+  if (task!=maintask)
+  {
+    delete task;
+  }
 }
 
 
@@ -1118,8 +1146,8 @@ cotask_yield()
   // start scheduling
  reschedule:
   // try unblocking tasks
-  cotask *n = curtask->next;
-  cotask *q = n;
+  GThread::cotask *n = curtask->next;
+  GThread::cotask *q = n;
   do 
     { 
       if (q->wchan)
@@ -1153,7 +1181,7 @@ cotask_yield()
   // find best candidate
   static int count;
   unsigned long best = MAXPENALTY + 1;
-  cotask *r = 0;
+  GThread::cotask *r = 0;
   count = 0;
   q = n;
   do 
@@ -1187,7 +1215,7 @@ cotask_yield()
 #ifdef COTHREAD_TRACE
           fprintf(stderr,"cothreads: ----- switch to %p [%ld]\n", r, best);
 #endif
-          cotask *old = curtask;
+          GThread::cotask *old = curtask;
           curtask = r;
           mach_switch(&old->regs, &curtask->regs);
         }
@@ -1238,7 +1266,7 @@ cotask_yield()
 
 
 static void
-cotask_terminate(cotask *task)
+cotask_terminate(GThread::cotask *task)
 {
 #ifdef COTHREAD_TRACE
   fprintf(stderr,"cothreads: terminating task %p\n", task);
@@ -1270,8 +1298,8 @@ cotask_wakeup(void *wchan, int onlyone)
 {
   if (maintask && curtask)
     {
-      cotask *n = curtask->next;
-      cotask *q = n;
+      GThread::cotask *n = curtask->next;
+      GThread::cotask *q = n;
       do 
         { 
           if (q->wchan == wchan)
@@ -1345,7 +1373,7 @@ cotask_get_select(int &nfds, fd_set *rfds, fd_set *wfds, fd_set *efds,
   FD_ZERO(&allfds.eset);
   if (curtask)
     {
-      cotask *q=curtask->next;
+      GThread::cotask *q=curtask->next;
       while (q != curtask)
         {
           ready++;
@@ -1424,25 +1452,24 @@ GThread::GThread(int stacksize)
   // initialization
   if (! maintask)
     {
-      static cotask comaintask;
+#ifndef NO_LIBGCC_HOOKS
+      static GThread::cotask comaintask(0,(*__get_eh_context_ptr)());
+      __get_eh_context_ptr = cotask_get_eh_context;
+#else
+      static GThread::cotask comaintask(0);
+#endif
       maintask = &comaintask;
-      memset(maintask, 0, sizeof(cotask));
+//      memset(maintask, 0, sizeof(GThread::cotask));
       maintask->next = maintask;
       maintask->prev = maintask;
       gettimeofday(&time_base,NULL);
-#ifndef NO_LIBGCC_HOOKS
-      maintask->ehctx =  (*__get_eh_context_ptr)();
-      __get_eh_context_ptr = cotask_get_eh_context;
-#endif
       curtask = maintask;
     }
   // allocation
-  task = new cotask;
-  memset(task, 0, sizeof(cotask));
-  task->stacksize = stacksize;
-  task->stack = new char[stacksize];
 #ifndef NO_LIBGCC_HOOKS
-  task->ehctx = __new_eh_context();
+  task = new GThread::cotask(stacksize,__new_eh_context());
+#else
+  task = new GThread::cotask(stacksize);
 #endif
 }
 
@@ -1450,13 +1477,13 @@ GThread::GThread(int stacksize)
 GThread::~GThread()
 {
   if (task && task!=maintask)
-    {
-      if (task->prev) // running
-        task->autodelete = true;
-      else
-        cotask_free(task);
-      task = 0;
-    }
+  {
+    if (task->prev) // running
+      task->autodelete = true;
+    else
+      cotask_free(task);
+    task = 0;
+  }
 }
 
 
@@ -1529,7 +1556,7 @@ GThread::create(void (*entry)(void*), void *arg)
   task->prev = curtask->prev;
   task->next->prev = task;
   task->prev->next = task;
-  cotask *old = curtask;
+  GThread::cotask *old = curtask;
   starter = this;
   mach_start(&old->regs, (void*)startone, 
              task->stack, task->stack+task->stacksize);

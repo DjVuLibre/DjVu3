@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GThreads.h,v 1.44 2001-01-04 22:04:55 bcr Exp $
+// $Id: GThreads.h,v 1.45 2001-01-10 19:45:51 bcr Exp $
 // $Name:  $
 
 #ifndef _GTHREADS_H_
@@ -95,7 +95,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Praveen Guduru <praveen@sanskrit.lz.att.com> -- mac implementation.
     @version
-    #$Id: GThreads.h,v 1.44 2001-01-04 22:04:55 bcr Exp $# */
+    #$Id: GThreads.h,v 1.45 2001-01-10 19:45:51 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -242,8 +242,9 @@ private:
   JRIGlobalRef obj;
 #elif THREADMODEL==COTHREADS
   friend class GMonitor;
-  struct cotask *task;
 public:
+  class cotask;
+  class cotask *task;
   /** Replaces system call #select# (COTHREADS only).  The #COTHREADS# model
       does not redefine system function.  System functions therefore can
       potentially block the whole process (instead of blocking the current

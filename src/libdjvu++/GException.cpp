@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GException.cpp,v 1.27 2001-01-04 22:04:55 bcr Exp $
+// $Id: GException.cpp,v 1.28 2001-01-10 19:45:51 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -92,7 +92,7 @@ GException::GException (const char *xcause, const char *file, int line, const ch
 GException::~GException(void)
 {
   if (cause && cause!=outofmemory ) 
-    delete [] (char*)cause; 
+    delete [] const_cast<char*>(cause); 
   cause=file=func=0;
 }
 
@@ -100,7 +100,7 @@ GException &
 GException::operator=(const GException & exc)
 {
   if (cause && cause!=outofmemory) 
-    delete [] (char*)cause;
+    delete [] const_cast<char*>(cause);
   cause = 0;
   file = exc.file;
   func = exc.func;
