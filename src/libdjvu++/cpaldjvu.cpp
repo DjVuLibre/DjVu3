@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: cpaldjvu.cpp,v 1.1 2000-02-17 22:09:08 leonb Exp $
+//C- $Id: cpaldjvu.cpp,v 1.2 2000-02-22 14:32:31 leonb Exp $
 
 
 /** @name cpaldjvu
@@ -36,17 +36,18 @@
 
     {\bf Remarks}
 
-    This is a very good alternative to GIF which performs quite well on
+    This is a very good alternative to GIF. It performs especially well on
     screendumps.  Compression ratios can get hurt when there are continuous
-    tone segment in the image.  Demoting such segments from foreground to background
-    is a pretty interesting project.  Dithered segments behave surprisingly well. 
+    tone segment in the image.  Demoting such segments from foreground to
+    background is a pretty interesting project.  Dithered segments behave
+    surprisingly well.
 
     @memo
     Simple lossless encoder for low resolution, low color images.
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: cpaldjvu.cpp,v 1.1 2000-02-17 22:09:08 leonb Exp $# */
+    #$Id: cpaldjvu.cpp,v 1.2 2000-02-22 14:32:31 leonb Exp $# */
 //@{
 //@}
 
