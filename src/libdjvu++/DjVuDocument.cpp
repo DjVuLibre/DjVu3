@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.19 1999-08-25 22:07:25 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.20 1999-08-26 19:29:59 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -35,6 +35,8 @@ DjVuDocument::DjVuDocument(const GURL & url, DjVuPort * xport,
       simple_port=new DjVuSimplePort();
       pcaster->add_route(this, simple_port);
    }
+   
+   pcaster->add_route(this, this);
 
    detect_doc_type(url);
 }
@@ -42,13 +44,6 @@ DjVuDocument::DjVuDocument(const GURL & url, DjVuPort * xport,
 DjVuDocument::~DjVuDocument(void)
 {
    delete simple_port; simple_port=0;
-}
-
-GP<DjVuFile>
-DjVuDocument::create_djvu_file(const GURL & url, DjVuPort * port,
-			       GCache<GURL, DjVuFile> * cache)
-{
-   return new DjVuFile(url, port, cache);
 }
 
 void
@@ -323,10 +318,10 @@ void
 DjVuDocument::add_to_cache(const GP<DjVuFile> & f)
 {
    if (cache)
-     {
-       GMap<GURL, void *> map;
-       ::add_to_cache(f, map, cache);
-     }
+   {
+      GMap<GURL, void *> map;
+      ::add_to_cache(f, map, cache);
+   }
 }
 
 void
@@ -375,12 +370,27 @@ DjVuDocument::id_to_url(const DjVuPort * source, const char * id)
    return id_to_url(id);
 }
 
+GPBase
+DjVuDocument::get_cached_file(const DjVuPort * source, const GURL & url)
+{
+   DEBUG_MSG("DjVuDocument::get_cached_file(): url='" << url << "'\n");
+   DEBUG_MAKE_INDENT(3);
+
+   GP<DjVuFile> file;
+   if (cache) file=cache->get_item(url);
+
+   DEBUG_MSG("found file in the cache=" << (file!=0) << "\n");
+   return (DjVuFile *) file;
+}
+
 GP<DataRange>
 DjVuDocument::request_data(const DjVuPort * source, const GURL & url)
 {
    DEBUG_MSG("DjVuDocument::request_data(): seeing if we can do it\n");
    DEBUG_MAKE_INDENT(3);
 
+   if (source==this) return 0;
+   
    switch(doc_type)
    {
       case OLD_BUNDLED:
@@ -454,13 +464,11 @@ DjVuDocument::get_djvu_file(const GURL & url)
 {
    DEBUG_MSG("DjVuDocument::get_djvu_file(): request for '" << url << "'\n");
    DEBUG_MAKE_INDENT(3);
-   
-   GP<DjVuFile> file;
-   if (cache) file=cache->get_item(url);
-   if (!file)
-   {
-      file=create_djvu_file(url, this, cache);
-   } else if (dummy_ndir)
+
+   GPBase tmpfile=get_portcaster()->get_cached_file(this, url);
+   GP<DjVuFile> file=(DjVuFile *) tmpfile.get();
+   if (!file) file=new DjVuFile(url, this);
+   else if (dummy_ndir)
    {
       GP<DjVuNavDir> dir=file->find_ndir();
       if (dir)

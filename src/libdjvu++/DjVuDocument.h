@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.h,v 1.8 1999-08-19 23:03:52 eaf Exp $
+//C- $Id: DjVuDocument.h,v 1.9 1999-08-26 19:29:59 eaf Exp $
  
 #ifndef _DJVUDOCUMENT_H
 #define _DJVUDOCUMENT_H
@@ -19,6 +19,7 @@
 #endif
 
 #include "GSmartPointer.h"
+#include "GCache.h"
 #include "DjVuFile.h"
 #include "DjVuImage.h"
 #include "DjVmDir0.h"
@@ -31,7 +32,7 @@
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocument.h,v 1.8 1999-08-19 23:03:52 eaf Exp $#
+    @version #$Id: DjVuDocument.h,v 1.9 1999-08-26 19:29:59 eaf Exp $#
 */
 
 //@{
@@ -265,13 +266,10 @@ public:
    virtual bool		inherits(const char * class_name) const;
 
    virtual GURL		id_to_url(const DjVuPort * source, const char * id);
+   virtual GPBase	get_cached_file(const DjVuPort * source, const GURL & url);
    virtual GP<DataRange>request_data(const DjVuPort * source, const GURL & url);
    virtual void		notify_chunk_done(const DjVuPort * source, const char * name);
    virtual void		notify_file_done(const DjVuPort * source);
-protected:
-      // This function will be overriden by DjVuDocEditor
-   virtual GP<DjVuFile>	create_djvu_file(const GURL & url, DjVuPort * port,
-					 GCache<GURL, DjVuFile> * cache);
 private:
    GCache<GURL, DjVuFile> * cache;
    DjVuSimplePort	* simple_port;
