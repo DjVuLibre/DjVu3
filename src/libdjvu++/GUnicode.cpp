@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GUnicode.cpp,v 1.18 2001-05-25 19:44:00 bcr Exp $
+// $Id: GUnicode.cpp,v 1.19 2001-05-25 20:23:14 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -160,7 +160,6 @@ static unsigned long UCS4BEtoUCS4(unsigned char const *&s,void const * const);
 static unsigned long UCS4LEtoUCS4(unsigned char const *&s,void const * const);
 static unsigned long UCS4_3412toUCS4(unsigned char const *&s,void const * const);
 static unsigned long UCS4_2143toUCS4(unsigned char const *&s,void const * const);
-template <class TYPE>
 
 GP<GStringRep>
 GStringRep::Unicode::create(const unsigned int sz)
