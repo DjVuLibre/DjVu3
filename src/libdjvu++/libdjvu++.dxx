@@ -845,7 +845,33 @@
 //@Include: djvmcvt.cpp
 //@Include: djvm.cpp
 //@Include: djthumb.cpp
+
+
+/** @name cdjvu
+
+    {\bf Synopsis}
+    \begin{verbatim}
+       % cdjvu <ppmfile> <djvufile>
+    \end{verbatim}
+
+    {\bf Description}
+
+    Shell script #cdjvu# illustrates a very simple encoder for color images.
+    The script first segments the image using a fixed threshold.  It calls
+    then program \Ref{cjb2} to create the encoded mask and program
+    \Ref{djvumake} to create the color layers and assemble the DjVu file.
+
+    The segmentation performed by this script depends on the NetPBM tools
+    #ppmtopgm# and #pgmtopbm#
+    (\URL{http://www.arc.umn.edu/GVL/Software/netpbm.html}).  You may also
+    investigate option #-segment# in the ImageMagick program #convert#
+    (\URL{http://www.wizards.dupont.com/cristy/}) or consider creating the
+    mask image using The Gimp (\URL{http://www.gimp.org}).
+
+    @memo
+    Simple shell script for encoding color DjVu images.
+    @author
+    Patrick Haffner <haffner@research.att.com> */
+
 //@}
-
-
 //@}
