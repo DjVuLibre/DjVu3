@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuAPI.h,v 1.38 2000-02-15 20:59:21 haffner Exp $
+ *C- $Id: DjVuAPI.h,v 1.39 2000-02-16 00:44:08 bcr Exp $
  *
  * The main header file for the DjVu API
  */
@@ -17,7 +17,10 @@
 
 /* 
  * $Log: DjVuAPI.h,v $
- * Revision 1.38  2000-02-15 20:59:21  haffner
+ * Revision 1.39  2000-02-16 00:44:08  bcr
+ * Commented out an unimplimented method.
+ *
+ * Revision 1.38  2000/02/15 20:59:21  haffner
  * Spell check.
  * Improved Mhistogrid to avoid bug reported in forbes/medieval2, buyback3
  *
@@ -828,9 +831,14 @@ djvu_image_hflip(djvu_image *ximg);
  * defined your own decoding, and want to map it to a stream for use with
  * one of the above functions.  The image will be passed directly and
  * may be modified by the encoder.
- */
+ *
 DJVUAPI djvu_import
 djvu_import_image ( djvu_image * );
+ *
+ * (This method is planned for the a future release of DjVu.
+ *  contact djvu@research.att.com if you need this function
+ *  implimented.)
+ */
 
 /* This is a special type of djvu_export, intended for obtaining the
  * pixel image in memory...  An apon successful decoding, the image
