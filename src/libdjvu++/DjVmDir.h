@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVmDir.h,v 1.37 2001-05-01 17:12:15 bcr Exp $
+// $Id: DjVmDir.h,v 1.38 2001-05-01 17:59:24 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVMDIR_H
@@ -84,7 +84,7 @@
     @memo Implements DjVu multipage document directory
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: DjVmDir.h,v 1.37 2001-05-01 17:12:15 bcr Exp $# */
+    #$Id: DjVmDir.h,v 1.38 2001-05-01 17:59:24 bcr Exp $# */
 //@{
 
 
@@ -154,7 +154,7 @@ public:
       /** Returns position of the given page in the directory. */
    int get_page_pos(int page_num) const;
       /** Check for duplicate names, and resolve them. */
-   GPList<DjVmDir::File> resolve_duplicates(const bool save_as_bundled);
+   GPList<File> resolve_duplicates(const bool save_as_bundled);
       /** Returns a copy of the list of file records. */
    GPList<File> get_files_list(void) const;
       /** Returns the number of file records. */
