@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: ByteStream.h,v 1.4 1999-02-26 22:23:06 leonb Exp $
+//C-  $Id: ByteStream.h,v 1.5 1999-03-01 14:48:02 leonb Exp $
 
 
 #ifndef _BYTESTREAM_H
@@ -39,7 +39,7 @@
     Leon Bottou <leonb@research.att.com> -- initial implementation\\
     Andrei Erofeev <eaf@research.att.com> -- 
     @version
-    #$Id: ByteStream.h,v 1.4 1999-02-26 22:23:06 leonb Exp $# */
+    #$Id: ByteStream.h,v 1.5 1999-03-01 14:48:02 leonb Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -273,15 +273,18 @@ private:
   // Cancel C++ default stuff
   MemoryByteStream(const MemoryByteStream &);
   MemoryByteStream & operator=(const MemoryByteStream &);
-private:
-  // Position
+  // Current position
   int where;
 protected:
-  /** Buffer size */
+  /** Reads data from a random position. This function reads at most #sz#
+      bytes at position #pos# into #buffer# and returns the actual number of
+      bytes read.  The current position is unchanged. */
+  size_t readat(void *buffer, size_t sz, int pos);
+  /** Number of bytes in internal buffer. */
   int bsize;
-  /** Number of blocks of 4096 bytes */
+  /** Number of 4096 bytes blocks. */
   int nblocks;
-  /** Pointers to blocks of 4096 bytes */
+  /** Pointers (possibly null) to 4096 bytes blocks. */
   char **blocks;
 };
 

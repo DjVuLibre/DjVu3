@@ -7,9 +7,9 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: ByteStream.cpp,v 1.4 1999-02-26 22:19:13 leonb Exp $
+//C-  $Id: ByteStream.cpp,v 1.5 1999-03-01 14:48:02 leonb Exp $
 
-// File "$Id: ByteStream.cpp,v 1.4 1999-02-26 22:19:13 leonb Exp $"
+// File "$Id: ByteStream.cpp,v 1.5 1999-03-01 14:48:02 leonb Exp $"
 // - Author: Leon Bottou, 04/1997
 
 #ifdef __GNUC__
@@ -385,23 +385,31 @@ MemoryByteStream::write(const void *buffer, size_t sz)
 }
 
 size_t 
-MemoryByteStream::read(void *buffer, size_t sz)
+MemoryByteStream::readat(void *buffer, size_t sz, int pos)
 {
-  if ((int) sz > bsize - where)
-    sz = bsize - where;
+  if ((int) sz > bsize - pos)
+    sz = bsize - pos;
   int nsz = (int)sz;
   if (nsz <= 0)
     return 0;
   // read data from buffer
   while (nsz > 0)
     {
-      int n = (where|0xfff) + 1 - where;
+      int n = (pos|0xfff) + 1 - pos;
       n = ((nsz < n) ? nsz : n);
-      memcpy(buffer, (void*)&blocks[where>>12][where&0xfff], n);
+      memcpy(buffer, (void*)&blocks[pos>>12][pos&0xfff], n);
       buffer = (void*) ((char*)buffer + n);
-      where += n;
+      pos += n;
       nsz -= n;
     }
+  return sz;
+}
+
+size_t 
+MemoryByteStream::read(void *buffer, size_t sz)
+{
+  sz = readat(buffer,sz,where);
+  where += sz;
   return sz;
 }
 
