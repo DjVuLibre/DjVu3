@@ -1,3 +1,6 @@
+
+#ifndef _DJVU_PRIV_H_
+#define _DJVU_PRIV_H_ true
 #include "DjVuGlobal.h"
 #include "DjVuAPI.h"
 #include <stdlib.h> 
@@ -200,4 +203,5 @@ _djvu_image_free(djvu_image *img)
   }
 }
 
+#endif /* _DJVU_PRIV_H_ */
 

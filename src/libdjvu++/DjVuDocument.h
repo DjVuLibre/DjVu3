@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.h,v 1.54 2000-01-20 23:17:21 eaf Exp $
+//C- $Id: DjVuDocument.h,v 1.55 2000-01-21 02:16:56 bcr Exp $
  
 #ifndef _DJVUDOCUMENT_H
 #define _DJVUDOCUMENT_H
@@ -33,7 +33,7 @@
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@research.att.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocument.h,v 1.54 2000-01-20 23:17:21 eaf Exp $#
+    @version #$Id: DjVuDocument.h,v 1.55 2000-01-21 02:16:56 bcr Exp $#
 */
 
 //@{
@@ -734,8 +734,9 @@ DjVuDocument::wait_for_complete_init(void)
    while(!(flags & DOC_INIT_FAILED) &&
 	 !(flags & DOC_INIT_COMPLETE)) flags.wait();
    flags.leave();
+#if THREADMODEL!=NOTHREADS
    init_thr.wait_for_finish();
-   
+#endif // THREADMODEL!=NOTHREADS    
    return (flags & DOC_INIT_COMPLETE)!=0;
 }
 

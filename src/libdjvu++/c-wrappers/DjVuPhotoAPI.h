@@ -8,7 +8,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C- "$Id: DjVuPhotoAPI.h,v 1.2 2000-01-20 05:00:00 bcr Exp $"
+//C- "$Id: DjVuPhotoAPI.h,v 1.3 2000-01-21 02:16:56 bcr Exp $"
 //C- -- Photo To DjVu
 //C- Author: Parag Deshmukh (Dec 99), Andrei Erofeev (Jan 2000), Bill C Riemers (Jan 2000)
 #endif  /* __cplusplus */
@@ -82,10 +82,10 @@ struct phototodjvu_options_struct
   be between 10 to 20*/
   int crcbdelay;
 
-/** Boolian values specified whether a vflip, hflip, or invert should
-  be done.  vflip means to flip on the vertical axis, hflip the horizontal
-  axis, and invert means to reverse black and white. */
-  int vflip, hflip, invert;
+/** Boolian values specified whether a vflip, hflip, should be done.
+  vflip means to flip on the vertical axis, and hflip the horizontal
+  axis., and invert means to reverse black and white. */
+  int vflip, hflip;
 
 /** Specify the angle the input image should be rotated.  This may be any
     multiple of 90 degrees.  Rotation is clockwise and takes place after
@@ -100,6 +100,31 @@ struct phototodjvu_options_struct
 
 /** dpi should the resolution in dots per inch of input images. */
   int dpi;
+
+/** Slice target.  Data generation for the current chunk stops if the total
+    number of slices (in this chunk and all the previous chunks) reaches
+    value #slice#.  Use a NULL array to bypass this test.  Alternatively,
+    you may use #0# to bypass this test on selected chunks.  (You should 
+    specify at least one test for each chunk.) */
+  const int *slices;
+/** Size target.  Data generation for the current chunk stops if the total
+    data size (in this chunk and all the previous chunks), expressed in
+    bytes, reaches value #size#.  A NULL array means this criteria will
+    not be used.  Alternatively, #0# can be used to bypass this value
+    on a particular chunk.  (You should always specify at least one test 
+    for each chunk.) */
+  const int    *bytes;
+/** Decibel target.  Data generation for the current chunk stops if the
+    estimated luminance error, expressed in decibels, reaches value
+    #decibel#.  Use a NULL array to shortcut the computation of luminance
+    and sensibly speeds up the encoding process. Alternatively, you may
+    use #0.0# to bypass this test for just one chunk.  (You should always
+    specify at least one test for each chunk.) */
+  const float *decibels;
+
+/** nchunks specifies the size of each of the above arrays.  The arrays must
+    be either null pointers, or nchunk size. */
+  int nchunks;
 
 /** list of input filenames being the last. */
   const char * const * filelist;
