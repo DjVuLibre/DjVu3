@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: parseoptions.cpp,v 1.33 2000-02-01 04:18:51 bcr Exp $
+//C- $Id: parseoptions.cpp,v 1.34 2000-02-01 19:11:37 bcr Exp $
 #ifdef __GNUC__
 #pragma implementation
 #endif
@@ -1210,17 +1210,13 @@ LPSTR RegOpenReadConfig ( HKEY hParentKey )
 #endif
 
 const char * const
-DjVuParseOptions::ConfigFilename
-(const char config[],int level)
+DjVuParseOptions::ConfigFilename(const char config[],int level)
 {
+  delete [] filename;
+  filename=0;
 #ifndef WIN32
   const char *retval=0;
   const char *this_config=config[0]?config:default_string;
-  if ( filename )
-  {
-    delete [] filename;
-    filename=0;
-  }
   if(level<=0)
   {
     static const char *home=0;
@@ -1285,25 +1281,20 @@ DjVuParseOptions::ConfigFilename
   const char *retval=0;
   const char *this_config=config[0]?config:default_string;
 
-  if ( filename )
-  {
-    delete [] filename;
-    filename=0;
-  }
-
-    if (level == 0 ) 
+  if (level == 0 ) 
     root = (char *) RegOpenReadConfig (HKEY_CURRENT_USER);
   else
     root = (char *) RegOpenReadConfig (HKEY_LOCAL_MACHINE);
-    if( !root )
-    {
+
+  if( !root )
+  {
         char *defl="c:\\";
         retval = filename = new char [strlen(defl)+1];
         strcpy(filename, defl);
         return retval;
-    }
-    if (root && root[0])
-    {
+  }
+  if (root && root[0])
+  {
     rootlen = strlen(root);
     retval=filename=new char [rootlen+strlen(this_config)+sizeof(ConfigExt)+1];
     strcpy(filename,root);
@@ -1311,12 +1302,13 @@ DjVuParseOptions::ConfigFilename
     strcat(filename,this_config);
     strcat(filename,ConfigExt);
     return retval;        
-  } else {
-        const char emsg[]="SDK not installed properly, please install it again.\n";
-        char *s=new char [sizeof(emsg)];
-        sprintf(s,emsg);
-        Errors->AddError(s);
-        delete [] s;
+  }else
+  {
+    const char emsg[]="SDK not installed properly, please install it again.\n";
+    char *s=new char [sizeof(emsg)];
+    sprintf(s,emsg);
+    Errors->AddError(s);
+    delete [] s;
     char tempfilename[] = "/windows/djvu";
     filename = new char[sizeof(tempfilename)];
     strcpy ( filename, tempfilename);
@@ -1634,6 +1626,11 @@ DjVuTokenList::GetToken
     }
   }
   return (-1-MinGuess);
+}
+
+DjVuTokenList::Entries::~Entries()
+{
+  delete [] Name;
 }
 
 int

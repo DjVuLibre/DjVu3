@@ -6,7 +6,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: parseoptions.h,v 1.24 2000-02-01 04:18:51 bcr Exp $
+//C- $Id: parseoptions.h,v 1.25 2000-02-01 19:11:37 bcr Exp $
 
 #endif /* __cplusplus */
 
@@ -67,7 +67,7 @@
 
    @memo Class used for parsing options and configuration files.
    @author Bill Riemers
-   @version #$Id: parseoptions.h,v 1.24 2000-02-01 04:18:51 bcr Exp $#
+   @version #$Id: parseoptions.h,v 1.25 2000-02-01 19:11:37 bcr Exp $#
  */
 
 /*@{*/
@@ -637,6 +637,7 @@ public:
   int Token;
   char *Name;
   Entries() : Token(0),Name(0) {};
+  ~Entries();
 };
 #endif /* _PARSEOPTIONS_H_IMPLEMENTATION_  */
 
