@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: parseoptions.cpp,v 1.21 2000-01-06 06:11:30 bcr Exp $
+//C- $Id: parseoptions.cpp,v 1.22 2000-01-07 00:28:08 bcr Exp $
 #ifdef __GNUC__
 #pragma implementation
 #endif
@@ -132,9 +132,9 @@ djvu_parse_error(struct djvu_parse opts)
 
   /* This is a wrapper for the DjVuParseOptions::perror function */
 void
-djvu_parse_perror(struct djvu_parse opts)
+djvu_parse_perror(struct djvu_parse opts,const char *mesg)
 {
-  ((DjVuParseOptions *)(opts.Private))->perror();
+  ((DjVuParseOptions *)(opts.Private))->perror(mesg);
   return;
   
 }
@@ -383,37 +383,15 @@ DjVuParseOptions::GetBest
   int retval=(-1);
   int besttoken=(-1);
   int i;
-  for(i=0;(i<listsize);r=Arguments->GetValue(tokens[i++])) if(r)
+  for(i=0;(i<listsize);i++)
   {
-    if((!requiretrue)||(r[0]=='T')||(r[0]=='t')||(atoi(r)))
-    {
-      for(besttoken=tokens[(retval=i-1)];i<listsize;i++)
-      {
-        const char *s=Arguments->GetValue(tokens[i]);
-        if(s)
-        {
-          if((!requiretrue)||(s[0]=='T')||(s[0]=='t')||(atoi(s)))
-          {
-            AmbiguousOptions(besttoken,r,tokens[i],s);
-          }
-        }
-      }
-      break;
-    }else
-    {
-      r=0;
-    }
-  }
-  if(!r)
-  {
-    for(i=0;!r&&(i<listsize);
-      r=Configuration->GetValue(currentProfile,tokens[i++])) if(r)
+    if((r=Arguments->GetValue(tokens[i])))
     {
       if((!requiretrue)||(r[0]=='T')||(r[0]=='t')||(atoi(r)))
       {
-        for(besttoken=tokens[(retval=i-1)];i<listsize;i++)
+        for(besttoken=tokens[(retval=i++)];i<listsize;i++)
         {
-          const char *s=Configuration->GetValue(currentProfile,tokens[i]);
+          const char *s=Arguments->GetValue(tokens[i]);
           if(s)
           {
             if((!requiretrue)||(s[0]=='T')||(s[0]=='t')||(atoi(s)))
@@ -428,16 +406,18 @@ DjVuParseOptions::GetBest
         r=0;
       }
     }
-    if(!r)
+  }
+  if(!r)
+  {
+    for(i=0;(i<listsize);i++)
     {
-      for(i=0;!r&&(i<listsize);
-        r=Configuration->GetValue(defaultProfile,tokens[i++])) if(r)
+      if((r=Arguments->GetValue(tokens[i])))
       {
         if((!requiretrue)||(r[0]=='T')||(r[0]=='t')||(atoi(r)))
         {
-          for(besttoken=tokens[(retval=i-1)];i<listsize;i++)
+          for(besttoken=tokens[(retval=i++)];i<listsize;i++)
           {
-            const char *s=Configuration->GetValue(defaultProfile,tokens[i]);
+            const char *s=Configuration->GetValue(currentProfile,tokens[i]);
             if(s)
             {
               if((!requiretrue)||(s[0]=='T')||(s[0]=='t')||(atoi(s)))
@@ -450,6 +430,33 @@ DjVuParseOptions::GetBest
         }else
         {
           r=0;
+        }
+      }
+    }
+    if(!r)
+    {
+      for(i=0;(i<listsize);i++)
+      {
+        if((r=Arguments->GetValue(tokens[i])))
+        {
+          if((!requiretrue)||(r[0]=='T')||(r[0]=='t')||(atoi(r)))
+          {
+            for(besttoken=tokens[(retval=i++)];i<listsize;i++)
+            {
+              const char *s=Configuration->GetValue(defaultProfile,tokens[i]);
+              if(s)
+              {
+                if((!requiretrue)||(s[0]=='T')||(s[0]=='t')||(atoi(s)))
+                {
+                  AmbiguousOptions(besttoken,r,tokens[i],s);
+                }
+              }
+            }
+            break;
+          }else
+          {
+            r=0;
+          }
         }
       }
     }
@@ -964,6 +971,7 @@ DjVuParseOptions::ReadFile
             delete [] value;
             value=value_new;
             value_end=value+value_size+local_bufsize;
+            s=value+value_size;
           }
           if(state == READ_EOL) break;
         }
@@ -1511,24 +1519,23 @@ DjVuParseOptions::GetOpt::getopt_long()
     }
     if(has_dash)
     {
-      static const char emesg[]="Unrecognized option '%s'";
-      char *ss=new char[sizeof(emesg)+strlen(argv[optind])];
+      static const char emesg[]="Unrecognized option '%1.1024s'";
+      char ss[sizeof(emesg)+1024];
       sprintf(ss,emesg,argv[optind]);
       Errors.AddError(ss);
-      delete [] ss;
       return -1;
     }
   }
-  optptr=strchr(optstring,argv[optind][nextchar]);
-  if(!optptr)
+  if((argv[optind][nextchar] == '-')||
+    !(optptr=strchr(optstring,argv[optind][nextchar])))
   {
-    if(nextchar > 1 || argv[optind][nextchar] != '-')
+    if(nextchar > 1 || argv[optind][nextchar] != '-' ||
+      (argv[optind][nextchar+1]&&argv[optind][nextchar+1]!='-'))
     {
       static const char emesg[]="Unrecognized option -%c";
-      char *s=new char[sizeof(emesg)];
+      char s[sizeof(emesg)];
       sprintf(s,emesg,argv[optind][nextchar]);
       Errors.AddError(s);
-      delete [] s;
       return -1;
     }
     nextchar=1;
@@ -1556,12 +1563,11 @@ DjVuParseOptions::GetOpt::getopt_long()
       optarg=0;
     }else
     {
-      static const char emesg[]="Argument required for --%s option";
+      static const char emesg[]="Argument required for --%1.1024s option";
       const char * const xname=opts.name;
-      char *s=new char[sizeof(emesg)+strlen(xname)];
+      char s[sizeof(emesg)+1024];
       sprintf(s,emesg,xname);
       Errors.AddError(s);
-      delete [] s;
       return -1;
     }
     optind++;

@@ -8,7 +8,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVu.h,v 1.3 2000-01-06 20:00:30 bcr Exp $
+//C- $Id: DjVu.h,v 1.4 2000-01-07 00:28:07 bcr Exp $
 #endif /* __cplusplus */
 
 #include <stdlib.h>
@@ -179,7 +179,7 @@ djvu_parse_error(struct djvu_parse);
 
   /** This is a wrapper for the DjVuParseOptions::perror function */
 void
-djvu_parse_perror(struct djvu_parse);
+djvu_parse_perror(struct djvu_parse,const char *mesg);
 
   /** This is a wrapper for the DjVuParseOptions::ConfigFilename function */
 const char *

@@ -10,7 +10,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuMultiAPI.h,v 1.3 2000-01-06 20:10:44 praveen Exp $
+//C- $Id: DjVuMultiAPI.h,v 1.4 2000-01-07 00:28:07 bcr Exp $
 #endif
 
 #ifndef __DJVUMULTIAPI_H__
@@ -25,7 +25,10 @@
 
 /* 
  * $Log: DjVuMultiAPI.h,v $
- * Revision 1.3  2000-01-06 20:10:44  praveen
+ * Revision 1.4  2000-01-07 00:28:07  bcr
+ * Fixed bugs in parseoptions, and added usage instructions to executables.
+ *
+ * Revision 1.3  2000/01/06 20:10:44  praveen
  * added DjVu decode interface file
  *
  */
@@ -130,7 +133,7 @@ const char * djvu_bundle_error(djvu_bundle_options []);
 
 /** Prints all the errors to stderr */
 DJVUAPI
-void djvu_bundle_perror(djvu_bundle_options []);
+void djvu_bundle_perror(djvu_bundle_options [],const char *mesg);
 
 /** This will print usage instructions to the specified output. */
 DJVUAPI
@@ -166,7 +169,7 @@ const char * djvu_join_error(djvu_join_options []);
 
 /** Prints all the errors to stderr */
 DJVUAPI
-void djvu_join_perror(djvu_join_options []);
+void djvu_join_perror(djvu_join_options [],const char *mesg);
 
 
 

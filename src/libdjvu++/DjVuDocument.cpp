@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.93 2000-01-06 19:48:58 praveen Exp $
+//C- $Id: DjVuDocument.cpp,v 1.94 2000-01-07 00:28:07 bcr Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -68,7 +68,15 @@ DjVuDocument::init(const GURL & url, GP<DjVuPort> xport,
 
    init_data_pool=pcaster->request_data(this, init_url);
    if (!init_data_pool) 
-      THROW("Failed to get data for URL '"+init_url+"'");
+   {
+     if(url.is_local_file_url())
+     {
+        THROW("Failed to read '"+GOS::url_to_filename(init_url)+"'");
+     }else
+     {
+        THROW("Failed to get data for URL '"+init_url+"'");
+     }
+   }
 
       // Now we say it is ready
    init_called=true;
@@ -414,7 +422,16 @@ DjVuDocument::check_unnamed_files(void)
 	    if (ufile->data_pool)
 	    {
 	       GP<DataPool> new_pool=pcaster->request_data(ufile->file, new_url);
-	       if (!new_pool) THROW("Failed to get data for URL '"+new_url+"'");
+               if(!new_pool)
+               {
+                 if(new_url.is_local_file_url())
+                 {
+                   THROW("Failed to read '"+GOS::url_to_filename(new_url)+"'");
+                 }else
+                 {
+                   THROW("Failed to get data for URL '"+new_url+"'");
+                 }
+	       }
 	       ufile->data_pool->connect(new_pool);
 	    }
 
