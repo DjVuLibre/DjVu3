@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuToPS.h,v 1.1 2000-03-19 22:12:34 eaf Exp $
+//C- $Id: DjVuToPS.h,v 1.2 2000-03-19 22:31:51 eaf Exp $
 
 #ifndef _DJVU_TO_PS_H_
 #define _DJVU_TO_PS_H_
@@ -22,7 +22,7 @@
     @memo PostScript file generator
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: DjVuToPS.h,v 1.1 2000-03-19 22:12:34 eaf Exp $#
+    #$Id: DjVuToPS.h,v 1.2 2000-03-19 22:31:51 eaf Exp $#
 */
 //@{
 
@@ -90,7 +90,7 @@ public:
 		     the \Ref{DjVuImage}'s #dpi# to have approximately
 		     the same physical dimensions as the original image
 		     before compression (provided that the #dpi# is correct).
-	     \end{description}
+	     \end{description}*/
       enum Zoom { FIT_PAGE, ONE_TO_ONE };
 	 /** Selects the output format ({\bf PostScript} or
 	     {\bf Encapsulated PostScript}) */
