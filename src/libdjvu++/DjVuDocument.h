@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.h,v 1.46 1999-11-21 09:21:36 bcr Exp $
+//C- $Id: DjVuDocument.h,v 1.47 1999-11-30 19:56:31 eaf Exp $
  
 #ifndef _DJVUDOCUMENT_H
 #define _DJVUDOCUMENT_H
@@ -33,7 +33,7 @@
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@research.att.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocument.h,v 1.46 1999-11-21 09:21:36 bcr Exp $#
+    @version #$Id: DjVuDocument.h,v 1.47 1999-11-30 19:56:31 eaf Exp $#
 */
 
 //@{
@@ -510,7 +510,7 @@ public:
 	  not contain all the data you need. In this case you will need
 	  to install a trigger into the \Ref{DataPool} to learn when the
 	  data actually arrives. */
-   GP<DataPool> get_thumbnail(int page_num, bool dont_decode);
+   virtual GP<DataPool> get_thumbnail(int page_num, bool dont_decode);
       /* Will return gamma correction, which was used when creating
 	 thumbnail images. If you need other gamma correction, you will
 	 need to correct the thumbnails again. */
