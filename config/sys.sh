@@ -1,4 +1,4 @@
-# This sets the variable SYS
+# This sets the variable SYS and DEFS
 #
 
 if [ -z "$CONFIG_DIR" ] ; then
@@ -9,6 +9,7 @@ fi
 if [ -z "$SYS" ] ; then
   echon "Checking system type ... "
   SYS=`"${uname}" -s`
+  DEFS="-DUNIX"
   if [ "$SYS" = "Linux" ] ; then
     if [ -r /lib/libc.so.6 ] ; then
       SYS=linux-libc6
@@ -24,6 +25,6 @@ if [ -z "$SYS" ] ; then
     fi
   fi
   echo "$SYS"
-  CONFIG_VARS=`echo SYS "$CONFIG_VARS"`
+  CONFIG_VARS=`echo SYS DEFS $CONFIG_VARS`
 fi
 

@@ -1,5 +1,5 @@
 # This rule sets the following variables:
-#	CC, CCFLAGS, CCSYMBOLIC CCPIC
+#	CC, CCFLAGS, CCSYMBOLIC, CCPIC, CCWARN, CCUNROLL
 
 if [ -z "$CONFIG_DIR" ]
 then
@@ -131,15 +131,26 @@ then
   echon "Checking whether ${CC} is gcc ... "
   echo 'int main(void) { return __GNUC__;}' | testfile $temp.c
   CCOPT=""
+  CCUNROLL=""
+  CCWARN=""
   if ( run $CC $CCFLAGS -c $temp.c ) 
   then
     echo yes
     cc_is_gcc=yes
+    CCWARN="-Wall"
     echon "Checking whether ${CC} -O3 works ... "
     if ( run $CC ${CCFLAGS} -O3 -c $temp.c )
     then
       echo yes
       CCOPT="-O3"
+    else
+      echo no
+    fi
+    echon "Checking whether ${CC} -funroll-loops works ... "
+    if ( run $CC ${CCFLAGS} ${CCOPT} -funroll-loops -c $temp.c )
+    then
+      echo yes
+      CCUNROLL="-funroll-loops"
     else
       echo no
     fi
@@ -159,6 +170,6 @@ then
     fi
   fi
   "${rm}" -rf $temp.c $temp.o $temp.so
-  CONFIG_VARS=`echo CC CCFLAGS CCOPT CCSYMBOLIC CCPIC cc_is_gcc $CONFIG_VARS`
+  CONFIG_VARS=`echo CC CCFLAGS CCOPT CCWARN CCUNROLL CCSYMBOLIC CCPIC cc_is_gcc $CONFIG_VARS`
 fi
 

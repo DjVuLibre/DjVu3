@@ -31,7 +31,7 @@ do
       threads=`echo $arg | sed 's/[-A-Za-z_]*=//'` 
       ;; 
     --with-rpo|--frepo )
-      rpo=yes
+      use_rpo=yes
       ;;
     *)
       if ( process_general_option $arg )
@@ -69,7 +69,7 @@ check_compiler
 check_debug_option $debug
 check_thread_option $threads
 check_library math log -lm
-check_rpo_option $rpo
+check_rpo_option $use_rpo
 check_make_stlib
 
 

@@ -1,5 +1,5 @@
 # This rule sets the following variables:
-#	CXX, CXXFLAGS, CXXSYMBOLIC, CXXPIC
+#	CXX, CXXFLAGS, CXXSYMBOLIC, CXXPIC, CXXUNROLL, CXXWARN
 
 if [ -z "$CONFIG_DIR" ] ; then
   echo "You must source functions.sh" 1>&2
@@ -110,14 +110,25 @@ if [ -z "$CXX" ] ; then
   echon "Checking whether ${CXX} is gcc ... "
   echo 'int main(void) { return __GNUG__;}' | testfile $temp.cpp
   CXXOPT=""
+  CXXUNROLL=""
+  CXXWARN=""
   if ( run $CXX $CXXFLAGS -c $temp.cpp ) 
   then
-    cxx_is_gcc=yes
     echo yes
+    cxx_is_gcc=yes
+    CXXWARN="-Wall"
     echon "Checking whether ${CXX} -O3 works ... "
     if ( run $CXX ${CXXFLAGS} -O3 -c $temp.cpp ) ; then
       echo yes
       CXXOPT="-O3"
+    else
+      echo no
+    fi
+    echon "Checking whether ${CXX} -funroll-loops works ... "
+    if ( run $CXX ${CXXFLAGS} ${CXXOPT} -funroll-loops -c $temp.cpp )
+    then
+      echo yes
+      CXXUNROLL="-funroll-loops"
     else
       echo no
     fi
@@ -135,6 +146,6 @@ if [ -z "$CXX" ] ; then
     fi
   fi
   "${rm}" -rf $temp.cpp $temp.so $temp.o
-  CONFIG_VARS=`echo CXX CXXFLAGS CXXOPT CXXSYMBOLIC CXXPIC cxx_is_gcc "$CONFIG_VARS"`
+  CONFIG_VARS=`echo CXX CXXFLAGS CXXOPT CXXUNROLL CXXWARN CXXSYMBOLIC CXXPIC cxx_is_gcc $CONFIG_VARS`
 fi
 

@@ -244,28 +244,17 @@ EOF
 #               $OPT             <-- initial guess for optimization options
 #               $WARN            <-- initial guess for warning options
 #               $LIBS            <-- empty
-#               $compiler_is_gcc <-- 'yes' if this compiler is g++
 
 
 check_compiler()
 {
-    . ${CONFIG_DIR}/cc.sh
-    . ${CONFIG_DIR}/cxx.sh
-    OPT=${OPT}
-    WARN=${WARN}
-    LIBS=
-
-    # -----
-
-    if [ -n "$cc_is_gcc" -a -n "$cxx_is_gcc" ]
+    if [ -z "$CXX" -o -z "$CC" ]
     then
-      compiler_is_gcc=yes
-      if [ -z "$OPT" ] ; then  OPT="-funroll-loops" ; fi
-      if [ -z "$WARN" ] ; then  WARN="-Wall -Wno-unused" ; fi
-    else
-      compiler_is_gcc=
+      . ${CONFIG_DIR}/cc.sh
+      . ${CONFIG_DIR}/cxx.sh
+      LIBS=
+      CONFIG_VARS=`echo LIBS $CONFIG_VARS`
     fi
-
 }
 
 
@@ -319,39 +308,59 @@ check_thread_option()
        A_DEFS="-DTHREADMODEL=JRITHREADS $A_DEFS" 
        ;;       
     co* )
-       if [ -z "$COTHREAD" ]  ; then
-         . "${CONFIG_DIR}/cothread.sh"
-       fi
-       if [ -z "$CXXCOTHREAD" ]
+       if [ ! -z "$CXX" ]
        then
-         echo 1>&2 "${PROGRAM_NAME}: Cothreads does not work with ${CXX}."
-         echo 1>&2 "You need GNU g++ or a dirivative such as pgcc or egcs."
-         exit 1
+         if [ -z "$CXXCOTHREAD_TEST" ]  ; then
+           . "${CONFIG_DIR}/cothread.sh"
+         fi
+         if [ -z "$CXXCOTHREAD" ]
+         then
+           echo 1>&2 "${PROGRAM_NAME}: Cothreads does not work with ${CXX}."
+           echo 1>&2 "You need GNU g++ or a dirivative such as pgcc or egcs."
+           exit 1
+         fi
+         C_CXXFLAGS=APPEND
+         A_CXXFLAGS="${CXXCOTHREAD} $A_CXXFLAGS" 
        fi
-       if [ -z "$CCCOTHREAD" ]
+       if [ ! -z "$CC" ]
        then
-         echo 1>&2 "${PROGRAM_NAME}: Cothreads does not work with ${CC}."
-         echo 1>&2 "You need GNU gcc or a dirivative such as pgcc or egcs."
-         exit 1
+         if [ -z "$CCCOTHREAD_TEST" ]  ; then
+           . "${CONFIG_DIR}/cothread.sh"
+         fi
+         if [ -z "$CCCOTHREAD" ]
+         then
+           echo 1>&2 "${PROGRAM_NAME}: Cothreads does not work with ${CC}."
+           echo 1>&2 "You need GNU gcc or a dirivative such as pgcc or egcs."
+           exit 1
+         fi
+         C_CCFLAGS=APPEND
+         A_CCFLAGS="${CCCOTHREAD} $A_CCFLAGS" 
        fi
-       C_CXXFLAGS=APPEND
-       A_CXXFLAGS="${CXXCOTHREAD} $A_CXXFLAGS" 
-       C_CCFLAGS=APPEND
-       A_CCFLAGS="${CCCOTHREAD} $A_CCFLAGS" 
-       if [ ! -z "$CXXCOTHREAD_UNSAFE$CCCOTHREAD" ] 
+       if [ ! -z "$CXXCOTHREAD_UNSAFE$CCCOTHREAD_UNSAFE" ] 
        then
           echo 1>&2 "${PROGRAM_NAME}: Using COTHREADS without the patch is unsafe."
           echo 1>&2 "-- See documentation for libdjvu++."
        fi
        ;;       
     posix* | dce* )
-       if [ -z "$CXXPTHREAD" ]  ; then
-         . "${CONFIG_DIR}/pthread.sh"
+       if [ ! -z "$CC" ]
+       then
+         if [ -z "$CCPTHREAD" ]
+         then
+           . "${CONFIG_DIR}/pthread.sh"
+         fi
+         C_CCFLAGS=APPEND
+         A_CCFLAGS="$CCPTHREAD $A_CCFLAGS"
        fi
-       C_CCFLAGS=APPEND
-       A_CCFLAGS="$CCPTHREAD $A_CCFLAGS"
-       C_CXXFLAGS=APPEND
-       A_CXXFLAGS="$CXXPTHREAD $A_CXXFLAGS"
+       if [ ! -z "$CXX" ]
+       then
+         if [ -z "$CXXPTHREAD" ]
+         then
+           . "${CONFIG_DIR}/pthread.sh"
+         fi
+         C_CXXFLAGS=APPEND
+         A_CXXFLAGS="$CXXPTHREAD $A_CXXFLAGS"
+       fi
        if [ ! -z "${CCPTHREAD_LIB}${CXXPTHREAD_LIB}" ]
        then 
          C_LIBS=APPEND
@@ -379,38 +388,33 @@ check_thread_option()
 check_rpo_option()
 {
   if [ -z "$1" ] ; then return; fi
-  echon "Testing if compiler supports option '-frepo' ... "
-  if [ -z "$compiler_is_gcc" ] 
+  if [ ! -z "$CXX" ]
   then
-     echo no.
-     echo 2>&1 "${PROGRAM_NAME}: Option '-frepo' only work with gcc."
-     exit 1
+    if [ -z "$CXXRPO_TEST" ]
+    then
+      . "${CONFIG_DIR}/rpo.sh"
+    fi
+    if [ -z "$CXXRPO" ]
+    then
+      echo 2>&1 "${PROGRAM_NAME}: The ${CXX} option '-frepo' is not supported."
+      exit 1
+    fi
+    C_CXXOPT=APPEND
+    A_CXXOPT="$CXXRPO $A_CXXOPT"
   fi
-  echo 'int main(void) {return 0;}' | testfile $temp.cpp
-  run $CXX $CXXFLAGS -frepo $temp.cpp -o $temp
-  if [ $? = 0 -a -z "`grep -i unrecognized $temp.out`" ]
+  if [ ! -z "$CC" ]
   then
-    echo yes.
-    OPT="$OPT -frepo"
-  else
-    echo no.
-    echo 1>&2 "${PROGRAM_NAME}: Compiler does not support option '-frepo'."
-    exit 1
-  fi
-  echon "Searching rpo program ... "
-  if [ -z "$RPO" ] ; then RPO=rpo ; fi
-  if ( run $RPO ) 
-  then
-    echo $RPO
-  else
-    echo not found.
-
-    #
-    # We could build it instead of complaining
-    #
-    echo 1>&2 "${PROGRAM_NAME}: Cannot find program RPO."
-    echo 1>&2 "-- You cannot use option -frepo without this program."
-    exit 1
+    if [ -z "$CCRPO_TEST" ]
+    then
+      . "${CONFIG_DIR}/rpo.sh"
+    fi
+    if [ -z "$CCRPO" ]
+    then
+      echo 2>&1 "${PROGRAM_NAME}: The ${CC} option '-frepo' is not supported."
+      exit 1
+    fi
+    C_CCOPT=APPEND
+    A_CCOPT="$CCRPO $A_CCOPT"
   fi
 }
 
@@ -433,21 +437,38 @@ check_library()
   t=`escape "$*"`
   if [ "x$s" != "x$t" ] ; then
     eval "lib${name}_paths='$t'"
-    CONFIG_VARS=`lib${name}_paths lib${name} $CONFIG_VARS`
+    CONFIG_VARS=`echo lib${name}_paths lib${name} $CONFIG_VARS`
     echon "Searching library containing ${func}() ... "
-    testfile $temp.cpp <<EOF
+    if [ -z "$CXX" ] 
+    then
+      testfile $temp.c <<EOF
+int ${func}(void);
+int main(void) { return ${func}(); }
+EOF
+      for lib
+      do
+        if ( run "$CC" $CCFLAGS $OPT $DEFS $WARN $temp.c $lib -o $temp ) 
+        then
+          echo $lib
+          eval "lib${name}='"`escape "$lib"`"'"
+          return 0
+        fi
+      done
+    else
+      testfile $temp.cpp <<EOF
 extern "C" int ${func}(void);
 int main(void) { return ${func}(); }
 EOF
-    for lib
-    do
-      if ( run $CXX $CXXFLAGS $OPT $DEFS $WARN $temp.cpp $lib -o $temp ) 
-      then
-        echo $lib
-        eval "lib${name}='"`escape "$lib"`"'"
-        return 0
-      fi
-    done
+      for lib
+      do
+        if ( run "$CXX" $CXXFLAGS $OPT $DEFS $WARN $temp.cpp $lib -o $temp ) 
+        then
+          echo $lib
+          eval "lib${name}='"`escape "$lib"`"'"
+          return 0
+        fi
+      done
+    fi
     echo "not found."
     echo 2>&1 "${PROGRAM_NAME}: Function ${func}() not found."
     exit 1
@@ -469,7 +490,7 @@ check_make_stlib()
     testfile $temp.c <<EOF
 int main(void) { return 1; }
 EOF
-    run $CC $CCFLAGS $OPT $DEFS $WARN -c $temp.c
+    run "$CC" $CCFLAGS $OPT $DEFS $WARN -c $temp.c
     if [ -z "$MAKE_STDLIB" ]
     then
       make_stlib="${ar} cq"
@@ -483,6 +504,7 @@ EOF
         echo 1>&2 "-- Please set environment variable make_stlib or AR."
         exit 1
     fi
+    CONFIG_VARS=`echo make_stlib $CONFIG_VARS`
 }
 
 
@@ -536,14 +558,12 @@ generate_main_makefile()
     # Generate Makefile header
     "${cat}" > "$TOPBUILDDIR/Makefile" <<EOF
 SHELL=/bin/sh
-TOPSRCDIR= $TOPSRCDIR
-TOPBUILDDIR= $TOPBUILDDIR
-CC= $CC $CCFLAGS
-CXX= $CXX $CXXFLAGS
-OPT= $OPT
-WARN= $WARN
-DEFS= $DEFS
-SUBDIRS= $subdirs
+TOPSRCDIR=$TOPSRCDIR
+TOPBUILDDIR=$TOPBUILDDIR
+CC=$CC $CCFLAGS
+CXX=$CXX $CXXFLAGS
+DEFS=$DEFS
+SUBDIRS=$subdirs
 EOF
 
     # Insert Makefile fragment
@@ -618,7 +638,7 @@ fi
 if [ -z "$whence" ] ; then
   . "${CONFIG_DIR}/commands.sh"
 fi
-CONFIG_VARS=`echo DEFS OPT WARN LIBS RPO make_stlib make_shlib $CONFIG_VARS`
+CONFIG_VARS=`echo make_shlib $CONFIG_VARS`
 
 ### ------------------------------------------------------------------------
 ### General stuff

@@ -24,6 +24,7 @@ PWDCMD=@%pwdcmd%@
 RANLIB=@%ranlib%@
 RM=@%rm%@
 SED=@%sed%@
+SORT=@%sort%@
 TAR=@%tar%@
 TEE=@%tee%@
 TRUE=@%true%@
