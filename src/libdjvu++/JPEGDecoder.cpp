@@ -9,15 +9,17 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: JPEGDecoder.cpp,v 1.6 1999-11-09 16:53:04 parag Exp $
+//C- $Id: JPEGDecoder.cpp,v 1.7 2000-01-19 14:24:10 bcr Exp $
 
 
 #include "JPEGDecoder.h"
 #ifdef NEED_JPEG_DECODER
 
-extern "C" {
+extern "C"
+{
 
-struct djvu_error_mgr {
+struct djvu_error_mgr
+{
   struct jpeg_error_mgr pub;  /* "public" fields */
 
   jmp_buf setjmp_buffer;  /* for return to caller */
@@ -54,14 +56,15 @@ JPEGDecoder::decode(ByteStream & bs )
   JSAMPARRAY buffer;    /* Output row buffer */
   int row_stride;   /* physical row width in output buffer */
   char tempBuf[50];
-	int full_buf_size;
-	int isGrey,i;
+  int full_buf_size;
+  int isGrey,i;
 
   cinfo.err = jpeg_std_error(&jerr.pub);
 
   jerr.pub.error_exit = djvu_error_exit;
 
-  if (setjmp(jerr.setjmp_buffer)) {
+  if (setjmp(jerr.setjmp_buffer))
+  {
 
     jpeg_destroy_decompress(&cinfo);
     return 0;
@@ -84,40 +87,44 @@ JPEGDecoder::decode(ByteStream & bs )
 
   /* JSAMPLEs per row in output buffer */
   row_stride = cinfo.output_width * cinfo.output_components;
-	full_buf_size = row_stride * cinfo.output_height;
+  full_buf_size = row_stride * cinfo.output_height;
 
   /* Make a one-row-high sample array that will go away when done with image */
   buffer = (*cinfo.mem->alloc_sarray)
     ((j_common_ptr) &cinfo, JPOOL_IMAGE, row_stride, 1);
 
-	sprintf(tempBuf,"P6\n%d %d\n%d\n",cinfo.output_width, 
-		                             cinfo.output_height,255);
-	MemoryByteStream outputBlock;
-	outputBlock.write((char *)tempBuf,strlen(tempBuf));
+  sprintf(tempBuf,"P6\n%d %d\n%d\n",cinfo.output_width, 
+                                 cinfo.output_height,255);
+  MemoryByteStream outputBlock;
+  outputBlock.write((char *)tempBuf,strlen(tempBuf));
 
-	isGrey = ( cinfo.out_color_space == JCS_GRAYSCALE) ? 1 : 0; 
+  isGrey = ( cinfo.out_color_space == JCS_GRAYSCALE) ? 1 : 0; 
 
-  while (cinfo.output_scanline < cinfo.output_height) {
+  while (cinfo.output_scanline < cinfo.output_height)
+  {
     (void) jpeg_read_scanlines(&cinfo, buffer, 1);
 
-			if ( isGrey == 1 ){
-				for (i=0; i<row_stride; i++) {
-					outputBlock.write8((char)buffer[0][i]); 
-					outputBlock.write8((char)buffer[0][i]); 
-					outputBlock.write8((char)buffer[0][i]); 
-				}
-			}else {
-				for (i=0; i<row_stride; i++) 
-					outputBlock.write8((char)buffer[0][i]); 
-			}
+    if ( isGrey == 1 )
+    {
+      for (i=0; i<row_stride; i++)
+      {
+        outputBlock.write8((char)buffer[0][i]); 
+        outputBlock.write8((char)buffer[0][i]); 
+        outputBlock.write8((char)buffer[0][i]); 
+      }
+    }else
+    {
+      for (i=0; i<row_stride; i++) 
+        outputBlock.write8((char)buffer[0][i]); 
+    }
   }
 
   (void) jpeg_finish_decompress(&cinfo);   
 
   jpeg_destroy_decompress(&cinfo);
-	
-	outputBlock.seek(0,SEEK_SET);
-	GP<GPixmap> gp = new GPixmap(outputBlock);
+  
+  outputBlock.seek(0,SEEK_SET);
+  GP<GPixmap> gp = new GPixmap(outputBlock);
 
   return gp; 
 }         
@@ -125,9 +132,11 @@ JPEGDecoder::decode(ByteStream & bs )
 /*** From here onwards code is to make ByteStream as the data
      source for the JPEG library */
 
-extern "C" {
+extern "C"
+{
 
-typedef struct {
+typedef struct
+{
   struct jpeg_source_mgr pub; /* public fields */
 
   ByteStream * byteStream;    /* source stream */
@@ -156,7 +165,8 @@ fill_input_buffer (j_decompress_ptr cinfo)
 
   nbytes = src->byteStream->readall(src->buffer, INPUT_BUF_SIZE);
 
-  if (nbytes <= 0) {
+  if (nbytes <= 0)
+  {
     if (src->start_of_stream) /* Treat empty input as fatal error */
       ERREXIT(cinfo, JERR_INPUT_EMPTY);
     WARNMS(cinfo, JWRN_JPEG_EOF);
@@ -179,14 +189,15 @@ skip_input_data (j_decompress_ptr cinfo, long num_bytes)
 {
   byte_stream_src_ptr src = (byte_stream_src_ptr) cinfo->src;
 
-  if (num_bytes > (long) src->pub.bytes_in_buffer) {
-
-  	src->byteStream->seek((num_bytes - src->pub.bytes_in_buffer), SEEK_CUR);
+  if (num_bytes > (long) src->pub.bytes_in_buffer)
+  {
+    src->byteStream->seek((num_bytes - src->pub.bytes_in_buffer), SEEK_CUR);
     (void) fill_input_buffer(cinfo);
-  }else{
-		src->pub.bytes_in_buffer -= num_bytes;
-  	src->pub.next_input_byte += num_bytes;
-	}
+  }else
+  {
+    src->pub.bytes_in_buffer -= num_bytes;
+    src->pub.next_input_byte += num_bytes;
+  }
 }
                  
 METHODDEF(void)
@@ -200,7 +211,8 @@ jpeg_byte_stream_src (j_decompress_ptr cinfo, ByteStream * bs)
 {
   byte_stream_src_ptr src;
 
-  if (cinfo->src == NULL) { /* first time for this JPEG object? */
+  if (cinfo->src == NULL)
+  { /* first time for this JPEG object? */
     cinfo->src = (struct jpeg_source_mgr *)      
       (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_PERMANENT,
           SIZEOF(byte_stream_src_mgr));

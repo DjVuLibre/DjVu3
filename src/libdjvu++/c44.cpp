@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: c44.cpp,v 1.18 1999-10-22 15:02:12 leonb Exp $
+//C- $Id: c44.cpp,v 1.19 2000-01-19 14:24:10 bcr Exp $
 
 
 /** @name c44
@@ -162,7 +162,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: c44.cpp,v 1.18 1999-10-22 15:02:12 leonb Exp $# */
+    #$Id: c44.cpp,v 1.19 2000-01-19 14:24:10 bcr Exp $# */
 //@{
 //@}
 
@@ -642,7 +642,7 @@ main(int argc, char **argv)
       int h = 0;
       IWPixmap *iwp = 0;
       IWBitmap *iwb = 0;
-      // Check color vs black and white
+      // Check color vs gray
       if (prefix[0]=='P' && (prefix[1]=='3' || prefix[1]=='6'))
         {
           // color file
@@ -654,7 +654,7 @@ main(int argc, char **argv)
         }
       else if (prefix[0]=='P' && (prefix[1]=='2' || prefix[1]=='5'))
         {
-          // b&w file
+          // gray file
           ibs.seek(0);
           GBitmap ibm(ibs);
           w = ibm.columns();

@@ -37,14 +37,24 @@ struct _djvu_image_priv
   inline void *
   realloc(size_t sz)
   {
-    void *data=0;
-    if((isMalloc||!img->start_alloc)&&(data=::_djvu_realloc(img->start_alloc,sz)))
+    unsigned char *data=0,*olddata=img->start_alloc;
+    const size_t s=((img->datasize)>sz)?(sz):(img->datasize);
+    if(isMalloc)
     {
-      size_t offset=(size_t)img->data-(size_t)img->start_alloc;
+      data=(unsigned char *)::_djvu_realloc(img->start_alloc,sz);
+    }else if(((s+s)>=sz)&&(data=new unsigned char [sz?sz:1])&&olddata)
+    {
+      for(size_t i=0;i<s;i++)
+        data[i]=olddata[i];
+      delete [] olddata;
+    }
+    if(data)
+    {
+      size_t offset=(size_t)(img->data)-(size_t)(img->start_alloc);
       img->data=(img->start_alloc=(unsigned char *)data)+offset;
       img->datasize=sz;
     }
-    return data;
+    return data?data:((sz!=s)?olddata:0);
   }
 
   djvu_image *moveto(djvu_image *ximg) 
