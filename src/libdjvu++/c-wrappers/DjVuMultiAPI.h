@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuMultiAPI.h,v 1.8 2000-01-20 23:15:46 leonb Exp $
+//C- $Id: DjVuMultiAPI.h,v 1.9 2000-01-20 23:27:45 leonb Exp $
 */
 
 #ifndef __DJVUMULTIAPI_H__
@@ -27,7 +27,10 @@
 
 /* 
  * $Log: DjVuMultiAPI.h,v $
- * Revision 1.8  2000-01-20 23:15:46  leonb
+ * Revision 1.9  2000-01-20 23:27:45  leonb
+ * Added cosmetic changes for doc++
+ *
+ * Revision 1.8  2000/01/20 23:15:46  leonb
  * Rationalized libmulti++ and its documentation.
  *
  * Revision 1.7  2000/01/07 21:46:47  bcr
@@ -78,11 +81,10 @@
 #ifdef __cplusplus
 extern "C" {  
 #ifndef __cplusplus
-           }
+           } ;  // makes doc++ look nicer
 #endif
 #endif
 
-  
 
 /** Option structure for the MultiPage API.
     This structure defines the options shared by both the \Ref{djvu_combine}.
