@@ -25,7 +25,7 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: csepdjvu.cpp,v 1.2 2000-11-02 01:08:34 bcr Exp $
+// $Id: csepdjvu.cpp,v 1.3 2000-11-02 07:27:12 bcr Exp $
 // $Name:  $
 
 
@@ -103,7 +103,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: csepdjvu.cpp,v 1.2 2000-11-02 01:08:34 bcr Exp $# */
+    #$Id: csepdjvu.cpp,v 1.3 2000-11-02 07:27:12 bcr Exp $# */
 //@{
 //@}
 
@@ -149,10 +149,10 @@ public:
   BufferByteStream(ByteStream &lbs);
   size_t read(void *buffer, size_t size);
   size_t write(const void *buffer, size_t size);
-  long tell();
-  int eof();
+  virtual long tell(void) const;
+  int eof(void);
   int unget(char c);
-  inline int get();
+  inline int get(void);
 };
 
 BufferByteStream::BufferByteStream(ByteStream &bs)
@@ -161,7 +161,7 @@ BufferByteStream::BufferByteStream(ByteStream &bs)
 }
 
 int 
-BufferByteStream::eof() // aka. feof
+BufferByteStream::eof(void) // aka. feof
 {
   if (bufpos < bufend) 
     return false;
@@ -192,17 +192,17 @@ BufferByteStream::read(void *buf, size_t size)
 size_t 
 BufferByteStream::write(const void *, size_t )
 {
-  THROW("Cannot write into a BufferByteStream");
+  G_THROW("Cannot write into a BufferByteStream");
 }
 
 long 
-BufferByteStream::tell() 
+BufferByteStream::tell(void) const
 { 
   return bs.tell() + bufpos - bufend; 
 }
     
 inline int 
-BufferByteStream::get() // aka. getc()
+BufferByteStream::get(void) // aka. getc()
 {
   if (bufpos < bufend || !eof())
     return buffer[bufpos++];
@@ -319,7 +319,7 @@ CRLEImage::read_integer(char &c, ByteStream &bs)
     }
   // Read integer
   if (c<'0' || c>'9')
-      THROW("csepdjvu: corrupted input file (bad file header)");
+      G_THROW("csepdjvu: corrupted input file (bad file header)");
   while (c>='0' && c<='9') 
     {
       x = x*10 + c - '0';
@@ -362,7 +362,7 @@ CRLEImage::CRLEImage(BufferByteStream &bs)
   width = read_integer(lookahead, bs);
   height = read_integer(lookahead, bs);
   if (width<1 || height<1)
-    THROW("csepdjvu: corrupted input file (bad image size)");
+    G_THROW("csepdjvu: corrupted input file (bad image size)");
   // An array for the runs and the buffered data
   GTArray<short> ax(3*width);
   // File format switch
@@ -382,12 +382,12 @@ CRLEImage::CRLEImage(BufferByteStream &bs)
       while (n >= 0)
         {
           if (bs.eof())
-            THROW("EOF");
+            G_THROW("EOF");
           x = bs.get();
           if (x >= 0xc0)
             x = (bs.get()) + ((x - 0xc0) << 8);
           if (c+x > width || bs.eof())
-            THROW("csepdjvu: corrupted input file (lost RLE synchronization)");
+            G_THROW("csepdjvu: corrupted input file (lost RLE synchronization)");
           if (p)
             {
               px[0] = c;
@@ -411,7 +411,7 @@ CRLEImage::CRLEImage(BufferByteStream &bs)
       pal = new DjVuPalette();
       int ncolors = read_integer(lookahead, bs);
       if (ncolors<1 || ncolors>4095) 
-        THROW("csepdjvu: corrupted input file (bad number of colors)");
+        G_THROW("csepdjvu: corrupted input file (bad number of colors)");
       pal->decode_rgb_entries(bs, ncolors);
       // RLE format
       int x, c, n, p;
@@ -421,7 +421,7 @@ CRLEImage::CRLEImage(BufferByteStream &bs)
       while (n >= 0)
         {
           if (bs.eof())
-            THROW("EOF");
+            G_THROW("EOF");
           x  = (bs.get() << 24);
           x  |= (bs.get() << 16);
           x  |= (bs.get() << 8);
@@ -429,7 +429,7 @@ CRLEImage::CRLEImage(BufferByteStream &bs)
           p = (x >> 20) & 0xfff;
           x = (x & 0xfffff);
           if (c+x > width)
-            THROW("csepdjvu: corrupted input file (lost RLE synchronization)");
+            G_THROW("csepdjvu: corrupted input file (lost RLE synchronization)");
           if (p >= 0 && p < ncolors)
             {
               px[0] = c;
@@ -448,7 +448,7 @@ CRLEImage::CRLEImage(BufferByteStream &bs)
             }
         }
     } else { // Unrecognized file
-      THROW("csepdjvu: corrupted input file (bad file header)");
+      G_THROW("csepdjvu: corrupted input file (bad file header)");
     }
 }
 
@@ -827,9 +827,9 @@ CRLEImage::get_bitmap_for_cc(const int ccid) const
   for (int i=0; i<cc.nrun; i++,prun++)
     {
       if (prun->y<bb.ymin || prun->y>=bb.ymax)
-        THROW("Internal error (y bounds)");
+        G_THROW("Internal error (y bounds)");
       if (prun->x1<bb.xmin || prun->x2>=bb.xmax)
-        THROW("Internal error (x bounds)");
+        G_THROW("Internal error (x bounds)");
       unsigned char *row = (*bits)[prun->y - bb.ymin];
       for (int x=prun->x1; x<=prun->x2; x++)
         row[x - bb.xmin] = 1;
@@ -980,7 +980,7 @@ read_background(BufferByteStream &bs, int w, int h, int &bgred)
         return pix;
     }
   // Failure
-  THROW("Background pixmap size does not match foreground");
+  G_THROW("Background pixmap size does not match foreground");
 }
 
 
@@ -1227,22 +1227,22 @@ parse_slice(const char *q, csepdjvuopts &opts)
       char *ptr; 
       int x = strtol(q, &ptr, 10);
       if (ptr == q)
-        THROW("csepdjvu: illegal quality specification (number expected)");
+        G_THROW("csepdjvu: illegal quality specification (number expected)");
       if (lastx>0 && q[-1]=='+')
         x += lastx;
       if (x<1 || x>1000 || x<lastx)
-        THROW("csepdjvu: illegal quality specification (number out of range)");
+        G_THROW("csepdjvu: illegal quality specification (number out of range)");
       lastx = x;
       if (*ptr && *ptr!='+' && *ptr!=',')
-        THROW("csepdjvu: illegal quality specification (comma expected)");        
+        G_THROW("csepdjvu: illegal quality specification (comma expected)");        
       q = (*ptr ? ptr+1 : ptr);
       if (count+1 >= (int)(sizeof(opts.slice)/sizeof(opts.slice[0])))
-        THROW("csepdjvu: illegal quality specification (too many chunks)");                
+        G_THROW("csepdjvu: illegal quality specification (too many chunks)");                
       opts.slice[count++] = x;
       opts.slice[count] = 0;
     }
   if (count < 1)
-    THROW("csepdjvu: illegal quality specification (no chunks)");                    
+    G_THROW("csepdjvu: illegal quality specification (no chunks)");                    
 }
 
 
@@ -1250,7 +1250,7 @@ parse_slice(const char *q, csepdjvuopts &opts)
 int 
 main(int argc, const char **argv)
 {
-  TRY
+  G_TRY
     {
       DjVmDoc doc;
       GString outputfile;
@@ -1333,12 +1333,12 @@ main(int argc, const char **argv)
       else 
         usage();
     }
-  CATCH(ex)
+  G_CATCH(ex)
     {
       ex.perror();
       exit(1);
     }
-  ENDCATCH;
+  G_ENDCATCH;
   return 0;
 }
 

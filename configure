@@ -26,7 +26,7 @@
 #C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 #C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 #
-# $Id: configure,v 1.35 2000-11-02 01:08:33 bcr Exp $
+# $Id: configure,v 1.36 2000-11-02 07:27:12 bcr Exp $
 # $Name:  $
 
 #!/bin/ksh
@@ -138,21 +138,22 @@ then
     generate_main_makefile src/3rd-party/libjpeg src/libdjvu++ <<\EOF
 all: 
 	( cd src/3rd-party/libjpeg; $(MAKE) lib prog)
-	( cd src/libdjvu++; $(MAKE) lib prog )
+	( cd src/libdjvu++; $(MAKE) lib )
+	( cd src/djvutools/reference; $(MAKE) prog )
 
 install:
-	( cd src/3rd-party/libjpeg; $(MAKE) install-lib )
-	( cd src/libdjvu++; $(MAKE) install-lib install-prog )
+	echo Rule not supported...
 EOF
 
 else
     ## This is the regular version
     generate_main_makefile src/libdjvu++ <<\EOF
 all: 
-	( cd src/libdjvu++; $(MAKE) lib prog )
+	( cd src/libdjvu++; $(MAKE) lib )
+	( cd src/djvutools/reference; $(MAKE) prog )
 
 install:
-	( cd src/libdjvu++; $(MAKE) install-lib install-prog )
+	echo Rule not supported...
 EOF
 fi
 
