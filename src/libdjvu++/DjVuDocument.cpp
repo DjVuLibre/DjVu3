@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.44 1999-09-17 20:21:26 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.45 1999-09-19 19:25:19 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -100,9 +100,9 @@ DjVuDocument::static_init_thread(void * cl_data)
       th->init_thread();
 	 // Do not do ANYTHING below this line
    } CATCH(exc) {
-      th->flags=th->flags | DjVuDocument::DOC_INIT_FAILED;
+      th->flags|=DjVuDocument::DOC_INIT_FAILED;
       TRY { get_portcaster()->notify_error(th, exc.get_cause()); } CATCH(exc) {} ENDCATCH;
-      th->init_thread_flags=th->init_thread_flags | FINISHED;
+      th->init_thread_flags|=FINISHED;
 	 // Do not do ANYTHING below this line
    } ENDCATCH;
       // Do not do ANYTHING below this line
@@ -154,14 +154,14 @@ DjVuDocument::init_thread(void)
 	    DEBUG_MSG("Got INDIRECT file.\n");
 	    doc_type=INDIRECT;
 	 }
-	 flags=flags | DOC_TYPE_KNOWN | DOC_DIR_KNOWN;
+	 flags|=DOC_TYPE_KNOWN | DOC_DIR_KNOWN;
 	 pcaster->notify_doc_flags_changed(this, DOC_TYPE_KNOWN | DOC_DIR_KNOWN, 0);
 	 check_unnamed_files();
       } else if (chkid=="DIR0")
       {
 	 DEBUG_MSG("Got OLD_BUNDLED file.\n");
 	 doc_type=OLD_BUNDLED;
-	 flags=flags | DOC_TYPE_KNOWN;
+	 flags|=DOC_TYPE_KNOWN;
 	 pcaster->notify_doc_flags_changed(this, DOC_TYPE_KNOWN, 0);
 	 check_unnamed_files();
       } else THROW("Unknown document format. Can't decode.");
@@ -206,7 +206,7 @@ DjVuDocument::init_thread(void)
 	 if (!first_page_name.length())
 	    THROW("Failed to find any page in this document.");
 
-	 flags=flags | DOC_DIR_KNOWN;
+	 flags|=DOC_DIR_KNOWN;
 	 pcaster->notify_doc_flags_changed(this, DOC_DIR_KNOWN, 0);
 	 check_unnamed_files();
       }
@@ -216,7 +216,7 @@ DjVuDocument::init_thread(void)
       DEBUG_MSG("Got DJVU OLD_INDEXED document here.\n");
       doc_type=OLD_INDEXED;
 
-      flags=flags | DOC_TYPE_KNOWN;
+      flags|=DOC_TYPE_KNOWN;
       pcaster->notify_doc_flags_changed(this, DOC_TYPE_KNOWN, 0);
       check_unnamed_files();
    }
@@ -239,16 +239,16 @@ DjVuDocument::init_thread(void)
 	    ndir->insert_page(-1, init_url.name());
 	 }
       }
-      flags=flags | DOC_NDIR_KNOWN;
+      flags|=DOC_NDIR_KNOWN;
       pcaster->notify_doc_flags_changed(this, DOC_NDIR_KNOWN, 0);
       check_unnamed_files();
    }
 
-   flags=flags | DOC_INIT_COMPLETE;
+   flags|=DOC_INIT_COMPLETE;
    pcaster->notify_doc_flags_changed(this, DOC_INIT_COMPLETE, 0);
    check_unnamed_files();
 
-   init_thread_flags=init_thread_flags | FINISHED;
+   init_thread_flags|=FINISHED;
       // Nothing else after this point, please. The object may already
       // be destroyed.
    
