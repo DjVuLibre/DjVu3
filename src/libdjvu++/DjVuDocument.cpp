@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.1.2.3 1999-04-28 20:22:01 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.1.2.4 1999-05-04 21:19:53 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -78,6 +78,15 @@ DjVuDocument::detect_doc_type(const GURL & doc_url)
 {
    DEBUG_MSG("DjVuDocument::detect_doc_type(): guessing what we're dealing with\n");
    DEBUG_MAKE_INDENT(3);
+
+   if (cache && cache->get_item(doc_url))
+   {
+	 // Shortcut: since the url is in the cache, it's a file's URL,
+	 // which means, that we've got DJVU document
+      DEBUG_MSG("URL is in the cache => DJVU doc.\n");
+      djvm=0;
+      return;
+   }
    
    DjVuPortcaster * pcaster=get_portcaster();
    GP<DataRange> data_range=pcaster->request_data(this, doc_url);
