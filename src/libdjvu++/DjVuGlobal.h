@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuGlobal.h,v 1.49 2001-04-12 17:05:31 fcrary Exp $
+// $Id: DjVuGlobal.h,v 1.50 2001-04-13 00:50:10 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUGLOBAL_H
@@ -79,7 +79,7 @@
     @memo
     Global definitions.
     @version
-    #$Id: DjVuGlobal.h,v 1.49 2001-04-12 17:05:31 fcrary Exp $#
+    #$Id: DjVuGlobal.h,v 1.50 2001-04-13 00:50:10 bcr Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> -- empty file.\\
     Bill Riemers <bcr@lizardtech.com> -- real work.  */
@@ -346,7 +346,9 @@ DJVUEXTERNCAPI(void DjVuPrintMessage(const char *fmt, ...));
 //  effect on the executed program. It should be used to surround each
 //  message name that will need to be looked up in the external message
 //  files. In particular, it should use on all strings passed to G_THROW.
+#ifndef ERR_MSG
 #define ERR_MSG(x) x
+#endif
 
 #endif /* _DJVUGLOBAL_H_ */
 
