@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVmDir.h,v 1.2 1999-08-17 23:48:04 leonb Exp $
+//C- $Id: DjVmDir.h,v 1.3 1999-08-24 22:02:33 eaf Exp $
 
 #ifndef _DJVMDIR_H
 #define _DJVMDIR_H
@@ -22,7 +22,7 @@
     @memo Implements DjVu multipage document directory
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: DjVmDir.h,v 1.2 1999-08-17 23:48:04 leonb Exp $# */
+    #$Id: DjVmDir.h,v 1.3 1999-08-24 22:02:33 eaf Exp $# */
 //@{
 
 
@@ -82,6 +82,8 @@
 class DjVmDir : public GPEnabled
 {
 public:
+   static const int	version=0;
+   
       /** This class represents file records stored in \Ref{DjVmDir}. */
    class File : public GPEnabled
    {

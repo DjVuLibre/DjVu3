@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVmDir.cpp,v 1.2 1999-08-17 23:48:04 leonb Exp $
+//C- $Id: DjVmDir.cpp,v 1.3 1999-08-24 22:02:33 eaf Exp $
 
 
 #ifdef __GNUC__
@@ -24,17 +24,18 @@
 
 /* Directory file format
 
-   char8		bundled or not
+   char8		(version number | (bundled or not) << 7)
    char16		number of records
-   bzz compressed char8 flags for every record
    for every record (only if bundled)
       char32		offset
       char24		size
    bzz compressed block:
-   for every record
-      ASCIIZ id
-      ASCIIZ name, if it's different from id (see flags)
-      ASCIIZ title, if it's different from id (see flags)
+      for every record
+         char8 flags
+      for every record
+         ASCIIZ id
+         ASCIIZ name, if it's different from id (see flags)
+         ASCIIZ title, if it's different from id (see flags)
 */
 
 void 
@@ -53,34 +54,25 @@ DjVmDir::decode(ByteStream & str)
    id2file.empty();
    title2file.empty();
 
-   bool bundled=str.read8();
+   int ver=str.read8();
+   bool bundled=(ver & 0x80)!=0;
+   ver&=0x7f;
+
+   DEBUG_MSG("DIRM version=" << ver << ", our version=" << version << "\n");
+   if (ver>version)
+      THROW("Unable to read DJVM directories of versions higher than "+
+	    GString(version)+".\nData version number is "+GString(ver)+".");
    DEBUG_MSG("bundled directory=" << bundled << "\n");
    
    DEBUG_MSG("reading the directory records...\n");
    int files=str.read16();
    DEBUG_MSG("number of files=" << files << "\n");
 
+   DEBUG_MSG("reading offsets and sizes\n");
+   for(int file=0;file<files;file++)
    {
-      DEBUG_MSG("reading and decompressing flags...\n");
-      int data_size=str.read16();
-      TArray<char> data(data_size-1);
-      str.readall(data, data.size());
-      DEBUG_MSG("flags: " << data.size() << "=>" << files << "\n");
-      
-      MemoryByteStream mem_str((const void*)(const char*)data, data.size());
-      BSByteStream bs_str(mem_str);
-      for(int file_num=0;file_num<files;file_num++)
-      {
-	 GP<File> file=new File();
-	 file->flags=bs_str.read8();
-	 files_list.append(file);
-      }
-   }
-
-   DEBUG_MSG("setting offsets and sizes\n");
-   for(pos=files_list;pos;++pos)
-   {
-      GP<File> & file=files_list[pos];
+      GP<File> file=new File();
+      files_list.append(file);
       if (bundled)
       {
 	 file->offset=str.read32();
@@ -90,16 +82,20 @@ DjVmDir::decode(ByteStream & str)
       } else file->offset=file->size=0;
    }
 
-   DEBUG_MSG("reading and decompressing compressed names...\n");
-   TArray<char> strings;
    BSByteStream bs_str(str);
+   DEBUG_MSG("reading and decompressing flags...\n");
+   for(pos=files_list;pos;++pos)
+      files_list[pos]->flags=bs_str.read8();
+   
+   DEBUG_MSG("reading and decompressing names...\n");
+   TArray<char> strings;
    char buffer[1024];
    int length;
    while((length=bs_str.read(buffer, 1024)))
    {
       int strings_size=strings.size();
       strings.resize(strings_size+length-1);
-      memcpy( (char*)strings + strings_size, buffer, length);
+      memcpy((char*) strings+strings_size, buffer, length);
    }
    DEBUG_MSG("size of decompressed names block=" << strings.size() << "\n");
    
@@ -182,32 +178,11 @@ DjVmDir::encode(ByteStream & str) const
    GPosition pos;
 
    bool bundled=files_list[files_list]->offset!=0;
-   DEBUG_MSG("encoding dir for bundled doc=" << bundled << "\n");
-   str.write8(bundled);
+   DEBUG_MSG("encoding version number=" << version << ", bundled=" << bundled << "\n");
+   str.write8(version | ((int) bundled<< 7));
    
    DEBUG_MSG("storing the number of records=" << files_list.size() << "\n");
    str.write16(files_list.size());
-
-   DEBUG_MSG("storing and compressing flags for every record\n");
-   {
-      MemoryByteStream mem_str;
-      {
-	 BSByteStream bs_str(mem_str, 1024);
-	 for(GPosition pos=files_list;pos;++pos)
-	 {
-	    GP<File> file=files_list[pos];
-	    if (file->name!=file->id) file->flags|=File::HAS_NAME;
-	    else file->flags&=~File::HAS_NAME;
-	    if (file->title!=file->id) file->flags|=File::HAS_TITLE;
-	    else file->flags&=~File::HAS_TITLE;
-	    bs_str.write8(file->flags);
-	 }
-      }
-      TArray<char> data=mem_str.get_data();
-      DEBUG_MSG("flags: " << files_list.size() << "=>" << data.size() << "\n");
-      str.write16(data.size());
-      str.writall((const void*)(const char*)data, data.size());
-   }
 
    if (bundled)
    {
@@ -223,8 +198,19 @@ DjVmDir::encode(ByteStream & str) const
       }
    }
 
+   BSByteStream bs_str(str, 50);
+   DEBUG_MSG("storing and compressing flags for every record\n");
+   for(pos=files_list;pos;++pos)
+   {
+      GP<File> file=files_list[pos];
+      if (file->name!=file->id) file->flags|=File::HAS_NAME;
+      else file->flags&=~File::HAS_NAME;
+      if (file->title!=file->id) file->flags|=File::HAS_TITLE;
+      else file->flags&=~File::HAS_TITLE;
+      bs_str.write8(file->flags);
+   }
+
    DEBUG_MSG("storing and compressing names...\n");
-   BSByteStream bs_str(str, 1024);
    for(pos=files_list;pos;++pos)
    {
      GP<File> file=files_list[pos];
@@ -234,6 +220,7 @@ DjVmDir::encode(ByteStream & str) const
      if (file->flags & File::HAS_TITLE)
        bs_str.writall((const void*)(const char*)file->title, file->title.length()+1);
    }
+   
    DEBUG_MSG("done\n");
 }
 
