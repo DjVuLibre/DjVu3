@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.1.2.9 1999-05-03 22:09:13 eaf Exp $
+//C- $Id: DjVuFile.cpp,v 1.1.2.10 1999-05-05 20:40:05 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -343,6 +343,9 @@ DjVuFile::decode_func(void)
 GP<DjVuFile>
 DjVuFile::process_incl_chunk(ByteStream & str)
 {
+   DEBUG_MSG("DjVuFile::process_incl_chunk(): processing INCL chunk...\n");
+   DEBUG_MAKE_INDENT(3);
+   
    GString incl_str;
    char buffer[1024];
    int length;
@@ -361,6 +364,8 @@ DjVuFile::process_incl_chunk(ByteStream & str)
    {
       if (strchr(incl_str, '/'))
 	 THROW("Malformed INCL chunk. No directories allowed.");
+
+      DEBUG_MSG("incl_str='" << incl_str << "'\n");
       
       GURL incl_url=url.baseURL()+incl_str;
       GCriticalSectionLock lock(&inc_files_lock);
@@ -373,9 +378,10 @@ DjVuFile::process_incl_chunk(ByteStream & str)
 	 if (cache) file=cache->get_item(incl_url);
 	 if (!file)
 	 {
+	    DEBUG_MSG("creating new file\n");
 	    file=new DjVuFile(incl_url, this, cache);
 	    if (cache) cache->add_item(incl_url, file);
-	 };
+	 } else { DEBUG_MSG("reusing file from cache\n"); }
 	 get_portcaster()->add_route(file, this);
 	 inc_files_list.append(file);
 	 return file;
@@ -432,11 +438,31 @@ DjVuFile::decode(ByteStream & str)
 	 } else if (chkid=="INCL")
 	 {
 	    GP<DjVuFile> file=process_incl_chunk(iff);
-	    if (file &&
-		!file->is_decoding() &&
-		!file->is_decode_ok() &&
-		!file->is_decode_failed())
-	       file->start_decode();
+	    if (file)
+	       if (!file->is_decoding() &&
+		   !file->is_decode_ok() &&
+		   !file->is_decode_failed()) file->start_decode();
+	       else
+	       {
+		  ByteStream * str=0;
+		  TRY {
+		     str=file->data_range->get_stream();
+		     int chksize;
+		     GString chkid;
+		     IFFByteStream iff(*str);
+		     if (!iff.get_chunk(chkid)) THROW("File does not appear to be in IFF format.");
+
+		     while((chksize=iff.get_chunk(chkid)))
+		     {
+			get_portcaster()->notify_chunk_done(file, chkid);
+			iff.close_chunk();
+		     }
+		  } CATCH(exc) {
+		     delete str; str=0;
+		     RETHROW;
+		  } ENDCATCH;
+		  delete str; str=0;
+	       }
 	    desc.format(" %0.1f Kb\t'%s'\tIndirection chunk.\n",
 			chksize/1024.0, (const char*)chkid);
 	 } else if (chkid=="NDIR")
@@ -552,11 +578,31 @@ DjVuFile::decode(ByteStream & str)
 	 } else if (chkid=="INCL")
 	 {
 	    GP<DjVuFile> file=process_incl_chunk(iff);
-	    if (file &&
-		!file->is_decoding() &&
-		!file->is_decode_ok() &&
-		!file->is_decode_failed())
-	       file->start_decode();
+	    if (file)
+	       if (!file->is_decoding() &&
+		   !file->is_decode_ok() &&
+		   !file->is_decode_failed()) file->start_decode();
+	       else
+	       {
+		  ByteStream * str=0;
+		  TRY {
+		     str=file->data_range->get_stream();
+		     int chksize;
+		     GString chkid;
+		     IFFByteStream iff(*str);
+		     if (!iff.get_chunk(chkid)) THROW("File does not appear to be in IFF format.");
+
+		     while((chksize=iff.get_chunk(chkid)))
+		     {
+			get_portcaster()->notify_chunk_done(file, chkid);
+			iff.close_chunk();
+		     }
+		  } CATCH(exc) {
+		     delete str; str=0;
+		     RETHROW;
+		  } ENDCATCH;
+		  delete str; str=0;
+	       }
 	    desc.format(" %0.1f Kb\t'%s'\tIndirection chunk (Unsupported).\n",
 			chksize/1024.0, (const char*)chkid);
 	 } else if (chkid=="NDIR")
