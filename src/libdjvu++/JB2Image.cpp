@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: JB2Image.cpp,v 1.3 1999-02-08 19:38:36 leonb Exp $
+//C-  $Id: JB2Image.cpp,v 1.4 1999-03-11 14:33:25 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -274,7 +274,7 @@ JB2Image::decode(ByteStream &bs, int)
 
 // STATIC DATA MEMBERS
 
-const int JB2Image::JB2Codec::BIGPOSITIVE = 262143;
+const int JB2Image::JB2Codec::BIGPOSITIVE = 262142;
 const int JB2Image::JB2Codec::BIGNEGATIVE = -262143;
 const int JB2Image::JB2Codec::MAX_NCELLS = 20000;
 
