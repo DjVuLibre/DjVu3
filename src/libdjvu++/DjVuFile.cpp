@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuFile.cpp,v 1.175 2001-07-03 17:02:32 bcr Exp $
+// $Id: DjVuFile.cpp,v 1.176 2001-07-10 17:38:14 mchen Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -2702,11 +2702,16 @@ DjVuFile::change_meta(const GUTF8String &xmeta,const bool do_reset)
   {
     const GP<IFFByteStream> giff=IFFByteStream::create(meta);
     IFFByteStream &iff=*giff;
+#if 0
+    iff.put_chunk("METa");
+    iff.get_bytestream()->writestring(xmeta);
+#else
     iff.put_chunk("METz");
     {
       GP<ByteStream> gbsiff=BSByteStream::create(iff.get_bytestream(),50);
       gbsiff->writestring(xmeta);
     }
+#endif
     iff.close_chunk();
   }
 }

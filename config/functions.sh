@@ -31,7 +31,7 @@
 #C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #
-# $Id: functions.sh,v 1.68 2001-06-26 17:30:25 bcr Exp $
+# $Id: functions.sh,v 1.69 2001-07-10 17:38:14 mchen Exp $
 # $Name:  $
 
 #
@@ -294,10 +294,10 @@ add_undefs()
     shift
     echo '#ifdef '"$Dname" >> "$CONFIG_H"
     echo '#undef '"$Dname" >> "$CONFIG_H"
-    echo '#endif '"$Dname" >> "$CONFIG_H"
+    echo '#endif ' >> "$CONFIG_H"
     echo '#ifdef '"$Dname" >> "$CONFIG_H_CACHE"
     echo '#undef '"$Dname" >> "$CONFIG_H_CACHE"
-    echo '#endif '"$Dname" >> "$CONFIG_H_CACHE"
+    echo '#endif ' >> "$CONFIG_H_CACHE"
   done
 }
 
@@ -323,7 +323,7 @@ append_undefs()
     shift
     echo '#ifdef '"$Dname" >> "$CONFIG_H"
     echo '#undef '"$Dname" >> "$CONFIG_H"
-    echo '#endif '"$Dname" >> "$CONFIG_H"
+    echo '#endif ' >> "$CONFIG_H"
   done
 }
   

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuImage.cpp,v 1.82 2001-07-03 17:02:32 bcr Exp $
+// $Id: DjVuImage.cpp,v 1.83 2001-07-10 17:38:14 mchen Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -1424,11 +1424,13 @@ DjVuImage::writeXML(ByteStream &str_out,const GURL &doc_url,const int flags) con
         GP<ByteStream> gbs(iff.get_bytestream());
         if(chkid == "METa")
         {
-          str_out.writestring(gbs->getAsUTF8());
+	   str_out.copy(*gbs);
+          //str_out.writestring(gbs->getAsUTF8());
         }else if(chkid == "METz")
         {
           gbs=BSByteStream::create(gbs);
-          str_out.writestring(gbs->getAsUTF8());
+          str_out.copy(*gbs);
+          //str_out.writestring(gbs->getAsUTF8());
         }
         iff.close_chunk();
       }
