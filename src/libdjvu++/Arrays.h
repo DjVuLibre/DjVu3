@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: Arrays.h,v 1.16 2000-10-06 21:47:21 fcrary Exp $
+//C- $Id: Arrays.h,v 1.17 2000-10-20 16:33:53 bcr Exp $
 
 
 #ifndef _ARRAYS_H_
@@ -76,7 +76,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@geocities.com> -- Copy-on-demand implementation.
     @version 
-    #$Id: Arrays.h,v 1.16 2000-10-06 21:47:21 fcrary Exp $# */
+    #$Id: Arrays.h,v 1.17 2000-10-20 16:33:53 bcr Exp $# */
 //@{
 
 // Auxiliary classes: Will be used in place of GPBase and GPEnabled objects
@@ -433,8 +433,7 @@ public:
        invocation of this conversion operator. */
    operator const TYPE* () const;
    
-#if defined(macintosh) //MCW can't compile
-#else  
+#ifndef __MWERKS__ //MCW can't compile
    operator const TYPE* ();
 #endif  
    /** Insert new elements into an array. This function inserts
@@ -483,8 +482,7 @@ ArrayBaseT<TYPE>::operator TYPE* ()
    return &((TYPE *) rep->data)[-rep->minlo];
 }
 
-#if defined(macintosh) //MCW can't compile
-#else
+#ifndef __MWERKS__ //MCW can't compile
 template <class TYPE> inline
 ArrayBaseT<TYPE>::operator const TYPE* ()
 {
@@ -860,8 +858,7 @@ public:
   // -- CONVERSION
   operator GP<TYPE>* ();
   
-#if defined(macintosh) //MCW can't compile
-#else  
+#ifndef __MWERKS__ //MCW can't compile
   operator const GP<TYPE>* ();
 #endif 
  
@@ -909,8 +906,7 @@ inline DPArray<TYPE>::operator GP<TYPE>* ()
    return (GP<TYPE> *) DArray<GPBase>::operator GPBase*();
 }
 
-#if defined(macintosh) //MCW can't compile
-#else
+#ifndef __MWERKS__ //MCW can't compile
 template<class TYPE>
 inline DPArray<TYPE>::operator const GP<TYPE>* ()
 {

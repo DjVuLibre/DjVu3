@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.131 2000-10-06 21:47:21 fcrary Exp $
+//C- $Id: DjVuFile.cpp,v 1.132 2000-10-20 16:33:53 bcr Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -184,28 +184,30 @@ DjVuFile::~DjVuFile(void)
 void
 DjVuFile::reset(void)
 {
-  info = 0; 
-  anno = 0; 
-  bg44 = 0; 
-  fgjb = 0; 
-  fgjd = 0;
-  fgpm = 0;
-  dir  = 0; 
-  description = ""; 
-  mimetype = "";
+   info = 0; 
+   anno = 0; 
+   bg44 = 0; 
+   fgbc = 0;
+   fgjb = 0; 
+   fgjd = 0;
+   fgpm = 0;
+   dir  = 0; 
+   description = ""; 
+   mimetype = "";
 }
 
 unsigned int
 DjVuFile::get_memory_usage(void) const
 {
-  unsigned int size=sizeof(*this);
-  if (info) size+=info->get_memory_usage();
-  if (bg44) size+=bg44->get_memory_usage();
-  if (fgjb) size+=fgjb->get_memory_usage();
-  if (fgpm) size+=fgpm->get_memory_usage();
-  if (anno) size+=anno->size();
-  if (dir) size+=dir->get_memory_usage();
-  return size;
+   unsigned int size=sizeof(*this);
+   if (info) size+=info->get_memory_usage();
+   if (bg44) size+=bg44->get_memory_usage();
+   if (fgjb) size+=fgjb->get_memory_usage();
+   if (fgpm) size+=fgpm->get_memory_usage();
+   if (fgbc) size+=fgbc->size()*sizeof(int);
+   if (anno) size+=anno->size();
+   if (dir) size+=dir->get_memory_usage();
+   return size;
 }
 
 GPList<DjVuFile>
