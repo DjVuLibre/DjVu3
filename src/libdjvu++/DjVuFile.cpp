@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.98 1999-12-09 03:49:52 bcr Exp $
+//C- $Id: DjVuFile.cpp,v 1.99 1999-12-13 20:03:26 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -1255,7 +1255,7 @@ DjVuFile::get_merged_anno(const GP<DjVuFile> & file,
 	 GPList<DjVuFile> list=file->get_included_files();
 	 for(GPosition pos=list;pos;++pos)
 	    get_merged_anno(list[pos], str_out, map);
-      } else
+      } else if (file->is_data_present())
       {
 	    // Process the DjVuFile's data by decoding the annotations
 	    // and included annotations from lower-level files where necessary
