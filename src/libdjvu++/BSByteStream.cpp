@@ -9,9 +9,9 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: BSByteStream.cpp,v 1.10 1999-08-18 17:53:46 leonb Exp $
+//C- $Id: BSByteStream.cpp,v 1.11 1999-09-02 02:17:22 leonb Exp $
 
-// "$Id: BSByteStream.cpp,v 1.10 1999-08-18 17:53:46 leonb Exp $"
+// "$Id: BSByteStream.cpp,v 1.11 1999-09-02 02:17:22 leonb Exp $"
 // - Author: Leon Bottou, 07/1998
 
 
@@ -1071,9 +1071,10 @@ BSByteStream::BSByteStream(ByteStream &xbs, int encoding)
 {
   if (encoding)
     {
-      if (encoding<MINBLOCK || encoding>MAXBLOCK)
-        THROW("Requested block size must be in ["
-              STR(MINBLOCK) "Kb.." STR(MAXBLOCK) "Kb] range");
+      if (encoding < MINBLOCK)
+        encoding = MINBLOCK;
+      if (encoding > MAXBLOCK)
+        THROW("Requested block size must be less than " STR(MAXBLOCK) "Kbytes.");
       // Record block size
       blocksize = encoding * 1024;
     }
