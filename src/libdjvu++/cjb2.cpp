@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: cjb2.cpp,v 1.7 2000-02-17 16:09:28 leonb Exp $
+//C- $Id: cjb2.cpp,v 1.8 2000-02-17 22:12:47 leonb Exp $
 
 
 /** @name cjb2
@@ -29,13 +29,11 @@
     Options are:
     \begin{description}
     \item[-dpi xxx]  Specify image resolution (default 300).
-    \item[-smooth]   Smooth characters shapes (lossy).
     \item[-clean]    Clean small flyspecs (lossy).
     \item[-loose]    Substitute patterns with small variations (lossy).
     \end{description}
     Encoding is lossless unless one or several lossy options are selected.
-    The #dpi# argument mostly affects the level of cleanups and/or smoothing 
-    performed on the shapes.
+    The #dpi# argument mostly affects the cleaning thresholds.
 
     @memo
     Simple JB2 encoder.
@@ -43,7 +41,7 @@
     L\'eon Bottou <leonb@research.att.com>\\
     Paul Howard <pgh@research.att.com>
     @version
-    #$Id: cjb2.cpp,v 1.7 2000-02-17 16:09:28 leonb Exp $# */
+    #$Id: cjb2.cpp,v 1.8 2000-02-17 22:12:47 leonb Exp $# */
 //@{
 //@}
 
@@ -93,7 +91,7 @@ MAX(int a, int b)
 
 
 // --------------------------------------------------
-// CONNECTED COMPONENT ANALYSIS - SMOOTH/CLEAN
+// CONNECTED COMPONENT ANALYSIS AND CLEANING
 // --------------------------------------------------
 
 // -- A run of black pixels
@@ -136,7 +134,6 @@ public:
   void make_ccs_from_ccids();
   void erase_tiny_ccs();
   void merge_and_split_ccs();
-  void smooth_ccs();
   void sort_in_reading_order(); 
 };
 
@@ -385,96 +382,6 @@ CCImage::erase_tiny_ccs()
     }
 }
  
-
-// -- Smooth ccs
-void
-CCImage::smooth_ccs()
-{
-  int nccs = ccs.size();
-  for (int ccid=0; ccid<nccs; ccid++)
-    {
-      // Access runs
-      CC &cc = ccs[ccid];
-      int nrun = cc.nrun;
-      Run *run = &runs[cc.frun];
-      if (cc.bb.height() < 3)
-        continue;
-      if (cc.bb.height()<=smallsize && cc.bb.width()<=smallsize)
-        continue;
-      // 1 - Smooth vertical edges
-      {
-        // Get three lines of runs
-        int r0 = 0;
-        int r1 = 0;
-        int r2 = 0;
-        // Loop on all three lines
-        for (int y=cc.bb.ymin; y+2<cc.bb.ymax; y++)
-          {
-            while (r0<nrun && run[r0].y<y) r0++;
-            while (r1<nrun && run[r1].y<y+1) r1++;
-            while (r2<nrun && run[r2].y<y+2) r2++;
-            // Loop on all runs on current line
-            while (r0<nrun && run[r0].y == y)
-              {
-                // Synchronize left sides
-                int x = run[r0].x1;
-                while (r1<nrun && run[r1].y==y+1 && run[r1].x2<x-1) r1++;
-                while (r2<nrun && run[r2].y==y+2 && run[r2].x2<x-1) r2++;
-                // Align left sides
-                if (run[r0].x1==run[r2].x1 && run[r1].x2!=run[r1].x1)
-                  if (run[r1].y==y+1 && run[r2].y==y+2)
-                    if (run[r1].x1==x-1 || run[r1].x1==x+1)
-                      run[r1].x1 = x;
-                // Synchronize right sides
-                x = run[r0].x2;
-                while (r1<nrun && run[r1].y==y+1 && run[r1].x2<x-1) r1++;
-                while (r2<nrun && run[r2].y==y+2 && run[r2].x2<x-1) r2++;
-                // Align right sides
-                if (run[r0].x2==run[r2].x2 && run[r1].x2!=run[r1].x1)
-                  if (run[r1].y==y+1 && run[r2].y==y+2)
-                    if (run[r1].x2==x-1 || run[r1].x2==x+1)
-                      run[r1].x2 = x;
-                // Next run
-                r0++;
-              }
-          }
-      }
-      // 2- Smooth horizontal edges
-      {
-        // Get three lines of runs
-        int r0 = 0;
-        int r1 = 0;
-        int r2 = 0;
-        // Loop on all three lines
-        for (int y=cc.bb.ymin; y<cc.bb.ymax; y++)
-          {
-            while (r0<nrun && run[r0].y<y-1) r0++;
-            while (r1<nrun && run[r1].y<y) r1++;
-            while (r2<nrun && run[r2].y<y+1) r2++;
-            // Loop on all runs on current line
-            while (r1<nrun && run[r1].y == y)
-              {
-                // Lone black pixel
-                if (run[r1].x1 == run[r1].x2)
-                  {
-                    int x = run[r1].x1;
-                    while (r0<nrun && run[r0].y==y-1 && run[r0].x2<x-1) r0++;
-                    while (r2<nrun && run[r2].y==y+1 && run[r2].x2<x-1) r2++;
-                    if (run[r0].x1<=x-1 && run[r0].x2>=x+1 && run[r0].y==y-1)
-                      if (run[r2].y!=y+1 || run[r2].x1>x+1 || run[r2].x2<x-1 )
-                        { run[r1].ccid = -1; r1++; continue;  }
-                    if (run[r2].x1<=x-1 && run[r2].x2>=x+1 && run[r2].y==y+1)
-                      if (run[r0].y!=y-1 || run[r0].x1>x+1 || run[r0].x2<x-1 )
-                        { run[r1].ccid = -1; r1++; continue; }
-                  }
-                // Next pixel
-                r1++;
-              }
-          }
-      }
-    }
-}
-
 
 // -- Merges small ccs and split large ccs
 void
@@ -859,7 +766,6 @@ tune_jb2image(JB2Image *jimg,
 struct cjb2opts {
   int dpi;
   int substitute_threshold;
-  bool smooth;
   bool clean; 
 };
 
@@ -880,8 +786,6 @@ cjb2(const char *filein, const char *fileout, const cjb2opts &opts)
   rimg.make_ccs_from_ccids();                // compute cc descriptors
   if (opts.clean) 
     rimg.erase_tiny_ccs();                   // clean
-  if (opts.smooth) 
-    rimg.smooth_ccs();                       // smooth
   rimg.merge_and_split_ccs();                // reorganize weird ccs
   rimg.sort_in_reading_order();              // sort cc descriptors
   
@@ -930,7 +834,6 @@ usage()
   fprintf(stderr,"Usage: cjb2 [options] <inputpbmfile> <outputdjvufile>\n"
           "Options are:\n"
           "   -dpi xxx     Specify image resolution (default 300).\n"
-          "   -smooth      Smooth characters shapes (lossy).\n"
           "   -clean       Remove small flyspecs (lossy).\n"
           "   -loose       Substitute patterns with small variations (lossy).\n"
           "Encoding is lossless unless one or several lossy options are selected.\n" );
@@ -950,7 +853,6 @@ main(int argc, const char **argv)
       opts.dpi = 300;
       opts.substitute_threshold = 0;
       opts.clean = false;
-      opts.smooth = false;
       // Parse options
       for (int i=1; i<argc; i++)
         {
@@ -964,8 +866,6 @@ main(int argc, const char **argv)
             }
           else if (arg == "-clean")
             opts.clean = true;
-          else if (arg == "-smooth")
-            opts.smooth = true;
           else if (arg == "-loose")
             opts.substitute_threshold = 5;
           else if (arg[0] == '-')
