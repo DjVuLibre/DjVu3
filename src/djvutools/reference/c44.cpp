@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: c44.cpp,v 1.30 2001-08-24 21:50:09 docbill Exp $
+// $Id: c44.cpp,v 1.31 2001-08-24 22:18:14 docbill Exp $
 // $Name:  $
 
 
@@ -185,7 +185,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: c44.cpp,v 1.30 2001-08-24 21:50:09 docbill Exp $# */
+    #$Id: c44.cpp,v 1.31 2001-08-24 22:18:14 docbill Exp $# */
 //@{
 //@}
 
@@ -199,6 +199,7 @@
 #include "GPixmap.h"
 #include "GURL.h"
 #include "DjVuMessage.h"
+#include "JPEGDecoder.h"
 
 #include <locale.h>
 #include <stdio.h>
@@ -210,6 +211,8 @@
 GURL pnmurl;
 GURL iw4url;
 GURL mskurl;
+
+GUTF8String percent;
 
 int flag_mask = 0;
 int flag_bpp = 0;
@@ -245,6 +248,8 @@ usage()
          "Usage: c44 [options] pnmfile [djvufile]\n\n"
          "Usage: c44 [options] jpegfile [djvufile]\n\n"
          "Options:\n"
+         "    -percent n,..,n    -- selects the percentage of original file size\n"
+         "                        for building progressive file.\n"
          "    -bpp n,..,n      -- select a increasing sequence of bitrates\n"
          "                        for building progressive file (in bits per pixel).\n"
          "    -size n,..,n     -- select an increasing sequence of minimal sizes\n"
@@ -318,8 +323,9 @@ parse_bpp(const char *q)
 
 
 void 
-parse_size(const char *q)
+parse_size(const char *q,const int size=0)
 {
+  percent=GUTF8String();
   flag_size = 1;
   argc_size = 0;
   int lastx = 0;
@@ -337,7 +343,8 @@ parse_size(const char *q)
       if (*ptr && *ptr!='+' && *ptr!=',')
         G_THROW( ERR_MSG("c44.size_comma_expected") );
       q = (*ptr ? ptr+1 : ptr);
-      argv_size[argc_size++] = x;
+      fprintf(stderr,"%d,%d,%d\n",size,x,size?((x*size)/100):x);
+      argv_size[argc_size++] = size?((x*size)/100):x;
       if (argc_size>=MAXCHUNKS)
         G_THROW( ERR_MSG("c44.size_too_many") );
     }
@@ -470,7 +477,15 @@ parse(DArray<GUTF8String> &argv)
     {
       if (argv[i][0] == '-')
         {
-          if (argv[i] == "-bpp")
+          if (argv[i] == "-percent")
+            {
+              if (++i >= argc)
+                G_THROW( ERR_MSG("c44.no_bpp_arg") );
+              if (flag_bpp || flag_size)
+                G_THROW( ERR_MSG("c44.multiple_bitrate") );
+              percent=argv[i];
+            }
+          else if (argv[i] == "-bpp")
             {
               if (++i >= argc)
                 G_THROW( ERR_MSG("c44.no_bpp_arg") );
@@ -671,6 +686,14 @@ main(int argc, char **argv)
       char prefix[16];
       if (ibs.readall((void*)prefix, sizeof(prefix)) != sizeof(prefix))
         G_THROW( ERR_MSG("c44.failed_pnm_header") );
+      if(percent.length())
+        {
+          parse_size(percent,gibs->size());
+        }
+      else if(prefix[0]!='P' &&prefix[0]!='A' && prefix[0]!='F' && !flag_mask && !flag_bpp && !flag_size && !flag_slice && !flag_decibel)
+        {
+          parse_size("10,20,30,50",gibs->size());
+        }
       // Load images
       int w = 0;
       int h = 0;
@@ -705,15 +728,14 @@ main(int argc, char **argv)
           if (! mskurl.is_empty())
             G_THROW( ERR_MSG("c44.failed_mask") );
         }
-      else
+      else  // just for kicks, try jpeg.
         {
           // color file
-          GP<GPixmap> gipm=GPixmap::create(ibs);
+          GP<GPixmap> gipm=JPEGDecoder::decode(ibs);
           GPixmap &ipm=*gipm;
           w = ipm.columns();
           h = ipm.rows();
           iw = IW44Image::create_encode(ipm, getmask(w,h), arg_crcbmode);
-//          G_THROW( ERR_MSG("c44.unrecognized") );
         }
       // Call destructor on input file
       gibs=0;
