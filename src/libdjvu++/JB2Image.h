@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: JB2Image.h,v 1.12.2.1 1999-06-22 19:18:33 leonb Exp $
+//C- $Id: JB2Image.h,v 1.12.2.2 1999-07-13 19:53:06 leonb Exp $
 
 #ifndef _JB2IMAGE_H
 #define _JB2IMAGE_H
@@ -107,7 +107,7 @@
     \end{itemize}
 
     @version
-    #$Id: JB2Image.h,v 1.12.2.1 1999-06-22 19:18:33 leonb Exp $#
+    #$Id: JB2Image.h,v 1.12.2.2 1999-07-13 19:53:06 leonb Exp $#
     @memo
     Coding bilevel images with JB2.
     @author
@@ -183,7 +183,7 @@ public:
     The callback function must return a pointer to the dictionary or NULL
     if none is found. */
 
-typedef GP<JB2Dict> ( *JB2DecoderCallback ) ( void* );
+typedef GP<JB2Dict> JB2DecoderCallback ( void* );
 
 
 /** Dictionary of JB2 shapes. */
