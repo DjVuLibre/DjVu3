@@ -907,6 +907,13 @@ PHONY: all install clean html depend
 EOF
 }
 
+generate_main_makefile_extra()
+{
+
+    # Insert Makefile fragment
+    "${cat}" >> "${TOPBUILDDIR}/Makefile"
+}
+
 finish_config()
 {
   if [ -z "$WROTE_STATUS" ]
