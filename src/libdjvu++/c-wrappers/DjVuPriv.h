@@ -65,11 +65,12 @@ struct _djvu_image_priv
     return (int)(img.pixsize);
   }
   static inline int
-  GetRowTDRLNR(const djvu_image &img,const int row,const unsigned char *&startptr,const unsigned char *&stopptr)
+  GetRowTDLRNR(djvu_image &img,const int row,unsigned char *&startptr,unsigned char *&stopptr)
   {
-    startptr=(stopptr=img.data+img.rowsize*row-img.pixsize)+img.pixsize*img.w;
-    return -(int)(img.pixsize);
+    stopptr=(startptr=img.data+img.rowsize*row)+img.pixsize*img.w;
+    return (int)(img.pixsize);
   }
+
   static inline int
   GetRowBULRNR(const djvu_image &img,const int row,const unsigned char *&startptr,const unsigned char *&stopptr)
   {
@@ -77,40 +78,17 @@ struct _djvu_image_priv
     return (int)(img.pixsize);
   }
   static inline int
-  GetRowBURLNR(const djvu_image &img,const int row,const unsigned char *&startptr,const unsigned char *&stopptr)
+  GetRowBULRNR(djvu_image &img,const int row,unsigned char *&startptr,unsigned char *&stopptr)
   {
-    startptr=(stopptr=img.data+img.rowsize*(img.h-row-1)-img.pixsize)+img.pixsize*img.w;
-    return -(int)(img.pixsize);
-  }
-  static inline int
-  GetRowTDLRCW(const djvu_image &img,const int row,const unsigned char *&startptr,const unsigned char *&stopptr)
-  {
-    stopptr=(startptr=img.data+img.pixsize*(img.w-row-1))+img.rowsize*img.h;
-    return (int)(img.rowsize);
-  }
-  static inline int
-  GetRowTDRLCW(const djvu_image &img,const int row,const unsigned char *&startptr,const unsigned char *&stopptr)
-  {
-    startptr=(stopptr=img.data+img.pixsize*(img.w-row-1)-img.rowsize)+img.rowsize*img.h;
-    return -(int)(img.rowsize);
-  }
-  static inline int
-  GetRowBULRCW(const djvu_image &img,const int row,const unsigned char *&startptr,const unsigned char *&stopptr)
-  {
-    startptr=(stopptr=img.data+img.pixsize*row-img.rowsize)+img.rowsize*img.h;
-    return -(int)(img.rowsize);
-  }
-  static inline int
-  GetRowBURLCW(const djvu_image &img,const int row,const unsigned char *&startptr,const unsigned char *&stopptr)
-  {
-    stopptr=(startptr=img.data+img.pixsize*row)+img.rowsize*img.h;
-    return (int)(img.rowsize);
-  }
-  static inline int
-  GetRowTDLRNR(djvu_image &img,const int row,unsigned char *&startptr,unsigned char *&stopptr)
-  {
-    stopptr=(startptr=img.data+img.rowsize*row)+img.pixsize*img.w;
+    stopptr=(startptr=img.data+img.rowsize*(img.h-row-1))+img.pixsize*img.w;
     return (int)(img.pixsize);
+  }
+
+  static inline int
+  GetRowTDRLNR(const djvu_image &img,const int row,const unsigned char *&startptr,const unsigned char *&stopptr)
+  {
+    startptr=(stopptr=img.data+img.rowsize*row-img.pixsize)+img.pixsize*img.w;
+    return -(int)(img.pixsize);
   }
   static inline int
   GetRowTDRLNR(djvu_image &img,const int row,unsigned char *&startptr,unsigned char *&stopptr)
@@ -118,11 +96,12 @@ struct _djvu_image_priv
     startptr=(stopptr=img.data+img.rowsize*row-img.pixsize)+img.pixsize*img.w;
     return -(int)(img.pixsize);
   }
+
   static inline int
-  GetRowBULRNR(djvu_image &img,const int row,unsigned char *&startptr,unsigned char *&stopptr)
+  GetRowBURLNR(const djvu_image &img,const int row,const unsigned char *&startptr,const unsigned char *&stopptr)
   {
-    stopptr=(startptr=img.data+img.rowsize*(img.h-row-1))+img.pixsize*img.w;
-    return (int)(img.pixsize);
+    startptr=(stopptr=img.data+img.rowsize*(img.h-row-1)-img.pixsize)+img.pixsize*img.w;
+    return -(int)(img.pixsize);
   }
   static inline int
   GetRowBURLNR(djvu_image &img,const int row,unsigned char *&startptr,unsigned char *&stopptr)
@@ -130,11 +109,38 @@ struct _djvu_image_priv
     startptr=(stopptr=img.data+img.rowsize*(img.h-row-1)-img.pixsize)+img.pixsize*img.w;
     return -(int)(img.pixsize);
   }
+
+  static inline int
+  GetRowTDLRCW(const djvu_image &img,const int row,const unsigned char *&startptr,const unsigned char *&stopptr)
+  {
+    startptr=(stopptr=img.data+img.pixsize*row-img.rowsize)+img.rowsize*img.h;
+    return -(int)(img.rowsize);
+  }
   static inline int
   GetRowTDLRCW(djvu_image &img,const int row,unsigned char *&startptr,unsigned char *&stopptr)
   {
-    stopptr=(startptr=img.data+img.pixsize*(img.w-row-1))+img.rowsize*img.h;
+    startptr=(stopptr=img.data+img.pixsize*row-img.rowsize)+img.rowsize*img.h;
+    return -(int)(img.rowsize);
+  }
+
+  static inline int
+  GetRowBULRCW(const djvu_image &img,const int row,const unsigned char *&startptr,const unsigned char *&stopptr)
+  {
+    stopptr=(startptr=img.data+img.pixsize*row)+img.rowsize*img.h;
     return (int)(img.rowsize);
+  }
+  static inline int
+  GetRowBULRCW(djvu_image &img,const int row,unsigned char *&startptr,unsigned char *&stopptr)
+  {
+    stopptr=(startptr=img.data+img.pixsize*row)+img.rowsize*img.h;
+    return (int)(img.rowsize);
+  }
+
+  static inline int
+  GetRowTDRLCW(const djvu_image &img,const int row,const unsigned char *&startptr,const unsigned char *&stopptr)
+  {
+    startptr=(stopptr=img.data+img.pixsize*(img.w-row-1)-img.rowsize)+img.rowsize*img.h;
+    return -(int)(img.rowsize);
   }
   static inline int
   GetRowTDRLCW(djvu_image &img,const int row,unsigned char *&startptr,unsigned char *&stopptr)
@@ -142,16 +148,17 @@ struct _djvu_image_priv
     startptr=(stopptr=img.data+img.pixsize*(img.w-row-1)-img.rowsize)+img.rowsize*img.h;
     return -(int)(img.rowsize);
   }
+
   static inline int
-  GetRowBULRCW(djvu_image &img,const int row,unsigned char *&startptr,unsigned char *&stopptr)
+  GetRowBURLCW(const djvu_image &img,const int row,const unsigned char *&startptr,const unsigned char *&stopptr)
   {
-    startptr=(stopptr=img.data+img.pixsize*row-img.rowsize)+img.rowsize*img.h;
-    return -(int)(img.rowsize);
+    stopptr=(startptr=img.data+img.pixsize*(img.w-row-1))+img.rowsize*img.h;
+    return (int)(img.rowsize);
   }
   static inline int
   GetRowBURLCW(djvu_image &img,const int row,unsigned char *&startptr,unsigned char *&stopptr)
   {
-    stopptr=(startptr=img.data+img.pixsize*row)+img.rowsize*img.h;
+    stopptr=(startptr=img.data+img.pixsize*(img.w-row-1))+img.rowsize*img.h;
     return (int)(img.rowsize);
   }
 };

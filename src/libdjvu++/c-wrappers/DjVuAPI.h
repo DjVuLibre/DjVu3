@@ -1,4 +1,4 @@
-/* File "$Id: DjVuAPI.h,v 1.21 2000-01-12 14:29:31 bcr Exp $"
+/* File "$Id: DjVuAPI.h,v 1.22 2000-01-16 13:13:54 bcr Exp $"
  *
  * The main header file for the DjVu API
  */
@@ -8,150 +8,11 @@
 
 /* 
  * $Log: DjVuAPI.h,v $
- * Revision 1.21  2000-01-12 14:29:31  bcr
- * Removed djvu_run_image and exposed more of GBitmap to the rest of the libraries.
+ * Revision 1.22  2000-01-16 13:13:54  bcr
+ * Added a get_info() option to the Stream class.
  *
- * Revision 1.20  2000/01/07 16:58:50  praveen
- * updated
- *
- * Revision 1.19  2000/01/06 04:34:03  bcr
- * Don't ask me.
- *
- * Revision 1.17  2000/01/05 19:39:48  praveen
- * *** empty log message ***
- *
- * Revision 1.16  2000/01/05 19:34:24  bcr
- * Generic header file.
- *
- * Revision 1.15  2000/01/04 20:01:46  bcr
- * Made streams resumable, and fixed a few minor bugs.
- *
- * Revision 1.14  2000/01/04 05:31:30  bcr
- * Refinement of previous patch, so we don't have unused variables.
- *
- * Revision 1.13  2000/01/04 04:48:37  bcr
- * Moved memory and progress callbacks exclusively into libdjvu++.
- * Added a text message for the progress callback, to indicate what
- * is currently being done.
- *
- * Revision 1.12  1999/12/22 18:29:04  bcr
- * Changed the libio++ functions to use ByteStream's.
- *
- * Revision 1.11  1999/12/20 20:11:46  bcr
- * Removed references to G4TiffStream, since this class is superceded by MTiffStream.
- *
- * Revision 1.10  1999/12/14 18:11:40  parag
- * C Wrapper for MTiff added
- *
- * Revision 1.9  1999/12/14 04:44:08  parag
- * C Wrapers for libio
- *
- * Revision 1.8  1999/12/03 00:23:10  parag
- * Added C Compatibility
- *
- * Revision 1.7  1999/11/24 19:21:50  orost
- * added djvu_pixel_rotate
- *
- * Revision 1.6  1999/11/23 15:54:08  orost
- * additions for DjVu3
- *
- * Revision 1.5  1999/11/18 00:17:12  parag
- * After changing Callback for djvu_fin
- *
- * Revision 1.4  1999/11/16 20:04:16  orost
- * Added in the functions for libimage
- *
- * Revision 1.3  1999/11/10 17:55:01  parag
- * Rotate90_CW
- *
- * Revision 1.2  1999/11/10 17:18:30  parag
- * Added Orientation Flags in run and pixel img
- *
- * Revision 1.1  1999/11/04 20:41:06  orost
- * It is a common file used by different libraries.
- * Mostly contains the image structures.
- *
- * Revision 1.2.2.17.2.1  1999/07/21 21:55:18  bcr
- * Added a memory debugging routines and fixed memory problems in DjVuMaskFind.cpp.
- * I've also added a DJVU_MASK_DISCARD_CONST flag for quicker decoding of low
- * resolution documents.
- *
- * Revision 1.2.2.17  1999/04/28 22:17:03  bcr
- *
- * Updates for documentation, and added resolution information to PNM files.
- *
- * Revision 1.2.2.16  1999/04/28 17:04:00  bcr
- * Changed to support resolution as part of the pixel image format.  This way
- * we can read resolution from BMP files, and keep it accurate across image
- * transformations.
- *
- * Revision 1.2.2.15  1999/03/27 06:39:37  bcr
- * I've disabled stripes for most documents, due to large letter problems.
- *
- * Revision 1.2.2.14  1999/03/02 07:07:29  bcr
- * Packaging correcitons
- *
- * Revision 1.2.2.13  1999/02/24 18:47:22  bcr
- * djvuencode now uses the progress reporting callback, and I've corrected a
- * couple of the options, such as crcbhalf.
- *
- * Revision 1.2.2.12  1999/02/18 18:20:18  orost
- * Added bmp routines.
- *
- * Revision 1.2.2.11  1999/02/15 22:27:31  bcr
- * I have updated the progress indicator to pass back an id from the parms
- * structure.  I've also modified, the order of djvu_render_full parameters and
- * renamed the function to djvu_render_area.
- *
- * I don't know why BmpStream.h keeps appearing in the commits.  I haven't made
- * any changes this time.
- *
- * Revision 1.2.2.10  1999/02/14 03:28:16  bcr
- * Added progress callback.
- * The automatic scaling now uses the reserved field.
- *
- * Revision 1.2.2.9  1999/02/12 04:56:08  bcr
- * Added in saving of original sizes.
- *
- * Revision 1.2.2.8  1999/02/10 22:24:36  bcr
- * I've finished updating the API to read the usefull data in the info
- * structure.  Now, if we can just add scale, I can consider this complete.
- *
- * Revision 1.2.2.7  1999/02/10 15:57:04  bcr
- * Hmmm. I really don't know.
- *
- * Revision 1.2.2.6  1999/02/10 15:19:28  bcr
- * Changed the high resolution and very low resolution values to be parameters
- * instead constants.
- *
- * Revision 1.2.2.5  1999/02/10 14:31:22  bcr
- * I have fixed the quality factors, and modified the DjVu routines to
- * automatically scale images below 225 DPI.
- *
- * Revision 1.2.2.4  1999/02/09 18:55:33  bcr
- * Corrected default background DPI to be 75 instead of 100.
- * Corrected the reverse video problem for the mask.
- *
- * Revision 1.2.2.3  1999/02/09 03:43:01  bcr
- * This is a complete re-write of the maskfind/libdjvu interphase.  It seems
- * to be working, but it still needs more testing.  For some reason the -2 option
- * is causing a core dump in my test programs, but I don't think the problem is
- * related.
- *
- * Revision 1.2.2.2  1999/02/02 06:49:53  bcr
- * Changed libMaskFind to use callback functions, instead of unresolved externals.
- * Also added the static_inline macro.
- *
- * Revision 1.2.2.1  1999/02/01 20:29:57  orost
- * I don't know why these changes were ommited.
- *
- * Revision 1.3  1999/02/01 07:07:10  bcr
- * The 2.0.0-prerelease version is now compiling.
- *
- * Revision 1.3  1999/01/31 16:49:37  bcr
- * All the files have been modified to list in comments if C++, revision,
- * author (if known), brief description, and finally the CVS log of
- * comments like this.
+ * I found the orientation flags is ignored by most unix programs, so the
+ * tiff images are now  oriented manually.
  *
  */
 
@@ -715,34 +576,6 @@ DJVUAPI djvu_image *
 djvu_dstream_to_image(djvu_input_sub *, void *);
 #endif
 /* 
- *      djvu_image_flip
- *
- * 		See DjVuAPI-2_0.html#djvu_image_flip
- */
-DJVUAPI djvu_image * 
-djvu_image_flip(djvu_image []);
-/* 
- *      djvu_image_mirror
- *
- * 		See DjVuAPI-2_0.html#djvu_image_mirror
- */
-DJVUAPI djvu_image * 
-djvu_image_mirror(djvu_image []);
-/* 
- *      djvu_image_gray
- *
- * 		See DjVuAPI-2_0.html#djvu_image_gray
- */
-DJVUAPI djvu_image *
-djvu_image_gray(djvu_image []);
-/* 
- *      djvu_image_to_native
- *
- * 		See DjVuAPI-2_0.html#djvu_image_to_native
- */
-DJVUAPI djvu_image *
-djvu_image_to_native(djvu_image []);
-/* 
  *      djvu_image_to_pnm
  *
  * 		See DjVuAPI-2_0.html#djvu_image_to_pnm
@@ -755,69 +588,6 @@ DJVUAPI int
 djvu_image_to_pict(djvu_image [],djvu_output_sub *,void *);
 DJVUAPI int
 djvu_image_to_ps(djvu_image [],djvu_output_sub *,void *);
-/* 
- *      djvu_pnm_to_run
- *
- * 		See DjVuAPI-2_0.html#djvu_pnm_to_run
- */
-
-// alloc functions return a handle which is used for 
-// further calls
-DJVUAPI void *
-djvu_alloc_mtiff_reader(djvu_input_sub * inpf,djvu_seek_sub *seekf,void * iarg);
-DJVUAPI void *
-djvu_alloc_mtiff_writer(djvu_output_sub * outf, void * oarg);
-DJVUAPI djvu_image *
-djvu_mtiff_to_dstream(void * handle, int pageNum);
-DJVUAPI int
-djvu_image_to_mtiff(void * handle, djvu_image pimg[]);
-DJVUAPI void
-djvu_free_mtiff(void * handle);
-
-/* 
- *      djvu_image_to_bitonal
- *
- * 		See DjVuAPI-2_0.html#djvu_image_to_bitonal
- */
-DJVUAPI djvu_image *
-djvu_image_to_bitonal(const djvu_image pimg[],const int threshold);
-
-/*
- * For freeing memory allocated by the callbacks
- */ 
-DJVUAPI void
-io_free_callback(void * callbackStruct);
-/*
- *      djvu_image_copy_transformed
- *
- *		Not documented yet.
- */
-DJVUAPI djvu_image *
-djvu_image_copy_transformed
-(const djvu_image im[],int angle,int w,int h);
-/*
- *      djvu_image_transform
- *
- *		Not documented yet.
- */
-DJVUAPI djvu_image *
-djvu_image_transform
-(djvu_image pimg[],int angle,int w,int h);
-/*
- *      djvu_image_rotate
- *
- *		Not documented yet.
- */
-DJVUAPI djvu_image *
-djvu_image_rotate(djvu_image pimg[], int angle);
-
-/* 
- *      djvu_counts_left
- *
- * 		Returns the number of counts left in the Limit License counter.
- */
-DJVUAPI int
-djvu_counts_left();
 
 #ifdef __cplusplus
 }
