@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.72 1999-10-07 15:48:34 eaf Exp $
+//C- $Id: DjVuFile.cpp,v 1.73 1999-10-12 19:42:21 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -574,9 +574,13 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
         THROW("DjVu Decoder: Corrupted file (Duplicate INFO chunk)");
       if (djvi)
         THROW("DjVu Decoder: Corrupted file (Found INFO chunk in FORM:DJVI)");
-      GP<DjVuInfo> info=new DjVuInfo();
+
+	 // We want to set the info in the DjVuFile right now in case
+	 // if DjVuInfo::decode() throws an error due to too big version
+	 // of the image. If we don't set it, the plugin will not be able
+	 // to retrieve the document version.
+      info=new DjVuInfo();
       info->decode(iff);
-      DjVuFile::info = info;
       desc.format("Page information");
     }
 
@@ -1265,6 +1269,7 @@ DjVuFile::add_djvu_data(IFFByteStream & ostr, GMap<GURL, void *> & map,
               GCriticalSectionLock lock(&inc_files_lock);  // anno_lock ?
               ostr.put_chunk("FORM:ANNO");
               anno->seek(0);
+	      fprintf(stderr, "size=%d\n", anno->size());
               ostr.copy(*anno);
               ostr.close_chunk();
             }
@@ -1295,6 +1300,7 @@ DjVuFile::add_djvu_data(IFFByteStream & ostr, GMap<GURL, void *> & map,
        GCriticalSectionLock lock(&inc_files_lock);  // anno_lock ?
        ostr.put_chunk("FORM:ANNO");
        anno->seek(0);
+       fprintf(stderr, "size=%d\n", anno->size());
        ostr.copy(*anno);
        ostr.close_chunk();
      }
