@@ -843,20 +843,28 @@ require_make_stlib()
 
 generate_makefile()
 {
-  # compute xtopsrcdir
-  # compute xsrcdir
-  xsrcdir=$TOPSRCDIR/$1
+  TOPSRCDIR=`unescape $TOPSRCDIR`
+  TOPBUILDDIR=`unescape $TOPBUILDDIR`
+  while [ -n "$1" ]
+  do
+    # compute xtopsrcdir
+    # compute xsrcdir
+    xsrcdir=$TOPSRCDIR/$1
 
-  # make nice pathnames
-  xsrcdir=`pathclean $xsrcdir`
+    # make nice pathnames
+    xsrcdir=`pathclean $xsrcdir`
 
-  # substitute
-  mkdirp "$TOPBUILDDIR/$1"
-  if [ -z "$WROTE_STATUS" ]
-  then
-    . "${CONFIG_DIR}/write_status.sh"
-  fi
-  run "${CONFIG_STATUS}" "$TOPSRCDIR/$1/Makefile.in" "$TOPBUILDDIR/$1/Makefile"
+    # substitute
+    mkdirp "$TOPBUILDDIR/$1"
+    if [ -z "$WROTE_STATUS" ]
+    then
+      . "${CONFIG_DIR}/write_status.sh"
+    fi
+    echo "Creating: $TOPBUILDDIR/$1/Makefile"
+    echo "	from  $TOPSRCDIR/$1/Makefile.in"
+    run "${CONFIG_STATUS}" "$TOPSRCDIR/$1/Makefile.in" "$TOPBUILDDIR/$1/Makefile"
+    shift
+  done
 }
 
 
@@ -874,13 +882,24 @@ generate_main_makefile()
 {
     subdirs=$*
 
+    echo "Writing $TOPBUILDDIR/Makefile"
     # Generate Makefile header
-    "${cat}" > "$TOPBUILDDIR/Makefile" <<EOF
+    "${sed}" -e 's,x$,\\,g' > "$TOPBUILDDIR/Makefile" <<EOF
 SHELL=/bin/sh
 TOPSRCDIR=`unescape $TOPSRCDIR`
 TOPBUILDDIR=`unescape $TOPBUILDDIR`
-SUBDIRS=`unescape $1` `unescape $2` `unescape $3`
+SUBDIRS= x
 EOF
+    while [ -n "$1" ] 
+    do
+      if [ -n "$2" ]
+      then
+        echo "'	`unescape $1`' \\" >> "$TOPBUILDDIR/Makefile"
+      else
+        echo "'	`unescape $1`'" >> "$TOPBUILDDIR/Makefile"
+      fi
+      shift
+    done
 
     # Insert Makefile fragment
     "${cat}" >> "${TOPBUILDDIR}/Makefile"
