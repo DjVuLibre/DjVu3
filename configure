@@ -33,6 +33,20 @@ do
     --with-rpo|--frepo )
       use_rpo=yes
       ;;
+    --with-jpeg-inc=* )
+      jpeg_inc_path=`echo $arg | sed 's/[-A-Za-z_]*=//'` 
+			C_DEFS=APPEND
+			A_DEFS="$A_DEFS -DNEED_JPEG_DECODER"
+			C_INCS=APPEND
+			A_INCS="$A_INCS -I$jpeg_inc_path"
+			C_JOBJ=APPEND
+			A_JOBJ="$A_JOBJ JPEGDecoder.o"
+      ;;
+    --with-jpeg-lib=* )
+      jpeg_lib_path=`echo $arg | sed 's/[-A-Za-z_]*=//'` 
+			C_LIBS=APPEND
+			A_LIBS="$A_LIBS $jpeg_lib_path"
+      ;;
     *)
       if ( process_general_option $arg )
       then true  
@@ -43,6 +57,8 @@ do
         list_general_options
         echo 1>&2 "  --with-threads=(no|co|posix|dce)          choose a thread implementation."
         echo 1>&2 "  --with-rpo,--frepo                        use --frepo option in G++."
+        echo 1>&2 "  --with-jpeg-inc=jpeg_inc_path         give a jpeg include file path."
+        echo 1>&2 "  --with-jpeg-lib=jpeg_lib_path         give a jpeg library  path."
         exit 1 
       fi
       ;;

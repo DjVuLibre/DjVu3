@@ -421,6 +421,10 @@ ZPCodec.o: ZPCodec.cpp \
  GContainer.h \
  GSmartPointer.h \
  Arrays.h
+JPEGDecoder.o: JPEGDecoder.cpp\
+ ByteStream.h \
+ GPixmap.h \
+ GException
 bzz.o: bzz.cpp \
  GException.h \
  DjVuGlobal.h \

@@ -1,4 +1,4 @@
-# This sets the variable SYS and DEFS
+# This sets the variable SYS INCS JOBJ and DEFS
 #
 
 if [ -z "$CONFIG_DIR" ] ; then
@@ -10,6 +10,8 @@ if [ -z "$SYS" ] ; then
   echon "Checking system type ... "
   SYS=`"${uname}" -s`
   DEFS="-DUNIX"
+  INCS=" "
+  JOBJ=" "
   if [ "$SYS" = "Linux" ] ; then
     if [ -r /lib/libc.so.6 ] ; then
       SYS=linux-libc6
@@ -25,6 +27,6 @@ if [ -z "$SYS" ] ; then
     fi
   fi
   echo "$SYS"
-  CONFIG_VARS=`echo SYS DEFS $CONFIG_VARS`
+  CONFIG_VARS=`echo SYS DEFS INCS JOBJ $CONFIG_VARS`
 fi
 
