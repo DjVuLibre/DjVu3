@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: IFFByteStream.h,v 1.18 2000-09-18 17:10:22 bcr Exp $
+//C- $Id: IFFByteStream.h,v 1.19 2000-10-04 01:38:02 bcr Exp $
 
 
 #ifndef _IFFBYTESTREAM_H_
@@ -68,7 +68,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: IFFByteStream.h,v 1.18 2000-09-18 17:10:22 bcr Exp $# */
+    #$Id: IFFByteStream.h,v 1.19 2000-10-04 01:38:02 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -131,10 +131,10 @@ public:
   IFFByteStream(ByteStream &bs);
   // --- BYTESTREAM INTERFACE
   ~IFFByteStream();
-  size_t read(void *buffer, size_t size);
-  size_t write(const void *buffer, size_t size);
-  long tell();
-  void flush();
+  virtual size_t read(void *buffer, size_t size);
+  virtual size_t write(const void *buffer, size_t size);
+  virtual long tell(void) const;
+  virtual void flush(void);
   // -- NAVIGATING CHUNKS
   /** Enters a chunk for reading.  Function #get_chunk# returns zero when the
       last chunk has already been accessed.  Otherwise it parses a chunk

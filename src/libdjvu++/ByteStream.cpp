@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: ByteStream.cpp,v 1.28 2000-09-18 17:10:03 bcr Exp $
+//C- $Id: ByteStream.cpp,v 1.29 2000-10-04 01:38:01 bcr Exp $
 // - Author: Leon Bottou, 04/1997
 
 #ifdef __GNUC__
@@ -361,12 +361,18 @@ StdioByteStream::flush()
 }
 
 long 
-StdioByteStream::tell()
+StdioByteStream::tell() const
 {
   long x = ftell(fp);
   if (x >= 0)
-    pos = x;
-  return pos;
+  {
+    StdioByteStream *sbs=const_cast<StdioByteStream *>(this);
+    (sbs->pos) = x;
+  }else
+  {
+    x=pos;
+  }
+  return x;
 }
 
 int
@@ -503,7 +509,7 @@ MemoryByteStream::read(void *buffer, size_t sz)
 }
 
 long 
-MemoryByteStream::tell()
+MemoryByteStream::tell() const
 {
   return where;
 }
@@ -595,7 +601,7 @@ StaticByteStream::seek(long offset, int whence, bool nothrow)
 }
 
 long 
-StaticByteStream::tell()
+StaticByteStream::tell() const
 {
   return where;
 }

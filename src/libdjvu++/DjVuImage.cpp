@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: DjVuImage.cpp,v 1.41 2000-09-18 17:10:13 bcr Exp $
+//C- $Id: DjVuImage.cpp,v 1.42 2000-10-04 01:38:02 bcr Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -132,16 +132,19 @@ DjVuImage::get_info() const
    else return 0;
 }
 
-GP<MemoryByteStream>   
+GP<ByteStream>   
 DjVuImage::get_anno() const
 {
-   GP<MemoryByteStream> out = new MemoryByteStream;
+   MemoryByteStream *mbs = new MemoryByteStream;
+   GP<ByteStream> out = mbs;
    if (file) 
-     file->merge_anno(*out);
-   out->seek(0);
-   if (out->size()) 
-     return out;
-   else return 0;
+   {
+     file->merge_anno(*mbs);
+   }
+   mbs->seek(0);
+   if(!mbs->size())
+     out=0;
+   return out;
 }
 
 GP<IWPixmap>   

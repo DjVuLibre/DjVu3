@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuImage.h,v 1.29 2000-09-18 17:10:13 bcr Exp $
+//C- $Id: DjVuImage.h,v 1.30 2000-10-04 01:38:02 bcr Exp $
 
 #ifndef _DJVUIMAGE_H
 #define _DJVUIMAGE_H
@@ -51,7 +51,7 @@
     L\'eon Bottou <leonb@research.att.com> - initial implementation
     Andrei Erofeev <eaf@geocities.com> - multipage support
     @version
-    #$Id: DjVuImage.h,v 1.29 2000-09-18 17:10:13 bcr Exp $# */
+    #$Id: DjVuImage.h,v 1.30 2000-10-04 01:38:02 bcr Exp $# */
 //@{
 
 
@@ -152,11 +152,11 @@ public:
       foreground components of a DjVu image.  These colors are only
       pertinent with respect to the JB2Image. */
   GP<DjVuPalette> get_fgbc() const;
-  /** Returns a pointer to a MemoryByteStream containing all the annotation
+  /** Returns a pointer to a ByteStream containing all the annotation
       chunks collected so far for this image.  Individual chunks can be
       retrieved using \Ref{IFFByteStream}. Returns NULL if no chunks have been
       collected yet. */
-  GP<MemoryByteStream> get_anno() const;
+  GP<ByteStream> get_anno() const;
   //@}
 
   // NEW STYLE DECODING

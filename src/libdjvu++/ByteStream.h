@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: ByteStream.h,v 1.21 2000-09-18 17:10:03 bcr Exp $
+//C- $Id: ByteStream.h,v 1.22 2000-10-04 01:38:01 bcr Exp $
 
 
 #ifndef _BYTESTREAM_H
@@ -41,7 +41,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation\\
     Andrei Erofeev <eaf@geocities.com> -- 
     @version
-    #$Id: ByteStream.h,v 1.21 2000-09-18 17:10:03 bcr Exp $# */
+    #$Id: ByteStream.h,v 1.22 2000-10-04 01:38:01 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -101,7 +101,7 @@ public:
   virtual size_t write(const void *buffer, size_t size) = 0;
   /** Returns the offset of the current position in the ByteStream.  This
       function {\em must} be implemented by each subclass of #ByteStream#. */
-  virtual long tell(void) = 0;
+  virtual long tell(void) const  = 0;
   /** Sets the current position for reading or writing the ByteStream.  Class
       #ByteStream# provides a default implementation able to seek forward by
       calling function #read# until reaching the desired position.  Subclasses
@@ -129,7 +129,7 @@ public:
       guarantees that pending data have been actually written (i.e. passed to
       the operating system). Class #ByteStream# provides a default
       implementation which does nothing. */
-  virtual void flush();
+  virtual void flush(void);
   //@}
   /** @name Utility Functions.  
       Class #ByteStream# implements these functions using the virtual
@@ -189,6 +189,10 @@ public:
       The integer most significant bytes are read first,
       regardless of the processor endianness. */
   unsigned int read32();
+  /** Returns the total number of bytes contained in the buffer, file, etc.
+      Valid offsets for function #seek# range from 0 to the value returned
+      by this function. */
+  virtual int size(void) const;
   //@}
 protected:
   ByteStream() {};
@@ -197,6 +201,20 @@ private:
   ByteStream(const ByteStream &);
   ByteStream & operator=(const ByteStream &);
 };
+
+inline int
+ByteStream::size(void) const
+{
+  ByteStream *bs=const_cast<ByteStream *>(this);
+  int bsize=(-1);
+  long pos=tell();
+  if(bs->seek(0,SEEK_END,true))
+  {
+    bsize=(int)tell();
+    (void)(bs->seek(pos,SEEK_SET,false));
+  }
+  return bsize;
+}
 
 
 /** ByteStream interface for stdio files. 
@@ -223,11 +241,11 @@ public:
   StdioByteStream(FILE *f, const char *mode="rb", bool closeme=false);
   // Virtual functions
   ~StdioByteStream();
-  size_t read(void *buffer, size_t size);
-  size_t write(const void *buffer, size_t size);
-  void flush();
-  int seek(long offset, int whence = SEEK_SET, bool nothrow=false);
-  long tell();
+  virtual size_t read(void *buffer, size_t size);
+  virtual size_t write(const void *buffer, size_t size);
+  virtual void flush(void);
+  virtual int seek(long offset, int whence = SEEK_SET, bool nothrow=false);
+  virtual long tell() const;
 private:
   // Cancel C++ default stuff
   StdioByteStream(const StdioByteStream &);
@@ -264,17 +282,17 @@ public:
   MemoryByteStream(const char *buffer);
   // Virtual functions
   ~MemoryByteStream();
-  size_t read(void *buffer, size_t size);
-  size_t write(const void *buffer, size_t size);
-  int    seek(long offset, int whence=SEEK_SET, bool nothrow=false);
-  long   tell();
+  virtual size_t read(void *buffer, size_t size);
+  virtual size_t write(const void *buffer, size_t size);
+  virtual int    seek(long offset, int whence=SEEK_SET, bool nothrow=false);
+  virtual long   tell(void) const;
   /** Erases everything in the MemoryByteStream.
       The current location is reset to zero. */
   void empty();
   /** Returns the total number of bytes contained in the buffer.  Valid
       offsets for function #seek# range from 0 to the value returned by this
       function. */
-  int size() const;
+  virtual int size(void) const;
   /** Returns a reference to the byte at offset #n#. This reference can be
       used to read (as in #mbs[n]#) or modify (as in #mbs[n]=c#) the contents
       of the buffer. */
@@ -301,8 +319,9 @@ protected:
 };
 
 
+
 inline int
-MemoryByteStream::size() const
+MemoryByteStream::size(void) const
 {
   return bsize;
 }
@@ -331,15 +350,26 @@ public:
       memory area starting at address #buffer#. */
   StaticByteStream(const char *buffer);  
   // Virtual functions
-  size_t read(void *buffer, size_t sz);
-  size_t write(const void *buffer, size_t sz);
-  int    seek(long offset, int whence = SEEK_SET, bool nothrow=false);
-  long tell();
+  virtual size_t read(void *buffer, size_t sz);
+  virtual size_t write(const void *buffer, size_t sz);
+  virtual int    seek(long offset, int whence = SEEK_SET, bool nothrow=false);
+  virtual long tell(void) const;
+  /** Returns the total number of bytes contained in the buffer, file, etc.
+      Valid offsets for function #seek# range from 0 to the value returned
+      by this function. */
+  virtual int size(void) const;
 private:
   const char *data;
   int bsize;
   int where;
 };
+
+inline int
+StaticByteStream::size(void) const
+{
+  return bsize;
+}
+
 
 //@}
 

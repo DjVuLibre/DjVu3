@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: DjVuDocEditor.cpp,v 1.42 2000-09-18 17:10:08 bcr Exp $
+//C- $Id: DjVuDocEditor.cpp,v 1.43 2000-10-04 01:38:01 bcr Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -1195,9 +1195,10 @@ DjVuDocEditor::simplify_anno(void (* progress_cb)(float progress, void *),
             // Merge all chunks in one by decoding and encoding DjVuAnno
          GP<DjVuAnno> dec_anno=new DjVuAnno;
          dec_anno->decode(*anno);
-         GP<MemoryByteStream> new_anno=new MemoryByteStream;
-         dec_anno->encode(*new_anno);
-         new_anno->seek(0);
+         MemoryByteStream *mbs=new MemoryByteStream;
+         GP<ByteStream> new_anno=mbs;
+         dec_anno->encode(*mbs);
+         mbs->seek(0);
 
             // And store it in the file
          djvu_file->anno=new_anno;
@@ -1433,8 +1434,9 @@ DjVuDocEditor::file_thumbnails(void)
    int ipf=1;
    int image_num=0;
    int page_num=0, pages_num=djvm_dir->get_pages_num();
-   GP<MemoryByteStream> str=new MemoryByteStream;
-   GP<IFFByteStream> iff=new IFFByteStream(*str);
+   MemoryByteStream *mbs=new MemoryByteStream;
+   GP<ByteStream> str=mbs;
+   GP<IFFByteStream> iff=new IFFByteStream(*mbs);
    iff->put_chunk("FORM:THUM");
    while(true)
    {
@@ -1476,16 +1478,16 @@ DjVuDocEditor::file_thumbnails(void)
             // the file in DjVmDir and will ask for data. We will intercept
             // the request for data and will provide this DataPool
          iff->close_chunk();
-         str->seek(0);
-         GP<DataPool> file_pool=new DataPool(*str);
+         mbs->seek(0);
+         GP<DataPool> file_pool=new DataPool(*mbs);
          GP<File> f=new File;
          f->pool=file_pool;
          GCriticalSectionLock lock(&files_lock);
          files_map[id]=f;
 
             // And create new streams
-         str=new MemoryByteStream;
-         iff=new IFFByteStream(*str);
+         str=mbs=new MemoryByteStream;
+         iff=new IFFByteStream(*mbs);
          iff->put_chunk("FORM:THUM");
          image_num=0;
 
@@ -1521,13 +1523,14 @@ DjVuDocEditor::generate_thumbnails(int thumb_size, int page_num)
 
             // Store and compress the pixmap
          GP<IWPixmap> iwpix=new IWPixmap(pm);
-         GP<MemoryByteStream> str=new MemoryByteStream;
+         MemoryByteStream *mbs=new MemoryByteStream;
+         GP<ByteStream> str=mbs;
          IWEncoderParms parms;
          parms.slices=97;
          parms.bytes=0;
          parms.decibels=0;
-         iwpix->encode_chunk(*str, parms);
-         thumb_map[id]=new TArray<char>(str->get_data());
+         iwpix->encode_chunk(*mbs, parms);
+         thumb_map[id]=new TArray<char>(mbs->get_data());
       }
       ++page_num;
    }else

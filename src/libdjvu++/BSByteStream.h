@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: BSByteStream.h,v 1.15 2000-09-18 17:10:03 bcr Exp $
+//C- $Id: BSByteStream.h,v 1.16 2000-10-04 01:38:01 bcr Exp $
 
 
 #ifndef _BSBYTESTREAM_H
@@ -94,7 +94,7 @@
     @memo
     Simple Burrows-Wheeler general purpose compressor.
     @version
-    #$Id: BSByteStream.h,v 1.15 2000-09-18 17:10:03 bcr Exp $# */
+    #$Id: BSByteStream.h,v 1.16 2000-10-04 01:38:01 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -170,10 +170,10 @@ public:
   BSByteStream(ByteStream &bs, int blocksize=0);
   // ByteStream Interface
   ~BSByteStream();
-  size_t read(void *buffer, size_t size);
-  size_t write(const void *buffer, size_t size);
-  long tell();
-  void flush();
+  virtual size_t read(void *buffer, size_t size);
+  virtual size_t write(const void *buffer, size_t size);
+  virtual long tell(void) const;
+  virtual void flush(void);
 private:
   // Data
   int             encoding;

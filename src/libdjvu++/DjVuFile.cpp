@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.129 2000-09-18 17:10:10 bcr Exp $
+//C- $Id: DjVuFile.cpp,v 1.130 2000-10-04 01:38:01 bcr Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -68,7 +68,7 @@ public:
    {
      return str->seek(offset, whence);
    }
-   virtual long tell() { return str->tell(); }
+   virtual long tell(void ) const { return str->tell(); }
 
    void		set_progress_cb(void (* xprogress_cb)(int, void *),
 				void * xprogress_cl_data)
@@ -992,7 +992,10 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
       achunk.seek(0);
       GCriticalSectionLock lock(&anno_lock);
       if (! anno)
-        anno = new MemoryByteStream();
+      {
+        MemoryByteStream *mbs=new MemoryByteStream();
+        anno = mbs;
+      }
       anno->seek(0,SEEK_END);
       if (anno->tell() & 1)
         anno->write((void*)"", 1);
@@ -1009,7 +1012,10 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
       achunk.seek(0);
       GCriticalSectionLock lock(&anno_lock);
       if (! anno)
-        anno = new MemoryByteStream();
+      {
+        MemoryByteStream *mbs=new MemoryByteStream();
+        anno = mbs;
+      }
       anno->seek(0,SEEK_END);
       if (anno->tell() & 1)
         anno->write((const void*)"", 1);
@@ -1427,11 +1433,13 @@ DjVuFile::get_merged_anno(const GList<GURL> & ignore_list,
    GP<ByteStream> str=mstr;
    GMap<GURL, void *> map;
    int max_level=0;
-   get_merged_anno(this, *str, ignore_list, 0, max_level, map);
+   get_merged_anno(this, *mstr, ignore_list, 0, max_level, map);
    if (max_level_ptr)
       *max_level_ptr=max_level;
-   if (str->tell()==0) str=0;
-   else str->seek(0);
+   if (mstr->tell()==0)
+     str=0;
+   else
+     mstr->seek(0);
    return str;
 }
 
@@ -1835,12 +1843,13 @@ DjVuFile::get_djvu_bytestream(bool included_too, bool no_ndir)
    check();
    DEBUG_MSG("DjVuFile::get_djvu_bytestream(): creating DjVu raw file\n");
    DEBUG_MAKE_INDENT(3);
-   GP<ByteStream> pbs = new MemoryByteStream();
-   IFFByteStream iff(*pbs);
+   MemoryByteStream *mbs=new MemoryByteStream();
+   GP<ByteStream> pbs =mbs;
+   IFFByteStream iff(*mbs);
    GMap<GURL, void *> map;
    add_djvu_data(iff, map, included_too, no_ndir);
    iff.flush();
-   pbs->seek(0, SEEK_SET);
+   mbs->seek(0, SEEK_SET);
    return pbs;
 }
 
@@ -1880,9 +1889,7 @@ void
 DjVuFile::remove_anno(void)
 {
    GP<ByteStream> str_in=data_pool->get_stream();
-   MemoryByteStream *mstr_out=new MemoryByteStream();
-   GP<MemoryByteStream> gmstr_out=mstr_out;
-   MemoryByteStream &str_out=*mstr_out;
+   MemoryByteStream str_out;
    
    GString chkid;
    IFFByteStream iff_in(*str_in);
@@ -1930,9 +1937,7 @@ DjVuFile::unlink_file(const GP<DataPool> & data, const char * name)
       // Will process contents of data[] and remove any INCL chunk
       // containing 'name'
 {
-   MemoryByteStream *mstr_out=new MemoryByteStream();
-   GP<MemoryByteStream> gmstr_out=mstr_out;
-   MemoryByteStream &str_out=*mstr_out;
+   MemoryByteStream str_out;
    IFFByteStream iff_out(str_out);
 
    GP<ByteStream> str_in=data->get_stream();
@@ -1997,9 +2002,7 @@ DjVuFile::insert_file(const char * id, int chunk_num)
    GP<ByteStream> str_in=data_pool->get_stream();
    IFFByteStream iff_in(*str_in);
 
-   MemoryByteStream *mstr_out=new MemoryByteStream();
-   GP<MemoryByteStream> gmstr_out=mstr_out;
-   MemoryByteStream &str_out=*mstr_out;
+   MemoryByteStream str_out;
    IFFByteStream iff_out(str_out);
 
    int chunk_cnt=0;
@@ -2066,9 +2069,7 @@ DjVuFile::unlink_file(const char * id)
    GP<ByteStream> str_in=data_pool->get_stream();
    IFFByteStream iff_in(*str_in);
 
-   MemoryByteStream *mstr_out=new MemoryByteStream();
-   GP<MemoryByteStream> gmstr_out=mstr_out;
-   MemoryByteStream &str_out=*mstr_out;
+   MemoryByteStream str_out;
    IFFByteStream iff_out(str_out);
 
    GString chkid;
@@ -2136,7 +2137,8 @@ DjVuFile::change_text(GP<DjVuTXT> txt,const bool do_reset)
   if(do_reset)
     reset();
   anno_c.txt = txt;
-  anno=new MemoryByteStream();
+  MemoryByteStream *mbs=new MemoryByteStream();
+  anno=mbs;
   anno_c.encode(*anno);
 }
 #endif

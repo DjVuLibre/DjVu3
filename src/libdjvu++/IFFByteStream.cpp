@@ -11,9 +11,9 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: IFFByteStream.cpp,v 1.15 2000-09-18 17:10:22 bcr Exp $
+//C- $Id: IFFByteStream.cpp,v 1.16 2000-10-04 01:38:02 bcr Exp $
 
-// File "$Id: IFFByteStream.cpp,v 1.15 2000-09-18 17:10:22 bcr Exp $"
+// File "$Id: IFFByteStream.cpp,v 1.16 2000-10-04 01:38:02 bcr Exp $"
 // -- Implementation of IFFByteStream
 // - Author: Leon Bottou, 06/1998
 
@@ -442,11 +442,8 @@ IFFByteStream::flush()
 // -- tell position
 
 long 
-IFFByteStream::tell()
+IFFByteStream::tell() const
 {
-  if (seekto > offset)
-    return seekto;
-  else
-    return offset;
+  return (seekto>offset)?seekto:offset;
 }
 

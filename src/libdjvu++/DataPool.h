@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.h,v 1.33 2000-09-18 17:10:04 bcr Exp $
+//C- $Id: DataPool.h,v 1.34 2000-10-04 01:38:01 bcr Exp $
  
 #ifndef _DATAPOOL_H
 #define _DATAPOOL_H
@@ -44,7 +44,7 @@
 
     @memo Thread safe data storage
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DataPool.h,v 1.33 2000-09-18 17:10:04 bcr Exp $#
+    @version #$Id: DataPool.h,v 1.34 2000-10-04 01:38:01 bcr Exp $#
 */
 
 //@{
@@ -503,7 +503,7 @@ private:
    GString		fname;
    void *fstream;
    GCriticalSection	class_stream_lock;
-   GP<MemoryByteStream>	data;
+   GP<ByteStream>	data;
    GCriticalSection	data_lock;
    BlockList		*block_list;
    int			add_at;

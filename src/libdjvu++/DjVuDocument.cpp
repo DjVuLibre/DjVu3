@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.127 2000-09-18 17:10:08 bcr Exp $
+//C- $Id: DjVuDocument.cpp,v 1.128 2000-10-04 01:38:01 bcr Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -1044,13 +1044,13 @@ DjVuDocument::process_threqs(void)
 		     
 			// Store and compress the pixmap
 		     GP<IWPixmap> iwpix=new IWPixmap(pm);
-		     GP<MemoryByteStream> str=new MemoryByteStream;
+		     MemoryByteStream str;
 		     IWEncoderParms parms;
 		     parms.slices=97;
 		     parms.bytes=0;
 		     parms.decibels=0;
-		     iwpix->encode_chunk(*str, parms);
-		     TArray<char> data=str->get_data();
+		     iwpix->encode_chunk(str, parms);
+		     TArray<char> data=str.get_data();
 
 		     req->data_pool->add_data((const char *) data, data.size());
 		     req->data_pool->set_eof();

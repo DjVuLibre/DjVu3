@@ -10,7 +10,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: DataPool.cpp,v 1.52 2000-09-18 17:10:03 bcr Exp $
+//C- $Id: DataPool.cpp,v 1.53 2000-10-04 01:38:01 bcr Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -485,20 +485,6 @@ DataPool::BlockList::get_range(int start, int length) const
 //******************************* DataPool ***********************************
 //****************************************************************************
 
-void
-DataPool::init(void)
-{
-   DEBUG_MSG("DataPool::init(): Initializing\n");
-   DEBUG_MAKE_INDENT(3);
-   
-   start=0; length=-1; add_at=0;
-   eof_flag=false;
-   stop_flag=false;
-   stop_blocked_flag=false;
-
-   data=new MemoryByteStream();
-}
-
 class DataPool::Reader : public GPEnabled
 {
 public:
@@ -539,10 +525,25 @@ public:
    void              dec(void);
 };
 
-DataPool::DataPool(void) : fstream(0)
+#define DATAPOOL_INIT eof_flag(false),stop_flag(false), \
+    stop_blocked_flag(false),fstream(0), \
+    add_at(0),start(0),length(-1)
+
+void
+DataPool::init(void)
 {
+   DEBUG_MSG("DataPool::init(): Initializing\n");
+   DEBUG_MAKE_INDENT(3);
+   
    active_readers=new Counter;
    block_list=new BlockList;
+   MemoryByteStream *mbs=new MemoryByteStream;
+   data=mbs;
+}
+
+
+DataPool::DataPool(void) : DATAPOOL_INIT
+{
    init();
 
       // If we maintain the data ourselves, we want to interpret its
@@ -550,10 +551,8 @@ DataPool::DataPool(void) : fstream(0)
    add_trigger(0, 32, static_trigger_cb, this);
 }
 
-DataPool::DataPool(ByteStream & str) : fstream(0)
+DataPool::DataPool(ByteStream & str) : DATAPOOL_INIT
 {
-   active_readers=new Counter;
-   block_list=new BlockList;
    init();
 
       // It's nice to have IFF data analyzed in this case too.
@@ -567,19 +566,15 @@ DataPool::DataPool(ByteStream & str) : fstream(0)
 }
 
 DataPool::DataPool(const GP<DataPool> & pool, int start, int length)
-: fstream(0)
+: DATAPOOL_INIT
 {
-   active_readers=new Counter;
-   block_list=new BlockList;
    init();
    connect(pool, start, length);
 }
 
 DataPool::DataPool(const char * fname, int start, int length)
-: fstream(0)
+: DATAPOOL_INIT
 {
-   active_readers=new Counter;
-   block_list=new BlockList;
    init();
    connect(fname, start, length);
 }
@@ -713,13 +708,17 @@ DataPool::get_length(void) const
       // Not connected and length has been guessed
       // Or connected to a file
       // Or connected to a pool, but length was preset
-   if (length>=0) return length;
-   else if (pool)
+   int retval=(-1);
+   if (length>=0) 
+   {
+     retval=length;
+   }else if (pool)
    {
       int plength=pool->get_length();
-      if (plength>=0) return plength-start;
+      if (plength>=0)
+        retval=plength-start;
    }
-   return -1;	// Still unknown
+   return retval;
 }
 
 int
@@ -1104,7 +1103,8 @@ DataPool::load_file(void)
       {  // Scope to de-allocate lock2 before stream gets released
          GCriticalSectionLock lock2(&(f->stream_lock));
 
-         data=new MemoryByteStream();
+         MemoryByteStream *mbs=new MemoryByteStream;
+         data=mbs;
          block_list->clear();
          FCPools::get()->del_pool(fname, this);
          fname="";
@@ -1346,7 +1346,7 @@ public:
 
    virtual size_t read(void *buffer, size_t size);
    virtual size_t write(const void *buffer, size_t size);
-   virtual long tell();
+   virtual long tell(void) const ;
    virtual int seek(long offset, int whence = SEEK_SET, bool nothrow=false);
 private:
       // Don't make data_pool GP<>. The problem is that DataPool creates
@@ -1408,7 +1408,7 @@ PoolByteStream::write(const void *buffer, size_t size)
 }
 
 long
-PoolByteStream::tell(void)
+PoolByteStream::tell(void) const
 {
    return position;
 }

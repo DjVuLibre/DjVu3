@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: BSByteStream.cpp,v 1.17 2000-09-18 17:10:03 bcr Exp $
+//C- $Id: BSByteStream.cpp,v 1.18 2000-10-04 01:38:00 bcr Exp $
 // - Author: Leon Bottou, 07/1998
 
 
@@ -1120,7 +1120,7 @@ BSByteStream::~BSByteStream()
 
 
 long 
-BSByteStream::tell()
+BSByteStream::tell() const
 {
   return offset;
 }
