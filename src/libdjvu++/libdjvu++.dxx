@@ -814,7 +814,6 @@
 //@Include: DjVuImage.h
 //@Include: DjVmDoc.h
 //@Include: DjVuDocEditor.h
-//@Include: c-wrappers/DjVu.h
 //@Include: parseoptions.h
 
 /** @name Quasi obsolete files.
