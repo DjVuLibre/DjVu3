@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuAnno.cpp,v 1.29 1999-10-26 20:09:32 praveen Exp $
+//C- $Id: DjVuAnno.cpp,v 1.30 1999-10-26 20:52:06 eaf Exp $
 
 
 #ifdef __GNUC__
@@ -1160,90 +1160,139 @@ DjVuTXT::copy(void) const
 }
 
 
-bool DjVuTXT::find_zone(Zone &zone, Zone czone, int start, int length )
-// will return the lowest-level zone 
+bool
+DjVuTXT::search_zone(Zone & zone, int start, int & length)
+      // Will return TRUE if 'zone' contains beginning of the text
+      // at 'start'. In this case it will also modify the 'length'
+      // to show how much of the text in this zone
 {
-    if( czone.text_start > start || (czone.text_start+czone.text_length)<(start+length))
-        return false;
-    else
-    {
-        zone = czone;
-        GPosition pos;
-        pos = czone.children.firstpos();
-        while(pos)
-        {
-            if( find_zone(zone, czone.children[pos], start, length) )
-                break;
-            czone.children.next(pos);
-        }
-        return true;
-    }
-return true;
+   if (start>=zone.text_start && start<zone.text_start+zone.text_length)
+   {
+      if (start+length>zone.text_start+zone.text_length)
+	 length=zone.text_start+zone.text_length-start;
+      return true;
+   }
+   return false;
 }
 
-
-
-
-
-
-
-
-GList<DjVuTXT::Zone> DjVuTXT::search_string(const char* string, int &from, bool direction_down)
+DjVuTXT::Zone *
+DjVuTXT::get_smallest_zone(int max_type, int start, int & length)
+      // Will return the smallest zone with type up to max_type containing
+      // the text starting at start. If anything is found, length will
+      // be modified to indicate how much of the text is inside the zone
 {
-	int k,i;
-	GList<Zone> zone_list;
-	int string_length = strlen(string);
+   if (!search_zone(main, start, length)) return 0;
+   
+   Zone * zone=&main;
+   while(zone->ztype<max_type)
+   {
+      GPosition pos;
+      for(pos=zone->children;pos;++pos)
+	 if (search_zone(zone->children[pos], start, length))
+	    break;
+      if (pos) zone=&zone->children[pos];
+      else break;
+   }
+
+   return zone;
+}
+
+static inline bool
+chars_equal(char ch1, char ch2, bool match_case)
+{
+   return match_case ? (ch1==ch2) : (toupper(ch1)==toupper(ch2));
+}
+
+GList<DjVuTXT::Zone *>
+DjVuTXT::search_string(const char* string, int &from,
+		       bool search_down, bool match_case)
+{
+   int k,i;
+   GList<Zone *> zone_list;
+   int string_length = strlen(string);
 	
-	if( (string_length == 0) || (textUTF8.length() == 0) || (string_length>textUTF8.length()))
-		return zone_list;
+   if( (string_length == 0) || (textUTF8.length() == 0) || (string_length>textUTF8.length()))
+      return zone_list;
 
-	if( direction_down )
-	{
-		for(i=from; i<textUTF8.length(); i++)
-		{
-			k=0;
-			for(int j=i; j<textUTF8.length() && k<string_length; j++,k++)
-			{
-				if( textUTF8[j] != string[k] )
-					break;
-			}
+   if( search_down )
+   {
+      for(i=from; i<textUTF8.length(); i++)
+      {
+	 k=0;
+	 for(int j=i; j<textUTF8.length() && k<string_length; j++,k++)
+	 {
+	    if( !chars_equal(textUTF8[j], string[k], match_case ) )
+	       break;
+	 }
 
-			if( k == string_length )
-				break;
-		}
-        if( k != string_length )
-            from = -1;
-	}
-	else
-	{
-		for(i=from; i>=0; i--)
-		{
-			k=0;
-			for(int j=i; j<textUTF8.length() && k<string_length; j++,k++)
-			{
-				if( textUTF8[j] != string[k] )
-					break;
-			}
+	 if( k == string_length )
+	    break;
+      }
+      if( k != string_length )
+	 from = -1; 
+   }
+   else
+   {
+      for(i=from; i>=0; i--)
+      {
+	 k=0;
+	 for(int j=i; j<textUTF8.length() && k<string_length; j++,k++)
+	 {
+	    if( !chars_equal(textUTF8[j], string[k], match_case ) )
+	       break;
+	 }
 
-			if( k == string_length )
-				break;
-		}
-        if( k != string_length )
-            from = 0;
-	}
+	 if( k == string_length )
+	    break;
+      }
+      if( k != string_length )
+	 from = 0; 
+      
+   }
 
-	if( k == string_length )   /// string found in text?
-	{
-		from = i; /// update search location for next search
+   if( k == string_length )   /// string found in text?
+   {
+      from = i; /// update search location for next search
 
-		//// fill the zone list
-        Zone zone;
-        find_zone(zone, main, from, string_length);
-        zone_list.append(zone);
+      int string_start=from;
 
-	}
+      if (search_down) from++;
+      else from--;
 
-	return zone_list;
+      int zone_type=CHARACTER;
+      while(zone_type>=PAGE)
+      {
+	 int start=string_start;
+	 int length=string_length;
+
+	    /*
+	 fprintf(stderr, "trying zone_type=%d, st=%d, len=%d\n",
+		 zone_type, start, length);*/
+	 
+	 zone_list.empty();
+	 while(1)
+	 {
+	    Zone * zone=get_smallest_zone(zone_type, start, length);
+	    if (zone && zone_type==zone->ztype)
+	    {
+		  /*
+	       fprintf(stderr, "   found zone, length=%d\n", length);
+	       fprintf(stderr, "   type=%d, zst=%d, zend=%d\n",
+		       zone->ztype, zone->text_start, zone->text_length);*/
+	       
+	       zone_list.append(zone);
+	       start+=length;
+	       length=string_start+string_length-start;
+	       if (length==0) return zone_list;
+	    } else
+	    {
+	       zone_type--;
+	       break;
+	    }
+	 }
+      }
+   }
+   return zone_list;
 }
 
 
@@ -1268,6 +1317,7 @@ DjVuAnno::decode(ByteStream &bs)
    IFFByteStream iff(bs);
    while( iff.get_chunk(chkid) )
    {
+      fprintf(stderr, "chkid=%s\n", (const char *) chkid);
      if (chkid == "ANTa")
        {
          if (ant) {
