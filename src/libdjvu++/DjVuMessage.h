@@ -43,17 +43,15 @@ public:
   //  strings they are mapped to. The message text may contain the following:
   //
   //    Parameter specifications: These are modelled after printf format
-  //      specifications and have the form:
+  //      specifications and have one of the following forms:
   //
-  //            %#n#s
-  //      or
-  //            %#n#d
+  //            %#n#s            %#n#d            %#n#x
   //
   //      where n is the parameter number. The parameter number is indicated
   //      explicitly to allow for the possibility that the parameter order may
   //      change when the message text is translated into another language.
-  //      The final letter ('s' or 'd') indicates the form of the parameter (string
-  //      or integer, respectively). But, you say, all the parameters are strings!
+  //      The final letter ('s', 'd', or 'x') indicates the form of the parameter (string,
+  //      integer or hexadecimal, respectively). But, you say, all the parameters are strings!
   //      The form is indicated in case there is a necessity to change the appearance
   //      (especially of numbers) when translating the message.
   //

@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: GException.cpp,v 1.20 2000-10-06 21:47:21 fcrary Exp $
+//C- $Id: GException.cpp,v 1.21 2000-10-10 20:12:21 fcrary Exp $
 
 
 #ifdef __GNUC__
@@ -30,7 +30,7 @@
 #include "DjVuMessage.h"
 #include "debug.h"
 
-// File "$Id: GException.cpp,v 1.20 2000-10-06 21:47:21 fcrary Exp $"
+// File "$Id: GException.cpp,v 1.21 2000-10-10 20:12:21 fcrary Exp $"
 // - Author: Leon Bottou, 05/1997
 
 GException::GException() 
@@ -115,7 +115,7 @@ GException::perror(const char *msg) const
   else if (file)
     fprintf(stderr, "\n*** (%s)", file);        
   if (msg) 
-    fprintf(stderr, " %s", msg);
+    fprintf(stderr, " %s", DjVuMsg.LookUp( msg ) );
   if (func)
     fprintf(stderr, "\n*** %s", func);
   fprintf(stderr,"\n");

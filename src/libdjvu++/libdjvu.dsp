@@ -210,7 +210,7 @@ LIB32=link.exe -lib
 # PROP Intermediate_Dir "libdjvu___Win64_Debug"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "..\3rd-party\libjpeg" /I "..\..\..\MrSID\libjpeg" /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "DJVU_STATIC_LIBRARY" /D "NEED_JPEG_DECODER" /D "GCONTAINER_NO_MEMBER_TEMPLATES" /D "NEED_DJVU_MEMORY" /D "NEED_DJVU_PROGRESS" /FR /YX /FD /GZ /c
-# ADD CPP /nologo /MTd /W3 /GX /Od /I "..\..\..\MrSID\libjpeg" /I "..\3rd-party\libjpeg" /I "..\include" /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "DJVU_STATIC_LIBRARY" /D "NEED_JPEG_DECODER" /D "GCONTAINER_NO_MEMBER_TEMPLATES" /D "NEED_DJVU_MEMORY" /D "NEED_DJVU_PROGRESS" /D "WIN64" /GZ /Wp64 /c
+# ADD CPP /nologo /MTd /W3 /GX /Od /I "..\..\..\MrSID\libjpeg" /I "..\3rd-party\libjpeg" /I "..\include" /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "DJVU_STATIC_LIBRARY" /D "NEED_JPEG_DECODER" /D "GCONTAINER_NO_MEMBER_TEMPLATES" /D "NEED_DJVU_MEMORY" /D "NEED_DJVU_PROGRESS" /GZ /Wp64 /c
 # SUBTRACT CPP /YX
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
 # ADD RSC /l 0x409 /d "_DEBUG"
