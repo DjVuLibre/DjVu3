@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuDocumentAPI.h,v 1.3 2000-01-22 07:10:14 bcr Exp $
+ *C- $Id: DjVuDocumentAPI.h,v 1.4 2000-01-24 21:35:56 haffner Exp $
  */
 
 #ifndef _DJVUDOC_H_
@@ -37,7 +37,7 @@
 #endif /*DJVUAPI*/
 
 
-/** @name djvuphoto.h
+/** @name djvudocument.h
       functions used to convert multiple photo images to DjVu multipage 
       documents.
 */
@@ -47,10 +47,11 @@ extern "C"
 {
 #endif
 
-/*@{*/
+  /*@{*/
 
 
-/** List of djvu_segmenter options */
+/** List of djvu_segmenter options.
+ */
 struct djvu_segmenter_options_struct
 {
   /** @name Quality slider options
@@ -61,7 +62,7 @@ struct djvu_segmenter_options_struct
 
       
    */
-  //@{
+  /*@{*/
   
   /** Pixel filter level.
 
@@ -159,12 +160,12 @@ struct djvu_segmenter_options_struct
   */
   int inversion_level;
 
-  //@}
+  /*@}*/
 
   /** @name Size Options
       Sizes are expressed as a number of mask pixels (DOTs).
    */
-  //@{
+  /*@{*/
   
   /** @name Sizes depending on characteristics of the input document
       (resolution, noise).
@@ -181,7 +182,7 @@ struct djvu_segmenter_options_struct
       \end{description}
       
   */
-  //@{
+  /*@{*/
   /** Edge size parameter. 
 
       
@@ -243,11 +244,11 @@ struct djvu_segmenter_options_struct
   */
   int smoothing_size;
 
-  //@}
+  /*@}*/
   
   /** @name Options for the subsampling process that happens after the  extraction of the selector mask.
   */
-  //@{
+  /*@{*/
    /** Subsampling for the foreground image.
       
       \begin{description}
@@ -273,7 +274,7 @@ struct djvu_segmenter_options_struct
    */
   int bg_pixel_size;
 
-  //@}
+  /*@}*/
 
   /** The original luminance image and, as a consequence, the mask, have
       a resolution approximately #upsample_size# times 300dpi.
@@ -303,13 +304,13 @@ struct djvu_segmenter_options_struct
       
   */
   int upsample_size;
-  //@}
+  /*@}*/
 
  
   /** @name Flags
   */
 
-  //@{
+  /*@{*/
   /** Indicates the color of the foreground characters  varies in the same line.
 
       Normally, it is assumed that over a width of 32 pixels, the foreground color does not vary too much.
@@ -333,12 +334,12 @@ struct djvu_segmenter_options_struct
    */
   int masksub_refine;
 
-  //@}
+  /*@}*/
 #ifdef __cplusplus
 
   /** @name Profiles examples
    */
-  //@{
+  /*@{*/
 
   /** Standard profile
    */
@@ -524,7 +525,7 @@ struct djvu_segmenter_options_struct
       high_variation_foreground= true;
       masksub_refine= false;
     }
-  //@}
+  /*@}*/
 
   /** C++ constructor */
   djvu_segmenter_options_struct() {standard();};
@@ -533,7 +534,7 @@ struct djvu_segmenter_options_struct
 
 typedef struct djvu_segmenter_options_struct djvu_segmenter_options;
 
-/*@}*/
+  /*@}*/
 
 #ifdef __cplusplus
 }
