@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: BSEncodeByteStream.cpp,v 1.4 2001-04-13 00:41:16 bcr Exp $
+// $Id: BSEncodeByteStream.cpp,v 1.5 2001-05-04 16:21:21 bcr Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 07/1998
@@ -62,6 +62,9 @@
 // --- Global Definitions
             
 
+#ifdef OVERFLOW
+#undef OVERFLOW
+#endif
 // Overflow required when encoding
 static const int OVERFLOW=32;
 

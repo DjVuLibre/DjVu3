@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.95 2001-05-02 22:32:43 bcr Exp $
+// $Id: GString.cpp,v 1.96 2001-05-04 16:21:21 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -67,9 +67,9 @@ wcrtomb(char *bytes,wchar_t w,mbstate_t *)
 }
 
 static inline int
-mbrtowc(wchar_t *w,const char *s, size_t n, mbstate_t *)
+mbrtowc(wchar_t *w,const char *source, size_t n, mbstate_t *)
 {
-  return mbtowc(&w,source,n);
+  return mbtowc(w,source,n);
 }
 
 static inline size_t
