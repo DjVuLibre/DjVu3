@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: JB2Image.h,v 1.1 1999-02-01 18:57:34 leonb Exp $
+//C-  $Id: JB2Image.h,v 1.2 1999-02-12 20:38:12 leonb Exp $
 
 #ifndef _JB2IMAGE_H
 #define _JB2IMAGE_H
@@ -27,9 +27,9 @@
     is responsible for both the JPEG and JBIG standards.  This is hardly
     surprising since JB2 was the Paul Howard's proposal for the JBIG2 standard
     and remained the only proposal for years.  The full JBIG2 standard however
-    will be significantly more complex than JB2 because it addresses a much
-    broader range of applications.  Full JBIG2 compliance will be implemented
-    when the JBIG2 standard will be established.
+    is significantly more complex and slighlty less efficient than JB2 because
+    it addresses a broader range of applications.  Full JBIG2 compliance may
+    be implemented in the future.
 
     {\bf JB2 Images} --- Class \Ref{JB2Image} is the central data structure
     implemented in this file.  A #JB2Image# is composed of an array of shapes
@@ -96,7 +96,7 @@
     \end{itemize}
 
     @version
-    #$Id: JB2Image.h,v 1.1 1999-02-01 18:57:34 leonb Exp $#
+    #$Id: JB2Image.h,v 1.2 1999-02-12 20:38:12 leonb Exp $#
     @memo
     Coding bilevel images with JB2.
     @author

@@ -10,10 +10,7 @@
  */
 //@{
 
-/** @name AT&T License
- */
-
-/** @name Source Code Release
+/** @name AT&T Source Code License
  */
 
 /** @name How To Participate
@@ -28,11 +25,119 @@
  */
 //@{
 
-/** @name Layered Images
+/** @name Introduction
  */
 
 /** @name DjVu files
- */
+    
+    DjVu files are organized according to the EA IFF85 layout.  Pointers to
+    the appropriate reference document are provided in section
+    \Ref{IFFByteStream.h}.  IFF files are logically composed of a sequence of
+    data {\em chunks}.  Each chunk is identified by a four character {\em
+    chunk identifier} describing the type of the data stored in the chunk.  A
+    few special chunk identifiers, for instance #"FORM"#, are reserved for
+    {\em composite chunks} which themselves contain a sequence of data chunks.
+    This conventions effectively provides IFF files with a convenient
+    hierarchical structure.  Composite chunks are further identified by a {\em
+    secondary chunk identifier}.  For convenience, both identifiers are
+    gathered as an extended chunk identifier such as #"FORM:DJVU"#.
+
+    The four octets #"AT&T"# may be inserted in front of the IFF compliant
+    byte stream.  The decoder simply ignores these four octets when they are
+    present.  These four octets are not part of the IFF format and are not
+    required components of a valid DjVu file.  Certain versions of MSIE
+    incorrectly recognize any IFF file as a Microsoft AIFF sound file.  The
+    presence of these four octets prevents this incorrect identification.
+
+    There are in fact three kinds of DjVu files:
+    \begin{description}
+
+    \item[Bilevel DjVu Files] Bilevel DjVu Files are used to compress black
+       and white images representing text and simple drawings.  These files
+       should not be used for encoding heavily dithered bilevel images.  The
+       data compression model uses a the "soft pattern matching" technique
+       which essentially consists of encoding each character by describing how
+       it differs from a well chosen character which has already been encoded
+       (see \Ref{JB2Image.h}).
+
+       Bilevel DjVu Files are composed of a single #"FORM:DJVU"# composite
+       chunk.  This composite chunk itself contains an #"INFO"# chunk
+       describing the image size and resolution (see \Ref{DjVuInfo}) and a
+       #"Sjbz"# chunk representing the bilevel data (see \Ref{JB2Image}).
+
+   \item[IW44 Files] IW44 Files are best used to compress photographic images
+      in colors or in shades of gray.  The DjVu Reference Library comes with
+      two small programs, \Ref{c44} and \Ref{d44}, for encoding and decoding
+      IW44 Files.  The data compression model relies on a sophisticated
+      wavelet representation named IW44 (see \Ref{IWImage.h}).  The IW44
+      decoder is able to quickly perform progressive rendering of any image
+      segment using only a small amount of memory.
+
+      Gray Level IW44 Files are composed of a single #"FORM:BM44"# composite
+      chunk.  This composite chunk itself contains one or more #"BM44" chunks
+      containing successive refinements of the gray level image (see
+      \Ref{IWBitmap}).  Color IW44 Files are composed of a single
+      #"FORM:PM44"# composite chunk.  This composite chunk itself contains one
+      or more #"PM44" chunks containing successive refinements of the color
+      image (see \Ref{IWPixmap}).
+
+   \item[Color DjVu Files] Color DjVu Files are an extremely efficient way to
+      compress high resolution color document images containing both pictures
+      and text, such as a page of a magazine.  This technique is geared
+      towards encoding color images produced by scanning a document at 300 dpi
+      or more.  The raw image files created by the scanner easily exceed 25
+      megabytes.  The size of the corresponding DjVu file can be as low as 25
+      kilobytes.  Color DjVu Files represent the document images using two
+      layers.  The {\em background layer} is used for encoding the pictures
+      and the paper texture.  The {\em foreground layer} is used for encoding
+      the text and the drawings.
+
+      The main component of the foreground layer is a bilevel image named the
+      {\em foreground mask}. The size of the foreground mask is equal to the
+      size of the DjVu image.  It contains a black-on-white representation of
+      the text and the drawings.  The second component of the foreground layer
+      is a small color image named the {\em foreground color image}.  The size
+      of this image is computed by dividing the size of the mask by an integer
+      subsampling factor and rounding up.  The decoder accepts integer
+      subsampling factors ranging from 1 to 12.  It is not advisable however
+      to use values smaller than 6 for that purpose.  Most DjVu image use a
+      foreground color subsampling factor equal to 12.
+
+      The background layer is also a color image, the {\em background color
+      image}, whose size is computed by dividing the size of the mask by an
+      integer subsampling factor and rounding up.  The decoder accepts integer
+      subsampling factors ranging from 1 to 12.  Most DjVu image use a
+      background subsampling factor equal to 3.  Smaller subsampling factors
+      are adequate for images with a very rich paper texture.  Larger
+      subsampling factors are adequate for images containing no pictures.
+
+      Color DjVu images are rendered by first rescaling all three images (the
+      background color image, the foreground mask, and the foreground color
+      image) to the desired size. The text and the drawings are then overlayed
+      on top of the background color image by painting the foreground color
+      image through the the foreground mask used as a stencil.
+
+      Color DjVu Files are composed of a single #"FORM:DJVU"# composite chunk.
+      This composite chunk always begins with one #"INFO"# chunk describing
+      the size and the resolution of the image (see \Ref{DjVuInfo}).  It also
+      contains exactly one #"Sjbz"# chunk representing the mask encoded with
+      soft pattern matching (see \Ref{JB2Image}) and one #"FG44"# chunk
+      containing the foreground color image encoded as a single IW44
+      refinement (see \Ref{IWPixmap} or \Ref{IWBitmap}).  The background color
+      image is encoded as an arbitrary number of #"BG44"# chunks containing
+      IW44 data (see \Ref{IWPixmap} or \Ref{IWBitmap}).  There are no ordering
+      or interleaving constraints on these chunks except that (a) the #"INFO"#
+      chunk must appear first, and (b) the successive #"BG44"# refinements
+      must appear with their natural order.
+
+   \end{description}
+   
+   The DjVu specification mandates that the decoder must silently skip chunks
+   when the identifier is not recognized. This mechanism provides a backward
+   compatible way to extend the initial format by allocating new chunk
+   identifiers.  Possible extensions include new encoding schemes for the
+   image components, of additional data required by particular applications.
+*/
 
 /** @name Proposed extensions
  */

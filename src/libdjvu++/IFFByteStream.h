@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: IFFByteStream.h,v 1.4 1999-02-03 22:55:30 leonb Exp $
+//C-  $Id: IFFByteStream.h,v 1.5 1999-02-12 20:38:12 leonb Exp $
 
 
 #ifndef _IFFBYTESTREAM_H_
@@ -45,15 +45,16 @@
     without worrying about the final file position. See class \Ref{ZPCodec}
     for more details.
     
-    {\bf AT&T IFF Files} ---
-    We had initially planned to exactly follow the EA IFF 85 specifications.
-    Then we realized that certain versions of MSIE recognize any IFF file as a
-    Microsoft AIFF sound file.  It was quite disturbing to see a message box
-    "Cannot play that sound!" when accessing a DjVu document image.  We avoid
-    this problem by casting the AT&T protection spell.  Our IFF files always
-    start with the four letters #"AT&T"# followed by the fully conformant EA
-    IFF 85 byte stream.  Class #IFFByteStream# silently skips the protection
-    spell when it encounters it.
+    {\bf AT&T IFF Files} --- We had initially planned to exactly follow the EA
+    IFF 85 specifications.  Then we realized that certain versions of MSIE
+    recognize any IFF file as a Microsoft AIFF sound file and pop a message
+    box "Cannot play that sound".  It appears that the structure of AIFF files
+    is entirely modeled after the IFF standard, with small variations
+    regarding the endianness of numbers and the padding rules.  We fix the
+    problem by casting the AT&T protection spell.  Our IFF files always start
+    with the four octets #"AT&T"# followed by the fully conformant EA IFF 85
+    byte stream.  Class #IFFByteStream# silently skips these four octets when
+    it encounters them.
 
     {\bf References} --- EA IFF 85 file format specification:
     \URL{http://www.cica.indiana.edu/graphics/image_specs/ilbm.format.txt} or
@@ -64,7 +65,7 @@
     @author
     Leon Bottou <leonb@research.att.com>
     @version
-    #$Id: IFFByteStream.h,v 1.4 1999-02-03 22:55:30 leonb Exp $# */
+    #$Id: IFFByteStream.h,v 1.5 1999-02-12 20:38:12 leonb Exp $# */
 //@{
 
 #ifdef __GNUC__
