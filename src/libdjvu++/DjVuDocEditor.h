@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocEditor.h,v 1.9 1999-12-01 20:56:00 eaf Exp $
+//C- $Id: DjVuDocEditor.h,v 1.10 1999-12-01 22:12:01 eaf Exp $
  
 #ifndef _DJVUDOCEDITOR_H
 #define _DJVUDOCEDITOR_H
@@ -27,7 +27,7 @@
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocEditor.h,v 1.9 1999-12-01 20:56:00 eaf Exp $#
+    @version #$Id: DjVuDocEditor.h,v 1.10 1999-12-01 22:12:01 eaf Exp $#
 */
 
 //@{
@@ -60,6 +60,8 @@
 class DjVuDocEditor : public DjVuDocument
 {
 public:
+   static int	thumbnails_per_file;
+   
    DjVuDocEditor(void);
 
    void		init(void);
@@ -169,9 +171,6 @@ public:
 	  @param thumb_size The size of the thumbnails in pixels. DjVu viewer
 	         is able to rescale the thumbnail images if necessary, so this
 		 parameter affects thumbnails quality only. 128 is a good number.
-	  @param images_per_file Thumbnail images will be grouped together into
-	  	 files. This parameter defines how many of them will be stored
-		 in one file. Ten is a good number.
 	  @param cb The callback, which will be called after thumbnail image
 	         for the next page has been generated. Regardless of if
 		 the document already has thumbnail images for some of its
@@ -179,7 +178,7 @@ public:
 		 #pages_num# is the total number of pages in the document.
 		 The callback should return #FALSE# if thumbnails generating
 		 should proceed. #TRUE# will stop it. */
-   void		generate_thumbnails(int thumb_size, int images_per_file,
+   void		generate_thumbnails(int thumb_size,
 				    bool (* cb)(int page_num, void *)=0,
 				    void * cl_data=0);
       //@}
@@ -242,6 +241,8 @@ private:
    void		generate_ref_map(const GP<DjVuFile> & file,
 				 GMap<GString, void *> & ref_map,
 				 GMap<GURL, void *> & visit_map);
+   void		unfile_thumbnails(void);
+   void		file_thumbnails(void);
 };
 
 inline bool

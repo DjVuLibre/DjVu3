@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocEditor.cpp,v 1.15 1999-12-01 20:56:00 eaf Exp $
+//C- $Id: DjVuDocEditor.cpp,v 1.16 1999-12-01 22:12:02 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -20,6 +20,8 @@
 #include "debug.h"
 
 #include <ctype.h>
+
+int	DjVuDocEditor::thumbnails_per_file=10;
 
 void
 DjVuDocEditor::check(void)
@@ -118,7 +120,10 @@ DjVuDocEditor::init(const char * fname)
    int pages_num=get_pages_num();
    for(int page_num=0;page_num<pages_num;page_num++)
    {
-      GP<DataPool> pool=get_thumbnail(page_num, true);
+	 // Call DjVuDocument::get_thumbnail() here to bypass logic
+	 // of DjVuDocEditor::get_thumbnail(). init() is the only safe
+	 // place where we can still call DjVuDocument::get_thumbnail();
+      GP<DataPool> pool=DjVuDocument::get_thumbnail(page_num, true);
       if (pool)
       {
 	 TArray<char> * data=new TArray<char>(pool->get_size()-1);
@@ -128,12 +133,7 @@ DjVuDocEditor::init(const char * fname)
    }
       // And remove then from DjVmDir so that DjVuDocument
       // does not try to use them
-   GPList<DjVmDir::File> xfiles_list=djvm_dir->get_files_list();
-   for(GPosition pos=xfiles_list;pos;++pos)
-   {
-      GP<DjVmDir::File> f=xfiles_list[pos];
-      if (f->is_thumbnails()) djvm_dir->delete_file(f->id);
-   }
+   unfile_thumbnails();
 }
 
 GP<DataPool>
@@ -788,7 +788,11 @@ DjVuDocEditor::get_thumbnail(int page_num, bool dont_decode)
       pool->add_data((const char *) data, data.size());
       pool->set_eof();
       return pool;
-   } else return DjVuDocument::get_thumbnail(page_num, dont_decode);
+   } else
+   {
+      unfile_thumbnails();
+      return DjVuDocument::get_thumbnail(page_num, dont_decode);
+   }
 }
 
 int
@@ -836,13 +840,7 @@ DjVuDocEditor::remove_thumbnails(void)
    DEBUG_MSG("DjVuDocEditor::remove_thumbnails(): doing it\n");
    DEBUG_MAKE_INDENT(3);
 
-   DEBUG_MSG("removing from DjVmDir\n");
-   GPList<DjVmDir::File> xfiles_list=djvm_dir->get_files_list();
-   for(GPosition pos=xfiles_list;pos;++pos)
-   {
-      GP<DjVmDir::File> f=xfiles_list[pos];
-      if (f->is_thumbnails()) djvm_dir->delete_file(f->id);
-   }
+   unfile_thumbnails();
 
    DEBUG_MSG("clearing thumb_map\n");
    GPosition pos;
@@ -855,86 +853,60 @@ DjVuDocEditor::remove_thumbnails(void)
 }
 
 void
-DjVuDocEditor::generate_thumbnails(int thumb_size, int images_per_file,
-				   bool (* cb)(int page_num, void *),
-				   void * cl_data)
+DjVuDocEditor::unfile_thumbnails(void)
+      // Will erase all "THUMBNAILS" files from DjVmDir.
+      // This function is useful when filing thumbnails (to get rid of
+      // those files, which currently exist: they need to be replaced
+      // anyway) and when calling DjVuDocument::get_thumbnail() to
+      // be sure, that it will not use wrong information from DjVmDir
 {
-   DEBUG_MSG("DjVuDocEditor::generate_thumbnails(): doing it\n");
+   DEBUG_MSG("DjVuDocEditor::unfile_thumbnails(): updating DjVmDir\n");
    DEBUG_MAKE_INDENT(3);
 
-   GP<DjVmDir> djvm_dir=get_djvm_dir();
-   
-   DEBUG_MSG("removing any existing thumbnails\n");
    GPList<DjVmDir::File> xfiles_list=djvm_dir->get_files_list();
    for(GPosition pos=xfiles_list;pos;++pos)
    {
       GP<DjVmDir::File> f=xfiles_list[pos];
       if (f->is_thumbnails()) djvm_dir->delete_file(f->id);
    }
+}
 
-   DEBUG_MSG("creating new thumbnails\n");
-   int page_num, pages_num=djvm_dir->get_pages_num();
-   GPArray<MemoryByteStream> thumb_str(pages_num-1);
-   for(page_num=0;page_num<pages_num;page_num++)
-   {
-      if (cb) if (cb(page_num, cl_data)) return;
+void
+DjVuDocEditor::file_thumbnails(void)
+      // The purpose of this function is to create files containing
+      // thumbnail images and register them in DjVmDir.
+      // If some of the thumbnail images are missing, they'll
+      // be generated with generate_thumbnails()
+{
+   DEBUG_MSG("DjVuDocEditor::file_thumbnails(): updating DjVmDir\n");
+   DEBUG_MAKE_INDENT(3);
 
-      GPosition pos;
-      GCriticalSectionLock lock(&thumb_lock);
-      if (thumb_map.contains(page_to_id(page_num), pos))
-      {
-	 GP<MemoryByteStream> str=new MemoryByteStream;
-	 TArray<char> & data=*(TArray<char> *) thumb_map[pos];
-	 str->writall((const char *) data, data.size());
-	 str->seek(0);
-	 thumb_str[page_num]=str;
-      } else
-      {
-	 GP<DjVuImage> dimg=get_page(page_num);
-	 dimg->wait_for_complete_decode();
-      
-	 GRect rect(0, 0, thumb_size, dimg->get_height()*thumb_size/dimg->get_width());
-	 GP<GPixmap> pm=dimg->get_pixmap(rect, rect, get_thumbnails_gamma());
-	 if (!pm)
-	 {
-	    GP<GBitmap> bm=dimg->get_bitmap(rect, rect, sizeof(int));
-	    pm=new GPixmap(*bm);
-	 }
-	 if (!pm) THROW("Unable to render image of page "+GString(page_num));
-      
-	    // Store and compress the pixmap
-	 GP<IWPixmap> iwpix=new IWPixmap(pm);
-	 GP<MemoryByteStream> str=new MemoryByteStream;
-	 IWEncoderParms parms;
-	 parms.slices=97;
-	 parms.bytes=0;
-	 parms.decibels=0;
-	 iwpix->encode_chunk(*str, parms);
-	 str->seek(0);
-	 thumb_str[page_num]=str;
-      }
-   }
+   unfile_thumbnails();
 
-   for(page_num=0;page_num<pages_num;page_num++)
-   {
-      GString id=page_to_id(page_num);
-      if (!thumb_map.contains(id))
-	 thumb_map[id]=new TArray<char>(thumb_str[page_num]->get_data());
-   }
+      // Generate thumbnails if they're missing due to some reason.
+   int thumb_num=get_thumbnails_num();
+   int size=thumb_num>0 ? get_thumbnails_size() : 128;
+   if (thumb_num!=get_pages_num()) generate_thumbnails(size);
 
-   DEBUG_MSG("creating DjVuFiles to contain new thumbnails...\n");
+   DEBUG_MSG("filing thumbnails\n");
+
+   GCriticalSectionLock lock(&thumb_lock);
    
       // The first thumbnail file always contains only one thumbnail
    int ipf=1;
    int image_num=0;
-   page_num=0;
+   int page_num=0, pages_num=djvm_dir->get_pages_num();
    GP<MemoryByteStream> str=new MemoryByteStream;
    GP<IFFByteStream> iff=new IFFByteStream(*str);
    iff->put_chunk("FORM:THUM");
    while(true)
    {
+      GPosition pos;
+      if (!thumb_map.contains(page_to_id(page_num), pos))
+	 THROW("Internal error: Can't find thumbnail for page "+GString(page_num));
+      TArray<char> & data=*(TArray<char> *) thumb_map[pos];
       iff->put_chunk("TH44");
-      iff->copy(*thumb_str[page_num]);
+      iff->write((const char *) data, data.size());
       iff->close_chunk();
       image_num++;
       page_num++;
@@ -973,8 +945,52 @@ DjVuDocEditor::generate_thumbnails(int thumb_size, int images_per_file,
 
 	    // Reset ipf to correct value (after we stored first
 	    // "exceptional" file with thumbnail for the first page)
-	 if (page_num==1) ipf=images_per_file;
+	 if (page_num==1) ipf=thumbnails_per_file;
 	 if (page_num>=pages_num) break;
+      }
+   }
+}
+
+void
+DjVuDocEditor::generate_thumbnails(int thumb_size,
+				   bool (* cb)(int page_num, void *),
+				   void * cl_data)
+{
+   DEBUG_MSG("DjVuDocEditor::generate_thumbnails(): doing it\n");
+   DEBUG_MAKE_INDENT(3);
+
+   DEBUG_MSG("creating missing thumbnails\n");
+   GCriticalSectionLock lock(&thumb_lock);
+   
+   int pages_num=djvm_dir->get_pages_num();
+   for(int page_num=0;page_num<pages_num;page_num++)
+   {
+      if (cb) if (cb(page_num, cl_data)) return;
+
+      GString id=page_to_id(page_num);
+      if (!thumb_map.contains(id))
+      {
+	 GP<DjVuImage> dimg=get_page(page_num);
+	 dimg->wait_for_complete_decode();
+      
+	 GRect rect(0, 0, thumb_size, dimg->get_height()*thumb_size/dimg->get_width());
+	 GP<GPixmap> pm=dimg->get_pixmap(rect, rect, get_thumbnails_gamma());
+	 if (!pm)
+	 {
+	    GP<GBitmap> bm=dimg->get_bitmap(rect, rect, sizeof(int));
+	    pm=new GPixmap(*bm);
+	 }
+	 if (!pm) THROW("Unable to render image of page "+GString(page_num));
+      
+	    // Store and compress the pixmap
+	 GP<IWPixmap> iwpix=new IWPixmap(pm);
+	 GP<MemoryByteStream> str=new MemoryByteStream;
+	 IWEncoderParms parms;
+	 parms.slices=97;
+	 parms.bytes=0;
+	 parms.decibels=0;
+	 iwpix->encode_chunk(*str, parms);
+	 thumb_map[id]=new TArray<char>(str->get_data());
       }
    }
 }
@@ -998,13 +1014,12 @@ DjVuDocEditor::save_as(const char * where, bool bundled)
 
       // First see if we need to generate (or just reshuffle) thumbnails...
       // If we have an icon for every page, we will just call
-      // generate_thumbnails(), which will update DjVmDir and will create
+      // file_thumbnails(), which will update DjVmDir and will create
       // the actual bundles with thumbnails (very fast)
       // Otherwise we will remove the thumbnails completely because
       // we really don't want to deal with documents, which have only
       // some of their pages thumbnailed.
-   if (get_thumbnails_num()==get_pages_num())
-      generate_thumbnails(get_thumbnails_size(), 10);
+   if (get_thumbnails_num()==get_pages_num()) file_thumbnails();
    else remove_thumbnails();
    
    GURL save_doc_url;
