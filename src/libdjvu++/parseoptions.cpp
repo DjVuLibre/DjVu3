@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: parseoptions.cpp,v 1.11 1999-11-24 05:32:56 bcr Exp $
+//C- $Id: parseoptions.cpp,v 1.12 1999-11-29 21:19:06 parag Exp $
 #ifdef __GNUC__
 #pragma implementation
 #endif
@@ -145,6 +145,7 @@ djvu_parse_configfile(struct djvu_parse opts,const char *name,int which)
 DjVuParseOptions::DjVuParseOptions 
 (const char prog[])
 {
+	filename = 0;
   VarTokens=new DjVuTokenList;
   ProfileTokens=new DjVuTokenList;
   Configuration=new ProfileList;
@@ -171,6 +172,7 @@ DjVuParseOptions::DjVuParseOptions
 #if 0
 DjVuParseOptions::DjVuParseOptions()
 {
+	filename = 0;
   VarTokens=new DjVuTokenList;
   ProfileTokens=new DjVuTokenList;
   Configuration=new ProfileList;
@@ -997,8 +999,10 @@ DjVuParseOptions::ConfigFilename
 {
   const char *retval=0;
   const char *this_config=config[0]?config:default_string;
-  delete [] filename;
-  filename=0;
+	if ( filename ) {
+  	delete [] filename;
+  	filename=0;
+	}
   if(level<=0)
   {
     static const char *home=0;

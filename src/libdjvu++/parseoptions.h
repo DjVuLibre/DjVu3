@@ -6,7 +6,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: parseoptions.h,v 1.8 1999-11-24 05:32:56 bcr Exp $
+//C- $Id: parseoptions.h,v 1.9 1999-11-29 21:19:02 parag Exp $
 
 #endif /* __cplusplus */
 
@@ -181,8 +181,8 @@
    Be very careful of missing quotes...  */  
 
 /**  @memo parseoptions header file
-     @version $Id: parseoptions.h,v 1.8 1999-11-24 05:32:56 bcr Exp $
-     @author: $Author: bcr $ */
+     @version $Id: parseoptions.h,v 1.9 1999-11-29 21:19:02 parag Exp $
+     @author: $Author: parag $ */
 
 // First we include some C wrappers for our class.
 // The purpose of the DjVuParseOptions class, is to give a standard
@@ -564,7 +564,7 @@ public:
   ~Profiles();
   void Add(const int,const char []);
   inline const char * const GetValue(const int token) const
-  {return (token<size)?values[token]:0;};
+  {return ((token<size)&&(token>=0))?values[token]:0;};
 };
 
 // And this is a an array of array of strings...
@@ -581,7 +581,7 @@ public:
   void Add(const int,const int,const char []);
   int Grow(const int);
   inline const char *GetValue(const int profile ,const int var) const
-  { return (profile<size)?(profiles[profile].GetValue(var)):0; };
+  { return ((profile<size) && (profile>=0))?(profiles[profile].GetValue(var)):0; };
 };
 
 // This is a class for implementing a getopt_long type function.
