@@ -42,6 +42,9 @@
 # check_compiler
 #   Queries the C and C++ compilers
 #
+# require_compiler
+#   Queries the C and C++ compilers, and exits if not found.
+#
 # check_debug_option ARG
 #   Seems to be a dummy function that is the same as:
 #	process_general_option -g
@@ -57,7 +60,7 @@
 #   (to be documented)
 #
 # require_library
-#   (to be documented)
+#   Same as check_library, but exits with error if a library is not found.
 #
 # check_make_stlib
 #   (to be documented)
@@ -271,7 +274,7 @@ EOF
 
 check_compiler()
 {
-  if [ -z "$CC_SET$CXX_SET" ]
+  if [ -z "$CC_SET" -o -z "$CXX_SET" ]
   then
     compilers="$*"
     if [ -z "$compilers" ]
@@ -302,7 +305,7 @@ check_compiler()
 
 require_compiler()
 {
-  if [ -z "$CC_SET$CXX_SET" ]
+  if [ -z "$CC_SET" -o -z "$CXX_SET" ]
   then
     compilers="$*"
     if [ -z "$compilers" ]
