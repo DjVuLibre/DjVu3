@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GString.h,v 1.11 1999-09-09 21:38:42 leonb Exp $
+//C- $Id: GString.h,v 1.12 1999-11-18 21:19:06 eaf Exp $
 
 
 #ifndef _GSTRING_H_
@@ -36,7 +36,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.11 1999-09-09 21:38:42 leonb Exp $# */
+    #$Id: GString.h,v 1.12 1999-11-18 21:19:06 eaf Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -165,6 +165,10 @@ public:
       length of the string, this function appends character #ch# to the end of
       the string. */
   void setat(int n, char ch);
+  /** Returns #TRUE# if the string contains an integer number. */
+  bool is_int(void) const;
+  /** Returns #TRUE# if the string contains a float number. */
+  bool is_float(void) const;
   // -- DERIVED STRINGS
   /** Returns a sub-string.  The sub-string is composed by copying #len#
       characters starting at position #from# in this string.  The length of

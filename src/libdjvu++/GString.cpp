@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GString.cpp,v 1.10 1999-09-09 21:38:42 leonb Exp $
+//C- $Id: GString.cpp,v 1.11 1999-11-18 21:19:06 eaf Exp $
 
 
 #ifdef __GNUC__
@@ -25,7 +25,7 @@
 
 #include "GString.h"
 
-// File "$Id: GString.cpp,v 1.10 1999-09-09 21:38:42 leonb Exp $"
+// File "$Id: GString.cpp,v 1.11 1999-11-18 21:19:06 eaf Exp $"
 // - Author: Leon Bottou, 04/1997
 
 GStringRep *
@@ -297,6 +297,26 @@ GString::concat(const char *str1, const char *str2)
   if (rep && str1) strcpy(rep->data, str1);
   if (rep && str2) strcat(rep->data, str2);
   return GString(rep);
+}
+
+bool
+GString::is_int(void) const
+{
+   const char * buf=*this;
+   char * ptr;
+   strtol(buf, &ptr, 10);
+   while(*ptr && isspace(*ptr)) ptr++;
+   return *ptr==0;
+}
+
+bool
+GString::is_float(void) const
+{
+   const char * buf=*this;
+   char * ptr;
+   strtod(buf, &ptr);
+   while(*ptr && isspace(*ptr)) ptr++;
+   return *ptr==0;
 }
 
 unsigned int 
