@@ -9,9 +9,9 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GOS.cpp,v 1.20 2000-01-06 19:48:58 praveen Exp $
+//C- $Id: GOS.cpp,v 1.21 2000-01-24 22:54:36 eaf Exp $
 
-// "$Id: GOS.cpp,v 1.20 2000-01-06 19:48:58 praveen Exp $"
+// "$Id: GOS.cpp,v 1.21 2000-01-24 22:54:36 eaf Exp $"
 
 #ifdef __GNUC__
 #pragma implementation
@@ -852,7 +852,13 @@ GOS::filename_to_url(const char *filename, const char *useragent)
 #endif  
 #endif
 #endif
-      // unreserved characters
+	// WARNING: Whenever you modify this conversion code,
+	// make sure, that the following functions are in sync:
+	//   encode_reserved()
+	//   decode_reserved()
+	//   url_to_filename()
+	//   filename_to_url()
+	// unreserved characters
       if ( (*s>='a' && *s<='z') ||
            (*s>='A' && *s<='Z') ||
            (*s>='0' && *s<='9') ||
@@ -913,6 +919,12 @@ GOS::url_to_filename(const char *url)
 #endif
 #endif  
 #endif
+	// WARNING: Whenever you modify this conversion code,
+	// make sure, that the following functions are in sync:
+	//   encode_reserved()
+	//   decode_reserved()
+	//   url_to_filename()
+	//   filename_to_url()
   // Process hexdecimal character specification
   GString urlcopy;
   char *d = urlcopy.getbuf(strlen(url)+1);
@@ -982,6 +994,66 @@ GOS::url_to_filename(const char *url)
   return tmp;
 }
 
+GString
+GOS::encode_reserved(const char * filename)
+      // WARNING: Whenever you modify this conversion code,
+      // make sure, that the following functions are in sync:
+      //   encode_reserved()
+      //   decode_reserved()
+      //   url_to_filename()
+      //   filename_to_url()
+{
+   const char *hex = "0123456789ABCDEF";
+   
+   GString res;
+
+   for(const char * ptr=filename;*ptr;ptr++)
+   {
+      if ((*ptr>='a' && *ptr<='z') ||
+	  (*ptr>='A' && *ptr<='Z') ||
+	  (*ptr>='0' && *ptr<='9') ||
+	  (strchr("$-_.+!*'(),:", *ptr)))	// Added : because of windows!
+	 res+=*ptr;
+      else
+      {
+	    // escape sequence
+	 res+='%';
+	 res+=hex[(*ptr >> 4) & 0xf];
+	 res+=hex[(*ptr) & 0xf];
+      }
+   }
+   
+   return res;
+}
+
+GString
+GOS::decode_reserved(const char * url)
+      // WARNING: Whenever you modify this conversion code,
+      // make sure, that the following functions are in sync:
+      //   encode_reserved()
+      //   decode_reserved()
+      //   url_to_filename()
+      //   filename_to_url()
+{
+   GString res;
+
+   for(const char * ptr=url;*ptr;ptr++)
+   {
+      if (*ptr!='%') res+=*ptr;
+      else
+      {
+	 int c1=hexval(ptr[1]);
+	 int c2=hexval(ptr[2]);
+	 if (c1>=0 && c2>=0)
+	 {
+	    res+=(c1<<4)|c2;
+	    ptr+=2;
+	 } else res+=*ptr;
+      }
+   }
+
+   return res;
+}
 
 // -----------------------------------------
 // Testing

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GOS.h,v 1.9 1999-11-23 15:39:18 eaf Exp $
+//C- $Id: GOS.h,v 1.10 2000-01-24 22:54:36 eaf Exp $
 
 #ifndef _GOS_H_
 #define _GOS_H_
@@ -31,7 +31,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- Initial implementation
     @version
-    #$Id: GOS.h,v 1.9 1999-11-23 15:39:18 eaf Exp $#
+    #$Id: GOS.h,v 1.10 2000-01-24 22:54:36 eaf Exp $#
 */
 //@{
 
@@ -118,7 +118,16 @@ class GOS
       function cannot parse the URL or when the URL is not a file URL. */
   static GString url_to_filename(const char *url);
 
+  /** Encodes all reserved characters, so that the #filename# can be
+      used inside a URL. Every reserved character is encoded using escape
+      sequence in the form of #%XX#. The legal characters are alphanumeric and
+      #$-_.+!*'(),:#.
+      Use \Ref{decode_reserved}() to convert the URL back to the filename. */
+  static GString encode_reserved(const char * filename);
 
+  /** Decodes reserved characters from the URL.
+      See also: \Ref{encode_reserved}(). */
+  static GString decode_reserved(const char * url);
 };
 
 
