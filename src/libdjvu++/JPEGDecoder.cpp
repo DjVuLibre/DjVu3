@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: JPEGDecoder.cpp,v 1.3 1999-11-03 16:20:06 eaf Exp $
+//C- $Id: JPEGDecoder.cpp,v 1.4 1999-11-08 04:45:44 praveen Exp $
 
 
 #include "JPEGDecoder.h"
@@ -27,7 +27,7 @@ typedef struct djvu_error_mgr * djvu_error_ptr;
 
 void jpeg_byte_stream_src(j_decompress_ptr, ByteStream *);
 
-METHODDEF void
+METHODDEF() void
 djvu_error_exit (j_common_ptr cinfo)
 {
   /* cinfo->err really points to a djvu_error_mgr struct, so coerce pointer */
@@ -140,7 +140,7 @@ typedef byte_stream_src_mgr * byte_stream_src_ptr;
 
 #define INPUT_BUF_SIZE   4096
 
-METHODDEF void
+METHODDEF() void
 init_source (j_decompress_ptr cinfo)
 {
   byte_stream_src_ptr src = (byte_stream_src_ptr) cinfo->src;
@@ -148,7 +148,7 @@ init_source (j_decompress_ptr cinfo)
   src->start_of_stream = TRUE;
 }
 
-METHODDEF boolean
+METHODDEF() boolean
 fill_input_buffer (j_decompress_ptr cinfo)
 {
   byte_stream_src_ptr src = (byte_stream_src_ptr) cinfo->src;
@@ -174,7 +174,7 @@ fill_input_buffer (j_decompress_ptr cinfo)
 }
 
 
-METHODDEF void
+METHODDEF() void
 skip_input_data (j_decompress_ptr cinfo, long num_bytes)
 {
   byte_stream_src_ptr src = (byte_stream_src_ptr) cinfo->src;
@@ -189,13 +189,13 @@ skip_input_data (j_decompress_ptr cinfo, long num_bytes)
 	}
 }
                  
-METHODDEF void
+METHODDEF() void
 term_source (j_decompress_ptr cinfo)
 {
   /* no work necessary here */
 }
     
-GLOBAL void
+GLOBAL() void
 jpeg_byte_stream_src (j_decompress_ptr cinfo, ByteStream * bs)
 {
   byte_stream_src_ptr src;
