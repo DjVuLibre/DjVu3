@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: JB2Image.cpp,v 1.10.2.4 1999-06-25 22:44:41 leonb Exp $
+//C- $Id: JB2Image.cpp,v 1.10.2.5 1999-07-13 15:43:20 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -41,6 +41,7 @@ public:
   _JB2Codec(ByteStream &bs, int encoding=0);
   ~_JB2Codec();
   // Functions
+  void set_dict_callback(JB2DecoderCallback *cb, void *arg);
   void code(JB2Image *jim);
   void code(JB2Dict *jim);
 protected:
@@ -66,6 +67,8 @@ private:
   // Info
   char refinementp;
   char gotstartrecordp;
+  JB2DecoderCallback *cbfunc;
+  void *cbarg;
   // Code comment
   NumContext dist_comment_byte;
   NumContext dist_comment_length;
@@ -90,6 +93,7 @@ private:
   NumContext abs_size_x;
   NumContext abs_size_y;
   NumContext image_size_dist;
+  NumContext inherited_shape_count_dist;
   BitContext offset_type_dist;
   NumContext rel_loc_x_current;
   NumContext rel_loc_x_last;
@@ -104,6 +108,8 @@ private:
   int last_row_left;
   int image_columns;
   int image_rows;
+  void code_inherited_shape_count(JB2Dict *jim);
+  void code_image_size(JB2Dict *jim);
   void code_image_size(JB2Image *jim);
   void code_relative_location(JB2Blit *jblt, int rows, int columns);
   void code_absolute_location(JB2Blit *jblt,  int rows, int columns);
@@ -201,7 +207,8 @@ JB2Dict::decode(ByteStream &bs, JB2DecoderCallback *cb, void *arg)
 {
   init();
   _JB2Codec codec(bs);
-  codec.code(this);
+  codec.set_dict_callback(cb,arg);
+  codec.code((JB2Dict*)this);
 }
 
 
@@ -306,7 +313,8 @@ JB2Image::decode(ByteStream &bs, JB2DecoderCallback *cb, void *arg)
 {
   init();
   _JB2Codec codec(bs);
-  codec.code(this);
+  codec.set_dict_callback(cb,arg);
+  codec.code((JB2Image*)this);
 }
 
 
@@ -326,9 +334,10 @@ JB2Image::decode(ByteStream &bs, JB2DecoderCallback *cb, void *arg)
 #define MATCHED_REFINE_IMAGE_ONLY       (6)
 #define MATCHED_COPY                    (7)
 #define NON_MARK_DATA                   (8)
-#define LOSSLESS_REFINEMENT             (9)
+#define REQUIRED_DICT                   (9)
 #define PRESERVED_COMMENT               (10)
 #define END_OF_DATA                     (11)
+
 
 
 // STATIC DATA MEMBERS
@@ -349,6 +358,8 @@ _JB2Codec::_JB2Codec(ByteStream &bs, int encoding)
     rightcell(0),
     refinementp(0),
     gotstartrecordp(0),
+    cbfunc(0),
+    cbarg(0),
     dist_comment_byte(0),
     dist_comment_length(0),
     dist_record_type(0),
@@ -359,6 +370,7 @@ _JB2Codec::_JB2Codec(ByteStream &bs, int encoding)
     abs_size_x(0),
     abs_size_y(0),
     image_size_dist(0),
+    inherited_shape_count_dist(0),
     offset_type_dist(0),
     rel_loc_x_current(0),
     rel_loc_x_last(0),
@@ -386,6 +398,14 @@ _JB2Codec::~_JB2Codec()
   delete [] rightcell;
   delete [] leftcell;
 }
+
+void 
+_JB2Codec::set_dict_callback(JB2DecoderCallback *cb, void *arg)
+{
+  cbfunc = cb;
+  cbarg = arg;
+}
+
 
 // CODE NUMBERS
 
@@ -660,6 +680,48 @@ _JB2Codec::update_short_list(int v)
 // CODE PAIRS
 
 
+void
+_JB2Codec::code_inherited_shape_count(JB2Dict *jim)
+{
+  int size;
+  if (encoding)
+    size = jim->get_inherited_shape_count();
+  CodeNum(size, 0, BIGPOSITIVE, inherited_shape_count_dist);
+  if (!encoding)
+    {
+      GP<JB2Dict> dict = jim->get_inherited_dict();
+      if (!dict && size>0)
+        {
+          // Call callback function to obtain dictionary
+          if (cbfunc)
+            dict = (*cbfunc)(cbarg);
+          if (dict)
+            jim->set_inherited_dict(dict);
+        }
+      if (!dict && size>0)
+        THROW("JB2 data requires a shape dictionary.");
+      if (dict && size!=dict->get_shape_count())
+        THROW("Size of shape dictionary does not match JB2 data.");
+    }
+}
+
+void 
+_JB2Codec::code_image_size(JB2Dict *jim)
+{
+  int w = 0;
+  int h = 0;
+  CodeNum(w, 0, BIGPOSITIVE, image_size_dist);
+  CodeNum(h, 0, BIGPOSITIVE, image_size_dist);
+  if (!encoding && (w || h))
+    THROW("Corrupted file: non zero image dimension in JB2 dictionary");
+  last_left = 1;
+  last_row_left = 0;
+  last_row_bottom = 0;
+  last_right = 0;
+  fill_short_list(last_row_bottom);
+  gotstartrecordp = 1;
+}
+
 void 
 _JB2Codec::code_image_size(JB2Image *jim)
 {
@@ -672,6 +734,8 @@ _JB2Codec::code_image_size(JB2Image *jim)
   CodeNum(image_rows, 0, BIGPOSITIVE, image_size_dist);
   if (!encoding)
     {
+      if (!image_columns || !image_rows)
+        THROW("Corrupted file: JB2 image dimension is zero");
       jim->set_dimension(image_columns, image_rows);
     }
   last_left = 1 + image_columns;
@@ -1052,7 +1116,7 @@ _JB2Codec::code_bitmap_by_cross_coding (GBitmap *bm, GBitmap *cbm, int libno)
 
 
 
-// CODE RECORDS
+// CODE JB2DICT RECORD
 
 void
 _JB2Codec::code_record(int &rectype, JB2Dict *jim, JB2Shape *jshp)
@@ -1080,6 +1144,14 @@ _JB2Codec::code_record(int &rectype, JB2Dict *jim, JB2Shape *jshp)
   // Coding actions
   switch (rectype)
     {
+    case START_OF_DATA:
+      {
+        code_image_size (jim);
+        code_eventual_lossless_refinement ();
+        if (! encoding)
+          init_library(jim);
+        break;
+      }
     case NEW_MARK_LIBRARY_ONLY:
       {
         code_absolute_mark_size (bm, 4);
@@ -1098,6 +1170,13 @@ _JB2Codec::code_record(int &rectype, JB2Dict *jim, JB2Shape *jshp)
     case PRESERVED_COMMENT:
       {
         code_comment(jim->comment);
+        break;
+      }
+    case REQUIRED_DICT:
+      {
+        if (gotstartrecordp)
+          THROW("Corrupted file: Misplaced REQUIRED_DICT record");
+        code_inherited_shape_count(jim);
         break;
       }
     case END_OF_DATA:
@@ -1129,6 +1208,76 @@ _JB2Codec::code_record(int &rectype, JB2Dict *jim, JB2Shape *jshp)
 }
 
 
+// CODE JB2DICT
+
+void 
+_JB2Codec::code(JB2Dict *jim)
+{
+  if (encoding)
+    {
+      // -------------------------
+      // THIS IS THE ENCODING PART
+      // -------------------------
+      int i;
+      init_library(jim);
+      int firstshape = jim->get_inherited_shape_count();
+      int nshape = jim->get_shape_count();
+      shape2lib.resize(0,nshape-1);
+      lib2shape.resize(0,nshape-1);
+      for (i=firstshape; i<nshape; i++)
+        shape2lib[i] = lib2shape[i] = i;
+      // Code headers.
+      int rectype = REQUIRED_DICT;
+      if (jim->get_inherited_shape_count() > 0)
+        code_record(rectype, jim, NULL);
+      rectype = START_OF_DATA;
+      code_record(rectype, jim, NULL);
+      // Code Comment.
+      rectype = PRESERVED_COMMENT;
+      if (!! jim->comment)
+        code_record(rectype, jim, NULL);
+      // Encode every shape
+      int shapeno;
+      for (shapeno=firstshape; shapeno<nshape; shapeno++)
+        {
+          JB2Shape *jshp = jim->get_shape(shapeno);
+          DJVU_PROGRESS("code_record(jb2dict)", (hapeno-firstshape*100)/(nshape-firstshape));
+          rectype = NEW_MARK_LIBRARY_ONLY;
+          if (jshp->parent >= 0)
+            rectype = MATCHED_REFINE_LIBRARY_ONLY;
+          code_record(rectype, jim, jshp);
+        }
+      // Code end of data record
+      rectype = END_OF_DATA;
+      code_record(rectype, jim, NULL); 
+      zp.ZPCodec::~ZPCodec();
+      // Progress
+      DJVU_PROGRESS("code_record(jb2dict)", 999);
+
+
+    }
+  else
+    {
+      // -------------------------
+      // THIS IS THE DECODING PART
+      // -------------------------
+      int rectype;
+      JB2Shape tmpshape;
+      for(;;) 
+        {
+          code_record(rectype, jim, &tmpshape);        
+          if (rectype == END_OF_DATA)
+            break;
+        } 
+      if (!gotstartrecordp)
+        THROW("Corrupted file: No start record");
+      jim->compress();
+    }
+}
+
+
+
+// CODE JB2IMAGE RECORD
 
 void
 _JB2Codec::code_record(int &rectype, JB2Image *jim, JB2Shape *jshp, JB2Blit *jblt)
@@ -1168,6 +1317,8 @@ _JB2Codec::code_record(int &rectype, JB2Image *jim, JB2Shape *jshp, JB2Blit *jbl
       {
         code_image_size (jim);
         code_eventual_lossless_refinement ();
+        if (! encoding)
+          init_library(jim);
         break;
       }
     case NEW_MARK:
@@ -1249,7 +1400,19 @@ _JB2Codec::code_record(int &rectype, JB2Image *jim, JB2Shape *jshp, JB2Blit *jbl
         code_comment(jim->comment);
         break;
       }
-    case LOSSLESS_REFINEMENT:
+    case REQUIRED_DICT:
+      {
+        // An error is normally signaled when a REQUIRED_DICT record occurs
+        // after START_OF_DATA, However the REQUIRED_DICT record uses the same
+        // record number as the obsolete LOSSLESS_REFINEMENT record. Therefore
+        // we do not signal an error if the refinement flag is set and we will
+        // simply handle thge record as an END_OF_DATA.
+        if (gotstartrecordp && !refinementp)
+          THROW("Corrupted file: Misplaced REQUIRED_DICT record");
+        if (! gotstartrecordp)
+          code_inherited_shape_count(jim);
+        break;
+      }
     case END_OF_DATA:
       {
         break;
@@ -1309,16 +1472,7 @@ _JB2Codec::code_record(int &rectype, JB2Image *jim, JB2Shape *jshp, JB2Blit *jbl
 }
 
 
-// CODE DICT
-
-void 
-_JB2Codec::code(JB2Dict *jim)
-{
-  THROW("Not yet supported");
-}
-
-
-// CODE IMAGE
+// CODE JB2IMAGE
 
 void 
 _JB2Codec::code(JB2Image *jim)
@@ -1357,11 +1511,13 @@ _JB2Codec::code(JB2Image *jim)
               shapeno = jim->get_shape(shapeno)->parent;
             }
         }
-      // Code start of data token
-      int rectype = START_OF_DATA;
-      if (! gotstartrecordp)
+      // Code headers.
+      int rectype = REQUIRED_DICT;
+      if (jim->get_inherited_shape_count() > 0)
         code_record(rectype, jim, NULL, NULL);
-      // Comment.
+      rectype = START_OF_DATA;
+      code_record(rectype, jim, NULL, NULL);
+      // Code Comment.
       rectype = PRESERVED_COMMENT;
       if (!! jim->comment)
         code_record(rectype, jim, NULL, NULL);
@@ -1373,7 +1529,7 @@ _JB2Codec::code(JB2Image *jim)
           int shapeno = jblt->shapeno;
           JB2Shape *jshp = jim->get_shape(shapeno);
           // Progress indicator
-          DJVU_PROGRESS("code_record", blitno*100/nblit);
+          DJVU_PROGRESS("code_record(jb2image)", blitno*100/nblit);
           // Tests if shape exists in library
           if (shape2lib[shapeno] >= 0)
             {
@@ -1426,7 +1582,7 @@ _JB2Codec::code(JB2Image *jim)
       code_record(rectype, jim, NULL, NULL); 
       zp.ZPCodec::~ZPCodec();
       // Progress
-      DJVU_PROGRESS("code_record", 999);
+      DJVU_PROGRESS("code_record(jb2image)", 999);
     }
   else
     {
@@ -1436,13 +1592,13 @@ _JB2Codec::code(JB2Image *jim)
       int rectype;
       JB2Blit tmpblit;
       JB2Shape tmpshape;
-      init_library(jim);
       for(;;) 
         {
           code_record(rectype, jim, &tmpshape, &tmpblit);        
-          if (rectype == END_OF_DATA)
+          if (rectype==END_OF_DATA)
             break;
-          if (rectype == LOSSLESS_REFINEMENT)
+          // Handle obsolete LOSSLESS_REFINEMENT record as END_OF_DATA records.
+          if (gotstartrecordp && rectype==REQUIRED_DICT)
             break;
         } 
       if (!gotstartrecordp)
