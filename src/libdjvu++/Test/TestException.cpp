@@ -7,8 +7,11 @@
 
 
 #include <stdio.h>
+#include <locale.h>
 #include "GException.h"
 #include "GString.h"
+#include "DjVu.h"
+#include "DjVuMessage.h"
 
 
 #ifdef _MSC_VER
@@ -18,6 +21,9 @@
 int
 main()
 {
+   setlocale(LC_ALL,"");
+   DjVuMessage::use_locale();
+
 #ifdef _MSC_VER
   // Redirect STDERR on STDOUT
   fflush(NULL);
@@ -33,7 +39,7 @@ main()
     } 
   G_CATCH(ex) 
     {
-      DjVuPrintError("*** %s\n", DjVuMsg.LookUp( ex.get_cause() ));
+      DjVuPrintError("*** %s\n", (const char *)DjVuMessage::LookUpNative( ex.get_cause() ));
     }
   G_ENDCATCH;
   
@@ -47,20 +53,20 @@ main()
     }
   G_CATCH(ex)
     {
-      DjVuPrintError("*** %s\n", DjVuMsg.LookUp( ex.get_cause() ));
+      DjVuPrintError("*** %s\n", (const char *)DjVuMessage::LookUpNative( ex.get_cause() ));
     }
   G_ENDCATCH;
 
   G_TRY
     {
-      GString gs = "abcdef";
+      GUTF8String gs = "abcdef";
       DjVuPrintMessage("gs[0]=%c\n",gs[0]);
       DjVuPrintMessage("gs[-1]=%c\n",gs[-1]);
       DjVuPrintMessage("gs[-12]=%c\n",gs[-12]);
     }
   G_CATCH(ex)
     {
-      DjVuPrintError("*** %s\n", DjVuMsg.LookUp( ex.get_cause() ));
+      DjVuPrintError("*** %s\n", (const char *)DjVuMessage::LookUpNative( ex.get_cause() ));
     }
   G_ENDCATCH;
 
@@ -69,14 +75,14 @@ main()
     {
       G_TRY
         {
-          GString gs = "abcdef";
+          GUTF8String gs = "abcdef";
           DjVuPrintMessage("gs[0]=%c\n",gs[0]);
           DjVuPrintMessage("gs[-1]=%c\n",gs[-1]);
           DjVuPrintMessage("gs[-12]=%c\n",gs[-12]);
         }
       G_CATCH(ex)
         {
-          DjVuPrintError("*** %s\n", DjVuMsg.LookUp( ex.get_cause() ));
+          DjVuPrintError("*** %s\n", (const char *)DjVuMessage::LookUpNative( ex.get_cause() ));
           DjVuPrintMessage("Rethrown\n");
           G_RETHROW;
         }
@@ -85,7 +91,7 @@ main()
   G_CATCH(ex)
     {
       DjVuPrintMessage("Recatched\n");
-      DjVuPrintError("*** %s\n", DjVuMsg.LookUp( ex.get_cause() ));
+      DjVuPrintError("*** %s\n", (const char *)DjVuMessage::LookUpNative( ex.get_cause() ));
     }
   G_ENDCATCH;
 

@@ -1,57 +1,67 @@
+### BEGIN C++ DEPENDENCIES
 TestArray.o: TestArray.cpp \
- ../GContainer.h \
- ../DjVuGlobal.h \
- ../GException.h \
- ../GSmartPointer.h \
- ../GString.h
+ ../../../src/libdjvu++/GContainer.h \
+ ../../../src/libdjvu++/GException.h \
+ ../../../src/libdjvu++/DjVuGlobal.h \
+ ../../../src/include/DjVu.h \
+ ../../../src/libdjvu++/GSmartPointer.h \
+ ../../../src/libdjvu++/GString.h
 TestBitmap.o: TestBitmap.cpp \
- ../GBitmap.h \
- ../DjVuGlobal.h \
- ../GRect.h \
- ../ByteStream.h \
- ../GException.h \
- ../GContainer.h \
- ../GSmartPointer.h \
- ../Arrays.h
+ ../../../src/libdjvu++/GBitmap.h \
+ ../../../src/libdjvu++/GSmartPointer.h \
+ ../../../src/libdjvu++/DjVuGlobal.h \
+ ../../../src/include/DjVu.h \
+ ../../../src/libdjvu++/ByteStream.h \
+ ../../../src/libdjvu++/Arrays.h \
+ ../../../src/libdjvu++/GException.h
 TestException.o: TestException.cpp \
- ../GException.h \
- ../DjVuGlobal.h \
- ../GString.h \
- ../GSmartPointer.h
-TestJB2.o: TestJB2.cpp \
- ../JB2Image.h \
- ../DjVuGlobal.h \
- ../GString.h \
- ../GException.h \
- ../GSmartPointer.h \
- ../ZPCodec.h \
- ../ByteStream.h \
- ../GContainer.h \
- ../Arrays.h \
- ../GRect.h \
- ../GBitmap.h
+ ../../../src/libdjvu++/GException.h \
+ ../../../src/libdjvu++/DjVuGlobal.h \
+ ../../../src/include/DjVu.h \
+ ../../../src/libdjvu++/GString.h \
+ ../../../src/libdjvu++/GContainer.h \
+ ../../../src/libdjvu++/GSmartPointer.h
+TestJB2.o: TestJB2.cpp ../../../src/libdjvu++/JB2Image.h \
+ ../../../src/libdjvu++/GString.h \
+ ../../../src/libdjvu++/DjVuGlobal.h \
+ ../../../src/include/DjVu.h \
+ ../../../src/libdjvu++/GContainer.h \
+ ../../../src/libdjvu++/GException.h \
+ ../../../src/libdjvu++/GSmartPointer.h \
+ ../../../src/libdjvu++/ZPCodec.h \
+ ../../../src/libdjvu++/GBitmap.h \
+ ../../../src/libdjvu++/ByteStream.h \
+ ../../../src/libdjvu++/Arrays.h
 TestList.o: TestList.cpp \
- ../GContainer.h \
- ../DjVuGlobal.h \
- ../GException.h \
- ../GSmartPointer.h \
- ../GString.h
+ ../../../src/libdjvu++/GContainer.h \
+ ../../../src/libdjvu++/GException.h \
+ ../../../src/libdjvu++/DjVuGlobal.h \
+ ../../../src/include/DjVu.h \
+ ../../../src/libdjvu++/GSmartPointer.h \
+ ../../../src/libdjvu++/GString.h
 TestMap.o: TestMap.cpp \
- ../GContainer.h \
- ../DjVuGlobal.h \
- ../GException.h \
- ../GSmartPointer.h \
- ../GString.h
-TestSmartPointer.o: \
- TestSmartPointer.cpp \
- ../GSmartPointer.h \
- ../DjVuGlobal.h
+ ../../../src/libdjvu++/GContainer.h \
+ ../../../src/libdjvu++/GException.h \
+ ../../../src/libdjvu++/DjVuGlobal.h \
+ ../../../src/include/DjVu.h \
+ ../../../src/libdjvu++/GSmartPointer.h \
+ ../../../src/libdjvu++/GString.h
+TestSmartPointer.o: TestSmartPointer.cpp \
+ ../../../src/libdjvu++/GSmartPointer.h \
+ ../../../src/libdjvu++/DjVuGlobal.h \
+ ../../../src/include/DjVu.h
 TestString.o: TestString.cpp \
- ../GString.h \
- ../DjVuGlobal.h \
- ../GException.h \
- ../GSmartPointer.h
+ ../../../src/libdjvu++/GString.h \
+ ../../../src/libdjvu++/DjVuGlobal.h \
+ ../../../src/include/DjVu.h \
+ ../../../src/libdjvu++/GContainer.h \
+ ../../../src/libdjvu++/GException.h \
+ ../../../src/libdjvu++/GSmartPointer.h \
+ ../../../src/libdjvu++/DjVuMessage.h \
+ ../../../src/libdjvu++/DjVuMessageLite.h
 TestThreads.o: TestThreads.cpp \
- ../GThreads.h \
- ../DjVuGlobal.h \
- ../GException.h
+ ../../../src/libdjvu++/GThreads.h \
+ ../../../src/libdjvu++/DjVuGlobal.h \
+ ../../../src/include/DjVu.h \
+ ../../../src/libdjvu++/GException.h
+### END   C++ DEPENDENCIES

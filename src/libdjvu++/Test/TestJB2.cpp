@@ -6,10 +6,12 @@
 //C-
 
 #include <stdio.h>
+#include <locale.h>
 #include "JB2Image.h"
 #include "GBitmap.h"
 #include "ByteStream.h"
 #include "GException.h"
+#include "GURL.h"
 
 #ifdef ENCODE
 #include "JB2Filter.h"
@@ -29,6 +31,8 @@ usage()
 int
 main(int argc, char **argv)
 {
+  setlocale(LC_ALL,"");
+   
   G_TRY
     {
       if (argc < 2)
@@ -40,7 +44,7 @@ main(int argc, char **argv)
           if (argc != 4)
             usage();
           // Read image and compute runs
-          GP<ByteStream> input=ByteStream::create(argv[2],"rb");
+          GP<ByteStream> input=ByteStream::create(GURL::Filename::Native(argv[2]),"rb");
           GBitmap bm(*input);
           input=0;
           RunImage rimg;
@@ -56,7 +60,7 @@ main(int argc, char **argv)
           // Apply JB2 Image filters
           GP<JB2Image> jimgf = JB2Filter(jimg);
           // Code JB2 Image
-          GP<ByteStream> output=ByteStream::create(argv[3],"wb");
+          GP<ByteStream> output=ByteStream::create(GURL::Filename::Native(argv[3]),"wb");
           jimgf->encode(*output);
         }
       else
@@ -66,26 +70,26 @@ main(int argc, char **argv)
           //
           if (argc>3)
             usage();
-          GP<ByteStream> input=ByteStream::create(argv[1],"rb");
-          GP<JB2Image> image = new JB2Image;
-          image->decode(*input);
+          GP<ByteStream> input=ByteStream::create(GURL::Filename::Native(argv[1]),"rb");
+          GP<JB2Image> image = JB2Image::create();
+          image->decode(input);
           input=0;
           GP<GBitmap> bm = image->get_bitmap(1);
           if (argc>2)
             {
               int len = strlen(argv[2]);
               if (! strcmp(argv[2]+len-4, ".pbm")) {
-                GP<ByteStream> output=ByteStream::create(argv[2],"wb");
+                GP<ByteStream> output=ByteStream::create(GURL::Filename::Native(argv[2]),"wb");
                 bm->save_pbm(*output);
               } else if (! strcmp(argv[2]+len-4, ".rle")) {
-                GP<ByteStream> output=ByteStream::create((argv[2],"wb");
+                GP<ByteStream> output=ByteStream::create(GURL::Filename::Native(argv[2]),"wb");
                 bm->save_rle(*output);
               } else if (! strcmp(argv[2]+len-2, ".r")) {
-                GP<ByteStream> output=ByteStream::Create(argv[2],"wb");
+                GP<ByteStream> output=ByteStream::create(GURL::Filename::Native(argv[2]),"wb");
                 bm->save_rle(*output);
               } else if (! strcmp(argv[2]+len-2, ".q")) {
-                GP<ByteStream> output=ByteStream::Create(argv[2],"wb");
-                image->encode(*output);
+                GP<ByteStream> output=ByteStream::create(GURL::Filename::Native(argv[2]),"wb");
+                image->encode(output);
               } else {
                 G_THROW( ERR_MSG("TestJB2.bad_suffix") );
               }

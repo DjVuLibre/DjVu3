@@ -8,9 +8,10 @@
 #include <new.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <locale.h>
 #include "GString.h"
-
-
+#include "DjVu.h"
+#include "DjVuMessage.h"
 
 #define PRS(expr)  DjVuPrintMessage("%s :=\"%s\"\n", #expr, (const char*)(expr))
 #define PRI(expr)  DjVuPrintMessage("%s :=%d\n", #expr, (int)(expr))
@@ -33,15 +34,18 @@ void operator delete(void *x) {
 int
 main()
 {
-  GString gs1;
+  setlocale(LC_ALL,"");
+  DjVuMessage::use_locale();
+
+  GUTF8String gs1;
   PRS(gs1);
-  GString gs2 = "abcdefghijklmnopqrstuvwxyz";
+  GUTF8String gs2 = "abcdefghijklmnopqrstuvwxyz";
   PRS(gs2);
-  GString gs3 = gs2;
+  GUTF8String gs3 = gs2;
   PRS(gs3);
-  GString gs4("abcdefghijk",4);
+  GUTF8String gs4("abcdefghijk",4);
   PRS(gs4);
-  GString gs5(gs2,-4, 5);
+  GUTF8String gs5(gs2,-4, 5);
   PRS(gs5);
   gs5 = gs2;
   PRS(gs5);
@@ -60,7 +64,7 @@ main()
   gs2.setat(24,'Z');
   PRS(gs2);
   PRS(gs3);
-  GString gsu = gs2.upcase();
+  GUTF8String gsu = gs2.upcase();
   PRS(gsu);
   gsu = gs2.downcase();
   PRS(gsu);
@@ -92,8 +96,8 @@ main()
   gs1 = gsu + " " + gs3;
   PRS(gs1);
   
-  GString gsa ("abcdef");
-  GString gsb = GString("abc") + GString("def");
+  GUTF8String gsa ("abcdef");
+  GUTF8String gsb = GUTF8String("abc") + GUTF8String("def");
   PRS(gsa);
   PRS(gsb);
   PRI(gsa==gsb);

@@ -5,11 +5,12 @@
 //C-
 //C-
 
-#include "GContainer.h"
-#include "GString.h"
 #include <stdlib.h>
 #include <stdio.h>
-
+#include <locale.h>
+#include "GContainer.h"
+#include "GString.h"
+#include "DjVuMessage.h"
 
 // #define THOROUGH
 #ifdef THOROUGH
@@ -39,7 +40,7 @@ PCONTI(GList<int> &ga)
 }
 
 void
-PCONTS(GList<GString> &ga)
+PCONTS(GList<GUTF8String> &ga)
 {
   DjVuPrintMessage("( ");
   for (GPosition pos=ga; pos; ++pos)
@@ -50,7 +51,7 @@ PCONTS(GList<GString> &ga)
 
 
 void
-PFIRST(const GList<GString> * const gl)
+PFIRST(const GList<GUTF8String> * const gl)
 {
   GPosition pos(*gl);
   PRS((*gl)[pos]);
@@ -60,7 +61,10 @@ PFIRST(const GList<GString> * const gl)
 int
 main()
 {
-  GList<GString> gl1;
+   setlocale(LC_ALL,"");
+   DjVuMessage::use_locale();
+   
+  GList<GUTF8String> gl1;
 
   gl1.append("one");
   gl1.append("two");
@@ -72,7 +76,7 @@ main()
   ++pos;
   PRS(gl1[pos]);
 
-  GList<GString> gl2 = gl1;
+  GList<GUTF8String> gl2 = gl1;
   gl2.prepend("zero");
   PCONTS(gl2);
   gl2 = gl1;
@@ -98,7 +102,7 @@ main()
   gl2.del(pos);
   PCONTS(gl2);
   
-  GList<GString> gl3 = gl1;
+  GList<GUTF8String> gl3 = gl1;
   PRI(gl1.size());
   PCONTS(gl1);
   pos = gl1.firstpos();

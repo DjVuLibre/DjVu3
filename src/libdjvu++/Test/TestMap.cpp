@@ -30,9 +30,9 @@ void operator delete(void *x) {
 #define PRC(expr)  DjVuPrintMessage("%s :=%d '%c'\n", #expr, (char)(expr), (char)(expr))
 
 void
-PMAPSI(const GMap<GString,int> &map)
+PMAPSI(const GMap<GUTF8String,int> &map)
 {
-  GString gs;
+  GUTF8String gs;
   DjVuPrintMessage("( ");
   for (GPosition pos=map.firstpos(); pos; ++pos)
     DjVuPrintMessage("%s:%d ", (const char*)map.key(pos), map[pos]);
@@ -40,7 +40,7 @@ PMAPSI(const GMap<GString,int> &map)
 }
 
 void
-PMAPIS(const GMap<int,GString> &map)
+PMAPIS(const GMap<int,GUTF8String> &map)
 {
   DjVuPrintMessage("( ");
   for (GPosition pos=map.firstpos(); pos; ++pos)
@@ -51,7 +51,7 @@ PMAPIS(const GMap<int,GString> &map)
 int
 main()
 {
-  GMap<GString,int> forw;
+  GMap<GUTF8String,int> forw;
 
   forw["one"] = 1 ;
   forw["two"] = 2;
@@ -70,11 +70,11 @@ main()
   PRI(forw["three"]);
   
   PMAPSI(forw);
-  GMap<GString,int> copy(forw);
+  GMap<GUTF8String,int> copy(forw);
   PMAPSI(copy);
   
-  GMap<int,GString> rev;
-  GString gs;
+  GMap<int,GUTF8String> rev;
+  GUTF8String gs;
   for (pf=copy.firstpos(); pf; ++pf)
     rev[ copy[pf] ] = copy.key(pf);
   PMAPIS(rev);

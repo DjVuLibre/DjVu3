@@ -7,9 +7,9 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <locale.h>
 #include "GContainer.h"
 #include "GString.h"
-
 
 #define PRS(expr)  DjVuPrintMessage("%s :=\"%s\"\n", #expr, (const char*)(expr))
 #define PRI(expr)  DjVuPrintMessage("%s :=%d\n", #expr, (int)(expr))
@@ -74,7 +74,7 @@ test_integer()
 void
 test_string()
 {
-  GArray<GString> ga(0,9);
+  GArray<GUTF8String> ga(0,9);
   // Test of allocation
   ga[0] = "zero";
   ga[2] = "two";
@@ -109,7 +109,7 @@ test_string()
   ga.ins(1,"hello",2);
   for(i=ga.lbound();i<=ga.hbound();i++) PRS(ga[i]);
   // Test of copy
-  GArray<GString> gb (ga);
+  GArray<GUTF8String> gb (ga);
   PRI(gb.size());
   PRI(gb.lbound());
   PRI(gb.hbound());
@@ -128,6 +128,7 @@ test_string()
 int
 main()
 {
+  setlocale(LC_ALL,"");
    G_TRY {
       test_string();
       test_integer();

@@ -25,8 +25,8 @@ gsu.search('f',8) :=12
 gsu.search('z') :=-1
 gsu.search("folks") :=6
 gsu.rsearch(" f") :=11
-gsu.rsearch(" f",8) :=5
-gsu.rsearch(" f",3) :=-1
+gsu.rsearch(" f",8) :=11
+gsu.rsearch(" f",3) :=11
 gs2 :="hello folks from 314"
 gs3 :="abcdefghijklmnopqrstuvwxyz"
 gs2==gsu :=1

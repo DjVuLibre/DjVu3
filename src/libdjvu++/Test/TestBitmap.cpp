@@ -8,11 +8,11 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <locale.h>
 #include "GBitmap.h"
 #include "ByteStream.h"
 
-
-StaticByteStream bs1 ( 
+const char *bmap1=
 "P1  16 16\n"
 "0000000111000000\n"
 "0000001101100000\n"
@@ -29,9 +29,9 @@ StaticByteStream bs1 (
 "0011000000000110\n"
 "0111100000001111\n"
 "0000000000000000\n"
-"0000000000000000\n" );
+"0000000000000000\n";
 
-StaticByteStream bs2 ( 
+const char *bmap2=
 "P1  16 16\n"
 "0000000000000000\n"
 "0000000000000000\n"
@@ -48,7 +48,7 @@ StaticByteStream bs2 (
 "0111000000000110\n"
 "0011100000001111\n"
 "0001111111110110\n"
-"0000000000000000\n" );
+"0000000000000000\n";
 
 
 
@@ -82,66 +82,80 @@ compare_GBitmap(const GBitmap  &bm1, const GBitmap &bm2)
 int 
 main(void)
 {
+  setlocale(LC_ALL,"");
 
-  GBitmap b (bs1);
-  GBitmap c (bs2);
+   GP<ByteStream> gbs1=ByteStream::create_static(bmap1,strlen(bmap1));
+   GP<ByteStream> gbs2=ByteStream::create_static(bmap2,strlen(bmap2));
+
+   GP<GBitmap> gb=GBitmap::create(*gbs1);
+   GP<GBitmap> gc=GBitmap::create(*gbs2);
+   GBitmap &b=*gb;
+   GBitmap &c=*gc;
 
   //// Test File I/O
   {
     GP<ByteStream> gmb=ByteStream::create();
-    ByteStream &mb=gmb;
+    ByteStream &mb=*gmb;
     b.save_pbm( mb,0 );  mb.seek(0);
-    GBitmap p1 ( mb );
+    GP<GBitmap> gp1=GBitmap::create( mb );
+    GBitmap &p1=*gp1;
     COMPBM(p1, b);
   }
   {
     GP<ByteStream> gmb=ByteStream::create();
-    ByteStream &mb=gmb;
+    ByteStream &mb=*gmb;
     b.save_pbm( mb );  mb.seek(0);
-    GBitmap p4 ( mb );
+    GP<GBitmap> gp4=GBitmap::create( mb );
+    GBitmap &p4=*gp4;
     COMPBM(p4, b);
   }
   {
     GP<ByteStream> gmb=ByteStream::create();
-    ByteStream &mb=gmb;
+    ByteStream &mb=*gmb;
     b.save_pgm( mb,0 );  mb.seek(0);
-    GBitmap p2 ( mb );
+    GP<GBitmap> gp2=GBitmap::create( mb );
+    GBitmap &p2=*gp2;
     COMPBM(p2, b);
   }
   {
     GP<ByteStream> gmb=ByteStream::create();
-    ByteStream &mb=gmb;
+    ByteStream &mb=*gmb;
     b.save_pgm( mb,0 );  mb.seek(0);
-    GBitmap p5 ( mb );
+    GP<GBitmap> gp5=GBitmap::create( mb );
+    GBitmap &p5=*gp5;
     COMPBM(p5, b);
   }
   {
     GP<ByteStream> gmb=ByteStream::create();
-    ByteStream &mb=gmb;
+    ByteStream &mb=*gmb;
     b.save_rle( mb );  mb.seek(0);
-    GBitmap r4 ( mb );
+    GP<GBitmap> gr4=GBitmap::create( mb );
+    GBitmap &r4=*gr4;
     COMPBM(r4, b);
   }
 
   //// Test Copy
   {
-    GBitmap b2 = b;
+    GP<GBitmap> gb2 =GBitmap::create(b);
+    GBitmap &b2=*gb2;
     COMPBM(b2,b);
     COMPBM(b2,c);
-    b2 = c;
-    COMPBM(b2,c);    
+    gb2 =GBitmap::create(c);
+    COMPBM(*gb2,c);    
   }
 
   //// Test Border
   {
-    GBitmap b2 (b, 10);
+    GP<GBitmap> gb2=GBitmap::create(b, 10);
+    GBitmap &b2=*gb2;
     PRI(b2[-1][-9]);
     PRI(b2[23][23]);
   }
 
   //// Test Compress
   {
-    GBitmap bc (c);
+    GP<GBitmap> gbc=GBitmap::create(c);
+    GBitmap &bc=*gbc;
     bc.compress();
     COMPBM(bc,c);
     bc.compress();
@@ -149,8 +163,11 @@ main(void)
   }
 
   //// Test Blit from Bytes
-  GBitmap d1(24,32);
-  GBitmap d2(24,32);
+  GP<GBitmap> gd1=GBitmap::create(24,32);
+  GP<GBitmap> gd2=GBitmap::create(24,32);
+  GBitmap &d1=*gd1;
+  GBitmap &d2=*gd2;
+  
   d1.set_grays(4);
   d2.set_grays(9);
   {
@@ -160,7 +177,7 @@ main(void)
     d2.blit(&c,16,8,1);
     d2.blit(&c,16,8,2);
     d2.blit(&c,0,0,3);
-    GP<ByteStream> gcout=ByteStream::create(stdout,"w"); 
+    GP<ByteStream> gcout=ByteStream::create(stdout,"w", false); 
     ByteStream &cout=*gcout;
     d1.save_pgm(cout,0);
     d2.save_pgm(cout,0);
@@ -169,8 +186,10 @@ main(void)
   //// Test blit from RLE
   b.compress();
   c.compress();
-  GBitmap d1c(24,32);
-  GBitmap d2c(24,32);
+  GP<GBitmap> gd1c=GBitmap::create(24,32);
+  GP<GBitmap> gd2c=GBitmap::create(24,32);
+  GBitmap &d1c=*gd1c;
+  GBitmap &d2c=*gd2c;
   d1c.set_grays(4);
   d2c.set_grays(9);
   {
