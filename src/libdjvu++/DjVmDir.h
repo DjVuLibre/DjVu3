@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVmDir.h,v 1.4 1999-08-30 19:28:31 leonb Exp $
+//C- $Id: DjVmDir.h,v 1.5 1999-08-31 16:16:45 leonb Exp $
 
 #ifndef _DJVMDIR_H
 #define _DJVMDIR_H
@@ -22,7 +22,7 @@
     @memo Implements DjVu multipage document directory
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: DjVmDir.h,v 1.4 1999-08-30 19:28:31 leonb Exp $# */
+    #$Id: DjVmDir.h,v 1.5 1999-08-31 16:16:45 leonb Exp $# */
 //@{
 
 
@@ -75,40 +75,40 @@ public:
   {
     friend class DjVmDir;
   public:
-    /* File name.  The optional file name must be unique and is
-       assigned either by encoder or by user when the document is
-       composed. By keeping the name in {\em bundled} document we
-       guarantee, that it can be expanded later into {\em indirect}
-       document and files will still have the same names. */
+    /** File name.  The optional file name must be unique and is assigned
+        either by encoder or by user when the document is composed.  In the
+        case of an {\em indirect} document, this is the relative URL of the
+        file.  By keeping the name in {\em bundled} document we guarantee,
+        that it can be expanded later into {\em indirect} document and files
+        will still have the same names. */
     GString name;
-    /* File identifier.  The encoder assigns a unique identifier to
-       each file in a multipage document. Indirection chunks in other
-       files (#"INCL"# chunks) may refer to another file using its
-       identifier. */
+    /** File identifier.  The encoder assigns a unique identifier to each file
+       in a multipage document. Indirection chunks in other files (#"INCL"#
+       chunks) may refer to another file using its identifier. */
     GString id;
-    /* File title.  The file title is assigned by the user and
-       may be used as a shortcut for viewing a particular page.
-       Names like #"chapter1"# or #"appendix"# are appropriate. */
+    /** File title.  The file title is assigned by the user and may be used as
+        a shortcut for viewing a particular page.  Names like #"chapter1"# or
+        #"appendix"# are appropriate. */
     GString title;
-    /* Offset of the file data in a bundled DJVM file.  This number is
-       relevant in the {\em bundled} case only when everything is
-       packed into one single file. */
+    /** Offset of the file data in a bundled DJVM file.  This number is
+        relevant in the {\em bundled} case only when everything is packed into
+        one single file. */
     int	offset;
-    /* Size of the file data in a bundled DJVM file.  This number is
-       relevant in the {\em bundled} case only when everything is
-       packed into one single file. */
+    /** Size of the file data in a bundled DJVM file.  This number is
+        relevant in the {\em bundled} case only when everything is
+        packed into one single file. */
     int size;
-    /* Tests if this file represents a page of the document. */
+    /** Tests if this file represents a page of the document. */
     bool is_page(void) const 
       { return (flags & IS_PAGE)!=0; } ;
-    /* Returns the page number of this file. This function returns
-       #-1# if this file does not represent a page of the document. */
+    /** Returns the page number of this file. This function returns
+        #-1# if this file does not represent a page of the document. */
     int	get_page_num(void) const 
       { return page_num; } ;
-    // Default constructor
+    /** Default constructor. */
     File(void) : flags(0) 
       { } ;
-    // Constructor for DjVmDoc
+    /** Full constructor. */
     File(const char *name, const char *id, const char *title, bool page)
       : name(name), id(id), title(title), flags(0), page_num(-1)
       { if (page) flags|=IS_PAGE; } ;
