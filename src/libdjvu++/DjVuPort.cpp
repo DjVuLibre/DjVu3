@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuPort.cpp,v 1.6 1999-08-17 21:27:10 eaf Exp $
+//C- $Id: DjVuPort.cpp,v 1.7 1999-08-20 23:07:45 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -67,7 +67,7 @@ DjVuPortcaster::del_port(const DjVuPort * port)
    {
       delete (GList<void *> *) route_map[port];
       route_map.del(port);
-   };
+   }
    for(GPosition pos=route_map;pos;)
    {
       GList<void *> & list=*(GList<void *> *) route_map[pos];
@@ -80,7 +80,7 @@ DjVuPortcaster::del_port(const DjVuPort * port)
 	 ++pos;
 	 route_map.del(tmp_pos);
       } else ++pos;
-   };
+   }
 }
 
 void
@@ -112,8 +112,8 @@ DjVuPortcaster::del_route(const DjVuPort * src, DjVuPort * dst)
       {
 	 delete &list;
 	 route_map.del(src);
-      };
-   };
+      }
+   }
 }
 
 void
@@ -154,8 +154,8 @@ DjVuPortcaster::add_to_closure(GMap<const void *, void *> & set,
       {
 	 DjVuPort * new_dst=(DjVuPort *) list[pos];
 	 if (!set.contains(new_dst)) add_to_closure(set, new_dst, distance+1);
-      };
-   };
+      }
+   }
 }
 
 void
@@ -169,8 +169,12 @@ DjVuPortcaster::compute_closure(GMap<const void *, void *> & set,
    {
       GList<void *> & list=*(GList<void *> *) route_map[src];
       for(GPosition pos=list;pos;++pos)
-	 add_to_closure(set, (DjVuPort *) list[pos], 0);
-   };
+      {
+	 DjVuPort * dst=(DjVuPort *) list[pos];
+	 if (dst==src) add_to_closure(set, src, 0);
+	 else add_to_closure(set, dst, 1);
+      }
+   }
 }
 
 void
