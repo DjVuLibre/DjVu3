@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.118 2000-02-18 19:31:52 eaf Exp $
+//C- $Id: DjVuFile.cpp,v 1.119 2000-03-15 15:26:42 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -737,7 +737,7 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
     }
 
   // INCL (inclusion chunk)
-  else if (chkid == "INCL" && (djvi || djvu))
+  else if (chkid == "INCL" && (djvi || djvu || iw44))
     {
       GP<DjVuFile> file=process_incl_chunk(iff);
       if (file)
