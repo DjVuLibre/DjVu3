@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuImage.cpp,v 1.57 2001-03-30 23:31:29 bcr Exp $
+// $Id: DjVuImage.cpp,v 1.58 2001-04-02 21:17:15 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -58,7 +58,7 @@
 //// DJVUIMAGE: CONSTRUCTION
 
 DjVuImage::DjVuImage(void) 
-: relayout_sent(false), rotate_count(0)
+: relayout_sent(false)
 {
 }
 
@@ -232,22 +232,14 @@ int
 DjVuImage::get_width() const
 {
    GP<DjVuInfo> info=get_info();
-   if( info )
-   {
-       return rotate_count&1 ? info->height: info->width;
-   }
-   return 0;
+   return info?(info->orientation&GRect::ROTATE90_CW)?(info->height):(info->width):0;
 }
 
 int
 DjVuImage::get_height() const
 {
    GP<DjVuInfo> info=get_info();
-   if( info )
-   {
-       return rotate_count&1 ? info->width: info->height;
-   }
-   return 0;
+   return info?(info->orientation&GRect::ROTATE90_CW)?(info->width):(info->height):0;
 }
 
 int
@@ -764,7 +756,8 @@ DjVuImage::stencil(GPixmap *pm, const GRect &rect,
 		   int subsample, double gamma) const
 {
   // Warping and blending. 
-  if (!pm) return 0;
+  if (!pm)
+    return 0;
   // Access components
   
   GP<DjVuInfo> info = get_info();
@@ -1210,11 +1203,33 @@ DjVuImage::get_fg_pixmap(const GRect &rect, const GRect &all, double gamma) cons
 int 
 DjVuImage::get_rotate() const
 { 
-    return rotate_count; 
+  GP<DjVuInfo> info=get_info();
+  int rotate_count=0;
+  if(info)
+  {
+    for(int a=(int)(info->orientation);(a!=(int)GRect::BULRNR)&&(a!=(int)GRect::BURLNR);--rotate_count)
+    {
+      a^=((a&(int)GRect::ROTATE90_CW)
+        ?(int)(GRect::BOTTOM_UP|GRect::MIRROR|GRect::ROTATE90_CW)
+        :(int)(GRect::ROTATE90_CW));
+    }
+  }
+  return (rotate_count+4)%4; 
 }
+
 void DjVuImage::set_rotate(int count) 
 { 
-    rotate_count = count%4; 
+  GP<DjVuInfo> info=get_info();
+  if(info)
+  {
+    GRect::Orientations &orientation=info->orientation;
+    for(count=((count%4)+4)%4;count>=1;--count)
+    {
+      orientation=(GRect::Orientations)(((int)orientation)^((orientation&GRect::ROTATE90_CW)
+        ?(int)(GRect::BOTTOM_UP|GRect::MIRROR|GRect::ROTATE90_CW)
+        :(int)(GRect::ROTATE90_CW)));
+    }
+  }
 }
 
 GP<DjVuAnno> 
@@ -1225,7 +1240,8 @@ DjVuImage::get_decoded_anno()
     if( bs )
     {
         djvuanno->decode(bs);
-        
+       
+        const int rotate_count=get_rotate(); 
         if( rotate_count % 4 )
         {   
             ///map hyperlinks correctly for rotation           
@@ -1265,6 +1281,7 @@ void
 DjVuImage::map(GRect &rect) const
 {
     GRect input, output;
+    const int rotate_count=get_rotate(); 
     if(rotate_count%4)
     {  
         input = GRect(0,0,get_width(), get_height());
@@ -1283,6 +1300,7 @@ void
 DjVuImage::unmap(GRect &rect) const
 {
     GRect input, output;
+    const int rotate_count=get_rotate(); 
     if(rotate_count%4)
     {  
         input = GRect(0,0,get_width(), get_height());
@@ -1301,6 +1319,7 @@ void
 DjVuImage::map(int &x, int &y) const
 {
     GRect input, output;
+    const int rotate_count=get_rotate(); 
     if(rotate_count%4)
     {  
         input = GRect(0,0,get_width(), get_height());
@@ -1319,6 +1338,7 @@ void
 DjVuImage::unmap(int &x, int &y) const
 {
     GRect input, output;
+    const int rotate_count=get_rotate(); 
     if(rotate_count%4)
     {  
         input = GRect(0,0,get_width(), get_height());

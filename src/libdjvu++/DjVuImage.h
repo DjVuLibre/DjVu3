@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuImage.h,v 1.39 2001-03-29 18:50:06 praveen Exp $
+// $Id: DjVuImage.h,v 1.40 2001-04-02 21:17:15 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUIMAGE_H
@@ -73,7 +73,7 @@
     L\'eon Bottou <leonb@research.att.com> - initial implementation
     Andrei Erofeev <eaf@geocities.com> - multipage support
     @version
-    #$Id: DjVuImage.h,v 1.39 2001-03-29 18:50:06 praveen Exp $# */
+    #$Id: DjVuImage.h,v 1.40 2001-04-02 21:17:15 bcr Exp $# */
 //@{
 
 
@@ -83,6 +83,7 @@
 
 #include "DjVuFile.h"
 #include "DjVuAnno.h"
+#include "GRect.h"
 
 /* Obsolete class included for backward compatibility. */
 
@@ -365,7 +366,6 @@ public:
 private:
   GP<DjVuFile>		file;
   bool			relayout_sent;
-  int           rotate_count;
   
   // HELPERS
   int stencil(GPixmap *pm, const GRect &rect, int subs, double gcorr) const;

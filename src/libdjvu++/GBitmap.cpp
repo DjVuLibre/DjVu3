@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GBitmap.cpp,v 1.50 2001-03-31 01:14:31 bcr Exp $
+// $Id: GBitmap.cpp,v 1.51 2001-04-02 21:17:15 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -45,7 +45,7 @@
 #include "GException.h"
 #include <string.h>
 
-// File "$Id: GBitmap.cpp,v 1.50 2001-03-31 01:14:31 bcr Exp $"
+// File "$Id: GBitmap.cpp,v 1.51 2001-04-02 21:17:15 bcr Exp $"
 // - Author: Leon Bottou, 05/1997
 
 
@@ -1559,7 +1559,6 @@ GBitmap::rotate(int count)
   }
   return newbitmap;
 }
-
 
 #ifndef NO_DEBUG
 void 

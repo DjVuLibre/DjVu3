@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuInfo.cpp,v 1.15 2001-01-04 22:04:55 bcr Exp $
+// $Id: DjVuInfo.cpp,v 1.16 2001-04-02 21:17:15 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -52,7 +52,7 @@
 DjVuInfo::DjVuInfo()
   : width(0), height(0), 
     version(DJVUVERSION),
-    dpi(300), gamma(2.2), compressable(false)
+    dpi(300), gamma(2.2), compressable(false), orientation(GRect::BULRNR)
 {
 }
 
@@ -66,6 +66,7 @@ DjVuInfo::decode(ByteStream &bs)
   dpi = 300;
   gamma = 2.2;
   compressable=false;
+  orientation=GRect::BULRNR;
   // Read data
   unsigned char buffer[10];
   int  size = bs.readall((void*)buffer, sizeof(buffer));
@@ -98,6 +99,10 @@ DjVuInfo::decode(ByteStream &bs)
     dpi = 300;
   if(flags&COMPRESSABLE_FLAG)
     compressable=true;
+  if(version>=DJVUVERSION_ORIENTATION)
+  {
+    orientation=(GRect::Orientations)(flags&((int)GRect::BOTTOM_UP|(int)GRect::MIRROR|(int)GRect::ROTATE90_CW));
+  }
 }
 
 void 
@@ -110,7 +115,7 @@ DjVuInfo::encode(ByteStream &bs)
   bs.write8(dpi & 0xff);
   bs.write8(dpi >> 8);
   bs.write8((int)(10.0*gamma+0.5) );
-  unsigned char flags=0;
+  unsigned char flags=orientation;
   if(compressable) 
   {
     flags|=COMPRESSABLE_FLAG;

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuInfo.h,v 1.13 2001-03-06 19:55:42 bcr Exp $
+// $Id: DjVuInfo.h,v 1.14 2001-04-02 21:17:15 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUINFO_H
@@ -46,7 +46,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: DjVuInfo.h,v 1.13 2001-03-06 19:55:42 bcr Exp $# */
+    #$Id: DjVuInfo.h,v 1.14 2001-04-02 21:17:15 bcr Exp $# */
 //@{
 
 
@@ -55,6 +55,7 @@
 #endif
 
 #include "GSmartPointer.h"
+#include "GRect.h"
 
 class ByteStream;
 
@@ -64,7 +65,9 @@ class ByteStream;
 /** Current DjVu format version.  The value of this macro represents the
     version of the DjVu file format implemented by this release of the DjVu
     Reference Library. */
-#define DJVUVERSION          21
+#define DJVUVERSION          22
+/** This is the version which introduced orientations. */
+#define DJVUVERSION_ORIENTATION          22
 /** Oldest DjVu format version supported by this library.  This release of the
     library cannot completely decode DjVu files whose version field is less
     than or equal to this number. */
@@ -73,7 +76,7 @@ class ByteStream;
     the library will attempt to decode files whose version field is smaller
     than this macro.  If the version field is greater than or equal to this
     number, the decoder will just throw a \Ref{GException}.  */
-#define DJVUVERSION_TOO_NEW  25
+#define DJVUVERSION_TOO_NEW  26
 //@}
 
 
@@ -128,6 +131,9 @@ public:
       and backwards compatability. */
   bool compressable;
   enum {COMPRESSABLE_FLAG=0x80,RESERVED_FLAGS1=0x7f};
+
+  /** We also store the current image orientation as three bits. */
+  GRect::Orientations orientation;
 };
 
 

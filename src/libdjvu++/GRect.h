@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GRect.h,v 1.24 2001-03-29 18:50:06 praveen Exp $
+// $Id: GRect.h,v 1.25 2001-04-02 21:17:15 bcr Exp $
 // $Name:  $
 
 #ifndef _GRECT_H_
@@ -51,7 +51,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GRect.h,v 1.24 2001-03-29 18:50:06 praveen Exp $# */
+    #$Id: GRect.h,v 1.25 2001-04-02 21:17:15 bcr Exp $# */
 //@{
 
 #include "DjVuGlobal.h"
@@ -100,6 +100,48 @@
 class GRect 
 {
 public:
+  /** #OrientationBits# defines 3 mutually exclusive
+     bits to indicate the image orientation.
+
+     There are four possible rotation values for an image
+     which are 0 degrees, 90 degrees, 180 degrees, and 270 degrees.
+     In addition the image can be mirrored backwards in any of these
+     orientations, giving a possible of 8 orientations.  To sanely deal
+     with these orientations, we have defined 3 mutually exclusive
+     bits.  These are BOTTOM_UP, MIRROR, and ROTATE90_CW.
+  */
+  enum OrientationBits
+  {
+    BOTTOM_UP=0x1,  /* Upside down */
+    MIRROR=0x2,     /* Written backwards. (right to left) */
+    ROTATE90_CW=0x4 /* rotated 90 degrees */
+  };
+
+  /**  #Orientations# defines all 8 possible orientations, using
+   the three \Ref{OrientationBits}.
+   \begin{itemize}
+   \item {\em TDLRNR} for Top Down, Left to Right, No Rotation.
+   \item {\em BULRNR} for Bottom Up, Left to Right, No Rotation.
+   \item {\em TDRLNR} for Top Down, Right to Left, No Rotation.
+   \item {\em BURLNR} for Bottom Up, Right to Left, No Rotation.
+   \item {\em TDLRCW} for Top Down, Left to Right, 90 degree CW rotation.
+   \item {\em BULRCW} for Bottom Up, Left to Right, 90 degree CW rotation.
+   \item {\em TDRLCW} for Top Down, Right to Left, 90 degree CW rotation.
+   \item {\em BURLCW} for Bottom Up, Right to Left, 90 degree CW rotation.
+   \end{itemize}
+  */
+  enum Orientations
+  {
+    TDLRNR=0,                                     /* normal orientation */
+    BULRNR=BOTTOM_UP,                               /* upside down */
+    TDRLNR=MIRROR,                    /* backwards (right to left) */
+    BURLNR=MIRROR|BOTTOM_UP,                    /* rotate 180 */
+    TDLRCW=ROTATE90_CW,                              /* rotated 90 */
+    BULRCW=ROTATE90_CW|BOTTOM_UP, /* backwards and rotate 180 */
+    TDRLCW=ROTATE90_CW|MIRROR,     /* backwards and rotate 90 */
+    BURLCW=ROTATE90_CW|MIRROR|BOTTOM_UP    /* rotate 270 */
+  };
+
   /** Constructs an empty rectangle */
   GRect();
   /** Constructs a rectangle given its minimal coordinates #xmin# and #ymin#,
