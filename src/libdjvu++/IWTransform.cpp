@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: IWTransform.cpp,v 1.1 1999-05-24 19:31:59 leonb Exp $
+//C- $Id: IWTransform.cpp,v 1.2 1999-05-24 21:30:34 leonb Exp $
 
 
 
@@ -20,6 +20,7 @@
 #include <string.h>
 #include <math.h>
 
+#define IWTRANSFORM_TIMER
 #ifdef IWTRANSFORM_TIMER
 #include "GOS.h"
 #endif
@@ -62,11 +63,12 @@
 #define MMXir(op,imm,dst) \
   __asm { op dst,imm }
 #define MMXar(op,addr,dst) \
-  do { register int var=(int)(addr); __asm { op dst,(var) } } while(0);
+  { register __int64 var=*(__int64*)(addr); __asm { op dst,var } }
 #define MMXra(op,src,addr) \
-  do { register int var=(int)(addr); __asm { op (var),src } } while(0);
-// Untested and disabled for now.
-#undef MMX
+  { register __int64 var; __asm { op [var],src };  *(__int64*)addr = var; } 
+// Probably not as efficient as GCC macros
+// Disabled now: Not thoroughly tested.
+// #define MMX 1
 #endif
 
 
@@ -191,6 +193,179 @@ IWTransform::enable_mmx()
 //////////////////////////////////////////////////////
 
 
+// Note:
+// MMX implementation for vertical transforms only.
+// Speedup is basically related to faster memory transfer
+// The IW44 transform is not CPU bound, it is memory bound.
+
+
+static short w9[]  = {9,9,9,9};
+static short w1[]  = {1,1,1,1};
+static int   d8[]  = {8,8};
+static int   d16[] = {16,16};
+
+
+static inline void
+mmx_fv_1 ( short* &q, short* e, int s, int s3 )
+{
+  while (q<e && (((long)q)&0x7))
+    {
+      int a = (int)q[-s] + (int)q[s];
+      int b = (int)q[-s3] + (int)q[s3];
+      *q -= (((a<<3)+a-b+8)>>4);
+      q++;
+    }
+  while (q+3<e)
+    {
+      MMXar( movq,       q-s,mm0);  // MM0=[ b3, b2, b1, b0 ]
+      MMXar( movq,       q+s,mm2);  // MM2=[ c3, c2, c1, c0 ]
+      MMXrr( movq,       mm0,mm1);  
+      MMXrr( punpcklwd,  mm2,mm0);  // MM0=[ c1, b1, c0, b0 ]
+      MMXrr( punpckhwd,  mm2,mm1);  // MM1=[ c3, b3, c2, b2 ]
+      MMXar( pmaddwd,    w9,mm0);   // MM0=[ (c1+b1)*9, (c0+b0)*9 ]
+      MMXar( pmaddwd,    w9,mm1);   // MM1=[ (c3+b3)*9, (c2+b2)*9 ]
+      MMXar( movq,       q-s3,mm2);
+      MMXar( movq,       q+s3,mm4);
+      MMXrr( movq,       mm2,mm3);
+      MMXrr( punpcklwd,  mm4,mm2);  // MM2=[ d1, a1, d0, a0 ]
+      MMXrr( punpckhwd,  mm4,mm3);  // MM3=[ d3, a3, d2, a2 ]
+      MMXar( pmaddwd,    w1,mm2);   // MM2=[ (a1+d1)*1, (a0+d0)*1 ]
+      MMXar( pmaddwd,    w1,mm3);   // MM3=[ (a3+d3)*1, (a2+d2)*1 ]
+      MMXar( paddd,      d8,mm0);
+      MMXar( paddd,      d8,mm1);
+      MMXrr( psubd,      mm2,mm0);  // MM0=[ (c1+b1)*9-a1-d1+8, ...
+      MMXrr( psubd,      mm3,mm1);  // MM1=[ (c3+b3)*9-a3-d3+8, ...
+      MMXir( psrad,      4,mm0);
+      MMXar( movq,       q,mm7);    // MM7=[ p3,p2,p1,p0 ]
+      MMXir( psrad,      4,mm1);
+      MMXrr( packssdw,   mm1,mm0);  // MM0=[ x3,x2,x1,x0 ]
+      MMXrr( psubw,      mm0,mm7);  // MM7=[ p3-x3, p2-x2, ... ]
+      MMXra( movq,       mm7,q);
+      q += 4;
+    }
+}
+
+static inline void
+mmx_fv_2 ( short* &q, short* e, int s, int s3 )
+{
+  while (q<e && (((long)q)&0x7))
+    {
+      int a = (int)q[-s] + (int)q[s];
+      int b = (int)q[-s3] + (int)q[s3];
+      *q += (((a<<3)+a-b+16)>>5);
+      q ++;
+    }
+  while (q+3<e)
+    {
+      MMXar( movq,       q-s,mm0);  // MM0=[ b3, b2, b1, b0 ]
+      MMXar( movq,       q+s,mm2);  // MM2=[ c3, c2, c1, c0 ]
+      MMXrr( movq,       mm0,mm1);  
+      MMXrr( punpcklwd,  mm2,mm0);  // MM0=[ c1, b1, c0, b0 ]
+      MMXrr( punpckhwd,  mm2,mm1);  // MM1=[ c3, b3, c2, b2 ]
+      MMXar( pmaddwd,    w9,mm0);   // MM0=[ (c1+b1)*9, (c0+b0)*9 ]
+      MMXar( pmaddwd,    w9,mm1);   // MM1=[ (c3+b3)*9, (c2+b2)*9 ]
+      MMXar( movq,       q-s3,mm2);
+      MMXar( movq,       q+s3,mm4);
+      MMXrr( movq,       mm2,mm3);
+      MMXrr( punpcklwd,  mm4,mm2);  // MM2=[ d1, a1, d0, a0 ]
+      MMXrr( punpckhwd,  mm4,mm3);  // MM3=[ d3, a3, d2, a2 ]
+      MMXar( pmaddwd,    w1,mm2);   // MM2=[ (a1+d1)*1, (a0+d0)*1 ]
+      MMXar( pmaddwd,    w1,mm3);   // MM3=[ (a3+d3)*1, (a2+d2)*1 ]
+      MMXar( paddd,      d16,mm0);
+      MMXar( paddd,      d16,mm1);
+      MMXrr( psubd,      mm2,mm0);  // MM0=[ (c1+b1)*9-a1-d1+8, ...
+      MMXrr( psubd,      mm3,mm1);  // MM1=[ (c3+b3)*9-a3-d3+8, ...
+      MMXir( psrad,      5,mm0);
+      MMXar( movq,       q,mm7);    // MM7=[ p3,p2,p1,p0 ]
+      MMXir( psrad,      5,mm1);
+      MMXrr( packssdw,   mm1,mm0);  // MM0=[ x3,x2,x1,x0 ]
+      MMXrr( paddw,      mm0,mm7);  // MM7=[ p3+x3, p2+x2, ... ]
+      MMXra( movq,       mm7,q);
+      q += 4;
+    }
+}
+
+
+inline void
+mmx_bv_1 ( short* &q, short* e, int s, int s3 )
+{
+  while (q<e && (((long)q)&0x7))
+    {
+      int a = (int)q[-s] + (int)q[s];
+      int b = (int)q[-s3] + (int)q[s3];
+      *q -= (((a<<3)+a-b+16)>>5);
+      q ++;
+  }
+  while (q+3 < e)
+    {
+      MMXar( movq,       q-s,mm0);  // MM0=[ b3, b2, b1, b0 ]
+      MMXar( movq,       q+s,mm2);  // MM2=[ c3, c2, c1, c0 ]
+      MMXrr( movq,       mm0,mm1);  
+      MMXrr( punpcklwd,  mm2,mm0);  // MM0=[ c1, b1, c0, b0 ]
+      MMXrr( punpckhwd,  mm2,mm1);  // MM1=[ c3, b3, c2, b2 ]
+      MMXar( pmaddwd,    w9,mm0);   // MM0=[ (c1+b1)*9, (c0+b0)*9 ]
+      MMXar( pmaddwd,    w9,mm1);   // MM1=[ (c3+b3)*9, (c2+b2)*9 ]
+      MMXar( movq,       q-s3,mm2);
+      MMXar( movq,       q+s3,mm4);
+      MMXrr( movq,       mm2,mm3);
+      MMXrr( punpcklwd,  mm4,mm2);  // MM2=[ d1, a1, d0, a0 ]
+      MMXrr( punpckhwd,  mm4,mm3);  // MM3=[ d3, a3, d2, a2 ]
+      MMXar( pmaddwd,    w1,mm2);   // MM2=[ (a1+d1)*1, (a0+d0)*1 ]
+      MMXar( pmaddwd,    w1,mm3);   // MM3=[ (a3+d3)*1, (a2+d2)*1 ]
+      MMXar( paddd,      d16,mm0);
+      MMXar( paddd,      d16,mm1);
+      MMXrr( psubd,      mm2,mm0);  // MM0=[ (c1+b1)*9-a1-d1+8, ...
+      MMXrr( psubd,      mm3,mm1);  // MM1=[ (c3+b3)*9-a3-d3+8, ...
+      MMXir( psrad,      5,mm0);
+      MMXar( movq,       q,mm7);    // MM7=[ p3,p2,p1,p0 ]
+      MMXir( psrad,      5,mm1);
+      MMXrr( packssdw,   mm1,mm0);  // MM0=[ x3,x2,x1,x0 ]
+      MMXrr( psubw,      mm0,mm7);  // MM7=[ p3-x3, p2-x2, ... ]
+      MMXra( movq,       mm7,q);
+      q += 4;
+    }
+}
+
+
+static inline void
+mmx_bv_2 ( short* &q, short* e, int s, int s3 )
+{
+  while (q<e && (((long)q)&0x7))
+    {
+      int a = (int)q[-s] + (int)q[s];
+      int b = (int)q[-s3] + (int)q[s3];
+      *q += (((a<<3)+a-b+8)>>4);
+      q ++;
+    }
+  while (q+3 < e)
+    {
+      MMXar( movq,       q-s,mm0);  // MM0=[ b3, b2, b1, b0 ]
+      MMXar( movq,       q+s,mm2);  // MM2=[ c3, c2, c1, c0 ]
+      MMXrr( movq,       mm0,mm1);  
+      MMXrr( punpcklwd,  mm2,mm0);  // MM0=[ c1, b1, c0, b0 ]
+      MMXrr( punpckhwd,  mm2,mm1);  // MM1=[ c3, b3, c2, b2 ]
+      MMXar( pmaddwd,    w9,mm0);   // MM0=[ (c1+b1)*9, (c0+b0)*9 ]
+      MMXar( pmaddwd,    w9,mm1);   // MM1=[ (c3+b3)*9, (c2+b2)*9 ]
+      MMXar( movq,       q-s3,mm2);
+      MMXar( movq,       q+s3,mm4);
+      MMXrr( movq,       mm2,mm3);
+      MMXrr( punpcklwd,  mm4,mm2);  // MM2=[ d1, a1, d0, a0 ]
+      MMXrr( punpckhwd,  mm4,mm3);  // MM3=[ d3, a3, d2, a2 ]
+      MMXar( pmaddwd,    w1,mm2);   // MM2=[ (a1+d1)*1, (a0+d0)*1 ]
+      MMXar( pmaddwd,    w1,mm3);   // MM3=[ (a3+d3)*1, (a2+d2)*1 ]
+      MMXar( paddd,      d8,mm0);
+      MMXar( paddd,      d8,mm1);
+      MMXrr( psubd,      mm2,mm0);  // MM0=[ (c1+b1)*9-a1-d1+8, ...
+      MMXrr( psubd,      mm3,mm1);  // MM1=[ (c3+b3)*9-a3-d3+8, ...
+      MMXir( psrad,      4,mm0);
+      MMXar( movq,       q,mm7);    // MM7=[ p3,p2,p1,p0 ]
+      MMXir( psrad,      4,mm1);
+      MMXrr( packssdw,   mm1,mm0);  // MM0=[ x3,x2,x1,x0 ]
+      MMXrr( paddw,      mm0,mm7);  // MM7=[ p3+x3, p2+x2, ... ]
+      MMXra( movq,       mm7,q);
+      q += 4;
+    }
+}
 
 
 //////////////////////////////////////////////////////
@@ -215,12 +390,12 @@ filter_begin(int w, int h)
 static void
 filter_end()
 {
-  if (zeroes)
-    delete [] zeroes;
-  zeroes = 0;
 #ifdef MMX
   MMXemms;
 #endif
+  if (zeroes)
+    delete [] zeroes;
+  zeroes = 0;
 }
 
 
@@ -242,6 +417,10 @@ filter_fv(short *p, int w, int h, int rowsize, int scale)
         if (y>=3 && y+3<h)
           {
             // Generic case
+#ifdef MMX
+            if (scale==1 && mmxflag>0)
+              mmx_fv_1(q, e, s, s3);
+#endif
             while (q<e)
               {
                 int a = (int)q[-s] + (int)q[s];
@@ -270,6 +449,10 @@ filter_fv(short *p, int w, int h, int rowsize, int scale)
         if (y>=6 && y<h)
           {
             // Generic case
+#ifdef MMX
+            if (scale==1 && mmxflag>0)
+              mmx_fv_2(q, e, s, s3);
+#endif
             while (q<e)
               {
                 int a = (int)q[-s] + (int)q[s];
@@ -343,6 +526,10 @@ filter_bv(short *p, int w, int h, int rowsize, int scale)
         if (y>=3 && y+3<h)
           {
             // Generic case
+#ifdef MMX
+            if (scale==1 && mmxflag>0)
+              mmx_bv_1(q, e, s, s3);
+#endif
             while (q<e)
               {
                 int a = (int)q[-s] + (int)q[s];
@@ -401,6 +588,10 @@ filter_bv(short *p, int w, int h, int rowsize, int scale)
         if (y>=6 && y<h)
           {
             // Generic case
+#ifdef MMX
+            if (scale==1 && mmxflag>0)
+              mmx_bv_2(q, e, s, s3);
+#endif
             while (q<e)
               {
                 int a = (int)q[-s] + (int)q[s];
