@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.cpp,v 1.71 2001-04-26 23:58:11 bcr Exp $
+// $Id: ByteStream.cpp,v 1.72 2001-04-30 22:31:19 praveen Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 04/1997
@@ -786,8 +786,8 @@ ByteStream::Stdio::seek(long offset, int whence, bool nothrow)
         G_THROW( ERR_MSG("ByteStream.seek_error") );             //  seek, seek error.
 #endif
     }
-  tell();
-  return 0;
+  
+  return tell();
 }
 
 
