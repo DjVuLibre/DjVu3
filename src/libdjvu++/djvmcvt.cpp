@@ -1,8 +1,8 @@
 /*****************************************************************************
  *
- *   $Revision: 1.3 $
- *   $Date: 1999-09-03 23:35:40 $
- *   @(#) $Id: djvmcvt.cpp,v 1.3 1999-09-03 23:35:40 leonb Exp $
+ *   $Revision: 1.4 $
+ *   $Date: 1999-09-28 19:58:08 $
+ *   @(#) $Id: djvmcvt.cpp,v 1.4 1999-09-28 19:58:08 leonb Exp $
  *
  *****************************************************************************/
 
@@ -77,9 +77,7 @@
     @author
     Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: djvmcvt.cpp,v 1.3 1999-09-03 23:35:40 leonb Exp $# */
-
-static char RCSVersion[]="@(#) $Id: djvmcvt.cpp,v 1.3 1999-09-03 23:35:40 leonb Exp $";
+    #$Id: djvmcvt.cpp,v 1.4 1999-09-28 19:58:08 leonb Exp $# */
 
 #ifdef __GNUC__
 #pragma implementation
