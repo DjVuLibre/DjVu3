@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" ?>
 <!DOCTYPE DjVuMessages PUBLIC "-//W3C/DTD DjVuMessages 1.0//EN" "../../../pubtext/DjVuMessages.dtd">
 <!-- Messages from libdjvu++ -->
-<!-- $Id: libdjvu++.xml,v 1.4 2001/07/12 23:33:16 bcr Exp $ -->
+<!-- $Id: libdjvu++.xml,v 1.5 2001/08/16 00:05:50 fcrary Exp $ -->
 <DjVuMessages>
 <BODY>
 <MESSAGE name="DjVuMessage.Unrecognized" number="10000">
@@ -700,9 +700,6 @@ mode.
 </MESSAGE>
 <MESSAGE name="DjVuToPS.big_page" number="13311">
 [1-%0!05u!] Page number %1!d! is too big.
-</MESSAGE>
-<MESSAGE name="DjVuToPS.cant_decode" number="13312">
-[1-%0!05u!] Failed to decode page %1!s!.
 </MESSAGE>
 <MESSAGE name="DjVuToPS.empty_image" number="13313">
 [1-%0!05u!] Attempt to print an empty image.

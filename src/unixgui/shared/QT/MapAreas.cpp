@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: MapAreas.cpp,v 1.5 2001-07-25 17:10:42 mchen Exp $
+// $Id: MapAreas.cpp,v 1.6 2001-08-17 17:02:02 docbill Exp $
 // $Name:  $
 
 
@@ -40,6 +40,7 @@
 #pragma implementation
 #endif
 
+#include "DjVu.h"
 #include "MapAreas.h"
 #include "MapDraw.h"
 #include "debug.h"
@@ -374,7 +375,7 @@ MapArea::initBorder(void)
 	 repaintBorder();
 	 break;
       default:
-	 throw ERROR_MESSAGE("MapArea::initBorder", "MapArea.unknown_border_type");
+	 throw ERROR_MESSAGE("MapArea::initBorder", ERR_MSG("MapArea.unknown_border_type"));
    }
 }
 

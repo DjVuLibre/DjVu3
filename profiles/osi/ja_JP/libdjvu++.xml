@@ -26,7 +26,7 @@
 [1-%0!05u!] 単語中にセパレータが見つかりました。
 </MESSAGE>
 <MESSAGE name="DjVuText.dupl_text" number="10105">
-[1-%0!05u!] 1つ以上のテキスト零夜が見つかりました。
+[1-%0!05u!] 1つ以上のテキストレイヤが見つかりました。
 </MESSAGE>
 <MESSAGE name="arrays.ill_arg" number="11500"
   value="[%0!05u!] DArray::del に不正な引数があります。" />
@@ -231,7 +231,7 @@
 <MESSAGE name="DjVuDocEditor.init" number="12305"
   value="[%0!05u!] DjVuDocEditor は既に初期化されています。" />
 <MESSAGE name="DjVuDocEditor.no_codec" number="12306"
-  value="[%0!05u!] 圧縮こーデックのロードに失敗しました。" />
+  value="[%0!05u!] 圧縮コーデックのロードに失敗しました。" />
 <MESSAGE name="DjVuDocEditor.no_file" number="12307"
   value="[%0!05u!] この文章の中に ID &apos;%1!s!&apos; のファイルがありません。" />
 <MESSAGE name="DjVuDocEditor.not_1_page" number="12308"
@@ -265,7 +265,7 @@
 <MESSAGE name="DjVuDocument.cant_render" number="12406"
   value="[%0!05u!] %1!d! ページが取得できません。" />
 <MESSAGE name="DjVuDocument.comp_codec" number="12407"
-  value="[%0!05u!] codec 圧縮がロードされません。" />
+  value="[%0!05u!] 圧縮コーデックがロードされていません。" />
 <MESSAGE name="DjVuDocument.empty_url" number="12408"
   value="[%0!05u!] 無効なURL が DjVuDocument に存在します。" />
 <MESSAGE name="DjVuDocument.exclude_page" number="12409"

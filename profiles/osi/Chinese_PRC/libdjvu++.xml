@@ -240,7 +240,6 @@
 <MESSAGE name="DjVuToPS.bad_scale" number="13309" value="[%0!s!] 打印时试图把图像调成点。" />
 <MESSAGE name="DjVuToPS.bad_zoom" number="13310" value="[%0!s!] 无效的缩放比例交给打印函数。" />
 <MESSAGE name="DjVuToPS.big_page" number="13311" value="[%0!s!] 页码%1!d!太大。" />
-<MESSAGE name="DjVuToPS.cant_decode" number="13312" value="[%0!s!] 解码第%1!d!页失败。" />
 <MESSAGE name="DjVuToPS.empty_image" number="13313" value="[%0!s!] 试图打印空图像。" />
 <MESSAGE name="DjVuToPS.empty_rect" number="13314" value="[%0!s!] 试图打印空长方形。" />
 <MESSAGE name="DjVuToPS.no_image" number="13315" value="[%0!s!] 无法得到第 %1!d!页的图像" />

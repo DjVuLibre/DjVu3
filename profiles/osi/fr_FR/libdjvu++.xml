@@ -699,9 +699,6 @@ compabilité avec les versions précédentes
 <MESSAGE name="DjVuToPS.big_page" number="13311">
 [1-%0!05u!] Le numéro de page %1!d! est trop élevé.
 </MESSAGE>
-<MESSAGE name="DjVuToPS.cant_decode" number="13312">
-[1-%0!05u!] Impossible de décoder la page %1!s!
-</MESSAGE>
 <MESSAGE name="DjVuToPS.empty_image" number="13313">
 [1-%0!05u!] Tentative d&apos;impression d&apos;une page vide
 </MESSAGE>

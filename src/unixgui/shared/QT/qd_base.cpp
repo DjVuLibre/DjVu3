@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qd_base.cpp,v 1.12 2001-08-15 22:18:30 docbill Exp $
+// $Id: qd_base.cpp,v 1.13 2001-08-17 17:02:02 docbill Exp $
 // $Name:  $
 
 
@@ -40,6 +40,7 @@
 #pragma implementation
 #endif
 
+#include "DjVu.h"
 #include "qd_base.h"
 #include "debug.h"
 #include "djvu_base_res.h"
@@ -1076,7 +1077,7 @@ QDBase::exportToPNM(void)
 	 if (bw)
 	 {
 	    GP<GBitmap> bmp=dimg->get_bitmap(grect, doc_grect);
-	    if (!bmp) throw ERROR_MESSAGE("QDBase::exportToPNM", "QDBase.bitmap_not_found");
+	    if (!bmp) throw ERROR_MESSAGE("QDBase::exportToPNM", ERR_MSG("QDBase.bitmap_not_found"));
 	    for(int n=bmp->rows()-1;n>=0;n--)
 	    {
 	       const unsigned char * row=(*bmp)[n];
@@ -1133,7 +1134,7 @@ QDBase::exportToPNM(void)
 		  pix=dimg->get_fg_pixmap(grect, doc_grect, prefs.dScreenGamma);
 		  break;
 	    }
-	    if (!pix) throw ERROR_MESSAGE("QDBase::exportToPNM", "QDBase.pixmap_not_found");
+	    if (!pix) throw ERROR_MESSAGE("QDBase::exportToPNM", ERR_MSG("QDBase.pixmap_not_found"));
 	    if (raw)
 	    {
 	       TArray<char> buffer(3*pix->columns());

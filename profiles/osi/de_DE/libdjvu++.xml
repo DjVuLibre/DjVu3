@@ -701,9 +701,6 @@ decodiert werden.
 <MESSAGE name="DjVuToPS.big_page" number="13311">
 [1-%0!05u!] Die Seitenzahl %1!d! ist zu hoch.
 </MESSAGE>
-<MESSAGE name="DjVuToPS.cant_decode" number="13312">
-[1-%0!05u!] Seite %1!s! konnte nicht decodiert werden.
-</MESSAGE>
 <MESSAGE name="DjVuToPS.empty_image" number="13313">
 [1-%0!05u!] Es wurde versucht, ein leeres Bild zu drucken.
 </MESSAGE>
