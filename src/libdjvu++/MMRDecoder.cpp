@@ -8,7 +8,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: MMRDecoder.cpp,v 1.8 1999-12-23 05:15:03 bcr Exp $
+//C- $Id: MMRDecoder.cpp,v 1.9 1999-12-27 22:08:19 parag Exp $
 
 
 #ifdef __GNUC__
@@ -454,14 +454,19 @@ MMRDecoder::MMRDecoder(ByteStream &bs, int width, int height)
   wtable = new VLTable(wcodes, 13);
 }
 
-MMRDecoder::MMRDecoder(ByteStream &bs, int width, int height, int rpstrip)
+MMRDecoder::MMRDecoder(ByteStream &bs, int width, int height, int strip)
   : width(width), height(height), lineno(0), striplineno(0), 
-	  rowsperstrip(rpstrip), nextstriploc(0)
+	  nextstriploc(0)
 {
 	int startPoint = bs.tell();
   refline = new unsigned char [width+5];
   memset(refline, 0, width);
-	nextstriploc = bs.read32() + startPoint + 4;
+	if ( strip ) {
+		rowsperstrip = bs.read16();
+		nextstriploc = bs.read32() + startPoint + 4;
+	}else{
+		rowsperstrip = 0xffff;
+	}
   src = new VLSource(bs);
   mrtable = new VLTable(mrcodes, 7);
   btable = new VLTable(bcodes, 13);
@@ -685,7 +690,7 @@ GP<JB2Image>
 MMRDecoder::decode(ByteStream &inp)
 {
   // Read header
-  int width, height, invert, strip, rowsperstrip;
+  int width, height, invert, strip;
   decode_header(inp, width, height, invert, strip);
   // Prepare image
   GP<JB2Image> jimg = new JB2Image();
@@ -694,12 +699,7 @@ MMRDecoder::decode(ByteStream &inp)
   int blocksize = MIN(500,MAX(64,MAX(width/17,height/22)));
   int blocksperline = (width+blocksize-1)/blocksize;
   // Prepare decoder
-	if ( strip ) {
-		rowsperstrip = inp.read16();
-	}else{
-		rowsperstrip = 0xffff;
-	}
-	MMRDecoder dcd(inp, width, height, rowsperstrip);
+	MMRDecoder dcd(inp, width, height, strip);
   // Loop on stripes
   int line = height-1;
   while (line >= 0)
