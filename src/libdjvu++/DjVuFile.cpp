@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.18 1999-08-19 23:03:52 eaf Exp $
+//C- $Id: DjVuFile.cpp,v 1.19 1999-08-20 22:51:50 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -84,7 +84,7 @@ DjVuFile::DjVuFile(ByteStream & str) : cache(0), status(0), simple_port(0)
       data_pool->add_data(buffer, length);
 
       // Construct some dummy URL
-   sprintf(buffer, "djvufile:/%p", this);
+   sprintf(buffer, "djvufile:/%p.djvu", this);
    url=buffer;
 
       // Create the DataRange
@@ -123,9 +123,10 @@ DjVuFile::~DjVuFile(void)
    DEBUG_MSG("DjVuFile::~DjVuFile(): destroying...\n");
    DEBUG_MAKE_INDENT(3);
 
-   GCriticalSectionLock lock(&trigger_lock);
-   
-   data_range->del_trigger(static_trigger_cb, this);
+   {
+      GCriticalSectionLock lock(&trigger_lock);
+      data_range->del_trigger(static_trigger_cb, this);
+   }
    
    stop_decode(1);
 
@@ -232,7 +233,8 @@ DjVuFile::wait_for_chunk(void)
 bool
 DjVuFile::wait_for_finish(bool self)
       // if self==TRUE, will block until decoding of this file is over
-      // if self==FALSE, will block until decoding of a child is over
+      // if self==FALSE, will block until decoding of a child (direct
+      // or indirect) is over.
       // Will return FALSE if there is nothing to wait for. TRUE otherwise
 {
 #ifdef DEBUG_MSG
@@ -248,13 +250,12 @@ DjVuFile::wait_for_finish(bool self)
       //
       // Locking is required by GMonitor interface too, btw.
    GMonitorLock lock(&finish_mon);
-   if (self && is_decoding())
+   if (self)
    {
-      finish_mon.wait();
+      while(is_decoding()) finish_mon.wait();
       DEBUG_MSG("got it\n");
       return 1;
-   };
-   if (!self)
+   } else
    {
       GP<DjVuFile> file;
       {
@@ -274,7 +275,7 @@ DjVuFile::wait_for_finish(bool self)
 	 DEBUG_MSG("got it\n");
 	 return 1;
       }
-   };
+   }
    DEBUG_MSG("nothing to wait for\n");
    return 0;
 }
@@ -290,15 +291,6 @@ DjVuFile::notify_chunk_done(const DjVuPort *, const char *)
 void
 DjVuFile::notify_file_done(const DjVuPort * src)
 {
-   if (src!=this)
-   {
-      GCriticalSectionLock inc_lock(&inc_files_lock);
-      GPosition pos;
-      for(pos=inc_files_list;pos;++pos)
-	 if (inc_files_list[pos]==src) break;
-      if (!pos) return;
-   }
-   
       // Signal threads waiting for file termination
    finish_mon.enter();
    finish_mon.broadcast();
