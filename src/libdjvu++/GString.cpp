@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.47 2001-04-12 15:28:34 bcr Exp $
+// $Id: GString.cpp,v 1.48 2001-04-12 15:29:08 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -242,13 +242,11 @@ GString::operator= ( const GP<GStringRep> &rep)
   return (*this);
 }
 
-#if 0
 GString& 
 GString::operator= (const char *str)
 {
   return ((*this)=GStringRep::create(str));
 }
-#endif
 
 void
 GString::empty( void )
