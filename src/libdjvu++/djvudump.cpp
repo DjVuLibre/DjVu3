@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: djvudump.cpp,v 1.6 1999-10-21 15:02:17 leonb Exp $
+//C- $Id: djvudump.cpp,v 1.7 1999-11-05 18:59:43 eaf Exp $
 
 
 
@@ -57,7 +57,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: djvudump.cpp,v 1.6 1999-10-21 15:02:17 leonb Exp $# */
+    #$Id: djvudump.cpp,v 1.7 1999-11-05 18:59:43 eaf Exp $# */
 //@{
 //@}
 
@@ -170,6 +170,16 @@ display_djvm_dirm(IFFByteStream & iff, GString head, size_t, DjVmInfo& djvminfo)
 }
 
 void
+display_th44(IFFByteStream & iff, GString, size_t, DjVmInfo & djvminfo)
+{
+  static int th_page_num=0;
+  if (djvminfo.dir && th_page_num>=djvminfo.dir->get_pages_num())
+     printf("Thumbnails for page ???");
+  else printf("Thumbnails for page %d", th_page_num+1);
+  th_page_num++;
+}
+
+void
 display_incl(IFFByteStream & iff, GString, size_t, DjVmInfo& )
 {
    GString name;
@@ -205,6 +215,7 @@ disproutines[] =
   { "BM44.BM44", display_iw4 },
   { "PM44.PM44", display_iw4 },
   { "DJVM.DIRM", display_djvm_dirm },
+  { "THUM.TH44", display_th44 },
   { "INCL", display_incl },
   { "ANTa", display_anta },
   { 0, 0 },
