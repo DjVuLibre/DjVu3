@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GContainer.cpp,v 1.13 1999-09-15 22:28:04 leonb Exp $
+//C- $Id: GContainer.cpp,v 1.14 1999-09-28 21:18:18 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -434,6 +434,7 @@ GListBase::insert_before(GPosition pos, GListBase &fromlist, GPosition &frompos)
   // Update frompos
   Node *n = frompos.ptr;
   frompos.ptr = n->next;
+  if (pos.ptr == n) return;
   // Unlink
   if (n->next)
     n->next->prev = n->prev;
