@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuMultiAPI.h,v 1.17 2000-02-26 18:53:20 bcr Exp $
+ *C- $Id: DjVuMultiAPI.h,v 1.18 2000-03-03 00:48:35 bcr Exp $
  */
 
 
@@ -15,24 +15,29 @@
 #define __DJVUMULTIAPI_H__
 
 /** @name DjVuMultiAPI.h
-    File #"DjVuMultiAPI.h"# contains the main API for assembling multipage
-    DjVu documents.  This API allows you to assemble already compressed pages
-    and to create multipage DjVu documents.  It does not describe how to
-    compress single pages.    
+
+    File #"DjVuMultiAPI.h"# contains the API for assembling multi page
+    DjVu documents, from single page, and other multi page documents.
+    This API does not contain any functions for encoding, rendering, or
+    decoding.
     @author
-    Dr Bill C Riemers <bcr@att.com>
+    Bill C Riemers <bcr@att.com>
 */
+
+/* 
+ * $Log: DjVuMultiAPI.h,v $
+ * Revision 1.18  2000-03-03 00:48:35  bcr
+ * Be less restrictive with GString's.
+ *
+ * Revision 1.17  2000/02/26 18:53:20  bcr
+ * Changes to the DOC++ comments.
+ *
+ */
+
 
 #ifdef DOCXX_CODE
 //@{
 #endif
-
-/* 
- * $Log: DjVuMultiAPI.h,v $
- * Revision 1.17  2000-02-26 18:53:20  bcr
- * Changes to the DOC++ comments.
- *
- */
 
 /*
  *  ------------------------------------------------------------------------
@@ -70,12 +75,15 @@ extern "C" {
 #endif
 
 
-/** Option structure for the MultiPage API.
-    This structure defines the options shared by both the \Ref{djvu_combine}.
+/** @name djvu_combine_options structure
+
+    @memo Option structure for the MultiPage API.
+
+    This structure defines the options used by both \Ref{djvu_joinby both the \Ref{djvu_combine}.
     Each field somehow corresponds to one of the command line options of the
     corresponding utility program(s).
  */
-typedef struct djvu_combine_options_struct
+struct djvu_combine_options_struct
 {
   /** Size of the option structure.
       This field should be set to the value #sizeof(djvu_combine_options)# */
@@ -134,10 +142,13 @@ typedef struct djvu_combine_options_struct
       Function \Ref{djvu_combine_options_alloc} properly initializes this field.  
       Do not modify it. */
   void *priv;
-} djvu_combine_options;
+};
+typedef struct djvu_combine_options_struct djvu_combine_options;
 
-
-/** Allocates an instance of #djvu_combine_options#.
+/** @name DjVuMultiAPI C function calls
+ */
+/*@{*/
+/** Allocates an instance of #djvu_combine_options Structure#.
     This function allocates a \Ref{djvu_combine_options} data structure
     and initializes its fields according to the command line arguments
     passed via arguments #argc# and #argv#.  Argument #reserved# should
@@ -199,6 +210,8 @@ DJVUAPI int djvu_join(djvu_combine_options*);
     program name #djvubundle# are replaced by the user supplied
     program name #prog#. */
 DJVUAPI void djvu_join_usage(int fd,const char *prog);
+
+/*@}*/
 
 #ifdef DOCXX_CODE
 //@}

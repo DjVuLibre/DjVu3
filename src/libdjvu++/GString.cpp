@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GString.cpp,v 1.14 2000-03-02 20:59:23 parag Exp $
+//C- $Id: GString.cpp,v 1.15 2000-03-03 00:48:35 bcr Exp $
 
 
 #ifdef __GNUC__
@@ -25,7 +25,7 @@
 
 #include "GString.h"
 
-// File "$Id: GString.cpp,v 1.14 2000-03-02 20:59:23 parag Exp $"
+// File "$Id: GString.cpp,v 1.15 2000-03-03 00:48:35 bcr Exp $"
 // - Author: Leon Bottou, 04/1997
 
 GStringRep *
@@ -197,7 +197,7 @@ GString::setat(int n, char ch)
 void
 GString::format(const char *fmt, ... )
 {
-  int buflen=4096;
+  int buflen=32768;
   char *buffer=new char [buflen];
   // Format string
   va_list args;
@@ -207,15 +207,19 @@ GString::format(const char *fmt, ... )
   while(USE_VSNPRINTF(buffer, buflen, fmt, args)<0)
   {
     delete [] buffer;
-    buffer=new char [buflen+=4096];
-		buffer[buflen-1]=0;
+    buffer=new char [buflen+=32768];
   }
+  va_end(args);
 #else
   vsprintf(buffer, fmt, args);
-#endif
   va_end(args);
   if (buffer[buflen-1])
-    abort();
+  {
+    // This isn't as fatal since it is on the stack, but we
+    // definitely should stop the current operation.
+    THROW("Memory Overwrite.  Program in unstable state.");
+  }
+#endif
   // Go altering the string
   (*this) = (const char *)buffer;
   delete [] buffer;
