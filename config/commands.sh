@@ -107,15 +107,7 @@ then
       fi
     fi
   done
-  if [ "x`$echo -n`" = "x-n" ]
-  then
-    ECHO_TYPE=SUFFIX
-  else
-    ECHO_TYPE=PREFIX
-  fi
-  ETAIL="@%%@z"
-  ECHO="$echo"
-  CONFIG_VARS="$CONFIG_VARS ECHO_TYPE ECHO"
+
 fi
 
  

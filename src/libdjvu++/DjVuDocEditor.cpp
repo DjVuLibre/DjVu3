@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: DjVuDocEditor.cpp,v 1.37 2000-06-06 18:04:13 bcr Exp $
+//C- $Id: DjVuDocEditor.cpp,v 1.38 2000-06-06 18:59:38 bcr Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -293,19 +293,12 @@ DjVuDocEditor::find_unique_id(const char * id_in)
 }
 
 GP<DataPool>
-DjVuDocEditor::strip_incl_chunks(GP<DataPool> & pool_in, const char *fname)
+DjVuDocEditor::strip_incl_chunks(const GP<DataPool> & pool_in)
 {
    DEBUG_MSG("DjVuDocEditor::strip_incl_chunks() called\n");
    DEBUG_MAKE_INDENT(3);
 
-   GP<ByteStream> str_in;
-   if(fname && DjVuDocument::djvu_import_codec)
-   {
-     str_in=(*DjVuDocument::djvu_import_codec)(fname,pool_in,needs_compression_flag);
-   }else
-   {
-     str_in=pool_in->get_stream();
-   }
+   GP<ByteStream> str_in=pool_in->get_stream();
    IFFByteStream iff_in(*str_in);
 
    MemoryByteStream str_out;
@@ -349,13 +342,14 @@ DjVuDocEditor::insert_file(const char * file_name, const char * parent_id,
    DEBUG_MSG("DjVuDocEditor::insert_file(): fname='" << file_name <<
 	     "', parent_id='" << parent_id << "'\n");
    DEBUG_MAKE_INDENT(3);
+
    GP<DjVmDir> dir=get_djvm_dir();
 
       // Create DataPool and see if the file exists
    GP<DataPool> file_pool=new DataPool(file_name);
 
       // Strip any INCL chunks
-   file_pool=strip_incl_chunks(file_pool,(const char *)file_name);
+   file_pool=strip_incl_chunks(file_pool);
 
       // Check if parent ID is valid
    GP<DjVmDir::File> parent_frec=dir->id_to_file(parent_id);
@@ -428,14 +422,7 @@ DjVuDocEditor::insert_file(const char * file_name, bool is_page,
 
 	 // Oh. It does exist... Check that it has IFF structure
       {
-	 GP<ByteStream> str;
-         if(DjVuDocument::djvu_import_codec)
-         {
-           str=(*DjVuDocument::djvu_import_codec)((const char *)file_name,file_pool,needs_compression_flag);
-         }else
-         {
-           str=file_pool->get_stream();
-         }
+	 GP<ByteStream> str=file_pool->get_stream();
 	 IFFByteStream iff(*str);
 	 GString chkid;
 	 int length;
@@ -606,19 +593,10 @@ DjVuDocEditor::insert_group(const GList<GString> & file_names, int page_num,
 	 GString fname=file_names[pos];
 	 TRY {
 	       // Check if it's a multipage document...
-            GP<DataPool> xdata_pool=new DataPool(fname);
-            GP<ByteStream> str;
-	    if(DjVuDocument::djvu_import_codec)
-            {
-	      str=(*DjVuDocument::djvu_import_codec)((const char *)fname,xdata_pool,needs_compression_flag);
-            }else
-            {
-	      str=xdata_pool->get_stream();
-            }
-	    IFFByteStream iff(*str);
+	    StdioByteStream str(fname, "rb");
+	    IFFByteStream iff(str);
 	    GString chkid;
 	    iff.get_chunk(chkid);
-            str=0;
 	    if (chkid=="FORM:DJVM")
 	    {
 		  // Hey, it really IS a multipage document.

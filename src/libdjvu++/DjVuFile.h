@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.h,v 1.59 2000-06-06 18:04:14 bcr Exp $
+//C- $Id: DjVuFile.h,v 1.60 2000-06-06 18:59:39 bcr Exp $
  
 #ifndef _DJVUFILE_H
 #define _DJVUFILE_H
@@ -46,7 +46,7 @@
 
     @memo Classes representing DjVu files.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuFile.h,v 1.59 2000-06-06 18:04:14 bcr Exp $#
+    @version #$Id: DjVuFile.h,v 1.60 2000-06-06 18:59:39 bcr Exp $#
 */
 
 //@{
@@ -148,7 +148,7 @@ public:
    enum { DECODING=1, DECODE_OK=2, DECODE_FAILED=4, DECODE_STOPPED=8,
 	  DATA_PRESENT=16, ALL_DATA_PRESENT=32, INCL_FILES_CREATED=64,
           MODIFIED=128, DONT_START_DECODE=256, STOPPED=512,
-	  BLOCKED_STOPPED=1024, NEEDS_COMPRESSION=2048 };
+	  BLOCKED_STOPPED=1024 };
    enum { STARTED=1, FINISHED=2 };
 
       /** @name Decoded file contents */
@@ -285,9 +285,7 @@ public:
 	  the correct information. */
    bool		are_incl_files_created(void) const;
    bool		is_modified(void) const;
-   bool		needs_compression(void) const;
    void		set_modified(bool m);
-   void		set_needs_compression(bool m);
       //@}
 
       /// Returns the URL assigned to this file
@@ -475,8 +473,6 @@ public:
    virtual void		set_recover_errors(ErrorRecoveryAction=ABORT);
    virtual void		set_verbose_eof(bool=true);
    virtual void		report_error(const GException &ex,const bool=true);
-   static void set_decode_codec(GP<GPixmap> (*codec)(ByteStream &bs));
-
 protected:
    GURL			url;
    GP<DataPool>		data_pool;
@@ -604,19 +600,6 @@ DjVuFile::set_modified(bool m)
 {
    if (m) flags=flags | MODIFIED;
    else flags=flags & ~MODIFIED;
-}
-
-inline bool
-DjVuFile::needs_compression(void) const
-{
-   return (flags & NEEDS_COMPRESSION)!=0;
-}
-
-inline void
-DjVuFile::set_needs_compression(bool m)
-{
-   if (m) flags=flags | NEEDS_COMPRESSION;
-   else flags=flags & ~NEEDS_COMPRESSION;
 }
 
 inline void

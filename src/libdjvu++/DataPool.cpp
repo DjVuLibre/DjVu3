@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: DataPool.cpp,v 1.47 2000-06-06 18:04:13 bcr Exp $
+//C- $Id: DataPool.cpp,v 1.48 2000-06-06 18:59:38 bcr Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -1238,7 +1238,6 @@ public:
    virtual size_t read(void *buffer, size_t size);
    virtual size_t write(const void *buffer, size_t size);
    virtual long tell();
-   virtual int seek(long offset, int whence = SEEK_SET, bool nothrow=false);
 private:
       // Don't make data_pool GP<>. The problem is that DataPool creates
       // and soon destroys this ByteStream from the constructor. Since
@@ -1302,46 +1301,6 @@ long
 PoolByteStream::tell(void)
 {
    return position;
-}
-
-int
-PoolByteStream::seek(long offset, int whence, bool nothrow)
-{
-  int retval=(-1);
-  switch(whence)
-  {
-    case SEEK_CUR:
-      offset+=position;
-      // fallthrough;
-    case SEEK_SET:
-      if(offset<position)
-      {
-        if(offset+buffer_pos>=position)
-        {
-          buffer_pos-=position-offset;
-        }else
-        {
-          buffer_size=0;
-        }
-        position=offset;
-      }else if(offset>position)
-      {
-        buffer_pos+=(offset-position)-1;
-        position=offset-1;
-        unsigned char c;
-        if(read(&c,1)<1)
-        {
-          THROW("EOF");
-        }
-      }
-      retval=0;
-      break;
-    case SEEK_END:
-      if(! nothrow)
-        THROW("Seeking backwards from EOF is not supported by this ByteStream");
-      break;
-   }
-   return retval;
 }
 
 inline GP<ByteStream>
