@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuPalette.h,v 1.1 1999-11-10 21:25:58 leonb Exp $
+//C- $Id: DjVuPalette.h,v 1.2 1999-11-10 22:21:34 leonb Exp $
 
 
 
@@ -35,7 +35,7 @@
     @memo 
     DjVuPalette header file
     @version 
-    #$Id: DjVuPalette.h,v 1.1 1999-11-10 21:25:58 leonb Exp $#
+    #$Id: DjVuPalette.h,v 1.2 1999-11-10 22:21:34 leonb Exp $#
     @author: 
     L\'eon Bottou <leonb@research.att.com>
 */
@@ -53,7 +53,7 @@ public:
   void histogram_clear();
   void histogram_add(const GPixel &p, int weight);
   void histogram_add(const unsigned char *bgr, int weight);
-  int compute_palette(int ncolors);
+  int compute_palette(int ncolors, int minboxsize=0);
   // CONVERSION
   int size() const;
   int color_to_index(const GPixel &p);
@@ -65,10 +65,11 @@ public:
   void decode(ByteStream &bs);
   // MASS CONVERSION
   void quantize(GPixmap &pm);
-  int compute_palette_and_quantize(GPixmap &pm, int ncolors);
+  int compute_palette_and_quantize(GPixmap &pm, int ncolors, int minboxsize=0);
 public:
   // COLOR ARRAY
   GTArray<short> colordata;
+  void get_color(int nth, GPixel &out) const;
 private:
   // Histogram
   struct PHist { int p[3]; int w; };
@@ -160,6 +161,11 @@ DjVuPalette::index_to_color(int index, GPixel &p) const
 }
 
 
+void
+DjVuPalette::get_color(int nth, GPixel &p) const
+{
+  index_to_color(colordata[nth], p);
+}
 
 
 

@@ -9,11 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuPalette.cpp,v 1.1 1999-11-10 21:25:58 leonb Exp $
-
-// File "$Id: DjVuPalette.cpp,v 1.1 1999-11-10 21:25:58 leonb Exp $"
-// -- Implements class PIXMAP
-// Author: Leon Bottou 07/1997
+//C- $Id: DjVuPalette.cpp,v 1.2 1999-11-10 22:21:34 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -36,6 +32,8 @@
 #define GMUL 9
 #define BMUL 2
 #define SMUL (RMUL+GMUL+BMUL)
+
+#define MAXPALETTESIZE 1024
 
 
 inline unsigned char 
@@ -109,6 +107,7 @@ struct PBox
 {
   PData *data;
   int colors;
+  int boxsize;
   int sum;
 };
 
@@ -133,15 +132,24 @@ DjVuPalette::rcomp (const void *a, const void *b)
 int
 DjVuPalette::lcomp (const void *a, const void *b)
 {
-  return ((PColor*)a)->p[3] - ((PColor*)b)->p[3];
+  unsigned char *aa = ((PColor*)a)->p;
+  unsigned char *bb = ((PColor*)b)->p;
+  if (aa[3] != bb[3])
+    return aa[3]-bb[3];
+  else if (aa[2] != bb[2])
+    return aa[2]-bb[2];
+  else if (aa[1] != bb[1])
+    return aa[1]=bb[1];
+  else
+    return aa[0]-bb[0];
 }
 
 int
-DjVuPalette::compute_palette(int maxcolors)
+DjVuPalette::compute_palette(int maxcolors, int minboxsize)
 {
   if (!hcube)
     THROW("Color histogram not found");
-  if (maxcolors<1 || maxcolors>1024)
+  if (maxcolors<1 || maxcolors>MAXPALETTESIZE)
     THROW("Unrealistic number of colors");
   
   // Paul Heckbert: "Color Image Quantization for Frame Buffer Display", 
@@ -168,6 +176,7 @@ DjVuPalette::compute_palette(int maxcolors)
   PBox newbox;
   newbox.data = pdata;
   newbox.colors = ncolors;
+  newbox.boxsize = 256;
   newbox.sum = sum;
   boxes.append(newbox);
   // Repeat spliting boxes
@@ -176,7 +185,7 @@ DjVuPalette::compute_palette(int maxcolors)
       // Find suitable box
       GPosition p;
       for (p=boxes; p; ++p)
-        if (boxes[p].colors >= 2)
+        if (boxes[p].colors>=2 && boxes[p].boxsize>minboxsize) 
           break;
       if (! p)
         break;
@@ -197,12 +206,15 @@ DjVuPalette::compute_palette(int maxcolors)
           pmin[2] = umin(pmin[2], splitbox.data[j].p[2]);
         }
       // Determine split direction and sort
-      int blum = (pmax[0]-pmin[0]) * BMUL;
-      int glum = (pmax[1]-pmin[1]) * GMUL;
-      int rlum = (pmax[2]-pmin[2]) * RMUL;
-      if (glum>=rlum && glum>=blum)
+      int bl = pmax[0]-pmin[0]; 
+      int gl = pmax[1]-pmin[1];
+      int rl = pmax[2]-pmin[2];
+      splitbox.boxsize = (bl>gl ? (rl>bl ? rl : bl) : (rl>gl ? rl : gl));
+      if (splitbox.boxsize <= minboxsize)
+        continue;
+      if (gl == splitbox.boxsize)
         qsort(splitbox.data, splitbox.colors, sizeof(PData), gcomp);
-      else if (rlum>blum)
+      else if (rl == splitbox.boxsize)
         qsort(splitbox.data, splitbox.colors, sizeof(PData), rcomp);
       else
         qsort(splitbox.data, splitbox.colors, sizeof(PData), bcomp);
@@ -254,7 +266,10 @@ DjVuPalette::compute_palette(int maxcolors)
     }
   // Sort palette colors in luminance order
   qsort((PColor*)palette, ncolors, sizeof(PColor), lcomp);
-  if (pcube) allocate_pcube();
+  // Clear invalid data
+  colordata.empty();
+  if (pcube) 
+    allocate_pcube();
   return ncolors;
 }
 
@@ -304,7 +319,7 @@ DjVuPalette::quantize(GPixmap &pm)
 }
 
 int 
-DjVuPalette::compute_palette_and_quantize(GPixmap &pm, int maxcolors)
+DjVuPalette::compute_palette_and_quantize(GPixmap &pm, int maxcolors, int minboxsize)
 {
   // Prepare histogram
   histogram_clear();
@@ -315,7 +330,7 @@ DjVuPalette::compute_palette_and_quantize(GPixmap &pm, int maxcolors)
         histogram_add(p[i], 1);
     }
   // Execute
-  int ncolors = compute_palette(maxcolors);
+  int ncolors = compute_palette(maxcolors, minboxsize);
   quantize(pm);
   return ncolors;
 }
@@ -329,31 +344,88 @@ DjVuPalette::compute_palette_and_quantize(GPixmap &pm, int maxcolors)
 void 
 DjVuPalette::encode(ByteStream &bs) const
 {
+  // Code version number
+  const int version = 0;
+  bs.write8(version);
+  // Code palette
+  int palettesize = palette.size();
+  bs.write16(palette.size());
+  for (int c=0; c<palettesize; c++)
+    {
+      unsigned char p[3];
+      p[0] = palette[c].p[0];
+      p[1] = palette[c].p[1];
+      p[2] = palette[c].p[2];
+      bs.writall((const void*)p, 3);
+    }
+  // Code colordata
+  int datasize = colordata.size();
+  bs.write24(datasize);
+  BSByteStream bsb(bs,20);
+  for (int d=0; d<datasize; d++)
+    bsb.write16(colordata[d]);
 }
 
 void 
 DjVuPalette::decode(ByteStream &bs)
 {
+  // Make sure that everything is clear
+  if (hcube) 
+    delete [] hcube;
+  if (pcube)
+    delete [] pcube;
+  hcube = 0;
+  pcube = 0;
+  // Get version
+  int version = bs.read8();
+  if (version != 0)
+    THROW("Unrecognized version in color data chunk");
+  // Get palette
+  int palettesize = bs.read16();
+  if (palettesize<0 || palettesize>MAXPALETTESIZE)
+    THROW("Corrupted foreground color palette");
+  palette.resize(0,palettesize-1);
+  for (int c=0; c<palettesize; c++)
+    {
+      unsigned char p[3];
+      bs.readall((void*)p, 3);
+      palette[c].p[0] = p[0];
+      palette[c].p[1] = p[1];
+      palette[c].p[2] = p[2];
+      palette[c].p[3] = (p[0]*BMUL+p[1]*GMUL+p[2]*RMUL)/SMUL;
+    }
+  // Get data
+  int datasize = bs.read24();
+  if (datasize<0)
+    THROW("Corrupted foreground color data");
+  colordata.resize(0,datasize-1);
+  BSByteStream bsb(bs);
+  for (int d=0; d<datasize; d++)
+    {
+      short s = bsb.read16();
+      if (s<0 || s>=palettesize)
+        THROW("Corrupted foreground color data");        
+      colordata[d] = s;
+    }
 }
 
 
 // -------- TEST
 
 
-
 #ifdef TEST
-
 int main(int argc, char **argv)
 {
   TRY
     {
-      if (argc!=3)
-        THROW("Usage: quant <ncol> <ppmfile>");
+      if (argc!=4)
+        THROW("Usage: quant <ncol> <minbox> <ppmfile>");
       int maxcolors = atoi(argv[1]);
-      StdioByteStream ibs(argv[2],"rb");
+      int minboxsize = atoi(argv[2]);
+      StdioByteStream ibs(argv[3],"rb");
       GPixmap pm(ibs);
       DjVuPalette pal;
-      int ncolors = pal.compute_palette_and_quantize(pm, maxcolors);
+      int ncolors = pal.compute_palette_and_quantize(pm, maxcolors, minboxsize);
       fprintf(stderr,"%d colors allocated\n", ncolors);
       StdioByteStream obs(stdout,"wb");
       pm.save_ppm(obs);
@@ -366,8 +438,4 @@ int main(int argc, char **argv)
   ENDCATCH;
   return 0;
 }
-
-
-
-
 #endif
