@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: IFFByteStream.h,v 1.28 2001-02-16 00:56:30 praveen Exp $
+// $Id: IFFByteStream.h,v 1.29 2001-02-23 01:12:23 praveen Exp $
 // $Name:  $
 
 #ifndef _IFFBYTESTREAM_H_
@@ -89,7 +89,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: IFFByteStream.h,v 1.28 2001-02-16 00:56:30 praveen Exp $# */
+    #$Id: IFFByteStream.h,v 1.29 2001-02-23 01:12:23 praveen Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -151,7 +151,7 @@ public:
   /** Constructs an IFFByteStream object attached to ByteStream #bs#.
       Any ByteStream can be used when reading an IFF file.  Writing
       an IFF file however requires a seekable ByteStream. */
-  static GP<IFFByteStream> IFFByteStream::create(GP<ByteStream> bs);
+  static GP<IFFByteStream> create(GP<ByteStream> bs);
   // --- BYTESTREAM INTERFACE
   ~IFFByteStream();
   virtual size_t read(void *buffer, size_t size);
@@ -240,7 +240,7 @@ private:
   // Cancel C++ default stuff
   IFFByteStream(const IFFByteStream &);
   IFFByteStream & operator=(const IFFByteStream &);
-  static GP<IFFByteStream> IFFByteStream::create(ByteStream *bs);
+  static GP<IFFByteStream> create(ByteStream *bs);
 };
 
 //@}
