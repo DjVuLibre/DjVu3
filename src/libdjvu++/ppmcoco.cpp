@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: ppmcoco.cpp,v 1.11 1999-03-17 19:25:00 leonb Exp $
+//C- $Id: ppmcoco.cpp,v 1.12 1999-09-20 23:12:59 leonb Exp $
 
 
 
@@ -84,7 +84,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: ppmcoco.cpp,v 1.11 1999-03-17 19:25:00 leonb Exp $# */
+    #$Id: ppmcoco.cpp,v 1.12 1999-09-20 23:12:59 leonb Exp $# */
 //@{
 //@}
 
@@ -97,7 +97,6 @@
 #include "ByteStream.h"
 #include "GPixmap.h"
 #include "GString.h"
-#include "ATTLicense.h"
 
 double fromGamma = 2.2;
 double toGamma = 2.2;
@@ -106,9 +105,9 @@ int
 usage(void)
 {
   fprintf(stderr,
-          "PPMCOCO -- Color correction program\n%s\n"
-          "usage: ppmcoco [-from gamma] [-to gamma] [<ppmin>] [<ppmout>]\n",
-          ATTLicense::get_usage_text());
+          "PPMCOCO -- Color correction program\n"
+          "  Copyright (c) AT&T 1999.  All rights reserved\n"
+          "usage: ppmcoco [-from gamma] [-to gamma] [<ppmin>] [<ppmout>]\n" );
   exit(1);
 }
 
@@ -133,7 +132,6 @@ main (int argc, char **argv)
   TRY
     {
       // parse
-      ATTLicense::process_cmdline(argc,argv);
       if (argc==1)
         usage();
       int flag = 0;

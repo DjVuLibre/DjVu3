@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: djvuextract.cpp,v 1.15 1999-09-03 23:35:40 leonb Exp $
+//C- $Id: djvuextract.cpp,v 1.16 1999-09-20 23:12:59 leonb Exp $
 
 /** @name djvuextract
 
@@ -54,7 +54,7 @@
     @memo
     Extract components from DjVu files.
     @version
-    #$Id: djvuextract.cpp,v 1.15 1999-09-03 23:35:40 leonb Exp $#
+    #$Id: djvuextract.cpp,v 1.16 1999-09-20 23:12:59 leonb Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> - Initial implementation\\
     Andrei Erofeev <eaf@geocities.com> - Multipage support */
@@ -64,7 +64,6 @@
 #include "GException.h"
 #include "ByteStream.h"
 #include "IFFByteStream.h"
-#include "ATTLicense.h"
 #include "DjVuDocument.h"
 #include "GOS.h"
 
@@ -183,11 +182,10 @@ usage()
 {
   fprintf(stderr, 
           "DJVUEXTRACT -- Extracts components of a DJVU file\n"
-          "%s\n"
+          "  Copyright (c) AT&T 1999.  All rights reserved\n"
           "Usage:\n"
 	  "   djvuextract <djvufile> [-page=<page_num>] [Sjbz=file] \\\n"
-	  "               [BG44=file] [FG44=file]\n",
-          ATTLicense::get_usage_text());
+	  "               [BG44=file] [FG44=file]\n");
   exit(1);
 }
 
@@ -198,7 +196,6 @@ main(int argc, char **argv)
   TRY
     {
       int i;
-      ATTLicense::process_cmdline(argc,argv);
       int page_num=0;
       for(i=1;i<argc;i++)
 	 if (!strncmp(argv[i], "-page=", 6))

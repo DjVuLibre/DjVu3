@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: c44.cpp,v 1.15 1999-03-17 19:24:59 leonb Exp $
+//C- $Id: c44.cpp,v 1.16 1999-09-20 23:12:59 leonb Exp $
 
 
 /** @name c44
@@ -151,7 +151,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: c44.cpp,v 1.15 1999-03-17 19:24:59 leonb Exp $# */
+    #$Id: c44.cpp,v 1.16 1999-09-20 23:12:59 leonb Exp $# */
 //@{
 //@}
 
@@ -161,7 +161,6 @@
 #include "GException.h"
 #include "IWImage.h"
 #include "GOS.h"
-#include "ATTLicense.h"
 
 // command line data
 
@@ -197,7 +196,7 @@ void
 usage()
 {
   printf("C44 -- Image compression utility using Interpolating Wavelets (4,4)\n"
-         "%s\n"
+         "  Copyright (c) AT&T 1999.  All rights reserved\n"
          "Usage: c44 [options] pnmfile [djvufile]\n\n"
          "Options:\n"
          "    -bpp n,..,n      -- select a increasing sequence of bitrates\n"
@@ -231,7 +230,7 @@ usage()
          "    -crcbnone     -- do not encode chrominance at all\n"
          "    -crcbdelay n  -- select chrominance coding delay (default 10)\n"
          "                     for -crcbnormal and -crcbhalf modes\n"
-         "\n", ATTLicense::get_usage_text());
+         "\n");
   exit(1);
 }
 
@@ -556,7 +555,6 @@ main(int argc, char **argv)
   TRY
     {
       // Parse arguments
-      ATTLicense::process_cmdline(argc,argv);
       parse(argc, argv);
       // Check input file
       StdioByteStream ibs(pnmfile,"rb");

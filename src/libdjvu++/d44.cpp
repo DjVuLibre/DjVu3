@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: d44.cpp,v 1.14 1999-05-25 19:42:30 eaf Exp $
+//C- $Id: d44.cpp,v 1.15 1999-09-20 23:12:59 leonb Exp $
 
 
 
@@ -64,7 +64,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: d44.cpp,v 1.14 1999-05-25 19:42:30 eaf Exp $# 
+    #$Id: d44.cpp,v 1.15 1999-09-20 23:12:59 leonb Exp $# 
 */
 //@{
 //@}
@@ -74,7 +74,6 @@
 #include "GException.h"
 #include "IWImage.h"
 #include "GOS.h"
-#include "ATTLicense.h"
 
 
 // global data
@@ -93,12 +92,12 @@ void
 usage()
 {
   printf("D44 -- Image decompression utility using Interpolating Wavelets (4,4)\n"
-         "%s\n"
+         "  Copyright (c) AT&T 1999.  All rights reserved\n"
          "Usage: d44 [options] iw4file [pnmfile]\n"
          "Options:\n"
          "    -verbose     -- report decoding time and memory use\n"
          "    -chunks n    -- select number of chunks to decode\n"
-         "\n", ATTLicense::get_usage_text());
+         "\n");
   exit(1);
 }
 
@@ -154,7 +153,6 @@ main(int argc, char **argv)
   TRY
     {
       // Parse arguments
-      ATTLicense::process_cmdline(argc,argv);
       parse(argc, argv);
       // Check input file
       StdioByteStream ibs(iw4file,"rb");

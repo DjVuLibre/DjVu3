@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: djvutopnm.cpp,v 1.23 1999-09-15 23:48:44 leonb Exp $
+//C- $Id: djvutopnm.cpp,v 1.24 1999-09-20 23:12:59 leonb Exp $
 
 
 /** @name djvutopnm
@@ -90,7 +90,7 @@
     Yann Le Cun <yann@research.att.com>\\
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: djvutopnm.cpp,v 1.23 1999-09-15 23:48:44 leonb Exp $# */
+    #$Id: djvutopnm.cpp,v 1.24 1999-09-20 23:12:59 leonb Exp $# */
 //@{
 //@}
 
@@ -103,7 +103,6 @@
 #include "DjVuImage.h"
 #include "DjVuDocument.h"
 #include "GOS.h"
-#include "ATTLicense.h"
 
 
 static double flag_scale = -1;
@@ -232,7 +231,7 @@ usage()
 {
   fprintf(stderr,
           "DJVUTOPNM -- DjVu decompression utility\n"
-          "%s\n"
+          "  Copyright (c) AT&T 1999.  All rights reserved\n"
           "Usage: djvutopnm [options] [<djvufile> [<pnmfile>]]\n\n"
           "Options:\n"
           "  -v                  Prints various informational messages.\n"
@@ -248,8 +247,7 @@ usage()
           "The output will be a PBM, PGM or PPM file depending of its content."
           "If <pnmfile> is a single dash or omitted, the decompressed image\n"
           "is sent to the standard output.  If <djvufile> is a single dash or\n"
-          "omitted, the djvu file is read from the standard input.\n\n",
-          ATTLicense::get_usage_text());
+          "omitted, the djvu file is read from the standard input.\n\n");
   exit(1);
 }
 
@@ -286,7 +284,6 @@ main(int argc, char **argv)
   TRY
     {
       // Process options
-      ATTLicense::process_cmdline(argc,argv);
       int page_num=-1;
       while (argc>1 && argv[1][0]=='-' && argv[1][1])
         {

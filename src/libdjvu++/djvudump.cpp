@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: djvudump.cpp,v 1.3 1999-09-14 14:19:50 leonb Exp $
+//C- $Id: djvudump.cpp,v 1.4 1999-09-20 23:12:59 leonb Exp $
 
 
 
@@ -57,7 +57,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: djvudump.cpp,v 1.3 1999-09-14 14:19:50 leonb Exp $# */
+    #$Id: djvudump.cpp,v 1.4 1999-09-20 23:12:59 leonb Exp $# */
 //@{
 //@}
 
@@ -69,7 +69,6 @@
 #include "IFFByteStream.h"
 #include "DjVuImage.h"
 #include "DjVmDir.h"
-#include "ATTLicense.h"
 
 
 struct DjVmInfo
@@ -269,8 +268,8 @@ usage()
 {
   fprintf(stderr,
           "DJVUINFO -- Describes IFF85 files\n"
-          "%s\nUsage: djvuinfo <iff_filenames>\n",
-          ATTLicense::get_usage_text() );
+          "  Copyright (c) AT&T 1999.  All rights reserved\n"
+          "Usage: djvuinfo <iff_filenames>\n" );
   exit(1);
 }
 
@@ -279,7 +278,6 @@ main(int argc, char **argv)
 {
   TRY
     {
-      ATTLicense::process_cmdline(argc,argv);
       if (argc<=1)
         usage();
       for (int i=1; i<argc; i++)

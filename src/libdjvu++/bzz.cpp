@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: bzz.cpp,v 1.10 1999-03-17 19:24:59 leonb Exp $
+//C- $Id: bzz.cpp,v 1.11 1999-09-20 23:12:59 leonb Exp $
 
 // BZZ -- a frontend for BSByteStream
 
@@ -35,14 +35,13 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation
     @version
-    #$Id: bzz.cpp,v 1.10 1999-03-17 19:24:59 leonb Exp $# */
+    #$Id: bzz.cpp,v 1.11 1999-09-20 23:12:59 leonb Exp $# */
 //@{
 //@}
 
 #include "GException.h"
 #include "ByteStream.h"
 #include "BSByteStream.h"
-#include "ATTLicense.h"
 
 char *program = "(unknown)";
 
@@ -51,12 +50,12 @@ usage(void)
 {
   fprintf(stderr, 
           "BZZ -- ZPCoded Burrows Wheeler compression\n"
-          "%s\n"
+          "  Copyright (c) AT&T 1999.  All rights reserved\n"
           "Usage [encoding]: %s -e[<blocksize>] <infile> <outfile>\n"
           "Usage [decoding]: %s -d <infile> <outfile>\n"
           "  Argument <blocksize> must be in range [900..4096] (default 1100).\n"
           "  Arguments <infile> and <outfile> can be '-' for stdin/stdout.\n",
-          ATTLicense::get_usage_text(), program, program);
+          program, program);
   exit(1);
 }
 
@@ -65,7 +64,6 @@ main(int argc, char **argv)
 {
   TRY
     {
-      ATTLicense::process_cmdline(argc,argv);
       // Get program name
       program = strrchr(argv[0],'/');
       if (program) 
