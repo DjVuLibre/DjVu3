@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocEditor.h,v 1.14 1999-12-14 20:48:17 eaf Exp $
+//C- $Id: DjVuDocEditor.h,v 1.15 1999-12-17 16:39:37 eaf Exp $
  
 #ifndef _DJVUDOCEDITOR_H
 #define _DJVUDOCEDITOR_H
@@ -27,7 +27,7 @@
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocEditor.h,v 1.14 1999-12-14 20:48:17 eaf Exp $#
+    @version #$Id: DjVuDocEditor.h,v 1.15 1999-12-17 16:39:37 eaf Exp $#
 */
 
 //@{
@@ -242,7 +242,7 @@ private:
    int		orig_doc_type;
    int		orig_doc_pages;
 
-   GPMap<GURL, File>	files_map;
+   GPMap<GString, File>	files_map; 	// files_map[id]=GP<File>
    GCriticalSection	files_lock;
 
    GMap<GString, void *>thumb_map;
@@ -290,7 +290,7 @@ inline int
 DjVuDocEditor::get_save_doc_type(void) const
 {
    if (orig_doc_type==SINGLE_PAGE)
-      if (get_pages_num()==1) return SINGLE_PAGE;
+      if (djvm_dir->get_files_num()==1) return SINGLE_PAGE;
       else return BUNDLED;
    else if (orig_doc_type==INDIRECT) return INDIRECT;
    else if (orig_doc_type==OLD_BUNDLED || orig_doc_type==BUNDLED) return BUNDLED;

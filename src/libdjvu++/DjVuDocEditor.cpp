@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocEditor.cpp,v 1.18 1999-12-14 20:48:17 eaf Exp $
+//C- $Id: DjVuDocEditor.cpp,v 1.19 1999-12-17 16:39:37 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -147,10 +147,12 @@ DjVuDocEditor::request_data(const DjVuPort * source, const GURL & url)
    if (url==doc_url) return doc_pool;
 
       // Now see if we have any file matching the url
+   GP<DjVmDir::File> frec=djvm_dir->name_to_file(url.name());
+   if (frec)
    {
       GCriticalSectionLock lock(&files_lock);
       GPosition pos;
-      if (files_map.contains(url, pos))
+      if (files_map.contains(frec->id, pos))
       {
 	 GP<File> f=files_map[pos];
 	 if (f->file && f->file->get_init_data_pool())
@@ -212,10 +214,12 @@ DjVuDocEditor::url_to_file(const GURL & url, bool dont_create)
    
       // Check if have a DjVuFile with this url cached (created before
       // and either still active or left because it has been modified)
+   GP<DjVmDir::File> frec=djvm_dir->name_to_file(url.name());
+   if (frec)
    {
       GCriticalSectionLock lock(&files_lock);
       GPosition pos;
-      if (files_map.contains(url, pos))
+      if (files_map.contains(frec->id, pos))
       {
 	 GP<File> f=files_map[pos];
 	 if (f->file) return f->file;
@@ -228,17 +232,17 @@ DjVuDocEditor::url_to_file(const GURL & url, bool dont_create)
    GP<DjVuFile> file=DjVuDocument::url_to_file(url, dont_create);
 
       // And add it to our private "cache"
-   if (file)
+   if (file && frec)
    {
       GCriticalSectionLock lock(&files_lock);
       GPosition pos;
-      if (files_map.contains(url, pos))
-	 files_map[url]->file=file;
+      if (files_map.contains(frec->id, pos))
+	 files_map[frec->id]->file=file;
       else
       {
 	 GP<File> f=new File();
 	 f->file=file;
-	 files_map[url]=f;
+	 files_map[frec->id]=f;
       }
    }
    
@@ -360,13 +364,12 @@ DjVuDocEditor::insert_file(const char * file_name, const char * parent_id,
    if (pos>=0) ++pos;
    dir->insert_file(frec, pos);
 
-      // Add it to the list
+      // Add it to our "cache"
    {
-      GURL file_url=id_to_url(id);
       GP<File> f=new File;
       f->pool=file_pool;
       GCriticalSectionLock lock(&files_lock);
-      files_map[file_url]=f;
+      files_map[id]=f;
    }
 
       // And insert it into the parent DjVuFile
@@ -447,11 +450,10 @@ DjVuDocEditor::insert_file(const char * file_name, bool is_page,
 
 	 // And add the File record (containing the file URL and DataPool)
       {
-	 GURL file_url=id_to_url(id);
 	 GP<File> f=new File;
 	 f->pool=file_pool;
 	 GCriticalSectionLock lock(&files_lock);
-	 files_map[file_url]=f;
+	 files_map[id]=f;
       }
 
 	 // The file has been added. If it doesn't include anything else,
@@ -509,11 +511,10 @@ DjVuDocEditor::insert_file(const char * file_name, bool is_page,
       {
 	    // It's important, that we replace the pool here anyway.
 	    // By doing this we load the file into memory. And this is
-	    // exactly what we want insert_group() wants us to do because
+	    // exactly what insert_group() wants us to do because
 	    // it creates temporary files.
-	 GURL file_url=id_to_url(id);
 	 GCriticalSectionLock lock(&files_lock);
-	 files_map[file_url]->pool=new_file_pool;
+	 files_map[id]->pool=new_file_pool;
       }
    } CATCH(exc) {
       if (errors.length()) errors+="\n\n";
@@ -844,15 +845,13 @@ DjVuDocEditor::set_file_name(const char * id, const char * name)
    
       // Now find DjVuFile (if any) and rename it
    GPosition pos;
-   if (files_map.contains(url, pos))
+   if (files_map.contains(id, pos))
    {
       GP<File> file=files_map[pos];
       GP<DataPool> pool=file->pool;
       if (pool) pool->load_file();
       GP<DjVuFile> djvu_file=file->file;
       if (djvu_file) djvu_file->set_name(name);
-      files_map.del(pos);
-      files_map[url.base()+name]=file;
    }
 }
 
@@ -1056,11 +1055,10 @@ DjVuDocEditor::file_thumbnails(void)
 	 iff->close_chunk();
 	 str->seek(0);
 	 GP<DataPool> file_pool=new DataPool(*str);
-	 GURL file_url=id_to_url(id);
 	 GP<File> f=new File;
 	 f->pool=file_pool;
 	 GCriticalSectionLock lock(&files_lock);
-	 files_map[file_url]=f;
+	 files_map[id]=f;
 
 	    // And create new streams
 	 str=new MemoryByteStream;
@@ -1177,15 +1175,16 @@ DjVuDocEditor::save_as(const char * where, bool bundled)
 
    DjVuPortcaster * pcaster=DjVuPort::get_portcaster();
    
-      // First: save each page in a separate file, if applies
-   if (get_pages_num()==1)
+      // First consider saving in SINGLE_FILE format (one file)
+   if (djvm_dir->get_files_num()==1)
    {
 	 // Here 'bundled' has no effect: we will save it as one page.
-      DEBUG_MSG("saving one page...\n");
+      DEBUG_MSG("saving one file...\n");
       GURL file_url=page_to_url(0);
+      GString file_id=djvm_dir->page_to_file(0)->id;
       GP<DataPool> file_pool;
       GPosition pos;
-      if (files_map.contains(file_url, pos))
+      if (files_map.contains(file_id, pos))
       {
 	 GP<File> file_rec=files_map[pos];
 	 if (file_rec->pool && (!file_rec->file ||
@@ -1224,9 +1223,10 @@ DjVuDocEditor::save_as(const char * where, bool bundled)
       for(int page_num=0;page_num<pages_num;page_num++)
       {
 	 GURL file_url=page_to_url(page_num);
+	 GString file_id=djvm_dir->page_to_file(page_num)->id;
 	 GP<DataPool> file_pool;
 	 GPosition pos;
-	 if (files_map.contains(file_url, pos))
+	 if (files_map.contains(file_id, pos))
 	 {
 	    GP<File> file_rec=files_map[pos];
 	    if (file_rec->pool && (!file_rec->file ||
@@ -1330,9 +1330,6 @@ DjVuDocEditor::save_as(const char * where, bool bundled)
 	 ++pos;
       }
    }
-
-      // Another problem: we need to do smth with files_map[URL]. Namely
-      // we need to recreate all items under new URL.
 
    orig_doc_type=save_doc_type;
    doc_type=save_doc_type;
