@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVmDir0.cpp,v 1.1.2.1 1999-04-12 16:48:21 eaf Exp $
+//C- $Id: DjVmDir0.cpp,v 1.1.2.2 1999-05-12 21:44:00 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -21,7 +21,7 @@
 
 int
 DjVmDir0::get_size(void) const
-      // WARNING! make sure, that get_size(), write() and read() are in sync
+      // WARNING! make sure, that get_size(), encode() and decode() are in sync
 {
    int size=0;
 
@@ -39,35 +39,35 @@ DjVmDir0::get_size(void) const
 }
 
 void
-DjVmDir0::write(ByteStream * bs)
-      // WARNING! make sure, that get_size(), write() and read() are in sync
+DjVmDir0::encode(ByteStream & bs)
+      // WARNING! make sure, that get_size(), encode() and decode() are in sync
 {
-   bs->write16(num2file.size());
+   bs.write16(num2file.size());
    for(int i=0;i<num2file.size();i++)
    {
       FileRec & file=*num2file[i];
-      bs->write(file.name, file.name.length()+1);
-      bs->write8(file.iff_file);
-      bs->write32(file.offset);
-      bs->write32(file.size);
-   };
+      bs.write(file.name, file.name.length()+1);
+      bs.write8(file.iff_file);
+      bs.write32(file.offset);
+      bs.write32(file.size);
+   }
 }
 
 void
-DjVmDir0::read(ByteStream * bs)
-      // WARNING! make sure, that get_size(), write() and read() are in sync
+DjVmDir0::decode(ByteStream & bs)
+      // WARNING! make sure, that get_size(), encode() and decode() are in sync
 {
    name2file.empty();
    num2file.empty();
 
-   for(int i=bs->read16();i>0;i--)
+   for(int i=bs.read16();i>0;i--)
    {
       GString name;
       char ch;
-      while(bs->read(&ch, 1) && ch) name+=ch;
-      int iff_file=bs->read8();
-      int offset=bs->read32();
-      int size=bs->read32();
+      while(bs.read(&ch, 1) && ch) name+=ch;
+      int iff_file=bs.read8();
+      int offset=bs.read32();
+      int size=bs.read32();
       add_file(name, iff_file, offset, size);
    };
 }
@@ -87,7 +87,7 @@ DjVmDir0::get_file(int file_num)
 }
 
 void
-DjVmDir0::add_file(const char * name, int iff_file, int offset, int size)
+DjVmDir0::add_file(const char * name, bool iff_file, int offset, int size)
 {
    DEBUG_MSG("DjVmDir0::add_file(): name='" << name << "', iff=" << iff_file <<
 	     ", offset=" << offset << "\n");

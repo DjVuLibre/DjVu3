@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.1.2.5 1999-05-05 18:54:47 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.1.2.6 1999-05-12 21:44:00 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -121,7 +121,7 @@ DjVuDocument::detect_doc_type(const GURL & doc_url)
 	       if (chkid=="DIR0")
 	       {
 		  DEBUG_MSG("Got DIR0 chunk\n");
-		  djvm_dir.read(&iff);
+		  djvm_dir.decode(iff);
 		  if (first_page_offset) break;
 	       };
 	       if (!first_page_offset &&
