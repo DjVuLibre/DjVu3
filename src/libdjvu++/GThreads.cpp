@@ -7,10 +7,10 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: GThreads.cpp,v 1.16 1999-03-08 16:21:16 leonb Exp $
+//C-  $Id: GThreads.cpp,v 1.17 1999-03-08 16:29:48 leonb Exp $
 
 
-// **** File "$Id: GThreads.cpp,v 1.16 1999-03-08 16:21:16 leonb Exp $"
+// **** File "$Id: GThreads.cpp,v 1.17 1999-03-08 16:29:48 leonb Exp $"
 // This file defines machine independent classes
 // for running and synchronizing threads.
 // - Author: Leon Bottou, 01/1998
@@ -1126,21 +1126,30 @@ GCriticalSection::~GCriticalSection()
 void 
 GCriticalSection::lock() 
 {
-  if (count>0) {
-    count = 0;
-    locker = curtask;
-  } else {
-    if (! locker)
-      locker = maintask;
-    if (locker==curtask) {
-      count -= 1;
-    } else if (ok) {
-      curtask->wchan = &count;
-      cotask_yield();
+  if (count>0) 
+    {
       count = 0;
       locker = curtask;
+    } 
+  else 
+    {
+      if (locker == 0)
+        locker = maintask;
+      if (locker==curtask) 
+        {
+          count -= 1;
+        } 
+      else if (ok) 
+        {
+          while (count<1) 
+            {
+              curtask->wchan = &count;
+              cotask_yield();
+            }
+          count = 0;
+          locker = curtask;
+        }
     }
-  }
 }
 
 void 
