@@ -7,10 +7,10 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: GThreads.cpp,v 1.2 1999-02-01 18:32:33 leonb Exp $
+//C-  $Id: GThreads.cpp,v 1.3 1999-02-01 22:50:40 leonb Exp $
 
 
-// **** File "$Id: GThreads.cpp,v 1.2 1999-02-01 18:32:33 leonb Exp $"
+// **** File "$Id: GThreads.cpp,v 1.3 1999-02-01 22:50:40 leonb Exp $"
 // This file defines machine independent classes
 // for running and synchronizing threads.
 // - Author: Leon Bottou, 01/1998
@@ -1057,33 +1057,39 @@ GCriticalSection::lock()
   if (count>0) {
     count = 0;
     locker = curtask;
-  } else if (locker==curtask) {
-    count -= 1;
-  } else if (ok) {
-    curtask->nfds = 0;
-    curtask->wakup.tv_sec = 0;
-    curtask->wchan = &count;
-    GThread::yield();
-    count = 0;
-    locker = curtask;
+  } else {
+    if (! locker)
+      locker = maintask;
+    if (locker==curtask) {
+      count -= 1;
+    } else if (ok) {
+      curtask->nfds = 0;
+      curtask->wakup.tv_sec = 0;
+      curtask->wchan = &count;
+      GThread::yield();
+      count = 0;
+      locker = curtask;
+    }
   }
 }
 
 void 
 GCriticalSection::unlock() 
 {
-  if (locker == curtask)
+  if (count>0)
+    return;
+  if (! locker)
+    locker = maintask;
+  if (locker != curtask)
+    return;
+  count += 1;
+  if (count>0)
     {
-      count += 1;
-      if (count>0)
-        {
-          locker = 0;
-          if (scheduling_callback)
-            (*scheduling_callback)(1);
-        }
+      locker = 0;
+      if (scheduling_callback)
+        (*scheduling_callback)(1);
     }
 }
-
 
 // -- GEvent
 

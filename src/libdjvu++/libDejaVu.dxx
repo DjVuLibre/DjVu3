@@ -1,5 +1,5 @@
 // -*- C++ -*-
-/** @name DjVu Reference Library.
+/** @name DjVu Reference Library
  */              
 //@{        
         
@@ -10,31 +10,13 @@
  */
 //@{
 
-/** @name AT&T License.
+/** @name AT&T License
  */
 
-/** @name Source Code Release.
+/** @name Source Code Release
  */
 
-/** @name How To Participate.
- */
-
-//@}
-
-
-
-//----------------------------------------
-/** @name DjVu Overview.
- */
-//@{
-
-/** @name Layered Images.
- */
-
-/** @name DJVU files.
- */
-
-/** @name DJVM files.
+/** @name How To Participate
  */
 
 //@}
@@ -42,17 +24,35 @@
 
 
 //----------------------------------------
-/** @name Getting Started.
+/** @name DjVu Overview
  */
 //@{
 
-/** @name Compiling the Library.
+/** @name Layered Images
  */
 
-/** @name Decoding DjVu content.
+/** @name DjVu files
  */
 
-/** @name Creating DjVu content.
+/** @name Proposed extensions
+ */
+
+//@}
+
+
+
+//----------------------------------------
+/** @name Getting Started
+ */
+//@{
+
+/** @name Compiling the Library
+ */
+
+/** @name Decoding DjVu content
+ */
+
+/** @name Creating DjVu content
  */
 
 
@@ -81,8 +81,9 @@
 //@Include: GBitmap.h
 //@Include: GPixmap.h
 //@Include: GScaler.h
-//@Include: IWCodec.h
-//@Include: JB2Codec.h
+//@Include: IWImage.h
+//@Include: JB2Image.h
+//@Include: DjVuImage.h
 //@}
 
 

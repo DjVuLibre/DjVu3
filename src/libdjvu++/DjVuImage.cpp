@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: DjVuImage.cpp,v 1.1 1999-02-01 18:57:33 leonb Exp $
+//C-  $Id: DjVuImage.cpp,v 1.2 1999-02-01 22:50:39 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -165,10 +165,9 @@ DjVuImage::init()
 {
   info = 0;
   anno = 0;
-  bgpm = 0;
   bg44 = 0;
   fgpm = 0;
-  stencil = 0;
+  fgjb = 0;
   mimetype = GString();
   description = GString();
   filesize = 0;
@@ -186,14 +185,12 @@ DjVuImage::get_memory_usage() const
     usage += info->get_memory_usage();
   if (anno)
     usage += anno->get_memory_usage();
-  if (bgpm) 
-    usage += bgpm->get_memory_usage();
   if (bg44) 
     usage += bg44->get_memory_usage();
   if (fgpm) 
     usage += fgpm->get_memory_usage();
-  if (stencil)
-    usage += stencil->get_memory_usage();
+  if (fgjb)
+    usage += fgjb->get_memory_usage();
   // This one should not count!
   usage += description.length();
   // Return
@@ -280,9 +277,8 @@ DjVuImage::is_legal_color() const
 {
   // Components
   GP<DjVuInfo> info = get_info();
-  GP<JB2Image> stencil = get_stencil();
+  GP<JB2Image> fgjb = get_fgjb();
   GP<IWPixmap> bg44 = get_bg44();
-  GP<GPixmap>  bgpm = get_bgpm();
   GP<GPixmap>  fgpm = get_fgpm();
   // Check size
   if (! info)
@@ -291,16 +287,14 @@ DjVuImage::is_legal_color() const
   int height = info->height;
   if (! (width>0 && height>0))
     return 0;
-  // Check stencil
-  if (stencil)
-    if (stencil->get_width()!=width || stencil->get_height()!=height)
+  // Check fgjb
+  if (fgjb)
+    if (fgjb->get_width()!=width || fgjb->get_height()!=height)
       return 0;
   // Check background
   int bgred = 0;
   if (bg44)
     bgred = compute_red(width, height, bg44->get_width(), bg44->get_height());
-  else if (bgpm)
-    bgred = compute_red(width, height,  bgpm->columns(), bgpm->rows());
   if (bgred>12)
     return 0;
   // Check foreground colors
@@ -310,10 +304,10 @@ DjVuImage::is_legal_color() const
   if (fgred>12)
     return 0;
   // Test for pure color image (IW44)
-  if (bgred==1 && stencil==0 && fgred==0)
+  if (bgred==1 && fgjb==0 && fgred==0)
     return 1;
   // Test for multilayer color image (DJVU)
-  if (stencil && bgred && fgred)
+  if (fgjb && bgred && fgred)
     return 1;
   // Unrecognized
   return 0;
@@ -324,7 +318,7 @@ DjVuImage::is_legal_bilevel() const
 {
   // Components
   GP<DjVuInfo> info = get_info();
-  GP<JB2Image> stencil = get_stencil();
+  GP<JB2Image> fgjb = get_fgjb();
   // Check info
   if (! info)
     return 0;
@@ -332,13 +326,13 @@ DjVuImage::is_legal_bilevel() const
   int height = info->height;
   if (! (width>0 && height>0))
     return 0;
-  // Check stencil
-  if (!stencil)
+  // Check fgjb
+  if (!fgjb)
     return 0;
-  if (stencil->get_width()!=width || stencil->get_height()!=height)
+  if (fgjb->get_width()!=width || fgjb->get_height()!=height)
     return 0;
   // Check that color information is not present.
-  if (get_bg44() || get_bgpm() || get_fgpm())
+  if (get_bg44() || get_fgpm())
     return 0;
   // Ok.
   return 1;
@@ -355,12 +349,12 @@ DjVuImage::get_bitmap(const GRect &rect,
   // Access image size
   int width = get_width();
   int height = get_height();
-  GP<JB2Image> stencil = get_stencil();
-  if ( width && height && stencil && 
-       (stencil->get_width() == width) && 
-       (stencil->get_height() == height) ) 
+  GP<JB2Image> fgjb = get_fgjb();
+  if ( width && height && fgjb && 
+       (fgjb->get_width() == width) && 
+       (fgjb->get_height() == height) ) 
     {
-      return stencil->get_bitmap(rect, subsample, align);
+      return fgjb->get_bitmap(rect, subsample, align);
     }
   return 0;
 }
@@ -376,7 +370,6 @@ DjVuImage::get_bg_pixmap(const GRect &rect,
   GP<DjVuInfo> info = get_info();
   if (width<=0 || height<=0 || !info) return 0;
   GP<IWPixmap> bg44 = get_bg44();
-  GP<GPixmap>  bgpm = get_bgpm();
   // Compute gamma_correction
   double gamma_correction = 1.0;
   if (gamma > 0)
@@ -453,57 +446,12 @@ DjVuImage::get_bg_pixmap(const GRect &rect,
       return pm;
     }
 
-  // CASE2: Explicit BG pixmap
-  if (bgpm)
-    {
-      int w = bgpm->columns();
-      int h = bgpm->rows();
-      // Avoid silly cases
-      if (w==0 || h==0 || width==0 || height==0)
-        return 0;
-      // Determine how much bgpm is reduced
-      int red = compute_red(width,height,w,h);
-      if (red<1 || red>12)
-        return 0;
-      // Handle pure downsampling cases
-      pm = new GPixmap;
-      if (subsample == red)
-        pm->init(*bgpm, rect);
-      else if (subsample == 2*red)
-        pm->downsample(bgpm, 2, &rect);
-      else if (subsample == 4*red)
-        pm->downsample(bgpm, 4, &rect);
-      else if (subsample == 8*red)
-        pm = bg44->get_pixmap(8,rect); 
-      // Handle fractional downsampling cases
-      else if (red*4 == subsample*3)
-        pm->downsample43(bgpm, &rect);
-      // Handle all other cases with pixmapscaler
-      else
-        {
-          // setup pixmap scaler
-          int outw = (width+subsample-1)/subsample;
-          int outh = (height+subsample-1)/subsample;
-          GPixmapScaler ps(w, h, outw, outh);
-          ps.set_horz_ratio(red, subsample);
-          ps.set_vert_ratio(red, subsample);
-          // run pixmap scaler
-          pm = new GPixmap();
-          GRect xrect(0,0,w,h);
-          ps.scale(xrect, *bgpm, rect, *pm);
-        }
-      // Apply gamma correction
-      if (pm && gamma_correction!=1.0)
-        pm->color_correct(gamma_correction);
-      return pm;
-    }
-
   // FAILURE
   return 0;
 }
 
 int  
-DjVuImage::apply_stencil(GPixmap *pm, const GRect &rect, 
+DjVuImage::stencil(GPixmap *pm, const GRect &rect, 
                          int subsample, double gamma) const
 {
   // Access components
@@ -511,7 +459,7 @@ DjVuImage::apply_stencil(GPixmap *pm, const GRect &rect,
   int height = get_height();
   GP<DjVuInfo> info = get_info();
   if (width<=0 || height<=0 || !info) return 0;
-  GP<JB2Image> stencil = get_stencil();
+  GP<JB2Image> fgjb = get_fgjb();
   GP<GPixmap> fgpm = get_fgpm();
   // Compute gamma_correction
   double gamma_correction = 1.0;
@@ -523,7 +471,7 @@ DjVuImage::apply_stencil(GPixmap *pm, const GRect &rect,
     gamma_correction = 10;
 
   // CASE1: JB2 stencil and FG pixmap
-  if (stencil && fgpm)
+  if (fgjb && fgpm)
     {
       GP<GBitmap> bm = get_bitmap(rect, subsample);
       if (bm && pm)
@@ -597,7 +545,7 @@ DjVuImage::get_fg_pixmap(const GRect &rect,
   if (width && height)
     {
       pm = new GPixmap(rect.height(),rect.width(), &GPixel::WHITE);
-      if (apply_stencil(pm, rect, subsample, gamma))
+      if (stencil(pm, rect, subsample, gamma))
         return pm;
     }
   return 0;
@@ -609,7 +557,7 @@ DjVuImage::get_pixmap(const GRect &rect, int subsample, double gamma) const
   // Get background
   GP<GPixmap> pm = get_bg_pixmap(rect, subsample, gamma);
   // Superpose foreground
-  apply_stencil(pm, rect, subsample, gamma);
+  stencil(pm, rect, subsample, gamma);
   // Return
   return pm;
 }
@@ -752,7 +700,10 @@ DjVuImage::decode(ByteStream &bs, DjVuInterface *notifier)
       int chksize;
       while ((chksize = iff.get_chunk(chkid)))
         {
-          
+          // Check that first chunk is an INFO chunk.
+          if (info==0 && chkid!="INFO")
+            THROW("DjVuDecoder:: Corrupted file (Does not start with INFO chunk)");
+
           // --- CHUNK 'INFO'
           if (chkid=="INFO")
             {
@@ -777,8 +728,6 @@ DjVuImage::decode(ByteStream &bs, DjVuInterface *notifier)
           //--- CHUNK "BG44"
           else if (chkid == "BG44")
             {
-              if (bgpm)
-                THROW("DjVu Decoder: Corrupted data (Duplicate background layer)");
               if (! bg44)
                 {
                   // First chunk
@@ -801,6 +750,19 @@ DjVuImage::decode(ByteStream &bs, DjVuInterface *notifier)
                   
                 }
             }
+          // --- CHUNK "Sjbz"
+          else if (chkid == "Sjbz")
+            {
+              if (fgjb)
+                THROW("DjVu Decoder: Corrupted data (Duplicate FGxx chunk)");
+              GP<JB2Image> jimg = new JB2Image;
+              jimg->decode(iff);
+              fgjb = jimg;
+              if (notifier) notifier->notify_redisplay();
+              desc.format(" %0.1f Kb\t'%s'\tJB2 foreground mask (%dx%d)\n",
+                          chksize/1024.0, (const char*)chkid,
+                          fgjb->get_width(), fgjb->get_height() );
+            }
           // --- CHUNK "FG44"
           else if (chkid == "FG44")
             {
@@ -814,33 +776,30 @@ DjVuImage::decode(ByteStream &bs, DjVuInterface *notifier)
                           chksize/1024.0, (const char*)chkid,
                           fg44.get_width(), fg44.get_height() );
             }
-          // --- CHUNK "Sjbz"
-          else if (chkid == "Sjbz")
-            {
-              if (stencil)
-                THROW("DjVu Decoder: Corrupted data (Duplicate FGxx chunk)");
-              GP<JB2Image> jimg = new JB2Image;
-              jimg->decode(iff);
-              stencil = jimg;
-              if (notifier) notifier->notify_redisplay();
-              desc.format(" %0.1f Kb\t'%s'\tJB2 stencil (%dx%d)\n",
-                          chksize/1024.0, (const char*)chkid,
-                          stencil->get_width(), stencil->get_height() );
-            }
-          // --- CHUNK "BGjp"
+          // --- OBSOLETE CHUNKS
           else if (chkid == "BGjp")
             {
-              if (bgpm || bg44)
+              if (bg44)
                 THROW("DjVu Decoder: Corrupted data (Duplicate background layer)");
               desc.format(" %0.1f Kb\t'%s'\tObsolete JPEG background (Ignored).\n", 
                           chksize/1024.0, (const char*)chkid);
             }
-          // --- CHUNK "FGjp"
           else if (chkid == "FGjp")
             {
               if (fgpm)
                 THROW("DjVu Decoder: Corrupted data (Duplicate foreground layer)");
               desc.format(" %0.1f Kb\t'%s'\tObsolete JPEG foreground colors (Ignored).\n", 
+                          chksize/1024.0, (const char*)chkid);
+            }
+          // --- FUTURE CHUNKS
+          else if (chkid == "INCL")
+            {
+              desc.format(" %0.1f Kb\t'%s'\tIndirection chunk (Unsupported).\n",
+                          chksize/1024.0, (const char*)chkid);
+            }
+          else if (chkid == "NDIR")
+            {
+              desc.format(" %0.1f Kb\t'%s'\tNavigation chunk (Unsupported).\n",
                           chksize/1024.0, (const char*)chkid);
             }
           // --- UNKNOWN CHUNK

@@ -92,7 +92,8 @@ bzz: $(BZZOBJS) $(TARG) Makefile
 # Documentation
 
 html:
-	-@mkdir @Doc 2>/dev/null
+	-rm -rf @Doc
+	-mkdir @Doc 2>/dev/null
 	${DOCXX} -d @Doc -B libDejaVu.html libDejaVu.dxx
 
 dvi:
