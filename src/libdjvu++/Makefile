@@ -13,17 +13,15 @@ OBJS= 	GString.o		\
 	IFFByteStream.o		\
 	BSByteStream.o		\
 	GIFFManager.o		\
-	GPixmap.o		\
 	GScaler.o               \
 	IWCodec.o		\
 	DejaVuDecoder.o		\
 	GOS.o                   \
-	GURL.o                  \
 	debug.o	
 
 SHELL=/bin/sh
 TARG= libDejaVu.a
-PROG= showiff c44 d44 djvutopnm makedjvu breakdjvu ppmcoco annotate bzz
+PROG= showiff c44 d44 djvutopnm makedjvu breakdjvu ppmcoco bzz
 
 #CC=gcc
 #CXX=g++
