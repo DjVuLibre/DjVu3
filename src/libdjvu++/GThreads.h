@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GThreads.h,v 1.14 1999-03-17 19:24:58 leonb Exp $
+//C- $Id: GThreads.h,v 1.15 1999-04-03 00:13:36 leonb Exp $
 
 #ifndef _GTHREADS_H_
 #define _GTHREADS_H_
@@ -19,10 +19,9 @@
 
     Files #"GThreads.h"# and #"GThreads.cpp"# implement common entry points
     for multithreading on multiple platforms.  Each execution thread is
-    represented by an instance of class \Ref{GThread}.  Portions of code can
-    be protected using class \Ref{GCriticalSection} or class
-    \Ref{GCriticalSectionLock}. Synchronization is provided by class
-    \Ref{GEvent}.
+    represented by an instance of class \Ref{GThread}.  Synchronization is
+    provided by class \Ref{GMonitor} which implements a monitor (C.A.R Hoare,
+    Communications of the ACM, 17(10), 1974).
 
     The value of compiler symbol #THREADMODEL# selects an appropriate
     implementation for these classes. The current implementation supports
@@ -58,7 +57,8 @@
           Java and to access them using JRI.  The classes just contain a
           JRIGlobalRef.  This is not a real implementation since everything
           (Java code, native functions, stubs, exception thread safety) must
-          be addressed by the plugin source code. Performance may be an issue.
+          be addressed by the plugin source code. Performance may be a serious
+          issue.
     \end{description}
     
     {\bf Portability}: The simultaneous use of threads and exceptions caused a
@@ -68,17 +68,13 @@
     COTHREAD-safe.  We expect to make COTHREADs the default in future
     releases.
 
-    {\bf ToDo}: For historical reasons, the interface is modeled after the
-    Win32 model.  This is unfortunate because more and more systems adopt the
-    simpler monitor approach.  It would be nice to change that some day.
-
     @memo
     Portable threads
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Praveen Guduru <praveen@sanskrit.lz.att.com> -- mac implementation.
     @version
-    #$Id: GThreads.h,v 1.14 1999-03-17 19:24:58 leonb Exp $# */
+    #$Id: GThreads.h,v 1.15 1999-04-03 00:13:36 leonb Exp $# */
 //@{
 
 #include "DjVuGlobal.h"
@@ -176,6 +172,7 @@
     {\bf Note} --- Both the copy constructor and the copy operator are declared
     as private members. It is therefore not possible to make multiple copies
     of instances of this class, as implied by the class semantic. */
+
 class GThread {
 public:
   /** Constructs a new thread object.  Memory is allocated for the
@@ -268,171 +265,95 @@ private:
 };
 
 
-/** Mutual exclusion class.  Class #GCriticalSection# provides an efficient
-    way to protect segment of codes ({\em critical sections}) which should
-    not be simultaneously executed by two threads. Only one thread can own a
-    critical section object at a given time.  Function \Ref{lock} causes the
-    current thread to own the critical section object (or wait as long as
-    necessary). Function \Ref{unlock} is used to release the critical section
-    object.  Critical section in the code are easily protected by creating a
-    critical section object, locking this object at beginning of the critical
-    section code, and unlocking the object at the end of the critical section
-    code. Class \Ref{GCriticalSectionLock} provides a convenient way to do
-    this effectively.
+/** Monitor class.  Monitors have been first described in (C.A.R Hoare,
+    Communications of the ACM, 17(10), 1974).  This mechanism provides the
+    basic mutual exclusion (mutex) and thread notification facilities
+    (condition variables).
+    
+    Only one thread can own the monitor at a given time.  Functions
+    \Ref{enter} and \Ref{leave} can be used to acquire and release the
+    monitor. This mutual exclusion provides an efficient way to protect
+    segment of codes ({\em critical sections}) which should not be
+    simultaneously executed by two threads. Class \Ref{GMonitorLock} provides
+    a convenient way to do this effectively.
+    
+    When the thread owning the monitor calls function \Ref{wait}, the monitor
+    is released and the thread starts waiting until another thread calls
+    function \Ref{signal} or \Ref{broadcast}.  When the thread wakes-up, it
+    re-acquires the monitor and function #wait# returns.  Since the signaling
+    thread must acquire the monitor before calling functions #signal# and
+    #broadcast#, the signaled thread will not be able to re-acquire the
+    monitor until the signaling thread(s) releases the monitor.
+    
+    {\bf Note} --- Both the copy constructor and the copy operator are declared
+    as private members. It is therefore not possible to make multiple copies
+    of instances of this class, as implied by the class semantic. */
 
-    {\bf Note}. Both the copy constructor and the copy operator are declared
-    as private members. It is therefore not possible to make multiple copies of
-    instances of this class, as implied by the class semantic. */
-
-class GCriticalSection {
+class GMonitor
+{
+public:
+  GMonitor();
+  ~GMonitor();
+  /** Enters the monitor.  If the monitor is acquired by another thread this
+      function waits until the monitor is released.  The current thread then
+      acquires the monitor.  Calls to #enter# and #leave# may be nested. */
+  void enter();
+  /** Leaves the monitor.  The monitor counts how many times the current
+      thread has entered the monitor.  Function #leave# decrement this count.
+      The monitor is released when this count reaches zero.  An exception is
+      thrown if this function is called by a thread which does not own the
+      monitor. */
+  void leave();
+  /** Waits until the monitor is signaled.  The current thread atomically
+      releases the monitor and waits until another thread calls function
+      #signal# or #broadcast#.  Function #wait# then re-acquires the monitor
+      and returns.  An exception is thrown if this function is called by a
+      thread which does not own the monitor. */
+  void wait();
+  /** Waits until the monitor is signaled or a timeout is reached.  The
+      current thread atomically releases the monitor and waits until another
+      thread calls function #signal# or #broadcast# or a maximum of #timeout#
+      milliseconds.  Function #wait# then re-acquires the monitor and returns.
+      An exception is thrown if this function is called by a thread which does
+      not own the monitor. */
+  void wait(unsigned long timeout);
+  /** Signals one waiting thread.  Function #signal# wakes up at most one of
+      the waiting threads for this monitor.  An exception is thrown if this
+      function is called by a thread which does not own the monitor. */
+  void signal();
+  /** Signals all waiting threads. Function #broadcast# wakes up all the
+      waiting threads for this monitor.  An exception is thrown if this
+      function is called by a thread which does not own the monitor. */
+  void broadcast();
+private:
 #if THREADMODEL==WINTHREADS
-  BOOL ok;
+  int ok;
+  int count;
+  DWORD locker;
   CRITICAL_SECTION cs;
+  HANDLE hev[2];
 #elif THREADMODEL==POSIXTHREADS
   int ok;
   int count;
   pthread_t locker;
   pthread_mutex_t mutex;
-#elif THREADMODEL==JRITHREADS
-private:
-  JRIGlobalRef obj;
+  pthread_cond_t cond;
 #elif THREADMODEL==COTHREADS
   int ok;
   int count;
-  struct cotask *locker;
-#endif
-public:
-  GCriticalSection();
-  ~GCriticalSection();
-  /** Locks a critical section. Only one thread can own a critical section at
-      a given time. If the critical section is already owned by another
-      thread, the thread waits until the critical section is released.
-      Otherwise the locking counter is incremented and the current thread is
-      given ownership of the critical section object. */
-  void lock();
-  /** Unlocks a critical section object. If the critical section is owned by
-      the current thread, the locking counter is decremented. The critical
-      section is released when the counter reaches zero. */
-  void unlock();
-private:
-  // Disable default members
-  GCriticalSection(const GCriticalSection&);
-  GCriticalSection& operator=(const GCriticalSection&);
-};
-
-/** Thread synchronization class. Class #GEvent# provides a simple way to
-    synchronize several threads.  An event object can be either {\em signaled}
-    or {\em non-signaled}. Event objects are initially {\em
-    non-signaled}. Function \Ref{set} turns an event object to {\em signaled}.
-    Function \Ref{wait} waits until the event object is {\em signaled} and
-    then turns it to {\em non-signaled}.
-
-    {\bf Note}. Both the copy constructor and the copy operator are declared
-    as private members. It is therefore not possible to make multiple copies
-    of instances of this class, as implied by the class semantic. */
-
-class GEvent {
-#if THREADMODEL==WINTHREADS
-  HANDLE hev;
-#elif THREADMODEL==POSIXTHREADS
-  pthread_mutex_t mutex;
-  pthread_cond_t cond;
-  char status;
+  void *locker;
+  int wchan;
+  int seqno;  
 #elif THREADMODEL==JRITHREADS
-private:
   JRIGlobalRef obj;
-#elif THREADMODEL==COTHREADS
-  int ok;
-  int status;
-#endif
-public:
-  GEvent();
-  ~GEvent();
-  /** Sets the event object to {\em signaled}. */
-  void set();
-  /** Waits until the event object is {\em signaled}.  If the event object was
-      {\em signaled} before, the event object is turned to {\em non signaled}
-      and this function returns immediately. If the event object was {\em not
-      signaled}, this function waits until another thread calls function
-      \Ref{set}, then turns the object to the {\em non-signaled} state and
-      returns. */
-  void wait();
-  /** Waits until the event object is {\em signaled} with a timeout.  This
-      function is similar to \Ref{GEvent::wait} but will return after
-      #timeout# milliseconds, regardless of the status of the event object.  */
-  void wait(int timeout);
+#endif  
 private:
   // Disable default members
-  GEvent(const GEvent&);
-  GEvent& operator=(const GEvent&);
+  GMonitor(const GMonitor&);
+  GMonitor& operator=(const GMonitor&);
 };
 
 
-// ----------------------------------------
-// WIN32 INLINES
-
-#if THREADMODEL==WINTHREADS
-
-inline
-GCriticalSection::GCriticalSection()
-  : ok(FALSE)
-{ 
-  InitializeCriticalSection(&cs); 
-  ok=TRUE; 
-}
-
-inline 
-GCriticalSection::~GCriticalSection()
-{ 
-  ok=FALSE; 
-  DeleteCriticalSection(&cs); 
-}
-
-inline void 
-GCriticalSection::lock() 
-{
-  if (ok) 
-    EnterCriticalSection(&cs);
-}
-
-inline void 
-GCriticalSection::unlock() 
-{
-  if (ok) 
-    LeaveCriticalSection(&cs);
-}
-
-inline
-GEvent::GEvent()
-{
-  hev = CreateEvent(NULL,FALSE,FALSE,NULL);
-}
-
-inline
-GEvent::~GEvent()
-{
-  CloseHandle(hev);
-}
-
-inline void 
-GEvent::set()
-{
-  SetEvent(hev);
-}
-
-inline void 
-GEvent::wait()
-{
-  WaitForSingleObject(hev,INFINITE);
-}
-
-inline void 
-GEvent::wait(int timeout)
-{
-  WaitForSingleObject(hev, timeout);
-}
-
-#endif  //WINTHREADS
 
 
 // ----------------------------------------
@@ -444,15 +365,14 @@ inline GThread::~GThread(void) {}
 inline void GThread::terminate() {}
 inline int GThread::yield() { return -1; }
 inline void* GThread::current() { return 0; }
-inline GCriticalSection::GCriticalSection() {}
-inline GCriticalSection::~GCriticalSection() {}
-inline void GCriticalSection::lock() {}
-inline void GCriticalSection::unlock() {}
-inline GEvent::GEvent() {}
-inline GEvent::~GEvent() {}
-inline void GEvent::set() {}
-inline void GEvent::wait() {}
-inline void GEvent::wait(int timeout) {}
+inline GMonitor::GMonitor() {}
+inline GMonitor::~GMonitor() {}
+inline void GMonitor::enter() {}
+inline void GMonitor::leave() {}
+inline void GMonitor::wait() {}
+inline void GMonitor::wait(unsigned long timeout) {}
+inline void GMonitor::signal() {}
+inline void GMonitor::broadcast() {}
 #endif // NOTHREADS
 
 
@@ -464,45 +384,76 @@ inline void GEvent::wait(int timeout) {}
     This class locks a specified critical section (see \Ref{GCriticalSection})
     at construction time and unlocks it at destruction time. It provides a
     convenient way to take advantage of the C++ implicit destruction of
-    automatic variables in order to make sure that the critical section is
-    unlocked when exiting the protected code.  The following code will release
-    the lock when the execution thread leaves the protected scope, either
+    automatic variables in order to make sure that the monitor is
+    released when exiting the protected code.  The following code will release
+    the monitor when the execution thread leaves the protected scope, either
     because the protected code has executed successfully, or because an
     exception was thrown.
     \begin{verbatim}
       {      -- protected scope
-         static GCriticalSection theSection;
-         GCriticalSectionLock lock(&theSection)
+         static GMonitor theMonitor;
+         GMonitorLock lock(&theMonitor)
          ... -- protected code
       }
     \end{verbatim} 
 */
-class GCriticalSectionLock 
+class GMonitorLock 
+{
+private:
+  GMonitor *gsec;
+public:
+  /** Constructor. Enters the monitor #gsec#. */
+  GMonitorLock(GMonitor *gsec) : gsec(gsec) 
+    { gsec->enter(); };
+  /** Destructor. Leaves the associated monitor. */
+  ~GMonitorLock() 
+    { gsec->leave(); };
+};
+
+//@}
+
+
+
+
+// ----------------------------------------
+// COMPATIBILITY CLASSES
+
+
+// -- these classes are no longer documented.
+
+class GCriticalSection : protected GMonitor 
+{
+public:
+  void lock() 
+    { GMonitor::enter(); };
+  void unlock() 
+    { GMonitor::leave(); };
+};
+
+class GEvent : protected GMonitor 
+{
+private:
+  int status;
+public:
+  void set() 
+    { if (!status) { enter(); status=1; signal(); leave(); } };
+  void wait() 
+    { enter(); if (!status) GMonitor::wait(); status=0; leave(); };
+  void wait(int timeout) 
+    { enter(); if (!status) GMonitor::wait(timeout); status=0; leave(); };
+};
+
+class GCriticalSectionLock
 {
 private:
   GCriticalSection *gsec;
 public:
-  /** Constructor. Locks the critical section object #gsec#. */
-  GCriticalSectionLock(GCriticalSection *gsec);
-  /** Destructor. Releases the associated critical section. */
-  ~GCriticalSectionLock();
+  GCriticalSectionLock(GCriticalSection *gsec) : gsec(gsec) 
+    { gsec->lock(); };
+  ~GCriticalSectionLock() 
+    { gsec->unlock(); };
 };
 
-inline 
-GCriticalSectionLock::GCriticalSectionLock(GCriticalSection *gsec)
-  : gsec(gsec) 
-{ 
-  gsec->lock(); 
-}
-
-inline  
-GCriticalSectionLock::~GCriticalSectionLock()
-{
-  gsec->unlock();
-}
-
-
-//@}
 
 // ----------------------------------------
 #endif //_GTHREADS_H_

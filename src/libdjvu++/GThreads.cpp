@@ -9,10 +9,10 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GThreads.cpp,v 1.20 1999-03-17 19:24:58 leonb Exp $
+//C- $Id: GThreads.cpp,v 1.21 1999-04-03 00:13:36 leonb Exp $
 
 
-// **** File "$Id: GThreads.cpp,v 1.20 1999-03-17 19:24:58 leonb Exp $"
+// **** File "$Id: GThreads.cpp,v 1.21 1999-04-03 00:13:36 leonb Exp $"
 // This file defines machine independent classes
 // for running and synchronizing threads.
 // - Author: Leon Bottou, 01/1998
@@ -131,10 +131,131 @@ GThread::yield()
   return 0;
 }
 
-void*
+void *
 GThread::current()
 {
   return (void*) GetCurrentThreadId();
+}
+
+GMonitor::GMonitor()
+  : ok(0), count(1)
+{
+  InitializeCriticalSection(&cs);
+  hev[0] = CreateEvent(NULL,FALSE,FALSE,NULL);
+  hev[1] = CreateEvent(NULL,TRUE,FALSE,NULL);
+  locker = GetCurrentThreadId();
+  ok = 1;
+}
+
+GMonitor::~GMonitor()
+{
+  ok = 0;
+  DeleteCriticalSection(&cs); 
+  CloseHandle(hev[0]);
+  CloseHandle(hev[1]);
+}
+
+void 
+GMonitor::enter()
+{
+  DWORD self = GetCurrentThreadId();
+  if (count>0 || self!=locker)
+    {
+      if (ok)
+        EnterCriticalSection(&cs);
+      locker = self;
+      count = 1;
+    }
+  count -= 1;
+}
+
+void 
+GMonitor::leave()
+{
+  DWORD self = GetCurrentThreadId();
+  if (ok && (count>0 || self!=locker))
+    THROW("Monitor was not acquired by this thread (GMonitor::broadcast)");
+  count += 1;
+  if (count > 0)
+    {
+      count = 1;
+      if (ok)
+        LeaveCriticalSection(&cs);
+    }
+}
+
+void
+GMonitor::signal()
+{
+  if (ok)
+    {
+      DWORD self = GetCurrentThreadId();
+      if (count>0 || self!=locker)
+        THROW("Monitor was not acquired by this thread (GMonitor::signal)");
+      PulseEvent(hev[0]);
+    }
+}
+
+void
+GMonitor::broadcast()
+{
+  if (ok)
+    {
+      DWORD self = GetCurrentThreadId();
+      if (count>0 || self!=locker)
+        THROW("Monitor was not acquired by this thread (GMonitor::broadcast)");
+      PulseEvent(hev[1]);
+    }
+}
+
+void
+GMonitor::wait()
+{
+  // Check state
+  DWORD self = GetCurrentThreadId();
+  if (count>0 || self!=locker)
+    THROW("Monitor was not acquired by this thread (GMonitor::wait)");
+  // Wait
+  if (ok)
+    {
+      // Release
+      int sav_count = count;
+      count = 1;
+      LeaveCriticalSection(&cs);
+      // Wait
+      ResetEvent(hev[0]);
+      ResetEvent(hev[1]);
+      WaitForMultipleObjects(2,hev,FALSE,INFINITE);
+      // Re-acquire
+      EnterCriticalSection(&cs);
+      count = sav_count;
+      locker = self;
+    }
+}
+
+void
+GMonitor::wait(unsigned long timeout) 
+{
+  // Check state
+  DWORD self = GetCurrentThreadId();
+  if (count>0 || self!=locker)
+    THROW("Monitor was not acquired by this thread (GMonitor::wait)");
+  // Wait
+  if (ok)
+    {
+      // Release
+      int sav_count = count;
+      count = 1;
+      ResetEvent(hev[0]);
+      ResetEvent(hev[1]);
+      // Wait
+      LeaveCriticalSection(&cs);
+      WaitForMultipleObjects(2,hev,FALSE,timeout);
+      // Re-acquire
+      EnterCriticalSection(&cs);
+      count = sav_count;
+      locker = self;
+    }
 }
 
 #endif
@@ -220,19 +341,15 @@ GThread::current()
   return (void*) thid;
 }
 
-
-// GCriticalSection: unimportant since mac threads are cooperative
-GCriticalSection::GCriticalSection() {}
-GCriticalSection::~GCriticalSection() {}
-void GCriticalSection::lock() {}
-void GCriticalSection::unlock() {}
-
-// GEvent: this is highly suspicious (LYB!)
-GEvent::GEvent() {}
-GEvent::~GEvent() {}
-void GEvent::set() {}
-void GEvent::wait() {}
-void GEvent::wait(int timeout) {}
+// GMonitor is not implemented (highly suspicious)
+inline GMonitor::GMonitor() {}
+inline GMonitor::~GMonitor() {}
+inline void GMonitor::enter() {}
+inline void GMonitor::leave() {}
+inline void GMonitor::wait() {}
+inline void GMonitor::wait(unsigned long timeout) {}
+inline void GMonitor::signal() {}
+inline void GMonitor::broadcast() {}
 
 #endif
 
@@ -247,11 +364,9 @@ void GEvent::wait(int timeout) {}
 #if defined(CMA_INCLUDE) || defined(pthread_attr_default)
 #define DCETHREADS
 #define pthread_key_create pthread_keycreate
-static pthread_t nullthread;
 #else
 #define pthread_mutexattr_default  NULL
 #define pthread_condattr_default   NULL
-static const pthread_t nullthread = 0;
 #endif
 
 static void *
@@ -301,9 +416,8 @@ start(void *arg)
 // GThread
 
 GThread::GThread(int stacksize) : 
-    hthr(nullthread),
-    xentry(0), 
-    xarg(0)
+  xentry(0), 
+  xarg(0)
 {
 }
 
@@ -364,94 +478,113 @@ GThread::current()
 #endif
 }
 
+// -- GMonitor
 
-
-// -- GCriticalSection
-
-GCriticalSection::GCriticalSection() 
-  : count(0), locker(nullthread) 
-{	
+GMonitor::GMonitor()
+  : ok(0), count(1), locker(0)
+{
   pthread_mutex_init(&mutex, pthread_mutexattr_default);
+  pthread_cond_init(&cond, pthread_condattr_default); 
+  locker = pthread_self();
   ok = 1;
 }
 
-GCriticalSection::~GCriticalSection()
-{	
+GMonitor::~GMonitor()
+{
   ok = 0;
+  pthread_cond_destroy(&cond);
   pthread_mutex_destroy(&mutex); 
 }
 
+
 void 
-GCriticalSection::lock() 
+GMonitor::enter()
 {
   pthread_t self = pthread_self();
-  if (count<=0 || !pthread_equal(locker, self))
+  if (count>0 || !pthread_equal(locker, self))
     {
       if (ok)
         pthread_mutex_lock(&mutex);
       locker = self;
+      count = 1;
     }
-  count += 1;
+  count -= 1;
 }
 
 void 
-GCriticalSection::unlock() 
+GMonitor::leave()
 {
   pthread_t self = pthread_self();
-  if (! pthread_equal(locker, self))
-    THROW("GCriticalSection has been misused");
-  count -= 1;
-  if (count == 0) 
+  if (ok && (count>0 || !pthread_equal(locker, self)))
+    THROW("Monitor was not acquired by this thread (GMonitor::broadcast)");
+  count += 1;
+  if (count > 0)
     {
-      count  = 0;
-      locker = nullthread;
+      count = 1;
       if (ok)
         pthread_mutex_unlock(&mutex);
     }
 }
 
-// -- GEvent
-
-GEvent::GEvent() 
-  : status(0) 
+void
+GMonitor::signal()
 {
-  pthread_cond_init(&cond, pthread_condattr_default); 
-  pthread_mutex_init(&mutex, pthread_mutexattr_default);
-}
-
-GEvent::~GEvent() 
-{
-  pthread_mutex_destroy(&mutex);
-  pthread_cond_destroy(&cond);
+  if (ok)
+    {
+      pthread_t self = pthread_self();
+      if (count>0 || !pthread_equal(locker, self))
+        THROW("Monitor was not acquired by this thread (GMonitor::signal)");
+      pthread_cond_signal(&cond);
+    }
 }
 
 void
-GEvent::set() 
+GMonitor::broadcast()
 {
-  if (status) 
-    return;
-  pthread_mutex_lock(&mutex);
-  status = 1;
-  pthread_cond_signal(&cond);
-  pthread_mutex_unlock(&mutex);
+  if (ok)
+    {
+      pthread_t self = pthread_self();
+      if (count>0 || !pthread_equal(locker, self))
+        THROW("Monitor was not acquired by this thread (GMonitor::broadcast)");
+      pthread_cond_broadcast(&cond);
+    }
 }
 
 void
-GEvent::wait()
+GMonitor::wait()
 {
-  pthread_mutex_lock(&mutex);
-  if (! status)
-    pthread_cond_wait(&cond, &mutex);
-  status = 0;
-  pthread_mutex_unlock(&mutex);
+  // Check
+  pthread_t self = pthread_self();
+  if (count>0 || !pthread_equal(locker, self))
+    THROW("Monitor was not acquired by this thread (GMonitor::wait)");
+  // Wait
+  if (ok)
+    {
+      // Release
+      int sav_count = count;
+      count = 1;
+      // Wait
+      pthread_cond_wait(&cond, &mutex);
+      // Re-acquire
+      count = sav_count;
+      locker = self;
+    }      
 }
 
 void
-GEvent::wait(int timeout) 
+GMonitor::wait(unsigned long timeout) 
 {
-  pthread_mutex_lock(&mutex);
-  if (! status)
-    {	
+  // Check
+  pthread_t self = pthread_self();
+  if (count>0 || !pthread_equal(locker, self))
+    THROW("Monitor was not acquired by this thread (GMonitor::wait)");
+  // Wait
+  if (ok)
+    {
+      // Release
+      int sav_count = count;
+      count = 1;
+      // Wait
       struct timeval  abstv;
       struct timespec absts;
       gettimeofday(&abstv, NULL); // grrr
@@ -462,12 +595,14 @@ GEvent::wait(int timeout)
         absts.tv_sec += 1;
       }
       pthread_cond_timedwait(&cond, &mutex, &absts);
-    }
-  status = 0;
-  pthread_mutex_unlock(&mutex);
+      // Re-acquire
+      count = sav_count;
+      locker = self;
+    }      
 }
 
 #endif
+
 
 
 // ----------------------------------------
@@ -1102,7 +1237,7 @@ GThread::select(int nfds,
   return cotask_select(nfds, readfds, writefds, exceptfds, timeout);
 }
 
-void*
+inline void *
 GThread::current()
 {
   if (curtask && curtask!=maintask)
@@ -1111,117 +1246,133 @@ GThread::current()
 }
 
 
-// -------------------------------------- GCriticalSection
+// -------------------------------------- GMonitor
 
-GCriticalSection::GCriticalSection() 
-  : count(1), locker(0) 
-{	
+GMonitor::GMonitor()
+  : count(1), locker(0), seqno(0)
+{
+  locker = 0;
   ok = 1;
 }
 
-GCriticalSection::~GCriticalSection()
-{	
+GMonitor::~GMonitor()
+{
   ok = 0;
   cotask_unblock_wchan(&count);
 }
 
 void 
-GCriticalSection::lock() 
+GMonitor::enter()
 {
-  if (count>0) 
+  void *self = GThread::current();
+  if (count>0 || self!=locker)
     {
-      count = 0;
-      locker = curtask;
-    } 
-  else 
-    {
-      if (locker == 0)
-        locker = maintask;
-      if (locker==curtask) 
+      while (ok && count<=0)
         {
-          count -= 1;
-        } 
-      else if (ok) 
-        {
-          while (count<1) 
-            {
-              curtask->wchan = &count;
-              cotask_yield();
-            }
-          count = 0;
-          locker = curtask;
+          curtask->wchan = &count;
+          cotask_yield();
         }
+      count = 1;
+      locker = self;
     }
+  count -= 1;
 }
 
 void 
-GCriticalSection::unlock() 
+GMonitor::leave()
 {
-  if (count>0)
-    return;
-  if (! locker)
-    locker = maintask;
-  if (locker != curtask)
-    return;
+  void *self = GThread::current();
+  if (ok && (count>0 || self!=locker))
+    THROW("Monitor was not acquired by this thread (GMonitor::leave)");
   count += 1;
-  if (count>0)
-    {
-      locker = 0;
-      if (scheduling_callback)
-        (*scheduling_callback)(GThread::CallbackUnblock);
-    }
-}
-
-// -------------------------------------- GEvent
-
-GEvent::GEvent() 
-  : status(0) 
-{
-  ok = 1;
-}
-
-GEvent::~GEvent() 
-{
-  ok = 0;
-  cotask_unblock_wchan(&status);
 }
 
 void
-GEvent::set() 
+GMonitor::signal()
 {
-  status = 1;
-  if (scheduling_callback)
-    (*scheduling_callback)(GThread::CallbackUnblock);
+  void *self = GThread::current();
+  if (count>0 || self!=locker)
+    THROW("Monitor was not acquired by this thread (GMonitor::signal)");
+  wchan = 1;
 }
 
 void
-GEvent::wait()
+GMonitor::broadcast()
 {
-  if (ok && status<1)
+  void *self = GThread::current();
+  if (count>0 || self!=locker)
+    THROW("Monitor was not acquired by this thread (GMonitor::broadcast)");
+  seqno += 1;
+  wchan = 1;
+}
+
+void
+GMonitor::wait()
+{
+  // Check state
+  void *self = GThread::current();
+  if (count>0 || locker!=self)
+    THROW("Monitor was not acquired by this thread (GMonitor::wait)");
+  // Wait
+  if (ok)
     {
-      while (status<1)
+      // Release
+      int sav_count = count;
+      int sav_seqno = seqno;
+      count = 1;
+      // Wait
+      wchan = 0;
+      while (wchan<=0 && seqno==sav_seqno)
         {
-          curtask->wchan = &status;
+          curtask->wchan = &wchan;
           cotask_yield();
         }
+      wchan = 0;
+      // Re-acquire
+      while (ok && count <= 0)
+        {
+          curtask->wchan = &count;
+          cotask_yield();
+        }
+      count = sav_count;
+      locker = self;
     }
-  status = 0;
 }
 
 void
-GEvent::wait(int timeout) 
+GMonitor::wait(unsigned long timeout) 
 {
-  if (ok && status<1)
+  // Check state
+  void *self = GThread::current();
+  if (count>0 || locker!=self)
+    THROW("Monitor was not acquired by this thread (GMonitor::wait)");
+  // Wait
+  if (ok)
     {
+      // Release
+      int sav_count = count;
+      int sav_seqno = seqno;
+      count = 1;
+      // Wait
+      wchan = 0;
       unsigned long maxwait = time_elapsed(0) + timeout;
-      while (status<1 && maxwait>0)
+      while (wchan<=0 && maxwait>0 && seqno==sav_seqno)
         {
           curtask->maxwait = &maxwait;
-          curtask->wchan = &status;
+          curtask->wchan = &wchan;
           cotask_yield();
         }
+      wchan = 0;
+      // Re-acquire
+      while (ok && count<=0)
+        {
+          curtask->wchan = &count;
+          cotask_yield();
+        }
+      count = sav_count;
+      locker = self;
     }
-  status = 0;
 }
 
 #endif
+
