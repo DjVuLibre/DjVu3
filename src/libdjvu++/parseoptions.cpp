@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: parseoptions.cpp,v 1.13 1999-12-05 08:08:26 bcr Exp $
+//C- $Id: parseoptions.cpp,v 1.14 1999-12-08 03:22:54 bcr Exp $
 #ifdef __GNUC__
 #pragma implementation
 #endif
@@ -144,6 +144,7 @@ djvu_parse_configfile(struct djvu_parse opts,const char *name,int which)
 // Simple constructor
 DjVuParseOptions::DjVuParseOptions 
 (const char prog[])
+: argc(0),argv(0),optind(0)
 {
 	filename = 0;
   VarTokens=new DjVuTokenList;
@@ -171,6 +172,7 @@ DjVuParseOptions::DjVuParseOptions
 
 #if 0
 DjVuParseOptions::DjVuParseOptions()
+: argc(0),argv(0),optind(0)
 {
 	filename = 0;
   VarTokens=new DjVuTokenList;
@@ -189,6 +191,7 @@ DjVuParseOptions::DjVuParseOptions()
 
 DjVuParseOptions::DjVuParseOptions 
 (const char readfilename[],const char readasprofile[],DjVuTokenList *Vars)
+: argc(0),argv(0),optind(0)
 {
   if(Vars)
   {
@@ -216,7 +219,10 @@ DjVuParseOptions::DjVuParseOptions
   currentProfile(Original.currentProfile),
   VarTokens(Original.VarTokens),
   ProfileTokens(Original.ProfileTokens),
-  Configuration(Original.Configuration)
+  Configuration(Original.Configuration),
+  argc(0),
+  argv(0),
+  optind(0)
 {
   Errors=new ErrorList;
   VarTokens->links++;
@@ -239,6 +245,16 @@ DjVuParseOptions::DjVuParseOptions
 //
 DjVuParseOptions::~DjVuParseOptions()
 {
+  if(argv)
+  {
+    int i;
+    for(i=0;i<argc;i++)
+    {
+      delete argv[i];
+      argv[i]=0;
+    }
+    delete [] argv;
+  }
   if(!VarTokens->links--) delete VarTokens;
   if(!ProfileTokens->links--) delete ProfileTokens;
   if(!Configuration->links--) delete Configuration;
@@ -451,9 +467,14 @@ DjVuParseOptions::GetInteger
 //
 int
 DjVuParseOptions::ParseArguments
-(const int argc,const char * const argv[],const djvu_option opts[],const int long_only)
+(
+  const int xargc,
+  const char * const xargv[],
+  const djvu_option opts[],
+  const int long_only
+)
 {
-  GetOpt args(this,argc,argv,opts,long_only);
+  GetOpt args(this,xargc,xargv,opts,long_only);
   int i;
   while((i=args.getopt_long())>=0)
   {
@@ -462,6 +483,42 @@ DjVuParseOptions::ParseArguments
     if(s && (j=strlen(s)) && (v=VarTokens->GetToken(opts[i].name))>=0)
     {
       Arguments->Add(v,args.optarg?args.optarg:"TRUE");
+    }
+  }
+  if(argv)
+  {
+    for(i=0;i<argc;i++)
+    {
+      delete argv[i];
+      argv[i]=0;
+    }
+    delete [] argv;
+  }
+  if(xargc)
+  {
+    int j;
+    if(argc)
+    {
+      char **oldargv=argv;
+      argv=new char *[argc+xargc-1];
+      for(i=0;i<argc;i++)
+      {
+        argv[i]=oldargv[i];
+        oldargv[i]=0;
+      }
+      delete [] oldargv;
+      optind=args.optind+argc-1;
+      argc+=xargc-(j=1);
+    }else
+    {
+      i=j=0;
+      argv=new char *[(argc=xargc)];
+      optind=args.optind; 
+    }
+    while(i<argc)
+    {
+      argv[i]=new char[strlen(xargv[j])+1];
+      strcpy(argv[i++],xargv[j++]);
     }
   }
   return args.optind;

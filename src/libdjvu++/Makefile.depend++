@@ -241,17 +241,6 @@ djvumake.o: djvumake.cpp GString.h DjVuGlobal.h \
  GMapAreas.h DjVuFile.h DataPool.h \
  DjVuPalette.h DjVuPort.h GURL.h \
  DjVuNavDir.h MMRDecoder.h
-djvureindex.o: djvureindex.cpp DjVuDocument.h \
- DjVuGlobal.h GSmartPointer.h DjVuFileCache.h \
- DjVuFile.h ByteStream.h GException.h \
- GContainer.h Arrays.h DataPool.h \
- GThreads.h GString.h DjVuInfo.h \
- JB2Image.h ZPCodec.h GRect.h GBitmap.h \
- IWImage.h GPixmap.h IFFByteStream.h \
- DjVuPalette.h DjVuPort.h GURL.h \
- DjVuNavDir.h debug.h DjVuImage.h \
- DjVuAnno.h GMapAreas.h DjVmDir0.h \
- DjVmDoc.h DjVmDir.h GOS.h
 djvutopnm.o: djvutopnm.cpp GException.h \
  DjVuGlobal.h GSmartPointer.h GRect.h \
  GPixmap.h ByteStream.h GContainer.h \
