@@ -32,16 +32,16 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: bin2cpp.cpp,v 1.4 2001-10-16 18:01:44 docbill Exp $
+// $Id: bin2cpp.cpp,v 1.5 2001-10-17 18:59:36 docbill Exp $
 // $Name:  $
 
-
-#include <stdio.h>
-#include <stdlib.h>
 
 #include "GURL.h"
 #include "GString.h"
 #include "BSByteStream.h"
+
+#include <stdio.h>
+#include <stdlib.h>
 
 int
 main(int argc, char ** argv)

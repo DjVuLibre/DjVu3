@@ -32,16 +32,12 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: MapDraw.h,v 1.5 2001-10-16 18:01:45 docbill Exp $
+// $Id: MapDraw.h,v 1.6 2001-10-17 19:09:17 docbill Exp $
 // $Name:  $
 
 
 #ifndef HDR_MAPDRAW
 #define HDR_MAPDRAW
-
-#ifdef __GNUC__
-#pragma interface
-#endif
 
 #include "GPixmap.h"
 #include "GMapAreas.h"

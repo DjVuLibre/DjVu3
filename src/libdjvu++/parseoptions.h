@@ -30,11 +30,16 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: parseoptions.h,v 1.52 2001-10-16 18:01:44 docbill Exp $
+// $Id: parseoptions.h,v 1.53 2001-10-17 18:56:49 docbill Exp $
 // $Name:  $
 
 #ifndef __DJVUPARSEOPTIONS_H__
 #define __DJVUPARSEOPTIONS_H__
+
+#include "GString.h"
+#include "Arrays.h"
+#include "DjVu.h"
+
 
 /** @name parseoptions.h
    The idea is simply to have one object that we can use to parse arguments
@@ -66,7 +71,7 @@
 
    @memo Class used for parsing options and configuration files.
    @author Bill Riemers
-   @version #$Id: parseoptions.h,v 1.52 2001-10-16 18:01:44 docbill Exp $#
+   @version #$Id: parseoptions.h,v 1.53 2001-10-17 18:56:49 docbill Exp $#
  */
 
 /*@{*/
@@ -77,18 +82,7 @@
  * configuration files.  The operations of ChangeProfile(), and the copy
  * constructor are only thread safe if you define a THREADMODEL. 
  */
-#include "GString.h"
-#include "Arrays.h"
-#include "DjVu.h"
-
 #ifdef __cplusplus
-#ifdef __GNUC__
-#pragma interface
-#endif /* __GNUC */
-
-#ifndef DJVUPARSEOPTIONS_STANDALONE
-#include "DjVuGlobal.h"
-#endif /* DJVUPARSEOPTIONS_STANDALONE */
 
 #include <stdio.h>
 

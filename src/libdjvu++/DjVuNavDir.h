@@ -30,15 +30,11 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuNavDir.h,v 1.19 2001-10-16 18:01:43 docbill Exp $
+// $Id: DjVuNavDir.h,v 1.20 2001-10-17 18:56:47 docbill Exp $
 // $Name:  $
 
 #ifndef _DJVUNAVDIR_H
 #define _DJVUNAVDIR_H
-
-#ifdef __GNUC__
-#pragma interface
-#endif
 
 #include "GString.h"
 #include "GThreads.h"
@@ -56,7 +52,7 @@ class ByteStream;
 
     @memo DjVu Navigation Directory
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: DjVuNavDir.h,v 1.19 2001-10-16 18:01:43 docbill Exp $#
+    @version #$Id: DjVuNavDir.h,v 1.20 2001-10-17 18:56:47 docbill Exp $#
 */
 
 //@{

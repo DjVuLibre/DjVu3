@@ -32,12 +32,8 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: GMarginCache.cpp,v 1.17 2001-10-16 18:01:45 docbill Exp $
+// $Id: GMarginCache.cpp,v 1.18 2001-10-17 19:11:41 docbill Exp $
 // $Name:  $
 
-
-#ifdef __GNUC__
-#pragma implementation
-#endif
 
 #include "GMarginCache.h"

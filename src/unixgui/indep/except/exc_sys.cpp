@@ -32,12 +32,8 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: exc_sys.cpp,v 1.4 2001-10-16 18:01:45 docbill Exp $
+// $Id: exc_sys.cpp,v 1.5 2001-10-17 19:04:27 docbill Exp $
 // $Name:  $
 
-
-#ifdef __GNUC__
-#pragma implementation
-#endif
 
 #include "exc_sys.h"

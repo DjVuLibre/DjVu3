@@ -32,17 +32,14 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: prefs.h,v 1.19 2001-10-16 18:01:45 docbill Exp $
+// $Id: prefs.h,v 1.20 2001-10-17 19:11:41 docbill Exp $
 // $Name:  $
 
 
 #ifndef HDR_PREFS
 #define HDR_PREFS
 
-#ifdef __GNUC__
-#pragma interface
-#endif
-
+#include "DjVuGlobal.h"
 #include "GString.h"
 
 class DjVuPrefs

@@ -30,15 +30,11 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GIFFManager.h,v 1.21 2001-10-16 18:01:44 docbill Exp $
+// $Id: GIFFManager.h,v 1.22 2001-10-17 18:56:47 docbill Exp $
 // $Name:  $
 
 #ifndef _GIFFMANAGER_H
 #define _GIFFMANAGER_H
-
-#ifdef __GNUC__
-#pragma interface
-#endif
 
 #include "IFFByteStream.h"
 #include "GContainer.h"
@@ -62,7 +58,7 @@
     @author 
     Andrei Erofeev <eaf@geocities.com> -- Initial implementation.
     @version 
-    #$Id: GIFFManager.h,v 1.21 2001-10-16 18:01:44 docbill Exp $# */
+    #$Id: GIFFManager.h,v 1.22 2001-10-17 18:56:47 docbill Exp $# */
 
 /** #GIFFChunk# is the base class for other IFF chunks understood by
     {\Ref GIFFManager}. It provides some basic interface, and is not supposed

@@ -30,11 +30,16 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuGlobal.h,v 1.60 2001-10-16 18:01:43 docbill Exp $
+// $Id: DjVuGlobal.h,v 1.61 2001-10-17 18:56:47 docbill Exp $
 // $Name:  $
 
 #ifndef _DJVUGLOBAL_H
 #define _DJVUGLOBAL_H
+
+#ifdef HAS_CONFIG_H
+#undef HAS_CONFIG_H
+#include "config.h"
+#endif
 
 #ifndef _DEBUG
 #ifdef NDEBUG
@@ -43,6 +48,7 @@
 #endif
 #endif
 #endif
+
 //Placement new support.
 //There is no new.h for WinCE, so we define a placement new here.
 // (lifted from wcealt.h which can not be included in the library header files
@@ -86,7 +92,7 @@
     @memo
     Global definitions.
     @version
-    #$Id: DjVuGlobal.h,v 1.60 2001-10-16 18:01:43 docbill Exp $#
+    #$Id: DjVuGlobal.h,v 1.61 2001-10-17 18:56:47 docbill Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> -- empty file.\\
     Bill Riemers <bcr@lizardtech.com> -- real work.  */

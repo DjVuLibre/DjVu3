@@ -30,15 +30,11 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GBitmap.h,v 1.40 2001-10-16 18:01:44 docbill Exp $
+// $Id: GBitmap.h,v 1.41 2001-10-17 18:56:47 docbill Exp $
 // $Name:  $
 
 #ifndef _GBITMAP_H_
 #define _GBITMAP_H_
-
-#ifdef __GNUC__
-#pragma interface
-#endif
 
 #include "GSmartPointer.h"
 #ifndef NO_DEBUG
@@ -69,7 +65,7 @@ class ByteStream;
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: GBitmap.h,v 1.40 2001-10-16 18:01:44 docbill Exp $#
+    #$Id: GBitmap.h,v 1.41 2001-10-17 18:56:47 docbill Exp $#
 
  */
 //@{

@@ -30,11 +30,14 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: JB2Image.h,v 1.38 2001-10-16 18:01:44 docbill Exp $
+// $Id: JB2Image.h,v 1.39 2001-10-17 18:56:49 docbill Exp $
 // $Name:  $
 
 #ifndef _JB2IMAGE_H
 #define _JB2IMAGE_H
+
+#include "GString.h"
+#include "ZPCodec.h"
 
 /** @name JB2Image.h
 
@@ -129,20 +132,13 @@
     \end{itemize}
 
     @version
-    #$Id: JB2Image.h,v 1.38 2001-10-16 18:01:44 docbill Exp $#
+    #$Id: JB2Image.h,v 1.39 2001-10-17 18:56:49 docbill Exp $#
     @memo
     Coding bilevel images with JB2.
     @author
     Paul Howard <pgh@research.att.com> -- JB2 design\\
     L\'eon Bottou <leonb@research.att.com> -- this implementation */
 //@{
-
-#ifdef __GNUC__
-#pragma interface
-#endif
-
-#include "GString.h"
-#include "ZPCodec.h"
 
 class JB2Dict;
 class JB2Image;

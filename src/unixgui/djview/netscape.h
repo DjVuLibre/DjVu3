@@ -32,17 +32,14 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: netscape.h,v 1.4 2001-10-16 18:01:44 docbill Exp $
+// $Id: netscape.h,v 1.5 2001-10-17 19:00:53 docbill Exp $
 // $Name:  $
 
  
 #ifndef HDR_NETSCAPE
 #define HDR_NETSCAPE
 
-#ifdef __GNUC__
-#pragma interface
-#endif
-
+#include "DjVuGlobal.h"
 #include <time.h>
 
 // In 5 minutes of inactivity the program will exit. IN MILLISECONDS.

@@ -30,11 +30,16 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuInfo.h,v 1.19 2001-10-16 18:01:43 docbill Exp $
+// $Id: DjVuInfo.h,v 1.20 2001-10-17 18:56:47 docbill Exp $
 // $Name:  $
 
 #ifndef _DJVUINFO_H
 #define _DJVUINFO_H
+
+#include "GSmartPointer.h"
+#include "GRect.h"
+
+class ByteStream;
 
 
 /** @name DjVuInfo.h
@@ -46,18 +51,9 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: DjVuInfo.h,v 1.19 2001-10-16 18:01:43 docbill Exp $# */
+    #$Id: DjVuInfo.h,v 1.20 2001-10-17 18:56:47 docbill Exp $# */
 //@{
 
-
-#ifdef __GNUC__
-#pragma interface
-#endif
-
-#include "GSmartPointer.h"
-#include "GRect.h"
-
-class ByteStream;
 
 /** @name DjVu version constants
     @memo DjVu file format version. */

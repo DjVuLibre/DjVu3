@@ -5,9 +5,9 @@
 //C-
 //C-
 
+#include "GSmartPointer.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include "GSmartPointer.h"
 
 
 static char genid = 'a';

@@ -32,16 +32,14 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: mime_utils.h,v 1.17 2001-10-16 18:01:45 docbill Exp $
+// $Id: mime_utils.h,v 1.18 2001-10-17 19:11:41 docbill Exp $
 // $Name:  $
 
 
 #ifndef HDR_MIME
 #define HDR_MIME
 
-#ifdef __GNUC__
-#pragma interface
-#endif
+#include "DjVuGlobal.h"
 
 bool
 fixMimeTypes(const char * name_in, const char * name_out);

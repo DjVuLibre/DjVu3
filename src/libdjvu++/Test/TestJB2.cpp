@@ -5,13 +5,13 @@
 //C-
 //C-
 
-#include <stdio.h>
-#include <locale.h>
 #include "JB2Image.h"
 #include "GBitmap.h"
 #include "ByteStream.h"
 #include "GException.h"
 #include "GURL.h"
+#include <stdio.h>
+#include <locale.h>
 
 #ifdef ENCODE
 #include "JB2Filter.h"

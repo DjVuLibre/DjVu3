@@ -30,15 +30,11 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocEditor.h,v 1.50 2001-10-16 18:01:43 docbill Exp $
+// $Id: DjVuDocEditor.h,v 1.51 2001-10-17 18:56:46 docbill Exp $
 // $Name:  $
 
 #ifndef _DJVUDOCEDITOR_H
 #define _DJVUDOCEDITOR_H
-
-#ifdef __GNUC__
-#pragma interface
-#endif
 
 #include "DjVuDocument.h"
 #include "DjVmDoc.h"
@@ -51,7 +47,7 @@
 
     @memo DjVu document editor class.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: DjVuDocEditor.h,v 1.50 2001-10-16 18:01:43 docbill Exp $#
+    @version #$Id: DjVuDocEditor.h,v 1.51 2001-10-17 18:56:46 docbill Exp $#
 */
 
 //@{

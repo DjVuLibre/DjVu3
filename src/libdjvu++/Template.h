@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: Template.h,v 1.17 2001-10-16 18:01:44 docbill Exp $
+// $Id: Template.h,v 1.18 2001-10-17 18:56:49 docbill Exp $
 // $Name:  $
 
 //T// This is a template for the header files in the
@@ -42,17 +42,13 @@
 #ifndef _TEMPLATE_H_
 #define _TEMPLATE_H_
 
-//T// GCC stuff reducing template overhead
-#ifdef __GNUC__
-#pragma interface
-#endif
-
-//T// Always include "DjVuGlobal.h"
+//T// Always include "DjVuGlobal.h" first, unless it is included
+//T// first from the first include file...
 #include "DjVuGlobal.h"
 
 //T// Other include files
-#include <string.h>
 #include "GException.h"
+#include <string.h>
 
 
 
@@ -96,7 +92,7 @@
     @memo 
     Template header file
     @version 
-    #$Id: Template.h,v 1.17 2001-10-16 18:01:44 docbill Exp $# 
+    #$Id: Template.h,v 1.18 2001-10-17 18:56:49 docbill Exp $# 
     @author: 
     L\'eon Bottou <leonb@research.att.com> -- initial implementation \\
     Andrew Erofeev <eaf@geocities.com> -- implemented EXTERNAL_TEMPLATES */

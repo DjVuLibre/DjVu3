@@ -30,12 +30,8 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GUnicode.cpp,v 1.35 2001-10-16 22:27:24 docbill Exp $
+// $Id: GUnicode.cpp,v 1.36 2001-10-17 18:56:48 docbill Exp $
 // $Name:  $
-
-#ifdef __GNUC__
-#pragma implementation
-#endif
 
 #include "GString.h"
 #ifdef HAS_ICONV

@@ -30,12 +30,8 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GURL.cpp,v 1.91 2001-10-16 22:27:24 docbill Exp $
+// $Id: GURL.cpp,v 1.92 2001-10-17 18:56:48 docbill Exp $
 // $Name:  $
-
-#ifdef __GNUC__
-#pragma implementation
-#endif
 
 #include "GException.h"
 #include "GOS.h"

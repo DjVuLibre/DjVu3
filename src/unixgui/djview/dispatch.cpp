@@ -32,17 +32,14 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: dispatch.cpp,v 1.6 2001-10-16 22:27:24 docbill Exp $
+// $Id: dispatch.cpp,v 1.7 2001-10-17 19:00:53 docbill Exp $
 // $Name:  $
 
-#ifdef __GNUC__
-#pragma implementation
-#endif
+#include "DjVuGlobal.h"
 #ifdef DJVU_VIEWER
 #define REPARENT 1
 #endif
 
-#include <sys/time.h>
 
 #include "DataPool.h"
 
@@ -61,6 +58,7 @@
 #include "qx_imager.h"
 #include "qlib.h"
 #include "mime_check.h"
+#include <sys/time.h>
 
 #include <iostream.h>
 #include <qtimer.h>

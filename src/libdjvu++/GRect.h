@@ -30,15 +30,13 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GRect.h,v 1.31 2001-10-16 18:01:44 docbill Exp $
+// $Id: GRect.h,v 1.32 2001-10-17 18:56:48 docbill Exp $
 // $Name:  $
 
 #ifndef _GRECT_H_
 #define _GRECT_H_
 
-#ifdef __GNUC__
-#pragma interface
-#endif
+#include "DjVuGlobal.h"
 
 /** @name GRect.h
     Files #"GRect.h"# and #"GRect.cpp"# implement basic operations on
@@ -51,10 +49,9 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GRect.h,v 1.31 2001-10-16 18:01:44 docbill Exp $# */
+    #$Id: GRect.h,v 1.32 2001-10-17 18:56:48 docbill Exp $# */
 //@{
 
-#include "DjVuGlobal.h"
 
 
 /** @name Point Coordinates vs. Pixel Coordinates

@@ -32,16 +32,12 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qd_doc_saver.h,v 1.4 2001-10-16 18:01:45 docbill Exp $
+// $Id: qd_doc_saver.h,v 1.5 2001-10-17 19:09:17 docbill Exp $
 // $Name:  $
 
 
 #ifndef HDR_QD_DOC_SAVER
 #define HDR_QD_DOC_SAVER
-
-#ifdef __GNUC__
-#pragma interface
-#endif
 
 #include "DjVuDocument.h"
 #include "DjVmDir.h"

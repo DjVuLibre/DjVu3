@@ -6,11 +6,11 @@
 //C-
 
 
+#include "GBitmap.h"
+#include "ByteStream.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <locale.h>
-#include "GBitmap.h"
-#include "ByteStream.h"
 
 const char *bmap1=
 "P1  16 16\n"

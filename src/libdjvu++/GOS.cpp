@@ -30,12 +30,8 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GOS.cpp,v 1.66 2001-10-16 22:27:24 docbill Exp $
+// $Id: GOS.cpp,v 1.67 2001-10-17 18:56:47 docbill Exp $
 // $Name:  $
-
-#ifdef __GNUC__
-#pragma implementation
-#endif
 
 #include "GException.h"
 #include "GThreads.h"

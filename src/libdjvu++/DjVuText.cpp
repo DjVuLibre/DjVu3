@@ -30,12 +30,8 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuText.cpp,v 1.32 2001-10-16 18:01:44 docbill Exp $
+// $Id: DjVuText.cpp,v 1.33 2001-10-17 18:56:47 docbill Exp $
 // $Name:  $
-
-#ifdef __GNUC__
-#pragma implementation
-#endif
 
 #include "DjVuText.h"
 #include "IFFByteStream.h"

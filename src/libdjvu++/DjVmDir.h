@@ -30,11 +30,15 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVmDir.h,v 1.42 2001-10-16 18:01:43 docbill Exp $
+// $Id: DjVmDir.h,v 1.43 2001-10-17 18:56:45 docbill Exp $
 // $Name:  $
 
 #ifndef _DJVMDIR_H
 #define _DJVMDIR_H
+
+#include "GString.h"
+#include "GThreads.h"
+class ByteStream;
 
 
 /** @name DjVmDir.h
@@ -84,18 +88,8 @@
     @memo Implements DjVu multipage document directory
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: DjVmDir.h,v 1.42 2001-10-16 18:01:43 docbill Exp $# */
+    #$Id: DjVmDir.h,v 1.43 2001-10-17 18:56:45 docbill Exp $# */
 //@{
-
-
-#ifdef __GNUC__
-#pragma interface
-#endif
-
-#include "GString.h"
-#include "GThreads.h"
-
-class ByteStream;
 
 /** Implements DjVu multipage document directory.  There are currently two
     multipage DjVu formats supported: {\em bundled} and {\em indirect}.  In

@@ -30,11 +30,15 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuImage.h,v 1.50 2001-10-16 18:01:43 docbill Exp $
+// $Id: DjVuImage.h,v 1.51 2001-10-17 18:56:47 docbill Exp $
 // $Name:  $
 
 #ifndef _DJVUIMAGE_H
 #define _DJVUIMAGE_H
+
+#include "DjVuFile.h"
+#include "DjVuAnno.h"
+#include "GRect.h"
 
 
 /** @name DjVuImage.h
@@ -73,17 +77,9 @@
     L\'eon Bottou <leonb@research.att.com> - initial implementation
     Andrei Erofeev <eaf@geocities.com> - multipage support
     @version
-    #$Id: DjVuImage.h,v 1.50 2001-10-16 18:01:43 docbill Exp $# */
+    #$Id: DjVuImage.h,v 1.51 2001-10-17 18:56:47 docbill Exp $# */
 //@{
 
-
-#ifdef __GNUC__
-#pragma interface
-#endif
-
-#include "DjVuFile.h"
-#include "DjVuAnno.h"
-#include "GRect.h"
 
 /* Obsolete class included for backward compatibility. */
 

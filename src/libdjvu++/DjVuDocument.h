@@ -30,15 +30,11 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocument.h,v 1.96 2001-10-16 18:01:43 docbill Exp $
+// $Id: DjVuDocument.h,v 1.97 2001-10-17 18:56:46 docbill Exp $
 // $Name:  $
 
 #ifndef _DJVUDOCUMENT_H
 #define _DJVUDOCUMENT_H
-
-#ifdef __GNUC__
-#pragma interface
-#endif
 
 #include "DjVuPort.h"
 
@@ -58,7 +54,7 @@ class ByteStream;
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocument.h,v 1.96 2001-10-16 18:01:43 docbill Exp $#
+    @version #$Id: DjVuDocument.h,v 1.97 2001-10-17 18:56:46 docbill Exp $#
 */
 
 //@{

@@ -30,8 +30,10 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: JB2EncodeCodec.cpp,v 1.13 2001-10-16 18:01:44 docbill Exp $
+// $Id: JB2EncodeCodec.cpp,v 1.14 2001-10-17 18:56:48 docbill Exp $
 // $Name:  $
+
+#include "DjVuGlobal.h"
 
 #ifndef NEED_DECODER_ONLY
 

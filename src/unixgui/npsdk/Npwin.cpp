@@ -4,8 +4,10 @@
 //C-              Unauthorized use prohibited.
 //C-
 // 
-// $Id: Npwin.cpp,v 1.16 2001-10-16 18:01:45 docbill Exp $
+// $Id: Npwin.cpp,v 1.17 2001-10-17 19:06:56 docbill Exp $
 // $Name:  $
+
+#include "DjVuGlobal.h"
 
 /* npwin.cpp */
 

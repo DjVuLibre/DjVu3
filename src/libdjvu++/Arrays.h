@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: Arrays.h,v 1.31 2001-10-16 18:01:43 docbill Exp $
+// $Id: Arrays.h,v 1.32 2001-10-17 18:56:41 docbill Exp $
 // $Name:  $
 
 #ifndef _ARRAYS_H_
@@ -40,10 +40,6 @@
 #include "GSmartPointer.h"
 #include <string.h>
 
-
-#ifdef __GNUC__
-#pragma interface
-#endif
 
 
 /** @name Arrays.h
@@ -94,7 +90,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@geocities.com> -- Copy-on-demand implementation.
     @version 
-    #$Id: Arrays.h,v 1.31 2001-10-16 18:01:43 docbill Exp $# */
+    #$Id: Arrays.h,v 1.32 2001-10-17 18:56:41 docbill Exp $# */
 //@{
 
 // Auxiliary classes: Will be used in place of GPBase and GPEnabled objects

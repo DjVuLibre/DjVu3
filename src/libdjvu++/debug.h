@@ -30,15 +30,13 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: debug.h,v 1.21 2001-10-16 18:01:44 docbill Exp $
+// $Id: debug.h,v 1.22 2001-10-17 18:56:49 docbill Exp $
 // $Name:  $
 
 #ifndef _DEBUG_H_
 #define _DEBUG_H_
 
-#ifdef __GNUC__
-#pragma interface
-#endif
+#include "DjVuGlobal.h"
 
 #include <stdio.h>
 #ifdef WIN32
@@ -94,7 +92,7 @@ class GURL;
     @memo 
     Macros for printing debug messages.
     @version 
-    #$Id: debug.h,v 1.21 2001-10-16 18:01:44 docbill Exp $#
+    #$Id: debug.h,v 1.22 2001-10-17 18:56:49 docbill Exp $#
     @author
     Andrew Erofeev <eaf@geocities.com> -- initial implementation \\
     Leon Bottou <leonb@research.att.com> -- cleanups */

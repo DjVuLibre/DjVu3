@@ -32,12 +32,8 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: saved_data.cpp,v 1.17 2001-10-16 18:01:45 docbill Exp $
+// $Id: saved_data.cpp,v 1.18 2001-10-17 19:10:29 docbill Exp $
 // $Name:  $
 
-
-#ifdef __GNUC__
-#pragma implementation
-#endif
 
 #include "saved_data.h"

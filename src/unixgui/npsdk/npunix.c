@@ -1,5 +1,5 @@
 /*C-  -*- C -*-
- * $Id: npunix.c,v 1.15 2001-10-16 18:01:45 docbill Exp $
+ * $Id: npunix.c,v 1.16 2001-10-17 19:06:56 docbill Exp $
  * $Name:  $
  */
 
@@ -20,9 +20,9 @@
 
 #define XP_UNIX 1
 
-#include <stdio.h>
 #include "npapi.h"
 #include "npupp.h"
+#include <stdio.h>
 
 /*
  * Define PLUGIN_TRACE to have the wrapper functions print

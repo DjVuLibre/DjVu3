@@ -30,19 +30,21 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuGlobalMemory.cpp,v 1.18 2001-10-16 18:01:43 docbill Exp $
+// $Id: DjVuGlobalMemory.cpp,v 1.19 2001-10-17 18:56:47 docbill Exp $
 // $Name:  $
 
-#ifdef NEED_DJVU_MEMORY
 #ifndef NEED_DJVU_MEMORY_IMPLEMENTATION
 #define NEED_DJVU_MEMORY_IMPLEMENTATION
 #endif /* NEED_DJVU_MEMORY_IMPLEMENTATION */
 
 #include "DjVuGlobal.h"
+
+#ifdef NEED_DJVU_MEMORY
+
 #include "GException.h"
+#include "debug.h"
 #include <stdlib.h>
 #include <string.h>
-#include "debug.h"
 
 #ifdef UNIX
 djvu_delete_callback *

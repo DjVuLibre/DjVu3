@@ -5,13 +5,13 @@
 //C-
 //C-
 
+#include "GString.h"
+#include "DjVu.h"
+#include "DjVuMessage.h"
 #include <new.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <locale.h>
-#include "GString.h"
-#include "DjVu.h"
-#include "DjVuMessage.h"
 
 #define PRS(expr)  DjVuPrintMessageUTF8("%s :=\"%s\"\n", #expr, (const char*)(expr))
 #define PRI(expr)  DjVuPrintMessageUTF8("%s :=%d\n", #expr, (int)(expr))

@@ -5,11 +5,11 @@
 //C-
 //C-
 
+#include "GContainer.h"
+#include "GString.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <locale.h>
-#include "GContainer.h"
-#include "GString.h"
 
 #define PRS(expr)  DjVuPrintMessageUTF8("%s :=\"%s\"\n", #expr, (const char*)(expr))
 #define PRI(expr)  DjVuPrintMessageUTF8("%s :=%d\n", #expr, (int)(expr))

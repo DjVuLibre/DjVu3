@@ -32,17 +32,14 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qd_welcome.h,v 1.4 2001-10-16 18:01:45 docbill Exp $
+// $Id: qd_welcome.h,v 1.5 2001-10-17 19:09:18 docbill Exp $
 // $Name:  $
 
 
 #ifndef HDR_QD_WELCOME
 #define HDR_QD_WELCOME
 
-#ifdef __GNUC__
-#pragma interface
-#endif
-
+#include "DjVuGlobal.h"
 #include <qdialog.h>
 #include <qcheckbox.h>
 #include <qpushbutton.h>

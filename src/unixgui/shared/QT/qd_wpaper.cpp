@@ -32,13 +32,9 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qd_wpaper.cpp,v 1.5 2001-10-16 18:01:45 docbill Exp $
+// $Id: qd_wpaper.cpp,v 1.6 2001-10-17 19:09:18 docbill Exp $
 // $Name:  $
 
-
-#ifdef __GNUC__
-#pragma implementation
-#endif
 
 #include "qd_wpaper.h"
 

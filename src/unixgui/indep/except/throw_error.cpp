@@ -32,13 +32,11 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: throw_error.cpp,v 1.6 2001-10-16 18:01:45 docbill Exp $
+// $Id: throw_error.cpp,v 1.7 2001-10-17 19:04:27 docbill Exp $
 // $Name:  $
 
 
-#ifdef __GNUC__
-#pragma implementation
-#endif
+#include "DjVuGlobal.h"
 
 // GCC 2.8.1 on RedHat 4.0 can't compile this file with -DDEBUG_i and -O2
 // Disable debug messages locally.

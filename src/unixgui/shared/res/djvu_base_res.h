@@ -32,17 +32,14 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: djvu_base_res.h,v 1.18 2001-10-16 18:01:45 docbill Exp $
+// $Id: djvu_base_res.h,v 1.19 2001-10-17 19:10:29 docbill Exp $
 // $Name:  $
 
 
 #ifndef HDR_DJVU_BASE_RES
 #define HDR_DJVU_BASE_RES
 
-#ifdef __GNUC__
-#pragma interface
-#endif
-
+#include "DjVuGlobal.h"
 #define IDC_SAVE			40000
 #define IDC_SAVE_DOC			40001
 #define IDC_SAVE_DOC_AS			40002

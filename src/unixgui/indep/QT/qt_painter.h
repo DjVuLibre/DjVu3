@@ -32,16 +32,12 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qt_painter.h,v 1.4 2001-10-16 18:01:45 docbill Exp $
+// $Id: qt_painter.h,v 1.5 2001-10-17 19:02:05 docbill Exp $
 // $Name:  $
 
 
 #ifndef HDR_QT_PAINTER
 #define HDR_QT_PAINTER
-
-#ifdef __GNUC__
-#pragma interface
-#endif
 
 #include "GPixmap.h"
 #include "GBitmap.h"

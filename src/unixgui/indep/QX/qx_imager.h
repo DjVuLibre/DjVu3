@@ -32,16 +32,12 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qx_imager.h,v 1.4 2001-10-16 18:01:45 docbill Exp $
+// $Id: qx_imager.h,v 1.5 2001-10-17 19:03:18 docbill Exp $
 // $Name:  $
 
 
 #ifndef HDR_QX_IMAGER
 #define HDR_QX_IMAGER
-
-#ifdef __GNUC__
-#pragma interface
-#endif
 
 #include "qt_imager.h"
 #include "GRect.h"

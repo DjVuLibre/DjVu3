@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuGlobal.cpp,v 1.37 2001-10-16 18:01:43 docbill Exp $
+// $Id: DjVuGlobal.cpp,v 1.38 2001-10-17 18:56:46 docbill Exp $
 // $Name:  $
 
 /** This file impliments the DjVuProgressTask elements.  The memory
@@ -38,10 +38,9 @@
     functions should be compiled with out overloading of the memory functions.
  */
   
-
-#ifdef NEED_DJVU_PROGRESS
 #include "DjVuGlobal.h"
 
+#ifdef NEED_DJVU_PROGRESS
 
 // ----------------------------------------
 

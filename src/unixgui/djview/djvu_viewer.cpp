@@ -32,13 +32,9 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: djvu_viewer.cpp,v 1.7 2001-10-16 22:27:24 docbill Exp $
+// $Id: djvu_viewer.cpp,v 1.8 2001-10-17 19:00:53 docbill Exp $
 // $Name:  $
 
-
-#ifdef __GNUC__
-#pragma implementation
-#endif
 
 #include "djvu_viewer.h"
 

@@ -30,17 +30,13 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GThreads.cpp,v 1.66 2001-10-16 22:27:24 docbill Exp $
+// $Id: GThreads.cpp,v 1.67 2001-10-17 18:56:48 docbill Exp $
 // $Name:  $
 
 
 // This file defines machine independent classes
 // for running and synchronizing threads.
 // - Author: Leon Bottou, 01/1998
-
-#ifdef __GNUC__
-#pragma implementation
-#endif
 
 #include "GThreads.h"
 #include "GException.h"

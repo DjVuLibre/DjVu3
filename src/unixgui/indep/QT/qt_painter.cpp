@@ -32,13 +32,9 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qt_painter.cpp,v 1.4 2001-10-16 18:01:45 docbill Exp $
+// $Id: qt_painter.cpp,v 1.5 2001-10-17 19:02:05 docbill Exp $
 // $Name:  $
 
-
-#ifdef __GNUC__
-#pragma implementation
-#endif
 
 #include "qt_painter.h"
 #include "exc_msg.h"

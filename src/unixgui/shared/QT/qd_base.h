@@ -32,16 +32,12 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qd_base.h,v 1.6 2001-10-16 18:01:45 docbill Exp $
+// $Id: qd_base.h,v 1.7 2001-10-17 19:09:17 docbill Exp $
 // $Name:  $
 
 
 #ifndef HDR_QD_BASE
 #define HDR_QD_BASE
-
-#ifdef __GNUC__
-#pragma interface
-#endif
 
 #include "DjVuImage.h"
 #include "GMarginCache.h"

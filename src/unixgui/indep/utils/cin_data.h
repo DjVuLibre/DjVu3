@@ -32,16 +32,12 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: cin_data.h,v 1.4 2001-10-16 18:01:45 docbill Exp $
+// $Id: cin_data.h,v 1.5 2001-10-17 19:05:39 docbill Exp $
 // $Name:  $
 
  
 #ifndef HDR_CIN_DATA
 #define HDR_CIN_DATA
-
-#ifdef __GNUC__
-#pragma interface
-#endif
 
 #include "ByteStream.h"
 #include "GContainer.h"

@@ -32,13 +32,9 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qd_messenger.cpp,v 1.16 2001-10-16 18:01:45 docbill Exp $
+// $Id: qd_messenger.cpp,v 1.17 2001-10-17 19:09:17 docbill Exp $
 // $Name:  $
 
-
-#ifdef __GNUC__
-#pragma implementation
-#endif
 
 #include "qd_messenger.h"
 #include "exc_msg.h"

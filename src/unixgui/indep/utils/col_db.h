@@ -32,16 +32,12 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: col_db.h,v 1.4 2001-10-16 18:01:45 docbill Exp $
+// $Id: col_db.h,v 1.5 2001-10-17 19:05:40 docbill Exp $
 // $Name:  $
 
 
 #ifndef HDR_COL_DB
 #define HDR_COL_DB
-
-#ifdef __GNUC__
-#pragma interface
-#endif
 
 #include "int_types.h"
 #include "GContainer.h"

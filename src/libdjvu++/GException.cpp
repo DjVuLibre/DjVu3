@@ -30,19 +30,15 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GException.cpp,v 1.38 2001-10-16 18:01:44 docbill Exp $
+// $Id: GException.cpp,v 1.39 2001-10-17 18:56:47 docbill Exp $
 // $Name:  $
 
-#ifdef __GNUC__
-#pragma implementation
-#endif
-
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 #include "GException.h"
 #include "DjVuMessageLite.h"
 #include "debug.h"
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 
 // - Author: Leon Bottou, 05/1997
 

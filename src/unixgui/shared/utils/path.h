@@ -32,17 +32,14 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: path.h,v 1.17 2001-10-16 18:01:45 docbill Exp $
+// $Id: path.h,v 1.18 2001-10-17 19:11:41 docbill Exp $
 // $Name:  $
 
  
 #ifndef HDR_PATH
 #define HDR_PATH
 
-#ifdef __GNUC__
-#pragma interface
-#endif
-
+#include "DjVuGlobal.h"
 #include "GString.h"
 
 GUTF8String	GetLibraryPath(void);

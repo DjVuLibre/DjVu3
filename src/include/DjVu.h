@@ -26,7 +26,7 @@
  *C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
  *C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
  * 
- * $Id: DjVu.h,v 1.25 2001-10-16 18:01:43 docbill Exp $
+ * $Id: DjVu.h,v 1.26 2001-10-17 18:55:12 docbill Exp $
  * $Name:  $
  */
 
@@ -46,7 +46,11 @@
 
 /* Predeclarations. (should go here) */
 
- 
+#ifdef HAS_CONFIG_H
+#undef HAS_CONFIG_H
+#include "config.h"
+#endif
+
 #include <stdlib.h>
 
 #ifdef __cplusplus

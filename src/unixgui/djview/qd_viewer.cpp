@@ -32,13 +32,9 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qd_viewer.cpp,v 1.26 2001-10-16 18:01:44 docbill Exp $
+// $Id: qd_viewer.cpp,v 1.27 2001-10-17 19:00:53 docbill Exp $
 // $Name:  $
 
-
-#ifdef __GNUC__
-#pragma implementation
-#endif
 
 #include "qd_viewer.h"
 #include "debug.h"

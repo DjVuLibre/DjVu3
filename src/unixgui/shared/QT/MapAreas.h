@@ -32,17 +32,12 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: MapAreas.h,v 1.6 2001-10-16 18:01:45 docbill Exp $
+// $Id: MapAreas.h,v 1.7 2001-10-17 19:09:17 docbill Exp $
 // $Name:  $
 
 
 #ifndef HDR_MAPAREAS
 #define HDR_MAPAREAS
-
-#ifdef __GNUC__
-#pragma interface
-#endif
-
 
 #include "GMapAreas.h"
 #include "GContainer.h"

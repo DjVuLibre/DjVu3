@@ -32,16 +32,14 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: version.h,v 1.18 2001-10-16 18:01:45 docbill Exp $
+// $Id: version.h,v 1.19 2001-10-17 19:10:29 docbill Exp $
 // $Name:  $
 
 
 #ifndef HDR_VERSION
 #define HDR_VERSION
 
-#ifdef __GNUC__
-#pragma interface
-#endif
+#include "DjVuGlobal.h"
 
 #define DJVIEW_VERSION_STR	"3.5"
 #define DJEDIT_VERSION_STR	"3.5"

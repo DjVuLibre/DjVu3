@@ -30,11 +30,16 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuToPS.h,v 1.17 2001-10-16 18:01:44 docbill Exp $
+// $Id: DjVuToPS.h,v 1.18 2001-10-17 18:56:47 docbill Exp $
 // $Name:  $
 
 #ifndef _DJVU_TO_PS_H_
 #define _DJVU_TO_PS_H_
+
+#include "DjVuGlobal.h"
+#include "GRect.h"
+#include "DjVuDocument.h"
+#include "DjVuText.h"
 
 /** @name DjVuToPS.h
     Files #"DjVuToPS.h"# and #"DjVuToPS.cpp"# implement code that can be
@@ -45,17 +50,9 @@
     @author Andrei Erofeev <eaf@geocities.com> \\
             Florin Nicsa <Florin.Nicsa@insa-lyon.fr>
     @version
-    #$Id: DjVuToPS.h,v 1.17 2001-10-16 18:01:44 docbill Exp $#
+    #$Id: DjVuToPS.h,v 1.18 2001-10-17 18:56:47 docbill Exp $#
 */
 //@{
-
-#ifdef __GNUC__
-#pragma interface
-#endif
-#include "DjVuGlobal.h"
-#include "GRect.h"
-#include "DjVuDocument.h"
-#include "DjVuText.h"
 
 /** DjVuImage to PostScript converter.
     Use this class to print \Ref{DjVuImage}s and \Ref{DjVuDocument}s.

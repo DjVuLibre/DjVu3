@@ -32,13 +32,9 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qx_pnote.cpp,v 1.4 2001-10-16 18:01:45 docbill Exp $
+// $Id: qx_pnote.cpp,v 1.5 2001-10-17 19:03:18 docbill Exp $
 // $Name:  $
 
-
-#ifdef __GNUC__
-#pragma implementation
-#endif
 
 #include "qx_pnote.h"
 #include "exc_msg.h"

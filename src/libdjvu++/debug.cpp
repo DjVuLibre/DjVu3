@@ -30,9 +30,10 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: debug.cpp,v 1.28 2001-10-16 18:01:44 docbill Exp $
+// $Id: debug.cpp,v 1.29 2001-10-17 18:56:49 docbill Exp $
 // $Name:  $
 
+#include "DjVuGlobal.h"
 #ifdef NO_DEBUG
 #undef NO_DEBUG
 #endif
@@ -50,10 +51,6 @@
 #include <stdio.h>
 #ifndef UNDER_CE
 #include <errno.h>
-#endif
-
-#ifdef __GNUC__
-#pragma implementation
 #endif
 
 #ifndef UNIX

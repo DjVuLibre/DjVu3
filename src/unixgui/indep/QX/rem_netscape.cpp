@@ -32,13 +32,9 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: rem_netscape.cpp,v 1.5 2001-10-16 22:27:24 docbill Exp $
+// $Id: rem_netscape.cpp,v 1.6 2001-10-17 19:03:18 docbill Exp $
 // $Name:  $
 
-
-#ifdef __GNUC__
-#pragma implementation
-#endif
 
 #include "throw_error.h"
 #include "exc_msg.h"

@@ -32,13 +32,9 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qd_base_events.cpp,v 1.25 2001-10-16 22:27:24 docbill Exp $
+// $Id: qd_base_events.cpp,v 1.26 2001-10-17 19:09:17 docbill Exp $
 // $Name:  $
 
-
-#ifdef __GNUC__
-#pragma implementation
-#endif
 
 #include "qd_base_events.h"
 #include "djvu_base_res.h"

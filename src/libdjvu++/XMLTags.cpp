@@ -30,12 +30,8 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: XMLTags.cpp,v 1.28 2001-10-16 18:01:44 docbill Exp $
+// $Id: XMLTags.cpp,v 1.29 2001-10-17 18:56:49 docbill Exp $
 // $Name:  $
-
-#ifdef __GNUC__
-#pragma implementation
-#endif
 
 #include "XMLTags.h"
 #include "UnicodeByteStream.h"

@@ -30,12 +30,8 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessageLite.cpp,v 1.11 2001-10-16 18:01:43 docbill Exp $
+// $Id: DjVuMessageLite.cpp,v 1.12 2001-10-17 18:56:47 docbill Exp $
 // $Name:  $
-
-#ifdef __GNUC__
-#pragma implementation
-#endif
 
 #include "DjVuMessageLite.h"
 #include "GOS.h"

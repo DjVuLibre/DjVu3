@@ -30,15 +30,11 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuPort.h,v 1.43 2001-10-16 18:01:44 docbill Exp $
+// $Id: DjVuPort.h,v 1.44 2001-10-17 18:56:47 docbill Exp $
 // $Name:  $
 
 #ifndef _DJVUPORT_H
 #define _DJVUPORT_H
-
-#ifdef __GNUC__
-#pragma interface
-#endif
 
 #include "GThreads.h"
 #include "GURL.h"
@@ -90,7 +86,7 @@ class DataPool;
     @memo DjVu decoder communication mechanism.
     @author Andrei Erofeev <eaf@geocities.com>\\
             L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuPort.h,v 1.43 2001-10-16 18:01:44 docbill Exp $# */
+    @version #$Id: DjVuPort.h,v 1.44 2001-10-17 18:56:47 docbill Exp $# */
 //@{
 
 class DjVuPort;

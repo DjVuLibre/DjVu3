@@ -30,12 +30,8 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuImage.cpp,v 1.86 2001-10-16 18:01:43 docbill Exp $
+// $Id: DjVuImage.cpp,v 1.87 2001-10-17 18:56:47 docbill Exp $
 // $Name:  $
-
-#ifdef __GNUC__
-#pragma implementation
-#endif
 
 #include "DjVuImage.h"
 #include "GScaler.h"

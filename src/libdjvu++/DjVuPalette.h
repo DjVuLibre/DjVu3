@@ -30,15 +30,11 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuPalette.h,v 1.30 2001-10-16 18:01:44 docbill Exp $
+// $Id: DjVuPalette.h,v 1.31 2001-10-17 18:56:47 docbill Exp $
 // $Name:  $
 
 #ifndef _DJVUPALETTE_H_
 #define _DJVUPALETTE_H_
-
-#ifdef __GNUC__
-#pragma interface
-#endif
 
 #include "GContainer.h"
 #include "GPixmap.h"
@@ -52,7 +48,7 @@
     @memo 
     DjVuPalette header file
     @version 
-    #$Id: DjVuPalette.h,v 1.30 2001-10-16 18:01:44 docbill Exp $#
+    #$Id: DjVuPalette.h,v 1.31 2001-10-17 18:56:47 docbill Exp $#
     @author: 
     L\'eon Bottou <leonb@research.att.com> */
 //@{

@@ -30,12 +30,13 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GThreads.h,v 1.48 2001-10-16 18:01:44 docbill Exp $
+// $Id: GThreads.h,v 1.49 2001-10-17 18:56:48 docbill Exp $
 // $Name:  $
 
 #ifndef _GTHREADS_H_
 #define _GTHREADS_H_
 
+#include "DjVuGlobal.h"
 
 /** @name GThreads.h
 
@@ -95,14 +96,9 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Praveen Guduru <praveen@sanskrit.lz.att.com> -- mac implementation.
     @version
-    #$Id: GThreads.h,v 1.48 2001-10-16 18:01:44 docbill Exp $# */
+    #$Id: GThreads.h,v 1.49 2001-10-17 18:56:48 docbill Exp $# */
 //@{
 
-#ifdef __GNUC__
-#pragma interface
-#endif
-
-#include "DjVuGlobal.h"
 #include "GException.h"
 
 #define NOTHREADS     0

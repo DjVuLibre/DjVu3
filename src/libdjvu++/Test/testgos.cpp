@@ -5,7 +5,7 @@
 //C-
 //C-
 
-#include "..\GOS.h"
+#include "GOS.h"
 #ifdef WIN32
 #include <tchar.h>
 #endif

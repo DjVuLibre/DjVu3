@@ -32,19 +32,15 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qd_mime_dialog.h,v 1.4 2001-10-16 18:01:44 docbill Exp $
+// $Id: qd_mime_dialog.h,v 1.5 2001-10-17 19:00:53 docbill Exp $
 // $Name:  $
 
 
 #ifndef HDR_QD_MIME_DIALOG
 #define HDR_QD_MIDE_DIALOG
 
-#ifdef __GNUC__
-#pragma interface
-#endif
-
+#include "DjVuGlobal.h"
 #include <qdialog.h>
-
 #include "qt_fix.h"
 
 class QDMimeDialog : public QeDialog

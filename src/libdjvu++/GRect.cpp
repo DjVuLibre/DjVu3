@@ -30,15 +30,11 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GRect.cpp,v 1.25 2001-10-16 18:01:44 docbill Exp $
+// $Id: GRect.cpp,v 1.26 2001-10-17 18:56:48 docbill Exp $
 // $Name:  $
 
 // -- Implementation of class GRect and GRectMapper
 // - Author: Leon Bottou, 05/1997
-
-#ifdef __GNUC__
-#pragma implementation
-#endif
 
 #include "GRect.h"
 #include "GException.h"

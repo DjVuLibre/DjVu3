@@ -30,12 +30,16 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: IFFByteStream.h,v 1.35 2001-10-16 18:01:44 docbill Exp $
+// $Id: IFFByteStream.h,v 1.36 2001-10-17 18:56:48 docbill Exp $
 // $Name:  $
 
 #ifndef _IFFBYTESTREAM_H_
 #define _IFFBYTESTREAM_H_
 
+#include "DjVuGlobal.h"
+#include "GException.h"
+#include "GString.h"
+#include "ByteStream.h"
 
 /** @name IFFByteStream.h
 
@@ -89,20 +93,12 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: IFFByteStream.h,v 1.35 2001-10-16 18:01:44 docbill Exp $# */
+    #$Id: IFFByteStream.h,v 1.36 2001-10-17 18:56:48 docbill Exp $# */
 //@{
 
-#ifdef __GNUC__
-#pragma interface
-#endif
-
-#include "DjVuGlobal.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "GException.h"
-#include "GString.h"
-#include "ByteStream.h"
 
 
 

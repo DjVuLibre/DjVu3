@@ -30,21 +30,15 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GSmartPointer.cpp,v 1.29 2001-10-16 18:01:44 docbill Exp $
+// $Id: GSmartPointer.cpp,v 1.30 2001-10-17 18:56:48 docbill Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 05/1997
 
-#if 0 // Put this into *one* file, which instantiates all the required containers
-#ifdef __GNUC__
-#pragma implementation
-#endif 
-#endif
-
-#include <string.h>
 #include "GThreads.h"
 #include "GSmartPointer.h"
 #include "GException.h"
+#include <string.h>
 
 
 // ------ STATIC CRITICAL SECTION

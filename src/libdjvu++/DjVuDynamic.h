@@ -30,15 +30,11 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDynamic.h,v 1.5 2001-10-16 18:01:43 docbill Exp $
+// $Id: DjVuDynamic.h,v 1.6 2001-10-17 18:56:46 docbill Exp $
 // $Name:  $
 
 #ifndef _DJVUDYNAMIC_H_
 #define _DJVUDYNAMIC_H_
-
-#ifdef __GNUC__
-#pragma interface
-#endif
 
 #include "GString.h"
 

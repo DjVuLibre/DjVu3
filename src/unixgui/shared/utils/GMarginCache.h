@@ -32,16 +32,12 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: GMarginCache.h,v 1.17 2001-10-16 18:01:45 docbill Exp $
+// $Id: GMarginCache.h,v 1.18 2001-10-17 19:11:41 docbill Exp $
 // $Name:  $
 
 
 #ifndef HDR_GMARGIN_CACHE
 #define HDR_GMARGIN_CACHE
-
-#if defined(EXTERNAL_TEMPLATES) && defined(__GNUC__)
-#pragma interface
-#endif
 
 #include "GRect.h"
 #include "GContainer.h"

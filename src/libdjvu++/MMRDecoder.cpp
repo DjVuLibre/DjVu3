@@ -30,12 +30,8 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: MMRDecoder.cpp,v 1.38 2001-10-16 18:01:44 docbill Exp $
+// $Id: MMRDecoder.cpp,v 1.39 2001-10-17 18:56:49 docbill Exp $
 // $Name:  $
-
-#ifdef __GNUC__
-#pragma implementation
-#endif
 
 #include "MMRDecoder.h"
 #include "JB2Image.h"

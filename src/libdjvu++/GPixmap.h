@@ -30,11 +30,17 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GPixmap.h,v 1.28 2001-10-16 18:01:44 docbill Exp $
+// $Id: GPixmap.h,v 1.29 2001-10-17 18:56:47 docbill Exp $
 // $Name:  $
 
 #ifndef _GPIXMAP_H_
 #define _GPIXMAP_H_
+
+#include "GSmartPointer.h"
+
+class GBitmap;
+class GRect;
+class ByteStream;
 
 /** @name GPixmap.h
 
@@ -52,18 +58,8 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: GPixmap.h,v 1.28 2001-10-16 18:01:44 docbill Exp $# */
+    #$Id: GPixmap.h,v 1.29 2001-10-17 18:56:47 docbill Exp $# */
 //@{
-
-#ifdef __GNUC__
-#pragma interface
-#endif
-
-#include "GSmartPointer.h"
-
-class GBitmap;
-class GRect;
-class ByteStream;
 
 
 /** Color pixel as a RGB triple.  

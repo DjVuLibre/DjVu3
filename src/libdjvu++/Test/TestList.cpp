@@ -5,12 +5,12 @@
 //C-
 //C-
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <locale.h>
 #include "GContainer.h"
 #include "GString.h"
 #include "DjVuMessage.h"
+#include <stdlib.h>
+#include <stdio.h>
+#include <locale.h>
 
 // #define THOROUGH
 #ifdef THOROUGH

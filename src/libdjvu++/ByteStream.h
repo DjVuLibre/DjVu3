@@ -30,11 +30,14 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.h,v 1.61 2001-10-16 18:01:43 docbill Exp $
+// $Id: ByteStream.h,v 1.62 2001-10-17 18:56:44 docbill Exp $
 // $Name:  $
 
 #ifndef _BYTESTREAM_H
 #define _BYTESTREAM_H
+
+#include "Arrays.h"
+#include <stdio.h>
 
 /** @name ByteStream.h
     
@@ -62,17 +65,8 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation\\
     Andrei Erofeev <eaf@geocities.com> -- 
     @version
-    #$Id: ByteStream.h,v 1.61 2001-10-16 18:01:43 docbill Exp $# */
+    #$Id: ByteStream.h,v 1.62 2001-10-17 18:56:44 docbill Exp $# */
 //@{
-
-#ifdef __GNUC__
-#pragma interface
-#endif
-
-#include "Arrays.h"
-#include <stdio.h>
-//include <stdlib.h>
-//include <string.h>
 
 class GURL;
 class GUTF8String;

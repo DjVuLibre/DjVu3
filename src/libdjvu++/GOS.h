@@ -30,11 +30,16 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GOS.h,v 1.24 2001-10-16 18:01:44 docbill Exp $
+// $Id: GOS.h,v 1.25 2001-10-17 18:56:47 docbill Exp $
 // $Name:  $
 
 #ifndef _GOS_H_
 #define _GOS_H_
+
+#include "DjVuGlobal.h"
+#include "GString.h"
+
+class GURL;
 
 /** @name GOS.h
     Files #"GOS.h"# and #"GOS.cpp"# implement operating system 
@@ -53,17 +58,9 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- Initial implementation
     @version
-    #$Id: GOS.h,v 1.24 2001-10-16 18:01:44 docbill Exp $#
+    #$Id: GOS.h,v 1.25 2001-10-17 18:56:47 docbill Exp $#
 */
 //@{
-
-#ifdef __GNUC__
-#pragma interface
-#endif
-#include "DjVuGlobal.h"
-#include "GString.h"
-
-class GURL;
 
 /** Operating System dependent functions. */
 class GOS 

@@ -30,11 +30,16 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDumpHelper.h,v 1.14 2001-10-16 18:01:43 docbill Exp $
+// $Id: DjVuDumpHelper.h,v 1.15 2001-10-17 18:56:46 docbill Exp $
 // $Name:  $
 
 #ifndef _DJVUDUMPHELPER_H
 #define _DJVUDUMPHELPER_H
+
+#include "GSmartPointer.h"
+
+class DataPool;
+class ByteStream;
 
 
 /** @name DjVuDupmHelper.h
@@ -48,18 +53,9 @@
     L\'eon Bottou <leonb@research.att.com>,
     Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: DjVuDumpHelper.h,v 1.14 2001-10-16 18:01:43 docbill Exp $# */
+    #$Id: DjVuDumpHelper.h,v 1.15 2001-10-17 18:56:46 docbill Exp $# */
 //@{
 
-
-#ifdef __GNUC__
-#pragma interface
-#endif
-
-#include "GSmartPointer.h"
-
-class DataPool;
-class ByteStream;
 
 /** DjVuDumpHelper.
     This class can dump information on any DjVu file without decoding it.

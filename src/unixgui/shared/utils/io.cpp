@@ -32,13 +32,9 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: io.cpp,v 1.17 2001-10-16 18:01:45 docbill Exp $
+// $Id: io.cpp,v 1.18 2001-10-17 19:11:41 docbill Exp $
 // $Name:  $
 
-
-#ifdef __GNUC__
-#pragma implementation
-#endif
 
 #include "io.h"
 #include "debug.h"

@@ -1,5 +1,5 @@
 /*C-  -*- C -*-
- * $Id: jri_md.h,v 1.15 2001-10-16 18:01:45 docbill Exp $
+ * $Id: jri_md.h,v 1.16 2001-10-17 19:06:56 docbill Exp $
  * $Name:  $
  */
 
@@ -11,6 +11,8 @@
  
 #ifndef JRI_MD_H
 #define JRI_MD_H
+
+#include "DjVu.h"
 
 #include <assert.h>
 

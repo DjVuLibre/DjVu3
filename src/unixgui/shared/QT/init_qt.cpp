@@ -32,14 +32,11 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: init_qt.cpp,v 1.7 2001-10-16 18:01:45 docbill Exp $
+// $Id: init_qt.cpp,v 1.8 2001-10-17 19:09:17 docbill Exp $
 // $Name:  $
 
 
-#ifdef __GNUC__
-#pragma implementation
-#endif
-
+#include "DjVuGlobal.h"
 #include <qfileinfo.h>
 #include <qtranslator.h>
 

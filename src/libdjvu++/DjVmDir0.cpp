@@ -30,12 +30,9 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVmDir0.cpp,v 1.20 2001-10-16 18:01:43 docbill Exp $
+// $Id: DjVmDir0.cpp,v 1.21 2001-10-17 18:56:46 docbill Exp $
 // $Name:  $
 
-#ifdef __GNUC__
-#pragma implementation
-#endif
 
 #include "DjVmDir0.h"
 #include "ByteStream.h"

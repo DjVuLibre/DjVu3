@@ -6,12 +6,12 @@
 //C-
 
 
-#include <stdio.h>
-#include <locale.h>
 #include "GException.h"
 #include "GString.h"
 #include "DjVu.h"
 #include "DjVuMessage.h"
+#include <stdio.h>
+#include <locale.h>
 
 
 #ifdef _MSC_VER

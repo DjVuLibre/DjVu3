@@ -32,18 +32,9 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: main.cpp,v 1.10 2001-10-16 18:01:44 docbill Exp $
+// $Id: main.cpp,v 1.11 2001-10-17 19:00:53 docbill Exp $
 // $Name:  $
 
-
-#ifdef __GNUC__
-#pragma implementation
-#endif
-
-#include <iostream>
-#include <signal.h>
-#include <stdio.h>
-#include <locale.h>
 
 #include "DjVu.h"
 #include "ZPCodec.h"		// Wants to be before QT
@@ -62,6 +53,11 @@
 #include "execdir.h"
 #include "mime_check.h"
 #include "version.h"
+#include <iostream>
+#include <signal.h>
+#include <stdio.h>
+#include <locale.h>
+
 
 char		* progname;
 

@@ -32,16 +32,12 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: exc_res.h,v 1.4 2001-10-16 18:01:45 docbill Exp $
+// $Id: exc_res.h,v 1.5 2001-10-17 19:04:27 docbill Exp $
 // $Name:  $
 
 
 #ifndef HDR_EXC_RES
 #define HDR_EXC_RES
-
-#ifdef __GNUC__
-#pragma interface
-#endif
 
 #include "exc_base.h"
 

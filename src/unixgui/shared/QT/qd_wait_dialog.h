@@ -32,17 +32,14 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qd_wait_dialog.h,v 1.4 2001-10-16 18:01:45 docbill Exp $
+// $Id: qd_wait_dialog.h,v 1.5 2001-10-17 19:09:18 docbill Exp $
 // $Name:  $
 
 
 #ifndef HDR_QD_WAIT_DIALOG
 #define HDR_QD_WAIT_DIALOG
 
-#ifdef __GNUC__
-#pragma interface
-#endif
-
+#include "DjVuGlobal.h"
 #include <qsemimodal.h>
 
 #include "qt_fix.h"

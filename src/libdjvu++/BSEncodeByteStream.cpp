@@ -30,19 +30,18 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: BSEncodeByteStream.cpp,v 1.10 2001-10-16 18:01:43 docbill Exp $
+// $Id: BSEncodeByteStream.cpp,v 1.11 2001-10-17 18:56:43 docbill Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 07/1998
 
 
-#ifdef __GNUC__
-#pragma implementation
-#endif
-
 #include "BSByteStream.h"
 #include "GString.h"
+
+#ifdef BSORT_TIMER
 #undef BSORT_TIMER
+#endif
 #ifdef BSORT_TIMER
 #include "GOS.h"
 #endif
