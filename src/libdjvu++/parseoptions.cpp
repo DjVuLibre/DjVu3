@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: parseoptions.cpp,v 1.73 2001-04-05 23:57:31 bcr Exp $
+// $Id: parseoptions.cpp,v 1.74 2001-04-10 17:34:03 fcrary Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -669,7 +669,7 @@ void DjVuParseOptions::perror(const char *mesg)
   {
     if(mesg)
     {
-      DjVuPrintError("%s: %s\n",mesg,s);
+      DjVuPrintError("%s\n%s\n",mesg,s);
     }else
     {
       DjVuPrintError("%s\n",s);

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: parseoptions.h,v 1.42 2001-01-04 22:04:55 bcr Exp $
+// $Id: parseoptions.h,v 1.43 2001-04-10 17:34:03 fcrary Exp $
 // $Name:  $
 
 #ifndef __DJVUPARSEOPTIONS_H__
@@ -66,7 +66,7 @@
 
    @memo Class used for parsing options and configuration files.
    @author Bill Riemers
-   @version #$Id: parseoptions.h,v 1.42 2001-01-04 22:04:55 bcr Exp $#
+   @version #$Id: parseoptions.h,v 1.43 2001-04-10 17:34:03 fcrary Exp $#
  */
 
 /*@{*/
@@ -409,7 +409,7 @@ public:
       without the need to do a GetError() loop. */
   void ClearError();
 
-  /** This simple perror() type function prints all errors to stderr, with 
+  /** This simple perror() type function prints all errors, with 
       a GetError() loop, so the errors are cleared. */
   void perror(const char *mesg=0);
   /*@}*/
