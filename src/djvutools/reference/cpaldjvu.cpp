@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: cpaldjvu.cpp,v 1.23 2001-07-03 17:02:31 bcr Exp $
+// $Id: cpaldjvu.cpp,v 1.24 2001-07-23 22:46:37 bcr Exp $
 // $Name:  $
 
 
@@ -69,7 +69,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: cpaldjvu.cpp,v 1.23 2001-07-03 17:02:31 bcr Exp $# */
+    #$Id: cpaldjvu.cpp,v 1.24 2001-07-23 22:46:37 bcr Exp $# */
 //@{
 //@}
 
@@ -888,8 +888,8 @@ usage()
 {
   DjVuPrintErrorUTF8("Usage: cpaldjvu [options] <inputppmfile> <outputdjvufile>\n"
           "Options are:\n"
-          "   -colors n    Maximum number of colors during quantization (default 256).\n"
-          "   -dpi n       Resolution written into the output file (default 100).\n"
+          "   -colors [2-1024] Maximum number of colors during quantization (default 256).\n"
+          "   -dpi [25-1200]   Resolution written into the output file (default 100).\n"
           "   -verbose     Displays additional messages.\n" );
   exit(10);
 }
@@ -927,7 +927,7 @@ main(int argc, const char **argv)
             {
               char *end;
               opts.dpi = strtol(dargv[++i], &end, 10);
-              if (*end || opts.dpi<25 || opts.dpi>144000)
+              if (*end || opts.dpi<25 || opts.dpi>1200)
                 usage();
             }
           else if (arg == "-verbose")
