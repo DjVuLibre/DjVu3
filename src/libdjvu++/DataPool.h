@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DataPool.h,v 1.50 2001-08-24 15:40:31 docbill Exp $
+// $Id: DataPool.h,v 1.51 2001-08-24 18:38:05 docbill Exp $
 // $Name:  $
 
 #ifndef _DATAPOOL_H
@@ -65,7 +65,7 @@ class ByteStream;
 
     @memo Thread safe data storage
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DataPool.h,v 1.50 2001-08-24 15:40:31 docbill Exp $#
+    @version #$Id: DataPool.h,v 1.51 2001-08-24 18:38:05 docbill Exp $#
 */
 
 //@{

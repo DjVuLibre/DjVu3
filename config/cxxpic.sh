@@ -31,12 +31,12 @@
 #C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #
-# $Id: cxxpic.sh,v 1.13 2001-08-24 15:40:30 docbill Exp $
+# $Id: cxxpic.sh,v 1.14 2001-08-24 18:38:05 docbill Exp $
 # $Name:  $
 
 # This rule sets the following variables:
 #	CXXSYMBOLIC, CXXPIC
-# $Id: cxxpic.sh,v 1.13 2001-08-24 15:40:30 docbill Exp $
+# $Id: cxxpic.sh,v 1.14 2001-08-24 18:38:05 docbill Exp $
 
 if [ -z "$CXX_SET" ] ; then
   echo "You must source cxx.sh" 1>&2

@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: GMarginCache.h,v 1.13 2001-08-24 15:40:31 docbill Exp $
+// $Id: GMarginCache.h,v 1.14 2001-08-24 18:38:05 docbill Exp $
 // $Name:  $
 
 

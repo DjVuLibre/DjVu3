@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ZPCodec.cpp,v 1.22 2001-07-24 17:52:04 bcr Exp $
+// $Id: ZPCodec.cpp,v 1.23 2001-08-24 18:38:05 docbill Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -647,7 +647,7 @@ ZPCodec::Decode::Decode(GP<ByteStream> gbs, const bool djvucompat)
 ZPCodec::Decode::~Decode() {}
 
 ZPCodec::ZPCodec(GP<ByteStream> xgbs, const bool xencoding, const bool djvucompat)
-: gbs(xgbs), bs(xgbs), encoding(xencoding)
+: gbs(xgbs), bs(xgbs), encoding(xencoding), fence(0), subend(0), buffer(0), nrun(0)
 {
   // Create machine independent ffz table
   for (int i=0; i<256; i++)

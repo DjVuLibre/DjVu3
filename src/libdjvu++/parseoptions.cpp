@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: parseoptions.cpp,v 1.90 2001-07-24 17:52:04 bcr Exp $
+// $Id: parseoptions.cpp,v 1.91 2001-08-24 18:38:05 docbill Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -77,7 +77,7 @@ static const char profile_token_read_string[]="read";
 static const char profile_token_default_string[]="default";
 
 // These are some static functions we need.  They don't need access to class
-// variables so, there is no need to messup the class declarations with them.
+// variables so, there is no need to mess up the class declarations with them.
 //
 static int ReadEscape(FILE *f,int &line);
 
@@ -274,9 +274,9 @@ DjVuParseOptions::~DjVuParseOptions()
   delete Arguments;
 }
 
-// This reiniallizes the object, by creating a new object, copying the
+// This reinitializes the object by creating a new object, copying the
 // arguments and error list into that object, and then stealing the data
-// from the new object.  This is the only way to handle something simmular
+// from the new object.  This is the only way to handle something similar
 // to make's -f option.
 //
 void
@@ -855,7 +855,7 @@ DjVuParseOptions::ReadNextConfig (
 //  10. You can use single quotes to make everything exactly as is.  e.g. \\  
 //      would remain \\, and not be parsed as an escape character for a
 //      single \  
-//  In otherwords, it is very simmular to parsing a typical ~/.profile file
+//  In otherwords, it is very similar to parsing a typical ~/.profile file
 //  that only sets variable names.
 
 void

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.cpp,v 1.90 2001-08-24 15:40:30 docbill Exp $
+// $Id: ByteStream.cpp,v 1.91 2001-08-24 18:38:05 docbill Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 04/1997

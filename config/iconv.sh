@@ -31,7 +31,7 @@
 #C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #
-# $Id: iconv.sh,v 1.4 2001-08-24 15:40:30 docbill Exp $
+# $Id: iconv.sh,v 1.5 2001-08-24 18:38:05 docbill Exp $
 # $Name:  $
 
 # This script sets the variables:
@@ -57,6 +57,8 @@ then
   then
     echo yes
     (echo '#include <iconv.h>'
+     echo '#include <unistd.h>'
+     echo '#include <stdlib.h>'
      echo 'int main(int argc,char *[],char *[])'
      echo '{iconv_t cv;char *a;size_t i;iconv(cv,&a,&i,&a,&i);;exit(0);}'
     )|testfile $temp.cpp

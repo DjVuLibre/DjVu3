@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: parseoptions.h,v 1.48 2001-07-24 17:52:04 bcr Exp $
+// $Id: parseoptions.h,v 1.49 2001-08-24 18:38:05 docbill Exp $
 // $Name:  $
 
 #ifndef __DJVUPARSEOPTIONS_H__
@@ -66,7 +66,7 @@
 
    @memo Class used for parsing options and configuration files.
    @author Bill Riemers
-   @version #$Id: parseoptions.h,v 1.48 2001-07-24 17:52:04 bcr Exp $#
+   @version #$Id: parseoptions.h,v 1.49 2001-08-24 18:38:05 docbill Exp $#
  */
 
 /*@{*/
@@ -272,7 +272,8 @@ class DjVuTokenList;
 class DjVuParseOptions
 {
 
-public: // These are just class declarations.
+private:
+  // These are just class declarations.
   class Profiles;
   class ProfileList;
   class GetOpt;
@@ -280,7 +281,6 @@ public: // These are just class declarations.
   
   
 
-private:
   GUTF8String filename; // This is the name of the function.
   GUTF8String name; // This is the name of the function.
   int defaultProfile;
@@ -447,6 +447,7 @@ public:
 
 private:
   int profile_token;
+
   /* If you wish to retrieve the same variable multiple times, or from    
       multiple profiles, we recommend retrieving the token value for that  
       variable, to avoid repeated lookups of the string.                   
@@ -455,8 +456,8 @@ private:
 
   void Add(const int,const int,const int,const GUTF8String &);
   int ReadConfig(const GUTF8String &,const GUTF8String &);
-  inline int ReadConfig(const GUTF8String &) 
-  { return ReadConfig(name,""); }
+  inline int ReadConfig(const GUTF8String & xname) 
+      { return ReadConfig(xname,""); }
   int ReadNextConfig(int &,const GUTF8String &prog,FILE *f);
   void ReadFile(int &,FILE *f,int profile);
   void Init(const GUTF8String &,const DArray<GUTF8String> &argv,const djvu_option []);
@@ -465,14 +466,14 @@ private:
 };
 
  /** Token list.
-     This is a class very similar to GMap, only it is limited much more
+     This is a class very similar to GMap, only it has much more
      limited scope.  It is an associative array "string" to integer.  But
      the integer is assigned uniquely by this class in sequential order.
      This is of use when you want to store items sequentially in an array
      without making the array too large.  This list is always sorted, so
      this class is also useful for creating a sorted unique list of words.
 
-     At some point the TokenList class could easily be replace by GMap, but
+     At some point the TokenList class could easily be replaced by GMap, but
      is left as a separate class so static install programs can link just
      one object from the libdjvu++ library.
 
@@ -514,76 +515,101 @@ public:
 // The following are the inline functions declared above:
 //
 inline int
-DjVuParseOptions::GetVarToken
-(const GUTF8String &xname) const
-{return VarTokens->GetToken(xname);}
+DjVuParseOptions::GetVarToken(const GUTF8String &xname) const
+{
+  return VarTokens->GetToken(xname);
+}
 
 inline int
-DjVuParseOptions::SetVarToken
-(const GUTF8String &xname) const
-{return VarTokens->SetToken(xname);}
+DjVuParseOptions::SetVarToken(const GUTF8String &xname) const
+{
+  return VarTokens->SetToken(xname);
+}
 
 inline int
-DjVuParseOptions::GetProfileToken
-(const GUTF8String &xname) const
-{return ProfileTokens->GetToken(xname);}
+DjVuParseOptions::GetProfileToken(const GUTF8String &xname) const
+{
+  return ProfileTokens->GetToken(xname);
+}
 
 inline int
-DjVuParseOptions::SetProfileToken
-(const GUTF8String &xname) const
-{return ProfileTokens->SetToken(xname);}
+DjVuParseOptions::SetProfileToken(const GUTF8String &xname) const
+{
+  return ProfileTokens->SetToken(xname);
+}
 
 inline const char * const
-DjVuParseOptions::GetVarName
-(const int token) const
-{return VarTokens->GetString(token);}
+DjVuParseOptions::GetVarName(const int token) const
+{
+  return VarTokens->GetString(token);
+}
 
 inline const char * const
-DjVuParseOptions::GetProfileName
-(const int token) const
-{return ProfileTokens->GetString(token);}
+DjVuParseOptions::GetProfileName(const int token) const
+{
+  return ProfileTokens->GetString(token);
+}
 
 inline int
-DjVuParseOptions::GetBest
-(const int tokens[],bool requiretrue)
-{int i;for(i=0;tokens[i]>=0;i++);return GetBest(i,tokens,requiretrue);}
+DjVuParseOptions::GetBest(const int tokens[],bool requiretrue)
+{
+  int i;
+  for(i=0;tokens[i]>=0;i++);
+  return GetBest(i,tokens,requiretrue);
+}
 
 inline const char * const
-DjVuParseOptions::GetValue
-(const GUTF8String &xname) const
-{ return GetValue(GetVarToken(xname)); }
+DjVuParseOptions::GetValue(const GUTF8String &xname) const
+{
+  return GetValue(GetVarToken(xname)); 
+}
 
 inline int
-DjVuParseOptions::GetBest
-(const char * const names[],bool requiretrue)
-{int i;for(i=0;names[i];i++);return GetBest(i,names,requiretrue);}
+DjVuParseOptions::GetBest(const char * const names[],bool requiretrue)
+{
+  int i;
+  for(i=0;names[i];i++);
+  return GetBest(i,names,requiretrue);
+}
 
 inline int
-DjVuParseOptions::GetInteger
-(const GUTF8String &xname,const int errval,const int falseval,const int trueval) const
-{ return GetInteger(GetVarToken(xname),errval,falseval,trueval); }
+DjVuParseOptions::GetInteger(const GUTF8String &xname,
+                             const int errval,
+                             const int falseval,
+                             const int trueval) const
+{
+  return GetInteger(GetVarToken(xname),errval,falseval,trueval);
+}
 
 inline int
-DjVuParseOptions::GetNumber
-(const GUTF8String &xname,const int errval) const
-{ return GetNumber(GetVarToken(xname),errval); }
+DjVuParseOptions::GetNumber(const GUTF8String &xname,const int errval) const
+{ 
+  return GetNumber(GetVarToken(xname),errval); 
+}
 
 inline const char * const
-DjVuTokenList::GetString
-(const int token) const
-{ return (token<NextToken)?Strings[token]:0; }
+DjVuTokenList::GetString(const int token) const
+{
+  return (token<NextToken)?Strings[token]:0; 
+}
 
 inline const DArray<GUTF8String> &
 DjVuParseOptions::get_argv(void) const
-{ return argv; }
+{ 
+  return argv;
+}
 
 inline int
 DjVuParseOptions::get_argc(void) const
-{ return argv.hbound()+1; }
+{
+  return argv.hbound()+1; 
+}
 
 inline int
 DjVuParseOptions::get_optind(void) const
-{ return optind; }
+{ 
+  return optind; 
+}
 
 
 // The following are all classes which are private to the implementation
@@ -614,7 +640,8 @@ public:
     {return ((token<size)&&(token>=0))?values[token]:0;};
 };
 
-// And this is an array of array of strings...
+
+// And this is an array of arrays of strings...
 //
 class DjVuParseOptions::ProfileList
 {
@@ -639,6 +666,7 @@ public:
       return ((profile<size) && (profile>=0))?(profiles[profile].GetValue(var)):0; 
   };
 };
+
 
 // This is a class for implementing a getopt_long type function.
 //
