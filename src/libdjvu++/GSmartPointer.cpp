@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GSmartPointer.cpp,v 1.24 2001-01-10 02:13:18 bcr Exp $
+// $Id: GSmartPointer.cpp,v 1.25 2001-01-10 19:47:37 bcr Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 05/1997
@@ -155,7 +155,7 @@ GPBufferBase::swap(GPBufferBase &other)
   other.ptr=temp_ptr;
   const size_t temp_num=num;
   num=other.num;
-  other.num=num;
+  other.num=temp_num;
 }
 
 void
@@ -166,7 +166,7 @@ GPBufferBase::resize(const size_t n, const size_t t)
     num=0;
   }else
   {
-    const size_t s=((num<n)?num:n)*t;
+    const size_t s=ptr?(((num<n)?num:n)*t):0;
     void *nptr;
     GPBufferBase gnptr(nptr, n, t);
     if(s)
