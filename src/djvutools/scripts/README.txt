@@ -17,10 +17,10 @@ Perform the following procedure to install the PDF/PS to DjVu
 conversion utilities.  
  
 Step 1:
-        Download the pdftodjvu.tar.gz
+        Download the pdftodjvu301.tar.gz
 Step 2:
-        Untar and unzip the pdftodjvu.tar.gz file:
-                gunzip -c < pdftodjvu.tar.gz|tar xvvf -
+        Untar and unzip the pdftodjvu301.tar.gz file:
+                gunzip -c < pdftodjvu301.tar.gz|tar xvvf -
               
 Step 3: Verify that if you have Ghostscript version 5.50 installed,
         with the command:
@@ -118,6 +118,6 @@ Copyright (c) 2001 LizardTech, Inc.
 All rights reserved. DjVu is a registered trademark of LizardTech.
 Unauthorized use is prohibited by law.
 
-This pdftodjvu.tar.gz software is made available by LizardTech 
+This pdftodjvu301.tar.gz software is made available by LizardTech 
 subject to the GNU General Public License, in the COPYING.txt file.
 
