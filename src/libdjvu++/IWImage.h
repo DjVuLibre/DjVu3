@@ -30,12 +30,12 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: IWImage.h,v 1.19 2001-01-19 01:23:27 bcr Exp $
+// $Id: IWImage.h,v 1.20 2001-01-20 01:55:40 bcr Exp $
 // $Name:  $
 
 
-#ifndef _IWIMAGE_H_
-#define _IWIMAGE_H_
+#ifndef IWIMAGE_H_
+#define IWIMAGE_H_
 
 
 /** @name IWImage.h
@@ -129,7 +129,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: IWImage.h,v 1.19 2001-01-19 01:23:27 bcr Exp $# */
+    #$Id: IWImage.h,v 1.20 2001-01-20 01:55:40 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -137,21 +137,13 @@
 #endif
 
 #include "GSmartPointer.h"
-//include "GBitmap.h"
-//include "GPixmap.h"
-//include "ByteStream.h"
-//include "IFFByteStream.h"
-//include "GRect.h"
+#include "ZPCodec.h"
 
 class GRect;
 class IFFByteStream;
 class ByteStream;
 class GBitmap;
 class GPixmap;
-
-class _IWMap;
-class _IWBlock;
-class _IWCodec;
 
 
 
@@ -185,6 +177,131 @@ struct IWEncoderParms
 
 
 
+/** IW44 encoded gray-level and color images.  This class acts as a base for
+    images represented as a collection of IW44 wavelet coefficients.  The
+    coefficients are stored in a memory efficient data structure.  Member
+    function \Ref{get_bitmap} renders an arbitrary segment of the image into
+    a \Ref{GBitmap}.  Member functions \Ref{decode_iff} and \Ref{encode_iff}
+    read and write DjVu IW44 files (see \Ref{IWImage.h}).  Both the copy
+    constructor and the copy operator are declared as private members. It is
+    therefore not possible to make multiple copies of instances of this
+    class. */
+
+class IW44Image : public GPEnabled
+{
+public:
+  class Transform;
+  class Map;
+  class Block;
+  class Codec;
+  class Alloc;
+  struct PrimaryHeader;
+  struct SecondaryHeader;
+  struct TertiaryHeader1;
+  struct TertiaryHeader2;
+
+  /** Null constructor.  Constructs an empty IW44Image object. This object does
+      not contain anything meaningful. You must call function \Ref{init},
+      \Ref{decode_iff} or \Ref{decode_chunk} to populate the wavelet
+      coefficient data structure. */
+  IW44Image();
+  // virtual destructor
+  virtual ~IW44Image();
+  // ACCESS
+  /** Returns the width of the IWBitmap image. */
+  int get_width() const;
+  /** Returns the height of the IWBitmap image. */
+  int get_height() const;
+  /** Reconstructs the complete image.  The reconstructed image
+      is then returned as a GBitmap object. */
+  virtual GP<GBitmap> get_bitmap() {return 0;}
+  /** Reconstructs a segment of the image at a given scale.  The subsampling
+      ratio #subsample# must be a power of two between #1# and #32#.  Argument
+      #rect# specifies which segment of the subsampled image should be
+      reconstructed.  The reconstructed image is returned as a GBitmap object
+      whose size is equal to the size of the rectangle #rect#. */
+  virtual GP<GBitmap> get_bitmap(int subsample, const GRect &rect) {return 0;}
+  /** Reconstructs the complete image.  The reconstructed image
+      is then returned as a GPixmap object. */
+  virtual GP<GPixmap> get_pixmap() {return 0;}
+  /** Reconstructs a segment of the image at a given scale.  The subsampling
+      ratio #subsample# must be a power of two between #1# and #32#.  Argument
+      #rect# specifies which segment of the subsampled image should be
+      reconstructed.  The reconstructed image is returned as a GPixmap object
+      whose size is equal to the size of the rectangle #rect#. */
+  virtual GP<GPixmap> get_pixmap(int subsample, const GRect &rect) {return 0;}
+  /** Returns the amount of memory used by the wavelet coefficients.  This
+      amount of memory is expressed in bytes. */
+  virtual unsigned int get_memory_usage() const = 0;
+  /** Returns the filling ratio of the internal data structure.  Wavelet
+      coefficients are stored in a sparse array.  This function tells what
+      percentage of bins have been effectively allocated. */
+  virtual int get_percent_memory() const = 0;
+  // CODER
+  /** Encodes one data chunk into ByteStream #bs#.  Parameter #parms# controls
+      how much data is generated.  The chunk data is written to ByteStream
+      #bs# with no IFF header.  Successive calls to #encode_chunk# encode
+      successive chunks.  You must call #close_codec# after encoding the last
+      chunk of a file. */
+  virtual int  encode_chunk(ByteStream &bs, const IWEncoderParms &parms) = 0;
+  /** Writes a gray level image into DjVu IW44 file.  This function creates a
+      composite chunk (identifier #FORM:BM44# or #FORM:PM44#) composed of
+      #nchunks# chunks (identifier #BM44# or #PM44#).  Data for each chunk is
+      generated with #encode_chunk# using the corresponding parameters in
+      array #parms#. */
+  virtual void encode_iff(IFFByteStream &iff, int nchunks, const IWEncoderParms *parms) = 0;
+  // DECODER
+  /** Decodes one data chunk from ByteStream #bs#.  Successive calls to
+      #decode_chunk# decode successive chunks.  You must call #close_codec#
+      after decoding the last chunk of a file.  Note that function
+      #get_bitmap# and #decode_chunk# may be called simultaneously from two
+      execution threads. */
+  virtual int  decode_chunk(ByteStream &bs) = 0;
+  /** This function enters a composite chunk (identifier #FORM:BM44#, or
+      #FORM:PM44#), and decodes a maximum of #maxchunks# data chunks
+      (identifier #BM44#).  Data for each chunk is processed using the
+      function #decode_chunk#. */
+  virtual void decode_iff(IFFByteStream &iff, int maxchunks=999) = 0;
+  // MISCELLANEOUS
+  /** Resets the encoder/decoder state.  The first call to #decode_chunk# or
+      #encode_chunk# initializes the coder for encoding or decoding.  Function
+      #close_codec# must be called after processing the last chunk in order to
+      reset the coder and release the associated memory. */
+  void close_codec();  
+  /** Returns the chunk serial number.  This function returns the serial
+      number of the last chunk encoded with #encode_chunk# or decoded with
+      #decode_chunk#. The first chunk always has serial number #1#. Successive
+      chunks have increasing serial numbers.  Value #0# is returned if this
+      function is called before calling #encode_chunk# or #decode_chunk# or
+      after calling #close_codec#. */
+  virtual int get_serial() = 0;
+  /** Sets the chrominance delay parameter.  This function can be called
+      before encoding the first color IW44 data chunk.  Parameter #parm# is an
+      encoding delay which reduces the bitrate associated with the
+      chrominance information. The default chrominance encoding delay is 10. */
+  int  parm_crcbdelay(int parm);
+  /** Sets the #dbfrac# parameter.  This function can be called before
+      encoding the first IW44 data chunk.  Parameter #frac# modifies the
+      decibel estimation algorithm in such a way that the decibel target only
+      pertains to the average error of the fraction #frac# of the most
+      misrepresented 32x32 pixel blocks.  Setting arguments #frac# to #1.0#
+      restores the normal behavior.  */
+  virtual void parm_dbfrac(float frac) = 0;
+protected:
+  // Parameter
+  float db_frac;
+  // Data
+  Map *ymap, *cbmap, *crmap;
+  Codec *ycodec, *cbcodec, *crcodec;
+  int cslice;
+  int cserial;
+  int cbytes;
+private:
+  // Disable assignment semantic
+  IW44Image(const IW44Image &ref);
+  IW44Image& operator=(const IW44Image &ref);
+};
+
 /** IW44 encoded gray-level image.  This class provided functions for managing
     a gray level image represented as a collection of IW44 wavelet
     coefficients.  The coefficients are stored in a memory efficient data
@@ -195,7 +312,7 @@ struct IWEncoderParms
     members. It is therefore not possible to make multiple copies of instances
     of this class. */
 
-class IWBitmap : public GPEnabled
+class IWBitmap : public IW44Image
 {
 public:
   /** Null constructor.  Constructs an empty IWBitmap object. This object does
@@ -211,85 +328,62 @@ public:
   /** Convenience constructor. This constructors creates an empty IWBitmap
       and then calls function \Ref{init} above. */
   IWBitmap(const GBitmap *bm, const GBitmap *mask=0);
-  // Virtual destructor
-  ~IWBitmap();
   // ACCESS
-  /** Returns the width of the IWBitmap image. */
-  int get_width() const;
-  /** Returns the height of the IWBitmap image. */
-  int get_height() const;
   /** Reconstructs the complete image.  The reconstructed image
       is then returned as a GBitmap object. */
-  GP<GBitmap> get_bitmap();
+  virtual GP<GBitmap> get_bitmap();
   /** Reconstructs a segment of the image at a given scale.  The subsampling
       ratio #subsample# must be a power of two between #1# and #32#.  Argument
       #rect# specifies which segment of the subsampled image should be
       reconstructed.  The reconstructed image is returned as a GBitmap object
       whose size is equal to the size of the rectangle #rect#. */
-  GP<GBitmap> get_bitmap(int subsample, const GRect &rect);
+  virtual GP<GBitmap> get_bitmap(int subsample, const GRect &rect);
   /** Returns the amount of memory used by the wavelet coefficients.  This
       amount of memory is expressed in bytes. */
-  unsigned int get_memory_usage() const;
+  virtual unsigned int get_memory_usage() const;
   /** Returns the filling ratio of the internal data structure.  Wavelet
       coefficients are stored in a sparse array.  This function tells what
       percentage of bins have been effectively allocated. */
-  int get_percent_memory() const;
+  virtual int get_percent_memory() const;
   // CODER
   /** Encodes one data chunk into ByteStream #bs#.  Parameter #parms# controls
       how much data is generated.  The chunk data is written to ByteStream
       #bs# with no IFF header.  Successive calls to #encode_chunk# encode
       successive chunks.  You must call #close_codec# after encoding the last
       chunk of a file. */
-  int  encode_chunk(ByteStream &bs, const IWEncoderParms &parms);
+  virtual int  encode_chunk(ByteStream &bs, const IWEncoderParms &parms);
   /** Writes a gray level image into DjVu IW44 file.  This function creates a
       composite chunk (identifier #FORM:BM44#) composed of #nchunks# chunks
       (identifier #BM44#).  Data for each chunk is generated with
       #encode_chunk# using the corresponding parameters in array #parms#. */
-  void encode_iff(IFFByteStream &iff, int nchunks, const IWEncoderParms *parms);
+  virtual void encode_iff(IFFByteStream &iff, int nchunks, const IWEncoderParms *parms);
   // DECODER
   /** Decodes one data chunk from ByteStream #bs#.  Successive calls to
       #decode_chunk# decode successive chunks.  You must call #close_codec#
       after decoding the last chunk of a file.  Note that function
       #get_bitmap# and #decode_chunk# may be called simultaneously from two
       execution threads. */
-  int  decode_chunk(ByteStream &bs);
+  virtual int  decode_chunk(ByteStream &bs);
   /** Reads a DjVu IW44 file as a gray level image.  This function enters a
       composite chunk (identifier #FORM:BM44#), and decodes a maximum of
       #maxchunks# data chunks (identifier #BM44#).  Data for each chunk is
       processed using the function #decode_chunk#. */
-  void decode_iff(IFFByteStream &iff, int maxchunks=999);
+  virtual void decode_iff(IFFByteStream &iff, int maxchunks=999);
   // MISCELLANEOUS
-  /** Resets the encoder/decoder state.  The first call to #decode_chunk# or
-      #encode_chunk# initializes the coder for encoding or decoding.  Function
-      #close_codec# must be called after processing the last chunk in order to
-      reset the coder and release the associated memory. */
-  void close_codec();  
   /** Returns the chunk serial number.  This function returns the serial
       number of the last chunk encoded with #encode_chunk# or decoded with
       #decode_chunk#. The first chunk always has serial number #1#. Successive
       chunks have increasing serial numbers.  Value #0# is returned if this
       function is called before calling #encode_chunk# or #decode_chunk# or
       after calling #close_codec#. */
-  int get_serial();
+  virtual int get_serial();
   /** Sets the #dbfrac# parameter.  This function can be called before
       encoding the first IW44 data chunk.  Parameter #frac# modifies the
       decibel estimation algorithm in such a way that the decibel target only
       pertains to the average error of the fraction #frac# of the most
       misrepresented 32x32 pixel blocks.  Setting arguments #frac# to #1.0#
       restores the normal behavior.  */
-  void parm_dbfrac(float frac);
-private:
-  // Parameter
-  float db_frac;
-  // Data
-  _IWMap *ymap;
-  _IWCodec *ycodec;
-  int cslice;
-  int cserial;
-  int cbytes;
-  // Disable assignment semantic
-  IWBitmap(const IWBitmap &ref);
-  IWBitmap& operator=(const IWBitmap &ref);
+  virtual void parm_dbfrac(float frac);
 };
 
 
@@ -304,7 +398,7 @@ private:
     therefore not possible to make multiple copies of instances of this
     class. */
 
-class IWPixmap : public GPEnabled
+class IWPixmap : public IW44Image
 {
 public:
   /** Null constructor.  Constructs an empty IWBitmap object. This object does
@@ -343,97 +437,78 @@ public:
   /** Convenience constructor. This constructors creates an empty IWBitmap
       and then calls function \Ref{init} above. */
   IWPixmap(const GPixmap *bm, const GBitmap *mask=0, CRCBMode crcbmode=CRCBnormal );
-  // Virtual destructor.
-  ~IWPixmap();
   // ACCESS
-  /** Returns the width of the IWPixmap image. */
-  int get_width() const;
-  /** Returns the height of the IWPixmap image. */
-  int get_height() const;
   /** Reconstructs the complete image.  The reconstructed image
       is then returned as a GPixmap object. */
-  GP<GPixmap> get_pixmap();
+  virtual GP<GPixmap> get_pixmap();
   /** Reconstructs a segment of the image at a given scale.  The subsampling
       ratio #subsample# must be a power of two between #1# and #32#.  Argument
       #rect# specifies which segment of the subsampled image should be
       reconstructed.  The reconstructed image is returned as a GPixmap object
       whose size is equal to the size of the rectangle #rect#. */
-  GP<GPixmap> get_pixmap(int subsample, const GRect &rect);
+  virtual GP<GPixmap> get_pixmap(int subsample, const GRect &rect);
   /** Returns the amount of memory used by the wavelet coefficients.  This
       amount of memory is expressed in bytes. */
-  unsigned int get_memory_usage() const;
+  virtual unsigned int get_memory_usage() const;
   /** Returns the filling ratio of the internal data structure.  Wavelet
       coefficients are stored in a sparse array.  This function tells what
       percentage of bins have been effectively allocated. */
-  int get_percent_memory() const;
+  virtual int get_percent_memory() const;
   // CODER
   /** Encodes one data chunk into ByteStream #bs#.  Parameter #parms# controls
       how much data is generated.  The chunk data is written to ByteStream
       #bs# with no IFF header.  Successive calls to #encode_chunk# encode
       successive chunks.  You must call #close_codec# after encoding the last
       chunk of a file. */
-  int  encode_chunk(ByteStream &bs, const IWEncoderParms &parms);
+  virtual int  encode_chunk(ByteStream &bs, const IWEncoderParms &parms);
   /** Writes a color image into a DjVu IW44 file.  This function creates a
       composite chunk (identifier #FORM:PM44#) composed of #nchunks# chunks
       (identifier #PM44#).  Data for each chunk is generated with
       #encode_chunk# using the corresponding parameters in array #parms#. */
-  void encode_iff(IFFByteStream &iff, int nchunks, const IWEncoderParms *parms);
+  virtual void encode_iff(IFFByteStream &iff, int nchunks, const IWEncoderParms *parms);
   // DECODER
   /** Decodes one data chunk from ByteStream #bs#.  Successive calls to
       #decode_chunk# decode successive chunks.  You must call #close_codec#
       after decoding the last chunk of a file.  Note that function
       #get_bitmap# and #decode_chunk# may be called simultaneously from two
       execution threads. */
-  int  decode_chunk(ByteStream &bs);
+  virtual int  decode_chunk(ByteStream &bs);
   /** Reads a DjVu IW44 file as a color image.  This function enters a
       composite chunk (identifier #FORM:PM44# or #FORM:BM44#), and decodes a
       maximum of #maxchunks# data chunks (identifier #PM44# or #BM44#).  Data
       for each chunk is processed using the function #decode_chunk#. */
-  void decode_iff(IFFByteStream &iff, int maxchunks=999);
+  virtual void decode_iff(IFFByteStream &iff, int maxchunks=999);
   // MISCELLANEOUS
-  /** Resets the encoder/decoder state.  The first call to #decode_chunk# or
-      #encode_chunk# initializes the coder for encoding or decoding.  Function
-      #close_codec# must be called after processing the last chunk in order to
-      reset the coder and release the associated memory. */
-  void close_codec();  
   /** Returns the chunk serial number.  This function returns the serial
       number of the last chunk encoded with #encode_chunk# or decoded with
       #decode_chunk#. The first chunk always has serial number #1#. Successive
       chunks have increasing serial numbers.  Value #0# is returned if this
       function is called before calling #encode_chunk# or #decode_chunk# or
       after calling #close_codec#. */
-  int  get_serial();
+  virtual int  get_serial();
   /** Sets the chrominance delay parameter.  This function can be called
       before encoding the first IW44 data chunk.  Parameter #parm# is an
       encoding delay which reduces the bitrate associated with the
       chrominance information. The default chrominance encoding delay is 10. */
-  int  parm_crcbdelay(int parm);
+  virtual int  parm_crcbdelay(int parm);
   /** Sets the #dbfrac# parameter.  This function can be called before
       encoding the first IW44 data chunk.  Parameter #frac# modifies the
       decibel estimation algorithm in such a way that the decibel target only
       pertains to the average error of the fraction #frac# of the most
       misrepresented 32x32 pixel blocks.  Setting arguments #frac# to #1.0#
       restores the normal behavior.  */
-  void parm_dbfrac(float frac);
-private:
+  virtual void parm_dbfrac(float frac);
+protected:
   // Parameter
   int   crcb_delay;
   int   crcb_half;
-  float db_frac;
   // Data
-  _IWMap *ymap, *cbmap, *crmap;
-  _IWCodec *ycodec, *cbcodec, *crcodec;
-  int cslice;
-  int cserial;
-  int cbytes;
-  // Disable assignment semantic
-  IWPixmap(const IWPixmap &ref);
-  IWPixmap& operator=(const IWPixmap &ref);
 };
 
+#ifdef IWIMAGE_IMPLIMENTATION
 /** IW44Transform.
 */
-class IWTransform
+class IW44Image::Transform
 {
 public:
   class Decode;
@@ -444,7 +519,7 @@ protected:
 };
 
 struct GPixel;
-class IWTransform::Decode : public IWTransform
+class IW44Image::Transform::Decode : public IW44Image::Transform
 {
 public:
  // WAVELET TRANSFORM
@@ -456,7 +531,152 @@ public:
   static void YCbCr_to_RGB(GPixel *p, int w, int h, int rowsize);
 };
 
+//---------------------------------------------------------------
+// *** Class IW44Image::Block [declaration]
+// Represents a block of 32x32 coefficients after zigzagging and scaling
+
+
+class IW44Image::Block // DJVU_CLASS
+{
+public:
+  // creating
+  Block();
+  // accessing scaled coefficients
+  short get(int n) const;
+  void  set(int n, int val, IW44Image::Map *map);
+  // converting from liftblock
+  void  read_liftblock(const short *coeff, IW44Image::Map *map);
+  void  write_liftblock(short *coeff, int bmin=0, int bmax=64) const;
+  // sparse array access
+  const short* data(int n) const;
+  short* data(int n, IW44Image::Map *map);
+  void   zero(int n);
+  // sparse representation
+private:
+  short **(pdata[4]);
+};
+
+//---------------------------------------------------------------
+// *** Class IW44Image::Map [declaration]
+// Represents all the blocks of an image
+
+class IW44Image::Map // DJVU_CLASS
+{
+  // construction
+public:
+  Map(int w, int h);
+  ~Map();
+  // creation (from image)
+  void create(const signed char *img8, int imgrowsize, 
+              const signed char *msk8=0, int mskrowsize=0);
+  // image access
+  void image(signed char *img8, int rowsize, 
+             int pixsep=1, int fast=0);
+  void image(int subsample, const GRect &rect, 
+             signed char *img8, int rowsize, 
+             int pixsep=1, int fast=0);
+  // slash resolution
+  void slashres(int res);
+  // array of blocks
+  IW44Image::Block *blocks;
+  // geometry
+  int iw, ih;
+  int bw, bh;
+  int nb;
+  // coefficient allocation stuff
+  short *alloc(int n);
+  short **allocp(int n);
+  IW44Image::Alloc *chain;
+  int top;
+  // statistics
+  int get_bucket_count() const;
+  unsigned int get_memory_usage() const;
+};
+
+//////////////////////////////////////////////////////
+// ENCODING/DECODING WAVELET COEFFICIENTS 
+//    USING HIERARCHICAL SET DIFFERENCE
+//////////////////////////////////////////////////////
+
+
+//-----------------------------------------------
+// Class IW44Image::Codec [declaration+implementation]
+// Maintains information shared while encoding or decoding
+
+class IW44Image::Codec 
+{
+public:
+  // Construction
+  Codec(IW44Image::Map &map, int encoding=0);
+  ~Codec();
+  // Coding
+  int code_slice(ZPCodec &zp);
+  float estimate_decibel(float frac);
+  // Data
+  IW44Image::Map &map;                  // working map
+  IW44Image::Map *emap;                 // encoder state
+  int encoding;
+  // status
+  int curband;                  // current band
+  int curbit;                   // current bitplane
+  // quantization tables
+  int quant_hi[10];             // quantization for bands 1 to 9
+  int quant_lo[16];             // quantization for band 0.
+  // bucket state
+  char coeffstate[256];
+  char bucketstate[16];
+  enum { ZERO   = 1,            // this coeff never hits this bit
+         ACTIVE = 2,            // this coeff is already active
+         NEW    = 4,            // this coeff is becoming active
+         UNK    = 8 };          // this coeff may become active
+  // coding context
+  BitContext ctxStart [32];
+  BitContext ctxBucket[10][8];
+  BitContext ctxMant;
+  BitContext ctxRoot;
+  // helper
+  int is_null_slice(int bit, int band);
+  int encode_prepare(int band, int fbucket, int nbucket, IW44Image::Block &blk, IW44Image::Block &eblk);
+  int decode_prepare(int fbucket, int nbucket, IW44Image::Block &blk);
+  void encode_buckets(ZPCodec &zp, int bit, int band,
+                      IW44Image::Block &blk, IW44Image::Block &eblk, int fbucket, int nbucket);
+  void decode_buckets(ZPCodec &zp, int bit, int band,
+                      IW44Image::Block &blk, int fbucket, int nbucket);
+};
+
+//////////////////////////////////////////////////////
+// DEFINITION OF CHUNK HEADERS
+//////////////////////////////////////////////////////
+
+
+struct IW44Image::PrimaryHeader {
+  unsigned char serial;
+  unsigned char slices;
+};  
+
+struct IW44Image::SecondaryHeader {
+  unsigned char major;
+  unsigned char minor;
+};
+
+struct IW44Image::TertiaryHeader1 {        // VER 1.1
+  unsigned char xhi, xlo;
+  unsigned char yhi, ylo;
+};
+
+struct IW44Image::TertiaryHeader2 {        // VER 1.2
+  unsigned char xhi, xlo;
+  unsigned char yhi, ylo;
+  unsigned char crcbdelay;
+};
+
+
+
+
+#endif // IWIMAGE_IMPLIMENTATION
+
 //@}
 
 
 #endif
+

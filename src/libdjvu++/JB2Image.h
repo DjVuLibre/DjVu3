@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: JB2Image.h,v 1.31 2001-01-18 01:33:50 bcr Exp $
+// $Id: JB2Image.h,v 1.32 2001-01-20 01:55:40 bcr Exp $
 // $Name:  $
 
 #ifndef _JB2IMAGE_H
@@ -129,7 +129,7 @@
     \end{itemize}
 
     @version
-    #$Id: JB2Image.h,v 1.31 2001-01-18 01:33:50 bcr Exp $#
+    #$Id: JB2Image.h,v 1.32 2001-01-20 01:55:40 bcr Exp $#
     @memo
     Coding bilevel images with JB2.
     @author
@@ -213,8 +213,6 @@ class JB2Dict : public GPEnabled
 {
 public:
   class JB2Codec;
-  class JB2DecodeCodec;
-  class JB2EncodeCodec;
 
   // CONSTRUCTION
   /** Null Constructor.  Constructs an empty #JB2Dict# object.  You can then
@@ -572,6 +570,8 @@ JB2Image::get_blit(int blitno) const
 class JB2Dict::JB2Codec
 {
 public:
+  class Decode;
+  class Encode;
   typedef unsigned int NumContext;
   struct LibRect
   {

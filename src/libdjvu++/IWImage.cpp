@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: IWImage.cpp,v 1.43 2001-01-19 02:51:08 bcr Exp $
+// $Id: IWImage.cpp,v 1.44 2001-01-20 01:55:40 bcr Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 08/1998
@@ -38,6 +38,8 @@
 #ifdef __GNUC__
 #pragma implementation
 #endif
+
+#define IWIMAGE_IMPLIMENTATION /* */
 
 #include "IWImage.h"
 #include "ZPCodec.h"
@@ -78,7 +80,7 @@
 // - iw_shift: scale applied before decomposition
 
 
-static int iw_quant[16] = {
+static const int iw_quant[16] = {
   0x004000, 
   0x008000, 0x008000, 0x010000,
   0x010000, 0x010000, 0x020000,
@@ -87,7 +89,7 @@ static int iw_quant[16] = {
   0x040000, 0x040000, 0x080000
 };
 
-static float iw_norm[16] = {
+static const float iw_norm[16] = {
   2.627989e+03F,
   1.832893e+02F, 1.832959e+02F, 5.114690e+01F,
   4.583344e+01F, 4.583462e+01F, 1.279225e+01F,
@@ -494,95 +496,26 @@ static int zigzagloc[1024] = {
  231, 247, 743, 759, 239, 255, 751, 767, 487, 503, 999,1015, 495, 511,1007,1023, // 1023
 };
 
-
-
-
 //---------------------------------------------------------------
-// *** Class _IWBlock [declaration]
-// Represents a block of 32x32 coefficients after zigzagging and scaling
+// *** Class IW44Image::Alloc [declaration]
 
-
-class _IWBlock // DJVU_CLASS
+struct IW44Image::Alloc // DJVU_CLASS
 {
-public:
-  // creating
-  _IWBlock();
-  // accessing scaled coefficients
-  short get(int n) const;
-  void  set(int n, int val, _IWMap *map);
-  // converting from liftblock
-  void  read_liftblock(const short *coeff, _IWMap *map);
-  void  write_liftblock(short *coeff, int bmin=0, int bmax=64) const;
-  // sparse array access
-  const short* data(int n) const;
-  short* data(int n, _IWMap *map);
-  void   zero(int n);
-  // sparse representation
-private:
-  short **(pdata[4]);
-};
-
-
-
-//---------------------------------------------------------------
-// *** Class _IWMap [declaration]
-// Represents all the blocks of an image
-
-
-
-struct _IWAlloc // DJVU_CLASS
-{
-  struct _IWAlloc *next;
+  struct Alloc *next;
   short data[IWALLOCSIZE];
 };
 
-
-class _IWMap // DJVU_CLASS
-{
-  // construction
-public:
-  _IWMap(int w, int h);
-  ~_IWMap();
-  // creation (from image)
-  void create(const signed char *img8, int imgrowsize, 
-              const signed char *msk8=0, int mskrowsize=0);
-  // image access
-  void image(signed char *img8, int rowsize, 
-             int pixsep=1, int fast=0);
-  void image(int subsample, const GRect &rect, 
-             signed char *img8, int rowsize, 
-             int pixsep=1, int fast=0);
-  // slash resolution
-  void slashres(int res);
-  // array of blocks
-  _IWBlock *blocks;
-  // geometry
-  int iw, ih;
-  int bw, bh;
-  int nb;
-  // coefficient allocation stuff
-  short *alloc(int n);
-  short **allocp(int n);
-  _IWAlloc *chain;
-  int top;
-  // statistics
-  int get_bucket_count() const;
-  unsigned int get_memory_usage() const;
-};
-
-
-
 //---------------------------------------------------------------
-// *** Class _IWBlock [implementation]
+// *** Class IW44Image::Block [implementation]
 
 
-_IWBlock::_IWBlock()
+IW44Image::Block::Block()
 {
   pdata[0] = pdata[1] = pdata[2] = pdata[3] = 0;
 }
 
 inline const short* 
-_IWBlock::data(int n) const
+IW44Image::Block::data(int n) const
 {
   if (! pdata[n>>4])
     return 0;
@@ -590,7 +523,7 @@ _IWBlock::data(int n) const
 }
 
 inline short* 
-_IWBlock::data(int n, _IWMap *map)
+IW44Image::Block::data(int n, IW44Image::Map *map)
 {
   if (! pdata[n>>4])
     pdata[n>>4] = map->allocp(16);
@@ -600,14 +533,14 @@ _IWBlock::data(int n, _IWMap *map)
 }
 
 void 
-_IWBlock::zero(int n)
+IW44Image::Block::zero(int n)
 {
   if (pdata[n>>4])
     pdata[n>>4][n&15] = 0;
 }
 
 inline short 
-_IWBlock::get(int n) const
+IW44Image::Block::get(int n) const
 {
   int n1 = (n>>4);
   const short *d = data(n1);
@@ -617,7 +550,7 @@ _IWBlock::get(int n) const
 }
 
 inline void  
-_IWBlock::set(int n, int val, _IWMap *map)
+IW44Image::Block::set(int n, int val, IW44Image::Map *map)
 {
   int n1 = (n>>4);
   short* d = data(n1, map);
@@ -626,7 +559,7 @@ _IWBlock::set(int n, int val, _IWMap *map)
 
 
 inline void  
-_IWBlock::read_liftblock(const short *coeff, _IWMap *map)
+IW44Image::Block::read_liftblock(const short *coeff, IW44Image::Map *map)
 {
   int n=0;
   for (int n1=0; n1<64; n1++)
@@ -638,7 +571,7 @@ _IWBlock::read_liftblock(const short *coeff, _IWMap *map)
 }
 
 inline void  
-_IWBlock::write_liftblock(short *coeff, int bmin, int bmax) const
+IW44Image::Block::write_liftblock(short *coeff, int bmin, int bmax) const
 {
   int n = bmin<<4;
   memset(coeff, 0, 1024*sizeof(short));
@@ -656,24 +589,24 @@ _IWBlock::write_liftblock(short *coeff, int bmin, int bmax) const
 
 
 //---------------------------------------------------------------
-// *** Class _IWMap [implementation]
+// *** Class IW44Image::Map [implementation]
 
 
-_IWMap::_IWMap(int w, int h)
+IW44Image::Map::Map(int w, int h)
   :  blocks(0), iw(w), ih(h), chain(0)
 {
   bw = (w+0x20-1) & ~0x1f;
   bh = (h+0x20-1) & ~0x1f;
   nb = (bw * bh) / (32 * 32);
-  blocks = new _IWBlock[nb];
+  blocks = new IW44Image::Block[nb];
   top = IWALLOCSIZE;
 }
 
-_IWMap::~_IWMap()
+IW44Image::Map::~Map()
 {
   while (chain)
     {
-      _IWAlloc *next = chain->next;
+      IW44Image::Alloc *next = chain->next;
       delete chain;
       chain = next;
     }
@@ -681,11 +614,11 @@ _IWMap::~_IWMap()
 }
 
 short *
-_IWMap::alloc(int n)
+IW44Image::Map::alloc(int n)
 {
   if (top+n > IWALLOCSIZE)
     {
-      _IWAlloc *n = new _IWAlloc;
+      IW44Image::Alloc *n = new IW44Image::Alloc;
       n->next = chain;
       chain = n;
       top = 0;
@@ -697,7 +630,7 @@ _IWMap::alloc(int n)
 }
 
 short **
-_IWMap::allocp(int n)
+IW44Image::Map::allocp(int n)
 {
   // Allocate enough room for pointers plus alignment
   short *p = alloc( (n+1) * sizeof(short*) / sizeof(short) );
@@ -709,7 +642,7 @@ _IWMap::allocp(int n)
 }
 
 int 
-_IWMap::get_bucket_count() const
+IW44Image::Map::get_bucket_count() const
 {
   int buckets = 0;
   for (int blockno=0; blockno<nb; blockno++)
@@ -720,12 +653,12 @@ _IWMap::get_bucket_count() const
 }
 
 unsigned int 
-_IWMap::get_memory_usage() const
+IW44Image::Map::get_memory_usage() const
 {
-  unsigned int usage = sizeof(_IWMap);
-  usage += sizeof(_IWBlock) * nb;
-  for (_IWAlloc *n = chain; n; n=n->next)
-    usage += sizeof(_IWAlloc);
+  unsigned int usage = sizeof(Map);
+  usage += sizeof(IW44Image::Block) * nb;
+  for (IW44Image::Alloc *n = chain; n; n=n->next)
+    usage += sizeof(IW44Image::Alloc);
   return usage;
 }
 
@@ -733,7 +666,7 @@ _IWMap::get_memory_usage() const
 
 
 void 
-_IWMap::image(signed char *img8, int rowsize, int pixsep, int fast)
+IW44Image::Map::image(signed char *img8, int rowsize, int pixsep, int fast)
 {
   // Allocate reconstruction buffer
   short *data16;
@@ -741,13 +674,13 @@ _IWMap::image(signed char *img8, int rowsize, int pixsep, int fast)
   // Copy coefficients
   int i;
   short *p = data16;
-  const _IWBlock *block = blocks;
+  const IW44Image::Block *block = blocks;
   for (i=0; i<bh; i+=32)
     {
       for (int j=0; j<bw; j+=32)
         {
           short liftblock[1024];
-          // transfer into _IWBlock (apply zigzag and scaling)
+          // transfer into IW44Image::Block (apply zigzag and scaling)
           block->write_liftblock(liftblock);
           block++;
           // transfer into coefficient matrix at (p+j)
@@ -762,7 +695,7 @@ _IWMap::image(signed char *img8, int rowsize, int pixsep, int fast)
   // Reconstruction
   if (fast)
     {
-      IWTransform::Decode::backward(data16, iw, ih, bw, 32, 2);  
+      IW44Image::Transform::Decode::backward(data16, iw, ih, bw, 32, 2);  
       p = data16;
       for (i=0; i<bh; i+=2,p+=bw)
         for (int jj=0; jj<bw; jj+=2,p+=2)
@@ -770,7 +703,7 @@ _IWMap::image(signed char *img8, int rowsize, int pixsep, int fast)
     }
   else
     {
-      IWTransform::Decode::backward(data16, iw, ih, bw, 32, 1);  
+      IW44Image::Transform::Decode::backward(data16, iw, ih, bw, 32, 1);  
     }
   // Copy result into image
   p = data16;
@@ -793,7 +726,7 @@ _IWMap::image(signed char *img8, int rowsize, int pixsep, int fast)
 }
 
 void 
-_IWMap::image(int subsample, const GRect &rect, 
+IW44Image::Map::image(int subsample, const GRect &rect, 
               signed char *img8, int rowsize, int pixsep, int fast)
 {
   int i;
@@ -845,11 +778,11 @@ _IWMap::image(int subsample, const GRect &rect,
   // -- loop over liftblocks rows
   short *ldata = data;
   int blkw = (bw>>5);
-  const _IWBlock *lblock = blocks + (work.ymin>>nlevel)*blkw + (work.xmin>>nlevel);
+  const IW44Image::Block *lblock = blocks + (work.ymin>>nlevel)*blkw + (work.xmin>>nlevel);
   for (int by=work.ymin; by<work.ymax; by+=boxsize)
     {
       // -- loop over liftblocks in row
-      const _IWBlock *block = lblock;
+      const IW44Image::Block *block = lblock;
       short *rdata = ldata;
       for (int bx=work.xmin; bx<work.xmax; bx+=boxsize)        
         {
@@ -901,7 +834,7 @@ _IWMap::image(int subsample, const GRect &rect,
       else
         {
           short *pp = data + comp.ymin*dataw + comp.xmin;
-          IWTransform::Decode::backward(pp, comp.width(), comp.height(), dataw, r, r>>1);
+          IW44Image::Transform::Decode::backward(pp, comp.width(), comp.height(), dataw, r, r>>1);
         }
       r = r>>1;
     }
@@ -938,55 +871,13 @@ _IWMap::image(int subsample, const GRect &rect,
 
 
 //-----------------------------------------------
-// Class _IWCodec [declaration+implementation]
+// Class IW44Image::Codec [implementation]
 // Maintains information shared while encoding or decoding
-
-
-class _IWCodec 
-{
-public:
-  // Construction
-  _IWCodec(_IWMap &map, int encoding=0);
-  ~_IWCodec();
-  // Coding
-  int code_slice(ZPCodec &zp);
-  float estimate_decibel(float frac);
-  // Data
-  _IWMap &map;                  // working map
-  _IWMap *emap;                 // encoder state
-  int encoding;
-  // status
-  int curband;                  // current band
-  int curbit;                   // current bitplane
-  // quantization tables
-  int quant_hi[10];             // quantization for bands 1 to 9
-  int quant_lo[16];             // quantization for band 0.
-  // bucket state
-  char coeffstate[256];
-  char bucketstate[16];
-  enum { ZERO   = 1,            // this coeff never hits this bit
-         ACTIVE = 2,            // this coeff is already active
-         NEW    = 4,            // this coeff is becoming active
-         UNK    = 8 };          // this coeff may become active
-  // coding context
-  BitContext ctxStart [32];
-  BitContext ctxBucket[10][8];
-  BitContext ctxMant;
-  BitContext ctxRoot;
-  // helper
-  int is_null_slice(int bit, int band);
-  int encode_prepare(int band, int fbucket, int nbucket, _IWBlock &blk, _IWBlock &eblk);
-  int decode_prepare(int fbucket, int nbucket, _IWBlock &blk);
-  void encode_buckets(ZPCodec &zp, int bit, int band,
-                      _IWBlock &blk, _IWBlock &eblk, int fbucket, int nbucket);
-  void decode_buckets(ZPCodec &zp, int bit, int band,
-                      _IWBlock &blk, int fbucket, int nbucket);
-};
 
 
 // Constant
 
-static struct { int start; int size; }  
+static const struct { const int start; const int size; }  
 bandbuckets[] = 
 {
   // Code first bucket and number of buckets in each band
@@ -997,9 +888,9 @@ bandbuckets[] =
 };
 
 
-// _IWCodec constructor
+// IW44Image::Codec constructor
 
-_IWCodec::_IWCodec(_IWMap &map, int encoding)
+IW44Image::Codec::Codec(IW44Image::Map &map, int encoding)
   : map(map), 
     emap(0),
     encoding(encoding),
@@ -1009,7 +900,7 @@ _IWCodec::_IWCodec(_IWMap &map, int encoding)
   // Initialize quantification
   int  j;
   int  i = 0;
-  int *q = iw_quant;
+  const int *q = iw_quant;
   // -- lo coefficients
   for (j=0; i<4; j++)
     quant_lo[i++] = *q++;
@@ -1037,15 +928,15 @@ _IWCodec::_IWCodec(_IWMap &map, int encoding)
 #ifdef NEED_DECODER_ONLY
     G_THROW("IWImage.decoder_only");
 #else
-    emap = new _IWMap(map.iw, map.ih);
+    emap = new IW44Image::Map(map.iw, map.ih);
 #endif
   }
 }
 
 
-// _IWCodec destructor
+// IW44Image::Codec destructor
 
-_IWCodec::~_IWCodec()
+IW44Image::Codec::~Codec()
 {
   if (emap)
     delete emap;
@@ -1056,7 +947,7 @@ _IWCodec::~_IWCodec()
 // -- also fills the sure_zero array
 
 inline int 
-_IWCodec::is_null_slice(int bit, int band)
+IW44Image::Codec::is_null_slice(int bit, int band)
 {
   if (band == 0)
     {
@@ -1085,7 +976,7 @@ _IWCodec::is_null_slice(int bit, int band)
 // -- read/write a slice of datafile
 
 int
-_IWCodec::code_slice(ZPCodec &zp)
+IW44Image::Codec::code_slice(ZPCodec &zp)
 {
   // Check that code_slice can still run
   if (curbit < 0)
@@ -1133,7 +1024,7 @@ _IWCodec::code_slice(ZPCodec &zp)
 // -- prepare the states before decoding buckets
 
 int
-_IWCodec::decode_prepare(int fbucket, int nbucket, _IWBlock &blk)
+IW44Image::Codec::decode_prepare(int fbucket, int nbucket, IW44Image::Block &blk)
 {  
   int bbstate = 0;
   char *cstate = coeffstate;
@@ -1198,8 +1089,8 @@ _IWCodec::decode_prepare(int fbucket, int nbucket, _IWBlock &blk)
 // -- code a sequence of buckets in a given block
 
 void
-_IWCodec::decode_buckets(ZPCodec &zp, int bit, int band, 
-                         _IWBlock &blk,
+IW44Image::Codec::decode_buckets(ZPCodec &zp, int bit, int band, 
+                         IW44Image::Block &blk,
                          int fbucket, int nbucket)
 {
   // compute state of all coefficients in all buckets
@@ -1385,34 +1276,6 @@ _IWCodec::decode_buckets(ZPCodec &zp, int bit, int band,
 
 
 //////////////////////////////////////////////////////
-// DEFINITION OF CHUNK HEADERS
-//////////////////////////////////////////////////////
-
-
-struct PrimaryHeader {
-  unsigned char serial;
-  unsigned char slices;
-};  
-
-struct SecondaryHeader {
-  unsigned char major;
-  unsigned char minor;
-};
-
-struct TertiaryHeader1 {        // VER 1.1
-  unsigned char xhi, xlo;
-  unsigned char yhi, ylo;
-};
-
-struct TertiaryHeader2 {        // VER 1.2
-  unsigned char xhi, xlo;
-  unsigned char yhi, ylo;
-  unsigned char crcbdelay;
-};
-
-
-
-//////////////////////////////////////////////////////
 // UTILITIES
 //////////////////////////////////////////////////////
 
@@ -1439,42 +1302,53 @@ max(const int x, const int y)
 
 
 //////////////////////////////////////////////////////
+// CLASS IW44Image
+//////////////////////////////////////////////////////
+
+IW44Image::IW44Image()
+  : db_frac(1.0),
+    ymap(0), cbmap(0), crmap(0), ycodec(0), cbcodec(0), crcodec(0),
+    cslice(0), cserial(0), cbytes(0)
+{}
+
+IW44Image::~IW44Image()
+{
+  close_codec();
+  delete ymap;
+  delete cbmap;
+  delete crmap;
+}
+
+void 
+IW44Image::close_codec()
+{
+  delete ycodec;
+  delete cbcodec;
+  delete crcodec;
+  ycodec = crcodec = cbcodec = 0;
+  cslice = cbytes = cserial = 0;
+}
+
+int 
+IW44Image::get_width() const
+{
+  return (ymap)?(ymap->iw):0;
+}
+
+int 
+IW44Image::get_height() const
+{
+  return (ymap)?(ymap->ih):0;
+}
+
+
+//////////////////////////////////////////////////////
 // CLASS IWBITMAP
 //////////////////////////////////////////////////////
 
-
 IWBitmap::IWBitmap()
-  : db_frac(1.0), 
-    ymap(0), ycodec(0), 
-    cslice(0), cserial(0), cbytes(0)
-{
-}
-
-IWBitmap::~IWBitmap()
-{
-  delete ycodec;
-  delete ymap;
-}
-
-
-int 
-IWBitmap::get_width() const
-{
-  if (ymap) 
-    return ymap->iw;
-  else
-    return 0;
-}
-
-int 
-IWBitmap::get_height() const
-{
-  if (ymap) 
-    return ymap->ih;
-  else
-    return 0;
-}
-
+: IW44Image()
+{}
 
 int
 IWBitmap::get_percent_memory() const
@@ -1560,7 +1434,7 @@ IWBitmap::decode_chunk(ByteStream &bs)
       ymap = 0;
     }
   // Read primary header
-  struct PrimaryHeader primary;
+  struct IW44Image::PrimaryHeader primary;
   if (bs.readall((void*)&primary, sizeof(primary)) != sizeof(primary))
     G_THROW("IWImage.cant_read_primary");
   if (primary.serial != cserial)
@@ -1569,7 +1443,7 @@ IWBitmap::decode_chunk(ByteStream &bs)
   // Read auxilliary headers
   if (cserial == 0)
     {
-      struct SecondaryHeader secondary;
+      struct IW44Image::SecondaryHeader secondary;
       if (bs.readall((void*)&secondary, sizeof(secondary)) != sizeof(secondary))
         G_THROW("IWImage.cant_read_secondary");
       if ((secondary.major & 0x7f) != IWCODEC_MAJOR)
@@ -1577,7 +1451,7 @@ IWBitmap::decode_chunk(ByteStream &bs)
       if (secondary.minor > IWCODEC_MINOR)
         G_THROW("IWImage.recent_codec");
       // Read tertiary header
-      struct TertiaryHeader2 tertiary;
+      struct IW44Image::TertiaryHeader2 tertiary;
       unsigned int header3size = sizeof(tertiary);
       if (bs.readall((void*)&tertiary, header3size) != header3size)
         G_THROW("IWImage.cant_read_tertiary");
@@ -1589,11 +1463,11 @@ IWBitmap::decode_chunk(ByteStream &bs)
 #ifndef UNDER_CE
       assert(! ymap);
 #endif
-      ymap = new _IWMap(w, h);
+      ymap = new Map(w, h);
 #ifndef UNDER_CE
       assert(! ycodec);
 #endif
-      ycodec = new _IWCodec(*ymap, 0);
+      ycodec = new Codec(*ymap, 0);
     }
   // Read data
 #ifndef UNDER_CE
@@ -1610,14 +1484,6 @@ IWBitmap::decode_chunk(ByteStream &bs)
   // Return
   cserial += 1;
   return nslices;
-}
-
-void 
-IWBitmap::close_codec()
-{
-  delete ycodec;
-  ycodec = 0;
-  cslice = cbytes = cserial = 0;
 }
 
 void 
@@ -1679,39 +1545,8 @@ IWEncoderParms::IWEncoderParms()
 
 
 IWPixmap::IWPixmap()
-  : crcb_delay(10), crcb_half(0), db_frac(1.0),
-    ymap(0), cbmap(0), crmap(0),
-    ycodec(0), cbcodec(0), crcodec(0),
-    cslice(0), cserial(0), cbytes(0)
+: IW44Image(), crcb_delay(10), crcb_half(0)
 {
-}
-
-IWPixmap::~IWPixmap()
-{
-  close_codec();
-  delete ymap;
-  delete crmap;
-  delete cbmap;
-  ymap = crmap = cbmap = 0;
-}
-
-
-int 
-IWPixmap::get_width() const
-{
-  if (ymap) 
-    return ymap->iw;
-  else
-    return 0;
-}
-
-int 
-IWPixmap::get_height() const
-{
-  if (ymap) 
-    return ymap->ih;
-  else
-    return 0;
 }
 
 
@@ -1775,7 +1610,7 @@ IWPixmap::get_pixmap()
   // Convert image data to RGB
   if (crmap && cbmap && crcb_delay >= 0)
     {
-      IWTransform::Decode::YCbCr_to_RGB((*ppm)[0], w, h, ppm->rowsize());
+      Transform::Decode::YCbCr_to_RGB((*ppm)[0], w, h, ppm->rowsize());
     }
   else
     {
@@ -1815,7 +1650,7 @@ IWPixmap::get_pixmap(int subsample, const GRect &rect)
   // Convert image data to RGB
   if (crmap && cbmap && crcb_delay >= 0)
     {
-      IWTransform::Decode::YCbCr_to_RGB((*ppm)[0], w, h, ppm->rowsize());
+      Transform::Decode::YCbCr_to_RGB((*ppm)[0], w, h, ppm->rowsize());
     }
   else
     {
@@ -1846,7 +1681,7 @@ IWPixmap::decode_chunk(ByteStream &bs)
       ymap = 0;
     }
   // Read primary header
-  struct PrimaryHeader primary;
+  struct IW44Image::PrimaryHeader primary;
   if (bs.readall((void*)&primary, sizeof(primary)) != sizeof(primary))
     G_THROW("IWImage.cant_read_primary2");
   if (primary.serial != cserial)
@@ -1855,7 +1690,7 @@ IWPixmap::decode_chunk(ByteStream &bs)
   // Read secondary header
   if (cserial == 0)
     {
-      struct SecondaryHeader secondary;
+      struct IW44Image::SecondaryHeader secondary;
       if (bs.readall((void*)&secondary, sizeof(secondary)) != sizeof(secondary))
         G_THROW("IWImage.cant_read_secondary2");
       if ((secondary.major & 0x7f) != IWCODEC_MAJOR)
@@ -1863,10 +1698,10 @@ IWPixmap::decode_chunk(ByteStream &bs)
       if (secondary.minor > IWCODEC_MINOR)
         G_THROW("IWImage.recent_codec2");
       // Read tertiary header
-      struct TertiaryHeader2 tertiary;
+      struct IW44Image::TertiaryHeader2 tertiary;
       unsigned int header3size = sizeof(tertiary);
       if (secondary.minor < 2)
-        header3size = sizeof(TertiaryHeader1);
+        header3size = sizeof(IW44Image::TertiaryHeader1);
       if (bs.readall((void*)&tertiary, header3size) != header3size)
         G_THROW("IWImage.cant_read_tertiary2");
       // Handle header information
@@ -1885,14 +1720,14 @@ IWPixmap::decode_chunk(ByteStream &bs)
       assert(! ymap);
       assert(! ycodec);
 #endif
-      ymap = new _IWMap(w, h);
-      ycodec = new _IWCodec(*ymap, 0);
+      ymap = new Map(w, h);
+      ycodec = new Codec(*ymap, 0);
       if (crcb_delay >= 0)
         {
-          cbmap = new _IWMap(w, h);
-          crmap = new _IWMap(w, h);
-          cbcodec = new _IWCodec(*cbmap, 0);
-          crcodec = new _IWCodec(*crmap, 0);
+          cbmap = new Map(w, h);
+          crmap = new Map(w, h);
+          cbcodec = new Codec(*cbmap, 0);
+          crcodec = new Codec(*crmap, 0);
         }
     }
   // Read data
@@ -1932,17 +1767,17 @@ IWPixmap::encode_chunk(ByteStream &bs, const IWEncoderParms &parm)
   if (!ycodec)
     {
       cslice = cserial = cbytes = 0;
-      ycodec = new _IWCodec(*ymap, 1);
+      ycodec = new Codec(*ymap, 1);
       if (crmap && cbmap)
         {
-          cbcodec = new _IWCodec(*cbmap, 1);
-          crcodec = new _IWCodec(*crmap, 1);
+          cbcodec = new Codec(*cbmap, 1);
+          crcodec = new Codec(*crmap, 1);
         }
     }
   // Adjust cbytes
-  cbytes += sizeof(struct PrimaryHeader);
+  cbytes += sizeof(struct IW44Image::PrimaryHeader);
   if (cserial == 0)
-    cbytes += sizeof(struct SecondaryHeader) + sizeof(struct TertiaryHeader2);
+    cbytes += sizeof(struct IW44Image::SecondaryHeader) + sizeof(struct IW44Image::TertiaryHeader2);
   // Prepare zcodec slices
   int flag = 1;
   int nslices = 0;
@@ -1973,20 +1808,20 @@ IWPixmap::encode_chunk(ByteStream &bs, const IWEncoderParms &parm)
       }
   }
   // Write primary header
-  struct PrimaryHeader primary;
+  struct IW44Image::PrimaryHeader primary;
   primary.serial = cserial;
   primary.slices = nslices;
   bs.writall((void*)&primary, sizeof(primary));
   // Write secondary header
   if (cserial == 0)
     {
-      struct SecondaryHeader secondary;
+      struct IW44Image::SecondaryHeader secondary;
       secondary.major = IWCODEC_MAJOR;
       secondary.minor = IWCODEC_MINOR;
       if (! (crmap && cbmap))
         secondary.major |= 0x80;
       bs.writall((void*)&secondary, sizeof(secondary));
-      struct TertiaryHeader2 tertiary;
+      struct IW44Image::TertiaryHeader2 tertiary;
       tertiary.xhi = (ymap->iw >> 8) & 0xff;
       tertiary.xlo = (ymap->iw >> 0) & 0xff;
       tertiary.yhi = (ymap->ih >> 8) & 0xff;
@@ -2003,16 +1838,6 @@ IWPixmap::encode_chunk(ByteStream &bs, const IWEncoderParms &parm)
   cslice  += nslices;
   cserial += 1;
   return flag;
-}
-
-void 
-IWPixmap::close_codec()
-{
-  delete ycodec;
-  delete crcodec;
-  delete cbcodec;
-  ycodec = crcodec = cbcodec = 0;
-  cslice = cbytes = cserial = 0;
 }
 
 int 
@@ -2063,7 +1888,7 @@ IWPixmap::decode_iff(IFFByteStream &iff, int maxchunks)
 //////////////////////////////////////////////////////
 
 void
-IWTransform::filter_begin(int w, int h)
+IW44Image::Transform::filter_begin(int w, int h)
 {
   if (MMXControl::mmxflag < 0)  
     MMXControl::enable_mmx();
@@ -2071,7 +1896,7 @@ IWTransform::filter_begin(int w, int h)
 
 
 void
-IWTransform::filter_end(void)
+IW44Image::Transform::filter_end(void)
 {
 #ifdef MMX
   if (MMXControl::mmxflag > 0)
@@ -2090,7 +1915,7 @@ IWTransform::filter_end(void)
 // scale intervals begin(inclusive) and end(exclusive)
 
 void
-IWTransform::Decode::backward(short *p, int w, int h, int rowsize, int begin, int end)
+IW44Image::Transform::Decode::backward(short *p, int w, int h, int rowsize, int begin, int end)
 { 
   // PREPARATION
   filter_begin(w,h);
@@ -2125,7 +1950,7 @@ IWTransform::Decode::backward(short *p, int w, int h, int rowsize, int begin, in
 
 /* Converts YCbCr to RGB. */
 void 
-IWTransform::Decode::YCbCr_to_RGB(GPixel *p, int w, int h, int rowsize)
+IW44Image::Transform::Decode::YCbCr_to_RGB(GPixel *p, int w, int h, int rowsize)
 {
   for (int i=0; i<h; i++,p+=rowsize)
     {
@@ -2148,1310 +1973,4 @@ IWTransform::Decode::YCbCr_to_RGB(GPixel *p, int w, int h, int rowsize)
         }
     }
 }
-
-#ifndef NEED_DECODER_ONLY
-
-//////////////////////////////////////////////////////
-/** IW44Transform.
-*/
-
-class IWTransform::Encode : IWTransform
-{
- public:
- // WAVELET TRANSFORM
-  /** Forward transform. */
-  static void forward(short *p, int w, int h, int rowsize, int begin, int end);
-  
-  // COLOR TRANSFORM
-  /** Extracts Y */
-  static void RGB_to_Y(const GPixel *p, int w, int h, int rowsize, 
-                       signed char *out, int outrowsize);
-  /** Extracts Cb */
-  static void RGB_to_Cb(const GPixel *p, int w, int h, int rowsize, 
-                        signed char *out, int outrowsize);
-  /** Extracts Cr */
-  static void RGB_to_Cr(const GPixel *p, int w, int h, int rowsize, 
-                        signed char *out, int outrowsize);
-};
-
-
-//////////////////////////////////////////////////////
-// MMX IMPLEMENTATION HELPERS
-//////////////////////////////////////////////////////
-
-
-// Note:
-// MMX implementation for vertical transforms only.
-// Speedup is basically related to faster memory transfer
-// The IW44 transform is not CPU bound, it is memory bound.
-
-#ifdef MMX
-
-static inline void
-mmx_fv_1 ( short* &q, short* e, int s, int s3 )
-{
-  while (q<e && (((long)q)&0x7))
-    {
-      int a = (int)q[-s] + (int)q[s];
-      int b = (int)q[-s3] + (int)q[s3];
-      *q -= (((a<<3)+a-b+8)>>4);
-      q++;
-    }
-  while (q+3<e)
-    {
-      MMXar( movq,       q-s,mm0);  // MM0=[ b3, b2, b1, b0 ]
-      MMXar( movq,       q+s,mm2);  // MM2=[ c3, c2, c1, c0 ]
-      MMXrr( movq,       mm0,mm1);  
-      MMXrr( punpcklwd,  mm2,mm0);  // MM0=[ c1, b1, c0, b0 ]
-      MMXrr( punpckhwd,  mm2,mm1);  // MM1=[ c3, b3, c2, b2 ]
-      MMXar( pmaddwd,    w9,mm0);   // MM0=[ (c1+b1)*9, (c0+b0)*9 ]
-      MMXar( pmaddwd,    w9,mm1);   // MM1=[ (c3+b3)*9, (c2+b2)*9 ]
-      MMXar( movq,       q-s3,mm2);
-      MMXar( movq,       q+s3,mm4);
-      MMXrr( movq,       mm2,mm3);
-      MMXrr( punpcklwd,  mm4,mm2);  // MM2=[ d1, a1, d0, a0 ]
-      MMXrr( punpckhwd,  mm4,mm3);  // MM3=[ d3, a3, d2, a2 ]
-      MMXar( pmaddwd,    w1,mm2);   // MM2=[ (a1+d1)*1, (a0+d0)*1 ]
-      MMXar( pmaddwd,    w1,mm3);   // MM3=[ (a3+d3)*1, (a2+d2)*1 ]
-      MMXar( paddd,      d8,mm0);
-      MMXar( paddd,      d8,mm1);
-      MMXrr( psubd,      mm2,mm0);  // MM0=[ (c1+b1)*9-a1-d1+8, ...
-      MMXrr( psubd,      mm3,mm1);  // MM1=[ (c3+b3)*9-a3-d3+8, ...
-      MMXir( psrad,      4,mm0);
-      MMXar( movq,       q,mm7);    // MM7=[ p3,p2,p1,p0 ]
-      MMXir( psrad,      4,mm1);
-      MMXrr( packssdw,   mm1,mm0);  // MM0=[ x3,x2,x1,x0 ]
-      MMXrr( psubw,      mm0,mm7);  // MM7=[ p3-x3, p2-x2, ... ]
-      MMXra( movq,       mm7,q);
-#if defined(_MSC_VER) && defined(_DEBUG)
-      MMXemms;
-#endif
-      q += 4;
-    }
-}
-
-static inline void
-mmx_fv_2 ( short* &q, short* e, int s, int s3 )
-{
-  while (q<e && (((long)q)&0x7))
-    {
-      int a = (int)q[-s] + (int)q[s];
-      int b = (int)q[-s3] + (int)q[s3];
-      *q += (((a<<3)+a-b+16)>>5);
-      q ++;
-    }
-  while (q+3<e)
-    {
-      MMXar( movq,       q-s,mm0);  // MM0=[ b3, b2, b1, b0 ]
-      MMXar( movq,       q+s,mm2);  // MM2=[ c3, c2, c1, c0 ]
-      MMXrr( movq,       mm0,mm1);  
-      MMXrr( punpcklwd,  mm2,mm0);  // MM0=[ c1, b1, c0, b0 ]
-      MMXrr( punpckhwd,  mm2,mm1);  // MM1=[ c3, b3, c2, b2 ]
-      MMXar( pmaddwd,    w9,mm0);   // MM0=[ (c1+b1)*9, (c0+b0)*9 ]
-      MMXar( pmaddwd,    w9,mm1);   // MM1=[ (c3+b3)*9, (c2+b2)*9 ]
-      MMXar( movq,       q-s3,mm2);
-      MMXar( movq,       q+s3,mm4);
-      MMXrr( movq,       mm2,mm3);
-      MMXrr( punpcklwd,  mm4,mm2);  // MM2=[ d1, a1, d0, a0 ]
-      MMXrr( punpckhwd,  mm4,mm3);  // MM3=[ d3, a3, d2, a2 ]
-      MMXar( pmaddwd,    w1,mm2);   // MM2=[ (a1+d1)*1, (a0+d0)*1 ]
-      MMXar( pmaddwd,    w1,mm3);   // MM3=[ (a3+d3)*1, (a2+d2)*1 ]
-      MMXar( paddd,      d16,mm0);
-      MMXar( paddd,      d16,mm1);
-      MMXrr( psubd,      mm2,mm0);  // MM0=[ (c1+b1)*9-a1-d1+8, ...
-      MMXrr( psubd,      mm3,mm1);  // MM1=[ (c3+b3)*9-a3-d3+8, ...
-      MMXir( psrad,      5,mm0);
-      MMXar( movq,       q,mm7);    // MM7=[ p3,p2,p1,p0 ]
-      MMXir( psrad,      5,mm1);
-      MMXrr( packssdw,   mm1,mm0);  // MM0=[ x3,x2,x1,x0 ]
-      MMXrr( paddw,      mm0,mm7);  // MM7=[ p3+x3, p2+x2, ... ]
-      MMXra( movq,       mm7,q);
-#if defined(_MSC_VER) && defined(_DEBUG)
-      MMXemms;
-#endif
-      q += 4;
-    }
-}
-
-#endif /* MMX */
-
-//////////////////////////////////////////////////////
-// NEW FILTERS
-//////////////////////////////////////////////////////
-
-static void 
-filter_fv(short *p, int w, int h, int rowsize, int scale)
-{
-  int y = 0;
-  int s = scale*rowsize;
-  int s3 = s+s+s;
-  h = ((h-1)/scale)+1;
-  y += 1;
-  p += s;
-  while (y-3 < h)
-    {
-      // 1-Delta
-      {
-        short *q = p;
-        short *e = q+w;
-        if (y>=3 && y+3<h)
-          {
-            // Generic case
-#ifdef MMX
-            if (scale==1 && MMXControl::mmxflag>0)
-              mmx_fv_1(q, e, s, s3);
-#endif
-            while (q<e)
-              {
-                int a = (int)q[-s] + (int)q[s];
-                int b = (int)q[-s3] + (int)q[s3];
-                *q -= (((a<<3)+a-b+8)>>4);
-                q += scale;
-              }
-          }
-        else if (y<h)
-          {
-            // Special cases
-            short *q1 = (y+1<h ? q+s : q-s);
-            while (q<e)
-              {
-                int a = (int)q[-s] + (int)(*q1);
-                *q -= ((a+1)>>1);
-                q += scale;
-                q1 += scale;
-              }
-          }
-      }
-      // 2-Update
-      {
-        short *q = p-s3;
-        short *e = q+w;
-        if (y>=6 && y<h)
-          {
-            // Generic case
-#ifdef MMX
-            if (scale==1 && MMXControl::mmxflag>0)
-              mmx_fv_2(q, e, s, s3);
-#endif
-            while (q<e)
-              {
-                int a = (int)q[-s] + (int)q[s];
-                int b = (int)q[-s3] + (int)q[s3];
-                *q += (((a<<3)+a-b+16)>>5);
-                q += scale;
-              }
-          }
-        else if (y>=3)
-          {
-            // Special cases
-            short *q1 = (y-2<h ? q+s : 0);
-            short *q3 = (y<h ? q+s3 : 0);
-            if (y>=6)
-              {
-                while (q<e)
-                  {
-                    int a = (int)q[-s] + (q1 ? (int)(*q1) : 0);
-                    int b = (int)q[-s3] + (q3 ? (int)(*q3) : 0);
-                    *q += (((a<<3)+a-b+16)>>5);
-                    q += scale;
-                    if (q1) q1 += scale;
-                    if (q3) q3 += scale;
-                  }
-              }
-            else if (y>=4)
-              {
-                while (q<e)
-                  {
-                    int a = (int)q[-s] + (q1 ? (int)(*q1) : 0);
-                    int b = (q3 ? (int)(*q3) : 0);
-                    *q += (((a<<3)+a-b+16)>>5);
-                    q += scale;
-                    if (q1) q1 += scale;
-                    if (q3) q3 += scale;
-                  }
-              }
-            else
-              {
-                while (q<e)
-                  {
-                    int a = (q1 ? (int)(*q1) : 0);
-                    int b = (q3 ? (int)(*q3) : 0);
-                    *q += (((a<<3)+a-b+16)>>5);
-                    q += scale;
-                    if (q1) q1 += scale;
-                    if (q3) q3 += scale;
-                  }
-              }
-          }
-      }
-      y += 2;
-      p += s+s;
-    }
-}
-
-static void 
-filter_fh(short *p, int w, int h, int rowsize, int scale)
-{
-  int y = 0;
-  int s = scale;
-  int s3 = s+s+s;
-  rowsize *= scale;
-  while (y<h)
-    {
-      short *q = p+s;
-      short *e = p+w;
-      int a0=0, a1=0, a2=0, a3=0;
-      int b0=0, b1=0, b2=0, b3=0;
-      if (q < e)
-        {
-          // Special case: x=1
-          a1 = a2 = a3 = q[-s];
-          if (q+s<e)
-            a2 = q[s];
-          if (q+s3<e)
-            a3 = q[s3];
-          b3 = q[0] - ((a1+a2+1)>>1);
-          q[0] = b3;
-          q += s+s;
-        }
-      while (q+s3 < e)
-        {
-          // Generic case
-          a0=a1; 
-          a1=a2; 
-          a2=a3;
-          a3=q[s3];
-          b0=b1; 
-          b1=b2; 
-          b2=b3;
-          b3 = q[0] - ((((a1+a2)<<3)+(a1+a2)-a0-a3+8) >> 4);
-          q[0] = b3;
-          q[-s3] = q[-s3] + ((((b1+b2)<<3)+(b1+b2)-b0-b3+16) >> 5);
-          q += s+s;
-        }
-      while (q < e)
-        {
-          // Special case: w-3 <= x < w
-          a1=a2; 
-          a2=a3;
-          b0=b1; 
-          b1=b2; 
-          b2=b3;
-          b3 = q[0] - ((a1+a2+1)>>1);
-          q[0] = b3;
-          q[-s3] = q[-s3] + ((((b1+b2)<<3)+(b1+b2)-b0-b3+16) >> 5);
-          q += s+s;
-        }
-      while (q-s3 < e)
-        {
-          // Special case  w <= x < w+3
-          b0=b1; 
-          b1=b2; 
-          b2=b3;
-          b3=0;
-          if (q-s3 >= p)
-            q[-s3] = q[-s3] + ((((b1+b2)<<3)+(b1+b2)-b0-b3+16) >> 5);
-          q += s+s;
-        }
-      y += scale;
-      p += rowsize;
-    }
-}
-
-
-//////////////////////////////////////////////////////
-// WAVELET TRANSFORM 
-//////////////////////////////////////////////////////
-
-
-//----------------------------------------------------
-// Function for applying bidimensional IW44 between 
-// scale intervals begin(inclusive) and end(exclusive)
-
-void
-IWTransform::Encode::forward(short *p, int w, int h, int rowsize, int begin, int end)
-{ 
-
-  // PREPARATION
-  filter_begin(w,h);
-  // LOOP ON SCALES
-  for (int scale=begin; scale<end; scale<<=1)
-    {
-#ifdef IWTRANSFORM_TIMER
-      int tv,th;
-      th = tv = GOS::ticks();
-#endif
-      filter_fh(p, w, h, rowsize, scale);
-#ifdef IWTRANSFORM_TIMER
-      th = GOS::ticks();
-      tv = th - tv;
-#endif
-      filter_fv(p, w, h, rowsize, scale);
-#ifdef IWTRANSFORM_TIMER
-      th = GOS::ticks()-th;
-      fprintf(stderr,"forw%d\tv=%dms h=%dms\n", scale,th,tv);
-#endif
-    }
-  // TERMINATE
-  filter_end();
-}
-
-//////////////////////////////////////////////////////
-// COLOR TRANSFORM 
-//////////////////////////////////////////////////////
-
-static const float 
-rgb_to_ycc[3][3] = 
-{ { 0.304348F,  0.608696F,  0.086956F },      
-  { 0.463768F, -0.405797F, -0.057971F },
-  {-0.173913F, -0.347826F,  0.521739F } };
-
-
-/* Extracts Y */
-void 
-IWTransform::Encode::RGB_to_Y(const GPixel *p, int w, int h, int rowsize, 
-                      signed char *out, int outrowsize)
-{
-  int rmul[256], gmul[256], bmul[256];
-  for (int k=0; k<256; k++)
-    {
-      rmul[k] = (int)(k*0x10000*rgb_to_ycc[0][0]);
-      gmul[k] = (int)(k*0x10000*rgb_to_ycc[0][1]);
-      bmul[k] = (int)(k*0x10000*rgb_to_ycc[0][2]);
-    }
-  for (int i=0; i<h; i++, p+=rowsize, out+=outrowsize)
-    {
-      const GPixel *p2 = p;
-      signed char *out2 = out;
-      for (int j=0; j<w; j++,p2++,out2++)
-        {
-          int y = rmul[p2->r] + gmul[p2->g] + bmul[p2->b] + 32768;
-          *out2 = (y>>16) - 128;
-        }
-    }
-}
-
-/* Extracts Cb */
-void 
-IWTransform::Encode::RGB_to_Cb(const GPixel *p, int w, int h, int rowsize, 
-                       signed char *out, int outrowsize)
-{
-  int rmul[256], gmul[256], bmul[256];
-  for (int k=0; k<256; k++)
-    {
-      rmul[k] = (int)(k*0x10000*rgb_to_ycc[2][0]);
-      gmul[k] = (int)(k*0x10000*rgb_to_ycc[2][1]);
-      bmul[k] = (int)(k*0x10000*rgb_to_ycc[2][2]);
-    }
-  for (int i=0; i<h; i++, p+=rowsize, out+=outrowsize)
-    {
-      const GPixel *p2 = p;
-      signed char *out2 = out;
-      for (int j=0; j<w; j++,p2++,out2++)
-        {
-          int c = rmul[p2->r] + gmul[p2->g] + bmul[p2->b] + 32768;
-          *out2 = max(-128, min(127, c>>16));
-        }
-    }
-}
-
-/* Extracts Cr */
-void 
-IWTransform::Encode::RGB_to_Cr(const GPixel *p, int w, int h, int rowsize, 
-                       signed char *out, int outrowsize)
-{
-  int rmul[256], gmul[256], bmul[256];
-  for (int k=0; k<256; k++)
-    {
-      rmul[k] = (int)((k*0x10000)*rgb_to_ycc[1][0]);
-      gmul[k] = (int)((k*0x10000)*rgb_to_ycc[1][1]);
-      bmul[k] = (int)((k*0x10000)*rgb_to_ycc[1][2]);
-    }
-  for (int i=0; i<h; i++, p+=rowsize, out+=outrowsize)
-    {
-      const GPixel *p2 = p;
-      signed char *out2 = out;
-      for (int j=0; j<w; j++,p2++,out2++)
-        {
-          int c = rmul[p2->r] + gmul[p2->g] + bmul[p2->b] + 32768;
-          *out2 = max(-128, min(127, c>>16));
-        }
-    }
-}
-
-
-//////////////////////////////////////////////////////
-// MASKING DECOMPOSITION
-//////////////////////////////////////////////////////
-
-//----------------------------------------------------
-// Function for applying bidimensional IW44 between 
-// scale intervals begin(inclusive) and end(exclusive)
-// with a MASK bitmap
-
-
-static void
-interpolate_mask(short *data16, int w, int h, int rowsize,
-                 const signed char *mask8, int mskrowsize)
-{
-  int i,j;
-  // count masked bits
-  short *count;
-  GPBuffer<short> gcount(count,w*h);
-  short *cp = count;
-  for (i=0; i<h; i++, cp+=w, mask8+=mskrowsize)
-    for (j=0; j<w; j++)
-      cp[j] = (mask8[j] ? 0 : 0x1000);
-  // copy image
-  short *sdata;
-  GPBuffer<short> gsdata(sdata,w*h);
-  short *p = sdata;
-  short *q = data16;
-  for (i=0; i<h; i++, p+=w, q+=rowsize)
-    for (j=0; j<w; j++)
-      p[j] = q[j];
-  // iterate over resolutions
-  int split = 1;
-  int scale = 2;
-  int again = 1;
-  while (again && scale<w && scale<h)
-    {
-      again = 0;
-      p = data16;
-      q = sdata;
-      cp = count;
-      // iterate over block
-      for (i=0; i<h; i+=scale, cp+=w*scale, q+=w*scale, p+=rowsize*scale)
-        for (j=0; j<w; j+=scale)
-          {
-            int ii, jj;
-            int gotz = 0;
-            int gray = 0;
-            int npix = 0;
-            short *cpp = cp;
-            short *qq = q;
-            // look around when square goes beyond border
-            int istart = i;
-            if (istart+split>h)
-              {
-                istart -= scale;
-                cpp -= w*scale;
-                qq -= w*scale;
-              }
-            int jstart = j;
-            if (jstart+split>w)
-              jstart -= scale;
-            // compute gray level
-            for (ii=istart; ii<i+scale && ii<h; ii+=split, cpp+=w*split, qq+=w*split)
-              for (jj=jstart; jj<j+scale && jj<w; jj+=split)
-                {
-                  if (cpp[jj]>0) 
-                    {
-                      npix += cpp[jj];
-                      gray += cpp[jj] * qq[jj];
-                    } 
-                  else if (ii>=i && jj>=j)
-                    {
-                      gotz = 1;
-                    }
-                }
-            // process result
-            if (npix == 0)
-              {
-                // continue to next resolution
-                again = 1;
-                cp[j] = 0;
-              }
-            else
-              {
-                gray = gray / npix;
-                // check whether initial image require fix
-                if (gotz)
-                  {
-                    cpp = cp;
-                    qq = p;
-                    for (ii=i; ii<i+scale && ii<h; ii+=1, cpp+=w, qq+=rowsize)
-                      for (jj=j; jj<j+scale && jj<w; jj+=1)
-                        if (cpp[jj] == 0)
-                          {
-                            qq[jj] = gray;
-                            cpp[jj] = 1;
-                          }
-                  }
-                // store average for next iteration
-                cp[j] = npix>>2;
-                q[j] = gray;
-              }
-          }
-      // double resolution
-      split = scale;
-      scale = scale+scale;
-    }
-}
-
-
-static void
-forward_mask(short *data16, int w, int h, int rowsize, int begin, int end,
-             const signed char *mask8, int mskrowsize )
-{
-  int i,j;
-  signed char *m;
-  short *p;
-  short *d;
-  // Allocate buffers
-  short *sdata;
-  GPBuffer<short> gsdata(sdata,w*h);
-  signed char *smask;
-  GPBuffer<signed char> gsmask(smask,w*h);
-  // Copy mask
-  m = smask;
-  for (i=0; i<h; i+=1, m+=w, mask8+=mskrowsize)
-    memcpy((void*)m, (void*)mask8, w);
-  // Loop over scale
-  for (int scale=begin; scale<end; scale<<=1)
-    {
-      // Copy data into sdata buffer
-      p = data16;
-      d = sdata;
-      for (i=0; i<h; i+=scale)
-        {
-          for (j=0; j<w; j+=scale)
-            d[j] = p[j];
-          p += rowsize * scale;
-          d += w * scale;
-        }
-      // Decompose
-      IWTransform::Encode::forward(sdata, w, h, w, scale, scale+scale);
-      // Cancel masked coefficients
-      d = sdata;
-      m = smask;
-      for (i=0; i<h; i+=scale+scale)
-        {
-          for (j=scale; j<w; j+=scale+scale)
-            if (m[j])
-              d[j] = 0;
-          d += w * scale;
-          m += w * scale;
-          if (i+scale < h)
-            {
-              for (j=0; j<w; j+=scale)
-                if (m[j])
-                  d[j] = 0;
-              d += w * scale;
-              m += w * scale;
-            }
-        }
-      // Reconstruct
-      IWTransform::Decode::backward(sdata, w, h, w, scale+scale, scale);
-      // Correct visible pixels
-      p = data16;
-      d = sdata;
-      m = smask;
-      for (i=0; i<h; i+=scale)
-        {
-          for (j=0; j<w; j+=scale)
-            if (! m[j])
-              d[j] = p[j];
-          p += rowsize*scale;
-          m += w*scale;
-          d += w*scale;
-        }
-      // Decompose again (no need to iterate actually!)
-      IWTransform::Encode::forward(sdata, w, h, w, scale, scale+scale);
-      // Copy coefficients from sdata buffer
-      p = data16;
-      d = sdata;
-      for (i=0; i<h; i+=scale)
-        {
-          for (j=0; j<w; j+=scale)
-            p[j] = d[j];
-          p += rowsize * scale;
-          d += w * scale;
-        }
-      // Compute new mask for next scale
-      m = smask;
-      signed char *m0 = m;
-      signed char *m1 = m;
-      for (i=0; i<h; i+=scale+scale)
-        {
-          m0 = m1;
-          if (i+scale < h)
-            m1 = m + w*scale;
-          for (j=0; j<w; j+=scale+scale)
-            if (m[j] && m0[j] && m1[j] && (j<=0 || m[j-scale]) && (j+scale>=w || m[j+scale]))
-              m[j] = 1;
-            else
-              m[j] = 0;
-          m = m1 + w*scale;
-        }
-    }
-  // Free buffers
-}
-
-void 
-_IWMap::create(const signed char *img8, int imgrowsize, 
-               const signed char *msk8, int mskrowsize )
-{
-  int i, j;
-  // Progress
-  DJVU_PROGRESS_TASK(transf,"create iw44 map",3);
-  // Allocate decomposition buffer
-  short *data16;
-  GPBuffer<short> gdata16(data16,bw*bh);
-  // Copy pixels
-  short *p = data16;
-  const signed char *row = img8;
-  for (i=0; i<ih; i++)
-    {
-      for (j=0; j<iw; j++)
-        *p++ = (int)(row[j]) << iw_shift;
-      row += imgrowsize;
-      for (j=iw; j<bw; j++)
-        *p++ = 0;
-    }
-  for (i=ih; i<bh; i++)
-    for (j=0; j<bw; j++)
-      *p++ = 0;
-  // Handle bitmask
-  if (msk8)
-    {
-      // Interpolate pixels below mask
-      DJVU_PROGRESS_RUN(transf, 1);
-      interpolate_mask(data16, iw, ih, bw, msk8, mskrowsize);
-      // Multiscale iterative masked decomposition
-      DJVU_PROGRESS_RUN(transf, 3);
-      forward_mask(data16, iw, ih, bw, 1, 32, msk8, mskrowsize);
-    }
-  else
-    {
-      // Perform traditional decomposition
-      DJVU_PROGRESS_RUN(transf, 3);
-      IWTransform::Encode::forward(data16, iw, ih, bw, 1, 32);
-    }
-  // Copy coefficient into blocks
-  p = data16;
-  _IWBlock *block = blocks;
-  for (i=0; i<bh; i+=32)
-    {
-      for (j=0; j<bw; j+=32)
-        {
-          short liftblock[1024];
-          // transfer coefficients at (p+j) into aligned block
-          short *pp = p + j;
-          short *pl = liftblock;
-          for (int ii=0; ii<32; ii++, pp+=bw)
-            for (int jj=0; jj<32; jj++) 
-              *pl++ = pp[jj];
-          // transfer into _IWBlock (apply zigzag and scaling)
-          block->read_liftblock(liftblock, this);
-          block++;
-        }
-      // next row of blocks
-      p += 32*bw;
-    }
-}
-
-void 
-_IWMap::slashres(int res)
-{
-  int minbucket = 1;
-  if (res < 2)
-    return;
-  else if (res < 4)
-    minbucket=16;
-  else if (res < 8)
-    minbucket=4;
-  for (int blockno=0; blockno<nb; blockno++)
-    for (int buckno=minbucket; buckno<64; buckno++)
-      blocks[blockno].zero(buckno);
-}
-
-// encode_prepare
-// -- compute the states prior to encoding the buckets
-int
-_IWCodec::encode_prepare(int band, int fbucket, int nbucket, _IWBlock &blk, _IWBlock &eblk)
-{
-  int bbstate = 0;
-  // compute state of all coefficients in all buckets
-  if (band) 
-    {
-      // Band other than zero
-      int thres = quant_hi[band];
-      char *cstate = coeffstate;
-      for (int buckno=0; buckno<nbucket; buckno++, cstate+=16)
-        {
-          const short *pcoeff = blk.data(fbucket+buckno);
-          const short *epcoeff = eblk.data(fbucket+buckno);
-          int bstatetmp = 0;
-          if (! pcoeff)
-            {
-              bstatetmp = UNK;
-              // cstate[i] is not used and does not need initialization
-            }
-          else if (! epcoeff)
-            {
-              for (int i=0; i<16; i++)
-                {
-                  int cstatetmp = UNK;
-                  if  ((int)(pcoeff[i])>=thres || (int)(pcoeff[i])<=-thres)
-                    cstatetmp = NEW|UNK;
-                  cstate[i] = cstatetmp;
-                  bstatetmp |= cstatetmp;
-                }
-            }
-          else
-            {
-              for (int i=0; i<16; i++)
-                {
-                  int cstatetmp = UNK;
-                  if (epcoeff[i])
-                    cstatetmp = ACTIVE;
-                  else if  ((int)(pcoeff[i])>=thres || (int)(pcoeff[i])<=-thres)
-                    cstatetmp = NEW|UNK;
-                  cstate[i] = cstatetmp;
-                  bstatetmp |= cstatetmp;
-                }
-            }
-          bucketstate[buckno] = bstatetmp;
-          bbstate |= bstatetmp;
-        }
-    }
-  else
-    {
-      // Band zero ( fbucket==0 implies band==zero and nbucket==1 )
-      const short *pcoeff = blk.data(0, &map);
-      const short *epcoeff = eblk.data(0, emap);
-      char *cstate = coeffstate;
-      for (int i=0; i<16; i++)
-        {
-          int thres = quant_lo[i];
-          int cstatetmp = cstate[i];
-          if (cstatetmp != ZERO)
-            {
-              cstatetmp = UNK;
-              if (epcoeff[i])
-                cstatetmp = ACTIVE;
-              else if ((int)(pcoeff[i])>=thres || (int)(pcoeff[i])<=-thres)
-                cstatetmp = NEW|UNK;
-            }
-          cstate[i] = cstatetmp;
-          bbstate |= cstatetmp;
-        }
-      bucketstate[0] = bbstate;
-    }
-  return bbstate;
-}
-
-// encode_buckets
-// -- code a sequence of buckets in a given block
-void
-_IWCodec::encode_buckets(ZPCodec &zp, int bit, int band, 
-                         _IWBlock &blk, _IWBlock &eblk,
-                         int fbucket, int nbucket)
-{
-  // compute state of all coefficients in all buckets
-  int bbstate = encode_prepare(band, fbucket, nbucket, blk, eblk);
-
-  // code root bit
-  if ((nbucket<16) || (bbstate&ACTIVE))
-    {
-      bbstate |= NEW;
-    }
-  else if (bbstate & UNK)
-    {
-      zp.encoder( (bbstate&NEW) ? 1 : 0 , ctxRoot);
-#ifdef TRACE
-      printf("bbstate[bit=%d,band=%d] = %d\n", bit, band, bbstate);
-#endif
-    }
-  
-  // code bucket bits
-  if (bbstate & NEW)
-    for (int buckno=0; buckno<nbucket; buckno++)
-      {
-        // Code bucket bit
-        if (bucketstate[buckno] & UNK)
-          {
-            // Context
-            int ctx = 0;
-#ifndef NOCTX_BUCKET_UPPER
-            if (band>0)
-              {
-                int k = (fbucket+buckno)<<2;
-                const short *b = eblk.data(k>>4);
-                if (b)
-                  {
-                    k = k & 0xf;
-                    if (b[k])
-                      ctx += 1;
-                    if (b[k+1])
-                      ctx += 1;
-                    if (b[k+2])
-                      ctx += 1;
-                    if (ctx<3 && b[k+3])
-                      ctx += 1;
-                  }
-              }
-#endif
-#ifndef NOCTX_BUCKET_ACTIVE
-            if (bbstate & ACTIVE)
-              ctx |= 4; 
-#endif
-            // Code
-            zp.encoder( (bucketstate[buckno]&NEW) ? 1 : 0, ctxBucket[band][ctx] );
-#ifdef TRACE
-            printf("  bucketstate[bit=%d,band=%d,buck=%d] = %d\n", 
-                   bit, band, buckno, bucketstate[buckno] & ~ZERO);
-#endif
-          }
-      }
-  
-  // code new active coefficient (with their sign)
-  if (bbstate & NEW)
-    {
-      int thres = quant_hi[band];
-      char *cstate = coeffstate;
-      for (int buckno=0; buckno<nbucket; buckno++, cstate+=16)
-        if (bucketstate[buckno] & NEW)
-          {
-            int i;
-#ifndef NOCTX_EXPECT
-            int gotcha = 0;
-            const int maxgotcha = 7;
-            for (i=0; i<16; i++)
-              if (cstate[i] & UNK)
-                gotcha += 1;
-#endif
-            const short *pcoeff = blk.data(fbucket+buckno);
-            short *epcoeff = eblk.data(fbucket+buckno, emap);
-            // iterate within bucket
-            for (i=0; i<16; i++)
-              {
-                if (cstate[i] & UNK)
-                  {
-                    // Prepare context
-                    int ctx = 0;
-#ifndef NOCTX_EXPECT
-                    if (gotcha>=maxgotcha)
-                      ctx = maxgotcha;
-                    else
-                      ctx = gotcha;
-#endif
-#ifndef NOCTX_ACTIVE
-                    if (bucketstate[buckno] & ACTIVE)
-                      ctx |= 8;
-#endif
-                    // Code
-                    zp.encoder( (cstate[i]&NEW) ? 1 : 0, ctxStart[ctx] );
-                    if (cstate[i] & NEW)
-                      {
-                        // Code sign
-                        zp.IWencoder( (pcoeff[i]<0) ? 1 : 0 );
-                        // Set encoder state
-                        if (band==0)
-                          thres = quant_lo[i];
-                        epcoeff[i] = thres + (thres>>1);
-                      }
-#ifndef NOCTX_EXPECT
-                    if (cstate[i] & NEW)
-                      gotcha = 0;
-                    else if (gotcha > 0)
-                      gotcha -= 1;
-#endif
-#ifdef TRACE
-                    printf("    coeffstate[bit=%d,band=%d,buck=%d,c=%d] = %d\n", 
-                           bit, band, buckno, i, cstate[i]);
-#endif
-                  }
-              }
-          }
-    }
-
-  // code mantissa bits
-  if (bbstate & ACTIVE)
-    {
-      int thres = quant_hi[band];
-      char *cstate = coeffstate;
-      for (int buckno=0; buckno<nbucket; buckno++, cstate+=16)
-        if (bucketstate[buckno] & ACTIVE)
-          {
-            const short *pcoeff = blk.data(fbucket+buckno);
-            short *epcoeff = eblk.data(fbucket+buckno, emap);
-            for (int i=0; i<16; i++)
-              if (cstate[i] & ACTIVE)
-                {
-                  // get coefficient
-                  int coeff = pcoeff[i];
-                  int ecoeff = epcoeff[i];
-                  if (coeff < 0)
-                    coeff = -coeff;
-                  // get band zero thresholds
-                  if (band == 0)
-                    thres = quant_lo[i];
-                  // compute mantissa bit
-                  int pix = 0;
-                  if (coeff >= ecoeff)
-                    pix = 1;
-                  // encode second or lesser mantissa bit
-                  if (ecoeff <= 3*thres)
-                    zp.encoder(pix, ctxMant);                      
-                  else
-                    zp.IWencoder(pix);
-                  // adjust epcoeff
-                  epcoeff[i] = ecoeff - (pix ? 0 : thres) + (thres>>1);
-                }
-          }
-    }
-}
-
-// _IWCodec::estimate_decibel
-// -- estimate encoding error (after code_slice) in decibels.
-float
-_IWCodec::estimate_decibel(float frac)
-{
-  int i,j;
-  float *q;
-  // Test that we are encoding
-  if (!encoding || !emap)
-    G_THROW("IWImage.cant_estimate");
-  // Fill norm arrays
-  float norm_lo[16];
-  float norm_hi[10];
-  // -- lo coefficients
-  q = iw_norm;
-  for (i=j=0; i<4; j++)
-    norm_lo[i++] = *q++;
-  for (j=0; j<4; j++)
-    norm_lo[i++] = *q;
-  q += 1;
-  for (j=0; j<4; j++)
-    norm_lo[i++] = *q;
-  q += 1;
-  for (j=0; j<4; j++)
-    norm_lo[i++] = *q;
-  q += 1;
-  // -- hi coefficients
-  norm_hi[0] = 0;
-  for (j=1; j<10; j++)
-    norm_hi[j] = *q++;
-  // Initialize mse array
-  float *xmse;
-  GPBuffer<float> gxmse(xmse,map.nb);
-  // Compute mse in each block
-  for (int blockno=0; blockno<map.nb; blockno++)
-    {
-      float mse = 0;
-      // Iterate over bands
-      for (int bandno=0; bandno<10; bandno++)
-        {
-          int fbucket = bandbuckets[bandno].start;
-          int nbucket = bandbuckets[bandno].size;
-          _IWBlock &blk = map.blocks[blockno];
-          _IWBlock &eblk = emap->blocks[blockno];
-          float norm = norm_hi[bandno];
-          for (int buckno=0; buckno<nbucket; buckno++)
-            {
-              const short *pcoeff = blk.data(fbucket+buckno);
-              const short *epcoeff = eblk.data(fbucket+buckno);
-              if (pcoeff)
-                {
-                  if (epcoeff)
-                    {
-                      for (i=0; i<16; i++)
-                        {
-                          if (bandno == 0)
-                            norm = norm_lo[i];
-                          float delta = (float)(pcoeff[i]<0 ? -pcoeff[i] : pcoeff[i]);
-                          delta = delta - epcoeff[i];
-                          mse = mse + norm * delta * delta;
-                        }
-                    }
-                  else
-                    {
-                      for (i=0; i<16; i++)
-                        {
-                          if (bandno == 0)
-                            norm = norm_lo[i];
-                          float delta = (float)(pcoeff[i]);
-                          mse = mse + norm * delta * delta;
-                        }
-                    }
-                }
-            }
-        }
-      xmse[blockno] = mse / 1024;
-    }
-  // Compute partition point
-  int n = 0;
-  int m = map.nb - 1;
-  int p = (int)floor(m*(1.0-frac)+0.5);
-  p = (p>m ? m : (p<0 ? 0 : p));
-  float pivot = 0;
-  // Partition array
-  while (n < p)
-    {
-      int l = n;
-      int h = m;
-      if (xmse[l] > xmse[h]) { float tmp=xmse[l]; xmse[l]=xmse[h]; xmse[h]=tmp; }
-      pivot = xmse[(l+h)/2];
-      if (pivot < xmse[l]) { float tmp=pivot; pivot=xmse[l]; xmse[l]=tmp; }
-      if (pivot > xmse[h]) { float tmp=pivot; pivot=xmse[h]; xmse[h]=tmp; }
-      while (l < h)
-        {
-          if (xmse[l] > xmse[h]) { float tmp=xmse[l]; xmse[l]=xmse[h]; xmse[h]=tmp; }
-          while (xmse[l]<pivot || (xmse[l]==pivot && l<h)) l++;
-          while (xmse[h]>pivot) h--;
-        }
-      if (p>=l) 
-        n = l;
-      else 
-        m = l-1;
-    }
-  // Compute average mse
-  float mse = 0;
-  for (i=p; i<map.nb; i++)
-    mse = mse + xmse[i];
-  mse = mse / (map.nb - p);
-  // Return
-  float factor = 255 << iw_shift;
-  float decibel = (float)(10.0 * log ( factor * factor / mse ) / 2.302585125);
-  return decibel;
-}
-
-IWBitmap::IWBitmap(const GBitmap *bm, const GBitmap *mask)
-  : db_frac(1.0),
-    ymap(0), ycodec(0),
-    cslice(0), cserial(0), cbytes(0)
-{
-  init(bm, mask);
-}
-
-void
-IWBitmap::init(const GBitmap *bm, const GBitmap *mask)
-{
-  // Free
-  close_codec();
-  delete ymap;
-  ymap = 0;
-  // Init
-  int i, j;
-  int w = bm->columns();
-  int h = bm->rows();
-  int g = bm->get_grays()-1;
-  signed char *buffer;
-  GPBuffer<signed char> gbuffer(buffer,w*h);
-  // Prepare gray level conversion table
-  signed char  bconv[256];
-  for (i=0; i<256; i++)
-    bconv[i] = max(0,min(255,i*255/g)) - 128;
-  // Perform decomposition
-  // Prepare mask information
-  const signed char *msk8 = 0;
-  int mskrowsize = 0;
-  if (mask)
-    {
-      msk8 = (const signed char*)((*mask)[0]);
-      mskrowsize = mask->rowsize();
-    }
-  // Prepare a buffer of signed bytes
-  for (i=0; i<h; i++)
-    {
-      signed char *bufrow = buffer + i*w;
-      const unsigned char *bmrow = (*bm)[i];
-      for (j=0; j<w; j++)
-        bufrow[j] = bconv[bmrow[j]];
-    }
-  // Create map
-  ymap = new _IWMap( w, h );
-  ymap->create(buffer, w, msk8, mskrowsize);
-}
-
-int  
-IWBitmap::encode_chunk(ByteStream &bs, const IWEncoderParms &parm)
-{
-  // Check
-  if (parm.slices==0 && parm.bytes==0 && parm.decibels==0)
-    G_THROW("IWImage.need_stop");
-  if (ycodec && !ycodec->encoding)
-    G_THROW("IWImage.codec_open2");
-  if (! ymap)
-    G_THROW("IWImage.empty_object");
-  // Open codec
-  if (!ycodec)
-    {
-      cslice = cserial = cbytes = 0;
-      ycodec = new _IWCodec(*ymap, 1);
-    }
-  // Adjust cbytes
-  cbytes += sizeof(struct PrimaryHeader);
-  if (cserial == 0)
-    cbytes += sizeof(struct SecondaryHeader) + sizeof(struct TertiaryHeader2);
-  // Prepare zcoded slices
-  int flag = 1;
-  int nslices = 0;
-  MemoryByteStream mbs;
-  DJVU_PROGRESS_TASK(chunk,"encode chunk",parm.slices-cslice);
-  {
-    float estdb = -1.0;
-    ZPCodec zp(mbs, true, true);
-    while (flag)
-      {
-        if (parm.decibels>0  && estdb>=parm.decibels)
-          break;
-        if (parm.bytes>0  && mbs.tell()+cbytes>=parm.bytes)
-          break;
-        if (parm.slices>0 && nslices+cslice>=parm.slices)
-          break;
-        DJVU_PROGRESS_RUN(chunk, (1+nslices-cslice)|0xf);
-        flag = ycodec->code_slice(zp);
-        if (flag && parm.decibels>0.0)
-          if (ycodec->curband==0 || estdb>=parm.decibels-DECIBEL_PRUNE)
-            estdb = ycodec->estimate_decibel(db_frac);
-        nslices++;
-      }
-  }
-  // Write primary header
-  struct PrimaryHeader primary;
-  primary.serial = cserial;
-  primary.slices = nslices;
-  bs.writall((void*)&primary, sizeof(primary));
-  // Write auxilliary headers
-  if (cserial == 0)
-    {
-      struct SecondaryHeader secondary;
-      secondary.major = IWCODEC_MAJOR + 0x80;
-      secondary.minor = IWCODEC_MINOR;
-      bs.writall((void*)&secondary, sizeof(secondary));
-      struct TertiaryHeader2 tertiary;
-      tertiary.xhi = (ymap->iw >> 8) & 0xff;
-      tertiary.xlo = (ymap->iw >> 0) & 0xff;
-      tertiary.yhi = (ymap->ih >> 8) & 0xff;
-      tertiary.ylo = (ymap->ih >> 0) & 0xff;
-      tertiary.crcbdelay = 0;
-      bs.writall((void*)&tertiary, sizeof(tertiary));
-    }
-  // Write slices
-  mbs.seek(0);
-  bs.copy(mbs);
-  // Return
-  cbytes  += mbs.tell();
-  cslice  += nslices;
-  cserial += 1;
-  return flag;
-}
-
-void 
-IWBitmap::encode_iff(IFFByteStream &iff, int nchunks, const IWEncoderParms *parms)
-{
-  if (ycodec)
-    G_THROW("IWImage.left_open1");
-  int flag = 1;
-  iff.put_chunk("FORM:BM44", 1);
-  DJVU_PROGRESS_TASK(iff,"encode iff chunk",nchunks);
-  for (int i=0; flag && i<nchunks; i++)
-    {
-      DJVU_PROGRESS_RUN(iff,i+1);
-      iff.put_chunk("BM44");
-      flag = encode_chunk(iff,parms[i]);
-      iff.close_chunk();
-    }
-  iff.close_chunk();
-  close_codec();
-}
-
-IWPixmap::IWPixmap(const GPixmap *pm, const GBitmap *mask, CRCBMode crcbmode)
-  : crcb_delay(10), crcb_half(0), db_frac(1.0),
-    ymap(0), cbmap(0), crmap(0),
-    ycodec(0), cbcodec(0), crcodec(0),
-    cslice(0), cserial(0), cbytes(0)
-{
-  init(pm, mask, crcbmode);
-}
-
-void
-IWPixmap::init(const GPixmap *pm, const GBitmap *mask, CRCBMode crcbmode)
-{
-  /* Free */
-  close_codec();
-  delete ymap;
-  delete cbmap;
-  delete crmap;
-  ymap = cbmap = crmap = 0;
-  /* Create */
-  int w = pm->columns();
-  int h = pm->rows();
-  signed char *buffer;
-  GPBuffer<signed char> gbuffer(buffer,w*h);
-  // Create maps
-  ymap = new _IWMap(w,h);
-  // Handle CRCB mode
-  switch (crcbmode) 
-    {
-    case CRCBnone:   crcb_half=1; crcb_delay=-1; break;
-    case CRCBhalf:   crcb_half=1; crcb_delay=10; break;        
-    case CRCBnormal: crcb_half=0; crcb_delay=10; break;
-    case CRCBfull:   crcb_half=0; crcb_delay= 0; break;
-    }
-  // Prepare mask information
-  const signed char *msk8 = 0;
-  int mskrowsize = 0;
-  if (mask)
-    {
-      msk8 = (const signed char*)((*mask)[0]);
-      mskrowsize = mask->rowsize();
-    }
-  // Fill buffer with luminance information
-  DJVU_PROGRESS_TASK(create,"initialize pixmap",3);
-  DJVU_PROGRESS_RUN(create,(crcb_delay>=0 ? 1 : 3));
-  IWTransform::Encode::RGB_to_Y((*pm)[0], w, h, pm->rowsize(), buffer, w);
-  if (crcb_delay < 0)
-    {
-      // Stupid inversion for gray images
-      signed char *e = buffer + w*h;
-      for (signed char *b=buffer; b<e; b++)
-        *b = 255 - *b;
-    }
-  // Create YMAP
-  ymap->create(buffer, w, msk8, mskrowsize);
-  // Create chrominance maps
-  if (crcb_delay >= 0)
-    {
-      cbmap = new _IWMap(w,h);
-      crmap = new _IWMap(w,h);
-      // Process CB information
-      DJVU_PROGRESS_RUN(create,2);
-      IWTransform::Encode::RGB_to_Cb((*pm)[0], w, h, pm->rowsize(), buffer, w);
-      cbmap->create(buffer, w, msk8, mskrowsize);
-      // Process CR information
-      DJVU_PROGRESS_RUN(create,3);
-      IWTransform::Encode::RGB_to_Cr((*pm)[0], w, h, pm->rowsize(), buffer, w); 
-      crmap->create(buffer, w, msk8, mskrowsize);
-      // Perform chrominance reduction (CRCBhalf)
-      if (crcb_half)
-        {
-          cbmap->slashres(2);
-          crmap->slashres(2);
-        }
-    }
-}
-
-void 
-IWPixmap::encode_iff(IFFByteStream &iff, int nchunks, const IWEncoderParms *parms)
-{
-  if (ycodec)
-    G_THROW("IWImage.left_open3");
-  int flag = 1;
-  iff.put_chunk("FORM:PM44", 1);
-  DJVU_PROGRESS_TASK(iff,"encode pixmap chunk", nchunks);
-  for (int i=0; flag && i<nchunks; i++)
-    {
-      DJVU_PROGRESS_RUN(iff,i+1);
-      iff.put_chunk("PM44");
-      flag = encode_chunk(iff, parms[i]);
-      iff.close_chunk();
-    }
-  iff.close_chunk();
-  close_codec();
-}
-#endif // NEED_DECODER_ONLY
 

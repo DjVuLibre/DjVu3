@@ -14,6 +14,7 @@ c44.o: c44.cpp ../../../src/libdjvu++/GString.h \
  ../../../src/libdjvu++/GException.h \
  ../../../src/libdjvu++/GSmartPointer.h \
  ../../../src/libdjvu++/IWImage.h \
+ ../../../src/libdjvu++/ZPCodec.h \
  ../../../src/libdjvu++/DjVuInfo.h \
  ../../../src/libdjvu++/IFFByteStream.h \
  ../../../src/libdjvu++/ByteStream.h \
@@ -81,6 +82,7 @@ d44.o: d44.cpp ../../../src/libdjvu++/GString.h \
  ../../../src/libdjvu++/GException.h \
  ../../../src/libdjvu++/GSmartPointer.h \
  ../../../src/libdjvu++/IWImage.h \
+ ../../../src/libdjvu++/ZPCodec.h \
  ../../../src/libdjvu++/GOS.h \
  ../../../src/libdjvu++/IFFByteStream.h \
  ../../../src/libdjvu++/ByteStream.h \

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: JB2EncodeCodec.cpp,v 1.4 2001-01-04 22:04:55 bcr Exp $
+// $Id: JB2EncodeCodec.cpp,v 1.5 2001-01-20 01:55:40 bcr Exp $
 // $Name:  $
 
 #ifndef NEED_DECODER_ONLY
@@ -40,7 +40,7 @@
 #include <string.h>
 
 ////////////////////////////////////////
-//// CLASS JB2ENCODECODEC:  DECLARATION
+//// CLASS JB2Codec::Encode:  DECLARATION
 ////////////////////////////////////////
 
 // This class is accessed via the encode
@@ -51,10 +51,10 @@
 // This class implements the JB2 coder.
 // Contains all contextual information for encoding a JB2Image.
 
-class JB2Dict::JB2EncodeCodec : public JB2Dict::JB2Codec
+class JB2Dict::JB2Codec::Encode : public JB2Dict::JB2Codec
 {
 public:
-  JB2EncodeCodec(ByteStream &bs);
+  Encode(ByteStream &bs);
 //virtual
   void code(JB2Image *jim);
   void code(JB2Dict *jim);
@@ -93,7 +93,7 @@ private:
 void 
 JB2Dict::encode(ByteStream &bs) const
 {
-  JB2EncodeCodec codec(bs);
+  JB2Codec::Encode codec(bs);
   codec.code((JB2Dict*)this);
 }
 
@@ -104,7 +104,7 @@ JB2Dict::encode(ByteStream &bs) const
 void 
 JB2Image::encode(ByteStream &bs) const
 {
-  JB2EncodeCodec codec(bs);
+  JB2Codec::Encode codec(bs);
   codec.code((JB2Image*)this);
 }
 
@@ -134,18 +134,18 @@ static const int CELLEXTRA =   500;
 
 // CONSTRUCTOR
 
-JB2Dict::JB2EncodeCodec::JB2EncodeCodec(ByteStream &bs)
+JB2Dict::JB2Codec::Encode::Encode(ByteStream &bs)
 : JB2Dict::JB2Codec(bs,1), zp(bs, true, true) {}
 
 inline bool
-JB2Dict::JB2EncodeCodec::CodeBit(const bool bit, BitContext &ctx)
+JB2Dict::JB2Codec::Encode::CodeBit(const bool bit, BitContext &ctx)
 {
     zp.encoder(bit?1:0, ctx);
     return bit;
 }
 
 void
-JB2Dict::JB2EncodeCodec::CodeNum(int num, int low, int high, NumContext &ctx)
+JB2Dict::JB2Codec::Encode::CodeNum(int num, int low, int high, NumContext &ctx)
 {
   if (num < low || num > high)
     G_THROW("JB2Image.bad_number");
@@ -155,7 +155,7 @@ JB2Dict::JB2EncodeCodec::CodeNum(int num, int low, int high, NumContext &ctx)
 // CODE COMMENTS
 
 void 
-JB2Dict::JB2EncodeCodec::code_comment(GString &comment)
+JB2Dict::JB2Codec::Encode::code_comment(GString &comment)
 {
   // Encode size
       int size=comment.length();
@@ -169,13 +169,13 @@ JB2Dict::JB2EncodeCodec::code_comment(GString &comment)
 // CODE SIMPLE VALUES
 
 inline void 
-JB2Dict::JB2EncodeCodec::code_record_type(int &rectype)
+JB2Dict::JB2Codec::Encode::code_record_type(int &rectype)
 {
   CodeNum(rectype, START_OF_DATA, END_OF_DATA, dist_record_type);
 }
 
 int 
-JB2Dict::JB2EncodeCodec::code_match_index(int &index, JB2Dict *jim)
+JB2Dict::JB2Codec::Encode::code_match_index(int &index, JB2Dict *jim)
 {
     int match=shape2lib[index];
     CodeNum(match, 0, lib2shape.hbound(), dist_match_index);
@@ -185,14 +185,14 @@ JB2Dict::JB2EncodeCodec::code_match_index(int &index, JB2Dict *jim)
 // CODE PAIRS
 
 void
-JB2Dict::JB2EncodeCodec::code_inherited_shape_count(JB2Dict *jim)
+JB2Dict::JB2Codec::Encode::code_inherited_shape_count(JB2Dict *jim)
 {
   CodeNum(jim->get_inherited_shape_count(),
     0, BIGPOSITIVE, inherited_shape_count_dist);
 }
 
 void 
-JB2Dict::JB2EncodeCodec::code_image_size(JB2Dict *jim)
+JB2Dict::JB2Codec::Encode::code_image_size(JB2Dict *jim)
 {
   CodeNum(0, 0, BIGPOSITIVE, image_size_dist);
   CodeNum(0, 0, BIGPOSITIVE, image_size_dist);
@@ -200,7 +200,7 @@ JB2Dict::JB2EncodeCodec::code_image_size(JB2Dict *jim)
 }
 
 void 
-JB2Dict::JB2EncodeCodec::code_image_size(JB2Image *jim)
+JB2Dict::JB2Codec::Encode::code_image_size(JB2Image *jim)
 {
   image_columns = jim->get_width();
   CodeNum(image_columns, 0, BIGPOSITIVE, image_size_dist);
@@ -210,14 +210,14 @@ JB2Dict::JB2EncodeCodec::code_image_size(JB2Image *jim)
 }
 
 inline int
-JB2Dict::JB2EncodeCodec::get_diff(int x_diff,NumContext &rel_loc)
+JB2Dict::JB2Codec::Encode::get_diff(int x_diff,NumContext &rel_loc)
 {
    CodeNum(x_diff, BIGNEGATIVE, BIGPOSITIVE, rel_loc);
    return x_diff;
 }
 
 void 
-JB2Dict::JB2EncodeCodec::code_absolute_location(JB2Blit *jblt, int rows, int columns)
+JB2Dict::JB2Codec::Encode::code_absolute_location(JB2Blit *jblt, int rows, int columns)
 {
   // Check start record
   if (!gotstartrecordp)
@@ -228,14 +228,14 @@ JB2Dict::JB2EncodeCodec::code_absolute_location(JB2Blit *jblt, int rows, int col
 }
 
 void 
-JB2Dict::JB2EncodeCodec::code_absolute_mark_size(GBitmap *bm, int border)
+JB2Dict::JB2Codec::Encode::code_absolute_mark_size(GBitmap *bm, int border)
 {
   CodeNum(bm->columns(), 0, BIGPOSITIVE, abs_size_x);
   CodeNum(bm->rows(), 0, BIGPOSITIVE, abs_size_y);
 }
 
 void 
-JB2Dict::JB2EncodeCodec::code_relative_mark_size(GBitmap *bm, int cw, int ch, int border)
+JB2Dict::JB2Codec::Encode::code_relative_mark_size(GBitmap *bm, int cw, int ch, int border)
 {
   CodeNum(bm->columns()-cw, BIGNEGATIVE, BIGPOSITIVE, rel_size_x);
   CodeNum(bm->rows()-ch, BIGNEGATIVE, BIGPOSITIVE, rel_size_y);
@@ -244,7 +244,7 @@ JB2Dict::JB2EncodeCodec::code_relative_mark_size(GBitmap *bm, int cw, int ch, in
 // CODE BITMAP DIRECTLY
 
 void 
-JB2Dict::JB2EncodeCodec::code_bitmap_directly(
+JB2Dict::JB2Codec::Encode::code_bitmap_directly(
   GBitmap &bm,const int dw, int dy,
   unsigned char *up2, unsigned char *up1, unsigned char *up0 )
 {
@@ -269,7 +269,7 @@ JB2Dict::JB2EncodeCodec::code_bitmap_directly(
 // CODE BITMAP BY CROSS CODING
 
 void 
-JB2Dict::JB2EncodeCodec::code_bitmap_by_cross_coding (GBitmap &bm, GBitmap &cbm,
+JB2Dict::JB2Codec::Encode::code_bitmap_by_cross_coding (GBitmap &bm, GBitmap &cbm,
   const int xd2c, const int dw, int dy, int cy,
   unsigned char *up1, unsigned char *up0, unsigned char *xup1, 
   unsigned char *xup0, unsigned char *xdn1 )
@@ -297,7 +297,7 @@ JB2Dict::JB2EncodeCodec::code_bitmap_by_cross_coding (GBitmap &bm, GBitmap &cbm,
 // CODE JB2DICT
 
 void 
-JB2Dict::JB2EncodeCodec::code(JB2Dict *jim)
+JB2Dict::JB2Codec::Encode::code(JB2Dict *jim)
 {
       // -------------------------
       // THIS IS THE ENCODING PART
@@ -344,7 +344,7 @@ JB2Dict::JB2EncodeCodec::code(JB2Dict *jim)
 // CODE JB2IMAGE
 
 void 
-JB2Dict::JB2EncodeCodec::code(JB2Image *jim)
+JB2Dict::JB2Codec::Encode::code(JB2Image *jim)
 {
       // -------------------------
       // THIS IS THE ENCODING PART
@@ -460,7 +460,7 @@ JB2Dict::JB2EncodeCodec::code(JB2Image *jim)
 ////////////////////////////////////////
 
 void 
-JB2Dict::JB2EncodeCodec::encode_libonly_shape(JB2Image *jim, int shapeno )
+JB2Dict::JB2Codec::Encode::encode_libonly_shape(JB2Image *jim, int shapeno )
 {
   // Recursively encode parent shape
   JB2Shape *jshp = jim->get_shape(shapeno);
