@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: Arrays.h,v 1.8 1999-08-24 20:59:46 eaf Exp $
+//C- $Id: Arrays.h,v 1.9 1999-12-01 20:09:36 parag Exp $
 
 
 #ifndef _ARRAYS_H_
@@ -72,7 +72,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@research.att.com> -- Copy-on-demand implementation.
     @version 
-    #$Id: Arrays.h,v 1.8 1999-08-24 20:59:46 eaf Exp $# */
+    #$Id: Arrays.h,v 1.9 1999-12-01 20:09:36 parag Exp $# */
 //@{
 
 // Auxiliary classes: Will be used in place of GPBase and GPEnabled objects
@@ -639,7 +639,8 @@ TArray<TYPE>::init2(void * data, int lo, int hi,
    };
 }
 
-template <class TYPE> inline void
+// inline removed
+template <class TYPE> void
 TArray<TYPE>::insert(void * data, int els, int where,
 		     const void * what, int howmany)
 {
@@ -649,26 +650,28 @@ TArray<TYPE>::insert(void * data, int els, int where,
       ((TYPE *) data)[where+i]=*(TYPE *) what;
 }
 
-template <class TYPE> inline 
+template <class TYPE> 
 TArray<TYPE>::TArray ()
 {
    assign(new ArrayRep(sizeof(TYPE), destroy, init1,
 		       init2, init2, insert));
 }
 
-template <class TYPE> inline 
+template <class TYPE> 
 TArray<TYPE>::TArray(int hi)
 {
    assign(new ArrayRep(sizeof(TYPE), destroy, init1,
 		       init2, init2, insert, hi));
 }
 
-template <class TYPE> inline 
+template <class TYPE> 
 TArray<TYPE>::TArray(int lo, int hi)
 {
    assign(new ArrayRep(sizeof(TYPE), destroy, init1,
 		       init2, init2, insert, lo, hi));
 }
+
+//inline removal ends
 
 /** Dynamic array for general types.
     Template class #DArray<TYPE># implements an array of
