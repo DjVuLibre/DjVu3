@@ -18,6 +18,18 @@ Package=<4>
 
 ###############################################################################
 
+Project: "libcharset"="..\..\libiconv-1.5.1\libcharset\lib\libcharset.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
 Project: "libdjvu"="..\libdjvu.dsp" - Package Owner=<4>
 
 Package=<5>
@@ -26,6 +38,24 @@ Package=<5>
 
 Package=<4>
 {{{
+    Begin Project Dependency
+    Project_Dep_Name libiconv
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "libiconv"="..\..\libiconv-1.5.1\lib\libiconv.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name libcharset
+    End Project Dependency
 }}}
 
 ###############################################################################

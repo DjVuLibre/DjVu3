@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/ksh
 #C-
 #C- DjVu® Reference Library (v. 3.0)
 #C- 
@@ -31,7 +31,7 @@
 #C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #
-# $Id: write_cache.sh,v 1.14 2001-01-09 17:29:22 bcr Exp $
+# $Id: write_cache.sh,v 1.15 2001-03-30 23:31:21 bcr Exp $
 # $Name:  $
 
 # This script writes the variables currently set to standard output.

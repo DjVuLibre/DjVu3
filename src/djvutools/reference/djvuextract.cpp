@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djvuextract.cpp,v 1.12 2001-03-06 19:55:41 bcr Exp $
+// $Id: djvuextract.cpp,v 1.13 2001-03-30 23:31:25 bcr Exp $
 // $Name:  $
 
 /** @name djvuextract
@@ -65,7 +65,7 @@
     @memo
     Extract components from DjVu files.
     @version
-    #$Id: djvuextract.cpp,v 1.12 2001-03-06 19:55:41 bcr Exp $#
+    #$Id: djvuextract.cpp,v 1.13 2001-03-30 23:31:25 bcr Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> - Initial implementation\\
     Andrei Erofeev <eaf@geocities.com> - Multipage support */
@@ -101,7 +101,7 @@ struct SecondaryHeader {
 
 
 void
-display_info_chunk(GP<ByteStream> ibs, const char *filename)
+display_info_chunk(GP<ByteStream> ibs, const GURL &url)
 {
   ibs->seek(0);
   GP<IFFByteStream> giff=IFFByteStream::create(ibs);
@@ -119,7 +119,7 @@ display_info_chunk(GP<ByteStream> ibs, const char *filename)
           if (iff.readall((void*)&djvuinfo,sizeof(djvuinfo)) < sizeof(djvuinfo))
             G_THROW("Cannot read INFO chunk");
           fprintf(stderr, "%s: (%d x %d) version %d\n", 
-                  filename, 
+                  (const char *)url, 
                   (djvuinfo.width_hi<<8)+djvuinfo.width_lo, 
                   (djvuinfo.height_hi<<8)+djvuinfo.height_lo,
                   djvuinfo.version );
@@ -204,6 +204,12 @@ usage()
 int
 main(int argc, char **argv)
 {
+  DArray<GString> dargv(0,argc-1);
+  for(int i=0;i<argc;++i)
+  {
+    GString g(argv[i]);
+    dargv[i]=g.getNative2UTF8();
+  }
   G_TRY
     {
       int i;
@@ -211,11 +217,11 @@ main(int argc, char **argv)
       // Process page number
       int page_num=0;
       for(i=1;i<argc;i++)
-	 if (!strncmp(argv[i], "-page=", 6))
+	 if (!strncmp(dargv[i], "-page=", 6))
            {
-             page_num = atoi(argv[i]+6) - 1;
+             page_num = atoi(6+(const char *)dargv[i]) - 1;
              for(int j=i;j<argc-1;j++) 
-               argv[j]=argv[j+1];
+               dargv[j]=dargv[j+1];
              argc--;
              break;
            } 
@@ -229,35 +235,37 @@ main(int argc, char **argv)
       if (argc<=2)
         usage();
       for (i=2; i<argc; i++)
-        if (IFFByteStream::check_id(argv[i]) || argv[i][4]!='=' || argv[i][5]==0)
+        if (IFFByteStream::check_id(dargv[i]) || dargv[i][4]!='=' || dargv[i][5]==0)
           usage();
 
       // Decode
-      GP<DjVuDocument> doc=DjVuDocument::create_wait(argv[1]);
+      const GURL::Filename::UTF8 url1(dargv[1]);
+      GP<DjVuDocument> doc=DjVuDocument::create_wait(url1);
       if (! doc->wait_for_complete_init())
         G_THROW("Decoding failed. Nothing can be done.");        
       GP<DjVuFile> file=doc->get_djvu_file(page_num);
       GP<ByteStream> pibs = file->get_djvu_bytestream(false, false);
       // Search info chunk
-      display_info_chunk(pibs, argv[1]);
+      display_info_chunk(pibs, url1);
       // Extract required chunks
       for (i=2; i<argc; i++)
         {
           GP<ByteStream> gmbs=ByteStream::create();
-          argv[i][4] = 0;
-          extract_chunk(pibs, argv[i], gmbs);
+          dargv[i].setat(4,0);
+          extract_chunk(pibs, dargv[i], gmbs);
           ByteStream &mbs=*gmbs;
           if (mbs.size() == 0)
             {
-              fprintf(stderr, "  %s --> not found!\n", argv[i]);
+              fprintf(stderr, "  %s --> not found!\n", (const char *)dargv[i]);
             }
           else
             {
-              GP<ByteStream> obs=ByteStream::create(argv[i]+5,"wb");
+              const GURL::Filename::UTF8 url(5+(const char *)dargv[i]);
+              GP<ByteStream> obs=ByteStream::create(url,"wb");
               mbs.seek(0);
               obs->copy(mbs);
               fprintf(stderr, "  %s --> \"%s\" (%d bytes)\n", 
-                      argv[i], argv[i]+5, mbs.size());
+                      (const char *)dargv[i], (const char *)dargv[i]+5, mbs.size());
             }
         }
     }

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVmDoc.cpp,v 1.42 2001-03-28 22:07:18 fcrary Exp $
+// $Id: DjVmDoc.cpp,v 1.43 2001-03-30 23:31:28 bcr Exp $
 // $Name:  $
 
 
@@ -267,12 +267,12 @@ DjVmDoc::read(ByteStream & str_in)
 }
 
 void
-DjVmDoc::read(const char * name)
+DjVmDoc::read(const GURL &url)
 {
    DEBUG_MSG("DjVmDoc::read(): reading the doc contents from the HDD\n");
    DEBUG_MAKE_INDENT(3);
 
-   GP<DataPool> pool=DataPool::create(name);
+   GP<DataPool> pool=DataPool::create(url);
    GP<ByteStream> str=pool->get_stream();
    GP<IFFByteStream> giff=IFFByteStream::create(str);
    IFFByteStream &iff=*giff;
@@ -287,11 +287,13 @@ DjVmDoc::read(const char * name)
    dir->decode(str);
    iff.close_chunk();
 
-   if (dir->is_bundled()) read(pool);
+   if (dir->is_bundled())
+     read(pool);
    else
    {
-      GString full_name=GOS::expand_name(name);
-      GString dir_name=GOS::dirname(full_name);
+//      GString full_name=GOS::expand_name(name);
+//      GString dir_name=GOS::dirname(GOS::url_to_filename(url.base()));
+      GURL dirbase=url.base();
 
       data.empty();
 
@@ -302,7 +304,9 @@ DjVmDoc::read(const char * name)
       
 	 DEBUG_MSG("reading contents of file '" << f->id << "'\n");
 
-	 data[f->id]=DataPool::create(GOS::expand_name(f->name, dir_name));
+//         const GURL::Filename::UTF8 url(GOS::expand_name(f->name,dir_name));
+         const GURL::UTF8 url(f->name,dirbase);
+	 data[f->id]=DataPool::create(url);
       }
    }
 }
@@ -337,9 +341,9 @@ DjVmDoc::write_index(GP<ByteStream> str)
 }
 
 void
-DjVmDoc::expand(const char * dir_name, const char * idx_name)
+DjVmDoc::expand(const GURL &codebase, const char * idx_name)
 {
-   DEBUG_MSG("DjVmDoc::expand(): Expanding into '" << dir_name << "'\n");
+   DEBUG_MSG("DjVmDoc::expand(): Expanding into '" << codebase << "'\n");
    DEBUG_MAKE_INDENT(3);
 
    GPosition pos;
@@ -354,24 +358,26 @@ DjVmDoc::expand(const char * dir_name, const char * idx_name)
       if (!data.contains(file->id, data_pos))
 	       G_THROW("DjVmDoc.no_data\t" + file->id);     //  Strange: there is no data for file 'xxx'.
 
-      GString file_name=GOS::expand_name(file->name, dir_name);
-      DEBUG_MSG("storing file '" << file_name << "'\n");
+//      const GURL::Filename::UTF8 url(GOS::expand_name(file->name, GOS::url_to_filename(codebase)));
+      const GURL::UTF8 url(file->name,codebase);
+      DEBUG_MSG("storing file '" << url << "'\n");
 
       GP<ByteStream> str_in=data[data_pos]->get_stream();
-      DataPool::load_file(file_name);
-      GP<ByteStream> str_out=ByteStream::create(file_name, "wb");
+      DataPool::load_file(url);
+      GP<ByteStream> str_out=ByteStream::create(url, "wb");
       str_out->writall(octets, 4);
       str_out->copy(*str_in);
    }
 
    if (idx_name && strlen(idx_name))
    {
-      GString idx_full_name=GOS::expand_name(idx_name, dir_name);
+//      const GURL::Filename::UTF8 idx_url(GOS::expand_name(idx_name, GOS::url_to_filename(codebase)));
+      const GURL::UTF8 idx_url(idx_name, codebase);
    
-      DEBUG_MSG("storing index file '" << idx_full_name << "'\n");
+      DEBUG_MSG("storing index file '" << idx_url << "'\n");
 
-      DataPool::load_file(idx_full_name);
-      GP<ByteStream> str=ByteStream::create(idx_full_name, "wb");
+      DataPool::load_file(idx_url);
+      GP<ByteStream> str=ByteStream::create(idx_url, "wb");
       write_index(str);
    }
 }

@@ -20,17 +20,34 @@ const char * valid_dir = "\\temp";
 const char * invalid_file = "\\My Documents\\xxx.xxx";
 const char * invalid_dir = "\\xxx";
 #else    // other Win32
+#ifdef JA_JP	//MBCS
+const char * valid_file = "F:\\Projects\\LizardTech\\Test\\日本語\\漢字.txt";
+const char * valid_dir = "F:\\Projects\\LizardTech\\Test\\日本語";
+const char * invalid_file = "F:\\Projects\\LizardTech\\Test\\日本語\\新漢字.txt";
+const char * invalid_dir = "F:\\Projects\\LizardTech\\Test\\新日本語";
+const char * clear_dir = "F:\\Projects\\LizardTech\\Test\\日本語dir2";
+#else
+#ifdef En_US
+const char * valid_file = "F:\\Projects\\LizardTech\\Test\\English\\test.txt";
+const char * valid_dir = "F:\\Projects\\LizardTech\\Test\\English";
+const char * invalid_file = "F:\\Projects\\LizardTech\\Test\\English\\newtest.txt";
+const char * invalid_dir = "F:\\Projects\\LizardTech\\Test\\newEnglish";
+const char * clear_dir = "F:\\Projects\\LizardTech\\Test\\newEnglish2";
+#else		//MBCS
 const char * valid_file = "C:\\test.txt";
 const char * valid_dir = "C:\\test";
 const char * invalid_file = "C:\\My Documents\\xxx.xxx";
 const char * invalid_dir = "C:\\xxx";
 #endif
+#endif
+#endif
 
 int
 main()
 {
-   char msg[256];
-   char  fullmsg[1024];
+   FILE *out = fopen("out.txt", "w");
+   char msg[500];
+   char  fullmsg[4024];
    if (GOS::is_file(valid_file))
       sprintf (msg,"Valid file, %s is recognized as a file\n",valid_file);
    else
@@ -61,10 +78,51 @@ main()
       sprintf (msg,"FAILURE:  Could not create directory, %s.\n",invalid_dir);
    strcat(fullmsg, msg);
 
-   if ( GOS::deletefile (valid_dir))
-      sprintf (msg,"Deleted directory, %s.  Verify it's gone.\n",valid_dir);
-   else
-      sprintf (msg,"FAILURE:  Could not delete directory, %s\n",valid_dir);
+//MBCS start additional tests
+// basename(filename[, suffix])
+// -- returns the last component of filename and removes suffix
+//    when present. works like /bin/basename.
+//GString GOS::basename(const char *fname, const char *suffix)
+   GString gsname;
+   gsname = GOS::basename (valid_dir);
+   sprintf (msg,"basename file, %s, gsname = %s.  Verify gsname.\n",valid_dir,(const char*)gsname);
+   strcat(fullmsg, msg);
+// expand_name(filename[, fromdirname])
+// -- returns the full path name of filename interpreted
+//    relative to fromdirname.  Use current working dir when
+//    fromdirname is null.
+//GString GOS::expand_name(const char *fname, const char *from)
+   gsname = GOS::expand_name (valid_file, valid_dir);
+   sprintf (msg,"expand_name file, %s directory, %s, gsname = %s. Verify gsname.\n",valid_file,valid_dir, (const char*)gsname);
+   strcat(fullmsg, msg);
+
+   gsname = GOS::expand_name (valid_file);
+   sprintf (msg,"expand_name file, %s, gsname = %s.  Verify gsname.\n",valid_file,(const char*)gsname);
+   strcat(fullmsg, msg);
+
+// filename_to_url --
+// -- Returns a url for accessing a given file.
+//    If useragent is not provided, standard url will be created,
+//    but will not be understood by some versions if IE.
+//GString GOS::filename_to_url(const char *filename, const char *useragent)
+   GString url;
+   url = GOS::filename_to_url (valid_dir);
+   sprintf (msg,"filename_to_url directory, %s, url = %s.  Verify url.\n",valid_dir,(const char *)url);
+   strcat(fullmsg, msg);
+// url_to_filename --
+// -- Applies heuristic rules to convert a url into a valid file name.  
+//    Returns a simple basename in case of failure.
+//GString GOS::url_to_filename(const char *url)
+   gsname = GOS::url_to_filename (url);
+   sprintf (msg,"url_to_filename directory, %s, gsname = %s.  Verify gsname.\n",(const char *)url,(const char*)gsname);
+   strcat(fullmsg, msg);
+//GString GOS::encode_reserved(const char * filename)
+   url = GOS::encode_reserved (valid_dir);
+   sprintf (msg,"encode_reserved directory, %s, gsname = %s.  Verify url.\n",valid_dir,(const char *)url);
+   strcat(fullmsg, msg);
+//GString GOS::decode_reserved(const char * url)
+   gsname = GOS::decode_reserved (url);
+   sprintf (msg,"decode_reserved directory, %s, gsname = %s.  Verify gsname.\n",(const char *)url,(const char*)gsname);
    strcat(fullmsg, msg);
 
    if ( GOS::deletefile (valid_file))
@@ -73,6 +131,21 @@ main()
       sprintf (msg,"FAILURE:  Could not delete file, %s\n",valid_file);
    strcat(fullmsg, msg);
 
+   if ( GOS::deletefile (valid_dir))
+      sprintf (msg,"Deleted directory, %s.  Verify it's gone.\n",valid_dir);
+   else
+      sprintf (msg,"FAILURE:  Could not delete directory, %s\n",valid_dir);
+   strcat(fullmsg, msg);
+
+//int GOS::cleardir(const char * dirname)
+   if ( ! GOS::cleardir (clear_dir))
+      sprintf (msg,"cleardir directory, %s.  Verify it's gone.\n",clear_dir);
+   else
+      sprintf (msg,"FAILURE:  Could not cleardir directory, %s\n",clear_dir);
+   strcat(fullmsg, msg);
+
+//MBCS end
+
 #ifdef UNDER_CE
    WCHAR temp[1024];
    wsprintf(temp,L"%S",fullmsg);
@@ -80,6 +153,8 @@ main()
    OutputDebugStringW(temp) ;
 #else
    printf("%s",fullmsg);
+   fprintf(out,"%s", fullmsg);
+   fclose(out);
 #endif
   return 0;
 }

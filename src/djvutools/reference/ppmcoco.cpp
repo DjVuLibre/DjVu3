@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ppmcoco.cpp,v 1.8 2001-03-06 19:55:41 bcr Exp $
+// $Id: ppmcoco.cpp,v 1.9 2001-03-30 23:31:25 bcr Exp $
 // $Name:  $
 
 /** @name ppmcoco
@@ -104,7 +104,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: ppmcoco.cpp,v 1.8 2001-03-06 19:55:41 bcr Exp $# */
+    #$Id: ppmcoco.cpp,v 1.9 2001-03-30 23:31:25 bcr Exp $# */
 //@{
 //@}
 
@@ -117,6 +117,8 @@
 #include "ByteStream.h"
 #include "GPixmap.h"
 #include "GString.h"
+#include "GOS.h"
+#include "GURL.h"
 
 double fromGamma = 2.2;
 double toGamma = 2.2;
@@ -147,8 +149,15 @@ str_to_gamma(const char *str)
 int 
 main (int argc, char **argv)
 {
-  GString infile("-");
-  GString outfile("-");
+  DArray<GString> dargv(0,argc-1);
+  for(int i=0;i<argc;++i)
+  {
+    GString g(argv[i]);
+    dargv[i]=g.getNative2UTF8();
+  }
+  const GURL::Filename::UTF8 stdinurl("-");
+  GURL inurl(stdinurl);
+  GURL outurl(stdinurl);
   G_TRY
     {
       // parse
@@ -157,23 +166,23 @@ main (int argc, char **argv)
       int flag = 0;
       for (int i=1; i<argc; i++)
         {
-          if (!strcmp(argv[i],"-from") && i+1<argc)
+          if (!strcmp(dargv[i],"-from") && i+1<argc)
             {
-          fromGamma = str_to_gamma(argv[++i]);
+          fromGamma = str_to_gamma(dargv[++i]);
             }
           else if (!strcmp(argv[i],"-to") && i+1<argc)
             {
-              toGamma = str_to_gamma(argv[++i]);
+              toGamma = str_to_gamma(dargv[++i]);
             }
           else if (flag==0)
             {
               flag = 1;
-              infile = argv[i];
+              inurl = GURL::Filename::UTF8(dargv[i]);
             }
           else if (flag == 1)
             {
               flag = 2;
-              outfile = argv[i];
+              outurl = GURL::Filename::UTF8(argv[i]);
             }
           else
             usage();
@@ -189,10 +198,10 @@ main (int argc, char **argv)
       // perform
       GP<GPixmap> gpm=GPixmap::create();
       GPixmap &pm=*gpm;
-      GP<ByteStream> ibs=ByteStream::create(infile,"rb"); 
+      GP<ByteStream> ibs=ByteStream::create(inurl,"rb"); 
       pm.init(*ibs); 
       pm.color_correct(gamma_correction);
-      GP<ByteStream> obs=ByteStream::create(outfile,"wb"); 
+      GP<ByteStream> obs=ByteStream::create(outurl,"wb"); 
       pm.save_ppm(*obs); 
     }
   G_CATCH(ex)

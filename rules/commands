@@ -34,5 +34,6 @@ UNAME=@%uname%@
 WHENCE=@%whence%@
 WC=@%wc%@
 MAKESHLIB=@%makeshlib%@
+MAKESTLIB=@%make_stlib%@
 STRIP=@%strip%@
 

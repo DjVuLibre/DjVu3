@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuErrorList.cpp,v 1.11 2001-03-06 19:55:42 bcr Exp $
+// $Id: DjVuErrorList.cpp,v 1.12 2001-03-30 23:31:28 bcr Exp $
 // $Name:  $
 
 
@@ -56,7 +56,7 @@ DjVuErrorList::set_stream(GP<ByteStream> xibs)
   pool=DataPool::create(*xibs);
   name.format("data://%08lx/%08lx.djvu",
     ++serial,(unsigned long)(size_t)((const ByteStream *)xibs));
-  pool_url=name;
+  pool_url=GURL::UTF8(name);
   return pool_url;
 }
 
@@ -123,9 +123,9 @@ DjVuErrorList::request_data(const DjVuPort * source, const GURL & url)
        }
      }else if (url.is_local_file_url())
      {
-       GString fname=GOS::url_to_filename(url);
-       if (GOS::basename(fname)=="-") fname="-";
-       retval=DataPool::create(fname);
+//       GString fname=GOS::url_to_filename(url);
+//       if (GOS::basename(fname)=="-") fname="-";
+       retval=DataPool::create(url);
      }
    }
    G_CATCH_ALL

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: d44.cpp,v 1.12 2001-03-07 00:33:31 bcr Exp $
+// $Id: d44.cpp,v 1.13 2001-03-30 23:31:25 bcr Exp $
 // $Name:  $
 
 /** @name d44
@@ -84,7 +84,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: d44.cpp,v 1.12 2001-03-07 00:33:31 bcr Exp $# 
+    #$Id: d44.cpp,v 1.13 2001-03-30 23:31:25 bcr Exp $# 
 */
 //@{
 //@}
@@ -93,6 +93,7 @@
 #include "GException.h"
 #include "IW44Image.h"
 #include "GOS.h"
+#include "GURL.h"
 #include "IFFByteStream.h"
 #include "GPixmap.h"
 #include "GBitmap.h"
@@ -106,8 +107,8 @@
 int flag_verbose = 0;
 int flag_chunks = 9999;
 int flag_addsuffix = 0;
-GString pnmfile;
-GString iw4file;
+GURL pnmurl;
+GURL iw4url;
 
 
 
@@ -128,8 +129,9 @@ usage()
 
 
 void
-parse(int argc, char **argv)
+parse(DArray<GString> &argv)
 {
+  const int argc=argv.hbound()+1;
   for (int i=1; i<argc; i++)
     {
       if (argv[i][0] == '-' && argv[i][1])
@@ -150,23 +152,23 @@ parse(int argc, char **argv)
           else
             usage();
         }
-      else if (!iw4file)
-        iw4file = argv[i];
-      else if (!pnmfile)
-        pnmfile = argv[i];
+      else if (iw4url.is_empty())
+        iw4url = GURL::Filename::UTF8(argv[i]);
+      else if (pnmurl.is_empty())
+        pnmurl = GURL::Filename::UTF8(argv[i]);
       else
         usage();
     }
-  if (!iw4file)
+  if (iw4url.is_empty())
     usage();
-  if (!pnmfile)
+  if (pnmurl.is_empty())
     {
-      GString dir = GOS::dirname(iw4file);
-      GString base = GOS::basename(iw4file);
+      const GURL codebase = iw4url.base();
+      GString base = iw4url.fname();
       int dot = base.rsearch('.');
       if (dot >= 1)
         base = base.substr(0,dot);
-      pnmfile = GOS::expand_name(base,dir);
+      pnmurl = GURL::UTF8(base,codebase);
       flag_addsuffix = 1;
     }
 }
@@ -179,12 +181,18 @@ main(int argc, char **argv)
 mymain(int argc, char **argv)
 #endif
 {
+  DArray<GString> dargv(0,argc-1);
+  for(int i=0;i<argc;++i)
+  {
+    GString g(argv[i]);
+    dargv[i]=g.getNative2UTF8();
+  }
   G_TRY
     {
       // Parse arguments
-      parse(argc, argv);
+      parse(dargv);
       // Check input file
-      GP<ByteStream> gibs=ByteStream::create(iw4file,"rb");
+      GP<ByteStream> gibs=ByteStream::create(iw4url,"rb");
       ByteStream &ibs=*gibs;
       GString chkid;
       // Determine file type
@@ -228,15 +236,15 @@ mymain(int argc, char **argv)
                 iw->get_width(), iw->get_height(), dtime, rtime, 
                 (iw->get_memory_usage()+512)/1024, iw->get_percent_memory());
       if (flag_addsuffix)
-        pnmfile = pnmfile + (color?".ppm":".pgm");
+        pnmurl = pnmurl + (color?".ppm":".pgm");
 #ifndef UNDER_CE
-      remove(pnmfile);
+      pnmurl.deletefile();
 #else
       WCHAR tszPnmFile[MAX_PATH] ;
-      MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED,pnmfile,strlen(pnmfile)+1,tszPnmFile,sizeof(tszPnmFile)) ;
+      MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED,GOS::url_to_filename(pnmurl),GOS::url_to_filename(pnmurl).length()+1,tszPnmFile,sizeof(tszPnmFile)) ;
       DeleteFile(tszPnmFile) ;
 #endif
-      GP<ByteStream> obs=ByteStream::create(pnmfile,"wb");
+      GP<ByteStream> obs=ByteStream::create(pnmurl,"wb");
       if(color)
       {
         ppm->save_ppm(*obs);

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: c44.cpp,v 1.14 2001-03-06 19:55:41 bcr Exp $
+// $Id: c44.cpp,v 1.15 2001-03-30 23:31:24 bcr Exp $
 // $Name:  $
 
 
@@ -184,7 +184,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: c44.cpp,v 1.14 2001-03-06 19:55:41 bcr Exp $# */
+    #$Id: c44.cpp,v 1.15 2001-03-30 23:31:24 bcr Exp $# */
 //@{
 //@}
 
@@ -196,15 +196,16 @@
 #include "GOS.h"
 #include "GBitmap.h"
 #include "GPixmap.h"
+#include "GURL.h"
 
 #include <stdio.h>
 #include <string.h>
 
 // command line data
 
-GString pnmfile;
-GString iw4file;
-GString mskfile;
+GURL pnmurl;
+GURL iw4url;
+GURL mskurl;
 
 int flag_mask = 0;
 int flag_bpp = 0;
@@ -457,8 +458,9 @@ resolve_quality(int npix)
 
 
 void
-parse(int argc, char **argv)
+parse(DArray<GString> &argv)
 {
+  const int argc=argv.hbound()+1;
   for (int i=1; i<argc; i++)
     {
       if (argv[i][0] == '-')
@@ -499,9 +501,9 @@ parse(int argc, char **argv)
             {
               if (++i >= argc)
                 G_THROW("c44: no argument for option '-mask'");
-              if (!! mskfile)
+              if (! mskurl.is_empty())
                 G_THROW("c44: multiple mask specification");
-              mskfile = argv[i];
+              mskurl = GURL::Filename::UTF8(argv[i]);
             }
           else if (!strcmp(argv[i],"-dbfrac"))
             {
@@ -578,26 +580,24 @@ parse(int argc, char **argv)
           else
             usage();
         }
-      else if (!pnmfile)
-        pnmfile = argv[i];
-      else if (!iw4file)
-        iw4file = argv[i];
+      else if (pnmurl.is_empty())
+        pnmurl = GURL::Filename::UTF8(argv[i]);
+      else if (iw4url.is_empty())
+        iw4url = GURL::Filename::UTF8(argv[i]);
       else
         usage();
     }
-  if (!pnmfile)
+  if (pnmurl.is_empty())
     usage();
-  if (!iw4file)
+  if (iw4url.is_empty())
     {
-      GString dir = GOS::dirname(pnmfile);
-      GString base = GOS::basename(pnmfile);
+      GURL codebase=pnmurl.base();
+      GString base = pnmurl.fname();
       int dot = base.rsearch('.');
       if (dot >= 1)
         base = base.substr(0,dot);
-      if (flag_dpi>0 || flag_gamma>0)
-        iw4file = GOS::expand_name(base,dir) + ".djvu";
-      else
-        iw4file = GOS::expand_name(base,dir) + ".iw4";
+      const char *ext=(flag_dpi>0 || flag_gamma>0)?".djvu":".iw4";
+      iw4url = GURL::UTF8(base+ext,codebase);
     }
 }
 
@@ -607,9 +607,9 @@ GP<GBitmap>
 getmask(int w, int h)
 {
   GP<GBitmap> msk8;
-  if (!! mskfile)
+  if (! mskurl.is_empty())
     {
-      GP<ByteStream> mbs=ByteStream::create(mskfile,"rb");
+      GP<ByteStream> mbs=ByteStream::create(mskurl,"rb");
       msk8 = GBitmap::create(*mbs);
       if (msk8->columns() != (unsigned int)w || 
           msk8->rows()    != (unsigned int)h  )
@@ -651,12 +651,18 @@ create_photo_djvu_file(IW44Image &iw, int w, int h,
 int
 main(int argc, char **argv)
 {
+  DArray<GString> dargv(0,argc-1);
+  for(int i=0;i<argc;++i)
+  {
+    GString g(argv[i]);
+    dargv[i]=g.getNative2UTF8();
+  }
   G_TRY
     {
       // Parse arguments
-      parse(argc, argv);
+      parse(dargv);
       // Check input file
-      GP<ByteStream> gibs=ByteStream::create(pnmfile,"rb");
+      GP<ByteStream> gibs=ByteStream::create(pnmurl,"rb");
       ByteStream &ibs=*gibs;
       char prefix[16];
       if (ibs.readall((void*)prefix, sizeof(prefix)) != sizeof(prefix))
@@ -701,7 +707,7 @@ main(int argc, char **argv)
           else
             G_THROW("Unrecognized file");
           // Check that no mask has been specified.
-          if (!! mskfile)
+          if (! mskurl.is_empty())
             G_THROW("Cannot apply mask on an already compressed image");
         }
       else
@@ -714,8 +720,8 @@ main(int argc, char **argv)
       // Perform compression PM44 or BM44 as required
       if (iw)
         {
-          remove(iw4file);
-          GP<IFFByteStream> iff=IFFByteStream::create(ByteStream::create(iw4file,"wb"));
+          iw4url.deletefile();
+          GP<IFFByteStream> iff=IFFByteStream::create(ByteStream::create(iw4url,"wb"));
           if (flag_crcbdelay >= 0)
             iw->parm_crcbdelay(flag_crcbdelay);
           if (flag_dbfrac > 0)

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/ksh
 #C-
 #C- DjVu® Reference Library (v. 3.0)
 #C- 
@@ -31,7 +31,7 @@
 #C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #
-# $Id: sys.sh,v 1.26 2001-02-20 18:30:04 bcr Exp $
+# $Id: sys.sh,v 1.27 2001-03-30 23:31:21 bcr Exp $
 # $Name:  $
 
 # This sets the variable SYS INCS JOBJ and DEFS

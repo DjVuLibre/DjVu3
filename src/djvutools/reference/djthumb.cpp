@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djthumb.cpp,v 1.9 2001-03-06 19:55:41 bcr Exp $
+// $Id: djthumb.cpp,v 1.10 2001-03-30 23:31:25 bcr Exp $
 // $Name:  $
 
 // DJTHUMB -- DjVu thumbnails generator
@@ -68,7 +68,7 @@
     @author
     Andrei Erofeev <eaf@geocities.com> -- initial implementation
     @version
-    #$Id: djthumb.cpp,v 1.9 2001-03-06 19:55:41 bcr Exp $# */
+    #$Id: djthumb.cpp,v 1.10 2001-03-30 23:31:25 bcr Exp $# */
 //@{
 //@}
 
@@ -116,10 +116,14 @@ progress_cb(int page_num, void *)
 int
 main(int argc, char ** argv)
 {
+  DArray<GString> dargv(0,argc-1);
+  for(int i=0;i<argc;++i)
+  {
+    GString g(argv[i]);
+    dargv[i]=g.getNative2UTF8();
+  }
       // Get the program name
-   const char * ptr;
-   for(progname=ptr=argv[0];*ptr;ptr++)
-      if (*ptr=='/') progname=ptr+1;
+   progname=dargv[0]=GOS::basename(dargv[0]);
    
    if (argc<3)
    {
@@ -129,10 +133,10 @@ main(int argc, char ** argv)
 
 #ifdef DEBUG
    {
-      const char * debug=getenv("DEBUG");
-      if (debug)
+      const GString debug(GOS::getenv("DEBUG"));
+      if (debug.length())
       {
-	 int level=atoi(debug);
+	 int level=debug.is_int()?atoi((const char *)debug):1;
 	 if (level<1) level=1;
 	 if (level>32) level=32;
 //	 DEBUG_SET_LEVEL(level);
@@ -141,29 +145,29 @@ main(int argc, char ** argv)
 #endif
    
    G_TRY {
-      const char * name_in=0;
-      const char * name_out=0;
+      GString name_in;
+      GString name_out;
       int size=128;
       bool verbose=false;
    
       for(int i=1;i<argc;i++)
       {
-	 if (argv[i][0]!='-')
+	 if (dargv[i][0]!='-')
 	 {
-	    if (!name_in) name_in=argv[i];
-	    else if (!name_out) name_out=argv[i];
-	    else fprintf(stderr, "Unexpected string '%s' ignored.\n", argv[i]);
-	 } else if (!strncmp(argv[i], "-v", 2)) verbose=true;
-	 else if (!strncmp(argv[i], "-s", 2))
+	    if (!name_in.length()) name_in=dargv[i];
+	    else if (!name_out.length()) name_out=dargv[i];
+	    else fprintf(stderr, "Unexpected string '%s' ignored.\n", (const char *)dargv[i]);
+	 } else if (!strncmp(dargv[i], "-v", 2)) verbose=true;
+	 else if (!strncmp(dargv[i], "-s", 2))
 	 {
 	    if (++i<argc)
 	    {
-	       int _size=atoi(argv[i]);
+	       int _size=atoi(dargv[i]);
 	       if (_size<32) fprintf(stderr, "Image size (%d) is too small\n", _size);
 	       else if (_size>256) fprintf(stderr, "Image size (%d) is too big\n", _size);
 	       else size=_size;
-	    } else fprintf(stderr, "Flag '%s' is missing its value.\n", argv[i-1]);
-	 } else fprintf(stderr, "Unknown flag '%s' encountered\n", argv[i]);
+	    } else fprintf(stderr, "Flag '%s' is missing its value.\n", (const char *)dargv[i-1]);
+	 } else fprintf(stderr, "Unknown flag '%s' encountered\n", (const char *)dargv[i]);
       }
 
       if (verbose)
@@ -171,9 +175,9 @@ main(int argc, char ** argv)
 
       int size_in=-1, size_out=-1;
       struct stat st;
-      if (stat(name_in, &st)>=0) size_in=st.st_size;
+      if (stat(name_in.getUTF82Native(), &st)>=0) size_in=st.st_size;
       
-      GP<DjVuDocEditor> edoc=DjVuDocEditor::create_wait(name_in);
+      GP<DjVuDocEditor> edoc=DjVuDocEditor::create_wait(GURL::Filename::UTF8(name_in));
       pages_num=edoc->get_pages_num();
       if (pages_num==1)
 	 G_THROW("Thumbnails cannot be generated for one-page documents.");
@@ -185,9 +189,9 @@ main(int argc, char ** argv)
         progress_cb(page_num,0);
       }while (page_num>=0);
       
-      edoc->save_as(name_out, true);
+      edoc->save_as(GURL::Filename::UTF8(name_out), true);
 
-      if (stat(name_out, &st)>=0) size_out=st.st_size;
+      if (stat(name_out.getUTF82Native(), &st)>=0) size_out=st.st_size;
       
       if (verbose && size_in>0 && size_out>0)
 	 fprintf(stderr, "Document size: was %d, became %d, increase %d%%\n",

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: parseoptions.cpp,v 1.67 2001-03-30 00:34:26 fcrary Exp $
+// $Id: parseoptions.cpp,v 1.68 2001-03-30 23:31:29 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -747,7 +747,7 @@ DjVuParseOptions::ReadConfig(const char prog[],
 #ifndef WIN32
     const char *xname=strrchr(prog,'/');
 #else
-    const char *xname=strrchr(prog,'\\');
+    const char *xname=_tcsrchr(prog,'\\');//MBCS DBCS
 #endif
     xname=xname?(xname+1):prog;
 
@@ -1415,6 +1415,7 @@ DjVuParseOptions::ConfigFilename(const char config[],int level)
   TCHAR modulepath[1024];
   GetModuleFileName(0, modulepath, sizeof(modulepath)-1);
   LPCTSTR path=modulepath;
+  /*
   int i=_tcslen(modulepath);
   while(i>0)
   {
@@ -1425,9 +1426,24 @@ DjVuParseOptions::ConfigFilename(const char config[],int level)
       break;
     }
   }
+  */
+	LPTSTR backslash = _tcsrchr(modulepath, _T('\\'));//MBCS DBCS
+	LPTSTR forslash = _tcsrchr(modulepath, _T('/'));//MBCS DBCS
+	if (forslash == NULL) {//MBCS DBCS
+		if (backslash != NULL)
+			*backslash=0;
+	}
+	else {
+		if (backslash == NULL || forslash > backslash)
+			*forslash=0;
+		else
+			*backslash=0;
+	}
+
   root = new TCHAR [_tcslen(path)+sizeof(profiles)];
   if(!level)
   {
+	/*
     int i=_tcslen(modulepath);
     while(i>0)
 	{
@@ -1438,6 +1454,20 @@ DjVuParseOptions::ConfigFilename(const char config[],int level)
         break;
 	  }
 	}
+	*/
+	LPTSTR backslash = _tcsrchr(modulepath, _T('\\'));//MBCS DBCS
+	LPTSTR forslash = _tcsrchr(modulepath, _T('/'));//MBCS DBCS
+	if (forslash == NULL) {//MBCS DBCS
+		if (backslash != NULL)
+			*backslash=0;
+	}
+	else {
+		if (backslash == NULL || forslash > backslash)
+			*forslash=0;
+		else
+			*backslash=0;
+	}
+
   }
   _tcscpy(root, path);
   _tcscat(root,profiles);

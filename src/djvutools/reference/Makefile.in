@@ -3,7 +3,7 @@
 #C-              Unauthorized use prohibited.
 #C-
 #
-# $Id: Makefile.in,v 1.8 2001-02-06 21:48:09 bcr Exp $
+# $Id: Makefile.in,v 1.9 2001-03-30 23:31:24 bcr Exp $
 # $Name:  $
 
 %%%include <paths>
@@ -72,67 +72,67 @@ CDJVUSCRIPT = SRCDIR/cdjvu
 
 $(BINPATH)/djvmcvt: $(DJVMCVTOBJS) $(LIB)
 	if [ -n "$(RPO)" ] ; then $(RPO) $(DJVMCVTOBJS) $(LIB) ; fi
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(DJVMCVTOBJS) $(LIB) $(LIBS)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(DJVMCVTOBJS) $(LIB) $(LIBS) $(LIBICONV_LINK)
 
 $(BINPATH)/djvm: $(DJVMOBJS) $(LIB)
 	if [ -n "$(RPO)" ] ; then $(RPO) $(DJVMOBJS) $(LIB) ; fi
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(DJVMOBJS) $(LIB) $(LIBS)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(DJVMOBJS) $(LIB) $(LIBS) $(LIBICONV_LINK)
 
 $(BINPATH)/c44: $(C44OBJS) $(LIB)
 	if [ -n "$(RPO)" ] ; then $(RPO) $(C44OBJS) $(LIB) ; fi
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(C44OBJS) $(LIB) $(LIBS)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(C44OBJS) $(LIB) $(LIBS) $(LIBICONV_LINK)
 
 $(BINPATH)/d44: $(D44OBJS) $(LIB)
 	if [ -n "$(RPO)" ] ; then $(RPO) $(D44OBJS) $(LIB) ; fi
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(D44OBJS) $(LIB) $(LIBS)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(D44OBJS) $(LIB) $(LIBS) $(LIBICONV_LINK)
 
 $(BINPATH)/djvudump: $(DJVUDUMPOBJS) $(LIB) 
 	if [ -n "$(RPO)" ] ; then $(RPO) $(DJVUDUMPOBJS) $(LIB)  ; fi
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(DJVUDUMPOBJS) $(LIB) $(LIBS)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(DJVUDUMPOBJS) $(LIB) $(LIBS) $(LIBICONV_LINK)
 
 $(BINPATH)/ddjvu: $(DDJVUOBJS) $(LIB)
 	if [ -n "$(RPO)" ] ; then $(RPO) $(DDJVUOBJS) $(LIB) ; fi
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(DDJVUOBJS) $(LIB) $(LIBS)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(DDJVUOBJS) $(LIB) $(LIBS) $(LIBICONV_LINK)
 
 $(BINPATH)/djvumake: $(MAKEDEJAVUOBJS) $(LIB)
 	if [ -n "$(RPO)" ] ; then $(RPO) $(MAKEDEJAVUOBJS) $(LIB) ; fi
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(MAKEDEJAVUOBJS) $(LIB) $(LIBS)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(MAKEDEJAVUOBJS) $(LIB) $(LIBS) $(LIBICONV_LINK)
 
 $(BINPATH)/djvuextract: $(BREAKDEJAVUOBJS) $(LIB)
 	if [ -n "$(RPO)" ] ; then $(RPO) $(BREAKDEJAVUOBJS) $(LIB) ; fi
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(BREAKDEJAVUOBJS) $(LIB) $(LIBS)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(BREAKDEJAVUOBJS) $(LIB) $(LIBS) $(LIBICONV_LINK)
 
 $(BINPATH)/ppmcoco: $(PPMCOCOOBJS) $(LIB)
 	if [ -n "$(RPO)" ] ; then $(RPO) $(PPMCOCOOBJS) $(LIB) ; fi
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(PPMCOCOOBJS) $(LIB) $(LIBS)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(PPMCOCOOBJS) $(LIB) $(LIBS) $(LIBICONV_LINK)
 
 $(BINPATH)/cjb2: $(CJB2OBJS) $(LIB)
 	if [ -n "$(RPO)" ] ; then $(RPO) $(CJB2OBJS) $(LIB) ; fi
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(CJB2OBJS) $(LIB) $(LIBS)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(CJB2OBJS) $(LIB) $(LIBS) $(LIBICONV_LINK)
 
 $(BINPATH)/cpaldjvu: $(CPALDJVUOBJS) $(LIB)
 	if [ -n "$(RPO)" ] ; then $(RPO) $(CPALDJVUOBJS) $(LIB) ; fi
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(CPALDJVUOBJS) $(LIB) $(LIBS)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(CPALDJVUOBJS) $(LIB) $(LIBS) $(LIBICONV_LINK)
 
 $(BINPATH)/csepdjvu: $(CSEPDJVUOBJS) $(LIB)
 	if [ -n "$(RPO)" ] ; then $(RPO) $(CSEPDJVUOBJS) $(LIB) ; fi
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(CSEPDJVUOBJS) $(LIB) $(LIBS)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(CSEPDJVUOBJS) $(LIB) $(LIBS) $(LIBICONV_LINK)
 
 $(BINPATH)/bzz: $(BZZOBJS) $(LIB)
 	if [ -n "$(RPO)" ] ; then $(RPO) $(BZZOBJS) $(LIB) ; fi
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(BZZOBJS) $(LIB) $(LIBS)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(BZZOBJS) $(LIB) $(LIBS) $(LIBICONV_LINK)
 
 $(BINPATH)/djthumb: $(DJTHUMBOBJS) $(LIB)
 	if [ -n "$(RPO)" ] ; then $(RPO) $(DJTHUMBOBJS) $(LIB) ; fi
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(DJTHUMBOBJS) $(LIB) $(LIBS)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(DJTHUMBOBJS) $(LIB) $(LIBS) $(LIBICONV_LINK)
 
 $(BINPATH)/djvutxt: $(DJVUTXTOBJS) $(LIB)
 	if [ -n "$(RPO)" ] ; then $(RPO) $(DJVUTXTOBJS) $(LIB) ; fi
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(DJVUTXTOBJS) $(LIB) $(LIBS)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(DJVUTXTOBJS) $(LIB) $(LIBS) $(LIBICONV_LINK)
 
 $(BINPATH)/djvuanno: $(DJVUANNOOBJS) $(LIB)
 	if [ -n "$(RPO)" ] ; then $(RPO) $(DJVUANNOOBJS) $(LIB) ; fi
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(DJVUANNOOBJS) $(LIB) $(LIBS)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(DJVUANNOOBJS) $(LIB) $(LIBS) $(LIBICONV_LINK)
 
 $(BINPATH)/cdjvu: $(CDJVUSCRIPT)
 	cp $(CDJVUSCRIPT) $@

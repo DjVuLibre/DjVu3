@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GUnicode.h,v 1.4 2001-03-13 01:34:50 bcr Exp $
+// $Id: GUnicode.h,v 1.5 2001-03-30 23:31:29 bcr Exp $
 // $Name:  $
 
 #ifndef __GUNICODE_
@@ -56,7 +56,7 @@ public:
     ~Remainder();
     inline void init(const Remainder &r1);
     void init(const Remainder &r1,const Remainder &r2);
-    void init(void const * const ,size_t const,EncodeType=OTHER);
+    void init(void const * const ,size_t,EncodeType=OTHER);
     EncodeType encodetype;
     void *data;
     GPBufferBase gdata;
@@ -96,6 +96,7 @@ protected:
   Remainder remainder;
   unsigned long *UnicodePtr;
   GPBuffer<unsigned long> gUnicodePtr;
+public:
   static unsigned long const nill;
 private:
   unsigned long UTF8toWideChar(unsigned char const *&,void const * const);

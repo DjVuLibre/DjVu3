@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuImage.cpp,v 1.56 2001-03-29 18:50:06 praveen Exp $
+// $Id: DjVuImage.cpp,v 1.57 2001-03-30 23:31:29 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -463,7 +463,7 @@ DjVuImage::decode(ByteStream & str, DjVuInterface *notifier)
   if (file) 
     G_THROW("DjVuImage.bad_call");
   GP<DjVuImageNotifier> pport = new DjVuImageNotifier(notifier);
-  pport->stream_url="internal://fake/fake.djvu";
+  pport->stream_url=GURL::UTF8("internal://fake/fake.djvu");
   pport->stream_pool=DataPool::create();
   // Get all the data first
   int length;
@@ -1239,17 +1239,20 @@ DjVuImage::get_decoded_anno()
             mapper.set_output(output);               
             mapper.rotate((4-rotate_count)%4);
 
-            GP<GMapArea> *item;
+//            GP<GMapArea> *item;
             GPList<GMapArea> &list=djvuanno->ant->map_areas;
-            GPosition pos;
-            list.first(pos);
-            while(item=list.next(pos))
-            {
-                GString shape_name = GString((*item)->get_shape_name());
-                const char *name = shape_name;
-                (*item)->unmap(mapper);
-            }
-            
+//            GPosition pos;
+//            list.first(pos);
+//            while(item=list.next(pos))
+//            {
+//                GString shape_name = GString((*item)->get_shape_name());
+//                const char *name = shape_name;
+//                (*item)->unmap(mapper);
+//            }
+           for(GPosition pos=list;pos;++pos)
+           {
+             list[pos]->unmap(mapper);
+           }
         }
         return djvuanno;
     }

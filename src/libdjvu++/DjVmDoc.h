@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVmDoc.h,v 1.23 2001-03-06 19:55:42 bcr Exp $
+// $Id: DjVmDoc.h,v 1.24 2001-03-30 23:31:28 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVMDOC_H
@@ -44,6 +44,7 @@
 
 class ByteStream;
 class DataPool;
+class GURL;
 
 /** @name DjVmDoc.h
     Files #"DjVmDoc.h"# and #"DjVmDoc.cpp"# contain implementation of the
@@ -51,7 +52,7 @@ class DataPool;
 
     @memo DjVu multipage documents reader/writer.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: DjVmDoc.h,v 1.23 2001-03-06 19:55:42 bcr Exp $#
+    @version #$Id: DjVmDoc.h,v 1.24 2001-03-30 23:31:28 bcr Exp $#
 */
 
 //@{
@@ -145,7 +146,7 @@ public:
 		 the \Ref{DjVmDir} with the list of all files).
 		 The rest of the files are expected to be in the
 		 same directory and will be read by this function as well. */
-   void		read(const char * name);
+   void		read(const GURL &url);
       //@}
 
       /** Writing routines */
@@ -167,7 +168,7 @@ public:
 	  @param idx_name Name of the top-level file with the \Ref{DjVmDir}
 		 with the list of files composing the given document.
 		 If empty, the file will not be created. */
-   void		expand(const char * dir_name, const char * idx_name);
+   void		expand(const GURL &codebase, const char * idx_name);
       //@}
 private:
    GP<DjVmDir>			dir;

@@ -31,19 +31,87 @@
 #C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #
-# $Id: mkdirp.sh,v 1.8 2001-03-30 23:31:21 bcr Exp $
+# $Id: make_stlib.sh,v 1.2 2001-03-30 23:31:21 bcr Exp $
 # $Name:  $
+if [ ! -r ./TOPDIR/config.cache ] ; then
+  echo "Failed to find config.cache" 1>&2
+  exit 1
+fi
+. ./TOPDIR/config.cache
 
-#!/bin/sh
-
-mkdirp()
+unescape()
 {
-  if [ -n "$*" -a "$*" != "." -a ! -d "$*" ]
-  then
-    mkdirp `dirname "$*"`
-    mkdir "$*"
-  fi
+  (for i
+   do
+    echo "$i"
+  done)|sed  -e 's,@%%@a,'"'"',g' -e 's,@%%@q,",g' -e 's,@%%@d,\$,g' -e 's,@%%@t,	,g' -e 's,@%%@s, ,g' -e 's,@%%@e,!,g' -e 's,@%%@p,@%%@,g' -e 's,@%%@z,\\,g'
 }
 
-mkdirp "$*"
+arname="$1"
+shift
+rm -f "$arname"
+
+libs=
+objs=
+for arg
+do
+  case $arg in
+   *.a )
+     if [ ! -r "$arg" ]
+     then
+	echo "$arg" does not exist 2>&1
+        exit 1
+     fi
+     libs=`echo $libs "$w$ws$arg"`
+     ;;
+   *.o )
+     if [ ! -r "$arg" ]
+     then
+	echo "$arg" does not exist 2>&1
+        exit 1
+     fi
+     objs=`echo $objs "$arg"`
+     ;;
+   ?* )
+     echo "Unrecognized argument $arg" 2>&1
+     exit 1
+     ;;
+   esac
+done
+
+tmpdirs=
+if [ -n "$libs" ] 
+then
+  j=0
+  for i in "$libs"
+  do
+    tmp=libs-$j.tmp
+    mkdir $tmp
+    tmpdirs=`echo $tmpdirs $tmp`
+    (cd $tmp;if [ ! -r "$i" ] ; then i="../$i" ; fi; ar x "$i")
+    for k in $tmp/*.o ; do
+      if [ -r "$k" ]
+      then
+        objs=`echo $objs $k`
+      fi
+    done
+  done
+fi
+
+if [ -n "$objs" ] 
+then
+  if ( "$ar" cq "$arname" $objs )
+  then
+    if [ -n "$tmpdirs" ]
+    then
+      rm -rf $tmpdirs
+    fi
+    exec "$ranlib" "$arname"
+  fi
+fi
+if [ -n "$tmpdirs" ]
+then
+  rm -rf $tmpdirs
+fi
+exit 1
 

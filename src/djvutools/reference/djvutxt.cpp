@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djvutxt.cpp,v 1.12 2001-03-06 19:55:41 bcr Exp $
+// $Id: djvutxt.cpp,v 1.13 2001-03-30 23:31:25 bcr Exp $
 // $Name:  $
 
 // DJVUTXT -- DjVu TXT extractor
@@ -69,7 +69,7 @@
     @author
     Andrei Erofeev <eaf@geocities.com> -- initial implementation
     @version
-    #$Id: djvutxt.cpp,v 1.12 2001-03-06 19:55:41 bcr Exp $# */
+    #$Id: djvutxt.cpp,v 1.13 2001-03-30 23:31:25 bcr Exp $# */
 //@{
 //@}
 
@@ -131,17 +131,20 @@ doPage(const GP<DjVuDocument> & doc, int page_num,
 int
 main(int argc, char ** argv)
 {
-      // Get the program name
-   const char * ptr;
-   for(progname=ptr=argv[0];*ptr;ptr++)
-      if (*ptr=='/') progname=ptr+1;
+  DArray<GString> dargv(0,argc-1);
+  for(int i=0;i<argc;++i)
+  {
+    GString g(argv[i]);
+    dargv[i]=g.getNative2UTF8();
+  }
+  progname=dargv[0]=GOS::basename(dargv[0]);
    
 #ifdef DEBUG
    {
-      const char * debug=getenv("DEBUG");
-      if (debug)
+      const GString debug(GOS::getenv("DEBUG"));
+      if (debug.length())
       {
-	 int level=atoi(debug);
+	 int level=debug.is_int()?atoi((const char *)debug):0;
 	 if (level<1) level=1;
 	 if (level>32) level=32;
 //	 DEBUG_SET_LEVEL(level);
@@ -155,20 +158,20 @@ main(int argc, char ** argv)
 
       for(int i=1;i<argc;i++)
       {
-	 if (!strcmp(argv[i], "-") || argv[i][0]!='-')
+	 if (!strcmp(dargv[i], "-") || dargv[i][0]!='-')
 	 {
 	    if (!name_in.length())
 	    {
-	       if (!strcmp(argv[i], "-"))
+	       if (!strcmp(dargv[i], "-"))
 	       {
 		  fprintf(stderr, "Can't read from standard input.\n\n");
 		  usage();
 		  exit(1);
-	       } else name_in=argv[i];
+	       } else name_in=dargv[i];
 	    } else
 	    {
 	       if (!name_out.length())
-		  name_out=argv[i];
+		  name_out=dargv[i];
 	       else
 	       {
 		  usage();
@@ -177,9 +180,9 @@ main(int argc, char ** argv)
 	    }
 	 } else
 	 {
-	    if (argv[i][0]=='-' && argv[i][1]=='-')
-	       argv[i]++;
-	    if (!strcmp(argv[i], "--page"))
+	    if (dargv[i][0]=='-' && dargv[i][1]=='-')
+	       dargv[i]=1+(const char *)dargv[i];
+	    if (!strcmp(dargv[i], "--page"))
 	    {
 	       if (i+1>=argc)
 	       {
@@ -188,20 +191,20 @@ main(int argc, char ** argv)
 		  exit(1);
 	       }
 	       i++;
-	       page_num=atoi(argv[i])-1;
+	       page_num=atoi(dargv[i])-1;
 	       if (page_num<0)
 	       {
 		  fprintf(stderr, "Page number must be positive.\n\n");
 		  usage();
 		  exit(1);
 	       }
-	    } else if (!strcmp(argv[i], "--help"))
+	    } else if (!strcmp(dargv[i], "--help"))
 	    {
 	       usage();
 	       exit(1);
 	    } else
             {
-               fprintf(stderr, "Unrecognized option '%s' encountered.\n\n", argv[i]);
+               fprintf(stderr, "Unrecognized option '%s' encountered.\n\n", (const char *)dargv[i]);
             }
 	 }
       }
@@ -215,8 +218,8 @@ main(int argc, char ** argv)
       if (name_out.length()==0)
 	 name_out="-";
 
-      GP<DjVuDocument> doc=DjVuDocument::create_wait((const char *)name_in);
-      GP<ByteStream> gstr_out=ByteStream::create(name_out, "w");
+      GP<DjVuDocument> doc=DjVuDocument::create_wait(GURL::Filename::UTF8(name_in));
+      GP<ByteStream> gstr_out=ByteStream::create(GURL::Filename::UTF8(name_out), "w");
       ByteStream &str_out=*gstr_out;
       if (page_num<0)
 	 for(page_num=0;page_num<doc->get_pages_num();page_num++)

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.h,v 1.45 2001-03-12 23:50:23 fcrary Exp $
+// $Id: ByteStream.h,v 1.46 2001-03-30 23:31:28 bcr Exp $
 // $Name:  $
 
 #ifndef _BYTESTREAM_H
@@ -62,7 +62,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation\\
     Andrei Erofeev <eaf@geocities.com> -- 
     @version
-    #$Id: ByteStream.h,v 1.45 2001-03-12 23:50:23 fcrary Exp $# */
+    #$Id: ByteStream.h,v 1.46 2001-03-30 23:31:28 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -73,6 +73,8 @@
 #include <stdio.h>
 //include <stdlib.h>
 //include <string.h>
+
+class GURL;
 
 /** Abstract class for a stream of bytes.  Class #ByteStream# represent an
     object from which (resp. to which) bytes can be read (resp. written) as
@@ -238,9 +240,9 @@ public:
       Memory buffer is initialized with #size# bytes copied from the
       memory area pointed to by #buffer#. */
   static GP<ByteStream> create(void const * const buffer, const size_t size);
-  /** Constructs a ByteStream for accessing the file named #filename#.
-      Arguments #filename# and #mode# are similar to the arguments of the well
-      known stdio function #fopen#. In addition a filename of #-# will be
+  /** Constructs a ByteStream for accessing the file named #url#.
+      Arguments #url# and #mode# are similar to the arguments of the well
+      known stdio function #fopen#. In addition a url of #-# will be
       interpreted as the standard output or the standard input according to
       #mode#.  This constructor will open a stdio file and construct a
       ByteStream object accessing this file. Destroying the ByteStream object
@@ -248,7 +250,9 @@ public:
       \Ref{GException} is thrown with a plain text error message if the stdio
       file cannot be opened. */
   static GP<ByteStream> create(
-    const char filename[], char const * const mode);
+    const GURL &url, char const * const mode);
+  /** Same as the above, but uses stdio. */
+  static GP<ByteStream> create( char const * const mode);
 
 #if !defined(UNDER_CE)
   /** Constructs a ByteStream for accessing the stdio file #f#.
@@ -324,87 +328,6 @@ public:
     { return bs->seek(offset,whence,nothrow); }
   virtual void flush(void)
     { bs->flush(); }
-};
-
-/*x Obsolete ByteStream interface for stdio files. 
-    The virtual member functions #read#, #write#, #tell# and #seek# are mapped
-    to the well known stdio functions #fread#, #fwrite#, #ftell# and #fseek#.
-    @see Unix man page fopen(3), fread(3), fwrite(3), ftell(3), fseek(3) */
-
-class StdioByteStream : public ByteStream::Wrapper
-{
-public:
-  ~StdioByteStream();
-  /*x Constructs a ByteStream for accessing the file named #filename#.
-      Arguments #filename# and #mode# are similar to the arguments of the well
-      known stdio function #fopen#. In addition a filename of #-# will be
-      interpreted as the standard output or the standard input according to
-      #mode#.  This constructor will open a stdio file and construct a
-      ByteStream object accessing this file. Destroying the ByteStream object
-      will flush and close the associated stdio file.  Exception
-      \Ref{GException} is thrown with a plain text error message if the stdio
-      file cannot be opened. */
-  StdioByteStream(const char filename[], const char * const mode="rb")
-  { bs=gbs=create(filename,mode); }
-
-  /*x Constructs a ByteStream for accessing the stdio file #f#.
-      Argument #mode# indicates the type of the stdio file, as in the
-      well known stdio function #fopen#.  Destroying the ByteStream
-      object will not close the stdio file #f# unless closeme is true. */
-  StdioByteStream(
-    FILE * const f, const char * const mode="rb", const bool closeme=false)
-  { bs=gbs=create(f,mode,closeme);}
-};
-
-/*x Obsolete ByteStream interface managing a memory buffer.  
-    Class #ByteStream::Memory# manages a dynamically resizable buffer from
-    which data can be read or written.  The buffer itself is organized as an
-    array of blocks of 4096 bytes.  */
-
-class MemoryByteStream : public ByteStream::Wrapper
-{
-public:
-  ~MemoryByteStream();
-  /*x Constructs an empty ByteStream::Memory.
-      The buffer is initially empty. You must first use function #write#
-      to store data into the buffer, use function #seek# to rewind the
-      current position, and function #read# to read the data back. */
-  MemoryByteStream()
-  { bs=gbs=create(); }
-  /*x Constructs a Memory by copying initial data.  The
-      Memory buffer is initialized with #size# bytes copied from the
-      memory area pointed to by #buffer#. */
-  MemoryByteStream(const void *buffer, size_t size)
-  { bs=gbs=create(buffer,size); }
-  /*x Constructs a Memory by copying an initial string.  The
-      Memory buffer is initialized with the null terminated string
-      #buffer#. */
-  MemoryByteStream(const char *buffer)
-  { bs=gbs=create(buffer,strlen(buffer)); }
-  /*x Erases everything in the Memory.
-      The current location is reset to zero. */
-  void empty(void)
-  { bs=gbs=create(); }
-};
-
-/*x Obsolete Read-only ByteStream interface to a memory area.  
-    Class #ByteStream::Static# implements a read-only ByteStream interface for a
-    memory area specified by the user at construction time. Calls to function
-    #read# directly access this memory area.  The user must therefore make
-    sure that its content remain valid long enough.  */
-
-class StaticByteStream : public ByteStream::Wrapper
-{
-public:
-  ~StaticByteStream();
-  /*x Creates a ByteStream object for allocating the memory area of
-      length #sz# starting at address #buffer#. */
-  StaticByteStream(const char *buffer, size_t sz)
-  { bs=gbs=create_static(buffer,sz); }
-  /*x Creates a ByteStream object for allocating the null terminated
-      memory area starting at address #buffer#. */
-  StaticByteStream(const char *buffer)
-  { bs=gbs=create_static(buffer,strlen(buffer)); }
 };
 
 //@}

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DataPool.h,v 1.41 2001-02-17 02:38:41 bcr Exp $
+// $Id: DataPool.h,v 1.42 2001-03-30 23:31:28 bcr Exp $
 // $Name:  $
 
 #ifndef _DATAPOOL_H
@@ -42,6 +42,7 @@
 
 #include "GThreads.h"
 #include "GString.h"
+#include "GURL.h"
 
 class ByteStream;
 
@@ -64,7 +65,7 @@ class ByteStream;
 
     @memo Thread safe data storage
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DataPool.h,v 1.41 2001-02-17 02:38:41 bcr Exp $#
+    @version #$Id: DataPool.h,v 1.42 2001-03-30 23:31:28 bcr Exp $#
 */
 
 //@{
@@ -237,13 +238,13 @@ public:
 	  to the specified offsets range of the specified file.
 	  It is equivalent to calling default constructor and function
 	  \Ref{connect}().
-	  @param file_name Name of the file to connect to.
+	  @param url Name of the file to connect to.
 	  @param start Beginning of the offsets range which the #DataPool# is
 	         mapped into
           @param length Length of the offsets range. If negative, the range
 	         is assumed to extend up to the end of the file.
       */
-   static GP<DataPool> create(const char * file_name, int start=0, int length=-1);
+   static GP<DataPool> create(const GURL &url, int start=0, int length=-1);
 
    virtual ~DataPool();
 
@@ -257,14 +258,14 @@ public:
       */
    void		connect(const GP<DataPool> & master_pool, int start=0, int length=-1);
       /** Connects the #DataPool# to the specified offsets range of
-	  the named #file_name#.
-	  @param file_name Name of the file to connect to.
+	  the named #url#.
+	  @param url Name of the file to connect to.
 	  @param start Beginning of the offsets range which the #DataPool# is
 	         mapped into
           @param length Length of the offsets range. If negative, the range
 	         is assumed to extend up to the end of the file.
       */
-   void		connect(const char * file_name, int start=0, int length=-1);
+   void		connect(const GURL &url, int start=0, int length=-1);
       //@}
 
       /** Tells the #DataPool# to stop serving readers.
@@ -511,7 +512,7 @@ public:
 	  memory and close the file. This feature is important when you
 	  want to do something with the file like remove or overwrite it
 	  not affecting the rest of the program. */
-   static void	load_file(const char * name);
+   static void	load_file(const GURL &url);
 
       /** This function will remove OpenFiles filelist. */
    static void	close_all(void);
@@ -527,7 +528,7 @@ private:
    
       // Source or storage of data
    GP<DataPool>		pool;
-   GString		fname;
+   GURL		furl;
    GP<OpenFiles_File>   fstream;
    GCriticalSection	class_stream_lock;
    GP<ByteStream>	data;
@@ -562,7 +563,7 @@ private:
 inline bool
 DataPool::is_connected(void) const
 {
-   return fname.length()!=0 || pool!=0;
+   return furl.is_local_file_url() || pool!=0;
 }
 
 //@}

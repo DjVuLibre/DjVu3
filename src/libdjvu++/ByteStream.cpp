@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.cpp,v 1.55 2001-03-30 00:34:26 fcrary Exp $
+// $Id: ByteStream.cpp,v 1.56 2001-03-30 23:31:28 bcr Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 04/1997
@@ -40,6 +40,7 @@
 #endif
 #include "ByteStream.h"
 #include "GOS.h"
+#include "GURL.h"
 
 #ifdef UNIX
 #include <sys/types.h>
@@ -78,21 +79,24 @@ class ByteStream::Stdio : public ByteStream {
 public:
   Stdio(void);
 
-  /** Constructs a ByteStream for accessing the file named #filename#.
-      Arguments #filename# and #mode# are similar to the arguments of the well
-      known stdio function #fopen#. In addition a filename of #-# will be
+  /** Constructs a ByteStream for accessing the file named #url#.
+      Arguments #url# and #mode# are similar to the arguments of the well
+      known stdio function #fopen#. In addition a url of #-# will be
       interpreted as the standard output or the standard input according to
       #mode#.  This constructor will open a stdio file and construct a
       ByteStream object accessing this file. Destroying the ByteStream object
       will flush and close the associated stdio file.  Returns an error code
       if the stdio file cannot be opened. */
-  GString init(const char filename[], const char * const mode);
+  GString init(const GURL &url, const char * const mode);
 
   /** Constructs a ByteStream for accessing the stdio file #f#.
       Argument #mode# indicates the type of the stdio file, as in the
       well known stdio function #fopen#.  Destroying the ByteStream
       object will not close the stdio file #f# unless closeme is true. */
   GString init(FILE * const f, const char * const mode="rb", const bool closeme=false);
+
+  /** Initializes from stdio */
+  GString init(const char mode[]);
 
   // Virtual functions
   ~Stdio();
@@ -105,7 +109,6 @@ private:
   // Cancel C++ default stuff
   Stdio(const Stdio &);
   Stdio & operator=(const Stdio &);
-  GString init(const char mode[]);
 private:
   // Implementation
   bool can_read;
@@ -502,16 +505,20 @@ GString
 ByteStream::Stdio::init(const char mode[])
 {
   char const *mesg=0; 
+  if(!fp)
+    must_close=false;
   for (const char *s=mode; s && *s; s++)
   {
     switch(*s) 
     {
       case 'r':
         can_read=true;
+        if(!fp) fp=stdin;
         break;
       case 'w': 
       case 'a':
         can_write=true;
+        if(!fp) fp=stdout;
         break;
       case '+':
         can_read=can_write=true;
@@ -539,50 +546,69 @@ ByteStream::Stdio::init(const char mode[])
   return retval;
 }
 
+static FILE *
+urlfopen(const GURL &url,const char mode[])
+{
+  return fopen((const char *)url.NativeFilename(),mode);
+}
+
+static int
+urlopen(const GURL &url, const int mode, const int perm)
+{
+  return open((const char *)url.NativeFilename(),mode,perm);
+}
+
 GString
-ByteStream::Stdio::init(const char filename[], const char mode[])
+ByteStream::Stdio::init(const GURL &url, const char mode[])
 {
   GString retval;
-  if (filename[0] != '-' || filename[1])
+  if (url.fname() != '-')
   {
 #ifdef macintosh
-	  fp = fopen(filename, mode);
+    fp = urlfopen(url,mode);
 #else
-    fp = fopen(GOS::expand_name(filename), mode);
+    /* MBCS */
+    fp=urlfopen(url,mode);
+#if 0
+    if (!fp)
+    {
+      GString utf8Filename(GOS::expand_name(filename));
+      GString utf8Basename(GOS::basename(filename));
+      GString nativeBasename(GOS::encode_mbcs_reserved(utf8Basename.getUTF82Native()));
+      char *fpath;
+      const size_t fpath_length=1+utf8Filename.length()-utf8Basename.length();
+      GPBuffer<char> gfpath(fpath,fpath_length);
+      gfpath.clear();
+      strncpy(fpath,(char*)(const char*)utf8Filename, utf8Filename.length() - utf8Basename.length());
+      nativeFilename = GString(fpath).getUTF82Native();
+      nativeFilename+=nativeBasename;
+      fp = fopen((char*)(const char *)nativeFilename, mode);
+    }
+#endif
 #endif
     if (!fp)
     {
 #ifndef UNDER_CE
-      retval=GString("ByteStream.open_fail\t")+filename+strerror(errno);
+      char buffer[4096];
+      sprintf(buffer, "ByteStream.open_fail\t%s\t%s",
+        (const char *)url, strerror(errno));
+      G_THROW(buffer);                                   //  Failed to open '%s': %s
+#else
+      G_THROW("ByteStream.open_fail2");                  //  StdioByteStream::StdioByteStream, failed to open file.
+#endif
+//    } else
+//    { //MBCS cvt
+//      strcpy((char*)filename,(char*)(const char*)nativeFilename);//MBCS cvt add return new name
+    }
+    /*MBCS*/
+    if (!fp)
+    {
+#ifndef UNDER_CE
+      retval=GString("ByteStream.open_fail\t")+url+strerror(errno);
          //  Failed to open '%s': %s
 #else
       retval="ByteStream.open_fail2"; //  Stdio, failed to open file.
 #endif
-    }
-  }else 
-  {
-    for (const char *s=mode; s && *s; s++)
-    {
-      switch(*s) 
-      {
-        case 'r':
-          fp=stdin;
-          break;
-        case 'w':
-        case 'a':
-          fp=stdout;
-          break;
-        case '+':
-          fp=0;
-          break;
-        default:
-          break;
-      }
-    }
-    must_close=false;
-    if (!fp)
-    {
-      retval="ByteStream.bad_mode2"; // Illegal mode for stdin/stdout file descriptor
     }
   }
   return retval.length()?retval:init(mode);
@@ -909,13 +935,13 @@ ByteStream::create(void const * const buffer, const size_t size)
 }
 
 GP<ByteStream>
-ByteStream::create(const char filename[],char const * const mode)
+ByteStream::create(const GURL &url,char const * const mode)
 {
   GP<ByteStream> retval;
 #ifdef UNIX
   if(!mode || !strcmp(mode,"rb"))
   {
-    const int fd=open(filename,O_RDONLY,0777);
+    const int fd=urlopen(url,O_RDONLY,0777);
     if(fd>=0)
     {
       MemoryMapByteStream *rb=new MemoryMapByteStream();
@@ -932,11 +958,25 @@ ByteStream::create(const char filename[],char const * const mode)
   {
     Stdio *sbs=new Stdio();
     retval=sbs;
-    GString errmessage=sbs->init(filename,mode?mode:"rb");
+    GString errmessage=sbs->init(url,mode?mode:"rb");
     if(errmessage.length())
     {
       G_THROW(errmessage);
     }
+  }
+  return retval;
+}
+
+GP<ByteStream>
+ByteStream::create(char const * const mode)
+{
+  GP<ByteStream> retval;
+  Stdio *sbs=new Stdio();
+  retval=sbs;
+  GString errmessage=sbs->init(mode?mode:"rb");
+  if(errmessage.length())
+  {
+    G_THROW(errmessage);
   }
   return retval;
 }
@@ -1076,9 +1116,6 @@ MemoryMapByteStream::~MemoryMapByteStream()
 #endif
 
 ByteStream::Wrapper::~Wrapper() {}
-StdioByteStream::~StdioByteStream() {}
-MemoryByteStream::~MemoryByteStream() {}
-StaticByteStream::~StaticByteStream() {}
 
 
 

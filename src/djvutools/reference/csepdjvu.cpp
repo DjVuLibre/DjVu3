@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: csepdjvu.cpp,v 1.12 2001-03-06 19:55:41 bcr Exp $
+// $Id: csepdjvu.cpp,v 1.13 2001-03-30 23:31:25 bcr Exp $
 // $Name:  $
 
 
@@ -108,7 +108,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: csepdjvu.cpp,v 1.12 2001-03-06 19:55:41 bcr Exp $# */
+    #$Id: csepdjvu.cpp,v 1.13 2001-03-30 23:31:25 bcr Exp $# */
 //@{
 //@}
 
@@ -126,7 +126,8 @@
 #include "IW44Image.h"
 #include "DjVuInfo.h"
 #include "DjVmDoc.h"
-
+#include "GOS.h"
+#include "GURL.h"
 
 #undef MIN
 #undef MAX
@@ -1264,11 +1265,17 @@ parse_slice(const char *q, csepdjvuopts &opts)
 int 
 main(int argc, const char **argv)
 {
+  DArray<GString> dargv(0,argc-1);
+  for(int i=0;i<argc;++i)
+  {
+    GString g(argv[i]);
+    dargv[i]=g.getNative2UTF8();
+  }
   G_TRY
     {
       GP<DjVmDoc> gdoc=DjVmDoc::create();
       DjVmDoc &doc=*gdoc;
-      GString outputfile;
+      GURL outputurl;
       GP<ByteStream> goutputpage=ByteStream::create();
       csepdjvuopts opts;
       int pageno = 0;
@@ -1280,13 +1287,13 @@ main(int argc, const char **argv)
       opts.slice[2] =  93;
       opts.slice[3] = 103;
       opts.slice[4] =   0;
-      // Read outputfile name
+      // Read outputurl name
       if (argc < 3) usage();
-      outputfile = argv[--argc];
+      outputurl = GURL::Filename::UTF8(dargv[--argc]);
       // Process arguments
       for (int i=1; i<argc; i++)
         {
-          GString arg = argv[i];
+          GString arg = dargv[i];
           if (arg == "-v")
             opts.verbose = 1;
           else if (arg == "-vv")
@@ -1295,19 +1302,19 @@ main(int argc, const char **argv)
             {
               // Specify resolution
               char *end;
-              opts.dpi = strtol(argv[++i], &end, 10);
+              opts.dpi = strtol(dargv[++i], &end, 10);
               if (*end || opts.dpi<25 || opts.dpi>144000)
                 usage();
             }
           else if (arg == "-q" && i+1<argc)
             {
               // Specify background quality
-              parse_slice(argv[++i], opts);
+              parse_slice(dargv[++i], opts);
             }
           else 
             {
               // Process separation file
-              GP<ByteStream> fbs=ByteStream::create(arg,"rb");
+              GP<ByteStream> fbs=ByteStream::create(GURL::Filename::UTF8(arg),"rb");
               BufferByteStream ibs(*fbs);
               do {
                 char pagename[16];
@@ -1338,12 +1345,12 @@ main(int argc, const char **argv)
           ByteStream &outputpage=*goutputpage;
           // Save as a single page 
           outputpage.seek(0);
-          ByteStream::create(outputfile,"wb")->copy(outputpage);
+          ByteStream::create(outputurl,"wb")->copy(outputpage);
         }
       else if (pageno > 1)
         {
           // Save as a bundled file
-          doc.write(ByteStream::create(outputfile,"wb"));
+          doc.write(ByteStream::create(outputurl,"wb"));
         }
       else 
         usage();

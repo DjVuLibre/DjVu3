@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: cpaldjvu.cpp,v 1.11 2001-03-06 19:55:41 bcr Exp $
+// $Id: cpaldjvu.cpp,v 1.12 2001-03-30 23:31:25 bcr Exp $
 // $Name:  $
 
 
@@ -69,7 +69,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: cpaldjvu.cpp,v 1.11 2001-03-06 19:55:41 bcr Exp $# */
+    #$Id: cpaldjvu.cpp,v 1.12 2001-03-30 23:31:25 bcr Exp $# */
 //@{
 //@}
 
@@ -86,6 +86,8 @@
 #include "DjVuPalette.h"
 #include "IW44Image.h"
 #include "DjVuInfo.h"
+#include "GOS.h"
+#include "GURL.h"
 
 
 #undef MIN
@@ -723,7 +725,7 @@ struct cpaldjvuopts
 
 // -- Compresses low color pixmap.
 void 
-cpaldjvu(const GPixmap &input, const char *fileout, const cpaldjvuopts &opts)
+cpaldjvu(const GPixmap &input, GURL &urlout, const cpaldjvuopts &opts)
 {
   int w = input.columns();
   int h = input.rows();
@@ -826,7 +828,7 @@ cpaldjvu(const GPixmap &input, const char *fileout, const cpaldjvuopts &opts)
 #endif
 
   // Assemble DJVU file
-  GP<ByteStream> obs=ByteStream::create(fileout, "wb");
+  GP<ByteStream> obs=ByteStream::create(urlout, "wb");
   GP<IFFByteStream> giff=IFFByteStream::create(obs);
   IFFByteStream &iff=*giff;
   // -- main composite chunk
@@ -893,10 +895,16 @@ usage()
 int 
 main(int argc, const char **argv)
 {
+  DArray<GString> dargv(0,argc-1);
+  for(int i=0;i<argc;++i)
+  {
+    GString g(argv[i]);
+    dargv[i]=g.getNative2UTF8();
+  }
   G_TRY
     {
-      GString inputppmfile;
-      GString outputdjvufile;
+      GURL inputppmurl;
+      GURL outputdjvuurl;
       // Defaults
       cpaldjvuopts opts;
       opts.dpi = 100;
@@ -905,18 +913,18 @@ main(int argc, const char **argv)
       // Parse options
       for (int i=1; i<argc; i++)
         {
-          GString arg = argv[i];
+          GString arg = dargv[i];
           if (arg == "-colors" && i+1<argc)
             {
               char *end;
-              opts.ncolors = strtol(argv[++i], &end, 10);
+              opts.ncolors = strtol(dargv[++i], &end, 10);
               if (*end || opts.ncolors<2 || opts.ncolors>1024)
                 usage();
             }
           else if (arg == "-dpi" && i+1<argc)
             {
               char *end;
-              opts.dpi = strtol(argv[++i], &end, 10);
+              opts.dpi = strtol(dargv[++i], &end, 10);
               if (*end || opts.dpi<25 || opts.dpi>144000)
                 usage();
             }
@@ -924,19 +932,19 @@ main(int argc, const char **argv)
             opts.verbose = true;
           else if (arg[0] == '-')
             usage();
-          else if (!inputppmfile)
-            inputppmfile = arg;
-          else if (!outputdjvufile)
-            outputdjvufile = arg;
+          else if (inputppmurl.is_empty())
+            inputppmurl = GURL::Filename::UTF8(arg);
+          else if (outputdjvuurl.is_empty())
+            outputdjvuurl = GURL::Filename::UTF8(arg);
           else
             usage();
         }
-      if (!inputppmfile || !outputdjvufile)
+      if (inputppmurl.is_empty() || outputdjvuurl.is_empty())
         usage();
       // Load and run
-      GP<ByteStream> ibs=ByteStream::create(inputppmfile,"rb");
+      GP<ByteStream> ibs=ByteStream::create(inputppmurl,"rb");
       GP<GPixmap> ginput=GPixmap::create(*ibs);
-      cpaldjvu(*ginput, outputdjvufile, opts);
+      cpaldjvu(*ginput, outputdjvuurl, opts);
     }
   G_CATCH(ex)
     {

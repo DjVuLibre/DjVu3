@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GIFFManager.cpp,v 1.16 2001-03-06 19:55:42 bcr Exp $
+// $Id: GIFFManager.cpp,v 1.17 2001-03-30 23:31:29 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -80,7 +80,11 @@ GIFFChunk::set_name(const char * name)
 
    DEBUG_MSG("auto-setting type to '" << type << "'\n");
 
+#ifdef WIN32
+   if (_tcspbrk(name, ".[]"))//MBCS DBCS
+#else
    if (strpbrk(name, ".[]"))
+#endif
       G_THROW("GIFFManager.bad_char");
    
    strncpy(GIFFChunk::name, name, 4); GIFFChunk::name[4]=0;
@@ -174,10 +178,18 @@ GIFFChunk::decode_name(const char * name, GString * short_name_ptr,
 
    int number=0;
    const char * obracket;
+#ifdef WIN32
+   if ((obracket=_tcschr(name, '[')))//MBCS DBCS
+#else
    if ((obracket=strchr(name, '[')))
+#endif
    {
       const char * cbracket;
+#ifdef WIN32
+      if (!(cbracket=_tcschr(obracket+1, ']')))//MBCS DBCS
+#else
       if (!(cbracket=strchr(obracket+1, ']')))
+#endif
 	 G_THROW("GIFFManager.unmatched");
       number=atoi(GString(obracket+1, cbracket-obracket-1));
       if (cbracket[1]) G_THROW("GIFFManager.garbage");
@@ -321,10 +333,18 @@ GIFFManager::add_chunk(const char parent_name[], const GP<GIFFChunk> & chunk,
 	 strcpy(short_name, name);
 
 	 int number=0;
-	 char * obracket=strchr(short_name, '[');
+#ifdef WIN32
+	 char * obracket=_tcsrchr(short_name, '[');//MBCS DBCS
+#else
+	 char * obracket=strrchr(short_name, '[');
+#endif
 	 if (obracket)
 	 {
-	    char * cbracket=strchr(obracket+1, ']');
+#ifdef WIN32
+	    char * cbracket=_tcsrchr(obracket+1, ']');//MBCS DBCS
+#else
+	    char * cbracket=strrchr(obracket+1, ']');
+#endif
 	    if (!cbracket) G_THROW("GIFFManager.unbalanced");
 	    number=atoi(GString(obracket+1, cbracket-obracket-1));
 	    *obracket=0;
@@ -354,10 +374,19 @@ GIFFManager::add_chunk(const char name[], const TArray<char> & data)
    else short_name++;
 
    int pos=-1;
-   const char * obracket=strchr(short_name, '[');
+#ifdef WIN32
+   const char * obracket=_tcsrchr(short_name, '[');//MBCS DBCS
+#else
+   const char * obracket=strrchr(short_name, '[');
+#endif
+
    if (obracket)
    {
-      const char * cbracket=strchr(obracket+1, ']');
+#ifdef WIN32
+      const char * cbracket=_tcsrchr(obracket+1, ']');//MBCS DBCS
+#else
+      const char * cbracket=strrchr(obracket+1, ']');
+#endif
       if (!cbracket) G_THROW("GIFFManager.unbalanced");
       pos=atoi(GString(obracket+1, cbracket-obracket-1));
       if (cbracket[1]) G_THROW("GIFFManager.garbage");

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //
-// $Id: djvumake.cpp,v 1.13 2001-03-06 19:55:41 bcr Exp $
+// $Id: djvumake.cpp,v 1.14 2001-03-30 23:31:25 bcr Exp $
 // $Name:  $
 
 /** @name djvumake
@@ -102,7 +102,7 @@
     @memo
     Assemble DjVu files.
     @version
-    #$Id: djvumake.cpp,v 1.13 2001-03-06 19:55:41 bcr Exp $#
+    #$Id: djvumake.cpp,v 1.14 2001-03-30 23:31:25 bcr Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> \\
     Patrick Haffner <haffner@research.att.com>
@@ -180,11 +180,11 @@ usage()
 // -- Obtain image size from mmr chunk
 
 void
-analyze_mmr_chunk(char *filename)
+analyze_mmr_chunk(const GURL &url)
 {
   if (!mmrstencil || !mmrstencil->size())
     {
-      GP<ByteStream> gbs=ByteStream::create(filename,"rb");
+      GP<ByteStream> gbs=ByteStream::create(url,"rb");
       ByteStream &bs=*gbs;
       mmrstencil = ByteStream::create();
       // Check if file is an IFF file
@@ -222,7 +222,7 @@ analyze_mmr_chunk(char *filename)
       if (w < 0) w = jw;
       if (h < 0) h = jh;
       if (jw!=w || jh!=h)
-        fprintf(stderr,"djvumake: mask size (%s) does not match info size\n", filename);
+        fprintf(stderr,"djvumake: mask size (%s) does not match info size\n", (const char *)url);
     }
 }
 
@@ -230,11 +230,11 @@ analyze_mmr_chunk(char *filename)
 // -- Obtain image size from jb2 chunk
 
 void 
-analyze_jb2_chunk(char *filename)
+analyze_jb2_chunk(const GURL &url)
 {
   if (!jb2stencil || !jb2stencil->size())
     {
-      GP<ByteStream> gbs=ByteStream::create(filename,"rb");
+      GP<ByteStream> gbs=ByteStream::create(url,"rb");
       ByteStream &bs=*gbs;
       jb2stencil = ByteStream::create();
       // Check if file is an IFF file
@@ -273,7 +273,7 @@ analyze_jb2_chunk(char *filename)
       if (w < 0) w = jw;
       if (h < 0) h = jh;
       if (jw!=w || jh!=h)
-        fprintf(stderr,"djvumake: mask size (%s) does not match info size\n", filename);
+        fprintf(stderr,"djvumake: mask size (%s) does not match info size\n", (const char *)url);
     }
 }
 
@@ -281,19 +281,20 @@ analyze_jb2_chunk(char *filename)
 // -- Create info chunk from specification or mask
 
 void
-create_info_chunk(IFFByteStream &iff, int argc, char **argv)
+create_info_chunk(IFFByteStream &iff, DArray<GString> &argv)
 {
+  const int argc=argv.hbound()+1;
   // Process info specification
   for (int i=2; i<argc; i++)
     if (! strncmp(argv[i],"INFO=",5))
       {
         int   narg = 0;
-        char *ptr = argv[i]+5;
+        const char *ptr = 5+(const char *)argv[i];
         while (*ptr)
           {
             if (*ptr != ',')
               {
-                int x = strtol(ptr, &ptr, 10);
+                int x = strtol((char *)ptr, (char **)&ptr, 10);
                 switch(narg)
                   {
                   case 0: 
@@ -324,12 +325,12 @@ create_info_chunk(IFFByteStream &iff, int argc, char **argv)
       for (int i=2; i<argc; i++)
         if (!strncmp(argv[i],"Sjbz=",5))
           {
-            analyze_jb2_chunk(argv[i]+5);
+            analyze_jb2_chunk(GURL::Filename::UTF8(5+(const char *)argv[i]));
             break;
           }
       else if (!strncmp(argv[i],"Smmr=",5))
           {
-            analyze_mmr_chunk(argv[i]+5);
+            analyze_mmr_chunk(GURL::Filename::UTF8(5+(const char *)argv[i]));
             break;
           }
     }
@@ -352,9 +353,9 @@ create_info_chunk(IFFByteStream &iff, int argc, char **argv)
 // -- Create MMR mask chunk
 
 void 
-create_mmr_chunk(IFFByteStream &iff, char *chkid, char *filename)
+create_mmr_chunk(IFFByteStream &iff, char *chkid, const GURL &url)
 {
-  analyze_mmr_chunk(filename);
+  analyze_mmr_chunk(url);
   mmrstencil->seek(0);
   iff.put_chunk(chkid);
   iff.copy(*mmrstencil);
@@ -365,9 +366,9 @@ create_mmr_chunk(IFFByteStream &iff, char *chkid, char *filename)
 // -- Create JB2 mask chunk
 
 void 
-create_jb2_chunk(IFFByteStream &iff, char *chkid, char *filename)
+create_jb2_chunk(IFFByteStream &iff, const char * const chkid, const GURL &url)
 {
-  analyze_jb2_chunk(filename);
+  analyze_jb2_chunk(url);
   jb2stencil->seek(0);
   iff.put_chunk(chkid);
   iff.copy(*jb2stencil);
@@ -389,10 +390,10 @@ create_incl_chunk(IFFByteStream &iff, char *chkid, const char *fileid)
 // -- Create chunk by copying file contents
 
 void 
-create_raw_chunk(IFFByteStream &iff, char *chkid, char *filename)
+create_raw_chunk(IFFByteStream &iff, const GString &chkid, const GURL &url)
 {
   iff.put_chunk(chkid);
-  GP<ByteStream> ibs=ByteStream::create(filename,"rb");
+  GP<ByteStream> ibs=ByteStream::create(url,"rb");
   iff.copy(*ibs);
   iff.close_chunk();
 }
@@ -416,9 +417,9 @@ struct SecondaryHeader {
 // -- Create and check FG44 chunk
 
 void 
-create_fg44_chunk(IFFByteStream &iff, char *ckid, char *filename)
+create_fg44_chunk(IFFByteStream &iff, char *ckid, const GURL &url)
 {
-  GP<ByteStream> gbs=ByteStream::create(filename,"rb");
+  GP<ByteStream> gbs=ByteStream::create(url,"rb");
   GP<IFFByteStream> gbsi=IFFByteStream::create(gbs);
   IFFByteStream &bsi=*gbsi;
   GString chkid;
@@ -462,38 +463,37 @@ create_fg44_chunk(IFFByteStream &iff, char *ckid, char *filename)
 // -- Create and check BG44 chunk
 
 void 
-create_bg44_chunk(IFFByteStream &iff, char *ckid, char *filespec)
+create_bg44_chunk(IFFByteStream &iff, char *ckid, GString filespec)
 {
   if (! bg44iff)
     {
       if (flag_contains_bg)
         fprintf(stderr,"djvumake: Duplicate BGxx chunk\n");
-      char *s = strchr(filespec, ':');
-      if (s == filespec)
+      const int i=filespec.rsearch(':');
+      if (!i)
         G_THROW("djvumake: no filename specified in first BG44 specification");
-      if (!s)
-        s = filespec + strlen(filespec);
-      GString filename(filespec, s-filespec);
-      bg44iff = IFFByteStream::create(ByteStream::create(filename,"rb"));
+      GString filename=(i<0)?filespec:GString(filespec, i);
+      bg44iff = IFFByteStream::create(ByteStream::create(GURL::Filename::UTF8(filename),"rb"));
       GString chkid;
       bg44iff->get_chunk(chkid);
       if (chkid != "FORM:PM44" && chkid != "FORM:BM44")
         G_THROW("djvumake: BG44 file has incorrect format (wrong IFF header)");        
-      if (*s == ':')
-        filespec = s+1;
+      if (i>=0)
+        filespec = i+(const char *)filespec;
       else 
         filespec = "99";
     }
   else
     {
-      if (*filespec!=':')
+      if (filespec.length() && filespec[0]!=':')
         G_THROW("djvumake: filename specified in BG44 refinement");
-      filespec += 1;
+      filespec = 1+(const char *)filespec;
     }
-  int nchunks = strtol(filespec, &filespec, 10);
+  const char *s=filespec;
+  int nchunks = strtol((char *)s, (char **)&s, 10);
   if (nchunks<1 || nchunks>99)
     G_THROW("djvumake: invalid number of chunks in BG44 specification");    
-  if (*filespec)
+  if (*s)
     G_THROW("djvumake: invalid BG44 specification (syntax error)");
   
   int flag = (nchunks>=99);
@@ -551,12 +551,12 @@ void processBackground(const GPixmap* image, const JB2Image *mask,
 // -- Create both foreground and background by masking and subsampling
 
 void 
-create_masksub_chunks(IFFByteStream &iff, char *filespec)
+create_masksub_chunks(IFFByteStream &iff, const GURL &url)
 {
   // Check and load pixmap file
   if (!stencil)
     G_THROW("The use of a raw ppm image requires a stencil");
-  GP<ByteStream> gibs=ByteStream::create(filespec, "rb");
+  GP<ByteStream> gibs=ByteStream::create(url, "rb");
   ByteStream &ibs=*gibs;
   GP<GPixmap> graw_pm=GPixmap::create(ibs);
   GPixmap &raw_pm=*graw_pm;
@@ -612,85 +612,91 @@ create_masksub_chunks(IFFByteStream &iff, char *filespec)
 int
 main(int argc, char **argv)
 {
+  DArray<GString> dargv(0,argc-1);
+  for(int i=0;i<argc;++i)
+  {
+    GString g(argv[i]);
+    dargv[i]=g.getNative2UTF8();
+  }
   G_TRY
     {
       // Print usage when called without enough arguments
       if (argc <= 2)
         usage();
       // Open djvu file
-      remove(argv[1]);
-      GP<IFFByteStream> giff=IFFByteStream::create(ByteStream::create(argv[1],"wb"));
+      remove(dargv[1]);
+      GP<IFFByteStream> giff=IFFByteStream::create(ByteStream::create(GURL::Filename::UTF8(dargv[1]),"wb"));
       IFFByteStream &iff=*giff;
       // Create header
       iff.put_chunk("FORM:DJVU", 1);
       // Create information chunk
-      create_info_chunk(iff, argc, argv);
+      create_info_chunk(iff, dargv);
       // Parse all arguments
       for (int i=2; i<argc; i++)
         {
-          if (! strncmp(argv[i],"INFO=",5))
+          if (! strncmp(dargv[i],"INFO=",5))
             {
               if (i>2)
                 fprintf(stderr,"djvumake: 'INFO' chunk should appear first (ignored)\n");
             }
-          else if (! strncmp(argv[i],"Sjbz=",5))
+          else if (! strncmp(dargv[i],"Sjbz=",5))
             {
-              create_jb2_chunk(iff, "Sjbz", argv[i]+5);
+              create_jb2_chunk(iff, "Sjbz", GURL::Filename::UTF8(5+(const char *)dargv[i]));
               if (flag_contains_stencil)
                 fprintf(stderr,"djvumake: duplicate stencil chunk\n");
               flag_contains_stencil = 1;
             }
-          else if (! strncmp(argv[i],"Smmr=",5))
+          else if (! strncmp(dargv[i],"Smmr=",5))
             {
-              create_mmr_chunk(iff, "Smmr", argv[i]+5);
+              create_mmr_chunk(iff, "Smmr", GURL::Filename::UTF8(5+(const char *)dargv[i]));
               if (flag_contains_stencil)
                 fprintf(stderr,"djvumake: duplicate stencil chunk\n");
               flag_contains_stencil = 1;
             }
-          else if (! strncmp(argv[i],"FG44=",5))
+          else if (! strncmp(dargv[i],"FG44=",5))
             {
               if (flag_contains_fg)
                 fprintf(stderr,"djvumake: duplicate 'FGxx' chunk\n");
-              create_fg44_chunk(iff, "FG44", argv[i]+5);
+              create_fg44_chunk(iff, "FG44", GURL::Filename::UTF8(5+(const char *)dargv[i]));
             }
-          else if (! strncmp(argv[i],"BG44=",5))
+          else if (! strncmp(dargv[i],"BG44=",5))
             {
-              create_bg44_chunk(iff, "BG44", argv[i]+5);
+              create_bg44_chunk(iff, "BG44", 5+(const char *)dargv[i]);
             }
-          else if (! strncmp(argv[i],"BGjp=",5) ||
-                   ! strncmp(argv[i],"BG2k=",5)  )
+          else if (! strncmp(dargv[i],"BGjp=",5) ||
+                   ! strncmp(dargv[i],"BG2k=",5)  )
             {
               if (flag_contains_bg)
                 fprintf(stderr,"djvumake: Duplicate BGxx chunk\n");
-              argv[i][4] = 0;
-              create_raw_chunk(iff, argv[i], argv[i]+5);
+              dargv[i].setat(4,0);
+              create_raw_chunk(iff, dargv[i], GURL::Filename::UTF8(5+(const char *)dargv[i]));
               flag_contains_bg = 1;
             }
-          else if (! strncmp(argv[i],"FGjp=",5) ||
-                   ! strncmp(argv[i],"FG2k=",5)  )
+          else if (! strncmp(dargv[i],"FGjp=",5) ||
+                   ! strncmp(dargv[i],"FG2k=",5)  )
             {
               if (flag_contains_fg)
                 fprintf(stderr,"djvumake: duplicate 'FGxx' chunk\n");
-              argv[i][4] = 0;
-              create_raw_chunk(iff, argv[i], argv[i]+5);
+              dargv[i].setat(4,0);
+              create_raw_chunk(iff, dargv[i], GURL::Filename::UTF8(5+(const char *)dargv[i]));
               flag_contains_fg = 1;
             }
-          else if (! strncmp(argv[i],"INCL=",5))
+          else if (! strncmp(dargv[i],"INCL=",5))
             {
-              create_incl_chunk(iff, "INCL", argv[i]+5);
+              create_incl_chunk(iff, "INCL", GURL::Filename::UTF8(5+(const char *)dargv[i]).name());
               flag_contains_incl = 1;
             }
-          else if (! strncmp(argv[i],"PPM=",4))
+          else if (! strncmp(dargv[i],"PPM=",4))
             {
               if (flag_contains_bg || flag_contains_fg)
                 fprintf(stderr,"djvumake: Duplicate 'FGxx' or 'BGxx' chunk\n");
-              create_masksub_chunks(iff, argv[i]+4 );
+              create_masksub_chunks(iff, GURL::Filename::UTF8(4+(const char *)dargv[i]));
               flag_contains_bg = 1;
               flag_contains_fg = 1;
             }
           else 
             {
-              fprintf(stderr,"djvumake: illegal argument : ``%s'' (ignored)\n", argv[i]);
+              fprintf(stderr,"djvumake: illegal argument : ``%s'' (ignored)\n", (const char *)dargv[i]);
             }
         }
       // Close
@@ -717,7 +723,7 @@ main(int argc, char **argv)
     }
   G_CATCH(ex)
     {
-      remove(argv[1]);
+      remove(dargv[1]);
       ex.perror("Type 'djvumake' without arguments for more help");
       exit(1);
     }

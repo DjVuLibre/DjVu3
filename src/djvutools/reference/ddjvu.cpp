@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ddjvu.cpp,v 1.10 2001-03-06 19:55:41 bcr Exp $
+// $Id: ddjvu.cpp,v 1.11 2001-03-30 23:31:25 bcr Exp $
 // $Name:  $
 
 /** @name ddjvu
@@ -111,7 +111,7 @@
     Yann Le Cun <yann@research.att.com>\\
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: ddjvu.cpp,v 1.10 2001-03-06 19:55:41 bcr Exp $# */
+    #$Id: ddjvu.cpp,v 1.11 2001-03-30 23:31:25 bcr Exp $# */
 //@{
 //@}
 
@@ -148,7 +148,7 @@ GRect segmentrect;
 
 
 static void
-convert(const char *from, const char *to, int page_num)
+convert(const GURL &from, const GURL &to, int page_num)
 {
   unsigned long start, stop;
 
@@ -160,7 +160,7 @@ convert(const char *from, const char *to, int page_num)
   // Create DjVuImage
   start=GOS::ticks();
   GP<DjVuImage> dimg=doc->get_page(page_num);
-  if (! dimg->wait_for_complete_decode() )
+  if (!dimg || ! dimg->wait_for_complete_decode() )
     G_THROW("Decoding failed. Nothing can be done.");    
   stop=GOS::ticks();
 
@@ -286,18 +286,18 @@ usage()
 
 
 void
-geometry(char *s, GRect &rect)
+geometry(const char *s, GRect &rect)
 {
   int w,h;
   rect.xmin = rect.ymin = 0;
-  w = strtol(s, &s,10);
+  w = strtol((char *)s,(char **) &s,10);
   if (w<=0 || *s++!='x') goto error;
-  h = strtol(s,&s,10);
+  h = strtol((char *)s,(char **)&s,10);
   if (h<=0 || (*s && *s!='+' && *s!='-')) goto error;
   if (*s) 
-    rect.xmin = strtol(s,&s,10);
+    rect.xmin = strtol((char *)s,(char **)&s,10);
   if (*s)
-    rect.ymin = strtol(s,&s,10);
+    rect.ymin = strtol((char *)s,(char **)&s,10);
   if (*s) 
     {
     error:
@@ -333,14 +333,20 @@ int
 main(int argc, char **argv)
 {
 #endif
+  DArray<GString> dargv(0,argc-1);
+  for(int i=0;i<argc;++i)
+  {
+    GString g(argv[i]);
+    dargv[i]=g.getNative2UTF8();
+  }
    G_TRY
     {
       // Process options
       int page_num=-1;
-      while (argc>1 && argv[1][0]=='-' && argv[1][1])
+      while (argc>1 && dargv[1][0]=='-' && dargv[1][1])
         {
-          char *s = argv[1];
-          if (!strcmp(argv[1],"-v"))
+          const char *s = dargv[1];
+          if (!strcmp(dargv[1],"-v"))
             {
               flag_verbose = 1;
             }
@@ -350,8 +356,8 @@ main(int argc, char **argv)
                 G_THROW("No argument for option '-scale'");
               if (flag_subsample>=0 || flag_scale>=0 || flag_size>=0)
                 G_THROW("Duplicate scaling specification");
-              argc -=1; argv +=1; s = argv[1];
-              flag_scale = strtod(s,&s);
+              argc -=1; dargv.shift(-1); s = dargv[1];
+              flag_scale = strtod((char *)s,(char **)&s);
               if (*s == '%') 
                 s++;
               if (*s)
@@ -363,7 +369,7 @@ main(int argc, char **argv)
                 G_THROW("No argument for option '-size'");
               if (flag_subsample>=0 || flag_scale>=0 || flag_size>=0)
                 G_THROW("Duplicate scaling specification");
-              argc -=1; argv +=1; s = argv[1];
+              argc -=1; dargv.shift(-1); s = dargv[1];
               geometry(s, fullrect);
               flag_size = 1;
               if (fullrect.xmin || fullrect.ymin)
@@ -375,7 +381,7 @@ main(int argc, char **argv)
                 G_THROW("No argument for option '-segment'");
               if (flag_segment>=0)
                 G_THROW("Duplicate segment specification");
-              argc -=1; argv +=1; s = argv[1];
+              argc -=1; dargv.shift(-1); s = dargv[1];
               geometry(s, segmentrect);
               flag_segment = 1;
             }
@@ -403,14 +409,14 @@ main(int argc, char **argv)
                 G_THROW("No argument for option '-page'");
               if (page_num>=0)
                 G_THROW("Duplicate page specification");
-              argc -=1; argv +=1; s = argv[1];
+              argc -=1; dargv.shift(-1); s = dargv[1];
 	      page_num=atoi(s);
 	      if (page_num<=0) G_THROW("Page number must be positive.");
 	      page_num--;
 	    }
           else if (s[1]>='1' && s[1]<='9')
             {
-              int arg = strtol(s+1,&s,10);
+              int arg = strtol((char *)s+1,(char **)&s,10);
               if (arg<0 || *s) usage();
               if (flag_subsample>=0 || flag_scale>=0 || flag_size>=0)
                 G_THROW("Duplicate scaling specification");
@@ -421,16 +427,16 @@ main(int argc, char **argv)
               usage();
             }
           argc -= 1;
-          argv += 1;
+          dargv.shift(-1);
         }
       if (page_num<0) page_num=0;
       // Process remaining arguments
       if (argc == 1) 
-        convert("-","-", page_num); 
+        convert(GURL::Filename::UTF8("-"),GURL::Filename::UTF8("-"), page_num); 
       else if (argc == 2) 
-        convert(argv[1],"-", page_num);
+        convert(GURL::Filename::UTF8(dargv[1]),GURL::Filename::UTF8("-"), page_num);
       else if (argc == 3) 
-        convert(argv[1],argv[2], page_num);
+        convert(GURL::Filename::UTF8(dargv[1]),GURL::Filename::UTF8(dargv[2]), page_num);
       else
         usage();
     }

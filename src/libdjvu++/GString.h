@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.h,v 1.28 2001-03-28 22:07:18 fcrary Exp $
+// $Id: GString.h,v 1.29 2001-03-30 23:31:29 bcr Exp $
 // $Name:  $
 
 #ifndef _GSTRING_H_
@@ -57,7 +57,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.28 2001-03-28 22:07:18 fcrary Exp $# */
+    #$Id: GString.h,v 1.29 2001-03-30 23:31:29 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -127,6 +127,8 @@ public:
   GString(const char dat);
   /// Constructs a string from a null terminated character array.
   GString(const char *dat);
+  /// Constructs a string from a null terminated character array.
+  GString(const unsigned char *dat);
   /** Constructs a string from a character array.  Elements of the character
       array #dat# are added into the string until the string length reaches
       #len# or until encountering a null character (whichever comes first). */
@@ -230,6 +232,10 @@ public:
       unescaped forms. Numeric representations of characters (e.g., "&#38;"
       or "&#x26;" for "*") are the only forms converted by this function. */
   GString fromEscaped( void ) const;
+
+  /** Converts strings between native & UTF8 **/
+  GString getUTF82Native( char* tocode=NULL ) const;/*MBCS*/
+  GString getNative2UTF8( const char* fromcode="" ) const;/*MBCS*/
 
   /** Converts strings containing HTML/XML escaped characters (e.g.,
       "&lt;" for "<") into their unescaped forms. The conversion is partially

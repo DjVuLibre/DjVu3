@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: XMLAnno.cpp,v 1.8 2001-03-28 22:07:18 fcrary Exp $
+// $Id: XMLAnno.cpp,v 1.9 2001-03-30 23:31:29 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -102,7 +102,7 @@ convertToColor(const char s[])
 }
 
 void
-lt_XMLAnno::ChangeAnno(const lt_XMLTags &map,const GURL url,const GString id,const GString width,const GString height)
+lt_XMLAnno::ChangeAnno(const lt_XMLTags &map,const GURL &url,const GString &id,const GString &width,const GString &height)
 {
   const GString url_string((const char *)url);
   DjVuDocument &doc=*(docs[url_string]);
@@ -409,20 +409,21 @@ lt_XMLAnno::save(void)
   {
     DjVuDocument &doc=*(docs[pos]);
     GURL url=doc.get_init_url();
-    GString name=GOS::url_to_filename(url);
-    printf("Saving file '%s' with new annotations.\n",(const char *)name);
+//    GString name=GOS::url_to_filename(url);
+//    printf("Saving file '%s' with new annotations.\n",(const char *)url);
     const bool bundle=doc.is_bundled()||(doc.get_doc_type()==DjVuDocument::SINGLE_PAGE);
-    doc.save_as(name,bundle);
+    doc.save_as(url,bundle);
   }
   empty();
 }
 
 void
-lt_XMLAnno::parse(const char xmlfile[],GString basedir)
+lt_XMLAnno::parse(const char fname[],const GURL &codebase)
 {
-  m_basedir=basedir;
+  m_codebase=codebase;
   GP<lt_XMLTags> tags=lt_XMLTags::create();
-  tags->init(xmlfile);
+  const GURL::UTF8 url(fname,codebase);
+  tags->init(url);
   parse(*tags);
 }
 
@@ -464,19 +465,19 @@ lt_XMLAnno::parse(const lt_XMLTags &tags)
       const GMap<GString,GString> &args=GObject->args;
       GURL codebase;
       {
-        DEBUG_MSG("Setting up codebase... m_basedir = " << m_basedir << "\n");
+        DEBUG_MSG("Setting up codebase... m_codebase = " << m_codebase << "\n");
         GPosition codebasePos=args.contains("codebase");
         // If user specified a codebase attribute, assume it is correct (absolute URL):
         //  the GURL constructor will throw an exception if it isn't
         if(codebasePos)
         {
-          codebase=GURL(args[codebasePos]);
-        }else if (GOS::is_dir(m_basedir))
+          codebase=GURL::UTF8(args[codebasePos]);
+        }else if (m_codebase.is_dir())
         {
-          codebase=GOS::filename_to_url(m_basedir);
+          codebase=m_codebase;
         }else
         {
-          codebase=GOS::filename_to_url(GOS::cwd());
+          codebase=GURL::Filename::UTF8(GOS::cwd());
         }
         DEBUG_MSG("codebase = " << codebase << "\n");
       }
@@ -500,8 +501,8 @@ lt_XMLAnno::parse(const lt_XMLTags &tags)
           isDjVuType=true;
         }
         GURL url;
-        GURL simpleURL(args[datapos]);
-        if (simpleURL.is_valid())
+        const GURL::UTF8 simpleURL(args[datapos]);
+        if (simpleURL.is_empty())
         {
           url=simpleURL;
         }else if(args[datapos][0] == '/')

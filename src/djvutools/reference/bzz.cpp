@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: bzz.cpp,v 1.12 2001-03-06 19:55:41 bcr Exp $
+// $Id: bzz.cpp,v 1.13 2001-03-30 23:31:24 bcr Exp $
 // $Name:  $
 
 
@@ -58,16 +58,18 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation
     @version
-    $Id: bzz.cpp,v 1.12 2001-03-06 19:55:41 bcr Exp $ */
+    $Id: bzz.cpp,v 1.13 2001-03-30 23:31:24 bcr Exp $ */
 //@{
 //@}
 
 #include "GException.h"
 #include "ByteStream.h"
 #include "BSByteStream.h"
+#include "GOS.h"
+#include "GURL.h"
 #include <stdlib.h>
 
-char *program = "(unknown)";
+static const char *program = "(unknown)";
 
 void
 usage(void)
@@ -86,14 +88,16 @@ usage(void)
 int 
 main(int argc, char **argv)
 {
+  DArray<GString> dargv(0,argc-1);
+  for(int i=0;i<argc;++i)
+  {
+    GString g(argv[i]);
+    dargv[i]=g.getNative2UTF8();
+  }
   G_TRY
     {
       // Get program name
-      program = strrchr(argv[0],'/');
-      if (program) 
-        program += 1; 
-      else 
-        program = argv[0];
+      program=dargv[0]=GOS::basename(dargv[0]);
       // Obtain default mode from program name
       int blocksize = -1;
       if (!strcmp(program,"bzz"))
@@ -101,37 +105,33 @@ main(int argc, char **argv)
       else if (!strcmp(program,"unbzz"))
         blocksize = 0;
       // Parse arguments
-      if (argc>=2 && argv[1][0]=='-')
+      if (argc>=2 && dargv[1][0]=='-')
         {
-          if (argv[1][1]=='d' && argv[1][2]==0)
+          if (dargv[1][1]=='d' && dargv[1][2]==0)
             {
               blocksize = 0;
             }
-          else if (argv[1][1]=='e')
+          else if (dargv[1][1]=='e')
             {
               blocksize = 2048;
-              if (argv[1][2])
-                blocksize = atoi(argv[1]+2);
+              if (dargv[1][2])
+                blocksize = atoi(2+(const char *)dargv[1]);
             }
           else 
             usage();
-          argv++;
+          dargv.shift(-1);
           argc--;
         }
       if (blocksize < 0)
         usage();
       // Obtain filenames
-      char *infile = "-";
-      char *outfile = "-";
-      if (argc >= 2)
-        infile = argv[1];
-      if (argc >= 3)
-        outfile = argv[2];
+      const GURL::Filename::UTF8 inurl((argc>=2)?dargv[1]:GString("-"));
+      const GURL::Filename::UTF8 outurl((argc>=3)?dargv[2]:GString("-"));
       if (argc >= 4)
         usage();
       // Action
-      GP<ByteStream> in=ByteStream::create(infile,"rb");
-      GP<ByteStream> out=ByteStream::create(outfile,"wb");
+      GP<ByteStream> in=ByteStream::create(inurl,"rb");
+      GP<ByteStream> out=ByteStream::create(outurl,"wb");
       if (blocksize)
         {
           GP<ByteStream> gbsb=BSByteStream::create(out, blocksize);
