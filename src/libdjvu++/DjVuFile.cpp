@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.1.2.8 1999-05-03 21:55:39 eaf Exp $
+//C- $Id: DjVuFile.cpp,v 1.1.2.9 1999-05-03 22:09:13 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -94,7 +94,7 @@ DjVuFile::~DjVuFile(void)
 
    GCriticalSectionLock lock(&trigger_lock);
    
-   data_range->del_trigger(static_trigger_cb);
+   data_range->del_trigger(static_trigger_cb, this);
    
    stop_decode(1);
 }

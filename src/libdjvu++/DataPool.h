@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.h,v 1.1.2.4 1999-05-03 21:58:01 eaf Exp $
+//C- $Id: DataPool.h,v 1.1.2.5 1999-05-03 22:09:13 eaf Exp $
  
 #ifndef _DATAPOOL_H
 #define _DATAPOOL_H
@@ -31,7 +31,7 @@
 
     @memo Data storage with compatible byte streams.
     @author Andrei Erofeev
-    @version #$Id: DataPool.h,v 1.1.2.4 1999-05-03 21:58:01 eaf Exp $#
+    @version #$Id: DataPool.h,v 1.1.2.5 1999-05-03 22:09:13 eaf Exp $#
 */
 
 //@{
@@ -158,7 +158,7 @@ public:
       /** Use this function to unregister callbacks, which are no longer
 	  needed. {\bf Note!} It's important to do it when the client
 	  is about to be destroyed. */
-   void		del_trigger(void (* callback)(void *));
+   void		del_trigger(void (* callback)(void *), void * cl_data);
    
       /** Tells the #DataPool# to stop all readers waiting for data.
 	  This will unlock the threads (readers) and will throw an exceptions
@@ -239,7 +239,7 @@ public:
       // has been received. DataPool may still miss some megs.
    void			add_trigger(int thresh, void (* callback)(void *),
 				    void * cl_data);
-   void			del_trigger(void (* callback)(void *));
+   void			del_trigger(void (* callback)(void *), void * cl_data);
 private:
    GP<DataPool>	pool;
    long		start, length;
