@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: djvutopnm.cpp,v 1.31 2000-01-18 00:23:27 bcr Exp $
+//C- $Id: djvutopnm.cpp,v 1.32 2000-02-04 21:19:08 leonb Exp $
 
 
 /** @name djvutopnm
@@ -37,7 +37,6 @@
     \item[-N] This option (e.g #"-3"# or #"-19"#) specifies a subsampling
        factor #N#.  Rendering the full DjVu image would create an image whose
        dimensions are #N# times smaller than the DjVu image size.
-    \item[-subsample N] Same as above.
     \item[-scale N] This option takes advantage of the #dpi# field stored in
        the #"INFO"# chunk of the DjVu image (cf. \Ref{DjVuInfo}).  Argument
        #N# is a magnification percentage relative to the adequate resolution
@@ -60,15 +59,12 @@
        work with IW44 files because these files have no foreground layer mask.
        The output file will be a PBM file if the subsampling factor is 1.
        Otherwise the output file will be an anti-aliased PGM file.
-    \item[-layer black] Same as above.
     \item[-foreground] Renders only the foreground layer on a white
        background.  This mode works only with Compound DjVu files. The output
        file always is a PPM file.
-    \item[-layer foreground] Same as above.
     \item[-background] Renders only the background layer. This mode works only
        with Compound DjVu files and IW44 files. The output file always is a PPM
        file.
-    \item[-layer background] Same as above.
     \end{description}
 
     {\bf Other Options} --- The following two options are less commonly used:
@@ -94,7 +90,7 @@
     Yann Le Cun <yann@research.att.com>\\
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: djvutopnm.cpp,v 1.31 2000-01-18 00:23:27 bcr Exp $# */
+    #$Id: djvutopnm.cpp,v 1.32 2000-02-04 21:19:08 leonb Exp $# */
 //@{
 //@}
 
@@ -107,7 +103,7 @@
 #include "DjVuImage.h"
 #include "DjVuDocument.h"
 #include "GOS.h"
-#include "parseoptions.h"
+
 
 static double flag_scale = -1;
 static int    flag_size = -1;
@@ -222,14 +218,9 @@ convert(const char *from, const char *to, int page_num)
     {
       StdioByteStream out (to,"wb");
       if (bm->get_grays() == 2)
-      {
         bm->save_pbm(out);
-      }
       else 
-      {
-        bm->change_grays(256);
         bm->save_pgm(out);
-      }
     }
   else 
     {
@@ -246,18 +237,15 @@ usage()
           "  Copyright (c) AT&T 1999.  All rights reserved\n"
           "Usage: djvutopnm [options] [<djvufile> [<pnmfile>]]\n\n"
           "Options:\n"
-          "  -verbose           Prints various informational messages.\n"
-          "  -scale N           Selects display scale (default: 100%%).\n"
-          "  -size  WxH         Selects size of rendered image.\n"
-          "  -segment WxH+X+Y   Selects which segment of the rendered image\n"
-          "  -black             Only renders the stencil(s).\n"
-          "  -foreground        Only renders the foreground layer.\n"
-          "  -background        Only renders the background layer.\n"
-          "  -layer <layer>     Same as the above three options.\n"
-          "  -#                  Subsampling factor from full resolution.\n"
-          "  -subsample N       Same as above.\n"
-	  "  -page <page>       Decode page <page> (for multipage documents).\n"
-	  "  -profile <profile> Name of a profile to read defaults from.\n"
+          "  -v                  Prints various informational messages.\n"
+          "  -scale N            Selects display scale (default: 100%%).\n"
+          "  -size  WxH          Selects size of rendered image.\n"
+          "  -segment WxH+X+Y    Selects which segment of the rendered image\n"
+          "  -black              Only renders the stencil(s).\n"
+          "  -foreground         Only renders the foreground layer.\n"
+          "  -background         Only renders the background layer.\n"
+          "  -N                  Subsampling factor from full resolution.\n"
+	  "  -page <page>        Decode page <page> (for multipage documents).\n"
           "\n"
           "The output will be a PBM, PGM or PPM file depending of its content."
           "If <pnmfile> is a single dash or omitted, the decompressed image\n"
@@ -268,12 +256,11 @@ usage()
 
 
 void
-geometry(const char *r, GRect &rect)
+geometry(char *s, GRect &rect)
 {
   int w,h;
-  char *s;
   rect.xmin = rect.ymin = 0;
-  w = strtol(r, &s,10);
+  w = strtol(s, &s,10);
   if (w<=0 || *s++!='x') goto error;
   h = strtol(s,&s,10);
   if (h<=0 || (*s && *s!='+' && *s!='-')) goto error;
@@ -293,161 +280,101 @@ geometry(const char *r, GRect &rect)
 
 
 
-static const djvu_option long_options[] = {
-{"verbose",0,0,'v'},
-{"help",0,0,'h'},
-{"profile",0,0,'h'},
-{"scale",1,0,0},
-{"size",1,0,0},
-{"segment",1,0,0},
-{"layer",0,0,0},
-{"black",0,0,'s'},
-{"foreground",0,0,'f'},
-{"background",0,0,'b'},
-{"page",1,0,0},
-{"subsample",3,0,'1'},
-{"subsample",3,0,'2'},
-{"subsample",3,0,'3'},
-{"subsample",3,0,'4'},
-{"subsample",3,0,'5'},
-{"subsample",3,0,'6'},
-{"subsample",3,0,'7'},
-{"subsample",3,0,'8'},
-{"subsample",3,0,'9'},
-{0,0,0,0}
-};
-
 
 int
-main(int argc, char *argv[], char *[])
+main(int argc, char **argv)
 {
   TRY
     {
-      DjVuParseOptions Opts("djvutopnm");
-      int nextarg=Opts.ParseArguments(argc,argv,long_options,1)-1;
-      argc -= nextarg;
-      argv+=nextarg;
-
       // Process options
       int page_num=-1;
-      if(Opts.GetInteger("help",0))
-      {
-        Opts.perror();
-        usage();
-      }
-      const char *profile=Opts.GetValue("profile");
-      if(profile)
-      {
-        Opts.ChangeProfile(profile);
-      }
-      flag_verbose=Opts.GetInteger("verbose",0);
-      const char *segment=Opts.GetValue("segment");
-      if(segment)
-      {
-        geometry(segment, segmentrect);
-        flag_segment = 1;
-      }
-      page_num=Opts.GetInteger("page",-1);
-      if(page_num != -1)
-      {
-	if (page_num<=0) THROW("Page number must be positive.");
-	page_num--;
-      }
-      if (page_num<0) page_num=0;
-
-      // We need one and only one of the following three values.  The
-      // For that we should use the GetBest() method.  Otherwise we will
-      // run into problems if one is defined in a profile, but the other
-      // is specified on the command line.
-      int duplicates[5];
-      duplicates[0]=Opts.GetVarToken("scale");
-      duplicates[1]=Opts.GetVarToken("size");
-      duplicates[2]=Opts.GetVarToken("subsample");
-      duplicates[3]=-1;
-      switch(Opts.GetBest(duplicates))
-      {
-        case 0: // scale
+      while (argc>1 && argv[1][0]=='-' && argv[1][1])
         {
-          const char *s=Opts.GetValue(duplicates[0]);
-          char *r;
-          flag_scale = strtod(s,&r);
-          if (*r == '%') 
-            r++;
-          if (*r)
-            THROW("Illegal argument for option '-scale'");
-          break;
-        }
-        case 1: // size
-        {
-          const char *s=Opts.GetValue(duplicates[1]);
-          geometry(s, fullrect);
-          flag_size = 1;
-          if (fullrect.xmin || fullrect.ymin)
-            THROW("Illegal -size specification");
-          break;
-        }
-        case 2: // subsample
-        {
-          int i=Opts.GetInteger(duplicates[2],0);
-          if (i<0)
-          {
-            Opts.perror();
-            usage();
-          }
-          flag_subsample = i;
-          break;
-        }
-        default:  // none of them are defined.
-	  break;
-      }
-      duplicates[0]=Opts.GetVarToken("layer");
-      duplicates[1]=Opts.GetVarToken("black");
-      duplicates[2]=Opts.GetVarToken("foreground");
-      duplicates[3]=Opts.GetVarToken("background");
-      duplicates[4]=-1;
-      switch(Opts.GetBest(duplicates))
-      {
-        case 0:  // layer
-        {
-          const char *s=Opts.GetValue(duplicates[0]);
-          if(s[0])
-          {
-            if(!strcmp(s,"black"))
+          char *s = argv[1];
+          if (!strcmp(argv[1],"-v"))
             {
-              flag_mode = 's';
-            }else if(!strcmp(s,"foreground"))
-            {
-              flag_mode = 'f';
-            }else if(!strcmp(s,"background"))
-            {
-              flag_mode = 'b';
-            }else
-            {
-              THROW("Illegal -layer specification.");
+              flag_verbose = 1;
             }
-          }
-          break;
+          else if (!strcmp(s,"-scale"))
+            {
+              if (argc<=2)
+                THROW("No argument for option '-scale'");
+              if (flag_subsample>=0 || flag_scale>=0 || flag_size>=0)
+                THROW("Duplicate scaling specification");
+              argc -=1; argv +=1; s = argv[1];
+              flag_scale = strtod(s,&s);
+              if (*s == '%') 
+                s++;
+              if (*s)
+                THROW("Illegal argument for option '-scale'");
+            }
+          else if (! strcmp(s,"-size"))
+            {
+              if (argc<=2)
+                THROW("No argument for option '-size'");
+              if (flag_subsample>=0 || flag_scale>=0 || flag_size>=0)
+                THROW("Duplicate scaling specification");
+              argc -=1; argv +=1; s = argv[1];
+              geometry(s, fullrect);
+              flag_size = 1;
+              if (fullrect.xmin || fullrect.ymin)
+                THROW("Illegal size specification");
+            }
+          else if (! strcmp(s,"-segment"))
+            {
+              if (argc<=2)
+                THROW("No argument for option '-segment'");
+              if (flag_segment>=0)
+                THROW("Duplicate segment specification");
+              argc -=1; argv +=1; s = argv[1];
+              geometry(s, segmentrect);
+              flag_segment = 1;
+            }
+          else if (! strcmp(s,"-black"))
+            {
+              if (flag_mode)
+                THROW("Duplicate rendering mode specification");
+              flag_mode = 's';
+            }
+          else if (! strcmp(s,"-foreground"))
+            {
+              if (flag_mode)
+                THROW("Duplicate rendering mode specification");
+              flag_mode = 'f';
+            }
+          else if (! strcmp(s,"-background"))
+            {
+              if (flag_mode)
+                THROW("Duplicate rendering mode specification");
+              flag_mode = 'b';
+            }
+	  else if (! strcmp(s,"-page"))
+	    {
+	      if (argc<=2)
+                THROW("No argument for option '-page'");
+              if (page_num>=0)
+                THROW("Duplicate page specification");
+              argc -=1; argv +=1; s = argv[1];
+	      page_num=atoi(s);
+	      if (page_num<=0) THROW("Page number must be positive.");
+	      page_num--;
+	    }
+          else if (s[1]>='1' && s[1]<='9')
+            {
+              int arg = strtol(s+1,&s,10);
+              if (arg<0 || *s) usage();
+              if (flag_subsample>=0 || flag_scale>=0 || flag_size>=0)
+                THROW("Duplicate scaling specification");
+              flag_subsample = arg;
+            }
+          else
+            {
+              usage();
+            }
+          argc -= 1;
+          argv += 1;
         }
-        case 1: // black
-          if(Opts.GetInteger(duplicates[1],0))
-            flag_mode = 's';
-          break;
-        case 2: // foreground
-          if(Opts.GetInteger(duplicates[2],0))
-            flag_mode = 'f';
-          break;
-        case 3: // background
-          if(Opts.GetInteger(duplicates[3],0))
-            flag_mode = 'b';
-          break;
-        default: // none of these options have been specified.
-	  break;
-      }
-      if(Opts.HasError())
-      {
-        Opts.perror();
-        usage();
-      }
+      if (page_num<0) page_num=0;
       // Process remaining arguments
       if (argc == 1) 
         convert("-","-", page_num); 
