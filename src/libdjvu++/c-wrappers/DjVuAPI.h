@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuAPI.h,v 1.34 2000-01-31 17:02:20 bcr Exp $
+ *C- $Id: DjVuAPI.h,v 1.35 2000-01-31 21:30:19 bcr Exp $
  *
  * The main header file for the DjVu API
  */
@@ -17,7 +17,10 @@
 
 /* 
  * $Log: DjVuAPI.h,v $
- * Revision 1.34  2000-01-31 17:02:20  bcr
+ * Revision 1.35  2000-01-31 21:30:19  bcr
+ * Added new callbacks.
+ *
+ * Revision 1.34  2000/01/31 17:02:20  bcr
  * Converted the RawStream into a separate class.  I will be adding callbacks
  * to this class next.
  *
@@ -810,22 +813,6 @@ djvu_image_hflip(djvu_image *ximg);
  *    API libraries for memory to memory operations.
  */
 
-/* The @djvu_decode_page@ function will ignore the page range in the
- * the djvu_decode_options structure, but use the structure to define
- * all other processing variables.  The decoded image will be returned
- * instead of being output to a file.
- */
-DJVUAPI
-djvu_image *djvu_decode_page(djvu_decode_options[1],int page);
-
-/* For compressions, we need to define another type of callback to
- * accept the image from memory.  The djvu_import_sub will be passed
- * the argument "arg" specified when initializing the callback, and the
- * name of the "filename" being parsed.  You will be expected to return
- * a valid djvu_import stream for that file.
- */
-typedef djvu_import djvu_import_sub ( void *arg,  const char filename[]);
-
 /* This is a special type of djvu_import, intended for cases when you have
  * defined your own decoding, and want to map it to a stream for use with
  * one of the above functions.  The image will be passed directly and
@@ -841,6 +828,30 @@ djvu_import_image ( djvu_image * );
  */
 DJVUAPI djvu_export
 djvu_export_image ( djvu_image *[], const int size );
+
+/* For compressions, we need to define another type of callback to
+ * accept the streams from arbitrary sources.  The idea is quite
+ * simply, each time this stream runs out of pages to decode, it
+ * will make a callback, to obtain the next stream.  If the return
+ * from that callback is NULL we assume we are done.  Note, each stream
+ * will be closed when done.
+ */
+typedef djvu_import djvu_import_sub ( void *arg, int filecount );
+
+DJVUAPI djvu_import
+djvu_import_streams(djvu_import_sub *);
+
+/* For decompressions, we need to define another type of callback to
+ * accept the streams from arbitrary sources.  The idea is quite
+ * simply, after adding a single page to a stream type that does not
+ * accept multipe pages, we make this callback to get a new stream 
+ * for appending further pages to.
+ */
+typedef djvu_import djvu_export_sub ( void *arg, int filecount );
+
+DJVUAPI djvu_export
+djvu_export_streams(djvu_export_sub *);
+
 
 #ifdef __cplusplus
 }
