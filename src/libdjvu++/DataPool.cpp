@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DataPool.cpp,v 1.82 2001-06-28 19:42:58 bcr Exp $
+// $Id: DataPool.cpp,v 1.83 2001-07-23 19:59:34 bcr Exp $
 // $Name:  $
 
 
@@ -96,6 +96,7 @@ call_callback(void (* callback)(void *), void *cl_data)
       
       OpenFiles_File(const GURL &url, GP<DataPool> &pool);
       virtual ~OpenFiles_File(void);
+	  void clear_stream(void);
    };
 class DataPool::OpenFiles : public GPEnabled
 {
@@ -145,6 +146,20 @@ DataPool::OpenFiles_File::~OpenFiles_File(void)
    GCriticalSectionLock lock(&pools_lock);
    for(GPosition pos=pools_list;pos;++pos)
       pools_list[pos]->clear_stream();
+}
+
+void
+DataPool::OpenFiles_File::clear_stream(void)
+{
+   GCriticalSectionLock lock(&pools_lock);
+   for(GPosition pos=pools_list;pos;++pos)
+   {
+	 if(pools_list[pos])
+	 {
+       pools_list[pos]->clear_stream();
+	 }
+   }
+   pools_list.empty();
 }
 
 int
@@ -198,6 +213,7 @@ DataPool::OpenFiles::prune(void)
         oldest_pos=pos;
       }
     }
+	files_list[oldest_pos]->clear_stream();
     files_list.del(oldest_pos);
   }
 }
