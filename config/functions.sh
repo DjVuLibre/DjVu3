@@ -860,12 +860,9 @@ generate_main_makefile()
     # Generate Makefile header
     "${cat}" > "$TOPBUILDDIR/Makefile" <<EOF
 SHELL=/bin/sh
-TOPSRCDIR=$TOPSRCDIR
-TOPBUILDDIR=$TOPBUILDDIR
-CC=$CC $CCFLAGS
-CXX=$CXX $CXXFLAGS
-DEFS=$DEFS
-SUBDIRS=$subdirs
+TOPSRCDIR=`unescape $TOPSRCDIR`
+TOPBUILDDIR=`unescape $TOPBUILDDIR`
+SUBDIRS=`unescape $subdirs`
 EOF
 
     # Insert Makefile fragment

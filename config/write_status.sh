@@ -12,13 +12,19 @@ then
   if [ ! -d "$TOPBUILDDIR" ] ; then
     mkdirp "$TOPBUILDDIR"
   fi
-  ("${sed}" -e 's,+$,\\,g' -e 's,!!,#!,g' <<\EOF
-!!/bin/sh
+  ("${sed}" -e 's,+$,\\,g' -e 's,X!,#!,g' -e "s!xTOPBUILDDIR!$TOPBUILDDIR!g" -e "s!xTOPSRCDIR!$TOPSRCDIR!g" <<\EOF
+X!/bin/sh
 c=1;in="$1";out="$2";tmpA="$2~A";tmpB="$2~B";tmpC="$3~C"
 SRCDIR=`dirname "$1"`
 SRCDIR=`cd "$SRCDIR" 1>>/dev/null 2>>/dev/null;pwd`
 BUILDDIR=`dirname "$2"`
 BUILDDIR=`cd "$BUILDDIR" 1>>/dev/null 2>>/dev/null;pwd`
+rm -f "$BUILDDIR/SRCDIR" "$BUILDDIR/TOPDIR" "xTOPBUILDDIR/SRCDIR" "xTOPBUILDDIR/TOPDIR"
+TOPDIR=`echo "$BUILDDIR"|sed -e 's!^xTOPBUILDDIR/*!!' -e 's,^[.]//*,,g' -e 's,//*[.]$,,g' -e 's,/[.]/,/,g' -e 's,//*,/,g' -e 's,/[^/][^/]*,/..,g' -e 's,[^/][^/]*/,../,g'`
+ln -s "$SRCDIR" "$BUILDDIR/SRCDIR"
+ln -s "xTOPBUILDDIR" "$BUILDDIR/TOPDIR"
+ln -s "." "xTOPBUILDDIR/TOPDIR"
+ln -s "xTOPSRCDIR" "xTOPBUILDDIR/SRCDIR"
 while [ $c != 0 ]
 do
 sed +
@@ -29,8 +35,11 @@ sed +
   -e 's,\$,@%%@d,g' +
   -e 's,",@%%@q,g' +
   -e 's,'"'"',@%%@a,g' +
+  -e "s!@%TOPDIR%@!$TOPDIR!g" +
   -e "s!@%srcdir%@!$SRCDIR!g" +
   -e "s!@%builddir%@!$BUILDDIR!g" +
+  -e "s!@%topsrcdir%@!$TOPSRCDIR!g" +
+  -e "s!@%topbuilddir%@!$TOPBUILDDIR!g" +
 EOF
   CONFIG_VARS=`sortlist $CONFIG_VARS`
   for i in $CONFIG_VARS ; do
@@ -50,7 +59,7 @@ EOF
       ;;
     esac 
     s=`eval "$s"`
-    echo "-e 's!@%${i}%@!"${s}"!g' \\"
+    echo "-e 's!@%${i}%@!`nonl ${s}`!g' \\"
   done
 # We include the following unescape rule twice because we allow recursive
 # escapes in the variable substitutions.

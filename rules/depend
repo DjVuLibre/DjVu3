@@ -2,22 +2,22 @@
 update-depend: depend
 %%%BEGIN_REQUIRE(@%cxx_is_gcc%@)
 	if [ -r Makefile.depend++ ] ; then \
-	  if [ -r @%srcdir%@/Makefile.depend++ ] ; then \
-	    if ( @%cmp%@ Makefile.depend++ @%srcdir%@/Makefile.depend++ ) ; then \
+	  if [ -r ./SRCDIR/Makefile.depend++ ] ; then \
+	    if ( @%cmp%@ Makefile.depend++ ./SRCDIR/Makefile.depend++ ) ; then \
 	      echo No change in Makefile.depend++; \
 	    else \
-	      @%rm%@ -f @%srcdir%@/Makefile.depend++ ; @%cp%@ Makefile.depend++ @%srcdir%@/Makefile.depend++ ; \
+	      @%rm%@ -f ./SRCDIR/Makefile.depend++ ; @%cp%@ Makefile.depend++ ./SRCDIR/Makefile.depend++ ; \
 	    fi ; \
 	  fi ; \
 	fi
 %%%END_REQUIRE(@%cxx_is_gcc%@)
 %%%BEGIN_REQUIRE(@%cc_is_gcc%@)
 	if [ -r Makefile.depend ] ; then \
-	  if [ -r @%srcdir%@/Makefile.depend ] ; then \
-	    if ( @%cmp%@ Makefile.depend @%srcdir%@/Makefile.depend ) ; then \
+	  if [ -r ./SRCDIR/Makefile.depend ] ; then \
+	    if ( @%cmp%@ Makefile.depend ./SRCDIR/Makefile.depend ) ; then \
 	      echo No change in Makefile.depend ; \
 	    else \
-	      @%rm%@ -f @%srcdir%@/Makefile.depend ; @%cp%@ Makefile.depend @%srcdir%@/Makefile.depend ; \
+	      @%rm%@ -f ./SRCDIR/Makefile.depend ; @%cp%@ Makefile.depend ./SRCDIR/Makefile.depend ; \
 	    fi ; \
 	  fi ; \
 	fi
@@ -27,26 +27,26 @@ depend: $(SRC)
 %%%BEGIN_REQUIRE(@%cxx_is_gcc%@)
 	@%rm%@ -f Makefile.depend++
 	echo '### BEGIN C++ DEPENDENCIES' > Makefile.depend++
-	@for n in `(echo *.cpp;cd @%srcdir%@>>/dev/null 2>>/dev/null;echo *.cpp)|@%sort%@ -u`; do echo "@%CXX%@ -MM -I. @%CXXFLAGS%@ @%DEFS%@ $$n";(if [ -r "$$n" ] ; then @%CXX%@ -MM -I. -I@%srcdir%@ @%CXXFLAGS%@ $$n ; elif [ -r "@%srcdir%@/$$n" ] ; then @%CXX%@ -MM -I. -I@%srcdir%@ @%CXXFLAGS%@ @%DEFS%@ $(INCS) @%srcdir%@/$$n ; fi)| @%sed%@ -e 's,\([	 ]\)@%srcdir%@/,\1,g' >> Makefile.depend++;done
+	@for n in `(echo *.cpp;cd ./SRCDIR>>/dev/null 2>>/dev/null;echo *.cpp)|@%sort%@ -u`; do echo "@%CXX%@ -MM -I. @%CXXFLAGS%@ @%DEFS%@ $$n";(if [ -r "$$n" ] ; then @%CXX%@ -MM -I. -I./SRCDIR @%CXXFLAGS%@ $$n ; elif [ -r "./SRCDIR/$$n" ] ; then @%CXX%@ -MM -I. -I./SRCDIR @%CXXFLAGS%@ @%DEFS%@ $(INCS) ./SRCDIR/$$n ; fi)| @%sed%@ -e 's,\([ 	]\)SRCDIR/,\1,g' -e 's,\([ 	]\)TOPDIR/,\1@%TOPDIR%@/,g' -e 's,/SRCDIR/,/,g' -e 's,/TOPDIR/,/@%TOPDIR%@/,g' -e 's,//*,/,g' -e 's,\([ 	]\)[.]/,\1,g' -e 's,^[.]/,,g' >> Makefile.depend++;done
 	echo '### END   C++ DEPENDENCIES' >> Makefile.depend++
 	@%rm%@ -f Makefile.new
-	@%sed%@ -e '/^### BEGIN [ ]*C++ [ ]*DEPENDENCIES/,/^### END [ ]*C++ [ ]*DEPENDENCIES/d' Makefile > Makefile.new
+	@%sed%@ -n -e '/^### BEGIN [ ]*C++ [ ]*DEPENDENCIES/,/^### END [ ]*C++ [ ]*DEPENDENCIES/d' -e '/.*/p' Makefile > Makefile.new
 	@%chmod%@ ugo+w Makefile
 	@%cat%@ Makefile.new  > Makefile
 	@%rm%@ -f Makefile.new
 	@%cat%@ Makefile.depend++ >> Makefile
-	if [ `@%wc%@ -l<Makefile.depend++` != 2 ] ; then @%cat%@ Makefile.depend++ >> Makefile ; else @%rm%@ Makefile.depend++; fi
+	if [ `@%wc%@ -l<Makefile.depend++` -lt 3 ] ; then @%cat%@ Makefile.depend++ >> Makefile ; else @%rm%@ Makefile.depend++; fi
 %%%END_REQUIRE(@%cxx_is_gcc%@)
 %%%BEGIN_REQUIRE(@%cc_is_gcc%@)
 	@%rm%@ -f Makefile.depend
 	echo '### BEGIN C DEPENDENCIES' > Makefile.depend
-	@for n in `(echo *.c;cd @%srcdir%@>>/dev/null 2>>/dev/null;echo *.c)|@%sort%@ -u`; do echo "@%CC%@ -MM -I. @%CCFLAGS%@ @%DEFS%@ $$n";(if [ -r "$$n" ] ; then @%CC%@ -MM -I. -I@%srcdir%@ @%CCFLAGS%@ $$n ; elif [ -r "@%srcdir%@/$$n" ] ; then @%CC%@ -MM -I. -I@%srcdir%@ @%CCFLAGS%@ @%DEFS%@ $(INCS) @%srcdir%@/$$n ; fi)| @%sed%@ -e 's,\([	 ]\)@%srcdir%@/,\1,g' >> Makefile.depend;done
+	@for n in `(echo *.c;cd ./SRCDIR>>/dev/null 2>>/dev/null;echo *.c)|@%sort%@ -u`; do echo "@%CC%@ -MM -I. @%CCFLAGS%@ @%DEFS%@ $$n";(if [ -r "$$n" ] ; then @%CC%@ -MM -I. -I./SRCDIR @%CCFLAGS%@ $$n ; elif [ -r "./SRCDIR/$$n" ] ; then @%CC%@ -MM -I. -I./SRCDIR @%CCFLAGS%@ @%DEFS%@ $(INCS) ./SRCDIR/$$n ; fi)| @%sed%@ -e 's,\([ 	]\)SRCDIR/,\1,g' -e s,\([ 	]\)TOPDIR/,\1@%TOPDIR%@/,g' -e 's,/SRCDIR/,/,' -e 's,/TOPDIR/,/@%TOPDIR%@/,g' -e 's,//*,/,g' -e 's,\([ 	]\)[.]/,\1,g' -e 's,^[.]/,,g' >> Makefile.depend;done
 	echo '### END   C DEPENDENCIES' >> Makefile.depend
 	@%rm%@ -f Makefile.new
-	@%sed%@ -e '/^### BEGIN [ ]*C [ ]*DEPENDENCIES/,/^### END [ ]*C [ ]*DEPENDENCIES/d' Makefile > Makefile.new
+	@%sed%@ -n -e '/^### BEGIN [ ]*C [ ]*DEPENDENCIES/,/^### END [ ]*C [ ]*DEPENDENCIES/d' -e '/.*/p' Makefile > Makefile.new
 	@%chmod%@ ugo+w Makefile
 	@%cat%@ Makefile.new  > Makefile
 	@%rm%@ -f Makefile.new
-	if [ `@%wc%@ -l<Makefile.depend` != 2 ] ; then @%cat%@ Makefile.depend >> Makefile ; else @%rm%@ Makefile.depend; fi
+	if [ `@%wc%@ -l<Makefile.depend` -lt 3 ] ; then @%cat%@ Makefile.depend >> Makefile ; else @%rm%@ Makefile.depend; fi
 %%%END_REQUIRE(@%cc_is_gcc%@)
 
