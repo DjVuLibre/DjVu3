@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuPriv.h,v 1.7 2000-01-27 20:36:18 haffner Exp $
+ *C- $Id: DjVuPriv.h,v 1.8 2000-02-19 17:23:13 bcr Exp $
  */
 
 #ifndef _DJVU_PRIV_H_
@@ -56,7 +56,7 @@ struct _djvu_image_priv
     const size_t s=((img->datasize)>sz)?(sz):(img->datasize);
     if(isMalloc)
     {
-      data=(unsigned char *)::_djvu_realloc(img->start_alloc,sz);
+      data=(unsigned char *)::_djvu_realloc(olddata,sz);
     }else if(((s+s)>=sz)&&(data=new unsigned char [sz?sz:1])&&olddata)
     {
       for(size_t i=0;i<s;i++)
