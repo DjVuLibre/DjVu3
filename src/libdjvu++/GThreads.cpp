@@ -9,10 +9,10 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GThreads.cpp,v 1.32 1999-10-15 23:32:04 leonb Exp $
+//C- $Id: GThreads.cpp,v 1.33 1999-10-16 15:26:13 leonb Exp $
 
 
-// **** File "$Id: GThreads.cpp,v 1.32 1999-10-15 23:32:04 leonb Exp $"
+// **** File "$Id: GThreads.cpp,v 1.33 1999-10-16 15:26:13 leonb Exp $"
 // This file defines machine independent classes
 // for running and synchronizing threads.
 // - Author: Leon Bottou, 01/1998
@@ -269,7 +269,7 @@ GMonitor::wait(unsigned long timeout)
 #if THREADMODEL==MACTHREADS
 
 GThread::GThread(int stacksize) 
-  : thid(0)
+  : thid(kNoThreadID)
 {
 }
 
@@ -306,14 +306,12 @@ start(void *arg)
 int
 GThread::create(void (*entry)(void*), void *arg)
 {
-  if (thid)
+  if (thid != kNoThreadID)
     return -1;
   xentry = entry;
   xarg = arg;
-  int err = NewThread( kCooperativeThread, 
-                       start , this, 0,
-                       kCreateIfNeeded, 
-                       (void**)nil, &thid );
+  int err = NewThread( kCooperativeThread, start , this, 0,
+                       kCreateIfNeeded, (void**)nil, &thid );
   if( err != noErr )
     return err;
   return 0;
@@ -322,7 +320,7 @@ GThread::create(void (*entry)(void*), void *arg)
 void
 GThread::terminate()
 {
-  if (thid)
+  if (thid != kNoThreadID)
     DisposeThread( thid, NULL, false );
 }
 
@@ -336,20 +334,167 @@ GThread::yield()
 void*
 GThread::current()
 {
-  unsigned long thid;
+  unsigned long thid = kNoThreadID;
   GetCurrentThread(&thid);
   return (void*) thid;
 }
 
-// GMonitor is not implemented (highly suspicious)
-inline GMonitor::GMonitor() {}
-inline GMonitor::~GMonitor() {}
-inline void GMonitor::enter() {}
-inline void GMonitor::leave() {}
-inline void GMonitor::wait() {}
-inline void GMonitor::wait(unsigned long timeout) {}
-inline void GMonitor::signal() {}
-inline void GMonitor::broadcast() {}
+
+// Doubliy linked list of waiting threads
+static struct thr_waiting {
+  struct thr_waiting *next;     // ptr to next waiting thread record
+  struct thr_waiting *prev;     // ptr to ptr to this waiting thread
+  unsigned long thid;           // id of waiting thread
+  void *wchan;                  // cause of the wait
+};
+struct thr_waiting *first_waiting_thr = 0;
+struct thr_waiting *last_waiting_thr = 0;
+
+
+// Stops current thread. 
+// Argument ``self'' must be current thread id.
+// Assumes ``ThreadBeginCritical'' has been called before.
+static void
+macthread_wait(ThreadID self, void *wchan)
+{
+  // Prepare and link wait record
+  struct thr_waiting wait; // no need to malloc :-)
+  wait.thid = self;
+  wait.wchan = wchan;
+  wait.next = 0;
+  wait.prev = last_waiting_thr;
+  *(wait.prev ? &wait.prev->next : &first_waiting_thr ) = &wait;
+  *(wait.next ? &wait.next->prev : &last_waiting_thr ) = &wait;
+  // Leave critical section and start waiting.
+  SetThreadStateEndCritical(self, kStoppedThreadState, kNoThreadID);
+  // The Apple documentation says that the above call reschedules a new
+  // thread.  Therefore it will only return when the thread wakes up.
+  ThreadBeginCritical();
+  // Unlink wait record
+  *(wait.prev ? &wait.prev->next : &first_waiting_thr ) = wait.next;
+  *(wait.next ? &wait.next->prev : &last_waiting_thr ) = wait.prev;
+  // Returns from the wait.
+}
+
+// Wakeup one thread or all threads waiting on cause wchan
+static void
+macthread_wakeup(void *wchan, int onlyone)
+{
+  for (struct thr_waiting *q=first_waiting_thr; q; q=q->next)
+    if (q->wchan == wchan) {
+      // Found a waiting thread
+      q->wchan = 0;
+      SetThreadState(q->thid, kReadyThreadState, kNoThreadID);
+      if (onlyone)
+        return;
+    }
+}
+
+// GMonitor implementation
+GMonitor::GMonitor() 
+  : count(1), locker(0)
+{
+  locker = kNoThreadID;
+  ok = 1;
+}
+
+GMonitor::~GMonitor() 
+{
+  ok = 0;
+  ThreadBeginCritical();
+  macthread_wakeup((void*)this, 0);
+  macthread_wakeup((void*)count, 0);
+  ThreadEndCritical();
+  YieldToAnyThread();
+}
+
+void 
+GMonitor::enter() 
+{
+  ThreadID self;
+  GetCurrentThread(&self);
+  ThreadBeginCritical();
+  if (count>0 || self!=locker)
+    {
+      while (ok && count<=0)
+        macthread_wait(self, (void*)&count);
+      count = 1;
+      locker = self;
+    }
+  count -= 1;
+  ThreadEndCritical();
+}
+
+void 
+GMonitor::leave() 
+{
+  ThreadID self;
+  GetCurrentThread(&self);
+  if (ok && (count>0 || self!=locker))
+    THROW("Monitor was not acquired by this thread (GMonitor::leave)");
+  ThreadBeginCritical();
+  if (++count > 0)
+    macthread_wakeup((void*)&count, 1);
+  ThreadEndCritical();
+}
+
+void 
+GMonitor::signal() 
+{
+  ThreadID self;
+  GetCurrentThread(&self);
+  if (count>0 || self!=locker)
+    THROW("Monitor was not acquired by this thread (GMonitor::signal)");
+  ThreadBeginCritical();
+  macthread_wakeup((void*)this, 1);
+  ThreadEndCritical();
+}
+
+void 
+GMonitor::broadcast() 
+{
+  ThreadID self;
+  GetCurrentThread(&self);
+  if (count>0 || self!=locker)
+    THROW("Monitor was not acquired by this thread (GMonitor::broadcast)");
+  ThreadBeginCritical();
+  macthread_wakeup((void*)this, 0);
+  ThreadEndCritical();
+}
+
+void 
+GMonitor::wait() 
+{
+  // Check state
+  ThreadID self;
+  GetCurrentThread(&self);
+  if (count>0 || locker!=self)
+    THROW("Monitor was not acquired by this thread (GMonitor::wait)");
+  // Wait
+  if (ok)
+    {
+      // Atomically release monitor and wait
+      ThreadBeginCritical();
+      int sav_count = count;
+      count = 1;
+      macthread_wakeup((void*)count, 1);
+      macthread_wait(self, (void*)this);
+      // Re-acquire
+      while (ok && count<=0)
+        macthread_wait(self, (void*)&count);
+      count = sav_count;
+      locker = self;
+      ThreadEndCritical();
+    }
+}
+
+void 
+GMonitor::wait(unsigned long timeout) 
+{
+  // Timeouts are not used for anything important.
+  // Just ignore the timeout and wait the regular way.
+  wait();
+}
 
 #endif
 

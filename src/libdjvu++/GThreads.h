@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GThreads.h,v 1.24 1999-09-19 19:26:17 eaf Exp $
+//C- $Id: GThreads.h,v 1.25 1999-10-16 15:26:13 leonb Exp $
 
 #ifndef _GTHREADS_H_
 #define _GTHREADS_H_
@@ -73,7 +73,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Praveen Guduru <praveen@sanskrit.lz.att.com> -- mac implementation.
     @version
-    #$Id: GThreads.h,v 1.24 1999-09-19 19:26:17 eaf Exp $# */
+    #$Id: GThreads.h,v 1.25 1999-10-16 15:26:13 leonb Exp $# */
 //@{
 
 #include "DjVuGlobal.h"
@@ -341,6 +341,10 @@ private:
   DWORD locker;
   CRITICAL_SECTION cs;
   HANDLE hev[2];
+#elif THREADMODEL==MACTHREADS
+  int ok;
+  int count;
+  unsigned long locker;
 #elif THREADMODEL==POSIXTHREADS
   int ok;
   int count;
