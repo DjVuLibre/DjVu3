@@ -8,7 +8,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C- "$Id: DjVuPhotoAPI.h,v 1.1 2000-01-19 14:24:09 bcr Exp $"
+//C- "$Id: DjVuPhotoAPI.h,v 1.2 2000-01-20 05:00:00 bcr Exp $"
 //C- -- Photo To DjVu
 //C- Author: Parag Deshmukh (Dec 99), Andrei Erofeev (Jan 2000), Bill C Riemers (Jan 2000)
 #endif  /* __cplusplus */
@@ -73,29 +73,24 @@ struct phototodjvu_options_struct
 /** This keeps a string delimited by hypens(-) and commas(,) */
   const char *page_range;
 
-/** These are tuning parameters which affect the compression
-  and the quality of the output image */
-  int tolerance_percent, tolerance4_size;
-
 /** These decides which predefined set of options to use. They are
-  boolean values either 0 or 1. Quality  value is greatest in 
-  lossless. (lossless > normal > conservative > aggressive).
-  pseudo wil create the djvu output with data stored in G4 format,
-  that is same as input. */
+  enum values, defined above. */
   phototodjvu_type compression;
-
-/** Halftone detection is used for dithered images. */
-  int halftone_off;
 
 /** pages_per_dict allows n number of pages to be matched together.
   This value should never be too high or too low. Best value  can
   be between 10 to 20*/
-  int pages_per_dict;
+  int crcbdelay;
 
-/** They allow transformations to be done on the given input images. 
-  vflip is verticle flip, hflip is horizontal flip, invert gives the
-  negative of the image and rotateAngle will rotate image clockwise */
-  int vflip, hflip, invert, rotateAngle;
+/** Boolian values specified whether a vflip, hflip, or invert should
+  be done.  vflip means to flip on the vertical axis, hflip the horizontal
+  axis, and invert means to reverse black and white. */
+  int vflip, hflip, invert;
+
+/** Specify the angle the input image should be rotated.  This may be any
+    multiple of 90 degrees.  Rotation is clockwise and takes place after
+    any vflip or hflip commands. */
+  int rotateAngle;
 
 /** logfile should be non-NULL to print verbose processing details */
   int logfileno;
