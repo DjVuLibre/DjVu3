@@ -9,24 +9,24 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: cpalette.cpp,v 1.4 2000-02-17 21:23:26 leonb Exp $
+//C- $Id: cpalette.cpp,v 1.5 2000-02-17 21:54:52 leonb Exp $
 
 
-/** @name cpalette
+/** @name cpaldjvu
 
     {\bf Synopsis}
     \begin{verbatim}
-        cpalette [options] <inputppmfile> <outputdjvufile>
+        cpaldjvu [options] <inputppmfile> <outputdjvufile>
     \end{verbatim}
 
     {\bf Description}
     
-    File #"cpalette.cpp"# demonstrates a simple quasi-lossless compressor for
+    File #"cpaldjvu.cpp"# demonstrates a simple quasi-lossless compressor for
     low resolution, low color, images with a reduced number of colors (e.g
     screendumps).  It simply quantizes the image on a limited number of
     colors, uses the dominant color to construct a uniform background, then
-    performs lossless jb2 compression for all remaining objects.
-
+    performs lossless jb2 compression for all remaining objects.  
+    
     Options
     \begin{description}
     \item[-colors n]  Maximum number of colors during quantization (default 256)
@@ -34,12 +34,19 @@
     \item[-verbose]   Displays additional messages.
     \end{description}
 
+    {\bf Remarks}
+
+    This is a very good alternative to GIF which performs quite well on
+    screendumps.  Compression ratios can get hurt when there are continuous
+    tone segment in the image.  Demoting such segments from foreground to background
+    is a pretty interesting project.  Dithered segments behave surprisingly well. 
+
     @memo
     Simple lossless encoder for low resolution, low color images.
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: cpalette.cpp,v 1.4 2000-02-17 21:23:26 leonb Exp $# */
+    #$Id: cpalette.cpp,v 1.5 2000-02-17 21:54:52 leonb Exp $# */
 //@{
 //@}
 
@@ -530,8 +537,18 @@ CCImage::get_bitmap_for_cc(const int ccid) const
 
 
 // --------------------------------------------------
-// LOSSLESS PATTERN MATCHING
+// DEMOTION OF FOREGROUND CCS TO BACKGROUND STATUS
 // --------------------------------------------------
+
+
+// ISSUE: DEMOTION OF CCS
+// There are a lot of color ccs that actually belong to the background.
+// Such components could be better encoded in the background layer.
+// See USE_HIRES_BACKGROUND and USE_PROGRESSIVE_BACKGROUND below.
+// A way to achieve this could be to consider each cc and evaluate the costs
+// of coding it in the foreground (does it match other ccs, does it comes with
+// a complex geometry) versus the cost of coding it in the background (does
+// its color blend smoothly with the surrounding parts of the image).
 
 
 
@@ -653,7 +670,7 @@ tune_jb2image(JB2Image *jimg, int refine_threshold=21)
 
 
 // -- Options for low color compression
-struct cpaletteopts
+struct cpaldjvuopts
 {
   int ncolors;
   int dpi;
@@ -663,7 +680,7 @@ struct cpaletteopts
 
 // -- Compresses low color pixmap.
 void 
-cpalette(GPixmap &input, const char *fileout, const cpaletteopts &opts)
+cpaldjvu(GPixmap &input, const char *fileout, const cpaldjvuopts &opts)
 {
   int w = input.columns();
   int h = input.rows();
@@ -731,9 +748,16 @@ cpalette(GPixmap &input, const char *fileout, const cpaletteopts &opts)
   tune_jb2image(&jimg);
   // Create background image
   IWPixmap iwimage;
+#ifdef USE_HIRES_BACKGROUND
+  // -- we may create a hires background using masking ...
+  GP<GBitmap> mask = jimg.get_bitmap();
+  iwimage.init(&input, mask);
+  // -- but who cares when the background is uniform.
+#else
   GPixmap bgimage((h+11)/12, (w+11)/12, &bgcolor);
   iwimage.init(&bgimage, 0);
-  // Code
+#endif
+  // Assemble DJVU file
   StdioByteStream obs(fileout, "wb");
   IFFByteStream iff(obs);
   // -- main composite chunk
@@ -746,12 +770,6 @@ cpalette(GPixmap &input, const char *fileout, const cpaletteopts &opts)
   info.dpi = opts.dpi;
   info.encode(iff);
   iff.close_chunk();
-  // -- ``BG44'' chunk
-  iff.put_chunk("BG44");
-  IWEncoderParms iwparms;
-  iwparms.slices = 100;
-  iwimage.encode_chunk(iff, iwparms);
-  iff.close_chunk();
   // -- ``Sjbz'' chunk
   iff.put_chunk("Sjbz");
   jimg.encode(iff);
@@ -759,6 +777,24 @@ cpalette(GPixmap &input, const char *fileout, const cpaletteopts &opts)
   // -- ``FGbz'' chunk
   iff.put_chunk("FGbz");
   pal.encode(iff);
+  iff.close_chunk();
+  // -- ``BG44'' chunk
+  IWEncoderParms iwparms;
+#ifdef USE_PROGRESSIVE_BACKGROUND
+  // ----- we may use several chunks to enable progressive rendering ...
+  iff.put_chunk("BG44");
+  iwparms.slices = 74;
+  iwimage.encode_chunk(iff, iwparms);
+  iff.close_chunk();
+  iff.put_chunk("BG44");
+  iwparms.slices = 87;
+  iwimage.encode_chunk(iff, iwparms);
+  iff.close_chunk();
+  // ----- but who cares when the background is uniform!
+#endif
+  iff.put_chunk("BG44");
+  iwparms.slices = 97;
+  iwimage.encode_chunk(iff, iwparms);
   iff.close_chunk();
   // -- terminate main composite chunk
   iff.close_chunk();
@@ -775,7 +811,7 @@ cpalette(GPixmap &input, const char *fileout, const cpaletteopts &opts)
 void
 usage()
 {
-  fprintf(stderr,"Usage: cpalette [options] <inputppmfile> <outputdjvufile>\n"
+  fprintf(stderr,"Usage: cpaldjvu [options] <inputppmfile> <outputdjvufile>\n"
           "Options are:\n"
           "   -colors n    Maximum number of colors during quantization (default 256).\n"
           "   -dpi n       Resolution written into the output file (default 100).\n"
@@ -792,7 +828,7 @@ main(int argc, const char **argv)
       GString inputppmfile;
       GString outputdjvufile;
       // Defaults
-      cpaletteopts opts;
+      cpaldjvuopts opts;
       opts.dpi = 100;
       opts.ncolors = 256;
       opts.verbose = false;
@@ -830,7 +866,7 @@ main(int argc, const char **argv)
       // Load and run
       StdioByteStream ibs(inputppmfile,"rb");
       GPixmap input(ibs);
-      cpalette(input, outputdjvufile, opts);
+      cpaldjvu(input, outputdjvufile, opts);
     }
   CATCH(ex)
     {
