@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: csepdjvu.cpp,v 1.26 2001-05-31 23:28:47 lvincent Exp $
+// $Id: csepdjvu.cpp,v 1.27 2001-06-01 00:07:17 lvincent Exp $
 // $Name:  $
 
 
@@ -108,7 +108,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: csepdjvu.cpp,v 1.26 2001-05-31 23:28:47 lvincent Exp $# */
+    #$Id: csepdjvu.cpp,v 1.27 2001-06-01 00:07:17 lvincent Exp $# */
 //@{
 //@}
 
@@ -161,7 +161,7 @@ public:
   size_t write(const void *buffer, size_t size);
   virtual long tell(void) const;
   int eof(void);
-  int unget(char c);
+  int unget(int c);
   inline int get(void);
 };
 
@@ -221,10 +221,10 @@ BufferByteStream::get(void) // aka. getc()
 }
 
 int  
-BufferByteStream::unget(char c) // aka. ungetc()
+BufferByteStream::unget(int c) // aka. ungetc()
 {
   if (bufpos > 0) 
-    return buffer[--bufpos] = c;
+    return buffer[--bufpos] = (unsigned char)c;
   return EOF;
 }
   
@@ -375,7 +375,7 @@ CRLEImage::CRLEImage(BufferByteStream &bs)
   if (width<1 || height<1)
     G_THROW("csepdjvu: corrupted input file (bad image size)");
   // An array for the runs and the buffered data
-  GTArray<short> ax(3*width);
+  GTArray<short> ax(3*width+3);
   // File format switch
   if (magic == 0x5234) // Black&White RLE data
     {
@@ -400,8 +400,6 @@ CRLEImage::CRLEImage(BufferByteStream &bs)
             x = (bs.get()) + ((x - 0xc0) << 8);
           if (c+x > width)
             G_THROW("csepdjvu: corrupted input file (lost RLE synchronization)");
-          else if (c+x < width)
-            G_THROW("csepdjvu: corrupted input file (premature EOF)");
           if (p)
             {
               px[0] = c;
