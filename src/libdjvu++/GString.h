@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.h,v 1.34 2001-04-09 17:42:13 chrisp Exp $
+// $Id: GString.h,v 1.35 2001-04-09 18:24:02 chrisp Exp $
 // $Name:  $
 
 #ifndef _GSTRING_H_
@@ -57,7 +57,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.34 2001-04-09 17:42:13 chrisp Exp $# */
+    #$Id: GString.h,v 1.35 2001-04-09 18:24:02 chrisp Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -68,7 +68,7 @@
 #include "GContainer.h"
 
 //include <string.h>
-//include <stdlib.h>
+#include <stdlib.h>
 #include <stdarg.h>
 #ifdef WIN32
 #include <windows.h>
