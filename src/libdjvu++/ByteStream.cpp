@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.cpp,v 1.62 2001-04-05 19:57:56 chrisp Exp $
+// $Id: ByteStream.cpp,v 1.63 2001-04-06 00:11:23 bcr Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 04/1997
@@ -959,7 +959,6 @@ ByteStream::create(const GURL &url,char const * const mode)
 {
   GP<ByteStream> retval;
 #ifdef UNIX
-//  if(!mode || !strcmp(mode,"rb"))
   if (!mode || (GString("rb") == mode))
   {
     const int fd=urlopen(url,O_RDONLY,0777);
@@ -1036,7 +1035,7 @@ ByteStream::create(const int fd,char const * const mode,const bool closeme)
           break;
         }
       case 1:
-        if(!closeme && !mode)
+        if(!closeme && (!mode || GString(mode) == "a"))
         {
           f=stdout;
           default_mode="wb";
@@ -1044,9 +1043,9 @@ ByteStream::create(const int fd,char const * const mode,const bool closeme)
           break;
         }
       case 2:
-        if(!closeme && !mode)
+        if(!closeme && (!mode || GString(mode) == "a"))
         {
-          default_mode="wb";
+          default_mode="a";
           f=stderr;
           fd2=(-1);
           break;
@@ -1090,7 +1089,6 @@ ByteStream::create(FILE * const f,char const * const mode,const bool closeme)
 {
   GP<ByteStream> retval;
 #ifdef UNIX
-//  if(!mode || !strcmp(mode,"rb"))
   if (!mode || (GString("rb") == mode))
   {
     MemoryMapByteStream *rb=new MemoryMapByteStream();

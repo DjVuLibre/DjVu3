@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GContainer.h,v 1.44 2001-03-13 01:34:50 bcr Exp $
+// $Id: GContainer.h,v 1.45 2001-04-06 00:11:23 bcr Exp $
 // $Name:  $
 
 #ifndef _GCONTAINER_H_
@@ -92,7 +92,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@geocities.com> -- bug fixes.
     @version 
-    #$Id: GContainer.h,v 1.44 2001-03-13 01:34:50 bcr Exp $# */
+    #$Id: GContainer.h,v 1.45 2001-04-06 00:11:23 bcr Exp $# */
 //@{
 
 
@@ -637,13 +637,13 @@ public:
     void print_list(GList<GString> a)
     {
       for (GPosition i = a ; i; ++i) 
-        printf("%s\n", (const char*) a[i] );
+        DjVuPrintMessage("%s\n", (const char*) a[i] );
     }
 
     void print_list_backwards(GList<GString> a)
     {
       for (GPosition i = a.lastpos() ; i; --i) 
-        printf("%s\n", (const char*) a[i] );
+        DjVuPrintMessage("%s\n", (const char*) a[i] );
     }
     \end{verbatim}
     GPosition objects should only be used with the list or map for which they

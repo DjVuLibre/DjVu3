@@ -29,7 +29,7 @@ main()
     {
       int a = 2;
       int b = 2+a;
-      DjVuPrint("a=%d, b=%d, c=%d\n",a,b,a+b);
+      DjVuPrintMessage("a=%d, b=%d, c=%d\n",a,b,a+b);
     } 
   G_CATCH(ex) 
     {
@@ -42,7 +42,7 @@ main()
     {
       int a = 2;
       int b = 2+a;
-      DjVuPrint("a=%d, b=%d, c=%d\n",a,b,a+b);
+      DjVuPrintMessage("a=%d, b=%d, c=%d\n",a,b,a+b);
       G_THROW("TextException.test");
     }
   G_CATCH(ex)
@@ -54,9 +54,9 @@ main()
   G_TRY
     {
       GString gs = "abcdef";
-      DjVuPrint("gs[0]=%c\n",gs[0]);
-      DjVuPrint("gs[-1]=%c\n",gs[-1]);
-      DjVuPrint("gs[-12]=%c\n",gs[-12]);
+      DjVuPrintMessage("gs[0]=%c\n",gs[0]);
+      DjVuPrintMessage("gs[-1]=%c\n",gs[-1]);
+      DjVuPrintMessage("gs[-12]=%c\n",gs[-12]);
     }
   G_CATCH(ex)
     {
@@ -70,21 +70,21 @@ main()
       G_TRY
         {
           GString gs = "abcdef";
-          DjVuPrint("gs[0]=%c\n",gs[0]);
-          DjVuPrint("gs[-1]=%c\n",gs[-1]);
-          DjVuPrint("gs[-12]=%c\n",gs[-12]);
+          DjVuPrintMessage("gs[0]=%c\n",gs[0]);
+          DjVuPrintMessage("gs[-1]=%c\n",gs[-1]);
+          DjVuPrintMessage("gs[-12]=%c\n",gs[-12]);
         }
       G_CATCH(ex)
         {
           DjVuPrintError("*** %s\n", DjVuMsg.LookUp( ex.get_cause() ));
-          DjVuPrint("Rethrown\n");
+          DjVuPrintMessage("Rethrown\n");
           G_RETHROW;
         }
       G_ENDCATCH;
     }
   G_CATCH(ex)
     {
-      DjVuPrint("Recatched\n");
+      DjVuPrintMessage("Recatched\n");
       DjVuPrintError("*** %s\n", DjVuMsg.LookUp( ex.get_cause() ));
     }
   G_ENDCATCH;

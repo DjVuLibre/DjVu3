@@ -26,18 +26,18 @@ public:
 Test::Test()
 {
   id = genid++;
-  DjVuPrint("creating test-%c\n", id);
+  DjVuPrintMessage("creating test-%c\n", id);
 }
 
 Test::~Test()
 {
-  DjVuPrint("deleting test-%c\n", id);
+  DjVuPrintMessage("deleting test-%c\n", id);
 }
 
 void
 Test::show(char *s)
 {
-  DjVuPrint("%s contains test-%c with counter %d\n", 
+  DjVuPrintMessage("%s contains test-%c with counter %d\n", 
          s, id, count);
 }
 

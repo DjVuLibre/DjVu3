@@ -118,11 +118,11 @@ main()
    fullmsg+=msg;
 //GString GOS::encode_reserved(const char * filename)
 //   url = GOS::encode_reserved (valid_dir);
-//   sprintf (msg,"encode_reserved directory, %s, gsname = %s.  Verify url.\n",valid_dir,(const char *)url);
+//   msg.format("encode_reserved directory, %s, gsname = %s.  Verify url.\n",valid_dir,(const char *)url);
 //   strcat(fullmsg, msg);
 //GString GOS::decode_reserved(const char * url)
 //   gsname = GOS::decode_reserved (url);
-//   sprintf (msg,"decode_reserved directory, %s, gsname = %s.  Verify gsname.\n",(const char *)url,(const char*)gsname);
+//   msg.format("decode_reserved directory, %s, gsname = %s.  Verify gsname.\n",(const char *)url,(const char*)gsname);
 //   strcat(fullmsg, msg);
 
    if ( GURL::Filename::UTF8(valid_file).deletefile())
@@ -147,7 +147,7 @@ main()
 //MBCS end
 
 #ifndef UNDER_CE
-  DjVuPrint("%s",fullmsg);
+  DjVuPrintMessage("%s",fullmsg);
 #endif
   out->writestring(fullmsg);
   return 0;

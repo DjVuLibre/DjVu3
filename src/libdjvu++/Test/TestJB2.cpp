@@ -19,9 +19,9 @@
 int 
 usage()
 {
-  DjVuPrint("Usage: TestJB2 <jb2file> [<pbm-or-rle-or-q-file>]\n");
+  DjVuPrintMessage("Usage: TestJB2 <jb2file> [<pbm-or-rle-or-q-file>]\n");
 #ifdef ENCODE
-  DjVuPrint("   or: TestJB2 -e <pbm-or-rle-file> <jb2file>\n");
+  DjVuPrintMessage("   or: TestJB2 -e <pbm-or-rle-file> <jb2file>\n");
 #endif
   exit(0);
 }
@@ -47,8 +47,8 @@ main(int argc, char **argv)
           rimg.add_bitmap_runs(bm);
           bm.GBitmap::~GBitmap();
           // Perform CC analysis
-          DjVuPrint("%d ccs\n", rimg.make_ccs_by_analysis());
-          DjVuPrint("%d merged ccs\n", rimg.merge_overlapping_ccs(85));
+          DjVuPrintMessage("%d ccs\n", rimg.make_ccs_by_analysis());
+          DjVuPrintMessage("%d merged ccs\n", rimg.merge_overlapping_ccs(85));
           // Extract JB2 Image
           GP<JB2Image> jimg = rimg.get_jb2image();
           jimg->set_dimension(bm.columns(), bm.rows());

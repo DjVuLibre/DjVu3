@@ -15,37 +15,37 @@
 #ifdef THOROUGH
 void * operator new(size_t sz) {
   void *x = malloc(sz);
-  DjVuPrint("new %d = %x\n", sz, x);
+  DjVuPrintMessage("new %d = %x\n", sz, x);
   return x;
 }
 void operator delete(void *x) {
-  DjVuPrint("delete %x\n", x);
+  DjVuPrintMessage("delete %x\n", x);
   free(x);
 }
 #endif
 
 
-#define PRS(expr)  DjVuPrint("%s :=\"%s\"\n", #expr, (const char*)(expr))
-#define PRI(expr)  DjVuPrint("%s :=%d\n", #expr, (int)(expr))
-#define PRC(expr)  DjVuPrint("%s :=%d '%c'\n", #expr, (char)(expr), (char)(expr))
+#define PRS(expr)  DjVuPrintMessage("%s :=\"%s\"\n", #expr, (const char*)(expr))
+#define PRI(expr)  DjVuPrintMessage("%s :=%d\n", #expr, (int)(expr))
+#define PRC(expr)  DjVuPrintMessage("%s :=%d '%c'\n", #expr, (char)(expr), (char)(expr))
 
 void
 PMAPSI(const GMap<GString,int> &map)
 {
   GString gs;
-  DjVuPrint("( ");
+  DjVuPrintMessage("( ");
   for (GPosition pos=map.firstpos(); pos; ++pos)
-    DjVuPrint("%s:%d ", (const char*)map.key(pos), map[pos]);
-  DjVuPrint(")\n");
+    DjVuPrintMessage("%s:%d ", (const char*)map.key(pos), map[pos]);
+  DjVuPrintMessage(")\n");
 }
 
 void
 PMAPIS(const GMap<int,GString> &map)
 {
-  DjVuPrint("( ");
+  DjVuPrintMessage("( ");
   for (GPosition pos=map.firstpos(); pos; ++pos)
-    DjVuPrint("%d:%s ", map.key(pos), (const char*)map[pos]);
-  DjVuPrint(")\n");
+    DjVuPrintMessage("%d:%s ", map.key(pos), (const char*)map[pos]);
+  DjVuPrintMessage(")\n");
 }
 
 int

@@ -15,36 +15,36 @@
 #ifdef THOROUGH
 void * operator new(size_t sz) {
   void *x = malloc(sz);
-  DjVuPrint("new %d = %x\n", sz, x);
+  DjVuPrintMessage("new %d = %x\n", sz, x);
   return x;
 }
 void operator delete(void *x) {
-  DjVuPrint("delete %x\n", x);
+  DjVuPrintMessage("delete %x\n", x);
   free(x);
 }
 #endif
 
 
-#define PRS(expr)  DjVuPrint("%s :=\"%s\"\n", #expr, (const char*)(expr))
-#define PRI(expr)  DjVuPrint("%s :=%d\n", #expr, (int)(expr))
-#define PRC(expr)  DjVuPrint("%s :=%d '%c'\n", #expr, (char)(expr), (char)(expr))
+#define PRS(expr)  DjVuPrintMessage("%s :=\"%s\"\n", #expr, (const char*)(expr))
+#define PRI(expr)  DjVuPrintMessage("%s :=%d\n", #expr, (int)(expr))
+#define PRC(expr)  DjVuPrintMessage("%s :=%d '%c'\n", #expr, (char)(expr), (char)(expr))
 
 void
 PCONTI(GList<int> &ga)
 {
-  DjVuPrint("( ");
+  DjVuPrintMessage("( ");
   for (GPosition pos=ga; pos; ++pos)
-    DjVuPrint("%d ", ga[pos]);
-  DjVuPrint(")\n");
+    DjVuPrintMessage("%d ", ga[pos]);
+  DjVuPrintMessage(")\n");
 }
 
 void
 PCONTS(GList<GString> &ga)
 {
-  DjVuPrint("( ");
+  DjVuPrintMessage("( ");
   for (GPosition pos=ga; pos; ++pos)
-    DjVuPrint("\"%s\" ", (const char*)(ga[pos]));
-  DjVuPrint(")\n");
+    DjVuPrintMessage("\"%s\" ", (const char*)(ga[pos]));
+  DjVuPrintMessage(")\n");
 }
 
 
@@ -104,9 +104,9 @@ main()
   pos = gl1.firstpos();
   n = gl1.search("two",pos);
   PRI(n);
-  DjVuPrint("( ");
+  DjVuPrintMessage("( ");
   for (pos=gl2.lastpos(); pos; --pos)
-    DjVuPrint("'%s' ", (const char*)gl2[pos]);
-  DjVuPrint(")\n");
+    DjVuPrintMessage("'%s' ", (const char*)gl2[pos]);
+  DjVuPrintMessage(")\n");
   return 0;
 }

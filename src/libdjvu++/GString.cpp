@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.43 2001-04-04 22:12:11 bcr Exp $
+// $Id: GString.cpp,v 1.44 2001-04-06 00:11:23 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -383,7 +383,7 @@ GString::fromEscaped( const GMap<GString,GString> ConvMap ) const
 GString
 GString::fromEscaped(void) const
 {
-  static const GMap<GString,GString> nill;
+  const GMap<GString,GString> nill;
   return fromEscaped(nill);
 }
 
