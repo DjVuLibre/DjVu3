@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.47 1999-09-22 18:12:13 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.48 1999-09-22 19:36:15 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -860,16 +860,16 @@ DjVuDocument::request_data(const DjVuPort * source, const GURL & url)
    return data_pool;
 }
 
-static TArray<char>
-unlink_file(const TArray<char> & data, const char * name)
+static GP<DataPool>
+unlink_file(const GP<DataPool> & data, const char * name)
       // Will process contents of data[] and remove any INCL chunk
       // containing 'name'
 {
    MemoryByteStream str_out;
    IFFByteStream iff_out(str_out);
 
-   MemoryByteStream str_in(data, data.size());
-   IFFByteStream iff_in(str_in);
+   GP<ByteStream> str_in=data->get_stream();
+   IFFByteStream iff_in(*str_in);
 
    int chksize;
    GString chkid;
@@ -914,7 +914,8 @@ unlink_file(const TArray<char> & data, const char * name)
    }
    iff_out.close_chunk();
    iff_out.flush();
-   return str_out.get_data();
+   str_out.seek(0, SEEK_SET);
+   return new DataPool(str_out);
 }
 
 static void
@@ -937,7 +938,7 @@ add_file_to_djvm(const GP<DjVuFile> & file, bool page,
 	    // anything else.
 	 GPosition pos;
 	 GPList<DjVuFile> files_list=file->get_included_files(false);
-	 TArray<char> data=file->get_djvu_data(false, true);
+	 GP<DataPool> data=file->get_djvu_data(false, true);
 	 for(pos=files_list;pos;++pos)
 	 {
 	    GP<DjVuFile> f=files_list[pos];
