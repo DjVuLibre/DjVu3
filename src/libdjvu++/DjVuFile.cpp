@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.53 1999-09-16 21:50:11 eaf Exp $
+//C- $Id: DjVuFile.cpp,v 1.54 1999-09-16 23:21:33 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -149,6 +149,10 @@ DjVuFile::~DjVuFile(void)
 {
    DEBUG_MSG("DjVuFile::~DjVuFile(): destroying...\n");
    DEBUG_MAKE_INDENT(3);
+
+      // No more messages. They may result in adding this file to a cache
+      // which will be very-very bad as we're being destroyed
+   get_portcaster()->del_port(this);
    
    if (data_pool) data_pool->del_trigger(static_trigger_cb, this);
    stop();
@@ -328,10 +332,9 @@ DjVuFile::static_decode_func(void * cl_data)
    DjVuFile * th=(DjVuFile *) cl_data;
    TRY {
       th->decode_func();
+	 // Don't do ANYTHING below this line.
    } CATCH(exc) {
    } ENDCATCH;
-
-   TRY { th->decode_thread_flags=th->decode_thread_flags | FINISHED; } CATCH(exc) {} ENDCATCH;
 }
 
 void

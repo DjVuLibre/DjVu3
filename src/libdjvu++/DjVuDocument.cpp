@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.41 1999-09-16 21:50:10 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.42 1999-09-16 23:21:33 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -60,6 +60,9 @@ DjVuDocument::init(const GURL & url, GP<DjVuPort> xport,
 
 DjVuDocument::~DjVuDocument(void)
 {
+      // No more messages, please. We're being destroyed.
+   get_portcaster()->del_port(this);
+   
       // Before we proceed with destroy we must stop the initializing
       // thread (involves stopping the init_data_pool, the file
       // used to decode NDIR chunks (if any) and all unnamed files)
@@ -101,7 +104,7 @@ DjVuDocument::static_init_thread(void * cl_data)
 	 get_portcaster()->notify_error(th, exc.get_cause());
       } CATCH(exc) {} ENDCATCH;
    } ENDCATCH;
-   TRY { th->init_thread_flags=th->init_thread_flags | FINISHED; } CATCH(exc) {} ENDCATCH;
+      // Do not do ANYTHING below this line
 }
 
 void
