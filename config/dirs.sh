@@ -31,7 +31,7 @@
 #C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #
-# $Id: dirs.sh,v 1.13 2001-06-09 01:50:16 bcr Exp $
+# $Id: dirs.sh,v 1.14 2001-06-22 22:58:27 mchen Exp $
 # $Name:  $
 
 # This script sets the variables:
@@ -60,7 +60,7 @@ if [ -z "$CONFIG_CACHE" ] ; then
   CONFIG_CACHE="$TOPBUILDDIR"/config.cache
   CONFIG_H_CACHE="$TOPBUILDDIR"/config.h.cache
   CONFIG_H="$TOPBUILDDIR"/src/include/config.h
-  DEFS="-imacros $CONFIG_H"
+  DEFS="-imacros ./TOPDIR/src/include/config.h"
   CONFIG_STATUS="$TOPBUILDDIR"/config.status
   CONFIG_LOG="$TOPBUILDDIR"/config.log
   if [ ! -d "$TOPBUILDDIR/src/include" ] ; then
