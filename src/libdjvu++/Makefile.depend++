@@ -121,7 +121,7 @@ DjVuInfo.o: DjVuInfo.cpp DjVuInfo.h GString.h \
  ByteStream.h GContainer.h Arrays.h
 DjVuMessage.o: DjVuMessage.cpp DjVuMessage.h \
  GString.h DjVuGlobal.h ../../src/include/DjVu.h \
- GException.h GSmartPointer.h
+ GException.h GSmartPointer.h parseoptions.h
 DjVuNavDir.o: DjVuNavDir.cpp DjVuNavDir.h \
  ByteStream.h DjVuGlobal.h \
  ../../src/include/DjVu.h GException.h \
