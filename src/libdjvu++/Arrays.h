@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: Arrays.h,v 1.7 1999-08-18 20:47:40 leonb Exp $
+//C- $Id: Arrays.h,v 1.8 1999-08-24 20:59:46 eaf Exp $
 
 
 #ifndef _ARRAYS_H_
@@ -72,7 +72,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@research.att.com> -- Copy-on-demand implementation.
     @version 
-    #$Id: Arrays.h,v 1.7 1999-08-18 20:47:40 leonb Exp $# */
+    #$Id: Arrays.h,v 1.8 1999-08-24 20:59:46 eaf Exp $# */
 //@{
 
 // Auxiliary classes: Will be used in place of GPBase and GPEnabled objects
@@ -421,7 +421,6 @@ public:
        subscript range, you must stop using the pointers returned by prior
        invocation of this conversion operator. */
    operator TYPE* ();
-   operator const TYPE* () { return (TYPE*)(*this); } ;
    /** Returns a pointer for reading (but not modifying) the array elements.
        This pointer can be used to access the array elements with the same
        subscripts and the usual bracket syntax.  This pointer remains valid as
@@ -429,6 +428,7 @@ public:
        subscript range, you must stop using the pointers returned by prior
        invocation of this conversion operator. */
    operator const TYPE* () const;
+   operator const TYPE* ();
   
    /** Insert new elements into an array. This function inserts
        #howmany# elements at position #n# into the array. The initial value #val#
@@ -474,6 +474,13 @@ ArrayBaseT<TYPE>::operator TYPE* ()
    
    ArrayRep * rep=(ArrayRep *) get();
    return &((TYPE *) rep->data)[-rep->minlo];
+}
+
+template <class TYPE> inline
+ArrayBaseT<TYPE>::operator const TYPE* ()
+{
+   const ArrayRep * rep=(const ArrayRep *) get();
+   return &((const TYPE *) rep->data)[-rep->minlo];
 }
 
 template <class TYPE> inline
@@ -839,6 +846,7 @@ public:
   const GP<TYPE>& operator[](int n) const;
   // -- CONVERSION
   operator GP<TYPE>* ();
+  operator const GP<TYPE>* ();
   operator const GP<TYPE>* () const;
   // -- ALTERATION
   void ins(int n, const GP<TYPE> &val, unsigned int howmany=1);
@@ -881,6 +889,12 @@ template<class TYPE>
 inline DPArray<TYPE>::operator GP<TYPE>* ()
 {
    return (GP<TYPE> *) DArray<GPBase>::operator GPBase*();
+}
+
+template<class TYPE>
+inline DPArray<TYPE>::operator const GP<TYPE>* ()
+{
+   return (const GP<TYPE> *) DArray<GPBase>::operator const GPBase*();
 }
 
 template<class TYPE>
