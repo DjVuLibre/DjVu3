@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GRect.h,v 1.10 1999-06-22 19:14:51 leonb Exp $
+//C- $Id: GRect.h,v 1.11 1999-10-13 19:54:05 leonb Exp $
 
 
 #ifndef _GRECT_H_
@@ -30,13 +30,47 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GRect.h,v 1.10 1999-06-22 19:14:51 leonb Exp $# */
+    #$Id: GRect.h,v 1.11 1999-10-13 19:54:05 leonb Exp $# */
 //@{
 
 #include "DjVuGlobal.h"
 
+
+/** @name Point Coordinates vs. Pixel Coordinates
+
+    The DjVu technology relies on the accurate superposition of images at
+    different resolutions.  Such an accuracy cannot be reached with the usual
+    assumption that pixels are small enough to be considered infinitesimally
+    small.  We must distinguish very precisely ``points'' and ``pixels''.
+    This distinction is essential for performing scaling operations.
+
+    The pixels of an image are identified by ``pixel coordinates''.  The
+    bottom-left corner pixel has coordinates #(0,0)# and the top-right corner
+    pixel has coordinates #(w-1,h-1)# where #w# and #h# are the image size.
+    Pixel coordinates are necessarily integers since pixels never overlap.
+
+    An infinitesimally small point is identified by its ``point coordinates''.
+    There may be fractional point coordinates, although this library does not
+    make use of them.  Points with integer coordinates are located {\em on the
+    corners of each pixel}.  They are not located on the pixel centers.  The
+    center of the pixel with pixel coordinates #(i,j)# is located at point
+    coordinates #(i+1/2,j+1/2)#.  In other words, the pixel #(i,j)# extends
+    from point #(i,j)# to point #(i+1,j+1)#.
+
+    Therefore, the point located on the bottom left corner of an image has
+    coordinates #(0,0)#.  This point is in fact the bottom left corner of the
+    bottom left pixel of the image.  The point located on the top right corner
+    of an image has coordinates #(w,h)# where #w# and #h# are the image size.
+    This is in fact the top right corner of pixel #(w-1,h-1)# which is the
+    image pixel with the highest coordinates.
+*/
+//@{
+//@}
+
+
+
 /** Rectangle class.  Each instance of this class represents a rectangle whose
-    sides are parallel to the axis. Such a rectangle is composed of points
+    sides are parallel to the axis. Such a rectangle represents all the points
     whose coordinates lies between well defined minimal and maximal values.
     Member functions can combine several rectangles by computing the
     intersection of rectangles (\Ref{intersect}) or the smallest rectangle
@@ -57,7 +91,10 @@ public:
   int  height() const;
   /** Returns true iff the rectangle is empty. */
   int  isempty() const;
-  /** Returns true iff the rectangle contains point (#x#,#y#). */
+  /** Returns true iff the rectangle contains pixel (#x#,#y#).  A rectangle
+      contains all pixels with horizontal pixel coordinates in range #xmin#
+      (inclusive) to #xmax# (exclusive) and vertical coordinates #ymin#
+      (inclusive) to #ymax# (exclusive). */
   int  contains(int x, int y) const;
   /** Returns true iff rectangles #r1# and #r2# are equal. */
   friend int operator==(const GRect & r1, const GRect & r2);
@@ -79,13 +116,13 @@ public:
       both rectangles #rect1# and #rect2#. This function returns true iff the
       intersection rectangle is not empty. */
   int  recthull(const GRect &rect1, const GRect &rect2);
-  /** Minimal (inclusive) horizontal coordinate of the rectangle points. */
+  /** Minimal horizontal point coordinate of the rectangle. */
   int xmin;
-  /** Minimal (inclusive) vertical coordinate of the rectangle points. */
+  /** Minimal vertical point coordinate of the rectangle. */
   int ymin;
-  /** Maximal (exclusive) horizontal coordinate of the rectangle points. */
+  /** Maximal horizontal point coordinate of the rectangle. */
   int xmax;
-  /** Maximal (exclusive) vertical coordinate of the rectangle points. */
+  /** Maximal vertical point coordinate of the rectangle. */
   int ymax;
 };
 
@@ -130,7 +167,8 @@ public:
       initially contain the coordinates of a point. This operation overwrites
       these variables with the coordinates of a second point located in the
       same position relative to the corners of the output rectangle as the
-      first point relative to the matching corners of the input rectangle. */
+      first point relative to the matching corners of the input rectangle.
+      Coordinates are rounded to the nearest integer. */
   void map(int &x, int &y);
   /** Maps a rectangle according to the affine transform. This operation
       consists in mapping the rectangle corners and reordering the corners in
@@ -142,7 +180,7 @@ public:
       operation overwrites these variables with the coordinates of a second
       point located in the same position relative to the corners of input
       rectangle as the first point relative to the matching corners of the
-      input rectangle. */
+      input rectangle. Coordinates are rounded to the nearest integer. */
   void unmap(int &x, int &y);
   /** Maps a rectangle according to the inverse of the affine transform. This
       operation consists in mapping the rectangle corners and reordering the
