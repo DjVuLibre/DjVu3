@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessage.cpp,v 1.43 2001-05-03 02:07:40 bcr Exp $
+// $Id: DjVuMessage.cpp,v 1.44 2001-05-03 16:35:31 fcrary Exp $
 // $Name:  $
 
 
@@ -594,16 +594,24 @@ DjVuMessage::InsertArg( GUTF8String &message,
             case 'X':
               narg.format((const char *)format,(unsigned int)arg.toInt());
               break;
+            case 'f':
+              {
+                GUTF8String end;
+                bool success;
+                narg.format((const char *)format, arg.toDouble(end,success));
+                if( !success ) narg = arg;
+              }
+              break;
             default:
               narg.format((const char *)format,(const char *)arg);
               break;
           }
           message = message.substr( 0, format_start )+narg
-            +message.substr( format_end+1, (unsigned int)(-1));
+            +message.substr( format_end+1, -1 );
         }else
         {
           message = message.substr( 0, format_start )+arg
-            +message.substr( format_end+1, (unsigned int)(-1));
+            +message.substr( format_end+1, -1 );
         }
       }
       format_start=message.search(target,format_start+arg.length());

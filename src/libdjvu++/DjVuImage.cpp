@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuImage.cpp,v 1.74 2001-04-24 00:25:50 bcr Exp $
+// $Id: DjVuImage.cpp,v 1.75 2001-05-03 16:35:31 fcrary Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -337,60 +337,21 @@ DjVuImage::get_short_description() const
   int height = get_height();
   if (width && height)
     if (file && file->file_size>100)
-      msg.format("%dx%d in %0.1f Kb", width, height, file->file_size/1024.0);
+      //msg.format("%dx%d in %0.1f Kb", width, height, file->file_size/1024.0);
+      msg.format( ERR_MSG("DjVuImage.short1") "\t%d\t%d\t%0.1f", width, height, file->file_size/1024.0 );
     else
-      msg.format("%dx%d", width, height);
+      //msg.format("%dx%d", width, height);
+      msg.format( ERR_MSG("DjVuImage.short2") "\t%d\t%d", width, height );
   return msg;
 }
 
 GUTF8String 
 DjVuImage::get_long_description() const
 {
-  // Tab characters '\t' sometimes look really ugly.
-  // This code replace them with spaces so that every column 
-  // is really aligned.  Lines that do not contain tabs are 
-  // left unchanged.
   GUTF8String result = file ? file->description : GUTF8String();
-  // Loop on tabulations
-  for(;;)
-    {
-      // Search position of first tab in each line
-      int tab_num = 0;
-      int tab_pos = 0;
-      const char *s=result;
-      for (s=result; *s; s++)
-        {
-          const char *line_start = s;
-          for (; *s && *s!='\n' && *s!='\t'; s++) /**/;
-          if (*s == '\t')
-            {
-              int pos = s-line_start;
-              tab_pos = ( (pos>tab_pos) ? pos : tab_pos );
-              tab_num += 1;
-            }
-          for (; *s && *s!='\n'; s++) /**/;
-        }
-      // Check whether all tabs have been removed
-      if (tab_num <= 0)
-        break;
-      // Replace tab 
-      GUTF8String tmp;
-      char *d = tmp.getbuf(result.length() + tab_num * tab_pos + 1);
-      s = result;
-      for (s=result; *s; *d++=*s++)
-        {
-          const char *line_start = d;
-          for (; *s && *s!='\n' && *s!='\t'; *d++=*s++) /**/;
-          if (*s == '\t')
-            for(s++; d<line_start+tab_pos+2; *d++=' ') /**/;
-          for (; *s && *s!='\n'; *d++=*s++) /**/;
-        }
-      *d++ = 0;
-      result = tmp;
-    }
-  // All tabs have been replaced.
   return result;
 }
+
 
 void
 DjVuImage::notify_chunk_done(const DjVuPort *, const GUTF8String & name)

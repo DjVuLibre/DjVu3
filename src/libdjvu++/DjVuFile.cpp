@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuFile.cpp,v 1.169 2001-04-30 23:30:45 bcr Exp $
+// $Id: DjVuFile.cpp,v 1.170 2001-05-03 16:35:31 fcrary Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -803,7 +803,7 @@ DjVuFile::decode_chunk( const GUTF8String &id, const GP<ByteStream> &gbs,
   if (get_count()==1)
     G_THROW( DataPool::Stop );
   
-  GUTF8String desc = "Unrecognized chunk";
+  GUTF8String desc = ERR_MSG("DjVuFile.unrecog_chunk");
   GUTF8String chkid = id;
   DEBUG_MSG("DjVuFile::decode_chunk() : decoding " << id << "\n");
   
@@ -818,7 +818,7 @@ DjVuFile::decode_chunk( const GUTF8String &id, const GP<ByteStream> &gbs,
     GP<DjVuInfo> info=DjVuInfo::create();
     info->decode(bs);
     DjVuFile::info = info;
-    desc.format("Page information");
+    desc.format( ERR_MSG("DjVuFile.page_info") );
     // Consistency checks (previously in DjVuInfo::decode)
     if (info->width<0 || info->height<0)
       G_THROW( ERR_MSG("DjVuFile.corrupt_zero") );
@@ -855,8 +855,8 @@ DjVuFile::decode_chunk( const GUTF8String &id, const GP<ByteStream> &gbs,
         else if (file->is_decode_failed())
           get_portcaster()->notify_file_flags_changed(file, DECODE_FAILED, 0);
       }
-      desc.format("Indirection chunk ("+file->get_url().fname()+")");
-    } else desc.format("Indirection chunk");
+      desc.format( ERR_MSG("DjVuFile.indir_chunk1") "\t" + file->get_url().fname() );
+    } else desc.format( ERR_MSG("DjVuFile.indir_chunk2") );
   }
   
   // Djbz (JB2 Dictionary)
@@ -869,7 +869,7 @@ DjVuFile::decode_chunk( const GUTF8String &id, const GP<ByteStream> &gbs,
     GP<JB2Dict> fgjd = JB2Dict::create();
     fgjd->decode(gbs);
     DjVuFile::fgjd = fgjd;
-    desc.format("JB2 shape dictionary (%d shapes)", fgjd->get_shape_count());
+    desc.format( ERR_MSG("DjVuFile.shape_dict") "\t%d", fgjd->get_shape_count() );
   } 
   
   // Sjbz (JB2 encoded mask)
@@ -884,7 +884,7 @@ DjVuFile::decode_chunk( const GUTF8String &id, const GP<ByteStream> &gbs,
     // ---- end hack
     fgjb->decode(gbs, static_get_fgjd, (void*)this);
     DjVuFile::fgjb = fgjb;
-    desc.format("JB2 foreground mask (%dx%d, %d dpi)",
+    desc.format( ERR_MSG("DjVuFile.fg_mask") "\t%d\t%d\t%d",
       fgjb->get_width(), fgjb->get_height(),
       get_dpi(fgjb->get_width(), fgjb->get_height()));
   }
@@ -896,7 +896,7 @@ DjVuFile::decode_chunk( const GUTF8String &id, const GP<ByteStream> &gbs,
       G_THROW( ERR_MSG("DjVuFile.dupl_Sxxx") );
     set_can_compress(true);
     DjVuFile::fgjb = MMRDecoder::decode(gbs);
-    desc.format("G4/MMR encoded mask (%dx%d, %d dpi)",
+    desc.format( ERR_MSG("DjVuFile.G4_mask") "\t%d\t%d\t%d",
       fgjb->get_width(), fgjb->get_height(),
       get_dpi(fgjb->get_width(), fgjb->get_height()));
   }
@@ -912,7 +912,7 @@ DjVuFile::decode_chunk( const GUTF8String &id, const GP<ByteStream> &gbs,
       GP<IW44Image> bg44=IW44Image::create_decode(IW44Image::COLOR);
       bg44->decode_chunk(gbs);
       DjVuFile::bg44=bg44;
-      desc.format("IW44 background (%dx%d, %d dpi)",
+      desc.format( ERR_MSG("DjVuFile.IW44_bg1") "\t%d\t%d\t%d",
 		      bg44->get_width(), bg44->get_height(),
           get_dpi(bg44->get_width(), bg44->get_height()));
     } 
@@ -920,7 +920,7 @@ DjVuFile::decode_chunk( const GUTF8String &id, const GP<ByteStream> &gbs,
     {
       // Refinement chunks
       bg44->decode_chunk(gbs);
-      desc.format("IW44 background (part %d, %d dpi)",
+      desc.format( ERR_MSG("DjVuFile.IW44_bg2") "\t%d\t%d",
 		      bg44->get_serial(), get_dpi(bg44->get_width(), bg44->get_height()));
     }
   }
@@ -934,7 +934,7 @@ DjVuFile::decode_chunk( const GUTF8String &id, const GP<ByteStream> &gbs,
     IW44Image &fg44=*gfg44;
     fg44.decode_chunk(gbs);
     fgpm=fg44.get_pixmap();
-    desc.format("IW44 foreground colors (%dx%d, %d dpi)",
+    desc.format( ERR_MSG("DjVuFile.IW44_fg") "\t%d\t%d\t%d",
       fg44.get_width(), fg44.get_height(),
       get_dpi(fg44.get_width(), fg44.get_height()));
   } 
@@ -950,12 +950,12 @@ DjVuFile::decode_chunk( const GUTF8String &id, const GP<ByteStream> &gbs,
       set_can_compress(true);
       set_needs_compression(true);
       DjVuFile::bgpm = djvu_decode_codec(bs);
-      desc.format("LINK Color Import (%dx%d, %d dpi)",
+      desc.format( ERR_MSG("DjVuFile.color_import1") "\t%d\t%d\t%d",
         bgpm->columns(), bgpm->rows(),
         get_dpi(bgpm->columns(), bgpm->rows()));
     }else
     {
-      desc.format("LINK Color Import (Unimplemented)");
+      desc.format( ERR_MSG("DjVuFile.color_import2") );
     }
   } 
   
@@ -967,11 +967,11 @@ DjVuFile::decode_chunk( const GUTF8String &id, const GP<ByteStream> &gbs,
     set_can_compress(true);
 #ifdef NEED_JPEG_DECODER
     DjVuFile::bgpm = JPEGDecoder::decode(bs);
-    desc.format("JPEG background (%dx%d, %d dpi)",
+    desc.format( ERR_MSG("DjVuFile.JPEG_bg1") "\t%d\t%d\t%d",
       bgpm->columns(), bgpm->rows(),
       get_dpi(bgpm->columns(), bgpm->rows()));
 #else
-    desc.format("JPEG background (Unimplemented)");
+    desc.format( ERR_MSG("DjVuFile.JPEG_bg2") );
 #endif
   } 
   
@@ -982,11 +982,11 @@ DjVuFile::decode_chunk( const GUTF8String &id, const GP<ByteStream> &gbs,
       G_THROW( ERR_MSG("DjVuFile.dupl_foregrnd") );
 #ifdef NEED_JPEG_DECODER
     DjVuFile::fgpm = JPEGDecoder::decode(bs);
-    desc.format("JPEG foreground colors (%dx%d, %d dpi)",
+    desc.format( ERR_MSG("DjVuFile.JPEG_fg1") "\t%d\t%d\t%d",
       fgpm->columns(), fgpm->rows(),
       get_dpi(fgpm->columns(), fgpm->rows()));
 #else
-    desc.format("JPEG foreground colors (Unimplemented)");
+    desc.format( ERR_MSG("DjVuFile.JPEG_fg2") );
 #endif
   } 
   
@@ -995,7 +995,7 @@ DjVuFile::decode_chunk( const GUTF8String &id, const GP<ByteStream> &gbs,
   {
     if (bg44)
       G_THROW( ERR_MSG("DjVuFile.dupl_backgrnd") );
-    desc.format("JPEG-2000 background (Unimplemented)");
+    desc.format( ERR_MSG("DjVuFile.JPEG2K_bg") );
   } 
   
   // FG2k (foreground JPEG-2000) Note: JPEG2K bitstream not finalized.
@@ -1003,7 +1003,7 @@ DjVuFile::decode_chunk( const GUTF8String &id, const GP<ByteStream> &gbs,
   {
     if (fgpm || fgbc)
       G_THROW( ERR_MSG("DjVuFile.dupl_foregrnd") );
-    desc.format("JPEG-2000 foreground colors (Unimplemented)");
+    desc.format( ERR_MSG("DjVuFile.JPEG2K_fg") );
   } 
   
   // FGbz (foreground color vector)
@@ -1014,7 +1014,7 @@ DjVuFile::decode_chunk( const GUTF8String &id, const GP<ByteStream> &gbs,
     GP<DjVuPalette> fgbc = DjVuPalette::create();
     fgbc->decode(gbs);
     DjVuFile::fgbc = fgbc;
-    desc.format("JB2 foreground colors (%d colors, %d ccs)", 
+    desc.format( ERR_MSG("DjVuFile.JB2_fg") "\t%d\t%d",
       fgbc->size(), fgbc->colordata.size());
   }
   
@@ -1033,7 +1033,7 @@ DjVuFile::decode_chunk( const GUTF8String &id, const GP<ByteStream> &gbs,
       ginfo->dpi=100;
       bg44=gbg44;
       info=ginfo;
-      desc.format("IW44 data (%dx%d, %d dpi)",
+      desc.format( ERR_MSG("DjVuFile.IW44_data1") "\t%d\t%d\t%d",
 		      xbg44.get_width(), xbg44.get_height(),
           get_dpi(xbg44.get_width(), xbg44.get_height()));
     } 
@@ -1042,7 +1042,7 @@ DjVuFile::decode_chunk( const GUTF8String &id, const GP<ByteStream> &gbs,
       // Refinement chunks
       IW44Image &xbg44=*bg44;
       xbg44.decode_chunk(gbs);
-      desc.format("IW44 data (part %d, %d dpi)",
+      desc.format( ERR_MSG("DjVuFile.IW44_data2") "\t%d\t%d",
 		      xbg44.get_serial(),
           get_dpi(xbg44.get_width(), xbg44.get_height()));
     }
@@ -1054,7 +1054,7 @@ DjVuFile::decode_chunk( const GUTF8String &id, const GP<ByteStream> &gbs,
     GP<DjVuNavDir> dir=DjVuNavDir::create(url);
     dir->decode(bs);
     DjVuFile::dir=dir;
-    desc.format("Navigation directory (obsolete)");
+    desc.format( ERR_MSG("DjVuFile.nav_dir") );
   }
   
   // FORM:ANNO (obsolete) (must be before other annotations)
@@ -1076,7 +1076,7 @@ DjVuFile::decode_chunk( const GUTF8String &id, const GP<ByteStream> &gbs,
       }
       // Copy data
       anno->copy(achunk);
-      desc.format("Annotations (bundled)");
+      desc.format( ERR_MSG("DjVuFile.anno1") );
     }
   
   // ANTa/ANTx/TXTa/TXTz annotations
@@ -1102,8 +1102,7 @@ DjVuFile::decode_chunk( const GUTF8String &id, const GP<ByteStream> &gbs,
       iffout.put_chunk(id);
       iffout.copy(achunk);
       iffout.close_chunk();
-      desc.format("Annotations");
-      desc = desc + " (hyperlinks, etc.)";
+      desc.format( ERR_MSG("DjVuFile.anno2") );
     }
   else if (is_text(chkid))
     {
@@ -1127,8 +1126,7 @@ DjVuFile::decode_chunk( const GUTF8String &id, const GP<ByteStream> &gbs,
       iffout.put_chunk(id);
       iffout.copy(achunk);
       iffout.close_chunk();
-      desc.format("Text");
-      desc = desc + " (text, etc.)";
+      desc.format( ERR_MSG("DjVuFile.text") );
     }
 
   // Return description
@@ -1178,13 +1176,15 @@ DjVuFile::decode(const GP<ByteStream> &gbs)
     for(;(chunks_left--)&&(chksize = iff.get_chunk(chkid));last_chunk=chunks)
     {
       chunks++;
-      // Decode
+
+      // Decode and get chunk description
       GUTF8String str = decode_chunk(chkid, iff.get_bytestream(), djvi, djvu, iw44);
-      // Update description and notify
+      // Add parameters to the chunk description to give the size and chunk id
       GUTF8String desc;
-      desc.format(" %0.1f Kb\t'%s'\t%s.\n", chksize/1024.0, 
-        (const char*)chkid, (const char*)str );
-      description=description+desc;
+      desc.format("\t%5.1f\t%s", chksize/1024.0, (const char*)chkid);
+      // Append the whole thing to the growing file description
+      description = description + str + desc;
+
       pcaster->notify_chunk_done(this, chkid);
       // Close chunk
       iff.seek_close_chunk();
@@ -1224,15 +1224,15 @@ DjVuFile::decode(const GP<ByteStream> &gbs)
   {
     GUTF8String desc;
     if (djvu || djvi)
-      desc.format("DJVU Image (%dx%d, %d dpi) version %d:\n\n", 
-      info->width, info->height,
-      info->dpi, info->version);
+      desc.format( ERR_MSG("DjVuFile.djvu_header") "\t%d\t%d\t%d\t%d", 
+        info->width, info->height,
+        info->dpi, info->version);
     else if (iw44)
-      desc.format("IW44 Image (%dx%d, %d dpi) :\n\n", 
-      info->width, info->height, info->dpi);
+      desc.format( ERR_MSG("DjVuFile.IW44_header") "\t%d\t%d\t%d", 
+        info->width, info->height, info->dpi);
     description=desc+description;
     int rawsize=info->width*info->height*3;
-    desc.format("\nCompression ratio: %0.f (%0.1f Kb)\n",
+    desc.format( ERR_MSG("DjVuFile.ratio") "\t%d\t%d",
       (double)rawsize/file_size, file_size/1024.0 );
     description=description+desc;
   }
