@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuFile.cpp,v 1.183 2001-10-16 18:01:43 docbill Exp $
+// $Id: DjVuFile.cpp,v 1.184 2001-10-16 18:55:28 docbill Exp $
 // $Name:  $
 
 #ifdef __GNUC__
