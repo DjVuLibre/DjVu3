@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djvuextract.cpp,v 1.25 2001-07-03 17:02:31 bcr Exp $
+// $Id: djvuextract.cpp,v 1.26 2001-07-23 22:35:06 bcr Exp $
 // $Name:  $
 
 /** @name djvuextract
@@ -65,7 +65,7 @@
     @memo
     Extract components from DjVu files.
     @version
-    #$Id: djvuextract.cpp,v 1.25 2001-07-03 17:02:31 bcr Exp $#
+    #$Id: djvuextract.cpp,v 1.26 2001-07-23 22:35:06 bcr Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> - Initial implementation\\
     Andrei Erofeev <eaf@geocities.com> - Multipage support */
@@ -112,7 +112,7 @@ display_info_chunk(GP<ByteStream> ibs, const GURL &url)
   GUTF8String chkid;
   if (! iff.get_chunk(chkid))
     G_THROW("Malformed DJVU file");
-  if (chkid != "FORM:DJVU")
+  if (chkid != "FORM:DJVU" && chkid != "FORM:DJVI" )
     G_THROW("This is not a layered DJVU file");
   // Search info chunk
   while (iff.get_chunk(chkid))
@@ -141,7 +141,7 @@ extract_chunk(GP<ByteStream> ibs, const GUTF8String &id, GP<ByteStream> out)
   GUTF8String chkid;
   if (! iff.get_chunk(chkid))
     G_THROW("Malformed DJVU file");
-  if (chkid != "FORM:DJVU")
+  if (chkid != "FORM:DJVU" && chkid != "FORM:DJVI" )
     G_THROW("This is not a layered DJVU file");
   
 
@@ -253,8 +253,8 @@ main(int argc, char **argv)
       for (i=2; i<argc; i++)
         {
           GP<ByteStream> gmbs=ByteStream::create();
-          dargv[i].setat(4,0);
-          extract_chunk(pibs, dargv[i], gmbs);
+          const GUTF8String chunkid=dargv[i].substr(0,4);
+          extract_chunk(pibs, chunkid, gmbs);
           ByteStream &mbs=*gmbs;
           if (mbs.size() == 0)
             {
@@ -262,7 +262,7 @@ main(int argc, char **argv)
             }
           else
             {
-              const GURL::Filename::UTF8 url(5+(const char *)dargv[i]);
+              const GURL::Filename::UTF8 url((const char *)dargv[i].substr(5,-1));
               GP<ByteStream> obs=ByteStream::create(url,"wb");
               mbs.seek(0);
               obs->copy(mbs);

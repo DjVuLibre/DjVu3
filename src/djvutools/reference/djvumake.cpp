@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //
-// $Id: djvumake.cpp,v 1.24 2001-07-03 17:02:31 bcr Exp $
+// $Id: djvumake.cpp,v 1.25 2001-07-23 22:35:06 bcr Exp $
 // $Name:  $
 
 /** @name djvumake
@@ -102,7 +102,7 @@
     @memo
     Assemble DjVu files.
     @version
-    #$Id: djvumake.cpp,v 1.24 2001-07-03 17:02:31 bcr Exp $#
+    #$Id: djvumake.cpp,v 1.25 2001-07-23 22:35:06 bcr Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> \\
     Patrick Haffner <haffner@research.att.com>
@@ -132,10 +132,9 @@ int flag_contains_stencil = 0;
 int flag_contains_bg44    = 0;
 int flag_contains_incl    = 0;
 
-IFFByteStream *bg44iff    = 0;
-GP<ByteStream> jb2stencil = 0;
-GP<ByteStream> mmrstencil = 0;
-GP<JB2Image> stencil      = 0;
+GP<ByteStream> jb2stencil;
+GP<ByteStream> mmrstencil;
+GP<JB2Image> stencil;
 
 int w = -1;
 int h = -1;
@@ -467,6 +466,7 @@ create_fg44_chunk(IFFByteStream &iff, char *ckid, const GURL &url)
 void 
 create_bg44_chunk(IFFByteStream &iff, char *ckid, GUTF8String filespec)
 {
+  static GP<IFFByteStream> bg44iff;
   if (! bg44iff)
     {
       if (flag_contains_bg)
@@ -475,7 +475,13 @@ create_bg44_chunk(IFFByteStream &iff, char *ckid, GUTF8String filespec)
       if (!i)
         G_THROW("djvumake: no filename specified in first BG44 specification");
       GUTF8String filename=(i<0)?filespec:GUTF8String(filespec, i);
-      bg44iff = IFFByteStream::create(ByteStream::create(GURL::Filename::UTF8(filename),"rb"));
+      const GURL::Filename::UTF8 url(filename);
+      const GP<ByteStream> gbs(ByteStream::create(url,"rb"));
+      if(!gbs)
+      {
+        G_THROW("djvumake: no such file as"+filename);
+      }
+      bg44iff = IFFByteStream::create(gbs);
       GUTF8String chkid;
       bg44iff->get_chunk(chkid);
       if (chkid != "FORM:PM44" && chkid != "FORM:BM44")
