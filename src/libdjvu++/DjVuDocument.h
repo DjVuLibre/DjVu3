@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.h,v 1.23 1999-09-15 16:08:07 eaf Exp $
+//C- $Id: DjVuDocument.h,v 1.24 1999-09-15 17:36:49 eaf Exp $
  
 #ifndef _DJVUDOCUMENT_H
 #define _DJVUDOCUMENT_H
@@ -33,7 +33,7 @@
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocument.h,v 1.23 1999-09-15 16:08:07 eaf Exp $#
+    @version #$Id: DjVuDocument.h,v 1.24 1999-09-15 17:36:49 eaf Exp $#
 */
 
 //@{
@@ -169,7 +169,8 @@ public:
 	     \item #DOC_INIT_COMPLETE#: The initializating thread finished.
 	  \end{itemize} */
    enum DOC_FLAGS { DOC_TYPE_KNOWN=1, DOC_DIR_KNOWN=2,
-		    DOC_NDIR_KNOWN=4, DOC_INIT_COMPLETE=8 };
+		    DOC_NDIR_KNOWN=4, DOC_INIT_COMPLETE=8,
+		    DOC_INIT_FAILED=16 };
       /** Specifies the format of #DjVuDocument#. There are currently 4 DjVu
 	  multipage formats recognized by the library. Two of them are obsolete
 	  and should not be used.
@@ -622,7 +623,8 @@ inline void
 DjVuDocument::wait_for_complete_init(void)
 {
    flags.enter();
-   while(!is_init_complete()) flags.wait();
+   while(!(flags & DOC_INIT_FAILED) &&
+	 !(flags & DOC_INIT_COMPLETE)) flags.wait();
    flags.leave();
 }
 

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.37 1999-09-15 16:04:52 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.38 1999-09-15 17:36:49 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -76,10 +76,9 @@ DjVuDocument::static_init_thread(void * cl_data)
    TRY {
       th->init_thread();
    } CATCH(exc) {
+      th->flags=th->flags | DjVuDocument::DOC_INIT_FAILED;
       TRY {
-	 if (!strcmp(exc.get_cause(), "EOF"))
-	    get_portcaster()->notify_status(th, "EOF");
-	 else get_portcaster()->notify_error(th, exc.get_cause());
+	 get_portcaster()->notify_error(th, exc.get_cause());
       } CATCH(exc) {} ENDCATCH;
    } ENDCATCH;
 }
@@ -612,7 +611,7 @@ GP<DjVuImage>
 DjVuDocument::get_page(const char * id, DjVuPort * port)
 {
    check();
-   DEBUG_MSG("DjVuDocument::get_page(): ID=" << id << "\n");
+   DEBUG_MSG("DjVuDocument::get_page(): ID='" << id << "'\n");
    DEBUG_MAKE_INDENT(3);
 
    GP<DjVuFile> file=get_djvu_file(id);
