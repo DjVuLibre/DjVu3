@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.cpp,v 1.1.2.2 1999-04-26 18:31:35 eaf Exp $
+//C- $Id: DataPool.cpp,v 1.1.2.3 1999-05-03 18:50:08 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -224,6 +224,22 @@ DataPool::add_trigger(int thresh, void (* callback)(void *), void * cl_data)
    }
 }
 
+void
+DataPool::del_trigger(void (* callback)(void *))
+{
+   GCriticalSectionLock lock(&triggers_lock);
+   for(GPosition pos=triggers_list;pos;)
+   {
+      GP<Trigger> t=triggers_list[pos];
+      if (t->callback==callback)
+      {
+	 GPosition this_pos=pos;
+	 ++pos;
+	 triggers_list.del(this_pos);
+      } else ++pos;
+   }
+}
+
 //****************************************************************************
 //****************************** PoolByteStream ******************************
 //****************************************************************************
@@ -328,7 +344,12 @@ DataRange::DataRange(const DataRange & r) : pool(r.pool),
 {
    init();
 }
-	 
+
+DataRange::~DataRange(void)
+{
+   pool->del_trigger(static_trigger_cb);
+}
+
 int
 DataRange::get_data(void * buffer, int offset, int size)
 {
@@ -381,7 +402,7 @@ DataRange::trigger_cb(void)
       {
 	 GP<Trigger> trigger=triggers_list[pos];
 	 pool->add_trigger(start+length-1, trigger->callback, trigger->cl_data);
-      };
+      }
       triggers_list.empty();
    }
 }
@@ -398,6 +419,23 @@ DataRange::add_trigger(int thresh, void (* callback)(void *), void * cl_data)
       GCriticalSectionLock lock(&triggers_lock);
       triggers_list.append(new Trigger(callback, cl_data));
    }
+}
+
+void
+DataRange::del_trigger(void (* callback)(void *))
+{
+   GCriticalSectionLock lock(&triggers_lock);
+   for(GPosition pos=triggers_list;pos;)
+   {
+      GP<Trigger> t=triggers_list[pos];
+      if (t->callback==callback)
+      {
+	 GPosition this_pos=pos;
+	 ++pos;
+	 triggers_list.del(this_pos);
+      } else ++pos;
+   }
+   pool->del_trigger(callback);
 }
 
 void

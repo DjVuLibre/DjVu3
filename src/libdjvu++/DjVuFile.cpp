@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.1.2.4 1999-04-30 21:23:13 eaf Exp $
+//C- $Id: DjVuFile.cpp,v 1.1.2.5 1999-05-03 18:50:08 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -91,6 +91,8 @@ DjVuFile::~DjVuFile(void)
 {
    DEBUG_MSG("DjVuFile::~DjVuFile(): destroying...\n");
    DEBUG_MAKE_INDENT(3);
+
+   data_range->del_trigger(static_trigger_cb);
    
    stop_decode(1);
 }
@@ -291,6 +293,7 @@ DjVuFile::decode_func(void)
 	 // Wait for all child files to finish
       while(wait_for_finish(0));
 
+      DEBUG_MSG("waiting for children termination\n");
 	 // Check for termination status
       GCriticalSectionLock lock(&inc_files_lock);
       for(GPosition pos=inc_files_list;pos;++pos)
@@ -332,6 +335,7 @@ DjVuFile::decode_func(void)
 	 pcaster->notify_file_done(this);
       } else status_mon.leave();
    } CATCH(exc) {} ENDCATCH;
+   DEBUG_MSG("decoding thread for url='" << url << "' ended\n");
 }
 
 GP<DjVuFile>

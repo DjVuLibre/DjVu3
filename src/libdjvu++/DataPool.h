@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.h,v 1.1.2.2 1999-04-26 18:31:35 eaf Exp $
+//C- $Id: DataPool.h,v 1.1.2.3 1999-05-03 18:50:08 eaf Exp $
  
 #ifndef _DATAPOOL_H
 #define _DATAPOOL_H
@@ -31,7 +31,7 @@
 
     @memo Data storage with compatible byte streams.
     @author Andrei Erofeev
-    @version #$Id: DataPool.h,v 1.1.2.2 1999-04-26 18:31:35 eaf Exp $#
+    @version #$Id: DataPool.h,v 1.1.2.3 1999-05-03 18:50:08 eaf Exp $#
 */
 
 //@{
@@ -154,6 +154,11 @@ public:
 	  @param callback Function to call
 	  @param cl_data Argument to pass to the callback when it's called. */
    void		add_trigger(int thresh, void (* callback)(void *), void * cl_data);
+
+      /** Use this function to unregister callbacks, which are no longer
+	  needed. {\bf Note!} It's important to do it when the client
+	  is about to be destroyed. */
+   void		del_trigger(void (* callback)(void *));
    
       /** Tells the #DataPool# to stop all readers waiting for data.
 	  This will unlock the threads (readers) and will throw an exceptions
@@ -220,6 +225,7 @@ private:
 public:
    DataRange(const GP<DataPool> & pool, long start=0, long length=-1);
    DataRange(const DataRange & r);
+   virtual ~DataRange(void);
 
    ByteStream *		get_stream(void);
    GP<DataPool>		get_pool(void) const;
@@ -233,6 +239,7 @@ public:
       // has been received. DataPool may still miss some megs.
    void			add_trigger(int thresh, void (* callback)(void *),
 				    void * cl_data);
+   void			del_trigger(void (* callback)(void *));
 private:
    GP<DataPool>	pool;
    long		start, length;
