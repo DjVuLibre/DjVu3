@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: JB2Image.cpp,v 1.14 1999-08-12 18:42:05 leonb Exp $
+//C- $Id: JB2Image.cpp,v 1.15 1999-08-12 20:59:29 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -83,10 +83,10 @@ private:
   // Library
   void init_library(JB2Dict *jim);
   int add_library(int shapeno, JB2Shape *jshp);
-  TArray<int> shape2lib;
-  TArray<int> lib2shape;
+  GTArray<int> shape2lib;
+  GTArray<int> lib2shape;
   struct LibRect { short top,left,right,bottom; };
-  TArray<LibRect> libinfo;
+  GTArray<LibRect> libinfo;
   // Code pairs
   NumContext abs_loc_x;
   NumContext abs_loc_y;
