@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuPort.cpp,v 1.31 2000-01-21 00:06:47 eaf Exp $
+//C- $Id: DjVuPort.cpp,v 1.32 2000-02-03 16:13:06 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -40,7 +40,7 @@ DjVuPort::get_portcaster(void)
 //******************************* DjVuPort ***********************************
 //****************************************************************************
 
-#define MAX_CORPSE_NUM	64
+#define MAX_CORPSE_NUM	128
 
 // Last MAX_CORPSE_NUM addresses of dead DjVuPorts. We want to maintain this
 // list because of the way DjVuPort::is_port_alive() works: it accepts an
@@ -68,31 +68,42 @@ DjVuPort::operator new (size_t sz)
 
 	 // Store here addresses, which were found in 'corpse' list.
 	 // We will free then in the end
+      int addr_num=0;
       static void * addr_arr[MAX_CORPSE_NUM];
       
-	 // Make at most MAX_CORPSE_NUM attempts
-      int addr_num;
-      for(addr_num=0;addr_num<MAX_CORPSE_NUM;addr_num++)
+	 // Make at most MAX_CORPSE_NUM attempts. During each attempt
+	 // we try to allocate a block of memory for DjVuPort. If
+	 // the address of this block is not in the corpse list, we break
+	 // All addresses will be recorder, so that we can delete them
+	 // after we're done.
+      for(int attempt=0;attempt<MAX_CORPSE_NUM;attempt++)
       {
-	 addr=::operator new (sz);
-	    // See if 'addr' is in the 'corpse' list (was recently used)
+	 void * test_addr=::operator new (sz);
+	 addr_arr[addr_num++]=test_addr;
+	 
+	    // See if 'test_addr' is in the 'corpse' list (was recently used)
 	 DjVuPortCorpse * corpse;
 	 for(corpse=corpse_head;corpse;corpse=corpse->next)
-	    if (addr==corpse->port)
-	    {
-		  // Store address for future delete
-	       addr_arr[addr_num]=addr;
-	       break;
-	    }
-	 if (!corpse) break;
+	    if (test_addr==corpse->port) break;
+	 if (!corpse)
+	 {
+	    addr=test_addr;
+	    addr_num--;
+	    break;
+	 }
       }
-      addr_num--;
+	 // If all attempts failed (all addresses generated are already
+	 // in the list of corpses, allocate a new one and proceed
+	 // w/o additional checks
+      if (!addr) addr=::operator new(sz);
       
-	 // Here 'addr' contains address, that we want to use and
-	 // addr_arr contains addresses, that we want to free
+	 // Here 'addr_arr[0<=i<addr_num]' contains addresses, that we
+	 // tried to allocate, and which need to be freed now
+	 // 'addr' contains address we want to use.
+      addr_num--;
       while(addr_num>=0) ::operator delete(addr_arr[addr_num--]);
    }
-   
+
    DjVuPortcaster * pcaster=get_portcaster();
    GCriticalSectionLock lock(&pcaster->map_lock);
    pcaster->cont_map[addr]=0;
@@ -115,7 +126,7 @@ DjVuPort::operator delete(void * addr)
       } else
       {
 	 corpse_head=corpse_tail=new DjVuPortCorpse((DjVuPort *) addr);
-	 corpse_head->next=0;
+	 corpse_tail->next=0;
       }
       corpse_num++;
       if (corpse_num>=MAX_CORPSE_NUM)
@@ -182,11 +193,12 @@ DjVuPortcaster::~DjVuPortcaster(void)
 GP<DjVuPort>
 DjVuPortcaster::is_port_alive(DjVuPort *port)
 {
-  GCriticalSectionLock lock(&map_lock);
-  GPosition pos = cont_map.contains(port);
-  if (pos && cont_map[pos])
-    return GP<DjVuPort>((DjVuPort*)port);
-  return 0;
+   GP<DjVuPort> gp_port;
+   GCriticalSectionLock lock(&map_lock);
+   GPosition pos=cont_map.contains(port);
+   if (pos && cont_map[pos] && ((DjVuPort *) port)->get_count()>0)
+      gp_port=port;
+   return gp_port;
 }
 
 void
@@ -285,7 +297,8 @@ DjVuPortcaster::add_route(const DjVuPort * src, DjVuPort * dst)
       // Adds route src->dst
 {
    GCriticalSectionLock lock(&map_lock);
-   if (cont_map.contains(src) && cont_map.contains(dst))
+   if (cont_map.contains(src) && src->get_count()>0 &&
+       cont_map.contains(dst) && dst->get_count()>0)
    {
       if (!route_map.contains(src)) route_map[src]=new GList<void *>();
       GList<void *> & list=*(GList<void *> *) route_map[src];
@@ -320,7 +333,8 @@ DjVuPortcaster::copy_routes(DjVuPort * dst, const DjVuPort * src)
 {
    GCriticalSectionLock lock(&map_lock);
    
-   if (!cont_map.contains(src) || !cont_map.contains(dst)) return;
+   if (!cont_map.contains(src) || src->get_count()<=0 ||
+       !cont_map.contains(dst) || dst->get_count()<=0) return;
 
    for(GPosition pos=route_map;pos;++pos)
    {
@@ -368,6 +382,7 @@ DjVuPortcaster::compute_closure(const DjVuPort * src, GPList<DjVuPort> &list, bo
 	 else add_to_closure(set, dst, 1);
       }
    }
+
    // Compute list
    GPosition pos;
    if (sorted)
@@ -383,7 +398,7 @@ DjVuPortcaster::compute_closure(const DjVuPort * src, GPList<DjVuPort> &list, bo
        for(int dist=0;dist<=max_dist;dist++)
          for(pos=lists[dist];pos;++pos)
            {
-             GP<DjVuPort> p = (DjVuPort*) lists[dist][pos];
+             GP<DjVuPort> p = is_port_alive((DjVuPort*) lists[dist][pos]);
              if (p) list.append(p);
            }
      }
@@ -392,7 +407,7 @@ DjVuPortcaster::compute_closure(const DjVuPort * src, GPList<DjVuPort> &list, bo
        // Gather ports without order
        for(pos=set;pos;++pos)
          {
-           GP<DjVuPort> p = (DjVuPort*) set.key(pos);
+           GP<DjVuPort> p = is_port_alive((DjVuPort*) set.key(pos));
            if (p) list.append(p);
          }
      }
