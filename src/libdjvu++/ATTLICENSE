@@ -170,15 +170,14 @@ license to:
 
   (c) Distribute to others the AT&T Capsule; and,
 
-  (d) Make and distribute to others Derived Products but, in the case of these
-      rights, the license granted in this Section 3.2(d) shall only extend to
-      that portion of a Derived Product which is Computer Code compiled from
-      some portion, without Change, of the AT&T Source Code Release.
+  (d) Make, execute, use and distribute to others Derived Products but, in the
+      case of these rights, the license granted in this Section 3.2(d) shall
+      only extend to that portion of a Derived Product which is Computer Code
+      compiled from some portion, without Change, of the AT&T Source Code Release.
 
 The license granted in this Section 3.2 does not include the right to combine
-the AT&T Source Code Release or the AT&T Binaries with any hardware or other
-software or use any of such combinations, except that, the AT&T Binaries may
-be run by YOU on a computer.
+the AT&T Source Code Release or the AT&T Binaries with any hardware other
+than YOUR general purpose computer.
 
 3.3. Subject to the terms and conditions of this Agreement, YOU may create a
 hyperlink between an Internet website owned and controlled by YOU and the AT&T
