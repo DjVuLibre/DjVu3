@@ -25,7 +25,7 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DataPool.cpp,v 1.55 2000-11-02 01:08:34 bcr Exp $
+// $Id: DataPool.cpp,v 1.56 2000-11-03 19:02:34 fcrary Exp $
 // $Name:  $
 
 
@@ -1422,7 +1422,7 @@ PoolByteStream::read(void *data, size_t size)
 size_t
 PoolByteStream::write(const void *buffer, size_t size)
 {
-   G_THROW("not_implemented\tPoolByteStream::write()");   //  PoolByteStream::write() is not implemented.
+   G_THROW("not_implemented_n\tPoolByteStream::write()");   //  PoolByteStream::write() is not implemented.
    return 0;	// For compiler not to bark
 }
 
