@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuDocumentAPI.h,v 1.5 2000-01-24 21:48:03 haffner Exp $
+ *C- $Id: DjVuDocumentAPI.h,v 1.6 2000-01-26 15:38:33 haffner Exp $
  */
 
 #ifndef _DJVUDOC_H_
@@ -49,6 +49,37 @@ extern "C"
 
   /*@{*/
 
+/** List of options for the foreground image.
+
+    Whereas the backgound image can use the #libdjvuphoto# wavelet options,
+    the foreground image has specific constraints, as it may be encoded
+    within the JB2 image.
+
+    When encoded as wavelet, options such as the number of chunks or the
+    crcbdely would be an overkill.
+    
+    The #gamma_correction# is set to the same value as the background image.
+*/
+struct djvu_foreground_options_struct
+{ 
+  /** Use a full resolution image when computing the foreground image, 
+      to allow for a maximum color saturation */
+  int high_saturation;
+
+  /** Foreground colors are coded as a palette in the JB2Matcher */
+  int color_jb2;
+
+  /** JPEG-like quality slider for the foreground, ranging from 0 to 100.
+
+      This quality slider controls:
+      \begin{description}
+      \item[Color JB2 foreground] The maximum number of colors allowed in the palette (up to 1024) (palette_ncolors) and the minimal size of the color cube area affected
+      to a color palette entry (palette_boxsize).
+      \item[Wavelet foreground] The number of slices
+      \end{description}
+  */
+  int quality;
+};
 
 /** List of djvu_segmenter options.
  */
