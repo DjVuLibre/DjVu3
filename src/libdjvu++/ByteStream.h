@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: ByteStream.h,v 1.13 1999-09-03 23:01:38 eaf Exp $
+//C- $Id: ByteStream.h,v 1.14 1999-09-28 17:33:50 leonb Exp $
 
 
 #ifndef _BYTESTREAM_H
@@ -41,7 +41,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation\\
     Andrei Erofeev <eaf@research.att.com> -- 
     @version
-    #$Id: ByteStream.h,v 1.13 1999-09-03 23:01:38 eaf Exp $# */
+    #$Id: ByteStream.h,v 1.14 1999-09-28 17:33:50 leonb Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -102,11 +102,6 @@ public:
   /** Returns the offset of the current position in the ByteStream.  This
       function {\em must} be implemented by each subclass of #ByteStream#. */
   virtual long tell(void) = 0;
-  /** Tests whether function #seek# can seek backwards. Class
-      #ByteStream# provides a default implementation which always returns false. 
-      Subclasses implementing backward seek capabilities must override this
-      default implementation and return true. */
-  virtual int  is_seekable(void) const;
   /** Sets the current position for reading or writing the ByteStream.  Class
       #ByteStream# provides a default implementation able to seek forward by
       calling function #read# until reaching the desired position.  Subclasses
@@ -123,9 +118,11 @@ public:
       of the file. It is then advisable to provide a negative value for #offset#.
       \end{description}
       Results are undefined whenever the new position is greater than the
-      total size of the ByteStream. Exception \Ref{GException} is thrown with
-      a plain text error message whenever an error occurs. */
-  virtual void seek(long offset, int whence = SEEK_SET);
+      total size of the ByteStream.  An exception \Ref{GException} is thrown
+      whwnever an error occurs.  However, if argument #nothrow# is set, this
+      function will return #-1# if the bytestream is not able to perform the
+      required seek operation. */
+  virtual int seek(long offset, int whence = SEEK_SET, bool nothrow=false);
   /** Flushes all buffers in the ByteStream.  Calling this function
       guarantees that pending data have been actually written (i.e. passed to
       the operating system). Class #ByteStream# provides a default
@@ -227,8 +224,7 @@ public:
   size_t read(void *buffer, size_t size);
   size_t write(const void *buffer, size_t size);
   void flush();
-  int is_seekable(void) const;
-  void seek(long offset, int whence = SEEK_SET);
+  int seek(long offset, int whence = SEEK_SET, bool nothrow=false);
   long tell();
 private:
   // Cancel C++ default stuff
@@ -238,7 +234,6 @@ private:
   // Implementation
   char can_read;
   char can_write;
-  char can_seek;
   char must_close;
   FILE *fp;
   long pos;
@@ -269,9 +264,8 @@ public:
   ~MemoryByteStream();
   size_t read(void *buffer, size_t size);
   size_t write(const void *buffer, size_t size);
-  int is_seekable(void) const;
-  void seek(long offset, int whence = SEEK_SET);
-  long tell();
+  int    seek(long offset, int whence=SEEK_SET, bool nothrow=false);
+  long   tell();
   /** Returns the total number of bytes contained in the buffer.  Valid
       offsets for function #seek# range from 0 to the value returned by this
       function. */
@@ -334,8 +328,7 @@ public:
   // Virtual functions
   size_t read(void *buffer, size_t sz);
   size_t write(const void *buffer, size_t sz);
-  int is_seekable(void) const;
-  void seek(long offset, int whence = SEEK_SET);
+  int    seek(long offset, int whence = SEEK_SET, bool nothrow=false);
   long tell();
 private:
   const char *data;

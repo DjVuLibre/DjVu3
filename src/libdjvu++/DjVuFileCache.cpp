@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFileCache.cpp,v 1.2 1999-09-22 15:38:23 eaf Exp $
+//C- $Id: DjVuFileCache.cpp,v 1.3 1999-09-28 17:33:51 leonb Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -101,7 +101,7 @@ DjVuFileCache::clear_to_size(int size)
       {
 	    // More than 20 elements in the cache: use qsort to
 	    // sort them before picking up the oldest
-	 TArray<void *> item_arr(list.size()-1);
+	 GTArray<void *> item_arr(list.size()-1);
 	 GPosition pos;
 	 int i;
 	 for(pos=list, i=0;pos;++pos, i++)

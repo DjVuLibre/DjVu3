@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.64 1999-09-27 21:04:53 leonb Exp $
+//C- $Id: DjVuFile.cpp,v 1.65 1999-09-28 17:33:50 leonb Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -48,12 +48,11 @@ public:
    {
       return str->write(buffer, size);
    }
-   virtual void seek(long offset, int whence = SEEK_SET)
+   virtual int seek(long offset, int whence = SEEK_SET, bool nothrow=false)
    {
-      str->seek(offset, whence);
+     return str->seek(offset, whence);
    }
    virtual long tell() { return str->tell(); }
-   virtual int  is_seekable(void) const { return str->is_seekable(); }
 
    void		set_progress_cb(void (* xprogress_cb)(int, void *),
 				void * xprogress_cl_data)

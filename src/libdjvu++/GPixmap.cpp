@@ -9,9 +9,9 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GPixmap.cpp,v 1.9 1999-09-15 18:24:34 leonb Exp $
+//C- $Id: GPixmap.cpp,v 1.10 1999-09-28 17:33:51 leonb Exp $
 
-// File "$Id: GPixmap.cpp,v 1.9 1999-09-15 18:24:34 leonb Exp $"
+// File "$Id: GPixmap.cpp,v 1.10 1999-09-28 17:33:51 leonb Exp $"
 // -- Implements class PIXMAP
 // Author: Leon Bottou 07/1997
 
@@ -346,7 +346,7 @@ GPixmap::init(ByteStream &bs)
   // Read image data
   if (raw)
   {
-    TArray<unsigned char> line(ncolumns*3);
+    GTArray<unsigned char> line(ncolumns*3);
     for (int y=nrows-1; y>=0; y--) 
       {
         GPixel *p = (*this)[y];

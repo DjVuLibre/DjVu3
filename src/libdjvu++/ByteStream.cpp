@@ -9,9 +9,9 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: ByteStream.cpp,v 1.14 1999-09-28 15:05:19 leonb Exp $
+//C- $Id: ByteStream.cpp,v 1.15 1999-09-28 17:33:50 leonb Exp $
 
-// File "$Id: ByteStream.cpp,v 1.14 1999-09-28 15:05:19 leonb Exp $"
+// File "$Id: ByteStream.cpp,v 1.15 1999-09-28 17:33:50 leonb Exp $"
 // - Author: Leon Bottou, 04/1997
 
 #ifdef __GNUC__
@@ -33,27 +33,24 @@ ByteStream::flush()
 {
 }
 
-int 
-ByteStream::is_seekable() const
-{
-  return 0;
-}
-
-void
-ByteStream::seek(long offset, int whence)
+int
+ByteStream::seek(long offset, int whence, bool nothrow)
 {
   int nwhere = 0;
   int ncurrent = tell();
   switch (whence)
     {
-    case SEEK_SET: nwhere=0 ; break;
+    case SEEK_SET: nwhere=0; break;
     case SEEK_CUR: nwhere=ncurrent; break;
-    case SEEK_END: THROW("Seek mode SEEK_END is not supported by this ByteStream");
+    case SEEK_END: nwhere=ncurrent-offset-1; break;
     default: THROW("Illegal argument in ByteStream::seek");
     }
   nwhere += offset;
-  if (nwhere < ncurrent)
-    THROW("Seeking backwards is not supported by this ByteStream");
+  if (nwhere < ncurrent) 
+    {
+      if (nothrow) return -1;
+      THROW("Seeking backwards is not supported by this ByteStream");
+    }
   while (nwhere>ncurrent)
     {
       char buffer[512];
@@ -62,13 +59,12 @@ ByteStream::seek(long offset, int whence)
         bytes = nwhere - ncurrent;
       bytes = read(buffer, bytes);
       ncurrent += bytes;
-      if (ncurrent != tell())
-        THROW("Seeking is not supported by this ByteStream "
-              "(tell returns strange results)");
+      if (ncurrent!=tell())
+        THROW("Seeking works funny on this ByteStream (ftell() acts strange)");
       if (bytes==0)
         THROW("EOF");
     }
-  return;
+  return 0;
 }
 
 size_t 
@@ -213,13 +209,12 @@ StdioByteStream::StdioByteStream(FILE *f, const char *mode)
   pos = 0;
   must_close = 0;
   can_read = can_write = 0;
-  can_seek = 1;
   for (const char *s=mode; s && *s; s++)
     switch(*s) 
       {
-      case 'r': can_read=1; break;
+      case 'r': can_read=1;  break;
       case 'w': can_write=1; break;
-      case 'a': can_write=1; can_seek=0; break;
+      case 'a': can_write=1; break;
       case '+': can_read=can_write=1; break;
       case 'b': break;
       default: THROW("Illegal mode in StdioByteStream");
@@ -232,14 +227,13 @@ StdioByteStream::StdioByteStream(const char *filename, const char *mode)
   pos = 0;
   must_close = 1;
   can_read = can_write = 0;
-  can_seek = 1;
   FILE *dash = 0;
   for (const char *s=mode; s && *s; s++)
     switch(*s) 
       {
-      case 'r': can_read=1; dash=stdin; break;
+      case 'r': can_read=1;  dash=stdin; break;
       case 'w': can_write=1; dash=stdout; break;
-      case 'a': can_write=1; can_seek=0; dash=stdout; break;
+      case 'a': can_write=1; dash=stdout; break;
       case '+': can_read=can_write=1; dash=0; break;
       case 'b': break;
       default: THROW("Illegal mode in StdioByteStream");
@@ -258,7 +252,6 @@ StdioByteStream::StdioByteStream(const char *filename, const char *mode)
   else 
     {
       must_close = 0;
-      can_seek = 0;
       fp = dash;
       if (!fp)
         THROW("Illegal mode for stdin/stdout file descriptor");
@@ -272,7 +265,6 @@ StdioByteStream::~StdioByteStream()
     if (fclose(fp) < 0)
       THROW(strerror(errno));
 }
-
 
 size_t 
 StdioByteStream::read(void *buffer, size_t size)
@@ -328,22 +320,18 @@ StdioByteStream::tell()
   return pos;
 }
 
-int 
-StdioByteStream::is_seekable() const
+int
+StdioByteStream::seek(long offset, int whence, bool nothrow)
 {
-  return can_seek;
-}
-
-void
-StdioByteStream::seek(long offset, int whence)
-{
-  if (!can_seek)
-    ByteStream::seek(offset, whence);
-  else if (whence==SEEK_SET && offset>=0 && offset==ftell(fp))
-    return;
-  else if (fseek(fp, offset, whence))
-    THROW(strerror(errno));
+  if (whence==SEEK_SET && offset>=0 && offset==ftell(fp))
+    return 0;
+  if (fseek(fp, offset, whence)) 
+    {
+      if (nothrow) return -1;
+      THROW(strerror(errno));
+    }
   tell();
+  return 0;
 }
 
 
@@ -461,14 +449,8 @@ MemoryByteStream::tell()
   return where;
 }
 
-int 
-MemoryByteStream::is_seekable() const
-{
-  return 1;
-}
-
-void
-MemoryByteStream::seek(long offset, int whence)
+int
+MemoryByteStream::seek(long offset, int whence, bool nothrow)
 {
   int nwhere = 0;
   switch (whence)
@@ -479,9 +461,10 @@ MemoryByteStream::seek(long offset, int whence)
     default: THROW("Illegal argument in MemoryByteStream::seek()");
     }
   nwhere += offset;
-  if (nwhere<0 || nwhere>bsize)
-    THROW("Seek out of bound in MemoryByteStream");
+  if (nwhere<0)
+    THROW("Cannot seek before the beginning of the file");
   where = nwhere;
+  return 0;
 }
 
 TArray<char>
@@ -509,13 +492,14 @@ StaticByteStream::StaticByteStream(const char *buffer)
 size_t 
 StaticByteStream::read(void *buffer, size_t sz)
 {
-  if ((int) sz > bsize - where)
-    sz = bsize - where;
-  if ((int) sz <= 0)
+  int nsz = (int)sz;
+  if (nsz > bsize - where)
+    nsz = bsize - where;
+  if (nsz <= 0)
     return 0;
-  memcpy(buffer, data+where, sz);
-  where += sz;
-  return sz;
+  memcpy(buffer, data+where, nsz);
+  where += nsz;
+  return nsz;
 }
 
 size_t 
@@ -525,14 +509,8 @@ StaticByteStream::write(const void *buffer, size_t sz)
   return 0;
 }
 
-int 
-StaticByteStream::is_seekable(void) const
-{
-  return 1;
-}
-
-void 
-StaticByteStream::seek(long offset, int whence)
+int
+StaticByteStream::seek(long offset, int whence, bool nothrow)
 {
   int nwhere = 0;
   switch (whence)
@@ -543,9 +521,10 @@ StaticByteStream::seek(long offset, int whence)
     default: THROW("Illegal argument in StaticByteStream::seek()");
     }
   nwhere += offset;
-  if (nwhere<0 || nwhere>bsize)
-    THROW("Seek out of bound in StaticByteStream");
+  if (nwhere<0)
+    THROW("Cannot seek before the beginning of the file");
   where = nwhere;
+  return 0;
 }
 
 long 
