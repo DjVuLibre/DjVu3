@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuGlobal.cpp,v 1.6 1999-03-17 19:24:56 leonb Exp $
+//C- $Id: DjVuGlobal.cpp,v 1.7 1999-09-21 20:51:26 leonb Exp $
 
 
 
@@ -62,82 +62,125 @@ _djvu_memory_callback(djvu_delete_callback *dp, djvu_new_callback *np)
 #include <stdio.h>
 #include <string.h>
 
-static DjVuProgressScale       *p_scale  = 0;
-static djvu_progress_callback  *p_cb     = 0;
-static unsigned long            p_start  = 0;
-static FILE                    *p_log    = 0;
+DjVuProgress::CheckPoint *DjVuProgress::chk = 0;
+DjVuProgress::Callback   *DjVuProgress::cb = 0;
+unsigned long             DjVuProgress::base = 0;
+void                     *DjVuProgress::log = 0;
+int                       DjVuProgress::taglen = 0;
+int                       DjVuProgress::tagmax = 0;
+char                     *DjVuProgress::tagbuf = 0;
+
 
 void 
-_djvu_end_progress()
+DjVuProgress::end()
 {
-  p_scale = 0;
-  p_cb = 0;
-  if (p_log && p_log!=stderr) 
-    fclose(p_log);
-  p_log = 0;
+  if ((FILE*)log && (FILE*)log!=stderr) 
+    fclose((FILE*)log);
+  chk = 0;
+  cb = 0;
+  log = 0;
+  tagmax = taglen = 0;
+  delete [] tagbuf;
+  tagbuf = 0;
 }
 
 void 
-_djvu_start_progress(DjVuProgressScale *s, djvu_progress_callback *c)
+DjVuProgress::start(DjVuProgress::CheckPoint *s, DjVuProgress::Callback *c)
 {
-  _djvu_end_progress();
-  p_scale = s;
-  p_cb = c;
-  p_log = 0;
+  end();
+  chk = s;
+  cb = c;
+  log = 0;
 }
 
 void 
-_djvu_start_progress(DjVuProgressScale *s, const char *logname)
+DjVuProgress::start(const char *logname)
 {
-  _djvu_end_progress();
-  p_scale = s;
-  p_cb = 0;
-  p_start = GOS::ticks();
-  p_log = stderr;
+  end();
+  base = GOS::ticks();
+  log = (void*)stderr;
   if (logname) 
-    p_log = fopen(logname,"w");
-  if (p_log) 
-    fprintf(p_log, "------------------------------\n");
+    log = (void*)fopen(logname,"w");
 }
 
-
-// Internal stuff
-void 
-_djvu_progress(const char *filename, const char *tag, int index)
+DjVuProgress::Event::~Event()
 {
-  // Log current call
-  if (p_log)
-    fprintf(p_log, "  { \"%s\", \"%s\", %d },\t// time=%lu\n", 
-            filename,tag,index, GOS::ticks()-p_start );
-  // Search for a match
-  DjVuProgressScale *scale = p_scale;
-  for (; scale && scale->percent>0 && scale->percent<100; scale++)
+  taglen = n;
+  tagbuf[taglen] = 0;
+}
+
+DjVuProgress::Event::Event(const char *tag)
+  : n(taglen)
+{
+  enter(tag);
+}
+
+DjVuProgress::Event::Event(int tag)
+  : n(taglen)
+{
+  char buffer[16];
+  sprintf(buffer,"%d", tag);
+  enter(buffer);
+}
+
+void
+DjVuProgress::Event::enter(const char *tag)
+{
+  // Check tag buffer
+  int l = strlen(tag);
+  if (taglen+l+2 > tagmax) {
+    int newtagmax = tagmax + 256;
+    char *newbuf = new char[newtagmax];
+    strcpy(newbuf, tagbuf ? tagbuf : "");
+    delete [] tagbuf;
+    tagbuf = newbuf;
+    tagmax = newtagmax;
+  }
+  // Append tag component
+  if (taglen>0) {
+    strcpy(tagbuf+taglen, ".");
+    taglen += 1;
+  }
+  strcpy(tagbuf+taglen, tag);
+  taglen += l;
+  // Perform trace
+  if (log)
+    fprintf((FILE*)log, "  { %6ld, \"%s\" },\n", GOS::ticks()-base, tagbuf);
+  // Scan checkpoints
+  if (chk)
     {
-      // Check for a match
-      if (scale->match_filename && strcmp(filename, scale->match_filename))
-        continue;
-      if (scale->match_tag && strcmp(tag, scale->match_tag))
-        continue;
-      if (index < scale->match_index)
-        break;
-      // We have a match
-      if (p_log)
-        fprintf(p_log, "  // got %d %%\n", scale->percent );
-      if (p_cb)
-        (*p_cb) (scale->percent);
-      // Go to next entry
-      for (scale++; scale->percent>0 && scale->percent<100; scale++)
-        {
-          if (scale->match_filename && strcmp(filename, scale->match_filename))
-            break;
-          if (scale->match_tag && strcmp(tag, scale->match_tag))
-            break;
-          if (index <= scale->match_index)
-            break;
-        }
-      p_scale = scale;
-      break;
+      int lastpassed = -1;
+      for (CheckPoint *k=chk; k->tag; k++)
+        if (! k->passed)
+          {
+            char *s = tagbuf;
+            char *d = (char*)(k->tag);
+            for(;;)
+              {
+                if (*s>='0' && *s<='9' && *d>='0' && *d<='9')
+                  {
+                    int si = strtol(s, &s, 10);
+                    int di = strtol(d, &d, 10);
+                    if (si >= di)
+                      continue;
+                    break;
+                  }
+                if (*s==0 && *d==0)
+                  { 
+                    k->passed = 1; 
+                    lastpassed = k-chk;
+                    break; 
+                  }
+                if (*s++ != *d++)
+                  break;
+              }
+          }
+      // Callback
+      if (lastpassed>=0 && cb)
+        (*cb)(lastpassed);
     }
 }
 
+
 #endif
+

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: IWTransform.cpp,v 1.11 1999-08-18 18:04:52 leonb Exp $
+//C- $Id: IWTransform.cpp,v 1.12 1999-09-21 20:51:27 leonb Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -666,8 +666,6 @@ IWTransform::forward(short *p, int w, int h, int rowsize, int begin, int end)
       th = GOS::ticks()-th;
       fprintf(stderr,"forw%d\tv=%dms h=%dms\n", scale,th,tv);
 #endif
-      // Progress
-      DJVU_PROGRESS("decomp",scale);
     }
   // TERMINATE
   filter_end();

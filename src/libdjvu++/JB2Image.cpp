@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: JB2Image.cpp,v 1.19 1999-09-20 22:55:56 leonb Exp $
+//C- $Id: JB2Image.cpp,v 1.20 1999-09-21 20:51:27 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -1248,6 +1248,7 @@ _JB2Codec::code(JB2Dict *jim)
 {
   if (encoding)
     {
+      DJVU_PROGRESS("jb2dict");
       // -------------------------
       // THIS IS THE ENCODING PART
       // -------------------------
@@ -1269,8 +1270,12 @@ _JB2Codec::code(JB2Dict *jim)
       int shapeno;
       for (shapeno=firstshape; shapeno<nshape; shapeno++)
         {
+#ifdef NEED_DJVU_PROGRESS
+          if ((shapeno & 0xff) == 0xff)
+            DJVU_PROGRESS((shapeno-firstshape)*100/(nshape-firstshape));
+#endif
+          // Code shape
           JB2Shape *jshp = jim->get_shape(shapeno);
-          DJVU_PROGRESS("code_record(jb2dict)", (shapeno-firstshape*100)/(nshape-firstshape));
           rectype = NEW_MARK_LIBRARY_ONLY;
           if (jshp->parent >= 0)
             rectype = MATCHED_REFINE_LIBRARY_ONLY;
@@ -1287,10 +1292,6 @@ _JB2Codec::code(JB2Dict *jim)
       rectype = END_OF_DATA;
       code_record(rectype, jim, NULL); 
       zp.ZPCodec::~ZPCodec();
-      // Progress
-      DJVU_PROGRESS("code_record(jb2dict)", 999);
-
-
     }
   else
     {
@@ -1513,6 +1514,7 @@ _JB2Codec::code(JB2Image *jim)
   // Test case
   if (encoding)
     {
+      DJVU_PROGRESS("jb2image");
       // -------------------------
       // THIS IS THE ENCODING PART
       // -------------------------
@@ -1558,11 +1560,13 @@ _JB2Codec::code(JB2Image *jim)
       int blitno;
       for (blitno=0; blitno<nblit; blitno++)
         {
+#ifdef NEED_DJVU_PROGRESS
+          if ((blitno & 0xff) == 0xff)
+            DJVU_PROGRESS(blitno*100/nblit);
+#endif
           JB2Blit *jblt = jim->get_blit(blitno);
           int shapeno = jblt->shapeno;
           JB2Shape *jshp = jim->get_shape(shapeno);
-          // Progress indicator
-          DJVU_PROGRESS("code_record(jb2image)", blitno*100/nblit);
           // Tests if shape exists in library
           if (shape2lib[shapeno] >= 0)
             {
@@ -1620,8 +1624,6 @@ _JB2Codec::code(JB2Image *jim)
       rectype = END_OF_DATA;
       code_record(rectype, jim, NULL, NULL); 
       zp.ZPCodec::~ZPCodec();
-      // Progress
-      DJVU_PROGRESS("code_record(jb2image)", 999);
     }
   else
     {
