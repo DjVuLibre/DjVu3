@@ -9,10 +9,10 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GThreads.cpp,v 1.39 2000-01-21 00:02:45 eaf Exp $
+//C- $Id: GThreads.cpp,v 1.40 2000-01-22 00:52:49 leonb Exp $
 
 
-// **** File "$Id: GThreads.cpp,v 1.39 2000-01-21 00:02:45 eaf Exp $"
+// **** File "$Id: GThreads.cpp,v 1.40 2000-01-22 00:52:49 leonb Exp $"
 // This file defines machine independent classes
 // for running and synchronizing threads.
 // - Author: Leon Bottou, 01/1998
@@ -92,13 +92,12 @@ start(void *arg)
 void
 GThread::wait_for_finish(void)
 {
-   while(true)
-   {
-      DWORD exitcode;
-      if (!GetExitCodeThread(hthr, &exitcode) ||
-	  exitcode!=STILL_ACTIVE)
-	 break;
-   }
+  if ((xentry || arg) && hthr)
+    {
+      if (thrid == GetCurrentThreadId())
+        THROW("Can't wait on calling thread.");
+      WaitForSingleObject(hthr, INFINITE);
+    }
 }
 
 GThread::GThread(int stacksize)
@@ -133,7 +132,8 @@ void
 GThread::terminate()
 {
   OutputDebugString("Terminating thread.\n");
-  TerminateThread(hthr,0);
+  if (hthr)
+    TerminateThread(hthr,0);
 }
 
 int
@@ -298,85 +298,7 @@ GMonitor::wait(unsigned long timeout)
 
 #if THREADMODEL==MACTHREADS
 
-GThread::GThread(int stacksize) 
-  : thid(kNoThreadID)
-{
-}
-
-GThread::~GThread(void)
-{
-}
-
-pascal void *
-start(void *arg)
-{
-  GThread *gt = (GThread*)arg;
-  try 
-    {
-      TRY
-        {
-          (gt->xentry)(gt->xarg);
-        }
-      CATCH(ex)
-        {
-          ex.perror();
-          fprintf(stderr, "GThreads: uncaught exception.");
-          abort();
-        }
-      ENDCATCH;
-    }
-  catch(...)
-    {
-      fprintf(stderr, "GThreads: unrecognized uncaught exception.");
-      abort();
-    }
-  return 0;
-}
-
-int
-GThread::create(void (*entry)(void*), void *arg)
-{
-  if (thid != kNoThreadID)
-    return -1;
-  xentry = entry;
-  xarg = arg;
-  int err = NewThread( kCooperativeThread, start , this, 0,
-                       kCreateIfNeeded, (void**)nil, &thid );
-  if( err != noErr )
-    return err;
-  return 0;
-}
-
-void
-GThread::wait_for_finish()
-{
-      // TODO: write appropriate code here
-}
-
-void
-GThread::terminate()
-{
-  if (thid != kNoThreadID)
-    DisposeThread( thid, NULL, false );
-}
-
-int
-GThread::yield()
-{
-  YieldToAnyThread();
-  return 0;
-}
-
-void*
-GThread::current()
-{
-  unsigned long thid = kNoThreadID;
-  GetCurrentThread(&thid);
-  return (void*) thid;
-}
-
-
-// Doubliy linked list of waiting threads
+// Doubly linked list of waiting threads
 static struct thr_waiting {
   struct thr_waiting *next;     // ptr to next waiting thread record
   struct thr_waiting *prev;     // ptr to ptr to this waiting thread
@@ -412,6 +334,7 @@ macthread_wait(ThreadID self, void *wchan)
   // Returns from the wait.
 }
 
+
 // Wakeup one thread or all threads waiting on cause wchan
 static void
 macthread_wakeup(void *wchan, int onlyone)
@@ -425,6 +348,101 @@ macthread_wakeup(void *wchan, int onlyone)
         return;
     }
 }
+
+
+GThread::GThread(int stacksize) 
+  : thid(kNoThreadID), finished(0), xentry(0), xarg(0)
+{
+}
+
+
+GThread::~GThread(void)
+{
+}
+
+
+pascal void *
+GThread::start(void *arg)
+{
+  GThread *gt = (GThread*)arg;
+  try 
+    {
+      TRY
+        {
+          gt->finished = 0;
+          (gt->xentry)(gt->xarg);
+        }
+      CATCH(ex)
+        {
+          ex.perror();
+          fprintf(stderr, "GThreads: uncaught exception.");
+          abort();
+        }
+      ENDCATCH;
+    }
+  catch(...)
+    {
+      fprintf(stderr, "GThreads: unrecognized uncaught exception.");
+      abort();
+    }
+  gt->finished = 1;
+  macthread_wakeup((void*)gt, 0);
+  return 0;
+}
+
+int
+GThread::create(void (*entry)(void*), void *arg)
+{
+  if (thid != kNoThreadID)
+    return -1;
+  xentry = entry;
+  xarg = arg;
+  int err = NewThread( kCooperativeThread, GThread::start , this, 0,
+                       kCreateIfNeeded, (void**)nil, &thid );
+  if( err != noErr )
+    return err;
+  return 0;
+}
+
+void
+GThread::wait_for_finish()
+{
+  // TODO: test this code [LYB]
+  if ((xentry || xarg) && (thid != kNoThreadID))
+    {
+      if (thid == current())
+        THROW("Can't wait on calling thread.");
+      if (! finished)
+        macthread_wait(thid, (void*)this);
+    }
+}
+
+void
+GThread::terminate()
+{
+  if ((thid != kNoThreadID) && !finished)
+    {
+      finished = 1;
+      DisposeThread( thid, NULL, false );
+      macthread_wakeup((void*)this, 0);
+    }
+}
+
+int
+GThread::yield()
+{
+  YieldToAnyThread();
+  return 0;
+}
+
+void*
+GThread::current()
+{
+  unsigned long thid = kNoThreadID;
+  GetCurrentThread(&thid);
+  return (void*) thid;
+}
+
 
 // GMonitor implementation
 GMonitor::GMonitor() 
@@ -550,8 +568,11 @@ GMonitor::wait(unsigned long timeout)
 #define pthread_condattr_default   NULL
 #endif
 
-static void *
-start(void *arg)
+
+static GMonitor finish_mon;
+
+void *
+GThread::start(void *arg)
 {
   GThread *gt = (GThread*)arg;
 #ifdef DCETHREADS
@@ -574,6 +595,7 @@ start(void *arg)
 #endif 
       TRY
         {
+          gt->finished = 0;
           (gt->xentry)(gt->xarg);
         }
       CATCH(ex)
@@ -591,6 +613,11 @@ start(void *arg)
       abort();
     }
 #endif 
+  // Signal thread termination
+  finish_mon.enter();
+  gt->finished = 1;
+  finish_mon.broadcast();
+  finish_mon.leave();
   return 0;
 }
 
@@ -598,17 +625,24 @@ start(void *arg)
 void
 GThread::wait_for_finish(void)
 {
-   pthread_t caller=pthread_self();
-   if (pthread_equal(hthr, caller))
-      THROW("Can't wait on calling thread.");
-   pthread_join(hthr, 0);
+  if (xentry || xarg)
+    {
+      pthread_t caller=pthread_self();
+      if (pthread_equal(hthr, caller))
+        THROW("Can't wait on calling thread.");
+      // This is not very efficient
+      // but has low memory overhead.
+      finish_mon.enter();
+      while (!finished)
+        finish_mon.wait();
+      finish_mon.leave();
+    }
 }
 
 // GThread
 
 GThread::GThread(int stacksize) : 
-  xentry(0), 
-  xarg(0)
+  hthr(0), finished(0), xentry(0), xarg(0)
 {
 }
 
@@ -624,7 +658,7 @@ GThread::create(void (*entry)(void*), void *arg)
   xentry = entry;
   xarg = arg;
 #ifdef DCETHREADS
-  int ret = pthread_create(&hthr, pthread_attr_default, start, (void*)this);
+  int ret = pthread_create(&hthr, pthread_attr_default, GThread::start, (void*)this);
   if (ret >= 0)
     pthread_detach(&hthr);
 #else
@@ -640,7 +674,15 @@ GThread::create(void (*entry)(void*), void *arg)
 void 
 GThread::terminate()
 {
-  pthread_cancel(hthr);
+  if ((xentry || xarg) && !finished)
+    {
+      pthread_cancel(hthr);
+      // Signal termination
+      finish_mon.enter();
+      finished = 1;
+      finish_mon.broadcast();
+      finish_mon.leave();
+    }
 }
 
 int
@@ -1318,13 +1360,9 @@ GThread::set_scheduling_callback(void (*call)(int))
 }
 
 
-
-
 GThread::GThread(int stacksize)
   : task(0), xentry(0), xarg(0)
 {
-  finished=false;
-  
   // check argument
   if (stacksize < 0)
     stacksize = DEFSTACK;
@@ -1354,6 +1392,7 @@ GThread::GThread(int stacksize)
   task->ehctx = __new_eh_context();
 #endif
 }
+
 
 GThread::~GThread()
 {
@@ -1419,7 +1458,6 @@ starttwo(GThread *thr)
     }
 #endif 
   thr->terminate();
-  thr->finished=true;
   GThread::yield();
   abort();
 }
@@ -1428,8 +1466,16 @@ starttwo(GThread *thr)
 void
 GThread::wait_for_finish(void)
 {
-   while(!finished) GThread::yield();
+  if (maintask && curtask && (xentry || xarg))
+    {
+      if (task == curtask)
+        THROW("Can't wait on calling thread.");
+      if (task->next && task->prev)
+        curtask->wchan = (void*)this;
+      cotask_yield();
+    }
 }
+
 
 int 
 GThread::create(void (*entry)(void*), void *arg)
@@ -1452,6 +1498,7 @@ GThread::create(void (*entry)(void*), void *arg)
   return 0;
 }
 
+
 void 
 GThread::terminate()
 {
@@ -1465,7 +1512,11 @@ GThread::terminate()
         (*scheduling_callback)(CallbackTerminate);
       task->prev->next = task->next;
       task->next->prev = task->prev;
-      task->prev = 0; // mark task as terminated...
+      // mark task as terminated...
+      task->prev = 0; 
+      // signal termination
+      cotask_wakeup((void*)this, 0);
+      // yield if current task
       if (task == curtask)
         cotask_yield();
     }

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GThreads.h,v 1.32 2000-01-21 15:13:31 eaf Exp $
+//C- $Id: GThreads.h,v 1.33 2000-01-22 00:52:49 leonb Exp $
 
 #ifndef _GTHREADS_H_
 #define _GTHREADS_H_
@@ -73,7 +73,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Praveen Guduru <praveen@sanskrit.lz.att.com> -- mac implementation.
     @version
-    #$Id: GThreads.h,v 1.32 2000-01-21 15:13:31 eaf Exp $# */
+    #$Id: GThreads.h,v 1.33 2000-01-22 00:52:49 leonb Exp $# */
 //@{
 
 #include "DjVuGlobal.h"
@@ -216,17 +216,20 @@ private:
 #elif THREADMODEL==MACTHREADS
 private:
   unsigned long thid;
+  unsigned int finished;
+  static pascal void *start(void *arg);
 #elif THREADMODEL==POSIXTHREADS
 private:
   pthread_t hthr;
+  unsigned int finished;
+  static void *start(void *arg);
 #elif THREADMODEL==JRITHREADS
 private:
   JRIGlobalRef obj;
 #elif THREADMODEL==COTHREADS
-  bool finished;
-public:
-  // Should be considered as private
+  friend class GMonitor;
   struct cotask *task;
+public:
   /** Replaces system call #select# (COTHREADS only).  The #COTHREADS# model
       does not redefine system function.  System functions therefore can
       potentially block the whole process (instead of blocking the current

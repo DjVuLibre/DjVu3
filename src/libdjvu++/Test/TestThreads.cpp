@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: TestThreads.cpp,v 1.7 1999-03-17 19:25:01 leonb Exp $
+//C- $Id: TestThreads.cpp,v 1.8 2000-01-22 00:52:49 leonb Exp $
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -87,6 +87,8 @@ alloc()
   free(mem);
 }
 
+GEvent sleeper;
+
 
 void
 second(void *arg)
@@ -102,12 +104,12 @@ second(void *arg)
       ev.wait();
       xprintf("%d waiting (timeout 3s)\n",(int)arg);
       ev.wait(3000);
+      xprintf("%d waiting 10 seconds\n", (int)arg);
+      sleeper.wait(10000);
       xprintf("%d leave\n", (int)arg);
     }
 }
 
-
-GEvent sleeper;
 
 int
 main()
@@ -120,6 +122,8 @@ main()
   ev.set();
   xprintf("0 sleeping 6s\n");
   sleeper.wait(6000);
+  xprintf("0 waiting for end of 1\n");
+  th.wait_for_finish();
   xprintf("0 leave\n");
 }
 
