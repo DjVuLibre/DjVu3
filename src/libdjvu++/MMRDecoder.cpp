@@ -8,7 +8,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: MMRDecoder.cpp,v 1.2 1999-09-27 21:39:55 leonb Exp $
+//C- $Id: MMRDecoder.cpp,v 1.3 1999-09-28 01:22:34 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -25,10 +25,10 @@
 // ASSERTIONS/EXCEPTIONS
 
 
-#define ASSERT(x)  { if (!(x)) THROW(exc_assert); }
 
-static const char *exc_assert = "Assertion failed";
-static const char *exc_corrupt = "Corrupted file";
+static void throw_assertion() { THROW("Assertion failed"); }
+static void throw_corrupted() { THROW("MMR data is corrupted"); }
+#define ASSERT(x)  { if (!(x)) throw_assertion(); }
 
 
 // ----------------------------------------
@@ -300,8 +300,8 @@ private:
 public:
   // Initializes a bit source on a bytestream
   _VLSource(ByteStream &inp);
-  // Returns an integer with at least the next sixteen code bits 
-  // in the high order bits.
+  // Returns a 32 bits integer with at least the 
+  // next sixteen code bits in the high order bits.
   unsigned int peek() 
     { return codeword; }
   // Consumes #n# bits.
@@ -313,7 +313,7 @@ _VLSource::_VLSource(ByteStream &inp)
   : inp(inp), codeword(0), 
     lowbits(0), bufpos(0), bufmax(0)
 {
-  lowbits = 8 * sizeof(unsigned int);
+  lowbits = 32;
   preload();
 }
 
@@ -330,7 +330,7 @@ _VLSource::preload()
 	  if (! bufmax)
 	    {
 	      // Return if not yet beyond EOF
-	      if (lowbits <= (int)(8 * sizeof(unsigned int)))  
+	      if (lowbits <= 32)
 		return;
 	      THROW("EOF");
 	    }
@@ -378,8 +378,9 @@ _VLTable::_VLTable(VLCode *codes, int nbits)
   while (codes[ncodes].codelen)
     ncodes++;
   // check arguments
+  ASSERT(sizeof(int)>=4);
   ASSERT(nbits>1 && nbits<=16 && ncodes<256) // sizes are ok
-  codewordshift = (sizeof(unsigned int)*8) - nbits;
+  codewordshift = 32 - nbits;
   // allocate table
   int size = (1<<nbits);
   index = new unsigned char[size];
@@ -441,7 +442,10 @@ MMRDecoder::scanline()
 {
   // Check if all lines have been returned
   if (lineno >= height)
-    return 0;
+    {
+      memset(refline, 0, width);
+      return refline;
+    }
   // Loop until scanline is complete
   char a0color=0;
   int a0=0, a1, b1, b2;
@@ -464,33 +468,35 @@ MMRDecoder::scanline()
       switch ( mrtable->decode(src) )
         {
           /* Pass Mode */
-        case P: { 
-          while (a0 < b2)
-            refline[a0++] = a0color;
-          break;
-        }
+        case P: 
+          { 
+            while (a0 < b2)
+              refline[a0++] = a0color;
+            break;
+          }
           /* Horizontal Mode */
-        case H: { 
-          int len;
-          _VLTable *table;
-          // First run
-          a1 = a0;
-          table = (a0color ? btable : wtable);
-          do { len = table->decode(src); a1 += len; } while (len >= 64);
-          if (len<0 || a1>width) 
-            THROW(exc_corrupt);
-          while (a0 < a1) 
-            refline[a0++] = a0color;
-          // Second run
-          a1 = a0;
-          table = (!a0color ? btable : wtable);
-          do { len = table->decode(src); a1 += len; } while (len >= 64);
-          if (len<0 || a1>width) 
-            THROW(exc_corrupt);
-          while (a0 < a1) 
-            refline[a0++] = !a0color;
-          break;
-        }
+        case H: 
+          { 
+            int len;
+            _VLTable *table;
+            // First run
+            a1 = a0;
+            table = (a0color ? btable : wtable);
+            do { len = table->decode(src); a1 += len; } while (len >= 64);
+            if (len<0 || a1>width) 
+              throw_corrupted();
+            while (a0 < a1) 
+              refline[a0++] = a0color;
+            // Second run
+            a1 = a0;
+            table = (!a0color ? btable : wtable);
+            do { len = table->decode(src); a1 += len; } while (len >= 64);
+            if (len<0 || a1>width) 
+              throw_corrupted();
+            while (a0 < a1) 
+              refline[a0++] = !a0color;
+            break;
+          }
           /* Vertical Modes */
         case V0:
           a1 = b1;
@@ -515,15 +521,70 @@ MMRDecoder::scanline()
           goto vertical_mode;
         vertical_mode:
           if (a1 > width)
-            THROW(exc_corrupt);    
+            throw_corrupted();    
           while (a0 < a1) 
             refline[a0++] = a0color;
           a0color = !a0color;
           break;
-          /* Bad code */
-        default:
-          THROW(exc_corrupt);
-          break;
+          /* Uncommon codes */
+        default: 
+          {
+            // UNCOMPRESSED ``0000001111'' (cf TIFF 6.0) 
+            if ((src->peek() & 0xffc00000) == 0x03c00000)
+              {
+                // This code is *untested* -- never seen that!
+                unsigned int m;
+                src->shift(10);
+                while ((m = src->peek() & 0xfc000000))
+                  {
+                    if (m == 0x04000000)       // 000001
+                      {
+                        if (a0+4 >= width)
+                          throw_corrupted();
+                        refline[a0++] = 0;
+                        refline[a0++] = 0;
+                        refline[a0++] = 0;
+                        refline[a0++] = 0;
+                        refline[a0++] = 0;
+                        src->shift(6);
+                      } 
+                    else                       // 000010...111111
+                      {
+                        if (a0 >= width)
+                          throw_corrupted();
+                        refline[a0++] = ((src->peek() & 0x80000000)?1:0);
+                        src->shift(1);
+                      }
+                  }
+                m = src->peek() & 0xff000000;  
+                if (m == 0x03000000)           // 00000011
+                  a0color = 1;
+                else if (m == 0x02000000)      // 00000010
+                  a0color = 0;
+                else
+                  throw_corrupted();
+                src->shift(8);
+                // Hope that everything is ok.
+                break;
+              }
+            // EOFB ``000000000001000000000001'' (cf TIFF 6.0)
+            if ((src->peek() & 0xfff00000) == 0x00100000)
+              {
+                src->shift(12);
+                if ((src->peek() & 0xfff00000) == 0x00100000)
+                  {
+                    // Terminate decoding and make sure all 
+                    // remaining pixels are white.
+                    while (a0 < width)
+                      refline[a0++] = 0;
+                    lineno = height;
+                    return refline;
+                  }
+              }
+            // UNKNOWN: This has to be a corrupted file.
+            throw_corrupted();
+            break;
+          }
         }
     }
   /* Increment and return */
