@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.h,v 1.11 1999-08-31 22:56:54 eaf Exp $
+//C- $Id: DjVuDocument.h,v 1.12 1999-09-01 18:39:56 eaf Exp $
  
 #ifndef _DJVUDOCUMENT_H
 #define _DJVUDOCUMENT_H
@@ -32,7 +32,7 @@
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocument.h,v 1.11 1999-08-31 22:56:54 eaf Exp $#
+    @version #$Id: DjVuDocument.h,v 1.12 1999-09-01 18:39:56 eaf Exp $#
 */
 
 //@{
@@ -201,6 +201,17 @@ public:
       /** Translates the page URL back to page number. Returns #-1# if the
 	  page is not in the document. */
    int		url_to_page(const GURL & url);
+
+      /** Decodes document structure.
+	  This function is meaningful only for {\em obsolete} DjVu formats,
+	  which were using the so-called {\em navigation directory}. Since
+	  this directory is normally placed into a separate file, its contents
+	  are not known after the document is constructed. Thus functions
+	  like \Ref{get_pages_num}(), etc. initially return some dummy
+	  information. We do not call #decode_doc_structure()# from the
+	  constructor because it will block until enough data is available.
+	  This is undesirable for the plugin. */
+   void		decode_doc_structure(void);
    
       /** Returns \Ref{GP} pointer to \Ref{DjVuImage} corresponding to page
           #page_num#. The image will not necessarily bedecoded in full.  If

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.23 1999-08-31 22:56:54 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.24 1999-09-01 18:39:56 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -160,6 +160,18 @@ DjVuDocument::detect_doc_type(const GURL & doc_url)
 }
 
 void
+DjVuDocument::decode_doc_structure(void)
+{
+   DEBUG_MSG("DjVuDocument::decode_doc_structure(): learning doc structure.\n");
+   DEBUG_MAKE_INDENT(3);
+
+   if (get_doc_type()==OLD_BUNDLED ||
+       get_doc_type()==INDEXED)
+      if (!ndir || dummy_ndir)
+	 decode_ndir();
+}
+
+void
 DjVuDocument::decode_ndir(void)
 {
    DEBUG_MSG("DjVuDocument::decode_ndir(): decoding the navigation directory...\n");
@@ -183,11 +195,7 @@ DjVuDocument::get_pages_num(void)
 {
    if (doc_type==BUNDLED || doc_type==INDIRECT)
       return djvm_dir->get_pages_num();
-   else
-   {
-      if (dummy_ndir) decode_ndir();
-      return ndir->get_pages_num();
-   }
+   else return ndir->get_pages_num();
 }
 
 GString
@@ -197,11 +205,7 @@ DjVuDocument::page_to_id(int page_num)
    if (page_num>=get_pages_num()) THROW("Page number is too big.");
    if (doc_type==BUNDLED || doc_type==INDIRECT)
       return djvm_dir->page_to_file(page_num)->id;
-   else
-   {
-      if (dummy_ndir) decode_ndir();
-      return ndir->page_to_name(page_num);
-   }
+   else return ndir->page_to_name(page_num);
 }
 
 GString
@@ -211,11 +215,7 @@ DjVuDocument::page_to_name(int page_num)
    if (page_num>=get_pages_num()) THROW("Page number is too big.");
    if (doc_type==BUNDLED || doc_type==INDIRECT)
       return djvm_dir->page_to_file(page_num)->name;
-   else
-   {
-      if (dummy_ndir) decode_ndir();
-      return ndir->page_to_name(page_num);
-   }
+   else return ndir->page_to_name(page_num);
 }
 
 GString
@@ -225,11 +225,7 @@ DjVuDocument::page_to_title(int page_num)
    if (page_num>=get_pages_num()) THROW("Page number is too big.");
    if (doc_type==BUNDLED || doc_type==INDIRECT)
       return djvm_dir->page_to_file(page_num)->title;
-   else
-   {
-      if (dummy_ndir) decode_ndir();
-      return ndir->page_to_name(page_num);
-   }
+   else return ndir->page_to_name(page_num);
 }
 
 GURL
@@ -244,7 +240,6 @@ DjVuDocument::page_to_url(int page_num)
       case OLD_BUNDLED:
       case INDEXED:
       {
-	 if (dummy_ndir) decode_ndir();
 	 url=ndir->page_to_url(page_num);
 	 break;
       }
@@ -273,7 +268,6 @@ DjVuDocument::url_to_page(const GURL & url)
       case OLD_BUNDLED:
       case INDEXED:
       {
-	 if (dummy_ndir) decode_ndir();
 	 page_num=ndir->url_to_page(url);
 	 break;
       }
@@ -669,7 +663,7 @@ add_file_to_djvm(const GP<DjVuFile> & file, bool page,
 	    // Yes. We're lazy. We don't check if those files contain
 	    // anything else.
 	 GPosition pos;
-	 GPList<DjVuFile> files_list=file->get_included_files();
+	 GPList<DjVuFile> files_list=file->get_included_files(false);
 	 TArray<char> data=file->get_djvu_data(false, true);
 	 for(pos=files_list;pos;++pos)
 	 {
