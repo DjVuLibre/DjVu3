@@ -9,9 +9,9 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GOS.cpp,v 1.18 1999-11-23 22:52:28 praveen Exp $
+//C- $Id: GOS.cpp,v 1.19 1999-12-01 04:18:58 bcr Exp $
 
-// "$Id: GOS.cpp,v 1.18 1999-11-23 22:52:28 praveen Exp $"
+// "$Id: GOS.cpp,v 1.19 1999-12-01 04:18:58 bcr Exp $"
 
 #ifdef __GNUC__
 #pragma implementation
@@ -104,13 +104,16 @@ GOS::is_file(const char *filename)
     return FALSE;
   if (buf.st_mode & S_IFDIR) 
     return FALSE;
-#endif
+#else
 #ifdef WIN32
   struct _stat buf;
   if (_stat(filename,&buf)==-1)
     return FALSE;
   if (buf.st_mode & S_IFDIR) 
     return FALSE;
+#else
+  error ( define something here for your operating system )
+#endif  
 #endif
   return TRUE;
   
@@ -128,7 +131,7 @@ GOS::is_dir(const char *filename)
   if (stat(filename,&buf)==0)
     if (buf.st_mode & S_IFDIR)
       return TRUE;
-#endif
+#else
   /* WIN32 implementation (bug around) */
 #ifdef WIN32
   char *last;
@@ -145,6 +148,9 @@ GOS::is_dir(const char *filename)
   if (_stat(buffer,&buf)==0)
     if (buf.st_mode & S_IFDIR)
       return TRUE;
+#else
+  error ( define something here for your operating system )
+#endif  
 #endif
   return FALSE;
   
@@ -182,7 +188,7 @@ GOS::dirname(const char *fname)
   } while (s<p);
   *q = 0;
   return string_buffer;
-#endif
+#else
 
   /* WIN32 implementation */
 #ifdef WIN32
@@ -235,6 +241,9 @@ GOS::dirname(const char *fname)
   } while (s<p);
   *q = 0;
   return string_buffer;
+#else
+  error ( define something here for your operating system )
+#endif  
 #endif
 }
 
@@ -270,7 +279,7 @@ GOS::basename(const char *fname, const char *suffix)
       *s = 0;
   }
   return string_buffer;
-#endif
+#else
   
   /* WIN32 implementation */
 #ifdef WIN32
@@ -311,6 +320,9 @@ GOS::basename(const char *fname, const char *suffix)
       *s = 0;
   }
   return string_buffer;
+#else
+  error ( define something here for your operating system )
+#endif
 #endif
 }
 
@@ -353,7 +365,7 @@ GOS::cwd(const char *dirname)
   if (!result)
     THROW(errmsg());
   return result;
-#endif
+#else
 #ifdef WIN32
   char drv[2];
   if (dirname && _chdir(dirname)==-1)
@@ -364,7 +376,10 @@ GOS::cwd(const char *dirname)
   char *result = getcwd(string_buffer,MAXPATHLEN);
   GetFullPathName(drv, MAXPATHLEN, string_buffer, &result);
   return string_buffer;
+#else
+  error ( define something here for your operating system )
 #endif 
+#endif
 }
 
 
@@ -441,7 +456,7 @@ GOS::expand_name(const char *fname, const char *from)
     }
     *s = 0;
   }
-#endif
+#else
   
   
   /* WIN32 implementation */
@@ -513,6 +528,9 @@ GOS::expand_name(const char *fname, const char *from)
       *s = 0;
     }
   return string_buffer;
+#else
+  error ( define something here for your operating system )
+#endif  
 #endif  
 }
 
@@ -625,10 +643,13 @@ GOS::ticks()
     THROW(errmsg());
   return (unsigned long)( ((tv.tv_sec & 0xfffff)*1000) 
                           + (tv.tv_usec/1000) );
-#endif
+#else
 #ifdef WIN32
   DWORD clk = GetTickCount();
   return (unsigned long)clk;
+#else
+  error ( define something here for your operating system )
+#endif  
 #endif
 }
 
@@ -689,14 +710,18 @@ GOS::filename_to_url(const char *filename, const char *useragent)
 #ifdef WIN32
       if (*s == '\\' || *s=='/')
         { *d++ ='/'; continue; }
-#endif
+#else
 #ifdef macintosh
       if (*s == ':' )
         { *d++ ='/'; continue; }
-#endif
+#else
 #ifdef UNIX
       if (*s == '/' )
         { *d++ ='/'; continue; }
+#else
+  error ( define something here for your operating system )
+#endif  
+#endif
 #endif
       // unreserved characters
       if ( (*s>='a' && *s<='z') ||
@@ -748,9 +773,12 @@ GOS::url_to_filename(const char *url)
   GString tmp;
 #ifdef UNIX
   const char *root = "/";
-#endif
+#else
 #ifdef WIN32
   const char *root = "C:\\";
+#else
+  error ( define something here for your operating system )
+#endif  
 #endif
   // Process hexdecimal character specification
   GString urlcopy;
