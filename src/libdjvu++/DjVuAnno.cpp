@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuAnno.cpp,v 1.23 1999-10-10 21:12:23 eaf Exp $
+//C- $Id: DjVuAnno.cpp,v 1.24 1999-10-11 20:54:21 eaf Exp $
 
 
 #ifdef __GNUC__
@@ -910,7 +910,7 @@ DjVuANT::encode_raw(void) const
    GString ans;
    int size = str.size();
    str.seek(0);
-   str.write(ans.getbuf(size), size);
+   str.read(ans.getbuf(size), size);
    return ans;
 }
 
