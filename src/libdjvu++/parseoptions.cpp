@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: parseoptions.cpp,v 1.32 2000-01-30 02:41:05 praveen Exp $
+//C- $Id: parseoptions.cpp,v 1.33 2000-02-01 04:18:51 bcr Exp $
 #ifdef __GNUC__
 #pragma implementation
 #endif
@@ -1406,11 +1406,15 @@ ReadEscape
   return c;
 }
 
+DjVuParseOptions::GetOpt::~GetOpt()
+{
+  delete [] optstring;
+}
+
 // Having a prepared optstring is actually a pain, since it makes it more
 // difficult to compute longindex.
 //
-DjVuParseOptions::GetOpt::GetOpt
-(DjVuParseOptions *xopt,
+DjVuParseOptions::GetOpt::GetOpt(DjVuParseOptions *xopt,
   const int xargc,
   const char * const xargv[],
   const djvu_option lopts[],
