@@ -1,4 +1,4 @@
-/* File "$Id: DjVuAPI.h,v 1.7 1999-11-24 19:21:50 orost Exp $"
+/* File "$Id: DjVuAPI.h,v 1.8 1999-12-03 00:23:10 parag Exp $"
  *
  * The main header file for the DjVu API
  */
@@ -11,7 +11,10 @@
 
 /* 
  * $Log: DjVuAPI.h,v $
- * Revision 1.7  1999-11-24 19:21:50  orost
+ * Revision 1.8  1999-12-03 00:23:10  parag
+ * Added C Compatibility
+ *
+ * Revision 1.7  1999/11/24 19:21:50  orost
  * added djvu_pixel_rotate
  *
  * Revision 1.6  1999/11/23 15:54:08  orost
@@ -677,13 +680,16 @@ typedef enum {
  *
  *		See DjVuAPI-2_0.html#djvu_input_sub
  */ 
+
              typedef int
              djvu_input_sub (
                  void *arg,      /* Argument passed to
                                   * the API routine */
                  unsigned char * data[],     /* Pointer to the data
                                   * being read */
-                 const int len,  /* Length of the data
+                 const int len
+#ifdef __cplusplus
+								 ,                /* Length of the data
                                   * being read  
 				  * retVal < len >=0 (EOF reached)
 				  * retval > len     (Wants to send More Data)
@@ -692,6 +698,7 @@ typedef enum {
 				    * seek == +n   (Skip next "n" data )
 				    * seek == -1   (Deallocate if required) */
 		 const int whence=1 /* Default to SEEK_CUR */
+#endif
                             );
 
 /* 
