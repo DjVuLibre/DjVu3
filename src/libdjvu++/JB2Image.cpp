@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: JB2Image.cpp,v 1.15 1999-08-12 20:59:29 leonb Exp $
+//C- $Id: JB2Image.cpp,v 1.16 1999-09-13 20:20:44 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -81,7 +81,7 @@ private:
   void code_record_type(int &rectype);
   int code_match_index(int &index, JB2Dict *jim);
   // Library
-  void init_library(JB2Dict *jim);
+  void init_library(JB2Dict *jim, int nshape=-1);
   int add_library(int shapeno, JB2Shape *jshp);
   GTArray<int> shape2lib;
   GTArray<int> lib2shape;
@@ -577,13 +577,14 @@ _JB2Codec::code_comment(GString &comment)
 
 
 void
-_JB2Codec::init_library(JB2Dict *jim)
+_JB2Codec::init_library(JB2Dict *jim, int nshape)
 {
-  int startlib = jim->get_inherited_shape_count();
-  shape2lib.resize(0,startlib-1);
-  lib2shape.resize(0,startlib-1);
-  libinfo.resize(0,startlib-1);
-  for (int i=0; i<startlib; i++)
+  if (nshape < 0) 
+    nshape = jim->get_inherited_shape_count();
+  shape2lib.resize(0,nshape-1);
+  lib2shape.resize(0,nshape-1);
+  libinfo.resize(0,nshape-1);
+  for (int i=0; i<nshape; i++)
     {
       shape2lib[i] = i;
       lib2shape[i] = i;
@@ -1219,13 +1220,9 @@ _JB2Codec::code(JB2Dict *jim)
       // THIS IS THE ENCODING PART
       // -------------------------
       int i;
-      init_library(jim);
       int firstshape = jim->get_inherited_shape_count();
       int nshape = jim->get_shape_count();
-      shape2lib.resize(0,nshape-1);
-      lib2shape.resize(0,nshape-1);
-      for (i=firstshape; i<nshape; i++)
-        shape2lib[i] = lib2shape[i] = i;
+      init_library(jim, nshape);
       // Code headers.
       int rectype = REQUIRED_DICT;
       if (jim->get_inherited_shape_count() > 0)
