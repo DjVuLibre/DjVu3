@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessage.cpp,v 1.21 2001-03-13 01:49:21 bcr Exp $
+// $Id: DjVuMessage.cpp,v 1.22 2001-03-13 18:06:20 fcrary Exp $
 // $Name:  $
 
 
@@ -90,7 +90,7 @@ RegOpenReadConfig ( HKEY hParentKey )
 {
   GString retval;
    // To do:  This needs to be shared with SetProfile.cpp
-  LPCTSTR path = TEXT(registerypath) ;
+  LPCTSTR path = registrypath;
 
   HKEY hKey = 0;
   // MultiByteToWideChar(CP_ACP,MB_PRECOMPOSED,argv[1],strlen(argv[1])+1,wszSrcFile,sizeof(wszSrcFile));
@@ -522,53 +522,4 @@ DjVuMessage::InsertArg( GString &message, int ArgId, GString arg ) const
     message += GString("\n\tParameter ") + GString(ArgId) + ":  " + arg;
   }
 }
-
-#ifdef WIN32
-static GString
-RegOpenReadConfig ( HKEY hParentKey )
-{
-  GString retval;
-   // To do:  This needs to be shared with SetProfile.cpp
-  LPCTSTR path = registrypath ;
-
-  HKEY hKey = 0;
-  // MultiByteToWideChar(CP_ACP,MB_PRECOMPOSED,argv[1],strlen(argv[1])+1,wszSrcFile,sizeof(wszSrcFile));
-  if (RegOpenKeyEx(hParentKey, path, 0,
-              KEY_READ, &hKey) == ERROR_SUCCESS )
-  {
-    TCHAR path[1024];
-    // Success
-    PTCHAR szPathValue = path;
-    LPCTSTR lpszEntry = TEXT("");
-    DWORD dwCount = (sizeof(path)/sizeof(TCHAR))-1;
-    DWORD dwType;
-
-    LONG lResult = RegQueryValueEx(hKey, lpszEntry, NULL,
-             &dwType, (LPBYTE) szPathValue, &dwCount);
-
-    RegCloseKey(hKey);
-
-    if ((lResult == ERROR_SUCCESS))
-    {
-      szPathValue[dwCount] = 0;
-      USES_CONVERSION;
-      strcpy(retval.getbuf(_tcslen(path)),T2CA(path));
-    }
-  } 
-//  if (hKey)  RegCloseKey(hKey); 
-  return retval;
-}
-
-static GString
-GetModulePath( void )
-{
-  TCHAR path[1024];
-  DWORD dwCount = (sizeof(path)/sizeof(TCHAR))-1;
-  GetModuleFileName(0, path, dwCount);
-  GString retval;
-  USES_CONVERSION;
-  strcpy(retval.getbuf(_tcslen(path)),T2CA(path));
-  return GOS::expand_name(LocalDjVuDir,GOS::dirname(retval));
-}
-#endif
 
