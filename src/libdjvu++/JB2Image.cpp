@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: JB2Image.cpp,v 1.18 1999-09-20 12:55:50 leonb Exp $
+//C- $Id: JB2Image.cpp,v 1.19 1999-09-20 22:55:56 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -1270,7 +1270,7 @@ _JB2Codec::code(JB2Dict *jim)
       for (shapeno=firstshape; shapeno<nshape; shapeno++)
         {
           JB2Shape *jshp = jim->get_shape(shapeno);
-          DJVU_PROGRESS("code_record(jb2dict)", (hapeno-firstshape*100)/(nshape-firstshape));
+          DJVU_PROGRESS("code_record(jb2dict)", (shapeno-firstshape*100)/(nshape-firstshape));
           rectype = NEW_MARK_LIBRARY_ONLY;
           if (jshp->parent >= 0)
             rectype = MATCHED_REFINE_LIBRARY_ONLY;

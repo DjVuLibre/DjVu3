@@ -557,12 +557,16 @@ generate_makefile()
 ### ------------------------------------------------------------------------
 ### Function to generate main makefiles
 
-# Usage: generate_main_makefile  SUBDIRS
+
+
+
+# Usage: cat fragement | generate_main_makefile  SUBDIRS
 
 generate_main_makefile()
 {
     subdirs=$*
-    targets="all clean depend html tex install"
+
+    # Generate Makefile header
     cat > Makefile <<EOF
 SHELL=/bin/sh
 TOPSRCDIR= $topsrcdir
@@ -572,20 +576,24 @@ CXX= $CXX
 OPT= $OPT
 WARN= $WARN
 DEFS= $DEFS
-SUBDIRS=$subdirs
-
+SUBDIRS= $subdirs
 EOF
-     for target in $targets
-     do
-        cat >>Makefile <<EOF 
-$target:
-	@for n in \${SUBDIRS} ; do ( cd \$\$n ; \${MAKE} $target ) ; done
-	@echo Done.
 
-EOF
-     done
+    # Insert Makefile fragment
+    cat >> Makefile 
 
-        cat >>Makefile <<EOF 
-.PHONY: $targets
+    # Add final rules
+    cat >> Makefile <<\EOF
+
+clean:
+	for n in $(SUBDIRS) ; do ( cd $$n ; $(MAKE) clean ) ; done
+
+html:
+	for n in $(SUBDIRS) ; do ( cd $$n ; $(MAKE) html ) ; done
+
+depend:
+	for n in $(SUBDIRS) ; do ( cd $$n ; $(MAKE) depend ) ; done
+
+PHONY: all install clean html depend
 EOF
 }

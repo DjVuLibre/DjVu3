@@ -1,4 +1,6 @@
 #!/bin/sh
+# LIBDJVU++ -- Decoding library and utilities
+
 
 
 ### ---------------------------
@@ -79,7 +81,16 @@ check_make_stlib
 generate_makefile src/libdjvu++
 generate_makefile src/libdjvu++/Test
 
-generate_main_makefile src/libdjvu++
+generate_main_makefile src/libdjvu++ <<\EOF
+
+all: 
+    	( cd src/libdjvu++; $(MAKE) lib prog )
+
+install:
+    	( cd src/libdjvu++; $(MAKE) install-lib install-prog )
+
+EOF
+
 
 
 ### ------------------------------------------------------------------------

@@ -8,11 +8,13 @@
 # C- AT&T, you have an infringing copy of this software and cannot use it
 # C- without violating AT&T's intellectual property rights.
 # C-
-# C- $Id: Makefile.in,v 1.41 1999-09-10 22:04:54 leonb Exp $
+# C- $Id: Makefile.in,v 1.42 1999-09-20 22:55:56 leonb Exp $
 
 SHELL=/bin/sh
 prefix=@prefix@
 bindir=@prefix@/bin
+libdir=@prefix@/lib
+incdir=@prefix@/include
 SRCDIR=@srcdir@
 TOPSRCDIR=@topsrcdir@
 TOPBUILDDIR=@topbuilddir@
@@ -54,8 +56,13 @@ LIBOBJS= DjVuGlobal.o GOS.o GException.o GContainer.o GString.o \
 
 # Make all
 
-all: $(LIB) $(PROG) 
-	echo Done.
+all: lib prog
+
+lib: $(LIB)
+
+prog: $(PROG)
+
+
 
 # Rule for building the library
 
@@ -143,35 +150,54 @@ tex:  libdjvu++.dxx
 	gzip -f libdjvu++.ps
 
 
-# Generic rules
+# Cleaning
 
 clean:
 	-rm 2>/dev/null -rf $(PROG) ; true
 	-rm 2>/dev/null *.o *.a *.out *.rpo *.dep ii_files ; true
 	if [ -d Test ] ; then ( cd Test ; $(MAKE) clean ) ; fi
-	-@echo Cleaned.
 
 realclean:
 	-rm 2>/dev/null -rf Doc libdjvu++.dxx libdjvu++.ps.gz ; true
 	-rm 2>/dev/null -rf ATTLicense.cpp Makefile.depend ; true
 	-@$(MAKE) clean
 
-install: $(PROG)
+
+# Installing
+
+install: install-prog install-lib
+
+install-prog: $(PROG)
 	-@mkdir $(prefix) 2>/dev/null
 	-@mkdir $(bindir) 2>/dev/null
 	for n in $(PROG); do        \
 	  cp $$n $(bindir)        ; \
 	  chmod 755 $(bindir)/$$n ; \
 	done
-	-@echo Installed.
+
+install-lib: $(LIB)
+	-@mkdir $(prefix) 2>/dev/null
+	-@mkdir $(libdir) 2>/dev/null
+	for n in $(LIB); do        \
+	  cp $$n $(libdir)        ; \
+	  chmod 644 $(libdir)/$$n ; \
+	  $(RANLIB) $(libdir)/$$n ; \
+	done
+
+
+# Dependencies
 
 depend:
-	( cd $(SRCDIR) ; echo "### DEPENDENCIES" ;\
-	  for n in *.cpp ; do ${CXX} -MM $(CXXFLAGS) $$n ; done ) > Makefile.depend
+	( echo "### DEPENDENCIES" ;\
+	  for n in $(SRCDIR)/*.cpp ; \
+	  do ${CXX} -MM $(CXXFLAGS) $$n ; done ) > $(SRCDIR)/Makefile.depend
 	sed -e '/^### DEPENDENCIES$$/,$$d' Makefile > Makefile.new
 	cat $(SRCDIR)/Makefile.depend >> Makefile.new
 	mv Makefile.new Makefile
 	  
+
+# Misc
+
 release:
 	$(MAKE) realclean
 	$(MAKE) depend
@@ -187,10 +213,13 @@ capsule:
 	@echo Distribution is in ../$(NAM)-$(VER).tar.gz
 
 
-PHONY: html tex clean realclean distclean install depend release capsule
-
+PHONY: all lib prog \
+       install install-lib install-prog \
+       clean realclean html tex depend \
+       release capsule
 
 # Handle cpp files as C++
+
 .SUFFIXES: .cpp
 .cpp.o:
 	$(CXX) $(CXXFLAGS) -c $(SRCDIR)/$*.cpp
