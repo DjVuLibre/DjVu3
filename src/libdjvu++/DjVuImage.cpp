@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuImage.cpp,v 1.11.4.1 1999-04-12 16:45:50 eaf Exp $
+//C- $Id: DjVuImage.cpp,v 1.11.4.2 1999-04-16 20:20:09 eaf Exp $
 
 
 #ifdef __GNUC__
@@ -170,6 +170,25 @@ DjVuImage::get_dpi() const
 {
    GP<DjVuInfo> info=get_info();
    return info ? info->dpi : 300;
+}
+
+int
+DjVuImage::get_rounded_dpi() const
+{
+   int dpi=get_dpi();
+   if (dpi>700) return dpi;
+  
+   const int std_dpi[]={ 25, 50, 75, 100, 150, 300, 600 };
+   const int std_dpis=sizeof(std_dpi)/sizeof(std_dpi[0]);
+   int min_dist=abs(dpi-std_dpi[0]);
+   int min_idx=0;
+   for(int i=1;i<std_dpis;i++)
+      if (abs(std_dpi[i]-dpi)<min_dist)
+      {
+         min_dist=abs(std_dpi[i]-dpi);
+         min_idx=i;
+      };
+   return std_dpi[min_idx];
 }
 
 inline double

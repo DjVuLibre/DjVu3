@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuImage.h,v 1.11.4.1 1999-04-12 16:45:50 eaf Exp $
+//C- $Id: DjVuImage.h,v 1.11.4.2 1999-04-16 20:20:09 eaf Exp $
 
 #ifndef _DJVUIMAGE_H
 #define _DJVUIMAGE_H
@@ -60,7 +60,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: DjVuImage.h,v 1.11.4.1 1999-04-12 16:45:50 eaf Exp $# */
+    #$Id: DjVuImage.h,v 1.11.4.2 1999-04-16 20:20:09 eaf Exp $# */
 //@{
 
 
@@ -163,6 +163,10 @@ public:
       determine the natural magnification to use for rendering a DjVu
       image. */
   int get_dpi() const;
+  /** Same as \Ref{get_dpi}() but instead of precise value returns the closest
+      "standard" one: 25, 50, 75, 100, 150, 300, 600. If dpi is greater than
+      700, it's returned as is. */
+  int get_rounded_dpi() const;
   /** Returns the gamma coefficient of the display for which the image was
       designed.  The rendering functions can use this information in order to
       perform color correction for the intended display device. */
