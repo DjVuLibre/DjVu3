@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.cpp,v 1.42 2001-01-25 20:09:04 bcr Exp $
+// $Id: ByteStream.cpp,v 1.43 2001-02-07 23:26:34 bcr Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 04/1997
@@ -38,11 +38,18 @@
 #ifdef __GNUC__
 #pragma implementation
 #endif
+#include "ByteStream.h"
+#include "GOS.h"
+
+#ifdef UNIX
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <sys/mman.h>
+#endif
 #ifndef UNDER_CE
 #include <errno.h>
 #endif
-#include "ByteStream.h"
-#include "GOS.h"
 
 //// CLASS BYTESTREAM
 
@@ -598,17 +605,69 @@ ByteStream::get_data(void)
 
 ///////// STATICBYTESTREAM
 
-
 StaticByteStream::StaticByteStream(const char *buffer, size_t sz)
-  : data(buffer), bsize(sz), where(0)
+  : data(buffer), bsize(sz), where(0), buf(0)
 {
 }
 
 StaticByteStream::StaticByteStream(const char *buffer)
-  : data(buffer), bsize(0), where(0)
+  : data(buffer), bsize(0), where(0), buf(0)
 {
   bsize = strlen(data);
 }
+
+#if defined(UNIX) && defined(PROT_READ) && defined(MAP_SHARED)
+StaticByteStream::StaticByteStream(const int fd,const bool closeme)
+  : data(0), bsize(0), where(0), buf(0)
+{
+  if(fd>=0)
+  {
+    init(fd);
+    if(closeme)
+    {
+      close(fd);
+    }
+  }else
+  {
+    G_THROW("ByteStream.open_fail2");
+  } 
+}
+
+StaticByteStream::StaticByteStream(FILE *f,const bool closeme)
+  : data(0), bsize(0), where(0), buf(0)
+{
+  if(f)
+  {
+    init(fileno(f));
+    if(closeme)
+    {
+      fclose(f);
+    }
+  }
+}
+
+void
+StaticByteStream::init(const int fd)
+{
+  struct stat statbuf;
+  if(!fstat(fd,&statbuf))
+  {
+    if(statbuf.st_size)
+    {
+      bsize=statbuf.st_size;
+      data=(char *)(buf=mmap(0,statbuf.st_size,PROT_READ,MAP_SHARED,fd,0));
+    }
+  }
+}
+
+StaticByteStream::~StaticByteStream()
+{
+  if(buf)
+  {
+    munmap(buf,bsize);
+  }
+}
+#endif
 
 size_t 
 StaticByteStream::read(void *buffer, size_t sz)

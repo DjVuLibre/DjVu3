@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.h,v 1.33 2001-01-04 22:04:54 bcr Exp $
+// $Id: ByteStream.h,v 1.34 2001-02-07 23:26:34 bcr Exp $
 // $Name:  $
 
 #ifndef _BYTESTREAM_H
@@ -62,7 +62,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation\\
     Andrei Erofeev <eaf@geocities.com> -- 
     @version
-    #$Id: ByteStream.h,v 1.33 2001-01-04 22:04:54 bcr Exp $# */
+    #$Id: ByteStream.h,v 1.34 2001-02-07 23:26:34 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -383,7 +383,12 @@ public:
   StaticByteStream(const char *buffer, size_t sz);
   /** Creates a StaticByteStream object for allocating the null terminated
       memory area starting at address #buffer#. */
-  StaticByteStream(const char *buffer);  
+  StaticByteStream(const char *buffer);
+#ifdef UNIX
+  StaticByteStream(const int fd, const bool closeme);
+  StaticByteStream(FILE *f, const bool closeme);
+#endif
+  virtual ~StaticByteStream();  
   // Virtual functions
   virtual size_t read(void *buffer, size_t sz);
   virtual size_t write(const void *buffer, size_t sz);
@@ -397,6 +402,10 @@ private:
   const char *data;
   int bsize;
   int where;
+#ifdef UNIX
+  void *buf;
+  void init(const int fd);
+#endif
 };
 
 inline int
