@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuImage.cpp,v 1.49 2001-02-10 01:16:57 bcr Exp $
+// $Id: DjVuImage.cpp,v 1.50 2001-02-14 02:30:56 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -86,14 +86,14 @@ DjVuImage::get_info(const GP<DjVuFile> & file) const
    return 0;
 }
 
-GP<IWPixmap>
+GP<IW44Image>
 DjVuImage::get_bg44(const GP<DjVuFile> & file) const
 {
    if (file->bg44) return file->bg44;
    GPList<DjVuFile> list=file->get_included_files();
    for(GPosition pos=list;pos;++pos)
    {
-      GP<IWPixmap> bg44=get_bg44(list[pos]);
+      GP<IW44Image> bg44=get_bg44(list[pos]);
       if (bg44) return bg44;
    }
    return 0;
@@ -192,7 +192,7 @@ DjVuImage::get_text() const
    return out;
 }
 
-GP<IWPixmap>   
+GP<IW44Image>   
 DjVuImage::get_bg44() const
 {
    if (file) return get_bg44(file);
@@ -480,7 +480,7 @@ DjVuImage::is_legal_bilevel() const
   // Components
   GP<DjVuInfo> info = get_info();
   GP<JB2Image> fgjb = get_fgjb();
-  GP<IWPixmap> bg44 = get_bg44();
+  GP<IW44Image> bg44 = get_bg44();
   GP<GPixmap>  bgpm = get_bgpm();
   GP<GPixmap>  fgpm = get_fgpm();
   // Check info
@@ -508,7 +508,7 @@ DjVuImage::is_legal_photo() const
   // Components
   GP<DjVuInfo> info = get_info();
   GP<JB2Image> fgjb = get_fgjb(); 
-  GP<IWPixmap> bg44 = get_bg44();
+  GP<IW44Image> bg44 = get_bg44();
   GP<GPixmap>  bgpm = get_bgpm();
   GP<GPixmap>  fgpm = get_fgpm();
   // Check info
@@ -537,7 +537,7 @@ DjVuImage::is_legal_compound() const
   // Components
   GP<DjVuInfo>     info = get_info();
   GP<JB2Image>     fgjb = get_fgjb();
-  GP<IWPixmap>     bg44 = get_bg44();
+  GP<IW44Image>     bg44 = get_bg44();
   GP<GPixmap>      bgpm = get_bgpm();
   GP<GPixmap>      fgpm = get_fgpm();
   GP<DjVuPalette>  fgbc = get_fgbc();
@@ -615,8 +615,8 @@ DjVuImage::get_bg_pixmap(const GRect &rect,
   else if (gamma_correction > 10)
     gamma_correction = 10;
   
-  // CASE1: Incremental BG IWPixmap
-  GP<IWPixmap> bg44 = get_bg44();
+  // CASE1: Incremental BG IW44Image
+  GP<IW44Image> bg44 = get_bg44();
   if (bg44)
     {
       int w = bg44->get_width();

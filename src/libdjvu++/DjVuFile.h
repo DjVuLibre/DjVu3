@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuFile.h,v 1.71 2001-01-04 22:04:55 bcr Exp $
+// $Id: DjVuFile.h,v 1.72 2001-02-14 02:30:56 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUFILE_H
@@ -49,7 +49,7 @@ class ByteStream;
 class DataPool;
 class JB2Image;
 class JB2Dict;
-class IWPixmap;
+class IW44Image;
 class IFFByteStream;
 class GPixmap;
 class DjVuNavDir;
@@ -71,7 +71,7 @@ class DjVuNavDir;
 
     @memo Classes representing DjVu files.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuFile.h,v 1.71 2001-01-04 22:04:55 bcr Exp $#
+    @version #$Id: DjVuFile.h,v 1.72 2001-02-14 02:30:56 bcr Exp $#
 */
 
 //@{
@@ -181,7 +181,7 @@ public:
       /// Pointer to the DjVu file information component.
    GP<DjVuInfo>		info;
       /// Pointer to the background component of DjVu image (IW44 encoded).
-   GP<IWPixmap>		bg44;
+   GP<IW44Image>	bg44;
       /// Pointer to the background component of DjVu image (Raw).
    GP<GPixmap>		bgpm;
       /// Pointer to the mask of foreground component of DjVu image (JB2 encoded).

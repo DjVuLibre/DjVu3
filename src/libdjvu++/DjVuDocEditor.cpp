@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocEditor.cpp,v 1.57 2001-02-13 00:11:40 bcr Exp $
+// $Id: DjVuDocEditor.cpp,v 1.58 2001-02-14 02:30:56 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -1389,7 +1389,7 @@ DjVuDocEditor::get_thumbnails_size(void) const
          ByteStream &str=*gstr;
          str.writall((const char *) data, data.size());
          str.seek(0);
-         GP<IWPixmap> iwpix=new IWPixmap();
+         GP<IW44Image> iwpix=IW44Image::create_decode(true);
          iwpix->decode_chunk(str);
         
          int width=iwpix->get_width();
@@ -1558,7 +1558,7 @@ DjVuDocEditor::generate_thumbnails(int thumb_size, int page_num)
          if (!pm) G_THROW("DjVuDocEditor.render\t"+GString(page_num));
 
             // Store and compress the pixmap
-         GP<IWPixmap> iwpix=new IWPixmap(*pm);
+         GP<IW44Image> iwpix=IW44Image::create(*pm);
          GP<ByteStream> str=ByteStream::create();
          ByteStream &mbs=*str;
          IWEncoderParms parms;

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuImage.h,v 1.35 2001-01-04 22:04:55 bcr Exp $
+// $Id: DjVuImage.h,v 1.36 2001-02-14 02:30:56 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUIMAGE_H
@@ -73,7 +73,7 @@
     L\'eon Bottou <leonb@research.att.com> - initial implementation
     Andrei Erofeev <eaf@geocities.com> - multipage support
     @version
-    #$Id: DjVuImage.h,v 1.35 2001-01-04 22:04:55 bcr Exp $# */
+    #$Id: DjVuImage.h,v 1.36 2001-02-14 02:30:56 bcr Exp $# */
 //@{
 
 
@@ -137,7 +137,7 @@ public:
   /** Returns a pointer to the IW44 encoded background component of a DjVu
       image.  This function returns a null pointer until the decoder actually
       processes an #"BG44"# chunk. */
-  GP<IWPixmap>    get_bg44() const;
+  GP<IW44Image>    get_bg44() const;
   /** Returns a pointer to the raw background component of a DjVu image. The
       background component is used for JPEG encoded backgrounds.  This
       function returns a null pointer until the decoder actually processes an
@@ -329,7 +329,7 @@ private:
   // HELPERS
   int stencil(GPixmap *pm, const GRect &rect, int subs, double gcorr) const;
   GP<DjVuInfo>		get_info(const GP<DjVuFile> & file) const;
-  GP<IWPixmap>		get_bg44(const GP<DjVuFile> & file) const;
+  GP<IW44Image>		get_bg44(const GP<DjVuFile> & file) const;
   GP<GPixmap>		get_bgpm(const GP<DjVuFile> & file) const;
   GP<JB2Image>		get_fgjb(const GP<DjVuFile> & file) const;
   GP<GPixmap>		get_fgpm(const GP<DjVuFile> & file) const;

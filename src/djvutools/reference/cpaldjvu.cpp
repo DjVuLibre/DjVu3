@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: cpaldjvu.cpp,v 1.8 2001-02-13 00:11:40 bcr Exp $
+// $Id: cpaldjvu.cpp,v 1.9 2001-02-14 02:30:56 bcr Exp $
 // $Name:  $
 
 
@@ -69,7 +69,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: cpaldjvu.cpp,v 1.8 2001-02-13 00:11:40 bcr Exp $# */
+    #$Id: cpaldjvu.cpp,v 1.9 2001-02-14 02:30:56 bcr Exp $# */
 //@{
 //@}
 
@@ -809,17 +809,16 @@ cpaldjvu(const GPixmap &input, const char *fileout, const cpaldjvuopts &opts)
     }
   
   // Create background image
-  IWPixmap iwimage;
 #ifdef BACKGROUND_SUBSAMPLING_FACTOR
   // -- we may create the background by masking and subsampling
   GPixmap inputsub;
   GP<GBitmap> mask = jimg.get_bitmap(BACKGROUND_SUBSAMPLING_FACTOR);
   inputsub.downsample(&input, BACKGROUND_SUBSAMPLING_FACTOR);
-  iwimage.init(&inputsub, mask);
+  GP<IW44Image> iwimage=IW44Image::create(inputsub, mask);
 #else
   // -- but who cares since the background is uniform.
   GPixmap inputsub((h+11)/12, (w+11)/12, &bgcolor);
-  iwimage.init(inputsub);
+  GP<IW44Image> iwimage=IW44Image::create(inputsub);
 #endif
 
   // Assemble DJVU file
@@ -849,17 +848,17 @@ cpaldjvu(const GPixmap &input, const char *fileout, const cpaldjvuopts &opts)
   // ----- we may use several chunks to enable progressive rendering ...
   iff.put_chunk("BG44");
   iwparms.slices = 74;
-  iwimage.encode_chunk(iff, iwparms);
+  iwimage->encode_chunk(iff, iwparms);
   iff.close_chunk();
   iff.put_chunk("BG44");
   iwparms.slices = 87;
-  iwimage.encode_chunk(iff, iwparms);
+  iwimage->encode_chunk(iff, iwparms);
   iff.close_chunk();
 #endif
   // ----- but who cares when the background is so small.
   iff.put_chunk("BG44");
   iwparms.slices = 97;
-  iwimage.encode_chunk(iff, iwparms);
+  iwimage->encode_chunk(iff, iwparms);
   iff.close_chunk();
   // -- terminate main composite chunk
   iff.close_chunk();

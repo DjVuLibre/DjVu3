@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: d44.cpp,v 1.8 2001-02-09 01:06:42 bcr Exp $
+// $Id: d44.cpp,v 1.9 2001-02-14 02:30:56 bcr Exp $
 // $Name:  $
 
 /** @name d44
@@ -84,7 +84,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: d44.cpp,v 1.8 2001-02-09 01:06:42 bcr Exp $# 
+    #$Id: d44.cpp,v 1.9 2001-02-14 02:30:56 bcr Exp $# 
 */
 //@{
 //@}
@@ -197,66 +197,51 @@ mymain(int argc, char **argv)
       // Go decoding
       if (chkid == "FORM:DJVM")
 	      G_THROW("This is multipage DJVU file. Please break it into pieces.");
-      if (chkid == "FORM:BM44")
-        {
-          IFFByteStream iff(ibs);
-          IWBitmap iw;
-          int stime = GOS::ticks();
-          iw.decode_iff(iff, flag_chunks);
-          int dtime = GOS::ticks() - stime;
-          GP<GBitmap> pbm = iw.get_bitmap();
-          int rtime = GOS::ticks() - stime - dtime;
-          if (flag_verbose)
-            fprintf(stderr,
-                    "image: gray %d x %d\n"
-                    "times: %dms (decoding) + %dms (rendering)\n"
-                    "memory: %dkB (%d%% active coefficients)\n",
-                    iw.get_width(), iw.get_height(), dtime, rtime, 
-                    (iw.get_memory_usage()+512)/1024, iw.get_percent_memory());
-          if (flag_addsuffix)
-            pnmfile = pnmfile + ".pgm";
+      const bool color=(chkid == "FORM:PM44");
+      if (!color && !(chkid == "FORM:BM44"))
+      {
+        G_THROW("d44: expected BM44 or PM44 chunk in IW4 file");
+      }
+      IFFByteStream iff(ibs);
+      GP<IW44Image> iw=IW44Image::create_decode(color);
+      const int stime = GOS::ticks();
+      iw->decode_iff(iff, flag_chunks);
+      const int dtime = GOS::ticks() - stime;
+      GP<GPixmap> ppm;
+      GP<GBitmap> pgm;
+      if(color)
+      {
+        ppm = iw->get_pixmap();
+      }else
+      {
+        pgm = iw->get_bitmap();
+      }
+      const int rtime = GOS::ticks() - stime - dtime;
+      if (flag_verbose)
+        fprintf(stderr,
+                "image: %s %d x %d\n"
+                "times: %dms (decoding) + %dms (rendering)\n"
+                "memory: %dkB (%d%% active coefficients)\n",
+                color?"color":"gray",
+                iw->get_width(), iw->get_height(), dtime, rtime, 
+                (iw->get_memory_usage()+512)/1024, iw->get_percent_memory());
+      if (flag_addsuffix)
+        pnmfile = pnmfile + (color?".ppm":".pgm");
 #ifndef UNDER_CE
-          remove(pnmfile);
+      remove(pnmfile);
 #else
-          WCHAR tszPnmFile[MAX_PATH] ;
-          MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED,pnmfile,strlen(pnmfile)+1,tszPnmFile,sizeof(tszPnmFile)) ;
-          DeleteFile(tszPnmFile) ;
+      WCHAR tszPnmFile[MAX_PATH] ;
+      MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED,pnmfile,strlen(pnmfile)+1,tszPnmFile,sizeof(tszPnmFile)) ;
+      DeleteFile(tszPnmFile) ;
 #endif
-          GP<ByteStream> obs=ByteStream::create(pnmfile,"wb");
-          pbm->save_pgm(*obs);
-        }
-      else if (chkid == "FORM:PM44")
-        {
-          IFFByteStream iff(ibs);
-          IWPixmap iw;
-          int stime = GOS::ticks();
-          iw.decode_iff(iff, flag_chunks);
-          int dtime = GOS::ticks() - stime;
-          GP<GPixmap> ppm = iw.get_pixmap();
-          int rtime = GOS::ticks() - stime - dtime;
-          if (flag_verbose)
-            fprintf(stderr,
-                    "image: color %d x %d\n"
-                    "times: %dms (decoding) + %dms (rendering)\n"
-                    "memory: %dkB (%d%% active coefficients)\n",
-                    iw.get_width(), iw.get_height(), dtime, rtime, 
-                    (iw.get_memory_usage()+512)/1024, iw.get_percent_memory());
-          if (flag_addsuffix)
-            pnmfile = pnmfile + ".ppm";
-#ifndef UNDER_CE
-          remove(pnmfile);
-#else
-          WCHAR tszPnmFile[MAX_PATH] ;
-          MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED,pnmfile,strlen(pnmfile)+1,tszPnmFile,sizeof(tszPnmFile)) ;
-          DeleteFile(tszPnmFile) ;
-#endif
-          GP<ByteStream> obs=ByteStream::create(pnmfile,"wb");
-          ppm->save_ppm(*obs);
-        }
-      else
-        {
-          G_THROW("d44: expected BM44 or PM44 chunk in IW4 file");
-        }
+      GP<ByteStream> obs=ByteStream::create(pnmfile,"wb");
+      if(color)
+      {
+        ppm->save_ppm(*obs);
+      }else
+      {
+        pgm->save_pgm(*obs);
+      }
     }
   G_CATCH(ex)
     {

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: csepdjvu.cpp,v 1.9 2001-02-13 00:11:40 bcr Exp $
+// $Id: csepdjvu.cpp,v 1.10 2001-02-14 02:30:56 bcr Exp $
 // $Name:  $
 
 
@@ -108,7 +108,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: csepdjvu.cpp,v 1.9 2001-02-13 00:11:40 bcr Exp $# */
+    #$Id: csepdjvu.cpp,v 1.10 2001-02-14 02:30:56 bcr Exp $# */
 //@{
 //@}
 
@@ -1107,15 +1107,15 @@ csepdjvu_page(BufferByteStream &bs, ByteStream &obs, const csepdjvuopts &opts)
     }
   
   // Create background image
-  GP<IWPixmap> iwp;
+  GP<IW44Image> iw;
   if (! white_background)
     {
       /* Perform masked compression */
       GP<GBitmap> mask = jimg.get_bitmap(bgred);
       mask->binarize_grays(bgred*bgred-1);
-      IWPixmap::CRCBMode mode = IWPixmap::CRCBnormal;
-      if (gray_background) mode = IWPixmap::CRCBnone;
-      iwp = new IWPixmap(*bgpix, mask, mode);
+      IW44Image::CRCBMode mode = IW44Image::CRCBnormal;
+      if (gray_background) mode = IW44Image::CRCBnone;
+      iw = IW44Image::create(*bgpix, mask, mode);
       bgpix = 0;
     } 
   else if (! bitonal) 
@@ -1123,7 +1123,7 @@ csepdjvu_page(BufferByteStream &bs, ByteStream &obs, const csepdjvuopts &opts)
       /* Compute white background */
       GPixel bgcolor = GPixel::WHITE;
       GPixmap inputsub((h+11)/12, (w+11)/12, &bgcolor);
-      iwp = new IWPixmap(inputsub, 0, IWPixmap::CRCBnone);
+      iw = IW44Image::create(inputsub, 0, IW44Image::CRCBnone);
     }
   
   // Assemble DJVU file
@@ -1155,7 +1155,7 @@ csepdjvu_page(BufferByteStream &bs, ByteStream &obs, const csepdjvuopts &opts)
         {
           iff.put_chunk("BG44");
           iwparms.slices = 97;
-          iwp->encode_chunk(iff, iwparms);
+          iw->encode_chunk(iff, iwparms);
           iff.close_chunk();
         }
       else
@@ -1164,7 +1164,7 @@ csepdjvu_page(BufferByteStream &bs, ByteStream &obs, const csepdjvuopts &opts)
           while ((iwparms.slices = *slice++))
             {
               iff.put_chunk("BG44");
-              iwp->encode_chunk(iff, iwparms);
+              iw->encode_chunk(iff, iwparms);
               iff.close_chunk();
             }
         }

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: IWImage.h,v 1.23 2001-02-13 00:11:40 bcr Exp $
+// $Id: IWImage.h,v 1.24 2001-02-14 02:30:56 bcr Exp $
 // $Name:  $
 
 
@@ -129,7 +129,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: IWImage.h,v 1.23 2001-02-13 00:11:40 bcr Exp $# */
+    #$Id: IWImage.h,v 1.24 2001-02-14 02:30:56 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -190,6 +190,27 @@ struct IWEncoderParms
 class IW44Image : public GPEnabled
 {
 public:
+  /** Chrominance processing selector.  The following constants may be used as
+      argument to the following \Ref{IWPixmap} constructor to indicate how the
+      chrominance information should be processed. There are four possible values:
+      \begin{description}
+      \item[CRCBnone:] The wavelet transform will discard the chrominance 
+           information and only keep the luminance. The image will show in shades of gray.
+      \item[CRCBhalf:] The wavelet transform will process the chrominance at only 
+           half the image resolution. This option creates smaller files but may create
+           artifacts in highly colored images.
+      \item[CRCBnormal:] The wavelet transform will process the chrominance at full 
+           resolution. This is the default.
+      \item[CRCBfull:] The wavelet transform will process the chrominance at full 
+           resolution. This option also disables the chrominance encoding delay
+           (see \Ref{parm_crcbdelay}) which usually reduces the bitrate associated with the
+           chrominance information.
+      \end{description} */
+  enum CRCBMode { 
+    CRCBnone, 
+    CRCBhalf, 
+    CRCBnormal, 
+    CRCBfull };
   class Transform;
   class Map;
   class Block;
@@ -199,14 +220,35 @@ public:
   struct SecondaryHeader;
   struct TertiaryHeader1;
   struct TertiaryHeader2;
-
+protected:
+  IW44Image();
+public:
   /** Null constructor.  Constructs an empty IW44Image object. This object does
       not contain anything meaningful. You must call function \Ref{init},
       \Ref{decode_iff} or \Ref{decode_chunk} to populate the wavelet
-      coefficient data structure. */
-  IW44Image();
+      coefficient data structure. You may not use \Ref{encode_iff} or 
+      \Ref{encode_chunk}. */
+  static GP<IW44Image> create_decode(const bool color=true);
+  /** Null constructor.  Constructs an empty IW44Image object. This object does
+      not contain anything meaningful. You must call function \Ref{init},
+      \Ref{decode_iff} or \Ref{decode_chunk} to populate the wavelet
+      coefficient data structure.  You may then use \Ref{encode_iff}
+      and \Ref{encode_chunk}. */
+  static GP<IW44Image> create_encode(const bool color=true);
   // virtual destructor
   virtual ~IW44Image();
+  /** Initializes an IWBitmap with image #bm#.  This constructor
+      performs the wavelet decomposition of image #bm# and records the
+      corresponding wavelet coefficient.  Argument #mask# is an optional
+      bilevel image specifying the masked pixels (see \Ref{IWImage.h}). */
+  static GP<IW44Image> create(const GBitmap &bm, const GP<GBitmap> mask=0);
+  /** Initializes an IWPixmap with color image #bm#.  This constructor
+      performs the wavelet decomposition of image #bm# and records the
+      corresponding wavelet coefficient.  Argument #mask# is an optional
+      bilevel image specifying the masked pixels (see \Ref{IWImage.h}).
+      Argument #crcbmode# specifies how the chrominance information should be
+      encoded (see \Ref{CRCBMode}). */
+  static GP<IW44Image> create(const GPixmap &bm, const GP<GBitmap> mask=0, CRCBMode crcbmode=CRCBnormal);
   // ACCESS
   /** Returns the width of the IWBitmap image. */
   int get_width() const;
@@ -243,13 +285,13 @@ public:
       #bs# with no IFF header.  Successive calls to #encode_chunk# encode
       successive chunks.  You must call #close_codec# after encoding the last
       chunk of a file. */
-  virtual int  encode_chunk(ByteStream &bs, const IWEncoderParms &parms) = 0;
+  virtual int  encode_chunk(ByteStream &bs, const IWEncoderParms &parms);
   /** Writes a gray level image into DjVu IW44 file.  This function creates a
       composite chunk (identifier #FORM:BM44# or #FORM:PM44#) composed of
       #nchunks# chunks (identifier #BM44# or #PM44#).  Data for each chunk is
       generated with #encode_chunk# using the corresponding parameters in
       array #parms#. */
-  virtual void encode_iff(IFFByteStream &iff, int nchunks, const IWEncoderParms *parms) = 0;
+  virtual void encode_iff(IFFByteStream &iff, int nchunks, const IWEncoderParms *parms);
   // DECODER
   /** Decodes one data chunk from ByteStream #bs#.  Successive calls to
       #decode_chunk# decode successive chunks.  You must call #close_codec#
@@ -279,7 +321,7 @@ public:
       before encoding the first color IW44 data chunk.  Parameter #parm# is an
       encoding delay which reduces the bitrate associated with the
       chrominance information. The default chrominance encoding delay is 10. */
-  int  parm_crcbdelay(int parm);
+  virtual int  parm_crcbdelay(const int parm) {return parm;}
   /** Sets the #dbfrac# parameter.  This function can be called before
       encoding the first IW44 data chunk.  Parameter #frac# modifies the
       decibel estimation algorithm in such a way that the decibel target only
@@ -302,6 +344,8 @@ private:
   IW44Image& operator=(const IW44Image &ref);
 };
 
+#ifdef IWIMAGE_IMPLIMENTATION
+
 /** IW44 encoded gray-level image.  This class provided functions for managing
     a gray level image represented as a collection of IW44 wavelet
     coefficients.  The coefficients are stored in a memory efficient data
@@ -315,19 +359,12 @@ private:
 class IWBitmap : public IW44Image
 {
 public:
+  class Encode;
   /** Null constructor.  Constructs an empty IWBitmap object. This object does
       not contain anything meaningful. You must call function \Ref{init},
       \Ref{decode_iff} or \Ref{decode_chunk} to populate the wavelet
       coefficient data structure. */
-  IWBitmap();
-  /** Initializes an IWBitmap with image #bm#.  This constructor
-      performs the wavelet decomposition of image #bm# and records the
-      corresponding wavelet coefficient.  Argument #mask# is an optional
-      bilevel image specifying the masked pixels (see \Ref{IWImage.h}). */
-  void init(const GBitmap &bm, const GP<GBitmap> mask=0);
-  /** Convenience constructor. This constructors creates an empty IWBitmap
-      and then calls function \Ref{init} above. */
-  IWBitmap(const GBitmap &bm, const GP<GBitmap> mask=0);
+  IWBitmap(void);
   // ACCESS
   /** Reconstructs the complete image.  The reconstructed image
       is then returned as a GBitmap object. */
@@ -345,18 +382,6 @@ public:
       coefficients are stored in a sparse array.  This function tells what
       percentage of bins have been effectively allocated. */
   virtual int get_percent_memory() const;
-  // CODER
-  /** Encodes one data chunk into ByteStream #bs#.  Parameter #parms# controls
-      how much data is generated.  The chunk data is written to ByteStream
-      #bs# with no IFF header.  Successive calls to #encode_chunk# encode
-      successive chunks.  You must call #close_codec# after encoding the last
-      chunk of a file. */
-  virtual int  encode_chunk(ByteStream &bs, const IWEncoderParms &parms);
-  /** Writes a gray level image into DjVu IW44 file.  This function creates a
-      composite chunk (identifier #FORM:BM44#) composed of #nchunks# chunks
-      (identifier #BM44#).  Data for each chunk is generated with
-      #encode_chunk# using the corresponding parameters in array #parms#. */
-  virtual void encode_iff(IFFByteStream &iff, int nchunks, const IWEncoderParms *parms);
   // DECODER
   /** Decodes one data chunk from ByteStream #bs#.  Successive calls to
       #decode_chunk# decode successive chunks.  You must call #close_codec#
@@ -387,7 +412,6 @@ public:
 };
 
 
-
 /** IW44 encoded color image. This class provided functions for managing a
     color image represented as a collection of IW44 wavelet coefficients.  The
     coefficients are stored in a memory efficient data structure.  Member
@@ -401,42 +425,12 @@ public:
 class IWPixmap : public IW44Image
 {
 public:
-  /** Null constructor.  Constructs an empty IWBitmap object. This object does
-      not contain anything meaningful.  You must call function \Ref{init},
+  class Encode;
+  /** Null constructor.  Constructs an empty IWPixmap object. This object does
+      not contain anything meaningful. You must call function \Ref{init},
       \Ref{decode_iff} or \Ref{decode_chunk} to populate the wavelet
       coefficient data structure. */
-  IWPixmap();
-  /** Chrominance processing selector.  The following constants may be used as
-      argument to the following \Ref{IWPixmap} constructor to indicate how the
-      chrominance information should be processed. There are four possible values:
-      \begin{description}
-      \item[CRCBnone:] The wavelet transform will discard the chrominance 
-           information and only keep the luminance. The image will show in shades of gray.
-      \item[CRCBhalf:] The wavelet transform will process the chrominance at only 
-           half the image resolution. This option creates smaller files but may create
-           artifacts in highly colored images.
-      \item[CRCBnormal:] The wavelet transform will process the chrominance at full 
-           resolution. This is the default.
-      \item[CRCBfull:] The wavelet transform will process the chrominance at full 
-           resolution. This option also disables the chrominance encoding delay
-           (see \Ref{parm_crcbdelay}) which usually reduces the bitrate associated with the
-           chrominance information.
-      \end{description} */
-  enum CRCBMode { 
-    CRCBnone, 
-    CRCBhalf, 
-    CRCBnormal, 
-    CRCBfull };
-  /** Initializes an IWPixmap with color image #bm#.  This constructor
-      performs the wavelet decomposition of image #bm# and records the
-      corresponding wavelet coefficient.  Argument #mask# is an optional
-      bilevel image specifying the masked pixels (see \Ref{IWImage.h}).
-      Argument #crcbmode# specifies how the chrominance information should be
-      encoded (see \Ref{CRCBMode}). */
-  void init(const GPixmap &bm, const GP<GBitmap> mask=0, CRCBMode crcbmode=CRCBnormal);
-  /** Convenience constructor. This constructors creates an empty IWBitmap
-      and then calls function \Ref{init} above. */
-  IWPixmap(const GPixmap &bm, const GP<GBitmap> mask=0, CRCBMode crcbmode=CRCBnormal );
+  IWPixmap(void);
   // ACCESS
   /** Reconstructs the complete image.  The reconstructed image
       is then returned as a GPixmap object. */
@@ -454,18 +448,6 @@ public:
       coefficients are stored in a sparse array.  This function tells what
       percentage of bins have been effectively allocated. */
   virtual int get_percent_memory() const;
-  // CODER
-  /** Encodes one data chunk into ByteStream #bs#.  Parameter #parms# controls
-      how much data is generated.  The chunk data is written to ByteStream
-      #bs# with no IFF header.  Successive calls to #encode_chunk# encode
-      successive chunks.  You must call #close_codec# after encoding the last
-      chunk of a file. */
-  virtual int  encode_chunk(ByteStream &bs, const IWEncoderParms &parms);
-  /** Writes a color image into a DjVu IW44 file.  This function creates a
-      composite chunk (identifier #FORM:PM44#) composed of #nchunks# chunks
-      (identifier #PM44#).  Data for each chunk is generated with
-      #encode_chunk# using the corresponding parameters in array #parms#. */
-  virtual void encode_iff(IFFByteStream &iff, int nchunks, const IWEncoderParms *parms);
   // DECODER
   /** Decodes one data chunk from ByteStream #bs#.  Successive calls to
       #decode_chunk# decode successive chunks.  You must call #close_codec#
@@ -490,7 +472,7 @@ public:
       before encoding the first IW44 data chunk.  Parameter #parm# is an
       encoding delay which reduces the bitrate associated with the
       chrominance information. The default chrominance encoding delay is 10. */
-  virtual int  parm_crcbdelay(int parm);
+  virtual int  parm_crcbdelay(const int parm);
   /** Sets the #dbfrac# parameter.  This function can be called before
       encoding the first IW44 data chunk.  Parameter #frac# modifies the
       decibel estimation algorithm in such a way that the decibel target only
@@ -505,7 +487,6 @@ protected:
   // Data
 };
 
-#ifdef IWIMAGE_IMPLIMENTATION
 /** IW44Transform.
 */
 class IW44Image::Transform
@@ -562,21 +543,18 @@ private:
 
 class IW44Image::Map // DJVU_CLASS
 {
-  // construction
 public:
+  class Encode;
+
+  // construction
   Map(int w, int h);
   ~Map();
-  // creation (from image)
-  void create(const signed char *img8, int imgrowsize, 
-              const signed char *msk8=0, int mskrowsize=0);
   // image access
   void image(signed char *img8, int rowsize, 
              int pixsep=1, int fast=0);
   void image(int subsample, const GRect &rect, 
              signed char *img8, int rowsize, 
              int pixsep=1, int fast=0);
-  // slash resolution
-  void slashres(int res);
   // array of blocks
   IW44Image::Block *blocks;
   // geometry
@@ -606,12 +584,18 @@ public:
 class IW44Image::Codec 
 {
 public:
+  class Decode;
+  class Encode;
+
+protected:
   // Construction
   Codec(IW44Image::Map &map, int encoding=0);
-  ~Codec();
+public:
+  virtual ~Codec();
   // Coding
-  int code_slice(ZPCodec &zp);
-  float estimate_decibel(float frac);
+  virtual int finish_code_slice(ZPCodec &zp);
+  virtual int code_slice(ZPCodec &zp) = 0;
+  virtual float estimate_decibel(float frac);
   // Data
   IW44Image::Map &map;                  // working map
   IW44Image::Map *emap;                 // encoder state
@@ -636,12 +620,12 @@ public:
   BitContext ctxRoot;
   // helper
   int is_null_slice(int bit, int band);
-  int encode_prepare(int band, int fbucket, int nbucket, IW44Image::Block &blk, IW44Image::Block &eblk);
   int decode_prepare(int fbucket, int nbucket, IW44Image::Block &blk);
-  void encode_buckets(ZPCodec &zp, int bit, int band,
-                      IW44Image::Block &blk, IW44Image::Block &eblk, int fbucket, int nbucket);
   void decode_buckets(ZPCodec &zp, int bit, int band,
-                      IW44Image::Block &blk, int fbucket, int nbucket);
+    IW44Image::Block &blk, int fbucket, int nbucket);
+  virtual int encode_prepare(int band, int fbucket, int nbucket, IW44Image::Block &blk, IW44Image::Block &eblk);
+  virtual void encode_buckets(ZPCodec &zp, int bit, int band,
+    IW44Image::Block &blk, IW44Image::Block &eblk, int fbucket, int nbucket);
 };
 
 //////////////////////////////////////////////////////

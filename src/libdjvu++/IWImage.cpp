@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: IWImage.cpp,v 1.47 2001-02-10 01:16:57 bcr Exp $
+// $Id: IWImage.cpp,v 1.48 2001-02-14 02:30:56 bcr Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 08/1998
@@ -101,6 +101,15 @@ static const float iw_norm[16] = {
 static const int iw_border = 3;
 static const int iw_shift  = 6;
 static const int iw_round  = (1<<(iw_shift-1));
+
+class IW44Image::Codec::Decode : public IW44Image::Codec 
+{
+public:
+  // Construction
+  Decode(IW44Image::Map &map) : Codec(map,0) {}
+  // Coding
+  virtual int code_slice(ZPCodec &zp);
+};
 
 //////////////////////////////////////////////////////
 // MMX IMPLEMENTATION HELPERS
@@ -884,14 +893,6 @@ IW44Image::Codec::Codec(IW44Image::Map &map, int encoding)
   ctxMant = 0;
   ctxRoot = 0;
   // The encoder uses emap to track the decoder state
-  if (encoding)
-  {
-#ifdef NEED_DECODER_ONLY
-    G_THROW("IWImage.decoder_only");
-#else
-    emap = new IW44Image::Map(map.iw, map.ih);
-#endif
-  }
 }
 
 
@@ -937,7 +938,7 @@ IW44Image::Codec::is_null_slice(int bit, int band)
 // -- read/write a slice of datafile
 
 int
-IW44Image::Codec::code_slice(ZPCodec &zp)
+IW44Image::Codec::Decode::code_slice(ZPCodec &zp)
 {
   // Check that code_slice can still run
   if (curbit < 0)
@@ -949,18 +950,20 @@ IW44Image::Codec::code_slice(ZPCodec &zp)
         {
           int fbucket = bandbuckets[curband].start;
           int nbucket = bandbuckets[curband].size;
-#ifndef NEED_DECODER_ONLY
-          if (encoding)
-            encode_buckets(zp, curbit, curband, 
-                           map.blocks[blockno], emap->blocks[blockno], 
-                           fbucket, nbucket);
-          else
-#endif // NEED_DECODER_ONLY
-            decode_buckets(zp, curbit, curband, 
+          decode_buckets(zp, curbit, curband, 
                            map.blocks[blockno], 
                            fbucket, nbucket);
         }
     }
+  return finish_code_slice(zp);
+}
+
+// code_slice
+// -- read/write a slice of datafile
+
+int
+IW44Image::Codec::finish_code_slice(ZPCodec &zp)
+{
   // Reduce quantization threshold
   quant_hi[curband] = quant_hi[curband] >> 1;
   if (curband == 0)
@@ -1280,6 +1283,28 @@ IW44Image::~IW44Image()
   delete crmap;
 }
 
+GP<IW44Image>
+IW44Image::create_decode(const bool color)
+{
+  if(color)
+    return new IWPixmap();
+  else
+    return new IWBitmap();
+}
+
+int
+IW44Image::encode_chunk(ByteStream &, const IWEncoderParms &)
+{
+  G_THROW("IWImage.codec_open2");
+}
+
+void 
+IW44Image::encode_iff(IFFByteStream &, int nchunks, const IWEncoderParms *)
+{
+  G_THROW("IWImage.codec_open2");
+}
+
+  
 void 
 IW44Image::close_codec()
 {
@@ -1428,7 +1453,7 @@ IWBitmap::decode_chunk(ByteStream &bs)
 #ifndef UNDER_CE
       assert(! ycodec);
 #endif
-      ycodec = new Codec(*ymap, 0);
+      ycodec = new Codec::Decode(*ymap);
     }
   // Read data
 #ifndef UNDER_CE
@@ -1505,7 +1530,7 @@ IWEncoderParms::IWEncoderParms()
 //////////////////////////////////////////////////////
 
 
-IWPixmap::IWPixmap()
+IWPixmap::IWPixmap(void)
 : IW44Image(), crcb_delay(10), crcb_half(0)
 {
 }
@@ -1682,13 +1707,13 @@ IWPixmap::decode_chunk(ByteStream &bs)
       assert(! ycodec);
 #endif
       ymap = new Map(w, h);
-      ycodec = new Codec(*ymap, 0);
+      ycodec = new Codec::Decode(*ymap);
       if (crcb_delay >= 0)
         {
           cbmap = new Map(w, h);
           crmap = new Map(w, h);
-          cbcodec = new Codec(*cbmap, 0);
-          crcodec = new Codec(*crmap, 0);
+          cbcodec = new Codec::Decode(*cbmap);
+          crcodec = new Codec::Decode(*crmap);
         }
     }
   // Read data
@@ -1714,96 +1739,8 @@ IWPixmap::decode_chunk(ByteStream &bs)
 }
 
 
-int  
-IWPixmap::encode_chunk(ByteStream &bs, const IWEncoderParms &parm)
-{
-  // Check
-  if (parm.slices==0 && parm.bytes==0 && parm.decibels==0)
-    G_THROW("IWImage.need_stop2");
-  if (ycodec && !ycodec->encoding)
-    G_THROW("IWImage.codec_open4");
-  if (!ymap)
-    G_THROW("IWImage.empty_object2");
-  // Open
-  if (!ycodec)
-    {
-      cslice = cserial = cbytes = 0;
-      ycodec = new Codec(*ymap, 1);
-      if (crmap && cbmap)
-        {
-          cbcodec = new Codec(*cbmap, 1);
-          crcodec = new Codec(*crmap, 1);
-        }
-    }
-  // Adjust cbytes
-  cbytes += sizeof(struct IW44Image::PrimaryHeader);
-  if (cserial == 0)
-    cbytes += sizeof(struct IW44Image::SecondaryHeader) + sizeof(struct IW44Image::TertiaryHeader2);
-  // Prepare zcodec slices
-  int flag = 1;
-  int nslices = 0;
-  GP<ByteStream> gmbs=ByteStream::create();
-  ByteStream &mbs=*gmbs;
-  DJVU_PROGRESS_TASK(chunk, "encode pixmap chunk", parm.slices-cslice);
-  {
-    float estdb = -1.0;
-    ZPCodec zp(mbs, true, true);
-    while (flag)
-      {
-        if (parm.decibels>0  && estdb>=parm.decibels)
-          break;
-        if (parm.bytes>0  && mbs.tell()+cbytes>=parm.bytes)
-          break;
-        if (parm.slices>0 && nslices+cslice>=parm.slices)
-          break;
-        DJVU_PROGRESS_RUN(chunk,(1+nslices-cslice)|0xf);
-        flag = ycodec->code_slice(zp);
-        if (flag && parm.decibels>0)
-          if (ycodec->curband==0 || estdb>=parm.decibels-DECIBEL_PRUNE)
-            estdb = ycodec->estimate_decibel(db_frac);
-        if (crcodec && cbcodec && cslice+nslices>=crcb_delay)
-          {
-            flag |= cbcodec->code_slice(zp);
-            flag |= crcodec->code_slice(zp);
-          }
-        nslices++;
-      }
-  }
-  // Write primary header
-  struct IW44Image::PrimaryHeader primary;
-  primary.serial = cserial;
-  primary.slices = nslices;
-  bs.writall((void*)&primary, sizeof(primary));
-  // Write secondary header
-  if (cserial == 0)
-    {
-      struct IW44Image::SecondaryHeader secondary;
-      secondary.major = IWCODEC_MAJOR;
-      secondary.minor = IWCODEC_MINOR;
-      if (! (crmap && cbmap))
-        secondary.major |= 0x80;
-      bs.writall((void*)&secondary, sizeof(secondary));
-      struct IW44Image::TertiaryHeader2 tertiary;
-      tertiary.xhi = (ymap->iw >> 8) & 0xff;
-      tertiary.xlo = (ymap->iw >> 0) & 0xff;
-      tertiary.yhi = (ymap->ih >> 8) & 0xff;
-      tertiary.ylo = (ymap->ih >> 0) & 0xff;
-      tertiary.crcbdelay = (crcb_half ? 0x00 : 0x80);
-      tertiary.crcbdelay |= (crcb_delay>=0 ? crcb_delay : 0x00);
-      bs.writall((void*)&tertiary, sizeof(tertiary));
-    }
-  // Write slices
-  mbs.seek(0);
-  bs.copy(mbs);
-  // Return
-  cbytes  += mbs.tell();
-  cslice  += nslices;
-  cserial += 1;
-  return flag;
-}
-
 int 
-IWPixmap::parm_crcbdelay(int parm)
+IWPixmap::parm_crcbdelay(const int parm)
 {
   if (parm >= 0)
     crcb_delay = parm;
@@ -1934,5 +1871,24 @@ IW44Image::Transform::Decode::YCbCr_to_RGB(GPixel *p, int w, int h, int rowsize)
           q->b = max(0,min(255,tb));
         }
     }
+}
+
+int 
+IW44Image::Codec::encode_prepare(int, int, int, IW44Image::Block &, IW44Image::Block &) 
+{
+  G_THROW("IWImage.decoder_only");
+}
+
+void 
+IW44Image::Codec::encode_buckets(ZPCodec &zp, int bit, int band,
+  IW44Image::Block &blk, IW44Image::Block &eblk, int fbucket, int nbucket)
+{
+  G_THROW("IWImage.decoder_only");
+}
+
+float 
+IW44Image::Codec::estimate_decibel(float frac)
+{
+  G_THROW("IWImage.decoder_only");
 }
 

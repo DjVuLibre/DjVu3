@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: c44.cpp,v 1.9 2001-02-13 00:11:40 bcr Exp $
+// $Id: c44.cpp,v 1.10 2001-02-14 02:30:56 bcr Exp $
 // $Name:  $
 
 
@@ -184,7 +184,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: c44.cpp,v 1.9 2001-02-13 00:11:40 bcr Exp $# */
+    #$Id: c44.cpp,v 1.10 2001-02-14 02:30:56 bcr Exp $# */
 //@{
 //@}
 
@@ -220,7 +220,7 @@ int argc_bpp = 0;
 int argc_size = 0;
 int argc_slice = 0;
 int argc_decibel = 0;
-IWPixmap::CRCBMode arg_crcbmode = IWPixmap::CRCBnormal;
+IW44Image::CRCBMode arg_crcbmode = IW44Image::CRCBnormal;
 
 #define MAXCHUNKS 64
 float argv_bpp[MAXCHUNKS];
@@ -519,28 +519,28 @@ parse(int argc, char **argv)
               if (flag_crcbmode>=0 || flag_crcbdelay>=0)
                 G_THROW("c44: incompatible chrominance options");
               flag_crcbdelay = flag_crcbmode = 0;
-              arg_crcbmode = IWPixmap::CRCBnone;
+              arg_crcbmode = IW44Image::CRCBnone;
             }
           else if (!strcmp(argv[i],"-crcbhalf"))
             {
               if (flag_crcbmode>=0)
                 G_THROW("c44: incompatible chrominance options");
               flag_crcbmode = 0;
-              arg_crcbmode = IWPixmap::CRCBhalf;
+              arg_crcbmode = IW44Image::CRCBhalf;
             }
           else if (!strcmp(argv[i],"-crcbnormal"))
             {
               if (flag_crcbmode>=0)
                 G_THROW("c44: incompatible chrominance options");
               flag_crcbmode = 0;
-              arg_crcbmode = IWPixmap::CRCBnormal;
+              arg_crcbmode = IW44Image::CRCBnormal;
             }
           else if (!strcmp(argv[i],"-crcbfull"))
             {
               if (flag_crcbmode>=0 || flag_crcbdelay>=0)
                 G_THROW("c44: incompatible chrominance options");
               flag_crcbdelay = flag_crcbmode = 0;
-              arg_crcbmode = IWPixmap::CRCBfull;
+              arg_crcbmode = IW44Image::CRCBfull;
             }
           else if (!strcmp(argv[i],"-crcbdelay"))
             {
@@ -620,8 +620,8 @@ getmask(int w, int h)
 
 
 static void 
-create_photo_djvu_file(IWPixmap *iwp, IWBitmap *iwb, int w, int h,
-                       IFFByteStream &iff, int nchunks, IWEncoderParms *parms)
+create_photo_djvu_file(IW44Image &iw, int w, int h,
+                       IFFByteStream &iff, int nchunks, IWEncoderParms parms[])
 {
   // Prepare info chunk
   DjVuInfo info;
@@ -639,10 +639,7 @@ create_photo_djvu_file(IWPixmap *iwp, IWBitmap *iwb, int w, int h,
   for (int i=0; flag && i<nchunks; i++)
     {
       iff.put_chunk("BG44");
-      if (iwp)
-        flag = iwp->encode_chunk(iff, parms[i]);
-      else
-        flag = iwb->encode_chunk(iff, parms[i]);
+      flag = iw.encode_chunk(iff, parms[i]);
       iff.close_chunk();
     }
   // Close djvu chunk
@@ -666,45 +663,36 @@ main(int argc, char **argv)
       // Load images
       int w = 0;
       int h = 0;
-      IWPixmap *iwp = 0;
-      IWBitmap *iwb = 0;
+      ibs.seek(0);
+      GP<IW44Image> iw;
       // Check color vs gray
       if (prefix[0]=='P' && (prefix[1]=='3' || prefix[1]=='6'))
         {
           // color file
-          ibs.seek(0);
           GPixmap ipm(ibs);
           w = ipm.columns();
           h = ipm.rows();
-          iwp = new IWPixmap(ipm, getmask(w,h), arg_crcbmode);
+          iw = IW44Image::create(ipm, getmask(w,h), arg_crcbmode);
         }
       else if (prefix[0]=='P' && (prefix[1]=='2' || prefix[1]=='5'))
         {
           // gray file
-          ibs.seek(0);
           GBitmap ibm(ibs);
           w = ibm.columns();
           h = ibm.rows();
-          iwb = new IWBitmap(ibm, getmask(w,h));
+          iw = IW44Image::create(ibm, getmask(w,h));
         }
       else if (!strncmp(prefix,"AT&TFORM",8) || !strncmp(prefix,"FORM",4))
         {
           char *s = (prefix[0]=='F' ? prefix+8 : prefix+12);
-          ibs.seek(0);
           IFFByteStream iff(ibs);
-          if (!strncmp(s,"PM44",4))
+          const bool color=!strncmp(s,"PM44",4);
+          if (color || !strncmp(s,"BM44",4))
             {
-              iwp = new IWPixmap();
-              iwp->decode_iff(iff);
-              w = iwp->get_width();
-              h = iwp->get_height();
-            }
-          else if (!strncmp(s,"BM44",4))
-            {
-              iwb = new IWBitmap();
-              iwb->decode_iff(iff);
-              w = iwb->get_width();
-              h = iwb->get_height();
+              iw = IW44Image::create_encode(color);
+              iw->decode_iff(iff);
+              w = iw->get_width();
+              h = iw->get_height();
             }
           else
             G_THROW("Unrecognized file");
@@ -720,41 +708,23 @@ main(int argc, char **argv)
       ibs.ByteStream::~ByteStream();
               
       // Perform compression PM44 or BM44 as required
-      if (iwp)
+      if (iw)
         {
           remove(iw4file);
           GP<ByteStream> obs=ByteStream::create(iw4file,"wb");
           IFFByteStream iff(*obs);
           if (flag_crcbdelay >= 0)
-            iwp->parm_crcbdelay(flag_crcbdelay);
+            iw->parm_crcbdelay(flag_crcbdelay);
           if (flag_dbfrac > 0)
-            iwp->parm_dbfrac((float)flag_dbfrac);
+            iw->parm_dbfrac((float)flag_dbfrac);
           int nchunk = resolve_quality(w*h);
           if (flag_gamma>0 || flag_dpi>0)
             // Create djvu file
-            create_photo_djvu_file(iwp, 0, w, h, iff, nchunk, parms);
+            create_photo_djvu_file(*iw, w, h, iff, nchunk, parms);
           else
             // Create iw44 file
-            iwp->encode_iff(iff, nchunk, parms);
+            iw->encode_iff(iff, nchunk, parms);
         }
-      else if (iwb)
-        {
-          remove(iw4file);
-          GP<ByteStream> obs=ByteStream::create(iw4file,"wb");
-          IFFByteStream iff(*obs);
-          if (flag_dbfrac > 0)
-            iwb->parm_dbfrac((float)flag_dbfrac);
-          int nchunk = resolve_quality(w*h);
-          if (flag_gamma>0 || flag_dpi>0)
-            // Create djvu file
-            create_photo_djvu_file(0, iwb, w, h, iff, nchunk, parms);
-          else
-            // Create iw44 file
-            iwb->encode_iff(iff, nchunk, parms);
-        }
-      // Cleanup memory
-      delete iwp;
-      delete iwb;
     }
   G_CATCH(ex)
     {

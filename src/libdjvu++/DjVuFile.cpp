@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuFile.cpp,v 1.146 2001-02-13 00:15:33 praveen Exp $
+// $Id: DjVuFile.cpp,v 1.147 2001-02-14 02:30:56 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -873,7 +873,7 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
       if (bgpm)
         G_THROW("DjVuFile.dupl_backgrnd");
       // First chunk
-      GP<IWPixmap> bg44=new IWPixmap();
+      GP<IW44Image> bg44=IW44Image::create_decode(true);
       bg44->decode_chunk(iff);
       DjVuFile::bg44=bg44;
       desc.format("IW44 background (%dx%d, %d dpi)",
@@ -894,8 +894,8 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
   {
     if (fgpm || fgbc)
       G_THROW("DjVuFile.dupl_foregrnd");
-    GP<IWPixmap> gfg44=new IWPixmap();
-    IWPixmap &fg44=*gfg44;
+    GP<IW44Image> gfg44=IW44Image::create_decode(true);
+    IW44Image &fg44=*gfg44;
     fg44.decode_chunk(iff);
     fgpm=fg44.get_pixmap();
     desc.format("IW44 foreground colors (%dx%d, %d dpi)",
@@ -988,8 +988,8 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
     if (!bg44)
     {
       // First chunk
-      GP<IWPixmap> gbg44=new IWPixmap();
-      IWPixmap &xbg44=*gbg44;
+      GP<IW44Image> gbg44=IW44Image::create_decode(true);
+      IW44Image &xbg44=*gbg44;
       xbg44.decode_chunk(iff);
       GP<DjVuInfo> ginfo=new DjVuInfo();
       ginfo->width=xbg44.get_width();
@@ -1004,7 +1004,7 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
     else
     {
       // Refinement chunks
-      IWPixmap &xbg44=*bg44;
+      IW44Image &xbg44=*bg44;
       xbg44.decode_chunk(iff);
       desc.format("IW44 data (part %d, %d dpi)",
 		      xbg44.get_serial(),
