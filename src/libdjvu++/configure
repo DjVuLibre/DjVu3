@@ -35,24 +35,6 @@ then
 fi
 
 
-### License stuff
-
-accept=show
-while [ "$accept" != yes -a "$accept" != no ]
-do
-    if [ "$accept" = show ] ; then
-       ${PAGER-more} $SRCDIR/ATTLICENSE
-    fi
-    echo
-    echon "Do you accept this license agreement (yes/no/show) ?"
-    read accept
-    if [ "$accept" = no ] ; then
-       echo Bye
-       exit 0
-    fi
-done
-
-
 ### Process arguments
 
 for arg 
@@ -89,6 +71,24 @@ EOF
    esac
    shift
 done
+
+### License stuff
+
+accept=show
+while [ "$accept" != yes -a "$accept" != no ]
+do
+    if [ "$accept" = show ] ; then
+       ${PAGER-more} $SRCDIR/ATTLICENSE
+    fi
+    echo
+    echon "Do you accept this license agreement (yes/no/show) ?"
+    read accept
+    if [ "$accept" = no ] ; then
+       echo Bye
+       exit 0
+    fi
+done
+
 
 ### Check compiler
 
