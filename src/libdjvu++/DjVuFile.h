@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.h,v 1.33 1999-09-17 14:37:44 leonb Exp $
+//C- $Id: DjVuFile.h,v 1.34 1999-09-17 19:00:49 eaf Exp $
  
 #ifndef _DJVUFILE_H
 #define _DJVUFILE_H
@@ -46,7 +46,7 @@
 
     @memo Classes representing DjVu files.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuFile.h,v 1.33 1999-09-17 14:37:44 leonb Exp $#
+    @version #$Id: DjVuFile.h,v 1.34 1999-09-17 19:00:49 eaf Exp $#
 */
 
 //@{
@@ -374,14 +374,17 @@ public:
    TArray<char>		get_djvu_data(bool included_too, bool no_ndir);
       //@}
 
-      // Internal: used by DjVuDocument
+      // Internal. Used by DjVuDocument
    GP<DataPool>		get_data_pool(void) const { return data_pool; };
 
       // Internal. Used by DjVuDocument. May block for data.
    void			move(const GURL & dir_url);
 
-      // Internal: user by DjVuDocument
+      // Internal. Used by DjVuDocument
    void			set_name(const char * name);
+
+      // Internal. Used by DjVuDocument
+   GSafeFlags &		get_safe_flags(void);
 
       // Functions inherited from DjVuPort
    virtual bool		inherits(const char * class_name) const;
@@ -442,6 +445,12 @@ private:
 
 inline long
 DjVuFile::get_flags(void) const
+{
+   return flags;
+}
+
+inline GSafeFlags &
+DjVuFile::get_safe_flags(void)
 {
    return flags;
 }
