@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.77 1999-11-22 20:03:30 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.78 1999-11-22 20:48:30 bcr Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -1295,7 +1295,7 @@ DjVuDocument::get_file_names(void)
 
   GMap<GURL, void *> map;
   int i;
-  if (doc_type==BUNDLED || doc_type==INDIRECT || doc_type==SINGLE_PAGE)
+  if (doc_type==BUNDLED || doc_type==INDIRECT)
   {
     GPList<DjVmDir::File> files_list=djvm_dir->get_files_list();
     for(GPosition pos=files_list;pos;++pos)
@@ -1366,6 +1366,14 @@ DjVuDocument::get_djvm_doc()
 	 if (file->is_modified()) data=file->get_djvu_data(false, true);
 	 else data=file->get_init_data_pool();
 	 doc->insert_file(f, data);
+      }
+   } else if( doc_type==SINGLE_PAGE)
+   {
+      DEBUG_MSG("Creating: djvm for a single page document.\n");
+      for(int page_num=0;page_num<ndir->get_pages_num();page_num++)
+      {
+        GP<DjVuFile> file=url_to_file(ndir->page_to_url(page_num));
+        add_file_to_djvm(file, true, *doc, map_add);
       }
    } else
    {
