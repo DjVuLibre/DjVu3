@@ -587,7 +587,8 @@
     which we have already covered above, is ideal for web publishing: when
     every page is stored in one or more files. Convertion between these
     two formats can be done by \Ref{DjVuDocument} class or \Ref{djvm} program.
-    
+*/
+
 /** @name Experimental Features.
     
     The DjVu format already delivers extremely high compression ratios.  Yet
