@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.112 2000-02-06 21:31:00 eaf Exp $
+//C- $Id: DjVuFile.cpp,v 1.113 2000-02-07 20:25:52 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -1064,6 +1064,7 @@ DjVuFile::start_decode(void)
    DEBUG_MSG("DjVuFile::start_decode(), url='" << url << "'\n");
    DEBUG_MAKE_INDENT(3);
 
+   GThread * thread_to_delete=0;
    flags.enter();
    TRY {
       if (!(flags & DONT_START_DECODE) && !is_decoding())
@@ -1072,7 +1073,9 @@ DjVuFile::start_decode(void)
 	 flags&=~(DECODE_OK | DECODE_STOPPED | DECODE_FAILED);
 	 flags|=DECODING;
 
-	 delete decode_thread; decode_thread=0;
+	    // Don't delete the thread while you're owning the flags lock
+	    // Beware of deadlock!
+	 thread_to_delete=decode_thread; decode_thread=0;
 	 
 	    // We want to create it right here to be able to stop the
 	    // decoding thread even before its function is called (it starts)
@@ -1087,9 +1090,11 @@ DjVuFile::start_decode(void)
       flags|=DECODE_FAILED;
       flags.leave();
       get_portcaster()->notify_file_flags_changed(this, DECODE_FAILED, DECODING);
+      delete thread_to_delete;
       RETHROW;
    } ENDCATCH;
    flags.leave();
+   delete thread_to_delete;
 }
 
 void
