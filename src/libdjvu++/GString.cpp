@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.105 2001-05-23 21:48:01 bcr Exp $
+// $Id: GString.cpp,v 1.106 2001-05-25 19:17:16 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -1162,22 +1162,6 @@ GStringRep::concat(const GP<GStringRep> &s1,const GP<GStringRep> &s2) const
   return retval;
 }
 
-template <class TYPE>
-GP<GStringRep>
-GStringRep::create(const unsigned int sz, TYPE *)
-{
-  GP<GStringRep> gaddr;
-  if (sz > 0)
-  {
-    GStringRep *addr;
-    gaddr=(addr=new TYPE);
-    addr->data=(char *)(::operator new(sz+1));
-    addr->size = sz;
-    addr->data[sz] = 0;
-  }
-  return gaddr;
-}
-
 GStringRep::GStringRep(void)
 {
   size=0;
@@ -1208,13 +1192,13 @@ int
 GStringRep::cmp(const char *s1, const char *s2,const int len)
 {
   return (len
-   ?(s1
-      ?(s2
+   ?((s1&&s1[0])
+      ?((s2&&s2[0])
         ?((len>0)
           ?strncmp(s1,s2,len)
           :strcmp(s1,s2))
         :1)
-      :(s2?(-1):0))
+      :((s2&&s2[0])?(-1):0))
    :0);
 }
 
@@ -1861,6 +1845,19 @@ GStringRep::Native::getValidUCS4(const char *&source) const
     source++;
   }
   return retval;
+}
+
+// These are dummy functions.
+void 
+GStringRep::set_remainder(void const * const, const unsigned int,
+  const EncodeType) {}
+void
+GStringRep::set_remainder( const GP<GStringRep::Unicode> &) {}
+
+GP<GStringRep::Unicode>
+GStringRep::get_remainder( void ) const
+{
+  return 0;
 }
 
 #endif // UNDER_CE

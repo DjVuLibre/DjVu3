@@ -30,14 +30,14 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GUnicode.cpp,v 1.16 2001-05-23 21:48:01 bcr Exp $
+// $Id: GUnicode.cpp,v 1.17 2001-05-25 19:17:16 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
 #pragma implementation
 #endif
 
-#include "GUnicode.h"
+#include "GString.h"
 #ifdef UNIX
 #define HAS_ICONV
 #endif
@@ -45,59 +45,59 @@
 #include <iconv.h>
 #endif
 
-unsigned long const UnicodeRep::nill=0;
+static unsigned char nill=0;
 
 static void const * 
-checkmarks(void const * const xbuf,size_t &bufsize,UnicodeRep::EncodeType &rep)
+checkmarks(void const * const xbuf,size_t &bufsize,GStringRep::EncodeType &rep)
 {
   unsigned char const *buf=(unsigned char const *)xbuf;
-  if(bufsize >= 2 || (!bufsize && rep != UnicodeRep::OTHER))
+  if(bufsize >= 2 || (!bufsize && rep != GStringRep::XOTHER))
   {
     const unsigned int s=(((unsigned int)buf[0])<<8)+(unsigned int)buf[1];
     switch(s)
     {
       case 0:
-        if((bufsize>=4)||(!bufsize && rep == UnicodeRep::UCS4BE)
-          ||(!bufsize && rep == UnicodeRep::UCS4_2143))
+        if((bufsize>=4)||(!bufsize && rep == GStringRep::XUCS4BE)
+          ||(!bufsize && rep == GStringRep::XUCS4_2143))
         {
           const unsigned int s=(((unsigned int)buf[2])<<8)+(unsigned int)buf[3];
           if(s == 0xfeff)
           { 
-            rep=UnicodeRep::UCS4BE;
+            rep=GStringRep::XUCS4BE;
             buf+=4;
           }else if(s == 0xfffe)
           {
-            rep=UnicodeRep::UCS4_2143;
+            rep=GStringRep::XUCS4_2143;
             buf+=4;
           }
         }
         break;
       case 0xfffe:
-        if(((bufsize>=4)||(!bufsize && rep == UnicodeRep::UCS4LE)) && !(unsigned char *)buf[2] && !(unsigned char *)buf[3])
+        if(((bufsize>=4)||(!bufsize && rep == GStringRep::XUCS4LE)) && !(unsigned char *)buf[2] && !(unsigned char *)buf[3])
         {
-          rep=UnicodeRep::UCS4LE;
+          rep=GStringRep::XUCS4LE;
           buf+=4;
         }else
         {
-          rep=UnicodeRep::UTF16LE;
+          rep=GStringRep::XUTF16LE;
           buf+=2;
         }
         break;
       case 0xfeff:
-        if(((bufsize>=4)||(!bufsize && rep == UnicodeRep::UCS4_3412))&&!(unsigned char *)buf[2] && !(unsigned char *)buf[3])
+        if(((bufsize>=4)||(!bufsize && rep == GStringRep::XUCS4_3412))&&!(unsigned char *)buf[2] && !(unsigned char *)buf[3])
         {
-          rep=UnicodeRep::UCS4_3412;
+          rep=GStringRep::XUCS4_3412;
           buf+=4;
         }else
         {
-          rep=UnicodeRep::UTF16LE;
+          rep=GStringRep::XUTF16LE;
           buf+=2;
         }
         break;
       case 0xefbb:
-        if(((bufsize>=3)||(!bufsize && UnicodeRep::UTF8 == rep))&&(buf[2] == 0xbf))
+        if(((bufsize>=3)||(!bufsize && GStringRep::XUTF8 == rep))&&(buf[2] == 0xbf))
         {
-          rep=UnicodeRep::UTF8;
+          rep=GStringRep::XUTF8;
           buf+=3;
         }
         break;
@@ -116,238 +116,138 @@ checkmarks(void const * const xbuf,size_t &bufsize,UnicodeRep::EncodeType &rep)
       }else
       {
         bufsize=0;
-        buf=(const unsigned char *)&UnicodeRep::nill;
+        buf=(const unsigned char *)&nill;
       }
     }
   }
   return buf;
 }
 
-
-UnicodeRep::UnicodeRep(void)
-: len(0), remainder(UnicodeRep::Remainder::OTHER), gUnicodePtr(UnicodePtr)
+class GStringRep::Unicode : public GStringRep::UTF8
 {
+public:
+  GP<GStringRep> encoding;
+  EncodeType encodetype;
+  void *remainder;
+  GPBufferBase gremainder;
+public:
+  Unicode(void);
+  /// virtual destructor.
+  virtual ~Unicode();
+
+  static GP<GStringRep> create(void const * const buf,const size_t,const EncodeType,
+    const GP<GStringRep> &encoding);
+  static GP<GStringRep> create( void const * const buf,
+    unsigned int size, const EncodeType encodetype );
+  static GP<GStringRep> create( void const * const buf,
+    const unsigned int size, GP<GStringRep> encoding );
+  static GP<GStringRep> create( void const * const buf,
+    const unsigned int size, const GP<Unicode> &remainder );
+
+protected:
+  virtual void set_remainder( void const * const buf, const unsigned int size,
+    const EncodeType encodetype);
+  virtual void set_remainder( const GP<Unicode> &remainder );
+  virtual GP<Unicode> get_remainder(void) const;
+};
+// static unsigned long UTF8toUCS4(unsigned char const *&,void const * const);
+static unsigned long xUTF16toUCS4(unsigned short const *&s,void const * const);
+static unsigned long UTF16BEtoUCS4(unsigned char const *&s,void const * const);
+static unsigned long UTF16LEtoUCS4(unsigned char const *&s,void const * const);
+static unsigned long UTS4BEtoUCS4(unsigned char const *&s,void const * const);
+static unsigned long UCS4BEtoUCS4(unsigned char const *&s,void const * const);
+static unsigned long UCS4LEtoUCS4(unsigned char const *&s,void const * const);
+static unsigned long UCS4_3412toUCS4(unsigned char const *&s,void const * const);
+static unsigned long UCS4_2143toUCS4(unsigned char const *&s,void const * const);
+
+GStringRep::Unicode::Unicode(void)
+: encodetype(XUTF8), gremainder(remainder,0,1) {}
+
+GStringRep::Unicode::~Unicode() {}
+
+GP<GStringRep>
+GStringRep::Unicode::create(
+  void const * const xbuf,
+  const unsigned int bufsize,
+  const EncodeType t,
+  const GP<GStringRep> &encoding)
+{
+  return (encoding->size)
+    ?create(xbuf,bufsize,encoding)
+    :create(xbuf,bufsize,t);
 }
 
-UnicodeRep::UnicodeRep(const UnicodeRep &uni)
-: len(uni.len), gs(uni.gs), remainder(uni.remainder), gUnicodePtr(UnicodePtr)
+GP<GStringRep>
+GStringRep::Unicode::create(
+  void const * const xbuf,
+  const unsigned int bufsize,
+  const GP<Unicode> &xremainder )
 {
-  if(uni.len)
+  Unicode *r=xremainder;
+  GP<GStringRep> retval;
+  if(r)
   {
-    gUnicodePtr.resize(uni.len+1);
-    memcpy(UnicodePtr,uni.UnicodePtr,uni.len*sizeof(unsigned long));
-    UnicodePtr[uni.len]=0;
-  }else
-  {
-    gUnicodePtr.resize(0);
-  }
-}
-
-UnicodeRep::UnicodeRep(const UnicodeRep::Remainder &r)
-: gUnicodePtr(UnicodePtr)
-{
-  init(r.data,r.size,(UnicodeRep::EncodeType)r.encodetype,r.encoding);
-}
-
-UnicodeRep::UnicodeRep(
-  const UnicodeRep::Remainder &r1,const UnicodeRep::Remainder &r2)
-: gUnicodePtr(UnicodePtr)
-{
-  Remainder r(r1,r2);
-  init(r.data,r.size,(UnicodeRep::EncodeType)r.encodetype,r.encoding);
-}
-
-UnicodeRep::~UnicodeRep()
-{
-}
-
-GUnicode::GUnicode(void)
-{
-  GP<UnicodeRep>::operator=(UnicodeRep::create());
-}
-
-GUnicode::GUnicode(GUTF8String &str)
-{
-  GP<UnicodeRep>::operator=(UnicodeRep::create());
-  (*this)->init(str,str.length());
-}
-
-GUnicode::GUnicode(GUTF8String &str, unsigned int const i)
-{
-  GP<UnicodeRep>::operator=(UnicodeRep::create());
-  unsigned int const  j=str.length();
-  (*this)->init(str,(i>j)?j:i);
-}
- 
-GUnicode::GUnicode(const GUTF8String &str)
-{
-  GP<UnicodeRep>::operator=(UnicodeRep::create());
-  (*this)->init(str,str.length());
-}
-
-GUnicode::GUnicode(const GUTF8String &str, unsigned int const i)
-{
-  GP<UnicodeRep>::operator=(UnicodeRep::create());
-  unsigned int const  j=str.length();
-  (*this)->init(str,(i>j)?j:i);
-}
- 
-GUnicode::GUnicode(unsigned long const * const wide)
-{
-  GP<UnicodeRep>::operator=(UnicodeRep::create());
-  (*this)->init(wide,0,UnicodeRep::UCS4);
-}
-
-GUnicode::GUnicode(unsigned long const * const wide,unsigned int const i)
-{
-  GP<UnicodeRep>::operator=(UnicodeRep::create());
-  (*this)->init(i?wide:0,i*sizeof(unsigned long),UnicodeRep::UCS4);
-}
-
-GUnicode::GUnicode(
-  unsigned char const * const str,unsigned int const i,const EncodeType t)
-{
-  GP<UnicodeRep>::operator=(UnicodeRep::create());
-  (*this)->init(i?str:0,i,(UnicodeRep::EncodeType &)t);
-}
-
-GUnicode::GUnicode(
-  unsigned char const * const str,unsigned int const i,const EncodeType t,
-  const GUTF8String &encoding)
-{
-  GP<UnicodeRep>::operator=(UnicodeRep::create());
-  if(encoding.length())
-  {
-    (*this)->init(i?str:0,i,encoding);
-  }else
-  {
-    (*this)->init(i?str:0,i,(UnicodeRep::EncodeType &)t);
-  }
-}
-
-GUnicode::GUnicode(
-  unsigned short const * const str,unsigned int const i,const EncodeType t)
-{
-  GP<UnicodeRep>::operator=(UnicodeRep::create());
-  (*this)->init(i?str:0,i*sizeof(unsigned short),(UnicodeRep::EncodeType &)t);
-}
-
-GUnicode::GUnicode(
-  unsigned long const * const str,unsigned int const i,const EncodeType t)
-{
-  GP<UnicodeRep>::operator=(UnicodeRep::create());
-  (*this)->init(i?str:0,i*sizeof(unsigned long),(UnicodeRep::EncodeType &)t);
-}
-
-GP<UnicodeRep> 
-UnicodeRep::concat(const UnicodeRep &uni1,const UnicodeRep &uni2)
-{
-  GP<UnicodeRep> retval;
-  unsigned int const len1=uni1.length();
-  unsigned int const len2=uni2.length();
-  if(len2)
-  {
-    if(len1)
+    if(xbuf && bufsize)
     {
-      UnicodeRep *ptr=(retval=UnicodeRep::create());
-      ptr->remainder.init(uni2.remainder);
-      ptr->len=len1+len2;
-      ptr->gUnicodePtr.resize(ptr->len+1);
-      memcpy(ptr->UnicodePtr,uni1.UnicodePtr,len1*sizeof(unsigned long));
-      memcpy(ptr->UnicodePtr+len1,uni2.UnicodePtr,len2*sizeof(unsigned long));
-      ptr->UnicodePtr[ptr->len]=0;
-      ptr->gs=uni1.gs+uni2.gs;
-    }else
-    {
-      UnicodeRep *ptr=new UnicodeRep(uni2);
-      retval=ptr;
-    }
-  }else if(uni1.remainder.size)
-  {
-    if(uni2.remainder.size)
-    {
-      UnicodeRep r(uni1.remainder,uni2.remainder);
-      UnicodeRep *ptr=new UnicodeRep(uni1);
-      retval=ptr;
-      if(r.length())
+      const int s=r->gremainder;
+      if(s)
       {
-        ptr->remainder.init(0,0);
-        retval=concat(*retval,r);
+        void *buf;
+        GPBufferBase gbuf(buf,s+bufsize,1);
+        memcpy(buf,r->remainder,s);
+        memcpy((void *)((size_t)buf+s),xbuf,bufsize);
+        retval=((r->encoding)
+          ?create(buf,s+bufsize,r->encoding)
+          :create(buf,s+bufsize,r->encodetype));
       }else
-      {    
-        retval->remainder.init(r.remainder);
+      {
+        retval=((r->encoding)
+          ?create(xbuf,bufsize,r->encoding)
+          :create(xbuf,bufsize,r->encodetype));
       }
     }else
     {
-      retval=new UnicodeRep(uni1);
+      retval=xremainder;
     }
   }else
   {
-    UnicodeRep *ptr=new UnicodeRep(uni1);
-    retval=ptr;
-    if(uni2.remainder.size)
-    {
-      ptr->remainder.init(uni2.remainder);
-    }
+    retval=create(xbuf,bufsize,XUTF8);
   }
   return retval;
 }
 
-GP<UnicodeRep> 
-UnicodeRep::concat(const GP<UnicodeRep> &guni1,const GP<UnicodeRep> &guni2)
-{
-  return ((!guni1)
-    ?(guni2)
-    :((!guni2)
-      ?(guni1)
-      :((guni2->length())
-        ?((guni1->length())?concat(*guni1,*guni2):guni2)
-        :((guni2->remainder.size)?concat(*guni1,*guni2):guni1))));
-}
-
-void
-UnicodeRep::init(
-  void const * const xbuf,
-  const unsigned int bufsize,
-  const EncodeType t,
-  const GUTF8String &encoding)
-{
-  if(encoding.length())
-  {
-    init(xbuf,bufsize,encoding);
-  }else
-  {
-    init(xbuf,bufsize,t);
-  }
-}
-
-void
-UnicodeRep::init(
+GP<GStringRep>
+GStringRep::Unicode::create(
   void const * const xbuf,
   unsigned int bufsize,
-  const GUTF8String &encoding)
+  GP<GStringRep> encoding)
 {
-  GUTF8String e=encoding.upcase();
-  if(!e.length())
+  GP<GStringRep> retval;
+  GStringRep *e=encoding;
+  if(e)
   {
-    init(xbuf,bufsize);
-  }else if(e == "UTF8" || e == "UTF-8")
+    e=(encoding=e->upcase());
+  }
+  if(!e || !e->size)
   {
-    init(xbuf,bufsize,UTF8);
-  }else if(e == "UTF16" || e == "UTF-16"
-    || e == "UCS2" || e == "UCS2")
+    retval=create(xbuf,bufsize,XOTHER);
+  }else if(!e->cmp("UTF8") || !e->cmp("UTF-8"))
   {
-    init(xbuf,bufsize,UTF16);
-  }else if(e == "UCS4" || e == "UCS-4")
+    retval=create(xbuf,bufsize,XUTF8);
+  }else if(!e->cmp("UTF16")|| !e->cmp("UTF-16")
+    || !e->cmp("UCS2") || !e->cmp("UCS2"))
   {
-    init(xbuf,bufsize,UCS4);
+    retval=create(xbuf,bufsize,XUTF16);
+  }else if(!e->cmp("UCS4") || !e->cmp("UCS-4"))
+  {
+    retval=create(xbuf,bufsize,XUCS4);
   }else
   {
-#ifdef HAS_ICONV
+#ifdef HAS_ICONV_NEVER
     remainder.encoding=e;
-    EncodeType t=OTHER;
+    EncodeType t=XOTHER;
     void const * const buf=checkmarks(xbuf,bufsize,t); 
-    if(t != OTHER)
+    if(t != XOTHER)
     {
       init(xbuf,bufsize,t);
     }
@@ -384,7 +284,7 @@ UnicodeRep::init(
           if(cv == (iconv_t)(-1))
           { 
             remainder.encoding=GUTF8String();
-            if(remainder.encodetype == Remainder::EBCDIC)
+            if(remainder.encodetype == Remainder::XEBCDIC)
             {
               for(len=0;(ptr<eptr)&&(UnicodePtr[len]=*ptr++);len++)
                 EMPTY_LOOP;
@@ -433,212 +333,169 @@ UnicodeRep::init(
       gUnicodePtr.resize(0);
     }
 #else
-    init(xbuf,bufsize);
+    retval=create(xbuf,bufsize,XOTHER);
 #endif
   }
+  return retval;
 }
 
-void
-UnicodeRep::init(
+GP<GStringRep>
+GStringRep::Unicode::create(
   void const * const xbuf,
   unsigned int bufsize,
   EncodeType t)
-{ 
+{
+  GP<GStringRep> gretval;
+  GStringRep *retval=0;
   void const * const buf=checkmarks(xbuf,bufsize,t); 
-  if(t != OTHER)
-  {
-    remainder.encodetype=(UnicodeRep::Remainder::EncodeType)t;
-  }
-  if(buf)
+  if(buf && bufsize)
   {
     unsigned char const *eptr=(unsigned char *)buf;
-    unsigned int j=0;
-    switch(remainder.encodetype)
+    unsigned int maxutf8size=0;
+    void const* const xeptr=(void const *)((size_t)eptr+bufsize);
+    switch(t)
     {
-      case UCS4:
-      case UCS4BE:
-      case UCS4LE:
-      case UCS4_2143:
-      case UCS4_3412:
+      case XUCS4:
+      case XUCS4BE:
+      case XUCS4LE:
+      case XUCS4_2143:
+      case XUCS4_3412:
+        for(unsigned long w;
+          (eptr<xeptr)&&(w=*(unsigned long const *)eptr);
+          eptr+=sizeof(unsigned long))
         {
-          if(bufsize)
-          {
-            unsigned int const  ii=bufsize/sizeof(unsigned long);
-            for(j=0;(j<ii)&&*(unsigned long const *)eptr;
-              j++,eptr+=sizeof(unsigned long))
-              EMPTY_LOOP;
-          }else
-          {
-            while(*(unsigned long const *)eptr)
-              eptr+=sizeof(unsigned long);
-            j=((size_t)eptr-(size_t)buf)/sizeof(unsigned long);
-          }
+          maxutf8size+=(w>0x7f)?6:1;
         }
         break;
-      case UTF16:
-      case UTF16BE:
-      case UTF16LE:
+      case XUTF16:
+      case XUTF16BE:
+      case XUTF16LE:
+        for(unsigned short w;
+          (eptr<xeptr)&&(w=*(unsigned short const *)eptr);
+          eptr+=sizeof(unsigned short))
         {
-          if(bufsize)
-          {
-            unsigned int const  ii=bufsize/sizeof(unsigned short);
-            for(j=0;(j<ii)&&*(unsigned short const *)eptr;
-              j++,eptr+=sizeof(unsigned short))
-              EMPTY_LOOP;
-          }else
-          {
-            while(*(unsigned short const *)eptr)
-              eptr+=sizeof(unsigned short);
-            j=((size_t)eptr-(size_t)buf)/sizeof(unsigned short);
-          }
+          maxutf8size+=(w>0x7f)?3:1;
         }
         break;
-      case UTF8:
-      case EBCDIC:
+      case XUTF8:
+        for(;(eptr<xeptr)&&*eptr;maxutf8size++,eptr++)
+          EMPTY_LOOP;
+        break;
+      case XEBCDIC:
+        for(;(eptr<xeptr)&&*eptr;eptr++)
         {
-          if(bufsize)
-          {
-            for(j=0;(j<bufsize)&&*eptr;j++,eptr++)
-              EMPTY_LOOP;
-          }else
-          {
-            while(*eptr)
-              eptr++;
-            j=(size_t)eptr-(size_t)buf;
-          }
+          maxutf8size+=(*eptr>0x7f)?2:1;
         }
         break;
       default:
         break;
     }
-    if (j)
+    unsigned char *utf8buf=0;
+    GPBuffer<unsigned char> gutf8buf(utf8buf,maxutf8size+1);
+    utf8buf[0]=0;
+    if (maxutf8size)
     {
-      unsigned char const *ptr=(unsigned char *)buf;
-      gUnicodePtr.resize(j+1);
-      UnicodePtr[j]=0;
-      switch(remainder.encodetype)
+      unsigned char *optr=utf8buf;
+      int len=0;
+      unsigned char const *iptr=(unsigned char *)buf;
+      unsigned long w;
+      switch(t)
       {
-        case UCS4:
-          for(len=0;
-            (ptr<eptr)&&(UnicodePtr[len]=*(unsigned long const *)ptr);
-            len++,ptr+=sizeof(unsigned long const))
-            EMPTY_LOOP;
-          break;
-        case UCS4BE:
-          for(len=0;(UnicodePtr[len]=UCS4BEtoUCS4(ptr,eptr));len++)
-            EMPTY_LOOP;
-          break;
-        case UCS4LE:
-          for(len=0;(UnicodePtr[len]=UCS4LEtoUCS4(ptr,eptr));len++)
-            EMPTY_LOOP;
-          break;
-        case UCS4_2143:
-          for(len=0;(UnicodePtr[len]=UCS4_2143toUCS4(ptr,eptr));len++)
-            EMPTY_LOOP;
-          break;
-        case UCS4_3412:
-          for(len=0;(UnicodePtr[len]=UCS4_3412toUCS4(ptr,eptr));len++)
-            EMPTY_LOOP;
-          break;
-        case UTF16:
-          for(len=0;
-            (UnicodePtr[len]=UTF16toUCS4((unsigned short const*&)ptr,eptr));
-            len++)
-            EMPTY_LOOP;
-          break;
-        case UTF16BE:
-          for(len=0;(UnicodePtr[len]=UTF16BEtoUCS4(ptr,eptr));len++)
-            EMPTY_LOOP;
-          break;
-        case UTF16LE:
-          for(len=0;(UnicodePtr[len]=UTF16LEtoUCS4(ptr,eptr));len++)
-            EMPTY_LOOP;
-          break;
-        case UTF8:
-          for(len=0;(UnicodePtr[len]=UTF8toUCS4(ptr,eptr));len++)
-            EMPTY_LOOP;
-          break;
-        case EBCDIC:
-        default:
-          if(remainder.encodetype == Remainder::EBCDIC)
+        case XUCS4:
+          for(;
+            (iptr<eptr)&&(w=*(unsigned long const *)iptr);
+            len++,iptr+=sizeof(unsigned long const))
           {
-            for(len=0;(ptr<eptr)&&(UnicodePtr[len]=*ptr++);len++)
-              EMPTY_LOOP;
-          }else
-          {
-            UnicodePtr[(len=0)]=0;
+            optr=UCS4toUTF8(w,optr);
           }
           break;
+        case XUCS4BE:
+          for(;(w=UCS4BEtoUCS4(iptr,eptr));len++)
+          {
+            optr=UCS4toUTF8(w,optr);
+          }
+          break;
+        case XUCS4LE:
+          for(;(w=UCS4LEtoUCS4(iptr,eptr));len++)
+          {
+            optr=UCS4toUTF8(w,optr);
+          }
+          break;
+        case XUCS4_2143:
+          for(;(w=UCS4_2143toUCS4(iptr,eptr));len++)
+          {
+            optr=UCS4toUTF8(w,optr);
+          }
+          break;
+        case XUCS4_3412:
+          for(;(w=UCS4_3412toUCS4(iptr,eptr));len++)
+          {
+            optr=UCS4toUTF8(w,optr);
+          }
+          break;
+        case XUTF16:
+          for(;
+            (w=xUTF16toUCS4((unsigned short const*&)iptr,eptr));
+            len++)
+          {
+            optr=UCS4toUTF8(w,optr);
+          }
+          break;
+        case XUTF16BE:
+          for(;(w=UTF16BEtoUCS4(iptr,eptr));len++)
+          {
+            optr=UCS4toUTF8(w,optr);
+          }
+          break;
+        case XUTF16LE:
+          for(;(w=UTF16LEtoUCS4(iptr,eptr));len++)
+          {
+            optr=UCS4toUTF8(w,optr);
+          }
+          break;
+        case XUTF8:
+          for(;(w=UTF8toUCS4(iptr,eptr));len++)
+          {
+            optr=UCS4toUTF8(w,optr);
+          }
+          break;
+        case XEBCDIC:
+          for(;(iptr<eptr)&&(w=*iptr++);len++)
+          {
+            optr=UCS4toUTF8(w,optr);
+          }
+          break;
+        default:
+          break;
       }
-      if(len<j)
+      const unsigned int size=(size_t)optr-(size_t)utf8buf;
+      if(size)
       {
-        unsigned long *old_wide;
-        GPBuffer<unsigned long> gold_wide(old_wide);
-        gold_wide.swap(gUnicodePtr);
-        gUnicodePtr.resize(len+1);
-        for(j=0;j<len&&(UnicodePtr[j]=old_wide[j]);j++)
-          EMPTY_LOOP;
-        UnicodePtr[len]=0;
-      }
-      UnicodePtr[len]=0;
-    }
-    if(t != UTF8)
-    {
-      initUTF8();
-    }else
-    {
-      gs=GStringRep::UTF8::create((char const *)buf);
-      if((size_t)eptr<(size_t)buf+bufsize)
+        retval=(gretval=GStringRep::create(size,(GStringRep::Unicode *)0));
+        memcpy(retval->data,utf8buf,size);
+      }else
       {
-        gs.setat((size_t)eptr-(size_t)buf,0);
+        retval=(gretval=GStringRep::create(1,(GStringRep::Unicode *)0));
+        retval->size=size;
       }
-    }
-    if((size_t)eptr<(size_t)buf+bufsize)
-    {
-      remainder.init(eptr,bufsize+(size_t)buf-(size_t)eptr);
-    }
-  }else
-  {
-    gs=GStringRep::UTF8::create((size_t)0);
-    remainder.init(0,0);
-    len=0;
-    gUnicodePtr.resize(0);
-  }
-}
-
-void
-UnicodeRep::initUTF8(void)
-{
-  unsigned char *buf;
-  GPBuffer<unsigned char> gbuf(buf,length()*6+1);
-  unsigned char *ptr=buf;
-  if(UnicodePtr)
-  {
-    for(unsigned long *wide=UnicodePtr;*wide;wide++)
-    {
-      ptr=GStringRep::UCS4toUTF8(wide[0],ptr);
+      retval->data[size]=0;
+      gutf8buf.resize(0);
+      const size_t s=(size_t)eptr-(size_t)iptr;
+      retval->set_remainder(iptr,s,t);
     }
   }
-  *ptr=0;
-  gs=GStringRep::UTF8::create((char const *)buf);
+  if(!retval)
+  {
+    retval=(gretval=GStringRep::create(1,(GStringRep::Unicode *)0));
+    retval->data[0]=0;
+    retval->size=0;
+    retval->set_remainder(0,0,t);
+  }
+  return gretval;
 }
 
-static inline unsigned long
-add_char(unsigned long const U, unsigned char const * const r)
-{
-  unsigned long const C=r[0];
-  return ((C|0x3f) == 0xbf)?((U<<6)|(C&0x3f)):0;
-}
-
-unsigned long
-UnicodeRep::UTF8toUCS4(
-  unsigned char const *&s,void const * const eptr)
-{
-  return GStringRep::UTF8toUCS4(s,eptr);
-}
-
-unsigned long
-UnicodeRep::UTF16toUCS4(unsigned short const *&s,void const * const eptr)
+static unsigned long
+xUTF16toUCS4(unsigned short const *&s,void const * const eptr)
 {
   unsigned long U=0;
   unsigned short const * const r=s+1;
@@ -671,8 +528,8 @@ UnicodeRep::UTF16toUCS4(unsigned short const *&s,void const * const eptr)
   return U;
 }
 
-unsigned long
-UnicodeRep::UTF16BEtoUCS4(unsigned char const *&s,void const * const eptr)
+static unsigned long
+UTF16BEtoUCS4(unsigned char const *&s,void const * const eptr)
 {
   unsigned long U=0;
   unsigned char const * const r=s+2;
@@ -707,8 +564,8 @@ UnicodeRep::UTF16BEtoUCS4(unsigned char const *&s,void const * const eptr)
   return U;
 }
 
-unsigned long
-UnicodeRep::UTF16LEtoUCS4(unsigned char const *&s,void const * const eptr)
+static unsigned long
+UTF16LEtoUCS4(unsigned char const *&s,void const * const eptr)
 {
   unsigned long U=0;
   unsigned long const C1MSB=s[1];
@@ -743,8 +600,8 @@ UnicodeRep::UTF16LEtoUCS4(unsigned char const *&s,void const * const eptr)
   return U;
 }
 
-inline unsigned long
-UnicodeRep::UCS4BEtoUCS4(unsigned char const *&s,void const * const eptr)
+static unsigned long
+UCS4BEtoUCS4(unsigned char const *&s,void const * const eptr)
 {
   unsigned long U=0;
   unsigned char const * const r=s+4;
@@ -759,8 +616,8 @@ UnicodeRep::UCS4BEtoUCS4(unsigned char const *&s,void const * const eptr)
   return U;
 }
 
-inline unsigned long
-UnicodeRep::UCS4LEtoUCS4(unsigned char const *&s,void const * const eptr)
+static unsigned long
+UCS4LEtoUCS4(unsigned char const *&s,void const * const eptr)
 {
   unsigned long U=0;
   unsigned char const * const r=s+4;
@@ -775,8 +632,8 @@ UnicodeRep::UCS4LEtoUCS4(unsigned char const *&s,void const * const eptr)
   return U;
 }
 
-inline unsigned long
-UnicodeRep::UCS4_2143toUCS4(unsigned char const *&s,void const * const eptr)
+static unsigned long
+UCS4_2143toUCS4(unsigned char const *&s,void const * const eptr)
 {
   unsigned long U=0;
   unsigned char const * const r=s+4;
@@ -791,8 +648,8 @@ UnicodeRep::UCS4_2143toUCS4(unsigned char const *&s,void const * const eptr)
   return U;
 }
 
-inline unsigned long
-UnicodeRep::UCS4_3412toUCS4(unsigned char const *&s,void const * const eptr)
+static unsigned long
+UCS4_3412toUCS4(unsigned char const *&s,void const * const eptr)
 {
   unsigned long U=0;
   unsigned char const * const r=s+4;
@@ -807,136 +664,73 @@ UnicodeRep::UCS4_3412toUCS4(unsigned char const *&s,void const * const eptr)
   return U;
 }
 
-GUnicode
-GUnicode::substr_nr(unsigned int const from,unsigned int const to) const
-{
-  unsigned int const  len=length();
-  unsigned int const  xto=(to>len)?len:to;
-  GUnicode retval;
-  if(from < xto)
-  { 
-    retval=GUnicode(((unsigned long const *)*this)+from,xto-from);
-  }
-  return retval;
-}
-
-GUnicode
-GUnicode::substr(unsigned int const from,unsigned int const to) const
-{
-  unsigned int const  len=length();
-  unsigned int const  xto=(to>len)?len:to;
-  GUnicode retval;
-  if(!from && xto == len)
-  {
-    retval=*this;
-  }else if(from < xto)
-  { 
-    retval=GUnicode(((unsigned long const *)*this)+from,xto-from);
-    if(xto == len)
-    {
-      unsigned int const s=get_remainder_size();
-      if(s)
-      {
-        retval+=GUnicode((unsigned char const *)get_remainder(),s,get_remainderType());
-      }
-    }
-  }
-  return retval;
-}
-
 void
-GUnicode::setat(unsigned int const pos,unsigned long const w)
+GStringRep::Unicode::set_remainder( void const * const buf,
+   const unsigned int size, const EncodeType xencodetype )
 {
-  unsigned int const  len=length();
-  if(!w)
-  {
-    operator=(substr(0,pos));
-  }else if(pos<len)
-  {
-    operator=(((pos
-              ?(substr(0,pos)+GUnicode(&w,1))
-              :GUnicode(&w,1))+substr(pos+1,len+1)));
-  }
-}
-
-UnicodeRep::Remainder::Remainder(UnicodeRep::Remainder::EncodeType t)
-: encodetype(t),gdata(data,0,1),size(0) {}
-
-
-UnicodeRep::Remainder::Remainder(const Remainder &r)
-: encodetype(r.encodetype),gdata(data,r.size,1),size(r.size)
-{
+  gremainder.resize(size,1);
   if(size)
-  {
-    memcpy(data,r.data,size);
-  }
-}
-
-UnicodeRep::Remainder::Remainder(const Remainder &r1,const Remainder &r2)
-: encodetype(UnicodeRep::Remainder::OTHER),gdata(data,0,1),size(0)
-{
-  init(r1,r2);
-}
-
-UnicodeRep::Remainder::~Remainder()
-{
-}
-
-inline void
-UnicodeRep::Remainder::init(const Remainder &r)
-{
-  init(r.data,r.size,r.encodetype,r.encoding);
-}
-
-void 
-UnicodeRep::Remainder::init(
-  const Remainder &r1, const Remainder &r2)
-{
-  EncodeType t=
-	  encodetype=(r2.encodetype == OTHER)?r1.encodetype:r2.encodetype;
-  GUTF8String e=
-          encoding=(r2.encoding.length())?r2.encoding:r1.encoding;
-  if(!r2.size)
-  {
-    init(r1.data,r1.size,t,e);
-  }else if(r1.size
-    &&((r1.encodetype == OTHER)||(r1.encodetype == t)))
-  {
-    gdata.resize(0,1);
-    gdata.resize(size,1);
-    size=r1.size+r2.size;
-    memcpy(data,r1.data,r1.size);
-    memcpy((unsigned char *)data+r2.size,r2.data,r2.size);
-  }else
-  {
-    init(r2.data,r2.size,t,e);
-  }
+    memcpy(remainder,buf,size);
+  encodetype=xencodetype;
+  encoding=0;
 }
 
 void
-UnicodeRep::Remainder::init(
-  void const * const d,size_t const s,UnicodeRep::Remainder::EncodeType t,
-  const GUTF8String &e)
+GStringRep::Unicode::set_remainder( const GP<GStringRep::Unicode> &xremainder )
 {
-  gdata.resize(0,1);
-  if(d && s)
+  if(xremainder)
   {
-    gdata.resize(s,1);
-    size=s;
-    memcpy(data,d,s);
+    const int size=xremainder->gremainder;
+    gremainder.resize(size,1);
+    if(size)
+      memcpy(remainder,xremainder->remainder,size);
+    encodetype=xremainder->encodetype;
   }else
   {
-    data=0;
-    size=0;
-  }
-  if(t != OTHER)
-  {
-    encodetype=t;
-  }
-  if(e.length())
-  {
-    encoding=e;
+    gremainder.resize(0,1);
+    encodetype=XUTF8;
   }
 }
 
+GP<GStringRep::Unicode>
+GStringRep::Unicode::get_remainder( void ) const
+{
+  return const_cast<GStringRep::Unicode *>(this);
+}
+
+GUTF8String 
+GUTF8String::create(void const * const buf,const unsigned int size,
+    const EncodeType encodetype, const GUTF8String &encoding)
+{
+  return encoding.length()
+    ?create(buf,size,encodetype)
+    :create(buf,size,encoding);
+}
+
+GUTF8String 
+GUTF8String::create( void const * const buf,
+  unsigned int size, const EncodeType encodetype )
+{
+  GUTF8String retval;
+  retval.init(GStringRep::Unicode::create(buf,size,encodetype));
+  return retval;
+}
+
+GUTF8String 
+GUTF8String::create( void const * const buf,
+  const unsigned int size, const GP<GStringRep::Unicode> &remainder)
+{
+  GUTF8String retval;
+  retval.init(GStringRep::Unicode::create(buf,size,remainder));
+  return retval;
+}
+
+GUTF8String 
+GUTF8String::create( void const * const buf,
+  const unsigned int size, const GUTF8String &encoding )
+{
+  GUTF8String retval;
+  retval.init(GStringRep::Unicode::create(buf,size,encoding ));
+  return retval;
+}
 

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: xml2native.cpp,v 1.2 2001-05-23 21:48:01 bcr Exp $
+// $Id: xml2native.cpp,v 1.3 2001-05-25 19:17:15 bcr Exp $
 // $Name:  $
 
 /** @name nativetoutf8
@@ -43,15 +43,13 @@
     @author
     Dr Bill C Riemers <bcr@lizardtech.com>
     @version
-    #$Id: xml2native.cpp,v 1.2 2001-05-23 21:48:01 bcr Exp $# */
+    #$Id: xml2native.cpp,v 1.3 2001-05-25 19:17:15 bcr Exp $# */
 //@{
 //@}
 
 
 
 
-#include <stdlib.h>
-#include <stdio.h>
 #include "GException.h"
 #include "UnicodeByteStream.h"
 #include "ByteStream.h"
@@ -59,6 +57,7 @@
 #include "GURL.h"
 #include <locale.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 int 
 main(int argc, char **argv)
@@ -76,10 +75,10 @@ main(int argc, char **argv)
     {
       GP<XMLByteStream> uni=XMLByteStream::create(bs);
       bs=ByteStream::create();
-      GUnicode ustr;
+      GUTF8String ustr;
       while((ustr=uni->gets()).length())
       {
-        bs->writestring(ustr->get_string().getUTF82Native());
+        bs->writestring(ustr.getUTF82Native());
       }
     }
     bs->seek(0L);

@@ -1,7 +1,7 @@
 //C-  Copyright © 2000-2001, LizardTech, Inc. All Rights Reserved.
 //C-              Unauthorized use prohibited.
 //
-// $Id: UnicodeByteStream.h,v 1.6 2001-05-23 21:48:01 bcr Exp $
+// $Id: UnicodeByteStream.h,v 1.7 2001-05-25 19:17:16 bcr Exp $
 // $Name:  $
 
 #ifndef _UNICODEBYTESTREAM_H_
@@ -29,11 +29,11 @@
     @author
     Bill C Riemers <bcr@lizardtech.org>
     @version
-    #$Id: UnicodeByteStream.h,v 1.6 2001-05-23 21:48:01 bcr Exp $# */
+    #$Id: UnicodeByteStream.h,v 1.7 2001-05-25 19:17:16 bcr Exp $# */
 //@{
 
 #include "DjVuGlobal.h"
-#include "GUnicode.h"
+#include "GString.h"
 #include "ByteStream.h"
 
 
@@ -63,26 +63,26 @@ class UnicodeByteStream : public ByteStream
 protected:
   UnicodeByteStream(const UnicodeByteStream &bs);
   UnicodeByteStream(GP<ByteStream> bs,
-    const GUnicode::EncodeType encodetype=GUnicode::UTF8);
+    const GStringRep::EncodeType encodetype=GStringRep::XUTF8);
 public:
   /** Constructs an UnicodeByteStream object attached to ByteStream #bs#.
       Any ByteStream can be used when reading an XML file.  Writing
       an XML file however requires a seekable ByteStream. */
   static GP<UnicodeByteStream> create(GP<ByteStream> bs,
-    const GUnicode::EncodeType encodetype=GUnicode::UTF8)
+    const GStringRep::EncodeType encodetype=GStringRep::XUTF8)
   { return new UnicodeByteStream(bs,encodetype); }
 
   // --- BYTESTREAM INTERFACE
   ~UnicodeByteStream();
   /// Sets the encoding type and seek's to position 0.
-  void set_encodetype(const GUnicode::EncodeType et=GUnicode::UTF8);
+  void set_encodetype(const GStringRep::EncodeType et=GStringRep::XUTF8);
   void set_encoding(const GUTF8String &encoding);
   /// Simmular to fgets(), except read aheads effect the tell() position.
-  virtual GUnicode gets(size_t const t=0,unsigned long const stopat='\n',bool const inclusive=true); 
+  virtual GUTF8String gets(size_t const t=0,unsigned long const stopat='\n',bool const inclusive=true); 
   /// Resets the gets buffering as well as physically seeking.
   virtual int seek(long offset, int whence = SEEK_SET, bool nothrow=false);
-  /** Physically reads the specified bytes, and adds them to the gets
-      read ahead buffer. */
+  /** Physically reads the specified bytes, and truncate the read ahead buffer.
+    */
   virtual size_t read(void *buffer, size_t size);
   /// Not correctly implimented...
   virtual size_t write(const void *buffer, size_t size);
@@ -95,10 +95,9 @@ public:
   int get_lines_read(void) const { return linesread; }
 protected:
   /// The real byte stream.
-  GUnicode::EncodeType encodetype;
-  GUTF8String encoding;
-  GUnicode buffer;
   GP<ByteStream> bs;
+  GUTF8String buffer;
+  int bufferpos;
   int linesread;
   long startpos;
 private:
@@ -107,28 +106,33 @@ private:
 };
 
 inline void
-UnicodeByteStream::set_encodetype(const GUnicode::EncodeType et)
+UnicodeByteStream::set_encodetype(const GStringRep::EncodeType et)
 {
-  encodetype=et;
   seek(startpos,SEEK_SET);
-  buffer=GUnicode();
+  bufferpos=0;
+  buffer=GUTF8String::create(0,0,et);
 }
 
 inline void
 UnicodeByteStream::set_encoding(const GUTF8String &xencoding)
 {
-  encoding=xencoding;
   seek(startpos,SEEK_SET);
-  buffer=GUnicode();
+  bufferpos=0;
+  buffer=GUTF8String::create(0,0,xencoding);
 }
 
 inline size_t
 UnicodeByteStream::read(void *buf, size_t size)
 {
-  int retval=bs->read(buf,size);
+  bufferpos=0;
+  const int retval=bs->read(buf,size);
   if(retval)
   {
-    buffer+=GUnicode((unsigned char const *)buf,retval,encodetype,encoding);
+    buffer=GUTF8String::create(
+      (unsigned char const *)buf,retval,buffer.get_remainder());
+  }else
+  {
+    buffer=GUTF8String::create(0,0,buffer.get_remainder());
   }
   return retval;
 }
@@ -136,7 +140,8 @@ UnicodeByteStream::read(void *buf, size_t size)
 inline size_t
 UnicodeByteStream::write(const void *buf, size_t size)
 {
-  buffer=GUnicode();
+  bufferpos=0;
+  buffer=GUTF8String::create(0,0,buffer.get_remainder());
   return bs->write(buf,size);
 }
 
@@ -150,9 +155,8 @@ inline UnicodeByteStream &
 UnicodeByteStream::operator=(UnicodeByteStream &uni)
 {
   bs=uni.bs;
+  bufferpos=uni.bufferpos;
   buffer=uni.buffer;
-  encodetype=uni.encodetype;
-  encoding=uni.encoding;
   return *this;
 }
 
@@ -161,7 +165,8 @@ UnicodeByteStream::seek
 (long offset, int whence, bool nothrow)
 {
   int retval=bs->seek(offset,whence,nothrow);
-  buffer=GUnicode();
+  bufferpos=0;
+  buffer=GUTF8String::create(0,0,buffer.get_remainder());
   return retval;
 }
 
@@ -169,7 +174,8 @@ inline void
 UnicodeByteStream::flush(void)
 {
   bs->flush();
-  buffer=GUnicode();
+  bufferpos=0;
+  buffer=GUTF8String::create(0,0,buffer.get_remainder());
 }
 
 

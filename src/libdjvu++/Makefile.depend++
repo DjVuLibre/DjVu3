@@ -202,9 +202,9 @@ GThreads.o: GThreads.cpp GThreads.h \
  DjVuGlobal.h ../../src/include/DjVu.h \
  GException.h DjVuMessageLite.h GString.h \
  GContainer.h GSmartPointer.h
-GUnicode.o: GUnicode.cpp GUnicode.h GString.h \
- DjVuGlobal.h ../../src/include/DjVu.h \
- GContainer.h GException.h GSmartPointer.h
+GUnicode.o: GUnicode.cpp GString.h DjVuGlobal.h \
+ ../../src/include/DjVu.h GContainer.h \
+ GException.h GSmartPointer.h
 GURL.o: GURL.cpp GException.h DjVuGlobal.h \
  ../../src/include/DjVu.h GOS.h GString.h \
  GContainer.h GSmartPointer.h GURL.h \
@@ -249,11 +249,6 @@ parseoptions.o: parseoptions.cpp parseoptions.h \
  GString.h DjVuGlobal.h ../../src/include/DjVu.h \
  GContainer.h GException.h GSmartPointer.h \
  Arrays.h DjVuMessage.h DjVuMessageLite.h
-UnicodeByteStream.o: UnicodeByteStream.cpp \
- UnicodeByteStream.h DjVuGlobal.h \
- ../../src/include/DjVu.h GUnicode.h GString.h \
- GContainer.h GException.h GSmartPointer.h \
- ByteStream.h Arrays.h
 XMLParser.o: XMLParser.cpp XMLParser.h \
  GContainer.h GException.h DjVuGlobal.h \
  ../../src/include/DjVu.h GSmartPointer.h GURL.h \
@@ -262,11 +257,6 @@ XMLParser.o: XMLParser.cpp XMLParser.h \
  DjVuPort.h DjVuText.h GMapAreas.h GRect.h \
  DjVuAnno.h DjVuFile.h DjVuInfo.h \
  DjVuPalette.h GPixmap.h debug.h
-XMLTags.o: XMLTags.cpp XMLTags.h GContainer.h \
- GException.h DjVuGlobal.h \
- ../../src/include/DjVu.h GSmartPointer.h \
- GString.h UnicodeByteStream.h GUnicode.h \
- ByteStream.h Arrays.h
 ZPCodec.o: ZPCodec.cpp ZPCodec.h GContainer.h \
  GException.h DjVuGlobal.h \
  ../../src/include/DjVu.h GSmartPointer.h \

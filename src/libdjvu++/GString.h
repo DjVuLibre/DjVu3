@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.h,v 1.76 2001-05-23 21:48:01 bcr Exp $
+// $Id: GString.h,v 1.77 2001-05-25 19:17:16 bcr Exp $
 // $Name:  $
 
 #ifndef _GSTRING_H_
@@ -57,7 +57,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.76 2001-05-23 21:48:01 bcr Exp $# */
+    #$Id: GString.h,v 1.77 2001-05-25 19:17:16 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -88,16 +88,20 @@ typedef int mbstate_t;
 class GStringRep : public GPEnabled
 {
 public:
+  enum EncodeType { XUCS4, XUCS4BE, XUCS4LE, XUCS4_2143, XUCS4_3412,
+    XUTF16, XUTF16BE, XUTF16LE, XUTF8, XEBCDIC, XOTHER } ; 
+
   class UTF8;
-#ifndef UNDER_CE
-  class Native;
-  class ChangeLocale;
-#endif // UNDER_CE
+  friend UTF8;
+  class Unicode;
+  friend Unicode;
 
 #ifndef UNDER_CE
+  class ChangeLocale;
+  class Native;
+
   friend Native;
 #endif
-  friend UTF8;
   friend class GBaseString;
   friend class GUTF8String;
   friend class GNativeString;
@@ -267,7 +271,14 @@ protected:
   static unsigned long gtowupper(const unsigned long w);
   static unsigned long gtowlower(const unsigned long w);
 
-private:
+  virtual void set_remainder( void const * const buf, const unsigned int size,
+    const EncodeType encodetype);
+
+  virtual void set_remainder ( const GP<Unicode> &remainder );
+
+  virtual GP<Unicode> get_remainder( void ) const;
+  
+// Actual string data.
   int  size;
   char *data;
 };
@@ -969,6 +980,23 @@ public:
       init((*this)->setat(CheckSubscript(n),ch));
     }
   }
+public:
+  typedef enum GStringRep::EncodeType EncodeType;
+  static GUTF8String create(void const * const buf,const unsigned int size,
+    const EncodeType encodetype, const GUTF8String &encoding);
+  static GUTF8String create( void const * const buf,
+    unsigned int size, const EncodeType encodetype );
+  static GUTF8String create( void const * const buf,
+    const unsigned int size, const GUTF8String &encoding );
+  static GUTF8String create( void const * const buf,
+    const unsigned int size, const GP<GStringRep::Unicode> &remainder);
+  GP<GStringRep::Unicode> get_remainder(void) const
+  {
+    GP<GStringRep::Unicode> retval;
+    if(ptr)
+      retval=((*this)->get_remainder());
+    return retval;
+  }
 };
 
 
@@ -1385,6 +1413,22 @@ inline GNativeString
 GNativeString::downcase( void ) const
 { 
   return (ptr?(*this)->downcase():(*this));
+}
+
+template <class TYPE>
+GP<GStringRep>
+GStringRep::create(const unsigned int sz, TYPE *)
+{
+  GP<GStringRep> gaddr;
+  if (sz > 0)
+  {
+    GStringRep *addr;
+    gaddr=(addr=new TYPE);
+    addr->data=(char *)(::operator new(sz+1));
+    addr->size = sz;
+    addr->data[sz] = 0;
+  }
+  return gaddr;
 }
 
 
