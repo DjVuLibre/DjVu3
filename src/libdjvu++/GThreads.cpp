@@ -9,10 +9,10 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GThreads.cpp,v 1.27 1999-07-19 14:25:27 leonb Exp $
+//C- $Id: GThreads.cpp,v 1.28 1999-07-19 18:04:51 leonb Exp $
 
 
-// **** File "$Id: GThreads.cpp,v 1.27 1999-07-19 14:25:27 leonb Exp $"
+// **** File "$Id: GThreads.cpp,v 1.28 1999-07-19 18:04:51 leonb Exp $"
 // This file defines machine independent classes
 // for running and synchronizing threads.
 // - Author: Leon Bottou, 01/1998
@@ -1014,10 +1014,9 @@ cotask_select(int nfds,
 }
 
 
-void 
-GThread::get_select(int &nfds,
-                    fd_set *rfds, fd_set *wfds, fd_set *efds, 
-                    unsigned long &timeout)
+static void 
+cotask_get_select(int &nfds, fd_set *rfds, fd_set *wfds, fd_set *efds, 
+                  unsigned long &timeout)
 {
   int ready = 1;
   unsigned long minwait = MAXWAIT;
@@ -1258,7 +1257,7 @@ GThread::terminate()
         (*scheduling_callback)(CallbackTerminate);
       task->prev->next = task->next;
       task->next->prev = task->prev;
-      task->prev = 0;
+      task->prev = 0; // mark task as terminated...
       if (task == curtask)
         cotask_yield();
     }
@@ -1276,6 +1275,13 @@ GThread::select(int nfds,
                 struct timeval *timeout)
 {
   return cotask_select(nfds, readfds, writefds, exceptfds, timeout);
+}
+
+void
+GThread::get_select(int &nfds, fd_set *rfds, fd_set *wfds, fd_set *efds, 
+                    unsigned long &timeout)
+{
+  cotask_get_select(nfds, rfds, wfds, efds, timeout);
 }
 
 inline void *
@@ -1302,6 +1308,9 @@ GMonitor::~GMonitor()
   cotask_wakeup((void*)this, 0);
   cotask_wakeup((void*)count, 0);    
   cotask_yield();
+  // Because we know how the scheduler works, we know that this single call to
+  // yield will run all unblocked tasks and given them the chance to leave the
+  // scope of the monitor object.
 }
 
 void 
