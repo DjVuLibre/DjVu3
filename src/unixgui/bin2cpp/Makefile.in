@@ -1,0 +1,120 @@
+#C-
+#C-  Copyright © 1999-2001, LizardTech, Inc. All Rights Reserved.
+#C-              Unauthorized use prohibited.
+#C-
+#
+# $Id: Makefile.in,v 1.1 2001-05-29 22:05:28 bcr Exp $
+# $Name:  $
+
+%%%include <paths>
+
+default: all
+.SILENT:;
+
+%%%include <commands>
+SHELL	:= /bin/sh
+ECHO	:= @%ECHO%@
+ECHO_TYPE:= @%ECHO_TYPE%@
+CC	:= @%CC%@
+CXX	:= @%CXX%@
+INCLUDE	:= $(DJVUAPI_INC) $(LIBDJVUXX_INC) @%INCS%@ @%DEFS%@ @%DEFSTHREADS%@ 
+CXXFLAGS:= @%CXXFLAGS%@ @%CXXTHREADS%@ @%CXXOPT%@ @%CXXUNROLL%@ @%CXXWARN%@\
+	   $(DEFS)
+LDFLAGS	:= @%LDFLAGS%@
+LDOPTS	:= @%LDOPTS%@
+LIBS	:= @%libs%@ @%LIBSTHREADS%@ -lstdc++
+MAKESTLIB:= @%make_stlib%@
+RPO	:= @%RPO%@
+VPATH	:= .
+
+DIR_UNIXGUI	:= ./TOPDIR/SRCDIR/src/unixgui
+
+ifeq ($(ECHO_TYPE),PREFIX)
+EHEAD	:= -n
+ETAIL	:=
+else
+EHEAD	:=
+ETAIL	:= \\c
+endif
+
+#############################################################################
+### LIB_DJVU
+#############################################################################
+DIR_LIB_DJVU	:= ./TOPDIR/src/libdjvu++
+
+#############################################################################
+### BIN2CPP
+#############################################################################
+DIR_BIN2CPP	:= $(DIR_UNIXGUI)/bin2cpp
+VPATH		:= $(VPATH):$(DIR_BIN2CPP)
+SRC_BIN2CPP	:= bin2cpp.cpp
+HDR_BIN2CPP	:= $(patsubst %.cpp,%.h,$(SRC_BIN2CPP))
+OBJ_BIN2CPP	:= $(patsubst %.cpp,%.o,$(SRC_BIN2CPP))
+SRCS		+= $(SRC_BIN2CPP)
+OBJS		+= $(OBJ_BIN2CPP)
+PROGRAM		:= $(BINPATH)/bin2cpp
+
+INCLUDE		+= $(patsubst %,-I%,$(subst :, ,$(VPATH)))
+
+#############################################################################
+### Supporting programs
+#############################################################################
+ifneq ($(RPO),)
+$(RPO):
+	$(ECHO) "Building $(RPO)..."
+	$(ECHO) "cd $(dir $@); $(MAKE) $(notdir $@)"
+	cd $(dir $@); $(MAKE) $(notdir $@)
+endif
+
+#############################################################################
+### Library
+#############################################################################
+$(LIBDJVUXX):
+	$(ECHO) "Linking $@..."
+	if ( cd $(DIR_LIB_DJVU) ) ; then cd $(DIR_LIB_DJVU) ; $(MAKE) lib ; fi
+
+#############################################################################
+### Main program
+#############################################################################
+$(PROGRAM):	$(OBJS) $(LIBDJVUXX) $(MAKEFILE) $(RPO)
+	$(ECHO) "Linking $@...";\
+	if [ -n "$(RPO)" ];\
+	then\
+	   $(ECHO) "Applying RPO to the object files...";\
+	   $(RPO) -j3 -v $(OBJS) $(LIBDJVUXX);\
+	fi
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(LDOPTS) -o $(PROGRAM) $(OBJS) $(LIBDJVUXX) $(LIBS)
+
+#############################################################################
+### Dependencies generator
+#############################################################################
+-include $(patsubst %.c,%.dep,$(filter %.c,$(SRCS)))\
+	 $(patsubst %.cpp,%.dep,$(filter %.cpp,$(SRCS)))
+
+%.dep: %.cpp
+	$(ECHO) "Generating dependencies for $(notdir $<)...";\
+	$(CXX) -MM $(CXXFLAGS) $(INCLUDE) $< > /tmp/$$$$.dep || exit 1;\
+	$(RM) -f $@; ($(ECHO) $(EHEAD) "$@ " $(ETAIL); cat /tmp/$$$$.dep) > $@;\
+	$(RM) -f /tmp/$$$$.dep
+
+#############################################################################
+### Basic rules
+#############################################################################
+all: $(PROGRAM)
+
+clean:
+	-$(RM) -f $(PROGRAM) 2>>/dev/null
+	-$(RM) -f *.o *.a *.out *.rpo *.dep ii_files 2>>/dev/null
+
+distclean: clean
+	-$(RM) -f $(MAKEFILE) 2>>/dev/null
+
+.PHONY: all depend clean distclean
+
+#############################################################################
+### Implicit rules and suffixes
+#############################################################################
+.SUFFIXES: .cpp .dep
+.cpp.o:
+	$(ECHO) "Compiling $(notdir $<)...";\
+        $(CXX) $(CXXFLAGS) $(INCLUDE) -c $< -o $@

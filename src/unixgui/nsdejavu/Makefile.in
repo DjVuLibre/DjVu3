@@ -1,0 +1,205 @@
+# C- Copyright (c) 1999 AT&T Corp.  All rights reserved.
+# C-
+# C- This software may only be used by you under license from AT&T
+# C- Corp. ("AT&T"). A copy of AT&T's Source Code Agreement is available at
+# C- AT&T's Internet website having the URL <http://www.lizardtech.com/open>.
+# C- If you received this software without first entering into a license with
+# C- AT&T, you have an infringing copy of this software and cannot use it
+# C- without violating AT&T's intellectual property rights.
+# C-
+# C- $Id: Makefile.in,v 1.1 2001-05-29 22:05:30 bcr Exp $
+
+%%%include <paths>
+
+default: all
+.SILENT:;
+
+%%%include <commands>
+SHELL	:= /bin/sh
+ECHO	:= @%ECHO%@
+ECHO_TYPE:= @%ECHO_TYPE%@
+CC	:= @%CC%@
+CXX	:= @%CXX%@
+INCLUDE	:= -I./TOPDIR/src/include -I./TOPDIR/SRCDIR/src/include -I./TOPDIR/config -I./TOPDIR/SRCDIR/config @%INCLUDE_X11%@
+SYS	:= @%SYS%@
+DEFS	:= @%DEFS%@ -DXP_UNIX -DPLUGIN -DUSE_EXCEPTION_EMULATION \
+	   -DTHREADMODEL=NOTHREADS -DDO_NOT_MOVE_GET_DATA_TO_ARRAYS_CPP
+CXXFLAGS:= @%CXXFLAGS%@ @%CXXPIC%@ @%CXXRPO%@ @%CXXOPT%@ @%CXXUNROLL%@\
+	   @%CXXWARN%@ $(INCS) $(DEFS) -fno-exceptions
+CCFLAGS	:= @%CCFLAGS%@ @%CCPIC%@ @%CCOPT%@ @%CCUNROLL%@ @%CCWARN%@\
+	   $(INCS) $(DEFS) -fno-exceptions
+LDFLAGS	:= @%LDFLAGS%@ @%LDFLAGS_X11%@
+LDOPTS	:= @%LDOPTS%@ -shared
+LIBS	:= @%libs%@
+MAKESTLIB:= @%make_stlib%@
+RPO	:= @%RPO%@
+VPATH	:= .
+
+ifeq ($(ECHO_TYPE),PREFIX)
+EHEAD	:= -n
+ETAIL	:=
+else
+EHEAD	:=
+ETAIL	:= \\c
+endif
+
+#############################################################################
+### Platform specific
+#############################################################################
+ifneq (,$(findstring linux,$(SYS)))
+LIBS	+= -lXt -lX11 -lgcc -lc -lm
+PROGRAM	:= nsdejavu.so
+endif
+ifneq (,$(findstring Solaris,$(SYS)))
+LIBS	+= -lXt -lX11 -lgcc -lm -lc
+PROGRAM	:= nsdejavu.so
+endif
+ifneq (,$(findstring IRIX,$(SYS)))
+LIBS	+= -lXt -lX11 -lgcc -lm -lc
+PROGRAM	:= nsdejavu.so
+endif
+ifneq (,$(findstring HP-UX,$(SYS)))
+LIBS	+= -Wl,-a,archive_shared -lgcc
+LDOPTS	+= -Wl,-o,nsdejavu.sl,+I,plugin_init
+PROGRAM	:= nsdejavu.sl
+endif
+
+DIR_UNIXGUI	:= ./TOPDIR/SRCDIR/src/unixgui
+
+#############################################################################
+### LIB_DJVU
+#############################################################################
+DIR_LIB_DJVU	:= ./TOPDIR/SRCDIR/src/libdjvu++
+VPATH		:= $(VPATH):$(DIR_LIB_DJVU)
+SRC_LIB_DJVU 	:= GString.cpp GException.cpp GContainer.cpp \
+	GSmartPointer.cpp GThreads.cpp debug.cpp Arrays.cpp \
+	ByteStream.cpp DjVuMessageLite.cpp
+HDR_LIB_DJVU	:= $(patsubst %.cpp,%.h,$(SRC_LIB_DJVU))
+OBJ_LIB_DJVU	:= $(patsubst %.cpp,%.o,$(SRC_LIB_DJVU))
+LIB_DJVU	:= libdjvu++.a
+SRCS		+= $(SRC_LIB_DJVU)
+
+#############################################################################
+### SHARED_UTILS
+#############################################################################
+DIR_SHARED_UTILS:= $(DIR_UNIXGUI)/shared/utils
+VPATH		:= $(VPATH):$(DIR_SHARED_UTILS)
+SRC_SHARED_UTILS:= io.cpp path.cpp
+HDR_SHARED_UTILS:= $(patsubst %.cpp,%.h,$(SRC_SHARED_UTILS))
+OBJ_SHARED_UTILS:= $(patsubst %.cpp,%.o,$(SRC_SHARED_UTILS))
+SRCS		+= $(SRC_SHARED_UTILS)
+OBJS		+= $(OBJ_SHARED_UTILS)
+
+#############################################################################
+### SHARED_RES
+#############################################################################
+DIR_SHARED_RES	:= $(DIR_UNIXGUI)/shared/res
+VPATH		:= $(VPATH):$(DIR_SHARED_RES)
+SRC_SHARED_RES	:= saved_data.cpp
+HDR_SHARED_RES	:= $(patsubst %.cpp,%.h,$(SRC_SHARED_RES))
+OBJ_SHARED_RES	:= $(patsubst %.cpp,%.o,$(SRC_SHARED_RES))
+SRCS		+= $(SRC_SHARED_RES)
+OBJS		+= $(OBJ_SHARED_RES)
+
+#############################################################################
+### NPSDK
+#############################################################################
+DIR_NPSDK	:= $(DIR_UNIXGUI)/npsdk
+VPATH		:= $(VPATH):$(DIR_NPSDK)
+SRC_NPSDK 	:= npunix.c
+HDR_NPSDK	:= 
+OBJ_NPSDK	:= npunix.o
+SRCS		+= $(SRC_NPSDK)
+OBJS		+= $(OBJ_NPSDK)
+
+#############################################################################
+### NSDEJAVU
+#############################################################################
+DIR_NSDEJAVU	:= $(DIR_UNIXGUI)/nsdejavu
+VPATH		:= $(VPATH):$(DIR_NSDEJAVU)
+SRC_NSDEJAVU 	:= plugin.cpp
+HDR_NSDEJAVU	:= $(patsubst %.cpp,%.h,$(SRC_NSDEJAVU))
+OBJ_NSDEJAVU	:= $(patsubst %.cpp,%.o,$(SRC_NSDEJAVU))
+SRCS		+= $(SRC_NSDEJAVU)
+OBJS		+= $(OBJ_NSDEJAVU)
+
+INCLUDE		+= $(patsubst %,-I%,$(subst :, ,$(VPATH)))
+
+#############################################################################
+### Supporting programs
+#############################################################################
+ifneq ($(RPO),)
+$(RPO):
+	$(ECHO) "Building $(RPO)..."
+	$(ECHO) "cd $(dir $@); $(MAKE) $(notdir $@)"
+	cd $(dir $@); $(MAKE) $(notdir $@)
+endif
+
+#############################################################################
+### Library
+#############################################################################
+$(LIB_DJVU):	$(OBJ_LIB_DJVU) $(RPO)
+	$(ECHO) "Building $@..."
+	$(RM) -f $(LIB_DJVU)
+	if [ -n "$(RPO)" ];\
+	then\
+	   $(ECHO) "Applying RPO to the object files...";\
+	   CXX="$(CXX)"; export CXX;\
+	   $(RPO) -j3 -v $(OBJ_LIB_DJVU);\
+	fi
+	if [ -n "$(MAKESTLIB)" ];\
+	then\
+	   $(MAKESTLIB) $(LIB_DJVU) $(OBJ_LIB_DJVU);\
+	   $(RANLIB) $(LIB_DJVU);\
+	fi
+
+#############################################################################
+### Main program
+#############################################################################
+$(PROGRAM):	$(OBJS) $(LIB_DJVU) $(MAKEFILE) $(RPO)
+	$(ECHO) "Linking $@...";\
+	if [ -n "$(RPO)" ];\
+	then\
+	   $(ECHO) "Applying RPO to the object files...";\
+	   CXX="$(CXX)"; export CXX;\
+	   $(RPO) -j3 -v $(OBJS) $(LIB_DJVU);\
+	fi;\
+	$(CC) $(CXXFLAGS) $(LDFLAGS) $(LDOPTS) -o $(PROGRAM) $(OBJS) $(LIB_DJVU) $(LIBS)
+
+#############################################################################
+### Dependencies generator
+#############################################################################
+-include $(patsubst %.c,%.dep,$(filter %.c,$(SRCS)))\
+	 $(patsubst %.cpp,%.dep,$(filter %.cpp,$(SRCS)))
+
+$(patsubst %.cpp,%.dep,$(filter %.cpp,$(SRCS))): %.dep : %.cpp
+	$(ECHO) "Generating dependencies for $(notdir $<)...";\
+	$(CXX) -MM $(CXXFLAGS) $(INCLUDE) $< > /tmp/$$$$.dep || exit 1;\
+	$(RM) -f $@; ($(ECHO) $(EHEAD) "$@ " $(ETAIL); cat /tmp/$$$$.dep) > $@
+	$(RM) -f /tmp/$$$$.dep
+
+#############################################################################
+### Basic rules
+#############################################################################
+all: $(PROGRAM)
+
+clean:
+	-$(RM) -f $(PROGRAM) 2>>/dev/null
+	-$(RM) -f *.o *.a *.out *.rpo *.dep ii_files 2>>/dev/null
+
+distclean: clean
+	-$(RM) -f $(MAKEFILE) 2>>/dev/null
+
+.PHONY: all depend clean distclean
+
+#############################################################################
+### Implicit rules and suffixes
+#############################################################################
+.SUFFIXES: .cpp .dep .c
+.cpp.o:
+	$(ECHO) "Compiling $(notdir $<)...";\
+        $(CXX) $(CXXFLAGS) $(INCLUDE) -c $< -o $@
+
+.c.o:
+	$(ECHO) "Compiling $(notdir $<)...";\
+	$(CC) $(CCFLAGS) $(INCLUDE) -c $< -o $@;\

@@ -1,0 +1,299 @@
+#C-
+#C-  Copyright © 1999-2001, LizardTech, Inc. All Rights Reserved.
+#C-              Unauthorized use prohibited.
+#C-
+#
+# $Id: Makefile.in,v 1.1 2001-05-29 22:05:28 bcr Exp $
+# $Name:  $
+
+%%%include <paths>
+
+default: all
+.SILENT:;
+
+%%%include <commands>
+SHELL	:= /bin/sh
+ECHO	:= @%ECHO%@
+ECHO_TYPE:= @%ECHO_TYPE%@
+CC	:= @%CC%@
+CXX	:= @%CXX%@
+INCLUDE	:= $(DJVUAPI_INC) $(LIBDJVUXX_INC) @%INCLUDE_QT%@ @%INCLUDE_X11%@ @%INCS%@
+THREADS	:= @%threads%@
+SYS	:= @%SYS%@
+DEFS	:= @%DEFS%@ @%DEFSTHREADS%@ -DDJVU_VIEWER -DUSE_XSHAPE \
+	   -DREPARENT -DUSE_NETSCAPE_RESOURCES
+CXXFLAGS = @%CXXFLAGS%@ @%CXXTHREADS%@ @%CXXRPO%@ @%CXXOPT%@ @%CXXUNROLL%@\
+	   @%CXXWARN%@ $(DEFS) $(INCLUDE)
+LDFLAGS	:= @%LDFLAGS%@
+QTFLAGS	:= @%LDFLAGS_QT%@ @%LDFLAGS_X11%@
+LDOPTS	:= @%LDOPTS%@
+MOC	:= @%MOC%@
+LIBS	:= @%libs%@ @%LIBSTHREADS%@ -lqt -lX11 -lXext -lstdc++ -lm
+MAKESTLIB:= @%make_stlib%@
+RPO	:= @%RPO%@
+VPATH	:= .
+
+ifeq ($(ECHO_TYPE),PREFIX)
+EHEAD	:= -n
+ETAIL	:=
+else
+EHEAD	:=
+ETAIL	:= \\c
+endif
+
+DIR_UNIXGUI	:= ./TOPDIR/SRCDIR/src/unixgui
+
+BIN2CPP		:= $(BINPATH)/bin2cpp
+
+#############################################################################
+### LIB_DJVU
+#############################################################################
+DIR_LIB_DJVU	:= ./TOPDIR/src/libdjvu++
+
+%%%BEGIN_REQUIRE(@%LIBJPEG%@)
+#############################################################################
+### LIB_JPEG
+#############################################################################
+DIR_LIB_JPEG    := ./TOPDIR/src/3rd-party/libjpeg
+
+$(LIBJPEG):
+	$(ECHO) "Building $@..."
+	if ( cd $(DIR_LIB_JPEG) ) ; then cd $(DIR_LIB_JPEG) ; $(MAKE) lib ; fi
+%%%END_REQUIRE(@%LIBJPEG%@)
+
+#############################################################################
+### EXCEPT
+#############################################################################
+DIR_EXCEPT	:= $(DIR_UNIXGUI)/indep/except
+VPATH		:= $(VPATH):$(DIR_EXCEPT)
+SRC_EXCEPT 	:= exc_base.cpp exc_file.cpp exc_misc.cpp exc_msg.cpp\
+	exc_range.cpp exc_res.cpp exc_sys.cpp exceptions.cpp throw_error.cpp
+HDR_EXCEPT	:= $(patsubst %.cpp,%.h,$(SRC_EXCEPT))
+OBJ_EXCEPT	:= $(patsubst %.cpp,%.o,$(SRC_EXCEPT))
+SRCS		+= $(SRC_EXCEPT)
+OBJS		+= $(OBJ_EXCEPT)
+
+#############################################################################
+### INDEP_QX
+#############################################################################
+DIR_INDEP_QX	:= $(DIR_UNIXGUI)/indep/QX
+VPATH		:= $(VPATH):$(DIR_INDEP_QX)
+SRC_INDEP_QX 	:= qx_imager.cpp rem_netscape.cpp qxlib.cpp
+HDR_INDEP_QX	:= $(patsubst %.cpp,%.h,$(SRC_INDEP_QX))
+OBJ_INDEP_QX	:= $(patsubst %.cpp,%.o,$(SRC_INDEP_QX))
+SRCS		+= $(SRC_INDEP_QX)
+OBJS		+= $(OBJ_INDEP_QX)
+
+#############################################################################
+### INDEP_QT
+#############################################################################
+DIR_INDEP_QT	:= $(DIR_UNIXGUI)/indep/QT
+VPATH		:= $(VPATH):$(DIR_INDEP_QT)
+SRC_INDEP_QT 	:= qt_fix.cpp qt_imager.cpp qt_painter.cpp qt_n_in_one.cpp\
+	qlib.cpp qt_iscale.cpp qt_color_menu.cpp qt_color_dialog.cpp
+HDR_INDEP_QT	:= $(patsubst %.cpp,%.h,$(SRC_INDEP_QT))
+OBJ_INDEP_QT	:= $(patsubst %.cpp,%.o,$(SRC_INDEP_QT))
+SRCS		+= $(SRC_INDEP_QT)
+OBJS		+= $(OBJ_INDEP_QT)
+
+#############################################################################
+### INDEP_UTILS
+#############################################################################
+DIR_INDEP_UTILS	:= $(DIR_UNIXGUI)/indep/utils
+VPATH		:= $(VPATH):$(DIR_INDEP_UTILS)
+SRC_INDEP_UTILS := col_db.cpp execdir.cpp cin_data.cpp
+HDR_INDEP_UTILS	:= $(patsubst %.cpp,%.h,$(SRC_INDEP_UTILS))
+OBJ_INDEP_UTILS	:= $(patsubst %.cpp,%.o,$(SRC_INDEP_UTILS))
+SRCS		+= $(SRC_INDEP_UTILS)
+OBJS		+= $(OBJ_INDEP_UTILS)
+
+#############################################################################
+### SHARED_QT
+#############################################################################
+DIR_SHARED_QT	:= $(DIR_UNIXGUI)/shared/QT
+VPATH		:= $(VPATH):$(DIR_SHARED_QT)
+SRC_SHARED_QT 	:= qd_viewer_shell.cpp qd_wpaper.cpp qd_prefs.cpp\
+	qd_viewer_prefs.cpp qd_welcome.cpp qd_pane.cpp qd_base.cpp\
+	qd_base_paint.cpp qd_base_events.cpp qd_base_ant.cpp qd_viewer.cpp\
+	qd_viewer_menu.cpp MapAreas.cpp MapBorder.cpp MapDraw.cpp\
+	djvu_viewer.cpp qd_painter.cpp qd_doc_info.cpp qd_nav_goto_page.cpp\
+	qd_set_zoom.cpp qd_port.cpp qd_decoder.cpp qd_toolbutt.cpp\
+	qd_doc_saver.cpp qd_thumb.cpp qd_search_dialog.cpp\
+	qd_print_dialog.cpp qt_hack.cpp init_qt.cpp qd_messenger.cpp\
+	qd_mime_dialog.cpp qd_toolbar.cpp qd_tbar_mode_piece.cpp\
+	qd_tbar_nav_piece.cpp qd_tbar_print_piece.cpp \
+	qd_tbar_rotate_piece.cpp qd_page_saver.cpp
+ifeq ($(THREADS),co)
+SRC_SHARED_QT	+= qd_thr_yielder.cpp
+endif
+HDR_SHARED_QT	:= $(patsubst %.cpp,%.h,$(SRC_SHARED_QT))
+OBJ_SHARED_QT	:= $(patsubst %.cpp,%.o,$(SRC_SHARED_QT))
+SRCS		+= $(SRC_SHARED_QT)
+OBJS		+= $(OBJ_SHARED_QT)
+
+#############################################################################
+### SHARED_UTILS
+#############################################################################
+DIR_SHARED_UTILS:= $(DIR_UNIXGUI)/shared/utils
+VPATH		:= $(VPATH):$(DIR_SHARED_UTILS)
+SRC_SHARED_UTILS:= undo_redo.cpp GMarginCache.cpp \
+	djvu_file_cache.cpp io.cpp prefs.cpp mime_utils.cpp
+HDR_SHARED_UTILS:= $(patsubst %.cpp,%.h,$(SRC_SHARED_UTILS))
+OBJ_SHARED_UTILS:= $(patsubst %.cpp,%.o,$(SRC_SHARED_UTILS))
+SRCS		+= $(SRC_SHARED_UTILS)
+OBJS		+= $(OBJ_SHARED_UTILS)
+
+#############################################################################
+### SHARED_RES
+#############################################################################
+DIR_SHARED_RES	:= $(DIR_UNIXGUI)/shared/res
+VPATH		:= $(VPATH):$(DIR_SHARED_RES)
+SRC_SHARED_RES 	:= saved_data.cpp
+HDR_SHARED_RES	:= $(patsubst %.cpp,%.h,$(SRC_SHARED_RES))
+OBJ_SHARED_RES	:= $(patsubst %.cpp,%.o,$(SRC_SHARED_RES))
+SRCS		+= $(SRC_SHARED_RES)
+OBJS		+= $(OBJ_SHARED_RES)
+
+#############################################################################
+### CIN_DATA
+#############################################################################
+DIR_CIN_DATA	:= $(DIR_UNIXGUI)/shared/cin_data
+VPATH		:= $(VPATH):$(DIR_CIN_DATA)
+FILES_CIN_DATA	:= ppm_djvu_logo.cin ppm_vzoom_in.cin ppm_vzoom_out.cin\
+	ppm_vnpage.cin ppm_vnnpage.cin ppm_vppage.cin ppm_vpppage.cin\
+	ppm_vfpage.cin ppm_vlpage.cin ppm_vdjvu.cin ppm_vpin_out.cin\
+	ppm_vpin_in.cin ppm_djview_icon.cin bmp_djview_front1.cin\
+	bmp_djview_front2.cin ppm_vprint.cin ppm_vfind.cin ppm_vsave.cin\
+	ppm_rotate90.cin ppm_rotate270.cin 
+SRC_CIN_DATA	:= $(addsuffix .cpp,$(basename $(FILES_CIN_DATA)))
+OBJ_CIN_DATA	:= $(addsuffix .o,$(basename $(FILES_CIN_DATA)))
+SRCS		+= $(SRC_CIN_DATA)
+OBJS		+= $(OBJ_CIN_DATA)
+
+#############################################################################
+### DJVIEW
+#############################################################################
+DIR_DJVIEW	:= $(DIR_UNIXGUI)/djview
+VPATH		:= $(VPATH):$(DIR_DJVIEW)
+SRC_DJVIEW 	:= netscape.cpp dispatch.cpp mime_check.cpp main.cpp
+HDR_DJVIEW	:= netscape.h dispatch.h mime_check.h
+OBJ_DJVIEW	:= $(patsubst %.cpp,%.o,$(SRC_DJVIEW))
+SRCS		+= $(SRC_DJVIEW)
+OBJS		+= $(OBJ_DJVIEW)
+PROGRAM		:= $(BINPATH)/djview
+
+FROM_MOC	:= $(HDR_INDEP_QT) $(HDR_SHARED_QT)\
+	qx_imager.cpp netscape.cpp dispatch.cpp qd_doc_saver.cpp\
+	qd_page_saver.cpp mime_check.cpp qd_toolbar.cpp
+ifeq ($(THREADS),co)
+FROM_MOC	+= qd_thr_yielder.cpp
+endif
+CPP_MOC		:= $(patsubst %.h,%_moc.cpp,$(filter %.h,$(FROM_MOC)))
+INC_MOC		:= $(patsubst %.cpp,%_moc.inc,$(filter %.cpp,$(FROM_MOC)))
+OBJ_MOC		:= $(patsubst %.cpp,%.o,$(CPP_MOC))
+SRCS		+= $(CPP_MOC)
+OBJS		+= $(OBJ_MOC)
+
+INCLUDE		:= $(patsubst %,-I%,$(subst :, ,$(VPATH))) $(INCLUDE)
+
+#############################################################################
+### Support programs
+#############################################################################
+ifneq ($(RPO),)
+$(RPO):
+	$(ECHO) "Building $(RPO)..."
+	$(ECHO) "cd $(dir $@); $(MAKE) $(notdir $@)"
+	cd $(dir $@); $(MAKE) $(notdir $@)
+endif
+
+#############################################################################
+### Library
+#############################################################################
+$(LIBDJVUXX):
+	$(ECHO) "Building $@..."
+	if ( cd $(DIR_LIB_DJVU) ) ; then cd $(DIR_LIB_DJVU); $(MAKE) lib ; fi
+
+#############################################################################
+### Main program
+#############################################################################
+$(PROGRAM):	$(OBJS) $(LIBDJVUXX) $(MAKEFILE) $(RPO) $(LIBJPEG)
+	$(ECHO) "Linking $@...";\
+	if [ -n "$(RPO)" ];\
+	then\
+	   $(ECHO) "Applying RPO to the object files...";\
+	   CXX="$(CXX)"; export CXX;\
+	   $(RPO) -j3 -v $(OBJS) $(LIBDJVUXX);\
+	fi
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(LDOPTS) -o $(PROGRAM) $(OBJS)\
+	       $(LIBDJVUXX) $(LIBS) $(QTFLAGS) $(LIBJPEG)
+
+#############################################################################
+### Generated files
+#############################################################################
+$(SRC_CIN_DATA): %.cpp: %.cin
+	NAME=$(basename $(notdir $<));\
+	$(BIN2CPP) $$NAME < $< > /tmp/$$$$.cpp;\
+	echo "Generating $@ from $(notdir $<)...";\
+	rm -f $@; mv /tmp/$$$$.cpp $@
+
+$(CPP_MOC): %_moc.cpp: %.h
+	echo "Generating $@ from $(notdir $<)";\
+	$(MOC) $< -o $@;\
+	if [ -r $@ ];\
+	then\
+	  echo $< | grep "qt_fix" > /dev/null;\
+	  if [ $$? -eq 0 ];\
+	  then\
+	    (echo "#define QT_FIX_DO_ALL"; cat $@) > /tmp/$$$$.cpp || exit 1;\
+	    $(MV) /tmp/$$$$.cpp "$@";\
+	  fi;\
+	fi
+
+$(patsubst %_moc.inc,%.o,$(INC_MOC)): %.o: %_moc.inc
+$(INC_MOC): %_moc.inc: %.cpp
+	echo "Generating $@ from $(notdir $<)";\
+	$(MOC) $< -o $@
+
+
+#############################################################################
+### Dependencies generator
+#############################################################################
+-include $(patsubst %.c,%.dep,$(filter %.c,$(SRCS)))\
+	 $(patsubst %.cpp,%.dep,$(filter %.cpp,$(SRCS)))
+
+# Dependencies generator for files including *_moc.inc
+$(patsubst %.cpp,%.dep,$(filter %.cpp,$(FROM_MOC))): %.dep : %.cpp %_moc.inc
+	$(ECHO) "Generating dependencies for $(notdir $<)...";\
+	$(CXX) -MM $(CXXFLAGS) $< > /tmp/$$$$.dep || exit 1;\
+	$(RM) -f $@; ($(ECHO) $(EHEAD) "$@ " $(ETAIL); cat /tmp/$$$$.dep) > $@;\
+	$(RM) -f /tmp/$$$$.dep
+
+# Dependencies generator for files not including *_moc.inc
+$(patsubst %.cpp,%.dep,$(filter-out $(filter %,cpp,$(FROM_MOC)),$(SRCS))): %.dep : %.cpp
+	$(ECHO) "Generating dependencies for $(notdir $<)...";\
+	$(CXX) -MM $(CXXFLAGS) $< > /tmp/$$$$.dep || exit 1;\
+	$(RM) -f $@; ($(ECHO) $(EHEAD) "$@ " $(ETAIL); cat /tmp/$$$$.dep) > $@;\
+	$(RM) -f /tmp/$$$$.dep
+
+#############################################################################
+### Basic rules
+#############################################################################
+all: $(PROGRAM)
+
+clean:
+	-$(RM) -f $(PROGRAM) 2>>/dev/null
+	-$(RM) -f *.o *.a *.out *.rpo *.dep ii_files 2>>/dev/null
+	-$(RM) -f $(SRC_CIN_DATA) $(OBJ_CIN_DATA) 2>>/dev/null
+	-$(RM) -f $(SRC_MOC) $(OBJ_MOC) 2>>/dev/null
+
+distclean: clean
+	-$(RM) -f $(MAKEFILE) 2>>/dev/null
+
+.PHONY: all depend clean distclean
+
+#############################################################################
+### Implicit rules and suffixes
+#############################################################################
+.SUFFIXES: .cpp .dep .cin
+%%%include <compile> 
+
