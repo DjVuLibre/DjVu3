@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: Arrays.h,v 1.20 2000-11-09 20:15:05 jmw Exp $
+// $Id: Arrays.h,v 1.21 2000-11-16 22:20:36 mrosen Exp $
 // $Name:  $
 
 #ifndef _ARRAYS_H_
@@ -39,11 +39,6 @@
 
 #include "DjVuGlobal.h"
 #include <string.h>
-#ifdef UNDER_CE
-#include <afx.h>
-#else
-#include <new.h>
-#endif
 #include "GException.h"
 #include "GSmartPointer.h"
 
@@ -98,7 +93,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@geocities.com> -- Copy-on-demand implementation.
     @version 
-    #$Id: Arrays.h,v 1.20 2000-11-09 20:15:05 jmw Exp $# */
+    #$Id: Arrays.h,v 1.21 2000-11-16 22:20:36 mrosen Exp $# */
 //@{
 
 // Auxiliary classes: Will be used in place of GPBase and GPEnabled objects

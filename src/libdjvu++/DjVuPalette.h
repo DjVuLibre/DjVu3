@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: DjVuPalette.h,v 1.21 2000-11-09 20:15:06 jmw Exp $
+// $Id: DjVuPalette.h,v 1.22 2000-11-16 22:20:36 mrosen Exp $
 // $Name:  $
 
 #ifndef _DJVUPALETTE_H_
@@ -43,11 +43,7 @@
 
 #include "DjVuGlobal.h"
 #include <string.h>
-#ifdef UNDER_CE
-#include <afx.h>
-#else
-#include <new.h>
-#endif
+
 #include "GException.h"
 #include "GSmartPointer.h"
 #include "GContainer.h"
@@ -62,7 +58,7 @@
     @memo 
     DjVuPalette header file
     @version 
-    #$Id: DjVuPalette.h,v 1.21 2000-11-09 20:15:06 jmw Exp $#
+    #$Id: DjVuPalette.h,v 1.22 2000-11-16 22:20:36 mrosen Exp $#
     @author: 
     L\'eon Bottou <leonb@research.att.com> */
 //@{

@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: DjVuGlobalMemory.cpp,v 1.11 2000-11-09 20:15:06 jmw Exp $
+// $Id: DjVuGlobalMemory.cpp,v 1.12 2000-11-16 22:20:36 mrosen Exp $
 // $Name:  $
 
 #ifdef NEED_DJVU_MEMORY
@@ -43,7 +43,6 @@
 #include "GException.h"
 #include <stdlib.h>
 #include <string.h>
-#include <new.h>
 
 #ifdef UNIX
 djvu_delete_callback *

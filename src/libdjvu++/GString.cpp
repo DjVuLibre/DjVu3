@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: GString.cpp,v 1.25 2000-11-09 20:15:07 jmw Exp $
+// $Id: GString.cpp,v 1.26 2000-11-16 22:20:36 mrosen Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -42,11 +42,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
-#ifdef UNDER_CE
-#include <afx.h>
-#else
-#include <new.h>
-#endif
 
 #include "GString.h"
 

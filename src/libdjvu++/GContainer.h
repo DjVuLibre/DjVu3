@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: GContainer.h,v 1.37 2000-11-09 20:15:06 jmw Exp $
+// $Id: GContainer.h,v 1.38 2000-11-16 22:20:36 mrosen Exp $
 // $Name:  $
 
 #ifndef _GCONTAINER_H_
@@ -45,11 +45,6 @@
 #include "DjVuGlobal.h"
 #include "GException.h"
 #include "GSmartPointer.h"
-#ifdef UNDER_CE
-#include <afx.h>
-#else
-#include <new.h>
-#endif
 #include <string.h>
 
 // Supports old iterators (first/last/next/prev) on lists and maps?
@@ -100,7 +95,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@geocities.com> -- bug fixes.
     @version 
-    #$Id: GContainer.h,v 1.37 2000-11-09 20:15:06 jmw Exp $# */
+    #$Id: GContainer.h,v 1.38 2000-11-16 22:20:36 mrosen Exp $# */
 //@{
 
 

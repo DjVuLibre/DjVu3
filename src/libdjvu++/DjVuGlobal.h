@@ -31,11 +31,27 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: DjVuGlobal.h,v 1.40 2000-11-09 20:15:06 jmw Exp $
+// $Id: DjVuGlobal.h,v 1.41 2000-11-16 22:20:36 mrosen Exp $
 // $Name:  $
 
 #ifndef _DJVUGLOBAL_H
 #define _DJVUGLOBAL_H
+
+//Placement new support.
+//There is no new.h for WinCE, so we define a placement new here.
+// (lifted from wcealt.h which can not be included in the library header files
+//	but which must be included with an ActiveX control based on MFC)
+#ifdef UNDER_CE
+	#ifndef __WCEALT_H__	// Placement new also defined in wcealt.h
+		inline void * operator new(size_t, void * ptr) 
+		{ 
+			return ptr; 
+		}
+	#endif
+#else	// Non-CE platforms support this in a sensible fashion.
+	#include <new.h>
+#endif
+
 
 #ifndef DJVU_STATIC_LIBRARY
 #ifdef WIN32 
@@ -54,16 +70,17 @@
 /** @name DjVuGlobal.h 
 
     This file is included by all include files in the DjVu reference library.
-    It does nothing unless compilation symbols #NEED_DJVU_MEMORY#,
-    #NEED_DJVU_PROGRESS# or #NEED_DJVU_NAMES# are defined.  These compilation
-    symbols enable features which are useful for certain applications of the
+    
+	If compilation symbols #NEED_DJVU_MEMORY#, #NEED_DJVU_PROGRESS# 
+	or #NEED_DJVU_NAMES# are defined, this file enables 
+	features which are useful for certain applications of the
     DjVu Reference Library.  These features are still experimental and
     therefore poorly documented.
     
     @memo
     Global definitions.
     @version
-    #$Id: DjVuGlobal.h,v 1.40 2000-11-09 20:15:06 jmw Exp $#
+    #$Id: DjVuGlobal.h,v 1.41 2000-11-16 22:20:36 mrosen Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> -- empty file.\\
     Bill Riemers <bcr@lizardtech.com> -- real work.  */
@@ -82,9 +99,6 @@
 //@}
 
 #ifdef NEED_DJVU_MEMORY
-#ifndef UNDER_CE
-#include <new.h>
-#endif
 
 #include "DjVu.h"
 

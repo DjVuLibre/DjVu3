@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: GException.cpp,v 1.25 2000-11-09 20:15:06 jmw Exp $
+// $Id: GException.cpp,v 1.26 2000-11-16 22:20:36 mrosen Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -41,11 +41,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#ifdef UNDER_CE
-#include <afx.h>
-#else
-#include <new.h>
-#endif
 #include "GException.h"
 #include "DjVuMessage.h"
 #include "debug.h"

@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: Template.h,v 1.12 2000-11-09 20:15:08 jmw Exp $
+// $Id: Template.h,v 1.13 2000-11-16 22:20:36 mrosen Exp $
 // $Name:  $
 
 //T// This is a template for the header files in the
@@ -53,7 +53,6 @@
 
 //T// Other include files
 #include <string.h>
-#include <new.h>
 #include "GException.h"
 
 
@@ -98,7 +97,7 @@
     @memo 
     Template header file
     @version 
-    #$Id: Template.h,v 1.12 2000-11-09 20:15:08 jmw Exp $# 
+    #$Id: Template.h,v 1.13 2000-11-16 22:20:36 mrosen Exp $# 
     @author: 
     L\'eon Bottou <leonb@research.att.com> -- initial implementation \\
     Andrew Erofeev <eaf@geocities.com> -- implemented EXTERNAL_TEMPLATES */
