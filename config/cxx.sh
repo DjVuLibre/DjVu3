@@ -1,6 +1,6 @@
 # This rule sets the following variables:
 #	CXX, CXXFLAGS, CXXSYMBOLIC, CXXPIC, CXXUNROLL, CXXWARN
-# $Id: cxx.sh,v 1.20 2000-02-06 22:41:13 bcr Exp $
+# $Id: cxx.sh,v 1.21 2000-02-06 22:51:35 bcr Exp $
 
 if [ -z "$CONFIG_DIR" ]
 then
@@ -164,56 +164,6 @@ then
       echo no
       CXXOPT=""
     fi
-  fi
-
-  echon "Checking ${CXX} symbolic option ... "
-  CXXSYMBOLIC=""
-  SYSTEMGXX=`echo $SYS | tr A-Z a-z `-$cxx_is_gcc
-  case $SYSTEMGXX in
-    linux-*)
-      TESTCXXSYMBOLIC="-shared "
-      TESTCXXPIC="-fPIC"
-      ;;
-    solaris-yes)
-      if [ -z "$CROSSCOMPILER" ] ; then 
-        TESTCXXSYMBOLIC="-shared -L/usr/lib -R/usr/lib "
-      else
-        TESTCXXSYMBOLIC="-shared -Wl,-rpath,/usr/lib:/usr/ccs/lib:/usr/openwin/lib "
-      fi
-      TESTCXXPIC="-fPIC"
-      ;;
-    solaris-*)
-      if [ -z "$CROSSCOMPILER" ] ; then 
-        TESTCXXSYMBOLIC="-G -L/usr/lib -R/usr/lib "
-      else
-        TESTCXXSYMBOLIC="-shared -Wl,-rpath,/usr/lib:/usr/ccs/lib:/usr/openwin/lib "
-      fi
-      TESTCXXPIC="-K PIC"
-      ;;
-    irix*-*)
-      TESTCXXSYMBOLIC="-shared "
-      TESTCXXPIC=""
-      ;;
-    aix*-*)
-      TESTCXXSYMBOLIC="-r "
-      TESTCXXPIC="-bM\:SRE"
-      ;;
-  esac
-
-  check_shared_link_flags CXXSYMBOLIC $temp.cpp "$TESTCXXSYMBOLIC"
-  if [ -z "$CXXSYMBOLIC" ] ; then
-    echo "none"
-  else
-    echo "$CXXSYMBOLIC"
-  fi
-	
-  echon "Checking whether ${CXX} $TESTCXXPIC works ... "
-  check_compile_flags CXXPIC $temp.cpp $TESTCXXPIC
-  if [ $? = 0 ]
-  then
-    echo yes
-  else
-    echo no
   fi
 
   CXX_SET=true

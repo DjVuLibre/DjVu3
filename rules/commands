@@ -31,4 +31,5 @@ TRUE=@%true%@
 UNAME=@%uname%@
 WHENCE=@%whence%@
 WC=@%wc%@
+MAKESHLIB=@%makeshlib%@
 
