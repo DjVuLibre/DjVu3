@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.71 1999-10-07 15:22:22 eaf Exp $
+//C- $Id: DjVuFile.cpp,v 1.72 1999-10-07 15:48:34 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -1256,9 +1256,9 @@ DjVuFile::add_djvu_data(IFFByteStream & ostr, GMap<GURL, void *> & map,
           GP<DjVuFile> file = process_incl_chunk(iff);
           if (file) file->add_djvu_data(ostr, map, included_too, no_ndir);
         } 
-      else if (chkid=="ANTa" || chkid=="FORM:ANNO")
+      else if ((chkid=="ANTa" || chkid=="FORM:ANNO") && anno && anno->size())
         {
-          if (!processed_annotation && anno && anno->size())
+          if (!processed_annotation)
             {
               processed_annotation = true;
               // Borrow inc_files_lock since MemoryByteStreams are not thread safe
