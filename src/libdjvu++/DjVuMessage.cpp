@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessage.cpp,v 1.72 2001-09-13 23:44:21 docbill Exp $
+// $Id: DjVuMessage.cpp,v 1.73 2001-09-26 00:25:55 leonb Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -284,9 +284,12 @@ DjVuMessage::GetProfilePaths(void)
       appendPath(GURL::UTF8(DebugModuleDjVuDir,mpath),pathsmap,paths);
 #endif // !defined(NO_DEBUG) && defined(UNIX)
       appendPath(mpath,pathsmap,paths);
-	  mpath=mpath.base();
+      mpath=mpath.base();
       appendPath(GURL::UTF8(ModuleDjVuDir,mpath),pathsmap,paths);
-      appendPath(GURL::UTF8(ModuleDjVuDir,mpath.base()),pathsmap,paths);
+      mpath=mpath.base();
+      appendPath(GURL::UTF8(ModuleDjVuDir,mpath),pathsmap,paths);
+      mpath=mpath.base();
+      appendPath(GURL::UTF8(ModuleDjVuDir,mpath),pathsmap,paths);
     }
 #endif
 #ifdef WIN32
