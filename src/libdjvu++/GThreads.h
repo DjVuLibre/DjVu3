@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GThreads.h,v 1.27 1999-11-18 15:42:28 leonb Exp $
+//C- $Id: GThreads.h,v 1.28 2000-01-19 23:14:41 leonb Exp $
 
 #ifndef _GTHREADS_H_
 #define _GTHREADS_H_
@@ -73,7 +73,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Praveen Guduru <praveen@sanskrit.lz.att.com> -- mac implementation.
     @version
-    #$Id: GThreads.h,v 1.27 1999-11-18 15:42:28 leonb Exp $# */
+    #$Id: GThreads.h,v 1.28 2000-01-19 23:14:41 leonb Exp $# */
 //@{
 
 #include "DjVuGlobal.h"
@@ -460,7 +460,7 @@ public:
 	  bits mentioned in #clr_mask# are cleared in the flags, it sets all
 	  bits from #set_mask1# in the flags, clears all flags from
 	  #clr_mask1# in the flags and returns #TRUE#. Otherwise returns
-	  #FALSE. */
+	  #FALSE#. */
    bool	test_and_modify(long set_mask, long clr_mask,
 			long set_mask1, long clr_mask1);
 
