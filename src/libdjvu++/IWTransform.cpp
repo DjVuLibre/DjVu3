@@ -9,17 +9,20 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: IWTransform.cpp,v 1.10 1999-06-10 17:01:46 eaf Exp $
+//C- $Id: IWTransform.cpp,v 1.11 1999-08-18 18:04:52 leonb Exp $
 
+#ifdef __GNUC__
+#pragma implementation
+#endif
 
-
-#include "IWTransform.h"
-#include "GException.h"
-#include "MMX.h"
+#include "DjVuGlobal.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include "IWTransform.h"
+#include "GException.h"
+#include "MMX.h"
 #undef IWTRANSFORM_TIMER
 #ifdef IWTRANSFORM_TIMER
 #include "GOS.h"
