@@ -4,7 +4,7 @@
 //C-              Unauthorized use prohibited.
 //C-
 // 
-// $Id: throw_error.cpp,v 1.1 2001-05-29 22:05:30 bcr Exp $
+// $Id: throw_error.cpp,v 1.2 2001-07-19 16:59:10 mchen Exp $
 // $Name:  $
 
 
@@ -36,10 +36,15 @@ ThrowError(const char * func, const GUTF8String & msg, int in_errno)
    DEBUG_MSG("ThrowError(): func=" << func << ", errno=" << in_errno << "\n");
    DEBUG_MSG("\tmsg=" << (const char *) msg << "\n");
 
+   // CAUTION 
+   // changes for the following must be coordinated with
+   // QeExcMessage::QeExcMessage(...) and 
+   // QeExcMessage::switchDetails(...)
    GUTF8String message=msg;
    message+=":\n";
    message+=strerror(in_errno);
    message+='\n';
+   // END CAUTION
    
    switch(errno)
    {

@@ -4,7 +4,7 @@
 //C-              Unauthorized use prohibited.
 //C-
 // 
-// $Id: MapAreas.cpp,v 1.3 2001-06-19 17:14:49 mchen Exp $
+// $Id: MapAreas.cpp,v 1.4 2001-07-19 16:59:10 mchen Exp $
 // $Name:  $
 
 
@@ -346,8 +346,7 @@ MapArea::initBorder(void)
 	 repaintBorder();
 	 break;
       default:
-	 throw ERROR_MESSAGE("MapArea::initBorder",
-			     "Unknown border type.");
+	 throw ERROR_MESSAGE("MapArea::initBorder", "MapArea.unknown_border_type");
    }
 }
 

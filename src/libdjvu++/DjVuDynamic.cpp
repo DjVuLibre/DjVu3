@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDynamic.cpp,v 1.4 2001-07-16 20:33:36 bcr Exp $
+// $Id: DjVuDynamic.cpp,v 1.5 2001-07-19 16:59:10 mchen Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -186,11 +186,11 @@ DjVuDynamic::DjVuDynamic(const GUTF8String &libname)
 DjVuDynamic::DjVuDynamic(const GURL &liburl)
 : lib(0)
 {
-  error=(ERR_MSG("DjVuDynamicLib.failed_open") "\t")+libname.get_string();
+  error=(ERR_MSG("DjVuDynamicLib.failed_open") "\t")+liburl.get_string();
 }
 
 void *
-DjVuDynamic::lookup(const GUTF8String &symname, cosnt bool nothrow=false)
+DjVuDynamic::lookup(const GUTF8String &symname, const bool nothrow=false)
 {
   if(!nothrow)
     G_THROW(error);

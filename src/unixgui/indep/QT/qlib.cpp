@@ -4,7 +4,7 @@
 //C-              Unauthorized use prohibited.
 //C-
 // 
-// $Id: qlib.cpp,v 1.2 2001-06-07 14:28:43 mchen Exp $
+// $Id: qlib.cpp,v 1.3 2001-07-19 16:59:10 mchen Exp $
 // $Name:  $
 
 
@@ -38,6 +38,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <ctype.h>
+#include "DjVuMessage.h"
 
 #include "qt_fix.h"
 
@@ -52,6 +54,41 @@
 //****************************************************************************
 //******************************** QeExcMessage ******************************
 //****************************************************************************
+
+static GNativeString 
+getExcMsg(const char *exc_cause)
+{
+   GUTF8String exc_tag;
+   const char *exc_sep=0;
+   int exc_tag_len=0;
+   
+   if ( exc_cause )
+   {
+      exc_sep=strchr(exc_cause, '\n');
+      if ( exc_sep )
+      {
+	 exc_tag_len=exc_sep-exc_cause;
+	 int i;
+	 for (i=exc_tag_len; i>=0 && (isspace(exc_cause[i]) || exc_cause[i]==':'); --i)
+	    ;
+	 if ( i>0 ) exc_tag_len=i+1;
+	 exc_tag=GUTF8String(exc_cause, exc_tag_len);
+      }
+      else
+	 exc_tag=exc_cause;
+   } else
+   {
+      exc_tag="DjVuMessage.Unrecognized";
+   }
+
+   GNativeString exc_msg=DjVuMessage::LookUpNative(exc_tag);
+
+   if ( exc_sep )
+      exc_msg += GNativeString(exc_cause+exc_tag_len);
+
+   return exc_msg;
+}
+   
 
 void
 QeExcMessage::switchDetails(void)
@@ -71,7 +108,7 @@ QeExcMessage::switchDetails(void)
       ActivateLayouts(details_butt);
    } catch(const GException & exc)
    {
-      warning(exc.get_cause());
+      warning(QStringFromGString(getExcMsg(exc.get_cause())));   
    }
 }
 
@@ -90,8 +127,9 @@ QeExcMessage::QeExcMessage(const GException & exc, const char * title,
    icon->setPixmap(QMessageBox::standardIcon(QMessageBox::Critical,
 					     QApplication::style()));
    hlay->addWidget(icon);
-
-   QeLabel * text=new QeLabel(exc.get_cause(), this, "exc_text");
+      
+   QeLabel * text=new QeLabel(QStringFromGString(getExcMsg(exc.get_cause())),
+						 this, "exc_text");
    hlay->addWidget(text);
 
       // Creating "details" of the exception
@@ -822,4 +860,3 @@ createIcon(const GPixmap & gpix_in)
 
    return qpix;
 }
-

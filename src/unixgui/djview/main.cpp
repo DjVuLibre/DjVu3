@@ -4,7 +4,7 @@
 //C-              Unauthorized use prohibited.
 //C-
 // 
-// $Id: main.cpp,v 1.3 2001-07-17 20:49:51 mchen Exp $
+// $Id: main.cpp,v 1.4 2001-07-19 16:59:10 mchen Exp $
 // $Name:  $
 
 
@@ -179,8 +179,8 @@ main(int argc, char ** argv)
 	    if (level>32) level=32;
 	    DEBUG_SET_LEVEL(level);
 	 }
-	 FILE *df=fopen("/dev/tty", "w");
-	 if (df) DjVuDebug::set_debug_file(df);
+//  	 FILE *df=fopen("/dev/tty", "w");
+//  	 if (df) DjVuDebug::set_debug_file(df);
       }
 #endif
 

@@ -4,7 +4,7 @@
 //C-              Unauthorized use prohibited.
 //C-
 // 
-// $Id: qd_viewer.cpp,v 1.3 2001-06-12 15:34:31 mchen Exp $
+// $Id: qd_viewer.cpp,v 1.4 2001-07-19 16:59:10 mchen Exp $
 // $Name:  $
 
 
@@ -23,6 +23,7 @@
 #include "names.h"
 #include "throw_error.h"
 #include "DjVuFileCache.h"
+#include "DjVuMessage.h"
 
 #include "qd_viewer_prefs.h"
 #include "djvu_base_res.h"
@@ -383,6 +384,11 @@ QDViewer::layout(bool allow_redraw)
 void
 QDViewer::setCaption(void)
 {
+   GUTF8String qkey_in="abc";
+   throw ERROR_MESSAGE("QDViewer::setCaption", "QDViewer.pagekey_not_found" "\t" +qkey_in);
+
+//   ThrowError("QDViewer::slotChildError", "QDViewer.no_child_errmsg");
+
    if (dimg)
    {
       QWidget * w=this;
@@ -693,7 +699,9 @@ QDViewer::setDjVuDocument(GP<DjVuDocument> & doc, const GUTF8String &qkey_in)
    else
       new_dimg=doc->get_page(key, false, page_port.getPort());
    
-   if (!new_dimg) G_THROW(GUTF8String("Page '")+qkey_in+"' is not in this document");
+   if (!new_dimg)
+      throw ERROR_MESSAGE("QDViewer::setDjVuDocument",
+			  "QDViewer.pagekey_not_found" "\t" +qkey_in);
    setDjVuImage(new_dimg, 1);
 
    if (doc->get_pages_num()>1 &&
@@ -1322,15 +1330,13 @@ QDViewer::slotChildError(int pipe)
 	    FD_ZERO(&except_fds); FD_SET(pipe, &except_fds);
 	    int rc=select(pipe, &read_fds, 0, &except_fds, &tv);
 	    if (rc<0 && errno==EINTR) continue;
-	    if (rc<0) ThrowError("QDViewer::slotChildError",
-				 "Failed to read error message from child process");
+	    if (rc<0) ThrowError("QDViewer::slotChildError", "QDViewer.no_child_errmsg");
 	    if (rc>=0)
 	       if (FD_ISSET(pipe, &read_fds))
 	       {
 		  char ch;
 		  int rc=::read(pipe, &ch, 1);
-		  if (rc<0) ThrowError("QDViewer::slotChildError",
-				       "Failed to read error message from child process");
+		  if (rc<0) ThrowError("QDViewer::slotChildError", "QDViewer.no_child_errmsg");
 		  if (rc==0) break;
 		  message+=ch;
 	       } else if (FD_ISSET(pipe, &except_fds))
