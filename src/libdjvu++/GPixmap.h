@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GPixmap.h,v 1.11 1999-11-16 02:24:12 leonb Exp $
+//C- $Id: GPixmap.h,v 1.12 2000-01-17 07:34:16 bcr Exp $
 
 #ifndef _GPIXMAP_H_
 #define _GPIXMAP_H_
@@ -30,7 +30,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: GPixmap.h,v 1.11 1999-11-16 02:24:12 leonb Exp $# */
+    #$Id: GPixmap.h,v 1.12 2000-01-17 07:34:16 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -324,7 +324,9 @@ public:
       object does not ``own'' the buffer: you must explicitly de-allocate the
       buffer using #operator delete []#.  This de-allocation should take place
       after the destruction or the re-initialization of the GPixmap object.  */
-  void borrow_data(GPixel *data, int w, int h); 
+  inline void borrow_data(GPixel &data, int w, int h); 
+  /// Identical to the above, but GPixmap will do the delete []. 
+  void donate_data(GPixel *data, int w, int h); 
   //@}
   
   // Please ignore these two functions. Their only purpose is to allow
@@ -405,6 +407,12 @@ GPixmap::operator=(const GPixmap &ref)
   return *this;
 }
 
+inline void
+GPixmap::borrow_data(GPixel &data, int w, int h)
+{
+  donate_data(&data,w,h);
+  pixels_data=0;
+}
 
 
 // ---------------------------------

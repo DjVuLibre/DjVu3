@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GBitmap.h,v 1.17 2000-01-14 07:27:41 bcr Exp $
+//C- $Id: GBitmap.h,v 1.18 2000-01-17 07:34:16 bcr Exp $
 
 #ifndef _GBITMAP_H_
 #define _GBITMAP_H_
@@ -45,7 +45,7 @@ class GMonitor;
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: GBitmap.h,v 1.17 2000-01-14 07:27:41 bcr Exp $#
+    #$Id: GBitmap.h,v 1.18 2000-01-17 07:34:16 bcr Exp $#
 
  */
 //@{
@@ -329,17 +329,19 @@ public:
       explicitly de-allocate the buffer using #operator delete []#.  This
       de-allocation should take place after the destruction or the
       re-initialization of the GBitmap object.  */
-  void borrow_data(unsigned char *data, int w, int h);
+  inline void borrow_data(unsigned char &data, int w, int h);
+  /// Same as borrow_data, except GBitmap will do the delete[].
+  void donate_data(unsigned char *data, int w, int h);
   /** Initializes this GBitmap by setting the size to #h# rows and #w#
       columns, and directly addressing the memory buffer #rledata# provided by
       the user.  This buffer contains #rledatalen# bytes representing the
       bitmap in run length encoded form.  The GBitmap object then ``owns'' the
-      buffer (unlike #borrow_data# sigh!) and will deallocate this buffer when
-      appropriate: you should not deallocate this buffer yourself.  The
-      encoding of buffer #rledata# is similar to the data segment of the RLE
-      file format (without the header) documented in \Ref{PNM and RLE file
-      formats}.  */
-  void borrow_rle(unsigned char *rledata, unsigned int rledatalen, int w, int h);
+      buffer (unlike #borrow_data#, but like #donate_data#) and will
+      deallocate this buffer when appropriate: you should not deallocate this
+      buffer yourself.  The encoding of buffer #rledata# is similar to the
+      data segment of the RLE file format (without the header) documented in
+      \Ref{PNM and RLE file formats}.  */
+  void donate_rle(unsigned char *rledata, unsigned int rledatalen, int w, int h);
   //@}
 
 // These are constants, but we use enum because that works on older compilers.
@@ -527,5 +529,11 @@ GBitmap::read_run(const unsigned char *&data)
     ((z&~RUNOVERFLOWVALUE)<<8)|(*data++):z;
 }
 
+inline void
+GBitmap::borrow_data(unsigned char &data,int w,int h)
+{
+  donate_data(&data,w,h);
+  bytes_data=0;
+}
 // ---------------- THE END
 #endif

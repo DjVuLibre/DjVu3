@@ -10,7 +10,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDecodeAPI.h,v 1.10 2000-01-16 13:13:54 bcr Exp $
+//C- $Id: DjVuDecodeAPI.h,v 1.11 2000-01-17 07:34:15 bcr Exp $
 #endif
 
 #ifndef _DJVU_DECODE_API_H
@@ -18,7 +18,13 @@
 
 /* 
  * $Log: DjVuDecodeAPI.h,v $
- * Revision 1.10  2000-01-16 13:13:54  bcr
+ * Revision 1.11  2000-01-17 07:34:15  bcr
+ * Added GBitmap and GPixmap support to the libimage library.  There
+ * is definitely some sort of heap corruption in libdjvu++, but I still
+ * haven't found it.  Even something simple like set_grays() causing
+ * problems.
+ *
+ * Revision 1.10  2000/01/16 13:13:54  bcr
  * Added a get_info() option to the Stream class.
  *
  * I found the orientation flags is ignored by most unix programs, so the
@@ -122,6 +128,8 @@ typedef struct _djvu_image_priv * djvu_image_priv;
                inline unsigned int get_xdpi(void) const;
                  // Gets the vertical DPI using bottom up cooridinates.
                inline unsigned int get_ydpi(void) const;
+                 // Tests if this image is in the "native" format.
+               inline bool isNative(void) const;
                  // Does a rotate of 0,90,180, or 270 degress.
                inline void Rotate(const int angle);
 		 // This does a vertical flip in the raw coordinate system.
@@ -149,6 +157,11 @@ typedef struct _djvu_image_priv * djvu_image_priv;
 
 #define DJVU_IMAGE_GET_YDPI(image) \
      (((image)->orientation&DJVU_ROTATE90_CW)?(image)->xdpi:(image)->ydpi)
+
+#define DJVU_IMAGE_IS_NATIVE(image) \
+  (((image)->type==DJVU_RLE)?((image)->orientation==DJVU_TDLRNR):\
+  (((image)->orientation==DJVU_BULRNR)&&\
+    ((image)->pixsize==((image)->type==DJVU_GRAY)?1:3)))
 
 #define DJVU_IMAGE_ROTATE(image,angle) \
      { \
@@ -204,6 +217,9 @@ typedef struct _djvu_image_priv * djvu_image_priv;
                // Gets the vertical DPI using bottom up cooridinates.
              inline unsigned int djvu_image_struct::get_ydpi(void) const
              {return DJVU_IMAGE_GET_YDPI(this);}
+               // This tests if the image is in the "native" format.
+             inline bool djvu_image_struct::isNative(void) const
+             {return DJVU_IMAGE_IS_NATIVE(this);}
                // Does a rotate of 0,90,180, or 270 degress.
              inline void djvu_image_struct::Rotate(const int angle)
              DJVU_IMAGE_ROTATE(this,angle)
@@ -228,6 +244,11 @@ typedef struct _djvu_image_priv * djvu_image_priv;
  */
 DJVUAPI void 
 djvu_image_free(djvu_image *ximg);
+
+/** This free's only he raw image data, not the structure itself.
+ */
+DJVUAPI void
+djvu_image_free_data(djvu_image ximg[1]);
 
 /** This routine allocates memory for the specified image.
     An error is indicated by a NULL return.  No message is
@@ -284,13 +305,6 @@ djvu_image_copy_rle(
   const djvu_image *ximg,const int threshold,
   char *ebuf,size_t ebuf_size);
 
-/** This resizes the image to the specified width and height.
- */
-DJVUAPI djvu_image *
-djvu_image_resize(
-  djvu_image *ximg,const unsigned int width,const unsigned int height,
-  char *ebuf,size_t ebuf_size);
-
 /** This makes a copy of the image, resized to at the specified width and
     height.
  */
@@ -299,37 +313,32 @@ djvu_image_copy_resize(
   const djvu_image *ximg,const unsigned int width,const unsigned int height,
   char *ebuf,size_t ebuf_size);
 
+/** This resizes the image to the specified width and height.
+ */
+DJVUAPI djvu_image *
+djvu_image_resize(
+  djvu_image *ximg,const unsigned int width,const unsigned int height,
+  char *ebuf,size_t ebuf_size);
+
 /** This makes a copy of the image headers, with the flags changed to
     the specified rotation.
  */
-DJVUAPI const djvu_image 
-djvu_image_const_rotate(const djvu_image ximg,int angle);
-
-/** This makes a copy of the image headers, with the flags changed to
-    the specified crop size.
- */
-DJVUAPI const djvu_image 
-djvu_image_const_crop(
-  const djvu_image ximg,int x0,int y0,
-  const unsigned width,const unsigned int height);
-
-/** This makes a copy of the image headers, with the flags changed to
-    indicate a vflip operation.
- */
-DJVUAPI const djvu_image 
-djvu_image_const_vflip(const djvu_image ximg);
-
-/** This makes a copy of the image headers, with the flags changed to
-    indicate a hflip operation.
- */
-DJVUAPI const djvu_image 
-djvu_image_const_hflip(const djvu_image ximg);
+DJVUAPI djvu_image 
+djvu_image_const_rotate(djvu_image ximg,int angle);
 
 /** This changes the flags to indicate a rotate.  It is exactly the same
     as DJVU_IMAGE_ROTATE(ximg,angle)
  */
 DJVUAPI void
 djvu_image_rotate(djvu_image *ximg,int angle);
+
+/** This makes a copy of the image headers, with the flags changed to
+    the specified crop size.
+ */
+DJVUAPI djvu_image 
+djvu_image_const_crop(
+  djvu_image ximg,int x0,int y0,
+  const unsigned width,const unsigned int height);
 
 /** This changes the flags to indicate a crop.  It is exactly the same
     as DJVU_IMAGE_CROP(ximg,x0,y0,width,height)
@@ -339,11 +348,23 @@ djvu_image_crop(
   djvu_image *ximg,int x0,int y0,
   const unsigned width,const unsigned int height);
 
+/** This makes a copy of the image headers, with the flags changed to
+    indicate a vflip operation.
+ */
+DJVUAPI djvu_image 
+djvu_image_const_vflip(djvu_image ximg);
+
 /** This changes the flags to indicate a vflip.  It is exactly the same
     as DJVU_IMAGE_VFLIP(ximg)
  */
 DJVUAPI void
 djvu_image_vflip(djvu_image *ximg);
+
+/** This makes a copy of the image headers, with the flags changed to
+    indicate a hflip operation.
+ */
+DJVUAPI djvu_image 
+djvu_image_const_hflip(djvu_image ximg);
 
 /** This changes the flags to indicate a vflip.  It is exactly the same
     as DJVU_IMAGE_HFLIP(ximg)
@@ -351,10 +372,10 @@ djvu_image_vflip(djvu_image *ximg);
 DJVUAPI void
 djvu_image_hflip(djvu_image *ximg);
 
-
 /* This is a BIG mess that still needs to be cleaned up!!! 
  */
-typedef enum{DECODE_MASK, DECODE_FOREGROUND, DECODE_BACKGROUND, DECODE_ALL} Layer;
+typedef enum
+  {DECODE_MASK, DECODE_FOREGROUND, DECODE_BACKGROUND, DECODE_ALL} Layer;
 typedef enum{PNM, BMP, PS, MTIFF, JPEG} OUTFORMAT;
 enum{percent=100};
 

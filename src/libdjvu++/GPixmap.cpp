@@ -9,9 +9,9 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GPixmap.cpp,v 1.13 1999-11-16 02:05:56 leonb Exp $
+//C- $Id: GPixmap.cpp,v 1.14 2000-01-17 07:34:16 bcr Exp $
 
-// File "$Id: GPixmap.cpp,v 1.13 1999-11-16 02:05:56 leonb Exp $"
+// File "$Id: GPixmap.cpp,v 1.14 2000-01-17 07:34:16 bcr Exp $"
 // -- Implements class PIXMAP
 // Author: Leon Bottou 07/1997
 
@@ -278,14 +278,13 @@ GPixmap::init(const GPixmap &ref, const GRect &rect)
 
 
 void 
-GPixmap::borrow_data(GPixel *data, int w, int h)
+GPixmap::donate_data(GPixel *data, int w, int h)
 {
   delete [] pixels_data;
-  pixels = pixels_data = 0;
   nrows = h;
   ncolumns = w;
   nrowsize = w;
-  pixels = data;
+  pixels_data=pixels=data;
 }
 
 
