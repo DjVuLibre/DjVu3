@@ -9,10 +9,10 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GThreads.cpp,v 1.37 2000-01-20 22:55:39 praveen Exp $
+//C- $Id: GThreads.cpp,v 1.38 2000-01-20 23:14:39 eaf Exp $
 
 
-// **** File "$Id: GThreads.cpp,v 1.37 2000-01-20 22:55:39 praveen Exp $"
+// **** File "$Id: GThreads.cpp,v 1.38 2000-01-20 23:14:39 eaf Exp $"
 // This file defines machine independent classes
 // for running and synchronizing threads.
 // - Author: Leon Bottou, 01/1998
@@ -89,20 +89,17 @@ start(void *arg)
   return 0;
 }
 
-bool 
-GThread::is_active()
+void
+GThread::wait_for_finish(void)
 {
-	DWORD exitcode;
-	if(GetExitCodeThread(hthr, &exitcode))
-	{
-		if( exitcode == STILL_ACTIVE )
-			return true;
-		else
-			return false;
-	}
-	return false;
+   while(true)
+   {
+      DWORD exitcode;
+      if (!GetExitCodeThread(hthr, &exitcode) ||
+	  exitcode!=STILL_ACTIVE)
+	 break;
+   }
 }
- 
 
 GThread::GThread(int stacksize)
   : hthr(0), thrid(0), xentry(0), xarg(0)
@@ -350,11 +347,10 @@ GThread::create(void (*entry)(void*), void *arg)
   return 0;
 }
 
-bool 
-GThread::is_active()
+void
+GThread::wait_for_finish()
 {
-    //// write appropriate code here
-	return false;
+      // TODO: write appropriate code here
 }
 
 void
@@ -599,11 +595,13 @@ start(void *arg)
 }
 
 
-bool 
-GThread::is_active()
+void
+GThread::wait_for_finish(void)
 {
-    //// write appropriate code here
-	return false;
+   pthread_t caller=pthread_self();
+   if (pthread_equal(hthr, caller))
+      THROW("Can't wait on calling thread.");
+   pthread_join(hthr, 0);
 }
 
 // GThread
@@ -1424,11 +1422,10 @@ starttwo(GThread *thr)
 }
 
 
-bool 
-GThread::is_active()
+void
+GThread::wait_for_finish(void)
 {
-    //// write appropriate code here
-	return false;
+      // TODO: add appropriate code here
 }
 
 int 
