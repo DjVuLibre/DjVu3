@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: c44.cpp,v 1.24 2001-06-05 03:19:57 bcr Exp $
+// $Id: c44.cpp,v 1.25 2001-06-14 00:22:59 fcrary Exp $
 // $Name:  $
 
 
@@ -184,7 +184,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: c44.cpp,v 1.24 2001-06-05 03:19:57 bcr Exp $# */
+    #$Id: c44.cpp,v 1.25 2001-06-14 00:22:59 fcrary Exp $# */
 //@{
 //@}
 
@@ -275,7 +275,7 @@ usage()
          "    -crcbdelay n  -- select chrominance coding delay (default 10)\n"
          "                     for -crcbnormal and -crcbhalf modes\n"
          "\n"
-         "You can generating a Photo DjVu image instead of a IW44 image\n"
+         "You can generate a Photo DjVu image instead of a IW44 image\n"
          "by using any of the following options.  These files must be decoded\n"
          "using program DDJVU rather than D44\n"
          "    -dpi n        -- sets the image resolution\n"
