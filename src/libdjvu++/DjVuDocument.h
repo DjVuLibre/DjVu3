@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.h,v 1.33 1999-09-29 17:58:10 eaf Exp $
+//C- $Id: DjVuDocument.h,v 1.34 1999-09-29 20:35:13 eaf Exp $
  
 #ifndef _DJVUDOCUMENT_H
 #define _DJVUDOCUMENT_H
@@ -33,7 +33,7 @@
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocument.h,v 1.33 1999-09-29 17:58:10 eaf Exp $#
+    @version #$Id: DjVuDocument.h,v 1.34 1999-09-29 20:35:13 eaf Exp $#
 */
 
 //@{
@@ -578,6 +578,7 @@ protected:
    GURL			init_url;
    GP<DataPool>		init_data_pool;
    GP<DjVmDir>		djvm_dir;	// New-style DjVm directory
+   int			doc_type;
    
    virtual GP<DjVuFile>	url_to_file(const GURL & url);
 private:
@@ -600,7 +601,6 @@ private:
    GSafeFlags		init_thread_flags;
    DjVuFileCache	* cache;
    GP<DjVuSimplePort>	simple_port;
-   int			doc_type;
 
    GP<DjVmDir0>		djvm_dir0;	// Old-style DjVm directory
    GP<DjVuNavDir>	ndir;		// Old-style navigation directory
