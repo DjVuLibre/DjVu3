@@ -199,14 +199,22 @@ then
 			  TESTCCSYMBOLIC="-Wl,-Bstatic,-lstdc++ -shared"
 				TESTCCPIC="-fPIC"
 				;;
-		  solaris-yes) 
-			  TESTCCSYMBOLIC="-Wl,-Bstatic,-lstdc++ -G"
-				TESTCCPIC="-fpic"
-				;;
-		  solaris-*) 
-			  TESTCCSYMBOLIC="-Wl,-Bstatic,-lstdc++ -G"
-				TESTCCPIC="-K PIC"
-				;;
+      solaris-yes)
+        if [ -z "$CROSSCOMPILER" ] ; then 
+          TESTCCSYMBOLIC="-shared -L/usr/lib -R/usr/lib -Wl,-Bstatic,-lstdc++"
+        else
+          TESTCCSYMBOLIC="-shared -Wl,-rpath,/usr/lib:/usr/ccs/lib:/usr/openwin/lib -Wl,-Bstatic,-lstdc++"
+        fi
+        TESTCCPIC="-fPIC"
+        ;;
+      solaris-*)
+        if [ -z "$CROSSCOMPILER" ] ; then 
+          TESTCCSYMBOLIC="-G -L/usr/lib -R/usr/lib -Wl,-Bstatic,-lstdc++"
+        else
+          TESTCCSYMBOLIC="-shared -Wl,-rpath,/usr/lib:/usr/ccs/lib:/usr/openwin/lib -Wl,-Bstatic,-lstdc++"
+        fi
+        TESTCCPIC="-K PIC"
+        ;;
 		  irix*-*) 
 			  TESTCCSYMBOLIC="-Wl,-Bstatic,-lstdc++ -shared"
 				TESTCCPIC=""

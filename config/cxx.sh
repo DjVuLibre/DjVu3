@@ -167,11 +167,19 @@ if [ -z "$CXX_SET" ] ; then
         TESTCXXPIC="-fPIC"
         ;;
       solaris-yes)
-        TESTCXXSYMBOLIC="-G -Wl,-Bstatic,-lstdc++"
-        TESTCXXPIC="-fpic"
+        if [ -z "$CROSSCOMPILER" ] ; then 
+          TESTCXXSYMBOLIC="-shared -L/usr/lib -R/usr/lib -Wl,-Bstatic,-lstdc++"
+        else
+          TESTCXXSYMBOLIC="-shared -Wl,-rpath,/usr/lib:/usr/ccs/lib:/usr/openwin/lib -Wl,-Bstatic,-lstdc++"
+        fi
+        TESTCXXPIC="-fPIC"
         ;;
       solaris-*)
-        TESTCXXSYMBOLIC="-G -Wl,-Bstatic,-lstdc++"
+        if [ -z "$CROSSCOMPILER" ] ; then 
+          TESTCXXSYMBOLIC="-G -L/usr/lib -R/usr/lib -Wl,-Bstatic,-lstdc++"
+        else
+          TESTCXXSYMBOLIC="-shared -Wl,-rpath,/usr/lib:/usr/ccs/lib:/usr/openwin/lib -Wl,-Bstatic,-lstdc++"
+        fi
         TESTCXXPIC="-K PIC"
         ;;
       irix*-*)
