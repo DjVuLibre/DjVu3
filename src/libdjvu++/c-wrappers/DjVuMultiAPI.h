@@ -34,6 +34,7 @@
 #endif  /*BUILD_LIB*/
 #endif  /*DJVUAPI*/
 
+#include <stdio.h>
 
 #ifdef __cplusplus
 extern "C" {
