@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocEditor.cpp,v 1.77 2001-05-01 23:19:16 chrisp Exp $
+// $Id: DjVuDocEditor.cpp,v 1.78 2001-05-03 02:07:40 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -1672,7 +1672,11 @@ DjVuDocEditor::save_file(const GUTF8String &file_id, const GURL &codebase,
       if(!file_modified)
       {
         const GUTF8String id=files_map.key(pos);
-        map[id]=djvm_dir->id_to_file(id)->get_save_name();
+        const GUTF8String save_name(djvm_dir->id_to_file(id)->get_save_name());
+        if(id == save_name)
+        {
+          map[id]=id;
+        }
       }
     }
   }
@@ -1718,7 +1722,6 @@ DjVuDocEditor::save_file(
          }
       }else
       {
-        const GUTF8String file_name(file->get_save_name());
         map[file_id]=file->get_save_name();
       }
    }

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessage.cpp,v 1.42 2001-05-01 22:40:13 bcr Exp $
+// $Id: DjVuMessage.cpp,v 1.43 2001-05-03 02:07:40 bcr Exp $
 // $Name:  $
 
 
@@ -498,7 +498,7 @@ DjVuMessage::LookUpSingle( const GUTF8String &Single_Message ) const
 #ifndef NO_DEBUG
   else
   {
-    msg_text = "*!* " + msg_text + " *!*";    // temporary debug to show the message was translated
+    msg_text = "{!" + msg_text + "!}";    // temporary debug to show the message was translated
   }
 #endif
     
@@ -514,7 +514,7 @@ DjVuMessage::LookUpSingle( const GUTF8String &Single_Message ) const
       arg=LookUpSingle(Single_Message.substr(start_posn,ending_posn));
     }else
     {
-      ending_posn = Single_Message.search('\t',start_posn);
+      ending_posn = Single_Message.contains("\v\t",start_posn);
       if( ending_posn < 0 )
         ending_posn = Single_Message.length();
       arg=Single_Message.substr(start_posn, ending_posn-start_posn);

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GOS.cpp,v 1.59 2001-05-01 17:35:15 chrisp Exp $
+// $Id: GOS.cpp,v 1.60 2001-05-03 02:07:40 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -171,7 +171,7 @@ GOS::basename(const GUTF8String &gfname, const char *suffix)
 
 
   // Allocate buffer
-  GUTF8String retval(gfname,finddirsep(gfname),(unsigned int)(-1));
+  GUTF8String retval(gfname,finddirsep(gfname)+1,(unsigned int)(-1));
   fname=retval;
 
   // Process suffix
