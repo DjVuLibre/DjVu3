@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.67 1999-11-19 16:30:16 bcr Exp $
+//C- $Id: DjVuDocument.cpp,v 1.68 1999-11-19 18:27:18 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -381,6 +381,7 @@ DjVuDocument::check_unnamed_files(void)
 	       ufile->data_pool->connect(new_pool);
 	    }
 
+	    ufile->file->set_name(new_url.name());
 	    ufile->file->move(new_url.base());
 	    set_file_aliases(ufile->file);
 	 } else break;
