@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuMultiAPI.h,v 1.10 2000-01-21 14:24:56 leonb Exp $
+//C- $Id: DjVuMultiAPI.h,v 1.11 2000-01-21 14:46:29 leonb Exp $
 */
 
 #ifndef __DJVUMULTIAPI_H__
@@ -23,11 +23,16 @@
     Praveen K Guduru <guduru@att.com>
     @version
 */
+#ifdef DOCXX_CODE
 //@{
+#endif
 
 /* 
  * $Log: DjVuMultiAPI.h,v $
- * Revision 1.10  2000-01-21 14:24:56  leonb
+ * Revision 1.11  2000-01-21 14:46:29  leonb
+ * Reinserted #ifdef DOCXX_CODE etc.
+ *
+ * Revision 1.10  2000/01/21 14:24:56  leonb
  * BCR suggested changes
  *
  * Revision 1.9  2000/01/20 23:27:45  leonb
@@ -233,7 +238,9 @@ DJVUAPI int djvu_join(djvu_combine_options*);
     program name #prog#. */
 DJVUAPI void djvu_join_usage(int fd,const char *prog);
 
+#ifdef DOCXX_CODE
 //@}
+#endif
 
 #ifdef __cplusplus
 #ifndef __cplusplus
