@@ -13,10 +13,10 @@
 #define RESERVEDLENGTH 256
 #endif
 static const int filenamelen=RESERVEDLENGTH;
-#ifndef MAXPREFIXLENGTH
-#define MAXPREFIXLENGTH 256
+#ifndef MAXLIBPATHLENGTH
+#define MAXLIBPATHLENGTH 256
 #endif
-static const int maxlength=MAXPREFIXLENGTH;
+static const int maxlength=MAXLIBPATHLENGTH;
 
 static int testpath(const char *path)
 {
@@ -49,9 +49,9 @@ get_linkpath(int i)
 }
 
 static void
-changepath(const char *prefix,char *buf,int buflen)
+changepath(const char *libpath,char *buf,int buflen)
 {
-  if(prefix)
+  if(libpath)
   {
     int i=0;
     char *linkpath=(char *)malloc(sizeof(linkpath_base)+12);
@@ -69,14 +69,14 @@ changepath(const char *prefix,char *buf,int buflen)
         linkpath_len=strlen(linkpath);
         for(k+=linkpath_len;buf[k] == '/' && !strncmp(buf+k+1,linkpath,linkpath_len);
           k+=linkpath_len+1);
-        if((k-ii)<strlen(prefix))
+        if((k-ii)<strlen(libpath))
         {
-          fprintf(stderr,"Prefix '%s' is too long\n",prefix);
+          fprintf(stderr,"Libpath '%s' is too long\n",libpath);
           exit(1);
         }
         for(n=k;buf[n]&&n<buflen;n++) {}
-        strcpy(buf+ii,prefix);
-        for(ii+=strlen(prefix);k<=n;k++)
+        strcpy(buf+ii,libpath);
+        for(ii+=strlen(libpath);k<=n;k++)
         {
           buf[ii++]=buf[k];
         }
@@ -90,7 +90,7 @@ changepath(const char *prefix,char *buf,int buflen)
 }
 
 static int
-copyfile(const char *prefix,char *src,char *dest)
+copyfile(const char *libpath,char *src,char *dest)
 {
   int retval=1;
   int fd=open(src,O_RDONLY);
@@ -112,7 +112,7 @@ copyfile(const char *prefix,char *src,char *dest)
         }
         buf[statbuf.st_size]=0;
         close(fd);
-        changepath(prefix,buf,statbuf.st_size);
+        changepath(libpath,buf,statbuf.st_size);
         if((i == statbuf.st_size) && (fd=open(dest,O_WRONLY|O_CREAT,0x600)) >= 0)
         {
           for(i=0;i<statbuf.st_size;)
@@ -207,11 +207,11 @@ main(int argc,char *argv[],char *env[])
 #ifndef COMMAND
   if(argc > 2)
   {
-    if(!strcmp(argv[1],"-prefix"))
+    if(!strcmp(argv[1],"-libpath"))
     {
       if(argc<5)
       {
-        fprintf(stderr,"Usage: %s -prefix <prefix> <input> <output>\n"
+        fprintf(stderr,"Usage: %s -libpath <LIBPATH> <input> <output>\n"
           ,argv[0]);
         exit(1);
       }else
@@ -236,7 +236,7 @@ main(int argc,char *argv[],char *env[])
       linkpaths[k]=get_linkpath(k);
       if((paths[k]=make_path(linkpaths[k],0)))
       {
-        static const char def_opt[]="-DLT_DEFAULT_PREFIX=\"";
+        static const char def_opt[]="-DLT_DEFAULT_LIBPATH=\"";
         argv2[argc2]=(char *)malloc(strlen(paths[k])+sizeof(def_opt)+3);
         strcpy(argv2[argc2],def_opt);
         strcpy(argv2[argc2]+sizeof(def_opt)-1,paths[k]);
@@ -301,8 +301,8 @@ main(int argc,char *argv[],char *env[])
 #ifndef COMMAND
   }else
   {
-    fprintf(stderr,"Usage: %s <command> <arguments>\n",argv[0]);
-    fprintf(stderr,"-or- Usage: %s -prefix <input> <output>\n",argv[0]);
+    fprintf(stderr,"Usage: %s -libpath <LIBPATH> <input> <output>\n",argv[0]);
+    fprintf(stderr,"-or- Usage: %s <command> <arguments>\n",argv[0]);
     exit(1);
   }
 #endif
