@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GException.h,v 1.24 2001-01-04 22:04:55 bcr Exp $
+// $Id: GException.h,v 1.25 2001-04-17 22:20:14 bcr Exp $
 // $Name:  $
 
 #ifndef _GEXCEPTION_H_
@@ -92,7 +92,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@geocities.com> -- fixed message memory allocation.
     @version 
-    #$Id: GException.h,v 1.24 2001-01-04 22:04:55 bcr Exp $# */
+    #$Id: GException.h,v 1.25 2001-04-17 22:20:14 bcr Exp $# */
 //@{
 
 #include "DjVuGlobal.h"
@@ -105,6 +105,7 @@
 
 class GException {
 public:
+  enum source_type { GINTERNAL=0, GEXTERNAL, GAPPLICATION, GOTHER };
   /** Constructs a GException.  This constructor is usually called by macro
       #THROW#.  Argument #cause# is a plain text error message. As a
       convention, string #"EOF"# is used when reaching an unexpected
@@ -112,7 +113,7 @@ public:
       interrupts the execution. The remaining arguments are usually provided
       by the predefined macros #__FILE__#, #__LINE__#, and (G++ and EGCS only)
       #__PRETTY_FUNCTION__#.  */
-  GException (const char *cause, const char *file=0, int line=0, const char *func=0);
+  GException (const char *cause, const char *file=0, int line=0, const char *func=0, const source_type source=GINTERNAL);
 
   /** Copy Constructor. */
   GException (const GException & exc);
@@ -142,12 +143,15 @@ public:
 
   /** Returns the function name from which the exception was thrown.
       A null pointer is returned if no function name is available. */
-  const char* get_function(void) const { return func; };
+  const char* get_function(void) const { return func; }
   
   /** Returns the file name from which the exception was thrown.
       A null pointer is returned if no file name is available. */
-  const char* get_file(void) const { return file; };
-  
+  const char* get_file(void) const { return file; }
+ 
+  /** Returns the exception source */
+  source_type get_source(void) const { return source; }
+ 
   /** Returns the line number from which the exception was thrown.
       A zero is returned if no line number is available. */
   int get_line(void) const { return line; };
@@ -160,6 +164,7 @@ private:
   const char *file;
   const char *func;
   int line;
+  source_type source;
 };
 
 //@}
@@ -170,6 +175,10 @@ private:
 #undef G_ENDCATCH
 #undef G_RETHROW
 #undef G_THROW
+#undef G_THROW_INTERNAL
+#undef G_THROW_EXTERNAL
+#undef G_THROW_APPLICATION
+#undef G_THROW_OTHER
 
 // Check if compiler supports native exceptions
 #if defined(_MSC_VER)
@@ -211,11 +220,11 @@ public:
 #define G_RETHROW    GExceptionHandler::rethrow()
 #define G_EMTHROW(ex)  GExceptionHandler::exthrow(ex)
 #ifdef __GNUG__
-#define G_THROW(msg) GExceptionHandler::exthrow \
-  (GException(msg, __FILE__, __LINE__, __PRETTY_FUNCTION__))
+#define G_THROW_TYPE(msg,xtype) GExceptionHandler::exthrow \
+  (GException(msg, __FILE__, __LINE__, __PRETTY_FUNCTION__, xtype))
 #else
-#define G_THROW(msg) GExceptionHandler::exthrow \
-  (GException(msg, __FILE__, __LINE__))
+#define G_THROW_TYPE(msg,xtype) GExceptionHandler::exthrow \
+  (GException(msg, __FILE__, __LINE__,xtype)
 #endif
 
 #else // USE_EXCEPTION_EMULATION
@@ -250,12 +259,12 @@ public:
 #define G_RETHROW    GExceptionHandler::emthrow(__exh.current)
 
 #ifdef __GNUG__
-#define G_THROW(msg) GExceptionHandler::emthrow \
-  (GException(msg, __FILE__, __LINE__, __PRETTY_FUNCTION__)) 
+#define G_THROW_TYPE(msg,xtype) GExceptionHandler::emthrow \
+  (GException(msg, __FILE__, __LINE__, __PRETTY_FUNCTION__, xtype)) 
 #define G_EMTHROW(ex) GExceptionHandler::emthrow(ex)
 #else
-#define G_THROW(m) GExceptionHandler::emthrow \
-  (GException(m, __FILE__, __LINE__)) no_return
+#define G_THROW_TYPE(m,xtype) GExceptionHandler::emthrow \
+  (GException(m, __FILE__, __LINE__,xtype)) no_return
 #define G_EMTHROW(ex) GExceptionHandler::emthrow(ex) no_return
 #endif
 
@@ -264,22 +273,31 @@ public:
 
 inline void
 G_EXTHROW
-(const GException &ex,const char *msg=0,const char *file=0,int line=0,const char *func=0)
+(const GException &ex,const char *msg=0,const char *file=0,int line=0,
+  const char *func=0, const GException::source_type source=GException::GINTERNAL)
 {
   G_EMTHROW( (msg||file||line||func)?
       GException(msg?msg:ex.get_cause(),
         file?file:ex.get_file(),
         line?line:ex.get_line(),
-        func?func:ex.get_function())
+        func?func:ex.get_function(),
+        source)
   :ex);
 }
 
 inline void
 G_EXTHROW
-(const char msg[],const char *file=0,int line=0,const char *func=0)
+(const char msg[],const char *file=0,int line=0,const char *func=0,
+  const GException::source_type source=GException::GINTERNAL )
 {
-  G_EMTHROW(GException(msg,file,line,func));
+  G_EMTHROW(GException(msg,file,line,func,source));
 }
+
+#define G_THROW(msg) G_THROW_TYPE(msg,GException::GINTERNAL)
+#define G_THROW_INTERNAL(msg) G_THROW_TYPE(msg,GException::GINTERNAL)
+#define G_THROW_EXTERNAL(msg) G_THROW_TYPE(msg,GException::GEXTERNAL)
+#define G_THROW_APPLICATION(msg) G_THROW_TYPE(msg,GException::GAPPLICATION)
+#define G_THROW_OTHER(msg) G_THROW_TYPE(msg,GException::GOTHER)
 
 // -------------- THE END
 #endif

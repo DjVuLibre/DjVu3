@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.63 2001-04-17 19:51:00 bcr Exp $
+// $Id: GString.cpp,v 1.64 2001-04-17 22:20:14 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -244,14 +244,6 @@ GString::operator= ( const GP<GStringRep> &rep)
   GP<GStringRep>::operator=(rep);
   gstr=(*this)->data;
   return (*this);
-}
-#endif
-
-#if 0
-GString& 
-GString::operator= (const char *str)
-{
-  return ((*this)=GStringRep::create(str));
 }
 #endif
 
@@ -1320,17 +1312,16 @@ template <class TYPE>
 GP<GStringRep>
 GStringRep::create(const unsigned int sz, TYPE *)
 {
-  GStringRep *addr=0;
+  GP<GStringRep> gaddr;
   if (sz > 0)
   {
-    addr = new TYPE;
+    GStringRep *addr;
+    gaddr=(addr=new TYPE);
     addr->data=(char *)(::operator new(sz+1));
-//    void *vma = ::operator new(sizeof(TYPE) + sz);
-//    addr = new (vma) TYPE;
     addr->size = sz;
     addr->data[sz] = 0;
   }
-  return addr;
+  return gaddr;
 }
 
 GStringRep::GStringRep(void)

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GException.cpp,v 1.30 2001-04-12 17:05:32 fcrary Exp $
+// $Id: GException.cpp,v 1.31 2001-04-17 22:20:14 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -47,7 +47,7 @@
 // - Author: Leon Bottou, 05/1997
 
 GException::GException() 
-  : cause(0), file(0), func(0), line(0)
+  : cause(0), file(0), func(0), line(0), source(GException::GINTERNAL)
 {
 }
 
@@ -55,7 +55,7 @@ const char * const
 GException::outofmemory = ERR_MSG("GException.outofmemory");
 
 GException::GException(const GException & exc) 
-  : file(exc.file), func(exc.func), line(exc.line)
+  : file(exc.file), func(exc.func), line(exc.line), source(exc.source)
 {
   if (exc.cause && exc.cause!=outofmemory) 
     {
@@ -69,8 +69,9 @@ GException::GException(const GException & exc)
     }
 }
 
-GException::GException (const char *xcause, const char *file, int line, const char *func)
-  : file(file), func(func), line(line)
+GException::GException (const char *xcause, const char *file, int line,
+   const char *func, const source_type xsource)
+  : file(file), func(func), line(line), source(xsource)
 {
   // good place to set a breakpoint and DEBUG message too. 
   // It'd hard to track exceptions which seem to go from nowhere
@@ -105,6 +106,7 @@ GException::operator=(const GException & exc)
   file = exc.file;
   func = exc.func;
   line = exc.line;
+  source=exc.source;
   if (exc.cause && exc.cause!=outofmemory) 
     {
       char *s = new char[strlen(exc.cause)+1];
