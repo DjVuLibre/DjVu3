@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuDocumentAPI.h,v 1.25 2000-03-07 00:01:16 bcr Exp $
+ *C- $Id: DjVuDocumentAPI.h,v 1.26 2000-03-07 20:46:21 praveen Exp $
  */
 
 #ifndef _DJVUDOCUMENT_H_
@@ -27,7 +27,10 @@
 
 /*
  * $Log: DjVuDocumentAPI.h,v $
- * Revision 1.25  2000-03-07 00:01:16  bcr
+ * Revision 1.26  2000-03-07 20:46:21  praveen
+ * updated
+ *
+ * Revision 1.25  2000/03/07 00:01:16  bcr
  * Updated the document api documentation to build correctly.
  *
  */
@@ -489,7 +492,6 @@ DJVUAPI
 /** ++ Deallocates the fields of the documenttodjvu_options structure.
     You should always use the free option, even if you did not use alloc
     so the data pointed to by priv is freed. */
-DJVUAPI
 void documenttodjvu_options_free(documenttodjvu_options *);
 
 DJVUAPI
