@@ -9,9 +9,9 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: ByteStream.cpp,v 1.16 1999-09-28 19:56:18 leonb Exp $
+//C- $Id: ByteStream.cpp,v 1.17 1999-09-30 15:06:26 leonb Exp $
 
-// File "$Id: ByteStream.cpp,v 1.16 1999-09-28 19:56:18 leonb Exp $"
+// File "$Id: ByteStream.cpp,v 1.17 1999-09-30 15:06:26 leonb Exp $"
 // - Author: Leon Bottou, 04/1997
 
 #ifdef __GNUC__
@@ -358,7 +358,8 @@ MemoryByteStream::MemoryByteStream(const char *buffer)
   where = 0;
 }
 
-MemoryByteStream::~MemoryByteStream()
+void 
+MemoryByteStream::empty()
 {
   for (int b=0; b<nblocks; b++)
     delete [] blocks[b];
@@ -367,6 +368,11 @@ MemoryByteStream::~MemoryByteStream()
   nblocks = 0;
   delete [] blocks;
   blocks = 0;
+}
+
+MemoryByteStream::~MemoryByteStream()
+{
+  empty();
 }
 
 size_t 
@@ -466,8 +472,6 @@ MemoryByteStream::seek(long offset, int whence, bool nothrow)
   where = nwhere;
   return 0;
 }
-
-
 
 
 

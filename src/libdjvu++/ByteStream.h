@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: ByteStream.h,v 1.14 1999-09-28 17:33:50 leonb Exp $
+//C- $Id: ByteStream.h,v 1.15 1999-09-30 15:06:26 leonb Exp $
 
 
 #ifndef _BYTESTREAM_H
@@ -41,7 +41,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation\\
     Andrei Erofeev <eaf@research.att.com> -- 
     @version
-    #$Id: ByteStream.h,v 1.14 1999-09-28 17:33:50 leonb Exp $# */
+    #$Id: ByteStream.h,v 1.15 1999-09-30 15:06:26 leonb Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -266,6 +266,9 @@ public:
   size_t write(const void *buffer, size_t size);
   int    seek(long offset, int whence=SEEK_SET, bool nothrow=false);
   long   tell();
+  /** Erases everything in the memorybytestream.
+      The current location is reset to zero. */
+  void empty();
   /** Returns the total number of bytes contained in the buffer.  Valid
       offsets for function #seek# range from 0 to the value returned by this
       function. */
