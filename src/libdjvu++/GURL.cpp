@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GURL.cpp,v 1.71 2001-06-11 19:27:00 bcr Exp $
+// $Id: GURL.cpp,v 1.72 2001-06-11 22:45:18 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -837,9 +837,9 @@ GURL::operator==(const GURL & gurl2) const
 {
   bool retval=false;
   const GUTF8String g1(get_string());
-  const g1_length=g1.length();
+  const int g1_length=g1.length();
   const GUTF8String g2(gurl2.get_string());
-  const g2_length=g2.length();
+  const int g2_length=g2.length();
   if(g1_length == g2_length) // exactly equal
   {
 	retval=(g1==g2);
