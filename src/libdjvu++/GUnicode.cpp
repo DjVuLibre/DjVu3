@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GUnicode.cpp,v 1.8 2001-04-11 16:59:51 bcr Exp $
+// $Id: GUnicode.cpp,v 1.9 2001-04-17 22:41:56 chrisp Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -449,6 +449,7 @@ UnicodeRep::initUTF8(void)
   {
     ptr=GStringRep::UCS4toUTF8(wide[0],ptr);
   }
+  *ptr=0;
   gs=GStringRep::UTF8::create((char const *)buf);
 }
 
