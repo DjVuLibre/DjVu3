@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVmDir.cpp,v 1.17 2000-02-05 22:22:02 bcr Exp $
+//C- $Id: DjVmDir.cpp,v 1.18 2000-02-06 18:26:45 eaf Exp $
 
 
 #ifdef __GNUC__
@@ -403,14 +403,10 @@ DjVmDir::insert_file(File * file, int pos_num)
       // Add the file to the list
    int cnt;
    GPosition pos;
-   for(pos=files_list,cnt=0;pos && (cnt!=pos_num);++pos,++cnt) ;
-   if (pos)
-   {
-     files_list.insert_before(pos, file);
-   }else
-   {
-     files_list.append(file);
-   }
+   for(pos=files_list, cnt=0;pos;++pos, cnt++)
+      if (cnt==pos_num) break;
+   if (pos) files_list.insert_before(pos, file);
+   else files_list.append(file);
 
    if (file->is_page())
    {
@@ -420,10 +416,8 @@ DjVmDir::insert_file(File * file, int pos_num)
       for(pos=files_list;pos;++pos)
       {
 	 GP<File> & f=files_list[pos];
-	 if (f==file)
-           break;
-	 if (f->is_page())
-           page_num++;
+	 if (f==file) break;
+	 if (f->is_page()) page_num++;
       }
 
       int i;
