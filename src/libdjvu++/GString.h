@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.h,v 1.81 2001-06-09 01:50:17 bcr Exp $
+// $Id: GString.h,v 1.82 2001-07-02 19:48:07 bcr Exp $
 // $Name:  $
 
 #ifndef _GSTRING_H_
@@ -64,7 +64,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.81 2001-06-09 01:50:17 bcr Exp $# */
+    #$Id: GString.h,v 1.82 2001-07-02 19:48:07 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -97,6 +97,8 @@ class GStringRep : public GPEnabled
 public:
   enum EncodeType { XUCS4, XUCS4BE, XUCS4LE, XUCS4_2143, XUCS4_3412,
     XUTF16, XUTF16BE, XUTF16LE, XUTF8, XEBCDIC, XOTHER } ; 
+
+  enum EscapeMode { UNKNOWN_ESCAPED=0,  IS_ESCAPED=1, NOT_ESCAPED=2 };
 
   class UTF8;
   friend UTF8;
@@ -134,7 +136,8 @@ public:
       // Test if Native.
   virtual bool isNative(void) const { return false; }
       // Convert to Native.
-  virtual GP<GStringRep> toNative(const bool nothrow=false) const = 0;
+  virtual GP<GStringRep> toNative(
+    const EscapeMode escape=UNKNOWN_ESCAPED ) const = 0;
       // Convert to UTF8.
   virtual GP<GStringRep> toUTF8(const bool nothrow=false) const = 0;
       // Convert to same as current class.
@@ -193,7 +196,8 @@ public:
   GP<GStringRep> vformat(va_list &args) const;
   // -- SEARCHING
 
-  static GP<GStringRep> UTF8ToNative( const char *s );
+  static GP<GStringRep> UTF8ToNative( const char *s,
+    const EscapeMode escape=UNKNOWN_ESCAPED );
   static GP<GStringRep> NativeToUTF8( const char *s );
 
   // Creates an uppercase version of the current string.
@@ -284,6 +288,12 @@ protected:
   virtual void set_remainder ( const GP<Unicode> &remainder );
 
   virtual GP<Unicode> get_remainder( void ) const;
+
+  /* Returns a copy of this string with characters used in XML with
+      '<'  to "&lt;", '>'  to "&gt;",  '&' to "&amp;" '\'' to
+      "&apos;", and  '\"' to  "&quot;".   Characters 0x01 through
+      0x1f are also escaped. */
+  GP<GStringRep> toEscaped( const bool tosevenbit ) const;
   
 // Actual string data.
   int  size;
@@ -304,7 +314,8 @@ public:
       // Test if Native.
   virtual bool isUTF8(void) const;
       // Convert to Native.
-  virtual GP<GStringRep> toNative(const bool nothrow=false) const;
+  virtual GP<GStringRep> toNative(
+    const EscapeMode escape=UNKNOWN_ESCAPED) const;
       // Convert to UTF8.
   virtual GP<GStringRep> toUTF8(const bool nothrow=false) const;
       // Convert to same as current class.
@@ -351,6 +362,7 @@ public:
     const unsigned long w,unsigned char *ptr, mbstate_t *ps=0) const;
 
   friend class GBaseString;
+
 protected:
   // Return the next character and increment the source pointer.
   virtual unsigned long getValidUCS4(const char *&source) const;
@@ -373,7 +385,8 @@ public:
       // Test if Native.
   virtual bool isNative(void) const;
       // Convert to Native.
-  virtual GP<GStringRep> toNative(const bool nothrow=false) const;
+  virtual GP<GStringRep> toNative(
+    const EscapeMode escape=UNKNOWN_ESCAPED) const;
       // Convert to UTF8.
   virtual GP<GStringRep> toUTF8(const bool nothrow=false) const;
       // Convert to UTF8.
@@ -461,6 +474,11 @@ class GNativeString;
 class GBaseString : protected GP<GStringRep> 
 {
 public: 
+  enum EscapeMode {
+    UNKNOWN_ESCAPED=GStringRep::UNKNOWN_ESCAPED,
+    IS_ESCAPED=GStringRep::IS_ESCAPED,
+    NOT_ESCAPED=GStringRep::NOT_ESCAPED };
+
   friend GUTF8String;
   friend GNativeString;
 protected:
@@ -511,8 +529,8 @@ public:
   bool is_float(void) const;
 
   /** Converts strings between native & UTF8 **/
-  GNativeString getUTF82Native( char* tocode=NULL ) const;/*MBCS*/
-  GUTF8String getNative2UTF8( const char* fromcode="" ) const;/*MBCS*/
+  GNativeString getUTF82Native( EscapeMode escape=UNKNOWN_ESCAPED ) const;/*MBCS*/
+  GUTF8String getNative2UTF8( void ) const;/*MBCS*/
 
   // -- ALTERING
   /// Reinitializes a string with the null string.
@@ -739,7 +757,9 @@ protected:
   static void throw_illegal_subscript() no_return;
   static const char *nullstr;
 public:
-  GNativeString UTF8ToNative(const bool currentlocale=false) const;
+  GNativeString UTF8ToNative(
+    const bool currentlocale=false,
+    const EscapeMode escape=UNKNOWN_ESCAPED) const;
   GUTF8String NativeToUTF8(void) const;
 protected:
   int CheckSubscript(int n) const
@@ -864,7 +884,8 @@ public:
       '<'  to "&lt;", '>'  to "&gt;",  '&' to "&amp;" '\'' to
       "&apos;", and  '\"' to  "&quot;".   Characters 0x01 through
       0x1f are also escaped. */
-  GUTF8String toEscaped( const bool tosevenbit=false ) const;
+  GUTF8String toEscaped( const bool tosevenbit=false ) const
+  { return ptr?GUTF8String((*this)->toEscaped(tosevenbit)):(*this); }
 
   /** Converts strings containing HTML/XML escaped characters into
       their unescaped forms. Numeric representations of characters
@@ -1072,7 +1093,7 @@ public:
 
   /// Initialize this string class
   GNativeString &init(const GP<GStringRep> &rep)
-  {  GP<GStringRep>::operator=(rep?rep->toNative(true):rep);
+  {  GP<GStringRep>::operator=(rep?rep->toNative(GStringRep::NOT_ESCAPED):rep);
      init(); return *this; }
 
   /** Copy a null terminated character array. Resets this string with
@@ -1148,6 +1169,14 @@ public:
       32768 characters. */
   GNativeString &vformat(const GNativeString &fmt, va_list &args)
   { return (*this = (fmt.ptr?GNativeString(fmt,args):fmt)); }
+
+  /** Returns a copy of this string with characters used in XML with
+      '<'  to "&lt;", '>'  to "&gt;",  '&' to "&amp;" '\'' to
+      "&apos;", and  '\"' to  "&quot;".   Characters 0x01 through
+      0x1f are also escaped. */
+  GNativeString toEscaped( const bool tosevenbit=false ) const
+  { return ptr?GNativeString((*this)->toEscaped(tosevenbit)):(*this); }
+
 
   /** Provides a direct access to the string buffer.  Returns a
       pointer for directly accessing the string buffer.  This
@@ -1333,9 +1362,9 @@ GBaseString::toDouble(
 }
 
 inline GP<GStringRep> 
-GStringRep::UTF8ToNative( const char *s )
+GStringRep::UTF8ToNative( const char *s, const EscapeMode escape )
 {
-  return GStringRep::UTF8::create(s)->toNative();
+  return GStringRep::UTF8::create(s)->toNative(escape);
 }
 
 inline GP<GStringRep> 
@@ -1451,19 +1480,19 @@ GNativeString::GNativeString(const GNativeString &fmt, va_list &args)
 inline
 GNativeString::GNativeString(const GUTF8String &str)
 {
-  init(str.length()?(str->toNative(true)):(GP<GStringRep>)str);
+  init(str.length()?(str->toNative(GStringRep::NOT_ESCAPED)):(GP<GStringRep>)str);
 }
 
 inline
 GNativeString::GNativeString(const GP<GStringRep> &str)
 {
-  init(str?(str->toNative(true)):str);
+  init(str?(str->toNative(GStringRep::NOT_ESCAPED)):str);
 }
 
 inline
 GNativeString::GNativeString(const GBaseString &str)
 {
-  init(str.length()?(str->toNative(true)):(GP<GStringRep>)str);
+  init(str.length()?(str->toNative(GStringRep::NOT_ESCAPED)):(GP<GStringRep>)str);
 }
 
 inline

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.111 2001-06-28 23:43:56 fcrary Exp $
+// $Id: GString.cpp,v 1.112 2001-07-02 19:48:07 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -147,7 +147,7 @@ GP<GStringRep>
 GStringRep::Native::toThis(
      const GP<GStringRep> &rep,const GP<GStringRep> &) const
 {
-  return rep?(rep->toNative(true)):rep;
+  return rep?(rep->toNative(NOT_ESCAPED)):rep;
 }
 
 GP<GStringRep> 
@@ -492,61 +492,75 @@ GStringRep::tocase(
 //      '\'' -->  "&apos;"
 //      '\"' -->  "&quot;"
 //  Also escapes characters 0x00 through 0x1f and 0x7e through 0x7f.
-GUTF8String
-GUTF8String::toEscaped( const bool tosevenbit ) const
+GP<GStringRep>
+GStringRep::toEscaped( const bool tosevenbit ) const
 {
-  GUTF8String ret;
-  if( length() )
+  bool modified=false;
+  char *ret;
+  GPBuffer<char> gret(ret,size*7);
+  ret[0]=0;
+  char *retptr=ret;
+  char const *start=data;
+  char const *s=start;
+  char const *last=s;
+  GP<GStringRep> special;
+  for(unsigned long w;(w=getValidUCS4(s));last=s)
   {
-    GUTF8String special;
-    char const * const head=(*this);
-    char const *start=head;
-    char const *s=start;
-    char const *last=s;
-    for(unsigned long w; (w=(*this)->getValidUCS4(s)); last=s)
+    char const *ss=0;
+    switch(w)
     {
-      char const *ss=0;
-      switch(w)
+    case '<':
+      ss="&lt;";
+      break;
+    case '>':
+      ss="&gt;";
+      break;
+    case '&':
+      ss="&amp;";
+      break;
+    case '\47':
+      ss="&apos;";
+      break;
+    case '\42':
+      ss="&quot;";
+      break;
+    default:
+      if((w<' ')||(w>=0x7e && (tosevenbit || (w < 0x80))))
       {
-      case '<':
-        ss="&lt;";
-        break;
-      case '>':
-        ss="&gt;";
-        break;
-      case '&':
-        ss="&amp;";
-        break;
-      case '\47':
-        ss="&apos;";
-        break;
-      case '\42':
-        ss="&quot;";
-        break;
-      default:
-        if((w<' ')||(w>=0x7e && (tosevenbit || (w < 0x80))))
-        {
-          special.format("&#%lu;",w);
-          ss=special;
-        }
-        break;
+        special=toThis(UTF8::create_format("&#%lu;",w));
+        ss=special->data;
       }
-      if(ss)
+      break;
+    }
+    if(ss)
+    {
+      modified=true;
+      if(s!=start)
       {
-        if(s!=start)
-        {
-          ret+=substr((size_t)start-(size_t)head,(size_t)last-(size_t)start)+ss;
-        }else
-        {
-          ret+=ss;
-        }
+        size_t len=(size_t)last-(size_t)start;
+        strncpy(retptr,start,len);
+        retptr+=len;
         start=s;
       }
+      if(ss[0])
+      {
+        size_t len=strlen(ss);
+        strcpy(retptr,ss);
+        retptr+=len;
+      }
     }
-    ret+=start;
+  }
+  GP<GStringRep> retval;
+  if(modified)
+  {
+    strcpy(retptr,start);
+    retval=strdup( ret );
+  }else
+  {
+    retval=const_cast<GStringRep *>(this);
   }
 //  DEBUG_MSG( "Escaped string is '" << ret << "'\n" );
-  return (ret == *this)?(*this):ret;
+  return retval;
 }
 
 
@@ -858,7 +872,7 @@ GStringRep::rsearch(char c, int from) const
       G_THROW( ERR_MSG("GString.bad_subscript") );
   }
   int retval=(-1);
-  if (from>=0 && from<size)
+  if ((from>=0) && (from<size))
   {
     char const *const s = strrchr(data+from,c);
     if(s)
@@ -971,7 +985,7 @@ GStringRep::UTF8::UCS4toString(
 }
 
 GP<GStringRep> 
-GStringRep::UTF8::toNative(const bool) const
+GStringRep::UTF8::toNative(const EscapeMode escape) const
 {
   GP<GStringRep> retval;
   if(data[0])
@@ -989,8 +1003,15 @@ GStringRep::UTF8::toNative(const bool) const
       r=UCS4toNative(w0,r,&ps);
       if(r == r0)
       {
-        r=buf;
-        break;
+        if(escape == IS_ESCAPED)
+        {
+          sprintf((char *)r,"&#%lu;",w0);
+          r+=strlen((char *)r);
+        }else
+        {
+          r=buf;
+          break;
+        }
       }
     }
     r[0]=0;
@@ -1325,7 +1346,7 @@ GStringRep::UTF8::cmp(const GP<GStringRep> &s2,const int len) const
         retval=GStringRep::cmp(data,r->data,len);
       }else
       {
-        retval=-(s2->cmp(toNative(true),len));
+        retval=-(s2->cmp(toNative(NOT_ESCAPED),len));
       }
     }else
     {
@@ -1368,7 +1389,7 @@ GStringRep::UTF8::toLong(
     endpos=(-1);
     GP<GStringRep> ptr=ptr->strdup(data+pos);
     if(ptr)
-      ptr=ptr->toNative(true);
+      ptr=ptr->toNative(NOT_ESCAPED);
     if(ptr)
     {
       int xendpos;
@@ -1414,7 +1435,7 @@ GStringRep::UTF8::toULong(
     endpos=(-1);
     GP<GStringRep> ptr=ptr->strdup(data+pos);
     if(ptr)
-      ptr=ptr->toNative(true);
+      ptr=ptr->toNative(NOT_ESCAPED);
     if(ptr)
     {
       int xendpos;
@@ -1459,7 +1480,7 @@ GStringRep::UTF8::toDouble(const int pos, int &endpos) const
     endpos=(-1);
     GP<GStringRep> ptr=ptr->strdup(data+pos);
     if(ptr)
-      ptr=ptr->toNative(true);
+      ptr=ptr->toNative(NOT_ESCAPED);
     if(ptr)
     {
       int xendpos;
@@ -1669,6 +1690,10 @@ GStringRep::UCS4toNative(
     {
       break;
     }
+    if((w0&~0x7f))
+    {
+      fprintf(stderr,"converted %lu to %s\n",w0,(char *)ptr);
+    }
     ptr+=i;
   }
   ptr[0]=0;
@@ -1676,9 +1701,9 @@ GStringRep::UCS4toNative(
 }
 
 GP<GStringRep>
-GStringRep::Native::toNative(const bool nothrow) const
+GStringRep::Native::toNative(const EscapeMode escape) const
 {
-  if(!nothrow)
+  if(escape == UNKNOWN_ESCAPED)
     G_THROW( ERR_MSG("GStringRep.NativeToNative") );
   return const_cast<GStringRep::Native *>(this);
 }
@@ -1747,7 +1772,8 @@ GStringRep::Native::toUTF8(const bool) const
 }
 
 GNativeString
-GBaseString::UTF8ToNative(const bool currentlocale) const
+GBaseString::UTF8ToNative(
+  const bool currentlocale,const EscapeMode escape) const
 {
   const char *source=(*this);
   GP<GStringRep> retval;
@@ -1757,7 +1783,7 @@ GBaseString::UTF8ToNative(const bool currentlocale) const
     bool repeat;
     for(repeat=!currentlocale;;repeat=false)
     {
-      retval=(*this)->toNative();
+      retval=(*this)->toNative((GStringRep::EscapeMode)escape);
       if(!repeat
         || retval
         || (lc_ctype == setlocale(LC_CTYPE,""))
@@ -1773,7 +1799,7 @@ GBaseString::UTF8ToNative(const bool currentlocale) const
 
 /*MBCS*/
 GNativeString
-GBaseString::getUTF82Native(char* tocode) const
+GBaseString::getUTF82Native( const EscapeMode escape ) const
 { //MBCS cvt
   GNativeString retval;
 
@@ -1784,7 +1810,7 @@ GBaseString::getUTF82Native(char* tocode) const
   const size_t slen=length()+1;
   if(slen>1)
   {
-    retval=UTF8ToNative();
+    retval=UTF8ToNative(false,escape) ;
     if(!retval.length())
     {
       retval=(const char*)*this;
@@ -1823,7 +1849,7 @@ GBaseString::NativeToUTF8(void) const
 }
 
 GUTF8String
-GBaseString::getNative2UTF8(const char *fromcode) const
+GBaseString::getNative2UTF8(void) const
 { //MBCS cvt
 
    // We don't want to do a transform this
@@ -1857,7 +1883,7 @@ GStringRep::Native::cmp(const GP<GStringRep> &s2,const int len) const
         retval=GStringRep::cmp(r->data,s2->data,len);
       }else
       {
-        retval=cmp(s2->toNative(true),len);
+        retval=cmp(s2->toNative(NOT_ESCAPED),len);
       }
     }else
     {
