@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: parseoptions.h,v 1.40 2000-11-09 20:15:08 jmw Exp $
+// $Id: parseoptions.h,v 1.41 2000-12-25 00:04:24 praveen Exp $
 // $Name:  $
 
 #ifndef __DJVUPARSEOPTIONS_H__
@@ -67,7 +67,7 @@
 
    @memo Class used for parsing options and configuration files.
    @author Bill Riemers
-   @version #$Id: parseoptions.h,v 1.40 2000-11-09 20:15:08 jmw Exp $#
+   @version #$Id: parseoptions.h,v 1.41 2000-12-25 00:04:24 praveen Exp $#
  */
 
 /*@{*/
@@ -264,12 +264,15 @@ class DjVuTokenList;
 
 class DjVuParseOptions
 {
+
 public: // These are just class declarations.
   class ErrorList;
   class Profiles;
   class ProfileList;
   class GetOpt;
-  friend GetOpt;
+  friend class GetOpt;
+  
+  
 
 private:
   char *filename; // This is the name of the function.
