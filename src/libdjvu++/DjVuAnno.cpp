@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuAnno.cpp,v 1.9 1999-08-04 22:15:51 leonb Exp $
+//C- $Id: DjVuAnno.cpp,v 1.10 1999-08-09 12:49:21 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -25,7 +25,7 @@
 //****************************** GLParser.h *********************************
 //***************************************************************************
 
-#include "GPContainer.h"
+#include "GContainer.h"
 #include "GString.h"
 #include "GSmartPointer.h"
 #include "GException.h"
@@ -311,58 +311,52 @@ GLToken
 GLParser::get_token(const char * & start)
 {
    skip_white_space(start);
-   switch(*start)
-   {
-      case '(':
-	 start++;
-	 return GLToken(GLToken::OPEN_PAR, 0);
-      case ')':
-	 start++;
-	 return GLToken(GLToken::CLOSE_PAR, 0);
-      case '-':
-      case '0':
-      case '1':
-      case '2':
-      case '3':
-      case '4':
-      case '5':
-      case '6':
-      case '7':
-      case '8':
-      case '9':
-	 return GLToken(GLToken::OBJECT,
-			new GLObject(strtol(start, (char **) &start, 10)));
-      case '"':
-      {
-	 GString str;
-	 start++;
-	 while(1)
+   char c = *start;
+   if (c == '(')
+     {
+       start++;
+       return GLToken(GLToken::OPEN_PAR, 0);
+     }
+   else if (c == ')')
+     {
+       start++;
+       return GLToken(GLToken::CLOSE_PAR, 0);
+     }
+   else if (c=='-' || (c>='0' && c<='9'))
+     {
+       return GLToken(GLToken::OBJECT,
+                      new GLObject(strtol(start, (char **) &start, 10)));
+     }
+   else if (c=='"')
+     {
+       GString str;
+       start++;
+       while(1)
 	 {
-	    char ch=*start++;
-	    if (!ch) THROW("EOF");
-	    if (ch=='"')
-	    {
+           char ch=*start++;
+           if (!ch) THROW("EOF");
+           if (ch=='"')
+             {
 	       if (str.length()>0 && str[str.length()-1]=='\\')
-		  str.setat(str.length()-1, '"');
+                 str.setat(str.length()-1, '"');
 	       else break;
-	    } else str+=ch;
-	 };
+             } else str+=ch;
+	 }
 	 return GLToken(GLToken::OBJECT, new GLObject(GLObject::STRING, str));
-      }
-      default:
-      {
-	 GString str;
-	 while(1)
+     }
+   else
+     {
+       GString str;
+       while(1)
 	 {
-	    char ch=*start++;
-	    if (!ch) THROW("EOF");
-	    if (ch==')') { start--; break; };
-	    if (isspace(ch)) break;
-	    str+=ch;
-	 };
-	 return GLToken(GLToken::OBJECT, new GLObject(GLObject::SYMBOL, str));
-      }
-   };
+           char ch=*start++;
+           if (!ch) THROW("EOF");
+           if (ch==')') { start--; break; };
+           if (isspace(ch)) break;
+           str+=ch;
+	 }
+       return GLToken(GLToken::OBJECT, new GLObject(GLObject::SYMBOL, str));
+     }
 } 
 
 void
