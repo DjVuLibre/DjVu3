@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: c44.cpp,v 1.19 2001-04-24 00:25:49 bcr Exp $
+// $Id: c44.cpp,v 1.20 2001-04-25 22:28:47 bcr Exp $
 // $Name:  $
 
 
@@ -184,7 +184,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: c44.cpp,v 1.19 2001-04-24 00:25:49 bcr Exp $# */
+    #$Id: c44.cpp,v 1.20 2001-04-25 22:28:47 bcr Exp $# */
 //@{
 //@}
 
@@ -198,6 +198,7 @@
 #include "GPixmap.h"
 #include "GURL.h"
 
+#include <locale.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -651,6 +652,7 @@ create_photo_djvu_file(IW44Image &iw, int w, int h,
 int
 main(int argc, char **argv)
 {
+  setlocale(LC_CTYPE,"");
   DArray<GUTF8String> dargv(0,argc-1);
   for(int i=0;i<argc;++i)
   {

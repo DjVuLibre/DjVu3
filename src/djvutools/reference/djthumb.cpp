@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djthumb.cpp,v 1.15 2001-04-24 00:25:49 bcr Exp $
+// $Id: djthumb.cpp,v 1.16 2001-04-25 22:28:47 bcr Exp $
 // $Name:  $
 
 // DJTHUMB -- DjVu thumbnails generator
@@ -68,7 +68,7 @@
     @author
     Andrei Erofeev <eaf@geocities.com> -- initial implementation
     @version
-    #$Id: djthumb.cpp,v 1.15 2001-04-24 00:25:49 bcr Exp $# */
+    #$Id: djthumb.cpp,v 1.16 2001-04-25 22:28:47 bcr Exp $# */
 //@{
 //@}
 
@@ -81,6 +81,7 @@
 #include "DjVuDocEditor.h"
 #include "DjVmDoc.h"
 #include "GOS.h"
+#include <locale.h>
 
 static const char * progname;
 
@@ -116,6 +117,7 @@ progress_cb(int page_num, void *)
 int
 main(int argc, char ** argv)
 {
+  setlocale(LC_CTYPE,"");
   DArray<GUTF8String> dargv(0,argc-1);
   for(int i=0;i<argc;++i)
   {

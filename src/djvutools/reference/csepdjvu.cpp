@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: csepdjvu.cpp,v 1.19 2001-04-24 00:25:49 bcr Exp $
+// $Id: csepdjvu.cpp,v 1.20 2001-04-25 22:28:47 bcr Exp $
 // $Name:  $
 
 
@@ -108,7 +108,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: csepdjvu.cpp,v 1.19 2001-04-24 00:25:49 bcr Exp $# */
+    #$Id: csepdjvu.cpp,v 1.20 2001-04-25 22:28:47 bcr Exp $# */
 //@{
 //@}
 
@@ -128,6 +128,7 @@
 #include "DjVmDoc.h"
 #include "GOS.h"
 #include "GURL.h"
+#include <locale.h>
 
 #undef MIN
 #undef MAX
@@ -1265,6 +1266,7 @@ parse_slice(const char *q, csepdjvuopts &opts)
 int 
 main(int argc, const char **argv)
 {
+  setlocale(LC_CTYPE,"");
   DArray<GUTF8String> dargv(0,argc-1);
   for(int i=0;i<argc;++i)
   {

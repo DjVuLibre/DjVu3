@@ -1,7 +1,7 @@
 //C-  Copyright © 2000-2001, LizardTech, Inc. All Rights Reserved.
 //C-              Unauthorized use prohibited.
 //
-// $Id: djvuxmlparser.cpp,v 1.1 2001-04-24 19:50:38 bcr Exp $
+// $Id: djvuxmlparser.cpp,v 1.2 2001-04-25 22:28:48 bcr Exp $
 // $Name:  $
 
 #include "XMLParser.h"
@@ -12,10 +12,12 @@
 #include "ByteStream.h"
 #include <stdio.h>
 #include <ctype.h>
+#include <locale.h>
 
 int 
 main(int argc,char *argv[],char *[])
 {
+  setlocale(LC_CTYPE,"");
   G_TRY
   {
     bool is_valid=(argc >= 2);

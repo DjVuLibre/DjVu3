@@ -30,22 +30,23 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: annotate.cpp,v 1.11 2001-04-21 00:16:57 bcr Exp $
+// $Id: annotate.cpp,v 1.12 2001-04-25 22:28:47 bcr Exp $
 // $Name:  $
 
 /*****************************************************************************
  *
- *   $Revision: 1.11 $
- *   $Date: 2001-04-21 00:16:57 $
- *   @(#) $Id: annotate.cpp,v 1.11 2001-04-21 00:16:57 bcr Exp $
+ *   $Revision: 1.12 $
+ *   $Date: 2001-04-25 22:28:47 $
+ *   @(#) $Id: annotate.cpp,v 1.12 2001-04-25 22:28:47 bcr Exp $
  *
  *****************************************************************************/
 
-static const char RCSVersion[]="@(#) $Id: annotate.cpp,v 1.11 2001-04-21 00:16:57 bcr Exp $";
+static const char RCSVersion[]="@(#) $Id: annotate.cpp,v 1.12 2001-04-25 22:28:47 bcr Exp $";
 
 #include "GIFFManager.h"
 #include "GOS.h"
 #include "GURL.h"
+#include <locale.h>
 #include <stdio.h>
 #include <sys/stat.h>
 
@@ -182,6 +183,7 @@ static void insert_djvu(DArray<GUTF8String> & argv)
 
 int main(int argc, char ** argv)
 {
+  setlocale(LC_CTYPE,"");
    DArray<GUTF8String> dargv(0,argc-1);
    for(int i=0;i<argc;++i)
    {

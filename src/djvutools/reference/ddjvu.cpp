@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ddjvu.cpp,v 1.17 2001-04-21 00:16:57 bcr Exp $
+// $Id: ddjvu.cpp,v 1.18 2001-04-25 22:28:47 bcr Exp $
 // $Name:  $
 
 /** @name ddjvu
@@ -111,7 +111,7 @@
     Yann Le Cun <yann@research.att.com>\\
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: ddjvu.cpp,v 1.17 2001-04-21 00:16:57 bcr Exp $# */
+    #$Id: ddjvu.cpp,v 1.18 2001-04-25 22:28:47 bcr Exp $# */
 //@{
 //@}
 
@@ -125,6 +125,7 @@
 #include "GOS.h"
 #include "ByteStream.h"
 
+#include <locale.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -339,6 +340,7 @@ int
 main(int argc, char **argv)
 {
 #endif
+  setlocale(LC_CTYPE,"");
   DArray<GUTF8String> dargv(0,argc-1);
   for(int i=0;i<argc;++i)
   {

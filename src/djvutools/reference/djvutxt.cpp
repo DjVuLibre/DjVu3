@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djvutxt.cpp,v 1.17 2001-04-16 15:08:37 chrisp Exp $
+// $Id: djvutxt.cpp,v 1.18 2001-04-25 22:28:48 bcr Exp $
 // $Name:  $
 
 // DJVUTXT -- DjVu TXT extractor
@@ -69,7 +69,7 @@
     @author
     Andrei Erofeev <eaf@geocities.com> -- initial implementation
     @version
-    #$Id: djvutxt.cpp,v 1.17 2001-04-16 15:08:37 chrisp Exp $# */
+    #$Id: djvutxt.cpp,v 1.18 2001-04-25 22:28:48 bcr Exp $# */
 //@{
 //@}
 
@@ -81,6 +81,7 @@
 #include "GString.h"
 #include "GOS.h"
 
+#include <locale.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/stat.h>
@@ -131,6 +132,7 @@ doPage(const GP<DjVuDocument> & doc, int page_num,
 int
 main(int argc, char ** argv)
 {
+  setlocale(LC_CTYPE,"");
   DArray<GUTF8String> dargv(0,argc-1);
   for(int i=0;i<argc;++i)
   {

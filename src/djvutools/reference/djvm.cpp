@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djvm.cpp,v 1.14 2001-04-24 00:25:49 bcr Exp $
+// $Id: djvm.cpp,v 1.15 2001-04-25 22:28:47 bcr Exp $
 // $Name:  $
 
 /** @name djvm
@@ -99,7 +99,7 @@
     @author
     Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: djvm.cpp,v 1.14 2001-04-24 00:25:49 bcr Exp $# */
+    #$Id: djvm.cpp,v 1.15 2001-04-25 22:28:47 bcr Exp $# */
 //@{
 //@}
 
@@ -107,6 +107,7 @@
 #include "DjVuDocEditor.h"
 #include "GOS.h"
 
+#include <locale.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <iostream.h>
@@ -262,6 +263,7 @@ list(DArray<GUTF8String> &argv)
 int
 main(int argc, char ** argv)
 {
+  setlocale(LC_CTYPE,"");
   DArray<GUTF8String> dargv(0,argc-1);
   for(int i=0;i<argc;++i)
   {

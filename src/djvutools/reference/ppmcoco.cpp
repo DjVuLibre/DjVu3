@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ppmcoco.cpp,v 1.12 2001-04-21 00:16:58 bcr Exp $
+// $Id: ppmcoco.cpp,v 1.13 2001-04-25 22:28:48 bcr Exp $
 // $Name:  $
 
 /** @name ppmcoco
@@ -104,7 +104,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: ppmcoco.cpp,v 1.12 2001-04-21 00:16:58 bcr Exp $# */
+    #$Id: ppmcoco.cpp,v 1.13 2001-04-25 22:28:48 bcr Exp $# */
 //@{
 //@}
 
@@ -119,6 +119,7 @@
 #include "GString.h"
 #include "GOS.h"
 #include "GURL.h"
+#include <locale.h>
 
 double fromGamma = 2.2;
 double toGamma = 2.2;

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: cjb2.cpp,v 1.14 2001-04-21 00:16:57 bcr Exp $
+// $Id: cjb2.cpp,v 1.15 2001-04-25 22:28:47 bcr Exp $
 // $Name:  $
 
 
@@ -70,7 +70,7 @@
     Paul Howard <pgh@research.att.com>\\
     Pascal Vincent <vincentp@iro.umontreal.ca>
     @version
-    $Id: cjb2.cpp,v 1.14 2001-04-21 00:16:57 bcr Exp $ */
+    $Id: cjb2.cpp,v 1.15 2001-04-25 22:28:47 bcr Exp $ */
 //@{
 //@}
 
@@ -87,6 +87,7 @@
 #include "DjVuInfo.h"
 #include "GOS.h"
 #include "GURL.h"
+#include <locale.h>
 
 
 
@@ -895,6 +896,7 @@ usage()
 int 
 main(int argc, const char **argv)
 {
+  setlocale(LC_CTYPE,"");
   DArray<GUTF8String> dargv(0,argc-1);
   for(int i=0;i<argc;++i)
   {

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: bzz.cpp,v 1.17 2001-04-21 00:16:57 bcr Exp $
+// $Id: bzz.cpp,v 1.18 2001-04-25 22:28:47 bcr Exp $
 // $Name:  $
 
 
@@ -58,7 +58,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation
     @version
-    $Id: bzz.cpp,v 1.17 2001-04-21 00:16:57 bcr Exp $ */
+    $Id: bzz.cpp,v 1.18 2001-04-25 22:28:47 bcr Exp $ */
 //@{
 //@}
 
@@ -67,6 +67,7 @@
 #include "BSByteStream.h"
 #include "GOS.h"
 #include "GURL.h"
+#include <locale.h>
 #include <stdlib.h>
 
 static const char *program = "(unknown)";
@@ -88,6 +89,7 @@ usage(void)
 int 
 main(int argc, char **argv)
 {
+  setlocale(LC_CTYPE,"");
   DArray<GUTF8String> dargv(0,argc-1);
   for(int i=0;i<argc;++i)
   {

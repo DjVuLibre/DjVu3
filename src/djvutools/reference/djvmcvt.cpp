@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djvmcvt.cpp,v 1.16 2001-04-24 00:25:49 bcr Exp $
+// $Id: djvmcvt.cpp,v 1.17 2001-04-25 22:28:47 bcr Exp $
 // $Name:  $
 
 /** @name djvmcvt
@@ -106,7 +106,7 @@
     @author
     Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: djvmcvt.cpp,v 1.16 2001-04-24 00:25:49 bcr Exp $# */
+    #$Id: djvmcvt.cpp,v 1.17 2001-04-25 22:28:47 bcr Exp $# */
 
 #ifdef __GNUC__
 #pragma implementation
@@ -118,6 +118,7 @@
 #include "GOS.h"
 #include "debug.h"
 
+#include <locale.h>
 #include <stdio.h>
 
 static const char * progname;
@@ -174,6 +175,7 @@ do_indirect(DArray<GUTF8String> &argv)
 int 
 main(int argc, char ** argv)
 {
+  setlocale(LC_CTYPE,"");
   DArray<GUTF8String> dargv(0,argc-1);
   for(int i=0;i<argc;++i)
   {

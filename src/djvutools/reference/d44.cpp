@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: d44.cpp,v 1.15 2001-04-21 00:16:57 bcr Exp $
+// $Id: d44.cpp,v 1.16 2001-04-25 22:28:47 bcr Exp $
 // $Name:  $
 
 /** @name d44
@@ -84,7 +84,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: d44.cpp,v 1.15 2001-04-21 00:16:57 bcr Exp $# 
+    #$Id: d44.cpp,v 1.16 2001-04-25 22:28:47 bcr Exp $# 
 */
 //@{
 //@}
@@ -97,6 +97,7 @@
 #include "IFFByteStream.h"
 #include "GPixmap.h"
 #include "GBitmap.h"
+#include <locale.h>
 #include <stdlib.h>
 #ifdef UNDER_CE
 #include <windows.h>
@@ -181,6 +182,7 @@ main(int argc, char **argv)
 mymain(int argc, char **argv)
 #endif
 {
+  setlocale(LC_CTYPE,"");
   DArray<GUTF8String> dargv(0,argc-1);
   for(int i=0;i<argc;++i)
   {
