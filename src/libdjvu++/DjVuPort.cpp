@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuPort.cpp,v 1.28 1999-11-22 23:41:43 eaf Exp $
+//C- $Id: DjVuPort.cpp,v 1.29 1999-11-29 22:12:22 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -174,6 +174,9 @@ DjVuPortcaster::del_port(const DjVuPort * port)
    GCriticalSectionLock lock(&map_lock);
 
    GPosition pos;
+
+      // Update the "aliases map"
+   clear_aliases(port);
    
       // Update "contents map"
    if (cont_map.contains(port, pos)) cont_map.del(pos);
