@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: GThreads.h,v 1.1 1999-01-22 00:40:19 leonb Exp $
+//C-  $Id: GThreads.h,v 1.2 1999-01-25 21:11:05 leonb Exp $
 
 #ifndef _GTHREADS_H_
 #define _GTHREADS_H_
@@ -54,11 +54,26 @@
           Once you get the right compiler, this implementation is
           remarkably compact and portable. A variety of processors are
           supported, including mips, intel, sparc, hppa, and alpha.
+    \item #-DTHREADMODEL=JRITHREADS# is actually not currently implemented.
+          Multi-threading within a Netscape plugin can be tricky.  A simple
+          idea however consists of implementing the threading primitives in
+          Java and to access them using JRI.  The classes just contain a
+          JRIGlobalRef.  Everything (including exception thread safety) should
+          be implemented by the plugin source code.  Performance may be an
+          issue.
     \end{itemize}
     
-    Despites its limitations, the #COTHREADS# model actually seems much more
-    portable and convenient than all other models available under Unix. We
-    expect to make it the default in future releases.
+    {\bf Portability}: The simultaneous use of threads and exceptions caused a
+    lot of portability headaches under Unix.  We eventually decided to
+    implement the COTHREADS cooperative threads (because preemtive threads
+    have more problems) and to patch EGCS in order to make exception handling
+    COTHREAD-safe.  We expect to make COTHREADs the default in future
+    releases.
+
+    {\bf ToDo}: For historical reasons, the interface is modeled after the
+    Win32 model.  This is unfortunate because more and more systems (Java,
+    NSPR, pthreads) adopt the simpler monitor approach.  It would be nice to
+    change that some day.
 
     @memo
     Portable threads
@@ -66,7 +81,7 @@
     Leon Bottou <leonb@research.att.com> -- initial implementation.\\
     Praveen Guduru <praveen@sanskrit.lz.att.com> -- mac implementation.
     @version
-    #$Id: GThreads.h,v 1.1 1999-01-22 00:40:19 leonb Exp $# */
+    #$Id: GThreads.h,v 1.2 1999-01-25 21:11:05 leonb Exp $# */
 //@{
 
 #include "DjVuGlobal.h"
@@ -77,6 +92,7 @@
 
 #define NOTHREADS     0
 #define COTHREADS     1
+#define JRITHREADS    2
 #define POSIXTHREADS  10
 #define WINTHREADS    11
 #define MACTHREADS    12
@@ -128,6 +144,10 @@
 #define TRY G_TRY
 #define CATCH G_CATCH
 #endif 
+#endif
+
+#if THREADMODEL==JRITHREADS
+#include "jri.h"
 #endif
 
 #if THREADMODEL==COTHREADS
@@ -203,6 +223,9 @@ private:
 #elif THREADMODEL==POSIXTHREADS
 private:
   pthread_t hthr;
+#elif THREADMODEL==JRITHREADS
+private:
+  JRIGlobalRef obj;
 #elif THREADMODEL==COTHREADS
 private:
   struct cotask *task;
@@ -269,14 +292,17 @@ class GCriticalSection {
   BOOL ok;
   CRITICAL_SECTION cs;
 #elif THREADMODEL==POSIXTHREADS
-  int             ok;
-  int             count;
-  pthread_t       locker;
+  int ok;
+  int count;
+  pthread_t locker;
   pthread_mutex_t mutex;
+#elif THREADMODEL==JRITHREADS
+private:
+  JRIGlobalRef obj;
 #elif THREADMODEL==COTHREADS
-  int             ok;
-  int             count;
-  struct cotask  *locker;
+  int ok;
+  int count;
+  struct cotask *locker;
 #endif
 public:
   GCriticalSection();
@@ -313,8 +339,11 @@ class GEvent {
   HANDLE hev;
 #elif THREADMODEL==POSIXTHREADS
   pthread_mutex_t mutex;
-  pthread_cond_t  cond;
+  pthread_cond_t cond;
   char status;
+#elif THREADMODEL==JRITHREADS
+private:
+  JRIGlobalRef obj;
 #elif THREADMODEL==COTHREADS
   int ok;
   int status;
