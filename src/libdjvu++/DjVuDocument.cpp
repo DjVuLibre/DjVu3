@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.5 1999-05-26 18:26:48 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.6 1999-05-26 21:09:12 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -55,9 +55,9 @@ DjVuDocument::DjVuDocument(const GURL & url, bool xreadonly,
 
    if (!xreadonly)
    {
-	 // Get the REAL directory by decoding page #0
-      GP<DjVuImage> dimg=get_page(0);
-      dimg->get_djvu_file()->wait_for_finish();
+	 // Get the REAL directory
+      GP<DjVuNavDir> d=get_djvu_file(-1)->decode_ndir();
+      if (d) dir=d;
 
 	 // Now load each and every file into the cache
       int page;
