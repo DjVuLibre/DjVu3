@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessage.h,v 1.17 2001-04-19 23:25:46 bcr Exp $
+// $Id: DjVuMessage.h,v 1.18 2001-04-20 17:08:26 bcr Exp $
 // $Name:  $
 
 
@@ -65,23 +65,33 @@ class ByteStream;
     Parameter specifications: These are modelled after printf format
     specifications and have one of the following forms:
   
-      %n!s!            %n!d!            %n!x!
+      %n!s! %n!d! %n!i! %n!u! %n!x! %n!X!
   
     where n is the parameter number. The parameter number is indicated
     explicitly to allow for the possibility that the parameter order may
     change when the message text is translated into another language.
-    The final letter ('s', 'd', or 'x') indicates the form of the parameter
-    (string, integer or hexadecimal, respectively).  But, you say, all the
-    parameters are strings!
+    The final letter ('s', 'd', 'i', 'u', 'x', or 'X') indicates the form
+    of the parameter (string, integer, integer, unsigned integer, lowercase
+    hexadecimal, or uppercase hexadecimal, respectively).  In addition
+    formating options such as precision available in sprintf, may be used.
+    So, to print the third argument as 5 digit unsigned number, with leading
+    zero's one could use:
+      %3!05u!
 
-    The form is indicated in case there is a necessity to change the
-    appearance (especially of numbers) when translating the message.
+    All of the arguments are actually strings.  For forms that don't take
+    string input ('d', 'i', 'u', 'x', or 'X'), and atoi() conversion is done
+    on the string before formatting.  In addition the form indicates to the
+    translater whether to expect a word or a number.
 
-    Formatting strings: The message text may also contain formatting
-    strings of following forms:
+    The strings are read in from XML.  To to format the strings, use the
+    relavent XML escape sequences, such as follows:
 
-            "\\n"         [that is, a backslash followed by the letter 'n']
-            "\\t"         [backslash 't']
+            &#10;        [line feed]
+            &#09;        [horizontal tab]
+            &apos;       [single quote]
+            &#34;        [double quote]
+            &lt;         [less than sign]
+            &gt;         [greater than sign]
   
     After parameters have been inserted in the message text, the formatting 
     strings are replaced by their usual equivalents (newline and tab

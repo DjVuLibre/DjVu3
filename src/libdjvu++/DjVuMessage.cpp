@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessage.cpp,v 1.34 2001-04-20 00:30:54 bcr Exp $
+// $Id: DjVuMessage.cpp,v 1.35 2001-04-20 17:08:26 bcr Exp $
 // $Name:  $
 
 
@@ -489,12 +489,12 @@ DjVuMessage::LookUpID( const GUTF8String &msgID,
       GPosition valuepos=tag->args.contains(valuestring);
       if(valuepos)
       {
-        message_text=tag->args[valuepos].fromEscaped();
+        message_text=tag->args[valuepos];
       }
       GPosition numberpos=tag->args.contains(numberstring);
       if(numberpos)
       {
-        message_number=tag->args[numberpos].fromEscaped();
+        message_number=tag->args[numberpos];
       }
     }
   }
@@ -568,18 +568,21 @@ DjVuMessage::InsertArg( GUTF8String &message,
       if(format_end > format_start)
       { 
         const int len=1+format_end-n;
-        if(0 && len && isascii(message[n-1]))
+        if(len && isascii(message[n-1]))
         {
           GUTF8String narg;
           GUTF8String format="%"+message.substr(n-1,len);
-          switch(format[len-1])
+          switch(format[len])
           {
             case 'd':
-              narg.format((const char *)format,atoi((const char *)(arg)));
+            case 'i':
+              narg.format((const char *)format,arg.toInt());
               break;
             case 'u':
+            case 'o':
             case 'x':
-              narg.format((const char *)format,atoi((const char *)(arg)));
+            case 'X':
+              narg.format((const char *)format,(unsigned int)arg.toInt());
               break;
             default:
               narg.format((const char *)format,(const char *)arg);

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.h,v 1.55 2001-04-19 23:25:46 bcr Exp $
+// $Id: GString.h,v 1.56 2001-04-20 17:08:26 bcr Exp $
 // $Name:  $
 
 #ifndef _GSTRING_H_
@@ -57,7 +57,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.55 2001-04-19 23:25:46 bcr Exp $# */
+    #$Id: GString.h,v 1.56 2001-04-20 17:08:26 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -714,6 +714,7 @@ public:
 
   /// Comparies the string with the relavent lookup message.
   bool messagecmp(const char s2[]) const;
+  static bool messagecmp(const char s1[], const char s2[]);
 
 
   /** String comparison. Returns true if and only if character strings #s1#
@@ -824,6 +825,16 @@ GString::messagecmp(const char s2[]) const
 {
   const int n=s2?strlen(s2):0;
   return ncmp(s2,n)&&(!operator[](n)||operator[](n)=='\t'||operator[](n)=='\n');
+}
+
+inline bool 
+GString::messagecmp(const char s1[], const char s2[])
+{
+  const int n1=s1?strlen(s1):0;
+  const int n2=s2?strlen(s2):0;
+  const int n=(n1<n2)?n1:n2;
+  return n&&ncmp(s1,s2,n)&&(s1[n]||s1[n]=='\t'||s1[n]=='\n')
+    &&(s2[n]||s2[n]=='\t'||s2[n]=='\n');
 }
 
 

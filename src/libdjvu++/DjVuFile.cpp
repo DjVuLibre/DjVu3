@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuFile.cpp,v 1.162 2001-04-19 00:05:27 bcr Exp $
+// $Id: DjVuFile.cpp,v 1.163 2001-04-20 17:08:26 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -607,7 +607,7 @@ DjVuFile::report_error
 (const GException &ex,bool throw_errors)
 {
   data_pool->clear_stream();
-  if((!verbose_eof)|| (GString::cmp(ex.get_cause(),ByteStream::EndOfFile)))
+  if((!verbose_eof)|| (!GString::messagecmp(ex.get_cause(),ByteStream::EndOfFile)))
   {
     if(throw_errors)
     {
@@ -1189,7 +1189,7 @@ DjVuFile::decode(GP<ByteStream> gbs)
   }
   G_CATCH(ex)
   {
-    if(!GString::cmp(ex.get_cause(),ByteStream::EndOfFile))
+    if(GString::messagecmp(ex.get_cause(),ByteStream::EndOfFile))
     {
       if (chunks_number < 0)
         chunks_number=(recover_errors>SKIP_CHUNKS)?chunks:last_chunk;
@@ -1422,7 +1422,7 @@ DjVuFile::decode_ndir(GMap<GURL, void *> & map)
     }
     G_CATCH(ex)
     {
-       if(!GString::cmp(ex.get_cause(),ByteStream::EndOfFile))
+       if(GString::messagecmp(ex.get_cause(),ByteStream::EndOfFile))
        {
           if (chunks_number < 0)
              chunks_number=(recover_errors>SKIP_CHUNKS)?chunks:last_chunk;
@@ -2022,7 +2022,7 @@ DjVuFile::add_djvu_data(IFFByteStream & ostr, GMap<GURL, void *> & map,
     }
     G_CATCH(ex)
     {
-      if(!GString::cmp(ex.get_cause(),ByteStream::EndOfFile))
+      if(GString::messagecmp(ex.get_cause(),ByteStream::EndOfFile))
       {
         if (chunks_number < 0)
           chunks_number=(recover_errors>SKIP_CHUNKS)?chunks:last_chunk;
