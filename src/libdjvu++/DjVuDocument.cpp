@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.58 1999-10-25 16:49:41 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.59 1999-11-06 16:16:26 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -19,6 +19,8 @@
 #include "IFFByteStream.h"
 #include "GOS.h"
 #include "debug.h"
+
+const float	DjVuDocument::thumb_gamma=2.20;
 
 static GString
 get_int_prefix(void * ptr)
@@ -533,7 +535,7 @@ DjVuDocument::id_to_url(const DjVuPort * source, const char * id)
 }
 
 GP<DjVuFile>
-DjVuDocument::url_to_file(const GURL & url)
+DjVuDocument::url_to_file(const GURL & url, bool dont_create)
       // This function is private and is called from two places:
       // id_to_file() and get_djvu_file() ONLY when the structure is known
 {
@@ -561,16 +563,21 @@ DjVuDocument::url_to_file(const GURL & url)
       return (DjVuFile *) (DjVuPort *) port;
    }
 
-   DEBUG_MSG("creating a new file\n");
-   GP<DjVuFile> file=new DjVuFile();
-   file->init(url, this);
-   set_file_name(file);
+   GP<DjVuFile> file;
+   
+   if (!dont_create)
+   {
+      DEBUG_MSG("creating a new file\n");
+      file=new DjVuFile();
+      file->init(url, this);
+      set_file_name(file);
+   }
 
    return file;
 }
 
 GP<DjVuFile>
-DjVuDocument::get_djvu_file(int page_num)
+DjVuDocument::get_djvu_file(int page_num, bool dont_create)
 {
    check();
    DEBUG_MSG("DjVuDocument::get_djvu_file(): request for page " << page_num << "\n");
@@ -619,14 +626,14 @@ DjVuDocument::get_djvu_file(int page_num)
       }
    }
    
-   GP<DjVuFile> file=url_to_file(url);
-   get_portcaster()->add_route(file, this);
+   GP<DjVuFile> file=url_to_file(url, dont_create);
+   if (file) get_portcaster()->add_route(file, this);
    
    return file;
 }
 
 GP<DjVuFile>
-DjVuDocument::get_djvu_file(const char * id)
+DjVuDocument::get_djvu_file(const char * id, bool dont_create)
 {
    check();
    DEBUG_MSG("DjVuDocument::get_djvu_file(): ID='" << id << "'\n");
@@ -678,8 +685,8 @@ DjVuDocument::get_djvu_file(const char * id)
       }
    }
 
-   GP<DjVuFile> file=url_to_file(url);
-   get_portcaster()->add_route(file, this);
+   GP<DjVuFile> file=url_to_file(url, dont_create);
+   if (file) get_portcaster()->add_route(file, this);
    
    return file;
 }
@@ -724,6 +731,231 @@ DjVuDocument::get_page(const char * id, DjVuPort * port)
    return dimg;
 }
 
+void
+DjVuDocument::process_threqs(void)
+      // Will look thru threqs_list and try to fulfil every request
+{
+   GCriticalSectionLock lock(&threqs_lock);
+   for(GPosition pos=threqs_list;pos;)
+   {
+      GP<ThumbReq> req=threqs_list[pos];
+      bool remove=false;
+      if (req->thumb_file)
+      {
+	 TRY {
+	       // There supposed to be a file with thumbnails
+	    if (req->thumb_file->is_data_present())
+	    {
+		  // Cool we can extract the thumbnail now
+	       GP<ByteStream> str=req->thumb_file->get_init_data_pool()->get_stream();
+	       IFFByteStream iff(*str);
+	       GString chkid;
+	       if (!iff.get_chunk(chkid) || chkid!="FORM:THUM")
+		  THROW("Corrupted thumbnails");
+	       
+	       for(int i=0;i<req->thumb_chunk;i++)
+	       {
+		  if (!iff.get_chunk(chkid)) THROW("Corrupted thumbnails");
+		  iff.close_chunk();
+	       }
+	       if (!iff.get_chunk(chkid) || chkid!="TH44")
+		  THROW("Corrupted thumbnails");
+
+		  // Copy the data
+	       char buffer[1024];
+	       int length;
+	       while((length=iff.read(buffer, 1024)))
+		  req->data_pool->add_data(buffer, length);
+	       req->data_pool->set_eof();
+
+		  // Also add this file to cache so that we won't have
+		  // to download it next time
+	       add_to_cache(req->thumb_file);
+
+	       req->thumb_file=0;
+	       req->image_file=0;
+	       remove=true;
+	    }
+	 } CATCH(exc) {
+	    GString msg="Failed to extract predecoded thumbnails:\n";
+	    msg+=exc.get_cause();
+	    get_portcaster()->notify_error(this, msg);
+	       // Switch this request to the "decoding" mode
+	    req->image_file=get_djvu_file(req->page_num);
+	    req->thumb_file=0;
+	 } ENDCATCH;
+      } // if (req->thumb_file)
+      
+      if (req->image_file)
+      {
+	 TRY {
+	       // Decode the file if necessary. Or just used predecoded image.
+	    GSafeFlags & file_flags=req->image_file->get_safe_flags();
+	    {
+	       GMonitorLock lock(&file_flags);
+	       if (!req->image_file->is_decoding())
+	       {
+		  if (req->image_file->is_decode_ok())
+		  {
+			// We can generate it now
+		     GP<DjVuImage> dimg=new DjVuImage;
+		     dimg->connect(req->image_file);
+      
+		     GRect rect(0, 0, 160, dimg->get_height()*160/dimg->get_width());
+		     GP<GPixmap> pm=dimg->get_pixmap(rect, rect, thumb_gamma);
+		     if (!pm)
+		     {
+			GP<GBitmap> bm=dimg->get_bitmap(rect, rect, sizeof(int));
+			pm=new GPixmap(*bm);
+		     }
+		     if (!pm) THROW("Unable to render page "+GString(req->page_num));
+		     
+			// Store and compress the pixmap
+		     GP<IWPixmap> iwpix=new IWPixmap(pm);
+		     GP<MemoryByteStream> str=new MemoryByteStream;
+		     IWEncoderParms parms;
+		     parms.slices=97;
+		     parms.bytes=0;
+		     parms.decibels=0;
+		     iwpix->encode_chunk(*str, parms);
+		     TArray<char> data=str->get_data();
+
+		     req->data_pool->add_data((const char *) data, data.size());
+		     req->data_pool->set_eof();
+      
+		     req->thumb_file=0;
+		     req->image_file=0;
+		     remove=true;
+		  } else if (req->image_file->is_decode_failed())
+		  {
+			// Unfortunately we cannot decode it
+		     req->thumb_file=0;
+		     req->image_file=0;
+		     remove=true;
+		  } else req->image_file->start_decode();
+	       }
+	    }
+	 } CATCH(exc) {
+	    GString msg="Failed to decode thumbnails:\n";
+	    msg+=exc.get_cause();
+	    get_portcaster()->notify_error(this, msg);
+	    
+	       // Get rid of this request
+	    req->image_file=0;
+	    req->thumb_file=0;
+	    remove=true;
+	 } ENDCATCH;
+      }
+
+      if (remove)
+      {
+	 GPosition this_pos=pos;
+	 ++pos;
+	 threqs_list.del(this_pos);
+      } else ++pos;
+   }
+}
+
+GP<DjVuDocument::ThumbReq>
+DjVuDocument::add_thumb_req(const GP<ThumbReq> & thumb_req)
+      // Will look through the list of pending requests for thumbnails
+      // and try to add the specified request. If a duplicate is found,
+      // it will be returned and the list will not be modified
+{
+   GCriticalSectionLock lock(&threqs_lock);
+   for(GPosition pos=threqs_list;pos;++pos)
+   {
+      GP<ThumbReq> req=threqs_list[pos];
+      if (req->page_num==thumb_req->page_num)
+	 return req;
+   }
+   threqs_list.append(thumb_req);
+   return thumb_req;
+}
+
+GP<DataPool>
+DjVuDocument::get_thumbnail(int page_num, bool dont_decode)
+{
+   DEBUG_MSG("DjVuDocument::get_thumbnail(): page_num=" << page_num << "\n");
+   DEBUG_MAKE_INDENT(3);
+
+   if (!is_init_complete()) return 0;
+   
+   {
+	 // See if we already have request for this thumbnail pending
+      GCriticalSectionLock lock(&threqs_lock);
+      for(GPosition pos=threqs_list;pos;++pos)
+      {
+	 GP<ThumbReq> req=threqs_list[pos];
+	 if (req->page_num==page_num)
+	    return req->data_pool;	// That's it. Just return it.
+      }
+   }
+
+      // No pending request for this page... Create one
+   GP<ThumbReq> thumb_req=new ThumbReq(page_num, new DataPool());
+   
+      // First try to find predecoded thumbnail
+   if (get_doc_type()==INDIRECT || get_doc_type()==BUNDLED)
+   {
+	 // Predecoded thumbnails exist for new formats only
+      GPList<DjVmDir::File> files_list=djvm_dir->get_files_list();
+      GP<DjVmDir::File> thumb_file;
+      int thumb_start;
+      int page_cnt=-1;
+      for(GPosition pos=files_list;pos;++pos)
+      {
+	 GP<DjVmDir::File> f=files_list[pos];
+	 if (f->is_thumbnails())
+	 {
+	    thumb_file=f;
+	    thumb_start=page_cnt+1;
+	 } else if (f->is_page()) page_cnt++;
+	 if (page_cnt==page_num) break;
+      }
+      if (thumb_file)
+      {
+	    // That's the file with the desired thumbnail image
+	 thumb_req->thumb_file=get_djvu_file(thumb_file->id);
+	 thumb_req->thumb_chunk=page_num-thumb_start;
+	 thumb_req=add_thumb_req(thumb_req);
+	 process_threqs();
+	 return thumb_req->data_pool;
+      }
+   }
+
+      // Apparently we're out of luck and need to decode the requested
+      // page (unless it's already done and if it's allowed) and render
+      // it into the thumbnail. If dont_decode is true, do not attempt
+      // to create this file (because this will result in a request for data)
+   GP<DjVuFile> file=get_djvu_file(page_num, dont_decode);
+   if (file)
+   {
+      thumb_req->image_file=file;
+
+	 // I'm locking the flags here to make sure, that DjVuFile will not
+	 // change its state in between of the checks.
+      GSafeFlags & file_flags=file->get_safe_flags();
+      {
+	 GMonitorLock lock(&file_flags);
+	 if (thumb_req->image_file->is_decode_ok() || !dont_decode)
+	 {
+	       // Just add it to the list and call process_threqs(). It
+	       // will start decoding if necessary
+	    thumb_req=add_thumb_req(thumb_req);
+	    process_threqs();
+	 } else
+	 {
+	       // Nothing can be done return ZERO
+	    thumb_req=0;
+	 }
+      }
+   } else thumb_req=0;
+   
+   if (thumb_req) return thumb_req->data_pool;
+   else return 0;
+}
+
 static void
 add_to_cache(const GP<DjVuFile> & f, GMap<GURL, void *> & map,
 	     DjVuFileCache * cache)
@@ -762,7 +994,11 @@ DjVuDocument::notify_file_flags_changed(const DjVuFile * source,
    {
       set_file_name(source);
       if (cache) add_to_cache((DjVuFile *) source);
+      process_threqs();
    }
+   
+   if (set_mask & DjVuFile::DATA_PRESENT)
+      process_threqs();		// May be we can extract thumbnails now
 }
 
 GPBase

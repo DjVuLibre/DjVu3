@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.h,v 1.35 1999-10-05 16:00:06 leonb Exp $
+//C- $Id: DjVuDocument.h,v 1.36 1999-11-06 16:16:26 eaf Exp $
  
 #ifndef _DJVUDOCUMENT_H
 #define _DJVUDOCUMENT_H
@@ -33,7 +33,7 @@
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@research.att.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocument.h,v 1.35 1999-10-05 16:00:06 leonb Exp $#
+    @version #$Id: DjVuDocument.h,v 1.36 1999-11-06 16:16:26 eaf Exp $#
 */
 
 //@{
@@ -472,11 +472,14 @@ public:
 	  \Ref{page_to_url}(), \Ref{id_to_url}() functions start working
 	  properly.
 
+	  If #dont_create# is #FALSE# the function will return the file
+	  only if it already exists.
+
 	  {\bf Note:} To wait for the initialization to complete use
 	  \Ref{wait_for_complete_init}(). For single threaded applications
 	  the initialization completes before the \Ref{init}() function
 	  returns. */
-   GP<DjVuFile>	get_djvu_file(int page_num);
+   GP<DjVuFile>	get_djvu_file(int page_num, bool dont_create=false);
       /** Returns \Ref{DjVuFile} corresponding to the specified ID.
           This function behaves exactly as the #get_djvu_file()# function
 	  above. The only thing worth mentioning here is how the #ID#
@@ -485,8 +488,26 @@ public:
 	  First of all the function checks, if the ID contains a number.
 	  If so, it just calls the #get_djvu_file()# function above. If ID is
 	  #ZERO# or just empty, page number #-1# is assumed. Otherwise
-	  the ID is translated to the URL using \Ref{id_to_url}(). */
-   GP<DjVuFile>	get_djvu_file(const char * id);
+	  the ID is translated to the URL using \Ref{id_to_url}().
+
+	  If #dont_create# is #FALSE# the function will return the file
+	  only if it already exists. */
+   GP<DjVuFile>	get_djvu_file(const char * id, bool dont_create=false);
+      /** Returns a \Ref{DataPool} containing one chunk #TH44# with
+	  the encoded thumbnail for the specified page. The function
+	  first looks for thumbnails enclosed into the document and if
+	  it fails to find one, it decodes the required page and creates
+	  the thumbnail on the fly (unless #dont_decode# is true).
+
+	  {\bf Note:} It may happen that the returned \Ref{DataPool} will
+	  not contain all the data you need. In this case you will need
+	  to install a trigger into the \Ref{DataPool} to learn when the
+	  data actually arrives. */
+   GP<DataPool> get_thumbnail(int page_num, bool dont_decode);
+      /* Will return gamma correction, which was used when creating
+	 thumbnail images. If you need other gamma correction, you will
+	 need to correct the thumbnails again. */
+   float	get_thumbnails_gamma(void) const;
       //@}
 
       /** Waits until the document becomes completely initialized. As
@@ -580,7 +601,7 @@ protected:
    GP<DjVmDir>		djvm_dir;	// New-style DjVm directory
    int			doc_type;
    
-   virtual GP<DjVuFile>	url_to_file(const GURL & url);
+   virtual GP<DjVuFile>	url_to_file(const GURL & url, bool dont_create=false);
 private:
    class UnnamedFile : public GPEnabled
    {
@@ -595,6 +616,20 @@ private:
 
       UnnamedFile(int id_type, const char * id, int page_num, const GURL & url,
 		  const GP<DjVuFile> & file);
+   };
+   class ThumbReq : public GPEnabled
+   {
+   public:
+      int		page_num;
+      GP<DataPool>	data_pool;
+
+	 // Either of the next two blocks should present
+      GP<DjVuFile>	image_file;
+
+      int		thumb_chunk;
+      GP<DjVuFile>	thumb_file;
+
+      ThumbReq(int page_num, const GP<DataPool> & data_pool);
    };
    bool                 init_called;
    GSafeFlags		flags;
@@ -611,7 +646,12 @@ private:
    GPList<UnnamedFile>	ufiles_list;
    GCriticalSection	ufiles_lock;
 
+   GPList<ThumbReq>	threqs_list;
+   GCriticalSection	threqs_lock;
+
    GP<DjVuDocument>	init_life_saver;
+
+   static const float	thumb_gamma;
 
       // Reads document contents in another thread trying to determine
       // its type and structure
@@ -621,6 +661,9 @@ private:
 
    void                 check() const;
 
+   void			process_threqs(void);
+   GP<ThumbReq>		add_thumb_req(const GP<ThumbReq> & thumb_req);
+      
    void			add_to_cache(const GP<DjVuFile> & f);
    void			check_unnamed_files(void);
    void			set_file_name(const DjVuFile * file);
@@ -631,6 +674,10 @@ DjVuDocument::UnnamedFile::UnnamedFile(int xid_type, const char * xid,
 				       int xpage_num, const GURL & xurl,
 				       const GP<DjVuFile> & xfile) :
       id_type(xid_type), id(xid), page_num(xpage_num), url(xurl), file(xfile) {}
+
+inline
+DjVuDocument::ThumbReq::ThumbReq(int xpage_num, const GP<DataPool> & xdata_pool) :
+      page_num(xpage_num), data_pool(xdata_pool) {}
 
 inline bool
 DjVuDocument::is_init_complete(void) const
@@ -672,6 +719,12 @@ DjVuDocument::inherits(const char * class_name) const
    return
       !strcmp("DjVuDocument", class_name) ||
       DjVuPort::inherits(class_name);
+}
+
+inline float
+DjVuDocument::get_thumbnails_gamma(void) const
+{
+   return thumb_gamma;
 }
 
 inline DjVuFileCache *
