@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: GThreads.h,v 1.8 1999-03-02 16:51:34 leonb Exp $
+//C-  $Id: GThreads.h,v 1.9 1999-03-03 17:12:49 leonb Exp $
 
 #ifndef _GTHREADS_H_
 #define _GTHREADS_H_
@@ -76,7 +76,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Praveen Guduru <praveen@sanskrit.lz.att.com> -- mac implementation.
     @version
-    #$Id: GThreads.h,v 1.8 1999-03-02 16:51:34 leonb Exp $# */
+    #$Id: GThreads.h,v 1.9 1999-03-03 17:12:49 leonb Exp $# */
 //@{
 
 #include "DjVuGlobal.h"
@@ -132,6 +132,7 @@
 #include <unistd.h>
 #undef TRY
 #undef CATCH
+#define _CMA_NOWRAPPERS_
 #include <pthread.h>
 #if defined(G_TRY) && defined(G_CATCH)
 #undef TRY
