@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.22 1999-08-31 18:56:54 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.23 1999-08-31 22:56:54 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -482,17 +482,35 @@ DjVuDocument::request_data(const DjVuPort * source, const GURL & url)
 void
 DjVuDocument::notify_chunk_done(const DjVuPort * source, const char * name)
 {
-   if (!strcmp(name, "NDIR") && (!ndir || dummy_ndir))
-      if (source->inherits("DjVuFile"))
-      {
-	 DjVuFile * file=(DjVuFile *) source;
-	 if (file->dir)
+   if (doc_type==OLD_BUNDLED || doc_type==INDEXED)
+      if (!strcmp(name, "NDIR") && (!ndir || dummy_ndir))
+	 if (source->inherits("DjVuFile"))
 	 {
-	    DEBUG_MSG("DjVuDocument::notify_chunk_done(): updating nav. dir.\n");
-	    ndir=file->dir;
-	    dummy_ndir=false;
+	    GP<DjVuNavDir> dir=((DjVuFile *) source)->find_ndir();
+	    if (dir)
+	    {
+	       DEBUG_MSG("DjVuDocument::notify_chunk_done(): updating nav. dir.\n");
+	       ndir=dir;
+	       dummy_ndir=false;
+	    }
 	 }
-      }
+}
+
+void
+DjVuDocument::notify_all_data_received(const DjVuPort * source)
+{
+   if (doc_type==OLD_BUNDLED || doc_type==INDEXED)
+      if (!ndir || dummy_ndir)
+	 if (source->inherits("DjVuFile"))
+	 {
+	    GP<DjVuNavDir> dir=((DjVuFile *) source)->find_ndir();
+	    if (dir)
+	    {
+	       DEBUG_MSG("DjVuDocument::notify_all_data_received(): updating nav. dir.\n");
+	       ndir=dir;
+	       dummy_ndir=false;
+	    }
+	 }
 }
 
 GP<DjVuFile>
@@ -509,15 +527,17 @@ DjVuDocument::get_djvu_file(const GURL & url)
    else
    {
       pcaster->add_route(file, this);
-      if (dummy_ndir)
-      {
-	 GP<DjVuNavDir> dir=file->find_ndir();
-	 if (dir)
+      if (!ndir || dummy_ndir)
+	 if (file->is_all_data_present())	// Check to avoid deadlocks
 	 {
-	    DEBUG_MSG("updating nav. directory from the cached file.\n");
-	    ndir=dir;
+	    GP<DjVuNavDir> dir=file->find_ndir();
+	    if (dir)
+	    {
+	       DEBUG_MSG("updating nav. directory from the cached file.\n");
+	       ndir=dir;
+	       dummy_ndir=false;
+	    }
 	 }
-      }
    }
    
    return file;
