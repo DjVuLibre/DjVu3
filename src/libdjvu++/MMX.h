@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: MMX.h,v 1.7 1999-08-03 14:32:46 leonb Exp $
+//C- $Id: MMX.h,v 1.8 1999-12-07 18:20:58 eaf Exp $
 
 #ifndef _MMX_H_
 #define _MMX_H_
@@ -49,7 +49,7 @@
     @memo
     Essential support for MMX.
     @version 
-    #$Id: MMX.h,v 1.7 1999-08-03 14:32:46 leonb Exp $#
+    #$Id: MMX.h,v 1.8 1999-12-07 18:20:58 eaf Exp $#
     @author: 
     L\'eon Bottou <leonb@research.att.com> -- initial implementation */
 //@{
@@ -88,6 +88,8 @@ class MMXControl
 // ----------------------------------------
 // GCC MMX MACROS
 
+#ifndef NO_MMX
+
 #if defined(__GNUC__) && defined(__i386__)
 #define MMXemms \
   __asm__ volatile("emms" : : : "memory" ) 
@@ -123,6 +125,7 @@ class MMXControl
 #define MMX 1
 #endif
 
+#endif
 
 // -----------
 #endif
