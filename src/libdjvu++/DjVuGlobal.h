@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuGlobal.h,v 1.29 2000-01-11 21:08:51 eaf Exp $
+//C- $Id: DjVuGlobal.h,v 1.30 2000-01-11 21:30:41 eaf Exp $
 
 
 #ifndef _DJVUGLOBAL_H
@@ -40,7 +40,7 @@
     @memo
     Global definitions.
     @version
-    #$Id: DjVuGlobal.h,v 1.29 2000-01-11 21:08:51 eaf Exp $#
+    #$Id: DjVuGlobal.h,v 1.30 2000-01-11 21:30:41 eaf Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> -- empty file.\\
     Bill Riemers <bcr@sanskrit.lz.att.com> -- real work.  */
@@ -194,13 +194,13 @@ operator delete [] (void *addr) delete_throw_spec
 #ifndef HAS_DJVU_PROGRESS_CALLBACKS
 #define HAS_DJVU_PROGRESS_CALLBACKS
 
-#ifdef NEED_DJVU_PROGRESS
-
 #if defined(macintosh) //MCW can't compile
 #include "DjVu.h"
 #else
 #include "c-wrappers/DjVu.h"
 #endif
+
+#ifdef NEED_DJVU_PROGRESS
 
 extern djvu_progress_callback *_djvu_progress_ptr;
 
