@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: csepdjvu.cpp,v 1.23 2001-05-09 00:38:26 bcr Exp $
+// $Id: csepdjvu.cpp,v 1.24 2001-05-10 23:09:35 fcrary Exp $
 // $Name:  $
 
 
@@ -108,7 +108,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: csepdjvu.cpp,v 1.23 2001-05-09 00:38:26 bcr Exp $# */
+    #$Id: csepdjvu.cpp,v 1.24 2001-05-10 23:09:35 fcrary Exp $# */
 //@{
 //@}
 
@@ -1025,22 +1025,24 @@ csepdjvu_page(BufferByteStream &bs, GP<ByteStream> obs, const csepdjvuopts &opts
   int w = rimg.width;
   int h = rimg.height;
   if (opts.verbose > 1)
-    DjVuPrintError("csepdjvu:   %dx%d foreground, %d colors, %d runs\n", 
-            w, h, rimg.pal->size(), rimg.runs.size());
+    DjVuFormatError( "%s\t%d\t%d\t%d\t%d",
+                     ERR_MSG("csepdjvu.summary"), 
+                     w, h, rimg.pal->size(), rimg.runs.size());
   
   // Perform Color Connected Component Analysis
   rimg.make_ccids_by_analysis();                  // Obtain ccids
   rimg.make_ccs_from_ccids();                     // Compute cc descriptors
   if (opts.verbose > 1)
-    DjVuPrintError("csepdjvu:   %d ccs after cc analysis\n", rimg.ccs.size());
+    DjVuFormatError( "%s\t%d", ERR_MSG("csepdjvu.analyzed"), rimg.ccs.size());
   
   // Post-process Color Connected Components
   int largesize = MIN(500, MAX(64, opts.dpi));
   int smallsize = MAX(2, opts.dpi/150);
   rimg.merge_and_split_ccs(smallsize,largesize);  // Eliminates gross ccs
   if (opts.verbose > 1)
-    DjVuPrintError("csepdjvu:   %d ccs after merging/splitting\n", 
-            rimg.ccs.size());
+    DjVuFormatError( "%s\t%d",
+                     ERR_MSG("csepdjvu.merge_split"), 
+                     rimg.ccs.size());
   rimg.sort_in_reading_order();                   // Sort cc descriptors
   
   // Create JB2Image and fill colordata
@@ -1076,15 +1078,16 @@ csepdjvu_page(BufferByteStream &bs, GP<ByteStream> obs, const csepdjvuopts &opts
           if (jimg.get_shape(i).parent >= 0) nrefine++; 
           nshape++; 
         }
-      DjVuPrintError("csepdjvu:   %d shapes after matching (%d are cross-coded)\n", 
-              nshape, nrefine);
+      DjVuFormatError( "%s\t%d\t%d",
+                       ERR_MSG("csepdjvu.cross_code"), 
+                       nshape, nrefine);
     }
   
   // Obtain background image
   int bgred;
   GP<GPixmap> bgpix = read_background(bs, w, h, bgred);
   if (opts.verbose > 1 && bgpix)
-    DjVuPrintError("csepdjvu:   found background (reduction=%d)\n", bgred);
+    DjVuFormatError( "%s\t%d", ERR_MSG("csepdjvu.reduction"), bgred);
   
   // Compute flags for simplifying output format
   bool white_background = (bgpix ? false : true);
@@ -1102,13 +1105,13 @@ csepdjvu_page(BufferByteStream &bs, GP<ByteStream> obs, const csepdjvuopts &opts
   if (opts.verbose > 1)
     {
       if (bitonal)
-        DjVuPrintError("%s","csepdjvu:   encoding as a bilevel image\n");
+        DjVuWriteError( ERR_MSG("csepdjvu.bilevel") );
       else if (white_background) 
-        DjVuPrintError("%s","csepdjvu:   encoding with white background\n");
+        DjVuWriteError( ERR_MSG("csepdjvu.white_bg") );
       else if (gray_background) 
-        DjVuPrintError("%s","csepdjvu:   encoding with gray-level background\n");
+        DjVuWriteError( ERR_MSG("csepdjvu.gray_bg") );
       else 
-        DjVuPrintError("%s","csepdjvu:   encoding with full colors\n");
+        DjVuWriteError( ERR_MSG("csepdjvu.color") );
     }
   
   // Create background image

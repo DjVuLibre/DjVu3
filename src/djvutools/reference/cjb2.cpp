@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: cjb2.cpp,v 1.18 2001-05-09 00:38:26 bcr Exp $
+// $Id: cjb2.cpp,v 1.19 2001-05-10 23:09:35 fcrary Exp $
 // $Name:  $
 
 
@@ -70,7 +70,7 @@
     Paul Howard <pgh@research.att.com>\\
     Pascal Vincent <vincentp@iro.umontreal.ca>
     @version
-    $Id: cjb2.cpp,v 1.18 2001-05-09 00:38:26 bcr Exp $ */
+    $Id: cjb2.cpp,v 1.19 2001-05-10 23:09:35 fcrary Exp $ */
 //@{
 //@}
 
@@ -813,19 +813,19 @@ cjb2(const GURL &urlin, const GURL &urlout, const cjb2opts &opts)
   rimg.add_bitmap_runs(input);       // fill CCImage
   input.init(0,0);                   // save memory
   if (opts.verbose)
-    DjVuPrintError("cjb2: %d runs\n", rimg.runs.size());
+    DjVuFormatError( "%s\t%d", ERR_MSG("cjb2.runs"), rimg.runs.size() );
   
   // Component analysis
   rimg.make_ccids_by_analysis();             // obtain ccids
   rimg.make_ccs_from_ccids();                // compute cc descriptors
   if (opts.verbose)
-    DjVuPrintError("cjb2: %d ccs\n", rimg.ccs.size());
+    DjVuFormatError( "%s\t%d", ERR_MSG("cjb2.ccs_before"), rimg.ccs.size());
   if (opts.clean) 
     rimg.erase_tiny_ccs();                   // clean
   rimg.merge_and_split_ccs();                // reorganize weird ccs
   rimg.sort_in_reading_order();              // sort cc descriptors
   if (opts.verbose)
-    DjVuPrintError("cjb2: %d ccs after preprocessing\n", rimg.ccs.size());
+    DjVuFormatError( "%s\t%d", ERR_MSG("cjb2.ccs_after"), rimg.ccs.size());
   
   // Pattern matching
   GP<JB2Image> jimg = rimg.get_jb2image();          // get ``raw'' jb2image
@@ -840,8 +840,7 @@ cjb2(const GURL &urlin, const GURL &urlout, const cjb2opts &opts)
         if (jimg->get_shape(i).parent >= 0) nrefine++; 
         nshape++; 
       }
-      DjVuPrintError("cjb2: %d shapes after matching (%d are cross-coded)\n", 
-              nshape, nrefine);
+      DjVuFormatError( "%s\t%d\t%d", ERR_MSG("cjb2.shapes"), nshape, nrefine);
     }
   
   // Code

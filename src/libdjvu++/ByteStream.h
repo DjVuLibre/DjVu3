@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.h,v 1.53 2001-05-02 22:32:43 bcr Exp $
+// $Id: ByteStream.h,v 1.54 2001-05-10 23:09:36 fcrary Exp $
 // $Name:  $
 
 #ifndef _BYTESTREAM_H
@@ -62,7 +62,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation\\
     Andrei Erofeev <eaf@geocities.com> -- 
     @version
-    #$Id: ByteStream.h,v 1.53 2001-05-02 22:32:43 bcr Exp $# */
+    #$Id: ByteStream.h,v 1.54 2001-05-10 23:09:36 fcrary Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -198,6 +198,11 @@ public:
   int scanf(const char *fmt, ... );
   /** Writes the string as is, to the specified stream. */
   size_t writestring(const GUTF8String &s);
+  /** Formats the message string, looks up the external representation
+      and writes it to the specified stream. */
+  void formatmessage( const char *fmt, ... );
+  /** Looks up the message and writes it to the specified stream. */
+  void ByteStream::writemessage( const char *message );
   /** Writes a one-byte integer to a ByteStream. */
   void write8 (unsigned int card8);
   /** Writes a two-bytes integer to a ByteStream.

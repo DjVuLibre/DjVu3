@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: d44.cpp,v 1.18 2001-05-09 00:38:26 bcr Exp $
+// $Id: d44.cpp,v 1.19 2001-05-10 23:09:35 fcrary Exp $
 // $Name:  $
 
 /** @name d44
@@ -84,11 +84,12 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: d44.cpp,v 1.18 2001-05-09 00:38:26 bcr Exp $# 
+    #$Id: d44.cpp,v 1.19 2001-05-10 23:09:35 fcrary Exp $# 
 */
 //@{
 //@}
 
+#include "DjVuGlobal.h"
 #include "GString.h"
 #include "GException.h"
 #include "IW44Image.h"
@@ -229,13 +230,14 @@ mymain(int argc, char **argv)
       }
       const int rtime = GOS::ticks() - stime - dtime;
       if (flag_verbose)
-        DjVuPrintError(
-                "image: %s %d x %d\n"
-                "times: %dms (decoding) + %dms (rendering)\n"
-                "memory: %dkB (%d%% active coefficients)\n",
-                color?"color":"gray",
-                iw->get_width(), iw->get_height(), dtime, rtime, 
-                (iw->get_memory_usage()+512)/1024, iw->get_percent_memory());
+      {
+        GUTF8String kind = DjVuMessage::LookUpUTF8( color ? ERR_MSG("color.color") : ERR_MSG("color.gray") );
+        DjVuFormatError( "%s\t%s\t%d\t%d\t%d\t%d\t%d\t%d", 
+                         ERR_MSG("d44.summary"),
+                         (const char *)kind,
+                         iw->get_width(), iw->get_height(), dtime, rtime, 
+                         (iw->get_memory_usage()+512)/1024, iw->get_percent_memory());
+      }
       if (flag_addsuffix)
         pnmurl = pnmurl + (color?".ppm":".pgm");
 #ifndef UNDER_CE

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.cpp,v 1.77 2001-05-02 22:32:43 bcr Exp $
+// $Id: ByteStream.cpp,v 1.78 2001-05-10 23:09:36 fcrary Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 04/1997
@@ -41,6 +41,7 @@
 #include "ByteStream.h"
 #include "GOS.h"
 #include "GURL.h"
+#include "DjVuMessage.h"
 
 #ifdef UNIX
 #include <sys/types.h>
@@ -1290,6 +1291,43 @@ DjVuPrintMessage(const char *fmt, ... )
     const GUTF8String message(fmt,args);
     strout->writestring(message);
   }
+}
+
+void
+DjVuWriteError( const char *message )
+{
+  static GP<ByteStream> errout=ByteStream::create(2,0,false);
+  if(errout)
+  {
+    const GUTF8String external = DjVuMessage::LookUpUTF8( message );
+    errout->writestring(external);
+  }
+}
+
+void
+DjVuWriteMessage( const char *message )
+{
+  static GP<ByteStream> strout=ByteStream::create(1,0,false);
+  if(strout)
+  {
+    const GUTF8String external = DjVuMessage::LookUpUTF8( message );
+    strout->writestring(external);
+  }
+}
+
+/** Looks up the message and writes it to the specified stream. */
+void ByteStream::formatmessage( const char *fmt, ... )
+{
+  va_list args;
+  va_start(args, fmt);
+  const GUTF8String message(fmt,args);
+  writemessage( message );
+}
+
+/** Looks up the message and writes it to the specified stream. */
+void ByteStream::writemessage( const char *message )
+{
+  writestring( DjVuMessage::LookUpUTF8( message ) );
 }
 
 static void 

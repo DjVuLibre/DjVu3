@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessage.cpp,v 1.49 2001-05-09 00:38:26 bcr Exp $
+// $Id: DjVuMessage.cpp,v 1.50 2001-05-10 23:09:36 fcrary Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -1067,3 +1067,12 @@ DjVuMessage_LookUp(
     strcpy( msg_buffer, converted );
 }
 
+
+void
+DjVuFormatError( const char *fmt, ... )
+{
+  va_list args;
+  va_start(args, fmt); 
+  const GUTF8String message(fmt,args);
+  DjVuWriteError( message );
+}

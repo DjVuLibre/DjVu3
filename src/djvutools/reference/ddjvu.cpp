@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ddjvu.cpp,v 1.20 2001-05-09 00:38:26 bcr Exp $
+// $Id: ddjvu.cpp,v 1.21 2001-05-10 23:09:35 fcrary Exp $
 // $Name:  $
 
 /** @name ddjvu
@@ -111,7 +111,7 @@
     Yann Le Cun <yann@research.att.com>\\
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: ddjvu.cpp,v 1.20 2001-05-09 00:38:26 bcr Exp $# */
+    #$Id: ddjvu.cpp,v 1.21 2001-05-10 23:09:35 fcrary Exp $# */
 //@{
 //@}
 
@@ -169,8 +169,8 @@ convert(const GURL &from, const GURL &to, int page_num)
   // Verbose
   if (flag_verbose)
     {
-      DjVuPrintError("%s", (const char*)dimg->get_long_description());
-      DjVuPrintError("Decoding time:    %lu ms\n", stop - start);
+      DjVuPrintError( (const char*)dimg->get_long_description() );
+      DjVuFormatError( "%s\t%lu", ERR_MSG("ddjvu.decode"), stop - start);
     }
 
   // Check
@@ -181,13 +181,13 @@ convert(const GURL &from, const GURL &to, int page_num)
   if (flag_verbose)
     {
       if (compoundp)
-        DjVuPrintError("%s","This is a legal Compound DjVu image\n");
+        DjVuWriteError( ERR_MSG("ddjvu.compound") );
       else if (colorp)
-        DjVuPrintError("%s","This is a legal Photo DjVu image\n");
+        DjVuWriteError( ERR_MSG("ddjvu.photo") );
       else if (blackp)
-        DjVuPrintError("%s","This is a legal Bilevel DjVu image\n");
+        DjVuWriteError( ERR_MSG("ddjvu.bilevel") );
       // Without included files
-      DjVuPrintError("Direct memory usage is %4.1f Kb\n", 
+      DjVuFormatError( "%s\t%4.1f", ERR_MSG("ddjvu.memory"), 
               (double)(dimg->get_djvu_file()->get_memory_usage())/1024 );
     }    
   if (!compoundp && !colorp && !blackp)
@@ -237,7 +237,7 @@ convert(const GURL &from, const GURL &to, int page_num)
   stop = GOS::ticks();
   if (flag_verbose)
     {
-      DjVuPrintError("Rendering time:   %lu ms\n", stop - start);
+      DjVuFormatError( "%d\t%lu", ERR_MSG("ddjvu.render"), stop - start);
     }
 
   // Save image
