@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuDecodeAPI.h,v 1.16 2000-01-24 22:19:10 bcr Exp $
+ *C- $Id: DjVuDecodeAPI.h,v 1.17 2000-01-26 04:40:46 bcr Exp $
  */
 
 #ifndef _DJVUDECODE_H_
@@ -49,25 +49,6 @@ extern "C"
 /* Predeclarations. */
  
 struct djvu_parse;
-
-typedef enum djvuio_type_enum
-{
-  DjVuIO_NONE=0,
-  DjVuIO_PNM,
-  DjVuIO_PPM,
-  DjVuIO_PGM,
-  DjVuIO_PBM,
-  DjVuIO_BMP,
-  DjVuIO_PICT,
-  DjVuIO_PS,
-  DjVuIO_PDF,
-  DjVuIO_TIFF,
-  DjVuIO_LIBTIFF,
-  DjVuIO_JPEG,
-  DjVuIO_GIF,
-  DjVuIO_DJVU,
-  DjVuIO_UNKNOWN
-} djvuio_type;
 
 typedef enum djvu_layer_type_enum
 {

@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuAPI.h,v 1.26 2000-01-24 22:19:10 bcr Exp $
+ *C- $Id: DjVuAPI.h,v 1.27 2000-01-26 04:40:46 bcr Exp $
  *
  * The main header file for the DjVu API
  */
@@ -17,7 +17,10 @@
 
 /* 
  * $Log: DjVuAPI.h,v $
- * Revision 1.26  2000-01-24 22:19:10  bcr
+ * Revision 1.27  2000-01-26 04:40:46  bcr
+ * Began splitting PhotoToDjVu.
+ *
+ * Revision 1.26  2000/01/24 22:19:10  bcr
  * Completely replaced the libddjvu with libdjvudecode.
  *
  * Revision 1.25  2000/01/23 22:01:34  bcr
@@ -90,9 +93,28 @@ typedef djvuio_struct* djvu_export;
  * save a file to disk.  However, as you will see, it is possible to use
  * any type of device, not just a disk with this functions.
  * 
- * This stream allows at least limited support for all of the following
- * formats defined in DjVuDecodeAPI as #djvu_io_type#.
+ * All of the following are legal values for the magic functions:
  */
+
+typedef enum djvuio_type_enum
+{
+  DjVuIO_NONE=0,
+  DjVuIO_PNM,
+  DjVuIO_PPM,
+  DjVuIO_PGM,
+  DjVuIO_PBM,
+  DjVuIO_BMP,
+  DjVuIO_PICT,
+  DjVuIO_PS,
+  DjVuIO_PDF,
+  DjVuIO_TIFF,
+  DjVuIO_LIBTIFF,
+  DjVuIO_JPEG,
+  DjVuIO_GIF,
+  DjVuIO_DJVU,
+  DjVuIO_UNKNOWN
+} djvuio_type;
+
 
 /* --- Open commands ---
  */

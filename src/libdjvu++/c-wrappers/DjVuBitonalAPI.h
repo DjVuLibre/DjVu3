@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuBitonalAPI.h,v 1.5 2000-01-25 21:06:44 bcr Exp $
+ *C- $Id: DjVuBitonalAPI.h,v 1.6 2000-01-26 04:40:46 bcr Exp $
  */
 
 #ifndef _DJVUBITONAL_H_
@@ -90,15 +90,15 @@ inline djvu_jb2_options_struct();
 
 typedef struct bitonaltodjvu_options_struct
 {
-/** The #djvu_process_options struct@ defines the pages to be parsed,
-  input, and output, and contains the pointer for storing errors. */
+  /** The #djvu_process_options struct@ defines the pages to be parsed,
+    input, and output, and contains the pointer for storing errors. */
   djvu_process_options process;
 
-/** These are the transformation options.  These will take place before
+  /** These are the transformation options.  These will take place before
     compression. */
   djvu_transform_options transform;
 
-/** These are the compression options. */
+  /// These are the compression options.
   djvu_jb2_options jb2;
 
 #ifdef __cplusplus
