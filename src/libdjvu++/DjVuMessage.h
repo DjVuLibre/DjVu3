@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessage.h,v 1.26 2001-06-13 18:26:19 bcr Exp $
+// $Id: DjVuMessage.h,v 1.27 2001-06-28 19:05:47 fcrary Exp $
 // $Name:  $
 
 
@@ -73,7 +73,7 @@ public:
   static GUTF8String LookUpUTF8( const GUTF8String & MessageList )
   { use_language();return DjVuMessageLite::LookUpUTF8(MessageList); }
 
-  /** Same as Lookup, but returns the a multibyte character string in the
+  /** Same as Lookup, but returns a multibyte character string in the
       current locale. */
   static GNativeString LookUpNative( const GUTF8String & MessageList )
   { use_language();return DjVuMessageLite::LookUpNative(MessageList); }
@@ -85,10 +85,6 @@ public:
   static GList<GURL> GetProfilePaths(void);
 };
 
-// There is only object of class DjVuMessage in a program, and here it
-// is (the actual object is in DjVuMessage.cpp).
-//
-// #define DjVuMsg DjVuMessage::create()
 
 #endif /* __DJVU_MESSAGE_H__ */
 
