@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.33 1999-09-03 23:55:22 leonb Exp $
+//C- $Id: DjVuFile.cpp,v 1.34 1999-09-03 23:57:51 leonb Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -152,9 +152,10 @@ DjVuFile::~DjVuFile(void)
 {
    DEBUG_MSG("DjVuFile::~DjVuFile(): destroying...\n");
    DEBUG_MAKE_INDENT(3);
-   trigger_lock.lock();
-   data_pool->del_trigger(static_trigger_cb, this);
-   trigger_lock.unlock();
+   {
+     GCriticalSectionLock lock(&trigger_lock);
+     data_pool->del_trigger(static_trigger_cb, this);
+   }
    stop_decode(1);
 }
 
