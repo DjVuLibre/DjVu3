@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuImage.cpp,v 1.55 2001-03-27 22:04:19 praveen Exp $
+// $Id: DjVuImage.cpp,v 1.56 2001-03-29 18:50:06 praveen Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -232,7 +232,6 @@ int
 DjVuImage::get_width() const
 {
    GP<DjVuInfo> info=get_info();
-   //return info ? info->width : 0;
    if( info )
    {
        return rotate_count&1 ? info->height: info->width;
@@ -244,12 +243,25 @@ int
 DjVuImage::get_height() const
 {
    GP<DjVuInfo> info=get_info();
-   //return info ? info->height : 0;
    if( info )
    {
        return rotate_count&1 ? info->width: info->height;
    }
    return 0;
+}
+
+int
+DjVuImage::get_real_width() const
+{
+   GP<DjVuInfo> info=get_info();
+   return info ? info->width : 0;
+}
+
+int
+DjVuImage::get_real_height() const
+{
+   GP<DjVuInfo> info=get_info();
+   return info ? info->height : 0;
 }
 
 int
@@ -594,9 +606,8 @@ DjVuImage::get_bitmap(const GRect &rect,
                       int subsample, int align) const
 {
   // Access image size
-  GP<DjVuInfo> info = get_info();
-  int width = info?info->width:0;//get_width();
-  int height = info?info->height:0;//get_height();
+  int width = get_real_width();
+  int height = get_real_height();
   GP<JB2Image> fgjb = get_fgjb();
   if ( width && height && fgjb && 
        (fgjb->get_width() == width) && 
@@ -615,8 +626,8 @@ DjVuImage::get_bg_pixmap(const GRect &rect,
   // Access image size
   
   GP<DjVuInfo> info = get_info();
-  int width = info?info->width:0;//get_width();
-  int height = info?info->height:0;//get_height();
+  int width = get_real_width();
+  int height = get_real_height();
 
 
   if (width<=0 || height<=0 || !info) return 0;
@@ -757,8 +768,8 @@ DjVuImage::stencil(GPixmap *pm, const GRect &rect,
   // Access components
   
   GP<DjVuInfo> info = get_info();
-  int width = info?info->width:0;//get_width();
-  int height = info?info->height:0;//get_height();
+  int width = get_real_width();
+  int height = get_real_height();
 
 
   if (width<=0 || height<=0 || !info) return 0;
@@ -982,9 +993,8 @@ DjVuImage::get_fg_pixmap(const GRect &rect,
   // Obtain white background pixmap
   GP<GPixmap> pm;
   // Access components
-  GP<DjVuInfo> info = get_info();
-  const int width = info?info->width:0;//get_width();
-  const int height = info?info->height:0;//get_height();
+  const int width = get_real_width();
+  const int height = get_real_height();
   if (width && height)
   {
     pm = GPixmap::create(rect.height(),rect.width(), &GPixel::WHITE);
@@ -1049,9 +1059,8 @@ do_bitmap(const DjVuImage &dimg, BImager get,
     G_THROW("DjVuImage.bad_rect");
   // Check for integral reduction
   int red;
-  GP<DjVuInfo> info = dimg.get_info();
-  int w = info?info->width:0;//dimg.get_width();
-  int h = info?info->height:0;//dimg.get_height();
+  int w = dimg.get_real_width();
+  int h = dimg.get_real_height();
 
   int rw = all.width();
   int rh = all.height();
@@ -1129,12 +1138,9 @@ do_pixmap(const DjVuImage &dimg, PImager get,
     G_THROW("DjVuImage.bad_rect2");
   // Check for integral reduction
   int red, w=0, h=0, rw=0, rh=0;
-  /*w = dimg.get_width();
-  h = dimg.get_height();*/
-  GP<DjVuInfo> info = dimg.get_info();
-  w = info?info->width:0;
-  h = info?info->height:0;
-  ///////////////////////////
+  w = dimg.get_real_width();
+  h = dimg.get_real_height();
+  
 
   rw = all.width();
   rh = all.height();
@@ -1219,19 +1225,13 @@ DjVuImage::get_decoded_anno()
     if( bs )
     {
         djvuanno->decode(bs);
-        GP<DjVuInfo> info=get_info();
         
-        if( rotate_count % 4 && info)
+        if( rotate_count % 4 )
         {   
             ///map hyperlinks correctly for rotation           
             GRect input, output;
-
-            if( rotate_count & 1 )
-                input = GRect(0,0,info->height, info->width);
-            else
-                input = GRect(0,0,info->width, info->height);
-
-            output = GRect(0,0, info->width, info->height);
+            input = GRect(0,0,get_width(), get_height());
+            output = GRect(0,0,  get_real_width(), get_real_height());
 
             GRectMapper mapper;
             mapper.clear();
@@ -1262,15 +1262,10 @@ void
 DjVuImage::map(GRect &rect) const
 {
     GRect input, output;
-    GP<DjVuInfo> info=get_info();
-    if( info && rotate_count%4)
+    if(rotate_count%4)
     {  
-        if( rotate_count & 1 )
-            input = GRect(0,0,info->height, info->width);
-        else
-            input = GRect(0,0,info->width, info->height);
-
-        output = GRect(0,0, info->width, info->height);
+        input = GRect(0,0,get_width(), get_height());
+        output = GRect(0,0, get_real_width(), get_real_height());
 
         GRectMapper mapper;
         mapper.clear();
@@ -1285,15 +1280,10 @@ void
 DjVuImage::unmap(GRect &rect) const
 {
     GRect input, output;
-    GP<DjVuInfo> info=get_info();
-    if( info && rotate_count%4)
+    if(rotate_count%4)
     {  
-        if( rotate_count & 1 )
-            input = GRect(0,0,info->height, info->width);
-        else
-            input = GRect(0,0,info->width, info->height);
-
-        output = GRect(0,0, info->width, info->height);
+        input = GRect(0,0,get_width(), get_height());
+        output = GRect(0,0, get_real_width(), get_real_height());
 
         GRectMapper mapper;
         mapper.clear();
@@ -1308,15 +1298,10 @@ void
 DjVuImage::map(int &x, int &y) const
 {
     GRect input, output;
-    GP<DjVuInfo> info=get_info();
-    if( info && rotate_count%4)
+    if(rotate_count%4)
     {  
-        if( rotate_count & 1 )
-            input = GRect(0,0,info->height, info->width);
-        else
-            input = GRect(0,0,info->width, info->height);
-
-        output = GRect(0,0, info->width, info->height);
+        input = GRect(0,0,get_width(), get_height());
+        output = GRect(0,0, get_real_width(), get_real_height());
 
         GRectMapper mapper;
         mapper.clear();
@@ -1331,15 +1316,10 @@ void
 DjVuImage::unmap(int &x, int &y) const
 {
     GRect input, output;
-    GP<DjVuInfo> info=get_info();
-    if( info && rotate_count%4)
+    if(rotate_count%4)
     {  
-        if( rotate_count & 1 )
-            input = GRect(0,0,info->height, info->width);
-        else
-            input = GRect(0,0,info->width, info->height);
-
-        output = GRect(0,0, info->width, info->height);
+        input = GRect(0,0,get_width(), get_height());
+        output = GRect(0,0, get_real_width(), get_real_height());
 
         GRectMapper mapper;
         mapper.clear();

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GRect.h,v 1.23 2001-01-04 22:04:55 bcr Exp $
+// $Id: GRect.h,v 1.24 2001-03-29 18:50:06 praveen Exp $
 // $Name:  $
 
 #ifndef _GRECT_H_
@@ -51,7 +51,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GRect.h,v 1.23 2001-01-04 22:04:55 bcr Exp $# */
+    #$Id: GRect.h,v 1.24 2001-03-29 18:50:06 praveen Exp $# */
 //@{
 
 #include "DjVuGlobal.h"
@@ -179,8 +179,12 @@ public:
   void clear();
   /** Sets the input rectangle. */
   void set_input(const GRect &rect);
+  /** Returns the input rectangle. */
+  GRect get_input();
   /** Sets the output rectangle. */
   void set_output(const GRect &rect);
+  /** Returns the output rectangle. */
+  GRect get_output();
   /** Composes the affine transform with a rotation of #count# quarter turns
       counter-clockwise.  This operation essentially is a modification of the
       match between the corners of the input rectangle and the corners of the

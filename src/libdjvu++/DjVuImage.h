@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuImage.h,v 1.38 2001-03-27 20:15:30 praveen Exp $
+// $Id: DjVuImage.h,v 1.39 2001-03-29 18:50:06 praveen Exp $
 // $Name:  $
 
 #ifndef _DJVUIMAGE_H
@@ -73,7 +73,7 @@
     L\'eon Bottou <leonb@research.att.com> - initial implementation
     Andrei Erofeev <eaf@geocities.com> - multipage support
     @version
-    #$Id: DjVuImage.h,v 1.38 2001-03-27 20:15:30 praveen Exp $# */
+    #$Id: DjVuImage.h,v 1.39 2001-03-29 18:50:06 praveen Exp $# */
 //@{
 
 
@@ -196,12 +196,22 @@ public:
   //@{
   /** Returns the width of the DjVu image. This function just extracts this
       information from the DjVu information component. It returns zero if such
-      a component is not yet available. */
+      a component is not yet available. This gives rotated width if there is any
+      rotation of image. If you need real width, use #get_real_width()#.*/
   int get_width() const;
   /** Returns the height of the DjVu image. This function just extracts this
       information from the DjVu information component. It returns zero if such
-      a component is not yet available. */
+      a component is not yet available. This gives rotated height if there is any
+      rotation of image. If you need real width, use #get_real_height()#.*/
   int get_height() const;
+  /** Returns the width of the DjVu image. This function just extracts this
+      information from the DjVu information component. It returns zero if such
+      a component is not yet available.*/
+  int get_real_width() const;
+  /** Returns the height of the DjVu image. This function just extracts this
+      information from the DjVu information component. It returns zero if such
+      a component is not yet available.*/
+  int get_real_height() const;
   /** Returns the format version the DjVu data. This function just extracts
       this information from the DjVu information component. It returns zero if
       such a component is not yet available.  This version number should
@@ -278,7 +288,8 @@ public:
       defined by rectangle #all#.  The relation between this rectangle and the
       image size define the appropriate scaling.  The rendering function then
       extract the subrectangle #rect# and return the corresponding pixels as a
-      #GPixmap# or #GBitmap# object.  The actual implementation performs these
+      #GPixmap# or #GBitmap# object.  The #all# and #rect# should take the any
+      rotation in to effect, The actual implementation performs these
       two operation simultaneously for obvious efficiency reasons.  The best
       rendering speed is achieved by making sure that the size of rectangle
       #all# and the size of the DjVu image are related by an integer ratio. */
@@ -338,6 +349,8 @@ public:
   /** unmaps the given #x#, #y# from unrotated document co-ordinates to rotated  
       co-ordinates*/
   void unmap(int &x, int &y) const;
+
+
 
   //@}
 

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GRect.cpp,v 1.20 2001-01-04 22:04:55 bcr Exp $
+// $Id: GRect.cpp,v 1.21 2001-03-29 18:50:06 praveen Exp $
 // $Name:  $
 
 // -- Implementation of class GRect and GRectMapper
@@ -284,7 +284,7 @@ GRectMapper::rotate(int count)
       break;
     }
   if ((oldcode ^ code) & SWAPXY)
-    {
+    { 
       iswap(rectFrom.xmin, rectFrom.ymin);
       iswap(rectFrom.xmax, rectFrom.ymax);
       rw = rh = GRatio();
@@ -373,3 +373,16 @@ GRectMapper::unmap(GRect &rect)
   if (rect.ymin >= rect.ymax)
     iswap(rect.ymin, rect.ymax);
 }
+
+GRect 
+GRectMapper::get_input()
+{
+    return rectFrom;
+}
+
+GRect 
+GRectMapper::get_output()
+{
+    return rectTo;
+}
+
