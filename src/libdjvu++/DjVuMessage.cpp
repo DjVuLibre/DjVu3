@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessage.cpp,v 1.55 2001-06-05 15:12:23 bcr Exp $
+// $Id: DjVuMessage.cpp,v 1.56 2001-06-05 23:02:37 fcrary Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -494,7 +494,6 @@ parse(GMap<GUTF8String,GP<lt_XMLTags> > &retval)
 }
 
 
-//  There is only object of class DjVuMessage in a program, and here it is:
 const DjVuMessageLite &
 DjVuMessage::create_full(void)
 {

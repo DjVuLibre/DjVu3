@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: parseoptions.cpp,v 1.84 2001-06-05 15:54:56 fcrary Exp $
+// $Id: parseoptions.cpp,v 1.85 2001-06-05 23:02:38 fcrary Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -151,7 +151,7 @@ djvu_parse_arguments(
   struct djvu_parse opts,
   const int argc,
   char const * const *argv,
-  const struct djvu_option lopts[] )
+  const struct djvu_option *lopts )
 {
   DArray<GUTF8String> dargv(argc+1);
   for(int i=0;i<argc;++i)
