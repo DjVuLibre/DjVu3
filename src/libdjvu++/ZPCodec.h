@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: ZPCodec.h,v 1.11 1999-03-17 19:24:59 leonb Exp $
+//C- $Id: ZPCodec.h,v 1.12 1999-03-17 19:28:07 leonb Exp $
 
 
 #ifndef _ZPCODEC_H
@@ -111,7 +111,7 @@
     bits and context variables fast enough.
 
     {\bf History} --- The ZP-Coder is similar in function and performance to
-    the Q-Coder (Pennebaker, Mitchell, Langdon, Arps, IBM J. Res Dev. 32,
+    the seminal Q-Coder (Pennebaker, Mitchell, Langdon, Arps, IBM J. Res Dev. 32,
     1988). An improved version of the Q-Coder, named QM-Coder, has been
     described in certain parts of the JPEG standard.  Unfortunate patent
     policies have made these coders very difficult to use in general purpose
@@ -132,7 +132,7 @@
     @memo
     Binary adaptive quasi-arithmetic coder.
     @version
-    #$Id: ZPCodec.h,v 1.11 1999-03-17 19:24:59 leonb Exp $#
+    #$Id: ZPCodec.h,v 1.12 1999-03-17 19:28:07 leonb Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> */
 //@{
