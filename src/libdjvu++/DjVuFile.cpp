@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.60 1999-09-23 22:19:50 eaf Exp $
+//C- $Id: DjVuFile.cpp,v 1.61 1999-09-24 18:46:34 leonb Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -746,7 +746,6 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
       desc.format("IW44 foreground colors (%dx%d)", fg44.get_width(), fg44.get_height());
     } 
 
-
   // BGjp (background JPEG)
 
   else if (chkid == "BGjp" && (djvu || djvi))
@@ -765,6 +764,24 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
       desc.format("JPEG foreground colors (Unimplemented)");
     } 
   
+  // BG2k (background JPEG-2000) Note: JPEG2K bitstream not finalized.
+
+  else if (chkid == "BG2k" && (djvu || djvi))
+    {
+      if (bg44)
+        THROW("DjVu Decoder: Corrupted data (Duplicate background layer)");
+      desc.format("JPEG-2000 background (Unimplemented)");
+    } 
+
+  // FG2k (foreground JPEG-2000) Note: JPEG2K bitstream not finalized.
+  
+  else if (chkid == "FG2k" && (djvu || djvi))
+    {
+      if (fgpm)
+        THROW("DjVu Decoder: Corrupted data (Duplicate foreground layer)");
+      desc.format("JPEG-2000 foreground colors (Unimplemented)");
+    } 
+
   // BM44/PM44 (IW44 data)
 
   else if ((chkid == "PM44" || chkid=="BM44") && iw44)
