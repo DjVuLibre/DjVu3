@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: djvuinfo.cpp,v 1.7 1999-03-17 19:24:59 leonb Exp $
+//C- $Id: djvuinfo.cpp,v 1.8 1999-05-26 16:09:53 eaf Exp $
 
 
 
@@ -26,7 +26,9 @@
     ``EA IFF 85'' file.  Each line represent contains a chunk ID followed by the
     chunk size.  Additional information about the chunk is provided when
     program #djvuinfo.cpp# recognizes the chunk name and knows how to summarize
-    the chunk data.  Lines are indented in order to reflect the hierarchical
+    the chunk data. In addition, when it recognizes that the file is a DjVu
+    multipage document (an archive of pages), it prints page names too.
+    Lines are indented in order to reflect the hierarchical
     structure of the IFF files.
 
     {\bf Example}
@@ -35,6 +37,8 @@
     graham1.djvu:
       FORM:DJVU [32553] 
         INFO [5]            2325x3156, version 20, 300 dpi, gamma 2.2
+	ANTa [34]	    Page annotation
+	INCL [11]	    Indirection chunk (document.dir)
         Sjbz [17692]        JB2 data, no header
         BG44 [2570]         #1 - 74 slices - v1.2 (color) - 775x1052
         FG44 [1035]         #1 - 100 slices - v1.2 (color) - 194x263
@@ -53,20 +57,24 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: djvuinfo.cpp,v 1.7 1999-03-17 19:24:59 leonb Exp $# */
+    #$Id: djvuinfo.cpp,v 1.8 1999-05-26 16:09:53 eaf Exp $# */
 //@{
 //@}
 
 #include <stdio.h>
+#include <ctype.h>
 #include "GException.h"
 #include "GString.h"
 #include "ByteStream.h"
 #include "IFFByteStream.h"
 #include "DjVuImage.h"
+#include "DjVmDir0.h"
 #include "ATTLicense.h"
 
 
 // ---------- ROUTINES FOR SUMMARIZING CHUNK DATA
+
+static GP<DjVmDir0> dir0;
 
 void
 display_djvu_info(IFFByteStream &iff, const GString &head, size_t size)
@@ -118,6 +126,60 @@ display_iw4_info(IFFByteStream &iff, const GString &head, size_t size)
     }
 }
 
+void
+display_dir0_info(IFFByteStream & iff, const GString &, size_t)
+{
+   dir0=new DjVmDir0();
+   dir0->decode(iff);
+   printf("Document directory (%d files)", dir0->get_files_num());
+}
+
+void
+display_djvi_info(IFFByteStream & iff, const GString &, size_t)
+{
+   if (dir0)
+   {
+      long offset=iff.tell()-12;
+      int files=dir0->get_files_num();
+      for(int i=0;i<files;i++)
+      {
+	 GP<DjVmDir0::FileRec> file=dir0->get_file(i);
+	 if (file->offset==offset)
+	 {
+	    printf("Directory name: \"%s\"", (const char *) file->name);
+	    break;
+	 }
+      }
+   }
+}
+
+void
+display_ndir_info(IFFByteStream &, const GString &, size_t)
+{
+   printf("Navigation directory");
+}
+
+void
+display_incl_info(IFFByteStream & iff, const GString &, size_t)
+{
+   GString name;
+   char ch;
+   while(iff.read(&ch, 1))
+      if (!isspace(ch))
+      {
+	 name+=ch;
+	 break;
+      }
+   while(iff.read(&ch, 1) && ch!='\n') name+=ch;
+   
+   printf("Indirection chunk (%s)", (const char *) name);
+}
+
+void
+display_anta_info(IFFByteStream &, const GString &, size_t)
+{
+   printf("Page annotation");
+}
 
 struct displaysubr
 {
@@ -132,6 +194,14 @@ disproutines[] =
   { "DJVU.BG44", display_iw4_info },
   { "BM44.BM44", display_iw4_info },
   { "PM44.PM44", display_iw4_info },
+  { "DJVM.DIR0", display_dir0_info },
+  { "FORM:DJVI", display_djvi_info },
+  { "FORM:DJVU", display_djvi_info },
+  { "FORM:PM44", display_djvi_info },
+  { "FORM:BM44", display_djvi_info },
+  { "NDIR", display_ndir_info },
+  { "INCL", display_incl_info },
+  { "ANTa", display_anta_info },
   { 0, 0 },
 };
 
@@ -151,20 +221,19 @@ display_chunks(IFFByteStream &iff, const GString &head)
       msg.format("%s%s [%d] ", (const char *)head, (const char *)id, size);
       printf("%s", (const char *)msg);
       // Test chunk type
-      int ok = 1;
       iff.full_id(fullid);
       for (int i=0; disproutines[i].id; i++)
-        if (fullid == disproutines[i].id)
+        if (fullid == disproutines[i].id || id == disproutines[i].id)
           {
             int n = msg.length();
-            while (n++ < 30) putchar(' ');
+	    while (n++ < 26) putchar(' ');
+	    if (!iff.composite()) printf("    ");
             (*disproutines[i].subr)(iff, head2, size);
-            ok = 0;
             break;
           }
       // Default display of composite chunk
       printf("\n");
-      if (ok && iff.composite())
+      if (iff.composite())
         display_chunks(iff, head2);
       // Terminate
       iff.close_chunk();
