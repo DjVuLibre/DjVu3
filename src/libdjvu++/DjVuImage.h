@@ -1,13 +1,27 @@
 //C-  -*- C++ -*-
 //C-
-//C-  Copyright (c) 1998 AT&T	
-//C-  All Rights Reserved 
+//C- This software contains software code or other information proprietary to
+//C- AT&T Corp. ("AT&T").  Unless you accept a license to use this software,
+//C- you shall not use, execute, compile, modify, redistribute, reverse
+//C- compile, disassemble, or otherwise reverse engineer the AT&T software or
+//C- any derived work of the AT&T software.  The text of a license can be
+//C- found in file "ATTLICENSE" or at the Internet website having the URL
+//C- "http://www.djvu.att.com/open".
+//C
+//C- This software is provided to you "AS IS".  YOU ASSUME TOTAL
+//C- RESPONSIBILITY AND RISK FOR USE OF THE AT&T SOFTWARE.  AT&T DOES NOT
+//C- MAKE, AND EXPRESSLY DISCLAIMS, ANY EXPRESS OR IMPLIED WARRANTIES OF ANY
+//C- KIND WHATSOEVER, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+//C- MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE, WARRANTIES OF TITLE
+//C- OR NON-INFRINGEMENT OF ANY INTELLECTUAL PROPERTY RIGHTS, ANY WARRANTIES
+//C- ARISING BY USAGE OF TRADE, COURSE OF DEALING OR COURSE OF PERFORMANCE, OR
+//C- ANY WARRANTY THAT THE AT&T SOFTWARE IS ERROR FREE OR WILL MEET YOUR
+//C- REQUIREMENTS.
 //C-
-//C-  THIS IS UNPUBLISHED PROPRIETARY SOURCE CODE OF AT&T
-//C-  The copyright notice above does not evidence any
-//C-  actual or intended publication of such source code.
+//C-     (C) AT&T Corp. All rights reserved.
+//C-     AT&T is a registered trademark of AT&T Corp.
 //C-
-//C-  $Id: DjVuImage.h,v 1.8 1999-03-02 16:17:12 leonb Exp $
+//C- $Id: DjVuImage.h,v 1.9 1999-03-15 18:28:50 leonb Exp $
 
 #ifndef _DJVUIMAGE_H
 #define _DJVUIMAGE_H
@@ -58,7 +72,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: DjVuImage.h,v 1.8 1999-03-02 16:17:12 leonb Exp $# */
+    #$Id: DjVuImage.h,v 1.9 1999-03-15 18:28:50 leonb Exp $# */
 //@{
 
 
