@@ -7,272 +7,287 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuDecodeAPI.h,v 1.15 2000-01-23 03:16:39 bcr Exp $
+ *C- $Id: DjVuDecodeAPI.h,v 1.16 2000-01-24 22:19:10 bcr Exp $
  */
 
-#ifndef _DJVU_DECODE_API_H
-#define _DJVU_DECODE_API_H
+#ifndef _DJVUDECODE_H_
+#define _DJVUDECODE_H_
 
-/* 
- * $Log: DjVuDecodeAPI.h,v $
- * Revision 1.15  2000-01-23 03:16:39  bcr
- * Cleaned up the header files a bit more.  Eventually we'll reach something
- * that is understandable.
- *
- * Revision 1.14  2000/01/22 07:10:14  bcr
- * Fixed serious bug in djvutobitonal, with all output being bogus.  Fixed the
- * page ranges in PhotoToDjVu and DjVuToPhoto.  Updated comments.
- *
- * Revision 1.13  2000/01/21 02:47:51  bcr
- *
- * I forgot the RGB test as part of the isNative() test.
- *
- * Revision 1.12  2000/01/18 19:53:31  praveen
- * updated
- *
- * Revision 1.11  2000/01/17 07:34:15  bcr
- * Added GBitmap and GPixmap support to the libimage library.  There
- * is definitely some sort of heap corruption in libdjvu++, but I still
- * haven't found it.  Even something simple like set_grays() causing
- * problems.
- *
- * Revision 1.10  2000/01/16 13:13:54  bcr
- * Added a get_info() option to the Stream class.
- *
- * I found the orientation flags is ignored by most unix programs, so the
- * tiff images are now  oriented manually.
- *
- */
+#ifndef DJVUAPI
 
-/** This file contains the definitions needed to decode images,
-    and to manipulate the decoded images, and functions to export
-    the decoding images to files.
+#ifndef DJVU_STATIC_LIBRARY
+#ifdef WIN32 
+#define DLLIMPORT __declspec(dllimport)
+#define DLLEXPORT __declspec(dllexport)
+#else
+#define DLLIMPORT /**/
+#define DLLEXPORT /**/
+#endif
+#else /* DJVU_STATIC_LIBRARY */
+#define DLLIMPORT /**/
+#define DLLEXPORT /**/
+#endif /* DJVU_STATIC_LIBRARY */
+
+#ifdef BUILD_LIB
+#define DJVUAPI DLLEXPORT
+#else
+#define DJVUAPI DLLIMPORT
+#endif  /*BUILD_LIB*/
+
+#endif /*DJVUAPI*/
+
+
+/** @name djvudecode.h
+      Functions used to decode multiple page DjVu documents...
 */
-#include "DjVu.h"
-#include <stdlib.h>
 
 #ifdef __cplusplus
-extern "C" {
-#endif
-
-
-/* This is a BIG mess that still needs to be cleaned up!!! 
- */
-typedef enum
-  {DECODE_MASK, DECODE_FOREGROUND, DECODE_BACKGROUND, DECODE_ALL} Layer;
-typedef enum{PNM, BMP, PS, MTIFF, JPEG} OUTFORMAT;
-enum{percent=100};
-
-#ifndef _DJVU_IMAGE_
-#define _DJVU_IMAGE_
-struct djvu_image_struct;
-typedef struct djvu_image_struct djvu_image;
-#endif
-
-typedef struct
+extern "C"
 {
-   struct djvu_option* long_options;
-   int page;
-   unsigned char mode, subsample, vflip, hflip, togray, verbose;
-   char *profile, *resize, *segment;
-   unsigned int angle, jpeg_quality;
-   char *inFile, *outFile;
-   int optind;
-   djvu_image * ximg;
-   unsigned int Xsize,Xsubsample,Xupsample;
-   unsigned int Ysize,Ysubsample,Yupsample;
-   unsigned int xsiz, ysiz;
-   int xmin, ymin, seg_w, seg_h;
-   void *priv;
+#endif /* __cplusplus */
+
+/* Predeclarations. */
+ 
+struct djvu_parse;
+
+typedef enum djvuio_type_enum
+{
+  DjVuIO_NONE=0,
+  DjVuIO_PNM,
+  DjVuIO_PPM,
+  DjVuIO_PGM,
+  DjVuIO_PBM,
+  DjVuIO_BMP,
+  DjVuIO_PICT,
+  DjVuIO_PS,
+  DjVuIO_PDF,
+  DjVuIO_TIFF,
+  DjVuIO_LIBTIFF,
+  DjVuIO_JPEG,
+  DjVuIO_GIF,
+  DjVuIO_DJVU,
+  DjVuIO_UNKNOWN
+} djvuio_type;
+
+typedef enum djvu_layer_type_enum
+{
+  DJVU_ALL,
+  DJVU_MASK,
+  DJVU_FOREGROUND,
+  DJVU_BACKGROUND
+} djvu_layer_type;
+
+/*@{*/
+
+/** @name djvu_transform_options struct
+      
+    @memo Options that effect the processing of images.
+*/
+
+typedef struct djvu_transform_options_struct
+{
+  /** The #hflip# transform reverses left-right orientation.  This 
+    results in mirror imaged documents.  Set #hflip# to non-zero
+    to perform this transformation.  */
+  int hflip;
+  /** The #vflip# transform flips the image upside down.  This is
+    logically equivalent to a 180 degree rotation and then an hflip.
+    Set #vflip# to a non-zero value to perform this transformation. */
+  int vflip;
+  /** The #rotate# transform rotates an image to the nearest 90 degree
+    multiple of the angle specified.  For example, a value of 46 would
+    result in a 90 degree rotation clockwise. */
+  int rotateAngle;
+  /** The #togray# option will reduce color images to gray scale.  Set
+     #togray# to a non-zero value to perform this conversion. */
+  int togray;
+  /** The #tobitonal# option will reduce gray images to bitonal (RLE) images.
+     To convert color documents to bitonal, use the #togray# above as well
+     as the #tobitonal# option.  Set #tobitonal# to a non-zero value to
+     perform this conversion. */
+  int tobitonal;
+  /** The #invert# option exchanges black with white and white with black
+     in a bitonal (RLE) image.  There will be no effect on color and gray
+     scale documents unless the #togray# and #tobitonal# flags have also
+     been used respectively.  Set #invert# to a non-zero value to perform
+     this conversion. */
+  int invert;
+  /** Specify the absolute size desired.  0,0 has the special meaning of 
+     being unresized. */
+  int hsize,vsize;
+  /// The amount to upsample the horizontal axis.
+  int hupsample;
+  /// The amount to subsample the horizontal axis.
+  int hsubsample;
+  /// The amount to upsample the vertical axis.
+  int vupsample;
+  /// The amount to subsample the vertical axis.
+  int vsubsample;
+  /** The values xmin, ymin, seg_width, and seg_height, allow cropping
+      (segmentation) of the image. */
+  int xmin, ymin, seg_width, seg_height;
+  /** The #dpi# option will override the dpi value specified in the file.
+     The image itself is left unmodified, but the rendering and compression
+     will be effected.  To use the #dpi# information in the image, then
+     set this value to 0. */
+  int dpi;
+#ifdef __cplusplus
+  inline djvu_transform_options_struct();
+#endif /* __cplusplus */
+} djvu_transform_options;
+
+/*@}*/
+
+/*@{*/
+
+/** @name djvu_process_options struct
+      
+     @memo Options used in deciding page range, output devices, etc.
+*/
+
+typedef struct djvu_process_options_struct
+{
+  /// This keeps a string delimited by hypens(-) and commas(,)
+  const char *page_range;
+
+  /** warnfileno should be non-zero to print warning messages that may
+    effect the processing.  If this is zero, then warnings will be
+    spooled like error messages.  This will likely make the output less
+    intuitive, since unlike errors, processing continues even after a 
+    warning is issued. */
+  int warnfileno;
+
+  /// logfileno should be non-zero to print verbose processing details
+  int logfileno;
+
+  /// #helpfileno# should be non-zero to print usage instructions.
+  int helpfileno;
+
+  /// list of input filenames being the last
+  const char * const * filelist;
+
+  /// Number of files in filelist
+  int filecount;
+
+  /// The output filename (or directory)
+  const char *output;
+
+  /// The program name
+  const char *prog;
+
+  /// This is where all memory is allocated and errors are listed.
+  void *priv;
+
+#ifdef __cplusplus
+  inline djvu_process_options_struct();
+#endif /* __cplusplus */
+} djvu_process_options;
+
+/*@}*/
+
+/*@{*/
+
+/** @name djvu_decode_options struct
+      
+     @memo Options used in djvu_decode function 
+*/
+
+typedef struct djvu_decode_options_struct
+{
+  /** The #djvu_process_options struct# defines the pages to be parsed,
+     input, and output, and contains the pointer for storing errors. */
+  djvu_process_options process;
+
+  /** These are the transformation options.  These will take place after
+    rendering. */
+  djvu_transform_options transform;
+
+  /** #output_format# is string, that indicates the output format, specified
+    by the normal file extension of "pnm","ppm","pgm","pbm","tif","jpg",
+    "ps", or "pict".  The special value of "auto" or a NULL pointer means to 
+    try and decide the output format based on the output file's extension. */
+  const char *output_format;
+
+  /** This specifies the layer to decode.
+    Pages without the specified layer will be skipped. */
+  djvu_layer_type layer;
+
+#ifdef __cplusplus
+  inline djvu_decode_options_struct();
+#endif /* __cplusplus */
+
 } djvu_decode_options;
 
 
-/*
-    All the djvutoxxxx_decode_options_alloc() functions take a pointer to
-    DjVuPaseOptions object(passed as a void pointer), argc and argv as
-    arguments. If there is no existing DjVuParseOptions Object, pass null
-    value as the 1st argument, in which case the functions create one
-    DjVuParseOptions object from the input argc and argv and read the
-    options
-
-*/
+/** @name djvu_decode_options_alloc function 
+    This is the primary allocation routine for the
+    #djvu_decode_options struct#.  Even if the values specified are
+    illegal, an options structure will always be returned. */
 DJVUAPI
-djvu_decode_options* djvutopnm_decode_options_alloc(void *opts, int argc, char *argv[]);
+djvu_decode_options *
+djvu_decode_options_alloc(struct djvu_parse *,int,const char * const argv[]);
+
+/** @name djvu_decode_options_free function
+    Deallocates the fields of the #djvu_decode_options struct#.
+    You should always use the free option, even if you did not use alloc
+    so the data pointed to by priv is deallocated. */
 DJVUAPI
-djvu_decode_options* djvutopgm_decode_options_alloc(void *opts, int argc, char *argv[]);
+void djvu_decode_options_free(djvu_decode_options *);
+
+/** @name djvu_decode function 
+    This function converts the source multipage DjVu document to
+    a document image according to options structure. */
 DJVUAPI
-djvu_decode_options* djvutopbm_decode_options_alloc(void *opts, int argc, char *argv[]);
+int djvu_decode(djvu_decode_options[1]);
+
+/** A non-zero value indicates there are error messages.  Error
+    messages are generated for both fatal errors, and errors
+    that are recovered from.  */
 DJVUAPI
-djvu_decode_options* djvutops_decode_options_alloc(void *opts, int argc, char *argv[]);
+int djvu_decode_haserror(const djvu_decode_options [1]);
+
+/** A non-zero value indicates there are warning messages.  Warning
+    messages are generated from non-fatal errors, and sometimes just
+    abnormal, but correct usage. */
 DJVUAPI
-djvu_decode_options* djvutobmp_decode_options_alloc(void *opts, int argc, char *argv[]);
+int djvu_decode_haswarning(const djvu_decode_options [1]);
+
+/** Returns a string of the first error message on the stack.  Each
+    call erases the previous return value. */
 DJVUAPI
-djvu_decode_options* djvutotiff_decode_options_alloc(void *opts, int argc, char *argv[]);
+const char * djvu_decode_error(djvu_decode_options [1]);
+
+/** Returns a string of the first warning message on the stack.  Each
+    call erases the previous return value. */
 DJVUAPI
-djvu_decode_options* djvutojpeg_decode_options_alloc(void *opts, int argc, char *argv[]);
+const char * djvu_decode_warning(djvu_decode_options [1]);
 
-/*
-    All the djvu_decode_to_xxxx() functions take the decoder object as an
-    input argument and perform the necessary conversions and output the
-    image in respective formats.
-    
-    One should call djvu_decode_options_free() function to delete the
-    decoder object, passing a pointer to decoder object as input argument.
-    (i.e., pointer to djvu_decode_options object.)
-*/
+/// Prints all the errors to stderr.
 DJVUAPI
-void djvu_decode_to_pnm(djvu_decode_options *d_obj);
+void djvu_decode_perror(djvu_decode_options [1],const char *mesg);
+
+/// This will print usage instructions to the specified output.
 DJVUAPI
-void djvu_decode_to_pgm(djvu_decode_options *d_obj);
-DJVUAPI
-void djvu_decode_to_pbm(djvu_decode_options *d_obj);
-DJVUAPI
-void djvu_decode_to_bmp(djvu_decode_options *d_obj);
-DJVUAPI
-void djvu_decode_to_jpeg(djvu_decode_options *d_obj);
-DJVUAPI
-void djvu_decode_to_tiff(djvu_decode_options *d_obj);
-DJVUAPI
-void djvu_decode_to_ps(djvu_decode_options *d_obj);
+void djvu_decode_usage(int fd,const char *prog);
 
-/* 
-   Following are the C wrapper functions to the member functions of
-   the DjVuDecoder class. All these wrapper functions, except djvu_decode_options_alloc
-   take the pointer to decoder object as an input argument 
-*/
-
-/* Creates and returns a decoder object */
-DJVUAPI
-djvu_decode_options* djvu_decode_options_alloc();
-
-/* Sets the long options pointer to one of 'all_options',
-   'non_jpeg_options', 'pgm_options' or 'pbm_options'
- */
-DJVUAPI void
-djvu_decode_set_long_options(
-  djvu_decode_options *d_obj, struct djvu_option *long_opts);
-
-/* Reads the command line options as per the long_options */
-DJVUAPI void
-djvu_decode_read_options(
-  djvu_decode_options *d_obj, void *opts, int argc, char *argv[]);
-
-/* Decodes and then renders the DjVu image by taking the pointer to decoder
-   object and page number to decode as input arguments
- */
-DJVUAPI djvu_image *
-djvu_decode_and_render(djvu_decode_options *d_obj, int page_num);
-
-/* Transforms the  decoded image  */
-DJVUAPI djvu_image *
-djvu_decode_do_transform(djvu_decode_options *d_obj);
-
-/* Writes the final image to a file in the requested format */
-DJVUAPI void
-djvu_decode_write_image(
-  djvu_decode_options *d_obj, djvu_image *ximg, OUTFORMAT fmt);
-
-/* Frees the decoder object */
-DJVUAPI void
-djvu_decode_options_free(djvu_decode_options* d_obj);
-
-/*
-   This function sets the segment and full rectangles. The full rectangle
-   is the rectangle into which the djvu image is decoded to and segment
-   rectanlge is the rectangle which is a portion of the full rect. The final
-   output image will have dimensions as that of segment rectangle. 'xmin' and
-   'ymin' represent the bottom left corner of the rectangle and w, h represet
-   the 'width' and 'height' of the rectangle. 'xmin' and 'ymin' for the full
-   rectangle should always be zero. Otherwise exception will be thrown.
-*/
-DJVUAPI void
-djvu_decode_set_rectangles(
-  djvu_decode_options *d_obj,int seg_xmin,int seg_ymin,int seg_w,int seg_h,
-  int all_xmin, int all_ymin, int all_w, int all_h);
-
-
-/*
-   Sets the VFLIP option for vertical flip to ON if the 
-   input argument 'vf' is non-zero else sets it to OFF.
-*/
-DJVUAPI void
-djvu_decode_set_vflip(djvu_decode_options *d_obj, char vf);
-
-/*
-   Sets the HFLIP option for horizontal flip to ON if the 
-   input argument 'hf' is non-zero else sets it to OFF.
-*/
-DJVUAPI void
-djvu_decode_set_hflip(djvu_decode_options *d_obj, char hf);
-
-/* 
-   Sets the GRAY option for color to gray image converion to ON if
-   the input argument 'gray' is non-zero else sets it to OFF.
-*/
-DJVUAPI void
-djvu_decode_set_gray(djvu_decode_options *d_obj, char gray);
-
-/*
-   Sets the angle of rotation to 'ang'. The output image will
-   be oriented at an angle of 'ang' with respect to the original
-   image. The input angles must be multiples of 90.
-*/
-DJVUAPI void
-djvu_decode_set_angle(djvu_decode_options *d_obj, int ang);
-
-/*
-   Sets the 'input djvu file' to 'inf'. This facilitates the
-   the use of same decoder object with same command line options
-   to decode various djvu images.
-*/
-DJVUAPI void
-djvu_decode_change_infile(djvu_decode_options *d_obj, char *inf);
-
-/* Sets the 'output file' to 'outf'. */
-DJVUAPI void
-djvu_decode_change_outfile(djvu_decode_options *d_obj, char *outf);
-
-/* Returns the current input file name */
-DJVUAPI char*
-djvu_decode_get_infile(djvu_decode_options *d_obj);
-
-/* Returns the current output file name */
-DJVUAPI char*
-djvu_decode_get_outfile(djvu_decode_options *d_obj);
-
-/*
-   Sets the layer of the input djvu image to be decoded
-   to one of DECODE_MASK for black & white mask layer,
-   DECODE_FOREGROUND for foreground layer and DECODE_BACKGROUND
-   to background layer.
-*/
-DJVUAPI void
-djvu_decode_set_layer(djvu_decode_options *d_obj, Layer l);
-
-/*
-   Returns a non-zero value if any errors occur during decoding
-   and writing the output to the specified format.
-*/
-DJVUAPI int
-djvu_decode_has_error(djvu_decode_options *d_obj);
-
-/*
-   Returns the recent error from the list of errors and
-   deletes it from the list of errors.
-*/
-DJVUAPI const char*
-djvu_decode_error(djvu_decode_options *d_obj);
-
-/*
-   Prints all the errors in the list to stderr.
-*/
-DJVUAPI void
-djvu_decode_perror(djvu_decode_options *d_obj);
-
-
+/*@}*/
 
 #ifdef __cplusplus
-};
-#endif
+}
 
-#endif /* _DJVU_DECODEAPI_H */
+inline djvu_transform_options_struct::djvu_transform_options_struct() :
+  hflip(0), vflip(0), rotateAngle(0), togray(0), tobitonal(0),
+  invert(0), hsize(0), vsize(0), hupsample(1), hsubsample(1), vupsample(1),
+  vsubsample(1), xmin(0), ymin(0), seg_width(0), seg_height(0), dpi(0) {}
+
+inline djvu_process_options_struct::djvu_process_options_struct() :
+  page_range(0), warnfileno(0), logfileno(0), helpfileno(0), filelist(0),
+  filecount(0), output(0), prog(0), priv(0) {}
+
+inline djvu_decode_options_struct::djvu_decode_options_struct() :
+  process(), transform(), output_format(0), layer(DJVU_ALL) {}
+
+#endif /* __cplusplus */
+
+#endif /* _DJVUDECODE_H_ */
+

@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuPhotoAPI.h,v 1.7 2000-01-23 20:29:17 bcr Exp $
+ *C- $Id: DjVuPhotoAPI.h,v 1.8 2000-01-24 22:19:10 bcr Exp $
  */
 
 #ifndef _DJVUPHOTO_H_
@@ -47,14 +47,6 @@ extern "C"
 {
 #endif
 
-#ifdef DOCXX_CODE
-//@{
-#endif /*DOCXX_CODE*/
-
-/** @name phototodjvu_options struct
-    @memo Options used in phototodjvu function 
-*/
-
 enum phototodjvu_type_enum
 {
   djvu_crcbnone,
@@ -65,37 +57,16 @@ enum phototodjvu_type_enum
 };
 typedef enum phototodjvu_type_enum phototodjvu_type;
 
-struct phototodjvu_options_struct
+typedef struct djvu_iw44_options_struct
 {
-/** This keeps a string delimited by hypens(-) and commas(,) */
-  const char *page_range;
+/** This is the gamma factor used for correcting the image lighting.
+    If you don't know what this is just leave it as 2.2, the default.
+*/
+  float gamma;
 
 /** These decides which predefined set of options to use. They are
   enum values, defined above. */
   phototodjvu_type compression;
-
-/** This is the gamma factor used for correcting the image lighting.
-  If you don't know what this is just leave it as 2.2, the default. */
-  float gamma;
-
-/** Boolian values specified whether a vflip, hflip, should be done.
-  vflip means to flip on the vertical axis, and hflip the horizontal
-  axis., and invert means to reverse black and white. */
-  int vflip, hflip;
-
-/** Specify the angle the input image should be rotated.  This may be any
-    multiple of 90 degrees.  Rotation is clockwise and takes place after
-    any vflip or hflip commands. */
-  int rotateAngle;
-
-/** logfile should be non-NULL to print verbose processing details */
-  int logfileno;
-
-/** helpfile should be non-NULL to print usage instructions */
-  int helpfileno;
-
-/** dpi should the resolution in dots per inch of input images. */
-  int dpi;
 
 /** Slice target.  Data generation for the current chunk stops if the total
     number of slices (in this chunk and all the previous chunks) reaches
@@ -125,9 +96,51 @@ struct phototodjvu_options_struct
   int nchunks;
 
 /** pages_per_dict allows n number of pages to be matched together.
-  This value should never be too high or too low. Best value  can
-  be between 10 to 20*/
+    This value should never be too high or too low. Best value  can
+    be between 10 to 20 */
   int crcbdelay;
+
+#ifdef __cplusplus
+inline djvu_iw44_options_struct();
+#endif /* __cplusplus */
+
+} djvu_iw44_options;
+
+
+/*@{*/
+
+/** @name phototodjvu_options struct
+    @memo Options used in phototodjvu function 
+*/
+
+typedef struct phototodjvu_options_struct
+{
+/** This keeps a string delimited by hypens(-) and commas(,) */
+  const char *page_range;
+
+/** These options are the options that control the quality and speed
+    of compression.
+ */
+  djvu_iw44_options iw44;
+
+/** Boolian values specified whether a vflip, hflip, should be done.
+    vflip means to flip on the vertical axis, and hflip the horizontal
+    axis., and invert means to reverse black and white. */
+  int vflip, hflip;
+
+/** Specify the angle the input image should be rotated.  This may be any
+    multiple of 90 degrees.  Rotation is clockwise and takes place after
+    any vflip or hflip commands. */
+  int rotateAngle;
+
+/** logfile should be non-NULL to print verbose processing details */
+  int logfileno;
+
+/** helpfile should be non-NULL to print usage instructions */
+  int helpfileno;
+
+/** dpi should the resolution in dots per inch of input images. */
+  int dpi;
 
 /** list of input filenames being the last. */
   const char * const * filelist;
@@ -143,8 +156,12 @@ struct phototodjvu_options_struct
 
 /** This is where all memory is allocated and errors are listed. */
   void *priv;
-};
-typedef struct phototodjvu_options_struct phototodjvu_options;
+
+#ifdef __cplusplus
+inline phototodjvu_options_struct();
+#endif /* __cplusplus */
+
+} phototodjvu_options;
 
 struct djvu_parse;
 
@@ -193,21 +210,17 @@ void phototodjvu_perror(phototodjvu_options [1],const char *mesg);
 DJVUAPI
 void phototodjvu_usage(int fd,const char *prog);
 
-#ifdef DOCXX_CODE
-//@}
-#endif /*DOCXX_CODE*/
+/*@}*/ 
 
 
-#ifdef DOCXX_CODE
-//@{
-#endif /*DOCXX_CODE*/
+/*@{*/
 
 /** @name djvutophoto_options struct
       
      @memo Options used in djvutophoto function 
 */
 
-struct djvutophoto_options_struct
+typedef struct djvutophoto_options_struct
 {
 /** This keeps a string delimited by hypens(-) and commas(,) */
   const char *page_range;
@@ -246,8 +259,12 @@ struct djvutophoto_options_struct
 
 /** This is where all memory is allocated and errors are listed. */
   void *priv;
-};
-typedef struct djvutophoto_options_struct djvutophoto_options;
+
+#ifdef __cplusplus
+inline djvutophoto_options_struct();
+#endif /* __cplusplus */
+
+} djvutophoto_options;
 
 struct djvu_parse;
 
@@ -291,13 +308,25 @@ void djvutophoto_perror(djvutophoto_options [1],const char *mesg);
 DJVUAPI
 void djvutophoto_usage(int fd,const char *prog);
 
-#ifdef DOCXX_CODE
-//@}
-#endif /*DOCXX_CODE*/
+/*@}*/
 
 #ifdef __cplusplus
 }
+
+inline djvu_iw44_options_struct::djvu_iw44_options_struct() :
+  gamma((float)2.2), compression(djvu_crcbnormal), slices(0),
+  bytes(0), decibels(0), nchunks(0), crcbdelay(10) {}
+
+inline phototodjvu_options_struct::phototodjvu_options_struct() :
+  page_range(0), iw44(), vflip(0), hflip(0), rotateAngle(0),
+  logfileno(0), helpfileno(0), dpi(0), filelist(0), filecount(0),
+  output(0), prog(0), priv(0) {}
+
+inline djvutophoto_options_struct::djvutophoto_options_struct() :
+  page_range(0), togray(0), vflip(0), hflip(0), rotateAngle(0),
+  logfileno(0), helpfileno(0), filelist(0), filecount(0),
+  output(0), prog(0), priv(0) {}
+
 #endif
 
 #endif /* _DJVUPHOTO_H_ */
-

@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuAPI.h,v 1.25 2000-01-23 22:01:34 bcr Exp $
+ *C- $Id: DjVuAPI.h,v 1.26 2000-01-24 22:19:10 bcr Exp $
  *
  * The main header file for the DjVu API
  */
@@ -17,7 +17,10 @@
 
 /* 
  * $Log: DjVuAPI.h,v $
- * Revision 1.25  2000-01-23 22:01:34  bcr
+ * Revision 1.26  2000-01-24 22:19:10  bcr
+ * Completely replaced the libddjvu with libdjvudecode.
+ *
+ * Revision 1.25  2000/01/23 22:01:34  bcr
  * Add djvu_import_buffer().
  *
  * Revision 1.24  2000/01/23 03:16:39  bcr
@@ -88,27 +91,8 @@ typedef djvuio_struct* djvu_export;
  * any type of device, not just a disk with this functions.
  * 
  * This stream allows at least limited support for all of the following
- * formats.
+ * formats defined in DjVuDecodeAPI as #djvu_io_type#.
  */
-
-typedef enum djvuio_type_enum
-{
-  DjVuIO_NONE=0,
-  DjVuIO_PNM,
-  DjVuIO_PPM,
-  DjVuIO_PGM,
-  DjVuIO_PBM,
-  DjVuIO_BMP,
-  DjVuIO_PICT,
-  DjVuIO_PS,
-  DjVuIO_PDF,
-  DjVuIO_TIFF,
-  DjVuIO_LIBTIFF,
-  DjVuIO_JPEG,
-  DjVuIO_GIF,
-  DjVuIO_DJVU,
-  DjVuIO_UNKNOWN
-} djvuio_type;
 
 /* --- Open commands ---
  */
@@ -610,67 +594,67 @@ djvu_image_get_row(
   unsigned char *stopptr[1]);
 
 /** This routine allocates memory for the specified image.
-    An error is indicated by a NULL return.  No message is
-    returned.
+  An error is indicated by a NULL return.  No message is
+  returned.
  */
 DJVUAPI djvu_image *
 djvu_image_allocate(unsigned int cols,unsigned int rows,size_t datasize);
 
-/**  This routine converts the image to bottom up orientation for
-    color and gray images, top down for RLE data.  The alpha channel,
-    and all other padding bits are removed.  When possible, the image
-    is reallocated to the amount of memory actually used.  The
-    application program should free the image in the event of an error.
+/** This routine converts the image to bottom up orientation for
+  color and gray images, top down for RLE data.  The alpha channel,
+  and all other padding bits are removed.  When possible, the image
+  is reallocated to the amount of memory actually used.  The
+  application program should free the image in the event of an error.
  */
 DJVUAPI djvu_image *
 djvu_image_native(djvu_image *ximg,char *ebuf,size_t ebuf_size);
   
 /** This routine copies the image to bottom up orientation for
-    color and gray images, top down for RLE data.  The alpha channel,
-    and all other padding bits are removed.  The copy is a DEEP copy,
-    meaning all image data will be duplicated.  Any errors will be
-    indicated with a NULL return value, and a message written into
-    the user supplied buffer (ebuf).
+  color and gray images, top down for RLE data.  The alpha channel,
+  and all other padding bits are removed.  The copy is a DEEP copy,
+  meaning all image data will be duplicated.  Any errors will be
+  indicated with a NULL return value, and a message written into
+  the user supplied buffer (ebuf).
  */
 DJVUAPI djvu_image *
 djvu_image_copy_native(const djvu_image *ximg,char *ebuf,size_t ebuf_size);
 
 /** This converts images to gray scale.   An error is indicated by returning
-    a NULL value and writting a message into the user supplied buffer (ebuf). 
-    The application program should free the image in the event of an error.
+  a NULL value and writting a message into the user supplied buffer (ebuf). 
+  The application program should free the image in the event of an error.
  */
 DJVUAPI djvu_image *
 djvu_image_gray(djvu_image *ximg,char *ebuf,size_t ebuf_size);
 
 /** This copies an image in gray scale.  This will be a DEEP copy, meaning
-    all image data will be duplicated.  An error will be indicated by a
-    NULL return value and writting a message into the user supplied 
-    buffer (ebuf).
+  all image data will be duplicated.  An error will be indicated by a
+  NULL return value and writting a message into the user supplied 
+  buffer (ebuf).
  */
 DJVUAPI djvu_image *
 djvu_image_copy_gray(const djvu_image *ximg,char *ebuf,size_t ebuf_size);
 
 /** This run length encodes an image.  This means the image is converted
-    to bitonal black and white by comparing each pixel to the specified
-    threshold, with values below the threshold becoming black and above
-    white.  The pixels are then encoded by storing the number of
-    consecutive pixels of the same color, instead of bit mapping each
-    pixel.  An error is indicated by returning a NULL value and writting
-    a message into the user supplied buffer (ebuf).  The application
-    program should free the image in the event of an error.
+  to bitonal black and white by comparing each pixel to the specified
+  threshold, with values below the threshold becoming black and above
+  white.  The pixels are then encoded by storing the number of
+  consecutive pixels of the same color, instead of bit mapping each
+  pixel.  An error is indicated by returning a NULL value and writting
+  a message into the user supplied buffer (ebuf).  The application
+  program should free the image in the event of an error.
  */
 DJVUAPI djvu_image*
 djvu_image_rle(
   djvu_image *ximg,const int threshold,char *ebuf,size_t ebuf_size);
 
 /** This run length encodes a copy of the image image.  This means the
-    image is converted to bitonal black and white by comparing each pixel
-    to the specified threshold, with values below the threshold becoming
-    black and above white.  The pixels are then encoded by storing the
-    number of consecutive pixels of the same color, instead of bit mapping
-    each pixel.  This will be DEEP copy, meaning all image data is duplicated.
-    An error is indicated by returning a NULL value and writting a message
-    into the user supplied buffer (ebuf). 
+  image is converted to bitonal black and white by comparing each pixel
+  to the specified threshold, with values below the threshold becoming
+  black and above white.  The pixels are then encoded by storing the
+  number of consecutive pixels of the same color, instead of bit mapping
+  each pixel.  This will be DEEP copy, meaning all image data is duplicated.
+  An error is indicated by returning a NULL value and writting a message
+  into the user supplied buffer (ebuf). 
  */
 DJVUAPI djvu_image*
 djvu_image_copy_rle(
@@ -678,8 +662,8 @@ djvu_image_copy_rle(
   char *ebuf,size_t ebuf_size);
 
 /** This makes a copy of the image, resized to at the specified width and
-    height.  The application program should free the image in the event of
-    an error.
+  height.  The application program should free the image in the event of
+  an error.
  */
 DJVUAPI djvu_image *
 djvu_image_copy_resize(
@@ -687,9 +671,9 @@ djvu_image_copy_resize(
   char *ebuf,size_t ebuf_size);
 
 /** This resizes the image to the specified width and height.  This will be
-    DEEP copy, meaning all image data is duplicated.  An error is indicated
-    by returning a NULL value and writting a message into the user supplied
-    buffer (ebuf). 
+  DEEP copy, meaning all image data is duplicated.  An error is indicated
+  by returning a NULL value and writting a message into the user supplied
+  buffer (ebuf). 
  */
 DJVUAPI djvu_image *
 djvu_image_resize(
@@ -697,11 +681,11 @@ djvu_image_resize(
   char *ebuf,size_t ebuf_size);
 
 /** This makes a copy of the image headers, with the flags changed to
-    the specified rotation.  The copy will be SHALLOW, meaning the
-    new image structure still referes to the data in the original
-    image, and the original image can not be deallocaed while the copy
-    is still in use.  If a DEEP copy is desired, use any of the above
-    transforms, such as djvu_image_copy_native().
+  the specified rotation.  The copy will be SHALLOW, meaning the
+  new image structure still referes to the data in the original
+  image, and the original image can not be deallocaed while the copy
+  is still in use.  If a DEEP copy is desired, use any of the above
+  transforms, such as djvu_image_copy_native().
  */
 DJVUAPI void
 djvu_image_const_rotate(
@@ -714,11 +698,11 @@ DJVUAPI void
 djvu_image_rotate(djvu_image *ximg,int angle);
 
 /** This makes a copy of the image headers, with the flags changed to
-    the specified crop size.  The copy will be SHALLOW, meaning the
-    new image structure still referes to the data in the original
-    image, and the original image can not be deallocaed while the copy
-    is still in use.  If a DEEP copy is desired, use any of the above
-    transforms, such as djvu_image_copy_native().
+  the specified crop size.  The copy will be SHALLOW, meaning the
+  new image structure still referes to the data in the original
+  image, and the original image can not be deallocaed while the copy
+  is still in use.  If a DEEP copy is desired, use any of the above
+  transforms, such as djvu_image_copy_native().
  */
 DJVUAPI void
 djvu_image_const_crop(
@@ -726,7 +710,7 @@ djvu_image_const_crop(
   const unsigned width,const unsigned int height);
 
 /** This changes the flags to indicate a crop.  It is exactly the same
-    as DJVU_IMAGE_CROP(ximg,x0,y0,width,height)
+  as DJVU_IMAGE_CROP(ximg,x0,y0,width,height)
  */
 DJVUAPI void
 djvu_image_crop(
@@ -734,11 +718,11 @@ djvu_image_crop(
   const unsigned width,const unsigned int height);
 
 /** This makes a copy of the image headers, with the flags changed to
-    indicate a vflip operation.  The copy will be SHALLOW, meaning the
-    new image structure still referes to the data in the original
-    image, and the original image can not be deallocaed while the copy
-    is still in use.  If a DEEP copy is desired, use any of the above
-    transforms, such as djvu_image_copy_native().
+  indicate a vflip operation.  The copy will be SHALLOW, meaning the
+  new image structure still referes to the data in the original
+  image, and the original image can not be deallocaed while the copy
+  is still in use.  If a DEEP copy is desired, use any of the above
+  transforms, such as djvu_image_copy_native().
  */
 DJVUAPI void 
 djvu_image_const_vflip(const djvu_image in_img[1], djvu_image out_img[1]);
@@ -750,17 +734,17 @@ DJVUAPI void
 djvu_image_vflip(djvu_image *ximg);
 
 /** This makes a copy of the image headers, with the flags changed to
-    indicate a hflip operation.  The copy will be SHALLOW, meaning the
-    new image structure still referes to the data in the original
-    image, and the original image can not be deallocaed while the copy
-    is still in use.  If a DEEP copy is desired, use any of the above
-    transforms, such as djvu_image_copy_native().
+  indicate a hflip operation.  The copy will be SHALLOW, meaning the
+  new image structure still referes to the data in the original
+  image, and the original image can not be deallocaed while the copy
+  is still in use.  If a DEEP copy is desired, use any of the above
+  transforms, such as djvu_image_copy_native().
  */
 DJVUAPI void 
 djvu_image_const_hflip(const djvu_image in_img[1], djvu_image out_img[1]);
 
 /** This changes the flags to indicate a vflip.  It is exactly the same
-    as DJVU_IMAGE_HFLIP(ximg)
+  as DJVU_IMAGE_HFLIP(ximg)
  */
 DJVUAPI void
 djvu_image_hflip(djvu_image *ximg);

@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuBitonalAPI.h,v 1.3 2000-01-23 06:06:58 bcr Exp $
+ *C- $Id: DjVuBitonalAPI.h,v 1.4 2000-01-24 22:19:10 bcr Exp $
  */
 
 #ifndef _DJVUBITONAL_H_
@@ -52,6 +52,56 @@ extern "C"
 struct djvu_parse;
 
 
+/*@{*/
+
+/** @name djvu_transform_options struct
+      
+    @memo Options that effect the processing of images.
+*/
+
+typedef struct djvu_transform_options_struct
+{
+  /** The #hflip# transform reverses left-right orientation.  This 
+    results in mirror imaged documents.  Set #hflip# to non-zero
+    to perform this transformation.  */
+  int hflip;
+  /** The #vflip# transform flips the image upside down.  This is
+    logically equivalent to a 180 degree rotation and then an hflip.
+    Set #vflip# to a non-zero value to perform this transformation. */
+  int vflip;
+  /** The #rotate# transform rotates an image to the nearest 90 degree
+    multiple of the angle specified.  For example, a value of 46 would
+    result in a 90 degree rotation clockwise. */
+  int rotateAngle;
+  /** The #togray# option will reduce color images to gray scale.  Set
+     #togray# to a non-zero value to perform this conversion. */
+  int togray;
+  /** The #tobitonal# option will reduce gray images to bitonal (RLE) images.
+     To convert color documents to bitonal, use the #togray# above as well
+     as the #tobitonal# option.  Set #tobitonal# to a non-zero value to
+     perform this conversion. */
+  int tobitonal;
+  /** The #invert# option exchanges black with white and white with black
+     in a bitonal (RLE) image.  There will be no effect on color and gray
+     scale documents unless the #togray# and #tobitonal# flags have also
+     been used respectively.  Set #invert# to a non-zero value to perform
+     this conversion. */
+  int invert;
+  /** The #dpi# option will override the dpi value specified in the file.
+     The image itself is left unmodified, but the rendering and compression
+     will be effected.  To use the #dpi# information in the image, then
+     set this value to 0. */
+  int dpi;
+#ifdef __cplusplus
+  inline djvu_transform_options_struct();
+#endif /* __cplusplus */
+} djvu_transform_options;
+
+/*@}*/
+
+
+
+
 struct bitonaltodjvu_options_struct;
 typedef struct bitonaltodjvu_options_struct bitonaltodjvu_options;
 
@@ -76,7 +126,7 @@ typedef enum bitonaltodjvu_type_enum
       
     @memo Options to fine tune compression quality and speed.
 */
-struct djvu_jb2_options_struct
+typedef struct djvu_jb2_options_struct
 {
 /** pages_per_dict allows n number of pages to be matched together.
     This value should never be too high or too low. Best values are
@@ -109,10 +159,9 @@ struct djvu_jb2_options_struct
 inline djvu_jb2_options_struct();
 #endif /* __cplusplus */
 
-};
+} djvu_jb2_options;
 
 /*@}*/
-
 
 /*@{*/
 
@@ -120,18 +169,17 @@ inline djvu_jb2_options_struct();
     @memo Options used in bitonaltodjvu function 
 */
 
-struct bitonaltodjvu_options_struct
+typedef struct bitonaltodjvu_options_struct
 {
 /** This keeps a string delimited by hypens(-) and commas(,) */
   const char *page_range;
 
-/** These are the compression options */
+/** These are the compression options. */
   djvu_jb2_options jb2;
 
-/** They allow transformations to be done on the given input images. 
-  vflip is verticle flip, hflip is horizontal flip, invert gives the
-  negative of the image and rotateAngle will rotate image clockwise */
-  int vflip, hflip, invert, rotateAngle;
+/** These are the transformation options.  These will take place before
+    compression. */
+  djvu_transform_options transform;
 
 /** warnfileno should be set to a fileno which is greater than zero to
     print warning messages to the fileno specified.  (Warnings are errors
@@ -147,9 +195,6 @@ struct bitonaltodjvu_options_struct
 /** helpfileno should be set to a fileno which is greater than zero to
     print warning messages to the fileno specified. */
   int helpfileno;
-
-/** dpi should the resolution in dots per inch of input images. */
-  int dpi;
 
 /** list of input filenames being the last. */
   const char * const * filelist;
@@ -167,12 +212,10 @@ struct bitonaltodjvu_options_struct
   void *priv;
 
 #ifdef __cplusplus
-  inline bitonaltodjvu_options_struct::bitonaltodjvu_options_struct();
+  inline bitonaltodjvu_options_struct();
 #endif /* __cplusplus */
 
-};
-
-struct djvu_parse;
+} bitonaltodjvu_options;
 
 /** @name bitonaltodjvu_options_alloc function 
     This is the primary allocation routine for bitonaltodjvu_options.
@@ -228,10 +271,14 @@ void bitonaltodjvu_usage(int fd,const char *prog);
      @memo Options used in djvutobitonal function 
 */
 
-struct djvutobitonal_options_struct
+typedef struct djvutobitonal_options_struct
 {
 /** This keeps a string delimited by hypens(-) and commas(,) */
   const char *page_range;
+
+/** These are the transformation options.  These will take place after
+    rendering. */
+  djvu_transform_options transform;
 
 /** This option should be non-zero, if we want to force the application
     to avoid color images */
@@ -262,9 +309,9 @@ struct djvutobitonal_options_struct
   void *priv;
 
 #ifdef __cplusplus
-  inline djvutobitonal_options_struct::djvutobitonal_options_struct();
+  inline djvutobitonal_options_struct();
 #endif /* __cplusplus */
-};
+} djvutobitonal_options;
 
 
 /** @name djvutobitonal_options_alloc function 
@@ -312,18 +359,21 @@ void djvutobitonal_usage(int fd,const char *prog);
 #ifdef __cplusplus
 }
 
+inline djvu_transform_options_struct::djvu_transform_options_struct() :
+  hflip(0), vflip(0), rotateAngle(0), togray(0), tobitonal(0),
+  invert(0), dpi(0) {}
+
 inline djvu_jb2_options_struct::djvu_jb2_options_struct() :
   pages_per_dict(10), compression(djvu_normal), halftone_off(0),
   tolerance_percent(-1), tolerance4_size(-1) {}
 
 inline bitonaltodjvu_options_struct::bitonaltodjvu_options_struct() :
-  page_range(0), jb2(), vflip(0), hflip(0), invert(0),
-  rotateAngle(0), warnfileno(0), logfileno(0), helpfileno(0), filelist(0),
-  filecount(0), output(0), prog(0), priv(0) {}
+  page_range(0), jb2(), transform(), warnfileno(0), logfileno(0),
+  helpfileno(0), filelist(0), filecount(0), output(0), prog(0), priv(0) {}
 
 inline djvutobitonal_options_struct::djvutobitonal_options_struct() :
-  page_range(0), disable_mask(0), warnfileno(0), logfileno(0), helpfileno(0),
-  filelist(0), filecount(0), output(0), prog(0), priv(0) {}
+  page_range(0), transform(), disable_mask(0), warnfileno(0), logfileno(0),
+  helpfileno(0), filelist(0), filecount(0), output(0), prog(0), priv(0) {}
 
 #endif
 
