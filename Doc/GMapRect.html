@@ -5,7 +5,7 @@
 </HEAD>
 <BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
 
-<H2>class  <A HREF="#DOC.DOCU">GMapRect</A>: public <!1><A HREF="GMapArea.html#DOC.1.4.25.1.16">GMapArea</A></H2>
+<H2>class  <A HREF="#DOC.DOCU">GMapRect</A>: public <!1><A HREF="GMapArea.html">GMapArea</A></H2>
 <BLOCKQUOTE>Implements rectangular map areas.</BLOCKQUOTE>
 <HR>
 
@@ -22,26 +22,38 @@
 <DL>
 <P><DL>
 <DT><H3>Public Methods</H3><DD><DT>
-<A HREF="#DOC.1.4.25.2.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_width</B>(void) const 
+<A HREF="#DOC.1.4.27.2.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GMapRect.html">GMapRect</A>&gt;  <B>create</B>(void)
+<DD><I>Default creator.</I>
+<DT>
+<A HREF="#DOC.1.4.27.2.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GMapRect.html">GMapRect</A>&gt;  <B>create</B>(const <!1><A HREF="GRect.html">GRect</A> &amp;rect)
+<DD><I>Create with the specified GRect.</I>
+<DT>
+<A HREF="#DOC.1.4.27.2.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_width</B>(void) const 
 <DD><I>Returns the width of the rectangle</I>
 <DT>
-<A HREF="#DOC.1.4.25.2.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_height</B>(void) const 
+<A HREF="#DOC.1.4.27.2.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_height</B>(void) const 
 <DD><I>Returns the height of the rectangle</I>
 <DT>
-<A HREF="#DOC.1.4.25.2.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>operator GRect</B>(void)
+<A HREF="#DOC.1.4.27.2.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>operator GRect</B>(void)
 <DD><I>Returns <!1><A HREF="GRect.html">GRect</A> describing the map area's rectangle</I>
 <DT>
-<A HREF="#DOC.1.4.25.2.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GMapRect.html">GMapRect</A>&amp; <B>operator=</B>(const <!1><A HREF="GRect.html">GRect</A> &amp; rect)
+<A HREF="#DOC.1.4.27.2.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GMapRect.html">GMapRect</A>&amp; <B>operator=</B>(const <!1><A HREF="GRect.html">GRect</A> &amp; rect)
 <DD><I>Changes the <TT>GMapRect</TT>'s geometry</I>
 <DT>
-<A HREF="#DOC.1.4.25.2.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   MapAreaType const <B>get_shape_type</B>( void ) const 
+<A HREF="#DOC.1.4.27.2.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   MapAreaType const <B>get_shape_type</B>( void ) const 
 <DD><I>Returns MapRect</I>
 <DT>
-<A HREF="#DOC.1.4.25.2.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   char const* const <B>get_shape_name</B>(void) const 
+<A HREF="#DOC.1.4.27.2.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   char const* const <B>get_shape_name</B>(void) const 
 <DD><I>Returns <TT>&quot;rect&quot;</TT></I>
 <DT>
-<A HREF="#DOC.1.4.25.2.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GMapArea.html#DOC.1.4.25.1.16">GMapArea</A>&gt;  <B>get_copy</B>(void) const 
+<A HREF="#DOC.1.4.27.2.9"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GMapArea.html">GMapArea</A>&gt;  <B>get_copy</B>(void) const 
 <DD><I>Returns a copy of the rectangle</I>
+<DT>
+<A HREF="#DOC.1.4.27.2.10"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>map</B>(<!1><A HREF="GRectMapper.html">GRectMapper</A> &amp;mapper)
+<DD><I>Virtual function maps rectangle from one area to another using mapper</I>
+<DT>
+<A HREF="#DOC.1.4.27.2.11"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>unmap</B>(<!1><A HREF="GRectMapper.html">GRectMapper</A> &amp;mapper)
+<DD><I>Virtual function unmaps rectangle from one area to another using mapper</I>
 </DL></P>
 
 </DL>
@@ -49,11 +61,11 @@
 <DL>
 <P><DL>
 <DT><H3>Public Fields</H3><DD><DT>
-<IMG ALT="o" SRC=icon2.gif><!1><A HREF="GString.html">GString</A> <B>url</B>
+<IMG ALT="o" SRC=icon2.gif>GUTF8String <B>url</B>
 <DT>
-<IMG ALT="o" SRC=icon2.gif><!1><A HREF="GString.html">GString</A> <B>target</B>
+<IMG ALT="o" SRC=icon2.gif>GUTF8String <B>target</B>
 <DT>
-<IMG ALT="o" SRC=icon2.gif><!1><A HREF="GString.html">GString</A> <B>comment</B>
+<IMG ALT="o" SRC=icon2.gif>GUTF8String <B>comment</B>
 <DT>
 <IMG ALT="o" SRC=icon2.gif>BorderType <B>border_type</B>
 <DT>
@@ -88,7 +100,7 @@
 <DT>
 <IMG ALT="o" SRC=icon2.gif>char const* const <B>check_object</B>(void)
 <DT>
-<IMG ALT="o" SRC=icon2.gif><!1><A HREF="GString.html">GString</A> <B>print</B>(void)
+<IMG ALT="o" SRC=icon2.gif>GUTF8String <B>print</B>(void)
 <DT>
 <IMG ALT="o" SRC=icon2.gif>virtual   void <B>get_coords</B>( GList&lt;int&gt; &amp; CoordList )
 </DL></P>
@@ -121,40 +133,60 @@ supporting <TT>SHADOW_IN_BORDER</TT>, <TT>SHADOW_OUT_BORDER</TT>, <TT>SHADOW_EIN
 and <TT>SHADOW_EOUT_BORDER</TT> types of border and area highlighting. </BLOCKQUOTE>
 <DL>
 
+<A NAME="create">
+<A NAME="DOC.1.4.27.2.1">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GMapRect.html">GMapRect</A>&gt;  create(void)</B></TT>
+<DD>Default creator.
+<DL><DT><DD></DL><P>
+<A NAME="create">
+<A NAME="DOC.1.4.27.2.2">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GMapRect.html">GMapRect</A>&gt;  create(const <!1><A HREF="GRect.html">GRect</A> &amp;rect)</B></TT>
+<DD>Create with the specified GRect.
+<DL><DT><DD></DL><P>
 <A NAME="get_width">
-<A NAME="DOC.1.4.25.2.1">
+<A NAME="DOC.1.4.27.2.3">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int get_width(void) const </B></TT>
 <DD>Returns the width of the rectangle
 <DL><DT><DD></DL><P>
 <A NAME="get_height">
-<A NAME="DOC.1.4.25.2.2">
+<A NAME="DOC.1.4.27.2.4">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int get_height(void) const </B></TT>
 <DD>Returns the height of the rectangle
 <DL><DT><DD></DL><P>
 <A NAME="operator GRect">
-<A NAME="DOC.1.4.25.2.3">
+<A NAME="DOC.1.4.27.2.5">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> operator GRect(void)</B></TT>
 <DD>Returns <!1><A HREF="GRect.html">GRect</A> describing the map area's rectangle
 <DL><DT><DD></DL><P>
 <A NAME="operator=">
-<A NAME="DOC.1.4.25.2.4">
+<A NAME="DOC.1.4.27.2.6">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GMapRect.html">GMapRect</A>&amp; operator=(const <!1><A HREF="GRect.html">GRect</A> &amp; rect)</B></TT>
 <DD>Changes the <TT>GMapRect</TT>'s geometry
 <DL><DT><DD></DL><P>
 <A NAME="get_shape_type">
-<A NAME="DOC.1.4.25.2.5">
+<A NAME="DOC.1.4.27.2.7">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   MapAreaType const get_shape_type( void ) const </B></TT>
 <DD>Returns MapRect
 <DL><DT><DD></DL><P>
 <A NAME="get_shape_name">
-<A NAME="DOC.1.4.25.2.6">
+<A NAME="DOC.1.4.27.2.8">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   char const* const get_shape_name(void) const </B></TT>
 <DD>Returns <TT>&quot;rect&quot;</TT>
 <DL><DT><DD></DL><P>
 <A NAME="get_copy">
-<A NAME="DOC.1.4.25.2.7">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GMapArea.html#DOC.1.4.25.1.16">GMapArea</A>&gt;  get_copy(void) const </B></TT>
+<A NAME="DOC.1.4.27.2.9">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GMapArea.html">GMapArea</A>&gt;  get_copy(void) const </B></TT>
 <DD>Returns a copy of the rectangle
+<DL><DT><DD></DL><P>
+<A NAME="map">
+<A NAME="DOC.1.4.27.2.10">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   void map(<!1><A HREF="GRectMapper.html">GRectMapper</A> &amp;mapper)</B></TT>
+<DD>Virtual function maps rectangle from one area to another using mapper
+<DL><DT><DD></DL><P>
+<A NAME="unmap">
+<A NAME="DOC.1.4.27.2.11">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   void unmap(<!1><A HREF="GRectMapper.html">GRectMapper</A> &amp;mapper)</B></TT>
+<DD>Virtual function unmaps rectangle from one area to another using mapper
 <DL><DT><DD></DL><P></DL>
 
 <HR><DL><DT><B>This class has no child classes.</B></DL>

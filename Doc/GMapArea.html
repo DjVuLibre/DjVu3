@@ -5,7 +5,7 @@
 </HEAD>
 <BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
 
-<H2>class  <A HREF="#DOC.DOCU">GMapArea</A>: public <!1><A HREF="GPEnabled.html#DOC.1.4.4.1.2">GPEnabled</A></H2>
+<H2>class  <A HREF="#DOC.DOCU">GMapArea</A>: public <!1><A HREF="GPEnabled.html#DOC.1.4.4.2">GPEnabled</A></H2>
 <BLOCKQUOTE>This is the base object for all map areas.</BLOCKQUOTE>
 <HR>
 
@@ -22,85 +22,91 @@
 <DL>
 <P><DL>
 <DT><H3>Public Fields</H3><DD><DT>
-<A HREF="#DOC.1.4.25.1.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GString.html">GString</A> <B>url</B>
+<A HREF="#DOC.1.4.27.1.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>GUTF8String <B>url</B>
 <DD><I>Optional URL which this map area can be associated with.</I>
 <DT>
-<A HREF="#DOC.1.4.25.1.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GString.html">GString</A> <B>target</B>
+<A HREF="#DOC.1.4.27.1.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>GUTF8String <B>target</B>
 <DD><I>The target for the <TT>URL</TT>.</I>
 <DT>
-<A HREF="#DOC.1.4.25.1.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GString.html">GString</A> <B>comment</B>
+<A HREF="#DOC.1.4.27.1.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>GUTF8String <B>comment</B>
 <DD><I>Comment (displayed in a status line or as a popup hint when the mouse pointer moves over the map area </I>
 <DT>
-<A HREF="#DOC.1.4.25.1.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>BorderType <B>border_type</B>
+<A HREF="#DOC.1.4.27.1.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>BorderType <B>border_type</B>
 <DD><I>Border type.</I>
 <DT>
-<A HREF="#DOC.1.4.25.1.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>bool <B>border_always_visible</B>
+<A HREF="#DOC.1.4.27.1.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>bool <B>border_always_visible</B>
 <DD><I>If <TT>TRUE</TT>, the border will be made always visible.</I>
 <DT>
-<A HREF="#DOC.1.4.25.1.14"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>unsigned long int <B>border_color</B>
+<A HREF="#DOC.1.4.27.1.15"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>unsigned long int <B>border_color</B>
 <DD><I>Border color (when relevant) in <TT>0x00RRGGBB</TT> format</I>
 <DT>
-<A HREF="#DOC.1.4.25.1.15"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>border_width</B>
+<A HREF="#DOC.1.4.27.1.16"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>border_width</B>
 <DD><I>Border width in pixels</I>
 <DT>
-<A HREF="#DOC.1.4.25.1.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>unsigned long int <B>hilite_color</B>
+<A HREF="#DOC.1.4.27.1.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>unsigned long int <B>hilite_color</B>
 <DD><I>Specified a color for highlighting the internal area of the map area.</I>
 </DL></P>
 
 <P><DL>
 <DT><H3>Public Methods</H3><DD><DT>
-<A HREF="#DOC.1.4.25.1.16"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GMapArea</B>(void)
-<DD><I>Default constructor</I>
+<A HREF="#DOC.1.4.27.1.14"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   <B>~GMapArea</B>()
+<DD><I>Virtual destructor.</I>
 <DT>
-<A HREF="#DOC.1.4.25.1.17"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>bool <B>is_point_inside</B>(int x, int y)
+<A HREF="#DOC.1.4.27.1.17"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>bool <B>is_point_inside</B>(int x, int y)
 <DD><I>Returns 1 if the given point is inside the hyperlink area</I>
 <DT>
-<A HREF="#DOC.1.4.25.1.18"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_xmin</B>(void)
+<A HREF="#DOC.1.4.27.1.18"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_xmin</B>(void)
 <DD><I>Returns xmin of the bounding rectangle</I>
 <DT>
-<A HREF="#DOC.1.4.25.1.19"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_ymin</B>(void)
+<A HREF="#DOC.1.4.27.1.19"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_ymin</B>(void)
 <DD><I>Returns ymin of the bounding rectangle</I>
 <DT>
-<A HREF="#DOC.1.4.25.1.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_xmax</B>(void)
+<A HREF="#DOC.1.4.27.1.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_xmax</B>(void)
 <DD><I>Returns xmax of the bounding rectangle.</I>
 <DT>
-<A HREF="#DOC.1.4.25.1.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_ymax</B>(void)
+<A HREF="#DOC.1.4.27.1.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_ymax</B>(void)
 <DD><I>Returns xmax of the bounding rectangle.</I>
 <DT>
-<A HREF="#DOC.1.4.25.1.20"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GRect.html">GRect</A> <B>get_bound_rect</B>(void)
+<A HREF="#DOC.1.4.27.1.20"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GRect.html">GRect</A> <B>get_bound_rect</B>(void)
 <DD><I>Returns the hyperlink bounding rectangle</I>
 <DT>
-<A HREF="#DOC.1.4.25.1.9"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>move</B>(int dx, int dy)
+<A HREF="#DOC.1.4.27.1.9"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>move</B>(int dx, int dy)
 <DD><I>Moves the hyperlink along the given vector.</I>
 <DT>
-<A HREF="#DOC.1.4.25.1.10"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>resize</B>(int new_width, int new_height)
+<A HREF="#DOC.1.4.27.1.10"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>resize</B>(int new_width, int new_height)
 <DD><I>Resizes the hyperlink to fit new bounding rectangle while keeping the (xmin, ymin) points at rest.</I>
 <DT>
-<A HREF="#DOC.1.4.25.1.11"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>transform</B>(const <!1><A HREF="GRect.html">GRect</A> &amp; grect)
+<A HREF="#DOC.1.4.27.1.11"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>transform</B>(const <!1><A HREF="GRect.html">GRect</A> &amp; grect)
 <DD><I>Transforms the hyperlink to be within the specified rectangle </I>
 <DT>
-<A HREF="#DOC.1.4.25.1.12"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>char const* const <B>check_object</B>(void)
+<A HREF="#DOC.1.4.27.1.12"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>char const* const <B>check_object</B>(void)
 <DD><I>Checks if the object is OK.</I>
 <DT>
-<A HREF="#DOC.1.4.25.1.13"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GString.html">GString</A> <B>print</B>(void)
+<A HREF="#DOC.1.4.27.1.13"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>GUTF8String <B>print</B>(void)
 <DD><I>Stores the contents of the hyperlink object in a lisp-like format for saving into <TT>ANTa</TT> chunk (see <!1><A HREF="DjVuAnno.html">DjVuAnno</A>) </I>
 <DT>
-<A HREF="#DOC.1.4.25.1.21"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   MapAreaType const <B>get_shape_type</B>( void ) const 
+<A HREF="#DOC.1.4.27.1.21"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   MapAreaType const <B>get_shape_type</B>( void ) const 
 <DD><I>Virtual function returning the shape type.</I>
 <DT>
-<A HREF="#DOC.1.4.25.1.22"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   char const* const <B>get_shape_name</B>(void) const 
+<A HREF="#DOC.1.4.27.1.22"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   char const* const <B>get_shape_name</B>(void) const 
 <DD><I>Virtual function returning the shape name.</I>
 <DT>
-<A HREF="#DOC.1.4.25.1.23"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GMapArea.html#DOC.1.4.25.1.16">GMapArea</A>&gt;  <B>get_copy</B>(void) const 
+<A HREF="#DOC.1.4.27.1.23"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GMapArea.html">GMapArea</A>&gt;  <B>get_copy</B>(void) const 
 <DD><I>Virtual function generating a copy of this object</I>
 <DT>
-<A HREF="#DOC.1.4.25.1.25"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>get_coords</B>( GList&lt;int&gt; &amp; CoordList )
+<A HREF="#DOC.1.4.27.1.25"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>get_coords</B>( GList&lt;int&gt; &amp; CoordList )
 <DD><I>(default are the opposite corners of the enclosing rectangle)</I>
+<DT>
+<A HREF="#DOC.1.4.27.1.26"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>map</B>(<!1><A HREF="GRectMapper.html">GRectMapper</A> &amp;mapper)
+<DD><I>Virtual function maps maparea from one area to another using mapper</I>
+<DT>
+<A HREF="#DOC.1.4.27.1.27"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>unmap</B>(<!1><A HREF="GRectMapper.html">GRectMapper</A> &amp;mapper)
+<DD><I>Virtual function unmaps maparea from one area to another using mapper</I>
 </DL></P>
 
 <P><DL>
 <DT><H3>Public</H3><DD><DT>
-<A HREF="#DOC.1.4.25.1.24"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B></B>
+<A HREF="#DOC.1.4.27.1.24"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B></B>
 <DD><I>Virtual function generating a list of defining coordinates</I>
 </DL></P>
 
@@ -109,7 +115,7 @@
 <DL>
 <P><DL>
 <DT><H3>Public Methods</H3><DD><DT>
-<IMG ALT="o" SRC=icon2.gif><!1><A HREF="GPEnabled.html#DOC.1.4.4.1.2">GPEnabled</A>&amp; <B>operator=</B>(const <!1><A HREF="GPEnabled.html#DOC.1.4.4.1.2">GPEnabled</A> &amp; obj)
+<IMG ALT="o" SRC=icon2.gif><!1><A HREF="GPEnabled.html#DOC.1.4.4.2">GPEnabled</A>&amp; <B>operator=</B>(const <!1><A HREF="GPEnabled.html#DOC.1.4.4.2">GPEnabled</A> &amp; obj)
 <DT>
 <IMG ALT="o" SRC=icon2.gif>int <B>get_count</B>(void) const 
 </DL></P>
@@ -151,17 +157,22 @@ also be highlighted with some given color.
 </UL></BLOCKQUOTE>
 <DL>
 
+<A NAME="~GMapArea">
+<A NAME="DOC.1.4.27.1.14">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   ~GMapArea()</B></TT>
+<DD>Virtual destructor.
+<DL><DT><DD></DL><P>
 <A NAME="url">
-<A NAME="DOC.1.4.25.1.1">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GString.html">GString</A> url</B></TT>
+<A NAME="DOC.1.4.27.1.1">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>GUTF8String url</B></TT>
 <DD>Optional URL which this map area can be associated with.
 If it's not empty then clicking this map area with the mouse
 will make the browser load the HTML page referenced by
 this <TT>url</TT> 
 <DL><DT><DD></DL><P>
 <A NAME="target">
-<A NAME="DOC.1.4.25.1.2">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GString.html">GString</A> target</B></TT>
+<A NAME="DOC.1.4.27.1.2">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>GUTF8String target</B></TT>
 <DD>The target for the <TT>URL</TT>. Standard targets are:
 <UL>
 <LI> <TT>_blank</TT> - Load the link in a new blank window
@@ -170,13 +181,13 @@ this <TT>url</TT>
 </UL> 
 <DL><DT><DD></DL><P>
 <A NAME="comment">
-<A NAME="DOC.1.4.25.1.3">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GString.html">GString</A> comment</B></TT>
+<A NAME="DOC.1.4.27.1.3">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>GUTF8String comment</B></TT>
 <DD>Comment (displayed in a status line or as a popup hint when
 the mouse pointer moves over the map area 
 <DL><DT><DD></DL><P>
 <A NAME="border_type">
-<A NAME="DOC.1.4.25.1.4">
+<A NAME="DOC.1.4.27.1.4">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>BorderType border_type</B></TT>
 <DD>Border type. Defines how the map area border should be drawn
 <UL>
@@ -193,122 +204,127 @@ Is translated as "shadow etched in"
 </UL> 
 <DL><DT><DD></DL><P>
 <A NAME="border_always_visible">
-<A NAME="DOC.1.4.25.1.5">
+<A NAME="DOC.1.4.27.1.5">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>bool border_always_visible</B></TT>
 <DD>If <TT>TRUE</TT>, the border will be made always visible. Otherwise
 it will be drawn when the mouse moves over the map area. 
 <DL><DT><DD></DL><P>
 <A NAME="border_color">
-<A NAME="DOC.1.4.25.1.14">
+<A NAME="DOC.1.4.27.1.15">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>unsigned long int border_color</B></TT>
 <DD>Border color (when relevant) in <TT>0x00RRGGBB</TT> format
 <DL><DT><DD></DL><P>
 <A NAME="border_width">
-<A NAME="DOC.1.4.25.1.15">
+<A NAME="DOC.1.4.27.1.16">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int border_width</B></TT>
 <DD>Border width in pixels
 <DL><DT><DD></DL><P>
 <A NAME="hilite_color">
-<A NAME="DOC.1.4.25.1.6">
+<A NAME="DOC.1.4.27.1.6">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>unsigned long int hilite_color</B></TT>
 <DD>Specified a color for highlighting the internal area of the map
 area. Will work with rectangular map areas only. The color is
 specified in #00RRGGBB format. A special value of #FFFFFFFF disables
 highlighting and #FF000000 is for XOR highlighting. 
 <DL><DT><DD></DL><P>
-<A NAME="GMapArea">
-<A NAME="DOC.1.4.25.1.16">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> GMapArea(void)</B></TT>
-<DD>Default constructor
-<DL><DT><DD></DL><P>
 <A NAME="is_point_inside">
-<A NAME="DOC.1.4.25.1.17">
+<A NAME="DOC.1.4.27.1.17">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>bool is_point_inside(int x, int y)</B></TT>
 <DD>Returns 1 if the given point is inside the hyperlink area
 <DL><DT><DD></DL><P>
 <A NAME="get_xmin">
-<A NAME="DOC.1.4.25.1.18">
+<A NAME="DOC.1.4.27.1.18">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int get_xmin(void)</B></TT>
 <DD>Returns xmin of the bounding rectangle
 <DL><DT><DD></DL><P>
 <A NAME="get_ymin">
-<A NAME="DOC.1.4.25.1.19">
+<A NAME="DOC.1.4.27.1.19">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int get_ymin(void)</B></TT>
 <DD>Returns ymin of the bounding rectangle
 <DL><DT><DD></DL><P>
 <A NAME="get_xmax">
-<A NAME="DOC.1.4.25.1.7">
+<A NAME="DOC.1.4.27.1.7">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int get_xmax(void)</B></TT>
 <DD>Returns xmax of the bounding rectangle. In other words, if <TT>X</TT> is
 a coordinate of the last point in the right direction, the
 function will return <TT>X+1</TT> 
 <DL><DT><DD></DL><P>
 <A NAME="get_ymax">
-<A NAME="DOC.1.4.25.1.8">
+<A NAME="DOC.1.4.27.1.8">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int get_ymax(void)</B></TT>
 <DD>Returns xmax of the bounding rectangle. In other words, if <TT>Y</TT> is
 a coordinate of the last point in the top direction, the
 function will return <TT>Y+1</TT> 
 <DL><DT><DD></DL><P>
 <A NAME="get_bound_rect">
-<A NAME="DOC.1.4.25.1.20">
+<A NAME="DOC.1.4.27.1.20">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GRect.html">GRect</A> get_bound_rect(void)</B></TT>
 <DD>Returns the hyperlink bounding rectangle
 <DL><DT><DD></DL><P>
 <A NAME="move">
-<A NAME="DOC.1.4.25.1.9">
+<A NAME="DOC.1.4.27.1.9">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void move(int dx, int dy)</B></TT>
 <DD>Moves the hyperlink along the given vector. Is used by the
 hyperlinks editor. 
 <DL><DT><DD></DL><P>
 <A NAME="resize">
-<A NAME="DOC.1.4.25.1.10">
+<A NAME="DOC.1.4.27.1.10">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void resize(int new_width, int new_height)</B></TT>
 <DD>Resizes the hyperlink to fit new bounding rectangle while
 keeping the (xmin, ymin) points at rest. 
 <DL><DT><DD></DL><P>
 <A NAME="transform">
-<A NAME="DOC.1.4.25.1.11">
+<A NAME="DOC.1.4.27.1.11">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void transform(const <!1><A HREF="GRect.html">GRect</A> &amp; grect)</B></TT>
 <DD>Transforms the hyperlink to be within the specified rectangle 
 <DL><DT><DD></DL><P>
 <A NAME="check_object">
-<A NAME="DOC.1.4.25.1.12">
+<A NAME="DOC.1.4.27.1.12">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>char const* const check_object(void)</B></TT>
 <DD>Checks if the object is OK. Especially useful with <!1><A HREF="GMapPoly.html">GMapPoly</A>
 where edges may intersect. If there is a problem it returns a
 string describing it. 
 <DL><DT><DD></DL><P>
 <A NAME="print">
-<A NAME="DOC.1.4.25.1.13">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GString.html">GString</A> print(void)</B></TT>
+<A NAME="DOC.1.4.27.1.13">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>GUTF8String print(void)</B></TT>
 <DD>Stores the contents of the hyperlink object in a lisp-like format
 for saving into <TT>ANTa</TT> chunk (see <!1><A HREF="DjVuAnno.html">DjVuAnno</A>) 
 <DL><DT><DD></DL><P>
 <A NAME="get_shape_type">
-<A NAME="DOC.1.4.25.1.21">
+<A NAME="DOC.1.4.27.1.21">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   MapAreaType const get_shape_type( void ) const </B></TT>
 <DD>Virtual function returning the shape type.
 <DL><DT><DD></DL><P>
 <A NAME="get_shape_name">
-<A NAME="DOC.1.4.25.1.22">
+<A NAME="DOC.1.4.27.1.22">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   char const* const get_shape_name(void) const </B></TT>
 <DD>Virtual function returning the shape name.
 <DL><DT><DD></DL><P>
 <A NAME="get_copy">
-<A NAME="DOC.1.4.25.1.23">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GMapArea.html#DOC.1.4.25.1.16">GMapArea</A>&gt;  get_copy(void) const </B></TT>
+<A NAME="DOC.1.4.27.1.23">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GMapArea.html">GMapArea</A>&gt;  get_copy(void) const </B></TT>
 <DD>Virtual function generating a copy of this object
 <DL><DT><DD></DL><P>
 <A NAME="">
-<A NAME="DOC.1.4.25.1.24">
+<A NAME="DOC.1.4.27.1.24">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> </B></TT>
 <DD>Virtual function generating a list of defining coordinates
 <DL><DT><DD></DL><P>
 <A NAME="get_coords">
-<A NAME="DOC.1.4.25.1.25">
+<A NAME="DOC.1.4.27.1.25">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   void get_coords( GList&lt;int&gt; &amp; CoordList )</B></TT>
 <DD>(default are the opposite corners of the enclosing rectangle)
+<DL><DT><DD></DL><P>
+<A NAME="map">
+<A NAME="DOC.1.4.27.1.26">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   void map(<!1><A HREF="GRectMapper.html">GRectMapper</A> &amp;mapper)</B></TT>
+<DD>Virtual function maps maparea from one area to another using mapper
+<DL><DT><DD></DL><P>
+<A NAME="unmap">
+<A NAME="DOC.1.4.27.1.27">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   void unmap(<!1><A HREF="GRectMapper.html">GRectMapper</A> &amp;mapper)</B></TT>
+<DD>Virtual function unmaps maparea from one area to another using mapper
 <DL><DT><DD></DL><P></DL>
 <HR>
 <DL><DT><B>Direct child classes:

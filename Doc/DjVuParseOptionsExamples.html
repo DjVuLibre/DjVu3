@@ -32,44 +32,52 @@
   
    	int
     	main(int argc,const char **argv,char **env)
-        {
-   	  char *profile,*topping,*color;
-          int redo,bignumber;
-   		// This will read in the default configuration file
-   		// which is either ~/.DjVu/global.conf if it exists,
-   		// otherwise /etc/DjVu/global.conf.
-   		// Next the file MyConfigFile.conf will be read from
-   		// either ~/.DjVu or /etc/DjVu
-          DjVuParseOptions MyOptions(&quot;MyConfigFile&quot;);
-   		// This parses the command line arguments.
-          MyOptions.ParseArguments(argc,argv,long_options);
-   		// We could for example, check the value of a profile
-   		// option, and switch which profile we are using.
-   	  profile=MyOptions.GetValue(profile_string);
-          if(profile) MyOptions.ChangeProfile(profile);
-   		// Now we can read in the variables.
-   		// I find it is a good idea to only list the variable
-   		// strings once, so I use constant strings.  But this
-                // isn't required.
-   	  topping=MyOptions.GetValue(pizza_topping_string);
-   	  color=MyOptions.GetValue(favorite_color_string);
-   		// We can also read in integers, and specify a default value
-   		// to return in case the value is not an integer.  In this
-   		// case I specified -1.
-   	  bignumber=MyOptions.GetNumber(bignumber_string,-1);
-   		// We can also check true/false type values.
-   	  redo=MyOptions.GetInteger(redo_string,0);
-   		// Now before we do anything with these values we might
-   		// want to check for errors.
-   	  if(MyOptions.HasError())
-   	  {
-   	     MyOptions.perror();
-   	     usage();
+      {
+   	    char *profile,*topping,*color;
+        int redo,bignumber;
+
+   		  // This will read in the default configuration file
+   		  // which is either ~/.DjVu/global.conf if it exists,
+   		  // otherwise /etc/DjVu/global.conf.
+   		  // Next the file MyConfigFile.conf will be read from
+   		  // either ~/.DjVu or /etc/DjVu
+        DjVuParseOptions MyOptions(&quot;MyConfigFile&quot;);
+
+   		  // This parses the command line arguments.
+        MyOptions.ParseArguments(argc,argv,long_options);
+
+   		  // We could for example, check the value of a profile
+   		  // option, and switch which profile we are using.
+   	    profile=MyOptions.GetValue(profile_string);
+        if(profile) MyOptions.ChangeProfile(profile);
+
+   		  // Now we can read in the variables.
+   		  // I find it is a good idea to only list the variable
+   		  // strings once, so I use constant strings.  But this
+        // isn't required.
+   	    topping=MyOptions.GetValue(pizza_topping_string);
+   	    color=MyOptions.GetValue(favorite_color_string);
+
+   		  // We can also read in integers, and specify a default value
+   		  // to return in case the value is not an integer.  In this
+   		  // case I specified -1.
+   	    bignumber=MyOptions.GetNumber(bignumber_string,-1);
+
+   		  // We can also check true/false type values.
+   	    redo=MyOptions.GetInteger(redo_string,0);
+
+   		  // Now before we do anything with these values, we might
+   		  // want to check for errors.
+   	    if(MyOptions.HasError())
+   	    {
+   	       MyOptions.perror();
+   	       usage();
+   	    }
+
+   	    ... Now we can do the real work of this program...
+
+   	    exit(0);
    	  }
-  
-   	  ... Now we can do the real work of this program...
-   	  exit(0);
-   	}
 </PRE><P>Now the more complicated issue is using the same object for libraries
 with a minimal amount of changes.  The first issue to note is we don't
 want a library function to re-read the configuration file each time it
@@ -80,18 +88,16 @@ in the first function.<P>So, then the problem is if we pass by value, then if a 
 in it's own profile, each time it is recalled, it will have lost that
 information and need to read in the same profile again.  If we pass by
 references we run into problems that multiple functions can not parse
-argv[] arrays.<P>The compromise I reached is the profiles, are stored in the class as
-references.  So when you pass by "value", the profile information is
-still passed by reference.  Consequently if you do something like:
-<PRE>                                        
-   	int foo(DjVuParseOptions);
-   	DjVuParseOptions Opts(&quot;Config&quot;);
-   	Opts.ParseArguments(argc,argv,long_opts,long_only);
-   	foo(Opts);
-</PRE>
-the copy of Opts passed to foo will not contain any information from
+argv[] arrays.<P>The compromise I reached is the profiles are stored in the class as
+references.  So when you pass by "value," the profile information is
+still passed by reference.  Consequently if you do something like:<P><PRE>                                        
+   	  int foo(DjVuParseOptions);
+   	  DjVuParseOptions Opts(&quot;Config&quot;);
+   	  Opts.ParseArguments(argc,argv,long_opts,long_only);
+   	  foo(Opts);
+</PRE><P>the copy of Opts passed to foo will not contain any information from
 the argv[] array.  But it will contain the profile information.
-If you do a ChangeProfile() it will only effect the original to
+If you do a ChangeProfile() it will only affect the original to
 the extent if it does the same ChangeProfile() the configuration
 file will have already been parsed.<P>
 The core functionality is also available via C wrappers.<P>The configuration files themselves are fairly simple.  They simple
@@ -103,8 +109,8 @@ listings  of the form:
    	foo=&quot;689234 ksdf&quot;
    	fi=bar
    	test=TRUE
-</PRE><P>The one unique implementation detail, is alternate profiles may be
-specified  within a configuration file.  The rules is simple.  The
+</PRE><P>The one unique implementation detail is alternate profiles may be
+specified  within a configuration file.  The rules are simple.  The
 default profile name is the file name.  To end the current profile
 and begin a new one, simply list the new profile name followed by
 a ':'.  e.g.<P><PRE>                                        

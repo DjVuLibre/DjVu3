@@ -22,13 +22,13 @@
 <DL>
 <P><DL>
 <DT><H3>Public Methods</H3><DD><DT>
-<A HREF="#DOC.1.5.20.2.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GBitmapScaler</B>()
+<A HREF="#DOC.1.4.20.2.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GBitmapScaler</B>()
 <DD><I>Constructs an empty GBitmapScaler.</I>
 <DT>
-<A HREF="#DOC.1.5.20.2.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GBitmapScaler</B>(int inw, int inh, int outw, int outh)
+<A HREF="#DOC.1.4.20.2.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GBitmapScaler</B>(int inw, int inh, int outw, int outh)
 <DD><I>Constructs a GBitmapScaler.</I>
 <DT>
-<A HREF="#DOC.1.5.20.2.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>scale</B>( const <!1><A HREF="GRect.html">GRect</A> &amp;provided_input, const <!1><A HREF="GBitmap.html">GBitmap</A> &amp;input, const <!1><A HREF="GRect.html">GRect</A> &amp;desired_output, <!1><A HREF="GBitmap.html">GBitmap</A> &amp;output )
+<A HREF="#DOC.1.4.20.2.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>scale</B>( const <!1><A HREF="GRect.html">GRect</A> &amp;provided_input, const <!1><A HREF="GBitmap.html">GBitmap</A> &amp;input, const <!1><A HREF="GRect.html">GRect</A> &amp;desired_output, <!1><A HREF="GBitmap.html">GBitmap</A> &amp;output )
 <DD><I>Computes a segment of the rescaled output image.</I>
 </DL></P>
 
@@ -55,7 +55,7 @@
 <H2>Documentation</H2>
 <BLOCKQUOTE>Fast rescaling code for gray level images.  This class augments the base
 class <!1><A HREF="GScaler.html">GScaler</A> with a function for rescaling gray level
-images.  Function <!1><A HREF="GBitmapScaler.html#DOC.1.5.20.2.3">scale</A> computes an arbitrary segment
+images.  Function <!1><A HREF="GBitmapScaler.html#DOC.1.4.20.2.3">scale</A> computes an arbitrary segment
 of the output image given the corresponding pixels in the input image.<P><B>Example</B> --- The following functions returns an gray level image
 (sixteen gray levels, size <TT>nw</TT> by <TT>nh</TT>) containing a rescaled version of
 the input image
@@ -76,20 +76,20 @@ the input image
 <DL>
 
 <A NAME="GBitmapScaler">
-<A NAME="DOC.1.5.20.2.1">
+<A NAME="DOC.1.4.20.2.1">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> GBitmapScaler()</B></TT>
 <DD>Constructs an empty GBitmapScaler. You must call functions
-<!1><A HREF="GScaler.html#DOC.1.5.20.1.1">set_input_size</A> and <!1><A HREF="GScaler.html#DOC.1.5.20.1.2">set_output_size</A> before
+<!1><A HREF="GScaler.html#DOC.1.4.20.1.1">set_input_size</A> and <!1><A HREF="GScaler.html#DOC.1.4.20.1.2">set_output_size</A> before
 calling any of the scaling functions. 
 <DL><DT><DD></DL><P>
 <A NAME="GBitmapScaler">
-<A NAME="DOC.1.5.20.2.2">
+<A NAME="DOC.1.4.20.2.2">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> GBitmapScaler(int inw, int inh, int outw, int outh)</B></TT>
-<DD>Constructs a GBitmapScaler. The size of the input image is given by<P><!1><A HREF="GScaler.html#DOC.1.5.20.1.1">set_input_size</A> and <!1><A HREF="GScaler.html#DOC.1.5.20.1.2">set_output_size</A>. The
+<DD>Constructs a GBitmapScaler. The size of the input image is given by<P><!1><A HREF="GScaler.html#DOC.1.4.20.1.1">set_input_size</A> and <!1><A HREF="GScaler.html#DOC.1.4.20.1.2">set_output_size</A>. The
 size of the output image is given by <TT>outw</TT> and <TT>outh</TT>.  . 
 <DL><DT><DD></DL><P>
 <A NAME="scale">
-<A NAME="DOC.1.5.20.2.3">
+<A NAME="DOC.1.4.20.2.3">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void scale( const <!1><A HREF="GRect.html">GRect</A> &amp;provided_input, const <!1><A HREF="GBitmap.html">GBitmap</A> &amp;input, const <!1><A HREF="GRect.html">GRect</A> &amp;desired_output, <!1><A HREF="GBitmap.html">GBitmap</A> &amp;output )</B></TT>
 <DD>Computes a segment of the rescaled output image.  The GBitmap object
 <TT>output</TT> is overwritten with the segment of the output image specified
@@ -97,9 +97,9 @@ by the rectangle <TT>desired_output</TT>.  The rectangle <TT>provided_input</TT>
 specifies which segment of the input image is provided by the GBitmap
 object
 rectangle <TT>provided_input</TT> is smaller then the rectangle
-<TT>required_input</TT> returned by function <!1><A HREF="GScaler.html#DOC.1.5.20.1.5">get_input_rect</A>.
+<TT>required_input</TT> returned by function <!1><A HREF="GScaler.html#DOC.1.4.20.1.5">get_input_rect</A>.
 Note that the output image always contain 256 gray levels. You may want
-to use function <!1><A HREF="GBitmap.html#DOC.1.5.17.1.4.3">change_grays</A> to reduce the number of gray
+to use function <!1><A HREF="GBitmap.html#DOC.1.4.17.1.4.3">change_grays</A> to reduce the number of gray
 levels. 
 <DL><DT><DD></DL><P></DL>
 
@@ -109,7 +109,7 @@ levels.
 <!-- This is were the DOC++ footer is defined  -->
 
 <font face="arial,helvetica" size="2">
-<a href=http://www.lizardtech.com>DjVu</a> is a trademark of AT&amp;T.  
+<a href=http://www.lizardtech.com>DjVu</a> is a trademark of LizardTech, Inc.  
 <br>All other products mentioned are registered trademarks or trademarks of
 their respective companies.
 </font>
