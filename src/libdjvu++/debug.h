@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: debug.h,v 1.18 2001-07-24 17:52:04 bcr Exp $
+// $Id: debug.h,v 1.19 2001-08-02 23:54:05 bcr Exp $
 // $Name:  $
 
 #ifndef _DEBUG_H_
@@ -94,7 +94,7 @@ class GURL;
     @memo 
     Macros for printing debug messages.
     @version 
-    #$Id: debug.h,v 1.18 2001-07-24 17:52:04 bcr Exp $#
+    #$Id: debug.h,v 1.19 2001-08-02 23:54:05 bcr Exp $#
     @author
     Andrew Erofeev <eaf@geocities.com> -- initial implementation \\
     Leon Bottou <leonb@research.att.com> -- cleanups */
@@ -163,9 +163,9 @@ private:
 public:
   DjVuDebugIndent(int inc=2);
   ~DjVuDebugIndent();
-//#define DEBUG_MAKE_INDENT_2(x, y) DjVuDebugIndent debug_indent ## y ## (x)
+//#define DEBUG_MAKE_INDENT_2(x, y) DjVuDebugIndent debug_indent ## y (x)
 //#define DEBUG_MAKE_INDENT_1(x, y) DEBUG_MAKE_INDENT_2(x, y)
-#define DEBUG_MAKE_INDENT_1(x, y) DjVuDebugIndent debug_indent ## y ## (x)
+#define DEBUG_MAKE_INDENT_1(x, y) DjVuDebugIndent debug_indent ## y (x)
 };
 
 // ------------ MAIN MACROS

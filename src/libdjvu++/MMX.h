@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: MMX.h,v 1.15 2001-07-24 17:52:04 bcr Exp $
+// $Id: MMX.h,v 1.16 2001-08-02 23:54:05 bcr Exp $
 // $Name:  $
 
 #ifndef _MMX_H_
@@ -71,7 +71,7 @@
     @memo
     Essential support for MMX.
     @version 
-    #$Id: MMX.h,v 1.15 2001-07-24 17:52:04 bcr Exp $#
+    #$Id: MMX.h,v 1.16 2001-08-02 23:54:05 bcr Exp $#
     @author: 
     L\'eon Bottou <leonb@research.att.com> -- initial implementation */
 //@{
@@ -116,13 +116,13 @@ class MMXControl
 #define MMXemms \
   __asm__ volatile("emms" : : : "memory" ) 
 #define MMXrr(op,src,dst) \
-  __asm__ volatile( #op ## " %%" ## #src ## ",%%" ## #dst : : : "memory") 
+  __asm__ volatile( #op " %%" #src ",%%" #dst : : : "memory") 
 #define MMXir(op,imm,dst) \
-  __asm__ volatile( #op ## " %0,%%" ## #dst : : "i" (imm) : "memory") 
+  __asm__ volatile( #op " %0,%%" #dst : : "i" (imm) : "memory") 
 #define MMXar(op,addr,dst) \
-  __asm__ volatile( #op ## " %0,%%" ## #dst : : "rm" (*(int*)(addr)) : "memory") 
+  __asm__ volatile( #op " %0,%%" #dst : : "rm" (*(int*)(addr)) : "memory") 
 #define MMXra(op,src,addr) \
-  __asm__ volatile( #op ## " %%" #src ## ",%0" : : "rm" (*(int*)(addr)) : "memory") 
+  __asm__ volatile( #op " %%" #src ",%0" : : "rm" (*(int*)(addr)) : "memory") 
 #define MMX 1
 #endif
 

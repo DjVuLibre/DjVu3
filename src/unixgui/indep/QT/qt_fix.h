@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qt_fix.h,v 1.2 2001-07-25 17:10:42 mchen Exp $
+// $Id: qt_fix.h,v 1.3 2001-08-02 23:54:05 bcr Exp $
 // $Name:  $
 
 
@@ -327,11 +327,11 @@ private:
 public:
    QeSlider(QWidget * parent=0, const char * name=0) :
 	 QSlider(parent, name) { setMinMaxSize(); }
-   QeSlider(Orientation or, QWidget * parent=0, const char * name=0) :
-	 QSlider(or, parent, name) { setMinMaxSize(); }
+   QeSlider(Orientation ori, QWidget * parent=0, const char * name=0) :
+	 QSlider(ori, parent, name) { setMinMaxSize(); }
    QeSlider(int min, int max, int step, int value,
-	    Orientation or, QWidget * parent=0, const char * name=0) :
-	 QSlider(min, max, step, value, or, parent, name) { setMinMaxSize(); }
+	    Orientation ori, QWidget * parent=0, const char * name=0) :
+	 QSlider(min, max, step, value, ori, parent, name) { setMinMaxSize(); }
 public slots:
    virtual void	show(void)
    {

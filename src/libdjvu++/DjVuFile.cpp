@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuFile.cpp,v 1.178 2001-07-24 17:52:03 bcr Exp $
+// $Id: DjVuFile.cpp,v 1.179 2001-08-02 23:54:05 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -731,8 +731,8 @@ DjVuFile::get_fgjd(int block)
   check();
   
   // Simplest case
-  if (DjVuFile::fgjd)
-    return DjVuFile::fgjd;
+  if (fgjd)
+    return fgjd;
   // Check wether included files
   chunk_mon.enter();
   G_TRY {
@@ -886,20 +886,20 @@ DjVuFile::decode_chunk( const GUTF8String &id, const GP<ByteStream> &gbs,
   // Djbz (JB2 Dictionary)
   else if (chkid == "Djbz" && (djvu || djvi))
   {
-    if (DjVuFile::fgjd)
+    if (this->fgjd)
       G_THROW( ERR_MSG("DjVuFile.dupl_Dxxx") );
-    if (DjVuFile::fgjd)
+    if (this->fgjd)
       G_THROW( ERR_MSG("DjVuFile.Dxxx_after_Sxxx") );
     GP<JB2Dict> fgjd = JB2Dict::create();
     fgjd->decode(gbs);
-    DjVuFile::fgjd = fgjd;
+    this->fgjd = fgjd;
     desc.format( ERR_MSG("DjVuFile.shape_dict") "\t%d", fgjd->get_shape_count() );
   } 
   
   // Sjbz (JB2 encoded mask)
   else if (chkid=="Sjbz" && (djvu || djvi))
   {
-    if (DjVuFile::fgjb)
+    if (this->fgjb)
       G_THROW( ERR_MSG("DjVuFile.dupl_Sxxx") );
     GP<JB2Image> fgjb=JB2Image::create();
     // ---- begin hack
@@ -907,7 +907,7 @@ DjVuFile::decode_chunk( const GUTF8String &id, const GP<ByteStream> &gbs,
       fgjb->reproduce_old_bug = true;
     // ---- end hack
     fgjb->decode(gbs, static_get_fgjd, (void*)this);
-    DjVuFile::fgjb = fgjb;
+    this->fgjb = fgjb;
     desc.format( ERR_MSG("DjVuFile.fg_mask") "\t%d\t%d\t%d",
       fgjb->get_width(), fgjb->get_height(),
       get_dpi(fgjb->get_width(), fgjb->get_height()));
@@ -916,10 +916,10 @@ DjVuFile::decode_chunk( const GUTF8String &id, const GP<ByteStream> &gbs,
   // Smmr (MMR-G4 encoded mask)
   else if (chkid=="Smmr" && (djvu || djvi))
   {
-    if (DjVuFile::fgjb)
+    if (this->fgjb)
       G_THROW( ERR_MSG("DjVuFile.dupl_Sxxx") );
     set_can_compress(true);
-    DjVuFile::fgjb = MMRDecoder::decode(gbs);
+    this->fgjb = MMRDecoder::decode(gbs);
     desc.format( ERR_MSG("DjVuFile.G4_mask") "\t%d\t%d\t%d",
       fgjb->get_width(), fgjb->get_height(),
       get_dpi(fgjb->get_width(), fgjb->get_height()));
@@ -935,7 +935,7 @@ DjVuFile::decode_chunk( const GUTF8String &id, const GP<ByteStream> &gbs,
       // First chunk
       GP<IW44Image> bg44=IW44Image::create_decode(IW44Image::COLOR);
       bg44->decode_chunk(gbs);
-      DjVuFile::bg44=bg44;
+      this->bg44 = bg44;
       desc.format( ERR_MSG("DjVuFile.IW44_bg1") "\t%d\t%d\t%d",
 		      bg44->get_width(), bg44->get_height(),
           get_dpi(bg44->get_width(), bg44->get_height()));
@@ -973,7 +973,7 @@ DjVuFile::decode_chunk( const GUTF8String &id, const GP<ByteStream> &gbs,
       set_modified(true);
       set_can_compress(true);
       set_needs_compression(true);
-      DjVuFile::bgpm = djvu_decode_codec(bs);
+      this->bgpm = djvu_decode_codec(bs);
       desc.format( ERR_MSG("DjVuFile.color_import1") "\t%d\t%d\t%d",
         bgpm->columns(), bgpm->rows(),
         get_dpi(bgpm->columns(), bgpm->rows()));
@@ -990,7 +990,7 @@ DjVuFile::decode_chunk( const GUTF8String &id, const GP<ByteStream> &gbs,
       G_THROW( ERR_MSG("DjVuFile.dupl_backgrnd") );
     set_can_compress(true);
 #ifdef NEED_JPEG_DECODER
-    DjVuFile::bgpm = JPEGDecoder::decode(bs);
+    this->bgpm = JPEGDecoder::decode(bs);
     desc.format( ERR_MSG("DjVuFile.JPEG_bg1") "\t%d\t%d\t%d",
       bgpm->columns(), bgpm->rows(),
       get_dpi(bgpm->columns(), bgpm->rows()));
@@ -1005,7 +1005,7 @@ DjVuFile::decode_chunk( const GUTF8String &id, const GP<ByteStream> &gbs,
     if (fgpm || fgbc)
       G_THROW( ERR_MSG("DjVuFile.dupl_foregrnd") );
 #ifdef NEED_JPEG_DECODER
-    DjVuFile::fgpm = JPEGDecoder::decode(bs);
+    this->fgpm = JPEGDecoder::decode(bs);
     desc.format( ERR_MSG("DjVuFile.JPEG_fg1") "\t%d\t%d\t%d",
       fgpm->columns(), fgpm->rows(),
       get_dpi(fgpm->columns(), fgpm->rows()));
@@ -1037,7 +1037,7 @@ DjVuFile::decode_chunk( const GUTF8String &id, const GP<ByteStream> &gbs,
       G_THROW( ERR_MSG("DjVuFile.dupl_foregrnd") );
     GP<DjVuPalette> fgbc = DjVuPalette::create();
     fgbc->decode(gbs);
-    DjVuFile::fgbc = fgbc;
+    this->fgbc = fgbc;
     desc.format( ERR_MSG("DjVuFile.JB2_fg") "\t%d\t%d",
       fgbc->size(), fgbc->colordata.size());
   }
@@ -1077,7 +1077,7 @@ DjVuFile::decode_chunk( const GUTF8String &id, const GP<ByteStream> &gbs,
   {
     GP<DjVuNavDir> dir=DjVuNavDir::create(url);
     dir->decode(bs);
-    DjVuFile::dir=dir;
+    this->dir=dir;
     desc.format( ERR_MSG("DjVuFile.nav_dir") );
   }
   
@@ -1569,7 +1569,7 @@ DjVuFile::get_merged_anno(const GP<DjVuFile> & file,
       } else if (file->is_data_present())
       {
 	       // Copy all annotations chunks, but do NOT modify
-	       // DjVuFile::anno (to avoid correlation with DjVuFile::decode())
+	       // this->anno (to avoid correlation with DjVuFile::decode())
         const GP<ByteStream> str(file->data_pool->get_stream());
         const GP<IFFByteStream> giff(IFFByteStream::create(str));
         IFFByteStream &iff=*giff;
@@ -2587,7 +2587,7 @@ DjVuFile::unlink_file(const GUTF8String &id)
   // Remove the file from the list of included files
   {
     GURL url=DjVuPort::get_portcaster()->id_to_url(this, id);
-    if (url.is_empty()) url=GURL::UTF8(id,DjVuFile::url.base());
+    if (url.is_empty()) url=GURL::UTF8(id,this->url.base());
     GCriticalSectionLock lock(&inc_files_lock);
     for(GPosition pos=inc_files_list;pos;)
       if (inc_files_list[pos]->get_url()==url)

@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: throw_error.cpp,v 1.3 2001-07-25 17:10:42 mchen Exp $
+// $Id: throw_error.cpp,v 1.4 2001-08-02 23:54:06 bcr Exp $
 // $Name:  $
 
 
@@ -54,7 +54,7 @@
 
 #include <stdio.h>
 
-#define TRY_CASE(name) case E##name: throw EXC_##name##(func, message);
+#define TRY_CASE(name) case E##name: throw EXC_##name(func, message);
 
 void
 ThrowError(const char * func, const GUTF8String & msg, int in_errno)

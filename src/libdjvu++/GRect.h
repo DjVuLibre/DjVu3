@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GRect.h,v 1.28 2001-07-24 17:52:04 bcr Exp $
+// $Id: GRect.h,v 1.29 2001-08-02 23:54:05 bcr Exp $
 // $Name:  $
 
 #ifndef _GRECT_H_
@@ -51,7 +51,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GRect.h,v 1.28 2001-07-24 17:52:04 bcr Exp $# */
+    #$Id: GRect.h,v 1.29 2001-08-02 23:54:05 bcr Exp $# */
 //@{
 
 #include "DjVuGlobal.h"
@@ -146,7 +146,7 @@ public:
   rotate(const int angle,Orientations orientation)
   {
     for(int a=(((angle)%360)+405)%360;a>90;a-=90)
-      orientation=(Orientations)((int)orientation^(int)(orientation&ROTATE90_CW)?BURLCW:ROTATE90_CW);
+      orientation=(Orientations)((int)orientation^(int)(orientation&ROTATE90_CW)?BURLCW:TDLRCW);
     return orientation;
   }
 

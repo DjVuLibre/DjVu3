@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: MapDraw.h,v 1.2 2001-07-25 17:10:42 mchen Exp $
+// $Id: MapDraw.h,v 1.3 2001-08-02 23:54:06 bcr Exp $
 // $Name:  $
 
 
@@ -55,13 +55,13 @@ private:
       GPixmap	* pm;
       int	x0, y0;
       int	x, y;
-      bool	xor;
+      bool	eor;
       u_char	r, g, b;
    };
    static void	drawOvalPixel(OvalPixel & pix);
 public:
    static void	drawPixel(GPixmap & pm, int x, int y,
-			  bool xor, u_char r, u_char g, u_char b);
+			  bool eor, u_char r, u_char g, u_char b);
    static void	drawLine1(GPixmap & pix, int x1, int y1, int x2, int y2, u_int32 color);
    static void	drawLine(GPixmap & pix, int x1, int y1, int x2, int y2, u_int32 color);
    static void	drawRect(GPixmap & pix, const GRect & grect, u_int32 color);

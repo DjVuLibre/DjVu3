@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: MapDraw.cpp,v 1.2 2001-07-25 17:10:42 mchen Exp $
+// $Id: MapDraw.cpp,v 1.3 2001-08-02 23:54:06 bcr Exp $
 // $Name:  $
 
 
@@ -52,11 +52,11 @@ sign(int x)
 }
 
 void
-MapDraw::drawPixel(GPixmap & pm, int x, int y, bool xor,
+MapDraw::drawPixel(GPixmap & pm, int x, int y, bool eor,
 		   u_char r, u_char g, u_char b)
 {
    if (y>=0 && y<(int) pm.rows())
-      if (xor)
+      if (eor)
       {
 	 GPixel * pix=pm[pm.rows()-1-y]+x;
 	 if (x>=0 && x<(int) pm.columns())
@@ -83,7 +83,7 @@ MapDraw::drawLine1(GPixmap & pm, int x1, int y1, int x2, int y2, u_int32 color)
    int R=(color >> 16) & 0xff;
    int G=(color >> 8) & 0xff;
    int B=color & 0xff;
-   bool xor=(color==0xff000000);
+   bool eor=(color==0xff000000);
    
    int dx=x2-x1;
    int dy=y2-y1;
@@ -117,7 +117,7 @@ MapDraw::drawLine1(GPixmap & pm, int x1, int y1, int x2, int y2, u_int32 color)
       {
 	 while(c<=f)
 	 {
-	    if (c!=x2 || r!=y2) drawPixel(pm, c, r, xor, R, G, B);
+	    if (c!=x2 || r!=y2) drawPixel(pm, c, r, eor, R, G, B);
 
 	    c++;
 
@@ -135,7 +135,7 @@ MapDraw::drawLine1(GPixmap & pm, int x1, int y1, int x2, int y2, u_int32 color)
 	 while(c<=f)
 	 {
 	       /// set pixel at c, r
-	    if (c!=x2 || r!=y2) drawPixel(pm, c, r, xor, R, G, B);
+	    if (c!=x2 || r!=y2) drawPixel(pm, c, r, eor, R, G, B);
 
 	    c++;
 
@@ -171,7 +171,7 @@ MapDraw::drawLine1(GPixmap & pm, int x1, int y1, int x2, int y2, u_int32 color)
       {
 	 while(c<=f)
 	 {
-	    if (r!=x2 || c!=y2) drawPixel(pm, r, c, xor, R, G, B);
+	    if (r!=x2 || c!=y2) drawPixel(pm, r, c, eor, R, G, B);
 
 	    c++;
 
@@ -189,7 +189,7 @@ MapDraw::drawLine1(GPixmap & pm, int x1, int y1, int x2, int y2, u_int32 color)
 	 while(c<=f)
 	 {
 	       /// set pixel at r, c
-	    if (r!=x2 || c!=y2) drawPixel(pm, r, c, xor, R, G, B);
+	    if (r!=x2 || c!=y2) drawPixel(pm, r, c, eor, R, G, B);
 
 	    c++;
 
@@ -209,14 +209,14 @@ MapDraw::drawLine1(GPixmap & pm, int x1, int y1, int x2, int y2, u_int32 color)
 void
 MapDraw::drawLine(GPixmap & pm, int x1, int y1, int x2, int y2, u_int32 color)
       // Draws line between two points. Coordinate system origin is in
-      // the upper left corner of the pixmap. color=0xff000000 means do XOR
+      // the upper left corner of the pixmap. color=0xff000000 means do EOR
       // End points can be outside of the pixmap
 {
       // Color components
    int r=(color >> 16) & 0xff;
    int g=(color >> 8) & 0xff;
    int b=color & 0xff;
-   bool xor=(color==0xff000000);
+   bool eor=(color==0xff000000);
 
    if (x1==x2)
    {
@@ -232,7 +232,7 @@ MapDraw::drawLine(GPixmap & pm, int x1, int y1, int x2, int y2, u_int32 color)
 
 	    int jstart=(int) pm.rows()-1-yend;
 	    int jend=(int) pm.rows()-1-ystart;
-	    if (xor)
+	    if (eor)
 	       for(int j=jstart;j<=jend;j++)
 	       {
 		  GPixel & pix=pm[j][x1];
@@ -263,7 +263,7 @@ MapDraw::drawLine(GPixmap & pm, int x1, int y1, int x2, int y2, u_int32 color)
 	    if (xend>=(int) pm.columns()) xend=(int) pm.columns()-1;
 
 	    int j=(int) pm.rows()-1-y1;
-	    if (xor)
+	    if (eor)
 	       for(int x=xstart;x<=xend;x++)
 	       {
 		  GPixel & pix=pm[j][x];
@@ -300,12 +300,12 @@ MapDraw::drawRect(GPixmap & pm, const GRect & grect, u_int32 color)
 inline void
 MapDraw::drawOvalPixel(OvalPixel & pix)
 {
-   drawPixel(*pix.pm, pix.x0+pix.x, pix.y0-pix.y, pix.xor, pix.r, pix.g, pix.b);
-   if (pix.x!=0) drawPixel(*pix.pm, pix.x0-pix.x, pix.y0-pix.y, pix.xor, pix.r, pix.g, pix.b);
+   drawPixel(*pix.pm, pix.x0+pix.x, pix.y0-pix.y, pix.eor, pix.r, pix.g, pix.b);
+   if (pix.x!=0) drawPixel(*pix.pm, pix.x0-pix.x, pix.y0-pix.y, pix.eor, pix.r, pix.g, pix.b);
    if (pix.y!=0)
    {
-      drawPixel(*pix.pm, pix.x0+pix.x, pix.y0+pix.y, pix.xor, pix.r, pix.g, pix.b);
-      if (pix.x!=0) drawPixel(*pix.pm, pix.x0-pix.x, pix.y0+pix.y, pix.xor, pix.r, pix.g, pix.b);
+      drawPixel(*pix.pm, pix.x0+pix.x, pix.y0+pix.y, pix.eor, pix.r, pix.g, pix.b);
+      if (pix.x!=0) drawPixel(*pix.pm, pix.x0-pix.x, pix.y0+pix.y, pix.eor, pix.r, pix.g, pix.b);
    }
 }
 
@@ -339,7 +339,7 @@ MapDraw::drawOval(GPixmap & pm, const GRect & grect, u_int32 color)
    pix.pm=&pm;
    pix.x0=x0;
    pix.y0=y0;
-   pix.xor=(color==0xff000000);
+   pix.eor=(color==0xff000000);
    pix.r=(color >> 16) & 0xff;
    pix.g=(color >> 8) & 0xff;
    pix.b=color & 0xff;
