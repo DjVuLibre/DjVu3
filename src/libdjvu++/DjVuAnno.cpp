@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuAnno.cpp,v 1.103 2001-09-04 19:47:24 leonb Exp $
+// $Id: DjVuAnno.cpp,v 1.104 2001-09-04 23:01:51 docbill Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -534,7 +534,6 @@ static const int align_strings_size=sizeof(align_strings)/sizeof(const char *);
 #define ALIGN_TAG	"align"
 #define HALIGN_TAG	"halign"
 #define VALIGN_TAG	"valign"
-#define METADATA_TAG    "metadata"
 
 static const unsigned long default_bg_color=0xffffffff;
 
@@ -629,7 +628,6 @@ DjVuANT::decode(class GLParser & parser)
    hor_align=get_hor_align(parser);
    ver_align=get_ver_align(parser);
    map_areas=get_map_areas(parser);
-   metadata=get_metadata(parser); 
 }
 
 
@@ -958,38 +956,6 @@ DjVuANT::get_ver_align(GLParser & parser)
   return retval;
 }
 
-GMap<GUTF8String, GUTF8String>
-DjVuANT::get_metadata(GLParser & parser)
-{
-  DEBUG_MSG("DjVuANT::get_map_areas(): forming and returning back list of map areas\n");
-  DEBUG_MAKE_INDENT(3);
-  
-  GMap<GUTF8String, GUTF8String> mdata;
-  
-  GPList<GLObject> list=parser.get_list();
-  for(GPosition pos=list;pos;++pos)
-    {
-      GLObject & obj=*list[pos];
-      if (obj.get_type()==GLObject::LIST && obj.get_name()==METADATA_TAG)  
-        { 
-          G_TRY 
-            {
-              for(int obj_num=0;obj_num<obj.get_list().size();obj_num++)
-                {
-                  GLObject & el=*obj[obj_num];
-                  if (el.get_type()==GLObject::GLObject::LIST)
-                    { 
-                      const GUTF8String & name=el.get_name();  
-                      mdata[name]=(el[0])->get_string();
-                    }
-                }
-            } 
-          G_CATCH(exc) { } G_ENDCATCH;
-        }
-    }
-  return mdata;
-}
-
 GPList<GMapArea>
 DjVuANT::get_map_areas(GLParser & parser)
 {
@@ -1193,19 +1159,8 @@ DjVuANT::encode_raw(void) const
         +" "+align_strings[((ver_align<ALIGN_UNSPEC)||(ver_align>=align_strings_size))?ALIGN_UNSPEC:ver_align]+")";
       parser.parse(buffer);
    }
-      //*** Metadata
-   del_all_items(METADATA_TAG, parser);
-   if (!metadata.isempty())
-     {
-       GUTF8String mdatabuffer("(");
-       mdatabuffer +=  METADATA_TAG ;
-       for (GPosition pos=metadata; pos; ++pos)
-         mdatabuffer +=" (" + metadata.key(pos)+" \""+metadata[pos]+"\")";
-       mdatabuffer += " )";
-       parser.parse(mdatabuffer);
-     }
    
-     //*** Mapareas
+      //*** Mapareas
    del_all_items(GMapArea::MAPAREA_TAG, parser);
    for(GPosition pos=map_areas;pos;++pos)
       parser.parse(map_areas[pos]->print());

@@ -1,19 +1,19 @@
 //C-  -*- C++ -*-
 //C- DjVu® Reference Library (v. 3.5)
-//C- 
+//C-
 //C- Copyright © 1999-2001 LizardTech, Inc. All Rights Reserved.
 //C- The DjVu Reference Library is protected by U.S. Pat. No.
 //C- 6,058,214 and patents pending.
-//C- 
+//C-
 //C- This software is subject to, and may be distributed under, the
 //C- GNU General Public License, Version 2. The license should have
 //C- accompanied the software or you may obtain a copy of the license
 //C- from the Free Software Foundation at http://www.fsf.org .
-//C- 
+//C-
 //C- The computer code originally released by LizardTech under this
 //C- license and unmodified by other parties is deemed the "LizardTech
 //C- Original Code."
-//C- 
+//C-
 //C- With respect to the LizardTech Original Code ONLY, and subject
 //C- to any third party intellectual property claims, LizardTech
 //C- grants recipient a worldwide, royalty-free, non-exclusive license
@@ -24,27 +24,27 @@
 //C- made, practice, sell, or otherwise dispose of LizardTech Original
 //C- Code (or portions thereof) and not to any greater extent that may
 //C- be necessary to utilize further modifications or combinations.
-//C- 
+//C-
 //C- The LizardTech Original Code is provided "AS IS" WITHOUT WARRANTY
 //C- OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
-// 
-// $Id: GString.h,v 1.94 2001-08-24 21:50:10 docbill Exp $
+//
+// $Id: GString.h,v 1.95 2001-09-04 23:01:51 docbill Exp $
 // $Name:  $
 
 #ifndef _GSTRING_H_
 #define _GSTRING_H_
 
 /** @name GString.h
-    
+
     Files #"GString.h"# and #"GString.cpp"# implement a general
     purpose string class \Ref{GBaseString}, with dirived types
     \Ref{GUTF8String} and \Ref{GNativeString} for UTF8 MBS encoding
     and the current Native MBS encoding respectively.  This
     implementation relies on smart pointers (see
     \Ref{GSmartPointer.h}).
-    
+
     {\bf Historical Comments} --- At some point during the DjVu
     research era, it became clear that C++ compilers rarely provided
     portable libraries. We then decided to avoid fancy classes (like
@@ -56,15 +56,15 @@
     forgot this letter 'G' when creating more challenging things
     like the ZP Coder or the IW44 wavelets.  When converting to
     I18N, we realized two string classes where needing, replacing
-    the original GString with \Ref{GUTF8String} and 
+    the original GString with \Ref{GUTF8String} and
     \Ref{GNativeString}.
-    
+
     @memo
     General purpose string class.
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.94 2001-08-24 21:50:10 docbill Exp $# */
+    #$Id: GString.h,v 1.95 2001-09-04 23:01:51 docbill Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -98,7 +98,7 @@ class GStringRep : public GPEnabled
 {
 public:
   enum EncodeType { XUCS4, XUCS4BE, XUCS4LE, XUCS4_2143, XUCS4_3412,
-    XUTF16, XUTF16BE, XUTF16LE, XUTF8, XEBCDIC, XOTHER } ; 
+    XUTF16, XUTF16BE, XUTF16LE, XUTF8, XEBCDIC, XOTHER } ;
 
   enum EscapeMode { UNKNOWN_ESCAPED=0,  IS_ESCAPED=1, NOT_ESCAPED=2 };
 
@@ -158,7 +158,7 @@ public:
 
   // return the position of the next character
   int nextChar( const int from=0 ) const;
-  
+
   // return next non space position
   int nextNonSpace( const int from=0, const int len=(-1) ) const;
 
@@ -189,6 +189,12 @@ public:
   GP<GStringRep> substr(
     const char *s,const int start,const int length=(-1)) const;
 
+  GP<GStringRep> substr(
+    const unsigned short *s,const int start,const int length=(-1)) const;
+
+  GP<GStringRep> substr(
+    const unsigned long *s,const int start,const int length=(-1)) const;
+
   /** Initializes a string with a formatted string (as in #vprintf#).  The
       string is re-initialized with the characters generated according to the
       specified format #fmt# and using the optional arguments.  See the ANSI-C
@@ -211,7 +217,7 @@ public:
   static unsigned long UTF8toUCS4(
     unsigned char const *&s, void const * const endptr );
 
-  /** Returns the number of bytes in next UCS4 character, 
+  /** Returns the number of bytes in next UCS4 character,
       and sets #w# to the next UCS4 chacter.  */
   static int UTF8toUCS4(
     unsigned long &w, unsigned char const s[], void const * const endptr )
@@ -224,7 +230,7 @@ public:
   static int UCS4toUTF16(
     unsigned long w, unsigned short &w1, unsigned short &w2);
 
-  int cmp(const char *s2, const int len=(-1)) const; 
+  int cmp(const char *s2, const int len=(-1)) const;
   static int cmp(
     const GP<GStringRep> &s1, const GP<GStringRep> &s2, const int len=(-1)) ;
   static int cmp(
@@ -334,8 +340,7 @@ public:
       // Compare with #s2#.
   virtual int cmp(const GP<GStringRep> &s2,const int len=(-1)) const;
 
-  static GP<GStringRep> create(const unsigned int sz = 0)
-  { return GStringRep::create(sz,(GStringRep::UTF8 *)0); }
+  static GP<GStringRep> create(const unsigned int sz = 0);
 
   // Convert strings to numbers.
   virtual int toInt(void) const;
@@ -347,23 +352,24 @@ public:
     const int pos, int &endpos) const;
 
     // Create a strdup string.
-  static GP<GStringRep> create(const char *s)
-  { GStringRep::UTF8 dummy; return dummy.strdup(s); }
+  static GP<GStringRep> create(const char *s);
 
    // Creates with a concat operation.
   static GP<GStringRep> create(
-    const GP<GStringRep> &s1,const GP<GStringRep> &s2)
-  { GStringRep::UTF8 dummy; return dummy.concat(s1,s2); }
-  static GP<GStringRep> create( const GP<GStringRep> &s1,const char *s2)
-  { GStringRep::UTF8 dummy; return dummy.concat(s1,s2); }
-  static GP<GStringRep> create( const char *s1, const GP<GStringRep> &s2)
-  { GStringRep::UTF8 dummy; return dummy.concat(s1,s2); }
-  static GP<GStringRep> create( const char *s1,const char *s2)
-  { GStringRep::UTF8 dummy; return dummy.concat(s1,s2); }
+    const GP<GStringRep> &s1,const GP<GStringRep> &s2);
+  static GP<GStringRep> create( const GP<GStringRep> &s1,const char *s2);
+  static GP<GStringRep> create( const char *s1, const GP<GStringRep> &s2);
+  static GP<GStringRep> create( const char *s1,const char *s2);
+
+    // Create with a strdup and substr operation.
+  static GP<GStringRep> create(
+    const char *s,const int start,const int length=(-1));
 
   static GP<GStringRep> create(
-    const char *s,const int start,const int length=(-1))
-  { GStringRep::UTF8 dummy; return dummy.substr(s,start,length); }
+    const unsigned short *s,const int start,const int length=(-1));
+
+  static GP<GStringRep> create(
+    const unsigned long *s,const int start,const int length=(-1));
 
   static GP<GStringRep> create_format(const char fmt[],...);
   static GP<GStringRep> create(const char fmt[],va_list args);
@@ -382,88 +388,6 @@ protected:
   // Return the next character and increment the source pointer.
   virtual unsigned long getValidUCS4(const char *&source) const;
 };
-
-#if HAS_WCHAR
-class GStringRep::Native : public GStringRep
-{
-public:
-  // default constructor
-  Native(void);
-  // virtual destructor
-  virtual ~Native();
-
-    // Other virtual methods.
-      // Create an empty string.
-  virtual GP<GStringRep> blank(const unsigned int sz = 0) const;
-      // Append a string.
-  virtual GP<GStringRep> append(const GP<GStringRep> &s2) const;
-      // Test if Native.
-  virtual bool isNative(void) const;
-      // Convert to Native.
-  virtual GP<GStringRep> toNative(
-    const EscapeMode escape=UNKNOWN_ESCAPED) const;
-      // Convert to UTF8.
-  virtual GP<GStringRep> toUTF8(const bool nothrow=false) const;
-      // Convert to UTF8.
-  virtual GP<GStringRep> toThis(
-     const GP<GStringRep> &rep,const GP<GStringRep> &) const;
-      // Compare with #s2#.
-  virtual int cmp(const GP<GStringRep> &s2, const int len=(-1)) const;
-
-  // Convert strings to numbers.
-  virtual int toInt(void) const;
-  virtual long toLong(
-    const int pos, int &endpos, const int base=10) const;
-  virtual unsigned long toULong(
-    const int pos, int &endpos, const int base=10) const;
-  virtual double toDouble(
-    const int pos, int &endpos) const;
-
-    // Create an empty string
-  static GP<GStringRep> create(const unsigned int sz = 0)
-  { return GStringRep::create(sz,(GStringRep::Native *)0); }
-
-    // Create a strdup string.
-  static GP<GStringRep> create(const char *s)
-  { GStringRep::Native dummy; return dummy.strdup(s); }
-
-  // Creates by appending to the current string
-
-   // Creates with a concat operation.
-  static GP<GStringRep> create(
-    const GP<GStringRep> &s1,const GP<GStringRep> &s2)
-  { GStringRep::Native dummy; return dummy.concat(s1,s2); }
-  static GP<GStringRep> create( const GP<GStringRep> &s1,const char *s2)
-  { GStringRep::Native dummy; return dummy.concat(s1,s2); }
-  static GP<GStringRep> create( const char *s1, const GP<GStringRep> &s2)
-  { GStringRep::Native dummy; return dummy.concat(s1,s2); }
-  static GP<GStringRep> create(const char *s1,const char *s2)
-  { GStringRep::Native dummy; return dummy.concat(s1,s2); }
-
-    // Create with a strdup and substr operation.
-  static GP<GStringRep> create(
-    const char *s,const int start,const int length=(-1))
-  { GStringRep::Native dummy; return dummy.substr(s,start,length); }
-
-    // Create with an sprintf()
-  static GP<GStringRep> create_format(const char fmt[],...);
-  static GP<GStringRep> create(const char fmt[],va_list &args);
-
-  virtual unsigned char *UCS4toString(
-    const unsigned long w,unsigned char *ptr, mbstate_t *ps=0) const;
-
-  // Tests if a string is legally encoded in the current character set.
-  virtual bool is_valid(void) const;
-
-  virtual int ncopy(wchar_t * const buf, const int buflen) const;
-
-  friend class GBaseString;
-protected:
-  // Return the next character and increment the source pointer.
-  virtual unsigned long getValidUCS4(const char *&source) const;
-};
-
-#endif // HAS_WCHAR
 
 class GUTF8String;
 class GNativeString;
@@ -484,16 +408,16 @@ class GNativeString;
     to "#const char*#".  Functions returning strings should return
     #GUTF8String# or #GNativeString# objects because the class will
     automatically manage the necessary memory.
-    
+
     Characters in the string can be identified by their position.  The
     first character of a string is numbered zero. Negative positions
     represent characters relative to the end of the string (i.e.
     position #-1# accesses the last character of the string,
     position #-2# represents the second last character, etc.)  */
-    
-class GBaseString : protected GP<GStringRep> 
+
+class GBaseString : protected GP<GStringRep>
 {
-public: 
+public:
   enum EscapeMode {
     UNKNOWN_ESCAPED=GStringRep::UNKNOWN_ESCAPED,
     IS_ESCAPED=GStringRep::IS_ESCAPED,
@@ -506,8 +430,7 @@ protected:
   void init(void);
 
   ~GBaseString();
-  GBaseString &init(const GP<GStringRep> &rep)
-  { GP<GStringRep>::operator=(rep); init(); return *this;}
+  GBaseString &init(const GP<GStringRep> &rep);
 
   // -- CONSTRUCTORS
   /** Null constructor. Constructs an empty string. */
@@ -541,16 +464,15 @@ public:
       to #len-1#, where #len# is the length of the string.  The first
       character of a string is numbered zero.  Negative positions
       represent characters relative to the end of the string. */
-  char operator[] (int n) const
-    { return ((n||ptr)?((*this)->data[CheckSubscript(n)]):0); }
+  char operator[] (int n) const;
   /// Returns #TRUE# if the string contains an integer number.
   bool is_int(void) const;
   /// Returns #TRUE# if the string contains a float number.
   bool is_float(void) const;
 
   /** Converts strings between native & UTF8 **/
-  GNativeString getUTF82Native( EscapeMode escape=UNKNOWN_ESCAPED ) const;/*MBCS*/
-  GUTF8String getNative2UTF8( void ) const;/*MBCS*/
+  GNativeString getUTF82Native( EscapeMode escape=UNKNOWN_ESCAPED ) const;
+  GUTF8String getNative2UTF8( void ) const;
 
   // -- ALTERING
   /// Reinitializes a string with the null string.
@@ -560,40 +482,34 @@ public:
       #from# and scanning forward until reaching the end of the
       string.  This function returns the position of the matching
       character.  It returns #-1# if character #c# cannot be found. */
-  int search(char c, int from=0) const
-  { return ptr?((*this)->search(c,from)):(-1); }
+  int search(char c, int from=0) const;
 
   /** Searches sub-string #str# in the string, starting at position
       #from# and scanning forward until reaching the end of the
       string.  This function returns the position of the first
       matching character of the sub-string.  It returns #-1# if
       string #str# cannot be found. */
-  int search(const char *str, int from=0) const
-  { return ptr?((*this)->search(str,from)):(-1); }
+  int search(const char *str, int from=0) const;
 
   /** Searches character #c# in the string, starting at position
       #from# and scanning backwards until reaching the beginning of
       the string.  This function returns the position of the matching
       character.  It returns #-1# if character #c# cannot be found. */
-  int rsearch(char c, const int from=0) const
-  { return ptr?((*this)->rsearch(c,from)):(-1); }
+  int rsearch(char c, const int from=0) const;
   /** Searches sub-string #str# in the string, starting at position
       #from# and scanning backwards until reaching the beginning of
       the string.  This function returns the position of the first
       matching character of the sub-string. It returns #-1# if
       string #str# cannot be found. */
-  int rsearch(const char *str, const int from=0) const
-  { return ptr?((*this)->rsearch(str,from)):(-1); }
+  int rsearch(const char *str, const int from=0) const;
   /** Searches for any of the specified characters in the accept
       string.  It returns #-1# if the none of the characters and
       be found, otherwise the position of the first match. */
-  int contains(const char accept[], const int from=0) const
-  { return ptr?((*this)->contains(accept,from)):(-1); }
+  int contains(const char accept[], const int from=0) const;
   /** Searches for any of the specified characters in the accept
       string.  It returns #-1# if the none of the characters and be
       found, otherwise the position of the last match. */
-  int rcontains(const char accept[], const int from=0) const
-  { return ptr?((*this)->rcontains(accept,from)):(-1); }
+  int rcontains(const char accept[], const int from=0) const;
 
   /** Concatenates strings. Returns a string composed by concatenating
       the characters of strings #s1# and #s2#. */
@@ -639,20 +555,16 @@ public:
   // -- COMPARISONS
     /** Returns an #int#.  Compares string with #s2# and returns
         sorting order. */
-  int cmp(const GBaseString &s2, const int len=(-1)) const
-    { return GStringRep::cmp(*this,s2,len); }
+  int cmp(const GBaseString &s2, const int len=(-1)) const;
     /** Returns an #int#.  Compares string with #s2# and returns
         sorting order. */
-  int cmp(const char *s2, const int len=(-1)) const
-    { return GStringRep::cmp(*this,s2,len); }
+  int cmp(const char *s2, const int len=(-1)) const;
     /** Returns an #int#.  Compares string with #s2# and returns
         sorting order. */
-  int cmp(const char s2) const
-    { return GStringRep::cmp(*this,&s2,1); }
+  int cmp(const char s2) const;
     /** Returns an #int#.  Compares #s2# with #s2# and returns
         sorting order. */
-  static int cmp(const char *s1, const char *s2, const int len=(-1))
-    { return GStringRep::cmp(s1,s2,len); }
+  static int cmp(const char *s1, const char *s2, const int len=(-1));
   /** Returns a boolean. The Standard C strncmp takes two string and
       compares the first N characters.  static bool GBaseString::ncmp
       will compare #s1# with #s2# with the #len# characters starting
@@ -660,97 +572,55 @@ public:
   /** String comparison. Returns true if and only if character
       strings #s1# and #s2# are equal (as with #strcmp#.)
     */
-  bool operator==(const GBaseString &s2) const
-    { return !cmp(s2); }
-  bool operator==(const char *s2) const
-    { return !cmp(s2); }
-#if 0
-  bool operator==(const char s2)  const
-    { return !cmp(s2); }
-#endif
-  friend bool operator==(const char    *s1, const GBaseString &s2) 
-    { return !s2.cmp(s1); }
-#if 0
-  friend bool operator==(const char s1, const GBaseString &s2) 
-    { return !s2.cmp(s1); }
-#endif
+  bool operator==(const GBaseString &s2) const;
+  bool operator==(const char *s2) const;
+  friend bool operator==(const char    *s1, const GBaseString &s2);
 
   /** String comparison. Returns true if and only if character
       strings #s1# and #s2# are not equal (as with #strcmp#.)
     */
-  bool operator!=(const GBaseString &s2) const
-    { return !!cmp(s2); }
-  bool operator!=(const char *s2) const
-    { return !!cmp(s2); }
-#if 0
-  bool operator!=(const char s2) const
-    { return !!cmp(s2); }
-#endif
-  friend bool operator!=(const char *s1, const GBaseString &s2)
-    { return !!s2.cmp(s1); }
-#if 0
-  friend bool operator!=(const char s1, const GBaseString &s2)
-    { return !!s2.cmp(s1); }
-#endif
+  bool operator!=(const GBaseString &s2) const;
+  bool operator!=(const char *s2) const;
+  friend bool operator!=(const char *s1, const GBaseString &s2);
 
   /** String comparison. Returns true if and only if character
       strings #s1# is lexicographically greater than or equal to
       string #s2# (as with #strcmp#.) */
-  bool operator>=(const GBaseString &s2) const
-    { return (cmp(s2)>=0); }
-  bool operator>=(const char *s2) const
-    { return (cmp(s2)>=0); }
-  bool operator>=(const char s2) const
-    { return (cmp(s2)>=0); }
-  friend bool operator>=(const char    *s1, const GBaseString &s2)
-    { return (s2.cmp(s1)<=0); }
-  friend bool operator>=(const char s1, const GBaseString &s2)
-    { return (s2.cmp(s1)<=0); }
+  bool operator>=(const GBaseString &s2) const;
+  bool operator>=(const char *s2) const;
+  bool operator>=(const char s2) const;
+  friend bool operator>=(const char    *s1, const GBaseString &s2);
+  friend bool operator>=(const char s1, const GBaseString &s2);
 
   /** String comparison. Returns true if and only if character
       strings #s1# is lexicographically less than string #s2#
       (as with #strcmp#.)
    */
-  bool operator<(const GBaseString &s2) const
-    { return (cmp(s2)<0); }
-  bool operator<(const char *s2) const
-    { return (cmp(s2)<0); }
-  bool operator<(const char s2) const
-    { return (cmp(s2)<0); }
-  friend bool operator<(const char *s1, const GBaseString &s2)
-    { return (s2.cmp(s1)>0); }
-  friend bool operator<(const char s1, const GBaseString &s2)
-    { return (s2.cmp(s1)>0); }
+  bool operator<(const GBaseString &s2) const;
+  bool operator<(const char *s2) const;
+  bool operator<(const char s2) const;
+  friend bool operator<(const char *s1, const GBaseString &s2);
+  friend bool operator<(const char s1, const GBaseString &s2);
 
   /** String comparison. Returns true if and only if character
       strings #s1# is lexicographically greater than string #s2#
       (as with #strcmp#.)
    */
-  bool operator> (const GBaseString &s2) const
-    { return (cmp(s2)>0); }
-  bool operator> (const char *s2) const
-    { return (cmp(s2)>0); }
-  bool operator> (const char s2) const
-    { return (cmp(s2)>0); }
-  friend bool operator> (const char    *s1, const GBaseString &s2)
-    { return (s2.cmp(s1)<0); }
-  friend bool operator> (const char s1, const GBaseString &s2)
-    { return (s2.cmp(s1)<0); }
+  bool operator> (const GBaseString &s2) const;
+  bool operator> (const char *s2) const;
+  bool operator> (const char s2) const;
+  friend bool operator> (const char    *s1, const GBaseString &s2);
+  friend bool operator> (const char s1, const GBaseString &s2);
 
   /** String comparison. Returns true if and only if character
       strings #s1# is lexicographically less than or equal to string
       #s2# (as with #strcmp#.)
    */
-  bool operator<=(const GBaseString &s2) const
-    { return (cmp(s2)<=0); }
-  bool operator<=(const char *s2) const
-    { return (cmp(s2)<=0); }
-  bool operator<=(const char s2) const
-    { return (cmp(s2)<=0); }
-  friend bool operator<=(const char    *s1, const GBaseString &s2)
-    { return !(s1>s2); }
-  friend bool operator<=(const char    s1, const GBaseString &s2)
-    { return !(s1>s2); }
+  bool operator<=(const GBaseString &s2) const;
+  bool operator<=(const char *s2) const;
+  bool operator<=(const char s2) const;
+  friend bool operator<=(const char    *s1, const GBaseString &s2);
+  friend bool operator<=(const char    s1, const GBaseString &s2);
 
    /** Returns an integer.  Implements a functional i18n atoi. Note
        that if you pass a GBaseString that is not in Native format
@@ -766,28 +636,22 @@ public:
   friend GStringRep;
 
   /// Returns next non space position.
-  int nextNonSpace( const int from=0, const int len=(-1) ) const
-  { return ptr?(*this)->nextNonSpace(from,len):0; }
+  int nextNonSpace( const int from=0, const int len=(-1) ) const;
 
   /// Returns next character position.
-  int nextChar( const int from=0 ) const
-  { return ptr?(*this)->nextChar(from):0; }
+  int nextChar( const int from=0 ) const;
 
   /// Returns next non space position.
-  int nextSpace( const int from=0, const int len=(-1) ) const
-  { return ptr?(*this)->nextSpace(from,len):0; }
+  int nextSpace( const int from=0, const int len=(-1) ) const;
 
   /// return the position after the last non-whitespace character.
-  int firstEndSpace( const int from=0,const int len=(-1) ) const
-  { return ptr?(*this)->firstEndSpace(from,len):0; }
+  int firstEndSpace( const int from=0,const int len=(-1) ) const;
 
   /// Tests if the string is legally encoded in the current codepage.
-  bool is_valid(void) const
-  { return ptr?((*this)->is_valid()):true; }
+  bool is_valid(void) const;
 
   /// copy to a wchar_t buffer
-  int ncopy(wchar_t * const buf, const int buflen) const
-  {if(buf&&buflen)buf[0]=0;return ptr?((*this)->ncopy(buf,buflen)):0;}
+  int ncopy(wchar_t * const buf, const int buflen) const;
 
 protected:
   const char *gstr;
@@ -799,17 +663,7 @@ public:
     const EscapeMode escape=UNKNOWN_ESCAPED) const;
   GUTF8String NativeToUTF8(void) const;
 protected:
-  int CheckSubscript(int n) const
-  {
-    if(n)
-    {
-      if (n<0 && ptr)
-        n += (*this)->size;
-      if (n<0 || !ptr || n > (int)(*this)->size)
-        throw_illegal_subscript();
-    }
-    return n;
-  }
+  int CheckSubscript(int n) const;
 };
 
 /** General purpose character string.
@@ -826,22 +680,20 @@ protected:
     returning strings should return #GUTF8String# or #GNativeString#
     objects because the class will automatically manage the necessary
     memory.
-    
+
     Characters in the string can be identified by their position.  The
     first character of a string is numbered zero. Negative positions
     represent characters relative to the end of the string (i.e.
     position #-1# accesses the last character of the string,
     position #-2# represents the second last character, etc.)  */
-    
+
 class GUTF8String : public GBaseString
 {
 public:
   ~GUTF8String();
-  void init(void)
-  { GBaseString::init(); }
+  void init(void);
 
-  GUTF8String &init(const GP<GStringRep> &rep)
-  { GP<GStringRep>::operator=(rep?rep->toUTF8(true):rep); init(); return *this; }
+  GUTF8String &init(const GP<GStringRep> &rep);
 
   // -- CONSTRUCTORS
   /** Null constructor. Constructs an empty string. */
@@ -852,14 +704,19 @@ public:
   GUTF8String(const char *str);
   /// Constructs a string from a null terminated character array.
   GUTF8String(const unsigned char *str);
+  GUTF8String(const unsigned short *dat);
+  GUTF8String(const unsigned long *dat);
   /** Constructs a string from a character array.  Elements of the
       character array #dat# are added into the string until the
       string length reaches #len# or until encountering a null
       character (whichever comes first). */
   GUTF8String(const char *dat, unsigned int len);
+  GUTF8String(const unsigned short *dat, unsigned int len);
+  GUTF8String(const unsigned long *dat, unsigned int len);
+
   /// Construct from base class.
   GUTF8String(const GP<GStringRep> &str);
-  GUTF8String(const GBaseString &str); 
+  GUTF8String(const GBaseString &str);
   GUTF8String(const GUTF8String &str);
   GUTF8String(const GNativeString &str);
   /** Constructs a string from a character array.  Elements of the
@@ -914,15 +771,13 @@ public:
       information. The current implementation will cause a
       segmentation violation if the resulting string is longer
       than 32768 characters. */
-  GUTF8String &vformat(const GUTF8String &fmt, va_list &args)
-  { return (*this = (fmt.ptr?GUTF8String(fmt,args):fmt)); }
+  GUTF8String &vformat(const GUTF8String &fmt, va_list &args);
 
   /** Returns a copy of this string with characters used in XML with
       '<'  to "&lt;", '>'  to "&gt;",  '&' to "&amp;" '\'' to
       "&apos;", and  '\"' to  "&quot;".   Characters 0x01 through
       0x1f are also escaped. */
-  GUTF8String toEscaped( const bool tosevenbit=false ) const
-  { return ptr?GUTF8String((*this)->toEscaped(tosevenbit)):(*this); }
+  GUTF8String toEscaped( const bool tosevenbit=false ) const;
 
   /** Converts strings containing HTML/XML escaped characters into
       their unescaped forms. Numeric representations of characters
@@ -942,30 +797,18 @@ public:
 
   // -- CONCATENATION
   /// Appends character #ch# to the string.
-  GUTF8String& operator+= (char ch)
-  {
-    return init(
-      GStringRep::UTF8::create((const char*)*this,
-      GStringRep::UTF8::create(&ch,0,1)));
-  }
+  GUTF8String& operator+= (char ch);
 
   /// Appends the null terminated character array #str# to the string.
-  GUTF8String& operator+= (const char *str)
-  {
-    return init(GStringRep::UTF8::create(*this,str));
-  }
+  GUTF8String& operator+= (const char *str);
   /// Appends the specified GBaseString to the string.
-  GUTF8String& operator+= (const GBaseString &str)
-  { 
-    return init(GStringRep::UTF8::create(*this,str));
-  }
+  GUTF8String& operator+= (const GBaseString &str);
 
   /** Returns a sub-string.  The sub-string is composed by copying
       #len# characters starting at position #from# in this string.
       The length of the resulting string may be smaller than #len#
       if the specified range is too large. */
-  GUTF8String substr(int from, unsigned int len=1) const
-    { return GUTF8String(*this, from, len); }
+  GUTF8String substr(int from, unsigned int len=1) const;
 
   /** Returns an upper case copy of this string.  The returned string
       contains a copy of the current string with all letters turned
@@ -979,15 +822,11 @@ public:
   /** Concatenates strings. Returns a string composed by concatenating
       the characters of strings #s1# and #s2#.
   */
-  GUTF8String operator+(const GBaseString &s2) const 
-    { return GStringRep::UTF8::create(*this,s2); }
-  GUTF8String operator+(const GUTF8String &s2) const
-    { return GStringRep::UTF8::create(*this,s2); }
+  GUTF8String operator+(const GBaseString &s2) const;
+  GUTF8String operator+(const GUTF8String &s2) const;
   GUTF8String operator+(const GNativeString &s2) const;
-  GUTF8String operator+(const char    *s2) const
-    { return GStringRep::UTF8::create(*this,s2); }
-  friend GUTF8String operator+(const char    *s1, const GUTF8String &s2) 
-    { return GStringRep::UTF8::create(s1,s2); }
+  GUTF8String operator+(const char    *s2) const;
+  friend GUTF8String operator+(const char    *s1, const GUTF8String &s2);
 
   /** Provides a direct access to the string buffer.  Returns a
       pointer for directly accessing the string buffer.  This pointer
@@ -997,16 +836,7 @@ public:
       be large enough to hold at least #n# characters plus a null
       character.  If #n# is positive but smaller than the string
       length, the string will be truncated to #n# characters. */
-  char *getbuf(int n = -1)
-  {
-    if(ptr)
-      init((*this)->getbuf(n));
-    else if(n>0)
-      init(GStringRep::UTF8::create(n));
-    else
-      init(0);
-    return ptr?((*this)->data):0;
-  }
+  char *getbuf(int n = -1);
   /** Set the character at position #n# to value #ch#.  An exception
       \Ref{GException} is thrown if number #n# is not in range #-len#
       to #len#, where #len# is the length of the string.  If character
@@ -1015,16 +845,7 @@ public:
       positions represent characters relative to the end of the
       string. If position #n# is equal to the length of the string,
       this function appends character #ch# to the end of the string. */
-  void setat(const int n, const char ch)
-  { 
-    if((!n)&&(!ptr))
-    {
-      init(GStringRep::UTF8::create(&ch,0,1));
-    }else
-    {
-      init((*this)->setat(CheckSubscript(n),ch));
-    }
-  }
+  void setat(const int n, const char ch);
 public:
   typedef enum GStringRep::EncodeType EncodeType;
   static GUTF8String create(void const * const buf,
@@ -1036,13 +857,10 @@ public:
     const unsigned int size, const GUTF8String &encoding );
   static GUTF8String create( void const * const buf,
     const unsigned int size, const GP<GStringRep::Unicode> &remainder);
-  GP<GStringRep::Unicode> get_remainder(void) const
-  {
-    GP<GStringRep::Unicode> retval;
-    if(ptr)
-      retval=((*this)->get_remainder());
-    return retval;
-  }
+  GP<GStringRep::Unicode> get_remainder(void) const;
+  static GUTF8String create( const char *buf, const unsigned int bufsize );
+  static GUTF8String create( const unsigned short *buf, const unsigned int bufsize );
+  static GUTF8String create( const unsigned long *buf, const unsigned int bufsize );
 };
 
 
@@ -1064,13 +882,13 @@ public:
     returning strings should return #GUTF8String# or #GNativeString#
     objects because the class will automatically manage the necessary
     memory.
-    
+
     Characters in the string can be identified by their position.  The
     first character of a string is numbered zero. Negative positions
     represent characters relative to the end of the string (i.e.
     position #-1# accesses the last character of the string,
     position #-2# represents the second last character, etc.)  */
-    
+
 class GNativeString : public GBaseString
 {
 public:
@@ -1084,14 +902,18 @@ public:
   GNativeString(const char *str);
   /// Constructs a string from a null terminated character array.
   GNativeString(const unsigned char *str);
+  GNativeString(const unsigned short *str);
+  GNativeString(const unsigned long *str);
   /** Constructs a string from a character array.  Elements of the
       character array #dat# are added into the string until the
       string length reaches #len# or until encountering a null
       character (whichever comes first). */
   GNativeString(const char *dat, unsigned int len);
+  GNativeString(const unsigned short *dat, unsigned int len);
+  GNativeString(const unsigned long *dat, unsigned int len);
   /// Construct from base class.
   GNativeString(const GP<GStringRep> &str);
-  GNativeString(const GBaseString &str); 
+  GNativeString(const GBaseString &str);
 #if HAS_WCHAR
   GNativeString(const GUTF8String &str);
 #endif
@@ -1125,13 +947,10 @@ public:
 #undef GBaseString
 #else
   /// Initialize this string class
-  void init(void)
-  { GBaseString::init(); }
+  void init(void);
 
   /// Initialize this string class
-  GNativeString &init(const GP<GStringRep> &rep)
-  {  GP<GStringRep>::operator=(rep?rep->toNative(GStringRep::NOT_ESCAPED):rep);
-     init(); return *this; }
+  GNativeString &init(const GP<GStringRep> &rep);
 
   /** Copy a null terminated character array. Resets this string with
       the character string contained in the null terminated character
@@ -1142,31 +961,19 @@ public:
   GNativeString& operator= (const GBaseString &str);
   GNativeString& operator= (const GUTF8String &str);
   GNativeString& operator= (const GNativeString &str);
-
   // -- CONCATENATION
   /// Appends character #ch# to the string.
-  GNativeString& operator+= (char ch)
-  {
-    return init(GStringRep::Native::create(
-      *this,GStringRep::UTF8::create(&ch,0,1)));
-  }
+  GNativeString& operator+= (char ch);
   /// Appends the null terminated character array #str# to the string.
-  GNativeString& operator+= (const char *str)
-  {
-    return init(GStringRep::Native::create(*this,str));
-  }
+  GNativeString& operator+= (const char *str);
   /// Appends the specified GBaseString to the string.
-  GNativeString& operator+= (const GBaseString &str)
-  { 
-    return init(GStringRep::Native::create(*this,str));
-  }
+  GNativeString& operator+= (const GBaseString &str);
 
   /** Returns a sub-string.  The sub-string is composed by copying
       #len# characters starting at position #from# in this string.
       The length of the resulting string may be smaller than #len#
       if the specified range is too large. */
-  GNativeString substr(int from, unsigned int len=1) const
-    { return GNativeString(*this, from, len); }
+  GNativeString substr(int from, unsigned int len=1) const;
 
   /** Returns an upper case copy of this string.  The returned
       string contains a copy of the current string with all letters
@@ -1178,16 +985,12 @@ public:
   GNativeString downcase( void ) const;
 
 
-  GNativeString operator+(const GBaseString &s2) const
-    { return GStringRep::Native::create(*this,s2); }
-  GNativeString operator+(const GNativeString &s2) const 
-    { return GStringRep::Native::create(*this,s2); }
+  GNativeString operator+(const GBaseString &s2) const;
+  GNativeString operator+(const GNativeString &s2) const;
   GUTF8String operator+(const GUTF8String &s2) const;
-  GNativeString operator+(const char    *s2) const
-    { return GStringRep::Native::create(*this,s2); }
+  GNativeString operator+(const char    *s2) const;
   friend GNativeString operator+(
-    const char    *s1, const GNativeString &s2) 
-    { return GStringRep::Native::create(s1,s2); }
+    const char    *s1, const GNativeString &s2);
 
   /** Initializes a string with a formatted string (as in #printf#).
       The string is re-initialized with the characters generated
@@ -1204,15 +1007,13 @@ public:
       information. The current implementation will cause a
       segmentation violation if the resulting string is longer than
       32768 characters. */
-  GNativeString &vformat(const GNativeString &fmt, va_list &args)
-  { return (*this = (fmt.ptr?GNativeString(fmt,args):fmt)); }
+  GNativeString &vformat(const GNativeString &fmt, va_list &args);
 
   /** Returns a copy of this string with characters used in XML with
       '<'  to "&lt;", '>'  to "&gt;",  '&' to "&amp;" '\'' to
       "&apos;", and  '\"' to  "&quot;".   Characters 0x01 through
       0x1f are also escaped. */
-  GNativeString toEscaped( const bool tosevenbit=false ) const
-  { return ptr?GNativeString((*this)->toEscaped(tosevenbit)):(*this); }
+  GNativeString toEscaped( const bool tosevenbit=false ) const;
 
 
   /** Provides a direct access to the string buffer.  Returns a
@@ -1224,16 +1025,7 @@ public:
       characters plus a null character.  If #n# is positive but
       smaller than the string length, the string will be truncated
       to #n# characters. */
-  char *getbuf(int n = -1)
-  {
-    if(ptr)
-      init((*this)->getbuf(n));
-    else if(n>0)
-      init(GStringRep::Native::create(n));
-    else
-      init(0);
-    return ptr?((*this)->data):0;
-  }
+  char *getbuf(int n = -1);
   /** Set the character at position #n# to value #ch#.  An exception
       \Ref{GException} is thrown if number #n# is not in range #-len#
       to #len#, where #len# is the length of the string.  If
@@ -1243,29 +1035,24 @@ public:
       the string. If position #n# is equal to the length of the
       string, this function appends character #ch# to the end of the
       string. */
-  void setat(const int n, const char ch)
-  {
-    if((!n)&&(!ptr))
-    {
-      init(GStringRep::Native::create(&ch,0,1));
-    }else
-    {
-      init((*this)->setat(CheckSubscript(n),ch));
-    }
-  }
+  void setat(const int n, const char ch);
+
+  static GNativeString create( const char *buf, const unsigned int bufsize );
+  static GNativeString create( const unsigned short *buf, const unsigned int bufsize );
+  static GNativeString create( const unsigned long *buf, const unsigned int bufsize );
 #endif // WinCE
 };
 
 //@}
 
 inline
-GBaseString::operator const char* ( void ) const  
+GBaseString::operator const char* ( void ) const
 {
   return ptr?(*this)->data:nullstr;
 }
 
 inline unsigned int
-GBaseString::length( void ) const 
+GBaseString::length( void ) const
 {
   return ptr ? (*this)->size : 0;
 }
@@ -1276,16 +1063,41 @@ GBaseString::operator! ( void ) const
   return !ptr;
 }
 
-inline GUTF8String 
+inline GUTF8String
 GUTF8String::upcase( void ) const
-{ 
+{
   return (ptr?(*this)->upcase():(*this));
 }
 
-inline GUTF8String 
+inline GUTF8String
 GUTF8String::downcase( void ) const
-{ 
+{
   return (ptr?(*this)->downcase():(*this));
+}
+
+inline void
+GUTF8String::init(void)
+{ GBaseString::init(); }
+
+inline GUTF8String &
+GUTF8String::init(const GP<GStringRep> &rep)
+{ GP<GStringRep>::operator=(rep?rep->toUTF8(true):rep); init(); return *this; }
+
+inline GUTF8String &
+GUTF8String::vformat(const GUTF8String &fmt, va_list &args)
+{ return (*this = (fmt.ptr?GUTF8String(fmt,args):fmt)); }
+
+inline GUTF8String
+GUTF8String::toEscaped( const bool tosevenbit=false ) const
+{ return ptr?GUTF8String((*this)->toEscaped(tosevenbit)):(*this); }
+
+inline GP<GStringRep::Unicode> 
+GUTF8String::get_remainder(void) const
+{
+  GP<GStringRep::Unicode> retval;
+  if(ptr)
+    retval=((*this)->get_remainder());
+  return retval;
 }
 
 inline
@@ -1314,7 +1126,7 @@ GBaseString::toInt(void) const
 inline long
 GBaseString::toLong(const int pos, int &endpos, const int base) const
 {
-  long int retval=0; 
+  long int retval=0;
   if(ptr)
   {
     retval=(*this)->toLong(pos, endpos, base);
@@ -1340,10 +1152,10 @@ GBaseString::toLong(
 }
 
 /** Returns a unsigned long integer.  Implements i18n strtoul. */
-inline unsigned long 
+inline unsigned long
 GBaseString::toULong(const int pos, int &endpos, const int base) const
 {
-  unsigned long retval=0; 
+  unsigned long retval=0;
   if(ptr)
   {
     retval=(*this)->toULong(pos, endpos, base);
@@ -1373,7 +1185,7 @@ inline double
 GBaseString::toDouble(
   const int pos, int &endpos ) const
 {
-  double retval=(double)0; 
+  double retval=(double)0;
   if(ptr)
   {
     retval=(*this)->toDouble(pos, endpos);
@@ -1384,73 +1196,175 @@ GBaseString::toDouble(
   return retval;
 }
 
-inline double 
+inline double
 GBaseString::toDouble(
   const GUTF8String& src, const int pos, int &endpos)
 {
   return src.toDouble(pos,endpos);
 }
 
-inline double 
+inline double
 GBaseString::toDouble(
   const GNativeString& src, const int pos, int &endpos)
 {
   return src.toDouble(pos,endpos);
 }
 
-inline GP<GStringRep> 
-GStringRep::UTF8ToNative( const char *s, const EscapeMode escape )
-{
-  return GStringRep::UTF8::create(s)->toNative(escape);
-}
+inline GBaseString &
+GBaseString::init(const GP<GStringRep> &rep)
+{ GP<GStringRep>::operator=(rep); init(); return *this;}
 
-inline GP<GStringRep> 
-GStringRep::NativeToUTF8( const char *s )
+inline char
+GBaseString::operator[] (int n) const
+{ return ((n||ptr)?((*this)->data[CheckSubscript(n)]):0); }
+
+inline int
+GBaseString::search(char c, int from) const
+{ return ptr?((*this)->search(c,from)):(-1); }
+
+inline int
+GBaseString::search(const char *str, int from) const
+{ return ptr?((*this)->search(str,from)):(-1); }
+
+inline int
+GBaseString::rsearch(char c, const int from) const
+{ return ptr?((*this)->rsearch(c,from)):(-1); }
+
+inline int
+GBaseString::rsearch(const char *str, const int from) const
+{ return ptr?((*this)->rsearch(str,from)):(-1); }
+
+inline int
+GBaseString::contains(const char accept[], const int from) const
+{ return ptr?((*this)->contains(accept,from)):(-1); }
+
+inline int
+GBaseString::rcontains(const char accept[], const int from) const
+{ return ptr?((*this)->rcontains(accept,from)):(-1); }
+
+inline int
+GBaseString::cmp(const GBaseString &s2, const int len=(-1)) const
+{ return GStringRep::cmp(*this,s2,len); }
+
+inline int
+GBaseString::cmp(const char *s2, const int len=(-1)) const
+{ return GStringRep::cmp(*this,s2,len); }
+
+inline int
+GBaseString::cmp(const char s2) const
+{ return GStringRep::cmp(*this,&s2,1); }
+
+inline int
+GBaseString::cmp(const char *s1, const char *s2, const int len=(-1))
+{ return GStringRep::cmp(s1,s2,len); }
+
+inline bool
+GBaseString::operator==(const GBaseString &s2) const
+{ return !cmp(s2); }
+
+inline bool
+GBaseString::operator==(const char *s2) const
+{ return !cmp(s2); }
+
+inline bool
+GBaseString::operator!=(const GBaseString &s2) const
+{ return !!cmp(s2); }
+
+inline bool
+GBaseString::operator!=(const char *s2) const
+{ return !!cmp(s2); }
+
+inline bool
+GBaseString::operator>=(const GBaseString &s2) const
+{ return (cmp(s2)>=0); }
+
+inline bool
+GBaseString::operator>=(const char *s2) const
+{ return (cmp(s2)>=0); }
+
+inline bool
+GBaseString::operator>=(const char s2) const
+{ return (cmp(s2)>=0); }
+
+inline bool
+GBaseString::operator<(const GBaseString &s2) const
+{ return (cmp(s2)<0); }
+
+inline bool
+GBaseString::operator<(const char *s2) const
+{ return (cmp(s2)<0); }
+
+inline bool
+GBaseString::operator<(const char s2) const
+{ return (cmp(s2)<0); }
+
+inline bool
+GBaseString::operator> (const GBaseString &s2) const
+{ return (cmp(s2)>0); }
+
+inline bool
+GBaseString::operator> (const char *s2) const
+{ return (cmp(s2)>0); }
+
+inline bool
+GBaseString::operator> (const char s2) const
+{ return (cmp(s2)>0); }
+
+inline bool
+GBaseString::operator<=(const GBaseString &s2) const
+{ return (cmp(s2)<=0); }
+
+inline bool
+GBaseString::operator<=(const char *s2) const
+{ return (cmp(s2)<=0); }
+
+inline bool
+GBaseString::operator<=(const char s2) const
+{ return (cmp(s2)<=0); }
+
+inline int
+GBaseString::nextNonSpace( const int from, const int len ) const
+{ return ptr?(*this)->nextNonSpace(from,len):0; }
+
+inline int
+GBaseString::nextChar( const int from ) const
+{ return ptr?(*this)->nextChar(from):0; }
+
+inline int
+GBaseString::nextSpace( const int from, const int len ) const
+{ return ptr?(*this)->nextSpace(from,len):0; }
+
+inline int
+GBaseString::firstEndSpace( const int from,const int len ) const
+{ return ptr?(*this)->firstEndSpace(from,len):0; }
+
+inline bool
+GBaseString::is_valid(void) const
+{ return ptr?((*this)->is_valid()):true; }
+
+inline int
+GBaseString::ncopy(wchar_t * const buf, const int buflen) const
+{if(buf&&buflen)buf[0]=0;return ptr?((*this)->ncopy(buf,buflen)):0;}
+
+inline int
+GBaseString::CheckSubscript(int n) const
 {
-#if !HAS_WCHAR
-  return GStringRep::UTF8::create(s);
-#else
-  return GStringRep::Native::create(s)->toUTF8();
-#endif // HAS_WCHAR
+  if(n)
+  {
+    if (n<0 && ptr)
+      n += (*this)->size;
+    if (n<0 || !ptr || n > (int)(*this)->size)
+      throw_illegal_subscript();
+  }
+  return n;
 }
 
 inline GBaseString::GBaseString(void) { init(); }
 
 inline GUTF8String::GUTF8String(void) { }
 
-inline GUTF8String::GUTF8String(const char dat)
-{ init(GStringRep::UTF8::create(&dat,0,1)); }
-
-inline GUTF8String::GUTF8String(const char *str)
-{ init(GStringRep::UTF8::create(str)); }
-
-inline GUTF8String::GUTF8String(const unsigned char *str)
-{ init(GStringRep::UTF8::create((const char *)str)); }
-
-inline GUTF8String::GUTF8String(const char *dat, unsigned int len)
-{ init(GStringRep::UTF8::create(dat,0,((int)len<0)?(-1):(int)len)); }
-
 inline GUTF8String::GUTF8String(const GUTF8String &str)
 { init(str); }
-
-inline GUTF8String::GUTF8String(
-  const GBaseString &gs, int from, unsigned int len)
-{ init(GStringRep::UTF8::create(gs,from,((int)len<0)?(-1):(int)len)); }
-
-inline GUTF8String::GUTF8String(const int number)
-{ init(GStringRep::UTF8::create_format("%d",number)); }
-
-inline GUTF8String::GUTF8String(const double number)
-{ init(GStringRep::UTF8::create_format("%f",number)); }
-
-inline GUTF8String::GUTF8String(const GUTF8String &fmt, va_list &args)
-{ init(fmt.ptr?fmt->vformat(args):fmt); }
-
-inline GUTF8String& GUTF8String::operator= (const char str)
-{ return init(GStringRep::UTF8::create(&str,0,1)); }
-
-inline GUTF8String& GUTF8String::operator= (const char *str)
-{ return init(GStringRep::UTF8::create(str)); }
 
 inline GUTF8String& GUTF8String::operator= (const GP<GStringRep> &str)
 { return init(str); }
@@ -1464,10 +1378,55 @@ inline GUTF8String& GUTF8String::operator= (const GUTF8String &str)
 inline GUTF8String& GUTF8String::operator= (const GNativeString &str)
 { return init(str); }
 
-inline GUTF8String GBaseString::operator+(const GUTF8String &s2) const
-  { return GStringRep::UTF8::create(*this,s2); }
+inline GUTF8String
+GUTF8String::create( const char *buf, const unsigned int bufsize )
+{
+#if HAS_WCHAR
+  return GNativeString(buf,bufsize);
+#else
+  return GUTF8String(buf,0,bufsize);
+#endif
+}
+
+inline GUTF8String
+GUTF8String::create( const unsigned short *buf, const unsigned int bufsize )
+{
+  return GUTF8String(buf,bufsize);
+}
+
+inline GUTF8String
+GUTF8String::create( const unsigned long *buf, const unsigned int bufsize )
+{
+  return GUTF8String(buf,bufsize);
+}
 
 inline GNativeString::GNativeString(void) {}
+
+/// Initialize this string class
+inline void
+GNativeString::init(void)
+{ GBaseString::init(); }
+
+/// Initialize this string class
+inline GNativeString &
+GNativeString::init(const GP<GStringRep> &rep)
+{
+  GP<GStringRep>::operator=(rep?rep->toNative(GStringRep::NOT_ESCAPED):rep);
+  init();
+  return *this;
+}
+
+inline GNativeString 
+GNativeString::substr(int from, unsigned int len) const
+{ return GNativeString(*this, from, len); }
+
+inline GNativeString &
+GNativeString::vformat(const GNativeString &fmt, va_list &args)
+{ return (*this = (fmt.ptr?GNativeString(fmt,args):fmt)); }
+
+inline GNativeString
+GNativeString::toEscaped( const bool tosevenbit ) const
+{ return ptr?GNativeString((*this)->toEscaped(tosevenbit)):(*this); }
 
 #if !HAS_WCHAR
 // For Windows CE, GNativeString is essentially GUTF8String
@@ -1493,7 +1452,23 @@ GNativeString::GNativeString(const unsigned char *str)
 : GUTF8String(str) {}
 
 inline
+GNativeString::GNativeString(const unsigned short *str)
+: GUTF8String(str) {}
+
+inline
+GNativeString::GNativeString(const unsigned long *str)
+: GUTF8String(str) {}
+
+inline
 GNativeString::GNativeString(const char *dat, unsigned int len)
+: GUTF8String(dat,len) {}
+
+inline
+GNativeString::GNativeString(const unsigned short *dat, unsigned int len)
+: GUTF8String(dat,len) {}
+
+inline
+GNativeString::GNativeString(const unsigned long *dat, unsigned int len)
 : GUTF8String(dat,len) {}
 
 inline
@@ -1532,55 +1507,6 @@ GNativeString::GNativeString(const GBaseString &str)
   init(str.length()?(str->toNative(GStringRep::NOT_ESCAPED)):(GP<GStringRep>)str);
 }
 
-inline
-GNativeString::GNativeString(const char dat)
-{
-  init(GStringRep::Native::create(&dat,0,1));
-}
-
-inline
-GNativeString::GNativeString(const char *str)
-{
-  init(GStringRep::Native::create(str));
-}
-
-inline
-GNativeString::GNativeString(const unsigned char *str)
-{
-  init(GStringRep::Native::create((const char *)str));
-}
-
-inline
-GNativeString::GNativeString(const char *dat, unsigned int len)
-{
-  init(
-    GStringRep::Native::create(dat,0,((int)len<0)?(-1):(int)len));
-}
-
-inline
-GNativeString::GNativeString(const GNativeString &str)
-{
-  init(str);
-}
-
-inline
-GNativeString::GNativeString(const GBaseString &gs, int from, unsigned int len)
-{
-  init(
-    GStringRep::Native::create(gs,from,((int)len<0)?(-1):(int)len));
-}
-
-inline
-GNativeString::GNativeString(const int number)
-{
-  init(GStringRep::Native::create_format("%d",number));
-}
-
-inline
-GNativeString::GNativeString(const double number)
-{
-  init(GStringRep::Native::create_format("%f",number));
-}
 
 inline
 GNativeString::GNativeString(const GNativeString &fmt, va_list &args)
@@ -1588,20 +1514,23 @@ GNativeString::GNativeString(const GNativeString &fmt, va_list &args)
   init(fmt.ptr?fmt->vformat(args):fmt);
 }
 
-//inline GNativeString::GNativeString(const GP<GStringRep> &str)
-//{ init(str); }
-//inline GNativeString::GNativeString(const GBaseString &str)
-//{ init(str); }
-//inline GNativeString::GNativeString(const GUTF8String &str)
-//{ init(str); }
+inline GNativeString
+GNativeString::create( const char *buf, const unsigned int bufsize )
+{
+  return GNativeString(buf,bufsize);
+}
 
-inline GNativeString&
-GNativeString::operator= (const char str)
-{ return init(GStringRep::Native::create(&str,0,1)); }
+inline GNativeString
+GNativeString::create( const unsigned short *buf, const unsigned int bufsize )
+{
+  return GNativeString(buf,bufsize);
+}
 
-inline GNativeString&
-GNativeString::operator= (const char *str)
-{ return init(GStringRep::Native::create(str)); }
+inline GNativeString
+GNativeString::create( const unsigned long *buf, const unsigned int bufsize )
+{
+  return GNativeString(buf,bufsize);
+}
 
 inline GNativeString&
 GNativeString::operator= (const GP<GStringRep> &str)
@@ -1620,37 +1549,58 @@ GNativeString::operator= (const GNativeString &str)
 { return init(str); }
 
 inline GNativeString
-GBaseString::operator+(const GNativeString &s2) const
-{
-  return GStringRep::Native::create(*this,s2);
-}
-
-inline GUTF8String
-GNativeString::operator+(const GUTF8String &s2) const
-{
-  return GStringRep::UTF8::create(
-    ptr?(*this)->toUTF8(true):(*this),s2);
-}
-
-inline GUTF8String
-GUTF8String::operator+(const GNativeString &s2) const
-{
-  return GStringRep::UTF8::create(*this,s2.ptr?s2->toUTF8(true):s2);
-}
-
-inline GNativeString 
 GNativeString::upcase( void ) const
-{ 
+{
   return (ptr?(*this)->upcase():(*this));
 }
 
-inline GNativeString 
+inline GNativeString
 GNativeString::downcase( void ) const
-{ 
+{
   return (ptr?(*this)->downcase():(*this));
 }
 
 #endif // HAS_WCHAR
+
+inline bool
+operator==(const char *s1, const GBaseString &s2)
+{ return !s2.cmp(s1); }
+
+inline bool
+operator!=(const char *s1, const GBaseString &s2)
+{ return !!s2.cmp(s1); }
+
+inline bool
+operator>=(const char    *s1, const GBaseString &s2)
+{ return (s2.cmp(s1)<=0); }
+
+inline bool
+operator>=(const char s1, const GBaseString &s2)
+{ return (s2.cmp(s1)<=0); }
+
+inline bool
+operator<(const char *s1, const GBaseString &s2)
+{ return (s2.cmp(s1)>0); }
+
+inline bool
+operator<(const char s1, const GBaseString &s2)
+{ return (s2.cmp(s1)>0); }
+
+inline bool
+operator> (const char    *s1, const GBaseString &s2)
+{ return (s2.cmp(s1)<0); }
+
+inline bool
+operator> (const char s1, const GBaseString &s2)
+{ return (s2.cmp(s1)<0); }
+
+inline bool
+operator<=(const char    *s1, const GBaseString &s2)
+{ return !(s1>s2); }
+
+inline bool
+operator<=(const char    s1, const GBaseString &s2)
+{ return !(s1>s2); }
 
 // ------------------- The end
 
