@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuText.cpp,v 1.23 2001-07-03 14:39:19 mchen Exp $
+// $Id: DjVuText.cpp,v 1.24 2001-07-03 22:57:06 mchen Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -447,52 +447,122 @@ DjVuTXT::find_text_in_rect(GRect target_rect, GUTF8String &text) const
    // returns a list of zones of type WORD in the nearest/selected paragraph 
 {
    GList<Zone *> zone_list;
+   GList<Zone *> lines;
 
    get_zones((int)PARAGRAPH, &page_zone, zone_list);
    // it's possible that no paragraph structure exists for reasons that  
    // 1) ocr engine is not capable 2) file was modified by user. In such case, 
-   // we can only make a rough guess, i.e., select all the lines contained in
+   // we can only make a rough guess, i.e., select all the lines intersected with
    // target_rect
    if (zone_list.isempty())
    {
       get_zones((int)LINE, &page_zone, zone_list);
       GPosition pos;
-      GList<Zone *> lines;
       for(pos=zone_list; pos; ++pos)
       {
-	 if(target_rect.contains(zone_list[pos]->rect))
+	 GRect rect=zone_list[pos]->rect;
+	 if(rect.intersect(rect,target_rect))
 	    lines.append(zone_list[pos]);
-      }
-      if(!lines.isempty())
-      {
-	 zone_list.empty();
-	 for(pos=lines; pos; ++pos)
-	    get_zones((int)WORD, lines[pos], zone_list);
       }
    } else 
    {
       GPosition pos, pos_sel=zone_list;
-      int t_xmin=min(target_rect.xmin,target_rect.xmax);
-      int t_ymin=min(target_rect.ymin,target_rect.ymax);
-      int dist=-1;
+      float ar=0;
       for(pos=zone_list; pos; ++pos)
       {
 	 GRect rect=zone_list[pos]->rect;
-	 if ( rect.xmin>t_xmin && rect.ymin>t_ymin )
+	 int area=rect.area();
+	 if (rect.intersect(rect, target_rect))
 	 {
-	    int d=(rect.xmin-t_xmin)*(rect.xmin-t_xmin) +
-	       (rect.ymin-t_ymin)*(rect.ymin-t_ymin);
-	    if ( dist<0 || dist>d) 
+	    float ftmp=rect.area()/(float)area;
+	    if ( !ar || ar<ftmp )
 	    {
-	       dist=d;
+	       ar=ftmp;
 	       pos_sel=pos;
 	    }
 	 }
       }
-      Zone *pzone=zone_list[pos_sel];
+      Zone *parag;
+      if ( ar>0) parag=zone_list[pos_sel];
       zone_list.empty();
-      get_zones((int)WORD, pzone, zone_list);
+      if ( ar>0 ) 
+      {
+	 get_zones((int)LINE, parag, zone_list);
+	 if ( !zone_list.isempty() )
+	 {
+	    for(GPosition pos=zone_list; pos; ++pos)
+	    {
+	       GRect rect=zone_list[pos]->rect;
+	       if(rect.intersect(rect,target_rect))
+		  lines.append(zone_list[pos]);
+	    }
+	 }
+      }
    }
+
+   zone_list.empty();
+   if (!lines.isempty()) 
+   {
+      int i=1, lsize=lines.size();
+
+      GList<Zone *> words;
+      for (GPosition pos=lines; pos; ++pos, ++i)
+      {
+	 words.empty();
+	 get_zones((int)WORD, lines[pos], words);
+
+	 if ( lsize==1 )
+	 {
+	    for(GPosition p=words;p;++p)
+	    {
+	       if (target_rect.contains(words[p]->rect))
+		  zone_list.append(words[p]);
+	    }
+	 } else
+	 {
+	    if (i==1)
+	    {
+	       bool start=true;
+	       for(GPosition p=words; p; ++p)
+	       {
+		  if ( start )
+		  {
+		     if (target_rect.contains(words[p]->rect))
+		     {
+			start=false;
+			zone_list.append(words[p]);
+		     }
+		  } else 
+		  {
+		     zone_list.append(words[p]);
+		  }
+	       }
+	    } else if (i==lsize)
+	    {
+	       bool end=true;
+	       for(GPosition p=words.lastpos();p;--p)
+	       {
+		  if ( end )
+		  {
+		     if(target_rect.contains(words[p]->rect) )
+		     {
+			end=false;
+			zone_list.append(words[p]);
+		     }
+		  } else 
+		     zone_list.append(words[p]);
+	       }
+	    }
+
+	    if (i!=1 && i!=lsize )
+	       for(GPosition p=words;p;++p)
+	       {
+		  zone_list.append(words[p]);
+	       }
+	 }
+      }
+   } 
+
    return zone_list;
 }
 
