@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: DjVuDocument.h,v 1.70 2000-11-09 20:15:05 jmw Exp $
+// $Id: DjVuDocument.h,v 1.71 2000-12-05 21:41:21 fcrary Exp $
 // $Name:  $
 
 #ifndef _DJVUDOCUMENT_H
@@ -56,7 +56,7 @@
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocument.h,v 1.70 2000-11-09 20:15:05 jmw Exp $#
+    @version #$Id: DjVuDocument.h,v 1.71 2000-12-05 21:41:21 fcrary Exp $#
 */
 
 //@{
@@ -528,6 +528,7 @@ public:
 	  @param port A pointer to \Ref{DjVuPort}, that the created image
 	  	      will be connected to. */
    GP<DjVuImage>get_page(int page_num, bool sync=true, DjVuPort * port=0);
+
       /** Returns \Ref{GP} pointer to \Ref{DjVuImage} corresponding to the
 	  specified ID. This function behaves exactly as the #get_page()#
 	  function above. The only thing worth mentioning here is how the #ID#

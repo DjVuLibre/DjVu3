@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: DjVuAnno.h,v 1.33 2000-11-22 17:24:19 fcrary Exp $
+// $Id: DjVuAnno.h,v 1.34 2000-12-05 21:41:21 fcrary Exp $
 // $Name:  $
 
 #ifndef _DJVUANNO_H
@@ -59,7 +59,7 @@
     @memo Implements support for DjVuImage annotations
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: DjVuAnno.h,v 1.33 2000-11-22 17:24:19 fcrary Exp $# */
+    #$Id: DjVuAnno.h,v 1.34 2000-12-05 21:41:21 fcrary Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -225,7 +225,7 @@ public:
     static const int version;
     void encode(ByteStream &bs, const Zone * parent=0, const Zone * prev=0) const;
     void decode(ByteStream &bs, int maxtext,
-		const Zone * parent=0, const Zone * prev=0);
+	            	const Zone * parent=0, const Zone * prev=0);
   };
   /** Textual data for this page.  
       The content of this string is encoded using the UTF8 code.

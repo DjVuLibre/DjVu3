@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: DjVuAnno.cpp,v 1.59 2000-11-22 17:24:19 fcrary Exp $
+// $Id: DjVuAnno.cpp,v 1.60 2000-12-05 21:41:21 fcrary Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -1158,58 +1158,58 @@ DjVuTXT::Zone::memuse() const
 void 
 DjVuTXT::Zone::encode(ByteStream &bs, const Zone * parent, const Zone * prev) const
 {
-      // Encode type
-   bs.write8(ztype);
-
-      // Modify text_start and bounding rectangle based on the context
-      // (whether there is a previous non-zero same-level-child or parent)
-   int start=text_start;
-   int x=rect.xmin, y=rect.ymin;
-   int width=rect.width(), height=rect.height();
-   if (prev)
-   {
-      if (ztype==PAGE || ztype==PARAGRAPH || ztype==LINE)
-      {
-	    // Encode offset from the lower left corner of the previous
-	    // child in the coord system in that corner with x to the
-	    // right and y down
-	 x=x-prev->rect.xmin;
-	 y=prev->rect.ymin-(y+height);
-      } else // Either COLUMN or WORD or CHARACTER
-      {
-	    // Encode offset from the lower right corner of the previous
-	    // child in the coord system in that corner with x to the
-	    // right and y up
-	 x=x-prev->rect.xmax;
-	 y=y-prev->rect.ymin;
-      }
-      start-=prev->text_start+prev->text_length;
-   } else if (parent)
-   {
-	 // Encode offset from the upper left corner of the parent
-	 // in the coord system in that corner with x to the right and y down
-      x=x-parent->rect.xmin;
-      y=parent->rect.ymax-(y+height);
-      start-=parent->text_start;
-   }
-      // Encode rectangle
-   bs.write16(0x8000+x);
-   bs.write16(0x8000+y);
-   bs.write16(0x8000+width);
-   bs.write16(0x8000+height);
-      // Encode text info
-   bs.write16(0x8000+start);
-   bs.write24(text_length);
-      // Encode number of children
-   bs.write24(children.size());
+  // Encode type
+  bs.write8(ztype);
   
-   const Zone * prev_child=0;
-      // Encode all children
-   for (GPosition i=children; i; ++i)
-   {
-      children[i].encode(bs, this, prev_child);
-      prev_child=&children[i];
-   }
+  // Modify text_start and bounding rectangle based on the context
+  // (whether there is a previous non-zero same-level-child or parent)
+  int start=text_start;
+  int x=rect.xmin, y=rect.ymin;
+  int width=rect.width(), height=rect.height();
+  if (prev)
+  {
+    if (ztype==PAGE || ztype==PARAGRAPH || ztype==LINE)
+    {
+      // Encode offset from the lower left corner of the previous
+      // child in the coord system in that corner with x to the
+      // right and y down
+      x=x-prev->rect.xmin;
+      y=prev->rect.ymin-(y+height);
+    } else // Either COLUMN or WORD or CHARACTER
+    {
+      // Encode offset from the lower right corner of the previous
+      // child in the coord system in that corner with x to the
+      // right and y up
+      x=x-prev->rect.xmax;
+      y=y-prev->rect.ymin;
+    }
+    start-=prev->text_start+prev->text_length;
+  } else if (parent)
+  {
+    // Encode offset from the upper left corner of the parent
+    // in the coord system in that corner with x to the right and y down
+    x=x-parent->rect.xmin;
+    y=parent->rect.ymax-(y+height);
+    start-=parent->text_start;
+  }
+  // Encode rectangle
+  bs.write16(0x8000+x);
+  bs.write16(0x8000+y);
+  bs.write16(0x8000+width);
+  bs.write16(0x8000+height);
+  // Encode text info
+  bs.write16(0x8000+start);
+  bs.write24(text_length);
+  // Encode number of children
+  bs.write24(children.size());
+  
+  const Zone * prev_child=0;
+  // Encode all children
+  for (GPosition i=children; i; ++i)
+  {
+    children[i].encode(bs, this, prev_child);
+    prev_child=&children[i];
+  }
 }
 #endif
 
@@ -1217,51 +1217,56 @@ void
 DjVuTXT::Zone::decode(ByteStream &bs, int maxtext,
 		      const Zone * parent, const Zone * prev)
 {
-      // Decode type
-   ztype = (ZoneType) bs.read8();
-   if ( ztype<PAGE || ztype>CHARACTER )
-      G_THROW("DjVuAnno.corrupt_text");
-      // Decode coordinates
-   int x=(int) bs.read16()-0x8000;
-   int y=(int) bs.read16()-0x8000;
-   int width=(int) bs.read16()-0x8000;
-   int height=(int) bs.read16()-0x8000;
-      // Decode text info
-   text_start = (int) bs.read16()-0x8000;
-   text_length = bs.read24();
-   if (prev)
-   {
-      if (ztype==PAGE || ztype==PARAGRAPH || ztype==LINE)
-      {
-	 x=x+prev->rect.xmin;
-	 y=prev->rect.ymin-(y+height);
-      } else // Either COLUMN or WORD or CHARACTER
-      {
-	 x=x+prev->rect.xmax;
-	 y=y+prev->rect.ymin;
-      }
-      text_start+=prev->text_start+prev->text_length;
-   } else if (parent)
-   {
-      x=x+parent->rect.xmin;
-      y=parent->rect.ymax-(y+height);
-      text_start+=parent->text_start;
-   }
-   rect=GRect(x, y, width, height);
+  // Decode type
+  ztype = (ZoneType) bs.read8();
+  if ( ztype<PAGE || ztype>CHARACTER )
+    G_THROW("DjVuAnno.corrupt_text");
 
-      // Get children size
-   int size = bs.read24();
-      // Checks
-   if (rect.isempty() || text_start<0 || text_start+text_length>maxtext )
-      G_THROW("DjVuAnno.corrupt_text");
-      // Process children
-   const Zone * prev_child=0;
-   children.empty();
-   while (size-- > 0) {
-      Zone *z = append_child();
-      z->decode(bs, maxtext, this, prev_child);
-      prev_child=z;
-   }
+  // Decode coordinates
+  int x=(int) bs.read16()-0x8000;
+  int y=(int) bs.read16()-0x8000;
+  int width=(int) bs.read16()-0x8000;
+  int height=(int) bs.read16()-0x8000;
+
+  // Decode text info
+  text_start = (int) bs.read16()-0x8000;
+  text_length = bs.read24();
+  if (prev)
+  {
+    if (ztype==PAGE || ztype==PARAGRAPH || ztype==LINE)
+    {
+      x=x+prev->rect.xmin;
+      y=prev->rect.ymin-(y+height);
+    } else // Either COLUMN or WORD or CHARACTER
+    {
+      x=x+prev->rect.xmax;
+      y=y+prev->rect.ymin;
+    }
+    text_start+=prev->text_start+prev->text_length;
+  } else if (parent)
+  {
+    x=x+parent->rect.xmin;
+    y=parent->rect.ymax-(y+height);
+    text_start+=parent->text_start;
+  }
+  rect=GRect(x, y, width, height);
+  
+  // Get children size
+  int size = bs.read24();
+
+  // Checks
+  if (rect.isempty() || text_start<0 || text_start+text_length>maxtext )
+    G_THROW("DjVuAnno.corrupt_text");
+
+  // Process children
+  const Zone * prev_child=0;
+  children.empty();
+  while (size-- > 0) 
+  {
+    Zone *z = append_child();
+    z->decode(bs, maxtext, this, prev_child);
+    prev_child=z;
+  }
 }
 
 void 
@@ -1295,10 +1300,10 @@ DjVuTXT::encode(ByteStream &bs) const
   bs.writall( (void*)(const char*)textUTF8, textsize );
   // Encode zones
   if (has_valid_zones())
-    {
-      bs.write8(Zone::version);
-      page_zone.encode(bs);
-    }
+  {
+    bs.write8(Zone::version);
+    page_zone.encode(bs);
+  }
 }
 #endif
 
@@ -1316,11 +1321,11 @@ DjVuTXT::decode(ByteStream &bs)
   // Try reading zones
   unsigned char version;
   if ( bs.read( (void*) &version, 1 ) == 1) 
-    {
-      if (version != Zone::version)
-        G_THROW("DjVuAnno.bad_version\t"+GString(version));
-      page_zone.decode(bs, textsize);
-    }
+  {
+    if (version != Zone::version)
+      G_THROW("DjVuAnno.bad_version\t"+GString(version));
+    page_zone.decode(bs, textsize);
+  }
 }
 
 GP<DjVuTXT> 
@@ -1336,13 +1341,13 @@ DjVuTXT::search_zone(const Zone * zone, int start, int & end) const
       // at 'start'. In this case it will also modify the 'end'
       // to point to the first character beyond the zone
 {
-   if (start>=zone->text_start && start<zone->text_start+zone->text_length)
-   {
-      if (end>zone->text_start+zone->text_length)
-	 end=zone->text_start+zone->text_length;
-      return true;
-   }
-   return false;
+  if (start>=zone->text_start && start<zone->text_start+zone->text_length)
+  {
+    if (end>zone->text_start+zone->text_length)
+      end=zone->text_start+zone->text_length;
+    return true;
+  }
+  return false;
 }
 
 DjVuTXT::Zone *
@@ -1351,20 +1356,22 @@ DjVuTXT::get_smallest_zone(int max_type, int start, int & end) const
       // the text starting at start. If anything is found, end will
       // be modified to point to the first character beyond the zone
 {
-   if (!search_zone(&page_zone, start, end)) return 0;
-   
-   const Zone * zone=&page_zone;
-   while(zone->ztype<max_type)
-   {
-      GPosition pos;
-      for(pos=zone->children;pos;++pos)
-	 if (search_zone(&zone->children[pos], start, end))
-	    break;
-      if (pos) zone=&zone->children[pos];
-      else break;
-   }
-
-   return (Zone *) zone;
+  if (!search_zone(&page_zone, start, end)) return 0;
+  
+  const Zone * zone=&page_zone;
+  while(zone->ztype<max_type)
+  {
+    GPosition pos;
+    for(pos=zone->children;pos;++pos)
+      if (search_zone(&zone->children[pos], start, end))
+        break;
+      if (pos) 
+        zone=&zone->children[pos];
+      else 
+        break;
+  }
+  
+  return (Zone *) zone;
 }
 
 GList<DjVuTXT::Zone *>
@@ -1373,49 +1380,49 @@ DjVuTXT::find_zones(int string_start, int string_length) const
       // the function will generate a list of smallest zones of the
       // same type and will return it
 {
-   GList<Zone *> zone_list;
-
-   {
-	 // Get rid of the leading and terminating spaces
-      int start=string_start;
-      int end=string_start+string_length;
-      while(start<end && isspace(textUTF8[start]))
-	 start++;
-      while(end>start && isspace(textUTF8[end-1]))
-	 end--;
-      if (start==end)
-	 return zone_list;
-      string_start=start;
-      string_length=end-start;
-   }
-
-   int zone_type=CHARACTER;
-   while(zone_type>=PAGE)
-   {
-      int start=string_start;
-      int end=string_start+string_length;
-
-      while(true)
+  GList<Zone *> zone_list;
+  
+  {
+    // Get rid of the leading and terminating spaces
+    int start=string_start;
+    int end=string_start+string_length;
+    while(start<end && isspace(textUTF8[start]))
+      start++;
+    while(end>start && isspace(textUTF8[end-1]))
+      end--;
+    if (start==end)
+      return zone_list;
+    string_start=start;
+    string_length=end-start;
+  }
+  
+  int zone_type=CHARACTER;
+  while(zone_type>=PAGE)
+  {
+    int start=string_start;
+    int end=string_start+string_length;
+    
+    while(true)
+    {
+      while(start<end && isspace(textUTF8[start])) start++;
+      if (start==end) break;
+      
+      Zone * zone=get_smallest_zone(zone_type, start, end);
+      if (zone && zone_type==zone->ztype)
       {
-	 while(start<end && isspace(textUTF8[start])) start++;
-	 if (start==end) break;
-
-	 Zone * zone=get_smallest_zone(zone_type, start, end);
-	 if (zone && zone_type==zone->ztype)
-	 {
-	    zone_list.append(zone);
-	    start=end;
-	    end=string_start+string_length;
-	 } else
-	 {
-	    zone_type--;
-	    zone_list.empty();
-	    break;
-	 }
+        zone_list.append(zone);
+        start=end;
+        end=string_start+string_length;
+      } else
+      {
+        zone_type--;
+        zone_list.empty();
+        break;
       }
-      if (zone_list.size()) break;
-   }
-   return zone_list;
+    }
+    if (zone_list.size()) break;
+  }
+  return zone_list;
 }
 
 static inline bool
@@ -1487,85 +1494,85 @@ GList<DjVuTXT::Zone *>
 DjVuTXT::search_string(const char * string, int & from, bool search_fwd,
 		       bool match_case, bool whole_word) const
 {
-   GString local_string;
-
-   const char * ptr;
-
-      // Get rid of the leading separators
-   for(ptr=string;*ptr;ptr++)
-      if (!is_separator(*ptr, whole_word))
-	 break;
-   local_string=ptr;
-
-      // Get rid of the terminating separators
-   while(local_string.length() &&
-      is_separator(local_string[(int)(local_string.length())-1], whole_word))
-	 local_string.setat(local_string.length()-1, 0);
-
-   string=local_string;
-
-   if (whole_word)
-   {
-	 // Make sure that the string does not contain any
-	 // separators in the middle
-      for(const char * ptr=string;*ptr;ptr++)
-	 if (is_separator(*ptr, true))
-	    G_THROW("DjVuAnno.one_word");
-   }
-
-   int string_length=strlen(string);
-   bool found=false;
-
-   if (string_length==0 || textUTF8.length()==0 ||
-       string_length>(int) textUTF8.length())
-   {
-      if (search_fwd) from=textUTF8.length();
-      else from=-1;
-      return GList<Zone *>();
-   }
-
-   int real_str_len;
-   if (search_fwd)
-   {
-      if (from<0) from=0;
-      while(from<(int) textUTF8.length())
+  GString local_string;
+  
+  const char * ptr;
+  
+  // Get rid of the leading separators
+  for(ptr=string;*ptr;ptr++)
+    if (!is_separator(*ptr, whole_word))
+      break;
+  local_string=ptr;
+  
+  // Get rid of the terminating separators
+  while(local_string.length() &&
+        is_separator(local_string[(int)(local_string.length())-1], whole_word))
+    local_string.setat(local_string.length()-1, 0);
+  
+  string=local_string;
+  
+  if (whole_word)
+  {
+    // Make sure that the string does not contain any
+    // separators in the middle
+    for(const char * ptr=string;*ptr;ptr++)
+      if (is_separator(*ptr, true))
+        G_THROW("DjVuAnno.one_word");
+  }
+  
+  int string_length=strlen(string);
+  bool found=false;
+  
+  if (string_length==0 || textUTF8.length()==0 ||
+    string_length>(int) textUTF8.length())
+  {
+    if (search_fwd) from=textUTF8.length();
+    else from=-1;
+    return GList<Zone *>();
+  }
+  
+  int real_str_len;
+  if (search_fwd)
+  {
+    if (from<0) from=0;
+    while(from<(int) textUTF8.length())
+    {
+      if (equal((const char *) textUTF8+from, string, match_case, &real_str_len))
       {
-	 if (equal((const char *) textUTF8+from, string, match_case, &real_str_len))
-	 {
-	    if (!whole_word ||
-		(from==0 || is_separator(textUTF8[from-1], true)) &&
-		(from+real_str_len==(int) textUTF8.length() ||
-		 is_separator(textUTF8[from+real_str_len], true)))
-	    {
-	       found=true;
-	       break;
-	    }
-	 }
-	 from++;
-      }      
-   }
-   else
-   {
-      if (from>(int) textUTF8.length()-1) from=(int) textUTF8.length()-1;
-      while(from>=0)
-      {
-	 if (equal((const char *) textUTF8+from, string, match_case, &real_str_len))
-	 {
-	    if (!whole_word ||
-		(from==0 || is_separator(textUTF8[from-1], true)) &&
-		(from+real_str_len==(int) textUTF8.length() ||
-		 is_separator(textUTF8[from+real_str_len], true)))
-	    {
-	       found=true;
-	       break;
-	    }
-	 }
-	 from--;
+        if (!whole_word ||
+          (from==0 || is_separator(textUTF8[from-1], true)) &&
+          (from+real_str_len==(int) textUTF8.length() ||
+          is_separator(textUTF8[from+real_str_len], true)))
+        {
+          found=true;
+          break;
+        }
       }
-   }
-
-   if (found) return find_zones(from, real_str_len);
-   else return GList<Zone *>();
+      from++;
+    }      
+  }
+  else
+  {
+    if (from>(int) textUTF8.length()-1) from=(int) textUTF8.length()-1;
+    while(from>=0)
+    {
+      if (equal((const char *) textUTF8+from, string, match_case, &real_str_len))
+      {
+        if (!whole_word ||
+          (from==0 || is_separator(textUTF8[from-1], true)) &&
+          (from+real_str_len==(int) textUTF8.length() ||
+          is_separator(textUTF8[from+real_str_len], true)))
+        {
+          found=true;
+          break;
+        }
+      }
+      from--;
+    }
+  }
+  
+  if (found) return find_zones(from, real_str_len);
+  else return GList<Zone *>();
 }
 
 unsigned int 
