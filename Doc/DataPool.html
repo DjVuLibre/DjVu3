@@ -1,11 +1,11 @@
 <HTML>
 <HEAD>
-   <TITLE>class  DataPool</TITLE>
+   <TITLE>class  ByteStream::DataPool</TITLE>
    <META NAME="GENERATOR" CONTENT="DOC++ 3.4.1">
 </HEAD>
 <BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
 
-<H2>class  <A HREF="#DOC.DOCU">DataPool</A>: public <!1><A HREF="GPEnabled.html#DOC.1.5.4.1.2">GPEnabled</A></H2>
+<H2>class  <A HREF="#DOC.DOCU">DataPool</A>: public <!1><A HREF="GPEnabled.html#DOC.1.4.4.2">GPEnabled</A></H2>
 <BLOCKQUOTE>Thread safe data storage.</BLOCKQUOTE>
 <HR>
 
@@ -22,115 +22,115 @@
 <DL>
 <P><DL>
 <DT><H3>Public Methods</H3><DD><DT>
-<A HREF="#DOC.1.5.14.1.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>stop</B>(bool only_blocked=false)
+<A HREF="#DOC.1.4.16.1.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>stop</B>(bool only_blocked=false)
 <DD><I>Tells the <TT>DataPool</TT> to stop serving readers.</I>
 <DT>
-<A HREF="#DOC.1.5.14.1.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>load_file</B>(void)
+<A HREF="#DOC.1.4.16.1.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>load_file</B>(void)
 <DD><I>Loads data from the file into memory.</I>
 <DT>
-<A HREF="#DOC.1.5.14.1.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   void <B>load_file</B>(const char * name)
+<A HREF="#DOC.1.4.16.1.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   void <B>load_file</B>(const <!1><A HREF="GURL.html">GURL</A> &amp;url)
 <DD><I>This function will make every <TT>DataPool</TT> in the program, which is connected to a file, to load the file contents to the main memory and close the file.</I>
 <DT>
-<A HREF="#DOC.1.5.14.1.9"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   void <B>close_all</B>(void)
+<A HREF="#DOC.1.4.16.1.9"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   void <B>close_all</B>(void)
 <DD><I>This function will remove OpenFiles filelist.</I>
 </DL></P>
 
 <P><DL>
 <DT><H3>Public</H3><DD><DT>
-<A HREF="#DOC.1.5.14.1.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>class  Incrementorclass  Readerclass  Triggerclass  OpenFilesclass  BlockListclass  <B>Initialization </B>
+<A HREF="#DOC.1.4.16.1.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Initialization </B>
 <DD><I></I>
 <P><DL>
 
-<A NAME="DataPool">
-<A NAME="DOC.1.5.14.1.1.1">
+<A NAME="create">
+<A NAME="DOC.1.4.16.1.1.1">
 <DT>
-<IMG ALT="o" SRC=icon2.gif> <B>DataPool</B>()
-<DD><I>Default constructor.</I>
+<IMG ALT="o" SRC=icon2.gif>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DataPool.html">DataPool</A>&gt;  <B>create</B>(void)
+<DD><I>Default creator.</I>
 
-<A NAME="DataPool">
-<A NAME="DOC.1.5.14.1.1.2">
+<A NAME="create">
+<A NAME="DOC.1.4.16.1.1.2">
 <DT>
-<IMG ALT="o" SRC=icon2.gif> <B>DataPool</B>(<!1><A HREF="ByteStream.html">ByteStream</A> &amp; str)
+<IMG ALT="o" SRC=icon2.gif>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DataPool.html">DataPool</A>&gt;  <B>create</B>(const <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="ByteStream.html">ByteStream</A>&gt; &amp; str)
 <DD><I>Creates and initialized the <TT>DataPool</TT> with data from stream <TT>str</TT>.</I>
 
-<A NAME="DataPool">
-<A NAME="DOC.1.5.14.1.1.3">
+<A NAME="create">
+<A NAME="DOC.1.4.16.1.1.3">
 <DT>
-<IMG ALT="o" SRC=icon2.gif> <B>DataPool</B>(const <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DataPool.html#DOC.1.5.14.1.1.1">DataPool</A>&gt; &amp; master_pool, int start=0, int length=-1)
+<IMG ALT="o" SRC=icon2.gif>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DataPool.html">DataPool</A>&gt;  <B>create</B>(const <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DataPool.html">DataPool</A>&gt; &amp; master_pool, int start=0, int length=-1)
 <DD><I>Initializes the <TT>DataPool</TT> in slave mode and connects it to the specified offsets range of the specified master <TT>DataPool</TT>.</I>
 
-<A NAME="DataPool">
-<A NAME="DOC.1.5.14.1.1.4">
+<A NAME="create">
+<A NAME="DOC.1.4.16.1.1.4">
 <DT>
-<IMG ALT="o" SRC=icon2.gif> <B>DataPool</B>(const char * file_name, int start=0, int length=-1)
+<IMG ALT="o" SRC=icon2.gif>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DataPool.html">DataPool</A>&gt;  <B>create</B>(const <!1><A HREF="GURL.html">GURL</A> &amp;url, int start=0, int length=-1)
 <DD><I>Initializes the <TT>DataPool</TT> in slave mode and connects it to the specified offsets range of the specified file.</I>
 
 <A NAME="connect">
-<A NAME="DOC.1.5.14.1.1.5">
+<A NAME="DOC.1.4.16.1.1.5">
 <DT>
-<IMG ALT="o" SRC=icon2.gif>void <B>connect</B>(const <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DataPool.html#DOC.1.5.14.1.1.1">DataPool</A>&gt; &amp; master_pool, int start=0, int length=-1)
+<IMG ALT="o" SRC=icon2.gif>void <B>connect</B>(const <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DataPool.html">DataPool</A>&gt; &amp; master_pool, int start=0, int length=-1)
 <DD><I>Switches the <TT>DataPool</TT> to slave mode and connects it to the specified offsets range of the master <TT>DataPool</TT>.</I>
 
 <A NAME="connect">
-<A NAME="DOC.1.5.14.1.1.6">
+<A NAME="DOC.1.4.16.1.1.6">
 <DT>
-<IMG ALT="o" SRC=icon2.gif>void <B>connect</B>(const char * file_name, int start=0, int length=-1)
-<DD><I>Connects the <TT>DataPool</TT> to the specified offsets range of the named <TT>file_name</TT>.</I>
+<IMG ALT="o" SRC=icon2.gif>void <B>connect</B>(const <!1><A HREF="GURL.html">GURL</A> &amp;url, int start=0, int length=-1)
+<DD><I>Connects the <TT>DataPool</TT> to the specified offsets range of the named <TT>url</TT>.</I>
 </DL></P>
 <DT>
-<A HREF="#DOC.1.5.14.1.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Adding data.</B>
+<A HREF="#DOC.1.4.16.1.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Adding data.</B>
 <DD><I></I>
 <P><DL>
 <DT>
-<A HREF="#DOC.1.5.14.1.3.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>add_data</B>(const void * buffer, int size)
+<A HREF="#DOC.1.4.16.1.3.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>add_data</B>(const void * buffer, int size)
 <DD><I>Appends the new block of data to the <TT>DataPool</TT>.</I>
 <DT>
-<A HREF="#DOC.1.5.14.1.3.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>add_data</B>(const void * buffer, int offset, int size)
+<A HREF="#DOC.1.4.16.1.3.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>add_data</B>(const void * buffer, int offset, int size)
 <DD><I>Stores the specified block of data at the specified offset.</I>
 <DT>
-<A HREF="#DOC.1.5.14.1.3.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>set_eof</B>(void)
+<A HREF="#DOC.1.4.16.1.3.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>set_eof</B>(void)
 <DD><I>Tells the <TT>DataPool</TT> that all data has been added and nothing else is anticipated.</I>
 </DL></P>
 <DT>
-<A HREF="#DOC.1.5.14.1.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Accessing data.</B>
+<A HREF="#DOC.1.4.16.1.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Accessing data.</B>
 <DD><I></I>
 <P><DL>
 <DT>
-<A HREF="#DOC.1.5.14.1.4.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_data</B>(void * buffer, int offset, int size)
+<A HREF="#DOC.1.4.16.1.4.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_data</B>(void * buffer, int offset, int size)
 <DD><I>Attempts to return a block of data at the given <TT>offset</TT> of the given <TT>size</TT>.</I>
 <DT>
-<A HREF="#DOC.1.5.14.1.4.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="ByteStream.html">ByteStream</A>&gt;  <B>get_stream</B>(void)
+<A HREF="#DOC.1.4.16.1.4.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="ByteStream.html">ByteStream</A>&gt;  <B>get_stream</B>(void)
 <DD><I>Returns a <!1><A HREF="ByteStream.html">ByteStream</A> to access contents of the <TT>DataPool</TT> sequentially.</I>
 </DL></P>
 <DT>
-<A HREF="#DOC.1.5.14.1.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>State querying functions. </B>
+<A HREF="#DOC.1.4.16.1.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>State querying functions. </B>
 <DD><I></I>
 <P><DL>
 <DT>
-<A HREF="#DOC.1.5.14.1.5.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>bool <B>is_connected</B>(void) const 
+<A HREF="#DOC.1.4.16.1.5.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>bool <B>is_connected</B>(void) const 
 <DD><I>Returns <TT>TRUE</TT> if this <TT>DataPool</TT> is connected to another <TT>DataPool</TT> or to a file.</I>
 <DT>
-<A HREF="#DOC.1.5.14.1.5.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>bool <B>has_data</B>(int start, int length)
+<A HREF="#DOC.1.4.16.1.5.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>bool <B>has_data</B>(int start, int length)
 <DD><I>Returns <TT>TRUE</TT> if all data available for offsets from <TT>start</TT> till <TT>start+length-1</TT>.</I>
 <DT>
-<A HREF="#DOC.1.5.14.1.5.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_length</B>(void) const 
+<A HREF="#DOC.1.4.16.1.5.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_length</B>(void) const 
 <DD><I>Returns the <EM>length</EM> of data in the <TT>DataPool</TT>.</I>
 <DT>
-<A HREF="#DOC.1.5.14.1.5.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_size</B>(void) const 
+<A HREF="#DOC.1.4.16.1.5.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_size</B>(void) const 
 <DD><I>Returns the number of bytes of data available in this <TT>DataPool</TT>.</I>
 </DL></P>
 <DT>
-<A HREF="#DOC.1.5.14.1.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Trigger callbacks.</B>
+<A HREF="#DOC.1.4.16.1.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Trigger callbacks.</B>
 <DD><I></I>
 <P><DL>
 <DT>
-<A HREF="#DOC.1.5.14.1.6.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>add_trigger</B>(int start, int length, void (* callback)(void *), void * cl_data)
+<A HREF="#DOC.1.4.16.1.6.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>add_trigger</B>(int start, int length,  void (* callback)(void *), void * cl_data)
 <DD><I>Associates the specified <EM>trigger callback</EM> with the given data range.</I>
 <DT>
-<A HREF="#DOC.1.5.14.1.6.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>add_trigger</B>(int thresh, void (* callback)(void *), void * cl_data)
+<A HREF="#DOC.1.4.16.1.6.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>add_trigger</B>(int thresh, void (* callback)(void *), void * cl_data)
 <DD><I>Associates the specified <EM>trigger callback</EM> with the specified threshold.</I>
 <DT>
-<A HREF="#DOC.1.5.14.1.6.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>del_trigger</B>(void (* callback)(void *), void * cl_data)
+<A HREF="#DOC.1.4.16.1.6.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>del_trigger</B>(void (* callback)(void *), void * cl_data)
 <DD><I>Use this function to unregister callbacks, which are no longer needed.</I>
 </DL></P>
 </DL></P>
@@ -140,7 +140,7 @@
 <DL>
 <P><DL>
 <DT><H3>Public Methods</H3><DD><DT>
-<IMG ALT="o" SRC=icon2.gif><!1><A HREF="GPEnabled.html#DOC.1.5.4.1.2">GPEnabled</A>&amp; <B>operator=</B>(const <!1><A HREF="GPEnabled.html#DOC.1.5.4.1.2">GPEnabled</A> &amp; obj)
+<IMG ALT="o" SRC=icon2.gif><!1><A HREF="GPEnabled.html#DOC.1.4.4.2">GPEnabled</A>&amp; <B>operator=</B>(const <!1><A HREF="GPEnabled.html#DOC.1.4.4.2">GPEnabled</A> &amp; obj)
 <DT>
 <IMG ALT="o" SRC=icon2.gif>int <B>get_count</B>(void) const 
 </DL></P>
@@ -165,22 +165,22 @@ thread-safe way, blocking reading threads if there is no data of
 interest available. This blocking is especially useful in the
 networking environment (plugin) when there is a running decoding thread,
 which wants to start decoding as soon as there is just one byte available
-blocking if necessary.<P>Access to data in a <TT>DataPool</TT> may be direct (Using <!1><A HREF="DataPool.html#DOC.1.5.14.1.4.1">get_data</A>()
-function) or sequential (See <!1><A HREF="DataPool.html#DOC.1.5.14.1.4.2">get_stream</A>() function).<P>If the <TT>DataPool</TT> is not connected to anything, that is it contains
+blocking if necessary.<P>Access to data in a <TT>DataPool</TT> may be direct (Using <!1><A HREF="DataPool.html#DOC.1.4.16.1.4.1">get_data</A>()
+function) or sequential (See <!1><A HREF="DataPool.html#DOC.1.4.16.1.4.2">get_stream</A>() function).<P>If the <TT>DataPool</TT> is not connected to anything, that is it contains
 some real data, this data can be added to it by means of two
-<!1><A HREF="DataPool.html#DOC.1.5.14.1.3.1">add_data</A>() functions. One of them adds data sequentially maintaining
+<!1><A HREF="DataPool.html#DOC.1.4.16.1.3.1">add_data</A>() functions. One of them adds data sequentially maintaining
 the offset of the last block of data added by it. The other can store
 data anywhere. Thus it's important to realize, that there may be "white
 spots" in the data storage.<P>There is also a way to test if data is available for some given data
-range (See <!1><A HREF="DataPool.html#DOC.1.5.14.1.5.2">has_data</A>()). In addition to this mechanism, there are
+range (See <!1><A HREF="DataPool.html#DOC.1.4.16.1.5.2">has_data</A>()). In addition to this mechanism, there are
 so-called <EM>trigger callbacks</EM>, which are called, when there is
 all data available for a given data range.<P>Let us consider all modes of operation in details:<P><OL>
 <LI> <B>Not connected <TT>DataPool</TT></B>. In this mode the <TT>DataPool</TT>
 contains some real data. As mentioned above, it may be added  
-by means of two functions <!1><A HREF="DataPool.html#DOC.1.5.14.1.3.1">add_data</A>() operating independent
+by means of two functions <!1><A HREF="DataPool.html#DOC.1.4.16.1.3.1">add_data</A>() operating independent
 of each other and allowing to add data sequentially and
 directly to any place of data storage. It's important to call
-function <!1><A HREF="DataPool.html#DOC.1.5.14.1.3.3">set_eof</A>() after all data has been added.<P>Functions like <!1><A HREF="DataPool.html#DOC.1.5.14.1.4.1">get_data</A>() or <!1><A HREF="DataPool.html#DOC.1.5.14.1.4.2">get_stream</A>() can
+function <!1><A HREF="DataPool.html#DOC.1.4.16.1.3.3">set_eof</A>() after all data has been added.<P>Functions like <!1><A HREF="DataPool.html#DOC.1.4.16.1.4.1">get_data</A>() or <!1><A HREF="DataPool.html#DOC.1.4.16.1.4.2">get_stream</A>() can
 be used to obtain direct or sequential access to the data. As
 long as is_eof() is <TT>FALSE</TT>, <TT>DataPool</TT> will block every
 reader, which is trying to read unavailable data until it
@@ -189,55 +189,55 @@ really becomes available. But as soon as is_eof() is
 store DjVu files, which are in IFF formats, it becomes possible
 to predict the size of the <TT>DataPool</TT> as soon as the first
 <TT>32</TT> bytes have been added. This is invaluable for estimating
-download progress. See function <!1><A HREF="DataPool.html#DOC.1.5.14.1.5.3">get_length</A>() for details.
+download progress. See function <!1><A HREF="DataPool.html#DOC.1.4.16.1.5.3">get_length</A>() for details.
 If this estimate fails (which means, that stored data is not
-in IFF format), <!1><A HREF="DataPool.html#DOC.1.5.14.1.5.3">get_length</A>() returns <TT>-1</TT>.<P>Triggers may be added and removed by means of <!1><A HREF="DataPool.html#DOC.1.5.14.1.6.1">add_trigger</A>()
-and <!1><A HREF="DataPool.html#DOC.1.5.14.1.6.3">del_trigger</A>() functions. <!1><A HREF="DataPool.html#DOC.1.5.14.1.6.1">add_trigger</A>() takes
+in IFF format), <!1><A HREF="DataPool.html#DOC.1.4.16.1.5.3">get_length</A>() returns <TT>-1</TT>.<P>Triggers may be added and removed by means of <!1><A HREF="DataPool.html#DOC.1.4.16.1.6.1">add_trigger</A>()
+and <!1><A HREF="DataPool.html#DOC.1.4.16.1.6.3">del_trigger</A>() functions. <!1><A HREF="DataPool.html#DOC.1.4.16.1.6.1">add_trigger</A>() takes
 a data range. As soon as all data in that data range is
 available, the trigger callback will be called.<P>All trigger callbacks will be called when <TT>EOF</TT> condition
 has been set.<P><LI> <B><TT>DataPool</TT> connected to another <TT>DataPool</TT></B>. In this
 <EM>slave</EM> mode you can map a given <TT>DataPool</TT> to any offsets
 range inside another <TT>DataPool</TT>. You can connect the slave
 <TT>DataPool</TT> even if there is no data in the master <TT>DataPool</TT>.
-Any <!1><A HREF="DataPool.html#DOC.1.5.14.1.4.1">get_data</A>() request will be forwarded to the master
+Any <!1><A HREF="DataPool.html#DOC.1.4.16.1.4.1">get_data</A>() request will be forwarded to the master
 <TT>DataPool</TT>, and it will be responsible for blocking readers
-trying to access unavailable data.<P>The usage of <!1><A HREF="DataPool.html#DOC.1.5.14.1.3.1">add_data</A>() functions is prohibited for
+trying to access unavailable data.<P>The usage of <!1><A HREF="DataPool.html#DOC.1.4.16.1.3.1">add_data</A>() functions is prohibited for
 connected <TT>DataPool</TT>s.<P>The offsets range used to map a slave <TT>DataPool</TT> can be fully
 specified (both start offset and length are positive numbers)
 or partially specified (the length is negative). In this mode
 the slave <TT>DataPool</TT> is assumed to extend up to the end
 of the master <TT>DataPool</TT>.<P>Triggers may be used with slave <TT>DataPool</TT>s as well as with
-the master ones.<P>Calling <!1><A HREF="DataPool.html#DOC.1.5.14.1.2">stop</A>() function of a slave will stop only the slave
-(and any other slave connected to it), but not the master.<P><!1><A HREF="DataPool.html#DOC.1.5.14.1.3.3">set_eof</A>() function is meaningless for slaves. They obtain
-the <TT>EOF</TT> status from their master.<P>Depending on the offsets range passed to the constructor,
-<!1><A HREF="DataPool.html#DOC.1.5.14.1.5.3">get_length</A>() returns different values. If the length
+the master ones.<P>Calling <!1><A HREF="DataPool.html#DOC.1.4.16.1.2">stop</A>() function of a slave will stop only the slave
+(and any other slave connected to it), but not the master.<P><!1><A HREF="DataPool.html#DOC.1.4.16.1.3.3">set_eof</A>() function is meaningless for slaves. They obtain
+the <TT>ByteStream::EndOfFile</TT> status from their master.<P>Depending on the offsets range passed to the constructor,
+<!1><A HREF="DataPool.html#DOC.1.4.16.1.5.3">get_length</A>() returns different values. If the length
 passed to the constructor was positive, then it is returned
-by <!1><A HREF="DataPool.html#DOC.1.5.14.1.5.3">get_length</A>() all the time. Otherwise the value returned
+by <!1><A HREF="DataPool.html#DOC.1.4.16.1.5.3">get_length</A>() all the time. Otherwise the value returned
 is either <TT>-1</TT> if master's length is still unknown (it didn't
 manage to parse IFF data yet) or it is calculated as
 <TT>masters_length-slave_start</TT>.<P><LI> <B><TT>DataPool</TT> connected to a file</B>. This mode is quite similar
 to the case, when the <TT>DataPool</TT> is connected to another
 <TT>DataPool</TT>. Similarly, the <TT>DataPool</TT> stores no data inside.
-It just forwards all <!1><A HREF="DataPool.html#DOC.1.5.14.1.4.1">get_data</A>() requests to the underlying
+It just forwards all <!1><A HREF="DataPool.html#DOC.1.4.16.1.4.1">get_data</A>() requests to the underlying
 source (a file in this case). Thus these requests will never
 block the reader. But they may return <TT>0</TT> if there is no data
-available at the requested offset.<P>The usage of <!1><A HREF="DataPool.html#DOC.1.5.14.1.3.1">add_data</A>() functions is meaningless and
-is prohibited.<P>is_eof() function always returns <TT>TRUE</TT>. Thus <!1><A HREF="DataPool.html#DOC.1.5.14.1.3.3">set_eof</A>()
-us meaningless and does nothing.<P><!1><A HREF="DataPool.html#DOC.1.5.14.1.5.3">get_length</A>() function always returns the file size.<P>Calling <!1><A HREF="DataPool.html#DOC.1.5.14.1.2">stop</A>() function will stop this <TT>DataPool</TT> and
-any other slave connected to it.<P>Trigger callbacks passed through <!1><A HREF="DataPool.html#DOC.1.5.14.1.6.1">add_trigger</A>() function
+available at the requested offset.<P>The usage of <!1><A HREF="DataPool.html#DOC.1.4.16.1.3.1">add_data</A>() functions is meaningless and
+is prohibited.<P>is_eof() function always returns <TT>TRUE</TT>. Thus <!1><A HREF="DataPool.html#DOC.1.4.16.1.3.3">set_eof</A>()
+us meaningless and does nothing.<P><!1><A HREF="DataPool.html#DOC.1.4.16.1.5.3">get_length</A>() function always returns the file size.<P>Calling <!1><A HREF="DataPool.html#DOC.1.4.16.1.2">stop</A>() function will stop this <TT>DataPool</TT> and
+any other slave connected to it.<P>Trigger callbacks passed through <!1><A HREF="DataPool.html#DOC.1.4.16.1.6.1">add_trigger</A>() function
 are called immediately.<P>This mode is useful to read and decode DjVu files without reading
 and storing them in full in memory.
 </OL></BLOCKQUOTE>
 <DL>
 
 <A NAME="Initialization ">
-<A NAME="DOC.1.5.14.1.1">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>class  Incrementorclass  Readerclass  Triggerclass  OpenFilesclass  BlockListclass  Initialization </B></TT>
+<A NAME="DOC.1.4.16.1.1">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> Initialization </B></TT>
 <DL><DT><DD></DL><P><DL>
 </DL>
 
 <A NAME="stop">
-<A NAME="DOC.1.5.14.1.2">
+<A NAME="DOC.1.4.16.1.2">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void stop(bool only_blocked=false)</B></TT>
 <DD>Tells the <TT>DataPool</TT> to stop serving readers.<P>If <TT>only_blocked</TT> flag is <TT>TRUE</TT> then only those requests will
 be processed, which would not block. Any attempt to get non-existing
@@ -247,7 +247,7 @@ from this <TT>DataPool</TT> (as well as from any <TT>DataPool</TT> connected
 to this one) will result in a <TT>STOP</TT> exception. 
 <DL><DT><DD></DL><P>
 <A NAME="Adding data.">
-<A NAME="DOC.1.5.14.1.3">
+<A NAME="DOC.1.4.16.1.3">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> Adding data.</B></TT>
 <DD>Please note, that these functions are for not connected <TT>DataPool</TT>s
 only. You can not add data to a <TT>DataPool</TT>, which is connected
@@ -255,41 +255,41 @@ to another <TT>DataPool</TT> or to a file.
 <DL><DT><DD></DL><P><DL>
 
 <A NAME="add_data">
-<A NAME="DOC.1.5.14.1.3.1">
+<A NAME="DOC.1.4.16.1.3.1">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void add_data(const void * buffer, int size)</B></TT>
 <DD>Appends the new block of data to the <TT>DataPool</TT>. There are two
-<!1><A HREF="DataPool.html#DOC.1.5.14.1.3.1">add_data</A>() functions available. One is for adding data
+<!1><A HREF="DataPool.html#DOC.1.4.16.1.3.1">add_data</A>() functions available. One is for adding data
 sequentially. It keeps track of the last byte position, which has
 been stored <B>by it</B> and always appends the next block after
-this position. The other <!1><A HREF="DataPool.html#DOC.1.5.14.1.3.1">add_data</A>() can store data anywhere.<P>The function will unblock readers waiting for data if this data
+this position. The other <!1><A HREF="DataPool.html#DOC.1.4.16.1.3.1">add_data</A>() can store data anywhere.<P>The function will unblock readers waiting for data if this data
 arrives with this block. It may also trigger some <EM>trigger
-callbacks</EM>, which may have been added by means of <!1><A HREF="DataPool.html#DOC.1.5.14.1.6.1">add_trigger</A>()
+callbacks</EM>, which may have been added by means of <!1><A HREF="DataPool.html#DOC.1.4.16.1.6.1">add_trigger</A>()
 function.<P><B>Note:</B> After all the data has been added, it's necessary
-to call <!1><A HREF="DataPool.html#DOC.1.5.14.1.3.3">set_eof</A>() to tell the <TT>DataPool</TT> that nothing else
+to call <!1><A HREF="DataPool.html#DOC.1.4.16.1.3.3">set_eof</A>() to tell the <TT>DataPool</TT> that nothing else
 is expected.<P><B>Note:</B> This function may not be called if the <TT>DataPool</TT>
 has been connected to something.<P>
 <DL><DT><DT><B>Parameters:</B><DD><B>buffer</B> -  data to append
 <BR><B>size</B> -  length of the <EM>buffer</EM><BR><DD></DL><P>
 <A NAME="add_data">
-<A NAME="DOC.1.5.14.1.3.2">
+<A NAME="DOC.1.4.16.1.3.2">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void add_data(const void * buffer, int offset, int size)</B></TT>
 <DD>Stores the specified block of data at the specified offset.
 Like the function above this one can also unblock readers
 waiting for data and engage trigger callbacks. The difference
 is that <B>this</B> function can store data anywhere.<P><B>Note:</B> After all the data has been added, it's necessary
-to call <!1><A HREF="DataPool.html#DOC.1.5.14.1.3.3">set_eof</A>() to tell the <TT>DataPool</TT> that nothing else
+to call <!1><A HREF="DataPool.html#DOC.1.4.16.1.3.3">set_eof</A>() to tell the <TT>DataPool</TT> that nothing else
 is expected.<P><B>Note:</B> This function may not be called if the <TT>DataPool</TT>
 has been connected to something.<P>
 <DL><DT><DT><B>Parameters:</B><DD><B>buffer</B> -  data to store
 <BR><B>offset</B> -  where to store the data
 <BR><B>size</B> -  length of the <EM>buffer</EM> <BR><DD></DL><P>
 <A NAME="set_eof">
-<A NAME="DOC.1.5.14.1.3.3">
+<A NAME="DOC.1.4.16.1.3.3">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void set_eof(void)</B></TT>
 <DD>Tells the <TT>DataPool</TT> that all data has been added and nothing else
 is anticipated. When <TT>EOF</TT> is true, any reader attempting to read
 non existing data will not be blocked. It will either read <TT>ZERO</TT>
-bytes or will get an <TT>&quot;EOF&quot;</TT> exception (see <!1><A HREF="DataPool.html#DOC.1.5.14.1.4.1">get_data</A>()).
+bytes or will get an <TT>ByteStream::EndOfFile</TT> exception (see <!1><A HREF="DataPool.html#DOC.1.4.16.1.4.1">get_data</A>()).
 Calling this function will also activate all registered trigger
 callbacks.<P><B>Note:</B> This function is meaningless and does nothing
 when the <TT>DataPool</TT> is connected to another <TT>DataPool</TT> or to
@@ -297,7 +297,7 @@ a file.
 <DL><DT><DD></DL><P></DL>
 
 <A NAME="Accessing data.">
-<A NAME="DOC.1.5.14.1.4">
+<A NAME="DOC.1.4.16.1.4">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> Accessing data.</B></TT>
 <DD>These functions provide direct and sequential access to the
 data of the <TT>DataPool</TT>. If the <TT>DataPool</TT> is not connected
@@ -306,7 +306,7 @@ Otherwise they are forwarded to the master <TT>DataPool</TT> or the file.
 <DL><DT><DD></DL><P><DL>
 
 <A NAME="get_data">
-<A NAME="DOC.1.5.14.1.4.1">
+<A NAME="DOC.1.4.16.1.4.1">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int get_data(void * buffer, int offset, int size)</B></TT>
 <DD>Attempts to return a block of data at the given <TT>offset</TT>
 of the given <TT>size</TT>.<P><OL>
@@ -319,7 +319,7 @@ immediately.<P>If there is no data available, and is_eof() returns
 <TT>FALSE</TT>, the reader (and the thread) will be <B>blocked</B>
 until the data actually arrives. Please note, that since
 the reader is blocked, it should run in a separate thread
-so that other threads have a chance to call <!1><A HREF="DataPool.html#DOC.1.5.14.1.3.1">add_data</A>().
+so that other threads have a chance to call <!1><A HREF="DataPool.html#DOC.1.4.16.1.3.1">add_data</A>().
 If there is no data available, but is_eof() is <TT>TRUE</TT>
 the behavior is different and depends on the <TT>DataPool</TT>'s
 estimate of the file size:
@@ -328,7 +328,7 @@ estimate of the file size:
 data, that its size should be greater than it
 really is, then any attempt to read non-existing
 data in the range of <EM>valid</EM> offsets will
-result in an <TT>&quot;EOF&quot;</TT> exception. This is done to
+result in an <TT>ByteStream::EndOfFile</TT> exception. This is done to
 indicate, that there was an error in adding data,
 and the data requested is <B>supposed</B> to be
 there, but has actually not been added.
@@ -346,37 +346,37 @@ although it should have been.<BR><DT><B>Returns:</B><DD>  The number of bytes ac
 <BR><B>size</B> -  Size of the <EM>buffer</EM>
 <BR><DD></DL><P>
 <A NAME="get_stream">
-<A NAME="DOC.1.5.14.1.4.2">
+<A NAME="DOC.1.4.16.1.4.2">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="ByteStream.html">ByteStream</A>&gt;  get_stream(void)</B></TT>
 <DD>Returns a <!1><A HREF="ByteStream.html">ByteStream</A> to access contents of the <TT>DataPool</TT>
 sequentially. By reading from the returned stream you basically
-call <!1><A HREF="DataPool.html#DOC.1.5.14.1.4.1">get_data</A>() function. Thus, everything said for it
+call <!1><A HREF="DataPool.html#DOC.1.4.16.1.4.1">get_data</A>() function. Thus, everything said for it
 remains true for the stream too. 
 <DL><DT><DD></DL><P></DL>
 
 <A NAME="State querying functions. ">
-<A NAME="DOC.1.5.14.1.5">
+<A NAME="DOC.1.4.16.1.5">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> State querying functions. </B></TT>
 <DL><DT><DD></DL><P><DL>
 
 <A NAME="is_connected">
-<A NAME="DOC.1.5.14.1.5.1">
+<A NAME="DOC.1.4.16.1.5.1">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>bool is_connected(void) const </B></TT>
 <DD>Returns <TT>TRUE</TT> if this <TT>DataPool</TT> is connected to another <TT>DataPool</TT>
 or to a file. 
 <DL><DT><DD></DL><P>
 <A NAME="has_data">
-<A NAME="DOC.1.5.14.1.5.2">
+<A NAME="DOC.1.4.16.1.5.2">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>bool has_data(int start, int length)</B></TT>
 <DD>Returns <TT>TRUE</TT> if all data available for offsets from
 <TT>start</TT> till <TT>start+length-1</TT>. If <TT>length</TT> is negative, the
 range is assumed to extend up to the end of the <TT>DataPool</TT>.
 This function works both for connected and not connected <TT>DataPool</TT>s.
 Once it returned <TT>TRUE</TT> for some offsets range, you can be
-sure that the subsequent <!1><A HREF="DataPool.html#DOC.1.5.14.1.4.1">get_data</A>() request will not block.
+sure that the subsequent <!1><A HREF="DataPool.html#DOC.1.4.16.1.4.1">get_data</A>() request will not block.
 <DL><DT><DD></DL><P>
 <A NAME="get_length">
-<A NAME="DOC.1.5.14.1.5.3">
+<A NAME="DOC.1.4.16.1.5.3">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int get_length(void) const </B></TT>
 <DD>Returns the <EM>length</EM> of data in the <TT>DataPool</TT>. The value
 returned depends on the mode of operation:
@@ -384,22 +384,22 @@ returned depends on the mode of operation:
 <LI> If the <TT>DataPool</TT> is not connected to anything then
 the length returned is either calculated by interpreting
 the IFF structure of stored data (if successful) or
-by calculating the real size of data after <!1><A HREF="DataPool.html#DOC.1.5.14.1.3.3">set_eof</A>()
+by calculating the real size of data after <!1><A HREF="DataPool.html#DOC.1.4.16.1.3.3">set_eof</A>()
 has been called. Otherwise it is <TT>-1</TT>.
 <LI> If the <TT>DataPool</TT> is connected to a file, the length
 is calculated basing on the length passed to the
-<!1><A HREF="DataPool.html#DOC.1.5.14.1.1.6">connect</A>() function and the file size.
+<!1><A HREF="DataPool.html#DOC.1.4.16.1.1.5">connect</A>() function and the file size.
 <LI> If the <TT>DataPool</TT> is connected to a master <TT>DataPool</TT>,
 the length is calculated basing on the value returned
 by the master's <TT>get_length()</TT> function and the length
-passed to the <!1><A HREF="DataPool.html#DOC.1.5.14.1.1.6">connect</A>() function.
+passed to the <!1><A HREF="DataPool.html#DOC.1.4.16.1.1.5">connect</A>() function.
 </UL>. 
 <DL><DT><DD></DL><P>
 <A NAME="get_size">
-<A NAME="DOC.1.5.14.1.5.4">
+<A NAME="DOC.1.4.16.1.5.4">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int get_size(void) const </B></TT>
 <DD>Returns the number of bytes of data available in this <TT>DataPool</TT>.
-Contrary to the <!1><A HREF="DataPool.html#DOC.1.5.14.1.5.3">get_length</A>() function, this one doesn't try
+Contrary to the <!1><A HREF="DataPool.html#DOC.1.4.16.1.5.3">get_length</A>() function, this one doesn't try
 to interpret the IFF structure and predict the file length.
 It just returns the number of bytes of data really available inside
 the <TT>DataPool</TT>, if it contains data, or inside its range, if it's
@@ -407,7 +407,7 @@ connected to another <TT>DataPool</TT> or a file.
 <DL><DT><DD></DL><P></DL>
 
 <A NAME="Trigger callbacks.">
-<A NAME="DOC.1.5.14.1.6">
+<A NAME="DOC.1.4.16.1.6">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> Trigger callbacks.</B></TT>
 <DD><EM>Trigger callbacks</EM> are special callbacks called when
 all data for the given range of offsets has been made available.
@@ -423,8 +423,8 @@ last for <EM>threshold</EM>+1 bytes.
 <DL><DT><DD></DL><P><DL>
 
 <A NAME="add_trigger">
-<A NAME="DOC.1.5.14.1.6.1">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void add_trigger(int start, int length, void (* callback)(void *), void * cl_data)</B></TT>
+<A NAME="DOC.1.4.16.1.6.1">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void add_trigger(int start, int length,  void (* callback)(void *), void * cl_data)</B></TT>
 <DD>Associates the specified <EM>trigger callback</EM> with the
 given data range.<P><B>Note:</B> The callback may be called immediately if all
 data for the given range is already available or <TT>EOF</TT> is <TT>TRUE</TT>.<P>
@@ -438,7 +438,7 @@ If <EM>thresh</EM> is negative, the callback is called after
 <BR><B>callback</B> -  Function to call
 <BR><B>cl_data</B> -  Argument to pass to the callback when it's called. <BR><DD></DL><P>
 <A NAME="add_trigger">
-<A NAME="DOC.1.5.14.1.6.2">
+<A NAME="DOC.1.4.16.1.6.2">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void add_trigger(int thresh, void (* callback)(void *), void * cl_data)</B></TT>
 <DD>Associates the specified <EM>trigger callback</EM> with the
 specified threshold.<P>This function is a simplified version of the function above.
@@ -447,7 +447,7 @@ every offset from <TT>0</TT> to <TT>thresh</TT>, if <TT>thresh</TT> is positive,
 when <TT>EOF</TT> condition has been set otherwise. 
 <DL><DT><DD></DL><P>
 <A NAME="del_trigger">
-<A NAME="DOC.1.5.14.1.6.3">
+<A NAME="DOC.1.4.16.1.6.3">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void del_trigger(void (* callback)(void *), void * cl_data)</B></TT>
 <DD>Use this function to unregister callbacks, which are no longer
 needed. <B>Note!</B> It's important to do it when the client
@@ -455,7 +455,7 @@ is about to be destroyed.
 <DL><DT><DD></DL><P></DL>
 
 <A NAME="load_file">
-<A NAME="DOC.1.5.14.1.7">
+<A NAME="DOC.1.4.16.1.7">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void load_file(void)</B></TT>
 <DD>Loads data from the file into memory. This function is only useful
 for <TT>DataPool</TT>s getting data from a file. It descends the <TT>DataPool</TT>s
@@ -466,8 +466,8 @@ data from the file into memory and stop using the file.<P>This may be useful whe
 existing <TT>DataPool</TT>s with valid data. 
 <DL><DT><DD></DL><P>
 <A NAME="load_file">
-<A NAME="DOC.1.5.14.1.8">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static   void load_file(const char * name)</B></TT>
+<A NAME="DOC.1.4.16.1.8">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static   void load_file(const <!1><A HREF="GURL.html">GURL</A> &amp;url)</B></TT>
 <DD>This function will make every <TT>DataPool</TT> in the program, which
 is connected to a file, to load the file contents to the main
 memory and close the file. This feature is important when you
@@ -475,7 +475,7 @@ want to do something with the file like remove or overwrite it
 not affecting the rest of the program. 
 <DL><DT><DD></DL><P>
 <A NAME="close_all">
-<A NAME="DOC.1.5.14.1.9">
+<A NAME="DOC.1.4.16.1.9">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static   void close_all(void)</B></TT>
 <DD>This function will remove OpenFiles filelist. 
 <DL><DT><DD></DL><P></DL>
@@ -486,7 +486,7 @@ not affecting the rest of the program.
 <!-- This is were the DOC++ footer is defined  -->
 
 <font face="arial,helvetica" size="2">
-<a href=http://www.djvu.att.com>DjVu</a> is a trademark of AT&amp;T.  
+<a href=http://www.lizardtech.com>DjVu</a> is a trademark of LizardTech, Inc.  
 <br>All other products mentioned are registered trademarks or trademarks of
 their respective companies.
 </font>

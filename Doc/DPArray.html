@@ -5,7 +5,7 @@
 </HEAD>
 <BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
 
-<H2>template&lt;class TYPE&gt; class  <A HREF="#DOC.DOCU">DPArray</A>: public <!1><A HREF="DArray.html#DOC.1.5.7.4.1">DArray</A>&lt;<!1><A HREF="GPBase.html">GPBase</A>&gt;</H2>
+<H2>template&lt;class TYPE&gt; class  <A HREF="#DOC.DOCU">DPArray</A>: public <!1><A HREF="DArray.html#DOC.1.4.9.4.1">DArray</A>&lt;<!1><A HREF="GPBase.html">GPBase</A>&gt;</H2>
 <BLOCKQUOTE>Dynamic array for <!1><A HREF="GPBase.html">GPBase</A>d classes.</BLOCKQUOTE>
 <HR>
 
@@ -70,15 +70,15 @@
 <H2>Documentation</H2>
 <BLOCKQUOTE>Dynamic array for <!1><A HREF="GPBase.html">GPBase</A>d classes.<P>There are many situations when it's necessary to create arrays of
 <!1><A HREF="GP.html">GP</A> pointers. For example, <TT>DArray&lt;GP&lt;Dialog&gt; &gt;</TT> or <TT>DArray&lt;GP&lt;Button&gt; &gt;</TT>.
-This would result in compilation of two instances of <!1><A HREF="DArray.html#DOC.1.5.7.4.1">DArray</A> because
+This would result in compilation of two instances of <!1><A HREF="DArray.html#DOC.1.4.9.4.1">DArray</A> because
 from the viewpoint of the compiler there are two different classes used
 as array elements: <TT>GP&lt;Dialog&gt;</TT> and <TT>GP&lt;Button&gt;</TT>. In reality though,
 all <!1><A HREF="GP.html">GP</A> pointers have absolutely the same binary structure because
 they are derived from <!1><A HREF="GPBase.html">GPBase</A> class and do not add any variables
-or virtual functions. That's why it's possible to instantiate <!1><A HREF="DArray.html#DOC.1.5.7.4.1">DArray</A>
+or virtual functions. That's why it's possible to instantiate <!1><A HREF="DArray.html#DOC.1.4.9.4.1">DArray</A>
 only once for <!1><A HREF="GPBase.html">GPBase</A> elements and then just cast types.<P>To implement this idea we have created this <TT>DPArray&lt;TYPE&gt;</TT> class,
 which can be used instead of <TT>DArray&lt;GP&lt;TYPE&gt; &gt;</TT>. It behaves absolutely
-the same way as <!1><A HREF="DArray.html#DOC.1.5.7.4.1">DArray</A> but has one big advantage: overhead of
+the same way as <!1><A HREF="DArray.html#DOC.1.4.9.4.1">DArray</A> but has one big advantage: overhead of
 using <TT>DPArray</TT> with one more type is negligible.</BLOCKQUOTE>
 <DL>
 </DL>
@@ -89,7 +89,7 @@ using <TT>DPArray</TT> with one more type is negligible.</BLOCKQUOTE>
 <!-- This is were the DOC++ footer is defined  -->
 
 <font face="arial,helvetica" size="2">
-<a href=http://www.djvu.att.com>DjVu</a> is a trademark of AT&amp;T.  
+<a href=http://www.lizardtech.com>DjVu</a> is a trademark of LizardTech, Inc.  
 <br>All other products mentioned are registered trademarks or trademarks of
 their respective companies.
 </font>

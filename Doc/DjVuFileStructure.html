@@ -38,7 +38,7 @@ called <EM>composite chunks</EM> containing a sequence of data chunks.  This
 convention effectively provides IFF files with a hierarchical structure.
 Composite chunks are further identified by a <EM>secondary chunk
 identifier</EM>.  For convenience, both identifiers are gathered as an
-extended chunk identifier such as <TT>&quot;FORM:DJVU&quot;</TT>.<P>The four octets <TT>&quot;AT&amp;T&quot;</TT> may be inserted in front of the IFF compliant
+extended chunk identifier such as <TT>&quot;FORM:DJVU&quot;</TT>.<P>The four octets <TT>0x41,0x54,0x26,0x54</TT> may be inserted in front of the IFF compliant
 byte stream.  The decoder simply ignores these four octets when they are
 present.  These four octets are not part of the IFF format and are not
 required components of a valid DjVu file.  Certain versions of MSIE
@@ -51,7 +51,7 @@ allocating new chunk identifiers. </BLOCKQUOTE>
 <!-- This is were the DOC++ footer is defined  -->
 
 <font face="arial,helvetica" size="2">
-<a href=http://www.lizardtech.com>DjVu</a> is a trademark of AT&amp;T.  
+<a href=http://www.lizardtech.com>DjVu</a> is a trademark of LizardTech, Inc.  
 <br>All other products mentioned are registered trademarks or trademarks of
 their respective companies.
 </font>

@@ -22,25 +22,25 @@
 <DL>
 <P><DL>
 <DT><H3>Public Methods</H3><DD><DT>
-<A HREF="#DOC.1.5.7.2.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>TYPE&amp; <B>operator[]</B>(int n)
+<A HREF="#DOC.1.4.9.2.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>TYPE&amp; <B>operator[]</B>(int n)
 <DD><I>Returns a reference to the array element for subscript <TT>n</TT>.</I>
 <DT>
-<A HREF="#DOC.1.5.7.2.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>const TYPE&amp; <B>operator[]</B>(int n) const 
+<A HREF="#DOC.1.4.9.2.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>const TYPE&amp; <B>operator[]</B>(int n) const 
 <DD><I>Returns a constant reference to the array element for subscript <TT>n</TT>.</I>
 <DT>
-<A HREF="#DOC.1.5.7.2.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>operator TYPE* </B>()
+<A HREF="#DOC.1.4.9.2.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>operator TYPE* </B>()
 <DD><I>Returns a pointer for reading or writing the array elements.</I>
 <DT>
-<A HREF="#DOC.1.5.7.2.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>operator const TYPE* </B>() const 
+<A HREF="#DOC.1.4.9.2.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>operator const TYPE* </B>() const 
 <DD><I>Returns a pointer for reading (but not modifying) the array elements.</I>
 <DT>
-<A HREF="#DOC.1.5.7.2.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>ins</B>(int n, const TYPE &amp;val, unsigned int howmany=1)
+<A HREF="#DOC.1.4.9.2.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>ins</B>(int n, const TYPE &amp;val, unsigned int howmany=1)
 <DD><I>Insert new elements into an array.</I>
 <DT>
-<A HREF="#DOC.1.5.7.2.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>sort</B>()
+<A HREF="#DOC.1.4.9.2.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>sort</B>()
 <DD><I>Sort array elements.</I>
 <DT>
-<A HREF="#DOC.1.5.7.2.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>sort</B>(int lo, int hi)
+<A HREF="#DOC.1.4.9.2.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>sort</B>(int lo, int hi)
 <DD><I>Sort array elements in subscript range <TT>lo</TT> to <TT>hi</TT>.</I>
 </DL></P>
 
@@ -82,7 +82,7 @@ It's not supposed to be constructed by hands. Use <!1><A HREF="DArray.html">DArr
 <DL>
 
 <A NAME="operator[]">
-<A NAME="DOC.1.5.7.2.1">
+<A NAME="DOC.1.4.9.2.1">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>TYPE&amp; operator[](int n)</B></TT>
 <DD>Returns a reference to the array element for subscript <TT>n</TT>.  This
 reference can be used for both reading (as "<TT>a[n]</TT>") and writing (as
@@ -91,7 +91,7 @@ subscript range: an exception <!1><A HREF="GException.html">GException</A> is th
 is not in the valid subscript range. 
 <DL><DT><DD></DL><P>
 <A NAME="operator[]">
-<A NAME="DOC.1.5.7.2.2">
+<A NAME="DOC.1.4.9.2.2">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>const TYPE&amp; operator[](int n) const </B></TT>
 <DD>Returns a constant reference to the array element for subscript <TT>n</TT>.
 This reference can only be used for reading (as "<TT>a[n]</TT>") an array
@@ -101,7 +101,7 @@ subscript range.  This variant of <TT>operator[]</TT> is necessary when dealing
 with a <TT>const DArray&lt;TYPE&gt;</TT>. 
 <DL><DT><DD></DL><P>
 <A NAME="operator TYPE* ">
-<A NAME="DOC.1.5.7.2.3">
+<A NAME="DOC.1.4.9.2.3">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> operator TYPE* ()</B></TT>
 <DD>Returns a pointer for reading or writing the array elements.  This
 pointer can be used to access the array elements with the same
@@ -111,7 +111,7 @@ subscript range, you must stop using the pointers returned by prior
 invocation of this conversion operator. 
 <DL><DT><DD></DL><P>
 <A NAME="operator const TYPE* ">
-<A NAME="DOC.1.5.7.2.4">
+<A NAME="DOC.1.4.9.2.4">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> operator const TYPE* () const </B></TT>
 <DD>Returns a pointer for reading (but not modifying) the array elements.
 This pointer can be used to access the array elements with the same
@@ -121,7 +121,7 @@ subscript range, you must stop using the pointers returned by prior
 invocation of this conversion operator. 
 <DL><DT><DD></DL><P>
 <A NAME="ins">
-<A NAME="DOC.1.5.7.2.5">
+<A NAME="DOC.1.4.9.2.5">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void ins(int n, const TYPE &amp;val, unsigned int howmany=1)</B></TT>
 <DD>Insert new elements into an array. This function inserts
 <TT>howmany</TT> elements at position <TT>n</TT> into the array. The initial value <TT>val</TT>
@@ -133,14 +133,14 @@ valid subscript range is increased in order to account for this shift.
 <BR><B>val</B> -  initial value of the new elements.
 <BR><B>howmany</B> -  number of elements to insert. <BR><DD></DL><P>
 <A NAME="sort">
-<A NAME="DOC.1.5.7.2.6">
+<A NAME="DOC.1.4.9.2.6">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void sort()</B></TT>
 <DD>Sort array elements.  Sort all array elements in ascending order.  Array
 elements are compared using the less-or-equal comparison operator for
 type <TT>TYPE</TT>. 
 <DL><DT><DD></DL><P>
 <A NAME="sort">
-<A NAME="DOC.1.5.7.2.7">
+<A NAME="DOC.1.4.9.2.7">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void sort(int lo, int hi)</B></TT>
 <DD>Sort array elements in subscript range <TT>lo</TT> to <TT>hi</TT>.  Sort all array
 elements whose subscripts are in range <TT>lo</TT>..<TT>hi</TT> in ascending order.
@@ -161,7 +161,7 @@ for type <TT>TYPE</TT>.
 <!-- This is were the DOC++ footer is defined  -->
 
 <font face="arial,helvetica" size="2">
-<a href=http://www.djvu.att.com>DjVu</a> is a trademark of AT&amp;T.  
+<a href=http://www.lizardtech.com>DjVu</a> is a trademark of LizardTech, Inc.  
 <br>All other products mentioned are registered trademarks or trademarks of
 their respective companies.
 </font>

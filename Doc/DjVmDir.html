@@ -1,11 +1,11 @@
 <HTML>
 <HEAD>
-   <TITLE>class  DjVmDir</TITLE>
+   <TITLE>class  ByteStreamclass  DjVmDir</TITLE>
    <META NAME="GENERATOR" CONTENT="DOC++ 3.4.1">
 </HEAD>
 <BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
 
-<H2>class  <A HREF="#DOC.DOCU">DjVmDir</A>: public <!1><A HREF="GPEnabled.html#DOC.1.5.4.1.2">GPEnabled</A></H2>
+<H2>class  ByteStreamclass  <A HREF="#DOC.DOCU">DjVmDir</A>: public <!1><A HREF="GPEnabled.html#DOC.1.4.4.2">GPEnabled</A></H2>
 <BLOCKQUOTE>Implements DjVu multipage document directory.</BLOCKQUOTE>
 <HR>
 
@@ -22,56 +22,65 @@
 <DL>
 <P><DL>
 <DT><H3>Public Fields</H3><DD><DT>
-<A HREF="#DOC.1.5.29.1.16"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Changes the title of the file with ID void set_file_title(const char * id, const char * title); </B>
+<A HREF="#DOC.1.4.30.1.18"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Changes the title of the file with ID void set_file_title(const GUTF8String &amp;id, const GUTF8String &amp;title); </B>
 <DD><I></I>
 </DL></P>
 
 <P><DL>
 <DT><H3>Public Methods</H3><DD><DT>
-<A HREF="#DOC.1.5.29.1.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>DjVmDir</B>(void)
-<DD><I>Class DjVmDir::File represents the directory records managed by class <!1><A HREF="DjVmDir.html#DOC.1.5.29.1.1">DjVmDir</A>.</I>
+<A HREF="#DOC.1.4.30.1.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVmDir.html#DOC.1.4.30.1.1">DjVmDir</A>&gt;  <B>create</B>(void)
+<DD><I>Class DjVmDir::File represents the directory records managed by class <!1><A HREF="DjVmDir.html#DOC.1.4.30.1.1">DjVmDir</A>.</I>
 <DT>
-<A HREF="#DOC.1.5.29.1.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>decode</B>(<!1><A HREF="ByteStream.html">ByteStream</A> &amp; stream)
+<A HREF="#DOC.1.4.30.1.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>decode</B>(const <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="ByteStream.html">ByteStream</A>&gt; &amp;stream)
 <DD><I>Decodes the directory from the specified stream.</I>
 <DT>
-<A HREF="#DOC.1.5.29.1.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>encode</B>(<!1><A HREF="ByteStream.html">ByteStream</A> &amp; stream) const 
+<A HREF="#DOC.1.4.30.1.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>encode</B>(const <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="ByteStream.html">ByteStream</A>&gt; &amp;stream) const 
 <DD><I>Encodes the directory into the specified stream.</I>
 <DT>
-<A HREF="#DOC.1.5.29.1.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>bool <B>is_indirect</B>(void) const 
+<A HREF="#DOC.1.4.30.1.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>bool <B>is_indirect</B>(void) const 
 <DD><I>Tests if directory defines an <EM>indirect</EM> document.</I>
 <DT>
-<A HREF="#DOC.1.5.29.1.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>bool <B>is_bundled</B>(void) const 
+<A HREF="#DOC.1.4.30.1.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>bool <B>is_bundled</B>(void) const 
 <DD><I>Tests if the directory defines a <EM>bundled</EM> document.</I>
 <DT>
-<A HREF="#DOC.1.5.29.1.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;File&gt;  <B>page_to_file</B>(int page_num) const 
+<A HREF="#DOC.1.4.30.1.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;File&gt;  <B>page_to_file</B>(int page_num) const 
 <DD><I>Translates page numbers to file records.</I>
 <DT>
-<A HREF="#DOC.1.5.29.1.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;File&gt;  <B>name_to_file</B>(const <!1><A HREF="GString.html">GString</A> &amp; name) const 
+<A HREF="#DOC.1.4.30.1.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;File&gt;  <B>name_to_file</B>(const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp; name) const 
 <DD><I>Translates file names to file records.</I>
 <DT>
-<A HREF="#DOC.1.5.29.1.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;File&gt;  <B>id_to_file</B>(const char * id) const 
+<A HREF="#DOC.1.4.30.1.9"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;File&gt;  <B>id_to_file</B>(const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;id) const 
 <DD><I>Translates file IDs to file records.</I>
 <DT>
-<A HREF="#DOC.1.5.29.1.9"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;File&gt;  <B>title_to_file</B>(const char * title) const 
+<A HREF="#DOC.1.4.30.1.10"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;File&gt;  <B>title_to_file</B>(const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;title) const 
 <DD><I>Translates file shortcuts to file records.</I>
 <DT>
-<A HREF="#DOC.1.5.29.1.10"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_file_pos</B>(const File * f) const 
+<A HREF="#DOC.1.4.30.1.11"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_file_pos</B>(const File * f) const 
 <DD><I>Returns position of the file in the directory.</I>
 <DT>
-<A HREF="#DOC.1.5.29.1.11"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_page_pos</B>(int page_num) const 
+<A HREF="#DOC.1.4.30.1.12"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_page_pos</B>(int page_num) const 
 <DD><I>Returns position of the given page in the directory.</I>
 <DT>
-<A HREF="#DOC.1.5.29.1.12"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>GPList&lt;File&gt;  <B>get_files_list</B>(void) const 
+<A HREF="#DOC.1.4.30.1.13"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>GPList&lt;File&gt;  <B>resolve_duplicates</B>(const bool save_as_bundled)
+<DD><I>Check for duplicate names, and resolve them.</I>
+<DT>
+<A HREF="#DOC.1.4.30.1.14"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>GPList&lt;File&gt;  <B>get_files_list</B>(void) const 
 <DD><I>Returns a copy of the list of file records.</I>
 <DT>
-<A HREF="#DOC.1.5.29.1.13"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_files_num</B>(void) const 
+<A HREF="#DOC.1.4.30.1.15"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_files_num</B>(void) const 
 <DD><I>Returns the number of file records.</I>
 <DT>
-<A HREF="#DOC.1.5.29.1.14"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_pages_num</B>(void) const 
+<A HREF="#DOC.1.4.30.1.16"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_pages_num</B>(void) const 
 <DD><I>Returns the number of file records representing pages.</I>
 <DT>
-<A HREF="#DOC.1.5.29.1.15"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;File&gt;  <B>get_shared_anno_file</B>(void) const 
+<A HREF="#DOC.1.4.30.1.17"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;File&gt;  <B>get_shared_anno_file</B>(void) const 
 <DD><I>Returns back pointer to the file with <TT>SHARED_ANNO</TT> flag.</I>
+</DL></P>
+
+<P><DL>
+<DT><H3>Protected Methods</H3><DD><DT>
+<A HREF="#DOC.1.4.30.1.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>DjVmDir</B>(void)
+<DD><I>Class DjVmDir::File represents the directory records managed by class <!1><A HREF="DjVmDir.html#DOC.1.4.30.1.1">DjVmDir</A>.</I>
 </DL></P>
 
 </DL>
@@ -79,7 +88,7 @@
 <DL>
 <P><DL>
 <DT><H3>Public Methods</H3><DD><DT>
-<IMG ALT="o" SRC=icon2.gif><!1><A HREF="GPEnabled.html#DOC.1.5.4.1.2">GPEnabled</A>&amp; <B>operator=</B>(const <!1><A HREF="GPEnabled.html#DOC.1.5.4.1.2">GPEnabled</A> &amp; obj)
+<IMG ALT="o" SRC=icon2.gif><!1><A HREF="GPEnabled.html#DOC.1.4.4.2">GPEnabled</A>&amp; <B>operator=</B>(const <!1><A HREF="GPEnabled.html#DOC.1.4.4.2">GPEnabled</A> &amp; obj)
 <DT>
 <IMG ALT="o" SRC=icon2.gif>int <B>get_count</B>(void) const 
 </DL></P>
@@ -113,88 +122,99 @@ return a pointer to <TT>DjVmDir</TT> in some cases. </BLOCKQUOTE>
 <DL>
 
 <A NAME="DjVmDir">
-<A NAME="DOC.1.5.29.1.1">
+<A NAME="DOC.1.4.30.1.1">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> DjVmDir(void)</B></TT>
 <DD>Class DjVmDir::File represents the directory records
-managed by class <!1><A HREF="DjVmDir.html#DOC.1.5.29.1.1">DjVmDir</A>. 
+managed by class <!1><A HREF="DjVmDir.html#DOC.1.4.30.1.1">DjVmDir</A>. 
+<DL><DT><DD></DL><P>
+<A NAME="create">
+<A NAME="DOC.1.4.30.1.2">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVmDir.html#DOC.1.4.30.1.1">DjVmDir</A>&gt;  create(void)</B></TT>
+<DD>Class DjVmDir::File represents the directory records
+managed by class <!1><A HREF="DjVmDir.html#DOC.1.4.30.1.1">DjVmDir</A>. 
 <DL><DT><DD></DL><P>
 <A NAME="decode">
-<A NAME="DOC.1.5.29.1.2">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void decode(<!1><A HREF="ByteStream.html">ByteStream</A> &amp; stream)</B></TT>
+<A NAME="DOC.1.4.30.1.3">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void decode(const <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="ByteStream.html">ByteStream</A>&gt; &amp;stream)</B></TT>
 <DD>Decodes the directory from the specified stream. 
 <DL><DT><DD></DL><P>
 <A NAME="encode">
-<A NAME="DOC.1.5.29.1.3">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void encode(<!1><A HREF="ByteStream.html">ByteStream</A> &amp; stream) const </B></TT>
+<A NAME="DOC.1.4.30.1.4">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void encode(const <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="ByteStream.html">ByteStream</A>&gt; &amp;stream) const </B></TT>
 <DD>Encodes the directory into the specified stream. 
 <DL><DT><DD></DL><P>
 <A NAME="is_indirect">
-<A NAME="DOC.1.5.29.1.4">
+<A NAME="DOC.1.4.30.1.5">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>bool is_indirect(void) const </B></TT>
 <DD>Tests if directory defines an <EM>indirect</EM> document. 
 <DL><DT><DD></DL><P>
 <A NAME="is_bundled">
-<A NAME="DOC.1.5.29.1.5">
+<A NAME="DOC.1.4.30.1.6">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>bool is_bundled(void) const </B></TT>
 <DD>Tests if the directory defines a <EM>bundled</EM> document. 
 <DL><DT><DD></DL><P>
 <A NAME="page_to_file">
-<A NAME="DOC.1.5.29.1.6">
+<A NAME="DOC.1.4.30.1.7">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GP.html">GP</A>&lt;File&gt;  page_to_file(int page_num) const </B></TT>
 <DD>Translates page numbers to file records. 
 <DL><DT><DD></DL><P>
 <A NAME="name_to_file">
-<A NAME="DOC.1.5.29.1.7">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GP.html">GP</A>&lt;File&gt;  name_to_file(const <!1><A HREF="GString.html">GString</A> &amp; name) const </B></TT>
+<A NAME="DOC.1.4.30.1.8">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GP.html">GP</A>&lt;File&gt;  name_to_file(const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp; name) const </B></TT>
 <DD>Translates file names to file records. 
 <DL><DT><DD></DL><P>
 <A NAME="id_to_file">
-<A NAME="DOC.1.5.29.1.8">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GP.html">GP</A>&lt;File&gt;  id_to_file(const char * id) const </B></TT>
+<A NAME="DOC.1.4.30.1.9">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GP.html">GP</A>&lt;File&gt;  id_to_file(const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;id) const </B></TT>
 <DD>Translates file IDs to file records. 
 <DL><DT><DD></DL><P>
 <A NAME="title_to_file">
-<A NAME="DOC.1.5.29.1.9">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GP.html">GP</A>&lt;File&gt;  title_to_file(const char * title) const </B></TT>
+<A NAME="DOC.1.4.30.1.10">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GP.html">GP</A>&lt;File&gt;  title_to_file(const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;title) const </B></TT>
 <DD>Translates file shortcuts to file records. 
 <DL><DT><DD></DL><P>
 <A NAME="get_file_pos">
-<A NAME="DOC.1.5.29.1.10">
+<A NAME="DOC.1.4.30.1.11">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int get_file_pos(const File * f) const </B></TT>
 <DD>Returns position of the file in the directory. 
 <DL><DT><DD></DL><P>
 <A NAME="get_page_pos">
-<A NAME="DOC.1.5.29.1.11">
+<A NAME="DOC.1.4.30.1.12">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int get_page_pos(int page_num) const </B></TT>
 <DD>Returns position of the given page in the directory. 
 <DL><DT><DD></DL><P>
+<A NAME="resolve_duplicates">
+<A NAME="DOC.1.4.30.1.13">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>GPList&lt;File&gt;  resolve_duplicates(const bool save_as_bundled)</B></TT>
+<DD>Check for duplicate names, and resolve them. 
+<DL><DT><DD></DL><P>
 <A NAME="get_files_list">
-<A NAME="DOC.1.5.29.1.12">
+<A NAME="DOC.1.4.30.1.14">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>GPList&lt;File&gt;  get_files_list(void) const </B></TT>
 <DD>Returns a copy of the list of file records. 
 <DL><DT><DD></DL><P>
 <A NAME="get_files_num">
-<A NAME="DOC.1.5.29.1.13">
+<A NAME="DOC.1.4.30.1.15">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int get_files_num(void) const </B></TT>
 <DD>Returns the number of file records. 
 <DL><DT><DD></DL><P>
 <A NAME="get_pages_num">
-<A NAME="DOC.1.5.29.1.14">
+<A NAME="DOC.1.4.30.1.16">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int get_pages_num(void) const </B></TT>
 <DD>Returns the number of file records representing pages. 
 <DL><DT><DD></DL><P>
 <A NAME="get_shared_anno_file">
-<A NAME="DOC.1.5.29.1.15">
+<A NAME="DOC.1.4.30.1.17">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GP.html">GP</A>&lt;File&gt;  get_shared_anno_file(void) const </B></TT>
 <DD>Returns back pointer to the file with <TT>SHARED_ANNO</TT> flag.
 Note that there may be only one file with shared annotations
 in any multipage DjVu document. 
 <DL><DT><DD></DL><P>
-<A NAME="Changes the title of the file with ID void set_file_title(const char * id, const char * title); ">
-<A NAME="DOC.1.5.29.1.16">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> Changes the title of the file with ID void set_file_title(const char * id, const char * title); </B></TT>
+<A NAME="Changes the title of the file with ID void set_file_title(const GUTF8String &id, const GUTF8String &title); ">
+<A NAME="DOC.1.4.30.1.18">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> Changes the title of the file with ID void set_file_title(const GUTF8String &amp;id, const GUTF8String &amp;title); </B></TT>
 <DD>Changes the title of the file with ID
-void set_file_title(const char * id, const char * title);
+void set_file_title(const GUTF8String &amp;id, const GUTF8String &amp;title);
 
 <DL><DT><DD></DL><P></DL>
 
@@ -204,7 +224,7 @@ void set_file_title(const char * id, const char * title);
 <!-- This is were the DOC++ footer is defined  -->
 
 <font face="arial,helvetica" size="2">
-<a href=http://www.lizardtech.com>DjVu</a> is a trademark of AT&amp;T.  
+<a href=http://www.lizardtech.com>DjVu</a> is a trademark of LizardTech, Inc.  
 <br>All other products mentioned are registered trademarks or trademarks of
 their respective companies.
 </font>

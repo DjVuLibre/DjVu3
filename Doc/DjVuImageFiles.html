@@ -17,7 +17,7 @@ memory.  Photo DjVu files are composed of a single <TT>&quot;FORM:DJVU&quot;</TT
 chunk.  This composite chunk always begins with one <TT>&quot;INFO&quot;</TT> chunk
 describing the image size and resolution (see <!1><A HREF="DjVuInfo.h.html">DjVuInfo.h</A>).  One or
 more additional <TT>&quot;BG44&quot;</TT> chunks contains the image data encoded with the
-IW44 representation (see <!1><A HREF="IWImage.h.html">IWImage.h</A>).  The image size specified in
+IW44 representation (see <!1><A HREF="IW44Image.h.html">IW44Image.h</A>).  The image size specified in
 the <TT>&quot;INFO&quot;</TT> chunk and the image size specified in the IW44 data must be
 equal.<P><B>Bilevel DjVu Image</B> --- Bilevel DjVu Image files are used to compress
 black and white images representing text and simple drawings.   The
@@ -50,7 +50,7 @@ referenced by the <TT>&quot;Sjbz&quot;</TT> chunk.<P>The <EM>foreground colors</
 <LI> 
 The foreground colors may be encoded using a small color image, the <EM>
 foreground color image</EM>, encoded as a single <TT>&quot;FG44&quot;</TT> chunk using the
-IW44 representation (see <!1><A HREF="IWImage.h.html">IWImage.h</A>).  Such compound DjVu images
+IW44 representation (see <!1><A HREF="IW44Image.h.html">IW44Image.h</A>).  Such compound DjVu images
 are rendered by painting the foreground color image on top of the
 background color image using the foreground mask as a stencil.  The
 pixel size of the foreground color image is computed by rounding up the
@@ -67,7 +67,7 @@ painting each foreground object on top of the background color image
 using the solid color specified by the <TT>&quot;FGbz&quot;</TT> chunk.
 </UL><P>The background layer is a color image, the background color image
 ncoded by an arbitrary number of <TT>&quot;BG44&quot;</TT> chunks containing successive
-IW44 refinements (see <!1><A HREF="IWImage.h.html">IWImage.h</A>).  The size of this image is
+IW44 refinements (see <!1><A HREF="IW44Image.h.html">IW44Image.h</A>).  The size of this image is
 computed by rounding up the quotient of the mask size by an integer
 sub-sampling factor ranging from 1 to 12.  Most Compound DjVu Images use a
 background sub-sampling factor equal to 3.  Smaller sub-sampling factors

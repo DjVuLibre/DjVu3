@@ -22,13 +22,13 @@
 <DL>
 <P><DL>
 <DT><H3>Public Methods</H3><DD><DT>
-<A HREF="#DOC.1.5.7.4.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>DArray</B>()
+<A HREF="#DOC.1.4.9.4.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>DArray</B>(void)
 <DD><I>Constructs an empty array.</I>
 <DT>
-<A HREF="#DOC.1.5.7.4.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>DArray</B>(int hibound)
+<A HREF="#DOC.1.4.9.4.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>DArray</B>(const int hibound)
 <DD><I>Constructs an array with subscripts in range 0 to <TT>hibound</TT>.</I>
 <DT>
-<A HREF="#DOC.1.5.7.4.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>DArray</B>(int lobound, int hibound)
+<A HREF="#DOC.1.4.9.4.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>DArray</B>(const int lobound, const int hibound)
 <DD><I>Constructs an array with subscripts in range <TT>lobound</TT> to <TT>hibound</TT>.</I>
 </DL></P>
 
@@ -102,23 +102,23 @@ difference between this class and <!1><A HREF="GArray.html">GArray</A> (now obso
 <DL>
 
 <A NAME="DArray">
-<A NAME="DOC.1.5.7.4.1">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> DArray()</B></TT>
+<A NAME="DOC.1.4.9.4.1">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> DArray(void)</B></TT>
 <DD>Constructs an empty array. The valid subscript range is initially
 empty. Member function <TT>touch</TT> and <TT>resize</TT> provide convenient ways
 to enlarge the subscript range. 
 <DL><DT><DD></DL><P>
 <A NAME="DArray">
-<A NAME="DOC.1.5.7.4.2">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> DArray(int hibound)</B></TT>
+<A NAME="DOC.1.4.9.4.2">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> DArray(const int hibound)</B></TT>
 <DD>Constructs an array with subscripts in range 0 to <TT>hibound</TT>. 
 The subscript range can be subsequently modified with member functions
 <TT>touch</TT> and <TT>resize</TT>.
 
 <DL><DT><DT><B>Parameters:</B><DD><B>hibound</B> -  upper bound of the initial subscript range. <BR><DD></DL><P>
 <A NAME="DArray">
-<A NAME="DOC.1.5.7.4.3">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> DArray(int lobound, int hibound)</B></TT>
+<A NAME="DOC.1.4.9.4.3">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> DArray(const int lobound, const int hibound)</B></TT>
 <DD>Constructs an array with subscripts in range <TT>lobound</TT> to <TT>hibound</TT>.  
 The subscript range can be subsequently modified with member functions
 <TT>touch</TT> and <TT>resize</TT>.
@@ -134,7 +134,7 @@ The subscript range can be subsequently modified with member functions
 <!-- This is were the DOC++ footer is defined  -->
 
 <font face="arial,helvetica" size="2">
-<a href=http://www.djvu.att.com>DjVu</a> is a trademark of AT&amp;T.  
+<a href=http://www.lizardtech.com>DjVu</a> is a trademark of LizardTech, Inc.  
 <br>All other products mentioned are registered trademarks or trademarks of
 their respective companies.
 </font>
