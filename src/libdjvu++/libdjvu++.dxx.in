@@ -125,7 +125,7 @@
    The documentation somehow explains the basic ideas, but this is 
    not currently implemented:
    \begin{itemize}
-   \item {\em Creating DjVu Color Images} which are basically embedded IW44
+   \item {\em Creating DjVu Photo Images} which are basically embedded IW44
          images according to the instructions in \Ref{djvumake}.
    \item {\em Creating Lossless Bilevel DjVu Images} using lossless encoding.
          Instructions are provided in \Ref{JB2Image.h} and \Ref{djvumake}.
