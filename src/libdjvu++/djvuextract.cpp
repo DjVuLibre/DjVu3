@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: djvuextract.cpp,v 1.9 1999-03-17 19:24:59 leonb Exp $
+//C- $Id: djvuextract.cpp,v 1.9.4.1 1999-04-12 16:45:50 eaf Exp $
 
 /** @name djvuextract
 
@@ -37,7 +37,7 @@
     @memo
     Extract components from DjVu files.
     @version
-    #$Id: djvuextract.cpp,v 1.9 1999-03-17 19:24:59 leonb Exp $#
+    #$Id: djvuextract.cpp,v 1.9.4.1 1999-04-12 16:45:50 eaf Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> */
 //@{
@@ -86,6 +86,8 @@ djvuextract(const char *filename,
   GString chkid;
   if (! iff.get_chunk(chkid))
     THROW("Malformed DJVU file");
+  if (chkid == "FORM:DJVM")
+     THROW("This is multipage DJVU file. Please break it into pieces.");
   if (chkid != "FORM:DJVU")
     THROW("This IFF file is not a DJVU file");
   while (iff.get_chunk(chkid))

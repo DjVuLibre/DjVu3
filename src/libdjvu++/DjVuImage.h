@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuImage.h,v 1.11 1999-03-17 19:24:57 leonb Exp $
+//C- $Id: DjVuImage.h,v 1.11.4.1 1999-04-12 16:45:50 eaf Exp $
 
 #ifndef _DJVUIMAGE_H
 #define _DJVUIMAGE_H
@@ -60,7 +60,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: DjVuImage.h,v 1.11 1999-03-17 19:24:57 leonb Exp $# */
+    #$Id: DjVuImage.h,v 1.11.4.1 1999-04-12 16:45:50 eaf Exp $# */
 //@{
 
 
@@ -77,139 +77,13 @@
 #include "IWImage.h"
 #include "GBitmap.h"
 #include "GPixmap.h"
+#include "DjVuInfo.h"
+#include "DjVuAnno.h"
+#include "DjVuFile.h"
 
-
-/** @name DjVu version constants
-    @memo DjVu file format version. */
-//@{
-/** Current DjVu format version.  The value of this macro represents the
-    version of the DjVu file format implemented by this release of the DjVu
-    Reference Library. */
-#define DJVUVERSION          20
-/** Oldest DjVu format version supported by this library.  This release of the
-    library cannot completely decode DjVu files whose version field is less
-    than or equal to this number. */
-#define DJVUVERSION_TOO_OLD  15
-/** Newest DjVu format partially supported by this library.  This release of
-    the library will attempt to decode files whose version field is smaller
-    than this macro.  If the version field is greater than or equal to this
-    number, the decoder will just throw a \Ref{GException}.  */
-#define DJVUVERSION_TOO_NEW  22
-//@}
-
-
-
-
-/** Information component.
-    Each instance of class #DjVuInfo# represents the information
-    contained in the information chunk of a DjVu file.  This #"INFO"#
-    chunk is always the first chunk of a DjVu file.
- */
-
-class DjVuInfo : public GPEnabled
-{
-public:
-  /** Constructs an empty DjVuInfo object.
-      The #width# and #height# fields are set to zero.
-      All other fields are initialized with suitable default values. */
-  DjVuInfo();
-  /** Decodes the DjVu #"INFO"# chunk.  This function reads binary data from
-      ByteStream #bs# and populates the fields of this DjVuInfo object.  It is
-      normally called after detecting an #"INFO"# chunk header with function
-      \Ref{IFFByteStream::get_chunk}. */
-  void decode(ByteStream &bs);
-  /** Encodes the DjVu #"INFO"# chunk. This function writes the fields of this
-      DjVuInfo object into ByteStream #bs#. It is normally called after
-      creating an #"INFO"# chunk header with function
-      \Ref{IFFByteStream::put_chunk}. */
-  void encode(ByteStream &bs);  
-  /** Returns the number of bytes used by this object. */
-  unsigned int get_memory_usage() const;
-  /** Width of the DjVu image (in pixels). */
-  int width;
-  /** Height of the DjVu image (in pixels). */
-  int height;
-  /** DjVu file version number.  This number characterizes the file format
-      version used by the encoder to generate this DjVu image.  A decoder
-      should compare this version number with the constants described in
-      section "\Ref{DjVu version constants}". */
-  int version;
-  /** Resolution of the DjVu image.  The resolution is given in ``pixels per
-      2.54 centimeters'' (this unit is sometimes called ``pixels per
-      inch''). Display programs can use this information to determine the
-      natural magnification to use for rendering a DjVu image. */
-  int dpi;
-  /** Gamma coefficient of the display for which the image was designed.  The
-      rendering functions can use this information in order to perform color
-      correction for the intended display device. */
-  double gamma;
-  /** Reserved byte. The IFF padding rules give the opportunity to store an
-      extra byte in the #"INFO"# chunk.  This is reserved for possible
-      extensions and for backward compatibility. */
-  unsigned char reserved;
-};
-
-
-
-/** Display annotation component.
-    The annotation chunk contains directives for displaying DjVu image, such
-    as hyperlinks, border color, centering, preferred zoom factor, etc.
-    Directives are encoded in plain text using a lisp like syntax.
-    
-    {\bf Todo} --- The decoding/encoding functions should actually
-    convert the annotation chunk into/from an abstract representation
-    of the hyperlinks and display modes.  */
-
-class DjVuAnno : public GPEnabled
-{
-public:
-  /** Constructs an empty annotation object. */
-  DjVuAnno();
-  /** Decode an annotation chunk.  The annotation data is simply read from
-      ByteStream #bs# until reaching an end-of-stream marker.  This function
-      is normally called after a call to \Ref{IFFByteStream::get_chunk}. */
-  void decode(ByteStream &bs);
-  /** Encodes the annotation chunk.  The annotation data is simply written
-      into ByteStream #bs# with no IFF header. This function is normally
-      called after a call to \Ref{IFFByteStream::put_chunk}. */
-  void encode(ByteStream &bs);
-  /** Returns the number of bytes needed by this data structure. */
-  unsigned int get_memory_usage() const;
-  /** Raw annotation data. The current version of the DjVu Reference Library
-      does not yet use that data. */
-  GString raw;
-private:
-  GCriticalSection mutex;
-};
-
-
-
-
-
-/** Decoder progress notifier.  The DjVu decoder keeps a pointer to an
-    instance of this abstract class.  The virtual functions defined by this
-    class are called during the decoding process.  This callback system
-    provides a way to monitor the decoding thread and implement a progressive
-    display program. */
-
-class DjVuInterface
-{
-public:
-  /** This function is called after decoding each chunk.  
-      Argument #chkid# contains the chunk id.  
-      Argument #msg# contains a message describing the chunk data. */
-  virtual void notify_chunk(const char *chkid, const char *msg);
-  /** This function is called after decoding the INFO chunk.
-      It indicates that the size of the image is now known. */
-  virtual void notify_relayout(void);
-  /** This function is called whenever the image should be redrawn.  It
-      indicates that enough new data has been received and that the image can
-      be redisplayed with increased quality. */
-  virtual void notify_redisplay(void);
-};
-
-
-
+#include "GURL.h"
+#include "DataPool.h"
+#include "DjVuPort.h"
 
 /** Main DjVu Image data structure.  This class defines the internal
     representation of a DjVu image.  This representation consists of a few
@@ -218,16 +92,16 @@ public:
     rendering functions then can use the available components to compute a
     pixel representation of the desired segment of the DjVu image. */
 
-class DjVuImage : public GPEnabled
+class DjVuImage : public GPEnabled, protected DjVuPort
 {
 public:
   // CONSTRUCTION
   /** @name Construction. */
   //@{
-  /** Constructs an empty DjVu image.  
-      Function #decode# must then be called to
-      populate this DjVu image object. */
-  DjVuImage();
+  /** Constructs a DjVu image. */
+  DjVuImage(void);
+  /** Constructs a DjVu image. */
+  DjVuImage(const GP<DjVuFile> & file);
   /** Resets a DjVu image and release all memory. 
       Function #decode# must then be called to
       populate this DjVu image object. */
@@ -262,6 +136,12 @@ public:
   GP<GPixmap>    get_fgpm() const;
   //@}
 
+  // OLD STYLE DECODING
+  /** @name Old style decoding routing */
+  //@{
+  void decode(ByteStream & str);
+  //@}
+  
   // UTILITIES
   /** @name Utilities */
   //@{
@@ -291,9 +171,6 @@ public:
       is auto-sensed by the decoder.  The MIME type can be #"image/djvu"# or
       #"image/iw44"# depending on the data stream. */
   GString get_mimetype() const;
-  /** Returns the memory required to store this image.  This number includes
-      the memory required by all the components of the DjVu image. */
-  unsigned int get_memory_usage() const;
   /** Returns a short string describing the DjVu image.
       Example: #"2500x3223 in 23.1 Kb"#. */
   GString get_short_description() const;
@@ -312,18 +189,9 @@ public:
       Compression ratio: 676 (31.8 Kb)
       \end{verbatim} */
   GString get_long_description() const;
-  //@}
-
-  // DECODING
-  /** @name Decoding. */
-  //@{
-  /** Decodes DjVu data. This function reads binary data from the ByteStream
-      #bs# and populates this DjVu image.  The decoder can process both IW44
-      Image files and DjVu Image files.  IW44 Image files are in fact handled
-      like Photo DjVu Images.  The member functions of the optional argument
-      #notifier# are called at appropriate times during the decoding process.
-      See class \Ref{DjVuInterface} for more details. */
-  void decode(ByteStream &bs, DjVuInterface *notifier=0);
+  /** Returns pointer to \Ref{DjVuFile} which contains this image in
+      compressed form. */
+  GP<DjVuFile> get_djvu_file(void) const;
   //@}
 
   // CHECKING
@@ -403,96 +271,40 @@ public:
   GP<GPixmap>  get_bg_pixmap(const GRect &rect, int subs=1, double gamma=0) const;
   GP<GPixmap>  get_fg_pixmap(const GRect &rect, int subs=1, double gamma=0) const;
 private:
-  // HELPER
-  int stencil(GPixmap *pm, const GRect &rect, int subs, double gcorr) const;
-  // COMPONENTS
-  GP<DjVuInfo>  info;    // INFO component
-  GP<DjVuAnno>  anno;    // ANNOTATION component
-  GP<IWPixmap>  bg44;    // BACKGROUND component
-  GP<JB2Image>  fgjb;    // FOREGROUND MASK component
-  GP<GPixmap>   fgpm;    // FOREGROUND COLOR component
-  // DECODER INFO
-  GString mimetype;
-  GString description;
-  long filesize;
+   GP<DjVuFile>		file;
+   GP<DjVuInfo>		info;
+   GP<DjVuAnno>		anno;
+   GP<IWPixmap>		bg44;
+   GP<JB2Image>		fgjb;
+   GP<GPixmap>		fgpm;
+   GP<DjVuNavDir>	dir;
+   GString		description;
+   
+   // HELPERS
+   int	stencil(GPixmap *pm, const GRect &rect, int subs, double gcorr) const;
+   GP<DjVuInfo>		get_info(const GP<DjVuFile> & file) const;
+   GP<DjVuAnno>		get_anno(const GP<DjVuFile> & file) const;
+   GP<IWPixmap>		get_bg44(const GP<DjVuFile> & file) const;
+   GP<JB2Image>		get_fgjb(const GP<DjVuFile> & file) const;
+   GP<GPixmap>		get_fgpm(const GP<DjVuFile> & file) const;
+   GP<DjVuNavDir>	get_dir(const GP<DjVuFile> & file) const;
+
+
+   // Old decoding way emulation
+   GP<DataPool>		stream_pool;
+   GURL			stream_url;
+   virtual GP<DataRange>request_data(const DjVuPort * src, const GURL & url);
+   virtual bool		notify_error(const DjVuPort * source, const char * msg);
+   virtual bool		notify_status(const DjVuPort * source, const char * msg);
 };
 
+inline GP<DjVuFile>
+DjVuImage::get_djvu_file(void) const
+{
+   return file;
+}
+
 //@}
-
-
-
-
-// INLINE
-
-inline int
-DjVuImage::get_width() const
-{
-  return ( info ? info->width : 0 );
-}
-
-inline int
-DjVuImage::get_height() const
-{
-  return ( info ? info->height : 0 );
-}
-
-inline int
-DjVuImage::get_version() const
-{
-  return ( info ? info->version : DJVUVERSION );
-}
-
-inline int
-DjVuImage::get_dpi() const
-{
-  return ( info ? info->dpi : 300 );
-}
-
-
-inline double
-DjVuImage::get_gamma() const
-{
-  return ( info ? info->gamma : 2.2 );
-}
-
-inline GString
-DjVuImage::get_mimetype() const
-{
-  return mimetype;
-}
-
-
-inline GP<DjVuInfo>   
-DjVuImage::get_info() const
-{
-  return info;
-}
-
-inline GP<DjVuAnno>   
-DjVuImage::get_anno() const
-{
-  return anno;
-}
-
-inline GP<IWPixmap>   
-DjVuImage::get_bg44() const
-{
-  return bg44;
-}
-
-inline GP<JB2Image>   
-DjVuImage::get_fgjb() const
-{
-  return fgjb;
-}
-
-inline GP<GPixmap>    
-DjVuImage::get_fgpm() const
-{
-  return fgpm;
-}
-
-
 
 // ----- THE END
 #endif

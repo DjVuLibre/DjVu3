@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: djvutopnm.cpp,v 1.17 1999-03-17 19:25:00 leonb Exp $
+//C- $Id: djvutopnm.cpp,v 1.17.4.1 1999-04-12 16:45:50 eaf Exp $
 
 
 /** @name djvutopnm
@@ -87,7 +87,7 @@
     Yann Le Cun <yann@research.att.com>\\
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: djvutopnm.cpp,v 1.17 1999-03-17 19:25:00 leonb Exp $# */
+    #$Id: djvutopnm.cpp,v 1.17.4.1 1999-04-12 16:45:50 eaf Exp $# */
 //@{
 //@}
 
@@ -98,6 +98,7 @@
 #include "GPixmap.h"
 #include "GBitmap.h"
 #include "DjVuImage.h"
+#include "DjVuDocument.h"
 #include "GOS.h"
 #include "ATTLicense.h"
 
@@ -113,29 +114,55 @@ GRect fullrect;
 GRect segmentrect;
 
 static void
-convert(const char *from, const char *to)
+convert(const char *from, const char *to, int page_num)
 {
   unsigned long start, stop;
 
-  // Open djvu file
-  StdioByteStream in (from,"rb");
-  // Decode djvu file
-  DjVuImage dimg;
-  start = GOS::ticks();
-  dimg.decode(in);
-  stop = GOS::ticks();
+     // Create DjVuDocument
+  GURL from_url=GOS::filename_to_url(from);
+  GP<DjVuDocument> doc=new DjVuDocument(from_url);
+
+  GP<DjVuFile> f=doc->get_djvu_file(0);
+  TArray<char> data=f->get_djvu_data(0, 0);
+  StdioByteStream ostr("/tmp/file.djvu", "wb");
+  ostr.writall(data, data.size());
+  ostr.flush();
+  data=doc->get_djvm_data();
+  StdioByteStream ostr1("/tmp/doc.djvm", "wb");
+  ostr1.writall(data, data.size());
+  ostr1.flush();
+  doc->save_as_djvu("/tmp/djvu");
+  exit(0);
+  
+  if (page_num>0)
+  {
+	// Unfortunately, before we can access any page from the document,
+	// we have to decode ONE page, which will create navigation directory
+     GP<DjVuImage> dimg=doc->get_page(0);
+     dimg->get_djvu_file()->wait_for_finish();
+  }
+  
+  start=GOS::ticks();
+  GP<DjVuImage> dimg=doc->get_page(page_num);
+  GP<DjVuFile> file=dimg->get_djvu_file();
+  file->wait_for_finish();
+  stop=GOS::ticks();
+
+     // Check for success
+  if (!file->is_decode_ok())
+     THROW("Decoding failed. Nothing can be done.");
+
   // Verbose
   if (flag_verbose)
     {
-      fprintf(stderr,"%s", (const char*)dimg.get_long_description());
+      fprintf(stderr,"%s", (const char*)dimg->get_long_description());
       fprintf(stderr,"Decoding time:    %lu ms\n", stop - start);
-      fprintf(stderr,"DjVuImage memory: %.1f kB\n", dimg.get_memory_usage()/1024.0);
     }
   // Check
-  DjVuInfo *info = dimg.get_info();
-  int colorp = dimg.is_legal_photo();
-  int blackp = dimg.is_legal_bilevel();
-  int compoundp = dimg.is_legal_compound();
+  DjVuInfo *info = dimg->get_info();
+  int colorp = dimg->is_legal_photo();
+  int blackp = dimg->is_legal_bilevel();
+  int compoundp = dimg->is_legal_compound();
   if (flag_verbose)
     {
       if (compoundp)
@@ -158,8 +185,8 @@ convert(const char *from, const char *to)
     flag_scale = (double) info->dpi / flag_subsample;
   if (flag_scale>0)
     {
-      int w = (int)(dimg.get_width() * flag_scale / info->dpi);
-      int h = (int)(dimg.get_height() * flag_scale / info->dpi);
+      int w = (int)(dimg->get_width() * flag_scale / info->dpi);
+      int h = (int)(dimg->get_height() * flag_scale / info->dpi);
       if (w<1) w=1;
       if (h<1) h=1;
       fullrect = GRect(0,0, w, h);
@@ -173,18 +200,18 @@ convert(const char *from, const char *to)
   switch(flag_mode)
     {
     case 's':
-      bm = dimg.get_bitmap(segmentrect, fullrect);
+      bm = dimg->get_bitmap(segmentrect, fullrect);
       break;
     case 'f':
-      pm = dimg.get_fg_pixmap(segmentrect, fullrect);
+      pm = dimg->get_fg_pixmap(segmentrect, fullrect);
       break;
     case 'b':
-      pm = dimg.get_bg_pixmap(segmentrect, fullrect);
+      pm = dimg->get_bg_pixmap(segmentrect, fullrect);
       break;
     default:
-      pm = dimg.get_pixmap(segmentrect, fullrect);
+      pm = dimg->get_pixmap(segmentrect, fullrect);
       if (! pm)
-        bm = dimg.get_bitmap(segmentrect, fullrect);
+        bm = dimg->get_bitmap(segmentrect, fullrect);
       break;
     }
   stop = GOS::ticks();
@@ -229,6 +256,7 @@ usage()
           "  -foreground         Only renders the foreground layer.\n"
           "  -background         Only renders the background layer.\n"
           "  -N                  Subsampling factor from full resolution.\n"
+	  "  -page <page>        Decode page <page> (for multipage documents).\n"
           "\n"
           "The output will be a PBM, PGM or PPM file depending of its content."
           "If <pnmfile> is a single dash or omitted, the decompressed image\n"
@@ -272,6 +300,7 @@ main(int argc, char **argv)
     {
       // Process options
       ATTLicense::process_cmdline(argc,argv);
+      int page_num=-1;
       while (argc>1 && argv[1][0]=='-' && argv[1][1])
         {
           char *s = argv[1];
@@ -332,6 +361,17 @@ main(int argc, char **argv)
                 THROW("Duplicate rendering mode specification");
               flag_mode = 'b';
             }
+	  else if (! strcmp(s,"-page"))
+	    {
+	      if (argc<=2)
+                THROW("No argument for option '-page'");
+              if (page_num>=0)
+                THROW("Duplicate page specification");
+              argc -=1; argv +=1; s = argv[1];
+	      page_num=atoi(s);
+	      if (page_num<=0) THROW("Page number must be positive.");
+	      page_num--;
+	    }
           else if (s[1]>='1' && s[1]<='9')
             {
               int arg = strtol(s+1,&s,10);
@@ -347,13 +387,14 @@ main(int argc, char **argv)
           argc -= 1;
           argv += 1;
         }
+      if (page_num<0) page_num=0;
       // Process remaining arguments
       if (argc == 1) 
-        convert("-","-"); 
+        convert("-","-", page_num); 
       else if (argc == 2) 
-        convert(argv[1],"-");
+        convert(argv[1],"-", page_num);
       else if (argc == 3) 
-        convert(argv[1],argv[2]);
+        convert(argv[1],argv[2], page_num);
       else
         usage();
     }
