@@ -9,9 +9,9 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GOS.cpp,v 1.15 1999-11-22 20:18:51 eaf Exp $
+//C- $Id: GOS.cpp,v 1.16 1999-11-22 22:57:52 eaf Exp $
 
-// "$Id: GOS.cpp,v 1.15 1999-11-22 20:18:51 eaf Exp $"
+// "$Id: GOS.cpp,v 1.16 1999-11-22 22:57:52 eaf Exp $"
 
 #ifdef __GNUC__
 #pragma implementation
@@ -541,7 +541,29 @@ GOS::deletefile(const char * filename)
 }
 
 
+int
+GOS::mkdir(const char * dirname)
+{
+   if (!dirname || !dirname[0]) return -1;
 
+      // See if we need to create the parent directory
+   GString parent=GOS::dirname(dirname);
+   if (!GOS::is_dir(parent))
+   {
+      int rc=mkdir(parent);
+      if (rc<0) return rc;
+   }
+   
+#ifdef WIN32
+      // Please supply the correct arguments for Windows.
+      // I don't have VC nearby. Thanks, eaf.
+   return ::_mkdir(dirname);
+#else
+   return ::mkdir(dirname, 0755);
+#endif
+   
+   return -1;
+}
 
 
 
