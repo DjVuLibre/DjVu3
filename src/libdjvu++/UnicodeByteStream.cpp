@@ -1,7 +1,7 @@
 //C-  Copyright © 2000-2001, LizardTech, Inc. All Rights Reserved.
 //C-              Unauthorized use prohibited.
 //
-// $Id: UnicodeByteStream.cpp,v 1.9 2001-06-05 03:19:58 bcr Exp $
+// $Id: UnicodeByteStream.cpp,v 1.10 2001-06-05 15:22:45 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -157,7 +157,7 @@ UnicodeByteStream::gets(
   }
   if(len)
   {
-    int i=buffer.search(stopat,bufferpos);
+    int i=buffer.search((char)stopat,bufferpos);
     if(i>=0)
     {
       if(inclusive)

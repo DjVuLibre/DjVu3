@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: XMLParser.cpp,v 1.10 2001-06-05 03:19:58 bcr Exp $
+// $Id: XMLParser.cpp,v 1.11 2001-06-05 15:22:45 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -523,7 +523,7 @@ lt_XMLParser::Impl::parse(const lt_XMLTags &tags)
   {
     G_THROW( ERR_MSG("XMLAnno.extra_body") );
   }
-  const GP<lt_XMLTags> & GBody(Body[pos]);
+  const GP<lt_XMLTags> GBody(Body[pos]);
   if(!GBody)
   {
     G_THROW( ERR_MSG("XMLAnno.no_body") );
