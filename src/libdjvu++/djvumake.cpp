@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: djvumake.cpp,v 1.13 1999-09-29 22:43:00 leonb Exp $
+//C- $Id: djvumake.cpp,v 1.14 1999-12-28 15:35:43 bcr Exp $
 
 /** @name djvumake
 
@@ -130,7 +130,7 @@
     @memo
     Assemble DjVu files.
     @version
-    #$Id: djvumake.cpp,v 1.13 1999-09-29 22:43:00 leonb Exp $#
+    #$Id: djvumake.cpp,v 1.14 1999-12-28 15:35:43 bcr Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> */
 //@{
@@ -195,8 +195,8 @@ analyze_mmr_chunk(char *filename)
       mmrstencil = new MemoryByteStream();
       mmrstencil->copy(bs);
       mmrstencil->seek(0);
-      int jw, jh, invert;
-      MMRDecoder::decode_header(*mmrstencil, jw, jh, invert);
+      int jw, jh, invert, strip;
+      MMRDecoder::decode_header(*mmrstencil, jw, jh, invert,strip);
       if (w < 0) w = jw;
       if (h < 0) h = jh;
       if (jw!=w || jh!=h)
