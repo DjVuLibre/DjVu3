@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.h,v 1.64 2001-04-24 16:54:49 bcr Exp $
+// $Id: GString.h,v 1.65 2001-04-24 20:59:14 bcr Exp $
 // $Name:  $
 
 #ifndef _GSTRING_H_
@@ -57,7 +57,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.64 2001-04-24 16:54:49 bcr Exp $# */
+    #$Id: GString.h,v 1.65 2001-04-24 20:59:14 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -581,6 +581,10 @@ public:
       It returns #-1# if the none of the characters and be found, otherwise
       the position of the first match. */
   int contains(const char accept[], const int from=-1) const;
+  /** Searches for any of the specified characters in the accept string.
+      It returns #-1# if the none of the characters and be found, otherwise
+      the position of the last match. */
+  int rcontains(const char accept[], int from=-1) const;
 
   /** Concatenates strings. Returns a string composed by concatenating
       the characters of strings #s1# and #s2#. */

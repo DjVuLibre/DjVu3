@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.79 2001-04-24 18:46:40 bcr Exp $
+// $Id: GString.cpp,v 1.80 2001-04-24 20:59:14 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -800,6 +800,17 @@ GBaseString::contains(const char accept[],const int from) const
     {
       retval=(int)(ptr-src);
     }
+  }
+  return retval;
+}
+
+int
+GBaseString::rcontains(const char accept[],int from) const
+{
+  int retval=(-1);
+  while((from=contains(accept,from)) >= 0)
+  {
+    retval=from;
   }
   return retval;
 }

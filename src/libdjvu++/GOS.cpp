@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GOS.cpp,v 1.56 2001-04-21 00:16:58 bcr Exp $
+// $Id: GOS.cpp,v 1.57 2001-04-24 20:59:13 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -128,11 +128,11 @@ static inline int
 finddirsep(const GUTF8String &fname)
 {
 #if defined(UNIX)
-  return fname.contains("/");
+  return fname.rsearch('/');
 #elif defined(WIN32)
-  return fname.contains("\\/");
+  return fname.rcontains("\\/");
 #elif defined(macintosh)
-  return fname.contains(":/");
+  return fname.rcontains(":/");
 #else
 #error "Define something here for your operating system"
 #endif  
