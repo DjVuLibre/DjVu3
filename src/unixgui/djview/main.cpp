@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: main.cpp,v 1.7 2001-07-26 20:42:08 mchen Exp $
+// $Id: main.cpp,v 1.8 2001-08-02 21:31:37 bcr Exp $
 // $Name:  $
 
 
@@ -45,6 +45,7 @@
 #include <stdio.h>
 #include <locale.h>
 
+#include "DjVu.h"
 #include "ZPCodec.h"		// Wants to be before QT
 
 #include "prefs.h"
@@ -177,9 +178,8 @@ main(int argc, char ** argv)
    DEBUG_MSG("main(): Starting the program\n");
    DEBUG_MAKE_INDENT(3);
 
-   // not sure if we really need this since QT should take care of this
-   // no harm
-   //setlocale(LC_ALL,"");
+  setlocale(LC_ALL,"");
+  djvu_programname(argv[0]);
    
    try
    {
