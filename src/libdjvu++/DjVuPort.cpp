@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuPort.cpp,v 1.8 1999-08-26 19:25:11 eaf Exp $
+//C- $Id: DjVuPort.cpp,v 1.9 1999-08-27 22:28:29 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -239,7 +239,7 @@ DjVuPortcaster::get_cached_file(const DjVuPort * source, const GURL & url)
    sort_closure(set, list);
 
    GPBase file;
-   for(GPosition pos=list.lastpos();pos;--pos)
+   for(GPosition pos=list;pos;++pos)
    {
       DjVuPort * port=(DjVuPort *) list[pos];
       if (is_port_alive(port))
@@ -247,6 +247,20 @@ DjVuPortcaster::get_cached_file(const DjVuPort * source, const GURL & url)
 	    break;
    }
    return file;
+}
+
+void
+DjVuPortcaster::cache_djvu_file(const DjVuPort * source, class DjVuFile * file)
+{
+   GMap<const void *, void *> set;
+   compute_closure(set, source);
+
+   for(GPosition pos=set;pos;++pos)
+   {
+      DjVuPort * port=(DjVuPort *) set.key(pos);
+      if (is_port_alive(port))
+	 port->cache_djvu_file(source, file);
+   }
 }
 
 GP<DataRange>
@@ -439,6 +453,9 @@ DjVuPort::id_to_url(const DjVuPort *, const char *) { return GURL(); }
 
 GPBase
 DjVuPort::get_cached_file(const DjVuPort *, const GURL &) { return 0; }
+
+void
+DjVuPort::cache_djvu_file(const DjVuPort *, class DjVuFile *) {}
 
 GP<DataRange>
 DjVuPort::request_data(const DjVuPort *, const GURL &) { return 0; }
