@@ -1,19 +1,36 @@
 // -*- C++ -*-
 /** @name DjVu Reference Library
 
-    Copyright (c) AT&T 1999.  All Rights Reserved.  
+    DjVu® Reference Library (v. 3.0)
 
-    This software may only be used by you under license from AT&T
-    Corp. ("AT&T"). A copy of the \Ref{AT&T Source Code Agreement} is available at
-    AT&T's Internet website having the URL \URL{http://www.djvu.att.com/open}.
-    If you received this software without first entering into a license with
-    AT&T, you have an infringing copy of this software and cannot use it
-    without violating AT&T's intellectual property rights.
+    Copyright © 19xx-2000 LizardTech, Inc. All Rights Reserved.
+     
+    This software (the "Original Code") is subject to, and may be
+    distributed under, the GNU General Public License, Version 2.
+    The license should have accompanied the Original Code or you
+    may obtain a copy of the license from the Free Software
+    Foundation at http://www.fsf.org .
+     
+    With respect to the Original Code, and subject to any third
+    party intellectual property claims, LizardTech grants recipient
+    a worldwide, royalty-free, non-exclusive license under patent
+    claims infringed by making, using, or selling Original Code
+    which are now or hereafter owned or controlled by LizardTech,
+    but solely to the extent that any such patent is reasonably
+    necessary to enable you to make, have made, practice, sell, or 
+    otherwise dispose of Original Code (or portions thereof) and
+    not to any greater extent that may be necessary to utilize
+    further modifications or combinations.
+     
+    The Original Code is provided "AS IS" WITHOUT WARRANTY OF ANY
+    KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO
+    ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
+    MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 
     {\bf Acknowledgements} --- The ideas discussed in this library are the
     result of endless discussions with Yoshua Bengio, Patrick Haffner, Paul
     Howard, and Yann Le Cun.  Many improvements have suggested by Andrei
-    Erofeev, Praveen Guduru, and Bill Riemers.  Credits are given whenever
+    Erofeev, Praveen Guduru, and Bill C Riemers.  Credits are given whenever
     possible.  Finally, this document would be much worse without Joe Orost's
     and Paul Howard's careful proofreading.
 
@@ -22,6 +39,10 @@
     @author
     L\'eon Bottou, 02/1999 */
 //@{
+
+// $Id: libdjvu++.dxx,v 1.34 2000-11-02 01:08:35 bcr Exp $
+// $Name:  $
+
 
 
 

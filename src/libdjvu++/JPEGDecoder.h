@@ -1,14 +1,33 @@
-//C-  -*- C++ -*- //C-
-//C- Copyright (c) 1999 AT&T Corp.  All rights reserved.
-//C-
-//C- This software may only be used by you under license from AT&T
-//C- Corp. ("AT&T"). A copy of AT&T's Source Code Agreement is available at
-//C- AT&T's Internet website having the URL <http://www.djvu.att.com/open>.
-//C- If you received this software without first entering into a license with
-//C- AT&T, you have an infringing copy of this software and cannot use it
-//C- without violating AT&T's intellectual property rights.
-//C-
-//C- $Id: JPEGDecoder.h,v 1.7 2000-09-29 20:10:59 bcr Exp $
+//C-  -*- C++ -*-
+//C- DjVu® Reference Library (v. 3.0)
+//C- 
+//C- Copyright © 1999-2000 LizardTech, Inc. All Rights Reserved.
+//C- 
+//C- This software (the "Original Code") is subject to, and may be
+//C- distributed under, the GNU General Public License, Version 2.
+//C- The license should have accompanied the Original Code or you
+//C- may obtain a copy of the license from the Free Software
+//C- Foundation at http://www.fsf.org .
+//C- 
+//C- With respect to the Original Code, and subject to any third
+//C- party intellectual property claims, LizardTech grants recipient
+//C- a worldwide, royalty-free, non-exclusive license under patent
+//C- claims infringed by making, using, or selling Original Code
+//C- which are now or hereafter owned or controlled by LizardTech,
+//C- but solely to the extent that any such patent is reasonably
+//C- necessary to enable you to make, have made, practice, sell, or 
+//C- otherwise dispose of Original Code (or portions thereof) and
+//C- not to any greater extent that may be necessary to utilize
+//C- further modifications or combinations.
+//C- 
+//C- The Original Code is provided "AS IS" WITHOUT WARRANTY OF ANY
+//C- KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO
+//C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
+//C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
+// 
+// $Id: JPEGDecoder.h,v 1.8 2000-11-02 01:08:35 bcr Exp $
+// $Name:  $
+
 
 #ifndef _JPEGDECODER_H_
 #define _JPEGDECODER_H_
@@ -42,7 +61,7 @@ extern "C" {
     @memo
     Decoding interface to the IJG JPEG library.
     @version
-    #$Id: JPEGDecoder.h,v 1.7 2000-09-29 20:10:59 bcr Exp $#
+    #$Id: JPEGDecoder.h,v 1.8 2000-11-02 01:08:35 bcr Exp $#
     @author
     Parag Deshmukh <parag@sanskrit.lz.att.com> 
 */
