@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: GOS.cpp,v 1.31 2000-10-21 23:02:22 bcr Exp $
+//C- $Id: GOS.cpp,v 1.32 2000-10-23 19:31:39 mrosen Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -241,7 +241,7 @@ GOS::dirname(const char *fname)
   {
     q[0]=backslash;
     q[1]=0;
-    return temp;
+    return retval;
   }
   // Backtrack all slashes
   while (p>fname && (p[-1]== slash || p[-1]== backslash))
@@ -318,7 +318,7 @@ GOS::basename(const char *fname, const char *suffix)
 
 #ifdef WIN32
   // Special cases
-  if (fname[1] == colon))
+  if (fname[1] == colon)
   {
     if(!fname[2])
     {
