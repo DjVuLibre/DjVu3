@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: JB2Image.cpp,v 1.42 2000-12-19 19:48:18 bcr Exp $
+// $Id: JB2Image.cpp,v 1.43 2000-12-19 23:38:56 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -160,7 +160,7 @@ protected:
   // Helpers
   void encode_libonly_shape(JB2Image *jim, int shapeno);
   void compute_bounding_box(GBitmap *cbm, LibRect *lrect);
-  virtual int get_diff(int x_diff,NumContext &rel_loc_last_x) = 0;
+  virtual int get_diff(int x_diff,NumContext &rel_loc) = 0;
 };
 
 class _JB2DecodeCodec : public _JB2Codec
@@ -184,7 +184,7 @@ protected:
   virtual void code_relative_mark_size(GBitmap *bm, int cw, int ch, int border=0);
   virtual void code_bitmap_directly(GBitmap &bm,const int dw, int dy,
     unsigned char *up2, unsigned char *up1, unsigned char *up0 );
-  virtual int get_diff(int x_diff,NumContext &rel_loc_last_x);
+  virtual int get_diff(int x_diff,NumContext &rel_loc);
 };
 
 #ifndef NEED_DECODER_ONLY
@@ -209,7 +209,7 @@ protected:
   virtual void code_relative_mark_size(GBitmap *bm, int cw, int ch, int border=0);
   virtual void code_bitmap_directly(GBitmap &bm,const int dw, int dy,
     unsigned char *up2, unsigned char *up1, unsigned char *up0 );
-  virtual int get_diff(int x_diff,NumContext &rel_loc_last_x);
+  virtual int get_diff(int x_diff,NumContext &rel_loc);
 };
 #endif
 
@@ -921,17 +921,17 @@ _JB2Codec::code_image_size(JB2Image *jim)
 
 #ifndef NEED_DECODER_ONLY
 int
-_JB2EncodeCodec::get_diff(int x_diff,NumContext &rel_loc_last_x)
+_JB2EncodeCodec::get_diff(int x_diff,NumContext &rel_loc)
 {
-   CodeNum(x_diff, BIGNEGATIVE, BIGPOSITIVE, rel_loc_x_last);
+   CodeNum(x_diff, BIGNEGATIVE, BIGPOSITIVE, rel_loc);
    return x_diff;
 }
 #endif
 
 int
-_JB2DecodeCodec::get_diff(int,NumContext &rel_loc_last_x)
+_JB2DecodeCodec::get_diff(int,NumContext &rel_loc)
 {
-   return CodeNum(BIGNEGATIVE, BIGPOSITIVE, rel_loc_y_last);
+   return CodeNum(BIGNEGATIVE, BIGPOSITIVE, rel_loc);
 }
 
 void 
