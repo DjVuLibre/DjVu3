@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.104 2000-01-20 21:40:47 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.105 2000-01-21 20:27:20 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -43,6 +43,8 @@ void
 DjVuDocument::start_init(const GURL & url, GP<DjVuPort> xport,
 			 DjVuFileCache * xcache)
 {
+   if (url.is_empty()) THROW("Empty URL passed to DjVuDocument");
+   
    if (init_started)
       THROW("DjVuDocument cannot be initialized twice.");
    if (!get_count())
