@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.h,v 1.17 1999-08-31 18:31:21 eaf Exp $
+//C- $Id: DjVuFile.h,v 1.18 1999-08-31 18:56:36 eaf Exp $
  
 #ifndef _DJVUFILE_H
 #define _DJVUFILE_H
@@ -45,7 +45,7 @@
 
     @memo Classes representing DjVu files.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuFile.h,v 1.17 1999-08-31 18:31:21 eaf Exp $#
+    @version #$Id: DjVuFile.h,v 1.18 1999-08-31 18:56:36 eaf Exp $#
 */
 
 //@{
@@ -221,7 +221,7 @@ public:
 
       /** Specifies what function should be called when this instance
 	  of #DjVuFile# is about to be destroyed. */
-   void		set_destroy_cb(void (* destroy_cb)(const DjVuFile *, void *), void * cl_data);
+   void		add_destroy_cb(void (* destroy_cb)(const DjVuFile *, void *), void * cl_data);
 
       /** Disables the built-in port for accessing local files, which may
 	  have been created in the case when the #port# argument to
@@ -377,6 +377,14 @@ protected:
 
    virtual void		destroy();
 private:
+   class DestroyCB : public GPEnabled
+   {
+   public:
+      void	(* cb)(const DjVuFile *, void *);
+      void	* cl_data;
+      DestroyCB(void (* cb)(const DjVuFile *, void *), void * cl_data) :
+	    cb(cb), cl_data(cl_data) {};
+   };
    GMonitor		status_mon;
    int			status;
 
@@ -391,9 +399,9 @@ private:
 
    GMonitor		chunk_mon, finish_mon;
 
-   void			(* destroy_cb)(const DjVuFile *, void *);
-   void			* destroy_cl_data;
-   
+   GCriticalSection	destroy_lock;
+   GPList<DestroyCB>	destroy_list;
+
       // Functions called when the decoding thread starts
    static void	static_decode_func(void *);
    void		decode_func(void);
@@ -454,13 +462,6 @@ DjVuFile::reset(void)
 {
    info=0; anno=0; bg44=0; fgjb=0; fgpm=0;
    dir=0; description=""; mimetype="";
-}
-
-inline void
-DjVuFile::set_destroy_cb(void (* cb)(const DjVuFile *, void *), void * cl_data)
-{
-   destroy_cb=cb;
-   destroy_cl_data=cl_data;
 }
 
 //@}
