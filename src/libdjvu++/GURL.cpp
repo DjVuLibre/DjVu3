@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GURL.cpp,v 1.20 2000-01-19 22:39:14 eaf Exp $
+//C- $Id: GURL.cpp,v 1.21 2000-01-19 22:45:17 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -350,16 +350,15 @@ GURL::name(void) const
 GString
 GURL::extension(void) const
 {
-   GString filename = (const char *)name();
-   GString retval="";
+   GString filename=name();
+   GString retval;
 
-   GCriticalSectionLock lock((GCriticalSection *) &url_lock);
-     for(int i=filename.length()-1; i>=0; i--)
-         if( filename[i] == '.' )
-				 {
-             retval=GString((const char*)filename+i+1);
-						 break;
-				 }
+   for(int i=filename.length()-1;i>=0;i--)
+      if (filename[i]=='.')
+      {
+	 retval=GString((const char*) filename+i+1);
+	 break;
+      }
    
    return retval;
 }
