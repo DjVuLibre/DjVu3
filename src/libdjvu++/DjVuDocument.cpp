@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.48 1999-09-22 19:36:15 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.49 1999-09-27 20:06:57 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -966,17 +966,13 @@ DjVuDocument::get_djvm_doc(void)
    DEBUG_MSG("DjVuDocument::get_djvm_doc(): creating the DjVmDoc\n");
    DEBUG_MAKE_INDENT(3);
 
-   if (!is_init_complete()) THROW("Document has not been initialized complete yet.");
+   if (!is_init_complete()) THROW("Document has not been completely initialized yet.");
 
    GP<DjVmDoc> doc=new DjVmDoc();
-   if (doc_type==BUNDLED)
+   if (doc_type==BUNDLED || doc_type==INDIRECT)
    {
-      DEBUG_MSG("Trivial: the document is BUNDLED: just pass the pool.\n");
-      doc->read(init_data_pool);
-   } else if (doc_type==INDIRECT)
-   {
-      DEBUG_MSG("Not difficult: the document is INDIRECT => follow DjVmDir.\n");
-      
+      DEBUG_MSG("Trivial: the document is either INDIRECT or BUNDLED: follow DjVmDir.\n");
+
       GPList<DjVmDir::File> files_list=djvm_dir->get_files_list();
       for(GPosition pos=files_list;pos;++pos)
       {
