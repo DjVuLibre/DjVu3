@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GURL.cpp,v 1.66 2001-05-16 22:57:50 bcr Exp $
+// $Id: GURL.cpp,v 1.67 2001-05-24 16:00:37 mchen Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -895,7 +895,7 @@ GURL::encode_reserved(const GUTF8String &gs)
   static const char hex[] = "0123456789ABCDEF";
   
   unsigned char *retval;
-  GPBuffer<unsigned char> gd(retval,strlen(s)*3);
+  GPBuffer<unsigned char> gd(retval,strlen(s)*3+1);
   unsigned char *d=retval;
   for (; *s; s++,d++)
   {
