@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocument.cpp,v 1.144 2001-02-15 01:12:22 bcr Exp $
+// $Id: DjVuDocument.cpp,v 1.145 2001-02-17 00:07:35 bcr Exp $
 // $Name:  $
 
 
@@ -290,7 +290,7 @@ DjVuDocument::init_thread(void)
       if (chkid=="DIRM")
       {
 	 djvm_dir=new DjVmDir();
-	 djvm_dir->decode(stream);
+	 djvm_dir->decode(iff.get_bytestream());
 	 iff.close_chunk();
 	 if (djvm_dir->is_bundled())
 	 {

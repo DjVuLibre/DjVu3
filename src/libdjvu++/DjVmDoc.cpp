@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVmDoc.cpp,v 1.38 2001-02-15 19:06:56 bcr Exp $
+// $Id: DjVmDoc.cpp,v 1.39 2001-02-17 00:07:35 bcr Exp $
 // $Name:  $
 
 
@@ -146,7 +146,7 @@ DjVmDoc::write(GP<ByteStream> gstr)
    IFFByteStream &tmp_iff=*gtmp_iff;
    tmp_iff.put_chunk("FORM:DJVM", 1);
    tmp_iff.put_chunk("DIRM");
-   dir->encode(tmp_str);
+   dir->encode(tmp_iff.get_bytestream());
    tmp_iff.close_chunk();
    tmp_iff.close_chunk();
    int offset=tmp_iff.tell();
@@ -166,7 +166,7 @@ DjVmDoc::write(GP<ByteStream> gstr)
    IFFByteStream &iff=*giff;
    iff.put_chunk("FORM:DJVM", 1);
    iff.put_chunk("DIRM");
-   dir->encode(gstr);
+   dir->encode(iff.get_bytestream());
    iff.close_chunk();
 
    for(pos=files_list;pos;++pos)
@@ -317,7 +317,7 @@ DjVmDoc::write_index(GP<ByteStream> str)
    IFFByteStream &iff=*giff;
    iff.put_chunk("FORM:DJVM", 1);
    iff.put_chunk("DIRM");
-   dir->encode(str);
+   dir->encode(iff.get_bytestream());
    iff.close_chunk();
    iff.close_chunk();
    iff.flush();
