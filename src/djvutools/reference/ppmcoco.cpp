@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ppmcoco.cpp,v 1.18 2001-06-13 18:26:19 bcr Exp $
+// $Id: ppmcoco.cpp,v 1.19 2001-06-26 22:58:43 bcr Exp $
 // $Name:  $
 
 /** @name ppmcoco
@@ -104,7 +104,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: ppmcoco.cpp,v 1.18 2001-06-13 18:26:19 bcr Exp $# */
+    #$Id: ppmcoco.cpp,v 1.19 2001-06-26 22:58:43 bcr Exp $# */
 //@{
 //@}
 
@@ -169,23 +169,23 @@ main(int argc, char **argv)
       for (int i=1; i<argc; i++)
         {
           if (dargv[i] == "-from" && i+1<argc)
-            {
-          fromGamma = str_to_gamma(dargv[++i]);
-            }
-          else if ((argv[i] == "-to") && i+1<argc)
-            {
-              toGamma = str_to_gamma(dargv[++i]);
-            }
+          {
+            fromGamma = str_to_gamma(dargv[++i]);
+          }
+          else if ((dargv[i] == "-to") && i+1<argc)
+          {
+            toGamma = str_to_gamma(dargv[++i]);
+          }
           else if (flag==0)
-            {
-              flag = 1;
-              inurl = GURL::Filename::UTF8(dargv[i]);
-            }
+          {
+            flag = 1;
+            inurl = GURL::Filename::UTF8(dargv[i]);
+          }
           else if (flag == 1)
-            {
-              flag = 2;
-              outurl = GURL::Filename::UTF8(argv[i]);
-            }
+          {
+            flag = 2;
+            outurl = GURL::Filename::UTF8(argv[i]);
+          }
           else
             usage();
         }
