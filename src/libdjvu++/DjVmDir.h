@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVmDir.h,v 1.15 2000-01-24 22:51:08 leonb Exp $
+//C- $Id: DjVmDir.h,v 1.16 2000-01-25 00:46:31 leonb Exp $
 
 #ifndef _DJVMDIR_H
 #define _DJVMDIR_H
@@ -22,7 +22,7 @@
     @memo Implements DjVu multipage document directory
     @author Andrei Erofeev <eaf@research.att.com>
     @version
-    #$Id: DjVmDir.h,v 1.15 2000-01-24 22:51:08 leonb Exp $# */
+    #$Id: DjVmDir.h,v 1.16 2000-01-25 00:46:31 leonb Exp $# */
 //@{
 
 
@@ -64,6 +64,11 @@
     be useful though to be able to access records in the directory
     because some classes (like \Ref{DjVuDocument} and \Ref{DjVmDoc})
     return a pointer to #DjVmDir# in some cases. 
+
+    {\bf Implementation notes} ---
+    It is strongly suggested with the current implementation to always
+    make the file ID, the file NAME and the file TITLE identical.
+    This limitation will be lifted in a subsequent version of DjVu.
 */
 
 class DjVmDir : public GPEnabled

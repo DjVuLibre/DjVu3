@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVmDir.cpp,v 1.14 2000-01-24 22:51:08 leonb Exp $
+//C- $Id: DjVmDir.cpp,v 1.15 2000-01-25 00:46:31 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -28,17 +28,9 @@
 bool
 DjVmDir::File::is_legal_id(const char *id)
 {
-  if (id==0 || id[0]==0 || id[0]=='.')
+  // This is a minimal check.
+  if (id==0 || id[0]==0 || id[0]=='#')
     return false;
-  for(; *id; id++)
-    if (! ( (id[0]>='A' && id[0]<='Z')   ||
-            (id[0]>='a' && id[0]<='z')   ||
-            (id[0]>='0' && id[0]<='9')   ||
-            (id[0]=='_') || (id[0]=='-') ||
-            (id[0]=='~') || (id[0]=='@') ||
-            (id[0]=='.') ) )
-      return false;
-  // Should be ok.
   return true;
 }
 
