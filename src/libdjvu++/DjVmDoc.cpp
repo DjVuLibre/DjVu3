@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVmDoc.cpp,v 1.10 1999-09-28 17:23:12 eaf Exp $
+//C- $Id: DjVmDoc.cpp,v 1.11 1999-09-28 17:28:46 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -140,8 +140,9 @@ DjVmDoc::write(ByteStream & str)
    for(pos=files_list;pos;++pos)
    {
       GP<DjVmDir::File> & file=files_list[pos];
-      
-      GP<ByteStream> str_in=data[file->id]->get_stream();
+
+      GP<DataPool> pool=data[file->id];
+      GP<ByteStream> str_in=pool->get_stream();
 
 	 // First check that the file is in IFF format
       TRY {
@@ -156,7 +157,7 @@ DjVmDoc::write(ByteStream & str)
       } ENDCATCH;
 
 	 // Now copy the file contents
-      str_in->seek(0, SEEK_SET);
+      str_in=pool->get_stream();	// Rewind doesn't work
       if ((iff.tell() & 1)!=0) { char ch=0; iff.write(&ch, 1); }
       iff.copy(*str_in);
    }
