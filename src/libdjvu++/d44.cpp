@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: d44.cpp,v 1.8 1999-03-02 16:17:13 leonb Exp $
+//C-  $Id: d44.cpp,v 1.9 1999-03-02 21:49:08 leonb Exp $
 
 
 
@@ -62,9 +62,10 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: d44.cpp,v 1.8 1999-03-02 16:17:13 leonb Exp $# */
-//#{
-//#}
+    #$Id: d44.cpp,v 1.9 1999-03-02 21:49:08 leonb Exp $# 
+*/
+//@{
+//@}
 
 #include <stdio.h>
 #include "GString.h"
