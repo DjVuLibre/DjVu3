@@ -439,7 +439,7 @@ EOF
 
 
 # Usage: check_make_stlib
-# Side effect:  MAKE_STLIB <-- how to make a static library
+# Side effect:  make_stlib <-- how to make a static library
 #               RANLIB     <-- how to prepare a static library
 
 check_make_stlib()
@@ -451,15 +451,15 @@ EOF
     run $CC $CCFLAGS $OPT $DEFS $WARN -c $temp.c
     if [ -z "$MAKE_STDLIB" ]
     then
-      MAKE_STLIB="${ar} cq"
+      make_stlib="${ar} cq"
     fi
-    if ( run "${MAKE_STLIB}" $temp.a $temp.o ) 
+    if ( run "${make_stlib}" $temp.a $temp.o ) 
     then
-        echo "${MAKE_STLIB}"
+        echo "${make_stlib}"
     else
         echo unknown.
         echo 1>&2 "${PROGRAM_NAME}: Cannot find how to make a static library."
-        echo 1>&2 "-- Please set environment variable MAKE_STLIB or AR."
+        echo 1>&2 "-- Please set environment variable make_stlib or AR."
         exit 1
     fi
 }
@@ -597,7 +597,7 @@ fi
 if [ -z "$whence" ] ; then
   . "${CONFIG_DIR}/commands.sh"
 fi
-CONFIG_VARS=`(for i in DEFS OPT WARN LIBS RPO MAKE_STLIB MAKE_SHLIB $CONFIG_VARS; do echo $i; done)|${sort} -u`
+CONFIG_VARS=`(for i in DEFS OPT WARN LIBS RPO make_stlib make_shlib $CONFIG_VARS; do echo $i; done)|${sort} -u`
 
 ### ------------------------------------------------------------------------
 ### General stuff
