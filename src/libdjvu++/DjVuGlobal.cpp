@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuGlobal.cpp,v 1.19 2000-01-05 17:13:07 haffner Exp $
+//C- $Id: DjVuGlobal.cpp,v 1.20 2000-01-13 16:04:01 bcr Exp $
 
 /** This file impliments the DjVuProgressTask elements.  The memory
     functions are implimented in a separate file, because only the memory
@@ -116,13 +116,23 @@ djvu_set_progress_callback( djvu_progress_callback *callback )
    _djvu_progress_ptr=callback;
    return ncallback; 
 }
+
+int djvu_supports_progress_callback(void) {return 1;}
+
 #else
 
-djvu_progress_callback *
-djvu_set_progress_callback( djvu_progress_callback *)
+#ifndef HAS_DJVU_PROGRESS_TYPEDEF
+extern "C"
 {
-   return 0;
+  void *djvu_set_progress_callback(void *);
+  int djvu_supports_progress_callback(void) {return 0;}
 }
+void *djvu_set_progress_callback(void *) { return 0; }
+#else
+int djvu_supports_progress_callback(void) {return 0;}
+djvu_progress_callback *
+djvu_set_progress_callback( djvu_progress_callback *) { return 0; }
+#endif
 
 #endif
 

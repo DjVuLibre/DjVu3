@@ -10,7 +10,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDecodeAPI.h,v 1.6 2000-01-12 16:15:21 bcr Exp $
+//C- $Id: DjVuDecodeAPI.h,v 1.7 2000-01-13 16:04:01 bcr Exp $
 #endif
 
 #ifndef _DJVU_DECODE_API_H
@@ -18,7 +18,10 @@
 
 /* 
  * $Log: DjVuDecodeAPI.h,v $
- * Revision 1.6  2000-01-12 16:15:21  bcr
+ * Revision 1.7  2000-01-13 16:04:01  bcr
+ * Changed the djvu_image flags field to type and orientation.
+ *
+ * Revision 1.6  2000/01/12 16:15:21  bcr
  * Unified the C interface names without _pixel, and updated libddjvu
  *
  * Revision 1.5  2000/01/12 14:29:31  bcr
@@ -57,7 +60,8 @@ extern "C" {
 #endif
 
 
-typedef enum {
+typedef enum
+{
   asciiBW='1',
   asciiGRAY,
   asciiCOLOR,
@@ -68,91 +72,43 @@ typedef enum {
 
 
 /* These are the various color formats that may be specified in the flag
- * portion of the image flags.
+ * portion of the image types
  */
-enum djvu_colorflags
+typedef enum djvu_image_types_enum
 {
   DJVU_RLE=0,    /* black and white  (only valid for rle images) */
   DJVU_GRAY=0x1, /* gray (only valid for color images) */
   DJVU_RGB=0x2,  /* rgb (only valid for color images) */
   DJVU_BGR=0x3   /* bgr color (only valid for color images) */
-};
+} djvu_image_types;
 
  /* There are 8 possible image orientations.
   */
-enum djvu_bit_oflags
+enum djvu_image_orientations_bits
 {
-  DJVU_BOTTOM_UP=0x4,
-  DJVU_MIRROR=0x8,
-  DJVU_ROTATE90_CW=0x10
+  DJVU_BOTTOM_UP=0x1,
+  DJVU_MIRROR=0x2,
+  DJVU_ROTATE90_CW=0x4
 };
 
  /* This is a listing of all eight combinations, usefull for switch()
   * statements. 
   */
-enum djvu_oflags
+enum djvu_image_orientations
 {
-  DJVU_TDLRNR=0,
-  DJVU_BULRNR=DJVU_BOTTOM_UP,
-  DJVU_TDRLNR=DJVU_MIRROR,
-  DJVU_BURLNR=DJVU_MIRROR|DJVU_BOTTOM_UP,
-  DJVU_TDLRCW=DJVU_ROTATE90_CW,
-  DJVU_BULRCW=DJVU_ROTATE90_CW|DJVU_BOTTOM_UP,
-  DJVU_TDRLCW=DJVU_ROTATE90_CW|DJVU_MIRROR,
-  DJVU_BURLCW=DJVU_ROTATE90_CW|DJVU_MIRROR|DJVU_BOTTOM_UP
-};
-
- /* These masks are helpfull for extracting just the part of the flags
-  * you need.
-  */
-enum djvu_bit_masks
-{
-  DJVU_ORIENTATION=DJVU_BOTTOM_UP|DJVU_MIRROR|DJVU_ROTATE90_CW,
-  DJVU_COLOR=DJVU_RLE|DJVU_GRAY|DJVU_RGB|DJVU_BGR
-};
-
- /* And this is all the flags for code that needs switch statements to
-  * handle everything!
-  */
-enum djvu_flags
-{
-  DJVU_TDLRNR_RLE=DJVU_TDLRNR|DJVU_RLE,
-  DJVU_BULRNR_RLE=DJVU_BULRNR|DJVU_RLE,
-  DJVU_TDRLNR_RLE=DJVU_TDRLNR|DJVU_RLE,
-  DJVU_BURLNR_RLE=DJVU_BURLNR|DJVU_RLE,
-  DJVU_TDLRCW_RLE=DJVU_TDLRCW|DJVU_RLE,
-  DJVU_BULRCW_RLE=DJVU_BULRCW|DJVU_RLE,
-  DJVU_TDRLCW_RLE=DJVU_TDLRCW|DJVU_RLE,
-  DJVU_BURLCW_RLE=DJVU_BURLCW|DJVU_RLE,
-  DJVU_TDLRNR_GRAY=DJVU_TDLRNR|DJVU_GRAY,
-  DJVU_BULRNR_GRAY=DJVU_BULRNR|DJVU_GRAY,
-  DJVU_TDRLNR_GRAY=DJVU_TDRLNR|DJVU_GRAY,
-  DJVU_BURLNR_GRAY=DJVU_BURLNR|DJVU_GRAY,
-  DJVU_TDLRCW_GRAY=DJVU_TDLRCW|DJVU_GRAY,
-  DJVU_BULRCW_GRAY=DJVU_BULRCW|DJVU_GRAY,
-  DJVU_TDRLCW_GRAY=DJVU_TDLRCW|DJVU_GRAY,
-  DJVU_BURLCW_GRAY=DJVU_BURLCW|DJVU_GRAY,
-  DJVU_TDLRNR_RGB=DJVU_TDLRNR|DJVU_RGB,
-  DJVU_BULRNR_RGB=DJVU_BULRNR|DJVU_RGB,
-  DJVU_TDRLNR_RGB=DJVU_TDRLNR|DJVU_RGB,
-  DJVU_BURLNR_RGB=DJVU_BURLNR|DJVU_RGB,
-  DJVU_TDLRCW_RGB=DJVU_TDLRCW|DJVU_RGB,
-  DJVU_BULRCW_RGB=DJVU_BULRCW|DJVU_RGB,
-  DJVU_TDRLCW_RGB=DJVU_TDLRCW|DJVU_RGB,
-  DJVU_BURLCW_RGB=DJVU_BURLCW|DJVU_RGB,
-  DJVU_TDLRNR_BGR=DJVU_TDLRNR|DJVU_BGR,
-  DJVU_BULRNR_BGR=DJVU_BULRNR|DJVU_BGR,
-  DJVU_TDRLNR_BGR=DJVU_TDRLNR|DJVU_BGR,
-  DJVU_BURLNR_BGR=DJVU_BURLNR|DJVU_BGR,
-  DJVU_TDLRCW_BGR=DJVU_TDLRCW|DJVU_BGR,
-  DJVU_BULRCW_BGR=DJVU_BULRCW|DJVU_BGR,
-  DJVU_TDRLCW_BGR=DJVU_TDLRCW|DJVU_BGR,
-  DJVU_BURLCW_BGR=DJVU_BURLCW|DJVU_BGR
+  DJVU_TDLRNR=0,                                          /* 0 */
+  DJVU_BULRNR=DJVU_BOTTOM_UP,                             /* 1 */
+  DJVU_TDRLNR=DJVU_MIRROR,                                /* 2 */
+  DJVU_BURLNR=DJVU_MIRROR|DJVU_BOTTOM_UP,                 /* 3 */
+  DJVU_TDLRCW=DJVU_ROTATE90_CW,                           /* 4 */
+  DJVU_BULRCW=DJVU_ROTATE90_CW|DJVU_BOTTOM_UP,            /* 5 */
+  DJVU_TDRLCW=DJVU_ROTATE90_CW|DJVU_MIRROR,               /* 6 */
+  DJVU_BURLCW=DJVU_ROTATE90_CW|DJVU_MIRROR|DJVU_BOTTOM_UP /* 7 */
 };
 
 /* This structure is for internal use...
  */
-struct _djvu_image_privt;
+struct _djvu_image_priv;
 typedef struct _djvu_image_priv * djvu_image_priv;
 
 /*
@@ -164,7 +120,9 @@ typedef struct _djvu_image_priv * djvu_image_priv;
  */
              typedef struct djvu_image_struct
              {
-               int flags;	    /* normally enum djvu_flags ... */
+               djvu_image_types type; /* RLE,GRAY,RGB, or BGR */
+               int orientation;     /* We don't use the enum defined above */
+				    /* since |, &, and ^ require int types. */
                int w;               /* Width in Pixels (current orientation)*/
                int h;               /* Height in Pixels (current orientation)*/
                size_t pixsize;      /* Bytes per pixel (includes padding) */
@@ -178,20 +136,20 @@ typedef struct _djvu_image_priv * djvu_image_priv;
 #ifdef __cplusplus
                djvu_image_struct();
                inline int get_width(void) const
-               {return(flags&DJVU_ROTATE90_CW)?h:w;}
+               {return(orientation&DJVU_ROTATE90_CW)?h:w;}
                inline int get_height(void) const
-               {return(flags&DJVU_ROTATE90_CW)?w:h;}
+               {return(orientation&DJVU_ROTATE90_CW)?w:h;}
                inline unsigned int get_xdpi(void) const
-               {return(flags&DJVU_ROTATE90_CW)?ydpi:xdpi;}
+               {return(orientation&DJVU_ROTATE90_CW)?ydpi:xdpi;}
                inline unsigned int get_ydpi(void) const
-               {return(flags&DJVU_ROTATE90_CW)?xdpi:ydpi;}
+               {return(orientation&DJVU_ROTATE90_CW)?xdpi:ydpi;}
 #endif
              }
              djvu_image;
 #ifdef __cplusplus
              inline
              djvu_image_struct::djvu_image_struct()
-             : flags(0),w(0),h(0),pixsize(0),datasize(0),xdpi(0),ydpi(0),
+             : type(DJVU_RLE),orientation(0),w(0),h(0),pixsize(0),datasize(0),xdpi(0),ydpi(0),
                data(0),start_alloc(0),priv(0) {}
 #endif
 /* 

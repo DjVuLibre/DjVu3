@@ -2,44 +2,60 @@
 #include "DjVuAPI.h"
 #include <stdlib.h> 
 
+static inline void _djvu_image_free(djvu_image &img);
+
 /* This is an strictly inline version of a priv struct for djvu_image's,
  * so we don't have library dependancies...
  */
 struct _djvu_image_priv 
 {
-  djvu_image &img;
+  djvu_image *img;
   bool isMalloc;
 
   _djvu_image_priv(djvu_image &ximg,bool xisMalloc=true)
-  : img(ximg),isMalloc(xisMalloc)
+  : img(&ximg),isMalloc(xisMalloc)
   {
-    img.priv=this;
-    img.data=img.start_alloc=(unsigned char *)
-      (img.start_alloc?img.start_alloc:(isMalloc?
-        _djvu_malloc(img.datasize):new unsigned char [img.datasize]));
+    ximg.priv=this;
+    ximg.data=ximg.start_alloc=(unsigned char *)
+      (ximg.start_alloc?ximg.start_alloc:(isMalloc?
+        _djvu_malloc(ximg.datasize):new unsigned char [ximg.datasize]));
   }
 
   ~_djvu_image_priv()
   {
-    if(isMalloc&&img.start_alloc)
-      _djvu_free(img.start_alloc);
-    else
-      delete [] img.start_alloc;
-    img.data=img.start_alloc=0;
-    img.priv=0;
+    if(img->priv == this)
+    {
+      if(isMalloc&&img->start_alloc)
+        _djvu_free(img->start_alloc);
+      else
+        delete [] img->start_alloc;
+      img->data=img->start_alloc=0;
+      img->priv=0;
+    }
   }
 
   inline void *
   realloc(size_t sz)
   {
     void *data=0;
-    if((isMalloc||!img.start_alloc)&&(data=::_djvu_realloc(img.start_alloc,sz)))
+    if((isMalloc||!img->start_alloc)&&(data=::_djvu_realloc(img->start_alloc,sz)))
     {
-      size_t offset=(size_t)img.data-(size_t)img.start_alloc;
-      img.data=(img.start_alloc=(unsigned char *)data)+offset;
-      img.datasize=sz;
+      size_t offset=(size_t)img->data-(size_t)img->start_alloc;
+      img->data=(img->start_alloc=(unsigned char *)data)+offset;
+      img->datasize=sz;
     }
     return data;
+  }
+
+  djvu_image *moveto(djvu_image *ximg) 
+  {
+    _djvu_image_free(*ximg);
+    *ximg=*img;
+    img->priv=0;
+    _djvu_image_free(*img);
+    djvu_image *x=img;
+    img=ximg;
+    return x;
   }
 
   static inline int
@@ -149,7 +165,8 @@ _djvu_image_free(djvu_image &img)
   {
     delete img.priv;
   }
-  img.flags=(djvu_flags)0;
+  img.type=DJVU_RLE;
+  img.orientation=0;
   img.w=img.h=0;
   img.pixsize=img.rowsize=img.datasize=0;
 }
@@ -162,8 +179,7 @@ _djvu_image_free(djvu_image *img)
   if(img)
   {
     _djvu_image_free(*img);
-    if(img->priv)
-      delete img;
+    delete img;
   }
 }
 
