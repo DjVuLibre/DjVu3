@@ -467,10 +467,10 @@ SUBDIRS= $subdirs
 EOF
 
     # Insert Makefile fragment
-    cat >> Makefile 
+    cat >> ${TOPBUILDDIR}/Makefile 
 
     # Add final rules
-    cat >> Makefile <<\EOF
+    cat >> ${TOPBUILDDIR}/Makefile <<\EOF
 
 clean:
 	for n in $(SUBDIRS) ; do ( cd $$n ; $(MAKE) clean ) ; done
