@@ -9,10 +9,10 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GThreads.cpp,v 1.28 1999-07-19 18:04:51 leonb Exp $
+//C- $Id: GThreads.cpp,v 1.29 1999-07-22 22:03:52 leonb Exp $
 
 
-// **** File "$Id: GThreads.cpp,v 1.28 1999-07-19 18:04:51 leonb Exp $"
+// **** File "$Id: GThreads.cpp,v 1.29 1999-07-22 22:03:52 leonb Exp $"
 // This file defines machine independent classes
 // for running and synchronizing threads.
 // - Author: Leon Bottou, 01/1998
@@ -684,7 +684,8 @@ mach_start(mach_state *st1, void *pc, char *stacklo, char *stackhi)
                     : : "r" (sp), "r" (pc) );
 #elif #cpu(sparc)
       char *sp = (char*)(((unsigned long)stackhi-16) & ~0xff);
-      asm volatile ("mov %0,%%sp\n\t"   // set new stack pointer
+      asm volatile ("ta 3\n\t"          // saving the register windows will not hurt.
+                    "mov %0,%%sp\n\t"   // set new stack pointer
                     "call %1,0\n\t"     // call function
                     "nop"               // delay slot
                     : : "r" (sp), "r" (pc) );
