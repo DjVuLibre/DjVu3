@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.86 2001-04-26 18:38:44 bcr Exp $
+// $Id: GString.cpp,v 1.87 2001-04-26 18:58:05 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -48,7 +48,7 @@
 #include <wctype.h>
 #include <locale.h>
 #include <wchar.h>
-
+#endif
 
 GBaseString::~GBaseString() {}
 GNativeString::~GNativeString() {}
