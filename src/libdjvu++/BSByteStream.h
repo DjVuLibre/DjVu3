@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: BSByteStream.h,v 1.10 1999-03-17 19:24:56 leonb Exp $
+//C- $Id: BSByteStream.h,v 1.11 1999-07-30 19:08:55 leonb Exp $
 
 
 #ifndef _BSBYTESTREAM_H
@@ -94,7 +94,7 @@
     @memo
     Simple Burrows-Wheeler general purpose compressor.
     @version
-    #$Id: BSByteStream.h,v 1.10 1999-03-17 19:24:56 leonb Exp $# */
+    #$Id: BSByteStream.h,v 1.11 1999-07-30 19:08:55 leonb Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -132,8 +132,17 @@
     Due to the block oriented nature of the Burrows-Wheeler transform, there
     is a very significant latency between the data input and the data output.
     You can use function #flush# to force data output at the expense of
-    compression efficiency.  Destroying the BSByteStream performs an implicit
-    #flush#.  
+    compression efficiency.
+
+    You should never directly access a ByteStream object connected to a valid
+    BSByteStream object. The ByteStream object can be accessed again after the
+    destruction of the BSByteStream object.  Note that the encoder always
+    flushes its internal buffers and writes a few final code bytes when the
+    BSByteStream object is destroyed.  Note also that the decoder often reads
+    a few bytes beyond the last code byte written by the encoder.  This lag
+    means that you must reposition the ByteStream after the destruction of the
+    BSByteStream object and before re-using the ByteStream object (see
+    \Ref{IFFByteStream}.)
 */
 class BSByteStream : public ByteStream
 {
