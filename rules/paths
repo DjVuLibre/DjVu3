@@ -72,6 +72,12 @@ LIBJPEG_LINK=-ljpeg
 LIBJPEG_INC=-I./TOPDIR/src/3rd-party/libjpeg -I./TOPDIR/SRCDIR/src/3rd-party/libjpeg
 %%%END_REQUIRE(@%LIBJPEG%@)
 
+%%%BEGIN_REQUIRE(@%LIBICONV%@)
+LIBICONV=@%LIBICONV%@
+LIBICONV_LINK=-ltiff
+LIBICONV_INC=-I./TOPDIR/src/3rd-party/libiconv-1.5.1 -I./TOPDIR/SRCDIR/src/3rd-party/libiconv-1.5.1
+%%%END_REQUIRE(@%LIBICONV%@)
+
 %%%BEGIN_REQUIRE(@%LIBTIFF%@)
 LIBTIFF=@%LIBTIFF%@
 LIBTIFF_LINK=-ltiff

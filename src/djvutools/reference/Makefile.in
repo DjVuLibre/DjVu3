@@ -3,7 +3,7 @@
 #C-              Unauthorized use prohibited.
 #C-
 #
-# $Id: Makefile.in,v 1.8 2001-02-06 21:48:09 bcr Exp $
+# $Id: Makefile.in,v 1.8.2.1 2001-03-20 00:29:40 bcr Exp $
 # $Name:  $
 
 %%%include <paths>
@@ -31,7 +31,7 @@ CXXFLAGS=@%CXXFLAGS%@ $(CXXTHREADS) $(CXXRPO) $(CXXOPT) $(CXXWARN) $(CXXPIC) $(D
 
 %%%include <commands>
 
-LIB= $(LIBDJVUXX)
+LIB= $(LIBDJVUXX) $(LIBICONV)
 
 PROG= $(BINPATH)/djvudump $(BINPATH)/c44 $(BINPATH)/d44 $(BINPATH)/ddjvu\
 	$(BINPATH)/djvumake $(BINPATH)/djvuextract $(BINPATH)/ppmcoco\

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/ksh
 #C-
 #C- DjVu® Reference Library (v. 3.0)
 #C- 
@@ -31,12 +31,12 @@
 #C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #
-# $Id: cxxpic.sh,v 1.9 2001-01-09 17:29:22 bcr Exp $
+# $Id: cxxpic.sh,v 1.9.2.1 2001-03-20 00:29:33 bcr Exp $
 # $Name:  $
 
 # This rule sets the following variables:
 #	CXXSYMBOLIC, CXXPIC
-# $Id: cxxpic.sh,v 1.9 2001-01-09 17:29:22 bcr Exp $
+# $Id: cxxpic.sh,v 1.9.2.1 2001-03-20 00:29:33 bcr Exp $
 
 if [ -z "$CXX_SET" ] ; then
   echo "You must source cxx.sh" 1>&2

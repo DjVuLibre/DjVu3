@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.cpp,v 1.54 2001-03-12 23:50:23 fcrary Exp $
+// $Id: ByteStream.cpp,v 1.54.2.1 2001-03-20 00:29:40 bcr Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 04/1997
@@ -546,10 +546,42 @@ ByteStream::Stdio::init(const char filename[], const char mode[])
   if (filename[0] != '-' || filename[1])
   {
 #ifdef macintosh
-	  fp = fopen(filename, mode);
+    fp = fopen(filename, mode);
 #else
-    fp = fopen(GOS::expand_name(filename), mode);
+    /* MBCS */
+    //fp = fopen(GOS::expand_name(filename), mode);
+    GString nativeFilename(GString(GOS::expand_name(filename)).getUTF82Native());
+    fp=fopen((char*)(const char *)nativeFilename,mode);//MBCS cvt
+    if (!fp)
+    {
+      memset(fpath,0,sizeof(fpath));
+      GString utf8Filename(GOS::expand_name(filename));
+      GString utf8Basename(GOS::basename(utf8Filename));
+      GString nativeBasename(GOS::encode_mbcs_reserved(utf8Basename.getUTF82Native()));
+      char *fpath;
+      GPBuffer<char> gfpath(fpath,1+utf8Filename.length()-utf8Basename.length());
+      strncpy(fpath,(char*)(const char*)utf8Filename, utf8Filename.length() - utf8Basename.length());
+      nativeFilename = GString(fpath).getUTF82Native();
+      nativeFilename+=nativeBasename;
+      fp = fopen((char*)(const char *)nativeFilename, mode);
+    }
 #endif
+    if (!fp)
+    {
+#ifndef UNDER_CE
+      char buffer[4096];
+      sprintf(buffer, "ByteStream.open_fail\t%s\t%s",
+        (char*)(const char *)nativeFilename, strerror(errno));
+      G_THROW(buffer);                                   //  Failed to open '%s': %s
+#else
+      G_THROW("ByteStream.open_fail2");                  //  StdioByteStream::StdioByteStream, failed to open file.
+#endif
+    } else
+    { //MBCS cvt
+      strcpy((char*)filename,(char*)(const char*)nativeFilename);//MBCS cvt add return new name
+    }
+    /*MBCS*/
+#end patch
     if (!fp)
     {
 #ifndef UNDER_CE

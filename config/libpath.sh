@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/ksh
 #C-
 #C- DjVu® Reference Library (v. 3.0)
 #C- 
@@ -31,7 +31,7 @@
 #C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #
-# $Id: libpath.sh,v 1.7 2001-01-09 17:29:22 bcr Exp $
+# $Id: libpath.sh,v 1.7.2.1 2001-03-20 00:29:33 bcr Exp $
 # $Name:  $
 
 # This sets the variable SYS and DEFS

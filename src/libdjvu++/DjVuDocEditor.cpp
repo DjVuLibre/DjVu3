@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocEditor.cpp,v 1.68 2001-03-08 23:57:26 bcr Exp $
+// $Id: DjVuDocEditor.cpp,v 1.68.2.1 2001-03-20 00:29:40 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -690,7 +690,7 @@ DjVuDocEditor::insert_group(const GList<GString> & file_names, int page_num,
                GString dirname="tempFileForDjVu" ;
 #endif
                if (GOS::mkdir(dirname)<0)
-                  G_THROW(GString("DjVuDocEditor.dir_fail\t")+dirname);
+                  G_THROW(GString("DjVuDocEditor.dir_fail\t")+dirname.getUTF82Native());//MBCS cvt
                G_TRY {
                   doc->expand(dirname, GOS::basename(fname));
                   int pages_num=doc->get_pages_num();

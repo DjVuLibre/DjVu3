@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.37 2001-03-16 21:38:18 fcrary Exp $
+// $Id: GString.cpp,v 1.37.2.1 2001-03-20 00:29:40 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -44,6 +44,12 @@
 
 #include "GString.h"
 #include "debug.h"
+
+#ifdef UNIX
+#define LIBICONV_PLUG true
+#endif
+#include "iconv.h"//MBCS cvt
+#include "libcharset.h"//MBCS cvt
 
 // - Author: Leon Bottou, 04/1997
 
@@ -561,4 +567,78 @@ GString::throw_illegal_subscript()
   G_THROW("GString.bad_subscript");
 }
 
+/*MBCS*/
+GString
+GString::getUTF82Native(const char* tocode) const { //MBCS cvt
+    const char * s=*this;
+	char* result = NULL;
+	size_t length = 0;
+		if (iconv_string(locale_charset(), "UTF-8",
+			s, s+strlen(s)+1, &result, &length) < 0) {
+			if (iconv_string("ASCII", "UTF-8",
+				s, s+strlen(s)+1, &result, &length) < 0) {
+				if (iconv_string("ISO-8859-1", "UTF-8",
+					s, s+strlen(s)+1, &result, &length) < 0) {
+					if (iconv_string("CP932", "UTF-8",
+						s, s+strlen(s)+1, &result, &length) < 0) {
+						if (iconv_string("EUC-JP", "UTF-8",
+							s, s+strlen(s)+1, &result, &length) < 0) {
+							if (tocode) strcpy((char*)tocode,locale_charset()); 
+							return *this; //invalid codeset
+						} else {if (tocode) strcpy((char*)tocode,"EUC-JP"); return result;} //text converted to native
+					} else {if (tocode) strcpy((char*)tocode,"CP932"); return result;} //text converted to native
+				} else {if (tocode) strcpy((char*)tocode,"ISO-8859-1"); return result;} //text converted to native
+			} else {if (tocode) strcpy((char*)tocode,"ASCII"); return result;} //text converted to native
+		} else {if (tocode) strcpy((char*)tocode,locale_charset()); return result;} //text converted to native
 
+}
+
+GString
+GString::getNative2UTF8(const char* fromcode) const { //MBCS cvt
+    const char * s=*this;
+	char* result = NULL;
+	size_t length = 0;
+	if (!(strcmp(fromcode,""))) {
+		if (iconv_string("UTF-8", locale_charset(),
+			s, s+strlen(s)+1, &result, &length) < 0) 
+			if (iconv_string("UTF-8", "autodetect_jp",
+				s, s+strlen(s)+1, &result, &length) < 0) 
+				if (iconv_string("UTF-8", "autodetect_utf8",
+					s, s+strlen(s)+1, &result, &length) < 0) 
+					if (iconv_string("UTF-8", "autodetect_kr",
+						s, s+strlen(s)+1, &result, &length) < 0) 
+						return *this; //can't convert
+					else 
+						return result; //text converted
+				else 
+					return result; //text converted
+			else 
+				return result; //text converted
+		else 
+			return result; //text converted
+	}
+	else {
+		if (!(strcmp(fromcode,"autodetect"))) {
+			if (iconv_string("UTF-8", "autodetect_jp",
+				s, s+strlen(s)+1, &result, &length) < 0) 
+				if (iconv_string("UTF-8", "autodetect_utf8",
+					s, s+strlen(s)+1, &result, &length) < 0) 
+					if (iconv_string("UTF-8", "autodetect_kr",
+						s, s+strlen(s)+1, &result, &length) < 0) 
+						return *this; //can't convert
+					else 
+						return result; //text converted
+				else 
+					return result; //text converted
+			else 
+				return result; //text converted
+		}
+		else
+			if (iconv_string("UTF-8", fromcode,
+				s, s+strlen(s)+1, &result, &length) < 0) 
+				return *this; //can't convert
+			else 
+				return result; //text converted
+	}
+}
+/*MBCS*/

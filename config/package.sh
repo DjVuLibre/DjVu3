@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/ksh
 #C-
 #C- DjVu® Reference Library (v. 3.0)
 #C- 
@@ -31,7 +31,7 @@
 #C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #
-# $Id: package.sh,v 1.19 2001-02-07 01:11:20 bcr Exp $
+# $Id: package.sh,v 1.19.2.1 2001-03-20 00:29:33 bcr Exp $
 # $Name:  $
 
 # EXIT ON ERROR

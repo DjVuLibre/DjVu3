@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GOS.h,v 1.18 2001-01-16 16:59:46 fcrary Exp $
+// $Id: GOS.h,v 1.18.4.1 2001-03-20 00:29:40 bcr Exp $
 // $Name:  $
 
 #ifndef _GOS_H_
@@ -53,7 +53,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- Initial implementation
     @version
-    #$Id: GOS.h,v 1.18 2001-01-16 16:59:46 fcrary Exp $#
+    #$Id: GOS.h,v 1.18.4.1 2001-03-20 00:29:40 bcr Exp $#
 */
 //@{
 
@@ -164,6 +164,7 @@ class GOS
       #$-_.+!*'(),:#.
       Use \Ref{decode_reserved}() to convert the URL back to the filename. */
   static GString encode_reserved(const char * filename);
+  static GString encode_mbcs_reserved(const char * filename);/*MBCS*/
 
   /** Decodes reserved characters from the URL.
       See also: \Ref{encode_reserved}(). */

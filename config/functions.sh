@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/ksh
 #C-
 #C- DjVu® Reference Library (v. 3.0)
 #C- 
@@ -31,7 +31,7 @@
 #C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #
-# $Id: functions.sh,v 1.59 2001-02-20 18:30:04 bcr Exp $
+# $Id: functions.sh,v 1.59.4.1 2001-03-20 00:29:33 bcr Exp $
 # $Name:  $
 
 #
@@ -852,31 +852,33 @@ check_make_stlib()
   if [ -z "$make_stlib_test" ]
   then
     make_stlib_test=checked
-    if [ -z "$MAKE_STDLIB" ]
+    if [ -z "$MAKE_STLIB" ]
     then
-      make_stlib="${ar} cq"
+      make_stlib="${CONFIG_DIR}/make_stlib.sh" 
+    else
+      make_stlib="$MAKE_STLIB" 
     fi
     if [ ! -z "$CC$CXX" ]
     then
       echon Searching how to build a static library ...
-      if [ -z "$CC" ]
-      then
-        testfile $temp.cpp <<EOF
-int main(void) { return 1; }
-EOF
-        run "$CXX" $CCFLAGS $OPT $DEFS $WARN -c $temp.cpp
-      else
-        testfile $temp.c <<EOF
-int main(void) { return 1; }
-EOF
-        run "$CC" $CCFLAGS $OPT $DEFS $WARN -c $temp.c
-      fi
-      if ( run "${make_stlib}" $temp.a $temp.o ) 
-      then
+#       if [ -z "$CC" ]
+#       then
+#         testfile $temp.cpp <<EOF
+# int main(void) { return 1; }
+# EOF
+#         run "$CXX" $CCFLAGS $OPT $DEFS $WARN -c $temp.cpp
+#       else
+#         testfile $temp.c <<EOF
+# int main(void) { return 1; }
+# EOF
+#         run "$CC" $CCFLAGS $OPT $DEFS $WARN -c $temp.c
+#       fi
+#       if ( run "${make_stlib}" $temp.a $temp.o ) 
+#       then
         echo "${make_stlib}"
-      else
-        make_stlib=""
-      fi
+#       else
+#         make_stlib=""
+#       fi
       CONFIG_VARS=`echo make_stlib make_stlib_test $CONFIG_VARS`
     fi
   fi

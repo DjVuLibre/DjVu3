@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.h,v 1.27 2001-03-13 01:34:50 bcr Exp $
+// $Id: GString.h,v 1.27.2.1 2001-03-20 00:29:40 bcr Exp $
 // $Name:  $
 
 #ifndef _GSTRING_H_
@@ -57,7 +57,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.27 2001-03-13 01:34:50 bcr Exp $# */
+    #$Id: GString.h,v 1.27.2.1 2001-03-20 00:29:40 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -230,6 +230,10 @@ public:
       unescaped forms. Numeric representations of characters (e.g., "&#38;"
       or "&#x26;" for "*") are the only forms converted by this function. */
   GString fromEscaped( void ) const;
+
+  /** Converts strings between native & UTF8 **/
+  GString getUTF82Native( const char* tocode=NULL ) const;/*MBCS*/
+  GString getNative2UTF8( const char* fromcode="" ) const;/*MBCS*/
 
   /** Converts strings containing HTML/XML escaped characters (e.g.,
       "&lt;" for "<") into their unescaped forms. The conversion is partially

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GOS.cpp,v 1.47 2001-02-13 00:15:53 praveen Exp $
+// $Id: GOS.cpp,v 1.47.2.1 2001-03-20 00:29:40 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -135,7 +135,7 @@ GOS::is_file(const char *filename)
 #if defined(UNIX) || defined(macintosh)
   struct stat buf;
   bool retval;
-  if (!stat(filename,&buf))
+  if (!stat(((GString)filename).getUTF82Native(),&buf))//MBCS cvt
   {
     retval=!(buf.st_mode & S_IFDIR);
   }else
@@ -146,7 +146,7 @@ GOS::is_file(const char *filename)
 #elif defined(WIN32)
   DWORD           dwAttrib;       ;
   USES_CONVERSION ;
-  dwAttrib = GetFileAttributes(A2CT(filename)) ;
+  dwAttrib = GetFileAttributes(A2CT(((GString)filename).getUTF82Native())) ;//MBCS cvt
   return !((dwAttrib == 0xFFFFFFFF)
      ||( dwAttrib & FILE_ATTRIBUTE_DIRECTORY ));
 #else
@@ -165,7 +165,7 @@ GOS::is_dir(const char *filename)
 #if defined(UNIX) || defined(macintosh)
   struct stat buf;
   bool retval;
-  if (!stat(filename,&buf))
+  if (!stat(((GString)filename).getUTF82Native(),&buf))//MBCS cvt
   {
     retval=(buf.st_mode & S_IFDIR);
   }else
@@ -176,7 +176,7 @@ GOS::is_dir(const char *filename)
 #elif defined(WIN32)   // (either Windows or WCE)
    USES_CONVERSION ;
    DWORD           dwAttrib;       ;
-   dwAttrib = GetFileAttributes(A2CT(filename)) ;
+   dwAttrib = GetFileAttributes(A2CT(((GString)filename).getUTF82Native())) ;//MBCS cvt
    return ((dwAttrib != 0xFFFFFFFF)&&( dwAttrib & FILE_ATTRIBUTE_DIRECTORY ));
 #else
 #error "Define something here for your operating system"
@@ -226,6 +226,7 @@ GOS::dirname(const char *fname)
   // Search last non terminal slash or backslash
   for(;*s;s++)
   {
+	if (IsDBCSLeadByte((BYTE)s[0])) {s++;continue;}//MBCS DBCS
     if ((s[0]==backslash || s[0]== slash)
         &&(s[1] && s[1] != slash && s[1]!= backslash))
     {
@@ -263,8 +264,23 @@ GOS::dirname(const char *fname)
     return retval;
   }
   // Backtrack all slashes
-  while (p>fname && (p[-1]== slash || p[-1]== backslash))
-    p--;
+  //while (p>fname && (p[-1]== slash || p[-1]== backslash))
+  //  p--;
+  /*MBCS start*/
+  GString gsfname(fname,p-fname+1);
+  char* nfname = (char*)(const char*)gsfname;
+  char* pend = nfname + strlen(nfname)-1;
+  char* back = _tcsrchr(nfname,'\\');
+  while (pend>nfname && (pend[0]== slash || (back != NULL && pend == back) )) {//MBCS DBCS
+	*pend = 0;							
+    pend--;
+	char* back = _tcsrchr(nfname,'\\');
+  }
+  int plen = pend-nfname;
+  if (plen>0) p=fname+plen+1;
+  else p=fname;
+  /*MBCS end*/
+
   // Multiple leading slashes
   if (p == fname)
   {
@@ -310,6 +326,7 @@ finddirsep(const char * const fname)
     for(const char *q=fname;*q;q++)
     {
 #ifdef WIN32
+	  if (IsDBCSLeadByte((BYTE)*q)) {q++;continue;}//MBCS DBCS
       if(*q == slash || *q == backslash)
 #else
       if(*q == slash || *q == colon)
@@ -423,26 +440,26 @@ GString
 GOS::cwd(const char *dirname)
 {
 #if defined(UNIX) || defined(macintosh) 
-  if (dirname && chdir(dirname)==-1)
+  if (dirname && chdir(((GString)dirname).getUTF82Native())==-1)//MBCS cvt
     G_THROW(errmsg());
   char *string_buffer;
   GPBuffer<char> gstring_buffer(string_buffer,MAXPATHLEN+1);
   char *result = getcwd(string_buffer,MAXPATHLEN);
   if (!result)
     G_THROW(errmsg());
-  return result;
+  return ((GString)result).getNative2UTF8();//MBCS cvt
 #else
 #if defined (WIN32) || defined (UNDER_CE)
 #ifndef UNDER_CE
   char drv[2];
-  if (dirname && _chdir(dirname)==-1)
+  if (dirname && _chdir(((GString)dirname).getUTF82Native())==-1)//MBCS cvt
     G_THROW(errmsg());
   drv[0]= dot ; drv[1]=0;
   char *string_buffer;
   GPBuffer<char> gstring_buffer(string_buffer,MAXPATHLEN+1);
   char *result = getcwd(string_buffer,MAXPATHLEN);
   GetFullPathName(drv, MAXPATHLEN, string_buffer, &result);
-  return string_buffer;
+  return ((GString)string_buffer).getNative2UTF8();//MBCS cvt
 #else
   return GString(dot) ;
 #endif
@@ -478,7 +495,7 @@ GOS::expand_name(const char *fname, const char *from)
       pw=getpwnam(user);
     }else if ((s=getenv("HOME")))
     {
-      from=s;
+      from=(const char *)((GString)s).getNative2UTF8();//MBCS cvt
       fname = fname + n;
     }else if ((s=getenv("LOGNAME")))
     {
@@ -489,7 +506,7 @@ GOS::expand_name(const char *fname, const char *from)
     }
     if (pw)
     {
-      from = pw->pw_dir;
+      from = (const char *)((GString)pw->pw_dir).getNative2UTF8();//MBCS cvt;
       fname = fname + n;
     }
     for(;fname[0] == slash; fname++)
@@ -590,6 +607,7 @@ GOS::expand_name(const char *fname, const char *from)
           drv[2]= dot ;
           drv[3]=0;
           GetFullPathName(drv, MAXPATHLEN, string_buffer, &s);
+		  string_buffer = (char*)(const char *)((GString)string_buffer).getNative2UTF8();//MBCS cvt
           s = string_buffer;
         }
         fname += 2;
@@ -626,30 +644,40 @@ GOS::expand_name(const char *fname, const char *from)
           s = string_buffer;
           continue;
         }
+		char* s2=s;//MBCS DBCS
         for(;*s;s++) 
           EMPTY_LOOP;
-        if ((s>string_buffer)&&(*(s-1)!= slash)&&(*(s-1)!= backslash))
+		char* back = _tcsrchr(s2,backslash);//MBCS DBCS
+        if ((s>string_buffer)&&(*(s-1)!= slash)&&(back == NULL || (back!=NULL && s-1 != back) ))//MBCS DBCS
+        //if ((s>string_buffer)&&(*(s-1)!= slash)&&(*(s-1)!= backslash))
         {
           *s = backslash;
           s++;
         }
         while (*fname && *fname!= slash && *fname!=backslash)
         {
+	      if (IsDBCSLeadByte((BYTE)*fname)) {*s = *fname++;}//MBCS DBCS
           *s = *fname++;
           if ((++s)-string_buffer > MAXPATHLEN)
             G_THROW("GOS.big_name");
         }
         *s = 0;
       }
+	  char* s2=s;//MBCS DBCS
       for(;*s;s++) 
         EMPTY_LOOP;
-      if ((s == string_buffer)||((*(s-1)!= slash) && (*(s-1)!=backslash)))
+	  char* back = _tcsrchr(s2,backslash);//MBCS DBCS
+      if ((s>string_buffer)&&(*(s-1)!= slash)&&(back == NULL || (back!=NULL && s-1 != back) ))//MBCS DBCS
+      //if ((s == string_buffer)||((*(s-1)!= slash) && (*(s-1)!=backslash)))
       {
         *s = backslash;
         s++;
       }
       while (*fname && (*fname!= slash) && (*fname!=backslash))
       {
+	    if (IsDBCSLeadByte((BYTE)*fname)) {
+			*s++ = *fname++;
+		}//MBCS DBCS
         *s = *fname++;
         if ((++s)-string_buffer > MAXPATHLEN)
           G_THROW("GOS.big_name");
@@ -741,11 +769,11 @@ GOS::deletefile(const char * filename)
 #ifdef WIN32
    USES_CONVERSION;
    if(is_dir(filename))
-     return RemoveDirectory(A2CT(filename));
+     return RemoveDirectory(A2CT(((GString)filename).getUTF82Native()));//MBCS cvt
    else
-	 return DeleteFile(A2CT(filename));
+	 return DeleteFile(A2CT(((GString)filename).getUTF82Native()));//MBCS cvt
 #else
-   retval=(is_dir(filename)?rmdir(filename):unlink(filename));
+   retval=(is_dir(filename)?rmdir(((GString)filename).getUTF82Native()):unlink(((GString)filename).getUTF82Native()));//MBCS cvt
 #endif
   }
   return retval;
@@ -762,15 +790,15 @@ GOS::mkdir(const char * dirname)
    GString parent=GOS::dirname(dirname);
    if (!GOS::is_dir(parent))
    {
-      int rc=mkdir(parent);
+      int rc=mkdir(((GString)parent).getUTF82Native());//MBCS cvt
       if (rc<0)
         return rc;
    }
 #ifdef WIN32
    USES_CONVERSION;
-   return CreateDirectory(A2CT(dirname), NULL);
+   return CreateDirectory(A2CT(((GString)dirname).getUTF82Native()), NULL);//MBCS cvt
 #else
-   return ::mkdir(dirname, 0755);
+   return ::mkdir(((GString)dirname).getUTF82Native(), 0755);//MBCS cvt
 #endif
 }
 
@@ -804,7 +832,7 @@ GOS::cleardir(const char * dirname)
    if (!dirname || !dirname[0]) return -1;
    
 #ifdef UNIX
-   DIR * dir=opendir(dirname);
+   DIR * dir=opendir(((GString)dirname).getUTF82Native());//MBCS cvt
    if (dir)
      {
        dirent * de;
@@ -815,10 +843,10 @@ GOS::cleardir(const char * dirname)
              continue;
            if (de->d_name[0]== dot  && de->d_name[1]== dot  && len==2)
              continue;
-           GString name = GOS::expand_name( GString(de->d_name, len), dirname);
+           GString name = GOS::expand_name(GString(de->d_name, len).getNative2UTF8(), dirname);//MBCS cvt
            int status = 0;
            if (GOS::is_dir(name))
-             status = cleardir(name);
+             status = cleardir(name);//MBCS cvt
            if (status < 0) return status;
            status = GOS::deletefile(name);
            if (status < 0) return status;
@@ -830,22 +858,23 @@ GOS::cleardir(const char * dirname)
 #if defined (WIN32) && !defined (UNDER_CE)
    GString buffer=dirname;
    buffer += "\\*.*";
+   buffer = buffer.getUTF82Native();//MBCS cvt
 
    WIN32_FIND_DATA finddata;
-   HANDLE handle = FindFirstFile(buffer, &finddata);
+   HANDLE handle = FindFirstFile(buffer, &finddata);//MBCS cvt
    if( handle == INVALID_HANDLE_VALUE)
        return -1;
 
    do
    {
-       buffer = dirname;
+       buffer = ((GString)dirname).getUTF82Native();
        buffer += GString("\\") + finddata.cFileName;
 
        if( finddata.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY )                      {
            /// if it is directory, clear it
            if( GString(dot)!=finddata.cFileName && GString("..")!=finddata.cFileName)
            {
-               if( cleardir(buffer) >= 0 )
+               if( cleardir((const char*)((GString)buffer).getNative2UTF8()) >= 0 )//MBCS cvt
                    RemoveDirectory(buffer);
            }
        }
@@ -977,6 +1006,26 @@ GOS::filename_to_url(const char *filename, const char *useragent)
         *d = slash; 
         continue;
       }
+#ifdef WIN32
+ 		if (IsDBCSLeadByte((BYTE)*s)) { //MBCS DBCS
+			// escape sequence
+			d[0] = percent;
+			d[1] = hex[ (*s >> 4) & 0xf ];
+			d[2] = hex[ (*s) & 0xf ];
+			s++;
+			if (*s){
+				// escape sequence
+				d+=3;
+				d[0] = percent;
+				d[1] = hex[ (*s >> 4) & 0xf ];
+				d[2] = hex[ (*s) & 0xf ];
+				d+=2;
+			}
+			continue;
+		}
+#endif
+/*MBCS*/
+
   // WARNING: Whenever you modify this conversion code,
   // make sure, that the following functions are in sync:
   //   encode_reserved()
@@ -1156,6 +1205,49 @@ GOS::url_to_filename(const char *url)
   return retval;
 }
 
+/*MBCS*/
+GString
+GOS::encode_mbcs_reserved(const char * filename)
+      // Called from ByteStream to encode new OS-safe filenames
+{
+   const char *hex = "0123456789ABCDEF";
+   
+   GString res;
+
+   for(const char * ptr=filename;*ptr;ptr++)
+   {
+#ifdef WIN32
+ 		if (IsDBCSLeadByte((BYTE)*ptr)) { //MBCS DBCS
+			// escape sequence
+			res+=hex[(*ptr >> 4) & 0xf];
+			res+=hex[(*ptr) & 0xf];
+			ptr++;
+			if (*ptr){
+				// escape sequence
+				res+=hex[(*ptr >> 4) & 0xf];
+				res+=hex[(*ptr) & 0xf];
+			}
+			continue;
+		}
+#endif
+     if ((*ptr>='a' && *ptr<='z')
+        || (*ptr>='A' && *ptr<='Z')
+        || (*ptr>='0' && *ptr<='9')
+        || (strchr("$-_.+!*'(),:", *ptr))) // Added : because of windows!
+      {
+        res+=*ptr;
+      }else
+      {
+      // escape sequence
+        //res+=percent;
+        res+=hex[(*ptr >> 4) & 0xf];
+        res+=hex[(*ptr) & 0xf];
+      }
+   }
+   
+   return res;
+}
+/*MBCS*/
 
 GString
 GOS::encode_reserved(const char * filename)
@@ -1172,10 +1264,30 @@ GOS::encode_reserved(const char * filename)
 
    for(const char * ptr=filename;*ptr;ptr++)
    {
+/*MBCS*/
+#ifdef WIN32
+ 		if (IsDBCSLeadByte((BYTE)*ptr)) { //MBCS DBCS
+			// escape sequence
+			res+=percent;
+			res+=hex[(*ptr >> 4) & 0xf];
+			res+=hex[(*ptr) & 0xf];
+			ptr++;
+			if (*ptr){
+				// escape sequence
+				res+=percent;
+				res+=hex[(*ptr >> 4) & 0xf];
+				res+=hex[(*ptr) & 0xf];
+			}
+			continue;
+		}
+#endif
+/*MBCS*/
+
       if ((*ptr>='a' && *ptr<='z')
         || (*ptr>='A' && *ptr<='Z')
         || (*ptr>='0' && *ptr<='9')
-        || (strchr("$-_.+!*'(),:", *ptr))) // Added : because of windows!
+        //|| (strchr("$-_.+!*'(),:", *ptr))) // Added : because of windows!
+        || (strchr("$-_.+!*'(),:/", *ptr))) // MBCS Added : because of windows!
       {
         res+=*ptr;
       }else
