@@ -10,7 +10,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: IWTransform.cpp,v 1.18 2000-09-18 17:10:22 bcr Exp $
+//C- $Id: IWTransform.cpp,v 1.19 2000-09-19 19:18:12 mrosen Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -714,7 +714,10 @@ IWTransform::backward(short *p, int w, int h, int rowsize, int begin, int end)
 // COLOR TRANSFORM 
 //////////////////////////////////////////////////////
 
-
+#ifdef __AFX_H__     // UNDER_CE we need this header for the placement new operator, but it also defines min and max
+#undef min
+#undef max
+#endif
 /* Utilities */
 
 static inline int
