@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GSmartPointer.h,v 1.18 2000-02-27 23:19:50 eaf Exp $
+//C- $Id: GSmartPointer.h,v 1.19 2000-02-29 19:06:26 praveen Exp $
 
 #ifndef _GSMARTPOINTER_H_
 #define _GSMARTPOINTER_H_
@@ -31,7 +31,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation\\
     Andrei Erofeev <eaf@geocities.com> -- bug fix.
     @version 
-    #$Id: GSmartPointer.h,v 1.18 2000-02-27 23:19:50 eaf Exp $# 
+    #$Id: GSmartPointer.h,v 1.19 2000-02-29 19:06:26 praveen Exp $# 
     @args
 */
 //@{
@@ -189,7 +189,7 @@ protected:
     But one has to be aware of its existence.  */
 
 template <class TYPE>
-class GP : protected GPBase
+class GP : public GPBase
 {
 public:
   /** Constructs a null smart-pointer. */

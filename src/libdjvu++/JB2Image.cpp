@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: JB2Image.cpp,v 1.31 2000-02-14 16:52:38 leonb Exp $
+//C- $Id: JB2Image.cpp,v 1.32 2000-02-29 19:06:26 praveen Exp $
 
 
 #ifdef __GNUC__
@@ -362,7 +362,7 @@ const int _JB2Codec::CELLEXTRA =   500;
 // CONSTRUCTOR
 
 _JB2Codec::_JB2Codec(ByteStream &bs, int encoding)
-  : zp(bs, encoding, true),
+  : zp(bs, encoding!=0, true),
     encoding(encoding),
     cur_ncell(0),
     bitcells(0),

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVmDir0.cpp,v 1.4 1999-09-28 19:56:18 leonb Exp $
+//C- $Id: DjVmDir0.cpp,v 1.5 2000-02-29 19:06:26 praveen Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -67,7 +67,7 @@ DjVmDir0::decode(ByteStream & bs)
       GString name;
       char ch;
       while(bs.read(&ch, 1) && ch) name+=ch;
-      int iff_file=bs.read8();
+      bool iff_file=bs.read8()?true:false;
       int offset=bs.read32();
       int size=bs.read32();
       add_file(name, iff_file, offset, size);
