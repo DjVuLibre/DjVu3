@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.h,v 1.87 2001-08-20 16:54:24 docbill Exp $
+// $Id: GString.h,v 1.88 2001-08-21 15:44:34 docbill Exp $
 // $Name:  $
 
 #ifndef _GSTRING_H_
@@ -64,7 +64,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.87 2001-08-20 16:54:24 docbill Exp $# */
+    #$Id: GString.h,v 1.88 2001-08-21 15:44:34 docbill Exp $# */
 //@{
 
 #ifdef __GNUC__

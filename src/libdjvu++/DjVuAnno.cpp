@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuAnno.cpp,v 1.95 2001-08-20 16:54:24 docbill Exp $
+// $Id: DjVuAnno.cpp,v 1.96 2001-08-21 15:44:34 docbill Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -1145,7 +1145,7 @@ DjVuANT::encode_raw(void) const
       const int i=mode-1;
       if((i>=0)&& (i<mode_strings_size))
       { 
-        buffer="(" MODE_TAG " "+GUTF8String(mode_strings[i])+")";
+        buffer="(" MODE_TAG " " + GUTF8String(mode_strings[mode]) + ")";
       }
       parser.parse(buffer);
    }
