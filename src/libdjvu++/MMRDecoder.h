@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: MMRDecoder.h,v 1.12 2000-12-22 04:15:39 bcr Exp $
+// $Id: MMRDecoder.h,v 1.13 2001-01-03 21:30:06 bcr Exp $
 // $Name:  $
 
 #ifndef _MMRDECODER_H_
@@ -101,7 +101,7 @@ class JB2Image;
     @memo
     CCITT-G4/MMR decoder.
     @version
-    #$Id: MMRDecoder.h,v 1.12 2000-12-22 04:15:39 bcr Exp $#
+    #$Id: MMRDecoder.h,v 1.13 2001-01-03 21:30:06 bcr Exp $#
     @author
     Parag Deshmukh <parag@sanskrit.lz.att.com> \\
     Leon Bottou <leonb@research.att.com> */
@@ -152,13 +152,11 @@ public:
       buffer data should be processed before calling this function again. This
       is implemented by calling \Ref{MMRDecoder::scanruns}. */
   const unsigned char  *scanrle(int invert, const unsigned char **endptr=0);
-#if 0
   /** Decodes a scanline and returns a pointer to an array of #0# or #1# bytes.
       Returns a pointer to the scanline buffer containing one byte per pixel. 
       The buffer data should be processed before calling this function again.
       This is implemented by calling \Ref{MMRDecoder::scanruns}. */
   const unsigned char *scanline();
-#endif
  private:
   int width;
   int height;
@@ -166,11 +164,8 @@ public:
   int striplineno;
   int rowsperstrip;
   unsigned char  *line;
-  GPBuffer<unsigned char> gline;
   unsigned short *lineruns;
-  GPBuffer<unsigned short> glineruns;
   unsigned short *prevruns;
-  GPBuffer<unsigned short> gprevruns;
 public:
   class VLSource;
   class VLTable;
