@@ -9,10 +9,10 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GThreads.cpp,v 1.38 2000-01-20 23:14:39 eaf Exp $
+//C- $Id: GThreads.cpp,v 1.39 2000-01-21 00:02:45 eaf Exp $
 
 
-// **** File "$Id: GThreads.cpp,v 1.38 2000-01-20 23:14:39 eaf Exp $"
+// **** File "$Id: GThreads.cpp,v 1.39 2000-01-21 00:02:45 eaf Exp $"
 // This file defines machine independent classes
 // for running and synchronizing threads.
 // - Author: Leon Bottou, 01/1998
@@ -1323,6 +1323,8 @@ GThread::set_scheduling_callback(void (*call)(int))
 GThread::GThread(int stacksize)
   : task(0), xentry(0), xarg(0)
 {
+  finished=false;
+  
   // check argument
   if (stacksize < 0)
     stacksize = DEFSTACK;
@@ -1417,6 +1419,7 @@ starttwo(GThread *thr)
     }
 #endif 
   thr->terminate();
+  thr->finished=true;
   GThread::yield();
   abort();
 }
@@ -1425,7 +1428,7 @@ starttwo(GThread *thr)
 void
 GThread::wait_for_finish(void)
 {
-      // TODO: add appropriate code here
+   while(!finished) GThread::yield();
 }
 
 int 
