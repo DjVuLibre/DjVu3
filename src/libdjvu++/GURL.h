@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GURL.h,v 1.9 1999-10-05 16:00:06 leonb Exp $
+//C- $Id: GURL.h,v 1.10 1999-12-01 21:18:18 bcr Exp $
 
 #ifndef _GURL_H_
 #define _GURL_H_
@@ -25,7 +25,7 @@
     \Ref{GURL} class used to store URLs in a system independent format.
     @memo System independent URL representation.
     @author Andrei Erofeev <eaf@research.att.com>
-    @version #$Id: GURL.h,v 1.9 1999-10-05 16:00:06 leonb Exp $#
+    @version #$Id: GURL.h,v 1.10 1999-12-01 21:18:18 bcr Exp $#
 */
 
 //@{
@@ -90,9 +90,9 @@ public:
 	  separating slash preserving possible URL suffixes following #;# or #?#. */
       //@{
       ///
-   GURL		operator+(const char * name) const;
+   GURL		operator+(const char * xname) const;
       ///
-   GURL		operator+(const GString & name) const;
+   GURL		operator+(const GString & xname) const;
       //@}
 
       /// Returns TRUE if #gurl1# and #gurl2# are the same
@@ -128,9 +128,9 @@ public:
 };
 
 inline GURL
-GURL::operator+(const GString & name) const
+GURL::operator+(const GString & xname) const
 {
-   return (*this)+(const char *) name;
+   return (*this)+(const char *) xname;
 }
 
 inline int

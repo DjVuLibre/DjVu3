@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GURL.cpp,v 1.11 1999-11-18 20:51:54 praveen Exp $
+//C- $Id: GURL.cpp,v 1.12 1999-12-01 21:18:18 bcr Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -163,10 +163,10 @@ GURL::name(void) const
 }
 
 GURL
-GURL::operator+(const char * name) const
+GURL::operator+(const char * xname) const
 {
    GURL res;
-   if (!protocol(name).length())
+   if (!protocol(xname).length())
    {
       GString proto=protocol();
 
@@ -176,10 +176,10 @@ GURL::operator+(const char * name) const
 
       GString str(url, ptr-url);
       if (str[(int)str.length()-1]!='/') str+='/';
-      str+=name;
+      str+=xname;
       str+=ptr;
 
       res=str;
-   } else res=name;
+   } else res=xname;
    return res;
 }
