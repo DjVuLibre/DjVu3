@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: MMX.h,v 1.5 1999-06-22 19:14:51 leonb Exp $
+//C- $Id: MMX.h,v 1.6 1999-07-29 14:51:16 leonb Exp $
 
 #ifndef _MMX_H_
 #define _MMX_H_
@@ -24,9 +24,11 @@
 
     Macro #MMX# is defined if the compiler supports the X86-MMX instructions.
     It does not mean however that the processor supports the instruction set.
-    Function #MMXControl::ok# must be used to decide whether MMX instructions
-    can be executed.  MMX instructions are entered in the middle of C++ code
-    using the following macros.
+    Variable #MMXControl::mmxflag# must be used to decide whether MMX.
+    instructions can be executed.  MMX instructions are entered in the middle
+    of C++ code using the following macros.  Examples can be found in
+    #"IWTransform.cpp"#.
+
     \begin{description}
     \item[MMXrr( insn, srcreg, dstreg)] 
        Encode a register to register MMX instruction 
@@ -44,15 +46,12 @@
        Execute the #EMMS# instruction to reset the FPU state.
     \end{description}
 
-    Examples can be found in #"IWTransform.h"#.  
-
     @memo
     Essential support for MMX.
     @version 
-    #$Id: MMX.h,v 1.5 1999-06-22 19:14:51 leonb Exp $#
+    #$Id: MMX.h,v 1.6 1999-07-29 14:51:16 leonb Exp $#
     @author: 
-    L\'eon Bottou <leonb@research.att.com> -- initial implementation 
-*/    
+    L\'eon Bottou <leonb@research.att.com> -- initial implementation */
 //@{
 
 
@@ -64,21 +63,21 @@ class MMXControl
 {
  public:
   // MMX DETECTION
-  /** Detects and enable MMX or similar technologies.  This function chects
-      whether a specialized implementations of the IW44 transform is available
-      (such as the MMX implementation) and enables it.  Returns a boolean
-      indicating whether such an implementation is available.  Speedups
-      factors may vary. */
+  /** Detects and enable MMX or similar technologies.  This function checks
+      whether the CPU supports a vectorial instruction set (such as Intel's
+      MMX) and enables them.  Returns a boolean indicating whether such an
+      instruction set is available.  Speedups factors may vary. */
   static int enable_mmx();
   /** Disables MMX or similar technologies.  The transforms will then be
       performed using the baseline code. */
   static int disable_mmx();
-  /** Contains a value greater than zero if MMX code can be executed.  A
-      negative value means that you must call \Ref{enable_mmx} and test the
-      value again. Direct access to this member should only be used to
-      transfer the instruction flow to the MMX branch of the code. Do not
-      write into this variable. */
-  static int mmxflag;
+  /** Contains a value greater than zero if the CPU supports vectorial
+      instructions. A negative value means that you must call \Ref{enable_mmx}
+      and test the value again. Direct access to this member should only be
+      used to transfer the instruction flow to the vectorial branch of the
+      code. Never modify the value of this variable.  Use #enable_mmx# or
+      #disable_mmx# instead. */
+  static int mmxflag;  // readonly
 };
 
 //@}
@@ -121,7 +120,6 @@ class MMXControl
 #define MMXra(op,src,addr) \
   { register __int64 var; __asm { op [var],src };  *(__int64*)addr = var; } 
 // Probably not as efficient as GCC macros
-// Not thoroughly tested.
 #define MMX 1
 #endif
 
