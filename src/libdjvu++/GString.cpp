@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GString.cpp,v 1.13 2000-03-02 17:17:27 bcr Exp $
+//C- $Id: GString.cpp,v 1.14 2000-03-02 20:59:23 parag Exp $
 
 
 #ifdef __GNUC__
@@ -25,7 +25,7 @@
 
 #include "GString.h"
 
-// File "$Id: GString.cpp,v 1.13 2000-03-02 17:17:27 bcr Exp $"
+// File "$Id: GString.cpp,v 1.14 2000-03-02 20:59:23 parag Exp $"
 // - Author: Leon Bottou, 04/1997
 
 GStringRep *
@@ -202,18 +202,19 @@ GString::format(const char *fmt, ... )
   // Format string
   va_list args;
   va_start(args, fmt);
-  buffer[sizeof(buffer)-1] = 0;
+  buffer[buflen-1] = 0;
 #ifdef USE_VSNPRINTF
   while(USE_VSNPRINTF(buffer, buflen, fmt, args)<0)
   {
     delete [] buffer;
     buffer=new char [buflen+=4096];
+		buffer[buflen-1]=0;
   }
 #else
   vsprintf(buffer, fmt, args);
 #endif
   va_end(args);
-  if (buffer[sizeof(buffer)-1])
+  if (buffer[buflen-1])
     abort();
   // Go altering the string
   (*this) = (const char *)buffer;
