@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.103 2000-01-20 21:39:30 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.104 2000-01-20 21:40:47 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -626,15 +626,7 @@ DjVuDocument::id_to_url(const char * id) const
 	    break;
 	 case OLD_INDEXED:
 	 case SINGLE_PAGE:
-	    if (flags & DOC_NDIR_KNOWN)
-	    {
-	       if (ndir->name_to_page(id)>=0)
-		  return init_url.base()+id;
-	    } else
-	    {
-		  // This is required to successully load file with NDIR
-	       return init_url.base()+id;
-	    }
+	    return init_url.base()+id;
 	    break;
       }
    return GURL();
