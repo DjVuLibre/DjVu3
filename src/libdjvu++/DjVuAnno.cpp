@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: DjVuAnno.cpp,v 1.58 2000-11-09 20:15:05 jmw Exp $
+// $Id: DjVuAnno.cpp,v 1.59 2000-11-22 17:24:19 fcrary Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -1583,46 +1583,46 @@ DjVuTXT::get_memory_usage() const
 void
 DjVuAnno::decode(ByteStream &bs)
 {
-   GString chkid;
-   IFFByteStream iff(bs);
-   while( iff.get_chunk(chkid) )
-   {
-     if (chkid == "ANTa")
-       {
-         if (ant) {
-           ant->merge(iff);
-         } else {
-           ant=new DjVuANT;
-           ant->decode(iff);
-         }
-       }
-     else if (chkid == "ANTz")
-       {
-	 BSByteStream bsiff(iff);
-	 if (ant) {
-           ant->merge(bsiff);
-         } else {
-           ant=new DjVuANT;
-           ant->decode(bsiff);
-         }
-       } else if (chkid == "TXTa")
-       {
-         if (txt)
-           G_THROW("DjVuAnno.dupl_text");
-         txt = new DjVuTXT;
-         txt->decode(iff);
-       }
-     else if (chkid == "TXTz")
-       {
-         if (txt)
-           G_THROW("DjVuAnno.dupl_text");
-         txt = new DjVuTXT;
-         BSByteStream bsiff(iff);
-         txt->decode(bsiff);
-       }
-     // Add decoding of other chunks here
-     iff.close_chunk();
-   }
+  GString chkid;
+  IFFByteStream iff(bs);
+  while( iff.get_chunk(chkid) )
+  {
+    if (chkid == "ANTa")
+    {
+      if (ant) {
+        ant->merge(iff);
+      } else {
+        ant=new DjVuANT;
+        ant->decode(iff);
+      }
+    }
+    else if (chkid == "ANTz")
+    {
+      BSByteStream bsiff(iff);
+      if (ant) {
+        ant->merge(bsiff);
+      } else {
+        ant=new DjVuANT;
+        ant->decode(bsiff);
+      }
+    } else if (chkid == "TXTa")
+    {
+      if (txt)
+        G_THROW("DjVuAnno.dupl_text");
+      txt = new DjVuTXT;
+      txt->decode(iff);
+    }
+    else if (chkid == "TXTz")
+    {
+      if (txt)
+        G_THROW("DjVuAnno.dupl_text");
+      txt = new DjVuTXT;
+      BSByteStream bsiff(iff);
+      txt->decode(bsiff);
+    }
+    // Add decoding of other chunks here
+    iff.close_chunk();
+  }
 }
 
 void

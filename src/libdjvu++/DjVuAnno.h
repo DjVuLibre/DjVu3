@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: DjVuAnno.h,v 1.32 2000-11-09 20:15:05 jmw Exp $
+// $Id: DjVuAnno.h,v 1.33 2000-11-22 17:24:19 fcrary Exp $
 // $Name:  $
 
 #ifndef _DJVUANNO_H
@@ -59,7 +59,7 @@
     @memo Implements support for DjVuImage annotations
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: DjVuAnno.h,v 1.32 2000-11-09 20:15:05 jmw Exp $# */
+    #$Id: DjVuAnno.h,v 1.33 2000-11-22 17:24:19 fcrary Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -136,18 +136,22 @@ public:
       /** Returns TRUE if no features are specified or specified features
 	  are not different from default ones */
    bool		is_empty(void) const;
+
       /** Decodes contents of annotation chunk #ANTa#. The chunk data is
 	  read from ByteStream #bs# until reaching an end-of-stream marker.
 	  This function is normally called after a call to
 	  \Ref{IFFByteStream::get_chunk}(). */
    void	decode(ByteStream & bs);
+
       /** Same as \Ref{decode}() but adds the new data to what has
 	  been decoded before. */
    void merge(ByteStream & bs);
+
       /** Encodes the #ANTa# chunk. The annotation data is simply written
 	  into ByteStream #bs# with no IFF header. This function is normally
 	  called after a call to \Ref{IFFByteStream::put_chunk}(). */
    void encode(ByteStream &bs);
+
       /// Encodes data back into raw annotation data.
    GString encode_raw(void) const;
 
@@ -190,7 +194,7 @@ private:
 class DjVuTXT : public GPEnabled
 {
 public:
-  /** These constant are used to tell what a zone describes.
+  /** These constants are used to tell what a zone describes.
       This can be useful for a copy/paste application. 
       The deeper we go into the hierarchy, the higher the constant. */
   enum ZoneType { PAGE=1, COLUMN=2, REGION=3, PARAGRAPH=4, LINE=5, WORD=6, CHARACTER=7 };
@@ -199,7 +203,7 @@ public:
   struct Zone 
   {
     Zone();
-    /** Type fo the zone. */
+    /** Type of the zone. */
     enum ZoneType ztype;
     /** Rectangle spanned by the zone */
     GRect rect;
@@ -319,19 +323,24 @@ class DjVuAnno : public GPEnabled
 public:
    GP<DjVuANT>	ant;
    GP<DjVuTXT>  txt;
+
       /** Decodes a sequence of annotation chunks and merges contents of every
 	  chunk with previously decoded information. This function
 	  should be called right after applying \Ref{IFFByteStream::get_chunk}()
 	  to data from #FORM:ANNO#. */
    void decode(ByteStream & bs);
+
       /** Encodes all annotations back into a sequence of chunks to be put
 	  inside a #FORM:ANNO#. */
    void	encode(ByteStream & bs);
+
       /// Returns a copy of this object
    GP<DjVuAnno>	copy(void) const;
+
       /** Merged the contents of this class and of annotations
 	  pointed by #anno# pointer */
    void		merge(const GP<DjVuAnno> & anno);
+
       /** Returns the number of bytes needed by this data structure. It's
 	  used by caching routines to estimate the size of a \Ref{DjVuImage}. */
    unsigned int get_memory_usage() const;
