@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: cjb2.cpp,v 1.4 2000-02-15 14:37:19 leonb Exp $
+//C- $Id: cjb2.cpp,v 1.5 2000-02-15 15:45:59 leonb Exp $
 
 
 /** @name cjb2
@@ -18,11 +18,13 @@
     \begin{verbatim}
         cjb2 [options] <inputpbmfile>  <outputdjvufile>
     \end{verbatim}
-    This simple bilevel encoder demonstrates the major operations for creating
-    a Bilevel DjVu Image.  is able to perform lossless encoding and limited
-    lossy encoding.  Its purpose is to demonstrate how to generate Bilevel
-    DjVu Images and encourage research in pattern matching and halftone
-    processing.
+
+    {\bf Description}
+    
+    File #"cjb2.cpp"# demonstrates a simple encoder for Bilevel DjVu Images.
+    It is able to perform lossless encoding and limited lossy encoding.  Lots
+    of lossy encoding refinements are missing from this simple implementation.
+    Comments in the code suggest a few improvements.
 
     Options are:
     \begin{description}
@@ -32,13 +34,16 @@
     \item[-loose]    Substitute patterns with small variations (lossy).
     \end{description}
     Encoding is lossless unless one or several lossy options are selected.
-    
+    The #dpi# argument mostly affects the level of cleanups and/or smoothing 
+    performed on the shapes.
+
     @memo
     Simple JB2 encoder.
     @author
-    L\'eon Bottou <leonb@research.att.com>
+    L\'eon Bottou <leonb@research.att.com>\\
+    Paul Howard <pgh@research.att.com>
     @version
-    #$Id: cjb2.cpp,v 1.4 2000-02-15 14:37:19 leonb Exp $# */
+    #$Id: cjb2.cpp,v 1.5 2000-02-15 15:45:59 leonb Exp $# */
 //@{
 //@}
 
@@ -371,7 +376,7 @@ CCImage::make_ccs_from_ccids()
 void
 CCImage::erase_tiny_ccs()
 {
-  // ISSUE: Halftone detection
+  // ISSUE: HALFTONE DETECTION
   // We should not remove tiny ccs if they are part of a halftone pattern...
   for (int i=0; i<ccs.size(); i++)
     {
@@ -733,8 +738,8 @@ tune_jb2image(JB2Image *jimg,
               int refine_threshold=21      // max percent of different pixels in order to cross-code
               )
 {
-  // ISSUES: pattern matching
-  // Better criterions for substitution lead to faster code and improved compression ratios.
+  // ISSUE: PATTERN MATCHING
+  // Better criteria for substitution lead to faster code and improved compression ratios.
   // Beware of character substitution errors!
   
   // Pattern matching data
@@ -807,17 +812,22 @@ tune_jb2image(JB2Image *jimg,
             closest_match = candidate;
           }
         }
-      // Setup hierarchy
+      // Decide what to do with the match.
       if (closest_match >= 0)
         {
-          // This shape will be cross-coded
+          // Either mark the shape for cross-coding (``soft pattern matching'')
           jshp->parent = closest_match;
-          // Substitutions are marked by setting lib[current].bits to zero
+          // Or mark the shape for shape substitution (``pattern matching'')
           if ((best_score * 100) <= (substitute_threshold * rows * columns))
             lib[current].bits = 0;
         }
+      // ISSUE: CROSS-IMPROVING
+      // When we decide not to do a substitution, we can slightly modify
+      // the current shape in order to make it closer to the matching
+      // shape, therefore improving the file size.  In fact there is a continuity
+      // between pure cross-coding and pure substitution...
     }
-
+  
   // Process shape substitutions
   for (int blitno=0; blitno<jimg->get_blit_count(); blitno++)
     {
@@ -840,6 +850,7 @@ tune_jb2image(JB2Image *jimg,
           jshp->bits = 0;
         }
     }
+  // Cross-coding is achieved by the JB2Image codec.
 }
 
 
