@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.51 1999-09-16 16:55:42 eaf Exp $
+//C- $Id: DjVuFile.cpp,v 1.52 1999-09-16 17:48:18 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -151,7 +151,7 @@ DjVuFile::~DjVuFile(void)
    DEBUG_MAKE_INDENT(3);
    
    if (data_pool) data_pool->del_trigger(static_trigger_cb, this);
-   stop_decode(1);
+   stop();
 }
 
 void
@@ -916,6 +916,20 @@ DjVuFile::stop_decode(bool sync)
 
       delete decode_thread; decode_thread=0;
    }
+}
+
+void
+DjVuFile::stop(void)
+{
+   DEBUG_MSG("DjVuFile::stop(): Stopping everything\n");
+   DEBUG_MAKE_INDENT(3);
+
+   stop_decode(true);
+   
+   if (data_pool) data_pool->stop();
+   GCriticalSectionLock lock(&inc_files_lock);
+   for(GPosition pos=inc_files_list;pos;++pos)
+      inc_files_list[pos]->stop();
 }
 
 GP<DjVuNavDir>

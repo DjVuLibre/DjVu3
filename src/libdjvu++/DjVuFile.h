@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.h,v 1.30 1999-09-16 14:00:22 eaf Exp $
+//C- $Id: DjVuFile.h,v 1.31 1999-09-16 17:48:18 eaf Exp $
  
 #ifndef _DJVUFILE_H
 #define _DJVUFILE_H
@@ -46,7 +46,7 @@
 
     @memo Classes representing DjVu files.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuFile.h,v 1.30 1999-09-16 14:00:22 eaf Exp $#
+    @version #$Id: DjVuFile.h,v 1.31 1999-09-16 17:48:18 eaf Exp $#
 */
 
 //@{
@@ -299,6 +299,13 @@ public:
 	  just signal the thread to stop and will return immediately.
 	  Decoding of all included files will be stopped too. */
    void		stop_decode(bool sync);
+      /** Stops any data-related operations. In addition to what is
+	  done by \Ref{stop_decode}() (decoding stops) this function
+	  interrupts any operations with the #DjVuFile# data and makes
+	  sure, that all further requests for data will end immediately
+	  with #STOP# exception. This operation is synchronous (by the
+          moment the function returns everything will be stopped). */
+   void		stop(void);
       /** Wait for the decoding to finish. This will wait for the
 	  termination of included files too. */
    void		wait_for_finish(void);
