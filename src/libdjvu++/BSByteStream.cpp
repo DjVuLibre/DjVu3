@@ -9,9 +9,9 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: BSByteStream.cpp,v 1.8 1999-07-30 14:17:26 leonb Exp $
+//C- $Id: BSByteStream.cpp,v 1.9 1999-07-30 18:55:02 leonb Exp $
 
-// "$Id: BSByteStream.cpp,v 1.8 1999-07-30 14:17:26 leonb Exp $"
+// "$Id: BSByteStream.cpp,v 1.9 1999-07-30 18:55:02 leonb Exp $"
 // - Author: Leon Bottou, 07/1998
 
 
@@ -23,7 +23,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "BSByteStream.h"
-#define BSORT_TIMER
+#undef BSORT_TIMER
 #ifdef BSORT_TIMER
 #include "GOS.h"
 #endif
@@ -50,10 +50,10 @@
 #define OVERFLOW           32
 
 // Sorting tresholds
-#define RANKSORT_THRESH    20
+#define RANKSORT_THRESH    10
 #define QUICKSORT_STACK    512
 #define PRESORT_THRESH     10
-#define PRESORT_DEPTH      6
+#define PRESORT_DEPTH      8
 #define RADIX_THRESH       32768
 
 
@@ -585,7 +585,7 @@ _BSort::radixsort16(void)
   rank[size-2] = ftab[(c1<<8)];
   // Extra element
   rank[size] = -1;
-  // Free
+  // Free ftab
   delete [] ftab;
 }
 
@@ -623,6 +623,9 @@ _BSort::run(int &markerpos)
       lo = hi;
     }
   depth = PRESORT_DEPTH;
+#ifdef BSORT_TIMER
+  long middle = GOS::ticks();
+#endif  
   // Step 3: Perform rank doubling
   int again = 1;
   while (again)
@@ -688,7 +691,8 @@ _BSort::run(int &markerpos)
   ASSERT(markerpos>=0 && markerpos<size);
 #ifdef BSORT_TIMER
   long end = GOS::ticks();
-  fprintf(stderr,"Sorting time: %d bytes in %ldms\n", size-1, end-start);
+  fprintf(stderr,"Sorting time: %d bytes in %ld + %ld = %ld ms\n", 
+          size-1, middle-start, end-middle, end-start);
 #endif  
 }
 
