@@ -9,19 +9,13 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: MMX.cpp,v 1.5 1999-11-10 01:18:28 praveen Exp $
+//C- $Id: MMX.cpp,v 1.6 1999-11-10 18:35:17 leonb Exp $
 
 
 
 #include "MMX.h"
 #include <stdio.h>
 #include <stdlib.h>
-
-
-#if defined(_MSC_VER) && defined(_M_IX86)
-// Unfathomable bug in MSVC6 requires this
-//#pragma optimize("agy",off)
-#endif
 
 
 // ----------------------------------------
@@ -115,7 +109,8 @@ MMXControl::enable_mmx()
   __asm {  pushfd
            pop     ecx
            xor     edx,edx
-           mov     eax,ecx         ; check that CPUID exists
+             ;// Check that CPUID exists
+           mov     eax,ecx        
            xor     eax,0x200000
            push    eax
            popfd
@@ -125,14 +120,19 @@ MMXControl::enable_mmx()
            jz      fini
            push    ecx
            popfd
-           smsw    ax              ; check that CR0:EM is zero
+             ;// Check that CR0:EM is zero
+           smsw    ax
            and     eax,4
            jnz     fini
-           mov     eax,1           ; execute CPUID
+             ;// Execute CPUID
+           mov     eax,1
            _emit   0xf
            _emit   0xa2
          fini:
-           mov     cpuflags,edx 
+           mov     cpuflags,edx
+             ;// MSVC determines clobbered registers by scanning the assembly code.
+             ;// Since it does not know CPUID, it would not know that EBX is clobbered
+             ;// without the dummy instruction below...
            xor     ebx,ebx
          }
 #endif
