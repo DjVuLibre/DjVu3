@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: parseoptions.cpp,v 1.61 2000-11-09 20:15:08 jmw Exp $
+// $Id: parseoptions.cpp,v 1.62 2000-11-14 23:55:37 fcrary Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -59,6 +59,7 @@
 #endif
 #include <stdlib.h>
 #include <ctype.h>
+#include "GString.h"
 
 static const char LocalDjVuDir[] ="/.DjVu/"; // appended to the home directory.
 static const char RootDjVuDir[] ="/etc/DjVu/";
@@ -526,9 +527,8 @@ DjVuParseOptions::GetInteger(
       retval=falseval;
     }else 
     {  // We should try and detect errors.
-      const char mesg[]="'%1.10s' is not a number or boolian value.";
       const char *s=str;
-      const char *endptr=mesg;
+      const char *endptr=s;    // any non-null value will do
       if(s[0])
       {
         for(;isspace(s[0]);s++);
@@ -538,12 +538,13 @@ DjVuParseOptions::GetInteger(
       }
       if(*endptr)
       {
-        char sbuf[sizeof(mesg)+10];
-        sprintf(sbuf,mesg,str?str:"(NULL)");
-        Errors->AddError(sbuf);
+        Errors->AddError(GString("parseoptions.bad_value\t") + str);
         retval=errval;
       }
     }
+  } else
+  {
+    Errors->AddError("parseoptions.null_value");
   }
   return retval;
 }
@@ -556,13 +557,12 @@ int
 DjVuParseOptions::GetNumber(
   const int token,const int errval) const 
 {
-  const char mesg[]="'%1.10s' is not a number";
   int retval=errval;
   const char * const str=GetValue(token);
   if(str)
   {
     const char *s=str;
-    const char *endptr=mesg;
+    const char *endptr=s;
     if(s[0])
     {
       for(;isspace(s[0]);s++);
@@ -572,11 +572,12 @@ DjVuParseOptions::GetNumber(
     }
     if(*endptr)
     {
-      char sbuf[sizeof(mesg)+10];
-      sprintf(sbuf,mesg,str?str:"(NULL)");
-      Errors->AddError(sbuf);
+      Errors->AddError(GString("parseoptions.bad_number\t") + str);
       retval=errval;
     }
+  }else
+  {
+    Errors->AddError("parseoptions.null_number");
   }
   return retval;
 }
@@ -689,8 +690,8 @@ DjVuParseOptions::Add(
 {
   if(var<0)
   {
-    static const char emesg1[]="%s:Error in line %d of profile '%s'\n\t--> Illegal profile name '%s'";
-    static const char emesg2[]="%s:Error in line %d of profile '%s'\n\t--> %s";
+    static const char emesg1[]="parseoptions.illegal_profile";
+    static const char emesg2[]="parseoptions.profile_error";
     const char *emesg;
     if(value[0] && strchr(value,':'))
     {
@@ -700,10 +701,10 @@ DjVuParseOptions::Add(
       emesg=emesg2;
     }
     const char *p=GetProfileName(profile);
-    char *s=new char[22+strlen(emesg)+strlen(p)+strlen(value)+strlen(filename)];
-    sprintf(s,emesg,filename,line,p,value);
-    Errors->AddError(s);
-    delete [] s;
+    Errors->AddError(GString(emesg) + "\t" + filename +
+                                      "\t" + GString(line) + 
+                                      "\t" + p + 
+                                      "\t" + value);
   }else if(profile >= 0)
   {
     Configuration->Add(profile,var,value);
@@ -845,7 +846,7 @@ DjVuParseOptions::ReadNextConfig (
             {
               if(inherit_values[k])
               {
-		delete [] values[k];
+		            delete [] values[k];
                 char *s=new char [strlen(inherit_values[k])+1];
                 strcpy(s,inherit_values[k]);
                 values[k]=s;
@@ -853,11 +854,10 @@ DjVuParseOptions::ReadNextConfig (
             }
           }else
           {
-            static const char emesg[]="%s:Error in line %d of '%s'\n\t--> can not inherit unknown profile '%s'";
-            char *s=new char[sizeof(emesg)+20+strlen(filename)+strlen(name)+strlen(profilename)];
-            sprintf(s,emesg,filename,line,profilename,name);
-            Errors->AddError(s);
-            delete [] s;
+            Errors->AddError(GString("parseoptions.cant_inherit") + "\t" + filename +
+                                                                    "\t" + GString(line) +
+                                                                    "\t" + profilename +
+                                                                    "\t" + name);
 //            break;
           }
         }
@@ -1182,7 +1182,7 @@ DjVuParseOptions::ErrorList::AddError(const char mesg[])
   return retval;
 }
 
-// This function is the reverse of AddError.  Only we peal off the error
+// This function is the reverse of AddError.  Only we peel off the error
 // message from the top of the list, and AddError to the bottom.  So something
 // like AddError(GetError()) would rotate the end of the list to the top.
 //
@@ -1474,12 +1474,7 @@ DjVuParseOptions::ConfigFilename(const char config[],int level)
     return retval;        
   }else
   {
-    const char emsg[]="SDK not installed properly, please install it again.\n";
-    char *s=new char [sizeof(emsg)];
-    sprintf(s,emsg);
-    Errors->AddError(s);
-    delete [] s;
-    
+    Errors->AddError("parseoptions.bad_install");
     return 0;
   }
 #endif
@@ -1692,10 +1687,7 @@ DjVuParseOptions::GetOpt::getopt_long()
     }
     if(has_dash)
     {
-      static const char emesg[]="Unrecognized option '%1.1024s'";
-      char ss[sizeof(emesg)+1024];
-      sprintf(ss,emesg,argv[optind]);
-      Errors.AddError(ss);
+      Errors.AddError(GString("parseoptions.unrecog_option\t") + argv[optind]);
       return -1;
     }
   }
@@ -1705,10 +1697,7 @@ DjVuParseOptions::GetOpt::getopt_long()
     if(nextchar > 1 || argv[optind][nextchar] != '-' ||
       (argv[optind][nextchar+1]&&argv[optind][nextchar+1]!='-'))
     {
-      static const char emesg[]="Unrecognized option -%c";
-      char s[sizeof(emesg)];
-      sprintf(s,emesg,argv[optind][nextchar]);
-      Errors.AddError(s);
+      Errors.AddError(GString("parseoptions.unrecog_option_c\t") + GString(argv[optind][nextchar]));
       return -1;
     }
     nextchar=1;
@@ -1736,11 +1725,8 @@ DjVuParseOptions::GetOpt::getopt_long()
       optarg=0;
     }else
     {
-      static const char emesg[]="Argument required for --%1.1024s option";
       const char * const xname=opts.name;
-      char s[sizeof(emesg)+1024];
-      sprintf(s,emesg,xname);
-      Errors.AddError(s);
+      Errors.AddError(GString("parseoptions.missing_arg_option\t") + xname);
       return -1;
     }
     optind++;
