@@ -1,5 +1,5 @@
 // -*- C++ -*-
-// "$Id: GURL.cpp,v 1.3 1999-05-25 19:42:29 eaf Exp $"
+// "$Id: GURL.cpp,v 1.4 1999-05-25 20:36:38 leonb Exp $"
 
 #ifdef __GNUC__
 #pragma implementation
@@ -25,7 +25,8 @@ GURL::eatDots(void)
    char * buffer=new char[url.length()+1];
    strcpy(buffer, url);
    TRY {
-      char * ptr, * last_slash;
+      char * ptr;
+      char * last_slash = 0;
       for(ptr=buffer;*ptr && *ptr!='/';ptr++);
       while(*ptr)
       {
