@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: IWImage.h,v 1.11.2.1 1999-03-23 21:14:10 leonb Exp $
+//C- $Id: IWImage.h,v 1.11.2.2 1999-03-29 22:22:51 leonb Exp $
 
 #ifndef _IWIMAGE_H_
 #define _IWIMAGE_H_
@@ -106,7 +106,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: IWImage.h,v 1.11.2.1 1999-03-23 21:14:10 leonb Exp $# */
+    #$Id: IWImage.h,v 1.11.2.2 1999-03-29 22:22:51 leonb Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -227,8 +227,9 @@ public:
       #decode_chunk# decode successive chunks.  You must call #close_codec#
       after decoding the last chunk of a file.  Note that function
       #get_bitmap# and #decode_chunk# may be called simultaneously from two
-      execution threads. */
-  int  decode_chunk(ByteStream &bs);
+      execution threads.  Argument #maxslice# can be used to stop decoding
+      before reaching the end of the chunk. */
+  int  decode_chunk(ByteStream &bs, int maxslice=999);
   /** Reads a DjVu IW44 file as a gray level image.  This function enters a
       composite chunk (identifier #FORM:BM44#), and decodes a maximum of
       #maxchunks# data chunks (identifier #BM44#).  Data for each chunk is
@@ -363,8 +364,9 @@ public:
       #decode_chunk# decode successive chunks.  You must call #close_codec#
       after decoding the last chunk of a file.  Note that function
       #get_bitmap# and #decode_chunk# may be called simultaneously from two
-      execution threads. */
-  int  decode_chunk(ByteStream &bs);
+      execution threads. Argument #maxslice# can be used to stop decoding
+      before reaching the end of the chunk. */
+  int  decode_chunk(ByteStream &bs, int maxslice=999);
   /** Reads a DjVu IW44 file as a color image.  This function enters a
       composite chunk (identifier #FORM:PM44# or #FORM:BM44#), and decodes a
       maximum of #maxchunks# data chunks (identifier #PM44# or #BM44#).  Data
