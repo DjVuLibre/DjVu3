@@ -4,7 +4,7 @@
 //C-              Unauthorized use prohibited.
 //C-
 // 
-// $Id: qd_viewer.cpp,v 1.4 2001-07-19 16:59:10 mchen Exp $
+// $Id: qd_viewer.cpp,v 1.5 2001-07-19 17:05:32 mchen Exp $
 // $Name:  $
 
 
@@ -384,10 +384,6 @@ QDViewer::layout(bool allow_redraw)
 void
 QDViewer::setCaption(void)
 {
-   GUTF8String qkey_in="abc";
-   throw ERROR_MESSAGE("QDViewer::setCaption", "QDViewer.pagekey_not_found" "\t" +qkey_in);
-
-//   ThrowError("QDViewer::slotChildError", "QDViewer.no_child_errmsg");
 
    if (dimg)
    {
