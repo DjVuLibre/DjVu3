@@ -856,10 +856,12 @@
 
     {\bf Description}
 
-    Shell script #cdjvu# illustrates a very simple encoder for color images.
-    The script first segments the image using a fixed threshold.  It calls
-    then program \Ref{cjb2} to create the encoded mask and program
-    \Ref{djvumake} to create the color layers and assemble the DjVu file.
+    Shell script #cdjvu# illustrates a very simple encoder for creating a
+    Compound DjVu File.  You may also investigate \Ref{cpaldjvu} for a
+    completely different way to do this.  The script first segments the image
+    using a fixed threshold.  It calls then program \Ref{cjb2} to create the
+    encoded mask and program \Ref{djvumake} to create the color layers and
+    assemble the DjVu file.
 
     The segmentation performed by this script depends on the NetPBM tools
     #ppmtopgm# and #pgmtopbm#
@@ -869,7 +871,7 @@
     mask image using The Gimp (\URL{http://www.gimp.org}).
 
     @memo
-    Simple shell script for encoding color DjVu images.
+    Simple shell script for encoding Compound DjVu Files.
     @author
     Patrick Haffner <haffner@research.att.com> */
 
