@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: IWImage.h,v 1.21 2001-01-20 02:03:56 bcr Exp $
+// $Id: IWImage.h,v 1.22 2001-01-24 00:15:11 bcr Exp $
 // $Name:  $
 
 
@@ -129,7 +129,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: IWImage.h,v 1.21 2001-01-20 02:03:56 bcr Exp $# */
+    #$Id: IWImage.h,v 1.22 2001-01-24 00:15:11 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -670,8 +670,41 @@ struct IW44Image::TertiaryHeader2 {        // VER 1.2
   unsigned char crcbdelay;
 };
 
+inline const short* 
+IW44Image::Block::data(int n) const
+{
+  if (! pdata[n>>4])
+    return 0;
+  return pdata[n>>4][n&15];
+}
 
+inline short* 
+IW44Image::Block::data(int n, IW44Image::Map *map)
+{
+  if (! pdata[n>>4])
+    pdata[n>>4] = map->allocp(16);
+  if (! pdata[n>>4][n &15])
+    pdata[n>>4][n &15] = map->alloc(16);
+  return pdata[n>>4][n&15];
+}
 
+inline short 
+IW44Image::Block::get(int n) const
+{
+  int n1 = (n>>4);
+  const short *d = data(n1);
+  if (! d)
+    return 0;
+  return d[n&15];
+}
+
+inline void  
+IW44Image::Block::set(int n, int val, IW44Image::Map *map)
+{
+  int n1 = (n>>4);
+  short* d = data(n1, map);
+  d[n&15] = val;
+}
 
 #endif // IWIMAGE_IMPLIMENTATION
 

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: IWImage.cpp,v 1.45 2001-01-20 02:03:56 bcr Exp $
+// $Id: IWImage.cpp,v 1.46 2001-01-24 00:15:11 bcr Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 08/1998
@@ -514,24 +514,6 @@ IW44Image::Block::Block()
   pdata[0] = pdata[1] = pdata[2] = pdata[3] = 0;
 }
 
-inline const short* 
-IW44Image::Block::data(int n) const
-{
-  if (! pdata[n>>4])
-    return 0;
-  return pdata[n>>4][n&15];
-}
-
-inline short* 
-IW44Image::Block::data(int n, IW44Image::Map *map)
-{
-  if (! pdata[n>>4])
-    pdata[n>>4] = map->allocp(16);
-  if (! pdata[n>>4][n &15])
-    pdata[n>>4][n &15] = map->alloc(16);
-  return pdata[n>>4][n&15];
-}
-
 void 
 IW44Image::Block::zero(int n)
 {
@@ -539,26 +521,7 @@ IW44Image::Block::zero(int n)
     pdata[n>>4][n&15] = 0;
 }
 
-inline short 
-IW44Image::Block::get(int n) const
-{
-  int n1 = (n>>4);
-  const short *d = data(n1);
-  if (! d)
-    return 0;
-  return d[n&15];
-}
-
-inline void  
-IW44Image::Block::set(int n, int val, IW44Image::Map *map)
-{
-  int n1 = (n>>4);
-  short* d = data(n1, map);
-  d[n&15] = val;
-}
-
-
-inline void  
+void  
 IW44Image::Block::read_liftblock(const short *coeff, IW44Image::Map *map)
 {
   int n=0;
@@ -570,7 +533,7 @@ IW44Image::Block::read_liftblock(const short *coeff, IW44Image::Map *map)
     }
 }
 
-inline void  
+void  
 IW44Image::Block::write_liftblock(short *coeff, int bmin, int bmax) const
 {
   int n = bmin<<4;
@@ -585,8 +548,6 @@ IW44Image::Block::write_liftblock(short *coeff, int bmin, int bmax) const
           coeff[zigzagloc[n]] = d[n2];
     }
 }
-
-
 
 //---------------------------------------------------------------
 // *** Class IW44Image::Map [implementation]
@@ -946,7 +907,7 @@ IW44Image::Codec::~Codec()
 // -- check if data can be produced for this band/mask
 // -- also fills the sure_zero array
 
-inline int 
+int 
 IW44Image::Codec::is_null_slice(int bit, int band)
 {
   if (band == 0)
