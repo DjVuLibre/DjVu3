@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: c44.cpp,v 1.11 2001-02-15 01:12:21 bcr Exp $
+// $Id: c44.cpp,v 1.12 2001-02-15 19:06:55 bcr Exp $
 // $Name:  $
 
 
@@ -184,7 +184,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: c44.cpp,v 1.11 2001-02-15 01:12:21 bcr Exp $# */
+    #$Id: c44.cpp,v 1.12 2001-02-15 19:06:55 bcr Exp $# */
 //@{
 //@}
 
@@ -712,8 +712,7 @@ main(int argc, char **argv)
       if (iw)
         {
           remove(iw4file);
-          GP<ByteStream> obs=ByteStream::create(iw4file,"wb");
-          IFFByteStream iff(obs);
+          GP<IFFByteStream> iff=IFFByteStream::create(ByteStream::create(iw4file,"wb"));
           if (flag_crcbdelay >= 0)
             iw->parm_crcbdelay(flag_crcbdelay);
           if (flag_dbfrac > 0)
@@ -721,10 +720,10 @@ main(int argc, char **argv)
           int nchunk = resolve_quality(w*h);
           if (flag_gamma>0 || flag_dpi>0)
             // Create djvu file
-            create_photo_djvu_file(*iw, w, h, iff, nchunk, parms);
+            create_photo_djvu_file(*iw, w, h, *iff, nchunk, parms);
           else
             // Create iw44 file
-            iw->encode_iff(iff, nchunk, parms);
+            iw->encode_iff(*iff, nchunk, parms);
         }
     }
   G_CATCH(ex)

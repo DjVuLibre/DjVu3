@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDumpHelper.cpp,v 1.16 2001-02-15 01:12:22 bcr Exp $
+// $Id: DjVuDumpHelper.cpp,v 1.17 2001-02-15 19:06:56 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -323,8 +323,8 @@ DjVuDumpHelper::dump(GP<ByteStream> gstr)
 {
    GP<ByteStream> out_str=ByteStream::create();
    GString head="  ";
-   IFFByteStream iff(gstr);
+   GP<IFFByteStream> iff=IFFByteStream::create(gstr);
    DjVmInfo djvminfo;
-   display_chunks(*out_str, iff, head, djvminfo);
+   display_chunks(*out_str, *iff, head, djvminfo);
    return out_str;
 }

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djvuextract.cpp,v 1.10 2001-02-15 01:12:21 bcr Exp $
+// $Id: djvuextract.cpp,v 1.11 2001-02-15 19:06:55 bcr Exp $
 // $Name:  $
 
 /** @name djvuextract
@@ -65,7 +65,7 @@
     @memo
     Extract components from DjVu files.
     @version
-    #$Id: djvuextract.cpp,v 1.10 2001-02-15 01:12:21 bcr Exp $#
+    #$Id: djvuextract.cpp,v 1.11 2001-02-15 19:06:55 bcr Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> - Initial implementation\\
     Andrei Erofeev <eaf@geocities.com> - Multipage support */
@@ -104,7 +104,8 @@ void
 display_info_chunk(GP<ByteStream> ibs, const char *filename)
 {
   ibs->seek(0);
-  IFFByteStream iff(ibs);
+  GP<IFFByteStream> giff=IFFByteStream::create(ibs);
+  IFFByteStream &iff=*giff;
   GString chkid;
   if (! iff.get_chunk(chkid))
     G_THROW("Malformed DJVU file");
@@ -132,7 +133,8 @@ void
 extract_chunk(GP<ByteStream> ibs, const char *id, GP<ByteStream> out)
 {
   ibs->seek(0);
-  IFFByteStream iff(ibs);
+  GP<IFFByteStream> giff=IFFByteStream::create(ibs);
+  IFFByteStream &iff=*giff;
   GString chkid;
   if (! iff.get_chunk(chkid))
     G_THROW("Malformed DJVU file");
@@ -144,7 +146,8 @@ extract_chunk(GP<ByteStream> ibs, const char *id, GP<ByteStream> out)
   if (!strcmp(id,"BG44") || !strcmp(id,"FG44"))
     {
       // Rebuild IW44 file
-      IFFByteStream iffout(out);
+      GP<IFFByteStream> giffout=IFFByteStream::create(out);
+      IFFByteStream &iffout=*giffout;
       int color_bg = -1;
       while (iff.get_chunk(chkid))
         {

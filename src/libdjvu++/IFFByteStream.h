@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: IFFByteStream.h,v 1.25 2001-02-15 01:12:22 bcr Exp $
+// $Id: IFFByteStream.h,v 1.26 2001-02-15 19:06:56 bcr Exp $
 // $Name:  $
 
 #ifndef _IFFBYTESTREAM_H_
@@ -89,7 +89,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: IFFByteStream.h,v 1.25 2001-02-15 01:12:22 bcr Exp $# */
+    #$Id: IFFByteStream.h,v 1.26 2001-02-15 19:06:56 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -145,8 +145,7 @@
 
 class IFFByteStream : public ByteStream
 {
-//protected: 
-public:
+protected: 
   IFFByteStream(GP<ByteStream> &bs);
 public:
   /** Constructs an IFFByteStream object attached to ByteStream #bs#.

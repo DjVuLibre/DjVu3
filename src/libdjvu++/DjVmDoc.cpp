@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVmDoc.cpp,v 1.37 2001-02-15 01:12:22 bcr Exp $
+// $Id: DjVmDoc.cpp,v 1.38 2001-02-15 19:06:56 bcr Exp $
 // $Name:  $
 
 
@@ -162,7 +162,8 @@ DjVmDoc::write(GP<ByteStream> gstr)
 
    DEBUG_MSG("pass 2: store the file contents.\n");
 
-   IFFByteStream iff(gstr);
+   GP<IFFByteStream> giff=IFFByteStream::create(gstr);
+   IFFByteStream &iff=*giff;
    iff.put_chunk("FORM:DJVM", 1);
    iff.put_chunk("DIRM");
    dir->encode(gstr);
@@ -177,7 +178,8 @@ DjVmDoc::write(GP<ByteStream> gstr)
 
 	 // First check that the file is in IFF format
       G_TRY {
-	       IFFByteStream iff_in(str_in);
+               GP<IFFByteStream> giff_in=IFFByteStream::create(str_in);
+               IFFByteStream &iff_in=*giff_in;
 	       int size;
 	       GString chkid;
 	       size=iff_in.get_chunk(chkid);
@@ -207,7 +209,8 @@ DjVmDoc::read(const GP<DataPool> & pool)
    
    GP<ByteStream> str=pool->get_stream();
    
-   IFFByteStream iff(str);
+   GP<IFFByteStream> giff=IFFByteStream::create(str);
+   IFFByteStream &iff=*giff;
    GString chkid;
    iff.get_chunk(chkid);
    if (chkid!="FORM:DJVM")
@@ -258,7 +261,8 @@ DjVmDoc::read(const char * name)
 
    GP<DataPool> pool=new DataPool(name);
    GP<ByteStream> str=pool->get_stream();
-   IFFByteStream iff(str);
+   GP<IFFByteStream> giff=IFFByteStream::create(str);
+   IFFByteStream &iff=*giff;
    GString chkid;
    iff.get_chunk(chkid);
    if (chkid!="FORM:DJVM")
@@ -309,8 +313,8 @@ DjVmDoc::write_index(GP<ByteStream> str)
       if (!file->size) G_THROW("DjVmDoc.zero_file");  //  Strange: File size is zero.
    }
 
-   IFFByteStream iff(str);
-
+   GP<IFFByteStream> giff=IFFByteStream::create(str);
+   IFFByteStream &iff=*giff;
    iff.put_chunk("FORM:DJVM", 1);
    iff.put_chunk("DIRM");
    dir->encode(str);

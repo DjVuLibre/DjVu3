@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocEditor.cpp,v 1.60 2001-02-15 01:12:22 bcr Exp $
+// $Id: DjVuDocEditor.cpp,v 1.61 2001-02-15 19:06:56 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -365,11 +365,11 @@ DjVuDocEditor::strip_incl_chunks(GP<DataPool> & pool_in)
    DEBUG_MSG("DjVuDocEditor::strip_incl_chunks() called\n");
    DEBUG_MAKE_INDENT(3);
 
-   GP<ByteStream> str_in=pool_in->get_stream();
-   IFFByteStream iff_in(str_in);
+   GP<IFFByteStream> giff_in=IFFByteStream::create(pool_in->get_stream());
+   IFFByteStream &iff_in=*giff_in;
 
-   GP<ByteStream> gstr_out=ByteStream::create();
-   IFFByteStream iff_out(gstr_out);
+   GP<IFFByteStream> giff_out=IFFByteStream::create(ByteStream::create());
+   IFFByteStream &iff_out=*giff_out;
 
    bool have_incl=false;
 
@@ -393,9 +393,11 @@ DjVuDocEditor::strip_incl_chunks(GP<DataPool> & pool_in)
 
    if (have_incl)
    {
-      ByteStream &str_out=*gstr_out;
-      str_out.seek(0, SEEK_SET);
-      return new DataPool(str_out);
+      iff_out.seek(0,SEEK_SET);
+      return new DataPool(*iff_out.get_bytestream());
+//      ByteStream &str_out=*iff_out.get_bytestream();
+//      str_out.seek(0, SEEK_SET);
+//      return new DataPool(str_out);
    } else return pool_in;
 }
 
@@ -557,10 +559,11 @@ DjVuDocEditor::insert_file(const char * file_name, bool is_page,
          // We also want to include here our file with shared annotations,
          // if it exists.
       GString chkid;
-      GP<ByteStream> str_in=file_pool->get_stream();
-      IFFByteStream iff_in(str_in);
+      GP<IFFByteStream> giff_in=IFFByteStream::create(file_pool->get_stream());
+      IFFByteStream &iff_in=*giff_in;
       GP<ByteStream> gstr_out=ByteStream::create();
-      IFFByteStream iff_out(gstr_out);
+      GP<IFFByteStream> giff_out=IFFByteStream::create(gstr_out);
+      IFFByteStream &iff_out=*giff_out;
 
       GP<DjVmDir::File> shared_frec=djvm_dir->get_shared_anno_file();
 
@@ -615,9 +618,11 @@ DjVuDocEditor::insert_file(const char * file_name, bool is_page,
 
          // We have just inserted every included file. We may have modified
          // contents of the INCL chunks. So we need to update the DataPool...
-      ByteStream &str_out=*gstr_out;
-      str_out.seek(0);
-      GP<DataPool> new_file_pool=new DataPool(str_out);
+//      ByteStream &str_out=*gstr_out;
+//      str_out.seek(0);
+//      GP<DataPool> new_file_pool=new DataPool(str_out);
+      iff_out.seek(0);
+      GP<DataPool> new_file_pool=new DataPool(*(iff_out.get_bytestream()));
       {
             // It's important that we replace the pool here anyway.
             // By doing this we load the file into memory. And this is
@@ -1274,7 +1279,8 @@ DjVuDocEditor::create_shared_anno_file(void (* progress_cb)(float progress, void
 
       // Prepare file with ANTa chunk inside
    GP<ByteStream> gstr=ByteStream::create();
-   IFFByteStream iff(gstr);
+   GP<IFFByteStream> giff=IFFByteStream::create(gstr);
+   IFFByteStream &iff=*giff;
    iff.put_chunk("FORM:DJVI");
    iff.put_chunk("ANTa");
    iff.close_chunk();
@@ -1466,7 +1472,7 @@ DjVuDocEditor::file_thumbnails(void)
    int page_num=0, pages_num=djvm_dir->get_pages_num();
    GP<ByteStream> str=ByteStream::create();
    ByteStream *mbs=str;
-   GP<IFFByteStream> iff=new IFFByteStream(str);
+   GP<IFFByteStream> iff=IFFByteStream::create(str);
    iff->put_chunk("FORM:THUM");
    while(true)
    {
@@ -1517,7 +1523,7 @@ DjVuDocEditor::file_thumbnails(void)
 
             // And create new streams
          mbs=str=ByteStream::create();
-         iff=new IFFByteStream(str);
+         iff=IFFByteStream::create(str);
          iff->put_chunk("FORM:THUM");
          image_num=0;
 
@@ -1691,7 +1697,8 @@ DjVuDocEditor::save_file(const char * file_id, const char * save_dir,
          str_out.copy(*str_in);
 
          GP<ByteStream> str=file_pool->get_stream();
-         IFFByteStream iff(str);
+         GP<IFFByteStream> giff=IFFByteStream::create(str);
+         IFFByteStream &iff=*giff;
          GString chkid;
          if (iff.get_chunk(chkid))
          {
@@ -1872,7 +1879,8 @@ DjVuDocEditor::save_as(const char * where, bool bundled)
         }
         DataPool::load_file(save_doc_name);
         GP<ByteStream> gstr=ByteStream::create(save_doc_name, "wb");
-        IFFByteStream iff(gstr);
+        GP<IFFByteStream> giff=IFFByteStream::create(gstr);
+        IFFByteStream &iff=*giff;
 
         iff.put_chunk("FORM:DJVM", 1);
         iff.put_chunk("DIRM");

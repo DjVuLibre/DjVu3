@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: cjb2.cpp,v 1.9 2001-02-15 01:12:21 bcr Exp $
+// $Id: cjb2.cpp,v 1.10 2001-02-15 19:06:55 bcr Exp $
 // $Name:  $
 
 
@@ -70,7 +70,7 @@
     Paul Howard <pgh@research.att.com>\\
     Pascal Vincent <vincentp@iro.umontreal.ca>
     @version
-    $Id: cjb2.cpp,v 1.9 2001-02-15 01:12:21 bcr Exp $ */
+    $Id: cjb2.cpp,v 1.10 2001-02-15 19:06:55 bcr Exp $ */
 //@{
 //@}
 
@@ -844,7 +844,8 @@ cjb2(const char *filein, const char *fileout, const cjb2opts &opts)
   
   // Code
   GP<ByteStream> obs=ByteStream::create(fileout, "wb");
-  IFFByteStream iff(obs);
+  GP<IFFByteStream> giff=IFFByteStream::create(obs);
+  IFFByteStream &iff=*giff;
   // -- main composite chunk
   iff.put_chunk("FORM:DJVU", 1);
   // -- ``INFO'' chunk
