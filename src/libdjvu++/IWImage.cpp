@@ -9,9 +9,9 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: IWImage.cpp,v 1.14 1999-05-26 22:58:12 leonb Exp $
+//C- $Id: IWImage.cpp,v 1.15 1999-05-27 16:26:12 leonb Exp $
 
-// File "$Id: IWImage.cpp,v 1.14 1999-05-26 22:58:12 leonb Exp $"
+// File "$Id: IWImage.cpp,v 1.15 1999-05-27 16:26:12 leonb Exp $"
 // - Author: Leon Bottou, 08/1998
 
 #ifdef __GNUC__
@@ -2054,63 +2054,6 @@ IWBitmap::decode_iff(IFFByteStream &iff, int maxchunks)
 
 
 
-
-
-//////////////////////////////////////////////////////
-// COLOR CONVERSION STUFF
-//////////////////////////////////////////////////////
-
-
-static const float 
-rgb_to_ycc[3][3] = 
-{ { 0.304348F,  0.608696F,  0.086956F},      
-  { 0.463768F, -0.405797F, -0.057971F},
-  {-0.173913F, -0.347826F,  0.521739F} };
-
-static inline signed char
-RGB_to_Y(int r, int g, int b)
-{
-  int y = (int) ( rgb_to_ycc[0][0] * r +
-                  rgb_to_ycc[0][1] * g + 
-                  rgb_to_ycc[0][2] * b + 0.5 );
-  assert(y>=0 && y<256);
-  return (signed char) (y - 128);
-}
-
-static inline signed char
-RGB_to_CR(int r, int g, int b)
-{
-  int cr = (int) ( rgb_to_ycc[1][0] * r +
-                   rgb_to_ycc[1][1] * g + 
-                   rgb_to_ycc[1][2] * b + 0.5 );
-  return (signed char) max(-128, min(127, cr));
-}
-
-static inline signed char
-RGB_to_CB(int r, int g, int b)
-{
-  int cb = (int) ( rgb_to_ycc[2][0] * r +
-                   rgb_to_ycc[2][1] * g + 
-                   rgb_to_ycc[2][2] * b + 0.5 );
-  return (signed char) max(-128, min(127, cb));
-}
-
-static inline void
-YCC_to_RGB(int y, int b, int r, GPixel *p)
-{
-  int t1 = b >> 2 ; 
-  int t2 = r + (r >> 1);
-  int t3 = y + 128 - t1;
-  int tr = y + 128 + t2;
-  int tg = t3 - (t2 >> 1);
-  int tb = t3 + (b << 1);
-  p->r = max(0,min(255,tr));
-  p->g = max(0,min(255,tg));
-  p->b = max(0,min(255,tb));
-}
-
-
-
 //////////////////////////////////////////////////////
 // CLASS IWENCODERPARMS
 //////////////////////////////////////////////////////
@@ -2185,41 +2128,27 @@ IWPixmap::init(const GPixmap *pm, const GBitmap *mask, CRCBMode crcbmode)
           mskrowsize = mask->rowsize();
         }
       // Fill buffer with luminance information
-      for (i=0; i<h; i++)
+      IWTransform::RGB_to_Y((*pm)[0], w, h, pm->rowsize(), buffer, w);
+      if (crcb_delay < 0)
         {
-          signed char *bufrow = buffer + i*w;
-          const GPixel *pixrow = (*pm)[i];
-          for (int j=0; j<w; j++, pixrow++)
-            bufrow[j] = RGB_to_Y(pixrow->r, pixrow->g, pixrow->b);
-          if (crcb_delay < 0)
-            for (int j=0; j<w; j++, pixrow++)
-              bufrow[j] = 255 - bufrow[j];
+          // Stupid inversion for gray images
+          signed char *e = buffer + w*h;
+          for (signed char *b=buffer; b<e; b++)
+            *b = 255 - *b;
         }
       // Create YMAP
       ymap->create(buffer, w, msk8, mskrowsize);
       // Create chrominance maps
       if (crcb_delay >= 0)
         {
-          // Fill buffer with CB information
           cbmap = new _IWMap(w,h);
-          for (i=0; i<h; i++)
-            {
-              signed char *bufrow = buffer + i*w;
-              const GPixel *pixrow = (*pm)[i];
-              for (int j=0; j<w; j++, pixrow++)
-                bufrow[j] = RGB_to_CB(pixrow->r, pixrow->g, pixrow->b);
-            }
+          crmap = new _IWMap(w,h);
+          // Fill buffer with CB information
+          IWTransform::RGB_to_Cb((*pm)[0], w, h, pm->rowsize(), buffer, w);
           // Create chrominance map (CB) with half resolution
           cbmap->create(buffer, w, msk8, mskrowsize);
           // Fill buffer with CR information
-          crmap = new _IWMap(w,h);
-          for (i=0; i<h; i++)
-            {
-              signed char *bufrow = buffer + i*w;
-              const GPixel *pixrow = (*pm)[i];
-              for (int j=0; j<w; j++, pixrow++)
-                bufrow[j] = RGB_to_CR(pixrow->r, pixrow->g, pixrow->b);
-            }
+          IWTransform::RGB_to_Cr((*pm)[0], w, h, pm->rowsize(), buffer, w); 
           // Create chrominance map (CR) with half resolution
           crmap->create(buffer, w, msk8, mskrowsize);
           // Perform chrominance reduction (CRCBhalf)
@@ -2329,19 +2258,15 @@ IWPixmap::get_pixmap()
     crmap->image(ptr+2, rowsep, pixsep, crcb_half);
   }
   // Convert image data to RGB
-  for (int i=0; i<h; i++)
+  if (crmap && cbmap && crcb_delay >= 0)
     {
-      GPixel *pixrow = (*ppm)[i];
-      if (crmap && cbmap && crcb_delay >= 0)
+      IWTransform::YCbCr_to_RGB((*ppm)[0], w, h, ppm->rowsize());
+    }
+  else
+    {
+      for (int i=0; i<h; i++)
         {
-          for (int j=0; j<w; j++, pixrow++)
-            YCC_to_RGB(((signed char*)pixrow)[0], 
-                       ((signed char*)pixrow)[1], 
-                       ((signed char*)pixrow)[2], 
-                       pixrow );
-        }
-      else
-        {
+          GPixel *pixrow = (*ppm)[i];
           for (int j=0; j<w; j++, pixrow++)
             pixrow->b = pixrow->g = pixrow->r 
               = 127 - (int)(((signed char*)pixrow)[0]);
@@ -2373,22 +2298,18 @@ IWPixmap::get_pixmap(int subsample, const GRect &rect)
     crmap->image(subsample, rect, ptr+2, rowsep, pixsep, crcb_half);
   }
   // Convert image data to RGB
-  for (int i=0; i<h; i++)
+  if (crmap && cbmap && crcb_delay >= 0)
     {
-      GPixel *pixrow = (*ppm)[i];
-      if (crmap && cbmap && crcb_delay >= 0)
+      IWTransform::YCbCr_to_RGB((*ppm)[0], w, h, ppm->rowsize());
+    }
+  else
+    {
+      for (int i=0; i<h; i++)
         {
+          GPixel *pixrow = (*ppm)[i];
           for (int j=0; j<w; j++, pixrow++)
-            YCC_to_RGB(((signed char*)pixrow)[0], 
-                       ((signed char*)pixrow)[1], 
-                       ((signed char*)pixrow)[2], 
-                       pixrow );
-        }
-      else
-        {
-          for (int j=0; j<w; j++, pixrow++)
-          pixrow->b = pixrow->g = pixrow->r 
-            = 127 - (int)(((signed char*)pixrow)[0]);
+            pixrow->b = pixrow->g = pixrow->r 
+              = 127 - (int)(((signed char*)pixrow)[0]);
         }
     }
   // Return

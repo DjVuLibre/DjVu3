@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: IWTransform.cpp,v 1.5 1999-05-24 22:33:42 leonb Exp $
+//C- $Id: IWTransform.cpp,v 1.6 1999-05-27 16:26:12 leonb Exp $
 
 
 
@@ -801,7 +801,7 @@ filter_bh(short *p, int w, int h, int rowsize, int scale)
 
 
 //////////////////////////////////////////////////////
-// TRANSFORM ENTRY POINTS
+// WAVELET TRANSFORM 
 //////////////////////////////////////////////////////
 
 
@@ -867,5 +867,134 @@ IWTransform::backward(short *p, int w, int h, int rowsize, int begin, int end)
 }
   
 
+
+
+//////////////////////////////////////////////////////
+// COLOR TRANSFORM 
+//////////////////////////////////////////////////////
+
+
+/* Utilities */
+
+static inline int
+min (int x, int y)
+{
+  return (x <= y) ? x : y;
+}
+
+static inline int
+max (int x, int y)
+{
+  return (y <= x) ? x : y;
+}
+
+static const float 
+rgb_to_ycc[3][3] = 
+{ { 0.304348F,  0.608696F,  0.086956F },      
+  { 0.463768F, -0.405797F, -0.057971F },
+  {-0.173913F, -0.347826F,  0.521739F } };
+
+
+
+/* Converts YCbCr to RGB. */
+void 
+IWTransform::YCbCr_to_RGB(GPixel *p, int w, int h, int rowsize)
+{
+  for (int i=0; i<h; i++,p+=rowsize)
+    {
+      GPixel *q = p;
+      for (int j=0; j<w; j++,q++)
+        {
+          signed char y = ((signed char*)q)[0];
+          signed char b = ((signed char*)q)[1];
+          signed char r = ((signed char*)q)[2];
+          // This is the Pigeon transform
+          int t1 = b >> 2 ; 
+          int t2 = r + (r >> 1);
+          int t3 = y + 128 - t1;
+          int tr = y + 128 + t2;
+          int tg = t3 - (t2 >> 1);
+          int tb = t3 + (b << 1);
+          q->r = max(0,min(255,tr));
+          q->g = max(0,min(255,tg));
+          q->b = max(0,min(255,tb));
+        }
+    }
+}
+
+
+/* Extracts Y */
+void 
+IWTransform::RGB_to_Y(const GPixel *p, int w, int h, int rowsize, 
+                      signed char *out, int outrowsize)
+{
+  int rmul[256], gmul[256], bmul[256];
+  for (int k=0; k<256; k++)
+    {
+      rmul[k] = (int)(k*0x10000*rgb_to_ycc[0][0]);
+      gmul[k] = (int)(k*0x10000*rgb_to_ycc[0][1]);
+      bmul[k] = (int)(k*0x10000*rgb_to_ycc[0][2]);
+    }
+  for (int i=0; i<h; i++, p+=rowsize, out+=outrowsize)
+    {
+      const GPixel *p2 = p;
+      signed char *out2 = out;
+      for (int j=0; j<w; j++,p2++,out2++)
+        {
+          int y = rmul[p2->r] + gmul[p2->g] + bmul[p2->b] + 32768;
+          *out2 = (y>>16) - 128;
+        }
+    }
+}
+
+
+/* Extracts Cb */
+void 
+IWTransform::RGB_to_Cb(const GPixel *p, int w, int h, int rowsize, 
+                       signed char *out, int outrowsize)
+{
+  int rmul[256], gmul[256], bmul[256];
+  for (int k=0; k<256; k++)
+    {
+      rmul[k] = (int)(k*0x10000*rgb_to_ycc[2][0]);
+      gmul[k] = (int)(k*0x10000*rgb_to_ycc[2][1]);
+      bmul[k] = (int)(k*0x10000*rgb_to_ycc[2][2]);
+    }
+  for (int i=0; i<h; i++, p+=rowsize, out+=outrowsize)
+    {
+      const GPixel *p2 = p;
+      signed char *out2 = out;
+      for (int j=0; j<w; j++,p2++,out2++)
+        {
+          int c = rmul[p2->r] + gmul[p2->g] + bmul[p2->b] + 32768;
+          *out2 = max(-128, min(127, c>>16));
+        }
+    }
+}
+
+
+/* Extracts Cr */
+void 
+IWTransform::RGB_to_Cr(const GPixel *p, int w, int h, int rowsize, 
+                       signed char *out, int outrowsize)
+{
+  int rmul[256], gmul[256], bmul[256];
+  for (int k=0; k<256; k++)
+    {
+      rmul[k] = (int)((k*0x10000)*rgb_to_ycc[1][0]);
+      gmul[k] = (int)((k*0x10000)*rgb_to_ycc[1][1]);
+      bmul[k] = (int)((k*0x10000)*rgb_to_ycc[1][2]);
+    }
+  for (int i=0; i<h; i++, p+=rowsize, out+=outrowsize)
+    {
+      const GPixel *p2 = p;
+      signed char *out2 = out;
+      for (int j=0; j<w; j++,p2++,out2++)
+        {
+          int c = rmul[p2->r] + gmul[p2->g] + bmul[p2->b] + 32768;
+          *out2 = max(-128, min(127, c>>16));
+        }
+    }
+}
 
 
