@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: djvutopnm.cpp,v 1.22 1999-09-03 23:35:40 leonb Exp $
+//C- $Id: djvutopnm.cpp,v 1.23 1999-09-15 23:48:44 leonb Exp $
 
 
 /** @name djvutopnm
@@ -90,7 +90,7 @@
     Yann Le Cun <yann@research.att.com>\\
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: djvutopnm.cpp,v 1.22 1999-09-03 23:35:40 leonb Exp $# */
+    #$Id: djvutopnm.cpp,v 1.23 1999-09-15 23:48:44 leonb Exp $# */
 //@{
 //@}
 
@@ -125,11 +125,13 @@ convert(const char *from, const char *to, int page_num)
   GURL from_url=GOS::filename_to_url(from);
   GP<DjVuDocument> doc=new DjVuDocument;
   doc->init(from_url);
-
+  if (! doc->wait_for_complete_init())
+    THROW("Decoding failed. Nothing can be done.");        
+  
   // Create DjVuImage
   start=GOS::ticks();
   GP<DjVuImage> dimg=doc->get_page(page_num);
-  if (! dimg->wait_for_decoder())
+  if (! dimg->wait_for_complete_decode() )
     THROW("Decoding failed. Nothing can be done.");    
   stop=GOS::ticks();
 

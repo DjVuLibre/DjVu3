@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.h,v 1.24 1999-09-15 17:36:49 eaf Exp $
+//C- $Id: DjVuDocument.h,v 1.25 1999-09-15 23:48:43 leonb Exp $
  
 #ifndef _DJVUDOCUMENT_H
 #define _DJVUDOCUMENT_H
@@ -33,7 +33,7 @@
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocument.h,v 1.24 1999-09-15 17:36:49 eaf Exp $#
+    @version #$Id: DjVuDocument.h,v 1.25 1999-09-15 23:48:43 leonb Exp $#
 */
 
 //@{
@@ -108,13 +108,13 @@
 	     all these things are not required for single-threaded program.
 
 	     Secondly, since the program is single-threaded, the image is
-	     fully decoded before it's returned. In a multithreaded application
-	     decoding starts in a separate thread, and the pointer to the
-	     \Ref{DjVuImage} being decoded is returned immediately. This
-	     has been done to enable progressive redisplay in the DjVu
-	     plugin. Use communication mechanism provided by \Ref{DjVuPort}
-	     and \Ref{DjVuPortcaster} to learn about progress of decoding.
-	     Or try #dimg->get_djvu_file()->wait_for_finish()# to wait
+	     fully decoded before it's returned. In a multithreaded
+	     application decoding starts in a separate thread, and the pointer
+	     to the \Ref{DjVuImage} being decoded is returned
+	     immediately. This has been done to enable progressive redisplay
+	     in the DjVu plugin. Use communication mechanism provided by
+	     \Ref{DjVuPort} and \Ref{DjVuPortcaster} to learn about progress
+	     of decoding.  Or try #dimg->wait_for_complete_decode()# to wait
 	     until the decoding ends.
        \item See Also: \Ref{DjVuFile}, \Ref{DjVuImage}, \Ref{GOS}.
     \end{enumerate}
@@ -151,8 +151,7 @@
 		      documents (#OLD_BUNDLED# and #OLD_INDEXED#) only
 		\item #DOC_INIT_COMPLETE#: The initializating thread finished.
 	     \end{itemize}
-    \end{enumerate}
-*/
+    \end{enumerate} */
     
 class DjVuDocument : public DjVuPort
 {
@@ -490,13 +489,12 @@ public:
 	  described in \Ref{init}(), for multithreaded applications the
 	  initialization is carried out in parallel with the main thread.
 	  This function blocks the calling thread until the initializing
-	  thread reads enough data, receives information about the
-	  document format and exits. You can use \Ref{get_flags}() or
-	  \Ref{is_init_complete}() to check the degree of initialization.
-
-	  Please note, that all these is unnecessary for single-threaded
-	  applications. */
-   void		wait_for_complete_init(void);
+	  thread reads enough data, receives information about the document
+	  format and exits.  This function returns #true# if the
+	  initialization is successful. You can use \Ref{get_flags}() or
+	  \Ref{is_init_complete}() to check more precisely the degree of
+	  initialization. */
+   bool    	   wait_for_complete_init(void);
    
       /// Returns cache being used.
    DjVuFileCache * get_cache(void) const;
@@ -619,13 +617,14 @@ DjVuDocument::is_init_complete(void) const
    return (flags & DOC_INIT_COMPLETE)!=0;
 }
 
-inline void
+inline bool
 DjVuDocument::wait_for_complete_init(void)
 {
    flags.enter();
    while(!(flags & DOC_INIT_FAILED) &&
 	 !(flags & DOC_INIT_COMPLETE)) flags.wait();
    flags.leave();
+   return (flags & DOC_INIT_COMPLETE);
 }
 
 inline int

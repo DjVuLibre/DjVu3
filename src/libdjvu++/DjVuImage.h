@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuImage.h,v 1.18 1999-09-09 20:48:33 eaf Exp $
+//C- $Id: DjVuImage.h,v 1.19 1999-09-15 23:48:44 leonb Exp $
 
 #ifndef _DJVUIMAGE_H
 #define _DJVUIMAGE_H
@@ -51,7 +51,7 @@
     L\'eon Bottou <leonb@research.att.com> - initial implementation
     Andrei Erofeev <eaf@geocities.com> - multipage support
     @version
-    #$Id: DjVuImage.h,v 1.18 1999-09-09 20:48:33 eaf Exp $# */
+    #$Id: DjVuImage.h,v 1.19 1999-09-15 23:48:44 leonb Exp $# */
 //@{
 
 
@@ -156,7 +156,7 @@ public:
       by function \Ref{DjVuDocument::get_page} in \Ref{DjVuDocument}. 
       This function waits until the decoding thread terminates
       and returns TRUE if the image has been successfully decoded. */
-  bool wait_for_decoder(void);
+  bool wait_for_complete_decode(void);
   //@}
   
   // OLD STYLE DECODING
@@ -325,7 +325,7 @@ DjVuImage::get_djvu_file(void) const
 }
 
 inline bool
-DjVuImage::wait_for_decoder(void)
+DjVuImage::wait_for_complete_decode(void)
 {
   if (file) 
     {
