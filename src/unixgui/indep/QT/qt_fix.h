@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qt_fix.h,v 1.4 2001-09-25 18:40:15 leonb Exp $
+// $Id: qt_fix.h,v 1.5 2001-09-25 22:51:50 leonb Exp $
 // $Name:  $
 
 
@@ -170,8 +170,8 @@ private:
    int infl_w, infl_h;
    void setMinSize(void);
 public:
-   void inflateWidth(int _infl_w) { infl_w=_infl_w; }
-   void inflateHeight(int _infl_h) { infl_h=_infl_h; }
+   void inflateWidth(int _infl_w);
+   void inflateHeight(int _infl_h);
    virtual QSize sizeHint(void) const;
    QePushButton(QWidget * parent=0, const char * name=0);
    QePushButton(const QString & text, QWidget * parent=0, const char * name=0);

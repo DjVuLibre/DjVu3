@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qt_fix.cpp,v 1.5 2001-09-25 22:38:56 leonb Exp $
+// $Id: qt_fix.cpp,v 1.6 2001-09-25 22:51:50 leonb Exp $
 // $Name:  $
 
 
@@ -492,6 +492,24 @@ QePushButton::sizeHint(void) const
 {
   QSize size=QPushButton::sizeHint();
   return QSize(size.width()+2*infl_w, size.height()+2*infl_h);
+}
+
+void 
+QePushButton::inflateWidth(int _infl_w) 
+{ 
+  infl_w=_infl_w; 
+#ifndef QT1
+  updateGeometry();
+#endif
+}
+
+void 
+QePushButton::inflateHeight(int _infl_h) 
+{ 
+  infl_h=_infl_h; 
+#ifndef QT1
+  updateGeometry();
+#endif
 }
 
 QePushButton::QePushButton(QWidget * parent=0, const char * name=0) 
