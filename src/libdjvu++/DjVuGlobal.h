@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuGlobal.h,v 1.11 1999-03-17 19:24:56 leonb Exp $
+//C- $Id: DjVuGlobal.h,v 1.11.4.1 1999-04-16 20:19:43 eaf Exp $
 
 
 #ifndef _DJVUGLOBAL_H
@@ -27,14 +27,15 @@
     @memo
     Global definitions.
     @version
-    #$Id: DjVuGlobal.h,v 1.11 1999-03-17 19:24:56 leonb Exp $#
+    #$Id: DjVuGlobal.h,v 1.11.4.1 1999-04-16 20:19:43 eaf Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> -- empty file.\\
     Bill Riemers <bcr@sanskrit.lz.att.com> -- real work.  */
 //@{
 
 
-
+typedef unsigned int	u_int32;
+typedef unsigned short	u_int16;
 
 
 /** @name DjVu Memory 
