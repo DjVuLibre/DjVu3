@@ -31,7 +31,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessage.h,v 1.12 2001-03-31 01:18:11 fcrary Exp $
+// $Id: DjVuMessage.h,v 1.13 2001-04-02 22:53:24 fcrary Exp $
 // $Name:  $
 */
 
@@ -45,6 +45,7 @@
 
 #include "GString.h"
 // class DjVuParseOptions;
+
 class lt_XMLTags;
 
 class DjVuMessage
@@ -121,17 +122,17 @@ public:
 
 private:
 
-  //  Looks up the msgID in the file of messages and returns a pointer to the beginning
-  //  of the translated message, if found; and an empty string otherwise.
-  GString LookUpID( const GString & msgID ) const;
+  //  Looks up the msgID in the file of messages. The strings message_text and
+  //  message_number are returned if found. If not found, these strings are empty.
+  void LookUpID( const GString & msgID, GString &message_text, GString &message_number ) const;
 
   //  Expands a single message and inserts the arguments. Single_Message contains no
-  //  separators (newlines), but includes all the parameters.
+  //  separators (newlines), but includes all the parameters separated by tabs.
   GString LookUpSingle( const GString & Single_Message ) const;
 
   //  Insert a string into the message text. Will insert into any field description.
-  //  If the ArgId is not found, adds a line with the parameter so information will
-  //  not be lost.
+  //  Except for an ArgId of zero (message number), if the ArgId is not found, the
+  //  routine adds a line with the parameter so information will not be lost.
   void InsertArg( GString &message, int ArgId, GString arg ) const;
 };
 

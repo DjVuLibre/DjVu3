@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessage.cpp,v 1.25 2001-03-31 01:18:11 fcrary Exp $
+// $Id: DjVuMessage.cpp,v 1.26 2001-04-02 22:53:24 fcrary Exp $
 // $Name:  $
 
 
@@ -78,6 +78,7 @@ static const char DjVuMessageFileName[] = "message";
 static const char MessageFile[]="messages.xml";
 static const char namestring[]="name";
 static const char valuestring[]="value";
+static const char numberstring[]="number";
 static const char bodystring[]="BODY";
 static const char headstring[]="HEAD";
 static const char includestring[]="INCLUDE";
@@ -373,7 +374,7 @@ DjVuMessage::LookUp( const GString & MessageList ) const
 
 
 //  Expands a single message and inserts the arguments. Single_Message contains no
-//  separators (newlines), but includes all the parameters.
+//  separators (newlines), but includes all the parameters separated by tabs.
 GString
 DjVuMessage::LookUpSingle( const GString &Single_Message ) const
 {
@@ -381,18 +382,20 @@ DjVuMessage::LookUpSingle( const GString &Single_Message ) const
   int ending_posn = Single_Message.search('\t');
   if( ending_posn < 0 )
     ending_posn = Single_Message.length();
-  GString msg_text = LookUpID( Single_Message.substr(0,ending_posn) );
+  GString msg_text;
+  GString msg_number;
+  LookUpID( Single_Message.substr(0,ending_posn), msg_text, msg_number );
 
   //  Check whether we found anything
   if( !msg_text )
   {
     //  Didn't find anything, fabricate a message
-#ifndef macintosh
-    msg_text = GString("** Unrecognized DjVu Message: [Contact LizardTech for assistance]\n") + 
+#ifdef macintosh
+    msg_text = GString("** Error messages not implemented for Macintosh: [Contact LizardTech for assistance]\n") + 
                "\tMessage name:  " +
                Single_Message.substr(0,ending_posn);
 #else
-    msg_text = GString("** error messages not implemented for Macintosh: [Contact LizardTech for assistance]\n") + 
+    msg_text = GString("** Unrecognized DjVu Message: [Contact LizardTech for assistance]\n") + 
                "\tMessage name:  " +
                Single_Message.substr(0,ending_posn);
 #endif
@@ -402,7 +405,7 @@ DjVuMessage::LookUpSingle( const GString &Single_Message ) const
 #ifndef NO_DEBUG
   else
   {
-    msg_text = "*!* " + msg_text + " *!*";    // temporary debug
+    msg_text = "*!* " + msg_text + " *!*";    // temporary debug to show the message was translated
   }
 #endif
     
@@ -418,6 +421,10 @@ DjVuMessage::LookUpSingle( const GString &Single_Message ) const
                ++param_num,
                Single_Message.substr(start_posn, ending_posn-start_posn) );
   }
+  //  Insert the message number
+    InsertArg( msg_text,
+               0,
+               msg_number );
 
   return msg_text;
 }
@@ -425,11 +432,11 @@ DjVuMessage::LookUpSingle( const GString &Single_Message ) const
 
 //  Looks up the msgID in the file of messages and returns a pointer to the beginning
 //  of the translated message, if found; and an empty string otherwise.
-GString
-DjVuMessage::LookUpID( const GString &msgID ) const
+void
+DjVuMessage::LookUpID( const GString &msgID,
+                       GString &message_text,
+                       GString &message_number ) const
 {
-  GString result;
-
   if(!Map.isempty())
   {
     GPosition pos=Map.contains(msgID);
@@ -439,7 +446,12 @@ DjVuMessage::LookUpID( const GString &msgID ) const
       GPosition valuepos=tag->args.contains(valuestring);
       if(valuepos)
       {
-        result=tag->args[valuepos];
+        message_text=tag->args[valuepos];
+      }
+      GPosition numberpos=tag->args.contains(numberstring);
+      if(valuepos)
+      {
+        message_number=tag->args[numberpos];
       }
     }
   }
@@ -489,13 +501,12 @@ DjVuMessage::LookUpID( const GString &msgID ) const
   else
     result.empty();  // Message text file not open
 #endif
-  return result;
 }
 
 
 //  Insert a string into the message text. Will insert into any field description.
-//  If the ArgId is not found, adds a line with the parameter so information will
-//  not be lost.
+//  Except for an ArgId of zero (message number), if the ArgId is not found, the
+//  routine adds a line with the parameter so information will not be lost.
 void
 DjVuMessage::InsertArg( GString &message, int ArgId, GString arg ) const
 {
@@ -514,7 +525,8 @@ DjVuMessage::InsertArg( GString &message, int ArgId, GString arg ) const
   else
   {
     //  Not found, fake it
-    message += GString("\n\tParameter ") + GString(ArgId) + ":  " + arg;
+    if( ArgId != 0 )
+      message += GString("\n\tParameter ") + GString(ArgId) + ":  " + arg;
   }
 }
 
