@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: GBitmap.cpp,v 1.40 2000-12-24 23:59:48 praveen Exp $
+// $Id: GBitmap.cpp,v 1.41 2001-01-03 20:03:56 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -46,13 +46,21 @@
 #include "GException.h"
 #include <string.h>
 
-// File "$Id: GBitmap.cpp,v 1.40 2000-12-24 23:59:48 praveen Exp $"
+// File "$Id: GBitmap.cpp,v 1.41 2001-01-03 20:03:56 bcr Exp $"
 // - Author: Leon Bottou, 05/1997
 
 
 // ----- constructor and destructor
 
 GBitmap::~GBitmap()
+{
+  delete [] bytes_data;
+  delete [] rle;
+  delete [] rlerows;
+}
+
+void
+GBitmap::destroy(void)
 {
   delete [] bytes_data;
   delete [] rle;
@@ -76,7 +84,16 @@ GBitmap::GBitmap(int nrows, int ncolumns, int border)
     rle(0), rlerows(0), rlelength(0),
     monitorptr(0)
 {
-  init(nrows, ncolumns, border);
+  G_TRY
+  { 
+    init(nrows, ncolumns, border);
+  }
+  G_CATCH_ALL
+  {
+    destroy();
+    G_RETHROW;
+  }
+  G_ENDCATCH;
 }
 
 GBitmap::GBitmap(ByteStream &ref, int border)
@@ -85,7 +102,16 @@ GBitmap::GBitmap(ByteStream &ref, int border)
     rle(0), rlerows(0), rlelength(0),
     monitorptr(0)
 {
-  init(ref, border);
+  G_TRY
+  { 
+    init(ref, border);
+  }
+  G_CATCH_ALL
+  {
+    destroy();
+    G_RETHROW;
+  }
+  G_ENDCATCH;
 }
 
 GBitmap::GBitmap(const GBitmap &ref)
@@ -94,7 +120,16 @@ GBitmap::GBitmap(const GBitmap &ref)
     rle(0), rlerows(0), rlelength(0),
     monitorptr(0)
 {
-  init(ref, ref.border);
+  G_TRY
+  { 
+    init(ref, ref.border);
+  }
+  G_CATCH_ALL
+  {
+    destroy();
+    G_RETHROW;
+  }
+  G_ENDCATCH;
 }
 
 GBitmap::GBitmap(const GBitmap &ref, int border)
@@ -103,7 +138,16 @@ GBitmap::GBitmap(const GBitmap &ref, int border)
     rle(0), rlerows(0), rlelength(0),
     monitorptr(0)
 {
-  init(ref, border);
+  G_TRY
+  { 
+    init(ref, border);
+  }
+  G_CATCH_ALL
+  {
+    destroy();
+    G_RETHROW;
+  }
+  G_ENDCATCH;
 }
 
 
@@ -113,7 +157,16 @@ GBitmap::GBitmap(const GBitmap &ref, const GRect &rect, int border)
     rle(0), rlerows(0), rlelength(0),
     monitorptr(0)
 {
-  init(ref, rect, border);
+  G_TRY
+  { 
+    init(ref, rect, border);
+  }
+  G_CATCH_ALL
+  {
+    destroy();
+    G_RETHROW;
+  }
+  G_ENDCATCH;
 }
 
 
@@ -127,11 +180,7 @@ void
 GBitmap::init(int arows, int acolumns, int aborder)
 {
   GMonitorLock lock(monitor());
-  delete [] bytes_data;
-  delete [] rle;
-  delete [] rlerows;
-  bytes = bytes_data = rle = 0;
-  rlerows = 0;
+  destroy();
   grays = 2;
   nrows = arows;
   ncolumns = acolumns;
@@ -263,11 +312,7 @@ GBitmap::init(ByteStream &ref, int aborder)
 void
 GBitmap::donate_data(unsigned char *data, int w, int h)
 {
-  delete [] bytes_data;
-  delete [] rle;
-  delete [] rlerows;
-  rle = 0;
-  rlerows = 0;
+  destroy();
   grays = 2;
   nrows = h;
   ncolumns = w;
@@ -280,10 +325,7 @@ GBitmap::donate_data(unsigned char *data, int w, int h)
 void
 GBitmap::donate_rle(unsigned char *rledata, unsigned int rledatalen, int w, int h)
 {
-  delete [] bytes_data;
-  delete [] rle;
-  delete [] rlerows;
-  bytes = bytes_data = 0;
+  destroy();
   rlerows = 0;
   grays = 2;
   nrows = h;
@@ -303,15 +345,6 @@ GBitmap::take_data(size_t &offset)
   if (ret) offset = (size_t)border;
   bytes_data=0;
   return ret;
-}
-
-const unsigned char *
-GBitmap::get_rle(unsigned int &rle_length)
-{
-  if(!rle)
-    compress();
-  rle_length=rlelength;
-  return rle; 
 }
 
 // ----- compression
@@ -951,7 +984,7 @@ GBitmap::makerows(int nrows, int ncolumns, unsigned char *runs)
       rlerows[r] = runs;
       int c;
       for(c=0;c<ncolumns;c+=GBitmap::read_run(runs))
-      	continue;
+      	EMPTY_LOOP;
       if (c > ncolumns)
         G_THROW("GBitmap.lost_sync2");
     }
@@ -1294,12 +1327,12 @@ GBitmap::append_line(unsigned char *&data,const unsigned char *row,
         {
           if(*row)
             for(++count,++row;(row<rowend)&&*row;++count,++row)
-            	continue;
+            	EMPTY_LOOP;
         } 
       else if(!*row)
         {
           for(++count,++row;(row<rowend)&&!*row;++count,++row)
-          	continue;
+          	EMPTY_LOOP;
         }
       append_run(data,count);
     }
@@ -1328,3 +1361,4 @@ GBitmap::check_border() const
     }
 }
 #endif
+

@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: DjVuDocEditor.cpp,v 1.51 2000-12-22 22:49:31 fcrary Exp $
+// $Id: DjVuDocEditor.cpp,v 1.52 2001-01-03 19:56:07 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -142,7 +142,8 @@ DjVuDocEditor::init(const char * fname)
    DEBUG_MAKE_INDENT(3);
 
       // If you remove this check be sure to delete thumb_map
-   if (initialized) G_THROW("DjVuDocEditor.init");
+   if (initialized)
+     G_THROW("DjVuDocEditor.init");
 
       // First - create a temporary DjVuDocument and check its type
    doc_pool=new DataPool(fname);
@@ -831,7 +832,8 @@ DjVuDocEditor::remove_file(const char * id, bool remove_unref,
          GP<DjVuFile> parent=get_djvu_file(parent_id);
          if (parent) parent->unlink_file(id);
       }
-      delete parents; parents=0;
+      delete parents;
+      parents=0;
       ref_map.del(id);
    }
 

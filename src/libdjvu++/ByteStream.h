@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: ByteStream.h,v 1.29 2000-12-18 17:13:40 bcr Exp $
+// $Id: ByteStream.h,v 1.30 2001-01-03 19:56:07 bcr Exp $
 // $Name:  $
 
 #ifndef _BYTESTREAM_H
@@ -63,7 +63,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation\\
     Andrei Erofeev <eaf@geocities.com> -- 
     @version
-    #$Id: ByteStream.h,v 1.29 2000-12-18 17:13:40 bcr Exp $# */
+    #$Id: ByteStream.h,v 1.30 2001-01-03 19:56:07 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -74,7 +74,6 @@
 #include <stdio.h>
 //include <stdlib.h>
 //include <string.h>
-
 
 /** Abstract class for a stream of bytes.  Class #ByteStream# represent an
     object from which (resp. to which) bytes can be read (resp. written) as
@@ -251,7 +250,6 @@ ByteStream::size(void) const
   return bsize;
 }
 
-
 /** ByteStream interface for stdio files. 
     The virtual member functions #read#, #write#, #tell# and #seek# are mapped
     to the well known stdio functions #fread#, #fwrite#, #ftell# and #fseek#.
@@ -352,6 +350,8 @@ protected:
   int nblocks;
   /** Pointers (possibly null) to 4096 bytes blocks. */
   char **blocks;
+  /** Pointers (possibly null) to 4096 bytes blocks. */
+  GPBuffer<char *> gblocks;
 };
 
 
