@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GThreads.cpp,v 1.65 2001-10-16 18:01:44 docbill Exp $
+// $Id: GThreads.cpp,v 1.66 2001-10-16 22:27:24 docbill Exp $
 // $Name:  $
 
 
@@ -1071,7 +1071,7 @@ GThread::cotask::cotask(const int xstacksize)
   ,ehctx(xehctx)
 #endif
 {
-  memset(regs,0,sizeof(regs));
+  memset(&regs,0,sizeof(regs));
 }
 
 static GThread::cotask *maintask = 0;
@@ -1086,10 +1086,10 @@ GThread::cotask::~cotask()
 {
   gstack.resize(0);
 #ifndef NO_LIBGCC_HOOKS
-  if (task->ehctx)
-    free(task->ehctx);
+  if (ehctx)
+    free(ehctx);
+  ehctx = 0;
 #endif
-  task->ehctx = 0;
 }
 
 static void 

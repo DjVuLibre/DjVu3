@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: c44.cpp,v 1.41 2001-10-16 18:01:42 docbill Exp $
+// $Id: c44.cpp,v 1.42 2001-10-16 22:27:23 docbill Exp $
 // $Name:  $
 
 
@@ -48,8 +48,7 @@
     image using the DjVu IW44 wavelets.  This is the preferred mode for
     creating a DjVu image which does not require separate layers for encoding
     the text and the background images.  The files created by #c44# are
-    recognized by both the IW44 decoder (see program \Ref{d44}) and by the
-    DjVu decoder (see program \Ref{ddjvu}).
+    legal Photo DjVu files recognized by the DjVu decoder (see program \Ref{ddjvu}).
 
     {\bf Arguments} ---
     Argument #pnmfile# or #jpegfile# is the name of the input file.  PGM files
@@ -152,12 +151,9 @@
     \URL{http://www.research.att.com/~leonb/DJVU/mask}).
     \end{description}
 
-    {\bf Generating Photo DjVu instead of IW44} ---
-    Photo DjVu images have thje additional capability to store the resolution
-    and gamma correction information.  Using any of the following options will
-    generate a Photo DjVu Image instead of a IW44 file.  Program \Ref{d44}
-    does not work on these files.  Program \Ref{ddjvu} handles both IW44 and
-    DjVu files.
+    {\bf Photo DjVu options} ---
+    Photo DjVu images have the additional capability to store the resolution
+    and gamma correction information.
     \begin{description}
     \item[-dpi n]  Sets the resolution information for a Photo DjVu image.
     \item[-gamma n] Sets the gamma correction information for a Photo DjVu image.
@@ -185,7 +181,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: c44.cpp,v 1.41 2001-10-16 18:01:42 docbill Exp $# */
+    #$Id: c44.cpp,v 1.42 2001-10-16 22:27:23 docbill Exp $# */
 //@{
 //@}
 
@@ -282,9 +278,7 @@ usage()
          "    -crcbdelay n  -- select chrominance coding delay (default 10)\n"
          "                     for -crcbnormal and -crcbhalf modes\n"
          "\n"
-         "You can generate a Photo DjVu image instead of a IW44 image\n"
-         "by using any of the following options.  These files must be decoded\n"
-         "using program DDJVU rather than D44\n"
+         "Advanced Photo DjVu options:\n"
          "    -dpi n        -- sets the image resolution\n"
          "    -gamma n      -- sets the image gamma correction\n"
          "\n");
@@ -689,7 +683,8 @@ main(int argc, char **argv)
         {
           parse_size(percent,gibs->size());
         }
-      else if(prefix[0]!='P' &&prefix[0]!='A' && prefix[0]!='F' && !flag_mask && !flag_bpp && !flag_size && !flag_slice && !flag_decibel)
+      else if(prefix[0]!='P' &&prefix[0]!='A' && prefix[0]!='F' && 
+              !flag_mask && !flag_bpp && !flag_size && !flag_slice && !flag_decibel)
         {
           parse_size("10,20,30,50",gibs->size());
         }

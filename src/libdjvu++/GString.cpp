@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.135 2001-10-16 18:01:44 docbill Exp $
+// $Id: GString.cpp,v 1.136 2001-10-16 22:27:24 docbill Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -1524,10 +1524,16 @@ GStringRep::setat(int n, char ch) const
 
 #ifdef WIN32
 #define USE_VSNPRINTF _vsnprintf
-#else
-#ifdef linux
-#define USE_VSNPRINTF vsnprintf
 #endif
+
+#ifdef AUTOCONF
+# ifdef HAVE_VSNPRINTF
+#  define USE_VSNPRINTF vsnprintf
+# endif
+#else
+# ifdef linux
+#  define USE_VSNPRINTF vsnprintf
+# endif
 #endif
 
 GUTF8String &

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ddjvu.cpp,v 1.32 2001-10-16 18:01:43 docbill Exp $
+// $Id: ddjvu.cpp,v 1.33 2001-10-16 22:27:24 docbill Exp $
 // $Name:  $
 
 /** @name ddjvu
@@ -111,7 +111,7 @@
     Yann Le Cun <yann@research.att.com>\\
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: ddjvu.cpp,v 1.32 2001-10-16 18:01:43 docbill Exp $# */
+    #$Id: ddjvu.cpp,v 1.33 2001-10-16 22:27:24 docbill Exp $# */
 //@{
 //@}
 
@@ -169,7 +169,7 @@ convert(const GURL &from, const GURL &to, int page_num)
   // Verbose
   if (flag_verbose)
     {
-      DjVuPrintErrorUTF8( "%s",(const char*)dimg->get_long_description() );
+      DjVuFormatErrorUTF8( "%s",(const char*)dimg->get_long_description() );
       DjVuFormatErrorUTF8( "%s\t%lu", ERR_MSG("ddjvu.decode"), stop - start);
     }
 
@@ -237,7 +237,7 @@ convert(const GURL &from, const GURL &to, int page_num)
   stop = GOS::ticks();
   if (flag_verbose)
     {
-      DjVuFormatErrorUTF8( "%d\t%lu", ERR_MSG("ddjvu.render"), stop - start);
+      DjVuFormatErrorUTF8( "%s\t%lu", ERR_MSG("ddjvu.render"), stop - start);
     }
 
   // Save image

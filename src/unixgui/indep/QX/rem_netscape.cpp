@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: rem_netscape.cpp,v 1.4 2001-10-16 18:01:45 docbill Exp $
+// $Id: rem_netscape.cpp,v 1.5 2001-10-16 22:27:24 docbill Exp $
 // $Name:  $
 
 
@@ -52,10 +52,11 @@
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 
+#ifndef MAXHOSTNAMELEN
+#define MAXHOSTNAMELEN 128
 #ifdef sun
-// For the sake of MAXHOSTNAMELEN
-#include <netdb.h>
 extern "C" int gethostname(char *, int);
+#endif
 #endif
 
 #define MOZILLA_VERSION_PROP	"_MOZILLA_VERSION"
@@ -127,7 +128,8 @@ void RemoteNetscape::ObtainLock(void)
    DEBUG_MAKE_INDENT(3);
    
    if (!displ || !ref_window)
-      throw ERROR_MESSAGE("RemoteNetscape::ObtainLock", "Display has not been intialized yet.");
+      throw ERROR_MESSAGE("RemoteNetscape::ObtainLock", 
+                          "Display has not been intialized yet.");
 
    Display * displ=(Display *) RemoteNetscape::displ;
    
@@ -138,8 +140,11 @@ void RemoteNetscape::ObtainLock(void)
    
    char lock_data[MAXHOSTNAMELEN+128];
    sprintf(lock_data, "Locked by pid%d@", (int) getpid());
-   if (gethostname(lock_data+strlen(lock_data), MAXHOSTNAMELEN)<0)
-      ThrowError("RemoteNetscape::ObtainLock", "Failed to query local host name");
+   char *hostname = lock_data+strlen(lock_data); 
+#if defined(HAVE_GETHOSTNAME) || !defined(AUTOCONF)
+   if (gethostname(hostname, MAXHOSTNAMELEN) < 0)
+#endif
+     strcpy(hostname,"unknownhost");
    
    XSelectInput(displ, GetTopWindow(), PropertyChangeMask);
    
@@ -201,7 +206,8 @@ void RemoteNetscape::ReleaseLock(void)
    DEBUG_MAKE_INDENT(3);
    
    if (!displ || !ref_window)
-      throw ERROR_MESSAGE("RemoteNetscape::ReleaseLock", "Display has not been intialized yet.");
+      throw ERROR_MESSAGE("RemoteNetscape::ReleaseLock", 
+                          "Display has not been intialized yet.");
 
    Display * displ=(Display *) RemoteNetscape::displ;
    

@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qlib.cpp,v 1.6 2001-10-16 18:01:45 docbill Exp $
+// $Id: qlib.cpp,v 1.7 2001-10-16 22:27:24 docbill Exp $
 // $Name:  $
 
 
@@ -83,7 +83,7 @@
 //******************************** QeExcMessage ******************************
 //****************************************************************************
 
-static GNativeString 
+static GUTF8String 
 getExcMsg(const char *exc_cause)
 {
    GUTF8String exc_tag;
@@ -109,7 +109,7 @@ getExcMsg(const char *exc_cause)
       exc_tag="DjVuMessage.Unrecognized";
    }
 
-   GNativeString exc_msg=DjVuMessage::LookUpNative(exc_tag);
+   GNativeString exc_msg=DjVuMessage::LookUpUTF8(exc_tag);
 
    if ( exc_sep )
       exc_msg += GNativeString(exc_cause+exc_tag_len);

@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qd_base_events.cpp,v 1.24 2001-10-16 18:01:45 docbill Exp $
+// $Id: qd_base_events.cpp,v 1.25 2001-10-16 22:27:24 docbill Exp $
 // $Name:  $
 
 
@@ -468,6 +468,8 @@ QDBase::eventFilter(QObject *obj, QEvent *e)
 	    case Event_Enter:
 	       showToolBar();
 	       break;
+            default:
+               break;
 	 }
       } else if (obj==main_widget)
       {
@@ -481,6 +483,9 @@ QDBase::eventFilter(QObject *obj, QEvent *e)
 	       if (isToolBarEnabled() && isToolBarStuck() && toolbar->isVisible())
 		  if (toolbar->isVisible()) layout(true);
 	       break;
+
+            default:
+               break;
 	 }
       } else if (obj==pane)
       {
@@ -591,7 +596,7 @@ QDBase::eventFilter(QObject *obj, QEvent *e)
 			      int dx = (zoom_rect.xmax+zoom_rect.xmin-rectVisible.xmax-rectVisible.xmin)/2;
 			      int dy = (zoom_rect.ymax+zoom_rect.ymin-rectVisible.ymax-rectVisible.ymin)/2;
 			      float zf = new_zoom_factor/float(cur_zoom_factor);
-			      dx *= zf; dy *= zf;
+			      dx = (int)(dx*zf); dy = (int)(dy*zf);
 			      scroll(dx,dy);
 			   } else
 			   {

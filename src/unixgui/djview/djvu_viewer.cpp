@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: djvu_viewer.cpp,v 1.6 2001-10-16 18:01:44 docbill Exp $
+// $Id: djvu_viewer.cpp,v 1.7 2001-10-16 22:27:24 docbill Exp $
 // $Name:  $
 
 
@@ -47,6 +47,7 @@
 #include "GURL.h"
 #include "ByteStream.h"
 #include "DataPool.h"
+#include "DjVuMessage.h"
 #include "qlib.h"
 #include "djvu_file_cache.h"
 
@@ -178,8 +179,8 @@ DjVuViewer::slotShowError(const GUTF8String &title, const GUTF8String &msg)
       emit sigShowStatus(mesg);
    }else if (GException::cmp_cause(msg, DataPool::Stop))
    {
-      QString qtitle(title);
-      QString qmsg(msg);
+      QString qtitle = QStringFromGString(title);
+      QString qmsg = QStringFromGString(DjVuMessage::LookUpUTF8(msg));
       ::showError(viewer, qtitle, qmsg);
    }
 }

@@ -30,21 +30,23 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.cpp,v 1.95 2001-10-16 18:01:43 docbill Exp $
+// $Id: ByteStream.cpp,v 1.96 2001-10-16 22:27:24 docbill Exp $
 // $Name:  $
 
-// - Author: Leon Bottou, 04/1997
-
+#include "ByteStream.h"
 #ifdef __GNUC__
 #pragma implementation
 #endif
-#include "ByteStream.h"
+// - Author: Leon Bottou, 04/1997
+
 #include "GOS.h"
 #include "GURL.h"
 #include "DjVuMessage.h"
 
 #ifdef UNIX
+#ifndef HAS_MEMMAP
 #define HAS_MEMMAP 1
+#endif
 #endif
 
 #ifdef UNIX
@@ -52,7 +54,9 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
+#ifdef HAS_MEMMAP
 #include <sys/mman.h>
+#endif
 #else
 #ifdef macintosh
 #include <unistd.h>
@@ -713,7 +717,8 @@ ByteStream::Stdio::init(const GURL &url, const char mode[])
       const size_t fpath_length=1+utf8Filename.length()-utf8Basename.length();
       GPBuffer<char> gfpath(fpath,fpath_length);
       gfpath.clear();
-      strncpy(fpath,(char*)(const char*)utf8Filename, utf8Filename.length() - utf8Basename.length());
+      strncpy(fpath,(char*)(const char*)utf8Filename, 
+              utf8Filename.length() - utf8Basename.length());
       nativeFilename = GUTF8String(fpath).getUTF82Native();
       nativeFilename+=nativeBasename;
       fp = fopen((char*)(const char *)nativeFilename, mode);

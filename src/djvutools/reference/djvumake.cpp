@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //
-// $Id: djvumake.cpp,v 1.31 2001-10-16 18:01:43 docbill Exp $
+// $Id: djvumake.cpp,v 1.32 2001-10-16 22:27:24 docbill Exp $
 // $Name:  $
 
 /** @name djvumake
@@ -102,7 +102,7 @@
     @memo
     Assemble DjVu files.
     @version
-    #$Id: djvumake.cpp,v 1.31 2001-10-16 18:01:43 docbill Exp $#
+    #$Id: djvumake.cpp,v 1.32 2001-10-16 22:27:24 docbill Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> \\
     Patrick Haffner <haffner@research.att.com>
@@ -680,6 +680,7 @@ main(int argc, char **argv)
               flag_contains_bg = 1;
             }
           else if (!dargv[i].cmp("FGjp=",5) ||
+                   !dargv[i].cmp("FGbz=",5) ||
                    !dargv[i].cmp("FG2k=",5)  )
             {
               if (flag_contains_fg)

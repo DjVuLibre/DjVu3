@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //
-// $Id: djvused.cpp,v 1.9 2001-10-16 18:01:43 docbill Exp $
+// $Id: djvused.cpp,v 1.10 2001-10-16 22:27:24 docbill Exp $
 // $Name:  $
 
 #include <stdio.h>
@@ -139,13 +139,13 @@ ParsingByteStream::read(void *buf, size_t size)
 size_t 
 ParsingByteStream::write(const void *, size_t )
 {
-  G_THROW(ERR_MSG("Cannot write() into a ParsingByteStream"));
+  G_THROW("Cannot write() into a ParsingByteStream");
 }
 
 long int
 ParsingByteStream::tell() const
 { 
-  G_THROW(ERR_MSG("Cannot tell() a ParsingByteStream"));
+  G_THROW("Cannot tell() a ParsingByteStream");
 }
 
 inline int 
@@ -555,7 +555,7 @@ command_create_shared_ant(ParsingByteStream &)
       vprint("create-shared-ant: creating shared annotation file");
       doc->create_shared_anno_file();
       f = doc->get_shared_anno_file();
-      if (!f) G_THROW(ERR_MSG("internal error"));
+      if (!f) G_THROW("internal error");
     }
   file = f;
   fileid = "<shared_ant>";
