@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.57 2001-04-16 15:15:29 chrisp Exp $
+// $Id: GString.cpp,v 1.58 2001-04-16 17:55:04 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -710,55 +710,45 @@ GString::operator+= (const GString &str2)
 bool
 GString::is_int(void) const
 {
-//     const char * buf=*this;
-//     char * ptr;
-//     strtol(buf, &ptr, 10);
-
-//     while(*ptr && isspace(*ptr)) ptr++;
-//     return *ptr==0;
-
-   bool err;
+   bool isLong;
    GString endptr;
-   toLong(endptr, 10, err);
+   toLong(endptr, isLong, 10);
 
    // if an error occurred we cannot be sure that the value
    // was indeed a number...
-   if (err) return false;  
+   if (isLong)
+   {
+     // count blanks;
+     int i=0;
+     for (i=0; i < (int)endptr.length() && isspace(endptr[i]); ++i);
 
-   // count blanks;
-   int i=0;
-   for (i=0; i < (int)endptr.length() && isspace(endptr[i]); ++i);
-
-   // if the length of the endptr is 0 the whole string
-   // was a number so return true.
-   return  (i == (int)endptr.length());
-
+     // if the length of the endptr is 0 the whole string
+     // was a number so return true.
+     isLong=(i == (int)endptr.length());
+   }
+   return isLong;
 }
 
 bool
 GString::is_float(void) const
 {
-//     const char * buf=*this;
-//     char * ptr;
-//     strtod(buf, &ptr);
-//     while(*ptr && isspace(*ptr)) ptr++;
-//     return *ptr==0;
-
-   bool err;
+   bool isDouble;
    GString endptr;
-   toDouble(endptr, err);
+   toDouble(endptr, isDouble);
 
    // if an error occured we cannot be sure that the 
    // value was indeed a number...
-   if (err) return false;
-
-   // count blanks;
-   int i=0;
-   for (i=0; i < (int)endptr.length() && isspace(endptr[i]); ++i);
+   if (isDouble)
+   {
+     // count blanks;
+     int i=0;
+     for (i=0; i < (int)endptr.length() && isspace(endptr[i]); ++i);
    
-   // if i equals the length of the endptr the string is
-   // a number;
-   return (i == (int)endptr.length());
+     // if i equals the length of the endptr the string is
+     // a number;
+     isDouble=(i == (int)endptr.length());
+   }
+   return isDouble;
 }
 
 unsigned int 
@@ -1117,96 +1107,6 @@ GString::getNative2UTF8(const char *fromcode) const
   return retval;
 } /*MBCS*/
 
-/* The following block of code was added by CHRISP */
-long int
-GNativeString::toLong(GNativeString& endptr, int base, bool& ptrnull) const
-{
-
-   long int retval=0;
-   if(ptr)
-      retval = (*this)->toLong(endptr, base);
-   return retval;
-}
-
-long int
-GUTF8String::toLong(GUTF8String& endptr, int base, bool& ptrnull) const
-{
-   GNativeString err( endptr.getUTF82Native() );
-   const GNativeString tmp( getUTF82Native() );
-   long int retval = tmp.toLong( err, base, ptrnull );
-   endptr = err.getNative2UTF8();
-   return retval;
-}
-
-long int
-GString::toLong(GString& endptr, int base, bool& ptrnull) const
-{
-   GNativeString err( endptr.getUTF82Native() );
-   const GNativeString tmp( getUTF82Native() );
-   long int retval = tmp.toLong( err, base, ptrnull );
-   endptr = err.getNative2UTF8();
-   return retval;
-}
-
-unsigned long int
-GNativeString::toULong( GNativeString& endptr, int base, bool& nullptr) const
-{
-   long int retval = 0;
-   if(ptr)
-      retval = (*this)->toULong(endptr, base);
-   return retval; 
-}
-
-unsigned long int
-GUTF8String::toULong( GUTF8String& endptr, int base, bool& nullptr) const
-{
-   GNativeString err( endptr.getUTF82Native() );
-   const GNativeString tmp( getUTF82Native() );
-   unsigned long int retval = tmp.toULong( err, base, nullptr );
-   endptr = err.getNative2UTF8();
-   return retval;
-}
-
-unsigned long int
-GString::toULong( GString& endptr, int base, bool& nullptr) const
-{
-   GNativeString err( endptr.getUTF82Native() );
-   const GNativeString tmp(getUTF82Native());
-   unsigned long int retval = tmp.toULong( err, base, nullptr );
-   endptr = err.getNative2UTF8();
-   return retval;
-}
-
-double
-GNativeString::toDouble( GNativeString& endptr, bool& ptrnull) const
-{
-   double retval = 0;
-   if (ptr)
-      retval = (*this)->toDouble(endptr);
-   return retval;
-}
-
-double
-GUTF8String::toDouble( GUTF8String& endptr, bool& ptrnull ) const
-{
-   GNativeString err(endptr.getUTF82Native());
-   const GNativeString tmp(getUTF82Native());
-   double retval = tmp.toDouble(err, ptrnull);
-   endptr = err.getNative2UTF8();
-   return retval;
-}
-
-double
-GString::toDouble( GString& endptr, bool& ptrnull ) const
-{
-   GNativeString err(endptr.getUTF82Native());
-   const GNativeString tmp(getUTF82Native());
-   double retval = tmp.toDouble(err, ptrnull);
-   endptr = err.getNative2UTF8();
-   return retval;
-}
-/* end code block by CHRISP */
-
 static inline unsigned long
 add_char(unsigned long const U, unsigned char const * const r)
 {
@@ -1502,80 +1402,162 @@ GStringRep::Native::cmp(const GP<GStringRep> &s2) const
   }
   return retval;
 }
- 
+
 int
 GStringRep::Native::toInt() const
 {
-   if (this)
-   {
-      if (isNative())
-         return atoi(data);
-      else
-      {
-         GP<GStringRep> r= this->toNative();
-         if (r)
-         {
-            return atoi(r->data);
-         }
-      } 
-   }
-
-   return 0;
+  return atoi(data);
 }
 
-long int
-GStringRep::Native::toLong( GP<GStringRep>& eptr, int base ) const
+long 
+GStringRep::toLong( GP<GStringRep>& eptr, bool &isLong, const int base) const
 {
-   long int retval=0;
-   if (this)
+  char *edata=0;
+  const GString clocale=setlocale(LC_CTYPE,0);
+  const GString nlocale=setlocale(LC_NUMERIC,0);
+  setlocale(LC_CTYPE,"C");
+  setlocale(LC_NUMERIC,"C");
+  long retval=strtol(data, &edata, base);
+  setlocale(LC_CTYPE,(const char *)clocale);
+  setlocale(LC_NUMERIC,(const char *)nlocale);
+  if(edata)
+  {
+    eptr=GStringRep::create(data);
+    isLong=true;
+  }else
+  {
+    GP<GStringRep> ptr=toNative();
+    if(ptr)
+    {
+      retval=ptr->toLong(eptr,isLong,base);
+      if(isLong)
+      {
+        eptr=eptr->toUTF8();
+      }
+    }else
+    {
+      eptr=0;
+    }
+  }
+  return retval;
+}
+
+long
+GStringRep::Native::toLong(
+  GP<GStringRep>& eptr, bool &isLong, const int base ) const
+{
+   char *edata=0;
+   const long retval=strtol(data, &edata, base);
+   if(edata)
    {
-      if (isNative())
-      {
-         retval = strtol(data, &(eptr->data), base);
-      }
-      else
-      {
-         GP<GStringRep> r = this->toNative();
-         retval = strtol(r->data,  &(eptr->data), base);
-      }
+     eptr=GStringRep::Native::create(edata);
+     isLong=true;
+   }else
+   {
+     eptr=0;
+     isLong=false;
    }
    return retval;
 }
 
-unsigned long int
-GStringRep::Native::toULong( GP<GStringRep>& eptr, int base ) const
+unsigned long 
+GStringRep::toULong( GP<GStringRep>& eptr, bool &isULong, const int base) const
 {
-   unsigned long int retval=0;
-   if (this)
-   {
-      if (isNative())
+  char *edata=0;
+  const GString clocale=setlocale(LC_CTYPE,0);
+  const GString nlocale=setlocale(LC_NUMERIC,0);
+  setlocale(LC_CTYPE,"C");
+  setlocale(LC_NUMERIC,"C");
+  unsigned long retval=strtoul(data, &edata, base);
+  setlocale(LC_CTYPE,(const char *)clocale);
+  setlocale(LC_NUMERIC,(const char *)nlocale);
+  if(edata)
+  {
+    eptr=GStringRep::create(edata);
+    isULong=true;
+  }else
+  {
+    GP<GStringRep> ptr=toNative();
+    if(ptr)
+    {
+      retval=ptr->toULong(eptr,isULong,base);
+      if(isULong)
       {
-         retval = strtoul(data, &(eptr->data), base);
+        eptr=eptr->toUTF8();
       }
-      else
-      {
-         GP<GStringRep> r = this->toNative();
-         retval = strtoul(r->data,  &(eptr->data), base);
-      }
-   }
-   return retval;
+    }else
+    {
+      eptr=0;
+    }
+  }
+  return retval;
+}
+
+unsigned long
+GStringRep::Native::toULong(
+  GP<GStringRep>& eptr, bool &isULong, const int base ) const
+{
+  char *edata=0;
+  const unsigned long retval=strtoul(data, &edata, base);
+  if(edata)
+  {
+    eptr=GStringRep::Native::create(edata);
+    isULong=true;
+  }else
+  {
+    eptr=0;
+    isULong=false;
+  }
+  return retval;
 }
 
 double
-GStringRep::Native::toDouble( GP<GStringRep>& eptr ) const
+GStringRep::toDouble( GP<GStringRep>& eptr, bool &isDouble) const
 {
-   double retval=0;
-   if (this)
+  char *edata=0;
+  const GString clocale=setlocale(LC_CTYPE,0);
+  const GString nlocale=setlocale(LC_NUMERIC,0);
+  setlocale(LC_CTYPE,"C");
+  setlocale(LC_NUMERIC,"C");
+  double retval=strtod(data, &edata);
+  setlocale(LC_CTYPE,(const char *)clocale);
+  setlocale(LC_NUMERIC,(const char *)nlocale);
+  if(edata)
+  {
+    eptr=GStringRep::create(edata);
+    isDouble=true;
+  }else
+  {
+    GP<GStringRep> ptr=toNative();
+    if(ptr)
+    {
+      retval=ptr->toDouble(eptr,isDouble);
+      if(isDouble)
+      {
+        eptr=eptr->toUTF8();
+      }
+    }else
+    {
+      eptr=0;
+    }
+  }
+  return retval;
+}
+
+double
+GStringRep::Native::toDouble(
+  GP<GStringRep>& eptr, bool &isDouble) const
+{
+   char *edata=0;
+   const double retval=strtod(data, &edata);
+   if(edata)
    {
-      if (isNative())
-      {
-         retval = strtod(data, &(eptr->data));
-      }
-      else
-      {
-         GP<GStringRep> r = this->toNative();
-         retval = strtod(r->data,  &(eptr->data));
-      }
+     eptr=GStringRep::Native::create(edata);
+     isDouble=true;
+   }else
+   {
+     eptr=0;
+     isDouble=false;
    }
    return retval;
 }

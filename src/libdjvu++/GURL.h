@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GURL.h,v 1.36 2001-04-12 00:25:00 bcr Exp $
+// $Id: GURL.h,v 1.37 2001-04-16 17:55:05 bcr Exp $
 // $Name:  $
 
 #ifndef _GURL_H_
@@ -49,7 +49,7 @@
     \Ref{GURL} class used to store URLs in a system independent format.
     @memo System independent URL representation.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: GURL.h,v 1.36 2001-04-12 00:25:00 bcr Exp $#
+    @version #$Id: GURL.h,v 1.37 2001-04-16 17:55:05 bcr Exp $#
 */
 
 //@{
@@ -117,7 +117,7 @@ private:
    void		convert_slashes(void);
    void		beautify_path(void);
 
-   static GUTF8String	protocol(const char * url);
+   static GUTF8String	protocol(const GUTF8String& url);
    void		parse_cgi_args(void);
    void		store_cgi_args(void);
 public:
@@ -134,7 +134,7 @@ public:
       /** Inserts the #arg# after a separating hash into the URL.
 	  The function encodes any illegal character in #arg# using
 	  \Ref{GOS::encode_reserved}(). */
-   void		set_hash_argument(const char * arg);
+   void		set_hash_argument(const GUTF8String &arg);
 
       /** Returns the total number of CGI arguments in the URL.
 	  CGI arguments follow '#?#' sign and are separated by '#&#' signs */
@@ -190,7 +190,7 @@ public:
 
       /** Appends the specified CGI argument. Will insert "#DJVUOPTS#" if
 	  necessary */
-   void		add_djvu_cgi_argument(const char * name, const char * value=0);
+   void		add_djvu_cgi_argument(const GUTF8String &name, const char * value=0);
    
       /** Returns the URL corresponding to the directory containing
 	  the document with this URL. The function basically takes the
@@ -229,9 +229,7 @@ public:
       */
       //@{
       ///
-   GURL		operator+(const char * name) const;
-      ///
-   GURL		operator+(const GUTF8String & name) const;
+   GURL		operator+(const GUTF8String &name) const;
       //@}
 
       /// Returns TRUE if #gurl1# and #gurl2# are the same
@@ -252,23 +250,20 @@ public:
       A brain damaged MSIE compatible syntax is generated
       when the optional argument #useragent# contains string #"MSIE"# or
       #"Microsoft"#. */
-   GUTF8String get_string(const char *useragent=0) const;
+   GUTF8String get_string(const GUTF8String &useragent=GUTF8String()) const;
 
       /// Escape special characters
-   static GUTF8String encode_reserved(unsigned char const *s);
+   static GUTF8String encode_reserved(const GUTF8String &gs);
 
+#if 0
       /// Escape special characters
    static GUTF8String encode_reserved(char const * const s)
    { return encode_reserved((unsigned char *)s); }
+#endif
 
    /** Decodes reserved characters from the URL.
       See also: \Ref{encode_reserved}(). */
-   static GUTF8String decode_reserved(const char * url);
-
-   /** Decodes reserved characters from the URL.
-      See also: \Ref{encode_reserved}(). */
-   static GUTF8String decode_reserved(const unsigned char * url)
-   { return decode_reserved((const char *)url); }
+   static GUTF8String decode_reserved(const GUTF8String &url);
 
   /// Test if this url is an existing file, directory, or device.
   bool is_local_path(void) const;
@@ -326,7 +321,7 @@ public:
       #expand_name# is very useful for logically concatenating file names.  It
       knows which separators should be used for each operating system and it
       knows which syntactical rules apply. */
-  static GUTF8String expand_name(const char *filename, const char *fromdirname=0);
+  static GUTF8String expand_name(const GUTF8String &filename, const char *fromdirname=0);
 };
 
 class GURL::UTF8 : public GURL
@@ -362,11 +357,13 @@ public:
   Native(const GNativeString &filename);
 };
 
+#if 0
 inline GURL
-GURL::operator+(const GUTF8String & xname) const
+GURL::operator+(const char *xname) const
 {
-  return (*this)+(const char *) xname;
+  return (*this)+xname;
 }
+#endif
 
 inline int
 operator==(const GURL & gurl1, const GURL & gurl2)

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.h,v 1.45 2001-04-16 15:15:29 chrisp Exp $
+// $Id: GString.h,v 1.46 2001-04-16 17:55:04 bcr Exp $
 // $Name:  $
 
 #ifndef _GSTRING_H_
@@ -57,7 +57,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.45 2001-04-16 15:15:29 chrisp Exp $# */
+    #$Id: GString.h,v 1.46 2001-04-16 17:55:04 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -111,11 +111,14 @@ public:
       // Compare with #s2#.
   virtual int cmp(const GP<GStringRep> &s2) const;
 
-   // implements atoi
-   virtual int toInt() const { return 0; }
-   virtual long int toLong(GP<GStringRep>& eptr, int base) const { return 0; }
-   virtual unsigned long int toULong( GP<GStringRep>& eptr, int base) const { return 0; }
-   virtual double toDouble(GP<GStringRep>& eptr) const { return 0; }
+  // Convert strings to numbers.
+  virtual int toInt() const;
+  virtual long int toLong(
+    GP<GStringRep>& endptr, bool &isLong, const int base) const;
+  virtual unsigned long int toULong(
+    GP<GStringRep>& endptr, bool &isULong, const int base) const;
+  virtual double toDouble(
+    GP<GStringRep>& endptr, bool &isDouble) const;
 
     // Create an empty string.
   template <class TYPE> static GP<GStringRep> create(
@@ -167,7 +170,7 @@ public:
   GP<GStringRep> downcase(void) const;
 
   static unsigned long UTF8toUCS4(
-    unsigned char const *&s, void const * const eptr );
+    unsigned char const *&s, void const * const endptr );
 
   static unsigned char *UCS4toUTF8(
     const unsigned long w,unsigned char *ptr);
@@ -219,11 +222,14 @@ public:
       // Compare with #s2#.
   virtual int cmp(const GP<GStringRep> &s2) const;
 
-   // implements atoi
-   virtual int toInt() const;
-   virtual long int toLong(GP<GStringRep>& eptr, int base) const;
-   virtual unsigned long int toULong( GP<GStringRep>& eptr, int base) const;
-   virtual double toDouble(GP<GStringRep>& eptr) const;
+  // Convert strings to numbers.
+  virtual int toInt() const;
+  virtual long int toLong(
+    GP<GStringRep>& endptr, bool &isLong, const int base) const;
+  virtual unsigned long int toULong(
+    GP<GStringRep>& endptr, bool &isULong, const int base) const;
+  virtual double toDouble(
+    GP<GStringRep>& endptr, bool &isDouble) const;
 
     // Create an empty string
   static GP<GStringRep> create(const unsigned int sz = 0)
@@ -295,7 +301,6 @@ public:
       // Compare with #s2#.
   virtual int cmp(const GP<GStringRep> &s2) const;
 
-    // Create an empty string.
   static GP<GStringRep> create(const unsigned int sz = 0)
   { return GStringRep::create(sz,(GStringRep::UTF8 *)0); }
 
@@ -583,6 +588,26 @@ public:
   friend GString operator+(const char    *s1, const GString &s2) 
     { return GStringRep::create(s1,s2); }
 
+  /** Returns an integer.  Implements i18n atoi.  */
+  int toInt(void) const
+  { return ptr?(*this)->toInt():0; }
+
+  /** Returns a long intenger.  Implments i18n strtol.  */
+  long int toLong(
+    GString& endptr, bool &isLong, const int base=0) const
+  { return ptr?(*this)->toLong(endptr, isLong, base):0; }
+
+  /** Returns a unsigned long integer.  Implements i18n strtoul. */
+  unsigned long int toULong(
+    GString& endptr, bool &isULong, const int base=0) const
+  { return ptr?(*this)->toLong(endptr, isULong, base):0; }
+
+  /** Returns a double.  Implements the i18n strtod.  */
+  double toDouble( GString& endptr, bool& isDouble ) const
+  { return ptr?(*this)->toDouble(endptr,isDouble):(double)0; }
+
+  // -- HASHING
+
   // -- COMPARISONS
   int cmp(const GString &s2) const
     { return GStringRep::cmp(*this,s2); }
@@ -680,51 +705,17 @@ public:
    */
    inline bool ncmp(const GString& s2, const int len=1) const
       { return (substr(0,len) == s2.substr(0,len)); }
-   /** Returns a boolean. The Standard C strncmp takes two string and compares the 
-       first N characters.  static bool GString::ncmp will compare #s1# with #s2# 
+   /** Returns a boolean. The Standard C strncmp takes two string and
+       compares the first N characters.  static bool GString::ncmp will
+       compare #s1# with #s2# 
        with the #len# characters starting from the beginning of the string.*/
    static bool ncmp(const GString &s1,const GString &s2, const int len=1)
       { return (s1.substr(0,len) == s2.substr(0,len)); }
 
-   /** Returns an integer.  Implements a functional i18n atoi. Note that if you pass
-       a GString that is not in Native format the results may be disparaging. */
-//     inline int nativeToInt() const
-//        { return atoi((const char*)(*this)); }
-//     static int nativeToInt( const GString& src )
-//        { return atoi((const char*)(src)); }
+   /** Returns an integer.  Implements a functional i18n atoi. Note that if
+       you pass a GString that is not in Native format the results may be
+       disparaging. */
 
-   /** Returns an integer.  Implements i18n atoi.  Takes a UTF8 string and converts that
-       value into a native format string, which is then used to make the atoi call. */
-   int toInt(void) const;
-   static int toInt( const GString& src );
-
-   /** Returns a long intenger.  Implments i18n strtol.  Use toLong if you have a
-       UTF8 string, and nativeToLong if you already have the native string. */
-//   long int nativeToLong( GString& endptr, int base, bool& ptrnull) const;
-//   static long int nativeToLong(const GString& src, GString& endptr, int base, bool& err);
-//   long int toLong( GString& endptr, int base) const;
-   long int toLong( GString& endptr, int base, bool& ptrnull) const;
-   static long int toLong( const GString& src, GString& endptr, int base, bool& err);
-
-   /** Returns a unsigned long integer.  Implements i18n strtoul. Use toULong if you have
-       a UTF8 string, and nativeToULong if you already have the native string. */
-//   unsigned long int nativeToULong( GString& endptr, int base, bool& ptrnull) const;
-//   static unsigned long int nativeToULong(const GString& src, GString& endptr, int base, bool& err);
-//   unsigned long int toULong( GString& endptr, int base) const;
-   unsigned long int toULong( GString& endptr, int base, bool& ptrnull) const;
-   static unsigned long int toULong( const GString& src,  GString& endptr, int base, bool& err);
-   
-   /** Returns a double.  Implements the i18n strtod.  Use toDouble if you have a UTF8
-       string, and nativeToDouble if you already have the native string. */
-//   double nativeToDouble( GString& endptr, bool& ptrnull ) const;
-//   static double nativeToDouble(const GString& src, GString& endptr, bool& err);
-//   double toDouble( GString& endptr ) const;
-   double toDouble( GString& endptr, bool& ptrnull ) const;
-   static double toDouble( const GString& src,  GString& endptr, bool& err);
-
-   /* # END code block added by CHRISP */
-
-  // -- HASHING
   /** Returns a hash code for the string.  This hashing function helps when
       creating associative maps with string keys (see \Ref{GMap}).  This hash
       code may be reduced to an arbitrary range by computing its remainder
@@ -807,11 +798,33 @@ public:
    static bool ncmp(const GUTF8String &s1,const GUTF8String &s2, const int len=1)
       { return (s1.substr(0,len) == s2.substr(0,len)); }
 
+  /** Returns a long intenger.  Implments i18n strtol.  */
+  long int toLong(
+    GUTF8String& endptr, bool &isLong, const int base=10) const
+  { return ptr?(*this)->toLong(endptr, isLong, base):0; }
 
-   int toInt( void ) const;
-   long int toLong( GUTF8String& endptr, int base, bool& ptrnull) const;
-   unsigned long int toULong(GUTF8String& endptr, int base, bool& ptrnull) const;
-   double toDouble(GUTF8String& endptr, bool& ptrnull) const;
+  static long int toLong(
+    const GUTF8String& src, GUTF8String& endptr, bool &isLong,
+    const int base=10)
+  { return src.toLong(endptr,isLong,base); }
+
+  /** Returns a unsigned long integer.  Implements i18n strtoul. */
+  unsigned long int toULong(
+    GUTF8String& endptr, bool &isULong, const int base=10) const
+  { return ptr?(*this)->toLong(endptr, isULong, base):0; }
+
+  static unsigned long int toULong(
+    const GUTF8String& src, GUTF8String& endptr, bool &isULong,
+    const int base=10)
+  { return src.toLong(endptr,isULong,base); }
+
+  /** Returns a double.  Implements the i18n strtod.  */
+  double toDouble( GUTF8String& endptr, bool& isDouble ) const
+  { return ptr?(*this)->toDouble(endptr,isDouble):(double)0; }
+
+  static double toDouble(
+    const GUTF8String& src, GUTF8String& endptr, bool& isDouble)
+  { return src.toDouble(endptr,isDouble); }
 
   // -- CONCATENATION
   /// Appends character #ch# to the string.
@@ -897,20 +910,13 @@ public:
   GNativeString& operator= (const GUTF8String &str);
   GNativeString& operator= (const GNativeString &str);
 
-  template <class TYPE>
-  GNativeString& operator= (const TYPE &str)
-  { return (*this=GNativeString(str)); }
-
-   /** Returns a boolean. The Standard C strncmp takes two string and compares the 
-       first N characters.  static bool GString::ncmp will compare #s1# with #s2# 
-       with the #len# characters starting from the beginning of the string.*/
-   static bool ncmp(const GNativeString &s1,const GNativeString &s2, const int len=1)
-     { return (s1.substr(0,len) == s2.substr(0,len)); }
-
-   int toInt( void ) const;
-   long int toLong( GNativeString& endptr, int base, bool& ptrnull) const;
-   unsigned long int toULong(GNativeString& endptr, int base, bool& ptrnull) const;
-   double toDouble(GNativeString& endptr, bool& ptrnull) const;
+   /** Returns a boolean. The Standard C strncmp takes two string and
+       compares the first N characters.  static bool GString::ncmp will
+       compare #s1# with #s2# with the #len# characters starting from
+       the beginning of the string. */
+   static bool ncmp(
+     const GNativeString &s1,const GNativeString &s2, const int len=1)
+   { return (s1.substr(0,len) == s2.substr(0,len)); }
 
   // -- CONCATENATION
   /// Appends character #ch# to the string.
@@ -938,6 +944,32 @@ public:
       too large. */
   GNativeString substr(int from, unsigned int len=1) const
     { return GNativeString(*this, from, len); }
+
+  /** Returns a long intenger.  Implments i18n strtol.  */
+  long int toLong(
+    GNativeString& endptr, bool &isLong, const int base=10) const
+  { return ptr?(*this)->toLong(endptr, isLong, base):0; }
+
+  static long int toLong(
+    const GNativeString& src, GNativeString& endptr, bool &isLong, const int base=10)
+  { return src.toLong(endptr,isLong,base); }
+
+  /** Returns a unsigned long integer.  Implements i18n strtoul. */
+  unsigned long int toULong(
+    GNativeString& endptr, bool &isULong, const int base=10) const
+  { return ptr?(*this)->toLong(endptr, isULong, base):0; }
+
+  static unsigned long int toULong(
+    const GNativeString& src, GNativeString& endptr, bool &isULong, const int base=10)
+  { return src.toLong(endptr,isULong,base); }
+
+  /** Returns a double.  Implements the i18n strtod.  */
+  double toDouble( GNativeString& endptr, bool& isDouble ) const
+  { return ptr?(*this)->toDouble(endptr,isDouble):(double)0; }
+
+  static double toDouble(
+    const GNativeString& src,  GNativeString& endptr, bool& isDouble)
+  { return src.toDouble(endptr,isDouble); }
 
   friend GNativeString operator+(const GNativeString &s1, const GString &s2) 
     { return GStringRep::Native::create(s1,s2); }
@@ -983,22 +1015,6 @@ GString::downcase( void ) const
 { 
   return (ptr?GString((*this)->downcase()):(*this));
 }
-
-inline int 
-GString::toInt(void) const
-{ return getUTF82Native().toInt(); }
-
-inline int
-GString::toInt( const GString& src )
-{ return src.getUTF82Native().toInt(); }
-
-inline int
-GNativeString::toInt(void) const
-{ return (ptr?(*this)->toInt():0); }
-
-inline int
-GUTF8String::toInt(void) const
-{ return getUTF82Native().toInt(); }
 
 inline
 GUTF8String::GUTF8String(const GNativeString &str)

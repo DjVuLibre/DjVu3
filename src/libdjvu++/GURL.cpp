@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GURL.cpp,v 1.61 2001-04-13 23:32:19 fcrary Exp $
+// $Id: GURL.cpp,v 1.62 2001-04-16 17:55:05 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -348,7 +348,7 @@ GURL::operator=(const GURL & url_in)
 }
 
 GUTF8String
-GURL::protocol(const char * url)
+GURL::protocol(const GUTF8String& url)
 {
    const char * const url_ptr=url;
    const char * ptr=url_ptr;
@@ -382,7 +382,7 @@ GURL::hash_argument(void) const
 }
 
 void
-GURL::set_hash_argument(const char * arg)
+GURL::set_hash_argument(const GUTF8String &arg)
 {
    if(!validurl) init();
    GCriticalSectionLock lock((GCriticalSection *) &class_lock);
@@ -722,7 +722,7 @@ GURL::clear_djvu_cgi_arguments(void)
 }
 
 void
-GURL::add_djvu_cgi_argument(const char * name, const char * value)
+GURL::add_djvu_cgi_argument(const GUTF8String &name, const char * value)
 {
    if(!validurl) init();
    GCriticalSectionLock lock1(&class_lock);
@@ -837,12 +837,12 @@ GURL::extension(void) const
 }
 
 GURL
-GURL::operator+(const char * xname) const
+GURL::operator+(const GUTF8String &gname) const
 {
    if(!validurl) const_cast<GURL *>(this)->init();
    GCriticalSectionLock lock((GCriticalSection *) &class_lock);
    GURL res;
-   if (!protocol(xname).length())
+   if (!protocol(gname).length())
    {
       const char * const url_ptr=(const char *)url;
       const char * ptr;
@@ -850,18 +850,19 @@ GURL::operator+(const char * xname) const
       	EMPTY_LOOP;
 
       res=GUTF8String(GUTF8String(url_ptr,(int)(ptr-url_ptr))
-        +((*(ptr-1) != slash)?GUTF8String(slash):GUTF8String())+xname+ptr);
+        +((*(ptr-1) != slash)?GUTF8String(slash):GUTF8String())+gname+ptr);
    } else
    {
-     res=xname;
+     res=gname;
    }
    res.parse_cgi_args();
    return res;
 }
 
 GUTF8String
-GURL::decode_reserved(const char * url)
+GURL::decode_reserved(const GUTF8String &gurl)
 {
+  const char *url=gurl;
   GUTF8String res;
 
   for(const char * ptr=url;*ptr;ptr++)
@@ -887,13 +888,14 @@ GURL::decode_reserved(const char * url)
 }
 
 GUTF8String
-GURL::encode_reserved(unsigned char const *s)
+GURL::encode_reserved(const GUTF8String &gs)
 {
+  const char *s=(const char *)gs;
   // Potentially unsafe characters (cf. RFC1738 and RFC1808)
   static const char hex[] = "0123456789ABCDEF";
   
   unsigned char *retval;
-  GPBuffer<unsigned char> gd(retval,strlen((const char *)s)*3);
+  GPBuffer<unsigned char> gd(retval,strlen(s)*3);
   unsigned char *d=retval;
   for (; *s; s++,d++)
   {
@@ -918,23 +920,26 @@ GURL::encode_reserved(unsigned char const *s)
 #ifdef WIN32
     if (IsDBCSLeadByte((BYTE)*s)) //MBCS DBCS
     {
+      unsigned char const ss=(unsigned char const)(*s);
       // escape sequence
       d[0] = percent;
-      d[1] = hex[ (*s >> 4) & 0xf ];
-      d[2] = hex[ (*s) & 0xf ];
+      d[1] = hex[ (ss >> 4) & 0xf ];
+      d[2] = hex[ (ss) & 0xf ];
       s++;
       if (*s) // escape sequence
       {
+        unsigned char const ss=(unsigned char const)(*s);
         d+=3;
         d[0] = percent;
-        d[1] = hex[ (*s >> 4) & 0xf ];
-        d[2] = hex[ (*s) & 0xf ];
+        d[1] = hex[ (ss >> 4) & 0xf ];
+        d[2] = hex[ (ss) & 0xf ];
         d+=2;
       }
       continue;
     }
 #endif
 
+    unsigned char const ss=(unsigned char const)(*s);
     // WARNING: Whenever you modify this conversion code,
     // make sure, that the following functions are in sync:
     //   encode_reserved()
@@ -942,18 +947,18 @@ GURL::encode_reserved(unsigned char const *s)
     //   url_to_filename()
     //   filename_to_url()
     // unreserved characters
-    if ( (*s>='a' && *s<='z') ||
-       (*s>='A' && *s<='Z') ||
-       (*s>='0' && *s<='9') ||
-       (strchr("$-_.+!*'(),:", *s)) )   // Added : because of windows!
+    if ( (ss>='a' && ss<='z') ||
+       (ss>='A' && ss<='Z') ||
+       (ss>='0' && ss<='9') ||
+       (strchr("$-_.+!*'(),:~&;", ss)) )   // Added : because of windows!
     {
-      *d = *s;
+      *d = ss;
       continue;
     }
     // escape sequence
     d[0] = percent;
-    d[1] = hex[ (*s >> 4) & 0xf ];
-    d[2] = hex[ (*s) & 0xf ];
+    d[1] = hex[ (ss >> 4) & 0xf ];
+    d[2] = hex[ (ss) & 0xf ];
     d+=2;
   }
   *d = 0;
@@ -970,8 +975,6 @@ url_from_UTF8filename(const GUTF8String &gfilename)
   if(GURL::UTF8(gfilename).is_valid())
   {
     DEBUG_MSG("Illegal URL: " << gfilename << "\n");
-    char *s=0;
-    *s=5;
   } 
   const char *filename=gfilename;
   if(filename && (unsigned char)filename[0] == (unsigned char)0xEF
@@ -1025,13 +1028,12 @@ url_from_UTF8filename(const GUTF8String &gfilename)
 //    If useragent is not provided, standard url will be created,
 //    but will not be understood by some versions if IE.
 GUTF8String 
-GURL::get_string(const char *useragent) const
+GURL::get_string(const GUTF8String &useragent) const
 {
   GUTF8String retval(url);
-  if(is_local_file_url()&&useragent)
+  if(is_local_file_url()&&useragent.length())
   {
-    const GUTF8String agent(useragent);
-    if(agent.search("MSIE") >= 0 || agent.search("Microsoft")>=0)
+    if(useragent.search("MSIE") >= 0 || useragent.search("Microsoft")>=0)
     {
       retval=filespecslashes + expand_name(UTF8Filename());
     }
@@ -1406,8 +1408,9 @@ GURL::renameto(const GURL &newurl) const
 //    relative to fromdirname.  Use current working dir when
 //    fromdirname is null.
 GUTF8String 
-GURL::expand_name(const char *fname, const char *from)
+GURL::expand_name(const GUTF8String &xfname, const char *from)
 {
+  const char *fname=xfname;
   GUTF8String retval;
   char * const string_buffer = retval.getbuf(MAXPATHLEN+10);
   // UNIX implementation
