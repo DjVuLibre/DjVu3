@@ -8,7 +8,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: MMRDecoder.cpp,v 1.9 1999-12-27 22:08:19 parag Exp $
+//C- $Id: MMRDecoder.cpp,v 1.10 2000-01-31 21:14:45 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -290,9 +290,12 @@ private:
   int lowbits;
   int bufpos;
   int bufmax;
+  int readmax;
 public:
   // Initializes a bit source on a bytestream
-  VLSource(ByteStream &inp);
+  VLSource(ByteStream &inp, int striped);
+  // Synchronize on the next stripe
+  void nextstripe();
   // Returns a 32 bits integer with at least the 
   // next sixteen code bits in the high order bits.
   unsigned int peek() 
@@ -303,37 +306,39 @@ public:
   // Consumes #n# bits.
   void shift(int n)
     { codeword<<=n; lowbits+=n; if (lowbits>=16) preload(); }
-	unsigned int reset(unsigned int offset);
 };
 
-MMRDecoder::VLSource::VLSource(ByteStream &inp)
+
+
+
+MMRDecoder::VLSource::VLSource(ByteStream &inp, int striped)
   : inp(inp), codeword(0), 
-    lowbits(0), bufpos(0), bufmax(0)
+    lowbits(0), bufpos(0), bufmax(0),
+    readmax(-1)
 {
+  if (striped)
+    readmax = inp.read32();
   lowbits = 32;
   preload();
 }
 
-unsigned int
-MMRDecoder::VLSource::reset(unsigned int offset){
-	unsigned int stripsize, loc;
-	loc = inp.tell();
-	
-	preload();
-	// The endofblock is skipped
-	shift(24);
-	preload();
-	// To make it byte aligned
-	if ( lowbits > 0 ) {
-		shift(8 - lowbits);
-	}
-	preload();
-	stripsize = peek();
-	codeword = 0;
-	lowbits = 32;
-	preload();
-
-	return stripsize;
+void
+MMRDecoder::VLSource::nextstripe()
+{
+  while (readmax>0)
+    {
+      int size = sizeof(buffer);
+      if (readmax < size) 
+        size = readmax;
+      inp.readall(buffer, size);
+      readmax -= size;
+    }
+  bufpos = bufmax = 0;
+  memset(buffer,0,sizeof(buffer));
+  readmax = inp.read32();
+  codeword = 0; 
+  lowbits = 32;
+  preload();
 }
 
 void
@@ -343,10 +348,16 @@ MMRDecoder::VLSource::preload()
     {
       if (bufpos >= bufmax) 
 	{
-	  bufpos = 0; // Refill buffer
-	  bufmax = inp.read((void*)buffer, sizeof(buffer));
+          // Refill buffer
+	  bufpos = bufmax = 0;
+          int size = sizeof(buffer);
+          if (readmax>=0 && readmax<size) 
+            size = readmax;
+          if (size>0)
+            bufmax = inp.read((void*)buffer, size);
+          readmax -= bufmax;
 	  if (bufmax <= 0)
-            return;   // Fill with zeroes (invalid code)
+            return;
 	}
       lowbits -= 8;
       codeword |= buffer[bufpos++] << lowbits;
@@ -442,36 +453,19 @@ MMRDecoder::~MMRDecoder()
   delete [] refline;
 }
 
-MMRDecoder::MMRDecoder(ByteStream &bs, int width, int height)
-  : width(width), height(height), lineno(0), striplineno(0), 
-	  rowsperstrip(0xffff), nextstriploc(0)
+MMRDecoder::MMRDecoder(ByteStream &bs, int width, int height, int striped)
+  : width(width), height(height), lineno(0), 
+    striplineno(0), rowsperstrip(0)
 {
   refline = new unsigned char [width+5];
   memset(refline, 0, width);
-  src = new VLSource(bs);
+  rowsperstrip = (striped ? bs.read16() : height);
+  src = new VLSource(bs, striped);
   mrtable = new VLTable(mrcodes, 7);
   btable = new VLTable(bcodes, 13);
   wtable = new VLTable(wcodes, 13);
 }
 
-MMRDecoder::MMRDecoder(ByteStream &bs, int width, int height, int strip)
-  : width(width), height(height), lineno(0), striplineno(0), 
-	  nextstriploc(0)
-{
-	int startPoint = bs.tell();
-  refline = new unsigned char [width+5];
-  memset(refline, 0, width);
-	if ( strip ) {
-		rowsperstrip = bs.read16();
-		nextstriploc = bs.read32() + startPoint + 4;
-	}else{
-		rowsperstrip = 0xffff;
-	}
-  src = new VLSource(bs);
-  mrtable = new VLTable(mrcodes, 7);
-  btable = new VLTable(bcodes, 13);
-  wtable = new VLTable(wcodes, 13);
-}
 
 const unsigned char *
 MMRDecoder::scanline()
@@ -479,11 +473,12 @@ MMRDecoder::scanline()
   // Check if all lines have been returned
   if (lineno >= height)
     return 0;
-	if ( striplineno == rowsperstrip ){
-		striplineno=0;
-  	memset(refline, 0, width);
-		nextstriploc += src->reset(nextstriploc) + 4;
-	}
+  if ( striplineno == rowsperstrip )
+    {
+      striplineno=0;
+      memset(refline, 0, width);
+      src->nextstripe();
+    }
   // Loop until scanline is complete
   unsigned char CurColor=0;
   unsigned char *ptr=refline,*StartRun=refline,*EndRun;
@@ -594,7 +589,8 @@ MMRDecoder::scanline()
             //    What about the current line ?
             if ((m & 0xffffff00) == 0x00100100)
               {
-                lineno = height;
+                lineno += rowsperstrip - striplineno;
+                striplineno = rowsperstrip;
                 return 0;
               }
             // -- Could be UNCOMPRESSED ``0000001111''
@@ -645,7 +641,7 @@ MMRDecoder::scanline()
     }
   /* Increment and return */
   lineno += 1;
-	striplineno += 1;
+  striplineno += 1;
   return refline;
 }
 
@@ -654,29 +650,14 @@ MMRDecoder::scanline()
 // MAIN DECODING ROUTINE
 
 void 
-MMRDecoder::decode_header(ByteStream &inp, int &width, int &height, int &invert
- , int &strip)
+MMRDecoder::decode_header(ByteStream &inp, int &width, int &height, 
+                          int &invert, int &strip)
 {
   unsigned long int magic = inp.read32();
-  if (magic == 0x4d4d5200) {// "MMR\00"
-    invert = 0;
-		strip = 0;
-	}
-  else if (magic == 0x4d4d5201) { // "MMR\01"
-    invert = 1;
-		strip = 0;
-	}
-  else if (magic == 0x4d4d5202) { // "MMR\02"
-    invert = 0;
-		strip = 1;
-	}
-  else if (magic == 0x4d4d5203) { // "MMR\03"
-    invert = 1;
-		strip = 1;
-	}
-  else {
-    THROW("Cannot recognize G4/MMR header");
-	}
+  if((magic&0xfffffffc) != 0x4d4d5200)
+    THROW("Cannot recognize G4/MMR header"); 
+  invert = ((magic & 0x1) ? 1 : 0);
+  strip =  ((magic & 0x2) ? 1 : 0);
   width = inp.read16();
   height = inp.read16();
   if (width<=0 || height<=0)
@@ -690,8 +671,8 @@ GP<JB2Image>
 MMRDecoder::decode(ByteStream &inp)
 {
   // Read header
-  int width, height, invert, strip;
-  decode_header(inp, width, height, invert, strip);
+  int width, height, invert, rowsperstripe;
+  decode_header(inp, width, height, invert, rowsperstripe);
   // Prepare image
   GP<JB2Image> jimg = new JB2Image();
   jimg->set_dimension(width, height);
@@ -699,15 +680,15 @@ MMRDecoder::decode(ByteStream &inp)
   int blocksize = MIN(500,MAX(64,MAX(width/17,height/22)));
   int blocksperline = (width+blocksize-1)/blocksize;
   // Prepare decoder
-	MMRDecoder dcd(inp, width, height, strip);
-  // Loop on stripes
+  MMRDecoder dcd(inp, width, height, rowsperstripe);
+  // Loop on JB2 bands
   int line = height-1;
   while (line >= 0)
     {
-      int stripeline = MIN(blocksize-1,line);
+      int bandline = MIN(blocksize-1,line);
       GPArray<GBitmap> blocks(0,blocksperline-1);
       // Loop on scanlines
-      for(; stripeline >= 0; stripeline--,line--)
+      for(; bandline >= 0; bandline--,line--)
 	{
 	  // Decode one scanline
 	  const unsigned char *s = dcd.scanline();
@@ -731,10 +712,10 @@ MMRDecoder::decode(ByteStream &inp)
                           if (! blocks[b])
                             {
                               int w = lastx - firstx;
-                              int h = stripeline + 1;
+                              int h = bandline + 1;
                               blocks[b] = new GBitmap(h,w);
                             }
-                          bptr = (*blocks[b])[stripeline] - firstx;
+                          bptr = (*blocks[b])[bandline] - firstx;
                         }
                       bptr[x] = 1;
                     }
