@@ -9,17 +9,17 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.cpp,v 1.25 1999-09-23 13:26:06 leonb Exp $
+//C- $Id: DataPool.cpp,v 1.26 1999-09-23 19:07:59 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
 #endif
 
 #include <sys/types.h>
-#include <time.h>
 #include "DataPool.h"
 #include "IFFByteStream.h"
 #include "GString.h"
+#include "GOS.h"
 #include "debug.h"
 
 static inline void
@@ -56,7 +56,7 @@ private:
       GCriticalSection		stream_lock;
       GList<void *>		pools_list;	// List of pools using this stream
       GCriticalSection		pools_lock;
-      time_t			open_time;	// Time when stream was open
+      unsigned long		open_time;	// Time when stream was open
 
       int	add_pool(DataPool * pool);
       int	del_pool(DataPool * pool);
@@ -83,7 +83,7 @@ OpenFiles::File::File(const char * xname, DataPool * pool) : name(xname)
 {
    DEBUG_MSG("OpenFiles::File::File(): Opening file '" << name << "'\n");
    
-   open_time=time(0);
+   open_time=GOS::ticks();
    stream=new StdioByteStream(name, "rb");
    add_pool(pool);
 }
@@ -153,7 +153,7 @@ OpenFiles::request_stream(const char * name, DataPool * pool,
       if (files_list.size()>MAX_OPEN_FILES)
       {
 	    // Too many open files (streams). Get rid of the oldest one.
-	 time_t oldest_time=time(0);
+	 unsigned long oldest_time=GOS::ticks();
 	 GPosition oldest_pos=files_list;
 	 for(GPosition pos=files_list;pos;++pos)
 	    if (files_list[pos]->open_time<oldest_time)
