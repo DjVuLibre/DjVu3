@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.45 1999-09-19 19:25:19 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.46 1999-09-20 22:05:24 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -20,6 +20,19 @@
 #include "GOS.h"
 #include "debug.h"
 
+static GString
+get_int_prefix(void * ptr)
+{
+      // These NAMEs are used to enable DjVuFile sharing inside the same
+      // DjVuDocument using DjVuPortcaster. Since URLs are unique to the
+      // document, other DjVuDocuments cannot retrieve files until they're
+      // assigned some permanent name. After '?' there should be the real
+      // file's URL. Please note, that output of this function is used only
+      // as name for DjVuPortcaster. Not as a URL.
+   char buffer[128];
+   sprintf(buffer, "document_%p?", ptr);
+   return buffer;
+}
 
 DjVuDocument::DjVuDocument(void)
   : init_called(false), cache(0), doc_type(UNKNOWN_TYPE)
@@ -62,26 +75,50 @@ DjVuDocument::~DjVuDocument(void)
 {
       // No more messages, please. We're being destroyed.
    get_portcaster()->del_port(this);
-   
-      // Before we proceed with destroy we must stop the initializing
-      // thread (involves stopping the init_data_pool, the file
-      // used to decode NDIR chunks (if any) and all unnamed files)
-   if (init_data_pool) init_data_pool->stop(false);	// any operation
+
+      // We want to stop any DjVuFile, which has been created by us
+      // and is still being decoded. We have to stop them manually because
+      // they keep the "life saver" in the decoding thread and won't stop
+      // when we clear the last reference to them
+   {
+      GCriticalSectionLock lock(&ufiles_lock);
+      for(GPosition pos=ufiles_list;pos;++pos)
+	 ufiles_list[pos]->file->stop(false);	// Disable any access to data
+      ufiles_list.empty();
+   }
+
+   GPList<DjVuPort> ports=get_portcaster()->prefix_to_ports(get_int_prefix(this));
+   for(GPosition pos=ports;pos;++pos)
+   {
+      GP<DjVuPort> port=ports[pos];
+      if (port->inherits("DjVuFile"))
+      {
+	 DjVuFile * file=(DjVuFile *) (DjVuPort *) port;
+	 file->stop(false);	// Disable any access to data
+      }
+   }
+}
+
+void
+DjVuDocument::stop(void)
+{
+   DEBUG_MSG("DjVuDocument::stop(): making sure that the init thread dies.\n");
+   DEBUG_MAKE_INDENT(3);
+
    GMonitorLock lock(&init_thread_flags);
    while((init_thread_flags & STARTED) &&
 	 !(init_thread_flags & FINISHED))
    {
-      if (ndir_file) ndir_file->stop(true);	// non-block ops only
-      ndir_file=0;
+      if (init_data_pool) init_data_pool->stop(false);	// any operation
 
-      {
-	 GCriticalSectionLock lock(&ufiles_lock);
-	 for(GPosition pos=ufiles_list;pos;++pos)
-	    ufiles_list[pos]->file->stop(true);	// non-block ops only
-	 ufiles_list.empty();
-      }
+      if (ndir_file) ndir_file->stop(false);
 
-      init_thread_flags.wait(500);
+      GCriticalSectionLock lock(&ufiles_lock);
+      for(GPosition pos=ufiles_list;pos;++pos)
+	 ufiles_list[pos]->file->stop(false);	// Disable any access to data
+      ufiles_list.empty();
+
+      init_thread_flags.wait(50);
    }
 }
 
@@ -96,16 +133,15 @@ void
 DjVuDocument::static_init_thread(void * cl_data)
 {
    DjVuDocument * th=(DjVuDocument *) cl_data;
+   GP<DjVuDocument> life_saver=th;
+   th->init_life_saver=0;
    TRY {
       th->init_thread();
-	 // Do not do ANYTHING below this line
    } CATCH(exc) {
       th->flags|=DjVuDocument::DOC_INIT_FAILED;
       TRY { get_portcaster()->notify_error(th, exc.get_cause()); } CATCH(exc) {} ENDCATCH;
       th->init_thread_flags|=FINISHED;
-	 // Do not do ANYTHING below this line
    } ENDCATCH;
-      // Do not do ANYTHING below this line
 }
 
 void
@@ -117,13 +153,6 @@ DjVuDocument::init_thread(void)
    DEBUG_MSG("DjVuDocument::init_thread(): guessing what we're dealing with\n");
    DEBUG_MAKE_INDENT(3);
 
-      // No *local* life savers, please. Otherwise this object is very
-      // likely to be never destroyed (data stops flowing into a DataPool,
-      // the thread is waiting for it, the last external reference to
-      // DjVuDocument is lost, but this local would stay => we will hang
-      // forever)
-   init_life_saver=0;
-   
    DjVuPortcaster * pcaster=get_portcaster();
       
    GP<ByteStream> stream=init_data_pool->get_stream();
@@ -249,8 +278,6 @@ DjVuDocument::init_thread(void)
    check_unnamed_files();
 
    init_thread_flags|=FINISHED;
-      // Nothing else after this point, please. The object may already
-      // be destroyed.
    
    DEBUG_MSG("DOCUMENT IS FULLY INITIALIZED now: doc_type='" <<
 	     (doc_type==BUNDLED ? "BUNDLED" :
@@ -258,14 +285,6 @@ DjVuDocument::init_thread(void)
 	      doc_type==INDIRECT ? "INDIRECT" :
 	      doc_type==OLD_INDEXED ? "OLD_INDEXED" :
 	      "UNKNOWN") << "'\n");
-}
-
-static GString
-get_int_prefix(void * ptr)
-{
-   char buffer[128];
-   sprintf(buffer, "intfileurl://%p?", ptr);
-   return buffer;
 }
 
 void
@@ -342,10 +361,10 @@ DjVuDocument::check_unnamed_files(void)
 	       if (!new_pool) THROW("Failed to get data for URL '"+new_url+"'");
 	       ufile->data_pool->connect(new_pool);
 	    }
-
-	    set_file_name(ufile->file);
+	    
+	    ufile->file->set_name(new_url.name());
 	    ufile->file->move(new_url.base());
-	    pcaster->set_name(ufile->file, new_url);
+	    set_file_name(ufile->file);
 	 } else break;
       } CATCH(exc) {
 	 pcaster->notify_error(this, exc.get_cause());

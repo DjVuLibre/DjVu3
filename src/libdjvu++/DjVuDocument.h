@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.h,v 1.29 1999-09-17 19:02:28 eaf Exp $
+//C- $Id: DjVuDocument.h,v 1.30 1999-09-20 22:05:24 eaf Exp $
  
 #ifndef _DJVUDOCUMENT_H
 #define _DJVUDOCUMENT_H
@@ -33,7 +33,7 @@
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocument.h,v 1.29 1999-09-17 19:02:28 eaf Exp $#
+    @version #$Id: DjVuDocument.h,v 1.30 1999-09-20 22:05:24 eaf Exp $#
 */
 
 //@{
@@ -282,6 +282,9 @@ public:
 	  {\bf Note:} In a single threaded application the initialization
 	  completes before the \Ref{init}() function returns. */
    bool		is_init_complete(void) const;
+
+      /// Call this function when you don't need the #DjVuDocument# any more.
+   void		stop(void);
 
       /** If the document has already learnt its type, the function will
 	  returns it: #DjVuDocument::OLD_BUNDLED# or
