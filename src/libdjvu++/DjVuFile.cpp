@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.106 2000-01-26 23:59:32 eaf Exp $
+//C- $Id: DjVuFile.cpp,v 1.107 2000-01-29 23:40:02 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -1344,14 +1344,14 @@ DjVuFile::trigger_cb(void)
      process_incl_chunks();
 
    bool all=true;
-   {
-      GCriticalSectionLock flock(&inc_files_lock);
-      for(GPosition pos=inc_files_list;pos;++pos)
-	 if (!inc_files_list[pos]->is_all_data_present())
-	 {
-	    all=false; break;
-	 }
-   }
+   inc_files_lock.lock();
+   GPList<DjVuFile> files_list=inc_files_list;
+   inc_files_lock.unlock();
+   for(GPosition pos=files_list;pos;++pos)
+      if (!files_list[pos]->is_all_data_present())
+      {
+	 all=false; break;
+      }
    if (all)
    {
       DEBUG_MSG("It appears, that we have ALL data for '" << url << "'\n");
