@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocEditor.h,v 1.32 2001-02-15 20:31:57 bcr Exp $
+// $Id: DjVuDocEditor.h,v 1.33 2001-02-23 03:07:54 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUDOCEDITOR_H
@@ -51,7 +51,7 @@
 
     @memo DjVu document editor class.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: DjVuDocEditor.h,v 1.32 2001-02-15 20:31:57 bcr Exp $#
+    @version #$Id: DjVuDocEditor.h,v 1.33 2001-02-23 03:07:54 bcr Exp $#
 */
 
 //@{
@@ -376,6 +376,12 @@ private:
 			  bool only_modified, GMap<GString, void *> & map);
 private: //dummy stuff
    static void save_pages_as(ByteStream *, const GList<int> &);
+   static GP<DjVuDocument> create(
+     const GURL &url, GP<DjVuPort> xport=0, DjVuFileCache * const xcache=0);
+   static GP<DjVuDocument> create(
+     GP<DataPool> pool, GP<DjVuPort> xport=0, DjVuFileCache * const xcache=0);
+   static GP<DjVuDocument> create(
+     ByteStream &bs, GP<DjVuPort> xport=0, DjVuFileCache * const xcache=0);
 };
 
 inline bool
