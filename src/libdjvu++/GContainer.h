@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GContainer.h,v 1.28 2000-02-17 17:56:16 praveen Exp $
+//C- $Id: GContainer.h,v 1.29 2000-02-18 16:22:22 leonb Exp $
 
 
 #ifndef _GCONTAINER_H_
@@ -29,10 +29,12 @@
 #ifndef GCONTAINER_OLD_ITERATORS
 #define GCONTAINER_OLD_ITERATORS 1
 #endif
+
 // Check array bounds at runtime ?
 #ifndef GCONTAINER_BOUNDS_CHECK
 #define GCONTAINER_BOUNDS_CHECK 1
 #endif
+
 // Clears allocated memory prior to running constructors ?
 #ifndef GCONTAINER_ZERO_FILL
 #define GCONTAINER_ZERO_FILL 1
@@ -44,7 +46,7 @@
 #define GCONTAINER_NO_MEMBER_TEMPLATES 1
 #elif defined(_MSC_VER) && !defined(__ICL)
 #define GCONTAINER_NO_MEMBER_TEMPLATES 1
-#elif defined(macintosh)
+#elif defined(__MWERKS__)
 #define GCONTAINER_NO_MEMBER_TEMPLATES 1
 #else
 #define GCONTAINER_NO_MEMBER_TEMPLATES 0
@@ -71,7 +73,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@research.att.com> -- bug fixes.
     @version 
-    #$Id: GContainer.h,v 1.28 2000-02-17 17:56:16 praveen Exp $# */
+    #$Id: GContainer.h,v 1.29 2000-02-18 16:22:22 leonb Exp $# */
 //@{
 
 
