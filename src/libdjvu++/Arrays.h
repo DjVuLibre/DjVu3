@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: Arrays.h,v 1.10 2000-01-06 19:48:58 praveen Exp $
+//C- $Id: Arrays.h,v 1.11 2000-02-24 22:23:53 haffner Exp $
 
 
 #ifndef _ARRAYS_H_
@@ -55,7 +55,7 @@
     we call "copy-on-demand".
 
     Also, please note that now there is no separate class, which does fast
-    sorting. Both \Ref{TArray} (dymanic array for trivial types) and
+    sorting. Both \Ref{TArray} (dynamic array for trivial types) and
     \Ref{DArray} (dynamic array for arbitrary types) can sort their elements.
     
     {\bf Historical comments} --- Leon chose to implement his own arrays because
@@ -72,7 +72,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@research.att.com> -- Copy-on-demand implementation.
     @version 
-    #$Id: Arrays.h,v 1.10 2000-01-06 19:48:58 praveen Exp $# */
+    #$Id: Arrays.h,v 1.11 2000-02-24 22:23:53 haffner Exp $# */
 //@{
 
 // Auxiliary classes: Will be used in place of GPBase and GPEnabled objects
@@ -159,7 +159,7 @@ public:
    virtual ~ArrayRep();
    
       // Following is the standard interface to DArray. DArray will call these
-      // fuctions to access data.
+      // functions to access data.
    int		size() const;
    int		lbound() const;
    int		hbound() const;
@@ -184,7 +184,7 @@ public:
    int		hibound;
    int		elsize;
 private:
-      // These functions can'tbe virtual as they're called from
+      // These functions can't be virtual as they're called from
       // constructors and destructors :((
       // destroy(): should destroy elements in data[] array from 'lo' to 'hi'
    void		(* destroy)(void * data, int lo, int hi);

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.h,v 1.28 1999-12-22 21:00:50 eaf Exp $
+//C- $Id: DataPool.h,v 1.29 2000-02-24 22:23:53 haffner Exp $
  
 #ifndef _DATAPOOL_H
 #define _DATAPOOL_H
@@ -44,14 +44,14 @@
 
     @memo Thread safe data storage
     @author Andrei Erofeev <eaf@research.att.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DataPool.h,v 1.28 1999-12-22 21:00:50 eaf Exp $#
+    @version #$Id: DataPool.h,v 1.29 2000-02-24 22:23:53 haffner Exp $#
 */
 
 //@{
 
 /** Thread safe data storage.
     The purpose of #DataPool# is to provide a uniform interface for
-    accessing data from decoding routines running in a multithreaded
+    accessing data from decoding routines running in a multi-threaded
     environment. Depending on the mode of operation it may contain the
     actual data, may be connected to another #DataPool# or may be mapped
     to a file. Regardless of the mode, the class returns data in a
@@ -106,7 +106,7 @@
 	     a data range. As soon as all data in that data range is
 	     available, the trigger callback will be called.
 
-	     All trigger callbacks will be called when #EOF# condidition
+	     All trigger callbacks will be called when #EOF# condition
 	     has been set.
 
        \item {\bf #DataPool# connected to another #DataPool#}. In this
@@ -145,7 +145,7 @@
 
        \item {\bf #DataPool# connected to a file}. This mode is quite similar
              to the case, when the #DataPool# is connected to another
-	     #DataPool#. Similarily, the #DataPool# stores no data inside.
+	     #DataPool#. Similarly, the #DataPool# stores no data inside.
 	     It just forwards all \Ref{get_data}() requests to the underlying
 	     source (a file in this case). Thus these requests will never
 	     block the reader. But they may return #0# if there is no data
@@ -296,17 +296,17 @@ public:
       /** Tells the #DataPool# to stop serving readers.
 
 	  If #only_blocked# flag is #TRUE# then only those requests will
-	  be processed, which would not block. Any attempt to get nonexisting
+	  be processed, which would not block. Any attempt to get non-existing
 	  data would result in a #STOP# exception (instead of blocking until
 	  data is available).
 
-	  If #only_blocked# flas is #FALSE# then any further attempt to read
+	  If #only_blocked# flag is #FALSE# then any further attempt to read
 	  from this #DataPool# (as well as from any #DataPool# connected
 	  to this one) will result in a #STOP# exception. */
    void		stop(bool only_blocked=false);
 
       /** @name Adding data.
-	  Plese note, that these functions are for not connected #DataPool#s
+	  Please note, that these functions are for not connected #DataPool#s
 	  only. You can not add data to a #DataPool#, which is connected
 	  to another #DataPool# or to a file.
 	*/
@@ -388,19 +388,19 @@ public:
 		   the reader is blocked, it should run in a separate thread
 		   so that other threads have a chance to call \Ref{add_data}().
 		   If there is no data available, but \Ref{is_eof}() is #TRUE#
-		   the behaviour is different and depends on the #DataPool#'s
+		   the behavior is different and depends on the #DataPool#'s
 		   estimate of the file size:
 		   \begin{itemize}
 		      \item If #DataPool# learns from the IFF structure of the
 		            data, that its size should be greater than it
-			    really is, then any attempt to read nonexisting
+			    really is, then any attempt to read non-existing
 			    data in the range of {\em valid} offsets will
 			    result in an #"EOF"# exception. This is done to
 			    indicate, that there was an error in adding data,
 			    and the data requested is {\bf supposed} to be
 			    there, but has actually not been added.
 		      \item If #DataPool#'s expectations about the data size
-		            coinside with the reality then any attempt to
+		            coincide with the reality then any attempt to
 			    read data beyond the legal range of offsets will
 			    result in #ZERO# bytes returned.
 		   \end{itemize}.
@@ -520,7 +520,7 @@ public:
       //@}
 
       /** Loads data from the file into memory. This function is only useful
-	  for #DataPool#s getting data from a file. It decends the #DataPool#s
+	  for #DataPool#s getting data from a file. It descends the #DataPool#s
 	  hierarchy until it either reaches a file-connected #DataPool#
 	  or #DataPool# containing the real data. In the latter case it
 	  does nothing, in the first case it makes the #DataPool# read all

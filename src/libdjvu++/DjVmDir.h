@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVmDir.h,v 1.18 2000-02-21 19:55:26 leonb Exp $
+//C- $Id: DjVmDir.h,v 1.19 2000-02-24 22:23:53 haffner Exp $
 
 #ifndef _DJVMDIR_H
 #define _DJVMDIR_H
@@ -34,7 +34,7 @@
     pages of the document.
     \begin{itemize} 
     \item In a {\em bundled} multipage file, the component files 
-         are stored immediatly after the #"DIRM"# chunk,
+         are stored immediately after the #"DIRM"# chunk,
          within the #"FORM:DJVU"# composite chunk.  
     \item In an {\em indirect} multipage file, the component files are 
           stored in different files whose URLs are composed using information 
@@ -62,7 +62,7 @@
     @memo Implements DjVu multipage document directory
     @author Andrei Erofeev <eaf@research.att.com>
     @version
-    #$Id: DjVmDir.h,v 1.18 2000-02-21 19:55:26 leonb Exp $# */
+    #$Id: DjVmDir.h,v 1.19 2000-02-24 22:23:53 haffner Exp $# */
 //@{
 
 

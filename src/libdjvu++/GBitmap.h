@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GBitmap.h,v 1.20 2000-02-01 16:07:50 leonb Exp $
+//C- $Id: GBitmap.h,v 1.21 2000-02-24 22:23:55 haffner Exp $
 
 #ifndef _GBITMAP_H_
 #define _GBITMAP_H_
@@ -45,7 +45,7 @@ class GMonitor;
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: GBitmap.h,v 1.20 2000-02-01 16:07:50 leonb Exp $#
+    #$Id: GBitmap.h,v 1.21 2000-02-24 22:23:55 haffner Exp $#
 
  */
 //@{
@@ -350,7 +350,7 @@ public:
   /** Static function for generating run data.
       This function encoded run length #count# at position #data#
       and increments the pointer accordingly.  The pointer must
-      intially point to a large enough data buffer. */
+      initially point to a large enough data buffer. */
   static inline void append_run(unsigned char *&data, int count);
   //@}
 

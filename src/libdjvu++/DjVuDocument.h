@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.h,v 1.56 2000-01-26 23:59:32 eaf Exp $
+//C- $Id: DjVuDocument.h,v 1.57 2000-02-24 22:23:54 haffner Exp $
  
 #ifndef _DJVUDOCUMENT_H
 #define _DJVUDOCUMENT_H
@@ -33,7 +33,7 @@
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@research.att.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocument.h,v 1.56 2000-01-26 23:59:32 eaf Exp $#
+    @version #$Id: DjVuDocument.h,v 1.57 2000-02-24 22:23:54 haffner Exp $#
 */
 
 //@{
@@ -107,7 +107,7 @@
 
 	     Another difference between single-threaded and multi-threaded
 	     environments is that in a single-threaded program, the image is
-	     fully decoded before it's returned. In a multithreaded
+	     fully decoded before it's returned. In a multi-threaded
 	     application decoding starts in a separate thread, and the pointer
 	     to the \Ref{DjVuImage} being decoded is returned immediately.
 	     This has been done to enable progressive redisplay
@@ -275,7 +275,7 @@ public:
 			   DjVuFileCache * cache=0);
 
       /** Call this function when you don't need the #DjVuDocument# any more.
-	  In a multithreaded environment it will stop initialization
+	  In a multi-threaded environment it will stop initialization
 	  thread, if it is currently running. {\bf You will not be able
 	  to start the initialization again. Thus, after calling this
           function the document should not be used any more}. */
@@ -284,8 +284,8 @@ public:
       /** Initializes the document.
 
 	  Contrary to \Ref{start_init}(), which just starts the initialization
-	  thread in a multithreaded environment, this function does not
-	  return until the initilization completes (either successfully or
+	  thread in a multi-threaded environment, this function does not
+	  return until the initialization completes (either successfully or
 	  not). Basically, it calls \Ref{start_init}() and then
 	  \Ref{wait_for_complete_init}().
 	  */
@@ -344,7 +344,7 @@ public:
 
 	  {\bf Note:} The pointer returned is guaranteed to be non-#ZERO#
 	  only after the #DjVuDocument# learns its type (passes through
-	  the first stage of initialization process). Plese refer to
+	  the first stage of initialization process). Please refer to
 	  \Ref{init}() for details. */
    GP<DataPool>	get_init_data_pool(void) const;
 
@@ -352,7 +352,7 @@ public:
       //@{
       /** Returns the number of pages in the document. If there is still
 	  insufficient information about the document structure (initialization
-	  has not finished yet), #1# will be returned. Plese refer to
+	  has not finished yet), #1# will be returned. Please refer to
           \Ref{init}() for details. */
    int		get_pages_num(void) const;
       /** Translates the page number to the full URL of the page. This URL
@@ -410,7 +410,7 @@ public:
 
 		   For #INDIRECT# documents the URL is obtained by
 		   appending the #name# of the found file to the URL of
-		   the directory containingn the document.
+		   the directory containing the document.
 	     \item For #OLD_BUNDLED# documents the function compares the ID
 		   with internal name of every file inside the bundle and
 		   composes an artificial URL by appending the file name to
@@ -433,7 +433,7 @@ public:
       /** Returns \Ref{GP} pointer to \Ref{DjVuImage} corresponding to page
           #page_num#. If caching is enabled, and there is a {\em fully decoded}
 	  \Ref{DjVuFile} in the cache, the image will be reused and will
-	  be returned fully decoded. Otherwise, if multithreaded behaviour
+	  be returned fully decoded. Otherwise, if multi-threaded behavior
 	  is allowed, and #sync# is set to #FALSE#, the decoding will be
 	  started in a separate thread, which enables to do progressive
 	  redisplay. Thus, in this case the image returned may be partially
@@ -452,7 +452,7 @@ public:
 	  If this function is called before the document's structure becomes
 	  known (the initialization process completes), the \Ref{DjVuFile},
 	  which the returned image will be attached to, will be assigned a
-	  temporary artifical URL, which will be corrected as soon as enough
+	  temporary artificial URL, which will be corrected as soon as enough
 	  information becomes available. The trick prevents the main thread
 	  from blocking and in some cases helps to start decoding earlier.
 	  The URL is corrected and decoding will start as soon as
@@ -468,7 +468,7 @@ public:
 	  @param page_num Number of the page to be decoded
 	  @param sync When set to #TRUE# the function will not return
 	  	      until the page is completely decoded. Otherwise,
-		      in a multithreaded program, this function will
+		      in a multi-threaded program, this function will
 		      start decoding in a new thread and will return
 		      a partially decoded image. Refer to
 		      \Ref{DjVuImage::wait_for_complete_decode}() and
@@ -492,7 +492,7 @@ public:
 	  \Ref{page_to_url}() and then creates \Ref{DjVuFile} initializing
 	  it with data from the URL.
 
-	  The behaviour becomes different, though in the case when the
+	  The behavior becomes different, though in the case when the
 	  document structure is unknown at the moment this function is called.
 	  In this situations it invents a temporary URL, creates a
 	  \Ref{DjVuFile}, initializes it with this URL and returns
@@ -545,7 +545,7 @@ public:
       //@}
 
       /** Waits until the document becomes completely initialized. As
-	  described in \Ref{start_init}(), for multithreaded applications the
+	  described in \Ref{start_init}(), for multi-threaded applications the
 	  initialization is carried out in parallel with the main thread.
 	  This function blocks the calling thread until the initializing
 	  thread reads enough data, receives information about the document

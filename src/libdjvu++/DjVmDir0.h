@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVmDir0.h,v 1.6 1999-10-05 16:00:05 leonb Exp $
+//C- $Id: DjVmDir0.h,v 1.7 2000-02-24 22:23:53 haffner Exp $
  
 #ifndef _DJVMDIR0_H
 #define _DJVMDIR0_H
@@ -27,7 +27,7 @@
 
     Files #"DjVmDir0.h"# and #"DjVmDir0.cpp"# contain implementation of
     \Ref{DjVmDir0} class responsible for reading and writing the directory
-    of a mutipage all-in-one-file DjVu document (usually referred to as
+    of a multipage all-in-one-file DjVu document (usually referred to as
     {\bf DjVm} document.
 
     This is {\bf not} a navigation directory, which lists all the pages
@@ -37,7 +37,7 @@
 
     @memo Directory of DjVu all-in-one-file DjVu documents.
     @author Andrei Erofeev <eaf@research.att.com>
-    @version #$Id: DjVmDir0.h,v 1.6 1999-10-05 16:00:05 leonb Exp $# */
+    @version #$Id: DjVmDir0.h,v 1.7 2000-02-24 22:23:53 haffner Exp $# */
 
 //@{
 

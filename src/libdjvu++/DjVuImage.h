@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuImage.h,v 1.25 1999-11-16 00:00:21 leonb Exp $
+//C- $Id: DjVuImage.h,v 1.26 2000-02-24 22:23:55 haffner Exp $
 
 #ifndef _DJVUIMAGE_H
 #define _DJVUIMAGE_H
@@ -51,7 +51,7 @@
     L\'eon Bottou <leonb@research.att.com> - initial implementation
     Andrei Erofeev <eaf@research.att.com> - multipage support
     @version
-    #$Id: DjVuImage.h,v 1.25 1999-11-16 00:00:21 leonb Exp $# */
+    #$Id: DjVuImage.h,v 1.26 2000-02-24 22:23:55 haffner Exp $# */
 //@{
 
 
@@ -133,7 +133,7 @@ public:
       image.  This function returns a null pointer until the decoder actually
       processes an #"BG44"# chunk. */
   GP<IWPixmap>    get_bg44() const;
-  /** Returns a pointer to tthe raw background component of a DjVu image. The
+  /** Returns a pointer to the raw background component of a DjVu image. The
       background component is used for JPEG encoded backgrounds.  This
       function returns a null pointer until the decoder actually processes an
       #"BGjp"# chunk. */

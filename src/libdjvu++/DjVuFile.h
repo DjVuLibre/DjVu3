@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.h,v 1.53 2000-01-26 23:59:32 eaf Exp $
+//C- $Id: DjVuFile.h,v 1.54 2000-02-24 22:23:54 haffner Exp $
  
 #ifndef _DJVUFILE_H
 #define _DJVUFILE_H
@@ -46,7 +46,7 @@
 
     @memo Classes representing DjVu files.
     @author Andrei Erofeev <eaf@research.att.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuFile.h,v 1.53 2000-01-26 23:59:32 eaf Exp $#
+    @version #$Id: DjVuFile.h,v 1.54 2000-02-24 22:23:54 haffner Exp $#
 */
 
 //@{
@@ -130,7 +130,7 @@
     somewhere in the net. That is why #DjVuFile# uses {\bf URLs} to
     identify itself and other files. If you're working with files on the
     hard disk, you have to use the local URLs instead of file names.
-    A good way to do two way convertion is the \Ref{GOS} class. Sometimes it
+    A good way to do two way conversion is the \Ref{GOS} class. Sometimes it
     happens that a given file does not reside anywhere but the memory. No
     problem in this case either. There is a special port \Ref{DjVuMemoryPort},
     which can associate any URL with the corresponding data in the memory.
@@ -161,7 +161,7 @@ public:
    GP<GPixmap>		bgpm;
       /// Pointer to the mask of foreground component of DjVu image (JB2 encoded).
    GP<JB2Image>		fgjb;
-      /// Pointer to the optional shape dictionary for the mask (JB2 encoced).
+      /// Pointer to the optional shape dictionary for the mask (JB2 encoded).
    GP<JB2Dict>		fgjd;
       /// Pointer to a colors layer for the foreground component of DjVu image.
    GP<GPixmap>		fgpm;

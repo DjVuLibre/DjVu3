@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuErrorList.h,v 1.3 2000-01-30 23:19:25 bcr Exp $
+//C- $Id: DjVuErrorList.h,v 1.4 2000-02-24 22:23:54 haffner Exp $
  
 #ifndef _DJVUERRORLIST_H
 #define _DJVUERRORLIST_H
@@ -23,18 +23,18 @@
 
 
 /** @name DjVuErrorList.h
-    This file impliments a very simple class for redirecting port caster
+    This file implements a very simple class for redirecting port caster
     messages that would normally end up on stderr to a double linked list.
 
     @memo DjVuErrorList class.
     @author Bill C Riemers <bcr@att.com>
-    @version #$Id: DjVuErrorList.h,v 1.3 2000-01-30 23:19:25 bcr Exp $#
+    @version #$Id: DjVuErrorList.h,v 1.4 2000-02-24 22:23:54 haffner Exp $#
 */
 
 //@{
 
 /** #DjVuErrorList# provides a convenient way to redirect error messages
-    from classes dirived from DjVuPort to a list that can be accessed at
+    from classes derived from DjVuPort to a list that can be accessed at
     any time. */
 
 class DjVuErrorList : public DjVuSimplePort

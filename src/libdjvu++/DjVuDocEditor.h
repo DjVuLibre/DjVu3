@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocEditor.h,v 1.17 2000-01-14 19:03:28 eaf Exp $
+//C- $Id: DjVuDocEditor.h,v 1.18 2000-02-24 22:23:54 haffner Exp $
  
 #ifndef _DJVUDOCEDITOR_H
 #define _DJVUDOCEDITOR_H
@@ -28,7 +28,7 @@
 
     @memo DjVu document editor class.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: DjVuDocEditor.h,v 1.17 2000-01-14 19:03:28 eaf Exp $#
+    @version #$Id: DjVuDocEditor.h,v 1.18 2000-02-24 22:23:54 haffner Exp $#
 */
 
 //@{
@@ -40,7 +40,7 @@
     \begin{enumerate}
        \item Create (compose) new multipage DjVu documents using single
              page DjVu documents. The class does {\bf not} do compression.
-       \item Insert and remove different pages od multipage DjVu documents.
+       \item Insert and remove different pages of multipage DjVu documents.
        \item Change attributes ({\em names}, {\em IDs} and {\em titles})
              of files composing the DjVu document.
        \item Generate thumbnail images and integrate them into the document.

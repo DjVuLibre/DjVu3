@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GString.h,v 1.12 1999-11-18 21:19:06 eaf Exp $
+//C- $Id: GString.h,v 1.13 2000-02-24 22:23:55 haffner Exp $
 
 
 #ifndef _GSTRING_H_
@@ -26,7 +26,7 @@
     then decided to avoid fancy classes (like #iostream# or #string#) and to
     rely only on the good old C library.  A good string class however is very
     useful.  We had already randomly picked letter 'G' to prefix class names
-    and we logically derived the new class name.  Native english speakers kept
+    and we logically derived the new class name.  Native English speakers kept
     laughing in hiding.  This is ironic because we completely forgot this
     letter 'G' when creating more challenging things like the ZP Coder or the
     IW44 wavelets.
@@ -36,7 +36,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.12 1999-11-18 21:19:06 eaf Exp $# */
+    #$Id: GString.h,v 1.13 2000-02-24 22:23:55 haffner Exp $# */
 //@{
 
 #ifdef __GNUC__

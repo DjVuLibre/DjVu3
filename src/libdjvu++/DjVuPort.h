@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuPort.h,v 1.25 2000-01-21 00:06:47 eaf Exp $
+//C- $Id: DjVuPort.h,v 1.26 2000-02-24 22:23:55 haffner Exp $
  
 #ifndef _DJVUPORT_H
 #define _DJVUPORT_H
@@ -56,8 +56,8 @@
     where \Ref{DjVuDocument} can get the data from the hard drive itself not
     disturbing the document's creator.
 
-    Two class implemente a general communication mechanism: \Ref{DjVuPort} and
-    \Ref{DjVuPortcaster}. Any sender and recepient of requests should be a
+    Two class implement a general communication mechanism: \Ref{DjVuPort} and
+    \Ref{DjVuPortcaster}. Any sender and recipient of requests should be a
     subclass of \Ref{DjVuPort}.  \Ref{DjVuPortcaster} maintains a map of
     routes between \Ref{DjVuPort}s, which should be configured by somebody
     else. Whenever a port wants to send a request, it calls the corresponding
@@ -71,7 +71,7 @@
     @memo DjVu decoder communication mechanism.
     @author Andrei Erofeev <eaf@research.att.com>\\
             L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuPort.h,v 1.25 2000-01-21 00:06:47 eaf Exp $# */
+    @version #$Id: DjVuPort.h,v 1.26 2000-02-24 22:23:55 haffner Exp $# */
 //@{
 
 class DjVuPort;
@@ -85,7 +85,7 @@ class DjVuPortcaster;
     override one or more virtual function.
 
     {\bf Important remark} --- All ports should be allocated on the heap using
-    #operator new# and immediatlely secured using a \Ref{GP} smartpointer.
+    #operator new# and immediately secured using a \Ref{GP} smart pointer.
     Ports which are not secured by a smart-pointer are not considered
     ``alive'' and never receive notifications! */
 
@@ -101,11 +101,11 @@ public:
    static DjVuPortcaster *get_portcaster(void);
 
       /** Copy constructor. When #DjVuPort#s are copied, the portcaster
-          copies all incoming and outgoinf routes of the original. */
+          copies all incoming and outgoing routes of the original. */
    DjVuPort(const DjVuPort & port);
 
-      /** Copy operator. Similarily to the copy constructor, the portcaster
-          copies all incoming and outgoingcoming routes of the original. */
+      /** Copy operator. Similarly to the copy constructor, the portcaster
+          copies all incoming and outgoing coming routes of the original. */
    DjVuPort & operator=(const DjVuPort & port);
 
       /** Should return 1 if the called class inherits class #class_name#.
@@ -119,7 +119,7 @@ public:
    virtual bool		inherits(const char * class_name) const;
 
       /** @name Notifications. 
-          These virtual functions may be overidden by the subclasses
+          These virtual functions may be overridden by the subclasses
           of #DjVuPort#.  They are called by the \Ref{DjVuPortcaster}
           when the port is alive and when there is a route between the 
           source of the notification and this port. */
@@ -203,7 +203,7 @@ public:
    virtual void		notify_decode_progress(const DjVuPort * source, float done);
       /** This is the standard types for defining what to do in case of errors.
           This is only used by some of the subclasses, but it needs to be 
-          defined here to guarentee all subclasses use the same enum types.
+          defined here to guarantee all subclasses use the same enum types.
           In general, many errors are none recoverable.  Using a setting
           other than ABORT may just result in even more errors. */
    enum ErrorRecoveryAction {ABORT=0,SKIP_PAGES=1,SKIP_CHUNKS=2,KEEP_ALL=3 }; 
@@ -307,7 +307,7 @@ private:
     not been processed by the closest. The examples are \Ref{request_data}(),
     \Ref{notify_error}() and \Ref{notify_status}().
 
-    The user is not expected to create the #DjVuPortcaster# itselt. He should
+    The user is not expected to create the #DjVuPortcaster# itself. He should
     use \Ref{get_portcaster}() global function instead.  */
 class DjVuPortcaster
 {
@@ -423,7 +423,7 @@ public:
 	  the closest. */
    virtual void		notify_decode_progress(const DjVuPort * source, float done);
 private:
-      // We use these 'void *' to minimize template instanciations.
+      // We use these 'void *' to minimize template instantiations.
    friend class DjVuPort;
    GCriticalSection		map_lock;
    GMap<const void *, void *>	route_map;	// GMap<DjVuPort *, GList<DjVuPort *> *>

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFileCache.h,v 1.4 2000-01-06 19:48:58 praveen Exp $
+//C- $Id: DjVuFileCache.h,v 1.5 2000-02-24 22:23:54 haffner Exp $
 
 #ifndef _DJVUFILECACHE_H
 #define _DJVUFILECACHE_H
@@ -37,16 +37,16 @@
     
     @memo Simple DjVuFile caching class.
     @author Andrei Erofeev <eaf@research.att.com>
-    @version #$Id: DjVuFileCache.h,v 1.4 2000-01-06 19:48:58 praveen Exp $#
+    @version #$Id: DjVuFileCache.h,v 1.5 2000-02-24 22:23:54 haffner Exp $#
 */
 
 //@{
 
 /** #DjVuFileCache# is a simple list of \Ref{DjVuFile} instances. It keeps
     track of the total size of all elements and can get rid of the oldest
-    one once the total size becomes over some thresold. Its main purpose
+    one once the total size becomes over some threshold. Its main purpose
     is to keep the added \Ref{DjVuFile} instances alive until their size
-    exceeds some given threshould (set by \Ref{set_maximum_size}() function).
+    exceeds some given threshold (set by \Ref{set_maximum_size}() function).
     The user is supposed to use \Ref{DjVuPortcaster::name_to_port}() to
     find a file corresponding to a given name. The cache provides no
     naming services */
@@ -81,7 +81,7 @@ public:
 	  \Ref{del_file}() do nothing. But the {\em maximum size} is preserved
 	  inside the class so that next time the cache is enabled, it will
 	  be configured the same way. Clearly this "enable/disable" thing is
-	  for convenience only. One could easily simulate this behaviour by
+	  for convenience only. One could easily simulate this behavior by
 	  setting the {\em maximum size} of the cache to #ZERO#. */
    bool		is_enabled(void) const;
 protected:

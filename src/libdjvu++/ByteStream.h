@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: ByteStream.h,v 1.16 2000-02-15 19:08:39 eaf Exp $
+//C- $Id: ByteStream.h,v 1.17 2000-02-24 22:23:53 haffner Exp $
 
 
 #ifndef _BYTESTREAM_H
@@ -41,7 +41,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation\\
     Andrei Erofeev <eaf@research.att.com> -- 
     @version
-    #$Id: ByteStream.h,v 1.16 2000-02-15 19:08:39 eaf Exp $# */
+    #$Id: ByteStream.h,v 1.17 2000-02-24 22:23:53 haffner Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -243,7 +243,7 @@ private:
 
 
 /** ByteStream interface managing a memory buffer.  
-    Class #MemoryByteStream# manages a dynamically resizeable buffer from
+    Class #MemoryByteStream# manages a dynamically resizable buffer from
     which data can be read or written.  The buffer itself is organized as an
     array of blocks of 4096 bytes.  */
 
@@ -268,7 +268,7 @@ public:
   size_t write(const void *buffer, size_t size);
   int    seek(long offset, int whence=SEEK_SET, bool nothrow=false);
   long   tell();
-  /** Erases everything in the memorybytestream.
+  /** Erases everything in the MemoryByteStream.
       The current location is reset to zero. */
   void empty();
   /** Returns the total number of bytes contained in the buffer.  Valid

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuAnno.h,v 1.23 2000-01-19 23:24:51 leonb Exp $
+//C- $Id: DjVuAnno.h,v 1.24 2000-02-24 22:23:54 haffner Exp $
 
 #ifndef _DJVUANNO_H
 #define _DJVUANNO_H
@@ -36,7 +36,7 @@
     @memo Implements support for DjVuImage annotations
     @author Andrei Erofeev <eaf@research.att.com>
     @version
-    #$Id: DjVuAnno.h,v 1.23 2000-01-19 23:24:51 leonb Exp $# */
+    #$Id: DjVuAnno.h,v 1.24 2000-02-24 22:23:54 haffner Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -250,7 +250,7 @@ public:
 		      nothing will be found.
 	     \end{itemize}
 	     
-	     If the function manages to find an occurence of the string,
+	     If the function manages to find an occurrence of the string,
 	     it will modify the #start_pos# to point to it. If no match has
 	     been found, the #start_pos# will be reset to some big number
 	     if searching forward and #-1# otherwise.

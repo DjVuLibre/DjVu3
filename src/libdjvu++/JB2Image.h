@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: JB2Image.h,v 1.17 1999-10-18 21:45:52 leonb Exp $
+//C- $Id: JB2Image.h,v 1.18 2000-02-24 22:23:55 haffner Exp $
 
 #ifndef _JB2IMAGE_H
 #define _JB2IMAGE_H
@@ -25,7 +25,7 @@
     with JBIG1.
 
     {\bf JB2 and JBIG2} --- JB2 has strong similarities with the forthcoming
-    JBIG2 standard developped by the "ISO/IEC JTC1 SC29 Working Group 1" which
+    JBIG2 standard developed by the "ISO/IEC JTC1 SC29 Working Group 1" which
     is responsible for both the JPEG and JBIG standards.  This is hardly
     surprising since JB2 was our own proposal for the JBIG2 standard
     and remained the only proposal for years.  The full JBIG2 standard however
@@ -107,7 +107,7 @@
     \end{itemize}
 
     @version
-    #$Id: JB2Image.h,v 1.17 1999-10-18 21:45:52 leonb Exp $#
+    #$Id: JB2Image.h,v 1.18 2000-02-24 22:23:55 haffner Exp $#
     @memo
     Coding bilevel images with JB2.
     @author
