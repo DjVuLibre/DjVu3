@@ -1,5 +1,6 @@
 # This rule sets the following variables:
 #	CXX, CXXFLAGS, CXXSYMBOLIC, CXXPIC, CXXUNROLL, CXXWARN
+# $Id: cxx.sh,v 1.16 2000-02-05 02:09:36 bcr Exp $
 
 if [ -z "$CONFIG_DIR" ] ; then
   echo "You must source functions.sh" 1>&2
