@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.107 2000-01-26 23:59:31 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.108 2000-01-28 02:46:02 praveen Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -20,7 +20,7 @@
 #include "GOS.h"
 #include "debug.h"
 
-const float	DjVuDocument::thumb_gamma=2.20;
+const float	DjVuDocument::thumb_gamma=(float)2.20;
 
 DjVuDocument::DjVuDocument(void)
   : doc_type(UNKNOWN_TYPE),
