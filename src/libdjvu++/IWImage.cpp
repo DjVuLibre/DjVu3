@@ -9,9 +9,9 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: IWImage.cpp,v 1.13 1999-05-24 19:31:59 leonb Exp $
+//C- $Id: IWImage.cpp,v 1.14 1999-05-26 22:58:12 leonb Exp $
 
-// File "$Id: IWImage.cpp,v 1.13 1999-05-24 19:31:59 leonb Exp $"
+// File "$Id: IWImage.cpp,v 1.14 1999-05-26 22:58:12 leonb Exp $"
 // - Author: Leon Bottou, 08/1998
 
 #ifdef __GNUC__
@@ -186,7 +186,7 @@ interpolate_mask(short *data16, int w, int h, int rowsize,
 
 static void
 forward_mask(short *data16, int w, int h, int rowsize, int begin, int end,
-             const signed char *mask8, int mskrowsize, int quickmask=0 )
+             const signed char *mask8, int mskrowsize )
 {
   int i,j, rp;
   signed char *m;
@@ -199,14 +199,10 @@ forward_mask(short *data16, int w, int h, int rowsize, int begin, int end,
   m = smask;
   for (i=0; i<h; i+=1, m+=w, mask8+=mskrowsize)
     memcpy((void*)m, (void*)mask8, w);
-  // Compute maximal number of iterations
-  int maxit = 8+5+1;
-  for (rp=w*h; rp>0; rp>>=1)
-    maxit += 1;
   // Loop over scale
-  int minerr = iw_round;
-  for (int scale=begin; scale<end; scale<<=1, minerr>>=1)
+  for (int scale=begin; scale<end; scale<<=1)
     {
+      DJVU_PROGRESS("masking", scale);
       // Copy data into sdata buffer
       p = data16;
       d = sdata;
@@ -217,83 +213,44 @@ forward_mask(short *data16, int w, int h, int rowsize, int begin, int end,
           p += rowsize * scale;
           d += w * scale;
         }
-      // Iterate
-      int lasterr = 255 << iw_shift;
-      int overshoot = 1;
-      for (rp=0; rp<maxit; rp++)
+      // Decompose
+      IWTransform::forward(sdata, w, h, w, scale, scale+scale);
+      // Cancel masked coefficients
+      d = sdata;
+      m = smask;
+      for (i=0; i<h; i+=scale+scale)
         {
-          DJVU_PROGRESS("masking", scale*1000 + rp);
-          // Decompose
-          IWTransform::forward(sdata, w, h, w, scale, scale+scale);
-          // Zero masked coefficients
-          d = sdata;
-          m = smask;
-          for (i=0; i<h; i+=scale+scale)
-            {
-              for (j=scale; j<w; j+=scale+scale)
-                if (m[j])
-                  d[j] = (overshoot ? -d[j]>>1 : 0);
-              d += w * scale;
-              m += w * scale;
-              if (i+scale < h)
-                {
-                  for (j=0; j<w; j+=scale)
-                    if (m[j])
-                      d[j] = (overshoot ? -d[j]>>1 : 0);
-                  d += w * scale;
-                  m += w * scale;
-                }
-            }
-          if (lasterr <= minerr)
-            break;
-          if (quickmask && scale==1)
-            break;
-          // Reconstruct
-          IWTransform::backward(sdata, w, h, w, scale+scale, scale);
-          // Evaluate max error
-          lasterr = 0;
-          p = data16;
-          d = sdata;
-          m = smask;
-          for (i=0; i<h; i+=scale)
+          for (j=scale; j<w; j+=scale+scale)
+            if (m[j])
+              d[j] = 0;
+          d += w * scale;
+          m += w * scale;
+          if (i+scale < h)
             {
               for (j=0; j<w; j+=scale)
-                if (! m[j])
-                  {
-                    short error = p[j] - d[j];
-                    if (error > lasterr)
-                      lasterr = error;
-                    else if (-error > lasterr)
-                      lasterr = -error;
-                    d[j] = (overshoot ? p[j] + (error>>1) : p[j]);
-                  }
-              p += rowsize*scale;
-              m += w*scale;
-              d += w*scale;
-            }
-#ifdef TRACEMASK
-          printf("scale %d, iteration %d, maxerr=%d %c\n", 
-                 scale, rp, lasterr, overshoot ? '+' : ' ');
-#endif
-          // Cancel overshooting and force continuation
-          if (lasterr<=minerr && overshoot) 
-            {
-              lasterr = 255 << iw_shift;
-              overshoot = 0;
+                if (m[j])
+                  d[j] = 0;
+              d += w * scale;
+              m += w * scale;
             }
         }
-      // Decompose if we had too many iterations
-      if (rp >= maxit)
+      // Reconstruct
+      IWTransform::backward(sdata, w, h, w, scale+scale, scale);
+      // Correct visible pixels
+      p = data16;
+      d = sdata;
+      m = smask;
+      for (i=0; i<h; i+=scale)
         {
-#ifdef TRACEMASK
-          printf("numerical accuracy limit reached at scale %d\n", scale);
-#endif
-          delete [] sdata;
-          delete [] smask;
-          IWTransform::forward(data16, w, h, rowsize, scale, end);
-          DJVU_PROGRESS("masking", 999999);
-          return;
+          for (j=0; j<w; j+=scale)
+            if (! m[j])
+              d[j] = p[j];
+          p += rowsize*scale;
+          m += w*scale;
+          d += w*scale;
         }
+      // Decompose again (no need to iterate actually!)
+      IWTransform::forward(sdata, w, h, w, scale, scale+scale);
       // Copy coefficients from sdata buffer
       p = data16;
       d = sdata;
@@ -304,7 +261,7 @@ forward_mask(short *data16, int w, int h, int rowsize, int begin, int end,
           p += rowsize * scale;
           d += w * scale;
         }
-      // Compute new mask
+      // Compute new mask for next scale
       m = smask;
       signed char *m0 = m;
       signed char *m1 = m;
@@ -325,7 +282,7 @@ forward_mask(short *data16, int w, int h, int rowsize, int begin, int end,
   delete [] sdata;
   delete [] smask;
   // Progress
-  DJVU_PROGRESS("masking", 999999);
+  DJVU_PROGRESS("masking", 64);
 }
 
 
@@ -466,7 +423,7 @@ public:
   ~_IWMap();
   // creation (from image)
   void create(const signed char *img8, int imgrowsize, 
-              const signed char *msk8=0, int mskrowsize=0, int quickmask=0);
+              const signed char *msk8=0, int mskrowsize=0);
   // image access
   void image(signed char *img8, int rowsize, 
              int pixsep=1, int fast=0);
@@ -652,7 +609,7 @@ _IWMap::get_memory_usage() const
 
 void 
 _IWMap::create(const signed char *img8, int imgrowsize, 
-               const signed char *msk8, int mskrowsize, int quickmask )
+               const signed char *msk8, int mskrowsize )
 {
   int i, j;
   // Allocate decomposition buffer
@@ -676,8 +633,8 @@ _IWMap::create(const signed char *img8, int imgrowsize,
     {
       // Interpolate pixels below mask
       interpolate_mask(data16, iw, ih, bw, msk8, mskrowsize);
-      // Perform decomposition with a mask
-      forward_mask(data16, iw, ih, bw, 1, 32, msk8, mskrowsize, quickmask);
+      // Multiscale iterative masked decomposition
+      forward_mask(data16, iw, ih, bw, 1, 32, msk8, mskrowsize);
     }
   else
     {
@@ -2253,7 +2210,7 @@ IWPixmap::init(const GPixmap *pm, const GBitmap *mask, CRCBMode crcbmode)
                 bufrow[j] = RGB_to_CB(pixrow->r, pixrow->g, pixrow->b);
             }
           // Create chrominance map (CB) with half resolution
-          cbmap->create(buffer, w, msk8, mskrowsize, crcb_half);
+          cbmap->create(buffer, w, msk8, mskrowsize);
           // Fill buffer with CR information
           crmap = new _IWMap(w,h);
           for (i=0; i<h; i++)
@@ -2264,7 +2221,7 @@ IWPixmap::init(const GPixmap *pm, const GBitmap *mask, CRCBMode crcbmode)
                 bufrow[j] = RGB_to_CR(pixrow->r, pixrow->g, pixrow->b);
             }
           // Create chrominance map (CR) with half resolution
-          crmap->create(buffer, w, msk8, mskrowsize, crcb_half);
+          crmap->create(buffer, w, msk8, mskrowsize);
           // Perform chrominance reduction (CRCBhalf)
           if (crcb_half)
             {
