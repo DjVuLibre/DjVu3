@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocEditor.cpp,v 1.53 2001-01-04 22:04:54 bcr Exp $
+// $Id: DjVuDocEditor.cpp,v 1.54 2001-01-26 19:33:46 fcrary Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -1669,6 +1669,24 @@ DjVuDocEditor::save_file(const char * file_id, const char * save_dir,
          StdioByteStream str_out(save_name, "wb");
          str_out.writall(octets, 4);
          GP<ByteStream> str_in=file_pool->get_stream();
+
+         // "Eat" any magic octets in the input stream so we don't get duplicates
+         // in the output.
+         {
+           char sample[4];
+           int chars_read;
+           do
+           {
+             chars_read = str_in->read( sample, 4);
+           }
+           while( chars_read == 4 && 
+                  sample[0] == octets[0] &&
+                  sample[1] == octets[1] &&
+                  sample[2] == octets[2] &&
+                  sample[3] == octets[3] );
+           str_out.writall( sample, chars_read );
+         }
+         // Copy remainder of input stream
          str_out.copy(*str_in);
 
          GP<ByteStream> str=file_pool->get_stream();

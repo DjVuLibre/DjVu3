@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DataPool.cpp,v 1.60 2001-01-09 00:17:37 bcr Exp $
+// $Id: DataPool.cpp,v 1.61 2001-01-26 19:33:46 fcrary Exp $
 // $Name:  $
 
 
@@ -1241,7 +1241,7 @@ DataPool::load_file(void)
       pool->load_file();
    } else if (fname.length())
    {
-      DEBUG_MSG("loading the data.\n");
+      DEBUG_MSG("loading the data from \"" << fname << "\".\n");
 
       GCriticalSectionLock lock1(&class_stream_lock);
       if (!fstream)
