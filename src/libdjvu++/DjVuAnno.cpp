@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuAnno.cpp,v 1.28 1999-10-26 18:57:31 praveen Exp $
+//C- $Id: DjVuAnno.cpp,v 1.29 1999-10-26 20:09:32 praveen Exp $
 
 
 #ifdef __GNUC__
@@ -1160,7 +1160,35 @@ DjVuTXT::copy(void) const
 }
 
 
-GList<DjVuTXT::Zone> DjVuTXT::search_string(const char* string, int &from, DjVuTXT::SearchDirection dir)
+bool DjVuTXT::find_zone(Zone &zone, Zone czone, int start, int length )
+// will return the lowest-level zone 
+{
+    if( czone.text_start > start || (czone.text_start+czone.text_length)<(start+length))
+        return false;
+    else
+    {
+        zone = czone;
+        GPosition pos;
+        pos = czone.children.firstpos();
+        while(pos)
+        {
+            if( find_zone(zone, czone.children[pos], start, length) )
+                break;
+            czone.children.next(pos);
+        }
+        return true;
+    }
+return true;
+}
+
+
+
+
+
+
+
+
+GList<DjVuTXT::Zone> DjVuTXT::search_string(const char* string, int &from, bool direction_down)
 {
 	int k,i;
 	GList<Zone> zone_list;
@@ -1169,7 +1197,7 @@ GList<DjVuTXT::Zone> DjVuTXT::search_string(const char* string, int &from, DjVuT
 	if( (string_length == 0) || (textUTF8.length() == 0) || (string_length>textUTF8.length()))
 		return zone_list;
 
-	if( dir != DjVuTXT::UP )
+	if( direction_down )
 	{
 		for(i=from; i<textUTF8.length(); i++)
 		{
@@ -1183,10 +1211,12 @@ GList<DjVuTXT::Zone> DjVuTXT::search_string(const char* string, int &from, DjVuT
 			if( k == string_length )
 				break;
 		}
+        if( k != string_length )
+            from = -1;
 	}
 	else
 	{
-		for(i=from; i>0; i--)
+		for(i=from; i>=0; i--)
 		{
 			k=0;
 			for(int j=i; j<textUTF8.length() && k<string_length; j++,k++)
@@ -1198,13 +1228,21 @@ GList<DjVuTXT::Zone> DjVuTXT::search_string(const char* string, int &from, DjVuT
 			if( k == string_length )
 				break;
 		}
+        if( k != string_length )
+            from = 0;
 	}
 
 	if( k == string_length )   /// string found in text?
 	{
 		from = i; /// update search location for next search
 
+		//// fill the zone list
+        Zone zone;
+        find_zone(zone, main, from, string_length);
+        zone_list.append(zone);
+
 	}
+
 	return zone_list;
 }
 
