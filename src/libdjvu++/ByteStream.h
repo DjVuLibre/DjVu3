@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: ByteStream.h,v 1.12 1999-08-17 21:28:10 eaf Exp $
+//C- $Id: ByteStream.h,v 1.13 1999-09-03 23:01:38 eaf Exp $
 
 
 #ifndef _BYTESTREAM_H
@@ -41,7 +41,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation\\
     Andrei Erofeev <eaf@research.att.com> -- 
     @version
-    #$Id: ByteStream.h,v 1.12 1999-08-17 21:28:10 eaf Exp $# */
+    #$Id: ByteStream.h,v 1.13 1999-09-03 23:01:38 eaf Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -69,7 +69,7 @@
     as private members. It is therefore not possible to make multiple copies
     of instances of this class, as implied by the class semantic.  
 */
-class ByteStream {
+class ByteStream : public GPEnabled {
 public:
   /** @name Virtual Functions.
       These functions are usually implemented by each subclass of #ByteStream#. */
