@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.cpp,v 1.34 1999-09-29 20:12:41 eaf Exp $
+//C- $Id: DataPool.cpp,v 1.35 1999-10-20 16:12:10 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -1041,25 +1041,27 @@ DataPool::add_trigger(int tstart, int tlength,
    if (callback)
    {
       if (is_eof()) call_callback(callback, cl_data);
-      
-      if (pool)
+      else
       {
-	    // We're connected to a DataPool
-	    // Just pass the triggers down remembering it in the list
-	 if (tlength<0 && length>0) tlength=length-tstart;
-	 GP<Trigger> trigger=new Trigger(tstart, tlength, callback, cl_data);
-	 pool->add_trigger(start+tstart, tlength, callback, cl_data);
-	 GCriticalSectionLock lock(&triggers_lock);
-	 triggers_list.append(trigger);
-      } else if (!fname.length())
-      {
-	    // We're not connected to anything and maintain our own data
-	 if (tlength>=0 && block_list.get_bytes(tstart, tlength)==tlength)
-	    call_callback(callback, cl_data);
-	 else
+	 if (pool)
 	 {
+	       // We're connected to a DataPool
+	       // Just pass the triggers down remembering it in the list
+	    if (tlength<0 && length>0) tlength=length-tstart;
+	    GP<Trigger> trigger=new Trigger(tstart, tlength, callback, cl_data);
+	    pool->add_trigger(start+tstart, tlength, callback, cl_data);
 	    GCriticalSectionLock lock(&triggers_lock);
-	    triggers_list.append(new Trigger(tstart, tlength, callback, cl_data));
+	    triggers_list.append(trigger);
+	 } else if (!fname.length())
+	 {
+	       // We're not connected to anything and maintain our own data
+	    if (tlength>=0 && block_list.get_bytes(tstart, tlength)==tlength)
+	       call_callback(callback, cl_data);
+	    else
+	    {
+	       GCriticalSectionLock lock(&triggers_lock);
+	       triggers_list.append(new Trigger(tstart, tlength, callback, cl_data));
+	    }
 	 }
       }
    }
