@@ -1,4 +1,4 @@
-/* File "$Id: DjVuAPI.h,v 1.10 1999-12-14 18:11:40 parag Exp $"
+/* File "$Id: DjVuAPI.h,v 1.11 1999-12-20 20:11:46 bcr Exp $"
  *
  * The main header file for the DjVu API
  */
@@ -11,7 +11,10 @@
 
 /* 
  * $Log: DjVuAPI.h,v $
- * Revision 1.10  1999-12-14 18:11:40  parag
+ * Revision 1.11  1999-12-20 20:11:46  bcr
+ * Removed references to G4TiffStream, since this class is superceded by MTiffStream.
+ *
+ * Revision 1.10  1999/12/14 18:11:40  parag
  * C Wrapper for MTiff added
  *
  * Revision 1.9  1999/12/14 04:44:08  parag
@@ -897,8 +900,6 @@ DJVUAPI int
 djvu_pixel_to_pict(djvu_pixel_image *,djvu_output_sub *,void *);
 DJVUAPI int
 djvu_pixel_to_ps(djvu_pixel_image *,djvu_output_sub *,void *);
-DJVUAPI int
-djvu_run_to_g4tiff(djvu_run_image *,djvu_output_sub *,void *);
 /* 
  *      djvu_pnm_to_run
  *
@@ -906,8 +907,6 @@ djvu_run_to_g4tiff(djvu_run_image *,djvu_output_sub *,void *);
  */
 DJVUAPI djvu_run_image *
 djvu_pnm_to_run(djvu_input_sub *inpf, void *arg);
-DJVUAPI djvu_run_image *
-djvu_g4tiff_to_run(djvu_input_sub *inpf, void *arg);
 
 // alloc functions return a handle which is used for 
 // further calls
