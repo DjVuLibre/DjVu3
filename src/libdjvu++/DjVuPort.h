@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuPort.h,v 1.3 1999-08-17 21:27:09 eaf Exp $
+//C- $Id: DjVuPort.h,v 1.4 1999-08-26 19:25:11 eaf Exp $
  
 #ifndef _DJVUPORT_H
 #define _DJVUPORT_H
@@ -68,7 +68,7 @@
     
     @memo DjVu decoder communication mechanism.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuPort.h,v 1.3 1999-08-17 21:27:09 eaf Exp $#
+    @version #$Id: DjVuPort.h,v 1.4 1999-08-26 19:25:11 eaf Exp $#
 */
 
 //@{
@@ -118,7 +118,17 @@ public:
 	  intercepts all such requests, and the user doesn't have to
 	  worry about the translation */
    virtual GURL		id_to_url(const DjVuPort * source, const char * id);
-   
+
+      /** This request is issued to obtain a cached copy of a \Ref{DjVuFile}.
+	  Contrary to other requests, it's passed to the "farthest" destinations
+	  first. Then, if they're unable to return the cached copy, it's
+	  passed to the most "closest" (to the source) ones. If a port can not
+	  fulfil the request, it should return #ZERO#.
+
+	  @param source The sender of the request
+	  @param url The URL of the cached file to be returned */
+   virtual GPBase	get_cached_file(const DjVuPort * source, const GURL & url);
+	  
       /** This request is issued when decoder needs additional data
 	  for decoding. Both \Ref{DjVuFile} and \Ref{DjVuDocument} are
 	  initialized with a #URL#, not the document data. As soon as
@@ -361,6 +371,11 @@ public:
 	  function in each of the ports from the destination list starting from
 	  the closest until one of them returns non-empty \Ref{GURL}. */
    virtual GURL		id_to_url(const DjVuPort * source, const char * id);
+      /** Computes destination list for #source# and calls the corresponding
+	  function in each of the ports from the destination list {\bf
+	  starting from the farthest} until one of then returns non #ZERO#
+	  pointer to \Ref{DjVuFile}. */
+   virtual GPBase	get_cached_file(const DjVuPort * source, const GURL & url);
       /** Computes destination list for #source# and calls the corresponding
 	  function in each of the ports from the destination list starting from
 	  the closest until one of them returns non-zero \Ref{DataRange}. */
