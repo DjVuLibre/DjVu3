@@ -30,6 +30,9 @@
 <DT>
 <A HREF="#DOC.1.5.14.1.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   void <B>load_file</B>(const char * name)
 <DD><I>This function will make every <TT>DataPool</TT> in the program, which is connected to a file, to load the file contents to the main memory and close the file.</I>
+<DT>
+<A HREF="#DOC.1.5.14.1.9"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   void <B>close_all</B>(void)
+<DD><I>This function will remove OpenFiles filelist.</I>
 </DL></P>
 
 <P><DL>
@@ -516,6 +519,11 @@ is connected to a file, to load the file contents to the main
 memory and close the file. This feature is important when you
 want to do something with the file like remove or overwrite it
 not affecting the rest of the program. 
+<DL><DT><DD></DL><P>
+<A NAME="close_all">
+<A NAME="DOC.1.5.14.1.9">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static   void close_all(void)</B></TT>
+<DD>This function will remove OpenFiles filelist. 
 <DL><DT><DD></DL><P></DL>
 
 <HR><DL><DT><B>This class has no child classes.</B></DL>
@@ -524,7 +532,7 @@ not affecting the rest of the program.
 <!-- This is were the DOC++ footer is defined  -->
 
 <font face="arial,helvetica" size="2">
-<a href=http://www.djvu.att.com>DjVu</a> is a trademark of AT&amp;T.  
+DjVu is a trademark of LizardTech.   
 <br>All other products mentioned are registered trademarks or trademarks of
 their respective companies.
 </font>
