@@ -6,10 +6,14 @@ if [ -z "$CONFIG_DIR" ] ; then
   exit 1
 fi
 
-if [ -z "$SYS" ] ; then
+if [ -z "$SYS_SET" ] ; then
   echon "Checking system type ... "
-  SYS=`"${uname}" -s`
-  PROC=`"${uname}" -p`
+	if [ -z "$SYS" ] ; then 
+    SYS=`"${uname}" -s`
+	fi
+	if [ -z "$PROC" ] ; then 
+    PROC=`"${uname}" -p`
+	fi
   DEFS="-DUNIX"
   INCS=" "
   JOBJ=" "
@@ -35,7 +39,8 @@ if [ -z "$SYS" ] ; then
       fi
     fi
   fi
+	SYS_SET=true
   echo "$SYS"
-  CONFIG_VARS=`echo SYS DEFS INCS JOBJ $CONFIG_VARS`
+  CONFIG_VARS=`echo SYS SYS_SET DEFS INCS JOBJ $CONFIG_VARS`
 fi
 
