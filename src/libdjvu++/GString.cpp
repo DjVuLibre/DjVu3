@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.73 2001-04-20 17:53:19 bcr Exp $
+// $Id: GString.cpp,v 1.74 2001-04-20 18:04:51 chrisp Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -1595,7 +1595,7 @@ GStringRep::toLong( GP<GStringRep>& eptr, bool &isLong, const int base) const
   long retval=Cstrtol(data,&edata, base);
   if(edata)
   {
-    eptr=GStringRep::create(data);
+    eptr=GStringRep::create(edata);
     isLong=true;
   }else
   {
