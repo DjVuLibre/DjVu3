@@ -8,7 +8,7 @@
 # C- AT&T, you have an infringing copy of this software and cannot use it
 # C- without violating AT&T's intellectual property rights.
 # C-
-# C- $Id: Makefile.in,v 1.50 1999-09-24 14:56:28 bcr Exp $
+# C- $Id: Makefile.in,v 1.51 1999-09-24 19:38:41 bcr Exp $
 
 %%%include <commands>
 
@@ -28,7 +28,7 @@ DEFS=@%DEFS%@
 CXXFLAGS=@%CXXFLAGS%@ @%CXXOPT%@ $(DEFS) $(OPT) $(WARN) -DUNIX
 LDFLAGS=
 DOCXX=@%docxx%@
-LIBS=@%LIBS%@
+LIBS=@%LIBS%@ @%libmath%@
 MAKESTLIB=@%make_stlib%@
 MAKESHLIB=@%make_shlib%@
 RANLIB=@%ranlib%@

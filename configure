@@ -68,7 +68,7 @@ fi
 check_compiler
 check_debug_option $debug
 check_thread_option $threads
-check_library log -lm
+check_library math log -lm
 check_rpo_option $rpo
 check_make_stlib
 
@@ -109,8 +109,5 @@ echo "    make clean"
 if [ -n "$compiler_is_gcc" ] ; then echo "    make depend" ; fi
 echo "    make all"
 echo " "
-
-
-
 
 

@@ -22,27 +22,53 @@ BUILDDIR=`cd "$BUILDDIR" 1>>/dev/null 2>>/dev/null;pwd`
 while [ $c != 0 ]
 do
 sed +
+  -e 's,@%%@,@%%@p,g' +
+  -e 's,!,@%%@e,g' +
+  -e 's, ,@%%@s,g' +
+  -e 's,	,@%%@t,g' +
+  -e 's,\$,@%%@d,g' +
+  -e 's,",@%%@q,g' +
+  -e 's,'"'"',@%%@a,g' +
   -e "s!@%srcdir%@!$SRCDIR!g" +
   -e "s!@%builddir%@!$BUILDDIR!g" +
 EOF
+  CONFIG_VARS=`sortlist $CONFIG_VARS`
   for i in $CONFIG_VARS ; do
     ss='echo $'"C_${i}"
     case "x`eval $ss`" in
     xreplace|xREPLACE)
-      s='echo "$'"R_${i}"'"'
+      s='escape "$'"R_${i}"'"'
       ;;
     xprefix|xPREFIX)
-      s='echo "$'P_"${i}"'" "$'"${i}"'"'
+      s='escape "$'P_"${i}"'" "$'"${i}"'"'
       ;;
     xappend|xAPPEND)
-      s='echo "$'"${i}"'" "$'"A_${i}"'"'
+      s='escape "$'"${i}"'" "$'"A_${i}"'"'
       ;;
     *)
-      s='echo "$'"${i}"'"'
+      s='escape "$'"${i}"'"'
       ;;
     esac 
     echo "-e 's!@%${i}%@!`eval $s`!g' \\"
   done
+# We include the following unescape rule twice because we allow recursive
+# escapes in the variable substitutions.
+  "${sed}" -e 's,+$,\\,g' <<\EOF
+  -e 's,@%%@a,'"'"',g' +
+  -e 's,@%%@q,",g' +
+  -e 's,@%%@d,\$,g' +
+  -e 's,@%%@t,	,g' +
+  -e 's,@%%@s, ,g' +
+  -e 's,@%%@e,!,g' +
+  -e 's,@%%@p,@%%@,g' +
+  -e 's,@%%@a,'"'"',g' +
+  -e 's,@%%@q,",g' +
+  -e 's,@%%@d,\$,g' +
+  -e 's,@%%@t,	,g' +
+  -e 's,@%%@s, ,g' +
+  -e 's,@%%@e,!,g' +
+  -e 's,@%%@p,@%%@,g' +
+EOF
   "${sed}" -e 's,+$,\\,g' <<EOF
   -e 's!^%%%[ 	]*include[ 	]*<\(.*\)>!%%%include "${RULES_DIR}/\1"!g' +
   -e '/^%%%[ 	]*BEGIN_SYS=(${SYS})/d' +

@@ -11,9 +11,10 @@ if [ -z "$CONFIG_READONLY" ] ; then
   if [ ! -d "$TOPBUILDDIR" ] ; then
     mkdirp "$TOPBUILDDIR"
   fi
+  CONFIG_VARS=`sortlist $CONFIG_VARS`
   echo CONFIG_VARS="'$CONFIG_VARS'" > "${CONFIG_CACHE}"
   for i in $CONFIG_VARS ; do
-    s='echo $'"${i}"
+    s='escape $'"${i}"
     echo "${i}='`eval $s`'" >> "${CONFIG_CACHE}"
   done
 fi

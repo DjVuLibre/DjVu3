@@ -15,6 +15,9 @@
 # pathclean PATH
 #   Replace things like /./ with / in the PATH specified.
 #
+# sortlist LIST
+#   Sorts each element of the white space separated list in alphabetical order.
+#
 # mkdirp PATH
 #   Equivalent to the GNU command "mkdir -p PATH"
 #
@@ -80,11 +83,11 @@ trap "rm -rf 2>>/dev/null $temp $temp.*" 0
 if [ "`echo -n`" = "-n" ]
 then
   echon() { 
-    echo $* "" "\c" 
+    echo "$*" "\c" 
   }
 else
   echon() { 
-    echo -n $* ""
+    echo -n "$*"
   }
 fi
 
@@ -98,6 +101,28 @@ pathclean()
                 -e 's:\(.\)/\.$:\1:g'
 }
 
+# Sort a list and make sure the elements are unique
+sortlist()
+{
+  (while [ $# != 0 ] ; do
+    echo "$1"
+    shift
+  done)|${sort} -u
+}
+
+# Escape characters.
+escape()
+{
+  echo "$*"|${sed} -e 's,@%%@,@%%@p,g' -e 's,!,@%%@e,g' -e 's, ,@%%@s,g' -e 's,	,@%%@t,g' -e 's,\$,@%%@d,g' -e 's,",@%%@q,g' -e 's,'"'"',@%%@a,g'
+}
+
+unescape()
+{
+  (while [ $# != 0 ] ; do
+    echo "$1"
+    shift
+  done)|sed  -e 's,@%%@a,'"'"',g' -e 's,@%%@q,",g' -e 's,@%%@d,\$,g' -e 's,@%%@t,	,g' -e 's,@%%@s, ,g' -e 's,@%%@e,!,g' -e 's,@%%@p,@%%@,g'
+}
 
 # Make directory and all parents unless they exist already
 mkdir -p "$temp/test/test" 2>>/dev/null 1>>/dev/null
@@ -169,7 +194,7 @@ process_general_option()
 {
   case "$*" in
         --prefix=* )
-            prefix=`get_option_value $1`
+            prefix=`get_option_value "$*"`
             ;; 
         --with-debug|-g )
             C_OPT=REPLACE
@@ -183,7 +208,8 @@ process_general_option()
             ;;
         --with-flag=* )
             C_DEFS=APPEND
-            A_DEFS="`get option_value $*` $A_DEFS"
+            s=`get option_value "$*"`
+            A_DEFS=`escape "$s"`" $A_DEFS"
             ;;
         *)
             return 1;
@@ -271,8 +297,8 @@ check_debug_option()
 
 
 # Usage: check_thread_option THREADFLAG
-# Side effects:   $DEFS <-- updated for multithread compilation
-#                 $OPT  <-- updated for multithread compilation
+# Side effects:   $A_DEFS <-- updated for multithread compilation
+#                 $A_OPT  <-- updated for multithread compilation
 
 
 check_thread_option()
@@ -286,63 +312,50 @@ check_thread_option()
        ;;
     no* )
        C_DEFS=APPEND
-       A_DEFS="$A_DEFS -DTHREADMODEL=NOTHREADS" 
+       A_DEFS="-DTHREADMODEL=NOTHREADS $A_DEFS" 
        ;;       
     jri* )
        C_DEFS=APPEND
-       A_DEFS="$A_DEFS -DTHREADMODEL=JRITHREADS" 
+       A_DEFS="-DTHREADMODEL=JRITHREADS $A_DEFS" 
        ;;       
     co* )
-       C_DEFS=APPEND
-       A_DEFS="$A_DEFS -DTHREADMODEL=COTHREADS" 
-       if [ -z "$compiler_is_gcc" ] 
-       then
-          echo 1>&2 "${PROGRAM_NAME}: Cothreads only work with gcc."
-          exit 1
+       if [ -z "$COTHREAD" ]  ; then
+         . "${CONFIG_DIR}/cothread.sh"
        fi
-       echon "Testing exception handler patch for gcc ... "
-       testfile $temp.cpp <<\EOF
-extern "C" void *(*__get_eh_context_ptr)(void);
-extern "C" void *__new_eh_context(void);
-void main() { __get_eh_context_ptr = &__new_eh_context; }
-EOF
-       if ( run $CXX $CXXFLAGS $temp.cpp -o $temp ) 
+       if [ -z "$CXXCOTHREAD" ]
        then
-          echo yes.
-       else
-          echo no.
+         echo 1>&2 "${PROGRAM_NAME}: Cothreads does not work with ${CXX}."
+         echo 1>&2 "You need GNU g++ or a dirivative such as pgcc or egcs."
+         exit 1
+       fi
+       if [ -z "$CCCOTHREAD" ]
+       then
+         echo 1>&2 "${PROGRAM_NAME}: Cothreads does not work with ${CC}."
+         echo 1>&2 "You need GNU gcc or a dirivative such as pgcc or egcs."
+         exit 1
+       fi
+       C_CXXFLAGS=APPEND
+       A_CXXFLAGS="${CXXCOTHREAD} $A_CXXFLAGS" 
+       C_CCFLAGS=APPEND
+       A_CCFLAGS="${CCCOTHREAD} $A_CCFLAGS" 
+       if [ ! -z "$CXXCOTHREAD_UNSAFE$CCCOTHREAD" ] 
+       then
           echo 1>&2 "${PROGRAM_NAME}: Using COTHREADS without the patch is unsafe."
           echo 1>&2 "-- See documentation for libdjvu++."
-          DEFS="$DEFS -DNO_LIBGCC_HOOKS"
        fi
        ;;       
     posix* | dce* )
-       C_DEFS=APPEND
-       A_DEFS="$DEFS -DTHREADMODEL=POSIXTHREADS" 
-       echo 'int main(void) {return 0;}' | testfile $temp.cpp
-       echon "Check option -pthread ... "
-       run $CXX $CXXFLAGS -pthread $temp.cpp -o $temp
-       if [ $? = 0 -a -z "`grep -i unrecognized $temp.out`" ]
-       then
-         echo yes.
-         CC="$CC -pthread"
-         CXX="$CXX -pthread"
-       else
-         echo no.
-         echon "Check option -threads ... "
-         run $CXX $CXXFLAGS -threads $temp.cpp -o $temp
-         if [ $? = 0 -a -z "`grep -i unrecognized $temp.out`" ]
-         then
-           echo yes.
-           CC="$CC -threads"
-           CXX="$CXX $CXXFLAGS -threads"
-         else
-           echo no.
-           C_LIBS=APPEND
-           A_LIBS="$A_LIBS -lpthread"
-           C_DEFS=APPEND
-           A_DEFS="$A_DEFS -D_REENTRANT"
-         fi
+       if [ -z "$CXXPTHREAD" ]  ; then
+         . "${CONFIG_DIR}/pthread.sh"
+       fi
+       C_CCFLAGS=APPEND
+       A_CCFLAGS="$CCPTHREAD $A_CCFLAGS"
+       C_CXXFLAGS=APPEND
+       A_CXXFLAGS="$CXXPTHREAD $A_CXXFLAGS"
+       if [ ! -z "${CCPTHREAD_LIB}${CXXPTHREAD_LIB}" ]
+       then 
+         C_LIBS=APPEND
+         A_LIBS="${CXXPTHREAD_LIB} ${A_LIBS}"
        fi
        ;;
     *)
@@ -405,32 +418,40 @@ check_rpo_option()
 ### ------------------------------------------------------------------------
 ### Check library
 
-# Usage: check_library FUNCTION ...ALTERNATIVE_LINKSPEC...
-# Side effect: Update variable LIBS
+# Usage: check_library NAME FUNCTION ...ALTERNATIVE_LINKSPEC...
+# Side effect: Update variable lib<NAME>
 
 
 check_library()
 {
+  name="$1"
+  shift
   func="$1"
   shift
-  echon "Searching library containing ${func}() ... "
-  testfile $temp.cpp <<EOF
+  s='echo $'"lib${name}_paths"
+  s=`eval $s`
+  t=`escape "$*"`
+  if [ "x$s" != "x$t" ] ; then
+    eval "lib${name}_paths='$t'"
+    CONFIG_VARS=`lib${name}_paths lib${name} $CONFIG_VARS`
+    echon "Searching library containing ${func}() ... "
+    testfile $temp.cpp <<EOF
 extern "C" int ${func}(void);
 int main(void) { return ${func}(); }
 EOF
-  for lib
-  do
-    if ( run $CXX $CXXFLAGS $OPT $DEFS $WARN $temp.cpp $lib -o $temp ) 
-    then
-      echo $lib
-      C_LIBS=APPEND
-      A_LIBS="$A_LIBS $lib"
-      return 0
-    fi
-  done
-  echo "not found."
-  echo 2>&1 "${PROGRAM_NAME}: Function ${func}() not found."
-  exit 1
+    for lib
+    do
+      if ( run $CXX $CXXFLAGS $OPT $DEFS $WARN $temp.cpp $lib -o $temp ) 
+      then
+        echo $lib
+        eval "lib${name}='"`escape "$lib"`"'"
+        return 0
+      fi
+    done
+    echo "not found."
+    echo 2>&1 "${PROGRAM_NAME}: Function ${func}() not found."
+    exit 1
+  fi
 }
 
 
@@ -570,7 +591,7 @@ PROGRAM_NAME=`basename "$PROGRAM"`
 if [ -z "$CONFIG_DIR" ] ; then
   CONFIG_DIR=`dirname "$0"`/config
   CONFIG_DIR=`cd "$CONFIG_DIR" 2>>/dev/null 1>>/dev/null;pwd`
-  CONFIG_VARS=`echo CONFIG_DIR "${CONFIG_VARS}"`
+  CONFIG_VARS=`echo CONFIG_DIR ${CONFIG_VARS}`
 fi
 
 # Next we can read in the available commands
@@ -597,7 +618,7 @@ fi
 if [ -z "$whence" ] ; then
   . "${CONFIG_DIR}/commands.sh"
 fi
-CONFIG_VARS=`(for i in DEFS OPT WARN LIBS RPO make_stlib make_shlib $CONFIG_VARS; do echo $i; done)|${sort} -u`
+CONFIG_VARS=`echo DEFS OPT WARN LIBS RPO make_stlib make_shlib $CONFIG_VARS`
 
 ### ------------------------------------------------------------------------
 ### General stuff
