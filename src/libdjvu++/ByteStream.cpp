@@ -9,9 +9,9 @@
 //C- AT&T, you have an infringing copy of this software and can not use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: ByteStream.cpp,v 1.23 2000-02-23 18:34:29 eaf Exp $
+//C- $Id: ByteStream.cpp,v 1.24 2000-03-02 08:08:57 bcr Exp $
 
-// File "$Id: ByteStream.cpp,v 1.23 2000-02-23 18:34:29 eaf Exp $"
+// File "$Id: ByteStream.cpp,v 1.24 2000-03-02 08:08:57 bcr Exp $"
 // - Author: Leon Bottou, 04/1997
 
 #ifdef __GNUC__
@@ -210,11 +210,11 @@ ByteStream::read32()
 
 //// CLASS STDIOBYTESTREAM
 
-StdioByteStream::StdioByteStream(FILE *f, const char *mode)
+StdioByteStream::StdioByteStream(FILE *f, const char *mode, bool closeme)
 {
   fp = f;
   pos = 0;
-  must_close = 0;
+  must_close = closeme?1:0;
   can_read = can_write = 0;
   for (const char *s=mode; s && *s; s++)
     switch(*s) 

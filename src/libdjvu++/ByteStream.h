@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: ByteStream.h,v 1.18 2000-02-27 23:19:49 eaf Exp $
+//C- $Id: ByteStream.h,v 1.19 2000-03-02 08:08:57 bcr Exp $
 
 
 #ifndef _BYTESTREAM_H
@@ -41,7 +41,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation\\
     Andrei Erofeev <eaf@geocities.com> -- 
     @version
-    #$Id: ByteStream.h,v 1.18 2000-02-27 23:19:49 eaf Exp $# */
+    #$Id: ByteStream.h,v 1.19 2000-03-02 08:08:57 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -219,8 +219,8 @@ public:
   /** Constructs a ByteStream for accessing the stdio file #f#.
       Argument #mode# indicates the type of the stdio file, as in the
       well known stdio function #fopen#.  Destroying the ByteStream
-      object will not close the stdio file #f#. */
-  StdioByteStream(FILE *f, const char *mode="rb");
+      object will not close the stdio file #f# unless closeme is true. */
+  StdioByteStream(FILE *f, const char *mode="rb", bool closeme=false);
   // Virtual functions
   ~StdioByteStream();
   size_t read(void *buffer, size_t size);
