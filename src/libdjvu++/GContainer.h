@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GContainer.h,v 1.17 1999-08-17 22:16:46 leonb Exp $
+//C- $Id: GContainer.h,v 1.18 1999-08-18 16:01:47 eaf Exp $
 
 
 #ifndef _GCONTAINER_H_
@@ -46,7 +46,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@research.att.com> -- bug fixes.
     @version 
-    #$Id: GContainer.h,v 1.17 1999-08-17 22:16:46 leonb Exp $# */
+    #$Id: GContainer.h,v 1.18 1999-08-18 16:01:47 eaf Exp $# */
 //@{
 
 
@@ -626,7 +626,7 @@ class GListImpl : public GListBase
 {
 protected:
   GListImpl();
-  typedef ListNode<TI> LNode;
+  typedef GCont::ListNode<TI> LNode;
   static Node * newnode(const TI &elt);
   int operator==(const GListImpl<TI> &l2) const;
   int search(const TI &elt, GPosition &pos) const;
