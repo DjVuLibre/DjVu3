@@ -1,4 +1,4 @@
-/* File "$Id: DjVuAPI.h,v 1.15 2000-01-04 20:01:46 bcr Exp $"
+/* File "$Id: DjVuAPI.h,v 1.16 2000-01-05 19:34:24 bcr Exp $"
  *
  * The main header file for the DjVu API
  */
@@ -8,7 +8,10 @@
 
 /* 
  * $Log: DjVuAPI.h,v $
- * Revision 1.15  2000-01-04 20:01:46  bcr
+ * Revision 1.16  2000-01-05 19:34:24  bcr
+ * Generic header file.
+ *
+ * Revision 1.15  2000/01/04 20:01:46  bcr
  * Made streams resumable, and fixed a few minor bugs.
  *
  * Revision 1.14  2000/01/04 05:31:30  bcr
@@ -760,8 +763,13 @@ typedef enum {
  */
 typedef void
 djvu_error_callback ( const char cause[], const char file[], const int line);
+
+#ifndef HAS_DJVU_PROGRESS_CALLBACKS
+#define HAS_DJVU_PROGRESS_CALLBACKS
 typedef void
 djvu_progress_callback (const char [],unsigned long,unsigned long);
+#endif
+
 #ifndef HAS_DJVU_CALLBACKS
 #define HAS_DJVU_CALLBACKS
   typedef void djvu_free_callback (void *);

@@ -8,7 +8,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: djvu_global.h,v 1.1 2000-01-05 19:33:41 bcr Exp $
+//C- $Id: DjVu.h,v 1.1 2000-01-05 19:34:24 bcr Exp $
 #endif /* __cplusplus */
 
 #include <stdlib.h>
