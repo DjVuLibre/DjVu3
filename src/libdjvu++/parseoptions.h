@@ -1,4 +1,4 @@
-#ifdef __cplusplus
+/*C- -*- C++ -*-
 //C- This software may only be used by you under license from AT&T
 //C- Corp. ("AT&T"). A copy of AT&T's Source Code Agreement is available at
 //C- AT&T's Internet web site having the URL <http://www.djvu.att.com/open>.
@@ -6,36 +6,11 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: parseoptions.h,v 1.29 2000-02-11 17:08:34 bcr Exp $
-
-#endif /* __cplusplus */
+//C- $Id: parseoptions.h,v 1.30 2000-02-21 20:01:48 leonb Exp $
+*/
 
 #ifndef __DJVUPARSEOPTIONS_H__
 #define __DJVUPARSEOPTIONS_H__
-
-#ifdef __cplusplus
-// First we include some C wrappers for our class.
-// The purpose of the DjVuParseOptions class, is to give a standard
-// way for all DjVu programs and API type functions to access values
-// from the command line and from configuration files.
-//
-// The operations of ChangeProfile(), and the copy constructor are only
-// thread safe if you define a THREADMETHOD.
-//
-#endif /* __cplusplus */
-
-#include "c-wrappers/DjVu.h"
-
-#ifdef __cplusplus
-#ifdef __GNUC__
-#pragma interface
-#endif /* __GNUC */
-
-#ifndef DJVUPARSEOPTIONS_STANDALONE
-#include "DjVuGlobal.h"
-#endif /* DJVUPARSEOPTIONS_STANDALONE */
-
-#include <stdio.h>
 
 /** @name parseoptions.h
    The idea is simply to have one object that we can use to parse arguments
@@ -67,10 +42,29 @@
 
    @memo Class used for parsing options and configuration files.
    @author Bill Riemers
-   @version #$Id: parseoptions.h,v 1.29 2000-02-11 17:08:34 bcr Exp $#
+   @version #$Id: parseoptions.h,v 1.30 2000-02-21 20:01:48 leonb Exp $#
  */
 
 /*@{*/
+
+/* First we include some C wrappers for our class.  The purpose of the
+ * DjVuParseOptions class, is to give a standard way for all DjVu programs and
+ * API type functions to access values from the command line and from
+ * configuration files.  The operations of ChangeProfile(), and the copy
+ * constructor are only thread safe if you define a THREADMODEL. 
+ */
+#include "c-wrappers/DjVu.h"
+
+#ifdef __cplusplus
+#ifdef __GNUC__
+#pragma interface
+#endif /* __GNUC */
+
+#ifndef DJVUPARSEOPTIONS_STANDALONE
+#include "DjVuGlobal.h"
+#endif /* DJVUPARSEOPTIONS_STANDALONE */
+
+#include <stdio.h>
 
 /** @name DjVuParseOptions Examples
     The following #DjVuParseOptions examples# demonstrates how to use the
