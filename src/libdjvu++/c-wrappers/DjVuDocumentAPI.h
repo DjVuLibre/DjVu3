@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuDocumentAPI.h,v 1.15 2000-02-01 13:38:51 haffner Exp $
+ *C- $Id: DjVuDocumentAPI.h,v 1.16 2000-02-02 22:00:14 haffner Exp $
  */
 
 #ifndef _DJVUDOC_H_
@@ -44,9 +44,6 @@ extern "C"
 
 typedef struct djvu_foreground_options_struct
 { 
-  /** Use a full resolution image when computing the foreground image, 
-      to allow for a maximum color saturation */
-  int high_saturation;
 
   /** Foreground colors are coded as a palette in the JB2Matcher */
   int color_jb2;
@@ -356,6 +353,12 @@ typedef struct djvu_segmenter_options_struct
    */
   int masksub_refine;
 
+  /** Segmenter uses subsampled chrominance only.
+      
+      Use a full resolution chrominance when computing the foreground image, 
+      to allow for a maximum color saturation */
+  int masksub_sub_chrom;
+
   /*@}*/
 
 #ifdef __cplusplus 
@@ -472,7 +475,7 @@ void documenttodjvu_usage(int fd,const char *prog);
 
 inline
 djvu_foreground_options_struct::djvu_foreground_options_struct() :
-  high_saturation(false), color_jb2(false), quality(75)
+  color_jb2(false), quality(75)
 {};
 
 inline documenttodjvu_options_struct::documenttodjvu_options_struct() :
@@ -482,7 +485,7 @@ inline djvu_segmenter_options_struct::djvu_segmenter_options_struct() :
   pix_filter_level(25), threshold_level(75), shape_filter_level(50),
   inhibit_foreback_level(40), inversion_level(25), edge_size(3),
   render_size(3), blurring_size(3), fg_subsampling(12), bg_subsampling(3),
-  resolution_multiplier(1), high_variation_foreground(false), masksub_refine(true) {}
+  resolution_multiplier(1), high_variation_foreground(false), masksub_refine(true), masksub_sub_chrom(false) {}
 
 // These examples will be modified to show configuration file examples,
 // instead of inline functions at a future date.

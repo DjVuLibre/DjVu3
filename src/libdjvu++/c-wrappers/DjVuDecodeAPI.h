@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuDecodeAPI.h,v 1.19 2000-01-30 01:28:36 bcr Exp $
+ *C- $Id: DjVuDecodeAPI.h,v 1.20 2000-02-02 22:00:14 haffner Exp $
  */
 
 #ifndef _DJVUDECODE_H_
@@ -145,6 +145,9 @@ typedef struct djvu_process_options_struct
 
   /// logfileno should be non-zero to print verbose processing details
   int logfileno;
+
+  /// tracefileno should be non-zero to print trace information
+  int tracefileno;
 
   /// #helpfileno# should be non-zero to print usage instructions.
   int helpfileno;
