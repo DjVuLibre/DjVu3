@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuAnno.cpp,v 1.17 1999-09-30 21:48:35 praveen Exp $
+//C- $Id: DjVuAnno.cpp,v 1.18 1999-10-01 17:57:31 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -162,7 +162,7 @@ GLObject::print(ByteStream & str, int compact, int indent, int * cur_pos) const
 	    int src=0, dst=0;
 	    buffer_str.resize(string.length()*2);
 	    buffer_str[dst++]='"';
-	    for(src=0;src<string.length();src++)
+	    for(src=0;src<(int)string.length();src++)
 	    {
 	       char ch=string[src];
 	       if (ch=='"') buffer_str[dst++]='\\';
