@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVmDir.cpp,v 1.8 1999-10-18 14:07:33 leonb Exp $
+//C- $Id: DjVmDir.cpp,v 1.9 1999-10-24 20:25:53 eaf Exp $
 
 
 #ifdef __GNUC__
@@ -21,10 +21,6 @@
 #include "debug.h"
 
 #include <ctype.h>
-
-
-
-
 
 /* DjVmDir::File */
 
@@ -44,8 +40,6 @@ DjVmDir::File::File(const char *name, const char *id, const char *title, bool pa
     flags |= IS_PAGE; 
 }
 
-
-
 /* Directory file format
 
    char8		(version number | (bundled or not) << 7)
@@ -62,7 +56,7 @@ DjVmDir::File::File(const char *name, const char *id, const char *title, bool pa
          ASCIIZ title, if it's different from id (see flags)
 */
 
-const int DjVmDir::version=0;
+const int DjVmDir::version=1;
 
 void 
 DjVmDir::decode(ByteStream & str)
@@ -96,7 +90,7 @@ DjVmDir::decode(ByteStream & str)
 
    if (files)
    {
-      DEBUG_MSG("reading offsets and sizes\n");
+      DEBUG_MSG("reading offsets (and sizes for ver==0)\n");
       for(int file=0;file<files;file++)
       {
 	 GP<File> file=new File();
@@ -104,13 +98,20 @@ DjVmDir::decode(ByteStream & str)
 	 if (bundled)
 	 {
 	    file->offset=str.read32();
-	    file->size=str.read24();
-	    if (file->offset==0 || file->size==0)
+	    if (ver==0) file->size=str.read24();
+	    if (file->offset==0)
 	       THROW("Directory error: no indirect entries allowed in bundled document.");
 	 } else file->offset=file->size=0;
       }
 
       BSByteStream bs_str(str);
+      if (ver>0)
+      {
+	 DEBUG_MSG("reading and decompressing sizes...\n");
+	 for(GPosition pos=files_list;pos;++pos)
+	    files_list[pos]->size=bs_str.read24();
+      }
+	 
       DEBUG_MSG("reading and decompressing flags...\n");
       for(pos=files_list;pos;++pos)
 	 files_list[pos]->flags=bs_str.read8();
@@ -220,19 +221,30 @@ DjVmDir::encode(ByteStream & str) const
    {
       if (bundled)
       {
-	 DEBUG_MSG("storing offsets and sizes for every record\n");
+	    // We need to store offsets uncompressed. That's because when
+	    // we save a DjVmDoc, we first compress the DjVmDir with dummy
+	    // offsets and after computing the real offsets we rewrite the
+	    // DjVmDir, which should not change its size during this operation
+	 DEBUG_MSG("storing offsets for every record\n");
 	 for(pos=files_list;pos;++pos)
 	 {
 	    GP<File> file=files_list[pos];
 	    if (bundled ^ (file->offset!=0))
 	       THROW("The directory contains both indirect and bundled records.");
-      
 	    str.write32(file->offset);
-	    str.write24(file->size);
 	 }
       }
 
       BSByteStream bs_str(str, 50);
+      DEBUG_MSG("storing and compressing sizes for every record\n");
+      for(pos=files_list;pos;++pos)
+      {
+	 GP<File> file=files_list[pos];
+	 if (bundled ^ (file->offset!=0))
+	    THROW("The directory contains both indirect and bundled records.");
+	 bs_str.write24(file->size);
+      }
+	 
       DEBUG_MSG("storing and compressing flags for every record\n");
       for(pos=files_list;pos;++pos)
       {
