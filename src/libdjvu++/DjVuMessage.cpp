@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessage.cpp,v 1.54 2001-06-05 03:19:58 bcr Exp $
+// $Id: DjVuMessage.cpp,v 1.55 2001-06-05 15:12:23 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -82,8 +82,6 @@ static const char includestring[]="INCLUDE";
 static const char messagestring[]="MESSAGE";
 static const char localestring[]="locale";
 
-  // appended to the home directory.
-static const char ModuleDjVuDir[] ="profiles";
 
 #ifndef NO_DEBUG
 #if defined(UNIX)
@@ -102,6 +100,8 @@ static const char RootDjVuDir[] ="C:/Program Files/LizardTech/Profiles";
 static const TCHAR registrypath[]= TEXT("Software\\LizardTech\\DjVu\\Profile Path");
 #else
 // appended to the home directory.
+  // appended to the home directory.
+static const char ModuleDjVuDir[] ="profiles";
 static const char LocalDjVuDir[] =".DjVu";
 static const char RootDjVuDir[] ="/etc/DjVu/";
 #endif
@@ -316,7 +316,7 @@ DjVuMessage::GetProfilePaths(void)
         {
           G_THROW( ERR_MSG("XMLAnno.extra_body") );
         }
-        const GP<lt_XMLTags> & GBody(Body[pos]);
+        const GP<lt_XMLTags> GBody(Body[pos]);
         if(!GBody)
         {
           G_THROW( ERR_MSG("XMLAnno.no_body") );
