@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessage.h,v 1.18 2001-04-20 17:08:26 bcr Exp $
+// $Id: DjVuMessage.h,v 1.19 2001-04-20 22:13:45 praveen Exp $
 // $Name:  $
 
 
@@ -134,7 +134,7 @@ public:
 
   /** Same as Lookup, but returns the a multibyte character string in the
       current locale. */
-  static GUTF8String LookUpNative( const GUTF8String & MessageList )
+  static GNativeString LookUpNative( const GUTF8String & MessageList )
   { return DjVuMessage::create().LookUp(MessageList).getUTF82Native(); }
 
   /// This is a simple alias to the above class, but does an fprintf to stderr.

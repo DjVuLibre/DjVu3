@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.h,v 1.56 2001-04-20 17:08:26 bcr Exp $
+// $Id: GString.h,v 1.57 2001-04-20 22:13:45 praveen Exp $
 // $Name:  $
 
 #ifndef _GSTRING_H_
@@ -57,7 +57,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.56 2001-04-20 17:08:26 bcr Exp $# */
+    #$Id: GString.h,v 1.57 2001-04-20 22:13:45 praveen Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -1164,17 +1164,17 @@ GString::downcase( void ) const
 
 inline
 GUTF8String::GUTF8String(const GNativeString &str)
-: GString((str.length()?(str->toNative(true)):(GP<GStringRep>)str))
-{ init(); }
-
-inline
-GNativeString::GNativeString(const GUTF8String &str)
 : GString((str.length()?(str->toUTF8(true)):(GP<GStringRep>)str))
 { init(); }
 
 inline
+GNativeString::GNativeString(const GUTF8String &str)
+: GString((str.length()?(str->toNative(true)):(GP<GStringRep>)str))
+{ init(); }
+
+inline
 GUTF8String::GUTF8String(const GP<GStringRep> &str)
-: GString(str?(str->toNative(true)):str)
+: GString(str?(str->toUTF8(true)):str)
 { init(); }
 
 inline
@@ -1184,12 +1184,12 @@ GNativeString::GNativeString(const GP<GStringRep> &str)
 
 inline
 GUTF8String::GUTF8String(const GString &str)
-: GString((str.length()?(str->toNative(true)):(GP<GStringRep>)str))
+: GString((str.length()?(str->toUTF8(true)):(GP<GStringRep>)str))
 { init(); }
 
 inline
 GNativeString::GNativeString(const GString &str)
-: GString((str.length()?(str->toUTF8(true)):(GP<GStringRep>)str))
+: GString((str.length()?(str->toNative(true)):(GP<GStringRep>)str))
 { init(); }
 
 inline void
