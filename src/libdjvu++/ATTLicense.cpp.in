@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: ATTLicense.cpp.in,v 1.1 1999-02-27 00:53:17 leonb Exp $
+//C-  $Id: ATTLicense.cpp.in,v 1.2 1999-03-01 17:02:44 leonb Exp $
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -15,41 +15,33 @@
 #include "ByteStream.h"
 #include "BSByteStream.h"
 
-static const char the_copyright[] = 
+static const char *the_copyright = 
 "copyright (c) AT&T 1999";
 
-static const char the_license[] = {
-  @ATTLICENSE@
-  255
-};
+static const char *the_usage = 
+"\tThis program is copyright (c) AT&T 1999.\n"
+"\tUse option \'-license\' to see the licensing terms\n";
 
+static const char *the_license = 
+@ATTLICENSE@
+"\000";
 
-GString
+const char*
 ATTLicense::get_license_text()
 {
-  StaticByteStream input(the_license, sizeof(the_license));
-  BSByteStream decode(input);
-  MemoryByteStream temp;
-  temp.copy(decode);
-  GString str;
-  int len = temp.size();
-  char *buffer = str.getbuf(len);
-  temp.seek(0);
-  temp.read(buffer,len);
-  return str;
+  return the_license;
 }
 
-GString
+const char*
 ATTLicense::get_copyright_text()
 {
-  return GString(the_copyright);
+  return the_copyright;
 }
 
-GString
-ATTLicense::get_usage_text(char *program)
+const char*
+ATTLicense::get_usage_text()
 {
-  return "This program is " + GString(the_copyright) + ".\n" + 
-         "Type command \'" + program + " -license\' to see the licensing terms\n";
+  return the_usage;
 }
 
 void
@@ -75,10 +67,9 @@ ATTLicense::process_cmdline(int argc, char **argv)
   FILE *f = popen(pager,"w");
   if (f)
     {
-      StaticByteStream input(the_license, sizeof(the_license));
-      BSByteStream decode(input);
+      StaticByteStream input(the_license);
       StdioByteStream output(f, "w");
-      output.copy(decode);
+      output.copy(input);
       if (pclose(f) >= 0)
         exit(0);
     }

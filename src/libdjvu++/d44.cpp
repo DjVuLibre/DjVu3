@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: d44.cpp,v 1.5 1999-02-03 22:55:30 leonb Exp $
+//C-  $Id: d44.cpp,v 1.6 1999-03-01 17:02:45 leonb Exp $
 
 
 
@@ -62,7 +62,7 @@
     @author
     Leon Bottou <leonb@research.att.com>
     @version
-    #$Id: d44.cpp,v 1.5 1999-02-03 22:55:30 leonb Exp $# */
+    #$Id: d44.cpp,v 1.6 1999-03-01 17:02:45 leonb Exp $# */
 //#{
 //#}
 
@@ -71,7 +71,7 @@
 #include "GException.h"
 #include "IWImage.h"
 #include "GOS.h"
-
+#include "ATTLicense.h"
 
 
 // global data
@@ -90,12 +90,12 @@ void
 usage()
 {
   printf("D44 -- Image decompression utility using Interpolating Wavelets (4,4)\n"
-         "       [d44 (c) AT&T Labs 1997 (Leon Bottou, HA6156)]\n\n"
+         "%s\n"
          "Usage: d44 [options] iw4file [pnmfile]\n"
          "Options:\n"
          "    -verbose     -- report decoding time and memory use\n"
          "    -chunks n    -- select number of chunks to decode\n"
-         "\n");
+         "\n", ATTLicense::get_usage_text());
   exit(1);
 }
 
@@ -151,6 +151,7 @@ main(int argc, char **argv)
   TRY
     {
       // Parse arguments
+      ATTLicense::process_cmdline(argc,argv);
       parse(argc, argv);
       // Check input file
       StdioByteStream ibs(iw4file,"rb");

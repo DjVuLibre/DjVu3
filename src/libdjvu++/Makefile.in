@@ -2,7 +2,6 @@ SHELL=/bin/sh
 prefix=@prefix@
 bindir=@prefix@/bin
 SRCDIR=@srcdir@
-TOP=@topdir@
 VPATH=@srcdir@
 CXX=@cxx@
 OPT=@opt@
@@ -12,7 +11,7 @@ AR=@ar@
 DOCXX= doc++
 LDLIBS=@ldlibs@
 DEFS=@defs@
-CXXFLAGS= $(DEFS) $(OPT) $(WARN) -I$(TOP) -DUNIX
+CXXFLAGS= $(DEFS) $(OPT) $(WARN) -I$(SRCDIR) -DUNIX
 LDFLAGS=
 
 # This 
@@ -50,7 +49,7 @@ MAKEDEJAVUOBJS = djvumake.o
 BREAKDEJAVUOBJS = djvuextract.o
 PPMCOCOOBJS = ppmcoco.o
 ANNOTATEOBJS = annotate.o
-BZZOBJS = bzz.o BSByteStream.o ZPCodec.o ByteStream.o GException.o
+BZZOBJS = bzz.o BSByteStream.o ZPCodec.o ByteStream.o GException.o DjVuGlobal.o
 LIBDJVUOBJS = libdjvu.o 
 
 c44: $(C44OBJS) $(LIB)
@@ -77,29 +76,28 @@ ppmcoco: $(PPMCOCOOBJS) $(LIB)
 annotate: $(ANNOTATEOBJS) $(LIB)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(ANNOTATEOBJS) $(LIB) $(LDLIBS)
 
-bzz: $(BZZOBJS)
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(BZZOBJS) $(LDLIBS)
+bzz: $(BZZOBJS) $(LIB)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(BZZOBJS) $(LIB) $(LDLIBS)
 
 # License substitution
 
-ATTLicense.cpp: ATTLicense.cpp.in ATTLICENSE bzz
-	@echo nay > ATTLICENSE.tmp
-	-test -x bzz && ( bzz $(TOP)/ATTLICENSE - | od -A n -v -t d1 |\
-	   sed -e 's/.*/  &/' -e 's/ *0*\([0-9][0-9]*\)/\1,/g' > ATTLICENSE.tmp )
-	sed < $(TOP)/ATTLicense.cpp.in > ATTLicense.cpp \
+ATTLicense.cpp: ATTLicense.cpp.in ATTLICENSE
+	sed < $(SRCDIR)/ATTLICENSE > ATTLICENSE.tmp\
+	   -e 's/\"/\\"/g' -e 's/.*/"&\\n"/'
+	sed < $(SRCDIR)/ATTLicense.cpp.in > ATTLicense.cpp \
 	   -e '/@ATTLICENSE@/r ATTLICENSE.tmp' -e '/@ATTLICENSE@/d'
 	-rm ATTLICENSE.tmp
 
 libdjvu++.dxx: libdjvu++.dxx.in
-	sed < $(TOP)/libdjvu++.dxx.in > libdjvu++.dxx \
-	   -e '/@ATTLICENSE@/r $(TOP)/ATTLICENSE' -e '/@ATTLICENSE@/d' 
+	sed < $(SRCDIR)/libdjvu++.dxx.in > libdjvu++.dxx \
+	   -e '/@ATTLICENSE@/r $(SRCDIR)/ATTLICENSE' -e '/@ATTLICENSE@/d' 
 
 # Documentation
 
 html: libdjvu++.dxx libdjvu++.footer
 	-rm -rf @Doc
 	-mkdir @Doc 2>/dev/null
-	${DOCXX} -d @Doc -B $(TOP)/libdjvu++.footer libdjvu++.dxx
+	${DOCXX} -d @Doc -B $(SRCDIR)/libdjvu++.footer libdjvu++.dxx
 
 tex:  libdjvu++.dxx
 	-@mkdir @Doc 2>/dev/null
@@ -119,8 +117,8 @@ clean:
 	-@echo Cleaned.
 
 realclean:
-	-rm 2>/dev/null -rf @Doc ; true
-	-rm 2>/dev/null -rf ATTLicense.cpp libdjvu++.dxx libdjvu++.ps.gz ; true
+	-rm 2>/dev/null -rf @Doc libdjvu++.dxx libdjvu++.ps.gz ; true
+	-rm 2>/dev/null -rf ATTLicense.cpp Makefile.dep ; true
 	-@$(MAKE) clean
 
 distclean:
@@ -140,11 +138,12 @@ install: $(PROG)
 	-@echo Installed.
 
 depend:
+	( cd $(SRCDIR) ; echo "### DEPENDENCIES" ;\
+	  for n in *.cpp ; do ${CXX} -MM $(CXXFLAGS) $$n ; done ) > Makefile.dep
 	sed -e '/^### DEPENDENCIES$$/,$$d' Makefile > Makefile.new
-	echo "### DEPENDENCIES" >> Makefile.new
-	( cd $(TOP) ; for n in *.cpp ; do ${CXX} -MM $(CXXFLAGS) $$n ; done ) >> Makefile.new
-	sed -e '1,$$s/^\(Test[A-Za-z0-9]*\)\.o:/\1:/g' < Makefile.new > Makefile
-	rm Makefile.new
+	cat Makefile.dep >> Makefile.new
+	mv Makefile.new Makefile
+	  
 
 PHONY: html tex clean realclean distclean install depend
 
@@ -155,66 +154,3 @@ PHONY: html tex clean realclean distclean install depend
 	$(CXX) $(CXXFLAGS) -c $(SRCDIR)/$*.cpp
 
 
-### DEPENDENCIES
-ATTLicense.o: ATTLicense.cpp ATTLicense.h GString.h DjVuGlobal.h \
- GException.h GSmartPointer.h ByteStream.h GContainer.h BSByteStream.h \
- ZPCodec.h
-BSByteStream.o: BSByteStream.cpp BSByteStream.h DjVuGlobal.h \
- GException.h ByteStream.h GContainer.h GSmartPointer.h ZPCodec.h
-ByteStream.o: ByteStream.cpp ByteStream.h DjVuGlobal.h GException.h \
- GContainer.h GSmartPointer.h
-DjVuGlobal.o: DjVuGlobal.cpp DjVuGlobal.h
-DjVuImage.o: DjVuImage.cpp DjVuImage.h GString.h DjVuGlobal.h \
- GException.h GSmartPointer.h GThreads.h ByteStream.h GContainer.h \
- IFFByteStream.h JB2Image.h ZPCodec.h GRect.h GBitmap.h IWImage.h \
- GPixmap.h GScaler.h
-GBitmap.o: GBitmap.cpp GBitmap.h DjVuGlobal.h GRect.h ByteStream.h \
- GException.h GContainer.h GSmartPointer.h GString.h
-GContainer.o: GContainer.cpp GContainer.h DjVuGlobal.h GException.h
-GException.o: GException.cpp GException.h DjVuGlobal.h
-GOS.o: GOS.cpp GException.h DjVuGlobal.h GThreads.h GOS.h GString.h \
- GSmartPointer.h
-GPixmap.o: GPixmap.cpp GString.h DjVuGlobal.h GException.h \
- GSmartPointer.h ByteStream.h GContainer.h GRect.h GBitmap.h GPixmap.h \
- GThreads.h
-GRect.o: GRect.cpp GRect.h DjVuGlobal.h GException.h
-GScaler.o: GScaler.cpp GScaler.h GException.h DjVuGlobal.h GRect.h \
- GBitmap.h ByteStream.h GContainer.h GSmartPointer.h GPixmap.h
-GSmartPointer.o: GSmartPointer.cpp GThreads.h DjVuGlobal.h \
- GException.h GSmartPointer.h
-GString.o: GString.cpp GString.h DjVuGlobal.h GException.h \
- GSmartPointer.h
-GThreads.o: GThreads.cpp GThreads.h DjVuGlobal.h GException.h
-IFFByteStream.o: IFFByteStream.cpp IFFByteStream.h DjVuGlobal.h \
- GException.h GString.h GSmartPointer.h ByteStream.h GContainer.h
-IWImage.o: IWImage.cpp GRect.h DjVuGlobal.h GException.h \
- GSmartPointer.h ZPCodec.h ByteStream.h GContainer.h IWImage.h \
- GBitmap.h GPixmap.h IFFByteStream.h GString.h
-JB2Image.o: JB2Image.cpp JB2Image.h DjVuGlobal.h GString.h \
- GException.h GSmartPointer.h GContainer.h ZPCodec.h ByteStream.h \
- GRect.h GBitmap.h
-ZPCodec.o: ZPCodec.cpp ZPCodec.h DjVuGlobal.h ByteStream.h \
- GException.h GContainer.h GSmartPointer.h
-bzz.o: bzz.cpp GException.h DjVuGlobal.h ByteStream.h GContainer.h \
- GSmartPointer.h BSByteStream.h ZPCodec.h
-c44.o: c44.cpp GString.h DjVuGlobal.h GException.h GSmartPointer.h \
- IWImage.h GRect.h GBitmap.h ByteStream.h GContainer.h GPixmap.h \
- IFFByteStream.h GOS.h
-d44.o: d44.cpp GString.h DjVuGlobal.h GException.h GSmartPointer.h \
- IWImage.h GRect.h GBitmap.h ByteStream.h GContainer.h GPixmap.h \
- IFFByteStream.h GOS.h
-djvuextract.o: djvuextract.cpp GException.h DjVuGlobal.h ByteStream.h \
- GContainer.h GSmartPointer.h IFFByteStream.h GString.h
-djvuinfo.o: djvuinfo.cpp GException.h DjVuGlobal.h GString.h \
- GSmartPointer.h ByteStream.h GContainer.h IFFByteStream.h DjVuImage.h \
- GThreads.h JB2Image.h ZPCodec.h GRect.h GBitmap.h IWImage.h GPixmap.h
-djvumake.o: djvumake.cpp GString.h DjVuGlobal.h GException.h \
- GSmartPointer.h DjVuImage.h GThreads.h ByteStream.h GContainer.h \
- IFFByteStream.h JB2Image.h ZPCodec.h GRect.h GBitmap.h IWImage.h \
- GPixmap.h
-djvutopnm.o: djvutopnm.cpp GException.h DjVuGlobal.h GSmartPointer.h \
- GRect.h GPixmap.h ByteStream.h GContainer.h GBitmap.h DjVuImage.h \
- GString.h GThreads.h IFFByteStream.h JB2Image.h ZPCodec.h IWImage.h \
- GOS.h
-ppmcoco.o: ppmcoco.cpp GException.h DjVuGlobal.h ByteStream.h \
- GContainer.h GSmartPointer.h GPixmap.h GRect.h GBitmap.h GString.h

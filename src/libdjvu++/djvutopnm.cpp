@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: djvutopnm.cpp,v 1.12 1999-02-18 22:46:07 leonb Exp $
+//C-  $Id: djvutopnm.cpp,v 1.13 1999-03-01 17:02:45 leonb Exp $
 
 
 /** @name djvutopnm
@@ -85,7 +85,7 @@
     Yann Le Cun <yann@research.att.com>\\
     Leon Bottou <leonb@research.att.com>
     @version
-    #$Id: djvutopnm.cpp,v 1.12 1999-02-18 22:46:07 leonb Exp $# */
+    #$Id: djvutopnm.cpp,v 1.13 1999-03-01 17:02:45 leonb Exp $# */
 //@{
 //@}
 
@@ -97,6 +97,7 @@
 #include "GBitmap.h"
 #include "DjVuImage.h"
 #include "GOS.h"
+#include "ATTLicense.h"
 
 
 static double flag_scale = -1;
@@ -213,13 +214,13 @@ convert(const char *from, const char *to)
 void
 usage()
 {
-  fprintf(stderr,"%s",
+  fprintf(stderr,
           "DJVUTOPNM -- DjVu decompression utility\n"
-          "             [djvutopnm (c) AT&T Labs 1997 (Leon Bottou, HA6156)]\n\n"
+          "%s\n"
           "Usage: djvutopnm [options] [<djvufile> [<pnmfile>]]\n\n"
           "Options:\n"
           "  -v                  Prints various informational messages.\n"
-          "  -scale N            Selects display scale (default: 100%).\n"
+          "  -scale N            Selects display scale (default: 100%%).\n"
           "  -size  WxH          Selects size of rendered image.\n"
           "  -segment WxH+X+Y    Selects which segment of the rendered image\n"
           "  -black              Only renders the stencil(s).\n"
@@ -230,8 +231,8 @@ usage()
           "The output will be a PBM, PGM or PPM file depending of its content."
           "If <pnmfile> is a single dash or omitted, the decompressed image\n"
           "is sent to the standard output.  If <djvufile> is a single dash or\n"
-          "omitted, the djvu file is read from the standard input.\n\n"
-          );
+          "omitted, the djvu file is read from the standard input.\n\n",
+          ATTLicense::get_usage_text());
   exit(1);
 }
 
@@ -268,6 +269,7 @@ main(int argc, char **argv)
   TRY
     {
       // Process options
+      ATTLicense::process_cmdline(argc,argv);
       while (argc>1 && argv[1][0]=='-' && argv[1][1])
         {
           char *s = argv[1];

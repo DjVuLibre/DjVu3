@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: djvuextract.cpp,v 1.2 1999-02-18 00:12:01 leonb Exp $
+//C-  $Id: djvuextract.cpp,v 1.3 1999-03-01 17:02:45 leonb Exp $
 
 /** @name djvuextract
 
@@ -35,7 +35,7 @@
     @memo
     Extract layers from Bilevel DjVu files or Color DjVu files.
     @version
-    #$Id: djvuextract.cpp,v 1.2 1999-02-18 00:12:01 leonb Exp $#
+    #$Id: djvuextract.cpp,v 1.3 1999-03-01 17:02:45 leonb Exp $#
     @author
     Leon Bottou <leonb@research.att.com> */
 //@{
@@ -44,6 +44,7 @@
 #include "GException.h"
 #include "ByteStream.h"
 #include "IFFByteStream.h"
+#include "ATTLicense.h"
 
 
 
@@ -151,7 +152,10 @@ void
 usage()
 {
   fprintf(stderr, 
-          "Usage: djvuextract <djvufile> [Sjbz=file] [BG44=file] [FG44=file]\n");
+          "DJVUEXTRACT -- Extracts components of a DJVU file\n"
+          "%s\n"
+          "Usage: djvuextract <djvufile> [Sjbz=file] [BG44=file] [FG44=file]\n",
+          ATTLicense::get_usage_text());
   exit(1);
 }
 
@@ -161,6 +165,7 @@ main(int argc, char **argv)
 {
   TRY
     {
+      ATTLicense::process_cmdline(argc,argv);
       if (argc<2)
         usage();
       MemoryByteStream Sjbz;

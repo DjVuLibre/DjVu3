@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: bzz.cpp,v 1.4 1999-02-03 22:55:30 leonb Exp $
+//C-  $Id: bzz.cpp,v 1.5 1999-03-01 17:02:45 leonb Exp $
 
 // BZZ -- a frontend for BSByteStream
 
@@ -31,13 +31,14 @@
     @author
     Leon Bottou <leonb@research.att.com> -- initial implementation
     @version
-    #$Id: bzz.cpp,v 1.4 1999-02-03 22:55:30 leonb Exp $# */
+    #$Id: bzz.cpp,v 1.5 1999-03-01 17:02:45 leonb Exp $# */
 //@{
 //@}
 
 #include "GException.h"
 #include "ByteStream.h"
 #include "BSByteStream.h"
+#include "ATTLicense.h"
 
 char *program = "(unknown)";
 
@@ -45,11 +46,13 @@ void
 usage(void)
 {
   fprintf(stderr, 
-          "usage (encoding): %s -e[<blocksize>] <infile> <outfile>\n"
-          "usage (decoding): %s -d <infile> <outfile>\n"
+          "BZZ -- ZPCoded Burrows Wheeler compression\n"
+          "%s\n"
+          "Usage [encoding]: %s -e[<blocksize>] <infile> <outfile>\n"
+          "Usage [decoding]: %s -d <infile> <outfile>\n"
           "  Argument <blocksize> must be in range [900..4096] (default 1100).\n"
           "  Arguments <infile> and <outfile> can be '-' for stdin/stdout.\n",
-          program, program);
+          ATTLicense::get_usage_text(), program, program);
   exit(1);
 }
 
@@ -58,6 +61,7 @@ main(int argc, char **argv)
 {
   TRY
     {
+      ATTLicense::process_cmdline(argc,argv);
       // Get program name
       program = strrchr(argv[0],'/');
       if (program) 

@@ -7,12 +7,10 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: ATTLicense.h,v 1.2 1999-02-27 01:13:49 leonb Exp $
+//C-  $Id: ATTLicense.h,v 1.3 1999-03-01 17:02:44 leonb Exp $
 
 #ifndef _ATTLICENSE_H_
 #define _ATTLICENSE_H_
-
-#include "GString.h"
 
 /** @name ATTLicense.h
     
@@ -23,7 +21,7 @@
     @memo
     Support for AT&T Source Code Licensing
     @version
-    #$Id: ATTLicense.h,v 1.2 1999-02-27 01:13:49 leonb Exp $#
+    #$Id: ATTLicense.h,v 1.3 1999-03-01 17:02:44 leonb Exp $#
     @author
     Leon Bottou <leonb@research.att.com>\\
     Jeffrey S. Dickey <jsdickey@att.com>\\
@@ -36,11 +34,11 @@ class ATTLicense
 {
 public:
   /** Returns a constant pointer to the license text. */
-  static GString get_license_text();
+  static const char* get_license_text();
   /** Returns a constant pointer to the copyright notice. */
-  static GString get_copyright_text();
+  static const char* get_copyright_text();
   /** Returns a constant pointer to the usage fragment. */
-  static GString get_usage_text(char *program);
+  static const char* get_usage_text();
   /** Parse license argument.  If the command line contains #"-license"#, 
       this function shows the AT&T Source Code license and exits. */
   static void process_cmdline(int argc, char **argv);

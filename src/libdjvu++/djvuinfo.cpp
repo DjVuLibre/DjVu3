@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: djvuinfo.cpp,v 1.1 1999-02-03 22:55:30 leonb Exp $
+//C-  $Id: djvuinfo.cpp,v 1.2 1999-03-01 17:02:45 leonb Exp $
 
 
 
@@ -51,7 +51,7 @@
     @author
     Leon Bottou <leonb@research.att.com>
     @version
-    #$Id: djvuinfo.cpp,v 1.1 1999-02-03 22:55:30 leonb Exp $# */
+    #$Id: djvuinfo.cpp,v 1.2 1999-03-01 17:02:45 leonb Exp $# */
 //@{
 //@}
 
@@ -61,7 +61,7 @@
 #include "ByteStream.h"
 #include "IFFByteStream.h"
 #include "DjVuImage.h"
-
+#include "ATTLicense.h"
 
 
 // ---------- ROUTINES FOR SUMMARIZING CHUNK DATA
@@ -186,15 +186,19 @@ display(const char *s)
 void
 usage()
 {
-  fprintf(stderr,"usage: djvuinfo <iff_filenames>\n");
+  fprintf(stderr,
+          "DJVUINFO -- Describes IFF85 files\n"
+          "%s\nUsage: djvuinfo <iff_filenames>\n",
+          ATTLicense::get_usage_text() );
   exit(1);
 }
 
 int 
-main(int argc, const char **argv)
+main(int argc, char **argv)
 {
   TRY
     {
+      ATTLicense::process_cmdline(argc,argv);
       if (argc<=1)
         usage();
       for (int i=1; i<argc; i++)

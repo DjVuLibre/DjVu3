@@ -1,14 +1,14 @@
 SHELL=/bin/sh
 SRCDIR=@srcdir@
+TOPSRCDIR=@srcdir@/..
 VPATH=@srcdir@
-TOP=@topdir@
 CXX=@cxx@
 OPT=@opt@
 WARN=@warn@
 RANLIB=@ranlib@
 AR=@ar@
 DEFS=@defs@
-CXXFLAGS= $(DEFS) $(OPT) $(WARN) -I$(TOP) -DUNIX
+CXXFLAGS= $(DEFS) $(OPT) $(WARN) -I$(TOPSRCDIR) -DUNIX
 LDFLAGS=
 LDLIBS=@ldlibs@
 
@@ -61,22 +61,22 @@ TestThreads:
 
 
 ### DEPENDENCIES
-TestArray: TestArray.cpp $(TOP)/GContainer.h $(TOP)/DjVuGlobal.h \
- $(TOP)/GException.h $(TOP)/GString.h $(TOP)/GSmartPointer.h
-TestBitmap: TestBitmap.cpp $(TOP)/GBitmap.h $(TOP)/DjVuGlobal.h $(TOP)/GRect.h \
- $(TOP)/ByteStream.h $(TOP)/GException.h $(TOP)/GContainer.h $(TOP)/GSmartPointer.h
-TestException: TestException.cpp $(TOP)/GException.h $(TOP)/DjVuGlobal.h \
- $(TOP)/GString.h $(TOP)/GSmartPointer.h
-TestJB2: TestJB2.cpp $(TOP)/JB2Image.h $(TOP)/DjVuGlobal.h $(TOP)/GString.h \
- $(TOP)/GException.h $(TOP)/GSmartPointer.h $(TOP)/GContainer.h $(TOP)/ZPCodec.h \
- $(TOP)/ByteStream.h $(TOP)/GRect.h $(TOP)/GBitmap.h
-TestList: TestList.cpp $(TOP)/GContainer.h $(TOP)/DjVuGlobal.h \
- $(TOP)/GException.h $(TOP)/GString.h $(TOP)/GSmartPointer.h
-TestMap: TestMap.cpp $(TOP)/GContainer.h $(TOP)/DjVuGlobal.h $(TOP)/GException.h \
- $(TOP)/GString.h $(TOP)/GSmartPointer.h
-TestSmartPointer: TestSmartPointer.cpp $(TOP)/GSmartPointer.h \
- $(TOP)/DjVuGlobal.h
-TestString: TestString.cpp $(TOP)/GString.h $(TOP)/DjVuGlobal.h \
- $(TOP)/GException.h $(TOP)/GSmartPointer.h
-TestThreads: TestThreads.cpp $(TOP)/GThreads.h $(TOP)/DjVuGlobal.h \
- $(TOP)/GException.h
+TestArray: TestArray.cpp ../GContainer.h ../DjVuGlobal.h \
+ ../GException.h ../GString.h ../GSmartPointer.h
+TestBitmap: TestBitmap.cpp ../GBitmap.h ../DjVuGlobal.h \
+ ../GRect.h ../ByteStream.h ../GException.h \
+ ../GContainer.h ../GSmartPointer.h
+TestException: TestException.cpp ../GException.h ../DjVuGlobal.h \
+ ../GString.h ../GSmartPointer.h
+TestJB2: TestJB2.cpp ../JB2Image.h ../DjVuGlobal.h ../GString.h \
+ ../GException.h ../GSmartPointer.h ../GContainer.h ../ZPCodec.h \
+ ../ByteStream.h ../GRect.h ../GBitmap.h
+TestList: TestList.cpp ../GContainer.h ../DjVuGlobal.h \
+ ../GException.h ../GString.h ../GSmartPointer.h
+TestMap: TestMap.cpp ../GContainer.h ../DjVuGlobal.h ../GException.h \
+ ../GString.h ../GSmartPointer.h
+TestSmartPointer: TestSmartPointer.cpp ../GSmartPointer.h ../DjVuGlobal.h
+TestString: TestString.cpp ../GString.h ../DjVuGlobal.h \
+ ../GException.h ../GSmartPointer.h
+TestThreads: TestThreads.cpp ../GThreads.h ../DjVuGlobal.h \
+ ../GException.h

@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: djvumake.cpp,v 1.4 1999-02-18 22:46:07 leonb Exp $
+//C-  $Id: djvumake.cpp,v 1.5 1999-03-01 17:02:45 leonb Exp $
 
 /** @name djvumake
 
@@ -111,7 +111,7 @@
     @memo
     Create DjVu files.
     @version
-    #$Id: djvumake.cpp,v 1.4 1999-02-18 22:46:07 leonb Exp $#
+    #$Id: djvumake.cpp,v 1.5 1999-03-01 17:02:45 leonb Exp $#
     @author
     Leon Bottou <leonb@research.att.com> */
 //@{
@@ -122,6 +122,7 @@
 #include "GString.h"
 #include "GException.h"
 #include "DjVuImage.h"
+#include "ATTLicense.h"
 
 #ifndef TRUE
 #define TRUE 1
@@ -145,7 +146,8 @@ int h;
 void 
 usage()
 {
-  printf("djvumake -- Create a DjVu file\n"
+  printf("DJVUMAKE -- Create a DjVu file\n"
+         "%s\n"
          "Usage: djvumake djvufile ...arguments...\n"
          "\n"
          "The arguments describe the successive chunks of the DJVU file.\n"
@@ -159,7 +161,8 @@ usage()
          "chunk will be created using the image size of the first stencil chunk\n"
          "This program tries to issue a warning when you are building an\n"
          "incorrect djvu file.\n"
-         "\n");
+         "\n", 
+         ATTLicense::get_usage_text());
   exit(1);
 }
 
@@ -383,6 +386,7 @@ main(int argc, char **argv)
   TRY
     {
       // Print usage when called without enough arguments
+      ATTLicense::process_cmdline(argc,argv);
       if (argc <= 2)
         usage();
       // Open djvu file

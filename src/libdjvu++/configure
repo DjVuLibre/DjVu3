@@ -3,7 +3,6 @@
 ### The substitutions
 prefix=/usr/local
 SRCDIR=.
-TOPDIR=.
 CXX=${CXX-eg++}
 OPT=${OPT-"-O3 -fomit-frame-pointer -funroll-all-loops"}
 WARN=${WARN-"-Wall -Wno-unused"}
@@ -16,7 +15,6 @@ DEFS=
 
 conf=`basename $0`
 SRCDIR=`dirname $0`
-TOPDIR=$SRCDIR
 if [ ! -r "$SRCDIR/libdjvu++.dxx.in" ] 
 then
    echo 1>&2 "$conf: Cannot recognize source directory."
@@ -168,50 +166,54 @@ else
   echo "none."
 fi
 
+# Function to generate makefiles
+
+generate_makefile()
+{
+  # compute srcdir
+  case $SRCDIR in
+      /*) # absolute path
+        srcdir=$SRCDIR/$1
+        ;;
+      *) # relative path
+        temp=$1
+        srcdir=$SRCDIR/$1
+        while [ "$temp" != "." ] 
+        do
+          srcdir=../$srcdir
+          temp=`dirname $temp`
+        done
+        ;;
+  esac
+
+  # substitute
+  sed < $SRCDIR/$1/Makefile.in > $1/Makefile \
+    -e 's!@prefix@!'"$prefix"'!g' \
+    -e 's!@srcdir@!'"$srcdir"'!g' \
+    -e 's!@cc@!'"$CC"'!g' \
+    -e 's!@cxx@!'"$CXX"'!g' \
+    -e 's!@defs@!'"$DEFS"'!g' \
+    -e 's!@opt@!'"$OPT"'!g' \
+    -e 's!@warn@!'"$WARN"'!g' \
+    -e 's!@ldlibs@!'"$LDLIBS"'!g' \
+    -e 's!@ranlib@!'"$RANLIB"'!g' \
+    -e 's!@ar@!'"$AR"'!g'
+
+  # dependencies
+  if [ -r $SRCDIR/$1/Makefile.dep ]
+  then
+    cat $SRCDIR/$1/Makefile.dep >> $1/Makefile
+  fi
+}
+
 
 # Generate makefiles
 
-sed < $SRCDIR/Makefile.in > Makefile \
-  -e 's!@prefix@!'"$prefix"'!g' \
-  -e 's!@topdir@!'"$TOPDIR"'!g' \
-  -e 's!@srcdir@!'"$TOPDIR"'!g' \
-  -e 's!@cc@!'"$CC"'!g' \
-  -e 's!@cxx@!'"$CXX"'!g' \
-  -e 's!@defs@!'"$DEFS"'!g' \
-  -e 's!@opt@!'"$OPT"'!g' \
-  -e 's!@warn@!'"$WARN"'!g' \
-  -e 's!@ldlibs@!'"$LDLIBS"'!g' \
-  -e 's!@ranlib@!'"$RANLIB"'!g' \
-  -e 's!@ar@!'"$AR"'!g'
-
-case "$TOPDIR" in
-  .*) # relative source directory
-     TOPDIR="../$TOPDIR" ;;
-esac
-
 if [ ! -d @Tools ] ; then mkdir @Tools ; fi
-sed < $SRCDIR/@Tools/Makefile.in > @Tools/Makefile \
-  -e 's!@topdir@!'"$TOPDIR"'!g' \
-  -e 's!@srcdir@!'"$TOPDIR"/@Tools'!g' \
-  -e 's!@cc@!'"$CC"'!g' \
-  -e 's!@cxx@!'"$CXX"'!g' \
-  -e 's!@defs@!'"$DEFS"'!g' \
-  -e 's!@opt@!'"$OPT"'!g' \
-  -e 's!@warn@!'"$WARN"'!g' \
-  -e 's!@ldlibs@!'"$LDLIBS"'!g' \
-  -e 's!@ranlib@!'"$RANLIB"'!g' \
-  -e 's!@ar@!'"$AR"'!g'
-
 if [ ! -d @Test ] ; then mkdir @Test ; fi
-sed < $SRCDIR/@Test/Makefile.in > @Test/Makefile \
-  -e 's!@topdir@!'"$TOPDIR"'!g' \
-  -e 's!@srcdir@!'"$TOPDIR"/@Test'!g' \
-  -e 's!@cc@!'"$CC"'!g' \
-  -e 's!@cxx@!'"$CXX"'!g' \
-  -e 's!@defs@!'"$DEFS"'!g' \
-  -e 's!@opt@!'"$OPT"'!g' \
-  -e 's!@warn@!'"$WARN"'!g' \
-  -e 's!@ldlibs@!'"$LDLIBS"'!g' \
-  -e 's!@ranlib@!'"$RANLIB"'!g' \
-  -e 's!@ar@!'"$AR"'!g'
+
+generate_makefile .
+generate_makefile @Tools
+generate_makefile @Test
+
 

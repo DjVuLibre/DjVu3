@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: ppmcoco.cpp,v 1.3 1999-02-03 22:55:30 leonb Exp $
+//C-  $Id: ppmcoco.cpp,v 1.4 1999-03-01 17:02:45 leonb Exp $
 
 
 
@@ -82,7 +82,7 @@
     @author
     Leon Bottou <leonb@research.att.com>
     @version
-    #$Id: ppmcoco.cpp,v 1.3 1999-02-03 22:55:30 leonb Exp $# */
+    #$Id: ppmcoco.cpp,v 1.4 1999-03-01 17:02:45 leonb Exp $# */
 //@{
 //@}
 
@@ -95,6 +95,7 @@
 #include "ByteStream.h"
 #include "GPixmap.h"
 #include "GString.h"
+#include "ATTLicense.h"
 
 double fromGamma = 2.2;
 double toGamma = 2.2;
@@ -105,7 +106,9 @@ int
 usage(void)
 {
   fprintf(stderr,
-          "usage: ppmcoco [-from gamma] [-to gamma] [<ppmin>] [<ppmout>]\n");
+          "PPMCOCO -- Color correction program\n%s\n"
+          "usage: ppmcoco [-from gamma] [-to gamma] [<ppmin>] [<ppmout>]\n",
+          ATTLicense::get_usage_text());
   exit(1);
 }
 
@@ -128,6 +131,7 @@ main (int argc, char **argv)
   TRY
     {
       // parse
+      ATTLicense::process_cmdline(argc,argv);
       if (argc==1)
         usage();
       int flag = 0;

@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: c44.cpp,v 1.7 1999-02-18 00:05:05 leonb Exp $
+//C-  $Id: c44.cpp,v 1.8 1999-03-01 17:02:45 leonb Exp $
 
 
 /** @name c44
@@ -148,7 +148,7 @@
     @author
     Leon Bottou <leonb@research.att.com>
     @version
-    #$Id: c44.cpp,v 1.7 1999-02-18 00:05:05 leonb Exp $# */
+    #$Id: c44.cpp,v 1.8 1999-03-01 17:02:45 leonb Exp $# */
 //@{
 //@}
 
@@ -158,6 +158,7 @@
 #include "GException.h"
 #include "IWImage.h"
 #include "GOS.h"
+#include "ATTLicense.h"
 
 // command line data
 
@@ -193,7 +194,7 @@ void
 usage()
 {
   printf("C44 -- Image compression utility using Interpolating Wavelets (4,4)\n"
-         "       [c44 (c) AT&T Labs 1997 (Leon Bottou, HA6156)]\n\n"
+         "%s\n"
          "Usage: c44 [options] pnmfile [djvufile]\n\n"
          "Options:\n"
          "    -bpp n,..,n      -- select a increasing sequence of bitrates\n"
@@ -227,7 +228,7 @@ usage()
          "    -crcbnone     -- do not encode chrominance at all\n"
          "    -crcbdelay n  -- select chrominance coding delay (default 10)\n"
          "                     for -crcbnormal and -crcbhalf modes\n"
-         "\n");
+         "\n", ATTLicense::get_usage_text());
   exit(1);
 }
 
@@ -552,6 +553,7 @@ main(int argc, char **argv)
   TRY
     {
       // Parse arguments
+      ATTLicense::process_cmdline(argc,argv);
       parse(argc, argv);
       // Check input file
       StdioByteStream ibs(pnmfile,"rb");
