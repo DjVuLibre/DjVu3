@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GThreads.h,v 1.28 2000-01-19 23:14:41 leonb Exp $
+//C- $Id: GThreads.h,v 1.29 2000-01-20 22:55:39 praveen Exp $
 
 #ifndef _GTHREADS_H_
 #define _GTHREADS_H_
@@ -73,7 +73,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Praveen Guduru <praveen@sanskrit.lz.att.com> -- mac implementation.
     @version
-    #$Id: GThreads.h,v 1.28 2000-01-19 23:14:41 leonb Exp $# */
+    #$Id: GThreads.h,v 1.29 2000-01-20 22:55:39 praveen Exp $# */
 //@{
 
 #include "DjVuGlobal.h"
@@ -194,6 +194,9 @@ public:
       destroyed. This function must be considered as a last resort since
       memory may be lost. */
   void terminate();
+  /** This function return true, if this thread is active and still
+      running*/
+  bool is_active();
   /** Causes the current thread to relinquish the processor.  The scheduler
       selects a thread ready to run and transfers control to that thread.  The
       actual effect of #yield# heavily depends on the selected implementation.
@@ -205,6 +208,7 @@ public:
   static int yield();
   /** Returns a value which uniquely identifies the current thread. */
   static void *current();
+
 #if THREADMODEL==WINTHREADS
 private:
   HANDLE hthr;

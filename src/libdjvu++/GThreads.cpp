@@ -9,10 +9,10 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GThreads.cpp,v 1.36 1999-11-16 14:12:50 leonb Exp $
+//C- $Id: GThreads.cpp,v 1.37 2000-01-20 22:55:39 praveen Exp $
 
 
-// **** File "$Id: GThreads.cpp,v 1.36 1999-11-16 14:12:50 leonb Exp $"
+// **** File "$Id: GThreads.cpp,v 1.37 2000-01-20 22:55:39 praveen Exp $"
 // This file defines machine independent classes
 // for running and synchronizing threads.
 // - Author: Leon Bottou, 01/1998
@@ -88,6 +88,21 @@ start(void *arg)
     }
   return 0;
 }
+
+bool 
+GThread::is_active()
+{
+	DWORD exitcode;
+	if(GetExitCodeThread(hthr, &exitcode))
+	{
+		if( exitcode == STILL_ACTIVE )
+			return true;
+		else
+			return false;
+	}
+	return false;
+}
+ 
 
 GThread::GThread(int stacksize)
   : hthr(0), thrid(0), xentry(0), xarg(0)
@@ -335,6 +350,13 @@ GThread::create(void (*entry)(void*), void *arg)
   return 0;
 }
 
+bool 
+GThread::is_active()
+{
+    //// write appropriate code here
+	return false;
+}
+
 void
 GThread::terminate()
 {
@@ -574,6 +596,14 @@ start(void *arg)
     }
 #endif 
   return 0;
+}
+
+
+bool 
+GThread::is_active()
+{
+    //// write appropriate code here
+	return false;
 }
 
 // GThread
@@ -1290,6 +1320,8 @@ GThread::set_scheduling_callback(void (*call)(int))
 }
 
 
+
+
 GThread::GThread(int stacksize)
   : task(0), xentry(0), xarg(0)
 {
@@ -1389,6 +1421,14 @@ starttwo(GThread *thr)
   thr->terminate();
   GThread::yield();
   abort();
+}
+
+
+bool 
+GThread::is_active()
+{
+    //// write appropriate code here
+	return false;
 }
 
 int 
