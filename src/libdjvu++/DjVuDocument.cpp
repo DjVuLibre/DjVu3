@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.1.2.6 1999-05-12 21:44:00 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.1.2.7 1999-05-13 20:15:58 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -20,6 +20,8 @@
 #include "GOS.h"
 #include "DjVmFile.h"
 #include "debug.h"
+
+#include <unistd.h>
 
 DjVuDocument::DjVuDocument(const GURL & url, bool xreadonly,
 			   DjVuPort * xport, GCache<GURL, DjVuFile> * xcache):
