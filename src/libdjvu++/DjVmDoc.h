@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVmDoc.h,v 1.24 2001-03-30 23:31:28 bcr Exp $
+// $Id: DjVmDoc.h,v 1.25 2001-04-12 00:24:59 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVMDOC_H
@@ -52,7 +52,7 @@ class GURL;
 
     @memo DjVu multipage documents reader/writer.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: DjVmDoc.h,v 1.24 2001-03-30 23:31:28 bcr Exp $#
+    @version #$Id: DjVmDoc.h,v 1.25 2001-04-12 00:24:59 bcr Exp $#
 */
 
 //@{
@@ -172,7 +172,7 @@ public:
       //@}
 private:
    GP<DjVmDir>			dir;
-   GMap<GString, GP<DataPool> >	data;
+   GMap<GUTF8String, GP<DataPool> >	data;
 private: // dummy stuff
    static void write(ByteStream *);
    static void write_index(ByteStream *);

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: XMLTags.cpp,v 1.11 2001-04-05 19:19:23 bcr Exp $
+// $Id: XMLTags.cpp,v 1.12 2001-04-12 00:25:00 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -49,19 +49,19 @@ lt_XMLContents::lt_XMLContents(GP<lt_XMLTags> t)
   tag=t;
 }
 
-static GString
+static GUTF8String
 getargn(char const tag[], char const *&t)
 {
   char const *s;
   for(s=tag;isspace(*s);s++);
   for(t=s;(*t)&&((*t)!='/')&&((*t)!='>')&&((*t)!='=')&&!isspace(*t);++t);
-  return GString(s,t-s);
+  return GUTF8String(s,t-s);
 }
 
-static GString
+static GUTF8String
 getargv(char const tag[], char const *&t)
 {
-  GString retval;
+  GUTF8String retval;
   if(tag && tag[0] == '=')
   {
     char const *s=t=tag+1;
@@ -69,7 +69,7 @@ getargv(char const tag[], char const *&t)
     {
       char const q=*(t++);
       for(s++;(*t)&&((*t)!=q)&&((*t)!='>');++t);
-      retval=GString(s,t-s);
+      retval=GUTF8String(s,t-s);
       if (t[0] == q)
       {
         ++t;
@@ -77,7 +77,7 @@ getargv(char const tag[], char const *&t)
     }else
     {
       for(t=s;(*t)&&((*t)!='/')&&((*t)!='>')&&!isspace(*t);++t);
-      retval=GString(s,t-s);
+      retval=GUTF8String(s,t-s);
     }
   }else
   {
@@ -86,16 +86,16 @@ getargv(char const tag[], char const *&t)
   return retval;
 }
 
-static GString
+static GUTF8String
 tagtoname(char const tag[],char const *&t)
 {
   char const *s;
   for(s=tag;isspace(*s);s++);
   for(t=s;(*t)&&((*t)!='>')&&!isspace(*t);++t);
-  return GString(s,t-s);
+  return GUTF8String(s,t-s);
 }
 
-static inline GString
+static inline GUTF8String
 tagtoname(char const tag[])
 {
   char const *t;
@@ -141,9 +141,9 @@ isspaces(unsigned long const *s)
 }
 
 void
-lt_XMLTags::ParseValues(char const *t, GMap<GString,GString> &args,bool downcase)
+lt_XMLTags::ParseValues(char const *t, GMap<GUTF8String,GUTF8String> &args,bool downcase)
 {
-  GString argn;
+  GUTF8String argn;
   char const *tt;
   while((argn=getargn(t,tt)).length())
   {
@@ -186,12 +186,12 @@ lt_XMLTags::init(XMLByteStream &xmlbs)
     G_THROW("XMLTags.no_GP");
   }
   GPList<lt_XMLTags> level;
-  GMap<GString,GPList<lt_XMLTags> > allTags;
-  GMap<GString,GMap<GString,GPList<lt_XMLTags> > > namedTags;
+  GMap<GUTF8String,GPList<lt_XMLTags> > allTags;
+  GMap<GUTF8String,GMap<GUTF8String,GPList<lt_XMLTags> > > namedTags;
   GUnicode tag,raw(xmlbs.gets(0,'<',false));
   if(!isspaces((unsigned long const *)raw))
   {
-    GString mesg;
+    GUTF8String mesg;
     mesg.format("XMLTags.raw_string\t%s",(const char *)raw);
     G_THROW(mesg);
   }
@@ -200,7 +200,7 @@ lt_XMLTags::init(XMLByteStream &xmlbs)
     int len=tag.length();
     while(tag[len-1] != '>')
     {
-      GString mesg;
+      GUTF8String mesg;
       mesg.format("XMLTags.bad_tag\t%s",(const char *)tag);
       G_THROW(mesg);
     }
@@ -213,13 +213,13 @@ lt_XMLTags::init(XMLByteStream &xmlbs)
           GUnicode cont(xmlbs.gets(0,'>',true));
           if(!cont[0])
           { 
-            GString mesg;
+            GUTF8String mesg;
             mesg.format("XMLTags.bad_PI\t%s",(const char *)tag);
             G_THROW(mesg);
           }
           len=((tag+=cont).length());
         }
-        GString xname=tagtoname(((const char *)tag)+2);
+        GUTF8String xname=tagtoname(((const char *)tag)+2);
 //        if(xname.downcase() == "xml")
 //        {
 //          DjVuPrintMessage("Got XMLDecl: %s",(const char *)tag);
@@ -239,7 +239,7 @@ lt_XMLTags::init(XMLByteStream &xmlbs)
             GUnicode cont(xmlbs.gets(0,'>',true));
             if(!cont[0])
             { 
-              GString mesg;
+              GUTF8String mesg;
               mesg.format("XMLTags.bad_comment\t%s",(const char *)tag);
               G_THROW(mesg);
             }
@@ -254,7 +254,7 @@ lt_XMLTags::init(XMLByteStream &xmlbs)
       }
       case '/':
       {
-        GString xname=tagtoname(((const char *)tag)+2);
+        GUTF8String xname=tagtoname(((const char *)tag)+2);
         GPosition last=level.lastpos();
         if(last || level[last]->name != xname)
         {
@@ -262,7 +262,7 @@ lt_XMLTags::init(XMLByteStream &xmlbs)
           level.del(last);
         }else
         {
-          GString mesg("XMLTags.bad_form");
+          GUTF8String mesg("XMLTags.bad_form");
           G_THROW(mesg);
         }
         break;
@@ -290,7 +290,7 @@ lt_XMLTags::init(XMLByteStream &xmlbs)
           level.append(t);
         }else
         {
-          GString mesg("XMLTags.no_body");
+          GUTF8String mesg("XMLTags.no_body");
           G_THROW(mesg);
         }
         allTags[t->name].append(t);
@@ -310,7 +310,7 @@ lt_XMLTags::init(XMLByteStream &xmlbs)
 //        DjVuPrintMessage("Got raw %s: %s\n",(const char *)(level[last]->name),(const char *)raw);
       }else if(!isspaces((unsigned long const *)raw))
       {
-        GString mesg;
+        GUTF8String mesg;
         mesg.format("XMLTags.raw_string\t%s", (const char *)raw);
         G_THROW(mesg);
       }
@@ -327,7 +327,7 @@ lt_XMLTags::getTags(char const tagname[]) const
 }
 
 void
-lt_XMLTags::getMaps(char const tagname[],char const argn[],GPList<lt_XMLTags> list, GMap<GString, GP<lt_XMLTags> > &map)
+lt_XMLTags::getMaps(char const tagname[],char const argn[],GPList<lt_XMLTags> list, GMap<GUTF8String, GP<lt_XMLTags> > &map)
 {
   for(GPosition pos=list;pos;++pos)
   {
@@ -343,7 +343,7 @@ lt_XMLTags::getMaps(char const tagname[],char const argn[],GPList<lt_XMLTags> li
           GP<lt_XMLTags> gtag=maps[mloc];
           if(gtag)
           {
-            GMap<GString,GString> &args=gtag->args;
+            GMap<GUTF8String,GUTF8String> &args=gtag->args;
             GPosition gpos;
             if((gpos=args.contains(argn)))
             {
@@ -362,10 +362,10 @@ lt_XMLTags::write(ByteStream &bs,bool const top) const
 {
   if(name.length())
   {
-    GString tag="<"+name;
+    GUTF8String tag="<"+name;
     for(GPosition pos=args;pos;++pos)
     {
-      tag+=GString(' ')+args.key(pos)+GString("=\42")+args[pos].toEscaped()+GString("\42");
+      tag+=GUTF8String(' ')+args.key(pos)+GUTF8String("=\42")+args[pos].toEscaped()+GUTF8String("\42");
     }
     GPosition tags=content;
     if(tags||raw.length()) 

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.h,v 1.49 2001-04-05 19:19:22 bcr Exp $
+// $Id: ByteStream.h,v 1.50 2001-04-12 00:24:58 bcr Exp $
 // $Name:  $
 
 #ifndef _BYTESTREAM_H
@@ -62,7 +62,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation\\
     Andrei Erofeev <eaf@geocities.com> -- 
     @version
-    #$Id: ByteStream.h,v 1.49 2001-04-05 19:19:22 bcr Exp $# */
+    #$Id: ByteStream.h,v 1.50 2001-04-12 00:24:58 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -193,8 +193,6 @@ public:
   int scanf(const char *fmt, ... );
   /** Writes the string as is, to the specified stream. */
   size_t writestring(const GString &s);
-  /** Converts the string to native and writes it to the specified stream. */
-  void putsNative(const GString &s);
   /** Writes a one-byte integer to a ByteStream. */
   void write8 (unsigned int card8);
   /** Writes a two-bytes integer to a ByteStream.

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocument.cpp,v 1.156 2001-04-11 16:59:50 bcr Exp $
+// $Id: DjVuDocument.cpp,v 1.157 2001-04-12 00:24:59 bcr Exp $
 // $Name:  $
 
 
@@ -163,7 +163,7 @@ DjVuDocument::start_init(
      }
      if (!init_data_pool) 
      {
-       G_THROW("DjVuDocument.fail_URL\t"+init_url);
+       G_THROW("DjVuDocument.fail_URL\t"+init_url.get_string());
      }
    }
       // Now we say it is ready
@@ -252,9 +252,9 @@ DjVuDocument::static_init_thread(void * cl_data)
     th->flags|=DjVuDocument::DOC_INIT_FAILED;
     G_TRY {
       th->check_unnamed_files();
-      if ((GString("EOF") == exc.get_cause()) && th->verbose_eof)
+      if ((GUTF8String("EOF") == exc.get_cause()) && th->verbose_eof)
         get_portcaster()->notify_error(th, "DjVuDocument.init_eof");
-      else if (GString("STOP") == exc.get_cause())
+      else if (GUTF8String("STOP") == exc.get_cause())
         get_portcaster()->notify_status(th, "DjVuDocument.stopped");
       else
         get_portcaster()->notify_error(th, exc.get_cause());
@@ -278,7 +278,7 @@ DjVuDocument::init_thread(void)
 
    GP<IFFByteStream> giff=IFFByteStream::create(stream);
    IFFByteStream &iff=*giff;
-   GString chkid;
+   GUTF8String chkid;
    int size=iff.get_chunk(chkid);
    if (!size)
      G_THROW("EOF");
@@ -445,7 +445,7 @@ DjVuDocument::wait_get_pages_num(void)
   return get_pages_num();
 }
 
-GString
+GUTF8String
 DjVuDocument::get_int_prefix(void)
 {
       // These NAMEs are used to enable DjVuFile sharing inside the same
@@ -454,7 +454,7 @@ DjVuDocument::get_int_prefix(void)
       // assigned some permanent name. After '?' there should be the real
       // file's URL. Please note, that output of this function is used only
       // as name for DjVuPortcaster. Not as a URL.
-   GString retval;
+   GUTF8String retval;
    return retval.format("document_%p%d?", this, hash(init_url.get_string()));
 }
 
@@ -482,7 +482,7 @@ DjVuDocument::set_file_aliases(const DjVuFile * file)
 	 if (page_num>=0)
 	 {
 	    if (page_num==0) pcaster->add_alias(file, init_url.get_string()+"#-1");
-	    pcaster->add_alias(file, init_url.get_string()+"#"+GString(page_num));
+	    pcaster->add_alias(file, init_url.get_string()+"#"+GUTF8String(page_num));
 	 }
       }
 	 // The following line MUST stay here. For OLD_INDEXED documents
@@ -549,11 +549,11 @@ DjVuDocument::check_unnamed_files(void)
             // We now know all information about the document
             // and can determine if a page is inside it or not
             f->data_pool->set_eof();
-            GString msg;
+            GUTF8String msg;
             if (f->id_type==UnnamedFile::ID)
               msg="DjVuDocument.miss_page_name\t"+f->id;
             else 
-              msg="DjVuDocument.miss_page_num\t"+GString(f->page_num);
+              msg="DjVuDocument.miss_page_num\t"+GUTF8String(f->page_num);
             G_THROW(msg);
           }
           ++pos;
@@ -587,7 +587,7 @@ DjVuDocument::check_unnamed_files(void)
             GP<DataPool> new_pool=pcaster->request_data(ufile->file, new_url);
             if(!new_pool)
             {
-              G_THROW("DjVuDocument.fail_URL\t"+new_url);
+              G_THROW("DjVuDocument.fail_URL\t"+new_url.get_string());
             }
             ufile->data_pool->connect(new_pool);
 	         }
@@ -726,7 +726,7 @@ DjVuDocument::url_to_page(const GURL & url) const
 }
 
 GURL
-DjVuDocument::id_to_url(const GString & id) const
+DjVuDocument::id_to_url(const GUTF8String & id) const
 {
    check();
    DEBUG_MSG("DjVuDocument::id_to_url(): translating ID='" << id << "' to URL\n");
@@ -769,7 +769,7 @@ DjVuDocument::id_to_url(const GString & id) const
 }
 
 GURL
-DjVuDocument::id_to_url(const DjVuPort * source, const GString &id)
+DjVuDocument::id_to_url(const DjVuPort * source, const GUTF8String &id)
 {
    return id_to_url(id);
 }
@@ -845,7 +845,7 @@ DjVuDocument::get_djvu_file(int page_num, bool dont_create)
 	 DEBUG_MSG("Structure is not known => check <doc_url>#<page_num> alias...\n");
 	 GP<DjVuPort> port;
 	 if (cache)
-	    port=pcaster->alias_to_port(init_url.get_string()+"#"+GString(page_num));
+	    port=pcaster->alias_to_port(init_url.get_string()+"#"+GUTF8String(page_num));
 	 if (!port || !port->inherits("DjVuFile"))
 	 {
 	    DEBUG_MSG("failed => invent dummy URL and proceed\n");
@@ -853,7 +853,7 @@ DjVuDocument::get_djvu_file(int page_num, bool dont_create)
 	       // Invent some dummy temporary URL. I don't care what it will
 	       // be. I'll remember the page_num and will generate the correct URL
 	       // after I learn what the document is
-            GString name("page");
+            GUTF8String name("page");
             name+=page_num;
             name+=".djvu";
             url=invent_url(name);
@@ -890,15 +890,15 @@ DjVuDocument::get_djvu_file(int page_num, bool dont_create)
 }
 
 GURL
-DjVuDocument::invent_url(const GString &name) const
+DjVuDocument::invent_url(const GUTF8String &name) const
 {
-   GString buffer;
+   GUTF8String buffer;
    buffer.format("djvufileurl://%p/%s", this, (const char *)name);
    return GURL::UTF8(buffer);
 }
 
 GP<DjVuFile>
-DjVuDocument::get_djvu_file(const GString& id, bool dont_create)
+DjVuDocument::get_djvu_file(const GUTF8String& id, bool dont_create)
 {
    check();
    DEBUG_MSG("DjVuDocument::get_djvu_file(): ID='" << id << "'\n");
@@ -985,7 +985,7 @@ DjVuDocument::get_page(int page_num, bool sync, DjVuPort * port)
 }
 
 GP<DjVuImage>
-DjVuDocument::get_page(const GString &id, bool sync, DjVuPort * port)
+DjVuDocument::get_page(const GUTF8String &id, bool sync, DjVuPort * port)
 {
    check();
    DEBUG_MSG("DjVuDocument::get_page(): ID='" << id << "'\n");
@@ -1029,7 +1029,7 @@ DjVuDocument::process_threqs(void)
           GP<ByteStream> str=req->thumb_file->get_init_data_pool()->get_stream();
           GP<IFFByteStream> giff=IFFByteStream::create(str);
           IFFByteStream &iff=*giff;
-          GString chkid;
+          GUTF8String chkid;
           if (!iff.get_chunk(chkid) || chkid!="FORM:THUM")
             G_THROW("DjVuDocument.bad_thumb");
           
@@ -1057,7 +1057,7 @@ DjVuDocument::process_threqs(void)
           remove=true;
         }
       } G_CATCH(exc) {
-        GString msg="DjVuDocument.cant_extract\n";
+        GUTF8String msg="DjVuDocument.cant_extract\n";
         msg+=exc.get_cause();
         get_portcaster()->notify_error(this, msg);
 	       // Switch this request to the "decoding" mode
@@ -1102,7 +1102,7 @@ DjVuDocument::process_threqs(void)
                   pm=GPixmap::create(*bm);
               }
               if (!pm) 
-                G_THROW("DjVuDocument.cant_render\t"+GString(req->page_num+1));
+                G_THROW("DjVuDocument.cant_render\t"+GUTF8String(req->page_num+1));
               
               // Store and compress the pixmap
               GP<IW44Image> iwpix=IW44Image::create_encode(*pm);
@@ -1131,7 +1131,7 @@ DjVuDocument::process_threqs(void)
           }
         }
       } G_CATCH(exc) {
-        GString msg="Failed to decode thumbnails:\n";
+        GUTF8String msg="Failed to decode thumbnails:\n";
         msg+=exc.get_cause();
         get_portcaster()->notify_error(this, msg);
         
@@ -1314,7 +1314,7 @@ DjVuDocument::notify_file_flags_changed(const DjVuFile * source,
 }
 
 GPBase
-DjVuDocument::id_to_file(const DjVuPort * source, const GString &id)
+DjVuDocument::id_to_file(const DjVuPort * source, const GUTF8String &id)
 {
    return (DjVuFile *) get_djvu_file(id);
 }
@@ -1362,7 +1362,7 @@ DjVuDocument::request_data(const DjVuPort * source, const GURL & url)
 	    {
 	       DEBUG_MSG("The document is in OLD_BUNDLED format\n");
 	       if (url.base()!=init_url)
-		        G_THROW("DjVuDocument.URL_outside\t"+url);
+		        G_THROW("DjVuDocument.URL_outside\t"+url.get_string());
 	 
 	       GP<DjVmDir0::FileRec> file=djvm_dir0->get_file(url.fname());
 	       if (!file) G_THROW("DjVuDocument.file_outside\t"+url.fname());
@@ -1376,7 +1376,7 @@ DjVuDocument::request_data(const DjVuPort * source, const GURL & url)
 	    {
 	       DEBUG_MSG("The document is in new BUNDLED format\n");
 	       if (url.base()!=init_url)
-		        G_THROW("DjVuDocument.URL_outside\t"+url);
+		        G_THROW("DjVuDocument.URL_outside\t"+url.get_string());
 	 
 	       GP<DjVmDir::File> file=djvm_dir->name_to_file(url.fname());
 	       if (!file) G_THROW("DjVuDocument.file_outside\t"+url.fname());
@@ -1391,11 +1391,11 @@ DjVuDocument::request_data(const DjVuPort * source, const GURL & url)
 	    DEBUG_MSG("The document is in SINGLE_PAGE or OLD_INDEXED or INDIRECT format\n");
 	    if (flags & DOC_DIR_KNOWN)
 	       if (doc_type==INDIRECT && !djvm_dir->name_to_file(url.fname()))
-		        G_THROW("DjVuDocument.URL_outside2\t"+url);
+		        G_THROW("DjVuDocument.URL_outside2\t"+url.get_string());
 	 
 	    if (url.is_local_file_url())
 	    {
-//	       GString fname=GOS::url_to_filename(url);
+//	       GUTF8String fname=GOS::url_to_filename(url);
 //	       if (GOS::basename(fname)=="-") fname="-";
 	       DEBUG_MSG("url=" << url << "\n");
 
@@ -1436,7 +1436,7 @@ add_file_to_djvm(const GP<DjVuFile> & file, bool page,
 	 }
 	 
 	    // Finally add it to the document
-	 GString name=file->get_url().fname();
+	 GUTF8String name=file->get_url().fname();
 	 GP<DjVmDir::File> file_rec=new DjVmDir::File(name, name, name,
 						      page ? DjVmDir::File::PAGE :
 						      DjVmDir::File::INCLUDE);
@@ -1524,7 +1524,7 @@ DjVuDocument::get_url_names(void)
         // Why is this try/catch block here?
         G_TRY { 
           get_portcaster()->notify_error(this, ex.get_cause()); 
-          GString emsg = "DjVuDocument.exclude_page\t" + (i+1);
+          GUTF8String emsg = "DjVuDocument.exclude_page\t" + (i+1);
           get_portcaster()->notify_error(this, emsg);
         }
         G_CATCH_ALL
@@ -1604,7 +1604,7 @@ DjVuDocument::get_djvm_doc()
           {
             G_TRY { 
               get_portcaster()->notify_error(this, ex.get_cause());
-              GString emsg = "DjVuDocument.skip_page\t" + (page_num+1);
+              GUTF8String emsg = "DjVuDocument.skip_page\t" + (page_num+1);
               get_portcaster()->notify_error(this, emsg);
             }
             G_CATCH_ALL
@@ -1643,7 +1643,7 @@ DjVuDocument::write(GP<ByteStream> gstr, bool force_djvm)
 }
 
 void
-DjVuDocument::expand(const GURL &codebase, const GString &idx_name)
+DjVuDocument::expand(const GURL &codebase, const GUTF8String &idx_name)
 {
    DEBUG_MSG("DjVuDocument::expand(): codebase='" << codebase << "'\n");
    DEBUG_MAKE_INDENT(3);

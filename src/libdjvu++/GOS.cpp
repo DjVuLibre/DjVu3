@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GOS.cpp,v 1.53 2001-04-09 18:02:03 chrisp Exp $
+// $Id: GOS.cpp,v 1.54 2001-04-12 00:25:00 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -158,19 +158,20 @@ finddirsep(const char * const fname)
 // basename(filename[, suffix])
 // -- returns the last component of filename and removes suffix
 //    when present. works like /bin/basename.
-GString 
-GOS::basename(const char *fname, const char *suffix)
+GUTF8String 
+GOS::basename(const GUTF8String &gfname, const char *suffix)
 {
-  if(!fname || !fname[0])
-    return &nillchar;
+  if(!gfname.length())
+    return gfname;
 
+  const char *fname=gfname;
 #ifdef WIN32
   // Special cases
   if (fname[1] == colon)
   {
     if(!fname[2])
     {
-      return fname;
+      return gfname;
     }
     if (!fname[3] && (fname[2]== slash || fname[2]== backslash))
     {
@@ -190,7 +191,7 @@ GOS::basename(const char *fname, const char *suffix)
 
 
   // Allocate buffer
-  GString retval(fname);
+  GUTF8String retval(fname);
 
   // Process suffix
   if (suffix)
@@ -199,13 +200,13 @@ GOS::basename(const char *fname, const char *suffix)
       suffix ++;
     if (suffix[0])
     {
-      const GString gsuffix(suffix);
+      const GUTF8String gsuffix(suffix);
       const int sl = gsuffix.length();
       const char *s = fname + strlen(fname);
       if (s > fname + sl)
       {
         s = s - (sl + 1);
-        if(*s == dot && (GString(s+1).downcase() == gsuffix.downcase()))
+        if(*s == dot && (GUTF8String(s+1).downcase() == gsuffix.downcase()))
         {
           retval.setat((int)((size_t)s-(size_t)fname),0);
         }
@@ -221,10 +222,10 @@ GOS::basename(const char *fname, const char *suffix)
 // -- A small helper function returning a 
 //    stdio error message in a static buffer.
 
-static GString 
+static GNativeString 
 errmsg()
 {
-  GString buffer;
+  GNativeString buffer;
 #ifdef REIMPLEMENT_STRERROR
   const char *errname = "Unknown libc error";
   if (errno>0 && errno<sys_nerr)
@@ -369,46 +370,46 @@ strerror(int errno)
 // cwd([dirname])
 // -- changes directory to dirname (when specified).
 //    returns the full path name of the current directory. 
-GString 
-GOS::cwd(const char *dirname)
+GUTF8String 
+GOS::cwd(const GUTF8String &dirname)
 {
 #if defined(UNIX) || defined(macintosh) 
-  if (dirname && chdir(((GString)dirname).getUTF82Native())==-1)//MBCS cvt
+  if (dirname.length() && chdir(dirname.getUTF82Native())==-1)//MBCS cvt
     G_THROW(errmsg());
   char *string_buffer;
   GPBuffer<char> gstring_buffer(string_buffer,MAXPATHLEN+1);
   char *result = getcwd(string_buffer,MAXPATHLEN);
   if (!result)
     G_THROW(errmsg());
-  return ((GString)result).getNative2UTF8();//MBCS cvt
+  return GNativeString(result).getNative2UTF8();//MBCS cvt
 #elif defined(UNDER_CE)
-  return GString(dot) ;
+  return GUTF8String(dot) ;
 #elif defined (WIN32)
   char drv[2];
-  if (dirname && _chdir(((GString)dirname).getUTF82Native())==-1)//MBCS cvt
+  if (dirname.length() && _chdir(dirname.getUTF82Native())==-1)//MBCS cvt
     G_THROW(errmsg());
   drv[0]= dot ; drv[1]=0;
   char *string_buffer;
   GPBuffer<char> gstring_buffer(string_buffer,MAXPATHLEN+1);
   char *result = getcwd(string_buffer,MAXPATHLEN);
   GetFullPathName(drv, MAXPATHLEN, string_buffer, &result);
-  return ((GString)string_buffer).getNative2UTF8();//MBCS cvt
+  return GNativeString(string_buffer).getNative2UTF8();//MBCS cvt
 #else
 #error "Define something here for your operating system"
 #endif 
 }
 
-GString
-GOS::getenv(const GString &name)
+GUTF8String
+GOS::getenv(const GUTF8String &name)
 {
-  GString retval;
+  GUTF8String retval;
 #ifndef UNDER_CE
   if(name.length())
   {
     const char *env=::getenv(name.getUTF82Native());
     if(env)
     {
-      retval=GString(env).getNative2UTF8();
+      retval=GNativeString(env);
     }
   }
 #endif

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GURL.h,v 1.35 2001-04-03 22:46:09 praveen Exp $
+// $Id: GURL.h,v 1.36 2001-04-12 00:25:00 bcr Exp $
 // $Name:  $
 
 #ifndef _GURL_H_
@@ -49,7 +49,7 @@
     \Ref{GURL} class used to store URLs in a system independent format.
     @memo System independent URL representation.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: GURL.h,v 1.35 2001-04-03 22:46:09 praveen Exp $#
+    @version #$Id: GURL.h,v 1.36 2001-04-12 00:25:00 bcr Exp $#
 */
 
 //@{
@@ -88,7 +88,7 @@ protected:
       */
       //@{
       ///
-   GURL(const GString & url_string);
+   GURL(const GUTF8String & url_string);
       ///
    GURL(const char * url_string);
       //@}
@@ -108,16 +108,16 @@ private:
       // url, or cgi_name_arr, or cgi_value_arr.
    GCriticalSection	class_lock;
 protected:
-   GString		url;
+   GUTF8String	url;
 private:
-   DArray<GString>	cgi_name_arr, cgi_value_arr;
+   DArray<GUTF8String>	cgi_name_arr, cgi_value_arr;
    bool validurl;
 
    void		init(const bool nothrow=false);
    void		convert_slashes(void);
    void		beautify_path(void);
 
-   static GString	protocol(const char * url);
+   static GUTF8String	protocol(const char * url);
    void		parse_cgi_args(void);
    void		store_cgi_args(void);
 public:
@@ -125,11 +125,11 @@ public:
    bool is_valid(void) const;
 
       /// Extracts the {\em protocol} part from the URL and returns it
-   GString	protocol(void) const;
+   GUTF8String	protocol(void) const;
 
       /** Returns string after the first '\#' with decoded
 	  escape sequences. */
-   GString	hash_argument(void) const;
+   GUTF8String	hash_argument(void) const;
 
       /** Inserts the #arg# after a separating hash into the URL.
 	  The function encodes any illegal character in #arg# using
@@ -146,35 +146,35 @@ public:
 
       /** Returns that part of CGI argument number #num#, which is
 	  before the equal sign. */
-   GString	cgi_name(int num) const;
+   GUTF8String	cgi_name(int num) const;
 
       /** Returns that part of DjVu-related CGI argument number #num#,
 	  which is before the equal sign. */
-   GString	djvu_cgi_name(int num) const;
+   GUTF8String	djvu_cgi_name(int num) const;
 
       /** Returns that part of CGI argument number #num#, which is
 	  after the equal sign. */
-   GString	cgi_value(int num) const;
+   GUTF8String	cgi_value(int num) const;
    
       /** Returns that part of DjVu-related CGI argument number #num#,
 	  which is after the equal sign. */
-   GString	djvu_cgi_value(int num) const;
+   GUTF8String	djvu_cgi_value(int num) const;
    
       /** Returns array of all known CGI names (part of CGI argument before
 	  the equal sign) */
-   DArray<GString>cgi_names(void) const;
+   DArray<GUTF8String>cgi_names(void) const;
 
       /** Returns array of names of DjVu-related CGI arguments (arguments
 	  following #DJVUOPTS# option. */
-   DArray<GString>djvu_cgi_names(void) const;
+   DArray<GUTF8String>djvu_cgi_names(void) const;
    
       /** Returns array of all known CGI names (part of CGI argument before
 	  the equal sign) */
-   DArray<GString>cgi_values(void) const;
+   DArray<GUTF8String>cgi_values(void) const;
 
       /** Returns array of values of DjVu-related CGI arguments (arguments
 	  following #DJVUOPTS# option. */
-   DArray<GString>djvu_cgi_values(void) const;
+   DArray<GUTF8String>djvu_cgi_values(void) const;
 
       /// Erases everything after the first '\#' or '?'
    void		clear_all_arguments(void);
@@ -198,22 +198,22 @@ public:
    GURL		base(void) const;
 
       /// Returns the aboslute URL without the host part.
-   GString pathname(void) const;
+   GUTF8String pathname(void) const;
 
       /** Returns the name part of this URL.
 	  For example, if the URL is #http://www.lizardtech.com/file%201.djvu# then
           this function will return #file%201.djvu#. \Ref{fname}() will
           return #file 1.djvu# at the same time. */
-   GString	name(void) const;
+   GUTF8String	name(void) const;
 
       /** Returns the name part of this URL with escape sequences expanded.
 	  For example, if the URL is #http://www.lizardtech.com/file%201.djvu# then
           this function will return #file 1.djvu#. \Ref{name}() will
           return #file%201.djvu# at the same time. */
-   GString	fname(void) const;
+   GUTF8String	fname(void) const;
 
       /// Returns the extention part of name of document in this URL.
-   GString	extension(void) const;
+   GUTF8String	extension(void) const;
 
       /// Checks if this is an empty URL
    bool		is_empty(void) const;
@@ -231,7 +231,7 @@ public:
       ///
    GURL		operator+(const char * name) const;
       ///
-   GURL		operator+(const GString & name) const;
+   GURL		operator+(const GUTF8String & name) const;
       //@}
 
       /// Returns TRUE if #gurl1# and #gurl2# are the same
@@ -252,22 +252,22 @@ public:
       A brain damaged MSIE compatible syntax is generated
       when the optional argument #useragent# contains string #"MSIE"# or
       #"Microsoft"#. */
-   GString get_string(const char *useragent=0) const;
+   GUTF8String get_string(const char *useragent=0) const;
 
       /// Escape special characters
-   static GString encode_reserved(unsigned char const *s);
+   static GUTF8String encode_reserved(unsigned char const *s);
 
       /// Escape special characters
-   static GString encode_reserved(char const * const s)
+   static GUTF8String encode_reserved(char const * const s)
    { return encode_reserved((unsigned char *)s); }
 
    /** Decodes reserved characters from the URL.
       See also: \Ref{encode_reserved}(). */
-   static GString decode_reserved(const char * url);
+   static GUTF8String decode_reserved(const char * url);
 
    /** Decodes reserved characters from the URL.
       See also: \Ref{encode_reserved}(). */
-   static GString decode_reserved(const unsigned char * url)
+   static GUTF8String decode_reserved(const unsigned char * url)
    { return decode_reserved((const char *)url); }
 
   /// Test if this url is an existing file, directory, or device.
@@ -311,9 +311,9 @@ public:
                 file:/<path>
 
       which are accepted because various browsers recognize them.*/
-   GString UTF8Filename(void) const;
+   GUTF8String UTF8Filename(void) const;
    /// Same but returns a native string.
-   GString NativeFilename(void) const;
+   GNativeString NativeFilename(void) const;
 
       /** Hashing function.
 	  @return hash suitable for usage in \Ref{GMap} */
@@ -326,21 +326,21 @@ public:
       #expand_name# is very useful for logically concatenating file names.  It
       knows which separators should be used for each operating system and it
       knows which syntactical rules apply. */
-  static GString expand_name(const char *filename, const char *fromdirname=0);
+  static GUTF8String expand_name(const char *filename, const char *fromdirname=0);
 };
 
 class GURL::UTF8 : public GURL
 {
 public:
-  UTF8(const GString &url) : GURL(url) {}
-  UTF8(const GString &url, const GURL &codebase);
+  UTF8(const GUTF8String &url) : GURL(url) {}
+  UTF8(const GUTF8String &url, const GURL &codebase);
 };
 
 class GURL::Native : public GURL
 {
 public:
-  Native(const GString &url) : GURL(url.getNative2UTF8()) {}
-  Native(const GString &url, const GURL &codebase);
+  Native(const GNativeString &url) : GURL(url.getNative2UTF8()) {}
+  Native(const GNativeString &url, const GURL &codebase);
 };
 
 class GURL::Filename : public GURL
@@ -353,17 +353,17 @@ public:
 class GURL::Filename::UTF8 : public GURL::Filename
 {
 public:
-  UTF8(const GString &filename);
+  UTF8(const GUTF8String &filename);
 };
 
 class GURL::Filename::Native : public GURL::Filename
 {
 public:
-  Native(const GString &filename);
+  Native(const GNativeString &filename);
 };
 
 inline GURL
-GURL::operator+(const GString & xname) const
+GURL::operator+(const GUTF8String & xname) const
 {
   return (*this)+(const char *) xname;
 }
@@ -386,10 +386,11 @@ hash(const GURL & gurl)
    return hash(gurl.url);
 }
 
-inline GString
+inline GUTF8String
 GURL::protocol(void) const
 {
-   if(!validurl) const_cast<GURL *>(this)->init();
+   if(!validurl)
+     const_cast<GURL *>(this)->init();
    return protocol(url);
 }
 

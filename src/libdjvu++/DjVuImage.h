@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuImage.h,v 1.41 2001-04-03 22:31:37 bcr Exp $
+// $Id: DjVuImage.h,v 1.42 2001-04-12 00:24:59 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUIMAGE_H
@@ -73,7 +73,7 @@
     L\'eon Bottou <leonb@research.att.com> - initial implementation
     Andrei Erofeev <eaf@geocities.com> - multipage support
     @version
-    #$Id: DjVuImage.h,v 1.41 2001-04-03 22:31:37 bcr Exp $# */
+    #$Id: DjVuImage.h,v 1.42 2001-04-12 00:24:59 bcr Exp $# */
 //@{
 
 
@@ -234,10 +234,10 @@ public:
   /** Returns a MIME type string describing the DjVu data.  This information
       is auto-sensed by the decoder.  The MIME type can be #"image/djvu"# or
       #"image/iw44"# depending on the data stream. */
-  GString get_mimetype() const;
+  GUTF8String get_mimetype() const;
   /** Returns a short string describing the DjVu image.
       Example: #"2500x3223 in 23.1 Kb"#. */
-  GString get_short_description() const;
+  GUTF8String get_short_description() const;
   /** Returns a verbose description of the DjVu image.  This description lists
       all the chunks with their size and a brief comment, as shown in the
       following example.
@@ -252,7 +252,7 @@ public:
        7.1 Kb   'BG44'  IW44 background (part 4).
       Compression ratio: 676 (31.8 Kb)
       \end{verbatim} */
-  GString get_long_description() const;
+  GUTF8String get_long_description() const;
   /** Returns pointer to \Ref{DjVuFile} which contains this image in
       compressed form. */
   GP<DjVuFile> get_djvu_file(void) const;

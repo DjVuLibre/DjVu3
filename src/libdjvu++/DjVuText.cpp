@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuText.cpp,v 1.13 2001-04-02 23:30:19 praveen Exp $
+// $Id: DjVuText.cpp,v 1.14 2001-04-12 00:25:00 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -80,7 +80,7 @@ DjVuTXT::Zone::cleartext()
 }
 
 void
-DjVuTXT::Zone::normtext(const char *instr, GString &outstr)
+DjVuTXT::Zone::normtext(const char *instr, GUTF8String &outstr)
 {
   if (text_length == 0)
     {
@@ -97,7 +97,7 @@ DjVuTXT::Zone::normtext(const char *instr, GString &outstr)
     {
       // Collect text at this level
       int new_start = outstr.length();
-      outstr = outstr + GString(instr+text_start, text_length);
+      outstr = outstr + GUTF8String(instr+text_start, text_length);
       text_start = new_start;
       // Clear textual information on lower level nodes
       for (GPosition i=children; i; ++i)
@@ -123,7 +123,7 @@ DjVuTXT::Zone::normtext(const char *instr, GString &outstr)
   // Add separator if not present yet.
   if (outstr[text_start+text_length-1] != sep)
     {
-      outstr = outstr + GString(&sep, 1);
+      outstr = outstr + GUTF8String(&sep, 1);
       text_length += 1;
     }
 }
@@ -256,7 +256,7 @@ DjVuTXT::Zone::decode(ByteStream &bs, int maxtext,
 void 
 DjVuTXT::normalize_text()
 {
-  GString newtextUTF8;
+  GUTF8String newtextUTF8;
   page_zone.normtext( (const char*)textUTF8, newtextUTF8 );
   textUTF8 = newtextUTF8;
 }
@@ -307,7 +307,7 @@ DjVuTXT::decode(ByteStream &bs)
   if ( bs.read( (void*) &version, 1 ) == 1) 
   {
     if (version != Zone::version)
-      G_THROW("DjVuText.bad_version\t"+GString(version));
+      G_THROW("DjVuText.bad_version\t"+GUTF8String(version));
     page_zone.decode(bs, textsize);
   }
 }
@@ -411,7 +411,7 @@ DjVuTXT::find_zones(int string_start, int string_length) const
 
 
 GList<DjVuTXT::Zone *>
-DjVuTXT::find_text_in_rect(GRect target_rect, GString &text) const
+DjVuTXT::find_text_in_rect(GRect target_rect, GUTF8String &text) const
       // For the string starting at string_start of length string_length
       // the function will generate a list of smallest zones of the
       // same type and will return it
@@ -554,7 +554,7 @@ GList<DjVuTXT::Zone *>
 DjVuTXT::search_string(const char * string, int & from, bool search_fwd,
 		       bool match_case, bool whole_word) const
 {
-  GString local_string;
+  GUTF8String local_string;
   
   const char * ptr;
   
@@ -650,7 +650,7 @@ DjVuTXT::get_memory_usage() const
 void
 DjVuText::decode(GP<ByteStream> gbs)
 {
-  GString chkid;
+  GUTF8String chkid;
   GP<IFFByteStream> giff=IFFByteStream::create(gbs);
   IFFByteStream &iff=*giff;
   while( iff.get_chunk(chkid) )

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocument.h,v 1.82 2001-04-11 16:59:50 bcr Exp $
+// $Id: DjVuDocument.h,v 1.83 2001-04-12 00:24:59 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUDOCUMENT_H
@@ -58,7 +58,7 @@ class ByteStream;
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocument.h,v 1.82 2001-04-11 16:59:50 bcr Exp $#
+    @version #$Id: DjVuDocument.h,v 1.83 2001-04-12 00:24:59 bcr Exp $#
 */
 
 //@{
@@ -505,7 +505,7 @@ public:
 	     \item #OLD_BUNDLED# and #OLD_INDEXED# and #SINGLE_PAGE#:
 	           #DOC_TYPE_KNOWN# flag is set.
 	  \end{itemize} */
-   GURL		id_to_url(const GString &id) const;
+   GURL		id_to_url(const GUTF8String &id) const;
 
       /** Returns \Ref{GP} pointer to \Ref{DjVuImage} corresponding to page
           #page_num#. If caching is enabled, and there is a {\em fully decoded}
@@ -563,7 +563,7 @@ public:
 	  If so, it just calls the #get_page()# function above. If ID is
 	  #ZERO# or just empty, page number #-1# is assumed. Otherwise
 	  the ID is translated to the URL using \Ref{id_to_url}(). */
-   GP<DjVuImage>get_page(const GString &id, bool sync=true, DjVuPort * port=0);
+   GP<DjVuImage>get_page(const GUTF8String &id, bool sync=true, DjVuPort * port=0);
    
       /** Returns \Ref{DjVuFile} corresponding to the specified page.
 	  Normally it translates the page number to the URL using
@@ -604,7 +604,7 @@ public:
 
 	  If #dont_create# is #FALSE# the function will return the file
 	  only if it already exists. */
-   GP<DjVuFile>	get_djvu_file(const GString &id, bool dont_create=false);
+   GP<DjVuFile>	get_djvu_file(const GUTF8String &id, bool dont_create=false);
       /** Returns a \Ref{DataPool} containing one chunk #TH44# with
 	  the encoded thumbnail for the specified page. The function
 	  first looks for thumbnails enclosed into the document and if
@@ -682,7 +682,7 @@ public:
 	  @param idx_name - Name of the top-level file containing the document
 	         directory (basically, list of all files composing the document).
       */
-   void			expand(const GURL &codebase, const GString &idx_name);
+   void			expand(const GURL &codebase, const GUTF8String &idx_name);
       /** This function can be used instead of \Ref{write}() and \Ref{expand}().
 	  It allows to save the document either in the new #BUNDLED# format
 	  or in the new #INDIRECT# format depending on the value of parameter
@@ -722,10 +722,10 @@ public:
    GP<DjVuNavDir>	get_nav_dir(void) const;
 
       /// Returns TRUE if #class_name# is #"DjVuDocument"# or #"DjVuPort"#
-   virtual bool		inherits(const GString &class_name) const;
+   virtual bool		inherits(const GUTF8String &class_name) const;
 
-   virtual GURL		id_to_url(const DjVuPort * source, const GString &id);
-   virtual GPBase	id_to_file(const DjVuPort * source, const GString &id);
+   virtual GURL		id_to_url(const DjVuPort * source, const GUTF8String &id);
+   virtual GPBase	id_to_file(const DjVuPort * source, const GUTF8String &id);
    virtual GP<DataPool>	request_data(const DjVuPort * source, const GURL & url);
    virtual void		notify_file_flags_changed(const DjVuFile * source,
  			long set_mask, long clr_mask);
@@ -773,7 +773,7 @@ protected:
 
    GP<DjVmDir0>		djvm_dir0;	// Old-style DjVm directory
    GP<DjVuNavDir>	ndir;		// Old-style navigation directory
-   GString		first_page_name;// For OLD_BUNDLED docs only
+   GUTF8String		first_page_name;// For OLD_BUNDLED docs only
 
       // The following is used in init() and destructor to query NDIR
       // DO NOT USE FOR ANYTHING ELSE. THE FILE IS ZEROED IMMEDIATELY
@@ -804,9 +804,9 @@ protected:
       
    void			add_to_cache(const GP<DjVuFile> & f);
    void			check_unnamed_files(void);
-   GString		get_int_prefix(void);
+   GUTF8String		get_int_prefix(void);
    void			set_file_aliases(const DjVuFile * file);
-   GURL			invent_url(const GString &name) const;
+   GURL			invent_url(const GUTF8String &name) const;
 private: //dummy stuff
    static void	write(ByteStream *);
    static void	write(ByteStream *, bool);
@@ -817,13 +817,13 @@ class DjVuDocument::UnnamedFile : public GPEnabled
 public:
    enum { ID, PAGE_NUM };
    int		id_type;
-   GString		id;
+   GUTF8String		id;
    int		page_num;
    GURL		url;
    GP<DjVuFile>	file;
    GP<DataPool>	data_pool;
 protected:
-   UnnamedFile(int xid_type, const GString &xid, int xpage_num, const GURL & xurl,
+   UnnamedFile(int xid_type, const GUTF8String &xid, int xpage_num, const GURL & xurl,
 		  const GP<DjVuFile> & xfile) :
       id_type(xid_type), id(xid), page_num(xpage_num), url(xurl), file(xfile) {}
    friend class DjVuDocument;
@@ -924,10 +924,10 @@ inline GP<DataPool>
 DjVuDocument::get_init_data_pool(void) const { return init_data_pool; }
 
 inline bool
-DjVuDocument::inherits(const GString &class_name) const
+DjVuDocument::inherits(const GUTF8String &class_name) const
 {
    return
-      (GString("DjVuDocument") == class_name) ||
+      (GUTF8String("DjVuDocument") == class_name) ||
       DjVuPort::inherits(class_name);
 //      !strcmp("DjVuDocument", class_name) ||
 //      DjVuPort::inherits(class_name);

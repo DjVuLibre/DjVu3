@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GMapAreas.cpp,v 1.22 2001-04-05 16:06:27 bcr Exp $
+// $Id: GMapAreas.cpp,v 1.23 2001-04-12 00:25:00 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -209,7 +209,7 @@ GMapArea::is_point_inside(int x, int y)
 	      gma_is_point_inside(x, y) : false;
 }
 
-GString
+GUTF8String
 GMapArea::print(void)
 {
       // Make this hard check to make sure, that *no* illegal GMapArea
@@ -221,9 +221,9 @@ GMapArea::print(void)
    }
    
    int i;
-   GString tmp;
-   GString url1, target1, comment1;
-   GString url_str=(const char *) url;
+   GUTF8String tmp;
+   GUTF8String url1, target1, comment1;
+   GUTF8String url_str=(const char *) url;
    for(i=0;i<(int) url_str.length();i++)
    {
       char ch=url_str[i];
@@ -246,17 +246,17 @@ GMapArea::print(void)
       comment1+=ch;
    }
    
-   GString border_color_str;
+   GUTF8String border_color_str;
    border_color_str.format("#%02X%02X%02X",
 	   (border_color & 0xff0000) >> 16,
 	   (border_color & 0xff00) >> 8,
 	   (border_color & 0xff));
 
-   static const GString left('(');
-   static const GString right(')');
-   static const GString space(' ');
-   static const GString quote('"');
-   GString border_type_str;
+   static const GUTF8String left('(');
+   static const GUTF8String right(')');
+   static const GUTF8String space(' ');
+   static const GUTF8String quote('"');
+   GUTF8String border_type_str;
    switch(border_type)
    {
       case NO_BORDER:
@@ -269,23 +269,23 @@ GMapArea::print(void)
         border_type_str=left+SOLID_BORDER_TAG+space+border_color_str+right;
         break;
       case SHADOW_IN_BORDER:
-        border_type_str=left+SHADOW_IN_BORDER_TAG+space+GString(border_width)+right;
+        border_type_str=left+SHADOW_IN_BORDER_TAG+space+GUTF8String(border_width)+right;
         break;
       case SHADOW_OUT_BORDER:
-        border_type_str=left+SHADOW_OUT_BORDER_TAG+space+GString(border_width)+right;
+        border_type_str=left+SHADOW_OUT_BORDER_TAG+space+GUTF8String(border_width)+right;
         break;
       case SHADOW_EIN_BORDER:
-        border_type_str=left+SHADOW_EIN_BORDER_TAG+space+GString(border_width)+right;
+        border_type_str=left+SHADOW_EIN_BORDER_TAG+space+GUTF8String(border_width)+right;
         break;
       case SHADOW_EOUT_BORDER:
-        border_type_str=left+SHADOW_EOUT_BORDER_TAG+space+GString(border_width)+right;
+        border_type_str=left+SHADOW_EOUT_BORDER_TAG+space+GUTF8String(border_width)+right;
         break;
       default:
         border_type_str=left+XOR_BORDER_TAG+right;
         break;
    }
 
-   GString hilite_str;
+   GUTF8String hilite_str;
    if (hilite_color!=0xffffffff)
    {
       hilite_str.format("(%s #%02X%02X%02X)",
@@ -294,7 +294,7 @@ GMapArea::print(void)
 	      (hilite_color & 0xff));
    }
    
-   GString URL;
+   GUTF8String URL;
    if (target1==TARGET_SELF)
    {
       URL=quote+url1+quote;
@@ -303,7 +303,7 @@ GMapArea::print(void)
       URL=left+URL_TAG+space+quote+url1+quote+space+quote+target1+quote+right;
    }
 
-   GString total=left+MAPAREA_TAG+space+URL+space+quote+comment1+quote+space+gma_print()+border_type_str;
+   GUTF8String total=left+MAPAREA_TAG+space+URL+space+quote+comment1+quote+space+gma_print()+border_type_str;
    if (border_always_visible)
      total+=space+left+BORDER_AVIS_TAG+right;
    if ( hilite_str.length() > 0 )
@@ -369,10 +369,10 @@ GMapRect::gma_transform(const GRect & grect)
    xmax=grect.xmax; ymax=grect.ymax;
 }
 
-GString
+GUTF8String
 GMapRect::gma_print(void)
 {
-   GString buffer;
+   GUTF8String buffer;
    return buffer.format("(%s %d %d %d %d) ",
 	   RECT_TAG, xmin, ymin, xmax-xmin, ymax-ymin);
 }
@@ -694,14 +694,14 @@ GMapPoly::close_poly()
     sides=points;
 }
 
-GString
+GUTF8String
 GMapPoly::gma_print(void)
 {
-   static const GString space(' ');
-   GString res=GString('(')+POLY_TAG+space;
+   static const GUTF8String space(' ');
+   GUTF8String res=GUTF8String('(')+POLY_TAG+space;
    for(int i=0;i<points;i++)
    {
-      GString buffer;
+      GUTF8String buffer;
       res+=buffer.format("%d %d ", xx[i], yy[i]);
    }
    res.setat(res.length()-1, ')');
@@ -808,10 +808,10 @@ GMapOval::GMapOval(const GRect & rect) : xmin(rect.xmin), ymin(rect.ymin),
    initialize();
 }
 
-GString
+GUTF8String
 GMapOval::gma_print(void)
 {
-   GString buffer;
+   GUTF8String buffer;
    return buffer.format("(%s %d %d %d %d) ",
 	   OVAL_TAG, xmin, ymin, xmax-xmin, ymax-ymin);
 }

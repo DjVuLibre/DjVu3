@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocEditor.cpp,v 1.71 2001-04-11 16:59:50 bcr Exp $
+// $Id: DjVuDocEditor.cpp,v 1.72 2001-04-12 00:24:59 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -154,7 +154,7 @@ DjVuDocEditor::init(const GURL &url)
    doc_url=url;
    GP<DjVuDocument> tmp_doc=DjVuDocument::create_wait(doc_url,this);
    if (!tmp_doc->is_init_ok())
-      G_THROW(GString("DjVuDocEditor.open_fail\t")+url);
+      G_THROW(GUTF8String("DjVuDocEditor.open_fail\t")+url.get_string());
 
    orig_doc_type=tmp_doc->get_doc_type();
    orig_doc_pages=tmp_doc->get_pages_num();
@@ -324,23 +324,23 @@ DjVuDocEditor::url_to_file(const GURL & url, bool dont_create)
    return file;
 }
 
-GString
+GUTF8String
 DjVuDocEditor::page_to_id(int page_num) const
 {
    GP<DjVmDir::File> f;
    if (page_num<0 || page_num>=get_pages_num() ||
        (f=djvm_dir->page_to_file(page_num))==0)
-      G_THROW("DjVuDocEditor.page_num\t"+GString(page_num));
+      G_THROW("DjVuDocEditor.page_num\t"+GUTF8String(page_num));
 
    return f->id;
 }
 
-GString
-DjVuDocEditor::find_unique_id(GString id)
+GUTF8String
+DjVuDocEditor::find_unique_id(GUTF8String id)
 {
   GP<DjVmDir> dir=get_djvm_dir();
 
-  GString base, ext;
+  GUTF8String base, ext;
   const int dot=id.rsearch('.');
   if(dot >= 0)
   {
@@ -357,7 +357,7 @@ DjVuDocEditor::find_unique_id(GString id)
            !dir->title_to_file(id)))
   {
      cnt++;
-     id=base+"_"+GString(cnt);
+     id=base+"_"+GUTF8String(cnt);
      if (ext.length())
        id+="."+ext;
   }
@@ -380,7 +380,7 @@ DjVuDocEditor::strip_incl_chunks(GP<DataPool> & pool_in)
    bool have_incl=false;
 
    int chksize;
-   GString chkid;
+   GUTF8String chkid;
    if (iff_in.get_chunk(chkid))
    {
       iff_out.put_chunk(chkid);
@@ -408,8 +408,8 @@ DjVuDocEditor::strip_incl_chunks(GP<DataPool> & pool_in)
    } else return pool_in;
 }
 
-GString
-DjVuDocEditor::insert_file(const GURL &file_url, const GString &parent_id,
+GUTF8String
+DjVuDocEditor::insert_file(const GURL &file_url, const GUTF8String &parent_id,
                            int chunk_num)
       // Will open the 'file_name' and insert it into an existing DjVuFile
       // with ID 'parent_id'. Will insert the INCL chunk at position chunk_num
@@ -436,12 +436,12 @@ DjVuDocEditor::insert_file(const GURL &file_url, const GString &parent_id,
    if (!parent_frec) parent_frec=dir->name_to_file(parent_id);
    if (!parent_frec) parent_frec=dir->title_to_file(parent_id);
    if (!parent_frec)
-      G_THROW(GString("DjVuDocEditor.no_file\t")+parent_id);
+      G_THROW(GUTF8String("DjVuDocEditor.no_file\t")+parent_id);
    GP<DjVuFile> parent_file=get_djvu_file(parent_id);
-   if (!parent_file) G_THROW(GString("DjVuDocEditor.create_fail\t")+parent_id);
+   if (!parent_file) G_THROW(GUTF8String("DjVuDocEditor.create_fail\t")+parent_id);
 
       // Now obtain ID for the new file
-   GString id=find_unique_id(file_url.fname());
+   GUTF8String id=find_unique_id(file_url.fname());
 
       // Add it into the directory
    GP<DjVmDir::File> frec=new DjVmDir::File(id, id, id, DjVmDir::File::INCLUDE);
@@ -465,7 +465,7 @@ DjVuDocEditor::insert_file(const GURL &file_url, const GString &parent_id,
 
 bool
 DjVuDocEditor::insert_file(const GURL &file_url, bool is_page,
-                           int & file_pos, GMap<GString, GString> & name2id)
+                           int & file_pos, GMap<GUTF8String, GUTF8String> & name2id)
       // First it will insert the 'file_url' at position 'file_pos'.
       //
       // Then it will process all the INCL chunks in the file and try to do
@@ -484,7 +484,7 @@ DjVuDocEditor::insert_file(const GURL &file_url, bool is_page,
       // Will return TRUE if the file has been successfully inserted.
       // FALSE, if the file contains NDIR chunk and has been skipped.
 {
-  GString errors;
+  GUTF8String errors;
 
   if (refresh_cb)
     refresh_cb(refresh_cl_data);
@@ -510,15 +510,15 @@ DjVuDocEditor::insert_file(const GURL &file_url, bool is_page,
     {
        GP<IFFByteStream> giff=IFFByteStream::create(file_pool->get_stream());
        IFFByteStream &iff=*giff;
-       GString chkid;
+       GUTF8String chkid;
 
        int length;
        length=iff.get_chunk(chkid);
 //         if (length>100*1024*1024)
-//            G_THROW(GString("File '")+file_url+"' is not a DjVu file");
+//            G_THROW(GUTF8String("File '")+file_url+"' is not a DjVu file");
        if (chkid!="FORM:DJVI" && chkid!="FORM:DJVU" &&
          chkid!="FORM:BM44" && chkid!="FORM:PM44")
-       G_THROW(GString("DjVuDocEditor.not_1_page\t")+file_url);
+       G_THROW(GUTF8String("DjVuDocEditor.not_1_page\t")+file_url);
 
        // Wonderful. It's even a DjVu file. Scan for NDIR chunks.
        // If NDIR chunk is found, ignore the file
@@ -532,7 +532,7 @@ DjVuDocEditor::insert_file(const GURL &file_url, bool is_page,
 
          // Now get a unique name for this file.
          // Check the name2id first...
-      GString id, name=file_url.fname();
+      GUTF8String id, name=file_url.fname();
       if (name2id.contains(name))
       {
         id=name2id[name];
@@ -571,7 +571,7 @@ DjVuDocEditor::insert_file(const GURL &file_url, bool is_page,
          // chunks due to name2id translation.
          // We also want to include here our file with shared annotations,
          // if it exists.
-      GString chkid;
+      GUTF8String chkid;
       GP<IFFByteStream> giff_in=IFFByteStream::create(file_pool->get_stream());
       IFFByteStream &iff_in=*giff_in;
       GP<ByteStream> gstr_out=ByteStream::create();
@@ -598,11 +598,11 @@ DjVuDocEditor::insert_file(const GURL &file_url, bool is_page,
             }
          } else
          {
-            GString name;
+            GUTF8String name;
             char buffer[1024];
             int length;
             while((length=iff_in.read(buffer, 1024)))
-               name+=GString(buffer, length);
+               name+=GUTF8String(buffer, length);
             while(isspace(name[0]))
             {
               name=name.substr(1,(unsigned int)-1);
@@ -620,7 +620,7 @@ DjVuDocEditor::insert_file(const GURL &file_url, bool is_page,
                {
                      // If the child file has been inserted (doesn't
                      // contain NDIR chunk), add INCL chunk.
-                  GString id=name2id[name];
+                  GUTF8String id=name2id[name];
                   iff_out.put_chunk("INCL");
                   iff_out.writestring(name);
                   iff_out.close_chunk();
@@ -684,9 +684,9 @@ DjVuDocEditor::insert_group(const GList<GURL> & file_urls, int page_num,
          // Now call the insert_file() for every page. We will remember the
          // name2id translation table. Thus insert_file() will remember IDs
          // it assigned to shared files
-      GMap<GString, GString> name2id;
+      GMap<GUTF8String, GUTF8String> name2id;
 
-      GString errors;
+      GUTF8String errors;
       for(GPosition pos=file_urls;pos;++pos)
       {
          const GURL &furl=file_urls[pos];
@@ -698,7 +698,7 @@ DjVuDocEditor::insert_group(const GList<GURL> & file_urls, int page_num,
             {
               (*DjVuDocument::djvu_import_codec)(xdata_pool,furl,needs_compression_flag,can_compress_flag);
             }
-            GString chkid;
+            GUTF8String chkid;
             IFFByteStream::create(xdata_pool->get_stream())->get_chunk(chkid);
             if (chkid=="FORM:DJVM")
             {
@@ -712,13 +712,13 @@ DjVuDocEditor::insert_group(const GList<GURL> & file_urls, int page_num,
                GURL::Filename::UTF8 dirurl("tempFileForDjVu");
 #endif
                if (dirurl.mkdir()<0)
-                  G_THROW(GString("DjVuDocEditor.dir_fail\t")+dirurl);//MBCS cvt
+                  G_THROW(GUTF8String("DjVuDocEditor.dir_fail\t")+dirurl);//MBCS cvt
                G_TRY {
                   doc->expand(tmp_doc_url, furl.fname());
                   int pages_num=doc->get_pages_num();
                   for(int page_num=0;page_num<pages_num;page_num++)
                   {
-                     const GString name=doc->page_to_url(page_num).fname();
+                     const GUTF8String name=doc->page_to_url(page_num).fname();
                      const GURL::UTF8 url(name,dirurl);
                      insert_file(url, true, file_pos, name2id);
                   }
@@ -777,7 +777,7 @@ DjVuDocEditor::insert_page(GP<DataPool> & _file_pool,
    GP<DataPool> file_pool=strip_incl_chunks(_file_pool);
    
       // Now obtain ID for the new file
-   GString id=find_unique_id(file_url.fname());
+   GUTF8String id=find_unique_id(file_url.fname());
 
       // Add it into the directory
    GP<DjVmDir::File> frec=new DjVmDir::File(id, id, id, DjVmDir::File::PAGE);
@@ -795,15 +795,15 @@ DjVuDocEditor::insert_page(GP<DataPool> & _file_pool,
 
 void
 DjVuDocEditor::generate_ref_map(const GP<DjVuFile> & file,
-				GMap<GString, void *> & ref_map,
+				GMap<GUTF8String, void *> & ref_map,
 				GMap<GURL, void *> & visit_map)
       // This private function is used to generate a list (implemented as map)
       // of files referencing the given file. To get list of all parents
       // for file with ID 'id' iterate map obtained as
-      // *((GMap<GString, void *> *) ref_map[id])
+      // *((GMap<GUTF8String, void *> *) ref_map[id])
 {
    GURL url=file->get_url();
-   GString id=djvm_dir->name_to_file(url.fname())->id;
+   GUTF8String id=djvm_dir->name_to_file(url.fname())->id;
    if (!visit_map.contains(url))
    {
       visit_map[url]=0;
@@ -815,12 +815,12 @@ DjVuDocEditor::generate_ref_map(const GP<DjVuFile> & file,
             // First: add the current file to the list of parents for
             // the child being processed
          GURL child_url=child_file->get_url();
-         GString child_id=djvm_dir->name_to_file(child_url.fname())->id;
-         GMap<GString, void *> * parents=0;
+         GUTF8String child_id=djvm_dir->name_to_file(child_url.fname())->id;
+         GMap<GUTF8String, void *> * parents=0;
          if (ref_map.contains(child_id))
-            parents=(GMap<GString, void *> *) ref_map[child_id];
+            parents=(GMap<GUTF8String, void *> *) ref_map[child_id];
          else
-            ref_map[child_id]=parents=new GMap<GString, void *>();
+            ref_map[child_id]=parents=new GMap<GUTF8String, void *>();
          (*parents)[id]=0;
             // Second: go recursively
          generate_ref_map(child_file, ref_map, visit_map);
@@ -829,8 +829,8 @@ DjVuDocEditor::generate_ref_map(const GP<DjVuFile> & file,
 }
 
 void
-DjVuDocEditor::remove_file(const GString &id, bool remove_unref,
-                           GMap<GString, void *> & ref_map)
+DjVuDocEditor::remove_file(const GUTF8String &id, bool remove_unref,
+                           GMap<GUTF8String, void *> & ref_map)
       // Private function, which will remove file with ID id.
       //
       // If will also remove all INCL chunks in parent files pointing
@@ -843,12 +843,12 @@ DjVuDocEditor::remove_file(const GString &id, bool remove_unref,
       // this file (required when removing INCL chunks)
 {
       // First get rid of INCL chunks in parents
-   GMap<GString, void *> * parents=(GMap<GString, void *> *) ref_map[id];
+   GMap<GUTF8String, void *> * parents=(GMap<GUTF8String, void *> *) ref_map[id];
    if (parents)
    {
       for(GPosition pos=*parents;pos;++pos)
       {
-         GString parent_id=(*parents).key(pos);
+         GUTF8String parent_id=(*parents).key(pos);
          GP<DjVuFile> parent=get_djvu_file(parent_id);
          if (parent) parent->unlink_file(id);
       }
@@ -858,7 +858,7 @@ DjVuDocEditor::remove_file(const GString &id, bool remove_unref,
    }
 
       // We will accumulate errors here.
-   GString errors;
+   GUTF8String errors;
 
       // Now modify the ref_map and process children if necessary
    GP<DjVuFile> file=get_djvu_file(id);
@@ -870,8 +870,8 @@ DjVuDocEditor::remove_file(const GString &id, bool remove_unref,
          {
             GP<DjVuFile> child_file=files_list[pos];
             GURL child_url=child_file->get_url();
-            GString child_id=djvm_dir->name_to_file(child_url.fname())->id;
-            GMap<GString, void *> * parents=(GMap<GString, void *> *) ref_map[child_id];
+            GUTF8String child_id=djvm_dir->name_to_file(child_url.fname())->id;
+            GMap<GUTF8String, void *> * parents=(GMap<GUTF8String, void *> *) ref_map[child_id];
             if (parents) parents->del(id);
 
             if (remove_unref && (!parents || !parents->size()))
@@ -899,18 +899,18 @@ DjVuDocEditor::remove_file(const GString &id, bool remove_unref,
 }
 
 void
-DjVuDocEditor::remove_file(const GString &id, bool remove_unref)
+DjVuDocEditor::remove_file(const GUTF8String &id, bool remove_unref)
 {
    DEBUG_MSG("DjVuDocEditor::remove_file(): id='" << id << "'\n");
    DEBUG_MAKE_INDENT(3);
 
    if (!djvm_dir->id_to_file(id))
-      G_THROW("DjVuDocEditor.no_file\t"+GString(id));
+      G_THROW("DjVuDocEditor.no_file\t"+GUTF8String(id));
 
       // First generate a map of references (containing the list of parents
       // including this particular file. This will speed things up
       // significatly.
-   GMap<GString, void *> ref_map;        // GMap<GString, GMap<GString, void *> *> in fact
+   GMap<GUTF8String, void *> ref_map;        // GMap<GUTF8String, GMap<GUTF8String, void *> *> in fact
    GMap<GURL, void *> visit_map;        // To avoid loops
 
    int pages_num=djvm_dir->get_pages_num();
@@ -924,7 +924,7 @@ DjVuDocEditor::remove_file(const GString &id, bool remove_unref)
    GPosition pos;
    while((pos=ref_map))
    {
-      GMap<GString, void *> * parents=(GMap<GString, void *> *) ref_map[pos];
+      GMap<GUTF8String, void *> * parents=(GMap<GUTF8String, void *> *) ref_map[pos];
       delete parents;
       ref_map.del(pos);
    }
@@ -939,7 +939,7 @@ DjVuDocEditor::remove_page(int page_num, bool remove_unref)
       // Translate the page_num to ID
    GP<DjVmDir> djvm_dir=get_djvm_dir();
    if (page_num<0 || page_num>=djvm_dir->get_pages_num())
-      G_THROW("DjVuDocEditor.bad_page\t"+GString(page_num));
+      G_THROW("DjVuDocEditor.bad_page\t"+GUTF8String(page_num));
 
       // And call general remove_file()
    remove_file(djvm_dir->page_to_file(page_num)->id, remove_unref);
@@ -957,7 +957,7 @@ DjVuDocEditor::remove_pages(const GList<int> & page_list, bool remove_unref)
    GPosition pos ;
    if (djvm_dir)
    {
-      GList<GString> id_list;
+      GList<GUTF8String> id_list;
       for(pos=page_list;pos;++pos)
       {
          GP<DjVmDir::File> frec=djvm_dir->page_to_file(page_list[pos]);
@@ -975,8 +975,8 @@ DjVuDocEditor::remove_pages(const GList<int> & page_list, bool remove_unref)
 }
 
 void
-DjVuDocEditor::move_file(const GString &id, int & file_pos,
-                         GMap<GString, void *> & map)
+DjVuDocEditor::move_file(const GUTF8String &id, int & file_pos,
+                         GMap<GUTF8String, void *> & map)
       // NOTE! file_pos here is the desired position in DjVmDir *after*
       // the record with ID 'id' is removed.
 {
@@ -1007,7 +1007,7 @@ DjVuDocEditor::move_file(const GString &id, int & file_pos,
                GPList<DjVuFile> files_list=djvu_file->get_included_files(false);
                for(GPosition pos=files_list;pos;++pos)
                {
-                  GString name=files_list[pos]->get_url().fname();
+                  GUTF8String name=files_list[pos]->get_url().fname();
                   GP<DjVmDir::File> child_frec=djvm_dir->name_to_file(name);
 
                      // If the child is positioned in DjVmDir AFTER the
@@ -1034,9 +1034,9 @@ DjVuDocEditor::move_page(int page_num, int new_page_num)
 
    int pages_num=get_pages_num();
    if (page_num<0 || page_num>=pages_num)
-      G_THROW("DjVuDocEditor.bad_page\t"+GString(page_num));
+      G_THROW("DjVuDocEditor.bad_page\t"+GUTF8String(page_num));
 
-   GString id=page_to_id(page_num);
+   GUTF8String id=page_to_id(page_num);
    int file_pos=-1;
    if (new_page_num>=0 && new_page_num<pages_num)
       if (new_page_num>page_num)        // Moving toward the end
@@ -1046,7 +1046,7 @@ DjVuDocEditor::move_page(int page_num, int new_page_num)
       } else
          file_pos=djvm_dir->get_page_pos(new_page_num);
 
-   GMap<GString, void *> map;
+   GMap<GUTF8String, void *> map;
    move_file(id, file_pos, map);
 }
 #ifdef _WIN32_WCE_EMULATION         // Work around odd behavior under WCE Emulation
@@ -1089,7 +1089,7 @@ DjVuDocEditor::move_pages(const GList<int> & _page_list, int shift)
 
    GList<int> page_list=sortList(_page_list);
 
-   GList<GString> id_list;
+   GList<GUTF8String> id_list;
    for(GPosition pos=page_list;pos;++pos)
    {
       GP<DjVmDir::File> frec=djvm_dir->page_to_file(page_list[pos]);
@@ -1143,7 +1143,7 @@ DjVuDocEditor::move_pages(const GList<int> & _page_list, int shift)
 }
 
 void
-DjVuDocEditor::set_file_name(const GString &id, const GString &name)
+DjVuDocEditor::set_file_name(const GUTF8String &id, const GUTF8String &name)
 {
    DEBUG_MSG("DjVuDocEditor::set_file_name(), id='" << id << "', name='" << name << "'\n");
    DEBUG_MAKE_INDENT(3);
@@ -1168,19 +1168,19 @@ DjVuDocEditor::set_file_name(const GString &id, const GString &name)
 }
 
 void
-DjVuDocEditor::set_page_name(int page_num, const GString &name)
+DjVuDocEditor::set_page_name(int page_num, const GUTF8String &name)
 {
    DEBUG_MSG("DjVuDocEditor::set_page_name(), page_num='" << page_num << "'\n");
    DEBUG_MAKE_INDENT(3);
 
    if (page_num<0 || page_num>=get_pages_num())
-      G_THROW("DjVuDocEditor.bad_page\t"+GString(page_num));
+      G_THROW("DjVuDocEditor.bad_page\t"+GUTF8String(page_num));
 
    set_file_name(page_to_id(page_num), name);
 }
 
 void
-DjVuDocEditor::set_file_title(const GString &id, const GString &title)
+DjVuDocEditor::set_file_title(const GUTF8String &id, const GUTF8String &title)
 {
    DEBUG_MSG("DjVuDocEditor::set_file_title(), id='" << id << "', title='" << title << "'\n");
    DEBUG_MAKE_INDENT(3);
@@ -1190,13 +1190,13 @@ DjVuDocEditor::set_file_title(const GString &id, const GString &title)
 }
 
 void
-DjVuDocEditor::set_page_title(int page_num, const GString &title)
+DjVuDocEditor::set_page_title(int page_num, const GUTF8String &title)
 {
    DEBUG_MSG("DjVuDocEditor::set_page_title(), page_num='" << page_num << "'\n");
    DEBUG_MAKE_INDENT(3);
 
    if (page_num<0 || page_num>=get_pages_num())
-      G_THROW("DjVuDocEditor.bad_page\t"+GString(page_num));
+      G_THROW("DjVuDocEditor.bad_page\t"+GUTF8String(page_num));
 
    set_file_title(page_to_id(page_num), title);
 }
@@ -1216,7 +1216,7 @@ DjVuDocEditor::simplify_anno(void (* progress_cb)(float progress, void *),
       // Get the name of the SHARED_ANNO file. We will not
       // touch that file (will not move annotations from it)
    GP<DjVmDir::File> shared_file=djvm_dir->get_shared_anno_file();
-   GString shared_id;
+   GUTF8String shared_id;
    if (shared_file)
       shared_id=shared_file->id;
 
@@ -1308,7 +1308,7 @@ DjVuDocEditor::create_shared_anno_file(void (* progress_cb)(float progress, void
    GP<DataPool> file_pool=DataPool::create(str);
 
       // Get a unique ID for the new file
-   GString id=find_unique_id("shared_anno.iff");
+   GUTF8String id=find_unique_id("shared_anno.iff");
 
       // Add it into the directory
    GP<DjVmDir::File> frec=new DjVmDir::File(id, id, id, DjVmDir::File::SHARED_ANNO);
@@ -1357,7 +1357,7 @@ DjVuDocEditor::get_thumbnail(int page_num, bool dont_decode)
       // return it. Otherwise we will ask DjVuDocument to generate
       // this thumbnail for us.
 {
-   GString id=page_to_id(page_num);
+   GUTF8String id=page_to_id(page_num);
 
    GPosition pos;
    GCriticalSectionLock lock(&thumb_lock);
@@ -1493,11 +1493,11 @@ DjVuDocEditor::file_thumbnails(void)
    while(true)
    {
       GPosition pos;
-      GString id=page_to_id(page_num);
+      GUTF8String id=page_to_id(page_num);
 
       if (!thumb_map.contains(id, pos))
       {
-         G_THROW("DjVuDocEditor.no_thumb\t"+GString(page_num));
+         G_THROW("DjVuDocEditor.no_thumb\t"+GUTF8String(page_num));
       }
       TArray<char> & data=*(TArray<char> *) thumb_map[pos];
       iff->put_chunk("TH44");
@@ -1559,7 +1559,7 @@ DjVuDocEditor::generate_thumbnails(int thumb_size, int page_num)
 
    if(page_num<(djvm_dir->get_pages_num()))
    {
-      GString id=page_to_id(page_num);
+      GUTF8String id=page_to_id(page_num);
       if (!thumb_map.contains(id))
       {
          GP<DjVuImage> dimg=get_page(page_num, true);
@@ -1571,7 +1571,7 @@ DjVuDocEditor::generate_thumbnails(int thumb_size, int page_num)
             GP<GBitmap> bm=dimg->get_bitmap(rect, rect, sizeof(int));
             pm=GPixmap::create(*bm);
          }
-         if (!pm) G_THROW("DjVuDocEditor.render\t"+GString(page_num));
+         if (!pm) G_THROW("DjVuDocEditor.render\t"+GUTF8String(page_num));
 
             // Store and compress the pixmap
          GP<IW44Image> iwpix=IW44Image::create_encode(*pm);
@@ -1650,8 +1650,8 @@ DjVuDocEditor::save_pages_as(GP<ByteStream> str, const GList<int> & _page_list)
 }
 
 void
-DjVuDocEditor::save_file(const GString &file_id, const GURL &codebase,
-                         bool only_modified, GMap<GString, void *> & map)
+DjVuDocEditor::save_file(const GUTF8String &file_id, const GURL &codebase,
+                         bool only_modified, GMap<GUTF8String, void *> & map)
 {
    DEBUG_MSG("DjVuDocEditor::save_file(): ID='" << file_id << "'\n");
    DEBUG_MAKE_INDENT(3);
@@ -1659,7 +1659,7 @@ DjVuDocEditor::save_file(const GString &file_id, const GURL &codebase,
    if (!map.contains(file_id))
    {
       map[file_id]=0;
-      GString file_name=djvm_dir->id_to_file(file_id)->name;
+      GUTF8String file_name=djvm_dir->id_to_file(file_id)->name;
 
       GP<DataPool> file_pool;
       GPosition pos;
@@ -1715,18 +1715,18 @@ DjVuDocEditor::save_file(const GString &file_id, const GURL &codebase,
          GP<ByteStream> str=file_pool->get_stream();
          GP<IFFByteStream> giff=IFFByteStream::create(str);
          IFFByteStream &iff=*giff;
-         GString chkid;
+         GUTF8String chkid;
          if (iff.get_chunk(chkid))
          {
             while(iff.get_chunk(chkid))
             {
                if (chkid=="INCL")
                {
-                  GString incl_str;
+                  GUTF8String incl_str;
                   char buffer[1024];
                   int length;
                   while((length=iff.read(buffer, 1024)))
-                     incl_str+=GString(buffer, length);
+                     incl_str+=GUTF8String(buffer, length);
 
                      // Eat '\n' in the beginning and at the end
                   while(incl_str.length() && incl_str[0]=='\n')
@@ -1828,7 +1828,7 @@ DjVuDocEditor::save_as(const GURL &where, bool bundled)
          // Here 'bundled' has no effect: we will save it as one page.
         DEBUG_MSG("saving one file...\n");
         GURL file_url=page_to_url(0);
-        GString file_id=djvm_dir->page_to_file(0)->id;
+        GUTF8String file_id=djvm_dir->page_to_file(0)->id;
         GP<DataPool> file_pool;
         GPosition pos;
         if (files_map.contains(file_id, pos))
@@ -1871,11 +1871,11 @@ DjVuDocEditor::save_as(const GURL &where, bool bundled)
         bool save_only_modified=!(save_doc_url!=doc_url || save_doc_type!=orig_doc_type);
         const GURL codebase=save_doc_url.base();
         int pages_num=djvm_dir->get_pages_num();
-        GMap<GString, void *> map;
+        GMap<GUTF8String, void *> map;
          // First go thru the pages
         for(int page_num=0;page_num<pages_num;page_num++)
         {
-         GString id=djvm_dir->page_to_file(page_num)->id;
+         GUTF8String id=djvm_dir->page_to_file(page_num)->id;
          save_file(id, codebase, save_only_modified, map);
         }
          // Next go thru thumbnails and similar stuff

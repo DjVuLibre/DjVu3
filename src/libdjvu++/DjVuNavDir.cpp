@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuNavDir.cpp,v 1.17 2001-03-30 23:31:29 bcr Exp $
+// $Id: DjVuNavDir.cpp,v 1.18 2001-04-12 00:24:59 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -65,7 +65,7 @@ DjVuNavDir::decode(ByteStream & str)
 {
    GCriticalSectionLock lk(&lock);
    
-   GList<GString> tmp_page2name;
+   GList<GUTF8String> tmp_page2name;
    int eof=0;
    while(!eof)
    {
@@ -106,7 +106,7 @@ DjVuNavDir::encode(ByteStream & str)
 
    for(int i=0;i<page2name.size();i++)
    {
-      GString & name=page2name[i];
+      GUTF8String & name=page2name[i];
       str.writall((const char*)name, name.length());
       str.writall("\n", 1);
    };
@@ -139,7 +139,7 @@ DjVuNavDir::url_to_page(const GURL & url) const
    return url2page[url];
 }
 
-GString
+GUTF8String
 DjVuNavDir::page_to_name(int page) const
 {
    GCriticalSectionLock lk((GCriticalSection *)&lock);

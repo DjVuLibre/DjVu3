@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.cpp,v 1.65 2001-04-11 16:59:50 bcr Exp $
+// $Id: ByteStream.cpp,v 1.66 2001-04-12 00:24:58 bcr Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 04/1997
@@ -87,16 +87,16 @@ public:
       ByteStream object accessing this file. Destroying the ByteStream object
       will flush and close the associated stdio file.  Returns an error code
       if the stdio file cannot be opened. */
-  GString init(const GURL &url, const char * const mode);
+  GUTF8String init(const GURL &url, const char * const mode);
 
   /** Constructs a ByteStream for accessing the stdio file #f#.
       Argument #mode# indicates the type of the stdio file, as in the
       well known stdio function #fopen#.  Destroying the ByteStream
       object will not close the stdio file #f# unless closeme is true. */
-  GString init(FILE * const f, const char * const mode="rb", const bool closeme=false);
+  GUTF8String init(FILE * const f, const char * const mode="rb", const bool closeme=false);
 
   /** Initializes from stdio */
-  GString init(const char mode[]);
+  GUTF8String init(const char mode[]);
 
   // Virtual functions
   ~Stdio();
@@ -119,7 +119,7 @@ protected:
   long pos;
 };
 
-inline GString
+inline GUTF8String
 ByteStream::Stdio::init(FILE * const f,const char mode[],const bool closeme)
 {
   fp=f;
@@ -144,7 +144,7 @@ public:
   /** Constructs a Memory by copying initial data.  The
       Memory buffer is initialized with #size# bytes copied from the
       memory area pointed to by #buffer#. */
-  GString init(const void * const buffer, const size_t size);
+  GUTF8String init(const void * const buffer, const size_t size);
   // Virtual functions
   ~Memory();
   virtual size_t read(void *buffer, size_t size);
@@ -245,8 +245,8 @@ public:
   MemoryMapByteStream(void);
   virtual ~MemoryMapByteStream();  
 private:
-  GString init(const int fd, const bool closeme);
-  GString init(FILE *const f,const bool closeme);
+  GUTF8String init(const int fd, const bool closeme);
+  GUTF8String init(FILE *const f,const bool closeme);
   friend ByteStream;
 };
 #endif
@@ -524,7 +524,7 @@ ByteStream::Stdio::~Stdio()
     fclose(fp);
 }
 
-GString
+GUTF8String
 ByteStream::Stdio::init(const char mode[])
 {
   char const *mesg=0; 
@@ -552,7 +552,7 @@ ByteStream::Stdio::init(const char mode[])
         mesg="ByteStream.bad_mode"; //  Illegal mode in Stdio
     }
   }
-  GString retval;
+  GUTF8String retval;
   if(!mesg)
   {
     tell();
@@ -583,10 +583,10 @@ urlopen(const GURL &url, const int mode, const int perm)
 }
 #endif /* UNIX */
 
-GString
+GUTF8String
 ByteStream::Stdio::init(const GURL &url, const char mode[])
 {
-  GString retval;
+  GUTF8String retval;
   if (url.fname() != '-')
   {
 #ifdef macintosh
@@ -605,7 +605,7 @@ ByteStream::Stdio::init(const GURL &url, const char mode[])
       GPBuffer<char> gfpath(fpath,fpath_length);
       gfpath.clear();
       strncpy(fpath,(char*)(const char*)utf8Filename, utf8Filename.length() - utf8Basename.length());
-      nativeFilename = GString(fpath).getUTF82Native();
+      nativeFilename = GUTF8String(fpath).getUTF82Native();
       nativeFilename+=nativeBasename;
       fp = fopen((char*)(const char *)nativeFilename, mode);
     }
@@ -615,7 +615,7 @@ ByteStream::Stdio::init(const GURL &url, const char mode[])
     {
 #ifndef UNDER_CE
       //  Failed to open '%s': %s
-      G_THROW("ByteStream.open_fail\t"+url.get_string()+"\t"+GString(strerror(errno)).getNative2UTF8());
+      G_THROW("ByteStream.open_fail\t"+url.get_string()+"\t"+GNativeString(strerror(errno)).getNative2UTF8());
 #else
       G_THROW("ByteStream.open_fail2");                  //  StdioByteStream::StdioByteStream, failed to open file.
 #endif
@@ -624,7 +624,7 @@ ByteStream::Stdio::init(const GURL &url, const char mode[])
     if (!fp)
     {
 #ifndef UNDER_CE
-      retval=GString("ByteStream.open_fail\t")+url+strerror(errno);
+      retval=GUTF8String("ByteStream.open_fail\t")+url+GNativeString(strerror(errno)).getNative2UTF8();
          //  Failed to open '%s': %s
 #else
       retval="ByteStream.open_fail2"; //  Stdio, failed to open file.
@@ -746,10 +746,10 @@ ByteStream::Memory::Memory()
 {
 }
 
-GString
+GUTF8String
 ByteStream::Memory::init(void const * const buffer, const size_t sz)
 {
-  GString retval;
+  GUTF8String retval;
   G_TRY
   {
     writall(buffer, sz);
@@ -959,14 +959,14 @@ ByteStream::create(const GURL &url,char const * const mode)
 {
   GP<ByteStream> retval;
 #ifdef UNIX
-  if (!mode || (GString("rb") == mode))
+  if (!mode || (GUTF8String("rb") == mode))
   {
     const int fd=urlopen(url,O_RDONLY,0777);
     if(fd>=0)
     {
       MemoryMapByteStream *rb=new MemoryMapByteStream();
       retval=rb;
-      GString errmessage=rb->init(fd,true);
+      GUTF8String errmessage=rb->init(fd,true);
       if(errmessage.length())
       {
         retval=0;
@@ -978,7 +978,7 @@ ByteStream::create(const GURL &url,char const * const mode)
   {
     Stdio *sbs=new Stdio();
     retval=sbs;
-    GString errmessage=sbs->init(url,mode?mode:"rb");
+    GUTF8String errmessage=sbs->init(url,mode?mode:"rb");
     if(errmessage.length())
     {
       G_THROW(errmessage);
@@ -993,7 +993,7 @@ ByteStream::create(char const * const mode)
   GP<ByteStream> retval;
   Stdio *sbs=new Stdio();
   retval=sbs;
-  GString errmessage=sbs->init(mode?mode:"rb");
+  GUTF8String errmessage=sbs->init(mode?mode:"rb");
   if(errmessage.length())
   {
     G_THROW(errmessage);
@@ -1008,12 +1008,11 @@ ByteStream::create(const int fd,char const * const mode,const bool closeme)
   const char *default_mode="rb";
 #ifdef UNIX
 
-//  if((!mode&&(fd!=1)&&(fd!=2))||(mode&&!strcmp(mode,"rb")))
-  if ((!mode&&(fd!=1)&&(fd!=2)) || (mode&&(GString("rb") == mode)))
+  if ((!mode&&(fd!=1)&&(fd!=2)) || (mode&&(GUTF8String("rb") == mode)))
   {
     MemoryMapByteStream *rb=new MemoryMapByteStream();
     retval=rb;
-    GString errmessage=rb->init(fd,closeme);
+    GUTF8String errmessage=rb->init(fd,closeme);
     if(errmessage.length())
     {
       retval=0;
@@ -1034,7 +1033,7 @@ ByteStream::create(const int fd,char const * const mode,const bool closeme)
           break;
         }
       case 1:
-        if(!closeme && (!mode || GString(mode) == "a"))
+        if(!closeme && (!mode || GUTF8String(mode) == "a"))
         {
           f=stdout;
           default_mode="wb";
@@ -1042,7 +1041,7 @@ ByteStream::create(const int fd,char const * const mode,const bool closeme)
           break;
         }
       case 2:
-        if(!closeme && (!mode || GString(mode) == "a"))
+        if(!closeme && (!mode || GUTF8String(mode) == "a"))
         {
           default_mode="a";
           f=stderr;
@@ -1074,7 +1073,7 @@ ByteStream::create(const int fd,char const * const mode,const bool closeme)
     }
     Stdio *sbs=new Stdio();
     retval=sbs;
-    GString errmessage=sbs->init(f,mode?mode:default_mode,(fd2>=0));
+    GUTF8String errmessage=sbs->init(f,mode?mode:default_mode,(fd2>=0));
     if(errmessage.length())
     {
       G_THROW(errmessage);
@@ -1088,11 +1087,11 @@ ByteStream::create(FILE * const f,char const * const mode,const bool closeme)
 {
   GP<ByteStream> retval;
 #ifdef UNIX
-  if (!mode || (GString("rb") == mode))
+  if (!mode || (GUTF8String("rb") == mode))
   {
     MemoryMapByteStream *rb=new MemoryMapByteStream();
     retval=rb;
-    GString errmessage=rb->init(fileno(f),false);
+    GUTF8String errmessage=rb->init(fileno(f),false);
     if(errmessage.length())
     {
       retval=0;
@@ -1106,7 +1105,7 @@ ByteStream::create(FILE * const f,char const * const mode,const bool closeme)
   {
     Stdio *sbs=new Stdio();
     retval=sbs;
-    GString errmessage=sbs->init(f,mode?mode:"rb",closeme);
+    GUTF8String errmessage=sbs->init(f,mode?mode:"rb",closeme);
     if(errmessage.length())
     {
       G_THROW(errmessage);
@@ -1126,10 +1125,10 @@ MemoryMapByteStream::MemoryMapByteStream(void)
 : ByteStream::Static(0,0)
 {}
 
-GString
+GUTF8String
 MemoryMapByteStream::init(FILE *const f,const bool closeme)
 {
-  GString retval;
+  GUTF8String retval;
   retval=init(fileno(f),false);
   if(closeme)
   {
@@ -1138,10 +1137,10 @@ MemoryMapByteStream::init(FILE *const f,const bool closeme)
   return retval;
 }
 
-GString
+GUTF8String
 MemoryMapByteStream::init(const int fd,const bool closeme)
 {
-  GString retval;
+  GUTF8String retval;
 #if defined(PROT_READ) && defined(MAP_SHARED)
   struct stat statbuf;
   if(!fstat(fd,&statbuf))

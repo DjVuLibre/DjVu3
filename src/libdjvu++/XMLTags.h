@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: XMLTags.h,v 1.4 2001-03-30 23:31:29 bcr Exp $
+// $Id: XMLTags.h,v 1.5 2001-04-12 00:25:00 bcr Exp $
 // $Name:  $
 
 #ifndef _LT_XMLTAGS__
@@ -64,24 +64,24 @@ public:
   ~lt_XMLTags();
 
   inline void addtag(GP<lt_XMLTags> x);
-  inline void addraw(GString raw);
-  inline GPosition contains(GString name) const;
-  inline const GPList<lt_XMLTags> & operator [] (const GString name) const;
+  inline void addraw(GUTF8String raw);
+  inline GPosition contains(GUTF8String name) const;
+  inline const GPList<lt_XMLTags> & operator [] (const GUTF8String name) const;
   inline const GPList<lt_XMLTags> & operator [] (const GPosition &pos) const;
   void init(XMLByteStream &xmlbs);
   void init(GP<ByteStream> &bs);
   void init(const GURL & url);
   GPList<lt_XMLTags> getTags(char const tagname[]) const;
-  static void ParseValues(char const *t, GMap<GString,GString> &args,bool downcase=true);
+  static void ParseValues(char const *t, GMap<GUTF8String,GUTF8String> &args,bool downcase=true);
   static void getMaps(char const tagname[],char const argn[],
-    GPList<lt_XMLTags> list, GMap<GString, GP<lt_XMLTags> > &map);
+    GPList<lt_XMLTags> list, GMap<GUTF8String, GP<lt_XMLTags> > &map);
   void write(ByteStream &bs,bool const top=true) const;
 
-  GString name;
-  GMap<GString,GString> args;
-  GString raw;
+  GUTF8String name;
+  GMap<GUTF8String,GUTF8String> args;
+  GUTF8String raw;
   GList<lt_XMLContents> content;
-  GMap<GString,GPList<lt_XMLTags> > allTags;
+  GMap<GUTF8String,GPList<lt_XMLTags> > allTags;
 };
 
 class lt_XMLContents
@@ -90,7 +90,7 @@ public:
   lt_XMLContents(void);
   lt_XMLContents(GP<lt_XMLTags> tag);
   GP<lt_XMLTags> tag;
-  GString raw;
+  GUTF8String raw;
   void write(ByteStream &bs) const;
 };
 
@@ -102,7 +102,7 @@ lt_XMLTags::addtag (GP<lt_XMLTags> x)
 }
 
 inline void
-lt_XMLTags::addraw (GString r)
+lt_XMLTags::addraw (GUTF8String r)
 {
   GPosition pos=content;
   if(pos)
@@ -115,13 +115,13 @@ lt_XMLTags::addraw (GString r)
 }
 
 inline GPosition
-lt_XMLTags::contains(GString name) const
+lt_XMLTags::contains(GUTF8String name) const
 {
   return allTags.contains(name);
 }
 
 inline const GPList<lt_XMLTags> &
-lt_XMLTags::operator [] (const GString name) const
+lt_XMLTags::operator [] (const GUTF8String name) const
 {
   return allTags[name];
 }

@@ -31,7 +31,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessage.h,v 1.14 2001-04-04 22:12:11 bcr Exp $
+// $Id: DjVuMessage.h,v 1.15 2001-04-12 00:24:59 bcr Exp $
 // $Name:  $
 */
 
@@ -53,7 +53,7 @@ class DjVuMessage
 private:
   // Constructor:
   DjVuMessage( void );
-  GMap<GString,GP<lt_XMLTags> > Map;
+  GMap<GUTF8String,GP<lt_XMLTags> > Map;
 //  DjVuParseOptions *opts;
 
 public:
@@ -115,34 +115,34 @@ public:
   //  arguments into the retrieved messages.
   //  N.B. The resulting string may be encoded in UTF-8 format (ISO 10646-1 Annex R)
   //       and SHOULD NOT BE ASSUMED TO BE ASCII.
-  GString LookUp( const GString & MessageList ) const;
+  GUTF8String LookUp( const GUTF8String & MessageList ) const;
 
   // Same as LookUp, but this is a static method.
-  static GString LookUpUTF8( const GString & MessageList )
+  static GUTF8String LookUpUTF8( const GUTF8String & MessageList )
   { return DjVuMessage::create().LookUp(MessageList); }
 
   // Same as Lookup, but returns the a multibyte character string in the
   // current locale.
-  static GString LookUpNative( const GString & MessageList )
+  static GUTF8String LookUpNative( const GUTF8String & MessageList )
   { return DjVuMessage::create().LookUp(MessageList).getUTF82Native(); }
 
   // This is a simple alias to the above class, but does an fprintf to stderr.
-  void perror( const GString & MessageList ) const;
+  void perror( const GUTF8String & MessageList ) const;
 
 private:
 
   //  Looks up the msgID in the file of messages. The strings message_text and
   //  message_number are returned if found. If not found, these strings are empty.
-  void LookUpID( const GString & msgID, GString &message_text, GString &message_number ) const;
+  void LookUpID( const GUTF8String & msgID, GUTF8String &message_text, GUTF8String &message_number ) const;
 
   //  Expands a single message and inserts the arguments. Single_Message contains no
   //  separators (newlines), but includes all the parameters separated by tabs.
-  GString LookUpSingle( const GString & Single_Message ) const;
+  GUTF8String LookUpSingle( const GUTF8String & Single_Message ) const;
 
   //  Insert a string into the message text. Will insert into any field description.
   //  Except for an ArgId of zero (message number), if the ArgId is not found, the
   //  routine adds a line with the parameter so information will not be lost.
-  void InsertArg( GString &message, int ArgId, GString arg ) const;
+  void InsertArg( GUTF8String &message, int ArgId, GUTF8String arg ) const;
 };
 
 

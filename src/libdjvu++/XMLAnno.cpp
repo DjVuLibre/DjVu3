@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: XMLAnno.cpp,v 1.13 2001-04-09 17:42:13 chrisp Exp $
+// $Id: XMLAnno.cpp,v 1.14 2001-04-12 00:25:00 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -70,10 +70,10 @@ static void intList
   }
 }
 
-static inline const GMap<GString,GMapArea::BorderType> &
+static inline const GMap<GUTF8String,GMapArea::BorderType> &
 BorderTypeMap(void)
 {
-  static GMap<GString,GMapArea::BorderType> typeMap;
+  static GMap<GUTF8String,GMapArea::BorderType> typeMap;
   typeMap["none"]=GMapArea::NO_BORDER;
   typeMap["xor"]=GMapArea::XOR_BORDER;
   typeMap["solid"]=GMapArea::SOLID_BORDER;
@@ -94,7 +94,7 @@ convertToColor(const char s[])
     i=strtoul(s+1,0,16);
   }else if(s[0])
   {
-    GString mesg;
+    GUTF8String mesg;
     mesg.format("XMLAnno.bad_color\t%s",s);
     G_THROW(mesg);
   }
@@ -102,12 +102,12 @@ convertToColor(const char s[])
 }
 
 void
-lt_XMLAnno::ChangeAnno(const lt_XMLTags &map,const GURL &url,const GString &id,const GString &width,const GString &height)
+lt_XMLAnno::ChangeAnno(const lt_XMLTags &map,const GURL &url,const GUTF8String &id,const GUTF8String &width,const GUTF8String &height)
 {
-  const GString url_string((const char *)url);
+  const GUTF8String url_string((const char *)url);
   DjVuDocument &doc=*(docs[url_string]);
   bool const is_int=id.is_int();
-  GString xid;
+  GUTF8String xid;
   if(is_int)
   {
     const int page=id.toInt(); //atoi((char const *)id);
@@ -187,7 +187,7 @@ lt_XMLAnno::ChangeAnno(const lt_XMLTags &map,const GURL &url,const GString &id,c
       if(gareas[pos])
       {
         lt_XMLTags &areas=*(gareas[pos]);
-        GMap<GString,GString> args=areas.args;
+        GMap<GUTF8String,GUTF8String> args=areas.args;
         GList<int> coords;
         // ******************************************************
         // Parse the coords attribute:  first read the raw data into
@@ -219,7 +219,7 @@ lt_XMLAnno::ChangeAnno(const lt_XMLTags &map,const GURL &url,const GString &id,c
             }
           }
         }
-        GString shape;
+        GUTF8String shape;
         {
           GPosition shape_pos=args.contains("shape");
           if(shape_pos)
@@ -337,7 +337,7 @@ lt_XMLAnno::ChangeAnno(const lt_XMLTags &map,const GURL &url,const GString &id,c
           a=p;
         }else
         {
-          GString mesg("XMLAnno.unknown_shape\t");
+          GUTF8String mesg("XMLAnno.unknown_shape\t");
           mesg+=shape;
           G_THROW(mesg);
         }
@@ -358,14 +358,14 @@ lt_XMLAnno::ChangeAnno(const lt_XMLTags &map,const GURL &url,const GString &id,c
           }
           if((pos=args.contains("bordertype")))
           {
-            GString b=args[pos];
-            static const GMap<GString,GMapArea::BorderType> typeMap=BorderTypeMap();
+            GUTF8String b=args[pos];
+            static const GMap<GUTF8String,GMapArea::BorderType> typeMap=BorderTypeMap();
             if((pos=typeMap.contains(b)))
             {
               a->border_type=typeMap[pos];
             }else
             {
-              GString mesg("XMLAnno.unknown_border\t");
+              GUTF8String mesg("XMLAnno.unknown_border\t");
               mesg+=b;
               G_THROW(mesg);
             }
@@ -409,7 +409,7 @@ lt_XMLAnno::save(void)
   {
     DjVuDocument &doc=*(docs[pos]);
     GURL url=doc.get_init_url();
-//    GString name=GOS::url_to_filename(url);
+//    GUTF8String name=GOS::url_to_filename(url);
 //    DjVuPrintMessage("Saving file '%s' with new annotations.\n",(const char *)url);
     const bool bundle=doc.is_bundled()||(doc.get_doc_type()==DjVuDocument::SINGLE_PAGE);
     doc.save_as(url,bundle);
@@ -450,7 +450,7 @@ lt_XMLAnno::parse(const lt_XMLTags &tags)
   {
     G_THROW("XMLAnno.no_body");
   }
-  GMap<GString,GP<lt_XMLTags> > Maps;
+  GMap<GUTF8String,GP<lt_XMLTags> > Maps;
   lt_XMLTags::getMaps("MAP","name",Body,Maps);
 
   GPList<lt_XMLTags> Objects=GBody->getTags("OBJECT");
@@ -462,7 +462,7 @@ lt_XMLAnno::parse(const lt_XMLTags &tags)
     if(GObject)
     {
       // Map of attributes to value (e.g. "width" --> "500")
-      const GMap<GString,GString> &args=GObject->args;
+      const GMap<GUTF8String,GUTF8String> &args=GObject->args;
       GURL codebase;
       {
         DEBUG_MSG("Setting up codebase... m_codebase = " << m_codebase << "\n");
@@ -513,7 +513,7 @@ lt_XMLAnno::parse(const lt_XMLTags &tags)
           url=codebase+args[datapos];
           DEBUG_MSG("relative URL converted to absolute URL= " << url << "\n");
         }
-        GString width;
+        GUTF8String width;
         {
           GPosition widthPos=args.contains("width");
           if(widthPos)
@@ -521,7 +521,7 @@ lt_XMLAnno::parse(const lt_XMLTags &tags)
             width=args[widthPos];
           }
         }
-        GString height;
+        GUTF8String height;
         {
           GPosition heightPos=args.contains("height");
           if(heightPos)
@@ -529,7 +529,7 @@ lt_XMLAnno::parse(const lt_XMLTags &tags)
             height=args[heightPos];
           }
         }
-        GString page;
+        GUTF8String page;
         {
           GPosition paramPos=GObject->contains("PARAM");
           if(paramPos)
@@ -539,10 +539,10 @@ lt_XMLAnno::parse(const lt_XMLTags &tags)
             {
               if(Params[loc]->args.contains("name") && Params[loc]->args.contains("value"))
               {
-                GString name=(Params[loc]->args["name"]);
+                GUTF8String name=(Params[loc]->args["name"]);
                 if(name.downcase() == "flags")
                 {
-                  GMap<GString,GString> args;
+                  GMap<GUTF8String,GUTF8String> args;
                   lt_XMLTags::ParseValues((const char *)(Params[loc]->args["value"]),args,true);
                   if(args.contains("page"))
                   {
@@ -558,11 +558,11 @@ lt_XMLAnno::parse(const lt_XMLTags &tags)
           GPosition usemappos=GObject->args.contains("usemap");
           if(usemappos)
           {
-            GString mapname=GObject->args[usemappos];
+            GUTF8String mapname=GObject->args[usemappos];
             GPosition mappos=Maps.contains(mapname);
             if(!mappos)
             {
-              GString mesg("XMLAnno.map_find\t");
+              GUTF8String mesg("XMLAnno.map_find\t");
               mesg+=mapname;
               G_THROW(mesg);
             }else
@@ -572,15 +572,15 @@ lt_XMLAnno::parse(const lt_XMLTags &tags)
           }
         }
         {
-          GString url_string((char const *)url);
+          GUTF8String url_string((char const *)url);
           GPosition docspos=docs.contains(url_string);
           if(! docspos)
           {
             GP<DjVuDocument> doc=DjVuDocument::create_wait(url);
             if(! doc->wait_for_complete_init())
             {
-              GString mesg("XMLAnno.fail_init\t");
-              mesg+=GString((const char *)url);
+              GUTF8String mesg("XMLAnno.fail_init\t");
+              mesg+=GUTF8String((const char *)url);
               G_THROW(mesg);
             }
             docs[url_string]=doc;

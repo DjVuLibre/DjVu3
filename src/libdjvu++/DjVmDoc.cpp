@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVmDoc.cpp,v 1.43 2001-03-30 23:31:28 bcr Exp $
+// $Id: DjVmDoc.cpp,v 1.44 2001-04-12 00:24:59 bcr Exp $
 // $Name:  $
 
 
@@ -115,7 +115,7 @@ DjVmDoc::delete_file(const char * id)
    DEBUG_MAKE_INDENT(3);
    
    if (!data.contains(id))
-      G_THROW(GString("DjVmDoc.cant_delete\t") + id);      //  There is no file with ID 'xxx' to delete.
+      G_THROW(GUTF8String("DjVmDoc.cant_delete\t") + id);      //  There is no file with ID 'xxx' to delete.
    
    data.del(id);
    dir->delete_file(id);
@@ -126,7 +126,7 @@ DjVmDoc::get_data(const char * id)
 {
    GPosition pos;
    if (!data.contains(id, pos))
-      G_THROW(GString("DjVmDoc.cant_find\t") + id);       //  Can't find file with ID 'xxx'.
+      G_THROW(GUTF8String("DjVmDoc.cant_find\t") + id);       //  Can't find file with ID 'xxx'.
    return data[pos];
 }
 
@@ -194,7 +194,7 @@ DjVmDoc::write(GP<ByteStream> gstr)
                GP<IFFByteStream> giff_in=IFFByteStream::create(str_in);
                IFFByteStream &iff_in=*giff_in;
 	       int size;
-	       GString chkid;
+	       GUTF8String chkid;
 	       size=iff_in.get_chunk(chkid);
 	       if (size<0 || size>0x7fffffff)
 	          G_THROW("DjVmDoc.not_IFF\t" + file->id);    //  File 'xxx' is not in IFF format.
@@ -224,7 +224,7 @@ DjVmDoc::read(const GP<DataPool> & pool)
    
    GP<IFFByteStream> giff=IFFByteStream::create(str);
    IFFByteStream &iff=*giff;
-   GString chkid;
+   GUTF8String chkid;
    iff.get_chunk(chkid);
    if (chkid!="FORM:DJVM")
       G_THROW("DjVmDoc.no_form_djvm");      //  Can't find form DJVM in the input data.
@@ -276,7 +276,7 @@ DjVmDoc::read(const GURL &url)
    GP<ByteStream> str=pool->get_stream();
    GP<IFFByteStream> giff=IFFByteStream::create(str);
    IFFByteStream &iff=*giff;
-   GString chkid;
+   GUTF8String chkid;
    iff.get_chunk(chkid);
    if (chkid!="FORM:DJVM")
       G_THROW("DjVmDoc.no_form_djvm2");       //  Can't find form DJVM. The document is not in new multipage format.
@@ -291,8 +291,8 @@ DjVmDoc::read(const GURL &url)
      read(pool);
    else
    {
-//      GString full_name=GOS::expand_name(name);
-//      GString dir_name=GOS::dirname(GOS::url_to_filename(url.base()));
+//      GUTF8String full_name=GOS::expand_name(name);
+//      GUTF8String dir_name=GOS::dirname(GOS::url_to_filename(url.base()));
       GURL dirbase=url.base();
 
       data.empty();

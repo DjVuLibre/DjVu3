@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GURL.cpp,v 1.57 2001-04-11 00:46:51 praveen Exp $
+// $Id: GURL.cpp,v 1.58 2001-04-12 00:25:00 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -205,7 +205,7 @@ GURL::beautify_path(void)
 
   // Find end of the url (don't touch arguments)
   char * ptr;
-  GString args;
+  GUTF8String args;
   for(ptr=start;*ptr;ptr++)
   {
     if (is_argument(ptr))
@@ -241,13 +241,13 @@ GURL::beautify_path(void)
 
   // Remove trailing /.
   ptr=start+strlen(start)-2;
-  if((ptr>=start)&& (ptr == GString("/.")))
+  if((ptr>=start)&& (ptr == GUTF8String("/.")))
   {
     ptr[1]=0;
   }
   // Eat trailing /..
   ptr=start+strlen(start)-3;
-  if((ptr >= start) && (ptr == GString("/..")))
+  if((ptr >= start) && (ptr == GUTF8String("/..")))
   {
     for(char * ptr1=ptr-1;(ptr1>=start);ptr1--)
     {
@@ -272,7 +272,7 @@ GURL::init(const bool nothrow)
    
    if (url.length())
    {
-      GString proto=protocol();
+      GUTF8String proto=protocol();
       if (proto.length()<2)
       {
         validurl=false;
@@ -285,10 +285,10 @@ GURL::init(const bool nothrow)
          // referring to *local* files. Surprisingly, file://hostname/dir/file
          // is also valid, but shouldn't be treated thru local FS.
       if (proto=="file" && url[5]==slash &&
-          (url[6]!=slash || GString::ncmp(localhost, (const char *)url, sizeof(localhost))))
+          (url[6]!=slash || GUTF8String::ncmp(localhost, url, sizeof(localhost))))
       {
             // Separate the arguments
-         GString arg;
+         GUTF8String arg;
          {
            const char * const url_ptr=url;
            const char * ptr;
@@ -299,7 +299,7 @@ GURL::init(const bool nothrow)
          }
 
             // Do double conversion
-         GString tmp=UTF8Filename();
+         GUTF8String tmp=UTF8Filename();
          if (!tmp.length())
          {
            validurl=false;
@@ -307,7 +307,7 @@ GURL::init(const bool nothrow)
              G_THROW("GURL.fail_to_file");
            return;
          }
-         url=GURL::Filename::UTF8(tmp);
+         url=GURL::Filename::UTF8(tmp).get_string();
          if (!url.length())
          {
            validurl=false;
@@ -330,7 +330,7 @@ GURL::GURL(const char * url_in) : url(url_in ? url_in : ""), validurl(false)
 {
 }
 
-GURL::GURL(const GString & url_in) : url(url_in), validurl(false)
+GURL::GURL(const GUTF8String & url_in) : url(url_in), validurl(false)
 {
 }
 
@@ -347,7 +347,7 @@ GURL::operator=(const GURL & url_in)
    return *this;
 }
 
-GString
+GUTF8String
 GURL::protocol(const char * url)
 {
    const char * const url_ptr=url;
@@ -355,17 +355,17 @@ GURL::protocol(const char * url)
    for(char c=*ptr;
      c && (isalnum(c) || c == '+' || c == '-' || c == '.');
      c=*(++ptr)) EMPTY_LOOP;
-   return(*ptr==colon)?GString(url_ptr, ptr-url_ptr):GString();
+   return(*ptr==colon)?GUTF8String(url_ptr, ptr-url_ptr):GUTF8String();
 }
 
-GString
+GUTF8String
 GURL::hash_argument(void) const
       // Returns the HASH argument (anything after '#' and before '?')
 {
    if(!validurl) const_cast<GURL *>(this)->init();
    GCriticalSectionLock lock((GCriticalSection *) &class_lock);
    bool found=false;
-   GString arg;
+   GUTF8String arg;
 
          // Break if CGI argument is found
    for(const char * start=url;*start&&(*start!='?');start++)
@@ -387,7 +387,7 @@ GURL::set_hash_argument(const char * arg)
    if(!validurl) init();
    GCriticalSectionLock lock((GCriticalSection *) &class_lock);
 
-   GString new_url;
+   GUTF8String new_url;
    bool found=false;
    const char * ptr;
    for(ptr=url;*ptr;ptr++)
@@ -431,7 +431,7 @@ GURL::parse_cgi_args(void)
       // Now loop until we see all of them
    while(*start)
    {
-      GString arg;        // Storage for another argument
+      GUTF8String arg;        // Storage for another argument
       while(*start)        // Seek for the end of it
       {
          if (*start=='&')
@@ -451,11 +451,11 @@ GURL::parse_cgi_args(void)
 	 for(ptr=arg_ptr;*ptr&&(*ptr != '=');ptr++)
 	   EMPTY_LOOP;
 
-         GString name, value;
+         GUTF8String name, value;
          if (*ptr)
          {
-            name=GString(arg_ptr, (int)((ptr++)-arg_ptr));
-            value=GString(ptr, arg.length()-name.length()-1);
+            name=GUTF8String(arg_ptr, (int)((ptr++)-arg_ptr));
+            value=GUTF8String(ptr, arg.length()-name.length()-1);
          } else
          {
            name=arg;
@@ -483,12 +483,12 @@ GURL::store_cgi_args(void)
    for(ptr=url_ptr;*ptr&&(*ptr!='?');ptr++)
    		EMPTY_LOOP;
    
-   GString new_url(url_ptr, ptr-url_ptr);
+   GUTF8String new_url(url_ptr, ptr-url_ptr);
    
    for(int i=0;i<cgi_name_arr.size();i++)
    {
-      GString name=GURL::encode_reserved(cgi_name_arr[i]);
-      GString value=GURL::encode_reserved(cgi_value_arr[i]);
+      GUTF8String name=GURL::encode_reserved(cgi_name_arr[i]);
+      GUTF8String value=GURL::encode_reserved(cgi_value_arr[i]);
       new_url+=(i?"&":"?")+name;
       if (value.length())
          new_url+="="+value;
@@ -523,21 +523,21 @@ GURL::djvu_cgi_arguments(void) const
    return args;
 }
 
-GString
+GUTF8String
 GURL::cgi_name(int num) const
 {
    if(!validurl) const_cast<GURL *>(this)->init();
    GCriticalSectionLock lock((GCriticalSection *) &class_lock);
-   return (num<cgi_name_arr.size())?cgi_name_arr[num]:GString();
+   return (num<cgi_name_arr.size())?cgi_name_arr[num]:GUTF8String();
 }
 
-GString
+GUTF8String
 GURL::djvu_cgi_name(int num) const
 {
    if(!validurl) const_cast<GURL *>(this)->init();
    GCriticalSectionLock lock((GCriticalSection *) &class_lock);
 
-   GString arg;
+   GUTF8String arg;
    for(int i=0;i<cgi_name_arr.size();i++)
       if (cgi_name_arr[i].upcase()==djvuopts)
       {
@@ -552,21 +552,21 @@ GURL::djvu_cgi_name(int num) const
    return arg;
 }
 
-GString
+GUTF8String
 GURL::cgi_value(int num) const
 {
    if(!validurl) const_cast<GURL *>(this)->init();
    GCriticalSectionLock lock((GCriticalSection *) &class_lock);
-   return (num<cgi_value_arr.size())?cgi_value_arr[num]:GString();
+   return (num<cgi_value_arr.size())?cgi_value_arr[num]:GUTF8String();
 }
 
-GString
+GUTF8String
 GURL::djvu_cgi_value(int num) const
 {
    if(!validurl) const_cast<GURL *>(this)->init();
    GCriticalSectionLock lock((GCriticalSection *) &class_lock);
 
-   GString arg;
+   GUTF8String arg;
    for(int i=0;i<cgi_name_arr.size();i++)
    {
       if (cgi_name_arr[i].upcase()==djvuopts)
@@ -585,7 +585,7 @@ GURL::djvu_cgi_value(int num) const
    return arg;
 }
 
-DArray<GString>
+DArray<GUTF8String>
 GURL::cgi_names(void) const
 {
    if(!validurl) const_cast<GURL *>(this)->init();
@@ -593,7 +593,7 @@ GURL::cgi_names(void) const
    return cgi_name_arr;
 }
 
-DArray<GString>
+DArray<GUTF8String>
 GURL::cgi_values(void) const
 {
    if(!validurl) const_cast<GURL *>(this)->init();
@@ -601,14 +601,14 @@ GURL::cgi_values(void) const
    return cgi_value_arr;
 }
 
-DArray<GString>
+DArray<GUTF8String>
 GURL::djvu_cgi_names(void) const
 {
    if(!validurl) const_cast<GURL *>(this)->init();
    GCriticalSectionLock lock((GCriticalSection *) &class_lock);
 
    int i;
-   DArray<GString> arr;
+   DArray<GUTF8String> arr;
    for(i=0;(i<cgi_name_arr.size())&&
      (cgi_name_arr[i].upcase()!=djvuopts)
      ;i++)
@@ -625,14 +625,14 @@ GURL::djvu_cgi_names(void) const
    return arr;
 }
 
-DArray<GString>
+DArray<GUTF8String>
 GURL::djvu_cgi_values(void) const
 {
    if(!validurl) const_cast<GURL *>(this)->init();
    GCriticalSectionLock lock((GCriticalSection *) &class_lock);
 
    int i;
-   DArray<GString> arr;
+   DArray<GUTF8String> arr;
    for(i=0;i<cgi_name_arr.size()&&(cgi_name_arr[i].upcase()!=djvuopts);i++)
    		EMPTY_LOOP;
 
@@ -661,7 +661,7 @@ GURL::clear_hash_argument(void)
    if(!validurl) init();
    GCriticalSectionLock lock(&class_lock);
    bool found=false;
-   GString new_url;
+   GUTF8String new_url;
    for(const char * start=url;*start;start++)
    {
          // Break on first CGI arg.
@@ -766,12 +766,12 @@ GURL::is_local_file_url(void) const
    return (protocol()=="file" && url[5]==slash);
 }
 
-GString
+GUTF8String
 GURL::pathname(void) const
 {
   return (is_local_file_url())
     ?GURL::encode_reserved(UTF8Filename()) 
-    :url.search(slash);
+    :url.substr(url.search(slash),(unsigned int)(-1));
 }
 
 GURL
@@ -790,12 +790,12 @@ GURL::base(void) const
    return
 #ifdef WIN32
    (*(xslash-1) == colon)?
-     GString(url,(int)(xslash-url))+"/"+GString(ptr,url.length()-(int)(ptr-url_ptr)) :
+     GUTF8String(url,(int)(xslash-url))+"/"+GUTF8String(ptr,url.length()-(int)(ptr-url_ptr)) :
 #endif
-     GString(url,(int)(xslash-url))+GString(ptr,url.length()-(int)(ptr-url_ptr));
+     GUTF8String(url.substr(0,(int)(xslash-url_ptr))+GUTF8String(ptr,url.length()-(int)(ptr-url_ptr)));
 }
 
-GString
+GUTF8String
 GURL::name(void) const
 {
    if(!validurl) const_cast<GURL *>(this)->init();
@@ -808,22 +808,22 @@ GURL::name(void) const
         xslash=ptr;
    }
    
-   return GString(xslash+1, ptr-xslash-1);
+   return GUTF8String(xslash+1, ptr-xslash-1);
 }
 
-GString
+GUTF8String
 GURL::fname(void) const
 {
    if(!validurl) const_cast<GURL *>(this)->init();
    return decode_reserved(name());
 }
 
-GString
+GUTF8String
 GURL::extension(void) const
 {
    if(!validurl) const_cast<GURL *>(this)->init();
-   GString xfilename=name();
-   GString retval;
+   GUTF8String xfilename=name();
+   GUTF8String retval;
 
    for(int i=xfilename.length()-1;i>=0;i--)
    {
@@ -849,8 +849,8 @@ GURL::operator+(const char * xname) const
       for(ptr=url_ptr+protocol().length()+1;*ptr&&!is_argument(ptr);ptr++)
       	EMPTY_LOOP;
 
-      res=GString(url_ptr,(int)(ptr-url_ptr))
-        +((*(ptr-1) != slash)?GString(slash):GString())+xname+ptr;
+      res=GUTF8String(GUTF8String(url_ptr,(int)(ptr-url_ptr))
+        +((*(ptr-1) != slash)?GUTF8String(slash):GUTF8String())+xname+ptr);
    } else
    {
      res=xname;
@@ -859,10 +859,10 @@ GURL::operator+(const char * xname) const
    return res;
 }
 
-GString
+GUTF8String
 GURL::decode_reserved(const char * url)
 {
-  GString res;
+  GUTF8String res;
 
   for(const char * ptr=url;*ptr;ptr++)
   {
@@ -886,7 +886,7 @@ GURL::decode_reserved(const char * url)
   return res;
 }
 
-GString
+GUTF8String
 GURL::encode_reserved(unsigned char const *s)
 {
   // Potentially unsafe characters (cf. RFC1738 and RFC1808)
@@ -964,8 +964,8 @@ GURL::encode_reserved(unsigned char const *s)
 // Functions for converting filenames and urls
 // -------------------------------------------
 
-static GString
-url_from_UTF8filename(const GString &gfilename)
+static GUTF8String
+url_from_UTF8filename(const GUTF8String &gfilename)
 {
   if(GURL::UTF8(gfilename).is_valid())
   {
@@ -987,12 +987,12 @@ url_from_UTF8filename(const GString &gfilename)
   } 
 
   // Normalize file name to url slash-and-escape syntax
-  GString oname=GURL::expand_name(filename);
-  GString nname=GURL::encode_reserved(oname);
+  GUTF8String oname=GURL::expand_name(filename);
+  GUTF8String nname=GURL::encode_reserved(oname);
 
   // Preprend "file://" to file name. If file is on the local
   // machine, include "localhost".
-  GString url=filespecslashes;
+  GUTF8String url=filespecslashes;
   const char *cnname=nname;
   if (cnname[0] == slash)
   {
@@ -1009,7 +1009,7 @@ url_from_UTF8filename(const GString &gfilename)
   }
 #if 0
   // Special case for stupid MSIE 
-  GString agent(useragent ? useragent : "default");
+  GUTF8String agent(useragent ? useragent : "default");
   if (agent.search("MSIE")>=0 || agent.search("Microsoft")>=0)
   {
     // We now remove all the escaping we just did.  The reason for adding
@@ -1024,13 +1024,13 @@ url_from_UTF8filename(const GString &gfilename)
 // -- Returns a url for accessing a given file.
 //    If useragent is not provided, standard url will be created,
 //    but will not be understood by some versions if IE.
-GString 
+GUTF8String 
 GURL::get_string(const char *useragent) const
 {
-  GString retval(url);
+  GUTF8String retval(url);
   if(is_local_file_url()&&useragent)
   {
-    const GString agent(useragent);
+    const GUTF8String agent(useragent);
     if(agent.search("MSIE") >= 0 || agent.search("Microsoft")>=0)
     {
       retval=filespecslashes + expand_name(UTF8Filename());
@@ -1039,7 +1039,7 @@ GURL::get_string(const char *useragent) const
   return retval;
 }
 
-GURL::UTF8::UTF8(const GString &xurl,const GURL &codebase)
+GURL::UTF8::UTF8(const GUTF8String &xurl,const GURL &codebase)
 {
   if(GURL::UTF8(xurl).is_valid())
   {
@@ -1057,24 +1057,24 @@ GURL::UTF8::UTF8(const GString &xurl,const GURL &codebase)
       url=base.get_string()+GURL::encode_reserved(xurl);
     }else
     {
-      url=codebase.get_string()+GString(slash)+GURL::encode_reserved(xurl);
+      url=codebase.get_string()+GUTF8String(slash)+GURL::encode_reserved(xurl);
     }
   }
 }
 
-GURL::Native::Native(const GString &xurl,const GURL &codebase)
+GURL::Native::Native(const GNativeString &xurl,const GURL &codebase)
 {
   GURL::UTF8 retval(xurl.getNative2UTF8(),codebase);
   url=retval.get_string();
 }
 
-GURL::Filename::Native::Native(const GString &gfilename)
+GURL::Filename::Native::Native(const GNativeString &gfilename)
 {
   url=url_from_UTF8filename(gfilename.getNative2UTF8());
 }
 
 
-GURL::Filename::UTF8::UTF8(const GString &gfilename)
+GURL::Filename::UTF8::UTF8(const GUTF8String &gfilename)
 {
   url=url_from_UTF8filename(gfilename);
 }
@@ -1082,10 +1082,10 @@ GURL::Filename::UTF8::UTF8(const GString &gfilename)
 // filename --
 // -- Applies heuristic rules to convert a url into a valid file name.  
 //    Returns a simple basename in case of failure.
-GString 
+GUTF8String 
 GURL::UTF8Filename(void) const
 {
-  GString retval;
+  GUTF8String retval;
   if(! is_empty())
   {
     const char *url_ptr=url;
@@ -1097,20 +1097,20 @@ GURL::UTF8Filename(void) const
     //   url_to_filename()
     //   filename_to_url()
 
-    GString urlcopy=decode_reserved(url);
+    GUTF8String urlcopy=decode_reserved(url);
     url_ptr = urlcopy;
 
 #if 0
     // Check if we have a simple file name already
     {
-      GString tmp=expand_name(url_ptr,root);
+      GUTF8String tmp=expand_name(url_ptr,root);
       if (GOS::is_file(tmp)) 
         return tmp;
     }
 #endif
 
     // All file urls are expected to start with filespec which is "file:"
-    if (!GString::ncmp(filespec, url_ptr, sizeof(filespec)-1))  //if not
+    if (!GUTF8String::ncmp(filespec, url_ptr, sizeof(filespec)-1))  //if not
       return GOS::basename(url_ptr);
     url_ptr += sizeof(filespec)-1;
   
@@ -1119,16 +1119,16 @@ GURL::UTF8Filename(void) const
     for(;*url_ptr==slash;url_ptr++)
       EMPTY_LOOP;
     // Remove possible localhost spec
-    if ( GString::ncmp(localhost, url_ptr, sizeof(localhost)-1) )
+    if ( GUTF8String::ncmp(localhost, url_ptr, sizeof(localhost)-1) )
       url_ptr += sizeof(localhost)-1;
     //remove all leading slashes
     while(*url_ptr==slash)
       url_ptr++;
 #else
     // Remove possible localhost spec
-    if ( GString::ncmp(localhostspec1, url_ptr, sizeof(localhostspec1)-1) )        // RFC 1738 local host form
+    if ( GUTF8String::ncmp(localhostspec1, url_ptr, sizeof(localhostspec1)-1) )        // RFC 1738 local host form
       url_ptr += sizeof(localhostspec1)-1;
-    else if ( GString::ncmp(localhostspec2, url_ptr, sizeof(localhostspec2)-1 ) )   // RFC 1738 local host form
+    else if ( GUTF8String::ncmp(localhostspec2, url_ptr, sizeof(localhostspec2)-1 ) )   // RFC 1738 local host form
       url_ptr += sizeof(localhostspec2)-1;
     else if ( (strlen(url_ptr) > 4) // "file://<letter>:/<path>"
         && (url_ptr[0] == slash)      // "file://<letter>|/<path>"
@@ -1170,7 +1170,7 @@ GURL::UTF8Filename(void) const
 //        if (!is_file()) 
         {
       // Search for a drive letter (encoded a la netscape)
-          GString drive;
+          GUTF8String drive;
           drive.format("%c%c%c", url_ptr[0],colon,backslash);
           retval = expand_name(url_ptr+3, drive);
         }
@@ -1182,7 +1182,7 @@ GURL::UTF8Filename(void) const
   return retval;
 }
 
-GString 
+GNativeString 
 GURL::NativeFilename(void) const
 {
   return UTF8Filename().getUTF82Native();
@@ -1336,21 +1336,21 @@ GURL::listdir(void) const
         continue;
       if (de->d_name[0]== dot  && de->d_name[1]== dot  && len==2)
         continue;
-      retval.append(GURL::UTF8(de->d_name[0],*this));
+      retval.append(GURL::Native(de->d_name,*this));
     }
     closedir(dir);
 #elif defined (WIN32) && !defined (UNDER_CE)
     GURL::UTF8 wildcard("*.*",*this);
     WIN32_FIND_DATA finddata;
     HANDLE handle = FindFirstFile(wildcard.NativeFilename(), &finddata);//MBCS cvt
-    const GString gpathname=pathname();
-    const GString gbase=base().pathname();
+    const GUTF8String gpathname=pathname();
+    const GUTF8String gbase=base().pathname();
     if( handle != INVALID_HANDLE_VALUE)
     {
       do
       {
         GURL::UTF8 Entry(finddata.cFileName,*this);
-        const GString gentry=Entry.pathname();
+        const GUTF8String gentry=Entry.pathname();
         if((gentry != gpathname) && (gentry != gbase))
           retval.append(Entry);
       } while( FindNextFile(handle, &finddata) );
@@ -1405,15 +1405,15 @@ GURL::renameto(const GURL &newurl) const
 // -- returns the full path name of filename interpreted
 //    relative to fromdirname.  Use current working dir when
 //    fromdirname is null.
-GString 
+GUTF8String 
 GURL::expand_name(const char *fname, const char *from)
 {
-  GString retval;
+  GUTF8String retval;
   char * const string_buffer = retval.getbuf(MAXPATHLEN+10);
   // UNIX implementation
 #ifdef UNIX
   // Perform tilde expansion
-  GString senv;
+  GUTF8String senv;
   if (fname && fname[0]==tilde)
   {
     int n;
@@ -1422,7 +1422,7 @@ GURL::expand_name(const char *fname, const char *from)
     struct passwd *pw=0;
     if (n!=1)
     {
-      GString user(fname+1, n-1);
+      GUTF8String user(fname+1, n-1);
       pw=getpwnam(user);
     }else if ((senv=GOS::getenv("HOME")).length())
     {
@@ -1437,7 +1437,7 @@ GURL::expand_name(const char *fname, const char *from)
     }
     if (pw)
     {
-      senv=GString(pw->pw_dir).getNative2UTF8();
+      senv=GNativeString(pw->pw_dir).getNative2UTF8();
       from = (const char *)senv;
       fname = fname + n;
     }
@@ -1505,7 +1505,7 @@ GURL::expand_name(const char *fname, const char *from)
 #elif defined (WIN32) && !defined (UNDER_CE) // WIN32 implementation
   // Handle base
   strcpy(string_buffer, (char const *)(from?expand_name(from):GOS::cwd()));
-  GString native;
+//  GNativeString native;
   if (fname)
   {
     char *s = string_buffer;
@@ -1544,7 +1544,7 @@ GURL::expand_name(const char *fname, const char *from)
           drv[2]= dot ;
           drv[3]=0;
           GetFullPathName(drv, MAXPATHLEN, string_buffer, &s);
-		  strcpy(string_buffer,(const char *)GString(string_buffer).getNative2UTF8());
+		  strcpy(string_buffer,(const char *)GUTF8String(string_buffer).getNative2UTF8());
           s = string_buffer;
         }
         fname += 2;
@@ -1635,7 +1635,7 @@ GURL::expand_name(const char *fname, const char *from)
 #elif defined(macintosh) // MACINTOSH implementation
   strcpy(string_buffer, (const char *)(from?from:GOS::cwd()));
 
-  if (GString::ncmp(fname, string_buffer,strlen(string_buffer)) || is_file(fname))
+  if (GUTF8String::ncmp(fname, string_buffer,strlen(string_buffer)) || is_file(fname))
   {
     strcpy(string_buffer, "");//please don't expand, the logic of filename is chaos.
   }

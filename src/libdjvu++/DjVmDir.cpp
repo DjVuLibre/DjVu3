@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVmDir.cpp,v 1.37 2001-04-11 16:59:50 bcr Exp $
+// $Id: DjVmDir.cpp,v 1.38 2001-04-12 00:24:58 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -67,7 +67,7 @@ DjVmDir::File::File(const char *name, const char *id,
   : name(name), id(id), title(title), offset(0), size(0), page_num(-1)
 { 
   if (! File::is_legal_id(id) )
-    G_THROW("DjVmDir.bad_file\t" + GString(id));    //  DjVm File ID 'xxxx' contains illegal character(s)
+    G_THROW("DjVmDir.bad_file\t" + GUTF8String(id));    //  DjVm File ID 'xxxx' contains illegal character(s)
   flags=(file_type & TYPE_MASK);
 }
 
@@ -76,14 +76,14 @@ DjVmDir::File::File(const char *name, const char *id,
   : name(name), id(id), title(title), offset(0), size(0), page_num(-1)
 { 
   if (! File::is_legal_id(id) )
-    G_THROW("DjVmDir.bad_file\t" + GString(id));    //  DjVm File ID 'xxxx' contains illegal character(s)
+    G_THROW("DjVmDir.bad_file\t" + GUTF8String(id));    //  DjVm File ID 'xxxx' contains illegal character(s)
   flags=page ? PAGE : INCLUDE;
 }
    
-GString
+GUTF8String
 DjVmDir::File::get_str_type(void) const
 {
-   GString type;
+   GUTF8String type;
    switch(flags & TYPE_MASK)
    {
       case INCLUDE:
@@ -132,7 +132,7 @@ DjVmDir::decode(GP<ByteStream> gstr)
 
    DEBUG_MSG("DIRM version=" << ver << ", our version=" << version << "\n");
    if (ver>version)
-      G_THROW("DjVmDir.version_error\t" + GString(version) + "\t" + GString(ver));
+      G_THROW("DjVmDir.version_error\t" + GUTF8String(version) + "\t" + GUTF8String(ver));
                                            // Unable to read DJVM directories of versions higher than xxx
                                            // Data version number is yyy.
    DEBUG_MSG("bundled directory=" << bundled << "\n");
@@ -407,7 +407,7 @@ DjVmDir::page_to_file(int page_num) const
 }
 
 GP<DjVmDir::File>
-DjVmDir::name_to_file(const GString & name) const
+DjVmDir::name_to_file(const GUTF8String & name) const
 {
    GCriticalSectionLock lock((GCriticalSection *) &class_lock);
 
@@ -416,7 +416,7 @@ DjVmDir::name_to_file(const GString & name) const
 }
 
 GP<DjVmDir::File>
-DjVmDir::id_to_file(const GString &id) const
+DjVmDir::id_to_file(const GUTF8String &id) const
 {
    GCriticalSectionLock lock((GCriticalSection *) &class_lock);
 
@@ -425,7 +425,7 @@ DjVmDir::id_to_file(const GString &id) const
 }
 
 GP<DjVmDir::File>
-DjVmDir::title_to_file(const GString &title) const
+DjVmDir::title_to_file(const GUTF8String &title) const
 {
    GCriticalSectionLock lock((GCriticalSection *) &class_lock);
 
@@ -575,7 +575,7 @@ DjVmDir::delete_file(const char * id)
    {
       GP<File> & f=files_list[pos];
 //      if (!strcmp(f->id, id))
-      if (GString(id) == f->id)
+      if (GUTF8String(id) == f->id)
       {
          name2file.del(f->name);
          id2file.del(f->id);
@@ -617,12 +617,12 @@ DjVmDir::set_file_name(const char * id, const char * name)
    {
       GP<File> file=files_list[pos];
       if (file->id!=id && file->name==name)
-        G_THROW("DjVmDir.name_in_use\t" + GString(name));   //  Name 'xxx' is already in use");
+        G_THROW("DjVmDir.name_in_use\t" + GUTF8String(name));   //  Name 'xxx' is already in use");
    }
 
       // Check if ID is valid
    if (!id2file.contains(id, pos))
-      G_THROW("DjVmDir.no_info\t" + GString(id));       //  Nothing is known about file with ID 'xxx'
+      G_THROW("DjVmDir.no_info\t" + GUTF8String(id));       //  Nothing is known about file with ID 'xxx'
    GP<File> file=id2file[pos];
    name2file.del(file->name);
    file->name=name;
@@ -644,12 +644,12 @@ DjVmDir::set_file_title(const char * id, const char * title)
    {
       GP<File> file=files_list[pos];
       if (file->id!=id && file->title==title)
-        G_THROW("DjVmDir.title_in_use\t" + GString(title));  //  Title 'xxx' is already in use
+        G_THROW("DjVmDir.title_in_use\t" + GUTF8String(title));  //  Title 'xxx' is already in use
    }
 
       // Check if ID is valid
    if (!id2file.contains(id, pos))
-      G_THROW("DjVmDir.no_info\t" + GString(id));       //  Nothing is known about file with ID 'xxx'
+      G_THROW("DjVmDir.no_info\t" + GUTF8String(id));       //  Nothing is known about file with ID 'xxx'
    GP<File> file=id2file[pos];
    title2file.del(file->title);
    file->title=title;

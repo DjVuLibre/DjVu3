@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.h,v 1.36 2001-04-11 16:59:51 bcr Exp $
+// $Id: GString.h,v 1.37 2001-04-12 00:25:00 bcr Exp $
 // $Name:  $
 
 #ifndef _GSTRING_H_
@@ -57,7 +57,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.36 2001-04-11 16:59:51 bcr Exp $# */
+    #$Id: GString.h,v 1.37 2001-04-12 00:25:00 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -76,12 +76,11 @@
 
 
 // Internal string representation.
-
 class GStringRep : public GPEnabled
 {
 public:
-  class UTF8;
   class Native;
+  class UTF8;
   friend Native;
   friend UTF8;
   friend class GString;
@@ -107,8 +106,15 @@ public:
    // Creates with a concat operation.
   GP<GStringRep> concat(const char *s1,const char *s2) const;
 
+   // Creates with a concat operation.
+  static GP<GStringRep> concat(
+    const GP<GStringRep> &s1,const GP<GStringRep> &s2);
+
   static GP<GStringRep> create(const char *s1,const char *s2)
   { GStringRep dummy; return dummy.concat(s1,s2); }
+
+  // Creates by appending to the current string
+  virtual GP<GStringRep> append(const GP<GStringRep> &s2) const;
 
    /* Creates with a strdup.  Negative values have strlen(s)+1
       added to them.
@@ -135,6 +141,10 @@ public:
   static unsigned char *UCS4toUTF8(
     const unsigned long w,unsigned char *ptr);
 
+  virtual bool isUTF8(void) const { return false; }
+  virtual bool isNative(void) const { return false; }
+  virtual GP<GStringRep> toNative(const bool noconvert=false) const;
+  virtual GP<GStringRep> toUTF8(const bool noconvert=false) const;
 private:
   int  size;
   char data[1];
@@ -155,6 +165,11 @@ public:
   static GP<GStringRep> create(
     const char *s,const int start,const int length=(-1))
   { GStringRep::Native dummy; return dummy.substr(s,start,length); }
+  // Creates by appending to the current string
+  virtual GP<GStringRep> append(const GP<GStringRep> &s2) const;
+
+  virtual bool isNative(void) const { return true; }
+  virtual GP<GStringRep> toNative(const bool nothrow=false) const;
 
   friend class GString;
 };
@@ -173,7 +188,11 @@ public:
   static GP<GStringRep> create(
     const char *s,const int start,const int length=(-1))
   { GStringRep::UTF8 dummy; return dummy.substr(s,start,length); }
+  // Creates by appending to the current string
+  virtual GP<GStringRep> append(const GP<GStringRep> &s2) const;
 
+  virtual bool isUTF8(void) const { return true; }
+  virtual GP<GStringRep> toUTF8(const bool nothrow=false) const;
   friend class GString;
 };
 
@@ -196,41 +215,61 @@ public:
     the last character of the string, position #-2# represents the second last
     character, etc.)  */
 
+class GUTF8String;
+class GNativeString;
     
 class GString : protected GP<GStringRep> 
 {
 public: 
+  friend GUTF8String;
+  friend GNativeString;
+
+  // Sets the gstr pointer;
+  void init(void);
+
   // -- CONSTRUCTORS
   /** Null constructor. Constructs an empty string. */
-  GString( void ) { } 
+  GString( void ) { init(); } 
   /// Construct from parent class.
   GString( const GP<GStringRep> &rep);
   /// Copy constructor. Constructs a string by copying the string #gs#.
   GString(const GString &gs)
-    : GP<GStringRep>(gs) { } 
+    : GP<GStringRep>(gs) { init(); } 
   /// Constructs a string from a character.
   GString(const char dat);
   /// Constructs a string from a null terminated character array.
-  GString(const char *dat);
+  GString(const char *dat)
+    : GP<GStringRep>(GStringRep::create(dat)) { init(); }
   /// Constructs a string from a null terminated character array.
-  GString(const unsigned char *dat);
+  GString(const unsigned char *dat)
+    : GP<GStringRep>(GStringRep::create((const char *)dat)) { init(); }
   /** Constructs a string from a character array.  Elements of the character
       array #dat# are added into the string until the string length reaches
       #len# or until encountering a null character (whichever comes first). */
-  GString(const char *dat, unsigned int len);
+  GString(const char *dat, unsigned int len)
+    : GP<GStringRep>(GStringRep::create(dat,0,((int)len<0)?(-1):(int)len))
+    { init(); }
+
   /** Construct a string by copying a sub-string. The string will be
       initialized with at most #len# characters from string #gs# starting at
       position #from#.  The length of the constructed string may be smaller
       than #len# if the specified range is too large. */
-  GString(const GString &gs, int from, unsigned int len);
+  GString(const GString &gs, int from, unsigned int len)
+    : GP<GStringRep>(GStringRep::create(gs,from,((int)len<0)?(-1):(int)len))
+    { init(); }
+
   /** Constructs a string with a human-readable representation of integer
       #number#.  The format is similar to format #"%d"# in function
       #printf#. */
-  GString(const int number);
+  GString(const int number)
+  { format("%d",number); }
+
   /** Constructs a string with a human-readable representation of floating
       point number #number#. The format is similar to format #"%f"# in
       function #printf#.  */
-  GString(const double number);
+  GString(const double number)
+  { format("%f",number); }
+
   /** Constructs a string with a formatted string (as in #vprintf#).  The
       string is re-initialized with the characters generated according to the
       specified format #fmt# and using the optional arguments.  See the ANSI-C
@@ -253,6 +292,18 @@ public:
       character string contained in the null terminated character array
       #str#. */
   GString& operator= (const char *str);
+
+  /** Copy a null terminated character array, in the native mbs format.
+      Resets this string with the character string contained in the null
+      terminated character array #str#. */
+  GString& assignNative(const char *str)
+  { return ((*this)=GStringRep::Native::create(str)); }
+
+  /** Copy a null terminated character array, in the native mbs format.
+      Resets this string with the character string contained in the null
+      terminated character array #str#. */
+  GString& assignUTF8(const char *str)
+  { return ((*this)=GStringRep::UTF8::create(str)); }
 
   // -- ACCESS
   /** Converts a string into a constant null terminated character array.  This
@@ -312,27 +363,9 @@ public:
       lower case letters. */
   GString downcase( void ) const;
 
-  /** Returns a copy of this string with characters used in XML with
-      '<'  to "&lt;", '>'  to "&gt;",  '&' to "&amp;" '\'' to "&apos;",
-      and  '\"' to  "&quot;".   Characters 0x01 through 0x1f are also
-      escaped. */
-  GString toEscaped(void ) const;
-
-  /** Converts strings containing HTML/XML escaped characters into their
-      unescaped forms. Numeric representations of characters (e.g., "&#38;"
-      or "&#x26;" for "*") are the only forms converted by this function. */
-  GString fromEscaped( void ) const;
-
   /** Converts strings between native & UTF8 **/
-  GString getUTF82Native( char* tocode=NULL ) const;/*MBCS*/
-  GString getNative2UTF8( const char* fromcode="" ) const;/*MBCS*/
-
-  /** Converts strings containing HTML/XML escaped characters (e.g.,
-      "&lt;" for "<") into their unescaped forms. The conversion is partially
-      defined by the ConvMap argument which specifies the conversion strings
-      to be recognized. Numeric representations of
-      characters (e.g., "&#38;" or "&#x26;" for "*") are always converted. */
-  GString fromEscaped( const GMap<GString,GString> ConvMap ) const;
+  GNativeString getUTF82Native( char* tocode=NULL ) const;/*MBCS*/
+  GUTF8String getNative2UTF8( const char* fromcode="" ) const;/*MBCS*/
 
   // -- ALTERING
   /// Reinitializes a string with the null string.
@@ -390,10 +423,12 @@ public:
   GString& operator+= (char ch);
   /// Appends the null terminated character array #str# to the string.
   GString& operator+= (const char *str);
+  /// Appends the specified GString to the string.
+  GString& operator+= (const GString &str);
   /** Concatenates strings. Returns a string composed by concatenating
       the characters of strings #s1# and #s2#. */
   friend GString operator+(const GString &s1, const GString &s2) 
-    { return (s1.length()?(s2.length()?GString(s1->concat(s1,s2)):s1):s2);}
+    { return GStringRep::concat((const GP<GStringRep>)s1,(const GP<GStringRep>)s2); }
   friend GString operator+(const GString &s1, const char    *s2) 
     { return (s1.length()?GString(s1->concat(s1,s2)):GString(s2));}
   friend GString operator+(const char    *s1, const GString &s2) 
@@ -465,10 +500,8 @@ public:
       { return atoi((const char*)(src)); }
    /** Returns an integer.  Implements i18n atoi.  Takes a UTF8 string and converts that
        value into a native format string, which is then used to make the atoi call. */
-   inline int toInt() const
-      { return getUTF82Native().nativeToInt(); }
-   static int toInt( const GString& src )
-      { return src.getUTF82Native().nativeToInt(); }
+   int toInt(void) const;
+   static int toInt( const GString& src );
    /* # END code block added by CHRISP */
 
   // -- HASHING
@@ -483,12 +516,128 @@ protected:
   const char *gstr;
   static void throw_illegal_subscript() no_return;
   static const char *nullstr;
-  static GString UTF82Native(
-    const char source[],const bool currentlocale=false);
-  static GString Native2UTF8(const char *source,const size_t slen);
-private:  // dummy methods.
-  GString(const GStringRep* rep);
-  GString& operator= (const GStringRep *rep);
+  GNativeString UTF8ToNative(const bool currentlocale=false) const;
+  GUTF8String NativeToUTF8(void) const;
+};
+
+class GUTF8String : public GString
+{
+public:
+  GUTF8String(void) { init(); }
+  GUTF8String(const char *str)
+    : GString(GStringRep::UTF8::create(str)) { init(); }
+  GUTF8String(const unsigned char *str)
+    : GString(GStringRep::UTF8::create((const char *)str)) { init(); }
+  GUTF8String(const GString &str); 
+  GUTF8String(const GUTF8String &str)
+    : GString((GP<GStringRep>)str) { init(); }
+  GUTF8String(const GNativeString &str);
+  /// Constructs a string from a character.
+  GUTF8String(const char dat)
+    : GString(GStringRep::UTF8::create(&dat,0,1)) { init(); }
+
+  /** Constructs a string from a character array.  Elements of the character
+      array #dat# are added into the string until the string length reaches
+      #len# or until encountering a null character (whichever comes first). */
+  GUTF8String(const char *dat, unsigned int len)
+    : GString(GStringRep::UTF8::create(dat,0,((int)len<0)?(-1):(int)len))
+  { init(); }
+
+  /** Construct a string by copying a sub-string. The string will be
+      initialized with at most #len# characters from string #gs# starting at
+      position #from#.  The length of the constructed string may be smaller
+      than #len# if the specified range is too large. */
+  GUTF8String(const GString &gs, int from, unsigned int len)
+    : GString(GStringRep::UTF8::create(gs,from,((int)len<0)?(-1):(int)len))
+  { init(); }
+
+  /** Constructs a string with a human-readable representation of integer
+      #number#.  The format is similar to format #"%d"# in function
+      #printf#. */
+  GUTF8String(const int number)
+  { format("%d",number); }
+
+  /** Constructs a string with a human-readable representation of floating
+      point number #number#. The format is similar to format #"%f"# in
+      function #printf#.  */
+  GUTF8String(const double number)
+  { format("%f",number); }
+
+
+  /** Returns a copy of this string with characters used in XML with
+      '<'  to "&lt;", '>'  to "&gt;",  '&' to "&amp;" '\'' to "&apos;",
+      and  '\"' to  "&quot;".   Characters 0x01 through 0x1f are also
+      escaped. */
+  GUTF8String toEscaped(void ) const;
+
+  /** Converts strings containing HTML/XML escaped characters into their
+      unescaped forms. Numeric representations of characters (e.g., "&#38;"
+      or "&#x26;" for "*") are the only forms converted by this function. */
+  GUTF8String fromEscaped( void ) const;
+
+  /** Converts strings containing HTML/XML escaped characters (e.g.,
+      "&lt;" for "<") into their unescaped forms. The conversion is partially
+      defined by the ConvMap argument which specifies the conversion strings
+      to be recognized. Numeric representations of
+      characters (e.g., "&#38;" or "&#x26;" for "*") are always converted. */
+  GUTF8String fromEscaped( const GMap<GUTF8String,GUTF8String> ConvMap ) const;
+
+   /** Returns a boolean. The Standard C strncmp takes two string and compares the 
+       first N characters.  static bool GString::ncmp will compare #s1# with #s2# 
+       with the #len# characters starting from the beginning of the string.*/
+   static bool ncmp(const GUTF8String &s1,const GUTF8String &s2, const int len=1)
+      { return (s1.substr(0,len) == s2.substr(0,len)); }
+};
+
+class GNativeString : public GString
+{
+public:
+  GNativeString(void)
+  { init(); }
+  GNativeString(const char *str)
+    : GString(GStringRep::Native::create(str))
+  { init(); }
+  GNativeString(const unsigned char *str)
+    : GString(GStringRep::Native::create((const char *)str))
+  { init(); }
+  GNativeString(const GString &str); 
+  GNativeString(const GUTF8String &str);
+  GNativeString(const GNativeString &str) 
+    : GString((GP<GStringRep>)str) { init(); }
+  /** Constructs a string from a character array.  Elements of the character
+      array #dat# are added into the string until the string length reaches
+      #len# or until encountering a null character (whichever comes first). */
+  GNativeString(const char *dat, unsigned int len)
+    : GString(GStringRep::Native::create(dat,0,((int)len<0)?(-1):(int)len))
+  { init(); }
+  GNativeString(const char dat)
+    : GString(GStringRep::Native::create(&dat,0,1)) { init(); }
+
+  /** Constructs a string with a human-readable representation of integer
+      #number#.  The format is similar to format #"%d"# in function
+      #printf#. */
+  GNativeString(const int number) { format("%d",number); }
+
+  /** Constructs a string with a human-readable representation of floating
+      point number #number#. The format is similar to format #"%f"# in
+      function #printf#.  */
+  GNativeString(const double number) { format("%f",number); }
+
+  /** Construct a string by copying a sub-string. The string will be
+      initialized with at most #len# characters from string #gs# starting at
+      position #from#.  The length of the constructed string may be smaller
+      than #len# if the specified range is too large. */
+  GNativeString(const GString &gs, int from, unsigned int len)
+    : GString(GStringRep::Native::create(gs,from,((int)len<0)?(-1):(int)len))
+  { init(); }
+
+
+   /** Returns a boolean. The Standard C strncmp takes two string and compares the 
+       first N characters.  static bool GString::ncmp will compare #s1# with #s2# 
+       with the #len# characters starting from the beginning of the string.*/
+   static bool ncmp(
+     const GNativeString &s1,const GNativeString &s2, const int len=1)
+     { return (s1.substr(0,len) == s2.substr(0,len)); }
 };
 
 //@}
@@ -496,7 +645,7 @@ private:  // dummy methods.
 inline
 GString::operator const char* ( void ) const  
 {
-  return (*this)->data;
+  return ptr?(*this)->data:nullstr;
 }
 
 inline GString&
@@ -529,6 +678,41 @@ inline GString
 GString::downcase( void ) const
 { 
   return (ptr?GString((*this)->downcase()):(*this));
+}
+
+inline int 
+GString::toInt(void) const
+{ return getUTF82Native().nativeToInt(); }
+
+inline int
+GString::toInt( const GString& src )
+{ return src.getUTF82Native().nativeToInt(); }
+   /* # END code block added by CHRISP */
+
+inline
+GUTF8String::GUTF8String(const GNativeString &str)
+: GString((str.length()?(str->toNative(true)):(GP<GStringRep>)str))
+{ init(); }
+
+inline
+GNativeString::GNativeString(const GUTF8String &str)
+: GString((str.length()?(str->toUTF8(true)):(GP<GStringRep>)str))
+{ init(); }
+
+inline
+GUTF8String::GUTF8String(const GString &str)
+: GString((str.length()?(str->toNative(true)):(GP<GStringRep>)str))
+{ init(); }
+
+inline
+GNativeString::GNativeString(const GString &str)
+: GString((str.length()?(str->toUTF8(true)):(GP<GStringRep>)str))
+{ init(); }
+
+inline void
+GString::init(void)
+{
+  gstr=ptr?((*this)->data):nullstr;
 }
 
 // ------------------- The end

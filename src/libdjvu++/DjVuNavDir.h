@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuNavDir.h,v 1.15 2001-03-30 23:31:29 bcr Exp $
+// $Id: DjVuNavDir.h,v 1.16 2001-04-12 00:24:59 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUNAVDIR_H
@@ -56,7 +56,7 @@ class ByteStream;
 
     @memo DjVu Navigation Directory
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: DjVuNavDir.h,v 1.15 2001-03-30 23:31:29 bcr Exp $#
+    @version #$Id: DjVuNavDir.h,v 1.16 2001-04-12 00:24:59 bcr Exp $#
 */
 
 //@{
@@ -89,8 +89,8 @@ class DjVuNavDir : public GPEnabled
 private:
    GCriticalSection		lock;
    GURL				baseURL;
-   GArray<GString>		page2name;
-   GMap<GString, int>		name2page;
+   GArray<GUTF8String>		page2name;
+   GMap<GUTF8String, int>		name2page;
    GMap<GURL, int>		url2page;
 protected:
    DjVuNavDir(const GURL &dir_url);
@@ -146,7 +146,7 @@ public:
    GURL		page_to_url(int page) const;
       /** Converts given #page# to URL. Throws an exception if page number
 	  is invalid. */
-   GString	page_to_name(int page) const;
+   GUTF8String	page_to_name(int page) const;
 };
 
 //@}

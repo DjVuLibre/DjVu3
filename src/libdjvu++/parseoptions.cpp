@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: parseoptions.cpp,v 1.74 2001-04-10 17:34:03 fcrary Exp $
+// $Id: parseoptions.cpp,v 1.75 2001-04-12 00:25:00 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -538,7 +538,7 @@ DjVuParseOptions::GetInteger(
       }
       if(*endptr)
       {
-        Errors->AddError(GString("parseoptions.bad_value\t") + str);
+        Errors->AddError(GUTF8String("parseoptions.bad_value\t") + str);
         retval=errval;
       }
     }
@@ -569,7 +569,7 @@ DjVuParseOptions::GetNumber(
     }
     if(*endptr)
     {
-      Errors->AddError(GString("parseoptions.bad_number\t") + str);
+      Errors->AddError(GUTF8String("parseoptions.bad_number\t") + str);
       retval=errval;
     }
   }
@@ -697,7 +697,7 @@ DjVuParseOptions::Add(
       emesg=emesg2;
     }
     const char *p=GetProfileName(profile);
-    Errors->AddError(GString(emesg) + "\t" + filename +
+    Errors->AddError(GUTF8String(emesg) + "\t" + filename +
                                       "\t" + GString(line) + 
                                       "\t" + p + 
                                       "\t" + value);
@@ -850,7 +850,7 @@ DjVuParseOptions::ReadNextConfig (
             }
           }else
           {
-            Errors->AddError(GString("parseoptions.cant_inherit") + "\t" + filename +
+            Errors->AddError(GUTF8String("parseoptions.cant_inherit") + "\t" + filename +
                                                                     "\t" + GString(line) +
                                                                     "\t" + profilename +
                                                                     "\t" + name);
@@ -1713,7 +1713,7 @@ DjVuParseOptions::GetOpt::getopt_long()
     }
     if(has_dash)
     {
-      Errors.AddError(GString("parseoptions.unrecog_option\t") + argv[optind]);
+      Errors.AddError(GUTF8String("parseoptions.unrecog_option\t") + argv[optind]);
       return -1;
     }
   }
@@ -1723,7 +1723,7 @@ DjVuParseOptions::GetOpt::getopt_long()
     if(nextchar > 1 || argv[optind][nextchar] != '-' ||
       (argv[optind][nextchar+1]&&argv[optind][nextchar+1]!='-'))
     {
-      Errors.AddError(GString("parseoptions.unrecog_option_c\t") + GString(argv[optind][nextchar]));
+      Errors.AddError(GUTF8String("parseoptions.unrecog_option_c\t") + GString(argv[optind][nextchar]));
       return -1;
     }
     nextchar=1;
@@ -1752,7 +1752,7 @@ DjVuParseOptions::GetOpt::getopt_long()
     }else
     {
       const char * const xname=opts.name;
-      Errors.AddError(GString("parseoptions.missing_arg_option\t") + xname);
+      Errors.AddError(GUTF8String("parseoptions.missing_arg_option\t") + xname);
       return -1;
     }
     optind++;

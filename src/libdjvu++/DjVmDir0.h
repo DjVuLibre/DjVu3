@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVmDir0.h,v 1.16 2001-03-06 19:55:42 bcr Exp $
+// $Id: DjVmDir0.h,v 1.17 2001-04-12 00:24:59 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVMDIR0_H
@@ -58,7 +58,7 @@ class ByteStream;
 
     @memo Directory of DjVu all-in-one-file DjVu documents.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: DjVmDir0.h,v 1.16 2001-03-06 19:55:42 bcr Exp $# */
+    @version #$Id: DjVmDir0.h,v 1.17 2001-04-12 00:24:59 bcr Exp $# */
 
 //@{
 
@@ -81,7 +81,7 @@ public:
       /** Describes a file record inside a DjVm document (archive) */
    class FileRec;
 private:
-   GMap<GString, GP<FileRec> >	name2file;
+   GMap<GUTF8String, GP<FileRec> >	name2file;
    GPArray<FileRec>		num2file;
 protected:
       /// Default constructor
@@ -127,7 +127,7 @@ class DjVmDir0::FileRec : public GPEnabled
 {
 public:
   /// Name of the file.
-  GString		name;
+  GUTF8String		name;
   /// 1 if the file is in IFF format.
   bool		iff_file;
   /// Offset of the file in the archive.

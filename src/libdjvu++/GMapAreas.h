@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GMapAreas.h,v 1.25 2001-03-27 20:15:30 praveen Exp $
+// $Id: GMapAreas.h,v 1.26 2001-04-12 00:25:00 bcr Exp $
 // $Name:  $
 
 #ifndef _GMAPAREAS_H
@@ -64,7 +64,7 @@
     @memo Definition of base map area classes
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: GMapAreas.h,v 1.25 2001-03-27 20:15:30 praveen Exp $# */
+    #$Id: GMapAreas.h,v 1.26 2001-04-12 00:25:00 bcr Exp $# */
 //@{
 
 
@@ -140,17 +140,17 @@ public:
 	  If it's not empty then clicking this map area with the mouse
 	  will make the browser load the HTML page referenced by
 	  this #url# */
-   GString	url;
+   GUTF8String	url;
       /** The target for the #URL#. Standard targets are:
 	  \begin{itemize}
 	     \item #_blank# - Load the link in a new blank window
 	     \item #_self# - Load the link into the plugin window
 	     \item #_top# - Load the link into the top-level frame
 	  \end{itemize} */
-   GString	target;
+   GUTF8String	target;
       /** Comment (displayed in a status line or as a popup hint when
 	  the mouse pointer moves over the map area */
-   GString	comment;
+   GUTF8String	comment;
       /** Border type. Defines how the map area border should be drawn
 	  \begin{itemize}
 	     \item #NO_BORDER# - No border drawn
@@ -209,7 +209,7 @@ public:
    char const *	const check_object(void);
       /** Stores the contents of the hyperlink object in a lisp-like format
 	  for saving into #ANTa# chunk (see \Ref{DjVuAnno}) */
-   GString	print(void);
+   GUTF8String	print(void);
 
       /// Virtual function returning the shape type.
    virtual MapAreaType const get_shape_type( void ) const { return UNKNOWN; };
@@ -235,7 +235,7 @@ protected:
    virtual void		gma_transform(const GRect & grect)=0;
    virtual bool		gma_is_point_inside(const int x, const int y)=0;
    virtual char const * const	gma_check_object(void) const=0;
-   virtual GString	gma_print(void)=0;
+   virtual GUTF8String	gma_print(void)=0;
    
    void		clear_bounds(void);
 private:
@@ -305,7 +305,7 @@ protected:
    virtual void		gma_transform(const GRect & grect);
    virtual bool		gma_is_point_inside(const int x, const int y);
    virtual char const * const gma_check_object(void) const;
-   virtual GString	gma_print(void);
+   virtual GUTF8String	gma_print(void);
 };
 
 inline
@@ -450,7 +450,7 @@ protected:
    virtual void		gma_transform(const GRect & grect);
    virtual bool		gma_is_point_inside(const int x, const int y);
    virtual char const * const gma_check_object(void) const;
-   virtual GString	gma_print(void);
+   virtual GUTF8String	gma_print(void);
 private:
    bool		open;
    int		points, sides;
@@ -543,7 +543,7 @@ protected:
    virtual void		gma_transform(const GRect & grect);
    virtual bool		gma_is_point_inside(const int x, const int y);
    virtual char const * const	gma_check_object(void) const;
-   virtual GString	gma_print(void);
+   virtual GUTF8String	gma_print(void);
 private:
    int		rmax, rmin;
    int		a, b;

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocEditor.h,v 1.38 2001-04-11 16:59:50 bcr Exp $
+// $Id: DjVuDocEditor.h,v 1.39 2001-04-12 00:24:59 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUDOCEDITOR_H
@@ -51,7 +51,7 @@
 
     @memo DjVu document editor class.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: DjVuDocEditor.h,v 1.38 2001-04-11 16:59:50 bcr Exp $#
+    @version #$Id: DjVuDocEditor.h,v 1.39 2001-04-12 00:24:59 bcr Exp $#
 */
 
 //@{
@@ -149,9 +149,9 @@ public:
 
       /** Translates page number #page_num# to ID. If #page_num# is invalid,
 	  an exception is thrown. */
-   GString	page_to_id(int page_num) const;
+   GUTF8String	page_to_id(int page_num) const;
    
-   GString	insert_file(const GURL &url, const GString &parent_id,
+   GUTF8String	insert_file(const GURL &url, const GUTF8String &parent_id,
 			    int chunk_num=1);
       /** Inserts the referenced file into this DjVu document.
 
@@ -224,7 +224,7 @@ public:
 
 	  If #remove_unref# is #TRUE#, the function will also remove every
 	  file, which will become unreferenced after the removal of this file. */
-   void		remove_file(const GString &id, bool remove_unref=true);
+   void		remove_file(const GUTF8String &id, bool remove_unref=true);
       /** Makes page number #page_num# to be #new_page_num#. If #new_page_num#
 	  is negative or too big, the function will move page #page_num# to
 	  the end of the document. */
@@ -241,19 +241,19 @@ public:
       /** Changes the name of the file with ID #id# to #name#.
 	  Refer to \Ref{DjVmDir} for the explanation of {\em IDs},
           {\em names} and {\em titles}. */
-   void		set_file_name(const GString &id, const GString &name);
+   void		set_file_name(const GUTF8String &id, const GUTF8String &name);
       /** Changes the name of the page #page_num# to #name#.
 	  Refer to \Ref{DjVmDir} for the explanation of {\em IDs},
           {\em names} and {\em titles}. */
-   void		set_page_name(int page_num, const GString &name);
+   void		set_page_name(int page_num, const GUTF8String &name);
       /** Changes the title of the file with ID #id# to #title#.
 	  Refer to \Ref{DjVmDir} for the explanation of {\em IDs},
           {\em names} and {\em titles}. */
-   void		set_file_title(const GString &id, const GString &title);
+   void		set_file_title(const GUTF8String &id, const GUTF8String &title);
       /** Changes the title of the page #page_num# to #title#.
 	  Refer to \Ref{DjVmDir} for the explanation of {\em IDs},
           {\em names} and {\em titles}. */
-   void		set_page_title(int page_num, const GString &title);
+   void		set_page_title(int page_num, const GUTF8String &title);
 
       /** @name Thumbnails */
       //@{
@@ -338,7 +338,7 @@ public:
                                                                               
       /** Returns TRUE if #class_name# is #"DjVuDocEditor"#,
 	  #"DjVuDocument"# or #"DjVuPort"# */
-   virtual bool		inherits(const GString &class_name) const;
+   virtual bool		inherits(const GUTF8String &class_name) const;
    virtual GP<DataPool>	request_data(const DjVuPort * source, const GURL & url);
 protected:
    virtual GP<DjVuFile>	url_to_file(const GURL & url, bool dont_create);
@@ -354,35 +354,35 @@ private:
    int		orig_doc_type;
    int		orig_doc_pages;
 
-   GPMap<GString, File>	files_map; 	// files_map[id]=GP<File>
+   GPMap<GUTF8String, File>	files_map; 	// files_map[id]=GP<File>
    GCriticalSection	files_lock;
 
-   GMap<GString, void *>thumb_map;
+   GMap<GUTF8String, void *>thumb_map;
    GCriticalSection	thumb_lock;
 
    void		(* refresh_cb)(void *);
    void		* refresh_cl_data;
 
    void		check(void);
-   GString	find_unique_id(GString id);
+   GUTF8String	find_unique_id(GUTF8String id);
    GP<DataPool>	strip_incl_chunks(GP<DataPool> & pool);
    void		clean_files_map(void);
    bool		insert_file_type(const GURL &file_url,
                             DjVmDir::File::FILE_TYPE page_type,
-		            int & file_pos, GMap<GString, GString> & name2id);
+		            int & file_pos, GMap<GUTF8String, GUTF8String> & name2id);
    bool		insert_file(const GURL &file_url, bool is_page,
-			    int & file_pos, GMap<GString, GString> & name2id);
-   void		remove_file(const GString &id, bool remove_unref,
-			    GMap<GString, void *> & ref_map);
+			    int & file_pos, GMap<GUTF8String, GUTF8String> & name2id);
+   void		remove_file(const GUTF8String &id, bool remove_unref,
+			    GMap<GUTF8String, void *> & ref_map);
    void		generate_ref_map(const GP<DjVuFile> & file,
-				 GMap<GString, void *> & ref_map,
+				 GMap<GUTF8String, void *> & ref_map,
 				 GMap<GURL, void *> & visit_map);
-   void		move_file(const GString &id, int & file_pos,
-			  GMap<GString, void *> & map);
+   void		move_file(const GUTF8String &id, int & file_pos,
+			  GMap<GUTF8String, void *> & map);
    void		unfile_thumbnails(void);
    void		file_thumbnails(void);
-   void		save_file(const GString &id, const GURL &codebase,
-			  bool only_modified, GMap<GString, void *> & map);
+   void		save_file(const GUTF8String &id, const GURL &codebase,
+			  bool only_modified, GMap<GUTF8String, void *> & map);
 private: //dummy stuff
    static void save_pages_as(ByteStream *, const GList<int> &);
    static GP<DjVuDocument> create_wait(
@@ -394,10 +394,10 @@ private: //dummy stuff
 };
 
 inline bool
-DjVuDocEditor::inherits(const GString &class_name) const
+DjVuDocEditor::inherits(const GUTF8String &class_name) const
 {
    return
-      (GString("DjVuDocEditor") == class_name) ||
+      (GUTF8String("DjVuDocEditor") == class_name) ||
       DjVuDocument::inherits(class_name);
 //      !strcmp("DjVuDocEditor", class_name) ||
 //      DjVuDocument::inherits(class_name);

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVmDir0.cpp,v 1.14 2001-01-04 22:04:54 bcr Exp $
+// $Id: DjVmDir0.cpp,v 1.15 2001-04-12 00:24:59 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -86,7 +86,7 @@ DjVmDir0::decode(ByteStream & bs)
 
    for(int i=bs.read16();i>0;i--)
    {
-      GString name;
+      GUTF8String name;
       char ch;
       while(bs.read(&ch, 1) && ch) name+=ch;
       bool iff_file=bs.read8()?true:false;

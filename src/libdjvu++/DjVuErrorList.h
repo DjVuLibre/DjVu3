@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuErrorList.h,v 1.15 2001-03-06 19:55:42 bcr Exp $
+// $Id: DjVuErrorList.h,v 1.16 2001-04-12 00:24:59 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUERRORLIST_H
@@ -50,7 +50,7 @@ class ByteStream;
 
     @memo DjVuErrorList class.
     @author Bill C Riemers <bcr@lizardtech.com>
-    @version #$Id: DjVuErrorList.h,v 1.15 2001-03-06 19:55:42 bcr Exp $#
+    @version #$Id: DjVuErrorList.h,v 1.16 2001-04-12 00:24:59 bcr Exp $#
 */
 
 //@{
@@ -80,7 +80,7 @@ public:
   inline void connect( const DjVuPort &port);
 
      /// Get the listing of errors, and clear the list.
-  inline GList<GString> GetErrorList(void);
+  inline GList<GUTF8String> GetErrorList(void);
 
      /// Just clear the list.
   inline void ClearError(void);
@@ -92,7 +92,7 @@ public:
   inline bool HasError(void) const;
 
      /// Get the listing of status messages, and clear the list.
-  inline GList<GString> GetStatusList(void);
+  inline GList<GUTF8String> GetStatusList(void);
 
      /// Just clear the list.
   inline void ClearStatus(void);
@@ -111,10 +111,10 @@ public:
 private:
   GURL pool_url;
   GP<DataPool> pool;
-  GList<GString> Errors;
-  GString PrevError;
-  GList<GString> Status;
-  GString PrevStatus;
+  GList<GUTF8String> Errors;
+  GUTF8String PrevError;
+  GList<GUTF8String> Status;
+  GUTF8String PrevStatus;
 private: //dummy stuff
   static GURL set_stream(ByteStream *);
 };
@@ -123,10 +123,10 @@ inline void
 DjVuErrorList::connect( const DjVuPort &port )
 { get_portcaster()->add_route(&port, this); }
 
-inline GList<GString>
+inline GList<GUTF8String>
 DjVuErrorList::GetErrorList(void)
 {
-  GList<GString> retval=(const GList<GString>)Errors;
+  GList<GUTF8String> retval=(const GList<GUTF8String>)Errors;
   Errors.empty();
   return retval;
 }
@@ -135,10 +135,10 @@ inline void
 DjVuErrorList::ClearError(void)
 { Errors.empty(); }
 
-inline GList<GString>
+inline GList<GUTF8String>
 DjVuErrorList::GetStatusList(void)
 {
-  GList<GString> retval=(const GList<GString>)Status;
+  GList<GUTF8String> retval=(const GList<GUTF8String>)Status;
   Status.empty();
   return retval;
 }

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuImage.cpp,v 1.66 2001-04-06 17:50:22 fcrary Exp $
+// $Id: DjVuImage.cpp,v 1.67 2001-04-12 00:24:59 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -320,19 +320,19 @@ DjVuImage::get_gamma() const
    return info ? info->gamma : 2.2;
 }
 
-GString
+GUTF8String
 DjVuImage::get_mimetype() const
 {
-   return file ? file->mimetype : GString();
+   return file ? file->mimetype : GUTF8String();
 }
 
 
 //// DJVUIMAGE: UTILITIES
 
-GString 
+GUTF8String 
 DjVuImage::get_short_description() const
 {
-  GString msg = "Empty";
+  GUTF8String msg = "Empty";
   int width = get_width();
   int height = get_height();
   if (width && height)
@@ -343,14 +343,14 @@ DjVuImage::get_short_description() const
   return msg;
 }
 
-GString 
+GUTF8String 
 DjVuImage::get_long_description() const
 {
   // Tab characters '\t' sometimes look really ugly.
   // This code replace them with spaces so that every column 
   // is really aligned.  Lines that do not contain tabs are 
   // left unchanged.
-  GString result = file ? file->description : GString();
+  GUTF8String result = file ? file->description : GUTF8String();
   // Loop on tabulations
   for(;;)
     {
@@ -374,7 +374,7 @@ DjVuImage::get_long_description() const
       if (tab_num <= 0)
         break;
       // Replace tab 
-      GString tmp;
+      GUTF8String tmp;
       char *d = tmp.getbuf(result.length() + tab_num * tab_pos + 1);
       s = result;
       for (s=result; *s; *d++=*s++)
@@ -396,18 +396,18 @@ void
 DjVuImage::notify_chunk_done(const DjVuPort *, const char * name)
 {
    if (!relayout_sent &&
-     ( GString::ncmp("INFO",name, 4) ||
-       GString::ncmp("PMxx",name, 2) ||
-       GString::ncmp("BMxx",name, 2)  ) )
+     ( GUTF8String::ncmp("INFO",name, 4) ||
+       GUTF8String::ncmp("PMxx",name, 2) ||
+       GUTF8String::ncmp("BMxx",name, 2)  ) )
    {
       DjVuPort::get_portcaster()->notify_relayout(this);
       relayout_sent=true;
    } 
-   else if (GString::ncmp("Sxxx", name, 1) ||
-            GString::ncmp("BGxx", name, 2) ||
-            GString::ncmp("FGxx", name, 2) ||
-            GString::ncmp("BMxx", name, 2) ||
-            GString::ncmp("PMxx", name, 2)  )
+   else if (GUTF8String::ncmp("Sxxx", name, 1) ||
+            GUTF8String::ncmp("BGxx", name, 2) ||
+            GUTF8String::ncmp("FGxx", name, 2) ||
+            GUTF8String::ncmp("BMxx", name, 2) ||
+            GUTF8String::ncmp("PMxx", name, 2)  )
      DjVuPort::get_portcaster()->notify_redisplay(this);
 }
 

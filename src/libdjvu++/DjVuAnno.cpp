@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuAnno.cpp,v 1.74 2001-04-09 17:42:13 chrisp Exp $
+// $Id: DjVuAnno.cpp,v 1.75 2001-04-12 00:24:59 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -70,21 +70,21 @@ public:
    virtual ~GLObject(void);
    
    int		get_number(void) const;
-   GString	get_string(void) const;
-   GString	get_symbol(void) const;
+   GUTF8String	get_string(void) const;
+   GUTF8String	get_symbol(void) const;
    GPList<GLObject>	& get_list(void);
    GP<GLObject>	operator[](int n) const;
    
    GLObjectType	get_type(void) const;
-   GString	get_name(void) const;
+   GUTF8String	get_name(void) const;
    void		print(ByteStream & str, int compact=1, int indent=0, int * cur_pos=0) const;
 private:
    GLObjectType	type;
-   GString	name;
+   GUTF8String	name;
    
    int		number;
-   GString	string;
-   GString	symbol;
+   GUTF8String	string;
+   GUTF8String	symbol;
    GPList<GLObject>	list;
    void throw_can_not_convert_to(const GLObjectType to) const;
 };
@@ -163,7 +163,8 @@ GLObject::GLObject(GLObjectType xtype, const char * str) : type(xtype)
 {
    if (type!=STRING && type!=SYMBOL)
       G_THROW("DjVuAnno.bad_type");     //  GLObject(): Wrong object type passed. Should be either STRING or SYMBOL.
-   if (type==STRING) string=str;
+   if (type==STRING)
+     string=str;
    else symbol=str;
 }
 
@@ -176,7 +177,7 @@ GLObject::print(ByteStream & str, int compact, int indent, int * cur_pos) const
   int aldel_cur_pos=0;
   if (!cur_pos) { cur_pos=new int; *cur_pos=0; aldel_cur_pos=1; }
   
-  GString buffer;
+  GUTF8String buffer;
   GTArray<char> buffer_str;
   const char * to_print=0;
   switch(type)
@@ -236,13 +237,13 @@ GLObject::print(ByteStream & str, int compact, int indent, int * cur_pos) const
 void
 GLObject::throw_can_not_convert_to(const GLObjectType to) const
 {
-  static const GString two('2');
-  static const GString tab('\t');
-  GString mesg("DjVuAnno.");
+  static const GUTF8String two('2');
+  static const GUTF8String tab('\t');
+  GUTF8String mesg("DjVuAnno.");
   switch(type)
   {
     case NUMBER:
-      mesg+=GLObjectString[NUMBER]+two+GLObjectString[to]+tab+GString(number);
+      mesg+=GLObjectString[NUMBER]+two+GLObjectString[to]+tab+GUTF8String(number);
       break;
     case STRING:
       mesg+=GLObjectString[STRING]+two+GLObjectString[to]+tab+string;
@@ -260,7 +261,7 @@ GLObject::throw_can_not_convert_to(const GLObjectType to) const
   G_THROW(mesg);
 }
 
-GString
+GUTF8String
 GLObject::get_string(void) const
 {
    if (type!=STRING)
@@ -270,7 +271,7 @@ GLObject::get_string(void) const
    return string;
 }
 
-GString
+GUTF8String
 GLObject::get_symbol(void) const
 {
    if (type!=SYMBOL)
@@ -290,7 +291,7 @@ GLObject::get_number(void) const
    return number;
 }
 
-GString
+GUTF8String
 GLObject::get_name(void) const
 {
    if (type!=LIST)
@@ -357,7 +358,7 @@ GLParser::get_token(const char * & start)
      }
    else if (c=='"')
      {
-       GString str;
+       GUTF8String str;
        start++;
        while(1)
 	 {
@@ -374,7 +375,7 @@ GLParser::get_token(const char * & start)
      }
    else
      {
-       GString str;
+       GUTF8String str;
        while(1)
 	 {
            char ch=*start++;
@@ -401,7 +402,7 @@ GLParser::parse(const char * cur_name, GPList<GLObject> & list,
     {
       if (isspace(*start))
       {
-        GString mesg=GString("DjVuAnno.paren\t")+cur_name;
+        GUTF8String mesg=GUTF8String("DjVuAnno.paren\t")+cur_name;
         G_THROW(mesg);
       }
       
@@ -413,7 +414,7 @@ GLParser::parse(const char * cur_name, GPList<GLObject> & list,
         if (tok.type==GLToken::OPEN_PAR ||
           tok.type==GLToken::CLOSE_PAR)
         {
-          GString mesg=GString("DjVuAnno.no_paren\t")+cur_name;
+          GUTF8String mesg=GUTF8String("DjVuAnno.no_paren\t")+cur_name;
           G_THROW(mesg);
         }
         if (tok.type==GLToken::OBJECT)
@@ -421,13 +422,13 @@ GLParser::parse(const char * cur_name, GPList<GLObject> & list,
           GLObject::GLObjectType type=object->get_type();
           if (type==GLObject::NUMBER)
           {
-            GString mesg("DjVuAnno.no_number\t");
+            GUTF8String mesg("DjVuAnno.no_number\t");
             mesg += cur_name;
             G_THROW(mesg);
           }
           else if (type==GLObject::STRING)
           {
-            GString mesg("DjVuAnno.no_string\t");
+            GUTF8String mesg("DjVuAnno.no_string\t");
             mesg += cur_name;
             G_THROW(mesg);
           }
@@ -443,7 +444,7 @@ GLParser::parse(const char * cur_name, GPList<GLObject> & list,
       G_CATCH(exc)
       {
 //        if (strcmp(exc.get_cause(), "EOF"))
-         if (GString("EOF") != exc.get_cause())
+         if (GUTF8String("EOF") != exc.get_cause())
           G_RETHROW;
       } 
       G_ENDCATCH;
@@ -468,7 +469,7 @@ GLParser::parse(const char * str)
    } G_CATCH(exc)
    {
 //      if (strcmp(exc.get_cause(), "EOF"))
-      if (GString("EOF") != exc.get_cause())
+      if (GUTF8String("EOF") != exc.get_cause())
         G_RETHROW;
    } G_ENDCATCH;
 }
@@ -519,14 +520,14 @@ DjVuANT::~DjVuANT()
 {
 }
 
-GString
+GUTF8String
 DjVuANT::read_raw(ByteStream & str)
 {
-   GString raw;
+   GUTF8String raw;
    char buffer[1024];
    int length;
    while((length=str.read(buffer, 1024)))
-      raw+=GString(buffer, length);
+      raw+=GUTF8String(buffer, length);
    return raw;
 }
 
@@ -552,7 +553,7 @@ void
 DjVuANT::merge(ByteStream & str)
 {
    GLParser parser(encode_raw());
-   GString add_raw=read_raw(str);
+   GUTF8String add_raw=read_raw(str);
    parser.parse(add_raw);
    decode(parser);
 }
@@ -560,7 +561,7 @@ DjVuANT::merge(ByteStream & str)
 void
 DjVuANT::encode(ByteStream &bs)
 {
-  GString raw=encode_raw();
+  GUTF8String raw=encode_raw();
   bs.writall((const char*) raw, raw.length());
 }
 
@@ -639,7 +640,7 @@ DjVuANT::get_bg_color(GLParser & parser)
     GP<GLObject> obj=parser.get_object(BACKGROUND_TAG);
     if (obj && obj->get_list().size()==1)
     {
-      GString color=(*obj)[0]->get_symbol();
+      GUTF8String color=(*obj)[0]->get_symbol();
       DEBUG_MSG("color='" << color << "'\n");
       return cvt_color(color, 0xffffff);
       } else { DEBUG_MSG("can't find any.\n"); }
@@ -662,7 +663,7 @@ DjVuANT::get_zoom(GLParser & parser)
     GP<GLObject> obj=parser.get_object(ZOOM_TAG);
     if (obj && obj->get_list().size()==1)
     {
-      GString zoom=(*obj)[0]->get_symbol();
+      GUTF8String zoom=(*obj)[0]->get_symbol();
       DEBUG_MSG("zoom='" << zoom << "'\n");
       
       if (zoom=="stretch") return ZOOM_STRETCH;
@@ -688,7 +689,7 @@ DjVuANT::get_mode(GLParser & parser)
     GP<GLObject> obj=parser.get_object(MODE_TAG);
     if (obj && obj->get_list().size()==1)
     {
-      GString mode=(*obj)[0]->get_symbol();
+      GUTF8String mode=(*obj)[0]->get_symbol();
       DEBUG_MSG("mode='" << mode << "'\n");
       
       if (mode=="color") return MODE_COLOR;
@@ -711,7 +712,7 @@ DjVuANT::get_hor_align(GLParser & parser)
     GP<GLObject> obj=parser.get_object(ALIGN_TAG);
     if (obj && obj->get_list().size()==2)
     {
-      GString align=(*obj)[0]->get_symbol();
+      GUTF8String align=(*obj)[0]->get_symbol();
       DEBUG_MSG("hor_align='" << align << "'\n");
       
       if (align=="left") return ALIGN_LEFT;
@@ -733,7 +734,7 @@ DjVuANT::get_ver_align(GLParser & parser)
     GP<GLObject> obj=parser.get_object(ALIGN_TAG);
     if (obj && obj->get_list().size()==2)
     {
-      GString align=(*obj)[1]->get_symbol();
+      GUTF8String align=(*obj)[1]->get_symbol();
       DEBUG_MSG("ver_align='" << align << "'\n");
       
       if (align=="top") return ALIGN_TOP;
@@ -762,8 +763,8 @@ DjVuANT::get_map_areas(GLParser & parser)
     {
       G_TRY {
 	       // Getting the url
-        GString url;
-        GString target=GMapArea::TARGET_SELF;
+        GUTF8String url;
+        GUTF8String target=GMapArea::TARGET_SELF;
         GLObject & url_obj=*(obj[0]);
         if (url_obj.get_type()==GLObject::LIST)
         {
@@ -774,7 +775,7 @@ DjVuANT::get_map_areas(GLParser & parser)
         } else url=url_obj.get_string();
         
 	       // Getting the comment
-        GString comment=(obj[1])->get_string();
+        GUTF8String comment=(obj[1])->get_string();
         
         DEBUG_MSG("found maparea '" << comment << "' (" <<
           url << ":" << target << ")\n");
@@ -826,7 +827,7 @@ DjVuANT::get_map_areas(GLParser & parser)
             GLObject * el=obj[obj_num];
             if (el->get_type()==GLObject::LIST)
             {
-              const GString & name=el->get_name();
+              const GUTF8String & name=el->get_name();
               if (name==GMapArea::BORDER_AVIS_TAG)
                 map_area->border_always_visible=true;
               else if (name==GMapArea::HILITE_TAG)
@@ -888,10 +889,10 @@ DjVuANT::del_all_items(const char * name, GLParser & parser)
    }
 }
 
-GString
+GUTF8String
 DjVuANT::encode_raw(void) const
 {
-   GString buffer;
+   GUTF8String buffer;
    GLParser parser;
 
       //*** Background color
@@ -969,7 +970,7 @@ DjVuANT::encode_raw(void) const
    GP<ByteStream> gstr=ByteStream::create();
    ByteStream &str=*gstr;
    parser.print(str, 1);
-   GString ans;
+   GUTF8String ans;
    int size = str.size();
    str.seek(0);
    str.read(ans.getbuf(size), size);
@@ -979,7 +980,7 @@ DjVuANT::encode_raw(void) const
 bool
 DjVuANT::is_empty(void) const
 {
-   GString raw=encode_raw();
+   GUTF8String raw=encode_raw();
    for(int i=raw.length()-1;i>=0;i--)
       if (isspace(raw[i])) raw.setat(i, 0);
       else break;
@@ -1007,7 +1008,7 @@ DjVuANT::copy(void) const
 void
 DjVuAnno::decode(GP<ByteStream> gbs)
 {
-  GString chkid;
+  GUTF8String chkid;
   GP<IFFByteStream> giff=IFFByteStream::create(gbs);
   IFFByteStream &iff=*giff;
   while( iff.get_chunk(chkid) )

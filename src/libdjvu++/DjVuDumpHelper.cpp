@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDumpHelper.cpp,v 1.19 2001-04-05 16:06:27 bcr Exp $
+// $Id: DjVuDumpHelper.cpp,v 1.20 2001-04-12 00:24:59 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -63,7 +63,7 @@ putchar(ByteStream & str, char ch)
 
 static void
 display_djvu_info(ByteStream & out_str, IFFByteStream &iff,
-		  GString, size_t size, DjVmInfo&, int)
+		  GUTF8String, size_t size, DjVmInfo&, int)
 {
   GP<DjVuInfo> ginfo=DjVuInfo::create();
   DjVuInfo &info=*ginfo;
@@ -80,35 +80,35 @@ display_djvu_info(ByteStream & out_str, IFFByteStream &iff,
 
 static void
 display_djbz(ByteStream & out_str, IFFByteStream &iff,
-	     GString, size_t, DjVmInfo&, int)
+	     GUTF8String, size_t, DjVmInfo&, int)
 {
   out_str.format( "JB2 shared dictionary");
 }
 
 static void
 display_fgbz(ByteStream & out_str, IFFByteStream &iff,
-	     GString, size_t, DjVmInfo&, int)
+	     GUTF8String, size_t, DjVmInfo&, int)
 {
   out_str.format( "JB2 colors data");
 }
 
 static void
 display_sjbz(ByteStream & out_str, IFFByteStream &iff,
-	     GString, size_t, DjVmInfo&, int)
+	     GUTF8String, size_t, DjVmInfo&, int)
 {
   out_str.format( "JB2 bilevel data");
 }
 
 static void
 display_smmr(ByteStream & out_str, IFFByteStream &iff,
-	     GString, size_t, DjVmInfo&, int)
+	     GUTF8String, size_t, DjVmInfo&, int)
 {
   out_str.format( "G4/MMR stencil data");
 }
 
 static void
 display_iw4(ByteStream & out_str, IFFByteStream &iff,
-	    GString, size_t, DjVmInfo&, int)
+	    GUTF8String, size_t, DjVmInfo&, int)
 {
   struct PrimaryHeader {
     unsigned char serial;
@@ -138,7 +138,7 @@ display_iw4(ByteStream & out_str, IFFByteStream &iff,
 
 static void
 display_djvm_dirm(ByteStream & out_str, IFFByteStream & iff,
-		  GString head, size_t, DjVmInfo& djvminfo, int)
+		  GUTF8String head, size_t, DjVmInfo& djvminfo, int)
 {
   GP<DjVmDir> dir = DjVmDir::create();
   dir->decode(iff.get_bytestream());
@@ -164,7 +164,7 @@ display_djvm_dirm(ByteStream & out_str, IFFByteStream & iff,
 
 static void
 display_th44(ByteStream & out_str, IFFByteStream & iff,
-	     GString, size_t, DjVmInfo & djvminfo, int counter)
+	     GUTF8String, size_t, DjVmInfo & djvminfo, int counter)
 {
    int start_page=-1;
    if (djvminfo.dir)
@@ -192,9 +192,9 @@ display_th44(ByteStream & out_str, IFFByteStream & iff,
 
 static void
 display_incl(ByteStream & out_str, IFFByteStream & iff,
-	     GString, size_t, DjVmInfo&, int)
+	     GUTF8String, size_t, DjVmInfo&, int)
 {
-   GString name;
+   GUTF8String name;
    char ch;
    while(iff.read(&ch, 1) && ch!='\n')
      name += ch;
@@ -203,20 +203,20 @@ display_incl(ByteStream & out_str, IFFByteStream & iff,
 
 static void
 display_anno(ByteStream & out_str, IFFByteStream &iff,
-	     GString, size_t, DjVmInfo&, int)
+	     GUTF8String, size_t, DjVmInfo&, int)
 {
    out_str.format( "Page annotation");
-   GString id;
+   GUTF8String id;
    iff.short_id(id);
    out_str.format( " (hyperlinks, etc.)");
 }
 
 static void
 display_text(ByteStream & out_str, IFFByteStream &iff,
-	     GString, size_t, DjVmInfo&, int)
+	     GUTF8String, size_t, DjVmInfo&, int)
 {
    out_str.format( "Hidden text");
-   GString id;
+   GUTF8String id;
    iff.short_id(id);
    out_str.format( " (text, etc.)");
 }
@@ -224,7 +224,7 @@ display_text(ByteStream & out_str, IFFByteStream &iff,
 struct displaysubr
 {
   const char *id;
-  void (*subr)(ByteStream &, IFFByteStream &, GString,
+  void (*subr)(ByteStream &, IFFByteStream &, GUTF8String,
 	       size_t, DjVmInfo&, int counter);
 };
  
@@ -258,21 +258,21 @@ static displaysubr disproutines[] =
 
 static void
 display_chunks(ByteStream & out_str, IFFByteStream &iff,
-	       const GString &head, DjVmInfo djvminfo)
+	       const GUTF8String &head, DjVmInfo djvminfo)
 {
   size_t size;
-  GString id, fullid;
-  GString head2 = head + "  ";
+  GUTF8String id, fullid;
+  GUTF8String head2 = head + "  ";
   GPMap<int,DjVmDir::File> djvmmap;
   int rawoffset;
-  GMap<GString, int> counters;
+  GMap<GUTF8String, int> counters;
   
   while ((size = iff.get_chunk(id, &rawoffset)))
   {
     if (!counters.contains(id)) counters[id]=0;
     else counters[id]++;
     
-    GString msg;
+    GUTF8String msg;
     msg.format("%s%s [%d] ", (const char *)head, (const char *)id, size);
     out_str.format( "%s", (const char *)msg);
     // Display DJVM is when adequate
@@ -313,7 +313,7 @@ GP<ByteStream>
 DjVuDumpHelper::dump(GP<ByteStream> gstr)
 {
    GP<ByteStream> out_str=ByteStream::create();
-   GString head="  ";
+   GUTF8String head="  ";
    GP<IFFByteStream> iff=IFFByteStream::create(gstr);
    DjVmInfo djvminfo;
    display_chunks(*out_str, *iff, head, djvminfo);

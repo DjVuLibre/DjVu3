@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessage.cpp,v 1.29 2001-04-06 17:17:16 bcr Exp $
+// $Id: DjVuMessage.cpp,v 1.30 2001-04-12 00:24:59 bcr Exp $
 // $Name:  $
 
 
@@ -158,7 +158,7 @@ GetProfilePaths(void)
     first=false;
     GURL path;
 #ifndef WINCE
-    const GString envp(GOS::getenv(DjVuEnv));
+    const GUTF8String envp(GOS::getenv(DjVuEnv));
     if(envp.length())
       paths.append((path=GURL::Filename::UTF8(envp)));
 #endif
@@ -191,13 +191,13 @@ GetProfilePaths(void)
     if(!path.is_empty() && path.is_dir())
       paths.append(path);
 #else
-    GString home=GOS::getenv("HOME");
+    GUTF8String home=GOS::getenv("HOME");
     struct passwd *pw=0;
     if(home.length())
     {
       pw=getpwuid(getuid());
       if(pw)
-        home=GString(pw->pw_dir).getNative2UTF8();
+        home=GNativeString(pw->pw_dir);
     }
     if(home.length())
     {
@@ -220,9 +220,9 @@ GetProfilePaths(void)
 static void
 getbodies(
   GList<GURL> &paths,
-  const GString &MessageFileName,
+  const GUTF8String &MessageFileName,
   GPList<lt_XMLTags> &body, 
-  GMap<GString, void *> & map )
+  GMap<GUTF8String, void *> & map )
 {
   bool isdone=false;
   for(GPosition pos=paths;!isdone && pos;++pos)
@@ -250,11 +250,11 @@ getbodies(
       if(! Head.isempty())
       {
         isdone=true;
-        GMap<GString, GP<lt_XMLTags> > includes;
+        GMap<GUTF8String, GP<lt_XMLTags> > includes;
         lt_XMLTags::getMaps(includestring,namestring,Head,includes);
         for(GPosition pos=includes;pos;++pos)
         {
-          GString file=includes.key(pos);
+          GUTF8String file=includes.key(pos);
           if(! map.contains(file))
           {
             getbodies(paths,file,body,map);
@@ -266,13 +266,13 @@ getbodies(
 }
 
 static void
-parse(GMap<GString,GP<lt_XMLTags> > &retval)
+parse(GMap<GUTF8String,GP<lt_XMLTags> > &retval)
 {
   GPList<lt_XMLTags> body;
   {
     GList<GURL> paths=GetProfilePaths();
-    GMap<GString, void *> map;
-    GString m(MessageFile);
+    GMap<GUTF8String, void *> map;
+    GUTF8String m(MessageFile);
     getbodies(paths,m,body,map);
   }
   if(! body.isempty())
@@ -284,9 +284,9 @@ parse(GMap<GString,GP<lt_XMLTags> > &retval)
 
 #if 0
 static void
-parse (GMap<GString,GP<lt_XMLTags> > &retval)
+parse (GMap<GUTF8String,GP<lt_XMLTags> > &retval)
 {
-  GList<GString> &paths=GetProfilePaths();
+  GList<GUTF8String> &paths=GetProfilePaths();
   for(GPosition pos=paths;pos;++pos)
   {
     const GURL url=GOS::filename_to_url(GOS::expand_name(MessageFileName,paths[pos]));
@@ -330,9 +330,9 @@ DjVuMessage::~DjVuMessage( )
 
 
 void
-DjVuMessage::perror( const GString & MessageList ) const
+DjVuMessage::perror( const GUTF8String & MessageList ) const
 {
-  GString mesg=LookUp(MessageList);
+  GUTF8String mesg=LookUp(MessageList);
   DjVuPrintError("%s",(const char *)mesg);
 }
 
@@ -341,10 +341,10 @@ DjVuMessage::perror( const GString & MessageList ) const
 //  arguments into the retrieved messages.
 //  N.B. The resulting string may be encoded in UTF-8 format (ISO 10646-1 Annex R)
 //       and SHOULD NOT BE ASSUMED TO BE ASCII.
-GString
-DjVuMessage::LookUp( const GString & MessageList ) const
+GUTF8String
+DjVuMessage::LookUp( const GUTF8String & MessageList ) const
 {
-  GString result;                           // Result string; begins empty
+  GUTF8String result;                           // Result string; begins empty
 
   int start = 0;                            // Beginning of next message
   int end = MessageList.length();           // End of the message string
@@ -375,15 +375,15 @@ DjVuMessage::LookUp( const GString & MessageList ) const
 
 //  Expands a single message and inserts the arguments. Single_Message contains no
 //  separators (newlines), but includes all the parameters separated by tabs.
-GString
-DjVuMessage::LookUpSingle( const GString &Single_Message ) const
+GUTF8String
+DjVuMessage::LookUpSingle( const GUTF8String &Single_Message ) const
 {
   //  Isolate the message ID and get the corresponding message text
   int ending_posn = Single_Message.search('\t');
   if( ending_posn < 0 )
     ending_posn = Single_Message.length();
-  GString msg_text;
-  GString msg_number;
+  GUTF8String msg_text;
+  GUTF8String msg_number;
   LookUpID( Single_Message.substr(0,ending_posn), msg_text, msg_number );
 
   //  Check whether we found anything
@@ -391,11 +391,11 @@ DjVuMessage::LookUpSingle( const GString &Single_Message ) const
   {
     //  Didn't find anything, fabricate a message
 #ifdef macintosh
-    msg_text = GString("** Error messages not implemented for Macintosh: [Contact LizardTech for assistance]\n") + 
+    msg_text = GUTF8String("** Error messages not implemented for Macintosh: [Contact LizardTech for assistance]\n") + 
                "\tMessage name:  " +
                Single_Message.substr(0,ending_posn);
 #else
-    msg_text = GString("** Unrecognized DjVu Message: [Contact LizardTech for assistance]\n") + 
+    msg_text = GUTF8String("** Unrecognized DjVu Message: [Contact LizardTech for assistance]\n") + 
                "\tMessage name:  " +
                Single_Message.substr(0,ending_posn);
 #endif
@@ -433,9 +433,9 @@ DjVuMessage::LookUpSingle( const GString &Single_Message ) const
 //  Looks up the msgID in the file of messages and returns a pointer to the beginning
 //  of the translated message, if found; and an empty string otherwise.
 void
-DjVuMessage::LookUpID( const GString &msgID,
-                       GString &message_text,
-                       GString &message_number ) const
+DjVuMessage::LookUpID( const GUTF8String &msgID,
+                       GUTF8String &message_text,
+                       GUTF8String &message_number ) const
 {
   if(!Map.isempty())
   {
@@ -471,7 +471,7 @@ DjVuMessage::LookUpID( const GString &msgID,
   struct djvu_parse opt = djvu_parse_init( "-" );
   ss = djvu_parse_configfile( opt, DjVuMessageFileName, -1 );
   FILE *MessageFile = fopen( ss, "r" );
-  GString result;
+  GUTF8String result;
   if( MessageFile != NULL )
   {
     enum {BUFSIZE=500};
@@ -508,9 +508,9 @@ DjVuMessage::LookUpID( const GString &msgID,
 //  Except for an ArgId of zero (message number), if the ArgId is not found, the
 //  routine adds a line with the parameter so information will not be lost.
 void
-DjVuMessage::InsertArg( GString &message, int ArgId, GString arg ) const
+DjVuMessage::InsertArg( GUTF8String &message, int ArgId, GUTF8String arg ) const
 {
-  GString target = GString("%#") + GString(ArgId) + "#";           // argument target string
+  GUTF8String target = GUTF8String("%#") + GUTF8String(ArgId) + "#";           // argument target string
   int format_start = message.search( target );            // location of target string
   if( format_start >= 0 )
   {
@@ -526,7 +526,7 @@ DjVuMessage::InsertArg( GString &message, int ArgId, GString arg ) const
   {
     //  Not found, fake it
     if( ArgId != 0 )
-      message += GString("\n\tParameter ") + GString(ArgId) + ":  " + arg;
+      message += GUTF8String("\n\tParameter ") + GUTF8String(ArgId) + ":  " + arg;
   }
 }
 
@@ -537,7 +537,7 @@ DjVuMessage::InsertArg( GString &message, int ArgId, GString arg ) const
 //  empty (i.e., msg_buffer[0] == '\0').
 void DjVuMessage_LookUp( char *msg_buffer, const unsigned int buffer_size, const char *message )
 {
-  GString converted = DjVuMessage::LookUpUTF8( message );
+  GUTF8String converted = DjVuMessage::LookUpUTF8( message );
   if( converted.length() >= buffer_size )
     msg_buffer[0] = '\0';
   else

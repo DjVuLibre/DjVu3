@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GOS.h,v 1.19 2001-03-30 23:31:29 bcr Exp $
+// $Id: GOS.h,v 1.20 2001-04-12 00:25:00 bcr Exp $
 // $Name:  $
 
 #ifndef _GOS_H_
@@ -53,7 +53,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- Initial implementation
     @version
-    #$Id: GOS.h,v 1.19 2001-03-30 23:31:29 bcr Exp $#
+    #$Id: GOS.h,v 1.20 2001-04-12 00:25:00 bcr Exp $#
 */
 //@{
 
@@ -77,13 +77,13 @@ class GOS
       suffix matches argument #suffix#, the filename suffix is removed.  This
       function works like the unix command #/bin/basename#, but also supports
       the naming conventions of other operating systems. */
-  static GString basename(const char *filename, const char *suffix=0);
+  static GUTF8String basename(const GUTF8String &filename, const char *suffix=0);
 
   /** Sets and returns the current working directory.
       When argument #dirname# is specified, the current directory is changed
       to #dirname#. This function always returns the fully qualified name
       of the current directory. */
-  static GString cwd(const char *dirname=0);
+  static GUTF8String cwd(const GUTF8String &dirname=GUTF8String());
 
   // -----------------------------------------
   // Functions for measuring time
@@ -99,7 +99,7 @@ class GOS
   static void sleep(int milliseconds);
 
   /// Read the named variable from the environment, and converts it to UTF8.
-  static GString getenv(const GString &name);
+  static GUTF8String getenv(const GUTF8String &name);
 
 
   // -------------------------------------------

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVmDir.h,v 1.34 2001-04-11 16:59:50 bcr Exp $
+// $Id: DjVmDir.h,v 1.35 2001-04-12 00:24:58 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVMDIR_H
@@ -84,7 +84,7 @@
     @memo Implements DjVu multipage document directory
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: DjVmDir.h,v 1.34 2001-04-11 16:59:50 bcr Exp $# */
+    #$Id: DjVmDir.h,v 1.35 2001-04-12 00:24:58 bcr Exp $# */
 //@{
 
 
@@ -144,11 +144,11 @@ public:
       /** Translates page numbers to file records. */
    GP<File> page_to_file(int page_num) const;
       /** Translates file names to file records. */
-   GP<File> name_to_file(const GString & name) const;
+   GP<File> name_to_file(const GUTF8String & name) const;
       /** Translates file IDs to file records. */
-   GP<File> id_to_file(const GString &id) const;
+   GP<File> id_to_file(const GUTF8String &id) const;
       /** Translates file shortcuts to file records. */
-   GP<File> title_to_file(const GString &title) const;
+   GP<File> title_to_file(const GUTF8String &title) const;
       /** Returns position of the file in the directory. */
    int get_file_pos(const File * f) const;
       /** Returns position of the given page in the directory. */
@@ -176,9 +176,9 @@ private:
    GCriticalSection 	class_lock;
    GPList<File>		files_list;
    GPArray<File>	page2file;
-   GPMap<GString, File>	name2file;
-   GPMap<GString, File>	id2file;
-   GPMap<GString, File>	title2file;
+   GPMap<GUTF8String, File>	name2file;
+   GPMap<GUTF8String, File>	id2file;
+   GPMap<GUTF8String, File>	title2file;
 private: //dummy stuff
    static void decode(ByteStream *);
    static void encode(ByteStream *, const bool=false);
@@ -212,15 +212,15 @@ public:
 	     file.  By keeping the name in {\em bundled} document we guarantee,
 	     that it can be expanded later into {\em indirect} document and files
 	     will still have the same names. */
-      GString name;
+      GUTF8String name;
 	 /** File identifier.  The encoder assigns a unique identifier to each file
 	     in a multipage document. Indirection chunks in other files (#"INCL"#
 	     chunks) may refer to another file using its identifier. */
-      GString id;
+      GUTF8String id;
 	 /** File title.  The file title is assigned by the user and may be used as
 	     a shortcut for viewing a particular page.  Names like #"chapter1"# or
 	     #"appendix"# are appropriate. */
-      GString title;
+      GUTF8String title;
 	 /** Offset of the file data in a bundled DJVM file.  This number is
 	     relevant in the {\em bundled} case only when everything is packed into
 	     one single file. */
@@ -233,7 +233,7 @@ public:
              This function only checks that #id# is syntactically legal.
              It does not check for duplicate file IDs in a directory. */  
       static bool is_legal_id(const char *id);
-      GString get_str_type(void) const;
+      GUTF8String get_str_type(void) const;
 	 /** Tests if this file represents a page of the document. */
       bool is_page(void) const 
 	 { return (flags & TYPE_MASK)==PAGE; }

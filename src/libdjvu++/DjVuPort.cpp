@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuPort.cpp,v 1.47 2001-04-11 16:59:51 bcr Exp $
+// $Id: DjVuPort.cpp,v 1.48 2001-04-12 00:24:59 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -233,7 +233,7 @@ DjVuPortcaster::is_port_alive(DjVuPort *port)
 }
 
 void
-DjVuPortcaster::add_alias(const DjVuPort * port, const GString &alias)
+DjVuPortcaster::add_alias(const DjVuPort * port, const GUTF8String &alias)
 {
    GCriticalSectionLock lock(&map_lock);
    a2p_map[alias]=port;
@@ -265,7 +265,7 @@ DjVuPortcaster::clear_aliases(const DjVuPort * port)
 }
 
 GP<DjVuPort>
-DjVuPortcaster::alias_to_port(const GString &alias)
+DjVuPortcaster::alias_to_port(const GUTF8String &alias)
 {
    GCriticalSectionLock lock(&map_lock);
    GPosition pos;
@@ -280,7 +280,7 @@ DjVuPortcaster::alias_to_port(const GString &alias)
 }
 
 GPList<DjVuPort>
-DjVuPortcaster::prefix_to_ports(const GString &prefix)
+DjVuPortcaster::prefix_to_ports(const GUTF8String &prefix)
 {
   GPList<DjVuPort> list;
   {
@@ -289,7 +289,7 @@ DjVuPortcaster::prefix_to_ports(const GString &prefix)
     {
       GCriticalSectionLock lock(&map_lock);
       for(GPosition pos=a2p_map;pos;++pos)
-        if (GString::ncmp(a2p_map.key(pos), prefix, length))
+        if (GUTF8String::ncmp(a2p_map.key(pos), prefix, length))
         {
           DjVuPort * port=(DjVuPort *) a2p_map[pos];
           GP<DjVuPort> gp_port=is_port_alive(port);
@@ -456,7 +456,7 @@ DjVuPortcaster::compute_closure(const DjVuPort * src, GPList<DjVuPort> &list, bo
 }
 
 GURL
-DjVuPortcaster::id_to_url(const DjVuPort * source, const GString &id)
+DjVuPortcaster::id_to_url(const DjVuPort * source, const GUTF8String &id)
 {
    GPList<DjVuPort> list;
    compute_closure(source, list, true);
@@ -470,7 +470,7 @@ DjVuPortcaster::id_to_url(const DjVuPort * source, const GString &id)
 }
 
 GPBase
-DjVuPortcaster::id_to_file(const DjVuPort * source, const GString &id)
+DjVuPortcaster::id_to_file(const DjVuPort * source, const GUTF8String &id)
 {
    GPList<DjVuPort> list;
    compute_closure(source, list, true);
@@ -493,7 +493,7 @@ DjVuPortcaster::request_data(const DjVuPort * source, const GURL & url)
 }
 
 bool
-DjVuPortcaster::notify_error(const DjVuPort * source, const GString &msg)
+DjVuPortcaster::notify_error(const DjVuPort * source, const GUTF8String &msg)
 {
    GPList<DjVuPort> list;
    compute_closure(source, list, true);
@@ -504,7 +504,7 @@ DjVuPortcaster::notify_error(const DjVuPort * source, const GString &msg)
 }
 
 bool
-DjVuPortcaster::notify_status(const DjVuPort * source, const GString &msg)
+DjVuPortcaster::notify_status(const DjVuPort * source, const GUTF8String &msg)
 {
    GPList<DjVuPort> list;
    compute_closure(source, list, true);
@@ -533,7 +533,7 @@ DjVuPortcaster::notify_relayout(const DjVuImage * source)
 }
 
 void
-DjVuPortcaster::notify_chunk_done(const DjVuPort * source, const GString &name)
+DjVuPortcaster::notify_chunk_done(const DjVuPort * source, const GUTF8String &name)
 {
    GPList<DjVuPort> list;
    compute_closure(source, list);
@@ -575,19 +575,19 @@ DjVuPortcaster::notify_decode_progress(const DjVuPort * source, float done)
 //****************************************************************************
 
 GURL
-DjVuPort::id_to_url(const DjVuPort *, const GString &) { return GURL(); }
+DjVuPort::id_to_url(const DjVuPort *, const GUTF8String &) { return GURL(); }
 
 GPBase
-DjVuPort::id_to_file(const DjVuPort *, const GString &) { return 0; }
+DjVuPort::id_to_file(const DjVuPort *, const GUTF8String &) { return 0; }
 
 GP<DataPool>
 DjVuPort::request_data(const DjVuPort *, const GURL &) { return 0; }
 
 bool
-DjVuPort::notify_error(const DjVuPort *, const GString &) { return 0; }
+DjVuPort::notify_error(const DjVuPort *, const GUTF8String &) { return 0; }
 
 bool
-DjVuPort::notify_status(const DjVuPort *, const GString &) { return 0; }
+DjVuPort::notify_status(const DjVuPort *, const GUTF8String &) { return 0; }
 
 void
 DjVuPort::notify_redisplay(const DjVuImage *) {}
@@ -596,7 +596,7 @@ void
 DjVuPort::notify_relayout(const DjVuImage *) {}
 
 void
-DjVuPort::notify_chunk_done(const DjVuPort *, const GString &) {}
+DjVuPort::notify_chunk_done(const DjVuPort *, const GUTF8String &) {}
 
 void
 DjVuPort::notify_file_flags_changed(const DjVuFile *, long, long) {}
@@ -617,7 +617,7 @@ DjVuSimplePort::request_data(const DjVuPort * source, const GURL & url)
   G_TRY {
     if (url.is_local_file_url())
     {
-//      GString fname=GOS::url_to_filename(url);
+//      GUTF8String fname=GOS::url_to_filename(url);
 //      if (GOS::basename(fname)=="-") fname="-";
       return DataPool::create(url);
     }
@@ -626,14 +626,14 @@ DjVuSimplePort::request_data(const DjVuPort * source, const GURL & url)
 }
 
 bool
-DjVuSimplePort::notify_error(const DjVuPort * source, const GString &msg)
+DjVuSimplePort::notify_error(const DjVuPort * source, const GUTF8String &msg)
 {
    DjVuMsg.perror(msg);
    return 1;
 }
 
 bool
-DjVuSimplePort::notify_status(const DjVuPort * source, const GString &msg)
+DjVuSimplePort::notify_status(const DjVuPort * source, const GUTF8String &msg)
 {
    DjVuMsg.perror(msg);
    return 1;

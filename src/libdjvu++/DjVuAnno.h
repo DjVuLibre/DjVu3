@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuAnno.h,v 1.39 2001-03-06 19:55:42 bcr Exp $
+// $Id: DjVuAnno.h,v 1.40 2001-04-12 00:24:59 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUANNO_H
@@ -58,7 +58,7 @@
     @memo Implements support for DjVuImage annotations
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: DjVuAnno.h,v 1.39 2001-03-06 19:55:42 bcr Exp $# */
+    #$Id: DjVuAnno.h,v 1.40 2001-04-12 00:24:59 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -152,7 +152,7 @@ public:
    void encode(ByteStream &bs);
 
       /// Encodes data back into raw annotation data.
-   GString encode_raw(void) const;
+   GUTF8String encode_raw(void) const;
 
       /// Returns a copy of this object
    GP<DjVuANT>	copy(void) const;
@@ -166,7 +166,7 @@ public:
 private:
    void			decode(class GLParser & parser);
    
-   static GString	read_raw(ByteStream & str);
+   static GUTF8String	read_raw(ByteStream & str);
    
    static unsigned char	decode_comp(char ch1, char ch2);
    static unsigned long int	get_bg_color(class GLParser & parser);

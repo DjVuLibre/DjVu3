@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GIFFManager.cpp,v 1.19 2001-04-09 17:42:13 chrisp Exp $
+// $Id: GIFFManager.cpp,v 1.20 2001-04-12 00:25:00 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -55,7 +55,7 @@ GIFFManager::create(void)
 }
 
 GP<GIFFManager> 
-GIFFManager::create(const GString &name)
+GIFFManager::create(const GUTF8String &name)
 {
   GIFFManager *iff=new GIFFManager();
   GP<GIFFManager> retval=iff;
@@ -64,7 +64,7 @@ GIFFManager::create(const GString &name)
 }
 
 void
-GIFFChunk::set_name(GString name)
+GIFFChunk::set_name(GUTF8String name)
 {
   DEBUG_MSG("GIFFChunk::set_name(): name='" << name << "'\n");
   DEBUG_MAKE_INDENT(3);
@@ -90,9 +90,9 @@ GIFFChunk::set_name(GString name)
 }
 
 bool
-GIFFChunk::check_name(GString name)
+GIFFChunk::check_name(GUTF8String name)
 {
-  GString type;
+  GUTF8String type;
   const int colon=name.search(':');
   if(colon>=0)
   {
@@ -100,7 +100,7 @@ GIFFChunk::check_name(GString name)
     name=name.substr(colon+1,(unsigned int)-1);
   }
  
-  const GString sname=(name.substr(0,4)+"    ").substr(0,4);
+  const GUTF8String sname=(name.substr(0,4)+"    ").substr(0,4);
 
   DEBUG_MSG("GIFFChunk::check_name(): type='" << type << "' name='" << sname << "'\n");
   return (type==GIFFChunk::type || !type.length() && GIFFChunk::type=="FORM")
@@ -167,8 +167,8 @@ GIFFChunk::add_chunk(const GP<GIFFChunk> & chunk, int position)
   }
 }
 
-GString 
-GIFFChunk::decode_name(const GString &name, int &number)
+GUTF8String 
+GIFFChunk::decode_name(const GUTF8String &name, int &number)
 {
   DEBUG_MSG("GIFFChunk::decode_name(): Checking brackets in name '" << name << "'\n");
   DEBUG_MAKE_INDENT(3);
@@ -178,7 +178,7 @@ GIFFChunk::decode_name(const GString &name, int &number)
 
   number=0;
   const int obracket=name.search('[');
-  GString short_name;
+  GUTF8String short_name;
   if (obracket >= 0)
   {
     const int cbracket=name.search(']',obracket+1);
@@ -208,7 +208,7 @@ GIFFChunk::decode_name(const GString &name, int &number)
 }
 
 void
-GIFFChunk::del_chunk(const GString &name)
+GIFFChunk::del_chunk(const GUTF8String &name)
    // The name may contain brackets to specify the chunk number
 {
   DEBUG_MSG("GIFFChunk::del_chunk(): Deleting chunk '" << name <<
@@ -216,7 +216,7 @@ GIFFChunk::del_chunk(const GString &name)
   DEBUG_MAKE_INDENT(3);
 
   int number;
-  const GString short_name=decode_name(name,number);
+  const GUTF8String short_name=decode_name(name,number);
 
   GPosition pos=chunks;
   for(int num=0;pos;++pos)
@@ -229,12 +229,12 @@ GIFFChunk::del_chunk(const GString &name)
   }
   if(! pos)
   {
-    G_THROW("GIFFManager.no_chunk\t"+short_name+"\t"+GString(number)+"\t"+get_name());
+    G_THROW("GIFFManager.no_chunk\t"+short_name+"\t"+GUTF8String(number)+"\t"+get_name());
   }
 }
 
 GP<GIFFChunk>
-GIFFChunk::get_chunk(const GString &name, int * pos_ptr)
+GIFFChunk::get_chunk(const GUTF8String &name, int * pos_ptr)
    // The name may contain brackets to specify the chunk number
 {
   DEBUG_MSG("GIFFChunk::get_chunk(): Returning chunk '" << name <<
@@ -242,7 +242,7 @@ GIFFChunk::get_chunk(const GString &name, int * pos_ptr)
   DEBUG_MAKE_INDENT(3);
 
   int number;
-  const GString short_name=decode_name(name,number);
+  const GUTF8String short_name=decode_name(name,number);
 
   int num=0;
   int pos_num;
@@ -271,7 +271,7 @@ GIFFChunk::get_chunks_number(void)
 }
 
 int
-GIFFChunk::get_chunks_number(const GString &name)
+GIFFChunk::get_chunks_number(const GUTF8String &name)
 {
   DEBUG_MSG("GIFFChunk::get_chunks_number(): Returning number of chunks '" << name <<
      "' in '" << get_name() << "'\n");
@@ -281,7 +281,7 @@ GIFFChunk::get_chunks_number(const GString &name)
     G_THROW("GIFFManager.no_brackets");
   
   int number; 
-  GString short_name=decode_name(name,number);
+  GUTF8String short_name=decode_name(name,number);
    
   int num=0;
   for(GPosition pos=chunks;pos;++pos)
@@ -292,7 +292,7 @@ GIFFChunk::get_chunks_number(const GString &name)
 //************************************************************************
 
 void
-GIFFManager::add_chunk(GString parent_name, const GP<GIFFChunk> & chunk,
+GIFFManager::add_chunk(GUTF8String parent_name, const GP<GIFFChunk> & chunk,
 		       int pos)
       // parent_name is the fully qualified name of the PARENT
       //             IT MAY BE EMPTY
@@ -336,7 +336,7 @@ GIFFManager::add_chunk(GString parent_name, const GP<GIFFChunk> & chunk,
     {
       next_dot=parent_name.length();
     }
-    GString top_name=parent_name.substr(1,next_dot-1);
+    GUTF8String top_name=parent_name.substr(1,next_dot-1);
     if (!top_level->check_name(top_name))
       G_THROW("GIFFManager.wrong_name\t"+top_name);
     parent_name=parent_name.substr(next_dot,(unsigned int)-1);
@@ -350,8 +350,8 @@ GIFFManager::add_chunk(GString parent_name, const GP<GIFFChunk> & chunk,
       EMPTY_LOOP;
     if (end>start)
     {
-      GString name(start,end-start);
-      GString short_name;
+      GUTF8String name(start,end-start);
+      GUTF8String short_name;
       int number=0;
       const int obracket=name.search('[');
       if (obracket >= 0)
@@ -378,7 +378,7 @@ GIFFManager::add_chunk(GString parent_name, const GP<GIFFChunk> & chunk,
 }
 
 void
-GIFFManager::add_chunk(GString name, const TArray<char> & data)
+GIFFManager::add_chunk(GUTF8String name, const TArray<char> & data)
       // name is fully qualified name of the chunk TO BE INSERTED.
       //      it may contain brackets at the end to set the position
       // All the required chunks will be created
@@ -386,7 +386,7 @@ GIFFManager::add_chunk(GString name, const TArray<char> & data)
   DEBUG_MSG("GIFFManager::add_chunk(): adding plain chunk with name='" << name << "'\n");
   DEBUG_MAKE_INDENT(3);
 
-  GString chunk_name;
+  GUTF8String chunk_name;
   const int lastdot=name.rsearch('.');
   if(lastdot < 0)
   {
@@ -426,7 +426,7 @@ GIFFManager::del_chunk(void)
 }
 
 void
-GIFFManager::del_chunk(GString name)
+GIFFManager::del_chunk(GUTF8String name)
       // "name" should be fully qualified, that is contain dots.
       // It may also end with [] to set the chunk order number
 {
@@ -449,7 +449,7 @@ GIFFManager::del_chunk(GString name)
       }
       G_THROW("GIFFManager.wrong_name2\t"+name.substr(1,(unsigned int)-1));
     }
-    const GString top_name=name.substr(1,next_dot-1);
+    const GUTF8String top_name=name.substr(1,next_dot-1);
     if (!top_level->check_name(top_name))
       G_THROW("GIFFManager.wrong_name2\t"+top_name);
     name=name.substr(next_dot+1,(unsigned int)-1);
@@ -462,21 +462,21 @@ GIFFManager::del_chunk(GString name)
     for(start=++end;*end&&(*end!='.');end++)
       EMPTY_LOOP;
     if (end>start && *end=='.')
-      cur_sec=cur_sec->get_chunk(GString(start, end-start));
+      cur_sec=cur_sec->get_chunk(GUTF8String(start, end-start));
     if (!cur_sec)
-      G_THROW("GIFFManager.cant_find\t"+GString(name));
+      G_THROW("GIFFManager.cant_find\t"+GUTF8String(name));
   } while(*end);
    
   if (!start[0])
   {
-    G_THROW(GString("GIFFManager.malformed\t")+name);
+    G_THROW(GUTF8String("GIFFManager.malformed\t")+name);
   }
    
   cur_sec->del_chunk(start);
 }
 
 GP<GIFFChunk>
-GIFFManager::get_chunk(GString name, int * pos_num)
+GIFFManager::get_chunk(GUTF8String name, int * pos_num)
       // "name" should be fully qualified, that is contain dots.
       // It may also end with [] to set the chunk order number
 {
@@ -498,7 +498,7 @@ GIFFManager::get_chunk(GString name, int * pos_num)
       }
       G_THROW("GIFFManager.wrong_name2\t"+name.substr(1,(unsigned int)-1));
     }
-    const GString top_name=name.substr(1,next_dot-1);
+    const GUTF8String top_name=name.substr(1,next_dot-1);
     if (!top_level->check_name(top_name))
       G_THROW("GIFFManager.wrong_name2\t"+top_name);
     name=name.substr(next_dot+1,(unsigned int)-1);
@@ -511,7 +511,7 @@ GIFFManager::get_chunk(GString name, int * pos_num)
     for(start=++end;*end&&(*end!='.');end++)
       EMPTY_LOOP;
     if (end>start)
-      cur_sec=cur_sec->get_chunk(GString(start, end-start), pos_num);
+      cur_sec=cur_sec->get_chunk(GUTF8String(start, end-start), pos_num);
     if (!cur_sec)
       break;
   } while(*end);
@@ -528,7 +528,7 @@ GIFFManager::get_chunks_number(void)
 }
 
 int
-GIFFManager::get_chunks_number(const GString &name)
+GIFFManager::get_chunks_number(const GUTF8String &name)
    // Returns the number of chunks with given fully qualified name
 {
   DEBUG_MSG("GIFFManager::get_chunks_number(): name='" << name << "'\n");
@@ -560,7 +560,7 @@ GIFFManager::load_chunk(IFFByteStream & istr, GP<GIFFChunk> chunk)
   DEBUG_MAKE_INDENT(3);
    
   int chunk_size;
-  GString chunk_id;
+  GUTF8String chunk_id;
   while ((chunk_size=istr.get_chunk(chunk_id)))
   {
     if (istr.check_id(chunk_id))
@@ -594,7 +594,7 @@ GIFFManager::load_file(GP<ByteStream> str)
    
   GP<IFFByteStream> gistr=IFFByteStream::create(str);
   IFFByteStream &istr=*gistr;
-  GString chunk_id;
+  GUTF8String chunk_id;
   if (istr.get_chunk(chunk_id))
   {
     if (chunk_id.substr(0,5) != "FORM:")

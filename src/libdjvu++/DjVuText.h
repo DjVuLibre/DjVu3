@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuText.h,v 1.10 2001-03-06 19:55:42 bcr Exp $
+// $Id: DjVuText.h,v 1.11 2001-04-12 00:25:00 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUTEXT_H
@@ -55,7 +55,7 @@
     @memo Implements support for DjVuImage hidden text.
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: DjVuText.h,v 1.10 2001-03-06 19:55:42 bcr Exp $# */
+    #$Id: DjVuText.h,v 1.11 2001-04-12 00:25:00 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -108,7 +108,7 @@ public:
   private:
     friend class DjVuTXT;
     void cleartext();
-    void normtext(const char *instr, GString &outstr);
+    void normtext(const char *instr, GUTF8String &outstr);
     unsigned int memuse() const;
     static const int version;
     void encode(ByteStream &bs, const Zone * parent=0, const Zone * prev=0) const;
@@ -127,7 +127,7 @@ public:
         {\tt DjVuText::end_of_paragraph} & 037 & US, Unit Separator \\
         {\tt DjVuText::end_of_line}      & 012 & LF: Line Feed
       \end{tabular} */
-  GString textUTF8;
+  GUTF8String textUTF8;
   static const char end_of_column    ;      // VT: Vertical Tab
   static const char end_of_region    ;      // GS: Group Separator
   static const char end_of_paragraph ;      // US: Unit Separator
@@ -184,7 +184,7 @@ public:
 			      bool search_fwd, bool match_case,
 			      bool whole_word=false) const;
 
-  GList<Zone *> find_text_in_rect(GRect target_rect, GString &text) const;
+  GList<Zone *> find_text_in_rect(GRect target_rect, GUTF8String &text) const;
 
   /** Returns the number of bytes needed by this data structure. It's
       used by caching routines to estimate the size of a \Ref{DjVuImage}. */

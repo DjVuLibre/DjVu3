@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: debug.cpp,v 1.21 2001-04-11 16:59:51 bcr Exp $
+// $Id: debug.cpp,v 1.22 2001-04-12 00:25:00 bcr Exp $
 // $Name:  $
 
 #ifdef NO_DEBUG
@@ -237,7 +237,7 @@ OP(const void * const, "0x%08x")
 
 DjVuDebug& DjVuDebug::operator<<(const char * const ptr) 
 {
-  GString buffer(ptr?ptr:"(null)");
+  GUTF8String buffer(ptr?ptr:"(null)");
   if(buffer.length() > 255)
   {
     buffer=buffer.substr(0,252)+"...";
