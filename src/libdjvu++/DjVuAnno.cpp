@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuAnno.cpp,v 1.83 2001-06-14 15:01:06 mchen Exp $
+// $Id: DjVuAnno.cpp,v 1.84 2001-06-14 15:53:04 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -1025,7 +1025,7 @@ DjVuANT::copy(void) const
 //***************************************************************************
 
 void
-DjVuAnno::decode(GP<ByteStream> gbs)
+DjVuAnno::decode(const GP<ByteStream> &gbs)
 {
   GUTF8String chkid;
   GP<IFFByteStream> giff=IFFByteStream::create(gbs);
@@ -1057,13 +1057,13 @@ DjVuAnno::decode(GP<ByteStream> gbs)
 }
 
 void
-DjVuAnno::encode(GP<ByteStream> gbs)
+DjVuAnno::encode(const GP<ByteStream> &gbs)
 {
   GP<IFFByteStream> giff=IFFByteStream::create(gbs);
   IFFByteStream &iff=*giff;
   if (ant)
     {
-#ifndef NO_DEBUG
+#if 0
       iff.put_chunk("ANTa");
       ant->encode(iff);
       iff.close_chunk();
