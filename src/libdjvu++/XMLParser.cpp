@@ -30,19 +30,19 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: XMLAnno.cpp,v 1.16 2001-04-24 17:54:09 jhayes Exp $
+// $Id: XMLParser.cpp,v 1.1 2001-04-24 19:50:38 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
 #pragma implementation
 #endif
 
-#include "XMLAnno.h"
-#include "UnicodeByteStream.h"
+#include "XMLParser.h"
+#include "XMLTags.h"
+#include "ByteStream.h"
 #include "GOS.h"
-#include "GURL.h"
 #include "DjVuDocument.h"
-#include "GMapAreas.h"
+#include "DjVuText.h"
 #include "DjVuAnno.h"
 #include "DjVuFile.h"
 #include "debug.h"
@@ -50,7 +50,103 @@
 #include <ctype.h>
 #include <stdlib.h>
 
+class lt_XMLParser::Anno : public lt_XMLParser
+{
+public:
+  Anno(void);
+  /// Parse the specified tags.
+  virtual void parse(const lt_XMLTags &tags);
+  /// write to disk.
+protected:
+  void ChangeAnno(const lt_XMLTags &map,const GURL &url,const GUTF8String &id,
+    const GUTF8String &width,const GUTF8String &height);
 
+};
+
+// this class writes in a new text layer base on the xml input. 
+// 
+//  note: <HIDDENTEXT> object without any text will remove the text
+//  from that page.
+
+class lt_XMLParser::Text : public lt_XMLParser
+{
+public:
+  Text(void);
+  /// Parse the specified tags.
+  virtual void parse(const lt_XMLTags &tags);
+  /// write to disk.
+protected:
+  void ChangeText(const lt_XMLTags &text,const GURL &url,const GUTF8String &id,
+    const GUTF8String &width,const GUTF8String &height);
+
+};
+
+lt_XMLParser::lt_XMLParser(void) {}
+lt_XMLParser::Anno::Anno(void) {}
+lt_XMLParser::Text::Text(void) {}
+
+GP<lt_XMLParser>
+lt_XMLParser::create_anno(void)
+{
+  return new Anno();
+}
+
+GP<lt_XMLParser>
+lt_XMLParser::create_text(void)
+{
+  return new Text();
+}
+
+void 
+lt_XMLParser::intList(char const *coords, GList<int> &retval)
+{
+  char *ptr=0;
+  if(coords && *coords)
+  {
+    for(unsigned long i=strtoul(coords,&ptr,10);ptr&&ptr!=coords;i=strtoul(coords,&ptr,10))
+    {
+      retval.append(i);
+      for(coords=ptr;isspace(*coords);++coords);
+      if(*coords == ',')
+      {
+        ++coords;
+      }
+      if(!*coords)
+        break;
+    }
+  }
+}
+
+void 
+lt_XMLParser::empty(void)
+{
+  m_files.empty();
+  m_docs.empty();
+}
+
+void 
+lt_XMLParser::save(void)
+{
+  for(GPosition pos=m_docs;pos;++pos)
+  {
+    DjVuDocument &doc=*(m_docs[pos]);
+    GURL url=doc.get_init_url();
+//    GUTF8String name=GOS::url_to_filename(url);
+//    DjVuPrintMessage("Saving file '%s' with new annotations.\n",(const char *)url);
+    const bool bundle=doc.is_bundled()||(doc.get_doc_type()==DjVuDocument::SINGLE_PAGE);
+    doc.save_as(url,bundle);
+  }
+  empty();
+}
+
+void
+lt_XMLParser::parse(GP<ByteStream> &bs)
+{
+  GP<lt_XMLTags> tags=lt_XMLTags::create();
+  tags->init(bs);
+  parse(*tags);
+}
+  
 static inline const GMap<GUTF8String,GMapArea::BorderType> &
 BorderTypeMap(void)
 {
@@ -83,7 +179,7 @@ convertToColor(const char s[])
 }
 
 void
-lt_XMLAnno::ChangeAnno(const lt_XMLTags &map,const GURL &url,const GUTF8String &id,const GUTF8String &width,const GUTF8String &height)
+lt_XMLParser::Anno::ChangeAnno(const lt_XMLTags &map,const GURL &url,const GUTF8String &id,const GUTF8String &width,const GUTF8String &height)
 {
   const GUTF8String url_string((const char *)url);
   DjVuDocument &doc=*(m_docs[url_string]);
@@ -101,7 +197,6 @@ lt_XMLAnno::ChangeAnno(const lt_XMLTags &map,const GURL &url,const GUTF8String &
   {
     xid=id;
   }
-  const char* temp = xid;
   GP<DjVuFile> dfile=doc.get_djvu_file(xid,true);
   if(!dfile)
   {
@@ -373,7 +468,7 @@ lt_XMLAnno::ChangeAnno(const lt_XMLTags &map,const GURL &url,const GUTF8String &
 
   
 void
-lt_XMLAnno::parse(const lt_XMLTags &tags)
+lt_XMLParser::Anno::parse(const lt_XMLTags &tags)
 {
   GPList<lt_XMLTags> Body=tags.getTags("BODY");
   GPosition pos=Body;
@@ -532,3 +627,284 @@ lt_XMLAnno::parse(const lt_XMLTags &tags)
   }
 }
 
+// used to build the zone tree
+GRect make_next_layer(
+  DjVuTXT::Zone *parent, const lt_XMLTags &tag, ByteStream *bs, int height)
+{
+  // the plugin thinks there are only Pages, Lines and Words
+  // so we don't make Paragraphs, Regions and Columns zones
+  // if we did the plugin is not able to search the text but 
+  // DjVuToText writes out all the text anyway
+  DjVuTXT::Zone *child = parent;
+  if(tag.name == "WORD" || tag.name == "LINE")
+  {
+    child = parent->append_child();
+    child->ztype = (tag.name == "WORD") ? DjVuTXT::WORD: DjVuTXT::LINE;
+    child->text_start = bs->tell();
+  }
+  
+  if(tag.name == "WORD")
+  {
+    GList<int> rectArgs;
+    lt_XMLParser::intList(tag.args["coords"], rectArgs);
+    GPosition i = rectArgs;
+    
+    child->rect.xmin = rectArgs[i];
+    child->rect.ymin = height - 1 - rectArgs[++i];
+    child->rect.xmax = rectArgs[++i];
+    child->rect.ymax = height - 1 - rectArgs[++i];
+    child->text_length = tag.raw.length();
+    bs->write((const char*)tag.raw, child->text_length);
+    return child->rect;
+  }
+  else
+  {
+    GRect ret;
+    int set = 0;
+    for(GPosition i = tag.content; i; ++i)
+    {
+      GP<lt_XMLTags> t = tag.content[i].tag;
+      child->rect = make_next_layer(child, *t, bs, height);
+      
+      if(t->name == "LINE")
+      {
+        bs->write("\n", 1);
+      }
+      child->text_length = bs->tell() - child->text_start;
+      
+      // find the size of the rect that holds the zone
+      if(!set)
+      {  // on first pass
+        ret.xmin = child->rect.xmin;
+        ret.ymin = child->rect.ymin;
+        ret.xmax = child->rect.xmax;
+        ret.ymax = child->rect.ymax;
+        set = 1;
+      }
+      else
+      {  // grow the rect if needed
+        if(ret.xmin > child->rect.xmin) ret.xmin = child->rect.xmin;
+        if(ret.ymin > child->rect.ymin) ret.ymin = child->rect.ymin;
+        if(ret.xmax < child->rect.xmax) ret.xmax = child->rect.xmax;
+        if(ret.ymax < child->rect.ymax) ret.ymax = child->rect.ymax;
+      }
+    }
+    return ret; // returns the rect that holds the zone
+  }
+}
+
+// used in debugging to see if the zone tree is built right       
+void step_down(DjVuTXT::Zone *parent)
+{
+  if(parent)
+  {
+    for(GPosition i = parent->children; i; ++i)
+      step_down(&parent->children[i]);
+  }
+}
+
+void 
+lt_XMLParser::Text::ChangeText(const lt_XMLTags &tags, const GURL &url,const GUTF8String &id, const GUTF8String &width,const GUTF8String &height)
+{
+  const GUTF8String url_string((const char *)url);
+  DjVuDocument &doc = *(m_docs[url_string]);
+  GUTF8String xid;
+  
+  if(id.is_int())
+  {
+    const int page = id.toInt();
+    xid = page > 0 ? GUTF8String(page - 1) : GUTF8String("0");
+  }
+  else if(!id.length() || (doc.get_doc_type() == DjVuDocument::SINGLE_PAGE))
+  {
+    xid = "0";
+  }
+  else
+  {
+    xid=id;
+  }
+  
+  GP<DjVuFile> dfile = doc.get_djvu_file(xid,true);
+  if(!dfile)
+  {
+    G_THROW("Failed to get specified page");
+  }
+  
+  dfile->start_decode();
+  dfile->wait_for_finish();
+  
+  GP<DjVuText> text = DjVuText::create();
+  GP<DjVuTXT> txt = text->txt = DjVuTXT::create();
+  
+  // to store the new text
+  GP<ByteStream> textbs = ByteStream::create(); 
+  
+  txt->page_zone.text_start = 0;
+  txt->page_zone.rect = make_next_layer(&txt->page_zone, tags, textbs, atoi(height));
+  textbs->write("\0", 1);
+  long len = textbs->tell();
+  txt->page_zone.text_length = len;
+  textbs->seek(0,SEEK_SET);
+  textbs->read(txt->textUTF8.getbuf(len), len);
+  
+  dfile->set_modified(true);
+  dfile->reset();
+  GP<ByteStream> mbs = ByteStream::create();
+  dfile->text = mbs;
+  text->encode(dfile->text);
+  m_files.append(dfile);
+}
+
+void
+lt_XMLParser::Text::parse(const lt_XMLTags &tags)
+{
+  GPList<lt_XMLTags> Body=tags.getTags("BODY");
+  GPosition pos=Body;
+  
+  if(!pos || (pos != Body.lastpos()))
+  {
+    G_THROW( ERR_MSG("XMLAnno.extra_body") );
+  }
+  
+  GP<lt_XMLTags> & GBody = Body[pos];
+  if(!GBody)
+  {
+    G_THROW( ERR_MSG("XMLAnno.no_body") );
+  }
+  
+  GPList<lt_XMLTags> Objects = GBody->getTags("OBJECT");
+  
+  for(GPosition Objpos=Objects;Objpos;++Objpos)
+  {
+    lt_XMLTags const * const GObject=Objects[Objpos];
+    if(GObject)
+    {
+      GPosition textPos = GObject->contains("HIDDENTEXT");
+      if(textPos)
+      {
+        
+        // Map of attributes to value (e.g. "width" --> "500")
+        const GMap<GUTF8String,GUTF8String> &args=GObject->args;
+        GURL codebase;
+        {
+          DEBUG_MSG("Setting up codebase... m_codebase = " << m_codebase << "\n");
+          GPosition codebasePos=args.contains("codebase");
+          // If user specified a codebase attribute, assume it is correct (absolute URL):
+          //  the GURL constructor will throw an exception if it isn't
+          if(codebasePos)
+          {
+            codebase=GURL::UTF8(args[codebasePos]);
+          }else if (m_codebase.is_dir())
+          {
+            codebase=m_codebase;
+          }else
+          {
+            codebase=GURL::Filename::UTF8(GOS::cwd());
+          }
+          DEBUG_MSG("codebase = " << codebase << "\n");
+        }
+        // the data attribute specifies the input file.  This can be
+        //  either an absolute URL (starts with file:/) or a relative
+        //  URL (for now, just a path and file name).  If it's absolute,
+        //  our GURL will adequately wrap it.  If it's relative, we need
+        //  to use the codebase attribute to form an absolute URL first.
+        GPosition datapos=args.contains("data");
+        if(datapos)
+        {
+          bool isDjVuType=false;
+          GPosition typePos=args.contains("type");
+          if(typePos)
+          {
+            if(args[typePos] != "image/x.djvu")
+            {
+              DjVuPrintError("%s","Ignoring image/x.djvu OBJECT tag.\n");
+              continue;
+            }
+            isDjVuType=true;
+          }
+          
+          GURL url;
+          const GURL::UTF8 simpleURL(args[datapos]);
+          if (simpleURL.is_empty())
+          {
+            url=simpleURL;
+          }else if(args[datapos][0] == '/')
+          {
+            url=codebase.base()+args[datapos];
+          }else            // relative URL
+          {
+            url=codebase+args[datapos];
+            DEBUG_MSG("relative URL converted to absolute URL= " << url << "\n");
+          }
+          
+          GUTF8String width;
+          {
+            GPosition widthPos=args.contains("width");
+            if(widthPos)
+            {
+              width=args[widthPos];
+            }
+          }
+          
+          GUTF8String height;
+          {
+            GPosition heightPos=args.contains("height");
+            if(heightPos)
+            {
+              height=args[heightPos];
+            }
+          }
+          
+          GUTF8String page;
+          {
+            GPosition paramPos=GObject->contains("PARAM");
+            if(paramPos)
+            {
+              GPList<lt_XMLTags> Params=(*(GObject))[paramPos];
+              for(GPosition loc=Params;loc;++loc)
+              {
+                if(Params[loc]->args.contains("name") && Params[loc]->args.contains("value"))
+                {
+                  GUTF8String name=(Params[loc]->args["name"]);
+                  if(name.downcase() == "flags")
+                  {
+                    GMap<GUTF8String,GUTF8String> args;
+                    lt_XMLTags::ParseValues((const char *)(Params[loc]->args["value"]),args,true);
+                    if(args.contains("page"))
+                    {
+                      page=args["page"];
+                    }
+                  }
+                }
+              }
+            }
+          }
+          
+          {
+            GUTF8String url_string((char const *)url);
+            GPosition docspos=m_docs.contains(url_string);
+            if(! docspos)
+            {
+              GP<DjVuDocument> doc=DjVuDocument::create_wait(url);
+              if(! doc->wait_for_complete_init())
+              {
+                GUTF8String mesg( ERR_MSG("XMLAnno.fail_init") "\t");
+                mesg+=GUTF8String((const char *)url);
+                G_THROW(mesg);
+              }
+              m_docs[url_string]=doc;
+            }
+          }
+          
+          // loop through the hidden text - there should only be one 
+          // if there are more ??only the last one will be saved??
+          GPList<lt_XMLTags> textTags = (*(GObject))[textPos];
+          for(GPosition i = textTags; i; ++i)
+          {
+            ChangeText(*textTags[i], url, page, width, height);
+          } // for(i)
+        } // if(dataPos) 
+      } // if(textPos)
+    } // if(GObject)
+  } // for(Object)
+}

@@ -245,15 +245,14 @@ UnicodeByteStream.o: UnicodeByteStream.cpp \
  ../../src/include/DjVu.h GUnicode.h GString.h \
  GContainer.h GException.h GSmartPointer.h \
  ByteStream.h Arrays.h
-XMLAnno.o: XMLAnno.cpp XMLAnno.h XMLTags.h \
+XMLParser.o: XMLParser.cpp XMLParser.h \
  GContainer.h GException.h DjVuGlobal.h \
- ../../src/include/DjVu.h GSmartPointer.h \
- GString.h GURL.h Arrays.h GThreads.h \
- UnicodeByteStream.h GUnicode.h ByteStream.h \
- GOS.h DjVuDocument.h DjVuPort.h \
- GMapAreas.h GRect.h DjVuAnno.h DjVuFile.h \
- DjVuInfo.h DjVuPalette.h GPixmap.h \
- debug.h
+ ../../src/include/DjVu.h GSmartPointer.h GURL.h \
+ GString.h Arrays.h GThreads.h XMLTags.h \
+ ByteStream.h GOS.h DjVuDocument.h \
+ DjVuPort.h DjVuText.h GMapAreas.h GRect.h \
+ DjVuAnno.h DjVuFile.h DjVuInfo.h \
+ DjVuPalette.h GPixmap.h debug.h
 XMLTags.o: XMLTags.cpp XMLTags.h GContainer.h \
  GException.h DjVuGlobal.h \
  ../../src/include/DjVu.h GSmartPointer.h \

@@ -30,81 +30,59 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: XMLEdit.cpp,v 1.1 2001-04-24 17:54:09 jhayes Exp $
+// $Id: XMLParser.h,v 1.1 2001-04-24 19:50:38 bcr Exp $
 // $Name:  $
 
+#ifndef _LT_XMLPARSER__
+#define _LT_XMLPARSER__
+
 #ifdef __GNUC__
-#pragma implementation
+#pragma interface
 #endif
 
-#include "XMLEdit.h"
-#include "UnicodeByteStream.h"
-#include "GOS.h"
+#include "GContainer.h"
 #include "GURL.h"
-#include "DjVuDocument.h"
-#include "DjVuFile.h"
-#include "debug.h"
-#include <stdio.h>
-#include <ctype.h>
-#include <stdlib.h>
 
-void 
-lt_XMLEdit::intList(char const *coords, GList<int> &retval)
-{
-  char *ptr=0;
-  if(coords && *coords)
-  {
-    for(unsigned long i=strtoul(coords,&ptr,10);ptr&&ptr!=coords;i=strtoul(coords,&ptr,10))
-    {
-      retval.append(i);
-      for(coords=ptr;isspace(*coords);++coords);
-      if(*coords == ',')
-      {
-        ++coords;
-      }
-      if(!*coords)
-        break;
-    }
-  }
-}
+class ByteStream;
+class lt_XMLTags;
+class lt_XMLContents;
+class DjVuFile;
+class DjVuDocument;
+// this is the base class for using XML to change DjVu Docs.
 
-void 
-lt_XMLEdit::empty(void)
-{
-  m_files.empty();
-  m_docs.empty();
-}
 
-void 
-lt_XMLEdit::save(void)
+class lt_XMLParser : public GPEnabled
 {
-  for(GPosition pos=m_docs;pos;++pos)
-  {
-    DjVuDocument &doc=*(m_docs[pos]);
-    GURL url=doc.get_init_url();
-//    GUTF8String name=GOS::url_to_filename(url);
-//    DjVuPrintMessage("Saving file '%s' with new annotations.\n",(const char *)url);
-    const bool bundle=doc.is_bundled()||(doc.get_doc_type()==DjVuDocument::SINGLE_PAGE);
-    doc.save_as(url,bundle);
-  }
-  empty();
-}
+public:
+  class Text;
+  class Anno;
+protected:
+  lt_XMLParser(void);
+public:
+  static GP<lt_XMLParser> create_anno(void);
+  static GP<lt_XMLParser> create_text(void);
+  /// Parse the specified bytestream.
+  void parse(GP<ByteStream> &bs);
+  /// Parse the specified tags - this one does all the work
+  virtual void parse(const lt_XMLTags &tags) = 0;
+  /// write to disk.
+  void save(void);
+  /// erase.
+  void empty(void);
 
-void
-lt_XMLEdit::parse(const char fname[],const GURL &codebase)
-{
-  m_codebase=codebase;
-  GP<lt_XMLTags> tags=lt_XMLTags::create();
-  const GURL::UTF8 url(fname,codebase);
-  tags->init(url);
-  parse(*tags);
-}
+  // helper function for args
+  static void intList(char const *coords, GList<int> &retval);
+protected:
 
-void
-lt_XMLEdit::parse(GP<ByteStream> &bs)
-{
-  GP<lt_XMLTags> tags=lt_XMLTags::create();
-  tags->init(bs);
-  parse(*tags);
-}
-  
+  // we may want to make these list of modified file static so
+  // they only needed to be loaded and saved once.
+  GPList<DjVuFile> m_files;
+  GMap<GUTF8String,GP<DjVuDocument> > m_docs;
+  GURL m_codebase;
+private: // dummy stuff
+  static void parse(ByteStream *bs);
+};
+
+#endif /* _LT_XMLPARSER__ */
+
+

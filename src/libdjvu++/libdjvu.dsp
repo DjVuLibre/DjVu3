@@ -331,19 +331,11 @@ SOURCE=.\UnicodeByteStream.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\XMLAnno.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\XMLEdit.cpp
+SOURCE=.\XMLParser.cpp
 # End Source File
 # Begin Source File
 
 SOURCE=.\XMLTags.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\XMLText.cpp
 # End Source File
 # Begin Source File
 
@@ -527,19 +519,11 @@ SOURCE=.\UnicodeByteStream.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\XMLAnno.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\XMLEdit.h
+SOURCE=.\XMLParser.h
 # End Source File
 # Begin Source File
 
 SOURCE=.\XMLTags.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\XMLText.h
 # End Source File
 # Begin Source File
 
