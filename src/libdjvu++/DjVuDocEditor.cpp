@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: DjVuDocEditor.cpp,v 1.31 2000-05-10 17:03:06 bcr Exp $
+//C- $Id: DjVuDocEditor.cpp,v 1.32 2000-05-10 22:03:20 bcr Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -383,6 +383,16 @@ DjVuDocEditor::insert_file(const char * file_name, const char * parent_id,
 bool
 DjVuDocEditor::insert_file(const char * file_name, bool is_page,
 			   int & file_pos, GMap<GString, GString> & name2id)
+{
+  return insert_file_type(file_name,
+    is_page ? DjVmDir::File::PAGE : DjVmDir::File::INCLUDE,
+    file_pos, name2id);
+}
+
+bool
+DjVuDocEditor::insert_file_type(
+  const char * file_name, DjVmDir::File::FILE_TYPE page_type,
+			   int & file_pos, GMap<GString, GString> & name2id)
       // First it will insert the 'file_name' at position 'file_pos'.
       //
       // Then it will process all the INCL chunks in the file and try to do
@@ -454,8 +464,7 @@ DjVuDocEditor::insert_file(const char * file_name, bool is_page,
 
 	 // Create a file record with the chosen ID
       GP<DjVmDir::File> file;
-      file=new DjVmDir::File(id, id, id, is_page ? DjVmDir::File::PAGE :
-			     DjVmDir::File::INCLUDE);
+      file=new DjVmDir::File(id, id, id, page_type);
 
 	 // And insert it into the directory
       dir->insert_file(file, file_pos);
@@ -1034,8 +1043,11 @@ DjVuDocEditor::file_thumbnails(void)
 
       // Generate thumbnails if they're missing due to some reason.
    int thumb_num=get_thumbnails_num();
-   int size=thumb_num>0 ? get_thumbnails_size() : 128;
-   if (thumb_num!=get_pages_num()) generate_thumbnails(size);
+   int size=(thumb_num>0) ? get_thumbnails_size() : 128;
+   if (thumb_num!=get_pages_num())
+   {
+     generate_thumbnails(size);
+   }
 
    DEBUG_MSG("filing thumbnails\n");
 
@@ -1051,7 +1063,8 @@ DjVuDocEditor::file_thumbnails(void)
    while(true)
    {
       GPosition pos;
-      if (!thumb_map.contains(page_to_id(page_num), pos))
+      GString id=page_to_id(page_num);
+      if (!thumb_map.contains(id, pos))
 	 THROW("Internal error: Can't find thumbnail for page "+GString(page_num));
       TArray<char> & data=*(TArray<char> *) thumb_map[pos];
       iff->put_chunk("TH44");
@@ -1062,8 +1075,12 @@ DjVuDocEditor::file_thumbnails(void)
       if (image_num>=ipf || page_num>=pages_num)
       {
 	    // Get unique ID for this file
-         GString id;
-         id.format("thumb%03d.djvu",page_num);
+         int i=id.rsearch('.');
+         if(i<=0)
+         {
+           i=id.length();
+         }
+         id=id.substr(0,i)+".thumb";
 	 id=find_unique_id(id);
 
 	    // Create a file record with the chosen ID
@@ -1178,8 +1195,16 @@ DjVuDocEditor::save_as(const char * where, bool bundled)
       // Otherwise we will remove the thumbnails completely because
       // we really don't want to deal with documents, which have only
       // some of their pages thumbnailed.
-   if (get_thumbnails_num()==get_pages_num()) file_thumbnails();
-   else remove_thumbnails();
+   if ( ! get_pages_num())
+   {
+     THROW("Attempt to save empty file");
+   }else if (get_thumbnails_num()==get_pages_num())
+   {
+     file_thumbnails();
+   }else
+   {
+     remove_thumbnails();
+   }
    
    GURL save_doc_url;
    GString save_doc_name;
@@ -1254,11 +1279,14 @@ DjVuDocEditor::save_as(const char * where, bool bundled)
    } else if (save_doc_type==INDIRECT)
    {
       DEBUG_MSG("Saving in INDIRECT format to '" << save_doc_url << "'\n");
-      int pages_num=get_pages_num();
-      for(int page_num=0;page_num<pages_num;page_num++)
+      GPList<DjVmDir::File> files_list=djvm_dir->get_files_list();
+//      int pages_num=get_pages_num();
+//      for(int page_num=0;page_num<pages_num;page_num++)
+      for(GPosition fpos=files_list;fpos;++fpos)
       {
-	 GURL file_url=page_to_url(page_num);
-	 GString file_id=djvm_dir->page_to_file(page_num)->id;
+         GP<DjVmDir::File> &file=files_list[fpos];
+	 GString file_id=file->id;
+	 GURL file_url=id_to_url(file_id);
 	 GP<DataPool> file_pool;
 	 GPosition pos;
 	 if (files_map.contains(file_id, pos))
@@ -1331,7 +1359,10 @@ DjVuDocEditor::save_as(const char * where, bool bundled)
       
 	 // Also update DjVmDir (to reflect changes in offsets)
       djvm_dir=doc->get_djvm_dir();
-   } else THROW("Can't save the document. Use 'Save As'");
+   } else 
+   {
+     THROW("Can't save the document. Use 'Save As'");
+   }
 
       // Now, after we have saved the document w/o any error, detach DataPools,
       // which are in the 'File's list to save memory. Detach everything.
