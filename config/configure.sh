@@ -296,7 +296,7 @@ check_thread_option()
 extern "C" { extern void *(*__get_eh_context_ptr)(void), *__new_eh_context(void); }
 void main() { __get_eh_context_ptr = &__new_eh_context; }
 EOF
-       if ( $CXX $temp.cpp -o $temp 1>/dev/null 2>&1 ) 
+       if ( $CXX $temp.cpp -o $temp 1>$log 2>&1 ) 
        then
           echo yes.
        else
@@ -400,21 +400,21 @@ check_library()
 {
   func=$1
   shift
-  echon "Searching library for function $func() ... "
+  echon "Searching library containing $func() ... "
   cat > $temp.cpp <<EOF
 extern "C" int $func(void);
 int main(void) { return $func(); }
 EOF
   for lib
   do
-    if ( $CXX $OPT $DEFS $WARN $temp.cpp $lib -o $temp  2>&1 ) 
+    if ( $CXX $OPT $DEFS $WARN $temp.cpp $lib -o $temp 1>$log 2>&1 ) 
     then
       echo $lib
       LIBS="$LIBS $lib"
       return 0
     fi
-    shift
   done
+  echo "not found."
   echo 2>&1 "$conf: Function $func() not found."
   exit 1
 }
@@ -434,7 +434,7 @@ check_make_stlib()
     MAKE_STLIB=${MAKE_STLIB-$AR cq}
     
     echon Searching how to build a static library ...
-    if ( $MAKE_STLIB /tmp/$$.a /tmp/$$.o >/dev/null 2>&1 ) 
+    if ( $MAKE_STLIB /tmp/$$.a /tmp/$$.o >$log 2>&1 ) 
     then
         echo $MAKE_STLIB
     else
@@ -445,7 +445,7 @@ check_make_stlib()
     fi
 
     echon Searching RANLIB program ...
-    if ( $RANLIB /tmp/$$.a >/dev/null 2>&1 )
+    if ( $RANLIB /tmp/$$.a >$log 2>&1 )
     then
         echo $RANLIB
     else
