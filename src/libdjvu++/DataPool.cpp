@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.cpp,v 1.29 1999-09-28 15:18:28 eaf Exp $
+//C- $Id: DataPool.cpp,v 1.30 1999-09-28 16:24:49 leonb Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -1013,8 +1013,8 @@ private:
    long			position;
    
    char			buffer[512];
-   int			buffer_size;
-   int			buffer_pos;
+   size_t		buffer_size;
+   size_t		buffer_pos;
 
       // Cancel C++ default stuff
    PoolByteStream & operator=(const PoolByteStream &);
@@ -1034,16 +1034,24 @@ PoolByteStream::PoolByteStream(DataPool * xdata_pool) :
 size_t
 PoolByteStream::read(void *data, size_t size)
 {
-   if (buffer_pos==buffer_size)
-   {
-      buffer_size=data_pool->get_data(buffer, position, 512);
+  if (buffer_pos >= buffer_size) {
+    if (size >= sizeof(buffer)) {
+      // Direct read
+      size = data_pool->get_data(data, position, size);
+      position += size;
+      return size;
+    } else {
+      // Refill buffer
+      buffer_size = data_pool->get_data(buffer, position, sizeof(buffer));
       buffer_pos=0;
-   }
-   if (size>buffer_size-buffer_pos) size=buffer_size-buffer_pos;
-   memcpy(data, buffer+buffer_pos, size);
-   buffer_pos+=size;
-   position+=size;
-   return size;
+    }
+  }
+  if (buffer_pos + size >= buffer_size)
+    size = buffer_size - buffer_pos;
+  memcpy(data, buffer+buffer_pos, size);
+  buffer_pos += size;
+  position += size;
+  return size;
 }
 
 size_t
