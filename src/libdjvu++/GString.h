@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.h,v 1.40 2001-04-13 00:41:16 bcr Exp $
+// $Id: GString.h,v 1.41 2001-04-13 01:49:20 praveen Exp $
 // $Name:  $
 
 #ifndef _GSTRING_H_
@@ -57,7 +57,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.40 2001-04-13 00:41:16 bcr Exp $# */
+    #$Id: GString.h,v 1.41 2001-04-13 01:49:20 praveen Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -178,14 +178,14 @@ private:
 };
 
 inline GP<GStringRep>
-GStringRep::blank(const unsigned int sz = 0) const
+GStringRep::blank(const unsigned int sz) const
 { 
   return create(sz);
 }
 
 inline GP<GStringRep>
 GStringRep::toThis(
-  const GP<GStringRep> &rep,const GP<GStringRep> &locale=0) const
+  const GP<GStringRep> &rep,const GP<GStringRep> &locale) const
 {
    return (locale?(locale->toThis(rep)):rep);
 }
@@ -245,7 +245,7 @@ public:
 };
 
 inline GP<GStringRep> 
-GStringRep::Native::blank(const unsigned int sz = 0) const
+GStringRep::Native::blank(const unsigned int sz) const
 {
    return GStringRep::create(sz,(GStringRep::Native *)0);
 }
@@ -312,7 +312,7 @@ public:
 };
 
 inline GP<GStringRep> 
-GStringRep::UTF8::blank(const unsigned int sz = 0) const
+GStringRep::UTF8::blank(const unsigned int sz) const
 {
    return GStringRep::create(sz,(GStringRep::UTF8 *)0);
 }
@@ -782,7 +782,7 @@ public:
   /// Appends character #ch# to the string.
   GUTF8String& operator+= (char ch)
   {
-    return (*this=GStringRep::UTF8::create(*this,GStringRep::UTF8::create(&ch,1)));
+      return (*this=GStringRep::UTF8::create((const char*)*this,GStringRep::UTF8::create(&ch,1)));
   }
 
   /// Appends the null terminated character array #str# to the string.
@@ -875,7 +875,7 @@ public:
   /// Appends character #ch# to the string.
   GNativeString& operator+= (char ch)
   {
-    return (*this=GStringRep::Native::create(*this,GStringRep::UTF8::create(&ch,1)));
+    return (*this=GStringRep::Native::create((const char*)*this,GStringRep::UTF8::create(&ch,1)));
   }
   /// Appends the null terminated character array #str# to the string.
   GNativeString& operator+= (const char *str)
