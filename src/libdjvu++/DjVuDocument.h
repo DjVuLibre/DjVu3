@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.h,v 1.1.2.2 1999-04-26 19:20:46 eaf Exp $
+//C- $Id: DjVuDocument.h,v 1.1.2.3 1999-04-28 20:22:53 eaf Exp $
  
 #ifndef _DJVUDOCUMENT_H
 #define _DJVUDOCUMENT_H
@@ -52,7 +52,9 @@ public:
       // DjVm format related stuff
    bool		is_djvm(void) const;
    bool		djvm_contains(const GURL & url) const;
+   GURL		djvm_get_url(void) const;
    GURL		djvm_get_first_page_url(void) const;
+   GP<DataPool>	djvm_get_init_data_pool(void) const;
 
       // Routines for saving
    TArray<char>	get_djvm_data(void);
@@ -64,7 +66,6 @@ public:
    virtual GP<DataRange>request_data(const DjVuPort * source, const GURL & url);
    virtual void		notify_chunk_done(const DjVuPort * source, const char * name);
 private:
-   GURL			dir_url;
    GCache<GURL, DjVuFile> * cache;
    DjVuSimplePort	* simple_port;
    bool			readonly;
@@ -107,6 +108,20 @@ DjVuDocument::is_djvm(void) const
    if (!readonly)
       THROW("The document is being modified. Request for type is irrelevant.");
    return djvm;
+}
+
+inline GP<DataPool>
+DjVuDocument::djvm_get_init_data_pool(void) const
+{
+   if (!djvm) THROW("The document is not in DJVM format.");
+   return djvm_pool;
+}
+
+inline GURL
+DjVuDocument::djvm_get_url(void) const
+{
+   if (!djvm) THROW("The document is not in DJVM format.");
+   return djvm_doc_url;
 }
 
 inline GP<DjVuNavDir>
