@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.82 2001-04-25 22:15:35 praveen Exp $
+// $Id: GString.cpp,v 1.83 2001-04-25 22:58:51 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -416,10 +416,10 @@ GStringRep::tocase(
   }
   if(ptr<eptr)
   {
-    const int n=(int)((size_t)ptr-(size_t)data)-1;
+    const int n=(int)((size_t)ptr-(size_t)data);
     unsigned char *buf;
     GPBuffer<unsigned char> gbuf(buf,n+(1+size-n)*6);
-    if(n)
+    if(n>0)
     {
       strncpy((char *)buf,data,n);
     }
