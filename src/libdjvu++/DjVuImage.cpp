@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: DjVuImage.cpp,v 1.42 2000-10-04 01:38:02 bcr Exp $
+//C- $Id: DjVuImage.cpp,v 1.43 2000-10-06 21:47:21 fcrary Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -362,7 +362,7 @@ GP<DataPool>
 DjVuImageNotifier::request_data(const DjVuPort *src, const GURL & url)
 {
   if (url!=stream_url)
-    G_THROW("Cannot decode this DjVu document using the backward-compatibility mode.");
+    G_THROW("DjVuImage.not_decode");
   return stream_pool;
 }
 
@@ -393,7 +393,7 @@ DjVuImage::decode(ByteStream & str, DjVuInterface *notifier)
   DEBUG_MSG("DjVuImage::decode(): decoding old way...\n");
   DEBUG_MAKE_INDENT(3);
   if (file) 
-    G_THROW("DjVuImage::decode should not be called after DjVuImage::connect");
+    G_THROW("DjVuImage.bad_call");
   GP<DjVuImageNotifier> pport = new DjVuImageNotifier(notifier);
   pport->stream_url="internal://fake/fake.djvu";
   pport->stream_pool=new DataPool();
@@ -412,7 +412,7 @@ DjVuImage::decode(ByteStream & str, DjVuInterface *notifier)
   if (file->is_decode_failed())
     G_THROW("EOF");  // a guess
   if (!file->is_decode_ok())
-    G_THROW("Multiple errors while decoding");
+    G_THROW("DjVuImage.mult_error");
   DEBUG_MSG("decode DONE\n");
 }
 
@@ -771,7 +771,7 @@ DjVuImage::stencil(GPixmap *pm, const GRect &rect,
           int lastx = 0;
           int colorindex = fg->colordata[components[pos]];
           if (colorindex >= palettesize)
-            G_THROW("Corrupted file (color index is greater than palette size)");
+            G_THROW("DjVuImage.corrupted");
           // Gather relevant components and relevant rectangle
           GList<int> compset;
           GRect comprect;
@@ -955,7 +955,7 @@ do_bitmap(const DjVuImage &dimg, BImager get,
   // Sanity
   if (! ( all.contains(rect.xmin, rect.ymin) &&
           all.contains(rect.xmax-1, rect.ymax-1) ))
-    G_THROW("(DjVuImage::get_pixmap) Illegal target rectangles");
+    G_THROW("DjVuImage.bad_rect");
   // Check for integral reduction
   int red;
   int w = dimg.get_width();
@@ -997,7 +997,7 @@ do_pixmap(const DjVuImage &dimg, PImager get,
   // Sanity
   if (! ( all.contains(rect.xmin, rect.ymin) &&
           all.contains(rect.xmax-1, rect.ymax-1) ))
-    G_THROW("(DjVuImage::get_pixmap) Illegal target rectangles");
+    G_THROW("DjVuImage.bad_rect2");
   // Check for integral reduction
   int red, w=0, h=0, rw=0, rh=0;
   w = dimg.get_width();

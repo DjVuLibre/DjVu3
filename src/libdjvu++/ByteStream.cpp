@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: ByteStream.cpp,v 1.29 2000-10-04 01:38:01 bcr Exp $
+//C- $Id: ByteStream.cpp,v 1.30 2000-10-06 21:47:21 fcrary Exp $
 // - Author: Leon Bottou, 04/1997
 
 #ifdef __GNUC__
@@ -45,13 +45,13 @@ ByteStream::seek(long offset, int whence, bool nothrow)
     case SEEK_SET: nwhere=0; break;
     case SEEK_CUR: nwhere=ncurrent; break;
     case SEEK_END: nwhere=ncurrent-offset-1; break;
-    default: G_THROW("Illegal argument in ByteStream::seek");
+    default: G_THROW("ByteStream.bad_arg");       //  Illegal argument in ByteStream::seek
     }
   nwhere += offset;
   if (nwhere < ncurrent) 
     {
       if (nothrow) return -1;
-      G_THROW("Seeking backwards is not supported by this ByteStream");
+      G_THROW("ByteStream.backward");             //  Seeking backwards is not supported by this ByteStream
     }
   while (nwhere>ncurrent)
     {
@@ -62,7 +62,7 @@ ByteStream::seek(long offset, int whence, bool nothrow)
       bytes = read(buffer, bytes);
       ncurrent += bytes;
       if (ncurrent!=tell())
-        G_THROW("Seeking works funny on this ByteStream (ftell() acts strange)");
+        G_THROW("ByteStream.seek");               //  Seeking works funny on this ByteStream (ftell() acts strange)
       if (bytes==0)
         G_THROW("EOF");
     }
@@ -82,9 +82,9 @@ ByteStream::readall(void *buffer, size_t size)
       // - eaf
       if(nitems < 0) 
 #ifndef UNDER_CE
-        G_THROW(strerror(errno));
+        G_THROW(strerror(errno));               //  (No error in the DjVuMessageFile)
 #else
-        G_THROW("ByteStream::readall, read error.");
+        G_THROW("ByteStream.read_error");       //  ByteStream::readall, read error.
 #endif
       if (nitems == 0)
         break;
@@ -103,7 +103,7 @@ ByteStream::writall(const void *buffer, size_t size)
     {
       size_t nitems = write(buffer, size);
       if (nitems == 0)
-        G_THROW("Unknown error in ByteStream::write");
+        G_THROW("ByteStream.write_error");      //  Unknown error in ByteStream::write
       total += nitems;
       size -= nitems; 
       buffer = (void*)((char*)buffer + nitems);
@@ -140,9 +140,9 @@ ByteStream::write8 (unsigned int card)
   c[0] = (card) & 0xff;
   if (write((void*)c, sizeof(c)) != sizeof(c))
 #ifndef UNDER_CE
-        G_THROW(strerror(errno));
+        G_THROW(strerror(errno));                     //  (No error in the DjVuMessageFile)
 #else
-        G_THROW("ByteStream::write8, write error.");
+        G_THROW("ByteStream.write\t8");               //  ByteStream::write8, write error.
 #endif
 }
 
@@ -154,9 +154,9 @@ ByteStream::write16(unsigned int card)
   c[1] = (card) & 0xff;
   if (writall((void*)c, sizeof(c)) != sizeof(c))
 #ifndef UNDER_CE
-        G_THROW(strerror(errno));
+        G_THROW(strerror(errno));                     //  (No error in the DjVuMessageFile)
 #else
-        G_THROW("ByteStream::write16, write error.");
+  G_THROW("ByteStream.write\t16"):                    //  ByteStream::write16, write error.
 #endif
 }
 
@@ -169,9 +169,9 @@ ByteStream::write24(unsigned int card)
   c[2] = (card) & 0xff;
   if (writall((void*)c, sizeof(c)) != sizeof(c))
 #ifndef UNDER_CE
-        G_THROW(strerror(errno));
+        G_THROW(strerror(errno));                     //  (No error in the DjVuMessageFile)
 #else
-        G_THROW("ByteStream::write24, write error.");
+        G_THROW("ByteStream.write\t24"):              //  ByteStream::write24, write error.
 #endif
 }
 
@@ -185,9 +185,9 @@ ByteStream::write32(unsigned int card)
   c[3] = (card) & 0xff;
   if (writall((void*)c, sizeof(c)) != sizeof(c))
 #ifndef UNDER_CE
-        G_THROW(strerror(errno));
+        G_THROW(strerror(errno));                     //  (No error in the DjVuMessageFile)
 #else
-        G_THROW("ByteStream::write32, write error.");
+        G_THROW("ByteStream.write\t32"):              //  ByteStream::write32, write error.
 #endif
 }
 
@@ -245,7 +245,7 @@ StdioByteStream::StdioByteStream(FILE *f, const char *mode, bool closeme)
       case 'a': can_write=1; break;
       case '+': can_read=can_write=1; break;
       case 'b': break;
-      default: G_THROW("Illegal mode in StdioByteStream");
+      default: G_THROW("ByteStream.bad_mode");        //  Illegal mode in StdioByteStream
       }
   tell();
 }
@@ -264,7 +264,7 @@ StdioByteStream::StdioByteStream(const char *filename, const char *mode)
       case 'a': can_write=1; dash=stdout; break;
       case '+': can_read=can_write=1; dash=0; break;
       case 'b': break;
-      default: G_THROW("Illegal mode in StdioByteStream");
+      default: G_THROW("ByteStream.bad_mode");        //  Illegal mode in StdioByteStream
       }
   if (strcmp(filename,"-") != 0) 
     {
@@ -273,11 +273,11 @@ StdioByteStream::StdioByteStream(const char *filename, const char *mode)
       {
 #ifndef UNDER_CE
 	 char buffer[4096];
-	 sprintf(buffer, "Failed to open '%s': %s",
-		 filename, strerror(errno));
-	 G_THROW(buffer);
+	 sprintf(buffer, "ByteStream.open_fail\t%s\t%s",
+		               filename, strerror(errno));
+	 G_THROW(buffer);                                   //  Failed to open '%s': %s
 #else
-    G_THROW("StdioByteStream::StdioByteStream, failed to open file.");
+   G_THROW("ByteStream.open_fail2");                  //  StdioByteStream::StdioByteStream, failed to open file.
 #endif
 
 
@@ -288,7 +288,7 @@ StdioByteStream::StdioByteStream(const char *filename, const char *mode)
       must_close = 0;
       fp = dash;
       if (!fp)
-        G_THROW("Illegal mode for stdin/stdout file descriptor");
+        G_THROW("ByteStream.bad_mode2");              //  Illegal mode for stdin/stdout file descriptor
     }
   tell();
 }
@@ -303,7 +303,7 @@ size_t
 StdioByteStream::read(void *buffer, size_t size)
 {
   if (!can_read)
-    G_THROW("StdioByteStream not opened for writing");
+    G_THROW("ByteStream.no_read");                    //  StdioByteStream not opened for reading
 #ifndef UNDER_CE
 restart:
 #endif
@@ -315,9 +315,9 @@ restart:
 	goto restart;
 #endif
 #ifndef UNDER_CE
-        G_THROW(strerror(errno));
+        G_THROW(strerror(errno));                     //  (No error in the DjVuMessageFile)
 #else
-        G_THROW("StdioByteStream::read, read error.");
+        G_THROW("ByteStream.read_error2");            //  StdioByteStream::read, read error.
 #endif
     }
   pos += nitems;
@@ -328,7 +328,7 @@ size_t
 StdioByteStream::write(const void *buffer, size_t size)
 {
   if (!can_write)
-    G_THROW("StdioByteStream not opened for writing");
+    G_THROW("ByteStream.no_write");                   //  StdioByteStream not opened for writing
 #ifndef UNDER_CE
  restart:
 #endif
@@ -340,9 +340,9 @@ StdioByteStream::write(const void *buffer, size_t size)
 	goto restart;
 #endif
 #ifndef UNDER_CE
-        G_THROW(strerror(errno));
+        G_THROW(strerror(errno));                     //  (No error in the DjVuMessageFile)
 #else
-        G_THROW("StdioByteStream::write, write error.");
+        G_THROW("ByteStream.write_error2");           //  StdioByteStream::write, write error.
 #endif
     }
   pos += nitems;
@@ -354,9 +354,9 @@ StdioByteStream::flush()
 {
   if (fflush(fp) < 0)
 #ifndef UNDER_CE
-        G_THROW(strerror(errno));
+        G_THROW(strerror(errno));                     //  (No error in the DjVuMessageFile)
 #else
-        G_THROW("StdioByteStream::flush, flush error.");
+        G_THROW("ByteStream.flush_error");            //  StdioByteStream::flush, flush error.
 #endif
 }
 
@@ -384,9 +384,9 @@ StdioByteStream::seek(long offset, int whence, bool nothrow)
     {
       if (nothrow) return -1;
 #ifndef UNDER_CE
-        G_THROW(strerror(errno));
+        G_THROW(strerror(errno));                     //  (No error in the DjVuMessageFile)
 #else
-        G_THROW("StdioByteStream::seek, seek error.");
+        G_THROW("ByteStream.seek_error");             //  StdioByteStream::seek, seek error.
 #endif
     }
   tell();
@@ -523,11 +523,11 @@ MemoryByteStream::seek(long offset, int whence, bool nothrow)
     case SEEK_SET: nwhere = 0; break;
     case SEEK_CUR: nwhere = where; break;
     case SEEK_END: nwhere = bsize; break;
-    default: G_THROW("Illegal argument in MemoryByteStream::seek()");
+    default: G_THROW("bad_arg\tMemoryByteStream::seek()");      // Illegal argument in MemoryByteStream::seek()
     }
   nwhere += offset;
   if (nwhere<0)
-    G_THROW("Attempt to seek before the beginning of the file");
+    G_THROW("ByteStream.seek_error2");                          //  Attempt to seek before the beginning of the file
   where = nwhere;
   return 0;
 }
@@ -578,7 +578,7 @@ StaticByteStream::read(void *buffer, size_t sz)
 size_t 
 StaticByteStream::write(const void *buffer, size_t sz)
 {
-  G_THROW("Attempt to write into a StaticByteStream");
+  G_THROW("ByteStream.write_error3");                           //  Attempt to write into a StaticByteStream
   return 0;
 }
 
@@ -591,11 +591,11 @@ StaticByteStream::seek(long offset, int whence, bool nothrow)
     case SEEK_SET: nwhere = 0; break;
     case SEEK_CUR: nwhere = where; break;
     case SEEK_END: nwhere = bsize; break;
-    default: G_THROW("Illegal argument in StaticByteStream::seek()");
+    default: G_THROW("bad_arg\tStaticByteStream::seek()");      //  Illegal argument to StaticByteStream::seek()
     }
   nwhere += offset;
   if (nwhere<0)
-    G_THROW("Attempt to seek before the beginning of the file");
+    G_THROW("ByteStream.seek_error2");                          //  Attempt to seek before the beginning of the file
   where = nwhere;
   return 0;
 }

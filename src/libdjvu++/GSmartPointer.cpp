@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: GSmartPointer.cpp,v 1.14 2000-09-18 17:10:20 bcr Exp $
+//C- $Id: GSmartPointer.cpp,v 1.15 2000-10-06 21:47:21 fcrary Exp $
 // - Author: Leon Bottou, 05/1997
 
 /* Put this into *one* file, which instantiates all the required containers
@@ -36,14 +36,14 @@ static GCriticalSection gcsCounter;
 GPEnabled::~GPEnabled()
 {
   if (count > 0)
-    G_THROW("Suspicious destruction of referenced GPEnabled object");
+    G_THROW("GSmartPointer.suspicious");
 }
 
 void
 GPEnabled::destroy()
 {
   if (count >= 0)
-    G_THROW("Suspicious destruction of referenced GPEnabled object");
+    G_THROW("GSmartPointer.suspicious");
   delete this;
 }
 

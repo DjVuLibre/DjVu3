@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: DjVuInfo.cpp,v 1.9 2000-09-18 17:10:13 bcr Exp $
+//C- $Id: DjVuInfo.cpp,v 1.10 2000-10-06 21:47:21 fcrary Exp $
 
 
 #ifdef __GNUC__
@@ -51,7 +51,7 @@ DjVuInfo::decode(ByteStream &bs)
   if (size == 0)
     G_THROW("EOF");
   if (size < 5)
-    G_THROW("DjVu Decoder: Corrupted file (truncated INFO chunk)");
+    G_THROW("DjVuInfo.corrupt_file");
   // Analyze data with backward compatibility in mind!
   if (size>=2)
     width = (buffer[0]<<8) + buffer[1];

@@ -9,10 +9,10 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GThreads.cpp,v 1.50 2000-09-18 17:10:21 bcr Exp $
+//C- $Id: GThreads.cpp,v 1.51 2000-10-06 21:47:21 fcrary Exp $
 
 
-// **** File "$Id: GThreads.cpp,v 1.50 2000-09-18 17:10:21 bcr Exp $"
+// **** File "$Id: GThreads.cpp,v 1.51 2000-10-06 21:47:21 fcrary Exp $"
 // This file defines machine independent classes
 // for running and synchronizing threads.
 // - Author: Leon Bottou, 01/1998
@@ -23,6 +23,7 @@
 
 #include "GThreads.h"
 #include "GException.h"
+#include "DjVuMessage.h"
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -83,7 +84,7 @@ start(void *arg)
       G_CATCH(ex)
         {
           ex.perror();
-          fprintf(stderr, "GThreads: uncaught exception.");
+          fprintf(stderr, DjVuMsg.LookUp("GThreads.uncaught"));
 #ifdef _DEBUG
           abort();
 #endif
@@ -92,7 +93,7 @@ start(void *arg)
     }
   catch(...)
     {
-      fprintf(stderr, "GThreads: unrecognized uncaught exception.");
+      fprintf(stderr, DjVuMsg.LookUp("GThreads.unrecognized"));
 #ifdef _DEBUG
       abort();
 #endif
@@ -193,7 +194,7 @@ GMonitor::leave()
 {
   DWORD self = GetCurrentThreadId();
   if (ok && (count>0 || self!=locker))
-    G_THROW("Monitor was not acquired by this thread (GMonitor::broadcast)");
+    G_THROW("GThreads.not_acq_broad");
   count += 1;
   if (count > 0)
     {
@@ -210,7 +211,7 @@ GMonitor::signal()
     {
       DWORD self = GetCurrentThreadId();
       if (count>0 || self!=locker)
-        G_THROW("Monitor was not acquired by this thread (GMonitor::signal)");
+        G_THROW("GThreads.not_acq_signal");
       for (struct thr_waiting *w=head; w; w=w->next)
         if (w->waiting) 
           {
@@ -228,7 +229,7 @@ GMonitor::broadcast()
     {
       DWORD self = GetCurrentThreadId();
       if (count>0 || self!=locker)
-        G_THROW("Monitor was not acquired by this thread (GMonitor::broadcast)");
+        G_THROW("GThreads.not_acq_broad");
       for (struct thr_waiting *w=head; w; w=w->next)
         if (w->waiting)
             {
@@ -244,7 +245,7 @@ GMonitor::wait()
   // Check state
   DWORD self = GetCurrentThreadId();
   if (count>0 || self!=locker)
-    G_THROW("Monitor was not acquired by this thread (GMonitor::wait)");
+    G_THROW("GThreads.not_acq_wait");
   // Wait
   if (ok)
     {
@@ -279,7 +280,7 @@ GMonitor::wait(unsigned long timeout)
   // Check state
   DWORD self = GetCurrentThreadId();
   if (count>0 || self!=locker)
-    G_THROW("Monitor was not acquired by this thread (GMonitor::wait)");
+    G_THROW("GThreads.not_acq_wait");
   // Wait
   if (ok)
     {
@@ -395,7 +396,7 @@ GThread::start(void *arg)
       G_CATCH(ex)
         {
           ex.perror();
-          fprintf(stderr, "GThreads: uncaught exception.");
+          fprintf(stderr, DjVuMsg.LookUp("GThreads.uncaught"));
 #ifdef _DEBUG
           abort();
 #endif
@@ -404,7 +405,7 @@ GThread::start(void *arg)
     }
   catch(...)
     {
-      fprintf(stderr, "GThreads: unrecognized uncaught exception.");
+      fprintf(stderr, DjVuMsg.LookUp("GThreads.unrecognized"));
 #ifdef _DEBUG
       abort();
 #endif
@@ -492,7 +493,7 @@ GMonitor::leave()
   ThreadID self;
   GetCurrentThread(&self);
   if (ok && (count>0 || self!=locker))
-    G_THROW("Monitor was not acquired by this thread (GMonitor::leave)");
+    G_THROW("GThreads.not_acq_leave");
   ThreadBeginCritical();
   if (++count > 0)
     macthread_wakeup(&wlock, 1);
@@ -505,7 +506,7 @@ GMonitor::signal()
   ThreadID self;
   GetCurrentThread(&self);
   if (count>0 || self!=locker)
-    G_THROW("Monitor was not acquired by this thread (GMonitor::signal)");
+    G_THROW("GThreads.not_acq_signal");
   ThreadBeginCritical();
   macthread_wakeup(&wsig, 1);
   ThreadEndCritical();
@@ -517,7 +518,7 @@ GMonitor::broadcast()
   ThreadID self;
   GetCurrentThread(&self);
   if (count>0 || self!=locker)
-    G_THROW("Monitor was not acquired by this thread (GMonitor::broadcast)");
+    G_THROW("GThreads.not_acq_broad");
   ThreadBeginCritical();
   macthread_wakeup(&wsig, 0);
   ThreadEndCritical();
@@ -530,7 +531,7 @@ GMonitor::wait()
   ThreadID self;
   GetCurrentThread(&self);
   if (count>0 || locker!=self)
-    G_THROW("Monitor was not acquired by this thread (GMonitor::wait)");
+    G_THROW("GThreads.not_acq_wait");
   // Wait
   if (ok)
     {
@@ -605,7 +606,7 @@ GThread::start(void *arg)
       G_CATCH(ex)
         {
           ex.perror();
-          fprintf(stderr, "GThreads: uncaught exception.");
+          fprintf(stderr, DjVuMsg.LookUp("GThreads.uncaught"));
 #ifdef _DEBUG
           abort();
 #endif
@@ -615,7 +616,7 @@ GThread::start(void *arg)
     }
   catch(...)
     {
-      fprintf(stderr, "GThreads: unrecognized uncaught exception.");
+          fprintf(stderr, DjVuMsg.LookUp("GThreads.unrecognized"));
 #ifdef _DEBUG
       abort();
 #endif
@@ -729,7 +730,7 @@ GMonitor::leave()
 {
   pthread_t self = pthread_self();
   if (ok && (count>0 || !pthread_equal(locker, self)))
-    G_THROW("Monitor was not acquired by this thread (GMonitor::broadcast)");
+    G_THROW("GThreads.not_acq_broad");
   count += 1;
   if (count > 0)
     {
@@ -746,7 +747,7 @@ GMonitor::signal()
     {
       pthread_t self = pthread_self();
       if (count>0 || !pthread_equal(locker, self))
-        G_THROW("Monitor was not acquired by this thread (GMonitor::signal)");
+        G_THROW("GThreads.not_acq_signal");
       pthread_cond_signal(&cond);
     }
 }
@@ -758,7 +759,7 @@ GMonitor::broadcast()
     {
       pthread_t self = pthread_self();
       if (count>0 || !pthread_equal(locker, self))
-        G_THROW("Monitor was not acquired by this thread (GMonitor::broadcast)");
+        G_THROW("GThreads.not_acq_broad");
       pthread_cond_broadcast(&cond);
     }
 }
@@ -769,7 +770,7 @@ GMonitor::wait()
   // Check
   pthread_t self = pthread_self();
   if (count>0 || !pthread_equal(locker, self))
-    G_THROW("Monitor was not acquired by this thread (GMonitor::wait)");
+    G_THROW("GThreads.not_acq_wait");
   // Wait
   if (ok)
     {
@@ -790,7 +791,7 @@ GMonitor::wait(unsigned long timeout)
   // Check
   pthread_t self = pthread_self();
   if (count>0 || !pthread_equal(locker, self))
-    G_THROW("Monitor was not acquired by this thread (GMonitor::wait)");
+    G_THROW("GThreads.not_acq_wait");
   // Wait
   if (ok)
     {
@@ -1200,7 +1201,7 @@ cotask_yield()
   while (q != n);
   // abort on deadlock
   if (count == 0) {
-    fprintf(stderr,"PANIC: Cothreads deadlock\n");
+    fprintf(stderr, DjVuMsg.LookUp("GThreads.panic") );
     abort();
   }
   // select
@@ -1373,7 +1374,7 @@ cotask_get_eh_context()
     return curtask->ehctx;
   else if (maintask)
     return maintask->ehctx;
-  fprintf(stderr, "Panic COTHREADS : exception context not found\n");
+  fprintf(stderr, DjVuMsg.LookUp("GThreads.co_panic") );
   abort();
 }
 #endif
@@ -1386,7 +1387,7 @@ void
 GThread::set_scheduling_callback(void (*call)(int))
 {
   if (scheduling_callback)
-    G_THROW("GThread::set_scheduling_callback called twice");
+    G_THROW("GThreads.dupl_callback");
   scheduling_callback = call;
 }
 
@@ -1472,7 +1473,7 @@ starttwo(GThread *thr)
       G_CATCH(ex)
         {
           ex.perror();
-          fprintf(stderr, "GThreads: uncaught exception.");
+          fprintf(stderr, DjVuMsg.LookUp("GThreads.uncaught"));
 #ifdef _DEBUG
           abort();
 #endif
@@ -1482,7 +1483,7 @@ starttwo(GThread *thr)
     }
   catch(...)
     {
-      fprintf(stderr, "GThreads: unrecognized uncaught exception.");
+          fprintf(stderr, DjVuMsg.LookUp("GThreads.unrecognized"));
 #ifdef _DEBUG
       abort();
 #endif
@@ -1598,7 +1599,7 @@ GMonitor::leave()
 {
   void *self = GThread::current();
   if (ok && (count>0 || self!=locker))
-    G_THROW("Monitor was not acquired by this thread (GMonitor::leave)");
+    G_THROW("GThreads.not_acq_leave");
   if (++count > 0 && wlock > 0)
     cotask_wakeup((void*)&wlock, 1);
 }
@@ -1608,7 +1609,7 @@ GMonitor::signal()
 {
   void *self = GThread::current();
   if (count>0 || self!=locker)
-    G_THROW("Monitor was not acquired by this thread (GMonitor::signal)");
+    G_THROW("GThreads.not_acq_signal");
   if (wsig > 0)
     {
       cotask_wakeup((void*)&wsig, 1);
@@ -1622,7 +1623,7 @@ GMonitor::broadcast()
 {
   void *self = GThread::current();
   if (count>0 || self!=locker)
-    G_THROW("Monitor was not acquired by this thread (GMonitor::broadcast)");
+    G_THROW("GThreads.not_acq_broad");
   if (wsig > 0)
     {
       cotask_wakeup((void*)&wsig, 0);
@@ -1637,7 +1638,7 @@ GMonitor::wait()
   // Check state
   void *self = GThread::current();
   if (count>0 || locker!=self)
-    G_THROW("Monitor was not acquired by this thread (GMonitor::wait)");
+    G_THROW("GThreads.not_acq_wait");
   // Wait
   if (ok)
     {
@@ -1668,7 +1669,7 @@ GMonitor::wait(unsigned long timeout)
   // Check state
   void *self = GThread::current();
   if (count>0 || locker!=self)
-    G_THROW("Monitor was not acquired by this thread (GMonitor::wait)");
+    G_THROW("GThreads.not_acq_wait");
   // Wait
   if (ok)
     {

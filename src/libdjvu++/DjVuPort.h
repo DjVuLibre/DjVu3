@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuPort.h,v 1.29 2000-09-18 17:10:14 bcr Exp $
+//C- $Id: DjVuPort.h,v 1.30 2000-10-06 21:47:21 fcrary Exp $
  
 #ifndef _DJVUPORT_H
 #define _DJVUPORT_H
@@ -43,7 +43,7 @@
     more than one "client" working with the same document, and the document
     should send the information to each of the clients. This could be done by
     means of callback {\em lists}, of course, but we want to achieve more
-    bulletproof results: we want to be sure that the client, that we're about
+    bulletproof results: we want to be sure that the client that we're about
     to contact is still alive, and is not being destroyed by another thread.
     Besides, we are going to call these "callbacks" from many places, from
     many different classes.  Maintaining multi-thread safe callback lists is
@@ -56,7 +56,7 @@
     where \Ref{DjVuDocument} can get the data from the hard drive itself not
     disturbing the document's creator.
 
-    Two class implement a general communication mechanism: \Ref{DjVuPort} and
+    Two classes implement a general communication mechanism: \Ref{DjVuPort} and
     \Ref{DjVuPortcaster}. Any sender and recipient of requests should be a
     subclass of \Ref{DjVuPort}.  \Ref{DjVuPortcaster} maintains a map of
     routes between \Ref{DjVuPort}s, which should be configured by somebody
@@ -71,7 +71,7 @@
     @memo DjVu decoder communication mechanism.
     @author Andrei Erofeev <eaf@geocities.com>\\
             L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuPort.h,v 1.29 2000-09-18 17:10:14 bcr Exp $# */
+    @version #$Id: DjVuPort.h,v 1.30 2000-10-06 21:47:21 fcrary Exp $# */
 //@{
 
 class DjVuPort;
@@ -201,10 +201,11 @@ public:
 	  is done and how long the decoding will continue.  Argument #done# is
 	  a number from 0 to 1 reflecting the progress. */
    virtual void		notify_decode_progress(const DjVuPort * source, float done);
+
       /** This is the standard types for defining what to do in case of errors.
           This is only used by some of the subclasses, but it needs to be 
           defined here to guarantee all subclasses use the same enum types.
-          In general, many errors are none recoverable.  Using a setting
+          In general, many errors are non recoverable.  Using a setting
           other than ABORT may just result in even more errors. */
    enum ErrorRecoveryAction {ABORT=0,SKIP_PAGES=1,SKIP_CHUNKS=2,KEEP_ALL=3 }; 
       //@}
@@ -317,7 +318,7 @@ public:
 
       /** Removes the specified port from all routes. It will no longer
 	  be able to receive or generate messages and will be considered
-          {\bf "dead"} by \Ref{is_port_alive}() function. */
+    {\bf "dead"} by \Ref{is_port_alive}() function. */
    void		del_port(const DjVuPort * port);
    
       /** Adds route from #src# to #dst#. Whenever a request is
@@ -368,11 +369,13 @@ public:
 	  function in each of the ports from the destination list starting from
 	  the closest until one of them returns non-empty \Ref{GURL}. */
    virtual GURL		id_to_url(const DjVuPort * source, const char * id);
+
       /** Computes destination list for #source# and calls the corresponding
 	  function in each of the ports from the destination list starting from
 	  the closest until one of them returns non-zero pointer to
 	  \Ref{DjVuFile}. */
    virtual GPBase	id_to_file(const DjVuPort * source, const char * id);
+
       /** Computes destination list for #source# and calls the corresponding
 	  function in each of the ports from the destination list starting from
 	  the closest until one of them returns non-zero \Ref{DataPool}. */
@@ -419,6 +422,7 @@ public:
 	  function in each of the ports from the destination list starting from
 	  the closest. */
    virtual void		notify_decode_progress(const DjVuPort * source, float done);
+
 private:
       // We use these 'void *' to minimize template instantiations.
    friend class DjVuPort;

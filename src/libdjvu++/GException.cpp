@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: GException.cpp,v 1.19 2000-09-19 19:06:51 mrosen Exp $
+//C- $Id: GException.cpp,v 1.20 2000-10-06 21:47:21 fcrary Exp $
 
 
 #ifdef __GNUC__
@@ -27,9 +27,10 @@
 #include <new.h>
 #endif
 #include "GException.h"
+#include "DjVuMessage.h"
 #include "debug.h"
 
-// File "$Id: GException.cpp,v 1.19 2000-09-19 19:06:51 mrosen Exp $"
+// File "$Id: GException.cpp,v 1.20 2000-10-06 21:47:21 fcrary Exp $"
 // - Author: Leon Bottou, 05/1997
 
 GException::GException() 
@@ -38,7 +39,7 @@ GException::GException()
 }
 
 const char * const
-GException::outofmemory = "Out of memory";
+GException::outofmemory = "GException.outofmemory";
 
 GException::GException(const GException & exc) 
   : file(exc.file), func(exc.func), line(exc.line)
@@ -108,7 +109,7 @@ void
 GException::perror(const char *msg) const
 {
   fflush(NULL);
-  fprintf(stderr, "*** %s", get_cause());
+  fprintf(stderr, "*** %s", DjVuMsg.LookUp( get_cause() ));
   if (file && line>0)
     fprintf(stderr, "\n*** (%s:%d)", file, line);    
   else if (file)

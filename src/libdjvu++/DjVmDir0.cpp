@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: DjVmDir0.cpp,v 1.8 2000-09-18 17:10:07 bcr Exp $
+//C- $Id: DjVmDir0.cpp,v 1.9 2000-10-06 21:47:21 fcrary Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -96,7 +96,7 @@ DjVmDir0::add_file(const char * name, bool iff_file, int offset, int size)
    DEBUG_MSG("DjVmDir0::add_file(): name='" << name << "', iff=" << iff_file <<
 	     ", offset=" << offset << "\n");
    
-   if (strchr(name, '/')) G_THROW("File name may not contain slashes.");
+   if (strchr(name, '/')) G_THROW("DjVmDir0.no_slash");   //  File name may not contain slashes.
    
    GP<FileRec> file=new FileRec(name, iff_file, offset, size);
    name2file[name]=file;

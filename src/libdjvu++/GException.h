@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GException.h,v 1.18 2000-09-18 17:10:16 bcr Exp $
+//C- $Id: GException.h,v 1.19 2000-10-06 21:47:21 fcrary Exp $
 
 
 #ifndef _GEXCEPTION_H_
@@ -71,7 +71,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@geocities.com> -- fixed message memory allocation.
     @version 
-    #$Id: GException.h,v 1.18 2000-09-18 17:10:16 bcr Exp $# */
+    #$Id: GException.h,v 1.19 2000-10-06 21:47:21 fcrary Exp $# */
 //@{
 
 #include "DjVuGlobal.h"
@@ -92,17 +92,23 @@ public:
       by the predefined macros #__FILE__#, #__LINE__#, and (G++ and EGCS only)
       #__PRETTY_FUNCTION__#.  */
   GException (const char *cause, const char *file=0, int line=0, const char *func=0);
+
   /** Copy Constructor. */
   GException (const GException & exc);
+  
   /** Null Constructor. */
   GException ();
+  
   /** Destructor. */
   virtual ~GException(void);
+  
   /** Copy Operator. */
   GException & operator=(const GException & exc);
+  
   /** Prints an error message on stderr.
       @param msg: string incorporated into the error message. */
   void perror(const char *msg = 0) const;
+  
   /** Returns the string describing the cause of the exception.  The returned
       pointer is never null.  Exception handlers should not rely on the value
       of the string #cause#.  As a convention however, string #"EOF"# is used
@@ -112,17 +118,22 @@ public:
       in the future. They all will be small strings with only uppercase
       characters. */
   const char* get_cause(void) const;
+
   /** Returns the function name from which the exception was thrown.
       A null pointer is returned if no function name is available. */
   const char* get_function(void) const { return func; };
+  
   /** Returns the file name from which the exception was thrown.
       A null pointer is returned if no file name is available. */
   const char* get_file(void) const { return file; };
+  
   /** Returns the line number from which the exception was thrown.
       A zero is returned if no line number is available. */
   int get_line(void) const { return line; };
+  
   //  Magic cause string
   static const char * const outofmemory;
+
 private:
   const char *cause;
   const char *file;

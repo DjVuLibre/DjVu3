@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GBitmap.h,v 1.23 2000-09-18 17:10:15 bcr Exp $
+//C- $Id: GBitmap.h,v 1.24 2000-10-06 21:47:21 fcrary Exp $
 
 #ifndef _GBITMAP_H_
 #define _GBITMAP_H_
@@ -45,7 +45,7 @@ class GMonitor;
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: GBitmap.h,v 1.23 2000-09-18 17:10:15 bcr Exp $#
+    #$Id: GBitmap.h,v 1.24 2000-10-06 21:47:21 fcrary Exp $#
 
  */
 //@{
@@ -482,7 +482,7 @@ GBitmap::operator[](int row)
   if (row<0 || row>=nrows) {
 #ifdef DEBUG
     if (zerosize < bytes_per_row + border)
-      G_THROW("debug: zerobuffer is too small");
+      G_THROW("GBitmap.zero_small");
 #endif
     return zerobuffer + border;
   }
@@ -496,7 +496,7 @@ GBitmap::operator[](int row) const
   if (row<0 || row>=nrows) {
 #ifdef DEBUG
     if (zerosize < bytes_per_row + border)
-      G_THROW("debug: zerobuffer is too small");
+      G_THROW("GBitmap.zero_small");
 #endif
     return zerobuffer + border;
   }

@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: GURL.cpp,v 1.39 2000-10-03 00:12:53 mrosen Exp $
+//C- $Id: GURL.cpp,v 1.40 2000-10-06 21:47:21 fcrary Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -124,7 +124,7 @@ GURL::init(void)
    {
       GString proto=protocol();
       if (!proto.length())
-        G_THROW("URL '"+url+"' does not contain a protocol prefix.");
+        G_THROW("GURL.no_protocol\t"+url);
 
 	 // Below we have to make this complex test to detect URLs really
 	 // referring to *local* files. Surprisingly, file://hostname/dir/file
@@ -146,12 +146,9 @@ GURL::init(void)
 
 	    // Do double conversion
 	 GString tmp=GOS::url_to_filename(url);
-	 if (!tmp.length())
-           G_THROW("Failed to convert URL to filename.");
-
+	 if (!tmp.length()) G_THROW("GURL.fail_to_file");
 	 url=GOS::filename_to_url(tmp);
-	 if (!url.length())
-           G_THROW("Failed to convert filename back to URL.");
+	 if (!url.length()) G_THROW("GURL.fail_to_URL");
 
 	    // Return the argument back
 	 url+=arg;

@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: DjVuPalette.cpp,v 1.12 2000-09-18 17:10:13 bcr Exp $
+//C- $Id: DjVuPalette.cpp,v 1.13 2000-10-06 21:47:21 fcrary Exp $
 
 
 #ifdef __GNUC__
@@ -173,9 +173,9 @@ int
 DjVuPalette::compute_palette(int maxcolors, int minboxsize)
 {
   if (!hcube)
-    G_THROW("Color histogram not found");
+    G_THROW("DjVuPalette.no_color	");
   if (maxcolors<1 || maxcolors>MAXPALETTESIZE)
-    G_THROW("Unrealistic number of colors");
+    G_THROW("DjVuPalette.many_colors");
   
   // Paul Heckbert: "Color Image Quantization for Frame Buffer Display", 
   // SIGGRAPH '82 Proceedings, page 297.  (also in ppmquant)
@@ -330,7 +330,7 @@ int
 DjVuPalette::color_to_index_slow(const unsigned char *bgr)
 {
   int ncolors = palette.size();
-  if (! ncolors) G_THROW("Palette is not initialized");
+  if (! ncolors) G_THROW("DjVuPalette.not_init");
   PColor *pal = palette;
   // Should be able to do better
   int found = 0;
@@ -450,11 +450,11 @@ DjVuPalette::decode(ByteStream &bs)
   // Code version
   int version = bs.read8();
   if ( (version & 0x7f) != DJVUPALETTEVERSION)
-    G_THROW("Unrecognized version tag in palette data");
+    G_THROW("DjVuPalette.bad_version");
   // Code palette
   int palettesize = bs.read16();
   if (palettesize<0 || palettesize>MAXPALETTESIZE)
-    G_THROW("Corrupted foreground color palette");
+    G_THROW("DjVuPalette.bad_palette");
   palette.resize(0,palettesize-1);
   for (int c=0; c<palettesize; c++)
     {
@@ -470,14 +470,14 @@ DjVuPalette::decode(ByteStream &bs)
     {
       int datasize = bs.read24();
       if (datasize<0)
-        G_THROW("Corrupted foreground color data");
+        G_THROW("DjVuPalette.bad_palette");
       colordata.resize(0,datasize-1);
       BSByteStream bsb(bs);
       for (int d=0; d<datasize; d++)
         {
           short s = bsb.read16();
           if (s<0 || s>=palettesize)
-            G_THROW("Corrupted foreground color data");        
+            G_THROW("DjVuPalette.bad_palette");        
           colordata[d] = s;
         }
     }
@@ -493,7 +493,7 @@ int main(int argc, char **argv)
   G_TRY
     {
       if (argc!=4)
-        G_THROW("Usage: quant <ncol> <minbox> <ppmfile>");
+        G_THROW("DjVuPalette.test_usage");
       int maxcolors = atoi(argv[1]);
       int minboxsize = atoi(argv[2]);
       StdioByteStream ibs(argv[3],"rb");

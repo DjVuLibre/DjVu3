@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: GString.cpp,v 1.21 2000-09-19 19:06:51 mrosen Exp $
+//C- $Id: GString.cpp,v 1.22 2000-10-06 21:47:21 fcrary Exp $
 
 
 #ifdef __GNUC__
@@ -30,7 +30,7 @@
 
 #include "GString.h"
 
-// File "$Id: GString.cpp,v 1.21 2000-09-19 19:06:51 mrosen Exp $"
+// File "$Id: GString.cpp,v 1.22 2000-10-06 21:47:21 fcrary Exp $"
 // - Author: Leon Bottou, 04/1997
 
 GStringRep *
@@ -230,7 +230,7 @@ GString::format(const char *fmt, va_list args)
   {
     // This isn't as fatal since it is on the stack, but we
     // definitely should stop the current operation.
-    G_THROW("Memory Overwrite.  Program in unstable state.");
+    G_THROW("GString.overwrite");
   }
 #endif
   // Go altering the string
@@ -372,7 +372,7 @@ hash(const GString &str)
 void 
 GString::throw_illegal_subscript()
 {
-  G_THROW("Illegal subscript in GString::operator[]");
+  G_THROW("GString.bad_subscript");
 }
 
 

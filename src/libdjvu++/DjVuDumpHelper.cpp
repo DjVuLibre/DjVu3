@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDumpHelper.cpp,v 1.8 2000-10-04 01:38:01 bcr Exp $
+//C- $Id: DjVuDumpHelper.cpp,v 1.9 2000-10-06 21:47:21 fcrary Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -131,22 +131,22 @@ display_djvm_dirm(ByteStream & out_str, IFFByteStream & iff,
   dir->decode(iff);
   GPList<DjVmDir::File> list = dir->get_files_list();
   if (dir->is_indirect())
-    {
-      printf(out_str, "Document directory (indirect, %d files %d pages)", 
-	     dir->get_files_num(), dir->get_pages_num());
-      for (GPosition p=list; p; ++p)
-	printf(out_str, "\n%s%s -> %s", (const char*)head, 
-	       (const char*)list[p]->id, (const char*)list[p]->name );
-    }
+  {
+    printf(out_str, "Document directory (indirect, %d files %d pages)", 
+	                  dir->get_files_num(), dir->get_pages_num());
+    for (GPosition p=list; p; ++p)
+      printf(out_str, "\n%s%s -> %s", (const char*)head, 
+                      (const char*)list[p]->id, (const char*)list[p]->name );
+  }
   else
-    {
-      printf(out_str, "Document directory (bundled, %d files %d pages)", 
-	     dir->get_files_num(), dir->get_pages_num());
-      djvminfo.dir = dir;
-      djvminfo.map.empty();
-      for (GPosition p=list; p; ++p)
-	djvminfo.map[list[p]->offset] = list[p];
-    }
+  {
+    printf(out_str, "Document directory (bundled, %d files %d pages)", 
+	                  dir->get_files_num(), dir->get_pages_num());
+    djvminfo.dir = dir;
+    djvminfo.map.empty();
+    for (GPosition p=list; p; ++p)
+      djvminfo.map[list[p]->offset] = list[p];
+  }
 }
 
 static void
@@ -245,41 +245,41 @@ display_chunks(ByteStream & out_str, IFFByteStream &iff,
   GPMap<int,DjVmDir::File> djvmmap;
   int rawoffset;
   GMap<GString, int> counters;
-
+  
   while ((size = iff.get_chunk(id, &rawoffset)))
+  {
+    if (!counters.contains(id)) counters[id]=0;
+    else counters[id]++;
+    
+    GString msg;
+    msg.format("%s%s [%d] ", (const char *)head, (const char *)id, size);
+    printf(out_str, "%s", (const char *)msg);
+    // Display DJVM is when adequate
+    if (djvminfo.dir)
     {
-      if (!counters.contains(id)) counters[id]=0;
-      else counters[id]++;
-      
-      GString msg;
-      msg.format("%s%s [%d] ", (const char *)head, (const char *)id, size);
-      printf(out_str, "%s", (const char *)msg);
-      // Display DJVM is when adequate
-      if (djvminfo.dir)
-	{
-	  GP<DjVmDir::File> rec = djvminfo.map[rawoffset];
-	  if (rec)
-	     printf(out_str, "{%s}", (const char*) rec->id);
-	}
-      // Test chunk type
-      iff.full_id(fullid);
-      for (int i=0; disproutines[i].id; i++)
-        if (fullid == disproutines[i].id || id == disproutines[i].id)
-          {
-            int n = msg.length();
-	    while (n++ < 14+(int) head.length()) putchar(out_str, ' ');
-	    if (!iff.composite()) printf(out_str, "    ");
-            (*disproutines[i].subr)(out_str, iff, head2,
-				    size, djvminfo, counters[id]);
-            break;
-          }
+      GP<DjVmDir::File> rec = djvminfo.map[rawoffset];
+      if (rec)
+        printf(out_str, "{%s}", (const char*) rec->id);
+    }
+    // Test chunk type
+    iff.full_id(fullid);
+    for (int i=0; disproutines[i].id; i++)
+      if (fullid == disproutines[i].id || id == disproutines[i].id)
+      {
+        int n = msg.length();
+        while (n++ < 14+(int) head.length()) putchar(out_str, ' ');
+        if (!iff.composite()) printf(out_str, "    ");
+        (*disproutines[i].subr)(out_str, iff, head2,
+                                size, djvminfo, counters[id]);
+        break;
+      }
       // Default display of composite chunk
       printf(out_str, "\n");
       if (iff.composite())
-	display_chunks(out_str, iff, head2, djvminfo);
+        display_chunks(out_str, iff, head2, djvminfo);
       // Terminate
       iff.close_chunk();
-    }
+  }
 }
 
 GP<ByteStream>

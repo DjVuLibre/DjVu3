@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: ZPCodec.cpp,v 1.10 2000-09-18 17:10:24 bcr Exp $
+//C- $Id: ZPCodec.cpp,v 1.11 2000-10-06 21:47:21 fcrary Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -905,9 +905,9 @@ ZPCodec::outbit(int bit)
       if (++scount == 8)
         {
           if (!encoding)
-            G_THROW("ZPCodec has not been created for encoding");
+            G_THROW("ZPCodec.no_encoding");
           if (bs->write((void*)&byte, 1) != 1)
-            G_THROW("ZPCodec write error");
+            G_THROW("ZPCodec.write_error");
           scount = 0;
           byte = 0;
         }

@@ -10,7 +10,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: DataPool.cpp,v 1.53 2000-10-04 01:38:01 bcr Exp $
+//C- $Id: DataPool.cpp,v 1.54 2000-10-06 21:47:21 fcrary Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -336,7 +336,8 @@ private:
 public:
    BlockList() {};
    void              clear(void);
-   void              add_range(int start, int length);                             int               get_bytes(int start, int length) const;
+   void              add_range(int start, int length);
+   int               get_bytes(int start, int length) const;
    int               get_range(int start, int length) const;
 friend class DataPool;
 };
@@ -352,8 +353,8 @@ void
 DataPool::BlockList::add_range(int start, int length)
       // Adds range of known data.
 {
-   if (start<0) G_THROW("The start offset of the range may not be negative.");
-   if (length<0) G_THROW("The length must be positive.");
+   if (start<0) G_THROW("DataPool.neg_start");        //  The start offset of the range may not be negative.
+   if (length<=0) G_THROW("DataPool.bad_length");     //  The length must be positive.
    if (length>0)
    {
       GCriticalSectionLock lk(&lock);
@@ -429,7 +430,7 @@ DataPool::BlockList::get_bytes(int start, int length) const
       // Returns the number of bytes of data available in the range
       // [start, start+length[. There may be holes between data chunks
 {
-   if (length<0) G_THROW("Length must be positive.");
+   if (length<0) G_THROW("DataPool.bad_length");        //  The length must be positive.
 
    GCriticalSectionLock lk((GCriticalSection *) &lock);
    int bytes=0;
@@ -462,8 +463,8 @@ DataPool::BlockList::get_range(int start, int length) const
       // of intersection of this range with [start, start+length[
       // 0 is returned if nothing can be found
 {
-   if (start<0) G_THROW("Start must be non negative.");
-   if (length<=0) G_THROW("Length must be positive.");
+   if (start<0) G_THROW("DataPool.neg_start");    //  The start offset of the range may not be negative.
+   if (length<=0) G_THROW("DataPool.bad_length"); //  The length must be positive.
 
    GCriticalSectionLock lk((GCriticalSection *) &lock);
    int block_start=0, block_end=0;
@@ -622,9 +623,9 @@ DataPool::connect(const GP<DataPool> & pool_in, int start_in, int length_in)
    DEBUG_MSG("DataPool::connect(): connecting to another DataPool\n");
    DEBUG_MAKE_INDENT(3);
    
-   if (pool) G_THROW("Already connected to another DataPool.");
-   if (fname.length()) G_THROW("Already connected to a file.");
-   if (start_in<0) G_THROW("Start must be non negative");
+   if (pool) G_THROW("DataPool.connected1");            //  Already connected to another DataPool.
+   if (fname.length()) G_THROW("DataPool.connected2");  //  Already connected to a file.
+   if (start_in<0) G_THROW("DataPool.neg_start");       //  The start offset of the range may not be negative.
 
    pool=pool_in;
    start=start_in;
@@ -655,9 +656,10 @@ DataPool::connect(const char * fname_in, int start_in, int length_in)
    DEBUG_MSG("DataPool::connect(): connecting to a file\n");
    DEBUG_MAKE_INDENT(3);
    
-   if (pool) G_THROW("Already connected to a DataPool.");
-   if (fname.length()) G_THROW("Already connected to another file.");
-   if (start_in<0) G_THROW("Start must be non negative");
+   if (pool) G_THROW("DataPool.connected1");              //  Already connected to another DataPool.
+   if (fname.length()) G_THROW("DataPool.connected2");    //  Already connected to a file.
+   if (start_in<0) G_THROW("DataPool.neg_start");         //  The start offset of the range may not be negative.
+
 
    if (!strcmp(fname_in, "-"))
    {
@@ -766,7 +768,7 @@ DataPool::add_data(const void * buffer, int offset, int size)
    DEBUG_MAKE_INDENT(3);
    
    if (fname.length() || pool)
-      G_THROW("Function DataPool::add_data() may not be called for connected DataPools.");
+      G_THROW("DataPool.add_data");     //  Function DataPool::add_data() may not be called for connected DataPools.
    
       // Add data to the data storage
    {
@@ -852,7 +854,7 @@ DataPool::get_data(void * buffer, int offset, int sz, int level)
        !has_data(offset, sz))
      G_THROW("STOP");
    
-   if (sz < 0) G_THROW("Size must be non negative");
+   if (sz < 0) G_THROW("DataPool.bad_size");        //  Size must be non negative
    if (sz == 0) return 0;
 
    if (pool)
@@ -870,10 +872,10 @@ DataPool::get_data(void * buffer, int offset, int sz, int level)
 	    // exception.
 	 G_TRY {
 	    if (stop_flag || stop_blocked_flag && !is_eof() &&
-		!has_data(offset, sz)) G_THROW("STOP");
+        !has_data(offset, sz)) G_THROW("STOP");
 	    return pool->get_data(buffer, start+offset, sz, level+1);
 	 } G_CATCH(exc) {
-	    if (strcmp(exc.get_cause(), "DATA_POOL_REENTER") || level)
+	    if (strcmp(exc.get_cause(), "DataPool.reenter") || level)
 	      G_RETHROW;
 	 } G_ENDCATCH;
       }
@@ -935,24 +937,24 @@ DataPool::get_data(void * buffer, int offset, int sz, int level)
 		", data_size=" << data->size() << "\n");
       GP<Reader> reader=new Reader(offset, sz);
       G_TRY {
-	 {
-	    GCriticalSectionLock slock(&readers_lock);
-	    readers_list.append(reader);
-	 }
-	 wait_for_data(reader);
+	       {
+	          GCriticalSectionLock slock(&readers_lock);
+	          readers_list.append(reader);
+	       }
+	       wait_for_data(reader);
       } G_CATCH_ALL {
-	 {
-	    GCriticalSectionLock slock(&readers_lock);
-	    GPosition pos;
-	    if (readers_list.search(reader, pos)) readers_list.del(pos);
-	 }
-	 G_RETHROW;
+	       {
+	          GCriticalSectionLock slock(&readers_lock);
+	          GPosition pos;
+	          if (readers_list.search(reader, pos)) readers_list.del(pos);
+	       }
+	       G_RETHROW;
       } G_ENDCATCH;
    
       {
-	 GCriticalSectionLock slock(&readers_lock);
-	 GPosition pos;
-	 if (readers_list.search(reader, pos)) readers_list.del(pos);
+	       GCriticalSectionLock slock(&readers_lock);
+	       GPosition pos;
+	       if (readers_list.search(reader, pos)) readers_list.del(pos);
       }
 
 	 // This call to get_data() should return immediately as there MUST
@@ -973,12 +975,12 @@ DataPool::wait_for_data(const GP<Reader> & reader)
    DEBUG_MAKE_INDENT(3);
 
 #if THREADMODEL==NOTHREADS
-   G_THROW("Internal error. This function can't be used in threadless mode.");
+   G_THROW("DataPool.no_threadless");  // Internal error. This function can't be used in threadless mode.
 #else
    while(1)
    {
       if (stop_flag) G_THROW("STOP");
-      if (reader->reenter_flag) G_THROW("DATA_POOL_REENTER");
+      if (reader->reenter_flag) G_THROW("DataPool.reenter");    //  DATA_POOL_REENTER
       if (eof_flag || block_list->get_bytes(reader->offset, 1)) return;
       if (pool || fname.length()) return;
 
@@ -1370,7 +1372,7 @@ PoolByteStream::PoolByteStream(DataPool * xdata_pool) :
    data_pool(xdata_pool), position(0), buffer_size(0), buffer_pos(0)
 {
    if (!data_pool) 
-       G_THROW("Internal error: ZERO DataPool passed as input.");
+       G_THROW("DataPool.zero_DataPool");   //  Internal error: ZERO DataPool passed as input.
 
       // Secure the DataPool if possible. If we're called from DataPool
       // constructor (get_count()==0) there is no need to secure at all.
@@ -1403,7 +1405,7 @@ PoolByteStream::read(void *data, size_t size)
 size_t
 PoolByteStream::write(const void *buffer, size_t size)
 {
-   G_THROW("write() is not implemented.");
+   G_THROW("not_implemented\tPoolByteStream::write()");   //  PoolByteStream::write() is not implemented.
    return 0;	// For compiler not to bark
 }
 
@@ -1447,7 +1449,7 @@ PoolByteStream::seek(long offset, int whence, bool nothrow)
       break;
     case SEEK_END:
       if(! nothrow)
-        G_THROW("Seeking backwards from EOF is not supported by this ByteStream");
+        G_THROW("DataPool.seek_backward");  //  Seeking backwards from EOF is not supported by this ByteStream
       break;
    }
    return retval;

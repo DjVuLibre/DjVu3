@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: BSByteStream.cpp,v 1.18 2000-10-04 01:38:00 bcr Exp $
+//C- $Id: BSByteStream.cpp,v 1.19 2000-10-06 21:47:21 fcrary Exp $
 // - Author: Leon Bottou, 07/1998
 
 
@@ -915,7 +915,7 @@ BSByteStream::decode()
   if (size == 0)
     return 0;
   if (size>MAXBLOCK*1024)
-    G_THROW("Corrupted decoder input");
+    G_THROW("bytestream.corrupt");        //  Corrupted decoder input
   // Allocate
   if ((int)blocksize < size)
     {
@@ -1018,7 +1018,7 @@ BSByteStream::decode()
   ////////// Reconstruct the string
   
   if (markerpos<1 || markerpos>=size)
-    G_THROW("Corrupted decoder input");
+    G_THROW("bytestream.corrupt");        //  Corrupted decoder input
   // Allocate pointers
   unsigned int *posn = new unsigned int[blocksize];
   memset(posn, 0, sizeof(unsigned int)*size);
@@ -1060,7 +1060,7 @@ BSByteStream::decode()
   // Free and check
   delete [] posn;
   if (i != markerpos)
-    G_THROW("Corrupted decoder input");
+    G_THROW("bytestream.corrupt");        //  Corrupted decoder input
   return size;
 }
 
@@ -1079,12 +1079,12 @@ BSByteStream::BSByteStream(ByteStream &xbs, int encoding)
   if (encoding)
     {
 #ifdef NEED_DECODER_ONLY
-      G_THROW("Compiled with NEED_DECODER_ONLY");
+      G_THROW("bytestream.decoder_only");     //  Compiled with NEED_DECODER_ONLY
 #else
       if (encoding < MINBLOCK)
         encoding = MINBLOCK;
       if (encoding > MAXBLOCK)
-        G_THROW("Requested block size must be less than " STR(MAXBLOCK) "Kbytes.");
+        G_THROW("bytestream.blocksize\t" STR(MAXBLOCK));  //  "Requested block size must be less than " STR(MAXBLOCK) "Kbytes."
       // Record block size
       blocksize = encoding * 1024;
 #endif
@@ -1144,7 +1144,7 @@ size_t
 BSByteStream::read(void *buffer, size_t sz)
 {
   if (encoding)
-    G_THROW("Cannot read from BSByteStream created for encoding");
+    G_THROW("bytestream.cant_read");      //  Cannot read from BSByteStream created for encoding
   if (eof)
     return 0;
   // Loop
@@ -1183,11 +1183,11 @@ size_t
 BSByteStream::write(const void *buffer, size_t sz)
 {
 #ifdef NEED_ENCODER_ONLY
-  G_THROW("Cannot write to BSByteStream created for decoding");
+  G_THROW("bytestream.cant_write");         //  Cannot write to BSByteStream created for decoding
 #else
   // Trivial checks
   if (! encoding)
-    G_THROW("Cannot write to BSByteStream created for decoding");
+    G_THROW("bytestream.cant_write");       //  Cannot write to BSByteStream created for decoding
   if (sz == 0)
     return 0;
   // Loop

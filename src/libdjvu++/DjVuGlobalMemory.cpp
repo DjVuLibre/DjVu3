@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: DjVuGlobalMemory.cpp,v 1.7 2000-09-18 17:10:12 bcr Exp $
+//C- $Id: DjVuGlobalMemory.cpp,v 1.8 2000-10-06 21:47:21 fcrary Exp $
 
 
 #ifdef NEED_DJVU_MEMORY
@@ -130,7 +130,7 @@ _djvu_new(size_t siz)
 #endif
     if(!(ptr=(*_djvu_new_handler)(siz?siz:1)))
     {
-      G_THROW("Memory Exhausted");
+      G_THROW("DjVuGlobalMemory.exhausted	");
     }
 #ifndef UNIX
   }else
@@ -166,7 +166,7 @@ _djvu_newArray(size_t siz)
 #endif
     if(!(ptr=(*newArray_handler)(siz?siz:1)))
     {
-      G_THROW("Memory Exhausted");
+      G_THROW("DjVuGlobalMemory.exhausted	");
     }
 #ifndef UNIX
   }else

@@ -310,6 +310,10 @@ SOURCE=.\DjVuInfo.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\DjVuMessage.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\DjVuNavDir.cpp
 # End Source File
 # Begin Source File
@@ -475,6 +479,10 @@ SOURCE=.\DjVuImage.h
 # Begin Source File
 
 SOURCE=.\DjVuInfo.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\DjVuMessage.h
 # End Source File
 # Begin Source File
 

@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: Arrays.cpp,v 1.9 2000-09-18 17:10:02 bcr Exp $
+//C- $Id: Arrays.cpp,v 1.10 2000-10-06 21:47:21 fcrary Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -90,7 +90,7 @@ ArrayRep::resize(int lo, int hi)
   int nsize = hi - lo + 1;
   // Validation
   if (nsize < 0)
-    G_THROW("Invalid low and high bounds in DArray resize");
+    G_THROW("arrays.resize");     //  Invalid low and high bounds in DArray resize
   // Destruction
   if (nsize == 0)
     {
@@ -159,7 +159,7 @@ ArrayRep::del(int n, unsigned int howmany)
    if (howmany == 0)
       return;
    if ((int)(n + howmany) > hibound +1)
-      G_THROW("Illegal arguments in DArray::del");
+      G_THROW("arrays.ill_arg");      //  Illegal arguments in DArray::del
    copy(data, n-minlo, hibound-howmany-minlo,
 	data, n+howmany-minlo, hibound-minlo);
    destroy(data, hibound+1-howmany-minlo, hibound-minlo);

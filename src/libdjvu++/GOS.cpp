@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: GOS.cpp,v 1.29 2000-10-02 22:33:33 mrosen Exp $
+//C- $Id: GOS.cpp,v 1.30 2000-10-06 21:47:21 fcrary Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -381,6 +381,7 @@ GOS::basename(const char *fname, const char *suffix)
 static const char *
 errmsg()
 {
+/*
   static char buffer[256];
 #ifdef REIMPLEMENT_STRERROR
   const char *errname = "Unknown libc error";
@@ -396,6 +397,26 @@ errmsg()
 #endif
 #endif
   return buffer;
+*/
+  static char buffer[256];
+#ifdef REIMPLEMENT_STRERROR
+  const char *errname = "Unknown libc error";
+  if (errno>0 && errno<sys_nerr)
+  {
+    errname = sys_errlist[errno];
+    sprintf(buffer,"GOS.unknown3\t%s\t%d", errname, errno);
+  } else
+    sprintf(buffer,"GOS.unknown1\t%d", errno);
+#else
+#ifndef UNDER_CE
+  const char *errname = strerror(errno);
+  sprintf(buffer,"GOS.unknown3\t%s\t%d", errname, errno);
+#else
+  sprintf(buffer,"GOS.unknown2\t%d", -1);
+#endif
+#endif
+  return buffer;
+
 }
 
 
@@ -452,23 +473,23 @@ GOS::expand_name(const char *fname, const char *from)
   char *s;
   /* Perform tilde expansion */
   if (fname && fname[0]=='~')
-    {
-      int n = 1;
-      while (fname[n] && fname[n]!='/') 
-        n += 1;
-      GString user(fname+1, n-1);
-      if (n==1 && (s=getenv("LOGNAME")))
-        user = s;
-      struct passwd *pw = getpwnam(user);
-      if (n==1 && pw==0)
-        pw = getpwuid(getuid());
-      if (pw) {
-        from = pw->pw_dir;
-        fname = fname + n;
-      }
-      while (fname[0] && fname[0]=='/')
-        fname += 1;
+  {
+    int n = 1;
+    while (fname[n] && fname[n]!='/') 
+      n += 1;
+    GString user(fname+1, n-1);
+    if (n==1 && (s=getenv("LOGNAME")))
+      user = s;
+    struct passwd *pw = getpwnam(user);
+    if (n==1 && pw==0)
+      pw = getpwuid(getuid());
+    if (pw) {
+      from = pw->pw_dir;
+      fname = fname + n;
     }
+    while (fname[0] && fname[0]=='/')
+      fname += 1;
+  }
   /* Process absolute vs. relative path */
   if (fname && fname[0]=='/')
     strcpy(string_buffer,"/");
@@ -483,31 +504,31 @@ GOS::expand_name(const char *fname, const char *from)
       fname++;
     if (!fname || !fname[0]) {
       while (s>string_buffer+1 && s[-1]=='/')
-	s--;
+        s--;
       *s = 0;
       return string_buffer;
     }
     if (fname[0]=='.') {
       if (fname[1]=='/' || fname[1]==0) {
-	fname +=1;
-	continue;
+        fname +=1;
+        continue;
       }
       if (fname[1]=='.')
-	if (fname[2]=='/' || fname[2]==0) {
-	  fname +=2;
-	  while (s>string_buffer+1 && s[-1]=='/')
-	    s--;
-	  while (s>string_buffer+1 && s[-1]!='/')
-	    s--;
-	  continue;
-	}
+        if (fname[2]=='/' || fname[2]==0) {
+          fname +=2;
+          while (s>string_buffer+1 && s[-1]=='/')
+            s--;
+          while (s>string_buffer+1 && s[-1]!='/')
+            s--;
+          continue;
+        }
     }
     if (s==string_buffer || s[-1]!='/')
       *s++ = '/';
     while (*fname!=0 && *fname!='/') {
       *s++ = *fname++;
       if (s-string_buffer > MAXPATHLEN)
-	G_THROW("filename length exceeds system limits");
+        G_THROW("GOS.big_name");
     }
     *s = 0;
   }
@@ -533,7 +554,7 @@ GOS::expand_name(const char *fname, const char *from)
     } else
     {	// Case "/abcd" 
       if (s[0]==0 || s[1]!=':')
-	s[0] = _getdrive() + 'A' - 1;
+        s[0] = _getdrive() + 'A' - 1;
       s[1]=':'; s[2]= 0;
     }
   } else if (fname[0] && fname[1]==':')
@@ -541,8 +562,8 @@ GOS::expand_name(const char *fname, const char *from)
     if (fname[2]!='/' && fname[2]!='\\')
     { // Case "x:abcd"
       if ( toupper((unsigned char)s[0])!=toupper((unsigned char)fname[0]) || s[1]!=':') {
-	drv[0]=fname[0]; drv[1]=':'; drv[2]='.'; drv[3]=0;
-	GetFullPathName(drv, MAXPATHLEN, string_buffer, &s);
+        drv[0]=fname[0]; drv[1]=':'; drv[2]='.'; drv[3]=0;
+        GetFullPathName(drv, MAXPATHLEN, string_buffer, &s);
         s = string_buffer;
       }
       fname += 2;
@@ -587,7 +608,7 @@ GOS::expand_name(const char *fname, const char *from)
             fname += 2;
             strcpy(string_buffer, dirname(string_buffer));
             s = string_buffer;
-	  continue;
+            continue;
           }
       }
       while (*s) 
@@ -597,7 +618,7 @@ GOS::expand_name(const char *fname, const char *from)
       while (*fname && *fname!='/' && *fname!='\\') {
         *s++ = *fname++;
         if (s-string_buffer > MAXPATHLEN)
-          G_THROW("filename length exceeds system limits");
+          G_THROW("GOS.big_name");
       }
       *s = 0;
     }
@@ -609,7 +630,7 @@ GOS::expand_name(const char *fname, const char *from)
     {
       *s++ = *fname++;
       if (s-string_buffer > MAXPATHLEN)
-        G_THROW("filename length exceeds system limits");
+        G_THROW("GOS.big_name");
     }
     *s = 0;
   }
@@ -618,15 +639,15 @@ GOS::expand_name(const char *fname, const char *from)
   /* MACINTOSH implementation */
 #ifdef macintosh
   char *s;
-
+  
   if (from)
     strcpy(string_buffer, from);
   else
     strcpy(string_buffer, cwd());
-    
+  
   if (!strncmp(string_buffer,fname,strlen(string_buffer)) || is_file(fname))
     strcpy(string_buffer, "");//please don't expand, the logic of filename is chaos.
-    
+  
   /* Process path components */
   s = string_buffer + strlen(string_buffer);
   for (;;) {
@@ -634,34 +655,34 @@ GOS::expand_name(const char *fname, const char *from)
       fname++;
     if (!fname || !fname[0]) {
       while (s>string_buffer+1 && s[-1]==':')
-	s--;
+        s--;
       *s = 0;
       if (string_buffer[0]==':')
-      	return &string_buffer[1];
+        return &string_buffer[1];
       else
-      	return string_buffer;
+        return string_buffer;
     }
     if (fname[0]=='.') {
       if (fname[1]==':' || fname[1]==0) {
-	fname +=1;
-	continue;
+        fname +=1;
+        continue;
       }
       if (fname[1]=='.')
-	if (fname[2]==':' || fname[2]==0) {
-	  fname +=2;
-	  while (s>string_buffer+1 && s[-1]==':')
-	    s--;
-	  while (s>string_buffer+1 && s[-1]!=':')
-	    s--;
-	  continue;
-	}
+        if (fname[2]==':' || fname[2]==0) {
+          fname +=2;
+          while (s>string_buffer+1 && s[-1]==':')
+            s--;
+          while (s>string_buffer+1 && s[-1]!=':')
+            s--;
+          continue;
+        }
     }
     if (s==string_buffer || s[-1]!=':')
       *s++ = ':';
     while (*fname!=0 && *fname!=':') {
       *s++ = *fname++;
       if (s-string_buffer > MAXPATHLEN)
-	G_THROW("filename length exceeds system limits");
+        G_THROW("GOS.big_name");
     }
     *s = 0;
   }
@@ -814,7 +835,7 @@ GOS::cleardir(const char * dirname)
    return 0;
 #else
    // WCE and MAC is missing
-   G_THROW("Please provide correct implementation of GOS::cleardir() for this platform");
+   G_THROW("GOS.cleardir");
 #endif
 #endif
    return -1;

@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: DjVuDocEditor.cpp,v 1.43 2000-10-04 01:38:01 bcr Exp $
+//C- $Id: DjVuDocEditor.cpp,v 1.44 2000-10-06 21:47:21 fcrary Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -56,7 +56,7 @@ public:
 void
 DjVuDocEditor::check(void)
 {
-   if (!initialized) G_THROW("DjVuDocEditor should have been initialized before used.");
+   if (!initialized) G_THROW("DjVuDocEditor.not_init");
 }
 
 DjVuDocEditor::DjVuDocEditor(void)
@@ -87,7 +87,7 @@ DjVuDocEditor::init(void)
    DEBUG_MAKE_INDENT(3);
 
       // If you remove this check be sure to delete thumb_map
-   if (initialized) G_THROW("DjVuDocEditor has already been initialized.");
+   if (initialized) G_THROW("DjVuDocEditor.init");
 
    doc_url=GOS::filename_to_url(GOS::expand_name("noname.djvu", GOS::cwd()));
 
@@ -112,7 +112,7 @@ DjVuDocEditor::init(const char * fname)
    DEBUG_MAKE_INDENT(3);
 
       // If you remove this check be sure to delete thumb_map
-   if (initialized) G_THROW("DjVuDocEditor has already been initialized.");
+   if (initialized) G_THROW("DjVuDocEditor.init");
 
       // First - create a temporary DjVuDocument and check its type
    doc_pool=new DataPool(fname);
@@ -120,7 +120,7 @@ DjVuDocEditor::init(const char * fname)
    GP<DjVuDocument> tmp_doc=new DjVuDocument();
    tmp_doc->init(doc_url, this);
    if (!tmp_doc->is_init_ok())
-      G_THROW(GString("Failed to open document '")+fname+"'");
+      G_THROW(GString("DjVuDocEditor.open_fail\t")+fname);
 
    orig_doc_type=tmp_doc->get_doc_type();
    orig_doc_pages=tmp_doc->get_pages_num();
@@ -295,7 +295,7 @@ DjVuDocEditor::page_to_id(int page_num) const
    GP<DjVmDir::File> f;
    if (page_num<0 || page_num>=get_pages_num() ||
        (f=djvm_dir->page_to_file(page_num))==0)
-      G_THROW("Invalid page number "+GString(page_num));
+      G_THROW("DjVuDocEditor.page_num\t"+GString(page_num));
 
    return f->id;
 }
@@ -394,9 +394,9 @@ DjVuDocEditor::insert_file(const char * file_name, const char * parent_id,
    if (!parent_frec) parent_frec=dir->name_to_file(parent_id);
    if (!parent_frec) parent_frec=dir->title_to_file(parent_id);
    if (!parent_frec)
-      G_THROW(GString("There is no file with ID '")+parent_id+"' in this document.");
+      G_THROW(GString("DjVuDocEditor.no_file\t")+parent_id);
    GP<DjVuFile> parent_file=get_djvu_file(parent_id);
-   if (!parent_file) G_THROW(GString("Failed to create file with ID '")+parent_id+"'\n");
+   if (!parent_file) G_THROW(GString("DjVuDocEditor.create_fail\t")+parent_id);
 
       // Now obtain ID for the new file
    GString id=find_unique_id(GOS::basename(file_name));
@@ -474,7 +474,7 @@ DjVuDocEditor::insert_file(const char * file_name, bool is_page,
 //            G_THROW("File '"+GString(file_name)+"' is not a DjVu file");
          if (chkid!="FORM:DJVI" && chkid!="FORM:DJVU" &&
              chkid!="FORM:BM44" && chkid!="FORM:PM44")
-            G_THROW("File '"+GString(file_name)+"' is not a single page DjVu file");
+            G_THROW("DjVuDocEditor.not_1_page\t"+GString(file_name));
 
             // Wonderful. It's even a DjVu file. Scan for NDIR chunks.
             // If NDIR chunk is found, ignore the file
@@ -660,7 +660,7 @@ DjVuDocEditor::insert_group(const GList<GString> & file_names, int page_num,
                GString dirname="tempFileForDjVu" ;
 #endif
                if (GOS::mkdir(dirname)<0)
-                  G_THROW("Failed to create directory '"+dirname+"'");
+                  G_THROW(GString("DjVuDocEditor.dir_fail\t")+dirname);
                G_TRY {
                   doc->expand(dirname, GOS::basename(fname));
                   int pages_num=doc->get_pages_num();
@@ -853,7 +853,7 @@ DjVuDocEditor::remove_file(const char * id, bool remove_unref)
    DEBUG_MAKE_INDENT(3);
 
    if (!djvm_dir->id_to_file(id))
-      G_THROW("There is no such file with ID '"+GString(id)+"' in this document.");
+      G_THROW("DjVuDocEditor.no_file\t"+GString(id));
 
       // First generate a map of references (containing the list of parents
       // including this particular file. This will speed things up
@@ -887,7 +887,7 @@ DjVuDocEditor::remove_page(int page_num, bool remove_unref)
       // Translate the page_num to ID
    GP<DjVmDir> djvm_dir=get_djvm_dir();
    if (page_num<0 || page_num>=djvm_dir->get_pages_num())
-      G_THROW("Page number "+GString(page_num)+" is invalid");
+      G_THROW("DjVuDocEditor.bad_page\t"+GString(page_num));
 
       // And call general remove_file()
    remove_file(djvm_dir->page_to_file(page_num)->id, remove_unref);
@@ -982,7 +982,7 @@ DjVuDocEditor::move_page(int page_num, int new_page_num)
 
    int pages_num=get_pages_num();
    if (page_num<0 || page_num>=pages_num)
-      G_THROW("Invalid page number "+GString(page_num));
+      G_THROW("DjVuDocEditor.bad_page\t"+GString(page_num));
 
    GString id=page_to_id(page_num);
    int file_pos=-1;
@@ -1122,7 +1122,7 @@ DjVuDocEditor::set_page_name(int page_num, const char * name)
    DEBUG_MAKE_INDENT(3);
 
    if (page_num<0 || page_num>=get_pages_num())
-      G_THROW("Invalid page number "+GString(page_num));
+      G_THROW("DjVuDocEditor.bad_page\t"+GString(page_num));
 
    set_file_name(page_to_id(page_num), name);
 }
@@ -1144,7 +1144,7 @@ DjVuDocEditor::set_page_title(int page_num, const char * title)
    DEBUG_MAKE_INDENT(3);
 
    if (page_num<0 || page_num>=get_pages_num())
-      G_THROW("Invalid page number "+GString(page_num));
+      G_THROW("DjVuDocEditor.bad_page\t"+GString(page_num));
 
    set_file_title(page_to_id(page_num), title);
 }
@@ -1179,7 +1179,7 @@ DjVuDocEditor::simplify_anno(void (* progress_cb)(float progress, void *),
    {
       GP<DjVuFile> djvu_file=get_djvu_file(page_num);
       if (!djvu_file)
-         G_THROW("Internal error: unable to get page "+page_num);
+         G_THROW("DjVuDocEditor.page_fail\t"+page_num);
       int max_level=0;
       GP<ByteStream> anno;
       anno=djvu_file->get_merged_anno(ignore_list, &max_level);
@@ -1241,8 +1241,7 @@ DjVuDocEditor::create_shared_anno_file(void (* progress_cb)(float progress, void
                                        void * cl_data)
 {
    if (djvm_dir->get_shared_anno_file())
-      G_THROW("Attempt to create another file with shared annotations failed."
-            "There may be only one such file in a multipage document.");
+      G_THROW("DjVuDocEditor.share_fail");
 
       // Prepare file with ANTa chunk inside
    MemoryByteStream str;
@@ -1445,7 +1444,7 @@ DjVuDocEditor::file_thumbnails(void)
 
       if (!thumb_map.contains(id, pos))
       {
-         G_THROW("Internal error: Can't find thumbnail for page "+GString(page_num));
+         G_THROW("DjVuDocEditor.no_thumb\t"+GString(page_num));
       }
       TArray<char> & data=*(TArray<char> *) thumb_map[pos];
       iff->put_chunk("TH44");
@@ -1519,7 +1518,7 @@ DjVuDocEditor::generate_thumbnails(int thumb_size, int page_num)
             GP<GBitmap> bm=dimg->get_bitmap(rect, rect, sizeof(int));
             pm=new GPixmap(*bm);
          }
-         if (!pm) G_THROW("Unable to render image of page "+GString(page_num));
+         if (!pm) G_THROW("DjVuDocEditor.render\t"+GString(page_num));
 
             // Store and compress the pixmap
          GP<IWPixmap> iwpix=new IWPixmap(pm);
@@ -1680,7 +1679,7 @@ DjVuDocEditor::save(void)
    DEBUG_MAKE_INDENT(3);
 
    if (!can_be_saved())
-     G_THROW("Can't save the document. Use 'Save As'");
+     G_THROW("DjVuDocEditor.cant_save");
    save_as(0, orig_doc_type!=INDIRECT);
 }
 
@@ -1717,7 +1716,7 @@ DjVuDocEditor::save_as(const char * where, bool bundled)
                                 orig_doc_type==SINGLE_PAGE ||
                                 orig_doc_type==OLD_INDEXED && orig_doc_pages==1;
       if ((bundled ^ can_be_saved_bundled)!=0)
-         G_THROW("Can't 'Save' the document in the requested format. Use 'Save As'");
+         G_THROW("DjVuDocEditor.cant_save2");
       save_doc_url=doc_url;
       save_doc_name=GOS::url_to_filename(save_doc_url);
    } else
@@ -1741,7 +1740,7 @@ DjVuDocEditor::save_as(const char * where, bool bundled)
      remove_thumbnails();
      if(! djvu_compress_codec)
      {
-       G_THROW("Failed to load compression codec");
+       G_THROW("DjVuDocEditor.no_codec");
      }
      GP<DjVmDoc> doc=get_djvm_doc();
      GP<ByteStream> mbs=new MemoryByteStream();
@@ -1855,7 +1854,7 @@ DjVuDocEditor::save_as(const char * where, bool bundled)
         djvm_dir=doc->get_djvm_dir();
      } else
      {
-       G_THROW("Can't save the document. Use 'Save As'");
+       G_THROW("DjVuDocEditor.cant_save");
      }
 
         // Now, after we have saved the document w/o any error, detach DataPools,

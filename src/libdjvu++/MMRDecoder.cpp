@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: MMRDecoder.cpp,v 1.17 2000-09-18 17:10:23 bcr Exp $
+//C- $Id: MMRDecoder.cpp,v 1.18 2000-10-06 21:47:21 fcrary Exp $
 
 
 #ifdef __GNUC__
@@ -27,7 +27,7 @@
 // ----------------------------------------
 // MMR CODEBOOKS
 
-static const char invalid_mmr_data[]="Invalid G4/MMR Data";
+static const char invalid_mmr_data[]="MMRDecoder.bad_data";
 
 struct VLCode 
 {
@@ -427,7 +427,7 @@ MMRDecoder::VLTable::VLTable(const VLCode *codes, int nbits)
     int n = c + (1<<(nbits-b));
     while ( --n >= c ) {
       if(index[n] != ncodes)
-       G_THROW("ambiguous MMR codebook");
+       G_THROW("MMRDecoder.bad_codebook");
       index[n] = i;
     }
   }
@@ -579,7 +579,7 @@ MMRDecoder::scanruns(const unsigned short **endptr)
             else if ((m & 0xffc00000) == 0x03c00000)
               {
 #ifdef MMRDECODER_REFUSES_UNCOMPRESSED
-                G_THROW("Cannot processed uncompressed bits in G4/MMR data");
+                G_THROW("MMRDecoder.cant_process");
 #else
                 // ---THE-FOLLOWING-CODE-IS-POORLY-TESTED---
                 src->shift(10);
@@ -736,13 +736,13 @@ MMRDecoder::decode_header(ByteStream &inp, int &width, int &height,
 {
   unsigned long int magic = inp.read32();
   if((magic&0xfffffffc) != 0x4d4d5200)
-    G_THROW("Cannot recognize G4/MMR header"); 
+    G_THROW("MMRDecoder.unrecog_header"); 
   invert = ((magic & 0x1) ? 1 : 0);
   strip =  ((magic & 0x2) ? 1 : 0);
   width = inp.read16();
   height = inp.read16();
   if (width<=0 || height<=0)
-    G_THROW("Corrupted G4/MMR header");
+    G_THROW("MMRDecoder.bad_header");
 }
 
 static inline int MAX(int a, int b) { return a>b ? a : b; }

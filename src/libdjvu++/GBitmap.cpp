@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: GBitmap.cpp,v 1.32 2000-09-18 17:10:15 bcr Exp $
+//C- $Id: GBitmap.cpp,v 1.33 2000-10-06 21:47:21 fcrary Exp $
 
 
 #ifdef __GNUC__
@@ -25,7 +25,7 @@
 #include "GString.h"
 #include "GThreads.h"
 
-// File "$Id: GBitmap.cpp,v 1.32 2000-09-18 17:10:15 bcr Exp $"
+// File "$Id: GBitmap.cpp,v 1.33 2000-10-06 21:47:21 fcrary Exp $"
 // - Author: Leon Bottou, 05/1997
 
 
@@ -236,7 +236,7 @@ GBitmap::init(ByteStream &ref, int aborder)
           return;
         }
     }
-  G_THROW("Unknown PBM, PGM or RLE file format");
+  G_THROW("GBitmap.bad_format");
 }
 
 void
@@ -300,7 +300,7 @@ void
 GBitmap::compress()
 {
   if (grays > 2)
-    G_THROW("Cannot compress gray level bitmap");
+    G_THROW("GBitmap.cant_compress");
   GMonitorLock lock(monitor());
   if (bytes)
     {
@@ -382,7 +382,7 @@ void
 GBitmap::set_grays(int ngrays)
 {
   if (ngrays<2 || ngrays>256)
-    G_THROW("(GBitmap::set_grays) Illegal number of gray levels");
+    G_THROW("GBitmap.bad_levels");
   // set gray levels
   GMonitorLock lock(monitor());
   grays = ngrays;
@@ -499,7 +499,7 @@ GBitmap::blit(const GBitmap *bm, int x, int y)
         {
           const int z = read_run(runs);
           if (sc+z > bm->ncolumns)
-            G_THROW("RLE: synchronization lost");
+            G_THROW("GBitmap.lost_sync");
           int nc = sc + z;
           if (p && sr+y>=0 && sr+y<nrows) 
             {
@@ -600,7 +600,7 @@ GBitmap::blit(const GBitmap *bm, int xh, int yh, int subsample)
         {
           int z = read_run(runs);
           if (sc+z > bm->ncolumns)
-            G_THROW("RLE: synchronization lost");
+            G_THROW("GBitmap.lost_sync");
           int nc = sc + z;
 
           if (dr>=0 && dr<nrows)
@@ -659,7 +659,7 @@ GBitmap::read_integer(char &c, ByteStream &bs)
     }
   // check integer
   if (c<'0' || c>'9')
-    G_THROW("Reading bitmap: integer expected");
+    G_THROW("GBitmap.not_int");
   // eat integer
   while (c>='0' && c<='9') 
     {
@@ -692,7 +692,7 @@ GBitmap::read_pbm_text(ByteStream &bs)
           else if (bit=='0')
             row[c] = 0;
           else
-            G_THROW("Malformed PBM file");
+            G_THROW("GBitmap.bad_PBM");
         }
       row -= bytes_per_row;
     }
@@ -775,7 +775,7 @@ GBitmap::read_rle_raw(ByteStream &bs)
           x = h + ((x - (int)RUNOVERFLOWVALUE) << 8);
         }
       if (c+x > ncolumns)
-        G_THROW("RLE: synchronization lost");
+        G_THROW("GBitmap.lost_sync");
       while (x-- > 0)
         row[c++] = p;
       p = 1 - p;
@@ -797,7 +797,7 @@ GBitmap::save_pbm(ByteStream &bs, int raw)
 {
   // check arguments
   if (grays > 2)
-    G_THROW("Cannot make PBM file with a gray level bitmap");
+    G_THROW("GBitmap.cant_make_PBM");
   GMonitorLock lock(monitor());
   // header
   {
@@ -892,10 +892,10 @@ GBitmap::save_rle(ByteStream &bs)
 {
   // checks
   if (ncolumns==0 || nrows==0)
-    G_THROW("Uninitialized bitmap");
+    G_THROW("GBitmap.not_init");
   GMonitorLock lock(monitor());
   if (grays > 2)
-    G_THROW("Cannot make PBM file with a gray level bitmap");
+    G_THROW("GBitmap.cant_make_PBM");
   // header
   GString head;
   head.format("R4\n%d %d\n", ncolumns, nrows);
@@ -929,7 +929,7 @@ GBitmap::makerows(int nrows, int ncolumns, unsigned char *runs)
       int c;
       for(c=0;c<ncolumns;c+=GBitmap::read_run(runs));
       if (c > ncolumns)
-        G_THROW("(GBitmap::decode) RLE synchronization lost");
+        G_THROW("GBitmap.lost_sync2");
     }
   return rlerows;
 }
@@ -1152,10 +1152,10 @@ GBitmap::decode(unsigned char *runs)
 {
   // initialize pixel array
   if (nrows==0 || ncolumns==0)
-    G_THROW("Uninitialized bitmap");
+    G_THROW("GBitmap.not_init");
   bytes_per_row = ncolumns + border;
   if (runs==0)
-    G_THROW("(GBitmap::decode) Called with null argument");
+    G_THROW("GBitmap.null_arg");
   int npixels = nrows * bytes_per_row + border;
   if (!bytes_data)
     bytes = bytes_data = new unsigned char [ npixels ];
@@ -1172,7 +1172,7 @@ GBitmap::decode(unsigned char *runs)
     {
       int x = read_run(runs);
       if (c+x > ncolumns)
-        G_THROW("(GBitmap::decode) RLE synchronization lost");
+        G_THROW("GBitmap.lost_sync2");
       while (x-- > 0)
         row[c++] = p;
       p = 1 - p;
@@ -1288,16 +1288,16 @@ GBitmap::check_border() const
       const unsigned char *p = (*this)[-1];
       for (col=-border; col<ncolumns+border; col++)
         if (p[col])
-          G_THROW("debug: zero array is damaged");
+          G_THROW("GBitmap.zero_damaged");
       for (int row=0; row<nrows; row++)
         {
           p = (*this)[row];
           for (col=-border; col<0; col++)
             if (p[col])
-              G_THROW("debug: left border is damaged");
+              G_THROW("GBitmap.left_damaged");
           for (col=ncolumns; col<ncolumns+border; col++)
             if (p[col])
-              G_THROW("debug: right border is damaged");
+              G_THROW("GBitmap.right_damaged");
         }
     }
 }

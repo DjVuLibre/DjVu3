@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GMapAreas.cpp,v 1.8 2000-09-18 17:10:16 bcr Exp $
+//C- $Id: GMapAreas.cpp,v 1.9 2000-10-06 21:47:21 fcrary Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -101,18 +101,18 @@ GMapArea::transform(const GRect & grect)
 GString
 GMapArea::check_object(void)
 {
-   if (get_xmax()==get_xmin()) return "Area width is ZERO";
-   if (get_ymax()==get_ymin()) return "Area height is ZERO";
+   if (get_xmax()==get_xmin()) return "GMapAreas.zero_width";
+   if (get_ymax()==get_ymin()) return "GMapAreas.zero_height";
    if (border_type==XOR_BORDER ||
        border_type==SOLID_BORDER)
       if (border_width!=1)
-	 return "Border width must be 1 for XOR and SOLID border types";
+	       return "GMapAreas.width_1";
    if (border_type==SHADOW_IN_BORDER ||
        border_type==SHADOW_OUT_BORDER ||
        border_type==SHADOW_EIN_BORDER ||
        border_type==SHADOW_EOUT_BORDER)
       if (border_width<3 || border_width>32)
-	 return "Border width must be between 3 and 32 for SHADOW border types";
+	       return "GMapAreas.width_3-32";
    return gma_check_object();
 }
 
@@ -297,14 +297,15 @@ GMapPoly::are_segments_parallel(int x11, int y11, int x12, int y12,
 GString
 GMapPoly::check_data(void)
 {
-   if (open && points<2 || !open && points<3) return "Too few points in polygon.";
-   for(int i=0;i<sides;i++)
-      for(int j=i+2;j<sides;j++)
-         if ((j+1)%points!=i)
-	    if (do_segments_intersect(xx[i], yy[i], xx[i+1], yy[i+1],
+  if (open && points<2 || !open && points<3) 
+    return "GMapAreas.no_poly";
+  for(int i=0;i<sides;i++)
+    for(int j=i+2;j<sides;j++)
+      if ((j+1)%points!=i)
+        if (do_segments_intersect(xx[i], yy[i], xx[i+1], yy[i+1],
 				      xx[j], yy[j], xx[(j+1)%points], yy[(j+1)%points]))
-		return "Some polygon segments intersect.";
-   return "";
+              return "GMapAreas.intersect";
+  return "";
 }
 
 void
@@ -463,9 +464,9 @@ GMapPoly::gma_check_object(void)
    if (border_type!=NO_BORDER &&
        border_type!=SOLID_BORDER &&
        border_type!=XOR_BORDER)
-      return "This border type is not supported by polygon map areas";
+      return "GMapAreas.poly_border";
    if (hilite_color!=0xffffffff)
-      return "Area highlighting is not supported by polygon map areas";
+      return "GMapAreas.poly_hilite";
    return "";
 }
 
@@ -553,10 +554,10 @@ GMapOval::gma_check_object(void)
    if (border_type!=NO_BORDER &&
        border_type!=SOLID_BORDER &&
        border_type!=XOR_BORDER)
-      return "This border type is not supported by oval map areas";
+      return "GMapAreas.oval_border";
    if (hilite_color!=0xffffffff)
-      return "Area highlighting is not supported by oval map areas";
-   return "";
+      return "";
+   return "GMapAreas.oval_hilite";
 }
 
 void

@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: DjVuGlobal.cpp,v 1.24 2000-09-18 17:10:11 bcr Exp $
+//C- $Id: DjVuGlobal.cpp,v 1.25 2000-10-06 21:47:21 fcrary Exp $
 
 /** This file impliments the DjVuProgressTask elements.  The memory
     functions are implimented in a separate file, because only the memory
@@ -122,7 +122,7 @@ DjVuProgressTask::~DjVuProgressTask()
   if (data && data->callback)
   {
     if (data->head != this)
-      G_THROW("DjVuProgress is not compatible with multithreading");
+      G_THROW("DjVuGlobal.not_compatible");
     data->head = parent;
     if (!parent)
     {

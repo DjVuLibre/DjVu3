@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: TestJB2.cpp,v 1.9 2000-09-18 17:10:33 bcr Exp $
+//C- $Id: TestJB2.cpp,v 1.10 2000-10-06 21:47:21 fcrary Exp $
 
 #include <stdio.h>
 #include "JB2Image.h"
@@ -100,7 +100,7 @@ main(int argc, char **argv)
                 StdioByteStream output(argv[2],"w"BINARY);
                 image->encode(output);
               } else {
-                G_THROW("Unrecognized suffix for output file");
+                G_THROW("TestJB2.bad_suffix");
               }
             }
         }

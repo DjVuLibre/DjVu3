@@ -11,9 +11,9 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: IWImage.cpp,v 1.31 2000-09-18 17:10:22 bcr Exp $
+//C- $Id: IWImage.cpp,v 1.32 2000-10-06 21:47:21 fcrary Exp $
 
-// File "$Id: IWImage.cpp,v 1.31 2000-09-18 17:10:22 bcr Exp $"
+// File "$Id: IWImage.cpp,v 1.32 2000-10-06 21:47:21 fcrary Exp $"
 // - Author: Leon Bottou, 08/1998
 
 #ifdef __GNUC__
@@ -764,12 +764,12 @@ _IWMap::image(int subsample, const GRect &rect,
   int boxsize = 1<<nlevel;
   // Parameter check
   if (subsample!=(32>>nlevel))
-    G_THROW("(IWMap::image) Unsupported subsampling factor");
+    G_THROW("IWImage.sample_factor");
   if (rect.isempty())
-    G_THROW("(IWMap::image) Rectangle is empty");    
+    G_THROW("IWImage.empty_rect");    
   GRect irect(0,0,(iw+subsample-1)/subsample,(ih+subsample-1)/subsample);
   if (rect.xmin<0 || rect.ymin<0 || rect.xmax>irect.xmax || rect.ymax>irect.ymax)
-    G_THROW("(IWMap::image) Rectangle is out of bounds");
+    G_THROW("IWImage.bad_rect");
   // Multiresolution rectangles 
   // -- needed[i] tells which coeffs are required for the next step
   // -- recomp[i] tells which coeffs need to be computed at this level
@@ -1029,7 +1029,7 @@ _IWCodec::_IWCodec(_IWMap &map, int encoding)
   if (encoding)
   {
 #ifdef NEED_DECODER_ONLY
-    G_THROW("Compiled with NEED_DECODER_ONLY");
+    G_THROW("IWImage.decoder_only");
 #else
     emap = new _IWMap(map.iw, map.ih);
 #endif
@@ -1637,7 +1637,7 @@ _IWCodec::estimate_decibel(float frac)
   float *q;
   // Test that we are encoding
   if (!encoding || !emap)
-    G_THROW("Cannot estimate error when decoding");
+    G_THROW("IWImage.cant_estimate");
   // Fill norm arrays
   float norm_lo[16];
   float norm_hi[10];
@@ -1975,7 +1975,7 @@ IWBitmap::decode_chunk(ByteStream &bs)
 {
   // Check
   if (ycodec && ycodec->encoding)
-    G_THROW("(IWBitmap::decode_chunk) Codec still open for encoding");
+    G_THROW("IWImage.codec_open");
   // Open
   if (! ycodec)
     {
@@ -1986,27 +1986,27 @@ IWBitmap::decode_chunk(ByteStream &bs)
   // Read primary header
   struct PrimaryHeader primary;
   if (bs.readall((void*)&primary, sizeof(primary)) != sizeof(primary))
-    G_THROW("(IWBitmap::decode_chunk) Cannot read primary header");
+    G_THROW("IWImage.cant_read_primary");
   if (primary.serial != cserial)
-    G_THROW("(IWBitmap::decode_chunk) Chunk does not bear expected serial number");
+    G_THROW("IWImage.wrong_serial");
   int nslices = cslice + primary.slices;
   // Read auxilliary headers
   if (cserial == 0)
     {
       struct SecondaryHeader secondary;
       if (bs.readall((void*)&secondary, sizeof(secondary)) != sizeof(secondary))
-        G_THROW("(IWBitmap::decode_chunk) Cannot read secondary header");
+        G_THROW("IWImage.cant_read_secondary");
       if ((secondary.major & 0x7f) != IWCODEC_MAJOR)
-        G_THROW("(IWBitmap::decode_chunk) File has been compressed with an incompatible IWCodec");
+        G_THROW("IWImage.incompat_codec");
       if (secondary.minor > IWCODEC_MINOR)
-        G_THROW("(IWBitmap::decode_chunk) File has been compressed with a more recent IWCodec");
+        G_THROW("IWImage.recent_codec");
       // Read tertiary header
       struct TertiaryHeader2 tertiary;
       unsigned int header3size = sizeof(tertiary);
       if (bs.readall((void*)&tertiary, header3size) != header3size)
-        G_THROW("(IWBitmap::decode_chunk) Cannot read tertiary header");
+        G_THROW("IWImage.cant_read_tertiary");
       if (! (secondary.major & 0x80))
-        G_THROW("(IWBitmap::decode_chunk) File contains a color image\n");
+        G_THROW("IWImage.has_color");
       // Create ymap and ycodec
       int w = (tertiary.xhi << 8) | tertiary.xlo;
       int h = (tertiary.yhi << 8) | tertiary.ylo;
@@ -2043,11 +2043,11 @@ IWBitmap::encode_chunk(ByteStream &bs, const IWEncoderParms &parm)
 {
   // Check
   if (parm.slices==0 && parm.bytes==0 && parm.decibels==0)
-    G_THROW("(IWBitmap::encode_chunk) Must specify a stopping criterion");
+    G_THROW("IWImage.need_stop");
   if (ycodec && !ycodec->encoding)
-    G_THROW("(IWBitmap::encode_chunk) Codec still open for decoding");
+    G_THROW("IWImage.codec_open2");
   if (! ymap)
-    G_THROW("(IWBitmap::encode_chunk) IWBitmap object is empty");
+    G_THROW("IWImage.empty_object");
   // Open codec
   if (!ycodec)
     {
@@ -2127,7 +2127,7 @@ IWBitmap::parm_dbfrac(float frac)
   if (frac>0 && frac<=1)
     db_frac = frac;
   else
-    G_THROW("(IWBitmap::parm_dbfrac) parameter out of range");
+    G_THROW("IWImage.param_range");
 }
 
 
@@ -2143,7 +2143,7 @@ void
 IWBitmap::encode_iff(IFFByteStream &iff, int nchunks, const IWEncoderParms *parms)
 {
   if (ycodec)
-    G_THROW("(IWBitmap::encode_iff) Codec has been left open");
+    G_THROW("IWImage.left_open1");
   int flag = 1;
   iff.put_chunk("FORM:BM44", 1);
   DJVU_PROGRESS_TASK(iff,"encode iff chunk",nchunks);
@@ -2163,11 +2163,11 @@ void
 IWBitmap::decode_iff(IFFByteStream &iff, int maxchunks)
 {
   if (ycodec)
-    G_THROW("(IWBitmap::decode_iff)  Codec has been left open");
+    G_THROW("IWImage.left_open2");
   GString chkid;
   iff.get_chunk(chkid);
   if (chkid != "FORM:BM44")
-    G_THROW("(IWBitmap::decode_iff) File is corrupted (cannot read FORM.BM44)");
+    G_THROW("IWImage.corrupt_BM44");
   while (--maxchunks>=0 && iff.get_chunk(chkid))
     {
       if (chkid == "BM44")
@@ -2450,7 +2450,7 @@ IWPixmap::decode_chunk(ByteStream &bs)
 {
   // Check
   if (ycodec && ycodec->encoding)
-    G_THROW("(IWPixmap::decode_chunk) Codec still open for encoding");
+    G_THROW("IWImage.codec_open3");
   // Open
   if (! ycodec)
     {
@@ -2461,27 +2461,27 @@ IWPixmap::decode_chunk(ByteStream &bs)
   // Read primary header
   struct PrimaryHeader primary;
   if (bs.readall((void*)&primary, sizeof(primary)) != sizeof(primary))
-    G_THROW("(IWPixmap::decode_chunk) Cannot read primary header");
+    G_THROW("IWImage.cant_read_primary2");
   if (primary.serial != cserial)
-    G_THROW("(IWPixmap::decode_chunk) Chunk does not bear expected serial number");
+    G_THROW("IWImage.wrong_serial2");
   int nslices = cslice + primary.slices;
   // Read secondary header
   if (cserial == 0)
     {
       struct SecondaryHeader secondary;
       if (bs.readall((void*)&secondary, sizeof(secondary)) != sizeof(secondary))
-        G_THROW("(IWPixmap::decode_chunk) Cannot read secondary header");
+        G_THROW("IWImage.cant_read_secondary2");
       if ((secondary.major & 0x7f) != IWCODEC_MAJOR)
-        G_THROW("(IWPixmap::decode_chunk) File has been compressed with an incompatible IWCodec");
+        G_THROW("IWImage.incompat_codec2");
       if (secondary.minor > IWCODEC_MINOR)
-        G_THROW("(IWPixmap::decode_chunk) File has been compressed with a more recent IWCodec");
+        G_THROW("IWImage.recent_codec2");
       // Read tertiary header
       struct TertiaryHeader2 tertiary;
       unsigned int header3size = sizeof(tertiary);
       if (secondary.minor < 2)
         header3size = sizeof(TertiaryHeader1);
       if (bs.readall((void*)&tertiary, header3size) != header3size)
-        G_THROW("(IWBitmap::decode_chunk) Cannot read tertiary header");
+        G_THROW("IWImage.cant_read_tertiary2");
       // Handle header information
       int w = (tertiary.xhi << 8) | tertiary.xlo;
       int h = (tertiary.yhi << 8) | tertiary.ylo;
@@ -2536,11 +2536,11 @@ IWPixmap::encode_chunk(ByteStream &bs, const IWEncoderParms &parm)
 {
   // Check
   if (parm.slices==0 && parm.bytes==0 && parm.decibels==0)
-    G_THROW("(IWPixmap::encode_chunk) Must specify a stopping criterion");
+    G_THROW("IWImage.need_stop2");
   if (ycodec && !ycodec->encoding)
-    G_THROW("(IWPixmap::encode_chunk) Codec still open for decoding");
+    G_THROW("IWImage.codec_open4");
   if (!ymap)
-    G_THROW("(IWPixmap::encode_chunk) IWPixmap object is empty");
+    G_THROW("IWImage.empty_object2");
   // Open
   if (!ycodec)
     {
@@ -2642,7 +2642,7 @@ IWPixmap::parm_dbfrac(float frac)
   if (frac>0 && frac<=1)
     db_frac = frac;
   else
-    G_THROW("(IWPixmap::parm_dbfrac) parameter out of range");
+    G_THROW("IWImage.param_range2");
 }
 
 int 
@@ -2656,7 +2656,7 @@ void
 IWPixmap::encode_iff(IFFByteStream &iff, int nchunks, const IWEncoderParms *parms)
 {
   if (ycodec)
-    G_THROW("(IWPixmap::encode_iff) Codec has been left open");
+    G_THROW("IWImage.left_open3");
   int flag = 1;
   iff.put_chunk("FORM:PM44", 1);
   DJVU_PROGRESS_TASK(iff,"encode pixmap chunk", nchunks);
@@ -2676,11 +2676,11 @@ void
 IWPixmap::decode_iff(IFFByteStream &iff, int maxchunks)
 {
   if (ycodec)
-    G_THROW("(IWPixmap::decode_iff)  Codec has been left open");
+    G_THROW("IWImage.left_open4");
   GString chkid;
   iff.get_chunk(chkid);
   if (chkid!="FORM:PM44" && chkid!="FORM:BM44")
-    G_THROW("(IWPixmap::decode_iff) File is corrupted (cannot read FORM.BM44)");
+    G_THROW("IWImage.corrupt_BM44_2");
   while (--maxchunks>=0 && iff.get_chunk(chkid))
     {
       if (chkid=="PM44" || chkid=="BM44")

@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: TestException.cpp,v 1.9 2000-09-18 17:10:33 bcr Exp $
+//C- $Id: TestException.cpp,v 1.10 2000-10-06 21:47:21 fcrary Exp $
 
 
 #include <stdio.h>
@@ -41,7 +41,7 @@ main()
     } 
   G_CATCH(ex) 
     {
-      fprintf(stderr,"*** %s\n", ex.get_cause());
+      fprintf(stderr,"*** %s\n", DjVuMsg.LookUp( ex.get_cause() ));
     }
   G_ENDCATCH;
   
@@ -51,11 +51,11 @@ main()
       int a = 2;
       int b = 2+a;
       printf("a=%d, b=%d, c=%d\n",a,b,a+b);
-      G_THROW("Test exception");
+      G_THROW("TextException.test");
     }
   G_CATCH(ex)
     {
-      fprintf(stderr,"*** %s\n", ex.get_cause());
+      fprintf(stderr,"*** %s\n", DjVuMsg.LookUp( ex.get_cause() ));
     }
   G_ENDCATCH;
 
@@ -68,7 +68,7 @@ main()
     }
   G_CATCH(ex)
     {
-      fprintf(stderr,"*** %s\n", ex.get_cause());
+      fprintf(stderr,"*** %s\n", DjVuMsg.LookUp( ex.get_cause() ));
     }
   G_ENDCATCH;
 
@@ -84,7 +84,7 @@ main()
         }
       G_CATCH(ex)
         {
-          fprintf(stderr,"*** %s\n", ex.get_cause());
+          fprintf(stderr,"*** %s\n", DjVuMsg.LookUp( ex.get_cause() ));
           printf("Rethrown\n");
           G_RETHROW;
         }
@@ -93,7 +93,7 @@ main()
   G_CATCH(ex)
     {
       printf("Recatched\n");
-      fprintf(stderr,"*** %s\n", ex.get_cause());
+      fprintf(stderr,"*** %s\n", DjVuMsg.LookUp( ex.get_cause() ));
     }
   G_ENDCATCH;
 

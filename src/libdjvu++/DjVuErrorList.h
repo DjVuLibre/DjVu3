@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuErrorList.h,v 1.6 2000-09-18 17:10:09 bcr Exp $
+//C- $Id: DjVuErrorList.h,v 1.7 2000-10-06 21:47:21 fcrary Exp $
  
 #ifndef _DJVUERRORLIST_H
 #define _DJVUERRORLIST_H
@@ -28,7 +28,7 @@
 
     @memo DjVuErrorList class.
     @author Bill C Riemers <bcr@att.com>
-    @version #$Id: DjVuErrorList.h,v 1.6 2000-09-18 17:10:09 bcr Exp $#
+    @version #$Id: DjVuErrorList.h,v 1.7 2000-10-06 21:47:21 fcrary Exp $#
 */
 
 //@{
@@ -42,30 +42,43 @@ class DjVuErrorList : public DjVuSimplePort
 public:
      /// The normal port caster constructor. 
   DjVuErrorList();
+
      /// This constructor allows the user to specify the ByteStream.
   GURL set_stream(GP<ByteStream>);
+
      /// Append all error messages to the list
   virtual bool notify_error(const DjVuPort * source, const char * msg);
+
      /// Append all status messages to the list
   virtual bool notify_status(const DjVuPort * source, const char * msg);
+
      /// Add a new class to have its messages redirected here.
   inline void connect( const DjVuPort &port);
+
      /// Get the listing of errors, and clear the list.
   inline GList<GString> GetErrorList(void);
+
      /// Just clear the list.
   inline void ClearError(void);
+
      /// Get one error message and clear that message from the list.
   const char *GetError(void);
+
      /// Check if there are anymore error messages.
   inline bool HasError(void) const;
+
      /// Get the listing of status messages, and clear the list.
   inline GList<GString> GetStatusList(void);
+
      /// Just clear the list.
   inline void ClearStatus(void);
+
      /// Get one status message and clear that message from the list.
   const char *GetStatus(void);
-     /// Check if there are anymore status messages.
+
+     /// Check if there are any more status messages.
   inline bool HasStatus(void) const;
+
      /** This gets the data.  We can't use the simple port's request
        data since we want to allow the user to specify the ByteStream. */
   virtual GP<DataPool> request_data (

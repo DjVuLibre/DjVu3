@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: GPixmap.cpp,v 1.19 2000-09-18 17:10:17 bcr Exp $
+//C- $Id: GPixmap.cpp,v 1.20 2000-10-06 21:47:21 fcrary Exp $
 // -- Implements class PIXMAP
 // Author: Leon Bottou 07/1997
 
@@ -320,7 +320,7 @@ read_integer(char &c, ByteStream &bs)
     }
   // check integer
   if (c<'0' || c>'9')
-    G_THROW("Reading pixmap: integer expected");
+    G_THROW("GPixmap.no_int");
   // eat integer
   while (c>='0' && c<='9') 
     {
@@ -345,7 +345,7 @@ GPixmap::init(ByteStream &bs)
   else if (magic[0]=='P' && magic[1]=='6')
     raw = 1;
   else
-    G_THROW("Unknown PPM file format");
+    G_THROW("GPixmap.unk_PPM");
   // Read image size
   char lookahead = '\n';
   int acolumns = read_integer(lookahead, bs);
@@ -467,7 +467,7 @@ color_correction_table(double gamma, unsigned char gtable[256] )
 {
   // Check argument
   if (gamma<0.1 || gamma>10.0)
-    G_THROW("(GPixmap::color_correct) Illegal parameter");
+    G_THROW("GPixmap.bad_param");
   if (gamma<1.001 && gamma>0.999)
     {
       // Trivial correction
@@ -691,7 +691,7 @@ GPixmap::downsample(const GPixmap *src, int factor, const GRect *pdr)
         pdr->ymin < rect.ymin || 
         pdr->xmax > rect.xmax || 
         pdr->ymax > rect.ymax  )
-      G_THROW("(GPixmap::downsample) Specified rectangle overflows destination pixmap");
+      G_THROW("GPixmap.overflow1");
     rect = *pdr;
   }
 
@@ -777,7 +777,7 @@ GPixmap::upsample(const GPixmap *src, int factor, const GRect *pdr)
         pdr->ymin < rect.ymin || 
         pdr->xmax > rect.xmax || 
         pdr->ymax > rect.ymax  )
-      G_THROW("(GPixmap::upsample) Specified rectangle overflows destination pixmap");
+      G_THROW("GPixmap.overflow2");
     rect = *pdr;
   }
   // initialise pixmap
@@ -981,7 +981,7 @@ GPixmap::downsample43(const GPixmap *src, const GRect *pdr)
         pdr->ymin < rect.ymin || 
         pdr->xmax > rect.xmax || 
         pdr->ymax > rect.ymax  )
-      G_THROW("(GPixmap::downsample43) Specified rectangle overflows destination pixmap");
+      G_THROW("GPixmap.overflow3");
     rect = *pdr;
     destwidth = rect.width();
     destheight = rect.height();
@@ -1071,7 +1071,7 @@ GPixmap::upsample23(const GPixmap *src, const GRect *pdr)
         pdr->ymin < rect.ymin || 
         pdr->xmax > rect.xmax || 
         pdr->ymax > rect.ymax  )
-      G_THROW("(GPixmap::upsample23) Specified rectangle overflows destination pixmap");
+      G_THROW("GPixmap.overflow4");
     rect = *pdr;
     destwidth = rect.width();
     destheight = rect.height();
@@ -1167,7 +1167,7 @@ void
 GPixmap::attenuate(const GBitmap *bm, int xpos, int ypos)
 {
   // Check
-  if (!bm) G_THROW("Null alpha bitmap pointer");
+  if (!bm) G_THROW("GPixmap.null_alpha");
   // Compute number of rows and columns
   int xrows = mini(ypos + (int)bm->rows(), nrows) - maxi(0, ypos),
     xcolumns = mini(xpos + (int) bm->columns(), ncolumns) - maxi(0, xpos);
@@ -1217,7 +1217,7 @@ void
 GPixmap::blit(const GBitmap *bm, int xpos, int ypos, const GPixel *color)
 {
   // Check
-  if (!bm) G_THROW("Null alpha bitmap pointer");
+  if (!bm) G_THROW("GPixmap.null_alpha");
   if (!clipok) compute_clip();
   if (!color) return;
   // Compute number of rows and columns
@@ -1273,11 +1273,11 @@ void
 GPixmap::blit(const GBitmap *bm, int xpos, int ypos, const GPixmap *color)
 {
   // Check
-  if (!bm) G_THROW("Null alpha bitmap pointer");
-  if (!color) G_THROW("Null color pixmap pointer");
+  if (!bm) G_THROW("GPixmap.null_alpha");
+  if (!color) G_THROW("GPixmap.null_color");
   if (!clipok) compute_clip();
   if (bm->rows()!=color->rows() || bm->columns()!=color->columns())
-    G_THROW("Color pixmap and alpha bitmap have different sizes");
+    G_THROW("GPixmap.diff_size");
   // Compute number of rows and columns
   int xrows = mini(ypos + (int)bm->rows(), nrows) - maxi(0, ypos),
       xcolumns = mini(xpos + (int) bm->columns(), ncolumns) - maxi(0, xpos);
@@ -1331,11 +1331,11 @@ void
 GPixmap::blend(const GBitmap *bm, int xpos, int ypos, const GPixmap *color)
 {
   // Check
-  if (!bm) G_THROW("Null alpha bitmap pointer");
-  if (!color) G_THROW("Null color pixmap pointer");
+  if (!bm) G_THROW("GPixmap.null_alpha");
+  if (!color) G_THROW("GPixmap.null_color");
   if (!clipok) compute_clip();
   if (bm->rows()!=color->rows() || bm->columns()!=color->columns())
-    G_THROW("Color pixmap and alpha bitmap have different sizes");
+    G_THROW("GPixmap.diff_size");
   // Compute number of rows and columns
   int xrows = mini(ypos + (int)bm->rows(), nrows) - maxi(0, ypos),
       xcolumns = mini(xpos + (int) bm->columns(), ncolumns) - maxi(0, xpos);
@@ -1399,7 +1399,7 @@ GPixmap::stencil(const GBitmap *bm,
           pmr->ymin < rect.ymin || 
           pmr->xmax > rect.xmax || 
           pmr->ymax > rect.ymax  )
-        G_THROW("(GPixmap::stencil) Specified rectangle overflows foreground pixmap");
+        G_THROW("GPixmap.overflow5");
       rect = *pmr;
     }
   // Compute number of rows

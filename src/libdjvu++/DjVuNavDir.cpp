@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: DjVuNavDir.cpp,v 1.10 2000-09-18 17:10:13 bcr Exp $
+//C- $Id: DjVuNavDir.cpp,v 1.11 2000-10-06 21:47:21 fcrary Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -25,13 +25,13 @@
 
 DjVuNavDir::DjVuNavDir(const char * dirURL)
 {
-   if (!dirURL) G_THROW("ZERO directory URL passed to the DjVuNavDir constructor.");
+   if (!dirURL) G_THROW("DjVuNavDir.zero_dir");
    baseURL=GURL(dirURL).base();
 }
 
 DjVuNavDir::DjVuNavDir(ByteStream & str, const char * dirURL)
 {
-   if (!dirURL) G_THROW("ZERO directory URL passed to the DjVuNavDir constructor.");
+   if (!dirURL) G_THROW("DjVuNavDir.zero_dir");
    
    baseURL=GURL(dirURL).base();
    
@@ -51,7 +51,7 @@ DjVuNavDir::decode(ByteStream & str)
       char * ptr;
       for(ptr=buffer;ptr-buffer<1024;ptr++)
 	 if ((eof=!str.read(ptr, 1)) || *ptr=='\n') break;
-      if (ptr-buffer==1024) G_THROW("Failed to read DjVu directory. Line is too long.");
+      if (ptr-buffer==1024) G_THROW("DjVuNavDir.long_line");
       *ptr=0;
       if (!strlen(buffer)) continue;
 
@@ -122,9 +122,9 @@ DjVuNavDir::page_to_name(int page) const
 {
    GCriticalSectionLock lk((GCriticalSection *)&lock);
    
-   if (page<0) G_THROW("Page number may not be negative.");
+   if (page<0) G_THROW("DjVuNavDir.neg_page");
    if (page>=page2name.size())
-      G_THROW("Page number is too big.");
+      G_THROW("DjVuNavDir.large_page");
    return page2name[page];
 }
 
@@ -161,7 +161,7 @@ DjVuNavDir::delete_page(int page_num)
    int pages=page2name.size();
    
    if (page_num<0 || page_num>=pages)
-      G_THROW("Invalid page number passed as input.");
+      G_THROW("DjVuNavDir.bad_page");
 
    for(int i=page_num;i<pages-1;i++)
       page2name[i]=page2name[i+1];

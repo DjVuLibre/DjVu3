@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: DjVuAnno.cpp,v 1.52 2000-09-18 17:10:07 bcr Exp $
+//C- $Id: DjVuAnno.cpp,v 1.53 2000-10-06 21:47:21 fcrary Exp $
 
 
 #ifdef __GNUC__
@@ -136,7 +136,7 @@ GLObject::GLObject(int xnumber) : type(NUMBER), number(xnumber) {}
 GLObject::GLObject(GLObjectType xtype, const char * str) : type(xtype)
 {
    if (type!=STRING && type!=SYMBOL)
-      G_THROW("GLObject(): Wrong object type passed. Should be either STRING or SYMBOL.");
+      G_THROW("DjVuAnno.bad_type");     //  GLObject(): Wrong object type passed. Should be either STRING or SYMBOL.
    if (type==STRING) string=str;
    else symbol=str;
 }
@@ -147,65 +147,65 @@ GLObject::GLObject(const char * xname, const GPList<GLObject> & xlist) :
 void
 GLObject::print(ByteStream & str, int compact, int indent, int * cur_pos) const
 {
-   int aldel_cur_pos=0;
-   if (!cur_pos) { cur_pos=new int; *cur_pos=0; aldel_cur_pos=1; }
-   
-   char buffer[1024];
-   GTArray<char> buffer_str;
-   const char * to_print=0;
-   switch(type)
-   {
-      case NUMBER:
-	 sprintf(buffer, "%d", number);
-	 to_print=buffer;
-	 break;
-      case STRING:
-	 {
-	    int src=0, dst=0;
-	    buffer_str.resize(5+string.length()*2);
-	    buffer_str[dst++]='"';
-	    for(src=0;src<(int)string.length();src++)
-	    {
+  int aldel_cur_pos=0;
+  if (!cur_pos) { cur_pos=new int; *cur_pos=0; aldel_cur_pos=1; }
+  
+  char buffer[1024];
+  GTArray<char> buffer_str;
+  const char * to_print=0;
+  switch(type)
+  {
+  case NUMBER:
+    sprintf(buffer, "%d", number);
+    to_print=buffer;
+    break;
+  case STRING:
+    {
+      int src=0, dst=0;
+      buffer_str.resize(5+string.length()*2);
+      buffer_str[dst++]='"';
+      for(src=0;src<(int)string.length();src++)
+      {
 	       char ch=string[src];
-	       if (ch=='"') buffer_str[dst++]='\\';
-	       buffer_str[dst++]=ch;
-	    }
-	    buffer_str[dst++]='"';
-	    buffer_str[dst++]=0;
-	    to_print=buffer_str;
-	 }
-	 break;
-      case SYMBOL:
-	 sprintf(buffer, "%s", (const char *) symbol);
-	 to_print=buffer;
-	 break;
-      case LIST:
-	 sprintf(buffer, "(%s", (const char *) name);
-	 to_print=buffer;
-	 break;
-   }
-   if (!compact && *cur_pos+strlen(to_print)>70)
-   {
-      char ch='\n';
-      str.write(&ch, 1);
-      ch=' ';
-      for(int i=0;i<indent;i++) str.write(&ch, 1);
-      *cur_pos=indent;
-   }
-   str.write(to_print, strlen(to_print));
-   char ch=' ';
-   str.write(&ch, 1);
-   *cur_pos+=strlen(to_print)+1;
-   if (type==LIST)
-   {
-      int indent=*cur_pos-strlen(to_print);
-      for(GPosition pos=list;pos;++pos)
-	 list[pos]->print(str, compact, indent, cur_pos);
-      str.write(") ", 2);
-      *cur_pos+=2;
-   }
-   
-   if (aldel_cur_pos) delete cur_pos;
+         if (ch=='"') buffer_str[dst++]='\\';
+         buffer_str[dst++]=ch;
+      }
+      buffer_str[dst++]='"';
+      buffer_str[dst++]=0;
+      to_print=buffer_str;
+    }
+    break;
+  case SYMBOL:
+    sprintf(buffer, "%s", (const char *) symbol);
+    to_print=buffer;
+    break;
+  case LIST:
+    sprintf(buffer, "(%s", (const char *) name);
+    to_print=buffer;
+    break;
+  }
+  if (!compact && *cur_pos+strlen(to_print)>70)
+  {
+    char ch='\n';
+    str.write(&ch, 1);
+    ch=' ';
+    for(int i=0;i<indent;i++) str.write(&ch, 1);
+    *cur_pos=indent;
+  }
+  str.write(to_print, strlen(to_print));
+  char ch=' ';
+  str.write(&ch, 1);
+  *cur_pos+=strlen(to_print)+1;
+  if (type==LIST)
+  {
+    int indent=*cur_pos-strlen(to_print);
+    for(GPosition pos=list;pos;++pos)
+      list[pos]->print(str, compact, indent, cur_pos);
+    str.write(") ", 2);
+    *cur_pos+=2;
+  }
+  
+  if (aldel_cur_pos) delete cur_pos;
 }
 
 GString
@@ -213,6 +213,7 @@ GLObject::get_string(void) const
 {
    if (type!=STRING)
    {
+/*          Original preserved in case I screw up the works
       char * buffer=new char[256], buffer1[256]; buffer1[0]=0;
       sprintf(buffer, "Invalid object type. Can't convert ");
       if (type==NUMBER) sprintf(buffer1, "number %d", number);
@@ -220,6 +221,12 @@ GLObject::get_string(void) const
       else if (type==LIST) sprintf(buffer1, "compound object '%s'", (const char *) name);
       strcat(buffer, buffer1); strcat(buffer, " to string.");
       G_THROW(buffer);
+*/
+      char buffer[256];
+      if (type==NUMBER) sprintf(buffer, "dvvuanno.number2string\t%d", number);
+      else if (type==SYMBOL) sprintf(buffer, "dvvuanno.symbol2string\t%s", (const char *) symbol);
+      else if (type==LIST) sprintf(buffer, "dvvuanno.comp_obj2string\t%s", (const char *) name);
+      G_THROW(buffer);      //  Invalid object type. Can't convert xxx to string.
    }
    return string;
 }
@@ -229,6 +236,7 @@ GLObject::get_symbol(void) const
 {
    if (type!=SYMBOL)
    {
+/*          Original preserved in case I screw up the works
       char * buffer=new char[256], buffer1[256]; buffer1[0]=0;
       sprintf(buffer, "Invalid object type. Can't convert ");
       if (type==NUMBER) sprintf(buffer1, "number %d", number);
@@ -236,6 +244,12 @@ GLObject::get_symbol(void) const
       else if (type==LIST) sprintf(buffer1, "compound object '%s'", (const char *) name);
       strcat(buffer, buffer1); strcat(buffer, " to symbol.");
       G_THROW(buffer);
+*/
+      char buffer[256];
+      if (type==NUMBER) sprintf(buffer, "DjVuAnno.number2symbol\t%d", number);
+      else if (type==STRING) sprintf(buffer, "DjVuAnno.string2symbol\t%s", (const char *) string);
+      else if (type==LIST) sprintf(buffer, "DjVuAnno.comp_obj2symbol\t%s", (const char *) name);
+      G_THROW(buffer);       //  Invalid object type. Can't convert xxx to symbol.
    }
    return symbol;
 }
@@ -245,6 +259,7 @@ GLObject::get_number(void) const
 {
    if (type!=NUMBER)
    {
+/*          Original preserved in case I screw up the works
       char * buffer=new char[256], buffer1[256];
       sprintf(buffer, "Invalid object type. Can't convert ");
       if (type==STRING) sprintf(buffer1, "string '%s'", (const char *) string);
@@ -252,6 +267,12 @@ GLObject::get_number(void) const
       else if (type==LIST) sprintf(buffer1, "compound object '%s'", (const char *) name);
       strcat(buffer, buffer1); strcat(buffer, " to integer.");
       G_THROW(buffer);
+*/
+      char buffer[256];
+      if (type==STRING) sprintf(buffer, "DjVuAnno.string2integer\t%s", (const char *) string);
+      else if (type==SYMBOL) sprintf(buffer, "DjVuAnno.symbol2integer\t%s", (const char *) symbol);
+      else if (type==LIST) sprintf(buffer, "DjVuAnno.comp_obj2integer\t%s", (const char *) name);
+      G_THROW(buffer);       //  Invalid object type. Can't convert xxx to integer.
    }
    return number;
 }
@@ -261,6 +282,7 @@ GLObject::get_name(void) const
 {
    if (type!=LIST)
    {
+/*          Original preserved in case I screw up the works
       char * buffer=new char[256], buffer1[256];
       sprintf(buffer, "Invalid object type. Can't convert ");
       if (type==NUMBER) sprintf(buffer1, "number '%d'", number);
@@ -268,6 +290,12 @@ GLObject::get_name(void) const
       else if (type==SYMBOL) sprintf(buffer1, "symbol '%s'", (const char *) symbol);
       strcat(buffer, buffer1); strcat(buffer, " to compound object.");
       G_THROW(buffer);
+*/
+      char buffer[256];
+      if (type==NUMBER) sprintf(buffer, "DjVuAnno.number2comp_obj\t%d", number);
+      else if (type==STRING) sprintf(buffer, "DjVuAnno.string2comp_obj\t%s", (const char *) string);
+      else if (type==SYMBOL) sprintf(buffer, "DjVuAnno.symbol2comp_obj\t%s", (const char *) symbol);
+      G_THROW(buffer);       //  Invalid object type. Can't convert xxx to compound object.
    }
    return name;
 }
@@ -277,6 +305,7 @@ GLObject::operator[](int n) const
 {
    if (type!=LIST)
    {
+/*          Original preserved in case I screw up the works
       char * buffer=new char[256], buffer1[256];
       sprintf(buffer, "Invalid object type. Can't convert ");
       if (type==NUMBER) sprintf(buffer1, "number '%d'", number);
@@ -284,8 +313,14 @@ GLObject::operator[](int n) const
       else if (type==SYMBOL) sprintf(buffer1, "symbol '%s'", (const char *) symbol);
       strcat(buffer, buffer1); strcat(buffer, " to compound object.");
       G_THROW(buffer);
+*/
+      char buffer[256];
+      if (type==NUMBER) sprintf(buffer, "DjVuAnno.number2comp_obj\t%d", number);
+      else if (type==STRING) sprintf(buffer, "DjVuAnno.string2comp_obj\t%s", (const char *) string);
+      else if (type==SYMBOL) sprintf(buffer, "DjVuAnno.symbol2comp_obj\t%s", (const char *) symbol);
+      G_THROW(buffer);       //  Invalid object type. Can't convert xxx to compound object.
    }
-   if (n>=list.size()) G_THROW("Too few elements in '"+name+"'");
+   if (n>=list.size()) G_THROW("DjVuAnno.too_few\t"+name);
    int i;
    GPosition pos;
    for(i=0, pos=list;i<n && pos;i++, ++pos);
@@ -297,6 +332,7 @@ GLObject::get_list(void)
 {
    if (type!=LIST)
    {
+/*          Original preserved in case I screw up the works
       char * buffer=new char[256], buffer1[256];
       sprintf(buffer, "Invalid object type. Can't convert ");
       if (type==NUMBER) sprintf(buffer1, "number '%d'", number);
@@ -304,6 +340,12 @@ GLObject::get_list(void)
       else if (type==SYMBOL) sprintf(buffer1, "symbol '%s'", (const char *) symbol);
       strcat(buffer, buffer1); strcat(buffer, " to compound object.");
       G_THROW(buffer);
+*/
+      char buffer[256];
+      if (type==NUMBER) sprintf(buffer, "DjVuAnno.number2comp_obj\t%d", number);
+      else if (type==STRING) sprintf(buffer, "DjVuAnno.string2comp_obj\t%s", (const char *) string);
+      else if (type==SYMBOL) sprintf(buffer, "DjVuAnno.symbol2comp_obj\t%s", (const char *) symbol);
+      G_THROW(buffer);       //  Invalid object type. Can't convert xxx to compound object.
    }
    return list;
 }
@@ -373,62 +415,75 @@ void
 GLParser::parse(const char * cur_name, GPList<GLObject> & list,
 		const char * & start)
 {
-   DEBUG_MSG("GLParse::parse(): Parsing contents of object '" << cur_name << "'\n");
-   DEBUG_MAKE_INDENT(3);
-   
-   while(1)
-   {
-      GLToken token=get_token(start);
-      if (token.type==GLToken::OPEN_PAR)
+  DEBUG_MSG("GLParse::parse(): Parsing contents of object '" << cur_name << "'\n");
+  DEBUG_MAKE_INDENT(3);
+  
+  while(1)
+  {
+    GLToken token=get_token(start);
+    if (token.type==GLToken::OPEN_PAR)
+    {
+      if (isspace(*start))
       {
-	 if (isspace(*start))
-	 {
-	    char * buffer=new char[128];
-	    sprintf(buffer, "Error occurred when parsing contents of object '%s':\n"
-		    "'(' must be IMMEDIATELY followed by an object name.",
-		    (const char *) cur_name);
-	    G_THROW(buffer);
-	 }
-	 
-	 GLToken tok=get_token(start);
-	 GP<GLObject> object=tok.object;	// This object should be SYMBOL
-	 					// We will convert it to LIST later
-	 if (tok.type!=GLToken::OBJECT || object->get_type()!=GLObject::SYMBOL)
-	 {
-	    char * buffer=new char[512];
-	    sprintf(buffer, "Error occurred when parsing contents of object '%s':\n"
-		    "'(' must be followed by object name, not by ",
-		    (const char *) cur_name);
-	    if (tok.type==GLToken::OPEN_PAR ||
-		tok.type==GLToken::CLOSE_PAR) strcat(buffer, "parenthesis.");
-	    if (tok.type==GLToken::OBJECT)
-	    {
-	       GLObject::GLObjectType type=object->get_type();
-	       if (type==GLObject::NUMBER) strcat(buffer, "number.");
-	       else if (type==GLObject::STRING) strcat(buffer, "string.");
-	    }
-	    G_THROW(buffer);
-	 }
-	 
-	 // OK. Get the object contents
-	 GPList<GLObject> new_list;
-	 G_TRY
-           {
-             parse(object->get_symbol(), new_list, start);
-           } 
-         G_CATCH(exc)
-           {
-             if (strcmp(exc.get_cause(), "EOF"))
-               G_RETHROW;
-           } 
-         G_ENDCATCH;
-	 list.append(new GLObject(object->get_symbol(), new_list));
-	 continue;
+        /*        Original preserved in case I screw things up
+        char * buffer=new char[128];
+        sprintf(buffer, "Error occurred when parsing contents of object '%s':\n"
+		                    "'(' must be IMMEDIATELY followed by an object name.",
+                        (const char *) cur_name);
+        G_THROW(buffer);
+        */
+        G_THROW(GString("DjVuAnno.paren\t") + cur_name);
       }
-      if (token.type==GLToken::CLOSE_PAR) 
-        return;
-      list.append(token.object);
-   }
+      
+      GLToken tok=get_token(start);
+      GP<GLObject> object=tok.object;	// This object should be SYMBOL
+      // We will convert it to LIST later
+      if (tok.type!=GLToken::OBJECT || object->get_type()!=GLObject::SYMBOL)
+      {
+        /*        original preserved in case I screw it up
+        char * buffer=new char[512];
+        sprintf(buffer, "Error occurred when parsing contents of object '%s':\n"
+		                    "'(' must be followed by object name, not by ",
+                        (const char *) cur_name);
+        if (tok.type==GLToken::OPEN_PAR ||
+            tok.type==GLToken::CLOSE_PAR) strcat(buffer, "parenthesis.");
+        if (tok.type==GLToken::OBJECT)
+        {
+	         GLObject::GLObjectType type=object->get_type();
+           if (type==GLObject::NUMBER) strcat(buffer, "number.");
+           else if (type==GLObject::STRING) strcat(buffer, "string.");
+        }
+        G_THROW(buffer);
+        */
+        if (tok.type==GLToken::OPEN_PAR ||
+          tok.type==GLToken::CLOSE_PAR) G_THROW(GString("dvvuanno.no_paren\t") + cur_name);
+        if (tok.type==GLToken::OBJECT)
+        {
+          GLObject::GLObjectType type=object->get_type();
+          if (type==GLObject::NUMBER) G_THROW(GString("dvvuanno.no_number\t") + cur_name);
+          else if (type==GLObject::STRING) G_THROW(GString("dvvuanno.no_string\t") + cur_name);
+        }
+      }
+      
+      // OK. Get the object contents
+      GPList<GLObject> new_list;
+      G_TRY
+      {
+        parse(object->get_symbol(), new_list, start);
+      } 
+      G_CATCH(exc)
+      {
+        if (strcmp(exc.get_cause(), "EOF"))
+          G_RETHROW;
+      } 
+      G_ENDCATCH;
+      list.append(new GLObject(object->get_symbol(), new_list));
+      continue;
+    }
+    if (token.type==GLToken::CLOSE_PAR) 
+      return;
+    list.append(token.object);
+  }
 }
 
 void
@@ -611,20 +666,20 @@ DjVuANT::cvt_color(const char * color, u_int32 def)
 u_int32
 DjVuANT::get_bg_color(GLParser & parser)
 {
-   DEBUG_MSG("DjVuANT::get_bg_color(): getting background color ...\n");
-   DEBUG_MAKE_INDENT(3);
-   G_TRY
-   {
-      GP<GLObject> obj=parser.get_object(BACKGROUND_TAG);
-      if (obj && obj->get_list().size()==1)
-      {
-	 GString color=(*obj)[0]->get_symbol();
-	 DEBUG_MSG("color='" << color << "'\n");
-	 return cvt_color(color, 0xffffff);
+  DEBUG_MSG("DjVuANT::get_bg_color(): getting background color ...\n");
+  DEBUG_MAKE_INDENT(3);
+  G_TRY
+  {
+    GP<GLObject> obj=parser.get_object(BACKGROUND_TAG);
+    if (obj && obj->get_list().size()==1)
+    {
+      GString color=(*obj)[0]->get_symbol();
+      DEBUG_MSG("color='" << color << "'\n");
+      return cvt_color(color, 0xffffff);
       } else { DEBUG_MSG("can't find any.\n"); }
-   } G_CATCH_ALL {} G_ENDCATCH;
-   DEBUG_MSG("resetting color to 0xffffffff (UNSPEC)\n");
-   return 0xffffffff;
+  } G_CATCH_ALL {} G_ENDCATCH;
+  DEBUG_MSG("resetting color to 0xffffffff (UNSPEC)\n");
+  return 0xffffffff;
 }
 
 int
@@ -634,210 +689,210 @@ DjVuANT::get_zoom(GLParser & parser)
       //   =0 - not set
       //   >0 - numeric zoom (%%)
 {
-   DEBUG_MSG("DjVuANT::get_zoom(): getting zoom factor ...\n");
-   DEBUG_MAKE_INDENT(3);
-   G_TRY
-   {
-      GP<GLObject> obj=parser.get_object(ZOOM_TAG);
-      if (obj && obj->get_list().size()==1)
-      {
-	 GString zoom=(*obj)[0]->get_symbol();
-	 DEBUG_MSG("zoom='" << zoom << "'\n");
-
-	 if (zoom=="stretch") return ZOOM_STRETCH;
-	 else if (zoom=="one2one") return ZOOM_ONE2ONE;
-	 else if (zoom=="width") return ZOOM_WIDTH;
-	 else if (zoom=="page") return ZOOM_PAGE;
-	 else if (zoom[0]!='d') G_THROW("Illegal zoom specification");
-	 else return atoi((const char *) zoom+1);
+  DEBUG_MSG("DjVuANT::get_zoom(): getting zoom factor ...\n");
+  DEBUG_MAKE_INDENT(3);
+  G_TRY
+  {
+    GP<GLObject> obj=parser.get_object(ZOOM_TAG);
+    if (obj && obj->get_list().size()==1)
+    {
+      GString zoom=(*obj)[0]->get_symbol();
+      DEBUG_MSG("zoom='" << zoom << "'\n");
+      
+      if (zoom=="stretch") return ZOOM_STRETCH;
+      else if (zoom=="one2one") return ZOOM_ONE2ONE;
+      else if (zoom=="width") return ZOOM_WIDTH;
+      else if (zoom=="page") return ZOOM_PAGE;
+      else if (zoom[0]!='d') G_THROW("DjVuAnno.bad_zoom");
+      else return atoi((const char *) zoom+1);
       } else { DEBUG_MSG("can't find any.\n"); }
-   } G_CATCH_ALL {} G_ENDCATCH;
-   DEBUG_MSG("resetting zoom to 0 (UNSPEC)\n");
-   return ZOOM_UNSPEC;
+  } G_CATCH_ALL {} G_ENDCATCH;
+  DEBUG_MSG("resetting zoom to 0 (UNSPEC)\n");
+  return ZOOM_UNSPEC;
 }
 
 int
 DjVuANT::get_mode(GLParser & parser)
 {
-   DEBUG_MSG("DjVuAnt::get_mode(): getting default mode ...\n");
-   DEBUG_MAKE_INDENT(3);
-   G_TRY
-   {
-      GP<GLObject> obj=parser.get_object(MODE_TAG);
-      if (obj && obj->get_list().size()==1)
-      {
-	 GString mode=(*obj)[0]->get_symbol();
-	 DEBUG_MSG("mode='" << mode << "'\n");
-
-	 if (mode=="color") return MODE_COLOR;
-	 else if (mode=="fore") return MODE_FORE;
-	 else if (mode=="back") return MODE_BACK;
-	 else if (mode=="bw") return MODE_BW;
+  DEBUG_MSG("DjVuAnt::get_mode(): getting default mode ...\n");
+  DEBUG_MAKE_INDENT(3);
+  G_TRY
+  {
+    GP<GLObject> obj=parser.get_object(MODE_TAG);
+    if (obj && obj->get_list().size()==1)
+    {
+      GString mode=(*obj)[0]->get_symbol();
+      DEBUG_MSG("mode='" << mode << "'\n");
+      
+      if (mode=="color") return MODE_COLOR;
+      else if (mode=="fore") return MODE_FORE;
+      else if (mode=="back") return MODE_BACK;
+      else if (mode=="bw") return MODE_BW;
       } else { DEBUG_MSG("can't find any.\n"); }
-   } G_CATCH_ALL {} G_ENDCATCH;
-   DEBUG_MSG("resetting mode to MODE_UNSPEC\n");
-   return MODE_UNSPEC;
+  } G_CATCH_ALL {} G_ENDCATCH;
+  DEBUG_MSG("resetting mode to MODE_UNSPEC\n");
+  return MODE_UNSPEC;
 }
 
 int
 DjVuANT::get_hor_align(GLParser & parser)
 {
-   DEBUG_MSG("DjVuAnt::get_hor_align(): getting hor page alignemnt ...\n");
-   DEBUG_MAKE_INDENT(3);
-   G_TRY
-   {
-      GP<GLObject> obj=parser.get_object(ALIGN_TAG);
-      if (obj && obj->get_list().size()==2)
-      {
-	 GString align=(*obj)[0]->get_symbol();
-	 DEBUG_MSG("hor_align='" << align << "'\n");
-
-	 if (align=="left") return ALIGN_LEFT;
-	 else if (align=="center") return ALIGN_CENTER;
-	 else if (align=="right") return ALIGN_RIGHT;
+  DEBUG_MSG("DjVuAnt::get_hor_align(): getting hor page alignemnt ...\n");
+  DEBUG_MAKE_INDENT(3);
+  G_TRY
+  {
+    GP<GLObject> obj=parser.get_object(ALIGN_TAG);
+    if (obj && obj->get_list().size()==2)
+    {
+      GString align=(*obj)[0]->get_symbol();
+      DEBUG_MSG("hor_align='" << align << "'\n");
+      
+      if (align=="left") return ALIGN_LEFT;
+      else if (align=="center") return ALIGN_CENTER;
+      else if (align=="right") return ALIGN_RIGHT;
       } else { DEBUG_MSG("can't find any.\n"); }
-   } G_CATCH_ALL {} G_ENDCATCH;
-   DEBUG_MSG("resetting alignment to ALIGN_UNSPEC\n");
-   return ALIGN_UNSPEC;
+  } G_CATCH_ALL {} G_ENDCATCH;
+  DEBUG_MSG("resetting alignment to ALIGN_UNSPEC\n");
+  return ALIGN_UNSPEC;
 }
 
 int
 DjVuANT::get_ver_align(GLParser & parser)
 {
-   DEBUG_MSG("DjVuAnt::get_ver_align(): getting vert page alignemnt ...\n");
-   DEBUG_MAKE_INDENT(3);
-   G_TRY
-   {
-      GP<GLObject> obj=parser.get_object(ALIGN_TAG);
-      if (obj && obj->get_list().size()==2)
-      {
-	 GString align=(*obj)[1]->get_symbol();
-	 DEBUG_MSG("ver_align='" << align << "'\n");
-
-	 if (align=="top") return ALIGN_TOP;
-	 else if (align=="center") return ALIGN_CENTER;
-	 else if (align=="bottom") return ALIGN_BOTTOM;
+  DEBUG_MSG("DjVuAnt::get_ver_align(): getting vert page alignemnt ...\n");
+  DEBUG_MAKE_INDENT(3);
+  G_TRY
+  {
+    GP<GLObject> obj=parser.get_object(ALIGN_TAG);
+    if (obj && obj->get_list().size()==2)
+    {
+      GString align=(*obj)[1]->get_symbol();
+      DEBUG_MSG("ver_align='" << align << "'\n");
+      
+      if (align=="top") return ALIGN_TOP;
+      else if (align=="center") return ALIGN_CENTER;
+      else if (align=="bottom") return ALIGN_BOTTOM;
       } else { DEBUG_MSG("can't find any.\n"); }
-   } G_CATCH_ALL {} G_ENDCATCH;
-   DEBUG_MSG("resetting alignment to ALIGN_UNSPEC\n");
-   return ALIGN_UNSPEC;
+  } G_CATCH_ALL {} G_ENDCATCH;
+  DEBUG_MSG("resetting alignment to ALIGN_UNSPEC\n");
+  return ALIGN_UNSPEC;
 }
 
 GPList<GMapArea>
 DjVuANT::get_map_areas(GLParser & parser)
 {
-   DEBUG_MSG("DjVuANT::get_map_areas(): forming and returning back list of map areas\n");
-   DEBUG_MAKE_INDENT(3);
-
-   GPList<GMapArea> map_areas;
-   
-   GPList<GLObject> list=parser.get_list();
-   for(GPosition pos=list;pos;++pos)
-   {
-      GLObject & obj=*list[pos];
-      if (obj.get_type()==GLObject::LIST && obj.get_name()==MAPAREA_TAG)
-      {
-	 G_TRY {
+  DEBUG_MSG("DjVuANT::get_map_areas(): forming and returning back list of map areas\n");
+  DEBUG_MAKE_INDENT(3);
+  
+  GPList<GMapArea> map_areas;
+  
+  GPList<GLObject> list=parser.get_list();
+  for(GPosition pos=list;pos;++pos)
+  {
+    GLObject & obj=*list[pos];
+    if (obj.get_type()==GLObject::LIST && obj.get_name()==MAPAREA_TAG)
+    {
+      G_TRY {
 	       // Getting the url
-	    GString url;
-	    GString target="_self";
-	    GLObject & url_obj=*(obj[0]);
-	    if (url_obj.get_type()==GLObject::LIST)
-	    {
-	       if (url_obj.get_name()!="url") G_THROW("Invalid URL specification");
-	       url=(url_obj[0])->get_string();
-	       target=(url_obj[1])->get_string();
-	    } else url=url_obj.get_string();
-	    
+        GString url;
+        GString target="_self";
+        GLObject & url_obj=*(obj[0]);
+        if (url_obj.get_type()==GLObject::LIST)
+        {
+          if (url_obj.get_name()!="url") G_THROW("DjVuAnno.bad_url");
+          url=(url_obj[0])->get_string();
+          target=(url_obj[1])->get_string();
+        } else url=url_obj.get_string();
+        
 	       // Getting the comment
-	    GString comment=(obj[1])->get_string();
-	    
-	    DEBUG_MSG("found maparea '" << comment << "' (" <<
-		      url << ":" << target << ")\n");
-
-	    GLObject * shape=obj[2];
-	    GP<GMapArea> map_area;
-	    if (shape->get_type()==GLObject::LIST)
-	    {
-	       if (shape->get_name()==RECT_TAG)
-	       {
-		  DEBUG_MSG("it's a rectangle.\n");
-		  GRect grect((*shape)[0]->get_number(),
-			      (*shape)[1]->get_number(),
-			      (*shape)[2]->get_number(),
-			      (*shape)[3]->get_number());
-		  map_area=new GMapRect(grect);
-	       } else if (shape->get_name()==POLY_TAG)
-	       {
-		  DEBUG_MSG("it's a polygon.\n");
-		  int points=shape->get_list().size()/2;
-		  GTArray<int> xx(points-1), yy(points-1);
-		  for(int i=0;i<points;i++)
-		  {
-		     xx[i]=(*shape)[2*i]->get_number();
-		     yy[i]=(*shape)[2*i+1]->get_number();
-		  }
-		  map_area=new GMapPoly(xx, yy, points);
-	       } else if (shape->get_name()==OVAL_TAG)
-	       {
-		  DEBUG_MSG("it's an ellipse.\n");
-		  GRect grect((*shape)[0]->get_number(),
-			      (*shape)[1]->get_number(),
-			      (*shape)[2]->get_number(),
-			      (*shape)[3]->get_number());
-		  map_area=new GMapOval(grect);
-	       }
-	    }
-
-	    if (map_area)
-	    {
-	       map_area->url=url;
-	       map_area->target=target;
-	       map_area->comment=comment;
-	       for(int obj_num=3;obj_num<obj.get_list().size();obj_num++)
-	       {
-		  GLObject * el=obj[obj_num];
-		  if (el->get_type()==GLObject::LIST)
-		  {
-		     const GString & name=el->get_name();
-		     if (name==BORDER_AVIS_TAG)
-			map_area->border_always_visible=true;
-		     else if (name==HILITE_TAG)
-		     {
-			GLObject * obj=el->get_list()[el->get_list().firstpos()];
-			if (obj->get_type()==GLObject::SYMBOL)
-			   map_area->hilite_color=cvt_color(obj->get_symbol(), 0xff);
-		     } else
-		     {
-			int border_type=
-				   name==NO_BORDER_TAG ? GMapArea::NO_BORDER :
-				   name==XOR_BORDER_TAG ? GMapArea::XOR_BORDER :
-				   name==SOLID_BORDER_TAG ? GMapArea::SOLID_BORDER :
-				   name==SHADOW_IN_BORDER_TAG ? GMapArea::SHADOW_IN_BORDER :
-				   name==SHADOW_OUT_BORDER_TAG ? GMapArea::SHADOW_OUT_BORDER :
-				   name==SHADOW_EIN_BORDER_TAG ? GMapArea::SHADOW_EIN_BORDER :
-				   name==SHADOW_EOUT_BORDER_TAG ? GMapArea::SHADOW_EOUT_BORDER : -1;
-			if (border_type>=0)
-			{
-			   map_area->border_type=(GMapArea::BorderType) border_type;
-			   for(GPosition pos=el->get_list();pos;++pos)
-			   {
-			      GLObject * obj=el->get_list()[pos];
-			      if (obj->get_type()==GLObject::SYMBOL)
-				 map_area->border_color=cvt_color(obj->get_symbol(), 0xff);
-			      if (obj->get_type()==GLObject::NUMBER)
-				 map_area->border_width=obj->get_number();
-			   }
-			}
-		     }	    
-		  } // if (el->get_type()==...)
-	       } // for(int obj_num=...)
-	       map_areas.append(map_area);
-	    } // if (map_area) ...
-	 } G_CATCH_ALL {} G_ENDCATCH;
-      } // if (...get_name()==MAPAREA_TAG)
+        GString comment=(obj[1])->get_string();
+        
+        DEBUG_MSG("found maparea '" << comment << "' (" <<
+          url << ":" << target << ")\n");
+        
+        GLObject * shape=obj[2];
+        GP<GMapArea> map_area;
+        if (shape->get_type()==GLObject::LIST)
+        {
+          if (shape->get_name()==RECT_TAG)
+          {
+            DEBUG_MSG("it's a rectangle.\n");
+            GRect grect((*shape)[0]->get_number(),
+                        (*shape)[1]->get_number(),
+                        (*shape)[2]->get_number(),
+                        (*shape)[3]->get_number());
+            map_area=new GMapRect(grect);
+          } else if (shape->get_name()==POLY_TAG)
+          {
+            DEBUG_MSG("it's a polygon.\n");
+            int points=shape->get_list().size()/2;
+            GTArray<int> xx(points-1), yy(points-1);
+            for(int i=0;i<points;i++)
+            {
+              xx[i]=(*shape)[2*i]->get_number();
+              yy[i]=(*shape)[2*i+1]->get_number();
+            }
+            map_area=new GMapPoly(xx, yy, points);
+          } else if (shape->get_name()==OVAL_TAG)
+          {
+            DEBUG_MSG("it's an ellipse.\n");
+            GRect grect((*shape)[0]->get_number(),
+                        (*shape)[1]->get_number(),
+                        (*shape)[2]->get_number(),
+                        (*shape)[3]->get_number());
+            map_area=new GMapOval(grect);
+          }
+        }
+        
+        if (map_area)
+        {
+          map_area->url=url;
+          map_area->target=target;
+          map_area->comment=comment;
+          for(int obj_num=3;obj_num<obj.get_list().size();obj_num++)
+          {
+            GLObject * el=obj[obj_num];
+            if (el->get_type()==GLObject::LIST)
+            {
+              const GString & name=el->get_name();
+              if (name==BORDER_AVIS_TAG)
+                map_area->border_always_visible=true;
+              else if (name==HILITE_TAG)
+              {
+                GLObject * obj=el->get_list()[el->get_list().firstpos()];
+                if (obj->get_type()==GLObject::SYMBOL)
+                  map_area->hilite_color=cvt_color(obj->get_symbol(), 0xff);
+              } else
+              {
+                int border_type=
+                  name==NO_BORDER_TAG ? GMapArea::NO_BORDER :
+                  name==XOR_BORDER_TAG ? GMapArea::XOR_BORDER :
+                  name==SOLID_BORDER_TAG ? GMapArea::SOLID_BORDER :
+                  name==SHADOW_IN_BORDER_TAG ? GMapArea::SHADOW_IN_BORDER :
+                  name==SHADOW_OUT_BORDER_TAG ? GMapArea::SHADOW_OUT_BORDER :
+                  name==SHADOW_EIN_BORDER_TAG ? GMapArea::SHADOW_EIN_BORDER :
+                  name==SHADOW_EOUT_BORDER_TAG ? GMapArea::SHADOW_EOUT_BORDER : -1;
+                if (border_type>=0)
+                {
+                  map_area->border_type=(GMapArea::BorderType) border_type;
+                  for(GPosition pos=el->get_list();pos;++pos)
+                  {
+                    GLObject * obj=el->get_list()[pos];
+                    if (obj->get_type()==GLObject::SYMBOL)
+                      map_area->border_color=cvt_color(obj->get_symbol(), 0xff);
+                    if (obj->get_type()==GLObject::NUMBER)
+                      map_area->border_width=obj->get_number();
+                  }
+                }
+              }	    
+            } // if (el->get_type()==...)
+          } // for(int obj_num=...)
+          map_areas.append(map_area);
+        } // if (map_area) ...
+      } G_CATCH_ALL {} G_ENDCATCH;
+    } // if (...get_name()==MAPAREA_TAG)
    } // while(item==...)
-
+   
    return map_areas;
 }
 
@@ -1118,7 +1173,7 @@ DjVuTXT::Zone::decode(ByteStream &bs, int maxtext,
       // Decode type
    ztype = (ZoneType) bs.read8();
    if ( ztype<PAGE || ztype>CHARACTER )
-      G_THROW("Corrupted text zone hierarchy");
+      G_THROW("DjVuAnno.corrupt_text");
       // Decode coordinates
    int x=(int) bs.read16()-0x8000;
    int y=(int) bs.read16()-0x8000;
@@ -1151,7 +1206,7 @@ DjVuTXT::Zone::decode(ByteStream &bs, int maxtext,
    int size = bs.read24();
       // Checks
    if (rect.isempty() || text_start<0 || text_start+text_length>maxtext )
-      G_THROW("Corrupted text zone hierarchy");
+      G_THROW("DjVuAnno.corrupt_text");
       // Process children
    const Zone * prev_child=0;
    children.empty();
@@ -1186,7 +1241,7 @@ void
 DjVuTXT::encode(ByteStream &bs) const
 {
   if (! textUTF8 )
-    G_THROW("No text information to encode");
+    G_THROW("DjVuAnno.no_text");
   // Encode text
   int textsize = textUTF8.length();
   bs.write24( textsize );
@@ -1210,13 +1265,13 @@ DjVuTXT::decode(ByteStream &bs)
   int readsize = bs.read(buffer,textsize);
   buffer[readsize] = 0;
   if (readsize < textsize)
-    G_THROW("Corrupted TXT chunk");
+    G_THROW("DjVuAnno.corrupt_chunk");
   // Try reading zones
   unsigned char version;
   if ( bs.read( (void*) &version, 1 ) == 1) 
     {
       if (version != Zone::version)
-        G_THROW("Version "+GString(version)+" of text zone information is not supported.");
+        G_THROW("DjVuAnno.bad_version\t"+GString(version));
       page_zone.decode(bs, textsize);
     }
 }
@@ -1408,8 +1463,7 @@ DjVuTXT::search_string(const char * string, int & from, bool search_fwd,
 	 // separators in the middle
       for(const char * ptr=string;*ptr;ptr++)
 	 if (is_separator(*ptr, true))
-	    G_THROW("Search string must contain only ONE word\n"
-		  "in the 'Match Whole Word' mode.");
+	    G_THROW("DjVuAnno.one_word");
    }
 
    int string_length=strlen(string);
@@ -1507,14 +1561,14 @@ DjVuAnno::decode(ByteStream &bs)
        } else if (chkid == "TXTa")
        {
          if (txt)
-           G_THROW("Duplicate TXT annotation");
+           G_THROW("DjVuAnno.dupl_text");
          txt = new DjVuTXT;
          txt->decode(iff);
        }
      else if (chkid == "TXTz")
        {
          if (txt)
-           G_THROW("Duplicate TXT annotation");
+           G_THROW("DjVuAnno.dupl_text");
          txt = new DjVuTXT;
          BSByteStream bsiff(iff);
          txt->decode(bsiff);

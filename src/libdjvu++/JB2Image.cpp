@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: JB2Image.cpp,v 1.35 2000-09-18 17:10:23 bcr Exp $
+//C- $Id: JB2Image.cpp,v 1.36 2000-10-06 21:47:21 fcrary Exp $
 
 
 #ifdef __GNUC__
@@ -162,9 +162,9 @@ void
 JB2Dict::set_inherited_dict(GP<JB2Dict> dict)
 {
   if (shapes.size() > 0)
-    G_THROW("Cannot set dictionary after adding shapes");
+    G_THROW("JB2Image.cant_set");
   if (inherited_dict)
-    G_THROW("Cannot change dictionary once set");
+    G_THROW("JB2Image.cant_change");
   inherited_dict = dict; 
   inherited_shapes = dict->get_shape_count();
   // Make sure that inherited bitmaps are marked as shared
@@ -197,7 +197,7 @@ int
 JB2Dict::add_shape(const JB2Shape &shape)
 {
   if (shape.parent >= get_shape_count())
-    G_THROW("Illegal parent shape number in JB2Shape");
+    G_THROW("JB2Image.bad_parent_shape");
   int index = shapes.size();
   shapes.touch(index);
   shapes[index] = shape;
@@ -262,7 +262,7 @@ int
 JB2Image::add_blit(const JB2Blit &blit)
 {
   if (blit.shapeno >= (unsigned int)get_shape_count())
-    G_THROW("Illegal shape number in JB2Blit");
+    G_THROW("JB2Image.bad_shape");
   int index = blits.size();
   blits.touch(index);
   blits[index] = blit;
@@ -273,7 +273,7 @@ GP<GBitmap>
 JB2Image::get_bitmap(int subsample, int align) const
 {
   if (width==0 || height==0)
-    G_THROW("Cannot create bitmap image for an unsized JB2Image object");
+    G_THROW("JB2Image.cant_create");
   int swidth = (width + subsample - 1) / subsample;
   int sheight = (height + subsample - 1) / subsample;
   int border = ((swidth + align - 1) & ~(align - 1)) - swidth;
@@ -293,7 +293,7 @@ GP<GBitmap>
 JB2Image::get_bitmap(const GRect &rect, int subsample, int align, int dispy) const
 {
   if (width==0 || height==0)
-    G_THROW("Cannot create bitmap image for an unsized JB2Image object");
+    G_THROW("JB2Image.cant_create");
   int rxmin = rect.xmin * subsample;
   int rymin = rect.ymin * subsample;
   int swidth = rect.width();
@@ -467,10 +467,10 @@ _JB2Codec::CodeNum(int &num, int low, int high, NumContext &ctx)
   NumContext *pctx = &ctx;
   // Check
   if ((int)ctx >= cur_ncell)
-    G_THROW("(JB2Codec::CodeNum) Illegal NumContext");
+    G_THROW("JB2Image.bad_numcontext");
   if (encoding)
     if (num < low || num > high)
-      G_THROW("(JB2Codec::CodeNum) Number is outside the bounds.");
+      G_THROW("JB2Image.bad_number");
   // Initialize
   if (encoding) 
     v = num;
@@ -740,9 +740,9 @@ _JB2Codec::code_inherited_shape_count(JB2Dict *jim)
             jim->set_inherited_dict(dict);
         }
       if (!dict && size>0)
-        G_THROW("JB2 data requires a shape dictionary.");
+        G_THROW("JB2Image.need_dict");
       if (dict && size!=dict->get_shape_count())
-        G_THROW("Size of shape dictionary does not match JB2 data.");
+        G_THROW("JB2Image.bad_dict");
     }
 }
 
@@ -754,7 +754,7 @@ _JB2Codec::code_image_size(JB2Dict *jim)
   CodeNum(w, 0, BIGPOSITIVE, image_size_dist);
   CodeNum(h, 0, BIGPOSITIVE, image_size_dist);
   if (!encoding && (w || h))
-    G_THROW("Corrupted file: non zero image dimension in JB2 dictionary");
+    G_THROW("JB2Image.bad_dict2");
   last_left = 1;
   last_row_left = 0;
   last_row_bottom = 0;
@@ -776,7 +776,7 @@ _JB2Codec::code_image_size(JB2Image *jim)
   if (!encoding)
     {
       if (!image_columns || !image_rows)
-        G_THROW("Corrupted file: JB2 image dimension is zero");
+        G_THROW("JB2Image.zero_dim");
       jim->set_dimension(image_columns, image_rows);
     }
   last_left = 1 + image_columns;
@@ -792,7 +792,7 @@ _JB2Codec::code_relative_location(JB2Blit *jblt, int rows, int columns)
 {
   // Check start record
   if (!gotstartrecordp)
-    G_THROW("Corrupted file: No start record");
+    G_THROW("JB2Image.no_start");
   // Find location
   int bottom=0, left=0, top=0, right=0;
   int new_row, x_diff, y_diff;
@@ -865,7 +865,7 @@ _JB2Codec::code_absolute_location(JB2Blit *jblt, int rows, int columns)
 {
   // Check start record
   if (!gotstartrecordp)
-    G_THROW("Corrupted file: No start record");
+    G_THROW("JB2Image.no_start");
   // Code TOP and LEFT
   int top, left;
   if (encoding)
@@ -1236,7 +1236,7 @@ _JB2Codec::code_record(int &rectype, JB2Dict *jim, JB2Shape *jshp)
       }
     default:
       {
-        G_THROW("Corrupted file: Illegal record type for shape dictionary");
+        G_THROW("JB2Image.bad_type");
       }
     }
   // Post-coding action
@@ -1267,7 +1267,7 @@ _JB2Codec::code(JB2Dict *jim)
   if (encoding)
     {
 #ifdef NEED_DECODER_ONLY
-      G_THROW("Compiled with NEED_DECODER_ONLY");
+      G_THROW("JB2Image.decoder_only");
 #else
       // -------------------------
       // THIS IS THE ENCODING PART
@@ -1325,7 +1325,7 @@ _JB2Codec::code(JB2Dict *jim)
             break;
         } 
       if (!gotstartrecordp)
-        G_THROW("Corrupted file: No start record");
+        G_THROW("JB2Image.no_start");
       jim->compress();
     }
 }
@@ -1470,7 +1470,7 @@ _JB2Codec::code_record(int &rectype, JB2Image *jim, JB2Shape *jshp, JB2Blit *jbl
       }
     default:
       {
-        G_THROW("Corrupted file: Unknown record type");
+        G_THROW("JB2Image.unknown_type");
       }
     }
   
@@ -1532,7 +1532,7 @@ _JB2Codec::code(JB2Image *jim)
   if (encoding)
     {
 #ifdef NEED_DECODER_ONLY
-      G_THROW("Compiled with NEED_DECODER_ONLY");
+      G_THROW("JB2Image.decoder_only");
 #else
       // -------------------------
       // THIS IS THE ENCODING PART
@@ -1658,7 +1658,7 @@ _JB2Codec::code(JB2Image *jim)
             break;
         } 
       if (!gotstartrecordp)
-        G_THROW("Corrupted file: No start record");
+        G_THROW("JB2Image.no_start");
       jim->compress();
     }
 }

@@ -11,9 +11,9 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: GRect.cpp,v 1.13 2000-09-18 17:10:17 bcr Exp $
+//C- $Id: GRect.cpp,v 1.14 2000-10-06 21:47:21 fcrary Exp $
 // -- Implementation of class GRect and GRectMapper
-// - File "$Id: GRect.cpp,v 1.13 2000-09-18 17:10:17 bcr Exp $"
+// - File "$Id: GRect.cpp,v 1.14 2000-10-06 21:47:21 fcrary Exp $"
 // - Author: Leon Bottou, 05/1997
 
 #ifdef __GNUC__
@@ -153,7 +153,7 @@ GRectMapper::GRatio::GRatio(int p, int q)
   : p(p), q(q)
 {
   if (q == 0) 
-    G_THROW("Division by zero");
+    G_THROW("GRect.div_zero");
   if (p == 0)
     q = 1;
   if (q < 0)
@@ -209,7 +209,7 @@ void
 GRectMapper::set_input(const GRect &rect)
 {
   if (rect.isempty())
-    G_THROW("Illegal empty rect in GRectMapper::set_input");
+    G_THROW("GRect.empty_rect1");
   rectFrom = rect;
   if (code & SWAPXY)
   {
@@ -223,7 +223,7 @@ void
 GRectMapper::set_output(const GRect &rect)
 {
   if (rect.isempty())
-    G_THROW("Illegal empty rect in GRectMapper::set_output");
+    G_THROW("GRect.empty_rect2");
   rectTo = rect;
   rw = rh = GRatio();
 }
@@ -270,7 +270,7 @@ void
 GRectMapper::precalc()
 {
   if (rectTo.isempty() || rectFrom.isempty())
-    G_THROW("Illegal empty rectangles in GRectMapper::[un]map");
+    G_THROW("GRect.empty_rect3");
   rw = GRatio(rectTo.width(), rectFrom.width());
   rh = GRatio(rectTo.height(), rectFrom.height());
 }

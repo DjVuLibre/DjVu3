@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: Arrays.h,v 1.15 2000-09-19 19:06:50 mrosen Exp $
+//C- $Id: Arrays.h,v 1.16 2000-10-06 21:47:21 fcrary Exp $
 
 
 #ifndef _ARRAYS_H_
@@ -76,7 +76,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@geocities.com> -- Copy-on-demand implementation.
     @version 
-    #$Id: Arrays.h,v 1.15 2000-09-19 19:06:50 mrosen Exp $# */
+    #$Id: Arrays.h,v 1.16 2000-10-06 21:47:21 fcrary Exp $# */
 //@{
 
 // Auxiliary classes: Will be used in place of GPBase and GPEnabled objects
@@ -507,7 +507,7 @@ ArrayBaseT<TYPE>::operator[](int n)
    
    ArrayRep * rep=(ArrayRep *) get();
    if (n<rep->lobound || n>rep->hibound)
-      G_THROW("Illegal DArray subscript");
+      G_THROW("arrays.ill_sub");              //  Illegal DArray subscript
    return ((TYPE *) rep->data)[n - rep->minlo];
 }
 
@@ -516,7 +516,7 @@ ArrayBaseT<TYPE>::operator[](int n) const
 {
    const ArrayRep * rep=(const ArrayRep *) get();
    if (n<rep->lobound || n>rep->hibound)
-      G_THROW("Illegal DArray subscript");
+      G_THROW("arrays.ill_sub");              //  Illegal DArray subscript
    return ((const TYPE *) rep->data)[n - rep->minlo];
 }
 

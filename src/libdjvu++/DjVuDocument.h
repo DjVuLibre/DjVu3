@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.h,v 1.66 2000-09-18 17:10:09 bcr Exp $
+//C- $Id: DjVuDocument.h,v 1.67 2000-10-06 21:47:21 fcrary Exp $
  
 #ifndef _DJVUDOCUMENT_H
 #define _DJVUDOCUMENT_H
@@ -33,7 +33,7 @@
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocument.h,v 1.66 2000-09-18 17:10:09 bcr Exp $#
+    @version #$Id: DjVuDocument.h,v 1.67 2000-10-06 21:47:21 fcrary Exp $#
 */
 
 //@{
@@ -875,9 +875,9 @@ inline GP<DjVmDir>
 DjVuDocument::get_djvm_dir(void) const
 {
    if (doc_type==SINGLE_PAGE)
-      G_THROW("Single page documents don't have a DjVm directory.");
+      G_THROW("DjVuDocument.no_dir");
    if (doc_type!=BUNDLED && doc_type!=INDIRECT)
-      G_THROW("The document is in obsolete format => no DjVm directory.");
+      G_THROW("DjVuDocument.obsolete");
    return djvm_dir;
 }
 
@@ -885,7 +885,7 @@ inline GP<DjVmDir0>
 DjVuDocument::get_djvm_dir0(void) const
 {
    if (doc_type!=OLD_BUNDLED)
-      G_THROW("Only OLD_BUNDLED documents have DjVm v.0 directory.");
+      G_THROW("DjVuDocument.old_bundle");
    return djvm_dir0;
 }
 

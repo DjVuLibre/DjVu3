@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: GIFFManager.cpp,v 1.7 2000-09-18 17:10:16 bcr Exp $
+//C- $Id: GIFFManager.cpp,v 1.8 2000-10-06 21:47:21 fcrary Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -33,13 +33,13 @@ GIFFChunk::set_name(const char * name)
       type=GString(name, colon-name);
       name=colon+1;
       if (strchr(name, ':'))
-	 G_THROW("Chunk name may contain only one colon.");
+	 G_THROW("GIFFManager.one_colon");
    };
 
    DEBUG_MSG("auto-setting type to '" << type << "'\n");
 
    if (strpbrk(name, ".[]"))
-      G_THROW("Chunk name may not contain dots, and brackets.");
+      G_THROW("GIFFManager.bad_char");
    
    strncpy(GIFFChunk::name, name, 4); GIFFChunk::name[4]=0;
    for(int i=strlen(GIFFChunk::name);i<4;i++) GIFFChunk::name[i]=' ';
@@ -128,7 +128,7 @@ GIFFChunk::decode_name(const char * name, GString * short_name_ptr,
    DEBUG_MSG("GIFFChunk::decode_name(): Checking brackets in name '" << name << "'\n");
    DEBUG_MAKE_INDENT(3);
    
-   if (strchr(name, '.')) G_THROW("Chunk name may not contain dots.");
+   if (strchr(name, '.')) G_THROW("GIFFManager.no_dots");
 
    int number=0;
    const char * obracket;
@@ -136,9 +136,9 @@ GIFFChunk::decode_name(const char * name, GString * short_name_ptr,
    {
       const char * cbracket;
       if (!(cbracket=strchr(obracket+1, ']')))
-	 G_THROW("Unmatched openining bracket in chunk name encountered.");
+	 G_THROW("GIFFManager.unmatched");
       number=atoi(GString(obracket+1, cbracket-obracket-1));
-      if (cbracket[1]) G_THROW("Chunk name contains garbage after ']'.");
+      if (cbracket[1]) G_THROW("GIFFManager.garbage");
    };
 
    GString short_name=GString(name, obracket-name);
@@ -172,11 +172,14 @@ GIFFChunk::del_chunk(const char * name)
 	 chunks.del(pos);
 	 return;
       };
-   
+ 
+/*    Original preserved in case I screw things up      
    char * buffer=new char[256];
    sprintf(buffer, "There is no subchunk '%s' #%d in chunk '%s'.",
 	   (const char *) short_name, number, (const char *) get_name());
    G_THROW(buffer);
+*/
+   G_THROW(GString("GIFFManager.no_chunk\t")+short_name+"\t"+GString(number)+"\t"+get_name());
 }
 
 GP<GIFFChunk>
@@ -213,7 +216,7 @@ GIFFChunk::get_chunks_number(const char * name)
 
    if (!name) return chunks.size();
    
-   if (strpbrk(name, "[]")) G_THROW("Chunk name may not contain brackets.");
+   if (strpbrk(name, "[]")) G_THROW("GIFFManager.no_brackets");
    
    GString short_name;
    int number;
@@ -241,12 +244,12 @@ GIFFManager::add_chunk(const char * parent_name, const GP<GIFFChunk> & chunk,
    if (!top_level->get_name().length())
    {
       if (!parent_name || !strlen(parent_name) || parent_name[0]!='.')
-	 G_THROW("Top level chunk name is not known yet.");
+	 G_THROW("GIFFManager.no_top_name");
       if (!parent_name[1])
       {
 	    // 'chunk' is actually the new top-level chunk
 	 DEBUG_MSG("since parent_name=='.', making the chunk top-level\n");
-	 if (!chunk->is_container()) G_THROW("Only a container may be top level chunk.");
+	 if (!chunk->is_container()) G_THROW("GIFFManager.no_top_cont");
 	 top_level=chunk;
 	 return;
       };
@@ -264,8 +267,7 @@ GIFFManager::add_chunk(const char * parent_name, const GP<GIFFChunk> & chunk,
       if (!next_dot) next_dot=parent_name+strlen(parent_name);
       GString top_name=GString(parent_name+1, next_dot-parent_name-1);
       if (!top_level->check_name(top_name))
-	 G_THROW("The top level chunk of the file does not have the name '"+
-	       top_name+"'.");
+	 G_THROW("GIFFManager.wrong_name\t"+top_name);
       parent_name=next_dot;
    };
 
@@ -288,7 +290,7 @@ GIFFManager::add_chunk(const char * parent_name, const GP<GIFFChunk> & chunk,
 	 if (obracket)
 	 {
 	    char * cbracket=strchr(obracket+1, ']');
-	    if (!cbracket) G_THROW("Unbalanced bracket in chunk name.");
+	    if (!cbracket) G_THROW("GIFFManager.unbalanced");
 	    number=atoi(GString(obracket+1, cbracket-obracket-1));
 	    *obracket=0;
 	 };
@@ -296,7 +298,7 @@ GIFFManager::add_chunk(const char * parent_name, const GP<GIFFChunk> & chunk,
 	 for(int i=cur_sec->get_chunks_number(short_name);i<number+1;i++)
 	    cur_sec->add_chunk(new GIFFChunk(short_name));
 	 cur_sec=cur_sec->get_chunk(name);
-	 if (!cur_sec) G_THROW("Internal error: chunk '"+GString(name)+"' is not known.");
+	 if (!cur_sec) G_THROW("GIFFManager.unknown\t"+GString(name));
       };
    } while(*end);
    
@@ -321,9 +323,9 @@ GIFFManager::add_chunk(const char * name, const TArray<char> & data)
    if (obracket)
    {
       const char * cbracket=strchr(obracket+1, ']');
-      if (!cbracket) G_THROW("Unbalanced bracket in chunk name.");
+      if (!cbracket) G_THROW("GIFFManager.unbalanced");
       pos=atoi(GString(obracket+1, cbracket-obracket-1));
-      if (cbracket[1]) G_THROW("Chunk name contains garbage after ']'.");
+      if (cbracket[1]) G_THROW("GIFFManager.garbage");
    };
    GString chunk_name=GString(short_name, obracket-short_name);
    DEBUG_MSG("Creating new chunk with name " << chunk_name << "\n");
@@ -341,7 +343,7 @@ GIFFManager::del_chunk(const char * name)
    DEBUG_MAKE_INDENT(3);
    
    if (!name || !strlen(name))
-      G_THROW("Attempt to delete a chunk with empty name.");
+      G_THROW("GIFFManager.del_empty");
 
    if (name[0]=='.')
    {
@@ -354,11 +356,11 @@ GIFFManager::del_chunk(const char * name)
 	    top_level=new GIFFChunk();
 	    return;
 	 } else
-	    G_THROW("The name of the top level chunk is not '"+GString(name+1)+"'.");
+	    G_THROW("GIFFManager.wrong_name2\t"+GString(name+1));
       };
       GString top_name=GString(name+1, next_dot-name-1);
       if (!top_level->check_name(top_name))
-	 G_THROW("The name of the top level chunk is not '"+top_name+"'.");
+	 G_THROW("GIFFManager.wrong_name2\t"+top_name);
       name=next_dot+1;
    };
    
@@ -370,14 +372,17 @@ GIFFManager::del_chunk(const char * name)
 	 if (*end=='.') break;
       if (end>start && *end=='.')
 	 cur_sec=cur_sec->get_chunk(GString(start, end-start));
-      if (!cur_sec) G_THROW("Can't find chunk with name '"+GString(name)+"'.");
+      if (!cur_sec) G_THROW("GIFFManager.cant_find\t"+GString(name));
    } while(*end);
    
    if (!strlen(start))
    {
+     /*     Original preserved in case I screw things up
       char * buffer=new char[128];
       sprintf(buffer, "Malformed chunk name '%s': ends with a dot.", name);
       G_THROW(buffer);
+     */
+     G_THROW(GString("GIFFManager.malformed\t")+name);
    };
    
    cur_sec->del_chunk(start);
@@ -392,23 +397,23 @@ GIFFManager::get_chunk(const char * name, int * pos_num)
    DEBUG_MAKE_INDENT(3);
    
    if (!name || !strlen(name))
-      G_THROW("Attempt to get a chunk with empty name.");
+      G_THROW("GIFFManager.get_empty");
 
    if (name[0]=='.')
    {
       char * next_dot=strchr(name+1, '.');
       if (!next_dot)
       {
-	 if (top_level->check_name(name+1))
-	 {
-	    DEBUG_MSG("Returning top level chunk..\n");
-	    return top_level;
-	 } else
-	    G_THROW("The name of the top level chunk is not '"+GString(name+1)+"'.");
+	       if (top_level->check_name(name+1))
+	       {
+	          DEBUG_MSG("Returning top level chunk..\n");
+	          return top_level;
+	       } else
+	          G_THROW("GIFFManager.wrong_name2\t"+GString(name+1));
       };
       GString top_name=GString(name+1, next_dot-name-1);
       if (!top_level->check_name(top_name))
-	 G_THROW("The name of the top level chunk is not '"+top_name+"'.");
+	       G_THROW("GIFFManager.wrong_name2\t"+top_name);
       name=next_dot+1;
    };
    
@@ -491,7 +496,7 @@ GIFFManager::load_file(ByteStream & str)
    if (istr.get_chunk(chunk_id))
    {
       if (strncmp(chunk_id, "FORM:", 5))
-	 G_THROW("Can't find top level FORM chunk in the IFF file being loaded.");
+	       G_THROW("GIFFManager.cant_find2");
       set_name(chunk_id);
       load_chunk(istr, top_level);
       istr.close_chunk();

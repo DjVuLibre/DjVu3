@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: GContainer.cpp,v 1.20 2000-09-18 17:10:15 bcr Exp $
+//C- $Id: GContainer.cpp,v 1.21 2000-10-06 21:47:21 fcrary Exp $
 
 
 #ifdef __GNUC__
@@ -104,7 +104,7 @@ GArrayBase::steal(GArrayBase &ga)
 void 
 GArrayBase::throw_illegal_subscript()
 {
-  G_THROW("GArray subscript is out of bounds");
+  G_THROW("GContainer.bad_sub");
 }
 
 
@@ -132,7 +132,7 @@ GArrayBase::resize(int lo, int hi)
   // Validation
   int nsize = hi - lo + 1;
   if (nsize < 0)
-    G_THROW("Invalid arguments for GArray::resize");
+    G_THROW("GContainer.bad_args");
   // Destruction
   if (nsize == 0)
     {
@@ -217,11 +217,11 @@ void
 GArrayBase::del(int n, int howmany)
 {
   if (howmany < 0)
-    G_THROW("Illegal value for argument 'howmany'");
+    G_THROW("GContainer.bad_howmany");
   if (howmany == 0)
     return;
   if ( n < lobound || n+(int)howmany-1 > hibound)
-    G_THROW("Illegal subscript in GArray::del");
+    G_THROW("GContainer.bad_sub2");
   traits.fini( traits.lea(data, n-minlo), howmany );
   if ( n+howmany-1 < hibound)
     traits.copy( traits.lea(data, n-minlo),
@@ -249,7 +249,7 @@ void
 GArrayBase::ins(int n, const void *src, int howmany)
 {
   if (howmany < 0)
-    G_THROW("Illegal value for argument 'howmany'");
+    G_THROW("GContainer.bad_howmany");
   if (howmany == 0)
     return;
   // Make enough room
@@ -308,11 +308,11 @@ GArrayBase::ins(int n, const void *src, int howmany)
 void 
 GPosition::throw_invalid(void *c) const
 {
-  char *msg = "Invalid position";
+  char *msg = "GContainer.bad_pos";
   if (c != cont)
-    msg = "Invalid position (points into another container)";
+    msg = "GContainer.bad_pos_cont";
   if (! ptr)
-    msg = "Invalid position (null pointer)";
+    msg = "GContainer.bad_pos_null";
   // Throw exception
   G_THROW(msg);
 }
@@ -738,6 +738,6 @@ GSetBase::empty()
 void 
 GSetBase::throw_cannot_add()
 {
-  G_THROW("Cannot add key to constant associative map");
+  G_THROW("GContainer.cant_add");
 }
 
