@@ -4,7 +4,7 @@
 //C-              Unauthorized use prohibited.
 //C-
 // 
-// $Id: qd_base.h,v 1.1 2001-05-29 22:05:30 bcr Exp $
+// $Id: qd_base.h,v 1.2 2001-06-20 18:15:17 mchen Exp $
 // $Name:  $
 
 
@@ -124,7 +124,7 @@ private:
 
    GRect	lens_rect;
 
-   GPQCursor	cur_wait, cur_hand1, cur_hand2;
+   GPQCursor	cur_wait, cur_hand1, cur_hand2, cur_zoom_select;
    GPQCursor	cur_hand_hl, cur_ptr, cur_blank;
    u_int32	back_color;
    QPixmap	back_pixmap;
@@ -132,11 +132,13 @@ private:
    int		displ_dpi;
    int		zoom_prio[ZOOM_SRC_MAX], mode_prio[MODE_SRC_MAX];
    int		left_butt_down;
-   int		in_hand_scroll, in_paint, in_layout;
+   int		in_hand_scroll, in_paint, in_layout, in_zoom_select;
    OverrideFlags override_flags;
 
    int		acc_scroll_dh, acc_scroll_dv;
    int		hand_scroll_x, hand_scroll_y;
+   int		zoom_select_x0, zoom_select_y0;
+   GRect        *lastrect;
 
    GRectMapper	mapper;
 
@@ -163,6 +165,7 @@ private slots:
    void		slotSetMode(int cmd_mode);
    void		slotStickToolBar(bool on);
    void		slotSetRotate(int cmd_rotate);
+   void		slotSetPaneMode(int cmd_pane);
    
       // Slot called when the system is idle (to update caches)
    void		slotCheckCache(void);
@@ -177,6 +180,7 @@ protected:
    bool		ignore_ant_mode_zoom;
    int		zoom_src, mode_src;
    int		cmd_zoom, cmd_mode, cmd_mode_force;
+   int          pane_mode;
 
    GPQCursor	cur_last;
    

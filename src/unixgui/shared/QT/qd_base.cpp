@@ -4,7 +4,7 @@
 //C-              Unauthorized use prohibited.
 //C-
 // 
-// $Id: qd_base.cpp,v 1.3 2001-06-12 15:34:31 mchen Exp $
+// $Id: qd_base.cpp,v 1.4 2001-06-20 18:15:17 mchen Exp $
 // $Name:  $
 
 
@@ -29,6 +29,8 @@
 #include "hand1_mask.bm"
 #include "hand2.bm"
 #include "hand2_mask.bm"
+#include "zoom_select.bm"
+#include "zoom_select_mask.bm"
 
 #include <math.h>
 #include <qbitmap.h>
@@ -89,13 +91,16 @@ QDBase::QDBase(QWidget * parent, const char * name) : QWidget(parent, name)
    cmd_mode=cmd_mode_force=cmd_zoom=-1;
    zoom_src=ZOOM_DEFAULT;
    mode_src=MODE_DEFAULT;
-   in_hand_scroll=in_paint=in_layout=0;
+   in_hand_scroll=in_paint=in_layout=in_zoom_select=0;
+   lastrect=0;
    acc_scroll_dh=acc_scroll_dv=0;
    left_butt_down=0;
    ignore_ant_mode_zoom=0;
    for(int i=0;i<ZOOM_SRC_MAX;i++) zoom_prio[i]=i;
    for(int i=0;i<MODE_SRC_MAX;i++) mode_prio[i]=i;
 
+   pane_mode=IDC_PANE;
+   
    djvu_logo_bmp=GBitmap::create(*CINData::get("ppm_djvu_logo"));
    
    depth=QPaintDeviceMetrics(this).depth();
@@ -701,7 +706,7 @@ QDBase::setZoom(int cmd, bool do_layout, int src)
 
    if (zoom_prio[zoom_src]>zoom_prio[src]) return;
    zoom_src=src;
-   
+
    if (!dimg)
    {
       if (cmd!=IDC_ZOOM_ZOOMOUT && cmd!=IDC_ZOOM_ZOOMIN)
@@ -855,10 +860,12 @@ QDBase::setCursor(void)
 {
    DEBUG_MSG("QDBase::setCursor(): Installing cursor " <<
 	     (in_hand_scroll ? "HAND2" :
+	      in_zoom_select ? "ZOOM SELECT" :
 	      in_paint ? "WAIT" :
 	      cur_map_area ? "HLINK" :
 	      "HAND1") << "\n");
    GPQCursor cur=in_hand_scroll ? cur_hand2 :
+      in_zoom_select ? cur_zoom_select :
       isLensVisible() ? cur_blank :
       in_paint ? cur_wait :
       (cur_map_area && cur_map_area->isHyperlink()) ? cur_hand_hl : cur_hand1;
@@ -890,6 +897,11 @@ QDBase::createCursors(void)
    cur_hand2=new QCursor(QBitmap(hand2_size, (u_char *) hand2_bits, TRUE),
 		     QBitmap(hand2_size, (u_char *) hand2_mask_bits, TRUE),
 		     hand2_x, hand2_y);
+
+   QSize zoom_select_size(zoom_select_width, zoom_select_height);
+   cur_zoom_select=new QCursor(QBitmap(zoom_select_size, (u_char *) zoom_select_bits, TRUE),
+		     QBitmap(zoom_select_size, (u_char *) zoom_select_mask_bits, TRUE),
+		     zoom_select_x, zoom_select_y);
 
    cur_hand_hl=new QCursor(ArrowCursor);	// TODO: get X11 cursor instead
    cur_ptr=new QCursor(ArrowCursor);
@@ -1180,6 +1192,7 @@ QDBase::fillToolBar(QDToolBar * toolbar)
       connect(mode_tbar, SIGNAL(sigSetZoom(int)), this, SLOT(slotSetZoom(int)));
       connect(mode_tbar, SIGNAL(sigSetMode(int)), this, SLOT(slotSetMode(int)));
       connect(mode_tbar, SIGNAL(sigStick(bool)), this, SLOT(slotStickToolBar(bool)));
+      connect(mode_tbar, SIGNAL(sigSetPaneMode(int)), this, SLOT(slotSetPaneMode(int)));
       rotate_tbar = new QDTBarRotatePiece(toolbar);
       connect(rotate_tbar, SIGNAL(sigRotate(int)), this, SLOT(slotSetRotate(int)));
       
@@ -1194,7 +1207,7 @@ QDBase::updateToolBar(void)
 {
    if (mode_tbar)
       mode_tbar->update(getMode(), dimg && dimg->is_legal_compound(),
-			cmd_zoom, getZoom());
+			cmd_zoom, getZoom(), pane_mode);
    if (toolbar)
    {
       if (!dimg) toolbar->setEnabled(FALSE);
@@ -1425,6 +1438,12 @@ QDBase::slotSetZoom(int cmd_zoom)
 {
    if (getCMDZoom()!=cmd_zoom)
       setZoom(cmd_zoom, true, ZOOM_MANUAL);
+}
+
+void
+QDBase::slotSetPaneMode(int cmd_pane)
+{
+   pane_mode=cmd_pane;
 }
 
 void

@@ -4,7 +4,7 @@
 //C-              Unauthorized use prohibited.
 //C-
 // 
-// $Id: qd_base_events.cpp,v 1.1 2001-05-29 22:05:30 bcr Exp $
+// $Id: qd_base_events.cpp,v 1.2 2001-06-20 18:15:17 mchen Exp $
 // $Name:  $
 
 
@@ -302,23 +302,57 @@ QDBase::processMouseMoveEvent(QMouseEvent * ev)
       // and pane starts receiving Btn1Motion event w/o prior Btn1Down
    if ((ev->state() & LeftButton) && left_butt_down)
    {
-      if (!in_hand_scroll)
+      if ( pane_mode == IDC_PANE )
       {
-	 int dx=hand_scroll_x-ev->x();
-	 int dy=hand_scroll_y-ev->y();
-	 if (dx*dx+dy*dy>=49)
+	 if (!in_hand_scroll)
 	 {
-	    delete map_area_tip; map_area_tip=0;
-	    preScroll();
-	    in_hand_scroll=1;
-	    setCursor();
+	    int dx=hand_scroll_x-ev->x();
+	    int dy=hand_scroll_y-ev->y();
+	    if (dx*dx+dy*dy>=49)
+	    {
+	       delete map_area_tip; map_area_tip=0;
+	       preScroll();
+	       in_hand_scroll=1;
+	       setCursor();
+	    }
 	 }
-      }
-      if (in_hand_scroll)
-      {
-	 scroll(hand_scroll_x-ev->x(), hand_scroll_y-ev->y());
-	 hand_scroll_x=ev->x();
-	 hand_scroll_y=ev->y();
+	 if (in_hand_scroll)
+	 {
+	    scroll(hand_scroll_x-ev->x(), hand_scroll_y-ev->y());
+	    hand_scroll_x=ev->x();
+	    hand_scroll_y=ev->y();
+	 }
+      } else
+      { //IDC_ZOOM_SELECT || IDC_TEXT_SELECT
+	 if ( pane )
+	 {
+	    QPainter p(pane);
+	    p.setRasterOp(XorROP);
+	    p.setPen(QColor(0xff, 0xff, 0xff));
+
+	    if ( lastrect )
+	    {
+	       p.setClipRect(G2Q(*lastrect));
+	       p.drawRect(G2Q(*lastrect));
+	    }
+	    
+	    int rw=ev->x()-zoom_select_x0;
+	    int rh=ev->y()-zoom_select_y0;
+
+	    GRect *currect=0;
+	    if ( rw < 0 )	    
+	       currect= rh<0 ? new GRect(ev->x(),ev->y(),-rw,-rh) :
+	       new GRect(ev->x(), zoom_select_y0, -rw, rh);
+	    else
+	       currect= rh<0 ? new GRect(zoom_select_x0,ev->y(),rw,-rh) :
+	       new GRect(zoom_select_x0,zoom_select_y0,rw,rh);
+
+	    p.setClipRect(G2Q(*currect));
+	    p.drawRect(G2Q(*currect));
+
+	    if (lastrect) delete lastrect;
+	    lastrect=currect;
+	 }
       }
    } else if (!(ev->state() & (LeftButton | MidButton | RightButton |
 			       getLensHotKey())))
@@ -388,6 +422,9 @@ QDBase::processMouseMoveEvent(QMouseEvent * ev)
    return true;
 }
 
+#define MAX_ZOOM 1200
+#define MIN_ZOOM 5
+
 bool
 QDBase::eventFilter(QObject *obj, QEvent *e)
 {
@@ -433,22 +470,31 @@ QDBase::eventFilter(QObject *obj, QEvent *e)
 	       if (ev->button()==LeftButton)
 	       {
 		  left_butt_down=1;
-		  hand_scroll_x=ev->x();
-		  hand_scroll_y=ev->y();
+		  if ( pane_mode==IDC_PANE )
+		  {
+		     hand_scroll_x=ev->x();
+		     hand_scroll_y=ev->y();
 
 		     // Unfortunately, in "focus follows mouse" mode KWM
 		     // issues Event_Leave and Event_Enter right before this
 		     // Event_MouseButtonPress. This effectively deselects
 		     // the current hyperlink. So we want it back.
-		  if (ev->state()==0) processMouseMoveEvent(ev);
+		     if (ev->state()==0) processMouseMoveEvent(ev);
 	       
-		  if (!cur_map_area)
-		  {
-		     preScroll();
-		     in_hand_scroll=1;
-		     setCursor();
-		  }  // If we're over a hyperlink - wait before we either
+		     if (!cur_map_area)
+		     {
+			preScroll();
+			in_hand_scroll=1;
+			setCursor();
+		     }  // If we're over a hyperlink - wait before we either
 		     // release the mouse button (and go to URL) or displace far enough
+		  } else
+		  {
+		     in_zoom_select=1;
+		     zoom_select_x0=ev->x();
+		     zoom_select_y0=ev->y();
+		     setCursor();
+		  }   
 		  return TRUE;
 	       } else if (ev->button()==MidButton)
 	       {
@@ -483,6 +529,40 @@ QDBase::eventFilter(QObject *obj, QEvent *e)
 		     postScroll();
 		     in_hand_scroll=0;
 		     setCursor();
+		  } else if (in_zoom_select)
+		  {
+		     in_zoom_select=0;
+		     setCursor();
+            
+		     if(lastrect && !lastrect->isempty())
+		     {
+			//save current view ?
+			
+			lastrect->intersect(*lastrect, rectDocument);
+
+			int cur_zoom_factor=getZoom();
+			int zoom1 = cur_zoom_factor*((float)rectVisible.height()/lastrect->height());
+			int zoom2 = cur_zoom_factor*((float)rectVisible.width()/lastrect->width());
+			
+//  			printf("rectVisible: height x width = %d x %d\n", rectVisible.height(), rectVisible.width());
+//  			printf("lastrect:    height x width = %d x %d\n", lastrect->height(), lastrect->width());
+			int new_zoom=(zoom1<zoom2?zoom1:zoom2)+IDC_ZOOM_MIN;			
+//  			printf("zoom=%d,  zoom1=%d,  zoom2=%d\n", new_zoom, zoom1, zoom2);
+			if ( new_zoom < IDC_ZOOM_MAX )
+			{
+			   setZoom(new_zoom, true,  ZOOM_MANUAL);
+			} else
+			{
+			   QPainter p(pane);
+			   p.setRasterOp(XorROP);
+			   p.setPen(QColor(0xff, 0xff, 0xff));
+			   p.setClipRect(G2Q(*lastrect));
+			   p.drawRect(G2Q(*lastrect));
+			}
+                
+			delete lastrect;
+			lastrect=0;
+		     }
 		  } else
 		     if (cur_map_area && cur_map_area->isHyperlink())
 			getURL(cur_map_area->getURL(), cur_map_area->getTarget());
@@ -493,10 +573,10 @@ QDBase::eventFilter(QObject *obj, QEvent *e)
 		     hideLens();
 		  
 		  if (cur_map_area && cur_map_area->isHyperlink())
-                  {
-                     GUTF8String gurl=cur_map_area->getURL();
+		  {
+		     GUTF8String gurl=cur_map_area->getURL();
 		     getURL(gurl, "_blank");
-                  }
+		  }
 		  return TRUE;
 	       }
 	       break;

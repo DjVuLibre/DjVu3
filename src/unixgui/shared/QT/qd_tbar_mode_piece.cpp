@@ -4,7 +4,7 @@
 //C-              Unauthorized use prohibited.
 //C-
 // 
-// $Id: qd_tbar_mode_piece.cpp,v 1.2 2001-06-07 22:13:55 mchen Exp $
+// $Id: qd_tbar_mode_piece.cpp,v 1.3 2001-06-20 18:15:17 mchen Exp $
 // $Name:  $
 
 
@@ -102,6 +102,11 @@ QDTBarModePiece::setEnabled(bool en)
    mode_menu->setEnabled(en);
    zoom_in_butt->setEnabled(en);
    zoom_out_butt->setEnabled(en);
+#if 1
+   zoom_select_butt->setEnabled(en);
+   text_select_butt->setEnabled(en);
+   pane_butt->setEnabled(en);
+#endif
    if ( pin_butt )
       pin_butt->setEnabled(en);
 }
@@ -170,8 +175,35 @@ QDTBarModePiece::QDTBarModePiece(QWidget * toolbar) : QDTBarPiece(toolbar)
    zoom_out_butt=new QDToolButton(*CINData::get("ppm_vzoom_out"), true,
 				  IDC_ZOOM_ZOOMOUT, toolbar, tr("Zoom Out"));
    connect(zoom_out_butt, SIGNAL(clicked(void)), this, SLOT(slotZoom(void)));
+
    if ( qdtoolbar_child ) 
       ((QDToolBar *)toolbar)->addLeftWidgets(zoom_in_butt, zoom_out_butt);
+
+#if 1
+   QFrame *frame2=new QFrame(toolbar, "separator");
+   frame2->setFrameStyle(QFrame::VLine | QFrame::Sunken);
+   frame2->setMinimumWidth(10);
+   if ( qdtoolbar_child ) 
+      ((QDToolBar *)toolbar)->addLeftWidget(frame2);
+   
+   pane_butt=new QDToolButton(*CINData::get("ppm_hand1"), true,
+				  IDC_PANE, toolbar, tr("Pane Mode"));
+   pane_butt->setToggleButton(TRUE);
+   connect(pane_butt, SIGNAL(clicked(void)), this, SLOT(slotPaneMode(void)));
+
+   zoom_select_butt=new QDToolButton(*CINData::get("ppm_zoomselect"), true,
+				  IDC_ZOOM_SELECT, toolbar, tr("Zoom Selected Area"));
+   zoom_select_butt->setToggleButton(TRUE);
+   connect(zoom_select_butt, SIGNAL(clicked(void)), this, SLOT(slotPaneMode(void)));
+
+   text_select_butt=new QDToolButton(*CINData::get("ppm_textselect"), true,
+				  IDC_TEXT_SELECT, toolbar, tr("Select Text in Selected Area"));
+   text_select_butt->setToggleButton(TRUE);
+   connect(text_select_butt, SIGNAL(clicked(void)), this, SLOT(slotPaneMode(void)));
+
+   if ( qdtoolbar_child ) 
+      ((QDToolBar *)toolbar)->addLeftWidgets(pane_butt, zoom_select_butt, text_select_butt);
+#endif
 
    if ( qdtoolbar_child )
    {
@@ -191,7 +223,7 @@ QDTBarModePiece::QDTBarModePiece(QWidget * toolbar) : QDTBarPiece(toolbar)
 }
 
 void
-QDTBarModePiece::update(int cmd_mode, bool mode_enabled, int cmd_zoom, int zoom)
+QDTBarModePiece::update(int cmd_mode, bool mode_enabled, int cmd_zoom, int zoom, int pane_mode)
 {
    int i;
    for(i=0;i<menu_items_size;i++)
@@ -211,6 +243,10 @@ QDTBarModePiece::update(int cmd_mode, bool mode_enabled, int cmd_zoom, int zoom)
 
    zoom_in_butt->setEnabled(zoom<IDC_ZOOM_MAX-IDC_ZOOM_MIN);
    zoom_out_butt->setEnabled(zoom>5);
+
+   pane_butt->setOn(pane_mode==IDC_PANE);
+   zoom_select_butt->setOn(pane_mode==IDC_ZOOM_SELECT);
+   text_select_butt->setOn(pane_mode==IDC_TEXT_SELECT);
    
    switch(cmd_mode)
    {
@@ -287,6 +323,26 @@ QDTBarModePiece::slotZoom(void)
    {
       const QDToolButton * butt=(QDToolButton *) obj;
       emit sigSetZoom(butt->cmd);
+   }
+}
+
+void
+QDTBarModePiece::slotPaneMode(void)
+{
+   const QObject * obj=sender();
+   if (obj && obj->inherits("QDToolButton") && ((QDToolButton *)obj)->isToggleButton())
+   {
+      QDToolButton * butt=(QDToolButton *) obj;
+      
+      if (butt->isOn())
+      {
+	 // a bit inefficient, but I don't want to use button group either
+	 zoom_select_butt->setOn(FALSE);
+	 text_select_butt->setOn(FALSE);
+	 pane_butt->setOn(FALSE);
+      }
+      butt->setOn(TRUE);
+      emit sigSetPaneMode(butt->cmd);
    }
 }
 
