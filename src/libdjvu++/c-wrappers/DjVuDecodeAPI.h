@@ -10,7 +10,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDecodeAPI.h,v 1.11 2000-01-17 07:34:15 bcr Exp $
+//C- $Id: DjVuDecodeAPI.h,v 1.12 2000-01-18 19:53:31 praveen Exp $
 #endif
 
 #ifndef _DJVU_DECODE_API_H
@@ -18,7 +18,10 @@
 
 /* 
  * $Log: DjVuDecodeAPI.h,v $
- * Revision 1.11  2000-01-17 07:34:15  bcr
+ * Revision 1.12  2000-01-18 19:53:31  praveen
+ * updated
+ *
+ * Revision 1.11  2000/01/17 07:34:15  bcr
  * Added GBitmap and GPixmap support to the libimage library.  There
  * is definitely some sort of heap corruption in libdjvu++, but I still
  * haven't found it.  Even something simple like set_grays() causing
@@ -161,7 +164,7 @@ typedef struct _djvu_image_priv * djvu_image_priv;
 #define DJVU_IMAGE_IS_NATIVE(image) \
   (((image)->type==DJVU_RLE)?((image)->orientation==DJVU_TDLRNR):\
   (((image)->orientation==DJVU_BULRNR)&&\
-    ((image)->pixsize==((image)->type==DJVU_GRAY)?1:3)))
+    ((image)->pixsize==(unsigned int)((image)->type==DJVU_GRAY)?1:3)))
 
 #define DJVU_IMAGE_ROTATE(image,angle) \
      { \
@@ -323,8 +326,8 @@ djvu_image_resize(
 /** This makes a copy of the image headers, with the flags changed to
     the specified rotation.
  */
-DJVUAPI djvu_image 
-djvu_image_const_rotate(djvu_image ximg,int angle);
+DJVUAPI void
+djvu_image_const_rotate(const djvu_image *in_img, djvu_image *out_img, int angle);
 
 /** This changes the flags to indicate a rotate.  It is exactly the same
     as DJVU_IMAGE_ROTATE(ximg,angle)
@@ -335,9 +338,9 @@ djvu_image_rotate(djvu_image *ximg,int angle);
 /** This makes a copy of the image headers, with the flags changed to
     the specified crop size.
  */
-DJVUAPI djvu_image 
+DJVUAPI void
 djvu_image_const_crop(
-  djvu_image ximg,int x0,int y0,
+  const djvu_image *in_img, djvu_image *out_img, int x0,int y0,
   const unsigned width,const unsigned int height);
 
 /** This changes the flags to indicate a crop.  It is exactly the same
@@ -351,8 +354,8 @@ djvu_image_crop(
 /** This makes a copy of the image headers, with the flags changed to
     indicate a vflip operation.
  */
-DJVUAPI djvu_image 
-djvu_image_const_vflip(djvu_image ximg);
+DJVUAPI void 
+djvu_image_const_vflip(const djvu_image *in_img, djvu_image *out_img);
 
 /** This changes the flags to indicate a vflip.  It is exactly the same
     as DJVU_IMAGE_VFLIP(ximg)
@@ -363,8 +366,8 @@ djvu_image_vflip(djvu_image *ximg);
 /** This makes a copy of the image headers, with the flags changed to
     indicate a hflip operation.
  */
-DJVUAPI djvu_image 
-djvu_image_const_hflip(djvu_image ximg);
+DJVUAPI void 
+djvu_image_const_hflip(const djvu_image *in_img, djvu_image *out_img);
 
 /** This changes the flags to indicate a vflip.  It is exactly the same
     as DJVU_IMAGE_HFLIP(ximg)
