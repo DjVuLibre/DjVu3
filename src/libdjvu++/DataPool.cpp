@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.cpp,v 1.40 1999-12-28 21:52:24 eaf Exp $
+//C- $Id: DataPool.cpp,v 1.41 2000-01-05 15:39:20 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -1018,8 +1018,12 @@ DataPool::check_triggers(void)
       while(true)
       {
 	 GP<Trigger> trigger;
+	 
+	    // First find a candidate (trigger, which needs to be called)
+	    // Don't remove it from the list yet. del_trigger() should
+	    // be able to find it if necessary and disable.
 	 {
-	    GCriticalSectionLock lock(&triggers_lock);
+	    GCriticalSectionLock list_lock(&triggers_lock);
 	    for(GPosition pos=triggers_list;pos;++pos)
 	    {
 	       GP<Trigger> t=triggers_list[pos];
@@ -1027,21 +1031,33 @@ DataPool::check_triggers(void)
 		   block_list.get_bytes(t->start, t->length)==t->length)
 	       {
 		  trigger=t;
-		  triggers_list.del(pos);
 		  break;
 	       }
 	    }
 	 }
-	 if (!trigger) break;
-	 else
+	 
+	 if (trigger)
 	 {
-	       // Lock the trigger so that the owner of the 'callback'
-	       // will not be able to delete the trigger right when
-	       // we're trying to activate it.
-	    GMonitorLock lock(&trigger->disabled);
-	    if (!trigger->disabled)
-	       call_callback(trigger->callback, trigger->cl_data);
-	 }
+	       // Now check that the trigger is not disabled
+	       // and lock the trigger->disabled lock for the duration
+	       // of the trigger. This will block the del_trigger() and
+	       // will postpone client's destruction (usually following
+	       // the call to del_trigger())
+	    {
+	       GMonitorLock lock(&trigger->disabled);
+	       if (!trigger->disabled)
+		  call_callback(trigger->callback, trigger->cl_data);
+	    }
+	    
+	       // Finally - remove the trigger from the list.
+	    GCriticalSectionLock list_lock(&triggers_lock);
+	    for(GPosition pos=triggers_list;pos;++pos)
+	       if (triggers_list[pos]==trigger)
+	       {
+		  triggers_list.del(pos);
+		  break;
+	       }
+	 } else break;
       }
 }
 
@@ -1096,18 +1112,34 @@ DataPool::del_trigger(void (* callback)(void *), void * cl_data)
 {
    DEBUG_MSG("DataPool::del_trigger(): func=" << (void *) callback << "\n");
    DEBUG_MAKE_INDENT(3);
-   
-   GCriticalSectionLock lock(&triggers_lock);
-   for(GPosition pos=triggers_list;pos;)
+
+   while(true)
    {
-      GP<Trigger> t=triggers_list[pos];
-      if (t->callback==callback && t->cl_data==cl_data)
+      GP<Trigger> trigger;
       {
-	 t->disabled=1;
-	 GPosition this_pos=pos;
-	 ++pos;
-	 triggers_list.del(this_pos);
-      } else ++pos;
+	 GCriticalSectionLock lock(&triggers_lock);
+	 for(GPosition pos=triggers_list;pos;)
+	 {
+	    GP<Trigger> t=triggers_list[pos];
+	    if (t->callback==callback && t->cl_data==cl_data)
+	    {
+	       trigger=t;
+	       GPosition this_pos=pos;
+	       ++pos;
+	       triggers_list.del(this_pos);
+	       break;
+	    } else ++pos;
+	 }
+      }
+
+	 // Above we removed the trigger from the list and unlocked the list
+	 // Now we will disable it and will wait if necessary (if the
+	 // trigger is currently being processed by check_triggers())
+	 // check_triggers() locks the trigger for the duration of the
+	 // trigger callback. Thus we will wait for the trigger callback
+	 // to finish and avoid client's destruction.
+      if (trigger) trigger->disabled=1;
+      else break;
    }
 
    if (pool) pool->del_trigger(callback, cl_data);
