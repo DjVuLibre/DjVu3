@@ -30,18 +30,18 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: annotate.cpp,v 1.15 2001-05-09 00:38:26 bcr Exp $
+// $Id: annotate.cpp,v 1.16 2001-05-14 22:31:45 bcr Exp $
 // $Name:  $
 
 /*****************************************************************************
  *
- *   $Revision: 1.15 $
- *   $Date: 2001-05-09 00:38:26 $
- *   @(#) $Id: annotate.cpp,v 1.15 2001-05-09 00:38:26 bcr Exp $
+ *   $Revision: 1.16 $
+ *   $Date: 2001-05-14 22:31:45 $
+ *   @(#) $Id: annotate.cpp,v 1.16 2001-05-14 22:31:45 bcr Exp $
  *
  *****************************************************************************/
 
-static const char RCSVersion[]="@(#) $Id: annotate.cpp,v 1.15 2001-05-09 00:38:26 bcr Exp $";
+static const char RCSVersion[]="@(#) $Id: annotate.cpp,v 1.16 2001-05-14 22:31:45 bcr Exp $";
 
 #include "GIFFManager.h"
 #include "GOS.h"
@@ -65,7 +65,7 @@ static inline void del_anno(GIFFManager &mng)
    for(int i=0;i<chunksa;i++)
      mng.del_chunk(ascii_ant);
    const int chunksz=mng.get_chunks_number(binary_ant); 
-   for(int i=0;i<chunksz;i++)
+   for(int j=0;j<chunksz;j++)
      mng.del_chunk(binary_ant);
 }
 

@@ -1,0 +1,380 @@
+Microsoft Developer Studio Workspace File, Format Version 6.00
+# WARNING: DO NOT EDIT OR DELETE THIS WORKSPACE FILE!
+
+###############################################################################
+
+Project: "BuildAll"=.\BuildAll\BuildAll.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name bzz
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name c44
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name cjb2
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name cpaldjvu
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name csepdjvu
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name d44
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name ddjvu
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name djthumb
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name djvmcvt
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name djvuannotate
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name djvudump
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name djvuextract
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name djvumake
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name djvutoxml
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name djvutxt
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name djvuxmlparser
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name ppmcoco
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "JpegLibrary"=.\JpegLibrary.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "ReferenceLibrary"=.\ReferenceLibrary.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "bzz"=.\bzz.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name ReferenceLibrary
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "c44"=.\c44.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name ReferenceLibrary
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "cjb2"=.\cjb2.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name ReferenceLibrary
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "cpaldjvu"=.\cpaldjvu.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name ReferenceLibrary
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "csepdjvu"=.\csepdjvu.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name ReferenceLibrary
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "d44"=.\d44.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name ReferenceLibrary
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "ddjvu"=.\ddjvu.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name ReferenceLibrary
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name JpegLibrary
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "djthumb"=.\djthumb.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name ReferenceLibrary
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name JpegLibrary
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "djvmcvt"=.\djvmcvt.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name ReferenceLibrary
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name JpegLibrary
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "djvuannotate"=.\djvuannotate.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name ReferenceLibrary
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "djvudump"=.\djvudump.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name ReferenceLibrary
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "djvuextract"=.\djvuextract.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name ReferenceLibrary
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name JpegLibrary
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "djvumake"=.\djvumake.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name ReferenceLibrary
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "djvutoxml"=.\djvutoxml.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name ReferenceLibrary
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name JpegLibrary
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "djvutxt"=.\djvutxt.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name ReferenceLibrary
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name JpegLibrary
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "djvuxmlparser"=.\djvuxmlparser.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name ReferenceLibrary
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name JpegLibrary
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "ppmcoco"=.\ppmcoco.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name ReferenceLibrary
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Global:
+
+Package=<5>
+{{{
+}}}
+
+Package=<3>
+{{{
+}}}
+
+###############################################################################
+

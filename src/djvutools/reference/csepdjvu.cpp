@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: csepdjvu.cpp,v 1.24 2001-05-10 23:09:35 fcrary Exp $
+// $Id: csepdjvu.cpp,v 1.25 2001-05-14 22:31:45 bcr Exp $
 // $Name:  $
 
 
@@ -108,7 +108,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: csepdjvu.cpp,v 1.24 2001-05-10 23:09:35 fcrary Exp $# */
+    #$Id: csepdjvu.cpp,v 1.25 2001-05-14 22:31:45 bcr Exp $# */
 //@{
 //@}
 
@@ -148,8 +148,9 @@ inline int MAX(int a, int b) { return ( a>b ?a :b); }
 
 class BufferByteStream : public ByteStream 
 {
+public:
+	enum {bufsize=512};
 private:
-  static const size_t bufsize = 512;
   ByteStream &bs;
   char buffer[bufsize];
   int bufpos;
@@ -202,6 +203,7 @@ size_t
 BufferByteStream::write(const void *, size_t )
 {
   G_THROW("Cannot write into a BufferByteStream");
+  return 0;
 }
 
 long 
@@ -996,6 +998,7 @@ read_background(BufferByteStream &bs, int w, int h, int &bgred)
     }
   // Failure
   G_THROW("Background pixmap size does not match foreground");
+  return 0;
 }
 
 

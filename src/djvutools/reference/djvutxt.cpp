@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djvutxt.cpp,v 1.20 2001-05-09 00:38:26 bcr Exp $
+// $Id: djvutxt.cpp,v 1.21 2001-05-14 22:31:45 bcr Exp $
 // $Name:  $
 
 // DJVUTXT -- DjVu TXT extractor
@@ -69,7 +69,7 @@
     @author
     Andrei Erofeev <eaf@geocities.com> -- initial implementation
     @version
-    #$Id: djvutxt.cpp,v 1.20 2001-05-09 00:38:26 bcr Exp $# */
+    #$Id: djvutxt.cpp,v 1.21 2001-05-14 22:31:45 bcr Exp $# */
 //@{
 //@}
 
@@ -232,4 +232,8 @@ main(int argc, char ** argv)
       exc.perror();
       exit(1);
    } G_ENDCATCH;
+   exit(0);
+#ifdef WIN32
+   return 0;
+#endif
 }
