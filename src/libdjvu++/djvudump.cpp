@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: djvudump.cpp,v 1.9 1999-11-16 00:17:46 leonb Exp $
+//C- $Id: djvudump.cpp,v 1.10 2000-02-01 22:49:54 leonb Exp $
 
 
 
@@ -57,7 +57,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: djvudump.cpp,v 1.9 1999-11-16 00:17:46 leonb Exp $# */
+    #$Id: djvudump.cpp,v 1.10 2000-02-01 22:49:54 leonb Exp $# */
 //@{
 //@}
 
@@ -302,9 +302,9 @@ void
 usage()
 {
   fprintf(stderr,
-          "DJVUINFO -- Describes IFF85 files\n"
+          "DJVUDUMP -- Describes IFF85 files\n"
           "  Copyright (c) AT&T 1999.  All rights reserved\n"
-          "Usage: djvuinfo <iff_filenames>\n" );
+          "Usage: djvudump <iff_filenames>\n" );
   exit(1);
 }
 
