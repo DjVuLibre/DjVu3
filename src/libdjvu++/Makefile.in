@@ -7,7 +7,7 @@
 # C- AT&T, you have an infringing copy of this software and cannot use it
 # C- without violating AT&T's intellectual property rights.
 # C-
-# C- $Id: Makefile.in,v 1.86 2000-02-17 22:09:08 leonb Exp $
+# C- $Id: Makefile.in,v 1.87 2000-03-01 05:40:22 bcr Exp $
 
 %%%include <paths>
 
@@ -34,7 +34,7 @@ CXXFLAGS=@%CXXFLAGS%@ $(CXXOPT) $(CXXWARN) $(CXXPIC) $(DEFS) $(INCS)
 
 LIB= $(LIBDJVUXX)
 
-PROG= $(BINPATH)/djvudump $(BINPATH)/c44 $(BINPATH)/d44 $(BINPATH)/djvutopnm\
+PROG= $(BINPATH)/djvudump $(BINPATH)/c44 $(BINPATH)/d44 $(BINPATH)/djvu2pnm\
 	$(BINPATH)/djvumake $(BINPATH)/djvuextract $(BINPATH)/ppmcoco\
 	$(BINPATH)/bzz $(BINPATH)/djthumb $(BINPATH)/djvmcvt $(BINPATH)/djvm\
 	$(BINPATH)/cjb2 $(BINPATH)/cpaldjvu
@@ -76,7 +76,7 @@ DJVMCVTOBJS = djvmcvt.o
 C44OBJS = c44.o
 D44OBJS = d44.o
 DJVUDUMPOBJS = djvudump.o
-DJVUTOPNMOBJS = djvutopnm.o
+DJVU2PNMOBJS = djvu2pnm.o
 MAKEDEJAVUOBJS = djvumake.o
 BREAKDEJAVUOBJS = djvuextract.o
 PPMCOCOOBJS = ppmcoco.o
@@ -106,9 +106,9 @@ $(BINPATH)/djvudump: $(DJVUDUMPOBJS) $(LIB)
 	if [ -n "$(RPO)" ] ; then $(RPO) $(DJVUDUMPOBJS) $(LIB)  ; fi
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(DJVUDUMPOBJS) $(LIB) $(LIBS)
 
-$(BINPATH)/djvutopnm: $(DJVUTOPNMOBJS) $(LIB)
-	if [ -n "$(RPO)" ] ; then $(RPO) $(DJVUTOPNMOBJS) $(LIB) ; fi
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(DJVUTOPNMOBJS) $(LIB) $(LIBS)
+$(BINPATH)/djvu2pnm: $(DJVU2PNMOBJS) $(LIB)
+	if [ -n "$(RPO)" ] ; then $(RPO) $(DJVU2PNMOBJS) $(LIB) ; fi
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(DJVU2PNMOBJS) $(LIB) $(LIBS)
 
 $(BINPATH)/djvumake: $(MAKEDEJAVUOBJS) $(LIB)
 	if [ -n "$(RPO)" ] ; then $(RPO) $(MAKEDEJAVUOBJS) $(LIB) ; fi
