@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.cpp,v 1.52 2001-02-26 23:24:48 fcrary Exp $
+// $Id: ByteStream.cpp,v 1.53 2001-03-06 19:55:41 bcr Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 04/1997
@@ -209,7 +209,6 @@ public:
   Static(const void * const buffer, const size_t sz);
   // Virtual functions
   virtual size_t read(void *buffer, size_t sz);
-  virtual size_t write(const void *buffer, size_t sz);
   virtual int    seek(long offset, int whence = SEEK_SET, bool nothrow=false);
   virtual long tell(void) const;
   /** Returns the total number of bytes contained in the buffer, file, etc.
@@ -252,6 +251,20 @@ private:
 
 ByteStream::~ByteStream()
 {
+}
+
+size_t 
+ByteStream::read(void *buffer, size_t sz)
+{
+  G_THROW("bytestream.cant_read");      //  Cannot read from a ByteStream created for writing
+  return 0;
+}
+
+size_t 
+ByteStream::write(const void *buffer, size_t sz)
+{
+  G_THROW("bytestream.cant_write");      //  Cannot write from a ByteStream created for reading
+  return 0;
 }
 
 void
@@ -852,13 +865,6 @@ ByteStream::Static::read(void *buffer, size_t sz)
   memcpy(buffer, data+where, nsz);
   where += nsz;
   return nsz;
-}
-
-size_t 
-ByteStream::Static::write(const void *buffer, size_t sz)
-{
-  G_THROW("ByteStream.write_error3");                           //  Attempt to write into a Static
-  return 0;
 }
 
 int

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: JPEGDecoder.cpp,v 1.16 2001-02-10 01:16:57 bcr Exp $
+// $Id: JPEGDecoder.cpp,v 1.17 2001-03-06 19:55:42 bcr Exp $
 // $Name:  $
 
 #include "JPEGDecoder.h"
@@ -150,9 +150,8 @@ JPEGDecoder::decode(ByteStream & bs )
   jpeg_destroy_decompress(&cinfo);
   
   outputBlock.seek(0,SEEK_SET);
-  GP<GPixmap> gp = new GPixmap(outputBlock);
 
-  return gp; 
+  return GPixmap::create(outputBlock);
 }         
 
 /*** From here onwards code is to make ByteStream as the data

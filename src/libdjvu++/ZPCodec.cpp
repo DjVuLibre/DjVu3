@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ZPCodec.cpp,v 1.17 2001-01-04 22:04:55 bcr Exp $
+// $Id: ZPCodec.cpp,v 1.18 2001-03-06 19:55:42 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -601,8 +601,53 @@ static ZPCodec::Table default_ztable[256] =
 // CONSTRUCTOR/DESTRUCTOR
 ////////////////////////////////////////////////////////////////
 
-ZPCodec::ZPCodec(ByteStream &bs, bool encoding, bool djvucompat)
-  : bs(&bs), encoding(encoding)
+class ZPCodec::Encode : public ZPCodec
+{
+public:
+  Encode(GP<ByteStream> gbs, const bool djvucompat);
+  virtual ~Encode();
+private:
+  void init(void); 
+};
+
+ZPCodec::Encode::Encode(GP<ByteStream> gbs, const bool djvucompat)
+: ZPCodec(gbs,true,djvucompat)
+{
+  init();
+  // Codebit counter
+#ifdef ZPCODEC_BITCOUNT
+  bitcount = 0;
+#endif
+}
+
+ZPCodec::Encode::~Encode()
+{
+  eflush();
+}
+ 
+class ZPCodec::Decode : public ZPCodec
+{
+public:
+  Decode(GP<ByteStream> gbs, const bool djvucompat);
+  virtual ~Decode();
+private:
+  void init(void); 
+};
+
+ZPCodec::Decode::Decode(GP<ByteStream> gbs, const bool djvucompat)
+: ZPCodec(gbs,false,djvucompat)
+{
+  init();
+  // Codebit counter
+#ifdef ZPCODEC_BITCOUNT
+  bitcount = 0;
+#endif
+}
+ 
+ZPCodec::Decode::~Decode() {}
+
+ZPCodec::ZPCodec(GP<ByteStream> xgbs, const bool xencoding, const bool djvucompat)
+: gbs(xgbs), bs(xgbs), encoding(xencoding)
 {
   // Create machine independent ffz table
   for (int i=0; i<256; i++)
@@ -628,23 +673,23 @@ ZPCodec::ZPCodec(ByteStream &bs, bool encoding, bool djvucompat)
             }
         }
     }
-  // Initialize encoder or decoder
-  if (encoding) 
-    einit();
-  else
-    dinit();
-  // Codebit counter
-#ifdef ZPCODEC_BITCOUNT
-  bitcount = 0;
-#endif
 }
 
-ZPCodec::~ZPCodec()
+ZPCodec::~ZPCodec() {}
+
+GP<ZPCodec>
+ZPCodec::create(GP<ByteStream> gbs, const bool encoding, const bool djvucompat)
 {
-  if (encoding)
-    eflush();
+  GP<ZPCodec> retval;
+  if(encoding)
+  {
+    retval=new ZPCodec::Encode(gbs,djvucompat);
+  }else
+  {
+    retval=new ZPCodec::Decode(gbs,djvucompat);
+  }
+  return retval;
 }
-
 
 ////////////////////////////////////////////////////////////////
 // Z CODER DECODE ALGORITHM
@@ -653,7 +698,7 @@ ZPCodec::~ZPCodec()
 
 
 void 
-ZPCodec::dinit(void)
+ZPCodec::Decode::init(void)
 {
 #ifndef UNDER_CE
   assert(sizeof(unsigned int)==4);
@@ -894,7 +939,7 @@ ZPCodec::decode_sub_nolearn(int mps, unsigned int z)
 
 
 void 
-ZPCodec::einit(void)
+ZPCodec::Encode::init(void)
 {
 #ifndef UNDER_CE
   assert(sizeof(unsigned int)==4);

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuInfo.h,v 1.12 2001-01-04 22:04:55 bcr Exp $
+// $Id: DjVuInfo.h,v 1.13 2001-03-06 19:55:42 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUINFO_H
@@ -46,7 +46,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: DjVuInfo.h,v 1.12 2001-01-04 22:04:55 bcr Exp $# */
+    #$Id: DjVuInfo.h,v 1.13 2001-03-06 19:55:42 bcr Exp $# */
 //@{
 
 
@@ -85,11 +85,14 @@ class ByteStream;
 
 class DjVuInfo : public GPEnabled
 {
+protected:
+  DjVuInfo(void);
 public:
-  /** Constructs an empty DjVuInfo object.
+  /** Creates an empty DjVuInfo object.
       The #width# and #height# fields are set to zero.
       All other fields are initialized with suitable default values. */
-  DjVuInfo();
+  static GP<DjVuInfo> create(void) {return new DjVuInfo();}
+
   /** Decodes the DjVu #"INFO"# chunk.  This function reads binary data from
       ByteStream #bs# and populates the fields of this DjVuInfo object.  It is
       normally called after detecting an #"INFO"# chunk header with function

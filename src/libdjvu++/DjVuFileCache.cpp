@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuFileCache.cpp,v 1.12 2001-01-04 22:04:55 bcr Exp $
+// $Id: DjVuFileCache.cpp,v 1.13 2001-03-06 19:55:42 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -41,6 +41,8 @@
 #include "debug.h"
 
 #include <stdlib.h>
+
+DjVuFileCache::~DjVuFileCache(void) {}
 
 #ifndef UNDER_CE
 int

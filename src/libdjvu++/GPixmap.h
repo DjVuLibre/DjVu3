@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GPixmap.h,v 1.23 2001-01-04 22:04:55 bcr Exp $
+// $Id: GPixmap.h,v 1.24 2001-03-06 19:55:42 bcr Exp $
 // $Name:  $
 
 #ifndef _GPIXMAP_H_
@@ -52,7 +52,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: GPixmap.h,v 1.23 2001-01-04 22:04:55 bcr Exp $# */
+    #$Id: GPixmap.h,v 1.24 2001-03-06 19:55:42 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -115,39 +115,64 @@ struct GPixel
 
 class GPixmap : public GPEnabled
 {
+protected:
+  GPixmap(void);
+  GPixmap(int nrows, int ncolumns, const GPixel *filler=0);
+  GPixmap(const GBitmap &ref);
+  GPixmap(const GBitmap &ref, const GRect &rect);
+  GPixmap(const GPixmap &ref);
+  GPixmap(const GPixmap &ref, const GRect &rect);
+  GPixmap(ByteStream &ref);
+
 public:
+  /// Virtual destructor.
   virtual ~GPixmap();
+
   void destroy(void);
   /** @name Construction. */
   //@{
-  /** Constructs an empty GBitmap object.  The returned GPixmap has zero rows
+  /** Creates an empty GBitmap object.  The returned GPixmap has zero rows
       and zero columns.  Use function \Ref{init} to change the size of the
       image. */
-  GPixmap();
-  /** Constructs a GPixmap with #nrows# rows and #ncolumns# columns.  When the
+  static GP<GPixmap> create(void) {return new GPixmap();}
+
+  /** Creates a GPixmap with #nrows# rows and #ncolumns# columns.  When the
       optional argument #filler# is specified, all pixels are initialized 
       with the corresponding color. */
-  GPixmap(int nrows, int ncolumns, const GPixel *filler=0);
-  /** Constructs a GPixmap by copying the gray level image #ref#.
+  static GP<GPixmap> create(
+    const int nrows, const int ncolumns, const GPixel *filler=0)
+  { return new GPixmap(nrows,ncolumns,filler); }
+
+  /** Creates a GPixmap by copying the gray level image #ref#.
       The constructed GPixmap has the same size as #ref#.  The pixels
       are initialized with shades of grays copied from #ref#. */
-  GPixmap(const GBitmap &ref);
-  /** Constructs a GPixmap by copying the rectangle #rect# of the gray level
+  static GP<GPixmap> create(const GBitmap &ref)
+  { return new GPixmap(ref); }
+
+  /** Creates a GPixmap by copying the rectangle #rect# of the gray level
       image #ref#.  The constructed GPixmap has the same size as rectangle
       #rect#.  The pixels are initialized with shades of grays converted from
       the ink levels represented in #ref#.  This conversion depends on the
       number of gray levels in #ref#. */
-  GPixmap(const GBitmap &ref, const GRect &rect);
-  /** Copy constructors. Constructs a GPixmap by replicating the size and the
+  static GP<GPixmap> create(const GBitmap &ref, const GRect &rect)
+  { return new GPixmap(ref,rect); }
+
+  /** Copy constructors. Creates a GPixmap by replicating the size and the
       contents of GPixmap #ref#. */
-  GPixmap(const GPixmap &ref);
-  /** Constructs a GPixmap by copying the rectangle #rect# of the color image #ref#.
+  static GP<GPixmap> create(const GPixmap &ref)
+  { return new GPixmap(ref); }
+
+  /** Creates a GPixmap by copying the rectangle #rect# of the color image #ref#.
       The constructed GPixmap has the same size as rectangle #rect#.
       The pixels are initialized with colors copied from #ref#. */
-  GPixmap(const GPixmap &ref, const GRect &rect);
-  /** Constructs a GPixmap by reading PPM data from ByteStream #ref#.
+  static GP<GPixmap> create(const GPixmap &ref, const GRect &rect)
+  { return new GPixmap(ref,rect); }
+
+  /** Creates a GPixmap by reading PPM data from ByteStream #ref#.
       See \Ref{PNM and RLE file formats} for more information. */
-  GPixmap(ByteStream &ref);
+  static GP<GPixmap> create(ByteStream &ref)
+  { return new GPixmap(ref); }
+
   //@}
 
   /** @name Initialization. */

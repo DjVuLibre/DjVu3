@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuAnno.h,v 1.38 2001-02-15 20:31:57 bcr Exp $
+// $Id: DjVuAnno.h,v 1.39 2001-03-06 19:55:42 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUANNO_H
@@ -58,7 +58,7 @@
     @memo Implements support for DjVuImage annotations
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: DjVuAnno.h,v 1.38 2001-02-15 20:31:57 bcr Exp $# */
+    #$Id: DjVuAnno.h,v 1.39 2001-03-06 19:55:42 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -81,12 +81,20 @@ class ByteStream;
 
 class DjVuANT : public GPEnabled
 {
+protected:
+      /// Constructs an empty annotation object.
+   DjVuANT(void);
+
 public:
    enum { MODE_UNSPEC=0, MODE_COLOR, MODE_FORE, MODE_BACK, MODE_BW };
    enum { ZOOM_STRETCH=-4, ZOOM_ONE2ONE=-3, ZOOM_WIDTH=-2,
 	  ZOOM_PAGE=-1, ZOOM_UNSPEC=0 };
    enum { ALIGN_UNSPEC=0, ALIGN_LEFT, ALIGN_CENTER, ALIGN_RIGHT,
 	  ALIGN_TOP, ALIGN_BOTTOM };
+
+      /// Creates an empty annotation object.
+   static GP<DjVuANT> create(void) { return new DjVuANT; }
+   virtual ~DjVuANT();
 
       /** Background color. Is in #0x00RRBBGG# format. #0xffffffff# if
 	  there were no background color records in the annotation chunk. */
@@ -123,10 +131,6 @@ public:
 	  or hyperlink. Please refer to \Ref{GMapArea}, \Ref{GMapRect},
 	  \Ref{GMapPoly} and \Ref{GMapOval} for details. */
    GPList<GMapArea>	map_areas;
-
-      /// Constructs an empty annotation object.
-   DjVuANT();
-   virtual ~DjVuANT();
 
       /** Returns TRUE if no features are specified or specified features
 	  are not different from default ones */
@@ -186,7 +190,12 @@ private:
     lower-level classes. */
 class DjVuAnno : public GPEnabled
 {
+protected:
+   DjVuAnno(void) {}
 public:
+   /// Creation method.
+   static GP<DjVuAnno> create(void) { return new DjVuAnno; }
+
    GP<DjVuANT>	ant;
 
       /** Decodes a sequence of annotation chunks and merges contents of every

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: XMLAnno.h,v 1.3 2001-02-15 20:31:57 bcr Exp $
+// $Id: XMLAnno.h,v 1.4 2001-03-06 19:55:42 bcr Exp $
 // $Name:  $
 
 #ifndef _LT_XMLANNO__
@@ -51,12 +51,20 @@ class DjVuDocument;
 
 class lt_XMLAnno : public GPEnabled
 {
-public:
+protected:
   lt_XMLAnno(void) {}
+public:
+  /// Default creator
+  static GP<lt_XMLAnno> create(void) { return new lt_XMLAnno(); }
+  /// Parse the specified file.
   void parse(const char xmlfile[]);
+  /// Parse the specified bytestream.
   void parse(GP<ByteStream> &bs);
+  /// Parse the specified tags.
   void parse(const lt_XMLTags &tags);
+  /// write to disk.
   void save(void);
+  /// erase.
   void empty(void);
 protected:
   void ChangeAnno(const lt_XMLTags &map,const GURL url,const GString id,

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: c44.cpp,v 1.13 2001-02-21 00:03:11 bcr Exp $
+// $Id: c44.cpp,v 1.14 2001-03-06 19:55:41 bcr Exp $
 // $Name:  $
 
 
@@ -184,7 +184,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: c44.cpp,v 1.13 2001-02-21 00:03:11 bcr Exp $# */
+    #$Id: c44.cpp,v 1.14 2001-03-06 19:55:41 bcr Exp $# */
 //@{
 //@}
 
@@ -606,11 +606,11 @@ parse(int argc, char **argv)
 GP<GBitmap>
 getmask(int w, int h)
 {
-  static GP<GBitmap> msk8;
+  GP<GBitmap> msk8;
   if (!! mskfile)
     {
       GP<ByteStream> mbs=ByteStream::create(mskfile,"rb");
-      msk8 = new GBitmap(*mbs);
+      msk8 = GBitmap::create(*mbs);
       if (msk8->columns() != (unsigned int)w || 
           msk8->rows()    != (unsigned int)h  )
         G_THROW("c44: mask and image have different size");
@@ -624,7 +624,8 @@ create_photo_djvu_file(IW44Image &iw, int w, int h,
                        IFFByteStream &iff, int nchunks, IWEncoderParms parms[])
 {
   // Prepare info chunk
-  DjVuInfo info;
+  GP<DjVuInfo> ginfo=DjVuInfo::create();
+  DjVuInfo &info=*ginfo;
   info.width = w;
   info.height = h;
   info.dpi = (flag_dpi>0 ? flag_dpi : 100);
@@ -639,7 +640,7 @@ create_photo_djvu_file(IW44Image &iw, int w, int h,
   for (int i=0; flag && i<nchunks; i++)
     {
       iff.put_chunk("BG44");
-      flag = iw.encode_chunk(iff, parms[i]);
+      flag = iw.encode_chunk(iff.get_bytestream(), parms[i]);
       iff.close_chunk();
     }
   // Close djvu chunk
@@ -669,18 +670,20 @@ main(int argc, char **argv)
       if (prefix[0]=='P' && (prefix[1]=='3' || prefix[1]=='6'))
         {
           // color file
-          GPixmap ipm(ibs);
+          GP<GPixmap> gipm=GPixmap::create(ibs);
+          GPixmap &ipm=*gipm;
           w = ipm.columns();
           h = ipm.rows();
-          iw = IW44Image::create(ipm, getmask(w,h), arg_crcbmode);
+          iw = IW44Image::create_encode(ipm, getmask(w,h), arg_crcbmode);
         }
       else if (prefix[0]=='P' && (prefix[1]=='2' || prefix[1]=='5'))
         {
           // gray file
-          GBitmap ibm(ibs);
+          GP<GBitmap> gibm=GBitmap::create(ibs);
+          GBitmap &ibm=*gibm;
           w = ibm.columns();
           h = ibm.rows();
-          iw = IW44Image::create(ibm, getmask(w,h));
+          iw = IW44Image::create_encode(ibm, getmask(w,h));
         }
       else if (!strncmp(prefix,"AT&TFORM",8) || !strncmp(prefix,"FORM",4))
         {

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djvuextract.cpp,v 1.11 2001-02-15 19:06:55 bcr Exp $
+// $Id: djvuextract.cpp,v 1.12 2001-03-06 19:55:41 bcr Exp $
 // $Name:  $
 
 /** @name djvuextract
@@ -65,7 +65,7 @@
     @memo
     Extract components from DjVu files.
     @version
-    #$Id: djvuextract.cpp,v 1.11 2001-02-15 19:06:55 bcr Exp $#
+    #$Id: djvuextract.cpp,v 1.12 2001-03-06 19:55:41 bcr Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> - Initial implementation\\
     Andrei Erofeev <eaf@geocities.com> - Multipage support */
@@ -233,8 +233,7 @@ main(int argc, char **argv)
           usage();
 
       // Decode
-      GP<DjVuDocument> doc=new DjVuDocument;
-      doc->init(GOS::filename_to_url(argv[1]));
+      GP<DjVuDocument> doc=DjVuDocument::create_wait(argv[1]);
       if (! doc->wait_for_complete_init())
         G_THROW("Decoding failed. Nothing can be done.");        
       GP<DjVuFile> file=doc->get_djvu_file(page_num);

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocEditor.cpp,v 1.65 2001-02-21 00:03:11 bcr Exp $
+// $Id: DjVuDocEditor.cpp,v 1.66 2001-03-06 19:55:42 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -120,10 +120,10 @@ DjVuDocEditor::init(void)
 
    doc_url=GOS::filename_to_url(GOS::expand_name("noname.djvu", GOS::cwd()));
 
-   DjVmDoc doc;
+   GP<DjVmDoc> doc=DjVmDoc::create();
    GP<ByteStream> gstr=ByteStream::create();
    ByteStream &str=*gstr;
-   doc.write(gstr);
+   doc->write(gstr);
    str.seek(0, SEEK_SET);
    doc_pool=DataPool::create(str);
 
@@ -136,7 +136,7 @@ DjVuDocEditor::init(void)
 }
 
 void
-DjVuDocEditor::init(const char * fname)
+DjVuDocEditor::init(char const fname[])
 {
    DEBUG_MSG("DjVuDocEditor::init() called: fname='" << fname << "'\n");
    DEBUG_MAKE_INDENT(3);
@@ -148,8 +148,7 @@ DjVuDocEditor::init(const char * fname)
       // First - create a temporary DjVuDocument and check its type
    doc_pool=DataPool::create(fname);
    doc_url=GOS::filename_to_url(fname);
-   GP<DjVuDocument> tmp_doc=new DjVuDocument();
-   tmp_doc->init(doc_url, this);
+   GP<DjVuDocument> tmp_doc=DjVuDocument::create_wait(doc_url,this);
    if (!tmp_doc->is_init_ok())
       G_THROW(GString("DjVuDocEditor.open_fail\t")+fname);
 
@@ -683,8 +682,7 @@ DjVuDocEditor::insert_group(const GList<GString> & file_names, int page_num,
                   // Hey, it really IS a multipage document.
                   // Open it, expand to a tmp directory and add pages
                   // one after another
-               GP<DjVuDocument> doc=new DjVuDocument();
-               doc->init(GOS::filename_to_url(fname));
+               GP<DjVuDocument> doc=DjVuDocument::create_wait((const char *)fname);
 #ifndef UNDER_CE
 	             GString dirname=tmpnam(0);
 #else
@@ -1225,7 +1223,7 @@ DjVuDocEditor::simplify_anno(void (* progress_cb)(float progress, void *),
             file_flags.wait();
         
             // Merge all chunks in one by decoding and encoding DjVuAnno
-         GP<DjVuAnno> dec_anno=new DjVuAnno;
+         GP<DjVuAnno> dec_anno=DjVuAnno::create();
          dec_anno->decode(anno);
          GP<ByteStream> new_anno=ByteStream::create();
          dec_anno->encode(new_anno);
@@ -1383,11 +1381,10 @@ DjVuDocEditor::get_thumbnails_size(void) const
       {
          TArray<char> & data=*(TArray<char> *) thumb_map[pos];
          GP<ByteStream> gstr=ByteStream::create();
-         ByteStream &str=*gstr;
-         str.writall((const char *) data, data.size());
-         str.seek(0);
+         gstr->writall((const char *) data, data.size());
+         gstr->seek(0);
          GP<IW44Image> iwpix=IW44Image::create_decode(IW44Image::COLOR);
-         iwpix->decode_chunk(str);
+         iwpix->decode_chunk(gstr);
         
          int width=iwpix->get_width();
          int height=iwpix->get_height();
@@ -1550,20 +1547,19 @@ DjVuDocEditor::generate_thumbnails(int thumb_size, int page_num)
          if (!pm)
          {
             GP<GBitmap> bm=dimg->get_bitmap(rect, rect, sizeof(int));
-            pm=new GPixmap(*bm);
+            pm=GPixmap::create(*bm);
          }
          if (!pm) G_THROW("DjVuDocEditor.render\t"+GString(page_num));
 
             // Store and compress the pixmap
-         GP<IW44Image> iwpix=IW44Image::create(*pm);
-         GP<ByteStream> str=ByteStream::create();
-         ByteStream &mbs=*str;
+         GP<IW44Image> iwpix=IW44Image::create_encode(*pm);
+         GP<ByteStream> gstr=ByteStream::create();
          IWEncoderParms parms;
          parms.slices=97;
          parms.bytes=0;
          parms.decibels=0;
-         iwpix->encode_chunk(mbs, parms);
-         thumb_map[id]=new TArray<char>(mbs.get_data());
+         iwpix->encode_chunk(gstr, parms);
+         thumb_map[id]=new TArray<char>(gstr->get_data());
       }
       ++page_num;
    }else
@@ -1616,7 +1612,7 @@ DjVuDocEditor::save_pages_as(GP<ByteStream> str, const GList<int> & _page_list)
 {
    GList<int> page_list=sortList(_page_list);
 
-   GP<DjVmDoc> djvm_doc=new DjVmDoc;
+   GP<DjVmDoc> djvm_doc=DjVmDoc::create();
    GMap<GURL, void *> map;
    for(GPosition pos=page_list;pos;++pos)
    {

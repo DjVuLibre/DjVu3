@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocEditor.h,v 1.33 2001-02-23 03:07:54 bcr Exp $
+// $Id: DjVuDocEditor.h,v 1.34 2001-03-06 19:55:42 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUDOCEDITOR_H
@@ -51,7 +51,7 @@
 
     @memo DjVu document editor class.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: DjVuDocEditor.h,v 1.33 2001-02-23 03:07:54 bcr Exp $#
+    @version #$Id: DjVuDocEditor.h,v 1.34 2001-03-06 19:55:42 bcr Exp $#
 */
 
 //@{
@@ -75,6 +75,7 @@ class DjVuDocEditor : public DjVuDocument
 public:
    static int	thumbnails_per_file;
 
+protected:
       /// Default constructor
    DjVuDocEditor(void);
 
@@ -85,12 +86,20 @@ public:
 	  anything else with the #DjVuDocEditor#. */
    void		init(void);
 
-      /** Initialization function. Opens document with name #fname#.
+     /** Creates a DjVuDocEditor class and initializes an empty document. */
+   static GP<DjVuDocEditor> create_wait(void);
+
+      /** Initialization function. Opens document with name #filename#.
 
 	  {\bf Note}: You must call either of the two
 	  available \Ref{init}() function before you start doing
 	  anything else with the #DjVuDocEditor#. */
-   void		init(const char * fname);
+   void		init(char const filename[]);
+
+public:
+     /** Creates a DjVuDocEditor class and initializes with #fname#. */
+   static GP<DjVuDocEditor> create_wait(char const filename[]);
+
 
       /// Destructor
    virtual ~DjVuDocEditor(void);
@@ -376,6 +385,10 @@ private:
 			  bool only_modified, GMap<GString, void *> & map);
 private: //dummy stuff
    static void save_pages_as(ByteStream *, const GList<int> &);
+   static GP<DjVuDocument> create_wait(
+     const GURL &url, GP<DjVuPort> xport=0, DjVuFileCache * const xcache=0);
+   static GP<DjVuDocument> create_wait(
+     char const filename[], GP<DjVuPort> xport, DjVuFileCache * const xcache=0);
    static GP<DjVuDocument> create(
      const GURL &url, GP<DjVuPort> xport=0, DjVuFileCache * const xcache=0);
    static GP<DjVuDocument> create(
@@ -422,18 +435,23 @@ DjVuDocEditor::get_doc_url(void) const
    return doc_url.is_empty() ? init_url : doc_url;
 }
 
-class GDjVuDocEditor
+inline GP<DjVuDocEditor> 
+DjVuDocEditor::create_wait(void)
 {
-  GP<DjVuDocEditor> doc;
-public:
-  GDjVuDocEditor(DjVuDocEditor *_doc) : doc(_doc) {}
-  bool operator!(void) const {return !(const DjVuDocEditor *)doc;}
-  DjVuDocEditor* operator-> (void) {return doc;}
-  const DjVuDocEditor* operator-> (void) const {return doc;}
-  operator GP<DjVuDocument> (void) { return (DjVuDocEditor *)doc;}
-  operator DjVuDocEditor *(void) { return doc;}
-  operator const DjVuDocEditor *(void) const { return doc; }
-};
+  DjVuDocEditor *doc=new DjVuDocEditor();
+  GP<DjVuDocEditor> retval=doc;
+  doc->init();
+  return retval;
+}
+
+inline GP<DjVuDocEditor> 
+DjVuDocEditor::create_wait(char const filename[])
+{
+  DjVuDocEditor *doc=new DjVuDocEditor();
+  GP<DjVuDocEditor> retval=doc;
+  doc->init(filename);
+  return retval;
+}
 
 
 //@}

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djvmcvt.cpp,v 1.9 2001-02-15 01:12:21 bcr Exp $
+// $Id: djvmcvt.cpp,v 1.10 2001-03-06 19:55:41 bcr Exp $
 // $Name:  $
 
 /** @name djvmcvt
@@ -106,7 +106,7 @@
     @author
     Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: djvmcvt.cpp,v 1.9 2001-02-15 01:12:21 bcr Exp $# */
+    #$Id: djvmcvt.cpp,v 1.10 2001-03-06 19:55:41 bcr Exp $# */
 
 #ifdef __GNUC__
 #pragma implementation
@@ -151,8 +151,7 @@ do_bundled(int argc, char ** argv)
       // <progname> -b[undled] <file_in> <file_out>
 {
    if (argc!=4) { Usage(); exit(1); }
-   GP<DjVuDocument> doc = new DjVuDocument;
-   doc->init(GOS::filename_to_url(argv[2]));
+   GP<DjVuDocument> doc = DjVuDocument::create_wait(argv[2]);
    GP<ByteStream> str=ByteStream::create(argv[3], "wb");
    doc->write(str);
 }
@@ -162,8 +161,7 @@ do_indirect(int argc, char ** argv)
       // <progname> -i[ndirect] <file_in> <dir_out> <idx_fname>
 {
    if (argc!=5) { Usage(); exit(1); }
-   GP<DjVuDocument> doc = new DjVuDocument;
-   doc->init(GOS::filename_to_url(argv[2]));
+   GP<DjVuDocument> doc = DjVuDocument::create_wait(argv[2]);
    doc->expand(argv[3], argv[4]);
 }
 

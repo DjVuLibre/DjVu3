@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuAnno.cpp,v 1.68 2001-02-15 01:12:22 bcr Exp $
+// $Id: DjVuAnno.cpp,v 1.69 2001-03-06 19:55:42 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -507,7 +507,7 @@ GLParser::get_object(const char * name, bool last)
 #define MODE_TAG	"mode"
 #define ALIGN_TAG	"align"
 
-DjVuANT::DjVuANT()
+DjVuANT::DjVuANT(void)
 {
    bg_color=0xffffffff;
    zoom=0;
@@ -790,7 +790,8 @@ DjVuANT::get_map_areas(GLParser & parser)
                         (*shape)[1]->get_number(),
                         (*shape)[2]->get_number(),
                         (*shape)[3]->get_number());
-            map_area=new GMapRect(grect);
+            GP<GMapRect> map_rect=GMapRect::create(grect);
+            map_area=(GMapRect *)map_rect;
           } else if (shape->get_name()==GMapArea::POLY_TAG)
           {
             DEBUG_MSG("it's a polygon.\n");
@@ -801,7 +802,8 @@ DjVuANT::get_map_areas(GLParser & parser)
               xx[i]=(*shape)[2*i]->get_number();
               yy[i]=(*shape)[2*i+1]->get_number();
             }
-            map_area=new GMapPoly(xx, yy, points);
+            GP<GMapPoly> map_poly=GMapPoly::create(xx,yy,points);
+            map_area=(GMapPoly *)map_poly;
           } else if (shape->get_name()==GMapArea::OVAL_TAG)
           {
             DEBUG_MSG("it's an ellipse.\n");
@@ -809,7 +811,8 @@ DjVuANT::get_map_areas(GLParser & parser)
                         (*shape)[1]->get_number(),
                         (*shape)[2]->get_number(),
                         (*shape)[3]->get_number());
-            map_area=new GMapOval(grect);
+            GP<GMapOval> map_oval=GMapOval::create(grect);
+            map_area=(GMapOval *)map_oval;
           }
         }
         
@@ -997,18 +1000,18 @@ DjVuAnno::decode(GP<ByteStream> gbs)
       if (ant) {
         ant->merge(iff);
       } else {
-        ant=new DjVuANT;
+        ant=DjVuANT::create();
         ant->decode(iff);
       }
     }
     else if (chkid == "ANTz")
     {
-      BSByteStream bsiff(gbs);
+      GP<ByteStream> gbsiff=BSByteStream::create(gbs);
       if (ant) {
-        ant->merge(bsiff);
+        ant->merge(*gbsiff);
       } else {
-        ant=new DjVuANT;
-        ant->decode(bsiff);
+        ant=DjVuANT::create();
+        ant->decode(*gbsiff);
       }
     }
     // Add decoding of other chunks here

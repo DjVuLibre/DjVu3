@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: cpaldjvu.cpp,v 1.10 2001-02-15 01:12:21 bcr Exp $
+// $Id: cpaldjvu.cpp,v 1.11 2001-03-06 19:55:41 bcr Exp $
 // $Name:  $
 
 
@@ -69,7 +69,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: cpaldjvu.cpp,v 1.10 2001-02-15 01:12:21 bcr Exp $# */
+    #$Id: cpaldjvu.cpp,v 1.11 2001-03-06 19:55:41 bcr Exp $# */
 //@{
 //@}
 
@@ -542,7 +542,7 @@ CCImage::get_bitmap_for_cc(const int ccid) const
 {
   const CC &cc = ccs[ccid];
   const GRect &bb = cc.bb;
-  GP<GBitmap> bits = new GBitmap(bb.height(), bb.width());
+  GP<GBitmap> bits = GBitmap::create(bb.height(), bb.width());
   const Run *prun = & runs[(int)cc.frun];
   for (int i=0; i<cc.nrun; i++,prun++)
     {
@@ -627,10 +627,10 @@ tune_jb2image(JB2Image *jimg, int refine_threshold=21)
     {
       // Skip ``special shapes''
       lib[current].bits = 0;
-      JB2Shape *jshp = jimg->get_shape(current);
-      if (jshp->userdata || !jshp->bits) continue; 
+      JB2Shape &jshp = jimg->get_shape(current);
+      if (jshp.userdata || !jshp.bits) continue; 
       // Compute matchdata info
-      GBitmap *bitmap = jshp->bits;
+      GBitmap *bitmap = jshp.bits;
       int row;
       int rows = bitmap->rows();
       int column;
@@ -688,19 +688,19 @@ tune_jb2image(JB2Image *jimg, int refine_threshold=21)
       if (closest_match >= 0)
         {
           // Mark the shape for cross-coding (``soft pattern matching'')
-          jshp->parent = closest_match;
+          jshp.parent = closest_match;
           // Exact match ==> Substitution
           if (best_score == 0)
-            lib[current].bits = jshp->bits = 0;
+            lib[current].bits = jshp.bits = 0;
         }
     }
   // Process shape substitutions
   for (int blitno=0; blitno<jimg->get_blit_count(); blitno++)
     {
       JB2Blit *jblt = jimg->get_blit(blitno);
-      JB2Shape *jshp = jimg->get_shape(jblt->shapeno);
-      if (!jshp->bits && jshp->parent>=0)
-        jblt->shapeno = jshp->parent;
+      JB2Shape &jshp = jimg->get_shape(jblt->shapeno);
+      if (!jshp.bits && jshp.parent>=0)
+        jblt->shapeno = jshp.parent;
     }
 }
 
@@ -732,7 +732,8 @@ cpaldjvu(const GPixmap &input, const char *fileout, const cpaldjvuopts &opts)
   int smallsize = MAX(2, dpi/150);
 
   // Compute optimal palette and quantize input pixmap
-  DjVuPalette pal;
+  GP<DjVuPalette> gpal=DjVuPalette::create();
+  DjVuPalette &pal=*gpal;
   int bgindex = pal.compute_pixmap_palette(input, opts.ncolors);
   if (opts.verbose)
     fprintf(stderr,"cpaldjvu: image %dx%d quantized to %d colors\n", 
@@ -774,7 +775,8 @@ cpaldjvu(const GPixmap &input, const char *fileout, const cpaldjvuopts &opts)
   rimg.sort_in_reading_order();                   // Sort cc descriptors
   
   // Create JB2Image and fill colordata
-  JB2Image jimg;
+  GP<JB2Image> gjimg=JB2Image::create();
+  JB2Image &jimg=*gjimg;
   jimg.set_dimension(w, h);
   int nccs = rimg.ccs.size();
   for (int ccid=0; ccid<nccs; ccid++)
@@ -800,8 +802,8 @@ cpaldjvu(const GPixmap &input, const char *fileout, const cpaldjvuopts &opts)
     {
       int nshape=0, nrefine=0;
       for (int i=0; i<jimg.get_shape_count(); i++) {
-        if (!jimg.get_shape(i)->bits) continue;
-        if (jimg.get_shape(i)->parent >= 0) nrefine++; 
+        if (!jimg.get_shape(i).bits) continue;
+        if (jimg.get_shape(i).parent >= 0) nrefine++; 
         nshape++; 
       }
       fprintf(stderr,"cpaldjvu: %d shapes after matching (%d are cross-coded)\n", 
@@ -811,14 +813,16 @@ cpaldjvu(const GPixmap &input, const char *fileout, const cpaldjvuopts &opts)
   // Create background image
 #ifdef BACKGROUND_SUBSAMPLING_FACTOR
   // -- we may create the background by masking and subsampling
-  GPixmap inputsub;
+  GP<GPixmap> ginputsub=GPixmap::create();
+  GPixmap &inputsub=*ginputsub;
   GP<GBitmap> mask = jimg.get_bitmap(BACKGROUND_SUBSAMPLING_FACTOR);
   inputsub.downsample(&input, BACKGROUND_SUBSAMPLING_FACTOR);
   GP<IW44Image> iwimage=IW44Image::create(inputsub, mask);
 #else
   // -- but who cares since the background is uniform.
-  GPixmap inputsub((h+11)/12, (w+11)/12, &bgcolor);
-  GP<IW44Image> iwimage=IW44Image::create(inputsub);
+  GP<GPixmap> ginputsub=GPixmap::create((h+11)/12, (w+11)/12, &bgcolor);
+  GPixmap &inputsub=*ginputsub;
+  GP<IW44Image> iwimage=IW44Image::create_encode(inputsub);
 #endif
 
   // Assemble DJVU file
@@ -829,7 +833,8 @@ cpaldjvu(const GPixmap &input, const char *fileout, const cpaldjvuopts &opts)
   iff.put_chunk("FORM:DJVU", 1);
   // -- ``INFO'' chunk
   iff.put_chunk("INFO");
-  DjVuInfo info;
+  GP<DjVuInfo> ginfo=DjVuInfo::create();
+  DjVuInfo info=*ginfo;
   info.height = h;
   info.width = w;
   info.dpi = opts.dpi;
@@ -837,7 +842,7 @@ cpaldjvu(const GPixmap &input, const char *fileout, const cpaldjvuopts &opts)
   iff.close_chunk();
   // -- ``Sjbz'' chunk
   iff.put_chunk("Sjbz");
-  jimg.encode(iff);
+  jimg.encode(iff.get_bytestream());
   iff.close_chunk();
   // -- ``FGbz'' chunk
   iff.put_chunk("FGbz");
@@ -859,7 +864,7 @@ cpaldjvu(const GPixmap &input, const char *fileout, const cpaldjvuopts &opts)
   // ----- but who cares when the background is so small.
   iff.put_chunk("BG44");
   iwparms.slices = 97;
-  iwimage->encode_chunk(iff, iwparms);
+  iwimage->encode_chunk(iff.get_bytestream(), iwparms);
   iff.close_chunk();
   // -- terminate main composite chunk
   iff.close_chunk();
@@ -930,8 +935,8 @@ main(int argc, const char **argv)
         usage();
       // Load and run
       GP<ByteStream> ibs=ByteStream::create(inputppmfile,"rb");
-      GPixmap input(*ibs);
-      cpaldjvu(input, outputdjvufile, opts);
+      GP<GPixmap> ginput=GPixmap::create(*ibs);
+      cpaldjvu(*ginput, outputdjvufile, opts);
     }
   G_CATCH(ex)
     {

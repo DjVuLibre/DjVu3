@@ -7,17 +7,17 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: annotate.cpp,v 1.6 2001-02-15 01:12:21 bcr Exp $
+//C-  $Id: annotate.cpp,v 1.7 2001-03-06 19:55:40 bcr Exp $
 
 /*****************************************************************************
  *
- *   $Revision: 1.6 $
- *   $Date: 2001-02-15 01:12:21 $
- *   @(#) $Id: annotate.cpp,v 1.6 2001-02-15 01:12:21 bcr Exp $
+ *   $Revision: 1.7 $
+ *   $Date: 2001-03-06 19:55:40 $
+ *   @(#) $Id: annotate.cpp,v 1.7 2001-03-06 19:55:40 bcr Exp $
  *
  *****************************************************************************/
 
-static const char RCSVersion[]="@(#) $Id: annotate.cpp,v 1.6 2001-02-15 01:12:21 bcr Exp $";
+static const char RCSVersion[]="@(#) $Id: annotate.cpp,v 1.7 2001-03-06 19:55:40 bcr Exp $";
 
 #include "GIFFManager.h"
 #include <stdio.h>
@@ -46,7 +46,8 @@ static void remove_djvu(int argc, char ** argv)
    if (argc<3) WrongParams();
    
    GP<ByteStream> src=ByteStream::create(argv[2], "rb");
-   GIFFManager mng;
+   GP<GIFFManager> gmng=GIFFManager::create();
+   GIFFManager &mng=*gmng;
    mng.load_file(src);
    
    del_anno(mng);
@@ -67,7 +68,8 @@ static void extract_djvu(int argc, char ** argv)
    if (argc<4) WrongParams();
    
    GP<ByteStream> src=ByteStream::create(argv[2], "rb");
-   GIFFManager mng;
+   GP<GIFFManager> gmng=GIFFManager::create();
+   GIFFManager &mng=*gmng;
    mng.load_file(src);
 
    GP<GIFFChunk> chunk=mng.get_chunk(ascii_ant);
@@ -97,7 +99,8 @@ static void insert_djvu(int argc, char ** argv)
    if (argc<4) WrongParams();
    
    GP<ByteStream> src=ByteStream::create(argv[2], "rb");
-   GIFFManager mng;
+   GP<GIFFManager> gmng=GIFFManager::create();
+   GIFFManager &mng=*gmng;
    mng.load_file(src);
    
    struct stat st;

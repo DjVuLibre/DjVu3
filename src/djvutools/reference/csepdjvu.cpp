@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: csepdjvu.cpp,v 1.11 2001-02-15 01:12:21 bcr Exp $
+// $Id: csepdjvu.cpp,v 1.12 2001-03-06 19:55:41 bcr Exp $
 // $Name:  $
 
 
@@ -108,7 +108,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: csepdjvu.cpp,v 1.11 2001-02-15 01:12:21 bcr Exp $# */
+    #$Id: csepdjvu.cpp,v 1.12 2001-03-06 19:55:41 bcr Exp $# */
 //@{
 //@}
 
@@ -374,7 +374,7 @@ CRLEImage::CRLEImage(BufferByteStream &bs)
   if (magic == 0x5234) // Black&White RLE data
     {
       // Setup palette with one color
-      pal = new DjVuPalette();
+      pal = DjVuPalette::create();
       static char zeroes[4];
       GP<ByteStream> gzbs=ByteStream::create_static(zeroes,4);
       ByteStream &zbs=*gzbs;
@@ -416,7 +416,7 @@ CRLEImage::CRLEImage(BufferByteStream &bs)
         }
     } else if (magic == 0x5236) { // Color-RLE data 
       // Setup palette 
-      pal = new DjVuPalette();
+      pal = DjVuPalette::create();
       int ncolors = read_integer(lookahead, bs);
       if (ncolors<1 || ncolors>4095) 
         G_THROW("csepdjvu: corrupted input file (bad number of colors)");
@@ -833,7 +833,7 @@ CRLEImage::get_bitmap_for_cc(const int ccid) const
 {
   const CC &cc = ccs[ccid];
   const GRect &bb = cc.bb;
-  GP<GBitmap> bits = new GBitmap(bb.height(), bb.width());
+  GP<GBitmap> bits = GBitmap::create(bb.height(), bb.width());
   const Run *prun = & runs[(int)cc.frun];
   for (int i=0; i<cc.nrun; i++,prun++)
     {
@@ -863,7 +863,7 @@ CRLEImage::get_bitmap_for_cc(const int ccid) const
 // -- Candidate descriptor for pattern matching
 struct MatchData 
 {
-  GBitmap *bits;       // bitmap pointer
+  GP<GBitmap> bits;       // bitmap pointer
   int area;            // number of black pixels
 };
 
@@ -881,34 +881,34 @@ tune_jb2image(JB2Image *jimg, int refine_threshold=21)
     {
       // Skip ``special shapes''
       lib[current].bits = 0;
-      JB2Shape *jshp = jimg->get_shape(current);
-      if (jshp->userdata || !jshp->bits) continue; 
+      JB2Shape &jshp = jimg->get_shape(current);
+      if (jshp.userdata || !jshp.bits) continue; 
       // Compute matchdata info
-      GBitmap *bitmap = jshp->bits;
+      GBitmap &bitmap = *(jshp.bits);
       int row;
-      int rows = bitmap->rows();
+      int rows = bitmap.rows();
       int column;
-      int columns = bitmap->columns();
+      int columns = bitmap.columns();
       int black_pixels = 0;
       for (row = rows - 1; row >= 0; row--) 
         for (column = 0; column < columns; column++) 
-          if ((*bitmap)[row][column]) 
+          if (bitmap[row][column]) 
             black_pixels++;
-      lib[current].bits = bitmap;
+      lib[current].bits = jshp.bits;
       lib[current].area = black_pixels;
       // Prepare for search
       int closest_match = -1;
       int best_score = (refine_threshold * rows * columns + 50) / 100;
       if (best_score < 2) best_score = 2;
-      bitmap->minborder(2); // ensure sufficient borders
+      bitmap.minborder(2); // ensure sufficient borders
       // Search closest match
       for (int candidate = 0; candidate < current; candidate++) 
         {
           // Access candidate bitmap
-          GBitmap *cross_bitmap = lib[candidate].bits;
-          if (! cross_bitmap) continue;
-          int cross_columns = cross_bitmap->columns();
-          int cross_rows = cross_bitmap->rows();
+          if (lib[candidate].bits) continue;
+          GBitmap &cross_bitmap = *lib[candidate].bits;
+          int cross_columns = cross_bitmap.columns();
+          int cross_rows = cross_bitmap.rows();
           // Prune
           if (abs (lib[candidate].area - black_pixels) > best_score) continue;
           if (abs (cross_rows - rows) > 2) continue;
@@ -917,16 +917,16 @@ tune_jb2image(JB2Image *jimg, int refine_threshold=21)
           int cross_column_adjust = (cross_columns  - cross_columns/2) - (columns - columns/2);
           int cross_row_adjust = (cross_rows  - cross_rows/2) - (rows - rows/2);
           // Ensure adequate borders
-          cross_bitmap->minborder (2-cross_column_adjust);
-          cross_bitmap->minborder (2+columns-cross_columns+cross_column_adjust);
+          cross_bitmap.minborder (2-cross_column_adjust);
+          cross_bitmap.minborder (2+columns-cross_columns+cross_column_adjust);
           // Count pixel differences (including borders)
           int score = 0;
           unsigned char *p_row;
           unsigned char *p_cross_row;
           for (row = -1; row <= rows; row++) 
             {
-              p_row = (*bitmap) [row];
-              p_cross_row  = (*cross_bitmap)[row+cross_row_adjust] + cross_column_adjust;
+              p_row = bitmap[row];
+              p_cross_row  = cross_bitmap[row+cross_row_adjust] + cross_column_adjust;
               for (column = -1; column <= columns; column++) 
                 if (p_row [column] != p_cross_row [column])
                   score ++;
@@ -942,19 +942,19 @@ tune_jb2image(JB2Image *jimg, int refine_threshold=21)
       if (closest_match >= 0)
         {
           // Mark the shape for cross-coding (``soft pattern matching'')
-          jshp->parent = closest_match;
+          jshp.parent = closest_match;
           // Exact match ==> Substitution
           if (best_score == 0)
-            lib[current].bits = jshp->bits = 0;
+            lib[current].bits = jshp.bits = 0;
         }
     }
   // Process shape substitutions
   for (int blitno=0; blitno<jimg->get_blit_count(); blitno++)
     {
       JB2Blit *jblt = jimg->get_blit(blitno);
-      JB2Shape *jshp = jimg->get_shape(jblt->shapeno);
-      if (!jshp->bits && jshp->parent>=0)
-        jblt->shapeno = jshp->parent;
+      JB2Shape &jshp = jimg->get_shape(jblt->shapeno);
+      if (!jshp.bits && jshp.parent>=0)
+        jblt->shapeno = jshp.parent;
     }
 }
 
@@ -977,7 +977,7 @@ read_background(BufferByteStream &bs, int w, int h, int &bgred)
   if (lookahead != 'P') 
     return 0;
   // Check pixmap
-  GP<GPixmap> pix = new GPixmap(bs);
+  GP<GPixmap> pix = GPixmap::create(bs);
   while (! (lookahead = bs.get())) /**/;
   if (lookahead != EOF)
     bs.unget(lookahead);
@@ -1040,7 +1040,8 @@ csepdjvu_page(BufferByteStream &bs, GP<ByteStream> obs, const csepdjvuopts &opts
   rimg.sort_in_reading_order();                   // Sort cc descriptors
   
   // Create JB2Image and fill colordata
-  JB2Image jimg;
+  GP<JB2Image> gjimg=JB2Image::create(); 
+  JB2Image &jimg=*gjimg;
   jimg.set_dimension(w, h);
   int nccs = rimg.ccs.size();
   for (int ccid=0; ccid<nccs; ccid++)
@@ -1067,8 +1068,8 @@ csepdjvu_page(BufferByteStream &bs, GP<ByteStream> obs, const csepdjvuopts &opts
       int nshape=0, nrefine=0;
       for (int i=0; i<jimg.get_shape_count(); i++) 
         {
-          if (!jimg.get_shape(i)->bits) continue;
-          if (jimg.get_shape(i)->parent >= 0) nrefine++; 
+          if (!jimg.get_shape(i).bits) continue;
+          if (jimg.get_shape(i).parent >= 0) nrefine++; 
           nshape++; 
         }
       fprintf(stderr,"csepdjvu:   %d shapes after matching (%d are cross-coded)\n", 
@@ -1115,15 +1116,15 @@ csepdjvu_page(BufferByteStream &bs, GP<ByteStream> obs, const csepdjvuopts &opts
       mask->binarize_grays(bgred*bgred-1);
       IW44Image::CRCBMode mode = IW44Image::CRCBnormal;
       if (gray_background) mode = IW44Image::CRCBnone;
-      iw = IW44Image::create(*bgpix, mask, mode);
+      iw = IW44Image::create_encode(*bgpix, mask, mode);
       bgpix = 0;
     } 
   else if (! bitonal) 
     {
       /* Compute white background */
       GPixel bgcolor = GPixel::WHITE;
-      GPixmap inputsub((h+11)/12, (w+11)/12, &bgcolor);
-      iw = IW44Image::create(inputsub, 0, IW44Image::CRCBnone);
+      GP<GPixmap> inputsub=GPixmap::create((h+11)/12, (w+11)/12, &bgcolor);
+      iw = IW44Image::create_encode(*inputsub, 0, IW44Image::CRCBnone);
     }
   
   // Assemble DJVU file
@@ -1133,7 +1134,8 @@ csepdjvu_page(BufferByteStream &bs, GP<ByteStream> obs, const csepdjvuopts &opts
   iff.put_chunk("FORM:DJVU", 1);
   // -- ``INFO'' chunk
   iff.put_chunk("INFO");
-  DjVuInfo info;
+  GP<DjVuInfo> ginfo=DjVuInfo::create();
+  DjVuInfo &info=*ginfo;
   info.height = h;
   info.width = w;
   info.dpi = opts.dpi;
@@ -1141,7 +1143,7 @@ csepdjvu_page(BufferByteStream &bs, GP<ByteStream> obs, const csepdjvuopts &opts
   iff.close_chunk();
   // -- ``Sjbz'' chunk
   iff.put_chunk("Sjbz");
-  jimg.encode(iff);
+  jimg.encode(iff.get_bytestream());
   iff.close_chunk();
   // -- Color stuff
   if (! bitonal) 
@@ -1156,7 +1158,7 @@ csepdjvu_page(BufferByteStream &bs, GP<ByteStream> obs, const csepdjvuopts &opts
         {
           iff.put_chunk("BG44");
           iwparms.slices = 97;
-          iw->encode_chunk(iff, iwparms);
+          iw->encode_chunk(iff.get_bytestream(), iwparms);
           iff.close_chunk();
         }
       else
@@ -1165,7 +1167,7 @@ csepdjvu_page(BufferByteStream &bs, GP<ByteStream> obs, const csepdjvuopts &opts
           while ((iwparms.slices = *slice++))
             {
               iff.put_chunk("BG44");
-              iw->encode_chunk(iff, iwparms);
+              iw->encode_chunk(iff.get_bytestream(), iwparms);
               iff.close_chunk();
             }
         }
@@ -1264,7 +1266,8 @@ main(int argc, const char **argv)
 {
   G_TRY
     {
-      DjVmDoc doc;
+      GP<DjVmDoc> gdoc=DjVmDoc::create();
+      DjVmDoc &doc=*gdoc;
       GString outputfile;
       GP<ByteStream> goutputpage=ByteStream::create();
       csepdjvuopts opts;

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVmDir.h,v 1.32 2001-02-15 20:31:57 bcr Exp $
+// $Id: DjVmDir.h,v 1.33 2001-03-06 19:55:42 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVMDIR_H
@@ -84,7 +84,7 @@
     @memo Implements DjVu multipage document directory
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: DjVmDir.h,v 1.32 2001-02-15 20:31:57 bcr Exp $# */
+    #$Id: DjVmDir.h,v 1.33 2001-03-06 19:55:42 bcr Exp $# */
 //@{
 
 
@@ -120,13 +120,19 @@ class ByteStream;
 
 class DjVmDir : public GPEnabled
 {
+protected:
+      /** Class \Ref{DjVmDir::File} represents the directory records
+          managed by class \Ref{DjVmDir}. */
+   DjVmDir(void) { } ;
 public:
    class File;
 
    static const int version;
+
       /** Class \Ref{DjVmDir::File} represents the directory records
           managed by class \Ref{DjVmDir}. */
-   DjVmDir(void) { } ;
+   static GP<DjVmDir> create(void) {return new DjVmDir; } ;
+
       /** Decodes the directory from the specified stream. */
    void decode(GP<ByteStream> stream);
       /** Encodes the directory into the specified stream. */

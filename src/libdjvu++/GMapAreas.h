@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GMapAreas.h,v 1.23 2001-01-04 22:04:55 bcr Exp $
+// $Id: GMapAreas.h,v 1.24 2001-03-06 19:55:42 bcr Exp $
 // $Name:  $
 
 #ifndef _GMAPAREAS_H
@@ -64,7 +64,7 @@
     @memo Definition of base map area classes
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: GMapAreas.h,v 1.23 2001-01-04 22:04:55 bcr Exp $# */
+    #$Id: GMapAreas.h,v 1.24 2001-03-06 19:55:42 bcr Exp $# */
 //@{
 
 
@@ -101,7 +101,15 @@
 
 class GMapArea : public GPEnabled
 {
+protected:
+   GMapArea(void);
 public:
+//      // Default creator.
+//   static GP<GMapArea> create(void) {return new GMapArea();}
+
+      /// Virtual destructor.
+   virtual ~GMapArea();
+
    static const char MAPAREA_TAG [];
    static const char RECT_TAG [];
    static const char POLY_TAG [];
@@ -169,10 +177,6 @@ public:
 	  specified in \#00RRGGBB format. A special value of \#FFFFFFFF disables
           highlighting and \#FF000000 is for XOR highlighting. */
    unsigned long int	hilite_color;
-
-      /// Default constructor
-   GMapArea(void);
-   virtual ~GMapArea(void);
 
       /// Returns 1 if the given point is inside the hyperlink area
    bool		is_point_inside(int x, int y);
@@ -242,9 +246,6 @@ GMapArea::GMapArea(void) : target("_self"), border_type(NO_BORDER),
    border_always_visible(false), border_color(0xff), border_width(1),
    hilite_color(0xffffffff), bounds_initialized(0) {}
 
-inline
-GMapArea::~GMapArea(void) {}
-
 inline void
 GMapArea::clear_bounds(void) { bounds_initialized=0; }
 
@@ -257,7 +258,17 @@ GMapArea::clear_bounds(void) { bounds_initialized=0; }
 
 class GMapRect: public GMapArea
 {
+protected:
+   GMapRect(void);
+   GMapRect(const GRect & rect);
 public:
+   /// Default creator.
+   static GP<GMapRect> create(void) {return new GMapRect();}
+   /// Create with the specified GRect.
+   static GP<GMapRect> create(const GRect &rect) {return new GMapRect(rect);}
+
+   virtual ~GMapRect();
+
       /// Returns the width of the rectangle
    int		get_width(void) const;
       /// Returns the height of the rectangle
@@ -269,10 +280,6 @@ public:
       /// Changes the #GMapRect#'s geometry
    GMapRect & operator=(const GRect & rect);
    
-   GMapRect(void);
-   GMapRect(const GRect & rect);
-   virtual ~GMapRect(void);
-
       /// Returns MapRect
    virtual MapAreaType const get_shape_type( void ) const { return RECT; };
       /// Returns #"rect"#
@@ -301,9 +308,7 @@ GMapRect::GMapRect(const GRect & rect) : xmin(rect.xmin), ymin(rect.ymin),
    xmax(rect.xmax), ymax(rect.ymax) {}
 
 inline
-GMapRect::~GMapRect(void) {}
-
-inline GMapRect::operator GRect(void)
+GMapRect::operator GRect(void)
 {
    return GRect(xmin, ymin, xmax-xmin, ymax-ymin);
 }
@@ -372,10 +377,20 @@ GMapRect::get_copy(void) const { return new GMapRect(*this); }
 
 class GMapPoly : public GMapArea
 {
-public:
+protected:
    GMapPoly(void);
-   GMapPoly(const int * xx, const int * yy, int points, bool open=0);
-   virtual ~GMapPoly(void);
+   GMapPoly(const int * xx, const int * yy, int points, bool open=false);
+public:
+   /// Default creator
+   static GP<GMapPoly> create(void) {return new GMapPoly();}
+
+   /// Create from specified coordinates.
+   static GP<GMapPoly> create(
+     const int xx[], const int yy[], const int points, const bool open=false)
+   {return new GMapPoly(xx,yy,points,open);}
+
+   /// Virtual destructor.
+   virtual ~GMapPoly();
 
       /// Returns 1 if side #side# crosses the specified rectangle #rect#.
    bool		does_side_cross_rect(const GRect & grect, int side);
@@ -439,9 +454,6 @@ private:
 inline
 GMapPoly::GMapPoly(void) : points(0), sides(0) {}
 
-inline
-GMapPoly::~GMapPoly(void) {}
-
 inline int
 GMapPoly::get_points_num(void) const { return points; }
 
@@ -477,10 +489,18 @@ GMapPoly::get_copy(void) const { return new GMapPoly(*this); }
 
 class GMapOval: public GMapArea
 {
-public:
+protected:
    GMapOval(void);
    GMapOval(const GRect & rect);
-   virtual ~GMapOval(void);
+public:
+   /// Default creator.
+   static GP<GMapOval> create(void) {return new GMapOval();}
+
+   /// Create from the specified GRect.
+   static GP<GMapOval> create(const GRect &rect) {return new GMapOval(rect);}
+
+   /// Virtual destructor. 
+   virtual ~GMapOval();
 
       /// Returns (xmax-xmin)/2
    int		get_a(void) const;
@@ -519,9 +539,6 @@ private:
 
 inline
 GMapOval::GMapOval(void) : xmin(0), ymin(0), xmax(0), ymax(0) {}
-
-inline
-GMapOval::~GMapOval(void) {}
 
 inline int
 GMapOval::get_a(void) const { return a; }

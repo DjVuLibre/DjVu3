@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: cjb2.cpp,v 1.10 2001-02-15 19:06:55 bcr Exp $
+// $Id: cjb2.cpp,v 1.11 2001-03-06 19:55:41 bcr Exp $
 // $Name:  $
 
 
@@ -70,7 +70,7 @@
     Paul Howard <pgh@research.att.com>\\
     Pascal Vincent <vincentp@iro.umontreal.ca>
     @version
-    $Id: cjb2.cpp,v 1.10 2001-02-15 19:06:55 bcr Exp $ */
+    $Id: cjb2.cpp,v 1.11 2001-03-06 19:55:41 bcr Exp $ */
 //@{
 //@}
 
@@ -590,7 +590,7 @@ CCImage::get_bitmap_for_cc(const int ccid) const
 {
   const CC &cc = ccs[ccid];
   const GRect &bb = cc.bb;
-  GP<GBitmap> bits = new GBitmap(bb.height(), bb.width());
+  GP<GBitmap> bits = GBitmap::create(bb.height(), bb.width());
   const Run *prun = & runs[(int)cc.frun];
   for (int i=0; i<cc.nrun; i++,prun++)
     {
@@ -612,7 +612,7 @@ CCImage::get_jb2image() const
 {
   if (ccs.hbound() < 0)
     G_THROW("Must first perform a cc analysis");
-  GP<JB2Image> jimg = new JB2Image;
+  GP<JB2Image> jimg = JB2Image::create();
   jimg->set_dimension(width, height);
   if (runs.hbound() < 0)
     return jimg;
@@ -679,37 +679,37 @@ tune_jb2image(JB2Image *jimg,
     {
       lib[current].bits = 0;
       // Skip ``special shapes''
-      JB2Shape *jshp = jimg->get_shape(current);
-      if (jshp->userdata || ! jshp->bits) 
+      JB2Shape &jshp = jimg->get_shape(current);
+      if (jshp.userdata || ! jshp.bits) 
         continue; 
       // Compute matchdata info
-      GBitmap *bitmap = jshp->bits;
+      GBitmap &bitmap = *jshp.bits;
       int row;
-      int rows = bitmap->rows();
+      int rows = bitmap.rows();
       int column;
-      int columns = bitmap->columns();
+      int columns = bitmap.columns();
       int black_pixels = 0;
       for (row = rows - 1; row >= 0; row--) 
         for (column = 0; column < columns; column++) 
-          if ((*bitmap)[row][column]) 
+          if (bitmap[row][column]) 
             black_pixels++;
-      lib[current].bits = bitmap;
+      lib[current].bits = jshp.bits;
       lib[current].area = black_pixels;
 
       // Prepare for search
       int closest_match = -1;
       int best_score = (refine_threshold * rows * columns + 50) / 100;
       if (best_score < 2) best_score = 2;
-      bitmap->minborder(2); // ensure sufficient borders
+      bitmap.minborder(2); // ensure sufficient borders
       
       // Search closest match
       for (int candidate = 0; candidate < current; candidate++) 
         {
           // Access candidate bitmap
-          GBitmap *cross_bitmap = lib[candidate].bits;
-          if (! cross_bitmap) continue;
-          int cross_columns = cross_bitmap->columns();
-          int cross_rows = cross_bitmap->rows();
+          if (! lib[candidate].bits) continue;
+          GBitmap &cross_bitmap = *lib[candidate].bits;
+          int cross_columns = cross_bitmap.columns();
+          int cross_rows = cross_bitmap.rows();
           // Prune
           if (abs (lib[candidate].area - black_pixels) > best_score) continue;
           if (abs (cross_rows - rows) > 2) continue;
@@ -718,16 +718,16 @@ tune_jb2image(JB2Image *jimg,
           int cross_column_adjust = (cross_columns  - cross_columns/2) - (columns - columns/2);
           int cross_row_adjust = (cross_rows  - cross_rows/2) - (rows - rows/2);
           // Ensure adequate borders
-          cross_bitmap->minborder (2-cross_column_adjust);
-          cross_bitmap->minborder (2+columns-cross_columns+cross_column_adjust);
+          cross_bitmap.minborder (2-cross_column_adjust);
+          cross_bitmap.minborder (2+columns-cross_columns+cross_column_adjust);
           // Count pixel differences (including borders)
           int score = 0;
           unsigned char *p_row;
           unsigned char *p_cross_row;
           for (row = -1; row <= rows; row++) 
             {
-              p_row = (*bitmap) [row];
-              p_cross_row  = (*cross_bitmap)[row+cross_row_adjust] + cross_column_adjust;
+              p_row = bitmap[row];
+              p_cross_row  = cross_bitmap[row+cross_row_adjust] + cross_column_adjust;
               for (column = -1; column <= columns; column++) 
                 if (p_row [column] != p_cross_row [column])
                   score ++;
@@ -743,7 +743,7 @@ tune_jb2image(JB2Image *jimg,
       if (closest_match >= 0)
         {
           // Either mark the shape for cross-coding (``soft pattern matching'')
-          jshp->parent = closest_match;
+          jshp.parent = closest_match;
           // Or mark the shape for shape substitution (``pattern matching'')
           if ((best_score * 100) <= (substitute_threshold * rows * columns))
             lib[current].bits = 0;
@@ -759,22 +759,22 @@ tune_jb2image(JB2Image *jimg,
   for (int blitno=0; blitno<jimg->get_blit_count(); blitno++)
     {
       JB2Blit *jblt = jimg->get_blit(blitno);
-      JB2Shape *jshp = jimg->get_shape(jblt->shapeno);
-      if (lib[jblt->shapeno].bits==0 && jshp->parent>=0)
+      JB2Shape &jshp = jimg->get_shape(jblt->shapeno);
+      if (lib[jblt->shapeno].bits==0 && jshp.parent>=0)
         {
           // Compute coordinate adjustement
-          int columns = jshp->bits->columns();
-          int rows = jshp->bits->rows();
-          int cross_columns = lib[jshp->parent].bits->columns();
-          int cross_rows = lib[jshp->parent].bits->rows();
+          int columns = jshp.bits->columns();
+          int rows = jshp.bits->rows();
+          int cross_columns = lib[jshp.parent].bits->columns();
+          int cross_rows = lib[jshp.parent].bits->rows();
           int cross_column_adjust = (cross_columns  - cross_columns/2) - (columns - columns/2);
           int cross_row_adjust = (cross_rows  - cross_rows/2) - (rows - rows/2);
           // Adjust blit record
-          jblt->shapeno = jshp->parent;
+          jblt->shapeno = jshp.parent;
           jblt->bottom -= cross_row_adjust;
           jblt->left -= cross_column_adjust;
           // Adjust shape record
-          jshp->bits = 0;
+          jshp.bits = 0;
         }
     }
   // Cross-coding is achieved by the JB2Image codec.
@@ -804,7 +804,8 @@ void
 cjb2(const char *filein, const char *fileout, const cjb2opts &opts)
 {
   GP<ByteStream> ibs=ByteStream::create(filein, "rb");
-  GBitmap input(*ibs);
+  GP<GBitmap> ginput=GBitmap::create(*ibs);
+  GBitmap &input=*ginput;
 
   // Read input image
   CCImage rimg(input.columns(), input.rows(), opts.dpi);  // construct CCImage
@@ -834,8 +835,8 @@ cjb2(const char *filein, const char *fileout, const cjb2opts &opts)
     {
       int nshape=0, nrefine=0;
       for (int i=0; i<jimg->get_shape_count(); i++) {
-        if (!jimg->get_shape(i)->bits) continue;
-        if (jimg->get_shape(i)->parent >= 0) nrefine++; 
+        if (!jimg->get_shape(i).bits) continue;
+        if (jimg->get_shape(i).parent >= 0) nrefine++; 
         nshape++; 
       }
       fprintf(stderr,"cjb2: %d shapes after matching (%d are cross-coded)\n", 
@@ -849,7 +850,8 @@ cjb2(const char *filein, const char *fileout, const cjb2opts &opts)
   // -- main composite chunk
   iff.put_chunk("FORM:DJVU", 1);
   // -- ``INFO'' chunk
-  DjVuInfo info;
+  GP<DjVuInfo> ginfo=DjVuInfo::create();
+  DjVuInfo &info=*ginfo;
   info.height = rimg.height;
   info.width = rimg.width;
   info.dpi = opts.dpi;
@@ -858,7 +860,7 @@ cjb2(const char *filein, const char *fileout, const cjb2opts &opts)
   iff.close_chunk();
   // -- ``Sjbz'' chunk
   iff.put_chunk("Sjbz");
-  jimg->encode(iff);
+  jimg->encode(iff.get_bytestream());
   iff.close_chunk();
   // -- terminate main composite chunk
   iff.close_chunk();

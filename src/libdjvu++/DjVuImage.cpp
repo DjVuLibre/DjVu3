@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuImage.cpp,v 1.52 2001-02-17 02:38:41 bcr Exp $
+// $Id: DjVuImage.cpp,v 1.53 2001-03-06 19:55:42 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -448,8 +448,7 @@ DjVuImage::decode(ByteStream & str, DjVuInterface *notifier)
   while((length=str.read(buffer, 1024)))
     pport->stream_pool->add_data(buffer, length);
   pport->stream_pool->set_eof();
-  GP<DjVuDocument> doc = new DjVuDocument;
-  doc->init(pport->stream_url, (DjVuImageNotifier*)pport);
+  GP<DjVuDocument> doc = DjVuDocument::create_wait(pport->stream_url, (DjVuImageNotifier*)pport);
   GP<DjVuImage> dimg=doc->get_page(-1, true, (DjVuImageNotifier*)pport);
   file=dimg->get_djvu_file();
   if (file->is_decode_stopped())
@@ -652,7 +651,7 @@ DjVuImage::get_bg_pixmap(const GRect &rect,
           if (xrect.ymax > h) 
             xrect.ymax = h;
           GP<GPixmap> ipm = bg44->get_pixmap(1,xrect);
-          pm = new GPixmap();
+          pm = GPixmap::create();
           pm->downsample43(ipm, &nrect);
         }
       // Handle all other cases with pixmapscaler
@@ -667,14 +666,15 @@ DjVuImage::get_bg_pixmap(const GRect &rect,
           int inh = (h+po2-1)/po2;
           int outw = (width+subsample-1)/subsample;
           int outh = (height+subsample-1)/subsample;
-          GPixmapScaler ps(inw, inh, outw, outh);
+          GP<GPixmapScaler> gps=GPixmapScaler::create(inw, inh, outw, outh);
+          GPixmapScaler &ps=*gps;
           ps.set_horz_ratio(red*po2, subsample);
           ps.set_vert_ratio(red*po2, subsample);
           // run pixmap scaler
           GRect xrect;
           ps.get_input_rect(rect,xrect);
           GP<GPixmap> ipm = bg44->get_pixmap(po2,xrect);
-          pm = new GPixmap();
+          pm = GPixmap::create();
           ps.scale(xrect, *ipm, rect, *pm);
         }
       // Apply gamma correction
@@ -700,7 +700,7 @@ DjVuImage::get_bg_pixmap(const GRect &rect,
       int ratio = subsample/red;
       if (subsample==ratio*red && ratio>=1)
         {
-          pm = new GPixmap;
+          pm = GPixmap::create();
           if (ratio == 1)
             pm->init(*bgpm, rect);
           else if (ratio > 1)
@@ -712,11 +712,12 @@ DjVuImage::get_bg_pixmap(const GRect &rect,
           // setup pixmap scaler
           int outw = (width+subsample-1)/subsample;
           int outh = (height+subsample-1)/subsample;
-          GPixmapScaler ps(w, h, outw, outh);
+          GP<GPixmapScaler> gps=GPixmapScaler::create(w, h, outw, outh);
+          GPixmapScaler &ps=*gps;
           ps.set_horz_ratio(red, subsample);
           ps.set_vert_ratio(red, subsample);
           // run pixmap scaler
-          pm = new GPixmap();
+          pm = GPixmap::create();
           GRect xrect(0,0,w,h);
           ps.scale(xrect, *bgpm, rect, *pm);
         }
@@ -767,24 +768,24 @@ DjVuImage::stencil(GPixmap *pm, const GRect &rect,
              jimg->get_height() == height ) )
         return 0;
       // Decode bitmap
-      bm = new GBitmap(rect.height(), rect.width());
+      bm = GBitmap::create(rect.height(), rect.width());
       bm->set_grays(1+subsample*subsample);
       int rxmin = rect.xmin * subsample;
       int rymin = rect.ymin * subsample;
       for (int blitno = 0; blitno < jimg->get_blit_count(); blitno++)
         {
           const JB2Blit *pblit = jimg->get_blit(blitno);
-          const JB2Shape  *pshape = jimg->get_shape(pblit->shapeno);
-          if (pshape->bits &&
+          const JB2Shape  &pshape = jimg->get_shape(pblit->shapeno);
+          if (pshape.bits &&
               pblit->left <= rect.xmax * subsample &&
               pblit->bottom <= rect.ymax * subsample &&
-              pblit->left + (int)pshape->bits->columns() >= rect.xmin * subsample &&
-              pblit->bottom + (int)pshape->bits->rows() >= rect.ymin * subsample )
+              pblit->left + (int)pshape.bits->columns() >= rect.xmin * subsample &&
+              pblit->bottom + (int)pshape.bits->rows() >= rect.ymin * subsample )
             {
               // Record component list
               if (fgbc) components.append(blitno);
               // Blit
-              bm->blit(pshape->bits, 
+              bm->blit(pshape.bits, 
                        pblit->left - rxmin, pblit->bottom - rymin, 
                        subsample);
             }
@@ -828,9 +829,9 @@ DjVuImage::stencil(GPixmap *pm, const GRect &rect,
               lastx = pblit->left;
               if (fg->colordata[blitno] == colorindex)
                 {
-                  const JB2Shape  *pshape = jimg->get_shape(pblit->shapeno);
+                  const JB2Shape  &pshape = jimg->get_shape(pblit->shapeno);
                   GRect rect(pblit->left, pblit->bottom, 
-                             pshape->bits->columns(), pshape->bits->rows());
+                             pshape.bits->columns(), pshape.bits->rows());
                   comprect.recthull(comprect, rect);
                   compset.insert_before(nullpos, components, pos);
                   continue;
@@ -845,7 +846,7 @@ DjVuImage::stencil(GPixmap *pm, const GRect &rect,
           comprect.intersect(comprect, rect);
           // Compute alpha map for that color
           bm = 0;
-          bm = new GBitmap(comprect.height(), comprect.width());
+          bm = GBitmap::create(comprect.height(), comprect.width());
           bm->set_grays(1+subsample*subsample);
           int rxmin = comprect.xmin * subsample;
           int rymin = comprect.ymin * subsample;
@@ -853,8 +854,8 @@ DjVuImage::stencil(GPixmap *pm, const GRect &rect,
             {
               int blitno = compset[pos];
               const JB2Blit *pblit = jimg->get_blit(blitno);
-              const JB2Shape  *pshape = jimg->get_shape(pblit->shapeno);
-              bm->blit(pshape->bits, 
+              const JB2Shape  &pshape = jimg->get_shape(pblit->shapeno);
+              bm->blit(pshape.bits, 
                        pblit->left - rxmin, pblit->bottom - rymin, 
                        subsample);
             }
@@ -931,10 +932,11 @@ DjVuImage::stencil(GPixmap *pm, const GRect &rect,
             }
           else
             {
-              GPixmapScaler ps(w,h,desw,desh);
+              GP<GPixmapScaler> gps=GPixmapScaler::create(w,h,desw,desh);
+              GPixmapScaler &ps=*gps;
               ps.set_horz_ratio(red, wantedred);
               ps.set_vert_ratio(red, wantedred);
-              nfg = new GPixmap;
+              nfg = GPixmap::create();
               GRect provided(0,0,w,h);
               GRect desired(0,0,desw,desh);
               ps.scale(provided, *fgpm, desired, *nfg);
@@ -960,17 +962,17 @@ DjVuImage::get_fg_pixmap(const GRect &rect,
                          int subsample, double gamma) const
 {
   // Obtain white background pixmap
-  GP<GPixmap> pm = 0;
+  GP<GPixmap> pm;
   // Access components
-  int width = get_width();
-  int height = get_height();
+  const int width = get_width();
+  const int height = get_height();
   if (width && height)
-    {
-      pm = new GPixmap(rect.height(),rect.width(), &GPixel::WHITE);
-      if (stencil(pm, rect, subsample, gamma))
-        return pm;
-    }
-  return 0;
+  {
+    pm = GPixmap::create(rect.height(),rect.width(), &GPixel::WHITE);
+    if (!stencil(pm, rect, subsample, gamma))
+      pm=0;
+  }
+  return pm;
 }
 
 
@@ -1019,7 +1021,8 @@ do_bitmap(const DjVuImage &dimg, BImager get,
       break;
   // Setup bitmap scaler
   if (! (w && h)) return 0;
-  GBitmapScaler bs;
+  GP<GBitmapScaler> gbs=GBitmapScaler::create();
+  GBitmapScaler &bs=*gbs;
   bs.set_input_size( (w+red-1)/red, (h+red-1)/red );
   bs.set_output_size( rw, rh );
   bs.set_horz_ratio( rw*red, w );
@@ -1030,7 +1033,7 @@ do_bitmap(const DjVuImage &dimg, BImager get,
   GP<GBitmap> sbm = (dimg.*get)(srect, red, 1);
   if (!sbm) return 0;
   int border = ((zrect.width() + align - 1) & ~(align - 1)) - zrect.width();
-  GP<GBitmap> bm = new GBitmap(zrect.height(), zrect.width(), border);
+  GP<GBitmap> bm = GBitmap::create(zrect.height(), zrect.width(), border);
   bs.scale(srect, *sbm, zrect, *bm);
   return bm;
 }
@@ -1063,7 +1066,8 @@ do_pixmap(const DjVuImage &dimg, PImager get,
       break;
   // Setup pixmap scaler
   if (w<0 || h<0) return 0;
-  GPixmapScaler ps;
+  GP<GPixmapScaler> gps=GPixmapScaler::create();
+  GPixmapScaler &ps=*gps;
   ps.set_input_size( (w+red-1)/red, (h+red-1)/red );
   ps.set_output_size( rw, rh );
   ps.set_horz_ratio( rw*red, w );
@@ -1073,7 +1077,7 @@ do_pixmap(const DjVuImage &dimg, PImager get,
   ps.get_input_rect(zrect, srect);
   GP<GPixmap> spm = (dimg.*get)(srect, red, gamma);
   if (!spm) return 0;
-  GP<GPixmap> pm = new GPixmap;
+  GP<GPixmap> pm = GPixmap::create();
   ps.scale(srect, *spm, zrect, *pm);
   return pm;
 }

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ppmcoco.cpp,v 1.7 2001-02-09 01:06:42 bcr Exp $
+// $Id: ppmcoco.cpp,v 1.8 2001-03-06 19:55:41 bcr Exp $
 // $Name:  $
 
 /** @name ppmcoco
@@ -104,7 +104,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: ppmcoco.cpp,v 1.7 2001-02-09 01:06:42 bcr Exp $# */
+    #$Id: ppmcoco.cpp,v 1.8 2001-03-06 19:55:41 bcr Exp $# */
 //@{
 //@}
 
@@ -187,7 +187,8 @@ main (int argc, char **argv)
       if (gamma_correction<0.2 || gamma_correction>5)
         fprintf(stderr,"warning: strong correction reduces image quality\n");
       // perform
-      GPixmap pm;
+      GP<GPixmap> gpm=GPixmap::create();
+      GPixmap &pm=*gpm;
       GP<ByteStream> ibs=ByteStream::create(infile,"rb"); 
       pm.init(*ibs); 
       pm.color_correct(gamma_correction);

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocument.cpp,v 1.148 2001-02-21 00:03:11 bcr Exp $
+// $Id: DjVuDocument.cpp,v 1.149 2001-03-06 19:55:42 bcr Exp $
 // $Name:  $
 
 
@@ -95,9 +95,10 @@ GP<DjVuDocument>
 DjVuDocument::create(
   GP<DataPool> pool, GP<DjVuPort> xport, DjVuFileCache * const xcache)
 {
-  GP<DjVuDocument> retval=new DjVuDocument;
-  retval->init_data_pool=pool;
-  retval->start_init(0,xport,xcache);
+  DjVuDocument *doc=new DjVuDocument;
+  GP<DjVuDocument> retval=doc;
+  doc->init_data_pool=pool;
+  doc->start_init(0,xport,xcache);
   return retval;
 }
 
@@ -106,6 +107,15 @@ DjVuDocument::create(
   ByteStream &bs, GP<DjVuPort> xport, DjVuFileCache * const xcache)
 {
   return create(DataPool::create(bs),xport,xcache);
+}
+
+GP<DjVuDocument>
+DjVuDocument::create_wait(
+  char const filename[], GP<DjVuPort> xport, DjVuFileCache * const xcache)
+{
+  GP<DjVuDocument> retval=create(GOS::filename_to_url(filename),xport,xcache);
+  retval->wait_for_complete_init();
+  return retval;
 }
 
 void
@@ -122,7 +132,10 @@ DjVuDocument::start_init(
    {
      if (!init_data_pool)
        G_THROW("DjVuDocument.empty_url");
-     init_url=invent_url("document.djvu");
+     if(!init_url)
+     {
+       init_url=invent_url("document.djvu");
+     }
    }else
    {
      init_url=url;
@@ -289,7 +302,7 @@ DjVuDocument::init_thread(void)
       size=iff.get_chunk(chkid);
       if (chkid=="DIRM")
       {
-	 djvm_dir=new DjVmDir();
+	 djvm_dir=DjVmDir::create();
 	 djvm_dir->decode(iff.get_bytestream());
 	 iff.close_chunk();
 	 if (djvm_dir->is_bundled())
@@ -320,7 +333,7 @@ DjVuDocument::init_thread(void)
 	    // We only know that the first file with DJVU (BM44 or PM44)
 	    // form *is* the first page. The rest will become known
 	    // after we decode DjVuNavDir
-	 djvm_dir0=new DjVmDir0();
+	 djvm_dir0=DjVmDir0::create();
 	 djvm_dir0->decode(iff);
 	 iff.close_chunk();
 
@@ -379,11 +392,11 @@ DjVuDocument::init_thread(void)
 	    // Seems to be 1-page old-style document. Create dummy NDIR
 	 if (doc_type==OLD_BUNDLED)
 	 {
-	    ndir=new DjVuNavDir(init_url+"directory");
+	    ndir=DjVuNavDir::create(init_url+"directory");
 	    ndir->insert_page(-1, first_page_name);
 	 } else
 	 {
-	    ndir=new DjVuNavDir(init_url.base()+"directory");
+	    ndir=DjVuNavDir::create(init_url.base()+"directory");
 	    ndir->insert_page(-1, init_url.fname());
 	 }
       } 
@@ -969,7 +982,7 @@ DjVuDocument::get_page(int page_num, bool sync, DjVuPort * port)
    GP<DjVuFile> file=get_djvu_file(page_num);
    if (file)
    {
-      dimg=new DjVuImage();
+      dimg=DjVuImage::create();
       dimg->connect(file);
       if (port) DjVuPort::get_portcaster()->add_route(dimg, port);
    
@@ -995,7 +1008,7 @@ DjVuDocument::get_page(const char * id, bool sync, DjVuPort * port)
    GP<DjVuFile> file=get_djvu_file(id);
    if (file)
    {
-      dimg=new DjVuImage();
+      dimg=DjVuImage::create();
       dimg->connect(file);
       if (port) DjVuPort::get_portcaster()->add_route(dimg, port);
    
@@ -1079,7 +1092,7 @@ DjVuDocument::process_threqs(void)
             if (req->image_file->is_decode_ok())
             {
               // We can generate it now
-              GP<DjVuImage> dimg=new DjVuImage;
+              GP<DjVuImage> dimg=DjVuImage::create();
               dimg->connect(req->image_file);
               
               dimg->wait_for_complete_decode();
@@ -1098,21 +1111,20 @@ DjVuDocument::process_threqs(void)
               {
                 GP<GBitmap> bm=dimg->get_bitmap(rect, rect, sizeof(int));
                 if(bm)
-                  pm=new GPixmap(*bm);
+                  pm=GPixmap::create(*bm);
               }
               if (!pm) 
                 G_THROW("Unable to render page "+GString(req->page_num+1));
               
               // Store and compress the pixmap
-              GP<IW44Image> iwpix=IW44Image::create(*pm);
+              GP<IW44Image> iwpix=IW44Image::create_encode(*pm);
               GP<ByteStream> gstr=ByteStream::create();
-              ByteStream &str=*gstr;
               IWEncoderParms parms;
               parms.slices=97;
               parms.bytes=0;
               parms.decibels=0;
-              iwpix->encode_chunk(str, parms);
-              TArray<char> data=str.get_data();
+              iwpix->encode_chunk(gstr, parms);
+              TArray<char> data=gstr->get_data();
               
               req->data_pool->add_data((const char *) data, data.size());
               req->data_pool->set_eof();
@@ -1562,7 +1574,7 @@ DjVuDocument::get_djvm_doc()
 
    if (!is_init_complete()) G_THROW("DjVuDocument.init_not_done");
 
-   GP<DjVmDoc> doc=new DjVmDoc();
+   GP<DjVmDoc> doc=DjVmDoc::create();
 
    if (doc_type==BUNDLED || doc_type==INDIRECT)
    {

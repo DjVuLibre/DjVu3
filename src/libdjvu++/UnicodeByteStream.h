@@ -1,7 +1,7 @@
 //C-  Copyright © 2000-2001, LizardTech, Inc. All Rights Reserved.
 //C-              Unauthorized use prohibited.
 //
-// $Id: UnicodeByteStream.h,v 1.2 2001-02-08 23:58:01 bcr Exp $
+// $Id: UnicodeByteStream.h,v 1.3 2001-03-06 19:55:42 bcr Exp $
 // $Name:  $
 
 #ifndef _UNICODEBYTESTREAM_H_
@@ -29,7 +29,7 @@
     @author
     Bill C Riemers <bcr@lizardtech.org>
     @version
-    #$Id: UnicodeByteStream.h,v 1.2 2001-02-08 23:58:01 bcr Exp $# */
+    #$Id: UnicodeByteStream.h,v 1.3 2001-03-06 19:55:42 bcr Exp $# */
 //@{
 
 #include "DjVuGlobal.h"
@@ -60,13 +60,18 @@
 
 class UnicodeByteStream : public ByteStream
 {
+protected:
+  UnicodeByteStream(const UnicodeByteStream &bs);
+  UnicodeByteStream(GP<ByteStream> bs,
+    const GUnicode::EncodeType encodetype=GUnicode::UTF8);
 public:
   /** Constructs an UnicodeByteStream object attached to ByteStream #bs#.
       Any ByteStream can be used when reading an XML file.  Writing
       an XML file however requires a seekable ByteStream. */
-  UnicodeByteStream(GP<ByteStream> bs,
-    const GUnicode::EncodeType encodetype=GUnicode::UTF8);
-  UnicodeByteStream(UnicodeByteStream &bs);
+  static GP<UnicodeByteStream> create(GP<ByteStream> bs,
+    const GUnicode::EncodeType encodetype=GUnicode::UTF8)
+  { return new UnicodeByteStream(bs,encodetype); }
+
   // --- BYTESTREAM INTERFACE
   ~UnicodeByteStream();
   /// Sets the encoding type and seek's to position 0.
@@ -91,7 +96,7 @@ protected:
   GP<ByteStream> bs;
 private:
   // Cancel C++ default stuff
-  UnicodeByteStream & operator=(const UnicodeByteStream &);
+  UnicodeByteStream & operator=(UnicodeByteStream &);
 };
 
 inline void
@@ -126,7 +131,7 @@ UnicodeByteStream::tell(void) const
 }
 
 inline UnicodeByteStream & 
-UnicodeByteStream::operator=(const UnicodeByteStream &uni)
+UnicodeByteStream::operator=(UnicodeByteStream &uni)
 {
   bs=uni.bs;
   buffer=uni.buffer;
@@ -153,12 +158,22 @@ UnicodeByteStream::flush(void)
 
 class XMLByteStream : public UnicodeByteStream
 {
-public:
-  XMLByteStream(GP<ByteStream> bs);
+protected:
+  XMLByteStream(GP<ByteStream> &bs);
   XMLByteStream(UnicodeByteStream &bs);
+  void init(void);
+public:
+  static GP<XMLByteStream> create(GP<ByteStream> bs);
+  static GP<XMLByteStream> create(UnicodeByteStream &bs);
   // --- BYTESTREAM INTERFACE
   ~XMLByteStream();
 };
+
+GP<XMLByteStream>
+XMLByteStream::create(UnicodeByteStream &bs)
+{
+  return new XMLByteStream(bs);
+}
 
 //@}
 

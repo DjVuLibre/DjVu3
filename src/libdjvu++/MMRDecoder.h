@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: MMRDecoder.h,v 1.16 2001-01-04 22:04:55 bcr Exp $
+// $Id: MMRDecoder.h,v 1.17 2001-03-06 19:55:42 bcr Exp $
 // $Name:  $
 
 #ifndef _MMRDECODER_H_
@@ -100,7 +100,7 @@ class JB2Image;
     @memo
     CCITT-G4/MMR decoder.
     @version
-    #$Id: MMRDecoder.h,v 1.16 2001-01-04 22:04:55 bcr Exp $#
+    #$Id: MMRDecoder.h,v 1.17 2001-03-06 19:55:42 bcr Exp $#
     @author
     Parag Deshmukh <parag@sanskrit.lz.att.com> \\
     Leon Bottou <leonb@research.att.com> */
@@ -117,24 +117,33 @@ class JB2Image;
     the static member function \Ref{MMRDecoder::decode}.  This
     function internally creates an instance of #MMRDecoder# which
     processes the MMR data scanline by scanline.  */
-class MMRDecoder
+class MMRDecoder : public GPEnabled
 {
- public:
+protected:
+  MMRDecoder(const int width, const int height);
+  void init(GP<ByteStream> gbs, const bool striped=false);
+public:
   /** Main decoding routine that (a) decodes the header using
       #decode_header#, (b) decodes the MMR data using an instance of
       #MMRDecoder#, and returns a new \Ref{JB2Image} composed of tiles
       whose maximal width and height is derived from the size of the
       image. */
-  static GP<JB2Image> decode(ByteStream &inp);
-  /** Only decode the header. */
-  static void decode_header(ByteStream &inp, int &width, int &height, 
-                            int &invert, int &striped);
+  static GP<JB2Image> decode(GP<ByteStream> gbs);
+
+  /// Only decode the header.
+  static bool decode_header(
+     ByteStream &inp, int &width, int &height, int &invert);
+
 public:
+  /// Non-virtual destructor.
   ~MMRDecoder();
-  /** Construct a MMRDecoder object for decoding an image
+  /** Create a MMRDecoder object for decoding an image
       of size #width# by #height#. Flag $striped# must be set
       if the image is composed of multiple stripes. */
-  MMRDecoder(ByteStream &bs, int width, int height, int striped=0);
+  static GP<MMRDecoder> create(
+    GP<ByteStream> gbs, const int width, const int height,
+    const bool striped=false );
+
   /** Decodes a scanline and returns a pointer to an array of run lengths.
       The returned buffer contains the length of alternative white and black
       runs.  These run lengths sum to the image width. They are followed by
@@ -174,10 +183,10 @@ public:
   class VLSource;
   class VLTable;
 private:
-  VLSource *src;
-  VLTable *mrtable;
-  VLTable *wtable;
-  VLTable *btable;
+  GP<VLSource> src;
+  GP<VLTable> mrtable;
+  GP<VLTable> wtable;
+  GP<VLTable> btable;
   friend class VLSource;
   friend class VLTable;
 };

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ddjvu.cpp,v 1.9 2001-02-09 01:06:42 bcr Exp $
+// $Id: ddjvu.cpp,v 1.10 2001-03-06 19:55:41 bcr Exp $
 // $Name:  $
 
 /** @name ddjvu
@@ -111,7 +111,7 @@
     Yann Le Cun <yann@research.att.com>\\
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: ddjvu.cpp,v 1.9 2001-02-09 01:06:42 bcr Exp $# */
+    #$Id: ddjvu.cpp,v 1.10 2001-03-06 19:55:41 bcr Exp $# */
 //@{
 //@}
 
@@ -153,9 +153,7 @@ convert(const char *from, const char *to, int page_num)
   unsigned long start, stop;
 
   // Create DjVuDocument
-  GURL from_url=GOS::filename_to_url(from);
-  GP<DjVuDocument> doc=new DjVuDocument;
-  doc->init(from_url);
+  GP<DjVuDocument> doc=DjVuDocument::create_wait(from);
   if (! doc->wait_for_complete_init())
     G_THROW("Decoding failed. Nothing can be done.");        
   

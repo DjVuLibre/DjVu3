@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuPalette.cpp,v 1.21 2001-02-15 01:12:22 bcr Exp $
+// $Id: DjVuPalette.cpp,v 1.22 2001-03-06 19:55:42 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -468,7 +468,8 @@ DjVuPalette::encode(GP<ByteStream> gbs) const
   if (datasize > 0)
     {
       bs.write24(datasize);
-      BSByteStream bsb(gbs, 50);
+      GP<ByteStream> gbsb=BSByteStream::create(gbs, 50);
+      ByteStream &bsb=*gbsb;
       for (int d=0; d<datasize; d++)
         bsb.write16(colordata[d]);
     }
@@ -525,7 +526,8 @@ DjVuPalette::decode(GP<ByteStream> gbs)
       if (datasize<0)
         G_THROW("DjVuPalette.bad_palette");
       colordata.resize(0,datasize-1);
-      BSByteStream bsb(gbs);
+      GP<ByteStream> gbsb=BSByteStream::create(gbs);
+      ByteStream &bsb=*gbsb;
       for (int d=0; d<datasize; d++)
         {
           short s = bsb.read16();

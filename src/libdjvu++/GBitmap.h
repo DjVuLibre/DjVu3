@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GBitmap.h,v 1.34 2001-01-25 20:09:04 bcr Exp $
+// $Id: GBitmap.h,v 1.35 2001-03-06 19:55:42 bcr Exp $
 // $Name:  $
 
 #ifndef _GBITMAP_H_
@@ -69,7 +69,7 @@ class ByteStream;
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: GBitmap.h,v 1.34 2001-01-25 20:09:04 bcr Exp $#
+    #$Id: GBitmap.h,v 1.35 2001-03-06 19:55:42 bcr Exp $#
 
  */
 //@{
@@ -95,6 +95,13 @@ class ByteStream;
 
 class GBitmap : public GPEnabled
 {
+protected:
+  GBitmap(void);
+  GBitmap(int nrows, int ncolumns, int border=0);
+  GBitmap(const GBitmap &ref);
+  GBitmap(const GBitmap &ref, int border);
+  GBitmap(const GBitmap &ref, const GRect &rect, int border=0);
+  GBitmap(ByteStream &ref, int border=0);
 public:
   virtual ~GBitmap();
   void destroy(void);
@@ -103,27 +110,38 @@ public:
   /** Constructs an empty GBitmap object.  The returned GBitmap has zero rows
       and zero columns.  Use function \Ref{init} to change the size of the
       image. */
-  GBitmap();
+  static GP<GBitmap> create(void) {return new GBitmap;}
+
   /** Constructs a GBitmap with #nrows# rows and #ncolumns# columns.  All
       pixels are initialized to white. The optional argument #border#
       specifies the size of the optional border of white pixels surrounding
       the image.  The number of gray levels is initially set to #2#.  */
-  GBitmap(int nrows, int ncolumns, int border=0);
+  static GP<GBitmap> create(const int nrows, const int ncolumns, const int border=0)
+  {return new GBitmap(nrows,ncolumns, border); }
+
   /** Copy constructor. Constructs a GBitmap by replicating the size, the
       border and the contents of GBitmap #ref#. */
-  GBitmap(const GBitmap &ref);
+  static GP<GBitmap> create(const GBitmap &ref)
+  {return new GBitmap(ref);}
+
   /** Constructs a GBitmap by copying the contents of GBitmap #ref#.  
       Argument #border# specifies the width of the optional border. */
-  GBitmap(const GBitmap &ref, int border);
+  static GP<GBitmap> create(const GBitmap &ref, const int border)
+  { return new GBitmap(ref,border); }
+
   /** Constructs a GBitmap by copying a rectangular segment #rect# of GBitmap
       #ref#.  The optional argument #border# specifies the size of the
       optional border of white pixels surrounding the image. */
-  GBitmap(const GBitmap &ref, const GRect &rect, int border=0);
+  static GP<GBitmap> create(const GBitmap &ref, const GRect &rect, const int border=0)
+  { return new GBitmap(ref,rect,border); }
+
   /** Constructs a GBitmap by reading PBM, PGM or RLE data from ByteStream
       #ref# into this GBitmap. The optional argument #border# specifies the
       size of the optional border of white pixels surrounding the image.  See
       \Ref{PNM and RLE file formats} for more information.  */
-  GBitmap(ByteStream &ref, int border=0);
+  static GP<GBitmap> create(ByteStream &ref, const int border=0)
+  { return new GBitmap(ref,border); }
+
   //@}
 
   /** @name Initialization. */

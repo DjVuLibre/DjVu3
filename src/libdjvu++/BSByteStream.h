@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: BSByteStream.h,v 1.25 2001-02-15 20:31:57 bcr Exp $
+// $Id: BSByteStream.h,v 1.26 2001-03-06 19:55:41 bcr Exp $
 // $Name:  $
 
 #ifndef _BSBYTESTREAM_H
@@ -115,7 +115,7 @@
     @memo
     Simple Burrows-Wheeler general purpose compressor.
     @version
-    #$Id: BSByteStream.h,v 1.25 2001-02-15 20:31:57 bcr Exp $# */
+    #$Id: BSByteStream.h,v 1.26 2001-03-06 19:55:41 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -167,17 +167,34 @@
 class BSByteStream : public ByteStream
 {
 public:
-  /** Constructs a BSByteStream.
-      Argument #blocksize# determines whether the BSByteStream will be used
-      for compressing or decompressing data. 
+// Limits on block sizes
+  enum { MINBLOCK=10, MAXBLOCK=4096 };
+
+// Sorting tresholds
+  enum { FREQMAX=4, CTXIDS=3 };
+
+  class Decode;
+  class Encode;
+protected:
+  BSByteStream(GP<ByteStream> bs);
+
+public:
+  /** Creates a BSByteStream.
+      The BSByteStream will be used for decompressing data.
       \begin{description}
       \item[Decompression]
-      Setting #blocksize# to zero initializes the decompressor.  Chunks of
+      The BSByteStream is created and the decompressor initializes.  Chunks of
       data will be read from ByteStream #bs# and decompressed into an internal
       buffer. Function #read# can be used to access the decompressed data.
+      \end{description} */
+  static GP<ByteStream> create(GP<ByteStream> bs);
+
+  /** Constructs a BSByteStream.
+      The BSByteStream will be used for compressing data.
+      \begin{description}
       \item[Compression]
-      Setting #blocksize# to a positive number smaller than 4096
-      initializes the compressor.  Data written to the BSByteStream will be
+      Set #blocksize# to a positive number smaller than 4096 to 
+      initialize the compressor.  Data written to the BSByteStream will be
       accumulated into an internal buffer.  The buffered data will be
       compressed and written to ByteStream #bs# whenever the buffer sizes
       reaches the maximum value specified by argument #blocksize# (in
@@ -187,39 +204,32 @@ public:
       Setting #blocksize# to #1024# is a good starting point.  A minimal block
       size of 10 is silently enforced.
       \end{description} */
-  BSByteStream(GP<ByteStream> bs, int blocksize=0);
+  static GP<ByteStream> create(GP<ByteStream> bs, const int blocksize);
+
   // ByteStream Interface
   ~BSByteStream();
-  virtual size_t read(void *buffer, size_t size);
-  virtual size_t write(const void *buffer, size_t size);
   virtual long tell(void) const;
-  virtual void flush(void);
-private:
+  virtual void flush(void) = 0;
+protected:
   // Data
-  int             encoding;
   long            offset;
   int             bptr;
   unsigned int    blocksize;
+  int             size;
+  ByteStream *bs;
+  GP<ByteStream> gbs;
   unsigned char  *data;
   GPBuffer<unsigned char> gdata;
-  int             size;
-  int             eof;
-  GP<ByteStream> gbs;
-  ByteStream *bs;
   // Coder
-  ZPCodec           zp;
-  BitContext        ctx[300];
+  GP<ZPCodec> gzp;
+  BitContext ctx[300];
 private:  
   // Cancel C++ default stuff
   BSByteStream(const BSByteStream &);
   BSByteStream & operator=(const BSByteStream &);
   BSByteStream(ByteStream *);
   BSByteStream(ByteStream *, int);
-  // Helpers
-  unsigned int encode(void);
-  unsigned int decode(void);
 };
-
 
 //@}
 

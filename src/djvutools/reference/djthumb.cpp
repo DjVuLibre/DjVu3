@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djthumb.cpp,v 1.8 2001-01-19 02:31:21 bcr Exp $
+// $Id: djthumb.cpp,v 1.9 2001-03-06 19:55:41 bcr Exp $
 // $Name:  $
 
 // DJTHUMB -- DjVu thumbnails generator
@@ -68,7 +68,7 @@
     @author
     Andrei Erofeev <eaf@geocities.com> -- initial implementation
     @version
-    #$Id: djthumb.cpp,v 1.8 2001-01-19 02:31:21 bcr Exp $# */
+    #$Id: djthumb.cpp,v 1.9 2001-03-06 19:55:41 bcr Exp $# */
 //@{
 //@}
 
@@ -173,8 +173,7 @@ main(int argc, char ** argv)
       struct stat st;
       if (stat(name_in, &st)>=0) size_in=st.st_size;
       
-      GP<DjVuDocEditor> edoc=new DjVuDocEditor;
-      edoc->init(name_in);
+      GP<DjVuDocEditor> edoc=DjVuDocEditor::create_wait(name_in);
       pages_num=edoc->get_pages_num();
       if (pages_num==1)
 	 G_THROW("Thumbnails cannot be generated for one-page documents.");

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GScaler.h,v 1.16 2001-01-04 22:04:55 bcr Exp $
+// $Id: GScaler.h,v 1.17 2001-03-06 19:55:42 bcr Exp $
 // $Name:  $
 
 #ifndef _GSCALER_H_
@@ -61,7 +61,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: GScaler.h,v 1.16 2001-01-04 22:04:55 bcr Exp $# */
+    #$Id: GScaler.h,v 1.17 2001-03-06 19:55:42 bcr Exp $# */
 //@{
 
 
@@ -77,7 +77,7 @@
     performed by calling function #scale# in class \Ref{GBitmapScaler} and
     \Ref{GPixmapScaler}.  
 */
-class GScaler 
+class GScaler  : public GPEnabled
 {
 protected:  
   GScaler();
@@ -147,17 +147,26 @@ protected:
     \end{verbatim} */
 class GBitmapScaler : public GScaler
 {
+protected:
+  GBitmapScaler(void);
+  GBitmapScaler(int inw, int inh, int outw, int outh);
 public:
+  /// Virtual destructor.
   virtual ~GBitmapScaler();
-  /** Constructs an empty GBitmapScaler. You must call functions
+
+  /** Creates an empty GBitmapScaler. You must call functions
       \Ref{GScaler::set_input_size} and \Ref{GScaler::set_output_size} before
       calling any of the scaling functions. */
-  GBitmapScaler();
-  /** Constructs a GBitmapScaler. The size of the input image is given by
+  static GP<GBitmapScaler> create(void) {return new GBitmapScaler(); }
+
+  /** Creates a GBitmapScaler. The size of the input image is given by
       #inw# and #inh#.  This function internally calls
       \Ref{GScaler::set_input_size} and \Ref{GScaler::set_output_size}. The
       size of the output image is given by #outw# and #outh#.  . */
-  GBitmapScaler(int inw, int inh, int outw, int outh);
+  static GP<GBitmapScaler> create(
+    const int inw, const int inh, const int outw, const int outh)
+  { return new GBitmapScaler(inw,inh,outw,outh); }
+
   /** Computes a segment of the rescaled output image.  The GBitmap object
       #output# is overwritten with the segment of the output image specified
       by the rectangle #desired_output#.  The rectangle #provided_input#
@@ -212,17 +221,26 @@ protected:
  */
 class GPixmapScaler : public GScaler
 {
+protected:
+  GPixmapScaler(void);
+  GPixmapScaler(int inw, int inh, int outw, int outh);
 public:
+  /// Virtual destructor.
   virtual ~GPixmapScaler();
-  /** Constructs an empty GPixmapScaler. You must call functions
+
+  /** Creates an empty GPixmapScaler. You must call functions
       \Ref{GScaler::set_input_size} and \Ref{GScaler::set_output_size} before
       calling any of the scaling functions. */
-  GPixmapScaler();
-  /** Constructs a GPixmapScaler. The size of the input image is given by
+  static GP<GPixmapScaler> create(void) {return new GPixmapScaler(); }
+
+  /** Creates a GPixmapScaler. The size of the input image is given by
       #inw# and #inh#.  This function internally calls
       \Ref{GScaler::set_input_size} and \Ref{GScaler::set_output_size}. The
       size of the output image is given by #outw# and #outh#.  . */
-  GPixmapScaler(int inw, int inh, int outw, int outh);
+  static GP<GPixmapScaler> create(
+    const int inw, const int inh, const int outw, const int outh)
+  { return new GPixmapScaler(inw,inh,outw,outh); }
+
   /** Computes a segment of the rescaled output image.  The pixmap #output# is
       overwritten with the segment of the output image specified by the
       rectangle #desired_output#.  The rectangle #provided_input# specifies

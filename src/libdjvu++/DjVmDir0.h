@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVmDir0.h,v 1.15 2001-01-04 22:04:54 bcr Exp $
+// $Id: DjVmDir0.h,v 1.16 2001-03-06 19:55:42 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVMDIR0_H
@@ -58,7 +58,7 @@ class ByteStream;
 
     @memo Directory of DjVu all-in-one-file DjVu documents.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: DjVmDir0.h,v 1.15 2001-01-04 22:04:54 bcr Exp $# */
+    @version #$Id: DjVmDir0.h,v 1.16 2001-03-06 19:55:42 bcr Exp $# */
 
 //@{
 
@@ -84,7 +84,16 @@ private:
    GMap<GString, GP<FileRec> >	name2file;
    GPArray<FileRec>		num2file;
 protected:
+      /// Default constructor
+   DjVmDir0(void) {};
 public:
+      /// Copy constructor
+   DjVmDir0(const DjVmDir0 & d);
+
+   static GP<DjVmDir0> create(void) {return new DjVmDir0;}
+
+   virtual ~DjVmDir0(void) {};
+
       /// Returns the number of files in the DjVm archive
    int		get_files_num(void) const;
    
@@ -111,12 +120,6 @@ public:
 	  \Ref{ByteStream} */
    void		decode(ByteStream & bs);
 
-      /// Copy constructor
-   DjVmDir0(const DjVmDir0 & d);
-
-      /// Default constructor
-   DjVmDir0(void) {};
-   virtual ~DjVmDir0(void) {};
 };
 
       /** Describes a file record inside a DjVm document (archive) */

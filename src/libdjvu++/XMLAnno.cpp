@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: XMLAnno.cpp,v 1.5 2001-02-15 01:12:22 bcr Exp $
+// $Id: XMLAnno.cpp,v 1.6 2001-03-06 19:55:42 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -132,7 +132,8 @@ lt_XMLAnno::ChangeAnno(const lt_XMLTags &map,const GURL url,const GString id,con
   dfile->start_decode();
   dfile->wait_for_finish();
   GP<DjVuInfo> info=(dfile->info);
-  DjVuAnno anno;
+  GP<DjVuAnno> ganno=DjVuAnno::create();
+  DjVuAnno &anno=*ganno;
   if(dfile->contains_anno())
   {
     GP<ByteStream> annobs=dfile->get_merged_anno();
@@ -174,7 +175,7 @@ lt_XMLAnno::ChangeAnno(const lt_XMLTags &map,const GURL url,const GString id,con
     }
     if(!anno.ant)
     {
-      anno.ant=new DjVuANT;
+      anno.ant=DjVuANT::create();
     }
     GPList<GMapArea> &map_areas=anno.ant->map_areas;
     map_areas.empty();
@@ -222,7 +223,7 @@ lt_XMLAnno::ChangeAnno(const lt_XMLTags &map,const GURL url,const GString id,con
         if(shape == "default")
         {
           GRect rect(0,0,w,h);
-          a=new GMapRect(rect);
+          a=GMapRect::create(rect);
         }else if(!shape.length() || shape == "rect")
         {
           int xx[4];
@@ -258,7 +259,7 @@ lt_XMLAnno::ChangeAnno(const lt_XMLTags &map,const GURL url,const GString id,con
 //          printf("xmin=%d ymin=%d xmax=%d,ymax=%d\n",xmin,ymin,xmax,ymax);
           GRect rect(xmin,ymin,xmax-xmin,ymax-ymin);
 //          printf("xmin=%d ymin=%d width=%u height=%u\n",xmin,ymin,rect.width(),rect.height());
-          a=new GMapRect(rect);
+          a=GMapRect::create(rect);
         }else if(shape == "circle")
         {
           int xx[4];
@@ -278,7 +279,7 @@ lt_XMLAnno::ChangeAnno(const lt_XMLTags &map,const GURL url,const GString id,con
           }
           int x=xx[0],y=xx[1],rx=xx[2],ry=(h-xx[3])-1;
           GRect rect(x-rx,y-ry,x+rx,y+ry);
-          a=new GMapOval(rect);
+          a=GMapOval::create(rect);
         }else if(shape == "oval")
         {
           int xx[4];
@@ -312,10 +313,10 @@ lt_XMLAnno::ChangeAnno(const lt_XMLTags &map,const GURL url,const GString id,con
             ymax=xx[3];
           }
           GRect rect(xmin,ymin,xmax-xmin,ymax-ymin);
-          a=new GMapOval(rect);
+          a=GMapOval::create(rect);
         }else if(shape == "poly")
         {
-          GP<GMapPoly> p=new GMapPoly();
+          GP<GMapPoly> p=GMapPoly::create();
           for(GPosition poly_pos=coords;poly_pos;++poly_pos)
           {
             int x=coords[poly_pos];
@@ -411,7 +412,7 @@ lt_XMLAnno::save(void)
 void
 lt_XMLAnno::parse(const char xmlfile[])
 {
-  GP<lt_XMLTags> tags=new lt_XMLTags();
+  GP<lt_XMLTags> tags=lt_XMLTags::create();
   tags->init(xmlfile);
   parse(*tags);
 }
@@ -419,7 +420,7 @@ lt_XMLAnno::parse(const char xmlfile[])
 void
 lt_XMLAnno::parse(GP<ByteStream> &bs)
 {
-  GP<lt_XMLTags> tags=new lt_XMLTags();
+  GP<lt_XMLTags> tags=lt_XMLTags::create();
   tags->init(bs);
   parse(*tags);
 }
@@ -529,8 +530,7 @@ lt_XMLAnno::parse(const lt_XMLTags &tags)
           GPosition docspos=docs.contains(url_string);
           if(! docspos)
           {
-            GP<DjVuDocument> doc=new DjVuDocument();
-            doc->init(url);
+            GP<DjVuDocument> doc=DjVuDocument::create_wait(url);
             if(! doc->wait_for_complete_init())
             {
               GString mesg("Failed to initialize ");

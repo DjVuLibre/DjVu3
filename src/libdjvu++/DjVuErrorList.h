@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuErrorList.h,v 1.14 2001-02-15 20:31:57 bcr Exp $
+// $Id: DjVuErrorList.h,v 1.15 2001-03-06 19:55:42 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUERRORLIST_H
@@ -50,7 +50,7 @@ class ByteStream;
 
     @memo DjVuErrorList class.
     @author Bill C Riemers <bcr@lizardtech.com>
-    @version #$Id: DjVuErrorList.h,v 1.14 2001-02-15 20:31:57 bcr Exp $#
+    @version #$Id: DjVuErrorList.h,v 1.15 2001-03-06 19:55:42 bcr Exp $#
 */
 
 //@{
@@ -61,9 +61,11 @@ class ByteStream;
 
 class DjVuErrorList : public DjVuSimplePort
 {
-public:
+protected:
      /// The normal port caster constructor. 
-  DjVuErrorList();
+  DjVuErrorList(void);
+public:
+  static GP<DjVuErrorList> create(void) {return new DjVuErrorList();}
 
      /// This constructor allows the user to specify the ByteStream.
   GURL set_stream(GP<ByteStream>);

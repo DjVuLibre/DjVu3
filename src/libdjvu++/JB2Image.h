@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: JB2Image.h,v 1.32 2001-01-20 01:55:40 bcr Exp $
+// $Id: JB2Image.h,v 1.33 2001-03-06 19:55:42 bcr Exp $
 // $Name:  $
 
 #ifndef _JB2IMAGE_H
@@ -129,7 +129,7 @@
     \end{itemize}
 
     @version
-    #$Id: JB2Image.h,v 1.32 2001-01-20 01:55:40 bcr Exp $#
+    #$Id: JB2Image.h,v 1.33 2001-03-06 19:55:42 bcr Exp $#
     @memo
     Coding bilevel images with JB2.
     @author
@@ -211,39 +211,42 @@ typedef GP<JB2Dict> JB2DecoderCallback ( void* );
 
 class JB2Dict : public GPEnabled
 {
+protected:
+  JB2Dict(void);
 public:
   class JB2Codec;
 
   // CONSTRUCTION
-  /** Null Constructor.  Constructs an empty #JB2Dict# object.  You can then
+  /** Default creator.  Constructs an empty #JB2Dict# object.  You can then
       call the decoding function #decode#.  You can also manually set the
       image size using #add_shape#. */
-  JB2Dict();
+  static GP<JB2Dict> create(void) { return new JB2Dict(); }
+
   // INITIALIZATION
   /** Resets the #JB2Image# object.  This function reinitializes both the shape
      and the blit arrays.  All allocated memory is freed. */
-  void init();
+  void init(void);
 
   // INHERITED
   /** Returns the inherited dictionary. */
-  GP<JB2Dict> get_inherited_dict() const;
+  GP<JB2Dict> get_inherited_dict(void) const;
   /** Returns the number of inherited shapes. */
-  int get_inherited_shape_count() const;
+  int get_inherited_shape_count(void) const;
   /** Sets the inherited dictionary. */
   void set_inherited_dict(GP<JB2Dict> dict);
 
   // ACCESSING THE SHAPE LIBRARY
   /** Returns the total number of shapes.
       Shape indices range from #0# to #get_shape_count()-1#. */
-  int get_shape_count() const;
+  int get_shape_count(void) const;
   /** Returns a pointer to shape #shapeno#.
       The returned pointer directly points into the shape array.
       This pointer can be used for reading or writing the shape data. */
-  JB2Shape *get_shape(int shapeno);
+  JB2Shape &get_shape(const int shapeno);
   /** Returns a constant pointer to shape #shapeno#.
       The returned pointer directly points into the shape array.
       This pointer can only be used for reading the shape data. */
-  const JB2Shape *get_shape(int shapeno) const;
+  const JB2Shape &get_shape(const int shapeno) const;
   /** Appends a shape to the shape array.  This function appends a copy of
       shape #shape# to the shape array and returns the subscript of the new
       shape.  The subscript of the parent shape #shape.parent# must 
@@ -256,15 +259,15 @@ public:
       bitmaps.  This function is best called after decoding a #JB2Image#,
       because function \Ref{get_bitmap} can directly use the compressed
       bitmaps.  */
-  void compress();
+  void compress(void);
   /** Returns the total memory used by the JB2Image.
       The returned value is expressed in bytes. */
-  unsigned int get_memory_usage() const;
+  unsigned int get_memory_usage(void) const;
 
   // CODING
   /** Encodes the JB2Dict into ByteStream #bs#.  
       This function generates the JB2 data stream without any header.   */
-  void encode(ByteStream &bs) const;
+  void encode(GP<ByteStream> gbs) const;
   /** Decodes JB2 data from ByteStream #bs#. This function decodes the image
       size and populates the shape and blit arrays.  The callback function
       #cb# is called when the decoder determines that the ByteStream data
@@ -273,7 +276,7 @@ public:
       and must return a suitable dictionary which will be installed as the
       inherited dictionary.  The callback should return null if no such
       dictionary is found. */
-  void decode(ByteStream &bs, JB2DecoderCallback *cb=0, void *arg=0);
+  void decode(GP<ByteStream> gbs, JB2DecoderCallback *cb=0, void *arg=0);
 
   
 public:
@@ -296,27 +299,28 @@ private:
 
 class JB2Image : public JB2Dict
 {
+protected:
+  JB2Image(void);
 public:
 
-  // CONSTRUCTION
-  /** Null Constructor.  Constructs an empty #JB2Image# object.  You can then
+  /** Creates an empty #JB2Image# object.  You can then
       call the decoding function #decode#.  You can also manually set the
       image size using #set_dimension# and populate the shape and blit arrays
       using #add_shape# and #add_blit#. */
-  JB2Image();
+  static GP<JB2Image> create(void) { return new JB2Image(); }
 
   // INITIALIZATION
   /** Resets the #JB2Image# object.  This function reinitializes both the shape
      and the blit arrays.  All allocated memory is freed. */
-  void init();
+  void init(void);
 
   // DIMENSION
   /** Returns the width of the image.  
       This is the width value previously set with #set_dimension#. */
-  int get_width() const;
+  int get_width(void) const;
   /** Returns the height of the image.  
       This is the height value previously set with #set_dimension#. */
-  int get_height() const;
+  int get_height(void) const;
   /** Sets the size of the JB2Image.
       This function can be called at any time. 
       The corresponding #width# and the #height# are stored
@@ -344,8 +348,8 @@ public:
 
   // ACCESSING THE BLIT LIBRARY
   /** Returns the total number of blits.
-      Blit indices range from #0# to #get_blit_count()-1#. */
-  int get_blit_count() const;
+      Blit indices range from #0# to #get_blit_count(void)-1#. */
+  int get_blit_count(void) const;
   /** Returns a pointer to blit #blitno#.
       The returned pointer directly points into the blit array.
       This pointer can be used for reading or writing the blit data. */
@@ -363,12 +367,12 @@ public:
   // MEMORY OPTIMIZATION
   /** Returns the total memory used by the JB2Image.
       The returned value is expressed in bytes. */
-  unsigned int get_memory_usage() const;
+  unsigned int get_memory_usage(void) const;
 
   // CODING
   /** Encodes the JB2Image into ByteStream #bs#.  
       This function generates the JB2 data stream without any header. */
-  void encode(ByteStream &bs) const;
+  void encode(GP<ByteStream> gbs) const;
   /** Decodes JB2 data from ByteStream #bs#. This function decodes the image
       size and populates the shape and blit arrays.  The callback function
       #cb# is called when the decoder determines that the ByteStream data
@@ -377,7 +381,7 @@ public:
       and must return a suitable dictionary which will be installed as the
       inherited dictionary.  The callback should return null if no such
       dictionary is found. */
-  void decode(ByteStream &bs, JB2DecoderCallback *cb=0, void *arg=0);
+  void decode(GP<ByteStream> gbs, JB2DecoderCallback *cb=0, void *arg=0);
   
 private:
   // Implementation
@@ -396,60 +400,40 @@ public:
 // JB2DICT INLINE FUNCTIONS
 
 inline int
-JB2Dict::get_shape_count() const
+JB2Dict::get_shape_count(void) const
 {
   return inherited_shapes + shapes.size();
 }
 
 inline int
-JB2Dict::get_inherited_shape_count() const
+JB2Dict::get_inherited_shape_count(void) const
 {
   return inherited_shapes;
 }
 
 inline GP<JB2Dict>
-JB2Dict::get_inherited_dict() const
+JB2Dict::get_inherited_dict(void) const
 {
   return inherited_dict;
-}
-
-inline JB2Shape *
-JB2Dict::get_shape(int shapeno)
-{
-  if (shapeno >= inherited_shapes)
-    return & shapes[shapeno - inherited_shapes];
-  else if (inherited_dict)
-    return inherited_dict->get_shape(shapeno);
-  return 0;
-}
-
-inline const JB2Shape *
-JB2Dict::get_shape(int shapeno) const
-{
-  if (shapeno >= inherited_shapes)
-    return & shapes[shapeno - inherited_shapes];
-  else if (inherited_dict)
-    return inherited_dict->get_shape(shapeno);
-  return 0;
 }
 
 // JB2IMAGE INLINE FUNCTIONS
 
 inline int
-JB2Image::get_width() const
+JB2Image::get_width(void) const
 {
   return width;
 }
 
 inline int
-JB2Image::get_height() const
+JB2Image::get_height(void) const
 {
   return height;
 }
 
 
 inline int
-JB2Image::get_blit_count() const
+JB2Image::get_blit_count(void) const
 {
   return blits.size();
 }
@@ -581,21 +565,21 @@ public:
   virtual ~JB2Codec();
 protected:
   // Constructors
-  JB2Codec(ByteStream &bs, const bool xencoding=false);
+  JB2Codec(const bool xencoding=false);
   // Forbidden assignment
   JB2Codec(const JB2Codec &ref);
   JB2Codec& operator=(const JB2Codec &ref);
 
   int CodeNum(int lo, int hi, NumContext *pctx,int v);
   void reset_numcoder(void);
-  inline void code_eventual_lossless_refinement();
-  void init_library(JB2Dict *jim);
-  int add_library(int shapeno, JB2Shape *jshp);
+  inline void code_eventual_lossless_refinement(void);
+  void init_library(JB2Dict &jim);
+  int add_library(const int shapeno, JB2Shape &jshp);
   void code_relative_location(JB2Blit *jblt, int rows, int columns);
   void code_bitmap_directly (GBitmap &bm);
-  void code_bitmap_by_cross_coding (GBitmap &bm, GBitmap *cbm, const int libno);
-  void code_record(int &rectype, JB2Dict *jim, JB2Shape *jshp);
-  void code_record(int &rectype, JB2Image *jim, JB2Shape *jshp, JB2Blit *jblt);
+  void code_bitmap_by_cross_coding (GBitmap &bm, GP<GBitmap> &cbm, const int libno);
+  void code_record(int &rectype, GP<JB2Dict> jim, JB2Shape *jshp);
+  void code_record(int &rectype, GP<JB2Image> jim, JB2Shape *jshp, JB2Blit *jblt);
   static void compute_bounding_box(GBitmap &cbm, LibRect &lrect);
   static int get_direct_context( unsigned char const * const up2,
     unsigned char const * const up1, unsigned char const * const up0,
@@ -617,13 +601,13 @@ protected:
   virtual bool CodeBit(const bool bit, BitContext &ctx) = 0;
   virtual void code_comment(GString &comment) = 0;
   virtual void code_record_type(int &rectype) = 0;
-  virtual int code_match_index(int &index, JB2Dict *jim)=0;
-  virtual void code_inherited_shape_count(JB2Dict *jim)=0;
-  virtual void code_image_size(JB2Dict *jim);
-  virtual void code_image_size(JB2Image *jim);
+  virtual int code_match_index(int &index, JB2Dict &jim)=0;
+  virtual void code_inherited_shape_count(JB2Dict &jim)=0;
+  virtual void code_image_size(JB2Dict &jim);
+  virtual void code_image_size(JB2Image &jim);
   virtual void code_absolute_location(JB2Blit *jblt,  int rows, int columns)=0;
-  virtual void code_absolute_mark_size(GBitmap *bm, int border=0) = 0;
-  virtual void code_relative_mark_size(GBitmap *bm, int cw, int ch, int border=0) = 0;
+  virtual void code_absolute_mark_size(GBitmap &bm, int border=0) = 0;
+  virtual void code_relative_mark_size(GBitmap &bm, int cw, int ch, int border=0) = 0;
   virtual void code_bitmap_directly(GBitmap &bm,const int dw, int dy,
     unsigned char *up2, unsigned char *up1, unsigned char *up0 )=0;
   virtual void code_bitmap_by_cross_coding (GBitmap &bm, GBitmap &cbm,
@@ -690,7 +674,7 @@ protected:
 };
 
 inline void
-JB2Dict::JB2Codec::code_eventual_lossless_refinement()
+JB2Dict::JB2Codec::code_eventual_lossless_refinement(void)
 {
   refinementp=CodeBit(refinementp, dist_refinement_flag);
 }

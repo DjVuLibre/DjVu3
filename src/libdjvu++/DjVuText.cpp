@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuText.cpp,v 1.10 2001-02-15 01:12:22 bcr Exp $
+// $Id: DjVuText.cpp,v 1.11 2001-03-06 19:55:42 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -660,16 +660,16 @@ DjVuText::decode(GP<ByteStream> gbs)
     {
       if (txt)
         G_THROW("DjVuText.dupl_text");
-      txt = new DjVuTXT;
+      txt = DjVuTXT::create();
       txt->decode(iff);
     }
     else if (chkid == "TXTz")
     {
       if (txt)
         G_THROW("DjVuText.dupl_text");
-      txt = new DjVuTXT;
-      BSByteStream bsiff(gbs);
-      txt->decode(bsiff);
+      txt = DjVuTXT::create();
+      GP<ByteStream> gbsiff=BSByteStream::create(gbs);
+      txt->decode(*gbsiff);
     }
     // Add decoding of other chunks here
     iff.close_chunk();
@@ -685,8 +685,8 @@ DjVuText::encode(GP<ByteStream> gbs)
     IFFByteStream &iff=*giff;
     iff.put_chunk("TXTz");
     {
-      BSByteStream bsiff(gbs,50);
-      txt->encode(bsiff);
+      GP<ByteStream> gbsiff=BSByteStream::create(gbs,50);
+      txt->encode(*gbsiff);
     }
     iff.close_chunk();
   }

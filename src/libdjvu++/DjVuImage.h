@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuImage.h,v 1.36 2001-02-14 02:30:56 bcr Exp $
+// $Id: DjVuImage.h,v 1.37 2001-03-06 19:55:42 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUIMAGE_H
@@ -73,7 +73,7 @@
     L\'eon Bottou <leonb@research.att.com> - initial implementation
     Andrei Erofeev <eaf@geocities.com> - multipage support
     @version
-    #$Id: DjVuImage.h,v 1.36 2001-02-14 02:30:56 bcr Exp $# */
+    #$Id: DjVuImage.h,v 1.37 2001-03-06 19:55:42 bcr Exp $# */
 //@{
 
 
@@ -103,11 +103,13 @@ public:
 
 class DjVuImage : public DjVuPort
 {
+protected:
+  DjVuImage(void);
 public:
   // CONSTRUCTION
   /** @name Construction. */
   //@{
-  /** Constructs an empty DjVu image. After the image has been constructed,
+  /** Creates an empty DjVu image. After the image has been constructed,
       it may be connected to an existing \Ref{DjVuFile} or left as is.
 
       In the former case #DjVuImage# will look for its decoded components
@@ -116,7 +118,8 @@ public:
 
       In the latter case you can use \Ref{decode}() function to decode
       {\bf single-page} DjVu documents in the old-style way. */
-  DjVuImage(void);
+  static GP<DjVuImage> create(void) {return new DjVuImage();}
+
   /** Connects this #DjVuImage# to the passed \Ref{DjVuFile}. The #DjVuImage#
       will use this \Ref{DjVuFile} to retrieve components necessary for
       decoding. It will also connect itself to \Ref{DjVuFile} using the

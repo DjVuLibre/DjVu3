@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GIFFManager.h,v 1.15 2001-02-15 20:31:57 bcr Exp $
+// $Id: GIFFManager.h,v 1.16 2001-03-06 19:55:42 bcr Exp $
 // $Name:  $
 
 #ifndef _GIFFMANAGER_H
@@ -62,7 +62,7 @@
     @author 
     Andrei Erofeev <eaf@geocities.com> -- Initial implementation.
     @version 
-    #$Id: GIFFManager.h,v 1.15 2001-02-15 20:31:57 bcr Exp $# */
+    #$Id: GIFFManager.h,v 1.16 2001-03-06 19:55:42 bcr Exp $# */
 
 /** #GIFFChunk# is the base class for other IFF chunks understood by
     {\Ref GIFFManager}. It provides some basic interface, and is not supposed
@@ -70,14 +70,25 @@
 
 class GIFFChunk : public GPEnabled
 {
-private:
-   char			name[5];
-   GString		type;
-   GPList<GIFFChunk>	chunks;
-   TArray<char>		data;
-
-   static void	decode_name(const char * name, GString * short_name, int * number);
+protected:
+   GIFFChunk(void);
+   GIFFChunk(const char * name);
+   GIFFChunk(const char * name, const TArray<char> & data);
 public:
+      /// Default creator.
+   static GP<GIFFChunk> create(void) {return new GIFFChunk();}
+
+      /** Creates the chunk with the given name. The {\em name} may not
+	  contain dots colons or brackets */
+   static GP<GIFFChunk> create(const char name[]) {return new GIFFChunk(name);}
+
+      /** Creates the {\em plain chunk} containing raw data */
+   static GP<GIFFChunk> create(const char name[], const TArray<char> & data)
+   { return new GIFFChunk(name,data); }
+
+      /// Destructor
+   virtual ~GIFFChunk(void);
+
       /// Returns the name of the chunk (without possible #FORM:# or similar prefixes)
    GString	get_name(void) const;
       /// Returns full chunk name, with possible container specification
@@ -88,7 +99,7 @@ public:
    bool		is_container(void) const;
       /** Sets the chunk name. The {\em name} may not contain dots or brackets,
 	  but {\bf may} contain colons. */
-   void		set_name(const char * name);
+   void		set_name(const char name[]);
       /** Parses the {\em name} probably containing colon and compares it
 	  with its own name returning TRUE if they are the same */
    bool		check_name(const char * name);
@@ -117,16 +128,12 @@ public:
       /** Saves the chunk into the {\Ref IFFByteStream}.
 	  Set {\em use_trick} to #1# if this is a top-level chunk */
    void		save(IFFByteStream & istr, bool use_trick=0);
-      
-      /// Default constructor
-   GIFFChunk(void);
-      /** Constructs the chunk with the given name. The {\em name} may not
-	  contain dots colons or brackets */
-   GIFFChunk(const char * name);
-      /** Constructs the {\em plain chunk} containing raw data */
-   GIFFChunk(const char * name, const TArray<char> & data);
-      /// Destructor
-   virtual ~GIFFChunk(void);
+private:
+   char			name[5];
+   GString		type;
+   GPList<GIFFChunk>	chunks;
+   TArray<char>		data;
+   static void	decode_name(const char * name, GString * short_name, int * number);
 };
 
 inline GString
@@ -148,17 +155,14 @@ inline
 GIFFChunk::GIFFChunk(void) { name[0]=0; }
 
 inline
-GIFFChunk::GIFFChunk(const char * name) { set_name(name); }
+GIFFChunk::GIFFChunk(const char name[]) { set_name(name); }
 
 inline
-GIFFChunk::GIFFChunk(const char * name, const TArray<char> & data_in) :
+GIFFChunk::GIFFChunk(const char name[], const TArray<char> & data_in) :
       data(data_in)
 {
    set_name(name);
 }
-
-inline
-GIFFChunk::~GIFFChunk(void) {};
 
 //************************************************************************
 
@@ -207,15 +211,26 @@ GIFFChunk::~GIFFChunk(void) {};
 	     will take the second {\em found} one.
     \end{itemize} */
 
-class GIFFManager
+class GIFFManager : public GPEnabled
 {
-private:
-   GP<GIFFChunk>	top_level;
-
-   static const char *	check_leading_dot(const char * name);
+protected:
+   GIFFManager(void);
+   void init(void);
+   void init(const char name[]);
 public:
+      /// Default creator.
+   static GP<GIFFManager> create(void);
+
+      /** Creates the {\Ref GIFFManager} and assigns name {\em name} to
+	  the top-level chunk. you may use chunk type names (before colon)
+	  to set the top-level chunk type, or omit it to work with #FORM# */
+   static GP<GIFFManager> create(const char name[]);
+
+      /// Virtual destructor.
+   virtual ~GIFFManager(void);
+
       /// Sets the name of the top level chunk to {\em name}
-   void		set_name(const char * name);
+   void		set_name(const char name[]);
       /** Adds the chunk {\em chunk} to chunk with name {\em parent_name} at
 	  position {\em pos}. {\em parent_name} may contain dots, brackets
 	  and colons. All missing chunks in the chain will be created.
@@ -233,7 +248,7 @@ public:
 	     ;; Same thing regardless of the top-level chunk name
 	     m.addChunk("FORM:DJVU[1]", ch);
 	  \end{verbatim} */
-   void		add_chunk(const char * parent_name, const GP<GIFFChunk> & chunk, int pos=-1);
+   void		add_chunk(const char parent_name[], const GP<GIFFChunk> & chunk, int pos=-1);
       /** If {\em name}={\em name1}.{\em name2} where {\em name2} doesn't
 	  contain dots, then #addChunk()# will create plain chunk with
 	  name {\em name2} with data {\em buffer} of size {\em length} and
@@ -249,7 +264,7 @@ public:
              ;; To append chunk BG44 to 2nd DjVu file inside DjVm archive:
              m.addChunk(".DJVM.DJVU[1].BG44", data, length);
           \end{verbatim} */
-   void		add_chunk(const char * name, const TArray<char> & data);
+   void		add_chunk(const char name[], const TArray<char> & data);
       /** Will remove chunk with name {\em name}. You may use dots, colons
 	  and brackets to specify the chunk uniquely.
 
@@ -303,33 +318,34 @@ public:
       /** Saves all the chunks into the data array {\em data} */
    void		save_file(TArray<char> & data);
 
-      /// Default constructor
-   GIFFManager(void);
-      /** Constructs the {\Ref GIFFManager} and assigns name {\em name} to
-	  the top-level chunk. you may use chunk type names (before colon)
-	  to set the top-level chunk type, or omit it to work with #FORM# */
-   GIFFManager(const char * name);
-      /// Destructor
-   virtual ~GIFFManager(void);
 private:
+   GP<GIFFChunk>	top_level;
+
+   static const char *	check_leading_dot(const char * name);
+private: //dummy methods
    static void save_file(ByteStream *);
    static void load_file(ByteStream *);
 };
 
 inline void
-GIFFManager::set_name(const char * name)
+GIFFManager::set_name(const char name[])
 {
    top_level->set_name(name);
 }
 
 inline
-GIFFManager::GIFFManager(void) : top_level(new GIFFChunk()) {};
+GIFFManager::GIFFManager(void) {}
 
-inline
-GIFFManager::GIFFManager(const char * name) :
-      top_level(new GIFFChunk(name)) {};
+inline  void
+GIFFManager::init(void)
+{
+  top_level=GIFFChunk::create();
+}
 
-inline
-GIFFManager::~GIFFManager(void) {};
+inline  void
+GIFFManager::init(const char name[])
+{
+  top_level=GIFFChunk::create(name);
+}
 
 #endif

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: IW44Image.h,v 1.2 2001-02-21 00:03:11 bcr Exp $
+// $Id: IW44Image.h,v 1.3 2001-03-06 19:55:42 bcr Exp $
 // $Name:  $
 
 
@@ -129,7 +129,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: IW44Image.h,v 1.2 2001-02-21 00:03:11 bcr Exp $# */
+    #$Id: IW44Image.h,v 1.3 2001-03-06 19:55:42 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -244,14 +244,14 @@ public:
       performs the wavelet decomposition of image #bm# and records the
       corresponding wavelet coefficient.  Argument #mask# is an optional
       bilevel image specifying the masked pixels (see \Ref{IW44Image.h}). */
-  static GP<IW44Image> create(const GBitmap &bm, const GP<GBitmap> mask=0);
+  static GP<IW44Image> create_encode(const GBitmap &bm, const GP<GBitmap> mask=0);
   /** Initializes an IWPixmap with color image #bm#.  This constructor
       performs the wavelet decomposition of image #bm# and records the
       corresponding wavelet coefficient.  Argument #mask# is an optional
       bilevel image specifying the masked pixels (see \Ref{IW44Image.h}).
       Argument #crcbmode# specifies how the chrominance information should be
       encoded (see \Ref{CRCBMode}). */
-  static GP<IW44Image> create(const GPixmap &bm, const GP<GBitmap> mask=0, CRCBMode crcbmode=CRCBnormal);
+  static GP<IW44Image> create_encode(const GPixmap &bm, const GP<GBitmap> mask=0, CRCBMode crcbmode=CRCBnormal);
   // ACCESS
   /** Returns the width of the IWBitmap image. */
   int get_width(void) const;
@@ -288,7 +288,7 @@ public:
       #bs# with no IFF header.  Successive calls to #encode_chunk# encode
       successive chunks.  You must call #close_codec# after encoding the last
       chunk of a file. */
-  virtual int  encode_chunk(ByteStream &bs, const IWEncoderParms &parms);
+  virtual int  encode_chunk(GP<ByteStream> gbs, const IWEncoderParms &parms);
   /** Writes a gray level image into DjVu IW44 file.  This function creates a
       composite chunk (identifier #FORM:BM44# or #FORM:PM44#) composed of
       #nchunks# chunks (identifier #BM44# or #PM44#).  Data for each chunk is
@@ -301,7 +301,7 @@ public:
       after decoding the last chunk of a file.  Note that function
       #get_bitmap# and #decode_chunk# may be called simultaneously from two
       execution threads. */
-  virtual int  decode_chunk(ByteStream &bs) = 0;
+  virtual int  decode_chunk(GP<ByteStream> gbs) = 0;
   /** This function enters a composite chunk (identifier #FORM:BM44#, or
       #FORM:PM44#), and decodes a maximum of #maxchunks# data chunks
       (identifier #BM44#).  Data for each chunk is processed using the
@@ -392,7 +392,7 @@ public:
       after decoding the last chunk of a file.  Note that function
       #get_bitmap# and #decode_chunk# may be called simultaneously from two
       execution threads. */
-  virtual int  decode_chunk(ByteStream &bs);
+  virtual int  decode_chunk(GP<ByteStream> gbs);
   /*x Reads a DjVu IW44 file as a gray level image.  This function enters a
       composite chunk (identifier #FORM:BM44#), and decodes a maximum of
       #maxchunks# data chunks (identifier #BM44#).  Data for each chunk is
@@ -467,7 +467,7 @@ public:
       after decoding the last chunk of a file.  Note that function
       #get_bitmap# and #decode_chunk# may be called simultaneously from two
       execution threads. */
-  virtual int  decode_chunk(ByteStream &bs);
+  virtual int  decode_chunk(GP<ByteStream> gbs);
   /*x Reads a DjVu IW44 file as a color image.  This function enters a
       composite chunk (identifier #FORM:PM44# or #FORM:BM44#), and decodes a
       maximum of #maxchunks# data chunks (identifier #PM44# or #BM44#).  Data

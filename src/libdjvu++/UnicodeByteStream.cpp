@@ -1,7 +1,7 @@
 //C-  Copyright © 2000-2001, LizardTech, Inc. All Rights Reserved.
 //C-              Unauthorized use prohibited.
 //
-// $Id: UnicodeByteStream.cpp,v 1.1 2001-01-17 00:14:55 bcr Exp $
+// $Id: UnicodeByteStream.cpp,v 1.2 2001-03-06 19:55:42 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -11,7 +11,7 @@
 #include "UnicodeByteStream.h"
 #include "ByteStream.h"
 
-UnicodeByteStream::UnicodeByteStream(UnicodeByteStream &uni)
+UnicodeByteStream::UnicodeByteStream(const UnicodeByteStream &uni)
 : encodetype(uni.encodetype)
 {
   bs=uni.bs;
@@ -83,10 +83,24 @@ UnicodeByteStream::gets(size_t const t,unsigned long const stopat,bool const inc
 XMLByteStream::XMLByteStream(UnicodeByteStream &uni)
 : UnicodeByteStream(uni) {}
 
-XMLByteStream::XMLByteStream(GP<ByteStream> ibs) 
+XMLByteStream::XMLByteStream(GP<ByteStream> &ibs) 
 : UnicodeByteStream(ibs,GUnicode::OTHER)
+{}
+
+GP<XMLByteStream>
+XMLByteStream::create(GP<ByteStream> ibs) 
+{
+  XMLByteStream *xml=new XMLByteStream(ibs);
+  GP<XMLByteStream> retval=xml;
+  xml->init();
+  return retval;
+}
+
+void
+XMLByteStream::init(void)
 {
   unsigned char buf[4];
+  GP<ByteStream> ibs=bs;
   bs->readall(buf,sizeof(buf));
   const unsigned int i=(buf[0]<<8)+buf[1];
   switch(i)

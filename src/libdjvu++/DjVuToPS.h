@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuToPS.h,v 1.12 2001-01-04 22:04:55 bcr Exp $
+// $Id: DjVuToPS.h,v 1.13 2001-03-06 19:55:42 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVU_TO_PS_H_
@@ -44,7 +44,7 @@
     @memo PostScript file generator
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: DjVuToPS.h,v 1.12 2001-01-04 22:04:55 bcr Exp $#
+    #$Id: DjVuToPS.h,v 1.13 2001-03-06 19:55:42 bcr Exp $#
 */
 //@{
 
@@ -60,9 +60,15 @@ class GRect;
     Use this class to print \Ref{DjVuImage}s and \Ref{DjVuDocument}s.
     The behavior is customizable. See \Ref{DjVuToPS::Options} for the
     description of available options.*/
-class DjVuToPS
+class DjVuToPS : public GPEnabled
 {
+protected:
+      /** Default constructor. Initializes the class. */
+   DjVuToPS(void);
 public:
+      /// Default creator.
+   static GP<DjVuToPS> create(void) {return new DjVuToPS();}
+
       /** \Ref{DjVuToPS} options. Use this class to customize the way
 	  in which DjVu to PS conversion will be done. You can adjust
 	  the following things:
@@ -431,8 +437,6 @@ public:
    void		print(ByteStream & str, const GP<DjVuDocument> & doc,
 		      const char * page_range=0);
    
-      /** Default constructor. Initializes the class. */
-   DjVuToPS(void);
 };
 
 //****************************************************************************

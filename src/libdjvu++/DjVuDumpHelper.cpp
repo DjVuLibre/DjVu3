@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDumpHelper.cpp,v 1.17 2001-02-15 19:06:56 bcr Exp $
+// $Id: DjVuDumpHelper.cpp,v 1.18 2001-03-06 19:55:42 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -76,7 +76,8 @@ static void
 display_djvu_info(ByteStream & out_str, IFFByteStream &iff,
 		  GString, size_t size, DjVmInfo&, int)
 {
-  DjVuInfo info;
+  GP<DjVuInfo> ginfo=DjVuInfo::create();
+  DjVuInfo &info=*ginfo;
   info.decode(iff);
   if (size >= 4)
     printf(out_str, "DjVu %dx%d", info.width, info.height);
@@ -150,7 +151,7 @@ static void
 display_djvm_dirm(ByteStream & out_str, IFFByteStream & iff,
 		  GString head, size_t, DjVmInfo& djvminfo, int)
 {
-  GP<DjVmDir> dir = new DjVmDir();
+  GP<DjVmDir> dir = DjVmDir::create();
   dir->decode(iff.get_bytestream());
   GPList<DjVmDir::File> list = dir->get_files_list();
   if (dir->is_indirect())
@@ -236,8 +237,9 @@ struct displaysubr
   const char *id;
   void (*subr)(ByteStream &, IFFByteStream &, GString,
 	       size_t, DjVmInfo&, int counter);
-} 
-disproutines[] = 
+};
+ 
+static displaysubr disproutines[] = 
 {
   { "DJVU.INFO", display_djvu_info },
   { "DJVU.Smmr", display_smmr },
@@ -328,3 +330,4 @@ DjVuDumpHelper::dump(GP<ByteStream> gstr)
    display_chunks(*out_str, *iff, head, djvminfo);
    return out_str;
 }
+

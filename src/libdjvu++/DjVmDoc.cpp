@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVmDoc.cpp,v 1.40 2001-02-17 02:38:41 bcr Exp $
+// $Id: DjVmDoc.cpp,v 1.41 2001-03-06 19:55:42 bcr Exp $
 // $Name:  $
 
 
@@ -50,8 +50,21 @@ DjVmDoc::DjVmDoc(void)
 {
    DEBUG_MSG("DjVmDoc::DjVmDoc(): Constructing empty DjVm document.\n");
    DEBUG_MAKE_INDENT(3);
+}
 
-   dir=new DjVmDir();
+void
+DjVmDoc::init(void)
+{
+  dir=DjVmDir::create();
+}
+
+GP<DjVmDoc>
+DjVmDoc::create(void)
+{
+  DjVmDoc *doc=new DjVmDoc();
+  GP<DjVmDoc> retval=doc;
+  doc->init();
+  return retval;
 }
 
 void

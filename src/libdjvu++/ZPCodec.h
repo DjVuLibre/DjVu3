@@ -30,13 +30,13 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ZPCodec.h,v 1.24 2001-02-14 19:49:02 bcr Exp $
+// $Id: ZPCodec.h,v 1.25 2001-03-06 19:55:42 bcr Exp $
 // $Name:  $
 
 #ifndef _ZPCODEC_H
 #define _ZPCODEC_H
 
-#include "DjVuGlobal.h"
+#include "GContainer.h"
 
 class ByteStream;
 
@@ -153,7 +153,7 @@ class ByteStream;
     @memo
     Binary adaptive quasi-arithmetic coder.
     @version
-    #$Id: ZPCodec.h,v 1.24 2001-02-14 19:49:02 bcr Exp $#
+    #$Id: ZPCodec.h,v 1.25 2001-03-06 19:55:42 bcr Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> */
 //@{
@@ -208,8 +208,14 @@ typedef unsigned char  BitContext;
     pascal style string), or of defining a termination code (like a null
     terminated string).  */
 
-class ZPCodec {
+class ZPCodec : public GPEnabled {
+protected:
+  ZPCodec (GP<ByteStream> gbs, const bool encoding, const bool djvucompat=false);
 public:
+  class Encode;
+  class Decode;
+
+  /// Non-virtual destructor.
   ~ZPCodec();
   /** Constructs a ZP-Coder.  If argument #encoding# is zero, the ZP-Coder
       object will read code bits from the ByteStream #bs# and return a message
@@ -220,21 +226,26 @@ public:
       used by the DjVu project.  This is required in order to ensure the
       bitstream compatibility.  You should not use this flag unless you want
       to decode JB2, IW44 or BZZ encoded data. */
-  ZPCodec (ByteStream &bs, bool encoding, bool djvucompat=false);
+  static GP<ZPCodec> create(
+     GP<ByteStream> gbs, const bool encoding, const bool djvucompat=false);
+
   /** Encodes bit #bit# using context variable #ctx#.  Argument #bit# must be
       #0# or #1#. This function should only be used with ZP-Coder objects
       created for encoding. It may modify the contents of variable #ctx# in
       order to perform context adaptation. */
   void encoder(int bit, BitContext &ctx);
+
   /** Decodes a bit using context variable #ctx#. This function should only be
       used with ZP-Coder objects created for decoding. It may modify the
       contents of variable #ctx# in order to perform context adaptation. */
   int  decoder(BitContext &ctx);
+
   /** Encodes bit #bit# without compression (pass-thru encoder).  Argument
       #bit# must be #0# or #1#. No compression will be applied. Calling this
       function always increases the length of the code bit sequence by one
       bit. */
   void encoder(int bit);
+
   /** Decodes a bit without compression (pass-thru decoder).  This function
       retrieves bits encoded with the pass-thru encoder. */
   int  decoder(void);
@@ -263,8 +274,9 @@ public:
   inline void IWencoder(const bool bit);
 protected:
   // coder status
+  GP<ByteStream> gbs;           // Where the data goes/comes from
   ByteStream *bs;               // Where the data goes/comes from
-  bool encoding;                // Direction (0=decoding, 1=encoding)
+  const bool encoding;          // Direction (0=decoding, 1=encoding)
   unsigned char byte;
   unsigned char scount;
   unsigned char delay;

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuPalette.h,v 1.26 2001-02-15 20:31:57 bcr Exp $
+// $Id: DjVuPalette.h,v 1.27 2001-03-06 19:55:42 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUPALETTE_H_
@@ -52,7 +52,7 @@
     @memo 
     DjVuPalette header file
     @version 
-    #$Id: DjVuPalette.h,v 1.26 2001-02-15 20:31:57 bcr Exp $#
+    #$Id: DjVuPalette.h,v 1.27 2001-03-06 19:55:42 bcr Exp $#
     @author: 
     L\'eon Bottou <leonb@research.att.com> */
 //@{
@@ -89,8 +89,13 @@
 
 class DjVuPalette : public GPEnabled
 {
+protected:
+  DjVuPalette(void);
 public:
-  DjVuPalette();
+  /// Generic creator
+  static GP<DjVuPalette> create(void) {return new DjVuPalette();}
+
+  /// Non-virtual destructor
   ~DjVuPalette();
   // COPY
   DjVuPalette(const DjVuPalette &ref);

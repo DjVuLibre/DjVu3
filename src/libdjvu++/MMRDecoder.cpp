@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: MMRDecoder.cpp,v 1.32 2001-01-10 02:13:18 bcr Exp $
+// $Id: MMRDecoder.cpp,v 1.33 2001-03-06 19:55:42 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -303,9 +303,27 @@ static const VLCode bcodes[] = {
 
 #define VLSBUFSIZE    64
 
-class MMRDecoder::VLSource
+class MMRDecoder::VLSource : public GPEnabled
 {
+protected:
+  VLSource(GP<ByteStream> &inp);
+  void init(const bool striped);
+public:
+  // Initializes a bit source on a bytestream
+  static GP<VLSource> create(GP<ByteStream> &inp, const bool striped);
+
+  // Synchronize on the next stripe
+  void nextstripe(void);
+  // Returns a 32 bits integer with at least the 
+  // next sixteen code bits in the high order bits.
+  inline unsigned int peek(void);
+  // Ensures that next #peek()# contains at least
+  // the next 24 code bits.
+  void preload(void);
+  // Consumes #n# bits.
+  void shift(const int n);
 private:
+  GP<ByteStream> ginp;
   ByteStream &inp;
   unsigned char buffer[ VLSBUFSIZE ];
   unsigned int codeword;
@@ -313,30 +331,16 @@ private:
   int bufpos;
   int bufmax;
   int readmax;
-public:
-  // Initializes a bit source on a bytestream
-  VLSource(ByteStream &inp, int striped);
-  // Synchronize on the next stripe
-  void nextstripe();
-  // Returns a 32 bits integer with at least the 
-  // next sixteen code bits in the high order bits.
-  unsigned int peek() 
-    { return codeword; }
-  // Ensures that next #peek()# contains at least
-  // the next 24 code bits.
-  void preload();
-  // Consumes #n# bits.
-  void shift(int n)
-    { codeword<<=n; lowbits+=n; if (lowbits>=16) preload(); }
 };
 
+MMRDecoder::VLSource::VLSource(GP<ByteStream> &xinp)
+: ginp(xinp), inp(*ginp), codeword(0), 
+  lowbits(0), bufpos(0), bufmax(0),
+  readmax(-1)
+{}
 
-
-
-MMRDecoder::VLSource::VLSource(ByteStream &inp, int striped)
-  : inp(inp), codeword(0), 
-    lowbits(0), bufpos(0), bufmax(0),
-    readmax(-1)
+void
+MMRDecoder::VLSource::init(const bool striped)
 {
   if (striped)
     readmax = inp.read32();
@@ -344,8 +348,33 @@ MMRDecoder::VLSource::VLSource(ByteStream &inp, int striped)
   preload();
 }
 
+GP<MMRDecoder::VLSource>
+MMRDecoder::VLSource::create(GP<ByteStream> &inp, const bool striped)
+{
+  VLSource *src=new VLSource(inp);
+  GP<VLSource> retval=src;
+  src->init(striped);
+  return retval;
+}
+
+void 
+MMRDecoder::VLSource::shift(const int n)
+{ 
+  codeword<<=n;
+  lowbits+=n;
+  if (lowbits>=16)
+    preload();
+}
+
+inline unsigned int
+MMRDecoder::VLSource::peek(void)
+{
+  return codeword;
+}
+
+
 void
-MMRDecoder::VLSource::nextstripe()
+MMRDecoder::VLSource::nextstripe(void)
 {
   while (readmax>0)
     {
@@ -364,7 +393,7 @@ MMRDecoder::VLSource::nextstripe()
 }
 
 void
-MMRDecoder::VLSource::preload()
+MMRDecoder::VLSource::preload(void)
 {
   while (lowbits>=8) 
     {
@@ -393,18 +422,32 @@ MMRDecoder::VLSource::preload()
 
 
 
-class MMRDecoder::VLTable
+class MMRDecoder::VLTable : public GPEnabled
 {
+protected:
+  VLTable(const VLCode *codes);
+  void init(const int nbits);
 public:
+  // Construct a VLTable given a codebook with #nbits# long codes.
+  static GP<VLTable> create(VLCode const * const codes, const int nbits);
+
+  // Reads one symbol from a VLSource
+  int decode(MMRDecoder::VLSource *src);
+
   const VLCode *code;
   int codewordshift;
   unsigned char *index;
   GPBuffer<unsigned char> gindex;
-  // Construct a VLTable given a codebook with #nbits# long codes.
-  VLTable(const VLCode *codes, int nbits);
-  // Reads one symbol from a VLSource
-  int decode(MMRDecoder::VLSource *src);
 };
+
+GP<MMRDecoder::VLTable>
+MMRDecoder::VLTable::create(VLCode const * const codes, const int nbits)
+{
+  VLTable *table=new VLTable(codes);
+  GP<VLTable> retval=table;
+  table->init(nbits);
+  return retval;
+}
 
 inline int
 MMRDecoder::VLTable::decode(MMRDecoder::VLSource *src)    
@@ -414,13 +457,16 @@ MMRDecoder::VLTable::decode(MMRDecoder::VLSource *src)
   return c.value; 
 }
 
-MMRDecoder::VLTable::VLTable(const VLCode *codes, int nbits)
-  : code(codes), codewordshift(0), gindex(index,0)
+MMRDecoder::VLTable::VLTable(const VLCode *codes)
+: code(codes), codewordshift(0), gindex(index,0)
+{}
+
+void
+MMRDecoder::VLTable::init(const int nbits)
 {
-  int i;
   // count entries
   int ncodes = 0;
-  while (codes[ncodes].codelen)
+  while (code[ncodes].codelen)
     ncodes++;
   // check arguments
   if (nbits<=1 || nbits>16)
@@ -433,9 +479,9 @@ MMRDecoder::VLTable::VLTable(const VLCode *codes, int nbits)
   gindex.resize(size);
   gindex.set(ncodes);
   // process codes
-  for (i=0; i<ncodes; i++) {
-    int c = codes[i].code;
-    int b = codes[i].codelen;
+  for (int i=0; i<ncodes; i++) {
+    const int c = code[i].code;
+    const int b = code[i].codelen;
     if(b<=0 || b>nbits)
     {
       G_THROW(invalid_mmr_data);
@@ -455,45 +501,39 @@ MMRDecoder::VLTable::VLTable(const VLCode *codes, int nbits)
 
 
 
-MMRDecoder::~MMRDecoder()
-{
-  delete wtable;
-  delete btable;
-  delete mrtable;
-  delete src;
-}
+MMRDecoder::~MMRDecoder() {}
 
-
-
-MMRDecoder::MMRDecoder(ByteStream &bs, int width, int height, int striped)
-  : width(width), height(height), lineno(0), 
-    striplineno(0), rowsperstrip(0), gline(line,width+8),
-    glineruns(lineruns,width+4), gprevruns(prevruns,width+4),
-    src(0), mrtable(0), wtable(0), btable(0)
+MMRDecoder::MMRDecoder( const int xwidth, const int xheight )
+: width(xwidth), height(xheight), lineno(0), 
+  striplineno(0), rowsperstrip(0), gline(line,width+8),
+  glineruns(lineruns,width+4), gprevruns(prevruns,width+4)
 {
   gline.clear();
   glineruns.clear();
   gprevruns.clear();
   lineruns[0] = width;
   prevruns[0] = width;
-  rowsperstrip = (striped ? bs.read16() : height);
-  src = new VLSource(bs, striped);
-  G_TRY
-  {
-    mrtable = new VLTable(mrcodes, 7);
-    btable = new VLTable(bcodes, 13);
-    wtable = new VLTable(wcodes, 13);
-  }
-  G_CATCH_ALL
-  {
-    delete src; src=0;
-    delete mrtable; mrtable=0;
-    delete btable; btable=0;
-    delete wtable; wtable=0;
-  }
-  G_ENDCATCH;
 }
 
+void
+MMRDecoder::init(GP<ByteStream> gbs, const bool striped)
+{
+  rowsperstrip = (striped ? gbs->read16() : height);
+  src = VLSource::create(gbs, striped);
+  mrtable = VLTable::create(mrcodes, 7);
+  btable = VLTable::create(bcodes, 13);
+  wtable = VLTable::create(wcodes, 13);
+}
+
+GP<MMRDecoder> 
+MMRDecoder::create( GP<ByteStream> gbs, const int width, const int height,
+ const bool striped=false )
+{
+  MMRDecoder *mmr=new MMRDecoder(width,height);
+  GP<MMRDecoder> retval=mmr;
+  mmr->init(gbs,striped);
+  return retval;
+}
 
 const unsigned short *
 MMRDecoder::scanruns(const unsigned short **endptr)
@@ -535,13 +575,13 @@ MMRDecoder::scanruns(const unsigned short **endptr)
         case H: 
           { 
             // First run
-            VLTable *table = (a0color ? btable : wtable);
+            VLTable &table1 = *(a0color ? btable : wtable);
             int inc;
-            do { inc=table->decode(src); a0+=inc; rle+=inc; } while (inc>=64);
+            do { inc=table1.decode(src); a0+=inc; rle+=inc; } while (inc>=64);
             *xr = rle; xr++; rle = 0;
             // Second run
-            table = (!a0color ? btable : wtable);
-            do { inc=table->decode(src); a0+=inc; rle+=inc; } while (inc>=64);
+            VLTable &table2 = *(!a0color ? btable : wtable);
+            do { inc=table2.decode(src); a0+=inc; rle+=inc; } while (inc>=64);
             *xr = rle; xr++; rle = 0;
             break;
           }
@@ -752,7 +792,7 @@ MMRDecoder::scanrle(const bool invert, const unsigned char **endptr)
 
 #if 0
 const unsigned char *
-MMRDecoder::scanline()
+MMRDecoder::scanline(void)
 {
   // Obtain run lengths
   const unsigned short *xr = scanruns();
@@ -779,38 +819,41 @@ MMRDecoder::scanline()
 // ----------------------------------------
 // MAIN DECODING ROUTINE
 
-void 
-MMRDecoder::decode_header(ByteStream &inp, int &width, int &height, 
-                          int &invert, int &strip)
+bool
+MMRDecoder::decode_header(
+  ByteStream &inp, int &width, int &height, int &invert)
 {
   unsigned long int magic = inp.read32();
   if((magic&0xfffffffc) != 0x4d4d5200)
     G_THROW("MMRDecoder.unrecog_header"); 
   invert = ((magic & 0x1) ? 1 : 0);
-  strip =  ((magic & 0x2) ? 1 : 0);
+  const bool strip =  ((magic & 0x2) ? 1 : 0);
   width = inp.read16();
   height = inp.read16();
   if (width<=0 || height<=0)
     G_THROW("MMRDecoder.bad_header");
+  return strip;
 }
 
 static inline int MAX(int a, int b) { return a>b ? a : b; }
 static inline int MIN(int a, int b) { return a<b ? a : b; }
 
 GP<JB2Image>
-MMRDecoder::decode(ByteStream &inp)
+MMRDecoder::decode(GP<ByteStream> gbs)
 {
+  ByteStream &inp=*gbs;
   // Read header
-  int width, height, invert, striped;
-  decode_header(inp, width, height, invert, striped);
+  int width, height, invert;
+  const bool striped=decode_header(inp, width, height, invert);
   // Prepare image
-  GP<JB2Image> jimg = new JB2Image();
+  GP<JB2Image> jimg = JB2Image::create();
   jimg->set_dimension(width, height);
   // Choose pertinent blocksize
   int blocksize = MIN(500,MAX(64,MAX(width/17,height/22)));
   int blocksperline = (width+blocksize-1)/blocksize;
   // Prepare decoder
-  MMRDecoder dcd(inp, width, height, striped);
+  GP<MMRDecoder> gdcd=MMRDecoder::create(gbs, width, height, striped);
+  MMRDecoder &dcd=*gdcd;
   // Loop on JB2 bands
   int line = height-1;
   while (line >= 0)
@@ -838,7 +881,7 @@ MMRDecoder::decode(ByteStream &inp)
                   if (c)
                     {
                       if (!blocks[b])
-                        blocks[b] = new GBitmap(bandline+1, lastx-firstx);
+                        blocks[b] = GBitmap::create(bandline+1, lastx-firstx);
                       unsigned char *bptr = (*blocks[b])[bandline] - firstx;
                       int x1 = MAX(x,firstx);
                       int x2 = MIN(xend,lastx);

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: XMLTags.h,v 1.2 2001-02-02 16:41:42 bcr Exp $
+// $Id: XMLTags.h,v 1.3 2001-03-06 19:55:42 bcr Exp $
 // $Name:  $
 
 #ifndef _LT_XMLTAGS__
@@ -51,15 +51,17 @@ class XMLByteStream;
 
 class lt_XMLTags : public GPEnabled
 {
-public:
+protected:
   lt_XMLTags(void);
   lt_XMLTags(const char n[]);
+public:
+  /// Default creator.
+  static GP<lt_XMLTags> create(void) { return new lt_XMLTags(); }
+  /// Default the specified tag.
+  static GP<lt_XMLTags> create(const char n[]) { return new lt_XMLTags(n); }
+  /// Non-virtual destructor.
   ~lt_XMLTags();
-  GString name;
-  GMap<GString,GString> args;
-  GString raw;
-  GList<lt_XMLContents> content;
-  GMap<GString,GPList<lt_XMLTags> > allTags;
+
   inline void addtag(GP<lt_XMLTags> x);
   inline void addraw(GString raw);
   inline GPosition contains(GString name) const;
@@ -73,6 +75,12 @@ public:
   static void getMaps(char const tagname[],char const argn[],
     GPList<lt_XMLTags> list, GMap<GString, GP<lt_XMLTags> > &map);
   void write(ByteStream &bs,bool const top=true) const;
+
+  GString name;
+  GMap<GString,GString> args;
+  GString raw;
+  GList<lt_XMLContents> content;
+  GMap<GString,GPList<lt_XMLTags> > allTags;
 };
 
 class lt_XMLContents

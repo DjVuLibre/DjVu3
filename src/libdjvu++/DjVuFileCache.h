@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuFileCache.h,v 1.14 2001-01-04 22:04:55 bcr Exp $
+// $Id: DjVuFileCache.h,v 1.15 2001-03-06 19:55:42 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUFILECACHE_H
@@ -62,7 +62,7 @@
     
     @memo Simple DjVuFile caching class.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: DjVuFileCache.h,v 1.14 2001-01-04 22:04:55 bcr Exp $#
+    @version #$Id: DjVuFileCache.h,v 1.15 2001-03-06 19:55:42 bcr Exp $#
 */
 
 //@{
@@ -76,11 +76,13 @@
     find a file corresponding to a given name. The cache provides no
     naming services */
 #ifdef UNDER_CE
-class DjVuFileCache
+class DjVuFileCache : public GPEnabled
 {
+protected:
+   DjVuFileCache(const int) {}
 public:
-   DjVuFileCache(int) {}
-   virtual ~DjVuFileCache(void) {}
+   static GP<DjVuFileCache> create(const int);
+   virtual ~DjVuFileCache(void);
    void del_file(const DjVuFile *) {}
    void add_file(const GP<DjVuFile> &) {}
    void clear(void) {}
@@ -90,32 +92,40 @@ public:
    bool is_enabled(void) const {return false;}
 } ;
 #else
-class DjVuFileCache
+class DjVuFileCache : public GPEnabled
 {
+protected:
+   DjVuFileCache(const int max_size=5*2*1024*1024);
 public:
       /** Constructs the #DjVuFileCache#
 	  @param max_size Maximum allowed size of the cache in bytes. */
-   DjVuFileCache(int max_size=5*2*1024*1024);
+   static GP<DjVuFileCache> create(const int max_size=5*2*1024*1024);
+
    virtual ~DjVuFileCache(void);
 
       /** Removes file #file# from the cache */
    void		del_file(const DjVuFile * file);
+
       /** Adds the given file to the cache. It it's already there, its
 	  timestamp will be refreshed. */
    void		add_file(const GP<DjVuFile> & file);
+
       /** Clears the cache. All items will be deleted. */
    void		clear(void);
       /** Sets new maximum size. If the total size of all items in the cache
 	  is greater than #max_size#, the cache will be deleting the oldest
 	  items until the size is OK. */
    void		set_max_size(int max_size);
+
       /** Returns the maximum allowed size of the cache. */
    int		get_max_size(void) const;
+
       /** Enables or disables the cache. See \Ref{is_enabled}() for details
 	  @param en - If {\em en} is TRUE, the cache will be enabled.
 	         Otherwise it will be disabled.
 	*/
    void		enable(bool en);
+
       /** Returns #TRUE# if the cache is enabled, #FALSE# otherwise.
 	  When a cache is disabled, \Ref{add_file}(), and
 	  \Ref{del_file}() do nothing. But the {\em maximum size} is preserved
@@ -124,6 +134,7 @@ public:
 	  for convenience only. One could easily simulate this behavior by
 	  setting the {\em maximum size} of the cache to #ZERO#. */
    bool		is_enabled(void) const;
+
 public:
    class Item;
    
@@ -211,11 +222,8 @@ DjVuFileCache::Item::refresh(void)
 }
 
 inline
-DjVuFileCache::DjVuFileCache(int xmax_size) :
+DjVuFileCache::DjVuFileCache(const int xmax_size) :
       enabled(true), max_size(xmax_size), cur_size(0) {}
-
-inline
-DjVuFileCache::~DjVuFileCache(void) {}
 
 inline void
 DjVuFileCache::clear(void)
@@ -234,5 +242,13 @@ DjVuFileCache::get_max_size(void) const
 {
    return max_size;
 }
+
 #endif
+
+inline GP<DjVuFileCache>
+DjVuFileCache::create(const int max_size=5*2*1024*1024)
+{
+  return new DjVuFileCache(max_size);
+}
+
 #endif

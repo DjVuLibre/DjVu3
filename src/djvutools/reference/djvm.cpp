@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djvm.cpp,v 1.7 2001-01-04 22:04:54 bcr Exp $
+// $Id: djvm.cpp,v 1.8 2001-03-06 19:55:41 bcr Exp $
 // $Name:  $
 
 /** @name djvm
@@ -99,7 +99,7 @@
     @author
     Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: djvm.cpp,v 1.7 2001-01-04 22:04:54 bcr Exp $# */
+    #$Id: djvm.cpp,v 1.8 2001-03-06 19:55:41 bcr Exp $# */
 //@{
 //@}
 
@@ -159,8 +159,7 @@ create(int argc, char ** argv)
    if (argc<4) { usage(); exit(1); }
 
       // Initialize the DjVuDocEditor class
-   GP<DjVuDocEditor> doc=new DjVuDocEditor();
-   doc->init();
+   GP<DjVuDocEditor> doc=DjVuDocEditor::create_wait(argv[2]);
 
       // Insert pages
    GList<GString> list;
@@ -179,8 +178,7 @@ insert(int argc, char ** argv)
    if (argc!=4 && argc!=5) { usage(); exit(1); }
 
       // Initialize DjVuDocEditor class
-   GP<DjVuDocEditor> doc=new DjVuDocEditor();
-   doc->init(argv[2]);
+   GP<DjVuDocEditor> doc=DjVuDocEditor::create_wait(argv[2]);
 
       // Insert page
    int page_num=-1;
@@ -198,8 +196,7 @@ del(int argc, char ** argv)
    if (argc!=4) { usage(); exit(1); }
 
       // Initialize DjVuDocEditor class
-   GP<DjVuDocEditor> doc=new DjVuDocEditor();
-   doc->init(argv[2]);
+   GP<DjVuDocEditor> doc=DjVuDocEditor::create_wait(argv[2]);
 
       // Delete the page
    int page_num=atoi(argv[3])-1;
@@ -216,7 +213,7 @@ list(int argc, char ** argv)
 {
    if (argc!=3) { usage(); exit(1); }
 
-   GP<DjVmDoc> doc=new DjVmDoc();
+   GP<DjVmDoc> doc=DjVmDoc::create();
    doc->read(argv[2]);
    
    GP<DjVmDir> dir=doc->get_djvm_dir();

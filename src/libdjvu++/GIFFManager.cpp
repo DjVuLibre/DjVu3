@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GIFFManager.cpp,v 1.15 2001-02-15 01:12:22 bcr Exp $
+// $Id: GIFFManager.cpp,v 1.16 2001-03-06 19:55:42 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -40,6 +40,28 @@
 #include "GIFFManager.h"
 #include "GException.h"
 #include "debug.h"
+
+GIFFChunk::~GIFFChunk(void) {}
+
+GIFFManager::~GIFFManager(void) {}
+
+GP<GIFFManager> 
+GIFFManager::create(void)
+{
+  GIFFManager *iff=new GIFFManager();
+  GP<GIFFManager> retval=iff;
+  iff->init();
+  return retval;
+}
+
+GP<GIFFManager> 
+GIFFManager::create(const char name[])
+{
+  GIFFManager *iff=new GIFFManager();
+  GP<GIFFManager> retval=iff;
+  iff->init(name);
+  return retval;
+}
 
 void
 GIFFChunk::set_name(const char * name)
@@ -244,7 +266,7 @@ GIFFChunk::get_chunks_number(const char * name)
 //************************************************************************
 
 void
-GIFFManager::add_chunk(const char * parent_name, const GP<GIFFChunk> & chunk,
+GIFFManager::add_chunk(const char parent_name[], const GP<GIFFChunk> & chunk,
 		       int pos)
       // parent_name is the fully qualified name of the PARENT
       //             IT MAY BE EMPTY
@@ -309,7 +331,7 @@ GIFFManager::add_chunk(const char * parent_name, const GP<GIFFChunk> & chunk,
 	 };
 
 	 for(int i=cur_sec->get_chunks_number(short_name);i<number+1;i++)
-	    cur_sec->add_chunk(new GIFFChunk(short_name));
+	    cur_sec->add_chunk(GIFFChunk::create(short_name));
 	 cur_sec=cur_sec->get_chunk(name);
 	 if (!cur_sec) G_THROW("GIFFManager.unknown\t"+GString(name));
       };
@@ -319,7 +341,7 @@ GIFFManager::add_chunk(const char * parent_name, const GP<GIFFChunk> & chunk,
 }
 
 void
-GIFFManager::add_chunk(const char * name, const TArray<char> & data)
+GIFFManager::add_chunk(const char name[], const TArray<char> & data)
       // name is fully qualified name of the chunk TO BE INSERTED.
       //      it may contain brackets at the end to set the position
       // All the required chunks will be created
@@ -343,7 +365,7 @@ GIFFManager::add_chunk(const char * name, const TArray<char> & data)
    GString chunk_name=GString(short_name, obracket-short_name);
    DEBUG_MSG("Creating new chunk with name " << chunk_name << "\n");
    GP<GIFFChunk> chunk;
-   chunk=new GIFFChunk(chunk_name, data);
+   chunk=GIFFChunk::create(chunk_name, data);
    add_chunk(GString(name, short_name-name), chunk, pos);
 }
 
@@ -366,7 +388,7 @@ GIFFManager::del_chunk(const char * name)
 	 if (top_level->check_name(name+1))
 	 {
 	    DEBUG_MSG("Removing top level chunk..\n");
-	    top_level=new GIFFChunk();
+	    top_level=GIFFChunk::create();
 	    return;
 	 } else
 	    G_THROW("GIFFManager.wrong_name2\t"+GString(name+1));
@@ -472,14 +494,14 @@ GIFFManager::load_chunk(IFFByteStream & istr, GP<GIFFChunk> chunk)
    {
       if (istr.check_id(chunk_id))
       {
-	 GP<GIFFChunk> ch=new GIFFChunk(chunk_id);
+	 GP<GIFFChunk> ch=GIFFChunk::create(chunk_id);
 	 load_chunk(istr, ch);
 	 chunk->add_chunk(ch);
       } else
       {
 	 TArray<char> data(chunk_size-1);
 	 istr.readall( (char*)data, data.size());
-	 GP<GIFFChunk> ch=new GIFFChunk(chunk_id, data);
+	 GP<GIFFChunk> ch=GIFFChunk::create(chunk_id, data);
 	 chunk->add_chunk(ch);
       };
       istr.close_chunk();

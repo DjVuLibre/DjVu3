@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocument.h,v 1.77 2001-02-15 20:31:57 bcr Exp $
+// $Id: DjVuDocument.h,v 1.78 2001-03-06 19:55:42 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUDOCUMENT_H
@@ -58,7 +58,7 @@ class ByteStream;
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocument.h,v 1.77 2001-02-15 20:31:57 bcr Exp $#
+    @version #$Id: DjVuDocument.h,v 1.78 2001-03-06 19:55:42 bcr Exp $#
 */
 
 //@{
@@ -97,10 +97,9 @@ class ByteStream;
     Typical usage of #DjVuDocument# class in a threadless command line
     program would be the following:
     \begin{verbatim}
-    GString file_name="/tmp/document.djvu";
-    GP<DjVuDocument> doc=new DjVuDocument;
-    doc->init(GOS::filename_to_url(file_name));
-    int pages=doc->get_pages_num();
+    static const char file_name[]="/tmp/document.djvu";
+    GP<DjVuDocument> doc=DjVuDocument::create_wait(file_name);
+    const int pages=doc->get_pages_num();
     for(int page=0;page<pages;page++)
     {
        GP<DjVuImage> dimg=doc->get_page(page);
@@ -220,9 +219,14 @@ public:
 		   SINGLE_PAGE, UNKNOWN_TYPE };
    enum THREAD_FLAGS { STARTED=1, FINISHED=2 };
 
-      /** Default constructor. Please call functions \Ref{init}() or
-	  \Ref{start_init}() before you start working with the #DjVuDocument#. */
+protected:
+      /** Default creator. Please call functions \Ref{init}() or
+	  \Ref{start_init}() before you start working with the #DjVuDocument#.
+        */
    DjVuDocument(void);
+public:
+
+     /// Virtual Destructor
    virtual ~DjVuDocument(void);
 
       /** Initializes the #DjVuDocument# object using an existing document.
@@ -302,6 +306,15 @@ public:
 	         is actually useful in the plugin only.  */
    void		start_init(const GURL & url, GP<DjVuPort> port=0,
 			   DjVuFileCache * cache=0);
+
+   /** Create a version of DjVuDocument which has finished initializing. */
+   static GP<DjVuDocument> create_wait(
+     const GURL &url, GP<DjVuPort> xport=0, DjVuFileCache * const xcache=0);
+
+   /** Create a version of DjVuDocument which has finished initializing. */
+   static GP<DjVuDocument> create_wait(
+     char const filename[], GP<DjVuPort> xport=0,
+     DjVuFileCache * const xcache=0);
 
    /** Create a version of DjVuDocument which has begun initializing. */
    static GP<DjVuDocument> create(
@@ -844,11 +857,21 @@ DjVuDocument::init(const GURL &url, GP<DjVuPort> port, DjVuFileCache *cache)
 }
 
 inline GP<DjVuDocument>
+DjVuDocument::create_wait(const GURL &url, GP<DjVuPort> xport, DjVuFileCache *xcache)
+{
+  DjVuDocument *doc=new DjVuDocument;
+  GP<DjVuDocument> retval=doc;
+  doc->init(url,xport,xcache);
+  return retval;
+}
+
+inline GP<DjVuDocument>
 DjVuDocument::create(
   const GURL &url, GP<DjVuPort> xport, DjVuFileCache * const xcache)
 {
-  GP<DjVuDocument> retval=new DjVuDocument;
-  retval->start_init(url,xport,xcache);
+  DjVuDocument *doc=new DjVuDocument;
+  GP<DjVuDocument> retval=doc;
+  doc->start_init(url,xport,xcache);
   return retval;
 }
 

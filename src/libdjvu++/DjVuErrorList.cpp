@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuErrorList.cpp,v 1.10 2001-02-17 02:38:41 bcr Exp $
+// $Id: DjVuErrorList.cpp,v 1.11 2001-03-06 19:55:42 bcr Exp $
 // $Name:  $
 
 
@@ -116,7 +116,7 @@ DjVuErrorList::request_data(const DjVuPort * source, const GURL & url)
        }else if(url.base() == pool_url)
        {
          GString name=url.fname();
-         GP<DjVmDoc> doc=new DjVmDoc();
+         GP<DjVmDoc> doc=DjVmDoc::create();
          GP<ByteStream> bs=pool->get_stream();
          doc->read(*bs);
          retval=doc->get_data(name);

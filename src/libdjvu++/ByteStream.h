@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.h,v 1.43 2001-02-16 01:12:56 bcr Exp $
+// $Id: ByteStream.h,v 1.44 2001-03-06 19:55:41 bcr Exp $
 // $Name:  $
 
 #ifndef _BYTESTREAM_H
@@ -62,7 +62,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation\\
     Andrei Erofeev <eaf@geocities.com> -- 
     @version
-    #$Id: ByteStream.h,v 1.43 2001-02-16 01:12:56 bcr Exp $# */
+    #$Id: ByteStream.h,v 1.44 2001-03-06 19:55:41 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -109,7 +109,7 @@ public:
       than #size# for internal reasons. Programs must be ready to handle these
       cases or use function \Ref{readall}. Exception \Ref{GException} is
       thrown with a plain text error message whenever an error occurs. */
-  virtual size_t read(void *buffer, size_t size) = 0;
+  virtual size_t read(void *buffer, size_t size);
   /** Writes data to a ByteStream.  This function {\em must} be implemented by
       each subclass of #ByteStream#.  At most #size# bytes from buffer
       #buffer# are written to the ByteStream.  Function #write# returns
@@ -119,7 +119,7 @@ public:
       handle these cases or use function \Ref{writall}. Exception
       \Ref{GException} is thrown with a plain text error message whenever an
       error occurs. */
-  virtual size_t write(const void *buffer, size_t size) = 0;
+  virtual size_t write(const void *buffer, size_t size);
   /** Returns the offset of the current position in the ByteStream.  This
       function {\em must} be implemented by each subclass of #ByteStream#. */
   virtual long tell(void) const  = 0;

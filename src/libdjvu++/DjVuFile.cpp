@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuFile.cpp,v 1.152 2001-02-22 21:07:45 fcrary Exp $
+// $Id: DjVuFile.cpp,v 1.153 2001-03-06 19:55:42 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -786,7 +786,7 @@ is_text(GString chkid)
 GString
 DjVuFile::decode_chunk(const char *id, GP<ByteStream> gbs, bool djvi, bool djvu, bool iw44)
 {
-  ByteStream &iff=*gbs;
+  ByteStream &bs=*gbs;
   check();
   
   // If this object is referenced by only one GP<> pointer, this
@@ -807,8 +807,8 @@ DjVuFile::decode_chunk(const char *id, GP<ByteStream> gbs, bool djvi, bool djvu,
     if (djvi)
       G_THROW("DjVuFile.corrupt_INFO");
     // DjVuInfo::decode no longer throws version exceptions
-    GP<DjVuInfo> info=new DjVuInfo();
-    info->decode(iff);
+    GP<DjVuInfo> info=DjVuInfo::create();
+    info->decode(bs);
     DjVuFile::info = info;
     desc.format("Page information");
     // Consistency checks (previously in DjVuInfo::decode)
@@ -823,7 +823,7 @@ DjVuFile::decode_chunk(const char *id, GP<ByteStream> gbs, bool djvi, bool djvu,
   // INCL (inclusion chunk)
   else if (chkid == "INCL" && (djvi || djvu || iw44))
   {
-    GP<DjVuFile> file=process_incl_chunk(iff);
+    GP<DjVuFile> file=process_incl_chunk(bs);
     if (file)
     {
       int decode_was_already_started = 1;
@@ -858,8 +858,8 @@ DjVuFile::decode_chunk(const char *id, GP<ByteStream> gbs, bool djvi, bool djvu,
       G_THROW("DjVuFile.dupl_Dxxx");
     if (DjVuFile::fgjd)
       G_THROW("DjVuFile.Dxxx_after_Sxxx");
-    GP<JB2Dict> fgjd = new JB2Dict();
-    fgjd->decode(iff);
+    GP<JB2Dict> fgjd = JB2Dict::create();
+    fgjd->decode(gbs);
     DjVuFile::fgjd = fgjd;
     desc.format("JB2 shape dictionary (%d shapes)", fgjd->get_shape_count());
   } 
@@ -869,12 +869,12 @@ DjVuFile::decode_chunk(const char *id, GP<ByteStream> gbs, bool djvi, bool djvu,
   {
     if (DjVuFile::fgjb)
       G_THROW("DjVuFile.dupl_Sxxx");
-    GP<JB2Image> fgjb=new JB2Image();
+    GP<JB2Image> fgjb=JB2Image::create();
     // ---- begin hack
     if (info && info->version <=18)
       fgjb->reproduce_old_bug = true;
     // ---- end hack
-    fgjb->decode(iff, static_get_fgjd, (void*)this);
+    fgjb->decode(gbs, static_get_fgjd, (void*)this);
     DjVuFile::fgjb = fgjb;
     desc.format("JB2 foreground mask (%dx%d, %d dpi)",
       fgjb->get_width(), fgjb->get_height(),
@@ -887,7 +887,7 @@ DjVuFile::decode_chunk(const char *id, GP<ByteStream> gbs, bool djvi, bool djvu,
     if (DjVuFile::fgjb)
       G_THROW("DjVuFile.dupl_Sxxx");
     set_can_compress(true);
-    DjVuFile::fgjb = MMRDecoder::decode(iff);
+    DjVuFile::fgjb = MMRDecoder::decode(gbs);
     desc.format("G4/MMR encoded mask (%dx%d, %d dpi)",
       fgjb->get_width(), fgjb->get_height(),
       get_dpi(fgjb->get_width(), fgjb->get_height()));
@@ -902,7 +902,7 @@ DjVuFile::decode_chunk(const char *id, GP<ByteStream> gbs, bool djvi, bool djvu,
         G_THROW("DjVuFile.dupl_backgrnd");
       // First chunk
       GP<IW44Image> bg44=IW44Image::create_decode(IW44Image::COLOR);
-      bg44->decode_chunk(iff);
+      bg44->decode_chunk(gbs);
       DjVuFile::bg44=bg44;
       desc.format("IW44 background (%dx%d, %d dpi)",
 		      bg44->get_width(), bg44->get_height(),
@@ -911,7 +911,7 @@ DjVuFile::decode_chunk(const char *id, GP<ByteStream> gbs, bool djvi, bool djvu,
     else
     {
       // Refinement chunks
-      bg44->decode_chunk(iff);
+      bg44->decode_chunk(gbs);
       desc.format("IW44 background (part %d, %d dpi)",
 		      bg44->get_serial(), get_dpi(bg44->get_width(), bg44->get_height()));
     }
@@ -924,7 +924,7 @@ DjVuFile::decode_chunk(const char *id, GP<ByteStream> gbs, bool djvi, bool djvu,
       G_THROW("DjVuFile.dupl_foregrnd");
     GP<IW44Image> gfg44=IW44Image::create_decode(IW44Image::COLOR);
     IW44Image &fg44=*gfg44;
-    fg44.decode_chunk(iff);
+    fg44.decode_chunk(gbs);
     fgpm=fg44.get_pixmap();
     desc.format("IW44 foreground colors (%dx%d, %d dpi)",
       fg44.get_width(), fg44.get_height(),
@@ -941,7 +941,7 @@ DjVuFile::decode_chunk(const char *id, GP<ByteStream> gbs, bool djvi, bool djvu,
       set_modified(true);
       set_can_compress(true);
       set_needs_compression(true);
-      DjVuFile::bgpm = djvu_decode_codec(iff);
+      DjVuFile::bgpm = djvu_decode_codec(bs);
       desc.format("LINK Color Import (%dx%d, %d dpi)",
         bgpm->columns(), bgpm->rows(),
         get_dpi(bgpm->columns(), bgpm->rows()));
@@ -958,7 +958,7 @@ DjVuFile::decode_chunk(const char *id, GP<ByteStream> gbs, bool djvi, bool djvu,
       G_THROW("DjVuFile.dupl_backgrnd");
     set_can_compress(true);
 #ifdef NEED_JPEG_DECODER
-    DjVuFile::bgpm = JPEGDecoder::decode(iff);
+    DjVuFile::bgpm = JPEGDecoder::decode(bs);
     desc.format("JPEG background (%dx%d, %d dpi)",
       bgpm->columns(), bgpm->rows(),
       get_dpi(bgpm->columns(), bgpm->rows()));
@@ -973,7 +973,7 @@ DjVuFile::decode_chunk(const char *id, GP<ByteStream> gbs, bool djvi, bool djvu,
     if (fgpm || fgbc)
       G_THROW("DjVuFile.dupl_foregrnd");
 #ifdef NEED_JPEG_DECODER
-    DjVuFile::fgpm = JPEGDecoder::decode(iff);
+    DjVuFile::fgpm = JPEGDecoder::decode(bs);
     desc.format("JPEG foreground colors (%dx%d, %d dpi)",
       fgpm->columns(), fgpm->rows(),
       get_dpi(fgpm->columns(), fgpm->rows()));
@@ -1003,7 +1003,7 @@ DjVuFile::decode_chunk(const char *id, GP<ByteStream> gbs, bool djvi, bool djvu,
   {
     if (fgpm || fgbc)
       G_THROW("DjVuFile.dupl_foregrnd");
-    GP<DjVuPalette> fgbc = new DjVuPalette;
+    GP<DjVuPalette> fgbc = DjVuPalette::create();
     fgbc->decode(gbs);
     DjVuFile::fgbc = fgbc;
     desc.format("JB2 foreground colors (%d colors, %d ccs)", 
@@ -1018,8 +1018,8 @@ DjVuFile::decode_chunk(const char *id, GP<ByteStream> gbs, bool djvi, bool djvu,
       // First chunk
       GP<IW44Image> gbg44=IW44Image::create_decode(IW44Image::COLOR);
       IW44Image &xbg44=*gbg44;
-      xbg44.decode_chunk(iff);
-      GP<DjVuInfo> ginfo=new DjVuInfo();
+      xbg44.decode_chunk(gbs);
+      GP<DjVuInfo> ginfo=DjVuInfo::create();
       ginfo->width=xbg44.get_width();
       ginfo->height=xbg44.get_height();
       ginfo->dpi=100;
@@ -1033,7 +1033,7 @@ DjVuFile::decode_chunk(const char *id, GP<ByteStream> gbs, bool djvi, bool djvu,
     {
       // Refinement chunks
       IW44Image &xbg44=*bg44;
-      xbg44.decode_chunk(iff);
+      xbg44.decode_chunk(gbs);
       desc.format("IW44 data (part %d, %d dpi)",
 		      xbg44.get_serial(),
           get_dpi(xbg44.get_width(), xbg44.get_height()));
@@ -1043,8 +1043,8 @@ DjVuFile::decode_chunk(const char *id, GP<ByteStream> gbs, bool djvi, bool djvu,
   // NDIR (obsolete navigation chunk)
   else if (chkid == "NDIR")
   {
-    GP<DjVuNavDir> dir=new DjVuNavDir(url);
-    dir->decode(iff);
+    GP<DjVuNavDir> dir=DjVuNavDir::create(url);
+    dir->decode(bs);
     DjVuFile::dir=dir;
     desc.format("Navigation directory (obsolete)");
   }
@@ -1054,7 +1054,7 @@ DjVuFile::decode_chunk(const char *id, GP<ByteStream> gbs, bool djvi, bool djvu,
     {
       GP<ByteStream> gachunk=ByteStream::create();
       ByteStream &achunk=*gachunk;
-      achunk.copy(iff);
+      achunk.copy(bs);
       achunk.seek(0);
       GCriticalSectionLock lock(&anno_lock);
       if (! anno)
@@ -1076,7 +1076,7 @@ DjVuFile::decode_chunk(const char *id, GP<ByteStream> gbs, bool djvi, bool djvu,
     {
       GP<ByteStream> gachunk=ByteStream::create();
       ByteStream &achunk=*gachunk;
-      achunk.copy(iff);
+      achunk.copy(bs);
       achunk.seek(0);
       GCriticalSectionLock lock(&anno_lock);
       if (! anno)
@@ -1101,7 +1101,7 @@ DjVuFile::decode_chunk(const char *id, GP<ByteStream> gbs, bool djvi, bool djvu,
     {
       GP<ByteStream> gachunk=ByteStream::create();
       ByteStream &achunk=*gachunk;
-      achunk.copy(iff);
+      achunk.copy(bs);
       achunk.seek(0);
       GCriticalSectionLock lock(&text_lock);
       if (! text)
@@ -1409,7 +1409,7 @@ DjVuFile::decode_ndir(GMap<GURL, void *> & map)
         chunks++;
         if (chkid=="NDIR")
         {
-          GP<DjVuNavDir> d=new DjVuNavDir(url);
+          GP<DjVuNavDir> d=DjVuNavDir::create(url);
           d->decode(iff);
           dir=d;
           break;
@@ -2424,9 +2424,8 @@ DjVuFile::unlink_file(const char * id)
 void
 DjVuFile::change_text(GP<DjVuTXT> txt,const bool do_reset)
 {
-  
-  
-  DjVuText text_c;
+  GP<DjVuText> gtext_c=DjVuText::create();
+  DjVuText &text_c=*gtext_c;
   if(contains_text())
   {
     GP<ByteStream> file_text=get_text();

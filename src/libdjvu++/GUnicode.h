@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GUnicode.h,v 1.2 2001-02-02 16:41:42 bcr Exp $
+// $Id: GUnicode.h,v 1.3 2001-03-06 19:55:42 bcr Exp $
 // $Name:  $
 
 #ifndef __GUNICODE_
@@ -48,21 +48,48 @@ class UnicodeRep : public GPEnabled
 public:
   class Remainder
   {
-    public:
+  public:
     enum EncodeType {UCS4,UCS4BE,UCS4LE,UCS4_2143,UCS4_3412,UTF16,UTF16BE,UTF16LE,UTF8,EBCDIC,OTHER};
     Remainder(const Remainder &);
     Remainder(const Remainder &,const Remainder &);
     Remainder(EncodeType=OTHER);
+    ~Remainder();
     inline void init(const Remainder &r1);
     void init(const Remainder &r1,const Remainder &r2);
     void init(void const * const ,size_t const,EncodeType=OTHER);
-    ~Remainder();
     EncodeType encodetype;
     void *data;
     GPBufferBase gdata;
     size_t size;
   };
   enum EncodeType {UCS4,UCS4BE,UCS4LE,UCS4_2143,UCS4_3412,UTF16,UTF16BE,UTF16LE,UTF8,EBCDIC,OTHER};
+
+protected:
+  UnicodeRep(void);
+  UnicodeRep(const UnicodeRep &);
+  UnicodeRep(const Remainder &r); 
+  UnicodeRep(const Remainder &r1,const Remainder &r2); 
+
+public:
+  /// Default creator.
+  static GP<UnicodeRep> create(void)
+  { return new UnicodeRep(); }
+
+  /// Copy creator.
+  static GP<UnicodeRep> create(const UnicodeRep &r)
+  { return new UnicodeRep(r); }
+
+  /// Create from a remainder.
+  static GP<UnicodeRep> create(const Remainder &r)
+  { return new UnicodeRep(r); }
+
+  /// Create from two remainders.
+  static GP<UnicodeRep> create(const Remainder &r1,const Remainder &r2)
+  { return new UnicodeRep(r1,r2); }
+
+  /// Non-virtual destructor.
+  ~UnicodeRep();
+
 protected:
   unsigned int len;
   GString gs;
@@ -81,11 +108,6 @@ private:
   inline unsigned long UCS4_2143toWideChar(unsigned char const *&s,void const * const);
   static GP<UnicodeRep> concat(const UnicodeRep &,const UnicodeRep &);
 public:
-  UnicodeRep(void);
-  UnicodeRep(const UnicodeRep &);
-  UnicodeRep(const Remainder &r); 
-  UnicodeRep(const Remainder &r1,const Remainder &r2); 
-  ~UnicodeRep();
   void init (void const * const,unsigned int const,const EncodeType=EBCDIC);
   inline void init (GString &,unsigned int const=0);
   inline void init (const GString &,unsigned int const=0);

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GMapAreas.cpp,v 1.19 2001-01-04 22:04:55 bcr Exp $
+// $Id: GMapAreas.cpp,v 1.20 2001-03-06 19:55:42 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -73,6 +73,14 @@ static const char error_oval_border [] = "GMapAreas.oval_border";
 static const char error_oval_hilite [] = "GMapAreas.oval_hilite";
 static const char error_too_few_points [] = "GMapAreas.too_few_points";
 static const char error_intersect [] = "GMapAreas.intersect";
+
+GMapArea::~GMapArea() {}
+
+GMapRect::~GMapRect() {}
+
+GMapPoly::~GMapPoly() {}
+
+GMapOval::~GMapOval() {}
 
 void
 GMapArea::initialize_bounds(void)

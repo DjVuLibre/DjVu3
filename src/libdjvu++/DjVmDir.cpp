@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVmDir.cpp,v 1.34 2001-02-15 01:12:22 bcr Exp $
+// $Id: DjVmDir.cpp,v 1.35 2001-03-06 19:55:42 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -152,7 +152,8 @@ DjVmDir::decode(GP<ByteStream> gstr)
          }
       }
 
-      BSByteStream bs_str(gstr);
+      GP<ByteStream> gbs_str=BSByteStream::create(gstr);
+      ByteStream &bs_str=*gbs_str;
       if (ver>0)
       {
 	 DEBUG_MSG("reading and decompressing sizes...\n");
@@ -326,7 +327,8 @@ DjVmDir::encode(GP<ByteStream> gstr) const
 	       }
       }
 
-      BSByteStream bs_str(gstr, 50);
+      GP<ByteStream> gbs_str=BSByteStream::create(gstr, 50);
+      ByteStream &bs_str=*gbs_str;
       DEBUG_MSG("storing and compressing sizes for every record\n");
       for(pos=files_list;pos;++pos)
       {

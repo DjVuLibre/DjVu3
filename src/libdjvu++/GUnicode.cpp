@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GUnicode.cpp,v 1.3 2001-02-02 16:41:42 bcr Exp $
+// $Id: GUnicode.cpp,v 1.4 2001-03-06 19:55:42 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -82,65 +82,65 @@ UnicodeRep::~UnicodeRep()
 
 GUnicode::GUnicode(void)
 {
-  GP<UnicodeRep>::operator=(new UnicodeRep());
+  GP<UnicodeRep>::operator=(UnicodeRep::create());
 }
 
 GUnicode::GUnicode(GString &str)
 {
-  GP<UnicodeRep>::operator=(new UnicodeRep());
+  GP<UnicodeRep>::operator=(UnicodeRep::create());
   (*this)->init(str,str.length());
 }
 
 GUnicode::GUnicode(GString &str, unsigned int const i)
 {
-  GP<UnicodeRep>::operator=(new UnicodeRep());
+  GP<UnicodeRep>::operator=(UnicodeRep::create());
   unsigned int const  j=str.length();
   (*this)->init(str,(i>j)?j:i);
 }
  
 GUnicode::GUnicode(const GString &str)
 {
-  GP<UnicodeRep>::operator=(new UnicodeRep());
+  GP<UnicodeRep>::operator=(UnicodeRep::create());
   (*this)->init(str,str.length());
 }
 
 GUnicode::GUnicode(const GString &str, unsigned int const i)
 {
-  GP<UnicodeRep>::operator=(new UnicodeRep());
+  GP<UnicodeRep>::operator=(UnicodeRep::create());
   unsigned int const  j=str.length();
   (*this)->init(str,(i>j)?j:i);
 }
  
 GUnicode::GUnicode(unsigned long const * const wide)
 {
-  GP<UnicodeRep>::operator=(new UnicodeRep());
+  GP<UnicodeRep>::operator=(UnicodeRep::create());
   (*this)->init(wide,0,UnicodeRep::UCS4);
 }
 
 GUnicode::GUnicode(unsigned long const * const wide,unsigned int const i)
 {
-  GP<UnicodeRep>::operator=(new UnicodeRep());
+  GP<UnicodeRep>::operator=(UnicodeRep::create());
   (*this)->init(i?wide:0,i*sizeof(unsigned long),UnicodeRep::UCS4);
 }
 
 GUnicode::GUnicode(
   unsigned char const * const str,unsigned int const i,const EncodeType t)
 {
-  GP<UnicodeRep>::operator=(new UnicodeRep());
+  GP<UnicodeRep>::operator=(UnicodeRep::create());
   (*this)->init(i?str:0,i,(UnicodeRep::EncodeType &)t);
 }
 
 GUnicode::GUnicode(
   unsigned short const * const str,unsigned int const i,const EncodeType t)
 {
-  GP<UnicodeRep>::operator=(new UnicodeRep());
+  GP<UnicodeRep>::operator=(UnicodeRep::create());
   (*this)->init(i?str:0,i*sizeof(unsigned short),(UnicodeRep::EncodeType &)t);
 }
 
 GUnicode::GUnicode(
   unsigned long const * const str,unsigned int const i,const EncodeType t)
 {
-  GP<UnicodeRep>::operator=(new UnicodeRep());
+  GP<UnicodeRep>::operator=(UnicodeRep::create());
   (*this)->init(i?str:0,i*sizeof(unsigned long),(UnicodeRep::EncodeType &)t);
 }
 
@@ -154,8 +154,7 @@ UnicodeRep::concat(const UnicodeRep &uni1,const UnicodeRep &uni2)
   {
     if(len1)
     {
-      UnicodeRep *ptr=new UnicodeRep();
-      retval=ptr;
+      UnicodeRep *ptr=(retval=UnicodeRep::create());
       ptr->remainder.init(uni2.remainder);
       ptr->len=len1+len2;
       ptr->UnicodePtr=new unsigned long[ptr->len+1];

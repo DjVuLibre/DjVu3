@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: IW44Image.cpp,v 1.4 2001-02-21 00:03:11 bcr Exp $
+// $Id: IW44Image.cpp,v 1.5 2001-03-06 19:55:42 bcr Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 08/1998
@@ -1290,7 +1290,7 @@ IW44Image::create_decode(const ImageType itype)
 }
 
 int
-IW44Image::encode_chunk(ByteStream &, const IWEncoderParms &)
+IW44Image::encode_chunk(GP<ByteStream>, const IWEncoderParms &)
 {
   G_THROW("IW44Image.codec_open2");
   return 0;
@@ -1379,7 +1379,7 @@ IWBitmap::get_bitmap(void)
   // Perform wavelet reconstruction
   int w = ymap->iw;
   int h = ymap->ih;
-  GP<GBitmap> pbm = new GBitmap(h, w);
+  GP<GBitmap> pbm = GBitmap::create(h, w);
   ymap->image((signed char*)(*pbm)[0],pbm->rowsize());
   // Shift image data
   for (int i=0; i<h; i++)
@@ -1402,7 +1402,7 @@ IWBitmap::get_bitmap(int subsample, const GRect &rect)
   // Allocate bitmap
   int w = rect.width();
   int h = rect.height();
-  GP<GBitmap> pbm = new GBitmap(h,w);
+  GP<GBitmap> pbm = GBitmap::create(h,w);
   ymap->image(subsample, rect, (signed char*)(*pbm)[0],pbm->rowsize());
   // Shift image data
   for (int i=0; i<h; i++)
@@ -1418,7 +1418,7 @@ IWBitmap::get_bitmap(int subsample, const GRect &rect)
 
 
 int
-IWBitmap::decode_chunk(ByteStream &bs)
+IWBitmap::decode_chunk(GP<ByteStream> gbs)
 {
   // Open
   if (! ycodec)
@@ -1429,6 +1429,7 @@ IWBitmap::decode_chunk(ByteStream &bs)
   }
   // Read primary header
   struct IW44Image::PrimaryHeader primary;
+  ByteStream &bs=*gbs;
   if (bs.readall((void*)&primary, sizeof(primary)) != sizeof(primary))
     G_THROW("IW44Image.cant_read_primary");
   if (primary.serial != cserial)
@@ -1468,7 +1469,8 @@ IWBitmap::decode_chunk(ByteStream &bs)
   assert(ymap);
   assert(ycodec);
 #endif
-  ZPCodec zp(bs, false, true);
+  GP<ZPCodec> gzp=ZPCodec::create(gbs, false, true);
+  ZPCodec &zp=*gzp;
   int flag = 1;
   while (flag && cslice<nslices)
     {
@@ -1508,7 +1510,7 @@ IWBitmap::decode_iff(IFFByteStream &iff, int maxchunks)
   while (--maxchunks>=0 && iff.get_chunk(chkid))
     {
       if (chkid == "BM44")
-        decode_chunk(iff);
+        decode_chunk(iff.get_bytestream());
       iff.close_chunk();
     }
   iff.close_chunk();
@@ -1593,7 +1595,7 @@ IWPixmap::get_pixmap(void)
   // Allocate pixmap
   int w = ymap->iw;
   int h = ymap->ih;
-  GP<GPixmap> ppm = new GPixmap(h, w);
+  GP<GPixmap> ppm = GPixmap::create(h, w);
   // Perform wavelet reconstruction
   signed char *ptr = (signed char*) (*ppm)[0];
   int rowsep = ppm->rowsize() * sizeof(GPixel);
@@ -1633,7 +1635,7 @@ IWPixmap::get_pixmap(int subsample, const GRect &rect)
   // Allocate
   int w = rect.width();
   int h = rect.height();
-  GP<GPixmap> ppm = new GPixmap(h,w);
+  GP<GPixmap> ppm = GPixmap::create(h,w);
   // Perform wavelet reconstruction
   signed char *ptr = (signed char*) (*ppm)[0];
   int rowsep = ppm->rowsize() * sizeof(GPixel);
@@ -1665,7 +1667,7 @@ IWPixmap::get_pixmap(int subsample, const GRect &rect)
 
 
 int
-IWPixmap::decode_chunk(ByteStream &bs)
+IWPixmap::decode_chunk(GP<ByteStream> gbs)
 {
   // Open
   if (! ycodec)
@@ -1677,6 +1679,7 @@ IWPixmap::decode_chunk(ByteStream &bs)
 
   // Read primary header
   struct IW44Image::PrimaryHeader primary;
+  ByteStream &bs=*gbs;
   if (bs.readall((void*)&primary, sizeof(primary)) != sizeof(primary))
     G_THROW("IW44Image.cant_read_primary2");
   if (primary.serial != cserial)
@@ -1730,7 +1733,8 @@ IWPixmap::decode_chunk(ByteStream &bs)
   assert(ymap);
   assert(ycodec);
 #endif
-  ZPCodec zp(bs, false, true);
+  GP<ZPCodec> gzp=ZPCodec::create(gbs, false, true);
+  ZPCodec &zp=*gzp;
   int flag = 1;
   while (flag && cslice<nslices)
     {
@@ -1784,7 +1788,7 @@ IWPixmap::decode_iff(IFFByteStream &iff, int maxchunks)
   while (--maxchunks>=0 && iff.get_chunk(chkid))
     {
       if (chkid=="PM44" || chkid=="BM44")
-        decode_chunk(iff);
+        decode_chunk(iff.get_bytestream());
       iff.close_chunk();
     }
   iff.close_chunk();

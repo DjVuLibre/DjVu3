@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuText.h,v 1.9 2001-02-15 20:31:57 bcr Exp $
+// $Id: DjVuText.h,v 1.10 2001-03-06 19:55:42 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUTEXT_H
@@ -55,7 +55,7 @@
     @memo Implements support for DjVuImage hidden text.
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: DjVuText.h,v 1.9 2001-02-15 20:31:57 bcr Exp $# */
+    #$Id: DjVuText.h,v 1.10 2001-03-06 19:55:42 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -76,7 +76,12 @@ class ByteStream;
 
 class DjVuTXT : public GPEnabled
 {
+protected:
+  DjVuTXT(void) {}
 public:
+  /// Default creator
+  static GP<DjVuTXT> create(void) {return new DjVuTXT();}
+
   /** These constants are used to tell what a zone describes.
       This can be useful for a copy/paste application. 
       The deeper we go into the hierarchy, the higher the constant. */
@@ -193,8 +198,11 @@ private:
 
 class DjVuText : public GPEnabled
 {
+protected:
+   DjVuText(void) {}
 public:
-   GP<DjVuTXT>  txt;
+   /// Default creator.
+   static GP<DjVuText> create(void) {return new DjVuText();}
 
       /** Decodes a sequence of annotation chunks and merges contents of every
 	  chunk with previously decoded information. This function
@@ -212,6 +220,8 @@ public:
       /** Returns the number of bytes needed by this data structure. It's
 	  used by caching routines to estimate the size of a \Ref{DjVuImage}. */
    inline unsigned int get_memory_usage() const;
+
+   GP<DjVuTXT>  txt;
 private: // dummy stuff
    static void decode(ByteStream *);
    static void	encode(ByteStream *);

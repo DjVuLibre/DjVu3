@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //
-// $Id: djvumake.cpp,v 1.12 2001-02-15 01:12:21 bcr Exp $
+// $Id: djvumake.cpp,v 1.13 2001-03-06 19:55:41 bcr Exp $
 // $Name:  $
 
 /** @name djvumake
@@ -102,7 +102,7 @@
     @memo
     Assemble DjVu files.
     @version
-    #$Id: djvumake.cpp,v 1.12 2001-02-15 01:12:21 bcr Exp $#
+    #$Id: djvumake.cpp,v 1.13 2001-03-06 19:55:41 bcr Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> \\
     Patrick Haffner <haffner@research.att.com>
@@ -216,7 +216,7 @@ analyze_mmr_chunk(char *filename)
       if (!mmrstencil->size())
         G_THROW("Could not find MMR data");
       // Decode
-      stencil = MMRDecoder::decode(*mmrstencil);
+      stencil = MMRDecoder::decode(mmrstencil);
       int jw = stencil->get_width();
       int jh = stencil->get_height();
       if (w < 0) w = jw;
@@ -266,8 +266,8 @@ analyze_jb2_chunk(char *filename)
       if (!jb2stencil->size())
         G_THROW("Could not find JB2 data");
       // Decode
-      stencil=new(JB2Image);
-      stencil->decode(*jb2stencil);
+      stencil=JB2Image::create();
+      stencil->decode(jb2stencil);
       int jw = stencil->get_width();
       int jh = stencil->get_height();
       if (w < 0) w = jw;
@@ -338,7 +338,8 @@ create_info_chunk(IFFByteStream &iff, int argc, char **argv)
   if (w<0 || h<0)
     G_THROW("djvumake: cannot determine image size\n");
   // write info chunk
-  DjVuInfo info;
+  GP<DjVuInfo> ginfo=DjVuInfo::create();
+  DjVuInfo &info=*ginfo;
   info.width = w;
   info.height = h;
   info.dpi = dpi;
@@ -557,39 +558,50 @@ create_masksub_chunks(IFFByteStream &iff, char *filespec)
     G_THROW("The use of a raw ppm image requires a stencil");
   GP<ByteStream> gibs=ByteStream::create(filespec, "rb");
   ByteStream &ibs=*gibs;
-  GPixmap raw_pm(ibs);
+  GP<GPixmap> graw_pm=GPixmap::create(ibs);
+  GPixmap &raw_pm=*graw_pm;
   if ((int) stencil->get_width() != (int) raw_pm.columns())
     G_THROW("Stencil and raw image have different widths!");
   if ((int) stencil->get_height() != (int) raw_pm.rows())
     G_THROW("Stencil and raw image have different heights!");
   // Encode foreground
   {
-    GPixmap fg_img;
-    GP<GBitmap> fg_mask=new GBitmap();
+    GP<GPixmap> gfg_img=GPixmap::create();
+    GPixmap &fg_img=*gfg_img;
+    GP<GBitmap> fg_mask=GBitmap::create();
     processForeground(&raw_pm, stencil, fg_img, *fg_mask);
-    GP<IW44Image> fg_pm = IW44Image::create(fg_img, fg_mask, IW44Image::CRCBfull);
+    GP<IW44Image> fg_pm = IW44Image::create_encode(fg_img, fg_mask, IW44Image::CRCBfull);
     IWEncoderParms parms[8];
     iff.put_chunk("FG44");
     parms[0].slices = 100;
-    fg_pm->encode_chunk(iff, parms[0]);
+    fg_pm->encode_chunk(iff.get_bytestream(), parms[0]);
     iff.close_chunk();
   }
   // Encode backgound 
   {
-    GPixmap bg_img;
-    GP<GBitmap> bg_mask=new GBitmap();
+    GP<GPixmap> gbg_img=GPixmap::create();
+    GPixmap &bg_img=*gbg_img;
+    GP<GBitmap> bg_mask=GBitmap::create();
     processBackground(&raw_pm, stencil, bg_img, *bg_mask);
-    GP<IW44Image> bg_pm = IW44Image::create(bg_img, bg_mask, IW44Image::CRCBnormal);
+    GP<IW44Image> bg_pm = IW44Image::create_encode(bg_img, bg_mask, IW44Image::CRCBnormal);
     IWEncoderParms parms[4];
     parms[0].bytes = 10000;
     parms[0].slices = 74;
-    iff.put_chunk("BG44"); bg_pm->encode_chunk(iff, parms[0]); iff.close_chunk();
+    iff.put_chunk("BG44");
+    bg_pm->encode_chunk(iff.get_bytestream(), parms[0]);
+    iff.close_chunk();
     parms[1].slices = 84;
-    iff.put_chunk("BG44"); bg_pm->encode_chunk(iff, parms[1]); iff.close_chunk();
+    iff.put_chunk("BG44");
+    bg_pm->encode_chunk(iff.get_bytestream(), parms[1]);
+    iff.close_chunk();
     parms[2].slices = 90;
-    iff.put_chunk("BG44"); bg_pm->encode_chunk(iff, parms[2]); iff.close_chunk();
+    iff.put_chunk("BG44");
+    bg_pm->encode_chunk(iff.get_bytestream(), parms[2]);
+    iff.close_chunk();
     parms[3].slices = 97;
-    iff.put_chunk("BG44"); bg_pm->encode_chunk(iff, parms[3]); iff.close_chunk();
+    iff.put_chunk("BG44");
+    bg_pm->encode_chunk(iff.get_bytestream(), parms[3]);
+    iff.close_chunk();
   }
 }
 
@@ -725,7 +737,7 @@ static GP<GBitmap>
 dilate8(const GBitmap *p_bm)
 {
   const GBitmap& bm = *p_bm;
-  GP<GBitmap> p_newbm = new GBitmap(bm.rows()+2,bm.columns()+2); 
+  GP<GBitmap> p_newbm = GBitmap::create(bm.rows()+2,bm.columns()+2); 
   GBitmap& newbm = *p_newbm;
   for(unsigned int y=0; y<bm.rows(); y++)
     {
@@ -756,15 +768,15 @@ GP<JB2Image>
 dilate8(const JB2Image *im)
 {
   int i;
-  GP<JB2Image> newim = new JB2Image;
+  GP<JB2Image> newim = JB2Image::create();
   newim->set_dimension(im->get_width(),im->get_height());
   for(i=0; i<im->get_shape_count(); i++)
     {
-      const JB2Shape* shape = im->get_shape(i);
+      const JB2Shape &shape = im->get_shape(i);
       JB2Shape newshape;
-      newshape.parent = shape->parent;
-      if (shape->bits) 
-        newshape.bits = dilate8(shape->bits);
+      newshape.parent = shape.parent;
+      if (shape.bits) 
+        newshape.bits = dilate8(shape.bits);
       else
         newshape.bits = 0;
       newim->add_shape(newshape);
@@ -791,8 +803,8 @@ erode8(const GBitmap *p_bm)
   int newnrows = bm.rows()-2;
   int newncolumns = bm.columns()-2;
   if(newnrows<=0 || newncolumns<=0) // then return an empty GBitmap 
-    return new GBitmap;
-  GP<GBitmap> p_newbm = new GBitmap(newnrows,newncolumns); 
+    return GBitmap::create();
+  GP<GBitmap> p_newbm = GBitmap::create(newnrows,newncolumns); 
   GBitmap& newbm = *p_newbm;
   for(int y=0; y<newnrows; y++)
     {
@@ -817,15 +829,15 @@ GP<JB2Image>
 erode8(const JB2Image *im)
 {
   int i;
-  GP<JB2Image> newim = new JB2Image;
+  GP<JB2Image> newim = JB2Image::create();
   newim->set_dimension(im->get_width(),im->get_height());
   for(i=0; i<im->get_shape_count(); i++)
     {
-      const JB2Shape* shape = im->get_shape(i);
+      const JB2Shape &shape = im->get_shape(i);
       JB2Shape newshape;
-      newshape.parent = shape->parent;
-      if (shape->bits) 
-        newshape.bits = erode8(shape->bits);
+      newshape.parent = shape.parent;
+      if (shape.bits) 
+        newshape.bits = erode8(shape.bits);
       else
         newshape.bits = 0;
       newim->add_shape(newshape);

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVmDoc.h,v 1.22 2001-02-15 20:31:57 bcr Exp $
+// $Id: DjVmDoc.h,v 1.23 2001-03-06 19:55:42 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVMDOC_H
@@ -51,7 +51,7 @@ class DataPool;
 
     @memo DjVu multipage documents reader/writer.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: DjVmDoc.h,v 1.22 2001-02-15 20:31:57 bcr Exp $#
+    @version #$Id: DjVmDoc.h,v 1.23 2001-03-06 19:55:42 bcr Exp $#
 */
 
 //@{
@@ -82,13 +82,13 @@ class DataPool;
 
 class DjVmDoc : public GPEnabled
 {
-private:
-   GP<DjVmDir>			dir;
-   GMap<GString, GP<DataPool> >	data;
-
       // Internal function.
-   
+protected:   
+  DjVmDoc(void);
+  void init(void);
 public:
+      /// Creator
+   static GP<DjVmDoc> create(void);
       /** Inserts a file into the document.
           @param data  ByteStream containing the file data.
           @param file_type Describes the type of the file to be inserted.
@@ -169,9 +169,9 @@ public:
 		 If empty, the file will not be created. */
    void		expand(const char * dir_name, const char * idx_name);
       //@}
-
-      /// Constructor
-   DjVmDoc(void);
+private:
+   GP<DjVmDir>			dir;
+   GMap<GString, GP<DataPool> >	data;
 private: // dummy stuff
    static void write(ByteStream *);
    static void write_index(ByteStream *);

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: IW44EncodeCodec.cpp,v 1.8 2001-02-21 00:03:11 bcr Exp $
+// $Id: IW44EncodeCodec.cpp,v 1.9 2001-03-06 19:55:42 bcr Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 08/1998
@@ -132,7 +132,7 @@ public:
       #bs# with no IFF header.  Successive calls to #encode_chunk# encode
       successive chunks.  You must call #close_codec# after encoding the last
       chunk of a file. */
-  virtual int  encode_chunk(ByteStream &bs, const IWEncoderParms &parms);
+  virtual int  encode_chunk(GP<ByteStream> gbs, const IWEncoderParms &parms);
   /** Writes a gray level image into DjVu IW44 file.  This function creates a
       composite chunk (identifier #FORM:BM44#) composed of #nchunks# chunks
       (identifier #BM44#).  Data for each chunk is generated with
@@ -185,7 +185,7 @@ public:
       #bs# with no IFF header.  Successive calls to #encode_chunk# encode
       successive chunks.  You must call #close_codec# after encoding the last
       chunk of a file. */
-  virtual int  encode_chunk(ByteStream &bs, const IWEncoderParms &parms);
+  virtual int  encode_chunk(GP<ByteStream> gbs, const IWEncoderParms &parms);
   /** Writes a color image into a DjVu IW44 file.  This function creates a
       composite chunk (identifier #FORM:PM44#) composed of #nchunks# chunks
       (identifier #PM44#).  Data for each chunk is generated with
@@ -1322,7 +1322,7 @@ IW44Image::create_encode(const ImageType itype)
 }
 
 GP<IW44Image>
-IW44Image::create(const GBitmap &bm, const GP<GBitmap> mask)
+IW44Image::create_encode(const GBitmap &bm, const GP<GBitmap> mask)
 {
   IWBitmap::Encode *bit=new IWBitmap::Encode();
   GP<IW44Image> retval=bit;
@@ -1390,7 +1390,7 @@ IWBitmap::Encode::close_codec(void)
 }
 
 int  
-IWBitmap::Encode::encode_chunk(ByteStream &bs, const IWEncoderParms &parm)
+IWBitmap::Encode::encode_chunk(GP<ByteStream> gbs, const IWEncoderParms &parm)
 {
   // Check
   if (parm.slices==0 && parm.bytes==0 && parm.decibels==0)
@@ -1415,7 +1415,8 @@ IWBitmap::Encode::encode_chunk(ByteStream &bs, const IWEncoderParms &parm)
   DJVU_PROGRESS_TASK(chunk,"encode chunk",parm.slices-cslice);
   {
     float estdb = -1.0;
-    ZPCodec zp(mbs, true, true);
+    GP<ZPCodec> gzp=ZPCodec::create(gmbs, true, true);
+    ZPCodec &zp=*gzp;
     while (flag)
       {
         if (parm.decibels>0  && estdb>=parm.decibels)
@@ -1436,6 +1437,7 @@ IWBitmap::Encode::encode_chunk(ByteStream &bs, const IWEncoderParms &parm)
   struct IW44Image::PrimaryHeader primary;
   primary.serial = cserial;
   primary.slices = nslices;
+  ByteStream &bs=*gbs;
   bs.writall((void*)&primary, sizeof(primary));
   // Write auxilliary headers
   if (cserial == 0)
@@ -1474,7 +1476,7 @@ IWBitmap::Encode::encode_iff(IFFByteStream &iff, int nchunks, const IWEncoderPar
     {
       DJVU_PROGRESS_RUN(iff,i+1);
       iff.put_chunk("BM44");
-      flag = encode_chunk(iff,parms[i]);
+      flag = encode_chunk(iff.get_bytestream(),parms[i]);
       iff.close_chunk();
     }
   iff.close_chunk();
@@ -1482,7 +1484,7 @@ IWBitmap::Encode::encode_iff(IFFByteStream &iff, int nchunks, const IWEncoderPar
 }
 
 GP<IW44Image>
-IW44Image::create(
+IW44Image::create_encode(
   const GPixmap &pm, const GP<GBitmap> gmask, CRCBMode crcbmode)
 {
   IWPixmap::Encode *pix=new IWPixmap::Encode();
@@ -1583,7 +1585,7 @@ IWPixmap::Encode::encode_iff(IFFByteStream &iff, int nchunks, const IWEncoderPar
     {
       DJVU_PROGRESS_RUN(iff,i+1);
       iff.put_chunk("PM44");
-      flag = encode_chunk(iff, parms[i]);
+      flag = encode_chunk(iff.get_bytestream(), parms[i]);
       iff.close_chunk();
     }
   iff.close_chunk();
@@ -1601,7 +1603,7 @@ IWPixmap::Encode::close_codec(void)
 }
 
 int  
-IWPixmap::Encode::encode_chunk(ByteStream &bs, const IWEncoderParms &parm)
+IWPixmap::Encode::encode_chunk(GP<ByteStream> gbs, const IWEncoderParms &parm)
 {
   // Check
   if (parm.slices==0 && parm.bytes==0 && parm.decibels==0)
@@ -1632,7 +1634,8 @@ IWPixmap::Encode::encode_chunk(ByteStream &bs, const IWEncoderParms &parm)
   DJVU_PROGRESS_TASK(chunk, "encode pixmap chunk", parm.slices-cslice);
   {
     float estdb = -1.0;
-    ZPCodec zp(mbs, true, true);
+    GP<ZPCodec> gzp=ZPCodec::create(gmbs, true, true);
+    ZPCodec &zp=*gzp;
     while (flag)
       {
         if (parm.decibels>0  && estdb>=parm.decibels)
@@ -1658,7 +1661,7 @@ IWPixmap::Encode::encode_chunk(ByteStream &bs, const IWEncoderParms &parm)
   struct IW44Image::PrimaryHeader primary;
   primary.serial = cserial;
   primary.slices = nslices;
-  bs.writall((void*)&primary, sizeof(primary));
+  gbs->writall((void*)&primary, sizeof(primary));
   // Write secondary header
   if (cserial == 0)
     {
@@ -1667,7 +1670,7 @@ IWPixmap::Encode::encode_chunk(ByteStream &bs, const IWEncoderParms &parm)
       secondary.minor = IWCODEC_MINOR;
       if (! (crmap && cbmap))
         secondary.major |= 0x80;
-      bs.writall((void*)&secondary, sizeof(secondary));
+      gbs->writall((void*)&secondary, sizeof(secondary));
       struct IW44Image::TertiaryHeader2 tertiary;
       tertiary.xhi = (ymap->iw >> 8) & 0xff;
       tertiary.xlo = (ymap->iw >> 0) & 0xff;
@@ -1675,11 +1678,11 @@ IWPixmap::Encode::encode_chunk(ByteStream &bs, const IWEncoderParms &parm)
       tertiary.ylo = (ymap->ih >> 0) & 0xff;
       tertiary.crcbdelay = (crcb_half ? 0x00 : 0x80);
       tertiary.crcbdelay |= (crcb_delay>=0 ? crcb_delay : 0x00);
-      bs.writall((void*)&tertiary, sizeof(tertiary));
+      gbs->writall((void*)&tertiary, sizeof(tertiary));
     }
   // Write slices
   mbs.seek(0);
-  bs.copy(mbs);
+  gbs->copy(mbs);
   // Return
   cbytes  += mbs.tell();
   cslice  += nslices;
