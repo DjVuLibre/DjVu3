@@ -9,9 +9,9 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: IWImage.cpp,v 1.10 1999-03-17 19:24:58 leonb Exp $
+//C- $Id: IWImage.cpp,v 1.10.2.1 1999-03-23 21:14:09 leonb Exp $
 
-// File "$Id: IWImage.cpp,v 1.10 1999-03-17 19:24:58 leonb Exp $"
+// File "$Id: IWImage.cpp,v 1.10.2.1 1999-03-23 21:14:09 leonb Exp $"
 // - Author: Leon Bottou, 08/1998
 
 #ifdef __GNUC__
@@ -29,8 +29,11 @@
 
 #define IWALLOCSIZE    4080
 #define IWCODEC_MAJOR     1
-#define IWCODEC_MINOR     2
+#define IWCODEC_MINOR     3
 #define DECIBEL_PRUNE   5.0
+
+// Format 1.2 is used when waveshift==2
+#define IWCODEC_MINOR_NOSHIFT  2
 
 
 //////////////////////////////////////////////////////
@@ -223,7 +226,6 @@ backward(short *p, int w, int h, int rowsize, int begin, int end)
 // - iw_quant: quantization for all 16 sub-bands
 // - iw_norm: norm of all wavelets (for db estimation)
 // - iw_border: pixel border required to run filters
-// - iw_shift: scale applied before decomposition
 
 
 static int iw_quant[16] = {
@@ -245,8 +247,6 @@ static float iw_norm[16] = {
 };
 
 static const int iw_border = 3;
-static const int iw_shift  = 6;
-static const int iw_round  = (1<<(iw_shift-1));
 
 
 
@@ -367,7 +367,8 @@ interpolate_mask(short *data16, int w, int h, int rowsize,
 
 static void
 forward_mask(short *data16, int w, int h, int rowsize, int begin, int end,
-             const signed char *mask8, int mskrowsize, int quickmask=0 )
+             const signed char *mask8, int mskrowsize, int quickmask, 
+             int iw_shift, int iw_round )
 {
   int i,j, rp;
   signed char *m;
@@ -649,7 +650,7 @@ class _IWMap // DJVU_CLASS
 {
   // construction
 public:
-  _IWMap(int w, int h);
+  _IWMap(int w, int h, int waveshift);
   ~_IWMap();
   // creation (from image)
   void create(const signed char *img8, int imgrowsize, 
@@ -668,6 +669,9 @@ public:
   int iw, ih;
   int bw, bh;
   int nb;
+  // wavelet rounding
+  int iw_shift;
+  int iw_round;
   // coefficient allocation stuff
   short *alloc(int n);
   short **allocp(int n);
@@ -767,7 +771,7 @@ _IWBlock::write_liftblock(short *coeff, int bmin, int bmax) const
 // *** Class _IWMap [implementation]
 
 
-_IWMap::_IWMap(int w, int h)
+_IWMap::_IWMap(int w, int h,int waveshift)
   :  blocks(0), iw(w), ih(h), chain(0)
 {
   bw = (w+0x20-1) & ~0x1f;
@@ -775,6 +779,8 @@ _IWMap::_IWMap(int w, int h)
   nb = (bw * bh) / (32 * 32);
   blocks = new _IWBlock[nb];
   top = IWALLOCSIZE;
+  iw_shift = waveshift;
+  iw_round = (iw_shift>0 ? (1<<(iw_shift-1)) : 0);
 }
 
 _IWMap::~_IWMap()
@@ -864,7 +870,8 @@ _IWMap::create(const signed char *img8, int imgrowsize,
       // Interpolate pixels below mask
       interpolate_mask(data16, iw, ih, bw, msk8, mskrowsize);
       // Perform decomposition with a mask
-      forward_mask(data16, iw, ih, bw, 1, 32, msk8, mskrowsize, quickmask);
+      forward_mask(data16, iw, ih, bw, 1, 32, msk8, mskrowsize, 
+                   quickmask, iw_shift, iw_round);
     }
   else
     {
@@ -1245,7 +1252,7 @@ _IWCodec::_IWCodec(_IWMap &map, int encoding)
   for (j=1; j<10; j++)
     quant_hi[j] = *q++;
   // -- align on curbit
-  while (quant_lo[0] >= 0x8000)
+  while (quant_lo[0] >= (0x200 << map.iw_shift))
     next_quant();
   // Initialize coding contexts
   memset((void*)ctxStart, 0, sizeof(ctxStart));
@@ -1254,7 +1261,7 @@ _IWCodec::_IWCodec(_IWMap &map, int encoding)
   ctxRoot = 0;
   // The encoder uses emap to track the decoder state
   if (encoding)
-    emap = new _IWMap(map.iw, map.ih);
+    emap = new _IWMap(map.iw, map.ih, map.iw_shift);
 }
 
 
@@ -1885,7 +1892,7 @@ _IWCodec::estimate_decibel(float frac)
   mse = mse / (map.nb - p);
   // Return
   delete [] xmse;
-  float factor = 255 << iw_shift;
+  float factor = 255 << map.iw_shift;
   float decibel = (float)(10.0 * log ( factor * factor / mse ) / 2.302585125);
   return decibel;
 }
@@ -1918,6 +1925,12 @@ struct TertiaryHeader2 {        // VER 1.2
   unsigned char crcbdelay;
 };
 
+struct TertiaryHeader3 {        // VER 1.3
+  unsigned char xhi, xlo;
+  unsigned char yhi, ylo;
+  unsigned char crcbdelay;
+  unsigned char waveshift;
+};
 
 
 //////////////////////////////////////////////////////
@@ -1953,16 +1966,16 @@ IWBitmap::IWBitmap()
 }
 
 
-IWBitmap::IWBitmap(const GBitmap *bm, const GBitmap *mask)
+IWBitmap::IWBitmap(const GBitmap *bm, const GBitmap *mask, int waveshift)
   : db_frac(1.0),
     ymap(0), ycodec(0),
     cslice(0), cserial(0), cbytes(0)
 {
-  init(bm, mask);
+  init(bm, mask, waveshift);
 }
 
 void
-IWBitmap::init(const GBitmap *bm, const GBitmap *mask)
+IWBitmap::init(const GBitmap *bm, const GBitmap *mask, int waveshift)
 {
   // Free
   close_codec();
@@ -1998,7 +2011,7 @@ IWBitmap::init(const GBitmap *bm, const GBitmap *mask)
             bufrow[j] = bconv[bmrow[j]];
         }
       // Create map
-      ymap = new _IWMap( w, h );
+      ymap = new _IWMap( w, h, waveshift );
       ymap->create(buffer, w, msk8, mskrowsize);
     }
   CATCH(ex)
@@ -2140,17 +2153,26 @@ IWBitmap::decode_chunk(ByteStream &bs)
       if (secondary.minor > IWCODEC_MINOR)
         THROW("(IWBitmap::decode_chunk) File has been compressed with a more recent IWCodec");
       // Read tertiary header
-      struct TertiaryHeader2 tertiary;
+      struct TertiaryHeader3 tertiary;
       unsigned int header3size = sizeof(tertiary);
+      if (secondary.minor < 2)
+        header3size = sizeof(TertiaryHeader1);
+      if (secondary.minor < 3)
+        header3size = sizeof(TertiaryHeader2);
       if (bs.readall((void*)&tertiary, header3size) != header3size)
         THROW("(IWBitmap::decode_chunk) Cannot read tertiary header");
       if (! (secondary.major & 0x80))
         THROW("(IWBitmap::decode_chunk) File contains a color image\n");
+      int waveshift = 6;
+      if (header3size >= sizeof(TertiaryHeader3))
+        waveshift = tertiary.waveshift;
+      if (waveshift>6) 
+        waveshift = 6;
       // Create ymap and ycodec
       int w = (tertiary.xhi << 8) | tertiary.xlo;
       int h = (tertiary.yhi << 8) | tertiary.ylo;
       assert(! ymap);
-      ymap = new _IWMap(w, h);
+      ymap = new _IWMap(w, h, waveshift);
       assert(! ycodec);
       ycodec = new _IWCodec(*ymap, 0);
     }
@@ -2224,14 +2246,27 @@ IWBitmap::encode_chunk(ByteStream &bs, const IWEncoderParms &parm)
       struct SecondaryHeader secondary;
       secondary.major = IWCODEC_MAJOR + 0x80;
       secondary.minor = IWCODEC_MINOR;
-      bs.writall((void*)&secondary, sizeof(secondary));
-      struct TertiaryHeader2 tertiary;
+      struct TertiaryHeader3 tertiary;
       tertiary.xhi = (ymap->iw >> 8) & 0xff;
       tertiary.xlo = (ymap->iw >> 0) & 0xff;
       tertiary.yhi = (ymap->ih >> 8) & 0xff;
       tertiary.ylo = (ymap->ih >> 0) & 0xff;
       tertiary.crcbdelay = 0;
+      tertiary.waveshift = ymap->iw_shift;
+      // Waveshift feature is experimental
+      // Revert to version 1.2 when not used.
+#ifdef IWCODEC_MINOR_NOSHIFT
+      int sizeof_tertiary = sizeof(tertiary);
+      if (tertiary.waveshift == 6) {
+        secondary.minor = IWCODEC_MINOR_NOSHIFT;
+        sizeof_tertiary = sizeof(TertiaryHeader2);
+      }
+      bs.writall((void*)&secondary, sizeof(secondary));
+      bs.writall((void*)&tertiary, sizeof_tertiary);
+#else
+      bs.writall((void*)&secondary, sizeof(secondary));
       bs.writall((void*)&tertiary, sizeof(tertiary));
+#endif
     }
   // Write slices
   mbs.seek(0);
@@ -2395,17 +2430,17 @@ IWPixmap::IWPixmap()
 }
 
 
-IWPixmap::IWPixmap(const GPixmap *pm, const GBitmap *mask, CRCBMode crcbmode)
+IWPixmap::IWPixmap(const GPixmap *pm, const GBitmap *mask, CRCBMode crcbmode, int waveshift)
   : crcb_delay(10), crcb_half(0), db_frac(1.0),
     ymap(0), cbmap(0), crmap(0),
     ycodec(0), cbcodec(0), crcodec(0),
     cslice(0), cserial(0), cbytes(0)
 {
-  init(pm, mask, crcbmode);
+  init(pm, mask, crcbmode, waveshift);
 }
 
 void
-IWPixmap::init(const GPixmap *pm, const GBitmap *mask, CRCBMode crcbmode)
+IWPixmap::init(const GPixmap *pm, const GBitmap *mask, CRCBMode crcbmode, int waveshift)
 {
   /* Free */
   close_codec();
@@ -2422,7 +2457,7 @@ IWPixmap::init(const GPixmap *pm, const GBitmap *mask, CRCBMode crcbmode)
       int i;
       buffer = new signed char[w*h];
       // Create maps
-      ymap = new _IWMap(w,h);
+      ymap = new _IWMap(w,h, waveshift);
       // Handle CRCB mode
       switch (crcbmode) 
         {
@@ -2456,7 +2491,7 @@ IWPixmap::init(const GPixmap *pm, const GBitmap *mask, CRCBMode crcbmode)
       if (crcb_delay >= 0)
         {
           // Fill buffer with CB information
-          cbmap = new _IWMap(w,h);
+          cbmap = new _IWMap(w,h, waveshift);
           for (i=0; i<h; i++)
             {
               signed char *bufrow = buffer + i*w;
@@ -2467,7 +2502,7 @@ IWPixmap::init(const GPixmap *pm, const GBitmap *mask, CRCBMode crcbmode)
           // Create chrominance map (CB) with half resolution
           cbmap->create(buffer, w, msk8, mskrowsize, crcb_half);
           // Fill buffer with CR information
-          crmap = new _IWMap(w,h);
+          crmap = new _IWMap(w,h, waveshift);
           for (i=0; i<h; i++)
             {
               signed char *bufrow = buffer + i*w;
@@ -2682,10 +2717,12 @@ IWPixmap::decode_chunk(ByteStream &bs)
       if (secondary.minor > IWCODEC_MINOR)
         THROW("(IWPixmap::decode_chunk) File has been compressed with a more recent IWCodec");
       // Read tertiary header
-      struct TertiaryHeader2 tertiary;
+      struct TertiaryHeader3 tertiary;
       unsigned int header3size = sizeof(tertiary);
       if (secondary.minor < 2)
         header3size = sizeof(TertiaryHeader1);
+      if (secondary.minor < 3)
+        header3size = sizeof(TertiaryHeader2);
       if (bs.readall((void*)&tertiary, header3size) != header3size)
         THROW("(IWBitmap::decode_chunk) Cannot read tertiary header");
       // Handle header information
@@ -2699,15 +2736,20 @@ IWPixmap::decode_chunk(ByteStream &bs)
         crcb_half = (tertiary.crcbdelay & 0x80 ? 0 : 1);
       if (secondary.major & 0x80)
         crcb_delay = -1;
+      int waveshift = 6;
+      if (header3size >= sizeof(TertiaryHeader3))
+        waveshift = tertiary.waveshift;
+      if (waveshift>6) 
+        waveshift = 6;
       // Create ymap and ycodec      
       assert(! ymap);
       assert(! ycodec);
-      ymap = new _IWMap(w, h);
+      ymap = new _IWMap(w, h, waveshift);
       ycodec = new _IWCodec(*ymap, 0);
       if (crcb_delay >= 0)
         {
-          cbmap = new _IWMap(w, h);
-          crmap = new _IWMap(w, h);
+          cbmap = new _IWMap(w, h, waveshift);
+          crmap = new _IWMap(w, h, waveshift);
           cbcodec = new _IWCodec(*cbmap, 0);
           crcodec = new _IWCodec(*crmap, 0);
         }
@@ -2799,15 +2841,28 @@ IWPixmap::encode_chunk(ByteStream &bs, const IWEncoderParms &parm)
       secondary.minor = IWCODEC_MINOR;
       if (! (crmap && cbmap))
         secondary.major |= 0x80;
-      bs.writall((void*)&secondary, sizeof(secondary));
-      struct TertiaryHeader2 tertiary;
+      struct TertiaryHeader3 tertiary;
       tertiary.xhi = (ymap->iw >> 8) & 0xff;
       tertiary.xlo = (ymap->iw >> 0) & 0xff;
       tertiary.yhi = (ymap->ih >> 8) & 0xff;
       tertiary.ylo = (ymap->ih >> 0) & 0xff;
       tertiary.crcbdelay = (crcb_half ? 0x00 : 0x80);
       tertiary.crcbdelay |= (crcb_delay>=0 ? crcb_delay : 0x00);
+      tertiary.waveshift = ymap->iw_shift;
+      // Waveshift feature is experimental
+      // Revert to version 1.2 when not used.
+#ifdef IWCODEC_MINOR_NOSHIFT
+      int sizeof_tertiary = sizeof(tertiary);
+      if (tertiary.waveshift == 6) {
+        secondary.minor = IWCODEC_MINOR_NOSHIFT;
+        sizeof_tertiary = sizeof(TertiaryHeader2);
+      }
+      bs.writall((void*)&secondary, sizeof(secondary));
+      bs.writall((void*)&tertiary, sizeof_tertiary);
+#else
+      bs.writall((void*)&secondary, sizeof(secondary));
       bs.writall((void*)&tertiary, sizeof(tertiary));
+#endif
     }
   // Write slices
   mbs.seek(0);

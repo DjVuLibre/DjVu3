@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: IWImage.h,v 1.11 1999-03-17 19:24:58 leonb Exp $
+//C- $Id: IWImage.h,v 1.11.2.1 1999-03-23 21:14:10 leonb Exp $
 
 #ifndef _IWIMAGE_H_
 #define _IWIMAGE_H_
@@ -106,7 +106,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: IWImage.h,v 1.11 1999-03-17 19:24:58 leonb Exp $# */
+    #$Id: IWImage.h,v 1.11.2.1 1999-03-23 21:14:10 leonb Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -176,14 +176,17 @@ public:
       \Ref{decode_iff} or \Ref{decode_chunk} to populate the wavelet
       coefficient data structure. */
   IWBitmap();
-  /** Initializes an IWBitmap with image #bm#.  This constructor
-      performs the wavelet decomposition of image #bm# and records the
-      corresponding wavelet coefficient.  Argument #mask# is an optional
-      bilevel image specifying the masked pixels (see \Ref{IWImage.h}). */
-  void init(const GBitmap *bm, const GBitmap *mask=0);
+  /** Initializes an IWBitmap with image #bm#.  This constructor performs the
+      wavelet decomposition of image #bm# and records the corresponding
+      wavelet coefficient.  Argument #mask# is an optional bilevel image
+      specifying the masked pixels (see \Ref{IWImage.h}).  Argument
+      #waveshift# selects the wavelet rounding mode. Acceptable values range
+      from 6 (the default) to 0. Smaller values are better for high quality
+      images. */
+  void init(const GBitmap *bm, const GBitmap *mask=0, int waveshift=6);
   /** Convenience constructor. This constructors creates an empty IWBitmap
       and then calls function \Ref{init} above. */
-  IWBitmap(const GBitmap *bm, const GBitmap *mask=0);
+  IWBitmap(const GBitmap *bm, const GBitmap *mask=0, int waveshift=6);
   // Virtual destructor
   ~IWBitmap();
   // ACCESS
@@ -311,11 +314,15 @@ public:
       corresponding wavelet coefficient.  Argument #mask# is an optional
       bilevel image specifying the masked pixels (see \Ref{IWImage.h}).
       Argument #crcbmode# specifies how the chrominance information should be
-      encoded (see \Ref{CRCBMode}). */
-  void init(const GPixmap *bm, const GBitmap *mask=0, CRCBMode crcbmode=CRCBnormal);
+      encoded (see \Ref{CRCBMode}).  Argument #waveshift# selects the wavelet
+      rounding mode. Acceptable values range from 6 (the default) to
+      0. Smaller values are better for high quality images. */
+  void init(const GPixmap *bm, const GBitmap *mask=0, 
+            CRCBMode crcbmode=CRCBnormal, int waveshift=6);
   /** Convenience constructor. This constructors creates an empty IWBitmap
       and then calls function \Ref{init} above. */
-  IWPixmap(const GPixmap *bm, const GBitmap *mask=0, CRCBMode crcbmode=CRCBnormal );
+  IWPixmap(const GPixmap *bm, const GBitmap *mask=0, 
+           CRCBMode crcbmode=CRCBnormal, int waveshift=6);
   // Virtual destructor.
   ~IWPixmap();
   // ACCESS

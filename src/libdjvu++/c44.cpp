@@ -4,12 +4,12 @@
 //C-
 //C- This software may only be used by you under license from AT&T
 //C- Corp. ("AT&T"). A copy of AT&T's Source Code Agreement is available at
-//C- AT&T's Internet website having the URL <http://www.djvu.att.com/open>.
+//C- AT&T's Internet website having the URL http://www.djvu.att.com/open>.
 //C- If you received this software without first entering into a license with
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: c44.cpp,v 1.15 1999-03-17 19:24:59 leonb Exp $
+//C- $Id: c44.cpp,v 1.15.2.1 1999-03-23 21:14:10 leonb Exp $
 
 
 /** @name c44
@@ -151,7 +151,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: c44.cpp,v 1.15 1999-03-17 19:24:59 leonb Exp $# */
+    #$Id: c44.cpp,v 1.15.2.1 1999-03-23 21:14:10 leonb Exp $# */
 //@{
 //@}
 
@@ -170,6 +170,7 @@ GString iw4file;
 GString mskfile;
 
 int flag_mask = 0;
+int flag_waveshift = 0;
 int flag_bpp = 0;
 int flag_size = 0;
 int flag_slice = 0;
@@ -177,6 +178,7 @@ int flag_decibel = 0;
 int flag_crcbdelay = -1;
 int flag_crcbmode = -1;  
 float flag_dbfrac = -1;
+int arg_waveshift = 6;
 int argc_bpp = 0;
 int argc_size = 0;
 int argc_slice = 0;
@@ -212,6 +214,9 @@ usage()
          "                        of the most misrepresented 32x32 blocks\n"
          "    -mask pbmfile    -- select bitmask specifying image zone to encode\n"
          "                        with minimal bitrate. (default none)\n"
+         "    -waveshift n     -- controls wavelet rounding. Argument n ranges from 0\n"
+         "                        to 6 (default). Smaller values are better for high\n"
+         "                        quality images.\n"
          "\n"
          "Quality selection:\n"
          "    Chunks are generated until meeting either the decibel target (-decibel)\n"
@@ -434,6 +439,17 @@ parse(int argc, char **argv)
                 THROW("c44: multiple bitrate specification");
               parse_size(argv[i]);
             }
+          else if (!strcmp(argv[i],"-waveshift"))
+            {
+              if (++i >= argc)
+                THROW("c44: no argument for option '-waveshift'");
+              if (flag_waveshift>0)
+                THROW("c44: multiple waveshift specification");
+              if (argv[i][0]<'0' || argv[i][0]>'6' || argv[i][1])
+                THROW("c44: illegal waveshift specification");                
+              flag_waveshift = 1;
+              arg_waveshift = argv[i][0] - '0';
+            }
           else if (!strcmp(argv[i],"-decibel"))
             {
               if (++i >= argc)
@@ -576,7 +592,7 @@ main(int argc, char **argv)
           GPixmap ipm(ibs);
           w = ipm.columns();
           h = ipm.rows();
-          iwp = new IWPixmap(&ipm, getmask(w,h), arg_crcbmode);
+          iwp = new IWPixmap(&ipm, getmask(w,h), arg_crcbmode, arg_waveshift);
         }
       else if (prefix[0]=='P' && (prefix[1]=='2' || prefix[1]=='5'))
         {
@@ -585,7 +601,7 @@ main(int argc, char **argv)
           GBitmap ibm(ibs);
           w = ibm.columns();
           h = ibm.rows();
-          iwb = new IWBitmap(&ibm, getmask(w,h));
+          iwb = new IWBitmap(&ibm, getmask(w,h), arg_waveshift);
         }
       else if (!strncmp(prefix,"AT&TFORM",8) || !strncmp(prefix,"FORM",4))
         {
