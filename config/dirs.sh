@@ -31,7 +31,7 @@
 #C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #
-# $Id: dirs.sh,v 1.15 2001-06-22 23:58:01 mchen Exp $
+# $Id: dirs.sh,v 1.16 2001-06-26 15:06:22 bcr Exp $
 # $Name:  $
 
 # This script sets the variables:
@@ -46,6 +46,14 @@ fi
 if [ -z "$CONFIG_CACHE" ] ; then
   echo "Setting default paths"
   TOPSRCDIR=`cd "${CONFIG_DIR}/.." 1>>/dev/null 2>>/dev/null;"${pwdcmd}"`
+  if [ ! -d SRCDIR ]
+  then
+    ln -f -s  "$TOPSRCDIR" SRCDIR
+  fi
+  if [ ! -d TOPDIR/. ]
+  then
+    ln -f -s . TOPDIR
+  fi
   PROJECT=`echo  $PROGRAM_NAME|sed 's,^.*-,,g'`
   s=`${pwdcmd}`
   if [ "$TOPSRCDIR" != "$s" ] ; then
@@ -59,7 +67,7 @@ if [ -z "$CONFIG_CACHE" ] ; then
   fi
   CONFIG_CACHE="$TOPBUILDDIR"/config.cache
   CONFIG_H_CACHE="$TOPBUILDDIR"/config.h.cache
-  CONFIG_H="$TOPBUILDDIR"/src/include/config.h
+  CONFIG_H=./TOPDIR/src/include/config.h
   DEFS="-imacros $CONFIG_H"
   CONFIG_STATUS="$TOPBUILDDIR"/config.status
   CONFIG_LOG="$TOPBUILDDIR"/config.log
