@@ -9,9 +9,9 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GOS.cpp,v 1.8 1999-06-08 20:36:25 leonb Exp $
+//C- $Id: GOS.cpp,v 1.9 1999-11-09 19:26:52 eaf Exp $
 
-// "$Id: GOS.cpp,v 1.8 1999-06-08 20:36:25 leonb Exp $"
+// "$Id: GOS.cpp,v 1.9 1999-11-09 19:26:52 eaf Exp $"
 
 #ifdef __GNUC__
 #pragma implementation
@@ -155,6 +155,7 @@ GString
 GOS::dirname(const char *fname)
 {
   /* UNIX implementation */  
+  if (!fname) fname="";
 #ifdef UNIX
   GString temp;
   char *string_buffer = temp.getbuf(strlen(fname)+16);
@@ -242,6 +243,7 @@ GOS::dirname(const char *fname)
 GString 
 GOS::basename(const char *fname, const char *suffix)
 {
+  if (!fname) fname="";
   /* UNIX implementation */
 #ifdef UNIX
   char *s = strrchr(fname,'/');
