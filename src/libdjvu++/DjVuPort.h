@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuPort.h,v 1.16 1999-09-12 19:11:52 eaf Exp $
+//C- $Id: DjVuPort.h,v 1.17 1999-09-16 22:04:13 eaf Exp $
  
 #ifndef _DJVUPORT_H
 #define _DJVUPORT_H
@@ -71,7 +71,7 @@
     @memo DjVu decoder communication mechanism.
     @author Andrei Erofeev <eaf@geocities.com>\\
             L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuPort.h,v 1.16 1999-09-12 19:11:52 eaf Exp $# */
+    @version #$Id: DjVuPort.h,v 1.17 1999-09-16 22:04:13 eaf Exp $# */
 //@{
 
 class DjVuPort;
@@ -309,6 +309,11 @@ public:
 
    virtual ~DjVuPortcaster(void);
 
+      /** Removes the specified port from all routes. It will no longer
+	  be able to receive or generate messages and will be considered
+          {\bf "dead"} by \Ref{is_port_alive}() function. */
+   void		del_port(const DjVuPort * port);
+   
       /** Adds route from #src# to #dst#. Whenever a request is
 	  sent or received by #src#, it will be forwarded to #dst# as well.
 	  @param src The source
@@ -407,7 +412,6 @@ private:
    GMap<const void *, void *>	cont_map;	// GMap<DjVuPort *, DjVuPort *>
    GMap<GString, const void *>	n2p_map;	// GMap<GString, DjVuPort *>
    GMap<const void *, void *>	p2n_map;	// GMap<DjVuPort *, const char *>
-   void del_port(const DjVuPort * port);
    void add_to_closure(GMap<const void*, void*> & set,
                        const DjVuPort *dst, int distance);
    void compute_closure(const DjVuPort *src, GPList<DjVuPort> &list,
