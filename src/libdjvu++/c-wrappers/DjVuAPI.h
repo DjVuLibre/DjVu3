@@ -1,4 +1,4 @@
-/* File "$Id: DjVuAPI.h,v 1.2 1999-11-10 17:18:30 parag Exp $"
+/* File "$Id: DjVuAPI.h,v 1.3 1999-11-10 17:55:01 parag Exp $"
  *
  * The main header file for the DjVu API
  */
@@ -11,7 +11,10 @@
 
 /* 
  * $Log: DjVuAPI.h,v $
- * Revision 1.2  1999-11-10 17:18:30  parag
+ * Revision 1.3  1999-11-10 17:55:01  parag
+ * Rotate90_CW
+ *
+ * Revision 1.2  1999/11/10 17:18:30  parag
  * Added Orientation Flags in run and pixel img
  *
  * Revision 1.1  1999/11/04 20:41:06  orost
@@ -158,9 +161,9 @@ typedef enum {
  /* Mirror and Rotate90 is added to represent the orientation of any tiff
   * image.
 	*/
-#define 						 DJVU_PIXEL_MIRROR     0x20
-#define 						 DJVU_PIXEL_ROTATE90   0x40
-#define              DJVU_PIXEL_BOTTOM_UP  0x02
+#define 						 DJVU_PIXEL_MIRROR        0x20
+#define 						 DJVU_PIXEL_ROTATE90_CW   0x40
+#define              DJVU_PIXEL_BOTTOM_UP     0x02
 
 // This class is for PNM IO.
 /*
