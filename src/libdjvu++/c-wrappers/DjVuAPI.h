@@ -1,4 +1,4 @@
-/* File "$Id: DjVuAPI.h,v 1.6 1999-11-23 15:54:08 orost Exp $"
+/* File "$Id: DjVuAPI.h,v 1.7 1999-11-24 19:21:50 orost Exp $"
  *
  * The main header file for the DjVu API
  */
@@ -11,7 +11,10 @@
 
 /* 
  * $Log: DjVuAPI.h,v $
- * Revision 1.6  1999-11-23 15:54:08  orost
+ * Revision 1.7  1999-11-24 19:21:50  orost
+ * added djvu_pixel_rotate
+ *
+ * Revision 1.6  1999/11/23 15:54:08  orost
  * additions for DjVu3
  *
  * Revision 1.5  1999/11/18 00:17:12  parag
@@ -914,14 +917,6 @@ io_run_to_pixel(const djvu_run_image *rimg); /** ONLY internally used */
  */ 
 DJVUAPI void
 io_free_callback(void * callbackStruct);
-
-/* 
- *      djvu_pixel_copy_scaled  // depreciated, use djvu_pixel_copy_transformed
- *
- * 		See DjVuAPI-2_0.html#djvu_pixel_copy_scaled
- */
-DJVUAPI djvu_pixel_image *
-djvu_pixel_copy_scaled(const djvu_pixel_image *pimg,const int scale,const int quality);
 /*
  *      djvu_pixel_copy_transformed
  *
@@ -938,6 +933,13 @@ djvu_pixel_copy_transformed
 DJVUAPI djvu_pixel_image *
 djvu_pixel_transform
 (djvu_pixel_image *pimg,int angle,int w,int h);
+/*
+ *      djvu_pixel_rotate
+ *
+ *		Not documented yet.
+ */
+DJVUAPI djvu_pixel_image *
+djvu_pixel_rotate(djvu_pixel_image *pimg, int angle);
 /* 
  *      djvu_run_to_pnm
  *
