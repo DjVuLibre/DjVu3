@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessageLite.cpp,v 1.4 2001-06-25 23:33:38 bcr Exp $
+// $Id: DjVuMessageLite.cpp,v 1.5 2001-07-13 01:05:27 fcrary Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -141,6 +141,9 @@ DjVuMessageLite::perror( const GUTF8String & MessageList )
 GUTF8String
 DjVuMessageLite::LookUp( const GUTF8String & MessageList ) const
 {
+  DEBUG_MSG( "========== DjVuMessageLite::LookUp ==========\n" <<
+             MessageList <<
+             "\n========== DjVuMessageLite::LookUp ==========\n" );
   GUTF8String result;                       // Result string; begins empty
   if(errors.length())
   {

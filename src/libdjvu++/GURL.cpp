@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GURL.cpp,v 1.79 2001-07-12 22:54:28 bcr Exp $
+// $Id: GURL.cpp,v 1.80 2001-07-13 01:05:27 fcrary Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -1286,7 +1286,7 @@ GURL::UTF8Filename(void) const
       url_ptr += sizeof(localhostspec1)-1;
     else if ( !GStringRep::cmp(localhostspec2, url_ptr, sizeof(localhostspec2)-1 ) )   // RFC 1738 local host form
       url_ptr += sizeof(localhostspec2)-1;
-    else if ( (strlen(url_ptr) > 4) // "file://<letter>:/<path>"
+    else if ( (strlen(url_ptr) > 4)   // "file://<letter>:/<path>"
         && (url_ptr[0] == slash)      // "file://<letter>|/<path>"
         && (url_ptr[1] == slash)
         && isalpha(url_ptr[2])
@@ -1669,59 +1669,58 @@ GURL::expand_name(const GUTF8String &xfname, const char *from)
   }
 #elif defined (WIN32) && !defined (UNDER_CE) // WIN32 implementation
   // Handle base
-  strcpy(string_buffer, (char const *)(from?expand_name(from):GOS::cwd()));
-//  GNativeString native;
+  strcpy(string_buffer, (char const *)(from ? expand_name(from) : GOS::cwd()));
+  //  GNativeString native;
   if (fname)
   {
     char *s = string_buffer;
     char  drv[4];
     // Handle absolute part of fname
+    //      Put absolute part of the file name in string_buffer, and
+    //      the relative part pointed to by fname.
     if (fname[0]== slash || fname[0]== backslash)
     {
       if (fname[1]== slash || fname[1]== backslash)
-      { // Case "//abcd"
+      {       // Case "//abcd"
         s[0]=s[1]= backslash; s[2]=0;
-      } else
-      { // Case "/abcd" 
-          /*
-        if( _getdrive() )
-        {
-            if (s[0]==0 || s[1]!=colon)
-            {
-              s[0] = _getdrive() + 'A' - 1;
-            }
-            s[1]=colon;   
-        }
-        
-        s[2]= 0;
-        */
-          s[0]=s[1]= backslash; s[2]=0;
       }
-    } else if (fname[0] && fname[1]==colon)
+      else
+      {       // Case "/abcd" or "/"
+              //    File is at the root of the current drive. Delete the
+              //    slash at the beginning of the filename and leave
+              //    an explicit identification of the root of the drive in
+              //    string_buffer.
+        fname++;
+        s[3] = '\0';
+      }
+    }
+    else if (fname[0] && fname[1]==colon)
     {
       if (fname[2]!= slash && fname[2]!= backslash)
-      { // Case "x:abcd"
+      {       // Case "x:abcd"
         if ( toupper((unsigned char)s[0]) != toupper((unsigned char)fname[0])
-             || s[1]!=colon)
+          || s[1]!=colon)
         {
           drv[0]=fname[0];
           drv[1]=colon;
           drv[2]= dot ;
           drv[3]=0;
           GetFullPathName(drv, maxlen, string_buffer, &s);
-		  strcpy(string_buffer,(const char *)GUTF8String(string_buffer).getNative2UTF8());
+          strcpy(string_buffer,(const char *)GUTF8String(string_buffer).getNative2UTF8());
           s = string_buffer;
         }
         fname += 2;
-      } else if (fname[3]!= slash && fname[3]!= backslash)
-      { // Case "x:/abcd"
+      }
+      else if (fname[3]!= slash && fname[3]!= backslash)
+      {       // Case "x:/abcd"
         s[0]=toupper((unsigned char)fname[0]);
         s[1]=colon;
         s[2]=backslash;
         s[3]=0;
         fname += 3;
-      }else
-      { // Case "x://abcd"
+      }
+      else
+      {       // Case "x://abcd"
         s[0]=s[1]=backslash;
         s[2]=0;
         fname += 4;
@@ -1742,24 +1741,24 @@ GURL::expand_name(const GUTF8String &xfname, const char *from)
           && (fname[2]== slash || fname[2]==backslash || !fname[2]))
         {
           fname += 2;
-		  char *back=_tcsrchr(string_buffer,backslash);
-		  char *forward=_tcsrchr(string_buffer,slash);
-		  if(back>forward)
-		  {
-			*back=0;
-		  }else if(forward)
-		  {
+          char *back=_tcsrchr(string_buffer,backslash);
+          char *forward=_tcsrchr(string_buffer,slash);
+          if(back>forward)
+          {
+            *back=0;
+          }else if(forward)
+          {
             *forward=0;
-		  }
+          }
           s = string_buffer;
           continue;
         }
-		char* s2=s;//MBCS DBCS
+        char* s2=s;//MBCS DBCS
         for(;*s;s++) 
           EMPTY_LOOP;
-		char* back = _tcsrchr(s2,backslash);//MBCS DBCS
+        char* back = _tcsrchr(s2,backslash);//MBCS DBCS
         if ((s>string_buffer)&&(*(s-1)!= slash)&&(back == NULL || (back!=NULL && s-1 != back) ))//MBCS DBCS
-        //if ((s>string_buffer)&&(*(s-1)!= slash)&&(*(s-1)!= backslash))
+          //if ((s>string_buffer)&&(*(s-1)!= slash)&&(*(s-1)!= backslash))
         {
           *s = backslash;
           s++;
@@ -1772,12 +1771,12 @@ GURL::expand_name(const GUTF8String &xfname, const char *from)
         }
         *s = 0;
       }
-	  char* s2=s;//MBCS DBCS
+      char* s2=s;//MBCS DBCS
       for(;*s;s++) 
         EMPTY_LOOP;
-	  char* back = _tcsrchr(s2,backslash);//MBCS DBCS
+      char* back = _tcsrchr(s2,backslash);//MBCS DBCS
       if ((s>string_buffer)&&(*(s-1)!= slash)&&(back == NULL || (back!=NULL && s-1 != back) ))//MBCS DBCS
-      //if ((s == string_buffer)||((*(s-1)!= slash) && (*(s-1)!=backslash)))
+        //if ((s == string_buffer)||((*(s-1)!= slash) && (*(s-1)!=backslash)))
       {
         *s = backslash;
         s++;
@@ -1795,12 +1794,12 @@ GURL::expand_name(const GUTF8String &xfname, const char *from)
   }
 #elif defined(macintosh) // MACINTOSH implementation
   strcpy(string_buffer, (const char *)(from?from:GOS::cwd()));
-
+  
   if (!GStringRep::cmp(fname, string_buffer,strlen(string_buffer)) || is_file(fname))
   {
     strcpy(string_buffer, "");//please don't expand, the logic of filename is chaos.
   }
-    
+  
   // Process path components
   char *s = string_buffer + strlen(string_buffer);
   if(fname)
@@ -1817,7 +1816,7 @@ GURL::expand_name(const GUTF8String &xfname, const char *from)
           continue;
         }
         if ((fname[1]== dot )
-             &&(fname[2]==colon || fname[2]==0))
+          &&(fname[2]==colon || fname[2]==0))
         {
           fname +=2;
           for(;(s>string_buffer+1)&&(*(s-1)==colon);s--)
