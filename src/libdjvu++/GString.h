@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: GString.h,v 1.21 2000-12-01 22:54:16 fcrary Exp $
+// $Id: GString.h,v 1.22 2000-12-06 00:30:26 fcrary Exp $
 // $Name:  $
 
 #ifndef _GSTRING_H_
@@ -58,7 +58,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.21 2000-12-01 22:54:16 fcrary Exp $# */
+    #$Id: GString.h,v 1.22 2000-12-06 00:30:26 fcrary Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -121,6 +121,8 @@ public:
   /** Copy constructor. Constructs a string by copying the string #gs#. */
   GString(const GString &gs)
     : GP<GStringRep>(gs) { } 
+  /** Constructs a string from a character. */
+  GString(const char dat);
   /** Constructs a string from a null terminated character array. */ 
   GString(const char *dat);
   /** Constructs a string from a character array.  Elements of the character
