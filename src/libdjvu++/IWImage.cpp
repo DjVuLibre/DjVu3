@@ -21,9 +21,9 @@
 //C-     (C) AT&T Corp. All rights reserved.
 //C-     AT&T is a registered trademark of AT&T Corp.
 //C-
-//C- $Id: IWImage.cpp,v 1.7 1999-03-15 18:28:52 leonb Exp $
+//C- $Id: IWImage.cpp,v 1.8 1999-03-16 18:58:09 leonb Exp $
 
-// File "$Id: IWImage.cpp,v 1.7 1999-03-15 18:28:52 leonb Exp $"
+// File "$Id: IWImage.cpp,v 1.8 1999-03-16 18:58:09 leonb Exp $"
 // - Author: Leon Bottou, 08/1998
 
 #ifdef __GNUC__
@@ -1515,7 +1515,7 @@ _IWCodec::encode_buckets(_ZPCodecBias &zp, int bit, int band,
                         // Set encoder state
                         if (band==0)
                           thres = quant_lo[i];
-                        epcoeff[i] = thres + ((thres+1)>>1);
+                        epcoeff[i] = thres + (thres>>1);
                       }
 #ifndef NOCTX_EXPECT
                     if (cstate[i] & NEW)
@@ -1718,7 +1718,7 @@ _IWCodec::decode_buckets(_ZPCodecBias &zp, int bit, int band,
                     if (zp.decoder( ctxStart[ctx] ))
                       {
                         cstate[i] |= NEW;
-                        int halfthres = (thres+1)>>1;
+                        int halfthres = thres>>1;
                         int coeff = thres+halfthres-(halfthres>>2);
                         if (zp.decoder())
                           pcoeff[i] = -coeff;
