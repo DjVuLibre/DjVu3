@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.cpp,v 1.37 1999-12-13 20:07:05 eaf Exp $
+//C- $Id: DataPool.cpp,v 1.38 1999-12-22 21:00:50 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -1010,7 +1010,7 @@ DataPool::check_triggers(void)
    DEBUG_MAKE_INDENT(3);
 
    if (!pool && !fname.length())
-      while(1)
+      while(true)
       {
 	 GP<Trigger> trigger;
 	 {
@@ -1028,7 +1028,15 @@ DataPool::check_triggers(void)
 	    }
 	 }
 	 if (!trigger) break;
-	 else call_callback(trigger->callback, trigger->cl_data);
+	 else
+	 {
+	       // Lock the trigger so that the owner of the 'callback'
+	       // will not be able to delete the trigger right when
+	       // we're trying to activate it.
+	    GMonitorLock lock(&trigger->disabled);
+	    if (!trigger->disabled)
+	       call_callback(trigger->callback, trigger->cl_data);
+	 }
       }
 }
 
@@ -1090,6 +1098,7 @@ DataPool::del_trigger(void (* callback)(void *), void * cl_data)
       GP<Trigger> t=triggers_list[pos];
       if (t->callback==callback && t->cl_data==cl_data)
       {
+	 t->disabled=1;
 	 GPosition this_pos=pos;
 	 ++pos;
 	 triggers_list.del(this_pos);
