@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.96 2001-05-04 16:21:21 bcr Exp $
+// $Id: GString.cpp,v 1.97 2001-05-16 22:37:18 fcrary Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -218,7 +218,7 @@ GStringRep::UTF8::append(const GP<GStringRep> &s2) const
   {
     if(s2->isNative())
     {
-      G_THROW("GStringRep.appendNativeToUTF8");
+      G_THROW( ERR_MSG("GStringRep.appendNativeToUTF8") );
     }
     retval=concat(data,s2->data);
   }else
@@ -236,7 +236,7 @@ GStringRep::Native::append(const GP<GStringRep> &s2) const
   {
     if(s2->isUTF8())
     {
-      G_THROW("GStringRep.appendUTF8toNative");
+      G_THROW( ERR_MSG("GStringRep.appendUTF8toNative") );
     }
     retval=concat(data,s2->data);
   }else
@@ -1049,7 +1049,7 @@ GP<GStringRep>
 GStringRep::Native::toNative(const bool nothrow) const
 {
   if(!nothrow)
-    G_THROW("GStringRep.NativeToNative");
+    G_THROW( ERR_MSG("GStringRep.NativeToNative") );
   return const_cast<GStringRep::Native *>(this);
 }
 
@@ -1116,7 +1116,7 @@ GP<GStringRep>
 GStringRep::UTF8::toUTF8(const bool nothrow) const
 {
   if(!nothrow)
-    G_THROW("GStringRep.UTF8ToUTF8");
+    G_THROW( ERR_MSG("GStringRep.UTF8ToUTF8") );
   return const_cast<GStringRep::UTF8 *>(this);
 }
 
