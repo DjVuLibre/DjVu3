@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuOptions.h,v 1.4 2000-02-03 19:10:00 bcr Exp $
+ *C- $Id: DjVuOptions.h,v 1.5 2000-02-14 21:59:22 haffner Exp $
  */
 
 #ifndef _DJVU_OPTIONS_H_
@@ -140,7 +140,9 @@ extern const char djvu_resolution_multiplier_string[];
 extern const char djvu_high_variation_foreground_string[];
 extern const char djvu_refine_string[];
 extern const char djvu_sub_chrom_string[];
+extern const char djvu_background_floss_string[];
 
+#define djvu_background_floss_option {djvu_sub_chrom_string+2,0,0,0xf8}
 #define djvu_sub_chrom_option {djvu_sub_chrom_string+2,0,0,0xf8}
 #define djvu_threshold_level_option {djvu_threshold_level_string+2,1,0,0xf5}
 #define djvu_shape_filter_level_option {djvu_shape_filter_level_string+2,1,0,0xf4}

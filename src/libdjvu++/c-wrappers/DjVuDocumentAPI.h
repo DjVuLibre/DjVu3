@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuDocumentAPI.h,v 1.16 2000-02-02 22:00:14 haffner Exp $
+ *C- $Id: DjVuDocumentAPI.h,v 1.17 2000-02-14 21:59:21 haffner Exp $
  */
 
 #ifndef _DJVUDOC_H_
@@ -355,10 +355,25 @@ typedef struct djvu_segmenter_options_struct
 
   /** Segmenter uses subsampled chrominance only.
       
-      Use a full resolution chrominance when computing the foreground image, 
-      to allow for a maximum color saturation */
+      This option designed to save memory. It shoud be avoided 
+      when maximum color saturation is desired for 
+      the foreground image. Automatically turned off when
+      \Ref{background_floss} is on.
+
+      Using sub-chrominance implies that a faithful restitution of the
+      foreground color is not critical: the
+      \Ref{djvu_foreground_options_struct::color_jb2} option is automatically
+      turned on for improved compression.
+      
+  */
   int masksub_sub_chrom;
 
+  /** Sample background color in small intervals between character.
+
+     Generally causes larger files and less smooth background.
+     Necessary when characters are thick (typically when upsampling).
+  */
+  int background_floss;
   /*@}*/
 
 #ifdef __cplusplus 
