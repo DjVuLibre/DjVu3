@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuAnno.cpp,v 1.15 1999-09-29 21:52:44 eaf Exp $
+//C- $Id: DjVuAnno.cpp,v 1.16 1999-09-30 19:16:13 eaf Exp $
 
 
 #ifdef __GNUC__
@@ -511,7 +511,7 @@ DjVuAnno::decode(class GLParser & parser)
    mode=get_mode(parser);
    hor_align=get_hor_align(parser);
    ver_align=get_ver_align(parser);
-   get_hlinks(parser, rect_hlinks, poly_hlinks, oval_hlinks);
+   map_areas=get_map_areas(parser);
 }
 
 void 
@@ -725,15 +725,13 @@ DjVuAnno::get_ver_align(GLParser & parser)
    return ALIGN_UNSPEC;
 }
 
-void
-DjVuAnno::get_hlinks(GLParser & parser, GPList<GHLRect> & rect_hlinks,
-		     GPList<GHLPoly> & poly_hlinks,
-		     GPList<GHLOval> & oval_hlinks)
+GPList<GMapArea>
+DjVuAnno::get_map_areas(GLParser & parser)
 {
-   DEBUG_MSG("DjVuAnno::get_hlinks(): forming and returning back list of hyperlinks\n");
+   DEBUG_MSG("DjVuAnno::get_map_areas(): forming and returning back list of map areas\n");
    DEBUG_MAKE_INDENT(3);
 
-   rect_hlinks.empty(); poly_hlinks.empty(); oval_hlinks.empty();
+   GPList<GMapArea> map_areas;
    
    GPList<GLObject> list=parser.get_list();
    for(GPosition pos=list;pos;++pos)
@@ -741,9 +739,8 @@ DjVuAnno::get_hlinks(GLParser & parser, GPList<GHLRect> & rect_hlinks,
       GLObject & obj=*list[pos];
       if (obj.get_type()==GLObject::LIST && obj.get_name()==MAPAREA_TAG)
       {
-	 TRY
-	 {
-	    // Getting the url
+	 TRY {
+	       // Getting the url
 	    GString url;
 	    GString target="_self";
 	    GLObject & url_obj=*(obj[0]);
@@ -754,39 +751,14 @@ DjVuAnno::get_hlinks(GLParser & parser, GPList<GHLRect> & rect_hlinks,
 	       target=(url_obj[1])->get_string();
 	    } else url=url_obj.get_string();
 	    
-	    // Getting the comment
+	       // Getting the comment
 	    GString comment=(obj[1])->get_string();
 	    
 	    DEBUG_MSG("found maparea '" << comment << "' (" <<
 		      url << ":" << target << ")\n");
-	    
-	    GHLObject::HLType hltype=GHLObject::XOR;
-	    GString hlcolor="blue";
-	    int shadow_thick=3;
-	    GLObject * hl=obj[3];
-	    if (hl->get_type()==GLObject::LIST)
-	    {
-	       const GString & str=hl->get_name();
-	       hltype=
-		  str==NONE_TAG ? GHLObject::NONE :
-		  str==XOR_TAG ? GHLObject::XOR :
-		  str==BORDER_TAG ? GHLObject::BORDER :
-		  str==SHADOW_IN_TAG ? GHLObject::SHADOW_IN :
-		  str==SHADOW_OUT_TAG ? GHLObject::SHADOW_OUT :
-		  str==SHADOW_EIN_TAG ? GHLObject::SHADOW_EIN :
-		  str==SHADOW_EOUT_TAG ? GHLObject::SHADOW_EOUT : GHLObject::XOR;
-	       for(GPosition pos=hl->get_list();pos;++pos)
-	       {
-		  GLObject * obj=hl->get_list()[pos];
-		  if (obj->get_type()==GLObject::SYMBOL) hlcolor=obj->get_symbol();
-		  if (obj->get_type()==GLObject::NUMBER) shadow_thick=obj->get_number();
-	       };
-	    };
-	    
-	    u_int32 hlcolor_rgb=cvt_color(hlcolor, 0xff);
-	    
+
 	    GLObject * shape=obj[2];
-	    GHLObject * maparea=0;
+	    GP<GMapArea> map_area;
 	    if (shape->get_type()==GLObject::LIST)
 	    {
 	       if (shape->get_name()==RECT_TAG)
@@ -796,22 +768,18 @@ DjVuAnno::get_hlinks(GLParser & parser, GPList<GHLRect> & rect_hlinks,
 			      (*shape)[1]->get_number(),
 			      (*shape)[2]->get_number(),
 			      (*shape)[3]->get_number());
-		  GP<GHLRect> rect=new GHLRect(grect);
-		  rect_hlinks.append(rect);
-		  maparea=rect;
+		  map_area=new GMapRect(grect);
 	       } else if (shape->get_name()==POLY_TAG)
 	       {
-		  DEBUG_MSG("it's a polygojn.\n");
+		  DEBUG_MSG("it's a polygon.\n");
 		  int points=shape->get_list().size()/2;
 		  GTArray<int> xx(points-1), yy(points-1);
 		  for(int i=0;i<points;i++)
 		  {
 		     xx[i]=(*shape)[2*i]->get_number();
 		     yy[i]=(*shape)[2*i+1]->get_number();
-		  };
-		  GP<GHLPoly> poly=new GHLPoly(xx, yy, points);
-		  poly_hlinks.append(poly);
-		  maparea=poly;
+		  }
+		  map_area=new GMapPoly(xx, yy, points);
 	       } else if (shape->get_name()==OVAL_TAG)
 	       {
 		  DEBUG_MSG("it's an ellipse.\n");
@@ -819,25 +787,61 @@ DjVuAnno::get_hlinks(GLParser & parser, GPList<GHLRect> & rect_hlinks,
 			      (*shape)[1]->get_number(),
 			      (*shape)[2]->get_number(),
 			      (*shape)[3]->get_number());
-		  GP<GHLOval> oval=new GHLOval(grect);
-		  oval_hlinks.append(oval);
-		  maparea=oval;
-	       };
-	       if (maparea)
+		  map_area=new GMapOval(grect);
+	       }
+	    }
+
+	    if (map_area)
+	    {
+	       map_area->url=url;
+	       map_area->target=target;
+	       map_area->comment=comment;
+	       for(int obj_num=3;obj_num<obj.get_list().size();obj_num++)
 	       {
-		  maparea->url=url;
-		  maparea->target=target;
-		  maparea->comment=comment;
-		  maparea->hltype=hltype;
-		  maparea->hlcolor_rgb=hlcolor_rgb;
-		  maparea->shadow_thick=shadow_thick;
-	       } else DEBUG_MSG("hlink type is not recognized\n");
-	    };
-	 } CATCH(exc)
-	 {
-	 } ENDCATCH;
-      }; // if (...get_name()==MAPAREA_TAG)
-   }; // while(item==...)
+		     // Process border stuff
+		  GLObject * el=obj[obj_num];
+		  if (el->get_type()==GLObject::LIST)
+		  {
+		     const GString & name=el->get_name();
+		     if (name==BORDER_AVIS_TAG)
+			map_area->border_always_visible=true;
+		     else if (name==HILITE_TAG)
+		     {
+			GLObject * obj=el->get_list()[el->get_list().firstpos()];
+			if (obj->get_type()==GLObject::SYMBOL)
+			   map_area->hilite_color=cvt_color(obj->get_symbol(), 0xff);
+		     } else
+		     {
+			int border_type=
+				   name==NO_BORDER_TAG ? GMapArea::NO_BORDER :
+				   name==XOR_BORDER_TAG ? GMapArea::XOR_BORDER :
+				   name==SOLID_BORDER_TAG ? GMapArea::SOLID_BORDER :
+				   name==SHADOW_IN_BORDER_TAG ? GMapArea::SHADOW_IN_BORDER :
+				   name==SHADOW_OUT_BORDER_TAG ? GMapArea::SHADOW_OUT_BORDER :
+				   name==SHADOW_EIN_BORDER_TAG ? GMapArea::SHADOW_EIN_BORDER :
+				   name==SHADOW_EOUT_BORDER_TAG ? GMapArea::SHADOW_EOUT_BORDER : -1;
+			if (border_type>=0)
+			{
+			   map_area->border_type=(GMapArea::BorderType) border_type;
+			   for(GPosition pos=el->get_list();pos;++pos)
+			   {
+			      GLObject * obj=el->get_list()[pos];
+			      if (obj->get_type()==GLObject::SYMBOL)
+				 map_area->border_color=cvt_color(obj->get_symbol(), 0xff);
+			      if (obj->get_type()==GLObject::NUMBER)
+				 map_area->border_width=obj->get_number();
+			   }
+			}
+		     }	    
+		  }
+		  map_areas.append(map_area);
+	       }
+	    }
+	 } CATCH(exc) {} ENDCATCH;
+      } // if (...get_name()==MAPAREA_TAG)
+   } // while(item==...)
+
+   return map_areas;
 }
 
 void
@@ -916,15 +920,10 @@ DjVuAnno::encode_raw(void) const
       parser.parse(buffer);
    }
    
-      //*** Hyperlinks
+      //*** Mapareas
    del_all_items(MAPAREA_TAG, parser);
-   GPosition pos;
-   for(pos=rect_hlinks;pos;++pos)
-      parser.parse(rect_hlinks[pos]->print());
-   for(pos=poly_hlinks;pos;++pos)
-      parser.parse(poly_hlinks[pos]->print());
-   for(pos=oval_hlinks;pos;++pos)
-      parser.parse(oval_hlinks[pos]->print());
+   for(GPosition pos=map_areas;pos;++pos)
+      parser.parse(map_areas[pos]->print());
 
    MemoryByteStream str;
    parser.print(str, 1);

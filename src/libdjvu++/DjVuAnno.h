@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuAnno.h,v 1.6 1999-09-29 21:52:44 eaf Exp $
+//C- $Id: DjVuAnno.h,v 1.7 1999-09-30 19:16:13 eaf Exp $
 
 #ifndef _DJVUANNO_H
 #define _DJVUANNO_H
@@ -38,7 +38,7 @@
     @memo Implements support for DjVuImage annotations
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: DjVuAnno.h,v 1.6 1999-09-29 21:52:44 eaf Exp $# */
+    #$Id: DjVuAnno.h,v 1.7 1999-09-30 19:16:13 eaf Exp $# */
 //@{
 
 
@@ -51,7 +51,7 @@
 #include "GSmartPointer.h"
 #include "ByteStream.h"
 #include "DjVuGlobal.h"
-#include "GHLObjects.h"
+#include "GMapAreas.h"
 #include "GContainer.h"
 
 /** Implements support for \Ref{DjVuImage} annotations.
@@ -103,15 +103,10 @@ public:
       /** Vertical page alignment. Possible values are #ALIGN_TOP#,
 	  #ALIGN_CENTER#, #ALIGN_BOTTOM# and #ALIGN_UNSPEC#. */
    int		ver_align;
-      /** List of rectangular hyperlinks. Refer to the description of
-	  \Ref{GHLRect} class for details. */
-   GPList<GHLRect>	rect_hlinks;
-      /** List of polygonal hyperlinks. Refer to the description of
-	  \Ref{GHLPoly} class for details. */
-   GPList<GHLPoly>	poly_hlinks;
-      /** List of elliptical hyperlinks. Refer to the description of
-	  \Ref{GHLOval} class for details. */
-   GPList<GHLOval>	oval_hlinks;
+      /** List of defined map areas. They may be just areas of highlighting
+	  or hyperlink. Please refer to \Ref{GMapArea}, \Ref{GMapRect},
+	  \Ref{GMapPoly} and \Ref{GMapOval} for details. */
+   GPList<GMapArea>	map_areas;
    
       /// Constructs an empty annotation object.
    DjVuAnno();
@@ -153,10 +148,7 @@ private:
    static int		get_mode(class GLParser & parser);
    static int		get_hor_align(class GLParser & parser);
    static int		get_ver_align(class GLParser & parser);
-   static void		get_hlinks(class GLParser & parser,
-				   GPList<GHLRect> &,
-				   GPList<GHLPoly> &,
-				   GPList<GHLOval> &);
+   static GPList<GMapArea>get_map_areas(class GLParser & parser);
    static void		del_all_items(const char * name, class GLParser & parser);
 };
 
