@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocument.h,v 1.74 2001-01-16 23:03:53 bcr Exp $
+// $Id: DjVuDocument.h,v 1.75 2001-01-18 22:13:36 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUDOCUMENT_H
@@ -58,7 +58,7 @@ class ByteStream;
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocument.h,v 1.74 2001-01-16 23:03:53 bcr Exp $#
+    @version #$Id: DjVuDocument.h,v 1.75 2001-01-18 22:13:36 bcr Exp $#
 */
 
 //@{
@@ -624,6 +624,9 @@ public:
 	  \Ref{is_init_complete}() to check more precisely the degree of
 	  initialization. Use \Ref{stop_init}() to interrupt initialization. */
    bool    	   wait_for_complete_init(void);
+
+          /** Wait until we known the number of pages and return. */
+   int wait_get_pages_num(void);
    
       /// Returns cache being used.
    DjVuFileCache * get_cache(void) const;

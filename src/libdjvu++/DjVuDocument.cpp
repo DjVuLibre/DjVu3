@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocument.cpp,v 1.137 2001-01-16 23:03:53 bcr Exp $
+// $Id: DjVuDocument.cpp,v 1.138 2001-01-18 22:13:36 bcr Exp $
 // $Name:  $
 
 
@@ -424,6 +424,17 @@ DjVuDocument::wait_for_complete_init(void)
     init_thread_flags.wait();
   init_thread_flags.leave();
   return (flags & (DOC_INIT_OK | DOC_INIT_FAILED))!=0;
+}
+
+int
+DjVuDocument::wait_get_pages_num(void)
+{
+  flags.enter();
+  while(!(flags & DOC_TYPE_KNOWN) &&
+        !(flags & DOC_INIT_FAILED) &&
+        !(flags & DOC_INIT_OK)) flags.wait();
+  flags.leave();
+  return get_pages_num();
 }
 
 GString
