@@ -7,10 +7,10 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: GThreads.cpp,v 1.15 1999-03-08 16:07:45 leonb Exp $
+//C-  $Id: GThreads.cpp,v 1.16 1999-03-08 16:21:16 leonb Exp $
 
 
-// **** File "$Id: GThreads.cpp,v 1.15 1999-03-08 16:07:45 leonb Exp $"
+// **** File "$Id: GThreads.cpp,v 1.16 1999-03-08 16:21:16 leonb Exp $"
 // This file defines machine independent classes
 // for running and synchronizing threads.
 // - Author: Leon Bottou, 01/1998
@@ -756,7 +756,7 @@ cotask_yield()
     globalmaxwait -= elapsed;
   // find best candidate
   static int count;
-  unsigned long best = 0;
+  unsigned long best = MAXPENALTY + 1;
   cotask *r = 0;
   count = 0;
   q = n;
@@ -765,7 +765,7 @@ cotask_yield()
       if (! q->wchan)
         {
           count += 1;
-          if (r==0 || best>q->over) 
+          if (best > q->over)
             {
               r = q;
               best = r->over;
@@ -781,7 +781,7 @@ cotask_yield()
       q = n;
       do 
         { 
-          q->over = (q->over>best ? q->over - best : 0);
+          q->over = (q->over>best ? q->over-best : 0);
           q = q->next;
         } 
       while (q != n);
