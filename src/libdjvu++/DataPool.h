@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DataPool.h,v 1.43 2001-04-19 00:05:27 bcr Exp $
+// $Id: DataPool.h,v 1.44 2001-04-20 17:53:18 bcr Exp $
 // $Name:  $
 
 #ifndef _DATAPOOL_H
@@ -65,7 +65,7 @@ class ByteStream;
 
     @memo Thread safe data storage
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DataPool.h,v 1.43 2001-04-19 00:05:27 bcr Exp $#
+    @version #$Id: DataPool.h,v 1.44 2001-04-20 17:53:18 bcr Exp $#
 */
 
 //@{
@@ -558,6 +558,8 @@ private:
    static void	static_trigger_cb(void *);
    void		trigger_cb(void);
    void		analyze_iff(void);
+public:
+  static const char *Stop;
 };
 
 inline bool

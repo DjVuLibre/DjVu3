@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuText.cpp,v 1.14 2001-04-12 00:25:00 bcr Exp $
+// $Id: DjVuText.cpp,v 1.15 2001-04-20 17:53:19 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -42,6 +42,7 @@
 #include "BSByteStream.h"
 #include "debug.h"
 #include <ctype.h>
+#include <wctype.h>
 
 //***************************************************************************
 //******************************** DjVuTXT **********************************
@@ -370,9 +371,9 @@ DjVuTXT::find_zones(int string_start, int string_length) const
     // Get rid of the leading and terminating spaces
     int start=string_start;
     int end=string_start+string_length;
-    while(start<end && isspace(textUTF8[start]))
+    while(start<end && iswspace(textUTF8[start]))
       start++;
-    while(end>start && isspace(textUTF8[end-1]))
+    while(end>start && iswspace(textUTF8[end-1]))
       end--;
     if (start==end)
       return zone_list;
@@ -388,7 +389,7 @@ DjVuTXT::find_zones(int string_start, int string_length) const
     
     while(true)
     {
-      while(start<end && isspace(textUTF8[start])) start++;
+      while(start<end && iswspace(textUTF8[start])) start++;
       if (start==end) break;
       
       Zone * zone=get_smallest_zone(zone_type, start, end);

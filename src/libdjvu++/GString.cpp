@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.72 2001-04-19 23:25:46 bcr Exp $
+// $Id: GString.cpp,v 1.73 2001-04-20 17:53:19 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -41,6 +41,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+#include <wctype.h>
 #include <wchar.h>
 #include <locale.h>
 
@@ -790,7 +791,7 @@ GString::is_int(void) const
    {
      // count blanks;
      int i=0;
-     for (i=0; i < (int)endptr.length() && isspace(endptr[i]); ++i);
+     for (i=0; i < (int)endptr.length() && iswspace(endptr[i]); ++i);
 
      // if the length of the endptr is 0 the whole string
      // was a number so return true.
@@ -812,7 +813,7 @@ GString::is_float(void) const
    {
      // count blanks;
      int i=0;
-     for (i=0; i < (int)endptr.length() && isspace(endptr[i]); ++i);
+     for (i=0; i < (int)endptr.length() && iswspace(endptr[i]); ++i);
    
      // if i equals the length of the endptr the string is
      // a number;
@@ -1855,7 +1856,7 @@ GStringRep::UTF8::nextNonSpace(const int from) const
       retval=((size_t)s-(size_t)data))
     {
       const wchar_t w=(wchar_t)UTF8toUCS4(s,eptr);
-      if (!isspace(w))
+      if (!iswspace(w))
         break;
     }
   }else

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DataPool.cpp,v 1.76 2001-04-19 00:05:27 bcr Exp $
+// $Id: DataPool.cpp,v 1.77 2001-04-20 17:53:18 bcr Exp $
 // $Name:  $
 
 
@@ -51,6 +51,8 @@
 #include <sys/types.h>
 #endif
 #endif
+
+const char * DataPool::Stop = ERR_MSG("STOP");
 
 static void
 // call_callback(void (* callback)(GP<GPEnabled> &), GP<GPEnabled> cl_data)
@@ -992,10 +994,10 @@ DataPool::get_data(void * buffer, int offset, int sz, int level)
    Incrementor inc(*active_readers);
    
    if (stop_flag)
-     G_THROW( ERR_MSG("STOP") );
+     G_THROW( DataPool::Stop );
    if (stop_blocked_flag && !is_eof() &&
        !has_data(offset, sz))
-     G_THROW( ERR_MSG("STOP") );
+     G_THROW( DataPool::Stop );
    
    if (sz < 0)
      G_THROW( ERR_MSG("DataPool.bad_size") );
@@ -1019,12 +1021,12 @@ DataPool::get_data(void * buffer, int offset, int sz, int level)
 	    // demanding all readers to restart. This happens when
 	    // a DataPool in the chain of DataPools stops. All readers
 	    // should return to the most upper level and then reenter the
-	    // DataPools hierarchy. Some of them will be stopped by "STOP"
-	    // exception.
+	    // DataPools hierarchy. Some of them will be stopped by
+            // DataPool::Stop exception.
 	 G_TRY
          {
 	    if(stop_flag||stop_blocked_flag&&!is_eof()&&!has_data(offset, sz))
-              G_THROW( ERR_MSG("STOP") );
+              G_THROW( DataPool::Stop );
 	    retval=pool->get_data(buffer, start+offset, sz, level+1);
 	 } G_CATCH(exc) {
             pool->clear_stream();
@@ -1144,7 +1146,7 @@ DataPool::wait_for_data(const GP<Reader> & reader)
    for(;;)
    {
       if (stop_flag)
-        G_THROW( ERR_MSG("STOP") );
+        G_THROW( DataPool::Stop );
       if (reader->reenter_flag)
         G_THROW( ERR_MSG("DataPool.reenter") );
       if (eof_flag || block_list->get_bytes(reader->offset, 1))
@@ -1153,7 +1155,7 @@ DataPool::wait_for_data(const GP<Reader> & reader)
         return;
 
       if (stop_blocked_flag)
-        G_THROW( ERR_MSG("STOP") );
+        G_THROW( DataPool::Stop );
 
       DEBUG_MSG("calling event.wait()...\n");
       reader->event.wait();
@@ -1212,7 +1214,7 @@ DataPool::stop(bool only_blocked)
 
       // Now let all readers, which already go thru to the master DataPool,
       // come back and reenter. While reentering some of them will go
-      // thru this DataPool again and will be stopped ("STOP" exception)
+      // thru this DataPool again and will be stopped (DataPool::Stop exception)
       // Others (which entered the master DataPool thru other slave DataPools)
       // will simply continue waiting for their data.
    if (pool)

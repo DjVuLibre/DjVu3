@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: XMLTags.cpp,v 1.13 2001-04-12 22:40:15 fcrary Exp $
+// $Id: XMLTags.cpp,v 1.14 2001-04-20 17:53:19 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -41,6 +41,7 @@
 #include "UnicodeByteStream.h"
 //#include <stdio.h>
 #include <ctype.h>
+#include <wctype.h>
 
 lt_XMLContents::lt_XMLContents(void) {}
 
@@ -130,7 +131,7 @@ isspaces(unsigned long const *s)
   {
     while(*s)
     {
-      if(!isspace(*s++))
+      if(!iswspace(*s++))
       {
         retval=false;
         break;

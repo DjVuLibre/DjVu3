@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuImage.cpp,v 1.71 2001-04-19 00:05:27 bcr Exp $
+// $Id: DjVuImage.cpp,v 1.72 2001-04-20 17:53:19 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -486,7 +486,7 @@ DjVuImage::decode(ByteStream & str, DjVuInterface *notifier)
   GP<DjVuImage> dimg=doc->get_page(-1, true, (DjVuImageNotifier*)pport);
   file=dimg->get_djvu_file();
   if (file->is_decode_stopped())
-    G_THROW( ERR_MSG("STOP") );
+    G_THROW( DataPool::Stop );
   if (file->is_decode_failed())
     G_THROW( ByteStream::EndOfFile ); // guess
   if (!file->is_decode_ok())

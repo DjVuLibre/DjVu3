@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuFile.cpp,v 1.163 2001-04-20 17:08:26 bcr Exp $
+// $Id: DjVuFile.cpp,v 1.164 2001-04-20 17:53:19 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -453,7 +453,7 @@ DjVuFile::decode_func(void)
     {
       GP<DjVuFile> & f=inc_files_list[pos];
       if (f->is_decode_failed()) G_THROW( ERR_MSG("DjVuFile.decode_fail") );
-      if (f->is_decode_stopped()) G_THROW( ERR_MSG("STOP") );
+      if (f->is_decode_stopped()) G_THROW( DataPool::Stop );
       if (!f->is_decode_ok())
       {
         DEBUG_MSG("this_url='" << url << "'\n");
@@ -465,7 +465,7 @@ DjVuFile::decode_func(void)
     }
   } G_CATCH(exc) {
     G_TRY {
-      if (exc.get_cause() == GUTF8String("STOP"))
+      if (GString::messagecmp(exc.get_cause(),DataPool::Stop))
       {
         flags.enter();
         flags=flags & ~DECODING | DECODE_STOPPED;
@@ -748,7 +748,7 @@ DjVuFile::get_fgjd(int block)
     G_RETHROW;
   } G_ENDCATCH;
   chunk_mon.leave();
-  if (is_decode_stopped()) G_THROW( ERR_MSG("STOP") );
+  if (is_decode_stopped()) G_THROW( DataPool::Stop );
   return 0;
 }
 
@@ -794,8 +794,9 @@ DjVuFile::decode_chunk(const GUTF8String &id, GP<ByteStream> gbs, bool djvi, boo
   // If this object is referenced by only one GP<> pointer, this
   // pointer should be the "life_saver" created by the decoding thread.
   // If it is the only GP<> pointer, then nobody is interested in the
-  // results of the decoding and we can abort now with "STOP"
-  if (get_count()==1) G_THROW( ERR_MSG("STOP") );
+  // results of the decoding and we can abort now with #DataPool::Stop#
+  if (get_count()==1)
+    G_THROW( DataPool::Stop );
   
   GUTF8String desc = "Unrecognized chunk";
   GUTF8String chkid = id;

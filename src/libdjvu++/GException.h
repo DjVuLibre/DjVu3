@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GException.h,v 1.27 2001-04-19 00:05:28 bcr Exp $
+// $Id: GException.h,v 1.28 2001-04-20 17:53:19 bcr Exp $
 // $Name:  $
 
 #ifndef _GEXCEPTION_H_
@@ -92,7 +92,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@geocities.com> -- fixed message memory allocation.
     @version 
-    #$Id: GException.h,v 1.27 2001-04-19 00:05:28 bcr Exp $# */
+    #$Id: GException.h,v 1.28 2001-04-20 17:53:19 bcr Exp $# */
 //@{
 
 #include "DjVuGlobal.h"
@@ -109,7 +109,7 @@ public:
   /** Constructs a GException.  This constructor is usually called by macro
       #G_THROW#.  Argument #cause# is a plain text error message. As a
       convention, string #ByteStream::EndOfFile# is used when reaching an unexpected
-      end-of-file condition and string #"STOP"# is used when the user
+      end-of-file condition and string #DataPool::Stop# is used when the user
       interrupts the execution. The remaining arguments are usually provided
       by the predefined macros #__FILE__#, #__LINE__#, and (G++ and EGCS only)
       #__PRETTY_FUNCTION__#.  */
@@ -133,10 +133,12 @@ public:
   
   /** Returns the string describing the cause of the exception.  The returned
       pointer is never null.  Exception handlers should not rely on the value
-      of the string #cause#.  As a convention however, string #"EOF"# is used
-      when reaching an unexpected end-of-file condition and string #"STOP"# is
-      used when the user interrupts the execution. These strings can be tested
-      by the exception handlers. Similar conventional strings may be defined
+      of the string #cause#.  As a convention however, string
+      #ByteStream::EndOfFile# is used
+      when reaching an unexpected end-of-file condition and string
+      #DataPool::Stop# is used when the user interrupts the execution. These
+      strings can be tested by the exception handlers, with
+      GString::messagecmp(). Similar conventional strings may be defined
       in the future. They all will be small strings with only uppercase
       characters. */
   const char* get_cause(void) const;
