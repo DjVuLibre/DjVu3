@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GURL.cpp,v 1.27 2000-01-25 00:08:03 eaf Exp $
+//C- $Id: GURL.cpp,v 1.28 2000-01-25 20:08:59 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -26,16 +26,12 @@ static const char * DJVUOPTS="DJVUOPTS";
 
 static bool
 is_argument(const char * start)
+      // Returns TRUE if 'start' points to the beginning of an argument
+      // (either hash or CGI)
 {
    return
-      start[0]=='#' || start[0]=='%' &&
-      start[1]=='2' && start[2]=='3' ||
-      
-      start[0]=='?' || start[0]=='%' &&
-      start[1]=='3' && toupper(start[2])=='F' ||
-      
-      start[0]==';' || start[0]=='%' &&
-      start[1]=='3' && toupper(start[2])=='B';
+      *start=='#' || *start=='?' ||
+      *start=='&' || *start==';';
 }
 
 void
@@ -163,45 +159,32 @@ GURL::hash_argument(void) const
    for(const char * start=url;*start;start++)
    {
 	 // Break if CGI argument is found
-      if (start[0]=='?' || start[0]=='%' &&
-	  start[1]=='3' && toupper(start[2])=='F')
-	 break;
+      if (*start=='?') break;
 
       if (found) arg+=*start;
-      else
-      {
-	 if (start[0]=='#' || start[0]=='%' &&
-	     start[1]=='2' && start[2]=='3')
-	 {
-	    if (start[0]=='%') start+=2;
-	    found=true;
-	 }
-      }
+      else if (*start=='#')
+	 found=true;
    }
    return GOS::decode_reserved(arg);
 }
 
 void
-GURL::set_hash_argument(const char * xarg)
+GURL::set_hash_argument(const char * arg)
 {
    GCriticalSectionLock lock((GCriticalSection *) &url_lock);
 
-   GString arg=GOS::encode_reserved(xarg);
-   
    GString new_url;
    bool found=false;
    const char * ptr;
    for(ptr=url;*ptr;ptr++)
       if (is_argument(ptr))
       {
-	 if (ptr[0]=='#' || ptr[0]=='%' &&
-	     ptr[1]=='2' && ptr[2]=='3')
-	    found=true;
+	 if (*ptr=='#') found=true;
 	 else break;
       } else if (!found)
 	 new_url+=*ptr;
 
-   url=new_url+"#"+arg+ptr;
+   url=new_url+"#"+GOS::encode_reserved(arg)+ptr;
 }
 
 void
@@ -217,11 +200,9 @@ GURL::parse_cgi_args(void)
       // Search for the beginning of CGI arguments
    const char * start;
    for(start=url;*start;start++)
-      if (start[0]=='?' || start[0]=='%' &&
-	  start[1]=='3' && toupper(start[2])=='F')
+      if (*start=='?')
       {
-	 if (start[0]=='?') start++;
-	 else start+=3;
+	 start++;
 	 break;
       }
 
@@ -231,11 +212,9 @@ GURL::parse_cgi_args(void)
       GString arg;	// Storage for another argument
       while(*start)	// Seek for the end of it
       {
-	 if (start[0]=='&' || start[0]=='%' &&
-	     start[1]=='2' && start[2]=='6')
+	 if (*start=='&')
 	 {
-	    if (start[0]=='&') start++;
-	    else start+=3;
+	    start++;
 	    break;
 	 } else arg+=*start++;
       }
@@ -271,9 +250,7 @@ GURL::store_cgi_args(void)
 
    const char * ptr;
    for(ptr=url;*ptr;ptr++)
-      if (ptr[0]=='?' || ptr[0]=='%' &&
-	  ptr[1]=='3' && toupper(ptr[2])=='F')
-	 break;
+      if (*ptr=='?') break;
    
    GString new_url=GString(url, ptr-url);
    
@@ -450,16 +427,14 @@ GURL::clear_hash_argument(void)
    for(const char * start=url;*start;start++)
    {
 	 // Break on first CGI arg.
-      if (start[0]=='?' || start[0]=='%' &&
-	  start[1]=='3' && toupper(start[2])=='F')
+      if (*start=='?')
       {
 	 new_url+=start;
 	 break;
       }
 
       if (!found)
-	 if (start[0]=='#' || start[0]=='%' &&
-	     start[1]=='2' && start[2]=='3')
+	 if (*start=='#')
 	    found=true;
 
       if (!found) new_url+=*start;
@@ -480,8 +455,7 @@ GURL::clear_cgi_arguments(void)
 
       // And clear everything past the '?' sign in the URL
    for(const char * ptr=url;*ptr;ptr++)
-      if (ptr[0]=='?' || ptr[0]=='%' &&
-	  ptr[1]=='3' && toupper(ptr[2])=='F')
+      if (*ptr=='?')
       {
 	 url.setat(ptr-url, 0);
 	 break;

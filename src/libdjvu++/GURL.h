@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GURL.h,v 1.20 2000-01-25 00:08:03 eaf Exp $
+//C- $Id: GURL.h,v 1.21 2000-01-25 20:08:59 eaf Exp $
 
 #ifndef _GURL_H_
 #define _GURL_H_
@@ -27,7 +27,7 @@
     \Ref{GURL} class used to store URLs in a system independent format.
     @memo System independent URL representation.
     @author Andrei Erofeev <eaf@research.att.com>
-    @version #$Id: GURL.h,v 1.20 2000-01-25 00:08:03 eaf Exp $#
+    @version #$Id: GURL.h,v 1.21 2000-01-25 20:08:59 eaf Exp $#
 */
 
 //@{
@@ -72,7 +72,7 @@ public:
       /// Extracts the {\em protocol} part from the URL and returns it
    GString	protocol(void) const;
 
-      /** Returns string after the first '\#' or '%23' with decoded
+      /** Returns string after the first '\#' with decoded
 	  escape sequences. */
    GString	hash_argument(void) const;
 
@@ -121,16 +121,16 @@ public:
 	  following #DJVUOPTS# option. */
    DArray<GString>djvu_cgi_values(void) const;
 
-      /// Erases everything after the first '\#' ('%23') or '?' ('%3f')
+      /// Erases everything after the first '\#' or '?'
    void		clear_all_arguments(void);
 
-      /// Erases everything after the first '\#' ('\#23')
+      /// Erases everything after the first '\#'
    void		clear_hash_argument(void);
 
       /// Erases DjVu CGI arguments (following "#DJVUOPTS#")
    void		clear_djvu_cgi_arguments(void);
 
-      /// Erases all CGI arguments (following first '?')
+      /// Erases all CGI arguments (following the first '?')
    void		clear_cgi_arguments(void);
 
       /** Appends the specified CGI argument. Will insert "#DJVUOPTS#" if
