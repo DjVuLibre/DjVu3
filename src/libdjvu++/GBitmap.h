@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GBitmap.h,v 1.35 2001-03-06 19:55:42 bcr Exp $
+// $Id: GBitmap.h,v 1.36 2001-03-27 20:15:30 praveen Exp $
 // $Name:  $
 
 #ifndef _GBITMAP_H_
@@ -69,7 +69,7 @@ class ByteStream;
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: GBitmap.h,v 1.35 2001-03-06 19:55:42 bcr Exp $#
+    #$Id: GBitmap.h,v 1.36 2001-03-27 20:15:30 praveen Exp $#
 
  */
 //@{
@@ -404,6 +404,12 @@ public:
       and increments the pointer accordingly.  The pointer must
       initially point to a large enough data buffer. */
   static inline void append_run(unsigned char *&data, int count);
+  /** Rotates bitmap by 90, 180 or 270 degrees anticlockwise
+      and returns a new pixmap, input bitmap is not changed. 
+      count can be 1, 2, or 3 for 90, 180, 270 degree rotation.
+      It returns the same bitmap if not rotated. 
+      The input bitmap will be uncompressed for rotation*/
+  GP<GBitmap> rotate(int count=0);
   //@}
 
 // These are constants, but we use enum because that works on older compilers.

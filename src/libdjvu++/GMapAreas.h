@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GMapAreas.h,v 1.24 2001-03-06 19:55:42 bcr Exp $
+// $Id: GMapAreas.h,v 1.25 2001-03-27 20:15:30 praveen Exp $
 // $Name:  $
 
 #ifndef _GMAPAREAS_H
@@ -64,7 +64,7 @@
     @memo Definition of base map area classes
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: GMapAreas.h,v 1.24 2001-03-06 19:55:42 bcr Exp $# */
+    #$Id: GMapAreas.h,v 1.25 2001-03-27 20:15:30 praveen Exp $# */
 //@{
 
 
@@ -220,6 +220,10 @@ public:
       /// Virtual function generating a list of defining coordinates
       /// (default are the opposite corners of the enclosing rectangle)
    virtual void get_coords( GList<int> & CoordList );
+   /// Virtual function maps maparea from one area to another using mapper
+   virtual void map(GRectMapper &mapper)=0;
+   /// Virtual function unmaps maparea from one area to another using mapper
+   virtual void unmap(GRectMapper &mapper)=0;
 
 protected:
    virtual int		gma_get_xmin(void) const=0;
@@ -286,6 +290,10 @@ public:
    virtual char const * const	get_shape_name(void) const;
       /// Returns a copy of the rectangle
    virtual GP<GMapArea>	get_copy(void) const;
+      /// Virtual function maps rectangle from one area to another using mapper
+   virtual void map(GRectMapper &mapper);
+      /// Virtual function unmaps rectangle from one area to another using mapper
+   virtual void unmap(GRectMapper &mapper);
 protected:
    int			xmin, ymin, xmax, ymax;
    virtual int		gma_get_xmin(void) const;
@@ -428,6 +436,10 @@ public:
    virtual GP<GMapArea>	get_copy(void) const;
       /// Virtual function generating a list of defining coordinates
    void get_coords( GList<int> & CoordList );
+      /// Virtual function maps polygon from one area to another using mapper
+   virtual void map(GRectMapper &mapper);
+   /// Virtual function unmaps polygon from one area to another using mapper
+   virtual void unmap(GRectMapper &mapper);
 protected:
    virtual int		gma_get_xmin(void) const;
    virtual int		gma_get_ymin(void) const;
@@ -517,6 +529,10 @@ public:
    virtual char const * const get_shape_name(void) const;
       /// Returns a copy of the oval
    virtual GP<GMapArea>	get_copy(void) const;
+      /// Virtual function maps oval from one area to another using mapper
+   virtual void map(GRectMapper &mapper);
+      /// Virtual function unmaps oval from one area to another using mapper
+   virtual void unmap(GRectMapper &mapper);
 protected:
    virtual int		gma_get_xmin(void) const;
    virtual int		gma_get_ymin(void) const;

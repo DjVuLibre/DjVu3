@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GBitmap.cpp,v 1.48 2001-01-25 20:09:04 bcr Exp $
+// $Id: GBitmap.cpp,v 1.49 2001-03-27 20:15:30 praveen Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -45,7 +45,7 @@
 #include "GException.h"
 #include <string.h>
 
-// File "$Id: GBitmap.cpp,v 1.48 2001-01-25 20:09:04 bcr Exp $"
+// File "$Id: GBitmap.cpp,v 1.49 2001-03-27 20:15:30 praveen Exp $"
 // - Author: Leon Bottou, 05/1997
 
 
@@ -1488,6 +1488,80 @@ GBitmap::append_line(unsigned char *&data,const unsigned char *row,
       append_run(data,count);
     }
 }
+
+GP<GBitmap> 
+GBitmap::rotate(int count)
+{
+    count %= 4;
+    if( count == 0)
+        return this;
+
+    GP<GBitmap> newbitmap;
+    uncompress();
+
+    if( count & 0x01 )
+        newbitmap = new GBitmap(columns(), rows());
+    else
+        newbitmap = new GBitmap(rows(), columns());
+
+    GBitmap &sbitmap = *this;
+    GBitmap &dbitmap = *newbitmap;
+
+    dbitmap.set_grays(sbitmap.get_grays());
+
+    switch(count)
+    {
+    case 1: //// rotate 90 counter clockwise
+        {
+            int rows = sbitmap.rows();
+            int columns = sbitmap.columns();
+            int lastrow = dbitmap.rows()-1;
+
+            for(int y=0; y<rows; y++)
+            {
+                for(int x=0; x<columns; x++)
+                {
+                    dbitmap[lastrow-x][y] = sbitmap[y][x];
+                }
+            }
+        }
+        break;
+    case 2: //// rotate 180 counter clockwise
+        {
+            int rows = sbitmap.rows();
+            int columns = sbitmap.columns();
+            int lastrow = dbitmap.rows()-1;
+            int lastcolumn = dbitmap.columns()-1;
+
+            for(int y=0; y<rows; y++)
+            {
+                for(int x=0; x<columns; x++)
+                {
+                    dbitmap[lastrow-y][lastcolumn-x] = sbitmap[y][x];
+                }
+            }
+        }
+        break;
+    case 3: //// rotate 270 counter clockwise
+        {
+            int rows = sbitmap.rows();
+            int columns = sbitmap.columns();
+            int lastcolumn = dbitmap.columns()-1;
+
+            for(int y=0; y<rows; y++)
+            {
+                for(int x=0; x<columns; x++)
+                {
+                    dbitmap[x][lastcolumn-y] = sbitmap[y][x];
+                }
+            }
+        }
+        break;
+    }
+
+    return newbitmap;
+}
+
 
 #ifndef NO_DEBUG
 void 

@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: GPixmap.cpp,v 1.28 2001-01-10 02:13:18 bcr Exp $
+// $Id: GPixmap.cpp,v 1.29 2001-03-27 20:15:30 praveen Exp $
 // $Name:  $
 
 // -- Implements class PIXMAP
@@ -1553,5 +1553,73 @@ GPixmap::stencil(const GBitmap *bm,
   }
 }
 
+GP<GPixmap> GPixmap::rotate(int count)
+{
+    count %= 4;
+    if( count == 0 )
+        return this;
+
+    GP<GPixmap> newpixmap;
+
+    if( count&0x01)
+        newpixmap = new GPixmap(columns(), rows());
+    else
+        newpixmap = new GPixmap(rows(), columns());
+
+    GPixmap &dpixmap = *newpixmap;
+    GPixmap &spixmap = *this; /// references to make copy faster
+
+    switch(count)
+    {
+    case 1: //// rotate 90 counter clockwise
+        {
+            int rows = spixmap.rows();
+            int columns = spixmap.columns();
+            int lastrow = dpixmap.rows()-1;
+
+            for(int y=0; y<rows; y++)
+            {
+                for(int x=0; x<columns; x++)
+                {
+                    dpixmap[lastrow-x][y] = spixmap[y][x];
+                }
+            }
+        }
+        break;
+    case 2: //// rotate 180 counter clockwise
+        {
+            int rows = spixmap.rows();
+            int columns = spixmap.columns();
+            int lastrow = dpixmap.rows()-1;
+            int lastcolumn = dpixmap.columns()-1;
+
+            for(int y=0; y<rows; y++)
+            {
+                for(int x=0; x<columns; x++)
+                {
+                    dpixmap[lastrow-y][lastcolumn-x] = spixmap[y][x];
+                }
+            }
+        }
+        break;
+    case 3: //// rotate 270 counter clockwise
+        {
+            int rows = spixmap.rows();
+            int columns = spixmap.columns();
+            int lastcolumn = dpixmap.columns()-1;
+
+            for(int y=0; y<rows; y++)
+            {
+                for(int x=0; x<columns; x++)
+                {
+                    dpixmap[x][lastcolumn-y] = spixmap[y][x];
+                }
+            }
+        }
+        break;
+    }
+
+    return newpixmap;
+}
 
 

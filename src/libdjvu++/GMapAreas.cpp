@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GMapAreas.cpp,v 1.20 2001-03-06 19:55:42 bcr Exp $
+// $Id: GMapAreas.cpp,v 1.21 2001-03-27 20:15:30 praveen Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -312,6 +312,33 @@ GMapArea::print(void)
    return total;
 }
 
+/*
+void 
+GMapArea::map(GRectMapper &mapper)
+{
+    get_bound_rect();
+    GRect rect = GRect(xmin, ymin, xmax, ymax);
+    mapper.map(rect);
+    xmin = rect.xmin;
+    ymin = rect.ymin;
+    xmax = rect.xmax;
+    ymax = rect.ymax;
+    clear_bounds();
+}
+void 
+GMapArea::unmap(GRectMapper &mapper)
+{
+    get_bound_rect();
+    GRect rect = GRect(xmin, ymin, xmax, ymax);
+    mapper.unmap(rect);
+    xmin = rect.xmin;
+    ymin = rect.ymin;
+    xmax = rect.xmax;
+    ymax = rect.ymax;
+    clear_bounds();
+}
+*/
+
 
 /// Virtual function generating a list of defining coordinates
 /// (default are the opposite corners of the enclosing rectangle)
@@ -349,6 +376,39 @@ GMapRect::gma_print(void)
    sprintf(buffer, "(%s %d %d %d %d) ",
 	   RECT_TAG, xmin, ymin, xmax-xmin, ymax-ymin);
    return buffer;
+}
+
+void 
+GMapRect::map(GRectMapper &mapper)
+{
+    get_bound_rect();
+    GRect rect;
+    rect.xmin = xmin;
+    rect.xmax = xmax;
+    rect.ymin = ymin;
+    rect.ymax = ymax;
+    mapper.map(rect);
+    xmin = rect.xmin;
+    ymin = rect.ymin;
+    xmax = rect.xmax;
+    ymax = rect.ymax;
+    clear_bounds();
+}
+void 
+GMapRect::unmap(GRectMapper &mapper)
+{
+    get_bound_rect();
+    GRect rect;
+    rect.xmin = xmin;
+    rect.xmax = xmax;
+    rect.ymin = ymin;
+    rect.ymax = ymax;
+    mapper.unmap(rect);
+    xmin = rect.xmin;
+    ymin = rect.ymin;
+    xmax = rect.xmax;
+    ymax = rect.ymax;
+    clear_bounds();
 }
 
 /****************************************************************************
@@ -661,6 +721,28 @@ void GMapPoly::get_coords( GList<int> & CoordList )
   }
 }
 
+void 
+GMapPoly::map(GRectMapper &mapper)
+{
+    get_bound_rect();
+    for(int i=0; i<points; i++)
+    {
+        mapper.map(xx[i], yy[i]);
+    }
+    clear_bounds();
+}
+
+void 
+GMapPoly::unmap(GRectMapper &mapper)
+{
+    get_bound_rect();
+    for(int i=0; i<points; i++)
+    {
+        mapper.unmap(xx[i], yy[i]);
+    }
+    clear_bounds();
+}
+
 
 
 /****************************************************************************
@@ -735,4 +817,39 @@ GMapOval::gma_print(void)
    sprintf(buffer, "(%s %d %d %d %d) ",
 	   OVAL_TAG, xmin, ymin, xmax-xmin, ymax-ymin);
    return buffer;
+}
+
+void 
+GMapOval::map(GRectMapper &mapper)
+{
+    get_bound_rect();
+    GRect rect;
+    rect.xmin = xmin;
+    rect.xmax = xmax;
+    rect.ymin = ymin;
+    rect.ymax = ymax;
+    mapper.map(rect);
+    xmin = rect.xmin;
+    ymin = rect.ymin;
+    xmax = rect.xmax;
+    ymax = rect.ymax;
+    clear_bounds();
+    initialize();
+}
+void 
+GMapOval::unmap(GRectMapper &mapper)
+{
+    get_bound_rect();
+    GRect rect;
+    rect.xmin = xmin;
+    rect.xmax = xmax;
+    rect.ymin = ymin;
+    rect.ymax = ymax;
+    mapper.unmap(rect);
+    xmin = rect.xmin;
+    ymin = rect.ymin;
+    xmax = rect.xmax;
+    ymax = rect.ymax;
+    clear_bounds();
+    initialize();
 }

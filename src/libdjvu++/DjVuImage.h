@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuImage.h,v 1.37 2001-03-06 19:55:42 bcr Exp $
+// $Id: DjVuImage.h,v 1.38 2001-03-27 20:15:30 praveen Exp $
 // $Name:  $
 
 #ifndef _DJVUIMAGE_H
@@ -73,7 +73,7 @@
     L\'eon Bottou <leonb@research.att.com> - initial implementation
     Andrei Erofeev <eaf@geocities.com> - multipage support
     @version
-    #$Id: DjVuImage.h,v 1.37 2001-03-06 19:55:42 bcr Exp $# */
+    #$Id: DjVuImage.h,v 1.38 2001-03-27 20:15:30 praveen Exp $# */
 //@{
 
 
@@ -82,6 +82,7 @@
 #endif
 
 #include "DjVuFile.h"
+#include "DjVuAnno.h"
 
 /* Obsolete class included for backward compatibility. */
 
@@ -315,6 +316,29 @@ public:
       function returns a null pointer if there is not enough information in
       the DjVu image to properly render the desired image. */
   GP<GPixmap>  get_fg_pixmap(const GRect &rect, const GRect &all, double gamma=0) const;
+
+
+  /** set the rotation count(angle) in counter clock wise for the image
+    values (0,1,2,3) correspond to (0,90,180,270) degree rotation*/
+  void set_rotate(int count=0);
+  /** returns the rotation count*/
+  int get_rotate() const;
+  /** returns decoded annotations in DjVuAnno object in which all hyperlinks
+      and hilighted areas are rotated as per rotation setting*/
+  GP<DjVuAnno> get_decoded_anno();
+  /** maps the given #rect# from rotated co-ordinates to unrotated document 
+      co-ordinates*/
+  void map(GRect &rect) const;
+  /** unmaps the given #rect# from unrotated document co-ordinates to rotated  
+      co-ordinates*/
+  void unmap(GRect &rect) const;
+  /** maps the given #x#, #y# from rotated co-ordinates to unrotated document 
+      co-ordinates*/
+  void map(int &x, int &y) const;
+  /** unmaps the given #x#, #y# from unrotated document co-ordinates to rotated  
+      co-ordinates*/
+  void unmap(int &x, int &y) const;
+
   //@}
 
   // Inherited from DjVuPort.
@@ -328,6 +352,7 @@ public:
 private:
   GP<DjVuFile>		file;
   bool			relayout_sent;
+  int           rotate_count;
   
   // HELPERS
   int stencil(GPixmap *pm, const GRect &rect, int subs, double gcorr) const;

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GPixmap.h,v 1.24 2001-03-06 19:55:42 bcr Exp $
+// $Id: GPixmap.h,v 1.25 2001-03-27 20:15:30 praveen Exp $
 // $Name:  $
 
 #ifndef _GPIXMAP_H_
@@ -52,7 +52,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: GPixmap.h,v 1.24 2001-03-06 19:55:42 bcr Exp $# */
+    #$Id: GPixmap.h,v 1.25 2001-03-27 20:15:30 praveen Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -373,6 +373,13 @@ public:
   inline void borrow_data(GPixel &data, int w, int h); 
   /// Identical to the above, but GPixmap will do the delete []. 
   void donate_data(GPixel *data, int w, int h); 
+  
+  /** Rotates pixmap by 90, 180 or 270 degrees anticlockwise
+      and returns a new pixmap, input pixmap is not changed. 
+      count can be 1, 2, or 3 for 90, 180, 270 degree rotation.
+      It returns the same pixmap if not rotated. */
+  GP<GPixmap> rotate(int count=0);
+
   //@}
   
   // Please ignore these two functions. Their only purpose is to allow
