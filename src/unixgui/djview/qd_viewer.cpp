@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qd_viewer.cpp,v 1.6 2001-07-25 17:10:41 mchen Exp $
+// $Id: qd_viewer.cpp,v 1.7 2001-07-26 20:42:08 mchen Exp $
 // $Name:  $
 
 
@@ -412,11 +412,6 @@ QDViewer::layout(bool allow_redraw)
 void
 QDViewer::setCaption(void)
 {
-//   GUTF8String qkey_in="abc";
-//   throw ERROR_MESSAGE("QDViewer::setCaption", "QDViewer.pagekey_not_found" "\t" +qkey_in);
-
-//     ThrowError("QDViewer::slotChildError", "QDViewer.no_child_errmsg");
-
    if (dimg)
    {
       QWidget * w=this;
@@ -729,7 +724,7 @@ QDViewer::setDjVuDocument(GP<DjVuDocument> & doc, const GUTF8String &qkey_in)
    
    if (!new_dimg)
       throw ERROR_MESSAGE("QDViewer::setDjVuDocument",
-			  "QDViewer.pagekey_not_found" "\t" +qkey_in);
+			  ERR_MSG("QDViewer.pagekey_not_found") "\t" +qkey_in);
    setDjVuImage(new_dimg, 1);
 
    if (doc->get_pages_num()>1 &&
@@ -1358,13 +1353,15 @@ QDViewer::slotChildError(int pipe)
 	    FD_ZERO(&except_fds); FD_SET(pipe, &except_fds);
 	    int rc=select(pipe, &read_fds, 0, &except_fds, &tv);
 	    if (rc<0 && errno==EINTR) continue;
-	    if (rc<0) ThrowError("QDViewer::slotChildError", "QDViewer.no_child_errmsg");
+	    if (rc<0) ThrowError("QDViewer::slotChildError", 
+				 ERR_MSG("QDViewer.no_child_errmsg"));
 	    if (rc>=0)
 	       if (FD_ISSET(pipe, &read_fds))
 	       {
 		  char ch;
 		  int rc=::read(pipe, &ch, 1);
-		  if (rc<0) ThrowError("QDViewer::slotChildError", "QDViewer.no_child_errmsg");
+		  if (rc<0) ThrowError("QDViewer::slotChildError",
+				       ERR_MSG("QDViewer.no_child_errmsg"));
 		  if (rc==0) break;
 		  message+=ch;
 	       } else if (FD_ISSET(pipe, &except_fds))

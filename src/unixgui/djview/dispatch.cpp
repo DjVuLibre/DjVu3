@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: dispatch.cpp,v 1.2 2001-07-25 17:10:41 mchen Exp $
+// $Id: dispatch.cpp,v 1.3 2001-07-26 20:42:08 mchen Exp $
 // $Name:  $
 
 
@@ -199,7 +199,7 @@ QDispatchObject::slotGetURL(const GURL & url, const GUTF8String &qtarget)
       const QObject * obj=sender();
       if (!obj->inherits("DjVuViewer"))
 	 throw ERROR_MESSAGE("QDispatchObject::slotGetURL",
-			     "QDispatchObject.invalid_sender");
+			     ERR_MSG("QDispatchObject.invalid_sender"));
       const DjVuViewer * djvu=(const DjVuViewer *) obj;
       request_data(url, qtarget, djvu);
    } catch(const GException & exc)
@@ -216,7 +216,7 @@ QDispatchObject::slotShowStatus(const QString &qstatus)
       const QObject * obj=sender();
       if (!obj->inherits("DjVuViewer"))
 	 throw ERROR_MESSAGE("QDispatchObject::slotShowStatus",
-			     "QDispatchObject.invalid_sender");
+			     ERR_MSG("QDispatchObject.invalid_sender"));
       const DjVuViewer * djvu=(const DjVuViewer *) obj;
 
       const char *status=qstatus;
@@ -416,7 +416,7 @@ AttachWindow(void)
 
 	       displ=XOpenDisplay(displ_name);
 	       if (!displ) throw ERROR_MESSAGE("AttachWindow",
-					       "AttachWindow.open_display_fail" "\t" +
+					       ERR_MSG("AttachWindow.open_display_fail") "\t" +
 					       GUTF8String(XDisplayName(displ_name)));
 	       DEBUG_MSG("successfully opened connection to the display\n");
 
@@ -425,7 +425,8 @@ AttachWindow(void)
 	       vinfo.visualid=visual_id;
 	       vinfo_list=XGetVisualInfo(displ, VisualIDMask, &vinfo, &count);
 	       if (!vinfo_list || !count)
-		  throw ERROR_MESSAGE("AttachWindow","AttachWindow.no_netscape_visual");
+		  throw ERROR_MESSAGE("AttachWindow",
+				      ERR_MSG("AttachWindow.no_netscape_visual"));
 	       visual=vinfo_list[0].visual;
 	       depth=vinfo_list[0].depth;
 	       XFree(vinfo_list);
@@ -959,7 +960,7 @@ Dispatch(void)
 	    Handshake();
 	    break;
 	 default:
-	    throw ERROR_MESSAGE("Dispatch","Dispatch.unknown_pipe_read_request");
+	    throw ERROR_MESSAGE("Dispatch",ERR_MSG("Dispatch.unknown_pipe_read_request"));
       }
    } catch(PipeError & exc)
    {

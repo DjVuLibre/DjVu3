@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qd_viewer_shell.cpp,v 1.6 2001-07-25 17:10:41 mchen Exp $
+// $Id: qd_viewer_shell.cpp,v 1.7 2001-07-26 20:42:08 mchen Exp $
 // $Name:  $
 
 
@@ -114,7 +114,8 @@ QDViewerShell::openURL(const GURL & url)
 
    if (!url.is_local_file_url())
       throw ERROR_MESSAGE("QDViewerShell::openURL",
-			  "QDViewerShell.cant_display_remote" "\t" +(GUTF8String) url);
+			  ERR_MSG("QDViewerShell.cant_display_remote") "\t"
+			  +(GUTF8String) url);
 
    GUTF8String fname="-";
    GURL clean_url;
@@ -133,7 +134,8 @@ QDViewerShell::openURL(const GURL & url)
       gstr->read(&ch, 1);
    } catch(...)
    {
-      ThrowError("QDViewerShell::openURL", "QDViewerShell.open_file_fail" "\t" +fname);
+      ThrowError("QDViewerShell::openURL", ERR_MSG("QDViewerShell.open_file_fail") "\t"
+		 +fname);
    }
 
    if (fname!="-") QeFileDialog::lastLoadDir=QFileInfo(QStringFromGString(fname)).dirPath();
@@ -334,7 +336,7 @@ QDViewerShell::slotGetURLTimeout(void)
 	 }
       } else
       {
-	 throw ERROR_MESSAGE("main","main.cant_display_remote");
+	 throw ERROR_MESSAGE("main",ERR_MSG("main.cant_display_remote"));
       }
    } catch(const GException & exc)
    {

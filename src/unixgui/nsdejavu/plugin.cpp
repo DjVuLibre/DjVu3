@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: plugin.cpp,v 1.4 2001-07-25 17:10:42 mchen Exp $
+// $Id: plugin.cpp,v 1.5 2001-07-26 20:42:08 mchen Exp $
 // $Name:  $
 
 
@@ -1201,9 +1201,11 @@ NPError
 NPP_Initialize(void)
 {
 //#ifndef NO_DEBUG
-//    FILE *df=fopen("/dev/tty", "a");
-//   if (df) DjVuDebug::set_debug_file(df);
-//#endif
+#if 0
+   FILE *fd=fopen("/dev/tty", "a");
+   if (fd) DjVuDebug::set_debug_file(fd);
+#endif
+
    DEBUG_MSG("NPP_Initialize() called\n");
    DEBUG_MAKE_INDENT(3);
 

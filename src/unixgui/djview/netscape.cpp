@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: netscape.cpp,v 1.2 2001-07-25 17:10:41 mchen Exp $
+// $Id: netscape.cpp,v 1.3 2001-07-26 20:42:08 mchen Exp $
 // $Name:  $
 
 
@@ -163,7 +163,7 @@ WorkWithNetscape(void)
       FD_SET(pipe_read, &read_fds);
       int rc=select(pipe_read+1, &read_fds, 0, 0, exit_tv);
       if (rc<0 && errno!=EINTR)
-        ThrowError("WorkWithNetscape", "WorkWithNetscape.pipe_listen_fail");
+	 ThrowError("WorkWithNetscape", ERR_MSG("WorkWithNetscape.pipe_listen_fail"));
       if (rc==0)
         {
           DEBUG_MSG("Shutdown timeout => exit\n");

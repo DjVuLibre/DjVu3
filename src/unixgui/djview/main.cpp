@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: main.cpp,v 1.6 2001-07-25 17:10:41 mchen Exp $
+// $Id: main.cpp,v 1.7 2001-07-26 20:42:08 mchen Exp $
 // $Name:  $
 
 
@@ -208,8 +208,9 @@ main(int argc, char ** argv)
 	    if (level>32) level=32;
 	    DEBUG_SET_LEVEL(level);
 	 }
-  	 FILE *df=fopen("/dev/tty", "a");
-  	 if (df) DjVuDebug::set_debug_file(df);
+
+         FILE *fd=fopen("/dev/tty", "a");
+         if (fd) DjVuDebug::set_debug_file(fd);
       }
 #endif
 
@@ -315,7 +316,7 @@ main(int argc, char ** argv)
 	       } catch(...) {}
 
 	       if (!url.is_local_file_url())
-		  throw ERROR_MESSAGE("main","main.cant_display_remote");
+		  throw ERROR_MESSAGE("main",ERR_MSG("main.cant_display_remote"));
 	       if (page_num>0)
 	       {
 		     // Get rid of page specification via '#'

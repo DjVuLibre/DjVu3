@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: debug.cpp,v 1.25 2001-07-24 17:52:04 bcr Exp $
+// $Id: debug.cpp,v 1.26 2001-07-26 20:42:08 mchen Exp $
 // $Name:  $
 
 #ifdef NO_DEBUG
@@ -163,6 +163,7 @@ DjVuDebug::set_debug_file(FILE * file)
 //  GCriticalSectionLock glock(&debug_lock);
 //  if (debug_file && (debug_file != stderr))
 //    fclose(debug_file);
+  debug_file = 0;
   debug_file = ByteStream::create(file,"w",(file!=stderr));
 #endif
 }
