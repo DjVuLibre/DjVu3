@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: JB2Image.h,v 1.29 2001-01-04 22:04:55 bcr Exp $
+// $Id: JB2Image.h,v 1.30 2001-01-10 02:13:18 bcr Exp $
 // $Name:  $
 
 #ifndef _JB2IMAGE_H
@@ -129,7 +129,7 @@
     \end{itemize}
 
     @version
-    #$Id: JB2Image.h,v 1.29 2001-01-04 22:04:55 bcr Exp $#
+    #$Id: JB2Image.h,v 1.30 2001-01-10 02:13:18 bcr Exp $#
     @memo
     Coding bilevel images with JB2.
     @author
@@ -639,7 +639,6 @@ private:
 protected:
   // NumCoder
   int cur_ncell;
-  int max_ncell;
   BitContext *bitcells;
   GPBuffer<BitContext> gbitcells;
   NumContext *leftcell;

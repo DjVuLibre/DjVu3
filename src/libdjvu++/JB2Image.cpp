@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: JB2Image.cpp,v 1.52 2001-01-04 22:04:55 bcr Exp $
+// $Id: JB2Image.cpp,v 1.53 2001-01-10 02:13:18 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -301,7 +301,6 @@ JB2Dict::JB2DecodeCodec::JB2DecodeCodec(ByteStream &bs)
 JB2Dict::JB2Codec::JB2Codec(ByteStream &bs, const bool xencoding)
   : encoding(xencoding),
     cur_ncell(0),
-    max_ncell(CELLCHUNK+CELLEXTRA),
     gbitcells(bitcells,CELLCHUNK+CELLEXTRA),
     gleftcell(leftcell,CELLCHUNK+CELLEXTRA),
     grightcell(rightcell,CELLCHUNK+CELLEXTRA),
@@ -355,9 +354,9 @@ JB2Dict::JB2Codec::reset_numcoder()
   rel_loc_y_last = 0;
   rel_size_x = 0;
   rel_size_y = 0;
-  memset(bitcells, 0, sizeof(BitContext)*max_ncell);
-  memset(leftcell, 0, sizeof(NumContext)*max_ncell);
-  memset(rightcell, 0, sizeof(NumContext)*max_ncell);
+  gbitcells.clear();
+  gleftcell.clear();
+  grightcell.clear();
   cur_ncell = 1;
 }
 
@@ -375,7 +374,7 @@ JB2Dict::JB2DecodeCodec::set_dict_callback(JB2DecoderCallback *cb, void *arg)
 inline bool
 JB2Dict::JB2DecodeCodec::CodeBit(const bool, BitContext &ctx)
 {
-	return zp.decoder(ctx)?true:false;
+  return zp.decoder(ctx)?true:false;
 }
 
 int
@@ -398,13 +397,13 @@ JB2Dict::JB2Codec::CodeNum(int low, int high, NumContext *pctx, int v)
     {
       if (! *pctx)
         {
+          const int max_ncell=gbitcells;
           if (cur_ncell >= max_ncell)
             {
-              int nmax_ncell = max_ncell + CELLCHUNK;
+              const int nmax_ncell = max_ncell+CELLCHUNK;
               gbitcells.resize(nmax_ncell);
               gleftcell.resize(nmax_ncell);
               grightcell.resize(nmax_ncell);
-              max_ncell = nmax_ncell;
             }
           *pctx = cur_ncell ++;
           bitcells[*pctx] = 0;

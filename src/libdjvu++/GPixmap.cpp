@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: GPixmap.cpp,v 1.27 2001-01-06 03:09:04 bcr Exp $
+// $Id: GPixmap.cpp,v 1.28 2001-01-10 02:13:18 bcr Exp $
 // $Name:  $
 
 // -- Implements class PIXMAP
@@ -78,7 +78,6 @@ const GPixel GPixel::RED   = {   0,   0, 255 };
 static const GPixel *
 new_gray_ramp(int grays,GPixel *ramp)
 {
-  memset((void*)ramp, 0, 256 * sizeof(GPixel));
   int color = 0xff0000;
   int decrement = color / (grays-1);
   for (int i=0; i<grays; i++)
@@ -271,14 +270,15 @@ GPixmap::init(const GBitmap &ref, const GPixel *userramp)
 {
   init(ref.rows(), ref.columns(), 0);
   GPixel *xramp;
-  GPBuffer<GPixel> gxramp(xramp,0);
+  GPBuffer<GPixel> gxramp(xramp);
   if (nrows>0 && ncolumns>0)
   {
     // Create pixel ramp
     const GPixel *ramp = userramp;
     if (!userramp)
 	{
-      gxramp.resize(256);
+          gxramp.resize(256);
+          gxramp.clear();
 	  ramp = new_gray_ramp(ref.get_grays(),xramp);
 	}
     // Copy pixels
@@ -308,13 +308,14 @@ GPixmap::init(const GBitmap &ref, const GRect &rect, const GPixel *userramp)
   if (! rect2.isempty())
   {
     GPixel *xramp;
-    GPBuffer<GPixel> gxramp(xramp,0);
+    GPBuffer<GPixel> gxramp(xramp);
     // allocate ramp
     const GPixel *ramp = userramp;
     if (!userramp)
 	{
 	  gxramp.resize(256);
-      ramp = new_gray_ramp(ref.get_grays(),xramp);
+          gxramp.clear();
+          ramp = new_gray_ramp(ref.get_grays(),xramp);
 	}
     // copy pixels
     for (int y=rect2.ymin; y<rect2.ymax; y++)

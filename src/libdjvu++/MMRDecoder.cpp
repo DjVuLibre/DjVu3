@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: MMRDecoder.cpp,v 1.31 2001-01-04 22:04:55 bcr Exp $
+// $Id: MMRDecoder.cpp,v 1.32 2001-01-10 02:13:18 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -431,9 +431,7 @@ MMRDecoder::VLTable::VLTable(const VLCode *codes, int nbits)
   // allocate table
   int size = (1<<nbits);
   gindex.resize(size);
-  // fill table with pointer to illegal entry
-  for (i=0; i<size; i++)
-    index[i] = ncodes;
+  gindex.set(ncodes);
   // process codes
   for (i=0; i<ncodes; i++) {
     int c = codes[i].code;
@@ -473,9 +471,9 @@ MMRDecoder::MMRDecoder(ByteStream &bs, int width, int height, int striped)
     glineruns(lineruns,width+4), gprevruns(prevruns,width+4),
     src(0), mrtable(0), wtable(0), btable(0)
 {
-  memset(line,0,width+8);
-  memset(lineruns,0,width+4);
-  memset(prevruns,0,width+4);
+  gline.clear();
+  glineruns.clear();
+  gprevruns.clear();
   lineruns[0] = width;
   prevruns[0] = width;
   rowsperstrip = (striped ? bs.read16() : height);
