@@ -1,6 +1,6 @@
 %%%include <paths>
 
-SDKVERSION=3.1b4
+SDKVERSION=3.1b5
 
 %%%BEGIN_REQUIRE(@%LIBJPEG%@)
 LIBJPEGSO=$(LIBPATH)/libjpeg.so
