@@ -32,16 +32,15 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qd_viewer_shell.h,v 1.4 2001-10-16 18:01:45 docbill Exp $
+// $Id: qd_viewer_shell.h,v 1.3.2.1 2001-10-18 19:10:29 leonb Exp $
 // $Name:  $
-
 
 #ifndef HDR_QD_VIEWER_SHELL
 #define HDR_QD_VIEWER_SHELL
-
-#ifdef __GNUC__
-#pragma interface
+#ifdef HAVE_CONFIG_H
+#include "config.h"
 #endif
+
 
 #include "DjVuImage.h"		// Must be included before QT
 
@@ -70,6 +69,7 @@ private:
    GP<DjVuViewer>djvu;
    
    QeMenuBar	* menu;
+   QFrame       * status_frame;
    QLabel	* status_bar;
    QeNInOne	* main;
    QWidget	* wpaper;
@@ -79,8 +79,10 @@ private:
    const QObject * gu_djvu;
    GURL		gu_url;
    GUTF8String	gu_target;
-   
+
    GUTF8String	djvu_dir;
+
+   bool         fullscreen;
    
    void		getURL(const GURL & url, const GUTF8String &target);
    void		about(void);
@@ -91,10 +93,13 @@ private slots:
    void		slotMenuCB(int cmd);
    void		slotGetURLTimeout(void);
    void		slotGetURL(const GURL & url, const GUTF8String &target);
-protected:
-   virtual void	closeEvent(QCloseEvent * e);
 public slots:
    void		slotShowStatus(const QString &msg);
+   void         slotToggleFullScreen();
+   void         slotQueryFullScreen(bool &);
+protected:
+   virtual void	closeEvent(QCloseEvent * e);
+
 public:
       // Opens the document with the specified name in the current
       // window. ID serves to identify page to open. This is an obsolete
@@ -108,7 +113,10 @@ public:
       // Empty URL means to read stdin
    void		openURL(const GURL & url);
    void		setDjVuDir(const GUTF8String &dir);
-   
+
+      // Handle full screen mode
+   bool         isFullScreen() const;
+
    QDViewerShell(QWidget * parent=0, const char * name=0);
    ~QDViewerShell(void);
 };

@@ -32,13 +32,13 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qd_viewer_shell.cpp,v 1.10 2001-10-16 18:01:45 docbill Exp $
+// $Id: qd_viewer_shell.cpp,v 1.9.2.1 2001-10-18 19:10:29 leonb Exp $
 // $Name:  $
 
-
-#ifdef __GNUC__
-#pragma implementation
+#ifdef HAVE_CONFIG_H
+#include "config.h"
 #endif
+
 
 #include "DjVuImage.h"
 #include "DataPool.h"
@@ -165,6 +165,15 @@ QDViewerShell::openURL(const GURL & url)
 	 // Pass the pool to the DjVuViewer
       djvu->newStream(clean_url, pool);
       slotAboutToShowMenu();
+      QDViewer * viewer = djvu->getQDViewer();
+      if (viewer)
+        {
+          connect(viewer, SIGNAL(sigQueryFullScreen(bool &)),
+                  this, SLOT(slotQueryFullScreen(bool &)));
+          connect(viewer, SIGNAL(sigToggleFullScreen(void)),
+                  this, SLOT(slotToggleFullScreen(void)));
+        }
+
    } catch(const GException & exc)
    {
       main->setActiveWidget(wpaper);
@@ -251,6 +260,42 @@ QDViewerShell::help(void)
    }
 }
 
+bool
+QDViewerShell::isFullScreen() const
+{
+  return fullscreen;
+}
+
+void
+QDViewerShell::slotToggleFullScreen()
+{
+#ifndef QT1
+  if (isVisible())
+    {
+      hide();
+      fullscreen = ! fullscreen;
+      if (fullscreen)
+        {
+          menu->hide();
+          status_frame->hide();
+          showFullScreen();
+        }
+      else 
+        {
+          menu->show();
+          status_frame->show();
+          showNormal();
+        }
+    }
+#endif
+}
+
+void
+QDViewerShell::slotQueryFullScreen(bool &p)
+{
+  p |= fullscreen;
+}
+
 void
 QDViewerShell::slotMenuCB(int cmd)
 {
@@ -280,6 +325,9 @@ QDViewerShell::slotMenuCB(int cmd)
       } else if (cmd==IDC_HELP_DEJAVU)
       {
 	 help();
+      } else if (cmd==IDC_FULL_SCREEN)
+      {
+	 slotToggleFullScreen();
       } else
       {
 	 QDViewer * viewer;
@@ -356,12 +404,12 @@ QDViewerShell::slotGetURL(const GURL & url, const GUTF8String &target)
 void
 QDViewerShell::slotAboutToShowMenu(void)
 {
+      // The viewer does most of the job
    QDViewer * viewer;
    if (!djvu || !(viewer=djvu->getQDViewer()))
-   {
-      setItemsEnabled(menu, FALSE);
-   } else viewer->setupMenu(menu);
-   
+     setItemsEnabled(menu, FALSE);
+   else 
+     viewer->setupMenu(menu);
       // Enable the top-level things, Open and Exit and some more
    for(u_int i=0;i<menu->count();i++)
       menu->setItemEnabled(menu->idAt(i), TRUE);
@@ -371,6 +419,8 @@ QDViewerShell::slotAboutToShowMenu(void)
    menu->setItemEnabled(IDC_EXIT, TRUE);
    menu->setItemEnabled(IDC_ABOUT_DEJAVU, TRUE);
    menu->setItemEnabled(IDC_HELP_DEJAVU, TRUE);
+      // Set full screen mode
+   menu->setItemChecked(IDC_FULL_SCREEN, isFullScreen());
 }
 
 void
@@ -406,6 +456,7 @@ QDViewerShell::closeEvent(QCloseEvent * e)
 QDViewerShell::QDViewerShell(QWidget * parent, const char * name)
    : QMainWindow(parent, name) // DON'T use WDestructiveClose
 {
+   fullscreen = false;
    setCaption(tr("DjVu Standalone Viewer"));
 
       // Set the icon for the shell
@@ -446,6 +497,10 @@ QDViewerShell::QDViewerShell(QWidget * parent, const char * name)
    mode_pane->insertItem(tr("Black and &White"), IDC_DISPLAY_BLACKWHITE);
    mode_pane->insertItem(tr("&Background"), IDC_DISPLAY_BACKGROUND);
    mode_pane->insertItem(tr("&Foreground"), IDC_DISPLAY_FOREGROUND);
+#ifndef QT1
+   mode_pane->insertSeparator();
+   mode_pane->insertItem(tr("Full &Screen"), IDC_FULL_SCREEN);
+#endif
    connect(mode_pane, SIGNAL(aboutToShow(void)), this, SLOT(slotAboutToShowMenu(void)));
    menu->insertItem(tr("&Display"), mode_pane, IDC_MODE);
 
@@ -499,11 +554,11 @@ QDViewerShell::QDViewerShell(QWidget * parent, const char * name)
    main=new QeNInOne(central, "main");
    main->dontResize(TRUE);
    vlay->addWidget(main, 1);
-   QFrame * frame=new QFrame(central);
-   frame->setFrameStyle(QFrame::Panel | QFrame::Raised);
-   vlay->addWidget(frame);
-   QHBoxLayout * flay=new QHBoxLayout(frame, 2, 0);
-   status_bar=new QLabel(tr("Status bar"), frame, "status_bar");
+   status_frame=new QFrame(central);
+   status_frame->setFrameStyle(QFrame::Panel | QFrame::Raised);
+   vlay->addWidget(status_frame);
+   QHBoxLayout * flay=new QHBoxLayout(status_frame, 2, 0);
+   status_bar=new QLabel(tr("Status bar"), status_frame, "status_bar");
    status_bar->setFrameStyle(QFrame::Panel | QFrame::Sunken);
    status_bar->setFixedHeight(status_bar->sizeHint().height());
    status_bar->setAlignment(AlignVCenter | AlignLeft);

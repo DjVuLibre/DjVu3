@@ -32,13 +32,13 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qd_viewer_menu.cpp,v 1.16 2001-10-16 18:01:44 docbill Exp $
+// $Id: qd_viewer_menu.cpp,v 1.15.2.1 2001-10-18 19:10:29 leonb Exp $
 // $Name:  $
 
-
-#ifdef __GNUC__
-#pragma implementation
+#ifdef HAVE_CONFIG_H
+#include "config.h"
 #endif
+
 
 #include "qd_viewer_menu.h"
 #include "debug.h"
@@ -66,6 +66,12 @@ QDViewer::createPopupMenu(void)
    displ_pane->insertItem(tr("Black and &White"), IDC_DISPLAY_BLACKWHITE);
    displ_pane->insertItem(tr("&Background"), IDC_DISPLAY_BACKGROUND);
    displ_pane->insertItem(tr("&Foreground"), IDC_DISPLAY_FOREGROUND);
+#ifndef QT1
+   if (! in_netscape) {
+     displ_pane->insertSeparator();
+     displ_pane->insertItem(tr("Full &Screen"), IDC_FULL_SCREEN);
+   }
+#endif
    popup_menu->insertItem(tr("&Display"), displ_pane, IDC_DISPLAY);
 
    QPopupMenu * zoom_pane=new QPopupMenu(0, "zoom_pane");
@@ -225,6 +231,9 @@ QDViewer::runPopupMenu(QMouseEvent * ev)
    try
    {
       setupMenu(popup_menu);
+      bool fullscreen = false;
+      emit sigQueryFullScreen(fullscreen);
+      popup_menu->setItemChecked(IDC_FULL_SCREEN, fullscreen);
       
 	 // Strange as it may seem, but I can't process popup menu commands
 	 // directly from a slot connected to the proper activate() signal.
@@ -382,6 +391,10 @@ QDViewer::processCommand(int cmd)
 	 case IDC_EXPORT_PAGE:
 	    exportToPNM();
 	    break;
+
+         case IDC_FULL_SCREEN:
+            emit sigToggleFullScreen();
+            break;
 
 	 case IDC_GOTO_DJVU:
 	    getURL("http://www.lizardtech.com", "_blank");

@@ -32,16 +32,15 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qd_viewer.h,v 1.4 2001-10-16 18:01:44 docbill Exp $
+// $Id: qd_viewer.h,v 1.3.2.1 2001-10-18 19:10:29 leonb Exp $
 // $Name:  $
-
 
 #ifndef HDR_QD_VIEWER
 #define HDR_QD_VIEWER
-
-#ifdef __GNUC__
-#pragma interface
+#ifdef HAVE_CONFIG_H
+#include "config.h"
 #endif
+
 
 #include "qd_base.h"
 #ifdef UNIX
@@ -176,6 +175,8 @@ protected:
 signals:
    void		sigGetURL(const GURL & url, const GUTF8String &target);
    void		sigPageChanged(int page_num);
+   void         sigToggleFullScreen(void);
+   void         sigQueryFullScreen(bool &);
 public:
    SavedData	getSavedData(void) const;
    void		gotoStdPage(const GUTF8String &file_name, bool bypass_local=false);

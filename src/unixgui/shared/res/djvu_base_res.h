@@ -32,16 +32,15 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: djvu_base_res.h,v 1.18 2001-10-16 18:01:45 docbill Exp $
+// $Id: djvu_base_res.h,v 1.17.2.1 2001-10-18 19:10:31 leonb Exp $
 // $Name:  $
-
 
 #ifndef HDR_DJVU_BASE_RES
 #define HDR_DJVU_BASE_RES
-
-#ifdef __GNUC__
-#pragma interface
+#ifdef HAVE_CONFIG_H
+#include "config.h"
 #endif
+
 
 #define IDC_SAVE			40000
 #define IDC_SAVE_DOC			40001
@@ -96,6 +95,7 @@
 #define IDC_EXIT			41302
 #define IDC_FILE			41303
 #define IDC_IMPORT			41304
+#define IDC_FULL_SCREEN			41305
 
 #define IDC_NAVIGATE			41400
 #define IDC_NAV_FIRST_PAGE		41401
