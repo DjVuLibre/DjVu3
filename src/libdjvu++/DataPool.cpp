@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.cpp,v 1.1.2.1 1999-04-12 16:48:21 eaf Exp $
+//C- $Id: DataPool.cpp,v 1.1.2.2 1999-04-26 18:31:35 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -305,8 +305,8 @@ PoolByteStream::tell(void)
 //******************************** DataRange *********************************
 //****************************************************************************
 
-DataRange::DataRange(const GP<DataPool> & xpool, long xstart, long xlength) :
-      pool(xpool), start(xstart), length(xlength), stop_flag(0)
+void
+DataRange::init(void)
 {
    if (!pool) THROW("ZERO data pool passed as input.");
    if (length<0 && pool->is_eof()) length=pool->get_size()-start;
@@ -317,6 +317,18 @@ DataRange::DataRange(const GP<DataPool> & xpool, long xstart, long xlength) :
    }
 }
 
+DataRange::DataRange(const GP<DataPool> & xpool, long xstart, long xlength) :
+      pool(xpool), start(xstart), length(xlength), stop_flag(0)
+{
+   init();
+}
+
+DataRange::DataRange(const DataRange & r) : pool(r.pool),
+   start(r.start), length(r.length), stop_flag(0)
+{
+   init();
+}
+	 
 int
 DataRange::get_data(void * buffer, int offset, int size)
 {

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.h,v 1.1.2.1 1999-04-12 16:48:21 eaf Exp $
+//C- $Id: DataPool.h,v 1.1.2.2 1999-04-26 18:31:35 eaf Exp $
  
 #ifndef _DATAPOOL_H
 #define _DATAPOOL_H
@@ -31,7 +31,7 @@
 
     @memo Data storage with compatible byte streams.
     @author Andrei Erofeev
-    @version #$Id: DataPool.h,v 1.1.2.1 1999-04-12 16:48:21 eaf Exp $#
+    @version #$Id: DataPool.h,v 1.1.2.2 1999-04-26 18:31:35 eaf Exp $#
 */
 
 //@{
@@ -216,8 +216,10 @@ private:
 	    callback(xcallback), cl_data(xcl_data) {};
       virtual ~Trigger(void) {};
    };
+   void		init(void);
 public:
    DataRange(const GP<DataPool> & pool, long start=0, long length=-1);
+   DataRange(const DataRange & r);
 
    ByteStream *		get_stream(void);
    GP<DataPool>		get_pool(void) const;
