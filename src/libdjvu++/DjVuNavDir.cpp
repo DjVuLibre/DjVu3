@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuNavDir.cpp,v 1.4 1999-05-26 18:05:22 eaf Exp $
+//C- $Id: DjVuNavDir.cpp,v 1.5 1999-08-04 21:37:31 leonb Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -81,7 +81,7 @@ DjVuNavDir::encode(ByteStream & str)
    for(int i=0;i<page2name.size();i++)
    {
       GString & name=page2name[i];
-      str.writall(name, name.length());
+      str.writall((const char*)name, name.length());
       str.writall("\n", 1);
    };
 }
