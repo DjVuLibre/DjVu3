@@ -7,9 +7,9 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: IFFByteStream.cpp,v 1.3 1999-01-25 20:45:45 leonb Exp $
+//C-  $Id: IFFByteStream.cpp,v 1.4 1999-01-26 20:22:18 leonb Exp $
 
-// File "$Id: IFFByteStream.cpp,v 1.3 1999-01-25 20:45:45 leonb Exp $"
+// File "$Id: IFFByteStream.cpp,v 1.4 1999-01-26 20:22:18 leonb Exp $"
 // -- Implementation of IFFByteStream
 // - Author: Leon Bottou, 06/1998
 
@@ -23,10 +23,9 @@
 
 
 // Constructor
-IFFByteStream::IFFByteStream(ByteStream *bs)
-: ctx(0), bs(bs), dir(0)
+IFFByteStream::IFFByteStream(ByteStream &xbs)
+  : ctx(0), bs(&xbs), dir(0)
 {
-  assert(bs);
   offset = seekto = bs->tell();
 }
 

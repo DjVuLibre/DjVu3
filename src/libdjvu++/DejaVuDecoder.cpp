@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: DejaVuDecoder.cpp,v 1.2 1999-01-22 20:49:13 leonb Exp $
+//C-  $Id: DejaVuDecoder.cpp,v 1.3 1999-01-26 20:22:18 leonb Exp $
 
 #ifdef __GNUC__
 #pragma implementation "DejaVuCodec.h"
@@ -530,7 +530,7 @@ DejaVuDecoder::decode(DejaVuImage * dimg, GString * chunk_name,
   if (! iff)
     {
       GString chkid;
-      iff=new IFFByteStream(&bs);
+      iff=new IFFByteStream(bs);
       if (! iff->get_chunk(chkid))
         THROW("EOF");
       // Auto-determine MIME type

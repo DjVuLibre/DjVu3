@@ -7,10 +7,10 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: makedjvu.cpp,v 1.1 1999-01-22 00:40:19 leonb Exp $
+//C-  $Id: makedjvu.cpp,v 1.2 1999-01-26 20:22:18 leonb Exp $
 
 // MakeDjVu -- Assemble IFF files
-// $Id: makedjvu.cpp,v 1.1 1999-01-22 00:40:19 leonb Exp $
+// $Id: makedjvu.cpp,v 1.2 1999-01-26 20:22:18 leonb Exp $
 // Author: Leon Bottou 08/1997
 
 #include <stdio.h>
@@ -182,7 +182,7 @@ void
 create_fg44_chunk(IFFByteStream &iff, char *ckid, char *filename)
 {
   StdioByteStream bs(filename,"rb");
-  IFFByteStream bsi(&bs);
+  IFFByteStream bsi(bs);
   GString chkid;
   bsi.get_chunk(chkid);
   if (chkid != "FORM:PM44" && chkid != "FORM:BM44")
@@ -231,7 +231,7 @@ create_bg44_chunk(IFFByteStream &iff, char *ckid, char *filespec)
         THROW("makedjvu: invalid first BG44 specification (colon missing)");        
       GString filename(filespec, s-filespec);
       ByteStream *pbs = new StdioByteStream(filename,"rb");
-      bg44iff = new IFFByteStream(pbs);
+      bg44iff = new IFFByteStream(*pbs);
       GString chkid;
       bg44iff->get_chunk(chkid);
       if (chkid != "FORM:PM44" && chkid != "FORM:BM44")
@@ -303,7 +303,7 @@ main(int argc, char **argv)
     {
       remove(argv[1]);
       StdioByteStream obs(argv[1],"wb");
-      IFFByteStream iff(&obs);
+      IFFByteStream iff(obs);
       // Create header
       iff.put_chunk("FORM:DJVU", 1);
       // Create information chunk

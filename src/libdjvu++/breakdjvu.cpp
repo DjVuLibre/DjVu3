@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: breakdjvu.cpp,v 1.1 1999-01-22 00:40:19 leonb Exp $
+//C-  $Id: breakdjvu.cpp,v 1.2 1999-01-26 20:22:18 leonb Exp $
 
 // Obtains the components of a DJVU file
 // File "$Id"
@@ -46,12 +46,12 @@ breakdjvu(const char *filename,
           MemoryByteStream *pFG44)
   
 {
-  IFFByteStream BG44(pBG44);
-  IFFByteStream FG44(pFG44); 
+  IFFByteStream BG44(*pBG44);
+  IFFByteStream FG44(*pFG44); 
   int color_bg = 1;
   int color_fg = 1;
   StdioByteStream ibs(filename,"rb");
-  IFFByteStream iff(&ibs);
+  IFFByteStream iff(ibs);
   GString chkid;
   if (! iff.get_chunk(chkid))
     THROW("Malformed DJVU file");

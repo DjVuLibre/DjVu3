@@ -15,6 +15,7 @@ OBJS= 	GString.o		\
 	BSByteStream.o		\
 	GScaler.o               \
 	IWCodec.o		\
+	DjVuCodec.o             \
 	DejaVuDecoder.o		\
 	GOS.o                   \
 	debug.o	
@@ -130,28 +131,29 @@ ByteStream.o: ByteStream.cpp ByteStream.h DjVuGlobal.h GException.h \
  GContainer.h GSmartPointer.h
 DejaVuDecoder.o: DejaVuDecoder.cpp GException.h DjVuGlobal.h GRect.h \
  GString.h GSmartPointer.h GPixmap.h ByteStream.h GContainer.h \
- GBitmap.h JB2Codec.h ZPCodec.h IFFByteStream.h DejaVuCodec.h \
- IWCodec.h
+ GBitmap.h GScaler.h JB2Codec.h ZPCodec.h IFFByteStream.h \
+ DejaVuCodec.h IWCodec.h
+DjVuCodec.o: DjVuCodec.cpp DjVuCodec.h GString.h DjVuGlobal.h \
+ GException.h GSmartPointer.h GThreads.h ByteStream.h GContainer.h \
+ IFFByteStream.h JB2Codec.h ZPCodec.h GRect.h GBitmap.h IWCodec.h \
+ GPixmap.h
 GBitmap.o: GBitmap.cpp GBitmap.h DjVuGlobal.h GRect.h ByteStream.h \
  GException.h GContainer.h GSmartPointer.h GString.h
 GContainer.o: GContainer.cpp GContainer.h DjVuGlobal.h GException.h
-GException.o: GException.cpp GException.h DjVuGlobal.h
-GIFFManager.o: GIFFManager.cpp GIFFManager.h DjVuGlobal.h \
- IFFByteStream.h GException.h GString.h GSmartPointer.h ByteStream.h \
- GContainer.h
+GException.o: GException.cpp GException.h DjVuGlobal.h debug.h
 GOS.o: GOS.cpp GException.h DjVuGlobal.h GThreads.h GOS.h GString.h \
  GSmartPointer.h
 GPixmap.o: GPixmap.cpp GString.h DjVuGlobal.h GException.h \
  GSmartPointer.h ByteStream.h GContainer.h GRect.h GBitmap.h GPixmap.h \
  GThreads.h
 GRect.o: GRect.cpp GRect.h DjVuGlobal.h GException.h
+GScaler.o: GScaler.cpp GScaler.h GException.h DjVuGlobal.h GRect.h \
+ GBitmap.h ByteStream.h GContainer.h GSmartPointer.h GPixmap.h
 GSmartPointer.o: GSmartPointer.cpp GThreads.h DjVuGlobal.h \
  GException.h GSmartPointer.h
 GString.o: GString.cpp GString.h DjVuGlobal.h GException.h \
  GSmartPointer.h
 GThreads.o: GThreads.cpp GThreads.h DjVuGlobal.h GException.h
-GURL.o: GURL.cpp GException.h DjVuGlobal.h GOS.h GString.h \
- GSmartPointer.h GURL.h
 IFFByteStream.o: IFFByteStream.cpp IFFByteStream.h DjVuGlobal.h \
  GException.h GString.h GSmartPointer.h ByteStream.h GContainer.h
 IWCodec.o: IWCodec.cpp GRect.h DjVuGlobal.h GException.h \
@@ -162,19 +164,18 @@ JB2Codec.o: JB2Codec.cpp JB2Codec.h DjVuGlobal.h GString.h \
  GRect.h GBitmap.h
 ZPCodec.o: ZPCodec.cpp ZPCodec.h DjVuGlobal.h ByteStream.h \
  GException.h GContainer.h GSmartPointer.h
-annotate.o: annotate.cpp GIFFManager.h DjVuGlobal.h IFFByteStream.h \
- GException.h GString.h GSmartPointer.h ByteStream.h GContainer.h
 breakdjvu.o: breakdjvu.cpp GException.h DjVuGlobal.h ByteStream.h \
  GContainer.h GSmartPointer.h IFFByteStream.h GString.h
 bzz.o: bzz.cpp GException.h DjVuGlobal.h ByteStream.h GContainer.h \
  GSmartPointer.h BSByteStream.h ZPCodec.h
 c44.o: c44.cpp GString.h DjVuGlobal.h GException.h GSmartPointer.h \
  IWCodec.h GRect.h GBitmap.h ByteStream.h GContainer.h GPixmap.h \
- IFFByteStream.h
+ IFFByteStream.h GOS.h
 d44.o: d44.cpp GString.h DjVuGlobal.h GException.h GSmartPointer.h \
  IWCodec.h GRect.h GBitmap.h ByteStream.h GContainer.h GPixmap.h \
- IFFByteStream.h
-debug.o: debug.cpp debug.h
+ IFFByteStream.h GOS.h
+debug.o: debug.cpp debug.h GThreads.h DjVuGlobal.h GException.h \
+ GContainer.h
 djvutopnm.o: djvutopnm.cpp GException.h DjVuGlobal.h GSmartPointer.h \
  GRect.h GPixmap.h ByteStream.h GContainer.h GBitmap.h JB2Codec.h \
  GString.h ZPCodec.h IFFByteStream.h DejaVuCodec.h IWCodec.h

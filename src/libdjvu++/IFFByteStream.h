@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: IFFByteStream.h,v 1.1 1999-01-22 00:40:19 leonb Exp $
+//C-  $Id: IFFByteStream.h,v 1.2 1999-01-26 20:22:18 leonb Exp $
 
 
 #ifndef _IFFBYTESTREAM_H_
@@ -64,7 +64,7 @@
     @author
     Leon Bottou <leonb@research.att.com>
     @version
-    #$Id: IFFByteStream.h,v 1.1 1999-01-22 00:40:19 leonb Exp $# */
+    #$Id: IFFByteStream.h,v 1.2 1999-01-26 20:22:18 leonb Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -125,7 +125,7 @@ public:
   /** Constructs an IFFByteStream object attached to ByteStream #bs#.
       Any ByteStream can be used when reading an IFF file.  Writing
       an IFF file however requires a seekable ByteStream. */
-  IFFByteStream(ByteStream *bs);
+  IFFByteStream(ByteStream &bs);
   // --- BYTESTREAM INTERFACE
   ~IFFByteStream();
   size_t read(void *buffer, size_t size);

@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: c44.cpp,v 1.1 1999-01-22 00:40:19 leonb Exp $
+//C-  $Id: c44.cpp,v 1.2 1999-01-26 20:22:18 leonb Exp $
 
 
 /** @name c44
@@ -148,7 +148,7 @@
     @author
     Leon Bottou <leonb@research.att.com>
     @version
-    #$Id: c44.cpp,v 1.1 1999-01-22 00:40:19 leonb Exp $# */
+    #$Id: c44.cpp,v 1.2 1999-01-26 20:22:18 leonb Exp $# */
 //@{
 //@}
 
@@ -586,7 +586,7 @@ main(int argc, char **argv)
         {
           char *s = (prefix[0]=='F' ? prefix+8 : prefix+12);
           ibs.seek(0);
-          IFFByteStream iff(&ibs);
+          IFFByteStream iff(ibs);
           if (!strncmp(s,"PM44",4))
             {
               iwp = new IWPixmap();
@@ -615,7 +615,7 @@ main(int argc, char **argv)
         {
           remove(iw4file);
           StdioByteStream obs(iw4file,"wb");
-          IFFByteStream iff(&obs);
+          IFFByteStream iff(obs);
           if (flag_crcbdelay >= 0)
             iwp->parm_crcbdelay(flag_crcbdelay);
           if (flag_dbfrac > 0)
@@ -627,7 +627,7 @@ main(int argc, char **argv)
         {
           remove(iw4file);
           StdioByteStream obs(iw4file,"wb");
-          IFFByteStream iff(&obs);
+          IFFByteStream iff(obs);
           if (flag_dbfrac > 0)
             iwb->parm_dbfrac(flag_dbfrac);
           int nchunk = resolve_quality(w*h);
