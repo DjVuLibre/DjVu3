@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVu.h,v 1.10 2000-03-08 22:59:46 bcr Exp $
+ *C- $Id: DjVu.h,v 1.11 2000-03-10 14:57:35 haffner Exp $
  */
 
 #ifndef _DJVU_GLOBAL_API_H
@@ -26,7 +26,10 @@
 
 /*
  * $Log: DjVu.h,v $
- * Revision 1.10  2000-03-08 22:59:46  bcr
+ * Revision 1.11  2000-03-10 14:57:35  haffner
+ * Typos + cannot use "default" as a variable name!
+ *
+ * Revision 1.10  2000/03/08 22:59:46  bcr
  * Updated the documentation.  I'm using Leon's libdjvu++ documentation
  * as a template.
  *
@@ -314,7 +317,8 @@ DJVUAPI
   the value specified as default.
 */
 int
-djvu_parse_integer(struct djvu_parse,const char name[],const int default);
+djvu_parse_integer(struct djvu_parse,const char name[],
+                   const int default_val);
 
 DJVUAPI
 #if 0
@@ -378,7 +382,6 @@ DJVUAPI
   would be open.  Level should be 0 for the global configuration directory,
   1 for the user configuration file directory.  -1 has the special meaning
   of just return the path and don't actually search for a file name. */
-*/
 const char *
 djvu_parse_configfile(struct djvu_parse,const char[],int level);
 
