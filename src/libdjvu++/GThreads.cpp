@@ -7,10 +7,10 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: GThreads.cpp,v 1.10 1999-03-06 00:05:00 leonb Exp $
+//C-  $Id: GThreads.cpp,v 1.11 1999-03-06 00:07:05 leonb Exp $
 
 
-// **** File "$Id: GThreads.cpp,v 1.10 1999-03-06 00:05:00 leonb Exp $"
+// **** File "$Id: GThreads.cpp,v 1.11 1999-03-06 00:07:05 leonb Exp $"
 // This file defines machine independent classes
 // for running and synchronizing threads.
 // - Author: Leon Bottou, 01/1998
@@ -857,21 +857,24 @@ cotask_select(int nfds,
 static void
 cotask_unblock_wchan(int *wchan)
 {
-  cotask *n = curtask->next;
-  cotask *q = n;
-  do 
-    { 
-      if (q->wchan == wchan)
-        {
-          q->wchan=0; 
-          q->maxwait=0; 
-          q->wselect=0; 
-          q->over = 0;
-        }
-      q = q->next;
-    } 
-  while (q!=n);
-  cotask_yield();
+  if (maintask && curtask)
+    {
+      cotask *n = curtask->next;
+      cotask *q = n;
+      do 
+        { 
+          if (q->wchan == wchan)
+            {
+              q->wchan=0; 
+              q->maxwait=0; 
+              q->wselect=0; 
+              q->over = 0;
+            }
+          q = q->next;
+        } 
+      while (q!=n);
+      cotask_yield();
+    }
 }
 
 
