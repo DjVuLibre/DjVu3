@@ -215,7 +215,7 @@ int
 main(int argc,char *argv[],char *[])
 {
   FILE *log=0;
-  int ignore_error=0;
+  DjVuDocument::ErrorRecoveryAction recover_errors=DjVuDocument::ABORT;
   int bundled_only=0;
   int status=1;
   struct stat statbuf;
@@ -229,7 +229,7 @@ main(int argc,char *argv[],char *[])
       argv++;
     }else if(!strcmp(argv[1],"-force")||!strcmp(argv[1],"--force"))
     {
-      ignore_error=1;
+      recover_errors=DjVuDocument::SKIP_CHUNKS;
       argc--;
       argv++;
     }else if(!strcmp(argv[1],"--"))
@@ -277,11 +277,13 @@ main(int argc,char *argv[],char *[])
       fprintf(stderr,"WARNING: The new index name %s does not have a .djvu extension.\n",newindex);
     }
   }
-  TRY {
+  TRY
+  {
     GString file_name=oldindex;
     GP<DjVuDocument> doc=new DjVuDocument;
+    doc->set_verbose_eof(true);
+    doc->set_recover_errors(recover_errors);
     doc->init(GOS::filename_to_url(file_name));
-
     if((doc->get_doc_type()==DjVuDocument::BUNDLED)||(doc->get_doc_type()==DjVuDocument::INDIRECT))
     {
       fputs("This document is already in the new format.\n",stderr);
@@ -297,11 +299,11 @@ main(int argc,char *argv[],char *[])
       {
         char *where=new char [strlen(tmp)+strlen(basename)+2];
         sprintf(where,"%s/%s",(const char *)tmp,basename);
-        doc->save_as(where,0,ignore_error);
+        doc->save_as(where,false);
         delete [] where;
       }else if(doc->get_doc_type() == DjVuDocument::OLD_INDEXED)
       {
-        doc->expand((const char *)tmp,basename,ignore_error);
+        doc->expand((const char *)tmp,basename);
       }else
       {
         fprintf(stderr,"%s is an unrecognized format\n",oldindex);

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.h,v 1.45 1999-11-20 22:45:08 bcr Exp $
+//C- $Id: DjVuDocument.h,v 1.46 1999-11-21 09:21:36 bcr Exp $
  
 #ifndef _DJVUDOCUMENT_H
 #define _DJVUDOCUMENT_H
@@ -33,7 +33,7 @@
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@research.att.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocument.h,v 1.45 1999-11-20 22:45:08 bcr Exp $#
+    @version #$Id: DjVuDocument.h,v 1.46 1999-11-21 09:21:36 bcr Exp $#
 */
 
 //@{
@@ -542,7 +542,7 @@ public:
 	  {\bf Plugin Warning}. This function will read contents of the whole
 	  document. Thus, if you call it from the main thread (the thread,
 	  which transfers data from Netscape), the plugin will block. */
-   GP<DjVmDoc>		get_djvm_doc(const bool SkipErrors=0);
+   GP<DjVmDoc>		get_djvm_doc(void);
       /** Saves the document in the {\em new bundled} format. All the data
 	  is "bundled" into one file and this file is written into the
 	  passed stream.
@@ -572,8 +572,7 @@ public:
 	         directory (basically, list of all files composing the document).
       */
    void			expand(const char * dir_name,
-			       const char * idx_name,
-                               const bool SkipErrors=0);
+			       const char * idx_name);
       /** This function can be used instead of \Ref{write}() and \Ref{expand}().
 	  It allows to save the document either in the new #BUNDLED# format
 	  or in the new #INDIRECT# format depending on the value of parameter
@@ -586,8 +585,7 @@ public:
 	           index file. All document files will be saved into the
 		   save directory where the index file will resize. */
    virtual void		save_as(const char where[],
-                          const bool bundled=0,
-                          const bool SkipErrors=0);
+                          const bool bundled=0);
       //@}
       /** Returns pointer to the internal directory of the document, if it
 	  is in one of the new formats: #BUNDLED# or #INDIRECT#.
@@ -610,7 +608,8 @@ public:
  			long set_mask, long clr_mask);
 
    virtual GList<GString>	get_file_names(void);
-
+   virtual void 	set_recover_errors(ErrorRecoveryAction=ABORT);
+   virtual void 	set_verbose_eof(bool=true);
 protected:
    GURL			init_url;
    GP<DataPool>		init_data_pool;
@@ -622,6 +621,8 @@ protected:
    bool			has_file_names;
    GCriticalSection	file_names_lock;
    GList<GString>	file_names;
+   ErrorRecoveryAction	recover_errors;
+   bool			verbose_eof;
 
 private:
    class UnnamedFile : public GPEnabled
@@ -762,6 +763,18 @@ DjVuDocument::get_djvm_dir(void) const
    if (doc_type!=BUNDLED && doc_type!=INDIRECT)
       THROW("The document is in obsolete format => no DjVm directory.");
    return djvm_dir;
+}
+
+inline void
+DjVuDocument::set_recover_errors(ErrorRecoveryAction recover)
+{
+  recover_errors=recover;
+}
+
+inline void
+DjVuDocument::set_verbose_eof(bool verbose)
+{
+  verbose_eof=verbose;
 }
 
 //@}

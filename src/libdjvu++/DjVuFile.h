@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.h,v 1.48 1999-11-17 18:36:23 eaf Exp $
+//C- $Id: DjVuFile.h,v 1.49 1999-11-21 09:21:36 bcr Exp $
  
 #ifndef _DJVUFILE_H
 #define _DJVUFILE_H
@@ -46,7 +46,7 @@
 
     @memo Classes representing DjVu files.
     @author Andrei Erofeev <eaf@research.att.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuFile.h,v 1.48 1999-11-17 18:36:23 eaf Exp $#
+    @version #$Id: DjVuFile.h,v 1.49 1999-11-21 09:21:36 bcr Exp $#
 */
 
 //@{
@@ -435,6 +435,9 @@ public:
    virtual void		notify_chunk_done(const DjVuPort * source, const char * name);
    virtual void		notify_file_flags_changed(const DjVuFile * source,
 						  long set_mask, long clr_mask);
+   virtual void		set_recover_errors(ErrorRecoveryAction=ABORT);
+   virtual void		set_verbose_eof(bool=true);
+   virtual void		report_error(const GException &ex,const bool=true);
 protected:
    GURL			url;
    GP<DataPool>		data_pool;
@@ -442,6 +445,9 @@ protected:
    GPList<DjVuFile>	inc_files_list;
    GCriticalSection	inc_files_lock;
    GCriticalSection	anno_lock;
+   ErrorRecoveryAction	recover_errors;
+   bool			verbose_eof;
+   int			chunks_number;
 private:
    bool                 initialized;
    GSafeFlags		flags;
@@ -584,8 +590,6 @@ DjVuFile::get_url(void) const
 {
    return url;
 }
-
-
 
 //@}
 

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GException.h,v 1.14 1999-08-18 21:38:00 leonb Exp $
+//C- $Id: GException.h,v 1.15 1999-11-21 09:21:36 bcr Exp $
 
 
 #ifndef _GEXCEPTION_H_
@@ -60,7 +60,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@research.att.com> -- fixed message memory allocation.
     @version 
-    #$Id: GException.h,v 1.14 1999-08-18 21:38:00 leonb Exp $# */
+    #$Id: GException.h,v 1.15 1999-11-21 09:21:36 bcr Exp $# */
 //@{
 
 #include "DjVuGlobal.h"
@@ -170,6 +170,7 @@ public:
 #define G_CATCH(n)   catch(GException &n) { 
 #define G_ENDCATCH   }
 #define G_RETHROW    GExceptionHandler::rethrow()
+#define G_EXTHROW(ex)  GExceptionHandler::exthrow(ex)
 #ifdef __GNUG__
 #define G_THROW(msg) GExceptionHandler::exthrow \
   (GException(msg, __FILE__, __LINE__, __PRETTY_FUNCTION__))
@@ -212,9 +213,11 @@ public:
 #ifdef __GNUG__
 #define G_THROW(msg) GExceptionHandler::emthrow \
   (GException(msg, __FILE__, __LINE__, __PRETTY_FUNCTION__)) 
+#define G_EXTHROW(ex) GExceptionHandler::emthrow(ex)
 #else
 #define G_THROW(m) GExceptionHandler::emthrow \
   (GException(m, __FILE__, __LINE__)) no_return
+#define G_EXTHROW(ex) GExceptionHandler::emthrow(ex) no_return
 #endif
 
 #endif // !CPP_SUPPORTS_EXCEPTIONS
@@ -225,13 +228,32 @@ public:
 #undef ENDCATCH
 #undef RETHROW
 #undef THROW
+#undef FAKERETHROW
 #define TRY G_TRY
 #define CATCH G_CATCH
 #define ENDCATCH G_ENDCATCH
 #define RETHROW G_RETHROW
 #define THROW G_THROW
 
+inline void
+EXTHROW
+(const GException &ex,const char *msg=0,const char *file=0,int line=0,const char *func=0)
+{
+  G_EXTHROW( (msg||file||line||func)?
+      GException(msg?msg:ex.get_cause(),
+        file?file:ex.get_file(),
+        line?line:ex.get_line(),
+        func?func:ex.get_function())
+  :ex);
+}
 
+inline void
+EXTHROW
+(const char msg[],const char *file=0,int line=0,const char *func=0)
+{
+  G_EXTHROW(GException(msg,file,line,func));
+}
 
+  
 // -------------- THE END
 #endif

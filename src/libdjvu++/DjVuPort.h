@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuPort.h,v 1.22 1999-11-19 23:44:18 bcr Exp $
+//C- $Id: DjVuPort.h,v 1.23 1999-11-21 09:21:36 bcr Exp $
  
 #ifndef _DJVUPORT_H
 #define _DJVUPORT_H
@@ -71,7 +71,7 @@
     @memo DjVu decoder communication mechanism.
     @author Andrei Erofeev <eaf@research.att.com>\\
             L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuPort.h,v 1.22 1999-11-19 23:44:18 bcr Exp $# */
+    @version #$Id: DjVuPort.h,v 1.23 1999-11-21 09:21:36 bcr Exp $# */
 //@{
 
 class DjVuPort;
@@ -201,6 +201,12 @@ public:
 	  is done and how long the decoding will continue.  Argument #done# is
 	  a number from 0 to 1 reflecting the progress. */
    virtual void		notify_decode_progress(const DjVuPort * source, float done);
+      /** This is the standard types for defining what to do in case of errors.
+          This is only used by some of the subclasses, but it needs to be 
+          defined here to guarentee all subclasses use the same enum types.
+          In general, many errors are none recoverable.  Using a setting
+          other than ABORT may just result in even more errors. */
+   enum ErrorRecoveryAction {ABORT=0,SKIP_PAGES=1,SKIP_CHUNKS=2,KEEP_ALL=3 }; 
       //@}
 };
 

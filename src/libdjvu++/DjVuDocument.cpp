@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.71 1999-11-20 22:45:07 bcr Exp $
+//C- $Id: DjVuDocument.cpp,v 1.72 1999-11-21 09:21:36 bcr Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -37,7 +37,12 @@ get_int_prefix(void * ptr)
 }
 
 DjVuDocument::DjVuDocument(void)
-  : doc_type(UNKNOWN_TYPE), has_file_names(false), init_called(false), cache(0) 
+  : doc_type(UNKNOWN_TYPE),
+    has_file_names(false),
+    recover_errors(ABORT),
+    verbose_eof(false),
+    init_called(false),
+    cache(0) 
 {
 }
 
@@ -620,6 +625,8 @@ DjVuDocument::url_to_file(const GURL & url, bool dont_create)
       file->init(url, this);
       set_file_aliases(file);
    }
+   file->set_recover_errors(recover_errors);
+   file->set_verbose_eof(verbose_eof);
 
    return file;
 }
@@ -675,6 +682,8 @@ DjVuDocument::get_djvu_file(int page_num, bool dont_create)
       
 	    GP<DjVuFile> file=new DjVuFile();
 	    file->init(url, this);
+            file->set_recover_errors(recover_errors);
+            file->set_verbose_eof(verbose_eof);
 	    ufile->file=file;
 	    return file;
 	 } else url=((DjVuFile *) (DjVuPort *) port)->get_url();
@@ -682,8 +691,8 @@ DjVuDocument::get_djvu_file(int page_num, bool dont_create)
    }
    
    GP<DjVuFile> file=url_to_file(url, dont_create);
-   if (file) pcaster->add_route(file, this);
-   
+   if (file) 
+     pcaster->add_route(file, this);
    return file;
 }
 
@@ -735,14 +744,16 @@ DjVuDocument::get_djvu_file(const char * id, bool dont_create)
       
 	 GP<DjVuFile> file=new DjVuFile();
 	 file->init(url, this);
+         file->set_recover_errors(recover_errors);
+         file->set_verbose_eof(verbose_eof);
 	 ufile->file=file;
 	 return file;
       }
    }
 
    GP<DjVuFile> file=url_to_file(url, dont_create);
-   if (file) get_portcaster()->add_route(file, this);
-   
+   if (file)
+     get_portcaster()->add_route(file, this);
    return file;
 }
 
@@ -1332,7 +1343,7 @@ DjVuDocument::get_file_names(void)
 }
 
 GP<DjVmDoc>
-DjVuDocument::get_djvm_doc(const bool SkipErrors)
+DjVuDocument::get_djvm_doc()
       // This function may block for data
 {
    check();
@@ -1362,7 +1373,7 @@ DjVuDocument::get_djvm_doc(const bool SkipErrors)
       DEBUG_MSG("Converting: the document is in an old format.\n");
 
       GMap<GURL, void *> map_add;
-      if(!SkipErrors)
+      if(recover_errors == ABORT)
       {
         for(int page_num=0;page_num<ndir->get_pages_num();page_num++)
         {
@@ -1380,7 +1391,6 @@ DjVuDocument::get_djvm_doc(const bool SkipErrors)
           }
           CATCH(ex)
           {
-            if(!SkipErrors) RETHROW;
             TRY { 
               get_portcaster()->notify_error(this, ex.get_cause()); 
               static const char emsg[]="Skipping page %d due to errors.\n";
@@ -1420,18 +1430,18 @@ DjVuDocument::write(ByteStream & str, bool force_djvm)
 }
 
 void
-DjVuDocument::expand(const char * dir_name, const char * idx_name, const bool SkipErrors)
+DjVuDocument::expand(const char * dir_name, const char * idx_name)
 {
    DEBUG_MSG("DjVuDocument::expand(): dir_name='" << dir_name << "'\n");
    DEBUG_MAKE_INDENT(3);
    
-   GP<DjVmDoc> doc=get_djvm_doc(SkipErrors);
+   GP<DjVmDoc> doc=get_djvm_doc();
    doc->expand(dir_name, idx_name);
 }
 
 void
 DjVuDocument::save_as
-(const char where[], const bool bundled,const bool SkipErrors)
+(const char where[], const bool bundled)
 {
    DEBUG_MSG("DjVuDocument::save_as(): where='" << where <<
 	     "', bundled=" << bundled << "\n");
@@ -1444,6 +1454,6 @@ DjVuDocument::save_as
       DataPool::load_file(full_name);
       StdioByteStream str(full_name, "wb");
       write(str);
-   } else expand(GOS::dirname(full_name), GOS::basename(full_name),SkipErrors);
+   } else expand(GOS::dirname(full_name), GOS::basename(full_name));
 }
 

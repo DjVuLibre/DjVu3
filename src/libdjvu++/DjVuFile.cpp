@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.88 1999-11-19 18:38:51 eaf Exp $
+//C- $Id: DjVuFile.cpp,v 1.89 1999-11-21 09:21:36 bcr Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -27,7 +27,8 @@
 #define STRINGIFY_(x) #x
 
 
-
+#define REPORT_EOF(x) \
+  {TRY{THROW("EOF");}CATCH(ex){report_error(ex,(x));}ENDCATCH;}
 
 class ProgressByteStream : public ByteStream
 {
@@ -81,7 +82,8 @@ private:
 
 
 DjVuFile::DjVuFile()
-  : file_size(0), initialized(false)
+  : file_size(0), recover_errors(ABORT), verbose_eof(false), chunks_number(-1),
+    initialized(false)
 {
 }
 
@@ -424,6 +426,44 @@ DjVuFile::decode_func(void)
    DEBUG_MSG("decoding thread for url='" << url << "' ended\n");
 }
 
+void
+DjVuFile::set_recover_errors
+(ErrorRecoveryAction recover)
+{
+  if(recover != recover_errors)
+  {
+     // We need to set this class's recover_error flag first, to avoid 
+     // possable inifinite recursion.
+    recover_errors=recover;
+    if (are_incl_files_created())
+    {
+      // make sure all children have the same setting.
+      GCriticalSectionLock lock(&inc_files_lock);
+      for(GPosition pos=inc_files_list;pos;++pos)
+	inc_files_list[pos]->set_recover_errors(recover);
+    }
+  }
+}
+
+void
+DjVuFile::set_verbose_eof
+(bool verbose)
+{
+  if(verbose != verbose_eof)
+  {
+     // We need to set this class's recover_error flag first, to avoid 
+     // possable inifinite recursion.
+    verbose_eof=verbose;
+    if (are_incl_files_created())
+    {
+      // make sure all children have the same setting.
+      GCriticalSectionLock lock(&inc_files_lock);
+      for(GPosition pos=inc_files_list;pos;++pos)
+	inc_files_list[pos]->set_verbose_eof(verbose);
+    }
+  }
+}
+
 GP<DjVuFile>
 DjVuFile::process_incl_chunk(ByteStream & str, int file_num)
 {
@@ -469,6 +509,8 @@ DjVuFile::process_incl_chunk(ByteStream & str, int file_num)
       
 	 // No. We have to request a new file
       GP<DjVuFile> file=(DjVuFile *) pcaster->id_to_file(this, incl_str).get();
+      if(recover_errors != ABORT) file->set_recover_errors(recover_errors);
+      if(verbose_eof) file->set_verbose_eof(verbose_eof);
       if (!file) THROW("Internal error: id_to_file() didn't create any file.");
       pcaster->add_route(file, this);
       
@@ -494,6 +536,37 @@ DjVuFile::process_incl_chunk(ByteStream & str, int file_num)
    return 0;
 }
 
+
+void
+DjVuFile::report_error
+(const GException &ex,bool throw_errors)
+{
+  const char eof_msg[]="Unexpected End Of File Encountered Reading:\n\t%0.1024s";
+  if((verbose_eof)||strcmp(ex.get_cause(),"EOF"))
+  {
+    if(throw_errors)
+    {
+      EXTHROW(ex);
+    }else
+    {
+      get_portcaster()->notify_error(this,ex.get_cause());
+    }
+  }else
+  {
+    char buffer[sizeof(eof_msg)+1020];
+    const char *url=get_url();
+    strcpy(buffer,eof_msg); 
+    sprintf(buffer,eof_msg,url);
+    if(throw_errors)
+    {
+      EXTHROW(ex,buffer);
+    }else
+    {
+      get_portcaster()->notify_error(this,buffer);
+    }
+  }
+}
+
 void
 DjVuFile::process_incl_chunks(void)
       // This function may block for data
@@ -506,16 +579,30 @@ DjVuFile::process_incl_chunks(void)
    int incl_cnt=0;
    
    GP<ByteStream> str=data_pool->get_stream();
-   int chksize;
    GString chkid;
    IFFByteStream iff(*str);
    if (iff.get_chunk(chkid))
    {
-      while((chksize=iff.get_chunk(chkid)))
+      int chunks=0;
+      TRY
       {
-	 if (chkid=="INCL") process_incl_chunk(iff, incl_cnt++);
-	 iff.close_chunk();
+         int chunks_left=(recover_errors>SKIP_PAGES)?chunks_number:(-1);
+         int chksize;
+         while((chunks_left--)&&(chksize=iff.get_chunk(chkid)))
+         {
+            chunks++;
+	    if (chkid=="INCL") process_incl_chunk(iff, incl_cnt++);
+	    iff.close_chunk();
+         }
+         if (chunks_number < 0) chunks_number=chunks;
       }
+      CATCH(ex)
+      {	
+         if (chunks_number < 0)
+           chunks_number=(recover_errors>SKIP_CHUNKS)?chunks:(chunks-1);
+         report_error(ex,(recover_errors <= SKIP_PAGES));
+      }
+      ENDCATCH;
    }
    flags|=INCL_FILES_CREATED;
 }
@@ -874,11 +961,10 @@ DjVuFile::decode(ByteStream & str)
    DjVuPortcaster * pcaster=get_portcaster();
 
    // Get form chunk
-   int chksize;
    GString chkid;
    IFFByteStream iff(str);
    if (!iff.get_chunk(chkid)) 
-     THROW("EOF");
+     REPORT_EOF(true)
 
    // Check file format
    bool djvi = (chkid=="FORM:DJVI");
@@ -892,21 +978,46 @@ DjVuFile::decode(ByteStream & str)
      THROW("DejaVu decoder: a DJVU or IW44 image was expected");
    
    // Process chunks
-   while((chksize = iff.get_chunk(chkid)))
-     {
-       // Decode
-       GString str = decode_chunk(chkid, iff, djvi, djvu, iw44);
-       // Update description and notify
-       GString desc;
-       desc.format(" %0.1f Kb\t'%s'\t%s.\n", chksize/1024.0, 
+   int size_so_far=iff.tell();
+   int chunks=0;
+   TRY
+   {
+      int chunks_left=(recover_errors>SKIP_PAGES)?chunks_number:(-1);
+      int chksize;
+      while((chunks_left--)&&(chksize = iff.get_chunk(chkid)))
+        {
+          chunks++;
+          // Decode
+          GString str = decode_chunk(chkid, iff, djvi, djvu, iw44);
+          // Update description and notify
+          GString desc;
+          desc.format(" %0.1f Kb\t'%s'\t%s.\n", chksize/1024.0, 
                    (const char*)chkid, (const char*)str );
-       description=description+desc;
-       pcaster->notify_chunk_done(this, chkid);
-       // Close chunk
-       iff.close_chunk();
+          description=description+desc;
+          pcaster->notify_chunk_done(this, chkid);
+          // Close chunk
+          iff.close_chunk();
+          // Record file size
+          size_so_far=iff.tell();
+        }
+      if (chunks_number < 0) chunks_number=chunks;
+   }
+   CATCH(ex)
+   {
+     if(!strcmp(ex.get_cause(),"EOF"))
+     {
+       if (chunks_number < 0)
+         chunks_number=(recover_errors>SKIP_CHUNKS)?chunks:(chunks-1);
+       report_error(ex,(recover_errors <= SKIP_PAGES));
+     }else
+     {
+       report_error(ex,true);
      }
+   }
+   ENDCATCH;
+
    // Record file size
-   file_size=iff.tell();
+   file_size=size_so_far;
    // Close form chunk
    iff.close_chunk();
    // Close BG44 codec
@@ -1085,23 +1196,43 @@ DjVuFile::decode_ndir(GMap<GURL, void *> & map)
       
       GP<ByteStream> str=data_pool->get_stream();
       
-      int chksize;
       GString chkid;
       IFFByteStream iff(*str);
       if (!iff.get_chunk(chkid)) 
-	 THROW("EOF");
+        REPORT_EOF(true)
 
-      while((chksize=iff.get_chunk(chkid)))
+      int chunks=0;
+      TRY
       {
-	 if (chkid=="NDIR")
-	 {
-	    GP<DjVuNavDir> d=new DjVuNavDir(url);
-	    d->decode(iff);
-	    dir=d;
-	    break;
-	 }
-	 iff.close_chunk();
+         int chunks_left=(recover_errors>SKIP_PAGES)?chunks_number:(-1);
+         int chksize;
+         while((chunks_left--)&&(chksize=iff.get_chunk(chkid)))
+         {
+	    chunks++;
+	    if (chkid=="NDIR")
+	    {
+	       GP<DjVuNavDir> d=new DjVuNavDir(url);
+	       d->decode(iff);
+	       dir=d;
+	       break;
+	    }
+	    iff.close_chunk();
+         }
+         if ((!dir)&&(chunks_number < 0)) chunks_number=chunks;
       }
+      CATCH(ex)
+      {
+         if(!strcmp(ex.get_cause(),"EOF"))
+         {
+           if (chunks_number < 0)
+             chunks_number=(recover_errors>SKIP_CHUNKS)?chunks:(chunks-1);
+           report_error(ex,(recover_errors<=SKIP_PAGES));
+         }else
+         {
+           report_error(ex,true);
+         }
+      }
+      ENDCATCH;
 
       if (dir) return dir;
 
@@ -1318,40 +1449,77 @@ DjVuFile::set_name(const char * name)
 int
 DjVuFile::get_chunks_number(void)
 {
-   check();
-   int chunks=0;
-   GP<ByteStream> str=data_pool->get_stream();
-   int chksize;
-   GString chkid;
-   IFFByteStream iff(*str);
-   if (!iff.get_chunk(chkid)) 
-      THROW("EOF");
-   while((chksize=iff.get_chunk(chkid)))
+   if(chunks_number < 0)
    {
-      chunks++;
-      iff.close_chunk();
+     GP<ByteStream> str=data_pool->get_stream();
+     GString chkid;
+     IFFByteStream iff(*str);
+     if (!iff.get_chunk(chkid))
+       REPORT_EOF(true)
+
+     int chunks=0;
+     TRY
+     {
+       int chksize;
+       while((chksize=iff.get_chunk(chkid)))
+       {
+          chunks++;
+          iff.close_chunk();
+       }
+     }
+     CATCH(ex)
+     {
+       report_error(ex,(recover_errors<=SKIP_PAGES));
+     }
+     ENDCATCH;
+     chunks_number=chunks;
    }
-   return chunks;
+   return chunks_number;
 }
 
 GString
 DjVuFile::get_chunk_name(int chunk_num)
 {
+   if(chunk_num < 0)
+   {
+     THROW("Illegal chunk number");
+   }
+   if((chunks_number >= 0)&&(chunk_num > chunks_number))
+   {
+     THROW("Too few chunks");
+   }
    check();
+
    GString name;
    GP<ByteStream> str=data_pool->get_stream();
-   int chksize;
    GString chkid;
    IFFByteStream iff(*str);
    if (!iff.get_chunk(chkid)) 
-      THROW("EOF");
-   int chunk=0;
-   while((chksize=iff.get_chunk(chkid)))
+     REPORT_EOF(true)
+
+   int chunks=0;
+   TRY
    {
-      if (chunk++==chunk_num) { name=chkid; break; }
-      iff.close_chunk();
+     int chunks_left=(recover_errors>SKIP_PAGES)?chunks_number:(-1);
+     int chksize;
+     while((chunks_left--)&&(chksize=iff.get_chunk(chkid)))
+     {
+        if (chunks++==chunk_num) { name=chkid; break; }
+        iff.close_chunk();
+     }
    }
-   if (!name.length()) THROW("Too few chunks.");
+   CATCH(ex)
+   {
+     if (chunks_number < 0)
+       chunks_number=(recover_errors>SKIP_CHUNKS)?chunks:(chunks-1);
+     report_error(ex,(recover_errors <= SKIP_PAGES));
+   }
+   ENDCATCH;
+   if (!name.length())
+   {
+     if (chunks_number < 0) chunks_number=chunks;
+     THROW("Too few chunks.");
+   }
    return name;
 }
 
@@ -1365,16 +1533,31 @@ DjVuFile::contains_chunk(const char * chunk_name)
    
    bool contains=0;
    GP<ByteStream> str=data_pool->get_stream();
-   int chksize;
    GString chkid;
    IFFByteStream iff(*str);
    if (!iff.get_chunk(chkid)) 
-      THROW("EOF");
-   while((chksize=iff.get_chunk(chkid)))
+     REPORT_EOF((recover_errors<=SKIP_PAGES))
+
+   int chunks=0;
+   TRY
    {
-      if (chkid==chunk_name) { contains=1; break; }
-      iff.close_chunk();
+     int chunks_left=(recover_errors>SKIP_PAGES)?chunks_number:(-1);
+     int chksize;
+     while((chunks_left--)&&(chksize=iff.get_chunk(chkid)))
+     {
+       chunks++;
+       if (chkid==chunk_name) { contains=1; break; }
+       iff.close_chunk();
+     }
    }
+   CATCH(ex)
+   {
+     if (chunks_number < 0)
+       chunks_number=(recover_errors>SKIP_CHUNKS)?chunks:(chunks-1);
+     report_error(ex,(recover_errors <= SKIP_PAGES));
+   }
+   ENDCATCH;
+   if (!contains &&(chunks_number < 0)) chunks_number=chunks;
    return contains;
 }
 
@@ -1409,21 +1592,32 @@ DjVuFile::add_djvu_data(IFFByteStream & ostr, GMap<GURL, void *> & map,
    bool processed_annotation = false;
      
    GP<ByteStream> str=data_pool->get_stream();
-   int chksize;
    GString chkid;
    IFFByteStream iff(*str);
    if (!iff.get_chunk(chkid)) 
-     THROW("EOF");
+     REPORT_EOF(true)
+
    // Open toplevel form
    if (top_level) 
      ostr.put_chunk(chkid);
    // Process chunks
-   while((chksize = iff.get_chunk(chkid)))
+   int chunks=0;
+   TRY
    {
+     int chunks_left=(recover_errors>SKIP_PAGES)?chunks_number:(-1);
+     int chksize;
+     while((chunks_left--)&&(chksize = iff.get_chunk(chkid)))
+     {
+      chunks++;
       if (chkid=="INCL" && included_too)
         {
           GP<DjVuFile> file = process_incl_chunk(iff);
-          if (file) file->add_djvu_data(ostr, map, included_too, no_ndir);
+          if (file)
+          {
+            if(recover_errors!=ABORT) file->set_recover_errors(recover_errors);
+            if(verbose_eof) file->set_verbose_eof(verbose_eof);
+            file->add_djvu_data(ostr, map, included_too, no_ndir);
+          }
         } 
       else if (is_annotation(chkid) && anno && anno->size())
         {
@@ -1449,11 +1643,34 @@ DjVuFile::add_djvu_data(IFFByteStream & ostr, GMap<GURL, void *> & map,
       else
         {
           ostr.put_chunk(chkid);
-          ostr.copy(iff);
+          int ochksize=ostr.copy(iff);
           ostr.close_chunk();
+          if(ochksize != chksize)
+          {
+            iff.close_chunk();
+            if (chunks_number < 0)
+              chunks_number=(recover_errors>SKIP_CHUNKS)?chunks:(chunks-1);
+            THROW("EOF");
+          }
         }
       iff.close_chunk();
+     }
+     if (chunks_number < 0) chunks_number=chunks;
    }
+   CATCH(ex)
+   {
+     if(!strcmp(ex.get_cause(),"EOF"))
+     {
+       if (chunks_number < 0)
+         chunks_number=(recover_errors>SKIP_CHUNKS)?chunks:(chunks-1);
+       report_error(ex,(recover_errors<=SKIP_PAGES));
+     }else
+     {
+       report_error(ex,true);
+     }
+   }
+   ENDCATCH;
+
    // Otherwise, writes annotation at the end (annotations could be big)
    if (!processed_annotation && anno && anno->size())
      {
@@ -1463,7 +1680,7 @@ DjVuFile::add_djvu_data(IFFByteStream & ostr, GMap<GURL, void *> & map,
      }
    // Close iff
    if (top_level) 
-     ostr.close_chunk();
+       ostr.close_chunk();
 }
 
 
@@ -1531,11 +1748,11 @@ DjVuFile::insert_file(const char * id, int chunk_num)
 
    int chunk_cnt=0;
    bool done=false;
-   int chksize;
    GString chkid;
    if (iff_in.get_chunk(chkid))
    {
       iff_out.put_chunk(chkid);
+      int chksize;
       while((chksize=iff_in.get_chunk(chkid)))
       {
 	 if (chunk_cnt++==chunk_num)
@@ -1594,11 +1811,11 @@ DjVuFile::unlink_file(const char * id)
    MemoryByteStream str_out;
    IFFByteStream iff_out(str_out);
 
-   int chksize;
    GString chkid;
    if (iff_in.get_chunk(chkid))
    {
       iff_out.put_chunk(chkid);
+      int chksize;
       while((chksize=iff_in.get_chunk(chkid)))
       {
 	 if (chkid!="INCL")
