@@ -7,47 +7,48 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuDecodeAPI.h,v 1.23 2000-02-26 18:53:20 bcr Exp $
+ *C- $Id: DjVuDecodeAPI.h,v 1.24 2000-03-05 18:13:37 bcr Exp $
  */
 
 #ifndef _DJVUDECODE_H_
 #define _DJVUDECODE_H_
 
-#ifndef DJVUAPI
-
-#ifndef DJVU_STATIC_LIBRARY
-#ifdef WIN32 
-#define DLLIMPORT __declspec(dllimport)
-#define DLLEXPORT __declspec(dllexport)
-#else
-#define DLLIMPORT /**/
-#define DLLEXPORT /**/
-#endif
-#else /* DJVU_STATIC_LIBRARY */
-#define DLLIMPORT /**/
-#define DLLEXPORT /**/
-#endif /* DJVU_STATIC_LIBRARY */
-
-#ifdef BUILD_LIB
-#define DJVUAPI DLLEXPORT
-#else
-#define DJVUAPI DLLIMPORT
-#endif  /*BUILD_LIB*/
-
-#endif /*DJVUAPI*/
-
 
 /** @name DjVuDecodeAPI.h
-      functions used to decode multiple page DjVu documents...
+    
+    #DjVuDecodeAPI.h# defines the API for decoding multi page documents.
+    The structures defined here are also used for some of the encoding
+    functions.
+    @author
+    Bill C Riemers <bcr@att.com>
 */
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif /* __cplusplus */
+/*
+ * $Log: DjVuDecodeAPI.h,v $
+ * Revision 1.24  2000-03-05 18:13:37  bcr
+ * More comment changes.
+ *
+ */
+
 
 /* Predeclarations. */
- 
+
+/*@{*/
+
+/** ++ #djvu_layer_type# is used define which layer should be decoded.
+  Possible values consist of DJVU_ALL, DJVU_MASK, DJVU_FOREGROUND, and
+  DJVU_BACKGROUND.
+ */ 
+enum djvu_layer_type_enum
+{
+  DJVU_ALL,
+  DJVU_MASK,
+  DJVU_FOREGROUND,
+  DJVU_BACKGROUND
+};
+
+typedef enum djvu_layer_type_enum djvu_layer_type;
+
 struct djvu_parse;
 
 struct djvuio_struct;
@@ -55,22 +56,22 @@ struct djvuio_struct;
 typedef struct djvuio_struct* djvu_import;
 typedef struct djvuio_struct* djvu_export;
 
-typedef enum djvu_layer_type_enum
+#ifdef __cplusplus
+extern "C"
 {
-  DJVU_ALL,
-  DJVU_MASK,
-  DJVU_FOREGROUND,
-  DJVU_BACKGROUND
-} djvu_layer_type;
+#ifndef __cplusplus
+};
+#endif /* __cplusplus */
+#endif /* __cplusplus */
 
-/*@{*/
 
-/** @name djvu_transform_options struct
-      
-    @memo Options that effect the processing of images.
+/** @memo #djvu_transform_options# preprocessing of images.
+
+   The #djvu_transform_options# structure defines the options
+   used by all the decoding API and some encoding API's for
+   transforming the image.
 */
-
-typedef struct djvu_transform_options_struct
+struct djvu_transform_options_struct
 {
   /** The #hflip# transform reverses left-right orientation.  This 
     results in mirror imaged documents.  Set #hflip# to non-zero
@@ -120,20 +121,20 @@ typedef struct djvu_transform_options_struct
 #ifdef __cplusplus
   inline djvu_transform_options_struct();
 #endif /* __cplusplus */
-} djvu_transform_options;
+};
 
-/*@}*/
+typedef struct djvu_transform_options_struct djvu_transform_options;
 
-/*@{*/
+/** @memo #djvu_process_options# control the selection of input and output.
 
-/** @name djvu_process_options struct
-      
-     @memo Options used in deciding page range, output devices, etc.
+    The #djvu_process_options# structure defines the input and output files
+    which should be used, which pages should be parsed, and how errors
+    and warnings should be logged.
 */
-
-typedef struct djvu_process_options_struct
+struct djvu_process_options_struct
 {
-  /** This keeps a string delimited by hypens(-) and commas(,) */
+  /** This keeps a string delimited by hypens(-) and commas(,) listing
+      the pages that should be parsed. */
   const char *page_range;
 
   /** warnfileno should be non-zero to print warning messages that may
@@ -177,25 +178,25 @@ typedef struct djvu_process_options_struct
 #ifdef __cplusplus
   inline djvu_process_options_struct();
 #endif /* __cplusplus */
-} djvu_process_options;
+};
 
-/*@}*/
+typedef struct djvu_process_options_struct djvu_process_options;
 
-/*@{*/
+/** @memo #djvu_decode_options# contains options correponding to djvudecode.
 
-/** @name djvu_decode_options struct
-      
-     @memo Options used in djvu_decode function 
+   The values of the #djvu_decode_options# structure control all
+   aspects of djvudecode.
 */
 
-typedef struct djvu_decode_options_struct
+struct djvu_decode_options_struct
 {
-  /** The #djvu_process_options struct# defines the pages to be parsed,
-     input, and output, and contains the pointer for storing errors. */
+  /** The \Ref{djvu_process_options} structure, #process#, defines the pages
+     to be parsed, input, and output, and contains the pointer for storing
+     errors. */
   djvu_process_options process;
 
-  /** These are the transformation options.  These will take place after
-    rendering. */
+  /** The \Ref{djvu_transform_options} structure, #transform, defines the
+    preprocessing that should be done while rendering. */
   djvu_transform_options transform;
 
   /** #output_format# is string, that indicates the output format, specified
@@ -212,64 +213,129 @@ typedef struct djvu_decode_options_struct
   inline djvu_decode_options_struct();
 #endif /* __cplusplus */
 
-} djvu_decode_options;
+};
 
+typedef struct djvu_decode_options_struct djvu_decode_options;
 
-/** @name djvu_decode_options_alloc function 
-    This is the primary allocation routine for the
-    #djvu_decode_options struct#.  Even if the values specified are
-    illegal, an options structure will always be returned. */
+#ifndef DJVUAPI
+#if 0
+class dummy
+{
+  private:
+#endif
+#ifndef DJVU_STATIC_LIBRARY
+#ifdef WIN32 
+#define DLLIMPORT __declspec(dllimport)
+#define DLLEXPORT __declspec(dllexport)
+#else
+#define DLLIMPORT /**/
+#define DLLEXPORT /**/
+#endif
+#else /* DJVU_STATIC_LIBRARY */
+#define DLLIMPORT /**/
+#define DLLEXPORT /**/
+#endif /* DJVU_STATIC_LIBRARY */
+#if 0
+};
+#endif
+
+#ifdef BUILD_LIB
+#define DJVUAPI DLLEXPORT
+#else
+#define DJVUAPI DLLIMPORT
+#endif  /*BUILD_LIB*/
+
+#endif /*DJVUAPI*/
+
+/** @name DjVuDecodeAPI C function calls
+ */
+
+/*@{*/
+
 DJVUAPI
+#if 0
+;
+#endif
+/** ++ This is the primary allocation routine for the
+    #djvu_decode_options#.  Even if the values specified are
+    illegal, an options structure will always be returned. */
 djvu_decode_options *
 djvu_decode_options_alloc(struct djvu_parse *,int,const char * const argv[]);
 
-/** @name djvu_decode_options_free function
-    Deallocates the fields of the #djvu_decode_options struct#.
+DJVUAPI
+#if 0
+;
+#endif
+/** ++ Deallocates the fields of the #djvu_decode_options#.
     You should always use the free option, even if you did not use alloc
     so the data pointed to by priv is deallocated. */
-DJVUAPI
 void djvu_decode_options_free(djvu_decode_options *);
 
-/** @name djvu_decode function 
-    This function converts the source multipage DjVu document to
-    a document image according to options structure. */
 DJVUAPI
+#if 0
+;
+#endif
+/** ++ This function converts the source multipage DjVu document to
+    a document image according to options structure. */
 int djvu_decode(djvu_decode_options[1]);
 
-/** A non-zero value indicates there are error messages.  Error
+DJVUAPI
+#if 0
+;
+#endif
+/** ++ A non-zero value indicates there are error messages.  Error
     messages are generated for both fatal errors, and errors
     that are recovered from.  */
-DJVUAPI
 int djvu_decode_haserror(const djvu_decode_options [1]);
 
-/** A non-zero value indicates there are warning messages.  Warning
+DJVUAPI
+#if 0
+;
+#endif
+/** ++ A non-zero value indicates there are warning messages.  Warning
     messages are generated from non-fatal errors, and sometimes just
     abnormal, but correct usage. */
-DJVUAPI
 int djvu_decode_haswarning(const djvu_decode_options [1]);
 
-/** Returns a string of the first error message on the stack.  Each
-    call erases the previous return value. */
 DJVUAPI
+#if 0
+;
+#endif
+/** ++ Returns a string of the first error message on the stack.  Each
+    call erases the previous return value. */
 const char * djvu_decode_error(djvu_decode_options [1]);
 
-/** Returns a string of the first warning message on the stack.  Each
-    call erases the previous return value. */
 DJVUAPI
+#if 0
+;
+#endif
+/** ++ Returns a string of the first warning message on the stack.  Each
+    call erases the previous return value. */
 const char * djvu_decode_warning(djvu_decode_options [1]);
 
-/** Prints all the errors to stderr. */
 DJVUAPI
+#if 0
+;
+#endif
+/** ++ Prints all the errors to stderr. */
 void djvu_decode_perror(djvu_decode_options [1],const char *mesg);
 
-/** This will print usage instructions to the specified output. */
 DJVUAPI
+#if 0
+;
+#endif
+/** ++ This will print usage instructions to the specified output. */
 void djvu_decode_usage(int fd,const char *prog);
 
 /*@}*/
 
+/*@}*/
+
 #ifdef __cplusplus
-}
+#ifndef __cplusplus
+{
+#endif 
+};
 
 inline djvu_transform_options_struct::djvu_transform_options_struct() :
   hflip(0), vflip(0), rotateAngle(0), togray(0), tobitonal(0),

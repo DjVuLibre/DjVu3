@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuBitonalAPI.h,v 1.10 2000-03-05 06:29:16 bcr Exp $
+ *C- $Id: DjVuBitonalAPI.h,v 1.11 2000-03-05 18:13:37 bcr Exp $
  */
 
 #ifndef _DJVUBITONAL_H_
@@ -23,7 +23,10 @@
 
 /* 
  * $Log: DjVuBitonalAPI.h,v $
- * Revision 1.10  2000-03-05 06:29:16  bcr
+ * Revision 1.11  2000-03-05 18:13:37  bcr
+ * More comment changes.
+ *
+ * Revision 1.10  2000/03/05 06:29:16  bcr
  * More documentation updates.
  *
  */
@@ -35,7 +38,8 @@
 /*@{*/
 
 /** ++ #bitonaltodjvu_type# is used to define the bitonal
-    compression type.
+    compression type.  Possible values consist of normal,
+    conservative, lossless, aggressive, and pseudo.
 */
 enum bitonaltodjvu_type_enum
 {
@@ -105,7 +109,7 @@ typedef struct djvu_jb2_options_struct djvu_jb2_options;
 
 /** @memo #bitonaltodjvu_options# lists options corresponding to bitonaltodjvu.
 
-    @memo The values of the #bitonaltodjvu_options# correspond to
+    The values of the #bitonaltodjvu_options# correspond to
     the command line options of the bitonaltodjvu utility.
 */
 

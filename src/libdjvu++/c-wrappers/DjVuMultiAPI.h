@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuMultiAPI.h,v 1.19 2000-03-05 06:29:17 bcr Exp $
+ *C- $Id: DjVuMultiAPI.h,v 1.20 2000-03-05 18:13:37 bcr Exp $
  */
 
 
@@ -26,7 +26,10 @@
 
 /* 
  * $Log: DjVuMultiAPI.h,v $
- * Revision 1.19  2000-03-05 06:29:17  bcr
+ * Revision 1.20  2000-03-05 18:13:37  bcr
+ * More comment changes.
+ *
+ * Revision 1.19  2000/03/05 06:29:17  bcr
  * More documentation updates.
  *
  * Revision 1.18  2000/03/03 00:48:35  bcr
@@ -132,35 +135,6 @@ typedef struct djvu_combine_options_struct djvu_combine_options;
  *  ------------------------------------------------------------------------
  * DYNAMIC LINK LIBRARY STUFF
  */
-
-#if 0
-class stupid
-{
-private:
-#endif
-#ifndef DJVUAPI
-#ifndef DJVU_STATIC_LIBRARY
-#ifdef WIN32 
-#define DLLIMPORT __declspec(dllimport)
-#define DLLEXPORT __declspec(dllexport)
-#else
-#define DLLIMPORT
-#define DLLEXPORT
-#endif
-#else /* DJVU_STATIC_LIBRARY */
-#define DLLIMPORT
-#define DLLEXPORT
-#endif /* DJVU_STATIC_LIBRARY */
-#if 0
-};
-#endif
-
-#ifdef BUILD_LIB
-#define DJVUAPI DLLEXPORT
-#else
-#define DJVUAPI DLLIMPORT
-#endif  /* BUILD_LIB */
-#endif  /* DJVUAPI */
 
 /** @name DjVuMultiAPI C function calls
  */

@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuPhotoAPI.h,v 1.13 2000-02-26 18:53:20 bcr Exp $
+ *C- $Id: DjVuPhotoAPI.h,v 1.14 2000-03-05 18:13:37 bcr Exp $
  */
 
 #ifndef _DJVUPHOTO_H_
@@ -16,15 +16,30 @@
 #include "DjVuDecodeAPI.h"
 
 /** @name DjVuPhotoAPI.h
-      functions used to convert multiple photo images to DjVu multipage 
-      photo files.
+
+   #DjVuPhotoAPI.h# defines the API for wavelette encoding multi page photos.
+   Most of the structures defined here are also used for the background
+   when document encoding.
+   @author
+   Bill C Riemers <bcr@att.com>
 */
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
+/*
+ * $Log: DjVuPhotoAPI.h,v $
+ * Revision 1.14  2000-03-05 18:13:37  bcr
+ * More comment changes.
+ *
+ */
 
+/* Predeclarations. */
+
+/*@{*/
+
+/** ++ #phototodjvu_type# is used to decide how aggressively to compress
+  the chrominance information when wavelette encoding.  Possible values
+  consist of djvu_crcbnone, djvu_crcbhalf, djvu_crcbnormal, djvu_crcbfull,
+  and djvu_jpeg.
+ */
 enum phototodjvu_type_enum
 {
   djvu_crcbnone,
@@ -33,9 +48,24 @@ enum phototodjvu_type_enum
   djvu_crcbfull,
   djvu_jpeg
 };
+
 typedef enum phototodjvu_type_enum phototodjvu_type;
 
-typedef struct djvu_iw44_options_struct
+#ifdef __cplusplus
+extern "C"
+{
+#ifndef __cplusplus
+};
+#endif
+#endif
+
+/** @memo #djvu_iw44_options# define wavelette compression options.
+
+   The #djvu_iw44_options# structure defines the options
+   used by the photo encoder (and document encoder) for 
+   wavelette encoding the image (background).
+*/
+struct djvu_iw44_options_struct
 {
 /** This is the gamma factor used for correcting the image lighting.
     If you don't know what this is just leave it as 2.2, the default. */
@@ -69,29 +99,30 @@ typedef struct djvu_iw44_options_struct
     specify at least one test for each chunk.) */
   const float *decibels;
 
-/** nchunks specifies the size of each of the above arrays.  The arrays must
+/** #nchunks# specifies the size of each of the above arrays.  The arrays must
     be either null pointers, or nchunk size. */
   int nchunks;
 
-/** crcbdelay */
+/** #crcbdelay# specifies the delay factor for chrominace encoding.  A value
+    of 10 is typical. */
   int crcbdelay;
 
 #ifdef __cplusplus
 inline djvu_iw44_options_struct();
 #endif /* __cplusplus */
 
-} djvu_iw44_options;
+};
 
+typedef struct djvu_iw44_options_struct djvu_iw44_options;
 
-/*@{*/
+/** @memo #phototodjvu_options# contains options correponding to phototodjvu.
 
-/** @name phototodjvu_options struct
-    @memo Options used in the phototodjvu function 
+  The values of the #phototodjvu_options# structure control all
+  aspects of photo encoding.
 */
-
-typedef struct phototodjvu_options_struct
+struct phototodjvu_options_struct
 {
-/** The #djvu_process_options struct@ defines the pages to be parsed,
+/** The \Ref{djvu_process_options} defines the pages to be parsed,
   input, and output, and contains the pointer for storing errors. */
   djvu_process_options process;
 
@@ -108,70 +139,107 @@ typedef struct phototodjvu_options_struct
 inline phototodjvu_options_struct();
 #endif /* __cplusplus */
 
-} phototodjvu_options;
+};
+
+typedef struct phototodjvu_options_struct phototodjvu_options;
 
 struct djvu_parse;
 
-/** @name phototodjvu_options_alloc function 
-    This is the primary allocation routine for phototodjvu_options.
+/** @name DjVuPhotoAPI C function calls
+ */
+
+/*@{*/
+
+DJVUAPI
+#if 0
+;
+#endif
+/** ++ This is the primary allocation routine for phototodjvu_options.
     Even if the values specified are illegal, an options structure
     will be returned. */
-DJVUAPI
 phototodjvu_options *
 phototodjvu_options_alloc(struct djvu_parse *,int,const char * const argv[]);
 
-/** @name phototodjvu_options_free function
-    Deallocates the fields of the phototodjvu_options structure.
+DJVUAPI
+#if 0
+;
+#endif
+/** ++ Deallocates the fields of the phototodjvu_options structure.
     You should always use the free option, even if you did not use alloc
     so the data pointed to by priv is freed. */
-DJVUAPI
 void phototodjvu_options_free(phototodjvu_options *);
 
-/** @name phototodjvu function 
-    This function converts the photo input files to a multipage DjVu document
+DJVUAPI
+#if 0
+;
+#endif
+/** ++ This function converts the photo input files to a multipage DjVu document
     according to the options structure.
     Depending on the type of the input data, the function uses the proper
     stream derived from \Ref{DjVu_Stream} for decoding, while 
     \Ref{DjVu_PixImage.h} for transformations and \Ref{DjVmDoc.h}, 
     \Ref{JB2Matcher.h} for encoding.  A non-zero return value indicates a
     fatal error. */
-DJVUAPI
 int phototodjvu(phototodjvu_options[1]);
 
-/** A non-zero value indicates there are error messages.  Error
+DJVUAPI
+#if 0
+;
+#endif
+/** ++ A non-zero value indicates there are error messages.  Error
     messages are generated for both fatal errors, and errors
     that are recovered from.  */
-DJVUAPI
 int phototodjvu_haserror(const phototodjvu_options [1]);
 
-/** A non-zero value indicates there are warning messages.  Waring
+DJVUAPI
+#if 0
+;
+#endif
+/** ++ A non-zero value indicates there are warning messages.  Waring
     messages are generated for non-fatal problems, that may be an
     error, or could just be abnormal usage. */
-DJVUAPI
 int phototodjvu_haswarning(const phototodjvu_options [1]);
 
-/** Returns a string of the first error message on the stack.  Each
-    call erases the previous return value. */
 DJVUAPI
+#if 0
+;
+#endif
+/** ++ Returns a string of the first error message on the stack.  Each
+    call erases the previous return value. */
 const char * phototodjvu_error(phototodjvu_options [1]);
 
-/** Returns a string of the first warning message on the stack.  Each
-    call erases the previous return value. */
 DJVUAPI
+#if 0
+;
+#endif
+/** ++ Returns a string of the first warning message on the stack.  Each
+    call erases the previous return value. */
 const char * phototodjvu_warning(phototodjvu_options [1]);
 
-/** Prints all the errors to stderr */
 DJVUAPI
+#if 0
+;
+#endif
+/** ++ Prints all the errors to stderr */
 void phototodjvu_perror(phototodjvu_options [1],const char *mesg);
 
-/** This will print usage instructions to the specified output. */
 DJVUAPI
+#if 0
+;
+#endif
+/** ++ This will print usage instructions to the specified output. */
 void phototodjvu_usage(int fd,const char *prog);
 
 /*@}*/ 
 
+/*@}*/ 
+
 #ifdef __cplusplus
-}
+#ifndef __cplusplus
+{
+#endif
+};
+
 
 inline djvu_iw44_options_struct::djvu_iw44_options_struct() :
   gamma((float)DEFAULT_GAMMA), compression(djvu_crcbnormal), slices(0),
@@ -183,3 +251,4 @@ inline phototodjvu_options_struct::phototodjvu_options_struct() :
 #endif
 
 #endif /* _DJVUPHOTO_H_ */
+
