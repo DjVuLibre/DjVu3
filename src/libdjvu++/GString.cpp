@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.81 2001-04-25 21:30:06 bcr Exp $
+// $Id: GString.cpp,v 1.82 2001-04-25 22:15:35 praveen Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -355,35 +355,35 @@ inline bool
 GStringRep::iswspace(const unsigned long w)
 {
   return ((sizeof(wchar_t) == 2)&&(w&~0xffff))
-    ?(true):(::iswspace(w)?true:false);
+    ?(true):((unsigned long)::iswspace((wchar_t)w)?true:false);
 }
 
 inline bool
 GStringRep::iswupper(const unsigned long w)
 {
   return ((sizeof(wchar_t) == 2)&&(w&~0xffff))
-    ?(true):(::iswupper(w)?true:false);
+    ?(true):((unsigned long)::iswupper((wchar_t)w)?true:false);
 }
 
 inline bool
 GStringRep::iswlower(const unsigned long w)
 {
   return ((sizeof(wchar_t) == 2)&&(w&~0xffff))
-    ?(true):(::iswlower(w)?true:false);
+    ?(true):((unsigned long)::iswlower((wchar_t)w)?true:false);
 }
 
 inline unsigned long
 GStringRep::towupper(const unsigned long w)
 {
   return ((sizeof(wchar_t) == 2)&&(w&~0xffff))
-    ?w:(::towupper(w));
+    ?w:((unsigned long)::towupper((wchar_t)w));
 }
 
 inline unsigned long
 GStringRep::towlower(const unsigned long w)
 {
   return ((sizeof(wchar_t) == 2)&&(w&~0xffff))
-    ?w:(::towlower(w));
+    ?w:((unsigned long)::towlower((wchar_t)w));
 }
 
 
@@ -1909,13 +1909,13 @@ GStringRep::Native::getValidUCS4(const char *&source) const
   return retval;
 }
 
-inline int
+int
 GStringRep::nextNonSpace(const int from,const int len) const
 {
   return nextCharType(iswspace,from,len,true);
 }
 
-inline int
+int
 GStringRep::nextSpace(const int from,const int len) const
 {
   return nextCharType(iswspace,from,len,false);
