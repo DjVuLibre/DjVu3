@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuPort.cpp,v 1.5 1999-06-22 19:14:51 leonb Exp $
+//C- $Id: DjVuPort.cpp,v 1.6 1999-08-17 21:27:10 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -204,6 +204,27 @@ DjVuPortcaster::sort_closure(const GMap<const void *, void *> & set,
    } ENDCATCH;
 }
 
+GURL
+DjVuPortcaster::id_to_url(const DjVuPort * source, const char * id)
+{
+   GMap<const void *, void *> set;
+   GList<const void *> list;
+   compute_closure(set, source);
+   sort_closure(set, list);
+
+   GURL url;
+   for(GPosition pos=list;pos;++pos)
+   {
+      DjVuPort * port=(DjVuPort *) list[pos];
+      if (is_port_alive(port))
+      {
+	 url=port->id_to_url(source, id);
+	 if (!url.is_empty()) break;
+      }
+   }
+   return url;
+}
+
 GP<DataRange>
 DjVuPortcaster::request_data(const DjVuPort * source, const GURL & url)
 {
@@ -388,6 +409,9 @@ DjVuPortcaster::notify_all_data_received(const DjVuPort * source)
 //****************************************************************************
 //******************************* DjVuPort ***********************************
 //****************************************************************************
+
+GURL
+DjVuPort::id_to_url(const DjVuPort *, const char *) { return GURL(); }
 
 GP<DataRange>
 DjVuPort::request_data(const DjVuPort *, const GURL &) { return 0; }

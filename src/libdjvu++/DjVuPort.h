@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuPort.h,v 1.2 1999-05-25 19:42:28 eaf Exp $
+//C- $Id: DjVuPort.h,v 1.3 1999-08-17 21:27:09 eaf Exp $
  
 #ifndef _DJVUPORT_H
 #define _DJVUPORT_H
@@ -68,7 +68,7 @@
     
     @memo DjVu decoder communication mechanism.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuPort.h,v 1.2 1999-05-25 19:42:28 eaf Exp $#
+    @version #$Id: DjVuPort.h,v 1.3 1999-08-17 21:27:09 eaf Exp $#
 */
 
 //@{
@@ -112,6 +112,13 @@ public:
 	  is either #DjVuPort# or #DjVuFile# */
    virtual bool		inherits(const char * class_name) const;
 
+      /** This request is issued to request translation of the ID, used
+	  in an DjVu INCL chunk to a URL, which may be used to request
+	  data associated with included file. \Ref{DjVuDocument} usually
+	  intercepts all such requests, and the user doesn't have to
+	  worry about the translation */
+   virtual GURL		id_to_url(const DjVuPort * source, const char * id);
+   
       /** This request is issued when decoder needs additional data
 	  for decoding. Both \Ref{DjVuFile} and \Ref{DjVuDocument} are
 	  initialized with a #URL#, not the document data. As soon as
@@ -350,62 +357,66 @@ public:
       /// Returns 1 if #class_name# is #"DjVuPort"# or #"DjVuPortcaster".#
    virtual bool		inherits(const char * class_name) const;
 
-      /** Computes destination list for #soure# and calls the corresponding
+      /** Computes destination list for #source# and calls the corresponding
+	  function in each of the ports from the destination list starting from
+	  the closest until one of them returns non-empty \Ref{GURL}. */
+   virtual GURL		id_to_url(const DjVuPort * source, const char * id);
+      /** Computes destination list for #source# and calls the corresponding
 	  function in each of the ports from the destination list starting from
 	  the closest until one of them returns non-zero \Ref{DataRange}. */
    virtual GP<DataRange>request_data(const DjVuPort * source, const GURL & url);
 
-      /** Computes destination list for #soure# and calls the corresponding.
+      /** Computes destination list for #source# and calls the corresponding.
 	  function in each of the ports from the destination starting from
 	  the closest until one of them returns 1. */
    virtual bool		notify_error(const DjVuPort * source, const char * msg);
 
-      /** Computes destination list for #soure# and calls the corresponding
+      /** Computes destination list for #source# and calls the corresponding
 	  function in each of the ports from the destination list starting from
 	  the closest until one of them returns 1. */
    virtual bool		notify_status(const DjVuPort * source, const char * msg);
 
-      /** Computes destination list for #soure# and calls the corresponding
+      /** Computes destination list for #source# and calls the corresponding
 	  function in each of the ports from the destination list starting from
 	  the closest. */
    virtual void		notify_redisplay(const DjVuPort * source);
 
-      /** Computes destination list for #soure# and calls the corresponding
+      /** Computes destination list for #source# and calls the corresponding
 	  function in each of the ports from the destination list starting from
 	  the closest. */
    virtual void		notify_relayout(const DjVuPort * source);
 
-      /** Computes destination list for #soure# and calls the corresponding
+      /** Computes destination list for #source# and calls the corresponding
 	  function in each of the ports from the destination list starting from
 	  the closest. */
    virtual void		notify_chunk_done(const DjVuPort * source, const char * name);
 
-      /** Computes destination list for #soure# and calls the corresponding
+      /** Computes destination list for #source# and calls the corresponding
 	  function in each of the ports from the destination list starting from
 	  the closest. */
    virtual void		notify_file_done(const DjVuPort * source);
 
-      /** Computes destination list for #soure# and calls the corresponding
+      /** Computes destination list for #source# and calls the corresponding
 	  function in each of the ports from the destination list starting from
 	  the closest. */
    virtual void		notify_file_stopped(const DjVuPort * source);
 
-      /** Computes destination list for #soure# and calls the corresponding
+      /** Computes destination list for #source# and calls the corresponding
 	  function in each of the ports from the destination list starting from
 	  the closest. */
    virtual void		notify_file_failed(const DjVuPort * source);
 
-      /** Computes destination list for #soure# and calls the corresponding
+      /** Computes destination list for #source# and calls the corresponding
 	  function in each of the ports from the destination list starting from
 	  the closest. */
    virtual void		notify_decode_progress(const DjVuPort * source, float done);
 
-      /** Computes destination list for #soure# and calls the corresponding
+      /** Computes destination list for #source# and calls the corresponding
 	  function in each of the ports from the destination list starting from
 	  the closest. */
    virtual void		notify_file_data_received(const DjVuPort * source);
 
-      /** Computes destination list for #soure# and calls the corresponding
+      /** Computes destination list for #source# and calls the corresponding
 	  function in each of the ports from the destination list starting from
 	  the closest. */
    virtual void		notify_all_data_received(const DjVuPort * source);
