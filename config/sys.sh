@@ -31,10 +31,10 @@
 #C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #
-# $Id: sys.sh,v 1.27 2001-03-30 23:31:21 bcr Exp $
+# $Id: sys.sh,v 1.28 2001-06-09 01:50:16 bcr Exp $
 # $Name:  $
 
-# This sets the variable SYS INCS JOBJ and DEFS
+# This sets the variable SYS INCS JOBJ
 #
 
 if [ -z "$CONFIG_DIR" ] ; then
@@ -50,7 +50,6 @@ if [ -z "$SYS_SET" ] ; then
   if [ -z "$PROC" ] ; then 
     PROC=`"${uname}" -p`
   fi
-  DEFS="-DUNIX"
   INCS=" "
   JOBJ=" "
   SECURITYMODE="-D_LOCK_ID_"
@@ -59,18 +58,7 @@ if [ -z "$SYS_SET" ] ; then
   WHOLEARCHIVESEP=" "
   WHOLEARCHIVE="-Wl,--whole-archive"
   NOWHOLEARCHIVE="-Wl,--no-whole-archive"
-  LIBDL=""
-  LIBC=""
   if [ "$SYS" = "Linux" ] ; then
-    if [ -r /usr/lib/libdl.a ] ; then
-      LIBDL=/usr/lib/libdl.a
-    elif [ -r /lib/libdl.a ] ; then
-      LIBDL=/lib/libdl.a
-    elif [ -r /usr/lib/libdl.so ] ; then
-      LIBDL=/usr/lib/libdl.so
-    elif [ -r /lib/libdl.so ] ; then
-      LIBDL=/lib/libdl.so
-    fi
     if [ -r /lib/libc.so.6 ] ; then
       LIBC="libc.so.6"
       SYS=linux-libc6
@@ -119,6 +107,6 @@ if [ -z "$SYS_SET" ] ; then
   fi
   SYS_SET=true
   echo "$SYS"
-  CONFIG_VARS=`echo SYS SYS_SET LIBC LIBDL DEFS INCS JOBJ WHOLEARCHIVE WHOLEARCHIVESEP NOWHOLEARCHIVE SENTINAL SENTINAL_NEED_LIB RTK RTKFLAGS $CONFIG_VARS`
+  CONFIG_VARS=`echo SYS SYS_SET LIBC INCS JOBJ WHOLEARCHIVE WHOLEARCHIVESEP NOWHOLEARCHIVE SENTINAL SENTINAL_NEED_LIB RTK RTKFLAGS $CONFIG_VARS`
 fi
 

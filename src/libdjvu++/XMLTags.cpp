@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: XMLTags.cpp,v 1.22 2001-06-05 03:19:58 bcr Exp $
+// $Id: XMLTags.cpp,v 1.23 2001-06-09 01:50:17 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -92,7 +92,7 @@ tagtoname(char const tag[],char const *&t)
 {
   char const *s;
   for(s=tag;isspace(*s);s++);
-  for(t=s;(*t)&&((*t)!='>')&&!isspace(*t);++t);
+  for(t=s;(*t)&&((*t)!='>')&&((*t)!='/')&&!isspace(*t);++t);
   return GUTF8String(s,t-s);
 }
 
@@ -184,7 +184,7 @@ lt_XMLTags::init(XMLByteStream &xmlbs)
           len=((tag+=cont).length());
         }
         char const *n;
-        GUTF8String xname=tagtoname(((const char *)tag)+2,n);
+        GUTF8String xname=tagtoname(tag.substr(2,-1),n);
         if(xname.downcase() == "xml")
         {
           ParseValues(n,args);
@@ -241,7 +241,7 @@ lt_XMLTags::init(XMLByteStream &xmlbs)
       }
       case '/':
       {
-        GUTF8String xname=tagtoname(((const char *)tag)+2);
+        GUTF8String xname=tagtoname(tag.substr(2,-1));
         GPosition last=level.lastpos();
         if(last)
         {
@@ -267,16 +267,19 @@ lt_XMLTags::init(XMLByteStream &xmlbs)
         GP<lt_XMLTags> t;
         if(last)
         {
-          t=new lt_XMLTags(((char const *)tag)+1);
+          t=new lt_XMLTags(tag.substr(1,len-1));
           level[last]->addtag(t);
           if(tag[len-2] != '/')
           {
             level.append(t);
+          }else
+          {
+            level[last]->addtag(t);
           }
         }else if(tag[len-2] != '/')
         {
           char const *n;
-          name=tagtoname(((char const *)tag)+1,n);
+          name=tagtoname(tag.substr(1,-1),n);
           ParseValues(n,args);
           t=this;
           level.append(t);

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.h,v 1.80 2001-06-05 15:07:40 bcr Exp $
+// $Id: GString.h,v 1.81 2001-06-09 01:50:17 bcr Exp $
 // $Name:  $
 
 #ifndef _GSTRING_H_
@@ -64,7 +64,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.80 2001-06-05 15:07:40 bcr Exp $# */
+    #$Id: GString.h,v 1.81 2001-06-09 01:50:17 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -290,12 +290,6 @@ protected:
   char *data;
 };
 
-inline GP<GStringRep> GStringRep::upcase(void) const
-{ return tocase(giswupper,gtowupper); }
-
-inline GP<GStringRep> GStringRep::downcase(void) const
-{ return tocase(giswlower,gtowlower); }
-
 class GStringRep::UTF8 : public GStringRep
 {
 public:
@@ -361,32 +355,6 @@ protected:
   // Return the next character and increment the source pointer.
   virtual unsigned long getValidUCS4(const char *&source) const;
 };
-
-inline GP<GStringRep> 
-GStringRep::UTF8::blank(const unsigned int sz) const
-{
-   return GStringRep::create(sz,(GStringRep::UTF8 *)0);
-}
-
-inline bool
-GStringRep::UTF8::isUTF8(void) const
-{
-  return true;
-}
-
-inline GP<GStringRep> 
-GStringRep::UTF8::toThis(
-    const GP<GStringRep> &rep,const GP<GStringRep> &) const
-{
-  return rep?(rep->toUTF8(true)):rep;
-}
-
-inline GP<GStringRep> 
-GStringRep::UTF8::create(const char fmt[],va_list args)
-{ 
-  GP<GStringRep> s=create(fmt);
-  return (s?(s->vformat(args)):s);
-}
 
 #ifndef UNDER_CE
 class GStringRep::Native : public GStringRep
@@ -461,32 +429,6 @@ protected:
   // Return the next character and increment the source pointer.
   virtual unsigned long getValidUCS4(const char *&source) const;
 };
-
-inline GP<GStringRep> 
-GStringRep::Native::blank(const unsigned int sz) const
-{
-   return GStringRep::create(sz,(GStringRep::Native *)0);
-}
-
-inline bool
-GStringRep::Native::isNative(void) const
-{
-  return true;
-}
-
-inline GP<GStringRep>
-GStringRep::Native::toThis(
-     const GP<GStringRep> &rep,const GP<GStringRep> &) const
-{
-  return rep?(rep->toNative(true)):rep;
-}
-
-inline GP<GStringRep> 
-GStringRep::Native::create(const char fmt[],va_list &args)
-{ 
-  GP<GStringRep> s=create(fmt);
-  return (s?(s->vformat(args)):s);
-}
 
 #endif // UNDER_CE
 

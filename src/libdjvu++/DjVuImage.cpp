@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuImage.cpp,v 1.77 2001-05-09 00:38:26 bcr Exp $
+// $Id: DjVuImage.cpp,v 1.78 2001-06-09 01:50:16 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -1313,4 +1313,16 @@ DjVuImage::unmap(int &x, int &y) const
         mapper.unmap(x, y);
     }
 }
+
+bool
+DjVuImage::wait_for_complete_decode(void)
+{
+  if (file) 
+  {
+    file->resume_decode(true);
+    return file->is_decode_ok();
+  }
+  return 0;
+}
+
 

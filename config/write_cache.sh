@@ -31,7 +31,7 @@
 #C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #
-# $Id: write_cache.sh,v 1.15 2001-03-30 23:31:21 bcr Exp $
+# $Id: write_cache.sh,v 1.16 2001-06-09 01:50:16 bcr Exp $
 # $Name:  $
 
 # This script writes the variables currently set to standard output.
@@ -53,6 +53,7 @@ if [ -z "$CONFIG_READONLY" ] ; then
     s='escape $'"${i}"
     echo "${i}='`eval $s`'" >> "${CONFIG_CACHE}"
   done
+  add_defs UNIX 1
 fi
 
 

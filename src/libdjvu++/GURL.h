@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GURL.h,v 1.38 2001-05-23 20:20:59 fcrary Exp $
+// $Id: GURL.h,v 1.39 2001-06-09 01:50:17 bcr Exp $
 // $Name:  $
 
 #ifndef _GURL_H_
@@ -49,7 +49,7 @@
     \Ref{GURL} class used to store URLs in a system independent format.
     @memo System independent URL representation.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: GURL.h,v 1.38 2001-05-23 20:20:59 fcrary Exp $#
+    @version #$Id: GURL.h,v 1.39 2001-06-09 01:50:17 bcr Exp $#
 */
 
 //@{
@@ -109,13 +109,13 @@ private:
    GCriticalSection	class_lock;
 protected:
    GUTF8String	url;
-private:
    DArray<GUTF8String>	cgi_name_arr, cgi_value_arr;
    bool validurl;
 
    void		init(const bool nothrow=false);
    void		convert_slashes(void);
    void		beautify_path(void);
+   static GUTF8String	beautify_path(GUTF8String url);
 
    static GUTF8String	protocol(const GUTF8String& url);
    void		parse_cgi_args(void);
@@ -233,10 +233,10 @@ public:
       //@}
 
       /// Returns TRUE if #gurl1# and #gurl2# are the same
-   friend int	operator==(const GURL & gurl1, const GURL & gurl2);
+   bool	GURL::operator==(const GURL & gurl2) const;
 
       /// Returns TRUE if #gurl1# and #gurl2# are different
-   friend int	operator!=(const GURL & gurl1, const GURL & gurl2);
+   bool	GURL::operator!=(const GURL & gurl2) const;
 
       /// Assignment operator
    GURL &	operator=(const GURL & url);
@@ -250,7 +250,9 @@ public:
       A brain damaged MSIE compatible syntax is generated
       when the optional argument #useragent# contains string #"MSIE"# or
       #"Microsoft"#. */
-   GUTF8String get_string(const GUTF8String &useragent=GUTF8String()) const;
+   GUTF8String get_string(const GUTF8String &useragent) const;
+
+   GUTF8String get_string(void) const;
 
       /// Escape special characters
    static GUTF8String encode_reserved(const GUTF8String &gs);
@@ -327,15 +329,15 @@ public:
 class GURL::UTF8 : public GURL
 {
 public:
-  UTF8(const GUTF8String &url) : GURL(url) {}
-  UTF8(const GUTF8String &url, const GURL &codebase);
+  UTF8(const GUTF8String &xurl) : GURL(xurl) {}
+  UTF8(const GUTF8String &xurl, const GURL &codebase);
 };
 
 class GURL::Native : public GURL
 {
 public:
-  Native(const GNativeString &url) : GURL(url.getNative2UTF8()) {}
-  Native(const GNativeString &url, const GURL &codebase);
+  Native(const GNativeString &xurl) : GURL(xurl.getNative2UTF8()) {}
+  Native(const GNativeString &xurl, const GURL &codebase);
 };
 
 class GURL::Filename : public GURL
@@ -365,45 +367,44 @@ GURL::operator+(const char *xname) const
 }
 #endif
 
-inline int
-operator==(const GURL & gurl1, const GURL & gurl2)
+inline bool
+GURL::operator==(const GURL & gurl2) const
 {
-   return gurl1.url==gurl2.url;
+  return (get_string()==gurl2.get_string());
 }
 
-inline int
-operator!=(const GURL & gurl1, const GURL & gurl2)
+inline bool
+GURL::operator!=(const GURL & gurl2) const
 {
-   return gurl1.url!=gurl2.url;
+  return (get_string()!=gurl2.get_string());
 }
 
 inline unsigned int
 hash(const GURL & gurl)
 {
-   return hash(gurl.url);
+   return hash(gurl.get_string());
 }
 
 inline GUTF8String
 GURL::protocol(void) const
 {
-   if(!validurl)
-     const_cast<GURL *>(this)->init();
-   return protocol(url);
+   return protocol(get_string());
 }
 
 inline bool
 GURL::is_empty(void) const
 {
-   if(!validurl) const_cast<GURL *>(this)->init();
-   return !url.length();
+   return !get_string().length();
 }
 
 inline bool
 GURL::is_valid(void) const
 {
-  if(!validurl) const_cast<GURL *>(this)->init(true);
+  if(!validurl)
+    const_cast<GURL *>(this)->init(true);
   return validurl;
 }
+
 
 
 //@}

@@ -31,50 +31,61 @@
 #C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #
-# $Id: dirs.sh,v 1.13 2001-06-09 01:50:16 bcr Exp $
+# $Id: dlopen.sh,v 1.1 2001-06-09 01:50:16 bcr Exp $
 # $Name:  $
 
 # This script sets the variables:
-#   TOPSRCDIR, TOPBUILDDIR, CONFIG_CACHE, CONFIG_H_CACHE, CONFIG_H,  DEFS, CONFIG_STATUS, and CONFIG_LOG
+#   CXXPTHREAD,CXXPTHREAD_LIB,CCPTHREAD,CCPTHREAD_LIB
 
-if [ -z "$CONFIG_DIR" ] ; then
-  echo "You must source functions.sh" 1>&2
+if [ -z "$CXX_SET" ] ; then
+  echo "You must source cxx.sh" 1>&2
   exit 1
 fi
 
-
-if [ -z "$CONFIG_CACHE" ] ; then
-  echo "Setting default paths"
-  TOPSRCDIR=`cd "${CONFIG_DIR}/.." 1>>/dev/null 2>>/dev/null;"${pwdcmd}"`
-  PROJECT=`echo  $PROGRAM_NAME|sed 's,^.*-,,g'`
-  s=`${pwdcmd}`
-  if [ "$TOPSRCDIR" != "$s" ] ; then
-    TOPBUILDDIR="$s"
-  else
-    if [ -z "$TOPBUILDPREFIX" ] ; then
-    TOPBUILDDIR="${s}/build/${SYS}/$PROJECT"
-    else
-      TOPBUILDDIR="${TOPBUILDPREFIX}/${SYS}/PROJECT"
-    fi
-  fi
-  CONFIG_CACHE="$TOPBUILDDIR"/config.cache
-  CONFIG_H_CACHE="$TOPBUILDDIR"/config.h.cache
-  CONFIG_H="$TOPBUILDDIR"/src/include/config.h
-  DEFS="-imacros $CONFIG_H"
-  CONFIG_STATUS="$TOPBUILDDIR"/config.status
-  CONFIG_LOG="$TOPBUILDDIR"/config.log
-  if [ ! -d "$TOPBUILDDIR/src/include" ] ; then
-    ${mkdirp} "$TOPBUILDDIR/src/include"
-  fi
-  echo "/* created `date` */" > "$CONFIG_H"
-  CONFIG_VARS=`echo TOPSRCDIR PROJECT TOPBUILDDIR CONFIG_LOG CONFIG_STATUS CONFIG_CACHE CONFIG_H_CACHE CONFIG_H DEFS ${CONFIG_VARS}`
-fi
-if [ -z "$PROJECT_FILLNAME" ]
+if [ -z "${DLOPEN_TEST}" ]
 then
-  case "$PROJECT" in
-	plugin)
-		PROJECT_FULLNAME="NetscapePlugin";;
-	*)
-		PROJECT_FULLNAME="$PROJECT" ;;
-  esac
+  DLOPEN_TEST=true
+  (echo '#include <dlfcn.h>'
+  echo 'int main(int argc,char *[],char *[]){dlopen("foo",RTLD_LAZY);exit(0);}')|testfile $temp.cpp
+  echon "Checking for dlopen in the dlfcn.h header file ... "
+  check_compile_flags HAS_DLOPEN $temp.cpp -DHAS_DLOPEN=1
+  if [ $? = 0 ]
+  then
+    echo yes
+    add_defs HAS_DLOPEN 1
+    search_for_library dl dlopen /usr/lib/libdl.a /lib/libdl.a /usr/lib/libdl.so /lib/libdl.so -ldl
+    LIBDL="$libdl"
+  else
+    add_undefs HAS_DLOPEN
+    echo no
+  fi
+  CONFIG_VARS=`echo LIBDL DLOPEN_TEST $CONFIG_VARS`
+#  if [ -z "${CXXPTHREAD}" ]
+#  then
+#    echo 'int main(void) {return 0;}' | testfile $temp.cpp
+#    echon "Checking if ${CXX} -pthread works ... "
+#    run $CXX $CXXFLAGS -pthread $temp.cpp -o $temp
+#    CXXPTHREAD="-DTHREADMODEL=POSIXTHREADS"
+#    CXXPTHREAD_LIB=""
+#    if [ $? = 0 -a -z "`grep -i unrecognized $temp.out`" ]
+#    then
+#      echo yes.
+#      CXXPTHREAD="$CXXPTHREAD -pthread"
+#    else
+#      echo no.
+#      echon "Checking if ${CXX} -thread works ... "
+#      run $CXX $CXXFLAGS -threads $temp.cpp -o $temp
+#      if [ $? = 0 -a -z "`grep -i unrecognized $temp.out`" ]
+#      then
+#        echo yes.
+#        CXXPTHREAD="$CXXPTHREAD -threads"
+#      else
+#        echo no.
+#        CXXPTHREAD="$CXXPTHREAD -D_REENTRANT"
+#        CXXPTHREAD_LIB="-lpthread"
+#      fi
+#    fi
+#    CONFIG_VARS=`echo CXXPTHREAD CXXPTHREAD_LIB $CONFIG_VARS`
+#  fi
 fi
+

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GURL.cpp,v 1.67 2001-05-24 16:00:37 mchen Exp $
+// $Id: GURL.cpp,v 1.68 2001-06-09 01:50:17 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -138,6 +138,10 @@ static const char nillchar=0;
 #error "Define something here for your operating system"
 #endif
 
+
+static const int
+pathname_start(const GUTF8String &url, const int protolength);
+
 // hexval --
 // -- Returns the hexvalue of a character.
 //    Returns -1 if illegal;
@@ -165,10 +169,10 @@ is_argument(const char * start)
 void
 GURL::convert_slashes(void)
 {
-   if(!validurl) init();
+   const GUTF8String xurl(get_string());
 #ifndef UNIX
-   GCriticalSectionLock lock(&class_lock);
-   for(char *ptr=(url.getbuf()+protocol().length());*ptr;ptr++)
+   const int protocol_length=protocol(xurl).length();
+   for(char *ptr=(xurl.getbuf()+protocol_length);*ptr;ptr++)
    {
      if(*ptr == backslash)
        *ptr=slash;
@@ -188,20 +192,18 @@ collapse(char * ptr, const int chars)
      EMPTY_LOOP;
 }
 
-void
-GURL::beautify_path(void)
+GUTF8String
+GURL::beautify_path(GUTF8String xurl)
 {
-  if(!validurl) init();
-  GCriticalSectionLock lock(&class_lock);
+  const int protocol_length=GURL::protocol(xurl).length();
    
   // Eats parts like ./ or ../ or ///
   char * buffer;
-  GPBuffer<char> gbuffer(buffer,url.length()+1);
-  strcpy(buffer, (const char *)url);
+  GPBuffer<char> gbuffer(buffer,xurl.length()+1);
+  strcpy(buffer, (const char *)xurl);
    
   // Find start point
-  char * start=buffer+protocol().length()+1;
-  while(*start && *start==slash) start++;
+  char * start=buffer+pathname_start(xurl,protocol_length);
 
   // Find end of the url (don't touch arguments)
   char * ptr;
@@ -260,8 +262,14 @@ GURL::beautify_path(void)
   }
 
   // Done. Copy the buffer back into the URL and add arguments.
-  url=buffer;
-  url+=args;
+  xurl=buffer;
+  return (xurl+args);
+}
+
+void
+GURL::beautify_path(void)
+{
+  url=beautify_path(get_string());
 }
 
 void
@@ -342,7 +350,7 @@ GURL &
 GURL::operator=(const GURL & url_in)
 {
    GCriticalSectionLock lock(&class_lock);
-   url=url_in.url;
+   url=url_in.get_string();
    init();
    return *this;
 }
@@ -362,13 +370,13 @@ GUTF8String
 GURL::hash_argument(void) const
       // Returns the HASH argument (anything after '#' and before '?')
 {
-   if(!validurl) const_cast<GURL *>(this)->init();
-   GCriticalSectionLock lock((GCriticalSection *) &class_lock);
+   const GUTF8String xurl(get_string());
+
    bool found=false;
    GUTF8String arg;
 
          // Break if CGI argument is found
-   for(const char * start=url;*start&&(*start!='?');start++)
+   for(const char * start=xurl;*start&&(*start!='?');start++)
    {
       if (found)
       {
@@ -384,13 +392,12 @@ GURL::hash_argument(void) const
 void
 GURL::set_hash_argument(const GUTF8String &arg)
 {
-   if(!validurl) init();
-   GCriticalSectionLock lock((GCriticalSection *) &class_lock);
+   const GUTF8String xurl(get_string());
 
    GUTF8String new_url;
    bool found=false;
    const char * ptr;
-   for(ptr=url;*ptr;ptr++)
+   for(ptr=xurl;*ptr;ptr++)
    {
       if (is_argument(ptr))
       {
@@ -413,7 +420,8 @@ GURL::parse_cgi_args(void)
       // Will read CGI arguments from the URL into
       // cgi_name_arr and cgi_value_arr
 {
-   if(!validurl) init();
+   if(!validurl)
+     init();
    GCriticalSectionLock lock1(&class_lock);
    cgi_name_arr.empty();
    cgi_value_arr.empty();
@@ -475,7 +483,8 @@ GURL::store_cgi_args(void)
       // Will store CGI arguments from the cgi_name_arr and cgi_value_arr
       // back into the URL
 {
-   if(!validurl) init();
+   if(!validurl)
+     init();
    GCriticalSectionLock lock1(&class_lock);
 
    const char * const url_ptr=url;
@@ -500,15 +509,16 @@ GURL::store_cgi_args(void)
 int
 GURL::cgi_arguments(void) const
 {
-   if(!validurl) const_cast<GURL *>(this)->init();
-   GCriticalSectionLock lock((GCriticalSection *) &class_lock);
+   if(!validurl)
+      const_cast<GURL *>(this)->init();
    return cgi_name_arr.size();
 }
 
 int
 GURL::djvu_cgi_arguments(void) const
 {
-   if(!validurl) const_cast<GURL *>(this)->init();
+   if(!validurl)
+     const_cast<GURL *>(this)->init();
    GCriticalSectionLock lock((GCriticalSection *) &class_lock);
 
    int args=0;
@@ -685,7 +695,8 @@ GURL::clear_hash_argument(void)
 void
 GURL::clear_cgi_arguments(void)
 {
-   if(!validurl) init();
+   if(!validurl)
+     init();
    GCriticalSectionLock lock1(&class_lock);
 
       // Clear the arrays
@@ -724,7 +735,8 @@ GURL::clear_djvu_cgi_arguments(void)
 void
 GURL::add_djvu_cgi_argument(const GUTF8String &name, const char * value)
 {
-   if(!validurl) init();
+   if(!validurl)
+     init();
    GCriticalSectionLock lock1(&class_lock);
 
       // Check if we already have the "DJVUOPTS" argument
@@ -766,42 +778,69 @@ GURL::is_local_file_url(void) const
    return (protocol()=="file" && url[5]==slash);
 }
 
+static const int
+pathname_start(const GUTF8String &url, const int protolength)
+{
+  const int length=url.length();
+  int retval=0;
+  if(protolength+1<length)
+  {
+    retval=url.search(slash,((url[protolength+1] == '/')
+      ?((url[protolength+2] == '/')?(protolength+3):(protolength+2))
+      :(protolength+1)));
+  }
+  return (retval>0)?retval:length;
+}
+
 GUTF8String
 GURL::pathname(void) const
 {
   return (is_local_file_url())
     ?GURL::encode_reserved(UTF8Filename()) 
-    :url.substr(url.search(slash),(unsigned int)(-1));
+    :url.substr(pathname_start(url,protocol().length()),(unsigned int)(-1));
 }
 
 GURL
 GURL::base(void) const
 {
-   if(!validurl) const_cast<GURL *>(this)->init();
-   GCriticalSectionLock lock((GCriticalSection *) &class_lock);
-
-   const char * const url_ptr=url;
+   const GUTF8String xurl(get_string());
+   const int protocol_length=protocol(xurl).length();
+   const int xurl_length=xurl.length();
+   const char * const url_ptr=xurl;
    const char * ptr, * xslash;
-   for(ptr=xslash=url_ptr+protocol().length()+1;*ptr && !is_argument(ptr);ptr++)
+   ptr=xslash=url_ptr+protocol_length+1;
+   if(xslash[0] == '/')
    {
-      if (*ptr==slash)
+     xslash++;
+     if(xslash[0] == '/')
+       xslash++;
+     for(ptr=xslash;ptr[0] && !is_argument(ptr);ptr++)
+     {
+       if ((ptr[0]==slash)&&ptr[1]&&!is_argument(ptr+1))
         xslash=ptr;
+     }
+     if(xslash[0] != '/')
+     {
+       xslash=url_ptr+xurl_length;
+     }
    }
    return GURL::UTF8(
 #ifdef WIN32
    (*(xslash-1) == colon)?
-     GUTF8String(url,(int)(xslash-url))+"/"+GUTF8String(ptr,url.length()-(int)(ptr-url_ptr)) :
+     (GUTF8String(xurl,(int)(xslash-url_ptr))+"/"+GUTF8String(ptr,xurl_length-(int)(ptr-url_ptr))+"/" ):
 #endif
-     GUTF8String(url.substr(0,(int)(xslash-url_ptr))+GUTF8String(ptr,url.length()-(int)(ptr-url_ptr))) );
+     (GUTF8String(xurl,(int)(xslash-url_ptr))+GUTF8String(ptr,xurl_length-(int)(ptr-url_ptr))+"/"));
 }
 
 GUTF8String
 GURL::name(void) const
 {
-   if(!validurl) const_cast<GURL *>(this)->init();
-   GCriticalSectionLock lock((GCriticalSection *) &class_lock);
+   if(!validurl)
+     const_cast<GURL *>(this)->init();
+   const GUTF8String xurl(url);
+   const int protocol_length=protocol(xurl).length();
    const char * ptr, * xslash;
-   for(ptr=xslash=(const char *)url+protocol().length()+1;
+   for(ptr=xslash=(const char *)xurl+protocol_length+1;
      *ptr && !is_argument(ptr);ptr++)
    {
       if (*ptr==slash)
@@ -814,14 +853,16 @@ GURL::name(void) const
 GUTF8String
 GURL::fname(void) const
 {
-   if(!validurl) const_cast<GURL *>(this)->init();
+   if(!validurl)
+     const_cast<GURL *>(this)->init();
    return decode_reserved(name());
 }
 
 GUTF8String
 GURL::extension(void) const
 {
-   if(!validurl) const_cast<GURL *>(this)->init();
+   if(!validurl)
+     const_cast<GURL *>(this)->init();
    GUTF8String xfilename=name();
    GUTF8String retval;
 
@@ -839,18 +880,18 @@ GURL::extension(void) const
 GURL
 GURL::operator+(const GUTF8String &gname) const
 {
-   if(!validurl) const_cast<GURL *>(this)->init();
-   GCriticalSectionLock lock((GCriticalSection *) &class_lock);
+   const GUTF8String xurl(get_string());
    GURL res;
    if (!protocol(gname).length())
    {
-      const char * const url_ptr=(const char *)url;
-      const char * ptr;
-      for(ptr=url_ptr+protocol().length()+1;*ptr&&!is_argument(ptr);ptr++)
-      	EMPTY_LOOP;
+     const int protocol_length=protocol(xurl).length();
+     const char * const url_ptr=(const char *)xurl;
+     const char * ptr;
+     for(ptr=url_ptr+protocol_length+1;*ptr&&!is_argument(ptr);ptr++)
+       EMPTY_LOOP;
 
-      res=GUTF8String(GUTF8String(url_ptr,(int)(ptr-url_ptr))
-        +((*(ptr-1) != slash)?GUTF8String(slash):GUTF8String())+gname+ptr);
+     res=GUTF8String(GUTF8String(url_ptr,(int)(ptr-url_ptr))
+       +((*(ptr-1) != slash)?GUTF8String(slash):GUTF8String())+gname+ptr);
    } else
    {
      res=gname;
@@ -1002,12 +1043,22 @@ url_from_UTF8filename(const GUTF8String &gfilename)
   return url;
 }
 
+GUTF8String 
+GURL::get_string(void) const
+{
+  if(!validurl)
+    const_cast<GURL *>(this)->init();
+  return url;
+}
+
 // -- Returns a url for accessing a given file.
 //    If useragent is not provided, standard url will be created,
 //    but will not be understood by some versions if IE.
 GUTF8String 
 GURL::get_string(const GUTF8String &useragent) const
 {
+  if(!validurl)
+    const_cast<GURL *>(this)->init();
   GUTF8String retval(url);
   if(is_local_file_url()&&useragent.length())
   {
@@ -1037,7 +1088,7 @@ GURL::UTF8::UTF8(const GUTF8String &xurl,const GURL &codebase)
       url=base.get_string()+GURL::encode_reserved(xurl);
     }else
     {
-      url=codebase.get_string()+GUTF8String(slash)+GURL::encode_reserved(xurl);
+      url=beautify_path(codebase.get_string()+GUTF8String(slash)+GURL::encode_reserved(xurl));
     }
   }
 }

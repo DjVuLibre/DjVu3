@@ -1,7 +1,7 @@
 //C-  Copyright © 2000-2001, LizardTech, Inc. All Rights Reserved.
 //C-              Unauthorized use prohibited.
 //
-// $Id: djvuxmlparser.cpp,v 1.7 2001-06-05 03:19:57 bcr Exp $
+// $Id: djvuxmlparser.cpp,v 1.8 2001-06-09 01:50:16 bcr Exp $
 // $Name:  $
 
 #include "XMLParser.h"
@@ -45,7 +45,7 @@ main(int argc,char *argv[],char *[])
       exit(1);
     }
 
-    for(int i=0;i<argc;++i)
+    for(int i=1;i<argc;++i)
     {
       const GP<lt_XMLParser> parser(lt_XMLParser::create());
       {

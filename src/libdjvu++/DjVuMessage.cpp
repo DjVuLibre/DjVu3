@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessage.cpp,v 1.56 2001-06-05 23:02:37 fcrary Exp $
+// $Id: DjVuMessage.cpp,v 1.57 2001-06-09 01:50:16 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -173,11 +173,11 @@ parsePATH(void)
     int from=0;
     for(int to;(to=p.search(':',from))>0;from=to+1)
     {
-      retval.append(GURL::Native(p.substr(from,to-from)));
+      retval.append(GURL::Filename::Native(p.substr(from,to-from)));
     }
     if(from<(int)p.length())
     {
-      retval.append(GURL::Native(p.substr(from,-1)));
+      retval.append(GURL::Filename::Native(p.substr(from,-1)));
     }
   }
   return retval;
@@ -393,7 +393,7 @@ DjVuMessage::GetProfilePaths(void)
 #endif
     for(pos=paths;pos;++pos)
     {
-      appendPath(paths[pos],pathsmap,paths);
+      appendPath(paths[pos],pathsmap,realpaths);
     }
   }
   return realpaths;

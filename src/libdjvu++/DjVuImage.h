@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuImage.h,v 1.44 2001-06-05 03:19:58 bcr Exp $
+// $Id: DjVuImage.h,v 1.45 2001-06-09 01:50:16 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUIMAGE_H
@@ -73,7 +73,7 @@
     L\'eon Bottou <leonb@research.att.com> - initial implementation
     Andrei Erofeev <eaf@geocities.com> - multipage support
     @version
-    #$Id: DjVuImage.h,v 1.44 2001-06-05 03:19:58 bcr Exp $# */
+    #$Id: DjVuImage.h,v 1.45 2001-06-09 01:50:16 bcr Exp $# */
 //@{
 
 
@@ -388,17 +388,6 @@ inline GP<DjVuFile>
 DjVuImage::get_djvu_file(void) const
 {
    return file;
-}
-
-inline bool
-DjVuImage::wait_for_complete_decode(void)
-{
-  if (file) 
-    {
-      file->wait_for_finish();
-      return file->is_decode_ok();
-    }
-  return 0;
 }
 
 //@}

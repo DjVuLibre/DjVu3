@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.108 2001-06-05 03:19:58 bcr Exp $
+// $Id: GString.cpp,v 1.109 2001-06-09 01:50:17 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -82,6 +82,40 @@ mbrlen(const char *s, size_t n, mbstate_t *)
 
 // - Author: Leon Bottou, 04/1997
 
+GP<GStringRep>
+GStringRep::upcase(void) const
+{ return tocase(giswupper,gtowupper); }
+
+GP<GStringRep>
+GStringRep::downcase(void) const
+{ return tocase(giswlower,gtowlower); }
+
+GP<GStringRep> 
+GStringRep::UTF8::blank(const unsigned int sz) const
+{
+   return GStringRep::create(sz,(GStringRep::UTF8 *)0);
+}
+
+bool
+GStringRep::UTF8::isUTF8(void) const
+{
+  return true;
+}
+
+GP<GStringRep> 
+GStringRep::UTF8::toThis(
+    const GP<GStringRep> &rep,const GP<GStringRep> &) const
+{
+  return rep?(rep->toUTF8(true)):rep;
+}
+
+GP<GStringRep> 
+GStringRep::UTF8::create(const char fmt[],va_list args)
+{ 
+  GP<GStringRep> s=create(fmt);
+  return (s?(s->vformat(args)):s);
+}
+
 #ifndef UNDER_CE
 
 // The declaration and implementation of GStringRep::ChangeLocale
@@ -96,6 +130,34 @@ private:
   GUTF8String locale;
   int category;
 };
+
+GP<GStringRep> 
+GStringRep::Native::blank(const unsigned int sz) const
+{
+   return GStringRep::create(sz,(GStringRep::Native *)0);
+}
+
+bool
+GStringRep::Native::isNative(void) const
+{
+  return true;
+}
+
+GP<GStringRep>
+GStringRep::Native::toThis(
+     const GP<GStringRep> &rep,const GP<GStringRep> &) const
+{
+  return rep?(rep->toNative(true)):rep;
+}
+
+GP<GStringRep> 
+GStringRep::Native::create(const char fmt[],va_list &args)
+{ 
+  GP<GStringRep> s=create(fmt);
+  return (s?(s->vformat(args)):s);
+}
+
+
 
 GStringRep::ChangeLocale::ChangeLocale(
   const int xcategory, const char xlocale[] )
@@ -1475,8 +1537,16 @@ GStringRep::firstEndSpace(int from,const int len) const
     from=nextNonSpace(from,ysize-from);
     if(from < size)
     {
-      retval=nextSpace(from,ysize-from);
-      from=retval;
+      const int r=nextSpace(from,ysize-from);
+      // If a character isn't legal, then it will return
+      // tru for both nextSpace and nextNonSpace.
+      if(r == from)
+      {
+        from++;
+      }else
+      {
+        from=retval=r;
+      }
     }
   }
   return retval;
@@ -1612,58 +1682,62 @@ GStringRep::Native::toNative(const bool nothrow) const
 GP<GStringRep>
 GStringRep::Native::toUTF8(const bool) const
 {
-  size_t n=size;
-  const char *source=data;
-  mbstate_t ps;
   unsigned char *buf;
-  GPBuffer<unsigned char> gbuf(buf,n*6+1);
-  unsigned char *ptr=buf;
-  (void)mbrlen(source, n, &ps);
-  int i=0;
-  if(sizeof(wchar_t) == sizeof(unsigned long))
+  GPBuffer<unsigned char> gbuf(buf,size*6+1);
+  buf[0]=0;
+  if(data && size)
   {
-    for(wchar_t w;(n>0)
-      &&((i=mbrtowc(&w,source,n,&ps))>=0);
-      n-=i,source+=i)
+    size_t n=size;
+    const char *source=data;
+    mbstate_t ps;
+    unsigned char *ptr=buf;
+    (void)mbrlen(source, n, &ps);
+    int i=0;
+    if(sizeof(wchar_t) == sizeof(unsigned long))
     {
-      ptr=UCS4toUTF8(w,ptr);
-    }
-  }else
-  { 
-    for(wchar_t w;
-      (n>0)&&((i=mbrtowc(&w,source,n,&ps))>=0);
-      n-=i,source+=i)
-    {
-      unsigned short s[2];
-      s[0]=w;
-      unsigned long w0;
-      if(UTF16toUCS4(w0,s,s+1)<=0)
+      for(wchar_t w;(n>0)
+        &&((i=mbrtowc(&w,source,n,&ps))>=0);
+        n-=i,source+=i)
       {
-        source+=i;
-        n-=i;
-        if((n>0)&&((i=mbrtowc(&w,source,n,&ps))>=0))
+        ptr=UCS4toUTF8(w,ptr);
+      }
+    }else
+    { 
+      for(wchar_t w;
+        (n>0)&&((i=mbrtowc(&w,source,n,&ps))>=0);
+        n-=i,source+=i)
+      {
+        unsigned short s[2];
+        s[0]=w;
+        unsigned long w0;
+        if(UTF16toUCS4(w0,s,s+1)<=0)
         {
-          s[1]=w;
-          if(UTF16toUCS4(w0,s,s+2)<=0)
+          source+=i;
+          n-=i;
+          if((n>0)&&((i=mbrtowc(&w,source,n,&ps))>=0))
+          {
+            s[1]=w;
+            if(UTF16toUCS4(w0,s,s+2)<=0)
+            {
+              i=(-1);
+              break;
+            }
+          }else
           {
             i=(-1);
             break;
           }
-        }else
-        {
-          i=(-1);
-          break;
         }
+        ptr=UCS4toUTF8(w0,ptr);
       }
-      ptr=UCS4toUTF8(w0,ptr);
     }
-  }
-  if(i<0)
-  {
-    gbuf.resize(0);
-  }else
-  {
-    ptr[0]=0;
+    if(i<0)
+    {
+      gbuf.resize(0);
+    }else
+    {
+      ptr[0]=0;
+    }
   }
   return GStringRep::UTF8::create((const char *)buf);
 }
@@ -1728,7 +1802,7 @@ GBaseString::NativeToUTF8(void) const
     {
       if( (retval=GStringRep::NativeToUTF8(source)) )
       {
-        if(*this != GStringRep::UTF8ToNative(retval->data))
+        if(GStringRep::cmp(retval->toNative(),source))
         {
           retval=GStringRep::UTF8::create((size_t)0);
         }
@@ -1849,44 +1923,47 @@ GStringRep::Native::toDouble(
 unsigned long
 GStringRep::Native::getValidUCS4(const char *&source) const
 {
-  int n=(int)((size_t)size+(size_t)data-(size_t)source);
-  mbstate_t ps;
-  (void)mbrlen(source, n, &ps);
-  wchar_t wt;
-  const int len=mbrtowc(&wt,source,n,&ps); 
   unsigned long retval=0;
-  if(len>=0)
+  int n=(int)((size_t)size+(size_t)data-(size_t)source);
+  if(source && (n > 0))
   {
-    if(sizeof(wchar_t) == sizeof(unsigned short))
+    mbstate_t ps;
+    (void)mbrlen(source, n, &ps);
+    wchar_t wt;
+    const int len=mbrtowc(&wt,source,n,&ps); 
+    if(len>=0)
     {
-      source+=len;
-      unsigned short s[2];
-      s[0]=(unsigned short)wt;
-      if(UTF16toUCS4(retval,s,s+1)<=0)
+      if(sizeof(wchar_t) == sizeof(unsigned short))
       {
-        if((n-=len)>0)
+        source+=len;
+        unsigned short s[2];
+        s[0]=(unsigned short)wt;
+        if(UTF16toUCS4(retval,s,s+1)<=0)
         {
-          const int len=mbrtowc(&wt,source,n,&ps);
-          if(len>=0)
+          if((n-=len)>0)
           {
-            s[1]=(unsigned short)wt;
-            unsigned long w;
-            if(UTF16toUCS4(w,s,s+2)>0)
+            const int len=mbrtowc(&wt,source,n,&ps);
+            if(len>=0)
             {
-              source+=len;
-              retval=w;
+              s[1]=(unsigned short)wt;
+              unsigned long w;
+              if(UTF16toUCS4(w,s,s+2)>0)
+              {
+                source+=len;
+                retval=w;
+              }
             }
           }
         }
-      }
+      }else
+      {
+        retval=(unsigned long)wt;
+        source++;
+      } 
     }else
     {
-      retval=(unsigned long)wt;
       source++;
-    } 
-  }else
-  {
-    source++;
+    }
   }
   return retval;
 }

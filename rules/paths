@@ -9,6 +9,7 @@ HTMLREFLIBPATH=TOPDIR/html/ReferenceLibrary
 HTMLJB2PATH=TOPDIR/html/JB2
 HTMLMULTIPATH=TOPDIR/html/MultiPage
 HTMLMASKFINDPATH=TOPDIR/html/MaskFind
+LIBDL=@%LIBDL%@
 
 DJVUAPI_INC=-I./TOPDIR/src/include -I./TOPDIR/SRCDIR/src/include
 LIBDJVUXX=$(LIBPATH)/libdjvu.a
@@ -16,7 +17,7 @@ LIBDJVUXX_LINK=-ldjvu
 LIBDJVUXX_INC=-I./TOPDIR/src/libdjvu++ -I./TOPDIR/SRCDIR/src/libdjvu++
 
 LIBDJVUMULTIXX=$(LIBPATH)/libdjvumulti.a
-LIBDJVUMULTIXX_LINK=-ldjvumulti
+LIBDJVUMULTIXX_LINK=-ldjvumulti $(LIBDL)
 LIBDJVUMULTIXX_INC=-I./TOPDIR/src/libapi/libdjvumulti -I./TOPDIR/SRCDIR/src/libapi/libdjvumulti
 
 LIBJB2XX=$(LIBPATH)/libjb2.a

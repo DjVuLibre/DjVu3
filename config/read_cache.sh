@@ -31,7 +31,7 @@
 #C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #
-# $Id: read_cache.sh,v 1.13 2001-03-30 23:31:21 bcr Exp $
+# $Id: read_cache.sh,v 1.14 2001-06-09 01:50:16 bcr Exp $
 # $Name:  $
 
 # This script reads the variables from the cache file.
@@ -44,7 +44,8 @@ if [ -z "${CONFIG_CACHE}" ] ; then
   . ${CONFIG_DIR}/dirs.sh
 fi
 
-if [ -r "${CONFIG_CACHE}" ] ; then
+if [ -r "${CONFIG_CACHE}" ]
+then
   p=`"${pwdcmd}"`
   echon `echo "Checking the values in ${CONFIG_CACHE} ..."|sed -e "s! ${p}[/]*! !"` 
   THISSYS="$SYS"
@@ -69,5 +70,18 @@ if [ -r "${CONFIG_CACHE}" ] ; then
       eval "${i}="'"`'"$s"'`"'
     done
   fi
+fi
+
+if [ -r "${CONFIG_H}" ] ; then
+  echo "/* created `date` */" > "$CONFIG_H"
+fi
+if [ -r "${CONFIG_H_CACHE}" ]
+then
+  d=`dirname "${CONFIG_H_CACHE}"`
+  if [ ! -d "$d" ]
+  then
+    ${mkdirp} "$d"
+  fi
+  ${cp} "${CONFIG_H_CACHE}" "${CONFIG_H}"
 fi
 

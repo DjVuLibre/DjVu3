@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: XMLParser.cpp,v 1.11 2001-06-05 15:22:45 bcr Exp $
+// $Id: XMLParser.cpp,v 1.12 2001-06-09 01:50:17 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -62,7 +62,7 @@ static const char linetag[]="LINE";
 static const char paragraphtag[]="PARAGRAPH";
 static const char regiontag[]="REGION";
 static const char pagecolumntag[]="PAGECOLUMN";
-static const char hiddentexttag[]="HIDDENTTEXT";
+static const char hiddentexttag[]="HIDDENTEXT";
 
 class lt_XMLParser::Impl : public lt_XMLParser
 {
@@ -168,7 +168,7 @@ lt_XMLParser::Impl::save(void)
     const GP<DjVuDocument> doc(m_docs[pos]);
     const GURL url=doc->get_init_url();
     
-    DEBUG_MSG("Saving "<<(const char *)url<<" with new annotations.\n");
+    DEBUG_MSG("Saving "<<(const char *)url<<" with new text and annotations\n");
     const bool bundle=doc->is_bundled()||(doc->get_doc_type()==DjVuDocument::SINGLE_PAGE);
     doc->save_as(url,bundle);
   }
@@ -614,6 +614,10 @@ lt_XMLParser::Impl::parse(const lt_XMLTags &tags)
                   {
                     page=args["page"];
                   }
+                  if(args.contains("ocr"))
+                  {
+                    do_ocr=args["ocr"];
+                  }
                 }else if(name == "page")
                 {
                   page=value;
@@ -944,10 +948,8 @@ lt_XMLParser::Impl::parse_text(
     // loop through the hidden text - there should only be one 
     // if there are more ??only the last one will be saved??
     GPList<lt_XMLTags> textTags = GObject[textPos];
-    for(GPosition pos = textTags; pos; ++pos)
-    {
-      ChangeText(width,height,dfile,*textTags[pos]);
-    }
+    GPosition pos = textTags;
+    ChangeText(width,height,dfile,*textTags[pos]);
   }
 }
 

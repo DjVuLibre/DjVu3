@@ -31,7 +31,7 @@
 #C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #
-# $Id: functions.sh,v 1.61 2001-05-31 22:19:50 lvincent Exp $
+# $Id: functions.sh,v 1.62 2001-06-09 01:50:16 bcr Exp $
 # $Name:  $
 
 #
@@ -248,8 +248,10 @@ process_general_option()
             R_CXXOPT='-g'
             R_CCOPT='-g'
             R_OPT=''
-            C_DEFS=APPEND
-            A_DEFS="-DDEBUG $A_DEFS"
+            append_defs DEBUG 1
+            HAS_DEBUG=true
+#            C_DEFS=APPEND
+#            A_DEFS="-DDEBUG $A_DEFS"
             ;;
         --with-flag=* )
             C_DEFS=APPEND
@@ -278,6 +280,63 @@ EOF
 } 
 
 
+
+### ------------------------------------------------------------------------
+### Macro definition functions.
+
+add_undefs()
+{
+  while [ -n "$1" ]
+  do
+    Dname="$1"
+    shift
+    echo '#ifdef '"$Dname" >> "$CONFIG_H"
+    echo '#undef '"$Dname" >> "$CONFIG_H"
+    echo '#endif '"$Dname" >> "$CONFIG_H"
+    echo '#ifdef '"$Dname" >> "$CONFIG_H_CACHE"
+    echo '#undef '"$Dname" >> "$CONFIG_H_CACHE"
+    echo '#endif '"$Dname" >> "$CONFIG_H_CACHE"
+  done
+}
+
+add_defs()
+{
+  while [ -n "$1" ]
+  do
+    Dname="$1"
+    shift
+    Dvalue="$1"
+    shift
+    add_undefs "$Dname"
+    echo '#define '"$Dname $Dvalue" >> "$CONFIG_H"
+    echo '#define '"$Dname $Dvalue" >> "$CONFIG_H_CACHE"
+  done
+}
+
+append_undefs()
+{
+  while [ -n "$1" ]
+  do
+    Dname="$1"
+    shift
+    echo '#ifdef '"$Dname" >> "$CONFIG_H"
+    echo '#undef '"$Dname" >> "$CONFIG_H"
+    echo '#endif '"$Dname" >> "$CONFIG_H"
+  done
+}
+  
+append_defs()
+{
+  while [ -n "$1" ]
+  do
+    Dname="$1"
+    shift
+    Dvalue="$1"
+    shift
+    append_undefs "$Dname"
+    echo '#define '"$Dname $Dvalue" >> "$CONFIG_H"
+  done
+}
 
 
 
@@ -405,8 +464,10 @@ check_debug_option()
   R_CCOPT="-g"
   R_CXXOPT="-g"
   R_OPT=""
-  C_DEFS=APPEND
-  A_DEFS="-DDEBUG $A_DEFS"
+  append_defs DEBUG 1
+  HAS_DEBUG=true
+#  C_DEFS=APPEND
+#  A_DEFS="-DDEBUG $A_DEFS"
 }
 
 
@@ -499,7 +560,12 @@ check_thread_option()
   CONFIG_VARS="$CONFIG_VARS CCTHREADS CXXTHREADS DEFSTHREADS LIBSTHREADS"
 }
 
-
+check_dlopen()
+{
+  if [ -z "$DLOPEN_TEST" ]  ; then
+    . "${CONFIG_DIR}/dlopen.sh"
+  fi
+}
 
 ### ------------------------------------------------------------------------
 ### Check repository option
@@ -543,7 +609,6 @@ check_rpo_option()
   fi
 }
 
-
 ### ------------------------------------------------------------------------
 ### Check compile and link flags
 
@@ -583,7 +648,7 @@ check_compile_flags()
       for BBflags in $BBargs
       do
         flags=`unescape "$BBflags"`
-        run "$CC" $CCFLAGS $CCOPT $CCWARN $DEFS $BBflags -c $BBtmpfile
+        run "$CC" $CCFLAGS -c $BBtmpfile $CCOPT $CCWARN $DEFS $BBflags
         if [ $? = 0 -a -z "`grep -i unrecognized $temp.out`" ]
         then
           eval "${BBname}='"`escape "$BBflags"`"'"
@@ -594,7 +659,7 @@ check_compile_flags()
     *.cpp)
       for BBflags in $BBargs
       do
-        run "$CXX" $CXXFLAGS $CXXOPT $CXXWARN $DEFS $BBflags -c $BBtmpfile
+        run "$CXX" -c $BBtmpfile $CXXFLAGS $CXXOPT $CXXWARN $DEFS $BBflags
         if [ $? = 0 -a -z "`grep -i unrecognized $temp.out`" ]
         then
           eval "${BBname}='"`escape "$BBflags"`"'"
@@ -644,7 +709,7 @@ check_link_flags()
       for AAflags in $AAargs
       do
         AAflags=`unescape "$AAflags"`
-        if ( run "$CC" $CCFLAGS $CCOPT $CCWARN $DEFS $AAflags $AAtmpfile -o $temp ) 
+        if ( run "$CC" $AAtmpfile $CCFLAGS $CCOPT $CCWARN $DEFS $AAflags -o $temp ) 
         then
 
           eval "${AAname}='"`escape "$AAflags"`"'"
@@ -656,7 +721,7 @@ check_link_flags()
       for AAflags in $AAargs
       do
         AAflags=`unescape "$AAflags"`
-        if ( run "$CXX" $CXXFLAGS $CXXOPT $CXXWARN $DEFS $AAflags $AAtmpfile -o $temp ) 
+        if ( run "$CXX" $AAtmpfile $CXXFLAGS $CXXOPT $CXXWARN $DEFS $AAflags -o $temp ) 
         then
           eval "${AAname}='"`escape "$AAflags"`"'"
           return 0
@@ -764,7 +829,7 @@ EOF
       eval $s
       return 0
     fi
-    echo "not found."
+    echo "not found in $ABargs."
     return 1;
   fi
   s='echo $lib'"${ABname}"
@@ -824,13 +889,28 @@ search_for_library()
   do
     if [ `"${basename}" "x$i" .a` = `"${basename}" "x$i"` ] 
     then
-      if ( check_library "$ADname" "$ADfunc" @%%@ `echo $SOPATHS" "|sed -e "s, ,/$i ,g"` )
+      if [ `echo x$i|sed 's,^\(x.\).*,\1,'` = 'x-' ]
       then
-        return 0
+        check_library "$ADname" "$ADfunc" @%%@ "$i"
+        if [ $? = 0 ]
+        then
+          return 0
+        fi
+      else
+        check_library "$ADname" "$ADfunc" @%%@ `echo "/$i"|sed -e "s,//,/,g"`
+        if [ $? = 0 ]
+        then
+          return 0
+        fi
+        check_library "$ADname" "$ADfunc" @%%@ `echo $SOPATHS" "|sed -e "s, ,/$i ,g" -e "s,//,/,g"`
+        if [ $? = 0 ]
+        then
+          return 0
+        fi
       fi
     else
-      s=`"${basename}" "$i" ".a"|sed 's,^lib,-l,'`
-      if ( check_library "$ADname" "$ADfunc" @%%@ "-Wl,-Bstatic $s -Wl,-Bdynamic" `echo "${LIBPATHS} "|sed -e "s, ,/$i ,g" -e 's, $,,'` )
+      check_library "$ADname" "$ADfunc" @%%@ `echo "/$i"|sed -e "s, ,/$i ,g" -e 's,//,/,g' -e 's, $,,'`
+      if [ $? = 0 ]
       then
         return 0
       fi
@@ -1146,5 +1226,9 @@ then
   version="alpha"
 fi
 echo Building version $version
+if [ ! -d "$TOPBUILDDIR/src/include" ]
+then
+  ${mkdirp} "$TOPBUILDDIR/src/include"
+fi
 CONFIG_VARS=`echo version $CONFIG_VARS`
 
