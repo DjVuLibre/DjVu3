@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuDocumentAPI.h,v 1.14 2000-01-31 03:04:48 haffner Exp $
+ *C- $Id: DjVuDocumentAPI.h,v 1.15 2000-02-01 13:38:51 haffner Exp $
  */
 
 #ifndef _DJVUDOC_H_
@@ -314,7 +314,7 @@ typedef struct djvu_segmenter_options_struct
 
   /** Special indicator for images which are more than 400dpi.
 
-      In theory, upsample_size=(image_dpi/400)+1.
+      In theory, resolution_multiplier=(image_dpi/400)+1.
       
       \begin{description}
       \item[Option type] Pixel size.
@@ -325,7 +325,7 @@ typedef struct djvu_segmenter_options_struct
       \item[Command line] yes
       \end{description}
   */
-  int upsample_size;
+  int resolution_multiplier;
 
   /*@}*/
 
@@ -482,7 +482,7 @@ inline djvu_segmenter_options_struct::djvu_segmenter_options_struct() :
   pix_filter_level(25), threshold_level(75), shape_filter_level(50),
   inhibit_foreback_level(40), inversion_level(25), edge_size(3),
   render_size(3), blurring_size(3), fg_subsampling(12), bg_subsampling(3),
-  upsample_size(1), high_variation_foreground(false), masksub_refine(true) {}
+  resolution_multiplier(1), high_variation_foreground(false), masksub_refine(true) {}
 
 // These examples will be modified to show configuration file examples,
 // instead of inline functions at a future date.
@@ -511,7 +511,7 @@ inline djvu_segmenter_options_struct::djvu_segmenter_options_struct() :
       blurring_size= 3;
       fg_subsampling= 12; 
       bg_subsampling= 3; 
-      upsample_size=1;
+      resolution_multiplier=1;
 
       
       high_variation_foreground= false;
@@ -532,7 +532,7 @@ inline djvu_segmenter_options_struct::djvu_segmenter_options_struct() :
       blurring_size= 3;
       fg_subsampling= 12; 
       bg_subsampling= 4; 
-      upsample_size=2;
+      resolution_multiplier=2;
 
       
       high_variation_foreground= false;
@@ -554,7 +554,7 @@ inline djvu_segmenter_options_struct::djvu_segmenter_options_struct() :
       blurring_size= 3;
       fg_subsampling= 8; 
       bg_subsampling= 2; 
-      upsample_size=1;
+      resolution_multiplier=1;
 
       
       high_variation_foreground= false;
@@ -574,7 +574,7 @@ inline djvu_segmenter_options_struct::djvu_segmenter_options_struct() :
       blurring_size= 2;
       fg_subsampling= 6; 
       bg_subsampling= 1; 
-      upsample_size=1;
+      resolution_multiplier=1;
       inhibit_foreback_level=40;
 
       
@@ -608,7 +608,7 @@ inline djvu_segmenter_options_struct::djvu_segmenter_options_struct() :
       blurring_size= 3;
       fg_subsampling= 12; 
       bg_subsampling= 3; 
-      upsample_size=1;
+      resolution_multiplier=1;
       
       
       high_variation_foreground= false;
@@ -641,7 +641,7 @@ inline djvu_segmenter_options_struct::djvu_segmenter_options_struct() :
       blurring_size= 3;
       fg_subsampling= 12; 
       bg_subsampling= 3; 
-      upsample_size=1;
+      resolution_multiplier=1;
       
       
       high_variation_foreground= false;
@@ -672,7 +672,7 @@ inline djvu_segmenter_options_struct::djvu_segmenter_options_struct() :
       blurring_size= 1;
       fg_subsampling= 12; 
       bg_subsampling= 3; 
-      upsample_size=1;
+      resolution_multiplier=1;
       
       
       high_variation_foreground= true;
