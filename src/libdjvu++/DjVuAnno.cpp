@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuAnno.cpp,v 1.20 1999-10-04 22:33:33 eaf Exp $
+//C- $Id: DjVuAnno.cpp,v 1.21 1999-10-05 17:36:37 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -30,6 +30,7 @@
 #include "GSmartPointer.h"
 #include "GException.h"
 #include "IFFByteStream.h"
+#include "BSByteStream.h"
 
 class GLObject : public GPEnabled
 {
@@ -940,6 +941,229 @@ DjVuANT::copy(void) const
    return ant;
 }
 
+
+
+
+//***************************************************************************
+//******************************** DjVuTXT **********************************
+//***************************************************************************
+
+
+const char DjVuTXT::end_of_column    = 013;      // VT: Vertical Tab
+const char DjVuTXT::end_of_region    = 035;      // GS: Group Separator
+const char DjVuTXT::end_of_paragraph = 037;      // US: Unit Separator
+const char DjVuTXT::end_of_line      = 012;      // LF: Line Feed
+
+const int DjVuTXT::Zone::version  = 0;
+
+DjVuTXT::Zone::Zone()
+  : ztype(DjVuTXT::PAGE), text_start(0), text_length(0)
+{
+}
+
+DjVuTXT::Zone *
+DjVuTXT::Zone::append_child()
+{
+  Zone empty;
+  empty.ztype = ztype;
+  empty.text_start = 0;
+  empty.text_length = 0;
+  children.append(empty);
+  return & children[children.lastpos()];
+}
+
+void
+DjVuTXT::Zone::cleartext()
+{
+  text_start = 0;
+  text_length = 0;
+  for (GPosition i=children; i; ++i)
+    children[i].cleartext();
+}
+
+void
+DjVuTXT::Zone::normtext(const char *instr, GString &outstr)
+{
+  if (text_length == 0)
+    {
+      // Descend collecting text below
+      text_start = outstr.length();
+      for (GPosition i=children; i; ++i)
+        children[i].normtext(instr, outstr);
+      text_length = outstr.length() - text_start;
+      // Ignore empty zones
+      if (text_length == 0)
+        return;
+    }
+  else
+    {
+      // Collect text at this level
+      int new_start = outstr.length();
+      outstr = outstr + GString(instr+text_start, text_length);
+      text_start = new_start;
+      // Clear textual information on lower level nodes
+      for (GPosition i=children; i; ++i)
+        children[i].cleartext();
+    }
+  // Determine standard separator
+  char sep;
+  switch (ztype)
+    {
+    case COLUMN:
+      sep = end_of_column; break;
+    case REGION:
+      sep = end_of_region; break;
+    case PARAGRAPH: 
+      sep = end_of_paragraph; break;
+    case LINE:
+      sep = end_of_line; break;
+    default:
+      return;
+    }
+  // Add separator if not present yet.
+  if (outstr[text_start+text_length-1] != sep)
+    {
+      outstr = outstr + GString(&sep, 1);
+      text_length += 1;
+    }
+}
+
+unsigned int 
+DjVuTXT::Zone::memuse() const
+{
+  int memuse = sizeof(*this);
+  for (GPosition i=children; i; ++i)
+    memuse += children[i].memuse();
+  return memuse;
+}
+
+
+#ifndef NEED_DECODER_ONLY
+void 
+DjVuTXT::Zone::encode(ByteStream &bs) const
+{
+  // Encode type
+  bs.write8(ztype);
+  // Encode rectangle
+  bs.write24(rect.xmin);
+  bs.write24(rect.xmax);
+  bs.write24(rect.ymin);
+  bs.write24(rect.ymax);
+  // Encode text info
+  bs.write24(text_start);
+  bs.write24(text_length);
+  // Encode number of children
+  bs.write24(children.size());
+  // Encode all children
+  for (GPosition i=children; i; ++i)
+    children[i].encode(bs);
+}
+#endif
+
+void 
+DjVuTXT::Zone::decode(ByteStream &bs, int maxtext)
+{
+  // Decode type
+  ztype = (ZoneType) bs.read8();
+  if ( ztype<PAGE || ztype>CHARACTER )
+    THROW("Corrupted text zone hierarchy");
+  // Decode rectangle
+  rect.xmin = bs.read24();
+  rect.xmax = bs.read24();
+  rect.ymin = bs.read24();
+  rect.ymax = bs.read24();
+  // Decode text info
+  text_start = bs.read24();
+  text_length = bs.read24();
+  // Get children size
+  int size = bs.read24();
+  // Checks
+  if (rect.isempty() || text_start<0 || text_start+text_length>maxtext )
+    THROW("Corrupted text zone hierarchy");
+  // Process children
+  children.empty();
+  while (size-- > 0) {
+    Zone *z = append_child();
+    z->decode(bs, maxtext);
+  }
+}
+
+void 
+DjVuTXT::normalize_text()
+{
+  GString newtextUTF8;
+  main.normtext( (const char*)textUTF8, newtextUTF8 );
+  textUTF8 = newtextUTF8;
+}
+
+int 
+DjVuTXT::has_valid_zones() const
+{
+  if (!textUTF8)
+    return false;
+  if (main.children.isempty() || main.rect.isempty()) 
+    return false;
+  return true;
+}
+
+
+#ifndef NEED_DECODER_ONLY
+void 
+DjVuTXT::encode(ByteStream &bs) const
+{
+  if (! textUTF8 )
+    THROW("No text information to encode");
+  int textsize = textUTF8.length();
+  int blocksize = 1 + (textsize>>10);
+  if (blocksize < 10) blocksize = 10;
+  if (blocksize > 1024) blocksize = 1024;
+  // Encode text
+  bs.write32( textsize );
+  bs.writall( (void*)(const char*)textUTF8, textsize );
+  // Encode zones
+  if (has_valid_zones())
+    {
+      bs.write8(Zone::version);
+      main.encode(bs);
+    }
+}
+#endif
+
+void 
+DjVuTXT::decode(ByteStream &bs)
+{
+  // Read text
+  textUTF8.empty();
+  int textsize = bs.read24();
+  char *buffer = textUTF8.getbuf(textsize);
+  int readsize = bs.read(buffer,textsize);
+  buffer[readsize] = 0;
+  if (readsize < textsize)
+    THROW("Corrupted TXT chunk");
+  // Try reading zones
+  unsigned char version;
+  if ( bs.read( (void*) &version, 1 ) == 1) 
+    {
+      if (version != Zone::version)
+        THROW("Unsupported version tag in text zone information");
+      main.decode(bs, textsize);
+    }
+}
+
+GP<DjVuTXT> 
+DjVuTXT::copy(void) const
+{
+  return new DjVuTXT(*this);
+}
+
+unsigned int 
+DjVuTXT::get_memory_usage() const
+{
+  return sizeof(*this) + textUTF8.length() + main.memuse() - sizeof(main); 
+}
+
+
+
 //***************************************************************************
 //******************************** DjVuAnno *********************************
 //***************************************************************************
@@ -947,49 +1171,79 @@ DjVuANT::copy(void) const
 void
 DjVuAnno::decode(ByteStream &bs)
 {
-   IFFByteStream iff(bs);
    GString chkid;
-   int length;
-   while((length=iff.get_chunk(chkid)))
+   IFFByteStream iff(bs);
+   while( iff.get_chunk(chkid) )
    {
-      if (chkid=="ANTa")
-	 if (ant) ant->merge(iff);
-         else
-	 {
-	    ant=new DjVuANT;
-	    ant->decode(iff);
-	 }
-      
-	 // Add decoding of TXT chunks here
-      
-      iff.close_chunk();
+     if (chkid == "ANTa")
+       {
+         if (ant) {
+           ant->merge(iff);
+         } else {
+           ant=new DjVuANT;
+           ant->decode(iff);
+         }
+       }
+     else if (chkid == "TXTa")
+       {
+         if (txt)
+           THROW("Duplicate TXT annotation");
+         txt = new DjVuTXT;
+         txt->decode(iff);
+       }
+     else if (chkid == "TXTz")
+       {
+         if (txt)
+           THROW("Duplicate TXT annotation");
+         txt = new DjVuTXT;
+         BSByteStream bsiff(iff);
+         txt->decode(bsiff);
+       }
+     // Add decoding of other chunks here
+     iff.close_chunk();
    }
 }
 
 void
 DjVuAnno::encode(ByteStream &bs)
 {
-   IFFByteStream iff(bs);
-   if (ant)
-   {
+  IFFByteStream iff(bs);
+  if (ant)
+    {
       iff.put_chunk("ANTa");
       ant->encode(iff);
       iff.close_chunk();
-   }
-
-      // Add encoding of TXT chunks here
+    }
+  if (txt)
+    {
+      iff.put_chunk("TXTz");
+      BSByteStream bsiff(iff,50);
+      txt->encode(bsiff);
+      iff.close_chunk();
+    }
+  // Add encoding of other chunks here
 }
+
 
 GP<DjVuAnno>
 DjVuAnno::copy(void) const
 {
-   GP<DjVuAnno> anno=new DjVuAnno;
-
+   GP<DjVuAnno> anno= new DjVuAnno;
       // Copy any primitives (if any)
    *anno=*this;
-
       // Copy each substructure
-   anno->ant=ant->copy();
-
+   anno->ant = ant->copy();
+   anno->txt = txt->copy();
    return anno;
+}
+
+unsigned int 
+DjVuAnno::get_memory_usage() const
+{
+  int memuse = 0;
+  if (ant)
+    memuse += ant->get_memory_usage();
+  if (txt)
+    memuse += txt->get_memory_usage();
+  return memuse;
 }

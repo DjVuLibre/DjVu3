@@ -256,18 +256,6 @@ DjVuPort.o: DjVuPort.cpp \
  DjVmDir0.h \
  DjVmDoc.h \
  DjVmDir.h
-DjVuText.o: DjVuText.cpp \
- DjVuText.h \
- DjVuGlobal.h \
- GException.h \
- GSmartPointer.h \
- GString.h \
- ByteStream.h \
- GContainer.h \
- Arrays.h \
- GRect.h \
- BSByteStream.h \
- ZPCodec.h
 GBitmap.o: GBitmap.cpp \
  GBitmap.h \
  DjVuGlobal.h \

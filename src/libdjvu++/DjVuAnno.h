@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuAnno.h,v 1.9 1999-10-05 16:00:05 leonb Exp $
+//C- $Id: DjVuAnno.h,v 1.10 1999-10-05 17:36:37 leonb Exp $
 
 #ifndef _DJVUANNO_H
 #define _DJVUANNO_H
@@ -36,7 +36,7 @@
     @memo Implements support for DjVuImage annotations
     @author Andrei Erofeev <eaf@research.att.com>
     @version
-    #$Id: DjVuAnno.h,v 1.9 1999-10-05 16:00:05 leonb Exp $# */
+    #$Id: DjVuAnno.h,v 1.10 1999-10-05 17:36:37 leonb Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -50,6 +50,9 @@
 #include "DjVuGlobal.h"
 #include "GMapAreas.h"
 #include "GContainer.h"
+
+
+// -------- DJVUANT --------
 
 /** This class contains some trivial annotations of the page or of the
     document such as page border color, page alignment, initial zoom and
@@ -146,6 +149,95 @@ private:
 
 
 
+// -------- DJVUTXT --------
+
+
+/** Description of the text contained in a DjVu page.  This class contains the
+    textual data for the page.  It describes the text as a hierarchy of zones
+    corresponding to page, column, region, paragraph, lines, words, etc...
+    The piece of text associated with each zone is represented by an offset
+    and a length describing a segment of a global UTF8 encoded string.  */
+
+class DjVuTXT : public GPEnabled
+{
+public:
+  /** These constant are used to tell what a zone describes.
+      This can be useful for a copy/paste application. 
+      The deeper we go into the hierarchy, the higher the constant. */
+  enum ZoneType { PAGE=1, COLUMN=2, REGION=3, PARAGRAPH=4, LINE=5, WORD=6, CHARACTER=7 };
+  /** Data structure representing document textual components.
+      The text structure is represented by a hierarchy of rectangular zones. */
+  struct Zone 
+  {
+    Zone();
+    /** Type fo the zone. */
+    enum ZoneType ztype;
+    /** Rectangle spanned by the zone */
+    GRect rect;
+    /** Position of the zone text in string #textUTF8#. */
+    int text_start;
+    /** Length of the zone text in string #textUTF8#. */
+    int text_length;
+    /** List of children zone. */
+    GList<Zone> children;
+    /** Appends another subzone inside this zone.  The new zone is initialized
+        with an empty rectangle, empty text, and has the same type as this
+        zone. */
+    Zone *append_child();
+  private:
+    friend class DjVuTXT;
+    void cleartext();
+    void normtext(const char *instr, GString &outstr);
+    unsigned int memuse() const;
+    static const int version;
+    void encode(ByteStream &bs) const;
+    void decode(ByteStream &bs, int maxtext);
+  };
+  /** Textual data for this page.  
+      The content of this string is encoded using the UTF8 code.
+      This code corresponds to ASCII for the first 127 characters.
+      Columns, regions, paragraph and lines are delimited by the following
+      control character:
+      \begin{tabular}{lll}
+        {\bf Name} & {\bf Octal} & {\bf Ascii name} \\\hline\\
+        {\tt DjVuText::end_of_column}    & 013 & VT, Vertical Tab \\
+        {\tt DjVuText::end_of_region}    & 035 & GS, Group Separator \\
+        {\tt DjVuText::end_of_paragraph} & 037 & US, Unit Separator \\
+        {\tt DjVuText::end_of_line}      & 012 & LF: Line Feed
+      \end{tabular} */
+  GString textUTF8;
+  static const char end_of_column    ;      // VT: Vertical Tab
+  static const char end_of_region    ;      // GS: Group Separator
+  static const char end_of_paragraph ;      // US: Unit Separator
+  static const char end_of_line      ;      // LF: Line Feed
+  /** Main zone in the document.
+      This zone represent the page. */
+  Zone main;
+  /** Tests whether there is a meaningful zone hierarchy. */
+  int has_valid_zones() const;
+  /** Normalize textual data.  Assuming that a zone hierarchy has been built
+      and represents the reading order.  This function reorganizes the string
+      #textUTF8# by gathering the highest level text available in the zone
+      hierarchy.  The text offsets and lengths are recomputed for all the
+      zones in the hierarchy. Separators are inserted where appropriate. */
+  void normalize_text();
+  /** Encode data for a TXT chunk. */
+  void encode(ByteStream &bs) const;
+  /** Decode data from a TXT chunk. */
+  void decode(ByteStream &bs);
+  /** Returns a copy of this object. */
+  GP<DjVuTXT> copy(void) const;
+  /** Returns the number of bytes needed by this data structure. It's
+      used by caching routines to estimate the size of a \Ref{DjVuImage}. */
+  unsigned int get_memory_usage() const;
+};
+
+
+
+
+
+// -------- DJVUANNO --------
+
 
 /** This is a top-level class containing annotations of a DjVu document (or
     just a page). It has only two functions: \Ref{encode}() and
@@ -158,6 +250,7 @@ class DjVuAnno : public GPEnabled
 {
 public:
    GP<DjVuANT>	ant;
+   GP<DjVuTXT>  txt;
       /** Decodes a sequence of annotation chunks and merges contents of every
 	  chunk with previously decoded information. This function
 	  should be called right after applying \Ref{IFFByteStream::get_chunk}()
