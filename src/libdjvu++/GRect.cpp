@@ -1,19 +1,19 @@
 //C-  -*- C++ -*-
 //C-
-//C- Copyright (c) 1999 AT&T Corp.  All rights reserved.
+//C- Copyright (c) 1997-1999 AT&T Corp.
+//C- Copyright (c) 2000 LizardTech Inc.
+//C- All rights reserved.
 //C-
-//C- This software may only be used by you under license from AT&T
-//C- Corp. ("AT&T"). A copy of AT&T's Source Code Agreement is available at
-//C- AT&T's Internet website having the URL <http://www.djvu.att.com/open>.
+//C- This software may only be used by you under license from LizardTech
+//C- Inc. A copy of LizardTech's Source Code Agreement is available at
+//C- LizardTech's Internet website having the URL <http://www.djvu.com/open>.
 //C- If you received this software without first entering into a license with
-//C- AT&T, you have an infringing copy of this software and cannot use it
-//C- without violating AT&T's intellectual property rights.
+//C- LizardTech, you have an infringing copy of this software and cannot use it
+//C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: GRect.cpp,v 1.10 2000-03-16 19:38:59 eaf Exp $
-
-
+//C- $Id: GRect.cpp,v 1.11 2000-05-01 16:15:22 bcr Exp $
 // -- Implementation of class GRect and GRectMapper
-// - File "$Id: GRect.cpp,v 1.10 2000-03-16 19:38:59 eaf Exp $"
+// - File "$Id: GRect.cpp,v 1.11 2000-05-01 16:15:22 bcr Exp $"
 // - Author: Leon Bottou, 05/1997
 
 #ifdef __GNUC__

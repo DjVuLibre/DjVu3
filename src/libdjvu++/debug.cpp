@@ -1,14 +1,17 @@
 //C-  -*- C++ -*-
 //C-
-//C-  Copyright (c) 1998 AT&T	
-//C-  All Rights Reserved 
+//C- Copyright (c) 1999 AT&T Corp.
+//C- Copyright (c) 2000 LizardTech Inc.
+//C- All rights reserved.
 //C-
-//C-  THIS IS UNPUBLISHED PROPRIETARY SOURCE CODE OF AT&T
-//C-  The copyright notice above does not evidence any
-//C-  actual or intended publication of such source code.
+//C- This software may only be used by you under license from LizardTech
+//C- Inc. A copy of LizardTech's Source Code Agreement is available at
+//C- LizardTech's Internet website having the URL <http://www.djvu.com/open>.
+//C- If you received this software without first entering into a license with
+//C- LizardTech, you have an infringing copy of this software and cannot use it
+//C- without violating LizardTech's intellectual property rights.
 //C-
-//C-  $Id: debug.cpp,v 1.7 2000-02-10 14:31:30 leonb Exp $
-
+//C- $Id: debug.cpp,v 1.8 2000-05-01 16:15:23 bcr Exp $
 
 #include "debug.h"
 

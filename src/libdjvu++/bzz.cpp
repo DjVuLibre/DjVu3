@@ -1,15 +1,17 @@
 //C-  -*- C++ -*-
 //C-
-//C- Copyright (c) 1999 AT&T Corp.  All rights reserved.
+//C- Copyright (c) 1999 AT&T Corp.
+//C- Copyright (c) 2000 LizardTech Inc.
+//C- All rights reserved.
 //C-
-//C- This software may only be used by you under license from AT&T
-//C- Corp. ("AT&T"). A copy of AT&T's Source Code Agreement is available at
-//C- AT&T's Internet website having the URL <http://www.djvu.att.com/open>.
+//C- This software may only be used by you under license from LizardTech
+//C- Inc. A copy of LizardTech's Source Code Agreement is available at
+//C- LizardTech's Internet website having the URL <http://www.djvu.com/open>.
 //C- If you received this software without first entering into a license with
-//C- AT&T, you have an infringing copy of this software and cannot use it
-//C- without violating AT&T's intellectual property rights.
+//C- LizardTech, you have an infringing copy of this software and cannot use it
+//C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: bzz.cpp,v 1.11 1999-09-20 23:12:59 leonb Exp $
+//C- $Id: bzz.cpp,v 1.12 2000-05-01 16:15:23 bcr Exp $
 
 // BZZ -- a frontend for BSByteStream
 
@@ -35,7 +37,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation
     @version
-    #$Id: bzz.cpp,v 1.11 1999-09-20 23:12:59 leonb Exp $# */
+    #$Id: bzz.cpp,v 1.12 2000-05-01 16:15:23 bcr Exp $# */
 //@{
 //@}
 

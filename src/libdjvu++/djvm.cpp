@@ -1,15 +1,17 @@
 //C-  -*- C++ -*-
 //C-
-//C- Copyright (c) 1999 AT&T Corp.  All rights reserved.
+//C- Copyright (c) 1999 AT&T Corp.
+//C- Copyright (c) 2000 LizardTech Inc.
+//C- All rights reserved.
 //C-
-//C- This software may only be used by you under license from AT&T
-//C- Corp. ("AT&T"). A copy of AT&T's Source Code Agreement is available at
-//C- AT&T's Internet website having the URL <http://www.djvu.att.com/open>.
+//C- This software may only be used by you under license from LizardTech
+//C- Inc. A copy of LizardTech's Source Code Agreement is available at
+//C- LizardTech's Internet website having the URL <http://www.djvu.com/open>.
 //C- If you received this software without first entering into a license with
-//C- AT&T, you have an infringing copy of this software and cannot use it
-//C- without violating AT&T's intellectual property rights.
+//C- LizardTech, you have an infringing copy of this software and cannot use it
+//C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: djvm.cpp,v 1.10 2000-04-22 00:09:12 bcr Exp $
+//C- $Id: djvm.cpp,v 1.11 2000-05-01 16:15:23 bcr Exp $
 
 /** @name djvm
 
@@ -77,7 +79,7 @@
     @author
     Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: djvm.cpp,v 1.10 2000-04-22 00:09:12 bcr Exp $# */
+    #$Id: djvm.cpp,v 1.11 2000-05-01 16:15:23 bcr Exp $# */
 //@{
 //@}
 
