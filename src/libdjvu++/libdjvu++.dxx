@@ -301,6 +301,23 @@
 //@{
 
 /** @name Compiling the Library
+
+
+    \begin{verbatim}
+       % configure
+       Testing C++ compiler ...eg++.
+       Testing pipe option ...yes.
+       Searching AR program ...ar
+       Searching RANLIB program ...ranlib
+    \end{verbatim}
+
+    \begin{verbatim}
+       % make
+    \end{verbatim}
+       
+
+
+
  */
 
 /** @name Decoding DjVu content
