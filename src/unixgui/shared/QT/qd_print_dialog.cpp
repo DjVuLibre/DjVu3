@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qd_print_dialog.cpp,v 1.6 2001-09-25 22:38:56 leonb Exp $
+// $Id: qd_print_dialog.cpp,v 1.7 2001-09-26 15:10:03 leonb Exp $
 // $Name:  $
 
 
@@ -256,6 +256,12 @@ QDPrintDialog::adjustWhat(void)
       setPrint((What) id);
    else
       setPrint(PRINT_PAGE);
+
+#ifndef QT1
+   // This is needed to establish the proper geometry(!)
+   what_menu->sizeHint();
+   what_menu->updateGeometry();
+#endif
 
    custompages_label->setEnabled(!force_one_page);
    copies_spin->setEnabled(!force_one_copy);
