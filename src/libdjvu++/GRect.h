@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: GRect.h,v 1.1 1999-01-22 00:40:19 leonb Exp $
+//C-  $Id: GRect.h,v 1.2 1999-01-22 21:18:06 leonb Exp $
 
 
 #ifndef _GRECT_H_
@@ -28,7 +28,7 @@
     @author
     Leon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GRect.h,v 1.1 1999-01-22 00:40:19 leonb Exp $# */
+    #$Id: GRect.h,v 1.2 1999-01-22 21:18:06 leonb Exp $# */
 //@{
 
 #include "DjVuGlobal.h"
@@ -86,51 +86,6 @@ public:
   /** Maximal (exclusive) vertical coordinate of the rectangle points. */
   int ymax;
 };
-
-
-/** Rational number.
-    This is a minimal implementation of rational numbers.
-    More support will be added if the need arises.
-    Rational numbers are used to implement exact integer arithmetic 
-    in the rectangle mapping code (See \Ref{GRectMapper}). 
-*/
-
-class GRatio
-{
-public:
-  /** Constructs rational number #0#/#1#. */
-  GRatio() : p(0), q(1) {};
-  /** Constructs rational number #n#/#1#. This constructor provides an
-      implicit conversion from integers to rational numbers. */
-  GRatio(int n) : p(n), q(1) {};
-  /** Constructs rational number #p#/#q#.  Argument #q# must be non zero. This
-      constructor automatically divides both #p# and #q# by their greatest
-      common divisor. */
-  GRatio(int p, int q);
-  /** Returns the numerator of the rational number. */
-  int get_p() const { return p; };
-  /** Returns the denominator of the rational number. */
-  int get_q() const { return q; };
-  /** Convert a rational into a floating point number. */
-  operator double() const { return (double)p/(double)q; };
-  /** Multiplies two rational numbers. */
-  friend GRatio operator * (const GRatio &r1, const GRatio &r2);
-  /** Adds two rational numbers. */
-  friend GRatio operator + (const GRatio &r1, const GRatio &r2);
-  /** Retrurns true iff #r1# is equal to #r2#. */
-  friend int operator ==   (const GRatio &r1, const GRatio &r2);
-  /** Retrurns true iff #r1# is equal to #r2#. */
-  friend int operator !=   (const GRatio &r1, const GRatio &r2);
-  /** Retrurns true iff #r1# is smaller or equal to #r2#. */
-  friend int operator <=   (const GRatio &r1, const GRatio &r2);
-private:
-  // Members
-  int p;
-  int q;
-  // Helpers
-  void simplify();
-};
-
 
 
 /** Maps points from one rectangle to another rectangle.  This class
@@ -193,6 +148,13 @@ public:
       overwritten with the new rectangle coordinates. */
   void unmap(GRect &rect);
 private:
+  // GRatio
+  struct GRatio {
+    GRatio ();
+    GRatio (int p, int q);
+    int p;
+    int q;
+  };
   // Data
   GRect rectFrom;
   GRect rectTo;

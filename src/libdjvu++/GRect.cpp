@@ -7,11 +7,11 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: GRect.cpp,v 1.1 1999-01-22 00:40:19 leonb Exp $
+//C-  $Id: GRect.cpp,v 1.2 1999-01-22 21:18:06 leonb Exp $
 
 
 // -- Implementation of class GRect and GRectMapper
-// - File "$Id: GRect.cpp,v 1.1 1999-01-22 00:40:19 leonb Exp $"
+// - File "$Id: GRect.cpp,v 1.2 1999-01-22 21:18:06 leonb Exp $"
 // - Author: Leon Bottou, 05/1997
 
 #ifdef __GNUC__
@@ -132,14 +132,16 @@ GRect::recthull(const GRect &rect1, const GRect &rect2)
 
 // -- Class GRatio
 
-GRatio::GRatio(int p, int q)
-  : p(p), q(q)
+
+inline
+GRectMapper::GRatio::GRatio()
+  : p(0), q(1)
 {
-  simplify();
 }
 
-void 
-GRatio::simplify()
+inline
+GRectMapper::GRatio::GRatio(int p, int q)
+  : p(p), q(q)
 {
   if (q == 0) 
     THROW("Division by zero");
@@ -169,35 +171,16 @@ GRatio::simplify()
   q /= gcd;
 }
 
-
-GRatio 
-operator*(const GRatio &r1, const GRatio &r2)
-{ 
-  return GRatio(r1.p*r2.p, r1.q*r2.q); 
-}
-
-GRatio 
-operator+(const GRatio &r1, const GRatio &r2)
-{ 
-  return GRatio(r1.p*r2.q+r1.q*r2.p, r1.q*r2.q); 
-}
-
-int
-operator==(const GRatio &r1, const GRatio &r2)
+inline int
+operator* (int n, GRectMapper::GRatio r )
 {
-  return (r1.p==r2.p && r1.q==r2.q);
+  return (n * r.p + r.q/2) / r.q;
 }
 
-int
-operator!=(const GRatio &r1, const GRatio &r2)
+inline int
+operator/ (int n, GRectMapper::GRatio r )
 {
-  return (r1.p!=r2.p || r1.q!=r2.q);
-}
-
-int
-operator<=(const GRatio &r1, const GRatio &r2)
-{
-  return (r1.p * r2.q <= r1.q * r2.p);
+  return (n * r.q + r.p/2) / r.p;
 }
 
 
@@ -289,6 +272,8 @@ GRectMapper::mirrory()
 void
 GRectMapper::precalc()
 {
+  if (rectTo.isempty() || rectFrom.isempty())
+    THROW("Illegal empty rectangles in GRectMapper::[un]map");
   rw = GRatio(rectTo.width(), rectFrom.width());
   rh = GRatio(rectTo.height(), rectFrom.height());
 }
@@ -299,7 +284,7 @@ GRectMapper::map(int &x, int &y)
   int mx = x;
   int my = y;
   // precalc
-  if (! (rw.get_p() && rh.get_p()))
+  if (! (rw.p && rh.p))
     precalc();
   // swap and mirror
   if (code & SWAPXY)
@@ -309,21 +294,19 @@ GRectMapper::map(int &x, int &y)
   if (code & MIRRORY)
     my = rectFrom.ymin + rectFrom.ymax - my;
   // scale and translate
-  x = rectTo.xmin + (mx - rectFrom.xmin) * rw.get_p() / rw.get_q();
-  y = rectTo.ymin + (my - rectFrom.ymin) * rh.get_p() / rh.get_q();
+  x = rectTo.xmin + (mx - rectFrom.xmin) * rw;
+  y = rectTo.ymin + (my - rectFrom.ymin) * rh;
 }
 
 void 
 GRectMapper::unmap(int &x, int &y)
 {
   // precalc 
-  if (! (rw.get_p() && rh.get_p()))
+  if (! (rw.p && rh.p))
     precalc();
   // scale and translate
-  int mx = rectFrom.xmin 
-    + ( (x - rectTo.xmin) * rw.get_q() + rw.get_p()/2 ) / rw.get_p();
-  int my = rectFrom.ymin 
-    + ( (y - rectTo.ymin) * rh.get_q() + rh.get_p()/2 ) / rh.get_p();
+  int mx = rectFrom.xmin + (x - rectTo.xmin) / rw;
+  int my = rectFrom.ymin + (y - rectTo.ymin) / rh;
   //  mirror and swap
   if (code & MIRRORX)
     mx = rectFrom.xmin + rectFrom.xmax - mx;
