@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuAnno.cpp,v 1.25 1999-10-11 21:31:00 eaf Exp $
+//C- $Id: DjVuAnno.cpp,v 1.26 1999-10-19 22:06:08 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -1112,12 +1112,9 @@ DjVuTXT::encode(ByteStream &bs) const
 {
   if (! textUTF8 )
     THROW("No text information to encode");
-  int textsize = textUTF8.length();
-  int blocksize = 1 + (textsize>>10);
-  if (blocksize < 10) blocksize = 10;
-  if (blocksize > 1024) blocksize = 1024;
   // Encode text
-  bs.write32( textsize );
+  int textsize = textUTF8.length();
+  bs.write24( textsize );
   bs.writall( (void*)(const char*)textUTF8, textsize );
   // Encode zones
   if (has_valid_zones())
