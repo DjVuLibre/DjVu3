@@ -31,12 +31,12 @@
 #C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #
-# $Id: cxx.sh,v 1.38 2001-08-24 21:50:09 docbill Exp $
+# $Id: cxx.sh,v 1.39 2001-09-24 20:30:35 leonb Exp $
 # $Name:  $
 
 # This rule sets the following variables:
 #	CXX, CXXFLAGS, CXXSYMBOLIC, CXXPIC, CXXUNROLL, CXXWARN
-# $Id: cxx.sh,v 1.38 2001-08-24 21:50:09 docbill Exp $
+# $Id: cxx.sh,v 1.39 2001-09-24 20:30:35 leonb Exp $
 
 if [ -z "$CONFIG_DIR" ]
 then
@@ -44,7 +44,6 @@ then
   exit 1
 fi
 
-ECXX="eg++"
 if [ -z "$CXX_SET" ]
 then
   (echo '#include <unistd.h>'
@@ -66,20 +65,17 @@ then
   fi
   if [ -z "$CXX" ]
   then  
-    if ( run $EGXX -c $temp.cpp )
+    if ( run g++ -c $temp.cpp )
     then
-        CXX="$EGXX"
+      CXX=g++
     elif ( run c++ -c $temp.cpp )
     then
       CXX=c++
-    elif ( run g++ -c $temp.cpp )
-    then
-      CXX=g++
     elif ( run CC -c $temp.cpp )
     then
       CXX=CC
     else 
-      echo "none available"
+      echo "none available (please set environment variable CXX)"
       echo "Error: Can't find a C++ compiler" 1>&2
       exit 1
     fi

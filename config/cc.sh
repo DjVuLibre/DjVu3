@@ -31,7 +31,7 @@
 #C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #
-# $Id: cc.sh,v 1.27 2001-07-24 17:52:02 bcr Exp $
+# $Id: cc.sh,v 1.28 2001-09-24 20:30:35 leonb Exp $
 # $Name:  $
 
 # This rule sets the following variables:
@@ -43,7 +43,6 @@ then
   exit 1
 fi
 
-EGCS="egcs"
 if [ -z "$CC_SET" ]
 then
   (echo '#include <stdio.h>';echo 'int main(void) {puts("Hello World\n");return 0;}')|testfile $temp.c
@@ -62,16 +61,16 @@ then
   fi
   if [ -z "$CC" ]
   then
-    if ( run "$EGCS" -c $temp.c ) ; then
-      CC="$EGCS"
-    elif ( run gcc -c $temp.c ) ; then
+    if ( run gcc -c $temp.c ) ; then
       CC=gcc
+    elif ( run egcs -c $temp.c ) ; then
+      CC=egcs
     elif ( run cc -c $temp.c ) ; then
       CC=cc
     elif ( run CC -c $temp.c ) ; then
       CC=CC
     else
-      echo "none available"
+      echo "none available (please set environment variable CC)"
       echo "Error: Can't find a C compiler" 1>&2
       exit 1
     fi
