@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.36 1999-09-14 22:36:47 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.37 1999-09-15 16:04:52 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -77,7 +77,9 @@ DjVuDocument::static_init_thread(void * cl_data)
       th->init_thread();
    } CATCH(exc) {
       TRY {
-	 get_portcaster()->notify_error(th, exc.get_cause());
+	 if (!strcmp(exc.get_cause(), "EOF"))
+	    get_portcaster()->notify_status(th, "EOF");
+	 else get_portcaster()->notify_error(th, exc.get_cause());
       } CATCH(exc) {} ENDCATCH;
    } ENDCATCH;
 }
