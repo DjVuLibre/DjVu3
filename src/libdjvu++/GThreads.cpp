@@ -9,10 +9,10 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GThreads.cpp,v 1.29 1999-07-22 22:03:52 leonb Exp $
+//C- $Id: GThreads.cpp,v 1.30 1999-08-18 21:38:00 leonb Exp $
 
 
-// **** File "$Id: GThreads.cpp,v 1.29 1999-07-22 22:03:52 leonb Exp $"
+// **** File "$Id: GThreads.cpp,v 1.30 1999-08-18 21:38:00 leonb Exp $"
 // This file defines machine independent classes
 // for running and synchronizing threads.
 // - Author: Leon Bottou, 01/1998
@@ -1176,12 +1176,30 @@ GThread::~GThread()
   task = 0;
 }
 
+
+static void startone(void);
+static void starttwo(GThread *thr);
+static GThread * volatile starter;
+
+static void
+startone(void)
+{
+  GThread *thr = starter;
+  mach_switch(&thr->task->regs, &curtask->regs);
+  // Registers may still contain an improper pointer
+  // to the exception context.  We should neither 
+  // register cleanups nor register handlers.
+  starttwo(thr);
+  abort();
+}
+
 static void 
 starttwo(GThread *thr)
 {
   // Hopefully this function reacquires 
   // an exception context pointer. Therefore
   // we can register the exception handlers.
+  // It is placed after ``startone'' to avoid inlining.
 #ifdef __EXCEPTIONS
   try 
     {
@@ -1207,20 +1225,6 @@ starttwo(GThread *thr)
 #endif 
   thr->terminate();
   GThread::yield();
-  abort();
-}
-
-static GThread * volatile starter;
-
-static void
-startone(void)
-{
-  GThread *thr = starter;
-  mach_switch(&thr->task->regs, &curtask->regs);
-  // Registers may still contain an improper pointer
-  // to the exception context.  We should neither 
-  // register cleanups nor register handlers.
-  starttwo(thr);
   abort();
 }
 

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GException.h,v 1.13 1999-08-12 20:13:39 leonb Exp $
+//C- $Id: GException.h,v 1.14 1999-08-18 21:38:00 leonb Exp $
 
 
 #ifndef _GEXCEPTION_H_
@@ -60,7 +60,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@research.att.com> -- fixed message memory allocation.
     @version 
-    #$Id: GException.h,v 1.13 1999-08-12 20:13:39 leonb Exp $# */
+    #$Id: GException.h,v 1.14 1999-08-18 21:38:00 leonb Exp $# */
 //@{
 
 #include "DjVuGlobal.h"
@@ -160,16 +160,22 @@ private:
 // Compiler supports ANSI C++ exceptions.
 // Defined exception macros accordingly.
 
+class GExceptionHandler {
+public:
+  static void exthrow(const GException &) no_return;
+  static void rethrow(void) no_return;
+};
+
 #define G_TRY        try
 #define G_CATCH(n)   catch(GException &n) { 
 #define G_ENDCATCH   }
-#define G_RETHROW    throw
+#define G_RETHROW    GExceptionHandler::rethrow()
 #ifdef __GNUG__
-#define G_THROW(msg) throw \
-  GException(msg, __FILE__, __LINE__, __PRETTY_FUNCTION__)
+#define G_THROW(msg) GExceptionHandler::exthrow \
+  (GException(msg, __FILE__, __LINE__, __PRETTY_FUNCTION__))
 #else
-#define G_THROW(msg) throw \
-  GException(msg, __FILE__, __LINE__)
+#define G_THROW(msg) GExceptionHandler::exthrow \
+  (GException(msg, __FILE__, __LINE__))
 #endif
 
 #else // USE_EXCEPTION_EMULATION
