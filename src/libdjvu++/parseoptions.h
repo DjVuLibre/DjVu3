@@ -6,7 +6,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: parseoptions.h,v 1.20 2000-01-25 04:30:34 bcr Exp $
+//C- $Id: parseoptions.h,v 1.21 2000-01-27 02:48:41 haffner Exp $
 
 #endif /* __cplusplus */
 
@@ -54,21 +54,20 @@
    The next step is to declare the \Ref{DjVuParseOptions} class, passing
    it the name of the default profile to read values from.  Profiles are
    normally contained in "/etc/DjVu" or "~/.DjVu" for unix.  The location
-   is stored in the registery for Windows.  Legal profile variables can be
+   is stored in the registry for Windows.  Legal profile variables can be
    any name beginning with a letter consisting of characters [-A-Za-z0-9].
    This includes all command long options of this format in the
    \Ref{djvu_option} structure.
-
    Finally, you can tell your new \Ref{DjVuParseOptions} object to parse
    the command line arguments and use the class methods to determine the
    value specified for each option.
 
-   For a better understanding of this procedure contine on to the 
+   For a better understanding of this procedure continue on to the 
    \Ref{DjVuParseOptions Examples}.
 
    @memo Class used for parsing options and configuration files.
-   @author: #$Author: bcr $#
-   @version #$Id: parseoptions.h,v 1.20 2000-01-25 04:30:34 bcr Exp $#
+   @author: #$Author: haffner $#
+   @version #$Id: parseoptions.h,v 1.21 2000-01-27 02:48:41 haffner Exp $#
  */
 
 //@{
@@ -293,11 +292,11 @@ public:
       statically. */
   inline int SetVarToken(const char xname[]) const;
 
-  /** This is simular to GetVarToken(), but it looks up the token for       
+  /** This is similar to GetVarToken(), but it looks up the token for       
       profile name instead. */
   inline int GetProfileToken(const char xname[]) const;
 
-  /** This is simular to SetVarToken(), but it looks up the token for      
+  /** This is similar to SetVarToken(), but it looks up the token for      
       profile name instead.   Care should be used when using this method.  
       Once a token is assigned to a profile, then the profile is assumed   
       to have been read.  Consequently, if you use this function, and the  
@@ -321,10 +320,10 @@ public:
   const char * const GetValue(const int token) const;
 
   /** Multiple tokens may be in an array of the specified listsize.  The   
-      index of the token with a value of the highest presidence will be    
-      is returned.  Command line arguments have the highest presidence.    
-      Default profile values have the lowest presidence.  It is an error   
-      to have two values f the same presedence. */
+      index of the token with a value of the highest precedence will be    
+      is returned.  Command line arguments have the highest precedence.    
+      Default profile values have the lowest precedence.  It is an error   
+      to have two values f the same precedence. */
   int GetBest(const int listsize,const int tokens[],bool=false);
 
   /// Same as above, but -1 terminated 
@@ -335,10 +334,10 @@ public:
   inline const char * const GetValue(const char xname[]) const;
 
   /** Multiple names may be in an array of the specified listsize.  The    
-      index of the name with a value of the highest presidence will be     
-      is returned.  Command line arguments have the highest presidence.    
-      Default profile values have the lowest presidence.  It is an error   
-      to have two values f the same presedence. */
+      index of the name with a value of the highest precedence will be     
+      is returned.  Command line arguments have the highest precedence.    
+      Default profile values have the lowest precedence.  It is an error   
+      to have two values f the same precedence. */
   int GetBest(const int listsize,const char * const[],bool=false);
 
   /// Same as above, but NULL terminated 
@@ -406,19 +405,19 @@ private:
 };
 
  /** Token list.
-     This is a class very simmular to GMap, only it is limited much more
+     This is a class very similar to GMap, only it is limited much more
      limited scope.  It is an associative array "string" to integer.  But
-     the integer is assigned uniquely by this class in sequental order.
+     the integer is assigned uniquely by this class in sequential order.
      This is of use when you want to store items sequentially in an array
      without making the array to large.  This list is always sorted, so
-     this class is also usefull for creating a sorted unique list of words.
+     this class is also useful for creating a sorted unique list of words.
 
      At some point the TokenList class may be replaced by a wrapper to the
      GMap class.  We will have to evaluate CPU and memory usage to see if
-     the GMap replacement would be adiquate.
+     the GMap replacement would be adequate.
 
      The DjVuTokenList keeps track of string,integer pairs.  One unique     
-     interger is assigned per string.  With the integer range stored from   
+     integer is assigned per string.  With the integer range stored from   
      zero to the number of strings present.  This is primarily intended to  
      allow a simple mapping between strings and a fixed size array. */
 
@@ -604,7 +603,7 @@ private:
   const char *name;
   char *optstring;
   const djvu_option *long_opts;
-  int long_only;  // This is usefull for allowing single - in arguments.
+  int long_only;  // This is useful for allowing single - in arguments.
 public:
   const char *optarg;
   int getopt_long();
