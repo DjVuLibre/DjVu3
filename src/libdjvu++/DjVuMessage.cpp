@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessage.cpp,v 1.57 2001-06-09 01:50:16 bcr Exp $
+// $Id: DjVuMessage.cpp,v 1.58 2001-06-11 16:20:35 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -83,6 +83,7 @@ static const char messagestring[]="MESSAGE";
 static const char localestring[]="locale";
 
 
+#define opensourcedir[]="osi";
 #ifndef NO_DEBUG
 #if defined(UNIX)
   // appended to the home directory.

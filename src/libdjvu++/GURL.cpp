@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GURL.cpp,v 1.68 2001-06-09 01:50:17 bcr Exp $
+// $Id: GURL.cpp,v 1.69 2001-06-11 16:20:35 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -169,7 +169,7 @@ is_argument(const char * start)
 void
 GURL::convert_slashes(void)
 {
-   const GUTF8String xurl(get_string());
+   GUTF8String xurl(get_string());
 #ifndef UNIX
    const int protocol_length=protocol(xurl).length();
    for(char *ptr=(xurl.getbuf()+protocol_length);*ptr;ptr++)
