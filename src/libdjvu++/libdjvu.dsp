@@ -49,7 +49,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LIB32=xilink6.exe -lib
 # ADD BASE LIB32 /nologo
-# ADD LIB32 /nologo /nodefaultlib
+# ADD LIB32 /nologo /out:"..\ReleaseOutput\libdjvu.lib" /nodefaultlib
 
 !ELSEIF  "$(CFG)" == "libdjvu - Win32 Debug"
 
@@ -72,7 +72,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LIB32=xilink6.exe -lib
 # ADD BASE LIB32 /nologo
-# ADD LIB32 /nologo /nodefaultlib
+# ADD LIB32 /nologo /out:"..\DebugOutput\libdjvu.lib" /nodefaultlib
 
 !ENDIF 
 
