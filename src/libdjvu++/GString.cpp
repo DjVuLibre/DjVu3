@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.114 2001-07-16 15:46:04 bcr Exp $
+// $Id: GString.cpp,v 1.115 2001-07-16 15:57:34 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -402,8 +402,10 @@ GStringRep::nextCharType(
 bool
 GStringRep::giswspace(const unsigned long w)
 {
-  return ((sizeof(wchar_t) == 2)&&(w&~0xffff))
-    ?(true):((unsigned long)iswspace((wchar_t)w)?true:false);
+  return 
+    ((sizeof(wchar_t) == 2)&&(w&~0xffff))
+    ||((unsigned long)iswspace((wchar_t)w))
+    ||((w == '\r')||(w == '\n'));
 }
 
 bool
