@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuImage.h,v 1.13 1999-06-04 15:55:17 leonb Exp $
+//C- $Id: DjVuImage.h,v 1.14 1999-06-08 21:33:30 leonb Exp $
 
 #ifndef _DJVUIMAGE_H
 #define _DJVUIMAGE_H
@@ -51,7 +51,7 @@
     L\'eon Bottou <leonb@research.att.com> - initial implementation
     Andrei Erofeev <eaf@geocities.com> - multipage support
     @version
-    #$Id: DjVuImage.h,v 1.13 1999-06-04 15:55:17 leonb Exp $# */
+    #$Id: DjVuImage.h,v 1.14 1999-06-08 21:33:30 leonb Exp $# */
 //@{
 
 
@@ -75,6 +75,18 @@
 #include "GURL.h"
 #include "DataPool.h"
 #include "DjVuPort.h"
+
+
+/* Obsolete class included for backward compatibility. */
+
+class DjVuInterface
+{
+public:
+  virtual void notify_chunk(const char *chkid, const char *msg) = 0;
+  virtual void notify_relayout(void) = 0;
+  virtual void notify_redisplay(void) = 0;
+};
+
 
 /** Main DjVu Image data structure.  This class defines the internal
     representation of a DjVu image.  This representation consists of a few
@@ -136,11 +148,11 @@ public:
   // OLD STYLE DECODING
   /** @name Old style decoding (backward compatibility). */
   //@{
-  /** This function is here for backward compatibility. Now, with
+  /** This function is here for backward compatibility. Now, with the
       introduction of multipage DjVu documents, the decoding is handled
       by \Ref{DjVuFile} and \Ref{DjVuDocument} classes. For single page
       documents though, we still have this wrapper. */
-  void decode(ByteStream & str);
+  void decode(ByteStream & str, DjVuInterface *notifier=0);
   //@}
   
   // UTILITIES
@@ -293,14 +305,6 @@ private:
    GP<JB2Image>		get_fgjb(const GP<DjVuFile> & file) const;
    GP<GPixmap>		get_fgpm(const GP<DjVuFile> & file) const;
    GP<DjVuNavDir>	get_dir(const GP<DjVuFile> & file) const;
-
-
-   // Old decoding way emulation
-   GP<DataPool>		stream_pool;
-   GURL			stream_url;
-   virtual GP<DataRange>request_data(const DjVuPort * src, const GURL & url);
-   virtual bool		notify_error(const DjVuPort * source, const char * msg);
-   virtual bool		notify_status(const DjVuPort * source, const char * msg);
 };
 
 inline GP<DjVuFile>
@@ -321,6 +325,12 @@ DjVuImage::wait_for_decoder(void)
 }
 
 //@}
+
+
+
+
+
+
 
 // ----- THE END
 #endif

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuImage.cpp,v 1.15 1999-06-08 20:36:24 leonb Exp $
+//C- $Id: DjVuImage.cpp,v 1.16 1999-06-08 21:33:30 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -272,55 +272,101 @@ DjVuImage::get_long_description() const
 
 //// DJVUIMAGE: OLD-STYLE DECODING
 
-GP<DataRange>
-DjVuImage::request_data(const DjVuPort * src, const GURL & url)
-{
-   if (url!=stream_url)
-      THROW("This stream cannot be decoded the old way.");
 
-   return new DataRange(stream_pool);
+class _DjVuImageNotifier : public DjVuPort
+{
+  friend class DjVuImage;
+  DjVuInterface  *notifier;
+  GP<DataPool>	  stream_pool;
+  GURL		  stream_url;
+public:
+  _DjVuImageNotifier(DjVuInterface *notifier);
+  GP<DataRange> request_data(const DjVuPort *src, const GURL & url);
+  bool notify_error(const DjVuPort *src, const char * msg);
+  void notify_redisplay(const DjVuPort *);
+  void notify_relayout(const DjVuPort *);
+  void notify_chunk_done(const DjVuPort *, const char *);
+  void notify_file_stopped(const DjVuPort *);
+  void notify_file_failed(const DjVuPort *);
+};
+
+_DjVuImageNotifier::_DjVuImageNotifier(DjVuInterface *notifier)
+: notifier(notifier)
+{
+}
+
+GP<DataRange> 
+_DjVuImageNotifier::request_data(const DjVuPort *src, const GURL & url)
+{
+  if (url!=stream_url)
+    THROW("This stream cannot be decoded the old way.");
+  return new DataRange(stream_pool);
 }
 
 bool
-DjVuImage::notify_error(const DjVuPort *, const char * msg)
+_DjVuImageNotifier::notify_error(const DjVuPort * source, const char * msg)
 {
-   fprintf(stderr, "%s\n", msg);
-   return 1;
-}
-
-bool
-DjVuImage::notify_status(const DjVuPort *, const char * msg)
-{
-   fprintf(stderr, "%s\n", msg);
-   return 1;
+  THROW(msg);
+  return 0;
 }
 
 void
-DjVuImage::decode(ByteStream & str)
+_DjVuImageNotifier::notify_redisplay(const DjVuPort *)
 {
-   DEBUG_MSG("DjVuImage::decode(): decoding old way...\n");
-   DEBUG_MAKE_INDENT(3);
-   
-   if (file) THROW("To decode old way you should have been used default constructor.");
+  if (notifier)
+    notifier->notify_redisplay();
+}
 
-   stream_url="file:/internal_url_for_old_way_decoding";
-   stream_pool=new DataPool();
+void 
+_DjVuImageNotifier::notify_relayout(const DjVuPort *)
+{
+  if (notifier)
+    notifier->notify_relayout();
+}
 
-   int length;
-   char buffer[1024];
-   while((length=str.read(buffer, 1024)))
-      stream_pool->add_data(buffer, length);
-   stream_pool->set_eof();
-   
-   GP<DjVuDocument> doc = new DjVuDocument( stream_url, 1, this );
-   GP<DjVuImage> dimg=doc->get_page(-1);
-   file=dimg->get_djvu_file();
-   file->wait_for_finish();
+void 
+_DjVuImageNotifier::notify_chunk_done(const DjVuPort *, const char *name)
+{
+  if (notifier)
+    notifier->notify_chunk(name, "");
+}
 
-   if (!file->is_decode_ok())
-      THROW("Decoding failed. Nothing can be done.");
+void
+_DjVuImageNotifier::notify_file_stopped(const DjVuPort *)
+{
+  THROW("STOP");
+}
 
-   DEBUG_MSG("decode DONE\n");
+void
+_DjVuImageNotifier::notify_file_failed(const DjVuPort *)
+{
+  THROW("EOF");
+}
+
+void
+DjVuImage::decode(ByteStream & str, DjVuInterface *notifier)
+{
+  DEBUG_MSG("DjVuImage::decode(): decoding old way...\n");
+  DEBUG_MAKE_INDENT(3);
+  if (file) 
+    THROW("To decode old way you should have been used default constructor.");
+  
+  _DjVuImageNotifier port(notifier);
+  port.stream_url="internal://fake_url_for_old_style_decoder";
+  port.stream_pool=new DataPool();
+  int length;
+  char buffer[1024];
+  while((length=str.read(buffer, 1024)))
+    port.stream_pool->add_data(buffer, length);
+  port.stream_pool->set_eof();
+
+  GP<DjVuDocument> doc = new DjVuDocument( port.stream_url, 1, &port );
+  GP<DjVuImage> dimg=doc->get_page(-1);
+  file=dimg->get_djvu_file();
+  file->wait_for_finish();
+  if (!file->is_decode_ok())
+    THROW("Decoding failed. Nothing can be done.");
+  DEBUG_MSG("decode DONE\n");
 }
 
 
