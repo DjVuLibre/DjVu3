@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuAnno.cpp,v 1.19 1999-10-04 16:06:42 eaf Exp $
+//C- $Id: DjVuAnno.cpp,v 1.20 1999-10-04 22:33:33 eaf Exp $
 
 
 #ifdef __GNUC__
@@ -29,7 +29,7 @@
 #include "GString.h"
 #include "GSmartPointer.h"
 #include "GException.h"
-#include "ByteStream.h"
+#include "IFFByteStream.h"
 
 class GLObject : public GPEnabled
 {
@@ -464,7 +464,7 @@ GLParser::get_object(const char * name)
 }
 
 //***************************************************************************
-//***************************** DjVuAnno.cpp ********************************
+//********************************** ANT ************************************
 //***************************************************************************
 
 #include "DjVuAnno.h"
@@ -478,7 +478,7 @@ GLParser::get_object(const char * name)
 #define MODE_TAG	"mode"
 #define ALIGN_TAG	"align"
 
-DjVuAnno::DjVuAnno()
+DjVuANT::DjVuANT()
 {
    bg_color=0xffffffff;
    zoom=0;
@@ -486,12 +486,12 @@ DjVuAnno::DjVuAnno()
    hor_align=ver_align=ALIGN_UNSPEC;
 }
 
-DjVuAnno::~DjVuAnno()
+DjVuANT::~DjVuANT()
 {
 }
 
 GString
-DjVuAnno::read_raw(ByteStream & str)
+DjVuANT::read_raw(ByteStream & str)
 {
    GString raw;
    char buffer[1024];
@@ -502,10 +502,8 @@ DjVuAnno::read_raw(ByteStream & str)
 }
 
 void
-DjVuAnno::decode(class GLParser & parser)
+DjVuANT::decode(class GLParser & parser)
 {
-   GCriticalSectionLock lock(&class_lock);
-   
    bg_color=get_bg_color(parser);
    zoom=get_zoom(parser);
    mode=get_mode(parser);
@@ -515,28 +513,15 @@ DjVuAnno::decode(class GLParser & parser)
 }
 
 void 
-DjVuAnno::decode(ByteStream & str)
+DjVuANT::decode(ByteStream & str)
 {
-   GCriticalSectionLock lock(&class_lock);
-
    GLParser parser(read_raw(str));
    decode(parser);
 }
 
 void
-DjVuAnno::decode(const char * data)
+DjVuANT::merge(ByteStream & str)
 {
-   GCriticalSectionLock lock(&class_lock);
-
-   MemoryByteStream str(data, strlen(data));
-   decode(str);
-}
-
-void
-DjVuAnno::merge(ByteStream & str)
-{
-   GCriticalSectionLock lock(&class_lock);
-   
    GLParser parser(encode_raw());
    GString add_raw=read_raw(str);
    parser.parse(add_raw);
@@ -544,22 +529,20 @@ DjVuAnno::merge(ByteStream & str)
 }
 
 void
-DjVuAnno::encode(ByteStream &bs)
+DjVuANT::encode(ByteStream &bs)
 {
-  GCriticalSectionLock lock(&class_lock);
-  
   GString raw=encode_raw();
   bs.writall((const char*) raw, raw.length());
 }
 
 unsigned int 
-DjVuAnno::get_memory_usage() const
+DjVuANT::get_memory_usage() const
 {
-  return sizeof(DjVuAnno);
+  return sizeof(DjVuANT);
 }
 
 unsigned char
-DjVuAnno::decode_comp(char ch1, char ch2)
+DjVuANT::decode_comp(char ch1, char ch2)
 {
    unsigned char dig1=0;
    if (ch1)
@@ -582,7 +565,7 @@ DjVuAnno::decode_comp(char ch1, char ch2)
 }
 
 u_int32
-DjVuAnno::cvt_color(const char * color, u_int32 def)
+DjVuANT::cvt_color(const char * color, u_int32 def)
 {
    if (color[0]!='#') return def;
 
@@ -611,9 +594,9 @@ DjVuAnno::cvt_color(const char * color, u_int32 def)
 }
 
 u_int32
-DjVuAnno::get_bg_color(GLParser & parser)
+DjVuANT::get_bg_color(GLParser & parser)
 {
-   DEBUG_MSG("DjVuAnno::get_bg_color(): getting background color ...\n");
+   DEBUG_MSG("DjVuANT::get_bg_color(): getting background color ...\n");
    DEBUG_MAKE_INDENT(3);
    TRY
    {
@@ -630,13 +613,13 @@ DjVuAnno::get_bg_color(GLParser & parser)
 }
 
 int
-DjVuAnno::get_zoom(GLParser & parser)
+DjVuANT::get_zoom(GLParser & parser)
       // Returns:
       //   <0 - special zoom (like ZOOM_STRETCH)
       //   =0 - not set
       //   >0 - numeric zoom (%%)
 {
-   DEBUG_MSG("DjVuAnt::get_zoom(): getting zoom factor ...\n");
+   DEBUG_MSG("DjVuANT::get_zoom(): getting zoom factor ...\n");
    DEBUG_MAKE_INDENT(3);
    TRY
    {
@@ -659,7 +642,7 @@ DjVuAnno::get_zoom(GLParser & parser)
 }
 
 int
-DjVuAnno::get_mode(GLParser & parser)
+DjVuANT::get_mode(GLParser & parser)
 {
    DEBUG_MSG("DjVuAnt::get_mode(): getting default mode ...\n");
    DEBUG_MAKE_INDENT(3);
@@ -682,7 +665,7 @@ DjVuAnno::get_mode(GLParser & parser)
 }
 
 int
-DjVuAnno::get_hor_align(GLParser & parser)
+DjVuANT::get_hor_align(GLParser & parser)
 {
    DEBUG_MSG("DjVuAnt::get_hor_align(): getting hor page alignemnt ...\n");
    DEBUG_MAKE_INDENT(3);
@@ -704,7 +687,7 @@ DjVuAnno::get_hor_align(GLParser & parser)
 }
 
 int
-DjVuAnno::get_ver_align(GLParser & parser)
+DjVuANT::get_ver_align(GLParser & parser)
 {
    DEBUG_MSG("DjVuAnt::get_ver_align(): getting vert page alignemnt ...\n");
    DEBUG_MAKE_INDENT(3);
@@ -726,9 +709,9 @@ DjVuAnno::get_ver_align(GLParser & parser)
 }
 
 GPList<GMapArea>
-DjVuAnno::get_map_areas(GLParser & parser)
+DjVuANT::get_map_areas(GLParser & parser)
 {
-   DEBUG_MSG("DjVuAnno::get_map_areas(): forming and returning back list of map areas\n");
+   DEBUG_MSG("DjVuANT::get_map_areas(): forming and returning back list of map areas\n");
    DEBUG_MAKE_INDENT(3);
 
    GPList<GMapArea> map_areas;
@@ -844,7 +827,7 @@ DjVuAnno::get_map_areas(GLParser & parser)
 }
 
 void
-DjVuAnno::del_all_items(const char * name, GLParser & parser)
+DjVuANT::del_all_items(const char * name, GLParser & parser)
 {
    GPList<GLObject> & list=parser.get_list();
    GPosition pos=list;
@@ -862,10 +845,8 @@ DjVuAnno::del_all_items(const char * name, GLParser & parser)
 }
 
 GString
-DjVuAnno::encode_raw(void) const
+DjVuANT::encode_raw(void) const
 {
-   GCriticalSectionLock lock((GCriticalSection *) &class_lock);
-   
    char buffer[512];
    GLParser parser;
 
@@ -934,11 +915,81 @@ DjVuAnno::encode_raw(void) const
 }
 
 bool
-DjVuAnno::is_empty(void) const
+DjVuANT::is_empty(void) const
 {
    GString raw=encode_raw();
    for(int i=raw.length()-1;i>=0;i--)
       if (isspace(raw[i])) raw.setat(i, 0);
       else break;
    return raw.length()==0;
+}
+
+GP<DjVuANT>
+DjVuANT::copy(void) const
+{
+   GP<DjVuANT> ant=new DjVuANT;
+
+      // First: copy all primitives
+   *ant=*this;
+
+      // Now process the list of hyperlinks.
+   ant->map_areas.empty();
+   for(GPosition pos=map_areas;pos;++pos)
+      ant->map_areas.append(map_areas[pos]->get_copy());
+
+   return ant;
+}
+
+//***************************************************************************
+//******************************** DjVuAnno *********************************
+//***************************************************************************
+
+void
+DjVuAnno::decode(ByteStream &bs)
+{
+   IFFByteStream iff(bs);
+   GString chkid;
+   int length;
+   while((length=iff.get_chunk(chkid)))
+   {
+      if (chkid=="ANTa")
+	 if (ant) ant->merge(iff);
+         else
+	 {
+	    ant=new DjVuANT;
+	    ant->decode(iff);
+	 }
+      
+	 // Add decoding of TXT chunks here
+      
+      iff.close_chunk();
+   }
+}
+
+void
+DjVuAnno::encode(ByteStream &bs)
+{
+   IFFByteStream iff(bs);
+   if (ant)
+   {
+      iff.put_chunk("ANTa");
+      ant->encode(iff);
+      iff.close_chunk();
+   }
+
+      // Add encoding of TXT chunks here
+}
+
+GP<DjVuAnno>
+DjVuAnno::copy(void) const
+{
+   GP<DjVuAnno> anno=new DjVuAnno;
+
+      // Copy any primitives (if any)
+   *anno=*this;
+
+      // Copy each substructure
+   anno->ant=ant->copy();
+
+   return anno;
 }
