@@ -9,32 +9,37 @@ fi
 ECXX="eg++"
 if [ -z "$CXX_SET" ] ; then
   echo 'extern "C" {void exit(int);};void foo(void) {exit(0);}' |testfile $temp.cpp
-  CXXFLAGS=""
-  CXXSYMBOLIC=""
-  CXXPIC=""
-  cxx_is_gcc=
-  echon "Searching for C++ compiler ... "
-  if ( run $EGXX -c $temp.cpp ) ; then
-    CXX="$EGXX"
-    echo "$CXX"
-  elif [ ! -z "$CXX" ] ; then
-    if ( run g++ -c $temp.cpp ) ; then
+  
+  # I added CXX_OVERRIDE to be able to select compiler myself and let
+  # you do the rest (flags and options) -eaf
+  if [ -z "$CXX_OVERRIDE" ]; then
+    CXXFLAGS=""
+    CXXSYMBOLIC=""
+    CXXPIC=""
+    cxx_is_gcc=
+    echon "Searching for C++ compiler ... "
+    if ( run $EGXX -c $temp.cpp ) ; then
+      CXX="$EGXX"
       echo "$CXX"
-    else
-      CXX=""
+    elif [ ! -z "$CXX" ] ; then
+      if ( run g++ -c $temp.cpp ) ; then
+        echo "$CXX"
+      else
+        CXX=""
+      fi
     fi
-  fi
-  if [ -z "$CXX" ] ; then
-    if ( run g++ -c $temp.cpp ) ; then
-      CXX=c++
-    elif ( run CC -c $temp.cpp ) ; then
-      CXX=CC
-    else 
-      echo "none available"
-      echo "Error: Can't find a C++ compiler" 1>&2
-      exit 1
+    if [ -z "$CXX" ] ; then
+      if ( run g++ -c $temp.cpp ) ; then
+        CXX=c++
+      elif ( run CC -c $temp.cpp ) ; then
+        CXX=CC
+      else 
+        echo "none available"
+        echo "Error: Can't find a C++ compiler" 1>&2
+        exit 1
+      fi
+      echo "$CXX"
     fi
-    echo "$CXX"
   fi
   if [ -z "$CC" ] 
   then
