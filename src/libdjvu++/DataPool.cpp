@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.cpp,v 1.1.2.6 1999-05-04 15:16:15 eaf Exp $
+//C- $Id: DataPool.cpp,v 1.1.2.7 1999-05-04 20:37:13 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -487,7 +487,6 @@ DataRange::analyze_iff(void)
       }
    } CATCH(exc) {
       delete str; str=0;
-      RETHROW;
    } ENDCATCH;
    delete str; str=0;
 }
