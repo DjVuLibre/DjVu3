@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GCache.h,v 1.1.2.1 1999-04-12 16:48:22 eaf Exp $
+//C- $Id: GCache.h,v 1.1.2.2 1999-04-20 21:03:12 eaf Exp $
 
 #ifndef _GCACHE_H
 #define _GCACHE_H
@@ -100,25 +100,25 @@ template<class Key, class Value>
 class GCache
 {
 public:
-   GCache(unsigned int max_size=5*2*1024*1024);
+   GCache(int max_size=5*2*1024*1024);
    virtual ~GCache(void);
    
    GP<Value> 	get_item(const Key & key);
    void		del_item(const Key & key);
    void		add_item(const Key & key, const GP<Value> & value);
-   void		set_max_size(unsigned int max_size);
+   void		set_max_size(int max_size);
 private:
    GCriticalSection		cache_lock;
    GMap<Key, GCacheItem<Value> >cache;
-   unsigned int	max_size;
+   int		max_size;
    int		cur_size;
 
    int		calculate_size(void);
-   void		clear_to_size(unsigned int size);
+   void		clear_to_size(int size);
 };
 
 template<class Key, class Value> inline
-GCache<Key, Value>::GCache(unsigned int xmax_size) :
+GCache<Key, Value>::GCache(int xmax_size) :
       max_size(xmax_size), cur_size(0) {}
 
 template<class Key, class Value> inline
@@ -164,7 +164,7 @@ GCache<Key, Value>::del_item(const Key & k)
 }
 
 template<class Key, class Value> void
-GCache<Key, Value>::clear_to_size(unsigned int size)
+GCache<Key, Value>::clear_to_size(int size)
 {
    DEBUG_MSG("GCache::clear_to_size(): dropping cache size to " << size << "\n");
    DEBUG_MAKE_INDENT(3);
@@ -237,24 +237,24 @@ GCache<Key, Value>::add_item(const Key & k, const GP<Value> & v)
    DEBUG_MAKE_INDENT(3);
 
    GCriticalSectionLock lock(&cache_lock);
+
+   int add_size=v->get_memory_usage();
    
-   unsigned int add_size=v->get_memory_usage();
-   
-   if (add_size>max_size)
+   if (max_size>=0 && add_size>max_size)
    {
       DEBUG_MSG("but this item is way too large => doing nothing\n");
       return;
    };
 
    del_item(k);
-   clear_to_size(max_size-add_size);
+   if (max_size>=0) clear_to_size(max_size-add_size);
    
    cache[k]=v;
    cur_size+=add_size;
 }
 
 template<class Key, class Value> void
-GCache<Key, Value>::set_max_size(unsigned int xmax_size)
+GCache<Key, Value>::set_max_size(int xmax_size)
 {
    DEBUG_MSG("GCache::set_max_size(): resizing to " << xmax_size << "\n");
    DEBUG_MAKE_INDENT(3);
@@ -264,7 +264,7 @@ GCache<Key, Value>::set_max_size(unsigned int xmax_size)
    max_size=xmax_size;
    cur_size=calculate_size();
 
-   clear_to_size(max_size);
+   if (max_size>=0) clear_to_size(max_size);
 }
 
 #endif
