@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GBitmap.cpp,v 1.9 1999-05-25 20:36:25 leonb Exp $
+//C- $Id: GBitmap.cpp,v 1.10 1999-05-25 20:53:18 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -24,7 +24,7 @@
 #include "Arrays.h"
 
 
-// File "$Id: GBitmap.cpp,v 1.9 1999-05-25 20:36:25 leonb Exp $"
+// File "$Id: GBitmap.cpp,v 1.10 1999-05-25 20:53:18 leonb Exp $"
 // - Author: Leon Bottou, 05/1997
 
 // ----- constructor and destructor
@@ -604,10 +604,13 @@ GBitmap::read_pbm_text(ByteStream &bs)
     {
       for (int c = 0; c<ncolumns; c++) 
         {
-          char bit;
+          char bit = 0;
           bs.read(&bit,1);
           while (bit==' ' || bit=='\t' || bit=='\r' || bit=='\n')
-            bs.read(&bit,1);
+            { 
+              bit=0; 
+              bs.read(&bit,1); 
+            }
           if (bit=='1')
             row[c] = 1;
           else if (bit=='0')
@@ -760,7 +763,7 @@ GBitmap::save_pbm(ByteStream &bs, int raw)
               unsigned char bit= (row[c] ? '1' : '0');
               bs.write((void*)&bit, 1);
               c += 1;
-              if (c==ncolumns || (c&0x1f)==0) 
+              if (c==ncolumns || (c&0x3f)==0) 
                 bs.write((void*)&eol, 1);          
             }
         }
@@ -802,7 +805,7 @@ GBitmap::save_pgm(ByteStream &bs, int raw)
               head.format("%d ", grays - 1 - row[c]);
               bs.writall((void*)(const char *)head, head.length());
               c += 1;
-              if (c==ncolumns || (c&0xf)==0) 
+              if (c==ncolumns || (c&0x1f)==0) 
                 bs.write((void*)&eol, 1);          
             }
         }
@@ -943,7 +946,7 @@ GBitmap::encode(unsigned char **pruns) const
   // create run array
   int pos = 0;
   int size = 0;
-  TArray<unsigned char> runs;
+  TArray<unsigned char> runs(0,0);
   // encode bitmap as rle
   const unsigned char *row = bytes + border;
   int n = nrows - 1;
