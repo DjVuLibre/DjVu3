@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuGlobal.h,v 1.17 1999-09-23 03:42:56 leonb Exp $
+//C- $Id: DjVuGlobal.h,v 1.18 1999-09-23 03:55:34 leonb Exp $
 
 
 #ifndef _DJVUGLOBAL_H
@@ -27,7 +27,7 @@
     @memo
     Global definitions.
     @version
-    #$Id: DjVuGlobal.h,v 1.17 1999-09-23 03:42:56 leonb Exp $#
+    #$Id: DjVuGlobal.h,v 1.18 1999-09-23 03:55:34 leonb Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> -- empty file.\\
     Bill Riemers <bcr@sanskrit.lz.att.com> -- real work.  */
@@ -128,12 +128,15 @@ operator delete [] (void *addr) delete_throw_spec
          this operation of course can be described by one subtask and so on.
     \end{description}
  
-    {\bf Progress callback} --- The progresss callback function
-    #DjVuProgressTask::callback# should be defined {\em before defining the
-    outermost task}.  This function is called periodically with two #unsigned
-    long# arguments.  The first argument is the elapsed time. The second
-    argument is the estimated total execution time.  Both times are given in
-    milliseconds.  */
+    {\bf Progress callback} --- Before defining the outermost task, you can
+    store a callback function pointer into the static member variable
+    #DjVuProgressTask::callback#.  This callback function is called
+    periodically with two unsigned long arguments.  The first argument is the
+    elapsed time. The second argument is the estimated total execution time.
+    Both times are given in milliseconds.
+
+    {\bf Important Note} --- This monitoring mechanism should not be used by
+    multithreaded programs.  */
 //@{
 
 #ifdef NEED_DJVU_PROGRESS
@@ -141,14 +144,12 @@ operator delete [] (void *addr) delete_throw_spec
 #define DJVU_PROGRESS_TASK(name,nsteps)  DjVuProgressTask task_##name(nsteps)
 #define DJVU_PROGRESS_RUN(name,tostep)   { task_##name.run(tostep); }
 
-/// Progress indication class.
 class DjVuProgressTask
 {
 public:
   ~DjVuProgressTask();
   DjVuProgressTask(int nsteps);
   void run(int tostep);
-  /// Periodic callback function
   static void (*callback)(unsigned long elapsed, unsigned long estimated);
 private:
   DjVuProgressTask *parent;
