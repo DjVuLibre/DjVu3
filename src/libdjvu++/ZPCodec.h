@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ZPCodec.h,v 1.22 2001-01-19 01:16:22 bcr Exp $
+// $Id: ZPCodec.h,v 1.23 2001-02-08 23:30:05 bcr Exp $
 // $Name:  $
 
 #ifndef _ZPCODEC_H
@@ -153,7 +153,7 @@ class ByteStream;
     @memo
     Binary adaptive quasi-arithmetic coder.
     @version
-    #$Id: ZPCodec.h,v 1.22 2001-01-19 01:16:22 bcr Exp $#
+    #$Id: ZPCodec.h,v 1.23 2001-02-08 23:30:05 bcr Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> */
 //@{
@@ -505,7 +505,7 @@ ZPCodec::IWencoder(const bool bit)
     \begin{verbatim}
     int decode_points(const char *filename, int *x, int *y)
     {
-       StdioByteStream bs(filename, "rb");
+       StdioByteStream bs(filename,"rb");
        int n = bs.read32();      // Read number of points.
        ZPCodec zp(bs, 0);        // Construct decoder and context vars.
        BitContext ctxX[255], ctxY[255];

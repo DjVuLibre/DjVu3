@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuPalette.cpp,v 1.19 2001-01-04 22:04:55 bcr Exp $
+// $Id: DjVuPalette.cpp,v 1.20 2001-02-08 23:30:05 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -547,13 +547,13 @@ int main(int argc, char **argv)
         G_THROW("DjVuPalette.test_usage");
       int maxcolors = atoi(argv[1]);
       int minboxsize = atoi(argv[2]);
-      StdioByteStream ibs(argv[3],"rb");
-      GPixmap pm(ibs);
+      GP<ByteStream> ibs=ByteStream::create(argv[3],"rb");
+      GPixmap pm(*ibs);
       DjVuPalette pal;
       int ncolors = pal.compute_palette_and_quantize(pm, maxcolors, minboxsize);
       fprintf(stderr,"%d colors allocated\n", ncolors);
-      StdioByteStream obs(stdout,"wb");
-      pm.save_ppm(obs);
+      GP<ByteStream> obs=ByteStream::create(stdout,"wb",false);
+      pm.save_ppm(*obs);
     }
   G_CATCH(ex)
     {

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.h,v 1.34 2001-02-07 23:26:34 bcr Exp $
+// $Id: ByteStream.h,v 1.35 2001-02-08 23:30:05 bcr Exp $
 // $Name:  $
 
 #ifndef _BYTESTREAM_H
@@ -62,7 +62,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation\\
     Andrei Erofeev <eaf@geocities.com> -- 
     @version
-    #$Id: ByteStream.h,v 1.34 2001-02-07 23:26:34 bcr Exp $# */
+    #$Id: ByteStream.h,v 1.35 2001-02-08 23:30:05 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -222,6 +222,13 @@ private:
   // Cancel C++ default stuff
   ByteStream(const ByteStream &);
   ByteStream & operator=(const ByteStream &);
+public:
+  static GP<ByteStream> create(
+    const int fd, const char * const mode, const bool closeme);
+  static GP<ByteStream> create(
+    FILE * const f, const char * const mode, const bool closeme);
+  static GP<ByteStream> create(
+    const char filename[], const char * const mode);
 };
 
 inline size_t
@@ -265,12 +272,12 @@ public:
       will flush and close the associated stdio file.  Exception
       \Ref{GException} is thrown with a plain text error message if the stdio
       file cannot be opened. */
-  StdioByteStream(const char *filename, const char *mode="rb");
+  StdioByteStream(const char filename[], const char * const mode="rb");
   /** Constructs a ByteStream for accessing the stdio file #f#.
       Argument #mode# indicates the type of the stdio file, as in the
       well known stdio function #fopen#.  Destroying the ByteStream
       object will not close the stdio file #f# unless closeme is true. */
-  StdioByteStream(FILE *f, const char *mode="rb", bool closeme=false);
+  StdioByteStream(FILE * const f, const char * const mode="rb", const bool closeme=false);
   // Virtual functions
   ~StdioByteStream();
   virtual size_t read(void *buffer, size_t size);
@@ -283,15 +290,38 @@ private:
   // Cancel C++ default stuff
   StdioByteStream(const StdioByteStream &);
   StdioByteStream & operator=(const StdioByteStream &);
+  void init(const char mode[]);
 private:
   // Implementation
-  char can_read;
-  char can_write;
-  char must_close;
+  bool can_read;
+  bool can_write;
+  bool must_close;
 protected:
   FILE *fp;
   long pos;
+  StdioByteStream(void);
+  void init(FILE * const f,const char mode[],const bool closeme);
+  void init(const char filename[],const char mode[]);
 };
+
+inline int
+StdioByteStream::ungetc(int x)
+{
+  int retval;
+  if((retval=ungetc(x))!=EOF)
+  {
+    --pos;
+  }
+  return retval;
+}
+
+inline void
+StdioByteStream::init(FILE * const f,const char mode[],const bool closeme)
+{
+  fp=f;
+  must_close=closeme;
+  init(mode);
+}
 
 
 /** ByteStream interface managing a memory buffer.  
@@ -299,7 +329,8 @@ protected:
     which data can be read or written.  The buffer itself is organized as an
     array of blocks of 4096 bytes.  */
 
-class MemoryByteStream : public ByteStream {
+class MemoryByteStream : public ByteStream
+{
 public:
   /** Constructs an empty MemoryByteStream.
       The buffer is initially empty. You must first use function #write#
@@ -384,11 +415,6 @@ public:
   /** Creates a StaticByteStream object for allocating the null terminated
       memory area starting at address #buffer#. */
   StaticByteStream(const char *buffer);
-#ifdef UNIX
-  StaticByteStream(const int fd, const bool closeme);
-  StaticByteStream(FILE *f, const bool closeme);
-#endif
-  virtual ~StaticByteStream();  
   // Virtual functions
   virtual size_t read(void *buffer, size_t sz);
   virtual size_t write(const void *buffer, size_t sz);
@@ -398,31 +424,18 @@ public:
       Valid offsets for function #seek# range from 0 to the value returned
       by this function. */
   virtual int size(void) const;
-private:
+protected:
   const char *data;
   int bsize;
+private:
   int where;
-#ifdef UNIX
-  void *buf;
-  void init(const int fd);
-#endif
 };
+
 
 inline int
 StaticByteStream::size(void) const
 {
   return bsize;
-}
-
-inline int
-StdioByteStream::ungetc(int x)
-{
-  int retval;
-  if((retval=ungetc(x))!=EOF)
-  {
-    --pos;
-  }
-  return retval;
 }
 
 //@}

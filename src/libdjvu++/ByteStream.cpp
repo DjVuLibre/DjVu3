@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.cpp,v 1.43 2001-02-07 23:26:34 bcr Exp $
+// $Id: ByteStream.cpp,v 1.44 2001-02-08 23:30:05 bcr Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 04/1997
@@ -44,11 +44,29 @@
 #ifdef UNIX
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <fcntl.h>
 #include <unistd.h>
 #include <sys/mman.h>
 #endif
 #ifndef UNDER_CE
 #include <errno.h>
+#endif
+
+#ifdef UNIX
+/** Read-only ByteStream interface to a memmap area.
+    Class #MemoryMapByteStream# implements a read-only ByteStream interface
+    for a memory map to a file. */
+
+class MemoryMapByteStream : public StaticByteStream
+{
+public:
+  MemoryMapByteStream(void);
+  virtual ~MemoryMapByteStream();  
+private:
+  void init(const int fd, const bool closeme);
+  void init(FILE *const f,const bool closeme);
+  friend ByteStream;
+};
 #endif
 
 //// CLASS BYTESTREAM
@@ -277,72 +295,107 @@ ByteStream::read32()
 
 //// CLASS STDIOBYTESTREAM
 
-StdioByteStream::StdioByteStream(FILE *f, const char *mode, bool closeme)
+StdioByteStream::StdioByteStream(void)
+: can_read(false),can_write(false),must_close(true),fp(0),pos(0)
+{}
+
+StdioByteStream::StdioByteStream(FILE * const f,const char * const mode, const bool closeme)
+: can_read(false),can_write(false),must_close(closeme),fp(f),pos(0)
 {
-  fp = f;
-  pos = 0;
-  must_close = closeme?1:0;
-  can_read = can_write = 0;
-  for (const char *s=mode; s && *s; s++)
-    switch(*s) 
-      {
-      case 'r': can_read=1;  break;
-      case 'w': can_write=1; break;
-      case 'a': can_write=1; break;
-      case '+': can_read=can_write=1; break;
-      case 'b': break;
-      default: G_THROW("ByteStream.bad_mode");        //  Illegal mode in StdioByteStream
-      }
-  tell();
+  init(mode);
 }
 
-StdioByteStream::StdioByteStream(const char *filename, const char *mode)
+StdioByteStream::StdioByteStream(const char filename[],const char * const mode)
+: can_read(false),can_write(false),must_close(true),fp(0),pos(0)
 {
-  pos = 0;
-  must_close = 1;
-  can_read = can_write = 0;
-  FILE *dash = 0;
-  for (const char *s=mode; s && *s; s++)
-    switch(*s) 
-      {
-      case 'r': can_read=1;  dash=stdin; break;
-      case 'w': can_write=1; dash=stdout; break;
-      case 'a': can_write=1; dash=stdout; break;
-      case '+': can_read=can_write=1; dash=0; break;
-      case 'b': break;
-      default: G_THROW("ByteStream.bad_mode");        //  Illegal mode in StdioByteStream
-      }
-  if (strcmp(filename,"-") != 0) 
-    {
-      fp = fopen(GOS::expand_name(filename), mode);
-      if (!fp)
-      {
-#ifndef UNDER_CE
-	 char buffer[4096];
-	 sprintf(buffer, "ByteStream.open_fail\t%s\t%s",
-		               filename, strerror(errno));
-	 G_THROW(buffer);                                   //  Failed to open '%s': %s
-#else
-   G_THROW("ByteStream.open_fail2");                  //  StdioByteStream::StdioByteStream, failed to open file.
-#endif
-
-
-      }
-    } 
-  else 
-    {
-      must_close = 0;
-      fp = dash;
-      if (!fp)
-        G_THROW("ByteStream.bad_mode2");              //  Illegal mode for stdin/stdout file descriptor
-    }
-  tell();
+  init(filename,mode);
 }
 
 StdioByteStream::~StdioByteStream()
 {
-  if (must_close && fp)
-     fclose(fp);
+  if (fp && must_close)
+    fclose(fp);
+}
+
+void
+StdioByteStream::init(const char mode[])
+{ 
+  G_TRY
+  {
+    for (const char *s=mode; s && *s; s++)
+    {
+      switch(*s) 
+      {
+        case 'r':
+          can_read=true;
+        case 'w': 
+        case 'a':
+          can_write=true;
+          break;
+        case '+':
+          can_read=can_write=true;
+          break;
+        case 'b':
+          break;
+        default:
+          G_THROW("ByteStream.bad_mode"); //  Illegal mode in StdioByteStream
+      }
+    }
+    tell();
+  }
+  G_CATCH_ALL
+  {
+    if(fp && must_close)
+    {
+      fclose(fp);
+      fp=0;
+      must_close=false;
+    }
+    G_RETHROW;
+  }
+  G_ENDCATCH;
+}
+
+void
+StdioByteStream::init(const char filename[], const char mode[])
+{
+  if (filename[0] != '-' || filename[1])
+  {
+    fp = fopen(GOS::expand_name(filename), mode);
+    if (!fp)
+    {
+#ifndef UNDER_CE
+      G_THROW(GString("ByteStream.open_fail\t")+filename+strerror(errno));
+         //  Failed to open '%s': %s
+#else
+      G_THROW("ByteStream.open_fail2");                  //  StdioByteStream::StdioByteStream, failed to open file.
+#endif
+    }
+  }else 
+  {
+    for (const char *s=mode; s && *s; s++)
+    {
+      switch(*s) 
+      {
+        case 'r':
+          fp=stdin;
+          break;
+        case 'w':
+        case 'a':
+          fp=stdout;
+          break;
+        case '+':
+          fp=0;
+          break;
+        default:
+          break;
+      }
+    }
+    must_close=false;
+    if (!fp)
+      G_THROW("ByteStream.bad_mode2"); //  Illegal mode for stdin/stdout file descriptor
+  }
+  init(mode);
 }
 
 size_t 
@@ -606,68 +659,15 @@ ByteStream::get_data(void)
 ///////// STATICBYTESTREAM
 
 StaticByteStream::StaticByteStream(const char *buffer, size_t sz)
-  : data(buffer), bsize(sz), where(0), buf(0)
+  : data(buffer), bsize(sz), where(0)
 {
 }
 
 StaticByteStream::StaticByteStream(const char *buffer)
-  : data(buffer), bsize(0), where(0), buf(0)
+  : data(buffer), bsize(0), where(0)
 {
   bsize = strlen(data);
 }
-
-#if defined(UNIX) && defined(PROT_READ) && defined(MAP_SHARED)
-StaticByteStream::StaticByteStream(const int fd,const bool closeme)
-  : data(0), bsize(0), where(0), buf(0)
-{
-  if(fd>=0)
-  {
-    init(fd);
-    if(closeme)
-    {
-      close(fd);
-    }
-  }else
-  {
-    G_THROW("ByteStream.open_fail2");
-  } 
-}
-
-StaticByteStream::StaticByteStream(FILE *f,const bool closeme)
-  : data(0), bsize(0), where(0), buf(0)
-{
-  if(f)
-  {
-    init(fileno(f));
-    if(closeme)
-    {
-      fclose(f);
-    }
-  }
-}
-
-void
-StaticByteStream::init(const int fd)
-{
-  struct stat statbuf;
-  if(!fstat(fd,&statbuf))
-  {
-    if(statbuf.st_size)
-    {
-      bsize=statbuf.st_size;
-      data=(char *)(buf=mmap(0,statbuf.st_size,PROT_READ,MAP_SHARED,fd,0));
-    }
-  }
-}
-
-StaticByteStream::~StaticByteStream()
-{
-  if(buf)
-  {
-    munmap(buf,bsize);
-  }
-}
-#endif
 
 size_t 
 StaticByteStream::read(void *buffer, size_t sz)
@@ -712,4 +712,167 @@ StaticByteStream::tell() const
 {
   return where;
 }
+
+GP<ByteStream>
+ByteStream::create(const char filename[],const char * const mode)
+{
+  GP<ByteStream> retval;
+#ifdef UNIX
+  if(!mode || !strcmp(mode,"rb"))
+  {
+    const int fd=open(filename,O_RDONLY,0777);
+    if(fd>=0)
+    {
+      MemoryMapByteStream *rb=new MemoryMapByteStream();
+      retval=rb;
+      G_TRY
+      {
+        rb->init(fd,true);
+      }
+      G_CATCH_ALL
+      {
+        retval=0;
+      }
+      G_ENDCATCH;
+    }
+  }
+  if(!retval)
+#endif
+  {
+    retval=new StdioByteStream(filename,mode?mode:"rb");
+  }
+  return retval;
+}
+
+GP<ByteStream>
+ByteStream::create(const int fd,const char * const mode,const bool closeme)
+{
+  GP<ByteStream> retval;
+#ifdef UNIX
+  if(!mode || !strcmp(mode,"rb"))
+  {
+    MemoryMapByteStream *rb=new MemoryMapByteStream();
+    retval=rb;
+    G_TRY
+    {
+      rb->init(fd,closeme);
+    }
+    G_CATCH_ALL
+    {
+      retval=0;
+    }
+    G_ENDCATCH;
+  }
+  if(!retval)
+#endif
+  {
+    const int fd2=closeme?fd:dup(fd);
+    FILE * const f=fdopen(fd2,mode?mode:"rb");
+    if(!f)
+    {
+      close(fd2);
+      G_THROW("ByteStream.open_fail2");
+    }
+    retval=new StdioByteStream(f,mode?mode:"rb",true);
+  }
+  return retval;
+}
+
+GP<ByteStream>
+ByteStream::create(FILE * const f,const char * const mode,const bool closeme)
+{
+  GP<ByteStream> retval;
+#ifdef UNIX
+  if(!mode || !strcmp(mode,"rb"))
+  {
+    MemoryMapByteStream *rb=new MemoryMapByteStream();
+    retval=rb;
+    G_TRY
+    {
+      rb->init(fileno(f),false);
+      fclose(f);
+    }
+    G_CATCH_ALL
+    {
+      retval=0;
+    }
+    G_ENDCATCH;
+  }
+  if(!retval)
+#endif
+  {
+    retval=new StdioByteStream(f,mode?mode:"rb",closeme);
+  }
+  return retval;
+}
+
+#ifdef UNIX
+MemoryMapByteStream::MemoryMapByteStream(void)
+: StaticByteStream(0,0)
+{}
+
+void
+MemoryMapByteStream::init(FILE *const f,const bool closeme)
+{
+  if(!closeme)
+  {
+    init(fileno(f),false);
+  }else
+  {
+    G_TRY
+    {
+      init(fileno(f),false);
+      fclose(f);
+    }
+    G_CATCH_ALL
+    {
+      fclose(f);
+      G_RETHROW;
+    }
+    G_ENDCATCH;
+  }
+}
+
+void
+MemoryMapByteStream::init(const int fd,const bool closeme)
+{
+#if defined(PROT_READ) && defined(MAP_SHARED)
+  struct stat statbuf;
+  if(!fstat(fd,&statbuf))
+  {
+    if(statbuf.st_size)
+    {
+      bsize=statbuf.st_size;
+      data=(char *)mmap(0,statbuf.st_size,PROT_READ,MAP_SHARED,fd,0);
+    }
+  }else
+  {
+    if(closeme)
+    {
+      close(fd);
+    }
+    G_THROW("ByteStream.open_fail2");
+  }
+  if(closeme)
+  {
+    close(fd);
+  }
+#else
+  if(closeme)
+  {
+    close(fd);
+  }
+  G_THROW("ByteStream.open_fail2");
+#endif
+}
+
+MemoryMapByteStream::~MemoryMapByteStream()
+{
+  if(data)
+  {
+    munmap(const_cast<char *>(data),bsize);
+  }
+}
+#endif
+
 

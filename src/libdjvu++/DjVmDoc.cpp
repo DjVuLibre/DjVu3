@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVmDoc.cpp,v 1.34 2001-01-04 22:04:54 bcr Exp $
+// $Id: DjVmDoc.cpp,v 1.35 2001-02-08 23:30:05 bcr Exp $
 // $Name:  $
 
 
@@ -341,9 +341,9 @@ DjVmDoc::expand(const char * dir_name, const char * idx_name)
 
       GP<ByteStream> str_in=data[data_pos]->get_stream();
       DataPool::load_file(file_name);
-      StdioByteStream str_out(file_name, "wb");
-      str_out.writall(octets, 4);
-      str_out.copy(*str_in);
+      GP<ByteStream> str_out=ByteStream::create(file_name, "wb");
+      str_out->writall(octets, 4);
+      str_out->copy(*str_in);
    }
 
    if (idx_name && strlen(idx_name))
@@ -353,7 +353,7 @@ DjVmDoc::expand(const char * dir_name, const char * idx_name)
       DEBUG_MSG("storing index file '" << idx_full_name << "'\n");
 
       DataPool::load_file(idx_full_name);
-      StdioByteStream str(idx_full_name, "wb");
-      write_index(str);
+      GP<ByteStream> str=ByteStream::create(idx_full_name, "wb");
+      write_index(*str);
    }
 }

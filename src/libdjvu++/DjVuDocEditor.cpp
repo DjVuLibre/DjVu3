@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocEditor.cpp,v 1.54 2001-01-26 19:33:46 fcrary Exp $
+// $Id: DjVuDocEditor.cpp,v 1.55 2001-02-08 23:30:05 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -165,7 +165,8 @@ DjVuDocEditor::init(const char * fname)
 #else
       tmp_doc_name = "tempFileForDjVu" ;
 #endif
-      StdioByteStream str(tmp_doc_name, "wb");
+      GP<ByteStream> gstr=ByteStream::create(tmp_doc_name, "wb");
+      ByteStream &str=*gstr;
       tmp_doc->write(str, true);        // Force DJVM format
       str.flush();
       doc_pool=new DataPool(tmp_doc_name);
@@ -1666,7 +1667,8 @@ DjVuDocEditor::save_file(const char * file_id, const char * save_dir,
          GString save_name=GOS::expand_name(file_name, save_dir);
          DEBUG_MSG("Saving '" << file_id << "' to '" << save_name << "'\n");
          DataPool::load_file(save_name);
-         StdioByteStream str_out(save_name, "wb");
+         GP<ByteStream> gstr_out=ByteStream::create(save_name, "wb");
+         ByteStream &str_out=*gstr_out;
          str_out.writall(octets, 4);
          GP<ByteStream> str_in=file_pool->get_stream();
 
@@ -1824,7 +1826,8 @@ DjVuDocEditor::save_as(const char * where, bool bundled)
         {
          DEBUG_MSG("Saving '" << file_url << "' to '" << save_doc_url << "'\n");
          DataPool::load_file(save_doc_name);
-         StdioByteStream str_out(save_doc_name, "wb");
+         GP<ByteStream> gstr_out=ByteStream::create(save_doc_name, "wb");
+         ByteStream &str_out=*gstr_out;
          str_out.writall(octets, 4);
          GP<ByteStream> str_in=file_pool->get_stream();
          str_out.copy(*str_in);
@@ -1868,7 +1871,8 @@ DjVuDocEditor::save_as(const char * where, bool bundled)
          file->size=0;
         }
         DataPool::load_file(save_doc_name);
-        StdioByteStream str(save_doc_name, "wb");
+        GP<ByteStream> gstr=ByteStream::create(save_doc_name, "wb");
+        ByteStream &str=*gstr;
         IFFByteStream iff(str);
 
         iff.put_chunk("FORM:DJVM", 1);
@@ -1891,7 +1895,8 @@ DjVuDocEditor::save_as(const char * where, bool bundled)
          // Can't be very smart here. Simply overwrite the file.
         GP<DjVmDoc> doc=get_djvm_doc();
         DataPool::load_file(save_doc_name);
-        StdioByteStream str(save_doc_name, "wb");
+        GP<ByteStream> gstr=ByteStream::create(save_doc_name, "wb");
+        ByteStream &str=*gstr;
         doc->write(str);
         str.flush();
 

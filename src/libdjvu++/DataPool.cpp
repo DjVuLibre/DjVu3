@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DataPool.cpp,v 1.62 2001-02-02 17:11:42 bcr Exp $
+// $Id: DataPool.cpp,v 1.63 2001-02-08 23:30:05 bcr Exp $
 // $Name:  $
 
 
@@ -84,7 +84,7 @@ public:
    {
    public:
       GString			name;
-      GP<StdioByteStream>	stream;		// Stream connected to 'name'
+      GP<ByteStream>	        stream;		// Stream connected to 'name'
       GCriticalSection		stream_lock;
       GList<void *>		pools_list;	// List of pools using this stream
       GCriticalSection		pools_lock;
@@ -128,7 +128,7 @@ DataPool::OpenFiles::File::File(const char * xname, DataPool * pool) : name(xnam
    DEBUG_MAKE_INDENT(3);
    
    open_time=GOS::ticks();
-   stream=new StdioByteStream(name, "rb");
+   stream=ByteStream::create(name,"rb");
    add_pool(pool);
 }
 
@@ -780,7 +780,7 @@ DataPool::connect(const char * fname_in, int start_in, int length_in)
      G_THROW("DataPool.neg_start");         //  The start offset of the range may not be negative.
 
 
-   if (!strcmp(fname_in, "-"))
+   if (fname_in[0] == '-' && !fname_in[1])
    {
       DEBUG_MSG("This is stdin => just read the data...\n");
       DEBUG_MAKE_INDENT(3);
@@ -795,7 +795,7 @@ DataPool::connect(const char * fname_in, int start_in, int length_in)
 	 // Open the stream (just in this function) too see if
 	 // the file is accessible. In future we will be using 'OpenFiles'
 	 // to request and release streams
-      GP<ByteStream> str=new StdioByteStream(fname_in, "rb");
+      GP<ByteStream> str=ByteStream::create(fname_in,"rb");
       str->seek(0, SEEK_END);
       int file_size=str->tell();
 
