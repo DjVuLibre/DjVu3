@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qd_viewer.cpp,v 1.23 2001-08-24 21:50:10 docbill Exp $
+// $Id: qd_viewer.cpp,v 1.24 2001-09-25 20:28:58 leonb Exp $
 // $Name:  $
 
 
@@ -773,7 +773,7 @@ QDViewer::print(int what)
 	 {
 	    GRect prn_rect=rectVisible;
 	    ma_mapper.unmap(prn_rect);
-	    print_win=new QDPrintDialog(djvu_doc, dimg, &prefs, getMode(),
+	    print_win=new QDPrintDialog(djvu_doc, dimg, &prefs, getMode(true),
 					getZoom(), prn_rect, this,
 					"djvu_print", FALSE);
 	    print_win->setPrint(what==IDC_PRINT_WIN ? QDPrintDialog::PRINT_WIN :

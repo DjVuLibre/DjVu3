@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qd_tbar_mode_piece.cpp,v 1.20 2001-08-24 21:50:10 docbill Exp $
+// $Id: qd_tbar_mode_piece.cpp,v 1.21 2001-09-25 20:28:59 leonb Exp $
 // $Name:  $
 
 
@@ -163,8 +163,6 @@ QDTBarModePiece::QDTBarModePiece(QWidget * toolbar) : QDTBarPiece(toolbar)
    else
       qdtoolbar_child=FALSE;
    
-   QFrame * frame;
-   
    mode_menu=new QeComboBox(FALSE, toolbar, "mode_menu");
    mode_menu->insertItem(tr("Color"));
    mode_menu->insertItem(tr("B&W"));
@@ -176,11 +174,15 @@ QDTBarModePiece::QDTBarModePiece(QWidget * toolbar) : QDTBarPiece(toolbar)
    if ( qdtoolbar_child ) 
       ((QDToolBar *)toolbar)->addLeftWidget(mode_menu);
 
+#if 0
+   // disabled in order to save some space in the toolbar
+   QFrame * frame;
    frame=new QFrame(toolbar, "separator");
    frame->setFrameStyle(QFrame::VLine | QFrame::Sunken);
    frame->setMinimumWidth(10);
    if ( qdtoolbar_child ) 
       ((QDToolBar *)toolbar)->addLeftWidget(frame);
+#endif
    
    zoom_menu=new QeComboBox(TRUE, toolbar, "zoom_menu");
    zoom_menu->setInsertionPolicy(QComboBox::NoInsertion);

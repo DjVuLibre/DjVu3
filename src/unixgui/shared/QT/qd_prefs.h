@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qd_prefs.h,v 1.2 2001-07-25 17:10:43 mchen Exp $
+// $Id: qd_prefs.h,v 1.3 2001-09-25 20:28:59 leonb Exp $
 // $Name:  $
 
 
@@ -80,8 +80,6 @@ private:
    class QeSlider	* displ_slider, * print_slider;
    class QDGammaDispl	* preview;
 private slots:
-   void		printValueChanged(int v);
-   void		displValueChanged(int v);
    void		matchToggled(bool state);
 public:
    double	displGamma(void) const;

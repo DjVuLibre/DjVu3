@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qd_prefs.cpp,v 1.3 2001-07-25 17:10:43 mchen Exp $
+// $Id: qd_prefs.cpp,v 1.4 2001-09-25 20:28:59 leonb Exp $
 // $Name:  $
 
 
@@ -197,18 +197,6 @@ QDGammaPrefs::match(void) const
 }
 
 void
-QDGammaPrefs::printValueChanged(int v)
-{
-   if (match_butt->isChecked()) displ_slider->setValue(v);
-}
-
-void
-QDGammaPrefs::displValueChanged(int v)
-{
-   if (match_butt->isChecked()) print_slider->setValue(v);
-}
-
-void
 QDGammaPrefs::matchToggled(bool state)
 {
    if (state) print_slider->setValue(displ_slider->value());
@@ -285,19 +273,24 @@ QDGammaPrefs::QDGammaPrefs(DjVuPrefs * prefs, QWidget * parent, const char * nam
    hlay->addWidget(new QeLabel(tr("Lighter"), this));
    vlay->addStretch(1);
    
-   match_butt=new QeCheckBox(tr("Match screen colors"), this, "match_butt");
-   match_butt->setChecked(prefs->dPrinterGamma==0);
+   match_butt=new QeCheckBox(tr("Automatic\ncolor matching."), this, "match_butt");
+   match_butt->setChecked(false);
+   if (prefs->dPrinterGamma==0)
+     {
+       match_butt->setChecked(true);
+       print_slider->setValue(22);
+       print_slider->setEnabled(false);
+     }   
    glay->addWidget(match_butt, 3, 2);
 
    glay->activate();
    
       // Connecting signals and slots
-   connect(print_slider, SIGNAL(valueChanged(int)), this, SLOT(printValueChanged(int)));
-   connect(displ_slider, SIGNAL(valueChanged(int)), this, SLOT(displValueChanged(int)));
    connect(displ_slider, SIGNAL(valueChanged(int)), preview, SLOT(setGamma(int)));
    connect(match_butt, SIGNAL(toggled(bool)), this, SLOT(matchToggled(bool)));
-
-   QToolTip::add(preview, tr("Adjust slider on the left until all\nareas of the square look approximately\nthe same"));
+   QToolTip::add(preview, 
+                 tr("Adjust slider on the left until all\n"
+                    "areas of the square look approximately\nthe same"));
 }
 
 //***************************************************************************

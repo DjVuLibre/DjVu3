@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: prefs.h,v 1.16 2001-08-24 21:50:10 docbill Exp $
+// $Id: prefs.h,v 1.17 2001-09-25 20:28:59 leonb Exp $
 // $Name:  $
 
 
@@ -60,12 +60,11 @@ public:
 			  HLB_ITEMS=6 };
    enum MagButtType	{ MAG_SHIFT=0, MAG_ALT=1, MAG_CTRL=2,
 			  MAG_MID=3, MAG_ITEMS=4 };
-   static const int	legal_mag_size[]={ 50, 75, 100, 125, 150, 175, 200,
-					   225, 250, 275, 300 };
-   static const int	legal_mag_scale[]={ 15, 20, 25, 30, 35, 40, 45, 50 };
-   static const int	legal_mag_size_num=sizeof(legal_mag_size)/sizeof(legal_mag_size[0]);
-   static const int	legal_mag_scale_num=sizeof(legal_mag_scale)/sizeof(legal_mag_scale[0]);
-   
+
+   static const int legal_mag_size[];
+   static const int legal_mag_scale[];
+   static const int legal_mag_size_num;
+   static const int legal_mag_scale_num;
    static char	* hlb_names[];
    static char	* mag_names[];
 

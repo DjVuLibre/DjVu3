@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qd_base.cpp,v 1.22 2001-08-24 21:50:10 docbill Exp $
+// $Id: qd_base.cpp,v 1.23 2001-09-25 20:28:59 leonb Exp $
 // $Name:  $
 
 
@@ -1262,7 +1262,7 @@ void
 QDBase::updateToolBar(void)
 {
    if (mode_tbar)
-      mode_tbar->update(getMode(), dimg && dimg->is_legal_compound(),
+      mode_tbar->update(getMode(true), true,
 			cmd_zoom, getZoom(), pane_mode,
 			dimg && dimg->get_djvu_file()->get_text());
    
@@ -1508,7 +1508,7 @@ QDBase::slotSetPaneMode(int cmd_pane)
 void
 QDBase::slotSetMode(int cmd_mode)
 {
-   if (getMode()!=cmd_mode)
+   if (getMode(true)!=cmd_mode)
       setMode(cmd_mode, true, MODE_MANUAL);
 }
 

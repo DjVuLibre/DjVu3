@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qd_print_dialog.cpp,v 1.4 2001-07-31 17:37:12 mchen Exp $
+// $Id: qd_print_dialog.cpp,v 1.5 2001-09-25 20:28:59 leonb Exp $
 // $Name:  $
 
 
@@ -75,6 +75,9 @@
 static QMotifStyle *motif=0;
 #endif
 
+#include <unistd.h>
+#include <errno.h>
+#include <signal.h>
 
 static const QString print_page_str=QT_TRANSLATE_NOOP("QDPrintDialog","current page");
 static const QString print_custom_str=QT_TRANSLATE_NOOP("QDPrintDialog","custom pages");
@@ -253,7 +256,7 @@ QDPrintDialog::adjustWhat(void)
       setPrint((What) id);
    else
       setPrint(PRINT_PAGE);
-   
+
    custompages_label->setEnabled(!force_one_page);
    copies_spin->setEnabled(!force_one_copy);
    if (force_one_copy)
@@ -329,14 +332,14 @@ QDPrintDialog::decProgress_cb(double done, void * cl_data)
       th->progress->setPrefix(buffer);
       th->progress->setProgress(0);
       th->progress->show();
-   } else th->progress->setProgress(done*20);
+   } else th->progress->setProgress((int)(done*20));
 }
 
 void
 QDPrintDialog::prnProgress_cb(double done, void * cl_data)
 {
    QDPrintDialog * th=(QDPrintDialog *) cl_data;
-   th->progress->setProgress(done*20);
+   th->progress->setProgress((int)(done*20));
 }
 
 void
@@ -371,9 +374,9 @@ QDPrintDialog::done(int rc)
    if (rc==Accepted)
    {
       DEBUG_MSG("OK pressed...\n");
-      FILE * file=0;
+      FILE *fdesc = 0;
       QString fname;
-
+      
       try
       {
 	 int what=str2id(what_menu->currentText());
@@ -402,34 +405,70 @@ QDPrintDialog::done(int rc)
 	 ::setEnabled(progress, TRUE);
 	 
 	 bool printToFile=file_butt->isChecked();
+         QString printFile=file_text->text();
+         QString printCommand=printer_text->text();
 	 bool printColor=color_butt->isChecked();
 	 bool printPortrait=portrait_butt->isChecked();
 	 bool printPS=ps_butt->isChecked();
-	 int printLevel=level3_butt->isChecked() ? 3 :
-	    level2_butt->isChecked() ? 2 : 1;
-	 int zoom=zoom_menu->currentText()==fit_page_str ?
-		  DjVuToPS::Options::FIT_PAGE :
-		  zoom_menu->currentText()==one_to_one_str ? 100 :
-		  zoom_menu->currentText()==current_zoom_str ? cur_zoom :
-		  zoom_spin->value();
-	 	 
-	 QString printFile=file_text->text();
-	 QString printCommand=printer_text->text();
-	 
-	 if (printToFile) fname=printFile; else fname=tmpnam(0);
 
-	 DEBUG_MSG("creating file '" << (const char *) fname << "'\n");
-	 GP<ByteStream> gstr=ByteStream::create(GURL::Filename::UTF8(GStringFromQString(fname)),"wb");
-	 ByteStream &str=*gstr;
+	 int printLevel=2;
+         if (level3_butt->isChecked())
+           printLevel = 3;
+         else if (level1_butt->isChecked())
+           printLevel = 1;
 
-	 prog_widget->setActiveWidget(progress);
+         int zoom = zoom_spin->value();
+         if (! strcmp(zoom_menu->currentText(), fit_page_str))
+           zoom = DjVuToPS::Options::FIT_PAGE;
+         else if (! strcmp(zoom_menu->currentText(), one_to_one_str))
+           zoom = 100;
+         else if (! strcmp(zoom_menu->currentText(), current_zoom_str))
+           zoom = cur_zoom;
+
+	 GP<ByteStream> pstr;
+         if (printToFile)
+           {
+             fdesc = 0;
+             fname = printFile;
+             pstr = ByteStream::create(GURL::Filename::UTF8(GStringFromQString(fname)),"wb");
+           }
+         else
+           {
+#ifdef SIGPIPE
+              // Disable SIGPIPE and leave it that way!
+              sigset_t mask;
+              struct sigaction act;
+              sigemptyset(&mask);
+              sigaddset(&mask, SIGPIPE);
+              sigprocmask(SIG_BLOCK, &mask, 0);
+              sigaction(SIGPIPE, 0, &act);
+              act.sa_handler = SIG_IGN;
+              sigaction(SIGPIPE, &act, 0);
+#endif
+              // Open pipe to command
+              fdesc = popen((const char*)printCommand, "w");
+              if (!fdesc)
+                throw ERROR_MESSAGE("QDPrintDialog::done",
+                                    "Cannot launch specified print command");
+              pstr = ByteStream::create(fdesc, "wb", false);
+           }
+
+         prog_widget->setActiveWidget(progress);
 	 progress->reset();
-	 //GP<DjVuToPS> print=DjVuToPS::create();
-	 GP<DjVuToPS> print=new DjVuToPS();
-	 if (prefs->dPrinterGamma>0)
-	    print->options.set_gamma(prefs->dPrinterGamma);
-	 else
-	    print->options.set_gamma(prefs->dScreenGamma);
+	 GP<DjVuToPS> print = new DjVuToPS();
+
+         print->options.set_sRGB(true);
+	 if (prefs->dPrinterGamma>0) {
+           print->options.set_sRGB(false);
+           print->options.set_gamma(prefs->dPrinterGamma);
+	 } else if (printLevel < 2) {
+           QMessageBox::information(this, "DjVu",
+                                    tr("Print quality will be lower because\n"
+                                       "PostScript level 1 cannot perform\n"
+                                       "automatic color matching."),
+                                    tr("&OK"), 0, 0, 0, 0);
+         }
+         
 	 DjVuToPS::Options & opt=print->options;
 	 opt.set_mode(displ_mode==IDC_DISPLAY_BACKGROUND ? DjVuToPS::Options::BACK :
 		      displ_mode==IDC_DISPLAY_BLACKWHITE ? DjVuToPS::Options::BW :
@@ -449,7 +488,7 @@ QDPrintDialog::done(int rc)
 	 print->set_prn_progress_cb(decProgress_cb, this);
 	 print->set_info_cb(info_cb, this);
 	 if ((what==PRINT_DOC || what==PRINT_CUSTOM) && doc)
-	    print->print(str, doc, (what==PRINT_CUSTOM && customPages.length()) ?
+	    print->print(*pstr, doc, (what==PRINT_CUSTOM && customPages.length()) ?
 			(const char *) customPages : 0);
 	 else
 	 {
@@ -457,19 +496,12 @@ QDPrintDialog::done(int rc)
 	    GRect prn_rect=(what==PRINT_WIN) ? print_rect : img_rect;
 	    if (prn_rect.isempty())
 	       prn_rect=img_rect;
-	    print->print(str, dimg, prn_rect, img_rect);
+	    print->print(*pstr, dimg, prn_rect, img_rect);
 	 }
 	 prog_widget->setActiveWidget(save_butt);
-	 str.flush();
-      
-	 if (!printToFile)
-	 {
-	    DEBUG_MSG("sending created file to printer...\n");
-	    QString cmd="cat "+fname+" | "+printCommand+"; rm -f "+fname;
-	    DEBUG_MSG("command='" << (const char *) cmd << "'\n");
-	    system(cmd);
-	    fname="";
-	 }
+	 pstr->flush();
+         if (fdesc)
+           pclose(fdesc);
       
 	 DEBUG_MSG("updating preferences\n");
 	 DjVuPrefs disk_prefs;
@@ -490,30 +522,30 @@ QDPrintDialog::done(int rc)
 	 QeDialog::done(rc);
       } catch(Interrupted &)
       {
-	 if (file) fclose(file);
-	 if (fname!="") unlink(fname);
+	 if (fdesc) pclose(fdesc);
+	 if (!! fname) unlink(fname);
 	 prog_widget->setActiveWidget(save_butt);
 	 printing=0;
 	 ::setEnabled(this, TRUE);
 	 setSensitivity();
       } catch(const GException & exc)
       {
-	 if (file) fclose(file);
-	 if (fname!="") unlink(fname);
+	 if (fdesc) pclose(fdesc);
+	 if (!! fname) unlink(fname);
 	 prog_widget->setActiveWidget(save_butt);
 	 printing=0;
 	 ::setEnabled(this, TRUE);
 	 setSensitivity();
-      
 	 showError(this, exc);
       }
-   } else
+   } 
+   else
    {
-      if (printing)
-      {
-	 DEBUG_MSG("interrupting printing\n");
-	 interrupt_printing=1;
-      } else QeDialog::done(rc);
+     if (printing) {
+       DEBUG_MSG("interrupting printing\n");
+       interrupt_printing=1;
+     } else 
+       QeDialog::done(rc);
    }
 }
 
@@ -619,6 +651,7 @@ QDPrintDialog::QDPrintDialog(const GP<DjVuDocument> & _doc,
 
    QeButtonGroup * bg;
    QVBoxLayout * bg_lay;
+   QHBoxLayout * bg_hlay;
 
       //************* Creating 'File format' frame *******************
    bg=format_bg=new QeButtonGroup("File format", start);
@@ -678,8 +711,6 @@ QDPrintDialog::QDPrintDialog(const GP<DjVuDocument> & _doc,
    bg_lay->addWidget(zoom_spin);
    bg_lay->activate();
 
-   QHBoxLayout * bg_hlay;
-   
    //************* Creating 'What to Print' frame *******************
    bg=what_bg=new QeButtonGroup(tr("What to print"), start);
    hlay->addWidget(bg);
@@ -720,30 +751,31 @@ QDPrintDialog::QDPrintDialog(const GP<DjVuDocument> & _doc,
    
 
       //*********** Creating 'PostScript level' frame ****************
-   QGridLayout * bgrid;
    bg=new QeButtonGroup(tr("PostScript level"), start);
    vlay->addWidget(bg);
    bg_lay=new QVBoxLayout(bg, 10);
    bg_lay->addSpacing(bg->fontMetrics().height());
-   bgrid=new QGridLayout(3, 2, 20); bg_lay->addLayout(bgrid);
+   bg_hlay=new QHBoxLayout(10);
+   bg_hlay->addSpacing(bg->fontMetrics().height());
+   bg_lay->addLayout(bg_hlay);
+   
    level1_butt=new QeRadioButton(tr("Level &1"), bg, "level1_butt");
-   bgrid->addWidget(level1_butt, 0, 0);
-   label=new QeLabel(tr("Use this setting to generate a portable\nPostScript file. ")+
-		     tr("Images will not be compressed."), bg, "level1_label");
-   bgrid->addWidget(label, 0, 1);
+   bg_hlay->addWidget(level1_butt);
+   QToolTip::add(level1_butt,
+                 tr("Generate a portable PostScript. This option is useful\n"
+                    "with very old printers and produces very large files.") );
    level2_butt=new QeRadioButton(tr("Level &2"), bg, "level2_butt");
-   bgrid->addWidget(level2_butt, 1, 0);
-   label=new QeLabel(tr("Create a smaller PostScript file. ")+
-		     tr("The file will not be\ncompatible with PS Level 1 printers."),
-		     bg, "level2_label");
-   bgrid->addWidget(label, 1, 1);
+   bg_hlay->addWidget(level2_butt);
+   QToolTip::add(level2_butt,
+                 tr("Create a smaller and faster PostScript output.\n"
+                    "This is the best choice for most printers.") );
    level3_butt=new QeRadioButton(tr("Level &3"), bg, "level3_butt");
-   bgrid->addWidget(level3_butt, 2, 0);
-   label=new QeLabel(tr("Create an even smaller PostScript file. ")+
-		     tr("The file will\nnot be compatible with PS Level 1 or 2 printers."),
-		     bg, "level3_label");
-   bgrid->addWidget(label, 2, 1);
- 
+   bg_hlay->addWidget(level3_butt);
+   QToolTip::add(level3_butt,
+                 tr("Create the smallest and fastest PostScript output.\n"
+                    "Only use this option with recent PS Level 3 printers.\n"
+                    "Older printers (even some older level 3 printers) might\n"
+                    "print very slowly or not at all.") );
    bg_lay->activate();
 
       //**************** Creating the "destination" frame *************

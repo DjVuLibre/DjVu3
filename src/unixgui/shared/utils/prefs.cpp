@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: prefs.cpp,v 1.16 2001-08-24 21:50:10 docbill Exp $
+// $Id: prefs.cpp,v 1.17 2001-09-25 20:28:59 leonb Exp $
 // $Name:  $
 
 
@@ -51,13 +51,23 @@
 
 #define DATABASE_FILE_NAME ".djvurc"
 
-char *		DjVuPrefs::hlb_names[]=
-   { "Shift", "Shift + Shift", "Alt", "Alt + Alt", "Ctrl", "Ctrl + Ctrl" };
-char *		DjVuPrefs::mag_names[]=
-   { "Shift", "Alt", "Ctrl", "Mid" };
+const int DjVuPrefs::legal_mag_size[]
+   = { 50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300 };
 
-const int	DjVuPrefs::legal_mag_size[];
-const int	DjVuPrefs::legal_mag_scale[];
+const int DjVuPrefs::legal_mag_scale[] 
+   = { 15, 20, 25, 30, 35, 40, 45, 50 };
+
+const int DjVuPrefs::legal_mag_size_num 
+   = sizeof(DjVuPrefs::legal_mag_size)/sizeof(DjVuPrefs::legal_mag_size[0]);
+
+const int DjVuPrefs::legal_mag_scale_num
+   = sizeof(DjVuPrefs::legal_mag_scale)/sizeof(DjVuPrefs::legal_mag_scale[0]);
+
+char *DjVuPrefs::hlb_names[]=
+   { "Shift", "Shift + Shift", "Alt", "Alt + Alt", "Ctrl", "Ctrl + Ctrl" };
+
+char *DjVuPrefs::mag_names[]=
+   { "Shift", "Alt", "Ctrl", "Mid" };
 
 GUTF8String
 DjVuPrefs::getString(const char * name)
@@ -129,7 +139,7 @@ DjVuPrefs::load(void)
 		  "PrintPortrait:	1\n"
 	  	  "PrintToFile:		0\n"
 		  "PrintPS:		1\n"
-	  	  "PrintLevel:		1\n"
+	  	  "PrintLevel:		2\n"
 	  	  "PrintFitPage:	1\n"
 	  	  "PrintAllPages:	0\n"
 		  "PrintCommand:	lp\n"
@@ -193,8 +203,7 @@ DjVuPrefs::load(void)
   printToFile=getInt("PrintToFile");
   printPS=getInt("PrintPS");
   printLevel=getInt("PrintLevel");
-  if (printLevel<1) printLevel=1;
-  else if (printLevel>3) printLevel=3;
+  if (printLevel<1 || printLevel>3) printLevel=2;
   printFitPage=getInt("PrintFitPage");
   printAllPages=getInt("PrintAllPages");
   printCommand=getString("PrintCommand");

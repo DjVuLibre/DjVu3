@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qt_fix.cpp,v 1.3 2001-09-25 18:40:15 leonb Exp $
+// $Id: qt_fix.cpp,v 1.4 2001-09-25 20:28:59 leonb Exp $
 // $Name:  $
 
 
@@ -711,9 +711,12 @@ QeProgressBar::QeProgressBar(int totalSteps, QWidget * parent=0, const char * na
 void	
 QeGroupBox::init(void)
 {
+#if 0
+  // Disabled because if also affects the group's children
   QFont fnt=font();
   fnt.setBold(TRUE);
   setFont(fnt);
+#endif
 }
 
 QeGroupBox::QeGroupBox(QWidget * parent=0, const char * name=0) 
@@ -734,9 +737,12 @@ QeGroupBox::QeGroupBox(const QString & title, QWidget * parent=0, const char * n
 void
 QeButtonGroup::init(void)
 {
+#if 0
+  // Disabled because if also affects the group's children
   QFont fnt=font();
   fnt.setBold(TRUE);
   setFont(fnt);
+#endif
 }
 
 QeButtonGroup::QeButtonGroup(QWidget * parent=0, const char * name=0) 

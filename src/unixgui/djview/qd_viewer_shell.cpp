@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qd_viewer_shell.cpp,v 1.7 2001-07-26 20:42:08 mchen Exp $
+// $Id: qd_viewer_shell.cpp,v 1.8 2001-09-25 20:28:58 leonb Exp $
 // $Name:  $
 
 
@@ -183,7 +183,7 @@ QDViewerShell *
 QDViewerShell::createNewShell(const GURL & url) const
 {
    QDViewerShell * v=new QDViewerShell(0, "qd_viewer_shell");
-   qeApp->setWidgetGeometry(v);
+   qeApp->setWidgetGeometry(v->topLevelWidget());
    v->setDjVuDir(djvu_dir);
    v->show();
    if (!url.is_empty()) v->openURL(url);

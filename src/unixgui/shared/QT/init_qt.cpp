@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: init_qt.cpp,v 1.4 2001-07-25 17:10:42 mchen Exp $
+// $Id: init_qt.cpp,v 1.5 2001-09-25 20:28:59 leonb Exp $
 // $Name:  $
 
 
@@ -79,7 +79,7 @@ static QWindowsStyle *windows=0;
 static QMotifStyle *motif=0;
 static QMotifPlusStyle *motifplus=0;
 static QSGIStyle *sgi=0;
-static QPlatinumStyle *platium=0;
+static QPlatinumStyle *platinum=0;
 static QCDEStyle *cde=0;
 
 #define QTNAMESPACE_QT Qt
@@ -334,30 +334,11 @@ ParseQTArgs(int & argc, char ** argv)
 	    shift(argc, argv, i+1);
 	 } else cerr << "Option '" << argv[i] << "' must be followed by an argument.\n";
 	 shift(argc, argv, i);
-      } else if (!strcmp(argv[i], "-style=windows"))
+      } else if (!strncmp(argv[i], "-style=", 7))
       {
+	 DEBUG_MSG(argv[i] << " found\n");
+         appStyle = argv[i]+7;
 	 shift(argc, argv, i);
-	 appStyle="windows";
-      } else if (!strcmp(argv[i], "-style=motif"))
-      {
-	 shift(argc, argv, i);
-	 appStyle="motif";
-      } else if (!strcmp(argv[i], "-style=motifplus"))
-      {
-	 shift(argc, argv, i);
-	 appStyle="motifplus";
-      } else if (!strcmp(argv[i], "-style=sgi"))
-      {
-	 shift(argc, argv, i);
-	 appStyle="sgi";
-      } else if (!strcmp(argv[i], "-style=platium"))
-      {
-	 shift(argc, argv, i);
-	 appStyle="platium";
-      } else if (!strcmp(argv[i], "-style=cde"))
-      {
-	 shift(argc, argv, i);
-	 appStyle="cde";
       } else i++;
    }
 }
@@ -372,10 +353,6 @@ InitializeQT(int argc, char ** argv)
    DEBUG_MAKE_INDENT(3);
 
    FakeDisplayStructure(displ, visual, colormap, depth);
-
-//     if(!windows)
-//        windows=new QWindowsStyle();
-//     QApplication::setStyle(windows);
 
    qa=new QeApplication(displ);
    DjVuPrefs prefs;
@@ -410,7 +387,7 @@ InitializeQT(int argc, char ** argv)
    else qApp->setName("DjVu");
    
    if (mwGeometry) qeApp->geometry=mwGeometry;
-   else qeApp->geometry="690x600";
+   else qeApp->geometry="800x600";
 
    if (appStyle)
    {
@@ -423,10 +400,10 @@ InitializeQT(int argc, char ** argv)
       {
 	 if ( !motifplus ) motifplus = new QMotifPlusStyle();
 	 QApplication::setStyle(motifplus);
-      }else if (style=="platium")
+      }else if (style=="platinum")
       {
-	 if ( !platium ) platium = new QPlatinumStyle();
-	 QApplication::setStyle(platium);
+	 if ( !platinum ) platinum = new QPlatinumStyle();
+	 QApplication::setStyle(platinum);
       }else if (style=="sgi")
       {
 	 if ( !sgi ) sgi = new QSGIStyle();
@@ -436,7 +413,6 @@ InitializeQT(int argc, char ** argv)
 	 // from example themes.cpp
 	 if ( !cde ) cde = new QCDEStyle();
 	 QApplication::setStyle(cde);
-
 	 QPalette p( QColor( 75, 123, 130 ) );
 	 p.setColor( QPalette::Active, QColorGroup::Base, QColor( 55, 77, 78 ) );
 	 p.setColor( QPalette::Inactive, QColorGroup::Base, QColor( 55, 77, 78 ) );
@@ -470,8 +446,6 @@ InitializeQT(int argc, char ** argv)
    }      
   
    //HackQT();
-   QFont::setDefaultFont(QFont("Helvetica", 12, QFont::Normal,
-			       FALSE, QFont::Latin1));
    InstallErrorHandlers();
    InstallLangTranslator();
    

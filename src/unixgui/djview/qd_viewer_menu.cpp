@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qd_viewer_menu.cpp,v 1.13 2001-08-24 21:50:10 docbill Exp $
+// $Id: qd_viewer_menu.cpp,v 1.14 2001-09-25 20:28:58 leonb Exp $
 // $Name:  $
 
 
@@ -152,16 +152,11 @@ QDViewer::setupMenu(QMenuData * menu)
       int doc_page=djvu_doc->url_to_page(djvu_file->get_url());
       int doc_pages=djvu_doc->get_pages_num();
 
-      menu->setItemChecked(IDC_DISPLAY_COLOR, getMode()==IDC_DISPLAY_COLOR);
-      menu->setItemChecked(IDC_DISPLAY_BLACKWHITE, getMode()==IDC_DISPLAY_BLACKWHITE);
-      menu->setItemChecked(IDC_DISPLAY_FOREGROUND, getMode()==IDC_DISPLAY_FOREGROUND);
-      menu->setItemChecked(IDC_DISPLAY_BACKGROUND, getMode()==IDC_DISPLAY_BACKGROUND);
+      menu->setItemChecked(IDC_DISPLAY_COLOR, getMode(true)==IDC_DISPLAY_COLOR);
+      menu->setItemChecked(IDC_DISPLAY_BLACKWHITE, getMode(true)==IDC_DISPLAY_BLACKWHITE);
+      menu->setItemChecked(IDC_DISPLAY_FOREGROUND, getMode(true)==IDC_DISPLAY_FOREGROUND);
+      menu->setItemChecked(IDC_DISPLAY_BACKGROUND, getMode(true)==IDC_DISPLAY_BACKGROUND);
 
-      menu->setItemEnabled(IDC_DISPLAY_COLOR, !dimg->is_legal_bilevel());
-      menu->setItemEnabled(IDC_DISPLAY_BLACKWHITE, !dimg->is_legal_photo());
-      menu->setItemEnabled(IDC_DISPLAY_BACKGROUND, dimg->is_legal_compound());
-      menu->setItemEnabled(IDC_DISPLAY_FOREGROUND, dimg->is_legal_compound());
-      
       menu->setItemChecked(IDC_ZOOM_25, getCMDZoom()==IDC_ZOOM_25);
       menu->setItemChecked(IDC_ZOOM_50, getCMDZoom()==IDC_ZOOM_50);
       menu->setItemChecked(IDC_ZOOM_75, getCMDZoom()==IDC_ZOOM_75);
