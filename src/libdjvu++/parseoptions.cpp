@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: parseoptions.cpp,v 1.57 2000-10-11 21:12:36 bcr Exp $
+//C- $Id: parseoptions.cpp,v 1.58 2000-10-24 20:51:36 mrosen Exp $
 #ifdef __GNUC__
 #pragma implementation
 #endif
@@ -783,7 +783,7 @@ DjVuParseOptions::ReadNextConfig (
     fgets(buf+i,buf_size,f);
     j=i;
   }
-  if(!s||strcmp(s,profile_token_read_string))
+//  if(!s||strcmp(s,profile_token_read_string))
   {
     profile=ProfileTokens->SetToken(xname);
     (void)(Configuration->Grow(profile+1));
@@ -847,11 +847,12 @@ DjVuParseOptions::ReadNextConfig (
 //    ReadFile(line,f,profile);
     if(feof(f))
       profile=(-1);
-  }else if(f)
-  {
-    delete [] buf;
-    profile=(-1);
   }
+//  else if(f)
+//  {
+//    delete [] buf;
+//    profile=(-1);
+//  }
   return profile;
 }
 
