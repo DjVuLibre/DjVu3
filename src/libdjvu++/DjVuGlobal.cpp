@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuGlobal.cpp,v 1.20 2000-01-13 16:04:01 bcr Exp $
+//C- $Id: DjVuGlobal.cpp,v 1.21 2000-01-14 16:14:49 bcr Exp $
 
 /** This file impliments the DjVuProgressTask elements.  The memory
     functions are implimented in a separate file, because only the memory
@@ -17,12 +17,12 @@
  */
   
 
+#ifdef NEED_DJVU_PROGRESS
 #include "DjVuGlobal.h"
 
 
 // ----------------------------------------
 
-#ifdef NEED_DJVU_PROGRESS
 #include "GOS.h"
 #include "GException.h"
 #include <stdlib.h>
