@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuGlobal.cpp,v 1.7 1999-09-21 20:51:26 leonb Exp $
+//C- $Id: DjVuGlobal.cpp,v 1.8 1999-09-21 21:06:19 leonb Exp $
 
 
 
@@ -112,12 +112,16 @@ DjVuProgress::Event::~Event()
 DjVuProgress::Event::Event(const char *tag)
   : n(taglen)
 {
+  if (!log && !chk) 
+    return;
   enter(tag);
 }
 
 DjVuProgress::Event::Event(int tag)
   : n(taglen)
 {
+  if (!log && !chk) 
+    return;
   char buffer[16];
   sprintf(buffer,"%d", tag);
   enter(buffer);
@@ -126,6 +130,8 @@ DjVuProgress::Event::Event(int tag)
 void
 DjVuProgress::Event::enter(const char *tag)
 {
+  if (!log && !chk) 
+    return;
   // Check tag buffer
   int l = strlen(tag);
   if (taglen+l+2 > tagmax) {
