@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.h,v 1.62 2001-04-24 00:25:50 bcr Exp $
+// $Id: GString.h,v 1.63 2001-04-24 15:52:36 bcr Exp $
 // $Name:  $
 
 #ifndef _GSTRING_H_
@@ -57,7 +57,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.62 2001-04-24 00:25:50 bcr Exp $# */
+    #$Id: GString.h,v 1.63 2001-04-24 15:52:36 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -606,7 +606,7 @@ public:
     { return GStringRep::cmp(*this,s2,len); }
     /// Returns an #int#.  Compares string with #s2# and returns sorting order.
   int cmp(const char *s2, const int len=(-1)) const
-    { return GStringRep::cmp(*this,s2); }
+    { return GStringRep::cmp(*this,s2,len); }
     /// Returns an #int#.  Compares string with #s2# and returns sorting order.
   int cmp(const char s2) const
     { return GStringRep::cmp(*this,&s2,1); }
