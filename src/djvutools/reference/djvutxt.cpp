@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djvutxt.cpp,v 1.16 2001-04-09 20:49:40 chrisp Exp $
+// $Id: djvutxt.cpp,v 1.17 2001-04-16 15:08:37 chrisp Exp $
 // $Name:  $
 
 // DJVUTXT -- DjVu TXT extractor
@@ -69,7 +69,7 @@
     @author
     Andrei Erofeev <eaf@geocities.com> -- initial implementation
     @version
-    #$Id: djvutxt.cpp,v 1.16 2001-04-09 20:49:40 chrisp Exp $# */
+    #$Id: djvutxt.cpp,v 1.17 2001-04-16 15:08:37 chrisp Exp $# */
 //@{
 //@}
 
@@ -131,17 +131,17 @@ doPage(const GP<DjVuDocument> & doc, int page_num,
 int
 main(int argc, char ** argv)
 {
-  DArray<GString> dargv(0,argc-1);
+  DArray<GUTF8String> dargv(0,argc-1);
   for(int i=0;i<argc;++i)
   {
-    GString g(argv[i]);
+    GUTF8String g(argv[i]);
     dargv[i]=g.getNative2UTF8();
   }
   progname=dargv[0]=GOS::basename(dargv[0]);
    
 #ifdef DEBUG
    {
-      const GString debug(GOS::getenv("DEBUG"));
+      const GUTF8String debug(GOS::getenv("DEBUG"));
       if (debug.length())
       {
 //	 int level=debug.is_int()?atoi((const char *)debug):0;
@@ -154,16 +154,16 @@ main(int argc, char ** argv)
 #endif
    
    G_TRY {
-      GString name_in, name_out;
+      GUTF8String name_in, name_out;
       int page_num=-1;
 
       for(int i=1;i<argc;i++)
       {
-	 if ( (dargv[i] == GString("-")) || dargv[i][0]!='-')
+	 if ( (dargv[i] == GUTF8String("-")) || dargv[i][0]!='-')
 	 {
 	    if (!name_in.length())
 	    {
-	       if (dargv[i] == GString( "-"))
+	       if (dargv[i] == GUTF8String( "-"))
 	       {
 		  DjVuPrintError("%s","Can't read from standard input.\n\n");
 		  usage();
@@ -182,8 +182,8 @@ main(int argc, char ** argv)
 	 } else
 	 {
 	    if (dargv[i][0]=='-' && dargv[i][1]=='-')
-	       dargv[i]=1+(const char *)dargv[i];
-	    if (dargv[i] == GString("--page"))
+	       dargv[i]=(const char*)dargv[i]; //1+(const char *)dargv[i];
+	    if (dargv[i] == GUTF8String("--page"))
 	    {
 	       if (i+1>=argc)
 	       {
@@ -199,7 +199,7 @@ main(int argc, char ** argv)
 		  usage();
 		  exit(1);
 	       }
-	    } else if (dargv[i] == GString("--help"))
+	    } else if (dargv[i] == GUTF8String("--help"))
 	    {
 	       usage();
 	       exit(1);
