@@ -8,7 +8,7 @@
 # C- AT&T, you have an infringing copy of this software and cannot use it
 # C- without violating AT&T's intellectual property rights.
 # C-
-# C- $Id: Makefile.in,v 1.38 1999-09-09 16:16:16 leonb Exp $
+# C- $Id: Makefile.in,v 1.39 1999-09-09 21:56:30 leonb Exp $
 
 SHELL=/bin/sh
 prefix=@prefix@
@@ -131,15 +131,15 @@ libdjvu++.dxx: libdjvu++.dxx.in ATTLICENSE
 # Documentation
 
 html: libdjvu++.dxx libdjvu++.footer
-	-rm -rf @Doc
-	-mkdir @Doc 2>/dev/null
-	${DOCXX} -d @Doc -B $(SRCDIR)/libdjvu++.footer libdjvu++.dxx
+	-rm -rf Doc
+	-mkdir Doc 2>/dev/null
+	${DOCXX} -d Doc -B $(SRCDIR)/libdjvu++.footer libdjvu++.dxx
 
 tex:  libdjvu++.dxx
-	-@mkdir @Doc 2>/dev/null
-	${DOCXX} -t -o @Doc/libdjvu++.tex -ep fullpage libdjvu++.dxx
-	( cd @Doc ; latex libdjvu++.tex ; latex libdjvu++.tex )
-	dvips @Doc/libdjvu++.dvi -o
+	-@mkdir Doc 2>/dev/null
+	${DOCXX} -t -o Doc/libdjvu++.tex -ep fullpage libdjvu++.dxx
+	( cd Doc ; latex libdjvu++.tex ; latex libdjvu++.tex )
+	dvips Doc/libdjvu++.dvi -o
 	gzip -f libdjvu++.ps
 
 
@@ -148,11 +148,11 @@ tex:  libdjvu++.dxx
 clean:
 	-rm 2>/dev/null -rf $(PROG) ; true
 	-rm 2>/dev/null *.o *.a *.out *.rpo *.dep ii_files ; true
-	if [ -d @Test ] ; then ( cd @Test ; $(MAKE) clean ) ; fi
+	if [ -d Test ] ; then ( cd Test ; $(MAKE) clean ) ; fi
 	-@echo Cleaned.
 
 realclean:
-	-rm 2>/dev/null -rf @Doc libdjvu++.dxx libdjvu++.ps.gz ; true
+	-rm 2>/dev/null -rf Doc libdjvu++.dxx libdjvu++.ps.gz ; true
 	-rm 2>/dev/null -rf ATTLicense.cpp Makefile.depend ; true
 	-@$(MAKE) clean
 
