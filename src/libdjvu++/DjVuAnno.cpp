@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuAnno.cpp,v 1.10 1999-08-09 12:49:21 leonb Exp $
+//C- $Id: DjVuAnno.cpp,v 1.11 1999-09-07 15:28:34 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -100,17 +100,26 @@ private:
 		      const char * & start);
 };
 
+GLParser::GLParser(void) 
+{
+}
+
+GLParser::~GLParser(void) 
+{
+}
+
 inline GPList<GLObject> &
-GLParser::get_list(void) { return list; }
+GLParser::get_list(void) 
+{ 
+  return list; 
+}
 
 inline
-GLParser::GLParser(void) {}
+GLParser::GLParser(const char * str) 
+{
+  parse(str); 
+}
 
-inline
-GLParser::GLParser(const char * str) { parse(str); }
-
-inline
-GLParser::~GLParser(void) {}
 
 //***************************************************************************
 //***************************** GLParser.cpp ********************************
