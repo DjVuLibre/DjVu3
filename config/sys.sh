@@ -25,6 +25,7 @@ if [ -z "$SYS" ] ; then
     if [ "x$s" = xSOLARIS ] ; then
       SYS=Solaris
     fi
+    DEFS="$DEFS -DNEED_DJVU_MEMORY"
   fi
   echo "$SYS"
   CONFIG_VARS=`echo SYS DEFS INCS JOBJ $CONFIG_VARS`
