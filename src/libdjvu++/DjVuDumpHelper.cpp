@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDumpHelper.cpp,v 1.2 2000-06-20 21:10:17 bcr Exp $
+//C- $Id: DjVuDumpHelper.cpp,v 1.3 2000-07-11 19:28:54 bcr Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -19,6 +19,10 @@
 #include "DjVmDir.h"
 #include "DjVuInfo.h"
 #include "IFFByteStream.h"
+
+#ifdef putchar
+#undef putchar
+#endif
 
 struct DjVmInfo
 {

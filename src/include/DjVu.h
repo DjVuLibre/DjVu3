@@ -1,13 +1,8 @@
 /*C-  -*- C -*-
  *C-
- *C- This software may only be used by you under license from AT&T
- *C- Corp. ("AT&T"). A copy of AT&T's Source Code Agreement is available at
- *C- AT&T's Internet web site having the URL <http://www.djvu.att.com/open>.
- *C- If you received this software without first entering into a license with
- *C- AT&T, you have an infringing copy of this software and cannot use it
- *C- without violating AT&T's intellectual property rights.
+ *C- Copyright (c) 2000, LizardTech, Inc.  All Rights Reserved.
  *C-
- *C- $Id: DjVu.h,v 1.13 2000-07-05 16:50:53 bcr Exp $
+ *C- $Id: DjVu.h,v 1.14 2000-07-11 19:28:53 bcr Exp $
  */
 
 #ifndef _DJVU_GLOBAL_API_H
@@ -26,7 +21,10 @@
 
 /*
  * $Log: DjVu.h,v $
- * Revision 1.13  2000-07-05 16:50:53  bcr
+ * Revision 1.14  2000-07-11 19:28:53  bcr
+ * Various fixes to the copyrights and such.  Applied AT&T's latest patches.
+ *
+ * Revision 1.13  2000/07/05 16:50:53  bcr
  * Updated the documentation.
  *
  * Revision 1.12  2000/07/04 00:51:49  mrosen
