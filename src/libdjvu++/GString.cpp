@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.48 2001-04-12 15:29:08 bcr Exp $
+// $Id: GString.cpp,v 1.49 2001-04-12 16:07:04 mchen Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -663,9 +663,9 @@ GString::contains(const char accept[],const int from) const
 GString& 
 GString::operator+= (char ch)
 {
-  const char *str1 = (const char*)(*this);
-  if(str1)
+  if(ptr)
   {
+    const char *str1 = (const char*)(*this);
     const GP<GStringRep> rep = (*this)->blank((str1?strlen(str1):0) + 1);
     GStringRep &r=*rep;
     strcpy(r.data, str1);
