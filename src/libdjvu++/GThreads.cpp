@@ -7,10 +7,10 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: GThreads.cpp,v 1.13 1999-03-06 01:22:56 leonb Exp $
+//C-  $Id: GThreads.cpp,v 1.14 1999-03-08 15:10:45 leonb Exp $
 
 
-// **** File "$Id: GThreads.cpp,v 1.13 1999-03-06 01:22:56 leonb Exp $"
+// **** File "$Id: GThreads.cpp,v 1.14 1999-03-08 15:10:45 leonb Exp $"
 // This file defines machine independent classes
 // for running and synchronizing threads.
 // - Author: Leon Bottou, 01/1998
@@ -500,8 +500,8 @@ GEvent::wait(int timeout)
 #define MAXWAIT    (200)
 // Maximum penalty for hog task (ms)
 #define MAXPENALTY (1000)
-
-
+// Trace task switches
+#undef COTHREAD_TRACE
 
 // -------------------------------------- context switch code
 
@@ -688,6 +688,9 @@ time_elapsed(int reset=1)
   unsigned long elapsed = (long)(tm.tv_sec-time_base.tv_sec)*1000 + msec;
   if (reset && elapsed>0)
     {
+#ifdef COTHREAD_TRACE
+      fprintf(stderr,"cothreads: %4ld ms in task %p\n", elapsed, curtask);
+#endif
       time_base.tv_sec = tm.tv_sec;
       time_base.tv_usec += msec*1000;
     }
@@ -720,13 +723,12 @@ cotask_yield()
       if (q->wchan)
         {
           if ( (*q->wchan>0) ||
-               (q->maxwait && *q->maxwait<=elapsed) ||
+               (q->maxwait && *q->maxwait<=elapsed && !(*q->maxwait=0)) ||
                (q->wselect && globalmaxwait<=elapsed && coselect_test(q->wselect)) )
             { 
               q->wchan=0; 
               q->maxwait=0; 
               q->wselect=0; 
-              q->over = 0;
             }
           if (q->maxwait)
             *q->maxwait -= elapsed;
@@ -766,14 +768,16 @@ cotask_yield()
       q = n;
       do 
         { 
-          if (! q->wchan)
-            q->over = q->over - best;
+          q->over = (q->over>best ? q->over - best : 0);
           q = q->next;
         } 
       while (q != n);
       // switch
       if (r != curtask)
         {
+#ifdef COTHREAD_TRACE
+          fprintf(stderr,"cothreads: ----- switch to %p [%ld] ----- \n", r, best);
+#endif
           cotask *old = curtask;
           curtask = r;
           mach_switch(&old->regs, &curtask->regs);
@@ -1163,10 +1167,13 @@ GEvent::set()
 void
 GEvent::wait()
 {
-  if (ok && status<=0)
+  if (ok && status<1)
     {
-      curtask->wchan = &status;
-      cotask_yield();
+      while (status<1)
+        {
+          curtask->wchan = &status;
+          cotask_yield();
+        }
     }
   status = 0;
 }
@@ -1174,12 +1181,15 @@ GEvent::wait()
 void
 GEvent::wait(int timeout) 
 {
-  if (ok && status<=0) 
+  if (ok && status<1)
     {
-      unsigned long maxwait = timeout;
-      curtask->maxwait = &maxwait;
-      curtask->wchan = &status;
-      cotask_yield();
+      unsigned long maxwait = time_elapsed(0) + timeout;
+      while (status<1 && maxwait>0)
+        {
+          curtask->maxwait = &maxwait;
+          curtask->wchan = &status;
+          cotask_yield();
+        }
     }
   status = 0;
 }
