@@ -1,0 +1,37 @@
+#  Name:    bootstrap
+#  Purpose: Shell script to configure autotools.
+#
+#  $Id: bootstrap,v 1.1 2001-08-23 23:45:23 docbill Exp $
+
+set -x
+
+#
+# Create a link from configure.ac to configure.in
+#
+# Note: Starting with autoconf 2.50, preferred name is configure.ac
+#       but libtool and automake still look for configure.in.
+#
+if test -L ./configure.in; then
+  rm ./configure.in
+fi
+ln -s ./configure.ac configure.in
+
+
+#
+# Create config subdirectory
+#
+# Note: Autotools will place configuration shell tools in the config
+#       directory.  If does not exist, error will occur.
+if test ! -d config; then
+  mkdir config
+fi
+
+#
+# Run the autotools.
+#
+libtoolize --copy --force
+aclocal -I config
+# autoheader
+automake --add-missing --copy
+autoconf 
+
