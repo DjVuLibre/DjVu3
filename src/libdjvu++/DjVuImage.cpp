@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuImage.cpp,v 1.18 1999-06-24 15:13:02 leonb Exp $
+//C- $Id: DjVuImage.cpp,v 1.19 1999-06-24 17:58:15 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -701,7 +701,6 @@ do_bitmap(const DjVuImage &dimg, BImager get,
   int h = dimg.get_height();
   int rw = all.width();
   int rh = all.height();
-  if (w==0 || h==0) return 0;
   GRect zrect = rect; 
   zrect.translate(-all.xmin, -all.ymin);
   for (red=1; red<=15; red++)
@@ -713,6 +712,7 @@ do_bitmap(const DjVuImage &dimg, BImager get,
          (rw*red*3 < w || rh*red*3 < h) )
       break;
   // Setup bitmap scaler
+  if (! (w && h)) return 0;
   GBitmapScaler bs;
   bs.set_input_size( (w+red-1)/red, (h+red-1)/red );
   bs.set_output_size( rw, rh );
@@ -731,19 +731,18 @@ do_bitmap(const DjVuImage &dimg, BImager get,
 
 static GP<GPixmap>
 do_pixmap(const DjVuImage &dimg, PImager get,
-          const GRect &rect, const GRect &all, double gamma=0 )
+          const GRect &rect, const GRect &all, double gamma )
 {
   // Sanity
   if (! ( all.contains(rect.xmin, rect.ymin) &&
           all.contains(rect.xmax-1, rect.ymax-1) ))
     THROW("(DjVuImage::get_pixmap) Illegal target rectangles");
   // Check for integral reduction
-  int red;
-  int w = dimg.get_width();
-  int h = dimg.get_height();
-  int rw = all.width();
-  int rh = all.height();
-  if (w==0 || h==0) return 0;
+  int red, w=0, h=0, rw=0, rh=0;
+  w = dimg.get_width();
+  h = dimg.get_height();
+  rw = all.width();
+  rh = all.height();
   GRect zrect = rect; 
   zrect.translate(-all.xmin, -all.ymin);
   for (red=1; red<=15; red++)
@@ -757,6 +756,7 @@ do_pixmap(const DjVuImage &dimg, PImager get,
          (rw*red*3 < w || rh*red*3 < h) )
       break;
   // Setup pixmap scaler
+  if (w<0 || h<0) return 0;
   GPixmapScaler ps;
   ps.set_input_size( (w+red-1)/red, (h+red-1)/red );
   ps.set_output_size( rw, rh );
