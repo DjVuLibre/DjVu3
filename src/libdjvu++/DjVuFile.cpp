@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuFile.cpp,v 1.170 2001-05-03 16:35:31 fcrary Exp $
+// $Id: DjVuFile.cpp,v 1.171 2001-05-04 00:12:17 fcrary Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -1183,7 +1183,7 @@ DjVuFile::decode(const GP<ByteStream> &gbs)
       GUTF8String desc;
       desc.format("\t%5.1f\t%s", chksize/1024.0, (const char*)chkid);
       // Append the whole thing to the growing file description
-      description = description + str + desc;
+      description = description + str + desc + "\n";
 
       pcaster->notify_chunk_done(this, chkid);
       // Close chunk
@@ -1230,9 +1230,9 @@ DjVuFile::decode(const GP<ByteStream> &gbs)
     else if (iw44)
       desc.format( ERR_MSG("DjVuFile.IW44_header") "\t%d\t%d\t%d", 
         info->width, info->height, info->dpi);
-    description=desc+description;
+    description=desc + "\n" + description;
     int rawsize=info->width*info->height*3;
-    desc.format( ERR_MSG("DjVuFile.ratio") "\t%d\t%d",
+    desc.format( ERR_MSG("DjVuFile.ratio") "\t%0.1f\t%0.1f",
       (double)rawsize/file_size, file_size/1024.0 );
     description=description+desc;
   }
