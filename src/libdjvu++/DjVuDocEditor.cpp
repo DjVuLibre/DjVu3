@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocEditor.cpp,v 1.13 1999-11-30 20:29:19 eaf Exp $
+//C- $Id: DjVuDocEditor.cpp,v 1.14 1999-11-30 20:38:08 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -689,6 +689,15 @@ DjVuDocEditor::remove_file(const char * id, bool remove_unref,
 
       // Finally remove this file from the directory.
    djvm_dir->delete_file(id);
+
+      // And get rid of its thumbnail, if any
+   GCriticalSectionLock lock(&thumb_lock);
+   GPosition pos;
+   if (thumb_map.contains(id, pos))
+   {
+      delete (TArray<char> *) thumb_map[pos];
+      thumb_map.del(pos);
+   }
 
    if (errors.length()) THROW(errors);
 }
