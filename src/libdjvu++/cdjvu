@@ -7,6 +7,9 @@ djvufile=$2
 if [ -z "$1" -o -z "$2" -o -n "$3" ]
 then
     echo 1>&2 "Usage: cdjvu <ppmfile> <djvufile>"
+    echo 1>&2 " Simple script for encoding compound DjVu files."
+    echo 1>&2 " Not the real thing!."
+    exit 10
 fi
 
 # Setup root name of tmporary files
