@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GPixmap.h,v 1.13 2000-01-18 00:23:27 bcr Exp $
+//C- $Id: GPixmap.h,v 1.14 2000-01-21 19:35:27 leonb Exp $
 
 #ifndef _GPIXMAP_H_
 #define _GPIXMAP_H_
@@ -30,7 +30,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: GPixmap.h,v 1.13 2000-01-18 00:23:27 bcr Exp $# */
+    #$Id: GPixmap.h,v 1.14 2000-01-21 19:35:27 leonb Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -283,11 +283,7 @@ public:
   /** Applies a luminance gamma correction factor of #corr#.  Values greater than
       #1.0# make the image brighter.  Values smaller than #1.0# make the image
       darker.  The documentation of program \Ref{ppmcoco} explains how to
-      properly use this function.  Note that standard gamma correction sharply
-      increases the contrast of the darkest parts of the image.  This effect
-      reveals unpleasant data compression artifacts.  This is why we use an
-      ad-hoc formula which limits this effect.  The resulting image is less
-      accurate but more pleasant! */
+      properly use this function. */
   void color_correct(double corr);
   /** Applies a luminance gamma correction to an array of pixels. 
       This function is {\em static} and does not modify this pixmap. */
