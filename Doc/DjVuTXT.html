@@ -55,7 +55,7 @@
 <A HREF="#DOC.1.5.25.2.9"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVuTXT.html">DjVuTXT</A>&gt;  <B>copy</B>(void) const 
 <DD><I>Returns a copy of this object.</I>
 <DT>
-<A HREF="#DOC.1.5.25.2.10"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>GList&lt;<!1><A HREF="DjVuTXT.html#DOC.1.5.25.2.2">Zone</A> *&gt;  <B>search_string</B>(const char * string, int &amp; start_pos, bool search_fwd, bool match_case) const 
+<A HREF="#DOC.1.5.25.2.10"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>GList&lt;<!1><A HREF="DjVuTXT.html#DOC.1.5.25.2.2">Zone</A> *&gt;  <B>search_string</B>(const char * string, int &amp; start_pos, bool search_fwd, bool match_case, bool whole_word=false) const 
 <DD><I>Searches the TXT chunk for the given string and returns a list of the smallest zones covering the text.</I>
 <DT>
 <A HREF="#DOC.1.5.25.2.11"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>unsigned int <B>get_memory_usage</B>() const 
@@ -190,7 +190,7 @@ zones in the hierarchy. Separators are inserted where appropriate.
 <DL><DT><DD></DL><P>
 <A NAME="search_string">
 <A NAME="DOC.1.5.25.2.10">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>GList&lt;<!1><A HREF="DjVuTXT.html#DOC.1.5.25.2.2">Zone</A> *&gt;  search_string(const char * string, int &amp; start_pos, bool search_fwd, bool match_case) const </B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>GList&lt;<!1><A HREF="DjVuTXT.html#DOC.1.5.25.2.2">Zone</A> *&gt;  search_string(const char * string, int &amp; start_pos, bool search_fwd, bool match_case, bool whole_word=false) const </B></TT>
 <DD>Searches the TXT chunk for the given string and returns a list of
 the smallest zones covering the text.
 
@@ -212,7 +212,14 @@ it will modify the <TT>start_pos</TT> to point to it. If no match has
 been found, the <TT>start_pos</TT> will be reset to some big number
 if searching forward and <TT>-1</TT> otherwise.
 <BR><B>search_fwd</B> -  <TT>TRUE</TT> means to search forward. <TT>FALSE</TT> - backward.
-<BR><B>match_case</B> -  If set to <TT>FALSE</TT> the search will be case-insensitive.<BR><DD></DL><P>
+<BR><B>match_case</B> -  If set to <TT>FALSE</TT> the search will be case-insensitive.
+<BR><B>whole_word</B> -  If set to <TT>TRUE</TT> the function will try to find
+a whole word matching the passed string. The word separators
+are all blank and punctuation characters. The passed
+string may <B>not</B> contain word separators, that is it
+<B>must</B> be a whole word.
+<B>WARNING:</B> The returned list contains pointers to Zones.
+<B>DO NOT DELETE</B> these Zones.<BR><DD></DL><P>
 <A NAME="get_memory_usage">
 <A NAME="DOC.1.5.25.2.11">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>unsigned int get_memory_usage() const </B></TT>
