@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GException.cpp,v 1.31 2001-04-17 22:20:14 bcr Exp $
+// $Id: GException.cpp,v 1.32 2001-04-20 22:40:33 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -147,6 +147,32 @@ GException::get_cause(void) const
   return cause;
 }
 
+int
+GException::cmp_cause(const char s1[] , const char s2[])
+{
+  int retval;
+  if(! s2 || !s2[0])
+  {
+    retval=(s1&&s1[0])?1:(-1);
+  }else if(! s1 || !s1[0])
+  {
+    retval=(-1);
+  }else
+  {
+    const char *end_s1=strpbrk(s1,"\t\n");
+    const int n1=end_s1?(int)((size_t)end_s1-(size_t)s1):strlen(s1);
+    const char *end_s2=strpbrk(s1,"\t\n");
+    const int n2=end_s2?(int)((size_t)end_s2-(size_t)s2):strlen(s2);
+    retval=(n1==n2)?strncmp(s1,s2,n1):strcmp(s1,s2);
+  }
+  return retval;
+}
+
+int
+GException::cmp_cause(const char s2[]) const
+{
+  return cmp_cause(cause,s2);
+}
 
 #ifdef USE_EXCEPTION_EMULATION
 

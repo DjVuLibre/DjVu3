@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuFile.cpp,v 1.164 2001-04-20 17:53:19 bcr Exp $
+// $Id: DjVuFile.cpp,v 1.165 2001-04-20 22:40:33 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -465,7 +465,7 @@ DjVuFile::decode_func(void)
     }
   } G_CATCH(exc) {
     G_TRY {
-      if (GString::messagecmp(exc.get_cause(),DataPool::Stop))
+      if (!exc.cmp_cause(DataPool::Stop))
       {
         flags.enter();
         flags=flags & ~DECODING | DECODE_STOPPED;
@@ -481,7 +481,8 @@ DjVuFile::decode_func(void)
         pcaster->notify_error(this, exc.get_cause());
         pcaster->notify_file_flags_changed(this, DECODE_FAILED, DECODING);
       }
-    } G_CATCH_ALL {
+    } G_CATCH_ALL
+    {
       DEBUG_MSG("******* Oops. Almost missed an exception\n");
     } G_ENDCATCH;
   } G_ENDCATCH;
@@ -607,7 +608,7 @@ DjVuFile::report_error
 (const GException &ex,bool throw_errors)
 {
   data_pool->clear_stream();
-  if((!verbose_eof)|| (!GString::messagecmp(ex.get_cause(),ByteStream::EndOfFile)))
+  if((!verbose_eof)|| (ex.cmp_cause(ByteStream::EndOfFile)))
   {
     if(throw_errors)
     {
@@ -1190,7 +1191,7 @@ DjVuFile::decode(GP<ByteStream> gbs)
   }
   G_CATCH(ex)
   {
-    if(GString::messagecmp(ex.get_cause(),ByteStream::EndOfFile))
+    if(!ex.cmp_cause(ByteStream::EndOfFile))
     {
       if (chunks_number < 0)
         chunks_number=(recover_errors>SKIP_CHUNKS)?chunks:last_chunk;
@@ -1423,7 +1424,7 @@ DjVuFile::decode_ndir(GMap<GURL, void *> & map)
     }
     G_CATCH(ex)
     {
-       if(GString::messagecmp(ex.get_cause(),ByteStream::EndOfFile))
+       if(!ex.cmp_cause(ByteStream::EndOfFile))
        {
           if (chunks_number < 0)
              chunks_number=(recover_errors>SKIP_CHUNKS)?chunks:last_chunk;
@@ -2023,7 +2024,7 @@ DjVuFile::add_djvu_data(IFFByteStream & ostr, GMap<GURL, void *> & map,
     }
     G_CATCH(ex)
     {
-      if(GString::messagecmp(ex.get_cause(),ByteStream::EndOfFile))
+      if(!ex.cmp_cause(ByteStream::EndOfFile))
       {
         if (chunks_number < 0)
           chunks_number=(recover_errors>SKIP_CHUNKS)?chunks:last_chunk;

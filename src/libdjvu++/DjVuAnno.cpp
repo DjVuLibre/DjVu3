@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuAnno.cpp,v 1.80 2001-04-17 22:20:14 bcr Exp $
+// $Id: DjVuAnno.cpp,v 1.81 2001-04-20 22:40:33 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -346,7 +346,7 @@ GLParser::skip_white_space(const char * & start)
 {
    while(*start && isspace(*start)) start++;
    if (!*start) 
-       G_THROW( ERR_MSG("EOF") );
+       G_THROW( ByteStream::EndOfFile );
 }
 
 GLToken
@@ -376,7 +376,8 @@ GLParser::get_token(const char * & start)
        while(1)
 	 {
            char ch=*start++;
-           if (!ch) G_THROW( ERR_MSG("EOF") );
+           if (!ch)
+             G_THROW( ByteStream::EndOfFile );
            if (ch=='"')
              {
 	       if (str.length()>0 && str[(int)str.length()-1]=='\\')
@@ -392,7 +393,8 @@ GLParser::get_token(const char * & start)
        while(1)
 	 {
            char ch=*start++;
-           if (!ch) G_THROW( ERR_MSG("EOF") );
+           if (!ch)
+             G_THROW( ByteStream::EndOfFile );
            if (ch==')') { start--; break; }
            if (isspace(ch)) break;
            str+=ch;
@@ -456,8 +458,7 @@ GLParser::parse(const char * cur_name, GPList<GLObject> & list,
       } 
       G_CATCH(exc)
       {
-//        if (strcmp(exc.get_cause(), "EOF"))
-         if (GUTF8String("EOF") != exc.get_cause())
+        if (exc.cmp_cause(ByteStream::EndOfFile))
           G_RETHROW;
       } 
       G_ENDCATCH;
@@ -481,8 +482,7 @@ GLParser::parse(const char * str)
       parse("toplevel", list, str);
    } G_CATCH(exc)
    {
-//      if (strcmp(exc.get_cause(), "EOF"))
-      if (GUTF8String("EOF") != exc.get_cause())
+      if (exc.cmp_cause(ByteStream::EndOfFile))
         G_RETHROW;
    } G_ENDCATCH;
 }

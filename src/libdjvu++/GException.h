@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GException.h,v 1.28 2001-04-20 17:53:19 bcr Exp $
+// $Id: GException.h,v 1.29 2001-04-20 22:40:33 bcr Exp $
 // $Name:  $
 
 #ifndef _GEXCEPTION_H_
@@ -92,7 +92,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@geocities.com> -- fixed message memory allocation.
     @version 
-    #$Id: GException.h,v 1.28 2001-04-20 17:53:19 bcr Exp $# */
+    #$Id: GException.h,v 1.29 2001-04-20 22:40:33 bcr Exp $# */
 //@{
 
 #include "DjVuGlobal.h"
@@ -138,10 +138,18 @@ public:
       when reaching an unexpected end-of-file condition and string
       #DataPool::Stop# is used when the user interrupts the execution. These
       strings can be tested by the exception handlers, with
-      GString::messagecmp(). Similar conventional strings may be defined
+      #cmp_cause#. Similar conventional strings may be defined
       in the future. They all will be small strings with only uppercase
       characters. */
   const char* get_cause(void) const;
+
+  /** Compares the cause with the specified string, ignoring anything after
+      the first tab. */
+  int cmp_cause(const char s2[]) const;
+
+  /** Compares the cause with the specified string, ignoring anything after
+      the first tab. */
+  static int cmp_cause(const char s1[],const char s2[]);
 
   /** Returns the function name from which the exception was thrown.
       A null pointer is returned if no function name is available. */
