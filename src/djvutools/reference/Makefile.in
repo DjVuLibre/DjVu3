@@ -3,7 +3,7 @@
 #C-              Unauthorized use prohibited.
 #C-
 #
-# $Id: Makefile.in,v 1.19 2001-09-04 23:01:51 docbill Exp $
+# $Id: Makefile.in,v 1.20 2001-09-26 15:35:28 leonb Exp $
 # $Name:  $
 
 %%%include <paths>
@@ -38,7 +38,8 @@ PROG= $(BINPATH)/djvudump $(BINPATH)/c44 $(BINPATH)/d44 $(BINPATH)/ddjvu\
 	$(BINPATH)/bzz $(BINPATH)/djthumb $(BINPATH)/djvmcvt\
 	$(BINPATH)/djvutxt $(BINPATH)/djvuanno $(BINPATH)/cjb2\
 	$(BINPATH)/cpaldjvu $(BINPATH)/csepdjvu $(BINPATH)/cdjvu\
-	$(BINPATH)/djvm $(BINPATH)/djvuxmlparser $(BINPATH)/djvu2xml\
+	$(BINPATH)/djvm $(BINPATH)/djvused\
+	$(BINPATH)/djvuxmlparser $(BINPATH)/djvu2xml\
 	$(BINPATH)/native2utf8 $(BINPATH)/xml2native $(BINPATH)/xml2utf8\
 	$(BINPATH)/xml2utf16
 
@@ -55,6 +56,7 @@ prog: $(PROG)
 # Rules for building support programs
 
 DJVMOBJS = djvm.o
+DJVUSEDOBJS = djvused.o
 DJVUXMLPARSEROBJS = djvuxmlparser.o
 DJVUTOXMLOBJS = djvutoxml.o
 DJVMCVTOBJS = djvmcvt.o
@@ -86,6 +88,10 @@ $(BINPATH)/djvmcvt: $(DJVMCVTOBJS) $(LIB)
 $(BINPATH)/djvm: $(DJVMOBJS) $(LIB)
 	if [ -n "$(RPO)" ] ; then $(RPO) $(DJVMOBJS) $(LIB) ; fi
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(DJVMOBJS) $(LIB) $(LIBS) $(LIBICONV_LINK)
+
+$(BINPATH)/djvused: $(DJVUSEDOBJS) $(LIB)
+	if [ -n "$(RPO)" ] ; then $(RPO) $(DJVUSEDOBJS) $(LIB) ; fi
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(DJVUSEDOBJS) $(LIB) $(LIBS) $(LIBICONV_LINK)
 
 $(BINPATH)/djvuxmlparser: $(DJVUXMLPARSEROBJS) $(LIB)
 	if [ -n "$(RPO)" ] ; then $(RPO) $(DJVUXMLPARSEROBJS) $(LIB) ; fi
