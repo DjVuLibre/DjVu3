@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.h,v 1.3 1999-05-25 21:26:36 leonb Exp $
+//C- $Id: DataPool.h,v 1.4 1999-06-04 16:04:05 leonb Exp $
  
 #ifndef _DATAPOOL_H
 #define _DATAPOOL_H
@@ -38,7 +38,7 @@
 
     @memo Thread safe data storage
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DataPool.h,v 1.3 1999-05-25 21:26:36 leonb Exp $#
+    @version #$Id: DataPool.h,v 1.4 1999-06-04 16:04:05 leonb Exp $#
 */
 
 //@{
@@ -280,7 +280,7 @@ public:
 	  it's IFF data. If this attempt does not succeed, -1 is returned */
    long			get_length(void) const;
 
-      /** Provides random access to the data range from the pool
+      /** Provides random access to the data range from the pool.
 
 	  @param buffer Where to put data
 	  @param offset Offset from the data range's start to get data from

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuAnno.h,v 1.2 1999-05-25 19:42:27 eaf Exp $
+//C- $Id: DjVuAnno.h,v 1.3 1999-06-04 16:04:05 leonb Exp $
 
 #ifndef _DJVUANNO_H
 #define _DJVUANNO_H
@@ -36,9 +36,9 @@
     requests.
 
     @memo Implements support for DjVuImage annotations
-    @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
+    @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: DjVuAnno.h,v 1.2 1999-05-25 19:42:27 eaf Exp $# */
+    #$Id: DjVuAnno.h,v 1.3 1999-06-04 16:04:05 leonb Exp $# */
 //@{
 
 

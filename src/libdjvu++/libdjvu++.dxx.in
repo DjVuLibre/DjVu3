@@ -548,7 +548,7 @@
     structure, pointer to which is available from DjVu image.
 
     #ANTa# chunks contain uncompressed ASCII data. We may add a compressed
-    analogue of #ANTa# called #ANTz" later.
+    analogue of #ANTa# called #ANTz# later.
     */
 
 /** @name Multipage DjVu documents
