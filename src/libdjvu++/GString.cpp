@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: GString.cpp,v 1.31 2000-12-06 21:21:05 bcr Exp $
+// $Id: GString.cpp,v 1.32 2000-12-06 23:14:09 fcrary Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -68,7 +68,6 @@ GString::GString(const char dat)
 {
   GStringRep *rep = GStringRep::xnew(1);
   rep->data[0] = dat;
-  rep->data[1] = '\0';
   (*this) = rep;
 }
 
@@ -196,7 +195,7 @@ GString::downcase( void ) const
 //      '&'  -->  "&amp;"
 //      '\'' -->  "&apos;"
 //      '\"' -->  "&quot;"
-//  Also escapes characters 0x00 through 0x1f should they appear.
+//  Also escapes characters 0x00 through 0x7e and 0x80 through 0xff.
 GString
 GString::toEscaped( void ) const
 {
@@ -225,13 +224,14 @@ GString::toEscaped( void ) const
       ss="&quot;";
       break;
     default:
-      if((signed char)(*s) < ' ')
+      if( ( (signed char)(*s) < ' ' ) || ( *s > 126 ) )
       {
         special.format("&#%d;",(unsigned char)*s);
         ss=special;
       }
       break;
     }
+
     if(ss)
     {
       if(s!=start)
@@ -251,6 +251,7 @@ GString::toEscaped( void ) const
   DEBUG_MSG( "Escaped string is '" << ret << "'\n" );
   return ret;
 }
+
 
 static inline const GMap<GString,GString> &
 BasicMap( void )
