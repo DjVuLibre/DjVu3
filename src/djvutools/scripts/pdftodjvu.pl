@@ -32,7 +32,7 @@
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #C- 
 #
-# $Id: pdftodjvu.pl,v 1.1 2001-03-09 14:55:31 debs Exp $
+# $Id: pdftodjvu.pl,v 1.2 2001-03-22 22:19:25 debs Exp $
 # $Name:  $
 
 # Perl libs to use
@@ -264,7 +264,7 @@ if ( $free ) {
   $args="'-dpi $rdpi' $args";
   $djvucommand="$electroniccommand";
 } else {
-  $args="--dpi=$rdpi $profile --page-range=1 $args";
+  $args="--dpi=$rdpi $profile $args";
   $rc=system "$documentcommand -help > tmp.txt 2>&1";
   if ( -f 'tmp.txt' ) { unlink 'tmp.txt'; }
   if ( $rc eq 0 ) {
