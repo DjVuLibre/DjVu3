@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: DjVuFile.cpp,v 1.136 2000-12-07 03:11:55 bcr Exp $
+// $Id: DjVuFile.cpp,v 1.137 2000-12-14 17:28:02 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -139,8 +139,8 @@ DjVuFile::init(ByteStream & str)
   data_pool=new DataPool(str);
   
   // Construct some dummy URL
-  char buffer[1024];
-  sprintf(buffer, "djvufile:/%p.djvu", this);
+  GString buffer;
+  buffer.format("djvufile:/%p.djvu", this);
   url=buffer;
   
   // Set it here because trigger will call other DjVuFile's functions
@@ -522,12 +522,6 @@ DjVuFile::process_incl_chunk(ByteStream & str, int file_num)
     G_ENDCATCH;
     if (!file)
     {
-    /*  Original preserved in case I screwed it up
-    const char mesg[]="Internal error: id_to_file(%1.1023s) did not create any file.";
-    char buf[1024+sizeof(mesg)];
-    sprintf(buf,mesg,(const char *)incl_str);
-    G_THROW(buf);
-      */
       G_THROW("DjVuFile.no_create\t"+incl_str);
     }
     if (recover_errors!=ABORT)
