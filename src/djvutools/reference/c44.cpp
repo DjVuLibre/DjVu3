@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: c44.cpp,v 1.25 2001-06-14 00:22:59 fcrary Exp $
+// $Id: c44.cpp,v 1.26 2001-06-26 21:36:10 bcr Exp $
 // $Name:  $
 
 
@@ -184,7 +184,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: c44.cpp,v 1.25 2001-06-14 00:22:59 fcrary Exp $# */
+    #$Id: c44.cpp,v 1.26 2001-06-26 21:36:10 bcr Exp $# */
 //@{
 //@}
 
@@ -297,21 +297,21 @@ parse_bpp(const char *q)
       char *ptr; 
       double x = strtod(q, &ptr);
       if (ptr == q)
-        G_THROW("c44: illegal bitrate specification (number expected)");
+        G_THROW( ERR_MSG("c44.bitrate_not_number") );
       if (lastx>0 && q[-1]=='+')
         x += lastx;
       if (x<=0 || x>24 || x<lastx)
-        G_THROW("c44: illegal bitrate specification (number out of range)");
+        G_THROW( ERR_MSG("c44.bitrate_out_of_range") );
       lastx = x;
       if (*ptr && *ptr!='+' && *ptr!=',')
-        G_THROW("c44: illegal bitrate specification (comma expected)");        
+        G_THROW( ERR_MSG("c44.bitrate_comma_expected") );
       q = (*ptr ? ptr+1 : ptr);
       argv_bpp[argc_bpp++] = (float)x;
       if (argc_bpp>MAXCHUNKS)
-        G_THROW("c44: illegal bitrate specification (too many chunks)");                
+        G_THROW( ERR_MSG("c44.bitrate_too_many") );
     }
   if (argc_bpp < 1)
-    G_THROW("c44: illegal bitrate specification (no chunks)");                    
+    G_THROW( ERR_MSG("c44.bitrate_no_chunks") );
 }
 
 
@@ -326,21 +326,21 @@ parse_size(const char *q)
       char *ptr; 
       int x = strtol(q, &ptr, 10);
       if (ptr == q)
-        G_THROW("c44: illegal size specification (number expected)");
+        G_THROW( ERR_MSG("c44.size_not_number") );
       if (lastx>0 && q[-1]=='+')
         x += lastx;
       if (x<lastx)
-        G_THROW("c44: illegal size specification (number out of range)");
+        G_THROW( ERR_MSG("c44.size_out_of_range") );
       lastx = x;
       if (*ptr && *ptr!='+' && *ptr!=',')
-        G_THROW("c44: illegal size specification (comma expected)");        
+        G_THROW( ERR_MSG("c44.size_comma_expected") );
       q = (*ptr ? ptr+1 : ptr);
       argv_size[argc_size++] = x;
       if (argc_size>=MAXCHUNKS)
-        G_THROW("c44: illegal size specification (too many chunks)");                
+        G_THROW( ERR_MSG("c44.size_too_many") );
     }
   if (argc_size < 1)
-    G_THROW("c44: illegal size specification (no chunks)");                    
+    G_THROW( ERR_MSG("c44.size_no_chunks") );
 }
 
 void 
@@ -354,21 +354,21 @@ parse_slice(const char *q)
       char *ptr; 
       int x = strtol(q, &ptr, 10);
       if (ptr == q)
-        G_THROW("c44: illegal slice specification (number expected)");
+        G_THROW( ERR_MSG("c44.slice_not_number") );
       if (lastx>0 && q[-1]=='+')
         x += lastx;
       if (x<1 || x>1000 || x<lastx)
-        G_THROW("c44: illegal slice specification (number out of range)");
+        G_THROW( ERR_MSG("c44.slice_out_of_range") );
       lastx = x;
       if (*ptr && *ptr!='+' && *ptr!=',')
-        G_THROW("c44: illegal slice specification (comma expected)");        
+        G_THROW( ERR_MSG("c44.slice_comma_expected") );
       q = (*ptr ? ptr+1 : ptr);
       argv_slice[argc_slice++] = x;
       if (argc_slice>=MAXCHUNKS)
-        G_THROW("c44: illegal slice specification (too many chunks)");                
+        G_THROW( ERR_MSG("c44.slice_too_many") );
     }
   if (argc_slice < 1)
-    G_THROW("c44: illegal slice specification (no chunks)");                    
+    G_THROW( ERR_MSG("c44.slice_no_chunks") );
 }
 
 
@@ -383,21 +383,21 @@ parse_decibel(const char *q)
       char *ptr; 
       double x = strtod(q, &ptr);
       if (ptr == q)
-        G_THROW("c44: illegal decibel specification (number expected)");
+        G_THROW( ERR_MSG("c44.decibel_not_number") );
       if (lastx>0 && q[-1]=='+')
         x += lastx;
       if (x<16 || x>50 || x<lastx)
-        G_THROW("c44: illegal decibel specification (number out of range)");
+        G_THROW( ERR_MSG("c44.decibel_out_of_range") );
       lastx = x;
       if (*ptr && *ptr!='+' && *ptr!=',')
-        G_THROW("c44: illegal decibel specification (comma or plus expected)");        
+        G_THROW( ERR_MSG("c44.decibel_comma_expected") );
       q = (*ptr ? ptr+1 : ptr);
       argv_decibel[argc_decibel++] = (float)x;
       if (argc_decibel>=MAXCHUNKS)
-        G_THROW("c44: illegal decibel specification (too many chunks)");                
+        G_THROW( ERR_MSG("c44.decibel_too_many") );
     }
   if (argc_decibel < 1)
-    G_THROW("c44: illegal decibel specification (no chunks)");                    
+    G_THROW( ERR_MSG("c44.decibel_no_chunks") );
 }
 
 
@@ -408,7 +408,7 @@ resolve_quality(int npix)
   if (flag_bpp)
     {
       if (flag_size)
-        G_THROW("Options -size and -bpp are exclusive");
+        G_THROW( ERR_MSG("c44.exclusive") );
       flag_size = flag_bpp;
       argc_size = argc_bpp;
       for (int i=0; i<argc_bpp; i++)
@@ -471,114 +471,114 @@ parse(DArray<GUTF8String> &argv)
           if (argv[i] == "-bpp")
             {
               if (++i >= argc)
-                G_THROW("c44: no argument for option '-bpp'");
+                G_THROW( ERR_MSG("c44.no_bpp_arg") );
               if (flag_bpp || flag_size)
-                G_THROW("c44: multiple bitrate specification");
+                G_THROW( ERR_MSG("c44.multiple_bitrate") );
               parse_bpp(argv[i]);
             }
           else if (argv[i] == "-size")
             {
               if (++i >= argc)
-                G_THROW("c44: no argument for option '-size'");
+                G_THROW( ERR_MSG("c44.no_size_arg") );
               if (flag_bpp || flag_size)
-                G_THROW("c44: multiple bitrate specification");
+                G_THROW( ERR_MSG("c44.multiple_size") );
               parse_size(argv[i]);
             }
           else if (argv[i] == "-decibel")
             {
               if (++i >= argc)
-                G_THROW("c44: no argument for option '-decibel'");
+                G_THROW( ERR_MSG("c44.no_decibel_arg") );
               if (flag_decibel)
-                G_THROW("c44: multiple decibel specification");
+                G_THROW( ERR_MSG("c44.multiple_decibel") );
               parse_decibel(argv[i]);
             }
           else if (argv[i] == "-slice")
             {
               if (++i >= argc)
-                G_THROW("c44: no argument for option '-slice'");
+                G_THROW( ERR_MSG("c44.no_slice_arg") );
               if (flag_slice)
-                G_THROW("c44: multiple slice specification");
+                G_THROW( ERR_MSG("c44.multiple_slice") );
               parse_slice(argv[i]);
             }
           else if (argv[i] == "-mask")
             {
               if (++i >= argc)
-                G_THROW("c44: no argument for option '-mask'");
+                G_THROW( ERR_MSG("c44.no_mask_arg") );
               if (! mskurl.is_empty())
-                G_THROW("c44: multiple mask specification");
+                G_THROW( ERR_MSG("c44.multiple_mask") );
               mskurl = GURL::Filename::UTF8(argv[i]);
             }
           else if (argv[i] == "-dbfrac")
             {
               if (++i >= argc)
-                G_THROW("c44: no argument for option '-dbfrac'");
+                G_THROW( ERR_MSG("c44.no_dbfrac_arg") );
               if (flag_dbfrac>0)
-                G_THROW("c44: multiple dbfrac specification");                
+                G_THROW( ERR_MSG("c44.multiple_dbfrac") );
               char *ptr;
               flag_dbfrac = strtod(argv[i], &ptr);
               if (flag_dbfrac<=0 || flag_dbfrac>1 || *ptr)
-                G_THROW("c44: illegal dbfrac specification");
+                G_THROW( ERR_MSG("c44.illegal_dbfrac") );
             }
           else if (argv[i] == "-crcbnone")
             {
               if (flag_crcbmode>=0 || flag_crcbdelay>=0)
-                G_THROW("c44: incompatible chrominance options");
+                G_THROW( ERR_MSG("c44.incompatable_chrominance") );
               flag_crcbdelay = flag_crcbmode = 0;
               arg_crcbmode = IW44Image::CRCBnone;
             }
           else if (argv[i] == "-crcbhalf")
             {
               if (flag_crcbmode>=0)
-                G_THROW("c44: incompatible chrominance options");
+                G_THROW( ERR_MSG("c44.incompatable_chrominance") );
               flag_crcbmode = 0;
               arg_crcbmode = IW44Image::CRCBhalf;
             }
           else if (argv[i] == "-crcbnormal")
             {
               if (flag_crcbmode>=0)
-                G_THROW("c44: incompatible chrominance options");
+                G_THROW( ERR_MSG("c44.incompatable_chrominance") );
               flag_crcbmode = 0;
               arg_crcbmode = IW44Image::CRCBnormal;
             }
           else if (argv[i] == "-crcbfull")
             {
               if (flag_crcbmode>=0 || flag_crcbdelay>=0)
-                G_THROW("c44: incompatible chrominance options");
+                G_THROW( ERR_MSG("c44.incompatable_chrominance") );
               flag_crcbdelay = flag_crcbmode = 0;
               arg_crcbmode = IW44Image::CRCBfull;
             }
           else if (argv[i] == "-crcbdelay")
             {
               if (++i >= argc)
-                G_THROW("c44: no argument for option '-crcbdelay'");
+                G_THROW( ERR_MSG("c44.no_crcbdelay_arg") );
               if (flag_crcbdelay>=0)
-                G_THROW("c44: incompatible chrominance options");
+                G_THROW( ERR_MSG("c44.incompatable_chrominance") );
               char *ptr; 
               flag_crcbdelay = strtol(argv[i], &ptr, 10);
               if (*ptr || flag_crcbdelay<0 || flag_crcbdelay>=100)
-                G_THROW("c44: illegal argument for option '-crcbdelay'");
+                G_THROW( ERR_MSG("c44.illegal_crcbdelay") );
             }
           else if (argv[i] == "-dpi")
             {
               if (++i >= argc)
-                G_THROW("c44: no argument for option '-dpi'");
+                G_THROW( ERR_MSG("c44.no_dpi_arg") );
               if (flag_dpi>0)
-                G_THROW("c44: duplicate dpi option");
+                G_THROW( ERR_MSG("c44.duplicate_dpi") );
               char *ptr; 
               flag_dpi = strtol(argv[i], &ptr, 10);
               if (*ptr || flag_dpi<25 || flag_dpi>4800)
-                G_THROW("c44: illegal argument for option '-dpi'");
+                G_THROW( ERR_MSG("c44.illegal_dpi") );
             }
           else if (argv[i] == "-gamma")
             {
               if (++i >= argc)
-                G_THROW("c44: no argument for option '-gamma'");
+                G_THROW( ERR_MSG("c44.no_gamma_arg") );
               if (flag_gamma > 0)
-                G_THROW("c44: duplicate gamma option");
+                G_THROW( ERR_MSG("c44.duplicate_gamma") );
               char *ptr; 
               flag_gamma = strtod(argv[i], &ptr);
               if (*ptr || flag_gamma<=0.25 || flag_gamma>=5)
-                G_THROW("c44: illegal gamma specification");
+                G_THROW( ERR_MSG("c44.illegal_gamma") );
             }
           else
             usage();
@@ -616,7 +616,7 @@ getmask(int w, int h)
       msk8 = GBitmap::create(*mbs);
       if (msk8->columns() != (unsigned int)w || 
           msk8->rows()    != (unsigned int)h  )
-        G_THROW("c44: mask and image have different size");
+        G_THROW( ERR_MSG("c44.different_size") );
     }
   return msk8;
 }
@@ -668,7 +668,7 @@ main(int argc, char **argv)
       ByteStream &ibs=*gibs;
       char prefix[16];
       if (ibs.readall((void*)prefix, sizeof(prefix)) != sizeof(prefix))
-        G_THROW("c44: cannot read pnm file header");
+        G_THROW( ERR_MSG("c44.failed_pnm_header") );
       // Load images
       int w = 0;
       int h = 0;
@@ -707,17 +707,17 @@ main(int argc, char **argv)
               h = iw->get_height();
             }
           else
-            G_THROW("Unrecognized file");
+            G_THROW( ERR_MSG("c44.unrecognized") );
           // Check that no mask has been specified.
           if (! mskurl.is_empty())
-            G_THROW("Cannot apply mask on an already compressed image");
+            G_THROW( ERR_MSG("c44.failed_mask") );
         }
       else
         {
-          G_THROW("Unrecognized file");
+          G_THROW( ERR_MSG("c44.unrecognized") );
         }
       // Call destructor on input file
-      ibs.ByteStream::~ByteStream();
+      gibs=0;
               
       // Perform compression PM44 or BM44 as required
       if (iw)
@@ -739,7 +739,7 @@ main(int argc, char **argv)
     }
   G_CATCH(ex)
     {
-      ex.perror("Exception while executing C44");
+      ex.perror( ERR_MSG("Error") );
       exit(1);
     }
   G_ENDCATCH;
