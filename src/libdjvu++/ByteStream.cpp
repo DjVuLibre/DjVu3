@@ -7,9 +7,9 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: ByteStream.cpp,v 1.2 1999-02-01 18:32:31 leonb Exp $
+//C-  $Id: ByteStream.cpp,v 1.3 1999-02-03 23:07:25 leonb Exp $
 
-// File "$Id: ByteStream.cpp,v 1.2 1999-02-01 18:32:31 leonb Exp $"
+// File "$Id: ByteStream.cpp,v 1.3 1999-02-03 23:07:25 leonb Exp $"
 // - Author: Leon Bottou, 04/1997
 
 #ifdef __GNUC__
@@ -227,7 +227,7 @@ StdioByteStream::StdioByteStream(const char *filename, const char *mode)
       if (!fp)
       {
 	 char buffer[4096];
-	 sprintf(buffer, "Failed to open file '%s':\n%s",
+	 sprintf(buffer, "Cannot open '%s': %s",
 		 filename, strerror(errno));
 	 THROW(buffer);
       };
