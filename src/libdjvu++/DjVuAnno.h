@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuAnno.h,v 1.25 2000-02-27 23:19:49 eaf Exp $
+//C- $Id: DjVuAnno.h,v 1.26 2000-05-19 19:00:06 bcr Exp $
 
 #ifndef _DJVUANNO_H
 #define _DJVUANNO_H
@@ -36,7 +36,7 @@
     @memo Implements support for DjVuImage annotations
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: DjVuAnno.h,v 1.25 2000-02-27 23:19:49 eaf Exp $# */
+    #$Id: DjVuAnno.h,v 1.26 2000-05-19 19:00:06 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -297,6 +297,9 @@ public:
    void	encode(ByteStream & bs);
       /// Returns a copy of this object
    GP<DjVuAnno>	copy(void) const;
+      /** Merged the contents of this class and of annotations
+	  pointed by #anno# pointer */
+   void		merge(const GP<DjVuAnno> & anno);
       /** Returns the number of bytes needed by this data structure. It's
 	  used by caching routines to estimate the size of a \Ref{DjVuImage}. */
    unsigned int get_memory_usage() const;

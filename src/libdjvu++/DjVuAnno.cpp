@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: DjVuAnno.cpp,v 1.47 2000-05-01 16:15:20 bcr Exp $
+//C- $Id: DjVuAnno.cpp,v 1.48 2000-05-19 19:00:06 bcr Exp $
 
 
 #ifdef __GNUC__
@@ -88,7 +88,7 @@ class GLParser
 public:
    void		parse(const char * str);
    GPList<GLObject>	& get_list(void);
-   GP<GLObject>		get_object(const char * name);
+   GP<GLObject>		get_object(const char * name, bool last=true);
    void		print(ByteStream & str, int compact=1);
 
    GLParser(void);
@@ -454,15 +454,20 @@ GLParser::print(ByteStream & str, int compact)
 }
 
 GP<GLObject>
-GLParser::get_object(const char * name)
+GLParser::get_object(const char * name, bool last)
 {
+   GP<GLObject> object;
    for(GPosition pos=list;pos;++pos)
    {
       GP<GLObject> obj=list[pos];
       if (obj->get_type()==GLObject::LIST &&
-	  obj->get_name()==name) return obj;
+	  obj->get_name()==name)
+      {
+	 object=obj;
+	 if (!last) break;
+      }
    }
-   return 0;
+   return object;
 }
 
 //***************************************************************************
@@ -638,25 +643,12 @@ DjVuANT::get_zoom(GLParser & parser)
 	 GString zoom=(*obj)[0]->get_symbol();
 	 DEBUG_MSG("zoom='" << zoom << "'\n");
 
-	 if (zoom=="stretch") 
-         {
-           return ZOOM_STRETCH;
-	 }else if (zoom=="one2one")
-         {
-           return ZOOM_ONE2ONE;
-	 }else if (zoom=="width")
-         {
-           return ZOOM_WIDTH;
-	 }else if (zoom=="page")
-         {
-           return ZOOM_PAGE;
-         }else if (zoom[0]!='d')
-         {
-           THROW("Illegal zoom specification");
-	 }else 
-         {
-           return atoi((const char *) zoom+1);
-         }
+	 if (zoom=="stretch") return ZOOM_STRETCH;
+	 else if (zoom=="one2one") return ZOOM_ONE2ONE;
+	 else if (zoom=="width") return ZOOM_WIDTH;
+	 else if (zoom=="page") return ZOOM_PAGE;
+	 else if (zoom[0]!='d') THROW("Illegal zoom specification");
+	 else return atoi((const char *) zoom+1);
       } else { DEBUG_MSG("can't find any.\n"); }
    } CATCH(exc) {} ENDCATCH;
    DEBUG_MSG("resetting zoom to 0 (UNSPEC)\n");
@@ -1499,6 +1491,19 @@ DjVuAnno::copy(void) const
    if (ant) anno->ant = ant->copy();
    if (txt) anno->txt = txt->copy();
    return anno;
+}
+
+void
+DjVuAnno::merge(const GP<DjVuAnno> & anno)
+{
+   if (anno)
+   {
+      MemoryByteStream str;
+      encode(str);
+      anno->encode(str);
+      str.seek(0);
+      decode(str);
+   }
 }
 
 unsigned int 

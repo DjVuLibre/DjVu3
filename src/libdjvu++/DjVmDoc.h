@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVmDoc.h,v 1.12 2000-02-27 23:19:49 eaf Exp $
+//C- $Id: DjVmDoc.h,v 1.13 2000-05-19 19:00:06 bcr Exp $
  
 #ifndef _DJVMDOC_H
 #define _DJVMDOC_H
@@ -32,7 +32,7 @@
 
     @memo DjVu multipage documents reader/writer.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: DjVmDoc.h,v 1.12 2000-02-27 23:19:49 eaf Exp $#
+    @version #$Id: DjVmDoc.h,v 1.13 2000-05-19 19:00:06 bcr Exp $#
 */
 
 //@{
@@ -87,7 +87,8 @@ public:
 	  data #data# at position #pos#. If #pos# is negative, the file
           will be appended to the document. Otherwise it will be inserted
           at position #pos#. */
-   void		insert_file(DjVmDir::File * f, GP<DataPool> data, int pos=-1);
+   void		insert_file(const GP<DjVmDir::File> & f,
+			    GP<DataPool> data, int pos=-1);
 
       /** Removes file with the specified #id# from the document. Every
 	  file inside a new DjVu multipage document has its unique ID

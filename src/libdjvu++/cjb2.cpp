@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: cjb2.cpp,v 1.11 2000-05-01 16:15:23 bcr Exp $
+//C- $Id: cjb2.cpp,v 1.12 2000-05-19 19:00:06 bcr Exp $
 
 /** @name cjb2
 
@@ -49,7 +49,7 @@
     Paul Howard <pgh@research.att.com>\\
     Pascal Vincent <vincentp@iro.umontreal.ca>
     @version
-    #$Id: cjb2.cpp,v 1.11 2000-05-01 16:15:23 bcr Exp $# */
+    #$Id: cjb2.cpp,v 1.12 2000-05-19 19:00:06 bcr Exp $# */
 //@{
 //@}
 

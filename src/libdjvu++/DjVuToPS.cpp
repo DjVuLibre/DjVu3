@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: DjVuToPS.cpp,v 1.11 2000-05-01 16:15:21 bcr Exp $
+//C- $Id: DjVuToPS.cpp,v 1.12 2000-05-19 19:00:06 bcr Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -92,7 +92,7 @@ DjVuToPS::Options::set_mode(Mode _mode)
 void
 DjVuToPS::Options::set_zoom(Zoom _zoom)
 {
-   if (_zoom!=FIT_PAGE && _zoom!=ONE_TO_ONE)
+   if (_zoom!=FIT_PAGE && !(_zoom>=5 && _zoom<=999))
       THROW("Invalid zoom factor passed to printing code.");
    
    zoom=_zoom;
@@ -569,8 +569,9 @@ DjVuToPS::store_page_setup(ByteStream & str, int page_num,
       write(str, "\
 %% Coordinate system positioning\n\
 \n\
-/portrait %s def\n\
-/one-to-one %s def\n\
+/portrait %s def	%% Specifies image orientation\n\
+/fit-page %s def	%% If true, the image will be scaled to fit the page\n\
+/zoom %d def		%% Zoom factor in percents used to pre-scale image\n\
 /image-dpi %d def\n\
 clippath pathbbox\n\
 2 index sub exch\n\
@@ -585,7 +586,8 @@ clippath pathbbox\n\
 /image-width  %d def\n\
 /image-height %d def\n\n",
 	    options.get_orientation()==Options::PORTRAIT ? "true" : "false",
-	    options.get_zoom()==Options::ONE_TO_ONE ? "true" : "false",
+	    options.get_zoom()==Options::FIT_PAGE ? "true" : "false",
+	    options.get_zoom(),
 	    dpi, 0/*grect.xmin*/, 0/*grect.ymin*/,
 	    grect.width(), grect.height());
 
@@ -594,10 +596,7 @@ portrait\n\
 {\n\
     %% Portrait orientation\n\
     \n\
-    one-to-one\n\
-    {\n\
-       /coeff 72 image-dpi div def\n\
-    }\n\
+    fit-page\n\
     {\n\
        image-height page-height div\n\
        image-width page-width div\n\
@@ -608,6 +607,9 @@ portrait\n\
        {\n\
 	  page-width image-width div /coeff exch def\n\
        } ifelse\n\
+    }
+    {\n\
+       /coeff 72 image-dpi div zoom mul 100 div def\n\
     } ifelse\n\
     /start-x page-x page-width image-width coeff mul sub 2 div add def\n\
     /start-y page-y page-height add page-height image-height coeff mul sub 2 div sub def\n\
@@ -621,10 +623,7 @@ portrait\n\
 {\n\
     %% Landscape orientation\n\
     \n\
-    one-to-one\n\
-    {\n\
-       /coeff 72 image-dpi div def\n\
-    }\n\
+    fit-page\n\
     {\n\
        image-height page-width div\n\
        image-width page-height div\n\
@@ -635,6 +634,9 @@ portrait\n\
        {\n\
 	  page-height image-width div /coeff exch def\n\
        } ifelse\n\
+    }\n\
+    {\n\
+       /coeff 72 image-dpi div zoom mul 100 div def\n\
     } ifelse\n\
     /start-x page-x page-width add page-width image-height coeff mul sub 2 div sub def\n\
     /start-y page-y page-height add page-height image-width coeff mul sub 2 div sub def\n\

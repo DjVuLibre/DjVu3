@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.h,v 1.57 2000-04-22 00:09:12 bcr Exp $
+//C- $Id: DjVuFile.h,v 1.58 2000-05-19 19:00:06 bcr Exp $
  
 #ifndef _DJVUFILE_H
 #define _DJVUFILE_H
@@ -46,7 +46,7 @@
 
     @memo Classes representing DjVu files.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuFile.h,v 1.57 2000-04-22 00:09:12 bcr Exp $#
+    @version #$Id: DjVuFile.h,v 1.58 2000-05-19 19:00:06 bcr Exp $#
 */
 
 //@{

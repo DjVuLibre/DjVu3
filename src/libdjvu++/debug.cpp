@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: debug.cpp,v 1.8 2000-05-01 16:15:23 bcr Exp $
+//C-  $Id: debug.cpp,v 1.9 2000-05-19 19:00:06 bcr Exp $
 
 #include "debug.h"
 
@@ -57,12 +57,7 @@ Debug::Debug()
   : block(0), indent(0)
 {
   id = debug_id++;
-#ifdef UNIX
-  GCriticalSectionLock glock(&debug_lock);
-  if (! debug_file)
-    set_debug_file("/dev/tty");
-  debug_file_count++;
-#endif
+  set_debug_file(stderr);
 }
 
 Debug::~Debug()
@@ -115,6 +110,15 @@ Debug::set_debug_file(const char *fname)
     debug_file = fopen(fname, "w");
   if (! debug_file)
     debug_file = stderr;
+}
+
+void
+Debug::set_debug_file(FILE * file)
+{
+  GCriticalSectionLock glock(&debug_lock);
+  if (debug_file && (debug_file != stderr))
+    fclose(debug_file);
+  debug_file = file;
 }
 
 void

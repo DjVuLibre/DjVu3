@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.122 2000-05-01 16:15:21 bcr Exp $
+//C- $Id: DjVuFile.cpp,v 1.123 2000-05-19 19:00:06 bcr Exp $
 
 #ifdef __GNUC__
 #pragma implementation

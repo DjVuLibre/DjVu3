@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: DjVmDoc.cpp,v 1.24 2000-05-01 16:15:20 bcr Exp $
+//C- $Id: DjVmDoc.cpp,v 1.25 2000-05-19 19:00:06 bcr Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -31,7 +31,8 @@ DjVmDoc::DjVmDoc(void)
 }
 
 void
-DjVmDoc::insert_file(DjVmDir::File * f, GP<DataPool> data_pool, int pos)
+DjVmDoc::insert_file(const GP<DjVmDir::File> & f,
+		     GP<DataPool> data_pool, int pos)
 {
    DEBUG_MSG("DjVmDoc::insert_file(): inserting file '" << f->id <<
 	     "' at pos " << pos << "\n");
@@ -57,7 +58,7 @@ DjVmDoc::insert_file(ByteStream &data, DjVmDir::File::FILE_TYPE file_type,
                      const char *name, const char *id, 
                      const char *title, int pos)
 {
-   DjVmDir::File *file = new DjVmDir::File(name, id, title, file_type);
+   GP<DjVmDir::File> file=new DjVmDir::File(name, id, title, file_type);
    GP<DataPool> pool = new DataPool;
       // Cannot connect to a bytestream.
       // Must copy data into the datapool.

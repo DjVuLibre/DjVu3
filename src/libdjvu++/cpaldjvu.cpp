@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: cpaldjvu.cpp,v 1.8 2000-05-01 16:15:23 bcr Exp $
+//C- $Id: cpaldjvu.cpp,v 1.9 2000-05-19 19:00:06 bcr Exp $
 
 
 /** @name cpaldjvu
@@ -49,7 +49,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: cpaldjvu.cpp,v 1.8 2000-05-01 16:15:23 bcr Exp $# */
+    #$Id: cpaldjvu.cpp,v 1.9 2000-05-19 19:00:06 bcr Exp $# */
 //@{
 //@}
 

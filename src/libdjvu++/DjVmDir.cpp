@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: DjVmDir.cpp,v 1.20 2000-05-01 16:15:20 bcr Exp $
+//C- $Id: DjVmDir.cpp,v 1.21 2000-05-19 19:00:05 bcr Exp $
 
 
 #ifdef __GNUC__
@@ -413,7 +413,7 @@ DjVmDir::get_shared_anno_file(void) const
 }
 
 void
-DjVmDir::insert_file(File * file, int pos_num)
+DjVmDir::insert_file(const GP<File> & file, int pos_num)
 {
    DEBUG_MSG("DjVmDir::insert_file(): name='" << file->name << "', pos=" << pos_num << "\n");
    DEBUG_MAKE_INDENT(3);

@@ -7,16 +7,17 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: debug.h,v 1.7 2000-02-27 23:19:50 eaf Exp $
+//C-  $Id: debug.h,v 1.8 2000-05-19 19:00:06 bcr Exp $
 
 
-#ifndef _TEMPLATE_H_
-#define _TEMPLATE_H_
+#ifndef _DEBUG_H_
+#define _DEBUG_H_
 
 #ifdef __GNUC__
 #pragma interface
 #endif
 
+#include <stdio.h>
 
 /** @name debug.h
 
@@ -65,7 +66,7 @@
     @memo 
     Macros for printing debug messages.
     @version 
-    #$Id: debug.h,v 1.7 2000-02-27 23:19:50 eaf Exp $#
+    #$Id: debug.h,v 1.8 2000-05-19 19:00:06 bcr Exp $#
     @author
     Andrew Erofeev <eaf@geocities.com> -- initial implementation \\
     Leon Bottou <leonb@research.att.com> -- cleanups */
@@ -109,6 +110,7 @@ public:
   // access
   static void   set_debug_level(int lvl);
   static void   set_debug_file(const char *fname);
+  static void	set_debug_file(FILE * file);
   void          modify_indent(int rindent);
   static Debug& lock(int lvl, int noindent);
   void          unlock();

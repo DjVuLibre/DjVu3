@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVmDir.h,v 1.21 2000-04-22 00:09:12 bcr Exp $
+//C- $Id: DjVmDir.h,v 1.22 2000-05-19 19:00:05 bcr Exp $
 
 #ifndef _DJVMDIR_H
 #define _DJVMDIR_H
@@ -62,7 +62,7 @@
     @memo Implements DjVu multipage document directory
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: DjVmDir.h,v 1.21 2000-04-22 00:09:12 bcr Exp $# */
+    #$Id: DjVmDir.h,v 1.22 2000-05-19 19:00:05 bcr Exp $# */
 //@{
 
 
@@ -221,7 +221,7 @@ public:
    void set_file_name(const char * id, const char * name);
       /** Inserts the specified file record at the specified position.
 	  Specifying #pos# equal to #-1# means to append. */
-   void insert_file(File * file, int pos=-1);
+   void insert_file(const GP<File> & file, int pos=-1);
       /** Removes a file record with ID #id#. */
    void delete_file(const char * id);
 private:

@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: djvumake.cpp,v 1.19 2000-05-01 16:15:23 bcr Exp $
+//C- $Id: djvumake.cpp,v 1.20 2000-05-19 19:00:07 bcr Exp $
 
 /** @name djvumake
 
@@ -78,7 +78,7 @@
     @memo
     Assemble DjVu files.
     @version
-    #$Id: djvumake.cpp,v 1.19 2000-05-01 16:15:23 bcr Exp $#
+    #$Id: djvumake.cpp,v 1.20 2000-05-19 19:00:07 bcr Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> \\
     Patrick Haffner <haffner@research.att.com>

@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: DjVuDocEditor.cpp,v 1.32 2000-05-10 22:03:20 bcr Exp $
+//C- $Id: DjVuDocEditor.cpp,v 1.33 2000-05-19 19:00:06 bcr Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -34,6 +34,8 @@ DjVuDocEditor::check(void)
 DjVuDocEditor::DjVuDocEditor(void)
 {
    initialized=false;
+   refresh_cb=0;
+   refresh_cl_data=0;
 }
 
 DjVuDocEditor::~DjVuDocEditor(void)
@@ -57,9 +59,9 @@ DjVuDocEditor::init(void)
 
       // If you remove this check be sure to delete thumb_map
    if (initialized) THROW("DjVuDocEditor has already been initialized.");
-   
+
    doc_url=GOS::filename_to_url(GOS::expand_name("noname.djvu", GOS::cwd()));
-   
+
    DjVmDoc doc;
    MemoryByteStream str;
    doc.write(str);
@@ -68,7 +70,7 @@ DjVuDocEditor::init(void)
 
    orig_doc_type=UNKNOWN_TYPE;
    orig_doc_pages=0;
-   
+
    initialized=true;
 
    DjVuDocument::init(doc_url, this);
@@ -82,15 +84,15 @@ DjVuDocEditor::init(const char * fname)
 
       // If you remove this check be sure to delete thumb_map
    if (initialized) THROW("DjVuDocEditor has already been initialized.");
-   
+
       // First - create a temporary DjVuDocument and check its type
    doc_pool=new DataPool(fname);
    doc_url=GOS::filename_to_url(fname);
    GP<DjVuDocument> tmp_doc=new DjVuDocument();
    tmp_doc->init(doc_url, this);
    if (!tmp_doc->is_init_complete())
-      THROW(GString("Failed to open document '")+fname+"'\n");
-   
+      THROW(GString("Failed to open document '")+fname+"'");
+
    orig_doc_type=tmp_doc->get_doc_type();
    orig_doc_pages=tmp_doc->get_pages_num();
    if (orig_doc_type==OLD_BUNDLED ||
@@ -140,7 +142,7 @@ DjVuDocEditor::request_data(const DjVuPort * source, const GURL & url)
 {
    DEBUG_MSG("DjVuDocEditor::request_data(): url='" << url << "'\n");
    DEBUG_MAKE_INDENT(3);
-   
+
       // Check if we have either original data or converted (to new format),
       // if all the story is about the DjVuDocument's data
    if (url==doc_url) return doc_pool;
@@ -213,7 +215,7 @@ DjVuDocEditor::url_to_file(const GURL & url, bool dont_create)
 {
    DEBUG_MSG("DjVuDocEditor::url_to_file(): url='" << url << "'\n");
    DEBUG_MAKE_INDENT(3);
-   
+
       // Check if have a DjVuFile with this url cached (created before
       // and either still active or left because it has been modified)
    GP<DjVmDir::File> frec=djvm_dir->name_to_file(url.fname());
@@ -247,7 +249,7 @@ DjVuDocEditor::url_to_file(const GURL & url, bool dont_create)
 	 files_map[frec->id]=f;
       }
    }
-   
+
    return file;
 }
 
@@ -294,7 +296,7 @@ DjVuDocEditor::strip_incl_chunks(const GP<DataPool> & pool_in)
 {
    DEBUG_MSG("DjVuDocEditor::strip_incl_chunks() called\n");
    DEBUG_MAKE_INDENT(3);
-   
+
    GP<ByteStream> str_in=pool_in->get_stream();
    IFFByteStream iff_in(*str_in);
 
@@ -302,7 +304,7 @@ DjVuDocEditor::strip_incl_chunks(const GP<DataPool> & pool_in)
    IFFByteStream iff_out(str_out);
 
    bool have_incl=false;
-   
+
    int chksize;
    GString chkid;
    if (iff_in.get_chunk(chkid))
@@ -339,7 +341,7 @@ DjVuDocEditor::insert_file(const char * file_name, const char * parent_id,
    DEBUG_MSG("DjVuDocEditor::insert_file(): fname='" << file_name <<
 	     "', parent_id='" << parent_id << "'\n");
    DEBUG_MAKE_INDENT(3);
-   
+
    GP<DjVmDir> dir=get_djvm_dir();
 
       // Create DataPool and see if the file exists
@@ -347,7 +349,7 @@ DjVuDocEditor::insert_file(const char * file_name, const char * parent_id,
 
       // Strip any INCL chunks
    file_pool=strip_incl_chunks(file_pool);
-   
+
       // Check if parent ID is valid
    GP<DjVmDir::File> parent_frec=dir->id_to_file(parent_id);
    if (!parent_frec) parent_frec=dir->name_to_file(parent_id);
@@ -383,16 +385,6 @@ DjVuDocEditor::insert_file(const char * file_name, const char * parent_id,
 bool
 DjVuDocEditor::insert_file(const char * file_name, bool is_page,
 			   int & file_pos, GMap<GString, GString> & name2id)
-{
-  return insert_file_type(file_name,
-    is_page ? DjVmDir::File::PAGE : DjVmDir::File::INCLUDE,
-    file_pos, name2id);
-}
-
-bool
-DjVuDocEditor::insert_file_type(
-  const char * file_name, DjVmDir::File::FILE_TYPE page_type,
-			   int & file_pos, GMap<GString, GString> & name2id)
       // First it will insert the 'file_name' at position 'file_pos'.
       //
       // Then it will process all the INCL chunks in the file and try to do
@@ -413,11 +405,14 @@ DjVuDocEditor::insert_file_type(
 {
    GString errors;
 
+   if (refresh_cb)
+      refresh_cb(refresh_cl_data);
+
       // We do not want to insert the same file twice (important when
       // we insert a group of files at the same time using insert_group())
       // So we check if we already did that and return if so.
    if (name2id.contains(GOS::basename(file_name))) return true;
-   
+
    TRY {
       GP<DjVmDir> dir=get_djvm_dir();
 
@@ -445,7 +440,7 @@ DjVuDocEditor::insert_file_type(
 	    iff.close_chunk();
 	 }
       }
-      
+
 	 // Now get a unique name for this file.
 	 // Check the name2id first...
       GString id, name=GOS::basename(file_name);
@@ -464,7 +459,8 @@ DjVuDocEditor::insert_file_type(
 
 	 // Create a file record with the chosen ID
       GP<DjVmDir::File> file;
-      file=new DjVmDir::File(id, id, id, page_type);
+      file=new DjVmDir::File(id, id, id, is_page ? DjVmDir::File::PAGE :
+			     DjVmDir::File::INCLUDE);
 
 	 // And insert it into the directory
       dir->insert_file(file, file_pos);
@@ -481,13 +477,17 @@ DjVuDocEditor::insert_file_type(
 	 // The file has been added. If it doesn't include anything else,
 	 // that will be enough. Otherwise repeat what we just did for every
 	 // included child. Don't forget to modify the contents of INCL
-	 // chunks due to name2id translation
+	 // chunks due to name2id translation.
+	 // We also want to include here our file with shared annotations,
+	 // if it exists.
       GString chkid;
       GP<ByteStream> str_in=file_pool->get_stream();
       IFFByteStream iff_in(*str_in);
       MemoryByteStream str_out;
       IFFByteStream iff_out(str_out);
-      
+
+      GP<DjVmDir::File> shared_frec=djvm_dir->get_shared_anno_file();
+
       iff_in.get_chunk(chkid);
       iff_out.put_chunk(chkid);
       while(iff_in.get_chunk(chkid))
@@ -498,6 +498,13 @@ DjVuDocEditor::insert_file_type(
 	    iff_out.copy(iff_in);
 	    iff_in.close_chunk();
 	    iff_out.close_chunk();
+	    if (shared_frec && chkid=="INFO")
+	    {
+	       iff_out.put_chunk("INCL");
+	       iff_out.writall((const char *) shared_frec->id,
+			       shared_frec->id.length());
+	       iff_out.close_chunk();
+	    }
 	 } else
 	 {
 	    GString name;
@@ -505,15 +512,8 @@ DjVuDocEditor::insert_file_type(
 	    int length;
 	    while((length=iff_in.read(buffer, 1024)))
 	       name+=GString(buffer, length);
-	    while(isspace(name[0]))
-       {
-          GString tmp=(const char *) name+1;
-          name=tmp;
-       }
-	    while(isspace(name[(int)(name.length())-1]))
-       {
-          name.setat(name.length()-1, 0);
-       }
+	    while(isspace(name[0])) { GString tmp=(const char *) name+1; name=tmp; }
+	    while(isspace(name[name.length()-1])) name.setat(name.length()-1, 0);
 	    GString full_name=GOS::expand_name(name, GOS::dirname(file_name));
 	    iff_in.close_chunk();
 
@@ -564,71 +564,84 @@ DjVuDocEditor::insert_file_type(
 }
 
 void
-DjVuDocEditor::insert_group(const GList<GString> & file_names, int page_num)
+DjVuDocEditor::insert_group(const GList<GString> & file_names, int page_num,
+			     void (* _refresh_cb)(void *), void * _cl_data)
       // The function will insert every file from the list at position
       // corresponding to page_num. If page_num is negative, concatenation
       // will occur. Included files will be processed as well
 {
-      // First translate the page_num to file_pos.
-   GP<DjVmDir> dir=get_djvm_dir();
-   int file_pos;
-   if (page_num<0 || page_num>=dir->get_pages_num()) file_pos=-1;
-   else file_pos=dir->get_page_pos(page_num);
+   refresh_cb=_refresh_cb;
+   refresh_cl_data=_cl_data;
 
-      // Now call the insert_file() for every page. We will remember the
-      // name2id translation table. Thus insert_file() will remember IDs
-      // it assigned to shared files
-   GMap<GString, GString> name2id;
+   TRY {
 
-   GString errors;
-   for(GPosition pos=file_names;pos;++pos)
-   {
-      GString fname=file_names[pos];
-      TRY {
-	    // Check if it's a multipage document...
-	 StdioByteStream str(fname, "rb");
-	 IFFByteStream iff(str);
-	 GString chkid;
-	 iff.get_chunk(chkid);
-	 if (chkid=="FORM:DJVM")
-	 {
-	       // Hey, it really IS a multipage document.
-	       // Open it, expand to a tmp directory and add pages
-	       // one after another
-	    GP<DjVuDocument> doc=new DjVuDocument();
-	    doc->init(GOS::filename_to_url(fname));
-	    GString dirname=tmpnam(0);
-	    if (GOS::mkdir(dirname)<0)
-	       THROW("Failed to create directory '"+dirname+"'");
-	    TRY {
-	       doc->expand(dirname, GOS::basename(fname));
-	       int pages_num=doc->get_pages_num();
-	       for(int page_num=0;page_num<pages_num;page_num++)
-	       {
-		  GString name=doc->page_to_url(page_num).fname();
-		  name=GOS::expand_name(name, dirname);
-		  insert_file(name, true, file_pos, name2id);
-	       }
-	       GOS::cleardir(dirname);
-	       GOS::deletefile(dirname);
-	       dirname.empty();
-	    } CATCH(exc) {
-	       if (dirname.length())
-	       {
+	 // First translate the page_num to file_pos.
+      GP<DjVmDir> dir=get_djvm_dir();
+      int file_pos;
+      if (page_num<0 || page_num>=dir->get_pages_num()) file_pos=-1;
+      else file_pos=dir->get_page_pos(page_num);
+
+	 // Now call the insert_file() for every page. We will remember the
+	 // name2id translation table. Thus insert_file() will remember IDs
+	 // it assigned to shared files
+      GMap<GString, GString> name2id;
+
+      GString errors;
+      for(GPosition pos=file_names;pos;++pos)
+      {
+	 GString fname=file_names[pos];
+	 TRY {
+	       // Check if it's a multipage document...
+	    StdioByteStream str(fname, "rb");
+	    IFFByteStream iff(str);
+	    GString chkid;
+	    iff.get_chunk(chkid);
+	    if (chkid=="FORM:DJVM")
+	    {
+		  // Hey, it really IS a multipage document.
+		  // Open it, expand to a tmp directory and add pages
+		  // one after another
+	       GP<DjVuDocument> doc=new DjVuDocument();
+	       doc->init(GOS::filename_to_url(fname));
+	       GString dirname=tmpnam(0);
+	       if (GOS::mkdir(dirname)<0)
+		  THROW("Failed to create directory '"+dirname+"'");
+	       TRY {
+		  doc->expand(dirname, GOS::basename(fname));
+		  int pages_num=doc->get_pages_num();
+		  for(int page_num=0;page_num<pages_num;page_num++)
+		  {
+		     GString name=doc->page_to_url(page_num).fname();
+		     name=GOS::expand_name(name, dirname);
+		     insert_file(name, true, file_pos, name2id);
+		  }
 		  GOS::cleardir(dirname);
 		  GOS::deletefile(dirname);
-	       }
-	       EXTHROW(exc);
-	    } ENDCATCH;
-	 } else insert_file(fname, true, file_pos, name2id);
-      } CATCH(exc) {
-	 if (errors.length()) errors+="\n\n";
-	 errors+=exc.get_cause();
-      } ENDCATCH;
-   }
-   if (errors.length()) THROW(errors);
+		  dirname.empty();
+	       } CATCH(exc) {
+		  if (dirname.length())
+		  {
+		     GOS::cleardir(dirname);
+		     GOS::deletefile(dirname);
+		  }
+		  EXTHROW(exc);
+	       } ENDCATCH;
+	    } else insert_file(fname, true, file_pos, name2id);
+	 } CATCH(exc) {
+	    if (errors.length()) errors+="\n\n";
+	    errors+=exc.get_cause();
+	 } ENDCATCH;
+      }
+      if (errors.length()) THROW(errors);
+   } CATCH(exc) {
+      refresh_cb=0;
+      refresh_cl_data=0;
+      EXTHROW(exc);
+   } ENDCATCH;
+   refresh_cb=0;
+   refresh_cl_data=0;
 }
-   
+
 void
 DjVuDocEditor::insert_page(const char * file_name, int page_num)
 {
@@ -706,7 +719,7 @@ DjVuDocEditor::remove_file(const char * id, bool remove_unref,
 
       // We will accumulate errors here.
    GString errors;
-   
+
       // Now modify the ref_map and process children if necessary
    GP<DjVuFile> file=get_djvu_file(id);
    if (file)
@@ -753,7 +766,7 @@ DjVuDocEditor::remove_file(const char * id, bool remove_unref)
 
    if (!djvm_dir->id_to_file(id))
       THROW("There is no such file with ID '"+GString(id)+"' in this document.");
-   
+
       // First generate a map of references (containing the list of parents
       // including this particular file. This will speed things up
       // significatly.
@@ -793,8 +806,39 @@ DjVuDocEditor::remove_page(int page_num, bool remove_unref)
 }
 
 void
+DjVuDocEditor::remove_pages(const GList<int> & page_list, bool remove_unref)
+{
+   DEBUG_MSG("DjVuDocEditor::remove_pages() called\n");
+   DEBUG_MAKE_INDENT(3);
+
+      // First we need to translate page numbers to IDs (they will
+      // obviously be changing while we're removing pages one after another)
+   GP<DjVmDir> djvm_dir=get_djvm_dir();
+
+   if (djvm_dir)
+   {
+      GList<GString> id_list;
+      for(GPosition pos=page_list;pos;++pos)
+      {
+	 GP<DjVmDir::File> frec=djvm_dir->page_to_file(page_list[pos]);
+	 if (frec)
+	    id_list.append(frec->id);
+      }
+
+      for(GPosition pos=id_list;pos;++pos)
+      {
+	 GP<DjVmDir::File> frec=djvm_dir->id_to_file(id_list[pos]);
+	 if (frec)
+	    remove_page(frec->get_page_num(), remove_unref);
+      }
+   }
+}
+
+void
 DjVuDocEditor::move_file(const char * id, int & file_pos,
 			 GMap<GString, void *> & map)
+      // NOTE! file_pos here is the desired position in DjVmDir *after*
+      // the record with ID 'id' is removed.
 {
    if (!map.contains(id))
    {
@@ -803,13 +847,14 @@ DjVuDocEditor::move_file(const char * id, int & file_pos,
       GP<DjVmDir::File> file_rec=djvm_dir->id_to_file(id);
       if (file_rec)
       {
+	 file_rec=new DjVmDir::File(*file_rec);
 	 djvm_dir->delete_file(id);
 	 djvm_dir->insert_file(file_rec, file_pos);
 
 	 if (file_pos>=0)
 	 {
 	    file_pos++;
-	    
+	
 	       // We care to move included files only if we do not append
 	       // This is because the only reason why we move included
 	       // files is to made them available sooner than they would
@@ -846,7 +891,7 @@ DjVuDocEditor::move_page(int page_num, int new_page_num)
    DEBUG_MAKE_INDENT(3);
 
    if (page_num==new_page_num) return;
-   
+
    int pages_num=get_pages_num();
    if (page_num<0 || page_num>=pages_num)
       THROW("Invalid page number "+GString(page_num));
@@ -858,10 +903,97 @@ DjVuDocEditor::move_page(int page_num, int new_page_num)
       {
 	 if (new_page_num<pages_num-1)
 	    file_pos=djvm_dir->get_page_pos(new_page_num+1)-1;
-      } else file_pos=djvm_dir->get_page_pos(new_page_num);
+      } else
+	 file_pos=djvm_dir->get_page_pos(new_page_num);
 
    GMap<GString, void *> map;
    move_file(id, file_pos, map);
+}
+
+static int
+cmp(const void * ptr1, const void * ptr2)
+{
+   int num1=*(int *) ptr1;
+   int num2=*(int *) ptr2;
+   return num1<num2 ? -1 : num1>num2 ? 1 : 0;
+}
+
+static GList<int>
+sortList(const GList<int> & list)
+{
+   GArray<int> a(list.size()-1);
+   int cnt;
+   GPosition pos;
+   for(pos=list, cnt=0;pos;++pos, cnt++)
+      a[cnt]=list[pos];
+
+   qsort((int *) a, a.size(), sizeof(int), cmp);
+
+   GList<int> l;
+   for(int i=0;i<a.size();i++)
+      l.append(a[i]);
+
+   return l;
+}
+
+void
+DjVuDocEditor::move_pages(const GList<int> & _page_list, int shift)
+{
+   if (!shift) return;
+
+   GList<int> page_list=sortList(_page_list);
+
+   GList<GString> id_list;
+   for(GPosition pos=page_list;pos;++pos)
+   {
+      GP<DjVmDir::File> frec=djvm_dir->page_to_file(page_list[pos]);
+      if (frec)
+	 id_list.append(frec->id);
+   }
+
+   if (shift<0)
+   {
+	 // We have to start here from the smallest page number
+	 // We will move it according to the 'shift', and all
+	 // further moves are guaranteed not to affect its page number.
+
+	 // We will be changing the 'min_page' to make sure that
+	 // pages moved beyond the document will still be in correct order
+      int min_page=0;
+      for(GPosition pos=id_list;pos;++pos)
+      {
+	 GP<DjVmDir::File> frec=djvm_dir->id_to_file(id_list[pos]);
+	 if (frec)
+	 {
+	    int page_num=frec->get_page_num();
+	    int new_page_num=page_num+shift;
+	    if (new_page_num<min_page)
+	       new_page_num=min_page++;
+	    move_page(page_num, new_page_num);
+	 }
+      }
+   } else
+   {
+	 // We have to start here from the biggest page number
+	 // We will move it according to the 'shift', and all
+	 // further moves will not affect its page number.
+
+	 // We will be changing the 'max_page' to make sure that
+	 // pages moved beyond the document will still be in correct order
+      int max_page=djvm_dir->get_pages_num()-1;
+      for(GPosition pos=id_list.lastpos();pos;--pos)
+      {
+	 GP<DjVmDir::File> frec=djvm_dir->id_to_file(id_list[pos]);
+	 if (frec)
+	 {
+	    int page_num=frec->get_page_num();
+	    int new_page_num=page_num+shift;
+	    if (new_page_num>max_page)
+	       new_page_num=max_page--;
+	    move_page(page_num, new_page_num);
+	 }
+      }
+   }
 }
 
 void
@@ -873,10 +1005,10 @@ DjVuDocEditor::set_file_name(const char * id, const char * name)
       // It's important to get the URL now, because later (after we
       // change DjVmDir) id_to_url() will be returning a modified value
    GURL url=id_to_url(id);
-   
+
       // Change DjVmDir. It will check if the name is unique
    djvm_dir->set_file_name(id, name);
-   
+
       // Now find DjVuFile (if any) and rename it
    GPosition pos;
    if (files_map.contains(id, pos))
@@ -923,6 +1055,150 @@ DjVuDocEditor::set_page_title(int page_num, const char * title)
    set_file_title(page_to_id(page_num), title);
 }
 
+//****************************************************************************
+//************************** Shared annotations ******************************
+//****************************************************************************
+
+void
+DjVuDocEditor::simplify_anno(void (* progress_cb)(float progress, void *),
+			     void * cl_data)
+      // It's important that no decoding is done while this function
+      // is running. Otherwise the DjVuFile's decoding routines and
+      // this function may attempt to decode/modify a file's
+      // annotations at the same time.
+{
+      // Get the name of the SHARED_ANNO file. We will not
+      // touch that file (will not move annotations from it)
+   GP<DjVmDir::File> shared_file=djvm_dir->get_shared_anno_file();
+   GString shared_id;
+   if (shared_file)
+      shared_id=shared_file->id;
+
+   GList<GURL> ignore_list;
+   if (shared_id.length())
+      ignore_list.append(id_to_url(shared_id));
+
+      // First, for every page get merged (or "flatten" or "projected")
+      // annotations and store them inside the top-level page file
+   int pages_num=djvm_dir->get_pages_num();
+   for(int page_num=0;page_num<pages_num;page_num++)
+   {
+      GP<DjVuFile> djvu_file=get_djvu_file(page_num);
+      if (!djvu_file)
+	 THROW("Internal error: unable to get page "+page_num);
+      int max_level=0;
+      GP<MemoryByteStream> anno;
+      anno=djvu_file->get_merged_anno(ignore_list, &max_level);
+      if (anno && max_level>0)
+      {
+	    // This is the moment when we try to modify DjVuFile's annotations
+	    // Make sure, that it's not being decoded
+	 GSafeFlags & file_flags=djvu_file->get_safe_flags();
+	 GMonitorLock lock(&file_flags);
+	 while(file_flags & DjVuFile::DECODING)
+	    file_flags.wait();
+	
+	    // Merge all chunks in one by decoding and encoding DjVuAnno
+	 GP<DjVuAnno> dec_anno=new DjVuAnno;
+	 dec_anno->decode(*anno);
+	 GP<MemoryByteStream> new_anno=new MemoryByteStream;
+	 dec_anno->encode(*new_anno);
+	 new_anno->seek(0);
+
+	    // And store it in the file
+	 djvu_file->anno=new_anno;
+	 djvu_file->rebuild_data_pool();
+	 if ((file_flags & (DjVuFile::DECODE_OK |
+			    DjVuFile::DECODE_FAILED |
+			    DjVuFile::DECODE_STOPPED))==0)
+	    djvu_file->anno=0;
+      }
+      if (progress_cb)
+	 progress_cb(page_num/2.0/pages_num, cl_data);
+   }
+
+      // Now remove annotations from every file except for
+      // the top-level page files and SHARED_ANNO file.
+      // Unlink empty files too.
+   GPList<DjVmDir::File> files_list=djvm_dir->get_files_list();
+   int cnt;
+   GPosition pos;
+   for(pos=files_list, cnt=0;pos;++pos, cnt++)
+   {
+      GP<DjVmDir::File> frec=files_list[pos];
+      if (!frec->is_page() && frec->id!=shared_id)
+      {
+	 GP<DjVuFile> djvu_file=get_djvu_file(frec->id);
+	 if (djvu_file)
+	 {
+	    djvu_file->remove_anno();
+	    if (djvu_file->get_chunks_number()==0)
+	       remove_file(frec->id, true);
+	 }
+      }
+      if (progress_cb)
+	 progress_cb(0.5+cnt/2.0/files_list.size(), cl_data);
+   }
+}
+
+void
+DjVuDocEditor::create_shared_anno_file(void (* progress_cb)(float progress, void *),
+				       void * cl_data)
+{
+   if (djvm_dir->get_shared_anno_file())
+      THROW("Attempt to create another file with shared annotations failed."
+	    "There may be only one such file in a multipage document.");
+
+      // Prepare file with ANTa chunk inside
+   MemoryByteStream str;
+   IFFByteStream iff(str);
+   iff.put_chunk("FORM:DJVI");
+   iff.put_chunk("ANTa");
+   iff.close_chunk();
+   iff.close_chunk();
+   str.flush();
+   str.seek(0);
+   GP<DataPool> file_pool=new DataPool(str);
+
+      // Get a unique ID for the new file
+   GString id=find_unique_id("shared_anno.iff");
+
+      // Add it into the directory
+   GP<DjVmDir::File> frec=new DjVmDir::File(id, id, id, DjVmDir::File::SHARED_ANNO);
+   djvm_dir->insert_file(frec, 1);
+
+      // Add it to our "cache"
+   {
+      GP<File> f=new File;
+      f->pool=file_pool;
+      GCriticalSectionLock lock(&files_lock);
+      files_map[id]=f;
+   }
+
+      // Now include this shared file into every top-level page file
+   int pages_num=djvm_dir->get_pages_num();
+   for(int page_num=0;page_num<pages_num;page_num++)
+   {
+      GP<DjVuFile> djvu_file=get_djvu_file(page_num);
+      djvu_file->insert_file(id, 1);
+
+      if (progress_cb)
+	 progress_cb((float) page_num/pages_num, cl_data);
+   }
+}
+
+GP<DjVuFile>
+DjVuDocEditor::get_shared_anno_file(void)
+{
+   GP<DjVuFile> djvu_file;
+
+   GP<DjVmDir::File> frec=djvm_dir->get_shared_anno_file();
+   if (frec)
+      djvu_file=get_djvu_file(frec->id);
+
+   return djvu_file;
+}
+
 GP<DataPool>
 DjVuDocEditor::get_thumbnail(int page_num, bool dont_decode)
       // We override DjVuDocument::get_thumbnail() here because
@@ -935,7 +1211,7 @@ DjVuDocEditor::get_thumbnail(int page_num, bool dont_decode)
       // this thumbnail for us.
 {
    GString id=page_to_id(page_num);
-   
+
    GPosition pos;
    GCriticalSectionLock lock(&thumb_lock);
    if (thumb_map.contains(id, pos))
@@ -972,7 +1248,7 @@ DjVuDocEditor::get_thumbnails_size(void) const
    DEBUG_MAKE_INDENT(3);
 
    GCriticalSectionLock lock((GCriticalSection *) &thumb_lock);
-   
+
    GPosition pos;
    int pages_num=get_pages_num();
    for(int page_num=0;page_num<pages_num;page_num++)
@@ -984,7 +1260,7 @@ DjVuDocEditor::get_thumbnails_size(void) const
 	 str.seek(0);
 	 GP<IWPixmap> iwpix=new IWPixmap;
 	 iwpix->decode_chunk(str);
-	 
+	
 	 int width=iwpix->get_width();
 	 int height=iwpix->get_height();
 	 return width<height ? width : height;
@@ -1043,16 +1319,13 @@ DjVuDocEditor::file_thumbnails(void)
 
       // Generate thumbnails if they're missing due to some reason.
    int thumb_num=get_thumbnails_num();
-   int size=(thumb_num>0) ? get_thumbnails_size() : 128;
-   if (thumb_num!=get_pages_num())
-   {
-     generate_thumbnails(size);
-   }
+   int size=thumb_num>0 ? get_thumbnails_size() : 128;
+   if (thumb_num!=get_pages_num()) generate_thumbnails(size);
 
    DEBUG_MSG("filing thumbnails\n");
 
    GCriticalSectionLock lock(&thumb_lock);
-   
+
       // The first thumbnail file always contains only one thumbnail
    int ipf=1;
    int image_num=0;
@@ -1064,6 +1337,7 @@ DjVuDocEditor::file_thumbnails(void)
    {
       GPosition pos;
       GString id=page_to_id(page_num);
+
       if (!thumb_map.contains(id, pos))
 	 THROW("Internal error: Can't find thumbnail for page "+GString(page_num));
       TArray<char> & data=*(TArray<char> *) thumb_map[pos];
@@ -1074,14 +1348,14 @@ DjVuDocEditor::file_thumbnails(void)
       page_num++;
       if (image_num>=ipf || page_num>=pages_num)
       {
-	    // Get unique ID for this file
          int i=id.rsearch('.');
          if(i<=0)
          {
            i=id.length();
          }
          id=id.substr(0,i)+".thumb";
-	 id=find_unique_id(id);
+	    // Get unique ID for this file
+	 GString id=find_unique_id(id);
 
 	    // Create a file record with the chosen ID
 	 GP<DjVmDir::File> file=new DjVmDir::File(id, id, id, DjVmDir::File::THUMBNAILS);
@@ -1129,26 +1403,26 @@ DjVuDocEditor::generate_thumbnails(int thumb_size, int page_num)
       GString id=page_to_id(page_num);
       if (!thumb_map.contains(id))
       {
-	 GP<DjVuImage> dimg=get_page(page_num, true);
-      
-	 GRect rect(0, 0, thumb_size, dimg->get_height()*thumb_size/dimg->get_width());
-	 GP<GPixmap> pm=dimg->get_pixmap(rect, rect, get_thumbnails_gamma());
-	 if (!pm)
-	 {
-	    GP<GBitmap> bm=dimg->get_bitmap(rect, rect, sizeof(int));
-	    pm=new GPixmap(*bm);
-	 }
-	 if (!pm) THROW("Unable to render image of page "+GString(page_num));
-      
-	    // Store and compress the pixmap
-	 GP<IWPixmap> iwpix=new IWPixmap(pm);
-	 GP<MemoryByteStream> str=new MemoryByteStream;
-	 IWEncoderParms parms;
-	 parms.slices=97;
-	 parms.bytes=0;
-	 parms.decibels=0;
-	 iwpix->encode_chunk(*str, parms);
-	 thumb_map[id]=new TArray<char>(str->get_data());
+         GP<DjVuImage> dimg=get_page(page_num, true);
+
+         GRect rect(0, 0, thumb_size, dimg->get_height()*thumb_size/dimg->get_width());
+         GP<GPixmap> pm=dimg->get_pixmap(rect, rect, get_thumbnails_gamma());
+         if (!pm)
+         {
+            GP<GBitmap> bm=dimg->get_bitmap(rect, rect, sizeof(int));
+            pm=new GPixmap(*bm);
+         }
+         if (!pm) THROW("Unable to render image of page "+GString(page_num));
+
+            // Store and compress the pixmap
+         GP<IWPixmap> iwpix=new IWPixmap(pm);
+         GP<MemoryByteStream> str=new MemoryByteStream;
+         IWEncoderParms parms;
+         parms.slices=97;
+         parms.bytes=0;
+         parms.decibels=0;
+         iwpix->encode_chunk(*str, parms);
+         thumb_map[id]=new TArray<char>(str->get_data());
       }
       ++page_num;
    }else
@@ -1169,6 +1443,126 @@ DjVuDocEditor::generate_thumbnails(int thumb_size,
      page_num=generate_thumbnails(thumb_size,page_num);
      if (cb) if (cb(page_num, cl_data)) return;
    } while(page_num>=0);
+}
+
+static void
+store_file(const GP<DjVmDir> & src_djvm_dir, const GP<DjVmDoc> & djvm_doc,
+	   GP<DjVuFile> & djvu_file, GMap<GURL, void *> & map)
+{
+   GURL url=djvu_file->get_url();
+   if (!map.contains(url))
+   {
+      map[url]=0;
+
+	 // Store included files first
+      GPList<DjVuFile> djvu_files_list=djvu_file->get_included_files(false);
+      for(GPosition pos=djvu_files_list;pos;++pos)
+	 store_file(src_djvm_dir, djvm_doc, djvu_files_list[pos], map);
+
+	 // Now store contents of this file
+      GP<DataPool> file_data=djvu_file->get_djvu_data(false, true);
+      GP<DjVmDir::File> frec=src_djvm_dir->name_to_file(url.name());
+      if (frec)
+      {
+	 frec=new DjVmDir::File(*frec);
+	 djvm_doc->insert_file(frec, file_data, -1);
+      }
+   }
+}
+
+void
+DjVuDocEditor::save_pages_as(ByteStream & str, const GList<int> & _page_list)
+{
+   GList<int> page_list=sortList(_page_list);
+
+   GP<DjVmDoc> djvm_doc=new DjVmDoc;
+   GMap<GURL, void *> map;
+   for(GPosition pos=page_list;pos;++pos)
+   {
+      GP<DjVmDir::File> frec=djvm_dir->page_to_file(page_list[pos]);
+      if (frec)
+      {
+	 GP<DjVuFile> djvu_file=get_djvu_file(frec->id);
+	 if (djvu_file)
+	    store_file(djvm_dir, djvm_doc, djvu_file, map);
+      }
+   }
+   djvm_doc->write(str);
+}
+
+void
+DjVuDocEditor::save_file(const char * file_id, const char * save_dir,
+			 bool only_modified, GMap<GString, void *> & map)
+{
+   DEBUG_MSG("DjVuDocEditor::save_file(): ID='" << file_id << "'\n");
+   DEBUG_MAKE_INDENT(3);
+
+   if (!map.contains(file_id))
+   {
+      map[file_id]=0;
+      GString file_name=djvm_dir->id_to_file(file_id)->name;
+
+      GP<DataPool> file_pool;
+      GPosition pos;
+      if (files_map.contains(file_id, pos))
+      {
+	 GP<File> file_rec=files_map[pos];
+	 bool file_modified=file_rec->pool || file_rec->file &&
+			    file_rec->file->is_modified();
+	 if (file_rec->file)
+	    file_pool=file_rec->file->get_djvu_data(false, true);
+	 else
+	    file_pool=file_rec->pool;
+	 if (!file_modified && only_modified)
+	    file_pool=0;
+      }
+
+      if (!file_pool && !only_modified)
+      {
+	 DjVuPortcaster * pcaster=DjVuPort::get_portcaster();
+	 file_pool=pcaster->request_data(this, id_to_url(file_id));
+      }
+
+      if (file_pool)
+      {
+	 GString save_name=GOS::expand_name(file_name, save_dir);
+	 DEBUG_MSG("Saving '" << file_id << "' to '" << save_name << "'\n");
+	 DataPool::load_file(save_name);
+	 StdioByteStream str_out(save_name, "wb");
+	 str_out.writall("AT&T", 4);
+	 GP<ByteStream> str_in=file_pool->get_stream();
+	 str_out.copy(*str_in);
+
+	 GP<ByteStream> str=file_pool->get_stream();
+	 IFFByteStream iff(*str);
+	 GString chkid;
+	 if (iff.get_chunk(chkid))
+	 {
+	    while(iff.get_chunk(chkid))
+	    {
+	       if (chkid=="INCL")
+	       {
+		  GString incl_str;
+		  char buffer[1024];
+		  int length;
+		  while((length=iff.read(buffer, 1024)))
+		     incl_str+=GString(buffer, length);
+
+		     // Eat '\n' in the beginning and at the end
+		  while(incl_str.length() && incl_str[0]=='\n')
+		  {
+		     GString tmp=((const char *) incl_str)+1; incl_str=tmp;
+		  }
+		  while(incl_str.length()>0 && incl_str[(int)incl_str.length()-1]=='\n')
+		     incl_str.setat(incl_str.length()-1, 0);
+
+		  save_file(incl_str, save_dir, only_modified, map);
+	       }
+	       iff.close_chunk();
+	    }
+	 }
+      }
+   }
 }
 
 void
@@ -1195,20 +1589,12 @@ DjVuDocEditor::save_as(const char * where, bool bundled)
       // Otherwise we will remove the thumbnails completely because
       // we really don't want to deal with documents, which have only
       // some of their pages thumbnailed.
-   if ( ! get_pages_num())
-   {
-     THROW("Attempt to save empty file");
-   }else if (get_thumbnails_num()==get_pages_num())
-   {
-     file_thumbnails();
-   }else
-   {
-     remove_thumbnails();
-   }
-   
+   if (get_thumbnails_num()==get_pages_num()) file_thumbnails();
+   else remove_thumbnails();
+
    GURL save_doc_url;
    GString save_doc_name;
-   
+
    if (!where || !strlen(where))
    {
 	 // Assume, that we just want to 'save'. Check, that it's possible
@@ -1228,13 +1614,13 @@ DjVuDocEditor::save_as(const char * where, bool bundled)
    }
 
    int save_doc_type=bundled ? BUNDLED : INDIRECT;
-   
+
    clean_files_map();
-   
+
    GCriticalSectionLock lock(&files_lock);
 
    DjVuPortcaster * pcaster=DjVuPort::get_portcaster();
-   
+
       // First consider saving in SINGLE_FILE format (one file)
    if (djvm_dir->get_files_num()==1)
    {
@@ -1273,53 +1659,30 @@ DjVuDocEditor::save_as(const char * where, bool bundled)
       GP<DataPool> pool=new DataPool(str);
       doc_pool=pool;
       init_data_pool=pool;
-      
+
 	 // Also update DjVmDir (to reflect changes in offsets)
       djvm_dir=doc->get_djvm_dir();
    } else if (save_doc_type==INDIRECT)
    {
       DEBUG_MSG("Saving in INDIRECT format to '" << save_doc_url << "'\n");
-      GPList<DjVmDir::File> files_list=djvm_dir->get_files_list();
-//      int pages_num=get_pages_num();
-//      for(int page_num=0;page_num<pages_num;page_num++)
-      for(GPosition fpos=files_list;fpos;++fpos)
+      bool save_only_modified=!(save_doc_url!=doc_url || save_doc_type!=orig_doc_type);
+      GString save_dir=GOS::dirname(save_doc_name);
+      int pages_num=djvm_dir->get_pages_num();
+      GMap<GString, void *> map;
+	 // First go thru the pages
+      for(int page_num=0;page_num<pages_num;page_num++)
       {
-         GP<DjVmDir::File> &file=files_list[fpos];
-	 GString file_id=file->id;
-	 GURL file_url=id_to_url(file_id);
-	 GP<DataPool> file_pool;
-	 GPosition pos;
-	 if (files_map.contains(file_id, pos))
-	 {
-	    GP<File> file_rec=files_map[pos];
-	    if (file_rec->pool && (!file_rec->file ||
-				   !file_rec->file->is_modified()))
-	       file_pool=file_rec->pool;
-	    else if (file_rec->file) file_pool=file_rec->file->get_djvu_data(false, true);
-	 }
-	    // At this moment pool may be ZERO, which means, that the
-	    // data for this file has not been modified and is not
-	    // worth saving. Still, if we save not to the original location,
-	    // or the document type changed we still must save the file
-	 if (!file_pool && (save_doc_url!=doc_url || save_doc_type!=orig_doc_type))
-	    file_pool=pcaster->request_data(this, file_url);
-	 if (file_pool)
-	 {
-	    GURL save_url=save_doc_url.base()+file_url.name();
-	    GString save_name=GOS::url_to_filename(save_url);
-	    DEBUG_MSG("Saving '" << file_url << "' to '" << save_url << "'\n");
-	    DataPool::load_file(save_name);
-	    StdioByteStream str_out(save_name, "wb");
-	    str_out.writall("AT&T", 4);
-	    GP<ByteStream> str_in=file_pool->get_stream();
-	    str_out.copy(*str_in);
-	 }
+	 GString id=djvm_dir->page_to_file(page_num)->id;
+	 save_file(id, save_dir, save_only_modified, map);
       }
+	 // Next go thru thumbnails and similar stuff
+      GPList<DjVmDir::File> xfiles_list=djvm_dir->get_files_list();
+      GPosition pos;
+      for(pos=xfiles_list;pos;++pos)
+	 save_file(xfiles_list[pos]->id, save_dir, save_only_modified, map);
 
-	 // Save the top-level index file
-      GP<DjVmDir> dir=get_djvm_dir();
-      GPList<DjVmDir::File> xfiles_list=dir->get_files_list();
-      for(GPosition pos=xfiles_list;pos;++pos)
+	 // Finally - save the top-level index file
+      for(pos=xfiles_list;pos;++pos)
       {
 	 GP<DjVmDir::File> file=xfiles_list[pos];
 	 file->offset=0;
@@ -1331,7 +1694,7 @@ DjVuDocEditor::save_as(const char * where, bool bundled)
 
       iff.put_chunk("FORM:DJVM", 1);
       iff.put_chunk("DIRM");
-      dir->encode(iff);
+      djvm_dir->encode(iff);
       iff.close_chunk();
       iff.close_chunk();
       iff.flush();
@@ -1339,13 +1702,13 @@ DjVuDocEditor::save_as(const char * where, bool bundled)
 	 // Update the document data pool (not required, but will save memory)
       doc_pool=new DataPool(save_doc_name);
       init_data_pool=doc_pool;
-      
+
 	 // No reason to update DjVmDir as for this format it doesn't
 	 // contain DJVM offsets
    } else if (save_doc_type==BUNDLED || save_doc_type==OLD_BUNDLED)
    {
       DEBUG_MSG("Saving in BUNDLED format to '" << save_doc_url << "'\n");
-      
+
 	 // Can't be very smart here. Simply overwrite the file.
       GP<DjVmDoc> doc=get_djvm_doc();
       DataPool::load_file(save_doc_name);
@@ -1356,13 +1719,10 @@ DjVuDocEditor::save_as(const char * where, bool bundled)
 	 // Update the document data pool (not required, but will save memory)
       doc_pool=new DataPool(save_doc_name);
       init_data_pool=doc_pool;
-      
+
 	 // Also update DjVmDir (to reflect changes in offsets)
       djvm_dir=doc->get_djvm_dir();
-   } else 
-   {
-     THROW("Can't save the document. Use 'Save As'");
-   }
+   } else THROW("Can't save the document. Use 'Save As'");
 
       // Now, after we have saved the document w/o any error, detach DataPools,
       // which are in the 'File's list to save memory. Detach everything.

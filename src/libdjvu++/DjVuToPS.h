@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuToPS.h,v 1.4 2000-03-22 23:41:46 eaf Exp $
+//C- $Id: DjVuToPS.h,v 1.5 2000-05-19 19:00:06 bcr Exp $
 
 #ifndef _DJVU_TO_PS_H_
 #define _DJVU_TO_PS_H_
@@ -22,7 +22,7 @@
     @memo PostScript file generator
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: DjVuToPS.h,v 1.4 2000-03-22 23:41:46 eaf Exp $#
+    #$Id: DjVuToPS.h,v 1.5 2000-05-19 19:00:06 bcr Exp $#
 */
 //@{
 
@@ -85,13 +85,13 @@ public:
 	 /** Specifies how the output will be scaled.
 	     \begin{description}
 	        \item[FIT_PAGE] The output will be scaled (with aspect ratio
-		     unchanged) to occupy as much space as possible)
-		\item[ONE_TO_ONE] The output will be scaled according to
-		     the \Ref{DjVuImage}'s #dpi# to have approximately
-		     the same physical dimensions as the original image
-		     before compression (provided that the #dpi# is correct).
+		     unchanged) to occupy as much space as possible).
+		\item[Any positive number] Zoom factor from 5% to 999%.
+		     The \Ref{DjVuImage} will be scaled according to this
+		     zoom factor and the image's #dpi# (which gives the
+		     size of the original image before compression).
 	     \end{description}*/
-      enum Zoom { FIT_PAGE, ONE_TO_ONE };
+      enum Zoom { FIT_PAGE=0 };
 	 /** Selects the output format ({\bf PostScript} or
 	     {\bf Encapsulated PostScript}) */
       enum Format { PS, EPS };
@@ -116,7 +116,14 @@ public:
       void	set_orientation(Orientation orientation);
 	 /// Sets \Ref{DjVuImage} rendering mode (#COLOR#, #BW#, #FORE#, #BACK#)
       void	set_mode(Mode mode);
-	 /// Sets zoom factor to #FIT_PAGE# or #ONE_TO_ONE#
+	 /** Sets zoom factor to #FIT_PAGE# or any positive %%
+	     The zoom factor does {\bf not} affect the amount of data
+	     sent to the printer. It is used by the PostScript code
+	     to additionally scale the image. The reason why is that
+	     we do not know the resolution of the printer when we
+	     generate the PostScript file. So, we will render the \Ref{DjVuImage}
+	     into the rectangle passed to the \Ref{DjVuToPS::print}()
+	     function. */
       void	set_zoom(Zoom zoom);
 	 /// Affects automatic conversion of \Ref{DjVuImage} to GreyScale mode.
       void	set_color(bool color);
@@ -347,12 +354,23 @@ public:
 	  (or Encapsulated PostScript) file taking care of all comments
 	  conforming to Document Structure Conventions v. 3.0.
 
+	  {\bf Warning:} The zoom factor specified in \Ref{Options} does
+	  not affect the amount of data stored into the PostScript file.
+	  It will be used by the PostScript code to additionally scale
+	  the image. We cannot pre-scale it here, because we do not know
+	  the future resolution of the printer. The #img_rect# and
+	  #prn_rect# alone define how much data will be sent to printer.
+
 	  Using #img_rect# one can upsample or downsample the image prior
 	  to sending it to the printer.
 
 	  @param str \Ref{ByteStream} where PostScript output will be sent
 	  @param dimg \Ref{DjVuImage} to print
-	  @param img_rect Rectangle to which the \Ref{DjVuImage} will be scaled
+	  @param img_rect Rectangle to which the \Ref{DjVuImage} will be scaled.
+	         Note that this parameters defines the amount of data
+		 that will actually be sent to the printer. The PostScript
+		 code can futher resize the image according to the
+		 #zoom# parameter from the \Ref{Options} structure.
 	  @param prn_rect Part of img_rect to send to printer.
 	  @param override_dpi Optional parameter allowing you to override
 	         dpi setting that would otherwise be extracted from #dimg# */

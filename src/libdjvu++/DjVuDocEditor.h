@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocEditor.h,v 1.20 2000-05-10 22:03:21 bcr Exp $
+//C- $Id: DjVuDocEditor.h,v 1.21 2000-05-19 19:00:06 bcr Exp $
  
 #ifndef _DJVUDOCEDITOR_H
 #define _DJVUDOCEDITOR_H
@@ -28,7 +28,7 @@
 
     @memo DjVu document editor class.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: DjVuDocEditor.h,v 1.20 2000-05-10 22:03:21 bcr Exp $#
+    @version #$Id: DjVuDocEditor.h,v 1.21 2000-05-19 19:00:06 bcr Exp $#
 */
 
 //@{
@@ -112,6 +112,9 @@ public:
       /** Saves the document. */
    virtual void	save_as(const char * where, bool bundled);
 
+      /** Saves the specified pages in DjVu #BUNDLED# multipage document. */
+   void		save_pages_as(ByteStream & str, const GList<int> & page_list);
+
       /** Translates page number #page_num# to ID. If #page_num# is invalid,
 	  an exception is thrown. */
    GString	page_to_id(int page_num) const;
@@ -157,11 +160,16 @@ public:
 	  @param fname_list List of top-level files for the pages to be inserted
 	  @param page_num Position where the new pages should be inserted at.
 	  	 Negative value means "append" */
-   void		insert_group(const GList<GString> & fname_list, int page_num=-1);
+   void		insert_group(const GList<GString> & fname_list, int page_num=-1,
+			     void (* refresh_cb)(void *)=0, void * cl_data=0);
       /** Removes the specified page from the document. If #remove_unref#
 	  is #TRUE#, the function will also remove from the document any file,
 	  which became unreferenced due to the page's removal */
    void		remove_page(int page_num, bool remove_unref=true);
+      /** Removes the specified pages from the document. If #remove_unref#
+	  is #TRUE#, the function will also remove from the document any file,
+	  which became unreferenced due to the pages' removal */
+   void		remove_pages(const GList<int> & page_list, bool remove_unref=true);
       /** Removes a DjVu file with the specified #id#.
 
 	  If some other files include this file, the corresponding #INCL#
@@ -174,6 +182,15 @@ public:
 	  is negative or too big, the function will move page #page_num# to
 	  the end of the document. */
    void		move_page(int page_num, int new_page_num);
+      /** Shifts all pags from the #page_list# according to the #shift#.
+	  The #shift# can be positive (shift toward the end of the document)
+	  or negative (shift toward the beginning of the document).
+
+	  It is OK to make #shift# too big in value. Pages will just be
+	  moved to the end (or to the beginning, depending on the #shift#
+	  sign) of the document. */
+   void		move_pages(const GList<int> & page_list, int shift);
+   
       /** Changes the name of the file with ID #id# to #name#.
 	  Refer to \Ref{DjVmDir} for the explanation of {\em IDs},
           {\em names} and {\em titles}. */
@@ -246,7 +263,32 @@ public:
 				    bool (* cb)(int page_num, void *)=0,
 				    void * cl_data=0);
       //@}
-   
+      /** Use this function to simplify annotations in the document.
+        The "simplified" format is when annotations are only allowed
+        either in top-level page files or in a special file with
+        #SHARED_ANNO# flag on. This file is supposed to be included into
+        every page. */
+   void               simplify_anno(void (* progress_cb)(float progress, void *)=0,
+                            void * cl_data=0);
+
+      /** Will create a file that will be included into every page and
+        marked with the #SHARED_ANNO# flag. This file can be used
+        to store global annotations (annotations applicable to every page).
+
+        {\bf Note:} There may be only one #SHARED_ANNO# file in any
+        DjVu multipage document. */
+   void               create_shared_anno_file(void (* progress_cb)(float progress, void *)=0,
+                                      void * cl_data=0);
+
+      /** Returns a pointer to the file with #SHARED_ANNO# flag on.
+        This file should be used for storing document-wide annotations.
+
+        {\bf Note:} There may be only one #SHARED_ANNO# file in any
+        DjVu multipage document. */
+   GP<DjVuFile>       get_shared_anno_file(void);
+
+   GURL               get_doc_url(void) const;
+                                                                              
       /** Returns TRUE if #class_name# is #"DjVuDocEditor"#,
 	  #"DjVuDocument"# or #"DjVuPort"# */
    virtual bool		inherits(const char * class_name) const;
@@ -294,6 +336,9 @@ private:
    GMap<GString, void *>thumb_map;
    GCriticalSection	thumb_lock;
 
+   void		(* refresh_cb)(void *);
+   void		* refresh_cl_data;
+
    void		check(void);
    GString	find_unique_id(const char * id);
    GP<DataPool>	strip_incl_chunks(const GP<DataPool> & pool);
@@ -312,6 +357,8 @@ private:
 			  GMap<GString, void *> & map);
    void		unfile_thumbnails(void);
    void		file_thumbnails(void);
+   void		save_file(const char * id, const char * dir,
+			  bool only_modified, GMap<GString, void *> & map);
 };
 
 inline bool
@@ -344,6 +391,12 @@ DjVuDocEditor::get_save_doc_type(void) const
    else if (orig_doc_type==INDIRECT) return INDIRECT;
    else if (orig_doc_type==OLD_BUNDLED || orig_doc_type==BUNDLED) return BUNDLED;
    else return UNKNOWN_TYPE;
+}
+
+inline GURL
+DjVuDocEditor::get_doc_url(void) const
+{
+   return doc_url.is_empty() ? init_url : doc_url;
 }
 
 //@}
