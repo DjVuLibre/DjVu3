@@ -92,41 +92,56 @@
    intellectual property department to setup other agreements on the basis of
    fair revenue sharing.
 
-   The DjVu Reference Library currently contains:
-   \begin{itemize}
-   \item The {\em DjVu Decoder}, which decodes IW44 and DjVu files into 
-         a compact internal data structure (see \Ref{DjVuImage}) which
-         can be used to render the image.
-   \item The {\em DjVu Rendering Engine}, which uses this data structure
-         and produces the pixel representation of any part of the image 
-         at any resolution.
-   \item The {\em IW44 Wavelet Encoder}, which processes color or gray level
-         images and create IW44 Files.
-   \item The {\em Bilevel DjVu Encoder Back-end}, which processes structured
-         bilevel images (see \Ref{JB2Image}) and creates a file using the JB2
-         data compression model.
-   \end{itemize}
-   We also intend to release the source code for:
-   \begin{itemize}
-   \item A {\em Viewer for DjVu documents}, which uses the DjVu Decoder and
-         the DjVu Rendering Engine in order to provide progressive decoding,
-         on-the-fly rendering, etc.
-   \item A {\em Simple Encoder for Bilevel DjVu Files}, which processes a
-         bitmap image, creates a structured bilevel image, calls the Bilevel
-         DjVu Encoder Back-End, and packages the result as a Bilevel DjVu
-         File.  
-   \end{itemize}
+   The DjVu Reference Library is the first component of DjVu released in
+   source code form.  The DjVu Reference Library completely defines the DjVu
+   and IW44 image formats.  It does not implement however the sophisticated
+   encoding strategies which allow for the highest compression ratios.  These
+   strategies however are very application dependent.  We have developped
+   encoders for scanned documents (see \URL{http://www.djvu.att.com/djvu}.  We
+   also know that we need completely different (and probably much easier)
+   encoding strategies for electronically created documents.
 
-   The DjVu Reference Library however {\em does not contain} certain parts of
-   the DjVu technology such as the {\em Lossy Bilevel Encoder} or the {\em
-   Background-Foreground Separation}.  These missing parts have no impact on
-   the file format. Different implementations are possible and will only make
-   the encoder more or less efficient.  There are in fact several reasons for
-   not releasing these components now.  The current source code is so
-   intricate that it would not help anyone without a huge documentation
-   effort.  Furthermore, releasing this code today would negatively affect the
-   business of our business partners and eventually reduce the dissemination
-   of the DjVu technology.  */
+   We intend to keep releasing new versions of this library and additional
+   software such as viewers and encoders.  Using the currently released code,
+   you can {\em easily} do the following:
+   \begin{itemize}
+   \item {\em Decoding} DjVu and IW44 images.
+   \item {\em Rendering} DjVu or IW44 image fragments at any resolution.
+   \item {\em Encode IW44 wavelet images}.
+   \end{itemize}
+   The following tasks can be achieved with an increasing effort level.  
+   The documentation somehow explains the basic ideas, but this is 
+   not currently implemented:
+   \begin{itemize}
+   \item {\em Creating DjVu Color Images} which are basically embedded IW44
+         images according to the instructions in \Ref{djvumake}.
+   \item {\em Creating Lossless Bilevel DjVu Images} using lossless encoding.
+         Instructions are provided in \Ref{JB2Image.h} and \Ref{djvumake}.
+         Lossless encoding should be very efficient with electronically
+         produced documents (since the character shapes are perfectly
+         defined). A DVI to DJVU program comes to mind ...
+   \item {\em Creating Compound DjVu Images for Electronically Produced Images}.
+         Just combine the above task with the masking technique described in
+         \Ref{djvumake}.  A GIMP to DJVU filter comes to mind ...
+   \item {\em Creating DjVu Images from Scans}.  The most difficult part
+         involves the separation of the foreground and the background.  A
+         simple thresholding works on half the documents and fails miserably
+         on the second half.  Creating a robust solution is not easy at all.
+   \end{itemize}
+   
+   We do not plan to publish soon the source code pertaining to the DjVu
+   compression of scanned images.  We may provide the source code of older
+   versions.  We will provide executables for personal uses. We license this
+   technology to business partners who commit to support the DjVu format.
+   Releasing this code today would negatively affect the business of our
+   partners and eventually reduce the dissemination of the DjVu technology.
+
+   We think that this is preferable to the Java alternative where the license
+   mandates that you cannot use the software unless your work fully complies
+   with the Java specifications.  We think that we should not prevent people
+   from using our code for completely different purposes.  In other words, we
+   prefer to release less software but make it really {\em free} (in the sense
+   of {\em free speech} not {\em free lunch} as you probably know.)  */
    
 
 //----------------------------------------
@@ -135,6 +150,205 @@
     NO WARRANTY.
   */
 //@{
+//@}
+
+
+
+
+//----------------------------------------
+/** @name Getting Started
+ */
+//@{
+
+/** @name Compiling the Library (Unix)
+
+
+    {\bf Directories} --- The structure of the distribution is essentially
+    flat.  All the source code files, for both the library and the utility
+    programs, are found in the main directory #"libdjvu++"#.  A few
+    subdirectories contain accessory material.  Directory #"@Doc"# contains
+    the HTML documentation generated from the source files.  Directory
+    #"@Samples"# contains sample DjVu files for testing purposes.  Directory
+    #"@Test"# contains a few test programs for the library basic features.
+    Directory #"@Tools"# contains tools that may be useful for building the
+    library or its documentation.
+
+
+    {\bf Prerequisites} --- The DjVu Reference Library should compile and run
+    on any well behaved Unix system, {\em provided that you use a good C++
+    compiler} supporting templates, exceptions and possibly multithreading.
+    Workstation makers usually provide good compilers.  You can certainly
+    compile and run the library with these compilers if you find out which
+    options apply to your system and your particular version of the compiler.
+    We find that there are just too many different compilers around.  This is
+    why we recommend using #gcc# or #egcs#.
+
+    You can safely proceed to the compilation if you have #gcc-2.8.x# or any
+    version #egcs# greater than #egcs-1.0.2#.  Use command #g++ -v# to find
+    out what is installed on your system.  If you have an earlier version of
+    #g++# such as #gcc-2.7.23#, you must upgrade because it is not going to
+    work.  We strongly recomment upgrading directly to #egcs-1.1.1# or better.
+    The easiest way consists of picking a binary distribution somewhere on the
+    Internet.  Linux users may have a look at \URL{http://www.gcc.ml.org} or
+    \URL{http://rufus.w3.org/linux/RPM}.
+
+    {\bf Building your compiler (advanced)} --- You should really skip this
+    section if you can avoid reading it.  You should only read it if (a) you
+    cannot find a suitable binary distribution of #egcs#, or (b) you want to
+    experiment with the multi-threading features of the library.
+
+    Building the #egcs# compilers requires GNU Make.  The Linux operating
+    systems uses GNU Make by default.  Many Unix systems provide GNU Make
+    under the name #gmake#.  You must otherwise download the source code at
+    \URL{ftp://gatekeeper.dec.com/pub/GNU/make} or
+    \URL{ftp://prep.ai.mit.edu/pub/gnu}, unpack it, read the instructions,
+    compile and install.
+
+    You must then download the source distribution of the latest release of
+    #egcs# from \URL{http://egcs.cygnus.com}.  We provide a small patch for
+    #"egcs/gcc/libgcc2.c"# which is required by our multi-threading code.
+    You can apply the patch using command #patch#. 
+    \begin{verbatim}
+      % cd egcs/gcc
+      % patch < $HOME/libdjvu++/@Tools/libgcc2.c.diff
+      Patching file libgcc2.c using Plan A...
+      Hunk #1 succeeded at 3063.
+      Hunk #2 succeeded at 3118.
+      done
+    \end{verbatim}
+    This patch has been tested with #egcs-1.1# and #egcs-1.1.1#.  We hope that
+    the EGCS people will either include the patch in their future releases, or
+    provide a similar capability.  If anything suspicious happens during the
+    patching process, we suggest that you restore the original version of
+    #"libgcc2.c"# which is automatically saved as #"libgcc2.c.orig"#.
+
+    You must then configure and compile #egcs#.  Everything is pretty well
+    described at \URL{http://egcs.cygnus.com}.  I could use for instance the
+    following commands on my SGI workstation running Irix-6.4:
+    \begin{verbatim}
+      % cd egcs
+      % configure --prefix=$HOME/egcs  mips-sgi-irix-5.3
+      % gnu-make
+      % gnu-make install
+    \end{verbatim}
+    You are reading correctly: I am pretending that my workstation has
+    Irix-5.3 because I want to create backward compatible binaries.  Welcome
+    to the wonderful world of compilers.
+
+    {\bf Compiling the DjVu Reference Library} --- Compiling the DjVu
+    Reference Library is a two step process.  You must first invoke the script
+    #configure# which searches the compiler, selects the compilation options
+    and creates the makefiles.
+    \begin{verbatim}
+       % configure --prefix=$HOME/djvu
+    \end{verbatim}
+
+    You can specify a particular compiler by setting environment variable
+    #CXX# before invoking the configuration script. This script also 
+    supports the following options:
+    \begin{description}
+    \item[--prefix=PREFIXDIR] indicates where the binary files will be installed.
+    \item[--with-debug] enables the debugging options of the compiler.
+    \item[--with-cxxflag=FLAG] passes a particular option to the compiler.
+    \item[--without-threads] disables multi-threading (the default).
+    \item[--with-threads=(cothreads|posix|dce)] enables multithreading and
+         selects a multithreading implementation (see \Ref{GThreads.h}). You
+         must make sure that your C++ compiler is compatible with the chosen
+         thread implementation.  The safest option consists of using the
+         patched version of #egcs# (see above) and the #cothreads#
+         implementation.
+    \end{description}
+
+    You are now ready to compile and install everything by typing:
+    \begin{verbatim}
+       % make all
+       % make install
+    \end{verbatim}
+
+    {\bf Using the DjVu Reference Library} --- At this point, you have
+    generated a collection of small executables documented in section
+    \Ref{Utility Programs}.  This is not very exciting.  It is now time to
+    remember that the DjVu Reference Library is a source code library.  Almost
+    everything you can use safely is documented in section 
+    \Ref{Library Reference}.  You may want however to start with 
+    section \Ref{Decoding DjVu Content}.  */
+
+
+/** @name Compiling the Library (Systems other than Unix)       
+
+   This library compiles without modification under Windows using Visual C++
+   version 5.0.  It should also compile under MacOS using the MetroWerks
+   compiler, although some system dependent functions are still missing.  In
+   both cases however, you have to provide your makefile (or your project, or
+   your workspace or whatever) using the Unix makefiles as a template.
+
+ */
+
+
+/** @name Decoding DjVu Content
+
+    Class \Ref{DjVuImage} provides a simple interface for processing DjVu
+    content.  The complete documentation is found in section
+    \Ref{DjVuImage.h}.  You may also consult the source code of program
+    \Ref{djvutopnm}.
+
+    The DjVu Reference Library uses a two stage decoding model. 
+    \begin{itemize}
+    \item The first stage, called {\em decoding}, consists of analyzing a DjVu
+          or IW44 file and constructing a partially decoded representation of
+          the image in memory.  This partially decoded representation requires
+          much less memory (typically 1-2 MBytes) than the raw image
+          (typically 20-30 MBytes).  
+    \item The second stage, called {\em rendering}, consists of using this
+          representation to recreate the pixels for any part of the image at
+          any resolution.  You should render {\em on-the-fly} the part of the
+          image that you actually wish to display.  This strategy minimizes
+          both the memory and the computational requirements.
+    \end{itemize}
+
+    
+    The sample decoding code below may be called once when you receive the
+    DjVu data.  The function \Ref{DjVuImage::decode} processes the data stream 
+    represented by class \Ref{ByteStream} and updates the \Ref{DjVuImage} object.
+    \begin{verbatim}
+       DjVuImage img;
+       ByteStream &bs = my_incoming_data_stream();
+       img.decode(bs);
+    \end{verbatim}
+    The sample rendering code below may be called whenever you need to
+    redisplay part of a window showing DjVu image.  Class \Ref{GRect} is used
+    to represent two rectangles of interest. Rectangle #full# represents the
+    range of pixels that would be occupied by the full DjVu image. This
+    rectangle may be much larger than your computer screen.  The ratio between
+    the size of this rectangle and the size of the image implicitly defines
+    the resolution of the displayed image.  Rectangle #part# represents the
+    range of pixel that you actually want to compute.  This rectangle always
+    corresponds to a visible portion of your screen.  The functions
+    \Ref{DjVuImage::get_pixmap} and \Ref{DjVuImage::get_bitmap} return a
+    "smart" \Ref{GP} pointer to either a \Ref{GPixmap} or \Ref{GBitmap}
+    containing the requested pixels.
+    \begin{verbatim}
+       GRect part = my_rectangle_to_redisplay();
+       GRect full = my_rectangle_for_the_full_image();
+       // Try rendering in color
+       GP<GPixmap> pm = img->get_pixmap(part, full);
+       if (pm) { my_display_in_color(pm); return; }
+       // Try rendering in gray
+       GP<GBitmap> bm = img->get_bitmap(part, full);
+       if (bm) { my_display_in_grays(bm); return ; }
+    \end{verbatim}
+     
+    Progressive display can be implemented using multi-threading.  The browser
+    starts a decoding thread as soon as it starts receiving data.  The
+    decoding progress can be monitored using class \Ref{DjVuInterface}. The
+    main thread can call the rendering functions at any time while the
+    decoding is in progress.  These function render the image as early as
+    possible, using only the already decoded data.
+
+    Section \Ref{GThreads.h} discusses the multi-threading capabilities of the
+    DjVu Reference Library.  These features must be enabled at compile-time
+    using the adequate option of the configuration script.  */
+
 //@}
 
 
@@ -317,152 +531,6 @@
     textual information and the image would be described by a #"DX2I"# chunk.
     That would finally allow us to do Copy/Paste with DjVu documents.  */
 //@}
-
-
-
-//----------------------------------------
-/** @name Getting Started
- */
-//@{
-
-/** @name Compiling the Library (Unix)
-
-
-    {\bf Directories} --- The structure of the distribution is essentially
-    flat.  All the source code files, for both the library and the utility
-    programs, are found in the main directory #"libdjvu++"#.  A few
-    subdirectories contain accessory material.  Directory #"@Doc"# contains
-    the HTML documentation generated from the source files.  Directory
-    #"@Samples"# contains sample DjVu files for testing purposes.  Directory
-    #"@Test"# contains a few test programs for the library basic features.
-    Directory #"@Tools"# contains tools that may be useful for building the
-    library or its documentation.
-
-
-    {\bf Prerequisites} --- The DjVu Reference Library should compile and run
-    on any well behaved Unix system, {\em provided that you use a good C++
-    compiler} supporting templates, exceptions and possibly multithreading.
-    Workstation makers usually provide good compilers.  You can certainly
-    compile and run the library with these compilers if you find out which
-    options apply to your system and your particular version of the compiler.
-    We find that there are just too many different compilers around.  This is
-    why we recommend using #gcc# or #egcs#.
-
-    You can safely proceed to the compilation if you have #gcc-2.8.x# or any
-    version #egcs# greater than #egcs-1.0.2#.  Use command #g++ -v# to find
-    out what is installed on your system.  If you have an earlier version of
-    #g++# such as #gcc-2.7.23#, you must upgrade because it is not going to
-    work.  We strongly recomment upgrading directly to #egcs-1.1.1# or better.
-    The easiest way consists of picking a binary distribution somewhere on the
-    Internet.  Linux users may have a look at \URL{http://www.gcc.ml.org} or
-    \URL{http://rufus.w3.org/linux/RPM}.
-
-    {\bf Building your compiler (advanced)} --- You should really skip this
-    section if you can avoid reading it.  You should only read it if (a) you
-    cannot find a suitable binary distribution of #egcs#, or (b) you want to
-    experiment with the multi-threading features of the library.
-
-    Building the #egcs# compilers requires GNU Make.  The Linux operating
-    systems uses GNU Make by default.  Many Unix systems provide GNU Make
-    under the name #gmake#.  You must otherwise download the source code at
-    \URL{ftp://gatekeeper.dec.com/pub/GNU/make} or
-    \URL{ftp://prep.ai.mit.edu/pub/gnu}, unpack it, read the instructions,
-    compile and install.
-
-    You must then download the source distribution of the latest release of
-    #egcs# from \URL{http://egcs.cygnus.com}.  We provide a small patch for
-    #"egcs/gcc/libgcc2.c"# which is required by our multi-threading code.
-    You can apply the patch using command #patch#. 
-    \begin{verbatim}
-      % cd egcs/gcc
-      % patch < $HOME/libdjvu++/@Tools/libgcc2.c.diff
-      Patching file libgcc2.c using Plan A...
-      Hunk #1 succeeded at 3063.
-      Hunk #2 succeeded at 3118.
-      done
-    \end{verbatim}
-    This patch has been tested with #egcs-1.1# and #egcs-1.1.1#.  We hope that
-    the EGCS people will either include the patch in their future releases, or
-    provide a similar capability.  If anything suspicious happens during the
-    patching process, we suggest that you restore the original version of
-    #"libgcc2.c"# which is automatically saved as #"libgcc2.c.orig"#.
-
-    You must then configure and compile #egcs#.  Everything is pretty well
-    described at \URL{http://egcs.cygnus.com}.  I could use for instance the
-    following commands on my SGI workstation running Irix-6.4:
-    \begin{verbatim}
-      % cd egcs
-      % configure --prefix=$HOME/egcs  mips-sgi-irix-5.3
-      % gnu-make
-      % gnu-make install
-    \end{verbatim}
-    You are reading correctly: I am pretending that my workstation has
-    Irix-5.3 because I want to create backward compatible binaries.  Welcome
-    to the wonderful world of compilers.
-
-    {\bf Compiling the DjVu Reference Library} --- Compiling the DjVu
-    Reference Library is a two step process.  You must first invoke the script
-    #configure# which searches the compiler, selects the compilation options
-    and creates the makefiles.
-    \begin{verbatim}
-       % configure --prefix=$HOME/djvu
-    \end{verbatim}
-
-    You can specify a particular compiler by setting environment variable
-    #CXX# before invoking the configuration script. This script also 
-    supports the following options:
-    \begin{description}
-    \item[--prefix=PREFIXDIR] indicates where the binary files will be installed.
-    \item[--with-debug] enables the debugging options of the compiler.
-    \item[--with-cxxflag=FLAG] passes a particular option to the compiler.
-    \item[--without-threads] disables multi-threading (the default).
-    \item[--with-threads=(cothreads|posix|dce)] enables multithreading and
-         selects a multithreading implementation (see \Ref{GThreads.h}). You
-         must make sure that your C++ compiler is compatible with the chosen
-         thread implementation.  The safest option consists of using the
-         patched version of #egcs# (see above) and the #cothreads#
-         implementation.
-    \end{description}
-
-    You are now ready to compile and install everything by typing:
-    \begin{verbatim}
-       % make all
-       % make install
-    \end{verbatim}
-
-    {\bf Using the DjVu Reference Library} --- At this point, you have
-    generated a collection of small executables documented in section
-    \Ref{Utility Programs}.  This is not very exciting.  It is now time to
-    remember that the DjVu Reference Library is a source code library.  Almost
-    everything you can use safely is documented in section 
-    \Ref{Library Reference}.  You may want however to start with 
-    sections \Ref{Decoding DjVu content} and \Ref{Creating DjVu content}.  */
-
-
-/** @name Compiling the Library (Systems other than Unix)       
-
-   This library compiles without modification under Windows using Visual C++
-   version 5.0.  It should also compile under MacOS using the MetroWerks
-   compiler, although some system dependent functions are still missing.  In
-   both cases however, you have to provide your makefile (or your project, or
-   your workspace or whatever) using the Unix makefiles as a template.
-
- */
-
-
-/** @name Decoding DjVu content
-
-    See \Ref{DjVuImage.h}.
- */
-
-/** @name Creating DjVu content
-
-    See \Ref{djvumake}.
- */
-
-
-//@}
-
 
 
 //----------------------------------------
