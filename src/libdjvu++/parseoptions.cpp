@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: parseoptions.cpp,v 1.6 1999-11-03 21:26:01 bcr Exp $
+//C- $Id: parseoptions.cpp,v 1.7 1999-11-03 23:31:08 bcr Exp $
 #ifdef __GNUC__
 #pragma implementation
 #endif
@@ -225,23 +225,26 @@ DjVuParseOptions::AmbiguousOptions
 }
 
 // This function is usefull when the same option has multiple names.
-//
+// The variable index of the highest priority variable will be returned.
+// Command line arguments have higher priority than current profile values,
+// which are higher priority than default profile values.
 int
-DjVuParseOptions::GetBestToken
+DjVuParseOptions::GetBest
 (const int listsize,const int tokens[])
 {
   const char *r=0;
   int retval=(-1);
+  int besttoken=(-1);
   int i;
   for(i=0;!r&&(i<listsize);r=Arguments->GetValue(tokens[i++]));
   if(r)
   {
-    for(retval=tokens[i-1];i<listsize;i++)
+    for(besttoken=tokens[(retval=i-1)];i<listsize;i++)
     {
       const char *s=Arguments->GetValue(tokens[i]);
       if(s)
       {
-        AmbiguousOptions(retval,r,tokens[i],s);
+        AmbiguousOptions(besttoken,r,tokens[i],s);
       }
     }
   }else
@@ -250,12 +253,12 @@ DjVuParseOptions::GetBestToken
       r=Configuration->GetValue(currentProfile,tokens[i++]));
     if(r)
     {
-      for(retval=tokens[i-1];i<listsize;i++)
+      for(besttoken=tokens[(retval=i-1)];i<listsize;i++)
       {
         const char *s=Configuration->GetValue(currentProfile,tokens[i]);
         if(s)
         {
-          AmbiguousOptions(retval,r,tokens[i],s);
+          AmbiguousOptions(besttoken,r,tokens[i],s);
         }
       }
     }else
@@ -264,12 +267,12 @@ DjVuParseOptions::GetBestToken
         r=Configuration->GetValue(defaultProfile,tokens[i++]));
       if(r)
       {
-        for(retval=tokens[i-1];i<listsize;i++)
+        for(besttoken=tokens[(retval=i-1)];i<listsize;i++)
         {
           const char *s=Configuration->GetValue(defaultProfile,tokens[i]);
           if(s)
           {
-            AmbiguousOptions(retval,r,tokens[i],s);
+            AmbiguousOptions(besttoken,r,tokens[i],s);
           }
         }
       }
@@ -279,9 +282,11 @@ DjVuParseOptions::GetBestToken
 }
 
 // This function is usefull when the same option has multiple names.
-//
+// The variable index of the highest priority variable will be returned.
+// Command line arguments have higher priority than current profile values,
+// which are higher priority than default profile values.
 int
-DjVuParseOptions::GetBestToken
+DjVuParseOptions::GetBest
 (const int listsize,const char * const xname[])
 {
   int retval=(-1);
@@ -291,15 +296,9 @@ DjVuParseOptions::GetBestToken
     int *tokens=new int[listsize];
     for(i=j=0;i<listsize;i++)
     {
-      if(xname[i])
-      {
-        const int token=GetVarToken(xname[i]);
-        if(token>=0)
-          tokens[j++]=token;
-      } 
+      tokens[j++]=xname[i]?GetVarToken(xname[i]):(-1);
     }
-    if(j>0)
-      retval=GetBestToken(j,tokens);
+    retval=GetBest(j,tokens);
     delete [] tokens;
   }
   return retval;

@@ -6,7 +6,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: parseoptions.h,v 1.4 1999-11-03 21:26:01 bcr Exp $
+//C- $Id: parseoptions.h,v 1.5 1999-11-03 23:31:08 bcr Exp $
 
 #endif /* __cplusplus */
 
@@ -175,7 +175,7 @@
 //
 // \end{verbatim} */
 //** @memo parseoptions header file */
-//** @version $Id: parseoptions.h,v 1.4 1999-11-03 21:26:01 bcr Exp $ */
+//** @version $Id: parseoptions.h,v 1.5 1999-11-03 23:31:08 bcr Exp $ */
 //** @author: $Author: bcr $ */
 
 // First we include some C wrappers for our class.
@@ -330,28 +330,31 @@ public:
   const char * const GetValue(const int token) const;
 
   //** Multiple tokens may be in an array of the specified listsize.  The   */
-  //** token with a value of the highest presidence will be returned.     */
-  int GetBestToken(const int listsize,const int tokens[]);
+  //** index of the token with a value of the highest presidence will be    */
+  //** is returned.  Command line arguments have the highest presidence.    */
+  //** Default profile values have the lowest presidence.  It is an error   */
+  //** to have two values f the same presedence. */
+  int GetBest(const int listsize,const int tokens[]);
 
-  //** Multiple tokens may be in an array of the specified listsize.  The   */
-  //** value with the highest presidence will be returned.                  */
-  inline const char * const GetBestValue(const int listsize,const int tokens[])
-  { return GetValue(GetBestToken(listsize,tokens)); };
+  //** Same as above, but -1 terminated */
+  inline int GetBest(const int tokens[])
+  {int i;for(i=0;tokens[i]>=0;i++);return GetBest(i,tokens);}
 
   //** This is just a short cut, when a token value is only needed for one */
   //** lookup.  A list of tokens may be specified as well.                 */
   inline const char * const GetValue(const char xname[]) const
   { return GetValue(GetVarToken(xname)); }
 
-  //** Multiple names may be in an array of the specified listsize.  The     */
-  //** value with the highest presidence will be returned.                   */
-  int GetBestToken(const int listsize,const char * const[]);
+  //** Multiple names may be in an array of the specified listsize.  The    */
+  //** index of the name with a value of the highest presidence will be     */
+  //** is returned.  Command line arguments have the highest presidence.    */
+  //** Default profile values have the lowest presidence.  It is an error   */
+  //** to have two values f the same presedence. */
+  int GetBest(const int listsize,const char * const[]);
 
-  //** Multiple names may be in an array of the specified listsize.  The     */
-  //** token with a value of the highest presidence will be returned.     */
-  inline const char * const GetBestValue
-  (const int listsize,const char * const xname[])
-  { return GetValue(GetBestToken(listsize,xname)); };
+  //** Same as above, but NULL terminated */
+  inline int GetBest(const char * const names[])
+  {int i;for(i=0;names[i];i++);return GetBest(i,names);}
 
   //** This just checks for TRUE, and if not does an atoi() conversion. */
   //** Anything beginning with [Tt] is returned as 1, [Ff\0] is returned */

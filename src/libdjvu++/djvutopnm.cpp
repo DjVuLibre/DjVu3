@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: djvutopnm.cpp,v 1.26 1999-11-03 21:33:13 bcr Exp $
+//C- $Id: djvutopnm.cpp,v 1.27 1999-11-03 23:31:08 bcr Exp $
 
 
 /** @name djvutopnm
@@ -94,7 +94,7 @@
     Yann Le Cun <yann@research.att.com>\\
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: djvutopnm.cpp,v 1.26 1999-11-03 21:33:13 bcr Exp $# */
+    #$Id: djvutopnm.cpp,v 1.27 1999-11-03 23:31:08 bcr Exp $# */
 //@{
 //@}
 
@@ -320,6 +320,7 @@ main(int argc, char *argv[], char *[])
       int nextarg=Opts.ParseArguments(argc,argv,long_options,1)-1;
       argc -= nextarg;
       argv+=nextarg;
+
       // Process options
       int page_num=-1;
       if(Opts.GetInteger("help",0))
@@ -328,82 +329,11 @@ main(int argc, char *argv[], char *[])
         usage();
       }
       flag_verbose=Opts.GetInteger("verbose",0);
-      const static char *duplicates[3] = {
-        "scale","size","subsample"
-      };
-          // We can't use the value directly, because we don't know which
-          // one we got.  But if more than one was specified, the GetValue
-          // command will generate an error message.
-      int token;
-      if((token=Opts.GetBestToken(4,duplicates)) >= 0)
-      {
-        if(token == Opts.GetVarToken(duplicates[0]))
-        {
-          const char *s=Opts.GetValue(token);
-          char *r;
-          flag_scale = strtod(s,&r);
-          if (*r == '%') 
-            r++;
-          if (*r)
-            THROW("Illegal argument for option '-scale'");
-        }else if(token == Opts.GetVarToken(duplicates[1]))
-        {
-          const char *s=Opts.GetValue(token);
-          geometry(s, fullrect);
-          flag_size = 1;
-          if (fullrect.xmin || fullrect.ymin)
-            THROW("Illegal -size specification");
-        }else
-        {
-          int i=Opts.GetInteger(token,0);
-          if (i<0)
-          {
-            Opts.perror();
-            usage();
-          }
-          flag_subsample = i;
-        }
-      }
       const char *segment=Opts.GetValue("segment");
       if(segment)
       {
         geometry(segment, segmentrect);
         flag_segment = 1;
-      }
-      const static char *duplicates2[4] = {
-        "layer","black","foreground","background"
-      };
-      if((token=Opts.GetBestToken(4,duplicates2)) >= 0)
-      {
-        if(token == Opts.GetVarToken(duplicates2[0]))
-        {
-          const char *s=Opts.GetValue(token);
-          if(!strcmp(s,duplicates2[1]))
-          {
-            flag_mode = 's';
-          }else if(!strcmp(s,duplicates2[2]))
-          {
-            flag_mode = 'f';
-          }else if(!strcmp(s,duplicates2[3]))
-          {
-            flag_mode = 'b';
-          }else
-          {
-            THROW("Illegal -layer specification.");
-          }
-        }else if(Opts.GetInteger(duplicates2[token],0))
-        {
-          if(token == Opts.GetVarToken(duplicates2[1]))
-          {
-            flag_mode = 's';
-          }else if(token == Opts.GetVarToken(duplicates2[2]))
-          {
-            flag_mode = 'f';
-          }else if(token == Opts.GetVarToken(duplicates2[3]))
-          {
-            flag_mode = 'b';
-          }
-        }
       }
       page_num=Opts.GetInteger("page",-1);
       if(page_num != -1)
@@ -412,6 +342,92 @@ main(int argc, char *argv[], char *[])
 	page_num--;
       }
       if (page_num<0) page_num=0;
+
+      // We need one and only one of the following three values.  The
+      // For that we should use the GetBest() method.  Otherwise we will
+      // run into problems if one is defined in a profile, but the other
+      // is specified on the command line.
+      int duplicates[5];
+      duplicates[0]=Opts.GetVarToken("scale");
+      duplicates[1]=Opts.GetVarToken("size");
+      duplicates[2]=Opts.GetVarToken("subsample");
+      duplicates[3]=0;
+      switch(Opts.GetBest(duplicates))
+      {
+        case 0: // scale
+        {
+          const char *s=Opts.GetValue(duplicates[0]);
+          char *r;
+          flag_scale = strtod(s,&r);
+          if (*r == '%') 
+            r++;
+          if (*r)
+            THROW("Illegal argument for option '-scale'");
+          break;
+        }
+        case 1: // size
+        {
+          const char *s=Opts.GetValue(duplicates[1]);
+          geometry(s, fullrect);
+          flag_size = 1;
+          if (fullrect.xmin || fullrect.ymin)
+            THROW("Illegal -size specification");
+          break;
+        }
+        case 2: // subsample
+        {
+          int i=Opts.GetInteger(duplicates[2],0);
+          if (i<0)
+          {
+            Opts.perror();
+            usage();
+          }
+          flag_subsample = i;
+          break;
+        }
+        default:  // none of them are defined.
+	  break;
+      }
+      duplicates[0]=Opts.GetVarToken("layer");
+      duplicates[1]=Opts.GetVarToken("black");
+      duplicates[2]=Opts.GetVarToken("foreground");
+      duplicates[3]=Opts.GetVarToken("background");
+      duplicates[4]=0;
+      switch(Opts.GetBest(duplicates))
+      {
+        case 0:  // layer
+        {
+          const char *s=Opts.GetValue(duplicates[0]);
+          if(!strcmp(s,"black"))
+          {
+            flag_mode = 's';
+          }else if(!strcmp(s,"foreground"))
+          {
+            flag_mode = 'f';
+          }else if(!strcmp(s,"background"))
+          {
+            flag_mode = 'b';
+          }else
+          {
+            THROW("Illegal -layer specification.");
+          }
+          break;
+        }
+        case 1: // black
+          if(Opts.GetInteger(duplicates[1],0))
+            flag_mode = 's';
+          break;
+        case 2: // foreground
+          if(Opts.GetInteger(duplicates[2],0))
+            flag_mode = 'f';
+          break;
+        case 3: // background
+          if(Opts.GetInteger(duplicates[3],0))
+            flag_mode = 'b';
+          break;
+        default: // none of these options have been specified.
+	  break;
+      }
       if(Opts.HasError())
       {
         Opts.perror();
