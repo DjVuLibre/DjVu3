@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: IFFByteStream.h,v 1.27 2001-02-15 20:31:57 bcr Exp $
+// $Id: IFFByteStream.h,v 1.28 2001-02-16 00:56:30 praveen Exp $
 // $Name:  $
 
 #ifndef _IFFBYTESTREAM_H_
@@ -89,7 +89,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: IFFByteStream.h,v 1.27 2001-02-15 20:31:57 bcr Exp $# */
+    #$Id: IFFByteStream.h,v 1.28 2001-02-16 00:56:30 praveen Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -217,6 +217,7 @@ public:
       returns #-1# if this is an illegal or otherwise reserved identifier
       which should not be used.  */
   static int check_id(const char *id);
+  GP<ByteStream> get_bytestream(void) {return this;}
   /** #has_magic# is true if the stream has the DjVu file magic.
    */
   bool has_magic;
