@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djthumb.cpp,v 1.26 2001-09-21 20:21:30 leonb Exp $
+// $Id: djthumb.cpp,v 1.27 2001-09-26 18:29:45 leonb Exp $
 // $Name:  $
 
 // DJTHUMB -- DjVu thumbnails generator
@@ -68,7 +68,7 @@
     @author
     Andrei Erofeev <eaf@geocities.com> -- initial implementation
     @version
-#$Id: djthumb.cpp,v 1.26 2001-09-21 20:21:30 leonb Exp $# */
+#$Id: djthumb.cpp,v 1.27 2001-09-26 18:29:45 leonb Exp $# */
 //@{
 //@}
 
@@ -226,7 +226,7 @@ main(int argc, char ** argv)
                        size_in, size_out, 100*(size_out-size_in)/size_in);
     }
   } G_CATCH(exc) {
-    exc.perror( ERR_MSG("Error") );
+    exc.perror();
     exit(1);
   } G_ENDCATCH;
   return 0;

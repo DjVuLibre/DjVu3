@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: c44.cpp,v 1.38 2001-09-21 20:21:30 leonb Exp $
+// $Id: c44.cpp,v 1.39 2001-09-26 18:29:45 leonb Exp $
 // $Name:  $
 
 
@@ -185,7 +185,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: c44.cpp,v 1.38 2001-09-21 20:21:30 leonb Exp $# */
+    #$Id: c44.cpp,v 1.39 2001-09-26 18:29:45 leonb Exp $# */
 //@{
 //@}
 
@@ -755,7 +755,7 @@ main(int argc, char **argv)
     }
   G_CATCH(ex)
     {
-      ex.perror( ERR_MSG("Error") );
+      ex.perror();
       exit(1);
     }
   G_ENDCATCH;

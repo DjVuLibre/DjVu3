@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ddjvu.cpp,v 1.29 2001-09-24 22:38:04 leonb Exp $
+// $Id: ddjvu.cpp,v 1.30 2001-09-26 18:29:45 leonb Exp $
 // $Name:  $
 
 /** @name ddjvu
@@ -111,7 +111,7 @@
     Yann Le Cun <yann@research.att.com>\\
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: ddjvu.cpp,v 1.29 2001-09-24 22:38:04 leonb Exp $# */
+    #$Id: ddjvu.cpp,v 1.30 2001-09-26 18:29:45 leonb Exp $# */
 //@{
 //@}
 
@@ -465,7 +465,7 @@ main(int argc, char **argv)
     }
   G_CATCH(ex)
     {
-      ex.perror("Exception while executing DDJVU");
+      ex.perror();
       exit(1);
     }
   G_ENDCATCH;

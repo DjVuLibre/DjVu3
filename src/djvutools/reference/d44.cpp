@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: d44.cpp,v 1.25 2001-09-21 20:21:30 leonb Exp $
+// $Id: d44.cpp,v 1.26 2001-09-26 18:29:45 leonb Exp $
 // $Name:  $
 
 /** @name d44
@@ -84,7 +84,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: d44.cpp,v 1.25 2001-09-21 20:21:30 leonb Exp $# 
+    #$Id: d44.cpp,v 1.26 2001-09-26 18:29:45 leonb Exp $# 
 */
 //@{
 //@}
@@ -258,7 +258,7 @@ mymain(int argc, char **argv)
     }
   G_CATCH(ex)
     {
-      ex.perror("Exception while executing D44");
+      ex.perror();
       exit(1);
     }
   G_ENDCATCH;

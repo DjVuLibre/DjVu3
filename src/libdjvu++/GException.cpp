@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GException.cpp,v 1.35 2001-07-24 17:52:04 bcr Exp $
+// $Id: GException.cpp,v 1.36 2001-09-26 18:29:46 leonb Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -121,21 +121,17 @@ GException::operator=(const GException & exc)
 }
 
 void
-GException::perror(const char *msg) const
+GException::perror(void) const
 {
   fflush(0);
-  DjVuPrintErrorUTF8("%s","***");
+  DjVuPrintErrorUTF8("*** ");
   DjVuMessageLite::perror(get_cause());
   if (file && line>0)
-    DjVuPrintErrorUTF8("\n*** (%s:%d)", file, line);    
+    DjVuPrintErrorUTF8("*** (%s:%d)\n", file, line);    
   else if (file)
-    DjVuPrintErrorUTF8("\n*** (%s)", file);        
-  if (msg) 
-  {
-    DjVuMessageLite::perror(msg);
-  }
+    DjVuPrintErrorUTF8("*** (%s)\n", file);
   if (func)
-    DjVuPrintErrorUTF8("\n*** %s", func);
+    DjVuPrintErrorUTF8("*** '%s'\n", func);    
   DjVuPrintErrorUTF8("\n");
 }
 
@@ -188,7 +184,8 @@ GExceptionHandler::emthrow(const GException &gex)
     }
   else
     {
-      gex.perror("Unhandled exception");
+      DjVuPrintErrorUTF8("\n*** Unhandled exception");
+      gex.perror();
 #ifndef UNDER_CE
       abort();
 #else

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.cpp,v 1.92 2001-08-24 21:50:09 docbill Exp $
+// $Id: ByteStream.cpp,v 1.93 2001-09-26 18:29:46 leonb Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 04/1997
@@ -724,17 +724,18 @@ ByteStream::Stdio::init(const GURL &url, const char mode[])
     {
 #ifndef UNDER_CE
       //  Failed to open '%s': %s
-      G_THROW( ERR_MSG("ByteStream.open_fail") "\t"+url.get_string()+"\t"+GNativeString(strerror(errno)).getNative2UTF8());
+      G_THROW( ERR_MSG("ByteStream.open_fail") "\t"+url.name()+"\t"+GNativeString(strerror(errno)).getNative2UTF8());
 #else
-      G_THROW( ERR_MSG("ByteStream.open_fail2") );                  //  StdioByteStream::StdioByteStream, failed to open file.
+      G_THROW( ERR_MSG("ByteStream.open_fail2") ); //  StdioByteStream::StdioByteStream, failed to open file.
 #endif
     }
     /*MBCS*/
     if (!fp)
     {
 #ifndef UNDER_CE
-      retval=GUTF8String( ERR_MSG("ByteStream.open_fail") "\t")+url+GNativeString(strerror(errno)).getNative2UTF8();
-         //  Failed to open '%s': %s
+      retval=GUTF8String( ERR_MSG("ByteStream.open_fail") "\t")+url
+        +GNativeString(strerror(errno)).getNative2UTF8();
+      //  Failed to open '%s': %s
 #else
       retval= ERR_MSG("ByteStream.open_fail2"); //  Stdio, failed to open file.
 #endif

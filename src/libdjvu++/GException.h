@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GException.h,v 1.30 2001-07-24 17:52:04 bcr Exp $
+// $Id: GException.h,v 1.31 2001-09-26 18:29:46 leonb Exp $
 // $Name:  $
 
 #ifndef _GEXCEPTION_H_
@@ -92,7 +92,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@geocities.com> -- fixed message memory allocation.
     @version 
-    #$Id: GException.h,v 1.30 2001-07-24 17:52:04 bcr Exp $# */
+    #$Id: GException.h,v 1.31 2001-09-26 18:29:46 leonb Exp $# */
 //@{
 
 #include "DjVuGlobal.h"
@@ -128,8 +128,10 @@ public:
   GException & operator=(const GException & exc);
   
   /** Prints an error message on stderr.
-      @param msg: string incorporated into the error message. */
-  void perror(const char *msg = 0) const;
+      This function no longer takes a message parameter because 
+      some instances used a i18n message id and other instances
+      used a literal string. */
+  void perror(void) const;
   
   /** Returns the string describing the cause of the exception.  The returned
       pointer is never null.  Exception handlers should not rely on the value

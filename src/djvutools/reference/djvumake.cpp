@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //
-// $Id: djvumake.cpp,v 1.27 2001-09-21 20:21:30 leonb Exp $
+// $Id: djvumake.cpp,v 1.28 2001-09-26 18:29:45 leonb Exp $
 // $Name:  $
 
 /** @name djvumake
@@ -102,7 +102,7 @@
     @memo
     Assemble DjVu files.
     @version
-    #$Id: djvumake.cpp,v 1.27 2001-09-21 20:21:30 leonb Exp $#
+    #$Id: djvumake.cpp,v 1.28 2001-09-26 18:29:45 leonb Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> \\
     Patrick Haffner <haffner@research.att.com>
@@ -731,7 +731,7 @@ main(int argc, char **argv)
   G_CATCH(ex)
     {
       remove(dargv[1]);
-      ex.perror("Type 'djvumake' without arguments for more help");
+      ex.perror();
       exit(1);
     }
   G_ENDCATCH;
