@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.26 1999-09-03 23:35:40 leonb Exp $
+//C- $Id: DjVuDocument.cpp,v 1.27 1999-09-03 23:55:22 leonb Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -33,6 +33,8 @@ DjVuDocument::init(const GURL & url, GP<DjVuPort> xport,
 {
    if (initialized)
      THROW("DjVuDocument is already initialized");
+   if (!get_count())
+     THROW("DjVuDocument is not secured by a GP<DjVuDocument>");
    initialized = true;
    DEBUG_MSG("DjVuDocument::init(): initializing class...\n");
    DEBUG_MAKE_INDENT(3);
@@ -53,9 +55,19 @@ DjVuDocument::~DjVuDocument(void)
 {
 }
 
+
+void
+DjVuDocument::check() const
+{
+  if (!initialized)
+    THROW("DjVuDocument is not initialized");
+}
+
+
 void
 DjVuDocument::detect_doc_type(const GURL & doc_url)
 {
+   check();
    DEBUG_MSG("DjVuDocument::detect_doc_type(): guessing what we're dealing with\n");
    DEBUG_MAKE_INDENT(3);
 
@@ -160,6 +172,7 @@ DjVuDocument::detect_doc_type(const GURL & doc_url)
 void
 DjVuDocument::decode_doc_structure(void)
 {
+   check();
    DEBUG_MSG("DjVuDocument::decode_doc_structure(): learning doc structure.\n");
    DEBUG_MAKE_INDENT(3);
 
@@ -172,6 +185,7 @@ DjVuDocument::decode_doc_structure(void)
 void
 DjVuDocument::decode_ndir(void)
 {
+   check();
    DEBUG_MSG("DjVuDocument::decode_ndir(): decoding the navigation directory...\n");
    DEBUG_MAKE_INDENT(3);
 
@@ -191,6 +205,7 @@ DjVuDocument::decode_ndir(void)
 int
 DjVuDocument::get_pages_num(void)
 {
+   check();
    if (doc_type==BUNDLED || doc_type==INDIRECT)
       return djvm_dir->get_pages_num();
    else return ndir->get_pages_num();
@@ -199,6 +214,7 @@ DjVuDocument::get_pages_num(void)
 GString
 DjVuDocument::page_to_id(int page_num)
 {
+   check();
    if (page_num<0) THROW("Page number may not be negative.");
    if (page_num>=get_pages_num()) THROW("Page number is too big.");
    if (doc_type==BUNDLED || doc_type==INDIRECT)
@@ -209,6 +225,7 @@ DjVuDocument::page_to_id(int page_num)
 GString
 DjVuDocument::page_to_name(int page_num)
 {
+   check();
    if (page_num<0) THROW("Page number may not be negative.");
    if (page_num>=get_pages_num()) THROW("Page number is too big.");
    if (doc_type==BUNDLED || doc_type==INDIRECT)
@@ -219,6 +236,7 @@ DjVuDocument::page_to_name(int page_num)
 GString
 DjVuDocument::page_to_title(int page_num)
 {
+   check();
    if (page_num<0) THROW("Page number may not be negative.");
    if (page_num>=get_pages_num()) THROW("Page number is too big.");
    if (doc_type==BUNDLED || doc_type==INDIRECT)
@@ -229,6 +247,7 @@ DjVuDocument::page_to_title(int page_num)
 GURL
 DjVuDocument::page_to_url(int page_num)
 {
+   check();
    if (page_num<0) THROW("Page number may not be negative.");
    if (page_num>=get_pages_num()) THROW("Page number is too big.");
 
@@ -260,6 +279,7 @@ DjVuDocument::page_to_url(int page_num)
 int
 DjVuDocument::url_to_page(const GURL & url)
 {
+   check();
    int page_num=-1;
    switch(doc_type)
    {
@@ -319,6 +339,7 @@ DjVuDocument::add_to_cache(const GP<DjVuFile> & f)
 GURL
 DjVuDocument::id_to_url(const char * id)
 {
+   check();
    DEBUG_MSG("DjVuDocument::id_to_url(): translating ID='" << id << "' to URL\n");
    DEBUG_MAKE_INDENT(3);
 
@@ -414,6 +435,7 @@ DjVuDocument::cache_djvu_file(const DjVuPort * source, DjVuFile * file)
 GP<DataPool>
 DjVuDocument::request_data(const DjVuPort * source, const GURL & url)
 {
+   check();
    DEBUG_MSG("DjVuDocument::request_data(): seeing if we can do it\n");
    DEBUG_MAKE_INDENT(3);
 
@@ -508,6 +530,7 @@ DjVuDocument::notify_all_data_received(const DjVuPort * source)
 GP<DjVuFile>
 DjVuDocument::get_djvu_file(const GURL & url)
 {
+   check();
    DEBUG_MSG("DjVuDocument::get_djvu_file(): request for '" << url << "'\n");
    DEBUG_MAKE_INDENT(3);
 
@@ -559,6 +582,7 @@ DjVuDocument::get_djvu_file(int page_num)
 GP<DjVuImage>
 DjVuDocument::get_page(int page_num)
 {
+   check();
    DEBUG_MSG("DjVuDocument::get_page(): request for page " << page_num << "\n");
    DEBUG_MAKE_INDENT(3);
    
@@ -689,6 +713,7 @@ add_file_to_djvm(const GP<DjVuFile> & file, bool page,
 GP<DjVmDoc>
 DjVuDocument::get_djvm_doc(void)
 {
+   check();
    DEBUG_MSG("DjVuDocument::get_djvm_doc(): creating the DjVmDoc\n");
    DEBUG_MAKE_INDENT(3);
 

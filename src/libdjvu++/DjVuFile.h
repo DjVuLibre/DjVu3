@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.h,v 1.22 1999-09-03 23:35:40 leonb Exp $
+//C- $Id: DjVuFile.h,v 1.23 1999-09-03 23:55:22 leonb Exp $
  
 #ifndef _DJVUFILE_H
 #define _DJVUFILE_H
@@ -46,7 +46,7 @@
 
     @memo Classes representing DjVu files.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuFile.h,v 1.22 1999-09-03 23:35:40 leonb Exp $#
+    @version #$Id: DjVuFile.h,v 1.23 1999-09-03 23:55:22 leonb Exp $#
 */
 
 //@{
@@ -437,6 +437,7 @@ private:
       // Progress callback: called from time to time
    static void	progress_cb(int pos, void *);
 
+   void          check() const;
    GP<DjVuNavDir>find_ndir(GMap<GURL, void *> & map);
    GP<DjVuNavDir>decode_ndir(GMap<GURL, void *> & map);
    void		add_djvu_data(IFFByteStream & str,

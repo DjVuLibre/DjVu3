@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuPort.cpp,v 1.11 1999-09-03 23:35:40 leonb Exp $
+//C- $Id: DjVuPort.cpp,v 1.12 1999-09-03 23:55:22 leonb Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -144,7 +144,10 @@ DjVuPortcaster::add_route(const DjVuPort * src, DjVuPort * dst)
       // Adds route src->dst
 {
    GCriticalSectionLock lock(&map_lock);
-
+   if (!src->get_count())
+     THROW("Source port is not secured by a smart pointer.");
+   if (!dst->get_count())
+     THROW("Destination port is not secured by a smart pointer.");
    if (cont_map.contains(src) && cont_map.contains(dst))
    {
       if (!route_map.contains(src)) route_map[src]=new GList<void *>();

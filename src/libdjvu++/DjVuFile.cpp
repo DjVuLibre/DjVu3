@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.32 1999-09-03 23:35:40 leonb Exp $
+//C- $Id: DjVuFile.cpp,v 1.33 1999-09-03 23:55:22 leonb Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -76,6 +76,14 @@ DjVuFile::DjVuFile()
 {
 }
 
+void
+DjVuFile::check() const
+{
+  if (!initialized)
+    THROW("DjVuFile is not initialized");
+}
+
+
 void 
 DjVuFile::init(ByteStream & str)
 {
@@ -84,6 +92,9 @@ DjVuFile::init(ByteStream & str)
 
    if (initialized)
      THROW("DjVuFile is already initialized");
+   if (!get_count())
+     THROW("DjVuFile is not secured by a GP<DjVuFile>");
+
    initialized = 1;
    file_size=0;
    decode_thread=0;
@@ -114,8 +125,10 @@ DjVuFile::init(const GURL & xurl, GP<DjVuPort> port)
 
    if (initialized)
      THROW("DjVuFile is already initialized");
-   url = xurl;
+   if (!get_count())
+     THROW("DjVuFile is not secured by a GP<DjVuFile>");
    initialized = 1;
+   url = xurl;
    file_size=0;
    decode_thread=0;
    
@@ -139,12 +152,9 @@ DjVuFile::~DjVuFile(void)
 {
    DEBUG_MSG("DjVuFile::~DjVuFile(): destroying...\n");
    DEBUG_MAKE_INDENT(3);
-
-   {
-      GCriticalSectionLock lock(&trigger_lock);
-      data_pool->del_trigger(static_trigger_cb, this);
-   }
-
+   trigger_lock.lock();
+   data_pool->del_trigger(static_trigger_cb, this);
+   trigger_lock.unlock();
    stop_decode(1);
 }
 
@@ -285,6 +295,7 @@ void
 DjVuFile::wait_for_chunk(void)
       // Will return after a chunk has been decoded
 {
+   check();
    DEBUG_MSG("DjVuFile::wait_for_chunk() called\n");
    DEBUG_MAKE_INDENT(3);
    chunk_mon.enter();
@@ -311,6 +322,7 @@ DjVuFile::wait_for_finish(bool self)
       // may terminate in between, and we'll wait forever.
       //
       // Locking is required by GMonitor interface too, btw.
+   check();
    GMonitorLock lock(&finish_mon);
    if (self)
    {
@@ -395,6 +407,7 @@ DjVuFile::static_decode_func(void * cl_data)
 void
 DjVuFile::decode_func(void)
 {
+   check();
    DEBUG_MSG("DjVuFile::decode_func() called, url='" << url << "'\n");
    DEBUG_MAKE_INDENT(3);
    
@@ -890,6 +903,7 @@ DjVuFile::decode(ByteStream & str)
 void
 DjVuFile::start_decode(void)
 {
+   check();
    DEBUG_MSG("DjVuFile::start_decode(), url='" << url << "'\n");
    DEBUG_MAKE_INDENT(3);
 
@@ -924,10 +938,10 @@ DjVuFile::start_decode(void)
 void
 DjVuFile::stop_decode(bool sync)
 {
-  DEBUG_MSG("DjVuFile::stop_decode(), url='" << url <<
+   DEBUG_MSG("DjVuFile::stop_decode(), url='" << url <<
             "', sync=" << (int) sync << "\n");
    DEBUG_MAKE_INDENT(3);
-   
+
       // Don't stop SYNCHRONOUSLY from the thread where the decoding is going!!!
    {
 	 // First - ask every included child to stop in async mode
@@ -968,6 +982,7 @@ DjVuFile::stop_decode(bool sync)
 void
 DjVuFile::process_incl_chunks(void)
 {
+   check();
    GP<ByteStream> str=data_pool->get_stream();
    int chksize;
    GString chkid;
@@ -986,6 +1001,7 @@ DjVuFile::process_incl_chunks(void)
 GP<DjVuNavDir>
 DjVuFile::find_ndir(GMap<GURL, void *> & map)
 {
+   check();
    DEBUG_MSG("DjVuFile::find_ndir(): looking for NDIR in '" << url << "'\n");
    DEBUG_MAKE_INDENT(3);
    
@@ -1015,6 +1031,7 @@ DjVuFile::find_ndir(void)
 GP<DjVuNavDir>
 DjVuFile::decode_ndir(GMap<GURL, void *> & map)
 {
+   check();
    DEBUG_MSG("DjVuFile::decode_ndir(): decoding for NDIR in '" << url << "'\n");
    DEBUG_MAKE_INDENT(3);
    
@@ -1164,6 +1181,7 @@ DjVuFile::progress_cb(int pos, void * cl_data)
 int
 DjVuFile::get_chunks_number(void)
 {
+   check();
    int chunks=0;
    GP<ByteStream> str=data_pool->get_stream();
    int chksize;
@@ -1182,6 +1200,7 @@ DjVuFile::get_chunks_number(void)
 GString
 DjVuFile::get_chunk_name(int chunk_num)
 {
+   check();
    GString name;
    GP<ByteStream> str=data_pool->get_stream();
    int chksize;
@@ -1202,6 +1221,7 @@ DjVuFile::get_chunk_name(int chunk_num)
 bool
 DjVuFile::contains_chunk(const char * chunk_name)
 {
+   check();
    DEBUG_MSG("DjVuFile::contains_chunk(): url='" << url << "', chunk_name='" <<
 	     chunk_name << "'\n");
    DEBUG_MAKE_INDENT(3);
@@ -1229,6 +1249,7 @@ void
 DjVuFile::add_djvu_data(IFFByteStream & ostr, GMap<GURL, void *> & map,
 			bool included_too, bool no_ndir)
 {
+   check();
    if (map.contains(url)) return;
 
    bool top_level=map.size()==0;
