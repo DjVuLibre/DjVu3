@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: ATTLicense.cpp.in,v 1.7 1999-03-17 19:24:56 leonb Exp $
+//C- $Id: ATTLicense.cpp,v 1.1 1999-08-31 14:29:00 leonb Exp $
 
 #include <stdlib.h>
 #include <stdio.h>
