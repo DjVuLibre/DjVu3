@@ -5,7 +5,7 @@
 </HEAD>
 <BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
 
-<H2>class  <A HREF="#DOC.DOCU">DjVuFile</A>: public <!1><A HREF="DjVuPort.html#DOC.1.5.27.1.2">DjVuPort</A></H2>
+<H2>class  <A HREF="#DOC.DOCU">DjVuFile</A>: public <!1><A HREF="DjVuPort.html#DOC.1.4.27.1.2">DjVuPort</A></H2>
 <BLOCKQUOTE><TT>DjVuFile</TT> plays the central role in decoding <!1><A HREF="DjVuImage.html">DjVuImage</A>s.</BLOCKQUOTE>
 <HR>
 
@@ -22,162 +22,162 @@
 <DL>
 <P><DL>
 <DT><H3>Public Methods</H3><DD><DT>
-<A HREF="#DOC.1.5.28.1.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>init</B>(<!1><A HREF="ByteStream.html">ByteStream</A> &amp; str)
+<A HREF="#DOC.1.4.28.1.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>init</B>(<!1><A HREF="ByteStream.html">ByteStream</A> &amp; str)
 <DD><I>Initializes a <TT>DjVuFile</TT> object.</I>
 <DT>
-<A HREF="#DOC.1.5.28.1.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>init</B>(const <!1><A HREF="GURL.html">GURL</A> &amp; url, <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVuPort.html#DOC.1.5.27.1.2">DjVuPort</A>&gt; port=0)
+<A HREF="#DOC.1.4.28.1.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>init</B>(const <!1><A HREF="GURL.html">GURL</A> &amp; url, <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVuPort.html#DOC.1.4.27.1.2">DjVuPort</A>&gt; port=0)
 <DD><I>Initializes a <TT>DjVuFile</TT> object.</I>
 <DT>
-<A HREF="#DOC.1.5.28.1.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>disable_standard_port</B>(void)
+<A HREF="#DOC.1.4.28.1.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>disable_standard_port</B>(void)
 <DD><I>Disables the built-in port for accessing local files, which may have been created in the case when the <TT>port</TT> argument to the <!1><A HREF="DjVuFile.html">DjVuFile</A>() constructor is <TT>ZERO</TT> </I>
 <DT>
-<A HREF="#DOC.1.5.28.1.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVuNavDir.html">DjVuNavDir</A>&gt;  <B>find_ndir</B>(void)
+<A HREF="#DOC.1.4.28.1.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVuNavDir.html">DjVuNavDir</A>&gt;  <B>find_ndir</B>(void)
 <DD><I>Looks for <TT>decoded</TT> navigation directory (<!1><A HREF="DjVuNavDir.html">DjVuNavDir</A>) in this or included files.</I>
 <DT>
-<A HREF="#DOC.1.5.28.1.17"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GURL.html">GURL</A> <B>get_url</B>(void) const 
+<A HREF="#DOC.1.4.28.1.17"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GURL.html">GURL</A> <B>get_url</B>(void) const 
 <DD><I>Returns the URL assigned to this file</I>
 <DT>
-<A HREF="#DOC.1.5.28.1.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>GPList&lt;<!1><A HREF="DjVuFile.html">DjVuFile</A>&gt;  <B>get_included_files</B>(bool only_created=true)
+<A HREF="#DOC.1.4.28.1.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>GPList&lt;<!1><A HREF="DjVuFile.html">DjVuFile</A>&gt;  <B>get_included_files</B>(bool only_created=true)
 <DD><I>Returns the list of included DjVuFiles.</I>
 <DT>
-<A HREF="#DOC.1.5.28.1.9"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>insert_file</B>(const char * id, int chunk_num=1)
+<A HREF="#DOC.1.4.28.1.9"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>insert_file</B>(const char * id, int chunk_num=1)
 <DD><I>Includes a <TT>DjVuFile</TT> with the specified This function will also insert an <TT>INCL</TT> chunk at position <TT>chunk_num</TT>.</I>
 <DT>
-<A HREF="#DOC.1.5.28.1.18"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>unlink_file</B>(const char * id)
+<A HREF="#DOC.1.4.28.1.18"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>unlink_file</B>(const char * id)
 <DD><I>Will get rid of included file with the given</I>
 <DT>
-<A HREF="#DOC.1.5.28.1.10"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DataPool.html">DataPool</A>&gt;  <B>unlink_file</B>(const <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DataPool.html">DataPool</A>&gt; &amp; data, const char * name)
+<A HREF="#DOC.1.4.28.1.10"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DataPool.html">DataPool</A>&gt;  <B>unlink_file</B>(const <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DataPool.html">DataPool</A>&gt; &amp; data, const char * name)
 <DD><I>Will find an <TT>INCL</TT> chunk containing <TT>name</TT> in input <TT>data</TT> and will remove it </I>
 <DT>
-<A HREF="#DOC.1.5.28.1.19"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_chunks_number</B>(void)
+<A HREF="#DOC.1.4.28.1.19"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_chunks_number</B>(void)
 <DD><I>Returns the number of chunks in the IFF file data</I>
 <DT>
-<A HREF="#DOC.1.5.28.1.20"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GString.html">GString</A> <B>get_chunk_name</B>(int chunk_num)
+<A HREF="#DOC.1.4.28.1.20"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GString.html">GString</A> <B>get_chunk_name</B>(int chunk_num)
 <DD><I>Returns the name of chunk number <TT>chunk_num</TT></I>
 <DT>
-<A HREF="#DOC.1.5.28.1.21"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>bool <B>contains_chunk</B>(const char * chunk_name)
+<A HREF="#DOC.1.4.28.1.21"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>bool <B>contains_chunk</B>(const char * chunk_name)
 <DD><I>Returns 1 if this file contains chunk with name <TT>chunk_name</TT></I>
 <DT>
-<A HREF="#DOC.1.5.28.1.11"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="ByteStream.html">ByteStream</A>&gt;  <B>get_merged_anno</B>(int * max_level_ptr=0)
+<A HREF="#DOC.1.4.28.1.11"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="ByteStream.html">ByteStream</A>&gt;  <B>get_merged_anno</B>(int * max_level_ptr=0)
 <DD><I>Processes the included files hierarchy and returns merged annotations.</I>
 <DT>
-<A HREF="#DOC.1.5.28.1.12"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>remove_anno</B>(void)
+<A HREF="#DOC.1.4.28.1.12"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>remove_anno</B>(void)
 <DD><I>Goes down the hierarchy of <TT>DjVuFile</TT>s and merges their annotations.</I>
 <DT>
-<A HREF="#DOC.1.5.28.1.13"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>bool <B>contains_anno</B>(void)
+<A HREF="#DOC.1.4.28.1.13"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>bool <B>contains_anno</B>(void)
 <DD><I>Returns <TT>TRUE</TT> if the file contains annotation chunks.</I>
 <DT>
-<A HREF="#DOC.1.5.28.1.14"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>change_text</B>(<!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVuTXT.html">DjVuTXT</A>&gt; txt, const bool do_reset)
+<A HREF="#DOC.1.4.28.1.14"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>change_text</B>(<!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVuTXT.html">DjVuTXT</A>&gt; txt, const bool do_reset)
 <DD><I>Changes the value of the text annotation.</I>
 <DT>
-<A HREF="#DOC.1.5.28.1.16"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>set_name</B>(const char * name)
+<A HREF="#DOC.1.4.28.1.16"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>set_name</B>(const char * name)
 <DD><I>Internal.</I>
 </DL></P>
 
 <P><DL>
 <DT><H3>Public</H3><DD><DT>
-<A HREF="#DOC.1.5.28.1.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Decoded file contents </B>
+<A HREF="#DOC.1.4.28.1.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Decoded file contents </B>
 <DD><I></I>
 <P><DL>
 <DT>
-<A HREF="#DOC.1.5.28.1.1.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;IWPixmap&gt;  <B>bg44</B>
+<A HREF="#DOC.1.4.28.1.1.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;IWPixmap&gt;  <B>bg44</B>
 <DD><I>Pointer to the background component of DjVu image (IW44 encoded).</I>
 <DT>
-<A HREF="#DOC.1.5.28.1.1.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GPixmap.html">GPixmap</A>&gt;  <B>bgpm</B>
+<A HREF="#DOC.1.4.28.1.1.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GPixmap.html">GPixmap</A>&gt;  <B>bgpm</B>
 <DD><I>Pointer to the background component of DjVu image (Raw).</I>
 <DT>
-<A HREF="#DOC.1.5.28.1.1.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="JB2Image.html">JB2Image</A>&gt;  <B>fgjb</B>
+<A HREF="#DOC.1.4.28.1.1.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="JB2Image.html">JB2Image</A>&gt;  <B>fgjb</B>
 <DD><I>Pointer to the mask of foreground component of DjVu image (JB2 encoded).</I>
 <DT>
-<A HREF="#DOC.1.5.28.1.1.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="JB2Dict.html">JB2Dict</A>&gt;  <B>fgjd</B>
+<A HREF="#DOC.1.4.28.1.1.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="JB2Dict.html">JB2Dict</A>&gt;  <B>fgjd</B>
 <DD><I>Pointer to the optional shape dictionary for the mask (JB2 encoded).</I>
 <DT>
-<A HREF="#DOC.1.5.28.1.1.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GPixmap.html">GPixmap</A>&gt;  <B>fgpm</B>
+<A HREF="#DOC.1.4.28.1.1.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GPixmap.html">GPixmap</A>&gt;  <B>fgpm</B>
 <DD><I>Pointer to a colors layer for the foreground component of DjVu image.</I>
 <DT>
-<A HREF="#DOC.1.5.28.1.1.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;DjVuPalette&gt;  <B>fgbc</B>
+<A HREF="#DOC.1.4.28.1.1.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;DjVuPalette&gt;  <B>fgbc</B>
 <DD><I>Pointer to a colors vector for the foreground component of DjVu image.</I>
 <DT>
-<A HREF="#DOC.1.5.28.1.1.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="ByteStream.html">ByteStream</A>&gt;  <B>anno</B>
+<A HREF="#DOC.1.4.28.1.1.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="ByteStream.html">ByteStream</A>&gt;  <B>anno</B>
 <DD><I>Pointer to collected annotation chunks.</I>
 <DT>
-<A HREF="#DOC.1.5.28.1.1.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVuNavDir.html">DjVuNavDir</A>&gt;  <B>dir</B>
+<A HREF="#DOC.1.4.28.1.1.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVuNavDir.html">DjVuNavDir</A>&gt;  <B>dir</B>
 <DD><I>Pointer to the *old* navigation directory contained in this file</I>
 <DT>
-<A HREF="#DOC.1.5.28.1.1.9"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GString.html">GString</A> <B>description</B>
+<A HREF="#DOC.1.4.28.1.1.9"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GString.html">GString</A> <B>description</B>
 <DD><I>Description of the file formed during decoding</I>
 <DT>
-<A HREF="#DOC.1.5.28.1.1.10"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GString.html">GString</A> <B>mimetype</B>
+<A HREF="#DOC.1.4.28.1.1.10"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GString.html">GString</A> <B>mimetype</B>
 <DD><I>MIME type string describing the DjVu data.</I>
 <DT>
-<A HREF="#DOC.1.5.28.1.1.11"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>file_size</B>
+<A HREF="#DOC.1.4.28.1.1.11"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>file_size</B>
 <DD><I>Size of the file.</I>
 </DL></P>
 <DT>
-<A HREF="#DOC.1.5.28.1.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B><TT>DjVuFile</TT> flags query functions </B>
+<A HREF="#DOC.1.4.28.1.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B><TT>DjVuFile</TT> flags query functions </B>
 <DD><I></I>
 <P><DL>
 <DT>
-<A HREF="#DOC.1.5.28.1.6.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>long <B>get_flags</B>(void) const 
+<A HREF="#DOC.1.4.28.1.6.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>long <B>get_flags</B>(void) const 
 <DD><I>Returns the <TT>DjVuFile</TT> flags.</I>
 <DT>
-<A HREF="#DOC.1.5.28.1.6.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>bool <B>is_decoding</B>(void) const 
+<A HREF="#DOC.1.4.28.1.6.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>bool <B>is_decoding</B>(void) const 
 <DD><I>Returns <TT>TRUE</TT> if the file is being decoded.</I>
 <DT>
-<A HREF="#DOC.1.5.28.1.6.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>bool <B>is_decode_ok</B>(void) const 
+<A HREF="#DOC.1.4.28.1.6.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>bool <B>is_decode_ok</B>(void) const 
 <DD><I>Returns <TT>TRUE</TT> if decoding of the file has finished successfully.</I>
 <DT>
-<A HREF="#DOC.1.5.28.1.6.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>bool <B>is_decode_failed</B>(void) const 
+<A HREF="#DOC.1.4.28.1.6.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>bool <B>is_decode_failed</B>(void) const 
 <DD><I>Returns <TT>TRUE</TT> if decoding of the file has failed.</I>
 <DT>
-<A HREF="#DOC.1.5.28.1.6.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>bool <B>is_decode_stopped</B>(void) const 
-<DD><I>Returns <TT>TRUE</TT> if decoding of the file has been stopped by <!1><A HREF="DjVuFile.html#DOC.1.5.28.1.7.2">stop_decode</A>() function.</I>
+<A HREF="#DOC.1.4.28.1.6.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>bool <B>is_decode_stopped</B>(void) const 
+<DD><I>Returns <TT>TRUE</TT> if decoding of the file has been stopped by <!1><A HREF="DjVuFile.html#DOC.1.4.28.1.7.2">stop_decode</A>() function.</I>
 <DT>
-<A HREF="#DOC.1.5.28.1.6.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>bool <B>is_data_present</B>(void) const 
+<A HREF="#DOC.1.4.28.1.6.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>bool <B>is_data_present</B>(void) const 
 <DD><I>Returns <TT>TRUE</TT> if this file has received all data.</I>
 <DT>
-<A HREF="#DOC.1.5.28.1.6.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>bool <B>is_all_data_present</B>(void) const 
+<A HREF="#DOC.1.4.28.1.6.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>bool <B>is_all_data_present</B>(void) const 
 <DD><I>Returns <TT>TRUE</TT> if this file <B>and</B> all included files have received all data.</I>
 <DT>
-<A HREF="#DOC.1.5.28.1.6.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>bool <B>are_incl_files_created</B>(void) const 
+<A HREF="#DOC.1.4.28.1.6.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>bool <B>are_incl_files_created</B>(void) const 
 <DD><I>Returns <TT>TRUE</TT> if all included files have been created.</I>
 </DL></P>
 <DT>
-<A HREF="#DOC.1.5.28.1.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Decode control routines </B>
+<A HREF="#DOC.1.4.28.1.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Decode control routines </B>
 <DD><I></I>
 <P><DL>
 <DT>
-<A HREF="#DOC.1.5.28.1.7.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>start_decode</B>(void)
+<A HREF="#DOC.1.4.28.1.7.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>start_decode</B>(void)
 <DD><I>Starts decode.</I>
 <DT>
-<A HREF="#DOC.1.5.28.1.7.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>stop_decode</B>(bool sync)
+<A HREF="#DOC.1.4.28.1.7.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>stop_decode</B>(bool sync)
 <DD><I>Stops decode.</I>
 <DT>
-<A HREF="#DOC.1.5.28.1.7.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>stop</B>(bool only_blocked)
+<A HREF="#DOC.1.4.28.1.7.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>stop</B>(bool only_blocked)
 <DD><I>Recursively stops all data-related operations.</I>
 <DT>
-<A HREF="#DOC.1.5.28.1.7.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>wait_for_finish</B>(void)
+<A HREF="#DOC.1.4.28.1.7.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>wait_for_finish</B>(void)
 <DD><I>Wait for the decoding to finish.</I>
 <DT>
-<A HREF="#DOC.1.5.28.1.7.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVuNavDir.html">DjVuNavDir</A>&gt;  <B>decode_ndir</B>(void)
+<A HREF="#DOC.1.4.28.1.7.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVuNavDir.html">DjVuNavDir</A>&gt;  <B>decode_ndir</B>(void)
 <DD><I>Looks for <TT>NDIR</TT> chunk (navigation directory), and decodes its contents.</I>
 <DT>
-<A HREF="#DOC.1.5.28.1.7.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>reset</B>(void)
+<A HREF="#DOC.1.4.28.1.7.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>reset</B>(void)
 <DD><I>Clears all decoded components.</I>
 <DT>
-<A HREF="#DOC.1.5.28.1.7.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>process_incl_chunks</B>(void)
+<A HREF="#DOC.1.4.28.1.7.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>process_incl_chunks</B>(void)
 <DD><I>Processes <TT>INCL</TT> chunks and creates included files.</I>
 </DL></P>
 <DT>
-<A HREF="#DOC.1.5.28.1.15"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Encoding routines </B>
+<A HREF="#DOC.1.4.28.1.15"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Encoding routines </B>
 <DD><I></I>
 <P><DL>
 <DT>
-<A HREF="#DOC.1.5.28.1.15.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="ByteStream.html">ByteStream</A>&gt;  <B>get_djvu_bytestream</B>(bool included_too, bool no_ndir)
+<A HREF="#DOC.1.4.28.1.15.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="ByteStream.html">ByteStream</A>&gt;  <B>get_djvu_bytestream</B>(bool included_too, bool no_ndir)
 <DD><I>The main function that encodes data back into binary stream.</I>
 <DT>
-<A HREF="#DOC.1.5.28.1.15.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DataPool.html">DataPool</A>&gt;  <B>get_djvu_data</B>(bool included_too, bool no_ndir)
-<DD><I>Same as <!1><A HREF="DjVuFile.html#DOC.1.5.28.1.15.1">get_djvu_bytestream</A>(), returning a DataPool.</I>
+<A HREF="#DOC.1.4.28.1.15.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DataPool.html">DataPool</A>&gt;  <B>get_djvu_data</B>(bool included_too, bool no_ndir)
+<DD><I>Same as <!1><A HREF="DjVuFile.html#DOC.1.4.28.1.15.1">get_djvu_bytestream</A>(), returning a DataPool.</I>
 </DL></P>
 </DL></P>
 
@@ -188,7 +188,7 @@
 <DT><H3>Public Methods</H3><DD><DT>
 <IMG ALT="o" SRC=icon2.gif>static   <!1><A HREF="DjVuPortcaster.html">DjVuPortcaster</A>* <B>get_portcaster</B>(void)
 <DT>
-<IMG ALT="o" SRC=icon2.gif><!1><A HREF="DjVuPort.html#DOC.1.5.27.1.2">DjVuPort</A>&amp; <B>operator=</B>(const <!1><A HREF="DjVuPort.html#DOC.1.5.27.1.2">DjVuPort</A> &amp; port)
+<IMG ALT="o" SRC=icon2.gif><!1><A HREF="DjVuPort.html#DOC.1.4.27.1.2">DjVuPort</A>&amp; <B>operator=</B>(const <!1><A HREF="DjVuPort.html#DOC.1.4.27.1.2">DjVuPort</A> &amp; port)
 <DT>
 <IMG ALT="o" SRC=icon2.gif>virtual   bool <B>inherits</B>(const char * class_name) const 
 </DL></P>
@@ -198,40 +198,40 @@
 <P> <B>Notifications. </B>
 <P><DL>
 <DT>
-<A HREF="#DOC.1.5.27.1.5.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   <!1><A HREF="GURL.html">GURL</A> <B>id_to_url</B>(const <!1><A HREF="DjVuPort.html#DOC.1.5.27.1.2">DjVuPort</A> * source, const char * id)
+<A HREF="#DOC.1.4.27.1.5.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   <!1><A HREF="GURL.html">GURL</A> <B>id_to_url</B>(const <!1><A HREF="DjVuPort.html#DOC.1.4.27.1.2">DjVuPort</A> * source, const char * id)
 <DD><I>This request is issued to request translation of the ID, used in an DjVu INCL chunk to a URL, which may be used to request data associated with included file.</I>
 <DT>
-<A HREF="#DOC.1.5.27.1.5.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   <!1><A HREF="GPBase.html">GPBase</A> <B>id_to_file</B>(const <!1><A HREF="DjVuPort.html#DOC.1.5.27.1.2">DjVuPort</A> * source, const char * id)
+<A HREF="#DOC.1.4.27.1.5.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   <!1><A HREF="GPBase.html">GPBase</A> <B>id_to_file</B>(const <!1><A HREF="DjVuPort.html#DOC.1.4.27.1.2">DjVuPort</A> * source, const char * id)
 <DD><I>This request is used to get a file corresponding to the given ID.</I>
 <DT>
-<A HREF="#DOC.1.5.27.1.5.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DataPool.html">DataPool</A>&gt;  <B>request_data</B>(const <!1><A HREF="DjVuPort.html#DOC.1.5.27.1.2">DjVuPort</A> * source, const <!1><A HREF="GURL.html">GURL</A> &amp; url)
+<A HREF="#DOC.1.4.27.1.5.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DataPool.html">DataPool</A>&gt;  <B>request_data</B>(const <!1><A HREF="DjVuPort.html#DOC.1.4.27.1.2">DjVuPort</A> * source, const <!1><A HREF="GURL.html">GURL</A> &amp; url)
 <DD><I>This request is issued when decoder needs additional data for decoding.</I>
 <DT>
-<A HREF="#DOC.1.5.27.1.5.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   bool <B>notify_error</B>(const <!1><A HREF="DjVuPort.html#DOC.1.5.27.1.2">DjVuPort</A> * source, const char * msg)
+<A HREF="#DOC.1.4.27.1.5.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   bool <B>notify_error</B>(const <!1><A HREF="DjVuPort.html#DOC.1.4.27.1.2">DjVuPort</A> * source, const char * msg)
 <DD><I>This notification is sent when an error occurs and the error message should be shown to the user.</I>
 <DT>
-<A HREF="#DOC.1.5.27.1.5.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   bool <B>notify_status</B>(const <!1><A HREF="DjVuPort.html#DOC.1.5.27.1.2">DjVuPort</A> * source, const char * msg)
+<A HREF="#DOC.1.4.27.1.5.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   bool <B>notify_status</B>(const <!1><A HREF="DjVuPort.html#DOC.1.4.27.1.2">DjVuPort</A> * source, const char * msg)
 <DD><I>This notification is sent to update the decoding status.</I>
 <DT>
-<A HREF="#DOC.1.5.27.1.5.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>notify_redisplay</B>(const class <!1><A HREF="DjVuImage.html">DjVuImage</A> * source)
+<A HREF="#DOC.1.4.27.1.5.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>notify_redisplay</B>(const class <!1><A HREF="DjVuImage.html">DjVuImage</A> * source)
 <DD><I>This notification is sent by <!1><A HREF="DjVuImage.html">DjVuImage</A> when it should be redrawn.</I>
 <DT>
-<A HREF="#DOC.1.5.27.1.5.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>notify_relayout</B>(const class <!1><A HREF="DjVuImage.html">DjVuImage</A> * source)
+<A HREF="#DOC.1.4.27.1.5.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>notify_relayout</B>(const class <!1><A HREF="DjVuImage.html">DjVuImage</A> * source)
 <DD><I>This notification is sent by \ref{DjVuImage} when its geometry has been changed as a result of decoding.</I>
 <DT>
-<A HREF="#DOC.1.5.27.1.5.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>notify_chunk_done</B>(const <!1><A HREF="DjVuPort.html#DOC.1.5.27.1.2">DjVuPort</A> * source, const char * name)
+<A HREF="#DOC.1.4.27.1.5.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>notify_chunk_done</B>(const <!1><A HREF="DjVuPort.html#DOC.1.4.27.1.2">DjVuPort</A> * source, const char * name)
 <DD><I>This notification is sent when a new chunk has been decoded.</I>
 <DT>
-<A HREF="#DOC.1.5.27.1.5.9"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>notify_file_flags_changed</B>(const class <!1><A HREF="DjVuFile.html">DjVuFile</A> * source, long set_mask, long clr_mask)
+<A HREF="#DOC.1.4.27.1.5.9"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>notify_file_flags_changed</B>(const class <!1><A HREF="DjVuFile.html">DjVuFile</A> * source, long set_mask, long clr_mask)
 <DD><I>This notification is sent after the <!1><A HREF="DjVuFile.html">DjVuFile</A> flags have been changed.</I>
 <DT>
-<A HREF="#DOC.1.5.27.1.5.10"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>notify_doc_flags_changed</B>(const class <!1><A HREF="DjVuDocument.html">DjVuDocument</A> * source, long set_mask, long clr_mask)
+<A HREF="#DOC.1.4.27.1.5.10"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>notify_doc_flags_changed</B>(const class <!1><A HREF="DjVuDocument.html">DjVuDocument</A> * source, long set_mask, long clr_mask)
 <DD><I>This notification is sent after the <!1><A HREF="DjVuDocument.html">DjVuDocument</A> flags have been changed.</I>
 <DT>
-<A HREF="#DOC.1.5.27.1.5.11"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>notify_decode_progress</B>(const <!1><A HREF="DjVuPort.html#DOC.1.5.27.1.2">DjVuPort</A> * source, float done)
+<A HREF="#DOC.1.4.27.1.5.11"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>notify_decode_progress</B>(const <!1><A HREF="DjVuPort.html#DOC.1.4.27.1.2">DjVuPort</A> * source, float done)
 <DD><I>This notification is sent from time to time while decoding is in progress.</I>
 <DT>
-<A HREF="#DOC.1.5.27.1.5.12"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>enum  <B>ErrorRecoveryAction</B>
+<A HREF="#DOC.1.4.27.1.5.12"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>enum  <B>ErrorRecoveryAction</B>
 <DD><I>This is the standard types for defining what to do in case of errors.</I>
 </DL></P>
 </DL></P>
@@ -266,9 +266,9 @@ have been extracted from the <!1><A HREF="DjVuImage.html">DjVuImage</A> and put 
 class <TT>DjVuFile</TT>.<P>As <!1><A HREF="DjVuImage.html">DjVuImage</A> before, <TT>DjVuFile</TT> now contains public class
 variables corresponding to every component, that can ever be decoded
 from a DjVu file (such as <TT>INFO</TT> chunk, <TT>BG44</TT> chunk, <TT>SJBZ</TT> chunk, etc.).<P>As before, the decoding is initiated by a single function
-(<!1><A HREF="DjVuFile.html#DOC.1.5.28.1.7.1">start_decode</A>() in this case, and <!1><A HREF="DjVuImage.html#DOC.1.5.32.1.15.1">decode</A>() before).
+(<!1><A HREF="DjVuFile.html#DOC.1.4.28.1.7.1">start_decode</A>() in this case, and <!1><A HREF="DjVuImage.html#DOC.1.4.32.1.15.1">decode</A>() before).
 The difference is that <TT>DjVuFile</TT> now handles threads creation itself.
-When you call the <!1><A HREF="DjVuFile.html#DOC.1.5.28.1.7.1">start_decode</A>() function, it creates the decoding
+When you call the <!1><A HREF="DjVuFile.html#DOC.1.4.28.1.7.1">start_decode</A>() function, it creates the decoding
 thread, which starts decoding, and which can create additional threads:
 one per each file included into this one.<P><B>Inclusion</B> is also a new feature specifically designed for a
 multipage document. Indeed, inside a given document there can be a lot
@@ -278,9 +278,9 @@ dictionary (to be implemented). To avoid putting these chunks into
 every page, we have invented new chunk called <TT>INCL</TT> which purpose is
 to make the decoder open the specified file and decode it.<P><B>Source of data.</B> The <TT>DjVuFile</TT> can be initialized in two ways:
 <UL>
-<LI> With <TT>URL</TT> and <!1><A HREF="DjVuPort.html#DOC.1.5.27.1.2">DjVuPort</A>. In this case <TT>DjVuFile</TT> will
+<LI> With <TT>URL</TT> and <!1><A HREF="DjVuPort.html#DOC.1.4.27.1.2">DjVuPort</A>. In this case <TT>DjVuFile</TT> will
 request its data thru the communication mechanism provided by
-<!1><A HREF="DjVuPort.html#DOC.1.5.27.1.2">DjVuPort</A> in the constructor. If this file references
+<!1><A HREF="DjVuPort.html#DOC.1.4.27.1.2">DjVuPort</A> in the constructor. If this file references
 (includes) any other file, data for them will also be requested
 in the same way.
 <LI> With <!1><A HREF="ByteStream.html">ByteStream</A>. In this case the <TT>DjVuFile</TT> will read
@@ -290,14 +290,14 @@ no include anything else. In this case the <!1><A HREF="ByteStream.html">ByteStr
 is enough for the <TT>DjVuFile</TT> to initialize.
 </UL><P><B>Progress information.</B> <TT>DjVuFile</TT> does not do decoding silently.
 Instead, it sends a whole set of notifications through the mechanism
-provided by <!1><A HREF="DjVuPort.html#DOC.1.5.27.1.2">DjVuPort</A> and <!1><A HREF="DjVuPortcaster.html">DjVuPortcaster</A>. It tells the user
+provided by <!1><A HREF="DjVuPort.html#DOC.1.4.27.1.2">DjVuPort</A> and <!1><A HREF="DjVuPortcaster.html">DjVuPortcaster</A>. It tells the user
 of the class about the progress of the decoding, about possible errors,
 chunk being decoded, etc. The data is requested using this mechanism too.<P><B>Creating.</B> Depending on where you have data of the DjVu file, the
 <TT>DjVuFile</TT> can be initialized in two ways:
 <UL>
-<LI> By providing <TT>URL</TT> and pointer to <!1><A HREF="DjVuPort.html#DOC.1.5.27.1.2">DjVuPort</A>. In this case
+<LI> By providing <TT>URL</TT> and pointer to <!1><A HREF="DjVuPort.html#DOC.1.4.27.1.2">DjVuPort</A>. In this case
 <TT>DjVuFile</TT> will request data using communication mechanism
-provided by <!1><A HREF="DjVuPort.html#DOC.1.5.27.1.2">DjVuPort</A>. This is useful when the data is on
+provided by <!1><A HREF="DjVuPort.html#DOC.1.4.27.1.2">DjVuPort</A>. This is useful when the data is on
 the web or when this file includes other files.
 <LI> By providing a <!1><A HREF="ByteStream.html">ByteStream</A> with the data for the file. Use
 it only when the file doesn't include other files.
@@ -305,7 +305,7 @@ it only when the file doesn't include other files.
 There is also a bunch of functions provided for composing
 the desired <!1><A HREF="DjVuDocument.html">DjVuDocument</A> and modifying <TT>DjVuFile</TT> structure. The
 examples are delete_chunks(), insert_chunk(),
-include_file() and <!1><A HREF="DjVuFile.html#DOC.1.5.28.1.10">unlink_file</A>().<P><B>Caching.</B> In the case of plugin it's important to do the caching
+include_file() and <!1><A HREF="DjVuFile.html#DOC.1.4.28.1.10">unlink_file</A>().<P><B>Caching.</B> In the case of plugin it's important to do the caching
 of decoded images or files. <TT>DjVuFile</TT> appears to be the best candidate
 for caching, and that's why it supports this procedure. Whenever a
 <TT>DjVuFile</TT> is successfully decoded, it's added to the cache by
@@ -327,90 +327,90 @@ too. </BLOCKQUOTE>
 <DL>
 
 <A NAME="Decoded file contents ">
-<A NAME="DOC.1.5.28.1.1">
+<A NAME="DOC.1.4.28.1.1">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> Decoded file contents </B></TT>
 <DL><DT><DD></DL><P><DL>
 
 <A NAME="bg44">
-<A NAME="DOC.1.5.28.1.1.1">
+<A NAME="DOC.1.4.28.1.1.1">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GP.html">GP</A>&lt;IWPixmap&gt;  bg44</B></TT>
 <DD>Pointer to the background component of DjVu image (IW44 encoded).
 <DL><DT><DD></DL><P>
 <A NAME="bgpm">
-<A NAME="DOC.1.5.28.1.1.2">
+<A NAME="DOC.1.4.28.1.1.2">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GPixmap.html">GPixmap</A>&gt;  bgpm</B></TT>
 <DD>Pointer to the background component of DjVu image (Raw).
 <DL><DT><DD></DL><P>
 <A NAME="fgjb">
-<A NAME="DOC.1.5.28.1.1.3">
+<A NAME="DOC.1.4.28.1.1.3">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="JB2Image.html">JB2Image</A>&gt;  fgjb</B></TT>
 <DD>Pointer to the mask of foreground component of DjVu image (JB2 encoded).
 <DL><DT><DD></DL><P>
 <A NAME="fgjd">
-<A NAME="DOC.1.5.28.1.1.4">
+<A NAME="DOC.1.4.28.1.1.4">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="JB2Dict.html">JB2Dict</A>&gt;  fgjd</B></TT>
 <DD>Pointer to the optional shape dictionary for the mask (JB2 encoded).
 <DL><DT><DD></DL><P>
 <A NAME="fgpm">
-<A NAME="DOC.1.5.28.1.1.5">
+<A NAME="DOC.1.4.28.1.1.5">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GPixmap.html">GPixmap</A>&gt;  fgpm</B></TT>
 <DD>Pointer to a colors layer for the foreground component of DjVu image.
 <DL><DT><DD></DL><P>
 <A NAME="fgbc">
-<A NAME="DOC.1.5.28.1.1.6">
+<A NAME="DOC.1.4.28.1.1.6">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GP.html">GP</A>&lt;DjVuPalette&gt;  fgbc</B></TT>
 <DD>Pointer to a colors vector for the foreground component of DjVu image.
 <DL><DT><DD></DL><P>
 <A NAME="anno">
-<A NAME="DOC.1.5.28.1.1.7">
+<A NAME="DOC.1.4.28.1.1.7">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="ByteStream.html">ByteStream</A>&gt;  anno</B></TT>
 <DD>Pointer to collected annotation chunks.
 <DL><DT><DD></DL><P>
 <A NAME="dir">
-<A NAME="DOC.1.5.28.1.1.8">
+<A NAME="DOC.1.4.28.1.1.8">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVuNavDir.html">DjVuNavDir</A>&gt;  dir</B></TT>
 <DD>Pointer to the *old* navigation directory contained in this file
 <DL><DT><DD></DL><P>
 <A NAME="description">
-<A NAME="DOC.1.5.28.1.1.9">
+<A NAME="DOC.1.4.28.1.1.9">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GString.html">GString</A> description</B></TT>
 <DD>Description of the file formed during decoding
 <DL><DT><DD></DL><P>
 <A NAME="mimetype">
-<A NAME="DOC.1.5.28.1.1.10">
+<A NAME="DOC.1.4.28.1.1.10">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GString.html">GString</A> mimetype</B></TT>
 <DD>MIME type string describing the DjVu data.
 <DL><DT><DD></DL><P>
 <A NAME="file_size">
-<A NAME="DOC.1.5.28.1.1.11">
+<A NAME="DOC.1.4.28.1.1.11">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int file_size</B></TT>
 <DD>Size of the file.
 <DL><DT><DD></DL><P></DL>
 
 <A NAME="init">
-<A NAME="DOC.1.5.28.1.2">
+<A NAME="DOC.1.4.28.1.2">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void init(<!1><A HREF="ByteStream.html">ByteStream</A> &amp; str)</B></TT>
 <DD>Initializes a <TT>DjVuFile</TT> object. This is a simplified initializer,
 which is not supposed to be used for decoding or creating
 <TT>DjVuFile</TT>s, which include other files.<P>If the file is stored on the hard drive, you may also use the
 other constructor and pass it the file's URL and <TT>ZERO</TT> <TT>port</TT>.
 The <TT>DjVuFile</TT> will read the data itself.<P>If you want to receive error messages and notifications, you
-may connect the <TT>DjVuFile</TT> to your own <!1><A HREF="DjVuPort.html#DOC.1.5.27.1.2">DjVuPort</A> after
+may connect the <TT>DjVuFile</TT> to your own <!1><A HREF="DjVuPort.html#DOC.1.4.27.1.2">DjVuPort</A> after
 it has been constructed.<P>
 <DL><DT><DT><B>Parameters:</B><DD><B>str</B> -  The stream containing data for the file. <BR><DD></DL><P>
 <A NAME="init">
-<A NAME="DOC.1.5.28.1.3">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void init(const <!1><A HREF="GURL.html">GURL</A> &amp; url, <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVuPort.html#DOC.1.5.27.1.2">DjVuPort</A>&gt; port=0)</B></TT>
+<A NAME="DOC.1.4.28.1.3">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void init(const <!1><A HREF="GURL.html">GURL</A> &amp; url, <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVuPort.html#DOC.1.4.27.1.2">DjVuPort</A>&gt; port=0)</B></TT>
 <DD>Initializes a <TT>DjVuFile</TT> object. As you can notice, the data is not
 directly passed to this function. The <TT>DjVuFile</TT> will ask for it
-through the <!1><A HREF="DjVuPort.html#DOC.1.5.27.1.2">DjVuPort</A> mechanism before the constructor
+through the <!1><A HREF="DjVuPort.html#DOC.1.4.27.1.2">DjVuPort</A> mechanism before the constructor
 finishes. If the data is stored locally on the hard disk then the
-pointer to <!1><A HREF="DjVuPort.html#DOC.1.5.27.1.2">DjVuPort</A> may be set to <TT>ZERO</TT>, which will make
+pointer to <!1><A HREF="DjVuPort.html#DOC.1.4.27.1.2">DjVuPort</A> may be set to <TT>ZERO</TT>, which will make
 <TT>DjVuFile</TT> read all data from the hard disk and report all errors
 to <TT>stderr</TT>.<P><B>Note</B>. If the file includes (by means of <TT>INCL</TT> chunks) other
 files then you should be ready to
 <OL>
-<LI> Reply to requests <!1><A HREF="DjVuPort.html#DOC.1.5.27.1.5.1">id_to_url</A>() issued to
+<LI> Reply to requests <!1><A HREF="DjVuPort.html#DOC.1.4.27.1.5.1">id_to_url</A>() issued to
 translate IDs (used in <TT>INCL</TT> chunks) to absolute URLs.
 Usually, when the file is created by <!1><A HREF="DjVuDocument.html">DjVuDocument</A>
 this job is done by it. If you construct such a file
@@ -420,38 +420,38 @@ manually, be prepared to do the ID to URL translation
 <DL><DT><DT><B>Parameters:</B><DD><B>url</B> -  The URL assigned to this file. It will be used when
 the <TT>DjVuFile</TT> asks for data.
 <BR><B>port</B> -  All communication between <TT>DjVuFile</TT>s and <!1><A HREF="DjVuDocument.html">DjVuDocument</A>s
-is done through the <!1><A HREF="DjVuPort.html#DOC.1.5.27.1.2">DjVuPort</A> mechanism. If the <EM>url</EM>
+is done through the <!1><A HREF="DjVuPort.html#DOC.1.4.27.1.2">DjVuPort</A> mechanism. If the <EM>url</EM>
 is not local or the data does not reside on the hard disk,
 the <EM>port</EM> parameter must not be <TT>ZERO</TT>. If the <EM>port</EM>
 is <TT>ZERO</TT> then <TT>DjVuFile</TT> will create an internal instance
 of <!1><A HREF="DjVuSimplePort.html">DjVuSimplePort</A> for accessing local files and
 reporting errors. It can later be disabled by means
-of <!1><A HREF="DjVuFile.html#DOC.1.5.28.1.4">disable_standard_port</A>() function. <BR><DD></DL><P>
+of <!1><A HREF="DjVuFile.html#DOC.1.4.28.1.4">disable_standard_port</A>() function. <BR><DD></DL><P>
 <A NAME="disable_standard_port">
-<A NAME="DOC.1.5.28.1.4">
+<A NAME="DOC.1.4.28.1.4">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void disable_standard_port(void)</B></TT>
 <DD>Disables the built-in port for accessing local files, which may
 have been created in the case when the <TT>port</TT> argument to
 the <!1><A HREF="DjVuFile.html">DjVuFile</A>() constructor is <TT>ZERO</TT> 
 <DL><DT><DD></DL><P>
 <A NAME="find_ndir">
-<A NAME="DOC.1.5.28.1.5">
+<A NAME="DOC.1.4.28.1.5">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVuNavDir.html">DjVuNavDir</A>&gt;  find_ndir(void)</B></TT>
 <DD>Looks for <TT>decoded</TT> navigation directory (<!1><A HREF="DjVuNavDir.html">DjVuNavDir</A>) in this
 or included files. Returns <TT>ZERO</TT> if nothing could be found.<P><B>Note.</B> This function does <B>not</B> attempt to decode <TT>NDIR</TT>
 chunks. It is looking for predecoded components. <TT>NDIR</TT> can be
 decoded either during regular decoding (initiated by
-<!1><A HREF="DjVuFile.html#DOC.1.5.28.1.7.1">start_decode</A>() function) or by <!1><A HREF="DjVuFile.html#DOC.1.5.28.1.7.5">decode_ndir</A>() function,
+<!1><A HREF="DjVuFile.html#DOC.1.4.28.1.7.1">start_decode</A>() function) or by <!1><A HREF="DjVuFile.html#DOC.1.4.28.1.7.5">decode_ndir</A>() function,
 which processes this and included files recursively in search
 of <TT>NDIR</TT> chunks and decodes them. 
 <DL><DT><DD></DL><P>
 <A NAME="#DjVuFile# flags query functions ">
-<A NAME="DOC.1.5.28.1.6">
+<A NAME="DOC.1.4.28.1.6">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> <TT>DjVuFile</TT> flags query functions </B></TT>
 <DL><DT><DD></DL><P><DL>
 
 <A NAME="get_flags">
-<A NAME="DOC.1.5.28.1.6.1">
+<A NAME="DOC.1.4.28.1.6.1">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>long get_flags(void) const </B></TT>
 <DD>Returns the <TT>DjVuFile</TT> flags. The value returned is the
 result of ORing one or more of the following constants:
@@ -460,7 +460,7 @@ result of ORing one or more of the following constants:
 <LI> <TT>DECODE_OK</TT> The decoding has finished successfully
 <LI> <TT>DECODE_FAILED</TT> The decoding has failed
 <LI> <TT>DECODE_STOPPED</TT> The decoding has been stopped by
-<!1><A HREF="DjVuFile.html#DOC.1.5.28.1.7.2">stop_decode</A>() function
+<!1><A HREF="DjVuFile.html#DOC.1.4.28.1.7.2">stop_decode</A>() function
 <LI> <TT>DATA_PRESENT</TT> All data for this file has been received.
 It's especially important in the case of Netscape or IE
 plugins when the data is being received while the
@@ -470,69 +470,69 @@ for all included file has been received.
 <LI> <TT>INCL_FILES_CREATED</TT> All <TT>INCL</TT> and <TT>INCF</TT> chunks have been
 processed and the corresponding <TT>DjVuFile</TT>s created. This
 is important to know to be sure that the list returned by
-<!1><A HREF="DjVuFile.html#DOC.1.5.28.1.8">get_included_files</A>() is OK.
+<!1><A HREF="DjVuFile.html#DOC.1.4.28.1.8">get_included_files</A>() is OK.
 </UL> 
 <DL><DT><DD></DL><P>
 <A NAME="is_decoding">
-<A NAME="DOC.1.5.28.1.6.5">
+<A NAME="DOC.1.4.28.1.6.5">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>bool is_decoding(void) const </B></TT>
 <DD>Returns <TT>TRUE</TT> if the file is being decoded.
 <DL><DT><DD></DL><P>
 <A NAME="is_decode_ok">
-<A NAME="DOC.1.5.28.1.6.6">
+<A NAME="DOC.1.4.28.1.6.6">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>bool is_decode_ok(void) const </B></TT>
 <DD>Returns <TT>TRUE</TT> if decoding of the file has finished successfully.
 <DL><DT><DD></DL><P>
 <A NAME="is_decode_failed">
-<A NAME="DOC.1.5.28.1.6.7">
+<A NAME="DOC.1.4.28.1.6.7">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>bool is_decode_failed(void) const </B></TT>
 <DD>Returns <TT>TRUE</TT> if decoding of the file has failed.
 <DL><DT><DD></DL><P>
 <A NAME="is_decode_stopped">
-<A NAME="DOC.1.5.28.1.6.2">
+<A NAME="DOC.1.4.28.1.6.2">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>bool is_decode_stopped(void) const </B></TT>
 <DD>Returns <TT>TRUE</TT> if decoding of the file has been stopped by
-<!1><A HREF="DjVuFile.html#DOC.1.5.28.1.7.2">stop_decode</A>() function. 
+<!1><A HREF="DjVuFile.html#DOC.1.4.28.1.7.2">stop_decode</A>() function. 
 <DL><DT><DD></DL><P>
 <A NAME="is_data_present">
-<A NAME="DOC.1.5.28.1.6.8">
+<A NAME="DOC.1.4.28.1.6.8">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>bool is_data_present(void) const </B></TT>
 <DD>Returns <TT>TRUE</TT> if this file has received all data.
 <DL><DT><DD></DL><P>
 <A NAME="is_all_data_present">
-<A NAME="DOC.1.5.28.1.6.3">
+<A NAME="DOC.1.4.28.1.6.3">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>bool is_all_data_present(void) const </B></TT>
 <DD>Returns <TT>TRUE</TT> if this file <B>and</B> all included files have
 received all data. 
 <DL><DT><DD></DL><P>
 <A NAME="are_incl_files_created">
-<A NAME="DOC.1.5.28.1.6.4">
+<A NAME="DOC.1.4.28.1.6.4">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>bool are_incl_files_created(void) const </B></TT>
 <DD>Returns <TT>TRUE</TT> if all included files have been created. Only when
-this function returns 1, the <!1><A HREF="DjVuFile.html#DOC.1.5.28.1.8">get_included_files</A>() returns
+this function returns 1, the <!1><A HREF="DjVuFile.html#DOC.1.4.28.1.8">get_included_files</A>() returns
 the correct information. 
 <DL><DT><DD></DL><P></DL>
 
 <A NAME="get_url">
-<A NAME="DOC.1.5.28.1.17">
+<A NAME="DOC.1.4.28.1.17">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GURL.html">GURL</A> get_url(void) const </B></TT>
 <DD>Returns the URL assigned to this file
 <DL><DT><DD></DL><P>
 <A NAME="Decode control routines ">
-<A NAME="DOC.1.5.28.1.7">
+<A NAME="DOC.1.4.28.1.7">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> Decode control routines </B></TT>
 <DL><DT><DD></DL><P><DL>
 
 <A NAME="start_decode">
-<A NAME="DOC.1.5.28.1.7.1">
+<A NAME="DOC.1.4.28.1.7.1">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void start_decode(void)</B></TT>
 <DD>Starts decode. If threads are enabled, the decoding will be
-done in another thread. Be sure to use <!1><A HREF="DjVuFile.html#DOC.1.5.28.1.7.4">wait_for_finish</A>()
+done in another thread. Be sure to use <!1><A HREF="DjVuFile.html#DOC.1.4.28.1.7.4">wait_for_finish</A>()
 or listen for notifications sent through the <!1><A HREF="DjVuPortcaster.html">DjVuPortcaster</A>
 to remain in sync. 
 <DL><DT><DD></DL><P>
 <A NAME="stop_decode">
-<A NAME="DOC.1.5.28.1.7.2">
+<A NAME="DOC.1.4.28.1.7.2">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void stop_decode(bool sync)</B></TT>
 <DD>Stops decode. If <TT>sync</TT> is 1 then the function will not return
 until the decoding thread actually dies. Otherwise it will
@@ -540,7 +540,7 @@ just signal the thread to stop and will return immediately.
 Decoding of all included files will be stopped too. 
 <DL><DT><DD></DL><P>
 <A NAME="stop">
-<A NAME="DOC.1.5.28.1.7.3">
+<A NAME="DOC.1.4.28.1.7.3">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void stop(bool only_blocked)</B></TT>
 <DD>Recursively stops all data-related operations.<P>Depending on the value of <TT>only_blocked</TT> flag this works as follows:
 <UL>
@@ -557,31 +557,31 @@ results cannot be undone, and the whole idea is to make all threads
 working with this file exit with the <TT>STOP</TT> exception. 
 <DL><DT><DD></DL><P>
 <A NAME="wait_for_finish">
-<A NAME="DOC.1.5.28.1.7.4">
+<A NAME="DOC.1.4.28.1.7.4">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void wait_for_finish(void)</B></TT>
 <DD>Wait for the decoding to finish. This will wait for the
 termination of included files too. 
 <DL><DT><DD></DL><P>
 <A NAME="decode_ndir">
-<A NAME="DOC.1.5.28.1.7.5">
+<A NAME="DOC.1.4.28.1.7.5">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVuNavDir.html">DjVuNavDir</A>&gt;  decode_ndir(void)</B></TT>
 <DD>Looks for <TT>NDIR</TT> chunk (navigation directory), and decodes its
 contents. If the <TT>NDIR</TT> chunk has not been found in <EM>this</EM> file,
 but this file includes others, the procedure will continue
 recursively. This function is useful to obtain the document
 navigation directory before any page has been decoded. After it
-returns the directory can be obtained by calling <!1><A HREF="DjVuFile.html#DOC.1.5.28.1.5">find_ndir</A>()
-function.<P><B>Warning.</B> Contrary to <!1><A HREF="DjVuFile.html#DOC.1.5.28.1.7.1">start_decode</A>(), this function
+returns the directory can be obtained by calling <!1><A HREF="DjVuFile.html#DOC.1.4.28.1.5">find_ndir</A>()
+function.<P><B>Warning.</B> Contrary to <!1><A HREF="DjVuFile.html#DOC.1.4.28.1.7.1">start_decode</A>(), this function
 does not return before it completely decodes the directory.
 Make sure, that this file and all included files have enough data. 
 <DL><DT><DD></DL><P>
 <A NAME="reset">
-<A NAME="DOC.1.5.28.1.7.7">
+<A NAME="DOC.1.4.28.1.7.7">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void reset(void)</B></TT>
 <DD>Clears all decoded components.
 <DL><DT><DD></DL><P>
 <A NAME="process_incl_chunks">
-<A NAME="DOC.1.5.28.1.7.6">
+<A NAME="DOC.1.4.28.1.7.6">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void process_incl_chunks(void)</B></TT>
 <DD>Processes <TT>INCL</TT> chunks and creates included files.
 Normally you won't need to call this function because included
@@ -593,7 +593,7 @@ if not all data is available.
 <DL><DT><DD></DL><P></DL>
 
 <A NAME="get_included_files">
-<A NAME="DOC.1.5.28.1.8">
+<A NAME="DOC.1.4.28.1.8">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>GPList&lt;<!1><A HREF="DjVuFile.html">DjVuFile</A>&gt;  get_included_files(bool only_created=true)</B></TT>
 <DD>Returns the list of included DjVuFiles.<P><B>Warning.</B> Included files are normally created during decoding.
 Before that they do not exist.   If you call this function at
@@ -605,7 +605,7 @@ which may block your application, if not all data is available.<P>
 just those files, which have already been created during
 the decoding procedure. <BR><DD></DL><P>
 <A NAME="insert_file">
-<A NAME="DOC.1.5.28.1.9">
+<A NAME="DOC.1.4.28.1.9">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void insert_file(const char * id, int chunk_num=1)</B></TT>
 <DD>Includes a <TT>DjVuFile</TT> with the specified
 This function will also insert an <TT>INCL</TT> chunk at position
@@ -613,33 +613,33 @@ This function will also insert an <TT>INCL</TT> chunk at position
 file and will create it before returning. 
 <DL><DT><DD></DL><P>
 <A NAME="unlink_file">
-<A NAME="DOC.1.5.28.1.18">
+<A NAME="DOC.1.4.28.1.18">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void unlink_file(const char * id)</B></TT>
 <DD>Will get rid of included file with the given
 <DL><DT><DD></DL><P>
 <A NAME="unlink_file">
-<A NAME="DOC.1.5.28.1.10">
+<A NAME="DOC.1.4.28.1.10">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DataPool.html">DataPool</A>&gt;  unlink_file(const <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DataPool.html">DataPool</A>&gt; &amp; data, const char * name)</B></TT>
 <DD>Will find an <TT>INCL</TT> chunk containing <TT>name</TT> in input <TT>data</TT> and
 will remove it 
 <DL><DT><DD></DL><P>
 <A NAME="get_chunks_number">
-<A NAME="DOC.1.5.28.1.19">
+<A NAME="DOC.1.4.28.1.19">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int get_chunks_number(void)</B></TT>
 <DD>Returns the number of chunks in the IFF file data
 <DL><DT><DD></DL><P>
 <A NAME="get_chunk_name">
-<A NAME="DOC.1.5.28.1.20">
+<A NAME="DOC.1.4.28.1.20">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GString.html">GString</A> get_chunk_name(int chunk_num)</B></TT>
 <DD>Returns the name of chunk number <TT>chunk_num</TT>
 <DL><DT><DD></DL><P>
 <A NAME="contains_chunk">
-<A NAME="DOC.1.5.28.1.21">
+<A NAME="DOC.1.4.28.1.21">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>bool contains_chunk(const char * chunk_name)</B></TT>
 <DD>Returns 1 if this file contains chunk with name <TT>chunk_name</TT>
 <DL><DT><DD></DL><P>
 <A NAME="get_merged_anno">
-<A NAME="DOC.1.5.28.1.11">
+<A NAME="DOC.1.4.28.1.11">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="ByteStream.html">ByteStream</A>&gt;  get_merged_anno(int * max_level_ptr=0)</B></TT>
 <DD>Processes the included files hierarchy and returns merged
 annotations. This function may be used even when the <TT>DjVuFile</TT>
@@ -649,15 +649,15 @@ gather annotations from them and will return the result.
 If no annotations have been found, <TT>ZERO</TT> will be returned.
 If either this <TT>DjVuFile</TT> or any of the included files do not
 have all the data, the function will use the results of
-decoding, which may have been started with the <!1><A HREF="DjVuFile.html#DOC.1.5.28.1.7.1">start_decode</A>()
+decoding, which may have been started with the <!1><A HREF="DjVuFile.html#DOC.1.4.28.1.7.1">start_decode</A>()
 function. Otherwise <TT>ZERO</TT> will be returned as well.<P>If <TT>max_level_ptr</TT> pointer is not zero, the function will use
 it to store the maximum level number from which annotations
 have been obtained. <TT>ZERO</TT> level corresponds to the top-level
 page file.<P><B>Summary:</B> This function will return complete annotations only
-when the <!1><A HREF="DjVuFile.html#DOC.1.5.28.1.6.3">is_all_data_present</A>() returns <TT>TRUE</TT>. 
+when the <!1><A HREF="DjVuFile.html#DOC.1.4.28.1.6.3">is_all_data_present</A>() returns <TT>TRUE</TT>. 
 <DL><DT><DD></DL><P>
 <A NAME="remove_anno">
-<A NAME="DOC.1.5.28.1.12">
+<A NAME="DOC.1.4.28.1.12">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void remove_anno(void)</B></TT>
 <DD>Goes down the hierarchy of <TT>DjVuFile</TT>s and merges their annotations.<P>
 <DL><DT><DT><B>Parameters:</B><DD><B>max_level_ptr</B> -  If this pointer is not ZERO, the function
@@ -669,7 +669,7 @@ GP&lt;ByteStream&gt;	get_merged_anno(const GList&lt;GURL&gt; &amp; ignore_list,
 int * max_level_ptr);
 /** Clears this file of all annotations. <BR><DD></DL><P>
 <A NAME="contains_anno">
-<A NAME="DOC.1.5.28.1.13">
+<A NAME="DOC.1.4.28.1.13">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>bool contains_anno(void)</B></TT>
 <DD>Returns <TT>TRUE</TT> if the file contains annotation chunks.
 Known annotation chunks at the time of writing this help are:
@@ -677,38 +677,39 @@ Known annotation chunks at the time of writing this help are:
 <B>FORM:ANNO</B>. 
 <DL><DT><DD></DL><P>
 <A NAME="change_text">
-<A NAME="DOC.1.5.28.1.14">
+<A NAME="DOC.1.4.28.1.14">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void change_text(<!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVuTXT.html">DjVuTXT</A>&gt; txt, const bool do_reset)</B></TT>
 <DD>Changes the value of the text annotation. 
 <DL><DT><DD></DL><P>
 <A NAME="Encoding routines ">
-<A NAME="DOC.1.5.28.1.15">
+<A NAME="DOC.1.4.28.1.15">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> Encoding routines </B></TT>
 <DL><DT><DD></DL><P><DL>
 
 <A NAME="get_djvu_bytestream">
-<A NAME="DOC.1.5.28.1.15.1">
+<A NAME="DOC.1.4.28.1.15.1">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="ByteStream.html">ByteStream</A>&gt;  get_djvu_bytestream(bool included_too, bool no_ndir)</B></TT>
 <DD>The main function that encodes data back into binary stream.
 The data returned will reflect possible changes made into the
 chunk structure, annotation chunks and navigation directory
-chunk <TT>NDIR</TT>.<P><B>Note:</B> The file stream will not have the magic <TT>AT&amp;T</TT>
+chunk <TT>NDIR</TT>.<P><B>Note:</B> The file stream will not have the magic
+<TT>0x41,0x54,0x26,0x54</TT>
 at the beginning.<P>
 <DL><DT><DT><B>Parameters:</B><DD><B>included_too</B> -  Process included files too
 <BR><B>no_ndir</B> -  Get rid of <TT>NDIR</TT> chunks. <BR><DD></DL><P>
 <A NAME="get_djvu_data">
-<A NAME="DOC.1.5.28.1.15.2">
+<A NAME="DOC.1.4.28.1.15.2">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DataPool.html">DataPool</A>&gt;  get_djvu_data(bool included_too, bool no_ndir)</B></TT>
-<DD>Same as <!1><A HREF="DjVuFile.html#DOC.1.5.28.1.15.1">get_djvu_bytestream</A>(), returning a DataPool.
+<DD>Same as <!1><A HREF="DjVuFile.html#DOC.1.4.28.1.15.1">get_djvu_bytestream</A>(), returning a DataPool.
 
 <DL><DT><DT><B>Parameters:</B><DD><B>included_too</B> -  Process included files too
 <BR><B>no_ndir</B> -  Get rid of <TT>NDIR</TT> chunks. <BR><DD></DL><P></DL>
 
 <A NAME="set_name">
-<A NAME="DOC.1.5.28.1.16">
+<A NAME="DOC.1.4.28.1.16">
 <DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void set_name(const char * name)</B></TT>
 <DD>Internal. Used by DjVuDocument. The <TT>name</TT> should <B>not</B>
-be encoded with <!1><A HREF="GOS.html#DOC.1.5.10.1.14">encode_reserved</A>(). 
+be encoded with <!1><A HREF="GOS.html#DOC.1.4.10.1.14">encode_reserved</A>(). 
 <DL><DT><DD></DL><P></DL>
 
 <HR><DL><DT><B>This class has no child classes.</B></DL>
@@ -717,7 +718,7 @@ be encoded with <!1><A HREF="GOS.html#DOC.1.5.10.1.14">encode_reserved</A>().
 <!-- This is were the DOC++ footer is defined  -->
 
 <font face="arial,helvetica" size="2">
-<a href=http://www.lizardtech.com>DjVu</a> is a trademark of AT&amp;T.  
+<a href=http://www.lizardtech.com>DjVu</a> is a trademark of LizardTech, Inc.  
 <br>All other products mentioned are registered trademarks or trademarks of
 their respective companies.
 </font>
