@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessage.cpp,v 1.59 2001-06-11 17:10:39 bcr Exp $
+// $Id: DjVuMessage.cpp,v 1.60 2001-06-11 18:26:40 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -408,7 +408,7 @@ DjVuMessage::GetProfilePaths(void)
       appendPath(paths[pos],pathsmap,realpaths);
     }
 #ifndef UNDER_CE
-    for(pos=localepaths;pos;++pos)
+    for(pos=osilocalepaths;pos;++pos)
     {
       appendPath(osilocalepaths[pos],pathsmap,realpaths);
     }

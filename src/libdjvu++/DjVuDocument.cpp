@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocument.cpp,v 1.174 2001-06-05 03:19:57 bcr Exp $
+// $Id: DjVuDocument.cpp,v 1.175 2001-06-11 18:26:40 bcr Exp $
 // $Name:  $
 
 
@@ -455,7 +455,7 @@ DjVuDocument::get_int_prefix(void)
       // file's URL. Please note, that output of this function is used only
       // as name for DjVuPortcaster. Not as a URL.
    GUTF8String retval;
-   return retval.format("document_%p%d?", this, hash(init_url.get_string()));
+   return retval.format("document_%p%d?", this, hash(init_url));
 }
 
 void

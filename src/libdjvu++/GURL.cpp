@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GURL.cpp,v 1.69 2001-06-11 16:20:35 bcr Exp $
+// $Id: GURL.cpp,v 1.70 2001-06-11 18:26:40 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -830,6 +830,27 @@ GURL::base(void) const
      (GUTF8String(xurl,(int)(xslash-url_ptr))+"/"+GUTF8String(ptr,xurl_length-(int)(ptr-url_ptr))+"/" ):
 #endif
      (GUTF8String(xurl,(int)(xslash-url_ptr))+GUTF8String(ptr,xurl_length-(int)(ptr-url_ptr))+"/"));
+}
+
+bool
+GURL::operator==(const GURL & gurl2) const
+{
+  bool retval=true;
+  const GUTF8String g1(get_string());
+  const g1_length=g1.length();
+  const GUTF8String g2(gurl2.get_string());
+  const g2_length=g2.length();
+  if(g1_length == g2_length) // exactly equal
+  {
+	retval=(g1==g2);
+  }else if(g1_length+1 == g2_length) // g1 is g2 with a slash at the end
+  {
+    retval=(g1[g2_length] == '/')&&!g1.cmp(g2,g2_length);
+  }else if(g2_length+1 == g1_length)  // g2 is g1 with a slash at the end
+  {
+    retval=(g2[g1_length] == '/')&&!g2.cmp(g1,g1_length);
+  }
+  return retval;
 }
 
 GUTF8String

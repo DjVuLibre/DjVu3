@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GURL.h,v 1.39 2001-06-09 01:50:17 bcr Exp $
+// $Id: GURL.h,v 1.40 2001-06-11 18:26:40 bcr Exp $
 // $Name:  $
 
 #ifndef _GURL_H_
@@ -49,7 +49,7 @@
     \Ref{GURL} class used to store URLs in a system independent format.
     @memo System independent URL representation.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: GURL.h,v 1.39 2001-06-09 01:50:17 bcr Exp $#
+    @version #$Id: GURL.h,v 1.40 2001-06-11 18:26:40 bcr Exp $#
 */
 
 //@{
@@ -368,21 +368,25 @@ GURL::operator+(const char *xname) const
 #endif
 
 inline bool
-GURL::operator==(const GURL & gurl2) const
-{
-  return (get_string()==gurl2.get_string());
-}
-
-inline bool
 GURL::operator!=(const GURL & gurl2) const
 {
-  return (get_string()!=gurl2.get_string());
+  return !(*this == gurl2);
 }
 
 inline unsigned int
 hash(const GURL & gurl)
 {
-   return hash(gurl.get_string());
+  unsigned int retval;
+  const GUTF8String s(gurl.get_string());
+  const int len=s.length();
+  if(len && (s[len-1] == '/')) // Don't include the trailing slash as part of the hash.
+  {
+	retval=hash(s.substr(0,len-1));
+  }else
+  {
+    retval=hash(s);
+  }
+  return retval;
 }
 
 inline GUTF8String
