@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: DjVuCodec.cpp,v 1.1 1999-01-26 22:54:29 leonb Exp $
+//C-  $Id: DjVuCodec.cpp,v 1.2 1999-01-27 22:08:06 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -129,22 +129,22 @@ DjVuAnno::get_memory_usage() const
 
 
 // ----------------------------------------
-// CLASS DJVUNOTIFIER
+// CLASS DJVUINTERFACE
 
 void 
-DjVuNotifier::notify_chunk(const char *chkid, const char *msg)
+DjVuInterface::notify_chunk(const char *chkid, const char *msg)
 {
   // Noop
 }
 
 void 
-DjVuNotifier::notify_relayout(void)
+DjVuInterface::notify_relayout(void)
 {
   // Noop
 }
 
 void 
-DjVuNotifier::notify_redisplay(void)
+DjVuInterface::notify_redisplay(void)
 {
   // Noop
 }
@@ -269,10 +269,10 @@ DjVuImage::get_long_description() const
 static int
 compute_red(int w, int h, int rw, int rh)
 {
-  for (int red=1; red<=16; red++)
+  for (int red=1; red<16; red++)
     if (((w+red-1)/red==rw) && ((h+red-1)/red==rh))
       return red;
-  return 0;
+  return 16;
 }
 
 int 
@@ -296,21 +296,21 @@ DjVuImage::is_legal_color() const
     if (stencil->get_width()!=width || stencil->get_height()==height)
       return 0;
   // Check background
-  int bgred = -1;
+  int bgred = 0;
   if (bg44)
     bgred = compute_red(width, height, bg44->get_width(), bg44->get_height());
   else if (bgpm)
     bgred = compute_red(width, height,  bgpm->columns(), bgpm->rows());
-  if (bgred==0 || bgred>12)
+  if (bgred>12)
     return 0;
   // Check foreground colors
-  int fgred = -1;
+  int fgred = 0;
   if (fgpm)
     fgred = compute_red(width, height, fgpm->columns(), fgpm->rows());
-  if (fgred==0 || fgred>12)
+  if (fgred>12)
     return 0;
   // Test for pure color image (IW44)
-  if (bgred==1 && stencil==0 && fgred<0)
+  if (bgred==1 && stencil==0 && fgred==0)
     return 1;
   // Test for multilayer color image (DJVU)
   if (stencil && bgred && fgred)
@@ -616,15 +616,121 @@ DjVuImage::get_pixmap(const GRect &rect, int subsample, double gamma) const
 
 //// DJVUIMAGE: RENDERING (ARBITRARY SCALE)
 
+typedef GP<GBitmap>(DjVuImage::*BImager)(const GRect &, int, int) const;
+typedef GP<GPixmap>(DjVuImage::*PImager)(const GRect &, int, double) const;
 
+static GP<GBitmap>
+do_bitmap(const DjVuImage &dimg, BImager get,
+          const GRect &rect, const GRect &all, int align )
+{
+  // Sanity
+  if (! ( all.contains(rect.xmin, rect.ymin) &&
+          all.contains(rect.xmax-1, rect.ymax-1) ))
+    THROW("(DjVuImage::get_pixmap) Illegal target rectangles");
+  // Check for integral reduction
+  int red;
+  int w = dimg.get_width();
+  int h = dimg.get_height();
+  int rw = all.width();
+  int rh = all.height();
+  GRect zrect = rect; 
+  zrect.translate(-all.xmin, -all.ymin);
+  for (red=1; red<=15; red++)
+    if (((w+red-1)/red==rw) && ((h+red-1)/red==rh))
+      return (dimg.*get)(zrect, red, align);
+  // Find best reduction
+  for (red=15; red>1; red--)
+    if ( (rw*red < w && rh*red < h) ||
+         (rw*red*3 < w || rh*red*3 < h) )
+      break;
+  // Setup bitmap scaler
+  GBitmapScaler bs;
+  bs.set_input_size( (w+red-1)/red, (h+red-1)/red );
+  bs.set_output_size( rw, rh );
+  bs.set_horz_ratio( rw*red, w );
+  bs.set_vert_ratio( rh*red, h );
+  // Scale
+  GRect srect;
+  bs.get_input_rect(zrect, srect);
+  GP<GBitmap> sbm = (dimg.*get)(srect, red, 1);
+  if (!sbm) return 0;
+  int border = ((rw + align - 1) & ~(align - 1)) - rw;
+  GP<GBitmap> bm = new GBitmap(rw, rh, border);
+  bs.scale(srect, *sbm, zrect, *bm);
+  return bm;
+}
 
+static GP<GPixmap>
+do_pixmap(const DjVuImage &dimg, PImager get,
+          const GRect &rect, const GRect &all, double gamma=0 )
+{
+  // Sanity
+  if (! ( all.contains(rect.xmin, rect.ymin) &&
+          all.contains(rect.xmax-1, rect.ymax-1) ))
+    THROW("(DjVuImage::get_pixmap) Illegal target rectangles");
+  // Check for integral reduction
+  int red;
+  int w = dimg.get_width();
+  int h = dimg.get_height();
+  int rw = all.width();
+  int rh = all.height();
+  GRect zrect = rect; 
+  zrect.translate(-all.xmin, -all.ymin);
+  for (red=1; red<=15; red++)
+    if (((w+red-1)/red==rw) && ((h+red-1)/red==rh))
+      return (dimg.*get)(zrect, red, gamma);
+  // These reductions usually go faster (improve!)
+  static int fastred[] = { 12,6,4,3,2,1 };
+  // Find best reduction
+  for (int i=0; (red=fastred[i])>1; i++)
+    if ( (rw*red < w && rh*red < h) ||
+         (rw*red*3 < w || rh*red*3 < h) )
+      break;
+  // Setup pixmap scaler
+  GPixmapScaler ps;
+  ps.set_input_size( (w+red-1)/red, (h+red-1)/red );
+  ps.set_output_size( rw, rh );
+  ps.set_horz_ratio( rw*red, w );
+  ps.set_vert_ratio( rh*red, h );
+  // Scale
+  GRect srect;
+  ps.get_input_rect(zrect, srect);
+  GP<GPixmap> spm = (dimg.*get)(srect, red, gamma);
+  if (!spm) return 0;
+  GP<GPixmap> pm = new GPixmap;
+  ps.scale(srect, *spm, zrect, *pm);
+  return pm;
+}
 
+GP<GPixmap>  
+DjVuImage::get_pixmap(const GRect &rect, const GRect &all, double gamma=0) const
+{
+  return do_pixmap(*this, & DjVuImage::get_pixmap, rect, all, gamma);
+}
+
+GP<GBitmap>  
+DjVuImage::get_bitmap(const GRect &rect, const GRect &all, int align = 1) const
+{
+  return do_bitmap(*this, & DjVuImage::get_bitmap, rect, all, align);
+}
+
+GP<GPixmap>  
+DjVuImage::get_bg_pixmap(const GRect &rect, const GRect &all, double gamma=0) const
+{
+  return do_pixmap(*this, & DjVuImage::get_bg_pixmap, rect, all, gamma);
+}
+
+GP<GPixmap>  
+DjVuImage::get_fg_pixmap(const GRect &rect, const GRect &all, double gamma=0) const
+{
+  return do_pixmap(*this, & DjVuImage::get_fg_pixmap, rect, all, gamma);
+}
 
 
 //// DJVUIMAGE: DECODING
 
 void
-DjVuImage::decode(ByteStream &bs, DjVuNotifier *notifier)
+DjVuImage::decode(ByteStream &bs, DjVuInterface *notifier)
 {
   // Reset everything
   init();

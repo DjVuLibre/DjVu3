@@ -8,7 +8,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: DjVuCodec.h,v 1.1 1999-01-26 22:54:29 leonb Exp $
+//C-  $Id: DjVuCodec.h,v 1.2 1999-01-27 22:08:06 leonb Exp $
 
 #ifndef _DEJAVUCODEC_H
 #define _DEJAVUCODEC_H
@@ -34,7 +34,7 @@
    @author
    Leon Bottou <leonb@research.att.com>
    @version
-   #$Id: DjVuCodec.h,v 1.1 1999-01-26 22:54:29 leonb Exp $# */
+   #$Id: DjVuCodec.h,v 1.2 1999-01-27 22:08:06 leonb Exp $# */
 //@{
 
 
@@ -124,7 +124,7 @@ private:
 
 /** Decoder progress notifier.
  */
-class DjVuNotifier
+class DjVuInterface
 {
 public:
   /** This function is called after decoding each chunk.  
@@ -165,7 +165,7 @@ public:
   GString get_short_description() const;
   GString get_long_description() const;
   // DECODING
-  void decode(ByteStream &bs, DjVuNotifier *notifier=0);
+  void decode(ByteStream &bs, DjVuInterface *notifier=0);
   // CHECKING 
   int is_legal_color() const;
   int is_legal_bilevel() const;
@@ -182,7 +182,6 @@ public:
 private:
   // HELPERS
   int apply_stencil(GPixmap *pm, const GRect &rect, int subsample, double gamma) const;
-  void describe(const char *chkid, const char *fmt, ...);
   // COMPONENTS
   GP<DjVuInfo> info;
   GP<DjVuAnno> anno;
