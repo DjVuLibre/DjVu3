@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.58 1999-09-20 22:07:12 eaf Exp $
+//C- $Id: DjVuFile.cpp,v 1.59 1999-09-22 19:35:52 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -1288,7 +1288,7 @@ DjVuFile::add_djvu_data(IFFByteStream & ostr, GMap<GURL, void *> & map,
    if (top_level) ostr.close_chunk();
 }
 
-TArray<char>
+GP<DataPool>
 DjVuFile::get_djvu_data(bool included_too, bool no_ndir)
 {
    check();
@@ -1302,5 +1302,7 @@ DjVuFile::get_djvu_data(bool included_too, bool no_ndir)
 
    add_djvu_data(iff, map, included_too, no_ndir);
 
-   return str.get_data();
+   iff.flush();
+   str.seek(0, SEEK_SET);
+   return new DataPool(str);
 }
