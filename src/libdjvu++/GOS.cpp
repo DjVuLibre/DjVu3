@@ -9,9 +9,9 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GOS.cpp,v 1.21 2000-01-24 22:54:36 eaf Exp $
+//C- $Id: GOS.cpp,v 1.22 2000-01-26 16:44:05 praveen Exp $
 
-// "$Id: GOS.cpp,v 1.21 2000-01-24 22:54:36 eaf Exp $"
+// "$Id: GOS.cpp,v 1.22 2000-01-26 16:44:05 praveen Exp $"
 
 #ifdef __GNUC__
 #pragma implementation
@@ -1012,7 +1012,7 @@ GOS::encode_reserved(const char * filename)
       if ((*ptr>='a' && *ptr<='z') ||
 	  (*ptr>='A' && *ptr<='Z') ||
 	  (*ptr>='0' && *ptr<='9') ||
-	  (strchr("$-_.+!*'(),:", *ptr)))	// Added : because of windows!
+	  (strchr("%$-_.+!*'(),:", *ptr)))	// Added : because of windows!
 	 res+=*ptr;
       else
       {
