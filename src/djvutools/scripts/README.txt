@@ -16,9 +16,9 @@
     1. README.txt       - This file.
     2. build-gnu-gs.sh  - shell script to build Ghostscript
     3. pdftodjvu.sh     - shell script to convert PS and PDF files 
-			  to DjVu                      
+                          to DjVu                      
     4. pstodjvu.sh      - shell script to convert PS and PDF files
-			  to Djvu
+                          to Djvu
 
 -------------------------------------------------------------------
    II Installation instructions 
@@ -27,10 +27,10 @@ Perform the following procedure to install the PDF/PS to DjVu
 utilities.  
  
 Step 1:
-        Download the pdftodjvu303.tar.gz
+        Download the pdftodjvu304.tar.gz
 Step 2:
-        Untar and unzip the pdftodjvu303.tar.gz file:
-                gunzip -c < pdftodjvu303.tar.gz|tar xvvf -
+        Untar and unzip the pdftodjvu304.tar.gz file:
+                gunzip -c < pdftodjvu304.tar.gz|tar xvvf -
               
 Step 3: Verify that if you have Ghostscript version 5.50 installed,
         with the command:
@@ -45,9 +45,8 @@ Step 3: Verify that if you have Ghostscript version 5.50 installed,
                 gnu-gs-fonts-std-5.50.tar.gz
         
         GNU Ghostscript Source can also be obtained from the following
-        locations:
+        location:
                 http://www.cs.wisc.edu/~ghost
-		http://www.aladdin.com/
 
 Step 4:
         Install either DjVu Enterprise 3.1 for Linux (purchased from
@@ -59,6 +58,11 @@ Step 4:
 Step 5:
         Execute the build-gnu-gs.sh script:
                 ./build-gnu-gs.sh
+
+        Note: Under Linux, before running ./build-gnu-gs.sh check that 
+        /usr/X11 exists.  If not, create /usr/X11 with the command:
+        	ln -s /usr/X11R6 /usr/X11
+
         This script will extract the source and build Ghostscript.
         This script will also create an install.sh script.
 
@@ -92,7 +96,7 @@ DjVu Enterprise
 
     Indirect output
         ./pdftodjvu.sh --profile=[profilename] [documenttodjvu options] \
-	    [--best] <inputfile> <outputdir>
+            [--best] <inputfile> <outputdir>
 
 Note: "--profile=clean300" is recommended for most documents with photos or
 other complicated graphics.  "--free" is recommended for documents that are
@@ -122,15 +126,15 @@ Unauthorized use is prohibited by law.
 The PDF/PS to DjVu utility is made available by LizardTech 
 subject to the GNU General Public License, the text of which follows:
 
-		    GNU GENERAL PUBLIC LICENSE
-		       Version 2, June 1991
+                    GNU GENERAL PUBLIC LICENSE
+                       Version 2, June 1991
 
  Copyright (C) 1989, 1991 Free Software Foundation, Inc.
                        59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  Everyone is permitted to copy and distribute verbatim copies
  of this license document, but changing it is not allowed.
 
-			    Preamble
+                            Preamble
 
   The licenses for most software are designed to take away your
 freedom to share and change it.  By contrast, the GNU General Public
@@ -180,7 +184,7 @@ patent must be licensed for everyone's free use or not licensed at all.
   The precise terms and conditions for copying, distribution and
 modification follow.
 
-		    GNU GENERAL PUBLIC LICENSE
+                    GNU GENERAL PUBLIC LICENSE
    TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
 
   0. This License applies to any program or other work which contains
@@ -379,7 +383,7 @@ make exceptions for this.  Our decision will be guided by the two goals
 of preserving the free status of all derivatives of our free software and
 of promoting the sharing and reuse of software generally.
 
-			    NO WARRANTY
+                            NO WARRANTY
 
   11. BECAUSE THE PROGRAM IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
 FOR THE PROGRAM, TO THE EXTENT PERMITTED BY APPLICABLE LAW.  EXCEPT WHEN
@@ -401,4 +405,4 @@ YOU OR THIRD PARTIES OR A FAILURE OF THE PROGRAM TO OPERATE WITH ANY OTHER
 PROGRAMS), EVEN IF SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGES.
 
-		     END OF TERMS AND CONDITIONS
+                     END OF TERMS AND CONDITIONS
