@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qd_viewer.cpp,v 1.7 2001-07-26 20:42:08 mchen Exp $
+// $Id: qd_viewer.cpp,v 1.8 2001-08-02 23:56:51 mchen Exp $
 // $Name:  $
 
 
@@ -1044,14 +1044,15 @@ QDViewer::getURL(const GUTF8String &url_in, const GUTF8String &target)
       }
    } else
    {
+      // url protocol testing fails for the relative 
 	 // See if it's relative
-      try
-      {
-	 url=GURL::UTF8(url_in);
-      } catch(...) {}
+//        try
+//        {
+//  	     url=GURL::UTF8(url_in);
+//        } catch(...) {}
 
-      if (url.is_empty())
-	 url=GURL::UTF8(url_in,dimg->get_djvu_file()->get_url().base());
+//        if (url.is_empty())
+      url=GURL::UTF8(url_in,dimg->get_djvu_file()->get_url().base());
    }
 
    if (!url.is_empty())
