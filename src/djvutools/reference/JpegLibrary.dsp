@@ -28,7 +28,7 @@ CFG=JpegLibrary - Win32 Debug
 
 !IF  "$(CFG)" == "JpegLibrary - Win32 Release"
 
-# PROP BASE Use_MFC
+# PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 0
 # PROP BASE Output_Dir "Release"
 # PROP BASE Intermediate_Dir "Release"
@@ -37,11 +37,11 @@ CFG=JpegLibrary - Win32 Debug
 # PROP BASE Target_File "JpegLibrary.exe"
 # PROP BASE Bsc_Name "JpegLibrary.bsc"
 # PROP BASE Target_Dir ""
-# PROP Use_MFC
+# PROP Use_MFC 0
 # PROP Use_Debug_Libraries 0
 # PROP Output_Dir "Release"
 # PROP Intermediate_Dir "Release"
-# PROP Cmd_Line "cd .. && msdev djvutools.dsw /MAKE "libjpeg - Win32 Release""
+# PROP Cmd_Line "build.bat "libjpeg - Win32 Release" "dummyjpeg - Win32 Release""
 # PROP Rebuild_Opt "/REBUILD"
 # PROP Target_File "../../../Release/lib/libjpeg.lib"
 # PROP Bsc_Name ""
@@ -49,7 +49,7 @@ CFG=JpegLibrary - Win32 Debug
 
 !ELSEIF  "$(CFG)" == "JpegLibrary - Win32 Debug"
 
-# PROP BASE Use_MFC
+# PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 1
 # PROP BASE Output_Dir "JpegLibrary___Win32_Debug"
 # PROP BASE Intermediate_Dir "JpegLibrary___Win32_Debug"
@@ -58,11 +58,11 @@ CFG=JpegLibrary - Win32 Debug
 # PROP BASE Target_File "JpegLibrary.exe"
 # PROP BASE Bsc_Name "JpegLibrary.bsc"
 # PROP BASE Target_Dir ""
-# PROP Use_MFC
+# PROP Use_MFC 0
 # PROP Use_Debug_Libraries 1
 # PROP Output_Dir "JpegLibrary___Win32_Debug"
 # PROP Intermediate_Dir "JpegLibrary___Win32_Debug"
-# PROP Cmd_Line "cd .. && msdev djvutools.dsw /MAKE "libjpeg - Win32 Debug""
+# PROP Cmd_Line "build.bat "libjpeg - Win32 Debug" "dummyjpeg - Win32 Debug""
 # PROP Rebuild_Opt "/REBUILD"
 # PROP Target_File "../../../Debug/lib/libjpeg.lib"
 # PROP Bsc_Name ""

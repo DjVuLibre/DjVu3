@@ -41,7 +41,7 @@ CFG=ReferenceLibrary - Win32 Debug
 # PROP Use_Debug_Libraries 0
 # PROP Output_Dir "Release"
 # PROP Intermediate_Dir "Release"
-# PROP Cmd_Line "cd .. && msdev djvutools.dsw /MAKE "libdjvu - Win32 Release""
+# PROP Cmd_Line "build.bat "libdjvu - Win32 Release" "libdjvu - Win32 Release""
 # PROP Rebuild_Opt "/REBUILD"
 # PROP Target_File "../../../Release/lib/libdjvu.lib"
 # PROP Bsc_Name ""
@@ -62,7 +62,7 @@ CFG=ReferenceLibrary - Win32 Debug
 # PROP Use_Debug_Libraries 1
 # PROP Output_Dir "ReferenceLibrary___Win32_Debug"
 # PROP Intermediate_Dir "ReferenceLibrary___Win32_Debug"
-# PROP Cmd_Line "cd .. && msdev djvutools.dsw /MAKE "libdjvu - Win32 Debug""
+# PROP Cmd_Line "build.bat "libdjvu - Win32 Debug" "libdjvu - Win32 Debug""
 # PROP Rebuild_Opt "/REBUILD"
 # PROP Target_File "../../../Debug/lib/libdjvu.lib"
 # PROP Bsc_Name ""
