@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: parseoptions.cpp,v 1.28 2000-01-25 05:56:20 bcr Exp $
+//C- $Id: parseoptions.cpp,v 1.29 2000-01-27 23:36:28 bcr Exp $
 #ifdef __GNUC__
 #pragma implementation
 #endif
@@ -156,11 +156,10 @@ djvu_parse_configfile(struct djvu_parse opts,const char *name,int which)
 // times.
 //
 // Simple constructor
-DjVuParseOptions::DjVuParseOptions 
-(const char prog[])
+DjVuParseOptions::DjVuParseOptions(const char prog[])
 : argc(0),argv(0),optind(0)
 {
-	filename = 0;
+  filename = 0;
   VarTokens=new DjVuTokenList;
   ProfileTokens=new DjVuTokenList;
   Configuration=new ProfileList;
@@ -188,27 +187,8 @@ DjVuParseOptions::DjVuParseOptions
   currentProfile=ReadConfig(name);
 }
 
-#if 0
-DjVuParseOptions::DjVuParseOptions()
-: argc(0),argv(0),optind(0)
-{
-	filename = 0;
-  VarTokens=new DjVuTokenList;
-  ProfileTokens=new DjVuTokenList;
-  Configuration=new ProfileList;
-  Arguments=new Profiles;
-  Errors=new ErrorList;
-  name=new char[1];
-  name[0]=0;
-  filename=0;
-  name=new char [sizeof(default_string)];
-  strcpy(name,default_string));
-  currentProfile=defaultProfile=ReadConfig(default_string);
-}
-#endif
-
-DjVuParseOptions::DjVuParseOptions 
-(const char readfilename[],const char readasprofile[],DjVuTokenList *Vars)
+DjVuParseOptions::DjVuParseOptions (
+  const char readfilename[],const char readasprofile[],DjVuTokenList *Vars)
 : argc(0),argv(0),optind(0)
 {
   if(Vars)
@@ -288,8 +268,8 @@ DjVuParseOptions::~DjVuParseOptions()
 // to make's -f option.
 //
 void
-DjVuParseOptions::init
-(const char readfilename[],const char readasprofile[])
+DjVuParseOptions::init(
+  const char readfilename[],const char readasprofile[])
 {
   DjVuParseOptions tmp(readfilename,readasprofile,VarTokens);
 
@@ -683,8 +663,8 @@ DjVuParseOptions::Add
 // while it is still being read.
 //
 int
-DjVuParseOptions::ReadConfig
-(const char prog[],const char readasprofile[])
+DjVuParseOptions::ReadConfig(const char prog[],
+  const char readasprofile[])
 {
 #ifdef THREADMODEL
 #if THREADMODEL!=NOTHREADS
@@ -721,7 +701,7 @@ DjVuParseOptions::ReadConfig
     xname=xname?(xname+1):prog;
 
     retval=ProfileTokens->GetToken(xname);
-	// First check and see if we have already read in this profile.
+  // First check and see if we have already read in this profile.
     if(retval < 0)
     {
       retval=ProfileTokens->SetToken(xname);
@@ -755,7 +735,7 @@ DjVuParseOptions::ReadNextConfig
   if(profile<0)
   {
     profile=ProfileTokens->SetToken(xname);
-	// First check and see if we have already read in this profile.
+  // First check and see if we have already read in this profile.
     (void)(Configuration->Grow(profile+1));
     Configuration->Add(profile,VarTokens->SetToken("profile:"),"read");
     ReadFile(line,f,profile);
@@ -795,8 +775,7 @@ DjVuParseOptions::ReadNextConfig
 //  that only sets variable names.
 
 void
-DjVuParseOptions::ReadFile
-(int &line,FILE *f,const int profile)
+DjVuParseOptions::ReadFile(int &line,FILE *f,const int profile)
 {
   int c;
   char *value=new char[local_bufsize];
@@ -845,7 +824,7 @@ DjVuParseOptions::ReadFile
           switch(state)
           {
             case READ_HEAD:
-  	      if(isalpha(c))
+          if(isalpha(c))
               {
                 state=READ_NAME;
                 (s++)[0]=c;
@@ -865,7 +844,11 @@ DjVuParseOptions::ReadFile
               if(s==value_end) break;
               s[0]=0; // Mark the end of the variable name.
                 // Skip spaces...
-              for(;(c!=EOF)&&isspace(c);c=getc(f)) {if(c=='\n') line++;}
+              for(;(c!=EOF)&&isspace(c);c=getc(f))
+              { 
+                if(c=='\n')
+                  line++;
+              }
                 // Test the first non-space value.
               switch(c)
               {
@@ -960,7 +943,8 @@ DjVuParseOptions::ReadFile
                 case '\t':
                     // If there are no quotes, we only keep one space
                     // and even that is never at the end of the line.
-                  if(s != (s_end+1)) {
+                  if(s != (s_end+1))
+                  {
                     s_end=s;
                     (s++)[0]=' ';
                   }
@@ -1111,7 +1095,8 @@ DjVuParseOptions::ProfileList::Grow
   {
     Profiles *NewProfiles=new Profiles[newsize];
     int i;
-    for(i=0;i<size;i++) {
+    for(i=0;i<size;i++)
+    {
       NewProfiles[i].size=profiles[i].size;
       NewProfiles[i].values=profiles[i].values;
     }
@@ -1119,7 +1104,8 @@ DjVuParseOptions::ProfileList::Grow
     const int oldsize=size;
     profiles=NewProfiles;
     size=newsize;
-    for(i=0;i<oldsize;i++) {
+    for(i=0;i<oldsize;i++)
+    {
       OldProfiles[i].values=0,
       OldProfiles[i].size=0;
     }
@@ -1170,7 +1156,8 @@ DjVuParseOptions::ProfileList::Add
 }
 
 #ifdef WIN32
-LPSTR RegOpenReadConfig ( HKEY hParentKey) {
+LPSTR RegOpenReadConfig ( HKEY hParentKey )
+{
 
   LPCSTR szSoftware = "Software";
   LPCSTR szCompany =  "AT&T";
@@ -1183,31 +1170,38 @@ LPSTR RegOpenReadConfig ( HKEY hParentKey) {
   HKEY hProfilePathKey = NULL;
 
   if (RegOpenKeyEx(hParentKey, szSoftware, 0,
-                    KEY_READ, &hSoftwareKey) == ERROR_SUCCESS )
+              KEY_READ, &hSoftwareKey) == ERROR_SUCCESS )
+  {
     if (RegOpenKeyEx(hSoftwareKey, szCompany, 0,
-                      KEY_READ, &hCompanyKey) == ERROR_SUCCESS )
+                KEY_READ, &hCompanyKey) == ERROR_SUCCESS )
+    {
       if (RegOpenKeyEx(hCompanyKey, szProduct, 0,
-		                KEY_READ, &hProductKey) == ERROR_SUCCESS )
+                  KEY_READ, &hProductKey) == ERROR_SUCCESS )
+      {
         if (RegOpenKeyEx(hProductKey, szProfilePath, 0,
-		                  KEY_READ, &hProfilePathKey) == ERROR_SUCCESS )
+                    KEY_READ, &hProfilePathKey) == ERROR_SUCCESS )
         {
           // Success
           LPSTR szPathValue = new char[100];
-		  LPCSTR lpszEntry = "";
+          LPCSTR lpszEntry = "";
           DWORD dwCount = 100;
-		  DWORD dwType;
+          DWORD dwType;
           LONG lResult = RegQueryValueEx(hProfilePathKey, lpszEntry, NULL,
-		                   &dwType, (LPBYTE) szPathValue, &dwCount);
-		  RegCloseKey(hSoftwareKey);
+                     &dwType, (LPBYTE) szPathValue, &dwCount);
+          RegCloseKey(hSoftwareKey);
           RegCloseKey(hCompanyKey) ;
           RegCloseKey(hProductKey);
           RegCloseKey(hProfilePathKey);
-		  
-		  if ( (lResult == ERROR_SUCCESS) && (dwType == REG_SZ)) {
-			  return szPathValue ;
-		  }
+      
+          if ( (lResult == ERROR_SUCCESS) && (dwType == REG_SZ))
+          {
+            return szPathValue ;
+          }
           return 0;
         }
+      }
+    }
+  }
 
   if (hSoftwareKey) RegCloseKey(hSoftwareKey);
   if (hCompanyKey)  RegCloseKey(hCompanyKey); 
@@ -1288,21 +1282,22 @@ DjVuParseOptions::ConfigFilename
   return retval;
 #else
 
-	char * root;
-	int rootlen;
+  char * root;
+  int rootlen;
 
-	const char *retval=0;
-	const char *this_config=config[0]?config:default_string;
+  const char *retval=0;
+  const char *this_config=config[0]?config:default_string;
 
-	if ( filename ) {
-  	delete [] filename;
-  	filename=0;
-	}
+  if ( filename )
+  {
+    delete [] filename;
+    filename=0;
+  }
 
     if (level == 0 ) 
-		root = (char *) RegOpenReadConfig (HKEY_CURRENT_USER);
-	else
-		root = (char *) RegOpenReadConfig (HKEY_LOCAL_MACHINE);
+    root = (char *) RegOpenReadConfig (HKEY_CURRENT_USER);
+  else
+    root = (char *) RegOpenReadConfig (HKEY_LOCAL_MACHINE);
     if( !root )
     {
         char *defl="c:\\";
@@ -1310,25 +1305,26 @@ DjVuParseOptions::ConfigFilename
         strcpy(filename, defl);
         return retval;
     }
-	if (root && root[0]) {
-		rootlen = strlen(root);
-		retval=filename=new char [rootlen+strlen(this_config)+sizeof(ConfigExt)+1];
-		strcpy(filename,root);
-		strcat(filename, "\\");
-		strcat(filename,this_config);
-		strcat(filename,ConfigExt);
-		return retval;        
-	} else {
+    if (root && root[0])
+    {
+    rootlen = strlen(root);
+    retval=filename=new char [rootlen+strlen(this_config)+sizeof(ConfigExt)+1];
+    strcpy(filename,root);
+    strcat(filename, "\\");
+    strcat(filename,this_config);
+    strcat(filename,ConfigExt);
+    return retval;        
+  } else {
         const char emsg[]="SDK not installed properly, please install it again.\n";
         char *s=new char [sizeof(emsg)];
         sprintf(s,emsg);
         Errors->AddError(s);
         delete [] s;
-		char tempfilename[] = "/windows/djvu";
-		filename = new char[sizeof(tempfilename)];
-		strcpy ( filename, tempfilename);
-		return (retval = filename);
-	}
+    char tempfilename[] = "/windows/djvu";
+    filename = new char[sizeof(tempfilename)];
+    strcpy ( filename, tempfilename);
+    return (retval = filename);
+  }
 #endif
 }
 
@@ -1457,9 +1453,9 @@ DjVuParseOptions::GetOpt::GetOpt
 
 // We don't use the system getopt_long, because some versions of getopt_long
 // will interpret 
-// 	-r180
+//   -r180
 // as
-//	-1 -r 80
+//  -1 -r 80
 // This is too confusing to the user, and since it varies system to system.
 // We couldn't even document it correctly in the manual page.
 //
@@ -1484,8 +1480,8 @@ DjVuParseOptions::GetOpt::getopt_long()
       }else
       {
         nextchar=1;
-	if((++optind >= argc)||(argv[optind][0] != '-'))
-	  return -1;
+  if((++optind >= argc)||(argv[optind][0] != '-'))
+    return -1;
       }
     }
   }while(! argv[optind][nextchar]);
@@ -1524,8 +1520,8 @@ DjVuParseOptions::GetOpt::getopt_long()
       const char *ss=opts->name;
       s=strlen(opts->name);
       if(!strncmp(ss,argv[optind]+nextchar,s)
-        &&(argv[optind][nextchar+s] == '=')
-      ) {
+        &&(argv[optind][nextchar+s] == '='))
+      {
         if(opts->has_arg)
           optarg=argv[optind]+nextchar+1+s;
         optind++;
@@ -1647,16 +1643,16 @@ DjVuTokenList::SetToken
   if((retval=GetToken(name))<0)
   {
     const int MinGuess=(-1-retval);
-	// Allocate a larger buffer, if needed.
+  // Allocate a larger buffer, if needed.
     if(NextToken == ListSize)
     {
       Entries *NewEntry=new Entries[(ListSize+=inc_size)];
-	// Copy the lower entries.
+  // Copy the lower entries.
       if(MinGuess)
       {
         memcpy(NewEntry,Entry,sizeof(Entries)*MinGuess);
       }
-	// Copy the upper entries.
+  // Copy the upper entries.
       if(MinGuess<NextToken)
       {
         memcpy(&(NewEntry[MinGuess+1]),&(Entry[MinGuess]),sizeof(Entries)*(NextToken-MinGuess));
