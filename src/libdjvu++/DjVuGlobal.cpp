@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuGlobal.cpp,v 1.36.2.1 2001-10-23 21:16:44 leonb Exp $
+// $Id: DjVuGlobal.cpp,v 1.36.2.2 2001-10-23 21:20:16 leonb Exp $
 // $Name:  $
 
 #ifdef __GNUG__
@@ -88,7 +88,7 @@ DjVuProgressTask::set_callback(djvu_progress_callback *_callback)
   djvu_progress_callback *retval=0;
   if(_callback)
   {
-    GMap<void *,GP<DjVuProgressTask::Data> > &map=get_map();
+    GPMap<void *,DjVuProgressTask::Data> &map=get_map();
     void *threadID=GThread::current();
     if(map.contains(threadID))
     {
@@ -104,7 +104,7 @@ DjVuProgressTask::set_callback(djvu_progress_callback *_callback)
     }
   }else
   {
-    GMap<void *,GP<DjVuProgressTask::Data> > &map=get_map();
+    GPMap<void *,DjVuProgressTask::Data> &map=get_map();
     void *threadID=GThread::current();
     if(map.contains(threadID))
     {
@@ -125,7 +125,7 @@ DjVuProgressTask::DjVuProgressTask(const char *xtask,int nsteps)
 {
   //  gtask=task;
   {
-    GMap<void *,GP<DjVuProgressTask::Data> > &map=get_map();
+    GPMap<void *,DjVuProgressTask::Data> &map=get_map();
     void *threadID=GThread::current();
     if(map.contains(threadID))
     {
